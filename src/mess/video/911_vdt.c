@@ -180,7 +180,7 @@ static void apply_char_overrides(int nb_char_overrides, const char_override_t ch
 void vdt911_init(running_machine *machine)
 {
 	UINT8 *base;
-	UINT8 *chr = memory_region(machine, vdt911_chr_region);
+	UINT8 *chr = machine->region(vdt911_chr_region)->base();
 
 	memset(vdt, 0, sizeof(vdt));
 

@@ -20,7 +20,7 @@ VIDEO_UPDATE( llc1 )
 	llc_state *state = screen->machine->driver_data<llc_state>();
 	UINT8 code,disp;
 	int y, x, b,c,inv;
-	UINT8 *gfx = memory_region(screen->machine, "gfx1");
+	UINT8 *gfx = screen->machine->region("gfx1")->base();
 
 	for (x = 0; x < 64; x++)
 	{
@@ -52,7 +52,7 @@ VIDEO_UPDATE( llc2 )
 	llc_state *state = screen->machine->driver_data<llc_state>();
 	UINT8 code,disp;
 	int y, x, b,c;
-	UINT8 *gfx = memory_region(screen->machine, "gfx1");
+	UINT8 *gfx = screen->machine->region("gfx1")->base();
 
 	for (x = 0; x < 64; x++)
 	{

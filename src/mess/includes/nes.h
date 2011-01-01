@@ -120,10 +120,10 @@ public:
 	nes_chr_callback    mmc3_chr_cb;
 
 	/* devices */
-	running_device      *maincpu;
-	running_device      *ppu;
-	running_device      *sound;
-	running_device      *cart;
+	device_t      *maincpu;
+	device_t      *ppu;
+	device_t      *sound;
+	device_t      *cart;
 
 	/* misc region to be allocated at init */
 	// variables which don't change at run-time
@@ -263,7 +263,7 @@ DRIVER_INIT( famicom );
 READ8_HANDLER( nes_IN0_r );
 READ8_HANDLER( nes_IN1_r );
 
-int nes_ppu_vidaccess( running_device *device, int address, int data );
+int nes_ppu_vidaccess( device_t *device, int address, int data );
 
 void nes_partialhash(char *dest, const unsigned char *data, unsigned long length, unsigned int functions);
 

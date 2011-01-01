@@ -73,7 +73,7 @@ enum
 };
 
 
-INLINE mm58274c_t *get_safe_token(running_device *device)
+INLINE mm58274c_t *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 
@@ -304,7 +304,7 @@ WRITE8_DEVICE_HANDLER (mm58274c_w)
 */
 static TIMER_CALLBACK(rtc_interrupt_callback)
 {
-	running_device *device = (running_device *)ptr;
+	device_t *device = (device_t *)ptr;
 	mm58274c_t *mm58274c = get_safe_token(device);
 	mm58274c->status |= st_if;
 }
@@ -316,7 +316,7 @@ static TIMER_CALLBACK(rtc_interrupt_callback)
 
 static TIMER_CALLBACK(increment_rtc)
 {
-	running_device *device = (running_device *)ptr;
+	device_t *device = (device_t *)ptr;
 	mm58274c_t *mm58274c = get_safe_token(device);
 	if (! (mm58274c->control & ctl_clkstop))
 	{

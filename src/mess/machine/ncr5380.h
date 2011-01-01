@@ -37,9 +37,9 @@ enum
 #define R5380_CURDATA_DTACK	(R5380_CURDATA | 0x10)
 
 // device stuff
-#define MDRV_NCR5380_ADD(_tag, _clock, _intrf) \
-    MDRV_DEVICE_ADD(_tag, NCR5380, _clock) \
-    MDRV_DEVICE_CONFIG(_intrf)
+#define MCFG_NCR5380_ADD(_tag, _clock, _intrf) \
+    MCFG_DEVICE_ADD(_tag, NCR5380, _clock) \
+    MCFG_DEVICE_CONFIG(_intrf)
 
 class ncr5380_device_config : public device_config, public NCR5380interface
 {
@@ -103,8 +103,8 @@ extern const device_type NCR5380;
 READ8_DEVICE_HANDLER(ncr5380_read_reg);
 WRITE8_DEVICE_HANDLER(ncr5380_write_reg);
 
-void ncr5380_read_data(running_device *dev, int bytes, UINT8 *pData);
-void ncr5380_write_data(running_device *dev, int bytes, UINT8 *pData);
-void ncr5380_scan_devices(running_device *dev);
+void ncr5380_read_data(device_t *dev, int bytes, UINT8 *pData);
+void ncr5380_write_data(device_t *dev, int bytes, UINT8 *pData);
+void ncr5380_scan_devices(device_t *dev);
 
 #endif

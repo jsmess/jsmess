@@ -84,7 +84,7 @@ static const char *const mwa_bank_hard[4] =
 DRIVER_INIT(laser)
 {
 	vtech2_state *state = machine->driver_data<vtech2_state>();
-	UINT8 *gfx = memory_region(machine, "gfx2");
+	UINT8 *gfx = machine->region("gfx2")->base();
 	int i;
 
 	state->laser_track_x2[0] = state->laser_track_x2[1] = 80;
@@ -95,7 +95,7 @@ DRIVER_INIT(laser)
 		gfx[i] = i;
 
 	state->laser_latch = -1;
-	state->mem = memory_region(machine, "maincpu");
+	state->mem = machine->region("maincpu")->base();
 
 	for (i = 0; i < ARRAY_LENGTH(state->laser_bank); i++)
 		state->laser_bank[i] = -1;
@@ -185,7 +185,7 @@ WRITE8_HANDLER( laser_bank_select_w )
     }
 }
 
-static running_device *vtech2_cassette_image(running_machine *machine)
+static device_t *vtech2_cassette_image(running_machine *machine)
 {
 	return machine->device("cassette");
 }
@@ -292,7 +292,7 @@ static int mra_bank(running_machine *machine, int bank, int offs)
 static void mwa_bank(running_machine *machine, int bank, int offs, int data)
 {
 	vtech2_state *state = machine->driver_data<vtech2_state>();
-	running_device *speaker = machine->device("speaker");
+	device_t *speaker = machine->device("speaker");
 	offs += 0x4000 * state->laser_bank[bank];
     switch (state->laser_bank[bank])
     {
@@ -353,7 +353,7 @@ DEVICE_IMAGE_UNLOAD( laser_cart )
 	memset(&state->mem[0x30000], 0xff, 0x10000);
 }
 
-static running_device *laser_file(running_machine *machine)
+static device_t *laser_file(running_machine *machine)
 {
 	vtech2_state *state = machine->driver_data<vtech2_state>();
 	return machine->device( state->laser_drive ? FLOPPY_1 : FLOPPY_0 );

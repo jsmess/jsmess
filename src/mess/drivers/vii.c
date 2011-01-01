@@ -487,7 +487,7 @@ static WRITE16_HANDLER( vii_audio_w )
 static void vii_switch_bank(running_machine *machine, UINT32 bank)
 {
 	vii_state *state = machine->driver_data<vii_state>();
-	UINT8 *cart = memory_region(machine, "cart");
+	UINT8 *cart = machine->region("cart")->base();
 
 	if(bank == state->current_bank)
 	{
@@ -591,7 +591,7 @@ static READ16_HANDLER( vii_io_r )
 			break;
 
 		case 0x1c: // Random
-			val = mame_rand(space->machine) & 0x00ff;
+			val = space->machine->rand() & 0x00ff;
 			verboselog(space->machine, 3, "vii_io_r: Random = %04x (%04x)\n", val, mem_mask);
 			break;
 
@@ -601,7 +601,7 @@ static READ16_HANDLER( vii_io_r )
 			break;
 
 		case 0x2c: case 0x2d: // Timers?
-			val = mame_rand(space->machine) & 0x0000ffff;
+			val = space->machine->rand() & 0x0000ffff;
 			verboselog(space->machine, 3, "vii_io_r: Unknown Timer %d Register = %04x (%04x)\n", offset - 0x2c, val, mem_mask);
 			break;
 
@@ -839,7 +839,7 @@ INPUT_PORTS_END
 static DEVICE_IMAGE_LOAD( vii_cart )
 {
 	vii_state *state = image.device().machine->driver_data<vii_state>();
-	UINT8 *cart = memory_region( image.device().machine, "cart" );
+	UINT8 *cart = image.device().machine->region( "cart" )->base();
 	if (image.software_entry() == NULL)
 	{
 		int size = image.length();
@@ -873,7 +873,7 @@ static DEVICE_IMAGE_LOAD( vii_cart )
 static DEVICE_IMAGE_LOAD( vsmile_cart )
 {
 	vii_state *state = image.device().machine->driver_data<vii_state>();
-	UINT8 *cart = memory_region( image.device().machine, "cart" );
+	UINT8 *cart = image.device().machine->region( "cart" )->base();
 	if (image.software_entry() == NULL)
 	{
 		int size = image.length();
@@ -906,7 +906,7 @@ static MACHINE_START( vii )
 	state->controller_input[6] = 0xff;
 	state->controller_input[7] = 0;
 
-	UINT8 *rom = memory_region( machine, "cart" );
+	UINT8 *rom = machine->region( "cart" )->base();
 	if (rom) { // to prevent batman crash
 		memcpy(state->cart, rom + 0x4000*2, (0x400000 - 0x4000) * 2);
 	}
@@ -919,9 +919,9 @@ static MACHINE_RESET( vii )
 static INTERRUPT_GEN( vii_vblank )
 {
 	vii_state *state = device->machine->driver_data<vii_state>();
-	UINT32 x = mame_rand(device->machine) & 0x3ff;
-	UINT32 y = mame_rand(device->machine) & 0x3ff;
-	UINT32 z = mame_rand(device->machine) & 0x3ff;
+	UINT32 x = device->machine->rand() & 0x3ff;
+	UINT32 y = device->machine->rand() & 0x3ff;
+	UINT32 z = device->machine->rand() & 0x3ff;
 
 	VII_VIDEO_IRQ_STATUS = VII_VIDEO_IRQ_ENABLE & 1;
 	if(VII_VIDEO_IRQ_STATUS)
@@ -953,56 +953,56 @@ static INTERRUPT_GEN( vii_vblank )
 
 static MACHINE_CONFIG_START( vii, vii_state )
 
-	MDRV_CPU_ADD( "maincpu", UNSP, XTAL_27MHz)
-	MDRV_CPU_PROGRAM_MAP( vii_mem )
-	MDRV_CPU_VBLANK_INT("screen", vii_vblank)
+	MCFG_CPU_ADD( "maincpu", UNSP, XTAL_27MHz)
+	MCFG_CPU_PROGRAM_MAP( vii_mem )
+	MCFG_CPU_VBLANK_INT("screen", vii_vblank)
 
-	MDRV_MACHINE_START( vii )
-	MDRV_MACHINE_RESET( vii )
+	MCFG_MACHINE_START( vii )
+	MCFG_MACHINE_RESET( vii )
 
-	MDRV_SCREEN_ADD( "screen", RASTER )
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_SIZE(320, 240)
-	MDRV_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
+	MCFG_SCREEN_ADD( "screen", RASTER )
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_SIZE(320, 240)
+	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
 
-	MDRV_PALETTE_LENGTH(32768)
+	MCFG_PALETTE_LENGTH(32768)
 
-	MDRV_CARTSLOT_ADD( "cart" )
-	MDRV_CARTSLOT_EXTENSION_LIST( "bin" )
-	MDRV_CARTSLOT_LOAD( vii_cart )
-	MDRV_CARTSLOT_INTERFACE("vii_cart")
+	MCFG_CARTSLOT_ADD( "cart" )
+	MCFG_CARTSLOT_EXTENSION_LIST( "bin" )
+	MCFG_CARTSLOT_LOAD( vii_cart )
+	MCFG_CARTSLOT_INTERFACE("vii_cart")
 
-	MDRV_VIDEO_START( vii )
-	MDRV_VIDEO_UPDATE( vii )
+	MCFG_VIDEO_START( vii )
+	MCFG_VIDEO_UPDATE( vii )
 
-	MDRV_SOFTWARE_LIST_ADD("vii_cart","vii")
+	MCFG_SOFTWARE_LIST_ADD("vii_cart","vii")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( vsmile, vii_state )
 
-	MDRV_CPU_ADD( "maincpu", UNSP, XTAL_27MHz)
-	MDRV_CPU_PROGRAM_MAP( vii_mem )
-	MDRV_CPU_VBLANK_INT("screen", vii_vblank)
+	MCFG_CPU_ADD( "maincpu", UNSP, XTAL_27MHz)
+	MCFG_CPU_PROGRAM_MAP( vii_mem )
+	MCFG_CPU_VBLANK_INT("screen", vii_vblank)
 
-	MDRV_MACHINE_START( vii )
-	MDRV_MACHINE_RESET( vii )
+	MCFG_MACHINE_START( vii )
+	MCFG_MACHINE_RESET( vii )
 
-	MDRV_SCREEN_ADD( "screen", RASTER )
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_SIZE(320, 240)
-	MDRV_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
+	MCFG_SCREEN_ADD( "screen", RASTER )
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_SIZE(320, 240)
+	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
 
-	MDRV_PALETTE_LENGTH(32768)
+	MCFG_PALETTE_LENGTH(32768)
 
-	MDRV_CARTSLOT_ADD( "cart" )
-	MDRV_CARTSLOT_EXTENSION_LIST( "bin" )
-	MDRV_CARTSLOT_MANDATORY
-	MDRV_CARTSLOT_LOAD( vsmile_cart )
+	MCFG_CARTSLOT_ADD( "cart" )
+	MCFG_CARTSLOT_EXTENSION_LIST( "bin" )
+	MCFG_CARTSLOT_MANDATORY
+	MCFG_CARTSLOT_LOAD( vsmile_cart )
 
-	MDRV_VIDEO_START( vii )
-	MDRV_VIDEO_UPDATE( vii )
+	MCFG_VIDEO_START( vii )
+	MCFG_VIDEO_UPDATE( vii )
 MACHINE_CONFIG_END
 
 static const i2cmem_interface i2cmem_interface =
@@ -1012,25 +1012,25 @@ static const i2cmem_interface i2cmem_interface =
 
 static MACHINE_CONFIG_START( batman, vii_state )
 
-	MDRV_CPU_ADD( "maincpu", UNSP, XTAL_27MHz)
-	MDRV_CPU_PROGRAM_MAP( vii_mem )
-	MDRV_CPU_VBLANK_INT("screen", vii_vblank)
+	MCFG_CPU_ADD( "maincpu", UNSP, XTAL_27MHz)
+	MCFG_CPU_PROGRAM_MAP( vii_mem )
+	MCFG_CPU_VBLANK_INT("screen", vii_vblank)
 
-	MDRV_MACHINE_START( vii )
-	MDRV_MACHINE_RESET( vii )
+	MCFG_MACHINE_START( vii )
+	MCFG_MACHINE_RESET( vii )
 
-	MDRV_I2CMEM_ADD("i2cmem",i2cmem_interface)
+	MCFG_I2CMEM_ADD("i2cmem",i2cmem_interface)
 
-	MDRV_SCREEN_ADD( "screen", RASTER )
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_SIZE(320, 240)
-	MDRV_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
+	MCFG_SCREEN_ADD( "screen", RASTER )
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_SIZE(320, 240)
+	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
 
-	MDRV_PALETTE_LENGTH(32768)
+	MCFG_PALETTE_LENGTH(32768)
 
-	MDRV_VIDEO_START( vii )
-	MDRV_VIDEO_UPDATE( vii )
+	MCFG_VIDEO_START( vii )
+	MCFG_VIDEO_UPDATE( vii )
 MACHINE_CONFIG_END
 
 static DRIVER_INIT( vii )

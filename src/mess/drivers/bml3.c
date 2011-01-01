@@ -63,8 +63,8 @@ static VIDEO_UPDATE( bml3 )
 	int x,y,count;
 	int xi,yi;
 	int width,height;
-	UINT8 *gfx_rom = memory_region(screen->machine, "char");
-	UINT8 *vram = memory_region(screen->machine, "vram");
+	UINT8 *gfx_rom = screen->machine->region("char")->base();
+	UINT8 *vram = screen->machine->region("vram")->base();
 
 	count = 0x0000;
 
@@ -180,11 +180,11 @@ static READ8_HANDLER( bml3_keyboard_r )
 static READ8_HANDLER( bml3_io_r )
 {
 	bml3_state *state = space->machine->driver_data<bml3_state>();
-	UINT8 *rom = memory_region(space->machine, "maincpu");
+	UINT8 *rom = space->machine->region("maincpu")->base();
 
 	if(offset == 0x19) return state->io_latch;
 	if(offset == 0xc4) return 0xff; //some video modes wants this to be high
-//  if(offset == 0xc5 || offset == 0xca) return mame_rand(space->machine); //tape related
+//  if(offset == 0xc5 || offset == 0xca) return space->machine->rand(); //tape related
 	if(offset == 0xc8) return 0; //??? checks bit 7, scrolls vertically if active high
 	if(offset == 0xc9) return 0x11; //0x01 put 320 x 200 mode, 0x07 = 640 x 375
 
@@ -206,7 +206,7 @@ static READ8_HANDLER( bml3_io_r )
 		//if(cpu_get_pc(space->cpu) != 0xf838 && cpu_get_pc(space->cpu) != 0xfac4 && cpu_get_pc(space->cpu) != 0xf83c)
 		if(offset >= 0xd0 && offset < 0xe0)
 			logerror("I/O read [%02x] at PC=%04x\n",offset,cpu_get_pc(space->cpu));
-		return 0;//mame_rand(space->machine);
+		return 0;//space->machine->rand();
 	}
 
 	/* TODO: pretty sure that there's a bankswitch for this */
@@ -272,7 +272,7 @@ static WRITE8_HANDLER( bml3_io_w )
 static READ8_HANDLER( bml3_vram_r )
 {
 	bml3_state *state = space->machine->driver_data<bml3_state>();
-	UINT8 *vram = memory_region(space->machine, "vram");
+	UINT8 *vram = space->machine->region("vram")->base();
 
 	/* TODO: this presumably also triggers an attr latch read, unsure yet */
 	state->attr_latch = vram[offset+0x4000];
@@ -283,7 +283,7 @@ static READ8_HANDLER( bml3_vram_r )
 static WRITE8_HANDLER( bml3_vram_w )
 {
 	bml3_state *state = space->machine->driver_data<bml3_state>();
-	UINT8 *vram = memory_region(space->machine, "vram");
+	UINT8 *vram = space->machine->region("vram")->base();
 
 	vram[offset] = data;
 	vram[offset+0x4000] = state->attr_latch;
@@ -487,34 +487,34 @@ GFXDECODE_END
 
 static MACHINE_CONFIG_START( bml3, bml3_state )
     /* basic machine hardware */
-	MDRV_CPU_ADD("maincpu",M6809, XTAL_1MHz)
-	MDRV_CPU_PROGRAM_MAP(bml3_mem)
-//  MDRV_CPU_VBLANK_INT("screen", bml3_irq )
-//  MDRV_CPU_PERIODIC_INT(bml3_firq,45)
+	MCFG_CPU_ADD("maincpu",M6809, XTAL_1MHz)
+	MCFG_CPU_PROGRAM_MAP(bml3_mem)
+//  MCFG_CPU_VBLANK_INT("screen", bml3_irq )
+//  MCFG_CPU_PERIODIC_INT(bml3_firq,45)
 
-	MDRV_MACHINE_START(bml3)
-	MDRV_MACHINE_RESET(bml3)
+	MCFG_MACHINE_START(bml3)
+	MCFG_MACHINE_RESET(bml3)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(640, 480)
-	MDRV_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
-	MDRV_PALETTE_LENGTH(8)
-	MDRV_PALETTE_INIT(bml3)
-	MDRV_GFXDECODE(bml3)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(640, 480)
+	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
+	MCFG_PALETTE_LENGTH(8)
+	MCFG_PALETTE_INIT(bml3)
+	MCFG_GFXDECODE(bml3)
 
-	MDRV_MC6845_ADD("crtc", H46505, XTAL_3_579545MHz/4, mc6845_intf)	/* unknown clock, hand tuned to get ~60 fps */
+	MCFG_MC6845_ADD("crtc", H46505, XTAL_3_579545MHz/4, mc6845_intf)	/* unknown clock, hand tuned to get ~60 fps */
 
-	MDRV_VIDEO_START(bml3)
-	MDRV_VIDEO_UPDATE(bml3)
+	MCFG_VIDEO_START(bml3)
+	MCFG_VIDEO_UPDATE(bml3)
 
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("beeper", BEEP, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
+	MCFG_SOUND_ADD("beeper", BEEP, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
 MACHINE_CONFIG_END
 
 /* ROM definition */

@@ -18,8 +18,8 @@
 
 DECLARE_LEGACY_DEVICE(MOCKINGBOARD, mockingboard);
 
-#define MDRV_MOCKINGBOARD_ADD(_tag)	\
-	MDRV_DEVICE_ADD((_tag), MOCKINGBOARD, 0)
+#define MCFG_MOCKINGBOARD_ADD(_tag)	\
+	MCFG_DEVICE_ADD((_tag), MOCKINGBOARD, 0)
 
 
 /***************************************************************************

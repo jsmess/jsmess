@@ -490,7 +490,7 @@ static WRITE8_HANDLER( supercon_port3_w )
 static WRITE8_HANDLER( supercon_port4_w )
 {
 	supercon_state *state = space->machine->driver_data<supercon_state>();
-	running_device *speaker = space->machine->device("beep");
+	device_t *speaker = space->machine->device("beep");
 
 	if (data)
 		LOG(("Write from %04x data: %02x\n",0x1F00,data));
@@ -750,20 +750,20 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( supercon, supercon_state )
 
     /* basic machine hardware */
-	MDRV_CPU_ADD("maincpu",M6502,MAIN_CLOCK)
-    MDRV_CPU_PROGRAM_MAP(supercon_mem)
+	MCFG_CPU_ADD("maincpu",M6502,MAIN_CLOCK)
+    MCFG_CPU_PROGRAM_MAP(supercon_mem)
 
-	MDRV_MACHINE_START( supercon )
-	MDRV_MACHINE_RESET( supercon )
+	MCFG_MACHINE_START( supercon )
+	MCFG_MACHINE_RESET( supercon )
 
     /* video hardware */
 
-	//MDRV_DEFAULT_LAYOUT(layout_supercon)
+	//MCFG_DEFAULT_LAYOUT(layout_supercon)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("beep", BEEP, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("beep", BEEP, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 
 MACHINE_CONFIG_END

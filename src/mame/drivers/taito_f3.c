@@ -129,7 +129,7 @@ static WRITE32_HANDLER( f3_sound_reset_1_w )
 static WRITE32_HANDLER( f3_sound_bankswitch_w )
 {
 	if (f3_game==KIRAMEKI) {
-		UINT16 *rom = (UINT16 *)memory_region(space->machine, "audiocpu");
+		UINT16 *rom = (UINT16 *)space->machine->region("audiocpu")->base();
 		UINT32 idx;
 
 		idx = (offset << 1) & 0x1e;
@@ -392,32 +392,32 @@ static MACHINE_START(f3)
 static MACHINE_CONFIG_START( f3, taito_f3_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68EC020, XTAL_16MHz)
-	MDRV_CPU_PROGRAM_MAP(f3_map)
-	MDRV_CPU_VBLANK_INT("screen", f3_interrupt2)
+	MCFG_CPU_ADD("maincpu", M68EC020, XTAL_16MHz)
+	MCFG_CPU_PROGRAM_MAP(f3_map)
+	MCFG_CPU_VBLANK_INT("screen", f3_interrupt2)
 
-	MDRV_MACHINE_START(f3)
+	MCFG_MACHINE_START(f3)
 
-	MDRV_EEPROM_93C46_ADD("eeprom")
+	MCFG_EEPROM_93C46_ADD("eeprom")
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(58.97)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(624) /* 58.97 Hz, 624us vblank time */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_SIZE(40*8+48*2, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(46, 40*8-1 + 46, 24, 24+232-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(58.97)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(624) /* 58.97 Hz, 624us vblank time */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_SIZE(40*8+48*2, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(46, 40*8-1 + 46, 24, 24+232-1)
 
-	MDRV_GFXDECODE(taito_f3)
-	MDRV_PALETTE_LENGTH(0x2000)
+	MCFG_GFXDECODE(taito_f3)
+	MCFG_PALETTE_LENGTH(0x2000)
 
-	MDRV_VIDEO_START(f3)
-	MDRV_VIDEO_EOF(f3)
-	MDRV_VIDEO_UPDATE(f3)
+	MCFG_VIDEO_START(f3)
+	MCFG_VIDEO_EOF(f3)
+	MCFG_VIDEO_UPDATE(f3)
 
 	/* sound hardware */
-	MDRV_FRAGMENT_ADD(taito_f3_sound)
-	MDRV_SOUND_RESET(f3)
+	MCFG_FRAGMENT_ADD(taito_f3_sound)
+	MCFG_SOUND_RESET(f3)
 MACHINE_CONFIG_END
 
 /* These games reprogram the video output registers to display different scanlines,
@@ -426,33 +426,33 @@ MACHINE_CONFIG_END
  monitor recalibration.)
 */
 static MACHINE_CONFIG_DERIVED( f3_224a, f3 )
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_VISIBLE_AREA(46, 40*8-1 + 46, 31, 31+224-1)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_VISIBLE_AREA(46, 40*8-1 + 46, 31, 31+224-1)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( f3_224b, f3 )
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_VISIBLE_AREA(46, 40*8-1 + 46, 32, 32+224-1)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_VISIBLE_AREA(46, 40*8-1 + 46, 32, 32+224-1)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( f3_224c, f3 )
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_VISIBLE_AREA(46, 40*8-1 + 46, 24, 24+224-1)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_VISIBLE_AREA(46, 40*8-1 + 46, 24, 24+224-1)
 MACHINE_CONFIG_END
 
 /* recalh and gseeker need a default EEPROM to work */
 static MACHINE_CONFIG_DERIVED( f3_eeprom, f3 )
 
-	MDRV_DEVICE_REMOVE("eeprom")
-	MDRV_EEPROM_93C46_ADD("eeprom")
-	MDRV_EEPROM_DATA(recalh_eeprom, 128)
+	MCFG_DEVICE_REMOVE("eeprom")
+	MCFG_EEPROM_93C46_ADD("eeprom")
+	MCFG_EEPROM_DATA(recalh_eeprom, 128)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( f3_224b_eeprom, f3 )
 
-	MDRV_DEVICE_REMOVE("eeprom")
-	MDRV_EEPROM_93C46_ADD("eeprom")
-	MDRV_EEPROM_DATA(recalh_eeprom, 128)
+	MCFG_DEVICE_REMOVE("eeprom")
+	MCFG_EEPROM_93C46_ADD("eeprom")
+	MCFG_EEPROM_DATA(recalh_eeprom, 128)
 MACHINE_CONFIG_END
 
 static const gfx_layout bubsympb_sprite_layout =
@@ -487,34 +487,34 @@ GFXDECODE_END
 
 static MACHINE_CONFIG_START( bubsympb, taito_f3_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68EC020, XTAL_16MHz)
-	MDRV_CPU_PROGRAM_MAP(f3_map)
-	MDRV_CPU_VBLANK_INT("screen", f3_interrupt2)
+	MCFG_CPU_ADD("maincpu", M68EC020, XTAL_16MHz)
+	MCFG_CPU_PROGRAM_MAP(f3_map)
+	MCFG_CPU_VBLANK_INT("screen", f3_interrupt2)
 
-	MDRV_MACHINE_START(f3)
+	MCFG_MACHINE_START(f3)
 
-	MDRV_EEPROM_93C46_ADD("eeprom")
+	MCFG_EEPROM_93C46_ADD("eeprom")
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(58.97)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(624) /* 58.97 Hz, 624us vblank time */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_SIZE(40*8+48*2, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(46, 40*8-1 + 46, 31, 31+224-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(58.97)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(624) /* 58.97 Hz, 624us vblank time */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_SIZE(40*8+48*2, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(46, 40*8-1 + 46, 31, 31+224-1)
 
-	MDRV_GFXDECODE(bubsympb)
-	MDRV_PALETTE_LENGTH(8192)
+	MCFG_GFXDECODE(bubsympb)
+	MCFG_PALETTE_LENGTH(8192)
 
-	MDRV_VIDEO_START(f3)
-	MDRV_VIDEO_EOF(f3)
-	MDRV_VIDEO_UPDATE(f3)
+	MCFG_VIDEO_START(f3)
+	MCFG_VIDEO_EOF(f3)
+	MCFG_VIDEO_UPDATE(f3)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_OKIM6295_ADD("oki", 1000000 , OKIM6295_PIN7_HIGH) // not verified
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_OKIM6295_ADD("oki", 1000000 , OKIM6295_PIN7_HIGH) // not verified
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 /******************************************************************************/
@@ -3470,8 +3470,8 @@ static void tile_decode(running_machine *machine)
 {
 	UINT8 lsb,msb;
 	UINT32 offset,i;
-	UINT8 *gfx = memory_region(machine, "gfx2");
-	int size=memory_region_length(machine, "gfx2");
+	UINT8 *gfx = machine->region("gfx2")->base();
+	int size=machine->region("gfx2")->bytes();
 	int data;
 
 	/* Setup ROM formats:
@@ -3503,8 +3503,8 @@ static void tile_decode(running_machine *machine)
 		offset+=4;
 	}
 
-	gfx = memory_region(machine, "gfx1");
-	size=memory_region_length(machine, "gfx1");
+	gfx = machine->region("gfx1")->base();
+	size=machine->region("gfx1")->bytes();
 
 	offset = size/2;
 	for (i = size/2+size/4; i<size; i++)
@@ -3576,7 +3576,7 @@ static DRIVER_INIT( trstaroj )
 
 static DRIVER_INIT( scfinals )
 {
-	UINT32 *RAM = (UINT32 *)memory_region(machine, "maincpu");
+	UINT32 *RAM = (UINT32 *)machine->region("maincpu")->base();
 
 	/* Doesn't boot without this - eprom related? */
     RAM[0x5af0/4]=0x4e710000|(RAM[0x5af0/4]&0xffff);
@@ -3654,7 +3654,7 @@ static WRITE32_HANDLER( bubsympb_oki_w )
 	//if (mem_mask==0x000000ff) downcast<okim6295_device *>(device)->write(0,data&0xff);
 	if (ACCESSING_BITS_16_23)
 	{
-		UINT8 *snd = memory_region(space->machine, "oki");
+		UINT8 *snd = space->machine->region("oki")->base();
 		int bank = (data & 0x000f0000) >> 16;
 		// almost certainly wrong
 		memcpy(snd+0x30000, snd+0x80000+0x30000+bank*0x10000, 0x10000);
@@ -3674,7 +3674,7 @@ static DRIVER_INIT( bubsympb )
 	/* expand gfx rom */
 	{
 		int i;
-		UINT8 *gfx = memory_region(machine, "gfx2");
+		UINT8 *gfx = machine->region("gfx2")->base();
 
 		for (i=0x200000;i<0x400000; i+=4)
 		{
@@ -3721,7 +3721,7 @@ static DRIVER_INIT( landmakr )
 
 static DRIVER_INIT( landmkrp )
 {
-	UINT32 *RAM = (UINT32 *)memory_region(machine, "maincpu");
+	UINT32 *RAM = (UINT32 *)machine->region("maincpu")->base();
 
 	/* For some reason the least significant byte in the last 2 long words of
     ROM is swapped.  As the roms have been verified ok, I assume this is some
@@ -3764,7 +3764,7 @@ static DRIVER_INIT( pbobbl2p )
 	// which eventually causes the game to crash
 	//  -- protection check?? or some kind of checksum fail?
 
-	UINT32 *ROM = (UINT32 *)memory_region(machine, "maincpu");
+	UINT32 *ROM = (UINT32 *)machine->region("maincpu")->base();
 
 	/* protection? */
     ROM[0x40090/4]=0x00004e71|(ROM[0x40090/4]&0xffff0000);

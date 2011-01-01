@@ -195,7 +195,7 @@ VIDEO_UPDATE( pegasus )
 	pegasus_state *state = screen->machine->driver_data<pegasus_state>();
 	UINT16 addr,xpos,x,y;
 	UINT8 b,j,l,code,inv;
-	UINT8 *FNT = memory_region(screen->machine, "pcg");
+	UINT8 *FNT = screen->machine->region("pcg")->base();
 	UINT8 pcg_mode = state->control_bits & 2;
 
 	for(y = 0; y < 16; y++ )

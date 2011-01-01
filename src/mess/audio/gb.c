@@ -177,7 +177,7 @@ struct _gb_sound_t
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE gb_sound_t *get_token(running_device *device)
+INLINE gb_sound_t *get_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == GAMEBOY);
@@ -225,7 +225,7 @@ READ8_DEVICE_HANDLER( gb_sound_r )
 	}
 }
 
-static void gb_sound_w_internal(running_device *device, int offset, UINT8 data )
+static void gb_sound_w_internal(device_t *device, int offset, UINT8 data )
 {
 	gb_sound_t *gb = get_token(device);
 
@@ -359,7 +359,7 @@ static void gb_sound_w_internal(running_device *device, int offset, UINT8 data )
 			gb->snd_4.count = 0;
 			gb->snd_4.env_value = gb->snd_regs[NR42] >> 4;
 			gb->snd_4.env_count = 0;
-			gb->snd_4.signal = mame_rand(device->machine);
+			gb->snd_4.signal = device->machine->rand();
 			gb->snd_4.ply_value = 0x7fff;
 			gb->snd_regs[NR52] |= 0x8;
 		}

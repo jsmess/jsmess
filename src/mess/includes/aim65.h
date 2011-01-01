@@ -42,11 +42,11 @@ public:
 
 /*----------- defined in machine/aim65.c -----------*/
 
-void aim65_update_ds1(running_device *device, int digit, int data);
-void aim65_update_ds2(running_device *device, int digit, int data);
-void aim65_update_ds3(running_device *device, int digit, int data);
-void aim65_update_ds4(running_device *device, int digit, int data);
-void aim65_update_ds5(running_device *device, int digit, int data);
+void aim65_update_ds1(device_t *device, int digit, int data);
+void aim65_update_ds2(device_t *device, int digit, int data);
+void aim65_update_ds3(device_t *device, int digit, int data);
+void aim65_update_ds4(device_t *device, int digit, int data);
+void aim65_update_ds5(device_t *device, int digit, int data);
 
 WRITE8_DEVICE_HANDLER(aim65_pia_a_w);
 WRITE8_DEVICE_HANDLER(aim65_pia_b_w);

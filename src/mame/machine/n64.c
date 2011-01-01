@@ -427,7 +427,7 @@ static void sp_dma(running_machine *machine, int direction)
 	}
 }
 
-static void sp_set_status(running_device *device, UINT32 status)
+static void sp_set_status(device_t *device, UINT32 status)
 {
 	if (status & 0x1)
 	{
@@ -2030,8 +2030,8 @@ MACHINE_START( n64 )
 MACHINE_RESET( n64 )
 {
 	int i;
-	//UINT32 *pif_rom   = (UINT32*)memory_region(machine, "user1");
-	UINT32 *cart = (UINT32*)memory_region(machine, "user2");
+	//UINT32 *pif_rom   = (UINT32*)machine->region("user1");
+	UINT32 *cart = (UINT32*)machine->region("user2");
 	UINT64 boot_checksum;
 
 	mi_version = 0;

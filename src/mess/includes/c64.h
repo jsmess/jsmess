@@ -75,8 +75,8 @@ public:
 
 /* private area */
 
-UINT8 c64_m6510_port_read(running_device *device, UINT8 direction);
-void c64_m6510_port_write(running_device *device, UINT8 direction, UINT8 data);
+UINT8 c64_m6510_port_read(device_t *device, UINT8 direction);
+void c64_m6510_port_write(device_t *device, UINT8 direction, UINT8 data);
 
 READ8_HANDLER ( c64_colorram_read );
 WRITE8_HANDLER ( c64_colorram_write );
@@ -98,7 +98,7 @@ WRITE8_HANDLER(c64_ioarea_w);
 
 WRITE8_HANDLER ( c64_write_io );
 READ8_HANDLER ( c64_read_io );
-int c64_paddle_read (running_device *device, int which);
+int c64_paddle_read (device_t *device, int which);
 void c64_vic_interrupt (running_machine *machine, int level);
 
 extern const mos6526_interface c64_ntsc_cia0, c64_pal_cia0;

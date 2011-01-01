@@ -13,13 +13,13 @@
 #define OpRead16(s, a)	((s)->direct->read_decrypted_word(a))
 #define OpRead32(s, a)	((s)->direct->read_decrypted_dword(a))
 #else
-#define OpRead8(s, a)   ((s)->direct->read_decrypted_byte((a) ^ (s)->fetch_xor))
-#define OpRead16(s, a)	(((s)->direct->read_decrypted_byte(((a)+0) ^ (s)->fetch_xor) << 0) | \
-						 ((s)->direct->read_decrypted_byte(((a)+1) ^ (s)->fetch_xor) << 8))
-#define OpRead32(s, a)	(((s)->direct->read_decrypted_byte(((a)+0) ^ (s)->fetch_xor) << 0) | \
-						 ((s)->direct->read_decrypted_byte(((a)+1) ^ (s)->fetch_xor) << 8) | \
-						 ((s)->direct->read_decrypted_byte(((a)+2) ^ (s)->fetch_xor) << 16) | \
-						 ((s)->direct->read_decrypted_byte(((a)+3) ^ (s)->fetch_xor) << 24))
+#define OpRead8(s, a)   ((s)->direct->read_decrypted_byte((a), (s)->fetch_xor))
+#define OpRead16(s, a)	(((s)->direct->read_decrypted_byte(((a)+0), (s)->fetch_xor) << 0) | \
+						 ((s)->direct->read_decrypted_byte(((a)+1), (s)->fetch_xor) << 8))
+#define OpRead32(s, a)	(((s)->direct->read_decrypted_byte(((a)+0), (s)->fetch_xor) << 0) | \
+						 ((s)->direct->read_decrypted_byte(((a)+1), (s)->fetch_xor) << 8) | \
+						 ((s)->direct->read_decrypted_byte(((a)+2), (s)->fetch_xor) << 16) | \
+						 ((s)->direct->read_decrypted_byte(((a)+3), (s)->fetch_xor) << 24))
 #endif
 
 
@@ -125,7 +125,7 @@ struct _v60_state
 	UINT8				moddim;
 };
 
-INLINE v60_state *get_safe_token(running_device *device)
+INLINE v60_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == V60 ||
@@ -397,7 +397,7 @@ static CPU_EXIT( v60 )
 {
 }
 
-void v60_stall(running_device *device)
+void v60_stall(device_t *device)
 {
 	v60_state *cpustate = get_safe_token(device);
 	cpustate->stall_io = 1;

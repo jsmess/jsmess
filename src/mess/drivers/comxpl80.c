@@ -55,7 +55,7 @@ static WRITE8_HANDLER( pl80_port_a_w )
 		// read data from font ROM
 		int font_rom = (input_port_read(space->machine, "FONT") & 0x03) * 0x2000;
 
-		state->plotter_data = memory_region(space->machine, "gfx2")[font_rom | state->font_addr];
+		state->plotter_data = space->machine->region("gfx2")->base()[font_rom | state->font_addr];
 	}
 
 	if (!BIT(data, 6))
@@ -199,9 +199,9 @@ static MACHINE_CONFIG_START( comxpl80, comxpl80_state )
 
 	// basic system hardware
 
-	MDRV_CPU_ADD("maincpu", M6805, 4000000) // CX005: some kind of MC6805/MC68HC05 clone
-	MDRV_CPU_PROGRAM_MAP(pl80_map)
-	MDRV_CPU_IO_MAP(pl80_io_map)
+	MCFG_CPU_ADD("maincpu", M6805, 4000000) // CX005: some kind of MC6805/MC68HC05 clone
+	MCFG_CPU_PROGRAM_MAP(pl80_map)
+	MCFG_CPU_IO_MAP(pl80_io_map)
 MACHINE_CONFIG_END
 
 /* ROMs */

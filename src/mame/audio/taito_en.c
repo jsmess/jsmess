@@ -36,7 +36,7 @@ static WRITE16_HANDLER(f3_68000_share_w)
 
 static WRITE16_HANDLER( f3_es5505_bank_w )
 {
-	UINT32 max_banks_this_game=(memory_region_length(space->machine, "ensoniq.0")/0x200000)-1;
+	UINT32 max_banks_this_game=(space->machine->region("ensoniq.0")->bytes()/0x200000)-1;
 
 #if 0
 {
@@ -179,7 +179,7 @@ static READ16_HANDLER(es5510_dsp_r)
 */
 //  offset<<=1;
 
-//if (offset<7 && es5510_dsp_ram[0]!=0xff) return mame_rand(space->machine)%0xffff;
+//if (offset<7 && es5510_dsp_ram[0]!=0xff) return space->machine->rand()%0xffff;
 
 	if (offset==0x12) return 0;
 
@@ -191,7 +191,7 @@ static READ16_HANDLER(es5510_dsp_r)
 
 static WRITE16_HANDLER(es5510_dsp_w)
 {
-	UINT8 *snd_mem = (UINT8 *)memory_region(space->machine, "ensoniq.0");
+	UINT8 *snd_mem = (UINT8 *)space->machine->region("ensoniq.0")->base();
 
 //  if (offset>4 && offset!=0x80  && offset!=0xa0  && offset!=0xc0  && offset!=0xe0)
 //      logerror("%06x: DSP write offset %04x %04x\n",cpu_get_pc(space->cpu),offset,data);
@@ -249,7 +249,7 @@ ADDRESS_MAP_END
 SOUND_RESET( taito_f3_soundsystem_reset )
 {
 	/* Sound cpu program loads to 0xc00000 so we use a bank */
-	UINT16 *ROM = (UINT16 *)memory_region(machine, "audiocpu");
+	UINT16 *ROM = (UINT16 *)machine->region("audiocpu")->base();
 	memory_set_bankptr(machine, "bank1",&ROM[0x80000]);
 	memory_set_bankptr(machine, "bank2",&ROM[0x90000]);
 	memory_set_bankptr(machine, "bank3",&ROM[0xa0000]);
@@ -272,16 +272,16 @@ static const es5505_interface es5505_taito_f3_config =
 };
 
 MACHINE_CONFIG_FRAGMENT( taito_f3_sound )
-	MDRV_TIMER_ADD("timer_68681", taito_en_timer_callback)
+	MCFG_TIMER_ADD("timer_68681", taito_en_timer_callback)
 
-	MDRV_SOUND_RESET( taito_f3_soundsystem_reset )
+	MCFG_SOUND_RESET( taito_f3_soundsystem_reset )
 
-	MDRV_CPU_ADD("audiocpu",  M68000, 16000000)
-	MDRV_CPU_PROGRAM_MAP(f3_sound_map)
+	MCFG_CPU_ADD("audiocpu",  M68000, 16000000)
+	MCFG_CPU_PROGRAM_MAP(f3_sound_map)
 
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MDRV_SOUND_ADD("ensoniq", ES5505, 30476100/2)
-	MDRV_SOUND_CONFIG(es5505_taito_f3_config)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SOUND_ADD("ensoniq", ES5505, 30476100/2)
+	MCFG_SOUND_CONFIG(es5505_taito_f3_config)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END

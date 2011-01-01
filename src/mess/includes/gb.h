@@ -91,8 +91,8 @@ typedef struct {
 	emu_timer *lcd_timer;
 	int gbc_mode;
 
-	region_info *gb_vram;		/* Pointer to VRAM */
-	region_info *gb_oam;		/* Pointer to OAM memory */
+	memory_region *gb_vram;		/* Pointer to VRAM */
+	memory_region *gb_oam;		/* Pointer to OAM memory */
 	UINT8	*gb_vram_ptr;
 	UINT8	*gb_chrgen;		/* Character generator */
 	UINT8	*gb_bgdtab;		/* Background character table */
@@ -191,7 +191,7 @@ WRITE8_HANDLER( gb_ie_w );
 DEVICE_START(gb_cart);
 DEVICE_IMAGE_LOAD(gb_cart);
 INTERRUPT_GEN( gb_scanline_interrupt );
-void gb_timer_callback(running_device *device, int cycles);
+void gb_timer_callback(device_t *device, int cycles);
 WRITE8_HANDLER( gbc_io2_w );
 READ8_HANDLER( gbc_io2_r );
 MACHINE_START( gb );

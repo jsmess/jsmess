@@ -83,7 +83,7 @@ typedef struct
 
 
 
-INLINE mc6846_t* get_safe_token( running_device *device )
+INLINE mc6846_t* get_safe_token( device_t *device )
 {
 	assert( device != NULL );
 	assert( device->type() == MC6846 );
@@ -91,7 +91,7 @@ INLINE mc6846_t* get_safe_token( running_device *device )
 }
 
 
-INLINE UINT16 mc6846_counter( running_device *device )
+INLINE UINT16 mc6846_counter( device_t *device )
 {
 	mc6846_t* mc6846 = get_safe_token( device );
 	if ( mc6846->timer_started )
@@ -105,7 +105,7 @@ INLINE UINT16 mc6846_counter( running_device *device )
 
 
 
-INLINE void mc6846_update_irq( running_device *device )
+INLINE void mc6846_update_irq( device_t *device )
 {
 	mc6846_t* mc6846 = get_safe_token( device );
 	int cif = 0;
@@ -137,7 +137,7 @@ INLINE void mc6846_update_irq( running_device *device )
 
 
 
-INLINE void mc6846_update_cto ( running_device *device )
+INLINE void mc6846_update_cto ( device_t *device )
 {
 	mc6846_t* mc6846 = get_safe_token( device );
 	int cto = CTO;
@@ -152,7 +152,7 @@ INLINE void mc6846_update_cto ( running_device *device )
 
 
 
-INLINE void mc6846_timer_launch ( running_device *device )
+INLINE void mc6846_timer_launch ( device_t *device )
 {
 	mc6846_t* mc6846 = get_safe_token( device );
 	int delay = FACTOR * (mc6846->preset+1);
@@ -200,7 +200,7 @@ INLINE void mc6846_timer_launch ( running_device *device )
 
 static TIMER_CALLBACK( mc6846_timer_expire )
 {
-	running_device* device = (running_device*) ptr;
+	device_t* device = (device_t*) ptr;
 	mc6846_t* mc6846 = get_safe_token( device );
 	int delay = FACTOR * (mc6846->latch+1);
 
@@ -245,7 +245,7 @@ static TIMER_CALLBACK( mc6846_timer_expire )
 
 static TIMER_CALLBACK( mc6846_timer_one_shot )
 {
-	running_device* device = (running_device*) ptr;
+	device_t* device = (device_t*) ptr;
 	mc6846_t* mc6846 = get_safe_token( device );
 	LOG (( "%f: mc6846 timer one shot called\n", attotime_to_double(timer_get_time(device->machine)) ));
 
@@ -481,7 +481,7 @@ WRITE8_DEVICE_HANDLER ( mc6846_w )
 
 
 
-void mc6846_set_input_cp1 ( running_device *device, int data )
+void mc6846_set_input_cp1 ( device_t *device, int data )
 {
 	mc6846_t* mc6846 = get_safe_token( device );
 	data = (data != 0 );
@@ -496,7 +496,7 @@ void mc6846_set_input_cp1 ( running_device *device, int data )
 	}
 }
 
-void mc6846_set_input_cp2 ( running_device *device, int data )
+void mc6846_set_input_cp2 ( device_t *device, int data )
 {
 	mc6846_t* mc6846 = get_safe_token( device );
 	data = (data != 0 );
@@ -520,7 +520,7 @@ void mc6846_set_input_cp2 ( running_device *device, int data )
 
 
 
-UINT8 mc6846_get_output_port ( running_device *device )
+UINT8 mc6846_get_output_port ( device_t *device )
 {
 	mc6846_t* mc6846 = get_safe_token( device );
 	return PORT;
@@ -528,7 +528,7 @@ UINT8 mc6846_get_output_port ( running_device *device )
 
 
 
-UINT8 mc6846_get_output_cto ( running_device *device )
+UINT8 mc6846_get_output_cto ( device_t *device )
 {
 	mc6846_t* mc6846 = get_safe_token( device );
 	return CTO;
@@ -536,7 +536,7 @@ UINT8 mc6846_get_output_cto ( running_device *device )
 
 
 
-UINT8 mc6846_get_output_cp2 ( running_device *device )
+UINT8 mc6846_get_output_cp2 ( device_t *device )
 {
 	mc6846_t* mc6846 = get_safe_token( device );
 	return mc6846->cp2_cpu;
@@ -544,7 +544,7 @@ UINT8 mc6846_get_output_cp2 ( running_device *device )
 
 
 
-UINT16 mc6846_get_preset ( running_device *device )
+UINT16 mc6846_get_preset ( device_t *device )
 {
 	mc6846_t* mc6846 = get_safe_token( device );
 	return mc6846->preset;

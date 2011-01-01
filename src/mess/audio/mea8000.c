@@ -121,7 +121,7 @@ typedef struct
 #define SAMPLING ATTOTIME_IN_HZ((SUPERSAMPLING*F0))
 
 
-INLINE mea8000_t* get_safe_token( running_device *device )
+INLINE mea8000_t* get_safe_token( device_t *device )
 {
 	assert( device != NULL );
 	assert( device->type() == MEA8000);
@@ -197,7 +197,7 @@ static int mea8000_accept_byte( mea8000_t* mea8000 )
 		(mea8000->state == MEA8000_STARTED && mea8000->bufpos < 4);
 }
 
-static void mea8000_update_req( running_device *device )
+static void mea8000_update_req( device_t *device )
 {
 	mea8000_t* mea8000 = get_safe_token( device );
 	/* actually, req pulses less than 3us for each new byte,
@@ -242,7 +242,7 @@ static void mea8000_init_tables( running_machine* machine )
 		exp2_table[i] = exp(-2*M_PI*f) * QUANT;
 	}
 	for (i=0; i<NOISE_LEN; i++)
-		noise_table[i] = (mame_rand(machine) % (2*QUANT)) - QUANT;
+		noise_table[i] = (machine->rand() % (2*QUANT)) - QUANT;
 }
 
 
@@ -479,7 +479,7 @@ static void mea8000_stop_frame( running_machine *machine, mea8000_t* mea8000 )
 /* next sample in frame, sampling at 64 kHz */
 static TIMER_CALLBACK( mea8000_timer_expire )
 {
-	running_device* device = (running_device*) ptr;
+	device_t* device = (device_t*) ptr;
 	mea8000_t* mea8000 = get_safe_token( device );
 	int pos = mea8000->framepos % SUPERSAMPLING;
 

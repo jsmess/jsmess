@@ -33,12 +33,12 @@ public:
 	 { }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<running_device> m_gpib_pia;
-	required_device<running_device> m_com_pia;
+	required_device<device_t> m_gpib_pia;
+	required_device<device_t> m_com_pia;
 	required_device<acia6850_device> m_acia;
-	required_device<running_device> m_ieee;
-	required_device<running_device> m_speaker;
-	required_device<running_device> m_ram;
+	required_device<device_t> m_ieee;
+	required_device<device_t> m_speaker;
+	required_device<device_t> m_ram;
 
 	virtual void machine_start();
 
@@ -136,7 +136,7 @@ public:
 	 { }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<running_device> m_ram;
+	required_device<device_t> m_ram;
 
 	virtual void machine_start();
 

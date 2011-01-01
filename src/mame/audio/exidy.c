@@ -83,7 +83,7 @@ struct _exidy_sound_state
 	UINT8 riot_irq_state;
 
 	/* 6532 variables */
-	running_device *riot;
+	device_t *riot;
 
 	struct sh6840_timer_channel sh6840_timer[3];
 	INT16 sh6840_volume[3];
@@ -104,9 +104,9 @@ struct _exidy_sound_state
 	int has_sh8253;
 
 	/* 5220/CVSD variables */
-	running_device *cvsd;
-	running_device *tms;
-	running_device *pia1;
+	device_t *cvsd;
+	device_t *tms;
+	device_t *pia1;
 
 	/* sound streaming variables */
 	sound_stream *stream;
@@ -116,7 +116,7 @@ struct _exidy_sound_state
 };
 
 
-INLINE exidy_sound_state *get_safe_token(running_device *device)
+INLINE exidy_sound_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == EXIDY || device->type() == EXIDY_VENTURE || device->type() == EXIDY_VICTORY);
@@ -241,7 +241,7 @@ INLINE int sh6840_update_noise(exidy_sound_state *state, int clocks)
  *
  *************************************/
 
-static void sh6840_register_state_globals(running_device *device)
+static void sh6840_register_state_globals(device_t *device)
 {
 	exidy_sound_state *state = get_safe_token(device);
 
@@ -480,7 +480,7 @@ DEVICE_GET_INFO( exidy_sound )
  *
  *************************************/
 
-static void r6532_irq(running_device *device, int state)
+static void r6532_irq(device_t *device, int state)
 {
 	exidy_sound_state *sndstate = get_safe_token(device);
 	sndstate->riot_irq_state = (state == ASSERT_LINE) ? 1 : 0;
@@ -556,7 +556,7 @@ static const riot6532_interface r6532_interface =
  *************************************/
 
 
-static void sh8253_register_state_globals(running_device *device)
+static void sh8253_register_state_globals(device_t *device)
 {
 	exidy_sound_state *state = get_safe_token(device);
 
@@ -882,18 +882,18 @@ ADDRESS_MAP_END
 
 MACHINE_CONFIG_FRAGMENT( venture_audio )
 
-	MDRV_CPU_ADD("audiocpu", M6502, 3579545/4)
-	MDRV_CPU_PROGRAM_MAP(venture_audio_map)
+	MCFG_CPU_ADD("audiocpu", M6502, 3579545/4)
+	MCFG_CPU_PROGRAM_MAP(venture_audio_map)
 
-	MDRV_RIOT6532_ADD("riot", SH6532_CLOCK, r6532_interface)
+	MCFG_RIOT6532_ADD("riot", SH6532_CLOCK, r6532_interface)
 
-	MDRV_PIA6821_ADD("pia0", venture_pia0_intf)
-	MDRV_PIA6821_ADD("pia1", venture_pia1_intf)
+	MCFG_PIA6821_ADD("pia0", venture_pia0_intf)
+	MCFG_PIA6821_ADD("pia1", venture_pia1_intf)
 
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("custom", EXIDY_VENTURE, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("custom", EXIDY_VENTURE, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 
@@ -950,13 +950,13 @@ ADDRESS_MAP_END
 
 MACHINE_CONFIG_FRAGMENT( mtrap_cvsd_audio )
 
-	MDRV_CPU_ADD("cvsdcpu", Z80, CVSD_Z80_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(cvsd_map)
-	MDRV_CPU_IO_MAP(cvsd_iomap)
+	MCFG_CPU_ADD("cvsdcpu", Z80, CVSD_Z80_CLOCK)
+	MCFG_CPU_PROGRAM_MAP(cvsd_map)
+	MCFG_CPU_IO_MAP(cvsd_iomap)
 
 	/* audio hardware */
-	MDRV_SOUND_ADD("cvsd", MC3417, CVSD_CLOCK)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	MCFG_SOUND_ADD("cvsd", MC3417, CVSD_CLOCK)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
 
@@ -998,7 +998,7 @@ READ8_DEVICE_HANDLER( victory_sound_status_r )
 
 static TIMER_CALLBACK( delayed_command_w )
 {
-	running_device *pia1 = (running_device *)ptr;
+	device_t *pia1 = (device_t *)ptr;
 	pia6821_set_input_a(pia1, param, 0);
 	pia6821_ca1_w(pia1, 0);
 }
@@ -1068,7 +1068,7 @@ static DEVICE_START( victory_sound )
 static DEVICE_RESET( victory_sound )
 {
 	exidy_sound_state *state = get_safe_token(device);
-	running_device *pia1 = state->pia1;
+	device_t *pia1 = state->pia1;
 
 	DEVICE_RESET_CALL(common_sh_reset);
 	pia1->reset();
@@ -1121,17 +1121,17 @@ ADDRESS_MAP_END
 
 MACHINE_CONFIG_FRAGMENT( victory_audio )
 
-	MDRV_CPU_ADD("audiocpu", M6502, VICTORY_AUDIO_CPU_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(victory_audio_map)
+	MCFG_CPU_ADD("audiocpu", M6502, VICTORY_AUDIO_CPU_CLOCK)
+	MCFG_CPU_PROGRAM_MAP(victory_audio_map)
 
-	MDRV_RIOT6532_ADD("riot", SH6532_CLOCK, r6532_interface)
-	MDRV_PIA6821_ADD("pia1", victory_pia1_intf)
+	MCFG_RIOT6532_ADD("riot", SH6532_CLOCK, r6532_interface)
+	MCFG_PIA6821_ADD("pia1", victory_pia1_intf)
 
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("custom", EXIDY_VICTORY, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("custom", EXIDY_VICTORY, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD("tms", TMS5220, 640000)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("tms", TMS5220, 640000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END

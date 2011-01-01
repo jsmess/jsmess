@@ -716,9 +716,9 @@ static const sc61860_cpu_core pc1401_config =
 };
 
 static MACHINE_CONFIG_FRAGMENT( pocketc )
-	MDRV_QUANTUM_TIME(HZ(60))
+	MCFG_QUANTUM_TIME(HZ(60))
 
-	MDRV_NVRAM_HANDLER( pc1401 )
+	MCFG_NVRAM_HANDLER( pc1401 )
 
 	/*
        aim: show sharp with keyboard
@@ -726,36 +726,36 @@ static MACHINE_CONFIG_FRAGMENT( pocketc )
        (lcd dot displayed as 2x3 pixel)
        it seems to have 3/4 ratio in the real pc1401 */
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", LCD)
-	MDRV_SCREEN_REFRESH_RATE(20)	/* very early and slow lcd */
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(594, 273)
-	MDRV_SCREEN_VISIBLE_AREA(0, 594-1, 0, 273-1)
-//  MDRV_SCREEN_SIZE(640, 273)
-//  MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 273-1)
-	MDRV_GFXDECODE( pc1401 )
-	MDRV_PALETTE_LENGTH(8*2)
-	MDRV_PALETTE_INIT( pocketc )
+	MCFG_SCREEN_ADD("screen", LCD)
+	MCFG_SCREEN_REFRESH_RATE(20)	/* very early and slow lcd */
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(594, 273)
+	MCFG_SCREEN_VISIBLE_AREA(0, 594-1, 0, 273-1)
+//  MCFG_SCREEN_SIZE(640, 273)
+//  MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 273-1)
+	MCFG_GFXDECODE( pc1401 )
+	MCFG_PALETTE_LENGTH(8*2)
+	MCFG_PALETTE_INIT( pocketc )
 
 	/* sound hardware */
-	/*MDRV_SOUND_ADD("dac", DAC, pocketc_sound_interface)*/
+	/*MCFG_SOUND_ADD("dac", DAC, pocketc_sound_interface)*/
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( pc1401, pc1401_state )
-	MDRV_CPU_ADD("maincpu", SC61860, 192000)        /* 7.8336 MHz */
-	MDRV_CPU_PROGRAM_MAP(pc1401_mem)
-	MDRV_CPU_CONFIG(pc1401_config)
+	MCFG_CPU_ADD("maincpu", SC61860, 192000)        /* 7.8336 MHz */
+	MCFG_CPU_PROGRAM_MAP(pc1401_mem)
+	MCFG_CPU_CONFIG(pc1401_config)
 
-	MDRV_FRAGMENT_ADD(pocketc)
+	MCFG_FRAGMENT_ADD(pocketc)
 
-	MDRV_VIDEO_UPDATE( pc1401 )
+	MCFG_VIDEO_UPDATE( pc1401 )
 
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( pc1402, pc1401 )
-	MDRV_CPU_MODIFY( "maincpu" )
-	MDRV_CPU_PROGRAM_MAP( pc1402_mem)
+	MCFG_CPU_MODIFY( "maincpu" )
+	MCFG_CPU_PROGRAM_MAP( pc1402_mem)
 MACHINE_CONFIG_END
 
 static const sc61860_cpu_core pc1251_config =
@@ -767,37 +767,37 @@ static const sc61860_cpu_core pc1251_config =
 };
 
 static MACHINE_CONFIG_START( pc1250, pc1251_state )
-	MDRV_CPU_ADD("maincpu", SC61860, 192000)        /* 7.8336 MHz */
-	MDRV_CPU_PROGRAM_MAP( pc1250_mem)
-	MDRV_CPU_CONFIG( pc1251_config )
+	MCFG_CPU_ADD("maincpu", SC61860, 192000)        /* 7.8336 MHz */
+	MCFG_CPU_PROGRAM_MAP( pc1250_mem)
+	MCFG_CPU_CONFIG( pc1251_config )
 
-	MDRV_FRAGMENT_ADD(pocketc)
+	MCFG_FRAGMENT_ADD(pocketc)
 
-	MDRV_NVRAM_HANDLER( pc1251 )
+	MCFG_NVRAM_HANDLER( pc1251 )
 
 	/* video hardware */
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_SIZE(608, 300)
-	MDRV_SCREEN_VISIBLE_AREA(0, 608-1, 0, 300-1)
-	MDRV_GFXDECODE( pc1251 )
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_SIZE(608, 300)
+	MCFG_SCREEN_VISIBLE_AREA(0, 608-1, 0, 300-1)
+	MCFG_GFXDECODE( pc1251 )
 
-	MDRV_VIDEO_UPDATE( pc1251 )
+	MCFG_VIDEO_UPDATE( pc1251 )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( pc1251, pc1250 )
-	MDRV_CPU_MODIFY( "maincpu" )
-	MDRV_CPU_PROGRAM_MAP( pc1251_mem)
+	MCFG_CPU_MODIFY( "maincpu" )
+	MCFG_CPU_PROGRAM_MAP( pc1251_mem)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( pc1255, pc1250 )
-	MDRV_CPU_MODIFY( "maincpu" )
-	MDRV_CPU_PROGRAM_MAP( pc1255_mem)
+	MCFG_CPU_MODIFY( "maincpu" )
+	MCFG_CPU_PROGRAM_MAP( pc1255_mem)
 MACHINE_CONFIG_END
 
 static NVRAM_HANDLER( pc1260 )
 {
-	running_device *main_cpu = machine->device("maincpu");
-	UINT8 *ram = memory_region(machine, "maincpu") + 0x4000;
+	device_t *main_cpu = machine->device("maincpu");
+	UINT8 *ram = machine->region("maincpu")->base() + 0x4000;
 	UINT8 *cpu = sc61860_internal_ram(main_cpu);
 
 	if (read_or_write)
@@ -818,15 +818,15 @@ static NVRAM_HANDLER( pc1260 )
 }
 
 static MACHINE_CONFIG_DERIVED( pc1260, pc1250 )
-	MDRV_CPU_MODIFY( "maincpu" )
-	MDRV_CPU_PROGRAM_MAP( pc1260_mem)
+	MCFG_CPU_MODIFY( "maincpu" )
+	MCFG_CPU_PROGRAM_MAP( pc1260_mem)
 
-	MDRV_NVRAM_HANDLER( pc1260 )
+	MCFG_NVRAM_HANDLER( pc1260 )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( pc1261, pc1260 )
-	MDRV_CPU_MODIFY( "maincpu" )
-	MDRV_CPU_PROGRAM_MAP( pc1261_mem)
+	MCFG_CPU_MODIFY( "maincpu" )
+	MCFG_CPU_PROGRAM_MAP( pc1261_mem)
 MACHINE_CONFIG_END
 
 static const sc61860_cpu_core pc1350_config =
@@ -838,30 +838,30 @@ static const sc61860_cpu_core pc1350_config =
 };
 
 static MACHINE_CONFIG_START( pc1350, pc1350_state )
-	MDRV_CPU_ADD("maincpu", SC61860, 192000)        /* 7.8336 MHz */
-	MDRV_CPU_PROGRAM_MAP( pc1350_mem)
-	MDRV_CPU_CONFIG( pc1350_config )
+	MCFG_CPU_ADD("maincpu", SC61860, 192000)        /* 7.8336 MHz */
+	MCFG_CPU_PROGRAM_MAP( pc1350_mem)
+	MCFG_CPU_CONFIG( pc1350_config )
 
-	MDRV_FRAGMENT_ADD( pocketc )
+	MCFG_FRAGMENT_ADD( pocketc )
 
-	MDRV_MACHINE_START( pc1350 )
-	MDRV_NVRAM_HANDLER( pc1350 )
+	MCFG_MACHINE_START( pc1350 )
+	MCFG_NVRAM_HANDLER( pc1350 )
 
 	/*
        aim: show sharp with keyboard
        resolution depends on the dots of the lcd
        (lcd dot displayed as 2x2 pixel) */
 	/* video hardware */
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_SIZE(640, 252)
-	MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 252-1)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_SIZE(640, 252)
+	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 252-1)
 
-	MDRV_VIDEO_UPDATE( pc1350 )
+	MCFG_VIDEO_UPDATE( pc1350 )
 
 	/* internal ram */
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("4K")
-	MDRV_RAM_EXTRA_OPTIONS("12K,20K")
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("4K")
+	MCFG_RAM_EXTRA_OPTIONS("12K,20K")
 MACHINE_CONFIG_END
 
 static const sc61860_cpu_core pc1403_config =
@@ -873,36 +873,36 @@ static const sc61860_cpu_core pc1403_config =
 };
 
 static MACHINE_CONFIG_START( pc1403, pc1403_state )
-	MDRV_CPU_ADD("maincpu", SC61860, 192000)        /* 7.8336 MHz */
-	MDRV_CPU_PROGRAM_MAP(pc1401_mem)
-	MDRV_CPU_CONFIG(pc1401_config)
+	MCFG_CPU_ADD("maincpu", SC61860, 192000)        /* 7.8336 MHz */
+	MCFG_CPU_PROGRAM_MAP(pc1401_mem)
+	MCFG_CPU_CONFIG(pc1401_config)
 
-	MDRV_FRAGMENT_ADD( pocketc )
+	MCFG_FRAGMENT_ADD( pocketc )
 
-	MDRV_CPU_REPLACE( "maincpu", SC61860, 256000 )
-	MDRV_CPU_PROGRAM_MAP( pc1403_mem)
-	MDRV_CPU_CONFIG( pc1403_config )
+	MCFG_CPU_REPLACE( "maincpu", SC61860, 256000 )
+	MCFG_CPU_PROGRAM_MAP( pc1403_mem)
+	MCFG_CPU_CONFIG( pc1403_config )
 
-	MDRV_NVRAM_HANDLER( pc1403 )
+	MCFG_NVRAM_HANDLER( pc1403 )
 
 	/*
        aim: show sharp with keyboard
        resolution depends on the dots of the lcd
        (lcd dot displayed as 2x2 pixel) */
 	/* video hardware */
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_SIZE(848, 320)
-	MDRV_SCREEN_VISIBLE_AREA(0, 848-1, 0, 320-1)
-//  MDRV_SCREEN_SIZE(848, 361)
-//  MDRV_SCREEN_VISIBLE_AREA(0, 848-1, 0, 361-1)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_SIZE(848, 320)
+	MCFG_SCREEN_VISIBLE_AREA(0, 848-1, 0, 320-1)
+//  MCFG_SCREEN_SIZE(848, 361)
+//  MCFG_SCREEN_VISIBLE_AREA(0, 848-1, 0, 361-1)
 
-	MDRV_VIDEO_START( pc1403 )
-	MDRV_VIDEO_UPDATE( pc1403 )
+	MCFG_VIDEO_START( pc1403 )
+	MCFG_VIDEO_UPDATE( pc1403 )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( pc1403h, pc1403 )
-	MDRV_CPU_MODIFY( "maincpu" )
-	MDRV_CPU_PROGRAM_MAP( pc1403h_mem)
+	MCFG_CPU_MODIFY( "maincpu" )
+	MCFG_CPU_PROGRAM_MAP( pc1403h_mem)
 MACHINE_CONFIG_END
 
 

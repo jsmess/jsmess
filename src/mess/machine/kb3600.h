@@ -63,15 +63,15 @@
 
 DECLARE_LEGACY_DEVICE(AY3600PRO002, ay3600pro002);
 
-#define MDRV_AY3600PRO002_ADD(_tag, _intf) \
-	MDRV_DEVICE_ADD(_tag, AY3600PRO002, 0) \
-	MDRV_DEVICE_CONFIG(_intf)
+#define MCFG_AY3600PRO002_ADD(_tag, _intf) \
+	MCFG_DEVICE_ADD(_tag, AY3600PRO002, 0) \
+	MCFG_DEVICE_CONFIG(_intf)
 
 #define AY3600_INTERFACE(name) \
 	const ay3600_interface (name) =
 
-typedef UINT16 (*ay3600_y_r)(running_device *device, int x);
-#define AY3600_Y_READ(name) UINT16 name(running_device *device, int x)
+typedef UINT16 (*ay3600_y_r)(device_t *device, int x);
+#define AY3600_Y_READ(name) UINT16 name(device_t *device, int x)
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -96,6 +96,6 @@ struct _ay3600_interface
     PROTOTYPES
 ***************************************************************************/
 /* data read */
-UINT16 ay3600_b_r(running_device *device);
+UINT16 ay3600_b_r(device_t *device);
 
 #endif

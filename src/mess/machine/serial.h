@@ -224,24 +224,24 @@ void serial_helper_setup(void);
 /*******************************************************************************/
 /**** SERIAL DEVICE ****/
 
-unsigned long serial_device_get_state(running_device *device);
+unsigned long serial_device_get_state(device_t *device);
 
 /* connect this device to the emulated serial chip */
 /* id is the serial device to connect to */
 /* connection is the serial connection to connect to the serial device */
-void serial_device_connect(running_device *image, serial_connection *connection);
+void serial_device_connect(device_t *image, serial_connection *connection);
 
 DECLARE_LEGACY_IMAGE_DEVICE(SERIAL, serial);
 
-#define MDRV_SERIAL_ADD(_tag) \
-	MDRV_DEVICE_ADD(_tag, SERIAL, 0)
+#define MCFG_SERIAL_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, SERIAL, 0)
 
 DEVICE_START(serial);
 DEVICE_IMAGE_LOAD(serial);
 
-void serial_device_setup(running_device *image, int baud_rate, int num_data_bits, int stop_bit_count, int parity_code);
+void serial_device_setup(device_t *image, int baud_rate, int num_data_bits, int stop_bit_count, int parity_code);
 
 /* set the transmit state of the serial device */
-void serial_device_set_transmit_state(running_device *image, int state);
+void serial_device_set_transmit_state(device_t *image, int state);
 
 #endif /* SERIAL_H_ */

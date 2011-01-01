@@ -518,62 +518,62 @@ static const floppy_config cgenie_floppy_config =
 
 static MACHINE_CONFIG_START( cgenie_common, cgenie_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, XTAL_17_73447MHz/8)        /* 2,2168 MHz */
-	MDRV_CPU_PROGRAM_MAP(cgenie_mem)
-	MDRV_CPU_IO_MAP(cgenie_io)
-	MDRV_CPU_VBLANK_INT("screen", cgenie_frame_interrupt)
-	MDRV_CPU_PERIODIC_INT(cgenie_timer_interrupt, 40)
-	MDRV_QUANTUM_TIME(HZ(240))
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_17_73447MHz/8)        /* 2,2168 MHz */
+	MCFG_CPU_PROGRAM_MAP(cgenie_mem)
+	MCFG_CPU_IO_MAP(cgenie_io)
+	MCFG_CPU_VBLANK_INT("screen", cgenie_frame_interrupt)
+	MCFG_CPU_PERIODIC_INT(cgenie_timer_interrupt, 40)
+	MCFG_QUANTUM_TIME(HZ(240))
 
-	MDRV_MACHINE_START( cgenie )
-	MDRV_MACHINE_RESET( cgenie )
+	MCFG_MACHINE_START( cgenie )
+	MCFG_MACHINE_RESET( cgenie )
 
     /* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(50)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(48*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1,0*8,32*8-1)
-	MDRV_GFXDECODE( cgenie )
-	MDRV_PALETTE_LENGTH(108)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(48*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1,0*8,32*8-1)
+	MCFG_GFXDECODE( cgenie )
+	MCFG_PALETTE_LENGTH(108)
 
 	// Actually the video is driven by an HD46505 clocked at XTAL_17_73447MHz/16
-	MDRV_VIDEO_START( cgenie )
-	MDRV_VIDEO_UPDATE( cgenie )
+	MCFG_VIDEO_START( cgenie )
+	MCFG_VIDEO_UPDATE( cgenie )
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("dac", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MDRV_SOUND_ADD("ay8910", AY8910, XTAL_17_73447MHz/8)
-	MDRV_SOUND_CONFIG(cgenie_ay8910_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD("ay8910", AY8910, XTAL_17_73447MHz/8)
+	MCFG_SOUND_CONFIG(cgenie_ay8910_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
-	MDRV_CASSETTE_ADD( "cassette", cgenie_cassette_config )
+	MCFG_CASSETTE_ADD( "cassette", cgenie_cassette_config )
 
-	MDRV_WD179X_ADD("wd179x", cgenie_wd17xx_interface )
+	MCFG_WD179X_ADD("wd179x", cgenie_wd17xx_interface )
 
-	MDRV_FLOPPY_4_DRIVES_ADD(cgenie_floppy_config)
+	MCFG_FLOPPY_4_DRIVES_ADD(cgenie_floppy_config)
 	/* cartridge */
-	MDRV_CARTSLOT_ADD("cart")
-	MDRV_CARTSLOT_EXTENSION_LIST("rom")
-	MDRV_CARTSLOT_NOT_MANDATORY
+	MCFG_CARTSLOT_ADD("cart")
+	MCFG_CARTSLOT_EXTENSION_LIST("rom")
+	MCFG_CARTSLOT_NOT_MANDATORY
 
 	/* internal ram */
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("16K")
-	MDRV_RAM_EXTRA_OPTIONS("32K")
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("16K")
+	MCFG_RAM_EXTRA_OPTIONS("32K")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( cgenie, cgenie_common )
 
-	MDRV_PALETTE_INIT( cgenie )
+	MCFG_PALETTE_INIT( cgenie )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( cgenienz, cgenie_common )
 
-	MDRV_PALETTE_INIT( cgenienz )
+	MCFG_PALETTE_INIT( cgenienz )
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -708,7 +708,7 @@ DEVICE_IMAGE_LOAD( cgenie_floppy )
                 spt = pd_list[i].SPT / heads;
                 dir_sector = pd_list[i].DDSL * pd_list[i].GATM * pd_list[i].GPL + pd_list[i].SPT;
                 dir_length = pd_list[i].DDGA * pd_list[i].GPL;
-                memcpy(memory_region(image.device().machine, "maincpu") + 0x5A71 + floppy_get_drive(image) * sizeof(PDRIVE), &pd_list[i], sizeof(PDRIVE));
+                memcpy(image.device().machine->region("maincpu")->base() + 0x5A71 + floppy_get_drive(image) * sizeof(PDRIVE), &pd_list[i], sizeof(PDRIVE));
                 break;
             }
         }

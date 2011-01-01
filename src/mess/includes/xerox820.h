@@ -36,12 +36,12 @@ public:
 	virtual bool video_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 
 	required_device<cpu_device> m_maincpu;
-	required_device<running_device> m_kbpio;
-	required_device<running_device> m_ctc;
-	required_device<running_device> m_fdc;
-	required_device<running_device> m_ram;
-	required_device<running_device> m_floppy0;
-	required_device<running_device> m_floppy1;
+	required_device<device_t> m_kbpio;
+	required_device<device_t> m_ctc;
+	required_device<device_t> m_fdc;
+	required_device<device_t> m_ram;
+	required_device<device_t> m_floppy0;
+	required_device<device_t> m_floppy1;
 	
 	DECLARE_WRITE8_MEMBER( scroll_w );
 	//DECLARE_WRITE8_MEMBER( x120_system_w );

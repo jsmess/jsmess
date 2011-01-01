@@ -30,7 +30,7 @@ public:
 	int fdc_index;
 
 	/* devices */
-	running_device *cassette;
+	device_t *cassette;
 };
 
 /* ---------- defined in video/osi.c ---------- */

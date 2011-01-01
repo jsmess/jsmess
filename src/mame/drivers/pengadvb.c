@@ -40,7 +40,7 @@ static void mem_map_banks(running_machine *machine)
 		case 0:
 		{
 			memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000, 0x3fff, 0, 0, "bank1" );
-			memory_set_bankptr(machine, "bank1", memory_region(machine, "maincpu"));
+			memory_set_bankptr(machine, "bank1", machine->region("maincpu")->base());
 			break;
 		};
 		case 1:
@@ -60,16 +60,16 @@ static void mem_map_banks(running_machine *machine)
 		{
 			memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x4000, 0x5fff, 0, 0, "bank21" );
 			memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x6000, 0x7fff, 0, 0, "bank22" );
-			memory_set_bankptr(machine, "bank21", memory_region(machine, "maincpu") + 0x4000);
-			memory_set_bankptr(machine, "bank22", memory_region(machine, "maincpu") + 0x4000 + 0x2000);
+			memory_set_bankptr(machine, "bank21", machine->region("maincpu")->base() + 0x4000);
+			memory_set_bankptr(machine, "bank22", machine->region("maincpu")->base() + 0x4000 + 0x2000);
 			break;
 		}
 		case 1:
 		{
 			memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x4000, 0x5fff, 0, 0, "bank21" );
 			memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x6000, 0x7fff, 0, 0, "bank22" );
-			memory_set_bankptr(machine, "bank21", memory_region(machine, "game") + mem_banks[0]*0x2000);
-			memory_set_bankptr(machine, "bank22", memory_region(machine, "game") + mem_banks[1]*0x2000);
+			memory_set_bankptr(machine, "bank21", machine->region("game")->base() + mem_banks[0]*0x2000);
+			memory_set_bankptr(machine, "bank22", machine->region("game")->base() + mem_banks[1]*0x2000);
 			break;
 		}
 		case 2:
@@ -88,8 +88,8 @@ static void mem_map_banks(running_machine *machine)
 		{
 			memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0x9fff, 0, 0, "bank31" );
 			memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa000, 0xbfff, 0, 0, "bank32" );
-			memory_set_bankptr(machine, "bank31", memory_region(machine, "game") + mem_banks[2]*0x2000);
-			memory_set_bankptr(machine, "bank32", memory_region(machine, "game") + mem_banks[3]*0x2000);
+			memory_set_bankptr(machine, "bank31", machine->region("game")->base() + mem_banks[2]*0x2000);
+			memory_set_bankptr(machine, "bank32", machine->region("game")->base() + mem_banks[3]*0x2000);
 			break;
 		}
 		case 0:
@@ -268,34 +268,34 @@ static INTERRUPT_GEN( pengadvb_interrupt )
 
 static MACHINE_CONFIG_START( pengadvb, driver_device )
 
-	MDRV_CPU_ADD("maincpu", Z80, XTAL_10_738635MHz/3)		  /* 3.579545 Mhz */
-	MDRV_CPU_PROGRAM_MAP(program_mem)
-	MDRV_CPU_IO_MAP(io_mem)
-	MDRV_CPU_VBLANK_INT("screen",pengadvb_interrupt)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_10_738635MHz/3)		  /* 3.579545 Mhz */
+	MCFG_CPU_PROGRAM_MAP(program_mem)
+	MCFG_CPU_IO_MAP(io_mem)
+	MCFG_CPU_VBLANK_INT("screen",pengadvb_interrupt)
 
-	MDRV_MACHINE_START( pengadvb )
-	MDRV_MACHINE_RESET( pengadvb )
+	MCFG_MACHINE_START( pengadvb )
+	MCFG_MACHINE_RESET( pengadvb )
 
-    MDRV_I8255A_ADD( "ppi8255", pengadvb_ppi8255_interface)
+    MCFG_I8255A_ADD( "ppi8255", pengadvb_ppi8255_interface)
 
 	/* video hardware */
-	MDRV_FRAGMENT_ADD(tms9928a)
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_REFRESH_RATE((float)XTAL_10_738635MHz/2/342/262)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(4395)) /* 69 lines */
+	MCFG_FRAGMENT_ADD(tms9928a)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_REFRESH_RATE((float)XTAL_10_738635MHz/2/342/262)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(4395)) /* 69 lines */
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("aysnd", AY8910, (float)XTAL_10_738635MHz/6)
-	MDRV_SOUND_CONFIG(pengadvb_ay8910_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("aysnd", AY8910, (float)XTAL_10_738635MHz/6)
+	MCFG_SOUND_CONFIG(pengadvb_ay8910_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 static void pengadvb_decrypt(running_machine *machine, const char* region)
 {
-	UINT8 *mem = memory_region(machine, region);
-	int memsize = memory_region_length(machine, region);
+	UINT8 *mem = machine->region(region)->base();
+	int memsize = machine->region(region)->bytes();
 	UINT8 *buf;
 	int i;
 

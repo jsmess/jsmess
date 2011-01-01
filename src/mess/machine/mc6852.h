@@ -34,9 +34,9 @@
 
 DECLARE_LEGACY_DEVICE(MC6852, mc6852);
 
-#define MDRV_MC6852_ADD(_tag, _clock, _config) \
-	MDRV_DEVICE_ADD((_tag), MC6852, _clock)	\
-	MDRV_DEVICE_CONFIG(_config)
+#define MCFG_MC6852_ADD(_tag, _clock, _config) \
+	MCFG_DEVICE_ADD((_tag), MC6852, _clock)	\
+	MCFG_DEVICE_CONFIG(_config)
 
 #define MC6852_INTERFACE(name) \
 	const mc6852_interface (name) =

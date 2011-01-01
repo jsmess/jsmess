@@ -56,7 +56,7 @@ static WRITE8_HANDLER( cashquiz_question_bank_low_w )
 		static const char * const bankname[] = { "bank1", "bank2", "bank3", "bank4", "bank5", "bank6", "bank7", "bank8" };
 		const char *bank = bankname[data & 7];
 		int bankaddr = question_addr_high | ((data - 0x60) * 0x100);
-		UINT8 *questions = memory_region(space->machine, "user1") + bankaddr;
+		UINT8 *questions = space->machine->region("user1")->base() + bankaddr;
 		memory_set_bankptr(space->machine, bank,questions);
 
 	}
@@ -452,39 +452,39 @@ GFXDECODE_END
 static MACHINE_CONFIG_START( pingpong, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu",Z80,18432000/6)		/* 3.072 MHz (probably) */
-	MDRV_CPU_PROGRAM_MAP(pingpong_map)
-	MDRV_CPU_VBLANK_INT_HACK(pingpong_interrupt,16)	/* 1 IRQ + 8 NMI */
+	MCFG_CPU_ADD("maincpu",Z80,18432000/6)		/* 3.072 MHz (probably) */
+	MCFG_CPU_PROGRAM_MAP(pingpong_map)
+	MCFG_CPU_VBLANK_INT_HACK(pingpong_interrupt,16)	/* 1 IRQ + 8 NMI */
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(pingpong)
-	MDRV_PALETTE_LENGTH(64*4+64*4)
+	MCFG_GFXDECODE(pingpong)
+	MCFG_PALETTE_LENGTH(64*4+64*4)
 
-	MDRV_PALETTE_INIT(pingpong)
-	MDRV_VIDEO_START(pingpong)
-	MDRV_VIDEO_UPDATE(pingpong)
+	MCFG_PALETTE_INIT(pingpong)
+	MCFG_VIDEO_START(pingpong)
+	MCFG_VIDEO_UPDATE(pingpong)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("snsnd", SN76496, 18432000/8)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("snsnd", SN76496, 18432000/8)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 /* too fast! */
 static MACHINE_CONFIG_DERIVED( merlinmm, pingpong )
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(merlinmm_map)
-	MDRV_CPU_VBLANK_INT_HACK(pingpong_interrupt,2)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(merlinmm_map)
+	MCFG_CPU_VBLANK_INT_HACK(pingpong_interrupt,2)
 
-	MDRV_NVRAM_ADD_0FILL("nvram")
+	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
 
@@ -565,7 +565,7 @@ ROM_END
 
 static DRIVER_INIT( merlinmm )
 {
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 	int i;
 
 	/* decrypt program code */
@@ -579,12 +579,12 @@ static DRIVER_INIT( cashquiz )
 	int i;
 
 	/* decrypt program code */
-	ROM = memory_region(machine, "maincpu");
+	ROM = machine->region("maincpu")->base();
 	for( i = 0; i < 0x4000; i++ )
 		ROM[i] = BITSWAP8(ROM[i],0,1,2,3,4,5,6,7);
 
 	/* decrypt questions */
-	ROM = memory_region(machine, "user1");
+	ROM = machine->region("user1")->base();
 	for( i = 0; i < 0x40000; i++ )
 		ROM[i] = BITSWAP8(ROM[i],0,1,2,3,4,5,6,7);
 
@@ -603,14 +603,14 @@ static DRIVER_INIT( cashquiz )
 	memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x5700, 0x57ff, 0, 0, "bank8");
 
 	// setup default banks
-	memory_set_bankptr(machine, "bank1", memory_region(machine, "user1") + 0x100*0 );
-	memory_set_bankptr(machine, "bank2", memory_region(machine, "user1") + 0x100*1 );
-	memory_set_bankptr(machine, "bank3", memory_region(machine, "user1") + 0x100*2 );
-	memory_set_bankptr(machine, "bank4", memory_region(machine, "user1") + 0x100*3 );
-	memory_set_bankptr(machine, "bank5", memory_region(machine, "user1") + 0x100*4 );
-	memory_set_bankptr(machine, "bank6", memory_region(machine, "user1") + 0x100*5 );
-	memory_set_bankptr(machine, "bank7", memory_region(machine, "user1") + 0x100*6 );
-	memory_set_bankptr(machine, "bank8", memory_region(machine, "user1") + 0x100*7 );
+	memory_set_bankptr(machine, "bank1", machine->region("user1")->base() + 0x100*0 );
+	memory_set_bankptr(machine, "bank2", machine->region("user1")->base() + 0x100*1 );
+	memory_set_bankptr(machine, "bank3", machine->region("user1")->base() + 0x100*2 );
+	memory_set_bankptr(machine, "bank4", machine->region("user1")->base() + 0x100*3 );
+	memory_set_bankptr(machine, "bank5", machine->region("user1")->base() + 0x100*4 );
+	memory_set_bankptr(machine, "bank6", machine->region("user1")->base() + 0x100*5 );
+	memory_set_bankptr(machine, "bank7", machine->region("user1")->base() + 0x100*6 );
+	memory_set_bankptr(machine, "bank8", machine->region("user1")->base() + 0x100*7 );
 }
 
 

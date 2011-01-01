@@ -391,7 +391,7 @@ ADDRESS_MAP_END
 
 ***************************************************************************/
 
-static void sound_irq( running_device *device, int irq )
+static void sound_irq( device_t *device, int irq )
 {
 	psikyo_state *state = device->machine->driver_data<psikyo_state>();
 	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
@@ -1063,41 +1063,41 @@ static const ym2610_interface sngkace_ym2610_interface =
 static MACHINE_CONFIG_START( sngkace, psikyo_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68EC020, XTAL_32MHz/2) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(psikyo_map)
-	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
+	MCFG_CPU_ADD("maincpu", M68EC020, XTAL_32MHz/2) /* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(psikyo_map)
+	MCFG_CPU_VBLANK_INT("screen", irq1_line_hold)
 
-	MDRV_CPU_ADD("audiocpu", Z80, XTAL_32MHz/8) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(sngkace_sound_map)
-	MDRV_CPU_IO_MAP(sngkace_sound_io_map)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_32MHz/8) /* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(sngkace_sound_map)
+	MCFG_CPU_IO_MAP(sngkace_sound_io_map)
 
-	MDRV_MACHINE_START(psikyo)
-	MDRV_MACHINE_RESET(psikyo)
+	MCFG_MACHINE_START(psikyo)
+	MCFG_MACHINE_RESET(psikyo)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(59.3)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)	// we're using IPT_VBLANK
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(320, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 320-1, 0, 256-32-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(59.3)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)	// we're using IPT_VBLANK
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(320, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 256-32-1)
 
-	MDRV_GFXDECODE(psikyo)
-	MDRV_PALETTE_LENGTH(0x1000)
+	MCFG_GFXDECODE(psikyo)
+	MCFG_PALETTE_LENGTH(0x1000)
 
-	MDRV_VIDEO_START(sngkace)
-	MDRV_VIDEO_EOF(psikyo)
-	MDRV_VIDEO_UPDATE(psikyo)
+	MCFG_VIDEO_START(sngkace)
+	MCFG_VIDEO_EOF(psikyo)
+	MCFG_VIDEO_UPDATE(psikyo)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ymsnd", YM2610, XTAL_32MHz/4) /* verified on pcb */
-	MDRV_SOUND_CONFIG(sngkace_ym2610_interface)
-	MDRV_SOUND_ROUTE(0, "lspeaker",  1.2)
-	MDRV_SOUND_ROUTE(0, "rspeaker", 1.2)
-	MDRV_SOUND_ROUTE(1, "lspeaker",  1.0)
-	MDRV_SOUND_ROUTE(2, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_32MHz/4) /* verified on pcb */
+	MCFG_SOUND_CONFIG(sngkace_ym2610_interface)
+	MCFG_SOUND_ROUTE(0, "lspeaker",  1.2)
+	MCFG_SOUND_ROUTE(0, "rspeaker", 1.2)
+	MCFG_SOUND_ROUTE(1, "lspeaker",  1.0)
+	MCFG_SOUND_ROUTE(2, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -1115,74 +1115,74 @@ static const ym2610_interface gunbird_ym2610_interface =
 static MACHINE_CONFIG_START( gunbird, psikyo_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68EC020, 16000000)
-	MDRV_CPU_PROGRAM_MAP(psikyo_map)
-	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
+	MCFG_CPU_ADD("maincpu", M68EC020, 16000000)
+	MCFG_CPU_PROGRAM_MAP(psikyo_map)
+	MCFG_CPU_VBLANK_INT("screen", irq1_line_hold)
 
-	MDRV_CPU_ADD("audiocpu", Z80, 4000000)	/* ! LZ8420M (Z80 core) ! */
-	MDRV_CPU_PROGRAM_MAP(gunbird_sound_map)
-	MDRV_CPU_IO_MAP(gunbird_sound_io_map)
+	MCFG_CPU_ADD("audiocpu", Z80, 4000000)	/* ! LZ8420M (Z80 core) ! */
+	MCFG_CPU_PROGRAM_MAP(gunbird_sound_map)
+	MCFG_CPU_IO_MAP(gunbird_sound_io_map)
 
-	MDRV_MACHINE_START(psikyo)
-	MDRV_MACHINE_RESET(psikyo)
+	MCFG_MACHINE_START(psikyo)
+	MCFG_MACHINE_RESET(psikyo)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(59.3)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)	// we're using IPT_VBLANK
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(320, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 320-1, 0, 256-32-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(59.3)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)	// we're using IPT_VBLANK
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(320, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 256-32-1)
 
-	MDRV_GFXDECODE(psikyo)
-	MDRV_PALETTE_LENGTH(0x1000)
+	MCFG_GFXDECODE(psikyo)
+	MCFG_PALETTE_LENGTH(0x1000)
 
-	MDRV_VIDEO_START(psikyo)
-	MDRV_VIDEO_EOF(psikyo)
-	MDRV_VIDEO_UPDATE(psikyo)
+	MCFG_VIDEO_START(psikyo)
+	MCFG_VIDEO_EOF(psikyo)
+	MCFG_VIDEO_UPDATE(psikyo)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ymsnd", YM2610, 8000000)
-	MDRV_SOUND_CONFIG(gunbird_ym2610_interface)
-	MDRV_SOUND_ROUTE(0, "lspeaker",  1.2)
-	MDRV_SOUND_ROUTE(0, "rspeaker", 1.2)
-	MDRV_SOUND_ROUTE(1, "lspeaker",  1.0)
-	MDRV_SOUND_ROUTE(2, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("ymsnd", YM2610, 8000000)
+	MCFG_SOUND_CONFIG(gunbird_ym2610_interface)
+	MCFG_SOUND_ROUTE(0, "lspeaker",  1.2)
+	MCFG_SOUND_ROUTE(0, "rspeaker", 1.2)
+	MCFG_SOUND_ROUTE(1, "lspeaker",  1.0)
+	MCFG_SOUND_ROUTE(2, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( s1945bl, psikyo_state ) /* Bootleg hardware based on the unprotected Japanese Strikers 1945 set */
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68EC020, 16000000)
-	MDRV_CPU_PROGRAM_MAP(psikyo_bootleg_map)
-	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
+	MCFG_CPU_ADD("maincpu", M68EC020, 16000000)
+	MCFG_CPU_PROGRAM_MAP(psikyo_bootleg_map)
+	MCFG_CPU_VBLANK_INT("screen", irq1_line_hold)
 
-	MDRV_MACHINE_START(psikyo)
-	MDRV_MACHINE_RESET(psikyo)
+	MCFG_MACHINE_START(psikyo)
+	MCFG_MACHINE_RESET(psikyo)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(59.3)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)	// we're using IPT_VBLANK
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(320, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 320-1, 0, 256-32-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(59.3)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)	// we're using IPT_VBLANK
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(320, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 256-32-1)
 
-	MDRV_GFXDECODE(psikyo)
-	MDRV_PALETTE_LENGTH(0x1000)
+	MCFG_GFXDECODE(psikyo)
+	MCFG_PALETTE_LENGTH(0x1000)
 
-	MDRV_VIDEO_START(psikyo)
-	MDRV_VIDEO_UPDATE(psikyo_bootleg)
-	MDRV_VIDEO_EOF(psikyo)
+	MCFG_VIDEO_START(psikyo)
+	MCFG_VIDEO_UPDATE(psikyo_bootleg)
+	MCFG_VIDEO_EOF(psikyo)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_OKIM6295_ADD("oki", XTAL_16MHz/16, OKIM6295_PIN7_LOW) // ?? clock
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MDRV_DEVICE_ADDRESS_MAP(0, s1945bl_oki_map)
+	MCFG_OKIM6295_ADD("oki", XTAL_16MHz/16, OKIM6295_PIN7_LOW) // ?? clock
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_DEVICE_ADDRESS_MAP(0, s1945bl_oki_map)
 MACHINE_CONFIG_END
 
 
@@ -1192,7 +1192,7 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 
-static void irqhandler( running_device *device, int linestate )
+static void irqhandler( device_t *device, int linestate )
 {
 	psikyo_state *state = device->machine->driver_data<psikyo_state>();
 	cpu_set_input_line(state->audiocpu, 0, linestate ? ASSERT_LINE : CLEAR_LINE);
@@ -1206,41 +1206,41 @@ static const ymf278b_interface ymf278b_config =
 static MACHINE_CONFIG_START( s1945, psikyo_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68EC020, 16000000)
-	MDRV_CPU_PROGRAM_MAP(psikyo_map)
-	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
+	MCFG_CPU_ADD("maincpu", M68EC020, 16000000)
+	MCFG_CPU_PROGRAM_MAP(psikyo_map)
+	MCFG_CPU_VBLANK_INT("screen", irq1_line_hold)
 
-	MDRV_CPU_ADD("audiocpu", Z80, 4000000)	/* ! LZ8420M (Z80 core) ! */
-	MDRV_CPU_PROGRAM_MAP(gunbird_sound_map)
-	MDRV_CPU_IO_MAP(s1945_sound_io_map)
+	MCFG_CPU_ADD("audiocpu", Z80, 4000000)	/* ! LZ8420M (Z80 core) ! */
+	MCFG_CPU_PROGRAM_MAP(gunbird_sound_map)
+	MCFG_CPU_IO_MAP(s1945_sound_io_map)
 
 	/* MCU should go here */
 
-	MDRV_MACHINE_START(psikyo)
-	MDRV_MACHINE_RESET(psikyo)
+	MCFG_MACHINE_START(psikyo)
+	MCFG_MACHINE_RESET(psikyo)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(59.90)    /* verified on pcb */
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)	// we're using IPT_VBLANK
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(320, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 320-1, 0, 256-32-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(59.90)    /* verified on pcb */
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)	// we're using IPT_VBLANK
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(320, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 256-32-1)
 
-	MDRV_GFXDECODE(psikyo)
-	MDRV_PALETTE_LENGTH(0x1000)
+	MCFG_GFXDECODE(psikyo)
+	MCFG_PALETTE_LENGTH(0x1000)
 
-	MDRV_VIDEO_START(psikyo)
-	MDRV_VIDEO_EOF(psikyo)
-	MDRV_VIDEO_UPDATE(psikyo)
+	MCFG_VIDEO_START(psikyo)
+	MCFG_VIDEO_EOF(psikyo)
+	MCFG_VIDEO_UPDATE(psikyo)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ymf", YMF278B, YMF278B_STD_CLOCK)
-	MDRV_SOUND_CONFIG(ymf278b_config)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("ymf", YMF278B, YMF278B_STD_CLOCK)
+	MCFG_SOUND_CONFIG(ymf278b_config)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -1343,11 +1343,11 @@ Chips:  PS2001B
 ROM_START( gunbird )
 
 	ROM_REGION( 0x100000, "maincpu", 0 )		/* Main CPU Code */
-	ROM_LOAD32_WORD_SWAP( "4-u46.bin", 0x000000, 0x040000, CRC(b78ec99d) SHA1(399b79931652d9df1632cd4d7ec3d214e473a5c3) ) // 1&0
-	ROM_LOAD32_WORD_SWAP( "5-u39.bin", 0x000002, 0x040000, CRC(925f095d) SHA1(301a536119a0320a756e9c6e51fb10e36b90ef16) ) // 3&2
+	ROM_LOAD32_WORD_SWAP( "4.u46", 0x000000, 0x040000, CRC(b78ec99d) SHA1(399b79931652d9df1632cd4d7ec3d214e473a5c3) ) // 1&0
+	ROM_LOAD32_WORD_SWAP( "5.u39", 0x000002, 0x040000, CRC(925f095d) SHA1(301a536119a0320a756e9c6e51fb10e36b90ef16) ) // 3&2
 
 	ROM_REGION( 0x030000, "audiocpu", 0 )		/* Sound CPU Code */
-	ROM_LOAD( "3-u71.bin", 0x00000, 0x20000, CRC(2168e4ba) SHA1(ca7ad6acb5f806ce2528e7b52c19e8cceecb8543) )
+	ROM_LOAD( "3.u71",     0x00000, 0x20000, CRC(2168e4ba) SHA1(ca7ad6acb5f806ce2528e7b52c19e8cceecb8543) )
 	ROM_RELOAD(            0x10000, 0x20000             )
 
 	ROM_REGION( 0x700000, "gfx1", 0 )	/* Sprites */
@@ -1368,16 +1368,19 @@ ROM_START( gunbird )
 	ROM_REGION( 0x040000, "spritelut", 0 )	/* Sprites LUT */
 	ROM_LOAD( "u3.bin",  0x000000, 0x040000, CRC(0905aeb2) SHA1(8cca09f7dfe3f804e77515f7b1b1bdbeb7bb3d80) )
 
+	ROM_REGION( 0x0002, "pals", 0 )
+	ROM_LOAD( "3021.u69", 0x0000, 0x0001, NO_DUMP ) /* TIBPAL16L8-15CN */
+	ROM_LOAD( "3020.u19", 0x0000, 0x0001, NO_DUMP ) /* TIBPAL16L8-15CN */
 ROM_END
 
 ROM_START( gunbirdk )
 
 	ROM_REGION( 0x100000, "maincpu", 0 )		/* Main CPU Code */
-	ROM_LOAD32_WORD_SWAP( "1k-u46.bin", 0x000000, 0x080000, CRC(745cee52) SHA1(6c5bb92c92c55f882484417bc1aa580684019610) ) // 1&0
-	ROM_LOAD32_WORD_SWAP( "2k-u39.bin", 0x000002, 0x080000, CRC(669632fb) SHA1(885dea42e6da35e9166a208b18dbd930642c26cd) ) // 3&2
+	ROM_LOAD32_WORD_SWAP( "1k.u46", 0x000000, 0x080000, CRC(745cee52) SHA1(6c5bb92c92c55f882484417bc1aa580684019610) ) // 1&0
+	ROM_LOAD32_WORD_SWAP( "2k.u39", 0x000002, 0x080000, CRC(669632fb) SHA1(885dea42e6da35e9166a208b18dbd930642c26cd) ) // 3&2
 
 	ROM_REGION( 0x030000, "audiocpu", 0 )		/* Sound CPU Code */
-	ROM_LOAD( "k3-u71.bin", 0x00000, 0x20000, CRC(11994055) SHA1(619776c178361f23de37ff14e87284ec0f1f4f10) )
+	ROM_LOAD( "k3.u71",    0x00000, 0x20000, CRC(11994055) SHA1(619776c178361f23de37ff14e87284ec0f1f4f10) )
 	ROM_RELOAD(            0x10000, 0x20000             )
 
 	ROM_REGION( 0x700000, "gfx1", 0 )	/* Sprites */
@@ -1403,11 +1406,11 @@ ROM_END
 ROM_START( gunbirdj )
 
 	ROM_REGION( 0x100000, "maincpu", 0 )		/* Main CPU Code */
-	ROM_LOAD32_WORD_SWAP( "1-u46.bin", 0x000000, 0x040000, CRC(474abd69) SHA1(27f37333075f9c92849101aad4875e69004d747b) ) // 1&0
-	ROM_LOAD32_WORD_SWAP( "2-u39.bin", 0x000002, 0x040000, CRC(3e3e661f) SHA1(b5648546f390539b0f727a9a62d1b9516254ae21) ) // 3&2
+	ROM_LOAD32_WORD_SWAP( "1.u46", 0x000000, 0x040000, CRC(474abd69) SHA1(27f37333075f9c92849101aad4875e69004d747b) ) // 1&0
+	ROM_LOAD32_WORD_SWAP( "2.u39", 0x000002, 0x040000, CRC(3e3e661f) SHA1(b5648546f390539b0f727a9a62d1b9516254ae21) ) // 3&2
 
 	ROM_REGION( 0x030000, "audiocpu", 0 )		/* Sound CPU Code */
-	ROM_LOAD( "3-u71.bin", 0x00000, 0x20000, CRC(2168e4ba) SHA1(ca7ad6acb5f806ce2528e7b52c19e8cceecb8543) )
+	ROM_LOAD( "3.u71",     0x00000, 0x20000, CRC(2168e4ba) SHA1(ca7ad6acb5f806ce2528e7b52c19e8cceecb8543) )
 	ROM_RELOAD(            0x10000, 0x20000             )
 
 	ROM_REGION( 0x700000, "gfx1", 0 )	/* Sprites */
@@ -1826,8 +1829,8 @@ static DRIVER_INIT( sngkace )
 	psikyo_state *state = machine->driver_data<psikyo_state>();
 
 	{
-		UINT8 *RAM = memory_region(machine, "ymsnd");
-		int len = memory_region_length(machine, "ymsnd");
+		UINT8 *RAM = machine->region("ymsnd")->base();
+		int len = machine->region("ymsnd")->bytes();
 		int i;
 
 		/* Bit 6&7 of the samples are swapped. Naughty, naughty... */
@@ -1847,13 +1850,13 @@ static DRIVER_INIT( sngkace )
 	state->ka302c_banking = 0; // SH201B doesn't have any gfx banking
 
 	/* setup audiocpu banks */
-	memory_configure_bank(machine, "bank1", 0, 4, memory_region(machine, "audiocpu") + 0x10000, 0x8000);
+	memory_configure_bank(machine, "bank1", 0, 4, machine->region("audiocpu")->base() + 0x10000, 0x8000);
 
 	/* Enable other regions */
 #if 0
 	if (!strcmp(machine->gamedrv->name,"sngkace"))
 	{
-		UINT8 *ROM	=	memory_region(machine, "maincpu");
+		UINT8 *ROM	=	machine->region("maincpu")->base();
 		ROM[0x995] = 0x4e;
 		ROM[0x994] = 0x71;
 		ROM[0x997] = 0x4e;
@@ -1907,7 +1910,7 @@ static DRIVER_INIT( tengai )
 
 	/* setup audiocpu banks */
 	/* The banked rom is seen at 8200-ffff, so the last 0x200 bytes of the rom not reachable. */
-	memory_configure_bank(machine, "bank1", 0, 4, memory_region(machine, "audiocpu") + 0x10000 + 0x200, 0x8000);
+	memory_configure_bank(machine, "bank1", 0, 4, machine->region("audiocpu")->base() + 0x10000 + 0x200, 0x8000);
 }
 
 static DRIVER_INIT( gunbird )
@@ -1924,7 +1927,7 @@ static DRIVER_INIT( gunbird )
 
 	/* setup audiocpu banks */
 	/* The banked rom is seen at 8200-ffff, so the last 0x200 bytes of the rom not reachable. */
-	memory_configure_bank(machine, "bank1", 0, 4, memory_region(machine, "audiocpu") + 0x10000 + 0x200, 0x8000);
+	memory_configure_bank(machine, "bank1", 0, 4, machine->region("audiocpu")->base() + 0x10000 + 0x200, 0x8000);
 }
 
 
@@ -1948,7 +1951,7 @@ static DRIVER_INIT( s1945 )
 
 	/* setup audiocpu banks */
 	/* The banked rom is seen at 8200-ffff, so the last 0x200 bytes of the rom not reachable. */
-	memory_configure_bank(machine, "bank1", 0, 4, memory_region(machine, "audiocpu") + 0x10000 + 0x200, 0x8000);
+	memory_configure_bank(machine, "bank1", 0, 4, machine->region("audiocpu")->base() + 0x10000 + 0x200, 0x8000);
 }
 
 static DRIVER_INIT( s1945a )
@@ -1971,7 +1974,7 @@ static DRIVER_INIT( s1945a )
 
 	/* setup audiocpu banks */
 	/* The banked rom is seen at 8200-ffff, so the last 0x200 bytes of the rom not reachable. */
-	memory_configure_bank(machine, "bank1", 0, 4, memory_region(machine, "audiocpu") + 0x10000 + 0x200, 0x8000);
+	memory_configure_bank(machine, "bank1", 0, 4, machine->region("audiocpu")->base() + 0x10000 + 0x200, 0x8000);
 }
 
 static DRIVER_INIT( s1945j )
@@ -1994,7 +1997,7 @@ static DRIVER_INIT( s1945j )
 
 	/* setup audiocpu banks */
 	/* The banked rom is seen at 8200-ffff, so the last 0x200 bytes of the rom not reachable. */
-	memory_configure_bank(machine, "bank1", 0, 4, memory_region(machine, "audiocpu") + 0x10000 + 0x200, 0x8000);
+	memory_configure_bank(machine, "bank1", 0, 4, machine->region("audiocpu")->base() + 0x10000 + 0x200, 0x8000);
 }
 
 static DRIVER_INIT( s1945jn )
@@ -2011,7 +2014,7 @@ static DRIVER_INIT( s1945jn )
 
 	/* setup audiocpu banks */
 	/* The banked rom is seen at 8200-ffff, so the last 0x200 bytes of the rom not reachable. */
-	memory_configure_bank(machine, "bank1", 0, 4, memory_region(machine, "audiocpu") + 0x10000 + 0x200, 0x8000);
+	memory_configure_bank(machine, "bank1", 0, 4, machine->region("audiocpu")->base() + 0x10000 + 0x200, 0x8000);
 }
 
 static DRIVER_INIT( s1945bl )
@@ -2026,7 +2029,7 @@ static DRIVER_INIT( s1945bl )
 
 	state->ka302c_banking = 1;
 
-	memory_configure_bank(machine, "okibank", 0, 4, memory_region(machine, "oki") + 0x30000, 0x10000);
+	memory_configure_bank(machine, "okibank", 0, 4, machine->region("oki")->base() + 0x30000, 0x10000);
 	memory_set_bank(machine, "okibank", 0);
 }
 

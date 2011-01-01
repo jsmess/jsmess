@@ -260,7 +260,7 @@ static TIMER_CALLBACK(avigo_dummy_timer_callback)
 }
 
 /* does not do anything yet */
-static void avigo_tc8521_alarm_int(running_device *device, int state)
+static void avigo_tc8521_alarm_int(device_t *device, int state)
 {
 	avigo_state *drvstate = device->machine->driver_data<avigo_state>();
 //#if 0
@@ -395,8 +395,8 @@ static MACHINE_RESET( avigo )
 	state->flashes[2] = machine->device<intelfsh8_device>("flash2");
 
 	/* initialize flash contents */
-	memcpy(state->flashes[0]->space()->get_read_ptr(0), memory_region(machine, "maincpu")+0x10000, 0x100000);
-	memcpy(state->flashes[1]->space()->get_read_ptr(0), memory_region(machine, "maincpu")+0x110000, 0x100000);
+	memcpy(state->flashes[0]->space()->get_read_ptr(0), machine->region("maincpu")->base()+0x10000, 0x100000);
+	memcpy(state->flashes[1]->space()->get_read_ptr(0), machine->region("maincpu")->base()+0x110000, 0x100000);
 
 	state->stylus_marker_x = AVIGO_SCREEN_WIDTH>>1;
 	state->stylus_marker_y = AVIGO_SCREEN_HEIGHT>>1;
@@ -763,7 +763,7 @@ static  READ8_HANDLER(avigo_ad_data_r)
 static WRITE8_HANDLER(avigo_speaker_w)
 {
 	avigo_state *state = space->machine->driver_data<avigo_state>();
-	running_device *speaker = space->machine->device("speaker");
+	device_t *speaker = space->machine->device("speaker");
 	UINT8 previous_speaker;
 
 	previous_speaker = state->speaker_data;
@@ -945,46 +945,46 @@ GFXDECODE_END
 
 static MACHINE_CONFIG_START( avigo, avigo_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, 4000000)
-	MDRV_CPU_PROGRAM_MAP(avigo_mem)
-	MDRV_CPU_IO_MAP(avigo_io)
-	MDRV_QUANTUM_TIME(HZ(60))
+	MCFG_CPU_ADD("maincpu", Z80, 4000000)
+	MCFG_CPU_PROGRAM_MAP(avigo_mem)
+	MCFG_CPU_IO_MAP(avigo_io)
+	MCFG_QUANTUM_TIME(HZ(60))
 
-	MDRV_MACHINE_START( avigo )
-	MDRV_MACHINE_RESET( avigo )
+	MCFG_MACHINE_START( avigo )
+	MCFG_MACHINE_RESET( avigo )
 
-	MDRV_NS16550_ADD( "ns16550", avigo_com_interface )
+	MCFG_NS16550_ADD( "ns16550", avigo_com_interface )
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", LCD)
-	MDRV_SCREEN_REFRESH_RATE(50)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(640, 480)
-	MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MDRV_GFXDECODE(avigo)
-	MDRV_PALETTE_LENGTH(16)
-	MDRV_PALETTE_INIT( avigo )
+	MCFG_SCREEN_ADD("screen", LCD)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(640, 480)
+	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+	MCFG_GFXDECODE(avigo)
+	MCFG_PALETTE_LENGTH(16)
+	MCFG_PALETTE_INIT( avigo )
 
-	MDRV_VIDEO_START( avigo )
-	MDRV_VIDEO_UPDATE( avigo )
+	MCFG_VIDEO_START( avigo )
+	MCFG_VIDEO_UPDATE( avigo )
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* real time clock */
-	MDRV_TC8521_ADD("rtc", avigo_tc8521_interface)
+	MCFG_TC8521_ADD("rtc", avigo_tc8521_interface)
 
 	/* flash ROMs */
-	MDRV_INTEL_E28F008SA_ADD("flash0")
-	MDRV_INTEL_E28F008SA_ADD("flash1")
-	MDRV_INTEL_E28F008SA_ADD("flash2")
+	MCFG_INTEL_E28F008SA_ADD("flash0")
+	MCFG_INTEL_E28F008SA_ADD("flash1")
+	MCFG_INTEL_E28F008SA_ADD("flash2")
 
 	/* internal ram */
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("128K")
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("128K")
 MACHINE_CONFIG_END
 
 

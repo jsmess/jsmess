@@ -56,7 +56,7 @@ static int rombank;
 
 static MACHINE_RESET( thedeep )
 {
-	memory_set_bankptr(machine, "bank1", memory_region(machine, "maincpu") + 0x10000 + 0 * 0x4000);
+	memory_set_bankptr(machine, "bank1", machine->region("maincpu")->base() + 0x10000 + 0 * 0x4000);
 	thedeep_scroll[0] = 0;
 	thedeep_scroll[1] = 0;
 	thedeep_scroll[2] = 0;
@@ -89,7 +89,7 @@ static WRITE8_HANDLER( thedeep_protection_w )
 			int new_rombank = protection_command & 3;
 			if (rombank == new_rombank)	break;
 			rombank = new_rombank;
-			rom = memory_region(space->machine, "maincpu");
+			rom = space->machine->region("maincpu")->base();
 			memory_set_bankptr(space->machine, "bank1", rom + 0x10000 + rombank * 0x4000);
 			/* there's code which falls through from the fixed ROM to bank #1, I have to */
 			/* copy it there otherwise the CPU bank switching support will not catch it. */
@@ -119,7 +119,7 @@ static WRITE8_HANDLER( thedeep_protection_w )
 // d166-d174:   hl = (hl + 2*a)
 // d175-d181:   hl *= e (e must be non zero)
 // d182-d19a:   hl /= de
-				protection_data = memory_region(space->machine, "cpu3")[0x185+protection_index++];
+				protection_data = space->machine->region("cpu3")->base()[0x185+protection_index++];
 			else
 				protection_data = 0xc9;
 
@@ -306,7 +306,7 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-static void irqhandler(running_device *device, int irq)
+static void irqhandler(device_t *device, int irq)
 {
 	cputag_set_input_line(device->machine, "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -352,39 +352,39 @@ static INTERRUPT_GEN( thedeep_interrupt )
 static MACHINE_CONFIG_START( thedeep, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, XTAL_12MHz/2)		/* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(main_map)
-	MDRV_CPU_VBLANK_INT_HACK(thedeep_interrupt,2)	/* IRQ by MCU, NMI by vblank (maskable) */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2)		/* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_CPU_VBLANK_INT_HACK(thedeep_interrupt,2)	/* IRQ by MCU, NMI by vblank (maskable) */
 
-	MDRV_CPU_ADD("audiocpu", M65C02, XTAL_12MHz/8)		/* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(audio_map)
+	MCFG_CPU_ADD("audiocpu", M65C02, XTAL_12MHz/8)		/* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(audio_map)
 	/* IRQ by YM2203, NMI by when sound latch written by main cpu */
 
 	/* CPU3 is a i8751 running at 8Mhz (8mhz xtal)*/
 
-	MDRV_MACHINE_RESET(thedeep)
+	MCFG_MACHINE_RESET(thedeep)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(0x100, 0xf8)
-	MDRV_SCREEN_VISIBLE_AREA(0, 0x100-1, 0, 0xf8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(0x100, 0xf8)
+	MCFG_SCREEN_VISIBLE_AREA(0, 0x100-1, 0, 0xf8-1)
 
-	MDRV_GFXDECODE(thedeep)
-	MDRV_PALETTE_LENGTH(512)
+	MCFG_GFXDECODE(thedeep)
+	MCFG_PALETTE_LENGTH(512)
 
-	MDRV_PALETTE_INIT(thedeep)
-	MDRV_VIDEO_START(thedeep)
-	MDRV_VIDEO_UPDATE(thedeep)
+	MCFG_PALETTE_INIT(thedeep)
+	MCFG_VIDEO_START(thedeep)
+	MCFG_VIDEO_UPDATE(thedeep)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz/4)  /* verified on pcb */
-	MDRV_SOUND_CONFIG(thedeep_ym2203_intf)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz/4)  /* verified on pcb */
+	MCFG_SOUND_CONFIG(thedeep_ym2203_intf)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 

@@ -353,7 +353,7 @@ static WRITE8_HANDLER( systeme_bank_w )
 
 	segae_set_vram_banks(data);
 
-	//memcpy(sms_rom+0x8000, memory_region(space->machine, "user1")+0x10000+rombank*0x4000, 0x4000);
+	//memcpy(sms_rom+0x8000, space->machine->region("user1")->base()+0x10000+rombank*0x4000, 0x4000);
 	memory_set_bank(space->machine, "bank1", rombank);
 
 }
@@ -364,8 +364,8 @@ static void init_ports_systeme(running_machine *machine)
 	/* INIT THE PORTS *********************************************************************************************/
 
 	address_space *io = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO);
-	running_device *sn1 = machine->device("sn1");
-	running_device *sn2 = machine->device("sn2");
+	device_t *sn1 = machine->device("sn1");
+	device_t *sn2 = machine->device("sn2");
 
 	memory_install_write8_device_handler(io, sn2, 0x7b, 0x7b, 0, 0, sn76496_w);
 	memory_install_write8_device_handler(io, sn1, 0x7e, 0x7f, 0, 0, sn76496_w);
@@ -390,7 +390,7 @@ static void init_ports_systeme(running_machine *machine)
 
 static void init_systeme_map(running_machine *machine)
 {
-	memory_configure_bank(machine, "bank1", 0, 16, memory_region(machine, "maincpu") + 0x10000, 0x4000);
+	memory_configure_bank(machine, "bank1", 0, 16, machine->region("maincpu")->base() + 0x10000, 0x4000);
 
 	/* alternate way of accessing video ram */
 	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0xbfff, 0, 0, segasyse_videoram_w);
@@ -866,37 +866,37 @@ static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 static MACHINE_CONFIG_START( systeme, driver_device )
-	MDRV_CPU_ADD("maincpu", Z80, 10738600/2) /* correct?  */
-	MDRV_CPU_PROGRAM_MAP(systeme_map)
-	MDRV_CPU_IO_MAP(io_map)
+	MCFG_CPU_ADD("maincpu", Z80, 10738600/2) /* correct?  */
+	MCFG_CPU_PROGRAM_MAP(systeme_map)
+	MCFG_CPU_IO_MAP(io_map)
 
 	/* IRQ handled via the timers */
-	MDRV_MACHINE_RESET(systeme)
+	MCFG_MACHINE_RESET(systeme)
 
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0)) // Vblank handled manually.
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB15)
-	MDRV_SCREEN_SIZE(256, 256)
-//  MDRV_SCREEN_VISIBLE_AREA(0, 255, 0, 223)
-	MDRV_SCREEN_VISIBLE_AREA(0, 255, 0, 191)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0)) // Vblank handled manually.
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB15)
+	MCFG_SCREEN_SIZE(256, 256)
+//  MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 223)
+	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 191)
 
 
-	MDRV_PALETTE_LENGTH(0x200)
+	MCFG_PALETTE_LENGTH(0x200)
 
-	MDRV_VIDEO_START(sms)
-	MDRV_VIDEO_UPDATE(systeme) /* Copies a bitmap */
-	MDRV_VIDEO_EOF(systeme) /* Used to Sync the timing */
+	MCFG_VIDEO_START(sms)
+	MCFG_VIDEO_UPDATE(systeme) /* Copies a bitmap */
+	MCFG_VIDEO_EOF(systeme) /* Used to Sync the timing */
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("sn1", SN76496, 3579540)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("sn1", SN76496, 3579540)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD("sn2", SN76496, 3579540)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("sn2", SN76496, 3579540)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 

@@ -46,7 +46,7 @@ struct _cdp1862_t
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE cdp1862_t *get_safe_token(running_device *device)
+INLINE cdp1862_t *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == CDP1862);
@@ -61,7 +61,7 @@ INLINE cdp1862_t *get_safe_token(running_device *device)
     initialize_palette - palette initialization
 -------------------------------------------------*/
 
-static void initialize_palette(running_device *device)
+static void initialize_palette(device_t *device)
 {
 	const cdp1862_interface *intf = (const cdp1862_interface *)device->baseconfig().static_config();
 	int i;
@@ -156,7 +156,7 @@ WRITE_LINE_DEVICE_HANDLER( cdp1862_con_w )
     cdp1862_update - screen update
 -------------------------------------------------*/
 
-void cdp1862_update(running_device *device, bitmap_t *bitmap, const rectangle *cliprect)
+void cdp1862_update(device_t *device, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	cdp1862_t *cdp1862 = get_safe_token(device);
 

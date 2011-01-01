@@ -201,7 +201,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static void sound_irq(running_device *device, int linestate)
+static void sound_irq(device_t *device, int linestate)
 {
 	cputag_set_input_line(device->machine, "maincpu", 0, linestate);
 }
@@ -251,33 +251,33 @@ static MACHINE_RESET( compgolf )
 static MACHINE_CONFIG_START( compgolf, compgolf_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6809, 2000000)
-	MDRV_CPU_PROGRAM_MAP(compgolf_map)
-	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
+	MCFG_CPU_ADD("maincpu", M6809, 2000000)
+	MCFG_CPU_PROGRAM_MAP(compgolf_map)
+	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
-	MDRV_MACHINE_START(compgolf)
-	MDRV_MACHINE_RESET(compgolf)
+	MCFG_MACHINE_START(compgolf)
+	MCFG_MACHINE_RESET(compgolf)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(256, 256)
-	MDRV_SCREEN_VISIBLE_AREA(1*8, 32*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(256, 256)
+	MCFG_SCREEN_VISIBLE_AREA(1*8, 32*8-1, 1*8, 31*8-1)
 
-	MDRV_PALETTE_LENGTH(0x100)
-	MDRV_PALETTE_INIT(compgolf)
-	MDRV_GFXDECODE(compgolf)
+	MCFG_PALETTE_LENGTH(0x100)
+	MCFG_PALETTE_INIT(compgolf)
+	MCFG_GFXDECODE(compgolf)
 
-	MDRV_VIDEO_START(compgolf)
-	MDRV_VIDEO_UPDATE(compgolf)
+	MCFG_VIDEO_START(compgolf)
+	MCFG_VIDEO_UPDATE(compgolf)
 
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM2203, 1500000)
-	MDRV_SOUND_CONFIG(ym2203_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("ymsnd", YM2203, 1500000)
+	MCFG_SOUND_CONFIG(ym2203_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -348,8 +348,8 @@ ROM_END
 
 static void compgolf_expand_bg(running_machine *machine)
 {
-	UINT8 *GFXDST = memory_region(machine, "gfx2");
-	UINT8 *GFXSRC = memory_region(machine, "gfx4");
+	UINT8 *GFXDST = machine->region("gfx2")->base();
+	UINT8 *GFXSRC = machine->region("gfx4")->base();
 
 	int x;
 
@@ -362,7 +362,7 @@ static void compgolf_expand_bg(running_machine *machine)
 
 static DRIVER_INIT( compgolf )
 {
-	memory_configure_bank(machine, "bank1", 0, 2, memory_region(machine, "user1"), 0x4000);
+	memory_configure_bank(machine, "bank1", 0, 2, machine->region("user1")->base(), 0x4000);
 	compgolf_expand_bg(machine);
 }
 

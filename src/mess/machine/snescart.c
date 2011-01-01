@@ -710,7 +710,7 @@ static DEVICE_IMAGE_LOAD( snes_cart )
 	address_space *space = cputag_get_address_space( machine, "maincpu", ADDRESS_SPACE_PROGRAM );
 	int total_blocks, read_blocks, has_bsx_slot = 0, st_bios = 0;
 	UINT32 offset, int_header_offs;
-	UINT8 *ROM = memory_region(image.device().machine, "cart");
+	UINT8 *ROM = image.device().machine->region("cart")->base();
 
 	if (image.software_entry() == NULL)
 		state->cart_size = image.length();
@@ -1075,9 +1075,9 @@ static DEVICE_IMAGE_LOAD( sufami_cart )
 	int total_blocks, read_blocks;
 	int st_bios = 0, slot_id = 0;
 	UINT32 offset, st_data_offset = 0;
-	UINT8 *ROM = memory_region(image.device().machine, image.device().tag());
+	UINT8 *ROM = image.device().machine->region(image.device().tag())->base();
 
-	snes_ram = memory_region(machine, "maincpu");
+	snes_ram = machine->region("maincpu")->base();
 
 	if (strcmp(image.device().tag(), "slot_a") == 0)
 	{
@@ -1180,7 +1180,7 @@ static DEVICE_IMAGE_LOAD( bsx_cart )
 	int total_blocks, read_blocks;
 	int has_bsx_slot = 0;
 	UINT32 offset, int_header_offs;
-	UINT8 *ROM = memory_region(image.device().machine, "cart");
+	UINT8 *ROM = image.device().machine->region("cart")->base();
 
 	if (image.software_entry() == NULL)
 		state->cart_size = image.length();
@@ -1280,7 +1280,7 @@ static DEVICE_IMAGE_LOAD( bsx2slot_cart )
 	running_machine *machine = image.device().machine;
 	snes_state *state = machine->driver_data<snes_state>();
 	UINT32 offset, int_header_offs;
-	UINT8 *ROM = memory_region(image.device().machine, "flash");
+	UINT8 *ROM = image.device().machine->region("flash")->base();
 
 	if (image.software_entry() == NULL)
 		state->cart_size = image.length();
@@ -1330,30 +1330,30 @@ static DEVICE_IMAGE_LOAD( bsx2slot_cart )
 }
 
 MACHINE_CONFIG_FRAGMENT( snes_cartslot )
-	MDRV_CARTSLOT_ADD("cart")
-	MDRV_CARTSLOT_EXTENSION_LIST("sfc,smc,fig,swc,bin")
-	MDRV_CARTSLOT_NOT_MANDATORY
-	MDRV_CARTSLOT_INTERFACE("snes_cart")
-	MDRV_CARTSLOT_LOAD(snes_cart)
-	MDRV_SOFTWARE_LIST_ADD("cart_list","snes")
+	MCFG_CARTSLOT_ADD("cart")
+	MCFG_CARTSLOT_EXTENSION_LIST("sfc,smc,fig,swc,bin")
+	MCFG_CARTSLOT_NOT_MANDATORY
+	MCFG_CARTSLOT_INTERFACE("snes_cart")
+	MCFG_CARTSLOT_LOAD(snes_cart)
+	MCFG_SOFTWARE_LIST_ADD("cart_list","snes")
 MACHINE_CONFIG_END
 
 // This (hackily) emulates a SNES unit with a Sufami Turbo Unit cart inserted:
 // hence, the user can mount two data cart in the two slots available on the ST Unit
 MACHINE_CONFIG_FRAGMENT( sufami_cartslot )
-	MDRV_CARTSLOT_ADD("slot_a")
-	MDRV_CARTSLOT_EXTENSION_LIST("st,sfc")
-	MDRV_CARTSLOT_NOT_MANDATORY
-	MDRV_CARTSLOT_INTERFACE("sufami_cart")
-	MDRV_CARTSLOT_LOAD(sufami_cart)
+	MCFG_CARTSLOT_ADD("slot_a")
+	MCFG_CARTSLOT_EXTENSION_LIST("st,sfc")
+	MCFG_CARTSLOT_NOT_MANDATORY
+	MCFG_CARTSLOT_INTERFACE("sufami_cart")
+	MCFG_CARTSLOT_LOAD(sufami_cart)
 
-	MDRV_CARTSLOT_ADD("slot_b")
-	MDRV_CARTSLOT_EXTENSION_LIST("st,sfc")
-	MDRV_CARTSLOT_NOT_MANDATORY
-	MDRV_CARTSLOT_INTERFACE("sufami_cart")
-	MDRV_CARTSLOT_LOAD(sufami_cart)
+	MCFG_CARTSLOT_ADD("slot_b")
+	MCFG_CARTSLOT_EXTENSION_LIST("st,sfc")
+	MCFG_CARTSLOT_NOT_MANDATORY
+	MCFG_CARTSLOT_INTERFACE("sufami_cart")
+	MCFG_CARTSLOT_LOAD(sufami_cart)
 
-//  MDRV_SOFTWARE_LIST_ADD("cart_list","snes")
+//  MCFG_SOFTWARE_LIST_ADD("cart_list","snes")
 MACHINE_CONFIG_END
 
 // This (hackily) emulates a SNES unit where you want to load a BS-X compatible cart:
@@ -1361,31 +1361,31 @@ MACHINE_CONFIG_END
 // BS-X compatible one, e.g. Same Game), and there is a second slot for the 8M data pack
 // (in a real SNES this would have been inserted in the smaller slot on the cart itself)
 MACHINE_CONFIG_FRAGMENT( bsx_cartslot )
-	MDRV_CARTSLOT_ADD("cart")
-	MDRV_CARTSLOT_EXTENSION_LIST("sfc,smc,fig,swc,bin")
-	MDRV_CARTSLOT_NOT_MANDATORY
-	MDRV_CARTSLOT_INTERFACE("snes_cart")
-	MDRV_CARTSLOT_LOAD(bsx_cart)
+	MCFG_CARTSLOT_ADD("cart")
+	MCFG_CARTSLOT_EXTENSION_LIST("sfc,smc,fig,swc,bin")
+	MCFG_CARTSLOT_NOT_MANDATORY
+	MCFG_CARTSLOT_INTERFACE("snes_cart")
+	MCFG_CARTSLOT_LOAD(bsx_cart)
 
-	MDRV_CARTSLOT_ADD("slot2")
-	MDRV_CARTSLOT_EXTENSION_LIST("bs,sfc")
-	MDRV_CARTSLOT_NOT_MANDATORY
-	MDRV_CARTSLOT_INTERFACE("bsx_cart")
-	MDRV_CARTSLOT_LOAD(bsx2slot_cart)
+	MCFG_CARTSLOT_ADD("slot2")
+	MCFG_CARTSLOT_EXTENSION_LIST("bs,sfc")
+	MCFG_CARTSLOT_NOT_MANDATORY
+	MCFG_CARTSLOT_INTERFACE("bsx_cart")
+	MCFG_CARTSLOT_LOAD(bsx2slot_cart)
 
-//  MDRV_SOFTWARE_LIST_ADD("cart_list","snes")
+//  MCFG_SOFTWARE_LIST_ADD("cart_list","snes")
 MACHINE_CONFIG_END
 
 DRIVER_INIT( snes_mess )
 {
-	snes_ram = memory_region(machine, "maincpu");
+	snes_ram = machine->region("maincpu")->base();
 	memset(snes_ram, 0, 0x1000000);
 }
 
 DRIVER_INIT( snesst )
 {
 	snes_state *state = machine->driver_data<snes_state>();
-	UINT8 *STBIOS = memory_region(machine, "sufami");
+	UINT8 *STBIOS = machine->region("sufami")->base();
 	int i, j;
 
 	state->cart[0].slot_in_use = 0;

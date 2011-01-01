@@ -54,11 +54,11 @@ public:
 
 	required_device<cosmac_device> m_maincpu;
 	required_device<cdp1869_device> m_vis;
-	required_device<running_device> m_crtc;
-	required_device<running_device> m_fdc;
+	required_device<device_t> m_crtc;
+	required_device<device_t> m_fdc;
 	required_device<cdp1871_device> m_kbe;
-	required_device<running_device> m_cassette;
-	required_device<running_device> m_ram;
+	required_device<device_t> m_cassette;
+	required_device<device_t> m_ram;
 
 	virtual void machine_start();
 	virtual void machine_reset();

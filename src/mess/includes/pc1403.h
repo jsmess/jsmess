@@ -30,13 +30,13 @@ public:
 
 /*----------- defined in machine/pc1403.c -----------*/
 
-int pc1403_reset(running_device *device);
-int pc1403_brk(running_device *device);
-void pc1403_outa(running_device *device, int data);
-//void pc1403_outb(running_device *device, int data);
-void pc1403_outc(running_device *device, int data);
-int pc1403_ina(running_device *device);
-//int pc1403_inb(running_device *device);
+int pc1403_reset(device_t *device);
+int pc1403_brk(device_t *device);
+void pc1403_outa(device_t *device, int data);
+//void pc1403_outb(device_t *device, int data);
+void pc1403_outc(device_t *device, int data);
+int pc1403_ina(device_t *device);
+//int pc1403_inb(device_t *device);
 
 DRIVER_INIT( pc1403 );
 NVRAM_HANDLER( pc1403 );

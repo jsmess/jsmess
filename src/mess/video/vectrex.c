@@ -318,7 +318,7 @@ VIDEO_START(vectrex)
 static void vectrex_multiplexer(running_machine *machine, int mux)
 {
 	vectrex_state *state = machine->driver_data<vectrex_state>();
-	running_device *dac_device = machine->device("dac");
+	device_t *dac_device = machine->device("dac");
 
 	timer_set(machine, ATTOTIME_IN_NSEC(ANALOG_DELAY), &state->analog[mux], state->via_out[PORTA], update_signal);
 
@@ -393,7 +393,7 @@ static WRITE8_DEVICE_HANDLER(v_via_pb_w)
 	/* Sound */
 	if (data & 0x10)
 	{
-		running_device *ay8912 = device->machine->device("ay8912");
+		device_t *ay8912 = device->machine->device("ay8912");
 
 		if (data & 0x08) /* BC1 (do we select a reg or write it ?) */
 			ay8910_address_w(ay8912, 0, state->via_out[PORTA]);

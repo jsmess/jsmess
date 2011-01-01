@@ -194,7 +194,7 @@ static const UINT32 banks[4] = { 0, 0x40000/2, 0x20000/2, 0x60000/2 };
 
 static struct
 {
-	running_device *duart68681;
+	device_t *duart68681;
 } maygayv1_devices;
 
 #define DRAM_BANK_SEL		(banks[(VREG(DSBA) >> 7) & 3])
@@ -894,7 +894,7 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-static void duart_irq_handler(running_device *device, UINT8 vector)
+static void duart_irq_handler(device_t *device, UINT8 vector)
 {
 	cputag_set_input_line_and_vector(device->machine, "maincpu", 5, ASSERT_LINE, vector);
 //  cputag_set_input_line(device->machine, "maincpu", 5, state ? ASSERT_LINE : CLEAR_LINE);
@@ -902,7 +902,7 @@ static void duart_irq_handler(running_device *device, UINT8 vector)
 
 static int d68681_val;
 
-static void duart_tx(running_device *device, int channel, UINT8 data)
+static void duart_tx(device_t *device, int channel, UINT8 data)
 {
 	if (channel == 0)
 	{
@@ -921,12 +921,12 @@ static const duart68681_config maygayv1_duart68681_config =
 };
 
 
-static int data_to_i8031(running_device *device)
+static int data_to_i8031(device_t *device)
 {
 	return d68681_val;
 }
 
-static void data_from_i8031(running_device *device, int data)
+static void data_from_i8031(device_t *device, int data)
 {
 	duart68681_rx_data(maygayv1_devices.duart68681, 0, data);
 }
@@ -991,45 +991,45 @@ static INTERRUPT_GEN( vsync_interrupt )
 
 
 static MACHINE_CONFIG_START( maygayv1, driver_device )
-	MDRV_CPU_ADD("maincpu", M68000, MASTER_CLOCK / 2)
-	MDRV_CPU_PROGRAM_MAP(main_map)
-	MDRV_CPU_VBLANK_INT("screen", vsync_interrupt)
+	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK / 2)
+	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_CPU_VBLANK_INT("screen", vsync_interrupt)
 
-	MDRV_CPU_ADD("soundcpu", I8052, SOUND_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(sound_prg)
-	MDRV_CPU_DATA_MAP(sound_data)
-	MDRV_CPU_IO_MAP(sound_io)
+	MCFG_CPU_ADD("soundcpu", I8052, SOUND_CLOCK)
+	MCFG_CPU_PROGRAM_MAP(sound_prg)
+	MCFG_CPU_DATA_MAP(sound_data)
+	MCFG_CPU_IO_MAP(sound_io)
 
-	MDRV_PIA6821_ADD("pia", pia_intf)
+	MCFG_PIA6821_ADD("pia", pia_intf)
 
-	MDRV_MACHINE_START(maygayv1)
-	MDRV_MACHINE_RESET(maygayv1)
+	MCFG_MACHINE_START(maygayv1)
+	MCFG_MACHINE_RESET(maygayv1)
 
-	MDRV_NVRAM_ADD_0FILL("nvram")
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* TODO: Use real video timings */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(640, 300)
-	MDRV_SCREEN_VISIBLE_AREA(0, 640 - 1, 0, 300 - 1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(640, 300)
+	MCFG_SCREEN_VISIBLE_AREA(0, 640 - 1, 0, 300 - 1)
 
-	MDRV_PALETTE_LENGTH(16)
+	MCFG_PALETTE_LENGTH(16)
 
-	MDRV_DUART68681_ADD("duart68681", DUART_CLOCK, maygayv1_duart68681_config)
+	MCFG_DUART68681_ADD("duart68681", DUART_CLOCK, maygayv1_duart68681_config)
 
-	MDRV_VIDEO_START(maygayv1)
-	MDRV_VIDEO_UPDATE(maygayv1)
-	MDRV_VIDEO_EOF(maygayv1)
+	MCFG_VIDEO_START(maygayv1)
+	MCFG_VIDEO_UPDATE(maygayv1)
+	MCFG_VIDEO_EOF(maygayv1)
 
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd",YM2413, MASTER_CLOCK / 4)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.8)
+	MCFG_SOUND_ADD("ymsnd",YM2413, MASTER_CLOCK / 4)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.8)
 
-	MDRV_SOUND_ADD("upd",UPD7759, UPD7759_STANDARD_CLOCK)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("upd",UPD7759, UPD7759_STANDARD_CLOCK)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 

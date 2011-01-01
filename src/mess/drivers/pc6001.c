@@ -317,7 +317,7 @@ static void draw_tile_3bpp(running_machine *machine, bitmap_t *bitmap,const rect
 static void draw_tile_text(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int x,int y,int tile,int attr,int has_mc6847)
 {
 	int xi,yi,pen,fgcol,color;
-	UINT8 *gfx_data = memory_region(machine, "gfx1");
+	UINT8 *gfx_data = machine->region("gfx1")->base();
 
 	for(yi=0;yi<12;yi++)
 	{
@@ -520,7 +520,7 @@ static VIDEO_UPDATE( pc6001m2 )
 	else if(state->exgfx_text_mode)
 	{
 		int xi,yi,pen,fgcol,bgcol,color;
-		UINT8 *gfx_data = memory_region(screen->machine, "gfx1");
+		UINT8 *gfx_data = screen->machine->region("gfx1")->base();
 
 		for(y=0;y<20;y++)
 		{
@@ -569,7 +569,7 @@ static VIDEO_UPDATE( pc6001sr )
 	pc6001_state *state = screen->machine->driver_data<pc6001_state>();
 	int x,y,tile,attr;
 	int xi,yi,pen,fgcol,bgcol,color;
-	UINT8 *gfx_data = memory_region(screen->machine, "gfx1");
+	UINT8 *gfx_data = screen->machine->region("gfx1")->base();
 
 
 	if(state->sr_video_mode & 8) // text mode
@@ -711,7 +711,7 @@ static const UINT8 *pc6001_get_video_ram(running_machine *machine, int scanline)
 
 static UINT8 pc6001_get_char_rom(running_machine *machine, UINT8 ch, int line)
 {
-	UINT8 *gfx = memory_region(machine, "gfx1");
+	UINT8 *gfx = machine->region("gfx1")->base();
 	return gfx[ch*16+line];
 }
 #endif
@@ -754,8 +754,8 @@ static WRITE8_DEVICE_HANDLER(nec_ppi8255_w)
 		state->port_c_8255 |= 0xa8;
 
 		{
-			UINT8 *gfx_data = memory_region(device->machine, "gfx1");
-			UINT8 *ext_rom = memory_region(device->machine, "cart_img");
+			UINT8 *gfx_data = device->machine->region("gfx1")->base();
+			UINT8 *ext_rom = device->machine->region("cart_img")->base();
 
 			//printf("%02x\n",data);
 
@@ -969,8 +969,8 @@ static const UINT32 banksw_table_r1[0x10*4][4] = {
 static WRITE8_HANDLER( pc6001m2_bank_r0_w )
 {
 	pc6001_state *state = space->machine->driver_data<pc6001_state>();
-	UINT8 *ROM = memory_region(space->machine, "maincpu");
-	UINT8 *gfx_data = memory_region(space->machine, "gfx1");
+	UINT8 *ROM = space->machine->region("maincpu")->base();
+	UINT8 *gfx_data = space->machine->region("gfx1")->base();
 
 //  bankaddress = 0x10000 + (0x4000 * ((data & 0x40)>>6));
 //  memory_set_bankptr(space->machine, 1, &ROM[bankaddress]);
@@ -990,7 +990,7 @@ static WRITE8_HANDLER( pc6001m2_bank_r0_w )
 static WRITE8_HANDLER( pc6001m2_bank_r1_w )
 {
 	pc6001_state *state = space->machine->driver_data<pc6001_state>();
-	UINT8 *ROM = memory_region(space->machine, "maincpu");
+	UINT8 *ROM = space->machine->region("maincpu")->base();
 
 //  bankaddress = 0x10000 + (0x4000 * ((data & 0x40)>>6));
 //  memory_set_bankptr(space->machine, 1, &ROM[bankaddress]);
@@ -1013,8 +1013,8 @@ static WRITE8_HANDLER( pc6001m2_bank_w0_w )
 static WRITE8_HANDLER( pc6001m2_opt_bank_w )
 {
 	pc6001_state *state = space->machine->driver_data<pc6001_state>();
-	UINT8 *ROM = memory_region(space->machine, "maincpu");
-	UINT8 *gfx_data = memory_region(space->machine, "gfx1");
+	UINT8 *ROM = space->machine->region("maincpu")->base();
+	UINT8 *gfx_data = space->machine->region("gfx1")->base();
 
 	/*
     0 - TVROM / VOICE ROM
@@ -1042,53 +1042,53 @@ static WRITE8_HANDLER( pc6001m2_opt_bank_w )
 static WRITE8_HANDLER( work_ram0_w )
 {
 	pc6001_state *state = space->machine->driver_data<pc6001_state>();
-	UINT8 *ROM = memory_region(space->machine, "maincpu");
+	UINT8 *ROM = space->machine->region("maincpu")->base();
 	ROM[offset+((state->bank_w & 0x01) ? WRAM(0) : EXWRAM(0))] = data;
 }
 
 static WRITE8_HANDLER( work_ram1_w )
 {
 	pc6001_state *state = space->machine->driver_data<pc6001_state>();
-	UINT8 *ROM = memory_region(space->machine, "maincpu");
+	UINT8 *ROM = space->machine->region("maincpu")->base();
 	ROM[offset+((state->bank_w & 0x01) ? WRAM(1) : EXWRAM(1))] = data;
 }
 
 static WRITE8_HANDLER( work_ram2_w )
 {
 	pc6001_state *state = space->machine->driver_data<pc6001_state>();
-	UINT8 *ROM = memory_region(space->machine, "maincpu");
+	UINT8 *ROM = space->machine->region("maincpu")->base();
 	ROM[offset+((state->bank_w & 0x04) ? WRAM(2) : EXWRAM(2))] = data;
 }
 
 static WRITE8_HANDLER( work_ram3_w )
 {
 	pc6001_state *state = space->machine->driver_data<pc6001_state>();
-	UINT8 *ROM = memory_region(space->machine, "maincpu");
+	UINT8 *ROM = space->machine->region("maincpu")->base();
 	ROM[offset+((state->bank_w & 0x04) ? WRAM(3) : EXWRAM(3))] = data;
 }
 
 static WRITE8_HANDLER( work_ram4_w )
 {
 	pc6001_state *state = space->machine->driver_data<pc6001_state>();
-	UINT8 *ROM = memory_region(space->machine, "maincpu");
+	UINT8 *ROM = space->machine->region("maincpu")->base();
 	ROM[offset+((state->bank_w & 0x10) ? WRAM(4) : EXWRAM(4))] = data;
 }
 
 static WRITE8_HANDLER( work_ram5_w )
 {
 	pc6001_state *state = space->machine->driver_data<pc6001_state>();
-	UINT8 *ROM = memory_region(space->machine, "maincpu");
+	UINT8 *ROM = space->machine->region("maincpu")->base();
 	ROM[offset+((state->bank_w & 0x10) ? WRAM(5) : EXWRAM(5))] = data;
 }
 
 static WRITE8_HANDLER( work_ram6_w )
 {
-	pc6001_state *state = space->machine->driver_data<pc6001_state>(); UINT8 *ROM = memory_region(space->machine, "maincpu"); ROM[offset+((state->bank_w & 0x40) ? WRAM(6) : EXWRAM(6))] = data;
+	pc6001_state *state = space->machine->driver_data<pc6001_state>(); UINT8 *ROM = space->machine->region("maincpu")->base(); ROM[offset+((state->bank_w & 0x40) ? WRAM(6) : EXWRAM(6))] = data;
 }
 
 static WRITE8_HANDLER( work_ram7_w )
 {
-	pc6001_state *state = space->machine->driver_data<pc6001_state>(); UINT8 *ROM = memory_region(space->machine, "maincpu"); ROM[offset+((state->bank_w & 0x40) ? WRAM(7) : EXWRAM(7))] = data;
+	pc6001_state *state = space->machine->driver_data<pc6001_state>(); UINT8 *ROM = space->machine->region("maincpu")->base(); ROM[offset+((state->bank_w & 0x40) ? WRAM(7) : EXWRAM(7))] = data;
 }
 
 
@@ -1113,8 +1113,8 @@ static WRITE8_DEVICE_HANDLER(necmk2_ppi8255_w)
 		state->port_c_8255 |= 0xa8;
 
 		{
-			UINT8 *ROM = memory_region(device->machine, "maincpu");
-			UINT8 *gfx_data = memory_region(device->machine, "gfx1");
+			UINT8 *ROM = device->machine->region("maincpu")->base();
+			UINT8 *gfx_data = device->machine->region("gfx1")->base();
 
 			//printf("%02x\n",data);
 
@@ -1136,7 +1136,7 @@ static WRITE8_DEVICE_HANDLER(necmk2_ppi8255_w)
 static void vram_bank_change(running_machine *machine,UINT8 vram_bank)
 {
 	pc6001_state *state = machine->driver_data<pc6001_state>();
-	UINT8 *work_ram = memory_region(machine, "maincpu");
+	UINT8 *work_ram = machine->region("maincpu")->base();
 
 //  popmessage("%02x",vram_bank);
 
@@ -1376,7 +1376,7 @@ ADDRESS_MAP_END
 /* disk device placeholder (TODO: identify & hook-up this) */
 static READ8_HANDLER( pc6601_fdc_r )
 {
-	return mame_rand(space->machine);
+	return space->machine->rand();
 }
 
 static WRITE8_HANDLER( pc6601_fdc_w )
@@ -1456,7 +1456,7 @@ static WRITE8_HANDLER( pc6001sr_bank_rn_w )
 {
 	pc6001_state *state = space->machine->driver_data<pc6001_state>();
 	static const char *const bank_name[8] = { "bank1","bank2","bank3", "bank4", "bank5", "bank6", "bank7", "bank8" };
-	UINT8 *ROM = memory_region(space->machine, "maincpu");
+	UINT8 *ROM = space->machine->region("maincpu")->base();
 	UINT8 bank_num;
 
 	state->sr_bank_r[offset] = data;
@@ -1490,7 +1490,7 @@ static WRITE8_HANDLER( pc6001sr_bank_wn_w )
 #define SR_WRAM_BANK_W(_v_) \
 { \
 	pc6001_state *state = space->machine->driver_data<pc6001_state>(); \
-	UINT8 *ROM = memory_region(space->machine, "maincpu"); \
+	UINT8 *ROM = space->machine->region("maincpu")->base(); \
 	UINT8 bank_num; \
 	bank_num = state->sr_bank_w[_v_] & 0x0f; \
 	if((state->sr_bank_w[_v_] & 0xf0) != 0x20) \
@@ -1520,7 +1520,7 @@ static WRITE8_HANDLER( pc6001sr_mode_w )
 static WRITE8_HANDLER( pc6001sr_vram_bank_w )
 {
 	pc6001_state *state = space->machine->driver_data<pc6001_state>();
-	UINT8 *work_ram = memory_region(space->machine, "maincpu");
+	UINT8 *work_ram = space->machine->region("maincpu")->base();
 
 	state->video_ram = work_ram + 0x70000 + ((data & 0x0f)*0x1000);
 }
@@ -1573,8 +1573,8 @@ static WRITE8_DEVICE_HANDLER(necsr_ppi8255_w)
 
 		if(0)
 		{
-			UINT8 *gfx_data = memory_region(device->machine, "gfx1");
-			UINT8 *ext_rom = memory_region(device->machine, "cart_img");
+			UINT8 *gfx_data = device->machine->region("gfx1")->base();
+			UINT8 *ext_rom = device->machine->region("cart_img")->base();
 
 			//printf("%02x\n",data);
 
@@ -1978,7 +1978,7 @@ static TIMER_CALLBACK(cassette_callback)
 		else
 			cas_data_i>>=1;
 		#else
-			UINT8 *cas_data = memory_region(machine, "cas");
+			UINT8 *cas_data = machine->region("cas")->base();
 
 			state->cur_keycode = cas_data[state->cas_offset++];
 			popmessage("%04x %04x",state->cas_offset,state->cas_maxsize);
@@ -2054,7 +2054,7 @@ static MACHINE_START(pc6001)
 static MACHINE_RESET(pc6001)
 {
 	pc6001_state *state = machine->driver_data<pc6001_state>();
-	UINT8 *work_ram = memory_region(machine, "maincpu");
+	UINT8 *work_ram = machine->region("maincpu")->base();
 
 	state->video_ram =  work_ram + 0xc000;
 
@@ -2072,7 +2072,7 @@ static MACHINE_RESET(pc6001)
 static MACHINE_RESET(pc6001m2)
 {
 	pc6001_state *state = machine->driver_data<pc6001_state>();
-	UINT8 *work_ram = memory_region(machine, "maincpu");
+	UINT8 *work_ram = machine->region("maincpu")->base();
 
 	state->video_ram = work_ram + 0xc000 + 0x28000;
 
@@ -2084,7 +2084,7 @@ static MACHINE_RESET(pc6001m2)
 
 	/* set default bankswitch */
 	{
-		UINT8 *ROM = memory_region(machine, "maincpu");
+		UINT8 *ROM = machine->region("maincpu")->base();
 		state->bank_r0 = 0x71;
 		memory_set_bankptr(machine, "bank1", &ROM[BASICROM(0)]);
 		memory_set_bankptr(machine, "bank2", &ROM[BASICROM(1)]);
@@ -2108,7 +2108,7 @@ static MACHINE_RESET(pc6001m2)
 static MACHINE_RESET(pc6001sr)
 {
 	pc6001_state *state = machine->driver_data<pc6001_state>();
-	UINT8 *work_ram = memory_region(machine, "maincpu");
+	UINT8 *work_ram = machine->region("maincpu")->base();
 
 	state->video_ram = work_ram + 0x70000;
 
@@ -2120,7 +2120,7 @@ static MACHINE_RESET(pc6001sr)
 
 	/* set default bankswitch */
 	{
-		UINT8 *ROM = memory_region(machine, "maincpu");
+		UINT8 *ROM = machine->region("maincpu")->base();
 		state->sr_bank_r[0] = 0xf8; memory_set_bankptr(machine, "bank1", &ROM[SR_SYSROM_1(0x08)]);
 		state->sr_bank_r[1] = 0xfa; memory_set_bankptr(machine, "bank2", &ROM[SR_SYSROM_1(0x0a)]);
 		state->sr_bank_r[2] = 0xb0; memory_set_bankptr(machine, "bank3", &ROM[SR_EXROM1(0x00)]);
@@ -2217,7 +2217,7 @@ static const cassette_config pc6001_cassette_config =
 static DEVICE_IMAGE_LOAD( pc6001_cass )
 {
 	pc6001_state *state = image.device().machine->driver_data<pc6001_state>();
-	UINT8 *cas = memory_region(image.device().machine, "cas");
+	UINT8 *cas = image.device().machine->region("cas")->base();
 	UINT32 size;
 
 	size = image.length();
@@ -2265,94 +2265,94 @@ GFXDECODE_END
 
 static MACHINE_CONFIG_START( pc6001, pc6001_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu",Z80, PC6001_MAIN_CLOCK / 2) // ~4 Mhz
-	MDRV_CPU_PROGRAM_MAP(pc6001_map)
-	MDRV_CPU_IO_MAP(pc6001_io)
-	MDRV_CPU_VBLANK_INT("screen", pc6001_interrupt)
+	MCFG_CPU_ADD("maincpu",Z80, PC6001_MAIN_CLOCK / 2) // ~4 Mhz
+	MCFG_CPU_PROGRAM_MAP(pc6001_map)
+	MCFG_CPU_IO_MAP(pc6001_io)
+	MCFG_CPU_VBLANK_INT("screen", pc6001_interrupt)
 
-//  MDRV_CPU_ADD("subcpu", I8049, 7987200)
+//  MCFG_CPU_ADD("subcpu", I8049, 7987200)
 
-	MDRV_MACHINE_START(pc6001)
-	MDRV_MACHINE_RESET(pc6001)
+	MCFG_MACHINE_START(pc6001)
+	MCFG_MACHINE_RESET(pc6001)
 
-	MDRV_GFXDECODE(pc6001m2)
+	MCFG_GFXDECODE(pc6001m2)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_VIDEO_START(pc6001)
-	MDRV_VIDEO_UPDATE(pc6001)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-//  MDRV_SCREEN_REFRESH_RATE(M6847_NTSC_FRAMES_PER_SECOND)
-//  MDRV_VIDEO_UPDATE(m6847)
-//  MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_SIZE(320, 25+192+26)
-	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
-	MDRV_PALETTE_LENGTH(16+4)
-	MDRV_PALETTE_INIT(pc6001)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_VIDEO_START(pc6001)
+	MCFG_VIDEO_UPDATE(pc6001)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+//  MCFG_SCREEN_REFRESH_RATE(M6847_NTSC_FRAMES_PER_SECOND)
+//  MCFG_VIDEO_UPDATE(m6847)
+//  MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_SIZE(320, 25+192+26)
+	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
+	MCFG_PALETTE_LENGTH(16+4)
+	MCFG_PALETTE_INIT(pc6001)
 
-	MDRV_I8255A_ADD( "ppi8255", pc6001_ppi8255_interface )
+	MCFG_I8255A_ADD( "ppi8255", pc6001_ppi8255_interface )
 	/* uart */
-	MDRV_MSM8251_ADD("uart", pc6001_usart_interface)
+	MCFG_MSM8251_ADD("uart", pc6001_usart_interface)
 
-	MDRV_CARTSLOT_ADD("cart")
-	MDRV_CARTSLOT_EXTENSION_LIST("bin")
-	MDRV_CARTSLOT_NOT_MANDATORY
+	MCFG_CARTSLOT_ADD("cart")
+	MCFG_CARTSLOT_EXTENSION_LIST("bin")
+	MCFG_CARTSLOT_NOT_MANDATORY
 
-//  MDRV_CASSETTE_ADD("cass",pc6001_cassette_config)
-	MDRV_CARTSLOT_ADD("cass")
-	MDRV_CARTSLOT_EXTENSION_LIST("cas,p6")
-	MDRV_CARTSLOT_NOT_MANDATORY
-	MDRV_CARTSLOT_INTERFACE("pc6001_cass")
-	MDRV_CARTSLOT_LOAD(pc6001_cass)
+//  MCFG_CASSETTE_ADD("cass",pc6001_cassette_config)
+	MCFG_CARTSLOT_ADD("cass")
+	MCFG_CARTSLOT_EXTENSION_LIST("cas,p6")
+	MCFG_CARTSLOT_NOT_MANDATORY
+	MCFG_CARTSLOT_INTERFACE("pc6001_cass")
+	MCFG_CARTSLOT_LOAD(pc6001_cass)
 
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("ay8910", AY8910, PC6001_MAIN_CLOCK/4)
-	MDRV_SOUND_CONFIG(pc6001_ay_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-//	MDRV_SOUND_WAVE_ADD("wave","cass")
-//	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.05)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("ay8910", AY8910, PC6001_MAIN_CLOCK/4)
+	MCFG_SOUND_CONFIG(pc6001_ay_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+//	MCFG_SOUND_WAVE_ADD("wave","cass")
+//	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.05)
 MACHINE_CONFIG_END
 
 
 
 static MACHINE_CONFIG_DERIVED( pc6001m2, pc6001 )
 
-	MDRV_MACHINE_RESET(pc6001m2)
+	MCFG_MACHINE_RESET(pc6001m2)
 
-	MDRV_VIDEO_UPDATE(pc6001m2)
-	MDRV_PALETTE_LENGTH(16+16)
-	MDRV_PALETTE_INIT(pc6001m2)
+	MCFG_VIDEO_UPDATE(pc6001m2)
+	MCFG_PALETTE_LENGTH(16+16)
+	MCFG_PALETTE_INIT(pc6001m2)
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(pc6001m2_map)
-	MDRV_CPU_IO_MAP(pc6001m2_io)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(pc6001m2_map)
+	MCFG_CPU_IO_MAP(pc6001m2_io)
 
-	MDRV_GFXDECODE(pc6001m2)
+	MCFG_GFXDECODE(pc6001m2)
 
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( pc6601, pc6001m2 )
 
 	/* basic machine hardware */
-	MDRV_CPU_REPLACE("maincpu", Z80, PC6001_MAIN_CLOCK / 2)
-	MDRV_CPU_PROGRAM_MAP(pc6001m2_map)
-	MDRV_CPU_IO_MAP(pc6601_io)
-	MDRV_CPU_VBLANK_INT("screen", pc6001_interrupt)
+	MCFG_CPU_REPLACE("maincpu", Z80, PC6001_MAIN_CLOCK / 2)
+	MCFG_CPU_PROGRAM_MAP(pc6001m2_map)
+	MCFG_CPU_IO_MAP(pc6601_io)
+	MCFG_CPU_VBLANK_INT("screen", pc6001_interrupt)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( pc6001sr, pc6001m2 )
 
-	MDRV_MACHINE_RESET(pc6001sr)
+	MCFG_MACHINE_RESET(pc6001sr)
 
-	MDRV_VIDEO_UPDATE(pc6001sr)
+	MCFG_VIDEO_UPDATE(pc6001sr)
 
 	/* basic machine hardware */
-	MDRV_CPU_REPLACE("maincpu", Z80, XTAL_3_579545MHz) //*Yes*, PC-6001 SR Z80 CPU is actually slower than older models
-	MDRV_CPU_PROGRAM_MAP(pc6001sr_map)
-	MDRV_CPU_IO_MAP(pc6001sr_io)
-	MDRV_CPU_VBLANK_INT("screen", pc6001sr_interrupt)
+	MCFG_CPU_REPLACE("maincpu", Z80, XTAL_3_579545MHz) //*Yes*, PC-6001 SR Z80 CPU is actually slower than older models
+	MCFG_CPU_PROGRAM_MAP(pc6001sr_map)
+	MCFG_CPU_IO_MAP(pc6001sr_io)
+	MCFG_CPU_VBLANK_INT("screen", pc6001sr_interrupt)
 MACHINE_CONFIG_END
 
 /* ROM definition */

@@ -69,7 +69,7 @@ public:
 	UINT8    scroll, scrollhi;
 
 	/* devices */
-	running_device *maincpu;
+	device_t *maincpu;
 };
 
 
@@ -343,7 +343,7 @@ static WRITE8_DEVICE_HANDLER( chanbara_ay_out_1_w )
 	//if (data & 0xf8)    printf("chanbara_ay_out_1_w unused bits set %02x\n", data & 0xf8);
 }
 
-static void sound_irq( running_device *device, int linestate )
+static void sound_irq( device_t *device, int linestate )
 {
 	chanbara_state *state = device->machine->driver_data<chanbara_state>();
 	cpu_set_input_line(state->maincpu, 0, linestate);
@@ -384,32 +384,32 @@ static MACHINE_RESET( chanbara )
 
 static MACHINE_CONFIG_START( chanbara, chanbara_state )
 
-	MDRV_CPU_ADD("maincpu", M6809, 12000000/8)
-	MDRV_CPU_PROGRAM_MAP(memmap)
+	MCFG_CPU_ADD("maincpu", M6809, 12000000/8)
+	MCFG_CPU_PROGRAM_MAP(memmap)
 
-	MDRV_MACHINE_START(chanbara)
-	MDRV_MACHINE_RESET(chanbara)
+	MCFG_MACHINE_START(chanbara)
+	MCFG_MACHINE_RESET(chanbara)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(57.4122)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(57.4122)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(chanbara)
-	MDRV_PALETTE_LENGTH(256)
-	MDRV_PALETTE_INIT(chanbara)
+	MCFG_GFXDECODE(chanbara)
+	MCFG_PALETTE_LENGTH(256)
+	MCFG_PALETTE_INIT(chanbara)
 
-	MDRV_VIDEO_START(chanbara)
-	MDRV_VIDEO_UPDATE(chanbara)
+	MCFG_VIDEO_START(chanbara)
+	MCFG_VIDEO_UPDATE(chanbara)
 
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM2203, 12000000/8)
-	MDRV_SOUND_CONFIG(ym2203_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("ymsnd", YM2203, 12000000/8)
+	MCFG_SOUND_CONFIG(ym2203_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -453,9 +453,9 @@ ROM_END
 
 static DRIVER_INIT(chanbara )
 {
-	UINT8	*src = memory_region(machine, "gfx4");
-	UINT8	*dst = memory_region(machine, "gfx3") + 0x4000;
-	UINT8	*bg = memory_region(machine, "user1");
+	UINT8	*src = machine->region("gfx4")->base();
+	UINT8	*dst = machine->region("gfx3")->base() + 0x4000;
+	UINT8	*bg = machine->region("user1")->base();
 
 	int i;
 	for (i = 0; i < 0x1000; i++)

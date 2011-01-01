@@ -201,11 +201,11 @@ void abc80_state::update_screen(bitmap_t *bitmap, const rectangle *cliprect)
 void abc80_state::video_start()
 {
 	// find memory regions
-	m_char_rom = memory_region(machine, "chargen");
-	m_hsync_prom = memory_region(machine, "hsync");
-	m_vsync_prom = memory_region(machine, "vsync");
-	m_line_prom = memory_region(machine, "line");
-	m_attr_prom = memory_region(machine, "attr");
+	m_char_rom = machine->region("chargen")->base();
+	m_hsync_prom = machine->region("hsync")->base();
+	m_vsync_prom = machine->region("vsync")->base();
+	m_line_prom = machine->region("line")->base();
+	m_attr_prom = machine->region("attr")->base();
 
 	// register for state saving
 	state_save_register_global(machine, m_blink);
@@ -230,17 +230,17 @@ bool abc80_state::video_update(screen_device &screen, bitmap_t &bitmap, const re
 //-------------------------------------------------
 
 MACHINE_CONFIG_FRAGMENT( abc80_video )
-	MDRV_TIMER_ADD_PERIODIC("blink", blink_tick, HZ(ABC80_XTAL/2/6/64/312/16))
-	MDRV_TIMER_ADD_SCANLINE("vsync_on", vsync_on_tick, SCREEN_TAG, 0, ABC80_VTOTAL)
-	MDRV_TIMER_ADD_SCANLINE("vsync_off", vsync_off_tick, SCREEN_TAG, 16, ABC80_VTOTAL)
+	MCFG_TIMER_ADD_PERIODIC("blink", blink_tick, HZ(ABC80_XTAL/2/6/64/312/16))
+	MCFG_TIMER_ADD_SCANLINE("vsync_on", vsync_on_tick, SCREEN_TAG, 0, ABC80_VTOTAL)
+	MCFG_TIMER_ADD_SCANLINE("vsync_off", vsync_off_tick, SCREEN_TAG, 16, ABC80_VTOTAL)
 
-	MDRV_SCREEN_ADD(SCREEN_TAG, RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 
-	MDRV_GFXDECODE(abc80)
+	MCFG_GFXDECODE(abc80)
 	
-	MDRV_PALETTE_LENGTH(2)
-	MDRV_PALETTE_INIT(black_and_white)
+	MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_INIT(black_and_white)
 
-	MDRV_SCREEN_RAW_PARAMS(ABC80_XTAL/2, ABC80_HTOTAL, ABC80_HBEND, ABC80_HBSTART, ABC80_VTOTAL, ABC80_VBEND, ABC80_VBSTART)
+	MCFG_SCREEN_RAW_PARAMS(ABC80_XTAL/2, ABC80_HTOTAL, ABC80_HBEND, ABC80_HBSTART, ABC80_VTOTAL, ABC80_VBEND, ABC80_VBSTART)
 MACHINE_CONFIG_END

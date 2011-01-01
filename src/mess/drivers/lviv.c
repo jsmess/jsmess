@@ -427,46 +427,46 @@ static const cassette_config lviv_cassette_config =
 /* machine definition */
 static MACHINE_CONFIG_START( lviv, lviv_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", I8080, 2500000)
-	MDRV_CPU_PROGRAM_MAP(lviv_mem)
-	MDRV_CPU_IO_MAP(io_map)
-	MDRV_QUANTUM_TIME(HZ(60))
+	MCFG_CPU_ADD("maincpu", I8080, 2500000)
+	MCFG_CPU_PROGRAM_MAP(lviv_mem)
+	MCFG_CPU_IO_MAP(io_map)
+	MCFG_QUANTUM_TIME(HZ(60))
 
-	MDRV_MACHINE_RESET( lviv )
+	MCFG_MACHINE_RESET( lviv )
 
-	MDRV_I8255A_ADD( "ppi8255_0", lviv_ppi8255_interface_0 )
+	MCFG_I8255A_ADD( "ppi8255_0", lviv_ppi8255_interface_0 )
 
-	MDRV_I8255A_ADD( "ppi8255_1", lviv_ppi8255_interface_1 )
+	MCFG_I8255A_ADD( "ppi8255_1", lviv_ppi8255_interface_1 )
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(50)
-	MDRV_SCREEN_VBLANK_TIME(0)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(0)
 
     /* video hardware */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(256, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 256-1, 0, 256-1)
-	MDRV_PALETTE_LENGTH(sizeof (lviv_palette) / 3)
-	MDRV_PALETTE_INIT( lviv )
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(256, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 256-1)
+	MCFG_PALETTE_LENGTH(sizeof (lviv_palette) / 3)
+	MCFG_PALETTE_INIT( lviv )
 
-	MDRV_VIDEO_START( lviv )
-	MDRV_VIDEO_UPDATE( lviv )
+	MCFG_VIDEO_START( lviv )
+	MCFG_VIDEO_UPDATE( lviv )
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_WAVE_ADD("wave", "cassette")
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MDRV_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_WAVE_ADD("wave", "cassette")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* snapshot */
-	MDRV_SNAPSHOT_ADD("snapshot", lviv, "sav", 0)
+	MCFG_SNAPSHOT_ADD("snapshot", lviv, "sav", 0)
 
-	MDRV_CASSETTE_ADD( "cassette", lviv_cassette_config )
+	MCFG_CASSETTE_ADD( "cassette", lviv_cassette_config )
 
 	/* internal ram */
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("64K")
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("64K")
 MACHINE_CONFIG_END
 
 

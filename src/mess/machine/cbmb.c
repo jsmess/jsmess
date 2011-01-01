@@ -59,7 +59,7 @@ static TIMER_CALLBACK( cbmb_frame_interrupt );
  */
 READ8_DEVICE_HANDLER( cbmb_tpi0_port_a_r )
 {
-	running_device *ieeebus = device->machine->device("ieee_bus");
+	device_t *ieeebus = device->machine->device("ieee_bus");
 	UINT8 data = 0;
 
 	if (ieee488_nrfd_r(ieeebus))
@@ -85,7 +85,7 @@ READ8_DEVICE_HANDLER( cbmb_tpi0_port_a_r )
 
 WRITE8_DEVICE_HANDLER( cbmb_tpi0_port_a_w )
 {
-	running_device *ieeebus = device->machine->device("ieee_bus");
+	device_t *ieeebus = device->machine->device("ieee_bus");
 
 	ieee488_nrfd_w(ieeebus, device, BIT(data, 7));
 	ieee488_ndac_w(ieeebus, device, BIT(data, 6));
@@ -97,7 +97,7 @@ WRITE8_DEVICE_HANDLER( cbmb_tpi0_port_a_w )
 
 READ8_DEVICE_HANDLER( cbmb_tpi0_port_b_r )
 {
-	running_device *ieeebus = device->machine->device("ieee_bus");
+	device_t *ieeebus = device->machine->device("ieee_bus");
 	UINT8 data = 0;
 
 	if (ieee488_srq_r(ieeebus))
@@ -111,7 +111,7 @@ READ8_DEVICE_HANDLER( cbmb_tpi0_port_b_r )
 
 WRITE8_DEVICE_HANDLER( cbmb_tpi0_port_b_w )
 {
-	running_device *ieeebus = device->machine->device("ieee_bus");
+	device_t *ieeebus = device->machine->device("ieee_bus");
 
 	ieee488_srq_w(ieeebus, device, BIT(data, 1));
 	ieee488_ifc_w(ieeebus, device, BIT(data, 0));
@@ -236,7 +236,7 @@ READ8_DEVICE_HANDLER( cbmb_keyboard_line_c )
 	return data ^0xff;
 }
 
-void cbmb_irq( running_device *device, int level )
+void cbmb_irq( device_t *device, int level )
 {
 	cbmb_state *state = device->machine->driver_data<cbmb_state>();
 	if (level != state->old_level)
@@ -258,13 +258,13 @@ void cbmb_irq( running_device *device, int level )
  */
 static READ8_DEVICE_HANDLER( cbmb_cia_port_a_r )
 {
-	running_device *ieeebus = device->machine->device("ieee_bus");
+	device_t *ieeebus = device->machine->device("ieee_bus");
 	return ieee488_dio_r(ieeebus, 0);
 }
 
 static WRITE8_DEVICE_HANDLER( cbmb_cia_port_a_w )
 {
-	running_device *ieeebus = device->machine->device("ieee_bus");
+	device_t *ieeebus = device->machine->device("ieee_bus");
 	ieee488_dio_w(ieeebus, device, data);
 }
 
@@ -310,7 +310,7 @@ WRITE8_DEVICE_HANDLER( cbmb_change_font )
 static void cbmb_common_driver_init( running_machine *machine )
 {
 	cbmb_state *state = machine->driver_data<cbmb_state>();
-	state->chargen = memory_region(machine, "maincpu") + 0x100000;
+	state->chargen = machine->region("maincpu")->base() + 0x100000;
 	/*    memset(c64_memory, 0, 0xfd00); */
 
 	timer_pulse(machine, ATTOTIME_IN_MSEC(10), NULL, 0, cbmb_frame_interrupt);
@@ -383,7 +383,7 @@ static TIMER_CALLBACK( p500_lightpen_tick )
 static TIMER_CALLBACK(cbmb_frame_interrupt)
 {
 	cbmb_state *state = machine->driver_data<cbmb_state>();
-	running_device *tpi_0 = machine->device("tpi6525_0");
+	device_t *tpi_0 = machine->device("tpi6525_0");
 
 #if 0
 	int controller1 = input_port_read(machine, "CTRLSEL") & 0x07;
@@ -499,7 +499,7 @@ static DEVICE_IMAGE_LOAD(cbmb_cart)
 {
 	UINT32 size = image.length();
 	const char *filetype = image.filetype();
-	UINT8 *cbmb_memory = memory_region(image.device().machine, "maincpu");
+	UINT8 *cbmb_memory = image.device().machine->region("maincpu")->base();
 	int address = 0;
 
 	/* Assign loading address according to extension */
@@ -524,13 +524,13 @@ static DEVICE_IMAGE_LOAD(cbmb_cart)
 
 
 MACHINE_CONFIG_FRAGMENT(cbmb_cartslot)
-	MDRV_CARTSLOT_ADD("cart1")
-	MDRV_CARTSLOT_EXTENSION_LIST("10,20,40,60")
-	MDRV_CARTSLOT_NOT_MANDATORY
-	MDRV_CARTSLOT_LOAD(cbmb_cart)
+	MCFG_CARTSLOT_ADD("cart1")
+	MCFG_CARTSLOT_EXTENSION_LIST("10,20,40,60")
+	MCFG_CARTSLOT_NOT_MANDATORY
+	MCFG_CARTSLOT_LOAD(cbmb_cart)
 
-	MDRV_CARTSLOT_ADD("cart2")
-	MDRV_CARTSLOT_EXTENSION_LIST("10,20,40,60")
-	MDRV_CARTSLOT_NOT_MANDATORY
-	MDRV_CARTSLOT_LOAD(cbmb_cart)
+	MCFG_CARTSLOT_ADD("cart2")
+	MCFG_CARTSLOT_EXTENSION_LIST("10,20,40,60")
+	MCFG_CARTSLOT_NOT_MANDATORY
+	MCFG_CARTSLOT_LOAD(cbmb_cart)
 MACHINE_CONFIG_END

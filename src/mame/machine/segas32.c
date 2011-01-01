@@ -36,7 +36,7 @@ const UINT8 ga2_v25_opcode_table[256] = {
 void decrypt_ga2_protrom(running_machine *machine)
 {
 	int i;
-	UINT8 *rom = memory_region(machine, "mcu");
+	UINT8 *rom = machine->region("mcu")->base();
 	UINT8* temp = auto_alloc_array(machine, UINT8, 0x100000);
 
 	// make copy of ROM so original can be overwritten
@@ -113,7 +113,7 @@ WRITE16_HANDLER(sonic_level_load_protection)
 		}
 		else
 		{
-			const UINT8 *ROM = memory_region(space->machine, "maincpu");
+			const UINT8 *ROM = space->machine->region("maincpu")->base();
 			level =  *((ROM + LEVEL_ORDER_ARRAY) + (system32_workram[CLEARED_LEVELS / 2] * 2) - 1);
 			level |= *((ROM + LEVEL_ORDER_ARRAY) + (system32_workram[CLEARED_LEVELS / 2] * 2) - 2) << 8;
 		}
@@ -163,7 +163,7 @@ WRITE16_HANDLER(brival_protection_w)
 	};
 	char ret[32];
 	int curProtType;
-	UINT8 *ROM = memory_region(space->machine, "maincpu");
+	UINT8 *ROM = space->machine->region("maincpu")->base();
 
 	switch (offset)
 	{
@@ -205,7 +205,7 @@ WRITE16_HANDLER(brival_protection_w)
  ******************************************************************************
  ******************************************************************************/
 
-void darkedge_fd1149_vblank(running_device *device)
+void darkedge_fd1149_vblank(device_t *device)
 {
 	address_space *space = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
 

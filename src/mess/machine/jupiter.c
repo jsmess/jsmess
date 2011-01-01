@@ -29,8 +29,8 @@
 
 SNAPSHOT_LOAD(jupiter)
 {
-	UINT8 *RAM = memory_region(image.device().machine, "maincpu");
-	running_device *cpu = image.device().machine->device("maincpu");
+	UINT8 *RAM = image.device().machine->region("maincpu")->base();
+	device_t *cpu = image.device().machine->device("maincpu");
 	address_space *space = cputag_get_address_space(image.device().machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	unsigned char jupiter_repeat, jupiter_byte, loop;
 	int done=0, jupiter_index=0x2000;

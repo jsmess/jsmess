@@ -36,7 +36,7 @@
 #include "sound/ay8910.h"
 #include "devices/messram.h"
 
-INLINE running_device *get_floppy_image(running_machine *machine, int drive)
+INLINE device_t *get_floppy_image(running_machine *machine, int drive)
 {
 	return floppy_get_device(machine, drive);
 }
@@ -592,7 +592,7 @@ static MACHINE_START( tiki100 )
 	state->video_ram = auto_alloc_array(machine, UINT8, TIKI100_VIDEORAM_SIZE);
 
 	/* setup memory banking */
-	memory_configure_bank(machine, "bank1", BANK_ROM, 1, memory_region(machine, Z80_TAG), 0);
+	memory_configure_bank(machine, "bank1", BANK_ROM, 1, machine->region(Z80_TAG)->base(), 0);
 	memory_configure_bank(machine, "bank1", BANK_RAM, 1, messram_get_ptr(machine->device("messram")), 0);
 	memory_configure_bank(machine, "bank1", BANK_VIDEO_RAM, 1, state->video_ram, 0);
 
@@ -657,42 +657,42 @@ static const floppy_config tiki100_floppy_config =
 static MACHINE_CONFIG_START( tiki100, tiki100_state )
 
 	/* basic machine hardware */
-    MDRV_CPU_ADD(Z80_TAG, Z80, 2000000)
-    MDRV_CPU_PROGRAM_MAP(tiki100_mem)
-    MDRV_CPU_IO_MAP(tiki100_io)
-	MDRV_CPU_CONFIG(tiki100_daisy_chain)
+    MCFG_CPU_ADD(Z80_TAG, Z80, 2000000)
+    MCFG_CPU_PROGRAM_MAP(tiki100_mem)
+    MCFG_CPU_IO_MAP(tiki100_io)
+	MCFG_CPU_CONFIG(tiki100_daisy_chain)
 
-    MDRV_MACHINE_START(tiki100)
+    MCFG_MACHINE_START(tiki100)
 
     /* video hardware */
-    MDRV_SCREEN_ADD(SCREEN_TAG, RASTER)
-    MDRV_SCREEN_REFRESH_RATE(50)
-    MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-    MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-    MDRV_SCREEN_SIZE(1024, 256)
-    MDRV_SCREEN_VISIBLE_AREA(0, 1024-1, 0, 256-1)
+    MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
+    MCFG_SCREEN_REFRESH_RATE(50)
+    MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+    MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+    MCFG_SCREEN_SIZE(1024, 256)
+    MCFG_SCREEN_VISIBLE_AREA(0, 1024-1, 0, 256-1)
 
-	MDRV_PALETTE_LENGTH(16)
+	MCFG_PALETTE_LENGTH(16)
 
-    MDRV_VIDEO_UPDATE(tiki100)
+    MCFG_VIDEO_UPDATE(tiki100)
 
 	/* devices */
-	MDRV_Z80DART_ADD(Z80DART_TAG, 2000000, dart_intf)
-	MDRV_Z80PIO_ADD(Z80PIO_TAG, 2000000, pio_intf)
-	MDRV_Z80CTC_ADD(Z80CTC_TAG, 2000000, ctc_intf)
-	MDRV_TIMER_ADD_PERIODIC("ctc", ctc_tick, HZ(2000000))
-	MDRV_WD179X_ADD(FD1797_TAG, tiki100_wd17xx_interface) // FD1767PL-02 or FD1797-PL
-	MDRV_FLOPPY_2_DRIVES_ADD(tiki100_floppy_config)
+	MCFG_Z80DART_ADD(Z80DART_TAG, 2000000, dart_intf)
+	MCFG_Z80PIO_ADD(Z80PIO_TAG, 2000000, pio_intf)
+	MCFG_Z80CTC_ADD(Z80CTC_TAG, 2000000, ctc_intf)
+	MCFG_TIMER_ADD_PERIODIC("ctc", ctc_tick, HZ(2000000))
+	MCFG_WD179X_ADD(FD1797_TAG, tiki100_wd17xx_interface) // FD1767PL-02 or FD1797-PL
+	MCFG_FLOPPY_2_DRIVES_ADD(tiki100_floppy_config)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD(AY8912_TAG, AY8912, 2000000)
-	MDRV_SOUND_CONFIG(ay8910_intf)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD(AY8912_TAG, AY8912, 2000000)
+	MCFG_SOUND_CONFIG(ay8910_intf)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* internal ram */
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("64K")
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("64K")
 MACHINE_CONFIG_END
 
 /* ROMs */

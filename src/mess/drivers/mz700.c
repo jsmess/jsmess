@@ -331,66 +331,66 @@ static const cassette_config mz700_cassette_config =
 
 static MACHINE_CONFIG_START( mz700, mz_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, XTAL_17_73447MHz/5)
-	MDRV_CPU_PROGRAM_MAP(mz700_mem)
-	MDRV_CPU_IO_MAP(mz700_io)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_17_73447MHz/5)
+	MCFG_CPU_PROGRAM_MAP(mz700_mem)
+	MCFG_CPU_IO_MAP(mz700_io)
 
-	MDRV_MACHINE_START(mz700)
+	MCFG_MACHINE_START(mz700)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_RAW_PARAMS(XTAL_17_73447MHz/2, 568, 0, 40*8, 312, 0, 25*8)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_17_73447MHz/2, 568, 0, 40*8, 312, 0, 25*8)
 
-	MDRV_GFXDECODE(mz700)
-	MDRV_PALETTE_LENGTH(256*2)
-	MDRV_PALETTE_INIT(mz700)
+	MCFG_GFXDECODE(mz700)
+	MCFG_PALETTE_LENGTH(256*2)
+	MCFG_PALETTE_INIT(mz700)
 
-	MDRV_VIDEO_UPDATE(mz700)
+	MCFG_VIDEO_UPDATE(mz700)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_WAVE_ADD("wave", "cassette")
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MDRV_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_WAVE_ADD("wave", "cassette")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* ne556 timers */
-	MDRV_TIMER_ADD_PERIODIC("cursor", ne556_cursor_callback, HZ(1.5))
-	MDRV_TIMER_ADD_PERIODIC("other", ne556_other_callback, HZ(34.5))
+	MCFG_TIMER_ADD_PERIODIC("cursor", ne556_cursor_callback, HZ(1.5))
+	MCFG_TIMER_ADD_PERIODIC("other", ne556_other_callback, HZ(34.5))
 
 	/* devices */
-	MDRV_PIT8253_ADD("pit8253", mz700_pit8253_config)
-	MDRV_I8255A_ADD("ppi8255", mz700_ppi8255_interface)
-	MDRV_TTL74145_ADD("ls145", default_ttl74145)
+	MCFG_PIT8253_ADD("pit8253", mz700_pit8253_config)
+	MCFG_I8255A_ADD("ppi8255", mz700_ppi8255_interface)
+	MCFG_TTL74145_ADD("ls145", default_ttl74145)
 
-	MDRV_CASSETTE_ADD( "cassette", mz700_cassette_config )
+	MCFG_CASSETTE_ADD( "cassette", mz700_cassette_config )
 
 	/* internal ram */
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("64K")
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("64K")
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( mz800, mz700 )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(mz800_mem)
-	MDRV_CPU_IO_MAP(mz800_io)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(mz800_mem)
+	MCFG_CPU_IO_MAP(mz800_io)
 
-	MDRV_GFXDECODE(mz800)
-	MDRV_VIDEO_START(mz800)
-	MDRV_VIDEO_UPDATE(mz800)
+	MCFG_GFXDECODE(mz800)
+	MCFG_VIDEO_START(mz800)
+	MCFG_VIDEO_UPDATE(mz800)
 
-	MDRV_SOUND_ADD("sn76489n", SN76489, XTAL_17_73447MHz/5)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("sn76489n", SN76489, XTAL_17_73447MHz/5)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	/* devices */
-	MDRV_DEVICE_REMOVE("pit8253")
-	MDRV_PIT8253_ADD("pit8253", mz800_pit8253_config)
-	MDRV_Z80PIO_ADD("z80pio", XTAL_17_73447MHz/5, mz800_z80pio_config)
-	MDRV_CENTRONICS_ADD("centronics", standard_centronics)
+	MCFG_DEVICE_REMOVE("pit8253")
+	MCFG_PIT8253_ADD("pit8253", mz800_pit8253_config)
+	MCFG_Z80PIO_ADD("z80pio", XTAL_17_73447MHz/5, mz800_z80pio_config)
+	MCFG_CENTRONICS_ADD("centronics", standard_centronics)
 MACHINE_CONFIG_END
 
 

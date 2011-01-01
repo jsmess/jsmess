@@ -59,7 +59,7 @@ struct _pcf8593_t
     PROTOTYPES
 ***************************************************************************/
 
-static void pcf8593_clear_buffer_rx(running_device *device);
+static void pcf8593_clear_buffer_rx(device_t *device);
 static TIMER_CALLBACK( pcf8593_timer_callback );
 
 
@@ -67,7 +67,7 @@ static TIMER_CALLBACK( pcf8593_timer_callback );
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE pcf8593_t *get_token(running_device *device)
+INLINE pcf8593_t *get_token(device_t *device)
 {
 	assert(device->type() == PCF8593);
 	return (pcf8593_t *) downcast<legacy_device_base *>(device)->token();
@@ -119,7 +119,7 @@ static DEVICE_RESET( pcf8593 )
     pcf8593_pin_scl
 -------------------------------------------------*/
 
-void pcf8593_pin_scl(running_device *device, int data)
+void pcf8593_pin_scl(device_t *device, int data)
 {
 	pcf8593_t *rtc = get_token(device);
 
@@ -198,7 +198,7 @@ void pcf8593_pin_scl(running_device *device, int data)
     pcf8593_pin_sda_w
 -------------------------------------------------*/
 
-void pcf8593_pin_sda_w(running_device *device, int data)
+void pcf8593_pin_sda_w(device_t *device, int data)
 {
 	pcf8593_t *rtc = get_token(device);
 
@@ -234,7 +234,7 @@ void pcf8593_pin_sda_w(running_device *device, int data)
     pcf8593_pin_sda_r
 -------------------------------------------------*/
 
-int pcf8593_pin_sda_r(running_device *device)
+int pcf8593_pin_sda_r(device_t *device)
 {
 	pcf8593_t *rtc = get_token(device);
 	return rtc->inp;
@@ -246,7 +246,7 @@ int pcf8593_pin_sda_r(running_device *device)
     pcf8593_clear_buffer_rx
 -------------------------------------------------*/
 
-void pcf8593_clear_buffer_rx(running_device *device)
+void pcf8593_clear_buffer_rx(device_t *device)
 {
 	pcf8593_t *rtc = get_token(device);
 	memset( &rtc->data_recv[0], 0, sizeof( rtc->data_recv));
@@ -283,7 +283,7 @@ static UINT8 bcd_to_dec( UINT8 data)
     bcd_to_dec
 -------------------------------------------------*/
 
-static void pcf8593_set_time(running_device *device, int hour, int minute, int second)
+static void pcf8593_set_time(device_t *device, int hour, int minute, int second)
 {
 	pcf8593_t *rtc = get_token(device);
 	RTC_SET_TIME_HOUR( hour);
@@ -298,7 +298,7 @@ static void pcf8593_set_time(running_device *device, int hour, int minute, int s
     pcf8593_set_date
 -------------------------------------------------*/
 
-static void pcf8593_set_date(running_device *device, int year, int month, int day)
+static void pcf8593_set_date(device_t *device, int year, int month, int day)
 {
 	pcf8593_t *rtc = get_token(device);
 	RTC_SET_DATE_YEAR( year);
@@ -327,7 +327,7 @@ static int get_days_in_month( int year, int month)
 
 static TIMER_CALLBACK( pcf8593_timer_callback )
 {
-	running_device *device = (running_device *) ptr;
+	device_t *device = (device_t *) ptr;
 	pcf8593_t *rtc = get_token(device);
 	int value;
 
@@ -394,7 +394,7 @@ static TIMER_CALLBACK( pcf8593_timer_callback )
     pcf8593_load
 -------------------------------------------------*/
 
-void pcf8593_load(running_device *device, mame_file *file)
+void pcf8593_load(device_t *device, mame_file *file)
 {
 	pcf8593_t *rtc = get_token(device);
 	system_time systime;
@@ -412,7 +412,7 @@ void pcf8593_load(running_device *device, mame_file *file)
     pcf8593_save
 -------------------------------------------------*/
 
-void pcf8593_save(running_device *device, mame_file *file)
+void pcf8593_save(device_t *device, mame_file *file)
 {
 	pcf8593_t *rtc = get_token(device);
 

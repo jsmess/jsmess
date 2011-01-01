@@ -105,8 +105,8 @@ static MACHINE_RESET( sol20 )
 static VIDEO_START( sol20 )
 {
 	ptcsol_state *state = machine->driver_data<ptcsol_state>();
-	state->FNT = memory_region(machine, "chargen");
-	state->videoram = memory_region(machine, "maincpu")+0xcc00;
+	state->FNT = machine->region("chargen")->base();
+	state->videoram = machine->region("maincpu")->base()+0xcc00;
 }
 
 static VIDEO_UPDATE( sol20 )
@@ -176,30 +176,30 @@ static GENERIC_TERMINAL_INTERFACE( sol20_terminal_intf )
 
 static MACHINE_CONFIG_START( sol20, ptcsol_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu",I8080, XTAL_14_31818MHz/7)
-	MDRV_CPU_PROGRAM_MAP(sol20_mem)
-	MDRV_CPU_IO_MAP(sol20_io)
+	MCFG_CPU_ADD("maincpu",I8080, XTAL_14_31818MHz/7)
+	MCFG_CPU_PROGRAM_MAP(sol20_mem)
+	MCFG_CPU_IO_MAP(sol20_io)
 
-	MDRV_MACHINE_RESET(sol20)
+	MCFG_MACHINE_RESET(sol20)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(50)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(512, 208)
-	MDRV_SCREEN_VISIBLE_AREA(0, 511, 0, 207)
-	MDRV_PALETTE_LENGTH(2)
-	MDRV_PALETTE_INIT(black_and_white)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(512, 208)
+	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 207)
+	MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_INIT(black_and_white)
 
-	MDRV_VIDEO_START(sol20)
-	MDRV_VIDEO_UPDATE(sol20)
+	MCFG_VIDEO_START(sol20)
+	MCFG_VIDEO_UPDATE(sol20)
 
 	/* internal ram */
-//  MDRV_RAM_ADD("messram")
-//  MDRV_RAM_DEFAULT_SIZE("8K")
-//  MDRV_RAM_EXTRA_OPTIONS("16K,32K")
-	MDRV_GENERIC_TERMINAL_ADD("terminal", sol20_terminal_intf)
+//  MCFG_RAM_ADD("messram")
+//  MCFG_RAM_DEFAULT_SIZE("8K")
+//  MCFG_RAM_EXTRA_OPTIONS("16K,32K")
+	MCFG_GENERIC_TERMINAL_ADD("terminal", sol20_terminal_intf)
 MACHINE_CONFIG_END
 
 /* ROM definition */

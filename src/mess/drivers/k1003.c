@@ -93,14 +93,14 @@ static MACHINE_RESET(k1003)
 
 static MACHINE_CONFIG_START( k1003, k1003_state )
     /* basic machine hardware */
-    MDRV_CPU_ADD("maincpu",I8008, 800000)
-    MDRV_CPU_PROGRAM_MAP(k1003_mem)
-    MDRV_CPU_IO_MAP(k1003_io)
+    MCFG_CPU_ADD("maincpu",I8008, 800000)
+    MCFG_CPU_PROGRAM_MAP(k1003_mem)
+    MCFG_CPU_IO_MAP(k1003_io)
 
-    MDRV_MACHINE_RESET(k1003)
+    MCFG_MACHINE_RESET(k1003)
 
     /* video hardware */
-    MDRV_DEFAULT_LAYOUT(layout_k1003)
+    MCFG_DEFAULT_LAYOUT(layout_k1003)
 MACHINE_CONFIG_END
 
 

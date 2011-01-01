@@ -209,25 +209,25 @@ static MACHINE_START(vcs80)
 static MACHINE_CONFIG_START( vcs80, vcs80_state )
 
 	/* basic machine hardware */
-    MDRV_CPU_ADD(Z80_TAG, Z80, XTAL_5MHz/2) /* U880D */
-    MDRV_CPU_PROGRAM_MAP(vcs80_mem)
-    MDRV_CPU_IO_MAP(vcs80_io)
-	MDRV_CPU_CONFIG(vcs80_daisy_chain)
+    MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_5MHz/2) /* U880D */
+    MCFG_CPU_PROGRAM_MAP(vcs80_mem)
+    MCFG_CPU_IO_MAP(vcs80_io)
+	MCFG_CPU_CONFIG(vcs80_daisy_chain)
 
-    MDRV_MACHINE_START(vcs80)
+    MCFG_MACHINE_START(vcs80)
 
 	/* keyboard timer */
-	MDRV_TIMER_ADD_PERIODIC("keyboard", vcs80_keyboard_tick, HZ(1000))
+	MCFG_TIMER_ADD_PERIODIC("keyboard", vcs80_keyboard_tick, HZ(1000))
 
     /* video hardware */
-	MDRV_DEFAULT_LAYOUT( layout_vcs80 )
+	MCFG_DEFAULT_LAYOUT( layout_vcs80 )
 
 	/* devices */
-	MDRV_Z80PIO_ADD(Z80PIO_TAG, XTAL_5MHz/2, pio_intf)
+	MCFG_Z80PIO_ADD(Z80PIO_TAG, XTAL_5MHz/2, pio_intf)
 
 	/* internal ram */
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("1K")
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("1K")
 MACHINE_CONFIG_END
 
 /* ROMs */

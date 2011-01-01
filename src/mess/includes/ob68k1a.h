@@ -27,12 +27,12 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<running_device> m_dbrg;
-	required_device<running_device> m_acia0;
-	required_device<running_device> m_pia0;
-	required_device<running_device> m_pia1;
-	required_device<running_device> m_terminal;
-	required_device<running_device> m_ram;
+	required_device<device_t> m_dbrg;
+	required_device<device_t> m_acia0;
+	required_device<device_t> m_pia0;
+	required_device<device_t> m_pia1;
+	required_device<device_t> m_terminal;
+	required_device<device_t> m_ram;
 
 	virtual void machine_start();
 	virtual void machine_reset();

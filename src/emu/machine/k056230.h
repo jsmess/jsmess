@@ -17,9 +17,9 @@
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MDRV_K056230_ADD(_tag, _config) \
-	MDRV_DEVICE_ADD(_tag, K0506230, 0) \
-	MDRV_DEVICE_CONFIG(_config)
+#define MCFG_K056230_ADD(_tag, _config) \
+	MCFG_DEVICE_ADD(_tag, K0506230, 0) \
+	MCFG_DEVICE_CONFIG(_config)
 
 
 /***************************************************************************
@@ -92,7 +92,7 @@ private:
 	UINT32 *m_ram;
 	int		m_is_thunderh;
 
-	running_device *m_cpu;
+	device_t *m_cpu;
 
     const k056230_device_config &m_config;
 };

@@ -95,7 +95,7 @@ static MACHINE_START( midzeus )
 
 static MACHINE_RESET( midzeus )
 {
-	memcpy(ram_base, memory_region(machine, "user1"), 0x40000*4);
+	memcpy(ram_base, machine->region("user1")->base(), 0x40000*4);
 	*ram_base <<= 1;
 	machine->device("maincpu")->reset();
 
@@ -1095,26 +1095,26 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( midzeus, midzeus_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", TMS32032, CPU_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(zeus_map)
-	MDRV_CPU_VBLANK_INT("screen", display_irq)
+	MCFG_CPU_ADD("maincpu", TMS32032, CPU_CLOCK)
+	MCFG_CPU_PROGRAM_MAP(zeus_map)
+	MCFG_CPU_VBLANK_INT("screen", display_irq)
 
-	MDRV_MACHINE_START(midzeus)
-	MDRV_MACHINE_RESET(midzeus)
-	MDRV_NVRAM_ADD_1FILL("nvram")
+	MCFG_MACHINE_START(midzeus)
+	MCFG_MACHINE_RESET(midzeus)
+	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	/* video hardware */
-	MDRV_PALETTE_LENGTH(32768)
+	MCFG_PALETTE_LENGTH(32768)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_RAW_PARAMS(MIDZEUS_VIDEO_CLOCK/8, 529, 0, 400, 278, 0, 256)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS(MIDZEUS_VIDEO_CLOCK/8, 529, 0, 400, 278, 0, 256)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 
-	MDRV_VIDEO_START(midzeus)
-	MDRV_VIDEO_UPDATE(midzeus)
+	MCFG_VIDEO_START(midzeus)
+	MCFG_VIDEO_UPDATE(midzeus)
 
 	/* sound hardware */
-	MDRV_FRAGMENT_ADD(dcs2_audio_2104)
+	MCFG_FRAGMENT_ADD(dcs2_audio_2104)
 MACHINE_CONFIG_END
 
 static READ8_HANDLER( PIC16C5X_T0_clk_r )
@@ -1129,33 +1129,33 @@ ADDRESS_MAP_END
 
 static MACHINE_CONFIG_DERIVED( invasn, midzeus )
 
-	MDRV_CPU_ADD("pic", PIC16C57, 8000000)	/* ? */
-	MDRV_CPU_IO_MAP(pic_io_map)
+	MCFG_CPU_ADD("pic", PIC16C57, 8000000)	/* ? */
+	MCFG_CPU_IO_MAP(pic_io_map)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( midzeus2, midzeus_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", TMS32032, CPU_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(zeus2_map)
-	MDRV_CPU_VBLANK_INT("screen", display_irq)
+	MCFG_CPU_ADD("maincpu", TMS32032, CPU_CLOCK)
+	MCFG_CPU_PROGRAM_MAP(zeus2_map)
+	MCFG_CPU_VBLANK_INT("screen", display_irq)
 
-	MDRV_MACHINE_START(midzeus)
-	MDRV_MACHINE_RESET(midzeus)
-	MDRV_NVRAM_ADD_1FILL("nvram")
+	MCFG_MACHINE_START(midzeus)
+	MCFG_MACHINE_RESET(midzeus)
+	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_RAW_PARAMS(MIDZEUS_VIDEO_CLOCK/4, 666, 0, 512, 438, 0, 400)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS(MIDZEUS_VIDEO_CLOCK/4, 666, 0, 512, 438, 0, 400)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 
-	MDRV_VIDEO_START(midzeus2)
-	MDRV_VIDEO_UPDATE(midzeus2)
+	MCFG_VIDEO_START(midzeus2)
+	MCFG_VIDEO_UPDATE(midzeus2)
 
 	/* sound hardware */
-	MDRV_FRAGMENT_ADD(dcs2_audio_2104)
+	MCFG_FRAGMENT_ADD(dcs2_audio_2104)
 
-	MDRV_M48T35_ADD( "m48t35" )
+	MCFG_M48T35_ADD( "m48t35" )
 MACHINE_CONFIG_END
 
 
@@ -1421,7 +1421,7 @@ static DRIVER_INIT( crusnexo )
 {
 	dcs2_init(machine, 0, 0);
 	midway_ioasic_init(machine, MIDWAY_IOASIC_STANDARD, 472/* or 476,477,478,110 */, 99, NULL);
-	memory_configure_bank(machine, "bank1", 0, 3, memory_region(machine, "user2"), 0x400000*4);
+	memory_configure_bank(machine, "bank1", 0, 3, machine->region("user2")->base(), 0x400000*4);
 
 	memory_install_readwrite32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x9b0004, 0x9b0007, 0, 0, crusnexo_leds_r, crusnexo_leds_w);
 	memory_install_write32_handler    (cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8d0009, 0x8d000a, 0, 0, keypad_select_w);
@@ -1432,7 +1432,7 @@ static DRIVER_INIT( thegrid )
 {
 	dcs2_init(machine, 0, 0);
 	midway_ioasic_init(machine, MIDWAY_IOASIC_STANDARD, 474/* or 491 */, 99, NULL);
-	memory_configure_bank(machine, "bank1", 0, 3, memory_region(machine, "user2"), 0x400000*4);
+	memory_configure_bank(machine, "bank1", 0, 3, machine->region("user2")->base(), 0x400000*4);
 }
 
 

@@ -70,10 +70,10 @@ struct _c1551_t
 	int mode;								/* mode (0 = write, 1 = read) */
 
 	/* devices */
-	running_device *cpu;
-	running_device *tpi0;
-	running_device *tpi1;
-	running_device *image;
+	device_t *cpu;
+	device_t *tpi0;
+	device_t *tpi1;
+	device_t *image;
 
 	/* timers */
 	emu_timer *bit_timer;
@@ -83,14 +83,14 @@ struct _c1551_t
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE c1551_t *get_safe_token(running_device *device)
+INLINE c1551_t *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == C1551);
 	return (c1551_t *)downcast<legacy_device_base *>(device)->token();
 }
 
-INLINE c1551_config *get_safe_config(running_device *device)
+INLINE c1551_config *get_safe_config(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == C1551);
@@ -119,7 +119,7 @@ static TIMER_DEVICE_CALLBACK( irq_tick )
 
 static TIMER_CALLBACK( bit_tick )
 {
-	running_device *device = (running_device *)ptr;
+	device_t *device = (device_t *)ptr;
 	c1551_t *c1551 = get_safe_token(device);
 	int byte = 0;
 
@@ -158,7 +158,7 @@ static TIMER_CALLBACK( bit_tick )
 		if (!c1551->yb)
 		{
 			/* simulate weak bits with randomness */
-			c1551->yb = mame_rand(machine) & 0xff;
+			c1551->yb = machine->rand() & 0xff;
 		}
 
 		c1551->byte = byte;
@@ -250,7 +250,7 @@ static void step_motor(c1551_t *c1551, int mtr, int stp)
     c1551_port_r - M6510T port read
 -------------------------------------------------*/
 
-static UINT8 c1551_port_r( running_device *device, UINT8 direction )
+static UINT8 c1551_port_r( device_t *device, UINT8 direction )
 {
 	/*
 
@@ -283,7 +283,7 @@ static UINT8 c1551_port_r( running_device *device, UINT8 direction )
     c1551_port_w - M6510T port write
 -------------------------------------------------*/
 
-static void c1551_port_w( running_device *device, UINT8 direction, UINT8 data )
+static void c1551_port_w( device_t *device, UINT8 direction, UINT8 data )
 {
 	/*
 
@@ -673,16 +673,16 @@ static const floppy_config c1551_floppy_config =
 -------------------------------------------------*/
 
 static MACHINE_CONFIG_FRAGMENT( c1551 )
-	MDRV_CPU_ADD(M6510T_TAG, M6510T, XTAL_16MHz/8)
-	MDRV_CPU_PROGRAM_MAP(c1551_map)
-	MDRV_CPU_CONFIG(m6510t_intf)
+	MCFG_CPU_ADD(M6510T_TAG, M6510T, XTAL_16MHz/8)
+	MCFG_CPU_PROGRAM_MAP(c1551_map)
+	MCFG_CPU_CONFIG(m6510t_intf)
 
-	MDRV_TPI6525_ADD(M6523_0_TAG, tpi0_intf) // 6523
-	MDRV_TPI6525_ADD(M6523_1_TAG, tpi1_intf) // 6523
+	MCFG_TPI6525_ADD(M6523_0_TAG, tpi0_intf) // 6523
+	MCFG_TPI6525_ADD(M6523_1_TAG, tpi1_intf) // 6523
 
-	MDRV_TIMER_ADD_PERIODIC("irq", irq_tick, HZ(120))
+	MCFG_TIMER_ADD_PERIODIC("irq", irq_tick, HZ(120))
 
-	MDRV_FLOPPY_DRIVE_ADD(FLOPPY_0, c1551_floppy_config)
+	MCFG_FLOPPY_DRIVE_ADD(FLOPPY_0, c1551_floppy_config)
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------

@@ -450,7 +450,7 @@ static WRITE8_HANDLER( n7751_command_w )
     */
 	segas1x_state *state = space->machine->driver_data<segas1x_state>();
 
-	int numroms = memory_region_length(space->machine, "n7751data") / 0x8000;
+	int numroms = space->machine->region("n7751data")->bytes() / 0x8000;
 	state->n7751_rom_address &= 0x3fff;
 	state->n7751_rom_address |= (data & 0x01) << 14;
 	if (!(data & 0x02) && numroms >= 1) state->n7751_rom_address |= 0x00000;
@@ -495,7 +495,7 @@ static READ8_HANDLER( n7751_rom_r )
 {
 	/* read from BUS */
 	segas1x_state *state = space->machine->driver_data<segas1x_state>();
-	return memory_region(space->machine, "n7751data")[state->n7751_rom_address];
+	return space->machine->region("n7751data")->base()[state->n7751_rom_address];
 }
 
 
@@ -970,11 +970,11 @@ static READ8_HANDLER( mcu_io_r )
 			return maincpu_byte_r(space->machine, 0x840001 ^ offset);
 
 		case 5:
-			return memory_region(space->machine, "maincpu")[0x00000 + offset];
+			return space->machine->region("maincpu")->base()[0x00000 + offset];
 		case 6:
-			return memory_region(space->machine, "maincpu")[0x10000 + offset];
+			return space->machine->region("maincpu")->base()[0x10000 + offset];
 		case 7:
-			return memory_region(space->machine, "maincpu")[0x20000 + offset];
+			return space->machine->region("maincpu")->base()[0x20000 + offset];
 
 		default:
 			logerror("%03X: MCU movx read mode %02X offset %04X\n",
@@ -1944,68 +1944,68 @@ GFXDECODE_END
 static MACHINE_CONFIG_START( system16a, segas1x_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 10000000)
-	MDRV_CPU_PROGRAM_MAP(system16a_map)
-	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
+	MCFG_CPU_ADD("maincpu", M68000, 10000000)
+	MCFG_CPU_PROGRAM_MAP(system16a_map)
+	MCFG_CPU_VBLANK_INT("screen", irq4_line_hold)
 
-	MDRV_CPU_ADD("soundcpu", Z80, 4000000)
-	MDRV_CPU_PROGRAM_MAP(sound_map)
-	MDRV_CPU_IO_MAP(sound_portmap)
+	MCFG_CPU_ADD("soundcpu", Z80, 4000000)
+	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_CPU_IO_MAP(sound_portmap)
 
-	MDRV_CPU_ADD("n7751", N7751, 6000000)
-	MDRV_CPU_IO_MAP(n7751_portmap)
+	MCFG_CPU_ADD("n7751", N7751, 6000000)
+	MCFG_CPU_IO_MAP(n7751_portmap)
 
-	MDRV_I8243_ADD("n7751_8243", NULL, n7751_rom_offset_w)
+	MCFG_I8243_ADD("n7751_8243", NULL, n7751_rom_offset_w)
 
-	MDRV_MACHINE_START(system16a)
-	MDRV_MACHINE_RESET(system16a)
-	MDRV_NVRAM_ADD_0FILL("nvram")
+	MCFG_MACHINE_START(system16a)
+	MCFG_MACHINE_RESET(system16a)
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MDRV_PPI8255_ADD( "ppi8255", single_ppi_intf )
+	MCFG_PPI8255_ADD( "ppi8255", single_ppi_intf )
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(342,262)	/* to be verified */
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(342,262)	/* to be verified */
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
 
-	MDRV_SEGA16SP_ADD_16A("segaspr1")
+	MCFG_SEGA16SP_ADD_16A("segaspr1")
 
-	MDRV_GFXDECODE(segas16a)
-	MDRV_PALETTE_LENGTH(2048*3)
+	MCFG_GFXDECODE(segas16a)
+	MCFG_PALETTE_LENGTH(2048*3)
 
-	MDRV_VIDEO_START(system16a)
-	MDRV_VIDEO_UPDATE(system16a)
+	MCFG_VIDEO_START(system16a)
+	MCFG_VIDEO_UPDATE(system16a)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM2151, 4000000)
-	MDRV_SOUND_CONFIG(ym2151_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.43)
+	MCFG_SOUND_ADD("ymsnd", YM2151, 4000000)
+	MCFG_SOUND_CONFIG(ym2151_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.43)
 
-	MDRV_SOUND_ADD("dac", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( system16a_no7751, system16a )
-	MDRV_DEVICE_REMOVE("n7751")
-	MDRV_DEVICE_REMOVE("dac")
+	MCFG_DEVICE_REMOVE("n7751")
+	MCFG_DEVICE_REMOVE("dac")
 
-	MDRV_SOUND_REPLACE("ymsnd", YM2151, 4000000)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_REPLACE("ymsnd", YM2151, 4000000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( system16a_8751, system16a )
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_VBLANK_INT("screen", i8751_main_cpu_vblank)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_VBLANK_INT("screen", i8751_main_cpu_vblank)
 
-	MDRV_CPU_ADD("mcu", I8751, 8000000)
-	MDRV_CPU_IO_MAP(mcu_io_map)
-	MDRV_CPU_VBLANK_INT("screen", mcu_irq_assert)
+	MCFG_CPU_ADD("mcu", I8751, 8000000)
+	MCFG_CPU_IO_MAP(mcu_io_map)
+	MCFG_CPU_VBLANK_INT("screen", mcu_irq_assert)
 MACHINE_CONFIG_END
 
 

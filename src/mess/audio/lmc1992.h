@@ -28,8 +28,8 @@
 
 DECLARE_LEGACY_DEVICE(LMC1992, lmc1992);
 
-#define MDRV_LMC1992_ADD(_tag)		\
-	MDRV_DEVICE_ADD(_tag, LMC1992, 0)
+#define MCFG_LMC1992_ADD(_tag)		\
+	MCFG_DEVICE_ADD(_tag, LMC1992, 0)
 
 /* interface */
 typedef struct _lmc1992_interface lmc1992_interface;
@@ -70,8 +70,8 @@ enum
 
 #define LMC1992_MICROWIRE_DEVICE_ADDRESS	2
 
-void lmc1992_clock_w(running_device *device, int level);
-void lmc1992_data_w(running_device *device, int level);
-void lmc1992_enable_w(running_device *device, int level);
+void lmc1992_clock_w(device_t *device, int level);
+void lmc1992_data_w(device_t *device, int level);
+void lmc1992_enable_w(device_t *device, int level);
 
 #endif

@@ -51,7 +51,7 @@ static void b2m_set_bank(running_machine *machine,int bank)
 	memory_install_write_bank(space, 0x7000, 0xdfff, 0, 0, "bank4");
 	memory_install_write_bank(space, 0xe000, 0xffff, 0, 0, "bank5");
 
-	rom = memory_region(machine, "maincpu");
+	rom = machine->region("maincpu")->base();
 	switch(bank) {
 		case 0 :
 		case 1 :
@@ -243,7 +243,7 @@ static READ8_DEVICE_HANDLER (b2m_romdisk_porta_r )
 {
 	b2m_state *state = device->machine->driver_data<b2m_state>();
 
-	UINT8 *romdisk = memory_region(device->machine, "maincpu") + 0x12000;
+	UINT8 *romdisk = device->machine->region("maincpu")->base() + 0x12000;
 	return romdisk[state->b2m_romdisk_msb*256+state->b2m_romdisk_lsb];
 }
 

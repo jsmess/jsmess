@@ -45,7 +45,7 @@ struct _tpi6525_interface
 	write8_device_func out_c_func;
 	write8_device_func out_ca_func;
 	write8_device_func out_cb_func;
-	void (*irq_func)(running_device *device, int level);
+	void (*irq_func)(device_t *device, int level);
 };
 
 
@@ -55,9 +55,9 @@ struct _tpi6525_interface
 
 DECLARE_LEGACY_DEVICE(TPI6525, tpi6525);
 
-#define MDRV_TPI6525_ADD(_tag, _intrf) \
-	MDRV_DEVICE_ADD(_tag, TPI6525, 0) \
-	MDRV_DEVICE_CONFIG(_intrf)
+#define MCFG_TPI6525_ADD(_tag, _intrf) \
+	MCFG_DEVICE_ADD(_tag, TPI6525, 0) \
+	MCFG_DEVICE_CONFIG(_intrf)
 
 
 /***************************************************************************
@@ -76,15 +76,15 @@ WRITE8_DEVICE_HANDLER( tpi6525_portb_w );
 READ8_DEVICE_HANDLER( tpi6525_portc_r );
 WRITE8_DEVICE_HANDLER( tpi6525_portc_w );
 
-void tpi6525_irq0_level(running_device *device, int level);
-void tpi6525_irq1_level(running_device *device, int level);
-void tpi6525_irq2_level(running_device *device, int level);
-void tpi6525_irq3_level(running_device *device, int level);
-void tpi6525_irq4_level(running_device *device, int level);
+void tpi6525_irq0_level(device_t *device, int level);
+void tpi6525_irq1_level(device_t *device, int level);
+void tpi6525_irq2_level(device_t *device, int level);
+void tpi6525_irq3_level(device_t *device, int level);
+void tpi6525_irq4_level(device_t *device, int level);
 
-UINT8 tpi6525_get_ddr_a(running_device *device);
-UINT8 tpi6525_get_ddr_b(running_device *device);
-UINT8 tpi6525_get_ddr_c(running_device *device);
+UINT8 tpi6525_get_ddr_a(device_t *device);
+UINT8 tpi6525_get_ddr_b(device_t *device);
+UINT8 tpi6525_get_ddr_c(device_t *device);
 
 
 #endif /* __TPI6525_H__ */

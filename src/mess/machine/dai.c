@@ -47,7 +47,7 @@ static TIMER_CALLBACK(dai_bootstrap_callback)
 }
 
 
-static UINT8 dai_keyboard_read (running_device *device)
+static UINT8 dai_keyboard_read (device_t *device)
 {
 	dai_state *state = device->machine->driver_data<dai_state>();
 	UINT8 data = 0x00;
@@ -62,13 +62,13 @@ static UINT8 dai_keyboard_read (running_device *device)
 	return data;
 }
 
-static void dai_keyboard_write (running_device *device, UINT8 data)
+static void dai_keyboard_write (device_t *device, UINT8 data)
 {
 	dai_state *state = device->machine->driver_data<dai_state>();
 	state->keyboard_scan_mask = data;
 }
 
-static void dai_interrupt_callback(running_device *device, int intreq, UINT8 vector)
+static void dai_interrupt_callback(device_t *device, int intreq, UINT8 vector)
 {
 	if (intreq)
 		cputag_set_input_line_and_vector(device->machine, "maincpu", 0, HOLD_LINE, vector);
@@ -148,7 +148,7 @@ MACHINE_START( dai )
 	state->sound = machine->device("custom");
 	state->tms5501 = machine->device("tms5501");
 
-	memory_configure_bank(machine, "bank2", 0, 4, memory_region(machine, "maincpu") + 0x010000, 0x1000);
+	memory_configure_bank(machine, "bank2", 0, 4, machine->region("maincpu")->base() + 0x010000, 0x1000);
 	timer_set(machine, attotime_zero, NULL, 0, dai_bootstrap_callback);
 	timer_pulse(machine, ATTOTIME_IN_HZ(100),NULL,0,dai_timer);	/* timer for tms5501 */
 }
@@ -195,7 +195,7 @@ READ8_HANDLER( dai_io_discrete_devices_r )
 	case 0x00:
 		data = input_port_read(space->machine, "IN8");
 		data |= 0x08;			// serial ready
-		if (mame_rand(space->machine)&0x01)
+		if (space->machine->rand()&0x01)
 			data |= 0x40;		// random number generator
 		if (cassette_input(space->machine->device("cassette")) > 0.01)
 			data |= 0x80;		// tape input

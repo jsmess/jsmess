@@ -405,7 +405,7 @@ static const mc6845_interface bw12_mc6845_interface =
 void bw12_state::video_start()
 {
 	/* find memory regions */
-	m_char_rom = memory_region(machine, "chargen");
+	m_char_rom = machine->region("chargen")->base();
 }
 
 bool bw12_state::video_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
@@ -654,7 +654,7 @@ static AY3600_INTERFACE( bw12_ay3600_intf )
 void bw12_state::machine_start()
 {
 	/* setup memory banking */
-	memory_configure_bank(machine, "bank1", 0, 1, memory_region(machine, Z80_TAG), 0);
+	memory_configure_bank(machine, "bank1", 0, 1, machine->region(Z80_TAG)->base(), 0);
 	memory_configure_bank(machine, "bank1", 1, 1, messram_get_ptr(m_ram), 0);
 	memory_configure_bank(machine, "bank1", 2, 2, messram_get_ptr(m_ram) + 0x10000, 0x8000);
 
@@ -782,58 +782,58 @@ GFXDECODE_END
 /* Machine Driver */
 static MACHINE_CONFIG_START( common, bw12_state )
 	/* basic machine hardware */
-    MDRV_CPU_ADD(Z80_TAG, Z80, XTAL_16MHz/4)
-    MDRV_CPU_PROGRAM_MAP(bw12_mem)
-    MDRV_CPU_IO_MAP(bw12_io)
+    MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_16MHz/4)
+    MCFG_CPU_PROGRAM_MAP(bw12_mem)
+    MCFG_CPU_IO_MAP(bw12_io)
 
     /* video hardware */
-	MDRV_SCREEN_ADD(SCREEN_TAG, RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(640, 200)
-	MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
+	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(640, 200)
+	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
 
-	MDRV_GFXDECODE(bw12)
-	MDRV_PALETTE_LENGTH(2)
-	MDRV_PALETTE_INIT(monochrome_amber)
+	MCFG_GFXDECODE(bw12)
+	MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_INIT(monochrome_amber)
 
-	MDRV_MC6845_ADD(MC6845_TAG, MC6845, XTAL_16MHz/8, bw12_mc6845_interface)
+	MCFG_MC6845_ADD(MC6845_TAG, MC6845, XTAL_16MHz/8, bw12_mc6845_interface)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(MC1408_TAG, DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD(MC1408_TAG, DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* devices */
-	MDRV_TIMER_ADD(FLOPPY_TIMER_TAG, floppy_motor_off_tick)
-	MDRV_UPD765A_ADD(UPD765_TAG, fdc_intf)
-	MDRV_PIA6821_ADD(PIA6821_TAG, pia_intf)
-	MDRV_Z80SIO0_ADD(Z80SIO_TAG, XTAL_16MHz/4, sio_intf)
-	MDRV_PIT8253_ADD(PIT8253_TAG, pit_intf)
-	MDRV_AY3600PRO002_ADD(AY3600_TAG, bw12_ay3600_intf)
+	MCFG_TIMER_ADD(FLOPPY_TIMER_TAG, floppy_motor_off_tick)
+	MCFG_UPD765A_ADD(UPD765_TAG, fdc_intf)
+	MCFG_PIA6821_ADD(PIA6821_TAG, pia_intf)
+	MCFG_Z80SIO0_ADD(Z80SIO_TAG, XTAL_16MHz/4, sio_intf)
+	MCFG_PIT8253_ADD(PIT8253_TAG, pit_intf)
+	MCFG_AY3600PRO002_ADD(AY3600_TAG, bw12_ay3600_intf)
 
 	/* printer */
-	MDRV_CENTRONICS_ADD(CENTRONICS_TAG, bw12_centronics_intf)
+	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, bw12_centronics_intf)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( bw12, common )
 	/* floppy drives */
-	MDRV_FLOPPY_2_DRIVES_ADD(bw12_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_ADD(bw12_floppy_config)
 
 	/* internal ram */
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("64K")
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("64K")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( bw14, common )
 	/* floppy drives */
-	MDRV_FLOPPY_2_DRIVES_ADD(bw14_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_ADD(bw14_floppy_config)
 
 	/* internal ram */
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("128K")
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("128K")
 MACHINE_CONFIG_END
 
 /* ROMs */

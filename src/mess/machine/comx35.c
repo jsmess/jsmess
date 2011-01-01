@@ -153,7 +153,7 @@ UINT8 comx35_state::read_expansion()
 
 bool comx35_state::is_expansion_box_installed()
 {
-	return (memory_region(&m_machine, CDP1802_TAG)[0xe800] != 0x00);
+	return (&m_machine.region(CDP1802_TAG)->base()[0xe800] != 0x00);
 }
 
 bool comx35_state::is_dos_card_active()
@@ -547,7 +547,7 @@ DIRECT_UPDATE_HANDLER( comx35_opbase_handler )
 		if (state->is_dos_card_active())
 		{
 			// read opcode from DOS ROM
-			direct.explicit_configure(0x0dd0, 0x0ddf, 0x000f, memory_region(machine, "fdc"));
+			direct.explicit_configure(0x0dd0, 0x0ddf, 0x000f, machine->region("fdc")->base());
 			return ~0;
 		}
 	}
@@ -572,10 +572,10 @@ void comx35_state::machine_start()
 	/* BASIC ROM banking */
 	memory_install_read_bank(program, 0x1000, 0x17ff, 0, 0, "bank2");
 	memory_unmap_write(program, 0x1000, 0x17ff, 0, 0);
-	memory_configure_bank(machine, "bank2", 0, 1, memory_region(&m_machine, CDP1802_TAG) + 0x1000, 0); // normal ROM
-	memory_configure_bank(machine, "bank2", 1, 1, memory_region(&m_machine, CDP1802_TAG) + 0xe000, 0); // expansion box ROM
+	memory_configure_bank(machine, "bank2", 0, 1, machine->region(CDP1802_TAG)->base() + 0x1000, 0); // normal ROM
+	memory_configure_bank(machine, "bank2", 1, 1, machine->region(CDP1802_TAG)->base() + 0xe000, 0); // expansion box ROM
 
-	memory_configure_bank(machine, "bank3", 0, 1, memory_region(&m_machine, CDP1802_TAG) + 0xe000, 0);
+	memory_configure_bank(machine, "bank3", 0, 1, machine->region(CDP1802_TAG)->base() + 0xe000, 0);
 	memory_set_bank(machine, "bank3", 0);
 
 	if (is_expansion_box_installed())
@@ -591,14 +591,14 @@ void comx35_state::machine_start()
 	}
 	
 	/* card slot banking */
-	memory_configure_bank(machine, "bank1", 0, 1, memory_region(&m_machine, CDP1802_TAG) + 0xc000, 0);
-	memory_configure_bank(machine, "bank1", BANK_FLOPPY, 1, memory_region(&m_machine, "fdc"), 0);
-	memory_configure_bank(machine, "bank1", BANK_PRINTER_PARALLEL, 1, memory_region(&m_machine, "printer"), 0);
-	memory_configure_bank(machine, "bank1", BANK_PRINTER_PARALLEL_FM, 1, memory_region(&m_machine, "printer_fm"), 0);
-	memory_configure_bank(machine, "bank1", BANK_PRINTER_SERIAL, 1, memory_region(&m_machine, "rs232"), 0);
-	memory_configure_bank(machine, "bank1", BANK_PRINTER_THERMAL, 1, memory_region(&m_machine, "thermal"), 0);
-	memory_configure_bank(machine, "bank1", BANK_JOYCARD, 1, memory_region(&m_machine, CDP1802_TAG), 0);
-	memory_configure_bank(machine, "bank1", BANK_80_COLUMNS, 1, memory_region(&m_machine, "80column"), 0);
+	memory_configure_bank(machine, "bank1", 0, 1, machine->region(CDP1802_TAG)->base() + 0xc000, 0);
+	memory_configure_bank(machine, "bank1", BANK_FLOPPY, 1, machine->region("fdc")->base(), 0);
+	memory_configure_bank(machine, "bank1", BANK_PRINTER_PARALLEL, 1, machine->region("printer")->base(), 0);
+	memory_configure_bank(machine, "bank1", BANK_PRINTER_PARALLEL_FM, 1, machine->region("printer_fm")->base(), 0);
+	memory_configure_bank(machine, "bank1", BANK_PRINTER_SERIAL, 1, machine->region("rs232")->base(), 0);
+	memory_configure_bank(machine, "bank1", BANK_PRINTER_THERMAL, 1, machine->region("thermal")->base(), 0);
+	memory_configure_bank(machine, "bank1", BANK_JOYCARD, 1, machine->region(CDP1802_TAG)->base(), 0);
+	memory_configure_bank(machine, "bank1", BANK_80_COLUMNS, 1, machine->region("80column")->base(), 0);
 	memory_configure_bank(machine, "bank1", BANK_RAMCARD, 4, messram_get_ptr(m_ram), 0x2000);
 
 	memory_set_bank(machine, "bank1", 0);

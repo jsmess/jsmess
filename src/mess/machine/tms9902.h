@@ -11,17 +11,17 @@ DECLARE_LEGACY_DEVICE(TMS9902, tms9902);
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef void (*tms9902_int_callback_func)(running_device *device, int INT);
-#define TMS9902_INT_CALLBACK(name)	void name(running_device *device, int INT )
+typedef void (*tms9902_int_callback_func)(device_t *device, int INT);
+#define TMS9902_INT_CALLBACK(name)	void name(device_t *device, int INT )
 
-typedef void (*tms9902_rst_callback_func)(running_device *device, int RTS);
-#define TMS9902_RST_CALLBACK(name)	void name(running_device *device, int RTS )
+typedef void (*tms9902_rst_callback_func)(device_t *device, int RTS);
+#define TMS9902_RST_CALLBACK(name)	void name(device_t *device, int RTS )
 
-typedef void (*tms9902_brk_callback_func)(running_device *device, int RTS);
-#define TMS9902_BRK_CALLBACK(name)	void name(running_device *device, int BRK )
+typedef void (*tms9902_brk_callback_func)(device_t *device, int RTS);
+#define TMS9902_BRK_CALLBACK(name)	void name(device_t *device, int BRK )
 
-typedef void (*tms9902_xmit_callback_func)(running_device *device, int data);
-#define TMS9902_XMIT_CALLBACK(name)	void name(running_device *device, int data )
+typedef void (*tms9902_xmit_callback_func)(device_t *device, int data);
+#define TMS9902_XMIT_CALLBACK(name)	void name(device_t *device, int data )
 
 
 typedef struct _tms9902_interface tms9902_interface;
@@ -39,10 +39,10 @@ struct _tms9902_interface
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-void tms9902_set_cts(running_device *device, int state);
-void tms9902_set_dsr(running_device *device, int state);
+void tms9902_set_cts(device_t *device, int state);
+void tms9902_set_dsr(device_t *device, int state);
 
-void tms9902_push_data(running_device *device, int data);
+void tms9902_push_data(device_t *device, int data);
 
 READ8_DEVICE_HANDLER ( tms9902_cru_r );
 WRITE8_DEVICE_HANDLER( tms9902_cru_w );
@@ -51,8 +51,8 @@ WRITE8_DEVICE_HANDLER( tms9902_cru_w );
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MDRV_TMS9902_ADD(_tag, _intrf) \
-	MDRV_DEVICE_ADD(_tag, TMS9902, 0) \
-	MDRV_DEVICE_CONFIG(_intrf)
+#define MCFG_TMS9902_ADD(_tag, _intrf) \
+	MCFG_DEVICE_ADD(_tag, TMS9902, 0) \
+	MCFG_DEVICE_CONFIG(_intrf)
 
 #endif /* __TMS9902_H__ */

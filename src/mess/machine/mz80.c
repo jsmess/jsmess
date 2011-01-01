@@ -74,7 +74,7 @@ static WRITE8_DEVICE_HANDLER(mz80k_8255_portc_w)
 static WRITE_LINE_DEVICE_HANDLER( pit_out0_changed )
 {
 	mz80_state *drvstate = device->machine->driver_data<mz80_state>();
-	running_device *speaker = device->machine->device("speaker");
+	device_t *speaker = device->machine->device("speaker");
 	if((drvstate->prev_state==0) && (state==1)) {
 		drvstate->speaker_level ^= 1;
 	}
@@ -114,6 +114,6 @@ READ8_HANDLER(mz80k_strobe_r)
 }
 WRITE8_HANDLER(mz80k_strobe_w)
 {
-	running_device *pit = space->machine->device("pit8253");
+	device_t *pit = space->machine->device("pit8253");
 	pit8253_gate0_w(pit, BIT(data, 0));
 }

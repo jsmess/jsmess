@@ -463,7 +463,7 @@ A12 <-> A13
 */
 
 	UINT32 i,j,jscr,romoffset;
-	UINT8 *multfish_gfx = memory_region(machine, "gfx");
+	UINT8 *multfish_gfx = machine->region("gfx")->base();
 	UINT8 *temprom = auto_alloc_array(machine, UINT8, multfish_ROM_SIZE);
 
 
@@ -535,7 +535,7 @@ INLINE void rom_decodeh(UINT8 *romptr, UINT8 *tmprom, UINT8 xor_data, UINT32 xor
 
 static void lottery_decode(running_machine *machine, UINT8 xor12, UINT8 xor34, UINT8 xor56, UINT8 xor78, UINT32 xor_addr)
 {
-	UINT8 *multfish_gfx = memory_region(machine, "gfx");
+	UINT8 *multfish_gfx = machine->region("gfx")->base();
 	UINT8 *temprom = auto_alloc_array(machine, UINT8, multfish_ROM_SIZE);
 
 	/* ROMs decode */
@@ -576,7 +576,7 @@ INLINE void roment_decodeh(UINT8 *romptr, UINT8 *tmprom, UINT8 xor_data, UINT32 
 
 static void ent_decode(running_machine *machine, UINT8 xor12, UINT8 xor34, UINT8 xor56, UINT8 xor78, UINT32 xor_addr)
 {
-	UINT8 *multfish_gfx = memory_region(machine, "gfx");
+	UINT8 *multfish_gfx = machine->region("gfx")->base();
 	UINT8 *temprom = auto_alloc_array(machine, UINT8, multfish_ROM_SIZE);
 
 	/* ROMs decode */
@@ -1001,7 +1001,7 @@ static MACHINE_RESET( multfish )
 {
 	multfish_state *state = machine->driver_data<multfish_state>();
 
-	memory_configure_bank(machine, "bank1", 0, 16, memory_region(machine, "maincpu"), 0x4000);
+	memory_configure_bank(machine, "bank1", 0, 16, machine->region("maincpu")->base(), 0x4000);
 	memory_set_bank(machine, "bank1", 0);
 
 	state->disp_enable = 0;
@@ -1023,38 +1023,38 @@ static const ay8910_interface ay8910_config =
 
 static MACHINE_CONFIG_START( multfish, multfish_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, XTAL_24MHz/4)
-	MDRV_CPU_PROGRAM_MAP(multfish_map)
-	MDRV_CPU_IO_MAP(multfish_portmap)
-	MDRV_CPU_VBLANK_INT("screen",irq0_line_hold)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_24MHz/4)
+	MCFG_CPU_PROGRAM_MAP(multfish_map)
+	MCFG_CPU_IO_MAP(multfish_portmap)
+	MCFG_CPU_VBLANK_INT("screen",irq0_line_hold)
 
-	MDRV_MACHINE_START( multfish )
-	MDRV_MACHINE_RESET( multfish )
+	MCFG_MACHINE_START( multfish )
+	MCFG_MACHINE_RESET( multfish )
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*16, 32*16)
-	MDRV_SCREEN_VISIBLE_AREA(17*16, 1024-16*7-1, 1*16, 32*16-1*16-1)
-	MDRV_GFXDECODE(multfish)
-	MDRV_PALETTE_LENGTH(0x1000)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(64*16, 32*16)
+	MCFG_SCREEN_VISIBLE_AREA(17*16, 1024-16*7-1, 1*16, 32*16-1*16-1)
+	MCFG_GFXDECODE(multfish)
+	MCFG_PALETTE_LENGTH(0x1000)
 
-	MDRV_VIDEO_START(multfish)
-	MDRV_VIDEO_UPDATE(multfish)
+	MCFG_VIDEO_START(multfish)
+	MCFG_VIDEO_UPDATE(multfish)
 
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("aysnd", AY8910, 6000000/4)
-	MDRV_SOUND_CONFIG(ay8910_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("aysnd", AY8910, 6000000/4)
+	MCFG_SOUND_CONFIG(ay8910_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MDRV_M48T35_ADD( "m48t35" )
+	MCFG_M48T35_ADD( "m48t35" )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( rollfr, multfish )
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(rollfr_portmap)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_IO_MAP(rollfr_portmap)
 MACHINE_CONFIG_END
 
 static MACHINE_RESET( island2a )
@@ -1068,7 +1068,7 @@ static MACHINE_RESET( island2a )
 static MACHINE_CONFIG_DERIVED( island2a, multfish )
 
 	/* basic machine hardware */
-	MDRV_MACHINE_RESET( island2a )
+	MCFG_MACHINE_RESET( island2a )
 MACHINE_CONFIG_END
 
 

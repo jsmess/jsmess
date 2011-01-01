@@ -418,6 +418,9 @@ class render_texture
 	// reset before re-use
 	void reset(render_manager &manager, texture_scaler_func scaler = NULL, void *param = NULL);
 
+	// release resources when freed
+	void release();
+
 public:
 	// getters
 	int format() const { return m_format; }

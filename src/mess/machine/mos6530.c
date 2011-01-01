@@ -78,7 +78,7 @@ struct _mos6530_state
     into a mos6530_state
 -------------------------------------------------*/
 
-INLINE mos6530_state *get_safe_token(running_device *device)
+INLINE mos6530_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == MOS6530);
@@ -91,7 +91,7 @@ INLINE mos6530_state *get_safe_token(running_device *device)
     based on interrupt enables
 -------------------------------------------------*/
 
-INLINE void update_irqstate(running_device *device)
+INLINE void update_irqstate(device_t *device)
 {
 	mos6530_state *miot = get_safe_token(device);
 	UINT8 out = miot->port[1].out;
@@ -137,7 +137,7 @@ INLINE UINT8 get_timer(mos6530_state *miot)
 
 static TIMER_CALLBACK( timer_end_callback )
 {
-	running_device *device = (running_device *)ptr;
+	device_t *device = (device_t *)ptr;
 	mos6530_state *miot = get_safe_token(device);
 
 	assert(miot->timerstate != TIMER_IDLE);
@@ -304,7 +304,7 @@ READ8_DEVICE_HANDLER( mos6530_r )
     value
 -------------------------------------------------*/
 
-void mos6530_porta_in_set(running_device *device, UINT8 data, UINT8 mask)
+void mos6530_porta_in_set(device_t *device, UINT8 data, UINT8 mask)
 {
 	mos6530_state *miot = get_safe_token(device);
 	miot->port[0].in = (miot->port[0].in & ~mask) | (data & mask);
@@ -316,7 +316,7 @@ void mos6530_porta_in_set(running_device *device, UINT8 data, UINT8 mask)
     value
 -------------------------------------------------*/
 
-void mos6530_portb_in_set(running_device *device, UINT8 data, UINT8 mask)
+void mos6530_portb_in_set(device_t *device, UINT8 data, UINT8 mask)
 {
 	mos6530_state *miot = get_safe_token(device);
 	miot->port[1].in = (miot->port[1].in & ~mask) | (data & mask);
@@ -328,7 +328,7 @@ void mos6530_portb_in_set(running_device *device, UINT8 data, UINT8 mask)
     value
 -------------------------------------------------*/
 
-UINT8 mos6530_porta_in_get(running_device *device)
+UINT8 mos6530_porta_in_get(device_t *device)
 {
 	mos6530_state *miot = get_safe_token(device);
 	return miot->port[0].in;
@@ -340,7 +340,7 @@ UINT8 mos6530_porta_in_get(running_device *device)
     value
 -------------------------------------------------*/
 
-UINT8 mos6530_portb_in_get(running_device *device)
+UINT8 mos6530_portb_in_get(device_t *device)
 {
 	mos6530_state *miot = get_safe_token(device);
 	return miot->port[1].in;
@@ -352,7 +352,7 @@ UINT8 mos6530_portb_in_get(running_device *device)
     value
 -------------------------------------------------*/
 
-UINT8 mos6530_porta_out_get(running_device *device)
+UINT8 mos6530_porta_out_get(device_t *device)
 {
 	mos6530_state *miot = get_safe_token(device);
 	return miot->port[0].out;
@@ -364,7 +364,7 @@ UINT8 mos6530_porta_out_get(running_device *device)
     value
 -------------------------------------------------*/
 
-UINT8 mos6530_portb_out_get(running_device *device)
+UINT8 mos6530_portb_out_get(device_t *device)
 {
 	mos6530_state *miot = get_safe_token(device);
 	return miot->port[1].out;

@@ -276,7 +276,7 @@ MACHINE_RESET( gb )
 	gb_rom16_0000( machine, state->ROMMap[state->ROMBank00] );
 
 	/* Enable BIOS rom */
-	memory_set_bankptr(machine, "bank5", memory_region(machine, "maincpu") );
+	memory_set_bankptr(machine, "bank5", machine->region("maincpu")->base() );
 
 	state->divcount = 0x0004;
 }
@@ -310,7 +310,7 @@ MACHINE_RESET( sgb )
 	gb_rom16_0000( machine, state->ROMMap[state->ROMBank00] ? state->ROMMap[state->ROMBank00] : state->gb_dummy_rom_bank );
 
 	/* Enable BIOS rom */
-	memory_set_bankptr(machine, "bank5", memory_region(machine, "maincpu") );
+	memory_set_bankptr(machine, "bank5", machine->region("maincpu")->base() );
 
 	memset( state->sgb_tile_data, 0, 0x2000 );
 
@@ -367,8 +367,8 @@ MACHINE_RESET( gbc )
 	gb_rom16_0000( machine, state->ROMMap[state->ROMBank00] ? state->ROMMap[state->ROMBank00] : state->gb_dummy_rom_bank );
 
 	/* Enable BIOS rom */
-	memory_set_bankptr(machine, "bank5", memory_region(machine, "maincpu") );
-	memory_set_bankptr(machine, "bank6", memory_region(machine, "maincpu") + 0x100 );
+	memory_set_bankptr(machine, "bank5", machine->region("maincpu")->base() );
+	memory_set_bankptr(machine, "bank6", machine->region("maincpu")->base() + 0x100 );
 
 	/* Allocate memory for internal ram */
 	for( ii = 0; ii < 8; ii++ )
@@ -1968,7 +1968,7 @@ static void gb_timer_increment( running_machine *machine )
 	}
 }
 
-void gb_timer_callback(running_device *device, int cycles)
+void gb_timer_callback(device_t *device, int cycles)
 {
 	gb_state *state = device->machine->driver_data<gb_state>();
 	UINT16 old_gb_divcount = state->divcount;

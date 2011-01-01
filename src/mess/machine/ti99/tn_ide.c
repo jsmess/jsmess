@@ -53,8 +53,8 @@ typedef struct _tn_ide_state
 {
 	int 	selected;
 
-	running_device		*rtc;
-	running_device		*ide;
+	device_t		*rtc;
+	device_t		*ide;
 
 	int		ide_irq;
 	int		clk_irq;
@@ -75,7 +75,7 @@ typedef struct _tn_ide_state
 
 } tn_ide_state;
 
-INLINE tn_ide_state *get_safe_token(running_device *device)
+INLINE tn_ide_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	return (tn_ide_state *)downcast<legacy_device_base *>(device)->token();
@@ -317,7 +317,7 @@ static const ti99_peb_card tn_ide_card =
     ti99_ide_interrupt()
     IDE interrupt callback
 */
-static void ide_interrupt_callback(running_device *device, int state)
+static void ide_interrupt_callback(device_t *device, int state)
 {
 	tn_ide_state *card = get_safe_token(device->owner());
 	card->ide_irq = state;
@@ -329,7 +329,7 @@ static void ide_interrupt_callback(running_device *device, int state)
     clk_interrupt_callback()
     clock interrupt callback
 */
-static void clock_interrupt_callback(running_device *device, int state)
+static void clock_interrupt_callback(device_t *device, int state)
 {
 	tn_ide_state *card = get_safe_token(device->owner());
 	card->clk_irq = state;
@@ -357,7 +357,7 @@ static DEVICE_STOP( tn_ide )
 static DEVICE_RESET( tn_ide )
 {
 	tn_ide_state *card = get_safe_token(device);
-	running_device *peb = device->owner();
+	device_t *peb = device->owner();
 
 	if (input_port_read(device->machine, "HDCTRL") & HD_IDE)
 	{
@@ -372,8 +372,8 @@ static DEVICE_RESET( tn_ide )
 }
 
 MACHINE_CONFIG_FRAGMENT( tn_ide )
-	MDRV_RTC65271_ADD( "ide_rtc", clock_interrupt_callback )
-	MDRV_IDE_CONTROLLER_ADD( "ide", ide_interrupt_callback )
+	MCFG_RTC65271_ADD( "ide_rtc", clock_interrupt_callback )
+	MCFG_IDE_CONTROLLER_ADD( "ide", ide_interrupt_callback )
 MACHINE_CONFIG_END
 
 static const char DEVTEMPLATE_SOURCE[] = __FILE__;

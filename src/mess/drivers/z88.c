@@ -192,7 +192,7 @@ static void z88_install_memory_handler_pair(running_machine *machine, offs_t sta
 
 	/* special case */
 	if (read_addr == NULL)
-		read_addr = &memory_region(machine, "maincpu")[start];
+		read_addr = &machine->region("maincpu")->base()[start];
 
 	/* install the handlers */
 	if (read_addr == NULL) {
@@ -267,7 +267,7 @@ static void z88_refresh_memory_bank(running_machine *machine, int bank)
 		}
 		else
 		{
-			read_addr = memory_region(machine, "maincpu") + 0x010000 + (block << 14);
+			read_addr = machine->region("maincpu")->base() + 0x010000 + (block << 14);
 			write_addr = NULL;
 		}
 	}
@@ -283,7 +283,7 @@ static void z88_refresh_memory_bank(running_machine *machine, int bank)
 		if ((state->blink.com & (1<<2))==0)
 		{
 			/* yes */
-			read_addr = memory_region(machine, "maincpu") + 0x010000;
+			read_addr = machine->region("maincpu")->base() + 0x010000;
 			write_addr = NULL;
 		}
 		else
@@ -407,7 +407,7 @@ blink w: 03b6 03
 static WRITE8_HANDLER(z88_port_w)
 {
 	z88_state *state = space->machine->driver_data<z88_state>();
-	running_device *speaker = space->machine->device("speaker");
+	device_t *speaker = space->machine->device("speaker");
 	unsigned char port;
 
 	port = offset & 0x0ff;
@@ -746,35 +746,35 @@ INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( z88, z88_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, 3276800)
-	MDRV_CPU_PROGRAM_MAP(z88_mem)
-	MDRV_CPU_IO_MAP(z88_io)
-	MDRV_QUANTUM_TIME(HZ(60))
+	MCFG_CPU_ADD("maincpu", Z80, 3276800)
+	MCFG_CPU_PROGRAM_MAP(z88_mem)
+	MCFG_CPU_IO_MAP(z88_io)
+	MCFG_QUANTUM_TIME(HZ(60))
 
-	MDRV_MACHINE_START( z88 )
-	MDRV_MACHINE_RESET( z88 )
+	MCFG_MACHINE_START( z88 )
+	MCFG_MACHINE_RESET( z88 )
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", LCD)
-	MDRV_SCREEN_REFRESH_RATE(50)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(Z88_SCREEN_WIDTH, 480)
-	MDRV_SCREEN_VISIBLE_AREA(0, (Z88_SCREEN_WIDTH - 1), 0, (480 - 1))
-	MDRV_PALETTE_LENGTH(Z88_NUM_COLOURS)
-	MDRV_PALETTE_INIT( z88 )
+	MCFG_SCREEN_ADD("screen", LCD)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(Z88_SCREEN_WIDTH, 480)
+	MCFG_SCREEN_VISIBLE_AREA(0, (Z88_SCREEN_WIDTH - 1), 0, (480 - 1))
+	MCFG_PALETTE_LENGTH(Z88_NUM_COLOURS)
+	MCFG_PALETTE_INIT( z88 )
 
-	MDRV_VIDEO_EOF( z88 )
-	MDRV_VIDEO_UPDATE( z88 )
+	MCFG_VIDEO_EOF( z88 )
+	MCFG_VIDEO_UPDATE( z88 )
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* internal ram */
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("2M")
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("2M")
 MACHINE_CONFIG_END
 
 

@@ -36,7 +36,7 @@ static READ16_HANDLER(sun1_upd7201_r)
 
 static WRITE16_HANDLER(sun1_upd7201_w)
 {
-	running_device *devconf = space->machine->device("terminal");
+	device_t *devconf = space->machine->device("terminal");
 	if (offset==0) terminal_write(devconf,0,data >> 8);
 }
 
@@ -56,7 +56,7 @@ INPUT_PORTS_END
 static MACHINE_RESET(sun1)
 {
 	sun1_state *state = machine->driver_data<sun1_state>();
-	UINT8* user1 = memory_region(machine, "user1");
+	UINT8* user1 = machine->region("user1")->base();
 
 	memcpy((UINT8*)state->ram,user1,0x4000);
 
@@ -76,14 +76,14 @@ static GENERIC_TERMINAL_INTERFACE( sun1_terminal_intf )
 
 static MACHINE_CONFIG_START( sun1, sun1_state )
     /* basic machine hardware */
-    MDRV_CPU_ADD("maincpu", M68000, XTAL_10MHz)
-    MDRV_CPU_PROGRAM_MAP(sun1_mem)
+    MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)
+    MCFG_CPU_PROGRAM_MAP(sun1_mem)
 
-    MDRV_MACHINE_RESET(sun1)
+    MCFG_MACHINE_RESET(sun1)
 
     /* video hardware */
-    MDRV_FRAGMENT_ADD( generic_terminal )
-	MDRV_GENERIC_TERMINAL_ADD(TERMINAL_TAG,sun1_terminal_intf)
+    MCFG_FRAGMENT_ADD( generic_terminal )
+	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG,sun1_terminal_intf)
 MACHINE_CONFIG_END
 
 /* ROM definition */

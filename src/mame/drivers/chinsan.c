@@ -72,7 +72,7 @@ public:
 
 static PALETTE_INIT( chinsan )
 {
-	UINT8 *src = memory_region( machine, "color_proms" );
+	UINT8 *src = machine->region( "color_proms" )->base();
 	int i;
 
 	for (i = 0; i < 0x100; i++)
@@ -188,7 +188,7 @@ static READ8_HANDLER( chinsan_input_port_0_r )
 	}
 
 	printf("chinsan_input_port_0_r unk_r %02x\n", state->port_select);
-	return mame_rand(space->machine);
+	return space->machine->rand();
 }
 
 static READ8_HANDLER( chinsan_input_port_1_r )
@@ -219,7 +219,7 @@ static READ8_HANDLER( chinsan_input_port_1_r )
 	}
 
 	printf("chinsan_input_port_1_r unk_r %02x\n", state->port_select);
-	return mame_rand(space->machine);
+	return space->machine->rand();
 }
 
 static WRITE8_DEVICE_HANDLER( chin_adpcm_w )
@@ -526,7 +526,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static void chin_adpcm_int( running_device *device )
+static void chin_adpcm_int( device_t *device )
 {
 	chinsan_state *state = device->machine->driver_data<chinsan_state>();
 
@@ -538,7 +538,7 @@ static void chin_adpcm_int( running_device *device )
 	}
 	else
 	{
-		UINT8 *ROM = memory_region(device->machine, "adpcm");
+		UINT8 *ROM = device->machine->region("adpcm")->base();
 
 		state->adpcm_data = ((state->trigger ? (ROM[state->adpcm_pos] & 0x0f) : (ROM[state->adpcm_pos] & 0xf0) >> 4));
 		msm5205_data_w(device, state->adpcm_data & 0xf);
@@ -568,7 +568,7 @@ static MACHINE_START( chinsan )
 {
 	chinsan_state *state = machine->driver_data<chinsan_state>();
 
-	memory_configure_bank(machine, "bank1", 0, 4, memory_region(machine, "maincpu") + 0x10000, 0x4000);
+	memory_configure_bank(machine, "bank1", 0, 4, machine->region("maincpu")->base() + 0x10000, 0x4000);
 
 	state_save_register_global(machine, state->adpcm_idle);
 	state_save_register_global(machine, state->port_select);
@@ -592,42 +592,42 @@ static MACHINE_RESET( chinsan )
 static MACHINE_CONFIG_START( chinsan, chinsan_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80,10000000/2)		 /* ? MHz */
-	MDRV_CPU_PROGRAM_MAP(chinsan_map)
-	MDRV_CPU_IO_MAP(chinsan_io)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_ADD("maincpu", Z80,10000000/2)		 /* ? MHz */
+	MCFG_CPU_PROGRAM_MAP(chinsan_map)
+	MCFG_CPU_IO_MAP(chinsan_io)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_MACHINE_START( chinsan )
-	MDRV_MACHINE_RESET( chinsan )
+	MCFG_MACHINE_START( chinsan )
+	MCFG_MACHINE_RESET( chinsan )
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(512, 256)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_VISIBLE_AREA(24, 512-24-1, 16, 256-16-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(512, 256)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_VISIBLE_AREA(24, 512-24-1, 16, 256-16-1)
 
-	MDRV_GFXDECODE(chinsan)
-	MDRV_PALETTE_LENGTH(0x100)
-	MDRV_PALETTE_INIT(chinsan)
+	MCFG_GFXDECODE(chinsan)
+	MCFG_PALETTE_LENGTH(0x100)
+	MCFG_PALETTE_INIT(chinsan)
 
-	MDRV_VIDEO_START(chinsan)
-	MDRV_VIDEO_UPDATE(chinsan)
+	MCFG_VIDEO_START(chinsan)
+	MCFG_VIDEO_UPDATE(chinsan)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM2203, 1500000) /* ? Mhz */
-	MDRV_SOUND_CONFIG(ym2203_config)
-	MDRV_SOUND_ROUTE(0, "mono", 0.15)
-	MDRV_SOUND_ROUTE(1, "mono", 0.15)
-	MDRV_SOUND_ROUTE(2, "mono", 0.15)
-	MDRV_SOUND_ROUTE(3, "mono", 0.10)
+	MCFG_SOUND_ADD("ymsnd", YM2203, 1500000) /* ? Mhz */
+	MCFG_SOUND_CONFIG(ym2203_config)
+	MCFG_SOUND_ROUTE(0, "mono", 0.15)
+	MCFG_SOUND_ROUTE(1, "mono", 0.15)
+	MCFG_SOUND_ROUTE(2, "mono", 0.15)
+	MCFG_SOUND_ROUTE(3, "mono", 0.10)
 
-	MDRV_SOUND_ADD("adpcm", MSM5205, 384000)
-	MDRV_SOUND_CONFIG(msm5205_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("adpcm", MSM5205, 384000)
+	MCFG_SOUND_CONFIG(msm5205_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 

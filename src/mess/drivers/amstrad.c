@@ -861,191 +861,191 @@ static const floppy_config aleste_floppy_config =
 };
 
 static MACHINE_CONFIG_FRAGMENT( cpcplus_cartslot )
-	MDRV_CARTSLOT_ADD("cart")
-	MDRV_CARTSLOT_EXTENSION_LIST("cpr,bin")
-	MDRV_CARTSLOT_MANDATORY
-	MDRV_CARTSLOT_INTERFACE("gx4000_cart")
-	MDRV_CARTSLOT_LOAD(amstrad_plus_cartridge)
-	MDRV_SOFTWARE_LIST_ADD("cart_list","gx4000")
+	MCFG_CARTSLOT_ADD("cart")
+	MCFG_CARTSLOT_EXTENSION_LIST("cpr,bin")
+	MCFG_CARTSLOT_MANDATORY
+	MCFG_CARTSLOT_INTERFACE("gx4000_cart")
+	MCFG_CARTSLOT_LOAD(amstrad_plus_cartridge)
+	MCFG_SOFTWARE_LIST_ADD("cart_list","gx4000")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( amstrad, amstrad_state )
 	/* Machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, XTAL_16MHz / 4)
-	MDRV_CPU_PROGRAM_MAP(amstrad_mem)
-	MDRV_CPU_IO_MAP(amstrad_io)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz / 4)
+	MCFG_CPU_PROGRAM_MAP(amstrad_mem)
+	MCFG_CPU_IO_MAP(amstrad_io)
 
-	MDRV_QUANTUM_TIME(HZ(60))
+	MCFG_QUANTUM_TIME(HZ(60))
 
-	MDRV_MACHINE_START( amstrad )
-	MDRV_MACHINE_RESET( amstrad )
+	MCFG_MACHINE_START( amstrad )
+	MCFG_MACHINE_RESET( amstrad )
 
-	MDRV_I8255A_ADD( "ppi8255", amstrad_ppi8255_interface )
+	MCFG_I8255A_ADD( "ppi8255", amstrad_ppi8255_interface )
 
     /* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_RAW_PARAMS( XTAL_16MHz, 1024, 32, 32 + 640 + 64, 312, 56 + 15, 200 + 15 )
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_RAW_PARAMS( XTAL_16MHz, 1024, 32, 32 + 640 + 64, 312, 56 + 15, 200 + 15 )
+	MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 
-	MDRV_PALETTE_LENGTH(32)
-	MDRV_PALETTE_INIT(amstrad_cpc)
+	MCFG_PALETTE_LENGTH(32)
+	MCFG_PALETTE_INIT(amstrad_cpc)
 
-	MDRV_MC6845_ADD( "mc6845", MC6845, XTAL_16MHz / 16, amstrad_mc6845_intf )
+	MCFG_MC6845_ADD( "mc6845", MC6845, XTAL_16MHz / 16, amstrad_mc6845_intf )
 
-	MDRV_VIDEO_START(amstrad)
-	MDRV_VIDEO_UPDATE(amstrad)
-	MDRV_VIDEO_EOF(amstrad)
+	MCFG_VIDEO_START(amstrad)
+	MCFG_VIDEO_UPDATE(amstrad)
+	MCFG_VIDEO_EOF(amstrad)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_WAVE_ADD("wave", "cassette")
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MDRV_SOUND_ADD("ay", AY8912, XTAL_16MHz / 16)
-	MDRV_SOUND_CONFIG(ay8912_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_WAVE_ADD("wave", "cassette")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("ay", AY8912, XTAL_16MHz / 16)
+	MCFG_SOUND_CONFIG(ay8912_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* printer */
-	MDRV_CENTRONICS_ADD("centronics", standard_centronics)
+	MCFG_CENTRONICS_ADD("centronics", standard_centronics)
 
 	/* snapshot */
-	MDRV_SNAPSHOT_ADD("snapshot", amstrad, "sna", 0)
+	MCFG_SNAPSHOT_ADD("snapshot", amstrad, "sna", 0)
 
-	MDRV_CASSETTE_ADD( "cassette", amstrad_cassette_config )
+	MCFG_CASSETTE_ADD( "cassette", amstrad_cassette_config )
 
-	MDRV_UPD765A_ADD("upd765", amstrad_upd765_interface)
+	MCFG_UPD765A_ADD("upd765", amstrad_upd765_interface)
 
-	MDRV_FLOPPY_2_DRIVES_ADD(cpc6128_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_ADD(cpc6128_floppy_config)
 
 	/* internal ram */
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("128K")
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("128K")
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( kccomp, amstrad )
-	MDRV_MACHINE_START(kccomp)
-	MDRV_MACHINE_RESET(kccomp)
+	MCFG_MACHINE_START(kccomp)
+	MCFG_MACHINE_RESET(kccomp)
 
-	MDRV_PALETTE_INIT(kccomp)
+	MCFG_PALETTE_INIT(kccomp)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_START( cpcplus, amstrad_state )
 	/* Machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, XTAL_40MHz / 10)
-	MDRV_CPU_PROGRAM_MAP(amstrad_mem)
-	MDRV_CPU_IO_MAP(amstrad_io)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_40MHz / 10)
+	MCFG_CPU_PROGRAM_MAP(amstrad_mem)
+	MCFG_CPU_IO_MAP(amstrad_io)
 
-	MDRV_QUANTUM_TIME(HZ(60))
+	MCFG_QUANTUM_TIME(HZ(60))
 
-	MDRV_MACHINE_START( plus )
-	MDRV_MACHINE_RESET( plus )
+	MCFG_MACHINE_START( plus )
+	MCFG_MACHINE_RESET( plus )
 
-	MDRV_I8255A_ADD( "ppi8255", amstrad_ppi8255_interface )
+	MCFG_I8255A_ADD( "ppi8255", amstrad_ppi8255_interface )
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_RAW_PARAMS( ( XTAL_40MHz * 2 ) / 5, 1024, 32, 32 + 640 + 64, 312, 56 + 15, 200 + 15 )
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_RAW_PARAMS( ( XTAL_40MHz * 2 ) / 5, 1024, 32, 32 + 640 + 64, 312, 56 + 15, 200 + 15 )
+	MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 
-	MDRV_PALETTE_LENGTH(4096)
-	MDRV_PALETTE_INIT(amstrad_plus)
+	MCFG_PALETTE_LENGTH(4096)
+	MCFG_PALETTE_INIT(amstrad_plus)
 
-	MDRV_MC6845_ADD( "mc6845", MC6845, XTAL_40MHz / 40, amstrad_plus_mc6845_intf )
+	MCFG_MC6845_ADD( "mc6845", MC6845, XTAL_40MHz / 40, amstrad_plus_mc6845_intf )
 
-	MDRV_VIDEO_START(amstrad)
-	MDRV_VIDEO_UPDATE(amstrad)
-	MDRV_VIDEO_EOF(amstrad)
+	MCFG_VIDEO_START(amstrad)
+	MCFG_VIDEO_UPDATE(amstrad)
+	MCFG_VIDEO_EOF(amstrad)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_WAVE_ADD("wave", "cassette")
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MDRV_SOUND_ADD("ay", AY8912, XTAL_40MHz / 40)
-	MDRV_SOUND_CONFIG(ay8912_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_WAVE_ADD("wave", "cassette")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("ay", AY8912, XTAL_40MHz / 40)
+	MCFG_SOUND_CONFIG(ay8912_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* printer */
-	MDRV_CENTRONICS_ADD("centronics", standard_centronics)
+	MCFG_CENTRONICS_ADD("centronics", standard_centronics)
 
 	/* snapshot */
-	MDRV_SNAPSHOT_ADD("snapshot", amstrad, "sna", 0)
+	MCFG_SNAPSHOT_ADD("snapshot", amstrad, "sna", 0)
 
-	MDRV_CASSETTE_ADD( "cassette", amstrad_cassette_config )
+	MCFG_CASSETTE_ADD( "cassette", amstrad_cassette_config )
 
-	MDRV_UPD765A_ADD("upd765", amstrad_upd765_interface)
+	MCFG_UPD765A_ADD("upd765", amstrad_upd765_interface)
 
-	MDRV_FRAGMENT_ADD(cpcplus_cartslot)
+	MCFG_FRAGMENT_ADD(cpcplus_cartslot)
 
-	MDRV_FLOPPY_2_DRIVES_ADD(cpc6128_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_ADD(cpc6128_floppy_config)
 
 	/* internal ram */
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("128K")
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("128K")
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_START( gx4000, amstrad_state )
 	/* Machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, XTAL_40MHz / 10)
-	MDRV_CPU_PROGRAM_MAP(amstrad_mem)
-	MDRV_CPU_IO_MAP(amstrad_io)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_40MHz / 10)
+	MCFG_CPU_PROGRAM_MAP(amstrad_mem)
+	MCFG_CPU_IO_MAP(amstrad_io)
 
-	MDRV_QUANTUM_TIME(HZ(60))
+	MCFG_QUANTUM_TIME(HZ(60))
 
-	MDRV_MACHINE_START( gx4000 )
-	MDRV_MACHINE_RESET( gx4000 )
+	MCFG_MACHINE_START( gx4000 )
+	MCFG_MACHINE_RESET( gx4000 )
 
-	MDRV_I8255A_ADD( "ppi8255", amstrad_ppi8255_interface )
+	MCFG_I8255A_ADD( "ppi8255", amstrad_ppi8255_interface )
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_RAW_PARAMS( ( XTAL_40MHz * 2 ) / 5, 1024, 32, 32 + 640 + 64, 312, 56 + 15, 200 + 15 )
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_RAW_PARAMS( ( XTAL_40MHz * 2 ) / 5, 1024, 32, 32 + 640 + 64, 312, 56 + 15, 200 + 15 )
+	MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 
-	MDRV_PALETTE_LENGTH(4096)
-	MDRV_PALETTE_INIT(amstrad_plus)
+	MCFG_PALETTE_LENGTH(4096)
+	MCFG_PALETTE_INIT(amstrad_plus)
 
-	MDRV_MC6845_ADD( "mc6845", MC6845, XTAL_40MHz / 40, amstrad_plus_mc6845_intf )
+	MCFG_MC6845_ADD( "mc6845", MC6845, XTAL_40MHz / 40, amstrad_plus_mc6845_intf )
 
-	MDRV_VIDEO_START(amstrad)
-	MDRV_VIDEO_UPDATE(amstrad)
-	MDRV_VIDEO_EOF(amstrad)
+	MCFG_VIDEO_START(amstrad)
+	MCFG_VIDEO_UPDATE(amstrad)
+	MCFG_VIDEO_EOF(amstrad)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("ay", AY8912, XTAL_40MHz / 40)
-	MDRV_SOUND_CONFIG(ay8912_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("ay", AY8912, XTAL_40MHz / 40)
+	MCFG_SOUND_CONFIG(ay8912_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MDRV_FRAGMENT_ADD(cpcplus_cartslot)
+	MCFG_FRAGMENT_ADD(cpcplus_cartslot)
 
 	/* internal ram */
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("64K")
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("64K")
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( aleste, amstrad )
-	MDRV_MACHINE_START(aleste)
-	MDRV_MACHINE_RESET(aleste)
+	MCFG_MACHINE_START(aleste)
+	MCFG_MACHINE_RESET(aleste)
 
-	MDRV_SOUND_REPLACE("ay", AY8910, XTAL_16MHz / 16)
-	MDRV_SOUND_CONFIG(ay8912_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MDRV_PALETTE_LENGTH(32+64)
-	MDRV_PALETTE_INIT(aleste)
-	MDRV_MC146818_ADD( "rtc", MC146818_IGNORE_CENTURY )
-	MDRV_UPD765A_MODIFY("upd765", aleste_8272_interface)
+	MCFG_SOUND_REPLACE("ay", AY8910, XTAL_16MHz / 16)
+	MCFG_SOUND_CONFIG(ay8912_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_PALETTE_LENGTH(32+64)
+	MCFG_PALETTE_INIT(aleste)
+	MCFG_MC146818_ADD( "rtc", MC146818_IGNORE_CENTURY )
+	MCFG_UPD765A_MODIFY("upd765", aleste_8272_interface)
 
-	MDRV_FLOPPY_2_DRIVES_MODIFY(aleste_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_MODIFY(aleste_floppy_config)
 
 	/* internal ram */
-	MDRV_RAM_MODIFY("messram")
-	MDRV_RAM_DEFAULT_SIZE("2M")
+	MCFG_RAM_MODIFY("messram")
+	MCFG_RAM_DEFAULT_SIZE("2M")
 MACHINE_CONFIG_END
 
 

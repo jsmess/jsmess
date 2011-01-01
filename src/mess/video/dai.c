@@ -62,7 +62,7 @@ VIDEO_UPDATE( dai )
 	address_space *space = cputag_get_address_space(screen->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	int i, j, k, l;
 
-	UINT8* char_rom = memory_region(screen->machine, "gfx1");
+	UINT8* char_rom = screen->machine->region("gfx1")->base();
 
 	UINT16 dai_video_memory_start = 0xbfff;
 	UINT16 dai_scan_lines = 604;	/* scan lines of PAL tv */

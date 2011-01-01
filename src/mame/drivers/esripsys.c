@@ -140,7 +140,7 @@ static READ8_HANDLER( g_status_r )
 static WRITE8_HANDLER( g_status_w )
 {
 	int bankaddress;
-	UINT8 *rom = memory_region(space->machine, "game_cpu");
+	UINT8 *rom = space->machine->region("game_cpu")->base();
 
 	g_status = data;
 
@@ -523,7 +523,7 @@ static WRITE8_HANDLER( s_200e_w )
 
 static WRITE8_HANDLER( s_200f_w )
 {
-	UINT8 *rom = memory_region(space->machine, "sound_data");
+	UINT8 *rom = space->machine->region("sound_data")->base();
 	int rombank = data & 0x20 ? 0x2000 : 0;
 
 	/* Bit 6 -> Reset latch U56A */
@@ -555,7 +555,7 @@ static READ8_HANDLER( tms5220_r )
 	if (offset == 0)
 	{
 		/* TMS5220 core returns status bits in D7-D6 */
-		running_device *tms = space->machine->device("tms5220nl");
+		device_t *tms = space->machine->device("tms5220nl");
 		UINT8 status = tms5220_status_r(tms, 0);
 
 		status = ((status & 0x80) >> 5) | ((status & 0x40) >> 5) | ((status & 0x20) >> 5);
@@ -568,7 +568,7 @@ static READ8_HANDLER( tms5220_r )
 /* TODO: Implement correctly using the state PROM */
 static WRITE8_HANDLER( tms5220_w )
 {
-	running_device *tms = space->machine->device("tms5220nl");
+	device_t *tms = space->machine->device("tms5220nl");
 	if (offset == 0)
 	{
 		tms_data = data;
@@ -675,7 +675,7 @@ ADDRESS_MAP_END
 
 static DRIVER_INIT( esripsys )
 {
-	UINT8 *rom = memory_region(machine, "sound_data");
+	UINT8 *rom = machine->region("sound_data")->base();
 
 	fdt_a = auto_alloc_array(machine, UINT8, FDT_RAM_SIZE);
 	fdt_b = auto_alloc_array(machine, UINT8, FDT_RAM_SIZE);
@@ -728,42 +728,42 @@ static const esrip_config rip_config =
 };
 
 static MACHINE_CONFIG_START( esripsys, driver_device )
-	MDRV_CPU_ADD("game_cpu", M6809E, XTAL_8MHz)
-	MDRV_CPU_PROGRAM_MAP(game_cpu_map)
-	MDRV_CPU_VBLANK_INT("screen", esripsys_vblank_irq)
+	MCFG_CPU_ADD("game_cpu", M6809E, XTAL_8MHz)
+	MCFG_CPU_PROGRAM_MAP(game_cpu_map)
+	MCFG_CPU_VBLANK_INT("screen", esripsys_vblank_irq)
 
-	MDRV_CPU_ADD("frame_cpu", M6809E, XTAL_8MHz)
-	MDRV_CPU_PROGRAM_MAP(frame_cpu_map)
+	MCFG_CPU_ADD("frame_cpu", M6809E, XTAL_8MHz)
+	MCFG_CPU_PROGRAM_MAP(frame_cpu_map)
 
-	MDRV_CPU_ADD("video_cpu", ESRIP, XTAL_40MHz / 4)
-	MDRV_CPU_PROGRAM_MAP(video_cpu_map)
-	MDRV_CPU_CONFIG(rip_config)
+	MCFG_CPU_ADD("video_cpu", ESRIP, XTAL_40MHz / 4)
+	MCFG_CPU_PROGRAM_MAP(video_cpu_map)
+	MCFG_CPU_CONFIG(rip_config)
 
-	MDRV_CPU_ADD("sound_cpu", M6809E, XTAL_8MHz)
-	MDRV_CPU_PROGRAM_MAP(sound_cpu_map)
+	MCFG_CPU_ADD("sound_cpu", M6809E, XTAL_8MHz)
+	MCFG_CPU_PROGRAM_MAP(sound_cpu_map)
 
-	MDRV_NVRAM_ADD_0FILL("nvram")
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* Video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_RAW_PARAMS(ESRIPSYS_PIXEL_CLOCK, ESRIPSYS_HTOTAL, ESRIPSYS_HBLANK_END, ESRIPSYS_HBLANK_START, ESRIPSYS_VTOTAL, ESRIPSYS_VBLANK_END, ESRIPSYS_VBLANK_START)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_RAW_PARAMS(ESRIPSYS_PIXEL_CLOCK, ESRIPSYS_HTOTAL, ESRIPSYS_HBLANK_END, ESRIPSYS_HBLANK_START, ESRIPSYS_VTOTAL, ESRIPSYS_VBLANK_END, ESRIPSYS_VBLANK_START)
 
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
-	MDRV_VIDEO_START(esripsys)
-	MDRV_VIDEO_UPDATE(esripsys)
+	MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
+	MCFG_VIDEO_START(esripsys)
+	MCFG_VIDEO_UPDATE(esripsys)
 
 	/* Sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("dac", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD("tms5220nl", TMS5220, 640000)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SOUND_ADD("tms5220nl", TMS5220, 640000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* 6840 PTM */
-	MDRV_PTM6840_ADD("6840ptm", ptm_intf)
+	MCFG_PTM6840_ADD("6840ptm", ptm_intf)
 MACHINE_CONFIG_END
 
 

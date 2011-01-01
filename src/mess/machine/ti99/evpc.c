@@ -40,13 +40,13 @@ typedef struct _ti99_evpc_state
 
 } ti99_evpc_state;
 
-INLINE ti99_evpc_state *get_safe_token(running_device *device)
+INLINE ti99_evpc_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	return (ti99_evpc_state *)downcast<legacy_device_base *>(device)->token();
 }
 
-static int get_evpc_switch(running_device *device, int number)
+static int get_evpc_switch(device_t *device, int number)
 {
 	switch (number)
 	{
@@ -352,7 +352,7 @@ static DEVICE_RESET( ti99_evpc )
 	astring *region = new astring();
 
 	/* If the card is selected in the menu, register the card */
-	running_device *peb = device->owner();
+	device_t *peb = device->owner();
 	int success = mount_card(peb, device, &evpc_card, get_pebcard_config(device)->slot);
 	if (!success)
 	{
@@ -364,7 +364,7 @@ static DEVICE_RESET( ti99_evpc )
 
 	astring_assemble_3(region, device->tag(), ":", evpc_region);
 
-	card->dsrrom = memory_region(device->machine, astring_c(region));
+	card->dsrrom = device->machine->region(astring_c(region))->base();
 }
 
 static DEVICE_NVRAM( ti99_evpc )

@@ -59,44 +59,44 @@ static const i2cmem_interface i2cmem_interface =
 
 static MACHINE_CONFIG_START( pokemini, pokemini_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD( "maincpu", MINX, 4000000 )
-	MDRV_CPU_PROGRAM_MAP( pokemini_mem_map)
+	MCFG_CPU_ADD( "maincpu", MINX, 4000000 )
+	MCFG_CPU_PROGRAM_MAP( pokemini_mem_map)
 
-	MDRV_QUANTUM_TIME(HZ(60))
+	MCFG_QUANTUM_TIME(HZ(60))
 
-	MDRV_MACHINE_START( pokemini )
+	MCFG_MACHINE_START( pokemini )
 
-	MDRV_I2CMEM_ADD("i2cmem",i2cmem_interface)
+	MCFG_I2CMEM_ADD("i2cmem",i2cmem_interface)
 
 	/* video hardware */
-	MDRV_VIDEO_START( generic_bitmapped )
-	MDRV_VIDEO_UPDATE( generic_bitmapped )
+	MCFG_VIDEO_START( generic_bitmapped )
+	MCFG_VIDEO_UPDATE( generic_bitmapped )
 
 	/* This still needs to be improved to actually match the hardware */
-	MDRV_SCREEN_ADD("screen", LCD)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE( 96, 64 )
-	MDRV_SCREEN_VISIBLE_AREA( 0, 95, 0, 63 )
-	MDRV_DEFAULT_LAYOUT(layout_lcd)
-	MDRV_PALETTE_LENGTH( 4 )
-	MDRV_PALETTE_INIT( pokemini )
-	MDRV_SCREEN_REFRESH_RATE( 72 )
+	MCFG_SCREEN_ADD("screen", LCD)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE( 96, 64 )
+	MCFG_SCREEN_VISIBLE_AREA( 0, 95, 0, 63 )
+	MCFG_DEFAULT_LAYOUT(layout_lcd)
+	MCFG_PALETTE_LENGTH( 4 )
+	MCFG_PALETTE_INIT( pokemini )
+	MCFG_SCREEN_REFRESH_RATE( 72 )
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MDRV_SOUND_CONFIG(pokemini_speaker_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_CONFIG(pokemini_speaker_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* cartridge */
-	MDRV_CARTSLOT_ADD("cart")
-	MDRV_CARTSLOT_EXTENSION_LIST("min,bin")
-	MDRV_CARTSLOT_NOT_MANDATORY
-	MDRV_CARTSLOT_INTERFACE("pokemini_cart")
-	MDRV_CARTSLOT_LOAD(pokemini_cart)
+	MCFG_CARTSLOT_ADD("cart")
+	MCFG_CARTSLOT_EXTENSION_LIST("min,bin")
+	MCFG_CARTSLOT_NOT_MANDATORY
+	MCFG_CARTSLOT_INTERFACE("pokemini_cart")
+	MCFG_CARTSLOT_LOAD(pokemini_cart)
 
 	/* Software lists */
-	MDRV_SOFTWARE_LIST_ADD("cart_list","pokemini")
+	MCFG_SOFTWARE_LIST_ADD("cart_list","pokemini")
 MACHINE_CONFIG_END
 
 ROM_START( pokemini )

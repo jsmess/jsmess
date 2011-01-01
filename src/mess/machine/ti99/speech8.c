@@ -16,7 +16,7 @@
 
 typedef struct _ti99_speech8_state
 {
-	running_device			*vsp;
+	device_t			*vsp;
 	UINT8					*speechrom_data;		/* pointer to speech ROM data */
 	int 					load_pointer;			/* which 4-bit nibble will be affected by load address */
 	int 					ROM_bits_count;				/* current bit position in ROM */
@@ -25,7 +25,7 @@ typedef struct _ti99_speech8_state
 
 } ti99_speech8_state;
 
-INLINE ti99_speech8_state *get_safe_token(running_device *device)
+INLINE ti99_speech8_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	return (ti99_speech8_state *)downcast<legacy_device_base *>(device)->token();
@@ -36,9 +36,9 @@ INLINE ti99_speech8_state *get_safe_token(running_device *device)
 /*
     Read 'count' bits serially from speech ROM
 */
-static int ti99_spchroms_read(running_device *vspdev, int count)
+static int ti99_spchroms_read(device_t *vspdev, int count)
 {
-	running_device *device = vspdev->owner();
+	device_t *device = vspdev->owner();
 	ti99_speech8_state *spsys = get_safe_token(device);
 
 	int val;
@@ -79,9 +79,9 @@ static int ti99_spchroms_read(running_device *vspdev, int count)
 /*
     Write an address nibble to speech ROM
 */
-static void ti99_spchroms_load_address(running_device *vspdev, int data)
+static void ti99_spchroms_load_address(device_t *vspdev, int data)
 {
-	running_device *device = vspdev->owner();
+	device_t *device = vspdev->owner();
 	ti99_speech8_state *spsys = get_safe_token(device);
 	// tms5220 data sheet says that if we load only one 4-bit nibble, it won't work.
 	// This code does not care about this.
@@ -94,9 +94,9 @@ static void ti99_spchroms_load_address(running_device *vspdev, int data)
 /*
     Perform a read and branch command
 */
-static void ti99_spchroms_read_and_branch(running_device *vspdev)
+static void ti99_spchroms_read_and_branch(device_t *vspdev)
 {
-	running_device *device = vspdev->owner();
+	device_t *device = vspdev->owner();
 	ti99_speech8_state *spsys = get_safe_token(device);
 	// tms5220 data sheet says that if more than one speech ROM (tms6100) is present,
 	// there is a bus contention.  This code does not care about this. */
@@ -177,8 +177,8 @@ static DEVICE_RESET( ti99_speech8 )
 	astring *region = new astring();
 	astring_assemble_3(region, device->tag(), ":", speech8_region);
 
-	spsys->speechrom_data = memory_region(device->machine, astring_c(region));
-	spsys->speechROMlen = memory_region_length(device->machine, astring_c(region));
+	spsys->speechrom_data = device->machine->region(astring_c(region))->base();
+	spsys->speechROMlen = device->machine->region(astring_c(region))->bytes();
 	spsys->speechROMaddr = 0;
 	spsys->load_pointer = 0;
 	spsys->ROM_bits_count = 0;
@@ -204,9 +204,9 @@ static const tms5220_interface ti99_4x_tms5200interface =
 };
 
 MACHINE_CONFIG_FRAGMENT( ti99_speech8 )
-	MDRV_SOUND_ADD("speechsyn", TMS5220, 680000L)
-	MDRV_SOUND_CONFIG(ti99_4x_tms5200interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("speechsyn", TMS5220, 680000L)
+	MCFG_SOUND_CONFIG(ti99_4x_tms5200interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 ROM_START( ti99_speech8 )

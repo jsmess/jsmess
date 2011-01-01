@@ -58,7 +58,7 @@ VIDEO_UPDATE( trs80 )
 	UINT8 *videoram = state->videoram;
 	UINT8 y,ra,chr,gfx,gfxbit;
 	UINT16 sy=0,ma=0,x;
-	UINT8 *FNT = memory_region(screen->machine, "gfx1");
+	UINT8 *FNT = screen->machine->region("gfx1")->base();
 	UINT8 cols = (state->mode & 1) ? 32 : 64;
 	UINT8 skip = (state->mode & 1) ? 2 : 1;
 
@@ -122,7 +122,7 @@ VIDEO_UPDATE( trs80m4 )
 	UINT8 *videoram = state->videoram;
 	UINT8 y,ra,chr,gfx,gfxbit;
 	UINT16 sy=0,ma=0,x;
-	UINT8 *FNT = memory_region(screen->machine, "gfx1");
+	UINT8 *FNT = screen->machine->region("gfx1")->base();
 	UINT8 skip=1;
 	UINT8 cols = (state->mode & 4) ? 80 : 64;
 	UINT8 rows = (state->mode & 4) ? 24 : 16;
@@ -219,7 +219,7 @@ VIDEO_UPDATE( ht1080z )
 	UINT8 *videoram = state->videoram;
 	UINT8 y,ra,chr,gfx,gfxbit;
 	UINT16 sy=0,ma=0,x;
-	UINT8 *FNT = memory_region(screen->machine, "gfx1");
+	UINT8 *FNT = screen->machine->region("gfx1")->base();
 	UINT8 cols = (state->mode & 1) ? 32 : 64;
 	UINT8 skip = (state->mode & 1) ? 2 : 1;
 
@@ -281,7 +281,7 @@ VIDEO_UPDATE( lnw80 )
 	static const UINT16 rows[] = { 0, 0x200, 0x100, 0x300, 1, 0x201, 0x101, 0x301 };
 	UINT8 chr,gfx,gfxbit,bg=7,fg=0;
 	UINT16 sy=0,ma=0,x,y,ra;
-	UINT8 *FNT = memory_region(screen->machine, "gfx1");
+	UINT8 *FNT = screen->machine->region("gfx1")->base();
 	UINT8 cols = (state->mode & 0x10) ? 80 : 64;
 
 	/* Although the OS can select 32-character mode, it is not supported by hardware */
@@ -455,7 +455,7 @@ VIDEO_UPDATE( radionic )
 	UINT8 *videoram = state->videoram;
 	UINT8 y,ra,chr,gfx;
 	UINT16 sy=0,ma=0,x;
-	UINT8 *FNT = memory_region(screen->machine, "gfx1");
+	UINT8 *FNT = screen->machine->region("gfx1")->base();
 	UINT8 cols = (state->mode & 1) ? 32 : 64;
 	UINT8 skip = (state->mode & 1) ? 2 : 1;
 

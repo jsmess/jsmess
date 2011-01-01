@@ -28,8 +28,8 @@
 void advision_state::machine_start()
 {
 	/* configure EA banking */
-	memory_configure_bank(machine, "bank1", 0, 1, memory_region(machine, "bios"), 0);
-	memory_configure_bank(machine, "bank1", 1, 1, memory_region(machine, I8048_TAG), 0);
+	memory_configure_bank(machine, "bank1", 0, 1, machine->region("bios")->base(), 0);
+	memory_configure_bank(machine, "bank1", 1, 1, machine->region(I8048_TAG)->base(), 0);
 	memory_install_readwrite_bank(cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM), 0x0000, 0x03ff, 0, 0, "bank1");
 	memory_set_bank(machine, "bank1", 0);
 

@@ -28,9 +28,9 @@ public:
 	/* devices */
 	via6522_device *via0;
 	via6522_device *via1;
-	running_device *iec;
-	running_device *cassette;
-	running_device *mos6560;
+	device_t *iec;
+	device_t *cassette;
+	device_t *mos6560;
 
 	/* timers */
 	timer_device *cassette_timer;

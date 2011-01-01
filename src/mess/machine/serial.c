@@ -79,7 +79,7 @@ struct _serial_t
 	emu_timer	*timer;
 };
 
-INLINE serial_t *get_safe_token(running_device *device)
+INLINE serial_t *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 
@@ -134,7 +134,7 @@ static void serial_device_in_callback(running_machine *machine, int id, unsigned
 }
 
 /***** SERIAL DEVICE ******/
-void serial_device_setup(running_device *device, int baud_rate, int num_data_bits, int stop_bit_count, int parity_code)
+void serial_device_setup(device_t *device, int baud_rate, int num_data_bits, int stop_bit_count, int parity_code)
 {
 	serial_t *ser = get_safe_token(device);
 
@@ -162,14 +162,14 @@ void serial_device_setup(running_device *device, int baud_rate, int num_data_bit
 }
 
 
-unsigned long serial_device_get_state(running_device *device)
+unsigned long serial_device_get_state(device_t *device)
 {
 	serial_t *ser = get_safe_token(device);
 
 	return ser->connection.State;
 }
 
-void serial_device_set_transmit_state(running_device *device, int state)
+void serial_device_set_transmit_state(device_t *device, int state)
 {
 	int previous_state;
 	serial_t *ser = get_safe_token(device);
@@ -471,7 +471,7 @@ void transmit_register_send_bit(running_machine *machine, serial_transmit_regist
 	serial_connection_out(machine, connection);
 }
 
-static void serial_protocol_none_sent_char(running_device *device)
+static void serial_protocol_none_sent_char(device_t *device)
 {
 	int i;
 	int bit;
@@ -494,7 +494,7 @@ static void serial_protocol_none_sent_char(running_device *device)
 
 static TIMER_CALLBACK(serial_device_baud_rate_callback)
 {
-	serial_t *ser = get_safe_token((running_device*)ptr);
+	serial_t *ser = get_safe_token((device_t*)ptr);
 
 	/* receive data into receive register */
 	receive_register_update_bit(&ser->receive_reg, get_in_data_bit(ser->connection.input_state));
@@ -511,7 +511,7 @@ static TIMER_CALLBACK(serial_device_baud_rate_callback)
 	if (ser->transmit_reg.flags & TRANSMIT_REGISTER_EMPTY)
 	{
 		/* char has been sent, execute callback */
-		serial_protocol_none_sent_char((running_device*)ptr);
+		serial_protocol_none_sent_char((device_t*)ptr);
 	}
 
 	/* other side says it is clear to send? */
@@ -523,7 +523,7 @@ static TIMER_CALLBACK(serial_device_baud_rate_callback)
 }
 
 /* connect the specified connection to this serial device */
-void serial_device_connect(running_device *device, serial_connection *connection)
+void serial_device_connect(device_t *device, serial_connection *connection)
 {
 	serial_t *ser = get_safe_token(device);
 	serial_connection_link(device->machine, connection, &ser->connection);

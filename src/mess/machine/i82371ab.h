@@ -24,8 +24,8 @@ struct _i82371ab_config
 /***************************************************************************
     FUNCTION PROTOTYPES
 ***************************************************************************/
-UINT32 i82371ab_pci_read(running_device *busdevice, running_device *device, int function, int offset, UINT32 mem_mask);
-void i82371ab_pci_write(running_device *busdevice, running_device *device, int function, int offset, UINT32 data, UINT32 mem_mask);
+UINT32 i82371ab_pci_read(device_t *busdevice, device_t *device, int function, int offset, UINT32 mem_mask);
+void i82371ab_pci_write(device_t *busdevice, device_t *device, int function, int offset, UINT32 data, UINT32 mem_mask);
 
 
 /***************************************************************************
@@ -34,8 +34,8 @@ void i82371ab_pci_write(running_device *busdevice, running_device *device, int f
 
 DECLARE_LEGACY_DEVICE(I82371AB, i82371ab);
 
-#define MDRV_I82371AB_ADD(_tag) \
-	MDRV_DEVICE_ADD(_tag, I82371AB, 0)
+#define MCFG_I82371AB_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, I82371AB, 0)
 
 
 #endif /* __I82371AB_H__ */

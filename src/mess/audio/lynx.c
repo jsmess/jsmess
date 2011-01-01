@@ -113,7 +113,7 @@ struct _lynx_sound_state
 	LYNX_AUDIO audio[4];
 };
 
-INLINE lynx_sound_state *get_safe_token(running_device *device)
+INLINE lynx_sound_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == LYNX || device->type() == LYNX2);
@@ -125,7 +125,7 @@ static void lynx_audio_reset_channel(LYNX_AUDIO *This)
     memset(This->reg.data, 0, (char*)(This+1)-(char*)(This->reg.data));
 }
 
-void lynx_audio_count_down(running_device *device, int nr)
+void lynx_audio_count_down(device_t *device, int nr)
 {
     lynx_sound_state *state = get_safe_token(device);
     LYNX_AUDIO *This=state->audio+nr;
@@ -134,7 +134,7 @@ void lynx_audio_count_down(running_device *device, int nr)
     This->count--;
 }
 
-static void lynx_audio_shift(running_device *device, LYNX_AUDIO *channel)
+static void lynx_audio_shift(device_t *device, LYNX_AUDIO *channel)
 {
     lynx_sound_state *state = get_safe_token(device);
     int nr = (int)(channel - state->audio);
@@ -156,7 +156,7 @@ static void lynx_audio_shift(running_device *device, LYNX_AUDIO *channel)
     }
 }
 
-static void lynx_audio_execute(running_device *device, LYNX_AUDIO *channel)
+static void lynx_audio_execute(device_t *device, LYNX_AUDIO *channel)
 {
     lynx_sound_state *state = get_safe_token(device);
     if (channel->reg.n.control1&8) { // count_enable
@@ -188,7 +188,7 @@ static void lynx_audio_execute(running_device *device, LYNX_AUDIO *channel)
 }
 
 
-UINT8 lynx_audio_read(running_device *device, int offset)
+UINT8 lynx_audio_read(device_t *device, int offset)
 {
     lynx_sound_state *state = get_safe_token(device);
     UINT8 data=0;
@@ -223,7 +223,7 @@ UINT8 lynx_audio_read(running_device *device, int offset)
     return data;
 }
 
-void lynx_audio_write(running_device *device, int offset, UINT8 data)
+void lynx_audio_write(device_t *device, int offset, UINT8 data)
 {
 	lynx_sound_state *state = get_safe_token(device);
 //  logerror("%.6f audio write %.2x %.2x\n", timer_get_time(machine), offset, data);
@@ -325,7 +325,7 @@ static STREAM_UPDATE( lynx2_update )
 	}
 }
 
-static void lynx_audio_init(running_device *device)
+static void lynx_audio_init(device_t *device)
 {
 	lynx_sound_state *state = get_safe_token(device);
 	int i;

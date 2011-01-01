@@ -189,7 +189,7 @@ static VIDEO_START( jetwave )
 
 static VIDEO_UPDATE( jetwave )
 {
-	running_device *k001604 = screen->machine->device("k001604");
+	device_t *k001604 = screen->machine->device("k001604");
 
 	bitmap_fill(bitmap, cliprect, screen->machine->pens[0]);
 
@@ -224,7 +224,7 @@ static void game_tile_callback(running_machine *machine, int layer, int *code, i
 
 static VIDEO_START( zr107 )
 {
-	running_device *k056832 = machine->device("k056832");
+	device_t *k056832 = machine->device("k056832");
 
 	k056832_set_layer_offs(k056832, 0, -29, -27);
 	k056832_set_layer_offs(k056832, 1, -29, -27);
@@ -241,7 +241,7 @@ static VIDEO_START( zr107 )
 
 static VIDEO_UPDATE( zr107 )
 {
-	running_device *k056832 = screen->machine->device("k056832");
+	device_t *k056832 = screen->machine->device("k056832");
 	bitmap_fill(bitmap, cliprect, screen->machine->pens[0]);
 
 	k056832_tilemap_draw(k056832, bitmap, cliprect, 1, 0, 0);
@@ -639,7 +639,7 @@ static const sharc_config sharc_cfg =
 
 /* ADC0838 Interface */
 
-static double adc0838_callback( running_device *device, UINT8 input )
+static double adc0838_callback( device_t *device, UINT8 input )
 {
 	switch (input)
 	{
@@ -720,54 +720,54 @@ static MACHINE_RESET( zr107 )
 static MACHINE_CONFIG_START( zr107, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", PPC403GA, 64000000/2)	/* PowerPC 403GA 32MHz */
-	MDRV_CPU_PROGRAM_MAP(zr107_map)
-	MDRV_CPU_VBLANK_INT("screen", zr107_vblank)
+	MCFG_CPU_ADD("maincpu", PPC403GA, 64000000/2)	/* PowerPC 403GA 32MHz */
+	MCFG_CPU_PROGRAM_MAP(zr107_map)
+	MCFG_CPU_VBLANK_INT("screen", zr107_vblank)
 
-	MDRV_CPU_ADD("audiocpu", M68000, 64000000/8)	/* 8MHz */
-	MDRV_CPU_PROGRAM_MAP(sound_memmap)
+	MCFG_CPU_ADD("audiocpu", M68000, 64000000/8)	/* 8MHz */
+	MCFG_CPU_PROGRAM_MAP(sound_memmap)
 
-	MDRV_CPU_ADD("dsp", ADSP21062, 36000000)
-	MDRV_CPU_CONFIG(sharc_cfg)
-	MDRV_CPU_DATA_MAP(sharc_map)
+	MCFG_CPU_ADD("dsp", ADSP21062, 36000000)
+	MCFG_CPU_CONFIG(sharc_cfg)
+	MCFG_CPU_DATA_MAP(sharc_map)
 
-	MDRV_QUANTUM_TIME(HZ(30000))
+	MCFG_QUANTUM_TIME(HZ(30000))
 
-	MDRV_EEPROM_93C46_ADD("eeprom")
-	MDRV_MACHINE_START(zr107)
-	MDRV_MACHINE_RESET(zr107)
+	MCFG_EEPROM_93C46_ADD("eeprom")
+	MCFG_MACHINE_START(zr107)
+	MCFG_MACHINE_RESET(zr107)
 
-	MDRV_K056230_ADD("k056230", zr107_k056230_intf)
+	MCFG_K056230_ADD("k056230", zr107_k056230_intf)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_SIZE(64*8, 48*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 48*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_SIZE(64*8, 48*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 48*8-1)
 
-	MDRV_PALETTE_LENGTH(65536)
+	MCFG_PALETTE_LENGTH(65536)
 
-	MDRV_VIDEO_START(zr107)
-	MDRV_VIDEO_UPDATE(zr107)
+	MCFG_VIDEO_START(zr107)
+	MCFG_VIDEO_UPDATE(zr107)
 
-	MDRV_K056832_ADD("k056832", zr107_k056832_intf)
+	MCFG_K056832_ADD("k056832", zr107_k056832_intf)
 
-	MDRV_K056800_ADD("k056800", zr107_k056800_interface)
+	MCFG_K056800_ADD("k056800", zr107_k056800_interface)
 
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("konami1", K054539, 48000)
-	MDRV_SOUND_CONFIG(k054539_config)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 0.75)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 0.75)
+	MCFG_SOUND_ADD("konami1", K054539, 48000)
+	MCFG_SOUND_CONFIG(k054539_config)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.75)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.75)
 
-	MDRV_SOUND_ADD("konami2", K054539, 48000)
-	MDRV_SOUND_CONFIG(k054539_config)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 0.75)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 0.75)
+	MCFG_SOUND_ADD("konami2", K054539, 48000)
+	MCFG_SOUND_CONFIG(k054539_config)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.75)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.75)
 
-	MDRV_ADC0838_ADD("adc0838", zr107_adc_interface)
+	MCFG_ADC0838_ADD("adc0838", zr107_adc_interface)
 MACHINE_CONFIG_END
 
 
@@ -781,54 +781,54 @@ static const k001604_interface jetwave_k001604_intf =
 static MACHINE_CONFIG_START( jetwave, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", PPC403GA, 64000000/2)	/* PowerPC 403GA 32MHz */
-	MDRV_CPU_PROGRAM_MAP(jetwave_map)
-	MDRV_CPU_VBLANK_INT("screen", zr107_vblank)
+	MCFG_CPU_ADD("maincpu", PPC403GA, 64000000/2)	/* PowerPC 403GA 32MHz */
+	MCFG_CPU_PROGRAM_MAP(jetwave_map)
+	MCFG_CPU_VBLANK_INT("screen", zr107_vblank)
 
-	MDRV_CPU_ADD("audiocpu", M68000, 64000000/8)	/* 8MHz */
-	MDRV_CPU_PROGRAM_MAP(sound_memmap)
+	MCFG_CPU_ADD("audiocpu", M68000, 64000000/8)	/* 8MHz */
+	MCFG_CPU_PROGRAM_MAP(sound_memmap)
 
-	MDRV_CPU_ADD("dsp", ADSP21062, 36000000)
-	MDRV_CPU_CONFIG(sharc_cfg)
-	MDRV_CPU_DATA_MAP(sharc_map)
+	MCFG_CPU_ADD("dsp", ADSP21062, 36000000)
+	MCFG_CPU_CONFIG(sharc_cfg)
+	MCFG_CPU_DATA_MAP(sharc_map)
 
-	MDRV_QUANTUM_TIME(HZ(30000))
+	MCFG_QUANTUM_TIME(HZ(30000))
 
-	MDRV_EEPROM_93C46_ADD("eeprom")
-	MDRV_MACHINE_START(zr107)
-	MDRV_MACHINE_RESET(zr107)
+	MCFG_EEPROM_93C46_ADD("eeprom")
+	MCFG_MACHINE_START(zr107)
+	MCFG_MACHINE_RESET(zr107)
 
-	MDRV_K056230_ADD("k056230", zr107_k056230_intf)
+	MCFG_K056230_ADD("k056230", zr107_k056230_intf)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_SIZE(64*8, 48*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 48*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_SIZE(64*8, 48*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 48*8-1)
 
-	MDRV_PALETTE_LENGTH(65536)
+	MCFG_PALETTE_LENGTH(65536)
 
-	MDRV_VIDEO_START(jetwave)
-	MDRV_VIDEO_UPDATE(jetwave)
+	MCFG_VIDEO_START(jetwave)
+	MCFG_VIDEO_UPDATE(jetwave)
 
-	MDRV_K001604_ADD("k001604", jetwave_k001604_intf)
+	MCFG_K001604_ADD("k001604", jetwave_k001604_intf)
 
-	MDRV_K056800_ADD("k056800", zr107_k056800_interface)
+	MCFG_K056800_ADD("k056800", zr107_k056800_interface)
 
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("konami1", K054539, 48000)
-	MDRV_SOUND_CONFIG(k054539_config)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 0.75)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 0.75)
+	MCFG_SOUND_ADD("konami1", K054539, 48000)
+	MCFG_SOUND_CONFIG(k054539_config)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.75)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.75)
 
-	MDRV_SOUND_ADD("konami2", K054539, 48000)
-	MDRV_SOUND_CONFIG(k054539_config)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 0.75)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 0.75)
+	MCFG_SOUND_ADD("konami2", K054539, 48000)
+	MCFG_SOUND_CONFIG(k054539_config)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.75)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.75)
 
-	MDRV_ADC0838_ADD("adc0838", zr107_adc_interface)
+	MCFG_ADC0838_ADD("adc0838", zr107_adc_interface)
 MACHINE_CONFIG_END
 
 /*****************************************************************************/
@@ -839,7 +839,7 @@ static void init_zr107(running_machine *machine)
 	led_reg0 = led_reg1 = 0x7f;
 	ccu_vcth = ccu_vctl = 0;
 
-	K001005_preprocess_texture_data(memory_region(machine, "gfx1"), memory_region_length(machine, "gfx1"), 0);
+	K001005_preprocess_texture_data(machine->region("gfx1")->base(), machine->region("gfx1")->bytes(), 0);
 }
 
 static DRIVER_INIT(zr107)

@@ -155,7 +155,7 @@ static WRITE32_HANDLER( control_w )
 	/* handle EEPROM I/O */
 	if (ACCESSING_BITS_16_23)
 	{
-		running_device *device = space->machine->device("eeprom");
+		device_t *device = space->machine->device("eeprom");
 		eeprom_write_bit(device, data & 0x00800000);
 		eeprom_set_cs_line(device, (data & 0x00200000) ? CLEAR_LINE : ASSERT_LINE);
 		eeprom_set_clock_line(device, (data & 0x00400000) ? ASSERT_LINE : CLEAR_LINE);
@@ -164,7 +164,7 @@ static WRITE32_HANDLER( control_w )
 	/* toggling BSMT off then on causes a reset */
 	if (!(old & 0x80000000) && (control_data & 0x80000000))
 	{
-		running_device *device = space->machine->device("bsmt");
+		device_t *device = space->machine->device("bsmt");
 		bsmt2000_data_w(device, bsmt_data_bank, 0, 0xffff);
 		device->reset();
 	}
@@ -202,7 +202,7 @@ static WRITE32_HANDLER( policetr_bsmt2000_data_w )
 
 static READ32_HANDLER( bsmt2000_data_r )
 {
-	return memory_region(space->machine, "bsmt")[bsmt_data_bank * 0x10000 + bsmt_data_offset] << 8;
+	return space->machine->region("bsmt")->base()[bsmt_data_bank * 0x10000 + bsmt_data_offset] << 8;
 }
 
 
@@ -428,41 +428,41 @@ static const r3000_cpu_core r3000_config =
 static MACHINE_CONFIG_START( policetr, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", R3000BE, MASTER_CLOCK/2)
-	MDRV_CPU_CONFIG(r3000_config)
-	MDRV_CPU_PROGRAM_MAP(policetr_map)
-	MDRV_CPU_VBLANK_INT("screen", irq4_gen)
+	MCFG_CPU_ADD("maincpu", R3000BE, MASTER_CLOCK/2)
+	MCFG_CPU_CONFIG(r3000_config)
+	MCFG_CPU_PROGRAM_MAP(policetr_map)
+	MCFG_CPU_VBLANK_INT("screen", irq4_gen)
 
-	MDRV_EEPROM_ADD("eeprom", eeprom_interface_policetr)
+	MCFG_EEPROM_ADD("eeprom", eeprom_interface_policetr)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
+	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(400, 262)	/* needs to be verified */
-	MDRV_SCREEN_VISIBLE_AREA(0, 393, 0, 239)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(400, 262)	/* needs to be verified */
+	MCFG_SCREEN_VISIBLE_AREA(0, 393, 0, 239)
 
-	MDRV_PALETTE_LENGTH(256)
+	MCFG_PALETTE_LENGTH(256)
 
-	MDRV_VIDEO_START(policetr)
-	MDRV_VIDEO_UPDATE(policetr)
+	MCFG_VIDEO_START(policetr)
+	MCFG_VIDEO_UPDATE(policetr)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("bsmt", BSMT2000, MASTER_CLOCK/2)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("bsmt", BSMT2000, MASTER_CLOCK/2)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( sshooter, policetr )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(sshooter_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(sshooter_map)
 MACHINE_CONFIG_END
 
 

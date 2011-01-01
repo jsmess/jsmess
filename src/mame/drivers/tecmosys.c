@@ -524,14 +524,14 @@ GFXDECODE_END
 
 static WRITE8_HANDLER( deroon_bankswitch_w )
 {
-	memory_set_bankptr(space->machine,  "bank1", memory_region(space->machine, "audiocpu") + ((data-2) & 0x0f) * 0x4000 + 0x10000 );
+	memory_set_bankptr(space->machine,  "bank1", space->machine->region("audiocpu")->base() + ((data-2) & 0x0f) * 0x4000 + 0x10000 );
 }
 
 static WRITE8_HANDLER( tecmosys_oki_bank_w )
 {
 	UINT8 upperbank = (data & 0x30) >> 4;
 	UINT8 lowerbank = (data & 0x03) >> 0;
-	UINT8* region = memory_region(space->machine, "oki");
+	UINT8* region = space->machine->region("oki")->base();
 
 	memcpy( region+0x00000, region+0x80000 + lowerbank * 0x20000, 0x20000  );
 	memcpy( region+0x20000, region+0x80000 + upperbank * 0x20000, 0x20000  );
@@ -583,7 +583,7 @@ static VIDEO_START(deroon)
 
 static void tecmosys_render_sprites_to_bitmap(running_machine *machine, bitmap_t *bitmap, UINT16 extrax, UINT16 extray )
 {
-	UINT8 *gfxsrc    = memory_region       ( machine, "gfx1" );
+	UINT8 *gfxsrc    = machine->region       ( "gfx1" )->base();
 	int i;
 
 	/* render sprites (with priority information) to temp bitmap */
@@ -864,7 +864,7 @@ static VIDEO_UPDATE(deroon)
 */
 
 
-static void sound_irq(running_device *device, int irq)
+static void sound_irq(device_t *device, int irq)
 {
 	/* IRQ */
 	cputag_set_input_line(device->machine, "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
@@ -877,50 +877,50 @@ static const ymf262_interface tecmosys_ymf262_interface =
 
 
 static MACHINE_CONFIG_START( deroon, driver_device )
-	MDRV_CPU_ADD("maincpu", M68000, 16000000)
-	MDRV_CPU_PROGRAM_MAP(main_map)
-	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
-	MDRV_WATCHDOG_VBLANK_INIT(400) // guess
+	MCFG_CPU_ADD("maincpu", M68000, 16000000)
+	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_CPU_VBLANK_INT("screen", irq1_line_hold)
+	MCFG_WATCHDOG_VBLANK_INIT(400) // guess
 
-	MDRV_CPU_ADD("audiocpu", Z80, 16000000/2 )	/* 8 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(sound_map)
-	MDRV_CPU_IO_MAP(io_map)
+	MCFG_CPU_ADD("audiocpu", Z80, 16000000/2 )	/* 8 MHz ??? */
+	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_CPU_IO_MAP(io_map)
 
-	MDRV_GFXDECODE(tecmosys)
+	MCFG_GFXDECODE(tecmosys)
 
-	MDRV_EEPROM_93C46_ADD("eeprom")
+	MCFG_EEPROM_93C46_ADD("eeprom")
 
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
+	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(57.4458)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(3000))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_SIZE(64*8, 64*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(57.4458)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(3000))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_SIZE(64*8, 64*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
 
-	MDRV_PALETTE_LENGTH(0x4000+0x800)
+	MCFG_PALETTE_LENGTH(0x4000+0x800)
 
-	MDRV_VIDEO_START(deroon)
-	MDRV_VIDEO_UPDATE(deroon)
+	MCFG_VIDEO_START(deroon)
+	MCFG_VIDEO_UPDATE(deroon)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ymf", YMF262, 14318180)
-	MDRV_SOUND_CONFIG(tecmosys_ymf262_interface)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 1.00)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 1.00)
-	MDRV_SOUND_ROUTE(2, "lspeaker", 1.00)
-	MDRV_SOUND_ROUTE(3, "rspeaker", 1.00)
+	MCFG_SOUND_ADD("ymf", YMF262, 14318180)
+	MCFG_SOUND_CONFIG(tecmosys_ymf262_interface)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
+	MCFG_SOUND_ROUTE(2, "lspeaker", 1.00)
+	MCFG_SOUND_ROUTE(3, "rspeaker", 1.00)
 
-	MDRV_OKIM6295_ADD("oki", 16000000/8, OKIM6295_PIN7_HIGH)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
+	MCFG_OKIM6295_ADD("oki", 16000000/8, OKIM6295_PIN7_HIGH)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 
-	MDRV_SOUND_ADD("ymz", YMZ280B, 16900000)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 0.30)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 0.30)
+	MCFG_SOUND_ADD("ymz", YMZ280B, 16900000)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.30)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.30)
 MACHINE_CONFIG_END
 
 
@@ -1056,8 +1056,8 @@ ROM_END
 
 static void tecmosys_decramble(running_machine *machine)
 {
-	UINT8 *gfxsrc    = memory_region       ( machine, "gfx1" );
-	size_t  srcsize = memory_region_length( machine, "gfx1" );
+	UINT8 *gfxsrc    = machine->region       ( "gfx1" )->base();
+	size_t  srcsize = machine->region( "gfx1" )->bytes();
 	int i;
 
 	for (i=0; i < srcsize; i+=4)

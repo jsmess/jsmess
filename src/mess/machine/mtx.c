@@ -74,7 +74,7 @@ static void bankswitch(running_machine *machine, UINT8 data)
     */
 
 	address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
-	running_device *messram = machine->device("messram");
+	device_t *messram = machine->device("messram");
 
 //  UINT8 cbm_mode = data >> 7 & 0x01;
 	UINT8 rom_page = data >> 4 & 0x07;
@@ -404,7 +404,7 @@ SNAPSHOT_LOAD( mtx )
 MACHINE_START( mtx512 )
 {
 	mtx_state *state = machine->driver_data<mtx_state>();
-	running_device *messram = machine->device("messram");
+	device_t *messram = machine->device("messram");
 
 	/* find devices */
 	state->z80ctc = machine->device(Z80CTC_TAG);
@@ -412,8 +412,8 @@ MACHINE_START( mtx512 )
 	state->cassette = machine->device(CASSETTE_TAG);
 
 	/* configure memory */
-	memory_set_bankptr(machine, "bank1", memory_region(machine, "user1"));
-	memory_configure_bank(machine, "bank2", 0, 8, memory_region(machine, "user2"), 0x2000);
+	memory_set_bankptr(machine, "bank1", machine->region("user1")->base());
+	memory_configure_bank(machine, "bank2", 0, 8, machine->region("user2")->base(), 0x2000);
 	memory_configure_bank(machine, "bank3", 0, messram_get_size(messram)/0x4000/2, messram_get_ptr(messram), 0x4000);
 	memory_configure_bank(machine, "bank4", 0, messram_get_size(messram)/0x4000/2, messram_get_ptr(messram) + messram_get_size(messram)/2, 0x4000);
 

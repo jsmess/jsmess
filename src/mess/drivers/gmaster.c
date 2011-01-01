@@ -18,7 +18,7 @@ static READ8_HANDLER( gmaster_io_r )
     UINT8 data = 0;
     if (state->machine.ports[2] & 1)
 	{
-		data = memory_region(space->machine, "maincpu")[0x4000 + offset];
+		data = space->machine->region("maincpu")->base()[0x4000 + offset];
 		logerror("%.4x external memory %.4x read %.2x\n", (int)cpu_get_reg(space->cpu, CPUINFO_INT_PC), 0x4000 + offset, data);
     }
 	else
@@ -46,7 +46,7 @@ static WRITE8_HANDLER( gmaster_io_w )
 	gmaster_state *state = space->machine->driver_data<gmaster_state>();
     if (state->machine.ports[2] & 1)
 	{
-		memory_region(space->machine, "maincpu")[0x4000 + offset] = data;
+		space->machine->region("maincpu")->base()[0x4000 + offset] = data;
 		logerror("%.4x external memory %.4x written %.2x\n", (int)cpu_get_reg(space->cpu, CPUINFO_INT_PC), 0x4000 + offset, data);
 	}
 	else
@@ -217,13 +217,13 @@ static DEVICE_IMAGE_LOAD( gmaster_cart )
 	{
 		size = image.length();
 
-		if (size > (memory_region_length(image.device().machine, "maincpu") - 0x8000))
+		if (size > (image.device().machine->region("maincpu")->bytes() - 0x8000))
 		{
 			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
 			return IMAGE_INIT_FAIL;
 		}
 
-		if (image.fread( memory_region(image.device().machine, "maincpu") + 0x8000, size) != size)
+		if (image.fread( image.device().machine->region("maincpu")->base() + 0x8000, size) != size)
 		{
 			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unable to fully read from file");
 			return IMAGE_INIT_FAIL;
@@ -233,7 +233,7 @@ static DEVICE_IMAGE_LOAD( gmaster_cart )
 	else
 	{
 		size = image.get_software_region_length("rom");
-		memcpy(memory_region(image.device().machine, "maincpu") + 0x8000, image.get_software_region("rom"), size);
+		memcpy(image.device().machine->region("maincpu")->base() + 0x8000, image.get_software_region("rom"), size);
 	}
 
 	return IMAGE_INIT_PASS;
@@ -251,32 +251,32 @@ static const UPD7810_CONFIG config = {
 };
 
 static MACHINE_CONFIG_START( gmaster, gmaster_state )
-	MDRV_CPU_ADD("maincpu", UPD7810, MAIN_XTAL/2/*?*/)
-	MDRV_CPU_PROGRAM_MAP(gmaster_mem)
-	MDRV_CPU_IO_MAP( gmaster_io)
-	MDRV_CPU_CONFIG( config )
-	MDRV_CPU_VBLANK_INT("screen", gmaster_interrupt)
+	MCFG_CPU_ADD("maincpu", UPD7810, MAIN_XTAL/2/*?*/)
+	MCFG_CPU_PROGRAM_MAP(gmaster_mem)
+	MCFG_CPU_IO_MAP( gmaster_io)
+	MCFG_CPU_CONFIG( config )
+	MCFG_CPU_VBLANK_INT("screen", gmaster_interrupt)
 
-	MDRV_SCREEN_ADD("screen", LCD)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_SIZE(64, 64)
-	MDRV_SCREEN_VISIBLE_AREA(0, 64-1-3, 0, 64-1)
-	MDRV_PALETTE_LENGTH(sizeof(gmaster_palette)/sizeof(gmaster_palette[0]))
-	MDRV_VIDEO_UPDATE(gmaster)
-	MDRV_PALETTE_INIT(gmaster)
-	MDRV_DEFAULT_LAYOUT(layout_lcd)
+	MCFG_SCREEN_ADD("screen", LCD)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_SIZE(64, 64)
+	MCFG_SCREEN_VISIBLE_AREA(0, 64-1-3, 0, 64-1)
+	MCFG_PALETTE_LENGTH(sizeof(gmaster_palette)/sizeof(gmaster_palette[0]))
+	MCFG_VIDEO_UPDATE(gmaster)
+	MCFG_PALETTE_INIT(gmaster)
+	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
-	MDRV_SPEAKER_STANDARD_MONO("speaker")
-	MDRV_SOUND_ADD("custom", GMASTER, 0)
-	MDRV_SOUND_ROUTE(0, "speaker", 0.50)
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("custom", GMASTER, 0)
+	MCFG_SOUND_ROUTE(0, "speaker", 0.50)
 
-	MDRV_CARTSLOT_ADD("cart")
-	MDRV_CARTSLOT_EXTENSION_LIST("bin")
-	MDRV_CARTSLOT_MANDATORY
-	MDRV_CARTSLOT_INTERFACE("gmaster_cart")
-	MDRV_CARTSLOT_LOAD(gmaster_cart)
-	MDRV_SOFTWARE_LIST_ADD("cart_list","gmaster")
+	MCFG_CARTSLOT_ADD("cart")
+	MCFG_CARTSLOT_EXTENSION_LIST("bin")
+	MCFG_CARTSLOT_MANDATORY
+	MCFG_CARTSLOT_INTERFACE("gmaster_cart")
+	MCFG_CARTSLOT_LOAD(gmaster_cart)
+	MCFG_SOFTWARE_LIST_ADD("cart_list","gmaster")
 MACHINE_CONFIG_END
 
 

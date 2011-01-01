@@ -929,7 +929,7 @@ static DEVICE_IMAGE_LOAD( crvision_cart )
 	UINT32 size;
 	UINT8 *temp_copy;
 	running_machine *machine = image.device().machine;
-	UINT8 *mem = memory_region(machine, M6502_TAG);
+	UINT8 *mem = machine->region(M6502_TAG)->base();
 	address_space *program = cputag_get_address_space(machine, M6502_TAG, ADDRESS_SPACE_PROGRAM);
 
 	if (image.software_entry() == NULL)
@@ -1044,41 +1044,41 @@ static DEVICE_IMAGE_LOAD( crvision_cart )
 static MACHINE_CONFIG_START( creativision, crvision_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M6502_TAG, M6502, XTAL_2MHz)
-	MDRV_CPU_PROGRAM_MAP(crvision_map)
-	MDRV_CPU_VBLANK_INT(SCREEN_TAG, crvision_int)
+	MCFG_CPU_ADD(M6502_TAG, M6502, XTAL_2MHz)
+	MCFG_CPU_PROGRAM_MAP(crvision_map)
+	MCFG_CPU_VBLANK_INT(SCREEN_TAG, crvision_int)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD(SN76489_TAG, SN76489, XTAL_2MHz)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD(SN76489_TAG, SN76489, XTAL_2MHz)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MDRV_SOUND_WAVE_ADD("wave", CASSETTE_TAG)
-	MDRV_SOUND_ROUTE(1, "mono", 0.25)
+	MCFG_SOUND_WAVE_ADD("wave", CASSETTE_TAG)
+	MCFG_SOUND_ROUTE(1, "mono", 0.25)
 
 	/* peripheral hardware */
-	MDRV_PIA6821_ADD(PIA6821_TAG, pia_intf)
+	MCFG_PIA6821_ADD(PIA6821_TAG, pia_intf)
 
 	/* cartridge */
-	MDRV_CARTSLOT_ADD("cart")
-	MDRV_CARTSLOT_EXTENSION_LIST("bin,rom")
-	MDRV_CARTSLOT_MANDATORY
-	MDRV_CARTSLOT_INTERFACE("crvision_cart")
-	MDRV_CARTSLOT_LOAD(crvision_cart)
+	MCFG_CARTSLOT_ADD("cart")
+	MCFG_CARTSLOT_EXTENSION_LIST("bin,rom")
+	MCFG_CARTSLOT_MANDATORY
+	MCFG_CARTSLOT_INTERFACE("crvision_cart")
+	MCFG_CARTSLOT_LOAD(crvision_cart)
 
 	/* software lists */
-	MDRV_SOFTWARE_LIST_ADD("cart_list","crvision")
+	MCFG_SOFTWARE_LIST_ADD("cart_list","crvision")
 
 	/* cassette */
-	MDRV_CASSETTE_ADD(CASSETTE_TAG, crvision_cassette_config)
+	MCFG_CASSETTE_ADD(CASSETTE_TAG, crvision_cassette_config)
 
 	/* printer */
-	MDRV_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
+	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
 
 	/* internal ram */
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("1K")	// MAIN RAM
-	MDRV_RAM_EXTRA_OPTIONS("15K") // 16K expansion (lower 14K available only, upper 2K shared with BIOS ROM)
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("1K")	// MAIN RAM
+	MCFG_RAM_EXTRA_OPTIONS("15K") // 16K expansion (lower 14K available only, upper 2K shared with BIOS ROM)
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------
@@ -1087,13 +1087,13 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ntsc, creativision )
 
-	MDRV_MACHINE_START(ntsc)
+	MCFG_MACHINE_START(ntsc)
 
     /* video hardware */
-	MDRV_FRAGMENT_ADD(tms9928a)
-	MDRV_SCREEN_MODIFY(SCREEN_TAG)
-	MDRV_SCREEN_REFRESH_RATE((float)XTAL_10_738635MHz/2/342/262)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_FRAGMENT_ADD(tms9928a)
+	MCFG_SCREEN_MODIFY(SCREEN_TAG)
+	MCFG_SCREEN_REFRESH_RATE((float)XTAL_10_738635MHz/2/342/262)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------
@@ -1102,13 +1102,13 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( pal, creativision )
 
-	MDRV_MACHINE_START(pal)
+	MCFG_MACHINE_START(pal)
 
 	/* video hardware */
-	MDRV_FRAGMENT_ADD(tms9928a)
-	MDRV_SCREEN_MODIFY(SCREEN_TAG)
-	MDRV_SCREEN_REFRESH_RATE((float)XTAL_10_738635MHz/2/342/313)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_FRAGMENT_ADD(tms9928a)
+	MCFG_SCREEN_MODIFY(SCREEN_TAG)
+	MCFG_SCREEN_REFRESH_RATE((float)XTAL_10_738635MHz/2/342/313)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------
@@ -1118,51 +1118,51 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( lasr2001, crvision_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M6502_TAG, M6502, 17734470/9)
-	MDRV_CPU_PROGRAM_MAP(lasr2001_map)
-	MDRV_CPU_VBLANK_INT(SCREEN_TAG, crvision_int)
+	MCFG_CPU_ADD(M6502_TAG, M6502, 17734470/9)
+	MCFG_CPU_PROGRAM_MAP(lasr2001_map)
+	MCFG_CPU_VBLANK_INT(SCREEN_TAG, crvision_int)
 
-	MDRV_MACHINE_START(lasr2001)
+	MCFG_MACHINE_START(lasr2001)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD(SN76489_TAG, SN76489A, 17734470/9)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD(SN76489_TAG, SN76489A, 17734470/9)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MDRV_SOUND_WAVE_ADD("wave", CASSETTE_TAG)
-	MDRV_SOUND_ROUTE(1, "mono", 0.25)
+	MCFG_SOUND_WAVE_ADD("wave", CASSETTE_TAG)
+	MCFG_SOUND_ROUTE(1, "mono", 0.25)
 
 	/* peripheral hardware */
-	MDRV_PIA6821_ADD(PIA6821_TAG, lasr2001_pia_intf)
+	MCFG_PIA6821_ADD(PIA6821_TAG, lasr2001_pia_intf)
 
 	/* cartridge */
-	MDRV_CARTSLOT_ADD("cart")
-	MDRV_CARTSLOT_EXTENSION_LIST("bin,rom")
-	MDRV_CARTSLOT_INTERFACE("crvision_cart")
-	MDRV_CARTSLOT_LOAD(crvision_cart)
+	MCFG_CARTSLOT_ADD("cart")
+	MCFG_CARTSLOT_EXTENSION_LIST("bin,rom")
+	MCFG_CARTSLOT_INTERFACE("crvision_cart")
+	MCFG_CARTSLOT_LOAD(crvision_cart)
 
 	/* software lists */
-	MDRV_SOFTWARE_LIST_ADD("cart_list","crvision")
+	MCFG_SOFTWARE_LIST_ADD("cart_list","crvision")
 
 	/* cassette */
-	MDRV_CASSETTE_ADD(CASSETTE_TAG, lasr2001_cassette_config)
+	MCFG_CASSETTE_ADD(CASSETTE_TAG, lasr2001_cassette_config)
 
 	/* floppy */
-	MDRV_FLOPPY_DRIVE_ADD(FLOPPY_0, lasr2001_floppy_config)
+	MCFG_FLOPPY_DRIVE_ADD(FLOPPY_0, lasr2001_floppy_config)
 
 	/* printer */
-	MDRV_CENTRONICS_ADD(CENTRONICS_TAG, lasr2001_centronics_intf)
+	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, lasr2001_centronics_intf)
 
 	/* internal ram */
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("16K")
-	MDRV_RAM_EXTRA_OPTIONS("32K")
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("16K")
+	MCFG_RAM_EXTRA_OPTIONS("32K")
 
 	/* video hardware */
-	MDRV_FRAGMENT_ADD(tms9928a)
-	MDRV_SCREEN_MODIFY(SCREEN_TAG)
-	MDRV_SCREEN_REFRESH_RATE((float)10738000/2/342/313)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_FRAGMENT_ADD(tms9928a)
+	MCFG_SCREEN_MODIFY(SCREEN_TAG)
+	MCFG_SCREEN_REFRESH_RATE((float)10738000/2/342/313)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 MACHINE_CONFIG_END
 
 /***************************************************************************

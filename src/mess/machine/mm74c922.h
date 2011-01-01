@@ -44,13 +44,13 @@
 DECLARE_LEGACY_DEVICE(MM74C922, mm74c922);
 DECLARE_LEGACY_DEVICE(MM74C923, mm74c923);
 
-#define MDRV_MM74C922_ADD(_tag, _intrf) \
-	MDRV_DEVICE_ADD(_tag, MM74C922, 0) \
-	MDRV_DEVICE_CONFIG(_intrf)
+#define MCFG_MM74C922_ADD(_tag, _intrf) \
+	MCFG_DEVICE_ADD(_tag, MM74C922, 0) \
+	MCFG_DEVICE_CONFIG(_intrf)
 
-#define MDRV_MM74C923_ADD(_tag, _intrf) \
-	MDRV_DEVICE_ADD(_tag, MM74C923, 0) \
-	MDRV_DEVICE_CONFIG(_intrf)
+#define MCFG_MM74C923_ADD(_tag, _intrf) \
+	MCFG_DEVICE_ADD(_tag, MM74C923, 0) \
+	MCFG_DEVICE_CONFIG(_intrf)
 
 #define MM74C922_INTERFACE(name) \
 	const mm74c922_interface (name)=

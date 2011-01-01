@@ -96,7 +96,7 @@ static WRITE8_DEVICE_HANDLER(COPS_via_out_a);
 static WRITE8_DEVICE_HANDLER(COPS_via_out_b);
 static WRITE8_DEVICE_HANDLER(COPS_via_out_ca2);
 static WRITE8_DEVICE_HANDLER(COPS_via_out_cb2);
-static void COPS_via_irq_func(running_device *device, int val);
+static void COPS_via_irq_func(device_t *device, int val);
 static READ8_DEVICE_HANDLER(parallel_via_in_b);
 
 
@@ -762,11 +762,11 @@ static WRITE8_DEVICE_HANDLER(COPS_via_out_b)
 
 static WRITE8_DEVICE_HANDLER(COPS_via_out_cb2)
 {
-	running_device *speaker = device->machine->device("speaker");
+	device_t *speaker = device->machine->device("speaker");
 	speaker_level_w(speaker, data);
 }
 
-static void COPS_via_irq_func(running_device *device, int val)
+static void COPS_via_irq_func(device_t *device, int val)
 {
 	lisa_state *state = device->machine->driver_data<lisa_state>();
 	if (state->KBIR != val)
@@ -1002,8 +1002,8 @@ void init_lisa1(void)
 DRIVER_INIT( lisa2 )
 {
 	lisa_state *state = machine->driver_data<lisa_state>();
-	state->ram_ptr = memory_region(machine, "maincpu") + RAM_OFFSET;
-	state->rom_ptr = memory_region(machine, "maincpu") + ROM_OFFSET;
+	state->ram_ptr = machine->region("maincpu")->base() + RAM_OFFSET;
+	state->rom_ptr = machine->region("maincpu")->base() + ROM_OFFSET;
 	state->model = lisa2;
 	state->features.has_fast_timers = 0;
 	state->features.floppy_hardware = sony_lisa2;
@@ -1016,8 +1016,8 @@ DRIVER_INIT( lisa2 )
 DRIVER_INIT( lisa210 )
 {
 	lisa_state *state = machine->driver_data<lisa_state>();
-	state->ram_ptr = memory_region(machine, "maincpu") + RAM_OFFSET;
-	state->rom_ptr = memory_region(machine, "maincpu") + ROM_OFFSET;
+	state->ram_ptr = machine->region("maincpu")->base() + RAM_OFFSET;
+	state->rom_ptr = machine->region("maincpu")->base() + ROM_OFFSET;
 	state->model = lisa210;
 	state->features.has_fast_timers = 1;
 	state->features.floppy_hardware = sony_lisa210;
@@ -1030,8 +1030,8 @@ DRIVER_INIT( lisa210 )
 DRIVER_INIT( mac_xl )
 {
 	lisa_state *state = machine->driver_data<lisa_state>();
-	state->ram_ptr = memory_region(machine, "maincpu") + RAM_OFFSET;
-	state->rom_ptr = memory_region(machine, "maincpu") + ROM_OFFSET;
+	state->ram_ptr = machine->region("maincpu")->base() + RAM_OFFSET;
+	state->rom_ptr = machine->region("maincpu")->base() + ROM_OFFSET;
 	state->model = mac_xl;
 	state->features.has_fast_timers = 1;
 	state->features.floppy_hardware = sony_lisa210;
@@ -1053,9 +1053,9 @@ MACHINE_START( lisa )
 MACHINE_RESET( lisa )
 {
 	lisa_state *state = machine->driver_data<lisa_state>();
-	state->ram_ptr = memory_region(machine, "maincpu") + RAM_OFFSET;
-	state->rom_ptr = memory_region(machine, "maincpu") + ROM_OFFSET;
-	state->videoROM_ptr = memory_region(machine, "gfx1");
+	state->ram_ptr = machine->region("maincpu")->base() + RAM_OFFSET;
+	state->rom_ptr = machine->region("maincpu")->base() + ROM_OFFSET;
+	state->videoROM_ptr = machine->region("gfx1")->base();
 
 //	cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(lisa_OPbaseoverride, *machine));
 //	m68k_set_reset_callback(machine->device("maincpu"), /*lisa_reset_instr_callback*/NULL);
@@ -1226,7 +1226,7 @@ INLINE void lisa_fdc_ttl_glue_access(running_machine *machine, offs_t offset)
 			state->MT1 = offset & 1;
 			if (state->MT1 && ! oldMT1)
 			{
-				running_device *fdc = machine->device("fdc");
+				device_t *fdc = machine->device("fdc");
 
 				state->PWM_floppy_motor_speed = (state->PWM_floppy_motor_speed << 1) & 0xff;
 				if (applefdc_get_lines(fdc) & APPLEFDC_PH0)
@@ -1263,7 +1263,7 @@ INLINE void lisa_fdc_ttl_glue_access(running_machine *machine, offs_t offset)
 READ8_HANDLER ( lisa_fdc_io_r )
 {
 	int answer=0;
-	running_device *fdc = space->machine->device("fdc");
+	device_t *fdc = space->machine->device("fdc");
 
 	switch ((offset & 0x0030) >> 4)
 	{
@@ -1291,7 +1291,7 @@ READ8_HANDLER ( lisa_fdc_io_r )
 WRITE8_HANDLER ( lisa_fdc_io_w )
 {
 	lisa_state *state = space->machine->driver_data<lisa_state>();
-	running_device *fdc = space->machine->device("fdc");
+	device_t *fdc = space->machine->device("fdc");
 
 	switch ((offset & 0x0030) >> 4)
 	{

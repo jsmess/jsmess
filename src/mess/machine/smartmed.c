@@ -119,7 +119,7 @@ struct _smartmedia_t
 };
 
 
-INLINE smartmedia_t *get_safe_token(running_device *device)
+INLINE smartmedia_t *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == SMARTMEDIA);
@@ -329,13 +329,13 @@ static DEVICE_IMAGE_UNLOAD( smartmedia )
 	return;
 }
 
-int smartmedia_present(running_device *device)
+int smartmedia_present(device_t *device)
 {
 	smartmedia_t *sm = get_safe_token(device);
 	return sm->num_pages != 0;
 }
 
-int smartmedia_protected(running_device *device)
+int smartmedia_protected(device_t *device)
 {
 	smartmedia_t *sm = get_safe_token(device);
 	return (sm->status & 0x80) != 0;
@@ -344,7 +344,7 @@ int smartmedia_protected(running_device *device)
 /*
     write a byte to SmartMedia command port
 */
-void smartmedia_command_w(running_device *device, UINT8 data)
+void smartmedia_command_w(device_t *device, UINT8 data)
 {
 	smartmedia_t *sm = get_safe_token(device);
 
@@ -471,7 +471,7 @@ void smartmedia_command_w(running_device *device, UINT8 data)
 /*
     write a byte to SmartMedia address port
 */
-void smartmedia_address_w(running_device *device, UINT8 data)
+void smartmedia_address_w(device_t *device, UINT8 data)
 {
 	smartmedia_t *sm = get_safe_token(device);
 
@@ -529,7 +529,7 @@ void smartmedia_address_w(running_device *device, UINT8 data)
 /*
     read a byte from SmartMedia data port
 */
-UINT8 smartmedia_data_r(running_device *device)
+UINT8 smartmedia_data_r(device_t *device)
 {
 	UINT8 reply = 0;
 	smartmedia_t *sm = get_safe_token(device);
@@ -579,7 +579,7 @@ UINT8 smartmedia_data_r(running_device *device)
 /*
     write a byte to SmartMedia data port
 */
-void smartmedia_data_w(running_device *device, UINT8 data)
+void smartmedia_data_w(device_t *device, UINT8 data)
 {
 	smartmedia_t *sm = get_safe_token(device);
 

@@ -170,7 +170,7 @@ static void pokemini_check_irqs( running_machine *machine )
 static void pokemini_update_sound( running_machine *machine )
 {
 	pokemini_state *state = machine->driver_data<pokemini_state>();
-	running_device *speaker = machine->device("speaker");
+	device_t *speaker = machine->device("speaker");
 	/* Check if sound should be muted */
 	if ( state->pm_reg[0x70] & 0x03 )
 	{
@@ -1399,7 +1399,7 @@ DEVICE_IMAGE_LOAD( pokemini_cart )
 		image.fseek(0x2100, SEEK_SET);
 		size -= 0x2100;
 
-		if (size != image.fread( memory_region(image.device().machine, "maincpu") + 0x2100, size))
+		if (size != image.fread( image.device().machine->region("maincpu")->base() + 0x2100, size))
 		{
 			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Error occured while reading ROM image");
 			return IMAGE_INIT_FAIL;
@@ -1409,7 +1409,7 @@ DEVICE_IMAGE_LOAD( pokemini_cart )
 	{
 		UINT8 *cart_rom = image.get_software_region("rom");
 		UINT32 cart_rom_size = image.get_software_region_length("rom");
-		memcpy(memory_region(image.device().machine, "maincpu") + 0x2100, cart_rom + 0x2100, cart_rom_size - 0x2100);
+		memcpy(image.device().machine->region("maincpu")->base() + 0x2100, cart_rom + 0x2100, cart_rom_size - 0x2100);
 	}
 
 	return IMAGE_INIT_PASS;

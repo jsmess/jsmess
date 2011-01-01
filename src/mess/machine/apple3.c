@@ -25,7 +25,7 @@
 #include "devices/messram.h"
 
 
-static void apple3_update_drives(running_device *device);
+static void apple3_update_drives(device_t *device);
 
 
 #define LOG_MEMORY		1
@@ -104,8 +104,8 @@ static void apple3_profile_w(apple3_state *state, offs_t offset, UINT8 data)
 static READ8_HANDLER( apple3_c0xx_r )
 {
 	apple3_state *state = space->machine->driver_data<apple3_state>();
-	running_device *acia = space->machine->device("acia");
-	running_device *fdc = space->machine->device("fdc");
+	device_t *acia = space->machine->device("acia");
+	device_t *fdc = space->machine->device("fdc");
 	UINT8 result = 0xFF;
 
 	switch(offset)
@@ -190,8 +190,8 @@ static READ8_HANDLER( apple3_c0xx_r )
 static WRITE8_HANDLER( apple3_c0xx_w )
 {
 	apple3_state *state = space->machine->driver_data<apple3_state>();
-	running_device *acia = space->machine->device("acia");
-	running_device *fdc = space->machine->device("fdc");
+	device_t *acia = space->machine->device("acia");
+	device_t *fdc = space->machine->device("fdc");
 	switch(offset)
 	{
 		case 0x10: case 0x11: case 0x12: case 0x13:
@@ -440,14 +440,14 @@ static void apple3_update_memory(running_machine *machine)
 	else
 		memory_install_write_bank(space, 0xF000, 0xFFFF, 0, 0, "bank7");
 	if (state->via_0_a & 0x01)
-		memory_set_bankptr(machine,"bank7", memory_region(machine, "maincpu"));
+		memory_set_bankptr(machine,"bank7", machine->region("maincpu")->base());
 	else
 		apple3_setbank(machine,"bank7", ~0, 0x7000);
 
 	/* reinstall VIA handlers */
 	{
-		running_device *via_0 = space->machine->device("via6522_0");
-		running_device *via_1 = space->machine->device("via6522_1");
+		device_t *via_0 = space->machine->device("via6522_0");
+		device_t *via_1 = space->machine->device("via6522_1");
 
         space->install_handler(0xFFD0, 0xFFDF, 0, 0, read8_delegate_create(via6522_device, read, *via_0), write8_delegate_create(via6522_device, write, *via_0));
 		space->install_handler(0xFFE0, 0xFFEF, 0, 0, read8_delegate_create(via6522_device, read, *via_1), write8_delegate_create(via6522_device, write, *via_1));
@@ -494,7 +494,7 @@ static WRITE8_DEVICE_HANDLER(apple3_via_1_out_b)
 	apple3_via_out(device->machine, &state->via_1_b, data);
 }
 
-static void apple2_via_1_irq_func(running_device *device, int state)
+static void apple2_via_1_irq_func(device_t *device, int state)
 {
 	apple3_state *drvstate = device->machine->driver_data<apple3_state>();
 	if (!drvstate->via_1_irq && state)
@@ -634,7 +634,7 @@ READ8_HANDLER( apple3_indexed_read )
 	else if (addr != (UINT8 *) ~0)
 		result = *addr;
 	else
-		result = memory_region(space->machine, "maincpu")[offset % memory_region_length(space->machine, "maincpu")];
+		result = space->machine->region("maincpu")->base()[offset % space->machine->region("maincpu")->bytes()];
 	return result;
 }
 
@@ -668,7 +668,7 @@ DIRECT_UPDATE_HANDLER( apple3_opbase )
 
 
 
-static void apple3_update_drives(running_device *device)
+static void apple3_update_drives(device_t *device)
 {
 	apple3_state *state = device->machine->driver_data<apple3_state>();
 	int enable_mask = 0x00;
@@ -697,7 +697,7 @@ static void apple3_update_drives(running_device *device)
 
 
 
-static void apple3_set_enable_lines(running_device *device,int enable_mask)
+static void apple3_set_enable_lines(device_t *device,int enable_mask)
 {
 	apple3_state *state = device->machine->driver_data<apple3_state>();
 	state->enable_mask = enable_mask;
@@ -720,7 +720,7 @@ DRIVER_INIT( apple3 )
 {
 	apple3_state *state = machine->driver_data<apple3_state>();
 	/* hack to get around VIA problem */
-	memory_region(machine, "maincpu")[0x0685] = 0x00;
+	machine->region("maincpu")->base()[0x0685] = 0x00;
 
 	state->enable_mask = 0;
 	apple3_update_drives(machine->device("fdc"));

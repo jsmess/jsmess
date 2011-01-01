@@ -42,14 +42,14 @@ struct _ay3600_t
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE ay3600_t *get_safe_token(running_device *device)
+INLINE ay3600_t *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 
 	return (ay3600_t *)downcast<legacy_device_base *>(device)->token();
 }
 
-INLINE const ay3600_interface *get_interface(running_device *device)
+INLINE const ay3600_interface *get_interface(device_t *device)
 {
 	assert(device != NULL);
 	assert((device->type() == AY3600PRO002));
@@ -66,7 +66,7 @@ INLINE const ay3600_interface *get_interface(running_device *device)
 
 static TIMER_CALLBACK( ay3600_scan_tick )
 {
-	running_device *device = (running_device *)ptr;
+	device_t *device = (device_t *)ptr;
 	ay3600_t *ay3600 = get_safe_token(device);
 	const ay3600_interface *intf = get_interface(device);
 
@@ -121,7 +121,7 @@ static TIMER_CALLBACK( ay3600_scan_tick )
     ay3600_b_r - keyboard data read
 -------------------------------------------------*/
 
-UINT16 ay3600_b_r(running_device *device)
+UINT16 ay3600_b_r(device_t *device)
 {
 	ay3600_t *ay3600 = get_safe_token(device);
 

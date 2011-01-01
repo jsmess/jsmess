@@ -31,7 +31,7 @@
 
 /* timer to read cassette waveforms */
 
-static running_device *cassette_device_image(running_machine *machine)
+static device_t *cassette_device_image(running_machine *machine)
 {
 	z80ne_state *state = machine->driver_data<z80ne_state>();
 	if (state->lx385_ctrl & 0x08)
@@ -80,7 +80,7 @@ static TIMER_CALLBACK(z80ne_cassette_tc)
 DRIVER_INIT( z80ne )
 {
 	/* first two entries point to rom on reset */
-	UINT8 *RAM = memory_region(machine, "z80ne");
+	UINT8 *RAM = machine->region("z80ne")->base();
 	memory_configure_bank(machine, "bank1", 0, 1, &RAM[0x00000], 0x0400); /* RAM   at 0x0000 */
 	memory_configure_bank(machine, "bank1", 1, 1, &RAM[0x14000], 0x0400); /* ep382 at 0x0000 */
 	memory_configure_bank(machine, "bank2", 0, 1, &RAM[0x14000], 0x0400); /* ep382 at 0x8000 */
@@ -98,7 +98,7 @@ DRIVER_INIT( z80netb )
 DRIVER_INIT( z80netf )
 {
 	/* first two entries point to rom on reset */
-	UINT8 *RAM = memory_region(machine, "z80ne");
+	UINT8 *RAM = machine->region("z80ne")->base();
 	memory_configure_bank(machine, "bank1", 0, 1, &RAM[0x00000], 0x0400); /* RAM   at 0x0000-0x03FF */
 	memory_configure_bank(machine, "bank1", 1, 3, &RAM[0x14400], 0x0400); /* ep390, ep1390, ep2390 at 0x0000-0x03FF */
 	memory_configure_bank(machine, "bank1", 4, 1, &RAM[0x14000], 0x0400); /* ep382 at 0x0000-0x03FF */
@@ -639,7 +639,7 @@ READ8_DEVICE_HANDLER( lx388_mc6847_videoram_r )
 
 VIDEO_UPDATE( lx388 )
 {
-	running_device *mc6847 = screen->machine->device("mc6847");
+	device_t *mc6847 = screen->machine->device("mc6847");
 	return mc6847_update(mc6847, bitmap, cliprect);
 }
 
@@ -655,7 +655,7 @@ READ8_HANDLER(lx388_data_r)
 
 READ8_HANDLER( lx388_read_field_sync )
 {
-	running_device *mc6847 = space->machine->device("mc6847");
+	device_t *mc6847 = space->machine->device("mc6847");
 	return mc6847_fs_r(mc6847) << 7;
 }
 

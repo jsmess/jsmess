@@ -51,7 +51,7 @@ typedef struct _ti99_fdc_state
 	emu_timer			*motor_on_timer;
 
 	/* Link to the FDC1771 controller on the board. */
-	running_device		*controller;
+	device_t		*controller;
 
 	/* DSR ROM */
 	UINT8				*rom;
@@ -70,7 +70,7 @@ the controller. */
 #define PFLOPPY_1 "peribox:floppy1"
 #define PFLOPPY_2 "peribox:floppy2"
 
-INLINE ti99_fdc_state *get_safe_token(running_device *device)
+INLINE ti99_fdc_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	return (ti99_fdc_state *)downcast<legacy_device_base *>(device)->token();
@@ -85,7 +85,7 @@ INLINE ti99_fdc_state *get_safe_token(running_device *device)
     TODO: This has to be replaced by the proper READY handling that is already
     prepared here. (Requires READY handling by the CPU.)
 */
-static void fdc_handle_hold(running_device *device)
+static void fdc_handle_hold(device_t *device)
 {
 	ti99_fdc_state *card = get_safe_token(device);
 	line_state state;
@@ -104,7 +104,7 @@ static void fdc_handle_hold(running_device *device)
     the default implementation sets the drive geometry to the geometry
     of the medium.
 */
-static void set_geometry(running_device *drive, floppy_type_t type)
+static void set_geometry(device_t *drive, floppy_type_t type)
 {
 	if (drive!=NULL)
 		floppy_drive_set_geometry(drive, type);
@@ -112,7 +112,7 @@ static void set_geometry(running_device *drive, floppy_type_t type)
 		logerror("ti99/FDC: Drive not found\n");
 }
 
-static void set_all_geometries(running_device *device, floppy_type_t type)
+static void set_all_geometries(device_t *device, floppy_type_t type)
 {
 	set_geometry(device->machine->device(PFLOPPY_0), type);
 	set_geometry(device->machine->device(PFLOPPY_1), type);
@@ -274,7 +274,7 @@ static WRITE8_DEVICE_HANDLER( data_w )
 */
 static WRITE_LINE_DEVICE_HANDLER( ti_fdc_intrq_w )
 {
-	running_device *carddev = device->owner();
+	device_t *carddev = device->owner();
 	ti99_fdc_state *card = get_safe_token(carddev);
 
 	if (state)
@@ -294,7 +294,7 @@ static WRITE_LINE_DEVICE_HANDLER( ti_fdc_intrq_w )
 
 static WRITE_LINE_DEVICE_HANDLER( ti_fdc_drq_w )
 {
-	running_device *carddev = device->owner();
+	device_t *carddev = device->owner();
 	ti99_fdc_state *card = get_safe_token(carddev);
 
 	if (state)
@@ -310,7 +310,7 @@ static WRITE_LINE_DEVICE_HANDLER( ti_fdc_drq_w )
 */
 static TIMER_CALLBACK(motor_on_timer_callback)
 {
-	running_device *device = (running_device *)ptr;
+	device_t *device = (device_t *)ptr;
 	ti99_fdc_state *card = get_safe_token(device);
 	card->DVENA = 0;
 	fdc_handle_hold(device);
@@ -346,7 +346,7 @@ static DEVICE_START( ti99_fdc )
 
 	astring *region = new astring();
 	astring_assemble_3(region, device->tag(), ":", fdc_region);
-	card->rom = memory_region(device->machine, astring_c(region));
+	card->rom = device->machine->region(astring_c(region))->base();
 	card->controller = device->subdevice("fd1771");
 }
 
@@ -362,7 +362,7 @@ static DEVICE_RESET( ti99_fdc )
 	/* If the card is selected in the menu, register the card */
 	if (input_port_read(device->machine, "DISKCTRL") == DISK_TIFDC)
 	{
-		running_device *peb = device->owner();
+		device_t *peb = device->owner();
 		int success = mount_card(peb, device, &fdc_card, get_pebcard_config(device)->slot);
 		if (!success) return;
 
@@ -390,7 +390,7 @@ static WRITE_LINE_DEVICE_HANDLER( ti99_fdc_ready )
 #endif
 
 MACHINE_CONFIG_FRAGMENT( ti99_fdc )
-	MDRV_WD1771_ADD("fd1771", ti_wd17xx_interface )
+	MCFG_WD1771_ADD("fd1771", ti_wd17xx_interface )
 MACHINE_CONFIG_END
 
 ROM_START( ti99_fdc )

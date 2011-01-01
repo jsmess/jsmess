@@ -584,90 +584,90 @@ MACHINE_RESET( ti99_8 )
 static MACHINE_CONFIG_START( ti99_8_60hz, ti99_8_state )
 	/* basic machine hardware */
 	/* TMS9995-MP9537 CPU @ 10.7 MHz */
-	MDRV_CPU_ADD("maincpu", TMS9995, 10738635)
-	MDRV_CPU_CONFIG(ti99_8_processor_config)
-	MDRV_CPU_PROGRAM_MAP(ti99_8_memmap)
-	MDRV_CPU_IO_MAP(ti99_8_cru_map)
-	MDRV_CPU_VBLANK_INT("screen", ti99_vblank_interrupt)
+	MCFG_CPU_ADD("maincpu", TMS9995, 10738635)
+	MCFG_CPU_CONFIG(ti99_8_processor_config)
+	MCFG_CPU_PROGRAM_MAP(ti99_8_memmap)
+	MCFG_CPU_IO_MAP(ti99_8_cru_map)
+	MCFG_CPU_VBLANK_INT("screen", ti99_vblank_interrupt)
 
-	MDRV_MACHINE_RESET( ti99_8 )
+	MCFG_MACHINE_RESET( ti99_8 )
 
 	/* video hardware */
-	MDRV_TI_TMS991x_ADD("video", tms9928a, 60, "screen", 2500, &tms9118_interface)
+	MCFG_TI_TMS991x_ADD("video", tms9928a, 60, "screen", 2500, &tms9118_interface)
 
-	MDRV_GFXDECODE(ti99_8)
+	MCFG_GFXDECODE(ti99_8)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_WAVE_ADD("wave", "cassette")
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
-	MDRV_SOUND_ADD("soundgen", SN76496, 3579545)	/* 3.579545 MHz */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_WAVE_ADD("wave", "cassette")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+	MCFG_SOUND_ADD("soundgen", SN76496, 3579545)	/* 3.579545 MHz */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
-	MDRV_TISPEECH_ADD("speech")
+	MCFG_TISPEECH_ADD("speech")
 
-	MDRV_TI998_BOARD_ADD( "ti_board" )
-	MDRV_MAPPER8_ADD( "mapper", mapper_devices )
+	MCFG_TI998_BOARD_ADD( "ti_board" )
+	MCFG_MAPPER8_ADD( "mapper", mapper_devices )
 
 	/* tms9901 */
-	MDRV_TMS9901_ADD("tms9901", tms9901_wiring_ti99_8)
+	MCFG_TMS9901_ADD("tms9901", tms9901_wiring_ti99_8)
 
-	MDRV_CRUBUS_ADD( "crubus", cru_devices)
+	MCFG_CRUBUS_ADD( "crubus", cru_devices)
 
-	MDRV_GROM_ADD( "grom_0", 0, region_grom, 0x0000, 0x1800, console_ready )
-	MDRV_GROM_ADD( "grom_1", 1, region_grom, 0x2000, 0x1800, console_ready )
-	MDRV_GROM_ADD( "grom_2", 2, region_grom, 0x4000, 0x1800, console_ready )
+	MCFG_GROM_ADD( "grom_0", 0, region_grom, 0x0000, 0x1800, console_ready )
+	MCFG_GROM_ADD( "grom_1", 1, region_grom, 0x2000, 0x1800, console_ready )
+	MCFG_GROM_ADD( "grom_2", 2, region_grom, 0x4000, 0x1800, console_ready )
 
-	MDRV_PBOX8_ADD( "peribox", console_extint, console_notconnected, console_ready )
-	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )
+	MCFG_PBOX8_ADD( "peribox", console_extint, console_notconnected, console_ready )
+	MCFG_CASSETTE_ADD( "cassette", default_cassette_config )
 
-	MDRV_TI99_GROMPORT_ADD( "gromport", console_ready )
-	MDRV_MECMOUSE_ADD( "mecmouse" )
+	MCFG_TI99_GROMPORT_ADD( "gromport", console_ready )
+	MCFG_MECMOUSE_ADD( "mecmouse" )
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_START( ti99_8_50hz, ti99_8_state )
 	/* basic machine hardware */
 	/* TMS9995-MP9537 CPU @ 10.7 MHz */
-	MDRV_CPU_ADD("maincpu", TMS9995, 10738635)
-	MDRV_CPU_CONFIG(ti99_8_processor_config)
-	MDRV_CPU_PROGRAM_MAP(ti99_8_memmap)
-	MDRV_CPU_IO_MAP(ti99_8_cru_map)
-	MDRV_CPU_VBLANK_INT("screen", ti99_vblank_interrupt)
+	MCFG_CPU_ADD("maincpu", TMS9995, 10738635)
+	MCFG_CPU_CONFIG(ti99_8_processor_config)
+	MCFG_CPU_PROGRAM_MAP(ti99_8_memmap)
+	MCFG_CPU_IO_MAP(ti99_8_cru_map)
+	MCFG_CPU_VBLANK_INT("screen", ti99_vblank_interrupt)
 
-	MDRV_MACHINE_RESET( ti99_8 )
+	MCFG_MACHINE_RESET( ti99_8 )
 
 	/* video hardware */
-	MDRV_TI_TMS991x_ADD("video", tms9928a, 50, "screen", 2500, &tms9129_interface)
+	MCFG_TI_TMS991x_ADD("video", tms9928a, 50, "screen", 2500, &tms9129_interface)
 
-	MDRV_GFXDECODE(ti99_8)
+	MCFG_GFXDECODE(ti99_8)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_WAVE_ADD("wave", "cassette")
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
-	MDRV_SOUND_ADD("soundgen", SN76496, 3579545)	/* 3.579545 MHz */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_WAVE_ADD("wave", "cassette")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+	MCFG_SOUND_ADD("soundgen", SN76496, 3579545)	/* 3.579545 MHz */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
-	MDRV_TISPEECH_ADD("speech")
+	MCFG_TISPEECH_ADD("speech")
 
-	MDRV_TI998_BOARD_ADD( "ti_board" )
-	MDRV_MAPPER8_ADD( "mapper", mapper_devices )
+	MCFG_TI998_BOARD_ADD( "ti_board" )
+	MCFG_MAPPER8_ADD( "mapper", mapper_devices )
 
 	/* tms9901 */
-	MDRV_TMS9901_ADD("tms9901", tms9901_wiring_ti99_8)
+	MCFG_TMS9901_ADD("tms9901", tms9901_wiring_ti99_8)
 
-	MDRV_CRUBUS_ADD( "crubus", cru_devices)
+	MCFG_CRUBUS_ADD( "crubus", cru_devices)
 
-	MDRV_GROM_ADD( "grom_0", 0, region_grom, 0x0000, 0x1800, console_ready )
-	MDRV_GROM_ADD( "grom_1", 1, region_grom, 0x2000, 0x1800, console_ready )
-	MDRV_GROM_ADD( "grom_2", 2, region_grom, 0x4000, 0x1800, console_ready )
+	MCFG_GROM_ADD( "grom_0", 0, region_grom, 0x0000, 0x1800, console_ready )
+	MCFG_GROM_ADD( "grom_1", 1, region_grom, 0x2000, 0x1800, console_ready )
+	MCFG_GROM_ADD( "grom_2", 2, region_grom, 0x4000, 0x1800, console_ready )
 
-	MDRV_PBOX8_ADD( "peribox", console_extint, console_notconnected, console_ready )
-	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )
+	MCFG_PBOX8_ADD( "peribox", console_extint, console_notconnected, console_ready )
+	MCFG_CASSETTE_ADD( "cassette", default_cassette_config )
 
-	MDRV_TI99_GROMPORT_ADD( "gromport", console_ready )
-	MDRV_MECMOUSE_ADD( "mecmouse" )
+	MCFG_TI99_GROMPORT_ADD( "gromport", console_ready )
+	MCFG_MECMOUSE_ADD( "mecmouse" )
 MACHINE_CONFIG_END
 
 /*

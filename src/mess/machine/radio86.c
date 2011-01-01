@@ -28,7 +28,7 @@ void radio86_init_keyboard(running_machine *machine)
 DRIVER_INIT(radio86)
 {
 	/* set initialy ROM to be visible on first bank */
-	UINT8 *RAM = memory_region(machine, "maincpu");
+	UINT8 *RAM = machine->region("maincpu")->base();
 	memset(RAM,0x0000,0x1000); // make frist page empty by default
 	memory_configure_bank(machine, "bank1", 1, 2, RAM, 0x0000);
 	memory_configure_bank(machine, "bank1", 0, 2, RAM, 0xf800);
@@ -197,7 +197,7 @@ WRITE8_HANDLER ( radio86_pagesel )
 static READ8_DEVICE_HANDLER (radio86_romdisk_porta_r )
 {
 	radio86_state *state = device->machine->driver_data<radio86_state>();
-	UINT8 *romdisk = memory_region(device->machine, "maincpu") + 0x10000;
+	UINT8 *romdisk = device->machine->region("maincpu")->base() + 0x10000;
 	if ((state->disk_sel & 0x0f) ==0) {
 		return romdisk[state->romdisk_msb*256+state->romdisk_lsb];
 	} else {

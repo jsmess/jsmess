@@ -38,9 +38,9 @@ struct FMSCSIinterface
 	devcb_write_line drq_callback;	/* drq callback */
 };
 
-#define MDRV_FMSCSI_ADD(_tag, _intrf) \
-    MDRV_DEVICE_ADD(_tag, FMSCSI, 0) \
-    MDRV_DEVICE_CONFIG(_intrf)
+#define MCFG_FMSCSI_ADD(_tag, _intrf) \
+    MCFG_DEVICE_ADD(_tag, FMSCSI, 0) \
+    MCFG_DEVICE_CONFIG(_intrf)
 
 class fmscsi_device_config : public device_config, public FMSCSIinterface
 {

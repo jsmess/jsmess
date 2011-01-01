@@ -210,7 +210,7 @@ static void scorpion_update_memory(running_machine *machine)
 			state->ROMSelection = ((state->port_7ffd_data>>4) & 0x01) ? 1 : 0;
 		}
 		memory_unmap_write(space, 0x0000, 0x3fff, 0, 0);
-		memory_set_bankptr(machine, "bank1", memory_region(machine, "maincpu") + 0x010000 + (state->ROMSelection<<14));
+		memory_set_bankptr(machine, "bank1", machine->region("maincpu")->base() + 0x010000 + (state->ROMSelection<<14));
 	}
 
 
@@ -219,7 +219,7 @@ static void scorpion_update_memory(running_machine *machine)
 DIRECT_UPDATE_HANDLER( scorpion_direct )
 {
 	spectrum_state *state = machine->driver_data<spectrum_state>();
-	running_device *beta = machine->device(BETA_DISK_TAG);
+	device_t *beta = machine->device(BETA_DISK_TAG);
 	UINT16 pc = cpu_get_reg(machine->device("maincpu"), STATE_GENPCBASE);
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
@@ -230,7 +230,7 @@ DIRECT_UPDATE_HANDLER( scorpion_direct )
 			state->ROMSelection = ((state->port_7ffd_data>>4) & 0x01) ? 1 : 0;
 			betadisk_disable(beta);
 			memory_unmap_write(space, 0x0000, 0x3fff, 0, 0);
-			memory_set_bankptr(machine, "bank1", memory_region(machine, "maincpu") + 0x010000 + (state->ROMSelection<<14));
+			memory_set_bankptr(machine, "bank1", machine->region("maincpu")->base() + 0x010000 + (state->ROMSelection<<14));
 		}
 	}
 	else if (((pc & 0xff00) == 0x3d00) && (state->ROMSelection==1))
@@ -241,8 +241,8 @@ DIRECT_UPDATE_HANDLER( scorpion_direct )
 	if((address>=0x0000) && (address<=0x3fff))
 	{
 		memory_unmap_write(space, 0x0000, 0x3fff, 0, 0);
-		direct.explicit_configure(0x0000, 0x3fff, 0x3fff, memory_region(space->machine, "maincpu") + 0x010000 + (state->ROMSelection<<14));
-		memory_set_bankptr(machine, "bank1", memory_region(space->machine, "maincpu") + 0x010000 + (state->ROMSelection<<14));
+		direct.explicit_configure(0x0000, 0x3fff, 0x3fff, space->machine->region("maincpu")->base() + 0x010000 + (state->ROMSelection<<14));
+		memory_set_bankptr(machine, "bank1", space->machine->region("maincpu")->base() + 0x010000 + (state->ROMSelection<<14));
 		return ~0;
 	}
 	return address;
@@ -306,7 +306,7 @@ static MACHINE_RESET( scorpion )
 {
 	spectrum_state *state = machine->driver_data<spectrum_state>();
 	UINT8 *messram = messram_get_ptr(machine->device("messram"));
-	running_device *beta = machine->device(BETA_DISK_TAG);
+	device_t *beta = machine->device(BETA_DISK_TAG);
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	memory_install_read_bank (space, 0x0000, 0x3fff, 0, 0, "bank1");
@@ -389,26 +389,26 @@ static GFXDECODE_START( quorum )
 GFXDECODE_END
 
 static MACHINE_CONFIG_DERIVED( scorpion, spectrum_128 )
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(scorpion_io)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_IO_MAP(scorpion_io)
 
-	MDRV_MACHINE_START( scorpion )
-	MDRV_MACHINE_RESET( scorpion )
-	MDRV_GFXDECODE(scorpion)
+	MCFG_MACHINE_START( scorpion )
+	MCFG_MACHINE_RESET( scorpion )
+	MCFG_GFXDECODE(scorpion)
 
-	MDRV_BETA_DISK_ADD(BETA_DISK_TAG)
+	MCFG_BETA_DISK_ADD(BETA_DISK_TAG)
 
 	/* internal ram */
-	MDRV_RAM_MODIFY("messram")
-	MDRV_RAM_DEFAULT_SIZE("256K")
+	MCFG_RAM_MODIFY("messram")
+	MCFG_RAM_DEFAULT_SIZE("256K")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( profi, scorpion )
-	MDRV_GFXDECODE(profi)
+	MCFG_GFXDECODE(profi)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( quorum, scorpion )
-	MDRV_GFXDECODE(quorum)
+	MCFG_GFXDECODE(quorum)
 MACHINE_CONFIG_END
 
 

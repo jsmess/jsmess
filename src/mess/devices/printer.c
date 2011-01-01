@@ -20,7 +20,7 @@
     is ready
 -------------------------------------------------*/
 
-int printer_is_ready(running_device *printer)
+int printer_is_ready(device_t *printer)
 {
 	device_image_interface *image = dynamic_cast<device_image_interface *>(printer);
 	/* if there is a file attached to it, it's online */
@@ -33,7 +33,7 @@ int printer_is_ready(running_device *printer)
     printer_output - outputs data to a printer
 -------------------------------------------------*/
 
-void printer_output(running_device *printer, UINT8 data)
+void printer_output(device_t *printer, UINT8 data)
 {
 	device_image_interface *image = dynamic_cast<device_image_interface *>(printer);
 	if (image->exists())

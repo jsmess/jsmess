@@ -16,7 +16,7 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef void (*online_func)(running_device *device, int state);
+typedef void (*online_func)(device_t *device, int state);
 
 typedef struct _printer_config printer_config;
 struct _printer_config
@@ -28,11 +28,11 @@ struct _printer_config
 DECLARE_LEGACY_IMAGE_DEVICE(PRINTER, printer);
 
 
-#define MDRV_PRINTER_ADD(_tag) \
-	MDRV_DEVICE_ADD(_tag, PRINTER, 0) \
+#define MCFG_PRINTER_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, PRINTER, 0) \
 
-#define MDRV_PRINTER_ONLINE(_online) \
-	MDRV_DEVICE_CONFIG_DATAPTR(printer_config, online, _online)
+#define MCFG_PRINTER_ONLINE(_online) \
+	MCFG_DEVICE_CONFIG_DATAPTR(printer_config, online, _online)
 
 
 /***************************************************************************
@@ -40,9 +40,9 @@ DECLARE_LEGACY_IMAGE_DEVICE(PRINTER, printer);
 ***************************************************************************/
 
 /* checks to see if a printer is ready */
-int printer_is_ready(running_device *printer);
+int printer_is_ready(device_t *printer);
 
 /* outputs data to a printer */
-void printer_output(running_device *printer, UINT8 data);
+void printer_output(device_t *printer, UINT8 data);
 
 #endif /* __PRINTER_H__ */

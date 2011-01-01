@@ -361,7 +361,7 @@ void test_osd_interface::update(bool skip_redraw)
 {
 }
 
-void test_osd_interface::wait_for_debugger(running_device &device, bool firststop)
+void test_osd_interface::wait_for_debugger(device_t &device, bool firststop)
 {
 }
 void test_osd_interface::update_audio_stream(const INT16 *buffer, int samples_this_frame)
@@ -913,8 +913,8 @@ static void command_verify_memory(running_machine *machine)
 	if (region)
 	{
 		/* we're validating a conventional memory region */
-		target_data = memory_region(machine, region);
-		target_data_size = memory_region_length(machine, region);
+		target_data = machine->region(region)->base();
+		target_data_size = machine->region(region)->bytes();
 	}
 
 	/* sanity check the ranges */

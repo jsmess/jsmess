@@ -57,9 +57,9 @@ static VIDEO_UPDATE( smc777 )
 	smc777_state *state = screen->machine->driver_data<smc777_state>();
 	int x,y,yi;
 	UINT16 count;
-	UINT8 *vram = memory_region(screen->machine, "vram");
-	UINT8 *attr = memory_region(screen->machine, "attr");
-	UINT8 *gram = memory_region(screen->machine, "fbuf");
+	UINT8 *vram = screen->machine->region("vram")->base();
+	UINT8 *attr = screen->machine->region("attr")->base();
+	UINT8 *gram = screen->machine->region("fbuf")->base();
 	int x_width;
 
 	bitmap_fill(bitmap, cliprect, screen->machine->pens[state->backdrop_pen+0x10]);
@@ -178,7 +178,7 @@ static WRITE8_HANDLER( smc777_6845_w )
 
 static READ8_HANDLER( smc777_vram_r )
 {
-	UINT8 *vram = memory_region(space->machine, "vram");
+	UINT8 *vram = space->machine->region("vram")->base();
 	UINT16 vram_index;
 
 	vram_index = cpu_get_reg(space->machine->device("maincpu"), Z80_B);
@@ -188,7 +188,7 @@ static READ8_HANDLER( smc777_vram_r )
 
 static READ8_HANDLER( smc777_attr_r )
 {
-	UINT8 *attr = memory_region(space->machine, "attr");
+	UINT8 *attr = space->machine->region("attr")->base();
 	UINT16 vram_index;
 
 	vram_index = cpu_get_reg(space->machine->device("maincpu"), Z80_B);
@@ -198,7 +198,7 @@ static READ8_HANDLER( smc777_attr_r )
 
 static READ8_HANDLER( smc777_pcg_r )
 {
-	UINT8 *pcg = memory_region(space->machine, "pcg");
+	UINT8 *pcg = space->machine->region("pcg")->base();
 	UINT16 vram_index;
 
 	vram_index = cpu_get_reg(space->machine->device("maincpu"), Z80_B);
@@ -208,7 +208,7 @@ static READ8_HANDLER( smc777_pcg_r )
 
 static WRITE8_HANDLER( smc777_vram_w )
 {
-	UINT8 *vram = memory_region(space->machine, "vram");
+	UINT8 *vram = space->machine->region("vram")->base();
 	UINT16 vram_index;
 
 	vram_index = cpu_get_reg(space->machine->device("maincpu"), Z80_B);
@@ -218,7 +218,7 @@ static WRITE8_HANDLER( smc777_vram_w )
 
 static WRITE8_HANDLER( smc777_attr_w )
 {
-	UINT8 *attr = memory_region(space->machine, "attr");
+	UINT8 *attr = space->machine->region("attr")->base();
 	UINT16 vram_index;
 
 	vram_index = cpu_get_reg(space->machine->device("maincpu"), Z80_B);
@@ -228,7 +228,7 @@ static WRITE8_HANDLER( smc777_attr_w )
 
 static WRITE8_HANDLER( smc777_pcg_w )
 {
-	UINT8 *pcg = memory_region(space->machine, "pcg");
+	UINT8 *pcg = space->machine->region("pcg")->base();
 	UINT16 vram_index;
 
 	vram_index = cpu_get_reg(space->machine->device("maincpu"), Z80_B);
@@ -240,7 +240,7 @@ static WRITE8_HANDLER( smc777_pcg_w )
 
 static READ8_HANDLER( smc777_fbuf_r )
 {
-	UINT8 *fbuf = memory_region(space->machine, "fbuf");
+	UINT8 *fbuf = space->machine->region("fbuf")->base();
 	UINT16 vram_index;
 
 	vram_index = cpu_get_reg(space->machine->device("maincpu"), Z80_B);
@@ -250,7 +250,7 @@ static READ8_HANDLER( smc777_fbuf_r )
 
 static WRITE8_HANDLER( smc777_fbuf_w )
 {
-	UINT8 *fbuf = memory_region(space->machine, "fbuf");
+	UINT8 *fbuf = space->machine->region("fbuf")->base();
 	UINT16 vram_index;
 
 	vram_index = cpu_get_reg(space->machine->device("maincpu"), Z80_B);
@@ -277,7 +277,7 @@ static void check_floppy_inserted(running_machine *machine)
 static READ8_HANDLER( smc777_fdc1_r )
 {
 	smc777_state *state = space->machine->driver_data<smc777_state>();
-	running_device* dev = space->machine->device("fdc");
+	device_t* dev = space->machine->device("fdc");
 
 	check_floppy_inserted(space->machine);
 
@@ -302,7 +302,7 @@ static READ8_HANDLER( smc777_fdc1_r )
 
 static WRITE8_HANDLER( smc777_fdc1_w )
 {
-	running_device* dev = space->machine->device("fdc");
+	device_t* dev = space->machine->device("fdc");
 
 	check_floppy_inserted(space->machine);
 
@@ -631,7 +631,7 @@ static TIMER_CALLBACK( keyboard_callback )
 static MACHINE_START(smc777)
 {
 	smc777_state *state = machine->driver_data<smc777_state>();
-	UINT8 *rom = memory_region(machine, "bios");
+	UINT8 *rom = machine->region("bios")->base();
 	int i;
 
 	for(i=0;i<0x4000;i++)
@@ -727,39 +727,39 @@ static const floppy_config smc777_floppy_config =
 
 static MACHINE_CONFIG_START( smc777, smc777_state )
     /* basic machine hardware */
-    MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz) //4,028 Mhz!
-    MDRV_CPU_PROGRAM_MAP(smc777_mem)
-    MDRV_CPU_IO_MAP(smc777_io)
+    MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz) //4,028 Mhz!
+    MCFG_CPU_PROGRAM_MAP(smc777_mem)
+    MCFG_CPU_IO_MAP(smc777_io)
 
-    MDRV_MACHINE_START(smc777)
-    MDRV_MACHINE_RESET(smc777)
+    MCFG_MACHINE_START(smc777)
+    MCFG_MACHINE_RESET(smc777)
 
     /* video hardware */
-    MDRV_SCREEN_ADD("screen", RASTER)
-    MDRV_SCREEN_REFRESH_RATE(60)
-    MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-    MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-    MDRV_SCREEN_SIZE(0x400, 400)
-    MDRV_SCREEN_VISIBLE_AREA(0, 660-1, 0, 220-1) //normal 640 x 200 + 20 pixels for border color
-    MDRV_PALETTE_LENGTH(0x20)
-    MDRV_PALETTE_INIT(smc777)
-	MDRV_GFXDECODE(smc777)
+    MCFG_SCREEN_ADD("screen", RASTER)
+    MCFG_SCREEN_REFRESH_RATE(60)
+    MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+    MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+    MCFG_SCREEN_SIZE(0x400, 400)
+    MCFG_SCREEN_VISIBLE_AREA(0, 660-1, 0, 220-1) //normal 640 x 200 + 20 pixels for border color
+    MCFG_PALETTE_LENGTH(0x20)
+    MCFG_PALETTE_INIT(smc777)
+	MCFG_GFXDECODE(smc777)
 
-	MDRV_MC6845_ADD("crtc", H46505, XTAL_3_579545MHz/2, mc6845_intf)	/* unknown clock, hand tuned to get ~60 fps */
+	MCFG_MC6845_ADD("crtc", H46505, XTAL_3_579545MHz/2, mc6845_intf)	/* unknown clock, hand tuned to get ~60 fps */
 
-    MDRV_VIDEO_START(smc777)
-    MDRV_VIDEO_UPDATE(smc777)
+    MCFG_VIDEO_START(smc777)
+    MCFG_VIDEO_UPDATE(smc777)
 
-	MDRV_WD179X_ADD("fdc",smc777_mb8876_interface)
-	MDRV_FLOPPY_2_DRIVES_ADD(smc777_floppy_config)
+	MCFG_WD179X_ADD("fdc",smc777_mb8876_interface)
+	MCFG_FLOPPY_2_DRIVES_ADD(smc777_floppy_config)
 
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("sn1", SN76489A, 1996800) // unknown clock / divider
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("sn1", SN76489A, 1996800) // unknown clock / divider
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD("beeper", BEEP, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
+	MCFG_SOUND_ADD("beeper", BEEP, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
 MACHINE_CONFIG_END
 
 /* ROM definition */

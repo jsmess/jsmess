@@ -12,7 +12,7 @@
 
 struct pc_turbo_info
 {
-	running_device *cpu;
+	device_t *cpu;
 	const char *port;
 	int mask;
 	int cur_val;
@@ -38,7 +38,7 @@ static TIMER_CALLBACK(pc_turbo_callback)
 
 
 
-int pc_turbo_setup(running_machine *machine, running_device *cpu, const char *port, int mask, double off_speed, double on_speed)
+int pc_turbo_setup(running_machine *machine, device_t *cpu, const char *port, int mask, double off_speed, double on_speed)
 {
 	struct pc_turbo_info *ti;
 

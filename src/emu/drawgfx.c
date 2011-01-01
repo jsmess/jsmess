@@ -26,7 +26,7 @@ UINT8 no_priority_size_is_wrong[2 * (sizeof(NO_PRIORITY) == 3) - 1];
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-void decodechar(const gfx_element *gfx, UINT32 code, const UINT8 *src);
+static void decodechar(const gfx_element *gfx, UINT32 code, const UINT8 *src);
 
 
 
@@ -92,7 +92,7 @@ void gfx_init(running_machine *machine)
 	for (curgfx = 0; curgfx < MAX_GFX_ELEMENTS && gfxdecodeinfo[curgfx].gfxlayout != NULL; curgfx++)
 	{
 		const gfx_decode_entry *gfxdecode = &gfxdecodeinfo[curgfx];
-		const region_info *region = (gfxdecode->memory_region != NULL) ? machine->region(gfxdecode->memory_region) : NULL;
+		const memory_region *region = (gfxdecode->memory_region != NULL) ? machine->region(gfxdecode->memory_region) : NULL;
 		UINT32 region_length = (region != NULL) ? (8 * region->bytes()) : 0;
 		const UINT8 *region_base = (region != NULL) ? region->base() : NULL;
 		UINT32 xscale = (gfxdecode->xscale == 0) ? 1 : gfxdecode->xscale;
@@ -429,7 +429,7 @@ static void calc_penusage(const gfx_element *gfx, UINT32 code)
     on a specified layout
 -------------------------------------------------*/
 
-void decodechar(const gfx_element *gfx, UINT32 code, const UINT8 *src)
+static void decodechar(const gfx_element *gfx, UINT32 code, const UINT8 *src)
 {
 	const gfx_layout *gl = &gfx->layout;
 	int israw = (gl->planeoffset[0] == GFX_RAW);

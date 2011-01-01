@@ -160,15 +160,15 @@ static INTERRUPT_GEN( ninjakd2_interrupt )
 static MACHINE_RESET( ninjakd2 )
 {
 	/* initialize main Z80 bank */
-	memory_configure_bank(machine, "bank1", 0, 8, memory_region(machine, "maincpu") + 0x10000, 0x4000);
+	memory_configure_bank(machine, "bank1", 0, 8, machine->region("maincpu")->base() + 0x10000, 0x4000);
 	memory_set_bank(machine, "bank1", 0);
 }
 
 static void robokid_init_banks(running_machine *machine)
 {
 	/* initialize main Z80 bank */
-	memory_configure_bank(machine, "bank1", 0,  2, memory_region(machine, "maincpu"), 0x4000);
-	memory_configure_bank(machine, "bank1", 2, 14, memory_region(machine, "maincpu") + 0x10000, 0x4000);
+	memory_configure_bank(machine, "bank1", 0,  2, machine->region("maincpu")->base(), 0x4000);
+	memory_configure_bank(machine, "bank1", 2, 14, machine->region("maincpu")->base() + 0x10000, 0x4000);
 	memory_set_bank(machine, "bank1", 0);
 }
 
@@ -212,8 +212,8 @@ static WRITE8_HANDLER( ninjakd2_soundreset_w )
 static SAMPLES_START( ninjakd2_init_samples )
 {
 	running_machine *machine = device->machine;
-	const UINT8* const rom = memory_region(machine, "pcm");
-	const int length = memory_region_length(machine, "pcm");
+	const UINT8* const rom = machine->region("pcm")->base();
+	const int length = machine->region("pcm")->bytes();
 	INT16* sampledata = auto_alloc_array(machine, INT16, length);
 
 	int i;
@@ -227,13 +227,13 @@ static SAMPLES_START( ninjakd2_init_samples )
 
 static WRITE8_HANDLER( ninjakd2_pcm_play_w )
 {
-	running_device *samples = space->machine->device("pcm");
-	const UINT8* const rom = memory_region(space->machine, "pcm");
+	device_t *samples = space->machine->device("pcm");
+	const UINT8* const rom = space->machine->region("pcm")->base();
 
 	// only Ninja Kid II uses this
 	if (rom)
 	{
-		const int length = memory_region_length(space->machine, "pcm");
+		const int length = space->machine->region("pcm")->bytes();
 
 		const int start = data << 8;
 
@@ -874,7 +874,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static void irqhandler(running_device *device, int irq)
+static void irqhandler(device_t *device, int irq)
 {
 	cputag_set_input_line(device->machine, "soundcpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -908,108 +908,108 @@ static const samples_interface ninjakd2_samples_interface =
 static MACHINE_CONFIG_START( ninjakd2, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, MAIN_CLOCK_12/2)		/* verified */
-	MDRV_CPU_PROGRAM_MAP(ninjakd2_main_cpu)
-	MDRV_CPU_VBLANK_INT("screen", ninjakd2_interrupt)
+	MCFG_CPU_ADD("maincpu", Z80, MAIN_CLOCK_12/2)		/* verified */
+	MCFG_CPU_PROGRAM_MAP(ninjakd2_main_cpu)
+	MCFG_CPU_VBLANK_INT("screen", ninjakd2_interrupt)
 
-	MDRV_CPU_ADD("soundcpu", Z80, MAIN_CLOCK_5)		/* verified */
-	MDRV_CPU_PROGRAM_MAP(ninjakd2_sound_cpu)
-	MDRV_CPU_IO_MAP(ninjakd2_sound_io)
+	MCFG_CPU_ADD("soundcpu", Z80, MAIN_CLOCK_5)		/* verified */
+	MCFG_CPU_PROGRAM_MAP(ninjakd2_sound_cpu)
+	MCFG_CPU_IO_MAP(ninjakd2_sound_io)
 
-	MDRV_MACHINE_RESET(ninjakd2)
+	MCFG_MACHINE_RESET(ninjakd2)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(59.61)    /* verified on pcb */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 4*8, 28*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(59.61)    /* verified on pcb */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 4*8, 28*8-1)
 
-	MDRV_GFXDECODE(ninjakd2)
-	MDRV_PALETTE_LENGTH(0x300)
+	MCFG_GFXDECODE(ninjakd2)
+	MCFG_PALETTE_LENGTH(0x300)
 
-	MDRV_VIDEO_START(ninjakd2)
-	MDRV_VIDEO_UPDATE(ninjakd2)
-	MDRV_VIDEO_EOF(ninjakd2)
+	MCFG_VIDEO_START(ninjakd2)
+	MCFG_VIDEO_UPDATE(ninjakd2)
+	MCFG_VIDEO_EOF(ninjakd2)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("2203.1", YM2203, MAIN_CLOCK_12/8)		/* verified */
-	MDRV_SOUND_CONFIG(ym2203_config)
-	MDRV_SOUND_ROUTE(0, "mono", 0.10)
-	MDRV_SOUND_ROUTE(1, "mono", 0.10)
-	MDRV_SOUND_ROUTE(2, "mono", 0.10)
-	MDRV_SOUND_ROUTE(3, "mono", 0.50)
+	MCFG_SOUND_ADD("2203.1", YM2203, MAIN_CLOCK_12/8)		/* verified */
+	MCFG_SOUND_CONFIG(ym2203_config)
+	MCFG_SOUND_ROUTE(0, "mono", 0.10)
+	MCFG_SOUND_ROUTE(1, "mono", 0.10)
+	MCFG_SOUND_ROUTE(2, "mono", 0.10)
+	MCFG_SOUND_ROUTE(3, "mono", 0.50)
 
-	MDRV_SOUND_ADD("2203.2", YM2203, MAIN_CLOCK_12/8)		/* verified */
-	MDRV_SOUND_ROUTE(0, "mono", 0.10)
-	MDRV_SOUND_ROUTE(1, "mono", 0.10)
-	MDRV_SOUND_ROUTE(2, "mono", 0.10)
-	MDRV_SOUND_ROUTE(3, "mono", 0.50)
+	MCFG_SOUND_ADD("2203.2", YM2203, MAIN_CLOCK_12/8)		/* verified */
+	MCFG_SOUND_ROUTE(0, "mono", 0.10)
+	MCFG_SOUND_ROUTE(1, "mono", 0.10)
+	MCFG_SOUND_ROUTE(2, "mono", 0.10)
+	MCFG_SOUND_ROUTE(3, "mono", 0.50)
 
-	MDRV_SOUND_ADD("pcm", SAMPLES, 0)
-	MDRV_SOUND_CONFIG(ninjakd2_samples_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	MCFG_SOUND_ADD("pcm", SAMPLES, 0)
+	MCFG_SOUND_CONFIG(ninjakd2_samples_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mnight, ninjakd2 )
 
 	/* basic machine hardware */
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(mnight_main_cpu)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(mnight_main_cpu)
 
 	/* video hardware */
-	MDRV_VIDEO_START(mnight)
+	MCFG_VIDEO_START(mnight)
 
 	/* sound hardware */
-	MDRV_DEVICE_REMOVE("pcm")
+	MCFG_DEVICE_REMOVE("pcm")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( arkarea, ninjakd2 )
 
 	/* basic machine hardware */
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(mnight_main_cpu)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(mnight_main_cpu)
 
 	/* video hardware */
-	MDRV_VIDEO_START(arkarea)
+	MCFG_VIDEO_START(arkarea)
 
 	/* sound hardware */
-	MDRV_DEVICE_REMOVE("pcm")
+	MCFG_DEVICE_REMOVE("pcm")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( robokid, mnight )
 
 	/* basic machine hardware */
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(robokid_main_cpu)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(robokid_main_cpu)
 
-	MDRV_MACHINE_RESET(robokid)
+	MCFG_MACHINE_RESET(robokid)
 
 	/* video hardware */
-	MDRV_GFXDECODE(robokid)
-	MDRV_PALETTE_LENGTH(0x400)	// RAM is this large, but still only 0x300 colors used
+	MCFG_GFXDECODE(robokid)
+	MCFG_PALETTE_LENGTH(0x400)	// RAM is this large, but still only 0x300 colors used
 
-	MDRV_VIDEO_START(robokid)
-	MDRV_VIDEO_UPDATE(robokid)
+	MCFG_VIDEO_START(robokid)
+	MCFG_VIDEO_UPDATE(robokid)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( omegaf, robokid )
 
 	/* basic machine hardware */
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(omegaf_main_cpu)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(omegaf_main_cpu)
 
-	MDRV_MACHINE_RESET(omegaf)
+	MCFG_MACHINE_RESET(omegaf)
 
 	/* video hardware */
-	MDRV_VIDEO_START(omegaf)
-	MDRV_VIDEO_UPDATE(omegaf)
+	MCFG_VIDEO_START(omegaf)
+	MCFG_VIDEO_UPDATE(omegaf)
 MACHINE_CONFIG_END
 
 
@@ -1396,9 +1396,9 @@ by one place all the intervening bits.
 
 static void lineswap_gfx_roms(running_machine *machine, const char *region, const int bit)
 {
-	const int length = memory_region_length(machine, region);
+	const int length = machine->region(region)->bytes();
 
-	UINT8* const src = memory_region(machine, region);
+	UINT8* const src = machine->region(region)->base();
 
 	UINT8* const temp = auto_alloc_array(machine, UINT8, length);
 
@@ -1443,7 +1443,7 @@ static DRIVER_INIT( ninjakd2 )
 static DRIVER_INIT( bootleg )
 {
 	address_space *space = cputag_get_address_space(machine, "soundcpu", ADDRESS_SPACE_PROGRAM);
-	space->set_decrypted_region(0x0000, 0x7fff, memory_region(machine, "soundcpu") + 0x10000);
+	space->set_decrypted_region(0x0000, 0x7fff, machine->region("soundcpu")->base() + 0x10000);
 
 	gfx_unscramble(machine);
 }

@@ -292,7 +292,7 @@ TIMER_CALLBACK(x68k_crtc_raster_irq)
 TIMER_CALLBACK(x68k_crtc_vblank_irq)
 {
 	x68k_state *state = machine->driver_data<x68k_state>();
-	running_device *x68k_mfp = machine->device(MC68901_TAG);
+	device_t *x68k_mfp = machine->device(MC68901_TAG);
 	int val = param;
 	attotime irq_time;
 	int vblank_line;
@@ -1087,11 +1087,11 @@ VIDEO_START( x68000 )
 			break;
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	machine->gfx[gfx_index] = gfx_element_alloc(machine, &x68k_pcg_8, memory_region(machine, "user1"), 32, 0);
+	machine->gfx[gfx_index] = gfx_element_alloc(machine, &x68k_pcg_8, machine->region("user1")->base(), 32, 0);
 
 	gfx_index++;
 
-	machine->gfx[gfx_index] = gfx_element_alloc(machine, &x68k_pcg_16, memory_region(machine, "user1"), 32, 0);
+	machine->gfx[gfx_index] = gfx_element_alloc(machine, &x68k_pcg_16, machine->region("user1")->base(), 32, 0);
 	machine->gfx[gfx_index]->total_colors = 32;
 
 	/* Tilemaps */
@@ -1149,7 +1149,7 @@ VIDEO_UPDATE( x68000 )
 		rect.max_y = cliprect->max_y;
 
 	// update tiles
-	//rom = memory_region(screen->machine, "user1");
+	//rom = screen->machine->region("user1")->base();
 	for(x=0;x<256;x++)
 	{
 		if(state->video.tile16_dirty[x] != 0)

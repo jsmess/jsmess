@@ -13,7 +13,7 @@ typedef struct _ti99_mem32k_state
 
 } ti99_mem32k_state;
 
-INLINE ti99_mem32k_state *get_safe_token(running_device *device)
+INLINE ti99_mem32k_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	return (ti99_mem32k_state *)downcast<legacy_device_base *>(device)->token();
@@ -77,7 +77,7 @@ static DEVICE_RESET( ti99_mem32k )
 {
 	ti99_mem32k_state *card = (ti99_mem32k_state*)downcast<legacy_device_base *>(device)->token();
 	/* Register the card */
-	running_device *peb = device->owner();
+	device_t *peb = device->owner();
 
 	if (input_port_read(device->machine, "RAM")==RAM_TI32_EXT)
 	{

@@ -206,23 +206,23 @@ static Z80PIO_INTERFACE( pio_intf )
 
 static MACHINE_CONFIG_START( sc2, sc2_state )
     /* basic machine hardware */
-    MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz)
-    MDRV_CPU_PROGRAM_MAP(sc2_mem)
-    MDRV_CPU_IO_MAP(sc2_io)
+    MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
+    MCFG_CPU_PROGRAM_MAP(sc2_mem)
+    MCFG_CPU_IO_MAP(sc2_io)
 
-    MDRV_MACHINE_START(sc2)
-    MDRV_MACHINE_RESET(sc2)
+    MCFG_MACHINE_START(sc2)
+    MCFG_MACHINE_RESET(sc2)
 
     /* video hardware */
-	MDRV_DEFAULT_LAYOUT(layout_sc2)
+	MCFG_DEFAULT_LAYOUT(layout_sc2)
 
 	/* devices */
-	MDRV_Z80PIO_ADD("z80pio", XTAL_4MHz, pio_intf)
+	MCFG_Z80PIO_ADD("z80pio", XTAL_4MHz, pio_intf)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO( "mono" )
-	MDRV_SOUND_ADD( "beep", BEEP, 0 )
-	MDRV_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
+	MCFG_SPEAKER_STANDARD_MONO( "mono" )
+	MCFG_SOUND_ADD( "beep", BEEP, 0 )
+	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 MACHINE_CONFIG_END
 
 /* ROM definition */

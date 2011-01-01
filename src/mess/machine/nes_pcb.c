@@ -1104,7 +1104,7 @@ static WRITE8_HANDLER( sxrom_w )
 
  *************************************************************/
 
-static void mmc2_latch( running_device *device, offs_t offset )
+static void mmc2_latch( device_t *device, offs_t offset )
 {
 	nes_state *state = device->machine->driver_data<nes_state>();
 	if ((offset & 0x3ff0) == 0x0fd0)
@@ -1258,7 +1258,7 @@ static void mmc3_set_chr( running_machine *machine, UINT8 chr, int chr_base, int
 }
 
 /* Here, IRQ counter decrements every scanline. */
-static void mmc3_irq( running_device *device, int scanline, int vblank, int blanked )
+static void mmc3_irq( device_t *device, int scanline, int vblank, int blanked )
 {
 	nes_state *state = device->machine->driver_data<nes_state>();
 
@@ -1790,7 +1790,7 @@ static void mmc5_update_render_mode( running_machine *machine )
 {
 }
 
-static void mmc5_irq( running_device *device, int scanline, int vblank, int blanked )
+static void mmc5_irq( device_t *device, int scanline, int vblank, int blanked )
 {
 	nes_state *state = device->machine->driver_data<nes_state>();
 
@@ -2433,7 +2433,7 @@ static WRITE8_HANDLER( ntbrom_w )
 /* Here, IRQ counter decrements every CPU cycle. Since we update it every scanline,
  we need to decrement it by 114 (Each scanline consists of 341 dots and, on NTSC,
  there are 3 dots to every 1 CPU cycle, hence 114 is the number of cycles per scanline ) */
-static void jxrom_irq( running_device *device, int scanline, int vblank, int blanked )
+static void jxrom_irq( device_t *device, int scanline, int vblank, int blanked )
 {
 	nes_state *state = device->machine->driver_data<nes_state>();
 
@@ -2806,7 +2806,7 @@ static WRITE8_HANDLER( dis_74x161x161x32_w )
 /* Here, IRQ counter decrements every CPU cycle. Since we update it every scanline,
  we need to decrement it by 114 (Each scanline consists of 341 dots and, on NTSC,
  there are 3 dots to every 1 CPU cycle, hence 114 is the number of cycles per scanline ) */
-static void bandai_lz_irq( running_device *device, int scanline, int vblank, int blanked )
+static void bandai_lz_irq( device_t *device, int scanline, int vblank, int blanked )
 {
 	nes_state *state = device->machine->driver_data<nes_state>();
 
@@ -3064,7 +3064,7 @@ static WRITE8_HANDLER( g101_w )
 /* Here, IRQ counter decrements every CPU cycle. Since we update it every scanline,
  we need to decrement it by 114 (Each scanline consists of 341 dots and, on NTSC,
  there are 3 dots to every 1 CPU cycle, hence 114 is the number of cycles per scanline ) */
-static void h3001_irq( running_device *device, int scanline, int vblank, int blanked )
+static void h3001_irq( device_t *device, int scanline, int vblank, int blanked )
 {
 	nes_state *state = device->machine->driver_data<nes_state>();
 	if (state->IRQ_enable)
@@ -3145,7 +3145,7 @@ static WRITE8_HANDLER( h3001_w )
 /* Here, IRQ counter decrements every CPU cycle. Since we update it every scanline,
  we need to decrement it by 114 (Each scanline consists of 341 dots and, on NTSC,
  there are 3 dots to every 1 CPU cycle, hence 114 is the number of cycles per scanline ) */
-static void ss88006_irq( running_device *device, int scanline, int vblank, int blanked )
+static void ss88006_irq( device_t *device, int scanline, int vblank, int blanked )
 {
 	nes_state *state = device->machine->driver_data<nes_state>();
 
@@ -3560,7 +3560,7 @@ static void vrc4_set_prg( running_machine *machine )
 	}
 }
 
-static void konami_irq( running_device *device, int scanline, int vblank, int blanked )
+static void konami_irq( device_t *device, int scanline, int vblank, int blanked )
 {
 	nes_state *state = device->machine->driver_data<nes_state>();
 	/* Increment & check the IRQ scanline counter */
@@ -3829,7 +3829,7 @@ static WRITE8_HANDLER( konami_vrc7_w )
 /* Here, IRQ counter decrements every CPU cycle. Since we update it every scanline,
  we need to decrement it by 114 (Each scanline consists of 341 dots and, on NTSC,
  there are 3 dots to every 1 CPU cycle, hence 114 is the number of cycles per scanline ) */
-static void namcot_irq( running_device *device, int scanline, int vblank, int blanked )
+static void namcot_irq( device_t *device, int scanline, int vblank, int blanked )
 {
 	nes_state *state = device->machine->driver_data<nes_state>();
 
@@ -3998,7 +3998,7 @@ static WRITE8_HANDLER( sunsoft2_w )
 /* Here, IRQ counter decrements every CPU cycle. Since we update it every scanline,
  we need to decrement it by 114 (Each scanline consists of 341 dots and, on NTSC,
  there are 3 dots to every 1 CPU cycle, hence 114 is the number of cycles per scanline ) */
-static void sunsoft3_irq( running_device *device, int scanline, int vblank, int blanked )
+static void sunsoft3_irq( device_t *device, int scanline, int vblank, int blanked )
 {
 	nes_state *state = device->machine->driver_data<nes_state>();
 
@@ -4965,7 +4965,7 @@ static READ8_HANDLER( fukutake_l_r )
 
  *************************************************************/
 
-static void futuremedia_irq( running_device *device, int scanline, int vblank, int blanked )
+static void futuremedia_irq( device_t *device, int scanline, int vblank, int blanked )
 {
 	nes_state *state = device->machine->driver_data<nes_state>();
 	//  if (scanline < PPU_BOTTOM_VISIBLE_SCANLINE)
@@ -5345,7 +5345,7 @@ static void ks7032_prg_update( running_machine *machine )
 	prg8_cd(machine, state->mmc_reg[3]);
 }
 
-static void ks7032_irq( running_device *device, int scanline, int vblank, int blanked )
+static void ks7032_irq( device_t *device, int scanline, int vblank, int blanked )
 {
 	nes_state *state = device->machine->driver_data<nes_state>();
 
@@ -5460,7 +5460,7 @@ static WRITE8_HANDLER( ks202_w )
 
  *************************************************************/
 
-static void mmc_fds_irq( running_device *device, int scanline, int vblank, int blanked )
+static void mmc_fds_irq( device_t *device, int scanline, int vblank, int blanked )
 {
 	nes_state *state = device->machine->driver_data<nes_state>();
 
@@ -5747,7 +5747,7 @@ static WRITE8_HANDLER( magics_md_w )
 
  *************************************************************/
 
-static void nanjing_irq( running_device *device, int scanline, int vblank, int blanked )
+static void nanjing_irq( device_t *device, int scanline, int vblank, int blanked )
 {
 	nes_state *state = device->machine->driver_data<nes_state>();
 
@@ -7055,7 +7055,7 @@ static WRITE8_HANDLER( tengen_800008_w )
 
  *************************************************************/
 
-static void tengen_800032_irq( running_device *device, int scanline, int vblank, int blanked )
+static void tengen_800032_irq( device_t *device, int scanline, int vblank, int blanked )
 {
 	nes_state *state = device->machine->driver_data<nes_state>();
 	if (!state->IRQ_mode)	// we are in scanline mode!
@@ -8752,7 +8752,7 @@ static WRITE8_HANDLER( n625092_w )
 
  *************************************************************/
 
-static void sc127_irq( running_device *device, int scanline, int vblank, int blanked )
+static void sc127_irq( device_t *device, int scanline, int vblank, int blanked )
 {
 	nes_state *state = device->machine->driver_data<nes_state>();
 
@@ -8895,7 +8895,7 @@ static WRITE8_HANDLER( smb2j_w )
 
  *************************************************************/
 
-static void smb2jb_irq( running_device *device, int scanline, int vblank, int blanked )
+static void smb2jb_irq( device_t *device, int scanline, int vblank, int blanked )
 {
 	nes_state *state = device->machine->driver_data<nes_state>();
 	if (state->IRQ_enable)
@@ -9149,7 +9149,7 @@ static WRITE8_HANDLER( btl_mariobaby_w )
 
  *************************************************************/
 
-static void btl_smb2a_irq( running_device *device, int scanline, int vblank, int blanked )
+static void btl_smb2a_irq( device_t *device, int scanline, int vblank, int blanked )
 {
 	nes_state *state = device->machine->driver_data<nes_state>();
 
@@ -9237,7 +9237,7 @@ static WRITE8_HANDLER( btl_tobi_l_w )
 
  *************************************************************/
 
-static void btl_smb3_irq( running_device *device, int scanline, int vblank, int blanked )
+static void btl_smb3_irq( device_t *device, int scanline, int vblank, int blanked )
 {
 	nes_state *state = device->machine->driver_data<nes_state>();
 
@@ -9313,7 +9313,7 @@ static WRITE8_HANDLER( btl_smb3_w )
  *************************************************************/
 
 /* Scanline based IRQ ? */
-static void btl_dn_irq( running_device *device, int scanline, int vblank, int blanked )
+static void btl_dn_irq( device_t *device, int scanline, int vblank, int blanked )
 {
 	nes_state *state = device->machine->driver_data<nes_state>();
 	if (scanline < PPU_BOTTOM_VISIBLE_SCANLINE)
@@ -11157,7 +11157,7 @@ static WRITE8_HANDLER( h2288_w )
  *************************************************************/
 
 /* I think the IRQ should only get fired if enough CPU cycles have passed, but we don't implement (yet) this part */
-static void shjy3_irq( running_device *device, int scanline, int vblank, int blanked )
+static void shjy3_irq( device_t *device, int scanline, int vblank, int blanked )
 {
 	nes_state *state = device->machine->driver_data<nes_state>();
 	if (state->IRQ_enable & 0x02)
@@ -11642,7 +11642,7 @@ static READ8_HANDLER( fujiya_m_r )
 
 
 
-typedef void (*nes_ppu_latch)(running_device *device, offs_t offset);
+typedef void (*nes_ppu_latch)(device_t *device, offs_t offset);
 
 struct nes_memory_accessor
 {

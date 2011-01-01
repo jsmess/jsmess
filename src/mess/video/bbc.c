@@ -628,10 +628,10 @@ void bbcbp_setvideoshadow(running_machine *machine, int vdusel)
 	bbc_state *state = machine->driver_data<bbc_state>();
 	if (vdusel)
 	{
-		state->BBC_Video_RAM= memory_region(machine, "maincpu")+0x8000;
+		state->BBC_Video_RAM= machine->region("maincpu")->base()+0x8000;
 		state->vidmem_RAM=(state->vidmem)+0x8000;
 	} else {
-		state->BBC_Video_RAM= memory_region(machine, "maincpu");
+		state->BBC_Video_RAM= machine->region("maincpu")->base();
 		state->vidmem_RAM=state->vidmem;
 	}
 }
@@ -656,7 +656,7 @@ static void common_init(running_machine *machine)
 	m6845_config(&BBC6845);
 	saa505x_config(&BBCsaa5050);
 
-	state->BBC_Video_RAM = memory_region(machine, "maincpu");
+	state->BBC_Video_RAM = machine->region("maincpu")->base();
 	state->vidmem_RAM = state->vidmem;
 	state->draw_function = *BBC_draw_hi_res;
 }

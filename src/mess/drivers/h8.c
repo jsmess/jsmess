@@ -30,7 +30,7 @@ public:
 	UINT8 digit;
 	UINT8 segment;
 	UINT8 irq_ctl;
-	running_device *beeper;
+	device_t *beeper;
 	UINT8 ff_b;
 };
 
@@ -215,21 +215,21 @@ static I8085_CONFIG( h8_cpu_config )
 
 static MACHINE_CONFIG_START( h8, h8_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", I8080, H8_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(h8_mem)
-	MDRV_CPU_IO_MAP(h8_io)
-	MDRV_CPU_CONFIG(h8_cpu_config)
+	MCFG_CPU_ADD("maincpu", I8080, H8_CLOCK)
+	MCFG_CPU_PROGRAM_MAP(h8_mem)
+	MCFG_CPU_IO_MAP(h8_io)
+	MCFG_CPU_CONFIG(h8_cpu_config)
 
-	MDRV_MACHINE_RESET(h8)
-	MDRV_TIMER_ADD_PERIODIC("h8_timer", h8_irq_pulse, HZ(H8_IRQ_PULSE) )
+	MCFG_MACHINE_RESET(h8)
+	MCFG_TIMER_ADD_PERIODIC("h8_timer", h8_irq_pulse, HZ(H8_IRQ_PULSE) )
 
 	/* video hardware */
-	MDRV_DEFAULT_LAYOUT(layout_h8)
+	MCFG_DEFAULT_LAYOUT(layout_h8)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("beep", BEEP, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("beep", BEEP, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
 /* ROM definition */

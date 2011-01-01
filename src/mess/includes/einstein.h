@@ -19,8 +19,8 @@ public:
 	einstein_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	running_device *color_screen;
-	running_device *ctc;
+	device_t *color_screen;
+	device_t *ctc;
 
 	int rom_enabled;
 	int interrupt;
@@ -32,7 +32,7 @@ public:
 	UINT8 keyboard_data;
 
 	/* 80 column device */
-	running_device *mc6845;
+	device_t *mc6845;
 	screen_device *crtc_screen;
 	UINT8 *crtc_ram;
 };

@@ -234,7 +234,7 @@ static void log_add_disasm_comment(rsp_state *rsp, drcuml_block *block, UINT32 p
 #define SET_ZERO_FLAG(x)			{ rsp->flag[0] |= (0x100 << (x)); }
 #define CLEAR_ZERO_FLAG(x)			{ rsp->flag[0] &= ~(0x100 << (x)); }
 
-INLINE rsp_state *get_safe_token(running_device *device)
+INLINE rsp_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == RSP);
@@ -401,7 +401,7 @@ static void cfunc_write32(void *param)
     rspdrc_set_options - configure DRC options
 -------------------------------------------------*/
 
-void rspdrc_set_options(running_device *device, UINT32 options)
+void rspdrc_set_options(device_t *device, UINT32 options)
 {
 	rsp_state *rsp = get_safe_token(device);
 	rsp->impstate->drcoptions = options;
@@ -731,18 +731,6 @@ static CPU_RESET( rsp )
 {
 	rsp_state *rsp = get_safe_token(device);
 	rsp->nextpc = ~0;
-}
-
-INLINE UINT32 IREAD32(rsp_state *rsp, UINT32 address)
-{
-	UINT32 ret = 0;
-	address &= 0x00000fff;
-	address = 0x04001000 | (address & 0xfff);
-	ret = rsp->program->read_byte(address+0) << 24;
-	ret |= rsp->program->read_byte(address+1) << 16;
-	ret |= rsp->program->read_byte(address+2) << 8;
-	ret |= rsp->program->read_byte(address+3) << 0;
-	return ret;
 }
 
 static void cfunc_rsp_lbv(void *param)
@@ -3414,7 +3402,7 @@ static CPU_EXECUTE( rsp )
     accessor to code_flush_cache
 -------------------------------------------------*/
 
-void rspdrc_flush_drc_cache(running_device *device)
+void rspdrc_flush_drc_cache(device_t *device)
 {
 	rsp_state *rsp = get_safe_token(device);
 	rsp->impstate->cache_dirty = TRUE;
@@ -3699,9 +3687,6 @@ static void static_generate_memory_accessor(rsp_state *rsp, int size, int iswrit
 	/* add a global entry for this */
 	alloc_handle(drcuml, handleptr, name);
 	UML_HANDLE(block, *handleptr);													// handle  *handleptr
-
-	UML_AND(block, IREG(0), IREG(0), IMM(0x00000fff));
-	UML_OR(block, IREG(0), IREG(0), IMM(0x04000000));
 
 	// write:
 	if (iswrite)

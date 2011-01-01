@@ -105,7 +105,7 @@ MACHINE_RESET( mhavoc )
 
 	memory_configure_bank(machine, "bank1", 0, 1, mhavoc_zram0, 0);
 	memory_configure_bank(machine, "bank1", 1, 1, mhavoc_zram1, 0);
-	memory_configure_bank(machine, "bank2", 0, 4, memory_region(machine, "alpha") + 0x10000, 0x2000);
+	memory_configure_bank(machine, "bank2", 0, 4, machine->region("alpha")->base() + 0x10000, 0x2000);
 
 	/* reset RAM/ROM banks to 0 */
 	mhavoc_ram_banksel_w(space, 0, 0);
@@ -327,7 +327,7 @@ static WRITE8_HANDLER( mhavocrv_speech_data_w )
 
 static WRITE8_HANDLER( mhavocrv_speech_strobe_w )
 {
-	running_device *tms = space->machine->device("tms");
+	device_t *tms = space->machine->device("tms");
 	tms5220_data_w(tms, 0, speech_write_buffer);
 }
 

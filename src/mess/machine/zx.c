@@ -25,7 +25,7 @@
 
 static WRITE8_HANDLER( zx_ram_w )
 {
-	UINT8 *RAM = memory_region(space->machine, "maincpu");
+	UINT8 *RAM = space->machine->region("maincpu")->base();
 	RAM[offset + 0x4000] = data;
 
 	if (data & 0x40)
@@ -43,7 +43,7 @@ static WRITE8_HANDLER( zx_ram_w )
 /* I know this looks really pointless... but it has to be here */
 READ8_HANDLER( zx_ram_r )
 {
-	UINT8 *RAM = memory_region(space->machine, "maincpu");
+	UINT8 *RAM = space->machine->region("maincpu")->base();
 	return RAM[offset | 0xc000];
 }
 
@@ -53,7 +53,7 @@ DRIVER_INIT ( zx )
 
 	memory_install_read_bank(space, 0x4000, 0x4000 + messram_get_size(machine->device("messram")) - 1, 0, 0, "bank1");
 	memory_install_write8_handler(space, 0x4000, 0x4000 + messram_get_size(machine->device("messram")) - 1, 0, 0, zx_ram_w);
-	memory_set_bankptr(machine, "bank1", memory_region(machine, "maincpu") + 0x4000);
+	memory_set_bankptr(machine, "bank1", machine->region("maincpu")->base() + 0x4000);
 }
 
 DIRECT_UPDATE_HANDLER ( zx_setdirect )
@@ -247,7 +247,7 @@ READ8_HANDLER ( pc8300_io_r )
 
 	UINT8 data = 0xff;
 	UINT8 offs = offset & 0xff;
-	running_device *speaker = space->machine->device("speaker");
+	device_t *speaker = space->machine->device("speaker");
 
 	if (offs == 0xf5)
 	{
@@ -319,7 +319,7 @@ READ8_HANDLER ( pow3000_io_r )
 
 	UINT8 data = 0xff;
 	UINT8 offs = offset & 0xff;
-	running_device *speaker = space->machine->device("speaker");
+	device_t *speaker = space->machine->device("speaker");
 
 	if (offs == 0x7e)
 	{

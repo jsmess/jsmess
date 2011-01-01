@@ -93,63 +93,63 @@ typedef struct chrn_id
 #define FLOPPY_DRIVE_INDEX						0x0020
 
 /* a callback which will be executed if the ready state of the drive changes e.g. not ready->ready, ready->not ready */
-void floppy_drive_set_ready_state_change_callback(running_device *img, void (*callback)(running_device *controller,running_device *img, int state));
+void floppy_drive_set_ready_state_change_callback(device_t *img, void (*callback)(device_t *controller,device_t *img, int state));
 
-void floppy_drive_set_index_pulse_callback(running_device *img, void (*callback)(running_device *controller,running_device *image, int state));
+void floppy_drive_set_index_pulse_callback(device_t *img, void (*callback)(device_t *controller,device_t *image, int state));
 
 /* set flag state */
-int floppy_drive_get_flag_state(running_device *img, int flag);
+int floppy_drive_get_flag_state(device_t *img, int flag);
 /* get flag state */
-void floppy_drive_set_flag_state(running_device *img, int flag, int state);
+void floppy_drive_set_flag_state(device_t *img, int flag, int state);
 /* get current physical track drive is on */
-int floppy_drive_get_current_track(running_device *img);
+int floppy_drive_get_current_track(device_t *img);
 /* get current physical track size */
-UINT64 floppy_drive_get_current_track_size(running_device *img, int head);
+UINT64 floppy_drive_get_current_track_size(device_t *img, int head);
 
 /* get next id from track, 1 if got a id, 0 if no id was got */
-int floppy_drive_get_next_id(running_device *img, int side, chrn_id *);
+int floppy_drive_get_next_id(device_t *img, int side, chrn_id *);
 /* set ready state of drive. If flag == 1, set ready state only if drive present,
 disk is in drive, and motor is on. Otherwise set ready state to the state passed */
-void floppy_drive_set_ready_state(running_device *img, int state, int flag);
+void floppy_drive_set_ready_state(device_t *img, int state, int flag);
 
 /* seek up or down */
-void floppy_drive_seek(running_device *img, signed int signed_tracks);
+void floppy_drive_seek(device_t *img, signed int signed_tracks);
 
-void floppy_drive_read_track_data_info_buffer(running_device *img, int side, void *ptr, int *length );
-void floppy_drive_write_track_data_info_buffer(running_device *img, int side, const void *ptr, int *length );
-void floppy_drive_format_sector(running_device *img, int side, int sector_index, int c, int h, int r, int n, int filler);
-void floppy_drive_read_sector_data(running_device *img, int side, int index1, void *pBuffer, int length);
-void floppy_drive_write_sector_data(running_device *img, int side, int index1, const void *pBuffer, int length, int ddam);
+void floppy_drive_read_track_data_info_buffer(device_t *img, int side, void *ptr, int *length );
+void floppy_drive_write_track_data_info_buffer(device_t *img, int side, const void *ptr, int *length );
+void floppy_drive_format_sector(device_t *img, int side, int sector_index, int c, int h, int r, int n, int filler);
+void floppy_drive_read_sector_data(device_t *img, int side, int index1, void *pBuffer, int length);
+void floppy_drive_write_sector_data(device_t *img, int side, int index1, const void *pBuffer, int length, int ddam);
 
 /* set motor speed to get correct index pulses
    standard RPM are 300 RPM (common) and 360 RPM
    Note: this actually only works for soft sectored disks: one index pulse per
    track.
 */
-void floppy_drive_set_rpm(running_device *image, float rpm);
+void floppy_drive_set_rpm(device_t *image, float rpm);
 
-void floppy_drive_set_controller(running_device *img, running_device *controller);
+void floppy_drive_set_controller(device_t *img, device_t *controller);
 
-floppy_image *flopimg_get_image(running_device *image);
+floppy_image *flopimg_get_image(device_t *image);
 
 /* hack for apple II; replace this when we think of something better */
-void floppy_install_unload_proc(running_device *image, void (*proc)(device_image_interface &image));
+void floppy_install_unload_proc(device_t *image, void (*proc)(device_image_interface &image));
 
-void floppy_install_load_proc(running_device *image, void (*proc)(device_image_interface &image));
+void floppy_install_load_proc(device_t *image, void (*proc)(device_image_interface &image));
 
-running_device *floppy_get_device(running_machine *machine,int drive);
-running_device *floppy_get_device_by_type(running_machine *machine,int ftype,int drive);
-int floppy_get_drive_type(running_device *image);
-void floppy_set_type(running_device *image,int ftype);
+device_t *floppy_get_device(running_machine *machine,int drive);
+device_t *floppy_get_device_by_type(running_machine *machine,int ftype,int drive);
+int floppy_get_drive_type(device_t *image);
+void floppy_set_type(device_t *image,int ftype);
 int floppy_get_count(running_machine *machine);
 
-int floppy_get_drive(running_device *image);
-int floppy_get_drive_by_type(running_device *image,int ftype);
+int floppy_get_drive(device_t *image);
+int floppy_get_drive_by_type(device_t *image,int ftype);
 
-void *flopimg_get_custom_data(running_device *image);
-void flopimg_alloc_custom_data(running_device *image,void *custom);
+void *flopimg_get_custom_data(device_t *image);
+void flopimg_alloc_custom_data(device_t *image,void *custom);
 
-void floppy_drive_set_geometry(running_device *img, floppy_type_t type);
+void floppy_drive_set_geometry(device_t *img, floppy_type_t type);
 
 /* drive select lines */
 WRITE_LINE_DEVICE_HANDLER( floppy_ds0_w );
@@ -192,54 +192,54 @@ extern DEVICE_IMAGE_UNLOAD( floppy );
 #define FLOPPY_3 "floppy3"
 
 
-#define MDRV_FLOPPY_DRIVE_ADD(_tag, _config)	\
-	MDRV_DEVICE_ADD(_tag, FLOPPY, 0)			\
-	MDRV_DEVICE_CONFIG(_config)
+#define MCFG_FLOPPY_DRIVE_ADD(_tag, _config)	\
+	MCFG_DEVICE_ADD(_tag, FLOPPY, 0)			\
+	MCFG_DEVICE_CONFIG(_config)
 
-#define MDRV_FLOPPY_DRIVE_MODIFY(_tag, _config)	\
-	MDRV_DEVICE_MODIFY(_tag)		\
-	MDRV_DEVICE_CONFIG(_config)
+#define MCFG_FLOPPY_DRIVE_MODIFY(_tag, _config)	\
+	MCFG_DEVICE_MODIFY(_tag)		\
+	MCFG_DEVICE_CONFIG(_config)
 
-#define MDRV_FLOPPY_4_DRIVES_ADD(_config)	\
-	MDRV_DEVICE_ADD(FLOPPY_0, FLOPPY, 0)		\
-	MDRV_DEVICE_CONFIG(_config)	\
-	MDRV_DEVICE_ADD(FLOPPY_1, FLOPPY, 0)		\
-	MDRV_DEVICE_CONFIG(_config)	\
-	MDRV_DEVICE_ADD(FLOPPY_2, FLOPPY, 0)		\
-	MDRV_DEVICE_CONFIG(_config)	\
-	MDRV_DEVICE_ADD(FLOPPY_3, FLOPPY, 0)		\
-	MDRV_DEVICE_CONFIG(_config)
+#define MCFG_FLOPPY_4_DRIVES_ADD(_config)	\
+	MCFG_DEVICE_ADD(FLOPPY_0, FLOPPY, 0)		\
+	MCFG_DEVICE_CONFIG(_config)	\
+	MCFG_DEVICE_ADD(FLOPPY_1, FLOPPY, 0)		\
+	MCFG_DEVICE_CONFIG(_config)	\
+	MCFG_DEVICE_ADD(FLOPPY_2, FLOPPY, 0)		\
+	MCFG_DEVICE_CONFIG(_config)	\
+	MCFG_DEVICE_ADD(FLOPPY_3, FLOPPY, 0)		\
+	MCFG_DEVICE_CONFIG(_config)
 
-#define MDRV_FLOPPY_4_DRIVES_MODIFY(_config)	\
-	MDRV_DEVICE_MODIFY(FLOPPY_0)		\
-	MDRV_DEVICE_CONFIG(_config)	\
-	MDRV_DEVICE_MODIFY(FLOPPY_1)		\
-	MDRV_DEVICE_CONFIG(_config)	\
-	MDRV_DEVICE_MODIFY(FLOPPY_2)		\
-	MDRV_DEVICE_CONFIG(_config)	\
-	MDRV_DEVICE_MODIFY(FLOPPY_3)		\
-	MDRV_DEVICE_CONFIG(_config)
+#define MCFG_FLOPPY_4_DRIVES_MODIFY(_config)	\
+	MCFG_DEVICE_MODIFY(FLOPPY_0)		\
+	MCFG_DEVICE_CONFIG(_config)	\
+	MCFG_DEVICE_MODIFY(FLOPPY_1)		\
+	MCFG_DEVICE_CONFIG(_config)	\
+	MCFG_DEVICE_MODIFY(FLOPPY_2)		\
+	MCFG_DEVICE_CONFIG(_config)	\
+	MCFG_DEVICE_MODIFY(FLOPPY_3)		\
+	MCFG_DEVICE_CONFIG(_config)
 
-#define MDRV_FLOPPY_4_DRIVES_REMOVE()	\
-	MDRV_DEVICE_REMOVE(FLOPPY_0)		\
-	MDRV_DEVICE_REMOVE(FLOPPY_1)		\
-	MDRV_DEVICE_REMOVE(FLOPPY_2)		\
-	MDRV_DEVICE_REMOVE(FLOPPY_3)
+#define MCFG_FLOPPY_4_DRIVES_REMOVE()	\
+	MCFG_DEVICE_REMOVE(FLOPPY_0)		\
+	MCFG_DEVICE_REMOVE(FLOPPY_1)		\
+	MCFG_DEVICE_REMOVE(FLOPPY_2)		\
+	MCFG_DEVICE_REMOVE(FLOPPY_3)
 
-#define MDRV_FLOPPY_2_DRIVES_ADD(_config)	\
-	MDRV_DEVICE_ADD(FLOPPY_0, FLOPPY, 0)		\
-	MDRV_DEVICE_CONFIG(_config)	\
-	MDRV_DEVICE_ADD(FLOPPY_1, FLOPPY, 0)		\
-	MDRV_DEVICE_CONFIG(_config)
+#define MCFG_FLOPPY_2_DRIVES_ADD(_config)	\
+	MCFG_DEVICE_ADD(FLOPPY_0, FLOPPY, 0)		\
+	MCFG_DEVICE_CONFIG(_config)	\
+	MCFG_DEVICE_ADD(FLOPPY_1, FLOPPY, 0)		\
+	MCFG_DEVICE_CONFIG(_config)
 
-#define MDRV_FLOPPY_2_DRIVES_MODIFY(_config)	\
-	MDRV_DEVICE_MODIFY(FLOPPY_0)		\
-	MDRV_DEVICE_CONFIG(_config)	\
-	MDRV_DEVICE_MODIFY(FLOPPY_1)		\
-	MDRV_DEVICE_CONFIG(_config)
+#define MCFG_FLOPPY_2_DRIVES_MODIFY(_config)	\
+	MCFG_DEVICE_MODIFY(FLOPPY_0)		\
+	MCFG_DEVICE_CONFIG(_config)	\
+	MCFG_DEVICE_MODIFY(FLOPPY_1)		\
+	MCFG_DEVICE_CONFIG(_config)
 
-#define MDRV_FLOPPY_2_DRIVES_REMOVE()	\
-	MDRV_DEVICE_REMOVE(FLOPPY_0)		\
-	MDRV_DEVICE_REMOVE(FLOPPY_1)
+#define MCFG_FLOPPY_2_DRIVES_REMOVE()	\
+	MCFG_DEVICE_REMOVE(FLOPPY_0)		\
+	MCFG_DEVICE_REMOVE(FLOPPY_1)
 
 #endif /* __FLOPDRV_H__ */

@@ -44,7 +44,7 @@ static WRITE8_DEVICE_HANDLER(via_out_a);
 static READ8_DEVICE_HANDLER(via_in_b);
 static WRITE8_DEVICE_HANDLER(via_out_b);
 static WRITE8_DEVICE_HANDLER(via_out_cb2);
-static void via_irq_func(running_device *device, int state);
+static void via_irq_func(device_t *device, int state);
 
 
 const via6522_interface concept_via6522_intf =
@@ -250,7 +250,7 @@ static WRITE8_DEVICE_HANDLER(via_out_cb2)
 /*
     VIA irq -> 68k level 5
 */
-static void via_irq_func(running_device *device, int state)
+static void via_irq_func(device_t *device, int state)
 {
 	concept_set_interrupt(device->machine, TIMINT_level, state);
 }
@@ -593,7 +593,7 @@ const wd17xx_interface concept_wd17xx_interface =
 static  READ8_HANDLER(concept_fdc_reg_r)
 {
 	concept_state *state = space->machine->driver_data<concept_state>();
-	running_device *fdc = space->machine->device("wd179x");
+	device_t *fdc = space->machine->device("wd179x");
 	switch (offset)
 	{
 	case 0:
@@ -624,7 +624,7 @@ static WRITE8_HANDLER(concept_fdc_reg_w)
 {
 	concept_state *state = space->machine->driver_data<concept_state>();
 	int current_drive;
-	running_device *fdc = space->machine->device("wd179x");
+	device_t *fdc = space->machine->device("wd179x");
 	switch (offset)
 	{
 	case 0:

@@ -221,7 +221,7 @@ void spectrum_128_update_memory(running_machine *machine)
 
 	/* rom 0 is 128K rom, rom 1 is 48 BASIC */
 
-	ChosenROM = memory_region(machine, "maincpu") + 0x010000 + (ROMSelection<<14);
+	ChosenROM = machine->region("maincpu")->base() + 0x010000 + (ROMSelection<<14);
 
 	memory_set_bankptr(machine, "bank1", ChosenROM);
 }
@@ -295,28 +295,28 @@ GFXDECODE_END
 
 MACHINE_CONFIG_DERIVED( spectrum_128, spectrum )
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(spectrum_128_mem)
-	MDRV_CPU_IO_MAP(spectrum_128_io)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(spectrum_128_mem)
+	MCFG_CPU_IO_MAP(spectrum_128_io)
 
-	MDRV_MACHINE_RESET( spectrum_128 )
+	MCFG_MACHINE_RESET( spectrum_128 )
 
 	/* video hardware */
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_PALETTE_LENGTH(16)
-	MDRV_PALETTE_INIT( spectrum )
-	MDRV_SCREEN_REFRESH_RATE(50.021)
-	MDRV_VIDEO_START( spectrum_128 )
-	MDRV_GFXDECODE(spec128)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_PALETTE_LENGTH(16)
+	MCFG_PALETTE_INIT( spectrum )
+	MCFG_SCREEN_REFRESH_RATE(50.021)
+	MCFG_VIDEO_START( spectrum_128 )
+	MCFG_GFXDECODE(spec128)
 
 	/* sound hardware */
-	MDRV_SOUND_ADD("ay8912", AY8912, 1773400)
-	MDRV_SOUND_CONFIG(spectrum_ay_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD("ay8912", AY8912, 1773400)
+	MCFG_SOUND_CONFIG(spectrum_ay_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* internal ram */
-	MDRV_RAM_MODIFY("messram")
-	MDRV_RAM_DEFAULT_SIZE("128K")
+	MCFG_RAM_MODIFY("messram")
+	MCFG_RAM_DEFAULT_SIZE("128K")
 MACHINE_CONFIG_END
 
 

@@ -29,7 +29,7 @@ public:
 
 	/* devices */
 	hd61830_device *hd61830;
-	running_device *speaker;
+	device_t *speaker;
 
 };
 

@@ -139,7 +139,7 @@ static void bankswitch(running_machine *machine)
 	atom_state *state = machine->driver_data<atom_state>();
 	address_space *program = cputag_get_address_space(machine, SY6502_TAG, ADDRESS_SPACE_PROGRAM);
 
-	UINT8 *eprom = memory_region(machine, "a000") + (state->eprom << 12);
+	UINT8 *eprom = machine->region("a000")->base() + (state->eprom << 12);
 
 	memory_install_rom(program, 0xa000, 0xafff, 0, 0, eprom);
 }
@@ -559,7 +559,7 @@ static const via6522_interface via_intf =
 -------------------------------------------------*/
 
 
-static void atom_8271_interrupt_callback(running_device *device, int state)
+static void atom_8271_interrupt_callback(device_t *device, int state)
 {
 	atom_state *drvstate = device->machine->driver_data<atom_state>();
 	/* I'm assuming that the nmi is edge triggered */
@@ -705,10 +705,10 @@ static MACHINE_START( atom )
     generator. I don't know if this is hardware, or random data because the
     ram chips are not cleared at start-up. So at this time, these numbers
     are poked into the memory to simulate it. When I have more details I will fix it */
-	memory_region(machine, SY6502_TAG)[0x08] = mame_rand(machine) & 0x0ff;
-	memory_region(machine, SY6502_TAG)[0x09] = mame_rand(machine) & 0x0ff;
-	memory_region(machine, SY6502_TAG)[0x0a] = mame_rand(machine) & 0x0ff;
-	memory_region(machine, SY6502_TAG)[0x0b] = mame_rand(machine) & 0x0ff;
+	machine->region(SY6502_TAG)->base()[0x08] = machine->rand() & 0x0ff;
+	machine->region(SY6502_TAG)->base()[0x09] = machine->rand() & 0x0ff;
+	machine->region(SY6502_TAG)->base()[0x0a] = machine->rand() & 0x0ff;
+	machine->region(SY6502_TAG)->base()[0x0b] = machine->rand() & 0x0ff;
 
 	/* find devices */
 	state->mc6847 = machine->device(MC6847_TAG);
@@ -809,7 +809,7 @@ static DEVICE_IMAGE_LOAD( atom_cart )
 
 	/* With the following, we mirror the cart in the whole memory region */
 	for (i = 0; i < mirror; i++)
-		memcpy(memory_region(image.device().machine, this_cart->region) + this_cart->offset + i * size, temp_copy, size);
+		memcpy(image.device().machine->region(this_cart->region)->base() + this_cart->offset + i * size, temp_copy, size);
 
 	auto_free(image.device().machine, temp_copy);
 
@@ -821,58 +821,58 @@ static DEVICE_IMAGE_LOAD( atom_cart )
     MACHINE_DRIVER( atom )
 -------------------------------------------------*/
 
-#define MDRV_ATOM_CARTSLOT_ADD(_tag) \
-	MDRV_CARTSLOT_ADD(_tag) \
-	MDRV_CARTSLOT_EXTENSION_LIST("bin,rom") \
-	MDRV_CARTSLOT_INTERFACE("atom_cart") \
-	MDRV_CARTSLOT_LOAD(atom_cart)
+#define MCFG_ATOM_CARTSLOT_ADD(_tag) \
+	MCFG_CARTSLOT_ADD(_tag) \
+	MCFG_CARTSLOT_EXTENSION_LIST("bin,rom") \
+	MCFG_CARTSLOT_INTERFACE("atom_cart") \
+	MCFG_CARTSLOT_LOAD(atom_cart)
 
 
 static MACHINE_CONFIG_START( atom, atom_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(SY6502_TAG, M65C02, X2/4)
-	MDRV_CPU_PROGRAM_MAP(atom_mem)
+	MCFG_CPU_ADD(SY6502_TAG, M65C02, X2/4)
+	MCFG_CPU_PROGRAM_MAP(atom_mem)
 
-	MDRV_MACHINE_START( atom )
+	MCFG_MACHINE_START( atom )
 
 	/* video hardware */
-	MDRV_SCREEN_ADD(SCREEN_TAG, RASTER)
-	MDRV_SCREEN_REFRESH_RATE(M6847_PAL_FRAMES_PER_SECOND)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_SIZE(320, 25+192+26)
-	MDRV_SCREEN_VISIBLE_AREA(0, 319, 1, 239)
+	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
+	MCFG_SCREEN_REFRESH_RATE(M6847_PAL_FRAMES_PER_SECOND)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_SIZE(320, 25+192+26)
+	MCFG_SCREEN_VISIBLE_AREA(0, 319, 1, 239)
 
-	MDRV_MC6847_ADD(MC6847_TAG, atom_mc6847_intf)
-	MDRV_MC6847_TYPE(M6847_VERSION_ORIGINAL_PAL)
+	MCFG_MC6847_ADD(MC6847_TAG, atom_mc6847_intf)
+	MCFG_MC6847_TYPE(M6847_VERSION_ORIGINAL_PAL)
 
-	MDRV_VIDEO_UPDATE(atom)
+	MCFG_VIDEO_UPDATE(atom)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* devices */
-	MDRV_TIMER_ADD_PERIODIC("hz2400", cassette_output_tick, HZ(X2/4/416))
-	MDRV_VIA6522_ADD(R6522_TAG, X2/4, via_intf)
-	MDRV_I8255A_ADD(INS8255_TAG, ppi_intf)
-	MDRV_I8271_ADD(I8271_TAG, fdc_intf)
-	MDRV_FLOPPY_2_DRIVES_ADD(atom_floppy_config)
-	MDRV_CENTRONICS_ADD(CENTRONICS_TAG, atom_centronics_config)
-	MDRV_CASSETTE_ADD(CASSETTE_TAG, atom_cassette_config)
-	MDRV_QUICKLOAD_ADD("quickload", atom_atm, "atm", 0)
+	MCFG_TIMER_ADD_PERIODIC("hz2400", cassette_output_tick, HZ(X2/4/416))
+	MCFG_VIA6522_ADD(R6522_TAG, X2/4, via_intf)
+	MCFG_I8255A_ADD(INS8255_TAG, ppi_intf)
+	MCFG_I8271_ADD(I8271_TAG, fdc_intf)
+	MCFG_FLOPPY_2_DRIVES_ADD(atom_floppy_config)
+	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, atom_centronics_config)
+	MCFG_CASSETTE_ADD(CASSETTE_TAG, atom_cassette_config)
+	MCFG_QUICKLOAD_ADD("quickload", atom_atm, "atm", 0)
 
 	/* cartridge */
-	MDRV_ATOM_CARTSLOT_ADD("cart")
+	MCFG_ATOM_CARTSLOT_ADD("cart")
 
 	/* internal ram */
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("2K")
-	MDRV_RAM_EXTRA_OPTIONS("4K,6K,8K,10K,12K")
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("2K")
+	MCFG_RAM_EXTRA_OPTIONS("4K,6K,8K,10K,12K")
 
 	/* Software lists */
-	MDRV_SOFTWARE_LIST_ADD("cart_list","atom")
+	MCFG_SOFTWARE_LIST_ADD("cart_list","atom")
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------
@@ -880,32 +880,32 @@ MACHINE_CONFIG_END
 -------------------------------------------------*/
 
 static MACHINE_CONFIG_DERIVED( atomeb, atom )
-	MDRV_CPU_MODIFY(SY6502_TAG)
-	MDRV_CPU_PROGRAM_MAP(atomeb_mem)
+	MCFG_CPU_MODIFY(SY6502_TAG)
+	MCFG_CPU_PROGRAM_MAP(atomeb_mem)
 
-	MDRV_MACHINE_START(atomeb)
+	MCFG_MACHINE_START(atomeb)
 
 	/* cartridges */
-	MDRV_DEVICE_REMOVE("cart")
-	MDRV_ATOM_CARTSLOT_ADD("a0")
-	MDRV_ATOM_CARTSLOT_ADD("a1")
-	MDRV_ATOM_CARTSLOT_ADD("a2")
-	MDRV_ATOM_CARTSLOT_ADD("a3")
-	MDRV_ATOM_CARTSLOT_ADD("a4")
-	MDRV_ATOM_CARTSLOT_ADD("a5")
-	MDRV_ATOM_CARTSLOT_ADD("a6")
-	MDRV_ATOM_CARTSLOT_ADD("a7")
-	MDRV_ATOM_CARTSLOT_ADD("a8")
-	MDRV_ATOM_CARTSLOT_ADD("a9")
-	MDRV_ATOM_CARTSLOT_ADD("aa")
-	MDRV_ATOM_CARTSLOT_ADD("ab")
-	MDRV_ATOM_CARTSLOT_ADD("ac")
-	MDRV_ATOM_CARTSLOT_ADD("ad")
-	MDRV_ATOM_CARTSLOT_ADD("ae")
-	MDRV_ATOM_CARTSLOT_ADD("af")
+	MCFG_DEVICE_REMOVE("cart")
+	MCFG_ATOM_CARTSLOT_ADD("a0")
+	MCFG_ATOM_CARTSLOT_ADD("a1")
+	MCFG_ATOM_CARTSLOT_ADD("a2")
+	MCFG_ATOM_CARTSLOT_ADD("a3")
+	MCFG_ATOM_CARTSLOT_ADD("a4")
+	MCFG_ATOM_CARTSLOT_ADD("a5")
+	MCFG_ATOM_CARTSLOT_ADD("a6")
+	MCFG_ATOM_CARTSLOT_ADD("a7")
+	MCFG_ATOM_CARTSLOT_ADD("a8")
+	MCFG_ATOM_CARTSLOT_ADD("a9")
+	MCFG_ATOM_CARTSLOT_ADD("aa")
+	MCFG_ATOM_CARTSLOT_ADD("ab")
+	MCFG_ATOM_CARTSLOT_ADD("ac")
+	MCFG_ATOM_CARTSLOT_ADD("ad")
+	MCFG_ATOM_CARTSLOT_ADD("ae")
+	MCFG_ATOM_CARTSLOT_ADD("af")
 
-	MDRV_ATOM_CARTSLOT_ADD("e0")
-	MDRV_ATOM_CARTSLOT_ADD("e1")
+	MCFG_ATOM_CARTSLOT_ADD("e0")
+	MCFG_ATOM_CARTSLOT_ADD("e1")
 MACHINE_CONFIG_END
 
 /***************************************************************************

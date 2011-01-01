@@ -64,8 +64,8 @@ static const UINT8 cb2001_decryption_table[256] = {
 //                        pppp                 pppp pppp                pppp pppp
 	0xc3,0x53,0x02,0x58,xxxx,xxxx,0x24,xxxx, 0x72,xxxx,0xf3,xxxx,xxxx,0x43,xxxx,0x34, /* 70 */
 //    pppp pppp pppp pppp           pppp       pppp      pppp           pppp      ****
-	0x26,xxxx,0x81,xxxx,xxxx,0x3d,0xfb,0xf6, xxxx,xxxx,0x59,xxxx,0x73,xxxx,0x2a,xxxx, /* 80 */
-//    pppp      wwww           pppp **** pppp            pppp      pppp      pppp
+	0x26,xxxx,0xd1,xxxx,xxxx,0x3d,0xfb,0xf6, xxxx,xxxx,0x59,xxxx,0x73,xxxx,0x2a,xxxx, /* 80 */
+//    pppp      rrrr           pppp **** pppp            pppp      pppp      pppp
 	xxxx,0x3d,0xe9,xxxx,xxxx,0xbe,0xf9,xxxx, xxxx,xxxx,0x57,xxxx,0xb9,xxxx,0xbf,xxxx, /* 90 */
 //         wwww pppp           pppp ****                 pppp      pppp      pppp
 	0xc1,xxxx,0xe6,0x06,0xaa,0x9c,0xad,0xb8, 0x4e,xxxx,0x8d,0x50,0x51,0xa4,xxxx,0x1a, /* A0 */
@@ -738,8 +738,8 @@ static PALETTE_INIT(cb2001)
 	{
 		int r,g,b;
 
-		UINT8*proms = memory_region(machine, "proms");
-		int length = memory_region_length(machine, "proms");
+		UINT8*proms = machine->region("proms")->base();
+		int length = machine->region("proms")->bytes();
 		UINT16 dat;
 
 		dat = (proms[0x000+i] << 8) | proms[0x200+i];
@@ -792,36 +792,36 @@ static const ay8910_interface cb2001_ay8910_config =
 
 static const nec_config cb2001_config = { cb2001_decryption_table, };
 static MACHINE_CONFIG_START( cb2001, driver_device )
-	MDRV_CPU_ADD("maincpu", V35, 20000000) // CPU91A-011-0016JK004; encrypted cpu like nec v25/35 used in some irem game
-	MDRV_CPU_CONFIG(cb2001_config)
-	MDRV_CPU_PROGRAM_MAP(cb2001_map)
-	MDRV_CPU_IO_MAP(cb2001_io)
-	MDRV_CPU_VBLANK_INT("screen", vblank_irq)
+	MCFG_CPU_ADD("maincpu", V35, 20000000) // CPU91A-011-0016JK004; encrypted cpu like nec v25/35 used in some irem game
+	MCFG_CPU_CONFIG(cb2001_config)
+	MCFG_CPU_PROGRAM_MAP(cb2001_map)
+	MCFG_CPU_IO_MAP(cb2001_io)
+	MCFG_CPU_VBLANK_INT("screen", vblank_irq)
 
-	MDRV_PPI8255_ADD( "ppi8255_0", cb2001_ppi8255_intf[0] )
-	MDRV_PPI8255_ADD( "ppi8255_1", cb2001_ppi8255_intf[1] )
+	MCFG_PPI8255_ADD( "ppi8255_0", cb2001_ppi8255_intf[0] )
+	MCFG_PPI8255_ADD( "ppi8255_1", cb2001_ppi8255_intf[1] )
 
-	MDRV_GFXDECODE(cb2001)
+	MCFG_GFXDECODE(cb2001)
 
-	MDRV_PALETTE_INIT( cb2001 )
+	MCFG_PALETTE_INIT( cb2001 )
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_SIZE(64*8, 64*8)
-	MDRV_SCREEN_VISIBLE_AREA(0, 64*8-1, 0, 32*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_SIZE(64*8, 64*8)
+	MCFG_SCREEN_VISIBLE_AREA(0, 64*8-1, 0, 32*8-1)
 
-	MDRV_PALETTE_LENGTH(0x100)
+	MCFG_PALETTE_LENGTH(0x100)
 
-	MDRV_VIDEO_START(cb2001)
-	MDRV_VIDEO_UPDATE(cb2001)
+	MCFG_VIDEO_START(cb2001)
+	MCFG_VIDEO_UPDATE(cb2001)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("aysnd", AY8910, 1500000) // wrong
-	MDRV_SOUND_CONFIG(cb2001_ay8910_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("aysnd", AY8910, 1500000) // wrong
+	MCFG_SOUND_CONFIG(cb2001_ay8910_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 

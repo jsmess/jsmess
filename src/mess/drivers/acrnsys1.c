@@ -31,7 +31,7 @@ public:
 
 static READ8_DEVICE_HANDLER( ins8154_b1_port_a_r )
 {
-	running_device *ttl74145 = device->machine->device("ic8_7445");
+	device_t *ttl74145 = device->machine->device("ic8_7445");
 	UINT8 key_line = ttl74145_r(ttl74145, 0, 0);
 
 	switch (key_line)
@@ -62,7 +62,7 @@ static WRITE8_DEVICE_HANDLER( ins8154_b1_port_a_w )
 
 static WRITE8_DEVICE_HANDLER( acrnsys1_led_segment_w )
 {
-	running_device *ttl74145 = device->machine->device("ic8_7445");
+	device_t *ttl74145 = device->machine->device("ic8_7445");
 	UINT8 key_line = ttl74145_r(ttl74145, 0, 0);
 
 	output_set_digit_value(key_line, data);
@@ -165,14 +165,14 @@ static const ins8154_interface ins8154_b1 =
 
 static MACHINE_CONFIG_START( acrnsys1, acrnsys1_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6502, 1008000)  /* 1.008 MHz */
-	MDRV_CPU_PROGRAM_MAP(acrnsys1_map)
+	MCFG_CPU_ADD("maincpu", M6502, 1008000)  /* 1.008 MHz */
+	MCFG_CPU_PROGRAM_MAP(acrnsys1_map)
 
-	MDRV_DEFAULT_LAYOUT(layout_acrnsys1)
+	MCFG_DEFAULT_LAYOUT(layout_acrnsys1)
 
 	/* devices */
-	MDRV_INS8154_ADD("b1", ins8154_b1)
-	MDRV_TTL74145_ADD("ic8_7445", default_ttl74145)
+	MCFG_INS8154_ADD("b1", ins8154_b1)
+	MCFG_TTL74145_ADD("ic8_7445", default_ttl74145)
 MACHINE_CONFIG_END
 
 

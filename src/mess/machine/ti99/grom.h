@@ -82,7 +82,7 @@ typedef struct _ti99grom_config
 	int						writeable;
 	int 					ident;
 	const char				*region;
-	UINT8					*(*get_memory)(running_device *device);
+	UINT8					*(*get_memory)(device_t *device);
 	offs_t					offset;
 	int 					size;
 	int 					rollover;	// some GRAM simulations do not implement rollover
@@ -99,35 +99,35 @@ READ8Z_DEVICE_HANDLER( ti99grom_rz );
 
 DECLARE_LEGACY_DEVICE( GROM, ti99grom );
 
-#define MDRV_GROM_ADD(_tag, _id, _region, _offset, _size, _ready)	\
-	MDRV_DEVICE_ADD(_tag, GROM, 0)	\
-	MDRV_DEVICE_CONFIG_DATA32(ti99grom_config, writeable, FALSE) \
-	MDRV_DEVICE_CONFIG_DATA32(ti99grom_config, ident, _id) \
-	MDRV_DEVICE_CONFIG_DATAPTR(ti99grom_config, region, _region) \
-	MDRV_DEVICE_CONFIG_DATA32(ti99grom_config, offset, _offset) \
-	MDRV_DEVICE_CONFIG_DATA32(ti99grom_config, size, _size) \
-	MDRV_DEVICE_CONFIG_DATA32(ti99grom_config, rollover, FALSE) \
-	MDRV_DEVICE_CONFIG_DATAPTR(ti99grom_config, ready, _ready)
+#define MCFG_GROM_ADD(_tag, _id, _region, _offset, _size, _ready)	\
+	MCFG_DEVICE_ADD(_tag, GROM, 0)	\
+	MCFG_DEVICE_CONFIG_DATA32(ti99grom_config, writeable, FALSE) \
+	MCFG_DEVICE_CONFIG_DATA32(ti99grom_config, ident, _id) \
+	MCFG_DEVICE_CONFIG_DATAPTR(ti99grom_config, region, _region) \
+	MCFG_DEVICE_CONFIG_DATA32(ti99grom_config, offset, _offset) \
+	MCFG_DEVICE_CONFIG_DATA32(ti99grom_config, size, _size) \
+	MCFG_DEVICE_CONFIG_DATA32(ti99grom_config, rollover, FALSE) \
+	MCFG_DEVICE_CONFIG_DATAPTR(ti99grom_config, ready, _ready)
 
-#define MDRV_GROM_ADD_P(_tag, _id, _memptr, _offset, _size, _ready)	\
-	MDRV_DEVICE_ADD(_tag, GROM, 0)	\
-	MDRV_DEVICE_CONFIG_DATA32(ti99grom_config, writeable, FALSE) \
-	MDRV_DEVICE_CONFIG_DATA32(ti99grom_config, ident, _id) \
-	MDRV_DEVICE_CONFIG_DATAPTR(ti99grom_config, get_memory, _memptr) \
-	MDRV_DEVICE_CONFIG_DATAPTR(ti99grom_config, region, NULL) \
-	MDRV_DEVICE_CONFIG_DATA32(ti99grom_config, offset, _offset) \
-	MDRV_DEVICE_CONFIG_DATA32(ti99grom_config, size, _size) \
-	MDRV_DEVICE_CONFIG_DATA32(ti99grom_config, rollover, FALSE) \
-	MDRV_DEVICE_CONFIG_DATAPTR(ti99grom_config, ready, _ready)
+#define MCFG_GROM_ADD_P(_tag, _id, _memptr, _offset, _size, _ready)	\
+	MCFG_DEVICE_ADD(_tag, GROM, 0)	\
+	MCFG_DEVICE_CONFIG_DATA32(ti99grom_config, writeable, FALSE) \
+	MCFG_DEVICE_CONFIG_DATA32(ti99grom_config, ident, _id) \
+	MCFG_DEVICE_CONFIG_DATAPTR(ti99grom_config, get_memory, _memptr) \
+	MCFG_DEVICE_CONFIG_DATAPTR(ti99grom_config, region, NULL) \
+	MCFG_DEVICE_CONFIG_DATA32(ti99grom_config, offset, _offset) \
+	MCFG_DEVICE_CONFIG_DATA32(ti99grom_config, size, _size) \
+	MCFG_DEVICE_CONFIG_DATA32(ti99grom_config, rollover, FALSE) \
+	MCFG_DEVICE_CONFIG_DATAPTR(ti99grom_config, ready, _ready)
 
-#define MDRV_GRAM_ADD(_tag, _id, _region, _offset, _size, _rollover, _ready)		\
-	MDRV_DEVICE_ADD(_tag, GROM, 0)								\
-	MDRV_DEVICE_CONFIG_DATA32(ti99grom_config, writeable, TRUE)	\
-	MDRV_DEVICE_CONFIG_DATA32(ti99grom_config, ident, _id)		\
-	MDRV_DEVICE_CONFIG_DATAPTR(ti99grom_config, region, _region) \
-	MDRV_DEVICE_CONFIG_DATA32(ti99grom_config, offset, _offset) 	\
-	MDRV_DEVICE_CONFIG_DATA32(ti99grom_config, size, _size)	\
-	MDRV_DEVICE_CONFIG_DATA32(ti99grom_config, rollover, _rollover) \
-	MDRV_DEVICE_CONFIG_DATAPTR(ti99grom_config, ready, _ready)
+#define MCFG_GRAM_ADD(_tag, _id, _region, _offset, _size, _rollover, _ready)		\
+	MCFG_DEVICE_ADD(_tag, GROM, 0)								\
+	MCFG_DEVICE_CONFIG_DATA32(ti99grom_config, writeable, TRUE)	\
+	MCFG_DEVICE_CONFIG_DATA32(ti99grom_config, ident, _id)		\
+	MCFG_DEVICE_CONFIG_DATAPTR(ti99grom_config, region, _region) \
+	MCFG_DEVICE_CONFIG_DATA32(ti99grom_config, offset, _offset) 	\
+	MCFG_DEVICE_CONFIG_DATA32(ti99grom_config, size, _size)	\
+	MCFG_DEVICE_CONFIG_DATA32(ti99grom_config, rollover, _rollover) \
+	MCFG_DEVICE_CONFIG_DATAPTR(ti99grom_config, ready, _ready)
 
 

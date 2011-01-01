@@ -39,7 +39,7 @@ I8275_DISPLAY_PIXELS(ipds_display_pixels)
 {
 	int i;
 	bitmap_t *bitmap = device->machine->generic.tmpbitmap;
-	UINT8 *charmap = memory_region(device->machine, "gfx1");
+	UINT8 *charmap = device->machine->region("gfx1")->base();
 	UINT8 pixels = charmap[(linecount & 7) + (charcode << 3)] ^ 0xff;
 	if (vsp) {
 		pixels = 0;
@@ -71,7 +71,7 @@ static MACHINE_RESET(ipds)
 
 static VIDEO_UPDATE( ipds )
 {
-    running_device *devconf = screen->machine->device("i8275");
+    device_t *devconf = screen->machine->device("i8275");
 	i8275_update( devconf, bitmap, cliprect);
 	VIDEO_UPDATE_CALL ( generic_bitmapped );
 	return 0;
@@ -97,27 +97,27 @@ GFXDECODE_END
 
 static MACHINE_CONFIG_START( ipds, ipds_state )
     /* basic machine hardware */
-    MDRV_CPU_ADD("maincpu",I8085A, XTAL_19_6608MHz / 4)
-    MDRV_CPU_PROGRAM_MAP(ipds_mem)
-    MDRV_CPU_IO_MAP(ipds_io)
+    MCFG_CPU_ADD("maincpu",I8085A, XTAL_19_6608MHz / 4)
+    MCFG_CPU_PROGRAM_MAP(ipds_mem)
+    MCFG_CPU_IO_MAP(ipds_io)
 
-    MDRV_MACHINE_RESET(ipds)
+    MCFG_MACHINE_RESET(ipds)
 
     /* video hardware */
-    MDRV_SCREEN_ADD("screen", RASTER)
-    MDRV_SCREEN_REFRESH_RATE(50)
-    MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-    MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-    MDRV_SCREEN_SIZE(640, 480)
-    MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MDRV_GFXDECODE(ipds)
-    MDRV_PALETTE_LENGTH(2)
-    MDRV_PALETTE_INIT(black_and_white)
+    MCFG_SCREEN_ADD("screen", RASTER)
+    MCFG_SCREEN_REFRESH_RATE(50)
+    MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+    MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+    MCFG_SCREEN_SIZE(640, 480)
+    MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+	MCFG_GFXDECODE(ipds)
+    MCFG_PALETTE_LENGTH(2)
+    MCFG_PALETTE_INIT(black_and_white)
 
-	MDRV_I8275_ADD	( "i8275", ipds_i8275_interface)
+	MCFG_I8275_ADD	( "i8275", ipds_i8275_interface)
 
-    MDRV_VIDEO_START(generic_bitmapped)
-    MDRV_VIDEO_UPDATE(ipds)
+    MCFG_VIDEO_START(generic_bitmapped)
+    MCFG_VIDEO_UPDATE(ipds)
 MACHINE_CONFIG_END
 
 /* ROM definition */

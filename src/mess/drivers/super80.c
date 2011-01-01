@@ -624,7 +624,7 @@ static const cassette_config super80_cassette_config =
 
 static DEVICE_IMAGE_LOAD( super80_cart )
 {
-	image.fread( memory_region(image.device().machine, "maincpu") + 0xc000, 0x3000);
+	image.fread( image.device().machine->region("maincpu")->base() + 0xc000, 0x3000);
 
 	return IMAGE_INIT_PASS;
 }
@@ -643,128 +643,128 @@ static const mc6845_interface super80v_crtc = {
 };
 
 static MACHINE_CONFIG_FRAGMENT( super80_cartslot )
-	MDRV_CARTSLOT_ADD("cart")
-	MDRV_CARTSLOT_EXTENSION_LIST("rom")
-	MDRV_CARTSLOT_NOT_MANDATORY
-	MDRV_CARTSLOT_LOAD(super80_cart)
+	MCFG_CARTSLOT_ADD("cart")
+	MCFG_CARTSLOT_EXTENSION_LIST("rom")
+	MCFG_CARTSLOT_NOT_MANDATORY
+	MCFG_CARTSLOT_LOAD(super80_cart)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( super80, super80_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)		/* 2 MHz */
-	MDRV_CPU_PROGRAM_MAP(super80_map)
-	MDRV_CPU_IO_MAP(super80_io)
-	MDRV_CPU_CONFIG(super80_daisy_chain)
+	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)		/* 2 MHz */
+	MCFG_CPU_PROGRAM_MAP(super80_map)
+	MCFG_CPU_IO_MAP(super80_io)
+	MCFG_CPU_CONFIG(super80_daisy_chain)
 
-	MDRV_MACHINE_RESET( super80 )
+	MCFG_MACHINE_RESET( super80 )
 
-	MDRV_Z80PIO_ADD( "z80pio", MASTER_CLOCK/6, super80_pio_intf )
+	MCFG_Z80PIO_ADD( "z80pio", MASTER_CLOCK/6, super80_pio_intf )
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(48.8)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
-	MDRV_PALETTE_LENGTH(2)
-	MDRV_PALETTE_INIT(black_and_white)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(48.8)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
+	MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_INIT(black_and_white)
 
-	MDRV_GFXDECODE(super80)
-	MDRV_DEFAULT_LAYOUT( layout_super80 )
-	MDRV_VIDEO_START(super80)
-	MDRV_VIDEO_UPDATE(super80)
+	MCFG_GFXDECODE(super80)
+	MCFG_DEFAULT_LAYOUT( layout_super80 )
+	MCFG_VIDEO_START(super80)
+	MCFG_VIDEO_UPDATE(super80)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_WAVE_ADD("wave", "cassette")
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MDRV_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_WAVE_ADD("wave", "cassette")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* printer */
-	MDRV_CENTRONICS_ADD("centronics", standard_centronics)
+	MCFG_CENTRONICS_ADD("centronics", standard_centronics)
 
 	/* quickload */
-	MDRV_Z80BIN_QUICKLOAD_ADD("quickload", default, 1)
+	MCFG_Z80BIN_QUICKLOAD_ADD("quickload", default, 1)
 
 	/* cassette */
-	MDRV_CASSETTE_ADD( "cassette", super80_cassette_config )
+	MCFG_CASSETTE_ADD( "cassette", super80_cassette_config )
 
 	/* cartridge */
-	MDRV_FRAGMENT_ADD(super80_cartslot)
+	MCFG_FRAGMENT_ADD(super80_cartslot)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( super80d, super80 )
-	MDRV_GFXDECODE(super80d)
-	MDRV_VIDEO_UPDATE(super80d)
+	MCFG_GFXDECODE(super80d)
+	MCFG_VIDEO_UPDATE(super80d)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( super80e, super80 )
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(super80e_io)
-	MDRV_GFXDECODE(super80e)
-	MDRV_VIDEO_UPDATE(super80e)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_IO_MAP(super80e_io)
+	MCFG_GFXDECODE(super80e)
+	MCFG_VIDEO_UPDATE(super80e)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( super80m, super80 )
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(super80m_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(super80m_map)
 
-	MDRV_GFXDECODE(super80m)
-	MDRV_PALETTE_LENGTH(16)
-	MDRV_PALETTE_INIT(super80m)
-	MDRV_VIDEO_EOF(super80m)
-	MDRV_VIDEO_UPDATE(super80m)
+	MCFG_GFXDECODE(super80m)
+	MCFG_PALETTE_LENGTH(16)
+	MCFG_PALETTE_INIT(super80m)
+	MCFG_VIDEO_EOF(super80m)
+	MCFG_VIDEO_UPDATE(super80m)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( super80v, super80_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)		/* 2 MHz */
-	MDRV_CPU_PROGRAM_MAP(super80v_map)
-	MDRV_CPU_IO_MAP(super80v_io)
-	MDRV_CPU_CONFIG(super80_daisy_chain)
+	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)		/* 2 MHz */
+	MCFG_CPU_PROGRAM_MAP(super80v_map)
+	MCFG_CPU_IO_MAP(super80v_io)
+	MCFG_CPU_CONFIG(super80_daisy_chain)
 
-	MDRV_MACHINE_RESET( super80 )
+	MCFG_MACHINE_RESET( super80 )
 
-	MDRV_Z80PIO_ADD( "z80pio", MASTER_CLOCK/6, super80_pio_intf )
+	MCFG_Z80PIO_ADD( "z80pio", MASTER_CLOCK/6, super80_pio_intf )
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(50)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(SUPER80V_SCREEN_WIDTH, SUPER80V_SCREEN_HEIGHT)
-	MDRV_SCREEN_VISIBLE_AREA(0, SUPER80V_SCREEN_WIDTH-1, 0, SUPER80V_SCREEN_HEIGHT-1)
-	MDRV_PALETTE_LENGTH(16)
-	MDRV_PALETTE_INIT(super80m)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(SUPER80V_SCREEN_WIDTH, SUPER80V_SCREEN_HEIGHT)
+	MCFG_SCREEN_VISIBLE_AREA(0, SUPER80V_SCREEN_WIDTH-1, 0, SUPER80V_SCREEN_HEIGHT-1)
+	MCFG_PALETTE_LENGTH(16)
+	MCFG_PALETTE_INIT(super80m)
 
-	MDRV_MC6845_ADD("crtc", MC6845, MASTER_CLOCK / SUPER80V_DOTS, super80v_crtc)
+	MCFG_MC6845_ADD("crtc", MC6845, MASTER_CLOCK / SUPER80V_DOTS, super80v_crtc)
 
-	MDRV_GFXDECODE(super80v)
-	MDRV_DEFAULT_LAYOUT( layout_super80 )
-	MDRV_VIDEO_START(super80v)
-	MDRV_VIDEO_EOF(super80m)
-	MDRV_VIDEO_UPDATE(super80v)
+	MCFG_GFXDECODE(super80v)
+	MCFG_DEFAULT_LAYOUT( layout_super80 )
+	MCFG_VIDEO_START(super80v)
+	MCFG_VIDEO_EOF(super80m)
+	MCFG_VIDEO_UPDATE(super80v)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_WAVE_ADD("wave", "cassette")
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MDRV_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_WAVE_ADD("wave", "cassette")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* printer */
-	MDRV_CENTRONICS_ADD("centronics", standard_centronics)
+	MCFG_CENTRONICS_ADD("centronics", standard_centronics)
 
 	/* quickload */
-	MDRV_Z80BIN_QUICKLOAD_ADD("quickload", default, 1)
+	MCFG_Z80BIN_QUICKLOAD_ADD("quickload", default, 1)
 
 	/* cassette */
-	MDRV_CASSETTE_ADD( "cassette", super80_cassette_config )
+	MCFG_CASSETTE_ADD( "cassette", super80_cassette_config )
 
 	/* cartridge */
-	MDRV_FRAGMENT_ADD(super80_cartslot)
+	MCFG_FRAGMENT_ADD(super80_cartslot)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( super80r, super80v )
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(super80r_io)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_IO_MAP(super80r_io)
 MACHINE_CONFIG_END
 
 /**************************** ROMS *****************************************************************/

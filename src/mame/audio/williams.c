@@ -52,8 +52,8 @@ static UINT8 williams_sound_int_state;
 static UINT8 audio_talkback;
 static UINT8 audio_sync;
 
-static running_device *sound_cpu;
-static running_device *soundalt_cpu;
+static device_t *sound_cpu;
+static device_t *soundalt_cpu;
 
 
 
@@ -63,8 +63,8 @@ static running_device *soundalt_cpu;
 
 static void init_audio_state(running_machine *machine);
 
-static void cvsd_ym2151_irq(running_device *device, int state);
-static void adpcm_ym2151_irq(running_device *device, int state);
+static void cvsd_ym2151_irq(device_t *device, int state);
+static void adpcm_ym2151_irq(device_t *device, int state);
 static WRITE_LINE_DEVICE_HANDLER( cvsd_irqa );
 static WRITE_LINE_DEVICE_HANDLER( cvsd_irqb );
 
@@ -194,68 +194,68 @@ static const ym2151_interface adpcm_ym2151_interface =
 ****************************************************************************/
 
 MACHINE_CONFIG_FRAGMENT( williams_cvsd_sound )
-	MDRV_CPU_ADD("cvsdcpu", M6809E, CVSD_MASTER_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(williams_cvsd_map)
+	MCFG_CPU_ADD("cvsdcpu", M6809E, CVSD_MASTER_CLOCK)
+	MCFG_CPU_PROGRAM_MAP(williams_cvsd_map)
 
-	MDRV_PIA6821_ADD("cvsdpia", cvsd_pia_intf)
+	MCFG_PIA6821_ADD("cvsdpia", cvsd_pia_intf)
 
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM2151, CVSD_FM_CLOCK)
-	MDRV_SOUND_CONFIG(cvsd_ym2151_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
+	MCFG_SOUND_ADD("ymsnd", YM2151, CVSD_FM_CLOCK)
+	MCFG_SOUND_CONFIG(cvsd_ym2151_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-	MDRV_SOUND_ADD("dac", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD("cvsd", HC55516, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
+	MCFG_SOUND_ADD("cvsd", HC55516, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_FRAGMENT( williams_narc_sound )
-	MDRV_CPU_ADD("narc1cpu", M6809E, NARC_MASTER_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(williams_narc_master_map)
+	MCFG_CPU_ADD("narc1cpu", M6809E, NARC_MASTER_CLOCK)
+	MCFG_CPU_PROGRAM_MAP(williams_narc_master_map)
 
-	MDRV_CPU_ADD("narc2cpu", M6809E, NARC_MASTER_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(williams_narc_slave_map)
+	MCFG_CPU_ADD("narc2cpu", M6809E, NARC_MASTER_CLOCK)
+	MCFG_CPU_PROGRAM_MAP(williams_narc_slave_map)
 
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ymsnd", YM2151, NARC_FM_CLOCK)
-	MDRV_SOUND_CONFIG(adpcm_ym2151_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.10)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.10)
+	MCFG_SOUND_ADD("ymsnd", YM2151, NARC_FM_CLOCK)
+	MCFG_SOUND_CONFIG(adpcm_ym2151_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.10)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.10)
 
-	MDRV_SOUND_ADD("dac1", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
+	MCFG_SOUND_ADD("dac1", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 
-	MDRV_SOUND_ADD("dac2", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
+	MCFG_SOUND_ADD("dac2", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 
-	MDRV_SOUND_ADD("cvsd", HC55516, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.60)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.60)
+	MCFG_SOUND_ADD("cvsd", HC55516, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.60)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.60)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_FRAGMENT( williams_adpcm_sound )
-	MDRV_CPU_ADD("adpcm", M6809E, ADPCM_MASTER_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(williams_adpcm_map)
+	MCFG_CPU_ADD("adpcm", M6809E, ADPCM_MASTER_CLOCK)
+	MCFG_CPU_PROGRAM_MAP(williams_adpcm_map)
 
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM2151, ADPCM_FM_CLOCK)
-	MDRV_SOUND_CONFIG(adpcm_ym2151_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
+	MCFG_SOUND_ADD("ymsnd", YM2151, ADPCM_FM_CLOCK)
+	MCFG_SOUND_CONFIG(adpcm_ym2151_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-	MDRV_SOUND_ADD("dac", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_OKIM6295_ADD("oki", ADPCM_MASTER_CLOCK/8, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_OKIM6295_ADD("oki", ADPCM_MASTER_CLOCK/8, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 
@@ -274,7 +274,7 @@ void williams_cvsd_init(running_machine *machine)
 	soundalt_cpu = NULL;
 
 	/* configure master CPU banks */
-	ROM = memory_region(machine, "cvsdcpu");
+	ROM = machine->region("cvsdcpu")->base();
 	for (bank = 0; bank < 16; bank++)
 	{
 		/*
@@ -306,7 +306,7 @@ void williams_narc_init(running_machine *machine)
 	soundalt_cpu = machine->device("narc2cpu");
 
 	/* configure master CPU banks */
-	ROM = memory_region(machine, "narc1cpu");
+	ROM = machine->region("narc1cpu")->base();
 	for (bank = 0; bank < 16; bank++)
 	{
 		/*
@@ -320,7 +320,7 @@ void williams_narc_init(running_machine *machine)
 	memory_set_bankptr(machine, "bank6", &ROM[0x10000 + 0x4000 + 0x8000 + 0x10000 + 0x20000 * 3]);
 
 	/* configure slave CPU banks */
-	ROM = memory_region(machine, "narc2cpu");
+	ROM = machine->region("narc2cpu")->base();
 	for (bank = 0; bank < 16; bank++)
 	{
 		/*
@@ -349,13 +349,13 @@ void williams_adpcm_init(running_machine *machine)
 	soundalt_cpu = NULL;
 
 	/* configure banks */
-	ROM = memory_region(machine, "adpcm");
+	ROM = machine->region("adpcm")->base();
 	memory_configure_bank(machine, "bank5", 0, 8, &ROM[0x10000], 0x8000);
 	memory_set_bankptr(machine, "bank6", &ROM[0x10000 + 0x4000 + 7 * 0x8000]);
 
 	/* expand ADPCM data */
 	/* it is assumed that U12 is loaded @ 0x00000 and U13 is loaded @ 0x40000 */
-	ROM = memory_region(machine, "oki");
+	ROM = machine->region("oki")->base();
 	memcpy(ROM + 0x1c0000, ROM + 0x080000, 0x20000);	/* expand individual banks */
 	memcpy(ROM + 0x180000, ROM + 0x0a0000, 0x20000);
 	memcpy(ROM + 0x140000, ROM + 0x0c0000, 0x20000);
@@ -405,7 +405,7 @@ static void init_audio_state(running_machine *machine)
     CVSD IRQ GENERATION CALLBACKS
 ****************************************************************************/
 
-static void cvsd_ym2151_irq(running_device *device, int state)
+static void cvsd_ym2151_irq(device_t *device, int state)
 {
 	pia6821_ca1_w(device->machine->device("cvsdpia"), !state);
 }
@@ -428,7 +428,7 @@ static WRITE_LINE_DEVICE_HANDLER( cvsd_irqb )
     ADPCM IRQ GENERATION CALLBACKS
 ****************************************************************************/
 
-static void adpcm_ym2151_irq(running_device *device, int state)
+static void adpcm_ym2151_irq(device_t *device, int state)
 {
 	cpu_set_input_line(sound_cpu, M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -471,7 +471,7 @@ static WRITE8_DEVICE_HANDLER( cvsd_clock_set_w )
 
 static TIMER_CALLBACK( williams_cvsd_delayed_data_w )
 {
-	running_device *pia = machine->device("cvsdpia");
+	device_t *pia = machine->device("cvsdpia");
 	pia6821_portb_w(pia, 0, param & 0xff);
 	pia6821_cb1_w(pia, (param >> 8) & 1);
 	pia6821_cb2_w(pia, (param >> 9) & 1);

@@ -82,7 +82,7 @@ static WRITE8_HANDLER( k88games_sh_irqtrigger_w )
 static WRITE8_HANDLER( speech_control_w )
 {
 	_88games_state *state = space->machine->driver_data<_88games_state>();
-	running_device *upd;
+	device_t *upd;
 
 	state->speech_chip = (data & 4) ? 1 : 0;
 	upd = state->speech_chip ? state->upd_2 : state->upd_1;
@@ -94,7 +94,7 @@ static WRITE8_HANDLER( speech_control_w )
 static WRITE8_HANDLER( speech_msg_w )
 {
 	_88games_state *state = space->machine->driver_data<_88games_state>();
-	running_device *upd = state->speech_chip ? state->upd_2 : state->upd_1;
+	device_t *upd = state->speech_chip ? state->upd_2 : state->upd_1;
 
 	upd7759_port_w(upd, 0, data);
 }
@@ -275,7 +275,7 @@ INPUT_PORTS_END
 static KONAMI_SETLINES_CALLBACK( k88games_banking )
 {
 	_88games_state *state = device->machine->driver_data<_88games_state>();
-	UINT8 *RAM = memory_region(device->machine, "maincpu");
+	UINT8 *RAM = device->machine->region("maincpu")->base();
 	int offs;
 
 	logerror("%04x: bank select %02x\n", cpu_get_pc(device), lines);
@@ -339,7 +339,7 @@ static MACHINE_RESET( 88games )
 	_88games_state *state = machine->driver_data<_88games_state>();
 
 	konami_configure_set_lines(machine->device("maincpu"), k88games_banking);
-	machine->generic.paletteram.u8 = &memory_region(machine, "maincpu")[0x20000];
+	machine->generic.paletteram.u8 = &machine->region("maincpu")->base()[0x20000];
 
 	state->videobank = 0;
 	state->zoomreadroms = 0;
@@ -379,47 +379,47 @@ static const k051316_interface _88games_k051316_intf =
 static MACHINE_CONFIG_START( 88games, _88games_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", KONAMI, 3000000) /* ? */
-	MDRV_CPU_PROGRAM_MAP(main_map)
-	MDRV_CPU_VBLANK_INT("screen", k88games_interrupt)
+	MCFG_CPU_ADD("maincpu", KONAMI, 3000000) /* ? */
+	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_CPU_VBLANK_INT("screen", k88games_interrupt)
 
-	MDRV_CPU_ADD("audiocpu", Z80, 3579545)
-	MDRV_CPU_PROGRAM_MAP(sound_map)
+	MCFG_CPU_ADD("audiocpu", Z80, 3579545)
+	MCFG_CPU_PROGRAM_MAP(sound_map)
 
-	MDRV_MACHINE_START(88games)
-	MDRV_MACHINE_RESET(88games)
+	MCFG_MACHINE_START(88games)
+	MCFG_MACHINE_RESET(88games)
 
-	MDRV_NVRAM_ADD_0FILL("nvram")
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
+	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(13*8, (64-13)*8-1, 2*8, 30*8-1 )
-	MDRV_PALETTE_LENGTH(2048)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(13*8, (64-13)*8-1, 2*8, 30*8-1 )
+	MCFG_PALETTE_LENGTH(2048)
 
-	MDRV_K052109_ADD("k052109", _88games_k052109_intf)
-	MDRV_K051960_ADD("k051960", _88games_k051960_intf)
-	MDRV_K051316_ADD("k051316", _88games_k051316_intf)
+	MCFG_K052109_ADD("k052109", _88games_k052109_intf)
+	MCFG_K051960_ADD("k051960", _88games_k051960_intf)
+	MCFG_K051316_ADD("k051316", _88games_k051316_intf)
 
-	MDRV_VIDEO_UPDATE(88games)
+	MCFG_VIDEO_UPDATE(88games)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM2151, 3579545)
-	MDRV_SOUND_ROUTE(0, "mono", 0.75)
-	MDRV_SOUND_ROUTE(1, "mono", 0.75)
+	MCFG_SOUND_ADD("ymsnd", YM2151, 3579545)
+	MCFG_SOUND_ROUTE(0, "mono", 0.75)
+	MCFG_SOUND_ROUTE(1, "mono", 0.75)
 
-	MDRV_SOUND_ADD("upd1", UPD7759, UPD7759_STANDARD_CLOCK)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	MCFG_SOUND_ADD("upd1", UPD7759, UPD7759_STANDARD_CLOCK)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MDRV_SOUND_ADD("upd2", UPD7759, UPD7759_STANDARD_CLOCK)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	MCFG_SOUND_ADD("upd2", UPD7759, UPD7759_STANDARD_CLOCK)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
 

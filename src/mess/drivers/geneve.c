@@ -468,29 +468,29 @@ MACHINE_RESET( geneve )
 static MACHINE_CONFIG_START( geneve_60hz, geneve_state )
 	/* basic machine hardware */
 	/* TMS9995 CPU @ 12.0 MHz */
-	MDRV_CPU_ADD("maincpu", TMS9995, 12000000)
-	MDRV_CPU_PROGRAM_MAP(memmap)
-	MDRV_CPU_IO_MAP(cru_map)
-	MDRV_CPU_VBLANK_INT_HACK(geneve_hblank_interrupt, 262)	/* 262.5 in 60Hz, 312.5 in 50Hz */
+	MCFG_CPU_ADD("maincpu", TMS9995, 12000000)
+	MCFG_CPU_PROGRAM_MAP(memmap)
+	MCFG_CPU_IO_MAP(cru_map)
+	MCFG_CPU_VBLANK_INT_HACK(geneve_hblank_interrupt, 262)	/* 262.5 in 60Hz, 312.5 in 50Hz */
 
-	MDRV_MACHINE_START( geneve )
-	MDRV_MACHINE_RESET( geneve )
+	MCFG_MACHINE_START( geneve )
+	MCFG_MACHINE_RESET( geneve )
 
 	/* video hardware */
-	MDRV_TI_V9938_ADD("video", 60, "screen", 2500, 512+32, (212+28)*2, tms9901_gen_set_int2)
+	MCFG_TI_V9938_ADD("video", 60, "screen", 2500, 512+32, (212+28)*2, tms9901_gen_set_int2)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("soundgen", SN76496, 3579545)	/* 3.579545 MHz */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("soundgen", SN76496, 3579545)	/* 3.579545 MHz */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
 	/* Peripheral Box. Take the same as the TI-99/4A. */
-	MDRV_PBOXGEN_ADD( "peribox", board_inta, board_intb, board_ready )
+	MCFG_PBOXGEN_ADD( "peribox", board_inta, board_intb, board_ready )
 
-	MDRV_TMS9901_ADD("tms9901", tms9901_wiring_geneve)
+	MCFG_TMS9901_ADD("tms9901", tms9901_wiring_geneve)
 
 	/* tms9901 */
-	MDRV_GENEVE_BOARD_ADD("geneve_board")
+	MCFG_GENEVE_BOARD_ADD("geneve_board")
 MACHINE_CONFIG_END
 
 /*

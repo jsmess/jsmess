@@ -438,7 +438,7 @@ static VIDEO_UPDATE(magicard)
 
 static READ16_HANDLER( test_r )
 {
-	return mame_rand(space->machine);
+	return space->machine->rand();
 }
 
 static WRITE16_HANDLER( paletteram_io_w )
@@ -481,7 +481,7 @@ static READ16_HANDLER( philips_66470_r )
 	switch(offset)
 	{
 //      case 0/2:
-//          return mame_rand(space->machine); //TODO
+//          return space->machine->rand(); //TODO
 	}
 
 	//printf("[%04x]\n",offset*2);
@@ -533,7 +533,7 @@ static READ16_HANDLER( scc68070_uart_r )
 
 	switch(offset)
 	{
-		case 0x02/2: return mame_rand(space->machine); //uart mode register
+		case 0x02/2: return space->machine->rand(); //uart mode register
 	}
 
 	return scc68070_uart_regs[offset];
@@ -603,7 +603,7 @@ INPUT_PORTS_END
 
 static MACHINE_RESET( magicard )
 {
-	UINT16 *src    = (UINT16*)memory_region( machine, "maincpu" );
+	UINT16 *src    = (UINT16*)machine->region( "maincpu" )->base();
 	UINT16 *dst    = magicram;
 	memcpy (dst, src, 0x80000);
 	machine->device("maincpu")->reset();
@@ -624,27 +624,27 @@ static INTERRUPT_GEN( magicard_irq )
 }
 
 static MACHINE_CONFIG_START( magicard, driver_device )
-	MDRV_CPU_ADD("maincpu", SCC68070, CLOCK_A/2)	/* SCC-68070 CCA84 datasheet */
-	MDRV_CPU_PROGRAM_MAP(magicard_mem)
-	MDRV_CPU_VBLANK_INT("screen", magicard_irq) /* no interrupts? (it erases the vectors..) */
+	MCFG_CPU_ADD("maincpu", SCC68070, CLOCK_A/2)	/* SCC-68070 CCA84 datasheet */
+	MCFG_CPU_PROGRAM_MAP(magicard_mem)
+	MCFG_CPU_VBLANK_INT("screen", magicard_irq) /* no interrupts? (it erases the vectors..) */
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_SIZE(400, 300)
-	MDRV_SCREEN_VISIBLE_AREA(0, 320-1, 0, 256-1) //dynamic resolution,TODO
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_SIZE(400, 300)
+	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 256-1) //dynamic resolution,TODO
 
-	MDRV_PALETTE_LENGTH(0x100)
+	MCFG_PALETTE_LENGTH(0x100)
 
-	MDRV_VIDEO_START(magicard)
-	MDRV_VIDEO_UPDATE(magicard)
+	MCFG_VIDEO_START(magicard)
+	MCFG_VIDEO_UPDATE(magicard)
 
-	MDRV_MACHINE_RESET(magicard)
+	MCFG_MACHINE_RESET(magicard)
 
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("ymsnd", YM2413, CLOCK_A/12)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("ymsnd", YM2413, CLOCK_A/12)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 

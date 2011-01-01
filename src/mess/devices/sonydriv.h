@@ -23,35 +23,35 @@ enum
 };
 #endif
 
-void sony_set_lines(running_device *device,UINT8 lines);
-void sony_set_enable_lines(running_device *device,int enable_mask);
-void sony_set_sel_line(running_device *device,int sel);
+void sony_set_lines(device_t *device,UINT8 lines);
+void sony_set_enable_lines(device_t *device,int enable_mask);
+void sony_set_sel_line(device_t *device,int sel);
 
 void sony_set_speed(int speed);
 
-UINT8 sony_read_data(running_device *device);
-void sony_write_data(running_device *device,UINT8 data);
-int sony_read_status(running_device *device);
+UINT8 sony_read_data(device_t *device);
+void sony_write_data(device_t *device,UINT8 data);
+int sony_read_status(device_t *device);
 
 DECLARE_LEGACY_IMAGE_DEVICE(FLOPPY_SONY, sonydriv);
 
-#define MDRV_FLOPPY_SONY_2_DRIVES_ADD(_config)	\
-	MDRV_DEVICE_ADD(FLOPPY_0, FLOPPY_SONY, 0)		\
-	MDRV_DEVICE_CONFIG(_config)	\
-	MDRV_DEVICE_ADD(FLOPPY_1, FLOPPY_SONY, 0)		\
-	MDRV_DEVICE_CONFIG(_config)
+#define MCFG_FLOPPY_SONY_2_DRIVES_ADD(_config)	\
+	MCFG_DEVICE_ADD(FLOPPY_0, FLOPPY_SONY, 0)		\
+	MCFG_DEVICE_CONFIG(_config)	\
+	MCFG_DEVICE_ADD(FLOPPY_1, FLOPPY_SONY, 0)		\
+	MCFG_DEVICE_CONFIG(_config)
 
-#define MDRV_FLOPPY_SONY_2_DRIVES_ADDITIONAL_ADD(_config)	\
-	MDRV_DEVICE_ADD(FLOPPY_2, FLOPPY_SONY, 0)		\
-	MDRV_DEVICE_CONFIG(_config)	\
-	MDRV_DEVICE_ADD(FLOPPY_3, FLOPPY_SONY, 0)		\
-	MDRV_DEVICE_CONFIG(_config)
+#define MCFG_FLOPPY_SONY_2_DRIVES_ADDITIONAL_ADD(_config)	\
+	MCFG_DEVICE_ADD(FLOPPY_2, FLOPPY_SONY, 0)		\
+	MCFG_DEVICE_CONFIG(_config)	\
+	MCFG_DEVICE_ADD(FLOPPY_3, FLOPPY_SONY, 0)		\
+	MCFG_DEVICE_CONFIG(_config)
 
-#define MDRV_FLOPPY_SONY_2_DRIVES_MODIFY(_config)	\
-	MDRV_DEVICE_MODIFY(FLOPPY_0)		\
-	MDRV_DEVICE_CONFIG(_config)	\
-	MDRV_DEVICE_MODIFY(FLOPPY_1)		\
-	MDRV_DEVICE_CONFIG(_config)
+#define MCFG_FLOPPY_SONY_2_DRIVES_MODIFY(_config)	\
+	MCFG_DEVICE_MODIFY(FLOPPY_0)		\
+	MCFG_DEVICE_CONFIG(_config)	\
+	MCFG_DEVICE_MODIFY(FLOPPY_1)		\
+	MCFG_DEVICE_CONFIG(_config)
 
 
 

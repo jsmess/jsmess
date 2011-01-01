@@ -66,9 +66,9 @@
 
 DECLARE_LEGACY_DEVICE(C64H156, c64h156);
 
-#define MDRV_64H156_ADD(_tag, _clock, _intrf) \
-	MDRV_DEVICE_ADD(_tag, C64H156, _clock) \
-	MDRV_DEVICE_CONFIG(_intrf)
+#define MCFG_64H156_ADD(_tag, _clock, _intrf) \
+	MCFG_DEVICE_ADD(_tag, C64H156, _clock) \
+	MCFG_DEVICE_CONFIG(_intrf)
 
 #define C64H156_INTERFACE(name) \
 	const c64h156_interface (name)=
@@ -100,13 +100,13 @@ READ_LINE_DEVICE_HANDLER( c64h156_sync_r );
 READ_LINE_DEVICE_HANDLER( c64h156_byte_r );
 
 /* stepper driver */
-void c64h156_stp_w(running_device *device, int data);
+void c64h156_stp_w(device_t *device, int data);
 
 /* stepper motor */
 WRITE_LINE_DEVICE_HANDLER( c64h156_mtr_w );
 
 /* density select */
-void c64h156_ds_w(running_device *device, int data);
+void c64h156_ds_w(device_t *device, int data);
 
 /* */
 WRITE_LINE_DEVICE_HANDLER( c64h156_ted_w );

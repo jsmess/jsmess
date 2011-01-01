@@ -30,7 +30,7 @@ struct _adc080x_t
 	emu_timer *cycle_timer;				/* cycle timer */
 };
 
-INLINE adc080x_t *get_safe_token(running_device *device)
+INLINE adc080x_t *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 
@@ -41,7 +41,7 @@ INLINE adc080x_t *get_safe_token(running_device *device)
 
 static TIMER_CALLBACK( cycle_tick )
 {
-	running_device *device = (running_device *)ptr;
+	device_t *device = (device_t *)ptr;
 	adc080x_t *adc080x = get_safe_token(device);
 
 	if (!adc080x->start)
@@ -85,7 +85,7 @@ static TIMER_CALLBACK( cycle_tick )
 
 /* Address Latch Enable */
 
-void adc080x_ale_w(running_device *device, int level, int address)
+void adc080x_ale_w(device_t *device, int level, int address)
 {
 	adc080x_t *adc080x = get_safe_token(device);
 
@@ -99,7 +99,7 @@ void adc080x_ale_w(running_device *device, int level, int address)
 
 /* Start Conversion */
 
-void adc080x_start_w(running_device *device, int level)
+void adc080x_start_w(device_t *device, int level)
 {
 	adc080x_t *adc080x = get_safe_token(device);
 

@@ -116,40 +116,40 @@ static const floppy_config concept_floppy_config =
 /* concept machine */
 static MACHINE_CONFIG_START( concept, concept_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 8182000)        /* 16.364 MHz / 2 */
-	MDRV_CPU_PROGRAM_MAP(concept_memmap)
-	MDRV_CPU_VBLANK_INT("screen", concept_interrupt)
+	MCFG_CPU_ADD("maincpu", M68000, 8182000)        /* 16.364 MHz / 2 */
+	MCFG_CPU_PROGRAM_MAP(concept_memmap)
+	MCFG_CPU_VBLANK_INT("screen", concept_interrupt)
 
-	MDRV_QUANTUM_TIME(HZ(60))
-	MDRV_MACHINE_START(concept)
+	MCFG_QUANTUM_TIME(HZ(60))
+	MCFG_MACHINE_START(concept)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)			/* 50 or 60, jumper-selectable */
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(720, 560)
-	MDRV_SCREEN_VISIBLE_AREA(0, 720-1, 0, 560-1)
-	MDRV_PALETTE_LENGTH(2)
-	MDRV_PALETTE_INIT(black_and_white)
+	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)			/* 50 or 60, jumper-selectable */
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(720, 560)
+	MCFG_SCREEN_VISIBLE_AREA(0, 720-1, 0, 560-1)
+	MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_INIT(black_and_white)
 
-	MDRV_VIDEO_START(concept)
-	MDRV_VIDEO_UPDATE(concept)
+	MCFG_VIDEO_START(concept)
+	MCFG_VIDEO_UPDATE(concept)
 
 	/* no sound? */
 
-	MDRV_HARDDISK_ADD( "harddisk1" )
+	MCFG_HARDDISK_ADD( "harddisk1" )
 
 	/* rtc */
-	MDRV_MM58274C_ADD("mm58274c", concept_mm58274c_interface)
+	MCFG_MM58274C_ADD("mm58274c", concept_mm58274c_interface)
 
 	/* via */
-	MDRV_VIA6522_ADD("via6522_0", 1022750, concept_via6522_intf)
+	MCFG_VIA6522_ADD("via6522_0", 1022750, concept_via6522_intf)
 
-	MDRV_WD179X_ADD("wd179x", concept_wd17xx_interface )
+	MCFG_WD179X_ADD("wd179x", concept_wd17xx_interface )
 
-	MDRV_FLOPPY_4_DRIVES_ADD(concept_floppy_config)
+	MCFG_FLOPPY_4_DRIVES_ADD(concept_floppy_config)
 MACHINE_CONFIG_END
 
 

@@ -19,11 +19,11 @@ public:
 	UINT8 data;
 
 	/* devices */
-	running_device *cdp1861;
-	running_device *mm74c923;
-	running_device *dm9368_l;
-	running_device *dm9368_h;
-	running_device *cassette;
+	device_t *cdp1861;
+	device_t *mm74c923;
+	device_t *dm9368_l;
+	device_t *dm9368_h;
+	device_t *cassette;
 };
 
 #endif

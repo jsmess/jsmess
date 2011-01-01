@@ -389,26 +389,26 @@ ADDRESS_MAP_END
     MACHINE DRIVERS
 ***************************************************************************/
 
-static void duarta_irq_handler(running_device *device, UINT8 vector)
+static void duarta_irq_handler(device_t *device, UINT8 vector)
 {
 	verboselog(device->machine, 0, "duarta_irq_handler\n");
 	cputag_set_input_line_and_vector(device->machine, "maincpu", M68K_IRQ_6, HOLD_LINE, M68K_INT_ACK_AUTOVECTOR);
 };
 
-static UINT8 duarta_input(running_device *device)
+static UINT8 duarta_input(device_t *device)
 {
 	verboselog(device->machine, 0, "duarta_input\n");
 	return 0;
 }
 
-static void duarta_output(running_device *device, UINT8 data)
+static void duarta_output(device_t *device, UINT8 data)
 {
 	verboselog(device->machine, 0, "duarta_output: RTS: %d, DTR: %d\n", data & 1, (data & 4) >> 2);
 }
 
-static void duarta_tx(running_device *device, int channel, UINT8 data)
+static void duarta_tx(device_t *device, int channel, UINT8 data)
 {
-	running_device *devconf = device->machine->device("terminal");
+	device_t *devconf = device->machine->device("terminal");
 	verboselog(device->machine, 0, "duarta_tx: %02x\n", data);
 	terminal_write(devconf,0,data);
 }
@@ -421,24 +421,24 @@ static const duart68681_config sgi_ip2_duart68681a_config =
 	duarta_output
 };
 
-static void duartb_irq_handler(running_device *device, UINT8 vector)
+static void duartb_irq_handler(device_t *device, UINT8 vector)
 {
 	verboselog(device->machine, 0, "duartb_irq_handler\n");
 	cputag_set_input_line_and_vector(device->machine, "maincpu", M68K_IRQ_6, HOLD_LINE, M68K_INT_ACK_AUTOVECTOR);
 };
 
-static UINT8 duartb_input(running_device *device)
+static UINT8 duartb_input(device_t *device)
 {
 	verboselog(device->machine, 0, "duartb_input\n");
 	return 0;
 }
 
-static void duartb_output(running_device *device, UINT8 data)
+static void duartb_output(device_t *device, UINT8 data)
 {
 	verboselog(device->machine, 0, "duartb_output: RTS: %d, DTR: %d\n", data & 1, (data & 4) >> 2);
 }
 
-static void duartb_tx(running_device *device, int channel, UINT8 data)
+static void duartb_tx(device_t *device, int channel, UINT8 data)
 {
 	verboselog(device->machine, 0, "duartb_tx: %02x\n", data);
 }
@@ -453,25 +453,25 @@ static const duart68681_config sgi_ip2_duart68681b_config =
 
 static MACHINE_CONFIG_START( sgi_ip2, sgi_ip2_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68020, 16000000)
-	MDRV_CPU_PROGRAM_MAP(sgi_ip2_map)
-	MDRV_CPU_VBLANK_INT(TERMINAL_SCREEN_TAG, sgi_ip2_vbl)
+	MCFG_CPU_ADD("maincpu", M68020, 16000000)
+	MCFG_CPU_PROGRAM_MAP(sgi_ip2_map)
+	MCFG_CPU_VBLANK_INT(TERMINAL_SCREEN_TAG, sgi_ip2_vbl)
 
-	MDRV_MACHINE_START(sgi_ip2)
-	MDRV_MACHINE_RESET(sgi_ip2)
+	MCFG_MACHINE_START(sgi_ip2)
+	MCFG_MACHINE_RESET(sgi_ip2)
 
 	/* video hardware */
-	MDRV_FRAGMENT_ADD( generic_terminal )
-	MDRV_GENERIC_TERMINAL_ADD(TERMINAL_TAG,sgi_terminal_intf)
+	MCFG_FRAGMENT_ADD( generic_terminal )
+	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG,sgi_terminal_intf)
 
-    MDRV_DUART68681_ADD( "duart68681a", XTAL_3_6864MHz, sgi_ip2_duart68681a_config ) /* Y3 3.6864MHz Xtal ??? copy-over from dectalk */
-    MDRV_DUART68681_ADD( "duart68681b", XTAL_3_6864MHz, sgi_ip2_duart68681b_config ) /* Y3 3.6864MHz Xtal ??? copy-over from dectalk */
-	MDRV_MC146818_ADD( "rtc", MC146818_IGNORE_CENTURY )
+    MCFG_DUART68681_ADD( "duart68681a", XTAL_3_6864MHz, sgi_ip2_duart68681a_config ) /* Y3 3.6864MHz Xtal ??? copy-over from dectalk */
+    MCFG_DUART68681_ADD( "duart68681b", XTAL_3_6864MHz, sgi_ip2_duart68681b_config ) /* Y3 3.6864MHz Xtal ??? copy-over from dectalk */
+	MCFG_MC146818_ADD( "rtc", MC146818_IGNORE_CENTURY )
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD( "dac", DAC, 0 )
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD( "dac", DAC, 0 )
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( sgi_ip2 )
@@ -526,7 +526,7 @@ INPUT_PORTS_END
 static DRIVER_INIT( sgi_ip2 )
 {
 	sgi_ip2_state *state = machine->driver_data<sgi_ip2_state>();
-	UINT32 *src = (UINT32*)memory_region(machine, "user1");
+	UINT32 *src = (UINT32*)machine->region("user1")->base();
 	UINT32 *dst = state->mainram;
 	memcpy(dst, src, 8);
 

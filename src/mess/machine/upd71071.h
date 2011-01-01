@@ -12,13 +12,13 @@ struct _upd71071_interface
 	void (*dma_write[4])(running_machine* machine, UINT16 data);
 };
 
-int upd71071_dmarq(running_device* device,int state,int channel);
+int upd71071_dmarq(device_t* device,int state,int channel);
 
 DECLARE_LEGACY_DEVICE(UPD71071, upd71071);
 
-#define MDRV_UPD71071_ADD(_tag, _config) \
-	MDRV_DEVICE_ADD(_tag, UPD71071, 0) \
-	MDRV_DEVICE_CONFIG(_config)
+#define MCFG_UPD71071_ADD(_tag, _config) \
+	MCFG_DEVICE_ADD(_tag, UPD71071, 0) \
+	MCFG_DEVICE_CONFIG(_config)
 
 READ8_DEVICE_HANDLER(upd71071_r);
 WRITE8_DEVICE_HANDLER(upd71071_w);

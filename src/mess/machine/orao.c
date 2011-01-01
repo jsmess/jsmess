@@ -74,7 +74,7 @@ WRITE8_HANDLER( orao_io_w )
 {
 	if (offset == 0x0800)
 	{
-		running_device *dac_device = space->machine->device("dac");
+		device_t *dac_device = space->machine->device("dac");
 		dac_data_w(dac_device, data); //beeper
 	}
 }

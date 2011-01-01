@@ -34,14 +34,14 @@ struct _coco_cartridge_line
 	cococart_line_value			value;
 	int							line;
 	int							q_count;
-	void						(*callback)(running_device *, int line);
+	void						(*callback)(device_t *, int line);
 };
 
 
 typedef struct _coco_cartridge_t coco_cartridge_t;
 struct _coco_cartridge_t
 {
-	running_device *pcb;
+	device_t *pcb;
 	read8_device_func			pcb_r;
 	write8_device_func			pcb_w;
 
@@ -55,7 +55,7 @@ struct _coco_cartridge_t
     PROTOTYPES
 ***************************************************************************/
 
-static void set_line_timer(running_device *device, coco_cartridge_line *line, cococart_line_value value);
+static void set_line_timer(device_t *device, coco_cartridge_line *line, cococart_line_value value);
 
 static TIMER_CALLBACK( cart_timer_callback );
 static TIMER_CALLBACK( nmi_timer_callback );
@@ -66,7 +66,7 @@ static TIMER_CALLBACK( halt_timer_callback );
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE coco_cartridge_t *get_token(running_device *device)
+INLINE coco_cartridge_t *get_token(device_t *device)
 {
 	assert(device != NULL);
 	assert((device->type() == COCO_CARTRIDGE) || (device->type() == DRAGON_CARTRIDGE));
@@ -84,7 +84,7 @@ INLINE coco_cartridge_t *get_token(running_device *device)
 
 static DEVICE_START(coco_cartridge)
 {
-	running_device *cartslot;
+	device_t *cartslot;
 	coco_cartridge_t *cococart = get_token(device);
 	const cococart_config *config = (const cococart_config *) downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
    int i;
@@ -190,7 +190,7 @@ static const char *line_value_string(cococart_line_value value)
     set_line
 -------------------------------------------------*/
 
-static void set_line(running_device *device, const char *line_name, coco_cartridge_line *line, cococart_line_value value)
+static void set_line(device_t *device, const char *line_name, coco_cartridge_line *line, cococart_line_value value)
 {
 	if ((line->value != value) || (value == COCOCART_LINE_VALUE_Q))
 	{
@@ -232,7 +232,7 @@ static void set_line(running_device *device, const char *line_name, coco_cartrid
 
 static TIMER_CALLBACK( cart_timer_callback )
 {
-	running_device *device = (running_device *) ptr;
+	device_t *device = (device_t *) ptr;
 	set_line(device, "CART", &get_token(device)->cart_line, (cococart_line_value) param);
 }
 
@@ -243,7 +243,7 @@ static TIMER_CALLBACK( cart_timer_callback )
 
 static TIMER_CALLBACK( nmi_timer_callback )
 {
-	running_device *device = (running_device *) ptr;
+	device_t *device = (device_t *) ptr;
 	set_line(device, "NMI", &get_token(device)->nmi_line, (cococart_line_value) param);
 }
 
@@ -254,7 +254,7 @@ static TIMER_CALLBACK( nmi_timer_callback )
 
 static TIMER_CALLBACK( halt_timer_callback )
 {
-	running_device *device = (running_device *) ptr;
+	device_t *device = (device_t *) ptr;
 	set_line(device, "HALT", &get_token(device)->halt_line, (cococart_line_value) param);
 }
 
@@ -263,7 +263,7 @@ static TIMER_CALLBACK( halt_timer_callback )
     set_line_timer()
 -------------------------------------------------*/
 
-static void set_line_timer(running_device *device, coco_cartridge_line *line, cococart_line_value value)
+static void set_line_timer(device_t *device, coco_cartridge_line *line, cococart_line_value value)
 {
 	/* calculate delay; delay dependant on cycles per second */
 	attotime delay = (line->delay != 0)
@@ -279,7 +279,7 @@ static void set_line_timer(running_device *device, coco_cartridge_line *line, co
     twiddle_line_if_q
 -------------------------------------------------*/
 
-static void twiddle_line_if_q(running_device *device, coco_cartridge_line *line)
+static void twiddle_line_if_q(device_t *device, coco_cartridge_line *line)
 {
 	if (line->value == COCOCART_LINE_VALUE_Q)
 	{
@@ -294,7 +294,7 @@ static void twiddle_line_if_q(running_device *device, coco_cartridge_line *line)
     support twiddling the Q line
 -------------------------------------------------*/
 
-void coco_cartridge_twiddle_q_lines(running_device *device)
+void coco_cartridge_twiddle_q_lines(device_t *device)
 {
 	coco_cartridge_t *cococart = get_token(device);
 	twiddle_line_if_q(device, &cococart->cart_line);
@@ -307,7 +307,7 @@ void coco_cartridge_twiddle_q_lines(running_device *device)
     coco_cartridge_set_line
 -------------------------------------------------*/
 
-void coco_cartridge_set_line(running_device *device, cococart_line line, cococart_line_value value)
+void coco_cartridge_set_line(device_t *device, cococart_line line, cococart_line_value value)
 {
 	switch (line)
 	{
@@ -361,15 +361,15 @@ static DEVICE_GET_INFO(general_cartridge)
 ***************************************************************************/
 
 static MACHINE_CONFIG_FRAGMENT( coco_cartridge )
-	MDRV_CARTSLOT_ADD(CARTSLOT_TAG)
-	MDRV_CARTSLOT_EXTENSION_LIST("ccc,rom")
-	MDRV_CARTSLOT_NOT_MANDATORY
-	MDRV_CARTSLOT_PCBTYPE(0, "coco_fdc",	COCO_CARTRIDGE_PCB_FDC_COCO)
-	MDRV_CARTSLOT_PCBTYPE(1, "banked_16k",	COCO_CARTRIDGE_PCB_PAK_BANKED16K)
-	MDRV_CARTSLOT_PCBTYPE(2, "orch90",		COCO_CARTRIDGE_PCB_ORCH90)
-	MDRV_CARTSLOT_PCBTYPE(3, "rs232",		COCO_CARTRIDGE_PCB_RS232)
-	//MDRV_CARTSLOT_PCBTYPE(4, "coco_ssc",  COCO_CARTRIDGE_PCB_SSC)
-	MDRV_CARTSLOT_PCBTYPE(4, "",			COCO_CARTRIDGE_PCB_PAK)
+	MCFG_CARTSLOT_ADD(CARTSLOT_TAG)
+	MCFG_CARTSLOT_EXTENSION_LIST("ccc,rom")
+	MCFG_CARTSLOT_NOT_MANDATORY
+	MCFG_CARTSLOT_PCBTYPE(0, "coco_fdc",	COCO_CARTRIDGE_PCB_FDC_COCO)
+	MCFG_CARTSLOT_PCBTYPE(1, "banked_16k",	COCO_CARTRIDGE_PCB_PAK_BANKED16K)
+	MCFG_CARTSLOT_PCBTYPE(2, "orch90",		COCO_CARTRIDGE_PCB_ORCH90)
+	MCFG_CARTSLOT_PCBTYPE(3, "rs232",		COCO_CARTRIDGE_PCB_RS232)
+	//MCFG_CARTSLOT_PCBTYPE(4, "coco_ssc",  COCO_CARTRIDGE_PCB_SSC)
+	MCFG_CARTSLOT_PCBTYPE(4, "",			COCO_CARTRIDGE_PCB_PAK)
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------
@@ -396,11 +396,11 @@ DEVICE_GET_INFO(coco_cartridge)
 ***************************************************************************/
 
 static MACHINE_CONFIG_FRAGMENT( dragon_cartridge )
-	MDRV_CARTSLOT_ADD(CARTSLOT_TAG)
-	MDRV_CARTSLOT_EXTENSION_LIST("ccc,rom")
-	MDRV_CARTSLOT_NOT_MANDATORY
-	MDRV_CARTSLOT_PCBTYPE(0, "dragon_fdc", COCO_CARTRIDGE_PCB_FDC_DRAGON)
-	MDRV_CARTSLOT_PCBTYPE(1, "",           COCO_CARTRIDGE_PCB_PAK)
+	MCFG_CARTSLOT_ADD(CARTSLOT_TAG)
+	MCFG_CARTSLOT_EXTENSION_LIST("ccc,rom")
+	MCFG_CARTSLOT_NOT_MANDATORY
+	MCFG_CARTSLOT_PCBTYPE(0, "dragon_fdc", COCO_CARTRIDGE_PCB_FDC_DRAGON)
+	MCFG_CARTSLOT_PCBTYPE(1, "",           COCO_CARTRIDGE_PCB_PAK)
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------

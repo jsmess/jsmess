@@ -750,8 +750,8 @@ static void a800xl_mmu(running_machine *machine, UINT8 new_mmu)
 	if( new_mmu & 0x01 )
 	{
 		logerror("%s MMU BIOS ROM\n", machine->gamedrv->name);
-		base3 = memory_region(machine, "maincpu") + 0x14000;  /* 8K lo BIOS */
-		base4 = memory_region(machine, "maincpu") + 0x15800;  /* 4K FP ROM + 8K hi BIOS */
+		base3 = machine->region("maincpu")->base() + 0x14000;  /* 8K lo BIOS */
+		base4 = machine->region("maincpu")->base() + 0x15800;  /* 4K FP ROM + 8K hi BIOS */
 		memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc000, 0xcfff, 0, 0, "bank3");
 		memory_unmap_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc000, 0xcfff, 0, 0);
 		memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xd800, 0xffff, 0, 0, "bank4");
@@ -760,8 +760,8 @@ static void a800xl_mmu(running_machine *machine, UINT8 new_mmu)
 	else
 	{
 		logerror("%s MMU BIOS RAM\n", machine->gamedrv->name);
-		base3 = memory_region(machine, "maincpu") + 0x0c000;  /* 8K RAM */
-		base4 = memory_region(machine, "maincpu") + 0x0d800;  /* 4K RAM + 8K RAM */
+		base3 = machine->region("maincpu")->base() + 0x0c000;  /* 8K RAM */
+		base4 = machine->region("maincpu")->base() + 0x0d800;  /* 4K RAM + 8K RAM */
 		memory_install_readwrite_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc000, 0xcfff, 0, 0, "bank3");
 		memory_install_readwrite_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xd800, 0xffff, 0, 0, "bank4");
 	}
@@ -773,14 +773,14 @@ static void a800xl_mmu(running_machine *machine, UINT8 new_mmu)
 	{
 		logerror("%s MMU BASIC RAM\n", machine->gamedrv->name);
 		memory_install_readwrite_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa000, 0xbfff, 0, 0, "bank1");
-		base1 = memory_region(machine, "maincpu") + 0x0a000;  /* 8K RAM */
+		base1 = machine->region("maincpu")->base() + 0x0a000;  /* 8K RAM */
 	}
 	else
 	{
 		logerror("%s MMU BASIC ROM\n", machine->gamedrv->name);
 		memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa000, 0xbfff, 0, 0, "bank1");
 		memory_nop_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa000, 0xbfff, 0, 0);
-		base1 = memory_region(machine, "maincpu") + 0x10000;  /* 8K BASIC */
+		base1 = machine->region("maincpu")->base() + 0x10000;  /* 8K BASIC */
 	}
 
 	memory_set_bankptr(machine, "bank1", base1);
@@ -790,14 +790,14 @@ static void a800xl_mmu(running_machine *machine, UINT8 new_mmu)
 	{
 		logerror("%s MMU SELFTEST RAM\n", machine->gamedrv->name);
 		memory_install_readwrite_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x5000, 0x57ff, 0, 0, "bank2");
-		base2 = memory_region(machine, "maincpu") + 0x05000;  /* 0x0800 bytes */
+		base2 = machine->region("maincpu")->base() + 0x05000;  /* 0x0800 bytes */
 	}
 	else
 	{
 		logerror("%s MMU SELFTEST ROM\n", machine->gamedrv->name);
 		memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x5000, 0x57ff, 0, 0, "bank2");
 		memory_nop_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x5000, 0x57ff, 0, 0);
-		base2 = memory_region(machine, "maincpu") + 0x15000;  /* 0x0800 bytes */
+		base2 = machine->region("maincpu")->base() + 0x15000;  /* 0x0800 bytes */
 	}
 	memory_set_bankptr(machine, "bank2", base2);
 }
@@ -811,8 +811,8 @@ static void a1200xl_mmu(running_machine *machine, UINT8 new_mmu)
 	if( new_mmu & 0x01 )
 	{
 		logerror("%s MMU BIOS ROM\n", machine->gamedrv->name);
-		base3 = memory_region(machine, "maincpu") + 0x14000;  /* 8K lo BIOS */
-		base4 = memory_region(machine, "maincpu") + 0x15800;  /* 4K FP ROM + 8K hi BIOS */
+		base3 = machine->region("maincpu")->base() + 0x14000;  /* 8K lo BIOS */
+		base4 = machine->region("maincpu")->base() + 0x15800;  /* 4K FP ROM + 8K hi BIOS */
 		memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc000, 0xcfff, 0, 0, "bank3");
 		memory_unmap_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc000, 0xcfff, 0, 0);
 		memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xd800, 0xffff, 0, 0, "bank4");
@@ -821,8 +821,8 @@ static void a1200xl_mmu(running_machine *machine, UINT8 new_mmu)
 	else
 	{
 		logerror("%s MMU BIOS RAM\n", machine->gamedrv->name);
-		base3 = memory_region(machine, "maincpu") + 0x0c000;  /* 8K RAM */
-		base4 = memory_region(machine, "maincpu") + 0x0d800;  /* 4K RAM + 8K RAM */
+		base3 = machine->region("maincpu")->base() + 0x0c000;  /* 8K RAM */
+		base4 = machine->region("maincpu")->base() + 0x0d800;  /* 4K RAM + 8K RAM */
 		memory_install_readwrite_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc000, 0xcfff, 0, 0, "bank3");
 		memory_install_readwrite_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xd800, 0xffff, 0, 0, "bank4");
 	}
@@ -833,13 +833,13 @@ static void a1200xl_mmu(running_machine *machine, UINT8 new_mmu)
 	if( new_mmu & 0x80 )
 	{
 		logerror("%s MMU SELFTEST RAM\n", machine->gamedrv->name);
-		base2 = memory_region(machine, "maincpu") + 0x05000;  /* 0x0800 bytes */
+		base2 = machine->region("maincpu")->base() + 0x05000;  /* 0x0800 bytes */
 		memory_install_readwrite_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x5000, 0x57ff, 0, 0, "bank2");
 	}
 	else
 	{
 		logerror("%s MMU SELFTEST ROM\n", machine->gamedrv->name);
-		base2 = memory_region(machine, "maincpu") + 0x15000;  /* 0x0800 bytes */
+		base2 = machine->region("maincpu")->base() + 0x15000;  /* 0x0800 bytes */
 		memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x5000, 0x57ff, 0, 0, "bank2");
 		memory_unmap_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x5000, 0x57ff, 0, 0);
 	}
@@ -854,8 +854,8 @@ static void xegs_mmu(running_machine *machine, UINT8 new_mmu)
 	if( new_mmu & 0x01 )
 	{
 		logerror("%s MMU BIOS ROM\n", machine->gamedrv->name);
-		base3 = memory_region(machine, "maincpu") + 0x14000;  /* 8K lo BIOS */
-		base4 = memory_region(machine, "maincpu") + 0x15800;  /* 4K FP ROM + 8K hi BIOS */
+		base3 = machine->region("maincpu")->base() + 0x14000;  /* 8K lo BIOS */
+		base4 = machine->region("maincpu")->base() + 0x15800;  /* 4K FP ROM + 8K hi BIOS */
 		memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc000, 0xcfff, 0, 0, "bank3");
 		memory_unmap_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc000, 0xcfff, 0, 0);
 		memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xd800, 0xffff, 0, 0, "bank4");
@@ -864,8 +864,8 @@ static void xegs_mmu(running_machine *machine, UINT8 new_mmu)
 	else
 	{
 		logerror("%s MMU BIOS RAM\n", machine->gamedrv->name);
-		base3 = memory_region(machine, "maincpu") + 0x0c000;  /* 8K RAM */
-		base4 = memory_region(machine, "maincpu") + 0x0d800;  /* 4K RAM + 8K RAM */
+		base3 = machine->region("maincpu")->base() + 0x0c000;  /* 8K RAM */
+		base4 = machine->region("maincpu")->base() + 0x0d800;  /* 4K RAM + 8K RAM */
 		memory_install_readwrite_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc000, 0xcfff, 0, 0, "bank3");
 		memory_install_readwrite_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xd800, 0xffff, 0, 0, "bank4");
 	}
@@ -878,14 +878,14 @@ static void xegs_mmu(running_machine *machine, UINT8 new_mmu)
 	{
 		logerror("%s MMU SELFTEST RAM\n", machine->gamedrv->name);
 		memory_install_readwrite_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x5000, 0x57ff, 0, 0, "bank2");
-		base2 = memory_region(machine, "maincpu") + 0x05000;  /* 0x0800 bytes */
+		base2 = machine->region("maincpu")->base() + 0x05000;  /* 0x0800 bytes */
 	}
 	else
 	{
 		logerror("%s MMU SELFTEST ROM\n", machine->gamedrv->name);
 		memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x5000, 0x57ff, 0, 0, "bank2");
 		memory_nop_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x5000, 0x57ff, 0, 0);
-		base2 = memory_region(machine, "maincpu") + 0x15000;  /* 0x0800 bytes */
+		base2 = machine->region("maincpu")->base() + 0x15000;  /* 0x0800 bytes */
 	}
 	memory_set_bankptr(machine, "bank2", base2);
 }
@@ -1016,233 +1016,233 @@ static const pia6821_interface xegs_pia_interface =
  **************************************************************/
 
 static MACHINE_CONFIG_FRAGMENT( a400_cartslot )
-	MDRV_CARTSLOT_ADD("cart1")
-	MDRV_CARTSLOT_EXTENSION_LIST("rom,bin")
-	MDRV_CARTSLOT_NOT_MANDATORY
-	MDRV_CARTSLOT_LOAD(a800_cart)
-	MDRV_CARTSLOT_UNLOAD(a800_cart)
+	MCFG_CARTSLOT_ADD("cart1")
+	MCFG_CARTSLOT_EXTENSION_LIST("rom,bin")
+	MCFG_CARTSLOT_NOT_MANDATORY
+	MCFG_CARTSLOT_LOAD(a800_cart)
+	MCFG_CARTSLOT_UNLOAD(a800_cart)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_FRAGMENT( a800_cartslot )
-	MDRV_CARTSLOT_ADD("cart1")
-	MDRV_CARTSLOT_EXTENSION_LIST("rom,bin")
-	MDRV_CARTSLOT_NOT_MANDATORY
-	MDRV_CARTSLOT_LOAD(a800_cart)
-	MDRV_CARTSLOT_UNLOAD(a800_cart)
+	MCFG_CARTSLOT_ADD("cart1")
+	MCFG_CARTSLOT_EXTENSION_LIST("rom,bin")
+	MCFG_CARTSLOT_NOT_MANDATORY
+	MCFG_CARTSLOT_LOAD(a800_cart)
+	MCFG_CARTSLOT_UNLOAD(a800_cart)
 
-	MDRV_CARTSLOT_ADD("cart2")
-	MDRV_CARTSLOT_EXTENSION_LIST("rom,bin")
-	MDRV_CARTSLOT_NOT_MANDATORY
-	MDRV_CARTSLOT_LOAD(a800_cart)
-	MDRV_CARTSLOT_UNLOAD(a800_cart)
+	MCFG_CARTSLOT_ADD("cart2")
+	MCFG_CARTSLOT_EXTENSION_LIST("rom,bin")
+	MCFG_CARTSLOT_NOT_MANDATORY
+	MCFG_CARTSLOT_LOAD(a800_cart)
+	MCFG_CARTSLOT_UNLOAD(a800_cart)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( atari_common_nodac, driver_device )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6502, FREQ_17_EXACT)
+	MCFG_CPU_ADD("maincpu", M6502, FREQ_17_EXACT)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_VISIBLE_AREA(MIN_X, MAX_X, MIN_Y, MAX_Y)
-	MDRV_PALETTE_LENGTH(sizeof(atari_palette) / 3)
-	MDRV_PALETTE_INIT(mess_atari)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_VISIBLE_AREA(MIN_X, MAX_X, MIN_Y, MAX_Y)
+	MCFG_PALETTE_LENGTH(sizeof(atari_palette) / 3)
+	MCFG_PALETTE_INIT(mess_atari)
 
-	MDRV_VIDEO_START(atari)
-	MDRV_VIDEO_UPDATE(atari)
+	MCFG_VIDEO_START(atari)
+	MCFG_VIDEO_UPDATE(atari)
 
-	MDRV_PIA6821_ADD( "pia", atari_pia_interface )
+	MCFG_PIA6821_ADD( "pia", atari_pia_interface )
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("pokey", POKEY, FREQ_17_EXACT)
-	MDRV_SOUND_CONFIG(atari_pokey_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("pokey", POKEY, FREQ_17_EXACT)
+	MCFG_SOUND_CONFIG(atari_pokey_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* internal ram */
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("40K")
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("40K")
 
-	MDRV_ATARI_FDC_ADD("fdc")
+	MCFG_ATARI_FDC_ADD("fdc")
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( atari_common, atari_common_nodac )
-	MDRV_SOUND_ADD("dac", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( a400, atari_common )
 
-	MDRV_CPU_MODIFY( "maincpu" )
-	MDRV_CPU_PROGRAM_MAP(a400_mem)
-	MDRV_CPU_VBLANK_INT_HACK(a400_interrupt, TOTAL_LINES_60HZ)
+	MCFG_CPU_MODIFY( "maincpu" )
+	MCFG_CPU_PROGRAM_MAP(a400_mem)
+	MCFG_CPU_VBLANK_INT_HACK(a400_interrupt, TOTAL_LINES_60HZ)
 
-	MDRV_MACHINE_START( a400 )
+	MCFG_MACHINE_START( a400 )
 
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_REFRESH_RATE(FRAME_RATE_60HZ)
-	MDRV_SCREEN_SIZE(HWIDTH*8, TOTAL_LINES_60HZ)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_REFRESH_RATE(FRAME_RATE_60HZ)
+	MCFG_SCREEN_SIZE(HWIDTH*8, TOTAL_LINES_60HZ)
 
-	MDRV_FRAGMENT_ADD(a400_cartslot)
+	MCFG_FRAGMENT_ADD(a400_cartslot)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( a400pal, atari_common )
 
-	MDRV_CPU_MODIFY( "maincpu" )
-	MDRV_CPU_PROGRAM_MAP(a400_mem)
-	MDRV_CPU_VBLANK_INT_HACK(a400_interrupt, TOTAL_LINES_50HZ)
+	MCFG_CPU_MODIFY( "maincpu" )
+	MCFG_CPU_PROGRAM_MAP(a400_mem)
+	MCFG_CPU_VBLANK_INT_HACK(a400_interrupt, TOTAL_LINES_50HZ)
 
-	MDRV_MACHINE_START( a400 )
+	MCFG_MACHINE_START( a400 )
 
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_REFRESH_RATE(FRAME_RATE_50HZ)
-	MDRV_SCREEN_SIZE(HWIDTH*8, TOTAL_LINES_50HZ)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_REFRESH_RATE(FRAME_RATE_50HZ)
+	MCFG_SCREEN_SIZE(HWIDTH*8, TOTAL_LINES_50HZ)
 
-	MDRV_FRAGMENT_ADD(a400_cartslot)
+	MCFG_FRAGMENT_ADD(a400_cartslot)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( a800, atari_common )
 
-	MDRV_CPU_MODIFY( "maincpu" )
-	MDRV_CPU_PROGRAM_MAP(a800_mem)
-	MDRV_CPU_VBLANK_INT_HACK(a800_interrupt, TOTAL_LINES_60HZ)
+	MCFG_CPU_MODIFY( "maincpu" )
+	MCFG_CPU_PROGRAM_MAP(a800_mem)
+	MCFG_CPU_VBLANK_INT_HACK(a800_interrupt, TOTAL_LINES_60HZ)
 
-	MDRV_MACHINE_START( a800 )
+	MCFG_MACHINE_START( a800 )
 
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_REFRESH_RATE(FRAME_RATE_60HZ)
-	MDRV_SCREEN_SIZE(HWIDTH*8, TOTAL_LINES_60HZ)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_REFRESH_RATE(FRAME_RATE_60HZ)
+	MCFG_SCREEN_SIZE(HWIDTH*8, TOTAL_LINES_60HZ)
 
-	MDRV_FRAGMENT_ADD(a800_cartslot)
+	MCFG_FRAGMENT_ADD(a800_cartslot)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( a800pal, atari_common )
 
-	MDRV_CPU_MODIFY( "maincpu" )
-	MDRV_CPU_PROGRAM_MAP(a800_mem)
-	MDRV_CPU_VBLANK_INT_HACK(a800_interrupt, TOTAL_LINES_50HZ)
+	MCFG_CPU_MODIFY( "maincpu" )
+	MCFG_CPU_PROGRAM_MAP(a800_mem)
+	MCFG_CPU_VBLANK_INT_HACK(a800_interrupt, TOTAL_LINES_50HZ)
 
-	MDRV_MACHINE_START( a800 )
+	MCFG_MACHINE_START( a800 )
 
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_REFRESH_RATE(FRAME_RATE_50HZ)
-	MDRV_SCREEN_SIZE(HWIDTH*8, TOTAL_LINES_50HZ)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_REFRESH_RATE(FRAME_RATE_50HZ)
+	MCFG_SCREEN_SIZE(HWIDTH*8, TOTAL_LINES_50HZ)
 
-	MDRV_FRAGMENT_ADD(a800_cartslot)
+	MCFG_FRAGMENT_ADD(a800_cartslot)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( a600xl, atari_common )
 
-	MDRV_CPU_MODIFY( "maincpu" )
-	MDRV_CPU_PROGRAM_MAP(a600xl_mem)	// FIXME?
-	MDRV_CPU_VBLANK_INT_HACK(a800xl_interrupt, TOTAL_LINES_60HZ)
+	MCFG_CPU_MODIFY( "maincpu" )
+	MCFG_CPU_PROGRAM_MAP(a600xl_mem)	// FIXME?
+	MCFG_CPU_VBLANK_INT_HACK(a800xl_interrupt, TOTAL_LINES_60HZ)
 
-	MDRV_PIA6821_MODIFY( "pia", a600xl_pia_interface )
+	MCFG_PIA6821_MODIFY( "pia", a600xl_pia_interface )
 
-	MDRV_MACHINE_START( a800xl )	// FIXME?
+	MCFG_MACHINE_START( a800xl )	// FIXME?
 
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_REFRESH_RATE(FRAME_RATE_60HZ)
-	MDRV_SCREEN_SIZE(HWIDTH*8, TOTAL_LINES_60HZ)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_REFRESH_RATE(FRAME_RATE_60HZ)
+	MCFG_SCREEN_SIZE(HWIDTH*8, TOTAL_LINES_60HZ)
 
-	MDRV_FRAGMENT_ADD(a400_cartslot)
+	MCFG_FRAGMENT_ADD(a400_cartslot)
 
 	/* internal ram */
-	MDRV_RAM_MODIFY("messram")
-	MDRV_RAM_DEFAULT_SIZE("16K")
+	MCFG_RAM_MODIFY("messram")
+	MCFG_RAM_DEFAULT_SIZE("16K")
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( a800xl, atari_common )
 
-	MDRV_CPU_MODIFY( "maincpu" )
-	MDRV_CPU_PROGRAM_MAP(a800xl_mem)
-	MDRV_CPU_VBLANK_INT_HACK(a800xl_interrupt, TOTAL_LINES_60HZ)
+	MCFG_CPU_MODIFY( "maincpu" )
+	MCFG_CPU_PROGRAM_MAP(a800xl_mem)
+	MCFG_CPU_VBLANK_INT_HACK(a800xl_interrupt, TOTAL_LINES_60HZ)
 
-	MDRV_PIA6821_MODIFY( "pia", a800xl_pia_interface )
+	MCFG_PIA6821_MODIFY( "pia", a800xl_pia_interface )
 
-	MDRV_MACHINE_START( a800xl )
+	MCFG_MACHINE_START( a800xl )
 
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_REFRESH_RATE(FRAME_RATE_60HZ)
-	MDRV_SCREEN_SIZE(HWIDTH*8, TOTAL_LINES_60HZ)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_REFRESH_RATE(FRAME_RATE_60HZ)
+	MCFG_SCREEN_SIZE(HWIDTH*8, TOTAL_LINES_60HZ)
 
-	MDRV_FRAGMENT_ADD(a400_cartslot)
+	MCFG_FRAGMENT_ADD(a400_cartslot)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( a800xlpal, a800xl )
 
-	MDRV_CPU_MODIFY( "maincpu" )
-	MDRV_CPU_CLOCK( 1773000 )
-	MDRV_CPU_VBLANK_INT_HACK(a800xl_interrupt, TOTAL_LINES_50HZ)
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_REFRESH_RATE(FRAME_RATE_50HZ)
-	MDRV_SCREEN_SIZE(HWIDTH*8, TOTAL_LINES_50HZ)
+	MCFG_CPU_MODIFY( "maincpu" )
+	MCFG_CPU_CLOCK( 1773000 )
+	MCFG_CPU_VBLANK_INT_HACK(a800xl_interrupt, TOTAL_LINES_50HZ)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_REFRESH_RATE(FRAME_RATE_50HZ)
+	MCFG_SCREEN_SIZE(HWIDTH*8, TOTAL_LINES_50HZ)
 
-	MDRV_SOUND_MODIFY("pokey")
-	MDRV_SOUND_CLOCK(1773000)
+	MCFG_SOUND_MODIFY("pokey")
+	MCFG_SOUND_CLOCK(1773000)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( a1200xl, a800xl )
 
-	MDRV_PIA6821_MODIFY( "pia", a1200xl_pia_interface )
+	MCFG_PIA6821_MODIFY( "pia", a1200xl_pia_interface )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( xegs, a800xl )
 
-	MDRV_CPU_MODIFY( "maincpu" )
-	MDRV_CPU_PROGRAM_MAP(xegs_mem)
+	MCFG_CPU_MODIFY( "maincpu" )
+	MCFG_CPU_PROGRAM_MAP(xegs_mem)
 
-	MDRV_MACHINE_START( xegs )
+	MCFG_MACHINE_START( xegs )
 
-	MDRV_PIA6821_MODIFY( "pia", xegs_pia_interface )
+	MCFG_PIA6821_MODIFY( "pia", xegs_pia_interface )
 
-	MDRV_DEVICE_REMOVE("cart1")
+	MCFG_DEVICE_REMOVE("cart1")
 
-	MDRV_CARTSLOT_ADD("cart1")
-	MDRV_CARTSLOT_EXTENSION_LIST("rom,bin")
-	MDRV_CARTSLOT_NOT_MANDATORY
-	MDRV_CARTSLOT_INTERFACE("xegs_cart")
-	MDRV_CARTSLOT_LOAD(xegs_cart)
+	MCFG_CARTSLOT_ADD("cart1")
+	MCFG_CARTSLOT_EXTENSION_LIST("rom,bin")
+	MCFG_CARTSLOT_NOT_MANDATORY
+	MCFG_CARTSLOT_INTERFACE("xegs_cart")
+	MCFG_CARTSLOT_LOAD(xegs_cart)
 
 	/* software lists */
-	MDRV_SOFTWARE_LIST_ADD("cart_list","xegs")
+	MCFG_SOFTWARE_LIST_ADD("cart_list","xegs")
 
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( a5200, atari_common_nodac )
 
-	MDRV_CPU_MODIFY( "maincpu" )
-	MDRV_CPU_PROGRAM_MAP(a5200_mem)
-	MDRV_CPU_VBLANK_INT_HACK(a5200_interrupt, TOTAL_LINES_60HZ)
+	MCFG_CPU_MODIFY( "maincpu" )
+	MCFG_CPU_PROGRAM_MAP(a5200_mem)
+	MCFG_CPU_VBLANK_INT_HACK(a5200_interrupt, TOTAL_LINES_60HZ)
 
-	MDRV_MACHINE_START( a5200 )
+	MCFG_MACHINE_START( a5200 )
 
-	MDRV_SCREEN_MODIFY( "screen" )
-	MDRV_SCREEN_REFRESH_RATE(FRAME_RATE_60HZ)
-	MDRV_SCREEN_SIZE(HWIDTH*8, TOTAL_LINES_60HZ)
+	MCFG_SCREEN_MODIFY( "screen" )
+	MCFG_SCREEN_REFRESH_RATE(FRAME_RATE_60HZ)
+	MCFG_SCREEN_SIZE(HWIDTH*8, TOTAL_LINES_60HZ)
 
-	MDRV_CARTSLOT_ADD("cart")
-	MDRV_CARTSLOT_EXTENSION_LIST("rom,bin,a52")
-	MDRV_CARTSLOT_NOT_MANDATORY
-	MDRV_CARTSLOT_LOAD(a5200_cart)
-	MDRV_CARTSLOT_UNLOAD(a5200_cart)
-	MDRV_CARTSLOT_INTERFACE("a5200_cart")
+	MCFG_CARTSLOT_ADD("cart")
+	MCFG_CARTSLOT_EXTENSION_LIST("rom,bin,a52")
+	MCFG_CARTSLOT_NOT_MANDATORY
+	MCFG_CARTSLOT_LOAD(a5200_cart)
+	MCFG_CARTSLOT_UNLOAD(a5200_cart)
+	MCFG_CARTSLOT_INTERFACE("a5200_cart")
 
 	/* Software lists */
-	MDRV_SOFTWARE_LIST_ADD("cart_list","a5200")
+	MCFG_SOFTWARE_LIST_ADD("cart_list","a5200")
 
 	/* internal ram */
-	MDRV_RAM_MODIFY("messram")
-	MDRV_RAM_DEFAULT_SIZE("16K")
+	MCFG_RAM_MODIFY("messram")
+	MCFG_RAM_DEFAULT_SIZE("16K")
 MACHINE_CONFIG_END
 
 
@@ -1372,7 +1372,7 @@ static DRIVER_INIT( xegs )
 
 static DRIVER_INIT( a600xl )
 {
-	UINT8 *rom = memory_region(machine, "maincpu");
+	UINT8 *rom = machine->region("maincpu")->base();
 	memcpy( rom + 0x5000, rom + 0xd000, 0x800 );
 }
 

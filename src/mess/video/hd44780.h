@@ -10,9 +10,9 @@
 #define __HD44780_H__
 
 
-#define MDRV_HD44780_ADD( _tag , _config) \
-	MDRV_DEVICE_ADD( _tag, HD44780, 0 ) \
-	MDRV_DEVICE_CONFIG(_config)
+#define MCFG_HD44780_ADD( _tag , _config) \
+	MCFG_DEVICE_ADD( _tag, HD44780, 0 ) \
+	MCFG_DEVICE_CONFIG(_config)
 
 //**************************************************************************
 //  TYPE DEFINITIONS

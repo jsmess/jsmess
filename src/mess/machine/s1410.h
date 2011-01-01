@@ -28,8 +28,8 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MDRV_S1410_ADD() \
-    MDRV_DEVICE_ADD(S1410_TAG, S1410, 0)
+#define MCFG_S1410_ADD() \
+    MCFG_DEVICE_ADD(S1410_TAG, S1410, 0)
 
 
 

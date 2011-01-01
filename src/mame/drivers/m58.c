@@ -191,24 +191,24 @@ GFXDECODE_END
 static MACHINE_CONFIG_START( yard, m58_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK/3/2)
-	MDRV_CPU_PROGRAM_MAP(yard_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/3/2)
+	MCFG_CPU_PROGRAM_MAP(yard_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */
-	MDRV_GFXDECODE(yard)
-	MDRV_PALETTE_LENGTH(256+256+256)
+	MCFG_GFXDECODE(yard)
+	MCFG_PALETTE_LENGTH(256+256+256)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_RAW_PARAMS(MASTER_CLOCK/3, 384, 0, 256, 282, 42, 266)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/3, 384, 0, 256, 282, 42, 266)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 
-	MDRV_PALETTE_INIT(yard)
-	MDRV_VIDEO_START(yard)
-	MDRV_VIDEO_UPDATE(yard)
+	MCFG_PALETTE_INIT(yard)
+	MCFG_VIDEO_START(yard)
+	MCFG_VIDEO_UPDATE(yard)
 
 	/* sound hardware */
-	MDRV_FRAGMENT_ADD(m52_large_audio)
+	MCFG_FRAGMENT_ADD(m52_large_audio)
 MACHINE_CONFIG_END
 
 
@@ -434,7 +434,7 @@ static DRIVER_INIT( yard85 )
 	// on these sets the content of the sprite color PROM needs reversing
 	//  are the proms on the other sets from bootleg boards, or hand modified?
 	UINT8* buffer = auto_alloc_array(machine, UINT8, 0x10);
-	UINT8* region = memory_region(machine,"proms");
+	UINT8* region = machine->region("proms")->base();
 	int i;
 
 	for (i=0;i<0x10;i++)

@@ -37,7 +37,7 @@ WRITE8_MEMBER( z80dev_state::display_w )
 
 READ8_MEMBER( z80dev_state::test_r )
 {
-	return mame_rand(space.machine);
+	return space.machine->rand();
 }
 
 static ADDRESS_MAP_START(z80dev_mem, ADDRESS_SPACE_PROGRAM, 8, z80dev_state)
@@ -99,12 +99,12 @@ void z80dev_state::machine_reset()
 
 static MACHINE_CONFIG_START( z80dev, z80dev_state )
     /* basic machine hardware */
-    MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz)
-    MDRV_CPU_PROGRAM_MAP(z80dev_mem)
-    MDRV_CPU_IO_MAP(z80dev_io)
+    MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
+    MCFG_CPU_PROGRAM_MAP(z80dev_mem)
+    MCFG_CPU_IO_MAP(z80dev_io)
 
     /* video hardware */
-    MDRV_DEFAULT_LAYOUT(layout_z80dev)
+    MCFG_DEFAULT_LAYOUT(layout_z80dev)
 MACHINE_CONFIG_END
 
 /* ROM definition */

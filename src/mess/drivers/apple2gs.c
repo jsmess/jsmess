@@ -239,69 +239,69 @@ static const ay8910_interface apple2_ay8910_interface =
 
 static MACHINE_CONFIG_START( apple2gs, apple2gs_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", G65816, APPLE2GS_14M/5)
-	MDRV_CPU_PROGRAM_MAP(apple2gs_map)
-	MDRV_CPU_VBLANK_INT_HACK(apple2_interrupt, 192/8)
-	MDRV_QUANTUM_TIME(HZ(60))
+	MCFG_CPU_ADD("maincpu", G65816, APPLE2GS_14M/5)
+	MCFG_CPU_PROGRAM_MAP(apple2gs_map)
+	MCFG_CPU_VBLANK_INT_HACK(apple2_interrupt, 192/8)
+	MCFG_QUANTUM_TIME(HZ(60))
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(704, 262)	// 640+32+32 for the borders
-	MDRV_SCREEN_VISIBLE_AREA(0,703,0,230)
-	MDRV_PALETTE_LENGTH( 16+256 )
-	MDRV_GFXDECODE( apple2gs )
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(704, 262)	// 640+32+32 for the borders
+	MCFG_SCREEN_VISIBLE_AREA(0,703,0,230)
+	MCFG_PALETTE_LENGTH( 16+256 )
+	MCFG_GFXDECODE( apple2gs )
 
-	MDRV_MACHINE_START( apple2gs )
-	MDRV_MACHINE_RESET( apple2gs )
+	MCFG_MACHINE_START( apple2gs )
+	MCFG_MACHINE_RESET( apple2gs )
 
-	MDRV_PALETTE_INIT( apple2gs )
-	MDRV_VIDEO_START( apple2gs )
-	MDRV_VIDEO_UPDATE( apple2gs )
+	MCFG_PALETTE_INIT( apple2gs )
+	MCFG_VIDEO_START( apple2gs )
+	MCFG_VIDEO_UPDATE( apple2gs )
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("a2speaker", SPEAKER_SOUND, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MDRV_SOUND_ADD("ay8913.1", AY8913, 1022727)
-	MDRV_SOUND_CONFIG(apple2_ay8910_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	MDRV_SOUND_ADD("ay8913.2", AY8913, 1022727)
-	MDRV_SOUND_CONFIG(apple2_ay8910_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("a2speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SOUND_ADD("ay8913.1", AY8913, 1022727)
+	MCFG_SOUND_CONFIG(apple2_ay8910_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SOUND_ADD("ay8913.2", AY8913, 1022727)
+	MCFG_SOUND_CONFIG(apple2_ay8910_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MDRV_SOUND_ADD("es5503", ES5503, APPLE2GS_7M)
-	MDRV_SOUND_CONFIG(apple2gs_es5503_interface)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("es5503", ES5503, APPLE2GS_7M)
+	MCFG_SOUND_CONFIG(apple2gs_es5503_interface)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
 	/* slot devices */
-	MDRV_APPLE2_LANGCARD_ADD("langcard")
-	MDRV_MOCKINGBOARD_ADD("mockingboard")
-	MDRV_IWM_ADD("fdc", apple2_fdc_interface)
+	MCFG_APPLE2_LANGCARD_ADD("langcard")
+	MCFG_MOCKINGBOARD_ADD("mockingboard")
+	MCFG_IWM_ADD("fdc", apple2_fdc_interface)
 
 	/* slots */
-	MDRV_APPLE2_SLOT_ADD(0, "langcard", apple2_langcard_r, apple2_langcard_w, 0, 0, 0, 0)
-	MDRV_APPLE2_SLOT_ADD(4, "mockingboard", mockingboard_r, mockingboard_w, 0, 0, 0, 0)
-	MDRV_APPLE2_SLOT_ADD(6, "fdc", applefdc_r, applefdc_w, 0, 0, 0, 0)
+	MCFG_APPLE2_SLOT_ADD(0, "langcard", apple2_langcard_r, apple2_langcard_w, 0, 0, 0, 0)
+	MCFG_APPLE2_SLOT_ADD(4, "mockingboard", mockingboard_r, mockingboard_w, 0, 0, 0, 0)
+	MCFG_APPLE2_SLOT_ADD(6, "fdc", applefdc_r, applefdc_w, 0, 0, 0, 0)
 
 	/* SCC */
-	MDRV_SCC8530_ADD("scc", APPLE2GS_14M/2)
+	MCFG_SCC8530_ADD("scc", APPLE2GS_14M/2)
 
-	MDRV_FLOPPY_APPLE_2_DRIVES_ADD(apple2gs_floppy525_floppy_config,15,16)
-	MDRV_FLOPPY_SONY_2_DRIVES_ADDITIONAL_ADD(apple2gs_floppy35_floppy_config)
+	MCFG_FLOPPY_APPLE_2_DRIVES_ADD(apple2gs_floppy525_floppy_config,15,16)
+	MCFG_FLOPPY_SONY_2_DRIVES_ADDITIONAL_ADD(apple2gs_floppy35_floppy_config)
 
-	MDRV_NVRAM_HANDLER( apple2gs )
+	MCFG_NVRAM_HANDLER( apple2gs )
 
-	MDRV_CASSETTE_ADD( "cassette", apple2gs_cassette_config )
+	MCFG_CASSETTE_ADD( "cassette", apple2gs_cassette_config )
 
 	/* internal ram */
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("2M")
-	MDRV_RAM_EXTRA_OPTIONS("64K")
-	MDRV_RAM_DEFAULT_VALUE(0x00)
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("2M")
+	MCFG_RAM_EXTRA_OPTIONS("64K")
+	MCFG_RAM_DEFAULT_VALUE(0x00)
 MACHINE_CONFIG_END
 
 

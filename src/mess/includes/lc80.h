@@ -20,9 +20,9 @@ public:
 	UINT8 segment;
 
 	/* devices */
-	running_device *z80pio2;
-	running_device *speaker;
-	running_device *cassette;
+	device_t *z80pio2;
+	device_t *speaker;
+	device_t *cassette;
 };
 
 #endif

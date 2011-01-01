@@ -426,7 +426,7 @@ static READ32_HANDLER ( jc_control_r )
 		{
 			if (ACCESSING_BITS_24_31)
 			{
-				//r |= (mame_rand(space->machine) & 0xff) << 24;
+				//r |= (space->machine->rand() & 0xff) << 24;
 			}
 			return r;
 		}
@@ -875,7 +875,7 @@ ADDRESS_MAP_END
 static READ16_HANDLER( dsp_rom_r )
 {
 	taitojc_state *state = space->machine->driver_data<taitojc_state>();
-	UINT16 *rom = (UINT16*)memory_region(space->machine, "gfx2");
+	UINT16 *rom = (UINT16*)space->machine->region("gfx2")->base();
 	UINT16 data = rom[state->dsp_rom_pos++];
 
 	//mame_printf_debug("dsp_rom_r:  %08X, %08X at %08X\n", offset, mem_mask, cpu_get_pc(space->cpu));
@@ -1314,39 +1314,39 @@ static const hc11_config taitojc_config =
 
 static MACHINE_CONFIG_START( taitojc, taitojc_state )
 
-	MDRV_CPU_ADD("maincpu", M68040, 25000000)
-	MDRV_CPU_PROGRAM_MAP(taitojc_map)
-	MDRV_CPU_VBLANK_INT("screen", taitojc_vblank)
-	MDRV_CPU_PERIODIC_INT(taitojc_int6, 1000)
+	MCFG_CPU_ADD("maincpu", M68040, 25000000)
+	MCFG_CPU_PROGRAM_MAP(taitojc_map)
+	MCFG_CPU_VBLANK_INT("screen", taitojc_vblank)
+	MCFG_CPU_PERIODIC_INT(taitojc_int6, 1000)
 
-	MDRV_CPU_ADD("sub", MC68HC11, 4000000) //MC68HC11M0
-	MDRV_CPU_PROGRAM_MAP(hc11_pgm_map)
-	MDRV_CPU_IO_MAP(hc11_io_map)
-	MDRV_CPU_CONFIG(taitojc_config)
+	MCFG_CPU_ADD("sub", MC68HC11, 4000000) //MC68HC11M0
+	MCFG_CPU_PROGRAM_MAP(hc11_pgm_map)
+	MCFG_CPU_IO_MAP(hc11_io_map)
+	MCFG_CPU_CONFIG(taitojc_config)
 
-	MDRV_CPU_ADD("dsp", TMS32051, 50000000)
-	MDRV_CPU_PROGRAM_MAP(tms_program_map)
-	MDRV_CPU_DATA_MAP(tms_data_map)
+	MCFG_CPU_ADD("dsp", TMS32051, 50000000)
+	MCFG_CPU_PROGRAM_MAP(tms_program_map)
+	MCFG_CPU_DATA_MAP(tms_data_map)
 
-	MDRV_QUANTUM_TIME(HZ(6000))
+	MCFG_QUANTUM_TIME(HZ(6000))
 
-	MDRV_MACHINE_RESET(taitojc)
-	MDRV_EEPROM_93C46_ADD("eeprom")
+	MCFG_MACHINE_RESET(taitojc)
+	MCFG_EEPROM_93C46_ADD("eeprom")
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(512, 400)
-	MDRV_SCREEN_VISIBLE_AREA(0, 511, 0, 399)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(512, 400)
+	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 399)
 
-	MDRV_PALETTE_LENGTH(32768)
+	MCFG_PALETTE_LENGTH(32768)
 
-	MDRV_VIDEO_START(taitojc)
-	MDRV_VIDEO_UPDATE(taitojc)
+	MCFG_VIDEO_START(taitojc)
+	MCFG_VIDEO_UPDATE(taitojc)
 
 	/* sound hardware */
-	MDRV_FRAGMENT_ADD(taito_f3_sound)
+	MCFG_FRAGMENT_ADD(taito_f3_sound)
 MACHINE_CONFIG_END
 
 static DRIVER_INIT( taitojc )

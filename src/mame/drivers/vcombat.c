@@ -104,7 +104,7 @@ static VIDEO_UPDATE( vcombat )
 {
 	int y;
 	const rgb_t *const pens = tlc34076_get_pens(screen->machine->device("tlc34076"));
-	running_device *aux = screen->machine->device("aux");
+	device_t *aux = screen->machine->device("aux");
 
 	UINT16 *m68k_buf = m68k_framebuffer[(*framebuffer_ctrl & 0x20) ? 1 : 0];
 	UINT16 *i860_buf = i860_framebuffer[(screen == aux) ? 1 : 0][0];
@@ -189,7 +189,7 @@ static READ16_HANDLER( control_3_r )
 	return (input_port_read(space->machine, "IN2") << 8);
 }
 
-static void wiggle_i860_common(running_device *device, UINT16 data)
+static void wiggle_i860_common(device_t *device, UINT16 data)
 {
 	int bus_hold = (data & 0x03) == 0x03;
 	int reset = data & 0x10;
@@ -287,7 +287,7 @@ static WRITE64_HANDLER( v1_fb_w )
 
 static WRITE16_HANDLER( crtc_w )
 {
-	running_device *crtc = space->machine->device("crtc");
+	device_t *crtc = space->machine->device("crtc");
 
 	if (crtc == NULL)
 		return;
@@ -413,7 +413,7 @@ DIRECT_UPDATE_HANDLER( vcombat_vid_1_direct_handler )
 
 static DRIVER_INIT( vcombat )
 {
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 
 	/* The two i860s execute out of RAM */
 	address_space *space = machine->device<i860_device>("vid_0")->space(AS_PROGRAM);
@@ -548,85 +548,85 @@ static const mc6845_interface mc6845_intf =
 
 
 static MACHINE_CONFIG_START( vcombat, driver_device )
-	MDRV_CPU_ADD("maincpu", M68000, XTAL_12MHz)
-	MDRV_CPU_PROGRAM_MAP(main_map)
-	MDRV_CPU_VBLANK_INT("screen", irq1_line_assert)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz)
+	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_CPU_VBLANK_INT("screen", irq1_line_assert)
 
 	/* The middle board i860 */
-	MDRV_CPU_ADD("vid_0", I860, XTAL_20MHz)
-	MDRV_CPU_PROGRAM_MAP(vid_0_map)
+	MCFG_CPU_ADD("vid_0", I860, XTAL_20MHz)
+	MCFG_CPU_PROGRAM_MAP(vid_0_map)
 
 	/* The top board i860 */
-	MDRV_CPU_ADD("vid_1", I860, XTAL_20MHz)
-	MDRV_CPU_PROGRAM_MAP(vid_1_map)
+	MCFG_CPU_ADD("vid_1", I860, XTAL_20MHz)
+	MCFG_CPU_PROGRAM_MAP(vid_1_map)
 
 	/* Sound CPU */
-	MDRV_CPU_ADD("soundcpu", M68000, XTAL_12MHz)
-	MDRV_CPU_PROGRAM_MAP(sound_map)
-	MDRV_CPU_PERIODIC_INT(irq1_line_hold, 15000)	/* Remove this if MC6845 is enabled */
+	MCFG_CPU_ADD("soundcpu", M68000, XTAL_12MHz)
+	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_CPU_PERIODIC_INT(irq1_line_hold, 15000)	/* Remove this if MC6845 is enabled */
 
-	MDRV_NVRAM_ADD_0FILL("nvram")
-	MDRV_MACHINE_RESET(vcombat)
+	MCFG_NVRAM_ADD_0FILL("nvram")
+	MCFG_MACHINE_RESET(vcombat)
 
 /* Temporary hack for experimenting with timing. */
 #if 0
-	//MDRV_QUANTUM_TIME(HZ(1200))
-	MDRV_QUANTUM_PERFECT_CPU("maincpu")
+	//MCFG_QUANTUM_TIME(HZ(1200))
+	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 #endif
 
-	MDRV_TLC34076_ADD("tlc34076", TLC34076_6_BIT)
+	MCFG_TLC34076_ADD("tlc34076", TLC34076_6_BIT)
 
 	/* Disabled for now as it can't handle multiple screens */
-//  MDRV_MC6845_ADD("crtc", MC6845, 6000000 / 16, mc6845_intf)
-	MDRV_DEFAULT_LAYOUT(layout_dualhsxs)
+//  MCFG_MC6845_ADD("crtc", MC6845, 6000000 / 16, mc6845_intf)
+	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_RAW_PARAMS(XTAL_12MHz / 2, 400, 0, 256, 291, 0, 208)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_12MHz / 2, 400, 0, 256, 291, 0, 208)
 
-	MDRV_SCREEN_ADD("aux", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_RAW_PARAMS(XTAL_12MHz / 2, 400, 0, 256, 291, 0, 208)
+	MCFG_SCREEN_ADD("aux", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_12MHz / 2, 400, 0, 256, 291, 0, 208)
 
-	MDRV_VIDEO_UPDATE(vcombat)
+	MCFG_VIDEO_UPDATE(vcombat)
 
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("dac", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_START( shadfgtr, driver_device )
-	MDRV_CPU_ADD("maincpu", M68000, XTAL_12MHz)
-	MDRV_CPU_PROGRAM_MAP(main_map)
-	MDRV_CPU_VBLANK_INT("screen", irq1_line_assert)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz)
+	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_CPU_VBLANK_INT("screen", irq1_line_assert)
 
 	/* The middle board i860 */
-	MDRV_CPU_ADD("vid_0", I860, XTAL_20MHz)
-	MDRV_CPU_PROGRAM_MAP(vid_0_map)
+	MCFG_CPU_ADD("vid_0", I860, XTAL_20MHz)
+	MCFG_CPU_PROGRAM_MAP(vid_0_map)
 
 	/* Sound CPU */
-	MDRV_CPU_ADD("soundcpu", M68000, XTAL_12MHz)
-	MDRV_CPU_PROGRAM_MAP(sound_map)
+	MCFG_CPU_ADD("soundcpu", M68000, XTAL_12MHz)
+	MCFG_CPU_PROGRAM_MAP(sound_map)
 
-	MDRV_NVRAM_ADD_0FILL("nvram")
-	MDRV_MACHINE_RESET(shadfgtr)
+	MCFG_NVRAM_ADD_0FILL("nvram")
+	MCFG_MACHINE_RESET(shadfgtr)
 
-	MDRV_TLC34076_ADD("tlc34076", TLC34076_6_BIT)
+	MCFG_TLC34076_ADD("tlc34076", TLC34076_6_BIT)
 
-	MDRV_MC6845_ADD("crtc", MC6845, XTAL_20MHz / 4 / 16, mc6845_intf)
+	MCFG_MC6845_ADD("crtc", MC6845, XTAL_20MHz / 4 / 16, mc6845_intf)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_RAW_PARAMS(XTAL_20MHz / 4, 320, 0, 256, 277, 0, 224)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_20MHz / 4, 320, 0, 256, 277, 0, 224)
 
-	MDRV_VIDEO_UPDATE(vcombat)
+	MCFG_VIDEO_UPDATE(vcombat)
 
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("dac", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
 

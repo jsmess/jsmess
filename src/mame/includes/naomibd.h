@@ -26,7 +26,7 @@ enum
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef void (*naomibd_interrupt_func)(running_device *device, int state);
+typedef void (*naomibd_interrupt_func)(device_t *device, int state);
 
 typedef struct _naomibd_config naomibd_config;
 struct _naomibd_config
@@ -44,38 +44,38 @@ struct _naomibd_config
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MDRV_NAOMIBD_ADD(_tag, _type) \
-	MDRV_DEVICE_ADD(_tag, NAOMI_BOARD, 0) \
-	MDRV_DEVICE_CONFIG_DATA32(naomibd_config, type, _type)
+#define MCFG_NAOMIBD_ADD(_tag, _type) \
+	MCFG_DEVICE_ADD(_tag, NAOMI_BOARD, 0) \
+	MCFG_DEVICE_CONFIG_DATA32(naomibd_config, type, _type)
 
-#define MDRV_NAOMI_ROM_BOARD_ADD(_tag, _region) \
-	MDRV_NAOMIBD_ADD(_tag, ROM_BOARD) \
-	MDRV_NAOMIBD_REGION(_region)
+#define MCFG_NAOMI_ROM_BOARD_ADD(_tag, _region) \
+	MCFG_NAOMIBD_ADD(_tag, ROM_BOARD) \
+	MCFG_NAOMIBD_REGION(_region)
 
-#define MDRV_AW_ROM_BOARD_ADD(_tag, _region) \
-	MDRV_NAOMIBD_ADD(_tag, AW_ROM_BOARD) \
-	MDRV_NAOMIBD_REGION(_region)
+#define MCFG_AW_ROM_BOARD_ADD(_tag, _region) \
+	MCFG_NAOMIBD_ADD(_tag, AW_ROM_BOARD) \
+	MCFG_NAOMIBD_REGION(_region)
 
-#define MDRV_NAOMI_DIMM_BOARD_ADD(_tag, _gdrom, _region, _pic) \
-	MDRV_NAOMIBD_ADD(_tag, DIMM_BOARD) \
-	MDRV_NAOMIBD_REGION(_region) \
-	MDRV_NAOMIBD_GDROM_REGION(_gdrom) \
-	MDRV_NAOMIBD_PIC_REGION(_pic)
+#define MCFG_NAOMI_DIMM_BOARD_ADD(_tag, _gdrom, _region, _pic) \
+	MCFG_NAOMIBD_ADD(_tag, DIMM_BOARD) \
+	MCFG_NAOMIBD_REGION(_region) \
+	MCFG_NAOMIBD_GDROM_REGION(_gdrom) \
+	MCFG_NAOMIBD_PIC_REGION(_pic)
 
-#define MDRV_NAOMIBD_REGION(_region) \
-	MDRV_DEVICE_CONFIG_DATAPTR(naomibd_config, regiontag, _region)
+#define MCFG_NAOMIBD_REGION(_region) \
+	MCFG_DEVICE_CONFIG_DATAPTR(naomibd_config, regiontag, _region)
 
-#define MDRV_NAOMIBD_GDROM_REGION(_region) \
-	MDRV_DEVICE_CONFIG_DATAPTR(naomibd_config, gdromregiontag, _region)
+#define MCFG_NAOMIBD_GDROM_REGION(_region) \
+	MCFG_DEVICE_CONFIG_DATAPTR(naomibd_config, gdromregiontag, _region)
 
-#define MDRV_NAOMIBD_PIC_REGION(_region) \
-	MDRV_DEVICE_CONFIG_DATAPTR(naomibd_config, picregiontag, _region)
+#define MCFG_NAOMIBD_PIC_REGION(_region) \
+	MCFG_DEVICE_CONFIG_DATAPTR(naomibd_config, picregiontag, _region)
 
-#define MDRV_NAOMIBD_MODIFY(_tag) \
-	MDRV_DEVICE_MODIFY(_tag)
+#define MCFG_NAOMIBD_MODIFY(_tag) \
+	MCFG_DEVICE_MODIFY(_tag)
 
-/*#define MDRV_NAOMIBD_TMU_MEMORY(_tmu, _tmumem) \
-    MDRV_DEVICE_CONFIG_DATA32(naomibd_config, tmumem##_tmu, _tmumem)*/
+/*#define MCFG_NAOMIBD_TMU_MEMORY(_tmu, _tmumem) \
+    MCFG_DEVICE_CONFIG_DATA32(naomibd_config, tmumem##_tmu, _tmumem)*/
 
 
 /*----------- defined in machine/naomibd.c -----------*/
@@ -84,10 +84,10 @@ struct _naomibd_config
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-int naomibd_interrupt_callback(running_device *device, naomibd_interrupt_func callback);
-int naomibd_get_type(running_device *device);
-void *naomibd_get_memory(running_device *device);
-offs_t naomibd_get_dmaoffset(running_device *device);
+int naomibd_interrupt_callback(device_t *device, naomibd_interrupt_func callback);
+int naomibd_get_type(device_t *device);
+void *naomibd_get_memory(device_t *device);
+offs_t naomibd_get_dmaoffset(device_t *device);
 
 READ64_DEVICE_HANDLER( naomibd_r );
 WRITE64_DEVICE_HANDLER( naomibd_w );

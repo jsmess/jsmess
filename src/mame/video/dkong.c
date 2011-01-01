@@ -738,7 +738,7 @@ static void radarscp_step(running_machine *machine, int line_cnt)
 	if (line_cnt>=512)
 		line_cnt=512-VTOTAL;
 
-	if ( ( !(line_cnt & 0x40) && ((line_cnt+1) & 0x40) ) && (mame_rand(machine) > RAND_MAX/2))
+	if ( ( !(line_cnt & 0x40) && ((line_cnt+1) & 0x40) ) && (machine->rand() > RAND_MAX/2))
 		state->sig30Hz = (1-state->sig30Hz);
 
 	/* Now mix with SND02 (sound 2) line - on 74ls259, bit2 */
@@ -905,11 +905,11 @@ static void check_palette(running_machine *machine)
 			switch (newset)
 			{
 				case 0x00:
-					color_prom = memory_region(machine, "proms");
+					color_prom = machine->region("proms")->base();
 					PALETTE_INIT_CALL(radarscp);
 					break;
 				case 0x01:
-					color_prom = memory_region(machine, "proms");
+					color_prom = machine->region("proms")->base();
 					PALETTE_INIT_CALL(dkong2b);
 					break;
 			}
@@ -951,8 +951,8 @@ VIDEO_START( dkong )
 	{
 		case HARDWARE_TRS02:
 			state->bg_bits = machine->primary_screen->alloc_compatible_bitmap();
-			state->gfx3 = memory_region(machine, "gfx3");
-			state->gfx3_len = memory_region_length(machine, "gfx3");
+			state->gfx3 = machine->region("gfx3")->base();
+			state->gfx3_len = machine->region("gfx3")->bytes();
 		    /* fall through */
 		case HARDWARE_TKG04:
 		case HARDWARE_TKG02:
@@ -964,9 +964,9 @@ VIDEO_START( dkong )
 			tilemap_set_scrolldx(state->bg_tilemap, 0, 128);
 
 			state->bg_bits = machine->primary_screen->alloc_compatible_bitmap();
-			state->gfx4 = memory_region(machine, "gfx4");
-			state->gfx3 = memory_region(machine, "gfx3");
-			state->gfx3_len = memory_region_length(machine, "gfx3");
+			state->gfx4 = machine->region("gfx4")->base();
+			state->gfx3 = machine->region("gfx3")->base();
+			state->gfx3_len = machine->region("gfx3")->bytes();
 
 			break;
 		default:

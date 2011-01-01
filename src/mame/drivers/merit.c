@@ -93,7 +93,7 @@ static MACHINE_START(merit)
 
 static READ8_HANDLER( questions_r )
 {
-	UINT8 *questions = memory_region(space->machine, "user1");
+	UINT8 *questions = space->machine->region("user1")->base();
 	int address;
 
 	switch(question_address >> 16)
@@ -211,9 +211,9 @@ static MC6845_UPDATE_ROW( update_row )
 	UINT16 x = 0;
 	int rlen;
 
-	gfx[0] = memory_region(device->machine, "gfx1");
-	gfx[1] = memory_region(device->machine, "gfx2");
-	rlen = memory_region_length(device->machine, "gfx2");
+	gfx[0] = device->machine->region("gfx1")->base();
+	gfx[1] = device->machine->region("gfx2")->base();
+	rlen = device->machine->region("gfx2")->bytes();
 
 	//ma = ma ^ 0x7ff;
 	for (cx = 0; cx < x_count; cx++)
@@ -340,7 +340,7 @@ static WRITE8_HANDLER(casino5_bank_w)
 
 static CUSTOM_INPUT(rndbit_r)
 {
-	return mame_rand(field->port->machine);
+	return field->port->machine->rand();
 }
 
 static ADDRESS_MAP_START( pitboss_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -1149,7 +1149,7 @@ INPUT_PORTS_END
 
 static VIDEO_UPDATE( merit )
 {
-	running_device *mc6845 = screen->machine->device("crtc");
+	device_t *mc6845 = screen->machine->device("crtc");
 	mc6845_update(mc6845, bitmap, cliprect);
 
 	return 0;
@@ -1212,111 +1212,111 @@ void merit_state::dodge_nvram_init(nvram_device &nvram, void *base, size_t size)
 static MACHINE_START(casino5)
 {
 	MACHINE_START_CALL(merit);
-	memory_configure_bank(machine, "bank1", 0, 2, memory_region(machine, "maincpu") + 0x2000, 0x2000);
-	memory_configure_bank(machine, "bank2", 0, 2, memory_region(machine, "maincpu") + 0x6000, 0x2000);
+	memory_configure_bank(machine, "bank1", 0, 2, machine->region("maincpu")->base() + 0x2000, 0x2000);
+	memory_configure_bank(machine, "bank2", 0, 2, machine->region("maincpu")->base() + 0x6000, 0x2000);
 	memory_set_bank(machine, "bank1", 0);
 	memory_set_bank(machine, "bank2", 0);
 }
 
 static MACHINE_CONFIG_START( pitboss, merit_state )
-	MDRV_CPU_ADD("maincpu",Z80, CPU_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(pitboss_map)
-	MDRV_CPU_IO_MAP(trvwhiz_io_map)
+	MCFG_CPU_ADD("maincpu",Z80, CPU_CLOCK)
+	MCFG_CPU_PROGRAM_MAP(pitboss_map)
+	MCFG_CPU_IO_MAP(trvwhiz_io_map)
 
-	MDRV_PPI8255_ADD( "ppi8255_0", ppi8255_intf[0] )
-	MDRV_PPI8255_ADD( "ppi8255_1", ppi8255_intf[1] )
+	MCFG_PPI8255_ADD( "ppi8255_0", ppi8255_intf[0] )
+	MCFG_PPI8255_ADD( "ppi8255_1", ppi8255_intf[1] )
 
-	MDRV_MACHINE_START(merit)
+	MCFG_MACHINE_START(merit)
 	/* video hardware */
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 512, 0, 512, 256, 0, 256)	/* temporary, CRTC will configure screen */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 512, 0, 512, 256, 0, 256)	/* temporary, CRTC will configure screen */
 
-	MDRV_MC6845_ADD("crtc", MC6845, CRTC_CLOCK, mc6845_intf)
+	MCFG_MC6845_ADD("crtc", MC6845, CRTC_CLOCK, mc6845_intf)
 
-	MDRV_VIDEO_UPDATE(merit)
+	MCFG_VIDEO_UPDATE(merit)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("aysnd", AY8910, CRTC_CLOCK)
-	MDRV_SOUND_CONFIG(merit_ay8912_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
+	MCFG_SOUND_ADD("aysnd", AY8910, CRTC_CLOCK)
+	MCFG_SOUND_CONFIG(merit_ay8912_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( casino5, pitboss )
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(casino5_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(casino5_map)
 
-	MDRV_NVRAM_ADD_0FILL("nvram")
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MDRV_MACHINE_START(casino5)
+	MCFG_MACHINE_START(casino5)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( bigappg, pitboss )
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(bigappg_map)
-	MDRV_CPU_IO_MAP(tictac_io_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(bigappg_map)
+	MCFG_CPU_IO_MAP(tictac_io_map)
 
-	MDRV_NVRAM_ADD_0FILL("nvram")
+	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( dodge, pitboss )
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(dodge_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(dodge_map)
 
-	MDRV_NVRAM_REPLACE_CUSTOM("nvram", merit_state, dodge_nvram_init)
+	MCFG_NVRAM_REPLACE_CUSTOM("nvram", merit_state, dodge_nvram_init)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( tictac, pitboss )
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(tictac_map)
-	MDRV_CPU_IO_MAP(tictac_io_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(tictac_map)
+	MCFG_CPU_IO_MAP(tictac_io_map)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( trvwhiz, pitboss )
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(trvwhiz_map)
-	MDRV_CPU_IO_MAP(trvwhiz_io_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(trvwhiz_map)
+	MCFG_CPU_IO_MAP(trvwhiz_io_map)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( dtrvwz5, pitboss )
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(dtrvwz5_map)
-	MDRV_CPU_IO_MAP(tictac_io_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(dtrvwz5_map)
+	MCFG_CPU_IO_MAP(tictac_io_map)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( phrcraze, pitboss )
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(phrcraze_map)
-	MDRV_CPU_IO_MAP(phrcraze_io_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(phrcraze_map)
+	MCFG_CPU_IO_MAP(phrcraze_io_map)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( trvwhziv, pitboss )
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(trvwhziv_map)
-	MDRV_CPU_IO_MAP(tictac_io_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(trvwhziv_map)
+	MCFG_CPU_IO_MAP(tictac_io_map)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( couple, pitboss )
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(couple_map)
-	MDRV_CPU_IO_MAP(tictac_io_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(couple_map)
+	MCFG_CPU_IO_MAP(tictac_io_map)
 
-	MDRV_DEVICE_MODIFY("ppi8255_0")
-	MDRV_DEVICE_CONFIG( ppi8255_couple_intf[0])
-	MDRV_DEVICE_MODIFY("ppi8255_1")
-	MDRV_DEVICE_CONFIG( ppi8255_couple_intf[1])
+	MCFG_DEVICE_MODIFY("ppi8255_0")
+	MCFG_DEVICE_CONFIG( ppi8255_couple_intf[0])
+	MCFG_DEVICE_MODIFY("ppi8255_1")
+	MCFG_DEVICE_CONFIG( ppi8255_couple_intf[1])
 MACHINE_CONFIG_END
 
 
@@ -2014,7 +2014,7 @@ static DRIVER_INIT( key_7 )
 
 static DRIVER_INIT( couple )
 {
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 
 	#if 0 //quick rom compare test
 	{
@@ -2040,7 +2040,7 @@ static DRIVER_INIT( couple )
 static DRIVER_INIT( dtrvwz5 )
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 	/* fill b000 - b0ff with ret 0xc9 */
 	for ( i = 0xb000; i < 0xb100; i++ )
 		ROM[i] = 0xc9;

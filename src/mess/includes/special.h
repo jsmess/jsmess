@@ -22,7 +22,7 @@ public:
 	UINT8 erik_background;
 	UINT8 *specialist_video_ram;
 	UINT8 specimx_color;
-	running_device *specimx_audio;
+	device_t *specimx_audio;
 	int specialist_8255_porta;
 	int specialist_8255_portb;
 	int specialist_8255_portc;
@@ -85,6 +85,6 @@ extern const rgb_t specimx_palette[16];
 
 DECLARE_LEGACY_SOUND_DEVICE(SPECIMX, specimx_sound);
 
-void specimx_set_input(running_device *device, int index, int state);
+void specimx_set_input(device_t *device, int index, int state);
 
 #endif /* SPECIAL_H_ */

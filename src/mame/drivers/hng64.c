@@ -459,7 +459,7 @@ WRITE32_HANDLER( trap_write )
 
 static READ32_HANDLER( hng64_random_read )
 {
-	return mame_rand(space->machine)&0xffffffff;
+	return space->machine->rand()&0xffffffff;
 }
 #endif
 
@@ -530,7 +530,7 @@ static READ32_HANDLER( hng64_sysregs_r )
 
 	switch(offset*4)
 	{
-		case 0x001c: return mame_rand(space->machine); // hng64 hangs on start-up if zero.
+		case 0x001c: return space->machine->rand(); // hng64 hangs on start-up if zero.
 		//case 0x106c:
 		//case 0x107c:
 		case 0x1084: return 0x00000002; //MCU->MIPS latch port
@@ -559,7 +559,7 @@ static READ32_HANDLER( hng64_sysregs_r )
 
 //  printf("%08x\n",offset*4);
 
-//  return mame_rand(space->machine)&0xffffffff;
+//  return space->machine->rand()&0xffffffff;
 	return state->sysregs[offset];
 }
 
@@ -697,7 +697,7 @@ static READ32_HANDLER( shoot_io_r )
 		{
 			/* Quick kludge for use the input test items */
 			if(input_port_read(space->machine, "D_IN") & 0x01000000)
-				state->p1_trig = mame_rand(space->machine) & 0x01000000;
+				state->p1_trig = space->machine->rand() & 0x01000000;
 
 			return (input_port_read(space->machine, "D_IN") & ~0x01000000) | (state->p1_trig);
 		}
@@ -1540,14 +1540,14 @@ static void hng64_reorder(running_machine *machine, UINT8* gfxregion, size_t gfx
 
 static DRIVER_INIT( hng64_reorder_gfx )
 {
-	hng64_reorder(machine, memory_region(machine,"scrtile"), memory_region_length(machine, "scrtile"));
+	hng64_reorder(machine, machine->region("scrtile")->base(), machine->region("scrtile")->bytes());
 }
 
 #define HACK_REGION
 #ifdef HACK_REGION
 static void hng64_patch_bios_region(running_machine* machine, int region)
 {
-	UINT8 *rom = memory_region(machine, "user1");
+	UINT8 *rom = machine->region("user1")->base();
 
 	if ((rom[0x4000]==0xff) && (rom[0x4001] == 0xff))
 	{
@@ -1593,7 +1593,7 @@ static DRIVER_INIT( fatfurwa )
 {
 	hng64_state *state = machine->driver_data<hng64_state>();
 
-	/* FILE* fp = fopen("/tmp/test.bin", "wb"); fwrite(memory_region(machine, "verts"), 1, 0x0c00000*2, fp); fclose(fp); */
+	/* FILE* fp = fopen("/tmp/test.bin", "wb"); fwrite(machine->region("verts")->base(), 1, 0x0c00000*2, fp); fclose(fp); */
 	DRIVER_INIT_CALL(hng64_fght);
 	state->mcu_type = FIGHT_MCU;
 }
@@ -1683,7 +1683,7 @@ static MACHINE_RESET(hyperneo)
 {
 	hng64_state *state = machine->driver_data<hng64_state>();
 	int i;
-	const UINT8 *rom = memory_region(machine, "user2");
+	const UINT8 *rom = machine->region("user2")->base();
 
 	/* Sound CPU */
 	UINT8 *RAM = (UINT8*)state->soundram;
@@ -1718,35 +1718,35 @@ static MACHINE_RESET(hyperneo)
 static MACHINE_CONFIG_START( hng64, hng64_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", VR4300BE, MASTER_CLOCK) 	// actually R4300
-	MDRV_CPU_CONFIG(vr4300_config)
-	MDRV_CPU_PROGRAM_MAP(hng_map)
-	MDRV_CPU_VBLANK_INT_HACK(irq_start,4)
+	MCFG_CPU_ADD("maincpu", VR4300BE, MASTER_CLOCK) 	// actually R4300
+	MCFG_CPU_CONFIG(vr4300_config)
+	MCFG_CPU_PROGRAM_MAP(hng_map)
+	MCFG_CPU_VBLANK_INT_HACK(irq_start,4)
 
-	MDRV_CPU_ADD("audiocpu", V33, 8000000)				// v53, 16? mhz!
-	MDRV_CPU_PROGRAM_MAP(hng_sound_map)
+	MCFG_CPU_ADD("audiocpu", V33, 8000000)				// v53, 16? mhz!
+	MCFG_CPU_PROGRAM_MAP(hng_sound_map)
 
-	MDRV_CPU_ADD("comm", Z80,MASTER_CLOCK/4)		/* KL5C80A12CFP - binary compatible with Z80. */
-	MDRV_CPU_PROGRAM_MAP(hng_comm_map)
-	MDRV_CPU_IO_MAP(hng_comm_io_map)
+	MCFG_CPU_ADD("comm", Z80,MASTER_CLOCK/4)		/* KL5C80A12CFP - binary compatible with Z80. */
+	MCFG_CPU_PROGRAM_MAP(hng_comm_map)
+	MCFG_CPU_IO_MAP(hng_comm_io_map)
 
-	MDRV_NVRAM_ADD_0FILL("nvram")
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MDRV_GFXDECODE(hng64)
-	MDRV_MACHINE_START(hyperneo)
-	MDRV_MACHINE_RESET(hyperneo)
+	MCFG_GFXDECODE(hng64)
+	MCFG_MACHINE_START(hyperneo)
+	MCFG_MACHINE_RESET(hyperneo)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) //not accurate
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_SIZE(1024, 1024)
-	MDRV_SCREEN_VISIBLE_AREA(0, 0x200-1, 0, 0x1c0-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) //not accurate
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_SIZE(1024, 1024)
+	MCFG_SCREEN_VISIBLE_AREA(0, 0x200-1, 0, 0x1c0-1)
 
-	MDRV_PALETTE_LENGTH(0x1000)
+	MCFG_PALETTE_LENGTH(0x1000)
 
-	MDRV_VIDEO_START(hng64)
-	MDRV_VIDEO_UPDATE(hng64)
+	MCFG_VIDEO_START(hng64)
+	MCFG_VIDEO_UPDATE(hng64)
 MACHINE_CONFIG_END
 
 

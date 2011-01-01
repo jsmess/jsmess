@@ -21,26 +21,26 @@
 
 
 
-void pc1401_outa(running_device *device, int data)
+void pc1401_outa(device_t *device, int data)
 {
 	pc1401_state *state = device->machine->driver_data<pc1401_state>();
 	state->outa = data;
 }
 
-void pc1401_outb(running_device *device, int data)
+void pc1401_outb(device_t *device, int data)
 {
 	pc1401_state *state = device->machine->driver_data<pc1401_state>();
 	state->outb = data;
 }
 
-void pc1401_outc(running_device *device, int data)
+void pc1401_outc(device_t *device, int data)
 {
 	pc1401_state *state = device->machine->driver_data<pc1401_state>();
 	//logerror("%g outc %.2x\n", attotime_to_double(timer_get_time(machine)), data);
 	state->portc = data;
 }
 
-int pc1401_ina(running_device *device)
+int pc1401_ina(device_t *device)
 {
 	pc1401_state *state = device->machine->driver_data<pc1401_state>();
 	int data = state->outa;
@@ -93,7 +93,7 @@ int pc1401_ina(running_device *device)
 	return data;
 }
 
-int pc1401_inb(running_device *device)
+int pc1401_inb(device_t *device)
 {
 	pc1401_state *state = device->machine->driver_data<pc1401_state>();
 	int data=state->outb;
@@ -104,12 +104,12 @@ int pc1401_inb(running_device *device)
 	return data;
 }
 
-int pc1401_brk(running_device *device)
+int pc1401_brk(device_t *device)
 {
 	return (input_port_read(device->machine, "EXTRA") & 0x01);
 }
 
-int pc1401_reset(running_device *device)
+int pc1401_reset(device_t *device)
 {
 	return (input_port_read(device->machine, "EXTRA") & 0x02);
 }
@@ -117,8 +117,8 @@ int pc1401_reset(running_device *device)
 /* currently enough to save the external ram */
 NVRAM_HANDLER( pc1401 )
 {
-	running_device *main_cpu = machine->device("maincpu");
-	UINT8 *ram = memory_region(machine, "maincpu")+0x2000;
+	device_t *main_cpu = machine->device("maincpu");
+	UINT8 *ram = machine->region("maincpu")->base()+0x2000;
 	UINT8 *cpu = sc61860_internal_ram(main_cpu);
 
 	if (read_or_write)
@@ -148,7 +148,7 @@ DRIVER_INIT( pc1401 )
 {
 	pc1401_state *state = machine->driver_data<pc1401_state>();
 	int i;
-	UINT8 *gfx=memory_region(machine, "gfx1");
+	UINT8 *gfx=machine->region("gfx1")->base();
 #if 0
 	static const char sucker[]={
 		/* this routine dump the memory (start 0)

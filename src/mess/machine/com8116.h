@@ -30,9 +30,9 @@
 
 DECLARE_LEGACY_DEVICE(COM8116, com8116);
 
-#define MDRV_COM8116_ADD(_tag, _clock, _config) \
-	MDRV_DEVICE_ADD(_tag, COM8116, _clock) \
-	MDRV_DEVICE_CONFIG(_config)
+#define MCFG_COM8116_ADD(_tag, _clock, _config) \
+	MCFG_DEVICE_ADD(_tag, COM8116, _clock) \
+	MCFG_DEVICE_CONFIG(_config)
 
 #define COM8116_INTERFACE(name) \
 	const com8116_interface (name)=

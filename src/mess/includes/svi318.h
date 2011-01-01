@@ -33,7 +33,7 @@ typedef struct
 	/* SVI-806 80 column card */
 	UINT8	svi806_present;
 	UINT8	svi806_ram_enabled;
-	region_info	*svi806_ram;
+	memory_region	*svi806_ram;
 	UINT8	*svi806_gfx;
 } SVI_318;
 

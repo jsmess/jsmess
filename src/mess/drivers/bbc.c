@@ -782,167 +782,167 @@ static const floppy_config bbc_floppy_config =
 };
 
 static MACHINE_CONFIG_FRAGMENT( bbc_cartslot )
-	MDRV_CARTSLOT_ADD("cart1")
-	MDRV_CARTSLOT_EXTENSION_LIST("rom")
-	MDRV_CARTSLOT_NOT_MANDATORY
-	MDRV_CARTSLOT_LOAD(bbcb_cart)
+	MCFG_CARTSLOT_ADD("cart1")
+	MCFG_CARTSLOT_EXTENSION_LIST("rom")
+	MCFG_CARTSLOT_NOT_MANDATORY
+	MCFG_CARTSLOT_LOAD(bbcb_cart)
 
-	MDRV_CARTSLOT_ADD("cart2")
-	MDRV_CARTSLOT_EXTENSION_LIST("rom")
-	MDRV_CARTSLOT_NOT_MANDATORY
-	MDRV_CARTSLOT_LOAD(bbcb_cart)
+	MCFG_CARTSLOT_ADD("cart2")
+	MCFG_CARTSLOT_EXTENSION_LIST("rom")
+	MCFG_CARTSLOT_NOT_MANDATORY
+	MCFG_CARTSLOT_LOAD(bbcb_cart)
 
-	MDRV_CARTSLOT_ADD("cart3")
-	MDRV_CARTSLOT_EXTENSION_LIST("rom")
-	MDRV_CARTSLOT_NOT_MANDATORY
-	MDRV_CARTSLOT_LOAD(bbcb_cart)
+	MCFG_CARTSLOT_ADD("cart3")
+	MCFG_CARTSLOT_EXTENSION_LIST("rom")
+	MCFG_CARTSLOT_NOT_MANDATORY
+	MCFG_CARTSLOT_LOAD(bbcb_cart)
 
-	MDRV_CARTSLOT_ADD("cart4")
-	MDRV_CARTSLOT_EXTENSION_LIST("rom")
-	MDRV_CARTSLOT_NOT_MANDATORY
-	MDRV_CARTSLOT_LOAD(bbcb_cart)
+	MCFG_CARTSLOT_ADD("cart4")
+	MCFG_CARTSLOT_EXTENSION_LIST("rom")
+	MCFG_CARTSLOT_NOT_MANDATORY
+	MCFG_CARTSLOT_LOAD(bbcb_cart)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( bbca, bbc_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6502, 2000000)        /* 2.00 MHz */
-	MDRV_CPU_PROGRAM_MAP( bbca_mem)
-	MDRV_CPU_VBLANK_INT("screen", bbcb_vsync)				/* screen refresh interrupts */
-	MDRV_CPU_PERIODIC_INT(bbcb_keyscan, 1000)		/* scan keyboard */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(50)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(128))
-	MDRV_QUANTUM_TIME(HZ(60))
+	MCFG_CPU_ADD("maincpu", M6502, 2000000)        /* 2.00 MHz */
+	MCFG_CPU_PROGRAM_MAP( bbca_mem)
+	MCFG_CPU_VBLANK_INT("screen", bbcb_vsync)				/* screen refresh interrupts */
+	MCFG_CPU_PERIODIC_INT(bbcb_keyscan, 1000)		/* scan keyboard */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(128))
+	MCFG_QUANTUM_TIME(HZ(60))
 
-	MDRV_MACHINE_START( bbca )
-	MDRV_MACHINE_RESET( bbca )
+	MCFG_MACHINE_START( bbca )
+	MCFG_MACHINE_RESET( bbca )
 
 	/* video hardware */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(800,300)
-	MDRV_SCREEN_VISIBLE_AREA(0,800-1,0,300-1)
-	MDRV_PALETTE_LENGTH(16)
-	MDRV_PALETTE_INIT(bbc)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(800,300)
+	MCFG_SCREEN_VISIBLE_AREA(0,800-1,0,300-1)
+	MCFG_PALETTE_LENGTH(16)
+	MCFG_PALETTE_INIT(bbc)
 
-	MDRV_VIDEO_START(bbca)
-	MDRV_VIDEO_UPDATE(bbc)
+	MCFG_VIDEO_START(bbca)
+	MCFG_VIDEO_UPDATE(bbc)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("sn76489", SN76489, 4000000)	/* 4 MHz */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-//  MDRV_SOUND_ADD("tms5220", TMS5220, tms5220_interface)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("sn76489", SN76489, 4000000)	/* 4 MHz */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+//  MCFG_SOUND_ADD("tms5220", TMS5220, tms5220_interface)
 
 	/* cassette */
-	MDRV_CASSETTE_ADD( "cassette", bbc_cassette_config )
+	MCFG_CASSETTE_ADD( "cassette", bbc_cassette_config )
 
 	/* acia */
-	MDRV_ACIA6850_ADD("acia6850", bbc_acia6850_interface)
+	MCFG_ACIA6850_ADD("acia6850", bbc_acia6850_interface)
 
 	/* devices */
-	MDRV_UPD7002_ADD("upd7002", bbc_uPD7002)
-	MDRV_VIA6522_ADD("via6522_0", 1000000, bbcb_system_via)
+	MCFG_UPD7002_ADD("upd7002", bbc_uPD7002)
+	MCFG_VIA6522_ADD("via6522_0", 1000000, bbcb_system_via)
 
-	MDRV_I8271_ADD("i8271", bbc_i8271_interface)
+	MCFG_I8271_ADD("i8271", bbc_i8271_interface)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( bbcb, bbca )
-	MDRV_CPU_MODIFY( "maincpu" )
-	MDRV_CPU_PROGRAM_MAP( bbcb_mem)
-	MDRV_MACHINE_START( bbcb )
-	MDRV_MACHINE_RESET( bbcb )
-	MDRV_VIDEO_START( bbcb )
+	MCFG_CPU_MODIFY( "maincpu" )
+	MCFG_CPU_PROGRAM_MAP( bbcb_mem)
+	MCFG_MACHINE_START( bbcb )
+	MCFG_MACHINE_RESET( bbcb )
+	MCFG_VIDEO_START( bbcb )
 
-	MDRV_VIA6522_ADD("via6522_1", 1000000, bbcb_user_via)
-	MDRV_CENTRONICS_ADD("centronics", bbcb_centronics_config)
+	MCFG_VIA6522_ADD("via6522_1", 1000000, bbcb_user_via)
+	MCFG_CENTRONICS_ADD("centronics", bbcb_centronics_config)
 
-	MDRV_WD177X_ADD("wd177x", bbc_wd17xx_interface )
-	MDRV_FLOPPY_2_DRIVES_ADD(bbc_floppy_config)
-	MDRV_FRAGMENT_ADD(bbc_cartslot)
+	MCFG_WD177X_ADD("wd177x", bbc_wd17xx_interface )
+	MCFG_FLOPPY_2_DRIVES_ADD(bbc_floppy_config)
+	MCFG_FRAGMENT_ADD(bbc_cartslot)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( bbcbp, bbca )
-	MDRV_CPU_MODIFY( "maincpu" )
-	MDRV_CPU_PROGRAM_MAP( bbcbp_mem)
-	MDRV_MACHINE_START( bbcbp )
-	MDRV_MACHINE_RESET( bbcbp )
-	MDRV_VIDEO_START( bbcbp )
+	MCFG_CPU_MODIFY( "maincpu" )
+	MCFG_CPU_PROGRAM_MAP( bbcbp_mem)
+	MCFG_MACHINE_START( bbcbp )
+	MCFG_MACHINE_RESET( bbcbp )
+	MCFG_VIDEO_START( bbcbp )
 
-	MDRV_VIA6522_ADD("via6522_1", 1000000, bbcb_user_via)
-	MDRV_CENTRONICS_ADD("centronics", bbcb_centronics_config)
-	MDRV_WD177X_ADD("wd177x", bbc_wd17xx_interface )
-	MDRV_FLOPPY_2_DRIVES_ADD(bbc_floppy_config)
-	MDRV_FRAGMENT_ADD(bbc_cartslot)
+	MCFG_VIA6522_ADD("via6522_1", 1000000, bbcb_user_via)
+	MCFG_CENTRONICS_ADD("centronics", bbcb_centronics_config)
+	MCFG_WD177X_ADD("wd177x", bbc_wd17xx_interface )
+	MCFG_FLOPPY_2_DRIVES_ADD(bbc_floppy_config)
+	MCFG_FRAGMENT_ADD(bbc_cartslot)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( bbcbp128, bbca )
-	MDRV_CPU_MODIFY( "maincpu" )
-	MDRV_CPU_PROGRAM_MAP( bbcbp128_mem)
-	MDRV_MACHINE_START( bbcbp )
-	MDRV_MACHINE_RESET( bbcbp )
-	MDRV_VIDEO_START( bbcbp )
+	MCFG_CPU_MODIFY( "maincpu" )
+	MCFG_CPU_PROGRAM_MAP( bbcbp128_mem)
+	MCFG_MACHINE_START( bbcbp )
+	MCFG_MACHINE_RESET( bbcbp )
+	MCFG_VIDEO_START( bbcbp )
 
-	MDRV_VIA6522_ADD("via6522_1", 1000000, bbcb_user_via)
-	MDRV_CENTRONICS_ADD("centronics", bbcb_centronics_config)
+	MCFG_VIA6522_ADD("via6522_1", 1000000, bbcb_user_via)
+	MCFG_CENTRONICS_ADD("centronics", bbcb_centronics_config)
 
-	MDRV_WD177X_ADD("wd177x", bbc_wd17xx_interface )
-	MDRV_FLOPPY_2_DRIVES_ADD(bbc_floppy_config)
-	MDRV_FRAGMENT_ADD(bbc_cartslot)
+	MCFG_WD177X_ADD("wd177x", bbc_wd17xx_interface )
+	MCFG_FLOPPY_2_DRIVES_ADD(bbc_floppy_config)
+	MCFG_FRAGMENT_ADD(bbc_cartslot)
 MACHINE_CONFIG_END
 
 
 /****BBC MASTER */
 static MACHINE_CONFIG_START( bbcm, bbc_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M65SC02, 2000000)        /* 2.00 MHz */
-	MDRV_CPU_PROGRAM_MAP( bbcm_mem)
-	MDRV_CPU_VBLANK_INT("screen", bbcb_vsync)				/* screen refresh interrupts */
-	MDRV_CPU_PERIODIC_INT(bbcm_keyscan, 1000)		/* scan keyboard */
-	MDRV_QUANTUM_TIME(HZ(60))
+	MCFG_CPU_ADD("maincpu", M65SC02, 2000000)        /* 2.00 MHz */
+	MCFG_CPU_PROGRAM_MAP( bbcm_mem)
+	MCFG_CPU_VBLANK_INT("screen", bbcb_vsync)				/* screen refresh interrupts */
+	MCFG_CPU_PERIODIC_INT(bbcm_keyscan, 1000)		/* scan keyboard */
+	MCFG_QUANTUM_TIME(HZ(60))
 
-	MDRV_MACHINE_START( bbcm )
-	MDRV_MACHINE_RESET( bbcm )
+	MCFG_MACHINE_START( bbcm )
+	MCFG_MACHINE_RESET( bbcm )
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(50)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(128))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(800,300)
-	MDRV_SCREEN_VISIBLE_AREA(0,800-1,0,300-1)
-	MDRV_PALETTE_LENGTH(16)
-	MDRV_PALETTE_INIT(bbc)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(128))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(800,300)
+	MCFG_SCREEN_VISIBLE_AREA(0,800-1,0,300-1)
+	MCFG_PALETTE_LENGTH(16)
+	MCFG_PALETTE_INIT(bbc)
 
-	MDRV_VIDEO_START(bbcm)
-	MDRV_VIDEO_UPDATE(bbc)
+	MCFG_VIDEO_START(bbcm)
+	MCFG_VIDEO_UPDATE(bbc)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("sn76489", SN76489, 4000000)	/* 4 MHz */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("sn76489", SN76489, 4000000)	/* 4 MHz */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MDRV_MC146818_ADD( "rtc", MC146818_STANDARD )
+	MCFG_MC146818_ADD( "rtc", MC146818_STANDARD )
 
 	/* printer */
-	MDRV_CENTRONICS_ADD("centronics", bbcb_centronics_config)
+	MCFG_CENTRONICS_ADD("centronics", bbcb_centronics_config)
 
 	/* cassette */
-	MDRV_CASSETTE_ADD( "cassette", bbc_cassette_config )
+	MCFG_CASSETTE_ADD( "cassette", bbc_cassette_config )
 
 	/* acia */
-	MDRV_ACIA6850_ADD("acia6850", bbc_acia6850_interface)
+	MCFG_ACIA6850_ADD("acia6850", bbc_acia6850_interface)
 
 	/* devices */
-	MDRV_UPD7002_ADD("upd7002", bbc_uPD7002)
-	MDRV_VIA6522_ADD("via6522_0", 1000000, bbcb_system_via)
-	MDRV_VIA6522_ADD("via6522_1", 1000000, bbcb_user_via)
+	MCFG_UPD7002_ADD("upd7002", bbc_uPD7002)
+	MCFG_VIA6522_ADD("via6522_0", 1000000, bbcb_system_via)
+	MCFG_VIA6522_ADD("via6522_1", 1000000, bbcb_user_via)
 
-	MDRV_WD177X_ADD("wd177x", bbc_wd17xx_interface )
-	MDRV_FLOPPY_2_DRIVES_ADD(bbc_floppy_config)
+	MCFG_WD177X_ADD("wd177x", bbc_wd17xx_interface )
+	MCFG_FLOPPY_2_DRIVES_ADD(bbc_floppy_config)
 
-	MDRV_FRAGMENT_ADD(bbc_cartslot)
+	MCFG_FRAGMENT_ADD(bbc_cartslot)
 MACHINE_CONFIG_END
 
 /*     YEAR  NAME      PARENT    COMPAT MACHINE   INPUT  INIT      COMPANY  FULLNAME */

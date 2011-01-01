@@ -24,7 +24,7 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<running_device> m_discrete;
+	required_device<device_t> m_discrete;
 	required_device<screen_device> m_screen;
 	required_device<timer_device> m_timer_y_odd;
 	required_device<timer_device> m_timer_y_even;

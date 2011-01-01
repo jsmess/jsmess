@@ -237,7 +237,7 @@ static WRITE32_HANDLER( paletteram32_w )
 	palette_set_color_rgb(space->machine, offset, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
 }
 
-static void voodoo_vblank_0(running_device *device, int param)
+static void voodoo_vblank_0(device_t *device, int param)
 {
 	cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_IRQ0, ASSERT_LINE);
 }
@@ -245,8 +245,8 @@ static void voodoo_vblank_0(running_device *device, int param)
 
 static VIDEO_UPDATE( nwktr )
 {
-	running_device *voodoo = screen->machine->device("voodoo");
-	running_device *k001604 = screen->machine->device("k001604");
+	device_t *voodoo = screen->machine->device("voodoo");
+	device_t *k001604 = screen->machine->device("k001604");
 
 	bitmap_fill(bitmap, cliprect, screen->machine->pens[0]);
 
@@ -263,7 +263,7 @@ static VIDEO_UPDATE( nwktr )
 
 static READ32_HANDLER( sysreg_r )
 {
-	running_device *adc12138 = space->machine->device("adc12138");
+	device_t *adc12138 = space->machine->device("adc12138");
 	UINT32 r = 0;
 	if (offset == 0)
 	{
@@ -296,7 +296,7 @@ static READ32_HANDLER( sysreg_r )
 
 static WRITE32_HANDLER( sysreg_w )
 {
-	running_device *adc12138 = space->machine->device("adc12138");
+	device_t *adc12138 = space->machine->device("adc12138");
 	if( offset == 0 )
 	{
 		if (ACCESSING_BITS_24_31)
@@ -596,7 +596,7 @@ static const sharc_config sharc_cfg =
 };
 
 
-static double adc12138_input_callback( running_device *device, UINT8 input )
+static double adc12138_input_callback( device_t *device, UINT8 input )
 {
 	int value = 0;
 	switch (input)
@@ -655,59 +655,59 @@ static MACHINE_RESET( nwktr )
 static MACHINE_CONFIG_START( nwktr, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", PPC403GA, 64000000/2)	/* PowerPC 403GA 32MHz */
-	MDRV_CPU_PROGRAM_MAP(nwktr_map)
+	MCFG_CPU_ADD("maincpu", PPC403GA, 64000000/2)	/* PowerPC 403GA 32MHz */
+	MCFG_CPU_PROGRAM_MAP(nwktr_map)
 
-	MDRV_CPU_ADD("audiocpu", M68000, 64000000/4)	/* 16MHz */
-	MDRV_CPU_PROGRAM_MAP(sound_memmap)
+	MCFG_CPU_ADD("audiocpu", M68000, 64000000/4)	/* 16MHz */
+	MCFG_CPU_PROGRAM_MAP(sound_memmap)
 
-	MDRV_CPU_ADD("dsp", ADSP21062, 36000000)
-	MDRV_CPU_CONFIG(sharc_cfg)
-	MDRV_CPU_DATA_MAP(sharc_map)
+	MCFG_CPU_ADD("dsp", ADSP21062, 36000000)
+	MCFG_CPU_CONFIG(sharc_cfg)
+	MCFG_CPU_DATA_MAP(sharc_map)
 
-	MDRV_QUANTUM_TIME(HZ(6000))
+	MCFG_QUANTUM_TIME(HZ(6000))
 
-	MDRV_MACHINE_START(nwktr)
-	MDRV_MACHINE_RESET(nwktr)
+	MCFG_MACHINE_START(nwktr)
+	MCFG_MACHINE_RESET(nwktr)
 
-	MDRV_3DFX_VOODOO_1_ADD("voodoo", STD_VOODOO_1_CLOCK, 2, "screen")
-	MDRV_3DFX_VOODOO_CPU("dsp")
-	MDRV_3DFX_VOODOO_TMU_MEMORY(0, 2)
-	MDRV_3DFX_VOODOO_TMU_MEMORY(1, 2)
-	MDRV_3DFX_VOODOO_VBLANK(voodoo_vblank_0)
+	MCFG_3DFX_VOODOO_1_ADD("voodoo", STD_VOODOO_1_CLOCK, 2, "screen")
+	MCFG_3DFX_VOODOO_CPU("dsp")
+	MCFG_3DFX_VOODOO_TMU_MEMORY(0, 2)
+	MCFG_3DFX_VOODOO_TMU_MEMORY(1, 2)
+	MCFG_3DFX_VOODOO_VBLANK(voodoo_vblank_0)
 
-	MDRV_K033906_ADD("k033906_1", nwktr_k033906_interface)
+	MCFG_K033906_ADD("k033906_1", nwktr_k033906_interface)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_SIZE(512, 384)
-	MDRV_SCREEN_VISIBLE_AREA(0, 511, 0, 383)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_SIZE(512, 384)
+	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 383)
 
-	MDRV_PALETTE_LENGTH(65536)
+	MCFG_PALETTE_LENGTH(65536)
 
-	MDRV_VIDEO_UPDATE(nwktr)
+	MCFG_VIDEO_UPDATE(nwktr)
 
-	MDRV_K001604_ADD("k001604", racingj_k001604_intf)
+	MCFG_K001604_ADD("k001604", racingj_k001604_intf)
 
-	MDRV_K056800_ADD("k056800", nwktr_k056800_interface)
+	MCFG_K056800_ADD("k056800", nwktr_k056800_interface)
 
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("rfsnd", RF5C400, 16934400)	// as per Guru readme above
-	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("rfsnd", RF5C400, 16934400)	// as per Guru readme above
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MDRV_M48T58_ADD( "m48t58" )
+	MCFG_M48T58_ADD( "m48t58" )
 
-	MDRV_ADC12138_ADD( "adc12138", nwktr_adc_interface )
+	MCFG_ADC12138_ADD( "adc12138", nwktr_adc_interface )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( thrilld, nwktr )
 
-	MDRV_DEVICE_REMOVE("k001604")
-	MDRV_K001604_ADD("k001604", thrilld_k001604_intf)
+	MCFG_DEVICE_REMOVE("k001604")
+	MCFG_K001604_ADD("k001604", thrilld_k001604_intf)
 MACHINE_CONFIG_END
 
 
@@ -716,7 +716,7 @@ MACHINE_CONFIG_END
 static DRIVER_INIT(nwktr)
 {
 	init_konami_cgboard(machine, 1, CGBOARD_TYPE_NWKTR);
-	set_cgboard_texture_bank(machine, 0, "bank5", memory_region(machine, "user5"));
+	set_cgboard_texture_bank(machine, 0, "bank5", machine->region("user5")->base());
 
 	sharc_dataram = auto_alloc_array(machine, UINT32, 0x100000/4);
 	led_reg0 = led_reg1 = 0x7f;

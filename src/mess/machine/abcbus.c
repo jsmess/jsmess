@@ -24,7 +24,7 @@ typedef struct _abcbus_daisy_state abcbus_daisy_state;
 struct _abcbus_daisy_state
 {
 	abcbus_daisy_state			*next;			/* next device */
-	running_device				*device;		/* associated device */
+	device_t				*device;		/* associated device */
 
 	devcb_resolved_write8		out_cs_func;
 
@@ -43,7 +43,7 @@ struct _abcbus_t
 {
 	abcbus_daisy_state *daisy_state;
 
-	running_device *cpu;
+	device_t *cpu;
 
 	int resin;
 	int irq;
@@ -55,21 +55,21 @@ struct _abcbus_t
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE abcbus_t *get_safe_token(running_device *device)
+INLINE abcbus_t *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == ABCBUS);
 	return (abcbus_t *)downcast<legacy_device_base *>(device)->token();
 }
 
-INLINE const abcbus_daisy_chain *get_interface(running_device *device)
+INLINE const abcbus_daisy_chain *get_interface(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == ABCBUS);
 	return (const abcbus_daisy_chain *) device->baseconfig().static_config();
 }
 
-INLINE abcbus_config *get_safe_config(running_device *device)
+INLINE abcbus_config *get_safe_config(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == ABCBUS);
@@ -154,7 +154,7 @@ READ8_DEVICE_HANDLER( abcbus_stat_r )
 	return data;
 }
 
-static void command_w(running_device *device, int index, UINT8 data)
+static void command_w(device_t *device, int index, UINT8 data)
 {
 	abcbus_t *abcbus = get_safe_token(device);
 	abcbus_daisy_state *daisy = abcbus->daisy_state;

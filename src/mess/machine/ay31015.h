@@ -65,9 +65,9 @@ struct _ay31015_config
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MDRV_AY31015_ADD(_tag, _config)	\
-    MDRV_DEVICE_ADD(_tag, AY31015, 0)		\
-    MDRV_DEVICE_CONFIG(_config)
+#define MCFG_AY31015_ADD(_tag, _config)	\
+    MCFG_DEVICE_ADD(_tag, AY31015, 0)		\
+    MCFG_DEVICE_CONFIG(_config)
 
 
 /***************************************************************************
@@ -75,29 +75,29 @@ struct _ay31015_config
 ***************************************************************************/
 
 /* Set an input pin */
-void ay31015_set_input_pin( running_device *device, ay31015_input_pin_t pin, int data );
+void ay31015_set_input_pin( device_t *device, ay31015_input_pin_t pin, int data );
 
 
 /* Get an output pin */
-int ay31015_get_output_pin( running_device *device, ay31015_output_pin_t pin );
+int ay31015_get_output_pin( device_t *device, ay31015_output_pin_t pin );
 
 
 /* Set a new transmitter clock (new_clock is in Hz) */
-void ay31015_set_transmitter_clock( running_device *device, double new_clock );
+void ay31015_set_transmitter_clock( device_t *device, double new_clock );
 
 
 /* Set a new receiver clock (new_clock is in Hz) */
-void ay31015_set_receiver_clock( running_device *device, double new_clock );
+void ay31015_set_receiver_clock( device_t *device, double new_clock );
 
 
 /* Reead the received data */
 /* The received data is available on RD8-RD1 (pins 5-12) */
-UINT8 ay31015_get_received_data( running_device *device );
+UINT8 ay31015_get_received_data( device_t *device );
 
 
 /* Set the transmitter buffer */
 /* The data to transmit is set on DB1-DB8 (pins 26-33) */
-void ay31015_set_transmit_data( running_device *device, UINT8 data );
+void ay31015_set_transmit_data( device_t *device, UINT8 data );
 
 
 /***************************************************************************

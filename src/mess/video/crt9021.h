@@ -44,9 +44,9 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MDRV_CRT9021_ADD(_tag, _clock, _config) \
-	MDRV_DEVICE_ADD(_tag, CRT9021, _clock) \
-	MDRV_DEVICE_CONFIG(_config)
+#define MCFG_CRT9021_ADD(_tag, _clock, _config) \
+	MCFG_DEVICE_ADD(_tag, CRT9021, _clock) \
+	MCFG_DEVICE_CONFIG(_config)
 
 
 #define CRT9021_INTERFACE(name) \

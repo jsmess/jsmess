@@ -551,9 +551,9 @@ static READ16_HANDLER( dsp_hold_line_r )
 static READ16_HANDLER( dsp_rom_r )
 {
 	coolpool_state *state = space->machine->driver_data<coolpool_state>();
-	UINT8 *rom = memory_region(space->machine, "user2");
+	UINT8 *rom = space->machine->region("user2")->base();
 
-	return rom[state->iop_romaddr & (memory_region_length(space->machine, "user2") - 1)];
+	return rom[state->iop_romaddr & (space->machine->region("user2")->bytes() - 1)];
 }
 
 
@@ -869,73 +869,73 @@ static const tms34010_config tms_config_coolpool =
 static MACHINE_CONFIG_START( amerdart, coolpool_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", TMS34010, XTAL_40MHz)
-	MDRV_CPU_CONFIG(tms_config_amerdart)
-	MDRV_CPU_PROGRAM_MAP(amerdart_map)
+	MCFG_CPU_ADD("maincpu", TMS34010, XTAL_40MHz)
+	MCFG_CPU_CONFIG(tms_config_amerdart)
+	MCFG_CPU_PROGRAM_MAP(amerdart_map)
 
-	MDRV_CPU_ADD("dsp", TMS32015, XTAL_40MHz/2)
-	MDRV_CPU_PROGRAM_MAP(amerdart_dsp_pgm_map)
+	MCFG_CPU_ADD("dsp", TMS32015, XTAL_40MHz/2)
+	MCFG_CPU_PROGRAM_MAP(amerdart_dsp_pgm_map)
 	/* Data Map is internal to the CPU */
-	MDRV_CPU_IO_MAP(amerdart_dsp_io_map)
-	MDRV_TIMER_ADD_SCANLINE("audioint", amerdart_audio_int_gen, "screen", 0, 1)
+	MCFG_CPU_IO_MAP(amerdart_dsp_io_map)
+	MCFG_TIMER_ADD_SCANLINE("audioint", amerdart_audio_int_gen, "screen", 0, 1)
 
-	MDRV_MACHINE_RESET(amerdart)
-	MDRV_NVRAM_ADD_0FILL("nvram")
+	MCFG_MACHINE_RESET(amerdart)
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MDRV_TIMER_ADD("nvram_timer", nvram_write_timeout)
+	MCFG_TIMER_ADD("nvram_timer", nvram_write_timeout)
 
 	/* video hardware */
-	MDRV_VIDEO_UPDATE(tms340x0)
+	MCFG_VIDEO_UPDATE(tms340x0)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_RAW_PARAMS(XTAL_40MHz/6, 212*2, 0, 161*2, 262, 0, 241)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_40MHz/6, 212*2, 0, 161*2, 262, 0, 241)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("dac", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_START( coolpool, coolpool_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", TMS34010, XTAL_40MHz)
-	MDRV_CPU_CONFIG(tms_config_coolpool)
-	MDRV_CPU_PROGRAM_MAP(coolpool_map)
+	MCFG_CPU_ADD("maincpu", TMS34010, XTAL_40MHz)
+	MCFG_CPU_CONFIG(tms_config_coolpool)
+	MCFG_CPU_PROGRAM_MAP(coolpool_map)
 
-	MDRV_CPU_ADD("dsp", TMS32026,XTAL_40MHz)
-	MDRV_CPU_PROGRAM_MAP(coolpool_dsp_pgm_map)
-	MDRV_CPU_IO_MAP(coolpool_dsp_io_map)
+	MCFG_CPU_ADD("dsp", TMS32026,XTAL_40MHz)
+	MCFG_CPU_PROGRAM_MAP(coolpool_dsp_pgm_map)
+	MCFG_CPU_IO_MAP(coolpool_dsp_io_map)
 
-	MDRV_MACHINE_RESET(coolpool)
-	MDRV_NVRAM_ADD_0FILL("nvram")
+	MCFG_MACHINE_RESET(coolpool)
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MDRV_TIMER_ADD("nvram_timer", nvram_write_timeout)
+	MCFG_TIMER_ADD("nvram_timer", nvram_write_timeout)
 
 	/* video hardware */
-	MDRV_TLC34076_ADD("tlc34076", TLC34076_6_BIT)
+	MCFG_TLC34076_ADD("tlc34076", TLC34076_6_BIT)
 
-	MDRV_VIDEO_UPDATE(tms340x0)
+	MCFG_VIDEO_UPDATE(tms340x0)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_RAW_PARAMS(XTAL_40MHz/6, 424, 0, 320, 262, 0, 240)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_40MHz/6, 424, 0, 320, 262, 0, 240)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("dac", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( 9ballsht, coolpool )
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(nballsht_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(nballsht_map)
 MACHINE_CONFIG_END
 
 
@@ -1218,8 +1218,8 @@ static DRIVER_INIT( 9ballsht )
 	UINT16 *rom;
 
 	/* decrypt the main program ROMs */
-	rom = (UINT16 *)memory_region(machine, "user1");
-	len = memory_region_length(machine, "user1");
+	rom = (UINT16 *)machine->region("user1")->base();
+	len = machine->region("user1")->bytes();
 	for (a = 0;a < len/2;a++)
 	{
 		int hi,lo,nhi,nlo;
@@ -1242,8 +1242,8 @@ static DRIVER_INIT( 9ballsht )
 	}
 
 	/* decrypt the sub data ROMs */
-	rom = (UINT16 *)memory_region(machine, "user2");
-	len = memory_region_length(machine, "user2");
+	rom = (UINT16 *)machine->region("user2")->base();
+	len = machine->region("user2")->bytes();
 	for (a = 1;a < len/2;a+=4)
 	{
 		/* just swap bits 1 and 2 of the address */

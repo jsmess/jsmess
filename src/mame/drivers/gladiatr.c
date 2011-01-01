@@ -194,7 +194,7 @@ TODO:
 /*Rom bankswitching*/
 static WRITE8_HANDLER( gladiatr_bankswitch_w )
 {
-	UINT8 *rom = memory_region(space->machine, "maincpu") + 0x10000;
+	UINT8 *rom = space->machine->region("maincpu")->base() + 0x10000;
 
 	memory_set_bankptr(space->machine, "bank1", rom + 0x6000 * (data & 0x01));
 }
@@ -256,7 +256,7 @@ static MACHINE_RESET( gladiator )
 	TAITO8741_start(&gladiator_8741interface);
 	/* 6809 bank memory set */
 	{
-		UINT8 *rom = memory_region(machine, "audiocpu") + 0x10000;
+		UINT8 *rom = machine->region("audiocpu")->base() + 0x10000;
 		memory_set_bankptr(machine, "bank2",rom);
 		machine->device("audiocpu")->reset();
 	}
@@ -270,7 +270,7 @@ static WRITE8_DEVICE_HANDLER( gladiator_int_control_w )
 	/* bit 0   : ??                    */
 }
 /* YM2203 IRQ */
-static void gladiator_ym_irq(running_device *device, int irq)
+static void gladiator_ym_irq(device_t *device, int irq)
 {
 	/* NMI IRQ is not used by gladiator sound program */
 	cputag_set_input_line(device->machine, "sub", INPUT_LINE_NMI, irq ? ASSERT_LINE : CLEAR_LINE);
@@ -279,7 +279,7 @@ static void gladiator_ym_irq(running_device *device, int irq)
 /*Sound Functions*/
 static WRITE8_DEVICE_HANDLER( glad_adpcm_w )
 {
-	UINT8 *rom = memory_region(device->machine, "audiocpu") + 0x10000;
+	UINT8 *rom = device->machine->region("audiocpu")->base() + 0x10000;
 
 	/* bit6 = bank offset */
 	memory_set_bankptr(device->machine, "bank2",rom + ((data & 0x40) ? 0xc000 : 0));
@@ -344,9 +344,9 @@ static WRITE8_HANDLER(qx2_w){ }
 
 static WRITE8_HANDLER(qx3_w){ }
 
-static READ8_HANDLER(qx2_r){ return mame_rand(space->machine); }
+static READ8_HANDLER(qx2_r){ return space->machine->rand(); }
 
-static READ8_HANDLER(qx3_r){ return mame_rand(space->machine)&0xf; }
+static READ8_HANDLER(qx3_r){ return space->machine->rand()&0xf; }
 
 static READ8_HANDLER(qx0_r)
 {
@@ -623,7 +623,7 @@ GFXDECODE_END
 
 static READ8_DEVICE_HANDLER(f1_r)
 {
-	return mame_rand(device->machine);
+	return device->machine->rand();
 }
 
 static const ym2203_interface ppking_ym2203_interface =
@@ -663,100 +663,100 @@ static const msm5205_interface msm5205_config =
 static MACHINE_CONFIG_START( ppking, gladiatr_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, XTAL_12MHz/2) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(ppking_cpu1_map)
-	MDRV_CPU_IO_MAP(ppking_cpu1_io)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2) /* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(ppking_cpu1_map)
+	MCFG_CPU_IO_MAP(ppking_cpu1_io)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("sub", Z80, XTAL_12MHz/4) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(cpu2_map)
-	MDRV_CPU_IO_MAP(ppking_cpu2_io)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_ADD("sub", Z80, XTAL_12MHz/4) /* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(cpu2_map)
+	MCFG_CPU_IO_MAP(ppking_cpu2_io)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("audiocpu", M6809, XTAL_12MHz/16) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(ppking_cpu3_map)
+	MCFG_CPU_ADD("audiocpu", M6809, XTAL_12MHz/16) /* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(ppking_cpu3_map)
 
-	MDRV_QUANTUM_TIME(HZ(6000))
+	MCFG_QUANTUM_TIME(HZ(6000))
 
-	MDRV_MACHINE_RESET(ppking)
-	MDRV_NVRAM_ADD_0FILL("nvram")
+	MCFG_MACHINE_RESET(ppking)
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(ppking)
-	MDRV_PALETTE_LENGTH(1024)
+	MCFG_GFXDECODE(ppking)
+	MCFG_PALETTE_LENGTH(1024)
 
-	MDRV_VIDEO_START(ppking)
-	MDRV_VIDEO_UPDATE(ppking)
+	MCFG_VIDEO_START(ppking)
+	MCFG_VIDEO_UPDATE(ppking)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz/8) /* verified on pcb */
-	MDRV_SOUND_CONFIG(ppking_ym2203_interface)
-	MDRV_SOUND_ROUTE(0, "mono", 0.60)
-	MDRV_SOUND_ROUTE(1, "mono", 0.60)
-	MDRV_SOUND_ROUTE(2, "mono", 0.60)
-	MDRV_SOUND_ROUTE(3, "mono", 0.50)
+	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz/8) /* verified on pcb */
+	MCFG_SOUND_CONFIG(ppking_ym2203_interface)
+	MCFG_SOUND_ROUTE(0, "mono", 0.60)
+	MCFG_SOUND_ROUTE(1, "mono", 0.60)
+	MCFG_SOUND_ROUTE(2, "mono", 0.60)
+	MCFG_SOUND_ROUTE(3, "mono", 0.50)
 
-	MDRV_SOUND_ADD("msm", MSM5205, XTAL_455kHz) /* verified on pcb */
-	MDRV_SOUND_CONFIG(msm5205_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
+	MCFG_SOUND_ADD("msm", MSM5205, XTAL_455kHz) /* verified on pcb */
+	MCFG_SOUND_CONFIG(msm5205_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( gladiatr, gladiatr_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, XTAL_12MHz/2) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(gladiatr_cpu1_map)
-	MDRV_CPU_IO_MAP(gladiatr_cpu1_io)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2) /* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(gladiatr_cpu1_map)
+	MCFG_CPU_IO_MAP(gladiatr_cpu1_io)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("sub", Z80, XTAL_12MHz/4) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(cpu2_map)
-	MDRV_CPU_IO_MAP(gladiatr_cpu2_io)
+	MCFG_CPU_ADD("sub", Z80, XTAL_12MHz/4) /* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(cpu2_map)
+	MCFG_CPU_IO_MAP(gladiatr_cpu2_io)
 
-	MDRV_CPU_ADD("audiocpu", M6809, XTAL_12MHz/16) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(gladiatr_cpu3_map)
+	MCFG_CPU_ADD("audiocpu", M6809, XTAL_12MHz/16) /* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(gladiatr_cpu3_map)
 
-	MDRV_QUANTUM_TIME(HZ(600))
+	MCFG_QUANTUM_TIME(HZ(600))
 
-	MDRV_MACHINE_RESET(gladiator)
-	MDRV_NVRAM_ADD_0FILL("nvram")
+	MCFG_MACHINE_RESET(gladiator)
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(gladiatr)
-	MDRV_PALETTE_LENGTH(1024)
+	MCFG_GFXDECODE(gladiatr)
+	MCFG_PALETTE_LENGTH(1024)
 
-	MDRV_VIDEO_START(gladiatr)
-	MDRV_VIDEO_UPDATE(gladiatr)
+	MCFG_VIDEO_START(gladiatr)
+	MCFG_VIDEO_UPDATE(gladiatr)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz/8) /* verified on pcb */
-	MDRV_SOUND_CONFIG(gladiatr_ym2203_interface)
-	MDRV_SOUND_ROUTE(0, "mono", 0.60)
-	MDRV_SOUND_ROUTE(1, "mono", 0.60)
-	MDRV_SOUND_ROUTE(2, "mono", 0.60)
-	MDRV_SOUND_ROUTE(3, "mono", 0.50)
+	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz/8) /* verified on pcb */
+	MCFG_SOUND_CONFIG(gladiatr_ym2203_interface)
+	MCFG_SOUND_ROUTE(0, "mono", 0.60)
+	MCFG_SOUND_ROUTE(1, "mono", 0.60)
+	MCFG_SOUND_ROUTE(2, "mono", 0.60)
+	MCFG_SOUND_ROUTE(3, "mono", 0.50)
 
-	MDRV_SOUND_ADD("msm", MSM5205, XTAL_455kHz) /* verified on pcb */
-	MDRV_SOUND_CONFIG(msm5205_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
+	MCFG_SOUND_ADD("msm", MSM5205, XTAL_455kHz) /* verified on pcb */
+	MCFG_SOUND_CONFIG(msm5205_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -958,7 +958,7 @@ static DRIVER_INIT( gladiatr )
 	UINT8 *rom;
 	int i,j;
 
-	rom = memory_region(machine, "gfx2");
+	rom = machine->region("gfx2")->base();
 	// unpack 3bpp graphics
 	for (j = 3; j >= 0; j--)
 	{
@@ -972,7 +972,7 @@ static DRIVER_INIT( gladiatr )
 	swap_block(rom + 0x14000, rom + 0x18000, 0x4000);
 
 
-	rom = memory_region(machine, "gfx3");
+	rom = machine->region("gfx3")->base();
 	// unpack 3bpp graphics
 	for (j = 5; j >= 0; j--)
 	{
@@ -989,7 +989,7 @@ static DRIVER_INIT( gladiatr )
 	swap_block(rom + 0x24000, rom + 0x28000, 0x4000);
 
 	/* make sure bank is valid in cpu-reset */
-	rom = memory_region(machine, "audiocpu") + 0x10000;
+	rom = machine->region("audiocpu")->base() + 0x10000;
 	memory_set_bankptr(machine, "bank2",rom);
 }
 
@@ -1008,14 +1008,14 @@ static DRIVER_INIT(ppking)
 	UINT8 *rom;
 	int i,j;
 
-	rom = memory_region(machine, "gfx2");
+	rom = machine->region("gfx2")->base();
 	// unpack 3bpp graphics
 	for (i = 0; i < 0x2000; i++)
 	{
 		rom[i+0x2000] = rom[i] >> 4;
 	}
 
-	rom = memory_region(machine, "gfx3");
+	rom = machine->region("gfx3")->base();
 	// unpack 3bpp graphics
 	for (j = 1; j >= 0; j--)
 	{

@@ -119,8 +119,8 @@ static INT16 *samplebuf;
 static SAMPLES_START( pbillian_sh_start )
 {
 	running_machine *machine = device->machine;
-	UINT8 *src = memory_region(machine, "samples");
-	int i, len = memory_region_length(machine, "samples");
+	UINT8 *src = machine->region("samples")->base();
+	int i, len = machine->region("samples")->bytes();
 
 	/* convert 8-bit unsigned samples to 8-bit signed */
 	samplebuf = auto_alloc_array(machine, INT16, len);
@@ -130,7 +130,7 @@ static SAMPLES_START( pbillian_sh_start )
 
 static WRITE8_HANDLER( pbillian_sample_trigger_w )
 {
-	running_device *samples = space->machine->device("samples");
+	device_t *samples = space->machine->device("samples");
 	int start,end;
 
 	start = data << 7;
@@ -516,7 +516,7 @@ static READ8_DEVICE_HANDLER(pbillian_ay_port_a_r)
 {
 //  logerror("%04x: ay_port_a_r\n",cpu_get_pc(space->cpu));
 	 /* bits 76------  MCU status bits */
-	return (mame_rand(device->machine) & 0xc0) | input_port_read(device->machine, "BUTTONS");
+	return (device->machine->rand() & 0xc0) | input_port_read(device->machine, "BUTTONS");
 }
 
 
@@ -542,7 +542,7 @@ static void machine_init_common(running_machine *machine)
 static MACHINE_START( superqix )
 {
 	/* configure the banks */
-	memory_configure_bank(machine, "bank1", 0, 4, memory_region(machine, "maincpu") + 0x10000, 0x4000);
+	memory_configure_bank(machine, "bank1", 0, 4, machine->region("maincpu")->base() + 0x10000, 0x4000);
 
 	machine_init_common(machine);
 }
@@ -550,7 +550,7 @@ static MACHINE_START( superqix )
 static MACHINE_START( pbillian )
 {
 	/* configure the banks */
-	memory_configure_bank(machine, "bank1", 0, 2, memory_region(machine, "maincpu") + 0x10000, 0x4000);
+	memory_configure_bank(machine, "bank1", 0, 2, machine->region("maincpu")->base() + 0x10000, 0x4000);
 
 	machine_init_common(machine);
 }
@@ -1012,157 +1012,157 @@ static INTERRUPT_GEN( bootleg_interrupt )
 
 
 static MACHINE_CONFIG_START( pbillian, driver_device )
-	MDRV_CPU_ADD("maincpu", Z80,12000000/2)		 /* 6 MHz */
-	MDRV_CPU_PROGRAM_MAP(main_map)
-	MDRV_CPU_IO_MAP(pbillian_port_map)
-	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
+	MCFG_CPU_ADD("maincpu", Z80,12000000/2)		 /* 6 MHz */
+	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_CPU_IO_MAP(pbillian_port_map)
+	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
-	MDRV_MACHINE_START(pbillian)
+	MCFG_MACHINE_START(pbillian)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(256, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(256, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(pbillian)
-	MDRV_PALETTE_LENGTH(512)
+	MCFG_GFXDECODE(pbillian)
+	MCFG_PALETTE_LENGTH(512)
 
-	MDRV_VIDEO_START(pbillian)
-	MDRV_VIDEO_UPDATE(pbillian)
+	MCFG_VIDEO_START(pbillian)
+	MCFG_VIDEO_UPDATE(pbillian)
 
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("aysnd", AY8910, 12000000/8)
-	MDRV_SOUND_CONFIG(pbillian_ay8910_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	MCFG_SOUND_ADD("aysnd", AY8910, 12000000/8)
+	MCFG_SOUND_CONFIG(pbillian_ay8910_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MDRV_SOUND_ADD("samples", SAMPLES, 0)
-	MDRV_SOUND_CONFIG(pbillian_samples_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SOUND_CONFIG(pbillian_samples_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( hotsmash, driver_device )
-	MDRV_CPU_ADD("maincpu", Z80,12000000/2)		 /* 6 MHz */
-	MDRV_CPU_PROGRAM_MAP(main_map)
-	MDRV_CPU_IO_MAP(hotsmash_port_map)
-	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
+	MCFG_CPU_ADD("maincpu", Z80,12000000/2)		 /* 6 MHz */
+	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_CPU_IO_MAP(hotsmash_port_map)
+	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
-	MDRV_CPU_ADD("mcu", M68705, 4000000) /* ???? */
-	MDRV_CPU_PROGRAM_MAP(m68705_map)
+	MCFG_CPU_ADD("mcu", M68705, 4000000) /* ???? */
+	MCFG_CPU_PROGRAM_MAP(m68705_map)
 
-	MDRV_MACHINE_START(pbillian)
+	MCFG_MACHINE_START(pbillian)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(256, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(256, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(pbillian)
-	MDRV_PALETTE_LENGTH(512)
+	MCFG_GFXDECODE(pbillian)
+	MCFG_PALETTE_LENGTH(512)
 
-	MDRV_VIDEO_START(pbillian)
-	MDRV_VIDEO_UPDATE(pbillian)
+	MCFG_VIDEO_START(pbillian)
+	MCFG_VIDEO_UPDATE(pbillian)
 
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("aysnd", AY8910, 12000000/8)
-	MDRV_SOUND_CONFIG(hotsmash_ay8910_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	MCFG_SOUND_ADD("aysnd", AY8910, 12000000/8)
+	MCFG_SOUND_CONFIG(hotsmash_ay8910_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MDRV_SOUND_ADD("samples", SAMPLES, 0)
-	MDRV_SOUND_CONFIG(pbillian_samples_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SOUND_CONFIG(pbillian_samples_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( sqix, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, 12000000/2)	/* 6 MHz */
-	MDRV_CPU_PROGRAM_MAP(main_map)
-	MDRV_CPU_IO_MAP(sqix_port_map)
-	MDRV_CPU_VBLANK_INT_HACK(sqix_interrupt,6)	/* ??? */
+	MCFG_CPU_ADD("maincpu", Z80, 12000000/2)	/* 6 MHz */
+	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_CPU_IO_MAP(sqix_port_map)
+	MCFG_CPU_VBLANK_INT_HACK(sqix_interrupt,6)	/* ??? */
 
-	MDRV_CPU_ADD("mcu", I8751, 12000000/3)	/* ??? */
-	MDRV_CPU_IO_MAP(bootleg_mcu_io_map)
+	MCFG_CPU_ADD("mcu", I8751, 12000000/3)	/* ??? */
+	MCFG_CPU_IO_MAP(bootleg_mcu_io_map)
 
-	MDRV_QUANTUM_TIME(HZ(30000))
+	MCFG_QUANTUM_TIME(HZ(30000))
 
-	MDRV_MACHINE_START(superqix)
+	MCFG_MACHINE_START(superqix)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(sqix)
-	MDRV_PALETTE_LENGTH(256)
+	MCFG_GFXDECODE(sqix)
+	MCFG_PALETTE_LENGTH(256)
 
-	MDRV_VIDEO_START(superqix)
-	MDRV_VIDEO_UPDATE(superqix)
+	MCFG_VIDEO_START(superqix)
+	MCFG_VIDEO_UPDATE(superqix)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay1", AY8910, 12000000/8)
-	MDRV_SOUND_CONFIG(sqix_ay8910_interface_1)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD("ay1", AY8910, 12000000/8)
+	MCFG_SOUND_CONFIG(sqix_ay8910_interface_1)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MDRV_SOUND_ADD("ay2", AY8910, 12000000/8)
-	MDRV_SOUND_CONFIG(sqix_ay8910_interface_2)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD("ay2", AY8910, 12000000/8)
+	MCFG_SOUND_CONFIG(sqix_ay8910_interface_2)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( sqixu, sqix )
 
-	MDRV_CPU_MODIFY("mcu")
-	MDRV_CPU_IO_MAP(sqixu_mcu_io_map)
+	MCFG_CPU_MODIFY("mcu")
+	MCFG_CPU_IO_MAP(sqixu_mcu_io_map)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_START( sqixbl, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, 12000000/2)	/* 6 MHz */
-	MDRV_CPU_PROGRAM_MAP(main_map)
-	MDRV_CPU_IO_MAP(bootleg_port_map)
-	MDRV_CPU_VBLANK_INT_HACK(bootleg_interrupt,6)	/* ??? */
+	MCFG_CPU_ADD("maincpu", Z80, 12000000/2)	/* 6 MHz */
+	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_CPU_IO_MAP(bootleg_port_map)
+	MCFG_CPU_VBLANK_INT_HACK(bootleg_interrupt,6)	/* ??? */
 
-	MDRV_MACHINE_START(superqix)
+	MCFG_MACHINE_START(superqix)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(sqix)
-	MDRV_PALETTE_LENGTH(256)
+	MCFG_GFXDECODE(sqix)
+	MCFG_PALETTE_LENGTH(256)
 
-	MDRV_VIDEO_START(superqix)
-	MDRV_VIDEO_UPDATE(superqix)
+	MCFG_VIDEO_START(superqix)
+	MCFG_VIDEO_UPDATE(superqix)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay1", AY8910, 12000000/8)
-	MDRV_SOUND_CONFIG(bootleg_ay8910_interface_1)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD("ay1", AY8910, 12000000/8)
+	MCFG_SOUND_CONFIG(bootleg_ay8910_interface_1)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MDRV_SOUND_ADD("ay2", AY8910, 12000000/8)
-	MDRV_SOUND_CONFIG(bootleg_ay8910_interface_2)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD("ay2", AY8910, 12000000/8)
+	MCFG_SOUND_CONFIG(bootleg_ay8910_interface_2)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 
@@ -1359,8 +1359,8 @@ static DRIVER_INIT( perestro )
 	int i,j;
 
 	/* decrypt program code; the address lines are shuffled around in a non-trivial way */
-	src = memory_region(machine, "maincpu");
-	len = memory_region_length(machine, "maincpu");
+	src = machine->region("maincpu")->base();
+	len = machine->region("maincpu")->bytes();
 	for (i = 0;i < len;i += 16)
 	{
 		memcpy(temp,&src[i],16);
@@ -1379,8 +1379,8 @@ static DRIVER_INIT( perestro )
 	}
 
 	/* decrypt gfx ROMs; simple bit swap on the address lines */
-	src = memory_region(machine, "gfx1");
-	len = memory_region_length(machine, "gfx1");
+	src = machine->region("gfx1")->base();
+	len = machine->region("gfx1")->bytes();
 	for (i = 0;i < len;i += 16)
 	{
 		memcpy(temp,&src[i],16);
@@ -1390,8 +1390,8 @@ static DRIVER_INIT( perestro )
 		}
 	}
 
-	src = memory_region(machine, "gfx2");
-	len = memory_region_length(machine, "gfx2");
+	src = machine->region("gfx2")->base();
+	len = machine->region("gfx2")->bytes();
 	for (i = 0;i < len;i += 16)
 	{
 		memcpy(temp,&src[i],16);
@@ -1401,8 +1401,8 @@ static DRIVER_INIT( perestro )
 		}
 	}
 
-	src = memory_region(machine, "gfx3");
-	len = memory_region_length(machine, "gfx3");
+	src = machine->region("gfx3")->base();
+	len = machine->region("gfx3")->bytes();
 	for (i = 0;i < len;i += 16)
 	{
 		memcpy(temp,&src[i],16);

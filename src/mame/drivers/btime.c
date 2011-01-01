@@ -224,12 +224,12 @@ static void btime_decrypt( address_space *space )
 	/* however if the previous instruction was JSR (which caused a write to */
 	/* the stack), fetch the address of the next instruction. */
 	addr1 = cpu_get_previouspc(space->cpu);
-	src1 = (addr1 < 0x9000) ? state->rambase : memory_region(space->machine, "maincpu");
+	src1 = (addr1 < 0x9000) ? state->rambase : space->machine->region("maincpu")->base();
 	if (decrypted[addr1] == 0x20)	/* JSR $xxxx */
 		addr = src1[addr1 + 1] + 256 * src1[addr1 + 2];
 
 	/* If the address of the next instruction is xxxx xxx1 xxxx x1xx, decode it. */
-	src = (addr < 0x9000) ? state->rambase : memory_region(space->machine, "maincpu");
+	src = (addr < 0x9000) ? state->rambase : space->machine->region("maincpu")->base();
 	if ((addr & 0x0104) == 0x0104)
 	{
 		/* 76543210 -> 65342710 bit rotation */
@@ -1490,80 +1490,80 @@ static MACHINE_RESET( mmonkey )
 static MACHINE_CONFIG_START( btime, btime_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6502, HCLK2)	/* seletable between H2/H4 via jumper */
-	MDRV_CPU_PROGRAM_MAP(btime_map)
+	MCFG_CPU_ADD("maincpu", M6502, HCLK2)	/* seletable between H2/H4 via jumper */
+	MCFG_CPU_PROGRAM_MAP(btime_map)
 
-	MDRV_CPU_ADD("audiocpu", M6502, HCLK1/3/2)
-	MDRV_CPU_PROGRAM_MAP(audio_map)
-	MDRV_TIMER_ADD_SCANLINE("audionmi", audio_nmi_gen, "screen", 0, 8)
+	MCFG_CPU_ADD("audiocpu", M6502, HCLK1/3/2)
+	MCFG_CPU_PROGRAM_MAP(audio_map)
+	MCFG_TIMER_ADD_SCANLINE("audionmi", audio_nmi_gen, "screen", 0, 8)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_RAW_PARAMS(HCLK, 384, 8, 248, 272, 8, 248)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_RAW_PARAMS(HCLK, 384, 8, 248, 272, 8, 248)
 
-	MDRV_MACHINE_START(btime)
-	MDRV_MACHINE_RESET(btime)
+	MCFG_MACHINE_START(btime)
+	MCFG_MACHINE_RESET(btime)
 
-	MDRV_GFXDECODE(btime)
-	MDRV_PALETTE_LENGTH(16)
+	MCFG_GFXDECODE(btime)
+	MCFG_PALETTE_LENGTH(16)
 
-	MDRV_PALETTE_INIT(btime)
-	MDRV_VIDEO_START(btime)
-	MDRV_VIDEO_UPDATE(btime)
+	MCFG_PALETTE_INIT(btime)
+	MCFG_VIDEO_START(btime)
+	MCFG_VIDEO_UPDATE(btime)
 
 	/* audio hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay1", AY8910, HCLK2)
-	MDRV_SOUND_CONFIG(ay1_intf)
-	MDRV_SOUND_ROUTE_EX(0, "discrete", 1.0, 0)
-	MDRV_SOUND_ROUTE_EX(1, "discrete", 1.0, 1)
-	MDRV_SOUND_ROUTE_EX(2, "discrete", 1.0, 2)
+	MCFG_SOUND_ADD("ay1", AY8910, HCLK2)
+	MCFG_SOUND_CONFIG(ay1_intf)
+	MCFG_SOUND_ROUTE_EX(0, "discrete", 1.0, 0)
+	MCFG_SOUND_ROUTE_EX(1, "discrete", 1.0, 1)
+	MCFG_SOUND_ROUTE_EX(2, "discrete", 1.0, 2)
 
-	MDRV_SOUND_ADD("ay2", AY8910, HCLK2)
-	MDRV_SOUND_CONFIG(ay2_intf)
-	MDRV_SOUND_ROUTE_EX(0, "discrete", 1.0, 3)
-	MDRV_SOUND_ROUTE_EX(1, "discrete", 1.0, 4)
-	MDRV_SOUND_ROUTE_EX(2, "discrete", 1.0, 5)
+	MCFG_SOUND_ADD("ay2", AY8910, HCLK2)
+	MCFG_SOUND_CONFIG(ay2_intf)
+	MCFG_SOUND_ROUTE_EX(0, "discrete", 1.0, 3)
+	MCFG_SOUND_ROUTE_EX(1, "discrete", 1.0, 4)
+	MCFG_SOUND_ROUTE_EX(2, "discrete", 1.0, 5)
 
-	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
-	MDRV_SOUND_CONFIG_DISCRETE(btime_sound)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
+	MCFG_SOUND_CONFIG_DISCRETE(btime_sound)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( cookrace, btime )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(cookrace_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(cookrace_map)
 
-	MDRV_CPU_MODIFY("audiocpu")
-	MDRV_CPU_PROGRAM_MAP(audio_map)
+	MCFG_CPU_MODIFY("audiocpu")
+	MCFG_CPU_PROGRAM_MAP(audio_map)
 
 	/* video hardware */
-	MDRV_GFXDECODE(cookrace)
-	MDRV_PALETTE_LENGTH(16)
+	MCFG_GFXDECODE(cookrace)
+	MCFG_PALETTE_LENGTH(16)
 
-	MDRV_VIDEO_UPDATE(cookrace)
+	MCFG_VIDEO_UPDATE(cookrace)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( lnc, btime )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(lnc_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(lnc_map)
 
-	MDRV_MACHINE_RESET(lnc)
+	MCFG_MACHINE_RESET(lnc)
 
 	/* video hardware */
-	MDRV_GFXDECODE(lnc)
-	MDRV_PALETTE_LENGTH(8)
+	MCFG_GFXDECODE(lnc)
+	MCFG_PALETTE_LENGTH(8)
 
-	MDRV_PALETTE_INIT(lnc)
-	MDRV_VIDEO_UPDATE(lnc)
+	MCFG_PALETTE_INIT(lnc)
+	MCFG_VIDEO_UPDATE(lnc)
 MACHINE_CONFIG_END
 
 
@@ -1572,33 +1572,33 @@ static MACHINE_CONFIG_DERIVED( wtennis, lnc )
 	/* basic machine hardware */
 
 	/* video hardware */
-	MDRV_VIDEO_UPDATE(eggs)
+	MCFG_VIDEO_UPDATE(eggs)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( mmonkey, wtennis )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(mmonkey_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(mmonkey_map)
 
-	MDRV_MACHINE_START(mmonkey)
-	MDRV_MACHINE_RESET(mmonkey)
+	MCFG_MACHINE_START(mmonkey)
+	MCFG_MACHINE_RESET(mmonkey)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( sdtennis, btime )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_CLOCK(HCLK4)
-	MDRV_CPU_PROGRAM_MAP(bnj_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_CLOCK(HCLK4)
+	MCFG_CPU_PROGRAM_MAP(bnj_map)
 
 	/* video hardware */
-	MDRV_GFXDECODE(bnj)
-	MDRV_PALETTE_LENGTH(16)
+	MCFG_GFXDECODE(bnj)
+	MCFG_PALETTE_LENGTH(16)
 
-	MDRV_VIDEO_START(bnj)
-	MDRV_VIDEO_UPDATE(bnj)
+	MCFG_VIDEO_START(bnj)
+	MCFG_VIDEO_UPDATE(bnj)
 MACHINE_CONFIG_END
 
 
@@ -1607,61 +1607,61 @@ static MACHINE_CONFIG_DERIVED( bnj, sdtennis )
 	/* basic machine hardware */
 
 	/* video hardware */
-	MDRV_DEVICE_MODIFY("screen")
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1) // 256 * 240, confirmed
+	MCFG_DEVICE_MODIFY("screen")
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1) // 256 * 240, confirmed
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( zoar, btime )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(zoar_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(zoar_map)
 
 	/* video hardware */
-	MDRV_DEVICE_MODIFY("screen")
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1) // 256 * 240, confirmed
+	MCFG_DEVICE_MODIFY("screen")
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1) // 256 * 240, confirmed
 
-	MDRV_GFXDECODE(zoar)
-	MDRV_PALETTE_LENGTH(64)
+	MCFG_GFXDECODE(zoar)
+	MCFG_PALETTE_LENGTH(64)
 
-	MDRV_VIDEO_UPDATE(zoar)
+	MCFG_VIDEO_UPDATE(zoar)
 
-	MDRV_SOUND_REPLACE("ay1", AY8910, HCLK1)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.23)
-	MDRV_SOUND_CONFIG(ay1_intf)
+	MCFG_SOUND_REPLACE("ay1", AY8910, HCLK1)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.23)
+	MCFG_SOUND_CONFIG(ay1_intf)
 
-	MDRV_SOUND_REPLACE("ay2", AY8910, HCLK1)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.23)
+	MCFG_SOUND_REPLACE("ay2", AY8910, HCLK1)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.23)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( disco, btime )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_CLOCK(HCLK4)
-	MDRV_CPU_PROGRAM_MAP(disco_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_CLOCK(HCLK4)
+	MCFG_CPU_PROGRAM_MAP(disco_map)
 
-	MDRV_CPU_MODIFY("audiocpu")
-	MDRV_CPU_PROGRAM_MAP(disco_audio_map)
+	MCFG_CPU_MODIFY("audiocpu")
+	MCFG_CPU_PROGRAM_MAP(disco_audio_map)
 
 	/* video hardware */
-	MDRV_GFXDECODE(disco)
-	MDRV_PALETTE_LENGTH(32)
+	MCFG_GFXDECODE(disco)
+	MCFG_PALETTE_LENGTH(32)
 
-	MDRV_VIDEO_UPDATE(disco)
+	MCFG_VIDEO_UPDATE(disco)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( tisland, btime )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(tisland_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(tisland_map)
 
 	/* video hardware */
-	MDRV_GFXDECODE(zoar)
+	MCFG_GFXDECODE(zoar)
 MACHINE_CONFIG_END
 
 
@@ -2067,7 +2067,7 @@ static void decrypt_C10707_cpu(running_machine *machine, const char *cputag)
 {
 	address_space *space = cputag_get_address_space(machine, cputag, ADDRESS_SPACE_PROGRAM);
 	UINT8 *decrypt = auto_alloc_array(machine, UINT8, 0x10000);
-	UINT8 *rom = memory_region(machine, cputag);
+	UINT8 *rom = machine->region(cputag)->base();
 	offs_t addr;
 
 	space->set_decrypted_region(0x0000, 0xffff, decrypt);
@@ -2082,7 +2082,7 @@ static void decrypt_C10707_cpu(running_machine *machine, const char *cputag)
 
 static READ8_HANDLER( wtennis_reset_hack_r )
 {
-	UINT8 *RAM = memory_region(space->machine, "maincpu");
+	UINT8 *RAM = space->machine->region("maincpu")->base();
 
 	/* Otherwise the game goes into test mode and there is no way out that I
        can see.  I'm not sure how it can work, it probably somehow has to do
@@ -2096,7 +2096,7 @@ static READ8_HANDLER( wtennis_reset_hack_r )
 static void init_rom1(running_machine *machine)
 {
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	UINT8 *rom = memory_region(machine, "maincpu");
+	UINT8 *rom = machine->region("maincpu")->base();
 
 	decrypted = auto_alloc_array(machine, UINT8, 0x10000);
 	space->set_decrypted_region(0x0000, 0xffff, decrypted);
@@ -2117,7 +2117,7 @@ static DRIVER_INIT( btime )
 static DRIVER_INIT( zoar )
 {
 	btime_state *state = machine->driver_data<btime_state>();
-	UINT8 *rom = memory_region(machine, "maincpu");
+	UINT8 *rom = machine->region("maincpu")->base();
 
 	/* At location 0xD50A is what looks like an undocumented opcode. I tried
        implementing it given what opcode 0x23 should do, but it still didn't
@@ -2132,7 +2132,7 @@ static DRIVER_INIT( zoar )
 static DRIVER_INIT( tisland )
 {
 	btime_state *state = machine->driver_data<btime_state>();
-	UINT8 *rom = memory_region(machine, "maincpu");
+	UINT8 *rom = machine->region("maincpu")->base();
 
 	/* At location 0xa2b6 there's a strange RLA followed by a BPL that reads from an
     unmapped area that causes the game to fail in several circumstances.On the Cassette
@@ -2171,7 +2171,7 @@ static DRIVER_INIT( cookrace )
 	decrypt_C10707_cpu(machine, "maincpu");
 
 	memory_install_read_bank(cputag_get_address_space(machine, "audiocpu", ADDRESS_SPACE_PROGRAM), 0x0200, 0x0fff, 0, 0, "bank10");
-	memory_set_bankptr(machine, "bank10", memory_region(machine, "audiocpu") + 0xe200);
+	memory_set_bankptr(machine, "bank10", machine->region("audiocpu")->base() + 0xe200);
 	state->audio_nmi_enable_type = AUDIO_ENABLE_DIRECT;
 }
 
@@ -2190,7 +2190,7 @@ static DRIVER_INIT( wtennis )
 	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc15f, 0xc15f, 0, 0, wtennis_reset_hack_r);
 
 	memory_install_read_bank(cputag_get_address_space(machine, "audiocpu", ADDRESS_SPACE_PROGRAM), 0x0200, 0x0fff, 0, 0, "bank10");
-	memory_set_bankptr(machine, "bank10", memory_region(machine, "audiocpu") + 0xe200);
+	memory_set_bankptr(machine, "bank10", machine->region("audiocpu")->base() + 0xe200);
 	state->audio_nmi_enable_type = AUDIO_ENABLE_AY8910;
 }
 

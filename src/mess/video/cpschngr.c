@@ -237,9 +237,9 @@ WRITE16_HANDLER( cps1_cps_b_w )
 
 static void cps1_gfx_decode(running_machine *machine)
 {
-	int size=memory_region_length(machine, "gfx");
+	int size=machine->region("gfx")->bytes();
 	int i,j,gfxsize;
-	UINT8 *cps1_gfx = memory_region(machine, "gfx");
+	UINT8 *cps1_gfx = machine->region("gfx")->base();
 
 
 	gfxsize=size/4;
@@ -795,7 +795,7 @@ static void cps1_render_stars(screen_device *screen, bitmap_t *bitmap,const rect
 {
 	cpschngr_state *state = screen->machine->driver_data<cpschngr_state>();
 	int offs;
-	UINT8 *stars_rom = memory_region(screen->machine, "stars");
+	UINT8 *stars_rom = screen->machine->region("stars")->base();
 
 	if (!stars_rom && (state->cps1_stars_enabled[0] || state->cps1_stars_enabled[1]))
 	{

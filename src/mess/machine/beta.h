@@ -11,20 +11,20 @@
 #define __BETA_H__
 
 
-int betadisk_is_active(running_device *device);
-void betadisk_enable(running_device *device);
-void betadisk_disable(running_device *device);
-void betadisk_clear_status(running_device *device);
+int betadisk_is_active(device_t *device);
+void betadisk_enable(device_t *device);
+void betadisk_disable(device_t *device);
+void betadisk_clear_status(device_t *device);
 
 #define BETA_DISK_TAG	"beta"
 
 DECLARE_LEGACY_DEVICE(BETA_DISK, beta_disk);
 
-#define MDRV_BETA_DISK_ADD(_tag) \
-	MDRV_DEVICE_ADD(_tag, BETA_DISK, 0)
+#define MCFG_BETA_DISK_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, BETA_DISK, 0)
 
-#define MDRV_BETA_DISK_REMOVE(_tag)		\
-    MDRV_DEVICE_REMOVE(_tag)
+#define MCFG_BETA_DISK_REMOVE(_tag)		\
+    MCFG_DEVICE_REMOVE(_tag)
 
 READ8_DEVICE_HANDLER(betadisk_status_r);
 READ8_DEVICE_HANDLER(betadisk_track_r);

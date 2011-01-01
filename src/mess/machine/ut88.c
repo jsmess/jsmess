@@ -19,7 +19,7 @@
 DRIVER_INIT(ut88)
 {
 	/* set initialy ROM to be visible on first bank */
-	UINT8 *RAM = memory_region(machine, "maincpu");
+	UINT8 *RAM = machine->region("maincpu")->base();
 	memset(RAM,0x0000,0x0800); // make frist page empty by default
 	memory_configure_bank(machine, "bank1", 1, 2, RAM, 0x0000);
 	memory_configure_bank(machine, "bank1", 0, 2, RAM, 0xf800);
@@ -88,7 +88,7 @@ WRITE8_DEVICE_HANDLER( ut88_keyboard_w )
 
 WRITE8_HANDLER( ut88_sound_w )
 {
-	running_device *dac_device = space->machine->device("dac");
+	device_t *dac_device = space->machine->device("dac");
 	dac_data_w(dac_device, data); //beeper
 	cassette_output(space->machine->device("cassette"),data & 0x01 ? 1 : -1);
 }
@@ -106,8 +106,8 @@ READ8_HANDLER( ut88_tape_r )
 READ8_HANDLER( ut88mini_keyboard_r )
 {
 	// This is real keyboard implementation
-	UINT8 *keyrom1 = memory_region(space->machine, "maincpu")+ 0x10000;
-	UINT8 *keyrom2 = memory_region(space->machine, "maincpu")+ 0x10100;
+	UINT8 *keyrom1 = space->machine->region("maincpu")->base()+ 0x10000;
+	UINT8 *keyrom2 = space->machine->region("maincpu")->base()+ 0x10100;
 
 	UINT8 key = keyrom2[input_port_read(space->machine, "LINE1")];
 	// if keyboard 2nd part returned 0 on 4th bit output from

@@ -131,7 +131,7 @@ static INTERRUPT_GEN( cave_interrupt )
 }
 
 /* Called by the YMZ280B to set the IRQ state */
-static void sound_irq_gen( running_device *device, int state )
+static void sound_irq_gen( device_t *device, int state )
 {
 	cave_state *cave = device->machine->driver_data<cave_state>();
 	cave->sound_irq = (state != 0);
@@ -1048,7 +1048,7 @@ static WRITE8_HANDLER( hotdogst_rombank_w )
 
 static WRITE8_HANDLER( hotdogst_okibank_w )
 {
-	UINT8 *RAM = memory_region(space->machine, "oki");
+	UINT8 *RAM = space->machine->region("oki")->base();
 	int bank1 = (data >> 0) & 0x3;
 	int bank2 = (data >> 4) & 0x3;
 	memcpy(RAM + 0x20000 * 0, RAM + 0x40000 + 0x20000 * bank1, 0x20000);
@@ -1117,7 +1117,7 @@ static WRITE8_HANDLER( metmqstr_rombank_w )
 
 static WRITE8_HANDLER( metmqstr_okibank0_w )
 {
-	UINT8 *ROM = memory_region(space->machine, "oki1");
+	UINT8 *ROM = space->machine->region("oki1")->base();
 	int bank1 = (data >> 0) & 0x7;
 	int bank2 = (data >> 4) & 0x7;
 	memcpy(ROM + 0x20000 * 0, ROM + 0x40000 + 0x20000 * bank1, 0x20000);
@@ -1126,7 +1126,7 @@ static WRITE8_HANDLER( metmqstr_okibank0_w )
 
 static WRITE8_HANDLER( metmqstr_okibank1_w )
 {
-	UINT8 *ROM = memory_region(space->machine, "oki2");
+	UINT8 *ROM = space->machine->region("oki2")->base();
 	int bank1 = (data >> 0) & 0x7;
 	int bank2 = (data >> 4) & 0x7;
 	memcpy(ROM + 0x20000 * 0, ROM + 0x40000 + 0x20000 * bank1, 0x20000);
@@ -1211,7 +1211,7 @@ static WRITE8_HANDLER( sailormn_rombank_w )
 
 static WRITE8_HANDLER( sailormn_okibank0_w )
 {
-	UINT8 *RAM = memory_region(space->machine, "oki1");
+	UINT8 *RAM = space->machine->region("oki1")->base();
 	int bank1 = (data >> 0) & 0xf;
 	int bank2 = (data >> 4) & 0xf;
 	memcpy(RAM + 0x20000 * 0, RAM + 0x40000 + 0x20000 * bank1, 0x20000);
@@ -1220,7 +1220,7 @@ static WRITE8_HANDLER( sailormn_okibank0_w )
 
 static WRITE8_HANDLER( sailormn_okibank1_w )
 {
-	UINT8 *RAM = memory_region(space->machine, "oki2");
+	UINT8 *RAM = space->machine->region("oki2")->base();
 	int bank1 = (data >> 0) & 0xf;
 	int bank2 = (data >> 4) & 0xf;
 	memcpy(RAM + 0x20000 * 0, RAM + 0x40000 + 0x20000 * bank1, 0x20000);
@@ -1824,7 +1824,7 @@ static const ymz280b_interface ymz280b_intf =
 	sound_irq_gen
 };
 
-static void irqhandler(running_device *device, int irq)
+static void irqhandler(device_t *device, int irq)
 {
 	cputag_set_input_line(device->machine, "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -1851,36 +1851,36 @@ static const ym2203_interface ym2203_config =
 static MACHINE_CONFIG_START( dfeveron, cave_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, XTAL_16MHz)
-	MDRV_CPU_PROGRAM_MAP(dfeveron_map)
-	MDRV_CPU_VBLANK_INT("screen", cave_interrupt)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
+	MCFG_CPU_PROGRAM_MAP(dfeveron_map)
+	MCFG_CPU_VBLANK_INT("screen", cave_interrupt)
 
-	MDRV_MACHINE_START(cave)
-	MDRV_MACHINE_RESET(cave)
-	MDRV_EEPROM_93C46_ADD("eeprom")
+	MCFG_MACHINE_START(cave)
+	MCFG_MACHINE_RESET(cave)
+	MCFG_EEPROM_93C46_ADD("eeprom")
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(15625/271.5)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(320, 240)
-	MDRV_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(15625/271.5)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(320, 240)
+	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
 
-	MDRV_GFXDECODE(dfeveron)
-	MDRV_PALETTE_LENGTH(0x8000)	/* $8000 palette entries for consistency with the other games */
-	MDRV_PALETTE_INIT(dfeveron)
+	MCFG_GFXDECODE(dfeveron)
+	MCFG_PALETTE_LENGTH(0x8000)	/* $8000 palette entries for consistency with the other games */
+	MCFG_PALETTE_INIT(dfeveron)
 
-	MDRV_VIDEO_START(cave_2_layers)
-	MDRV_VIDEO_UPDATE(cave)
+	MCFG_VIDEO_START(cave_2_layers)
+	MCFG_VIDEO_UPDATE(cave)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ymz", YMZ280B, XTAL_16_9344MHz)
-	MDRV_SOUND_CONFIG(ymz280b_intf)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("ymz", YMZ280B, XTAL_16_9344MHz)
+	MCFG_SOUND_CONFIG(ymz280b_intf)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -1892,36 +1892,36 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( ddonpach, cave_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, XTAL_16MHz)
-	MDRV_CPU_PROGRAM_MAP(ddonpach_map)
-	MDRV_CPU_VBLANK_INT("screen", cave_interrupt)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
+	MCFG_CPU_PROGRAM_MAP(ddonpach_map)
+	MCFG_CPU_VBLANK_INT("screen", cave_interrupt)
 
-	MDRV_MACHINE_START(cave)
-	MDRV_MACHINE_RESET(cave)
-	MDRV_EEPROM_93C46_ADD("eeprom")
+	MCFG_MACHINE_START(cave)
+	MCFG_MACHINE_RESET(cave)
+	MCFG_EEPROM_93C46_ADD("eeprom")
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(15625/271.5)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(320, 240)
-	MDRV_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(15625/271.5)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(320, 240)
+	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
 
-	MDRV_GFXDECODE(ddonpach)
-	MDRV_PALETTE_LENGTH(0x8000 + 0x40*16)	// $400 extra entries for layers 1&2
-	MDRV_PALETTE_INIT(ddonpach)
+	MCFG_GFXDECODE(ddonpach)
+	MCFG_PALETTE_LENGTH(0x8000 + 0x40*16)	// $400 extra entries for layers 1&2
+	MCFG_PALETTE_INIT(ddonpach)
 
-	MDRV_VIDEO_START(cave_3_layers)
-	MDRV_VIDEO_UPDATE(cave)
+	MCFG_VIDEO_START(cave_3_layers)
+	MCFG_VIDEO_UPDATE(cave)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ymz", YMZ280B, XTAL_16_9344MHz)
-	MDRV_SOUND_CONFIG(ymz280b_intf)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("ymz", YMZ280B, XTAL_16_9344MHz)
+	MCFG_SOUND_CONFIG(ymz280b_intf)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -1937,41 +1937,41 @@ static const nmk112_interface donpachi_nmk112_intf =
 static MACHINE_CONFIG_START( donpachi, cave_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, XTAL_16MHz)
-	MDRV_CPU_PROGRAM_MAP(donpachi_map)
-	MDRV_CPU_VBLANK_INT("screen", cave_interrupt)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
+	MCFG_CPU_PROGRAM_MAP(donpachi_map)
+	MCFG_CPU_VBLANK_INT("screen", cave_interrupt)
 
-	MDRV_MACHINE_START(cave)
-	MDRV_MACHINE_RESET(cave)
-	MDRV_EEPROM_93C46_ADD("eeprom")
+	MCFG_MACHINE_START(cave)
+	MCFG_MACHINE_RESET(cave)
+	MCFG_EEPROM_93C46_ADD("eeprom")
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(15625/271.5)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(320, 240)
-	MDRV_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(15625/271.5)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(320, 240)
+	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
 
-	MDRV_GFXDECODE(donpachi)
-	MDRV_PALETTE_LENGTH(0x8000)	/* $8000 palette entries for consistency with the other games */
-	MDRV_PALETTE_INIT(dfeveron)
+	MCFG_GFXDECODE(donpachi)
+	MCFG_PALETTE_LENGTH(0x8000)	/* $8000 palette entries for consistency with the other games */
+	MCFG_PALETTE_INIT(dfeveron)
 
-	MDRV_VIDEO_START(cave_3_layers)
-	MDRV_VIDEO_UPDATE(cave)
+	MCFG_VIDEO_START(cave_3_layers)
+	MCFG_VIDEO_UPDATE(cave)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_OKIM6295_ADD("oki1", XTAL_1_056MHz, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.60)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.60)
+	MCFG_OKIM6295_ADD("oki1", XTAL_1_056MHz, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.60)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.60)
 
-	MDRV_OKIM6295_ADD("oki2", 2112000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	MCFG_OKIM6295_ADD("oki2", 2112000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MDRV_NMK112_ADD("nmk112", donpachi_nmk112_intf)
+	MCFG_NMK112_ADD("nmk112", donpachi_nmk112_intf)
 MACHINE_CONFIG_END
 
 
@@ -1982,36 +1982,36 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( esprade, cave_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, XTAL_16MHz)
-	MDRV_CPU_PROGRAM_MAP(esprade_map)
-	MDRV_CPU_VBLANK_INT("screen", cave_interrupt)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
+	MCFG_CPU_PROGRAM_MAP(esprade_map)
+	MCFG_CPU_VBLANK_INT("screen", cave_interrupt)
 
-	MDRV_MACHINE_START(cave)
-	MDRV_MACHINE_RESET(cave)
-	MDRV_EEPROM_93C46_ADD("eeprom")
+	MCFG_MACHINE_START(cave)
+	MCFG_MACHINE_RESET(cave)
+	MCFG_EEPROM_93C46_ADD("eeprom")
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(15625/271.5)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(320, 240)
-	MDRV_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(15625/271.5)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(320, 240)
+	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
 
-	MDRV_GFXDECODE(esprade)
-	MDRV_PALETTE_LENGTH(0x8000)
-	MDRV_PALETTE_INIT(cave)
+	MCFG_GFXDECODE(esprade)
+	MCFG_PALETTE_LENGTH(0x8000)
+	MCFG_PALETTE_INIT(cave)
 
-	MDRV_VIDEO_START(cave_3_layers)
-	MDRV_VIDEO_UPDATE(cave)
+	MCFG_VIDEO_START(cave_3_layers)
+	MCFG_VIDEO_UPDATE(cave)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ymz", YMZ280B, XTAL_16_9344MHz)
-	MDRV_SOUND_CONFIG(ymz280b_intf)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("ymz", YMZ280B, XTAL_16_9344MHz)
+	MCFG_SOUND_CONFIG(ymz280b_intf)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -2022,35 +2022,35 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( gaia, cave_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, XTAL_16MHz)
-	MDRV_CPU_PROGRAM_MAP(gaia_map)
-	MDRV_CPU_VBLANK_INT("screen", cave_interrupt)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
+	MCFG_CPU_PROGRAM_MAP(gaia_map)
+	MCFG_CPU_VBLANK_INT("screen", cave_interrupt)
 
-	MDRV_MACHINE_START(cave)
-	MDRV_MACHINE_RESET(cave)
+	MCFG_MACHINE_START(cave)
+	MCFG_MACHINE_RESET(cave)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(15625/271.5)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(320, 240)
-	MDRV_SCREEN_VISIBLE_AREA(0, 320-1, 0, 224-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(15625/271.5)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(320, 240)
+	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 224-1)
 
-	MDRV_GFXDECODE(esprade)
-	MDRV_PALETTE_LENGTH(0x8000)
-	MDRV_PALETTE_INIT(cave)
+	MCFG_GFXDECODE(esprade)
+	MCFG_PALETTE_LENGTH(0x8000)
+	MCFG_PALETTE_INIT(cave)
 
-	MDRV_VIDEO_START(cave_3_layers)
-	MDRV_VIDEO_UPDATE(cave)
+	MCFG_VIDEO_START(cave_3_layers)
+	MCFG_VIDEO_UPDATE(cave)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ymz", YMZ280B, XTAL_16_9344MHz)
-	MDRV_SOUND_CONFIG(ymz280b_intf)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("ymz", YMZ280B, XTAL_16_9344MHz)
+	MCFG_SOUND_CONFIG(ymz280b_intf)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -2061,36 +2061,36 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( guwange, cave_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, XTAL_16MHz)
-	MDRV_CPU_PROGRAM_MAP(guwange_map)
-	MDRV_CPU_VBLANK_INT("screen", cave_interrupt)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
+	MCFG_CPU_PROGRAM_MAP(guwange_map)
+	MCFG_CPU_VBLANK_INT("screen", cave_interrupt)
 
-	MDRV_MACHINE_START(cave)
-	MDRV_MACHINE_RESET(cave)
-	MDRV_EEPROM_93C46_ADD("eeprom")
+	MCFG_MACHINE_START(cave)
+	MCFG_MACHINE_RESET(cave)
+	MCFG_EEPROM_93C46_ADD("eeprom")
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(15625/271.5)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(320, 240)
-	MDRV_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(15625/271.5)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(320, 240)
+	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
 
-	MDRV_GFXDECODE(esprade)
-	MDRV_PALETTE_LENGTH(0x8000)
-	MDRV_PALETTE_INIT(cave)
+	MCFG_GFXDECODE(esprade)
+	MCFG_PALETTE_LENGTH(0x8000)
+	MCFG_PALETTE_INIT(cave)
 
-	MDRV_VIDEO_START(cave_3_layers)
-	MDRV_VIDEO_UPDATE(cave)
+	MCFG_VIDEO_START(cave_3_layers)
+	MCFG_VIDEO_UPDATE(cave)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ymz", YMZ280B, XTAL_16_9344MHz)
-	MDRV_SOUND_CONFIG(ymz280b_intf)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("ymz", YMZ280B, XTAL_16_9344MHz)
+	MCFG_SOUND_CONFIG(ymz280b_intf)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -2100,50 +2100,50 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( hotdogst, cave_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, XTAL_16MHz)
-	MDRV_CPU_PROGRAM_MAP(hotdogst_map)
-	MDRV_CPU_VBLANK_INT("screen", cave_interrupt)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
+	MCFG_CPU_PROGRAM_MAP(hotdogst_map)
+	MCFG_CPU_VBLANK_INT("screen", cave_interrupt)
 
-	MDRV_CPU_ADD("audiocpu", Z80, XTAL_4MHz)
-	MDRV_CPU_PROGRAM_MAP(hotdogst_sound_map)
-	MDRV_CPU_IO_MAP(hotdogst_sound_portmap)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_4MHz)
+	MCFG_CPU_PROGRAM_MAP(hotdogst_sound_map)
+	MCFG_CPU_IO_MAP(hotdogst_sound_portmap)
 
-	MDRV_MACHINE_START(cave)
-	MDRV_MACHINE_RESET(cave)
-	MDRV_EEPROM_93C46_ADD("eeprom")
+	MCFG_MACHINE_START(cave)
+	MCFG_MACHINE_RESET(cave)
+	MCFG_EEPROM_93C46_ADD("eeprom")
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(15625/271.5)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(384, 240)
-	MDRV_SCREEN_VISIBLE_AREA(0, 384-1, 0, 240-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(15625/271.5)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(384, 240)
+	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 240-1)
 
-	MDRV_GFXDECODE(hotdogst)
-	MDRV_PALETTE_LENGTH(0x8000)	/* $8000 palette entries for consistency with the other games */
-	MDRV_PALETTE_INIT(dfeveron)
+	MCFG_GFXDECODE(hotdogst)
+	MCFG_PALETTE_LENGTH(0x8000)	/* $8000 palette entries for consistency with the other games */
+	MCFG_PALETTE_INIT(dfeveron)
 
-	MDRV_VIDEO_START(cave_3_layers)
-	MDRV_VIDEO_UPDATE(cave)
+	MCFG_VIDEO_START(cave_3_layers)
+	MCFG_VIDEO_UPDATE(cave)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ymsnd", YM2203, XTAL_4MHz)
-	MDRV_SOUND_CONFIG(ym2203_config)
-	MDRV_SOUND_ROUTE(0, "lspeaker",  0.20)
-	MDRV_SOUND_ROUTE(0, "rspeaker", 0.20)
-	MDRV_SOUND_ROUTE(1, "lspeaker",  0.20)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 0.20)
-	MDRV_SOUND_ROUTE(2, "lspeaker",  0.20)
-	MDRV_SOUND_ROUTE(2, "rspeaker", 0.20)
-	MDRV_SOUND_ROUTE(3, "lspeaker",  0.80)
-	MDRV_SOUND_ROUTE(3, "rspeaker", 0.80)
+	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_4MHz)
+	MCFG_SOUND_CONFIG(ym2203_config)
+	MCFG_SOUND_ROUTE(0, "lspeaker",  0.20)
+	MCFG_SOUND_ROUTE(0, "rspeaker", 0.20)
+	MCFG_SOUND_ROUTE(1, "lspeaker",  0.20)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.20)
+	MCFG_SOUND_ROUTE(2, "lspeaker",  0.20)
+	MCFG_SOUND_ROUTE(2, "rspeaker", 0.20)
+	MCFG_SOUND_ROUTE(3, "lspeaker",  0.80)
+	MCFG_SOUND_ROUTE(3, "rspeaker", 0.80)
 
-	MDRV_OKIM6295_ADD("oki", XTAL_1_056MHz, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	MCFG_OKIM6295_ADD("oki", XTAL_1_056MHz, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -2154,43 +2154,43 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( korokoro, cave_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, XTAL_16MHz)
-	MDRV_CPU_PROGRAM_MAP(korokoro_map)
-	MDRV_CPU_VBLANK_INT("screen", cave_interrupt)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
+	MCFG_CPU_PROGRAM_MAP(korokoro_map)
+	MCFG_CPU_VBLANK_INT("screen", cave_interrupt)
 
-	MDRV_MACHINE_START(cave)
-	MDRV_MACHINE_RESET(cave)
-	MDRV_EEPROM_ADD("eeprom", eeprom_interface_93C46_8bit)
+	MCFG_MACHINE_START(cave)
+	MCFG_MACHINE_RESET(cave)
+	MCFG_EEPROM_ADD("eeprom", eeprom_interface_93C46_8bit)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(15625/271.5)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(320, 240)
-	MDRV_SCREEN_VISIBLE_AREA(0, 320-1-2, 0, 240-1-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(15625/271.5)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(320, 240)
+	MCFG_SCREEN_VISIBLE_AREA(0, 320-1-2, 0, 240-1-1)
 
-	MDRV_GFXDECODE(korokoro)
-	MDRV_PALETTE_LENGTH(0x8000)	/* $8000 palette entries for consistency with the other games */
-	MDRV_PALETTE_INIT(korokoro)
+	MCFG_GFXDECODE(korokoro)
+	MCFG_PALETTE_LENGTH(0x8000)	/* $8000 palette entries for consistency with the other games */
+	MCFG_PALETTE_INIT(korokoro)
 
-	MDRV_VIDEO_START(cave_1_layer)
-	MDRV_VIDEO_UPDATE(cave)
+	MCFG_VIDEO_START(cave_1_layer)
+	MCFG_VIDEO_UPDATE(cave)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ymz", YMZ280B, XTAL_16_9344MHz)
-	MDRV_SOUND_CONFIG(ymz280b_intf)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("ymz", YMZ280B, XTAL_16_9344MHz)
+	MCFG_SOUND_CONFIG(ymz280b_intf)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( crusherm, korokoro )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(crusherm_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(crusherm_map)
 MACHINE_CONFIG_END
 
 
@@ -2201,52 +2201,52 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( mazinger, cave_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, XTAL_16MHz)
-	MDRV_CPU_PROGRAM_MAP(mazinger_map)
-	MDRV_CPU_VBLANK_INT("screen", cave_interrupt)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
+	MCFG_CPU_PROGRAM_MAP(mazinger_map)
+	MCFG_CPU_VBLANK_INT("screen", cave_interrupt)
 
-	MDRV_CPU_ADD("audiocpu", Z80, XTAL_4MHz) // Bidirectional communication
-	MDRV_CPU_PROGRAM_MAP(mazinger_sound_map)
-	MDRV_CPU_IO_MAP(mazinger_sound_portmap)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_4MHz) // Bidirectional communication
+	MCFG_CPU_PROGRAM_MAP(mazinger_sound_map)
+	MCFG_CPU_IO_MAP(mazinger_sound_portmap)
 
-	MDRV_WATCHDOG_TIME_INIT(SEC(3))	/* a guess, and certainly wrong */
+	MCFG_WATCHDOG_TIME_INIT(SEC(3))	/* a guess, and certainly wrong */
 
-	MDRV_MACHINE_START(cave)
-	MDRV_MACHINE_RESET(cave)
-	MDRV_EEPROM_93C46_ADD("eeprom")
+	MCFG_MACHINE_START(cave)
+	MCFG_MACHINE_RESET(cave)
+	MCFG_EEPROM_93C46_ADD("eeprom")
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(15625/271.5)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(384, 240)
-	MDRV_SCREEN_VISIBLE_AREA(0, 384-1, 0, 240-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(15625/271.5)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(384, 240)
+	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 240-1)
 
-	MDRV_GFXDECODE(mazinger)
-	MDRV_PALETTE_LENGTH(0x8000)	/* $8000 palette entries for consistency with the other games */
-	MDRV_PALETTE_INIT(mazinger)
+	MCFG_GFXDECODE(mazinger)
+	MCFG_PALETTE_LENGTH(0x8000)	/* $8000 palette entries for consistency with the other games */
+	MCFG_PALETTE_INIT(mazinger)
 
-	MDRV_VIDEO_START(cave_2_layers)
-	MDRV_VIDEO_UPDATE(cave)
+	MCFG_VIDEO_START(cave_2_layers)
+	MCFG_VIDEO_UPDATE(cave)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ymsnd", YM2203, XTAL_4MHz)
-	MDRV_SOUND_CONFIG(ym2203_config)
-	MDRV_SOUND_ROUTE(0, "lspeaker",  0.20)
-	MDRV_SOUND_ROUTE(0, "rspeaker", 0.20)
-	MDRV_SOUND_ROUTE(1, "lspeaker",  0.20)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 0.20)
-	MDRV_SOUND_ROUTE(2, "lspeaker",  0.20)
-	MDRV_SOUND_ROUTE(2, "rspeaker", 0.20)
-	MDRV_SOUND_ROUTE(3, "lspeaker",  0.60)
-	MDRV_SOUND_ROUTE(3, "rspeaker", 0.60)
+	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_4MHz)
+	MCFG_SOUND_CONFIG(ym2203_config)
+	MCFG_SOUND_ROUTE(0, "lspeaker",  0.20)
+	MCFG_SOUND_ROUTE(0, "rspeaker", 0.20)
+	MCFG_SOUND_ROUTE(1, "lspeaker",  0.20)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.20)
+	MCFG_SOUND_ROUTE(2, "lspeaker",  0.20)
+	MCFG_SOUND_ROUTE(2, "rspeaker", 0.20)
+	MCFG_SOUND_ROUTE(3, "lspeaker",  0.60)
+	MCFG_SOUND_ROUTE(3, "rspeaker", 0.60)
 
-	MDRV_OKIM6295_ADD("oki", XTAL_1_056MHz, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 2.0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 2.0)
+	MCFG_OKIM6295_ADD("oki", XTAL_1_056MHz, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 2.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 2.0)
 MACHINE_CONFIG_END
 
 
@@ -2257,50 +2257,50 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( metmqstr, cave_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, XTAL_32MHz / 2)
-	MDRV_CPU_PROGRAM_MAP(metmqstr_map)
-	MDRV_CPU_VBLANK_INT("screen", cave_interrupt)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz / 2)
+	MCFG_CPU_PROGRAM_MAP(metmqstr_map)
+	MCFG_CPU_VBLANK_INT("screen", cave_interrupt)
 
-	MDRV_CPU_ADD("audiocpu", Z80, XTAL_32MHz / 4)
-	MDRV_CPU_PROGRAM_MAP(metmqstr_sound_map)
-	MDRV_CPU_IO_MAP(metmqstr_sound_portmap)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_32MHz / 4)
+	MCFG_CPU_PROGRAM_MAP(metmqstr_sound_map)
+	MCFG_CPU_IO_MAP(metmqstr_sound_portmap)
 
-	MDRV_WATCHDOG_TIME_INIT(SEC(3))	/* a guess, and certainly wrong */
+	MCFG_WATCHDOG_TIME_INIT(SEC(3))	/* a guess, and certainly wrong */
 
-	MDRV_MACHINE_START(cave)
-	MDRV_MACHINE_RESET(cave)	/* start with the watchdog armed */
-	MDRV_EEPROM_93C46_ADD("eeprom")
+	MCFG_MACHINE_START(cave)
+	MCFG_MACHINE_RESET(cave)	/* start with the watchdog armed */
+	MCFG_EEPROM_93C46_ADD("eeprom")
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(15625/271.5)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(0x200, 240)
-	MDRV_SCREEN_VISIBLE_AREA(0x7d, 0x7d + 0x180-1, 0, 240-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(15625/271.5)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(0x200, 240)
+	MCFG_SCREEN_VISIBLE_AREA(0x7d, 0x7d + 0x180-1, 0, 240-1)
 
-	MDRV_GFXDECODE(donpachi)
-	MDRV_PALETTE_LENGTH(0x8000)	/* $8000 palette entries for consistency with the other games */
-	MDRV_PALETTE_INIT(dfeveron)
+	MCFG_GFXDECODE(donpachi)
+	MCFG_PALETTE_LENGTH(0x8000)	/* $8000 palette entries for consistency with the other games */
+	MCFG_PALETTE_INIT(dfeveron)
 
-	MDRV_VIDEO_START(cave_3_layers)
-	MDRV_VIDEO_UPDATE(cave)
+	MCFG_VIDEO_START(cave_3_layers)
+	MCFG_VIDEO_UPDATE(cave)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ymsnd", YM2151, XTAL_16MHz / 4)
-	MDRV_SOUND_CONFIG(ym2151_config)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 1.20)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 1.20)
+	MCFG_SOUND_ADD("ymsnd", YM2151, XTAL_16MHz / 4)
+	MCFG_SOUND_CONFIG(ym2151_config)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.20)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.20)
 
-	MDRV_OKIM6295_ADD("oki1", XTAL_32MHz / 16 , OKIM6295_PIN7_HIGH)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	MCFG_OKIM6295_ADD("oki1", XTAL_32MHz / 16 , OKIM6295_PIN7_HIGH)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MDRV_OKIM6295_ADD("oki2", XTAL_32MHz / 16 , OKIM6295_PIN7_HIGH)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	MCFG_OKIM6295_ADD("oki2", XTAL_32MHz / 16 , OKIM6295_PIN7_HIGH)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -2310,45 +2310,45 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( pacslot, cave_state )
 
-	MDRV_NVRAM_ADD_0FILL("nvram")
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, XTAL_28MHz / 2)
-	MDRV_CPU_PROGRAM_MAP(pacslot_map)
-	MDRV_CPU_VBLANK_INT("screen", cave_interrupt)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_28MHz / 2)
+	MCFG_CPU_PROGRAM_MAP(pacslot_map)
+	MCFG_CPU_VBLANK_INT("screen", cave_interrupt)
 
-	MDRV_WATCHDOG_TIME_INIT(SEC(3))	/* a guess, and certainly wrong */
+	MCFG_WATCHDOG_TIME_INIT(SEC(3))	/* a guess, and certainly wrong */
 
-	MDRV_MACHINE_START(cave)
-	MDRV_MACHINE_RESET(cave)
-	MDRV_EEPROM_ADD("eeprom", eeprom_interface_93C46_pacslot)
+	MCFG_MACHINE_START(cave)
+	MCFG_MACHINE_RESET(cave)
+	MCFG_EEPROM_ADD("eeprom", eeprom_interface_93C46_pacslot)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(15625/271.5)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(0x200, 240)
-	MDRV_SCREEN_VISIBLE_AREA(0x80, 0x80 + 0x140-1, 0, 240-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(15625/271.5)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(0x200, 240)
+	MCFG_SCREEN_VISIBLE_AREA(0x80, 0x80 + 0x140-1, 0, 240-1)
 
-	MDRV_GFXDECODE(tjumpman)
-	MDRV_PALETTE_LENGTH(0x8000)
-	MDRV_PALETTE_INIT(cave)
+	MCFG_GFXDECODE(tjumpman)
+	MCFG_PALETTE_LENGTH(0x8000)
+	MCFG_PALETTE_INIT(cave)
 
-	MDRV_VIDEO_START(cave_1_layer)
-	MDRV_VIDEO_UPDATE(cave)
+	MCFG_VIDEO_START(cave_1_layer)
+	MCFG_VIDEO_UPDATE(cave)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_OKIM6295_ADD("oki1", XTAL_28MHz / 28, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	MCFG_OKIM6295_ADD("oki1", XTAL_28MHz / 28, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
 	// oki2 chip is present but its rom socket is unpopulated
-	MDRV_OKIM6295_ADD("oki2", XTAL_28MHz / 28, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	MCFG_OKIM6295_ADD("oki2", XTAL_28MHz / 28, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
 MACHINE_CONFIG_END
 
@@ -2367,56 +2367,56 @@ static const nmk112_interface pwrinst2_nmk112_intf =
 static MACHINE_CONFIG_START( pwrinst2, cave_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, XTAL_16MHz)	/* 16 MHz */
-	MDRV_CPU_PROGRAM_MAP(pwrinst2_map)
-	MDRV_CPU_VBLANK_INT("screen", cave_interrupt)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)	/* 16 MHz */
+	MCFG_CPU_PROGRAM_MAP(pwrinst2_map)
+	MCFG_CPU_VBLANK_INT("screen", cave_interrupt)
 
-	MDRV_CPU_ADD("audiocpu", Z80,XTAL_16MHz / 2)	/* 8 MHz */
-	MDRV_CPU_PROGRAM_MAP(pwrinst2_sound_map)
-	MDRV_CPU_IO_MAP(pwrinst2_sound_portmap)
+	MCFG_CPU_ADD("audiocpu", Z80,XTAL_16MHz / 2)	/* 8 MHz */
+	MCFG_CPU_PROGRAM_MAP(pwrinst2_sound_map)
+	MCFG_CPU_IO_MAP(pwrinst2_sound_portmap)
 
-	MDRV_MACHINE_START(cave)
-	MDRV_MACHINE_RESET(cave)
-	MDRV_EEPROM_93C46_ADD("eeprom")
+	MCFG_MACHINE_START(cave)
+	MCFG_MACHINE_RESET(cave)
+	MCFG_EEPROM_93C46_ADD("eeprom")
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(15625/271.5)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(0x200, 240)
-	MDRV_SCREEN_VISIBLE_AREA(0x70, 0x70 + 0x140-1, 0, 240-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(15625/271.5)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(0x200, 240)
+	MCFG_SCREEN_VISIBLE_AREA(0x70, 0x70 + 0x140-1, 0, 240-1)
 
-	MDRV_GFXDECODE(pwrinst2)
-	MDRV_PALETTE_LENGTH(0x8000+0x2800)
-	MDRV_PALETTE_INIT(pwrinst2)
+	MCFG_GFXDECODE(pwrinst2)
+	MCFG_PALETTE_LENGTH(0x8000+0x2800)
+	MCFG_PALETTE_INIT(pwrinst2)
 
-	MDRV_VIDEO_START(cave_4_layers)
-	MDRV_VIDEO_UPDATE(cave)
+	MCFG_VIDEO_START(cave_4_layers)
+	MCFG_VIDEO_UPDATE(cave)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ymsnd", YM2203, XTAL_16MHz / 4)
-	MDRV_SOUND_CONFIG(ym2203_config)
-	MDRV_SOUND_ROUTE(0, "lspeaker",  0.40)
-	MDRV_SOUND_ROUTE(0, "rspeaker", 0.40)
-	MDRV_SOUND_ROUTE(1, "lspeaker",  0.40)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 0.40)
-	MDRV_SOUND_ROUTE(2, "lspeaker",  0.40)
-	MDRV_SOUND_ROUTE(2, "rspeaker", 0.40)
-	MDRV_SOUND_ROUTE(3, "lspeaker",  0.80)
-	MDRV_SOUND_ROUTE(3, "rspeaker", 0.80)
+	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_16MHz / 4)
+	MCFG_SOUND_CONFIG(ym2203_config)
+	MCFG_SOUND_ROUTE(0, "lspeaker",  0.40)
+	MCFG_SOUND_ROUTE(0, "rspeaker", 0.40)
+	MCFG_SOUND_ROUTE(1, "lspeaker",  0.40)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.40)
+	MCFG_SOUND_ROUTE(2, "lspeaker",  0.40)
+	MCFG_SOUND_ROUTE(2, "rspeaker", 0.40)
+	MCFG_SOUND_ROUTE(3, "lspeaker",  0.80)
+	MCFG_SOUND_ROUTE(3, "rspeaker", 0.80)
 
-	MDRV_OKIM6295_ADD("oki1", XTAL_3MHz , OKIM6295_PIN7_LOW)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.80)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
+	MCFG_OKIM6295_ADD("oki1", XTAL_3MHz , OKIM6295_PIN7_LOW)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.80)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
 
-	MDRV_OKIM6295_ADD("oki2", XTAL_3MHz , OKIM6295_PIN7_LOW)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.00)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.00)
+	MCFG_OKIM6295_ADD("oki2", XTAL_3MHz , OKIM6295_PIN7_LOW)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.00)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.00)
 
-	MDRV_NMK112_ADD("nmk112", pwrinst2_nmk112_intf)
+	MCFG_NMK112_ADD("nmk112", pwrinst2_nmk112_intf)
 MACHINE_CONFIG_END
 
 
@@ -2427,49 +2427,49 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( sailormn, cave_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, XTAL_16MHz)
-	MDRV_CPU_PROGRAM_MAP(sailormn_map)
-	MDRV_CPU_VBLANK_INT("screen", cave_interrupt)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
+	MCFG_CPU_PROGRAM_MAP(sailormn_map)
+	MCFG_CPU_VBLANK_INT("screen", cave_interrupt)
 
-	MDRV_CPU_ADD("audiocpu", Z80, XTAL_8MHz) // Bidirectional Communication
-	MDRV_CPU_PROGRAM_MAP(sailormn_sound_map)
-	MDRV_CPU_IO_MAP(sailormn_sound_portmap)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz) // Bidirectional Communication
+	MCFG_CPU_PROGRAM_MAP(sailormn_sound_map)
+	MCFG_CPU_IO_MAP(sailormn_sound_portmap)
 
-//  MDRV_QUANTUM_TIME(HZ(600))
+//  MCFG_QUANTUM_TIME(HZ(600))
 
-	MDRV_MACHINE_START(cave)
-	MDRV_MACHINE_RESET(cave)
-	MDRV_EEPROM_93C46_ADD("eeprom")
+	MCFG_MACHINE_START(cave)
+	MCFG_MACHINE_RESET(cave)
+	MCFG_EEPROM_93C46_ADD("eeprom")
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(15625/271.5)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(320+1, 240)
-	MDRV_SCREEN_VISIBLE_AREA(0+1, 320+1-1, 0, 240-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(15625/271.5)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(320+1, 240)
+	MCFG_SCREEN_VISIBLE_AREA(0+1, 320+1-1, 0, 240-1)
 
-	MDRV_GFXDECODE(sailormn)
-	MDRV_PALETTE_LENGTH(0x8000)	/* $8000 palette entries for consistency with the other games */
-	MDRV_PALETTE_INIT(sailormn)	// 4 bit sprites, 6 bit tiles
+	MCFG_GFXDECODE(sailormn)
+	MCFG_PALETTE_LENGTH(0x8000)	/* $8000 palette entries for consistency with the other games */
+	MCFG_PALETTE_INIT(sailormn)	// 4 bit sprites, 6 bit tiles
 
-	MDRV_VIDEO_START(sailormn_3_layers)	/* Layer 2 has 1 banked ROM */
-	MDRV_VIDEO_UPDATE(cave)
+	MCFG_VIDEO_START(sailormn_3_layers)	/* Layer 2 has 1 banked ROM */
+	MCFG_VIDEO_UPDATE(cave)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MDRV_SOUND_ADD("ymsnd", YM2151, XTAL_16MHz/4)
-	MDRV_SOUND_CONFIG(ym2151_config)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 0.30)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 0.30)
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SOUND_ADD("ymsnd", YM2151, XTAL_16MHz/4)
+	MCFG_SOUND_CONFIG(ym2151_config)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.30)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.30)
 
-	MDRV_OKIM6295_ADD("oki1", 2112000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	MCFG_OKIM6295_ADD("oki1", 2112000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MDRV_OKIM6295_ADD("oki2", 2112000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	MCFG_OKIM6295_ADD("oki2", 2112000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -2479,40 +2479,40 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( tjumpman, cave_state )
 
-	MDRV_NVRAM_ADD_0FILL("nvram")
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, XTAL_28MHz / 2)
-	MDRV_CPU_PROGRAM_MAP(tjumpman_map)
-	MDRV_CPU_VBLANK_INT("screen", cave_interrupt)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_28MHz / 2)
+	MCFG_CPU_PROGRAM_MAP(tjumpman_map)
+	MCFG_CPU_VBLANK_INT("screen", cave_interrupt)
 
-	MDRV_WATCHDOG_TIME_INIT(SEC(3))	/* a guess, and certainly wrong */
+	MCFG_WATCHDOG_TIME_INIT(SEC(3))	/* a guess, and certainly wrong */
 
-	MDRV_MACHINE_START(cave)
-	MDRV_MACHINE_RESET(cave)
-	MDRV_EEPROM_93C46_ADD("eeprom")
+	MCFG_MACHINE_START(cave)
+	MCFG_MACHINE_RESET(cave)
+	MCFG_EEPROM_93C46_ADD("eeprom")
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(15625/271.5)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(0x200, 240)
-	MDRV_SCREEN_VISIBLE_AREA(0x80, 0x80 + 0x140-1, 0, 240-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(15625/271.5)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(0x200, 240)
+	MCFG_SCREEN_VISIBLE_AREA(0x80, 0x80 + 0x140-1, 0, 240-1)
 
-	MDRV_GFXDECODE(tjumpman)
-	MDRV_PALETTE_LENGTH(0x8000)
-	MDRV_PALETTE_INIT(cave)
+	MCFG_GFXDECODE(tjumpman)
+	MCFG_PALETTE_LENGTH(0x8000)
+	MCFG_PALETTE_INIT(cave)
 
-	MDRV_VIDEO_START(cave_1_layer)
-	MDRV_VIDEO_UPDATE(cave)
+	MCFG_VIDEO_START(cave_1_layer)
+	MCFG_VIDEO_UPDATE(cave)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_OKIM6295_ADD("oki1", XTAL_28MHz / 28, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	MCFG_OKIM6295_ADD("oki1", XTAL_28MHz / 28, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
 	// oki2 chip spot and rom socket are both unpopulated
 MACHINE_CONFIG_END
@@ -2525,35 +2525,35 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( uopoko, cave_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, XTAL_16MHz)
-	MDRV_CPU_PROGRAM_MAP(uopoko_map)
-	MDRV_CPU_VBLANK_INT("screen", cave_interrupt)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
+	MCFG_CPU_PROGRAM_MAP(uopoko_map)
+	MCFG_CPU_VBLANK_INT("screen", cave_interrupt)
 
-	MDRV_MACHINE_START(cave)
-	MDRV_EEPROM_93C46_ADD("eeprom")
+	MCFG_MACHINE_START(cave)
+	MCFG_EEPROM_93C46_ADD("eeprom")
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(15625/271.5)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(320, 240)
-	MDRV_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(15625/271.5)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(320, 240)
+	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
 
-	MDRV_GFXDECODE(uopoko)
-	MDRV_PALETTE_LENGTH(0x8000)
+	MCFG_GFXDECODE(uopoko)
+	MCFG_PALETTE_LENGTH(0x8000)
 
-	MDRV_PALETTE_INIT(cave)
-	MDRV_VIDEO_START(cave_1_layer)
-	MDRV_VIDEO_UPDATE(cave)
+	MCFG_PALETTE_INIT(cave)
+	MCFG_VIDEO_START(cave_1_layer)
+	MCFG_VIDEO_UPDATE(cave)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ymz", YMZ280B, XTAL_16_9344MHz)
-	MDRV_SOUND_CONFIG(ymz280b_intf)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("ymz", YMZ280B, XTAL_16_9344MHz)
+	MCFG_SOUND_CONFIG(ymz280b_intf)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -2568,8 +2568,8 @@ MACHINE_CONFIG_END
 /* 4 bits -> 8 bits. Even and odd pixels are swapped */
 static void unpack_sprites(running_machine *machine)
 {
-	const UINT32 len	=	memory_region_length(machine, "sprites");
-	UINT8 *rgn			=	memory_region       (machine, "sprites");
+	const UINT32 len	=	machine->region("sprites")->bytes();
+	UINT8 *rgn			=	machine->region       ("sprites")->base();
 	UINT8 *src			=	rgn + len / 2 - 1;
 	UINT8 *dst			=	rgn + len - 1;
 
@@ -2585,8 +2585,8 @@ static void unpack_sprites(running_machine *machine)
 /* 4 bits -> 8 bits. Even and odd pixels and even and odd words, are swapped */
 static void ddonpach_unpack_sprites(running_machine *machine)
 {
-	const UINT32 len	=	memory_region_length(machine, "sprites");
-	UINT8 *rgn			=	memory_region       (machine, "sprites");
+	const UINT32 len	=	machine->region("sprites")->bytes();
+	UINT8 *rgn			=	machine->region       ("sprites")->base();
 	UINT8 *src			=	rgn + len / 2 - 1;
 	UINT8 *dst			=	rgn + len - 1;
 
@@ -2609,8 +2609,8 @@ static void ddonpach_unpack_sprites(running_machine *machine)
 /* 2 pages of 4 bits -> 8 bits */
 static void esprade_unpack_sprites(running_machine *machine)
 {
-	UINT8 *src		=	memory_region(machine, "sprites");
-	UINT8 *dst		=	src + memory_region_length(machine, "sprites");
+	UINT8 *src		=	machine->region("sprites")->base();
+	UINT8 *dst		=	src + machine->region("sprites")->bytes();
 
 	while(src < dst)
 	{
@@ -3017,7 +3017,10 @@ ROM_START( donpachi )
 	ROM_LOAD( "atdp.u33", 0x140000, 0x200000, CRC(d749de00) SHA1(64a0acc23eb2515e7d0459f0289919e083c63afc) )
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
-	ROM_LOAD16_WORD( "eeprom-donpachi.bin", 0x0000, 0x0080, CRC(315fb546) SHA1(7f597107d1610fc286413e0e93c794c80c0c554f) )
+	ROM_LOAD16_WORD( "eeprom-donpachi.u10", 0x0000, 0x0080, CRC(315fb546) SHA1(7f597107d1610fc286413e0e93c794c80c0c554f) ) /* ATMEL 93C46 */
+
+    ROM_REGION( 0x0155, "pal", 0 )
+	ROM_LOAD( "peel18cv8p-15.u18", 0x0000, 0x0155, CRC(3f4787e9) SHA1(fc7da25c9f36c9cbc6ba5a7314c4828d405d1261) ) /* PEEL18CV8P-15 */
 ROM_END
 
 ROM_START( donpachij )
@@ -4327,8 +4330,8 @@ ROM_END
    Expand the 2 bit part into a 4 bit layout, so we can decode it */
 static void sailormn_unpack_tiles( running_machine *machine, const char *region )
 {
-	const UINT32 len	=	memory_region_length(machine, region);
-	UINT8 *rgn		=	memory_region(machine, region);
+	const UINT32 len	=	machine->region(region)->bytes();
+	UINT8 *rgn		=	machine->region(region)->base();
 	UINT8 *src		=	rgn + (len/4)*3 - 1;
 	UINT8 *dst		=	rgn + (len/4)*4 - 2;
 
@@ -4358,7 +4361,7 @@ static void init_cave(running_machine *machine)
 
 static DRIVER_INIT( agallet )
 {
-	UINT8 *ROM = memory_region(machine, "audiocpu");
+	UINT8 *ROM = machine->region("audiocpu")->base();
 	init_cave(machine);
 
 	memory_configure_bank(machine, "bank1", 0, 0x02, &ROM[0x00000], 0x4000);
@@ -4418,7 +4421,7 @@ static DRIVER_INIT( esprade )
 
 #if 0		//ROM PATCH
 	{
-		UINT16 *rom = (UINT16 *)memory_region(machine, "maincpu");
+		UINT16 *rom = (UINT16 *)machine->region("maincpu")->base();
 		rom[0x118A/2] = 0x4e71;			//palette fix   118A: 5548              SUBQ.W  #2,A0       --> NOP
 	}
 #endif
@@ -4448,7 +4451,7 @@ static DRIVER_INIT( guwange )
 static DRIVER_INIT( hotdogst )
 {
 	cave_state *state = machine->driver_data<cave_state>();
-	UINT8 *ROM = memory_region(machine, "audiocpu");
+	UINT8 *ROM = machine->region("audiocpu")->base();
 
 	init_cave(machine);
 
@@ -4463,10 +4466,10 @@ static DRIVER_INIT( hotdogst )
 static DRIVER_INIT( mazinger )
 {
 	cave_state *state = machine->driver_data<cave_state>();
-	UINT8 *ROM = memory_region(machine, "audiocpu");
+	UINT8 *ROM = machine->region("audiocpu")->base();
 	UINT8 *buffer;
-	UINT8 *src = memory_region(machine, "sprites");
-	int len = memory_region_length(machine, "sprites");
+	UINT8 *src = machine->region("sprites")->base();
+	int len = machine->region("sprites")->bytes();
 
 	init_cave(machine);
 
@@ -4489,14 +4492,14 @@ static DRIVER_INIT( mazinger )
 	state->time_vblank_irq = 2100;
 
 	/* setup extra ROM */
-	memory_set_bankptr(machine, "bank1",memory_region(machine, "user1"));
+	memory_set_bankptr(machine, "bank1",machine->region("user1")->base());
 }
 
 
 static DRIVER_INIT( metmqstr )
 {
 	cave_state *state = machine->driver_data<cave_state>();
-	UINT8 *ROM = memory_region(machine, "audiocpu");
+	UINT8 *ROM = machine->region("audiocpu")->base();
 
 	init_cave(machine);
 
@@ -4513,10 +4516,10 @@ static DRIVER_INIT( metmqstr )
 static DRIVER_INIT( pwrinst2j )
 {
 	cave_state *state = machine->driver_data<cave_state>();
-	UINT8 *ROM = memory_region(machine, "audiocpu");
+	UINT8 *ROM = machine->region("audiocpu")->base();
 	UINT8 *buffer;
-	UINT8 *src = memory_region(machine, "sprites");
-	int len = memory_region_length(machine, "sprites");
+	UINT8 *src = machine->region("sprites")->base();
+	int len = machine->region("sprites")->bytes();
 	int i, j;
 
 	init_cave(machine);
@@ -4552,7 +4555,7 @@ static DRIVER_INIT( pwrinst2 )
 
 #if 1		//ROM PATCH
 	{
-		UINT16 *rom = (UINT16 *)memory_region(machine, "maincpu");
+		UINT16 *rom = (UINT16 *)machine->region("maincpu")->base();
 		rom[0xd46c / 2] = 0xd482;			// kurara dash fix  0xd400 -> 0xd482
 	}
 #endif
@@ -4562,10 +4565,10 @@ static DRIVER_INIT( pwrinst2 )
 static DRIVER_INIT( sailormn )
 {
 	cave_state *state = machine->driver_data<cave_state>();
-	UINT8 *ROM = memory_region(machine, "audiocpu");
+	UINT8 *ROM = machine->region("audiocpu")->base();
 	UINT8 *buffer;
-	UINT8 *src = memory_region(machine, "sprites");
-	int len = memory_region_length(machine, "sprites");
+	UINT8 *src = machine->region("sprites")->base();
+	int len = machine->region("sprites")->bytes();
 
 	init_cave(machine);
 

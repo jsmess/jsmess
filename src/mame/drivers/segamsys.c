@@ -1608,13 +1608,13 @@ static WRITE8_HANDLER( mt_sms_standard_rom_bank_w )
 			//printf("bank ram??\n");
 			break;
 		case 1:
-			memcpy(sms_rom+0x0000, memory_region(space->machine, "maincpu")+bank*0x4000, 0x4000);
+			memcpy(sms_rom+0x0000, space->machine->region("maincpu")->base()+bank*0x4000, 0x4000);
 			break;
 		case 2:
-			memcpy(sms_rom+0x4000, memory_region(space->machine, "maincpu")+bank*0x4000, 0x4000);
+			memcpy(sms_rom+0x4000, space->machine->region("maincpu")->base()+bank*0x4000, 0x4000);
 			break;
 		case 3:
-			memcpy(sms_rom+0x8000, memory_region(space->machine, "maincpu")+bank*0x4000, 0x4000);
+			memcpy(sms_rom+0x8000, space->machine->region("maincpu")->base()+bank*0x4000, 0x4000);
 			break;
 
 	}
@@ -1623,19 +1623,19 @@ static WRITE8_HANDLER( mt_sms_standard_rom_bank_w )
 static WRITE8_HANDLER( codemasters_rom_bank_0000_w )
 {
 	int bank = data&0x1f;
-	memcpy(sms_rom+0x0000, memory_region(space->machine,"maincpu")+bank*0x4000, 0x4000);
+	memcpy(sms_rom+0x0000, space->machine->region("maincpu")->base()+bank*0x4000, 0x4000);
 }
 
 static WRITE8_HANDLER( codemasters_rom_bank_4000_w )
 {
 	int bank = data&0x1f;
-	memcpy(sms_rom+0x4000, memory_region(space->machine,"maincpu")+bank*0x4000, 0x4000);
+	memcpy(sms_rom+0x4000, space->machine->region("maincpu")->base()+bank*0x4000, 0x4000);
 }
 
 static WRITE8_HANDLER( codemasters_rom_bank_8000_w )
 {
 	int bank = data&0x1f;
-	memcpy(sms_rom+0x8000, memory_region(space->machine,"maincpu")+bank*0x4000, 0x4000);
+	memcpy(sms_rom+0x8000, space->machine->region("maincpu")->base()+bank*0x4000, 0x4000);
 }
 
 
@@ -1644,7 +1644,7 @@ static void megatech_set_genz80_as_sms_standard_ports(running_machine *machine, 
 	/* INIT THE PORTS *********************************************************************************************/
 
 	address_space *io = cputag_get_address_space(machine, tag, ADDRESS_SPACE_IO);
-	running_device *sn = machine->device("snsnd");
+	device_t *sn = machine->device("snsnd");
 
 	memory_install_readwrite8_handler(io, 0x0000, 0xffff, 0, 0, z80_unmapped_port_r, z80_unmapped_port_w);
 
@@ -1677,7 +1677,7 @@ void megatech_set_genz80_as_sms_standard_map(running_machine *machine, const cha
 	/* fixed rom bank area */
 	sms_rom = (UINT8 *)memory_install_rom(cputag_get_address_space(machine, tag, ADDRESS_SPACE_PROGRAM), 0x0000, 0xbfff, 0, 0, NULL);
 
-	memcpy(sms_rom, memory_region(machine, "maincpu"), 0xc000);
+	memcpy(sms_rom, machine->region("maincpu")->base(), 0xc000);
 
 	if (mapper == MAPPER_STANDARD )
 	{
@@ -1712,34 +1712,34 @@ static NVRAM_HANDLER( sms )
 }
 
 MACHINE_CONFIG_START( sms, driver_device )
-	MDRV_CPU_ADD("maincpu", Z80, 3579540)
-	//MDRV_CPU_PROGRAM_MAP(sms_map)
-	MDRV_CPU_IO_MAP(sms_io_map)
+	MCFG_CPU_ADD("maincpu", Z80, 3579540)
+	//MCFG_CPU_PROGRAM_MAP(sms_map)
+	MCFG_CPU_IO_MAP(sms_io_map)
 
 	/* IRQ handled via the timers */
-	MDRV_MACHINE_RESET(sms)
+	MCFG_MACHINE_RESET(sms)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0)) // Vblank handled manually.
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB15)
-	MDRV_SCREEN_SIZE(256, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 255, 0, 223)
-//  MDRV_SCREEN_VISIBLE_AREA(0, 255, 0, 191)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0)) // Vblank handled manually.
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB15)
+	MCFG_SCREEN_SIZE(256, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 223)
+//  MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 191)
 
-	MDRV_PALETTE_LENGTH(0x200)
+	MCFG_PALETTE_LENGTH(0x200)
 
-	MDRV_VIDEO_START(sms)
-	MDRV_VIDEO_UPDATE(megatech_md_sms) /* Copies a bitmap */
-	MDRV_VIDEO_EOF(sms) /* Used to Sync the timing */
+	MCFG_VIDEO_START(sms)
+	MCFG_VIDEO_UPDATE(megatech_md_sms) /* Copies a bitmap */
+	MCFG_VIDEO_EOF(sms) /* Used to Sync the timing */
 
-	MDRV_NVRAM_HANDLER( sms )
+	MCFG_NVRAM_HANDLER( sms )
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("snsnd", SN76496, 3579540)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("snsnd", SN76496, 3579540)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 

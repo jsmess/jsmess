@@ -8,23 +8,23 @@
 
 
 
-void pc1251_outa(running_device *device, int data)
+void pc1251_outa(device_t *device, int data)
 {
 	pc1251_state *state = device->machine->driver_data<pc1251_state>();
 	state->outa = data;
 }
 
-void pc1251_outb(running_device *device, int data)
+void pc1251_outb(device_t *device, int data)
 {
 	pc1251_state *state = device->machine->driver_data<pc1251_state>();
 	state->outb = data;
 }
 
-void pc1251_outc(running_device *device, int data)
+void pc1251_outc(device_t *device, int data)
 {
 }
 
-int pc1251_ina(running_device *device)
+int pc1251_ina(device_t *device)
 {
 	pc1251_state *state = device->machine->driver_data<pc1251_state>();
 	int data = state->outa;
@@ -69,7 +69,7 @@ int pc1251_ina(running_device *device)
 	return data;
 }
 
-int pc1251_inb(running_device *device)
+int pc1251_inb(device_t *device)
 {
 	pc1251_state *state = device->machine->driver_data<pc1251_state>();
 	int data = state->outb;
@@ -80,12 +80,12 @@ int pc1251_inb(running_device *device)
 	return data;
 }
 
-int pc1251_brk(running_device *device)
+int pc1251_brk(device_t *device)
 {
 	return (input_port_read(device->machine, "EXTRA") & 0x01);
 }
 
-int pc1251_reset(running_device *device)
+int pc1251_reset(device_t *device)
 {
 	return (input_port_read(device->machine, "EXTRA") & 0x02);
 }
@@ -93,8 +93,8 @@ int pc1251_reset(running_device *device)
 /* currently enough to save the external ram */
 NVRAM_HANDLER( pc1251 )
 {
-	running_device *main_cpu = machine->device("maincpu");
-	UINT8 *ram = memory_region(machine, "maincpu") + 0x8000;
+	device_t *main_cpu = machine->device("maincpu");
+	UINT8 *ram = machine->region("maincpu")->base() + 0x8000;
 	UINT8 *cpu = sc61860_internal_ram(main_cpu);
 
 	if (read_or_write)
@@ -124,7 +124,7 @@ DRIVER_INIT( pc1251 )
 {
 	pc1251_state *state = machine->driver_data<pc1251_state>();
 	int i;
-	UINT8 *gfx = memory_region(machine, "gfx1");
+	UINT8 *gfx = machine->region("gfx1")->base();
 	for (i=0; i<128; i++) gfx[i]=i;
 
 	state->power = 1;

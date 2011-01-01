@@ -171,18 +171,18 @@ static I8085_CONFIG( cpu_config )
 
 static MACHINE_CONFIG_START( bob85, bob85_state )
     /* basic machine hardware */
-    MDRV_CPU_ADD("maincpu", I8085A, XTAL_5MHz)
-    MDRV_CPU_PROGRAM_MAP(bob85_mem)
-    MDRV_CPU_IO_MAP(bob85_io)
-	MDRV_CPU_CONFIG(cpu_config)
+    MCFG_CPU_ADD("maincpu", I8085A, XTAL_5MHz)
+    MCFG_CPU_PROGRAM_MAP(bob85_mem)
+    MCFG_CPU_IO_MAP(bob85_io)
+	MCFG_CPU_CONFIG(cpu_config)
 
-    MDRV_MACHINE_RESET(bob85)
+    MCFG_MACHINE_RESET(bob85)
 
     /* video hardware */
-	MDRV_DEFAULT_LAYOUT(layout_bob85)
+	MCFG_DEFAULT_LAYOUT(layout_bob85)
 
 	// devices
-	MDRV_CASSETTE_ADD("cassette", bob85_cassette_config)
+	MCFG_CASSETTE_ADD("cassette", bob85_cassette_config)
 MACHINE_CONFIG_END
 
 /* ROM definition */

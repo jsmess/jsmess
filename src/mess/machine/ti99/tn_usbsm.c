@@ -44,7 +44,7 @@ typedef ti99_pebcard_config tn_usbsm_config;
 
 typedef struct _tn_usbsm_state
 {
-	running_device *smartmedia;
+	device_t *smartmedia;
 
 	int 	selected;
 	int		feeprom_page;
@@ -70,7 +70,7 @@ enum
 	cru_reg_feeprom_write_enable = 0x10
 };
 
-INLINE tn_usbsm_state *get_safe_token(running_device *device)
+INLINE tn_usbsm_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	return (tn_usbsm_state *)downcast<legacy_device_base *>(device)->token();
@@ -79,7 +79,7 @@ INLINE tn_usbsm_state *get_safe_token(running_device *device)
 /*
     demultiplexed read in USB-SmartMedia DSR space
 */
-static UINT16 usbsm_mem_16_r(running_device *device, offs_t offset)
+static UINT16 usbsm_mem_16_r(device_t *device, offs_t offset)
 {
 	UINT16 reply = 0;
 	tn_usbsm_state *card = get_safe_token(device);
@@ -113,7 +113,7 @@ static UINT16 usbsm_mem_16_r(running_device *device, offs_t offset)
 /*
     demultiplexed write in USB-SmartMedia DSR space
 */
-static void usbsm_mem_16_w(running_device *device, offs_t offset, UINT16 data)
+static void usbsm_mem_16_w(device_t *device, offs_t offset, UINT16 data)
 {
 	tn_usbsm_state *card = get_safe_token(device);
 
@@ -165,7 +165,7 @@ static READ8Z_DEVICE_HANDLER( cru_rz )
 	if ((offset & 0xff00)==CRU_BASE)
 	{
 		UINT8 reply = 0;
-		running_device *smartmedia = card->smartmedia;
+		device_t *smartmedia = card->smartmedia;
 		offset &= 3;
 
 		if (offset == 0)
@@ -321,7 +321,7 @@ static DEVICE_RESET( tn_usbsm )
 {
 	tn_usbsm_state *card = (tn_usbsm_state*)downcast<legacy_device_base *>(device)->token();
 	/* Register the card */
-	running_device *peb = device->owner();
+	device_t *peb = device->owner();
 
 	if (input_port_read(device->machine, "HDCTRL") & HD_USB)
 	{
@@ -336,7 +336,7 @@ static DEVICE_RESET( tn_usbsm )
 }
 
 MACHINE_CONFIG_FRAGMENT( tn_usbsm )
-	MDRV_SMARTMEDIA_ADD( "smartmedia" )
+	MCFG_SMARTMEDIA_ADD( "smartmedia" )
 MACHINE_CONFIG_END
 
 static const char DEVTEMPLATE_SOURCE[] = __FILE__;

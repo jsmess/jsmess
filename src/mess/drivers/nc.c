@@ -350,7 +350,7 @@ static void nc_refresh_memory_bank_config(running_machine *machine, int bank)
 
 			mem_bank = mem_bank & state->membank_rom_mask;
 
-			addr = (memory_region(machine, "maincpu")+0x010000) + (mem_bank<<14);
+			addr = (machine->region("maincpu")->base()+0x010000) + (mem_bank<<14);
 
 			memory_set_bankptr(machine, bank1, addr);
 
@@ -780,7 +780,7 @@ static const unsigned long baud_rate_table[]=
 
 static TIMER_CALLBACK(nc_serial_timer_callback)
 {
-	running_device *uart = machine->device("uart");
+	device_t *uart = machine->device("uart");
 
 	msm8251_transmit_clock(uart);
 	msm8251_receive_clock(uart);
@@ -815,7 +815,7 @@ static WRITE8_HANDLER(nc_uart_control_w)
 /* same for nc100 and nc200 */
 static void nc_printer_update(running_machine *machine, UINT8 data)
 {
-	running_device *printer = machine->device("centronics");
+	device_t *printer = machine->device("centronics");
 	centronics_strobe_w(printer, BIT(data, 6));
 }
 
@@ -853,7 +853,7 @@ static WRITE8_HANDLER(nc100_uart_control_w)
 }
 
 
-static void nc100_tc8521_alarm_callback(running_device *device, int state)
+static void nc100_tc8521_alarm_callback(device_t *device, int state)
 {
 	nc_state *drvstate = device->machine->driver_data<nc_state>();
 	/* I'm assuming that the nmi is edge triggered */
@@ -875,7 +875,7 @@ static void nc100_tc8521_alarm_callback(running_device *device, int state)
 	drvstate->previous_alarm_state = state;
 }
 
-static void nc100_txrdy_callback(running_device *device, int state)
+static void nc100_txrdy_callback(device_t *device, int state)
 {
 	nc_state *drvstate = device->machine->driver_data<nc_state>();
 	drvstate->irq_latch &= ~(1 << 1);
@@ -893,7 +893,7 @@ static void nc100_txrdy_callback(running_device *device, int state)
 	nc_update_interrupts(device->machine);
 }
 
-static void nc100_rxrdy_callback(running_device *device, int state)
+static void nc100_rxrdy_callback(device_t *device, int state)
 {
 	nc_state *drvstate = device->machine->driver_data<nc_state>();
 	drvstate->irq_latch &= ~(1<<0);
@@ -960,7 +960,7 @@ static MACHINE_RESET( nc100 )
 	nc_common_open_stream_for_reading(machine);
 
 	{
-		running_device *rtc = machine->device("rtc");
+		device_t *rtc = machine->device("rtc");
 		tc8521_load_stream(rtc, state->file);
 	}
 
@@ -977,7 +977,7 @@ static void nc100_machine_stop(running_machine &machine)
 	nc_state *state = machine.driver_data<nc_state>();
 	nc_common_open_stream_for_writing(&machine);
 	{
-		running_device *rtc = machine.device("rtc");
+		device_t *rtc = machine.device("rtc");
 		tc8521_save_stream(rtc, state->file);
 	}
 	nc_common_store_memory_to_stream(&machine);
@@ -1017,7 +1017,7 @@ static WRITE8_HANDLER(nc100_poweroff_control_w)
 static  READ8_HANDLER(nc100_card_battery_status_r)
 {
 	nc_state *state = space->machine->driver_data<nc_state>();
-	running_device *printer = space->machine->device("centronics");
+	device_t *printer = space->machine->device("centronics");
 	int nc_card_battery_status = 0x0fc;
 
 	/* printer */
@@ -1271,7 +1271,7 @@ static void nc200_refresh_uart_interrupt(running_machine *machine)
 	nc_update_interrupts(machine);
 }
 
-static void nc200_txrdy_callback(running_device *device, int state)
+static void nc200_txrdy_callback(device_t *device, int state)
 {
 	//nc_state *drvstate = machine->driver_data<nc_state>();
 //  drvstate->nc200_uart_interrupt_irq &=~(1<<0);
@@ -1284,7 +1284,7 @@ static void nc200_txrdy_callback(running_device *device, int state)
 //  nc200_refresh_uart_interrupt(device->machine);
 }
 
-static void nc200_rxrdy_callback(running_device *device, int state)
+static void nc200_rxrdy_callback(device_t *device, int state)
 {
 	nc_state *drvstate = device->machine->driver_data<nc_state>();
 	drvstate->nc200_uart_interrupt_irq &=~(1<<1);
@@ -1446,7 +1446,7 @@ static  READ8_HANDLER(nc200_card_battery_status_r)
 
 static READ8_HANDLER(nc200_printer_status_r)
 {
-	running_device *printer = space->machine->device("centronics");
+	device_t *printer = space->machine->device("centronics");
 	UINT8 result = 0;
 
 	result |= centronics_busy_r(printer);
@@ -1488,7 +1488,7 @@ static WRITE8_HANDLER(nc200_uart_control_w)
 
 static WRITE8_HANDLER(nc200_memory_card_wait_state_w)
 {
-	running_device *fdc = space->machine->device("upd765");
+	device_t *fdc = space->machine->device("upd765");
 	LOG_DEBUG(("nc200 memory card wait state: PC: %04x %02x\n", cpu_get_pc(space->machine->device("maincpu")), data));
 #if 0
 	floppy_drive_set_motor_state(0, 1);
@@ -1642,7 +1642,7 @@ INPUT_PORTS_END
 /* Serial */
 static DEVICE_IMAGE_LOAD( nc_serial )
 {
-	running_device *uart = image.device().machine->device("uart");
+	device_t *uart = image.device().machine->device("uart");
 
 	/* filename specified */
 	if (device_load_serial(image)==IMAGE_INIT_PASS)
@@ -1680,64 +1680,64 @@ DEVICE_GET_INFO( nc_serial )
 DECLARE_LEGACY_IMAGE_DEVICE(NC_SERIAL, nc_serial);
 DEFINE_LEGACY_IMAGE_DEVICE(NC_SERIAL, nc_serial);
 
-#define MDRV_NC_SERIAL_ADD(_tag) \
-	MDRV_DEVICE_ADD(_tag, NC_SERIAL, 0)
+#define MCFG_NC_SERIAL_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, NC_SERIAL, 0)
 
 /**********************************************************************************************************/
 
 static MACHINE_CONFIG_START( nc100, nc_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, /*6000000*/ 4606000)        /* Russell Marks says this is more accurate */
-	MDRV_CPU_PROGRAM_MAP(nc_map)
-	MDRV_CPU_IO_MAP(nc100_io)
-	MDRV_QUANTUM_TIME(HZ(60))
+	MCFG_CPU_ADD("maincpu", Z80, /*6000000*/ 4606000)        /* Russell Marks says this is more accurate */
+	MCFG_CPU_PROGRAM_MAP(nc_map)
+	MCFG_CPU_IO_MAP(nc100_io)
+	MCFG_QUANTUM_TIME(HZ(60))
 
-	MDRV_MACHINE_START( nc100 )
-	MDRV_MACHINE_RESET( nc100 )
+	MCFG_MACHINE_START( nc100 )
+	MCFG_MACHINE_RESET( nc100 )
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", LCD)
-	MDRV_SCREEN_REFRESH_RATE(50)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(640 /*NC_SCREEN_WIDTH*/, 480 /*NC_SCREEN_HEIGHT*/)
-	MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MDRV_PALETTE_LENGTH(NC_NUM_COLOURS)
-	MDRV_PALETTE_INIT( nc )
-	MDRV_DEFAULT_LAYOUT(layout_lcd)
+	MCFG_SCREEN_ADD("screen", LCD)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(640 /*NC_SCREEN_WIDTH*/, 480 /*NC_SCREEN_HEIGHT*/)
+	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+	MCFG_PALETTE_LENGTH(NC_NUM_COLOURS)
+	MCFG_PALETTE_INIT( nc )
+	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
-	MDRV_VIDEO_START( nc )
-	MDRV_VIDEO_UPDATE( nc )
+	MCFG_VIDEO_START( nc )
+	MCFG_VIDEO_UPDATE( nc )
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("beep.1", BEEP, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MDRV_SOUND_ADD("beep.2", BEEP, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("beep.1", BEEP, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("beep.2", BEEP, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* printer */
-	MDRV_CENTRONICS_ADD("centronics", nc100_centronics_config)
+	MCFG_CENTRONICS_ADD("centronics", nc100_centronics_config)
 
 	/* uart */
-	MDRV_MSM8251_ADD("uart", nc100_uart_interface)
+	MCFG_MSM8251_ADD("uart", nc100_uart_interface)
 
 	/* rtc */
-	MDRV_TC8521_ADD("rtc", nc100_tc8521_interface)
+	MCFG_TC8521_ADD("rtc", nc100_tc8521_interface)
 
 	/* cartridge */
-	MDRV_CARTSLOT_ADD("cart")
-	MDRV_CARTSLOT_EXTENSION_LIST("crd,card")
-	MDRV_CARTSLOT_NOT_MANDATORY
-	MDRV_CARTSLOT_START(nc_pcmcia_card)
-	MDRV_CARTSLOT_LOAD(nc_pcmcia_card)
-	MDRV_CARTSLOT_UNLOAD(nc_pcmcia_card)
+	MCFG_CARTSLOT_ADD("cart")
+	MCFG_CARTSLOT_EXTENSION_LIST("crd,card")
+	MCFG_CARTSLOT_NOT_MANDATORY
+	MCFG_CARTSLOT_START(nc_pcmcia_card)
+	MCFG_CARTSLOT_LOAD(nc_pcmcia_card)
+	MCFG_CARTSLOT_UNLOAD(nc_pcmcia_card)
 	
 	/* internal ram */
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("64K")
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("64K")
 
-	MDRV_NC_SERIAL_ADD("serial")
+	MCFG_NC_SERIAL_ADD("serial")
 MACHINE_CONFIG_END
 
 static const floppy_config nc200_floppy_config =
@@ -1754,38 +1754,38 @@ static const floppy_config nc200_floppy_config =
 
 static MACHINE_CONFIG_DERIVED( nc200, nc100 )
 
-	MDRV_CPU_MODIFY( "maincpu" )
-	MDRV_CPU_IO_MAP(nc200_io)
+	MCFG_CPU_MODIFY( "maincpu" )
+	MCFG_CPU_IO_MAP(nc200_io)
 
-	MDRV_MACHINE_START( nc200 )
-	MDRV_MACHINE_RESET( nc200 )
+	MCFG_MACHINE_START( nc200 )
+	MCFG_MACHINE_RESET( nc200 )
 
 	/* video hardware */
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_SIZE(NC200_SCREEN_WIDTH, NC200_SCREEN_HEIGHT)
-	MDRV_SCREEN_VISIBLE_AREA(0, NC200_SCREEN_WIDTH-1, 0, NC200_SCREEN_HEIGHT-1)
-	MDRV_PALETTE_LENGTH(NC200_NUM_COLOURS)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_SIZE(NC200_SCREEN_WIDTH, NC200_SCREEN_HEIGHT)
+	MCFG_SCREEN_VISIBLE_AREA(0, NC200_SCREEN_WIDTH-1, 0, NC200_SCREEN_HEIGHT-1)
+	MCFG_PALETTE_LENGTH(NC200_NUM_COLOURS)
 
 	/* printer */
-	MDRV_DEVICE_REMOVE("centronics")
-	MDRV_CENTRONICS_ADD("centronics", nc200_centronics_config)
+	MCFG_DEVICE_REMOVE("centronics")
+	MCFG_CENTRONICS_ADD("centronics", nc200_centronics_config)
 
 	/* uart */
-	MDRV_DEVICE_REMOVE("uart")
-	MDRV_MSM8251_ADD("uart", nc200_uart_interface)
+	MCFG_DEVICE_REMOVE("uart")
+	MCFG_MSM8251_ADD("uart", nc200_uart_interface)
 
 	/* no rtc */
-	MDRV_DEVICE_REMOVE("rtc")
+	MCFG_DEVICE_REMOVE("rtc")
 
-	MDRV_UPD765A_ADD("upd765", nc200_upd765_interface)
+	MCFG_UPD765A_ADD("upd765", nc200_upd765_interface)
 
-	MDRV_FLOPPY_DRIVE_ADD(FLOPPY_0, nc200_floppy_config)
+	MCFG_FLOPPY_DRIVE_ADD(FLOPPY_0, nc200_floppy_config)
 
-	MDRV_MC146818_ADD( "mc", MC146818_STANDARD )
+	MCFG_MC146818_ADD( "mc", MC146818_STANDARD )
 
 	/* internal ram */
-	MDRV_RAM_MODIFY("messram")
-	MDRV_RAM_DEFAULT_SIZE("128K")
+	MCFG_RAM_MODIFY("messram")
+	MCFG_RAM_DEFAULT_SIZE("128K")
 MACHINE_CONFIG_END
 
 

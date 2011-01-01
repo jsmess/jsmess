@@ -277,38 +277,38 @@ static Z80PIO_INTERFACE( nascom1_z80pio_intf )
 
 static MACHINE_CONFIG_START( nascom1, nascom1_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, XTAL_16MHz/8)
-	MDRV_CPU_PROGRAM_MAP(nascom1_mem)
-	MDRV_CPU_IO_MAP(nascom1_io)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz/8)
+	MCFG_CPU_PROGRAM_MAP(nascom1_mem)
+	MCFG_CPU_IO_MAP(nascom1_io)
 
-	MDRV_MACHINE_RESET( nascom1 )
+	MCFG_MACHINE_RESET( nascom1 )
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(50)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(48 * 8, 16 * 16)
-	MDRV_SCREEN_VISIBLE_AREA(0, 48 * 8 - 1, 0, 16 * 16 - 1)
-	MDRV_GFXDECODE(nascom1)
-	MDRV_PALETTE_LENGTH(2)
-	MDRV_PALETTE_INIT(black_and_white)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(48 * 8, 16 * 16)
+	MCFG_SCREEN_VISIBLE_AREA(0, 48 * 8 - 1, 0, 16 * 16 - 1)
+	MCFG_GFXDECODE(nascom1)
+	MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_INIT(black_and_white)
 
-	MDRV_VIDEO_UPDATE(nascom1)
+	MCFG_VIDEO_UPDATE(nascom1)
 
-	MDRV_AY31015_ADD( "hd6402", nascom1_ay31015_config )
+	MCFG_AY31015_ADD( "hd6402", nascom1_ay31015_config )
 
-	MDRV_Z80PIO_ADD( "z80pio", XTAL_16MHz/8, nascom1_z80pio_intf )
+	MCFG_Z80PIO_ADD( "z80pio", XTAL_16MHz/8, nascom1_z80pio_intf )
 
 	/* devices */
-	MDRV_SNAPSHOT_ADD("snapshot", nascom1, "nas", 0.5)
+	MCFG_SNAPSHOT_ADD("snapshot", nascom1, "nas", 0.5)
 
-	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )
+	MCFG_CASSETTE_ADD( "cassette", default_cassette_config )
 
 	/* internal ram */
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("40K")
-	MDRV_RAM_EXTRA_OPTIONS("1K,16K,32K")
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("40K")
+	MCFG_RAM_EXTRA_OPTIONS("1K,16K,32K")
 MACHINE_CONFIG_END
 
 static FLOPPY_OPTIONS_START(nascom2)
@@ -339,19 +339,19 @@ static const floppy_config nascom2_floppy_config =
 };
 
 static MACHINE_CONFIG_DERIVED( nascom2, nascom1 )
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(nascom2_io)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_IO_MAP(nascom2_io)
 
 	/* video hardware */
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_SIZE(48 * 8, 16 * 14)
-	MDRV_SCREEN_VISIBLE_AREA(0, 48 * 8 - 1, 0, 16 * 14 - 1)
-	MDRV_GFXDECODE(nascom2)
-	MDRV_VIDEO_UPDATE(nascom2)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_SIZE(48 * 8, 16 * 14)
+	MCFG_SCREEN_VISIBLE_AREA(0, 48 * 8 - 1, 0, 16 * 14 - 1)
+	MCFG_GFXDECODE(nascom2)
+	MCFG_VIDEO_UPDATE(nascom2)
 
-	MDRV_WD1793_ADD("wd1793", nascom2_wd17xx_interface )
+	MCFG_WD1793_ADD("wd1793", nascom2_wd17xx_interface )
 
-	MDRV_FLOPPY_4_DRIVES_ADD(nascom2_floppy_config)
+	MCFG_FLOPPY_4_DRIVES_ADD(nascom2_floppy_config)
 MACHINE_CONFIG_END
 
 

@@ -43,14 +43,14 @@ struct _com8116_t
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE com8116_t *get_safe_token(running_device *device)
+INLINE com8116_t *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == COM8116);
 	return (com8116_t *)downcast<legacy_device_base *>(device)->token();
 }
 
-INLINE const com8116_interface *get_interface(running_device *device)
+INLINE const com8116_interface *get_interface(device_t *device)
 {
 	assert(device != NULL);
 	assert((device->type() == COM8116));
@@ -97,7 +97,7 @@ WRITE8_DEVICE_HANDLER( com8116_stt_w )
 
 static TIMER_CALLBACK( fx4_tick )
 {
-	running_device *device = (running_device *)ptr;
+	device_t *device = (device_t *)ptr;
 	com8116_t *com8116 = get_safe_token(device);
 
 	devcb_call_write_line(&com8116->out_fx4_func, 1);
@@ -109,7 +109,7 @@ static TIMER_CALLBACK( fx4_tick )
 
 static TIMER_CALLBACK( fr_tick )
 {
-	running_device *device = (running_device *)ptr;
+	device_t *device = (device_t *)ptr;
 	com8116_t *com8116 = get_safe_token(device);
 
 	devcb_call_write_line(&com8116->out_fr_func, 1);
@@ -121,7 +121,7 @@ static TIMER_CALLBACK( fr_tick )
 
 static TIMER_CALLBACK( ft_tick )
 {
-	running_device *device = (running_device *)ptr;
+	device_t *device = (device_t *)ptr;
 	com8116_t *com8116 = get_safe_token(device);
 
 	devcb_call_write_line(&com8116->out_ft_func, 1);

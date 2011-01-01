@@ -50,7 +50,7 @@ struct _dave_interface
 /***************************************************************************
     PROTOTYPES
 ***************************************************************************/
-void dave_set_reg(running_device *device, offs_t offset, UINT8 data);
+void dave_set_reg(device_t *device, offs_t offset, UINT8 data);
 
 READ8_DEVICE_HANDLER ( dave_reg_r );
 WRITE8_DEVICE_HANDLER ( dave_reg_w );

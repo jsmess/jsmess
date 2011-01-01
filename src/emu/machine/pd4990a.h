@@ -18,8 +18,8 @@
 
 DECLARE_LEGACY_DEVICE(UPD4990A, upd4990a);
 
-#define MDRV_UPD4990A_ADD(_tag) \
-	MDRV_DEVICE_ADD(_tag, UPD4990A, 0)
+#define MCFG_UPD4990A_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, UPD4990A, 0)
 
 
 /***************************************************************************
@@ -27,7 +27,7 @@ DECLARE_LEGACY_DEVICE(UPD4990A, upd4990a);
 ***************************************************************************/
 
 /* this should be refactored, once RTCs get unified */
-extern void upd4990a_addretrace( running_device *device );
+extern void upd4990a_addretrace( device_t *device );
 
 extern READ8_DEVICE_HANDLER( upd4990a_testbit_r );
 extern READ8_DEVICE_HANDLER( upd4990a_databit_r );

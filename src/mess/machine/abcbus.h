@@ -95,10 +95,10 @@
 
 DECLARE_LEGACY_DEVICE(ABCBUS, abcbus);
 
-#define MDRV_ABCBUS_ADD(_tag, _daisy_chain, _cpu_tag) \
-	MDRV_DEVICE_ADD(_tag, ABCBUS, 0) \
-	MDRV_DEVICE_CONFIG(_daisy_chain) \
-	MDRV_DEVICE_CONFIG_DATAPTR(abcbus_config, cpu_tag, _cpu_tag)
+#define MCFG_ABCBUS_ADD(_tag, _daisy_chain, _cpu_tag) \
+	MCFG_DEVICE_ADD(_tag, ABCBUS, 0) \
+	MCFG_DEVICE_CONFIG(_daisy_chain) \
+	MCFG_DEVICE_CONFIG_DATAPTR(abcbus_config, cpu_tag, _cpu_tag)
 
 #define ABCBUS_DAISY(_name) \
 	const abcbus_daisy_chain (_name)[] =

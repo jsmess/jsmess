@@ -62,8 +62,8 @@ struct _msm8251_t
 ***************************************************************************/
 
 static void msm8251_in_callback(running_machine *machine, int id, unsigned long state);
-static void msm8251_update_tx_empty(running_device *device);
-static void msm8251_update_tx_ready(running_device *device);
+static void msm8251_update_tx_empty(device_t *device);
+static void msm8251_update_tx_ready(device_t *device);
 
 
 
@@ -71,14 +71,14 @@ static void msm8251_update_tx_ready(running_device *device);
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE msm8251_t *get_token(running_device *device)
+INLINE msm8251_t *get_token(device_t *device)
 {
 	assert(device->type() == MSM8251);
 	return (msm8251_t *) downcast<legacy_device_base *>(device)->token();
 }
 
 
-INLINE const msm8251_interface *get_interface(running_device *device)
+INLINE const msm8251_interface *get_interface(device_t *device)
 {
 	assert(device->type() == MSM8251);
 	return (const msm8251_interface *) device->baseconfig().static_config();
@@ -102,7 +102,7 @@ const msm8251_interface default_msm8251_interface = {0, };
 
 static void msm8251_in_callback(running_machine *machine, int id, unsigned long state)
 {
-	running_device *device;
+	device_t *device;
 	msm8251_t *uart;
 	int changed;
 
@@ -147,7 +147,7 @@ static DEVICE_START( msm8251 )
     msm8251_update_rx_ready
 -------------------------------------------------*/
 
-static void msm8251_update_rx_ready(running_device *device)
+static void msm8251_update_rx_ready(device_t *device)
 {
 	msm8251_t *uart = get_token(device);
 	const msm8251_interface *uart_interface = get_interface(device);
@@ -172,7 +172,7 @@ static void msm8251_update_rx_ready(running_device *device)
     msm8251_receive_clock
 -------------------------------------------------*/
 
-void msm8251_receive_clock(running_device *device)
+void msm8251_receive_clock(device_t *device)
 {
 	msm8251_t *uart = get_token(device);
 
@@ -197,7 +197,7 @@ void msm8251_receive_clock(running_device *device)
     msm8251_transmit_clock
 -------------------------------------------------*/
 
-void msm8251_transmit_clock(running_device *device)
+void msm8251_transmit_clock(device_t *device)
 {
 	msm8251_t *uart = get_token(device);
 
@@ -265,7 +265,7 @@ void msm8251_transmit_clock(running_device *device)
     msm8251_update_tx_ready
 -------------------------------------------------*/
 
-static void msm8251_update_tx_ready(running_device *device)
+static void msm8251_update_tx_ready(device_t *device)
 {
 	msm8251_t *uart = get_token(device);
 	const msm8251_interface *uart_interface = get_interface(device);
@@ -305,7 +305,7 @@ static void msm8251_update_tx_ready(running_device *device)
     msm8251_update_tx_empty
 -------------------------------------------------*/
 
-static void msm8251_update_tx_empty(running_device *device)
+static void msm8251_update_tx_empty(device_t *device)
 {
 	msm8251_t *uart = get_token(device);
 	const msm8251_interface *uart_interface = get_interface(device);
@@ -719,7 +719,7 @@ WRITE8_DEVICE_HANDLER(msm8251_data_w)
     bit of data has been received
 -------------------------------------------------*/
 
-void msm8251_receive_character(running_device *device, UINT8 ch)
+void msm8251_receive_character(device_t *device, UINT8 ch)
 {
 	msm8251_t *uart = get_token(device);
 
@@ -764,7 +764,7 @@ READ8_DEVICE_HANDLER(msm8251_data_r)
     updated it's state
 -------------------------------------------------*/
 
-void msm8251_connect_to_serial_device(running_device *device, running_device *image)
+void msm8251_connect_to_serial_device(device_t *device, device_t *image)
 {
 	msm8251_t *uart = get_token(device);
 	serial_device_connect(image, &uart->connection);
@@ -776,7 +776,7 @@ void msm8251_connect_to_serial_device(running_device *device, running_device *im
     msm8251_connect
 -------------------------------------------------*/
 
-void msm8251_connect(running_device *device, serial_connection *other_connection)
+void msm8251_connect(device_t *device, serial_connection *other_connection)
 {
 	msm8251_t *uart = get_token(device);
 	serial_connection_link(device->machine, &uart->connection, other_connection);

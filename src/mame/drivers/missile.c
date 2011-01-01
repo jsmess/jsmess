@@ -505,7 +505,7 @@ DIRECT_UPDATE_HANDLER( missile_direct_handler )
 static MACHINE_START( missile )
 {
 	/* initialize globals */
-	writeprom = memory_region(machine, "proms");
+	writeprom = machine->region("proms")->base();
 	flipscreen = 0;
 
 	/* set up an opcode base handler since we use mapped handlers for RAM */
@@ -777,7 +777,7 @@ static READ8_HANDLER( missile_r )
 
 	/* ROM */
 	else if (offset >= 0x5000)
-		result = memory_region(space->machine, "maincpu")[offset];
+		result = space->machine->region("maincpu")->base()[offset];
 
 	/* POKEY */
 	else if (offset < 0x4800)
@@ -1020,28 +1020,28 @@ static const pokey_interface pokey_config =
 static MACHINE_CONFIG_START( missile, missile_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6502, MASTER_CLOCK/8)
-	MDRV_CPU_PROGRAM_MAP(main_map)
+	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK/8)
+	MCFG_CPU_PROGRAM_MAP(main_map)
 
-	MDRV_MACHINE_START(missile)
-	MDRV_MACHINE_RESET(missile)
-	MDRV_WATCHDOG_VBLANK_INIT(8)
+	MCFG_MACHINE_START(missile)
+	MCFG_MACHINE_RESET(missile)
+	MCFG_WATCHDOG_VBLANK_INIT(8)
 
 	/* video hardware */
-	MDRV_PALETTE_LENGTH(8)
+	MCFG_PALETTE_LENGTH(8)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 
-	MDRV_VIDEO_UPDATE(missile)
+	MCFG_VIDEO_UPDATE(missile)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("pokey", POKEY, MASTER_CLOCK/8)
-	MDRV_SOUND_CONFIG(pokey_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("pokey", POKEY, MASTER_CLOCK/8)
+	MCFG_SOUND_CONFIG(pokey_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -1162,7 +1162,7 @@ ROM_END
 static DRIVER_INIT( suprmatk )
 {
 	int i;
-	UINT8 *rom = memory_region(machine, "maincpu");
+	UINT8 *rom = machine->region("maincpu")->base();
 
 	for (i = 0; i < 0x40; i++)
 	{

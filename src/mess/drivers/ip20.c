@@ -97,7 +97,7 @@ static const eeprom_interface eeprom_interface_93C56 =
 static READ32_HANDLER( hpc_r )
 {
 	ip20_state *state = space->machine->driver_data<ip20_state>();
-	running_device *scc;
+	device_t *scc;
 	running_machine *machine = space->machine;
 
 	offset <<= 2;
@@ -215,8 +215,8 @@ static READ32_HANDLER( hpc_r )
 static WRITE32_HANDLER( hpc_w )
 {
 	ip20_state *state = space->machine->driver_data<ip20_state>();
-	running_device *scc;
-	running_device *eeprom;
+	device_t *scc;
+	device_t *eeprom;
 	running_machine *machine = space->machine;
 
 	eeprom = space->machine->device("eeprom");
@@ -589,34 +589,34 @@ static const mips3_config config =
 };
 
 static MACHINE_CONFIG_START( ip204415, ip20_state )
-	MDRV_CPU_ADD( "maincpu", R4600BE, 50000000*3 )
-	MDRV_CPU_CONFIG( config )
-	MDRV_CPU_PROGRAM_MAP( ip204415_map)
+	MCFG_CPU_ADD( "maincpu", R4600BE, 50000000*3 )
+	MCFG_CPU_CONFIG( config )
+	MCFG_CPU_PROGRAM_MAP( ip204415_map)
 
-	MDRV_MACHINE_START( ip204415 )
+	MCFG_MACHINE_START( ip204415 )
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE( 60 )
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(800, 600)
-	MDRV_SCREEN_VISIBLE_AREA(0, 799, 0, 599)
-	MDRV_PALETTE_LENGTH(65536)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE( 60 )
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(800, 600)
+	MCFG_SCREEN_VISIBLE_AREA(0, 799, 0, 599)
+	MCFG_PALETTE_LENGTH(65536)
 
-	MDRV_VIDEO_START( ip204415 )
-	MDRV_VIDEO_UPDATE( ip204415 )
+	MCFG_VIDEO_START( ip204415 )
+	MCFG_VIDEO_UPDATE( ip204415 )
 
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD( "cdda", CDDA, 0 )
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD( "cdda", CDDA, 0 )
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SCC8530_ADD("scc", 7000000)
+	MCFG_SCC8530_ADD("scc", 7000000)
 
-	MDRV_CDROM_ADD( "cdrom" )
+	MCFG_CDROM_ADD( "cdrom" )
 
-	MDRV_EEPROM_ADD("eeprom", eeprom_interface_93C56)
+	MCFG_EEPROM_ADD("eeprom", eeprom_interface_93C56)
 MACHINE_CONFIG_END
 
 ROM_START( ip204415 )

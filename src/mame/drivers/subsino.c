@@ -2560,171 +2560,171 @@ GFXDECODE_END
 
 static MACHINE_CONFIG_START( victor21, driver_device )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z180, XTAL_12MHz / 8)	/* Unknown clock */
-	MDRV_CPU_PROGRAM_MAP(victor21_map)
-	MDRV_CPU_IO_MAP(subsino_iomap)
+	MCFG_CPU_ADD("maincpu", Z180, XTAL_12MHz / 8)	/* Unknown clock */
+	MCFG_CPU_PROGRAM_MAP(victor21_map)
+	MCFG_CPU_IO_MAP(subsino_iomap)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(512, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 512-1, 0+16, 256-16-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(512, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0+16, 256-16-1)
 
-	MDRV_GFXDECODE(subsino_depth3)
+	MCFG_GFXDECODE(subsino_depth3)
 
-	MDRV_PALETTE_LENGTH(0x100)
-	MDRV_PALETTE_INIT(subsino_2proms)
+	MCFG_PALETTE_LENGTH(0x100)
+	MCFG_PALETTE_INIT(subsino_2proms)
 
-	MDRV_VIDEO_START(subsino)
-	MDRV_VIDEO_UPDATE(subsino)
+	MCFG_VIDEO_START(subsino)
+	MCFG_VIDEO_UPDATE(subsino)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_OKIM6295_ADD("oki", XTAL_4_433619MHz / 4, OKIM6295_PIN7_HIGH)	/* Clock frequency & pin 7 not verified */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_OKIM6295_ADD("oki", XTAL_4_433619MHz / 4, OKIM6295_PIN7_HIGH)	/* Clock frequency & pin 7 not verified */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 /* same but with an additional protection. */
 static MACHINE_CONFIG_DERIVED( victor5, victor21 )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(victor5_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(victor5_map)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_START( crsbingo, driver_device )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z180, XTAL_12MHz / 8)	/* Unknown CPU and clock */
-	MDRV_CPU_PROGRAM_MAP(crsbingo_map)
-	MDRV_CPU_IO_MAP(subsino_iomap)
+	MCFG_CPU_ADD("maincpu", Z180, XTAL_12MHz / 8)	/* Unknown CPU and clock */
+	MCFG_CPU_PROGRAM_MAP(crsbingo_map)
+	MCFG_CPU_IO_MAP(subsino_iomap)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(512, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 512-1, 0+16, 256-16-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(512, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0+16, 256-16-1)
 
-	MDRV_GFXDECODE(subsino_depth4)
+	MCFG_GFXDECODE(subsino_depth4)
 
-	MDRV_PALETTE_LENGTH(0x100)
-	MDRV_PALETTE_INIT(subsino_2proms)
+	MCFG_PALETTE_LENGTH(0x100)
+	MCFG_PALETTE_INIT(subsino_2proms)
 
-	MDRV_VIDEO_START(subsino)
-	MDRV_VIDEO_UPDATE(subsino)
+	MCFG_VIDEO_START(subsino)
+	MCFG_VIDEO_UPDATE(subsino)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)	/* Unknown clock */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)	/* Unknown clock */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_START( srider, driver_device )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z180, XTAL_12MHz / 8)	/* Unknown clock */
-	MDRV_CPU_PROGRAM_MAP(srider_map)
-	MDRV_CPU_IO_MAP(subsino_iomap)
+	MCFG_CPU_ADD("maincpu", Z180, XTAL_12MHz / 8)	/* Unknown clock */
+	MCFG_CPU_PROGRAM_MAP(srider_map)
+	MCFG_CPU_IO_MAP(subsino_iomap)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(512, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 512-1, 0+16, 256-16-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(512, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0+16, 256-16-1)
 
-	MDRV_GFXDECODE(subsino_depth4)
+	MCFG_GFXDECODE(subsino_depth4)
 
-	MDRV_PALETTE_LENGTH(0x100)
-	MDRV_PALETTE_INIT(subsino_3proms)
+	MCFG_PALETTE_LENGTH(0x100)
+	MCFG_PALETTE_INIT(subsino_3proms)
 
-	MDRV_VIDEO_START(subsino)
-	MDRV_VIDEO_UPDATE(subsino)
+	MCFG_VIDEO_START(subsino)
+	MCFG_VIDEO_UPDATE(subsino)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM3812, XTAL_3_579545MHz)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_3_579545MHz)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_OKIM6295_ADD("oki", XTAL_4_433619MHz / 4, OKIM6295_PIN7_HIGH)	/* Clock frequency & pin 7 not verified */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_OKIM6295_ADD("oki", XTAL_4_433619MHz / 4, OKIM6295_PIN7_HIGH)	/* Clock frequency & pin 7 not verified */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( sharkpy, srider )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(sharkpy_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(sharkpy_map)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( tisub, driver_device )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z180, XTAL_12MHz / 8)	/* Unknown CPU and clock */
-	MDRV_CPU_PROGRAM_MAP(tisub_map)
-	MDRV_CPU_IO_MAP(subsino_iomap)
+	MCFG_CPU_ADD("maincpu", Z180, XTAL_12MHz / 8)	/* Unknown CPU and clock */
+	MCFG_CPU_PROGRAM_MAP(tisub_map)
+	MCFG_CPU_IO_MAP(subsino_iomap)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(512, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 512-1, 0+16, 256-16-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(512, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0+16, 256-16-1)
 
-	MDRV_GFXDECODE(subsino_depth4_reels)
+	MCFG_GFXDECODE(subsino_depth4_reels)
 
-	MDRV_PALETTE_LENGTH(0x100)
-	MDRV_PALETTE_INIT(subsino_3proms)
+	MCFG_PALETTE_LENGTH(0x100)
+	MCFG_PALETTE_INIT(subsino_3proms)
 
-	MDRV_VIDEO_START(subsino_reels)
-	MDRV_VIDEO_UPDATE(subsino_reels)
+	MCFG_VIDEO_START(subsino_reels)
+	MCFG_VIDEO_UPDATE(subsino_reels)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM3812, XTAL_3_579545MHz)	/* Unknown clock */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_3_579545MHz)	/* Unknown clock */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( stisub, driver_device )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z180, XTAL_12MHz / 8)	/* Unknown clock */
-	MDRV_CPU_PROGRAM_MAP(stisub_map)
-	MDRV_CPU_IO_MAP(subsino_iomap)
+	MCFG_CPU_ADD("maincpu", Z180, XTAL_12MHz / 8)	/* Unknown clock */
+	MCFG_CPU_PROGRAM_MAP(stisub_map)
+	MCFG_CPU_IO_MAP(subsino_iomap)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(512, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 512-1, 0+16, 256-16-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(512, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0+16, 256-16-1)
 
-	MDRV_GFXDECODE(subsino_stisub)
+	MCFG_GFXDECODE(subsino_stisub)
 
-	MDRV_PALETTE_LENGTH(0x100)
-	//MDRV_PALETTE_INIT(subsino_3proms)
+	MCFG_PALETTE_LENGTH(0x100)
+	//MCFG_PALETTE_INIT(subsino_3proms)
 
-	MDRV_VIDEO_START(stisub)
-	MDRV_VIDEO_UPDATE(stisub_reels)
+	MCFG_VIDEO_START(stisub)
+	MCFG_VIDEO_UPDATE(stisub_reels)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM3812, XTAL_3_579545MHz)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_3_579545MHz)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 VIDEO_START(mtrain)
@@ -2739,34 +2739,34 @@ VIDEO_UPDATE(mtrain)
 
 static MACHINE_CONFIG_START( mtrain, driver_device )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z180, XTAL_12MHz / 8)	/* Unknown clock */
-	MDRV_CPU_PROGRAM_MAP(mtrain_map)
-	MDRV_CPU_IO_MAP(subsino_iomap)
+	MCFG_CPU_ADD("maincpu", Z180, XTAL_12MHz / 8)	/* Unknown clock */
+	MCFG_CPU_PROGRAM_MAP(mtrain_map)
+	MCFG_CPU_IO_MAP(subsino_iomap)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(512, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 512-1, 0+16, 256-16-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(512, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0+16, 256-16-1)
 
-	MDRV_GFXDECODE(subsino_mtrain)
+	MCFG_GFXDECODE(subsino_mtrain)
 
-	MDRV_PALETTE_LENGTH(0x100)
-	MDRV_PALETTE_INIT(subsino_3proms)
+	MCFG_PALETTE_LENGTH(0x100)
+	MCFG_PALETTE_INIT(subsino_3proms)
 
-	MDRV_VIDEO_START(mtrain)
-	MDRV_VIDEO_UPDATE(mtrain)
+	MCFG_VIDEO_START(mtrain)
+	MCFG_VIDEO_UPDATE(mtrain)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM3812, XTAL_3_579545MHz)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_3_579545MHz)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_OKIM6295_ADD("oki", XTAL_4_433619MHz / 4, OKIM6295_PIN7_HIGH)	/* Clock frequency & pin 7 not verified */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_OKIM6295_ADD("oki", XTAL_4_433619MHz / 4, OKIM6295_PIN7_HIGH)	/* Clock frequency & pin 7 not verified */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -3328,7 +3328,7 @@ ROM_END
 
 static DRIVER_INIT( smoto16 )
 {
-	UINT8 *rom = memory_region( machine, "maincpu" );
+	UINT8 *rom = machine->region( "maincpu" )->base();
 	rom[0x12d0] = 0x20;	// "ERROR 951010"
 }
 
@@ -3564,7 +3564,7 @@ static void subsino_decrypt(running_machine* machine, void (*bitswaps)(UINT8* de
 {
 	int i;
 	UINT8 *decrypt = auto_alloc_array(machine, UINT8, 0x10000);
-	UINT8* region = memory_region(machine,"maincpu");
+	UINT8* region = machine->region("maincpu")->base();
 
 	for (i=0;i<0x10000;i++)
 	{
@@ -3611,13 +3611,13 @@ static DRIVER_INIT( sharkpye )
 
 static DRIVER_INIT( smoto20 )
 {
-	UINT8 *rom = memory_region( machine, "maincpu" );
+	UINT8 *rom = machine->region( "maincpu" )->base();
 	rom[0x12e1] = 0x20;	// "ERROR 951010"
 }
 
 static DRIVER_INIT( tisub )
 {
-	UINT8 *rom = memory_region( machine, "maincpu" );
+	UINT8 *rom = machine->region( "maincpu" )->base();
 
 	DRIVER_INIT_CALL(victor5);
 
@@ -3632,7 +3632,7 @@ static DRIVER_INIT( tisub )
 
 static DRIVER_INIT( tisuba )
 {
-	UINT8 *rom = memory_region( machine, "maincpu" );
+	UINT8 *rom = machine->region( "maincpu" )->base();
 
 	DRIVER_INIT_CALL(victor5);
 
@@ -3647,7 +3647,7 @@ static DRIVER_INIT( tisuba )
 
 static DRIVER_INIT( stisub )
 {
-	UINT8 *rom = memory_region( machine, "maincpu" );
+	UINT8 *rom = machine->region( "maincpu" )->base();
 	rom[0x1005] = 0x1d; //patch protection check
 	rom[0x7ab] = 0x18; //patch "winning protection" check
 	rom[0x957] = 0x18; //patch "losing protection" check

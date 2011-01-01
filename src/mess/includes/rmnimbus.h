@@ -304,7 +304,7 @@ WRITE8_HANDLER( nimbus_disk_w );
 
 #define SCSIBUS_TAG             "scsibus"
 
-void nimbus_scsi_linechange(running_device *device, UINT8 line, UINT8 state);
+void nimbus_scsi_linechange(device_t *device, UINT8 line, UINT8 state);
 
 /* Masks for writes to port 0x400 */
 #define FDC_DRIVE0_MASK 0x01
@@ -396,7 +396,7 @@ WRITE8_HANDLER( nimbus_sound_ay8910_portb_w );
 
 #define MSM5205_TAG             "msm5205"
 
-void nimbus_msm5205_vck(running_device *device);
+void nimbus_msm5205_vck(device_t *device);
 
 /* Mouse / Joystick */
 

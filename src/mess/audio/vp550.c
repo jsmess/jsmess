@@ -53,7 +53,7 @@ struct _vp550_t
 	int channels;						/* number of channels */
 
 	/* devices */
-	running_device *cdp1863[MAX_CHANNELS];
+	device_t *cdp1863[MAX_CHANNELS];
 	timer_device *sync_timer;
 };
 
@@ -61,7 +61,7 @@ struct _vp550_t
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE vp550_t *get_safe_token(running_device *device)
+INLINE vp550_t *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert((device->type() == VP550) || (device->type() == VP551));
@@ -158,7 +158,7 @@ static WRITE8_DEVICE_HANDLER( vp550_sync_w )
     or uninstall write handlers
 -------------------------------------------------*/
 
-void vp550_install_write_handlers(running_device *device, address_space *program, int enabled)
+void vp550_install_write_handlers(device_t *device, address_space *program, int enabled)
 {
 	vp550_t *vp550 = get_safe_token(device);
 
@@ -187,7 +187,7 @@ void vp550_install_write_handlers(running_device *device, address_space *program
     or uninstall write handlers
 -------------------------------------------------*/
 
-void vp551_install_write_handlers(running_device *device, address_space *program, int enabled)
+void vp551_install_write_handlers(device_t *device, address_space *program, int enabled)
 {
 }
 
@@ -207,13 +207,13 @@ static TIMER_DEVICE_CALLBACK( sync_tick )
 -------------------------------------------------*/
 
 static MACHINE_CONFIG_FRAGMENT( vp550 )
-	MDRV_TIMER_ADD_PERIODIC("sync", sync_tick, HZ(50))
+	MCFG_TIMER_ADD_PERIODIC("sync", sync_tick, HZ(50))
 
-	MDRV_CDP1863_ADD(CDP1863_A_TAG, 0, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_CDP1863_ADD(CDP1863_A_TAG, 0, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MDRV_CDP1863_ADD(CDP1863_B_TAG, 0, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_CDP1863_ADD(CDP1863_B_TAG, 0, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------
@@ -221,13 +221,13 @@ MACHINE_CONFIG_END
 -------------------------------------------------*/
 
 static MACHINE_CONFIG_FRAGMENT( vp551 )
-	MDRV_FRAGMENT_ADD(vp550)
+	MCFG_FRAGMENT_ADD(vp550)
 
-	MDRV_CDP1863_ADD(CDP1863_C_TAG, 0, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_CDP1863_ADD(CDP1863_C_TAG, 0, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MDRV_CDP1863_ADD(CDP1863_D_TAG, 0, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_CDP1863_ADD(CDP1863_D_TAG, 0, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------

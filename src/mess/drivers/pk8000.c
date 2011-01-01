@@ -29,14 +29,14 @@ public:
 
 
 
-static running_device *cassette_device_image(running_machine *machine)
+static device_t *cassette_device_image(running_machine *machine)
 {
 	return machine->device("cassette");
 }
 
 static void pk8000_set_bank(running_machine *machine,UINT8 data)
 {
-	UINT8 *rom = memory_region(machine, "maincpu");
+	UINT8 *rom = machine->region("maincpu")->base();
 	UINT8 block1 = data & 3;
 	UINT8 block2 = (data >> 2) & 3;
 	UINT8 block3 = (data >> 4) & 3;
@@ -338,41 +338,41 @@ static const cassette_config pk8000_cassette_config =
 
 static MACHINE_CONFIG_START( pk8000, pk8000_state )
     /* basic machine hardware */
-    MDRV_CPU_ADD("maincpu",I8080, 1780000)
-    MDRV_CPU_PROGRAM_MAP(pk8000_mem)
-    MDRV_CPU_IO_MAP(pk8000_io)
-    MDRV_CPU_VBLANK_INT("screen", pk8000_interrupt)
+    MCFG_CPU_ADD("maincpu",I8080, 1780000)
+    MCFG_CPU_PROGRAM_MAP(pk8000_mem)
+    MCFG_CPU_IO_MAP(pk8000_io)
+    MCFG_CPU_VBLANK_INT("screen", pk8000_interrupt)
 
-    MDRV_MACHINE_RESET(pk8000)
+    MCFG_MACHINE_RESET(pk8000)
 
     /* video hardware */
-    MDRV_SCREEN_ADD("screen", RASTER)
-    MDRV_SCREEN_REFRESH_RATE(50)
-    MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-    MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-    MDRV_SCREEN_SIZE(256+32, 192+32)
-    MDRV_SCREEN_VISIBLE_AREA(0, 256+32-1, 0, 192+32-1)
-    MDRV_PALETTE_LENGTH(16)
-    MDRV_PALETTE_INIT(pk8000)
+    MCFG_SCREEN_ADD("screen", RASTER)
+    MCFG_SCREEN_REFRESH_RATE(50)
+    MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+    MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+    MCFG_SCREEN_SIZE(256+32, 192+32)
+    MCFG_SCREEN_VISIBLE_AREA(0, 256+32-1, 0, 192+32-1)
+    MCFG_PALETTE_LENGTH(16)
+    MCFG_PALETTE_INIT(pk8000)
 
-    MDRV_VIDEO_START(pk8000)
-    MDRV_VIDEO_UPDATE(pk8000)
+    MCFG_VIDEO_START(pk8000)
+    MCFG_VIDEO_UPDATE(pk8000)
 
-    MDRV_I8255A_ADD( "ppi8255_1", pk8000_ppi8255_interface_1 )
-    MDRV_I8255A_ADD( "ppi8255_2", pk8000_ppi8255_interface_2 )
+    MCFG_I8255A_ADD( "ppi8255_1", pk8000_ppi8255_interface_1 )
+    MCFG_I8255A_ADD( "ppi8255_2", pk8000_ppi8255_interface_2 )
 
     /* audio hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MDRV_SOUND_WAVE_ADD("wave", "cassette")
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_WAVE_ADD("wave", "cassette")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-    MDRV_CASSETTE_ADD( "cassette", pk8000_cassette_config )
+    MCFG_CASSETTE_ADD( "cassette", pk8000_cassette_config )
 
 	/* internal ram */
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("64K")
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("64K")
 MACHINE_CONFIG_END
 
 /* ROM definition */

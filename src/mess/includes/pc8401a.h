@@ -39,10 +39,10 @@ public:
 	UINT8 *video_ram;		/* LCD video RAM */
 	UINT8 *crt_ram;			/* CRT video RAM */
 
-	running_device *upd1990a;
-	running_device *sed1330;
-	running_device *mc6845;
-	running_device *lcd;
+	device_t *upd1990a;
+	device_t *sed1330;
+	device_t *mc6845;
+	device_t *lcd;
 	UINT8 key_latch;
 };
 

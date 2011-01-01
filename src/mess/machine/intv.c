@@ -16,7 +16,7 @@ WRITE16_HANDLER ( intvkbd_dualport16_w )
 	COMBINE_DATA(&state->intvkbd_dualport_ram[offset]);
 
 	/* copy the LSB over to the 6502 OP RAM, in case they are opcodes */
-	RAM	 = memory_region(space->machine, "keyboard");
+	RAM	 = space->machine->region("keyboard")->base();
 	RAM[offset] = (UINT8) (data >> 0);
 }
 
@@ -35,7 +35,7 @@ WRITE8_HANDLER ( intvkbd_dualport8_lsb_w )
 	state->intvkbd_dualport_ram[offset] |= ((UINT16) data) << 0;
 
 	/* copy over to the 6502 OP RAM, in case they are opcodes */
-	RAM	 = memory_region(space->machine, "keyboard");
+	RAM	 = space->machine->region("keyboard")->base();
 	RAM[offset] = data;
 }
 
@@ -331,7 +331,7 @@ static int intv_load_rom_file(device_image_interface &image)
 	UINT8 high_byte;
 	UINT8 low_byte;
 
-	UINT8 *memory = memory_region(image.device().machine, "maincpu");
+	UINT8 *memory = image.device().machine->region("maincpu")->base();
 	const char *filetype = image.filetype();
 
 	/* if it is in .rom format, we enter here */
@@ -554,7 +554,7 @@ DEVICE_IMAGE_LOAD( intvkbd_cart )
 	{
 		/* First, initialize these as empty so that the intellivision
          * will think that the playcable is not attached */
-		UINT8 *memory = memory_region(image.device().machine, "maincpu");
+		UINT8 *memory = image.device().machine->region("maincpu")->base();
 
 		/* assume playcable is absent */
 		memory[0x4800 << 1] = 0xff;
@@ -565,7 +565,7 @@ DEVICE_IMAGE_LOAD( intvkbd_cart )
 
 	if (strcmp(image.device().tag(),"cart2") == 0) /* Keyboard component cartridge slot */
 	{
-		UINT8 *memory = memory_region(image.device().machine, "keyboard");
+		UINT8 *memory = image.device().machine->region("keyboard")->base();
 
 		/* Assume an 8K cart, like BASIC */
 		image.fread( &memory[0xe000], 0x2000);

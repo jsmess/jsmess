@@ -81,7 +81,7 @@ public:
 	UINT8    prot_addr;
 
 	/* devices */
-	running_device *audiocpu;
+	device_t *audiocpu;
 };
 
 
@@ -509,42 +509,42 @@ static PALETTE_INIT( ddayjlc )
 static MACHINE_CONFIG_START( ddayjlc, ddayjlc_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80,12000000/3)
-	MDRV_CPU_PROGRAM_MAP(main_cpu)
-	MDRV_CPU_VBLANK_INT("screen", ddayjlc_interrupt)
+	MCFG_CPU_ADD("maincpu", Z80,12000000/3)
+	MCFG_CPU_PROGRAM_MAP(main_cpu)
+	MCFG_CPU_VBLANK_INT("screen", ddayjlc_interrupt)
 
-	MDRV_CPU_ADD("audiocpu", Z80, 12000000/4)
-	MDRV_CPU_PROGRAM_MAP(sound_cpu)
-	MDRV_CPU_VBLANK_INT("screen", ddayjlc_snd_interrupt)
+	MCFG_CPU_ADD("audiocpu", Z80, 12000000/4)
+	MCFG_CPU_PROGRAM_MAP(sound_cpu)
+	MCFG_CPU_VBLANK_INT("screen", ddayjlc_snd_interrupt)
 
-	MDRV_QUANTUM_TIME(HZ(6000))
+	MCFG_QUANTUM_TIME(HZ(6000))
 
-	MDRV_MACHINE_START(ddayjlc)
-	MDRV_MACHINE_RESET(ddayjlc)
+	MCFG_MACHINE_START(ddayjlc)
+	MCFG_MACHINE_RESET(ddayjlc)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(ddayjlc)
-	MDRV_PALETTE_LENGTH(0x200)
-	MDRV_PALETTE_INIT(ddayjlc)
+	MCFG_GFXDECODE(ddayjlc)
+	MCFG_PALETTE_LENGTH(0x200)
+	MCFG_PALETTE_INIT(ddayjlc)
 
-	MDRV_VIDEO_START(ddayjlc)
-	MDRV_VIDEO_UPDATE(ddayjlc)
+	MCFG_VIDEO_START(ddayjlc)
+	MCFG_VIDEO_UPDATE(ddayjlc)
 
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay1", AY8910, 12000000/6)
-	MDRV_SOUND_CONFIG(ay8910_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("ay1", AY8910, 12000000/6)
+	MCFG_SOUND_CONFIG(ay8910_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD("ay2", AY8910, 12000000/6)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("ay2", AY8910, 12000000/6)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -671,8 +671,8 @@ static DRIVER_INIT( ddayjlc )
 		UINT8 *src, *dst, *temp;
 		temp = auto_alloc_array(machine, UINT8, 0x10000);
 		src = temp;
-		dst = memory_region(machine, "gfx1");
-		length = memory_region_length(machine, "gfx1");
+		dst = machine->region("gfx1")->base();
+		length = machine->region("gfx1")->bytes();
 		memcpy(src, dst, length);
 		newadr = 0;
 		oldaddr = 0;
@@ -686,7 +686,7 @@ static DRIVER_INIT( ddayjlc )
 		auto_free(machine, temp);
 	}
 
-	memory_configure_bank(machine, "bank1", 0, 3, memory_region(machine, "user1"), 0x4000);
+	memory_configure_bank(machine, "bank1", 0, 3, machine->region("user1")->base(), 0x4000);
 	memory_set_bank(machine, "bank1", 0);
 }
 

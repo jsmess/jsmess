@@ -17,9 +17,9 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MDRV_RIOT6532_ADD(_tag, _clock, _intrf) \
-    MDRV_DEVICE_ADD(_tag, RIOT6532, _clock) \
-    MDRV_DEVICE_CONFIG(_intrf)
+#define MCFG_RIOT6532_ADD(_tag, _clock, _intrf) \
+    MCFG_DEVICE_ADD(_tag, RIOT6532, _clock) \
+    MCFG_DEVICE_CONFIG(_intrf)
 
 
 
@@ -144,13 +144,13 @@ extern const device_type RIOT6532;
 READ8_DEVICE_HANDLER( riot6532_r );
 WRITE8_DEVICE_HANDLER( riot6532_w );
 
-void riot6532_porta_in_set(running_device *device, UINT8 data, UINT8 mask);
-void riot6532_portb_in_set(running_device *device, UINT8 data, UINT8 mask);
+void riot6532_porta_in_set(device_t *device, UINT8 data, UINT8 mask);
+void riot6532_portb_in_set(device_t *device, UINT8 data, UINT8 mask);
 
-UINT8 riot6532_porta_in_get(running_device *device);
-UINT8 riot6532_portb_in_get(running_device *device);
+UINT8 riot6532_porta_in_get(device_t *device);
+UINT8 riot6532_portb_in_get(device_t *device);
 
-UINT8 riot6532_porta_out_get(running_device *device);
-UINT8 riot6532_portb_out_get(running_device *device);
+UINT8 riot6532_porta_out_get(device_t *device);
+UINT8 riot6532_portb_out_get(device_t *device);
 
 #endif

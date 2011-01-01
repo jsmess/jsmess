@@ -160,8 +160,8 @@ static void bankswitch(running_machine *machine)
 	trs80m2_state *state = machine->driver_data<trs80m2_state>();
 
 	address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
-	running_device *messram = machine->device("messram");
-	UINT8 *rom = memory_region(machine, Z80_TAG);
+	device_t *messram = machine->device("messram");
+	UINT8 *rom = machine->region(Z80_TAG)->base();
 	UINT8 *ram = messram_get_ptr(messram);
 	int last_page = (messram_get_size(messram) / 0x8000) - 1;
 
@@ -733,7 +733,7 @@ static VIDEO_START( trs80m2 )
 	state->mc6845 = machine->device(MC6845_TAG);
 
 	/* find memory regions */
-	state->char_rom = memory_region(machine, MC6845_TAG);
+	state->char_rom = machine->region(MC6845_TAG)->base();
 }
 
 static VIDEO_UPDATE( trs80m2 )
@@ -1007,64 +1007,64 @@ static MACHINE_RESET( trs80m2 )
 static MACHINE_CONFIG_START( trs80m2, trs80m2_state )
 
 	/* basic machine hardware */
-    MDRV_CPU_ADD(Z80_TAG, Z80, XTAL_8MHz/2)
-	MDRV_CPU_CONFIG(trs80m2_daisy_chain)
-    MDRV_CPU_PROGRAM_MAP(z80_mem)
-    MDRV_CPU_IO_MAP(z80_io)
+    MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_8MHz/2)
+	MCFG_CPU_CONFIG(trs80m2_daisy_chain)
+    MCFG_CPU_PROGRAM_MAP(z80_mem)
+    MCFG_CPU_IO_MAP(z80_io)
 
-//  MDRV_CPU_ADD(I8021_TAG, I8021, 100000)
-//  MDRV_CPU_IO_MAP(trs80m2_keyboard_io)
+//  MCFG_CPU_ADD(I8021_TAG, I8021, 100000)
+//  MCFG_CPU_IO_MAP(trs80m2_keyboard_io)
 
-    MDRV_MACHINE_START(trs80m2)
-    MDRV_MACHINE_RESET(trs80m2)
+    MCFG_MACHINE_START(trs80m2)
+    MCFG_MACHINE_RESET(trs80m2)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD(SCREEN_TAG, RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(640, 480)
-	MDRV_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
+	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(640, 480)
+	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
 
-	MDRV_PALETTE_LENGTH(2)
-	MDRV_PALETTE_INIT(black_and_white)
+	MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_INIT(black_and_white)
 
-	MDRV_VIDEO_START(trs80m2)
-	MDRV_VIDEO_UPDATE(trs80m2)
+	MCFG_VIDEO_START(trs80m2)
+	MCFG_VIDEO_UPDATE(trs80m2)
 
-	MDRV_MC6845_ADD(MC6845_TAG, MC6845, XTAL_12_48MHz/8, mc6845_intf)
+	MCFG_MC6845_ADD(MC6845_TAG, MC6845, XTAL_12_48MHz/8, mc6845_intf)
 
 	/* devices */
-	MDRV_WD179X_ADD(FD1791_TAG, fd1791_intf)
-	MDRV_Z80CTC_ADD(Z80CTC_TAG, XTAL_8MHz/2, ctc_intf)
-	MDRV_TIMER_ADD_PERIODIC("ctc", ctc_tick, HZ(XTAL_8MHz/2/2))
-	MDRV_Z80DMA_ADD(Z80DMA_TAG, XTAL_8MHz/2, dma_intf)
-	MDRV_Z80PIO_ADD(Z80PIO_TAG, XTAL_8MHz/2, pio_intf)
-	MDRV_Z80SIO0_ADD(Z80SIO_TAG, XTAL_8MHz/2, sio_intf)
-	MDRV_CENTRONICS_ADD(CENTRONICS_TAG, centronics_intf)
-	MDRV_FLOPPY_DRIVE_ADD(FLOPPY_0, trs80m2_floppy_config)
+	MCFG_WD179X_ADD(FD1791_TAG, fd1791_intf)
+	MCFG_Z80CTC_ADD(Z80CTC_TAG, XTAL_8MHz/2, ctc_intf)
+	MCFG_TIMER_ADD_PERIODIC("ctc", ctc_tick, HZ(XTAL_8MHz/2/2))
+	MCFG_Z80DMA_ADD(Z80DMA_TAG, XTAL_8MHz/2, dma_intf)
+	MCFG_Z80PIO_ADD(Z80PIO_TAG, XTAL_8MHz/2, pio_intf)
+	MCFG_Z80SIO0_ADD(Z80SIO_TAG, XTAL_8MHz/2, sio_intf)
+	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_intf)
+	MCFG_FLOPPY_DRIVE_ADD(FLOPPY_0, trs80m2_floppy_config)
 
-	MDRV_TIMER_ADD_PERIODIC("keyboard", trs80m2_keyboard_tick, HZ(60))
+	MCFG_TIMER_ADD_PERIODIC("keyboard", trs80m2_keyboard_tick, HZ(60))
 
 	/* internal RAM */
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("32K")
-	MDRV_RAM_EXTRA_OPTIONS("64K,96K,128K,160K,192K,224K,256K,288K,320K,352K,384K,416K,448K,480K,512K")
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("32K")
+	MCFG_RAM_EXTRA_OPTIONS("64K,96K,128K,160K,192K,224K,256K,288K,320K,352K,384K,416K,448K,480K,512K")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( trs80m16, trs80m2 )
 
 	/* basic machine hardware */
-//  MDRV_CPU_ADD(M68000_TAG, M68000, 6000000)
-//  MDRV_CPU_PROGRAM_MAP(m68000_mem)
+//  MCFG_CPU_ADD(M68000_TAG, M68000, 6000000)
+//  MCFG_CPU_PROGRAM_MAP(m68000_mem)
 
 	/* video hardware */
-	MDRV_PALETTE_INIT(monochrome_green)
+	MCFG_PALETTE_INIT(monochrome_green)
 
 	/* internal RAM */
-	MDRV_RAM_MODIFY("messram")
-	MDRV_RAM_DEFAULT_SIZE("256K")
-	MDRV_RAM_EXTRA_OPTIONS("512K,768K,1M")
+	MCFG_RAM_MODIFY("messram")
+	MCFG_RAM_DEFAULT_SIZE("256K")
+	MCFG_RAM_EXTRA_OPTIONS("512K,768K,1M")
 MACHINE_CONFIG_END
 
 /* ROMs */

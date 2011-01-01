@@ -31,7 +31,7 @@ typedef ti99_pebcard_config ti_rs232_config;
 
 typedef struct _ti_rs232_state
 {
-	running_device *uart0, *uart1, *serdev0, *serdev1, *piodev;
+	device_t *uart0, *uart1, *serdev0, *serdev1, *piodev;
 
 	int 	selected;
 
@@ -64,7 +64,7 @@ typedef struct _ti_rs232_state
 
 } ti_rs232_state;
 
-INLINE ti_rs232_state *get_safe_token(running_device *device)
+INLINE ti_rs232_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	return (ti_rs232_state *)downcast<legacy_device_base *>(device)->token();
@@ -86,7 +86,7 @@ static DEVICE_START( ti99_piodev )
     <name><number>, i.e. the number is the longest string from the right
     which can be interpreted as a number.
 */
-static int get_index_from_tagname(running_device *image)
+static int get_index_from_tagname(device_t *image)
 {
 	const char *tag = image->tag();
 	int maxlen = strlen(tag);
@@ -102,7 +102,7 @@ static int get_index_from_tagname(running_device *image)
 */
 static DEVICE_IMAGE_LOAD( ti99_rs232_serdev )
 {
-	running_device *tms9902 = NULL;
+	device_t *tms9902 = NULL;
 
 	// TODO: strcmp does not work this way (wrong constant or wrong function)
 	int devnumber = get_index_from_tagname(&image.device());
@@ -139,7 +139,7 @@ static DEVICE_IMAGE_LOAD( ti99_rs232_serdev )
 */
 static DEVICE_IMAGE_LOAD( ti99_piodev )
 {
-	running_device *carddev = image.device().owner();
+	device_t *carddev = image.device().owner();
 	ti_rs232_state *card = get_safe_token(carddev);
 
 	/* tell whether the image is writable */
@@ -160,7 +160,7 @@ static DEVICE_IMAGE_LOAD( ti99_piodev )
 */
 static DEVICE_IMAGE_UNLOAD( ti99_piodev )
 {
-	running_device *carddev = image.device().owner();
+	device_t *carddev = image.device().owner();
 	ti_rs232_state *card = get_safe_token(carddev);
 
 	card->pio_writable = 0;
@@ -364,7 +364,7 @@ static WRITE8_DEVICE_HANDLER( data_w )
 */
 static TMS9902_INT_CALLBACK( int_callback_0 )
 {
-	running_device *carddev = device->owner();
+	device_t *carddev = device->owner();
 	ti_rs232_state *card = get_safe_token(carddev);
 	if (INT)
 		card->ila |= SENILA_0_BIT;
@@ -376,7 +376,7 @@ static TMS9902_INT_CALLBACK( int_callback_0 )
 
 static TMS9902_INT_CALLBACK( int_callback_1 )
 {
-	running_device *carddev = device->owner();
+	device_t *carddev = device->owner();
 	ti_rs232_state *card = get_safe_token(carddev);
 	if (INT)
 		card->ila |= SENILA_1_BIT;
@@ -504,7 +504,7 @@ static DEVICE_START( ti_rs232 )
 
 	astring *region = new astring();
 	astring_assemble_3(region, device->tag(), ":", ser_region);
-	card->rom = memory_region(device->machine, astring_c(region));
+	card->rom = device->machine->region(astring_c(region))->base();
 	devcb_resolve_write_line(&card->lines.inta, &topeb->inta, device);
 	// READY and INTB are not used
 	card->uart0 = device->subdevice("tms9902_0");
@@ -522,7 +522,7 @@ static DEVICE_RESET( ti_rs232 )
 {
 	ti_rs232_state *card = (ti_rs232_state*)downcast<legacy_device_base *>(device)->token();
 	/* Register the card */
-	running_device *peb = device->owner();
+	device_t *peb = device->owner();
 
 	if (input_port_read(device->machine, "SERIAL")==SERIAL_TI)
 	{
@@ -541,11 +541,11 @@ static DEVICE_RESET( ti_rs232 )
 }
 
 static MACHINE_CONFIG_FRAGMENT( ti_rs232 )
-	MDRV_TMS9902_ADD("tms9902_0", tms9902_params_0)
-	MDRV_TMS9902_ADD("tms9902_1", tms9902_params_1)
-	MDRV_DEVICE_ADD("serdev0", TI99_RS232, 0)
-	MDRV_DEVICE_ADD("serdev1", TI99_RS232, 0)
-	MDRV_DEVICE_ADD("piodev", TI99_PIO, 0)
+	MCFG_TMS9902_ADD("tms9902_0", tms9902_params_0)
+	MCFG_TMS9902_ADD("tms9902_1", tms9902_params_1)
+	MCFG_DEVICE_ADD("serdev0", TI99_RS232, 0)
+	MCFG_DEVICE_ADD("serdev1", TI99_RS232, 0)
+	MCFG_DEVICE_ADD("piodev", TI99_PIO, 0)
 MACHINE_CONFIG_END
 
 ROM_START( ti_rs232 )

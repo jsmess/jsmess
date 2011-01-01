@@ -171,7 +171,7 @@ static void towns_init_serial_rom(running_machine* machine)
 	towns_state* state = machine->driver_data<towns_state>();
 	int x;
 	static const UINT8 code[8] = { 0x04,0x65,0x54,0xA4,0x95,0x45,0x35,0x5F };
-	UINT8* srom = memory_region(machine,"serial");
+	UINT8* srom = machine->region("serial")->base();
 
 	memset(state->towns_serial_rom,0,256/8);
 
@@ -321,7 +321,7 @@ static WRITE8_HANDLER(towns_sys6c_w)
 static READ8_HANDLER(towns_dma1_r)
 {
 	towns_state* state = space->machine->driver_data<towns_state>();
-	running_device* dev = state->dma_1;
+	device_t* dev = state->dma_1;
 
 //	logerror("DMA#1: read register %i\n",offset);
 	return upd71071_r(dev,offset);
@@ -330,7 +330,7 @@ static READ8_HANDLER(towns_dma1_r)
 static WRITE8_HANDLER(towns_dma1_w)
 {
 	towns_state* state = space->machine->driver_data<towns_state>();
-	running_device* dev = state->dma_1;
+	device_t* dev = state->dma_1;
 
 //	logerror("DMA#1: wrote 0x%02x to register %i\n",data,offset);
 	upd71071_w(dev,offset,data);
@@ -339,7 +339,7 @@ static WRITE8_HANDLER(towns_dma1_w)
 static READ8_HANDLER(towns_dma2_r)
 {
 	towns_state* state = space->machine->driver_data<towns_state>();
-	running_device* dev = state->dma_2;
+	device_t* dev = state->dma_2;
 
 	logerror("DMA#2: read register %i\n",offset);
 	return upd71071_r(dev,offset);
@@ -348,7 +348,7 @@ static READ8_HANDLER(towns_dma2_r)
 static WRITE8_HANDLER(towns_dma2_w)
 {
 	towns_state* state = space->machine->driver_data<towns_state>();
-	running_device* dev = state->dma_2;
+	device_t* dev = state->dma_2;
 
 	logerror("DMA#2: wrote 0x%02x to register %i\n",data,offset);
 	upd71071_w(dev,offset,data);
@@ -377,7 +377,7 @@ static WRITE_LINE_DEVICE_HANDLER( towns_mb8877a_drq_w )
 static READ8_HANDLER(towns_floppy_r)
 {
 	towns_state* state = space->machine->driver_data<towns_state>();
-	running_device* fdc = state->fdc;
+	device_t* fdc = state->fdc;
 	device_image_interface* image;
 	UINT8 ret;
 
@@ -427,7 +427,7 @@ static READ8_HANDLER(towns_floppy_r)
 static WRITE8_HANDLER(towns_floppy_w)
 {
 	towns_state* state = space->machine->driver_data<towns_state>();
-	running_device* fdc = state->fdc;
+	device_t* fdc = state->fdc;
 
 	switch(offset)
 	{
@@ -494,14 +494,14 @@ static WRITE8_HANDLER(towns_floppy_w)
 static UINT16 towns_fdc_dma_r(running_machine* machine)
 {
 	towns_state* state = machine->driver_data<towns_state>();
-	running_device* fdc = state->fdc;
+	device_t* fdc = state->fdc;
 	return wd17xx_data_r(fdc,0);
 }
 
 static void towns_fdc_dma_w(running_machine* machine, UINT16 data)
 {
 	towns_state* state = machine->driver_data<towns_state>();
-	running_device* fdc = state->fdc;
+	device_t* fdc = state->fdc;
 	wd17xx_data_w(fdc,0,data);
 }
 
@@ -524,7 +524,7 @@ static void towns_fdc_dma_w(running_machine* machine, UINT16 data)
 static void towns_kb_sendcode(running_machine* machine, UINT8 scancode, int release)
 {
 	towns_state* state = machine->driver_data<towns_state>();
-	running_device* dev = state->pic_master;
+	device_t* dev = state->pic_master;
 
 	switch(release)
 	{
@@ -665,7 +665,7 @@ static READ8_HANDLER(towns_port60_r)
 static WRITE8_HANDLER(towns_port60_w)
 {
 	towns_state* state = space->machine->driver_data<towns_state>();
-	running_device* dev = state->pic_master;
+	device_t* dev = state->pic_master;
 
 	if(data & 0x80)
 	{
@@ -1026,7 +1026,7 @@ void towns_update_video_banks(address_space* space)
 
 	if(state->towns_mainmem_enable != 0)  // first MB is RAM
 	{
-		ROM = memory_region(space->machine,"user");
+		ROM = space->machine->region("user")->base();
 
 //      memory_set_bankptr(space->machine,1,messram_get_ptr(state->messram)+0xc0000);
 //      memory_set_bankptr(space->machine,2,messram_get_ptr(state->messram)+0xc8000);
@@ -1045,7 +1045,7 @@ void towns_update_video_banks(address_space* space)
 	}
 	else  // enable I/O ports and VRAM
 	{
-		ROM = memory_region(space->machine,"user");
+		ROM = space->machine->region("user")->base();
 
 //      memory_set_bankptr(space->machine,1,towns_gfxvram+(towns_vram_rplane*0x8000));
 //      memory_set_bankptr(space->machine,2,towns_txtvram);
@@ -1222,8 +1222,8 @@ static void towns_cd_set_status(running_machine* machine, UINT8 st0, UINT8 st1, 
 static UINT8 towns_cd_get_track(running_machine* machine)
 {
 	towns_state* state = machine->driver_data<towns_state>();
-	running_device* cdrom = state->cdrom;
-	running_device* cdda = state->cdda;
+	device_t* cdrom = state->cdrom;
+	device_t* cdda = state->cdda;
 	UINT32 lba = cdda_get_audio_lba(cdda);
 	UINT8 track;
 
@@ -1237,7 +1237,7 @@ static UINT8 towns_cd_get_track(running_machine* machine)
 
 static TIMER_CALLBACK( towns_cdrom_read_byte )
 {
-	running_device* device = (running_device* )ptr;
+	device_t* device = (device_t* )ptr;
 	towns_state* state = machine->driver_data<towns_state>();
 	int masked;
 	// TODO: support software transfers, for now DMA is assumed.
@@ -1286,7 +1286,7 @@ static TIMER_CALLBACK( towns_cdrom_read_byte )
 	}
 }
 
-static void towns_cdrom_read(running_device* device)
+static void towns_cdrom_read(device_t* device)
 {
 	// MODE 1 read
 	// load data into buffer to be sent via DMA1 channel 3
@@ -1346,7 +1346,7 @@ static void towns_cdrom_read(running_device* device)
 	}
 }
 
-static void towns_cdrom_play_cdda(running_device* device)
+static void towns_cdrom_play_cdda(device_t* device)
 {
 	// PLAY AUDIO
 	// Plays CD-DA audio from the specified MSF
@@ -1355,7 +1355,7 @@ static void towns_cdrom_play_cdda(running_device* device)
 	//          3 bytes: ending MSF of audio to play (can span multiple tracks)
 	towns_state* state = device->machine->driver_data<towns_state>();
 	UINT32 lba1,lba2;
-	running_device* cdda = state->cdda;
+	device_t* cdda = state->cdda;
 
 	lba1 = state->towns_cd.parameter[7] << 16;
 	lba1 += state->towns_cd.parameter[6] << 8;
@@ -1378,10 +1378,10 @@ static void towns_cdrom_play_cdda(running_device* device)
 
 static TIMER_CALLBACK(towns_delay_cdda)
 {
-	towns_cdrom_play_cdda((running_device*)ptr);
+	towns_cdrom_play_cdda((device_t*)ptr);
 }
 
-static void towns_cdrom_execute_command(running_device* device)
+static void towns_cdrom_execute_command(device_t* device)
 {
 	towns_state* state = device->machine->driver_data<towns_state>();
 
@@ -1868,8 +1868,8 @@ static READ8_HANDLER(towns_41ff_r)
 static IRQ_CALLBACK( towns_irq_callback )
 {
 	towns_state* state = device->machine->driver_data<towns_state>();
-	running_device* pic1 = state->pic_master;
-	running_device* pic2 = state->pic_slave;
+	device_t* pic1 = state->pic_master;
+	device_t* pic2 = state->pic_slave;
 	int r;
 
 	r = pic8259_acknowledge(pic2);
@@ -1882,10 +1882,10 @@ static IRQ_CALLBACK( towns_irq_callback )
 }
 
 // YM3438 interrupt (IRQ 13)
-static void towns_fm_irq(running_device* device, int irq)
+static void towns_fm_irq(device_t* device, int irq)
 {
 	towns_state* state = device->machine->driver_data<towns_state>();
-	running_device* pic = state->pic_slave;
+	device_t* pic = state->pic_slave;
 	if(irq)
 	{
 		state->towns_fm_irq_flag = 1;
@@ -1901,10 +1901,10 @@ static void towns_fm_irq(running_device* device, int irq)
 }
 
 // PCM interrupt (IRQ 13)
-static void towns_pcm_irq(running_device* device, int channel)
+static void towns_pcm_irq(device_t* device, int channel)
 {
 	towns_state* state = device->machine->driver_data<towns_state>();
-	running_device* pic = state->pic_slave;
+	device_t* pic = state->pic_slave;
 
 	if(state->towns_pcm_channel_mask & (1 << channel))
 	{
@@ -1924,7 +1924,7 @@ static WRITE_LINE_DEVICE_HANDLER( towns_pic_irq )
 static WRITE_LINE_DEVICE_HANDLER( towns_pit_out0_changed )
 {
 	towns_state* tstate = device->machine->driver_data<towns_state>();
-	running_device* dev = tstate->pic_master;
+	device_t* dev = tstate->pic_master;
 
 	if(tstate->towns_timer_mask & 0x01)
 	{
@@ -1936,7 +1936,7 @@ static WRITE_LINE_DEVICE_HANDLER( towns_pit_out0_changed )
 static WRITE_LINE_DEVICE_HANDLER( towns_pit_out1_changed )
 {
 	towns_state* tstate = device->machine->driver_data<towns_state>();
-//  running_device* dev = tstate->pic_master;
+//  device_t* dev = tstate->pic_master;
 
 	if(tstate->towns_timer_mask & 0x02)
 	{
@@ -2454,71 +2454,71 @@ GFXDECODE_END
 static MACHINE_CONFIG_START( towns, towns_state )
 
 	/* basic machine hardware */
-    MDRV_CPU_ADD("maincpu",I386, 16000000)
-    MDRV_CPU_PROGRAM_MAP(towns_mem)
-    MDRV_CPU_IO_MAP(towns_io)
-	MDRV_CPU_VBLANK_INT("screen", towns_vsync_irq)
+    MCFG_CPU_ADD("maincpu",I386, 16000000)
+    MCFG_CPU_PROGRAM_MAP(towns_mem)
+    MCFG_CPU_IO_MAP(towns_io)
+	MCFG_CPU_VBLANK_INT("screen", towns_vsync_irq)
 
-    MDRV_MACHINE_RESET(towns)
+    MCFG_MACHINE_RESET(towns)
 
     /* video hardware */
-    MDRV_SCREEN_ADD("screen", RASTER)
-    MDRV_SCREEN_REFRESH_RATE(60)
-    MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+    MCFG_SCREEN_ADD("screen", RASTER)
+    MCFG_SCREEN_REFRESH_RATE(60)
+    MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 
-    MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-    MDRV_SCREEN_SIZE(768,512)
-    MDRV_SCREEN_VISIBLE_AREA(0, 768-1, 0, 512-1)
-    MDRV_GFXDECODE(towns)
+    MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+    MCFG_SCREEN_SIZE(768,512)
+    MCFG_SCREEN_VISIBLE_AREA(0, 768-1, 0, 512-1)
+    MCFG_GFXDECODE(towns)
 
     /* sound hardware */
-    MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("fm", YM3438, 53693100 / 7) // actual clock speed unknown
-	MDRV_SOUND_CONFIG(ym3438_intf)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MDRV_SOUND_ADD("pcm", RF5C68, 53693100 / 7)  // actual clock speed unknown
-	MDRV_SOUND_CONFIG(rf5c68_intf)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.50)
-	MDRV_SOUND_ADD("cdda",CDDA,0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+    MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("fm", YM3438, 53693100 / 7) // actual clock speed unknown
+	MCFG_SOUND_CONFIG(ym3438_intf)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("pcm", RF5C68, 53693100 / 7)  // actual clock speed unknown
+	MCFG_SOUND_CONFIG(rf5c68_intf)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.50)
+	MCFG_SOUND_ADD("cdda",CDDA,0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-    MDRV_PIT8253_ADD("pit",towns_pit8253_config)
+    MCFG_PIT8253_ADD("pit",towns_pit8253_config)
 
-	MDRV_PIC8259_ADD( "pic8259_master", towns_pic8259_master_config )
+	MCFG_PIC8259_ADD( "pic8259_master", towns_pic8259_master_config )
 
-	MDRV_PIC8259_ADD( "pic8259_slave", towns_pic8259_slave_config )
+	MCFG_PIC8259_ADD( "pic8259_slave", towns_pic8259_slave_config )
 
-	MDRV_MB8877_ADD("fdc",towns_mb8877a_interface)
-	MDRV_FLOPPY_4_DRIVES_ADD(towns_floppy_config)
+	MCFG_MB8877_ADD("fdc",towns_mb8877a_interface)
+	MCFG_FLOPPY_4_DRIVES_ADD(towns_floppy_config)
 
-	MDRV_CDROM_ADD("cdrom")
+	MCFG_CDROM_ADD("cdrom")
 
-	MDRV_HARDDISK_ADD("harddisk0")
-	MDRV_HARDDISK_ADD("harddisk1")
-	MDRV_HARDDISK_ADD("harddisk2")
-	MDRV_HARDDISK_ADD("harddisk3")
-	MDRV_HARDDISK_ADD("harddisk4")
-	MDRV_FMSCSI_ADD("scsi",towns_scsi_config)
+	MCFG_HARDDISK_ADD("harddisk0")
+	MCFG_HARDDISK_ADD("harddisk1")
+	MCFG_HARDDISK_ADD("harddisk2")
+	MCFG_HARDDISK_ADD("harddisk3")
+	MCFG_HARDDISK_ADD("harddisk4")
+	MCFG_FMSCSI_ADD("scsi",towns_scsi_config)
 
-	MDRV_UPD71071_ADD("dma_1",towns_dma_config)
-	MDRV_UPD71071_ADD("dma_2",towns_dma_config)
+	MCFG_UPD71071_ADD("dma_1",towns_dma_config)
+	MCFG_UPD71071_ADD("dma_2",towns_dma_config)
 
-	MDRV_NVRAM_ADD_0FILL("nvram")
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
-    MDRV_VIDEO_START(towns)
-    MDRV_VIDEO_UPDATE(towns)
+    MCFG_VIDEO_START(towns)
+    MCFG_VIDEO_UPDATE(towns)
 
 	/* internal ram */
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("6M")
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("6M")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( marty, towns )
 
-	MDRV_CPU_REPLACE("maincpu",I386, 16000000)
-	MDRV_CPU_PROGRAM_MAP(marty_mem)
-	MDRV_CPU_IO_MAP(towns_io)
-	MDRV_CPU_VBLANK_INT("screen", towns_vsync_irq)
+	MCFG_CPU_REPLACE("maincpu",I386, 16000000)
+	MCFG_CPU_PROGRAM_MAP(marty_mem)
+	MCFG_CPU_IO_MAP(towns_io)
+	MCFG_CPU_VBLANK_INT("screen", towns_vsync_irq)
 MACHINE_CONFIG_END
 
 /* ROM definitions */

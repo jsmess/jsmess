@@ -18,7 +18,7 @@ VIDEO_START( homelab )
 VIDEO_UPDATE( homelab )
 {
 	int x,y,j,b;
-	UINT8 *gfx = memory_region(screen->machine, "gfx1");
+	UINT8 *gfx = screen->machine->region("gfx1")->base();
 	address_space *space = cputag_get_address_space(screen->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	for(y = 0; y < 25; y++ )
@@ -41,7 +41,7 @@ VIDEO_UPDATE( homelab )
 VIDEO_UPDATE( homelab3 )
 {
 	int x,y,j,b;
-	UINT8 *gfx = memory_region(screen->machine, "gfx1");
+	UINT8 *gfx = screen->machine->region("gfx1")->base();
 	address_space *space = cputag_get_address_space(screen->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	for(y = 0; y < 25; y++ )

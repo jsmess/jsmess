@@ -85,24 +85,24 @@ struct _mc6847_config
 
 DECLARE_LEGACY_DEVICE(MC6847, mc6847);
 
-#define MDRV_MC6847_ADD(_tag, _interface) \
-	MDRV_DEVICE_ADD(_tag, MC6847, 0) \
-	MDRV_DEVICE_CONFIG(_interface)
+#define MCFG_MC6847_ADD(_tag, _interface) \
+	MCFG_DEVICE_ADD(_tag, MC6847, 0) \
+	MCFG_DEVICE_CONFIG(_interface)
 
-#define MDRV_MC6847_TYPE(_type) \
-	MDRV_DEVICE_CONFIG_DATA32(mc6847_config, type, _type)
+#define MCFG_MC6847_TYPE(_type) \
+	MCFG_DEVICE_CONFIG_DATA32(mc6847_config, type, _type)
 
-#define MDRV_MC6847_CHAR_ROM(_get_char_rom) \
-	MDRV_DEVICE_CONFIG_DATAPTR(mc6847_config, get_char_rom, _get_char_rom)
+#define MCFG_MC6847_CHAR_ROM(_get_char_rom) \
+	MCFG_DEVICE_CONFIG_DATAPTR(mc6847_config, get_char_rom, _get_char_rom)
 
-#define MDRV_MC6847_FRAME_CALLBACK(_new_frame_callback) \
-	MDRV_DEVICE_CONFIG_DATAPTR(mc6847_config, new_frame_callback, _new_frame_callback)
+#define MCFG_MC6847_FRAME_CALLBACK(_new_frame_callback) \
+	MCFG_DEVICE_CONFIG_DATAPTR(mc6847_config, new_frame_callback, _new_frame_callback)
 
-#define MDRV_MC6847_PREPARE_SCANLINE(_prepare_scanline) \
-	MDRV_DEVICE_CONFIG_DATAPTR(mc6847_config, custom_prepare_scanline, _prepare_scanline)
+#define MCFG_MC6847_PREPARE_SCANLINE(_prepare_scanline) \
+	MCFG_DEVICE_CONFIG_DATAPTR(mc6847_config, custom_prepare_scanline, _prepare_scanline)
 
-#define MDRV_MC6847_PALETTE(_palette) \
-	MDRV_DEVICE_CONFIG_DATAPTR(mc6847_config, custom_palette, _palette)
+#define MCFG_MC6847_PALETTE(_palette) \
+	MCFG_DEVICE_CONFIG_DATAPTR(mc6847_config, custom_palette, _palette)
 
 
 /***************************************************************************
@@ -126,9 +126,9 @@ READ_LINE_DEVICE_HANDLER( mc6847_hs_r );
 
 
 /* video update proc */
-UINT32 mc6847_update(running_device *device, bitmap_t *bitmap, const rectangle *cliprect);
+UINT32 mc6847_update(device_t *device, bitmap_t *bitmap, const rectangle *cliprect);
 
-void mc6847_set_palette(running_device *device, UINT32 *palette);
+void mc6847_set_palette(device_t *device, UINT32 *palette);
 
 void m6847_video_changed(void);
 

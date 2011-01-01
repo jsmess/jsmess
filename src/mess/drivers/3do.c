@@ -135,11 +135,11 @@ static MACHINE_RESET( 3do )
 
 	state->maincpu = downcast<legacy_cpu_device*>( machine->device("maincpu") );
 
-	memory_set_bankptr(machine, "bank2",memory_region(machine, "user1"));
+	memory_set_bankptr(machine, "bank2",machine->region("user1")->base());
 
 	/* configure overlay */
 	memory_configure_bank(machine, "bank1", 0, 1, state->dram, 0);
-	memory_configure_bank(machine, "bank1", 1, 1, memory_region(machine, "user1"), 0);
+	memory_configure_bank(machine, "bank1", 1, 1, machine->region("user1")->base(), 0);
 
 	/* start with overlay enabled */
 	memory_set_bank(machine, "bank1", 1);
@@ -153,42 +153,42 @@ static MACHINE_RESET( 3do )
 static MACHINE_CONFIG_START( 3do, _3do_state )
 
 	/* Basic machine hardware */
-	MDRV_CPU_ADD( "maincpu", ARM7_BE, XTAL_50MHz/4 )
-	MDRV_CPU_PROGRAM_MAP( 3do_mem)
+	MCFG_CPU_ADD( "maincpu", ARM7_BE, XTAL_50MHz/4 )
+	MCFG_CPU_PROGRAM_MAP( 3do_mem)
 
-	MDRV_MACHINE_RESET( 3do )
+	MCFG_MACHINE_RESET( 3do )
 
-//  MDRV_VIDEO_START( generic_bitmapped )
-//  MDRV_VIDEO_UPDATE( generic_bitmapped )
-	MDRV_VIDEO_START( _3do )
-	MDRV_VIDEO_UPDATE( _3do )
+//  MCFG_VIDEO_START( generic_bitmapped )
+//  MCFG_VIDEO_UPDATE( generic_bitmapped )
+	MCFG_VIDEO_START( _3do )
+	MCFG_VIDEO_UPDATE( _3do )
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_FORMAT( BITMAP_FORMAT_RGB32 )
-	MDRV_SCREEN_RAW_PARAMS( X2_CLOCK_NTSC / 2, 1592, 254, 1534, 263, 22, 262 )
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_FORMAT( BITMAP_FORMAT_RGB32 )
+	MCFG_SCREEN_RAW_PARAMS( X2_CLOCK_NTSC / 2, 1592, 254, 1534, 263, 22, 262 )
 
-	MDRV_CDROM_ADD( "cdrom" )
+	MCFG_CDROM_ADD( "cdrom" )
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_START( 3do_pal, _3do_state )
 
 	/* Basic machine hardware */
-	MDRV_CPU_ADD("maincpu", ARM7_BE, XTAL_50MHz/4 )
-	MDRV_CPU_PROGRAM_MAP( 3do_mem)
+	MCFG_CPU_ADD("maincpu", ARM7_BE, XTAL_50MHz/4 )
+	MCFG_CPU_PROGRAM_MAP( 3do_mem)
 
-	MDRV_MACHINE_RESET( 3do )
+	MCFG_MACHINE_RESET( 3do )
 
-	MDRV_VIDEO_START( generic_bitmapped )
-	MDRV_VIDEO_UPDATE( generic_bitmapped )
+	MCFG_VIDEO_START( generic_bitmapped )
+	MCFG_VIDEO_UPDATE( generic_bitmapped )
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_FORMAT( BITMAP_FORMAT_RGB32 )
-	MDRV_SCREEN_SIZE( 640, 625 )
-	MDRV_SCREEN_VISIBLE_AREA( 0, 639, 0, 479 )
-	MDRV_SCREEN_REFRESH_RATE( 50 )
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_FORMAT( BITMAP_FORMAT_RGB32 )
+	MCFG_SCREEN_SIZE( 640, 625 )
+	MCFG_SCREEN_VISIBLE_AREA( 0, 639, 0, 479 )
+	MCFG_SCREEN_REFRESH_RATE( 50 )
 
-	MDRV_CDROM_ADD( "cdrom" )
+	MCFG_CDROM_ADD( "cdrom" )
 MACHINE_CONFIG_END
 
 

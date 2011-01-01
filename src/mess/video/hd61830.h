@@ -27,9 +27,9 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MDRV_HD61830_ADD(_tag, _clock, _config) \
-	MDRV_DEVICE_ADD(_tag, HD61830, _clock) \
-	MDRV_DEVICE_CONFIG(_config)
+#define MCFG_HD61830_ADD(_tag, _clock, _config) \
+	MCFG_DEVICE_ADD(_tag, HD61830, _clock) \
+	MCFG_DEVICE_CONFIG(_config)
 
 
 #define HD61830_INTERFACE(name) \

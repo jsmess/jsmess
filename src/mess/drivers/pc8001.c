@@ -312,7 +312,7 @@ static VIDEO_START( pc8001 )
 	pc8001_state *state = machine->driver_data<pc8001_state>();
 
 	/* find memory regions */
-	state->char_rom = memory_region(machine, "chargen");
+	state->char_rom = machine->region("chargen")->base();
 }
 
 static VIDEO_UPDATE( pc8001 )
@@ -435,7 +435,7 @@ static MACHINE_START( pc8001 )
 {
 	pc8001_state *state = machine->driver_data<pc8001_state>();
 	address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
-	running_device *messram = machine->device("messram");
+	device_t *messram = machine->device("messram");
 
 	/* look up devices */
 	state->i8257 = machine->device(I8257_TAG);
@@ -453,7 +453,7 @@ static MACHINE_START( pc8001 )
 	i8257_ready_w(state->i8257, 1);
 
 	/* setup memory banking */
-	memory_configure_bank(machine, "bank1", 1, 1, memory_region(machine, "n80"), 0);
+	memory_configure_bank(machine, "bank1", 1, 1, machine->region("n80")->base(), 0);
 	memory_install_read_bank(program, 0x0000, 0x5fff, 0, 0, "bank1");
 	memory_unmap_write(program, 0x0000, 0x5fff, 0, 0);
 
@@ -510,54 +510,54 @@ static const cassette_config pc8001_cassette_config =
 static MACHINE_CONFIG_START( pc8001, pc8001_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80_TAG, Z80, 4000000)
-	MDRV_CPU_PROGRAM_MAP(pc8001_mem)
-	MDRV_CPU_IO_MAP(pc8001_io)
-	MDRV_MACHINE_START(pc8001)
+	MCFG_CPU_ADD(Z80_TAG, Z80, 4000000)
+	MCFG_CPU_PROGRAM_MAP(pc8001_mem)
+	MCFG_CPU_IO_MAP(pc8001_io)
+	MCFG_MACHINE_START(pc8001)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD(SCREEN_TAG, RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(640, 220)
-	MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
+	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(640, 220)
+	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
 
-	MDRV_PALETTE_LENGTH(8)
-	MDRV_PALETTE_INIT(pc8001)
+	MCFG_PALETTE_LENGTH(8)
+	MCFG_PALETTE_INIT(pc8001)
 
-	MDRV_VIDEO_START(pc8001)
-	MDRV_VIDEO_UPDATE(pc8001)
+	MCFG_VIDEO_START(pc8001)
+	MCFG_VIDEO_UPDATE(pc8001)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* devices */
-	MDRV_MSM8251_ADD(I8251_TAG, pc8001_8251_intf)
-	MDRV_I8255A_ADD(I8255A_TAG, pc8001_8255_intf)
-	MDRV_I8257_ADD(I8257_TAG, 4000000, pc8001_8257_intf)
-	MDRV_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, pc8001_upd1990a_intf)
-	MDRV_UPD3301_ADD(UPD3301_TAG, 14318180, pc8001_upd3301_intf)
+	MCFG_MSM8251_ADD(I8251_TAG, pc8001_8251_intf)
+	MCFG_I8255A_ADD(I8255A_TAG, pc8001_8255_intf)
+	MCFG_I8257_ADD(I8257_TAG, 4000000, pc8001_8257_intf)
+	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, pc8001_upd1990a_intf)
+	MCFG_UPD3301_ADD(UPD3301_TAG, 14318180, pc8001_upd3301_intf)
 
-	MDRV_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
-	MDRV_CASSETTE_ADD(CASSETTE_TAG, pc8001_cassette_config)
+	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
+	MCFG_CASSETTE_ADD(CASSETTE_TAG, pc8001_cassette_config)
 
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("16K")
-	MDRV_RAM_EXTRA_OPTIONS("32K,64K")
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("16K")
+	MCFG_RAM_EXTRA_OPTIONS("32K,64K")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( pc8001mk2, pc8001 )
 
-	MDRV_CPU_MODIFY(Z80_TAG)
-	MDRV_CPU_PROGRAM_MAP(pc8001mk2_mem)
-	MDRV_CPU_IO_MAP(pc8001mk2_io)
-	MDRV_MACHINE_START(pc8001mk2)
+	MCFG_CPU_MODIFY(Z80_TAG)
+	MCFG_CPU_PROGRAM_MAP(pc8001mk2_mem)
+	MCFG_CPU_IO_MAP(pc8001mk2_io)
+	MCFG_MACHINE_START(pc8001mk2)
 
-	MDRV_RAM_MODIFY("messram")
-	MDRV_RAM_DEFAULT_SIZE("64K")
+	MCFG_RAM_MODIFY("messram")
+	MCFG_RAM_DEFAULT_SIZE("64K")
 MACHINE_CONFIG_END
 
 /* ROMs */

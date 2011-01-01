@@ -258,7 +258,7 @@ PALETTE_INIT( berlwall )
 VIDEO_START( berlwall )
 {
 	int sx, x,y;
-	UINT8 *RAM	=	memory_region(machine, "gfx3");
+	UINT8 *RAM	=	machine->region("gfx3")->base();
 
 	/* Render the hi-color static backgrounds held in the ROMs */
 
@@ -1121,7 +1121,7 @@ VIDEO_UPDATE( galsnew )
 
 VIDEO_UPDATE( sandscrp )
 {
-	running_device *pandora = screen->machine->device("pandora");
+	device_t *pandora = screen->machine->device("pandora");
 	kaneko16_fill_bitmap(screen->machine,bitmap,cliprect);
 
 	// if the display is disabled, do nothing?

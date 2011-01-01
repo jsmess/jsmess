@@ -1122,7 +1122,7 @@ void v1050_state::machine_start()
 
 	memory_configure_bank(machine, "bank1", 0, 2, ram, 0x10000);
 	memory_configure_bank(machine, "bank1", 2, 1, ram + 0x1c000, 0);
-	memory_configure_bank(machine, "bank1", 3, 1, memory_region(machine, Z80_TAG), 0);
+	memory_configure_bank(machine, "bank1", 3, 1, machine->region(Z80_TAG)->base(), 0);
 
 	memory_install_readwrite_bank(program, 0x2000, 0x3fff, 0, 0, "bank2");
 	memory_configure_bank(machine, "bank2", 0, 2, ram + 0x2000, 0x10000);
@@ -1166,51 +1166,51 @@ void v1050_state::machine_reset()
 
 static MACHINE_CONFIG_START( v1050, v1050_state )
 	/* basic machine hardware */
-    MDRV_CPU_ADD(Z80_TAG, Z80, XTAL_16MHz/4)
-    MDRV_CPU_PROGRAM_MAP(v1050_mem)
-    MDRV_CPU_IO_MAP(v1050_io)
-	MDRV_QUANTUM_PERFECT_CPU(Z80_TAG)
+    MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_16MHz/4)
+    MCFG_CPU_PROGRAM_MAP(v1050_mem)
+    MCFG_CPU_IO_MAP(v1050_io)
+	MCFG_QUANTUM_PERFECT_CPU(Z80_TAG)
 
-    MDRV_CPU_ADD(M6502_TAG, M6502, XTAL_15_36MHz/16)
-    MDRV_CPU_PROGRAM_MAP(v1050_crt_mem)
-	MDRV_QUANTUM_PERFECT_CPU(M6502_TAG)
+    MCFG_CPU_ADD(M6502_TAG, M6502, XTAL_15_36MHz/16)
+    MCFG_CPU_PROGRAM_MAP(v1050_crt_mem)
+	MCFG_QUANTUM_PERFECT_CPU(M6502_TAG)
 
-	MDRV_CPU_ADD(I8049_TAG, I8049, XTAL_4_608MHz)
-	MDRV_CPU_IO_MAP(v1050_kbd_io)
-	MDRV_DEVICE_DISABLE()
+	MCFG_CPU_ADD(I8049_TAG, I8049, XTAL_4_608MHz)
+	MCFG_CPU_IO_MAP(v1050_kbd_io)
+	MCFG_DEVICE_DISABLE()
 
 	/* keyboard HACK */
-	MDRV_TIMER_ADD_PERIODIC("keyboard", v1050_keyboard_tick, HZ(60))
+	MCFG_TIMER_ADD_PERIODIC("keyboard", v1050_keyboard_tick, HZ(60))
 
     /* video hardware */
-	MDRV_FRAGMENT_ADD(v1050_video)
+	MCFG_FRAGMENT_ADD(v1050_video)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-    MDRV_SOUND_ADD(DISCRETE_TAG, DISCRETE, 0)
-    MDRV_SOUND_CONFIG_DISCRETE(v1050)
-    MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+    MCFG_SOUND_ADD(DISCRETE_TAG, DISCRETE, 0)
+    MCFG_SOUND_CONFIG_DISCRETE(v1050)
+    MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* devices */
-	MDRV_I8214_ADD(UPB8214_TAG, XTAL_16MHz/4, pic_intf)
-	MDRV_MSM58321RS_ADD(MSM58321RS_TAG, XTAL_32_768kHz, rtc_intf)
-	MDRV_I8255A_ADD(I8255A_DISP_TAG, disp_ppi_intf)
-	MDRV_I8255A_ADD(I8255A_MISC_TAG, misc_ppi_intf)
-	MDRV_I8255A_ADD(I8255A_RTC_TAG, rtc_ppi_intf)
-	MDRV_I8255A_ADD(I8255A_M6502_TAG, m6502_ppi_intf)
-	MDRV_MSM8251_ADD(I8251A_KB_TAG, /*XTAL_16MHz/8,*/ kb_8251_intf)
-	MDRV_MSM8251_ADD(I8251A_SIO_TAG, /*XTAL_16MHz/8,*/ sio_8251_intf)
-	MDRV_WD1793_ADD(MB8877_TAG, /*XTAL_16MHz/16,*/ fdc_intf )
-	MDRV_FLOPPY_2_DRIVES_ADD(v1050_floppy_config)
-	MDRV_TIMER_ADD_PERIODIC(TIMER_KB_TAG, kb_8251_tick, HZ((double)XTAL_16MHz/4/13/8))
-	MDRV_TIMER_ADD(TIMER_SIO_TAG, sio_8251_tick)
+	MCFG_I8214_ADD(UPB8214_TAG, XTAL_16MHz/4, pic_intf)
+	MCFG_MSM58321RS_ADD(MSM58321RS_TAG, XTAL_32_768kHz, rtc_intf)
+	MCFG_I8255A_ADD(I8255A_DISP_TAG, disp_ppi_intf)
+	MCFG_I8255A_ADD(I8255A_MISC_TAG, misc_ppi_intf)
+	MCFG_I8255A_ADD(I8255A_RTC_TAG, rtc_ppi_intf)
+	MCFG_I8255A_ADD(I8255A_M6502_TAG, m6502_ppi_intf)
+	MCFG_MSM8251_ADD(I8251A_KB_TAG, /*XTAL_16MHz/8,*/ kb_8251_intf)
+	MCFG_MSM8251_ADD(I8251A_SIO_TAG, /*XTAL_16MHz/8,*/ sio_8251_intf)
+	MCFG_WD1793_ADD(MB8877_TAG, /*XTAL_16MHz/16,*/ fdc_intf )
+	MCFG_FLOPPY_2_DRIVES_ADD(v1050_floppy_config)
+	MCFG_TIMER_ADD_PERIODIC(TIMER_KB_TAG, kb_8251_tick, HZ((double)XTAL_16MHz/4/13/8))
+	MCFG_TIMER_ADD(TIMER_SIO_TAG, sio_8251_tick)
 
 	/* printer */
-	MDRV_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
+	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
 
 	/* internal ram */
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("128K")
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("128K")
 MACHINE_CONFIG_END
 
 /* ROMs */

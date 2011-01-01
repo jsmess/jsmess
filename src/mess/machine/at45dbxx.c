@@ -76,7 +76,7 @@ struct _at45dbxx_t
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE at45dbxx_t *get_token(running_device *device)
+INLINE at45dbxx_t *get_token(device_t *device)
 {
 	assert(device != NULL);
 	return (at45dbxx_t *) downcast<legacy_device_base *>(device)->token();
@@ -87,7 +87,7 @@ INLINE at45dbxx_t *get_token(running_device *device)
     IMPLEMENTATION
 ***************************************************************************/
 
-static void common_start(running_device *device, int device_type)
+static void common_start(device_t *device, int device_type)
 {
 	at45dbxx_t *flash = get_token(device);
 
@@ -160,7 +160,7 @@ static DEVICE_RESET( at45dbxx )
 	flash->si_bits = 0;
 }
 
-static UINT8 at45dbxx_read_byte( running_device *device)
+static UINT8 at45dbxx_read_byte( device_t *device)
 {
 	UINT8 data;
 	at45dbxx_t *flash = get_token(device);
@@ -173,7 +173,7 @@ static UINT8 at45dbxx_read_byte( running_device *device)
 	return data;
 }
 
-static void flash_set_io( running_device *device, UINT8* data, UINT32 size, UINT32 pos)
+static void flash_set_io( device_t *device, UINT8* data, UINT32 size, UINT32 pos)
 {
 	at45dbxx_t *flash = get_token(device);
 	flash->io.data = data;
@@ -181,7 +181,7 @@ static void flash_set_io( running_device *device, UINT8* data, UINT32 size, UINT
 	flash->io.pos  = pos;
 }
 
-static UINT32 flash_get_page_addr( running_device *device)
+static UINT32 flash_get_page_addr( device_t *device)
 {
 	at45dbxx_t *flash = get_token(device);
 	switch (flash->devid)
@@ -193,7 +193,7 @@ static UINT32 flash_get_page_addr( running_device *device)
 	}
 }
 
-static UINT32 flash_get_byte_addr( running_device *device)
+static UINT32 flash_get_byte_addr( device_t *device)
 {
 	at45dbxx_t *flash = get_token(device);
 	switch (flash->devid)
@@ -205,7 +205,7 @@ static UINT32 flash_get_byte_addr( running_device *device)
 	}
 }
 
-static void at45dbxx_write_byte(running_device *device,  UINT8 data)
+static void at45dbxx_write_byte(device_t *device,  UINT8 data)
 {
 	at45dbxx_t *flash = get_token(device);
 	// check mode
@@ -306,21 +306,21 @@ static void at45dbxx_write_byte(running_device *device,  UINT8 data)
 	}
 }
 
-int at45dbxx_pin_so( running_device *device)
+int at45dbxx_pin_so( device_t *device)
 {
 	at45dbxx_t *flash = get_token(device);
 	if (flash->pin.cs == 0) return 0;
 	return flash->pin.so;
 }
 
-void at45dbxx_pin_si(running_device *device,  int data)
+void at45dbxx_pin_si(device_t *device,  int data)
 {
 	at45dbxx_t *flash = get_token(device);
 	if (flash->pin.cs == 0) return;
 	flash->pin.si = data;
 }
 
-void at45dbxx_pin_cs(running_device *device,  int data)
+void at45dbxx_pin_cs(device_t *device,  int data)
 {
 	at45dbxx_t *flash = get_token(device);
 	// check if changed
@@ -344,7 +344,7 @@ void at45dbxx_pin_cs(running_device *device,  int data)
 	flash->pin.cs = data;
 }
 
-void at45dbxx_pin_sck(running_device *device,  int data)
+void at45dbxx_pin_sck(device_t *device,  int data)
 {
 	at45dbxx_t *flash = get_token(device);
 	// check if changed
@@ -375,14 +375,14 @@ void at45dbxx_pin_sck(running_device *device,  int data)
 	flash->pin.sck = data;
 }
 
-void at45dbxx_load(running_device *device, mame_file *file)
+void at45dbxx_load(device_t *device, mame_file *file)
 {
 	at45dbxx_t *flash = get_token(device);
 	_logerror( 0, ("at45dbxx_load (%p)\n", file));
 	mame_fread( file, flash->data, flash->size);
 }
 
-void at45dbxx_save(running_device *device, mame_file *file)
+void at45dbxx_save(device_t *device, mame_file *file)
 {
 	at45dbxx_t *flash = get_token(device);
 	_logerror( 0, ("at45dbxx_save (%p)\n", file));

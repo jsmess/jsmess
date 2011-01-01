@@ -157,7 +157,7 @@ static const struct {
     INLINE FUNCTIONS
 *****************************************************************************/
 
-INLINE vdc8563_state *get_safe_token( running_device *device )
+INLINE vdc8563_state *get_safe_token( device_t *device )
 {
 	assert(device != NULL);
 	assert(device->type() == VDC8563);
@@ -165,7 +165,7 @@ INLINE vdc8563_state *get_safe_token( running_device *device )
 	return (vdc8563_state *)downcast<legacy_device_base *>(device)->token();
 }
 
-INLINE const vdc8563_interface *get_interface( running_device *device )
+INLINE const vdc8563_interface *get_interface( device_t *device )
 {
 	assert(device != NULL);
 	assert((device->type() == VDC8563));
@@ -176,7 +176,7 @@ INLINE const vdc8563_interface *get_interface( running_device *device )
     IMPLEMENTATION
 *****************************************************************************/
 
-static void vdc_videoram_w( running_device *device, int offset, int data )
+static void vdc_videoram_w( device_t *device, int offset, int data )
 {
 	vdc8563_state *vdc8563 = get_safe_token(device);
 
@@ -191,13 +191,13 @@ static void vdc_videoram_w( running_device *device, int offset, int data )
 	}
 }
 
-INLINE int vdc_videoram_r( running_device *device, int offset )
+INLINE int vdc_videoram_r( device_t *device, int offset )
 {
 	vdc8563_state *vdc8563 = get_safe_token(device);
 	return vdc8563->ram[offset & vdc8563->mask];
 }
 
-void vdc8563_set_rastering( running_device *device, int on )
+void vdc8563_set_rastering( device_t *device, int on )
 {
 	vdc8563_state *vdc8563 = get_safe_token(device);
 	vdc8563->rastering = on;
@@ -345,7 +345,7 @@ READ8_DEVICE_HANDLER( vdc8563_port_r )
 	return val;
 }
 
-static int vdc8563_clocks_in_frame( running_device *device )
+static int vdc8563_clocks_in_frame( device_t *device )
 {
 	vdc8563_state *vdc8563 = get_safe_token(device);
 	int clocks = CRTC6845_COLUMNS * CRTC6845_LINES;
@@ -360,7 +360,7 @@ static int vdc8563_clocks_in_frame( running_device *device )
 	}
 }
 
-static void vdc8563_time( running_device *device )
+static void vdc8563_time( device_t *device )
 {
 	vdc8563_state *vdc8563 = get_safe_token(device);
 	double newtime, ftime;
@@ -393,7 +393,7 @@ static void vdc8563_time( running_device *device )
 	}
 }
 
-static void vdc8563_monotext_screenrefresh( running_device *device, bitmap_t *bitmap, int full_refresh )
+static void vdc8563_monotext_screenrefresh( device_t *device, bitmap_t *bitmap, int full_refresh )
 {
 	vdc8563_state *vdc8563 = get_safe_token(device);
 	running_machine *machine = device->machine;
@@ -436,7 +436,7 @@ static void vdc8563_monotext_screenrefresh( running_device *device, bitmap_t *bi
 	}
 }
 
-static void vdc8563_text_screenrefresh( running_device *device, bitmap_t *bitmap, int full_refresh )
+static void vdc8563_text_screenrefresh( device_t *device, bitmap_t *bitmap, int full_refresh )
 {
 	vdc8563_state *vdc8563 = get_safe_token(device);
 	running_machine *machine = device->machine;
@@ -500,7 +500,7 @@ static void vdc8563_text_screenrefresh( running_device *device, bitmap_t *bitmap
 	}
 }
 
-static void vdc8563_graphic_screenrefresh( running_device *device, bitmap_t *bitmap, int full_refresh )
+static void vdc8563_graphic_screenrefresh( device_t *device, bitmap_t *bitmap, int full_refresh )
 {
 	vdc8563_state *vdc8563 = get_safe_token(device);
 	running_machine *machine = device->machine;
@@ -536,7 +536,7 @@ static void vdc8563_graphic_screenrefresh( running_device *device, bitmap_t *bit
 	}
 }
 
-UINT32 vdc8563_video_update( running_device *device, bitmap_t *bitmap, const rectangle *cliprect )
+UINT32 vdc8563_video_update( device_t *device, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	vdc8563_state *vdc8563 = get_safe_token(device);
 	int i;

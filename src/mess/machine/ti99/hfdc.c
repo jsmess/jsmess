@@ -45,10 +45,10 @@ typedef struct _ti99_hfdc_state
 	emu_timer			*motor_on_timer;
 
 	/* Link to the HDC9234 controller on the board. */
-	running_device		*controller;
+	device_t		*controller;
 
 	/* Link to the clock chip on the board. */
-	running_device		*clock;
+	device_t		*clock;
 
 	/* Determines whether we have access to the CRU bits. */
 	int 				cru_select;
@@ -66,10 +66,10 @@ typedef struct _ti99_hfdc_state
 	UINT8				output2_latch;
 
 	/* Connected floppy drives. */
-	running_device		*floppy_unit[HFDC_MAX_FLOPPY];
+	device_t		*floppy_unit[HFDC_MAX_FLOPPY];
 
 	/* Connected harddisk drives. */
-	running_device		*harddisk_unit[HFDC_MAX_HARD];
+	device_t		*harddisk_unit[HFDC_MAX_HARD];
 
 	/* DMA address latch */
 	UINT32				dma_address;
@@ -91,7 +91,7 @@ typedef struct _ti99_hfdc_state
 
 } ti99_hfdc_state;
 
-INLINE ti99_hfdc_state *get_safe_token(running_device *device)
+INLINE ti99_hfdc_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	return (ti99_hfdc_state *)downcast<legacy_device_base *>(device)->token();
@@ -102,7 +102,7 @@ INLINE ti99_hfdc_state *get_safe_token(running_device *device)
     the default implementation sets the drive geometry to the geometry
     of the medium.
 */
-static void set_geometry(running_device *drive, floppy_type_t type)
+static void set_geometry(device_t *drive, floppy_type_t type)
 {
 	if (drive!=NULL)
 		floppy_drive_set_geometry(drive, type);
@@ -110,7 +110,7 @@ static void set_geometry(running_device *drive, floppy_type_t type)
 		logerror("ti99/HFDC: Drive not found\n");
 }
 
-static void set_all_geometries(running_device *device, floppy_type_t type)
+static void set_all_geometries(device_t *device, floppy_type_t type)
 {
 	set_geometry(device->siblingdevice(FLOPPY_0), type);
 	set_geometry(device->siblingdevice(FLOPPY_1), type);
@@ -452,7 +452,7 @@ static int line_to_index(UINT8 line, int max)
     (Callback function)
 */
 
-static running_device *current_floppy(running_device *controller)
+static device_t *current_floppy(device_t *controller)
 {
 	int disk_unit = -1;
 	ti99_hfdc_state *card = (ti99_hfdc_state*)downcast<legacy_device_base *>(controller->owner())->token();
@@ -479,7 +479,7 @@ static running_device *current_floppy(running_device *controller)
     so we must implement it here.
 */
 
-static running_device *current_harddisk(running_device *controller)
+static device_t *current_harddisk(device_t *controller)
 {
 	ti99_hfdc_state *card = (ti99_hfdc_state*)downcast<legacy_device_base *>(controller->owner())->token();
 
@@ -497,7 +497,7 @@ static running_device *current_harddisk(running_device *controller)
 static READ_LINE_DEVICE_HANDLER( auxbus_in )
 {
 	ti99_hfdc_state *card = get_safe_token(device->owner());
-	running_device *drive;
+	device_t *drive;
 	UINT8 reply = 0;
 
 	if (card->output1_latch==0)
@@ -541,7 +541,7 @@ static READ_LINE_DEVICE_HANDLER( auxbus_in )
 /*
     Read a byte from buffer in DMA mode
 */
-static UINT8 hfdc_dma_read_callback(running_device *device)
+static UINT8 hfdc_dma_read_callback(device_t *device)
 {
 	ti99_hfdc_state *card = get_safe_token(device->owner());
 	UINT8 value = card->ram[card->dma_address & 0x7fff];
@@ -552,7 +552,7 @@ static UINT8 hfdc_dma_read_callback(running_device *device)
 /*
     Write a byte to buffer in DMA mode
 */
-static void hfdc_dma_write_callback(running_device *device, UINT8 data)
+static void hfdc_dma_write_callback(device_t *device, UINT8 data)
 {
 	ti99_hfdc_state *card = get_safe_token(device->owner());
 	card->ram[card->dma_address & 0x7fff] = data;
@@ -570,44 +570,44 @@ static TIMER_CALLBACK(motor_on_timer_callback)
 /*
     Preliminary MFM harddisk interface.
 */
-static void hfdc_harddisk_get_next_id(running_device *controller, int head, chrn_id_hd *id)
+static void hfdc_harddisk_get_next_id(device_t *controller, int head, chrn_id_hd *id)
 {
-	running_device *harddisk = current_harddisk(controller);
+	device_t *harddisk = current_harddisk(controller);
 	if (harddisk != NULL)
 		ti99_mfm_harddisk_get_next_id(harddisk, head, id);
 }
 
-static void hfdc_harddisk_seek(running_device *controller, int direction)
+static void hfdc_harddisk_seek(device_t *controller, int direction)
 {
-	running_device *harddisk = current_harddisk(controller);
+	device_t *harddisk = current_harddisk(controller);
 	if (harddisk != NULL)
 		ti99_mfm_harddisk_seek(harddisk, direction);
 }
 
-static void hfdc_harddisk_read_sector(running_device *controller, int cylinder, int head, int sector, UINT8 **buf, int *sector_length)
+static void hfdc_harddisk_read_sector(device_t *controller, int cylinder, int head, int sector, UINT8 **buf, int *sector_length)
 {
-	running_device *harddisk = current_harddisk(controller);
+	device_t *harddisk = current_harddisk(controller);
 	if (harddisk != NULL)
 		ti99_mfm_harddisk_read_sector(harddisk, cylinder, head, sector, buf, sector_length);
 }
 
-static void hfdc_harddisk_write_sector(running_device *controller, int cylinder, int head, int sector, UINT8 *buf, int sector_length)
+static void hfdc_harddisk_write_sector(device_t *controller, int cylinder, int head, int sector, UINT8 *buf, int sector_length)
 {
-	running_device *harddisk = current_harddisk(controller);
+	device_t *harddisk = current_harddisk(controller);
 	if (harddisk != NULL)
 		ti99_mfm_harddisk_write_sector(harddisk, cylinder, head, sector, buf, sector_length);
 }
 
-static void hfdc_harddisk_read_track(running_device *controller, int head, UINT8 **buffer, int *data_count)
+static void hfdc_harddisk_read_track(device_t *controller, int head, UINT8 **buffer, int *data_count)
 {
-	running_device *harddisk = current_harddisk(controller);
+	device_t *harddisk = current_harddisk(controller);
 	if (harddisk != NULL)
 		ti99_mfm_harddisk_read_track(harddisk, head, buffer, data_count);
 }
 
-static void hfdc_harddisk_write_track(running_device *controller, int head, UINT8 *buffer, int data_count)
+static void hfdc_harddisk_write_track(device_t *controller, int head, UINT8 *buffer, int data_count)
 {
-	running_device *harddisk = current_harddisk(controller);
+	device_t *harddisk = current_harddisk(controller);
 	if (harddisk != NULL)
 		ti99_mfm_harddisk_write_track(harddisk, head, buffer, data_count);
 }
@@ -659,7 +659,7 @@ static DEVICE_START( ti99_hfdc )
 	card->clock = device->subdevice("mm58274c");
 	astring *region = new astring();
 	astring_assemble_3(region, device->tag(), ":", hfdc_region);
-	card->rom = memory_region(device->machine, astring_c(region));
+	card->rom = device->machine->region(astring_c(region))->base();
 }
 
 static DEVICE_STOP( ti99_hfdc )
@@ -677,7 +677,7 @@ static DEVICE_RESET( ti99_hfdc )
 	/* If the card is selected in the menu, register the card */
 	if (input_port_read(device->machine, "DISKCTRL") == DISK_HFDC)
 	{
-		running_device *peb = device->owner();
+		device_t *peb = device->owner();
 		int success = mount_card(peb, device, &hfdc_card, get_pebcard_config(device)->slot);
 		if (!success) return;
 
@@ -739,8 +739,8 @@ static const mm58274c_interface floppy_mm58274c_interface =
 };
 
 MACHINE_CONFIG_FRAGMENT( ti99_hfdc )
-	MDRV_SMC92X4_ADD("smc92x4", ti99_smc92x4_interface )
-	MDRV_MM58274C_ADD("mm58274c", floppy_mm58274c_interface)
+	MCFG_SMC92X4_ADD("smc92x4", ti99_smc92x4_interface )
+	MCFG_MM58274C_ADD("mm58274c", floppy_mm58274c_interface)
 MACHINE_CONFIG_END
 
 ROM_START( ti99_hfdc )

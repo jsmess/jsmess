@@ -338,8 +338,8 @@ static void draw_sprites(running_machine *machine, UINT32 *sprites, const rectan
 {
 	int i;
 
-	UINT8 *base_gfx	= memory_region(machine, "gfx1");
-	UINT8 *gfx_max	= base_gfx + memory_region_length(machine, "gfx1");
+	UINT8 *base_gfx	= machine->region("gfx1")->base();
+	UINT8 *gfx_max	= base_gfx + machine->region("gfx1")->bytes();
 
 	UINT8 *gfxdata;
 	gfx_element gfx;
@@ -641,60 +641,60 @@ GFXDECODE_END
 
 
 static MACHINE_CONFIG_START( limenko, driver_device )
-	MDRV_CPU_ADD("maincpu", E132XN, 20000000*4)	/* 4x internal multiplier */
-	MDRV_CPU_PROGRAM_MAP(limenko_map)
-	MDRV_CPU_IO_MAP(limenko_io_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_ADD("maincpu", E132XN, 20000000*4)	/* 4x internal multiplier */
+	MCFG_CPU_PROGRAM_MAP(limenko_map)
+	MCFG_CPU_IO_MAP(limenko_io_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_EEPROM_93C46_ADD("eeprom")
+	MCFG_EEPROM_93C46_ADD("eeprom")
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(384, 240)
-	MDRV_SCREEN_VISIBLE_AREA(0, 383, 0, 239)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(384, 240)
+	MCFG_SCREEN_VISIBLE_AREA(0, 383, 0, 239)
 
-	MDRV_GFXDECODE(limenko)
-	MDRV_PALETTE_LENGTH(0x1000)
+	MCFG_GFXDECODE(limenko)
+	MCFG_PALETTE_LENGTH(0x1000)
 
-	MDRV_VIDEO_START(limenko)
-	MDRV_VIDEO_UPDATE(limenko)
+	MCFG_VIDEO_START(limenko)
+	MCFG_VIDEO_UPDATE(limenko)
 
 	/* sound hardware */
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( spotty, driver_device )
-	MDRV_CPU_ADD("maincpu", GMS30C2232, 20000000)	/* 20 MHz, no internal multiplier */
-	MDRV_CPU_PROGRAM_MAP(spotty_map)
-	MDRV_CPU_IO_MAP(spotty_io_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_ADD("maincpu", GMS30C2232, 20000000)	/* 20 MHz, no internal multiplier */
+	MCFG_CPU_PROGRAM_MAP(spotty_map)
+	MCFG_CPU_IO_MAP(spotty_io_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("audiocpu", AT89C4051, 4000000)	/* 4 MHz */
-	MDRV_CPU_IO_MAP(spotty_sound_io_map)
+	MCFG_CPU_ADD("audiocpu", AT89C4051, 4000000)	/* 4 MHz */
+	MCFG_CPU_IO_MAP(spotty_sound_io_map)
 
-	MDRV_EEPROM_93C46_ADD("eeprom")
+	MCFG_EEPROM_93C46_ADD("eeprom")
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(384, 240)
-	MDRV_SCREEN_VISIBLE_AREA(0, 383, 0, 239)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(384, 240)
+	MCFG_SCREEN_VISIBLE_AREA(0, 383, 0, 239)
 
-	MDRV_GFXDECODE(limenko)
-	MDRV_PALETTE_LENGTH(0x1000)
+	MCFG_GFXDECODE(limenko)
+	MCFG_PALETTE_LENGTH(0x1000)
 
-	MDRV_VIDEO_START(limenko)
-	MDRV_VIDEO_UPDATE(limenko)
+	MCFG_VIDEO_START(limenko)
+	MCFG_VIDEO_UPDATE(limenko)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_OKIM6295_ADD("oki", 4000000 / 4 , OKIM6295_PIN7_HIGH) //?
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_OKIM6295_ADD("oki", 4000000 / 4 , OKIM6295_PIN7_HIGH) //?
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -1028,8 +1028,8 @@ static DRIVER_INIT( sb2003 )
 
 static DRIVER_INIT( spotty )
 {
-	UINT8 *dst    = memory_region(machine, "gfx1");
-	UINT8 *src    = memory_region(machine, "user2");
+	UINT8 *dst    = machine->region("gfx1")->base();
+	UINT8 *src    = machine->region("user2")->base();
 	int x;
 
 	/* expand 4bpp roms to 8bpp space */

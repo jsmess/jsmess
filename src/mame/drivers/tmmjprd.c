@@ -264,9 +264,9 @@ static void ttmjprd_draw_tilemap(running_machine *machine, bitmap_t *bitmap, con
 
 static VIDEO_UPDATE( tmmjprd )
 {
-	UINT8* gfxroms = memory_region(screen->machine,"gfx2");
-	running_device *left_screen  = screen->machine->device("lscreen");
-	running_device *right_screen = screen->machine->device("rscreen");
+	UINT8* gfxroms = screen->machine->region("gfx2")->base();
+	device_t *left_screen  = screen->machine->device("lscreen");
+	device_t *right_screen = screen->machine->device("rscreen");
 
 	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
 
@@ -339,7 +339,7 @@ static READ32_HANDLER( tmmjprd_tilemap3_r )
 
 static READ32_HANDLER( randomtmmjprds )
 {
-	return 0x0000;//mame_rand(space->machine);
+	return 0x0000;//space->machine->rand();
 }
 
 
@@ -354,7 +354,7 @@ static TIMER_CALLBACK( tmmjprd_blit_done )
 
 static void tmmjprd_do_blit(running_machine *machine)
 {
-	UINT8 *blt_data = memory_region(machine, "gfx1");
+	UINT8 *blt_data = machine->region("gfx1")->base();
 	int blt_source = (tmmjprd_blitterregs[0]&0x000fffff)>>0;
 	int blt_column = (tmmjprd_blitterregs[1]&0x00ff0000)>>16;
 	int blt_line   = (tmmjprd_blitterregs[1]&0x000000ff);
@@ -715,47 +715,47 @@ static INTERRUPT_GEN( tmmjprd_interrupt )
 }
 
 static MACHINE_CONFIG_START( tmmjprd, driver_device )
-	MDRV_CPU_ADD("maincpu",M68EC020,24000000) /* 24 MHz */
-	MDRV_CPU_PROGRAM_MAP(tmmjprd_map)
-	MDRV_CPU_VBLANK_INT_HACK(tmmjprd_interrupt,2)
-	MDRV_EEPROM_93C46_ADD("eeprom")
+	MCFG_CPU_ADD("maincpu",M68EC020,24000000) /* 24 MHz */
+	MCFG_CPU_PROGRAM_MAP(tmmjprd_map)
+	MCFG_CPU_VBLANK_INT_HACK(tmmjprd_interrupt,2)
+	MCFG_EEPROM_93C46_ADD("eeprom")
 
-	MDRV_GFXDECODE(tmmjprd)
+	MCFG_GFXDECODE(tmmjprd)
 
-//  MDRV_SCREEN_ADD("screen", RASTER)
-//  MDRV_SCREEN_REFRESH_RATE(60)
-//  MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-//  MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-//  MDRV_SCREEN_SIZE(64*16, 64*16)
-//  MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
-	MDRV_PALETTE_LENGTH(0x1000)
-
-
-	MDRV_DEFAULT_LAYOUT(layout_dualhsxs)
-
-	MDRV_SCREEN_ADD("lscreen", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_SIZE(64*16, 64*16)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
-	//MDRV_SCREEN_VISIBLE_AREA(0*8, 64*16-1, 0*8, 64*16-1)
-
-	MDRV_SCREEN_ADD("rscreen", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_SIZE(64*16, 64*16)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
-	//MDRV_SCREEN_VISIBLE_AREA(0*8, 64*16-1, 0*8, 64*16-1)
+//  MCFG_SCREEN_ADD("screen", RASTER)
+//  MCFG_SCREEN_REFRESH_RATE(60)
+//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+//  MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+//  MCFG_SCREEN_SIZE(64*16, 64*16)
+//  MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
+	MCFG_PALETTE_LENGTH(0x1000)
 
 
-	MDRV_VIDEO_START(tmmjprd)
-	MDRV_VIDEO_UPDATE(tmmjprd)
+	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
+
+	MCFG_SCREEN_ADD("lscreen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(64*16, 64*16)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
+	//MCFG_SCREEN_VISIBLE_AREA(0*8, 64*16-1, 0*8, 64*16-1)
+
+	MCFG_SCREEN_ADD("rscreen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(64*16, 64*16)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
+	//MCFG_SCREEN_VISIBLE_AREA(0*8, 64*16-1, 0*8, 64*16-1)
+
+
+	MCFG_VIDEO_START(tmmjprd)
+	MCFG_VIDEO_UPDATE(tmmjprd)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( tmpdoki, tmmjprd )
-	MDRV_DEFAULT_LAYOUT(layout_horizont)
+	MCFG_DEFAULT_LAYOUT(layout_horizont)
 MACHINE_CONFIG_END
 
 

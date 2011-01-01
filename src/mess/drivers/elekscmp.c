@@ -50,13 +50,13 @@ static MACHINE_RESET(elekscmp)
 
 static MACHINE_CONFIG_START( elekscmp, elekscmp_state )
     /* basic machine hardware */
-    MDRV_CPU_ADD("maincpu",INS8060, XTAL_4MHz)
-    MDRV_CPU_PROGRAM_MAP(elekscmp_mem)
+    MCFG_CPU_ADD("maincpu",INS8060, XTAL_4MHz)
+    MCFG_CPU_PROGRAM_MAP(elekscmp_mem)
 
-    MDRV_MACHINE_RESET(elekscmp)
+    MCFG_MACHINE_RESET(elekscmp)
 
     /* video hardware */
-	MDRV_DEFAULT_LAYOUT(layout_elekscmp)
+	MCFG_DEFAULT_LAYOUT(layout_elekscmp)
 
 MACHINE_CONFIG_END
 

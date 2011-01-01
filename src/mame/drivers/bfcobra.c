@@ -385,14 +385,14 @@ INLINE UINT8* blitter_get_addr(running_machine *machine, UINT32 addr)
 	if (addr < 0x10000)
 	{
 		/* Is this region fixed? */
-		return (UINT8*)(memory_region(machine, "user1") + addr);
+		return (UINT8*)(machine->region("user1")->base() + addr);
 	}
 	else if(addr < 0x20000)
 	{
 		addr &= 0xffff;
 		addr += (bank_data[0] & 1) ? 0x10000 : 0;
 
-		return (UINT8*)(memory_region(machine, "user1") + addr + ((bank_data[0] >> 1) * 0x20000));
+		return (UINT8*)(machine->region("user1")->base() + addr + ((bank_data[0] >> 1) * 0x20000));
 	}
 	else if (addr >= 0x20000 && addr < 0x40000)
 	{
@@ -971,7 +971,7 @@ INLINE void z80_bank(running_machine *machine, int num, int data)
 	{
 		UINT32 offset = ((bank_data[0] >> 1) * 0x20000) + ((0x4000 * data) ^ ((bank_data[0] & 1) ? 0 : 0x10000));
 
-		memory_set_bankptr(machine, bank_names[num - 1], memory_region(machine, "user1") + offset);
+		memory_set_bankptr(machine, bank_names[num - 1], machine->region("user1")->base() + offset);
 	}
 	else if (data < 0x10)
 	{
@@ -1109,7 +1109,7 @@ static READ8_HANDLER( fddata_r )
 				}
 
 				fdc.offset = (BPT * fdc.track*2) + (fdc.side ? BPT : 0) + (BPS * (fdc.sector-1)) + fdc.byte_pos++;
-				val = *(memory_region(space->machine, "user2") + fdc.offset);
+				val = *(space->machine->region("user2")->base() + fdc.offset);
 
 				/* Move on to next sector? */
 				if (fdc.byte_pos == 1024)
@@ -1667,7 +1667,7 @@ static DRIVER_INIT( bfcobra )
 	UINT8 *tmp;
 
 	tmp = auto_alloc_array(machine, UINT8, 0x8000);
-	rom = memory_region(machine, "audiocpu") + 0x8000;
+	rom = machine->region("audiocpu")->base() + 0x8000;
 	memcpy(tmp, rom, 0x8000);
 
 	for (i = 0; i < 0x8000; i++)
@@ -1696,7 +1696,7 @@ static DRIVER_INIT( bfcobra )
 	bank_data[3] = 0;
 
 	/* Fixed 16kB ROM region */
-	memory_set_bankptr(machine, "bank4", memory_region(machine, "user1"));
+	memory_set_bankptr(machine, "bank4", machine->region("user1")->base());
 
 	/* TODO: Properly sort out the data ACIA */
 	data_r = 1;
@@ -1731,43 +1731,43 @@ static INTERRUPT_GEN( vblank_gen )
 }
 
 static MACHINE_CONFIG_START( bfcobra, driver_device )
-	MDRV_CPU_ADD("maincpu", Z80, Z80_XTAL)
-	MDRV_CPU_PROGRAM_MAP(z80_prog_map)
-	MDRV_CPU_IO_MAP(z80_io_map)
-	MDRV_CPU_VBLANK_INT("screen", vblank_gen)
+	MCFG_CPU_ADD("maincpu", Z80, Z80_XTAL)
+	MCFG_CPU_PROGRAM_MAP(z80_prog_map)
+	MCFG_CPU_IO_MAP(z80_io_map)
+	MCFG_CPU_VBLANK_INT("screen", vblank_gen)
 
-	MDRV_CPU_ADD("audiocpu", M6809, M6809_XTAL)
-	MDRV_CPU_PROGRAM_MAP(m6809_prog_map)
-	MDRV_CPU_PERIODIC_INT(timer_irq, 1000)
+	MCFG_CPU_ADD("audiocpu", M6809, M6809_XTAL)
+	MCFG_CPU_PROGRAM_MAP(m6809_prog_map)
+	MCFG_CPU_PERIODIC_INT(timer_irq, 1000)
 
-	MDRV_NVRAM_ADD_0FILL("nvram")
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MDRV_MACHINE_RESET(bfcobra)
+	MCFG_MACHINE_RESET(bfcobra)
 
 	/* TODO */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(50)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_SIZE(512, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 512 - 1, 0, 256 - 1)
-	MDRV_PALETTE_LENGTH(256)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_SIZE(512, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 512 - 1, 0, 256 - 1)
+	MCFG_PALETTE_LENGTH(256)
 
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("aysnd", AY8910, M6809_XTAL)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+	MCFG_SOUND_ADD("aysnd", AY8910, M6809_XTAL)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
-	MDRV_SOUND_ADD("upd", UPD7759, UPD7759_STANDARD_CLOCK)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	MCFG_SOUND_ADD("upd", UPD7759, UPD7759_STANDARD_CLOCK)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-	MDRV_VIDEO_START(bfcobra)
-	MDRV_VIDEO_UPDATE(bfcobra)
+	MCFG_VIDEO_START(bfcobra)
+	MCFG_VIDEO_UPDATE(bfcobra)
 
 	/* ACIAs */
-	MDRV_ACIA6850_ADD("acia6850_0", z80_acia_if)
-	MDRV_ACIA6850_ADD("acia6850_1", m6809_acia_if)
-	MDRV_ACIA6850_ADD("acia6850_2", data_acia_if)
+	MCFG_ACIA6850_ADD("acia6850_0", z80_acia_if)
+	MCFG_ACIA6850_ADD("acia6850_1", m6809_acia_if)
+	MCFG_ACIA6850_ADD("acia6850_2", data_acia_if)
 MACHINE_CONFIG_END
 
 /***************************************************************************

@@ -110,10 +110,10 @@ extern const via6522_interface mac_via6522_intf;
 extern const via6522_interface mac_via6522_2_intf;
 extern const via6522_interface mac_via6522_adb_intf;
 
-void mac_scc_irq(running_device *device, int status);
+void mac_scc_irq(device_t *device, int status);
 void mac_scsi_irq(running_machine *machine, int state);
-void mac_asc_irq(running_device *device, int state);
-void mac_fdc_set_enable_lines(running_device *device, int enable_mask);
+void mac_asc_irq(device_t *device, int state);
+void mac_fdc_set_enable_lines(device_t *device, int enable_mask);
 
 MACHINE_START( macscsi );
 MACHINE_START( mac );
@@ -165,11 +165,11 @@ INTERRUPT_GEN( mac_cb264_vbl );
 
 DECLARE_LEGACY_SOUND_DEVICE(MAC_SOUND, mac_sound);
 
-void mac_enable_sound( running_device *device, int on );
-void mac_set_sound_buffer( running_device *device, int buffer );
-void mac_set_volume( running_device *device, int volume );
+void mac_enable_sound( device_t *device, int on );
+void mac_set_sound_buffer( device_t *device, int buffer );
+void mac_set_volume( device_t *device, int volume );
 
-void mac_sh_updatebuffer(running_device *device);
+void mac_sh_updatebuffer(device_t *device);
 
 /* Mac driver data */
 
@@ -189,7 +189,7 @@ public:
 	required_device<via6522_device> m_via1;
 	optional_device<via6522_device> m_via2;
 	optional_device<asc_device> m_asc;
-	required_device<running_device> m_ram;
+	required_device<device_t> m_ram;
 
 	virtual void machine_start();
 	virtual void machine_reset();

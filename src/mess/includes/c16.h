@@ -33,18 +33,18 @@ public:
 
 	/* devices */
 	legacy_cpu_device *maincpu;
-	running_device *ted7360;
-	running_device *serbus;
-	running_device *cassette;
-	running_device *messram;
-	running_device *sid;
+	device_t *ted7360;
+	device_t *serbus;
+	device_t *cassette;
+	device_t *messram;
+	device_t *sid;
 };
 
 
 /*----------- defined in machine/c16.c -----------*/
 
-UINT8 c16_m7501_port_read(running_device *device, UINT8 direction);
-void c16_m7501_port_write(running_device *device, UINT8 direction, UINT8 data);
+UINT8 c16_m7501_port_read(device_t *device, UINT8 direction);
+void c16_m7501_port_write(device_t *device, UINT8 direction, UINT8 data);
 
 extern WRITE8_HANDLER(c16_6551_port_w);
 extern READ8_HANDLER(c16_6551_port_r);

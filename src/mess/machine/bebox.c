@@ -434,14 +434,14 @@ static void bebox_fdc_dma_drq(running_machine *machine, int state)
 }
 
 
-static running_device *bebox_fdc_get_image(running_machine *machine, int floppy_index)
+static device_t *bebox_fdc_get_image(running_machine *machine, int floppy_index)
 {
 	/* the BeBox boot ROM seems to query for floppy #1 when it should be
      * querying for floppy #0 */
 	return floppy_get_device(machine, 0);
 }
 
-static running_device * bebox_get_device(running_machine *machine )
+static device_t * bebox_get_device(running_machine *machine )
 {
 	return machine->device("smc37c78");
 }
@@ -509,7 +509,7 @@ const struct pic8259_interface bebox_pic8259_slave_config =
  *
  *************************************/
 
-static running_device *ide_device(running_machine *machine)
+static device_t *ide_device(running_machine *machine)
 {
 	return machine->device("ide");
 }
@@ -552,7 +552,7 @@ WRITE64_HANDLER( bebox_800003F0_w )
 }
 
 
-void bebox_ide_interrupt(running_device *device, int state)
+void bebox_ide_interrupt(device_t *device, int state)
 {
 	bebox_state *drvstate = device->machine->driver_data<bebox_state>();
 	bebox_set_irq_bit(device->machine, 7, state);
@@ -754,7 +754,7 @@ static WRITE_LINE_DEVICE_HANDLER( bebox_dma8237_out_eop ) {
 	pc_fdc_set_tc_state( device->machine, state );
 }
 
-static void set_dma_channel(running_device *device, int channel, int state)
+static void set_dma_channel(device_t *device, int channel, int state)
 {
 	bebox_state *drvstate = device->machine->driver_data<bebox_state>();
 	if (!state) drvstate->dma_channel = channel;
@@ -982,7 +982,7 @@ static void scsi53c810_dma_callback(running_machine *machine, UINT32 src, UINT32
 }
 
 
-UINT32 scsi53c810_pci_read(running_device *busdevice, running_device *device, int function, int offset, UINT32 mem_mask)
+UINT32 scsi53c810_pci_read(device_t *busdevice, device_t *device, int function, int offset, UINT32 mem_mask)
 {
 	bebox_state *state = device->machine->driver_data<bebox_state>();
 	UINT32 result = 0;
@@ -1008,7 +1008,7 @@ UINT32 scsi53c810_pci_read(running_device *busdevice, running_device *device, in
 }
 
 
-void scsi53c810_pci_write(running_device *busdevice, running_device *device, int function, int offset, UINT32 data, UINT32 mem_mask)
+void scsi53c810_pci_write(device_t *busdevice, device_t *device, int function, int offset, UINT32 data, UINT32 mem_mask)
 {
 	bebox_state *state = device->machine->driver_data<bebox_state>();
 	offs_t addr;
@@ -1093,7 +1093,7 @@ MACHINE_RESET( bebox )
 	cputag_set_input_line(machine, "ppc1", INPUT_LINE_RESET, CLEAR_LINE);
 	cputag_set_input_line(machine, "ppc2", INPUT_LINE_RESET, ASSERT_LINE);
 
-	memcpy(machine->device<fujitsu_29f016a_device>("flash")->space()->get_read_ptr(0),memory_region(machine, "user1"),0x200000);
+	memcpy(machine->device<fujitsu_29f016a_device>("flash")->space()->get_read_ptr(0),machine->region("user1")->base(),0x200000);
 }
 
 static void bebox_exit(running_machine &machine)
@@ -1119,7 +1119,7 @@ DRIVER_INIT( bebox )
 	mpc105_init(machine, 0);
 
 	/* set up boot and flash ROM */
-	memory_set_bankptr(machine, "bank2", memory_region(machine, "user2"));
+	memory_set_bankptr(machine, "bank2", machine->region("user2")->base());
 
 	/* install MESS managed RAM */
 	memory_install_readwrite_bank(space_0, 0, messram_get_size(machine->device("messram")) - 1, 0, 0x02000000, "bank3");

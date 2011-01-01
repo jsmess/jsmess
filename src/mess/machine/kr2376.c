@@ -83,7 +83,7 @@ struct _kr2376_t
 	emu_timer *scan_timer;			/* keyboard scan timer */
 };
 
-INLINE kr2376_t *get_safe_token(running_device *device)
+INLINE kr2376_t *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 
@@ -93,7 +93,7 @@ INLINE kr2376_t *get_safe_token(running_device *device)
 /*-------------------------------------------------
     kr2376_set_input_pin - set an input pin
 -------------------------------------------------*/
-void kr2376_set_input_pin( running_device *device, kr2376_input_pin_t pin, int data )
+void kr2376_set_input_pin( device_t *device, kr2376_input_pin_t pin, int data )
 {
 	kr2376_t *kr2376 = get_safe_token(device);
 
@@ -111,7 +111,7 @@ void kr2376_set_input_pin( running_device *device, kr2376_input_pin_t pin, int d
 /*-------------------------------------------------
     kr2376_get_output_pin - get the status of an output pin
 -------------------------------------------------*/
-int kr2376_get_output_pin( running_device *device, kr2376_output_pin_t pin )
+int kr2376_get_output_pin( device_t *device, kr2376_output_pin_t pin )
 {
 	kr2376_t	*kr2376 = get_safe_token(device);
 
@@ -119,7 +119,7 @@ int kr2376_get_output_pin( running_device *device, kr2376_output_pin_t pin )
 }
 
 
-static void change_output_lines(running_device *device)
+static void change_output_lines(device_t *device)
 {
 	kr2376_t *kr2376 = get_safe_token(device);
 
@@ -138,7 +138,7 @@ static void change_output_lines(running_device *device)
 	}
 }
 
-static void clock_scan_counters(running_device *device)
+static void clock_scan_counters(device_t *device)
 {
 	kr2376_t *kr2376 = get_safe_token(device);
 
@@ -156,7 +156,7 @@ static void clock_scan_counters(running_device *device)
 	}
 }
 
-static void detect_keypress(running_device *device)
+static void detect_keypress(device_t *device)
 {
 	kr2376_t *kr2376= get_safe_token(device);
 
@@ -200,7 +200,7 @@ static void detect_keypress(running_device *device)
 
 static TIMER_CALLBACK( kr2376_scan_tick )
 {
-	running_device *device = (running_device *)ptr;
+	device_t *device = (device_t *)ptr;
 
 	change_output_lines(device);
 	clock_scan_counters(device);

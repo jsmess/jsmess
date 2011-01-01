@@ -177,24 +177,24 @@ static const cassette_config pecom_cassette_config =
 static MACHINE_CONFIG_START( pecom64, pecom_state )
 
     /* basic machine hardware */
-	MDRV_CPU_ADD(CDP1802_TAG, COSMAC, CDP1869_DOT_CLK_PAL/3)
-	MDRV_CPU_PROGRAM_MAP(pecom64_mem)
-	MDRV_CPU_IO_MAP(pecom64_io)
-	MDRV_CPU_CONFIG(pecom64_cdp1802_config)
+	MCFG_CPU_ADD(CDP1802_TAG, COSMAC, CDP1869_DOT_CLK_PAL/3)
+	MCFG_CPU_PROGRAM_MAP(pecom64_mem)
+	MCFG_CPU_IO_MAP(pecom64_io)
+	MCFG_CPU_CONFIG(pecom64_cdp1802_config)
 
-	MDRV_MACHINE_START( pecom )
-	MDRV_MACHINE_RESET( pecom )
+	MCFG_MACHINE_START( pecom )
+	MCFG_MACHINE_RESET( pecom )
 
 	// sound and video hardware
 
-	MDRV_FRAGMENT_ADD(pecom_video)
+	MCFG_FRAGMENT_ADD(pecom_video)
 
-	MDRV_CASSETTE_ADD( "cassette", pecom_cassette_config )
+	MCFG_CASSETTE_ADD( "cassette", pecom_cassette_config )
 
 	/* internal ram */
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("32K")
-	MDRV_RAM_DEFAULT_VALUE(0x00)
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("32K")
+	MCFG_RAM_DEFAULT_VALUE(0x00)
 MACHINE_CONFIG_END
 
 /* ROM definition */

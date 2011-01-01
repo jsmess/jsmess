@@ -20,7 +20,7 @@ struct _teleprinter_state
 /*****************************************************************************
     INLINE FUNCTIONS
 *****************************************************************************/
-INLINE teleprinter_state *get_safe_token(running_device *device)
+INLINE teleprinter_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == GENERIC_TELEPRINTER);
@@ -28,7 +28,7 @@ INLINE teleprinter_state *get_safe_token(running_device *device)
 	return (teleprinter_state *)downcast<legacy_device_base *>(device)->token();
 }
 
-INLINE const teleprinter_interface *get_interface(running_device *device)
+INLINE const teleprinter_interface *get_interface(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == GENERIC_TELEPRINTER);
@@ -171,7 +171,7 @@ static const UINT8 teleprinter_font[128*8] =
   0x2a,0x15,0x2a,0x15,0x2a,0x15,0x2a,0x15
 };
 
-static void teleprinter_scroll_line(running_device *device)
+static void teleprinter_scroll_line(device_t *device)
 {
 	teleprinter_state *term = get_safe_token(device);
 
@@ -179,7 +179,7 @@ static void teleprinter_scroll_line(running_device *device)
 	memset(term->buffer + TELEPRINTER_WIDTH*(TELEPRINTER_HEIGHT-1),0,TELEPRINTER_WIDTH);
 }
 
-static void teleprinter_write_char(running_device *device,UINT8 data) {
+static void teleprinter_write_char(device_t *device,UINT8 data) {
 	teleprinter_state *term = get_safe_token(device);
 
 	term->buffer[(TELEPRINTER_HEIGHT-1)*TELEPRINTER_WIDTH+term->x_pos] = data;
@@ -190,7 +190,7 @@ static void teleprinter_write_char(running_device *device,UINT8 data) {
 	}
 }
 
-static void teleprinter_clear(running_device *device) {
+static void teleprinter_clear(device_t *device) {
 	teleprinter_state *term = get_safe_token(device);
 
 	memset(term->buffer,0,TELEPRINTER_WIDTH*TELEPRINTER_HEIGHT);
@@ -217,7 +217,7 @@ WRITE8_DEVICE_HANDLER ( teleprinter_write )
 /***************************************************************************
     VIDEO HARDWARE
 ***************************************************************************/
-void generic_teleprinter_update(running_device *device, bitmap_t *bitmap, const rectangle *cliprect)
+void generic_teleprinter_update(device_t *device, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	UINT8 code;
 	int y, c, x, b;
@@ -242,7 +242,7 @@ void generic_teleprinter_update(running_device *device, bitmap_t *bitmap, const 
 
 static TIMER_CALLBACK(keyboard_callback)
 {
-	teleprinter_state *term = get_safe_token((running_device *)ptr);
+	teleprinter_state *term = get_safe_token((device_t *)ptr);
 	term->last_code = terminal_keyboard_handler(machine, &term->teleprinter_keyboard_func, term->last_code, &term->scan_line, NULL, NULL);
 }
 
@@ -256,23 +256,23 @@ static VIDEO_START( teleprinter )
 
 static VIDEO_UPDATE(teleprinter )
 {
-	running_device *devconf = screen->machine->device(TELEPRINTER_TAG);
+	device_t *devconf = screen->machine->device(TELEPRINTER_TAG);
 	generic_teleprinter_update( devconf, bitmap, cliprect);
 	return 0;
 }
 
 MACHINE_CONFIG_FRAGMENT( generic_teleprinter )
-	MDRV_SCREEN_ADD(TELEPRINTER_SCREEN_TAG, RASTER)
-    MDRV_SCREEN_REFRESH_RATE(50)
-    MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-    MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(TELEPRINTER_WIDTH*8, TELEPRINTER_HEIGHT*8)
-	MDRV_SCREEN_VISIBLE_AREA(0, TELEPRINTER_WIDTH*8-1, 0, TELEPRINTER_HEIGHT*8-1)
-	MDRV_PALETTE_LENGTH(2)
-    MDRV_PALETTE_INIT(black_and_white)
+	MCFG_SCREEN_ADD(TELEPRINTER_SCREEN_TAG, RASTER)
+    MCFG_SCREEN_REFRESH_RATE(50)
+    MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+    MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(TELEPRINTER_WIDTH*8, TELEPRINTER_HEIGHT*8)
+	MCFG_SCREEN_VISIBLE_AREA(0, TELEPRINTER_WIDTH*8-1, 0, TELEPRINTER_HEIGHT*8-1)
+	MCFG_PALETTE_LENGTH(2)
+    MCFG_PALETTE_INIT(black_and_white)
 
-	MDRV_VIDEO_START(teleprinter)
-	MDRV_VIDEO_UPDATE(teleprinter)
+	MCFG_VIDEO_START(teleprinter)
+	MCFG_VIDEO_UPDATE(teleprinter)
 MACHINE_CONFIG_END
 
 

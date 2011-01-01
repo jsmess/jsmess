@@ -62,7 +62,7 @@ static INT32 first_offset;
 
 static READ32_HANDLER( flash_r )
 {
-	UINT32 *ROM = (UINT32 *)memory_region(space->machine, "user1");
+	UINT32 *ROM = (UINT32 *)space->machine->region("user1")->base();
 
 	if(offset >= (0x2000000 - flash_roms * 0x400000) / 4)
 	{
@@ -99,7 +99,7 @@ static WRITE32_HANDLER( flash_w )
 		if(data == 0xd0d00000)
 		{
 			// point to game settings
-			UINT8 *rom = (UINT8 *)memory_region(space->machine, "user1") + offset*4;
+			UINT8 *rom = (UINT8 *)space->machine->region("user1")->base() + offset*4;
 
 			// erase one block
 			memset(rom, 0xff, 0x10000);
@@ -117,7 +117,7 @@ static WRITE32_HANDLER( flash_w )
 		}
 		else
 		{
-			UINT16 *rom = (UINT16 *)memory_region(space->machine, "user1");
+			UINT16 *rom = (UINT16 *)space->machine->region("user1")->base();
 
 			// write game settings
 
@@ -208,7 +208,7 @@ static NVRAM_HANDLER( flashroms )
 	if (read_or_write)
 	{
 		// point to game settings
-		UINT8 *rom = (UINT8 *)memory_region(machine, "user1") + 0x1c00000 + 0x360000;
+		UINT8 *rom = (UINT8 *)machine->region("user1")->base() + 0x1c00000 + 0x360000;
 		UINT8 tmp[0x40000];
 		int i;
 
@@ -221,7 +221,7 @@ static NVRAM_HANDLER( flashroms )
 	else if (file)
 	{
 		// point to game settings
-		UINT8 *rom = (UINT8 *)memory_region(machine, "user1") + 0x1c00000 + 0x360000;
+		UINT8 *rom = (UINT8 *)machine->region("user1")->base() + 0x1c00000 + 0x360000;
 		UINT8 tmp[0x40000];
 		int i;
 
@@ -304,31 +304,31 @@ static MACHINE_RESET( dgpix )
 
 
 static MACHINE_CONFIG_START( dgpix, driver_device )
-	MDRV_CPU_ADD("maincpu", E132XT, 20000000*4)	/* 4x internal multiplier */
-	MDRV_CPU_PROGRAM_MAP(cpu_map)
-	MDRV_CPU_IO_MAP(io_map)
+	MCFG_CPU_ADD("maincpu", E132XT, 20000000*4)	/* 4x internal multiplier */
+	MCFG_CPU_PROGRAM_MAP(cpu_map)
+	MCFG_CPU_IO_MAP(io_map)
 
 /*
     unknown 16bit sound cpu, embedded inside the KS0164 sound chip
     running at 16.9MHz
 */
 
-	MDRV_MACHINE_RESET(dgpix)
-	MDRV_NVRAM_HANDLER(flashroms)
+	MCFG_MACHINE_RESET(dgpix)
+	MCFG_NVRAM_HANDLER(flashroms)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(512, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(512, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 
-	MDRV_PALETTE_INIT(BBBBB_GGGGG_RRRRR)
-	MDRV_PALETTE_LENGTH(32768)
+	MCFG_PALETTE_INIT(BBBBB_GGGGG_RRRRR)
+	MCFG_PALETTE_LENGTH(32768)
 
-	MDRV_VIDEO_START(dgpix)
-	MDRV_VIDEO_UPDATE(dgpix)
+	MCFG_VIDEO_START(dgpix)
+	MCFG_VIDEO_UPDATE(dgpix)
 
 	/* sound hardware */
 	// KS0164 sound chip
@@ -556,7 +556,7 @@ ROM_END
 
 static DRIVER_INIT( xfiles )
 {
-	UINT8 *rom = (UINT8 *)memory_region(machine, "user1") + 0x1c00000;
+	UINT8 *rom = (UINT8 *)machine->region("user1")->base() + 0x1c00000;
 
 	rom[BYTE4_XOR_BE(0x3aa92e)] = 3;
 	rom[BYTE4_XOR_BE(0x3aa92f)] = 0;
@@ -573,7 +573,7 @@ static DRIVER_INIT( xfiles )
 
 static DRIVER_INIT( kdynastg )
 {
-	UINT8 *rom = (UINT8 *)memory_region(machine, "user1") + 0x1c00000;
+	UINT8 *rom = (UINT8 *)machine->region("user1")->base() + 0x1c00000;
 
 	rom[BYTE4_XOR_BE(0x3aaa10)] = 3; // 129f0 - nopped call
 	rom[BYTE4_XOR_BE(0x3aaa11)] = 0;

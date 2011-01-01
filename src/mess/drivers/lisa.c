@@ -52,14 +52,14 @@ ADDRESS_MAP_END
     DEVICE CONFIG
 ***************************************************************************/
 
-static void lisa2_set_iwm_enable_lines(running_device *device,int enable_mask)
+static void lisa2_set_iwm_enable_lines(device_t *device,int enable_mask)
 {
 	/* E1 & E2 is connected to the Sony SEL line (?) */
 	/*logerror("new sel line state %d\n", (enable_mask) ? 0 : 1);*/
 	sony_set_sel_line(device,(enable_mask) ? 0 : 1);
 }
 
-static void lisa210_set_iwm_enable_lines(running_device *device,int enable_mask)
+static void lisa210_set_iwm_enable_lines(device_t *device,int enable_mask)
 {
 	/* E2 is connected to the Sony enable line (?) */
 	sony_set_enable_lines(device,enable_mask >> 1);
@@ -116,67 +116,67 @@ static const floppy_config lisa_floppy_config =
 /* Lisa1 and Lisa 2 machine */
 static MACHINE_CONFIG_START( lisa, lisa_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 5093760)        /* 20.37504 MHz / 4 */
-	MDRV_CPU_PROGRAM_MAP(lisa_map)
-	MDRV_CPU_VBLANK_INT("screen", lisa_interrupt)
+	MCFG_CPU_ADD("maincpu", M68000, 5093760)        /* 20.37504 MHz / 4 */
+	MCFG_CPU_PROGRAM_MAP(lisa_map)
+	MCFG_CPU_VBLANK_INT("screen", lisa_interrupt)
 
-	MDRV_CPU_ADD("fdccpu", M6502, 2000000)        /* 16.000 MHz / 8 in when DIS asserted, 16.000 MHz / 9 otherwise (?) */
-	MDRV_CPU_PROGRAM_MAP(lisa_fdc_map)
+	MCFG_CPU_ADD("fdccpu", M6502, 2000000)        /* 16.000 MHz / 8 in when DIS asserted, 16.000 MHz / 9 otherwise (?) */
+	MCFG_CPU_PROGRAM_MAP(lisa_fdc_map)
 
-	MDRV_QUANTUM_TIME(HZ(60))
-	MDRV_MACHINE_START( lisa )
-	MDRV_MACHINE_RESET( lisa )
+	MCFG_QUANTUM_TIME(HZ(60))
+	MCFG_MACHINE_START( lisa )
+	MCFG_MACHINE_RESET( lisa )
 
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(880, 380)
-	MDRV_SCREEN_VISIBLE_AREA(0, 720-1, 0, 364-1)
-	MDRV_PALETTE_LENGTH(2)
-	MDRV_PALETTE_INIT(black_and_white)
+	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(880, 380)
+	MCFG_SCREEN_VISIBLE_AREA(0, 720-1, 0, 364-1)
+	MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_INIT(black_and_white)
 
-	MDRV_VIDEO_START(lisa)
-	MDRV_VIDEO_UPDATE(lisa)
+	MCFG_VIDEO_START(lisa)
+	MCFG_VIDEO_UPDATE(lisa)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* nvram */
-	MDRV_NVRAM_HANDLER(lisa)
+	MCFG_NVRAM_HANDLER(lisa)
 
 	/* devices */
-	MDRV_IWM_ADD("fdc", lisa2_fdc_interface)
-	MDRV_FLOPPY_SONY_2_DRIVES_ADD(lisa_floppy_config)
+	MCFG_IWM_ADD("fdc", lisa2_fdc_interface)
+	MCFG_FLOPPY_SONY_2_DRIVES_ADD(lisa_floppy_config)
 
 	/* via */
-	MDRV_VIA6522_ADD("via6522_0", 500000, lisa_via6522_0_intf)
-	MDRV_VIA6522_ADD("via6522_1", 500000, lisa_via6522_1_intf)
+	MCFG_VIA6522_ADD("via6522_0", 500000, lisa_via6522_0_intf)
+	MCFG_VIA6522_ADD("via6522_1", 500000, lisa_via6522_1_intf)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( lisa210, lisa )
-	MDRV_CPU_MODIFY( "fdccpu" )
-	MDRV_CPU_PROGRAM_MAP(lisa210_fdc_map)
+	MCFG_CPU_MODIFY( "fdccpu" )
+	MCFG_CPU_PROGRAM_MAP(lisa210_fdc_map)
 
 	/* Lisa 2/10 and MacXL had a slightly different FDC interface */
-	MDRV_IWM_MODIFY("fdc", lisa210_fdc_interface)
+	MCFG_IWM_MODIFY("fdc", lisa210_fdc_interface)
 
 	/* via */
-	MDRV_DEVICE_REMOVE("via6522_0")
-	MDRV_DEVICE_REMOVE("via6522_1")
-	MDRV_VIA6522_ADD("via6522_0", 1250000, lisa_via6522_0_intf)
-	MDRV_VIA6522_ADD("via6522_1", 1250000, lisa_via6522_1_intf)
+	MCFG_DEVICE_REMOVE("via6522_0")
+	MCFG_DEVICE_REMOVE("via6522_1")
+	MCFG_VIA6522_ADD("via6522_0", 1250000, lisa_via6522_0_intf)
+	MCFG_VIA6522_ADD("via6522_1", 1250000, lisa_via6522_1_intf)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( macxl, lisa210 )
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_SIZE(	768/* ???? */, 447/* ???? */)
-	MDRV_SCREEN_VISIBLE_AREA(0, 608-1, 0, 431-1)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_SIZE(	768/* ???? */, 447/* ???? */)
+	MCFG_SCREEN_VISIBLE_AREA(0, 608-1, 0, 431-1)
 MACHINE_CONFIG_END
 
 /* 2008-05 FP:

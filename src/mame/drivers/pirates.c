@@ -261,31 +261,31 @@ GFXDECODE_END
 /* Machine Driver + Related bits */
 
 static MACHINE_CONFIG_START( pirates, driver_device )
-	MDRV_CPU_ADD("maincpu", M68000, 16000000) /* 16mhz */
-	MDRV_CPU_PROGRAM_MAP(pirates_map)
-	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
+	MCFG_CPU_ADD("maincpu", M68000, 16000000) /* 16mhz */
+	MCFG_CPU_PROGRAM_MAP(pirates_map)
+	MCFG_CPU_VBLANK_INT("screen", irq1_line_hold)
 
-	MDRV_EEPROM_ADD("eeprom", eeprom_intf)
+	MCFG_EEPROM_ADD("eeprom", eeprom_intf)
 
-	MDRV_GFXDECODE(pirates)
+	MCFG_GFXDECODE(pirates)
 
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(36*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(36*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 2*8, 30*8-1)
 
-	MDRV_PALETTE_LENGTH(0x2000)
+	MCFG_PALETTE_LENGTH(0x2000)
 
-	MDRV_VIDEO_START(pirates)
-	MDRV_VIDEO_UPDATE(pirates)
+	MCFG_VIDEO_START(pirates)
+	MCFG_VIDEO_UPDATE(pirates)
 
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_OKIM6295_ADD("oki", 1333333, OKIM6295_PIN7_LOW)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_OKIM6295_ADD("oki", 1333333, OKIM6295_PIN7_LOW)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -343,11 +343,11 @@ static void pirates_decrypt_68k(running_machine *machine)
     UINT16 *buf, *rom;
     int i;
 
-    rom_size = memory_region_length(machine, "maincpu");
+    rom_size = machine->region("maincpu")->bytes();
 
     buf = auto_alloc_array(machine, UINT16, rom_size/2);
 
-    rom = (UINT16 *)memory_region(machine, "maincpu");
+    rom = (UINT16 *)machine->region("maincpu")->base();
     memcpy (buf, rom, rom_size);
 
     for (i=0; i<rom_size/2; i++)
@@ -372,11 +372,11 @@ static void pirates_decrypt_p(running_machine *machine)
     UINT8 *buf, *rom;
     int i;
 
-    rom_size = memory_region_length(machine, "gfx1");
+    rom_size = machine->region("gfx1")->bytes();
 
     buf = auto_alloc_array(machine, UINT8, rom_size);
 
-    rom = memory_region(machine, "gfx1");
+    rom = machine->region("gfx1")->base();
     memcpy (buf, rom, rom_size);
 
     for (i=0; i<rom_size/4; i++)
@@ -396,11 +396,11 @@ static void pirates_decrypt_s(running_machine *machine)
     UINT8 *buf, *rom;
     int i;
 
-    rom_size = memory_region_length(machine, "gfx2");
+    rom_size = machine->region("gfx2")->bytes();
 
     buf = auto_alloc_array(machine, UINT8, rom_size);
 
-    rom = memory_region(machine, "gfx2");
+    rom = machine->region("gfx2")->base();
     memcpy (buf, rom, rom_size);
 
     for (i=0; i<rom_size/4; i++)
@@ -421,11 +421,11 @@ static void pirates_decrypt_oki(running_machine *machine)
     UINT8 *buf, *rom;
     int i;
 
-    rom_size = memory_region_length(machine, "oki");
+    rom_size = machine->region("oki")->bytes();
 
     buf = auto_alloc_array(machine, UINT8, rom_size);
 
-    rom = memory_region(machine, "oki");
+    rom = machine->region("oki")->base();
     memcpy (buf, rom, rom_size);
 
     for (i=0; i<rom_size; i++)
@@ -439,7 +439,7 @@ static void pirates_decrypt_oki(running_machine *machine)
 
 static DRIVER_INIT( pirates )
 {
-	UINT16 *rom = (UINT16 *)memory_region(machine, "maincpu");
+	UINT16 *rom = (UINT16 *)machine->region("maincpu")->base();
 
 	pirates_decrypt_68k(machine);
 	pirates_decrypt_p(machine);

@@ -47,15 +47,15 @@ struct _wd17xx_interface
 /***************************************************************************
     FUNCTION PROTOTYPES
 ***************************************************************************/
-void wd17xx_reset(running_device *device);
+void wd17xx_reset(device_t *device);
 
 /* the following are not strictly part of the wd179x hardware/emulation
 but will be put here for now until the flopdrv code has been finalised more */
-void wd17xx_set_drive(running_device *device, UINT8);		/* set drive wd179x is accessing */
-void wd17xx_set_side(running_device *device, UINT8);		/* set side wd179x is accessing */
+void wd17xx_set_drive(device_t *device, UINT8);		/* set drive wd179x is accessing */
+void wd17xx_set_side(device_t *device, UINT8);		/* set side wd179x is accessing */
 
-void wd17xx_set_pause_time(running_device *device, int usec);       /* default is 40 usec if not set */
-void wd17xx_set_complete_command_delay(running_device *device, int usec);   /* default is 12 usec if not set */
+void wd17xx_set_pause_time(device_t *device, int usec);       /* default is 40 usec if not set */
+void wd17xx_set_complete_command_delay(device_t *device, int usec);   /* default is 12 usec if not set */
 
 READ8_DEVICE_HANDLER( wd17xx_status_r );
 READ8_DEVICE_HANDLER( wd17xx_track_r );
@@ -88,45 +88,45 @@ extern const wd17xx_interface default_wd17xx_interface_2_drives;
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MDRV_WD1770_ADD(_tag, _intrf) \
-	MDRV_DEVICE_ADD(_tag, WD1770, 0) \
-	MDRV_DEVICE_CONFIG(_intrf)
+#define MCFG_WD1770_ADD(_tag, _intrf) \
+	MCFG_DEVICE_ADD(_tag, WD1770, 0) \
+	MCFG_DEVICE_CONFIG(_intrf)
 
-#define MDRV_WD1771_ADD(_tag, _intrf) \
-	MDRV_DEVICE_ADD(_tag, WD1771, 0) \
-	MDRV_DEVICE_CONFIG(_intrf)
+#define MCFG_WD1771_ADD(_tag, _intrf) \
+	MCFG_DEVICE_ADD(_tag, WD1771, 0) \
+	MCFG_DEVICE_CONFIG(_intrf)
 
-#define MDRV_WD1772_ADD(_tag, _intrf) \
-	MDRV_DEVICE_ADD(_tag, WD1772, 0) \
-	MDRV_DEVICE_CONFIG(_intrf)
+#define MCFG_WD1772_ADD(_tag, _intrf) \
+	MCFG_DEVICE_ADD(_tag, WD1772, 0) \
+	MCFG_DEVICE_CONFIG(_intrf)
 
-#define MDRV_WD1773_ADD(_tag, _intrf) \
-	MDRV_DEVICE_ADD(_tag, WD1773, 0) \
-	MDRV_DEVICE_CONFIG(_intrf)
+#define MCFG_WD1773_ADD(_tag, _intrf) \
+	MCFG_DEVICE_ADD(_tag, WD1773, 0) \
+	MCFG_DEVICE_CONFIG(_intrf)
 
-#define MDRV_WD179X_ADD(_tag, _intrf) \
-	MDRV_DEVICE_ADD(_tag, WD179X, 0) \
-	MDRV_DEVICE_CONFIG(_intrf)
+#define MCFG_WD179X_ADD(_tag, _intrf) \
+	MCFG_DEVICE_ADD(_tag, WD179X, 0) \
+	MCFG_DEVICE_CONFIG(_intrf)
 
-#define MDRV_WD1793_ADD(_tag, _intrf) \
-	MDRV_DEVICE_ADD(_tag, WD1793, 0) \
-	MDRV_DEVICE_CONFIG(_intrf)
+#define MCFG_WD1793_ADD(_tag, _intrf) \
+	MCFG_DEVICE_ADD(_tag, WD1793, 0) \
+	MCFG_DEVICE_CONFIG(_intrf)
 
-#define MDRV_WD2793_ADD(_tag, _intrf) \
-	MDRV_DEVICE_ADD(_tag, WD2793, 0) \
-	MDRV_DEVICE_CONFIG(_intrf)
+#define MCFG_WD2793_ADD(_tag, _intrf) \
+	MCFG_DEVICE_ADD(_tag, WD2793, 0) \
+	MCFG_DEVICE_CONFIG(_intrf)
 
-#define MDRV_WD2797_ADD(_tag, _intrf) \
-	MDRV_DEVICE_ADD(_tag, WD2797, 0) \
-	MDRV_DEVICE_CONFIG(_intrf)
+#define MCFG_WD2797_ADD(_tag, _intrf) \
+	MCFG_DEVICE_ADD(_tag, WD2797, 0) \
+	MCFG_DEVICE_CONFIG(_intrf)
 
-#define MDRV_WD177X_ADD(_tag, _intrf) \
-	MDRV_DEVICE_ADD(_tag, WD177X, 0) \
-	MDRV_DEVICE_CONFIG(_intrf)
+#define MCFG_WD177X_ADD(_tag, _intrf) \
+	MCFG_DEVICE_ADD(_tag, WD177X, 0) \
+	MCFG_DEVICE_CONFIG(_intrf)
 
-#define MDRV_MB8877_ADD(_tag, _intrf) \
-	MDRV_DEVICE_ADD(_tag, MB8877, 0) \
-	MDRV_DEVICE_CONFIG(_intrf)
+#define MCFG_MB8877_ADD(_tag, _intrf) \
+	MCFG_DEVICE_ADD(_tag, MB8877, 0) \
+	MCFG_DEVICE_CONFIG(_intrf)
 
 
 #endif /* __WD17XX_H__ */

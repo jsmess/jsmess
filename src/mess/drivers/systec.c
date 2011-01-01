@@ -69,25 +69,25 @@ static VIDEO_UPDATE( systec )
 
 static MACHINE_CONFIG_START( systec, systec_state )
     /* basic machine hardware */
-    MDRV_CPU_ADD("maincpu", Z80, XTAL_16MHz / 4)
-    MDRV_CPU_PROGRAM_MAP(systec_mem)
-	MDRV_CPU_IO_MAP(systec_io)
+    MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz / 4)
+    MCFG_CPU_PROGRAM_MAP(systec_mem)
+	MCFG_CPU_IO_MAP(systec_io)
 
-    MDRV_MACHINE_RESET(systec)
+    MCFG_MACHINE_RESET(systec)
 
     /* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(256, 192) /* border size not accurate */
-	MDRV_SCREEN_VISIBLE_AREA(0, 256 - 1, 0, 192 - 1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(256, 192) /* border size not accurate */
+	MCFG_SCREEN_VISIBLE_AREA(0, 256 - 1, 0, 192 - 1)
 
-    MDRV_PALETTE_LENGTH(2)
-    MDRV_PALETTE_INIT(black_and_white)
+    MCFG_PALETTE_LENGTH(2)
+    MCFG_PALETTE_INIT(black_and_white)
 
-    MDRV_VIDEO_START(systec)
-    MDRV_VIDEO_UPDATE(systec)
+    MCFG_VIDEO_START(systec)
+    MCFG_VIDEO_UPDATE(systec)
 MACHINE_CONFIG_END
 
 

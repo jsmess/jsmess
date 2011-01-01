@@ -98,20 +98,20 @@ public:
 /************************ Saturn's I/O *******************************/
 
 /* memory controller */
-void hp48_mem_reset( running_device *device );
-void hp48_mem_config( running_device *device, int v );
-void hp48_mem_unconfig( running_device *device, int v );
-int  hp48_mem_id( running_device *device );
+void hp48_mem_reset( device_t *device );
+void hp48_mem_config( device_t *device, int v );
+void hp48_mem_unconfig( device_t *device, int v );
+int  hp48_mem_id( device_t *device );
 
 /* CRC computation */
-void hp48_mem_crc( running_device *device, int addr, int data );
+void hp48_mem_crc( device_t *device, int addr, int data );
 
 /* IN/OUT registers */
-int  hp48_reg_in( running_device *device );
-void hp48_reg_out( running_device *device, int v );
+int  hp48_reg_in( device_t *device );
+void hp48_reg_out( device_t *device, int v );
 
 /* keybord interrupt system */
-void hp48_rsi( running_device *device );
+void hp48_rsi( device_t *device );
 
 
 /***************************** serial ********************************/
@@ -130,9 +130,9 @@ extern const struct hp48_port_config hp48gx_port2_config;
 
 DECLARE_LEGACY_IMAGE_DEVICE(HP48_PORT, hp48_port);
 
-#define MDRV_HP48_PORT_ADD(_tag, _intrf) \
-	MDRV_DEVICE_ADD(_tag, HP48_PORT, 0) \
-	MDRV_DEVICE_CONFIG(_intrf)
+#define MCFG_HP48_PORT_ADD(_tag, _intrf) \
+	MCFG_DEVICE_ADD(_tag, HP48_PORT, 0) \
+	MCFG_DEVICE_CONFIG(_intrf)
 
 /****************************** machine ******************************/
 

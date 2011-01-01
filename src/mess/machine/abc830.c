@@ -218,12 +218,12 @@ struct _slow_t
 	int sel1;				/* drive select 1 */
 
 	/* devices */
-	running_device *bus;
-	running_device *cpu;
-	running_device *z80pio;
-	running_device *fd1791;
-	running_device *image0;
-	running_device *image1;
+	device_t *bus;
+	device_t *cpu;
+	device_t *z80pio;
+	device_t *fd1791;
+	device_t *image0;
+	device_t *image1;
 };
 
 typedef struct _fast_t fast_t;
@@ -242,33 +242,33 @@ struct _fast_t
 	UINT8 sw3;				/* ABC bus address */
 
 	/* devices */
-	running_device *bus;
-	running_device *cpu;
-	running_device *z80dma;
-	running_device *wd1793;
-	running_device *image0;
-	running_device *image1;
+	device_t *bus;
+	device_t *cpu;
+	device_t *z80dma;
+	device_t *wd1793;
+	device_t *image0;
+	device_t *image1;
 };
 
 /***************************************************************************
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE slow_t *get_safe_token_slow(running_device *device)
+INLINE slow_t *get_safe_token_slow(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == ABC830_PIO);
 	return (slow_t *)downcast<legacy_device_base *>(device)->token();
 }
 
-INLINE fast_t *get_safe_token_fast(running_device *device)
+INLINE fast_t *get_safe_token_fast(device_t *device)
 {
 	assert(device != NULL);
 	assert((device->type() == ABC830) || (device->type() == ABC832) || (device->type() == ABC838));
 	return (fast_t *)downcast<legacy_device_base *>(device)->token();
 }
 
-INLINE conkort_config *get_safe_config(running_device *device)
+INLINE conkort_config *get_safe_config(device_t *device)
 {
 	assert(device != NULL);
 	assert((device->type() == ABC830_PIO) || (device->type() == ABC830) || (device->type() == ABC832) || (device->type() == ABC838));
@@ -1185,38 +1185,38 @@ static const wd17xx_interface fast_fdc_intf =
 /* Machine Driver */
 
 static MACHINE_CONFIG_FRAGMENT( luxor_55_10828 )
-	MDRV_CPU_ADD(Z80_TAG, Z80, XTAL_4MHz/2)
-	MDRV_CPU_PROGRAM_MAP(slow_map)
-	MDRV_CPU_IO_MAP(slow_io_map)
-	MDRV_CPU_CONFIG(slow_daisy_chain)
+	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_4MHz/2)
+	MCFG_CPU_PROGRAM_MAP(slow_map)
+	MCFG_CPU_IO_MAP(slow_io_map)
+	MCFG_CPU_CONFIG(slow_daisy_chain)
 
-	MDRV_Z80PIO_ADD(Z80PIO_TAG, XTAL_4MHz/2, pio_intf)
-	MDRV_WD179X_ADD(FD1791_TAG, slow_fdc_intf)
+	MCFG_Z80PIO_ADD(Z80PIO_TAG, XTAL_4MHz/2, pio_intf)
+	MCFG_WD179X_ADD(FD1791_TAG, slow_fdc_intf)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( abc830_pio, luxor_55_10828 )
-	MDRV_FLOPPY_2_DRIVES_ADD(abc830_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_ADD(abc830_floppy_config)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_FRAGMENT( luxor_55_21046 )
-	MDRV_CPU_ADD(Z80_TAG, Z80, XTAL_16MHz/4)
-	MDRV_CPU_PROGRAM_MAP(fast_map)
-	MDRV_CPU_IO_MAP(fast_io_map)
+	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_16MHz/4)
+	MCFG_CPU_PROGRAM_MAP(fast_map)
+	MCFG_CPU_IO_MAP(fast_io_map)
 
-	MDRV_Z80DMA_ADD(Z80DMA_TAG, XTAL_16MHz/4, dma_intf)
-	MDRV_WD1793_ADD(SAB1793_TAG, fast_fdc_intf)
+	MCFG_Z80DMA_ADD(Z80DMA_TAG, XTAL_16MHz/4, dma_intf)
+	MCFG_WD1793_ADD(SAB1793_TAG, fast_fdc_intf)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( abc830, luxor_55_21046 )
-	MDRV_FLOPPY_2_DRIVES_ADD(abc830_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_ADD(abc830_floppy_config)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( abc832, luxor_55_21046 )
-	MDRV_FLOPPY_2_DRIVES_ADD(abc832_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_ADD(abc832_floppy_config)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( abc838, luxor_55_21046 )
-	MDRV_FLOPPY_2_DRIVES_ADD(abc838_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_ADD(abc838_floppy_config)
 MACHINE_CONFIG_END
 
 /* ROMs */

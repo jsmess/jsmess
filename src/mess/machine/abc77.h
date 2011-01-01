@@ -27,9 +27,9 @@
 
 DECLARE_LEGACY_DEVICE(ABC77, abc77);
 
-#define MDRV_ABC77_ADD(_config) \
-	MDRV_DEVICE_ADD(ABC77_TAG, ABC77, 0)\
-	MDRV_DEVICE_CONFIG(_config)
+#define MCFG_ABC77_ADD(_config) \
+	MCFG_DEVICE_ADD(ABC77_TAG, ABC77, 0)\
+	MCFG_DEVICE_CONFIG(_config)
 
 #define ABC77_INTERFACE(_name) \
 	const abc77_interface (_name) =

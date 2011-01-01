@@ -16,7 +16,7 @@
 
 MACHINE_RESET( rt1715 )
 {
-	memory_set_bankptr(machine, "bank1", memory_region(machine, "maincpu") + 0x10000);
+	memory_set_bankptr(machine, "bank1", machine->region("maincpu")->base() + 0x10000);
 	memory_set_bankptr(machine, "bank2", messram_get_ptr(machine->device("messram")) + 0x0800);
 	memory_set_bankptr(machine, "bank3", messram_get_ptr(machine->device("messram")));
 }

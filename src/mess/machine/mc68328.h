@@ -531,7 +531,7 @@ typedef struct
 #define PWMC_PWMEN              0x0010
 #define PWMC_CLKSEL             0x0007
 
-INLINE mc68328_t* mc68328_get_safe_token( running_device *device )
+INLINE mc68328_t* mc68328_get_safe_token( device_t *device )
 {
     assert( device != NULL );
     assert( device->type() == MC68328 );

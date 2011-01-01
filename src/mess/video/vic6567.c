@@ -80,7 +80,7 @@ struct _vic2_state
 	vic2_type  type;
 
 	screen_device *screen;			// screen which sets bitmap properties
-	running_device *cpu;
+	device_t *cpu;
 
 	UINT8 rdy_cycles;
 	UINT8 reg[0x80];
@@ -264,7 +264,7 @@ struct _vic2_state
     INLINE FUNCTIONS
 *****************************************************************************/
 
-INLINE vic2_state *get_safe_token( running_device *device )
+INLINE vic2_state *get_safe_token( device_t *device )
 {
 	assert(device != NULL);
 	assert(device->type() == VIC2);
@@ -272,7 +272,7 @@ INLINE vic2_state *get_safe_token( running_device *device )
 	return (vic2_state *)downcast<legacy_device_base *>(device)->token();
 }
 
-INLINE const vic2_interface *get_interface( running_device *device )
+INLINE const vic2_interface *get_interface( device_t *device )
 {
 	assert(device != NULL);
 	assert((device->type() == VIC2));
@@ -308,7 +308,7 @@ static void vic2_clear_interrupt( running_machine *machine, int mask, vic2_state
 	}
 }
 
-void vic2_lightpen_write( running_device *device, int level )
+void vic2_lightpen_write( device_t *device, int level )
 {
 	/* calculate current position, write it and raise interrupt */
 }
@@ -2202,25 +2202,25 @@ static TIMER_CALLBACK( ntsc_timer_callback )
     I/O HANDLERS
 *****************************************************************************/
 
-void vic2_set_rastering( running_device *device, int onoff )
+void vic2_set_rastering( device_t *device, int onoff )
 {
 	vic2_state *vic2 = get_safe_token(device);
 	vic2->on = onoff;
 }
 
-int vic2e_k0_r( running_device *device )
+int vic2e_k0_r( device_t *device )
 {
 	vic2_state *vic2 = get_safe_token(device);
 	return VIC2E_K0_LEVEL;
 }
 
-int vic2e_k1_r( running_device *device )
+int vic2e_k1_r( device_t *device )
 {
 	vic2_state *vic2 = get_safe_token(device);
 	return VIC2E_K1_LEVEL;
 }
 
-int vic2e_k2_r( running_device *device )
+int vic2e_k2_r( device_t *device )
 {
 	vic2_state *vic2 = get_safe_token(device);
 	return VIC2E_K2_LEVEL;
@@ -2581,7 +2581,7 @@ READ8_DEVICE_HANDLER( vic2_port_r )
 	return val;
 }
 
-UINT32 vic2_video_update( running_device *device, bitmap_t *bitmap, const rectangle *cliprect )
+UINT32 vic2_video_update( device_t *device, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	vic2_state *vic2 = get_safe_token(device);
 

@@ -22,14 +22,14 @@ public:
 	sms_state(running_machine &machine, const driver_device_config_base &config)
 	: driver_device(machine, config) { }
 
-	// running_devices
-	running_device *main_cpu;
-	running_device *control_cpu;
-	running_device *vdp;
-	running_device *ym;
-	running_device *main_scr;
-	running_device *left_lcd;
-	running_device *right_lcd;
+	// device_ts
+	device_t *main_cpu;
+	device_t *control_cpu;
+	device_t *vdp;
+	device_t *ym;
+	device_t *main_scr;
+	device_t *left_lcd;
+	device_t *right_lcd;
 
 	UINT8 bios_page_count;
 	UINT8 fm_detect;

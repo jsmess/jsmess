@@ -82,7 +82,7 @@ static MACHINE_RESET(cd2650)
 static VIDEO_START( cd2650 )
 {
 	cd2650_state *state = machine->driver_data<cd2650_state>();
-	state->charrom = memory_region(machine, "chargen");
+	state->charrom = machine->region("chargen")->base();
 }
 
 static VIDEO_UPDATE( cd2650 )
@@ -150,26 +150,26 @@ static GENERIC_TERMINAL_INTERFACE( cd2650_terminal_intf )
 
 static MACHINE_CONFIG_START( cd2650, cd2650_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu",S2650, XTAL_1MHz)
-	MDRV_CPU_PROGRAM_MAP(cd2650_mem)
-	MDRV_CPU_IO_MAP(cd2650_io)
+	MCFG_CPU_ADD("maincpu",S2650, XTAL_1MHz)
+	MCFG_CPU_PROGRAM_MAP(cd2650_mem)
+	MCFG_CPU_IO_MAP(cd2650_io)
 
-	MDRV_MACHINE_RESET(cd2650)
+	MCFG_MACHINE_RESET(cd2650)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(50)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(640, 160)
-	MDRV_SCREEN_VISIBLE_AREA(0, 639, 0, 159)
-	MDRV_PALETTE_LENGTH(2)
-	MDRV_PALETTE_INIT(black_and_white)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(640, 160)
+	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 159)
+	MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_INIT(black_and_white)
 
-	MDRV_VIDEO_START(cd2650)
-	MDRV_VIDEO_UPDATE(cd2650)
+	MCFG_VIDEO_START(cd2650)
+	MCFG_VIDEO_UPDATE(cd2650)
 
-	MDRV_GENERIC_TERMINAL_ADD("terminal", cd2650_terminal_intf) // keyboard only
+	MCFG_GENERIC_TERMINAL_ADD("terminal", cd2650_terminal_intf) // keyboard only
 MACHINE_CONFIG_END
 
 /* ROM definition */

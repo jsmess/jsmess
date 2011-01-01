@@ -92,7 +92,7 @@ int strataflash_init(running_machine *machine, int id)
 	/* set-up factory-programmed protection register segment */
 	strata[id].prot_regs[BYTE_XOR_LE(0)] &= 0xfe;
 	for (i=2; i<10; i++)
-		strata[id].prot_regs[i] = mame_rand(machine);
+		strata[id].prot_regs[i] = machine->rand();
 
 	return 0;
 }

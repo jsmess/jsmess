@@ -119,28 +119,28 @@ INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( sym1, sym1_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6502, SYM1_CLOCK)  /* 1 MHz */
-	MDRV_CPU_PROGRAM_MAP(sym1_map)
-	MDRV_MACHINE_RESET(sym1)
+	MCFG_CPU_ADD("maincpu", M6502, SYM1_CLOCK)  /* 1 MHz */
+	MCFG_CPU_PROGRAM_MAP(sym1_map)
+	MCFG_MACHINE_RESET(sym1)
 
-	MDRV_DEFAULT_LAYOUT(layout_sym1)
+	MCFG_DEFAULT_LAYOUT(layout_sym1)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	/* devices */
-	MDRV_RIOT6532_ADD("riot", SYM1_CLOCK, sym1_r6532_interface)
-	MDRV_TTL74145_ADD("ttl74145", sym1_ttl74145_intf)
-	MDRV_VIA6522_ADD("via6522_0", 0, sym1_via0)
-	MDRV_VIA6522_ADD("via6522_1", 0, sym1_via1)
-	MDRV_VIA6522_ADD("via6522_2", 0, sym1_via2)
+	MCFG_RIOT6532_ADD("riot", SYM1_CLOCK, sym1_r6532_interface)
+	MCFG_TTL74145_ADD("ttl74145", sym1_ttl74145_intf)
+	MCFG_VIA6522_ADD("via6522_0", 0, sym1_via0)
+	MCFG_VIA6522_ADD("via6522_1", 0, sym1_via1)
+	MCFG_VIA6522_ADD("via6522_2", 0, sym1_via2)
 
 	/* internal ram */
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("4K")
-	MDRV_RAM_EXTRA_OPTIONS("1K,2K,3K")
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("4K")
+	MCFG_RAM_EXTRA_OPTIONS("1K,2K,3K")
 MACHINE_CONFIG_END
 
 

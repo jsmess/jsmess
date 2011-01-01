@@ -84,14 +84,14 @@ static MACHINE_RESET(selz80)
 
 static MACHINE_CONFIG_START( selz80, selz80_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz)
-	MDRV_CPU_PROGRAM_MAP(selz80_mem)
-	MDRV_CPU_IO_MAP(selz80_io)
+	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
+	MCFG_CPU_PROGRAM_MAP(selz80_mem)
+	MCFG_CPU_IO_MAP(selz80_io)
 
-	MDRV_MACHINE_RESET(selz80)
+	MCFG_MACHINE_RESET(selz80)
 
 	/* video hardware */
-	MDRV_DEFAULT_LAYOUT(layout_selz80)
+	MCFG_DEFAULT_LAYOUT(layout_selz80)
 MACHINE_CONFIG_END
 
 /* ROM definition */

@@ -399,7 +399,7 @@ static MACHINE_START( galivan )
 	galivan_state *state = machine->driver_data<galivan_state>();
 
 	/* configure ROM banking */
-	UINT8 *rombase = memory_region(machine, "maincpu");
+	UINT8 *rombase = machine->region("maincpu")->base();
 	memory_configure_bank(machine, "bank1", 0, 2, &rombase[0x10000], 0x2000);
 	memory_set_bank(machine, "bank1", 0);
 
@@ -416,7 +416,7 @@ static MACHINE_START( ninjemak )
 	galivan_state *state = machine->driver_data<galivan_state>();
 
 	/* configure ROM banking */
-	UINT8 *rombase = memory_region(machine, "maincpu");
+	UINT8 *rombase = machine->region("maincpu")->base();
 	memory_configure_bank(machine, "bank1", 0, 4, &rombase[0x10000], 0x2000);
 	memory_set_bank(machine, "bank1", 0);
 
@@ -456,88 +456,88 @@ static MACHINE_RESET( ninjemak )
 static MACHINE_CONFIG_START( galivan, galivan_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80,12000000/2)		/* 6 MHz? */
-	MDRV_CPU_PROGRAM_MAP(galivan_map)
-	MDRV_CPU_IO_MAP(io_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_ADD("maincpu", Z80,12000000/2)		/* 6 MHz? */
+	MCFG_CPU_PROGRAM_MAP(galivan_map)
+	MCFG_CPU_IO_MAP(io_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("audiocpu", Z80,8000000/2)		/* 4 MHz? */
-	MDRV_CPU_PROGRAM_MAP(sound_map)
-	MDRV_CPU_IO_MAP(sound_io_map)
-	MDRV_CPU_PERIODIC_INT(irq0_line_hold, 7250)  /* timed interrupt, ?? Hz */
+	MCFG_CPU_ADD("audiocpu", Z80,8000000/2)		/* 4 MHz? */
+	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_CPU_IO_MAP(sound_io_map)
+	MCFG_CPU_PERIODIC_INT(irq0_line_hold, 7250)  /* timed interrupt, ?? Hz */
 
-	MDRV_MACHINE_START(galivan)
-	MDRV_MACHINE_RESET(galivan)
+	MCFG_MACHINE_START(galivan)
+	MCFG_MACHINE_RESET(galivan)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(galivan)
-	MDRV_PALETTE_LENGTH(8*16+16*16+256*16)
+	MCFG_GFXDECODE(galivan)
+	MCFG_PALETTE_LENGTH(8*16+16*16+256*16)
 
-	MDRV_PALETTE_INIT(galivan)
-	MDRV_VIDEO_START(galivan)
-	MDRV_VIDEO_UPDATE(galivan)
+	MCFG_PALETTE_INIT(galivan)
+	MCFG_VIDEO_START(galivan)
+	MCFG_VIDEO_UPDATE(galivan)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM3526, 8000000/2)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("ymsnd", YM3526, 8000000/2)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD("dac1", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("dac1", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD("dac2", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("dac2", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( ninjemak, galivan_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80,12000000/2)		/* 6 MHz? */
-	MDRV_CPU_PROGRAM_MAP(ninjemak_map)
-	MDRV_CPU_IO_MAP(ninjemak_io_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_ADD("maincpu", Z80,12000000/2)		/* 6 MHz? */
+	MCFG_CPU_PROGRAM_MAP(ninjemak_map)
+	MCFG_CPU_IO_MAP(ninjemak_io_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("audiocpu", Z80,8000000/2)		/* 4 MHz? */
-	MDRV_CPU_PROGRAM_MAP(sound_map)
-	MDRV_CPU_IO_MAP(sound_io_map)
-	MDRV_CPU_PERIODIC_INT(irq0_line_hold, 7250)	/* timed interrupt, ?? Hz */
+	MCFG_CPU_ADD("audiocpu", Z80,8000000/2)		/* 4 MHz? */
+	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_CPU_IO_MAP(sound_io_map)
+	MCFG_CPU_PERIODIC_INT(irq0_line_hold, 7250)	/* timed interrupt, ?? Hz */
 
-	MDRV_MACHINE_START(ninjemak)
-	MDRV_MACHINE_RESET(ninjemak)
+	MCFG_MACHINE_START(ninjemak)
+	MCFG_MACHINE_RESET(ninjemak)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(ninjemak)
-	MDRV_PALETTE_LENGTH(8*16+16*16+256*16)
+	MCFG_GFXDECODE(ninjemak)
+	MCFG_PALETTE_LENGTH(8*16+16*16+256*16)
 
-	MDRV_PALETTE_INIT(galivan)
-	MDRV_VIDEO_START(ninjemak)
-	MDRV_VIDEO_UPDATE(ninjemak)
+	MCFG_PALETTE_INIT(galivan)
+	MCFG_VIDEO_START(ninjemak)
+	MCFG_VIDEO_UPDATE(ninjemak)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("ymsnd", YM3526, 8000000/2)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("ymsnd", YM3526, 8000000/2)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD("dac1", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("dac1", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD("dac2", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("dac2", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 
@@ -1026,7 +1026,7 @@ static WRITE8_HANDLER( youmab_extra_bank_w )
 
 static READ8_HANDLER( youmab_8a_r )
 {
-	return mame_rand(space->machine);
+	return space->machine->rand();
 }
 
 static WRITE8_HANDLER( youmab_81_w )
@@ -1043,10 +1043,10 @@ static DRIVER_INIT( youmab )
 {
 	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x82, 0x82, 0, 0, youmab_extra_bank_w); // banks rom at 0x8000? writes 0xff and 0x00 before executing code there
 	memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000, 0x7fff, 0, 0, "bank3");
-	memory_set_bankptr(machine,  "bank3", memory_region(machine, "maincpu"));
+	memory_set_bankptr(machine,  "bank3", machine->region("maincpu")->base());
 
 	memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0xbfff, 0, 0, "bank2");
-	memory_configure_bank(machine, "bank2", 0, 2, memory_region(machine, "user2"), 0x4000);
+	memory_configure_bank(machine, "bank2", 0, 2, machine->region("user2")->base(), 0x4000);
 	memory_set_bank(machine, "bank2", 0);
 
 	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x81, 0x81, 0, 0, youmab_81_w); // ?? often, alternating values

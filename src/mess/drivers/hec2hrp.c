@@ -297,7 +297,7 @@ static MACHINE_RESET(hec2hrp)
 static MACHINE_START( hec2hrx )
 /*****************************************************************************/
 {
-	UINT8 *RAM   = memory_region(machine, "maincpu"  );	// pointer to mess ram
+	UINT8 *RAM   = machine->region("maincpu"  )->base();	// pointer to mess ram
 	//Patch rom possible !
 	//RAMD2[0xff6b] = 0x0ff; // force verbose mode hector !
 
@@ -310,14 +310,14 @@ static MACHINE_START( hec2hrx )
 
 /******************************************************SPECIFIQUE MX ***************************/
 	memory_configure_bank(machine, "bank2", HECTORMX_BANK_PAGE0 , 1, &RAM[0x0000]                    , 0); // Mess ram
-	memory_configure_bank(machine, "bank2", HECTORMX_BANK_PAGE1 , 1, memory_region(machine, "page1") , 0); // Rom page 1
-	memory_configure_bank(machine, "bank2", HECTORMX_BANK_PAGE2 , 1, memory_region(machine, "page2") , 0); // Rom page 2
+	memory_configure_bank(machine, "bank2", HECTORMX_BANK_PAGE1 , 1, machine->region("page1")->base() , 0); // Rom page 1
+	memory_configure_bank(machine, "bank2", HECTORMX_BANK_PAGE2 , 1, machine->region("page2")->base() , 0); // Rom page 2
 	memory_set_bank(machine, "bank2", HECTORMX_BANK_PAGE0);
 /******************************************************SPECIFIQUE MX ***************************/
 
 /*************************************************SPECIFIQUE DISK II ***************************/
-	memory_configure_bank(machine, "bank3", DISCII_BANK_ROM , 1, memory_region(machine, "rom_disc2") , 0); // ROM
-	memory_configure_bank(machine, "bank3", DISCII_BANK_RAM , 1, memory_region(machine, "disc2mem" ) , 0); // RAM
+	memory_configure_bank(machine, "bank3", DISCII_BANK_ROM , 1, machine->region("rom_disc2")->base() , 0); // ROM
+	memory_configure_bank(machine, "bank3", DISCII_BANK_RAM , 1, machine->region("disc2mem" )->base() , 0); // RAM
 	memory_set_bank(machine, "bank3", DISCII_BANK_ROM);
 /*************************************************SPECIFIQUE DISK II ***************************/
 
@@ -366,42 +366,42 @@ DISCRETE_SOUND_END
 static MACHINE_CONFIG_START( hec2hr, hec2hrp_state )
 /******************************************************************************/
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu",Z80, XTAL_5MHz)
-	MDRV_CPU_PROGRAM_MAP(hec2hrp_mem)
-	MDRV_CPU_IO_MAP(hec2hrp_io)
-	MDRV_CPU_PERIODIC_INT(irq0_line_hold,50) /*  put on the Z80 irq in Hz*/
-	MDRV_MACHINE_RESET(hec2hrp)
-	MDRV_MACHINE_START(hec2hrp)
+	MCFG_CPU_ADD("maincpu",Z80, XTAL_5MHz)
+	MCFG_CPU_PROGRAM_MAP(hec2hrp_mem)
+	MCFG_CPU_IO_MAP(hec2hrp_io)
+	MCFG_CPU_PERIODIC_INT(irq0_line_hold,50) /*  put on the Z80 irq in Hz*/
+	MCFG_MACHINE_RESET(hec2hrp)
+	MCFG_MACHINE_START(hec2hrp)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(50)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(400)) /* 2500 not accurate */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(512, 230)
-	MDRV_SCREEN_VISIBLE_AREA(0, 243, 0, 227)
-	MDRV_PALETTE_LENGTH(16)
-	MDRV_VIDEO_START(hec2hrp)
-	MDRV_VIDEO_UPDATE(hec2hrp)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(400)) /* 2500 not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(512, 230)
+	MCFG_SCREEN_VISIBLE_AREA(0, 243, 0, 227)
+	MCFG_PALETTE_LENGTH(16)
+	MCFG_VIDEO_START(hec2hrp)
+	MCFG_VIDEO_UPDATE(hec2hrp)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_WAVE_ADD("wave", "cassette")
-	MDRV_SOUND_ROUTE(0, "mono", 0.1)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_WAVE_ADD("wave", "cassette")
+	MCFG_SOUND_ROUTE(0, "mono", 0.1)
 
-	MDRV_SOUND_ADD("sn76477", SN76477, 0)
-	MDRV_SOUND_CONFIG(hector_sn76477_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.1)
+	MCFG_SOUND_ADD("sn76477", SN76477, 0)
+	MCFG_SOUND_CONFIG(hector_sn76477_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.1)
 
-	MDRV_SOUND_ADD("discrete", DISCRETE, 0) /* Son 1bit*/
-	MDRV_SOUND_CONFIG_DISCRETE( hec2hrp )
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("discrete", DISCRETE, 0) /* Son 1bit*/
+	MCFG_SOUND_CONFIG_DISCRETE( hec2hrp )
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	/* Gestion cassette*/
-	MDRV_CASSETTE_ADD( "cassette", hector_cassette_config )
+	MCFG_CASSETTE_ADD( "cassette", hector_cassette_config )
 
 	/* printer */
-	MDRV_PRINTER_ADD("printer")
+	MCFG_PRINTER_ADD("printer")
 
 MACHINE_CONFIG_END
 
@@ -409,42 +409,42 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( hec2hrp, hec2hrp_state )
 /*****************************************************************************/
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu",Z80, XTAL_5MHz)
-	MDRV_CPU_PROGRAM_MAP(hec2hrp_mem)
-	MDRV_CPU_IO_MAP(hec2hrp_io)
-	MDRV_CPU_PERIODIC_INT(irq0_line_hold,50) /*  put on the Z80 irq in Hz*/
-	MDRV_MACHINE_RESET(hec2hrp)
-	MDRV_MACHINE_START(hec2hrp)
+	MCFG_CPU_ADD("maincpu",Z80, XTAL_5MHz)
+	MCFG_CPU_PROGRAM_MAP(hec2hrp_mem)
+	MCFG_CPU_IO_MAP(hec2hrp_io)
+	MCFG_CPU_PERIODIC_INT(irq0_line_hold,50) /*  put on the Z80 irq in Hz*/
+	MCFG_MACHINE_RESET(hec2hrp)
+	MCFG_MACHINE_START(hec2hrp)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(50)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(400)) /* 2500 not accurate */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(512, 230)
-	MDRV_SCREEN_VISIBLE_AREA(0, 243, 0, 227)
-	MDRV_PALETTE_LENGTH(16)
-	MDRV_VIDEO_START(hec2hrp)
-	MDRV_VIDEO_UPDATE(hec2hrp)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(400)) /* 2500 not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(512, 230)
+	MCFG_SCREEN_VISIBLE_AREA(0, 243, 0, 227)
+	MCFG_PALETTE_LENGTH(16)
+	MCFG_VIDEO_START(hec2hrp)
+	MCFG_VIDEO_UPDATE(hec2hrp)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_WAVE_ADD("wave", "cassette")
-	MDRV_SOUND_ROUTE(0, "mono", 0.1)// Sound level for cassette, as it is in mono => output channel=0
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_WAVE_ADD("wave", "cassette")
+	MCFG_SOUND_ROUTE(0, "mono", 0.1)// Sound level for cassette, as it is in mono => output channel=0
 
-	MDRV_SOUND_ADD("sn76477", SN76477, 0)
-	MDRV_SOUND_CONFIG(hector_sn76477_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.1)
+	MCFG_SOUND_ADD("sn76477", SN76477, 0)
+	MCFG_SOUND_CONFIG(hector_sn76477_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.1)
 
-	MDRV_SOUND_ADD("discrete", DISCRETE, 0) // Son 1bit
-	MDRV_SOUND_CONFIG_DISCRETE( hec2hrp )
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("discrete", DISCRETE, 0) // Son 1bit
+	MCFG_SOUND_CONFIG_DISCRETE( hec2hrp )
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	/* Gestion cassette*/
-	MDRV_CASSETTE_ADD( "cassette", hector_cassette_config )
+	MCFG_CASSETTE_ADD( "cassette", hector_cassette_config )
 
 	/* printer */
-	MDRV_PRINTER_ADD("printer")
+	MCFG_PRINTER_ADD("printer")
 
 MACHINE_CONFIG_END
 
@@ -452,148 +452,148 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( hec2mx40, hec2hrp_state )
 /*****************************************************************************/
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu",Z80, XTAL_5MHz)
-	MDRV_CPU_PROGRAM_MAP(hec2hrx_mem)
-	MDRV_CPU_IO_MAP(hec2mx40_io)
-	MDRV_CPU_PERIODIC_INT(irq0_line_hold,50) //  put on the Z80 irq in Hz
+	MCFG_CPU_ADD("maincpu",Z80, XTAL_5MHz)
+	MCFG_CPU_PROGRAM_MAP(hec2hrx_mem)
+	MCFG_CPU_IO_MAP(hec2mx40_io)
+	MCFG_CPU_PERIODIC_INT(irq0_line_hold,50) //  put on the Z80 irq in Hz
 
 	/* Disc II unit */
-	MDRV_CPU_ADD("disc2cpu",Z80, XTAL_4MHz)
-	MDRV_CPU_PROGRAM_MAP(hecdisc2_mem)
-	MDRV_CPU_IO_MAP(hecdisc2_io)
-	MDRV_UPD765A_ADD("upd765", hector_disc2_upd765_interface)
-	MDRV_FLOPPY_2_DRIVES_ADD(hector_disc2_floppy_config)
-	MDRV_MACHINE_RESET(hec2hrx)
-	MDRV_MACHINE_START(hec2hrx)
+	MCFG_CPU_ADD("disc2cpu",Z80, XTAL_4MHz)
+	MCFG_CPU_PROGRAM_MAP(hecdisc2_mem)
+	MCFG_CPU_IO_MAP(hecdisc2_io)
+	MCFG_UPD765A_ADD("upd765", hector_disc2_upd765_interface)
+	MCFG_FLOPPY_2_DRIVES_ADD(hector_disc2_floppy_config)
+	MCFG_MACHINE_RESET(hec2hrx)
+	MCFG_MACHINE_START(hec2hrx)
 	
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(50)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(400)) /* 2500 not accurate */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(512, 230)
-	MDRV_SCREEN_VISIBLE_AREA(0, 243, 0, 227)
-	MDRV_PALETTE_LENGTH(16)
-	MDRV_VIDEO_START(hec2hrp)
-	MDRV_VIDEO_UPDATE(hec2hrp)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(400)) /* 2500 not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(512, 230)
+	MCFG_SCREEN_VISIBLE_AREA(0, 243, 0, 227)
+	MCFG_PALETTE_LENGTH(16)
+	MCFG_VIDEO_START(hec2hrp)
+	MCFG_VIDEO_UPDATE(hec2hrp)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_WAVE_ADD("wave", "cassette")
-	MDRV_SOUND_ROUTE(0, "mono", 0.1)// Sound level for cassette, as it is in mono => output channel=0
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_WAVE_ADD("wave", "cassette")
+	MCFG_SOUND_ROUTE(0, "mono", 0.1)// Sound level for cassette, as it is in mono => output channel=0
 
-	MDRV_SOUND_ADD("sn76477", SN76477, 0)
-	MDRV_SOUND_CONFIG(hector_sn76477_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.1)
+	MCFG_SOUND_ADD("sn76477", SN76477, 0)
+	MCFG_SOUND_CONFIG(hector_sn76477_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.1)
 
-	MDRV_SOUND_ADD("discrete", DISCRETE, 0) // Son 1bit
-	MDRV_SOUND_CONFIG_DISCRETE( hec2hrp )
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("discrete", DISCRETE, 0) // Son 1bit
+	MCFG_SOUND_CONFIG_DISCRETE( hec2hrp )
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	/* Gestion cassette*/
-	MDRV_CASSETTE_ADD( "cassette", hector_cassette_config )
+	MCFG_CASSETTE_ADD( "cassette", hector_cassette_config )
 
 	/* printer */
-	MDRV_PRINTER_ADD("printer")
+	MCFG_PRINTER_ADD("printer")
 
 MACHINE_CONFIG_END
 /*****************************************************************************/
 static MACHINE_CONFIG_START( hec2hrx, hec2hrp_state )
 /*****************************************************************************/
 /* basic machine hardware */
-	MDRV_CPU_ADD("maincpu",Z80, XTAL_5MHz)
-	MDRV_CPU_PROGRAM_MAP(hec2hrx_mem)
-	MDRV_CPU_IO_MAP(hec2hrx_io)
-	MDRV_CPU_PERIODIC_INT(irq0_line_hold,50) //  put on the Z80 irq in Hz
-	MDRV_MACHINE_RESET(hec2hrx)
-	MDRV_MACHINE_START(hec2hrx)
+	MCFG_CPU_ADD("maincpu",Z80, XTAL_5MHz)
+	MCFG_CPU_PROGRAM_MAP(hec2hrx_mem)
+	MCFG_CPU_IO_MAP(hec2hrx_io)
+	MCFG_CPU_PERIODIC_INT(irq0_line_hold,50) //  put on the Z80 irq in Hz
+	MCFG_MACHINE_RESET(hec2hrx)
+	MCFG_MACHINE_START(hec2hrx)
 
 	/* Disc II unit */
-	MDRV_CPU_ADD("disc2cpu",Z80, XTAL_4MHz)
-	MDRV_CPU_PROGRAM_MAP(hecdisc2_mem)
-	MDRV_CPU_IO_MAP(hecdisc2_io)
-	MDRV_UPD765A_ADD("upd765", hector_disc2_upd765_interface)
-	MDRV_FLOPPY_2_DRIVES_ADD(hector_disc2_floppy_config)
+	MCFG_CPU_ADD("disc2cpu",Z80, XTAL_4MHz)
+	MCFG_CPU_PROGRAM_MAP(hecdisc2_mem)
+	MCFG_CPU_IO_MAP(hecdisc2_io)
+	MCFG_UPD765A_ADD("upd765", hector_disc2_upd765_interface)
+	MCFG_FLOPPY_2_DRIVES_ADD(hector_disc2_floppy_config)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(50)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(400)) /* 2500 not accurate */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(512, 230)
-	MDRV_SCREEN_VISIBLE_AREA(0, 243, 0, 227)
-	MDRV_PALETTE_LENGTH(16)
-	MDRV_PALETTE_INIT(black_and_white)
-	MDRV_VIDEO_START(hec2hrp)
-	MDRV_VIDEO_UPDATE(hec2hrp)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(400)) /* 2500 not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(512, 230)
+	MCFG_SCREEN_VISIBLE_AREA(0, 243, 0, 227)
+	MCFG_PALETTE_LENGTH(16)
+	MCFG_PALETTE_INIT(black_and_white)
+	MCFG_VIDEO_START(hec2hrp)
+	MCFG_VIDEO_UPDATE(hec2hrp)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_WAVE_ADD("wave", "cassette")
-	MDRV_SOUND_ROUTE(0, "mono", 0.1)// Sound level for cassette, as it is in mono => output channel=0
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_WAVE_ADD("wave", "cassette")
+	MCFG_SOUND_ROUTE(0, "mono", 0.1)// Sound level for cassette, as it is in mono => output channel=0
 
-	MDRV_SOUND_ADD("sn76477", SN76477, 0)
-	MDRV_SOUND_CONFIG(hector_sn76477_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.1)
+	MCFG_SOUND_ADD("sn76477", SN76477, 0)
+	MCFG_SOUND_CONFIG(hector_sn76477_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.1)
 
-	MDRV_SOUND_ADD("discrete", DISCRETE, 0) // Son 1bit
-	MDRV_SOUND_CONFIG_DISCRETE( hec2hrp )
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("discrete", DISCRETE, 0) // Son 1bit
+	MCFG_SOUND_CONFIG_DISCRETE( hec2hrp )
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	// Gestion cassette
-	MDRV_CASSETTE_ADD( "cassette", hector_cassette_config )
+	MCFG_CASSETTE_ADD( "cassette", hector_cassette_config )
 
 	/* printer */
-	MDRV_PRINTER_ADD("printer")
+	MCFG_PRINTER_ADD("printer")
 
 MACHINE_CONFIG_END
 /*****************************************************************************/
 static MACHINE_CONFIG_START( hec2mx80, hec2hrp_state )
 /*****************************************************************************/
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu",Z80, XTAL_5MHz)
-	MDRV_CPU_PROGRAM_MAP(hec2hrx_mem)
-	MDRV_CPU_IO_MAP(hec2mx80_io)
-	MDRV_CPU_PERIODIC_INT(irq0_line_hold,50) //  put on the Z80 irq in Hz
-	MDRV_MACHINE_RESET(hec2hrx)
-	MDRV_MACHINE_START(hec2hrx)
+	MCFG_CPU_ADD("maincpu",Z80, XTAL_5MHz)
+	MCFG_CPU_PROGRAM_MAP(hec2hrx_mem)
+	MCFG_CPU_IO_MAP(hec2mx80_io)
+	MCFG_CPU_PERIODIC_INT(irq0_line_hold,50) //  put on the Z80 irq in Hz
+	MCFG_MACHINE_RESET(hec2hrx)
+	MCFG_MACHINE_START(hec2hrx)
 	
 	/* Disc II unit */
-	MDRV_CPU_ADD("disc2cpu",Z80, XTAL_4MHz)
-	MDRV_CPU_PROGRAM_MAP(hecdisc2_mem)
-	MDRV_CPU_IO_MAP(hecdisc2_io)
-	MDRV_UPD765A_ADD("upd765", hector_disc2_upd765_interface)
-	MDRV_FLOPPY_2_DRIVES_ADD(hector_disc2_floppy_config)
+	MCFG_CPU_ADD("disc2cpu",Z80, XTAL_4MHz)
+	MCFG_CPU_PROGRAM_MAP(hecdisc2_mem)
+	MCFG_CPU_IO_MAP(hecdisc2_io)
+	MCFG_UPD765A_ADD("upd765", hector_disc2_upd765_interface)
+	MCFG_FLOPPY_2_DRIVES_ADD(hector_disc2_floppy_config)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(50)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(400)) /* 2500 not accurate */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(512, 230)
-	MDRV_SCREEN_VISIBLE_AREA(0, 243, 0, 227)
-	MDRV_PALETTE_LENGTH(16)
-	MDRV_VIDEO_START(hec2hrp)
-	MDRV_VIDEO_UPDATE(hec2hrp)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(400)) /* 2500 not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(512, 230)
+	MCFG_SCREEN_VISIBLE_AREA(0, 243, 0, 227)
+	MCFG_PALETTE_LENGTH(16)
+	MCFG_VIDEO_START(hec2hrp)
+	MCFG_VIDEO_UPDATE(hec2hrp)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_WAVE_ADD("wave", "cassette")
-	MDRV_SOUND_ROUTE(0, "mono", 0.1)// Sound level for cassette, as it is in mono => output channel=0
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_WAVE_ADD("wave", "cassette")
+	MCFG_SOUND_ROUTE(0, "mono", 0.1)// Sound level for cassette, as it is in mono => output channel=0
 
-	MDRV_SOUND_ADD("sn76477", SN76477, 0)
-	MDRV_SOUND_CONFIG(hector_sn76477_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.1)
+	MCFG_SOUND_ADD("sn76477", SN76477, 0)
+	MCFG_SOUND_CONFIG(hector_sn76477_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.1)
 
-	MDRV_SOUND_ADD("discrete", DISCRETE, 0) // Son 1bit
-	MDRV_SOUND_CONFIG_DISCRETE( hec2hrp )
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("discrete", DISCRETE, 0) // Son 1bit
+	MCFG_SOUND_CONFIG_DISCRETE( hec2hrp )
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	/* Gestion cassette*/
-	MDRV_CASSETTE_ADD( "cassette", hector_cassette_config )
+	MCFG_CASSETTE_ADD( "cassette", hector_cassette_config )
 
 	/* printer */
-	MDRV_PRINTER_ADD("printer")
+	MCFG_PRINTER_ADD("printer")
 
 	MACHINE_CONFIG_END
 

@@ -28,12 +28,12 @@ DECLARE_LEGACY_DEVICE(MSM8251, msm8251);
 #define MSM8251_STATUS_RX_READY	0x02
 #define MSM8251_STATUS_TX_READY	0x01
 
-#define MDRV_MSM8251_ADD(_tag, _intrf) \
-	MDRV_DEVICE_ADD(_tag, MSM8251, 0) \
-	MDRV_DEVICE_CONFIG(_intrf)
+#define MCFG_MSM8251_ADD(_tag, _intrf) \
+	MCFG_DEVICE_ADD(_tag, MSM8251, 0) \
+	MCFG_DEVICE_CONFIG(_intrf)
 
-#define MDRV_MSM8251_REMOVE(_tag) \
-	MDRV_DEVICE_REMOVE(_tag)
+#define MCFG_MSM8251_REMOVE(_tag) \
+	MCFG_DEVICE_REMOVE(_tag)
 
 
 /***************************************************************************
@@ -44,11 +44,11 @@ typedef struct _msm8251_interface msm8251_interface;
 struct _msm8251_interface
 {
 	/* state of txrdy output */
-	void	(*tx_ready_callback)(running_device *device, int state);
+	void	(*tx_ready_callback)(device_t *device, int state);
 	/* state of txempty output */
-	void	(*tx_empty_callback)(running_device *device, int state);
+	void	(*tx_empty_callback)(device_t *device, int state);
 	/* state of rxrdy output */
-	void	(*rx_ready_callback)(running_device *device, int state);
+	void	(*rx_ready_callback)(device_t *device, int state);
 };
 
 
@@ -73,13 +73,13 @@ WRITE8_DEVICE_HANDLER(msm8251_control_w);
 /* The 8251 has seperate transmit and receive clocks */
 /* use these two functions to update the msm8251 for each clock */
 /* on NC100 system, the clocks are the same */
-void msm8251_transmit_clock(running_device *device);
-void msm8251_receive_clock(running_device *device);
+void msm8251_transmit_clock(device_t *device);
+void msm8251_receive_clock(device_t *device);
 
 /* connecting to serial output */
-void msm8251_connect_to_serial_device(running_device *device, running_device *image);
-void msm8251_connect(running_device *device, serial_connection *other_connection);
+void msm8251_connect_to_serial_device(device_t *device, device_t *image);
+void msm8251_connect(device_t *device, serial_connection *other_connection);
 
-void msm8251_receive_character(running_device *device, UINT8 ch);
+void msm8251_receive_character(device_t *device, UINT8 ch);
 
 #endif /* __MSM8251_H__ */

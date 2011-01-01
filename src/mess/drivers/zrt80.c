@@ -136,7 +136,7 @@ static VIDEO_START( zrt80 )
 
 static VIDEO_UPDATE( zrt80 )
 {
-	running_device *mc6845 = screen->machine->device("crtc");
+	device_t *mc6845 = screen->machine->device("crtc");
 	mc6845_update(mc6845, bitmap, cliprect);
 	return 0;
 }
@@ -144,7 +144,7 @@ static VIDEO_UPDATE( zrt80 )
 static MC6845_UPDATE_ROW( zrt80_update_row )
 {
 	zrt80_state *state = device->machine->driver_data<zrt80_state>();
-	UINT8 *charrom = memory_region(device->machine, "chargen");
+	UINT8 *charrom = device->machine->region("chargen")->base();
 
 	int column, bit;
 
@@ -217,29 +217,29 @@ GFXDECODE_END
 
 static MACHINE_CONFIG_START( zrt80, zrt80_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu",Z80, XTAL_2_4576MHz)
-	MDRV_CPU_PROGRAM_MAP(zrt80_mem)
-	MDRV_CPU_IO_MAP(zrt80_io)
+	MCFG_CPU_ADD("maincpu",Z80, XTAL_2_4576MHz)
+	MCFG_CPU_PROGRAM_MAP(zrt80_mem)
+	MCFG_CPU_IO_MAP(zrt80_io)
 
-	MDRV_MACHINE_RESET(zrt80)
+	MCFG_MACHINE_RESET(zrt80)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(640, 200)
-	MDRV_SCREEN_VISIBLE_AREA(0, 640 - 1, 0, 200 - 1)
-	MDRV_GFXDECODE(zrt80)
-	MDRV_PALETTE_LENGTH(2)
-	MDRV_PALETTE_INIT(black_and_white)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(640, 200)
+	MCFG_SCREEN_VISIBLE_AREA(0, 640 - 1, 0, 200 - 1)
+	MCFG_GFXDECODE(zrt80)
+	MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_INIT(black_and_white)
 
-	MDRV_MC6845_ADD("crtc", MC6845, XTAL_20MHz / 8, zrt80_crtc6845_interface)
+	MCFG_MC6845_ADD("crtc", MC6845, XTAL_20MHz / 8, zrt80_crtc6845_interface)
 
-	MDRV_VIDEO_START(zrt80)
-	MDRV_VIDEO_UPDATE(zrt80)
+	MCFG_VIDEO_START(zrt80)
+	MCFG_VIDEO_UPDATE(zrt80)
 
-	MDRV_INS8250_ADD( "ins8250", zrt80_com_interface )
+	MCFG_INS8250_ADD( "ins8250", zrt80_com_interface )
 MACHINE_CONFIG_END
 
 /* ROM definition */

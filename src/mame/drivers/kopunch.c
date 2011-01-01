@@ -18,9 +18,9 @@ static READ8_HANDLER( kopunch_in_r )
 {
 	/* port 31 + low 3 bits of port 32 contain the punch strength */
 	if (offset == 0)
-		return mame_rand(space->machine);
+		return space->machine->rand();
 	else
-		return (mame_rand(space->machine) & 0x07) | input_port_read(space->machine, "SYSTEM");
+		return (space->machine->rand() & 0x07) | input_port_read(space->machine, "SYSTEM");
 }
 
 static WRITE8_HANDLER( kopunch_lamp_w )
@@ -190,28 +190,28 @@ static MACHINE_RESET( kopunch )
 static MACHINE_CONFIG_START( kopunch, kopunch_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", I8085A, 4000000)	/* 4 MHz ???? Uses SIM, must be 8085 */
-	MDRV_CPU_PROGRAM_MAP(kopunch_map)
-	MDRV_CPU_IO_MAP(kopunch_io_map)
-	MDRV_CPU_VBLANK_INT("screen",kopunch_interrupt)
+	MCFG_CPU_ADD("maincpu", I8085A, 4000000)	/* 4 MHz ???? Uses SIM, must be 8085 */
+	MCFG_CPU_PROGRAM_MAP(kopunch_map)
+	MCFG_CPU_IO_MAP(kopunch_io_map)
+	MCFG_CPU_VBLANK_INT("screen",kopunch_interrupt)
 
-	MDRV_MACHINE_START(kopunch)
-	MDRV_MACHINE_RESET(kopunch)
+	MCFG_MACHINE_START(kopunch)
+	MCFG_MACHINE_RESET(kopunch)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 
-	MDRV_GFXDECODE(kopunch)
-	MDRV_PALETTE_LENGTH(8)
+	MCFG_GFXDECODE(kopunch)
+	MCFG_PALETTE_LENGTH(8)
 
-	MDRV_PALETTE_INIT(kopunch)
-	MDRV_VIDEO_START(kopunch)
-	MDRV_VIDEO_UPDATE(kopunch)
+	MCFG_PALETTE_INIT(kopunch)
+	MCFG_VIDEO_START(kopunch)
+	MCFG_VIDEO_UPDATE(kopunch)
 
 	/* sound hardware */
 MACHINE_CONFIG_END

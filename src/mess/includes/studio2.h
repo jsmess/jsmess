@@ -19,8 +19,8 @@ public:
 	{ }
 
 	required_device<cosmac_device> m_maincpu;
-	optional_device<running_device> m_vdc;
-	optional_device<running_device> m_cti;
+	optional_device<device_t> m_vdc;
+	optional_device<device_t> m_cti;
 
 	virtual void machine_start();
 	virtual void machine_reset();

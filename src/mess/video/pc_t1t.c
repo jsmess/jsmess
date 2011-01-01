@@ -46,16 +46,16 @@ static const mc6845_interface mc6845_t1000_intf = {
 
 
 MACHINE_CONFIG_FRAGMENT( pcvideo_t1000 )
-	MDRV_SCREEN_ADD(T1000_SCREEN_NAME, RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_RAW_PARAMS(XTAL_14_31818MHz,912,0,640,262,0,200)
-	MDRV_PALETTE_LENGTH( 32 )
-	MDRV_PALETTE_INIT(pcjr)
+	MCFG_SCREEN_ADD(T1000_SCREEN_NAME, RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_14_31818MHz,912,0,640,262,0,200)
+	MCFG_PALETTE_LENGTH( 32 )
+	MCFG_PALETTE_INIT(pcjr)
 
-	MDRV_MC6845_ADD(T1000_MC6845_NAME, MC6845, XTAL_14_31818MHz/8, mc6845_t1000_intf)
+	MCFG_MC6845_ADD(T1000_MC6845_NAME, MC6845, XTAL_14_31818MHz/8, mc6845_t1000_intf)
 
-	MDRV_VIDEO_START(pc_t1t)
-	MDRV_VIDEO_UPDATE( mc6845_t1000 )
+	MCFG_VIDEO_START(pc_t1t)
+	MCFG_VIDEO_UPDATE( mc6845_t1000 )
 MACHINE_CONFIG_END
 
 
@@ -74,16 +74,16 @@ static const mc6845_interface mc6845_pcjr_intf = {
 
 
 MACHINE_CONFIG_FRAGMENT( pcvideo_pcjr )
-	MDRV_SCREEN_ADD(T1000_SCREEN_NAME, RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_RAW_PARAMS(XTAL_14_31818MHz,912,0,640,262,0,200)
-	MDRV_PALETTE_LENGTH( 32 )
-	MDRV_PALETTE_INIT(pcjr)
+	MCFG_SCREEN_ADD(T1000_SCREEN_NAME, RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_14_31818MHz,912,0,640,262,0,200)
+	MCFG_PALETTE_LENGTH( 32 )
+	MCFG_PALETTE_INIT(pcjr)
 
-	MDRV_MC6845_ADD(T1000_MC6845_NAME, MC6845, XTAL_14_31818MHz/16, mc6845_pcjr_intf)
+	MCFG_MC6845_ADD(T1000_MC6845_NAME, MC6845, XTAL_14_31818MHz/16, mc6845_pcjr_intf)
 
-	MDRV_VIDEO_START(pc_pcjr)
-	MDRV_VIDEO_UPDATE( mc6845_t1000 )
+	MCFG_VIDEO_START(pc_pcjr)
+	MCFG_VIDEO_UPDATE( mc6845_t1000 )
 MACHINE_CONFIG_END
 
 
@@ -154,7 +154,7 @@ static struct
 
 static VIDEO_START( pc_t1t )
 {
-	pcjr.chr_gen = memory_region(machine, "gfx1");
+	pcjr.chr_gen = machine->region("gfx1")->base();
 	pcjr.update_row = NULL;
 	pcjr.bank = 0;
 	pcjr.chr_size = 16;
@@ -165,7 +165,7 @@ static VIDEO_START( pc_t1t )
 
 static VIDEO_START( pc_pcjr )
 {
-	pcjr.chr_gen = memory_region(machine, "gfx1");
+	pcjr.chr_gen = machine->region("gfx1")->base();
 	pcjr.update_row = NULL;
 	pcjr.bank = 0;
 	pcjr.mode_control = 0x08;
@@ -176,7 +176,7 @@ static VIDEO_START( pc_pcjr )
 
 static VIDEO_UPDATE( mc6845_t1000 )
 {
-	running_device *devconf = screen->machine->device(T1000_MC6845_NAME);
+	device_t *devconf = screen->machine->device(T1000_MC6845_NAME);
 	mc6845_update( devconf, bitmap, cliprect);
 	return 0;
 }
@@ -487,7 +487,7 @@ static void pc_t1t_mode_switch( void )
 
 static void pc_pcjr_mode_switch( running_machine *machine )
 {
-	running_device *mc6845 = machine->device(T1000_MC6845_NAME);
+	device_t *mc6845 = machine->device(T1000_MC6845_NAME);
 
 	switch( pcjr.reg.data[0] & 0x1A )
 	{
@@ -720,7 +720,7 @@ static void pc_t1t_bank_w(running_machine *machine, int data)
 {
 	if (pcjr.bank != data)
 	{
-		UINT8 *ram = memory_region(machine, "maincpu");
+		UINT8 *ram = machine->region("maincpu")->base();
 		int dram, vram;
 		pcjr.bank = data;
 	/* it seems the video ram is mapped to the last 128K of main memory */
@@ -784,7 +784,7 @@ static int pc_t1t_bank_r(void)
 
 WRITE8_HANDLER ( pc_T1T_w )
 {
-	running_device *devconf;
+	device_t *devconf;
 
 	switch( offset )
 	{
@@ -824,7 +824,7 @@ WRITE8_HANDLER ( pc_T1T_w )
 
 WRITE8_HANDLER( pc_pcjr_w )
 {
-	running_device *devconf;
+	device_t *devconf;
 
 	switch( offset )
 	{
@@ -864,7 +864,7 @@ WRITE8_HANDLER( pc_pcjr_w )
 
  READ8_HANDLER ( pc_T1T_r )
 {
-	running_device *devconf;
+	device_t *devconf;
 	int				data = 0xff;
 
 	switch( offset )

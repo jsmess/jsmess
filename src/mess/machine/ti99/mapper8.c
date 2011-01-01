@@ -62,7 +62,7 @@
 typedef struct _log_addressed_device
 {
 	/* The device. */
-	running_device	*device;
+	device_t	*device;
 
 	/* Mode. */
 	int				mode;
@@ -90,7 +90,7 @@ typedef struct _log_addressed_device
 typedef struct _phys_addressed_device
 {
 	/* The device. */
-	running_device	*device;
+	device_t	*device;
 
 	/* Stop. If true, stop the address decoder here and do not look for parallel devices. */
 	int				stop;
@@ -118,7 +118,7 @@ typedef struct _mapper8_state
 	phys_addressed_device physcomp[MAXPHYSDEV];
 
 	/* The I/O port. */
-	running_device	*ioport;
+	device_t	*ioport;
 
 	/* Select bit for the internal DSR. */
 	int	dsr_selected;
@@ -150,14 +150,14 @@ typedef struct _mapper8_state
 } mapper8_state;
 
 
-INLINE mapper8_state *get_safe_token(running_device *device)
+INLINE mapper8_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(downcast<legacy_device_base *>(device)->token() != NULL);
 	return (mapper8_state *)downcast<legacy_device_base *>(device)->token();
 }
 
-static void mapper_mount_logical_device(running_device *mapperdev, running_device *busdevice, int mode, int stop, UINT16 address_mask, UINT16 address_bits, UINT16 write_sel, mapper_read_function read, mapper_write_function write)
+static void mapper_mount_logical_device(device_t *mapperdev, device_t *busdevice, int mode, int stop, UINT16 address_mask, UINT16 address_bits, UINT16 write_sel, mapper_read_function read, mapper_write_function write)
 {
 	mapper8_state *mapper = get_safe_token(mapperdev);
 	int index = mapper->logindex++;
@@ -183,7 +183,7 @@ static void mapper_mount_logical_device(running_device *mapperdev, running_devic
 	}
 }
 
-static void mapper_mount_physical_device(running_device *mapperdev, running_device *busdevice, int stop, UINT32 address_mask, UINT32 address_bits, mapper_read_function read, mapper_write_function write)
+static void mapper_mount_physical_device(device_t *mapperdev, device_t *busdevice, int stop, UINT32 address_mask, UINT32 address_bits, mapper_read_function read, mapper_write_function write)
 {
 	mapper8_state *mapper = get_safe_token(mapperdev);
 	int index = mapper->physindex++;
@@ -532,7 +532,7 @@ static DEVICE_START( mapper8 )
 	mapper8_state *mapper = get_safe_token(device);
 	mapper->sram = (UINT8*)malloc(SRAM_SIZE);
 	mapper->dram = (UINT8*)malloc(DRAM_SIZE);
-	mapper->rom = memory_region(device->machine, "maincpu");
+	mapper->rom = device->machine->region("maincpu")->base();
 
 	memset(mapper->sram, 0x00, SRAM_SIZE);
 	memset(mapper->dram, 0x00, DRAM_SIZE);
@@ -579,11 +579,11 @@ static DEVICE_START( mapper8 )
 			{
 				if (cons[i].mode != 3)
 				{
-					mapper_mount_logical_device(device, (running_device*)dev, cons[i].mode, cons[i].stop, (UINT16)cons[i].address_mask, (UINT16)cons[i].select_pattern, (UINT16)cons[i].write_select, cons[i].read, cons[i].write);
+					mapper_mount_logical_device(device, (device_t*)dev, cons[i].mode, cons[i].stop, (UINT16)cons[i].address_mask, (UINT16)cons[i].select_pattern, (UINT16)cons[i].write_select, cons[i].read, cons[i].write);
 				}
 				else
 				{
-					mapper_mount_physical_device(device, (running_device*)dev, cons[i].stop, cons[i].address_mask, cons[i].select_pattern, cons[i].read, cons[i].write);
+					mapper_mount_physical_device(device, (device_t*)dev, cons[i].stop, cons[i].address_mask, cons[i].select_pattern, cons[i].read, cons[i].write);
 				}
 			}
 			else

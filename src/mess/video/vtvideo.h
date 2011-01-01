@@ -22,9 +22,9 @@
 
 DECLARE_LEGACY_DEVICE(VT100_VIDEO, vt100_video);
 
-#define MDRV_VT100_VIDEO_ADD(_tag, _intrf) \
-	MDRV_DEVICE_ADD(_tag, VT100_VIDEO, 0) \
-	MDRV_DEVICE_CONFIG(_intrf)
+#define MCFG_VT100_VIDEO_ADD(_tag, _intrf) \
+	MCFG_DEVICE_ADD(_tag, VT100_VIDEO, 0) \
+	MCFG_DEVICE_CONFIG(_intrf)
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
@@ -51,6 +51,6 @@ WRITE8_DEVICE_HANDLER ( vt_video_brightness_w );
 
 
 /* screen update */
-void vt_video_update(running_device *device, bitmap_t *bitmap, const rectangle *cliprect);
+void vt_video_update(device_t *device, bitmap_t *bitmap, const rectangle *cliprect);
 
 #endif

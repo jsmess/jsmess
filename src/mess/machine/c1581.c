@@ -50,32 +50,32 @@ struct _c1581_t
 	int cnt_out;							/* fast serial clock out */
 
 	/* devices */
-	running_device *cpu;
-	running_device *cia;
-	running_device *wd1770;
-	running_device *serial_bus;
-	running_device *image;
+	device_t *cpu;
+	device_t *cia;
+	device_t *wd1770;
+	device_t *serial_bus;
+	device_t *image;
 };
 
 /***************************************************************************
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE c1581_t *get_safe_token(running_device *device)
+INLINE c1581_t *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert((device->type() == C1581) || (device->type() == C1563));
 	return (c1581_t *)downcast<legacy_device_base *>(device)->token();
 }
 
-INLINE c1581_config *get_safe_config(running_device *device)
+INLINE c1581_config *get_safe_config(device_t *device)
 {
 	assert(device != NULL);
 	assert((device->type() == C1581) || (device->type() == C1563));
 	return (c1581_config *)downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
 }
 
-INLINE void set_iec_data(running_device *device)
+INLINE void set_iec_data(device_t *device)
 {
 	c1581_t *c1581 = get_safe_token(device);
 
@@ -88,7 +88,7 @@ INLINE void set_iec_data(running_device *device)
 	cbm_iec_data_w(c1581->serial_bus, device, data);
 }
 
-INLINE void set_iec_srq(running_device *device)
+INLINE void set_iec_srq(device_t *device)
 {
 	c1581_t *c1581 = get_safe_token(device);
 
@@ -396,13 +396,13 @@ static const floppy_config c1581_floppy_config =
 -------------------------------------------------*/
 
 static MACHINE_CONFIG_FRAGMENT( c1581 )
-	MDRV_CPU_ADD(M6502_TAG, M6502, XTAL_16MHz/8)
-	MDRV_CPU_PROGRAM_MAP(c1581_map)
+	MCFG_CPU_ADD(M6502_TAG, M6502, XTAL_16MHz/8)
+	MCFG_CPU_PROGRAM_MAP(c1581_map)
 
-	MDRV_MOS8520_ADD(M8520_TAG, XTAL_16MHz/8, cia_intf)
-	MDRV_WD1770_ADD(WD1770_TAG, /*XTAL_16MHz/2,*/ wd1770_intf)
+	MCFG_MOS8520_ADD(M8520_TAG, XTAL_16MHz/8, cia_intf)
+	MCFG_WD1770_ADD(WD1770_TAG, /*XTAL_16MHz/2,*/ wd1770_intf)
 
-	MDRV_FLOPPY_DRIVE_ADD(FLOPPY_0, c1581_floppy_config)
+	MCFG_FLOPPY_DRIVE_ADD(FLOPPY_0, c1581_floppy_config)
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------
@@ -410,13 +410,13 @@ MACHINE_CONFIG_END
 -------------------------------------------------*/
 
 static MACHINE_CONFIG_FRAGMENT( c1563 )
-	MDRV_CPU_ADD(M6502_TAG, M6502, XTAL_16MHz/8)
-	MDRV_CPU_PROGRAM_MAP(c1563_map)
+	MCFG_CPU_ADD(M6502_TAG, M6502, XTAL_16MHz/8)
+	MCFG_CPU_PROGRAM_MAP(c1563_map)
 
-	MDRV_MOS8520_ADD(M8520_TAG, XTAL_16MHz/8, cia_intf)
-	MDRV_WD1770_ADD(WD1770_TAG, /*XTAL_16MHz/2,*/ wd1770_intf)
+	MCFG_MOS8520_ADD(M8520_TAG, XTAL_16MHz/8, cia_intf)
+	MCFG_WD1770_ADD(WD1770_TAG, /*XTAL_16MHz/2,*/ wd1770_intf)
 
-	MDRV_FLOPPY_DRIVE_ADD(FLOPPY_0, c1581_floppy_config)
+	MCFG_FLOPPY_DRIVE_ADD(FLOPPY_0, c1581_floppy_config)
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------

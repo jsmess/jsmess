@@ -1231,7 +1231,7 @@ void cdicdic_device::device_reset()
 {
     init();
 
-    running_device *cdrom_dev = m_machine.device("cdrom");
+    device_t *cdrom_dev = m_machine.device("cdrom");
     if( cdrom_dev )
     {
         m_cd = mess_cd_get_cdrom_file(cdrom_dev);

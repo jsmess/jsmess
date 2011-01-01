@@ -17,7 +17,7 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef int (*adc1038_input_read_func)(running_device *device, int input);
+typedef int (*adc1038_input_read_func)(device_t *device, int input);
 
 typedef struct _adc1038_interface adc1038_interface;
 struct _adc1038_interface
@@ -33,9 +33,9 @@ struct _adc1038_interface
 
 DECLARE_LEGACY_DEVICE(ADC1038, adc1038);
 
-#define MDRV_ADC1038_ADD(_tag, _config) \
-	MDRV_DEVICE_ADD(_tag, ADC1038, 0) \
-	MDRV_DEVICE_CONFIG(_config)
+#define MCFG_ADC1038_ADD(_tag, _config) \
+	MCFG_DEVICE_ADD(_tag, ADC1038, 0) \
+	MCFG_DEVICE_CONFIG(_config)
 
 
 /***************************************************************************

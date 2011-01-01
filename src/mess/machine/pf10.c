@@ -29,7 +29,7 @@ struct _pf10_state
     INLINE FUNCTIONS
 *****************************************************************************/
 
-INLINE pf10_state *get_safe_token(running_device *device)
+INLINE pf10_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == PF10);
@@ -68,11 +68,11 @@ static const upd765_interface pf10_upd765a_intf =
 };
 
 static MACHINE_CONFIG_FRAGMENT( pf10 )
-	MDRV_CPU_ADD("pf10", M6803, XTAL_2_4576MHz / 4 /* ??? */) /* HD63A03 */
-	MDRV_CPU_PROGRAM_MAP(pf10_mem)
-	MDRV_CPU_IO_MAP(pf10_io)
+	MCFG_CPU_ADD("pf10", M6803, XTAL_2_4576MHz / 4 /* ??? */) /* HD63A03 */
+	MCFG_CPU_PROGRAM_MAP(pf10_mem)
+	MCFG_CPU_IO_MAP(pf10_io)
 
-	MDRV_UPD765A_ADD("upd765a", pf10_upd765a_intf)
+	MCFG_UPD765A_ADD("upd765a", pf10_upd765a_intf)
 MACHINE_CONFIG_END
 
 

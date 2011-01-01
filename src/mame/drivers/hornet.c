@@ -332,55 +332,55 @@ static emu_timer *sound_irq_timer;
 
 static READ32_HANDLER( hornet_k037122_sram_r )
 {
-	running_device *k037122 = space->machine->device(get_cgboard_id() ? "k037122_2" : "k037122_1");
+	device_t *k037122 = space->machine->device(get_cgboard_id() ? "k037122_2" : "k037122_1");
 	return k037122_sram_r(k037122, offset, mem_mask);
 }
 
 static WRITE32_HANDLER( hornet_k037122_sram_w )
 {
-	running_device *k037122 = space->machine->device(get_cgboard_id() ? "k037122_2" : "k037122_1");
+	device_t *k037122 = space->machine->device(get_cgboard_id() ? "k037122_2" : "k037122_1");
 	k037122_sram_w(k037122, offset, data, mem_mask);
 }
 
 
 static READ32_HANDLER( hornet_k037122_char_r )
 {
-	running_device *k037122 = space->machine->device(get_cgboard_id() ? "k037122_2" : "k037122_1");
+	device_t *k037122 = space->machine->device(get_cgboard_id() ? "k037122_2" : "k037122_1");
 	return k037122_char_r(k037122, offset, mem_mask);
 }
 
 static WRITE32_HANDLER( hornet_k037122_char_w )
 {
-	running_device *k037122 = space->machine->device(get_cgboard_id() ? "k037122_2" : "k037122_1");
+	device_t *k037122 = space->machine->device(get_cgboard_id() ? "k037122_2" : "k037122_1");
 	k037122_char_w(k037122, offset, data, mem_mask);
 }
 
 static READ32_HANDLER( hornet_k037122_reg_r )
 {
-	running_device *k037122 = space->machine->device(get_cgboard_id() ? "k037122_2" : "k037122_1");
+	device_t *k037122 = space->machine->device(get_cgboard_id() ? "k037122_2" : "k037122_1");
 	return k037122_reg_r(k037122, offset, mem_mask);
 }
 
 static WRITE32_HANDLER( hornet_k037122_reg_w )
 {
-	running_device *k037122 = space->machine->device(get_cgboard_id() ? "k037122_2" : "k037122_1");
+	device_t *k037122 = space->machine->device(get_cgboard_id() ? "k037122_2" : "k037122_1");
 	k037122_reg_w(k037122, offset, data, mem_mask);
 }
 
-static void voodoo_vblank_0(running_device *device, int param)
+static void voodoo_vblank_0(device_t *device, int param)
 {
 	cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_IRQ0, ASSERT_LINE);
 }
 
-static void voodoo_vblank_1(running_device *device, int param)
+static void voodoo_vblank_1(device_t *device, int param)
 {
 	cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_IRQ1, ASSERT_LINE);
 }
 
 static VIDEO_UPDATE( hornet )
 {
-	running_device *voodoo = screen->machine->device("voodoo0");
-	running_device *k037122 = screen->machine->device("k037122_1");
+	device_t *voodoo = screen->machine->device("voodoo0");
+	device_t *k037122 = screen->machine->device("k037122_1");
 
 	voodoo_update(voodoo, bitmap, cliprect);
 
@@ -395,8 +395,8 @@ static VIDEO_UPDATE( hornet_2board )
 {
 	if (strcmp(screen->tag(), "lscreen") == 0)
 	{
-		running_device *k037122 = screen->machine->device("k037122_1");
-		running_device *voodoo = screen->machine->device("voodoo0");
+		device_t *k037122 = screen->machine->device("k037122_1");
+		device_t *voodoo = screen->machine->device("voodoo0");
 		voodoo_update(voodoo, bitmap, cliprect);
 
 		/* TODO: tilemaps per screen */
@@ -404,8 +404,8 @@ static VIDEO_UPDATE( hornet_2board )
 	}
 	else if (strcmp(screen->tag(), "rscreen") == 0)
 	{
-		running_device *k037122 = screen->machine->device("k037122_2");
-		running_device *voodoo = screen->machine->device("voodoo1");
+		device_t *k037122 = screen->machine->device("k037122_2");
+		device_t *voodoo = screen->machine->device("voodoo1");
 		voodoo_update(voodoo, bitmap, cliprect);
 
 		/* TODO: tilemaps per screen */
@@ -423,8 +423,8 @@ static READ8_HANDLER( sysreg_r )
 {
 	UINT8 r = 0;
 	static const char *const portnames[] = { "IN0", "IN1", "IN2" };
-	running_device *adc12138 = space->machine->device("adc12138");
-	running_device *eeprom = space->machine->device("eeprom");
+	device_t *adc12138 = space->machine->device("adc12138");
+	device_t *eeprom = space->machine->device("eeprom");
 
 	switch (offset)
 	{
@@ -457,7 +457,7 @@ static READ8_HANDLER( sysreg_r )
 
 static WRITE8_HANDLER( sysreg_w )
 {
-	running_device *adc12138 = space->machine->device("adc12138");
+	device_t *adc12138 = space->machine->device("adc12138");
 
 	switch (offset)
 	{
@@ -557,7 +557,7 @@ static WRITE32_HANDLER( comm1_w )
 static WRITE32_HANDLER( comm_rombank_w )
 {
 	int bank = data >> 24;
-	UINT8 *usr3 = memory_region(space->machine, "user3");
+	UINT8 *usr3 = space->machine->region("user3")->base();
 	if (usr3 != NULL)
 		memory_set_bank(space->machine, "bank1", bank & 0x7f);
 }
@@ -853,11 +853,11 @@ static MACHINE_START( hornet )
 
 static MACHINE_RESET( hornet )
 {
-	UINT8 *usr3 = memory_region(machine, "user3");
-	UINT8 *usr5 = memory_region(machine, "user5");
+	UINT8 *usr3 = machine->region("user3")->base();
+	UINT8 *usr5 = machine->region("user5")->base();
 	if (usr3 != NULL)
 	{
-		memory_configure_bank(machine, "bank1", 0, memory_region_length(machine, "user3") / 0x40000, usr3, 0x40000);
+		memory_configure_bank(machine, "bank1", 0, machine->region("user3")->bytes() / 0x40000, usr3, 0x40000);
 		memory_set_bank(machine, "bank1", 0);
 	}
 
@@ -867,7 +867,7 @@ static MACHINE_RESET( hornet )
 		memory_set_bankptr(machine, "bank5", usr5);
 }
 
-static double adc12138_input_callback( running_device *device, UINT8 input )
+static double adc12138_input_callback( device_t *device, UINT8 input )
 {
 	return (double)0.0;
 }
@@ -922,65 +922,65 @@ static const k037122_interface hornet_k037122_intf_r =
 static MACHINE_CONFIG_START( hornet, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", PPC403GA, 64000000/2)	/* PowerPC 403GA 32MHz */
-	MDRV_CPU_PROGRAM_MAP(hornet_map)
+	MCFG_CPU_ADD("maincpu", PPC403GA, 64000000/2)	/* PowerPC 403GA 32MHz */
+	MCFG_CPU_PROGRAM_MAP(hornet_map)
 
-	MDRV_CPU_ADD("audiocpu", M68000, 64000000/4)	/* 16MHz */
-	MDRV_CPU_PROGRAM_MAP(sound_memmap)
+	MCFG_CPU_ADD("audiocpu", M68000, 64000000/4)	/* 16MHz */
+	MCFG_CPU_PROGRAM_MAP(sound_memmap)
 
-	MDRV_CPU_ADD("dsp", ADSP21062, 36000000)
-	MDRV_CPU_CONFIG(sharc_cfg)
-	MDRV_CPU_DATA_MAP(sharc0_map)
+	MCFG_CPU_ADD("dsp", ADSP21062, 36000000)
+	MCFG_CPU_CONFIG(sharc_cfg)
+	MCFG_CPU_DATA_MAP(sharc0_map)
 
-	MDRV_QUANTUM_TIME(HZ(6000))
+	MCFG_QUANTUM_TIME(HZ(6000))
 
-	MDRV_MACHINE_START( hornet )
-	MDRV_MACHINE_RESET( hornet )
+	MCFG_MACHINE_START( hornet )
+	MCFG_MACHINE_RESET( hornet )
 
-	MDRV_EEPROM_93C46_ADD("eeprom")
+	MCFG_EEPROM_93C46_ADD("eeprom")
 
-	MDRV_3DFX_VOODOO_1_ADD("voodoo0", STD_VOODOO_1_CLOCK, 2, "screen")
-	MDRV_3DFX_VOODOO_CPU("dsp")
-	MDRV_3DFX_VOODOO_TMU_MEMORY(0, 4)
-	MDRV_3DFX_VOODOO_VBLANK(voodoo_vblank_0)
+	MCFG_3DFX_VOODOO_1_ADD("voodoo0", STD_VOODOO_1_CLOCK, 2, "screen")
+	MCFG_3DFX_VOODOO_CPU("dsp")
+	MCFG_3DFX_VOODOO_TMU_MEMORY(0, 4)
+	MCFG_3DFX_VOODOO_VBLANK(voodoo_vblank_0)
 
-	MDRV_K033906_ADD("k033906_1", hornet_k033906_intf_0)
+	MCFG_K033906_ADD("k033906_1", hornet_k033906_intf_0)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_SIZE(64*8, 48*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 48*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_SIZE(64*8, 48*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 48*8-1)
 
-	MDRV_PALETTE_LENGTH(65536)
+	MCFG_PALETTE_LENGTH(65536)
 
-	MDRV_VIDEO_UPDATE(hornet)
+	MCFG_VIDEO_UPDATE(hornet)
 
-	MDRV_K037122_ADD("k037122_1", hornet_k037122_intf)
+	MCFG_K037122_ADD("k037122_1", hornet_k037122_intf)
 
-	MDRV_K056800_ADD("k056800", hornet_k056800_interface)
+	MCFG_K056800_ADD("k056800", hornet_k056800_interface)
 
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("rfsnd", RF5C400, 16934400)	// value from Guru readme, gives 44100 Hz sample rate
-	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("rfsnd", RF5C400, 16934400)	// value from Guru readme, gives 44100 Hz sample rate
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MDRV_M48T58_ADD( "m48t58" )
+	MCFG_M48T58_ADD( "m48t58" )
 
-	MDRV_ADC12138_ADD( "adc12138", hornet_adc_interface )
+	MCFG_ADC12138_ADD( "adc12138", hornet_adc_interface )
 MACHINE_CONFIG_END
 
 
 static MACHINE_RESET( hornet_2board )
 {
-	UINT8 *usr3 = memory_region(machine, "user3");
-	UINT8 *usr5 = memory_region(machine, "user5");
+	UINT8 *usr3 = machine->region("user3")->base();
+	UINT8 *usr5 = machine->region("user5")->base();
 
 	if (usr3 != NULL)
 	{
-		memory_configure_bank(machine, "bank1", 0, memory_region_length(machine, "user3") / 0x40000, usr3, 0x40000);
+		memory_configure_bank(machine, "bank1", 0, machine->region("user3")->bytes() / 0x40000, usr3, 0x40000);
 		memory_set_bank(machine, "bank1", 0);
 	}
 	cputag_set_input_line(machine, "dsp", INPUT_LINE_RESET, ASSERT_LINE);
@@ -992,68 +992,68 @@ static MACHINE_RESET( hornet_2board )
 
 static MACHINE_CONFIG_DERIVED( hornet_2board, hornet )
 
-	MDRV_CPU_ADD("dsp2", ADSP21062, 36000000)
-	MDRV_CPU_CONFIG(sharc_cfg)
-	MDRV_CPU_DATA_MAP(sharc1_map)
+	MCFG_CPU_ADD("dsp2", ADSP21062, 36000000)
+	MCFG_CPU_CONFIG(sharc_cfg)
+	MCFG_CPU_DATA_MAP(sharc1_map)
 
-	MDRV_MACHINE_RESET(hornet_2board)
+	MCFG_MACHINE_RESET(hornet_2board)
 
-	MDRV_VIDEO_UPDATE(hornet_2board)
+	MCFG_VIDEO_UPDATE(hornet_2board)
 
-	MDRV_DEVICE_REMOVE("k037122_1")
-	MDRV_K037122_ADD("k037122_1", hornet_k037122_intf_l)
-	MDRV_K037122_ADD("k037122_2", hornet_k037122_intf_r)
+	MCFG_DEVICE_REMOVE("k037122_1")
+	MCFG_K037122_ADD("k037122_1", hornet_k037122_intf_l)
+	MCFG_K037122_ADD("k037122_2", hornet_k037122_intf_r)
 
-	MDRV_DEVICE_REMOVE("voodoo0")
-	MDRV_3DFX_VOODOO_1_ADD("voodoo0", STD_VOODOO_1_CLOCK, 2, "lscreen")
-	MDRV_3DFX_VOODOO_CPU("dsp")
-	MDRV_3DFX_VOODOO_TMU_MEMORY(0, 4)
-	MDRV_3DFX_VOODOO_VBLANK(voodoo_vblank_0)
+	MCFG_DEVICE_REMOVE("voodoo0")
+	MCFG_3DFX_VOODOO_1_ADD("voodoo0", STD_VOODOO_1_CLOCK, 2, "lscreen")
+	MCFG_3DFX_VOODOO_CPU("dsp")
+	MCFG_3DFX_VOODOO_TMU_MEMORY(0, 4)
+	MCFG_3DFX_VOODOO_VBLANK(voodoo_vblank_0)
 
-	MDRV_3DFX_VOODOO_1_ADD("voodoo1", STD_VOODOO_1_CLOCK, 2, "rscreen")
-	MDRV_3DFX_VOODOO_CPU("dsp2")
-	MDRV_3DFX_VOODOO_TMU_MEMORY(0, 4)
-	MDRV_3DFX_VOODOO_VBLANK(voodoo_vblank_1)
+	MCFG_3DFX_VOODOO_1_ADD("voodoo1", STD_VOODOO_1_CLOCK, 2, "rscreen")
+	MCFG_3DFX_VOODOO_CPU("dsp2")
+	MCFG_3DFX_VOODOO_TMU_MEMORY(0, 4)
+	MCFG_3DFX_VOODOO_VBLANK(voodoo_vblank_1)
 
-	MDRV_K033906_ADD("k033906_2", hornet_k033906_intf_1)
+	MCFG_K033906_ADD("k033906_2", hornet_k033906_intf_1)
 
 	/* video hardware */
-	MDRV_PALETTE_LENGTH(65536)
+	MCFG_PALETTE_LENGTH(65536)
 
-	MDRV_DEVICE_REMOVE("screen")
+	MCFG_DEVICE_REMOVE("screen")
 
-	MDRV_SCREEN_ADD("lscreen", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_SIZE(512, 384)
-	MDRV_SCREEN_VISIBLE_AREA(0, 511, 0, 383)
+	MCFG_SCREEN_ADD("lscreen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_SIZE(512, 384)
+	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 383)
 
-	MDRV_SCREEN_ADD("rscreen", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_SIZE(512, 384)
-	MDRV_SCREEN_VISIBLE_AREA(0, 511, 0, 383)
+	MCFG_SCREEN_ADD("rscreen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_SIZE(512, 384)
+	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 383)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( terabrst, hornet_2board )
 
-	MDRV_CPU_ADD("gn680", M68000, 32000000/2)	/* 16MHz */
-	MDRV_CPU_PROGRAM_MAP(gn680_memmap)
+	MCFG_CPU_ADD("gn680", M68000, 32000000/2)	/* 16MHz */
+	MCFG_CPU_PROGRAM_MAP(gn680_memmap)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( hornet_2board_v2, hornet_2board )
 
-	MDRV_DEVICE_REMOVE("voodoo0")
-	MDRV_3DFX_VOODOO_2_ADD("voodoo0", STD_VOODOO_2_CLOCK, 2, "lscreen")
-	MDRV_3DFX_VOODOO_CPU("dsp")
-	MDRV_3DFX_VOODOO_TMU_MEMORY(0, 4)
-	MDRV_3DFX_VOODOO_VBLANK(voodoo_vblank_0)
+	MCFG_DEVICE_REMOVE("voodoo0")
+	MCFG_3DFX_VOODOO_2_ADD("voodoo0", STD_VOODOO_2_CLOCK, 2, "lscreen")
+	MCFG_3DFX_VOODOO_CPU("dsp")
+	MCFG_3DFX_VOODOO_TMU_MEMORY(0, 4)
+	MCFG_3DFX_VOODOO_VBLANK(voodoo_vblank_0)
 
-	MDRV_DEVICE_REMOVE("voodoo1")
-	MDRV_3DFX_VOODOO_2_ADD("voodoo1", STD_VOODOO_2_CLOCK, 2, "rscreen")
-	MDRV_3DFX_VOODOO_CPU("dsp2")
-	MDRV_3DFX_VOODOO_TMU_MEMORY(0, 4)
-	MDRV_3DFX_VOODOO_VBLANK(voodoo_vblank_1)
+	MCFG_DEVICE_REMOVE("voodoo1")
+	MCFG_3DFX_VOODOO_2_ADD("voodoo1", STD_VOODOO_2_CLOCK, 2, "rscreen")
+	MCFG_3DFX_VOODOO_CPU("dsp2")
+	MCFG_3DFX_VOODOO_TMU_MEMORY(0, 4)
+	MCFG_3DFX_VOODOO_VBLANK(voodoo_vblank_1)
 MACHINE_CONFIG_END
 
 
@@ -1061,7 +1061,7 @@ MACHINE_CONFIG_END
 
 static void jamma_jvs_cmd_exec(running_machine *machine);
 
-static void jamma_jvs_w(running_device *device, UINT8 data)
+static void jamma_jvs_w(device_t *device, UINT8 data)
 {
 	if (jvs_sdata_ptr == 0 && data != 0xe0)
 		return;
@@ -1203,7 +1203,7 @@ static void jamma_jvs_cmd_exec(running_machine *machine)
 static DRIVER_INIT(hornet)
 {
 	init_konami_cgboard(machine, 1, CGBOARD_TYPE_HORNET);
-	set_cgboard_texture_bank(machine, 0, "bank5", memory_region(machine, "user5"));
+	set_cgboard_texture_bank(machine, 0, "bank5", machine->region("user5")->base());
 
 	led_reg0 = led_reg1 = 0x7f;
 
@@ -1213,8 +1213,8 @@ static DRIVER_INIT(hornet)
 static DRIVER_INIT(hornet_2board)
 {
 	init_konami_cgboard(machine, 2, CGBOARD_TYPE_HORNET);
-	set_cgboard_texture_bank(machine, 0, "bank5", memory_region(machine, "user5"));
-	set_cgboard_texture_bank(machine, 1, "bank6", memory_region(machine, "user5"));
+	set_cgboard_texture_bank(machine, 0, "bank5", machine->region("user5")->base());
+	set_cgboard_texture_bank(machine, 1, "bank6", machine->region("user5")->base());
 
 	led_reg0 = led_reg1 = 0x7f;
 

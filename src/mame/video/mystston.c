@@ -75,7 +75,7 @@ static void set_palette(running_machine *machine, mystston_state *state)
 	static const int resistances_b [2] = { 3300, 1500 };
 	double weights_rg[3], weights_b[2];
 
-	UINT8 *color_prom = memory_region(machine, "proms");
+	UINT8 *color_prom = machine->region("proms")->base();
 
 	compute_resistor_weights(0,	255, -1.0,
 			3, resistances_rg, weights_rg, 0, 1000,
@@ -323,14 +323,14 @@ GFXDECODE_END
 
 MACHINE_CONFIG_FRAGMENT( mystston_video )
 
-	MDRV_VIDEO_START(mystston)
-	MDRV_VIDEO_RESET(mystston)
-	MDRV_VIDEO_UPDATE(mystston)
+	MCFG_VIDEO_START(mystston)
+	MCFG_VIDEO_RESET(mystston)
+	MCFG_VIDEO_UPDATE(mystston)
 
-	MDRV_GFXDECODE(mystston)
-	MDRV_PALETTE_LENGTH(0x40)
+	MCFG_GFXDECODE(mystston)
+	MCFG_PALETTE_LENGTH(0x40)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 MACHINE_CONFIG_END

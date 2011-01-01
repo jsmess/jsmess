@@ -435,7 +435,7 @@ static const UINT8 fcmp_cr_table_source[32] =
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE powerpc_state *get_safe_token(running_device *device)
+INLINE powerpc_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == PPC403GA ||
@@ -817,7 +817,7 @@ static CPU_GET_INFO( ppcdrc )
     ppcdrc_set_options - configure DRC options
 -------------------------------------------------*/
 
-void ppcdrc_set_options(running_device *device, UINT32 options)
+void ppcdrc_set_options(device_t *device, UINT32 options)
 {
 	powerpc_state *ppc = get_safe_token(device);
 	ppc->impstate->drcoptions = options;
@@ -829,7 +829,7 @@ void ppcdrc_set_options(running_device *device, UINT32 options)
     region
 -------------------------------------------------*/
 
-void ppcdrc_add_fastram(running_device *device, offs_t start, offs_t end, UINT8 readonly, void *base)
+void ppcdrc_add_fastram(device_t *device, offs_t start, offs_t end, UINT8 readonly, void *base)
 {
 	powerpc_state *ppc = get_safe_token(device);
 	if (ppc->impstate->fastram_select < ARRAY_LENGTH(ppc->impstate->fastram))
@@ -847,7 +847,7 @@ void ppcdrc_add_fastram(running_device *device, offs_t start, offs_t end, UINT8 
     ppcdrc_add_hotspot - add a new hotspot
 -------------------------------------------------*/
 
-void ppcdrc_add_hotspot(running_device *device, offs_t pc, UINT32 opcode, UINT32 cycles)
+void ppcdrc_add_hotspot(device_t *device, offs_t pc, UINT32 opcode, UINT32 cycles)
 {
 	powerpc_state *ppc = get_safe_token(device);
 	if (ppc->impstate->hotspot_select < ARRAY_LENGTH(ppc->impstate->hotspot))
@@ -2097,7 +2097,7 @@ static void generate_checksum_block(powerpc_state *ppc, drcuml_block *block, com
 	{
 		if (!(seqhead->flags & OPFLAG_VIRTUAL_NOOP))
 		{
-			void *base = ppc->direct->read_decrypted_ptr(seqhead->physpc ^ ppc->codexor);
+			void *base = ppc->direct->read_decrypted_ptr(seqhead->physpc, ppc->codexor);
 			UML_LOAD(block, IREG(0), base, IMM(0), DWORD);									// load    i0,base,dword
 			UML_CMP(block, IREG(0), IMM(seqhead->opptr.l[0]));								// cmp     i0,*opptr
 			UML_EXHc(block, IF_NE, ppc->impstate->nocode, IMM(seqhead->pc));				// exne    nocode,seqhead->pc
@@ -2111,20 +2111,20 @@ static void generate_checksum_block(powerpc_state *ppc, drcuml_block *block, com
 		for (curdesc = seqhead->next; curdesc != seqlast->next; curdesc = curdesc->next)
 			if (!(curdesc->flags & OPFLAG_VIRTUAL_NOOP))
 			{
-				void *base = ppc->direct->read_decrypted_ptr(seqhead->physpc ^ ppc->codexor);
+				void *base = ppc->direct->read_decrypted_ptr(seqhead->physpc, ppc->codexor);
 				UML_LOAD(block, IREG(0), base, IMM(0), DWORD);								// load    i0,base,dword
 				UML_CMP(block, IREG(0), IMM(curdesc->opptr.l[0]));							// cmp     i0,*opptr
 				UML_EXHc(block, IF_NE, ppc->impstate->nocode, IMM(seqhead->pc));			// exne    nocode,seqhead->pc
 			}
 #else
 		UINT32 sum = 0;
-		void *base = ppc->direct->read_decrypted_ptr(seqhead->physpc ^ ppc->codexor);
+		void *base = ppc->direct->read_decrypted_ptr(seqhead->physpc, ppc->codexor);
 		UML_LOAD(block, IREG(0), base, IMM(0), DWORD);										// load    i0,base,dword
 		sum += seqhead->opptr.l[0];
 		for (curdesc = seqhead->next; curdesc != seqlast->next; curdesc = curdesc->next)
 			if (!(curdesc->flags & OPFLAG_VIRTUAL_NOOP))
 			{
-				base = ppc->direct->read_decrypted_ptr(curdesc->physpc ^ ppc->codexor);
+				base = ppc->direct->read_decrypted_ptr(curdesc->physpc, ppc->codexor);
 				UML_LOAD(block, IREG(1), base, IMM(0), DWORD);								// load    i1,base,dword
 				UML_ADD(block, IREG(0), IREG(0), IREG(1));									// add     i0,i0,i1
 				sum += curdesc->opptr.l[0];

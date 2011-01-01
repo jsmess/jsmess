@@ -82,7 +82,7 @@ static WRITE16_HANDLER( snowbros_flipscreen_w )
 
 static VIDEO_UPDATE( snowbros )
 {
-	running_device *pandora = screen->machine->device("pandora");
+	device_t *pandora = screen->machine->device("pandora");
 
 	/* This clears & redraws the entire screen each pass */
 	bitmap_fill(bitmap,cliprect,0xf0);
@@ -93,7 +93,7 @@ static VIDEO_UPDATE( snowbros )
 
 static VIDEO_EOF( snowbros )
 {
-	running_device *pandora = machine->device("pandora");
+	device_t *pandora = machine->device("pandora");
 	pandora_eof(pandora);
 }
 
@@ -396,13 +396,13 @@ static void sb3_play_music(running_machine *machine, int data)
 	{
 		case 0x23:
 		case 0x26:
-		snd = memory_region(machine, "oki");
+		snd = machine->region("oki")->base();
 		memcpy(snd+0x20000, snd+0x80000+0x00000, 0x20000);
 		sb3_music_is_playing = 1;
 		break;
 
 		case 0x24:
-		snd = memory_region(machine, "oki");
+		snd = machine->region("oki")->base();
 		memcpy(snd+0x20000, snd+0x80000+0x20000, 0x20000);
 		sb3_music_is_playing = 1;
 		break;
@@ -415,7 +415,7 @@ static void sb3_play_music(running_machine *machine, int data)
 		case 0x2b:
 		case 0x2c:
 		case 0x2d:
-		snd = memory_region(machine, "oki");
+		snd = machine->region("oki")->base();
 		memcpy(snd+0x20000, snd+0x80000+0x40000, 0x20000);
 		sb3_music_is_playing = 1;
 		break;
@@ -1401,7 +1401,7 @@ static GFXDECODE_START( hyperpac )
 GFXDECODE_END
 
 /* handler called by the 3812/2151 emulator when the internal timers cause an IRQ */
-static void irqhandler(running_device *device, int irq)
+static void irqhandler(device_t *device, int irq)
 {
 	cputag_set_input_line(device->machine, "soundcpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -1423,7 +1423,7 @@ static const ym2151_interface ym2151_config =
 
 static MACHINE_RESET (semiprot)
 {
-	UINT16 *PROTDATA = (UINT16*)memory_region(machine, "user1");
+	UINT16 *PROTDATA = (UINT16*)machine->region("user1")->base();
 	int i;
 
 	for (i = 0;i < 0x200/2;i++)
@@ -1432,7 +1432,7 @@ static MACHINE_RESET (semiprot)
 
 static MACHINE_RESET (finalttr)
 {
-	UINT16 *PROTDATA = (UINT16*)memory_region(machine, "user1");
+	UINT16 *PROTDATA = (UINT16*)machine->region("user1")->base();
 	int i;
 
 	for (i = 0;i < 0x200/2;i++)
@@ -1449,76 +1449,76 @@ static const kaneko_pandora_interface snowbros_pandora_config =
 static MACHINE_CONFIG_START( snowbros, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 8000000) /* 8 Mhz - confirmed */
-	MDRV_CPU_PROGRAM_MAP(snowbros_map)
-	MDRV_CPU_VBLANK_INT_HACK(snowbros_interrupt,3)
+	MCFG_CPU_ADD("maincpu", M68000, 8000000) /* 8 Mhz - confirmed */
+	MCFG_CPU_PROGRAM_MAP(snowbros_map)
+	MCFG_CPU_VBLANK_INT_HACK(snowbros_interrupt,3)
 
-	MDRV_CPU_ADD("soundcpu", Z80, 6000000) /* 6 MHz - confirmed */
-	MDRV_CPU_PROGRAM_MAP(sound_map)
-	MDRV_CPU_IO_MAP(sound_io_map)
+	MCFG_CPU_ADD("soundcpu", Z80, 6000000) /* 6 MHz - confirmed */
+	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_CPU_IO_MAP(sound_io_map)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(57.5) /* ~57.5 - confirmed */
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(57.5) /* ~57.5 - confirmed */
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(snowbros)
-	MDRV_PALETTE_LENGTH(256)
+	MCFG_GFXDECODE(snowbros)
+	MCFG_PALETTE_LENGTH(256)
 
-	MDRV_VIDEO_UPDATE(snowbros)
-	MDRV_VIDEO_EOF(snowbros)
+	MCFG_VIDEO_UPDATE(snowbros)
+	MCFG_VIDEO_EOF(snowbros)
 
-	MDRV_KANEKO_PANDORA_ADD("pandora", snowbros_pandora_config)
+	MCFG_KANEKO_PANDORA_ADD("pandora", snowbros_pandora_config)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM3812, 3000000)
-	MDRV_SOUND_CONFIG(ym3812_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("ymsnd", YM3812, 3000000)
+	MCFG_SOUND_CONFIG(ym3812_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( wintbob, snowbros )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_CLOCK(10000000) /* 10mhz - Confirmed */
-	MDRV_CPU_PROGRAM_MAP(wintbob_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_CLOCK(10000000) /* 10mhz - Confirmed */
+	MCFG_CPU_PROGRAM_MAP(wintbob_map)
 
-	MDRV_DEVICE_REMOVE("pandora")
+	MCFG_DEVICE_REMOVE("pandora")
 
 	/* video hardware */
-	MDRV_GFXDECODE(wb)
-	MDRV_VIDEO_UPDATE(wintbob)
-	MDRV_VIDEO_EOF(0)
+	MCFG_GFXDECODE(wb)
+	MCFG_VIDEO_UPDATE(wintbob)
+	MCFG_VIDEO_EOF(0)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( semicom, snowbros )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_CLOCK(16000000) /* 16mhz or 12mhz ? */
-	MDRV_CPU_PROGRAM_MAP(hyperpac_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_CLOCK(16000000) /* 16mhz or 12mhz ? */
+	MCFG_CPU_PROGRAM_MAP(hyperpac_map)
 
-	MDRV_CPU_MODIFY("soundcpu")
-	MDRV_CPU_CLOCK(4000000) /* 4.0 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(hyperpac_sound_map)
+	MCFG_CPU_MODIFY("soundcpu")
+	MCFG_CPU_CLOCK(4000000) /* 4.0 MHz ??? */
+	MCFG_CPU_PROGRAM_MAP(hyperpac_sound_map)
 
-	MDRV_GFXDECODE(hyperpac)
+	MCFG_GFXDECODE(hyperpac)
 
 	/* sound hardware */
-	MDRV_SOUND_REPLACE("ymsnd", YM2151, 4000000)
-	MDRV_SOUND_CONFIG(ym2151_config)
-	MDRV_SOUND_ROUTE(0, "mono", 0.10)
-	MDRV_SOUND_ROUTE(1, "mono", 0.10)
+	MCFG_SOUND_REPLACE("ymsnd", YM2151, 4000000)
+	MCFG_SOUND_CONFIG(ym2151_config)
+	MCFG_SOUND_ROUTE(0, "mono", 0.10)
+	MCFG_SOUND_ROUTE(1, "mono", 0.10)
 
-	MDRV_OKIM6295_ADD("oki", 999900, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_OKIM6295_ADD("oki", 999900, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -1527,14 +1527,14 @@ static MACHINE_CONFIG_DERIVED( semicom_mcu, semicom )
 
 	/* basic machine hardware */
 
-	MDRV_CPU_ADD("protection", I8052, 16000000)  // AT89C52
-	MDRV_CPU_PROGRAM_MAP(protection_map)
-	MDRV_CPU_IO_MAP(protection_iomap)
+	MCFG_CPU_ADD("protection", I8052, 16000000)  // AT89C52
+	MCFG_CPU_PROGRAM_MAP(protection_map)
+	MCFG_CPU_IO_MAP(protection_iomap)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( semiprot, semicom )
-	MDRV_MACHINE_RESET ( semiprot )
+	MCFG_MACHINE_RESET ( semiprot )
 MACHINE_CONFIG_END
 
 /*
@@ -1560,72 +1560,72 @@ See included pics
 static MACHINE_CONFIG_START( honeydol, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 16000000)
-	MDRV_CPU_PROGRAM_MAP(honeydol_map)
-	MDRV_CPU_VBLANK_INT_HACK(snowbros_interrupt,3)
+	MCFG_CPU_ADD("maincpu", M68000, 16000000)
+	MCFG_CPU_PROGRAM_MAP(honeydol_map)
+	MCFG_CPU_VBLANK_INT_HACK(snowbros_interrupt,3)
 
-	MDRV_CPU_ADD("soundcpu", Z80, 4000000)
-	MDRV_CPU_PROGRAM_MAP(honeydol_sound_map)
-	MDRV_CPU_IO_MAP(honeydol_sound_io_map)
+	MCFG_CPU_ADD("soundcpu", Z80, 4000000)
+	MCFG_CPU_PROGRAM_MAP(honeydol_sound_map)
+	MCFG_CPU_IO_MAP(honeydol_sound_io_map)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(57.5)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(57.5)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(honeydol)
-	MDRV_PALETTE_LENGTH(0x800/2)
+	MCFG_GFXDECODE(honeydol)
+	MCFG_PALETTE_LENGTH(0x800/2)
 
-	MDRV_VIDEO_UPDATE(honeydol)
-
-	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_VIDEO_UPDATE(honeydol)
 
 	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM3812, 3000000)
-	MDRV_SOUND_CONFIG(ym3812_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	/* sound hardware */
+
+	MCFG_SOUND_ADD("ymsnd", YM3812, 3000000)
+	MCFG_SOUND_CONFIG(ym3812_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 
-	MDRV_OKIM6295_ADD("oki", 999900, OKIM6295_PIN7_HIGH) /* freq? */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_OKIM6295_ADD("oki", 999900, OKIM6295_PIN7_HIGH) /* freq? */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( twinadv, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 16000000) // or 12
-	MDRV_CPU_PROGRAM_MAP(twinadv_map)
-	MDRV_CPU_VBLANK_INT_HACK(snowbros_interrupt,3)
+	MCFG_CPU_ADD("maincpu", M68000, 16000000) // or 12
+	MCFG_CPU_PROGRAM_MAP(twinadv_map)
+	MCFG_CPU_VBLANK_INT_HACK(snowbros_interrupt,3)
 
-	MDRV_CPU_ADD("soundcpu", Z80, 4000000)
-	MDRV_CPU_PROGRAM_MAP(sound_map)
-	MDRV_CPU_IO_MAP(twinadv_sound_io_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_ADD("soundcpu", Z80, 4000000)
+	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_CPU_IO_MAP(twinadv_sound_io_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(57.5)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(57.5)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(twinadv)
-	MDRV_PALETTE_LENGTH(0x100)
+	MCFG_GFXDECODE(twinadv)
+	MCFG_PALETTE_LENGTH(0x100)
 
-	MDRV_VIDEO_UPDATE(twinadv)
-
-	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_VIDEO_UPDATE(twinadv)
 
 	/* sound hardware */
-	MDRV_OKIM6295_ADD("oki", 12000000/12, OKIM6295_PIN7_HIGH) /* freq? */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	/* sound hardware */
+	MCFG_OKIM6295_ADD("oki", 12000000/12, OKIM6295_PIN7_HIGH) /* freq? */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -1649,56 +1649,56 @@ Intel P8752 (mcu)
 
 static MACHINE_CONFIG_DERIVED( finalttr, semicom )
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_CLOCK(12000000)
-	MDRV_CPU_PROGRAM_MAP(finalttr_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_CLOCK(12000000)
+	MCFG_CPU_PROGRAM_MAP(finalttr_map)
 
-	MDRV_CPU_MODIFY("soundcpu")
-	MDRV_CPU_CLOCK(3578545)
+	MCFG_CPU_MODIFY("soundcpu")
+	MCFG_CPU_CLOCK(3578545)
 
-	MDRV_MACHINE_RESET ( finalttr )
+	MCFG_MACHINE_RESET ( finalttr )
 
-	MDRV_SOUND_REPLACE("ymsnd", YM2151, 4000000)
-	MDRV_SOUND_CONFIG(ym2151_config)
-	MDRV_SOUND_ROUTE(0, "mono", 0.08)
-	MDRV_SOUND_ROUTE(1, "mono", 0.08)
+	MCFG_SOUND_REPLACE("ymsnd", YM2151, 4000000)
+	MCFG_SOUND_CONFIG(ym2151_config)
+	MCFG_SOUND_ROUTE(0, "mono", 0.08)
+	MCFG_SOUND_ROUTE(1, "mono", 0.08)
 
-	MDRV_OKIM6295_REPLACE("oki", 999900, OKIM6295_PIN7_HIGH)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	MCFG_OKIM6295_REPLACE("oki", 999900, OKIM6295_PIN7_HIGH)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( _4in1, semicom )
 
 	/* basic machine hardware */
-	MDRV_GFXDECODE(snowbros)
+	MCFG_GFXDECODE(snowbros)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( snowbro3, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 16000000) /* 16mhz or 12mhz ? */
-	MDRV_CPU_PROGRAM_MAP(snowbros3_map)
-	MDRV_CPU_VBLANK_INT_HACK(snowbro3_interrupt,3)
+	MCFG_CPU_ADD("maincpu", M68000, 16000000) /* 16mhz or 12mhz ? */
+	MCFG_CPU_PROGRAM_MAP(snowbros3_map)
+	MCFG_CPU_VBLANK_INT_HACK(snowbro3_interrupt,3)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(sb3)
-	MDRV_PALETTE_LENGTH(512)
+	MCFG_GFXDECODE(sb3)
+	MCFG_PALETTE_LENGTH(512)
 
-	MDRV_VIDEO_UPDATE(snowbro3)
+	MCFG_VIDEO_UPDATE(snowbro3)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_OKIM6295_ADD("oki", 999900, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_OKIM6295_ADD("oki", 999900, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -2249,7 +2249,7 @@ static READ16_HANDLER ( moremorp_0a_read )
 
 static DRIVER_INIT( moremorp )
 {
-//  UINT16 *PROTDATA = (UINT16*)memory_region(machine, "user1");
+//  UINT16 *PROTDATA = (UINT16*)machine->region("user1")->base();
 //  int i;
 
 //  for (i = 0;i < 0x200/2;i++)
@@ -2262,8 +2262,8 @@ static DRIVER_INIT( moremorp )
 
 static DRIVER_INIT( cookbib2 )
 {
-//  UINT16 *HCROM = (UINT16*)memory_region(machine, "maincpu");
-//  UINT16 *PROTDATA = (UINT16*)memory_region(machine, "user1");
+//  UINT16 *HCROM = (UINT16*)machine->region("maincpu")->base();
+//  UINT16 *PROTDATA = (UINT16*)machine->region("user1")->base();
 //  int i;
 //  hyperpac_ram[0xf000/2] = 0x46fc;
 //  hyperpac_ram[0xf002/2] = 0x2700;
@@ -2627,8 +2627,8 @@ static READ16_HANDLER ( _4in1_02_read )
 static DRIVER_INIT(4in1boot)
 {
 	UINT8 *buffer;
-	UINT8 *src = memory_region(machine, "maincpu");
-	int len = memory_region_length(machine, "maincpu");
+	UINT8 *src = machine->region("maincpu")->base();
+	int len = machine->region("maincpu")->bytes();
 
 	/* strange order */
 	buffer = auto_alloc_array(machine, UINT8, len);
@@ -2642,8 +2642,8 @@ static DRIVER_INIT(4in1boot)
 		auto_free(machine, buffer);
 	}
 
-	src = memory_region(machine, "soundcpu");
-	len = memory_region_length(machine, "soundcpu");
+	src = machine->region("soundcpu")->base();
+	len = machine->region("soundcpu")->bytes();
 
 	/* strange order */
 	buffer = auto_alloc_array(machine, UINT8, len);
@@ -2660,8 +2660,8 @@ static DRIVER_INIT(4in1boot)
 static DRIVER_INIT(snowbro3)
 {
 	UINT8 *buffer;
-	UINT8 *src = memory_region(machine, "maincpu");
-	int len = memory_region_length(machine, "maincpu");
+	UINT8 *src = machine->region("maincpu")->base();
+	int len = machine->region("maincpu")->bytes();
 
 	/* strange order */
 	buffer = auto_alloc_array(machine, UINT8, len);

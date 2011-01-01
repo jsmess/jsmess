@@ -70,8 +70,8 @@ enum
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef void (*voodoo_vblank_func)(running_device *device, int state);
-typedef void (*voodoo_stall_func)(running_device *device, int state);
+typedef void (*voodoo_vblank_func)(device_t *device, int state);
+typedef void (*voodoo_stall_func)(device_t *device, int state);
 
 
 typedef struct _voodoo_config voodoo_config;
@@ -93,38 +93,38 @@ struct _voodoo_config
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MDRV_3DFX_VOODOO_ADD(_tag, _type, _clock, _fbmem, _screen) \
-	MDRV_DEVICE_ADD(_tag, VOODOO_GRAPHICS, _clock) \
-	MDRV_DEVICE_CONFIG_DATA32(voodoo_config, type, _type) \
-	MDRV_DEVICE_CONFIG_DATA32(voodoo_config, fbmem, _fbmem) \
-	MDRV_DEVICE_CONFIG_DATAPTR(voodoo_config, screen, _screen)
+#define MCFG_3DFX_VOODOO_ADD(_tag, _type, _clock, _fbmem, _screen) \
+	MCFG_DEVICE_ADD(_tag, VOODOO_GRAPHICS, _clock) \
+	MCFG_DEVICE_CONFIG_DATA32(voodoo_config, type, _type) \
+	MCFG_DEVICE_CONFIG_DATA32(voodoo_config, fbmem, _fbmem) \
+	MCFG_DEVICE_CONFIG_DATAPTR(voodoo_config, screen, _screen)
 
-#define MDRV_3DFX_VOODOO_1_ADD(_tag, _clock, _fbmem, _screen) \
-	MDRV_3DFX_VOODOO_ADD(_tag, VOODOO_1, _clock, _fbmem, _screen)
+#define MCFG_3DFX_VOODOO_1_ADD(_tag, _clock, _fbmem, _screen) \
+	MCFG_3DFX_VOODOO_ADD(_tag, VOODOO_1, _clock, _fbmem, _screen)
 
-#define MDRV_3DFX_VOODOO_2_ADD(_tag, _clock, _fbmem, _screen) \
-	MDRV_3DFX_VOODOO_ADD(_tag, VOODOO_2, _clock, _fbmem, _screen)
+#define MCFG_3DFX_VOODOO_2_ADD(_tag, _clock, _fbmem, _screen) \
+	MCFG_3DFX_VOODOO_ADD(_tag, VOODOO_2, _clock, _fbmem, _screen)
 
-#define MDRV_3DFX_VOODOO_BANSHEE_ADD(_tag, _clock, _fbmem, _screen) \
-	MDRV_3DFX_VOODOO_ADD(_tag, VOODOO_BANSHEE, _clock, _fbmem, _screen)
+#define MCFG_3DFX_VOODOO_BANSHEE_ADD(_tag, _clock, _fbmem, _screen) \
+	MCFG_3DFX_VOODOO_ADD(_tag, VOODOO_BANSHEE, _clock, _fbmem, _screen)
 
-#define MDRV_3DFX_VOODOO_3_ADD(_tag, _clock, _fbmem, _screen) \
-	MDRV_3DFX_VOODOO_ADD(_tag, VOODOO_3, _clock, _fbmem, _screen)
+#define MCFG_3DFX_VOODOO_3_ADD(_tag, _clock, _fbmem, _screen) \
+	MCFG_3DFX_VOODOO_ADD(_tag, VOODOO_3, _clock, _fbmem, _screen)
 
-#define MDRV_3DFX_VOODOO_TMU_MEMORY(_tmu, _tmumem) \
-	MDRV_DEVICE_CONFIG_DATA32(voodoo_config, tmumem##_tmu, _tmumem)
+#define MCFG_3DFX_VOODOO_TMU_MEMORY(_tmu, _tmumem) \
+	MCFG_DEVICE_CONFIG_DATA32(voodoo_config, tmumem##_tmu, _tmumem)
 
-#define MDRV_3DFX_VOODOO_VBLANK(_vblank) \
-	MDRV_DEVICE_CONFIG_DATAPTR(voodoo_config, vblank, _vblank)
+#define MCFG_3DFX_VOODOO_VBLANK(_vblank) \
+	MCFG_DEVICE_CONFIG_DATAPTR(voodoo_config, vblank, _vblank)
 
-#define MDRV_3DFX_VOODOO_STALL(_stall) \
-	MDRV_DEVICE_CONFIG_DATAPTR(voodoo_config, stall, _stall)
+#define MCFG_3DFX_VOODOO_STALL(_stall) \
+	MCFG_DEVICE_CONFIG_DATAPTR(voodoo_config, stall, _stall)
 
-#define MDRV_3DFX_VOODOO_CPU(_cputag) \
-	MDRV_DEVICE_CONFIG_DATAPTR(voodoo_config, cputag, _cputag)
+#define MCFG_3DFX_VOODOO_CPU(_cputag) \
+	MCFG_DEVICE_CONFIG_DATAPTR(voodoo_config, cputag, _cputag)
 
-#define MDRV_3DFX_VOODOO_MODIFY(_tag) \
-	MDRV_DEVICE_MODIFY(_tag)
+#define MCFG_3DFX_VOODOO_MODIFY(_tag) \
+	MCFG_DEVICE_MODIFY(_tag)
 
 
 
@@ -132,10 +132,10 @@ struct _voodoo_config
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-int voodoo_update(running_device *device, bitmap_t *bitmap, const rectangle *cliprect);
-int voodoo_get_type(running_device *device);
-int voodoo_is_stalled(running_device *device);
-void voodoo_set_init_enable(running_device *device, UINT32 newval);
+int voodoo_update(device_t *device, bitmap_t *bitmap, const rectangle *cliprect);
+int voodoo_get_type(device_t *device);
+int voodoo_is_stalled(device_t *device);
+void voodoo_set_init_enable(device_t *device, UINT32 newval);
 
 READ32_DEVICE_HANDLER( voodoo_r );
 WRITE32_DEVICE_HANDLER( voodoo_w );

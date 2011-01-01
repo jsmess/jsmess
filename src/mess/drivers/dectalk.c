@@ -180,14 +180,14 @@ public:
 
 
 /* Devices */
-static void duart_irq_handler(running_device *device, UINT8 vector)
+static void duart_irq_handler(device_t *device, UINT8 vector)
 {
 	cputag_set_input_line_and_vector(device->machine, "maincpu", M68K_IRQ_6, HOLD_LINE, M68K_INT_ACK_AUTOVECTOR);
 	//cputag_set_input_line_and_vector(device->machine, "maincpu", M68K_IRQ_6, CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR);
 	//cputag_set_input_line_and_vector(device->machine, "maincpu", M68K_IRQ_6, HOLD_LINE, vector);
 };
 
-static UINT8 duart_input(running_device *device)
+static UINT8 duart_input(device_t *device)
 {
 	dectalk_state *state = device->machine->driver_data<dectalk_state>();
 	UINT8 data = 0;
@@ -198,7 +198,7 @@ static UINT8 duart_input(running_device *device)
 	return data;
 }
 
-static void duart_output(running_device *device, UINT8 data)
+static void duart_output(device_t *device, UINT8 data)
 {
 	dectalk_state *state = device->machine->driver_data<dectalk_state>();
 	state->duart_outport = data;
@@ -207,9 +207,9 @@ static void duart_output(running_device *device, UINT8 data)
 #endif
 }
 
-static void duart_tx(running_device *device, int channel, UINT8 data)
+static void duart_tx(device_t *device, int channel, UINT8 data)
 {
-	running_device *devconf = device->machine->device("terminal");
+	device_t *devconf = device->machine->device("terminal");
 	terminal_write(devconf,0,data);
 #ifdef SERIAL_TO_STDERR
 	fprintf(stderr, "%02X ",data);
@@ -252,7 +252,7 @@ static void dectalk_clear_all_fifos( running_machine *machine )
 static void dectalk_x2212_store( running_machine *machine )
 {
 	dectalk_state *state = machine->driver_data<dectalk_state>();
-	UINT8 *nvram = memory_region(machine, "nvram");
+	UINT8 *nvram = machine->region("nvram")->base();
 	int i;
 	for (i = 0; i < 256; i++)
 	nvram[i] = state->x2214_sram[i];
@@ -264,7 +264,7 @@ static void dectalk_x2212_store( running_machine *machine )
 static void dectalk_x2212_recall( running_machine *machine )
 {
 	dectalk_state *state = machine->driver_data<dectalk_state>();
-	UINT8 *nvram = memory_region(machine, "nvram");
+	UINT8 *nvram = machine->region("nvram")->base();
 	int i;
 	for (i = 0; i < 256; i++)
 	state->x2214_sram[i] = nvram[i];
@@ -305,10 +305,10 @@ static UINT16 dectalk_outfifo_r ( running_machine *machine )
 }
 
 /* Machine reset and friends: stuff that needs setting up which IS directly affected by reset */
-static void dectalk_reset(running_device *device)
+static void dectalk_reset(device_t *device)
 {
 	dectalk_state *state = device->machine->driver_data<dectalk_state>();
-	const running_device *devconf = device->machine->device("duart68681"); // this is probably an evil disgusting hack, and AaronGiles is gonna throttle me for doing this...
+	const device_t *devconf = device->machine->device("duart68681"); // this is probably an evil disgusting hack, and AaronGiles is gonna throttle me for doing this...
 	state->hack_self_test = 0; // hack
 	// stuff that is DIRECTLY affected by the RESET line
 	state->statusLED = 0; // clear status led latch
@@ -699,7 +699,7 @@ INPUT_PORTS_END
 static TIMER_CALLBACK( outfifo_read_cb )
 {
 	UINT16 data;
-	running_device *speaker = machine->device("dac");
+	device_t *speaker = machine->device("dac");
 	data = dectalk_outfifo_r(machine);
 #ifdef VERBOSE
 	if (data!= 0x8000) logerror("sample output: %04X\n", data);
@@ -729,36 +729,36 @@ static GENERIC_TERMINAL_INTERFACE( dectalk_terminal_intf )
 
 static MACHINE_CONFIG_START( dectalk, dectalk_state )
     /* basic machine hardware */
-    MDRV_CPU_ADD("maincpu", M68000, XTAL_20MHz/2) /* E74 20MHz OSC (/2) */
-    MDRV_CPU_PROGRAM_MAP(m68k_mem)
-    MDRV_CPU_IO_MAP(m68k_io)
-    MDRV_MACHINE_RESET(dectalk)
-    MDRV_DUART68681_ADD( "duart68681", XTAL_3_6864MHz, dectalk_duart68681_config ) /* Y3 3.6864MHz Xtal */
+    MCFG_CPU_ADD("maincpu", M68000, XTAL_20MHz/2) /* E74 20MHz OSC (/2) */
+    MCFG_CPU_PROGRAM_MAP(m68k_mem)
+    MCFG_CPU_IO_MAP(m68k_io)
+    MCFG_MACHINE_RESET(dectalk)
+    MCFG_DUART68681_ADD( "duart68681", XTAL_3_6864MHz, dectalk_duart68681_config ) /* Y3 3.6864MHz Xtal */
 
 
-    MDRV_CPU_ADD("dsp", TMS32010, XTAL_20MHz) /* Y1 20MHz xtal */
-    MDRV_CPU_PROGRAM_MAP(tms32010_mem)
-    MDRV_CPU_IO_MAP(tms32010_io)
+    MCFG_CPU_ADD("dsp", TMS32010, XTAL_20MHz) /* Y1 20MHz xtal */
+    MCFG_CPU_PROGRAM_MAP(tms32010_mem)
+    MCFG_CPU_IO_MAP(tms32010_io)
 #ifdef USE_LOOSE_TIMING
-    MDRV_QUANTUM_TIME(HZ(100))
+    MCFG_QUANTUM_TIME(HZ(100))
 #else
-    MDRV_QUANTUM_PERFECT_CPU("dsp")
+    MCFG_QUANTUM_PERFECT_CPU("dsp")
 #endif
 
-    //MDRV_NVRAM_ADD_0FILL("nvram")
+    //MCFG_NVRAM_ADD_0FILL("nvram")
 
     /* video hardware */
-    //MDRV_DEFAULT_LAYOUT(layout_dectalk) // hack to avoid screenless system crash
+    //MCFG_DEFAULT_LAYOUT(layout_dectalk) // hack to avoid screenless system crash
 
     /* sound hardware */
-    MDRV_SPEAKER_STANDARD_MONO("mono")
-    MDRV_SOUND_ADD("dac", DAC, 0) /* E88 10KHz OSC, handled by timer */
-    MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.9)
+    MCFG_SPEAKER_STANDARD_MONO("mono")
+    MCFG_SOUND_ADD("dac", DAC, 0) /* E88 10KHz OSC, handled by timer */
+    MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.9)
 
     /* Y2 is a 3.579545 MHz xtal for the dtmf decoder chip */
 
-	MDRV_FRAGMENT_ADD( generic_terminal )
-	MDRV_GENERIC_TERMINAL_ADD(TERMINAL_TAG,dectalk_terminal_intf)
+	MCFG_FRAGMENT_ADD( generic_terminal )
+	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG,dectalk_terminal_intf)
 MACHINE_CONFIG_END
 
 

@@ -33,11 +33,11 @@
 typedef struct _tf20_state tf20_state;
 struct _tf20_state
 {
-	running_device *ram;
-	running_device *upd765a;
-	running_device *upd7201;
-	running_device *floppy_0;
-	running_device *floppy_1;
+	device_t *ram;
+	device_t *upd765a;
+	device_t *upd7201;
+	device_t *floppy_0;
+	device_t *floppy_1;
 };
 
 
@@ -45,7 +45,7 @@ struct _tf20_state
     INLINE FUNCTIONS
 *****************************************************************************/
 
-INLINE tf20_state *get_safe_token(running_device *device)
+INLINE tf20_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == TF20);
@@ -289,23 +289,23 @@ static const floppy_config tf20_floppy_config =
 };
 
 static MACHINE_CONFIG_FRAGMENT( tf20 )
-	MDRV_CPU_ADD("tf20", Z80, XTAL_CR1 / 2) /* uPD780C */
-	MDRV_CPU_PROGRAM_MAP(tf20_mem)
-	MDRV_CPU_IO_MAP(tf20_io)
+	MCFG_CPU_ADD("tf20", Z80, XTAL_CR1 / 2) /* uPD780C */
+	MCFG_CPU_PROGRAM_MAP(tf20_mem)
+	MCFG_CPU_IO_MAP(tf20_io)
 
 	/* 64k internal ram */
-	MDRV_RAM_ADD("ram")
-	MDRV_RAM_DEFAULT_SIZE("64k")
+	MCFG_RAM_ADD("ram")
+	MCFG_RAM_DEFAULT_SIZE("64k")
 
 	/* upd765a floppy controller */
-	MDRV_UPD765A_ADD("5a", tf20_upd765a_intf)
+	MCFG_UPD765A_ADD("5a", tf20_upd765a_intf)
 
 	/* upd7201 serial interface */
-	MDRV_UPD7201_ADD("3a", XTAL_CR1 / 2, tf20_upd7201_intf)
-	MDRV_TIMER_ADD_PERIODIC("serial_timer", serial_clock, HZ(XTAL_CR2 / 128))
+	MCFG_UPD7201_ADD("3a", XTAL_CR1 / 2, tf20_upd7201_intf)
+	MCFG_TIMER_ADD_PERIODIC("serial_timer", serial_clock, HZ(XTAL_CR2 / 128))
 
 	/* 2 floppy drives */
-	MDRV_FLOPPY_2_DRIVES_ADD(tf20_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_ADD(tf20_floppy_config)
 MACHINE_CONFIG_END
 
 
@@ -326,7 +326,7 @@ ROM_END
 static DEVICE_START( tf20 )
 {
 	tf20_state *tf20 = get_safe_token(device);
-	running_device *cpu = device->subdevice("tf20");
+	device_t *cpu = device->subdevice("tf20");
 	address_space *prg = cpu_get_address_space(cpu, ADDRESS_SPACE_PROGRAM);
 
 	cpu_set_irq_callback(cpu, tf20_irq_ack);
@@ -350,7 +350,7 @@ static DEVICE_START( tf20 )
 
 static DEVICE_RESET( tf20 )
 {
-	running_device *cpu = device->subdevice("tf20");
+	device_t *cpu = device->subdevice("tf20");
 	address_space *prg = cpu_get_address_space(cpu, ADDRESS_SPACE_PROGRAM);
 
 	/* enable rom */

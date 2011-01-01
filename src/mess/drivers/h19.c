@@ -49,7 +49,7 @@ public:
 
 	UINT8 *videoram;
 	UINT8 *charrom;
-	running_device *beeper;
+	device_t *beeper;
 	UINT8 term_data;
 };
 
@@ -287,12 +287,12 @@ static MACHINE_RESET(h19)
 static VIDEO_START( h19 )
 {
 	h19_state *state = machine->driver_data<h19_state>();
-	state->charrom = memory_region(machine, "chargen");
+	state->charrom = machine->region("chargen")->base();
 }
 
 static VIDEO_UPDATE( h19 )
 {
-	running_device *mc6845 = screen->machine->device("crtc");
+	device_t *mc6845 = screen->machine->device("crtc");
 	mc6845_update(mc6845, bitmap, cliprect);
 	return 0;
 }
@@ -392,35 +392,35 @@ static GENERIC_TERMINAL_INTERFACE( h19_terminal_intf )
 
 static MACHINE_CONFIG_START( h19, h19_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu",Z80, H19_CLOCK) // From schematics
-	MDRV_CPU_PROGRAM_MAP(h19_mem)
-	MDRV_CPU_IO_MAP(h19_io)
-	//MDRV_DEVICE_PERIODIC_INT(irq0_line_hold, 50) // for testing, causes a keyboard scan
+	MCFG_CPU_ADD("maincpu",Z80, H19_CLOCK) // From schematics
+	MCFG_CPU_PROGRAM_MAP(h19_mem)
+	MCFG_CPU_IO_MAP(h19_io)
+	//MCFG_DEVICE_PERIODIC_INT(irq0_line_hold, 50) // for testing, causes a keyboard scan
 
-	MDRV_MACHINE_RESET(h19)
+	MCFG_MACHINE_RESET(h19)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(640, 200)
-	MDRV_SCREEN_VISIBLE_AREA(0, 640 - 1, 0, 200 - 1)
-	MDRV_GFXDECODE(h19)
-	MDRV_PALETTE_LENGTH(2)
-	MDRV_PALETTE_INIT(black_and_white)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(640, 200)
+	MCFG_SCREEN_VISIBLE_AREA(0, 640 - 1, 0, 200 - 1)
+	MCFG_GFXDECODE(h19)
+	MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_INIT(black_and_white)
 
-	MDRV_MC6845_ADD("crtc", MC6845, XTAL_12_288MHz / 8, h19_crtc6845_interface) // clk taken from schematics
-	MDRV_INS8250_ADD( "ins8250", h19_ace_interface )
-	MDRV_GENERIC_TERMINAL_ADD("terminal", h19_terminal_intf) // keyboard only
+	MCFG_MC6845_ADD("crtc", MC6845, XTAL_12_288MHz / 8, h19_crtc6845_interface) // clk taken from schematics
+	MCFG_INS8250_ADD( "ins8250", h19_ace_interface )
+	MCFG_GENERIC_TERMINAL_ADD("terminal", h19_terminal_intf) // keyboard only
 
-	MDRV_VIDEO_START( h19 )
-	MDRV_VIDEO_UPDATE( h19 )
+	MCFG_VIDEO_START( h19 )
+	MCFG_VIDEO_UPDATE( h19 )
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("beep", BEEP, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("beep", BEEP, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
 /* ROM definition */

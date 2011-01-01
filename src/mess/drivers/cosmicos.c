@@ -592,7 +592,7 @@ static MACHINE_RESET( cosmicos )
 
 static QUICKLOAD_LOAD( cosmicos )
 {
-	UINT8 *ptr = memory_region(image.device().machine, CDP1802_TAG);
+	UINT8 *ptr = image.device().machine->region(CDP1802_TAG)->base();
 	int size = image.length();
 
 	/* load image to RAM */
@@ -613,42 +613,42 @@ static const cassette_config cosmicos_cassette_config =
 
 static MACHINE_CONFIG_START( cosmicos, cosmicos_state )
 	/* basic machine hardware */
-    MDRV_CPU_ADD(CDP1802_TAG, COSMAC, XTAL_1_75MHz)
-    MDRV_CPU_PROGRAM_MAP(cosmicos_mem)
-    MDRV_CPU_IO_MAP(cosmicos_io)
-	MDRV_CPU_CONFIG(cosmicos_config)
+    MCFG_CPU_ADD(CDP1802_TAG, COSMAC, XTAL_1_75MHz)
+    MCFG_CPU_PROGRAM_MAP(cosmicos_mem)
+    MCFG_CPU_IO_MAP(cosmicos_io)
+	MCFG_CPU_CONFIG(cosmicos_config)
 
-    MDRV_MACHINE_START(cosmicos)
-    MDRV_MACHINE_RESET(cosmicos)
+    MCFG_MACHINE_START(cosmicos)
+    MCFG_MACHINE_RESET(cosmicos)
 
     /* video hardware */
-	MDRV_DEFAULT_LAYOUT( layout_cosmicos )
-	MDRV_DM9368_ADD(DM9368_TAG, 0, NULL)
-	MDRV_TIMER_ADD_PERIODIC("digit", digit_tick, HZ(100))
-	MDRV_TIMER_ADD_PERIODIC("interrupt", int_tick, HZ(1000))
+	MCFG_DEFAULT_LAYOUT( layout_cosmicos )
+	MCFG_DM9368_ADD(DM9368_TAG, 0, NULL)
+	MCFG_TIMER_ADD_PERIODIC("digit", digit_tick, HZ(100))
+	MCFG_TIMER_ADD_PERIODIC("interrupt", int_tick, HZ(1000))
 
-	MDRV_CDP1864_SCREEN_ADD(SCREEN_TAG, XTAL_1_75MHz)
+	MCFG_CDP1864_SCREEN_ADD(SCREEN_TAG, XTAL_1_75MHz)
 
-	MDRV_PALETTE_LENGTH(8+8)
-	MDRV_VIDEO_UPDATE(cosmicos)
+	MCFG_PALETTE_LENGTH(8+8)
+	MCFG_VIDEO_UPDATE(cosmicos)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MDRV_CDP1864_ADD(CDP1864_TAG, XTAL_1_75MHz, cosmicos_cdp1864_intf)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_CDP1864_ADD(CDP1864_TAG, XTAL_1_75MHz, cosmicos_cdp1864_intf)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* devices */
-	MDRV_QUICKLOAD_ADD("quickload", cosmicos, "bin", 0)
-	MDRV_CASSETTE_ADD(CASSETTE_TAG, cosmicos_cassette_config)
+	MCFG_QUICKLOAD_ADD("quickload", cosmicos, "bin", 0)
+	MCFG_CASSETTE_ADD(CASSETTE_TAG, cosmicos_cassette_config)
 
 	/* internal ram */
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("256")
-	MDRV_RAM_EXTRA_OPTIONS("4K,48K")
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("256")
+	MCFG_RAM_EXTRA_OPTIONS("4K,48K")
 MACHINE_CONFIG_END
 
 /* ROMs */
@@ -672,7 +672,7 @@ DIRECT_UPDATE_HANDLER( cosmicos_direct_update_handler )
 	if (state->boot)
 	{
 		/* force A6 and A7 high */
-		direct.explicit_configure(0x0000, 0xffff, 0x3f3f, memory_region(machine, CDP1802_TAG) + 0xc0);
+		direct.explicit_configure(0x0000, 0xffff, 0x3f3f, machine->region(CDP1802_TAG)->base() + 0xc0);
 		return ~0;
 	}
 

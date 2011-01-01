@@ -426,7 +426,7 @@ static void pcw16_update_bank(running_machine *machine, int bank)
 		{
 			/* lower 4 banks are write protected. Use the rom
             loaded */
-			mem_ptr = &memory_region(machine, "maincpu")[0x010000];
+			mem_ptr = &machine->region("maincpu")->base()[0x010000];
 		}
 		else
 		{
@@ -1072,7 +1072,7 @@ static READ8_HANDLER(pcw16_timer_interrupt_counter_r)
 static WRITE8_HANDLER(pcw16_system_control_w)
 {
 	pcw16_state *state = space->machine->driver_data<pcw16_state>();
-	running_device *speaker = space->machine->device("beep");
+	device_t *speaker = space->machine->device("beep");
 	//logerror("0x0f8: function: %d\n",data);
 
 	/* lower 4 bits define function code */
@@ -1219,7 +1219,7 @@ static void pcw16_fdc_interrupt(running_machine *machine, int state)
 	pcw16_trigger_fdc_int(machine);
 }
 
-static running_device * pcw16_get_device(running_machine *machine)
+static device_t * pcw16_get_device(running_machine *machine)
 {
 	return machine->device("upd765");
 }
@@ -1356,7 +1356,7 @@ static void pcw16_reset(running_machine *machine)
 static MACHINE_START( pcw16 )
 {
 	pcw16_state *state = machine->driver_data<pcw16_state>();
-	running_device *speaker = machine->device("beep");
+	device_t *speaker = machine->device("beep");
 	state->system_status = 0;
 	state->interrupt_counter = 0;
 
@@ -1418,45 +1418,45 @@ static const floppy_config pcw16_floppy_config =
 
 static MACHINE_CONFIG_START( pcw16, pcw16_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, 16000000)
-	MDRV_CPU_PROGRAM_MAP(pcw16_map)
-	MDRV_CPU_IO_MAP(pcw16_io)
-	MDRV_QUANTUM_TIME(HZ(60))
+	MCFG_CPU_ADD("maincpu", Z80, 16000000)
+	MCFG_CPU_PROGRAM_MAP(pcw16_map)
+	MCFG_CPU_IO_MAP(pcw16_io)
+	MCFG_QUANTUM_TIME(HZ(60))
 
-	MDRV_MACHINE_START( pcw16 )
+	MCFG_MACHINE_START( pcw16 )
 
-	MDRV_NS16550_ADD( "ns16550_1", pcw16_com_interface[0] )				/* TODO: Verify uart model */
+	MCFG_NS16550_ADD( "ns16550_1", pcw16_com_interface[0] )				/* TODO: Verify uart model */
 
-	MDRV_NS16550_ADD( "ns16550_2", pcw16_com_interface[1] )				/* TODO: Verify uart model */
+	MCFG_NS16550_ADD( "ns16550_2", pcw16_com_interface[1] )				/* TODO: Verify uart model */
 
     /* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(50)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(PCW16_SCREEN_WIDTH, PCW16_SCREEN_HEIGHT)
-	MDRV_SCREEN_VISIBLE_AREA(0, PCW16_SCREEN_WIDTH-1, 0, PCW16_SCREEN_HEIGHT-1)
-	MDRV_PALETTE_LENGTH(PCW16_NUM_COLOURS)
-	MDRV_PALETTE_INIT( pcw16 )
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(PCW16_SCREEN_WIDTH, PCW16_SCREEN_HEIGHT)
+	MCFG_SCREEN_VISIBLE_AREA(0, PCW16_SCREEN_WIDTH-1, 0, PCW16_SCREEN_HEIGHT-1)
+	MCFG_PALETTE_LENGTH(PCW16_NUM_COLOURS)
+	MCFG_PALETTE_INIT( pcw16 )
 
-	MDRV_VIDEO_START( pcw16 )
-	MDRV_VIDEO_UPDATE( pcw16 )
+	MCFG_VIDEO_START( pcw16 )
+	MCFG_VIDEO_UPDATE( pcw16 )
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("beep", BEEP, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("beep", BEEP, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* printer */
-	MDRV_PC_LPT_ADD("lpt", pcw16_lpt_config)
-	MDRV_UPD765A_ADD("upd765", pc_fdc_upd765_connected_interface)
-	MDRV_FLOPPY_2_DRIVES_ADD(pcw16_floppy_config)
+	MCFG_PC_LPT_ADD("lpt", pcw16_lpt_config)
+	MCFG_UPD765A_ADD("upd765", pc_fdc_upd765_connected_interface)
+	MCFG_FLOPPY_2_DRIVES_ADD(pcw16_floppy_config)
 
 	/* internal ram */
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("2M")
-	MDRV_INTEL_E28F008SA_ADD("flash0")
-	MDRV_INTEL_E28F008SA_ADD("flash1")
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("2M")
+	MCFG_INTEL_E28F008SA_ADD("flash0")
+	MCFG_INTEL_E28F008SA_ADD("flash1")
 MACHINE_CONFIG_END
 
 /***************************************************************************

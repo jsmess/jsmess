@@ -19,8 +19,8 @@
 
 DECLARE_LEGACY_DEVICE(A2CFFA, a2cffa);
 
-#define MDRV_A2CFFA_ADD(_tag)	\
-	MDRV_DEVICE_ADD((_tag), A2CFFA, 0)
+#define MCFG_A2CFFA_ADD(_tag)	\
+	MCFG_DEVICE_ADD((_tag), A2CFFA, 0)
 
 
 /***************************************************************************

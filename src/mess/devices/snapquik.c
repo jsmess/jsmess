@@ -34,7 +34,7 @@ struct _snapquick_token
     that a given device is a snapshot or quickload
 -------------------------------------------------*/
 
-INLINE void assert_is_snapshot_or_quickload(running_device *device)
+INLINE void assert_is_snapshot_or_quickload(device_t *device)
 {
 	assert(device != NULL);
 	assert(downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config() != NULL);
@@ -48,7 +48,7 @@ INLINE void assert_is_snapshot_or_quickload(running_device *device)
     get_token - safely gets the snapshot/quickload data
 -------------------------------------------------*/
 
-INLINE snapquick_token *get_token(running_device *device)
+INLINE snapquick_token *get_token(device_t *device)
 {
 	assert_is_snapshot_or_quickload(device);
 	return (snapquick_token *) downcast<legacy_device_base *>(device)->token();
@@ -60,7 +60,7 @@ INLINE snapquick_token *get_token(running_device *device)
     get_config - safely gets the quickload config
 -------------------------------------------------*/
 
-INLINE const snapquick_config *get_config(running_device *device)
+INLINE const snapquick_config *get_config(device_t *device)
 {
 	assert_is_snapshot_or_quickload(device);
 	return (const snapquick_config *) downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();

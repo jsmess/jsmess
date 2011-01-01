@@ -128,7 +128,7 @@ struct _tpi6525_state
     INLINE FUNCTIONS
 *****************************************************************************/
 
-INLINE tpi6525_state *get_safe_token(running_device *device)
+INLINE tpi6525_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == TPI6525);
@@ -210,7 +210,7 @@ DEVICE_GET_INFO( tpi6525 )
     IMPLEMENTATION
 ***************************************************************************/
 
-static void tpi6525_set_interrupt(running_device *device)
+static void tpi6525_set_interrupt(device_t *device)
 {
 	tpi6525_state *tpi6525 = get_safe_token(device);
 
@@ -226,7 +226,7 @@ static void tpi6525_set_interrupt(running_device *device)
 }
 
 
-static void tpi6525_clear_interrupt(running_device *device)
+static void tpi6525_clear_interrupt(device_t *device)
 {
 	tpi6525_state *tpi6525 = get_safe_token(device);
 
@@ -242,7 +242,7 @@ static void tpi6525_clear_interrupt(running_device *device)
 }
 
 
-void tpi6525_irq0_level(running_device *device, int level)
+void tpi6525_irq0_level(device_t *device, int level)
 {
 	tpi6525_state *tpi6525 = get_safe_token(device);
 
@@ -259,7 +259,7 @@ void tpi6525_irq0_level(running_device *device, int level)
 }
 
 
-void tpi6525_irq1_level(running_device *device, int level)
+void tpi6525_irq1_level(device_t *device, int level)
 {
 	tpi6525_state *tpi6525 = get_safe_token(device);
 
@@ -276,7 +276,7 @@ void tpi6525_irq1_level(running_device *device, int level)
 }
 
 
-void tpi6525_irq2_level(running_device *device, int level)
+void tpi6525_irq2_level(device_t *device, int level)
 {
 	tpi6525_state *tpi6525 = get_safe_token(device);
 
@@ -293,7 +293,7 @@ void tpi6525_irq2_level(running_device *device, int level)
 }
 
 
-void tpi6525_irq3_level(running_device *device, int level)
+void tpi6525_irq3_level(device_t *device, int level)
 {
 	tpi6525_state *tpi6525 = get_safe_token(device);
 
@@ -312,7 +312,7 @@ void tpi6525_irq3_level(running_device *device, int level)
 }
 
 
-void tpi6525_irq4_level(running_device *device, int level)
+void tpi6525_irq4_level(device_t *device, int level)
 {
 	tpi6525_state *tpi6525 = get_safe_token(device);
 
@@ -607,19 +607,19 @@ WRITE8_DEVICE_HANDLER( tpi6525_w )
 
 /* this should probably be done better, needed for amigacd.c */
 
-UINT8 tpi6525_get_ddr_a(running_device *device)
+UINT8 tpi6525_get_ddr_a(device_t *device)
 {
 	tpi6525_state *tpi6525 = get_safe_token(device);
 	return tpi6525->ddr_a;
 }
 
-UINT8 tpi6525_get_ddr_b(running_device *device)
+UINT8 tpi6525_get_ddr_b(device_t *device)
 {
 	tpi6525_state *tpi6525 = get_safe_token(device);
 	return tpi6525->ddr_b;
 }
 
-UINT8 tpi6525_get_ddr_c(running_device *device)
+UINT8 tpi6525_get_ddr_c(device_t *device)
 {
 	tpi6525_state *tpi6525 = get_safe_token(device);
 	return tpi6525->ddr_c;

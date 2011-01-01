@@ -61,8 +61,8 @@ public:
 	tilemap_t *fg_tilemap;
 
 	/* devices */
-	running_device *maincpu;
-	running_device *audiocpu;
+	device_t *maincpu;
+	device_t *audiocpu;
 };
 
 
@@ -323,7 +323,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static void irqhandler(running_device *device, int linestate)
+static void irqhandler(device_t *device, int linestate)
 {
 	onetwo_state *state = device->machine->driver_data<onetwo_state>();
 	cpu_set_input_line(state->audiocpu, 0, linestate);
@@ -343,7 +343,7 @@ static const ym3812_interface ym3812_config =
 static MACHINE_START( onetwo )
 {
 	onetwo_state *state = machine->driver_data<onetwo_state>();
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 
 	memory_configure_bank(machine, "bank1", 0, 8, &ROM[0x10000], 0x4000);
 
@@ -354,40 +354,40 @@ static MACHINE_START( onetwo )
 static MACHINE_CONFIG_START( onetwo, onetwo_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80,MASTER_CLOCK)	/* 4 MHz */
-	MDRV_CPU_PROGRAM_MAP(main_cpu)
-	MDRV_CPU_IO_MAP(main_cpu_io)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_ADD("maincpu", Z80,MASTER_CLOCK)	/* 4 MHz */
+	MCFG_CPU_PROGRAM_MAP(main_cpu)
+	MCFG_CPU_IO_MAP(main_cpu_io)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("audiocpu", Z80,MASTER_CLOCK)	/* 4 MHz */
-	MDRV_CPU_PROGRAM_MAP(sound_cpu)
-	MDRV_CPU_IO_MAP(sound_cpu_io)
+	MCFG_CPU_ADD("audiocpu", Z80,MASTER_CLOCK)	/* 4 MHz */
+	MCFG_CPU_PROGRAM_MAP(sound_cpu)
+	MCFG_CPU_IO_MAP(sound_cpu_io)
 
-	MDRV_MACHINE_START(onetwo)
+	MCFG_MACHINE_START(onetwo)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(16))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(512, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(16))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(512, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
 
-	MDRV_GFXDECODE(onetwo)
-	MDRV_PALETTE_LENGTH(0x80)
+	MCFG_GFXDECODE(onetwo)
+	MCFG_PALETTE_LENGTH(0x80)
 
-	MDRV_VIDEO_START(onetwo)
-	MDRV_VIDEO_UPDATE(onetwo)
+	MCFG_VIDEO_START(onetwo)
+	MCFG_VIDEO_UPDATE(onetwo)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM3812, MASTER_CLOCK)
-	MDRV_SOUND_CONFIG(ym3812_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("ymsnd", YM3812, MASTER_CLOCK)
+	MCFG_SOUND_CONFIG(ym3812_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_OKIM6295_ADD("oki", 1056000*2, OKIM6295_PIN7_LOW) // clock frequency & pin 7 not verified
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_OKIM6295_ADD("oki", 1056000*2, OKIM6295_PIN7_LOW) // clock frequency & pin 7 not verified
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 /*************************************

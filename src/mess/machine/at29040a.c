@@ -76,13 +76,13 @@ typedef struct _at29c040a_state
 	emu_timer 	*programming_timer;
 } at29c040a_state;
 
-INLINE at29c040a_state *get_safe_token(running_device *device)
+INLINE at29c040a_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	return (at29c040a_state *)downcast<legacy_device_base *>(device)->token();
 }
 
-INLINE const at29c040a_config *get_config(running_device *device)
+INLINE const at29c040a_config *get_config(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == AT29C040A);
@@ -94,7 +94,7 @@ INLINE const at29c040a_config *get_config(running_device *device)
 */
 static TIMER_CALLBACK(at29c040a_programming_timer_callback)
 {
-	running_device *device = (running_device *)ptr;
+	device_t *device = (device_t *)ptr;
 	at29c040a_state *feeprom = get_safe_token(device); 
 	
 	switch (feeprom->s_pgm)
@@ -134,13 +134,13 @@ static TIMER_CALLBACK(at29c040a_programming_timer_callback)
 	}
 }
 
-int at29c040a_is_dirty(running_device *device)
+int at29c040a_is_dirty(device_t *device)
 {
 	at29c040a_state *feeprom = get_safe_token(device); 
 	return feeprom->s_dirty;
 }
 
-static void sync_flags(running_device *device)
+static void sync_flags(device_t *device)
 {
 	at29c040a_state *feeprom = get_safe_token(device); 
 	if (feeprom->s_lower_bbl) feeprom->memptr[1] |= 0x04; 

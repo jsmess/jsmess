@@ -66,7 +66,7 @@ struct _zsg2_state
 	sound_stream *stream;
 };
 
-INLINE zsg2_state *get_safe_token(running_device *device)
+INLINE zsg2_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == ZSG2);
@@ -229,7 +229,7 @@ static DEVICE_START( zsg2 )
 
 	info->stream = stream_create(device, 0, 2, info->sample_rate, info, update_stereo);
 
-	info->bank_samples = memory_region(device->machine, intf->samplergn);
+	info->bank_samples = device->machine->region(intf->samplergn)->base();
 }
 
 /**************************************************************************

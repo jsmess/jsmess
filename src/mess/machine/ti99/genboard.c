@@ -74,12 +74,12 @@ typedef struct _genboard_state
 	int		line_count;
 
 	/* Devices */
-	running_device	*cpu;
-	running_device	*video;
-	running_device  *tms9901;
-	running_device	*clock;
-	running_device	*peribox;
-	running_device	*sound;
+	device_t	*cpu;
+	device_t	*video;
+	device_t  *tms9901;
+	device_t	*clock;
+	device_t	*peribox;
+	device_t	*sound;
 
 } genboard_state;
 
@@ -111,14 +111,14 @@ static const UINT8 keyboard_mf1_code[0xe] =
 	0x53	/* delete */
 };
 
-static void poll_keyboard(running_device *device);
-static void poll_mouse(running_device *device);
+static void poll_keyboard(device_t *device);
+static void poll_mouse(device_t *device);
 static void read_key_if_possible(genboard_state *board);
-static UINT8 get_recent_key(running_device *device);
+static UINT8 get_recent_key(device_t *device);
 
 static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5", "KEY6", "KEY7" };
 
-INLINE genboard_state *get_safe_token(running_device *device)
+INLINE genboard_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(downcast<legacy_device_base *>(device)->token() != NULL);
@@ -130,7 +130,7 @@ INLINE genboard_state *get_safe_token(running_device *device)
 */
 INTERRUPT_GEN( geneve_hblank_interrupt )
 {
-	running_device *dev = device->machine->device("geneve_board");
+	device_t *dev = device->machine->device("geneve_board");
 	genboard_state *board = get_safe_token(dev);
 	v9938_interrupt(device->machine, 0);
 	board->line_count++;
@@ -687,7 +687,7 @@ READ8_DEVICE_HANDLER ( geneve_cru_r )
     Keyboard support
 *****************************************************************************/
 
-UINT8 get_recent_key(running_device *device)
+UINT8 get_recent_key(device_t *device)
 {
 	genboard_state *board = get_safe_token(device);
 	if (board->keyInBuf)
@@ -713,7 +713,7 @@ INLINE void post_in_keyQueue(genboard_state *board, int keycode)
 	board->keyQueueLen++;
 }
 
-static void poll_keyboard(running_device *device)
+static void poll_keyboard(device_t *device)
 {
 	genboard_state *board = get_safe_token(device);
 
@@ -925,7 +925,7 @@ static void poll_keyboard(running_device *device)
     Mouse support
 ****************************************************************************/
 
-static void poll_mouse(running_device *device)
+static void poll_mouse(device_t *device)
 {
 	genboard_state *board = get_safe_token(device);
 
@@ -984,7 +984,7 @@ static TMS9901_INT_CALLBACK( tms9901_interrupt_callback )
 */
 static READ8_DEVICE_HANDLER( R9901_0 )
 {
-	running_device *dev = device->machine->device("geneve_board");
+	device_t *dev = device->machine->device("geneve_board");
 	genboard_state *board = get_safe_token(dev);
 	int answer;
 	answer = input_port_read(device->machine, "JOY") >> (board->joySel * 8);
@@ -1051,14 +1051,14 @@ static WRITE8_DEVICE_HANDLER( W9901_VDP_reset )
 */
 static WRITE8_DEVICE_HANDLER( W9901_joySel )
 {
-	running_device *dev = device->machine->device("geneve_board");
+	device_t *dev = device->machine->device("geneve_board");
 	genboard_state *board = get_safe_token(dev);
 	board->joySel = data;
 }
 
 static WRITE8_DEVICE_HANDLER( W9901_keyboardReset )
 {
-	running_device *dev = device->machine->device("geneve_board");
+	device_t *dev = device->machine->device("geneve_board");
 	genboard_state *board = get_safe_token(dev);
 
 	board->keyReset = !data;
@@ -1174,7 +1174,7 @@ static const mm58274c_interface geneve_mm58274c_interface =
 };
 
 static MACHINE_CONFIG_FRAGMENT( genboard )
-	MDRV_MM58274C_ADD("mm58274c", geneve_mm58274c_interface)
+	MCFG_MM58274C_ADD("mm58274c", geneve_mm58274c_interface)
 MACHINE_CONFIG_END
 
 static DEVICE_START( genboard )
@@ -1191,7 +1191,7 @@ static DEVICE_START( genboard )
 
 	board->sram = (UINT8*)malloc(SRAM_SIZE);
 	board->dram = (UINT8*)malloc(DRAM_SIZE);
-	board->eprom = memory_region(device->machine, "maincpu");
+	board->eprom = device->machine->region("maincpu")->base();
 	assert(board->video && board->tms9901);
 	assert(board->peribox && board->cpu);
 	assert(board->sound && board->clock);
@@ -1247,7 +1247,7 @@ static DEVICE_RESET( genboard )
 
 	if (input_port_read(device->machine, "BOOTROM")==0)
 	{
-		board->eprom = memory_region(device->machine, "maincpu") + 0x4000;
+		board->eprom = device->machine->region("maincpu")->base() + 0x4000;
 	}
 }
 

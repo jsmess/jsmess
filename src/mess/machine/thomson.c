@@ -46,7 +46,7 @@ static int old_floppy_bank;
 
 /********************* common cassette code ***************************/
 
-INLINE running_device* thom_cassette_img( running_machine *machine )
+INLINE device_t* thom_cassette_img( running_machine *machine )
 { return machine->device("cassette"); }
 
 /*-------------- TO7 ------------*/
@@ -85,7 +85,7 @@ static UINT8* to7_k7_bits;
 */
 static int to7_get_cassette ( running_machine *machine )
 {
-	running_device* img = thom_cassette_img(machine);
+	device_t* img = thom_cassette_img(machine);
 	device_image_interface *image = dynamic_cast<device_image_interface *>(img);
 	if ( image->exists() )
 	{
@@ -139,7 +139,7 @@ static int to7_get_cassette ( running_machine *machine )
 /* 1-bit cassette output */
 static void to7_set_cassette ( running_machine *machine, int data )
 {
-	running_device* img = thom_cassette_img(machine);
+	device_t* img = thom_cassette_img(machine);
 	cassette_output( img, data ? 1. : -1. );
 }
 
@@ -147,7 +147,7 @@ static void to7_set_cassette ( running_machine *machine, int data )
 
 static WRITE8_DEVICE_HANDLER ( to7_set_cassette_motor )
 {
-	running_device* img = thom_cassette_img( device->machine );
+	device_t* img = thom_cassette_img( device->machine );
 	cassette_state state = cassette_get_state( img );
 	double pos = cassette_get_position(img);
 
@@ -186,7 +186,7 @@ static WRITE8_DEVICE_HANDLER ( to7_set_cassette_motor )
 
 static int mo5_get_cassette ( running_machine *machine )
 {
-	running_device* img = thom_cassette_img(machine);
+	device_t* img = thom_cassette_img(machine);
 	device_image_interface *image = dynamic_cast<device_image_interface *>(img);
 
 	if ( image->exists() )
@@ -215,7 +215,7 @@ static int mo5_get_cassette ( running_machine *machine )
 
 static void mo5_set_cassette ( running_machine *machine, int data )
 {
-	running_device* img = thom_cassette_img(machine);
+	device_t* img = thom_cassette_img(machine);
 	cassette_output( img, data ? 1. : -1. );
 }
 
@@ -223,7 +223,7 @@ static void mo5_set_cassette ( running_machine *machine, int data )
 
 static WRITE8_DEVICE_HANDLER ( mo5_set_cassette_motor )
 {
-	running_device* img = thom_cassette_img( device->machine );
+	device_t* img = thom_cassette_img( device->machine );
 	cassette_state state = cassette_get_state( img );
 	double pos = cassette_get_position(img);
 
@@ -319,7 +319,7 @@ static void thom_irq_0  ( running_machine *machine, int state )
 	thom_set_irq  ( machine, 0, state );
 }
 
-static void thom_dev_irq_0  ( running_device *device, int state )
+static void thom_dev_irq_0  ( device_t *device, int state )
 {
 	thom_irq_0( device->machine, state );
 }
@@ -394,7 +394,7 @@ static DEVICE_START( thom_serial_cc90323 )
 
 static DEVICE_START( thom_serial_rf57232 )
 {
-	running_device *acia = device->machine->device("acia");
+	device_t *acia = device->machine->device("acia");
 	DEVICE_START_CALL(serial);
 	LOG(( "thom_serial_init: init RF 57-232 RS232 device\n" ));
 	acia_6551_connect_to_serial_device( acia, device );
@@ -485,7 +485,7 @@ static UINT8 thom_cart_bank;     /* current bank */
 DEVICE_IMAGE_LOAD( to7_cartridge )
 {
 	int i,j;
-	UINT8* pos = memory_region(image.device().machine,  "maincpu" ) + 0x10000;
+	UINT8* pos = image.device().machine->region("maincpu" )->base() + 0x10000;
 	offs_t size = image.length();
 	char name[129];
 
@@ -569,7 +569,7 @@ WRITE8_HANDLER ( to7_cartridge_w )
 /* read signal to 0000-0003 generates a bank switch */
 READ8_HANDLER ( to7_cartridge_r )
 {
-	UINT8* pos = memory_region( space->machine, "maincpu" ) + 0x10000;
+	UINT8* pos = space->machine->region( "maincpu" )->base() + 0x10000;
 	UINT8 data = pos[offset + (thom_cart_bank % thom_cart_nb_banks) * 0x4000];
 	thom_cart_bank = offset & 3;
 	to7_update_cart_bank(space->machine);
@@ -639,7 +639,7 @@ static UINT8 to7_lightpen;
 
 static void to7_lightpen_cb ( running_machine *machine, int step )
 {
-	running_device *sys_pia = machine->device( THOM_PIA_SYS );
+	device_t *sys_pia = machine->device( THOM_PIA_SYS );
 
 	if ( ! to7_lightpen )
 		return;
@@ -658,7 +658,7 @@ static void to7_lightpen_cb ( running_machine *machine, int step )
 
 static void to7_set_init ( running_machine *machine, int init )
 {
-	running_device *sys_pia = machine->device( THOM_PIA_SYS );
+	device_t *sys_pia = machine->device( THOM_PIA_SYS );
 	/* INIT signal wired to system PIA 6821 */
 
 	LOG_VIDEO(( "%f to7_set_init: init=%i\n", attotime_to_double(timer_get_time(machine)), init ));
@@ -770,7 +770,7 @@ typedef enum
 */
 static to7_io_dev to7_io_mode( running_machine *machine )
 {
-	running_device *centronics = machine->device("centronics");
+	device_t *centronics = machine->device("centronics");
 	device_image_interface *serial = dynamic_cast<device_image_interface *>(machine->device("cc90232"));
 
 	if (centronics_pe_r(centronics) == TRUE)
@@ -784,7 +784,7 @@ static to7_io_dev to7_io_mode( running_machine *machine )
 
 static WRITE_LINE_DEVICE_HANDLER( to7_io_ack )
 {
-	running_device *io_pia = device->machine->device( THOM_PIA_IO );
+	device_t *io_pia = device->machine->device( THOM_PIA_IO );
 
 	pia6821_cb1_w( io_pia, state);
 	//LOG_IO (( "%f to7_io_ack: CENTRONICS new state $%02X (ack=%i)\n", attotime_to_double(timer_get_time(machine)), data, ack ));
@@ -811,7 +811,7 @@ static WRITE8_DEVICE_HANDLER ( to7_io_porta_out )
 
 static READ8_DEVICE_HANDLER( to7_io_porta_in )
 {
-	running_device *printer = device->machine->device("centronics");
+	device_t *printer = device->machine->device("centronics");
 	int cts = 1;
 	int dsr = ( to7_io_line.input_state & SERIAL_STATE_DSR ) ? 0 : 1;
 	int rd  = get_in_data_bit( to7_io_line.input_state );
@@ -830,7 +830,7 @@ static READ8_DEVICE_HANDLER( to7_io_porta_in )
 
 static WRITE8_DEVICE_HANDLER( to7_io_portb_out )
 {
-	running_device *printer = device->machine->device("centronics");
+	device_t *printer = device->machine->device("centronics");
 
 	LOG_IO(( "$%04x %f to7_io_portb_out: CENTRONICS set data=$%02X\n", cpu_get_previouspc(device->machine->device("maincpu")), attotime_to_double(timer_get_time(device->machine)), data ));
 
@@ -842,7 +842,7 @@ static WRITE8_DEVICE_HANDLER( to7_io_portb_out )
 
 static WRITE8_DEVICE_HANDLER( to7_io_cb2_out )
 {
-	running_device *printer = device->machine->device("centronics");
+	device_t *printer = device->machine->device("centronics");
 
 	LOG_IO(( "$%04x %f to7_io_cb2_out: CENTRONICS set strobe=%i\n", cpu_get_previouspc(device->machine->device("maincpu")), attotime_to_double(timer_get_time(device->machine)), data ));
 
@@ -890,7 +890,7 @@ const centronics_interface to7_centronics_config =
 
 static void to7_io_reset( running_machine *machine )
 {
-	running_device *io_pia = machine->device( THOM_PIA_IO );
+	device_t *io_pia = machine->device( THOM_PIA_IO );
 
 	LOG (( "to7_io_reset called\n" ));
 
@@ -941,7 +941,7 @@ static UINT8 to7_modem_tx;
 
 
 
-static void to7_modem_cb( running_device *device, int state )
+static void to7_modem_cb( device_t *device, int state )
 {
 	LOG(( "to7_modem_cb: called %i\n", state ));
 }
@@ -1018,12 +1018,12 @@ READ8_HANDLER ( to7_modem_mea8000_r )
 {
 	if ( input_port_read(space->machine, "mconfig") & 1 )
 	{
-		running_device* device = space->machine->device("mea8000" );
+		device_t* device = space->machine->device("mea8000" );
 		return mea8000_r( device, offset );
 	}
 	else
 	{
-		running_device* device = space->machine->device("acia6850" );
+		device_t* device = space->machine->device("acia6850" );
 		switch (offset) {
 		case 0: return acia6850_stat_r( device, offset );
 		case 1: return acia6850_data_r( device, offset );
@@ -1038,12 +1038,12 @@ WRITE8_HANDLER ( to7_modem_mea8000_w )
 {
 	if ( input_port_read(space->machine, "mconfig") & 1 )
 	{
-		running_device* device = space->machine->device("mea8000" );
+		device_t* device = space->machine->device("mea8000" );
 		mea8000_w( device, offset, data );
 	}
 	else
 	{
-		running_device* device = space->machine->device("acia6850" );
+		device_t* device = space->machine->device("acia6850" );
 		switch (offset) {
 		case 0: acia6850_ctrl_w( device, offset, data );
 		case 1: acia6850_data_w( device, offset, data );
@@ -1212,7 +1212,7 @@ const pia6821_interface to7_pia6821_game =
 /* this should be called periodically */
 static TIMER_CALLBACK(to7_game_update_cb)
 {
-	running_device *game_pia = machine->device( THOM_PIA_GAME );
+	device_t *game_pia = machine->device( THOM_PIA_GAME );
 
 	if ( input_port_read(machine, "config") & 1 )
 	{
@@ -1256,7 +1256,7 @@ static void to7_game_init ( running_machine *machine )
 
 static void to7_game_reset ( running_machine *machine )
 {
-	running_device *game_pia = machine->device( THOM_PIA_GAME );
+	device_t *game_pia = machine->device( THOM_PIA_GAME );
 
 	LOG (( "to7_game_reset called\n" ));
 	pia6821_ca1_w( game_pia, 0 );
@@ -1524,7 +1524,7 @@ static void to7_midi_init( running_machine *machine )
 
 MACHINE_RESET ( to7 )
 {
-	running_device *sys_pia = machine->device( THOM_PIA_SYS );
+	device_t *sys_pia = machine->device( THOM_PIA_SYS );
 
 	LOG (( "to7: machine reset called\n" ));
 
@@ -1558,7 +1558,7 @@ MACHINE_RESET ( to7 )
 MACHINE_START ( to7 )
 {
 	address_space* space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	UINT8* mem = memory_region(machine, "maincpu");
+	UINT8* mem = machine->region("maincpu")->base();
 
 	LOG (( "to7: machine start called\n" ));
 
@@ -1637,7 +1637,7 @@ static READ8_DEVICE_HANDLER ( to770_sys_porta_in )
 
 static void to770_update_ram_bank(running_machine *machine)
 {
-	running_device *sys_pia = machine->device( THOM_PIA_SYS );
+	device_t *sys_pia = machine->device( THOM_PIA_SYS );
 	address_space* space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT8 portb = pia6821_get_port_b_z_mask( sys_pia );
 	int bank;
@@ -1780,7 +1780,7 @@ WRITE8_HANDLER ( to770_gatearray_w )
 
 MACHINE_RESET( to770 )
 {
-	running_device *sys_pia = machine->device( THOM_PIA_SYS );
+	device_t *sys_pia = machine->device( THOM_PIA_SYS );
 
 	LOG (( "to770: machine reset called\n" ));
 
@@ -1815,7 +1815,7 @@ MACHINE_RESET( to770 )
 
 MACHINE_START ( to770 )
 {
-	UINT8* mem = memory_region(machine, "maincpu");
+	UINT8* mem = machine->region("maincpu")->base();
 
 	LOG (( "to770: machine start called\n" ));
 
@@ -1861,7 +1861,7 @@ MACHINE_START ( to770 )
 
 static void mo5_lightpen_cb ( running_machine *machine, int step )
 {
-	running_device *sys_pia = machine->device( THOM_PIA_SYS );
+	device_t *sys_pia = machine->device( THOM_PIA_SYS );
 
 	/* MO5 signals ca1 (TO7 signals cb1) */
 	if ( ! to7_lightpen )
@@ -1887,7 +1887,7 @@ static emu_timer* mo5_periodic_timer;
 
 static TIMER_CALLBACK(mo5_periodic_cb)
 {
-	running_device *sys_pia = machine->device( THOM_PIA_SYS );
+	device_t *sys_pia = machine->device( THOM_PIA_SYS );
 
 	/* pulse */
 	pia6821_cb1_w( sys_pia, 1 );
@@ -2016,7 +2016,7 @@ static UINT8 mo5_reg_cart; /* 0xa7cb bank switch */
 
 DEVICE_IMAGE_LOAD( mo5_cartridge )
 {
-	UINT8* pos = memory_region(image.device().machine, "maincpu") + 0x10000;
+	UINT8* pos = image.device().machine->region("maincpu")->base() + 0x10000;
 	UINT64 size = image.length();
 	int i,j;
 	char name[129];
@@ -2129,7 +2129,7 @@ WRITE8_HANDLER ( mo5_cartridge_w )
 /* read signal to bffc-bfff generates a bank switch */
 READ8_HANDLER ( mo5_cartridge_r )
 {
-	UINT8* pos = memory_region( space->machine, "maincpu" ) + 0x10000;
+	UINT8* pos = space->machine->region( "maincpu" )->base() + 0x10000;
 	UINT8 data = pos[offset + 0xbffc + (thom_cart_bank % thom_cart_nb_banks) * 0x4000];
 	thom_cart_bank = offset & 3;
 	mo5_update_cart_bank(space->machine);
@@ -2153,7 +2153,7 @@ WRITE8_HANDLER ( mo5_ext_w )
 
 MACHINE_RESET( mo5 )
 {
-	running_device *sys_pia = machine->device( THOM_PIA_SYS );
+	device_t *sys_pia = machine->device( THOM_PIA_SYS );
 
 	LOG (( "mo5: machine reset called\n" ));
 
@@ -2188,7 +2188,7 @@ MACHINE_RESET( mo5 )
 
 MACHINE_START ( mo5 )
 {
-	UINT8* mem = memory_region(machine, "maincpu");
+	UINT8* mem = machine->region("maincpu")->base();
 
 	LOG (( "mo5: machine start called\n" ));
 
@@ -2499,7 +2499,7 @@ WRITE8_HANDLER ( to9_cartridge_w )
 /* read signal to 0000-0003 generates a bank switch */
 READ8_HANDLER ( to9_cartridge_r )
 {
-	UINT8* pos = memory_region( space->machine, "maincpu" ) + 0x10000;
+	UINT8* pos = space->machine->region( "maincpu" )->base() + 0x10000;
 	UINT8 data = pos[offset + (thom_cart_bank % thom_cart_nb_banks) * 0x4000];
 	thom_cart_bank = offset & 3;
 	to9_update_cart_bank(space->machine);
@@ -2510,7 +2510,7 @@ READ8_HANDLER ( to9_cartridge_r )
 
 static void to9_update_ram_bank (running_machine *machine)
 {
-	running_device *sys_pia = machine->device( THOM_PIA_SYS );
+	device_t *sys_pia = machine->device( THOM_PIA_SYS );
 	address_space* space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT8 port = mc6846_get_output_port(machine->device("mc6846"));
 	UINT8 portb = pia6821_get_port_b_z_mask( sys_pia );
@@ -3047,7 +3047,7 @@ static READ8_DEVICE_HANDLER ( to9_sys_porta_in )
 
 static WRITE8_DEVICE_HANDLER ( to9_sys_porta_out )
 {
-	running_device *printer = device->machine->device("centronics");
+	device_t *printer = device->machine->device("centronics");
 	centronics_data_w(printer, 0, data & 0xfe);
 }
 
@@ -3055,7 +3055,7 @@ static WRITE8_DEVICE_HANDLER ( to9_sys_porta_out )
 
 static WRITE8_DEVICE_HANDLER ( to9_sys_portb_out )
 {
-	running_device *printer = device->machine->device("centronics");
+	device_t *printer = device->machine->device("centronics");
 
 	centronics_d0_w(printer, BIT(data, 0));
 	centronics_strobe_w(printer, BIT(data, 1));
@@ -3116,7 +3116,7 @@ const mc6846_interface to9_timer =
 
 MACHINE_RESET ( to9 )
 {
-	running_device *sys_pia = machine->device( THOM_PIA_SYS );
+	device_t *sys_pia = machine->device( THOM_PIA_SYS );
 
 	LOG (( "to9: machine reset called\n" ));
 
@@ -3152,7 +3152,7 @@ MACHINE_RESET ( to9 )
 
 MACHINE_START ( to9 )
 {
-	UINT8* mem = memory_region(machine, "maincpu");
+	UINT8* mem = machine->region("maincpu")->base();
 
 	LOG (( "to9: machine start called\n" ));
 
@@ -3568,7 +3568,7 @@ static STATE_POSTLOAD( to8_update_floppy_bank_postload )
 
 static void to8_update_ram_bank (running_machine *machine)
 {
-	running_device *sys_pia = machine->device( THOM_PIA_SYS );
+	device_t *sys_pia = machine->device( THOM_PIA_SYS );
 	address_space* space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT8 bank = 0;
 
@@ -3724,7 +3724,7 @@ WRITE8_HANDLER ( to8_cartridge_w )
 /* read signal to 0000-0003 generates a bank switch */
 READ8_HANDLER ( to8_cartridge_r )
 {
-	UINT8* pos = memory_region( space->machine, "maincpu" ) + 0x10000;
+	UINT8* pos = space->machine->region( "maincpu" )->base() + 0x10000;
 	UINT8 data = pos[offset + (thom_cart_bank % thom_cart_nb_banks) * 0x4000];
 	thom_cart_bank = offset & 3;
 	to8_update_cart_bank(space->machine);
@@ -3738,7 +3738,7 @@ READ8_HANDLER ( to8_cartridge_r )
 
 static void to8_floppy_init( running_machine *machine )
 {
-	UINT8* mem = memory_region(machine, "maincpu");
+	UINT8* mem = machine->region("maincpu")->base();
 	to7_floppy_init( machine, mem + 0x34000 );
 }
 
@@ -3746,7 +3746,7 @@ static void to8_floppy_init( running_machine *machine )
 
 static void to8_floppy_reset( running_machine *machine )
 {
-	UINT8* mem = memory_region(machine, "maincpu");
+	UINT8* mem = machine->region("maincpu")->base();
 	to7_floppy_reset(machine);
 	if ( THOM_FLOPPY_INT )
 		thmfc_floppy_reset(machine);
@@ -3996,7 +3996,7 @@ static READ8_DEVICE_HANDLER ( to8_sys_porta_in )
 
 static WRITE8_DEVICE_HANDLER ( to8_sys_portb_out )
 {
-	running_device *printer = device->machine->device("centronics");
+	device_t *printer = device->machine->device("centronics");
 
 	centronics_d0_w(printer, BIT(data, 0));
 	centronics_strobe_w(printer, BIT(data, 1));
@@ -4033,7 +4033,7 @@ const pia6821_interface to8_pia6821_sys =
 
 static READ8_DEVICE_HANDLER ( to8_timer_port_in )
 {
-	running_device *printer = device->machine->device("centronics");
+	device_t *printer = device->machine->device("centronics");
 	int lightpen = (input_port_read(device->machine, "lightpen_button") & 1) ? 2 : 0;
 	int cass = to7_get_cassette(device->machine) ? 0x80 : 0;
 	int dtr = centronics_busy_r(printer) << 6;
@@ -4098,7 +4098,7 @@ static void to8_lightpen_cb ( running_machine *machine, int step )
 
 MACHINE_RESET ( to8 )
 {
-	running_device *sys_pia = machine->device( THOM_PIA_SYS );
+	device_t *sys_pia = machine->device( THOM_PIA_SYS );
 	LOG (( "to8: machine reset called\n" ));
 
 	/* subsystems */
@@ -4145,7 +4145,7 @@ MACHINE_RESET ( to8 )
 
 MACHINE_START ( to8 )
 {
-	UINT8* mem = memory_region(machine, "maincpu");
+	UINT8* mem = machine->region("maincpu")->base();
 
 	LOG (( "to8: machine start called\n" ));
 
@@ -4232,7 +4232,7 @@ const pia6821_interface to9p_pia6821_sys =
 
 static READ8_DEVICE_HANDLER ( to9p_timer_port_in )
 {
-	running_device *printer = device->machine->device("centronics");
+	device_t *printer = device->machine->device("centronics");
 	int lightpen = (input_port_read(device->machine, "lightpen_button") & 1) ? 2 : 0;
 	int cass = to7_get_cassette(device->machine) ? 0x80 : 0;
 	int dtr = centronics_busy_r(printer) << 6;
@@ -4268,7 +4268,7 @@ const mc6846_interface to9p_timer =
 
 MACHINE_RESET ( to9p )
 {
-	running_device *sys_pia = machine->device( THOM_PIA_SYS );
+	device_t *sys_pia = machine->device( THOM_PIA_SYS );
 	LOG (( "to9p: machine reset called\n" ));
 
 	/* subsystems */
@@ -4315,7 +4315,7 @@ MACHINE_RESET ( to9p )
 
 MACHINE_START ( to9p )
 {
-	UINT8* mem = memory_region(machine, "maincpu");
+	UINT8* mem = machine->region("maincpu")->base();
 
 	LOG (( "to9p: machine start called\n" ));
 
@@ -4404,7 +4404,7 @@ static STATE_POSTLOAD( mo6_update_ram_bank_postload )
 
 static void mo6_update_cart_bank (running_machine *machine)
 {
-	running_device *sys_pia = machine->device( THOM_PIA_SYS );
+	device_t *sys_pia = machine->device( THOM_PIA_SYS );
 	address_space* space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	int b = (pia6821_get_output_a( sys_pia ) >> 5) & 1;
 	int bank = 0;
@@ -4511,7 +4511,7 @@ WRITE8_HANDLER ( mo6_cartridge_w )
 /* read signal generates a bank switch */
 READ8_HANDLER ( mo6_cartridge_r )
 {
-	UINT8* pos = memory_region( space->machine, "maincpu" ) + 0x10000;
+	UINT8* pos = space->machine->region( "maincpu" )->base() + 0x10000;
 	UINT8 data = pos[offset + 0xbffc + (thom_cart_bank % thom_cart_nb_banks) * 0x4000];
 	thom_cart_bank = offset & 3;
 	mo6_update_cart_bank(space->machine);
@@ -4536,7 +4536,7 @@ WRITE8_HANDLER ( mo6_ext_w )
 
 static WRITE_LINE_DEVICE_HANDLER( mo6_centronics_busy )
 {
-	running_device *game_pia = device->machine->device( THOM_PIA_GAME );
+	device_t *game_pia = device->machine->device( THOM_PIA_GAME );
 	pia6821_cb1_w(game_pia, state);
 }
 
@@ -4552,7 +4552,7 @@ const centronics_interface mo6_centronics_config =
 
 static WRITE8_DEVICE_HANDLER ( mo6_game_porta_out )
 {
-	running_device *printer = device->machine->device("centronics");
+	device_t *printer = device->machine->device("centronics");
 
 	LOG (( "$%04x %f mo6_game_porta_out: CENTRONICS set data=$%02X\n", cpu_get_previouspc(device->machine->device("maincpu")), attotime_to_double(timer_get_time(device->machine)), data ));
 
@@ -4564,7 +4564,7 @@ static WRITE8_DEVICE_HANDLER ( mo6_game_porta_out )
 
 static WRITE8_DEVICE_HANDLER ( mo6_game_cb2_out )
 {
-	running_device *printer = device->machine->device("centronics");
+	device_t *printer = device->machine->device("centronics");
 
 	LOG (( "$%04x %f mo6_game_cb2_out: CENTRONICS set strobe=%i\n", cpu_get_previouspc(device->machine->device("maincpu")), attotime_to_double(timer_get_time(device->machine)), data ));
 
@@ -4594,7 +4594,7 @@ const pia6821_interface mo6_pia6821_game =
 
 static TIMER_CALLBACK(mo6_game_update_cb)
 {
-	running_device *game_pia = machine->device( THOM_PIA_GAME );
+	device_t *game_pia = machine->device( THOM_PIA_GAME );
 
 	/* unlike the TO8, CB1 & CB2 are not connected to buttons */
 	if ( input_port_read(machine, "config") & 1 )
@@ -4627,7 +4627,7 @@ static void mo6_game_init ( running_machine *machine )
 
 static void mo6_game_reset ( running_machine *machine )
 {
-	running_device *game_pia = machine->device( THOM_PIA_GAME );
+	device_t *game_pia = machine->device( THOM_PIA_GAME );
 	LOG (( "mo6_game_reset called\n" ));
 	pia6821_ca1_w( game_pia, 0 );
 	to7_game_sound = 0;
@@ -4896,7 +4896,7 @@ WRITE8_HANDLER ( mo6_vreg_w )
 
 MACHINE_RESET ( mo6 )
 {
-	running_device *sys_pia = machine->device( THOM_PIA_SYS );
+	device_t *sys_pia = machine->device( THOM_PIA_SYS );
 	LOG (( "mo6: machine reset called\n" ));
 
 	/* subsystems */
@@ -4938,7 +4938,7 @@ MACHINE_RESET ( mo6 )
 
 MACHINE_START ( mo6 )
 {
-	UINT8* mem = memory_region(machine, "maincpu");
+	UINT8* mem = machine->region("maincpu")->base();
 
 	LOG (( "mo6: machine start called\n" ));
 
@@ -5032,7 +5032,7 @@ WRITE8_HANDLER ( mo5nr_net_w )
 
 READ8_HANDLER( mo5nr_prn_r )
 {
-	running_device *printer = space->machine->device("centronics");
+	device_t *printer = space->machine->device("centronics");
 	UINT8 result = 0;
 
 	result |= !centronics_busy_r(printer) << 7;
@@ -5043,7 +5043,7 @@ READ8_HANDLER( mo5nr_prn_r )
 
 WRITE8_HANDLER( mo5nr_prn_w )
 {
-	running_device *printer = space->machine->device("centronics");
+	device_t *printer = space->machine->device("centronics");
 
 	/* TODO: understand other bits */
 	centronics_strobe_w(printer, BIT(data, 3));
@@ -5140,7 +5140,7 @@ static void mo5nr_game_init ( running_machine* machine )
 
 static void mo5nr_game_reset ( running_machine* machine )
 {
-	running_device *game_pia = machine->device( THOM_PIA_GAME );
+	device_t *game_pia = machine->device( THOM_PIA_GAME );
 	LOG (( "mo5nr_game_reset called\n" ));
 	pia6821_ca1_w( game_pia, 0 );
 	to7_game_sound = 0;
@@ -5156,7 +5156,7 @@ static void mo5nr_game_reset ( running_machine* machine )
 
 MACHINE_RESET ( mo5nr )
 {
-	running_device *sys_pia = machine->device( THOM_PIA_SYS );
+	device_t *sys_pia = machine->device( THOM_PIA_SYS );
 	LOG (( "mo5nr: machine reset called\n" ));
 
 	/* subsystems */
@@ -5198,7 +5198,7 @@ MACHINE_RESET ( mo5nr )
 
 MACHINE_START ( mo5nr )
 {
-	UINT8* mem = memory_region(machine, "maincpu");
+	UINT8* mem = machine->region("maincpu")->base();
 
 	LOG (( "mo5nr: machine start called\n" ));
 

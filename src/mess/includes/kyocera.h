@@ -55,21 +55,21 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<running_device> m_rtc;
-	required_device<running_device> m_lcdc0;
-	required_device<running_device> m_lcdc1;
-	required_device<running_device> m_lcdc2;
-	required_device<running_device> m_lcdc3;
-	required_device<running_device> m_lcdc4;
-	required_device<running_device> m_lcdc5;
-	required_device<running_device> m_lcdc6;
-	required_device<running_device> m_lcdc7;
-	required_device<running_device> m_lcdc8;
-	required_device<running_device> m_lcdc9;
-	required_device<running_device> m_centronics;
-	required_device<running_device> m_speaker;
-	required_device<running_device> m_cassette;
-	required_device<running_device> m_ram;
+	required_device<device_t> m_rtc;
+	required_device<device_t> m_lcdc0;
+	required_device<device_t> m_lcdc1;
+	required_device<device_t> m_lcdc2;
+	required_device<device_t> m_lcdc3;
+	required_device<device_t> m_lcdc4;
+	required_device<device_t> m_lcdc5;
+	required_device<device_t> m_lcdc6;
+	required_device<device_t> m_lcdc7;
+	required_device<device_t> m_lcdc8;
+	required_device<device_t> m_lcdc9;
+	required_device<device_t> m_centronics;
+	required_device<device_t> m_speaker;
+	required_device<device_t> m_cassette;
+	required_device<device_t> m_ram;
 
 	virtual void machine_start();
 
@@ -149,12 +149,12 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<running_device> m_rtc;
+	required_device<device_t> m_rtc;
 	required_device<hd61830_device> m_lcdc;
-	required_device<running_device> m_centronics;
-	required_device<running_device> m_speaker;
-	required_device<running_device> m_cassette;
-	required_device<running_device> m_ram;
+	required_device<device_t> m_centronics;
+	required_device<device_t> m_speaker;
+	required_device<device_t> m_cassette;
+	required_device<device_t> m_ram;
 
 	virtual void machine_start();
 

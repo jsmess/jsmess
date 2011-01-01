@@ -24,7 +24,7 @@ typedef struct
 } SocratesASIC;
 
 
-INLINE SocratesASIC *get_safe_token(running_device *device)
+INLINE SocratesASIC *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == SOCRATES);
@@ -102,21 +102,21 @@ static DEVICE_START( socrates_snd )
 }
 
 
-void socrates_snd_reg0_w(running_device *device, int data)
+void socrates_snd_reg0_w(device_t *device, int data)
 {
 	SocratesASIC *chip = get_safe_token(device);
 	stream_update(chip->stream);
 	chip->freq[0] = data;
 }
 
-void socrates_snd_reg1_w(running_device *device, int data)
+void socrates_snd_reg1_w(device_t *device, int data)
 {
 	SocratesASIC *chip = get_safe_token(device);
 	stream_update(chip->stream);
 	chip->freq[1] = data;
 }
 
-void socrates_snd_reg2_w(running_device *device, int data)
+void socrates_snd_reg2_w(device_t *device, int data)
 {
 	SocratesASIC *chip = get_safe_token(device);
 	stream_update(chip->stream);
@@ -124,7 +124,7 @@ void socrates_snd_reg2_w(running_device *device, int data)
 	chip->enable[0] = (data&0x10)>>4;
 }
 
-void socrates_snd_reg3_w(running_device *device, int data)
+void socrates_snd_reg3_w(device_t *device, int data)
 {
 	SocratesASIC *chip = get_safe_token(device);
 	stream_update(chip->stream);
@@ -132,7 +132,7 @@ void socrates_snd_reg3_w(running_device *device, int data)
 	chip->enable[1] = (data&0x10)>>4;
 }
 
-void socrates_snd_reg4_w(running_device *device, int data)
+void socrates_snd_reg4_w(device_t *device, int data)
 {
 	SocratesASIC *chip = get_safe_token(device);
 	stream_update(chip->stream);

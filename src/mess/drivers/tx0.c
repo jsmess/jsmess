@@ -70,7 +70,7 @@ static DRIVER_INIT( tx0 )
 	};
 
 	/* set up our font */
-	dst = memory_region(machine, "gfx1");
+	dst = machine->region("gfx1")->base();
 
 	memcpy(dst, fontdata6x8, tx0_fontdata_size);
 }
@@ -320,30 +320,30 @@ static const tx0_reset_param_t tx0_reset_param =
 static MACHINE_CONFIG_START( tx0_64kw, tx0_state )
 	/* basic machine hardware */
 	/* TX0 CPU @ approx. 167 kHz (no master clock, but the memory cycle time is approximately 6usec) */
-	MDRV_CPU_ADD("maincpu", TX0_64KW, 166667)
-	MDRV_CPU_CONFIG(tx0_reset_param)
-	MDRV_CPU_PROGRAM_MAP(tx0_64kw_map)
+	MCFG_CPU_ADD("maincpu", TX0_64KW, 166667)
+	MCFG_CPU_CONFIG(tx0_reset_param)
+	MCFG_CPU_PROGRAM_MAP(tx0_64kw_map)
 	/* dummy interrupt: handles input */
-	MDRV_CPU_VBLANK_INT("screen", tx0_interrupt)
+	MCFG_CPU_VBLANK_INT("screen", tx0_interrupt)
 
-	MDRV_MACHINE_START( tx0 )
-	MDRV_MACHINE_RESET( tx0 )
+	MCFG_MACHINE_START( tx0 )
+	MCFG_MACHINE_RESET( tx0 )
 
 	/* video hardware (includes the control panel and typewriter output) */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(refresh_rate)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(virtual_width, virtual_height)
-	MDRV_SCREEN_VISIBLE_AREA(0, virtual_width-1, 0, virtual_height-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(refresh_rate)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(virtual_width, virtual_height)
+	MCFG_SCREEN_VISIBLE_AREA(0, virtual_width-1, 0, virtual_height-1)
 
-	MDRV_GFXDECODE(tx0)
-	MDRV_PALETTE_LENGTH(pen_crt_num_levels + sizeof(tx0_colors) / 3 + sizeof(tx0_palette))
+	MCFG_GFXDECODE(tx0)
+	MCFG_PALETTE_LENGTH(pen_crt_num_levels + sizeof(tx0_colors) / 3 + sizeof(tx0_palette))
 
-	MDRV_PALETTE_INIT(tx0)
-	MDRV_VIDEO_START(tx0)
-	MDRV_VIDEO_EOF(crt)
-	MDRV_VIDEO_UPDATE(tx0)
+	MCFG_PALETTE_INIT(tx0)
+	MCFG_VIDEO_START(tx0)
+	MCFG_VIDEO_EOF(crt)
+	MCFG_VIDEO_UPDATE(tx0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( tx0_8kw, tx0_64kw )
@@ -351,10 +351,10 @@ static MACHINE_CONFIG_DERIVED( tx0_8kw, tx0_64kw )
 	/* basic machine hardware */
 	/* TX0 CPU @ approx. 167 kHz (no master clock, but the memory cycle time is
     approximately 6usec) */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_CONFIG(tx0_reset_param)
-	MDRV_CPU_PROGRAM_MAP(tx0_8kw_map)
-	/*MDRV_CPU_PORTS(readport, writeport)*/
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_CONFIG(tx0_reset_param)
+	MCFG_CPU_PROGRAM_MAP(tx0_8kw_map)
+	/*MCFG_CPU_PORTS(readport, writeport)*/
 MACHINE_CONFIG_END
 
 ROM_START(tx0_64kw)

@@ -98,7 +98,7 @@ static WRITE16_HANDLER( zeropnt_sound_bank_w )
            contains garbage. Indeed, only banks 0&1 are used */
 
 		int bank = (data >> 8 ) & 1;
-		UINT8 *dst	= memory_region(space->machine, "oki");
+		UINT8 *dst	= space->machine->region("oki")->base();
 		UINT8 *src	= dst + 0x80000 + 0x20000 + 0x20000 * bank;
 		memcpy(dst + 0x20000, src, 0x20000);
 
@@ -194,7 +194,7 @@ static WRITE32_HANDLER( zeropnt2_sound_bank_w )
 	if (ACCESSING_BITS_24_31)
 	{
 		int bank = ((data >> 24) & 3) % 4;
-		UINT8 *dst	= memory_region(space->machine, "oki1");
+		UINT8 *dst	= space->machine->region("oki1")->base();
 		UINT8 *src	= dst + 0x80000 + 0x20000 + 0x20000 * bank;
 		memcpy(dst + 0x20000, src, 0x20000);
 	}
@@ -604,36 +604,36 @@ static const eeprom_interface zeropnt2_eeprom_interface =
 static MACHINE_CONFIG_START( burglarx, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 16000000)
-	MDRV_CPU_PROGRAM_MAP(burglarx_map)
-	MDRV_CPU_VBLANK_INT("screen", irq2_line_hold)
+	MCFG_CPU_ADD("maincpu", M68000, 16000000)
+	MCFG_CPU_PROGRAM_MAP(burglarx_map)
+	MCFG_CPU_VBLANK_INT("screen", irq2_line_hold)
 
-	MDRV_MACHINE_RESET(unico)
+	MCFG_MACHINE_RESET(unico)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(0x180, 0xe0)
-	MDRV_SCREEN_VISIBLE_AREA(0, 0x180-1, 0, 0xe0-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(0x180, 0xe0)
+	MCFG_SCREEN_VISIBLE_AREA(0, 0x180-1, 0, 0xe0-1)
 
-	MDRV_GFXDECODE(unico)
-	MDRV_PALETTE_LENGTH(8192)
+	MCFG_GFXDECODE(unico)
+	MCFG_PALETTE_LENGTH(8192)
 
-	MDRV_VIDEO_START(unico)
-	MDRV_VIDEO_UPDATE(unico)
+	MCFG_VIDEO_START(unico)
+	MCFG_VIDEO_UPDATE(unico)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ymsnd", YM3812, 3579545) /* 14.31818MHz OSC divided by 4 */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
+	MCFG_SOUND_ADD("ymsnd", YM3812, 3579545) /* 14.31818MHz OSC divided by 4 */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 
-	MDRV_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.80)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
+	MCFG_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.80)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
 MACHINE_CONFIG_END
 
 
@@ -650,36 +650,36 @@ static MACHINE_RESET( zeropt )
 static MACHINE_CONFIG_START( zeropnt, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 16000000)
-	MDRV_CPU_PROGRAM_MAP(zeropnt_map)
-	MDRV_CPU_VBLANK_INT("screen", irq2_line_hold)
+	MCFG_CPU_ADD("maincpu", M68000, 16000000)
+	MCFG_CPU_PROGRAM_MAP(zeropnt_map)
+	MCFG_CPU_VBLANK_INT("screen", irq2_line_hold)
 
-	MDRV_MACHINE_RESET(zeropt)
+	MCFG_MACHINE_RESET(zeropt)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(0x180, 0xe0)
-	MDRV_SCREEN_VISIBLE_AREA(0, 0x180-1, 0, 0xe0-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(0x180, 0xe0)
+	MCFG_SCREEN_VISIBLE_AREA(0, 0x180-1, 0, 0xe0-1)
 
-	MDRV_GFXDECODE(unico)
-	MDRV_PALETTE_LENGTH(8192)
+	MCFG_GFXDECODE(unico)
+	MCFG_PALETTE_LENGTH(8192)
 
-	MDRV_VIDEO_START(unico)
-	MDRV_VIDEO_UPDATE(unico)
+	MCFG_VIDEO_START(unico)
+	MCFG_VIDEO_UPDATE(unico)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ymsnd", YM3812, 3579545) /* 14.31818MHz OSC divided by 4 */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
+	MCFG_SOUND_ADD("ymsnd", YM3812, 3579545) /* 14.31818MHz OSC divided by 4 */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 
-	MDRV_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.80)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
+	MCFG_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.80)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
 MACHINE_CONFIG_END
 
 
@@ -691,40 +691,40 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( zeropnt2, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68EC020, 16000000)
-	MDRV_CPU_PROGRAM_MAP(zeropnt2_map)
-	MDRV_CPU_VBLANK_INT("screen", irq2_line_hold)
+	MCFG_CPU_ADD("maincpu", M68EC020, 16000000)
+	MCFG_CPU_PROGRAM_MAP(zeropnt2_map)
+	MCFG_CPU_VBLANK_INT("screen", irq2_line_hold)
 
-	MDRV_MACHINE_RESET(zeropt)
+	MCFG_MACHINE_RESET(zeropt)
 
-	MDRV_EEPROM_ADD("eeprom", zeropnt2_eeprom_interface)
+	MCFG_EEPROM_ADD("eeprom", zeropnt2_eeprom_interface)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(0x180, 0xe0)
-	MDRV_SCREEN_VISIBLE_AREA(0, 0x180-1, 0, 0xe0-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(0x180, 0xe0)
+	MCFG_SCREEN_VISIBLE_AREA(0, 0x180-1, 0, 0xe0-1)
 
-	MDRV_GFXDECODE(unico)
-	MDRV_PALETTE_LENGTH(8192)
+	MCFG_GFXDECODE(unico)
+	MCFG_PALETTE_LENGTH(8192)
 
-	MDRV_VIDEO_START(zeropnt2)
-	MDRV_VIDEO_UPDATE(zeropnt2)
+	MCFG_VIDEO_START(zeropnt2)
+	MCFG_VIDEO_UPDATE(zeropnt2)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ymsnd", YM2151, 3579545)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 0.70)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 0.70)
+	MCFG_SOUND_ADD("ymsnd", YM2151, 3579545)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.70)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.70)
 
-	MDRV_OKIM6295_ADD("oki1", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
+	MCFG_OKIM6295_ADD("oki1", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
 
-	MDRV_OKIM6295_ADD("oki2", 3960000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.20)
+	MCFG_OKIM6295_ADD("oki2", 3960000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.20)
 MACHINE_CONFIG_END
 
 

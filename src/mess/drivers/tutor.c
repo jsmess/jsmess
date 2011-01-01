@@ -202,8 +202,8 @@ static DRIVER_INIT(tutor)
 	tutor_state *state = machine->driver_data<tutor_state>();
 	state->tape_interrupt_timer = timer_alloc(machine, tape_interrupt_handler, NULL);
 
-	memory_configure_bank(machine, "bank1", 0, 1, memory_region(machine, "maincpu") + basic_base, 0);
-	memory_configure_bank(machine, "bank1", 1, 1, memory_region(machine, "maincpu") + cartridge_base, 0);
+	memory_configure_bank(machine, "bank1", 0, 1, machine->region("maincpu")->base() + basic_base, 0);
+	memory_configure_bank(machine, "bank1", 1, 1, machine->region("maincpu")->base() + cartridge_base, 0);
 	memory_set_bank(machine, "bank1", 0);
 }
 
@@ -280,7 +280,7 @@ static READ8_HANDLER(read_keyboard)
 static DEVICE_IMAGE_LOAD( tutor_cart )
 {
 	UINT32 size;
-	UINT8 *ptr = memory_region(image.device().machine, "maincpu");
+	UINT8 *ptr = image.device().machine->region("maincpu")->base();
 
 	if (image.software_entry() == NULL)
 	{
@@ -299,7 +299,7 @@ static DEVICE_IMAGE_LOAD( tutor_cart )
 
 static DEVICE_IMAGE_UNLOAD( tutor_cart )
 {
-	memset(memory_region(image.device().machine, "maincpu") + cartridge_base, 0, 0x6000);
+	memset(image.device().machine->region("maincpu")->base() + cartridge_base, 0, 0x6000);
 }
 
 /*
@@ -687,41 +687,41 @@ static const struct tms9995reset_param tutor_processor_config =
 static MACHINE_CONFIG_START( tutor, tutor_state )
 	/* basic machine hardware */
 	/* TMS9995 CPU @ 10.7 MHz */
-	MDRV_CPU_ADD("maincpu", TMS9995, 10700000)
-	MDRV_CPU_CONFIG(tutor_processor_config)
-	MDRV_CPU_PROGRAM_MAP(tutor_memmap)
-	MDRV_CPU_IO_MAP(tutor_io)
-	MDRV_CPU_VBLANK_INT("screen", tutor_vblank_interrupt)
+	MCFG_CPU_ADD("maincpu", TMS9995, 10700000)
+	MCFG_CPU_CONFIG(tutor_processor_config)
+	MCFG_CPU_PROGRAM_MAP(tutor_memmap)
+	MCFG_CPU_IO_MAP(tutor_io)
+	MCFG_CPU_VBLANK_INT("screen", tutor_vblank_interrupt)
 
-	MDRV_MACHINE_START( tutor )
-	MDRV_MACHINE_RESET( tutor )
+	MCFG_MACHINE_START( tutor )
+	MCFG_MACHINE_RESET( tutor )
 
 	/* video hardware */
-	MDRV_FRAGMENT_ADD(tms9928a)
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_FRAGMENT_ADD(tms9928a)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 
 	/* sound */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("sn76489a", SN76489A, 3579545)	/* 3.579545 MHz */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
-	MDRV_SOUND_WAVE_ADD("wave", "cassette")
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("sn76489a", SN76489A, 3579545)	/* 3.579545 MHz */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+	MCFG_SOUND_WAVE_ADD("wave", "cassette")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
-	MDRV_CENTRONICS_ADD("printer", standard_centronics)
+	MCFG_CENTRONICS_ADD("printer", standard_centronics)
 
-	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )
+	MCFG_CASSETTE_ADD( "cassette", default_cassette_config )
 
 	/* cartridge */
-	MDRV_CARTSLOT_ADD("cart")
-	MDRV_CARTSLOT_NOT_MANDATORY
-	MDRV_CARTSLOT_LOAD(tutor_cart)
-	MDRV_CARTSLOT_UNLOAD(tutor_cart)
-	MDRV_CARTSLOT_INTERFACE("tutor_cart")
+	MCFG_CARTSLOT_ADD("cart")
+	MCFG_CARTSLOT_NOT_MANDATORY
+	MCFG_CARTSLOT_LOAD(tutor_cart)
+	MCFG_CARTSLOT_UNLOAD(tutor_cart)
+	MCFG_CARTSLOT_INTERFACE("tutor_cart")
 
 	/* software lists */
-	MDRV_SOFTWARE_LIST_ADD("cart_list","tutor")
+	MCFG_SOFTWARE_LIST_ADD("cart_list","tutor")
 
 MACHINE_CONFIG_END
 

@@ -192,11 +192,11 @@ struct _c1541_t
 	int via1_irq;							/* VIA #1 interrupt request */
 
 	/* devices */
-	running_device *cpu;
+	device_t *cpu;
 	via6522_device *via0;
 	via6522_device *via1;
-	running_device *bus;
-	running_device *image;
+	device_t *bus;
+	device_t *image;
 
 	/* timers */
 	emu_timer *bit_timer;
@@ -206,7 +206,7 @@ struct _c1541_t
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE c1541_t *get_safe_token(running_device *device)
+INLINE c1541_t *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert((device->type() == C1540) || (device->type() == C1541) || (device->type() == C1541C) || (device->type() == C1541II) ||
@@ -214,7 +214,7 @@ INLINE c1541_t *get_safe_token(running_device *device)
 	return (c1541_t *)downcast<legacy_device_base *>(device)->token();
 }
 
-INLINE c1541_config *get_safe_config(running_device *device)
+INLINE c1541_config *get_safe_config(device_t *device)
 {
 	assert(device != NULL);
 	assert((device->type() == C1540) || (device->type() == C1541) || (device->type() == C1541C) || (device->type() == C1541II) ||
@@ -232,7 +232,7 @@ INLINE c1541_config *get_safe_config(running_device *device)
 
 static TIMER_CALLBACK( bit_tick )
 {
-	running_device *device = (running_device *)ptr;
+	device_t *device = (device_t *)ptr;
 	c1541_t *c1541 = get_safe_token(device);
 	int byte = 0;
 
@@ -269,7 +269,7 @@ static TIMER_CALLBACK( bit_tick )
 		if (!(c1541->data & 0xff))
 		{
 			/* simulate weak bits with randomness */
-			c1541->data = (c1541->data & 0xff00) | (mame_rand(machine) & 0xff);
+			c1541->data = (c1541->data & 0xff00) | (machine->rand() & 0xff);
 		}
 	}
 
@@ -1037,13 +1037,13 @@ static const floppy_config c1541_floppy_config =
 -------------------------------------------------*/
 
 static MACHINE_CONFIG_FRAGMENT( c1540 )
-	MDRV_CPU_ADD(M6502_TAG, M6502, XTAL_16MHz/16)
-	MDRV_CPU_PROGRAM_MAP(c1540_map)
+	MCFG_CPU_ADD(M6502_TAG, M6502, XTAL_16MHz/16)
+	MCFG_CPU_PROGRAM_MAP(c1540_map)
 
-	MDRV_VIA6522_ADD(M6522_0_TAG, XTAL_16MHz/16, c1541_via0_intf)
-	MDRV_VIA6522_ADD(M6522_1_TAG, XTAL_16MHz/16, c1541_via1_intf)
+	MCFG_VIA6522_ADD(M6522_0_TAG, XTAL_16MHz/16, c1541_via0_intf)
+	MCFG_VIA6522_ADD(M6522_1_TAG, XTAL_16MHz/16, c1541_via1_intf)
 
-	MDRV_FLOPPY_DRIVE_ADD(FLOPPY_0, c1541_floppy_config)
+	MCFG_FLOPPY_DRIVE_ADD(FLOPPY_0, c1541_floppy_config)
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------
@@ -1051,10 +1051,10 @@ MACHINE_CONFIG_END
 -------------------------------------------------*/
 
 static MACHINE_CONFIG_FRAGMENT( c1541 )
-	MDRV_FRAGMENT_ADD(c1540)
+	MCFG_FRAGMENT_ADD(c1540)
 
-	MDRV_CPU_MODIFY(M6502_TAG)
-	MDRV_CPU_PROGRAM_MAP(c1541_map)
+	MCFG_CPU_MODIFY(M6502_TAG)
+	MCFG_CPU_PROGRAM_MAP(c1541_map)
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------
@@ -1062,13 +1062,13 @@ MACHINE_CONFIG_END
 -------------------------------------------------*/
 
 static MACHINE_CONFIG_FRAGMENT( c1541c )
-	MDRV_CPU_ADD(M6502_TAG, M6502, XTAL_16MHz/16)
-	MDRV_CPU_PROGRAM_MAP(c1541c_map)
+	MCFG_CPU_ADD(M6502_TAG, M6502, XTAL_16MHz/16)
+	MCFG_CPU_PROGRAM_MAP(c1541c_map)
 
-	MDRV_VIA6522_ADD(M6522_0_TAG, XTAL_16MHz/16, c1541c_via0_intf)
-	MDRV_VIA6522_ADD(M6522_1_TAG, XTAL_16MHz/16, c1541_via1_intf)
+	MCFG_VIA6522_ADD(M6522_0_TAG, XTAL_16MHz/16, c1541c_via0_intf)
+	MCFG_VIA6522_ADD(M6522_1_TAG, XTAL_16MHz/16, c1541_via1_intf)
 
-	MDRV_FLOPPY_DRIVE_ADD(FLOPPY_0, c1541_floppy_config)
+	MCFG_FLOPPY_DRIVE_ADD(FLOPPY_0, c1541_floppy_config)
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------
@@ -1076,10 +1076,10 @@ MACHINE_CONFIG_END
 -------------------------------------------------*/
 
 static MACHINE_CONFIG_FRAGMENT( c1541ii )
-	MDRV_FRAGMENT_ADD(c1540)
+	MCFG_FRAGMENT_ADD(c1540)
 
-	MDRV_CPU_MODIFY(M6502_TAG)
-	MDRV_CPU_PROGRAM_MAP(c1541ii_map)
+	MCFG_CPU_MODIFY(M6502_TAG)
+	MCFG_CPU_PROGRAM_MAP(c1541ii_map)
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------
@@ -1087,10 +1087,10 @@ MACHINE_CONFIG_END
 -------------------------------------------------*/
 
 static MACHINE_CONFIG_FRAGMENT( sx1541 )
-	MDRV_FRAGMENT_ADD(c1540)
+	MCFG_FRAGMENT_ADD(c1540)
 
-	MDRV_CPU_MODIFY(M6502_TAG)
-	MDRV_CPU_PROGRAM_MAP(sx1541_map)
+	MCFG_CPU_MODIFY(M6502_TAG)
+	MCFG_CPU_PROGRAM_MAP(sx1541_map)
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------
@@ -1098,13 +1098,13 @@ MACHINE_CONFIG_END
 -------------------------------------------------*/
 
 static MACHINE_CONFIG_FRAGMENT( c2031 )
-	MDRV_CPU_ADD(M6502_TAG, M6502, XTAL_16MHz/16)
-	MDRV_CPU_PROGRAM_MAP(c2031_map)
+	MCFG_CPU_ADD(M6502_TAG, M6502, XTAL_16MHz/16)
+	MCFG_CPU_PROGRAM_MAP(c2031_map)
 
-	MDRV_VIA6522_ADD(M6522_0_TAG, XTAL_16MHz/16, c2031_via0_intf)
-	MDRV_VIA6522_ADD(M6522_1_TAG, XTAL_16MHz/16, c1541_via1_intf)
+	MCFG_VIA6522_ADD(M6522_0_TAG, XTAL_16MHz/16, c2031_via0_intf)
+	MCFG_VIA6522_ADD(M6522_1_TAG, XTAL_16MHz/16, c1541_via1_intf)
 
-	MDRV_FLOPPY_DRIVE_ADD(FLOPPY_0, c1541_floppy_config)
+	MCFG_FLOPPY_DRIVE_ADD(FLOPPY_0, c1541_floppy_config)
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------
@@ -1112,10 +1112,10 @@ MACHINE_CONFIG_END
 -------------------------------------------------*/
 
 static MACHINE_CONFIG_FRAGMENT( oc118 )
-	MDRV_FRAGMENT_ADD(c1540)
+	MCFG_FRAGMENT_ADD(c1540)
 
-	MDRV_CPU_MODIFY(M6502_TAG)
-	MDRV_CPU_PROGRAM_MAP(oc118_map)
+	MCFG_CPU_MODIFY(M6502_TAG)
+	MCFG_CPU_PROGRAM_MAP(oc118_map)
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------

@@ -24,9 +24,9 @@ public:
 	UINT8 char_substact;
 
 	/* devices */
-	running_device *mc6847;
-	running_device *centronics;
-	running_device *cassette;
+	device_t *mc6847;
+	device_t *centronics;
+	device_t *cassette;
 };
 
 #endif

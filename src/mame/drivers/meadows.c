@@ -651,63 +651,63 @@ static const samples_interface bowl3d_samples_interface =
 static MACHINE_CONFIG_START( meadows, meadows_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", S2650, MASTER_CLOCK/8)	/* 5MHz / 8 = 625 kHz */
-	MDRV_CPU_PROGRAM_MAP(meadows_main_map)
-	MDRV_CPU_VBLANK_INT("screen", meadows_interrupt)	/* one interrupt per frame!? */
+	MCFG_CPU_ADD("maincpu", S2650, MASTER_CLOCK/8)	/* 5MHz / 8 = 625 kHz */
+	MCFG_CPU_PROGRAM_MAP(meadows_main_map)
+	MCFG_CPU_VBLANK_INT("screen", meadows_interrupt)	/* one interrupt per frame!? */
 
-	MDRV_CPU_ADD("audiocpu", S2650, MASTER_CLOCK/8) 	/* 5MHz / 8 = 625 kHz */
-	MDRV_CPU_PROGRAM_MAP(audio_map)
-	MDRV_CPU_PERIODIC_INT(audio_interrupt, (double)5000000/131072)
+	MCFG_CPU_ADD("audiocpu", S2650, MASTER_CLOCK/8) 	/* 5MHz / 8 = 625 kHz */
+	MCFG_CPU_PROGRAM_MAP(audio_map)
+	MCFG_CPU_PERIODIC_INT(audio_interrupt, (double)5000000/131072)
 
-	MDRV_QUANTUM_TIME(HZ(600))
+	MCFG_QUANTUM_TIME(HZ(600))
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 30*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 30*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(meadows)
-	MDRV_PALETTE_LENGTH(2)
+	MCFG_GFXDECODE(meadows)
+	MCFG_PALETTE_LENGTH(2)
 
-	MDRV_PALETTE_INIT(meadows)
-	MDRV_VIDEO_START(meadows)
-	MDRV_VIDEO_UPDATE(meadows)
+	MCFG_PALETTE_INIT(meadows)
+	MCFG_VIDEO_START(meadows)
+	MCFG_VIDEO_UPDATE(meadows)
 
 	/* audio hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("dac", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD("samples", SAMPLES, 0)
-	MDRV_SOUND_CONFIG(meadows_samples_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SOUND_CONFIG(meadows_samples_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_START( minferno, meadows_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", S2650, MASTER_CLOCK/24) 	/* 5MHz / 8 / 3 = 208.33 kHz */
-	MDRV_CPU_PROGRAM_MAP(minferno_main_map)
-	MDRV_CPU_IO_MAP(minferno_io_map)
-	MDRV_CPU_VBLANK_INT("screen", minferno_interrupt)
+	MCFG_CPU_ADD("maincpu", S2650, MASTER_CLOCK/24) 	/* 5MHz / 8 / 3 = 208.33 kHz */
+	MCFG_CPU_PROGRAM_MAP(minferno_main_map)
+	MCFG_CPU_IO_MAP(minferno_io_map)
+	MCFG_CPU_VBLANK_INT("screen", minferno_interrupt)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 24*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 24*8-1)
 
-	MDRV_GFXDECODE(minferno)
-	MDRV_PALETTE_LENGTH(2)
+	MCFG_GFXDECODE(minferno)
+	MCFG_PALETTE_LENGTH(2)
 
-	MDRV_PALETTE_INIT(meadows)
-	MDRV_VIDEO_START(meadows)
-	MDRV_VIDEO_UPDATE(meadows)
+	MCFG_PALETTE_INIT(meadows)
+	MCFG_VIDEO_START(meadows)
+	MCFG_VIDEO_UPDATE(meadows)
 
 	/* audio hardware */
 MACHINE_CONFIG_END
@@ -715,44 +715,44 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( bowl3d, meadows_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", S2650, MASTER_CLOCK/8)	/* 5MHz / 8 = 625 kHz */
-	MDRV_CPU_PROGRAM_MAP(bowl3d_main_map)
-	MDRV_CPU_VBLANK_INT("screen", meadows_interrupt)	/* one interrupt per frame!? */
+	MCFG_CPU_ADD("maincpu", S2650, MASTER_CLOCK/8)	/* 5MHz / 8 = 625 kHz */
+	MCFG_CPU_PROGRAM_MAP(bowl3d_main_map)
+	MCFG_CPU_VBLANK_INT("screen", meadows_interrupt)	/* one interrupt per frame!? */
 
-	MDRV_CPU_ADD("audiocpu", S2650, MASTER_CLOCK/8) 	/* 5MHz / 8 = 625 kHz */
-	MDRV_CPU_PROGRAM_MAP(audio_map)
-	MDRV_CPU_PERIODIC_INT(audio_interrupt, (double)5000000/131072)
+	MCFG_CPU_ADD("audiocpu", S2650, MASTER_CLOCK/8) 	/* 5MHz / 8 = 625 kHz */
+	MCFG_CPU_PROGRAM_MAP(audio_map)
+	MCFG_CPU_PERIODIC_INT(audio_interrupt, (double)5000000/131072)
 
-	MDRV_QUANTUM_TIME(HZ(600))
+	MCFG_QUANTUM_TIME(HZ(600))
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 30*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 30*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(meadows)
-	MDRV_PALETTE_LENGTH(2)
+	MCFG_GFXDECODE(meadows)
+	MCFG_PALETTE_LENGTH(2)
 
-	MDRV_PALETTE_INIT(meadows)
-	MDRV_VIDEO_START(meadows)
-	MDRV_VIDEO_UPDATE(meadows)
-
-	/* audio hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-
-	MDRV_SOUND_ADD("dac", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-
-	MDRV_SOUND_ADD("samples", SAMPLES, 0)
-	MDRV_SOUND_CONFIG(meadows_samples_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_PALETTE_INIT(meadows)
+	MCFG_VIDEO_START(meadows)
+	MCFG_VIDEO_UPDATE(meadows)
 
 	/* audio hardware */
-	MDRV_SOUND_ADD("samples2", SAMPLES, 0)
-	MDRV_SOUND_CONFIG(bowl3d_samples_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SOUND_CONFIG(meadows_samples_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+	/* audio hardware */
+	MCFG_SOUND_ADD("samples2", SAMPLES, 0)
+	MCFG_SOUND_CONFIG(bowl3d_samples_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -886,12 +886,12 @@ static DRIVER_INIT( gypsyjug )
 		0x01,0x80, 0x03,0xc0, 0x03,0xc0, 0x01,0x80
 	};
 	int i;
-	UINT8 *gfx2 = memory_region(machine, "gfx2");
-	UINT8 *gfx3 = memory_region(machine, "gfx3");
-	UINT8 *gfx4 = memory_region(machine, "gfx4");
-	UINT8 *gfx5 = memory_region(machine, "gfx5");
-	int len3 = memory_region_length(machine, "gfx3");
-	int len4 = memory_region_length(machine, "gfx4");
+	UINT8 *gfx2 = machine->region("gfx2")->base();
+	UINT8 *gfx3 = machine->region("gfx3")->base();
+	UINT8 *gfx4 = machine->region("gfx4")->base();
+	UINT8 *gfx5 = machine->region("gfx5")->base();
+	int len3 = machine->region("gfx3")->bytes();
+	int len4 = machine->region("gfx4")->bytes();
 
 	memcpy(gfx3,gfx2,len3);
 
@@ -910,8 +910,8 @@ static DRIVER_INIT( minferno )
 	UINT8 *mem;
 
 	/* create an inverted copy of the graphics data */
-	mem = memory_region(machine, "gfx1");
-	length = memory_region_length(machine, "gfx1");
+	mem = machine->region("gfx1")->base();
+	length = machine->region("gfx1")->bytes();
 	for (i = 0; i < length/2; i++)
 		mem[i] = ~mem[i + length/2];
 }

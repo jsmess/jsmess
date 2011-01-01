@@ -371,7 +371,7 @@ ADDRESS_MAP_END
 */
 
 /* YM2151 IRQ */
-static void megasys1_sound_irq(running_device *device, int irq)
+static void megasys1_sound_irq(device_t *device, int irq)
 {
 	if (irq)
 		cputag_set_input_line(device->machine, "soundcpu", 4, HOLD_LINE);
@@ -1379,7 +1379,7 @@ static WRITE16_HANDLER( protection_peekaboo_w )
 
 	if ((protection_val & 0x90) == 0x90)
 	{
-		UINT8 *RAM = memory_region(space->machine, "oki1");
+		UINT8 *RAM = space->machine->region("oki1")->base();
 		int new_bank = (protection_val & 0x7) % 7;
 
 		if (bank != new_bank)
@@ -1457,126 +1457,126 @@ static const ym2151_interface ym2151_config =
 static MACHINE_CONFIG_START( system_A, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, SYS_A_CPU_CLOCK) /* 6MHz verified */
-	MDRV_CPU_PROGRAM_MAP(megasys1A_map)
-	MDRV_CPU_VBLANK_INT_HACK(interrupt_A,INTERRUPT_NUM_A)
+	MCFG_CPU_ADD("maincpu", M68000, SYS_A_CPU_CLOCK) /* 6MHz verified */
+	MCFG_CPU_PROGRAM_MAP(megasys1A_map)
+	MCFG_CPU_VBLANK_INT_HACK(interrupt_A,INTERRUPT_NUM_A)
 
-	MDRV_CPU_ADD("soundcpu", M68000, SOUND_CPU_CLOCK) /* 7MHz verified */
-	MDRV_CPU_PROGRAM_MAP(megasys1A_sound_map)
+	MCFG_CPU_ADD("soundcpu", M68000, SOUND_CPU_CLOCK) /* 7MHz verified */
+	MCFG_CPU_PROGRAM_MAP(megasys1A_sound_map)
 
-	MDRV_QUANTUM_TIME(HZ(120000))
+	MCFG_QUANTUM_TIME(HZ(120000))
 
-	MDRV_MACHINE_RESET(megasys1)
+	MCFG_MACHINE_RESET(megasys1)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(ABC)
-	MDRV_PALETTE_LENGTH(1024)
+	MCFG_GFXDECODE(ABC)
+	MCFG_PALETTE_LENGTH(1024)
 
-	MDRV_PALETTE_INIT(megasys1)
-	MDRV_VIDEO_START(megasys1)
-	MDRV_VIDEO_UPDATE(megasys1)
-	MDRV_VIDEO_EOF(megasys1)
+	MCFG_PALETTE_INIT(megasys1)
+	MCFG_VIDEO_START(megasys1)
+	MCFG_VIDEO_UPDATE(megasys1)
+	MCFG_VIDEO_EOF(megasys1)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ymsnd", YM2151, SOUND_CPU_CLOCK/2) /* 3.5MHz (7MHz / 2) verified */
-	MDRV_SOUND_CONFIG(ym2151_config)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 0.80)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 0.80)
+	MCFG_SOUND_ADD("ymsnd", YM2151, SOUND_CPU_CLOCK/2) /* 3.5MHz (7MHz / 2) verified */
+	MCFG_SOUND_CONFIG(ym2151_config)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
 
-	MDRV_OKIM6295_ADD("oki1", OKI4_SOUND_CLOCK, OKIM6295_PIN7_HIGH) /* 4MHz verified */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.30)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
+	MCFG_OKIM6295_ADD("oki1", OKI4_SOUND_CLOCK, OKIM6295_PIN7_HIGH) /* 4MHz verified */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.30)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
 
-	MDRV_OKIM6295_ADD("oki2", OKI4_SOUND_CLOCK, OKIM6295_PIN7_HIGH) /* 4MHz verified */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.30)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
+	MCFG_OKIM6295_ADD("oki2", OKI4_SOUND_CLOCK, OKIM6295_PIN7_HIGH) /* 4MHz verified */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.30)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( system_A_hachoo, system_A )
-	MDRV_MACHINE_RESET(megasys1_hachoo)
+	MCFG_MACHINE_RESET(megasys1_hachoo)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( system_B, system_A )
 
 	/* basic machine hardware */
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_CLOCK(SYS_B_CPU_CLOCK) /* 8MHz */
-	MDRV_CPU_PROGRAM_MAP(megasys1B_map)
-	MDRV_CPU_VBLANK_INT_HACK(interrupt_B,INTERRUPT_NUM_B)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_CLOCK(SYS_B_CPU_CLOCK) /* 8MHz */
+	MCFG_CPU_PROGRAM_MAP(megasys1B_map)
+	MCFG_CPU_VBLANK_INT_HACK(interrupt_B,INTERRUPT_NUM_B)
 
-	MDRV_CPU_MODIFY("soundcpu")
-	MDRV_CPU_PROGRAM_MAP(megasys1B_sound_map)
+	MCFG_CPU_MODIFY("soundcpu")
+	MCFG_CPU_PROGRAM_MAP(megasys1B_sound_map)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_START( system_Bbl, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, SYS_B_CPU_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(megasys1B_map)
-	MDRV_CPU_VBLANK_INT_HACK(interrupt_B,INTERRUPT_NUM_B)
+	MCFG_CPU_ADD("maincpu", M68000, SYS_B_CPU_CLOCK)
+	MCFG_CPU_PROGRAM_MAP(megasys1B_map)
+	MCFG_CPU_VBLANK_INT_HACK(interrupt_B,INTERRUPT_NUM_B)
 
-	MDRV_MACHINE_RESET(megasys1)
+	MCFG_MACHINE_RESET(megasys1)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(ABC)
-	MDRV_PALETTE_LENGTH(1024)
+	MCFG_GFXDECODE(ABC)
+	MCFG_PALETTE_LENGTH(1024)
 
-	MDRV_PALETTE_INIT(megasys1)
-	MDRV_VIDEO_START(megasys1)
-	MDRV_VIDEO_UPDATE(megasys1)
-	MDRV_VIDEO_EOF(megasys1)
+	MCFG_PALETTE_INIT(megasys1)
+	MCFG_VIDEO_START(megasys1)
+	MCFG_VIDEO_UPDATE(megasys1)
+	MCFG_VIDEO_EOF(megasys1)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	/* just the one OKI, used for sound and music */
-	MDRV_OKIM6295_ADD("oki1", OKI4_SOUND_CLOCK, OKIM6295_PIN7_HIGH)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.30)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
+	MCFG_OKIM6295_ADD("oki1", OKI4_SOUND_CLOCK, OKIM6295_PIN7_HIGH)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.30)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( system_B_hayaosi1, system_B )
 
 	/* basic machine hardware */
 
-	MDRV_OKIM6295_REPLACE("oki1", 2000000, OKIM6295_PIN7_HIGH) /* correct speed, but unknown OSC + divider combo */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.30)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
+	MCFG_OKIM6295_REPLACE("oki1", 2000000, OKIM6295_PIN7_HIGH) /* correct speed, but unknown OSC + divider combo */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.30)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
 
-	MDRV_OKIM6295_REPLACE("oki2", 2000000, OKIM6295_PIN7_HIGH) /* correct speed, but unknown OSC + divider combo */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.30)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
+	MCFG_OKIM6295_REPLACE("oki2", 2000000, OKIM6295_PIN7_HIGH) /* correct speed, but unknown OSC + divider combo */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.30)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( system_C, system_A )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_CLOCK(SYS_C_CPU_CLOCK) /* 12MHz */
-	MDRV_CPU_PROGRAM_MAP(megasys1C_map)
-	MDRV_CPU_VBLANK_INT_HACK(interrupt_C,INTERRUPT_NUM_C)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_CLOCK(SYS_C_CPU_CLOCK) /* 12MHz */
+	MCFG_CPU_PROGRAM_MAP(megasys1C_map)
+	MCFG_CPU_VBLANK_INT_HACK(interrupt_C,INTERRUPT_NUM_C)
 
-	MDRV_CPU_MODIFY("soundcpu")
-	MDRV_CPU_PROGRAM_MAP(megasys1B_sound_map)
+	MCFG_CPU_MODIFY("soundcpu")
+	MCFG_CPU_PROGRAM_MAP(megasys1B_sound_map)
 MACHINE_CONFIG_END
 
 
@@ -1594,33 +1594,33 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( system_D, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, SYS_D_CPU_CLOCK)	/* 8MHz */
-	MDRV_CPU_PROGRAM_MAP(megasys1D_map)
-	MDRV_CPU_VBLANK_INT("screen", interrupt_D)
+	MCFG_CPU_ADD("maincpu", M68000, SYS_D_CPU_CLOCK)	/* 8MHz */
+	MCFG_CPU_PROGRAM_MAP(megasys1D_map)
+	MCFG_CPU_VBLANK_INT("screen", interrupt_D)
 
-	MDRV_MACHINE_RESET(megasys1)
+	MCFG_MACHINE_RESET(megasys1)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(ABC)
-	MDRV_PALETTE_LENGTH(1024)
+	MCFG_GFXDECODE(ABC)
+	MCFG_PALETTE_LENGTH(1024)
 
-	MDRV_PALETTE_INIT(megasys1)
-	MDRV_VIDEO_START(megasys1)
-	MDRV_VIDEO_UPDATE(megasys1)
-	MDRV_VIDEO_EOF(megasys1)
+	MCFG_PALETTE_INIT(megasys1)
+	MCFG_VIDEO_START(megasys1)
+	MCFG_VIDEO_UPDATE(megasys1)
+	MCFG_VIDEO_EOF(megasys1)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_OKIM6295_ADD("oki1", SYS_D_CPU_CLOCK/4, OKIM6295_PIN7_HIGH)	/* 2MHz (8MHz / 4) */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_OKIM6295_ADD("oki1", SYS_D_CPU_CLOCK/4, OKIM6295_PIN7_HIGH)	/* 2MHz (8MHz / 4) */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -1637,7 +1637,7 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 
-static void irq_handler(running_device *device, int irq)
+static void irq_handler(device_t *device, int irq)
 {
 	cputag_set_input_line(device->machine, "soundcpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -1656,34 +1656,34 @@ static const ym2203_interface ym2203_config =
 static MACHINE_CONFIG_START( system_Z, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, SYS_A_CPU_CLOCK) /* 6MHz (12MHz / 2) */
-	MDRV_CPU_PROGRAM_MAP(megasys1A_map)
-	MDRV_CPU_VBLANK_INT_HACK(interrupt_A,INTERRUPT_NUM_A)
+	MCFG_CPU_ADD("maincpu", M68000, SYS_A_CPU_CLOCK) /* 6MHz (12MHz / 2) */
+	MCFG_CPU_PROGRAM_MAP(megasys1A_map)
+	MCFG_CPU_VBLANK_INT_HACK(interrupt_A,INTERRUPT_NUM_A)
 
-	MDRV_CPU_ADD("soundcpu", Z80, 3000000) /* OSC 12MHz divided by 4 ??? */
-	MDRV_CPU_PROGRAM_MAP(z80_sound_map)
-	MDRV_CPU_IO_MAP(z80_sound_io_map)
+	MCFG_CPU_ADD("soundcpu", Z80, 3000000) /* OSC 12MHz divided by 4 ??? */
+	MCFG_CPU_PROGRAM_MAP(z80_sound_map)
+	MCFG_CPU_IO_MAP(z80_sound_io_map)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(Z)
-	MDRV_PALETTE_LENGTH(768)
+	MCFG_GFXDECODE(Z)
+	MCFG_PALETTE_LENGTH(768)
 
-	MDRV_VIDEO_START(megasys1)
-	MDRV_VIDEO_UPDATE(megasys1)
+	MCFG_VIDEO_START(megasys1)
+	MCFG_VIDEO_UPDATE(megasys1)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM2203, 1500000)
-	MDRV_SOUND_CONFIG(ym2203_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("ymsnd", YM2203, 1500000)
+	MCFG_SOUND_CONFIG(ym2203_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 
@@ -3558,8 +3558,8 @@ ROM_END
 
 void phantasm_rom_decode(running_machine *machine, const char *region)
 {
-	UINT16	*RAM	=	(UINT16 *) memory_region(machine, region);
-	int i,		size	=	memory_region_length(machine, region);
+	UINT16	*RAM	=	(UINT16 *) machine->region(region)->base();
+	int i,		size	=	machine->region(region)->bytes();
 	if (size > 0x40000)	size = 0x40000;
 
 	for (i = 0 ; i < size/2 ; i++)
@@ -3592,8 +3592,8 @@ void phantasm_rom_decode(running_machine *machine, const char *region)
 
 void astyanax_rom_decode(running_machine *machine, const char *region)
 {
-	UINT16	*RAM	=	(UINT16 *) memory_region(machine, region);
-	int i,		size	=	memory_region_length(machine, region);
+	UINT16	*RAM	=	(UINT16 *) machine->region(region)->base();
+	int i,		size	=	machine->region(region)->bytes();
 	if (size > 0x40000)	size = 0x40000;
 
 	for (i = 0 ; i < size/2 ; i++)
@@ -3626,8 +3626,8 @@ void astyanax_rom_decode(running_machine *machine, const char *region)
 
 void rodland_rom_decode(running_machine *machine, const char *region)
 {
-	UINT16	*RAM	=	(UINT16 *) memory_region(machine, region);
-	int i,		size	=	memory_region_length(machine, region);
+	UINT16	*RAM	=	(UINT16 *) machine->region(region)->base();
+	int i,		size	=	machine->region(region)->bytes();
 	if (size > 0x40000)	size = 0x40000;
 
 	for (i = 0 ; i < size/2 ; i++)
@@ -3661,8 +3661,8 @@ void rodland_rom_decode(running_machine *machine, const char *region)
 
 static void rodlandj_gfx_unmangle(running_machine *machine, const char *region)
 {
-	UINT8 *rom = memory_region(machine, region);
-	int size = memory_region_length(machine, region);
+	UINT8 *rom = machine->region(region)->base();
+	int size = machine->region(region)->bytes();
 	UINT8 *buffer;
 	int i;
 
@@ -3693,8 +3693,8 @@ static void rodlandj_gfx_unmangle(running_machine *machine, const char *region)
 
 static void jitsupro_gfx_unmangle(running_machine *machine, const char *region)
 {
-	UINT8 *rom = memory_region(machine, region);
-	int size = memory_region_length(machine, region);
+	UINT8 *rom = machine->region(region)->base();
+	int size = machine->region(region)->bytes();
 	UINT8 *buffer;
 	int i;
 
@@ -3726,7 +3726,7 @@ static void jitsupro_gfx_unmangle(running_machine *machine, const char *region)
 
 static DRIVER_INIT( 64street )
 {
-//  UINT16 *RAM = (UINT16 *) memory_region(machine, "maincpu");
+//  UINT16 *RAM = (UINT16 *) machine->region("maincpu")->base();
 //  RAM[0x006b8/2] = 0x6004;        // d8001 test
 //  RAM[0x10EDE/2] = 0x6012;        // watchdog
 
@@ -3743,7 +3743,7 @@ static DRIVER_INIT( astyanax )
 
 	astyanax_rom_decode(machine, "maincpu");
 
-	RAM = (UINT16 *) memory_region(machine, "maincpu");
+	RAM = (UINT16 *) machine->region("maincpu")->base();
 	RAM[0x0004e6/2] = 0x6040;	// protection
 }
 
@@ -3815,7 +3815,7 @@ static DRIVER_INIT( hachoo )
 
 	astyanax_rom_decode(machine, "maincpu");
 
-	RAM  = (UINT16 *) memory_region(machine, "maincpu");
+	RAM  = (UINT16 *) machine->region("maincpu")->base();
 	RAM[0x0006da/2] = 0x6000;	// protection
 }
 
@@ -3834,7 +3834,7 @@ static DRIVER_INIT( iganinju )
 
 	phantasm_rom_decode(machine, "maincpu");
 
-	RAM  = (UINT16 *) memory_region(machine, "maincpu");
+	RAM  = (UINT16 *) machine->region("maincpu")->base();
 	RAM[0x02f000/2] = 0x835d;	// protection
 
 	RAM[0x00006e/2] = 0x0420;	// the only game that does
@@ -3850,9 +3850,9 @@ static WRITE16_DEVICE_HANDLER( okim6295_both_w )
 
 static DRIVER_INIT( jitsupro )
 {
-	running_device *oki1 = machine->device("oki1");
-	running_device *oki2 = machine->device("oki2");
-	UINT16 *RAM  = (UINT16 *) memory_region(machine, "maincpu");
+	device_t *oki1 = machine->device("oki1");
+	device_t *oki2 = machine->device("oki2");
+	UINT16 *RAM  = (UINT16 *) machine->region("maincpu")->base();
 
 	astyanax_rom_decode(machine, "maincpu");		// Code
 
@@ -3883,7 +3883,7 @@ static DRIVER_INIT( plusalph )
 
 	astyanax_rom_decode(machine, "maincpu");
 
-	RAM  = (UINT16 *) memory_region(machine, "maincpu");
+	RAM  = (UINT16 *) machine->region("maincpu")->base();
 	RAM[0x0012b6/2] = 0x0000;	// protection
 }
 
@@ -3932,7 +3932,7 @@ static DRIVER_INIT( stdragon )
 
 	phantasm_rom_decode(machine, "maincpu");
 
-	RAM  = (UINT16 *) memory_region(machine, "maincpu");
+	RAM  = (UINT16 *) machine->region("maincpu")->base();
 	RAM[0x00045e/2] = 0x0098;	// protection
 }
 
@@ -3943,7 +3943,7 @@ static READ16_HANDLER( monkelf_input_r )
 
 static DRIVER_INIT( monkelf )
 {
-	UINT16 *ROM = (UINT16*)memory_region(machine, "maincpu");
+	UINT16 *ROM = (UINT16*)machine->region("maincpu")->base();
 	ROM[0x00744/2] = 0x4e71;
 
 	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xe0000, 0xe000f, 0, 0, monkelf_input_r);

@@ -41,20 +41,20 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<running_device> m_uart;
-	required_device<running_device> m_pit;
-	required_device<running_device> m_fdc;
-	required_device<running_device> m_pic0;
-	required_device<running_device> m_pic1;
+	required_device<device_t> m_uart;
+	required_device<device_t> m_pit;
+	required_device<device_t> m_fdc;
+	required_device<device_t> m_pic0;
+	required_device<device_t> m_pic1;
 	required_device<crt9007_device> m_vpac;
 	required_device<crt9212_device> m_drb0;
 	required_device<crt9212_device> m_drb1;
 	required_device<crt9021_device> m_vac;
-	required_device<running_device> m_centronics;
-	required_device<running_device> m_speaker;
-	required_device<running_device> m_ram;
-	required_device<running_device> m_floppy0;
-	required_device<running_device> m_floppy1;
+	required_device<device_t> m_centronics;
+	required_device<device_t> m_speaker;
+	required_device<device_t> m_ram;
+	required_device<device_t> m_floppy0;
+	required_device<device_t> m_floppy1;
 
 	virtual void machine_start();
 

@@ -112,7 +112,7 @@ static READ16_HANDLER( rockn_adpcmbank_r )
 
 static WRITE16_HANDLER( rockn_adpcmbank_w )
 {
-	UINT8 *SNDROM = memory_region(space->machine, "ymz");
+	UINT8 *SNDROM = space->machine->region("ymz")->base();
 	int bank;
 
 	rockn_adpcmbank = data;
@@ -129,7 +129,7 @@ static WRITE16_HANDLER( rockn_adpcmbank_w )
 
 static WRITE16_HANDLER( rockn2_adpcmbank_w )
 {
-	UINT8 *SNDROM = memory_region(space->machine, "ymz");
+	UINT8 *SNDROM = space->machine->region("ymz")->base();
 	int bank;
 
 	char banktable[9][3]=
@@ -177,13 +177,13 @@ static WRITE16_HANDLER( nndmseal_sound_bank_w )
 
 	if (ACCESSING_BITS_0_7)
 	{
-		UINT8 *rom = memory_region(space->machine, "okisource");
+		UINT8 *rom = space->machine->region("okisource")->base();
 
 		if (data & 0x04)
 		{
 			bank_lo = data & 0x03;
 
-			memcpy(memory_region(space->machine, "oki"), rom + (bank_lo * 0x80000), 0x20000);
+			memcpy(space->machine->region("oki")->base(), rom + (bank_lo * 0x80000), 0x20000);
 
 //          logerror("PC:%06X sound bank_lo = %02X\n",cpu_get_pc(space->cpu),bank_lo);
 		}
@@ -191,7 +191,7 @@ static WRITE16_HANDLER( nndmseal_sound_bank_w )
 		{
 			bank_hi = data & 0x03;
 
-			memcpy(memory_region(space->machine, "oki") + 0x20000, rom + (bank_lo * 0x80000) + (bank_hi * 0x20000), 0x20000);
+			memcpy(space->machine->region("oki")->base() + 0x20000, rom + (bank_lo * 0x80000) + (bank_hi * 0x20000), 0x20000);
 
 //          logerror("PC:%06X sound bank_hi = %02X\n",cpu_get_pc(space->cpu),bank_hi);
 		}
@@ -209,8 +209,8 @@ static WRITE16_HANDLER( nndmseal_sound_bank_w )
 static READ16_HANDLER( tetrisp2_ip_1_word_r )
 {
 	return	( input_port_read(space->machine, "SYSTEM") &  0xfcff ) |
-			(           mame_rand(space->machine) & ~0xfcff ) |
-			(      1 << (8 + (mame_rand(space->machine)&1)) );
+			(           space->machine->rand() & ~0xfcff ) |
+			(      1 << (8 + (space->machine->rand()&1)) );
 }
 
 
@@ -1093,174 +1093,174 @@ static DRIVER_INIT( rockn3 )
 static MACHINE_CONFIG_START( tetrisp2, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 12000000)
-	MDRV_CPU_PROGRAM_MAP(tetrisp2_map)
-	MDRV_CPU_VBLANK_INT("screen", irq2_line_hold)
+	MCFG_CPU_ADD("maincpu", M68000, 12000000)
+	MCFG_CPU_PROGRAM_MAP(tetrisp2_map)
+	MCFG_CPU_VBLANK_INT("screen", irq2_line_hold)
 
-	MDRV_NVRAM_ADD_0FILL("nvram")
-	MDRV_WATCHDOG_VBLANK_INIT(8)	/* guess */
+	MCFG_NVRAM_ADD_0FILL("nvram")
+	MCFG_WATCHDOG_VBLANK_INIT(8)	/* guess */
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(0x140, 0xe0)
-	MDRV_SCREEN_VISIBLE_AREA(0, 0x140-1, 0, 0xe0-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(0x140, 0xe0)
+	MCFG_SCREEN_VISIBLE_AREA(0, 0x140-1, 0, 0xe0-1)
 
-	MDRV_GFXDECODE(tetrisp2)
-	MDRV_PALETTE_LENGTH(0x8000)
+	MCFG_GFXDECODE(tetrisp2)
+	MCFG_PALETTE_LENGTH(0x8000)
 
-	MDRV_VIDEO_START(tetrisp2)
-	MDRV_VIDEO_UPDATE(tetrisp2)
+	MCFG_VIDEO_START(tetrisp2)
+	MCFG_VIDEO_UPDATE(tetrisp2)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ymz", YMZ280B, 16934400)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("ymz", YMZ280B, 16934400)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_START( nndmseal, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, XTAL_12MHz)
-	MDRV_CPU_PROGRAM_MAP(nndmseal_map)
-	MDRV_CPU_VBLANK_INT("screen", irq2_line_hold)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz)
+	MCFG_CPU_PROGRAM_MAP(nndmseal_map)
+	MCFG_CPU_VBLANK_INT("screen", irq2_line_hold)
 
-	MDRV_NVRAM_ADD_0FILL("nvram")
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(0x180, 0xf0)
-	MDRV_SCREEN_VISIBLE_AREA(0, 0x180-1, 0, 0xf0-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(0x180, 0xf0)
+	MCFG_SCREEN_VISIBLE_AREA(0, 0x180-1, 0, 0xf0-1)
 
-	MDRV_GFXDECODE(tetrisp2)
-	MDRV_PALETTE_LENGTH(0x8000)
+	MCFG_GFXDECODE(tetrisp2)
+	MCFG_PALETTE_LENGTH(0x8000)
 
-	MDRV_VIDEO_START(nndmseal)	// bg layer offset
-	MDRV_VIDEO_UPDATE(tetrisp2)
+	MCFG_VIDEO_START(nndmseal)	// bg layer offset
+	MCFG_VIDEO_UPDATE(tetrisp2)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_OKIM6295_ADD("oki", XTAL_2MHz, OKIM6295_PIN7_HIGH)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_OKIM6295_ADD("oki", XTAL_2MHz, OKIM6295_PIN7_HIGH)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_START( rockn, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 12000000)
-	MDRV_CPU_PROGRAM_MAP(rockn1_map)
-	MDRV_CPU_VBLANK_INT("screen", irq2_line_hold)
+	MCFG_CPU_ADD("maincpu", M68000, 12000000)
+	MCFG_CPU_PROGRAM_MAP(rockn1_map)
+	MCFG_CPU_VBLANK_INT("screen", irq2_line_hold)
 
-	MDRV_NVRAM_ADD_0FILL("nvram")
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(0x140, 0xe0)
-	MDRV_SCREEN_VISIBLE_AREA(0, 0x140-1, 0, 0xe0-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(0x140, 0xe0)
+	MCFG_SCREEN_VISIBLE_AREA(0, 0x140-1, 0, 0xe0-1)
 
-	MDRV_GFXDECODE(tetrisp2)
-	MDRV_PALETTE_LENGTH(0x8000)
+	MCFG_GFXDECODE(tetrisp2)
+	MCFG_PALETTE_LENGTH(0x8000)
 
-	MDRV_VIDEO_START(rockntread)
-	MDRV_VIDEO_UPDATE(rockntread)
+	MCFG_VIDEO_START(rockntread)
+	MCFG_VIDEO_UPDATE(rockntread)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ymz", YMZ280B, 16934400)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("ymz", YMZ280B, 16934400)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_START( rockn2, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 12000000)
-	MDRV_CPU_PROGRAM_MAP(rockn2_map)
-	MDRV_CPU_VBLANK_INT("screen", irq2_line_hold)
+	MCFG_CPU_ADD("maincpu", M68000, 12000000)
+	MCFG_CPU_PROGRAM_MAP(rockn2_map)
+	MCFG_CPU_VBLANK_INT("screen", irq2_line_hold)
 
-	MDRV_NVRAM_ADD_0FILL("nvram")
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(0x140, 0xe0)
-	MDRV_SCREEN_VISIBLE_AREA(0, 0x140-1, 0, 0xe0-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(0x140, 0xe0)
+	MCFG_SCREEN_VISIBLE_AREA(0, 0x140-1, 0, 0xe0-1)
 
-	MDRV_GFXDECODE(tetrisp2)
-	MDRV_PALETTE_LENGTH(0x8000)
+	MCFG_GFXDECODE(tetrisp2)
+	MCFG_PALETTE_LENGTH(0x8000)
 
-	MDRV_VIDEO_START(rockntread)
-	MDRV_VIDEO_UPDATE(rockntread)
+	MCFG_VIDEO_START(rockntread)
+	MCFG_VIDEO_UPDATE(rockntread)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ymz", YMZ280B, 16934400)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("ymz", YMZ280B, 16934400)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_START( rocknms, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 12000000)
-	MDRV_CPU_PROGRAM_MAP(rocknms_main_map)
-	MDRV_CPU_VBLANK_INT("lscreen", irq2_line_hold)
+	MCFG_CPU_ADD("maincpu", M68000, 12000000)
+	MCFG_CPU_PROGRAM_MAP(rocknms_main_map)
+	MCFG_CPU_VBLANK_INT("lscreen", irq2_line_hold)
 
-	MDRV_CPU_ADD("sub", M68000, 12000000)
-	MDRV_CPU_PROGRAM_MAP(rocknms_sub_map)
-	MDRV_CPU_VBLANK_INT("lscreen", irq2_line_hold)
+	MCFG_CPU_ADD("sub", M68000, 12000000)
+	MCFG_CPU_PROGRAM_MAP(rocknms_sub_map)
+	MCFG_CPU_VBLANK_INT("lscreen", irq2_line_hold)
 
-	MDRV_NVRAM_ADD_0FILL("nvram")
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 
-	MDRV_GFXDECODE(rocknms)
-	MDRV_PALETTE_LENGTH(0x10000)
-	MDRV_DEFAULT_LAYOUT(layout_rocknms)
+	MCFG_GFXDECODE(rocknms)
+	MCFG_PALETTE_LENGTH(0x10000)
+	MCFG_DEFAULT_LAYOUT(layout_rocknms)
 
-	MDRV_SCREEN_ADD("lscreen", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_SIZE(0x140, 0xe0)
-	MDRV_SCREEN_VISIBLE_AREA(0, 0x140-1, 0, 0xe0-1)
+	MCFG_SCREEN_ADD("lscreen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(0x140, 0xe0)
+	MCFG_SCREEN_VISIBLE_AREA(0, 0x140-1, 0, 0xe0-1)
 
-	MDRV_SCREEN_ADD("rscreen", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_SIZE(0x140, 0xe0)
-	MDRV_SCREEN_VISIBLE_AREA(0, 0x140-1, 0, 0xe0-1)
+	MCFG_SCREEN_ADD("rscreen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(0x140, 0xe0)
+	MCFG_SCREEN_VISIBLE_AREA(0, 0x140-1, 0, 0xe0-1)
 
 
-	MDRV_VIDEO_START(rocknms)
-	MDRV_VIDEO_UPDATE(rocknms)
+	MCFG_VIDEO_START(rocknms)
+	MCFG_VIDEO_UPDATE(rocknms)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ymz", YMZ280B, 16934400)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("ymz", YMZ280B, 16934400)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 

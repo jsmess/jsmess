@@ -67,23 +67,23 @@ static struct {
 
 
 MACHINE_CONFIG_FRAGMENT( pcvideo_aga )
-	MDRV_SCREEN_ADD( AGA_SCREEN_NAME, RASTER )
-	MDRV_SCREEN_FORMAT( BITMAP_FORMAT_INDEXED16 )
-	MDRV_SCREEN_RAW_PARAMS( XTAL_14_31818MHz,912,0,640,262,0,200 )
-	MDRV_PALETTE_LENGTH( CGA_PALETTE_SETS * 16 )
+	MCFG_SCREEN_ADD( AGA_SCREEN_NAME, RASTER )
+	MCFG_SCREEN_FORMAT( BITMAP_FORMAT_INDEXED16 )
+	MCFG_SCREEN_RAW_PARAMS( XTAL_14_31818MHz,912,0,640,262,0,200 )
+	MCFG_PALETTE_LENGTH( CGA_PALETTE_SETS * 16 )
 
-	MDRV_PALETTE_INIT( pc_aga )
+	MCFG_PALETTE_INIT( pc_aga )
 
-	MDRV_MC6845_ADD( AGA_MC6845_NAME, MC6845, XTAL_14_31818MHz/8, mc6845_aga_intf )
+	MCFG_MC6845_ADD( AGA_MC6845_NAME, MC6845, XTAL_14_31818MHz/8, mc6845_aga_intf )
 
-	MDRV_VIDEO_START( pc_aga )
-	MDRV_VIDEO_UPDATE( mc6845_aga )
+	MCFG_VIDEO_START( pc_aga )
+	MCFG_VIDEO_UPDATE( mc6845_aga )
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_FRAGMENT( pcvideo_pc200 )
-	MDRV_FRAGMENT_ADD( pcvideo_aga )
-	MDRV_VIDEO_START( pc200 )
+	MCFG_FRAGMENT_ADD( pcvideo_aga )
+	MCFG_VIDEO_START( pc200 )
 MACHINE_CONFIG_END
 
 
@@ -489,7 +489,7 @@ static READ8_HANDLER ( pc_aga_mda_r )
 	UINT8 data = 0xFF;
 
 	if ( aga.mode == AGA_MONO ) {
-		running_device *devconf = space->machine->device(MDA_MC6845_NAME);
+		device_t *devconf = space->machine->device(MDA_MC6845_NAME);
 		switch( offset )
 		{
 		case 0: case 2: case 4: case 6:
@@ -511,7 +511,7 @@ static READ8_HANDLER ( pc_aga_mda_r )
 static WRITE8_HANDLER ( pc_aga_mda_w )
 {
 	if ( aga.mode == AGA_MONO ) {
-		running_device *devconf = space->machine->device(AGA_MC6845_NAME);
+		device_t *devconf = space->machine->device(AGA_MC6845_NAME);
 		switch( offset )
 		{
 			case 0: case 2: case 4: case 6:
@@ -544,7 +544,7 @@ static READ8_HANDLER ( pc_aga_cga_r )
 	UINT8 data = 0xFF;
 
 	if ( aga.mode == AGA_COLOR ) {
-		running_device *devconf = space->machine->device(AGA_MC6845_NAME);
+		device_t *devconf = space->machine->device(AGA_MC6845_NAME);
 		switch( offset ) {
 		case 0: case 2: case 4: case 6:
 			/* return last written mc6845 address value here? */
@@ -590,7 +590,7 @@ static void pc_aga_set_palette_luts(void) {
 static WRITE8_HANDLER ( pc_aga_cga_w )
 {
 	if ( aga.mode == AGA_COLOR ) {
-		running_device *devconf = space->machine->device(AGA_MC6845_NAME);
+		device_t *devconf = space->machine->device(AGA_MC6845_NAME);
 
 		switch(offset) {
 		case 0: case 2: case 4: case 6:
@@ -671,7 +671,7 @@ static WRITE16_HANDLER ( pc16le_aga_cga_w ) { write16le_with_write8_handler(pc_a
 
 void pc_aga_set_mode(running_machine *machine, AGA_MODE mode)
 {
-	running_device *devconf = machine->device(AGA_MC6845_NAME);
+	device_t *devconf = machine->device(AGA_MC6845_NAME);
 
 	aga.mode = mode;
 
@@ -717,8 +717,8 @@ VIDEO_START( pc_aga )
 	memset( &aga, 0, sizeof( aga ) );
 
 	aga.mode = AGA_COLOR;
-	aga.mda_chr_gen = memory_region(machine, "gfx1") + 0x1000;
-	aga.cga_chr_gen = memory_region(machine, "gfx1");
+	aga.mda_chr_gen = machine->region("gfx1")->base() + 0x1000;
+	aga.cga_chr_gen = machine->region("gfx1")->base();
 }
 
 
@@ -747,14 +747,14 @@ VIDEO_START( pc200 )
 			break;
 	}
 
-	aga.mda_chr_gen = memory_region(machine, "gfx1");
-	aga.cga_chr_gen = memory_region(machine, "gfx1") + 0x1000;
+	aga.mda_chr_gen = machine->region("gfx1")->base();
+	aga.cga_chr_gen = machine->region("gfx1")->base() + 0x1000;
 }
 
 
 static VIDEO_UPDATE( mc6845_aga )
 {
-	running_device *devconf = screen->machine->device(AGA_MC6845_NAME);
+	device_t *devconf = screen->machine->device(AGA_MC6845_NAME);
 	mc6845_update( devconf, bitmap, cliprect);
 
 	return 0;

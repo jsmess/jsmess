@@ -94,7 +94,7 @@ public:
 	UINT32 palette[0x10];
 	int rotate0;
 	int rotate;
-	running_device *audio;
+	device_t *audio;
 	SUZY suzy;
 	BLITTER blitter;
 	UINT8 memory_config;
@@ -130,9 +130,9 @@ MACHINE_CONFIG_EXTERN( lynx_cartslot );
 DECLARE_LEGACY_SOUND_DEVICE(LYNX, lynx_sound);
 DECLARE_LEGACY_SOUND_DEVICE(LYNX2, lynx2_sound);
 
-void lynx_audio_write(running_device *device, int offset, UINT8 data);
-UINT8 lynx_audio_read(running_device *device, int offset);
-void lynx_audio_count_down(running_device *device, int nr);
+void lynx_audio_write(device_t *device, int offset, UINT8 data);
+UINT8 lynx_audio_read(device_t *device, int offset);
+void lynx_audio_count_down(device_t *device, int nr);
 
 
 #endif /* LYNX_H_ */

@@ -38,7 +38,7 @@ static VIDEO_UPDATE( pce220 )
 	int x, y, xi,yi;
 	int count = 0;
 //  static int test_x,test_y;
-	UINT8 *vram = memory_region(screen->machine, "lcd_vram");
+	UINT8 *vram = screen->machine->region("lcd_vram")->base();
 
 	for (y = 0; y < 4; y++)
 	{
@@ -80,7 +80,7 @@ static WRITE8_HANDLER( lcd_control_w )
 static WRITE8_HANDLER( lcd_data_w )
 {
 	pce220_state *state = space->machine->driver_data<pce220_state>();
-	UINT8 *vram = memory_region(space->machine, "lcd_vram");
+	UINT8 *vram = space->machine->region("lcd_vram")->base();
 
 	vram[state->lcd_index_row*0x40|state->lcd_index_col] = data;
 
@@ -102,8 +102,8 @@ static WRITE8_HANDLER( rom_bank_w )
 
 	state->bank_num = data;
 
-	memory_set_bankptr(space->machine, "bank3", memory_region(space->machine, "user1") + 0x4000 * bank1);
-	memory_set_bankptr(space->machine, "bank4", memory_region(space->machine, "user1") + 0x4000 * bank2);
+	memory_set_bankptr(space->machine, "bank3", space->machine->region("user1")->base() + 0x4000 * bank1);
+	memory_set_bankptr(space->machine, "bank4", space->machine->region("user1")->base() + 0x4000 * bank2);
 }
 
 static WRITE8_HANDLER( ram_bank_w )
@@ -132,7 +132,7 @@ static READ8_HANDLER( battery_status_r )
 
 static READ8_HANDLER( timer_lcd_r )
 {
-	return mame_rand(space->machine) & 1;
+	return space->machine->rand() & 1;
 }
 
 static WRITE8_HANDLER( timer_lcd_w )
@@ -205,7 +205,7 @@ static MACHINE_RESET(pce220)
 {
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	memory_unmap_write(space, 0x0000, 0x3fff, 0, 0);
-	memory_set_bankptr(machine, "bank1", memory_region(machine, "user1") + 0x0000);
+	memory_set_bankptr(machine, "bank1", machine->region("user1")->base() + 0x0000);
 }
 
 static const gfx_layout test_decode =
@@ -226,30 +226,30 @@ GFXDECODE_END
 
 static MACHINE_CONFIG_START( pce220, pce220_state )
     /* basic machine hardware */
-    MDRV_CPU_ADD("maincpu",Z80, 3072000 ) // CMOS-SC7852
-    MDRV_CPU_PROGRAM_MAP(pce220_mem)
-    MDRV_CPU_IO_MAP(pce220_io)
+    MCFG_CPU_ADD("maincpu",Z80, 3072000 ) // CMOS-SC7852
+    MCFG_CPU_PROGRAM_MAP(pce220_mem)
+    MCFG_CPU_IO_MAP(pce220_io)
 
-    MDRV_MACHINE_RESET(pce220)
+    MCFG_MACHINE_RESET(pce220)
 
     /* video hardware */
 	// 4 lines x 24 characters, resp. 144 x 32 pixel
-    MDRV_SCREEN_ADD("screen", RASTER)
-    MDRV_SCREEN_REFRESH_RATE(50)
-    MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-    MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-    MDRV_SCREEN_SIZE(32*8, 32*8)
-    MDRV_SCREEN_VISIBLE_AREA(0, 32*8-1, 0, 32*8-1)
-    MDRV_PALETTE_LENGTH(2)
-    MDRV_PALETTE_INIT(black_and_white)
-	MDRV_GFXDECODE(pce220)
+    MCFG_SCREEN_ADD("screen", RASTER)
+    MCFG_SCREEN_REFRESH_RATE(50)
+    MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+    MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+    MCFG_SCREEN_SIZE(32*8, 32*8)
+    MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 0, 32*8-1)
+    MCFG_PALETTE_LENGTH(2)
+    MCFG_PALETTE_INIT(black_and_white)
+	MCFG_GFXDECODE(pce220)
 
-    MDRV_VIDEO_START(pce220)
-    MDRV_VIDEO_UPDATE(pce220)
+    MCFG_VIDEO_START(pce220)
+    MCFG_VIDEO_UPDATE(pce220)
 
 	/* internal ram */
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("64K") // 32K internal + 32K external card
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("64K") // 32K internal + 32K external card
 MACHINE_CONFIG_END
 
 /* ROM definition */

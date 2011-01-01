@@ -160,10 +160,10 @@ public:
 		: driver_device(machine, config) { }
 
 	/* devices */
-	running_device *mc6847;
-	running_device *speaker;
-	running_device *cassette;
-	running_device *printer;
+	device_t *mc6847;
+	device_t *speaker;
+	device_t *cassette;
+	device_t *printer;
 
 	UINT8 *ram;
 	UINT32 ram_size;
@@ -254,7 +254,7 @@ static SNAPSHOT_LOAD( vtech1 )
 
 static Z80BIN_EXECUTE( vtech1 )
 {
-	running_device *cpu = machine->device("maincpu");
+	device_t *cpu = machine->device("maincpu");
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	/* A Microsoft Basic program needs some manipulation before it can be run.
@@ -1008,86 +1008,86 @@ static const mc6847_interface vtech1_shrg_mc6847_intf =
 static MACHINE_CONFIG_START( laser110, vtech1_state )
 
     /* basic machine hardware */
-    MDRV_CPU_ADD("maincpu", Z80, VTECH1_CLK)  /* 3.57950 MHz */
-    MDRV_CPU_PROGRAM_MAP(laser110_mem)
-    MDRV_CPU_IO_MAP(vtech1_io)
+    MCFG_CPU_ADD("maincpu", Z80, VTECH1_CLK)  /* 3.57950 MHz */
+    MCFG_CPU_PROGRAM_MAP(laser110_mem)
+    MCFG_CPU_IO_MAP(vtech1_io)
 
     /* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(M6847_PAL_FRAMES_PER_SECOND)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_SIZE(320, 25+192+26)
-	MDRV_SCREEN_VISIBLE_AREA(0, 319, 1, 239)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(M6847_PAL_FRAMES_PER_SECOND)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_SIZE(320, 25+192+26)
+	MCFG_SCREEN_VISIBLE_AREA(0, 319, 1, 239)
 
-	MDRV_VIDEO_UPDATE(vtech1)
+	MCFG_VIDEO_UPDATE(vtech1)
 
-	MDRV_MC6847_ADD("mc6847", vtech1_mc6847_intf)
-	MDRV_MC6847_TYPE(M6847_VERSION_ORIGINAL_PAL)
-	MDRV_MC6847_PALETTE(vtech1_palette_mono)
+	MCFG_MC6847_ADD("mc6847", vtech1_mc6847_intf)
+	MCFG_MC6847_TYPE(M6847_VERSION_ORIGINAL_PAL)
+	MCFG_MC6847_PALETTE(vtech1_palette_mono)
 
     /* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_WAVE_ADD("wave", "cassette")
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MDRV_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MDRV_SOUND_CONFIG(vtech1_speaker_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_WAVE_ADD("wave", "cassette")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_CONFIG(vtech1_speaker_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
 	/* printer */
-	MDRV_CENTRONICS_ADD("centronics", standard_centronics)
+	MCFG_CENTRONICS_ADD("centronics", standard_centronics)
 
 	/* snapshot/quickload */
-	MDRV_SNAPSHOT_ADD("snapshot", vtech1, "vz", 1.5)
-	MDRV_Z80BIN_QUICKLOAD_ADD("quickload", vtech1, 1.5)
+	MCFG_SNAPSHOT_ADD("snapshot", vtech1, "vz", 1.5)
+	MCFG_Z80BIN_QUICKLOAD_ADD("quickload", vtech1, 1.5)
 
-	MDRV_CASSETTE_ADD( "cassette", laser_cassette_config )
+	MCFG_CASSETTE_ADD( "cassette", laser_cassette_config )
 
 	/* cartridge */
-	MDRV_CARTSLOT_ADD("cart")
-	MDRV_CARTSLOT_EXTENSION_LIST("rom")
+	MCFG_CARTSLOT_ADD("cart")
+	MCFG_CARTSLOT_EXTENSION_LIST("rom")
 
 	/* internal ram */
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("66K")
-	MDRV_RAM_EXTRA_OPTIONS("2K,18K,4098K")
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("66K")
+	MCFG_RAM_EXTRA_OPTIONS("2K,18K,4098K")
 
-	MDRV_FLOPPY_2_DRIVES_ADD(vtech1_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_ADD(vtech1_floppy_config)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( laser200, laser110 )
 
-    MDRV_DEVICE_MODIFY("mc6847")
-    MDRV_MC6847_PALETTE(NULL)
+    MCFG_DEVICE_MODIFY("mc6847")
+    MCFG_MC6847_PALETTE(NULL)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( laser210, laser200 )
-    MDRV_CPU_MODIFY("maincpu")
-    MDRV_CPU_PROGRAM_MAP(laser210_mem)
+    MCFG_CPU_MODIFY("maincpu")
+    MCFG_CPU_PROGRAM_MAP(laser210_mem)
 
 	/* internal ram */
-	MDRV_RAM_MODIFY("messram")
-	MDRV_RAM_DEFAULT_SIZE("66K")
-	MDRV_RAM_EXTRA_OPTIONS("6K,22K,4098K")
+	MCFG_RAM_MODIFY("messram")
+	MCFG_RAM_DEFAULT_SIZE("66K")
+	MCFG_RAM_EXTRA_OPTIONS("6K,22K,4098K")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( laser310, laser200 )
-    MDRV_CPU_REPLACE("maincpu", Z80, VZ300_XTAL1_CLK / 5)  /* 3.546894 MHz */
-    MDRV_CPU_PROGRAM_MAP(laser310_mem)
+    MCFG_CPU_REPLACE("maincpu", Z80, VZ300_XTAL1_CLK / 5)  /* 3.546894 MHz */
+    MCFG_CPU_PROGRAM_MAP(laser310_mem)
 
 	/* internal ram */
-	MDRV_RAM_MODIFY("messram")
-	MDRV_RAM_DEFAULT_SIZE("66K")
-	MDRV_RAM_EXTRA_OPTIONS("16K,32K,4098K")
+	MCFG_RAM_MODIFY("messram")
+	MCFG_RAM_DEFAULT_SIZE("66K")
+	MCFG_RAM_EXTRA_OPTIONS("16K,32K,4098K")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( laser310h, laser310 )
 
-    MDRV_CPU_MODIFY("maincpu")
-    MDRV_CPU_IO_MAP(vtech1_shrg_io)
+    MCFG_CPU_MODIFY("maincpu")
+    MCFG_CPU_IO_MAP(vtech1_shrg_io)
 
-    MDRV_DEVICE_REMOVE("mc6847")
-    MDRV_MC6847_ADD("mc6847", vtech1_shrg_mc6847_intf)
-	MDRV_MC6847_TYPE(M6847_VERSION_ORIGINAL_PAL)
+    MCFG_DEVICE_REMOVE("mc6847")
+    MCFG_MC6847_ADD("mc6847", vtech1_shrg_mc6847_intf)
+	MCFG_MC6847_TYPE(M6847_VERSION_ORIGINAL_PAL)
 MACHINE_CONFIG_END
 
 

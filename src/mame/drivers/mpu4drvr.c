@@ -365,8 +365,8 @@ static WRITE8_DEVICE_HANDLER( vid_o1_callback )
 
 	if (data)
 	{
-		running_device *acia_0 = device->machine->device("acia6850_0");
-		running_device *acia_1 = device->machine->device("acia6850_1");
+		device_t *acia_0 = device->machine->device("acia6850_0");
+		device_t *acia_1 = device->machine->device("acia6850_1");
 		acia6850_tx_clock_in(acia_0);
 		acia6850_rx_clock_in(acia_0);
 		acia6850_tx_clock_in(acia_1);
@@ -1105,25 +1105,31 @@ static READ8_DEVICE_HANDLER( pia_ic5_porta_track_r )
 	/* The SWP trackball interface connects a standard trackball to the AUX1 port on the MPU4
     mainboard. As per usual, they've taken the cheap route here, reading and processing the
     raw quadrature signal from the encoder wheels for a 4 bit interface, rather than use any
-    additional hardware to simplify matters. For our purposes, two fake ports give the X and Y positions,
+    additional hardware to simplify matters. What makes matters worse is that there is a 45 degree rotation to take into account.
+    For our purposes, two fake ports give the X and Y positions,
     which are then worked back into the signal levels.
     We invert the X and Y data at source due to the use of Schmitt triggers in the interface, which
     clean up the pulses and flip the active phase.*/
 
 	LOG(("%s: IC5 PIA Read of Port A (AUX1)\n",cpuexec_describe_context(device->machine)));
 
+	static INT8 cur[2];
+
 	UINT8 data = input_port_read(device->machine, "AUX1");
 
-	UINT16 dx = input_port_read(device->machine, "TRACKX");
-	UINT16 dy = input_port_read(device->machine, "TRACKY");
+	INT8 dx = input_port_read(device->machine, "TRACKX");
+	INT8 dy = input_port_read(device->machine, "TRACKY");
+
+	cur[0] = dy + dx;
+	cur[1] = dy - dx;
 
 	UINT8 xa, xb, ya, yb;
 
 	/* generate pulses for the input port (A and B are 1 unit out of phase for direction sensing)*/
-	xa = ((dx + 1) & 3) <= 1;
-	xb = (dx & 3) <= 1;
-	ya = ((dy + 1) & 3) <= 1;
-	yb = (dy & 3) <= 1;
+	xa = ((cur[0] + 1) & 3) <= 1;
+	xb = (cur[0] & 3) <= 1;
+	ya = ((cur[1] + 1) & 3) <= 1;
+	yb = (cur[1] & 3) <= 1;
 
 	data |= (xa << 4); // XA
 	data |= (ya << 5); // YA
@@ -1861,7 +1867,7 @@ INPUT_PORTS_END
 /* OKI M6376 (for Mating Game) FIXME */
 static READ16_DEVICE_HANDLER( oki_r )
 {
-	return mame_rand(device->machine);
+	return device->machine->rand();
 }
 
 static WRITE16_DEVICE_HANDLER( oki_w )
@@ -1870,7 +1876,7 @@ static WRITE16_DEVICE_HANDLER( oki_w )
 	// 0x12: .... ...x      OKIM6736 /ST
 }
 
-static void video_reset(running_device *device)
+static void video_reset(device_t *device)
 {
 	device->machine->device("6840ptm_68k")->reset();
 	device->machine->device("acia6850_1")->reset();
@@ -2029,7 +2035,7 @@ static PALETTE_INIT( dealem )
 			3,	resistances_rg,	weights_g,	1000,	0,
 			2,	resistances_b,	weights_b,	1000,	0);
 
-	len = memory_region_length(machine, "proms");
+	len = machine->region("proms")->bytes();
 	for (i = 0; i < len; i++)
 	{
 		int bit0,bit1,bit2,r,g,b;
@@ -2226,117 +2232,117 @@ static TIMER_DEVICE_CALLBACK( scanline_timer_callback )
 
 
 static MACHINE_CONFIG_START( mpu4_vid, driver_device )
-	MDRV_CPU_ADD("maincpu", M6809, MPU4_MASTER_CLOCK/4 )
-	MDRV_CPU_PROGRAM_MAP(mpu4_6809_map)
-	MDRV_TIMER_ADD_PERIODIC("50hz",gen_50hz, HZ(100))
+	MCFG_CPU_ADD("maincpu", M6809, MPU4_MASTER_CLOCK/4 )
+	MCFG_CPU_PROGRAM_MAP(mpu4_6809_map)
+	MCFG_TIMER_ADD_PERIODIC("50hz",gen_50hz, HZ(100))
 
-	MDRV_NVRAM_ADD_0FILL("nvram")				/* confirm */
+	MCFG_NVRAM_ADD_0FILL("nvram")				/* confirm */
 
 	/* 6840 PTM */
-	MDRV_PTM6840_ADD("6840ptm", ptm_ic2_intf)
+	MCFG_PTM6840_ADD("6840ptm", ptm_ic2_intf)
 
-	MDRV_PIA6821_ADD("pia_ic3", pia_ic3_intf)
-	MDRV_PIA6821_ADD("pia_ic4", pia_ic4_intf)
-	MDRV_PIA6821_ADD("pia_ic5", pia_ic5_intf)
-	MDRV_PIA6821_ADD("pia_ic6", pia_ic6_intf)
-	MDRV_PIA6821_ADD("pia_ic7", pia_ic7_intf)
-	MDRV_PIA6821_ADD("pia_ic8", pia_ic8_intf)
+	MCFG_PIA6821_ADD("pia_ic3", pia_ic3_intf)
+	MCFG_PIA6821_ADD("pia_ic4", pia_ic4_intf)
+	MCFG_PIA6821_ADD("pia_ic5", pia_ic5_intf)
+	MCFG_PIA6821_ADD("pia_ic6", pia_ic6_intf)
+	MCFG_PIA6821_ADD("pia_ic7", pia_ic7_intf)
+	MCFG_PIA6821_ADD("pia_ic8", pia_ic8_intf)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_SIZE(64*8, 40*8) // note this directly affects the scanline counters used below, and thus the timing of everything
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 63*8-1, 0*8, 37*8-1)
-	MDRV_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_SIZE(64*8, 40*8) // note this directly affects the scanline counters used below, and thus the timing of everything
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 63*8-1, 0*8, 37*8-1)
+	MCFG_SCREEN_REFRESH_RATE(50)
 
-	MDRV_CPU_ADD("video", M68000, VIDEO_MASTER_CLOCK )
-	MDRV_CPU_PROGRAM_MAP(mpu4_68k_map)
+	MCFG_CPU_ADD("video", M68000, VIDEO_MASTER_CLOCK )
+	MCFG_CPU_PROGRAM_MAP(mpu4_68k_map)
 
-	MDRV_QUANTUM_TIME(HZ(960))
+	MCFG_QUANTUM_TIME(HZ(960))
 
-	MDRV_MACHINE_START(mpu4_vid)
-	MDRV_MACHINE_RESET(mpu4_vid)
-	MDRV_VIDEO_START (mpu4_vid)
-	MDRV_VIDEO_UPDATE(mpu4_vid)
+	MCFG_MACHINE_START(mpu4_vid)
+	MCFG_MACHINE_RESET(mpu4_vid)
+	MCFG_VIDEO_START (mpu4_vid)
+	MCFG_VIDEO_UPDATE(mpu4_vid)
 
-	MDRV_PALETTE_LENGTH(16)
+	MCFG_PALETTE_LENGTH(16)
 
-	MDRV_PTM6840_ADD("6840ptm_68k", ptm_vid_intf)
+	MCFG_PTM6840_ADD("6840ptm_68k", ptm_vid_intf)
 
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("ay8913",AY8913, MPU4_MASTER_CLOCK/4)
-	MDRV_SOUND_CONFIG(ay8910_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("ay8913",AY8913, MPU4_MASTER_CLOCK/4)
+	MCFG_SOUND_CONFIG(ay8910_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	/* Present on all video cards */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MDRV_SOUND_ADD("saa", SAA1099, 8000000)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 0.5)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 0.5)
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SOUND_ADD("saa", SAA1099, 8000000)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.5)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.5)
 
-	MDRV_ACIA6850_ADD("acia6850_0", m6809_acia_if)
-	MDRV_ACIA6850_ADD("acia6850_1", m68k_acia_if)
+	MCFG_ACIA6850_ADD("acia6850_0", m6809_acia_if)
+	MCFG_ACIA6850_ADD("acia6850_1", m68k_acia_if)
 
 	// for the video timing
-	MDRV_TIMER_ADD_SCANLINE("scan_timer", scanline_timer_callback, "screen", 0, 1)
+	MCFG_TIMER_ADD_SCANLINE("scan_timer", scanline_timer_callback, "screen", 0, 1)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( crmaze, mpu4_vid )
-	MDRV_PIA6821_MODIFY("pia_ic5", pia_ic5t_intf)
+	MCFG_PIA6821_MODIFY("pia_ic5", pia_ic5t_intf)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mating, crmaze )
 
-	MDRV_SOUND_ADD("oki", OKIM6376, 64000) //?
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("oki", OKIM6376, 64000) //?
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( vgpoker, mpu4_vid )
-	MDRV_CPU_MODIFY("video")
-	MDRV_CPU_PROGRAM_MAP(vp_68k_map)
+	MCFG_CPU_MODIFY("video")
+	MCFG_CPU_PROGRAM_MAP(vp_68k_map)
 MACHINE_CONFIG_END
 
 
 
 /* machine driver for Zenitone Deal 'Em board */
 static MACHINE_CONFIG_START( dealem, driver_device )
-	MDRV_MACHINE_START(mpu4mod2)							/* main mpu4 board initialisation */
-	MDRV_MACHINE_RESET(mpu4_vid)
-	MDRV_CPU_ADD("maincpu", M6809, MPU4_MASTER_CLOCK/4)
-	MDRV_CPU_PROGRAM_MAP(dealem_memmap)
+	MCFG_MACHINE_START(mpu4mod2)							/* main mpu4 board initialisation */
+	MCFG_MACHINE_RESET(mpu4_vid)
+	MCFG_CPU_ADD("maincpu", M6809, MPU4_MASTER_CLOCK/4)
+	MCFG_CPU_PROGRAM_MAP(dealem_memmap)
 
-	MDRV_TIMER_ADD_PERIODIC("50hz",gen_50hz, HZ(100))
+	MCFG_TIMER_ADD_PERIODIC("50hz",gen_50hz, HZ(100))
 
-	MDRV_PTM6840_ADD("6840ptm", ptm_ic2_intf)
+	MCFG_PTM6840_ADD("6840ptm", ptm_ic2_intf)
 
-	MDRV_PIA6821_ADD("pia_ic3", pia_ic3_intf)
-	MDRV_PIA6821_ADD("pia_ic4", pia_ic4_intf)
-	MDRV_PIA6821_ADD("pia_ic5", pia_ic5_intf)
-	MDRV_PIA6821_ADD("pia_ic6", pia_ic6_intf)
-	MDRV_PIA6821_ADD("pia_ic7", pia_ic7_intf)
-	MDRV_PIA6821_ADD("pia_ic8", pia_ic8_intf)
+	MCFG_PIA6821_ADD("pia_ic3", pia_ic3_intf)
+	MCFG_PIA6821_ADD("pia_ic4", pia_ic4_intf)
+	MCFG_PIA6821_ADD("pia_ic5", pia_ic5_intf)
+	MCFG_PIA6821_ADD("pia_ic6", pia_ic6_intf)
+	MCFG_PIA6821_ADD("pia_ic7", pia_ic7_intf)
+	MCFG_PIA6821_ADD("pia_ic8", pia_ic8_intf)
 
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("ay8913",AY8913, MPU4_MASTER_CLOCK/4)
-	MDRV_SOUND_CONFIG(ay8910_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("ay8913",AY8913, MPU4_MASTER_CLOCK/4)
+	MCFG_SOUND_CONFIG(ay8910_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_NVRAM_ADD_0FILL("nvram")
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE((54+1)*8, (32+1)*8)					/* Taken from 6845 init, registers 00 & 04. Normally programmed with (value-1) */
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 31*8-1)		/* Taken from 6845 init, registers 01 & 06 */
-	MDRV_SCREEN_REFRESH_RATE(56)							/* Measured accurately from the flip-flop, but 6845 handles this */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE((54+1)*8, (32+1)*8)					/* Taken from 6845 init, registers 00 & 04. Normally programmed with (value-1) */
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 31*8-1)		/* Taken from 6845 init, registers 01 & 06 */
+	MCFG_SCREEN_REFRESH_RATE(56)							/* Measured accurately from the flip-flop, but 6845 handles this */
 
-	MDRV_GFXDECODE(dealem)
-	MDRV_VIDEO_UPDATE(dealem)
+	MCFG_GFXDECODE(dealem)
+	MCFG_VIDEO_UPDATE(dealem)
 
-	MDRV_PALETTE_LENGTH(32)
-	MDRV_PALETTE_INIT(dealem)
+	MCFG_PALETTE_LENGTH(32)
+	MCFG_PALETTE_INIT(dealem)
 
-	MDRV_MC6845_ADD("crtc", HD6845, MPU4_MASTER_CLOCK / 4 / 8, hd6845_intf)	/* HD68B45 */
+	MCFG_MC6845_ADD("crtc", HD6845, MPU4_MASTER_CLOCK / 4 / 8, hd6845_intf)	/* HD68B45 */
 MACHINE_CONFIG_END
 
 
@@ -2581,7 +2587,7 @@ static DRIVER_INIT (crmaze3a)
 static DRIVER_INIT (mating)
 {
 	address_space *space = cputag_get_address_space(machine, "video", ADDRESS_SPACE_PROGRAM);
-	running_device *device = machine->device("oki");
+	device_t *device = machine->device("oki");
 
 	/* The Mating Game has an extra 256kB RAM on the program card */
 	memory_install_ram(space, 0x600000, 0x63ffff, 0, 0, NULL);

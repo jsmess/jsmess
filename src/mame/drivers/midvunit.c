@@ -74,7 +74,7 @@ static MACHINE_RESET( midvunit )
 	dcs_reset_w(1);
 	dcs_reset_w(0);
 
-	memcpy(ram_base, memory_region(machine, "user1"), 0x20000*4);
+	memcpy(ram_base, machine->region("user1")->base(), 0x20000*4);
 	machine->device("maincpu")->reset();
 
 	timer[0] = machine->device<timer_device>("timer0");
@@ -87,7 +87,7 @@ static MACHINE_RESET( midvplus )
 	dcs_reset_w(1);
 	dcs_reset_w(0);
 
-	memcpy(ram_base, memory_region(machine, "user1"), 0x20000*4);
+	memcpy(ram_base, machine->region("user1")->base(), 0x20000*4);
 	machine->device("maincpu")->reset();
 
 	timer[0] = machine->device<timer_device>("timer0");
@@ -463,7 +463,7 @@ static WRITE32_HANDLER( midvplus_misc_w )
  *
  *************************************/
 
-static void midvplus_xf1_w(running_device *device, UINT8 val)
+static void midvplus_xf1_w(device_t *device, UINT8 val)
 {
 	static int lastval;
 //  mame_printf_debug("xf1_w = %d\n", val);
@@ -1025,50 +1025,50 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( midvcommon, midvunit_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", TMS32031, CPU_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(midvunit_map)
+	MCFG_CPU_ADD("maincpu", TMS32031, CPU_CLOCK)
+	MCFG_CPU_PROGRAM_MAP(midvunit_map)
 
-	MDRV_MACHINE_START(midvunit)
-	MDRV_MACHINE_RESET(midvunit)
-	MDRV_NVRAM_ADD_1FILL("nvram")
+	MCFG_MACHINE_START(midvunit)
+	MCFG_MACHINE_RESET(midvunit)
+	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	MDRV_TIMER_ADD("timer0", NULL)
-	MDRV_TIMER_ADD("timer1", NULL)
+	MCFG_TIMER_ADD("timer0", NULL)
+	MCFG_TIMER_ADD("timer1", NULL)
 
 	/* video hardware */
-	MDRV_PALETTE_LENGTH(32768)
+	MCFG_PALETTE_LENGTH(32768)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_RAW_PARAMS(MIDVUNIT_VIDEO_CLOCK/2, 666, 0, 512, 432, 0, 400)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS(MIDVUNIT_VIDEO_CLOCK/2, 666, 0, 512, 432, 0, 400)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 
-	MDRV_VIDEO_START(midvunit)
-	MDRV_VIDEO_UPDATE(midvunit)
+	MCFG_VIDEO_START(midvunit)
+	MCFG_VIDEO_UPDATE(midvunit)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( midvunit, midvcommon )
 
 	/* sound hardware */
-	MDRV_FRAGMENT_ADD(dcs_audio_2k)
+	MCFG_FRAGMENT_ADD(dcs_audio_2k)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( midvplus, midvcommon )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_CONFIG(midvplus_config)
-	MDRV_CPU_PROGRAM_MAP(midvplus_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_CONFIG(midvplus_config)
+	MCFG_CPU_PROGRAM_MAP(midvplus_map)
 
-	MDRV_MACHINE_RESET(midvplus)
-	MDRV_DEVICE_REMOVE("nvram")
-	MDRV_NVRAM_HANDLER(midway_serial_pic2)
+	MCFG_MACHINE_RESET(midvplus)
+	MCFG_DEVICE_REMOVE("nvram")
+	MCFG_NVRAM_HANDLER(midway_serial_pic2)
 
-	MDRV_IDE_CONTROLLER_ADD("ide", NULL)
+	MCFG_IDE_CONTROLLER_ADD("ide", NULL)
 
 	/* sound hardware */
-	MDRV_FRAGMENT_ADD(dcs2_audio_2115)
+	MCFG_FRAGMENT_ADD(dcs2_audio_2115)
 MACHINE_CONFIG_END
 
 

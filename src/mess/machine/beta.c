@@ -23,14 +23,14 @@ struct _beta_disk_state
 	UINT8 betadisk_status;
 	UINT8 betadisk_active;
 
-	running_device *wd179x;
+	device_t *wd179x;
 };
 
 
 /*****************************************************************************
     INLINE FUNCTIONS
 *****************************************************************************/
-INLINE beta_disk_state *get_safe_token(running_device *device)
+INLINE beta_disk_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 
@@ -38,28 +38,28 @@ INLINE beta_disk_state *get_safe_token(running_device *device)
 }
 
 
-int betadisk_is_active(running_device *device)
+int betadisk_is_active(device_t *device)
 {
 	beta_disk_state *beta = get_safe_token(device);
 
 	return beta->betadisk_active;
 }
 
-void betadisk_enable(running_device *device)
+void betadisk_enable(device_t *device)
 {
 	beta_disk_state *beta = get_safe_token(device);
 
 	beta->betadisk_active = 1;
 }
 
-void betadisk_disable(running_device *device)
+void betadisk_disable(device_t *device)
 {
 	beta_disk_state *beta = get_safe_token(device);
 
 	beta->betadisk_active = 0;
 }
 
-void betadisk_clear_status(running_device *device)
+void betadisk_clear_status(device_t *device)
 {
 	beta_disk_state *beta = get_safe_token(device);
 
@@ -215,8 +215,8 @@ static const floppy_config beta_floppy_config =
 };
 
 static MACHINE_CONFIG_FRAGMENT( beta_disk )
-	MDRV_WD179X_ADD("wd179x", beta_wd17xx_interface )
-	MDRV_FLOPPY_4_DRIVES_ADD(beta_floppy_config)
+	MCFG_WD179X_ADD("wd179x", beta_wd17xx_interface )
+	MCFG_FLOPPY_4_DRIVES_ADD(beta_floppy_config)
 MACHINE_CONFIG_END
 
 ROM_START( beta_disk )

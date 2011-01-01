@@ -32,7 +32,7 @@ static void pmd851_update_memory(running_machine *machine)
 
 	if (state->startup_mem_map)
 	{
-		UINT8 *mem = memory_region(machine, "maincpu");
+		UINT8 *mem = machine->region("maincpu")->base();
 
 		memory_unmap_write(space, 0x0000, 0x0fff, 0, 0);
 		memory_nop_write(space, 0x1000, 0x1fff, 0, 0);
@@ -76,7 +76,7 @@ static void pmd852a_update_memory(running_machine *machine)
 
 	if (state->startup_mem_map)
 	{
-		UINT8 *mem = memory_region(machine, "maincpu");
+		UINT8 *mem = machine->region("maincpu")->base();
 
 		memory_unmap_write(space, 0x0000, 0x0fff, 0, 0);
 		memory_unmap_write(space, 0x2000, 0x2fff, 0, 0);
@@ -111,7 +111,7 @@ static void pmd853_update_memory(running_machine *machine)
 	pmd85_state *state = machine->driver_data<pmd85_state>();
 	if (state->startup_mem_map)
 	{
-		UINT8 *mem = memory_region(machine, "maincpu");
+		UINT8 *mem = machine->region("maincpu")->base();
 
 		memory_set_bankptr(machine, "bank1", mem + 0x010000);
 		memory_set_bankptr(machine, "bank2", mem + 0x010000);
@@ -139,7 +139,7 @@ static void pmd853_update_memory(running_machine *machine)
 		memory_set_bankptr(machine,  "bank5", messram_get_ptr(machine->device("messram")) + 0x8000);
 		memory_set_bankptr(machine,  "bank6", messram_get_ptr(machine->device("messram")) + 0xa000);
 		memory_set_bankptr(machine,  "bank7", messram_get_ptr(machine->device("messram")) + 0xc000);
-		memory_set_bankptr(machine,  "bank8", state->pmd853_memory_mapping ? memory_region(machine, "maincpu") + 0x010000 : messram_get_ptr(machine->device("messram")) + 0xe000);
+		memory_set_bankptr(machine,  "bank8", state->pmd853_memory_mapping ? machine->region("maincpu")->base() + 0x010000 : messram_get_ptr(machine->device("messram")) + 0xe000);
 	}
 }
 
@@ -150,7 +150,7 @@ static void alfa_update_memory(running_machine *machine)
 
 	if (state->startup_mem_map)
 	{
-		UINT8 *mem = memory_region(machine, "maincpu");
+		UINT8 *mem = machine->region("maincpu")->base();
 
 		memory_unmap_write(space, 0x0000, 0x0fff, 0, 0);
 		memory_unmap_write(space, 0x1000, 0x33ff, 0, 0);
@@ -183,7 +183,7 @@ static void mato_update_memory(running_machine *machine)
 
 	if (state->startup_mem_map)
 	{
-		UINT8 *mem = memory_region(machine, "maincpu");
+		UINT8 *mem = machine->region("maincpu")->base();
 
 		memory_unmap_write(space, 0x0000, 0x3fff, 0, 0);
 
@@ -206,7 +206,7 @@ static void c2717_update_memory(running_machine *machine)
 	pmd85_state *state = machine->driver_data<pmd85_state>();
 	address_space* space = cputag_get_address_space(machine, "maincpu",ADDRESS_SPACE_PROGRAM);
 
-	UINT8 *mem = memory_region(machine, "maincpu");
+	UINT8 *mem = machine->region("maincpu")->base();
 	if (state->startup_mem_map)
 	{
 		memory_unmap_write(space, 0x0000, 0x3fff, 0, 0);
@@ -453,8 +453,8 @@ const struct pit8253_config pmd85_pit8253_interface =
 static READ8_DEVICE_HANDLER ( pmd85_ppi_3_porta_r )
 {
 	pmd85_state *state = device->machine->driver_data<pmd85_state>();
-	if (memory_region(device->machine, "user1") != NULL)
-		return memory_region(device->machine, "user1")[state->ppi_port_outputs[3][1] | (state->ppi_port_outputs[3][2] << 8)];
+	if (device->machine->region("user1")->base() != NULL)
+		return device->machine->region("user1")->base()[state->ppi_port_outputs[3][1] | (state->ppi_port_outputs[3][2] << 8)];
 	else
 		return 0;
 }

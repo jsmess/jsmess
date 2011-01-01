@@ -313,7 +313,7 @@ WRITE8_HANDLER ( m6545_data_w )
 	case 12:
 		data &= 0x3f; // select alternate character set
 		if( state->sy6545_reg[12] != data )
-			memcpy(state->gfxram, memory_region(space->machine, "gfx") + (((data & 0x30) == 0x20) << 11), 0x800);
+			memcpy(state->gfxram, space->machine->region("gfx")->base() + (((data & 0x30) == 0x20) << 11), 0x800);
 		break;
 	case 31:
 		/* This firstly pushes the contents of the transparent registers onto the MA lines,
@@ -388,8 +388,8 @@ VIDEO_START( mbee )
 {
 	mbee_state *state = machine->driver_data<mbee_state>();
 	state->mc6845 = machine->device("crtc");
-	state->videoram = memory_region(machine, "videoram");
-	state->gfxram = memory_region(machine, "gfx")+0x1000;
+	state->videoram = machine->region("videoram")->base();
+	state->gfxram = machine->region("gfx")->base()+0x1000;
 	state->is_premium = 0;
 }
 
@@ -397,9 +397,9 @@ VIDEO_START( mbeeic )
 {
 	mbee_state *state = machine->driver_data<mbee_state>();
 	state->mc6845 = machine->device("crtc");
-	state->videoram = memory_region(machine, "videoram");
-	state->colorram = memory_region(machine, "colorram");
-	state->gfxram = memory_region(machine, "gfx")+0x1000;
+	state->videoram = machine->region("videoram")->base();
+	state->colorram = machine->region("colorram")->base();
+	state->gfxram = machine->region("gfx")->base()+0x1000;
 	state->is_premium = 0;
 }
 
@@ -407,10 +407,10 @@ VIDEO_START( mbeeppc )
 {
 	mbee_state *state = machine->driver_data<mbee_state>();
 	state->mc6845 = machine->device("crtc");
-	state->videoram = memory_region(machine, "videoram");
-	state->colorram = memory_region(machine, "colorram");
-	state->gfxram = memory_region(machine, "gfx")+0x1000;
-	state->attribram = memory_region(machine, "attrib");
+	state->videoram = machine->region("videoram")->base();
+	state->colorram = machine->region("colorram")->base();
+	state->gfxram = machine->region("gfx")->base()+0x1000;
+	state->attribram = machine->region("attrib")->base();
 	state->is_premium = 1;
 }
 

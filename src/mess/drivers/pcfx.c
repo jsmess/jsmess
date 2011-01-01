@@ -50,20 +50,20 @@ INPUT_PORTS_END
 
 static MACHINE_RESET( pcfx )
 {
-	memory_set_bankptr( machine, "bank1", memory_region(machine, "user1") );
+	memory_set_bankptr( machine, "bank1", machine->region("user1")->base() );
 }
 
 
 static MACHINE_CONFIG_START( pcfx, pcfx_state )
-	MDRV_CPU_ADD( "maincpu", V810, 21477270 )
-	MDRV_CPU_PROGRAM_MAP( pcfx_mem)
-	MDRV_CPU_IO_MAP( pcfx_io)
+	MCFG_CPU_ADD( "maincpu", V810, 21477270 )
+	MCFG_CPU_PROGRAM_MAP( pcfx_mem)
+	MCFG_CPU_IO_MAP( pcfx_io)
 
-	MDRV_MACHINE_RESET( pcfx )
+	MCFG_MACHINE_RESET( pcfx )
 
-	MDRV_SCREEN_ADD( "screen", RASTER )
-	MDRV_SCREEN_FORMAT( BITMAP_FORMAT_RGB32 )
-	MDRV_SCREEN_RAW_PARAMS(21477270/2, VDC_WPF, 70, 70 + 512 + 32, VDC_LPF, 14, 14+242)
+	MCFG_SCREEN_ADD( "screen", RASTER )
+	MCFG_SCREEN_FORMAT( BITMAP_FORMAT_RGB32 )
+	MCFG_SCREEN_RAW_PARAMS(21477270/2, VDC_WPF, 70, 70 + 512 + 32, VDC_LPF, 14, 14+242)
 MACHINE_CONFIG_END
 
 

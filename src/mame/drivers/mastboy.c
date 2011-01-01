@@ -531,7 +531,7 @@ static READ8_HANDLER(banked_ram_r)
 
 		if (bank>0x3) // ROM access
 		{
-			UINT8 *src    = memory_region( space->machine, "gfx1" );
+			UINT8 *src    = space->machine->region( "gfx1" )->base();
 			bank &=0x3;
 			return src[offset+(bank*0x4000)];
 		}
@@ -547,7 +547,7 @@ static READ8_HANDLER(banked_ram_r)
 		UINT8 *src;
 		int bank;
 		bank = mastboy_bank & 0x7f;
-		src = memory_region       ( space->machine, "user1" ) + bank * 0x4000;
+		src = space->machine->region       ( "user1" )->base() + bank * 0x4000;
 		return src[offset];
 	}
 }
@@ -623,7 +623,7 @@ static WRITE8_HANDLER( backupram_enable_w )
 
 static WRITE8_HANDLER( msm5205_mastboy_m5205_sambit0_w )
 {
-	running_device *adpcm = space->machine->device("msm");
+	device_t *adpcm = space->machine->device("msm");
 
 	mastboy_m5205_sambit0 = data & 1;
 	msm5205_playmode_w(adpcm,  (1 << 2) | (mastboy_m5205_sambit1 << 1) | (mastboy_m5205_sambit0) );
@@ -633,7 +633,7 @@ static WRITE8_HANDLER( msm5205_mastboy_m5205_sambit0_w )
 
 static WRITE8_HANDLER( msm5205_mastboy_m5205_sambit1_w )
 {
-	running_device *adpcm = space->machine->device("msm");
+	device_t *adpcm = space->machine->device("msm");
 
 	mastboy_m5205_sambit1 = data & 1;
 
@@ -653,7 +653,7 @@ static WRITE8_HANDLER( mastboy_msm5205_data_w )
 	mastboy_m5205_next = data;
 }
 
-static void mastboy_adpcm_int(running_device *device)
+static void mastboy_adpcm_int(device_t *device)
 {
 	msm5205_data_w(device, mastboy_m5205_next);
 	mastboy_m5205_next >>= 4;
@@ -870,37 +870,37 @@ static MACHINE_RESET( mastboy )
 
 
 static MACHINE_CONFIG_START( mastboy, mastboy_state )
-	MDRV_CPU_ADD("maincpu", Z180, 12000000/2)	/* HD647180X0CP6-1M1R */
-	MDRV_CPU_PROGRAM_MAP(mastboy_map)
-	MDRV_CPU_IO_MAP(mastboy_io_map)
-	MDRV_CPU_VBLANK_INT("screen", mastboy_interrupt)
+	MCFG_CPU_ADD("maincpu", Z180, 12000000/2)	/* HD647180X0CP6-1M1R */
+	MCFG_CPU_PROGRAM_MAP(mastboy_map)
+	MCFG_CPU_IO_MAP(mastboy_io_map)
+	MCFG_CPU_VBLANK_INT("screen", mastboy_interrupt)
 
-	MDRV_NVRAM_ADD_1FILL("nvram")
+	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	MDRV_MACHINE_RESET( mastboy )
+	MCFG_MACHINE_RESET( mastboy )
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(6000000.0f / 384.0f / 282.0f)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(256, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-16-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(6000000.0f / 384.0f / 282.0f)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(256, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-16-1)
 
-	MDRV_GFXDECODE(mastboy)
-	MDRV_PALETTE_LENGTH(0x100)
+	MCFG_GFXDECODE(mastboy)
+	MCFG_PALETTE_LENGTH(0x100)
 
-	MDRV_VIDEO_START(mastboy)
-	MDRV_VIDEO_UPDATE(mastboy)
+	MCFG_VIDEO_START(mastboy)
+	MCFG_VIDEO_UPDATE(mastboy)
 
 	// sound hardware
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("saa", SAA1099, 6000000 )
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("saa", SAA1099, 6000000 )
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD("msm", MSM5205, 384000)
-	MDRV_SOUND_CONFIG(msm5205_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("msm", MSM5205, 384000)
+	MCFG_SOUND_CONFIG(msm5205_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 /* Romsets */
@@ -984,7 +984,7 @@ ROM_END
 
 static DRIVER_INIT( mastboy )
 {
-	mastboy_vram = memory_region( machine, "gfx1" ); // makes decoding the RAM based tiles easier this way
+	mastboy_vram = machine->region( "gfx1" )->base(); // makes decoding the RAM based tiles easier this way
 }
 
 GAME( 1991, mastboy,  0,          mastboy, mastboy, mastboy, ROT0, "Gaelco", "Master Boy (Spanish, PCB Rev A)", 0 )

@@ -65,7 +65,7 @@ static WRITE8_HANDLER ( write_io )
 {
 int i;
  hd44780_device * hd44780 = space->machine->device<hd44780_device>("hd44780");
- running_device *speaker = space->machine->device("beep");
+ device_t *speaker = space->machine->device("beep");
 
 if (BIT(data,1)) {
 	if (BIT(data,0)) {
@@ -359,7 +359,7 @@ INPUT_PORTS_END
 
 static TIMER_CALLBACK( update_nmi )
 {
-	// running_device *speaker = machine->device("beep");
+	// device_t *speaker = machine->device("beep");
 	cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI,PULSE_LINE);
 	// cputag_set_input_line(machine, "maincpu", M6502_IRQ_LINE, CLEAR_LINE);
 	// dac_data_w(0,led_status&64?128:0);
@@ -386,45 +386,45 @@ static MACHINE_RESET( polgar )
 
 static MACHINE_CONFIG_START( polgar, driver_device )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu",M65C02,4915200)        /* 65C02 */
-	MDRV_CPU_PROGRAM_MAP(polgar_mem)
-	MDRV_QUANTUM_TIME(HZ(60))
-	MDRV_MACHINE_START( polgar )
-	MDRV_MACHINE_RESET( polgar )
+	MCFG_CPU_ADD("maincpu",M65C02,4915200)        /* 65C02 */
+	MCFG_CPU_PROGRAM_MAP(polgar_mem)
+	MCFG_QUANTUM_TIME(HZ(60))
+	MCFG_MACHINE_START( polgar )
+	MCFG_MACHINE_RESET( polgar )
 
 	/* video hardware */
-  // MDRV_DEFAULT_LAYOUT(layout_milano)
-  MDRV_SCREEN_ADD("screen", LCD)
-	MDRV_SCREEN_REFRESH_RATE(50)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(100, 20)
-	MDRV_SCREEN_VISIBLE_AREA(0, 100-1, 0, 20-1)
-	MDRV_PALETTE_LENGTH(2)
-	MDRV_PALETTE_INIT(polgar)
+  // MCFG_DEFAULT_LAYOUT(layout_milano)
+  MCFG_SCREEN_ADD("screen", LCD)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(100, 20)
+	MCFG_SCREEN_VISIBLE_AREA(0, 100-1, 0, 20-1)
+	MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_INIT(polgar)
 
-	MDRV_GFXDECODE(polgar)
+	MCFG_GFXDECODE(polgar)
 
-	MDRV_HD44780_ADD("hd44780", polgar_display)
+	MCFG_HD44780_ADD("hd44780", polgar_display)
 
-    MDRV_VIDEO_START(polgar)
-    MDRV_VIDEO_UPDATE(polgar)
+    MCFG_VIDEO_START(polgar)
+    MCFG_VIDEO_UPDATE(polgar)
 
 
-//	MDRV_DEFAULT_LAYOUT(layout_van16)
-	 MDRV_DEFAULT_LAYOUT(layout_lcd)
+//	MCFG_DEFAULT_LAYOUT(layout_van16)
+	 MCFG_DEFAULT_LAYOUT(layout_lcd)
 
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("beep", BEEP, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("beep", BEEP, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( milano, polgar )
 	/* basic machine hardware */
-  // MDRV_IMPORT_FROM( polgar )
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(milano_mem)
+  // MCFG_IMPORT_FROM( polgar )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(milano_mem)
 	//beep_set_frequency(0, 4000);
 MACHINE_CONFIG_END
 

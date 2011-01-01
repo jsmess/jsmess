@@ -304,7 +304,7 @@ INPUT_PORTS_END
 
 static TIMER_CALLBACK( update_nmi )
 {
-	running_device *speaker = machine->device("beep");
+	device_t *speaker = machine->device("beep");
 	cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI,PULSE_LINE);
 	// dac_data_w(0,led_status&64?128:0);
 	beep_set_state(speaker,led_status&64?1:0);
@@ -312,7 +312,7 @@ static TIMER_CALLBACK( update_nmi )
 
 static TIMER_CALLBACK( update_irq )		//only mm2
 {
-	running_device *speaker = machine->device("beep");
+	device_t *speaker = machine->device("beep");
 
 	cputag_set_input_line(machine, "maincpu", M6502_IRQ_LINE, ASSERT_LINE);
 	cputag_set_input_line(machine, "maincpu", M6502_IRQ_LINE, CLEAR_LINE);
@@ -365,34 +365,34 @@ static MACHINE_RESET( mephisto )
 
 static MACHINE_CONFIG_START( mephisto, driver_device )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu",M65C02,4915200)        /* 65C02 */
-	MDRV_CPU_PROGRAM_MAP(mephisto_mem)
-	MDRV_QUANTUM_TIME(HZ(60))
-	MDRV_MACHINE_START( mephisto )
-	MDRV_MACHINE_RESET( mephisto )
+	MCFG_CPU_ADD("maincpu",M65C02,4915200)        /* 65C02 */
+	MCFG_CPU_PROGRAM_MAP(mephisto_mem)
+	MCFG_QUANTUM_TIME(HZ(60))
+	MCFG_MACHINE_START( mephisto )
+	MCFG_MACHINE_RESET( mephisto )
 
 	/* video hardware */
-//	MDRV_DEFAULT_LAYOUT(layout_mephisto)
+//	MCFG_DEFAULT_LAYOUT(layout_mephisto)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("beep", BEEP, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("beep", BEEP, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( rebel5, mephisto )
 	/* basic machine hardware */
-//	MDRV_IMPORT_FROM( mephisto )
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(rebel5_mem)
+//	MCFG_IMPORT_FROM( mephisto )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(rebel5_mem)
 	//beep_set_frequency(0, 4000);
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mm2, mephisto )
-//	MDRV_IMPORT_FROM( mephisto )
-	MDRV_CPU_REPLACE("maincpu", M65C02, 3700000)
-	MDRV_CPU_PROGRAM_MAP(mm2_mem)
-	MDRV_MACHINE_START( mm2 )
+//	MCFG_IMPORT_FROM( mephisto )
+	MCFG_CPU_REPLACE("maincpu", M65C02, 3700000)
+	MCFG_CPU_PROGRAM_MAP(mm2_mem)
+	MCFG_MACHINE_START( mm2 )
 MACHINE_CONFIG_END
 
 

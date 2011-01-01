@@ -251,24 +251,24 @@ static const cassette_config c80_cassette_config =
 static MACHINE_CONFIG_START( c80, c80_state )
 
 	/* basic machine hardware */
-    MDRV_CPU_ADD(Z80_TAG, Z80, 2500000) /* U880D */
-    MDRV_CPU_PROGRAM_MAP(c80_mem)
-    MDRV_CPU_IO_MAP(c80_io)
-	MDRV_CPU_CONFIG(c80_daisy_chain)
+    MCFG_CPU_ADD(Z80_TAG, Z80, 2500000) /* U880D */
+    MCFG_CPU_PROGRAM_MAP(c80_mem)
+    MCFG_CPU_IO_MAP(c80_io)
+	MCFG_CPU_CONFIG(c80_daisy_chain)
 
-    MDRV_MACHINE_START(c80)
+    MCFG_MACHINE_START(c80)
 
     /* video hardware */
-	MDRV_DEFAULT_LAYOUT( layout_c80 )
+	MCFG_DEFAULT_LAYOUT( layout_c80 )
 
 	/* devices */
-	MDRV_Z80PIO_ADD(Z80PIO1_TAG, 2500000, pio1_intf)
-	MDRV_Z80PIO_ADD(Z80PIO2_TAG, 2500000, pio2_intf)
-	MDRV_CASSETTE_ADD(CASSETTE_TAG, c80_cassette_config)
+	MCFG_Z80PIO_ADD(Z80PIO1_TAG, 2500000, pio1_intf)
+	MCFG_Z80PIO_ADD(Z80PIO2_TAG, 2500000, pio2_intf)
+	MCFG_CASSETTE_ADD(CASSETTE_TAG, c80_cassette_config)
 
 	/* internal ram */
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("1K")
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("1K")
 MACHINE_CONFIG_END
 
 /* ROMs */

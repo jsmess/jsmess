@@ -41,10 +41,10 @@ struct _k053260_state
 	UINT32						*delta_table;
 	k053260_channel				channels[4];
 	const k053260_interface		*intf;
-	running_device				*device;
+	device_t				*device;
 };
 
-INLINE k053260_state *get_safe_token(running_device *device)
+INLINE k053260_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == K053260);
@@ -222,7 +222,7 @@ static DEVICE_START( k053260 )
 
 	ic->mode = 0;
 
-	const region_info *region = (ic->intf->rgnoverride != NULL) ? device->machine->region(ic->intf->rgnoverride) : device->region();
+	const memory_region *region = (ic->intf->rgnoverride != NULL) ? device->machine->region(ic->intf->rgnoverride) : device->region();
 
 	ic->rom = *region;
 	ic->rom_size = region->bytes();

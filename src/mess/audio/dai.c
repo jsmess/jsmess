@@ -25,7 +25,7 @@ struct _dai_sound_state
 	UINT8 noise_volume;
 };
 
-INLINE dai_sound_state *get_token(running_device *device)
+INLINE dai_sound_state *get_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == DAI);
@@ -46,7 +46,7 @@ static const UINT16 dai_noise_volume_table[] = {
 					  2500, 3000, 3500, 4000
 };
 
-void dai_set_volume(running_device *device, int offset, UINT8 data)
+void dai_set_volume(device_t *device, int offset, UINT8 data)
 {
 	dai_sound_state *sndstate = get_token(device);
 
@@ -63,7 +63,7 @@ void dai_set_volume(running_device *device, int offset, UINT8 data)
 	}
 }
 
-void dai_set_input(running_device *device, int index, int state)
+void dai_set_input(device_t *device, int index, int state)
 {
 	dai_sound_state *sndstate = get_token(device);
 	stream_update( sndstate->mixer_channel );
@@ -114,7 +114,7 @@ static STREAM_UPDATE( dai_sh_update )
 
 		/* noise channel */
 
-		*sample_left += mame_rand(device->machine)&0x01 ? dai_noise_volume_table[state->noise_volume] : -dai_noise_volume_table[state->noise_volume];
+		*sample_left += device->machine->rand()&0x01 ? dai_noise_volume_table[state->noise_volume] : -dai_noise_volume_table[state->noise_volume];
 
 		sample_left++;
 		sample_right++;

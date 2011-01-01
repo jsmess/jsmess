@@ -42,8 +42,8 @@ WRITE_LINE_DEVICE_HANDLER( pf10_rxd2_w );
 
 DECLARE_LEGACY_DEVICE(PF10, pf10);
 
-#define MDRV_PF10_ADD(_tag) \
-	MDRV_DEVICE_ADD(_tag, PF10, 0) \
+#define MCFG_PF10_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, PF10, 0) \
 
 
 #endif /* __PF10_H__ */

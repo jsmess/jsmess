@@ -363,7 +363,7 @@ DISCRETE_SOUND_END
 //  f3853_interface smi_intf
 //-------------------------------------------------
 /*
-static void f3853_int_req_w(running_device *device, UINT16 addr, int level)
+static void f3853_int_req_w(device_t *device, UINT16 addr, int level)
 {
 	cpu_set_input_line_vector(device->machine->device(F3850_TAG), 0, addr);
 
@@ -397,7 +397,7 @@ static const cassette_config vidbrain_cassette_config =
 static DEVICE_IMAGE_LOAD( vidbrain_cart )
 {
 	UINT32 size;
-	UINT8 *ptr = memory_region(image.device().machine, F3850_TAG) + 0x1000;
+	UINT8 *ptr = image.device().machine->region(F3850_TAG)->base() + 0x1000;
 
 	if (image.software_entry() == NULL)
 	{
@@ -476,36 +476,36 @@ void vidbrain_state::machine_start()
 
 static MACHINE_CONFIG_START( vidbrain, vidbrain_state )
     // basic machine hardware
-    MDRV_CPU_ADD(F3850_TAG, F8, XTAL_14_31818MHz/8)
-    MDRV_CPU_PROGRAM_MAP(vidbrain_mem)
-    MDRV_CPU_IO_MAP(vidbrain_io)
+    MCFG_CPU_ADD(F3850_TAG, F8, XTAL_14_31818MHz/8)
+    MCFG_CPU_PROGRAM_MAP(vidbrain_mem)
+    MCFG_CPU_IO_MAP(vidbrain_io)
 
 	// video hardware
-	MDRV_FRAGMENT_ADD(vidbrain_video)
+	MCFG_FRAGMENT_ADD(vidbrain_video)
 
 	// sound hardware
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(DISCRETE_TAG, DISCRETE, 0)
-	MDRV_SOUND_CONFIG_DISCRETE(vidbrain)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	MCFG_SOUND_ADD(DISCRETE_TAG, DISCRETE, 0)
+	MCFG_SOUND_CONFIG_DISCRETE(vidbrain)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	// devices
-//	MDRV_F3853_ADD(F3853_TAG, XTAL_14_31818MHz/8, smi_intf)
-	MDRV_CASSETTE_ADD(CASSETTE_TAG, vidbrain_cassette_config)
+//	MCFG_F3853_ADD(F3853_TAG, XTAL_14_31818MHz/8, smi_intf)
+	MCFG_CASSETTE_ADD(CASSETTE_TAG, vidbrain_cassette_config)
 
 	// cartridge
-	MDRV_CARTSLOT_ADD("cart")
-	MDRV_CARTSLOT_EXTENSION_LIST("bin")
-	MDRV_CARTSLOT_INTERFACE("vidbrain_cart")
-	MDRV_CARTSLOT_LOAD(vidbrain_cart)
+	MCFG_CARTSLOT_ADD("cart")
+	MCFG_CARTSLOT_EXTENSION_LIST("bin")
+	MCFG_CARTSLOT_INTERFACE("vidbrain_cart")
+	MCFG_CARTSLOT_LOAD(vidbrain_cart)
 
 	// software lists
-	MDRV_SOFTWARE_LIST_ADD("cart_list", "vidbrain")
+	MCFG_SOFTWARE_LIST_ADD("cart_list", "vidbrain")
 
 	// internal ram
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("1K")
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("1K")
 MACHINE_CONFIG_END
 
 

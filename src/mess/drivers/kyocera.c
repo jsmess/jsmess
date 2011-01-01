@@ -406,7 +406,7 @@ READ8_MEMBER( pc8201_state::romrd_r )
 
 	if (m_rom_sel)
 	{
-		data = memory_region(machine, "option")[m_rom_addr & 0x1ffff];
+		data = machine->region("option")->base()[m_rom_addr & 0x1ffff];
 	}
 
 	return data;
@@ -1129,8 +1129,8 @@ void kc85_state::machine_start()
 	/* configure ROM banking */
 	memory_install_read_bank(program, 0x0000, 0x7fff, 0, 0, "bank1");
 	memory_unmap_write(program, 0x0000, 0x7fff, 0, 0);
-	memory_configure_bank(machine, "bank1", 0, 1, memory_region(machine, I8085_TAG), 0);
-	memory_configure_bank(machine, "bank1", 1, 1, memory_region(machine, "option"), 0);
+	memory_configure_bank(machine, "bank1", 0, 1, machine->region(I8085_TAG)->base(), 0);
+	memory_configure_bank(machine, "bank1", 1, 1, machine->region("option")->base(), 0);
 	memory_set_bank(machine, "bank1", 0);
 
 	/* configure RAM banking */
@@ -1165,8 +1165,8 @@ void pc8201_state::machine_start()
 	upd1990a_oe_w(m_rtc, 1);
 
 	/* configure ROM banking */
-	memory_configure_bank(machine, "bank1", 0, 1, memory_region(machine, I8085_TAG), 0);
-	memory_configure_bank(machine, "bank1", 1, 1, memory_region(machine, "option"), 0);
+	memory_configure_bank(machine, "bank1", 0, 1, machine->region(I8085_TAG)->base(), 0);
+	memory_configure_bank(machine, "bank1", 1, 1, machine->region("option")->base(), 0);
 	memory_configure_bank(machine, "bank1", 2, 2, ram + 0x8000, 0x8000);
 	memory_set_bank(machine, "bank1", 0);
 
@@ -1196,8 +1196,8 @@ void trsm100_state::machine_start()
 	/* configure ROM banking */
 	memory_install_read_bank(program, 0x0000, 0x7fff, 0, 0, "bank1");
 	memory_unmap_write(program, 0x0000, 0x7fff, 0, 0);
-	memory_configure_bank(machine, "bank1", 0, 1, memory_region(machine, I8085_TAG), 0);
-	memory_configure_bank(machine, "bank1", 1, 1, memory_region(machine, "option"), 0);
+	memory_configure_bank(machine, "bank1", 0, 1, machine->region(I8085_TAG)->base(), 0);
+	memory_configure_bank(machine, "bank1", 1, 1, machine->region("option")->base(), 0);
 	memory_set_bank(machine, "bank1", 0);
 
 	/* configure RAM banking */
@@ -1236,9 +1236,9 @@ void trsm100_state::machine_start()
 void tandy200_state::machine_start()
 {
 	/* configure ROM banking */
-	memory_configure_bank(machine, "bank1", 0, 1, memory_region(machine, I8085_TAG), 0);
-	memory_configure_bank(machine, "bank1", 1, 1, memory_region(machine, I8085_TAG) + 0x10000, 0);
-	memory_configure_bank(machine, "bank1", 2, 1, memory_region(machine, "option"), 0);
+	memory_configure_bank(machine, "bank1", 0, 1, machine->region(I8085_TAG)->base(), 0);
+	memory_configure_bank(machine, "bank1", 1, 1, machine->region(I8085_TAG)->base() + 0x10000, 0);
+	memory_configure_bank(machine, "bank1", 2, 1, machine->region("option")->base(), 0);
 	memory_set_bank(machine, "bank1", 0);
 
 	/* configure RAM banking */
@@ -1290,165 +1290,165 @@ static TIMER_DEVICE_CALLBACK( tandy200_tp_tick )
 
 static MACHINE_CONFIG_START( kc85, kc85_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD(I8085_TAG, I8085A, XTAL_4_9152MHz)
-	MDRV_CPU_PROGRAM_MAP(kc85_mem)
-	MDRV_CPU_IO_MAP(kc85_io)
-	MDRV_CPU_CONFIG(kc85_i8085_config)
+	MCFG_CPU_ADD(I8085_TAG, I8085A, XTAL_4_9152MHz)
+	MCFG_CPU_PROGRAM_MAP(kc85_mem)
+	MCFG_CPU_IO_MAP(kc85_io)
+	MCFG_CPU_CONFIG(kc85_i8085_config)
 
 	/* video hardware */
-	MDRV_FRAGMENT_ADD(kc85_video)
+	MCFG_FRAGMENT_ADD(kc85_video)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* devices */
-	MDRV_I8155_ADD(I8155_TAG, XTAL_4_9152MHz/2, kc85_8155_intf)
-	MDRV_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, kc85_upd1990a_intf)
-	MDRV_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
-	MDRV_CASSETTE_ADD("cassette", kc85_cassette_config)
+	MCFG_I8155_ADD(I8155_TAG, XTAL_4_9152MHz/2, kc85_8155_intf)
+	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, kc85_upd1990a_intf)
+	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
+	MCFG_CASSETTE_ADD("cassette", kc85_cassette_config)
 
 	/* option ROM cartridge */
-	MDRV_CARTSLOT_ADD("cart")
-	MDRV_CARTSLOT_EXTENSION_LIST("rom,bin")
-	MDRV_CARTSLOT_NOT_MANDATORY
-	MDRV_CARTSLOT_INTERFACE("trsm100_cart")
+	MCFG_CARTSLOT_ADD("cart")
+	MCFG_CARTSLOT_EXTENSION_LIST("rom,bin")
+	MCFG_CARTSLOT_NOT_MANDATORY
+	MCFG_CARTSLOT_INTERFACE("trsm100_cart")
 
 	/* software lists */
-	MDRV_SOFTWARE_LIST_ADD("cart_list", "trsm100")
+	MCFG_SOFTWARE_LIST_ADD("cart_list", "trsm100")
 
 	/* internal ram */
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("16K")
-	MDRV_RAM_EXTRA_OPTIONS("32K")
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("16K")
+	MCFG_RAM_EXTRA_OPTIONS("32K")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( pc8201, pc8201_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD(I8085_TAG, I8085A, XTAL_4_9152MHz)
-	MDRV_CPU_PROGRAM_MAP(pc8201_mem)
-	MDRV_CPU_IO_MAP(pc8201_io)
-	MDRV_CPU_CONFIG(kc85_i8085_config)
+	MCFG_CPU_ADD(I8085_TAG, I8085A, XTAL_4_9152MHz)
+	MCFG_CPU_PROGRAM_MAP(pc8201_mem)
+	MCFG_CPU_IO_MAP(pc8201_io)
+	MCFG_CPU_CONFIG(kc85_i8085_config)
 
 	/* video hardware */
-	MDRV_FRAGMENT_ADD(kc85_video)
+	MCFG_FRAGMENT_ADD(kc85_video)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* devices */
-	MDRV_I8155_ADD(I8155_TAG, XTAL_4_9152MHz/2, kc85_8155_intf)
-	MDRV_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, kc85_upd1990a_intf)
-	MDRV_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
-	MDRV_CASSETTE_ADD("cassette", kc85_cassette_config)
+	MCFG_I8155_ADD(I8155_TAG, XTAL_4_9152MHz/2, kc85_8155_intf)
+	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, kc85_upd1990a_intf)
+	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
+	MCFG_CASSETTE_ADD("cassette", kc85_cassette_config)
 
 	/* option ROM cartridge */
-	MDRV_CARTSLOT_ADD("cart")
-	MDRV_CARTSLOT_EXTENSION_LIST("rom,bin")
-	MDRV_CARTSLOT_NOT_MANDATORY
-	MDRV_CARTSLOT_INTERFACE("pc8201_cart")
+	MCFG_CARTSLOT_ADD("cart")
+	MCFG_CARTSLOT_EXTENSION_LIST("rom,bin")
+	MCFG_CARTSLOT_NOT_MANDATORY
+	MCFG_CARTSLOT_INTERFACE("pc8201_cart")
 
 	/* 128KB ROM cassette */
-	MDRV_CARTSLOT_ADD("cart2")
-	MDRV_CARTSLOT_EXTENSION_LIST("rom,bin")
-	MDRV_CARTSLOT_NOT_MANDATORY
-	MDRV_CARTSLOT_INTERFACE("pc8201_cart2")
+	MCFG_CARTSLOT_ADD("cart2")
+	MCFG_CARTSLOT_EXTENSION_LIST("rom,bin")
+	MCFG_CARTSLOT_NOT_MANDATORY
+	MCFG_CARTSLOT_INTERFACE("pc8201_cart2")
 
 	/* software lists */
-	MDRV_SOFTWARE_LIST_ADD("cart_list", "pc8201")
+	MCFG_SOFTWARE_LIST_ADD("cart_list", "pc8201")
 
 	/* internal ram */
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("16K")
-	MDRV_RAM_EXTRA_OPTIONS("32K,64K,96K")
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("16K")
+	MCFG_RAM_EXTRA_OPTIONS("32K,64K,96K")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( trsm100, trsm100_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD(I8085_TAG, I8085A, XTAL_4_9152MHz)
-	MDRV_CPU_PROGRAM_MAP(kc85_mem)
-	MDRV_CPU_IO_MAP(trsm100_io)
-	MDRV_CPU_CONFIG(kc85_i8085_config)
+	MCFG_CPU_ADD(I8085_TAG, I8085A, XTAL_4_9152MHz)
+	MCFG_CPU_PROGRAM_MAP(kc85_mem)
+	MCFG_CPU_IO_MAP(trsm100_io)
+	MCFG_CPU_CONFIG(kc85_i8085_config)
 
 	/* video hardware */
-	MDRV_FRAGMENT_ADD(kc85_video)
+	MCFG_FRAGMENT_ADD(kc85_video)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* devices */
-	MDRV_I8155_ADD(I8155_TAG, XTAL_4_9152MHz/2, kc85_8155_intf)
-	MDRV_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, kc85_upd1990a_intf)
-	MDRV_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
-	MDRV_CASSETTE_ADD("cassette", kc85_cassette_config)
-//  MDRV_MC14412_ADD(MC14412_TAG, XTAL_1MHz)
+	MCFG_I8155_ADD(I8155_TAG, XTAL_4_9152MHz/2, kc85_8155_intf)
+	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, kc85_upd1990a_intf)
+	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
+	MCFG_CASSETTE_ADD("cassette", kc85_cassette_config)
+//  MCFG_MC14412_ADD(MC14412_TAG, XTAL_1MHz)
 
 	/* option ROM cartridge */
-	MDRV_CARTSLOT_ADD("cart")
-	MDRV_CARTSLOT_EXTENSION_LIST("rom,bin")
-	MDRV_CARTSLOT_NOT_MANDATORY
-	MDRV_CARTSLOT_INTERFACE("trsm100_cart")
+	MCFG_CARTSLOT_ADD("cart")
+	MCFG_CARTSLOT_EXTENSION_LIST("rom,bin")
+	MCFG_CARTSLOT_NOT_MANDATORY
+	MCFG_CARTSLOT_INTERFACE("trsm100_cart")
 
 	/* software lists */
-	MDRV_SOFTWARE_LIST_ADD("cart_list", "trsm100")
+	MCFG_SOFTWARE_LIST_ADD("cart_list", "trsm100")
 
 	/* internal ram */
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("8K")
-	MDRV_RAM_EXTRA_OPTIONS("16K,24K,32K")
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("8K")
+	MCFG_RAM_EXTRA_OPTIONS("16K,24K,32K")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( tandy102, trsm100 )
-	MDRV_RAM_MODIFY("messram")
-	MDRV_RAM_DEFAULT_SIZE("24K")
-	MDRV_RAM_EXTRA_OPTIONS("32K")
+	MCFG_RAM_MODIFY("messram")
+	MCFG_RAM_DEFAULT_SIZE("24K")
+	MCFG_RAM_EXTRA_OPTIONS("32K")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( tandy200, tandy200_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD(I8085_TAG, I8085A, XTAL_4_9152MHz)
-	MDRV_CPU_PROGRAM_MAP(tandy200_mem)
-	MDRV_CPU_IO_MAP(tandy200_io)
-	MDRV_CPU_CONFIG(kc85_i8085_config)
+	MCFG_CPU_ADD(I8085_TAG, I8085A, XTAL_4_9152MHz)
+	MCFG_CPU_PROGRAM_MAP(tandy200_mem)
+	MCFG_CPU_IO_MAP(tandy200_io)
+	MCFG_CPU_CONFIG(kc85_i8085_config)
 
 	/* video hardware */
-	MDRV_FRAGMENT_ADD(tandy200_video)
+	MCFG_FRAGMENT_ADD(tandy200_video)
 
 	/* TP timer */
-	MDRV_TIMER_ADD_PERIODIC("tp", tandy200_tp_tick, HZ(XTAL_4_9152MHz/2/8192))
+	MCFG_TIMER_ADD_PERIODIC("tp", tandy200_tp_tick, HZ(XTAL_4_9152MHz/2/8192))
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-//  MDRV_TCM5089_ADD(TCM5089_TAG, XTAL_3_579545MHz)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+//  MCFG_TCM5089_ADD(TCM5089_TAG, XTAL_3_579545MHz)
 
 	/* devices */
-	MDRV_I8155_ADD(I8155_TAG, XTAL_4_9152MHz/2, tandy200_8155_intf)
-	MDRV_RP5C01A_ADD(RP5C01A_TAG, XTAL_32_768kHz, tandy200_rp5c01a_intf)
-	MDRV_MSM8251_ADD(MSM8251_TAG, /*XTAL_4_9152MHz/2,*/ tandy200_msm8251_interface)
-//  MDRV_MC14412_ADD(MC14412_TAG, XTAL_1MHz)
-	MDRV_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
-	MDRV_CASSETTE_ADD("cassette", kc85_cassette_config)
+	MCFG_I8155_ADD(I8155_TAG, XTAL_4_9152MHz/2, tandy200_8155_intf)
+	MCFG_RP5C01A_ADD(RP5C01A_TAG, XTAL_32_768kHz, tandy200_rp5c01a_intf)
+	MCFG_MSM8251_ADD(MSM8251_TAG, /*XTAL_4_9152MHz/2,*/ tandy200_msm8251_interface)
+//  MCFG_MC14412_ADD(MC14412_TAG, XTAL_1MHz)
+	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
+	MCFG_CASSETTE_ADD("cassette", kc85_cassette_config)
 
 	/* option ROM cartridge */
-	MDRV_CARTSLOT_ADD("cart")
-	MDRV_CARTSLOT_EXTENSION_LIST("rom,bin")
-	MDRV_CARTSLOT_NOT_MANDATORY
-	MDRV_CARTSLOT_INTERFACE("tandy200_cart")
+	MCFG_CARTSLOT_ADD("cart")
+	MCFG_CARTSLOT_EXTENSION_LIST("rom,bin")
+	MCFG_CARTSLOT_NOT_MANDATORY
+	MCFG_CARTSLOT_INTERFACE("tandy200_cart")
 
 	/* software lists */
-	MDRV_SOFTWARE_LIST_ADD("cart_list", "tandy200")
+	MCFG_SOFTWARE_LIST_ADD("cart_list", "tandy200")
 
 	/* internal ram */
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("24K")
-	MDRV_RAM_EXTRA_OPTIONS("48K,72K")
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("24K")
+	MCFG_RAM_EXTRA_OPTIONS("48K,72K")
 MACHINE_CONFIG_END
 
 /* ROMs */

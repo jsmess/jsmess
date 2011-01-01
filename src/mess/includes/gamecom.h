@@ -235,8 +235,8 @@ extern READ8_HANDLER( gamecom_internal_r );
 extern WRITE8_HANDLER( gamecom_pio_w );
 extern READ8_HANDLER( gamecom_pio_r );
 
-extern void gamecom_handle_dma( running_device *device, int cycles );
-extern void gamecom_update_timers( running_device *device, int cycles );
+extern void gamecom_handle_dma( device_t *device, int cycles );
+extern void gamecom_update_timers( device_t *device, int cycles );
 
 
 /*----------- defined in video/gamecom.c -----------*/

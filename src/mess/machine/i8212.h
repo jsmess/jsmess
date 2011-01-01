@@ -47,9 +47,9 @@ enum
 //  INTERFACE CONFIGURATION MACROS
 ///*************************************************************************
 
-#define MDRV_I8212_ADD(_tag, _config) \
-	MDRV_DEVICE_ADD((_tag), I8212, 0)	\
-	MDRV_DEVICE_CONFIG(_config)
+#define MCFG_I8212_ADD(_tag, _config) \
+	MCFG_DEVICE_ADD((_tag), I8212, 0)	\
+	MCFG_DEVICE_CONFIG(_config)
 
 #define I8212_INTERFACE(name) \
 	const i8212_interface (name) =

@@ -41,9 +41,9 @@
 
 DECLARE_LEGACY_DEVICE(I8257, i8257);
 
-#define MDRV_I8257_ADD(_tag, _clock, _config) \
-	MDRV_DEVICE_ADD(_tag, I8257, _clock) \
-	MDRV_DEVICE_CONFIG(_config)
+#define MCFG_I8257_ADD(_tag, _clock, _config) \
+	MCFG_DEVICE_ADD(_tag, I8257, _clock) \
+	MCFG_DEVICE_CONFIG(_config)
 
 #define I8257_INTERFACE(_name) \
 	const i8257_interface (_name) =

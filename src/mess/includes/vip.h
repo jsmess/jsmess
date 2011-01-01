@@ -63,14 +63,14 @@ public:
 	{ }
 
 	required_device<cosmac_device> m_maincpu;
-	required_device<running_device> m_vdc;
-	required_device<running_device> m_cgc;
-	required_device<running_device> m_cassette;
-	required_device<running_device> m_beeper;
-	required_device<running_device> m_vp595;
-	required_device<running_device> m_vp550;
-	required_device<running_device> m_vp551;
-	required_device<running_device> m_ram;
+	required_device<device_t> m_vdc;
+	required_device<device_t> m_cgc;
+	required_device<device_t> m_cassette;
+	required_device<device_t> m_beeper;
+	required_device<device_t> m_vp595;
+	required_device<device_t> m_vp550;
+	required_device<device_t> m_vp551;
+	required_device<device_t> m_ram;
 
 	virtual void machine_start();
 	virtual void machine_reset();

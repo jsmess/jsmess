@@ -99,7 +99,7 @@ struct _tms5501_t
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE tms5501_t *get_token(running_device *device)
+INLINE tms5501_t *get_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == TMS5501);
@@ -107,7 +107,7 @@ INLINE tms5501_t *get_token(running_device *device)
 }
 
 
-INLINE const tms5501_interface *get_interface(running_device *device)
+INLINE const tms5501_interface *get_interface(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == TMS5501);
@@ -145,7 +145,7 @@ static int find_first_bit(int value)
     tms5501_field_interrupts
 -------------------------------------------------*/
 
-static void tms5501_field_interrupts(running_device *device)
+static void tms5501_field_interrupts(device_t *device)
 {
 	static const UINT8 int_vectors[] = { 0xc7, 0xcf, 0xd7, 0xdf, 0xe7, 0xef, 0xf7, 0xff };
 
@@ -198,7 +198,7 @@ static void tms5501_field_interrupts(running_device *device)
     tms5501_timer_decrementer
 -------------------------------------------------*/
 
-static void tms5501_timer_decrementer(running_device *device, UINT8 mask)
+static void tms5501_timer_decrementer(device_t *device, UINT8 mask)
 {
 	tms5501_t *tms = get_token(device);
 
@@ -215,7 +215,7 @@ static void tms5501_timer_decrementer(running_device *device, UINT8 mask)
 
 static TIMER_CALLBACK(tms5501_timer_decrementer_callback)
 {
-	running_device *device = (running_device *) ptr;
+	device_t *device = (device_t *) ptr;
 	UINT8 mask = param;
 
 	tms5501_timer_decrementer(device, mask);
@@ -226,7 +226,7 @@ static TIMER_CALLBACK(tms5501_timer_decrementer_callback)
     tms5501_timer_reload
 -------------------------------------------------*/
 
-static void tms5501_timer_reload(running_device *device, int timer)
+static void tms5501_timer_reload(device_t *device, int timer)
 {
 	tms5501_t *tms = get_token(device);
 	const tms5501_interface *intf = get_interface(device);
@@ -308,7 +308,7 @@ static DEVICE_START( tms5501 )
     tms5501_set_pio_bit_7
 -------------------------------------------------*/
 
-void tms5501_set_pio_bit_7 (running_device *device, UINT8 data)
+void tms5501_set_pio_bit_7 (device_t *device, UINT8 data)
 {
 	tms5501_t *tms = get_token(device);
 
@@ -333,7 +333,7 @@ void tms5501_set_pio_bit_7 (running_device *device, UINT8 data)
     tms5501_sensor
 -------------------------------------------------*/
 
-void tms5501_sensor (running_device *device, UINT8 data)
+void tms5501_sensor (device_t *device, UINT8 data)
 {
 	tms5501_t *tms = get_token(device);
 

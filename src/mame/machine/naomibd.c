@@ -205,7 +205,7 @@ struct _naomibd_state
 {
 	UINT8				index;					/* index of board */
 	UINT8				type;
-	running_device *device;				/* pointer to our containing device */
+	device_t *device;				/* pointer to our containing device */
 
 	UINT8 *				memory;
 	UINT8 *				protdata;
@@ -312,7 +312,7 @@ static UINT16 block_decrypt(UINT32 game_key, UINT16 sequence_key, UINT16 counter
     in device is, in fact, a naomibd device
 -------------------------------------------------*/
 
-INLINE naomibd_state *get_safe_token(running_device *device)
+INLINE naomibd_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == NAOMI_BOARD);
@@ -328,7 +328,7 @@ INLINE naomibd_state *get_safe_token(running_device *device)
  *
  *************************************/
 
-int naomibd_interrupt_callback(running_device *device, naomibd_interrupt_func callback)
+int naomibd_interrupt_callback(device_t *device, naomibd_interrupt_func callback)
 {
 	naomibd_config *config = (naomibd_config *)downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
 	//naomibd_state *v = get_safe_token(device);
@@ -337,20 +337,20 @@ int naomibd_interrupt_callback(running_device *device, naomibd_interrupt_func ca
 	return 0;
 }
 
-int naomibd_get_type(running_device *device)
+int naomibd_get_type(device_t *device)
 {
 	naomibd_state *v = get_safe_token(device);
 	return v->type;
 }
 
 
-void *naomibd_get_memory(running_device *device)
+void *naomibd_get_memory(device_t *device)
 {
 	return get_safe_token(device)->memory;
 }
 
 
-offs_t naomibd_get_dmaoffset(running_device *device)
+offs_t naomibd_get_dmaoffset(device_t *device)
 {
 	offs_t result = 0;
 
@@ -409,7 +409,7 @@ static STATE_POSTLOAD( naomibd_postload )
 }
 
 
-static void init_save_state(running_device *device)
+static void init_save_state(device_t *device)
 {
 	naomibd_state *v = get_safe_token(device);
 
@@ -943,7 +943,7 @@ static void load_rom_gdrom(running_machine* machine, naomibd_state *v)
 
 	memset(name,'\0',128);
 
-	realpic = memory_region(machine,"pic");
+	realpic = machine->region("pic")->base();
 
 	if (realpic)
 	{
@@ -1104,7 +1104,7 @@ static void load_rom_gdrom(running_machine* machine, naomibd_state *v)
 		}
 	}
 	// get des key
-	realpic = memory_region(machine,"pic");
+	realpic = machine->region("pic")->base();
 
 	if (realpic)
 	{
@@ -1787,18 +1787,18 @@ static DEVICE_START( naomibd )
 	switch (config->type)
 	{
 		case ROM_BOARD:
-			v->memory = (UINT8 *)memory_region(device->machine, config->regiontag);
-			v->protdata = (UINT8 *)memory_region(device->machine, "naomibd_prot");
+			v->memory = (UINT8 *)device->machine->region(config->regiontag)->base();
+			v->protdata = (UINT8 *)device->machine->region("naomibd_prot")->base();
 			break;
 
 		case AW_ROM_BOARD:
-			v->memory = (UINT8 *)memory_region(device->machine, config->regiontag);
+			v->memory = (UINT8 *)device->machine->region(config->regiontag)->base();
 			break;
 
 		case DIMM_BOARD:
 			v->memory = (UINT8 *)auto_alloc_array_clear(device->machine, UINT8, 0x40000000); // 0x40000000 is needed for some Chihiro sets, Naomi should be less, we should pass as device param
 			v->gdromchd = get_disk_handle(device->machine, config->gdromregiontag);
-			v->picdata = (UINT8 *)memory_region(device->machine, config->picregiontag);
+			v->picdata = (UINT8 *)device->machine->region(config->picregiontag)->base();
 			if (v->memory != NULL && v->gdromchd != NULL && v->picdata != NULL)
 				load_rom_gdrom(device->machine, v);
 			break;
@@ -1873,7 +1873,7 @@ static DEVICE_NVRAM( naomibd )
 		/*if (file)
             eeprom_load(file);
         else*/
-		games_contents = memory_region(device->machine, "naomibd_eeprom");
+		games_contents = device->machine->region("naomibd_eeprom")->base();
 
 		if (games_contents)
 		{

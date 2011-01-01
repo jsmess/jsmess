@@ -414,9 +414,9 @@ static void set_ea(address_space *space, int ea)
 static SOUND_START( mario )
 {
 	mario_state	*state = machine->driver_data<mario_state>();
-	running_device *audiocpu = machine->device("audiocpu");
+	device_t *audiocpu = machine->device("audiocpu");
 #if USE_8039
-	UINT8 *SND = memory_region(machine, "audiocpu");
+	UINT8 *SND = machine->region("audiocpu")->base();
 
 	SND[0x1001] = 0x01;
 #endif
@@ -426,8 +426,8 @@ static SOUND_START( mario )
 	{
 		state->eabank = "bank1";
 		memory_install_read_bank(cpu_get_address_space(audiocpu, ADDRESS_SPACE_PROGRAM), 0x000, 0x7ff, 0, 0, "bank1");
-		memory_configure_bank(machine, "bank1", 0, 1, memory_region(machine, "audiocpu"), 0);
-	    memory_configure_bank(machine, "bank1", 1, 1, memory_region(machine, "audiocpu") + 0x1000, 0x800);
+		memory_configure_bank(machine, "bank1", 0, 1, machine->region("audiocpu")->base(), 0);
+	    memory_configure_bank(machine, "bank1", 1, 1, machine->region("audiocpu")->base() + 0x1000, 0x800);
 	}
 
     state_save_register_global(machine, state->last);
@@ -482,8 +482,8 @@ static READ8_HANDLER( mario_sh_t1_r )
 
 static READ8_HANDLER( mario_sh_tune_r )
 {
-	UINT8 *SND = memory_region(space->machine, "audiocpu");
-	UINT16 mask = memory_region_length(space->machine, "audiocpu")-1;
+	UINT8 *SND = space->machine->region("audiocpu")->base();
+	UINT16 mask = space->machine->region("audiocpu")->bytes()-1;
 	UINT8 p2 = I8035_P2_R(space);
 
 	if ((p2 >> 7) & 1)
@@ -634,36 +634,36 @@ static const ay8910_interface ay8910_config =
 MACHINE_CONFIG_FRAGMENT( mario_audio )
 
 #if USE_8039
-	MDRV_CPU_ADD("audiocpu", I8039, I8035_CLOCK)         /* 730 kHz */
+	MCFG_CPU_ADD("audiocpu", I8039, I8035_CLOCK)         /* 730 kHz */
 #else
-	MDRV_CPU_ADD("audiocpu", M58715, I8035_CLOCK)        /* 730 kHz */
+	MCFG_CPU_ADD("audiocpu", M58715, I8035_CLOCK)        /* 730 kHz */
 #endif
-	MDRV_CPU_PROGRAM_MAP(mario_sound_map)
-	MDRV_CPU_IO_MAP(mario_sound_io_map)
+	MCFG_CPU_PROGRAM_MAP(mario_sound_map)
+	MCFG_CPU_IO_MAP(mario_sound_io_map)
 
-	MDRV_SOUND_START(mario)
-	MDRV_SOUND_RESET(mario)
+	MCFG_SOUND_START(mario)
+	MCFG_SOUND_RESET(mario)
 
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
-	MDRV_SOUND_CONFIG_DISCRETE(mario)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
+	MCFG_SOUND_CONFIG_DISCRETE(mario)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1)
 
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_FRAGMENT( masao_audio )
 
-	MDRV_CPU_ADD("audiocpu", Z80, 24576000/16)	/* ???? */
-	MDRV_CPU_PROGRAM_MAP(masao_sound_map)
+	MCFG_CPU_ADD("audiocpu", Z80, 24576000/16)	/* ???? */
+	MCFG_CPU_PROGRAM_MAP(masao_sound_map)
 
-	MDRV_SOUND_START(mario)
-	MDRV_SOUND_RESET(mario)
+	MCFG_SOUND_START(mario)
+	MCFG_SOUND_RESET(mario)
 
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("aysnd", AY8910, 14318000/6)
-	MDRV_SOUND_CONFIG(ay8910_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("aysnd", AY8910, 14318000/6)
+	MCFG_SOUND_CONFIG(ay8910_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 MACHINE_CONFIG_END
 

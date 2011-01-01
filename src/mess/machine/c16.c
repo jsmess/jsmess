@@ -68,7 +68,7 @@
   p7 serial data in, serial bus 5
 */
 
-void c16_m7501_port_write( running_device *device, UINT8 direction, UINT8 data )
+void c16_m7501_port_write( device_t *device, UINT8 direction, UINT8 data )
 {
 	c16_state *state = device->machine->driver_data<c16_state>();
 
@@ -82,7 +82,7 @@ void c16_m7501_port_write( running_device *device, UINT8 direction, UINT8 data )
 	cassette_change_state(state->cassette, BIT(data, 7) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
 }
 
-UINT8 c16_m7501_port_read( running_device *device, UINT8 direction )
+UINT8 c16_m7501_port_read( device_t *device, UINT8 direction )
 {
 	c16_state *state = device->machine->driver_data<c16_state>();
 	UINT8 data = 0xff;
@@ -107,7 +107,7 @@ UINT8 c16_m7501_port_read( running_device *device, UINT8 direction )
 static void c16_bankswitch( running_machine *machine )
 {
 	c16_state *state = machine->driver_data<c16_state>();
-	UINT8 *rom = memory_region(machine, "maincpu");
+	UINT8 *rom = machine->region("maincpu")->base();
 	memory_set_bankptr(machine, "bank9", messram_get_ptr(state->messram));
 
 	switch (state->lowrom)
@@ -395,7 +395,7 @@ void c16_interrupt( running_machine *machine, int level )
 static void c16_common_driver_init( running_machine *machine )
 {
 	c16_state *state = machine->driver_data<c16_state>();
-	UINT8 *rom = memory_region(machine, "maincpu");
+	UINT8 *rom = machine->region("maincpu")->base();
 
 	/* initial bankswitch (notice that TED7360 is init to ROM) */
 	memory_set_bankptr(machine, "bank2", rom + 0x10000);
@@ -618,7 +618,7 @@ INTERRUPT_GEN( c16_frame_interrupt )
 
 static DEVICE_IMAGE_LOAD( c16_cart )
 {
-	UINT8 *mem = memory_region(image.device().machine, "maincpu");
+	UINT8 *mem = image.device().machine->region("maincpu")->base();
 	int size = image.length(), test;
 	const char *filetype;
 	int address = 0;
@@ -669,8 +669,8 @@ static DEVICE_IMAGE_LOAD( c16_cart )
 }
 
 MACHINE_CONFIG_FRAGMENT( c16_cartslot )
-	MDRV_CARTSLOT_ADD("cart")
-	MDRV_CARTSLOT_EXTENSION_LIST("bin,rom,hi,lo")
-	MDRV_CARTSLOT_NOT_MANDATORY
-	MDRV_CARTSLOT_LOAD(c16_cart)
+	MCFG_CARTSLOT_ADD("cart")
+	MCFG_CARTSLOT_EXTENSION_LIST("bin,rom,hi,lo")
+	MCFG_CARTSLOT_NOT_MANDATORY
+	MCFG_CARTSLOT_LOAD(c16_cart)
 MACHINE_CONFIG_END

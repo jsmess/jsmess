@@ -265,7 +265,7 @@ static void start_interrupt_timers( running_machine *machine )
  *
  *************************************/
 
-static void audio_cpu_irq(running_device *device, int assert)
+static void audio_cpu_irq(device_t *device, int assert)
 {
 	neogeo_state *state = device->machine->driver_data<neogeo_state>();
 	cpu_set_input_line(state->audiocpu, 0, assert ? ASSERT_LINE : CLEAR_LINE);
@@ -634,7 +634,7 @@ static void set_main_cpu_vector_table_source( running_machine *machine, UINT8 da
 static void _set_main_cpu_bank_address( running_machine *machine )
 {
 	neogeo_state *state = machine->driver_data<neogeo_state>();
-	memory_set_bankptr(machine, NEOGEO_BANK_CARTRIDGE, &memory_region(machine, "maincpu")[state->main_cpu_bank_address]);
+	memory_set_bankptr(machine, NEOGEO_BANK_CARTRIDGE, &machine->region("maincpu")->base()[state->main_cpu_bank_address]);
 }
 
 
@@ -653,7 +653,7 @@ void neogeo_set_main_cpu_bank_address( address_space *space, UINT32 bank_address
 static WRITE16_HANDLER( main_cpu_bank_select_w )
 {
 	UINT32 bank_address;
-	UINT32 len = memory_region_length(space->machine, "maincpu");
+	UINT32 len = space->machine->region("maincpu")->bytes();
 
 	if ((len <= 0x100000) && (data & 0x07))
 		logerror("PC %06x: warning: bankswitch to %02x but no banks available\n", cpu_get_pc(space->cpu), data);
@@ -677,11 +677,11 @@ static void main_cpu_banking_init( running_machine *machine )
 	address_space *mainspace = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	/* create vector banks */
-	memory_configure_bank(machine, NEOGEO_BANK_VECTORS, 0, 1, memory_region(machine, "mainbios"), 0);
-	memory_configure_bank(machine, NEOGEO_BANK_VECTORS, 1, 1, memory_region(machine, "maincpu"), 0);
+	memory_configure_bank(machine, NEOGEO_BANK_VECTORS, 0, 1, machine->region("mainbios")->base(), 0);
+	memory_configure_bank(machine, NEOGEO_BANK_VECTORS, 1, 1, machine->region("maincpu")->base(), 0);
 
 	/* set initial main CPU bank */
-	if (memory_region_length(machine, "maincpu") > 0x100000)
+	if (machine->region("maincpu")->bytes() > 0x100000)
 		neogeo_set_main_cpu_bank_address(mainspace, 0x100000);
 	else
 		neogeo_set_main_cpu_bank_address(mainspace, 0x000000);
@@ -753,7 +753,7 @@ static void _set_audio_cpu_rom_source( address_space *space )
 {
 	neogeo_state *state = space->machine->driver_data<neogeo_state>();
 
-/*  if (!memory_region(machine, "audiobios"))   */
+/*  if (!machine->region("audiobios")->base())   */
 		state->audio_cpu_rom_source = 1;
 
 	memory_set_bank(space->machine, NEOGEO_BANK_AUDIO_CPU_MAIN_BANK, state->audio_cpu_rom_source);
@@ -788,14 +788,14 @@ static void audio_cpu_banking_init( running_machine *machine )
 	UINT32 address_mask;
 
 	/* audio bios/cartridge selection */
-	if (memory_region(machine, "audiobios"))
-		memory_configure_bank(machine, NEOGEO_BANK_AUDIO_CPU_MAIN_BANK, 0, 1, memory_region(machine, "audiobios"), 0);
-	memory_configure_bank(machine, NEOGEO_BANK_AUDIO_CPU_MAIN_BANK, 1, 1, memory_region(machine, "audiocpu"), 0);
+	if (machine->region("audiobios")->base())
+		memory_configure_bank(machine, NEOGEO_BANK_AUDIO_CPU_MAIN_BANK, 0, 1, machine->region("audiobios")->base(), 0);
+	memory_configure_bank(machine, NEOGEO_BANK_AUDIO_CPU_MAIN_BANK, 1, 1, machine->region("audiocpu")->base(), 0);
 
 	/* audio banking */
-	address_mask = memory_region_length(machine, "audiocpu") - 0x10000 - 1;
+	address_mask = machine->region("audiocpu")->bytes() - 0x10000 - 1;
 
-	rgn = memory_region(machine, "audiocpu");
+	rgn = machine->region("audiocpu")->base();
 	for (region = 0; region < 4; region++)
 	{
 		for (bank = 0; bank < 0x100; bank++)
@@ -1076,10 +1076,10 @@ static READ16_HANDLER(neocd_transfer_r)
 {
 	ng_aes_state *state = space->machine->driver_data<ng_aes_state>();
 	UINT16 ret = 0x0000;
-	UINT8* Z80 = memory_region(space->machine,"audiocpu");
-	UINT8* PCM = memory_region(space->machine,"ymsnd");
-	UINT8* FIX = memory_region(space->machine,"fixed");
-	UINT16* SPR = (UINT16*)memory_region(space->machine,"sprites");
+	UINT8* Z80 = space->machine->region("audiocpu")->base();
+	UINT8* PCM = space->machine->region("ymsnd")->base();
+	UINT8* FIX = space->machine->region("fixed")->base();
+	UINT16* SPR = (UINT16*)space->machine->region("sprites")->base();
 
 	switch(state->neocd_ctrl.area_sel)
 	{
@@ -1103,10 +1103,10 @@ static READ16_HANDLER(neocd_transfer_r)
 static WRITE16_HANDLER(neocd_transfer_w)
 {
 	ng_aes_state *state = space->machine->driver_data<ng_aes_state>();
-	UINT8* Z80 = memory_region(space->machine,"audiocpu");
-	UINT8* PCM = memory_region(space->machine,"ymsnd");
-	UINT8* FIX = memory_region(space->machine,"fixed");
-	UINT16* SPR = (UINT16*)memory_region(space->machine,"sprites");
+	UINT8* Z80 = space->machine->region("audiocpu")->base();
+	UINT8* PCM = space->machine->region("ymsnd")->base();
+	UINT8* FIX = space->machine->region("fixed")->base();
+	UINT16* SPR = (UINT16*)space->machine->region("sprites")->base();
 
 	switch(state->neocd_ctrl.area_sel)
 	{
@@ -1229,7 +1229,7 @@ static void common_machine_start(running_machine* machine)
 	neogeo_state *state = machine->driver_data<neogeo_state>();
 
 	/* set the BIOS bank */
-	memory_set_bankptr(machine, NEOGEO_BANK_BIOS, memory_region(machine, "mainbios"));
+	memory_set_bankptr(machine, NEOGEO_BANK_BIOS, machine->region("mainbios")->base());
 
 	/* set the initial main CPU bank */
 	main_cpu_banking_init(machine);
@@ -1284,10 +1284,10 @@ static MACHINE_START( neogeo )
 static MACHINE_START(neocd)
 {
 	ng_aes_state *state = machine->driver_data<ng_aes_state>();
-	UINT8* ROM = memory_region(machine,"mainbios");
-	UINT8* RAM = memory_region(machine,"maincpu");
-	UINT8* Z80bios = memory_region(machine,"audiobios");
-	UINT8* FIXbios = memory_region(machine,"fixedbios");
+	UINT8* ROM = machine->region("mainbios")->base();
+	UINT8* RAM = machine->region("maincpu")->base();
+	UINT8* Z80bios = machine->region("audiobios")->base();
+	UINT8* FIXbios = machine->region("fixedbios")->base();
 	int x;
 
 	common_machine_start(machine);
@@ -1709,59 +1709,59 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( neogeo, ng_aes_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, NEOGEO_MAIN_CPU_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(main_map)
+	MCFG_CPU_ADD("maincpu", M68000, NEOGEO_MAIN_CPU_CLOCK)
+	MCFG_CPU_PROGRAM_MAP(main_map)
 
-	MDRV_CPU_ADD("audiocpu", Z80, NEOGEO_AUDIO_CPU_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(audio_map)
-	MDRV_CPU_IO_MAP(audio_io_map)
+	MCFG_CPU_ADD("audiocpu", Z80, NEOGEO_AUDIO_CPU_CLOCK)
+	MCFG_CPU_PROGRAM_MAP(audio_map)
+	MCFG_CPU_IO_MAP(audio_io_map)
 
-	MDRV_MACHINE_START(neogeo)
-	MDRV_MACHINE_RESET(neogeo)
+	MCFG_MACHINE_START(neogeo)
+	MCFG_MACHINE_RESET(neogeo)
 
 	/* video hardware */
-	MDRV_VIDEO_START(neogeo)
-	MDRV_VIDEO_RESET(neogeo)
-	MDRV_VIDEO_UPDATE(neogeo)
-	MDRV_DEFAULT_LAYOUT(layout_neogeo)
+	MCFG_VIDEO_START(neogeo)
+	MCFG_VIDEO_RESET(neogeo)
+	MCFG_VIDEO_UPDATE(neogeo)
+	MCFG_DEFAULT_LAYOUT(layout_neogeo)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_RAW_PARAMS(NEOGEO_PIXEL_CLOCK, NEOGEO_HTOTAL, NEOGEO_HBEND, NEOGEO_HBSTART, NEOGEO_VTOTAL, NEOGEO_VBEND, NEOGEO_VBSTART)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_RAW_PARAMS(NEOGEO_PIXEL_CLOCK, NEOGEO_HTOTAL, NEOGEO_HBEND, NEOGEO_HBSTART, NEOGEO_VTOTAL, NEOGEO_VBEND, NEOGEO_VBSTART)
 
 	/* audio hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ymsnd", YM2610, NEOGEO_YM2610_CLOCK)
-	MDRV_SOUND_CONFIG(ym2610_config)
-	MDRV_SOUND_ROUTE(0, "lspeaker",  0.60)
-	MDRV_SOUND_ROUTE(0, "rspeaker", 0.60)
-	MDRV_SOUND_ROUTE(1, "lspeaker",  1.0)
-	MDRV_SOUND_ROUTE(2, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("ymsnd", YM2610, NEOGEO_YM2610_CLOCK)
+	MCFG_SOUND_CONFIG(ym2610_config)
+	MCFG_SOUND_ROUTE(0, "lspeaker",  0.60)
+	MCFG_SOUND_ROUTE(0, "rspeaker", 0.60)
+	MCFG_SOUND_ROUTE(1, "lspeaker",  1.0)
+	MCFG_SOUND_ROUTE(2, "rspeaker", 1.0)
 
 	/* NEC uPD4990A RTC */
-	MDRV_UPD4990A_ADD("upd4990a")
+	MCFG_UPD4990A_ADD("upd4990a")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( aes, neogeo )
 
-	MDRV_MEMCARD_HANDLER(neogeo)
+	MCFG_MEMCARD_HANDLER(neogeo)
 
-	MDRV_AES_CARTRIDGE_ADD("aes_multicart")
-//  MDRV_CARTSLOT_ADD("cart")
-//  MDRV_CARTSLOT_MANDATORY
+	MCFG_AES_CARTRIDGE_ADD("aes_multicart")
+//  MCFG_CARTSLOT_ADD("cart")
+//  MCFG_CARTSLOT_MANDATORY
 
-//  MDRV_CARTSLOT_LOAD(aes_cart)
+//  MCFG_CARTSLOT_LOAD(aes_cart)
 
-	MDRV_SOFTWARE_LIST_ADD("cart_list","aes")
+	MCFG_SOFTWARE_LIST_ADD("cart_list","aes")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( neocd, neogeo )
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(neocd_main_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(neocd_main_map)
 
-	MDRV_MACHINE_START(neocd)
+	MCFG_MACHINE_START(neocd)
 MACHINE_CONFIG_END
 
 /*************************************

@@ -475,7 +475,7 @@ static UINT8 cmos_unlocked;
 static UINT32 *timekeeper_nvram;
 static size_t timekeeper_nvram_size;
 
-static running_device *voodoo;
+static device_t *voodoo;
 static UINT8 dcs_idma_cs;
 
 static int dynamic_count;
@@ -487,7 +487,7 @@ static struct dynamic_address
 	write32_space_func mwrite;
 	read32_device_func	dread;
 	write32_device_func dwrite;
-	running_device *device;
+	device_t *device;
 	const char *	rdname;
 	const char *	wrname;
 } dynamic[MAX_DYNAMIC_ADDRESSES];
@@ -503,7 +503,7 @@ static struct dynamic_address
 
 static STATE_POSTLOAD( vegas_postload );
 static TIMER_CALLBACK( nile_timer_callback );
-static void ide_interrupt(running_device *device, int state);
+static void ide_interrupt(device_t *device, int state);
 static void remap_dynamic_addresses(running_machine *machine);
 
 
@@ -1246,7 +1246,7 @@ static WRITE32_HANDLER( nile_w )
  *
  *************************************/
 
-static void ide_interrupt(running_device *device, int state)
+static void ide_interrupt(device_t *device, int state)
 {
 	ide_irq_state = state;
 	if (state)
@@ -1274,7 +1274,7 @@ static void update_sio_irqs(running_machine *machine)
 }
 
 
-static void vblank_assert(running_device *device, int state)
+static void vblank_assert(device_t *device, int state)
 {
 	if (!vblank_state && state)
 	{
@@ -1301,7 +1301,7 @@ static void ioasic_irq(running_machine *machine, int state)
 }
 
 
-static void ethernet_interrupt(running_device *device, int state)
+static void ethernet_interrupt(device_t *device, int state)
 {
 	if (state)
 		sio_irq_state |= 0x10;
@@ -1534,7 +1534,7 @@ INLINE void _add_dynamic_address(offs_t start, offs_t end, read32_space_func rea
 	dynamic_count++;
 }
 
-INLINE void _add_dynamic_device_address(running_device *device, offs_t start, offs_t end, read32_device_func read, write32_device_func write, const char *rdname, const char *wrname)
+INLINE void _add_dynamic_device_address(device_t *device, offs_t start, offs_t end, read32_device_func read, write32_device_func write, const char *rdname, const char *wrname)
 {
 	dynamic[dynamic_count].start = start;
 	dynamic[dynamic_count].end = end;
@@ -1551,8 +1551,8 @@ INLINE void _add_dynamic_device_address(running_device *device, offs_t start, of
 
 static void remap_dynamic_addresses(running_machine *machine)
 {
-	running_device *ethernet = machine->device("ethernet");
-	running_device *ide = machine->device("ide");
+	device_t *ethernet = machine->device("ethernet");
+	device_t *ide = machine->device("ide");
 	int voodoo_type = voodoo_get_type(voodoo);
 	offs_t base;
 	int addr;
@@ -2223,93 +2223,93 @@ static const mips3_config r5000_config =
 static MACHINE_CONFIG_START( vegascore, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", R5000LE, SYSTEM_CLOCK*2)
-	MDRV_CPU_CONFIG(r5000_config)
-	MDRV_CPU_PROGRAM_MAP(vegas_map_8mb)
+	MCFG_CPU_ADD("maincpu", R5000LE, SYSTEM_CLOCK*2)
+	MCFG_CPU_CONFIG(r5000_config)
+	MCFG_CPU_PROGRAM_MAP(vegas_map_8mb)
 
-	MDRV_MACHINE_START(vegas)
-	MDRV_MACHINE_RESET(vegas)
-	MDRV_NVRAM_HANDLER(timekeeper_save)
+	MCFG_MACHINE_START(vegas)
+	MCFG_MACHINE_RESET(vegas)
+	MCFG_NVRAM_HANDLER(timekeeper_save)
 
-	MDRV_IDE_CONTROLLER_ADD("ide", ide_interrupt)
-	MDRV_IDE_BUS_MASTER_SPACE("maincpu", PROGRAM)
+	MCFG_IDE_CONTROLLER_ADD("ide", ide_interrupt)
+	MCFG_IDE_BUS_MASTER_SPACE("maincpu", PROGRAM)
 
-	MDRV_SMC91C94_ADD("ethernet", ethernet_interrupt)
+	MCFG_SMC91C94_ADD("ethernet", ethernet_interrupt)
 
-	MDRV_3DFX_VOODOO_2_ADD("voodoo", STD_VOODOO_2_CLOCK, 2, "screen")
-	MDRV_3DFX_VOODOO_CPU("maincpu")
-	MDRV_3DFX_VOODOO_TMU_MEMORY(0, 4)
-	MDRV_3DFX_VOODOO_TMU_MEMORY(1, 4)
-	MDRV_3DFX_VOODOO_VBLANK(vblank_assert)
+	MCFG_3DFX_VOODOO_2_ADD("voodoo", STD_VOODOO_2_CLOCK, 2, "screen")
+	MCFG_3DFX_VOODOO_CPU("maincpu")
+	MCFG_3DFX_VOODOO_TMU_MEMORY(0, 4)
+	MCFG_3DFX_VOODOO_TMU_MEMORY(1, 4)
+	MCFG_3DFX_VOODOO_VBLANK(vblank_assert)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(57)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_SIZE(640, 480)
-	MDRV_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(57)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_SIZE(640, 480)
+	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
 
-	MDRV_VIDEO_UPDATE(vegas)
+	MCFG_VIDEO_UPDATE(vegas)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( vegas, vegascore )
-	MDRV_FRAGMENT_ADD(dcs2_audio_2104)
+	MCFG_FRAGMENT_ADD(dcs2_audio_2104)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( vegas250, vegascore )
-	MDRV_FRAGMENT_ADD(dcs2_audio_2104)
+	MCFG_FRAGMENT_ADD(dcs2_audio_2104)
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_CLOCK(SYSTEM_CLOCK*2.5)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_CLOCK(SYSTEM_CLOCK*2.5)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( vegas32m, vegascore )
-	MDRV_FRAGMENT_ADD(dcs2_audio_dsio)
+	MCFG_FRAGMENT_ADD(dcs2_audio_dsio)
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(vegas_map_32mb)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(vegas_map_32mb)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( vegasban, vegascore )
-	MDRV_FRAGMENT_ADD(dcs2_audio_2104)
+	MCFG_FRAGMENT_ADD(dcs2_audio_2104)
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(vegas_map_32mb)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(vegas_map_32mb)
 
-	MDRV_DEVICE_REMOVE("voodoo")
-	MDRV_3DFX_VOODOO_BANSHEE_ADD("voodoo", STD_VOODOO_BANSHEE_CLOCK, 16, "screen")
-	MDRV_3DFX_VOODOO_CPU("maincpu")
-	MDRV_3DFX_VOODOO_VBLANK(vblank_assert)
+	MCFG_DEVICE_REMOVE("voodoo")
+	MCFG_3DFX_VOODOO_BANSHEE_ADD("voodoo", STD_VOODOO_BANSHEE_CLOCK, 16, "screen")
+	MCFG_3DFX_VOODOO_CPU("maincpu")
+	MCFG_3DFX_VOODOO_VBLANK(vblank_assert)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( vegasv3, vegas32m )
-	MDRV_CPU_REPLACE("maincpu", RM7000LE, SYSTEM_CLOCK*2.5)
-	MDRV_CPU_CONFIG(r5000_config)
-	MDRV_CPU_PROGRAM_MAP(vegas_map_8mb)
+	MCFG_CPU_REPLACE("maincpu", RM7000LE, SYSTEM_CLOCK*2.5)
+	MCFG_CPU_CONFIG(r5000_config)
+	MCFG_CPU_PROGRAM_MAP(vegas_map_8mb)
 
-	MDRV_DEVICE_REMOVE("voodoo")
-	MDRV_3DFX_VOODOO_3_ADD("voodoo", STD_VOODOO_3_CLOCK, 16, "screen")
-	MDRV_3DFX_VOODOO_CPU("maincpu")
-	MDRV_3DFX_VOODOO_VBLANK(vblank_assert)
+	MCFG_DEVICE_REMOVE("voodoo")
+	MCFG_3DFX_VOODOO_3_ADD("voodoo", STD_VOODOO_3_CLOCK, 16, "screen")
+	MCFG_3DFX_VOODOO_CPU("maincpu")
+	MCFG_3DFX_VOODOO_VBLANK(vblank_assert)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( denver, vegascore )
-	MDRV_FRAGMENT_ADD(dcs2_audio_denver)
+	MCFG_FRAGMENT_ADD(dcs2_audio_denver)
 
-	MDRV_CPU_REPLACE("maincpu", RM7000LE, SYSTEM_CLOCK*2.5)
-	MDRV_CPU_CONFIG(r5000_config)
-	MDRV_CPU_PROGRAM_MAP(vegas_map_32mb)
+	MCFG_CPU_REPLACE("maincpu", RM7000LE, SYSTEM_CLOCK*2.5)
+	MCFG_CPU_CONFIG(r5000_config)
+	MCFG_CPU_PROGRAM_MAP(vegas_map_32mb)
 
-	MDRV_DEVICE_REMOVE("voodoo")
-	MDRV_3DFX_VOODOO_3_ADD("voodoo", STD_VOODOO_3_CLOCK, 16, "screen")
-	MDRV_3DFX_VOODOO_CPU("maincpu")
-	MDRV_3DFX_VOODOO_VBLANK(vblank_assert)
+	MCFG_DEVICE_REMOVE("voodoo")
+	MCFG_3DFX_VOODOO_3_ADD("voodoo", STD_VOODOO_3_CLOCK, 16, "screen")
+	MCFG_3DFX_VOODOO_CPU("maincpu")
+	MCFG_3DFX_VOODOO_VBLANK(vblank_assert)
 MACHINE_CONFIG_END
 
 

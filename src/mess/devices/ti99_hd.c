@@ -67,11 +67,11 @@ static int harddisk_chs_to_lba(hard_disk_file *hdfile, int cylinder, int head, i
 }
 
 /* Accessor functions */
-void ti99_mfm_harddisk_read_sector(running_device *harddisk, int cylinder, int head, int sector, UINT8 **buf, int *sector_length)
+void ti99_mfm_harddisk_read_sector(device_t *harddisk, int cylinder, int head, int sector, UINT8 **buf, int *sector_length)
 {
 	UINT32 lba;
 	mfmhd_state *hd = (mfmhd_state *)downcast<legacy_device_base *>(harddisk)->token();
-	running_device *drive = harddisk->subdevice("drive");
+	device_t *drive = harddisk->subdevice("drive");
 	hard_disk_file *file = mess_hd_get_hard_disk_file(drive);
 
 	*sector_length = 256;
@@ -103,11 +103,11 @@ void ti99_mfm_harddisk_read_sector(running_device *harddisk, int cylinder, int h
 	hd->status |= MFMHD_READY;
 }
 
-void ti99_mfm_harddisk_write_sector(running_device *harddisk, int cylinder, int head, int sector, UINT8 *buf, int sector_length)
+void ti99_mfm_harddisk_write_sector(device_t *harddisk, int cylinder, int head, int sector, UINT8 *buf, int sector_length)
 {
 	UINT32 lba;
 	mfmhd_state *hd = (mfmhd_state *)downcast<legacy_device_base *>(harddisk)->token();
-	running_device *drive = harddisk->subdevice("drive");
+	device_t *drive = harddisk->subdevice("drive");
 	hard_disk_file *file = mess_hd_get_hard_disk_file(drive);
 
 	if (file==NULL)
@@ -169,10 +169,10 @@ static int find_block(const UINT8 *buffer, int start, int stop, UINT8 byte, size
     WARNING: This function is untested! We need to create a suitable
     application program for the TI which makes use of it.
 */
-void ti99_mfm_harddisk_read_track(running_device *harddisk, int head, UINT8 **pbuffer, int *data_count)
+void ti99_mfm_harddisk_read_track(device_t *harddisk, int head, UINT8 **pbuffer, int *data_count)
 {
 	mfmhd_state *hd = (mfmhd_state *)downcast<legacy_device_base *>(harddisk)->token();
-	running_device *drive = harddisk->subdevice("drive");
+	device_t *drive = harddisk->subdevice("drive");
 
 	/* We assume an interleave of 3 for 32 sectors. */
 	int step = 3;
@@ -293,7 +293,7 @@ void ti99_mfm_harddisk_read_track(running_device *harddisk, int head, UINT8 **pb
     Writes a track to the image. We need to isolate the sector contents.
     This is basically done in the same way as in the SDF format in ti99_dsk.
 */
-void ti99_mfm_harddisk_write_track(running_device *harddisk, int head, UINT8 *track_image, int data_count)
+void ti99_mfm_harddisk_write_track(device_t *harddisk, int head, UINT8 *track_image, int data_count)
 {
 	int current_pos = 0;
 	int found;
@@ -307,7 +307,7 @@ void ti99_mfm_harddisk_write_track(running_device *harddisk, int head, UINT8 *tr
 
 	UINT32 lba;
 	mfmhd_state *hd = (mfmhd_state *)downcast<legacy_device_base *>(harddisk)->token();
-	running_device *drive = harddisk->subdevice("drive");
+	device_t *drive = harddisk->subdevice("drive");
 	hard_disk_file *file = mess_hd_get_hard_disk_file(drive);
 
 	/* printf("ti99_hd write track c=%d h=%d\n", hd->current_cylinder, head); */
@@ -405,10 +405,10 @@ void ti99_mfm_harddisk_write_track(running_device *harddisk, int head, UINT8 *tr
 	}
 }
 
-UINT8 ti99_mfm_harddisk_status(running_device *harddisk)
+UINT8 ti99_mfm_harddisk_status(device_t *harddisk)
 {
 	UINT8 status = 0;
-	running_device *drive;
+	device_t *drive;
 	mfmhd_state *hd = (mfmhd_state *)downcast<legacy_device_base *>(harddisk)->token();
 	drive = harddisk->subdevice("drive");
 	hard_disk_file *file = mess_hd_get_hard_disk_file(drive);
@@ -429,9 +429,9 @@ UINT8 ti99_mfm_harddisk_status(running_device *harddisk)
 	return status;
 }
 
-void ti99_mfm_harddisk_seek(running_device *harddisk, int direction)
+void ti99_mfm_harddisk_seek(device_t *harddisk, int direction)
 {
-	running_device *drive = harddisk->subdevice("drive");
+	device_t *drive = harddisk->subdevice("drive");
 	mfmhd_state *hd = (mfmhd_state *)downcast<legacy_device_base *>(harddisk)->token();
 	const hard_disk_info *info;
 	hard_disk_file *file = mess_hd_get_hard_disk_file(drive);
@@ -456,9 +456,9 @@ void ti99_mfm_harddisk_seek(running_device *harddisk, int direction)
 	hd->seeking = FALSE;
 }
 
-void ti99_mfm_harddisk_get_next_id(running_device *harddisk, int head, chrn_id_hd *id)
+void ti99_mfm_harddisk_get_next_id(device_t *harddisk, int head, chrn_id_hd *id)
 {
-	running_device *drive = harddisk->subdevice("drive");
+	device_t *drive = harddisk->subdevice("drive");
 	mfmhd_state *hd = (mfmhd_state *)downcast<legacy_device_base *>(harddisk)->token();
 	const hard_disk_info *info;
 	hard_disk_file *file;
@@ -497,11 +497,11 @@ static DEVICE_START( idehd )
 
 
 MACHINE_CONFIG_FRAGMENT( mfmhd )
-	MDRV_DEVICE_ADD( "drive", HARDDISK, 0 )
+	MCFG_DEVICE_ADD( "drive", HARDDISK, 0 )
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_FRAGMENT( idehd )
-	MDRV_DEVICE_ADD( "drive", IDE_HARDDISK, 0 )
+	MCFG_DEVICE_ADD( "drive", IDE_HARDDISK, 0 )
 MACHINE_CONFIG_END
 
 static const char DEVTEMPLATE_SOURCE[] = __FILE__;

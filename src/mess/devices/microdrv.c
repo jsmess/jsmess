@@ -58,7 +58,7 @@ struct _microdrive_t
     INLINE HELPERS
 ***************************************************************************/
 
-INLINE microdrive_t *get_safe_token(running_device *device)
+INLINE microdrive_t *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == MICRODRIVE);
@@ -71,7 +71,7 @@ INLINE microdrive_t *get_safe_token(running_device *device)
 
 static TIMER_CALLBACK( bit_timer_tick )
 {
-	running_device *device = (running_device *) ptr;
+	device_t *device = (device_t *) ptr;
 	microdrive_t *mdv = get_safe_token(device);
 
 	mdv->bit_offset++;

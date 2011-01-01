@@ -58,7 +58,7 @@ static int adpcm_data;
 static WRITE8_HANDLER( tecmo_bankswitch_w )
 {
 	int bankaddress;
-	UINT8 *RAM = memory_region(space->machine, "maincpu");
+	UINT8 *RAM = space->machine->region("maincpu")->base();
 
 
 	bankaddress = 0x10000 + ((data & 0xf8) << 8);
@@ -84,10 +84,10 @@ static WRITE8_DEVICE_HANDLER( tecmo_adpcm_vol_w )
 {
 	msm5205_set_volume(device,(data & 0x0f) * 100 / 15);
 }
-static void tecmo_adpcm_int(running_device *device)
+static void tecmo_adpcm_int(device_t *device)
 {
 	if (adpcm_pos >= adpcm_end ||
-				adpcm_pos >= memory_region_length(device->machine, "adpcm"))
+				adpcm_pos >= device->machine->region("adpcm")->bytes())
 		msm5205_reset_w(device,1);
 	else if (adpcm_data != -1)
 	{
@@ -96,7 +96,7 @@ static void tecmo_adpcm_int(running_device *device)
 	}
 	else
 	{
-		UINT8 *ROM = memory_region(device->machine, "adpcm");
+		UINT8 *ROM = device->machine->region("adpcm")->base();
 
 		adpcm_data = ROM[adpcm_pos++];
 		msm5205_data_w(device,adpcm_data >> 4);
@@ -638,7 +638,7 @@ GFXDECODE_END
 
 
 
-static void irqhandler(running_device *device, int linestate)
+static void irqhandler(device_t *device, int linestate)
 {
 	cputag_set_input_line(device->machine, "soundcpu", 0, linestate);
 }
@@ -665,95 +665,95 @@ static MACHINE_RESET( rygar )
 static MACHINE_CONFIG_START( rygar, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, XTAL_24MHz/4) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(rygar_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_24MHz/4) /* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(rygar_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("soundcpu", Z80, XTAL_4MHz) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(rygar_sound_map)
+	MCFG_CPU_ADD("soundcpu", Z80, XTAL_4MHz) /* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(rygar_sound_map)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0)	/* frames per second, vblank duration */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0)	/* frames per second, vblank duration */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(tecmo)
-	MDRV_PALETTE_LENGTH(1024)
+	MCFG_GFXDECODE(tecmo)
+	MCFG_PALETTE_LENGTH(1024)
 
-	MDRV_VIDEO_START(tecmo)
-	MDRV_VIDEO_UPDATE(tecmo)
+	MCFG_VIDEO_START(tecmo)
+	MCFG_VIDEO_UPDATE(tecmo)
 
-	MDRV_MACHINE_RESET( rygar )
+	MCFG_MACHINE_RESET( rygar )
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM3812, XTAL_4MHz) /* verified on pcb */
-	MDRV_SOUND_CONFIG(ym3812_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_4MHz) /* verified on pcb */
+	MCFG_SOUND_CONFIG(ym3812_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD("msm", MSM5205, XTAL_400kHz) /* verified on pcb, even if schematics shows a 384khz resonator */
-	MDRV_SOUND_CONFIG(msm5205_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("msm", MSM5205, XTAL_400kHz) /* verified on pcb, even if schematics shows a 384khz resonator */
+	MCFG_SOUND_CONFIG(msm5205_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( gemini, rygar )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_CLOCK(6000000)
-	MDRV_CPU_PROGRAM_MAP(gemini_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_CLOCK(6000000)
+	MCFG_CPU_PROGRAM_MAP(gemini_map)
 
-	MDRV_CPU_MODIFY("soundcpu")
-	MDRV_CPU_PROGRAM_MAP(tecmo_sound_map)
+	MCFG_CPU_MODIFY("soundcpu")
+	MCFG_CPU_PROGRAM_MAP(tecmo_sound_map)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( silkworm, gemini )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_CLOCK(6000000)
-	MDRV_CPU_PROGRAM_MAP(silkworm_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_CLOCK(6000000)
+	MCFG_CPU_PROGRAM_MAP(silkworm_map)
 MACHINE_CONFIG_END
 
 #ifdef UNUSED_CODE
 static MACHINE_CONFIG_START( backfirt, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, XTAL_24MHz/4)
-	MDRV_CPU_PROGRAM_MAP(rygar_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_24MHz/4)
+	MCFG_CPU_PROGRAM_MAP(rygar_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("soundcpu", Z80, XTAL_8MHz/2)
-	MDRV_CPU_PROGRAM_MAP(rygar_sound_map)
+	MCFG_CPU_ADD("soundcpu", Z80, XTAL_8MHz/2)
+	MCFG_CPU_PROGRAM_MAP(rygar_sound_map)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0)	/* frames per second, vblank duration */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0)	/* frames per second, vblank duration */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(tecmo)
-	MDRV_PALETTE_LENGTH(1024)
+	MCFG_GFXDECODE(tecmo)
+	MCFG_PALETTE_LENGTH(1024)
 
-	MDRV_VIDEO_START(tecmo)
-	MDRV_VIDEO_UPDATE(tecmo)
+	MCFG_VIDEO_START(tecmo)
+	MCFG_VIDEO_UPDATE(tecmo)
 
-	MDRV_MACHINE_RESET( rygar )
+	MCFG_MACHINE_RESET( rygar )
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM3812, XTAL_4MHz) /* verified on pcb */
-	MDRV_SOUND_CONFIG(ym3812_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_4MHz) /* verified on pcb */
+	MCFG_SOUND_CONFIG(ym3812_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	/* no MSM on this PCB */
 

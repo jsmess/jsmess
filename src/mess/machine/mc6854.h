@@ -38,23 +38,23 @@ typedef struct _mc6854_interface mc6854_interface;
 struct _mc6854_interface
 {
   /* low-level, bit-based interface */
-  void ( * out_tx  ) ( running_device *device, int state ); /* transmit bit */
+  void ( * out_tx  ) ( device_t *device, int state ); /* transmit bit */
 
   /* high-level, frame-based interface */
-  void ( * out_frame ) ( running_device *device, UINT8* data, int length );
+  void ( * out_frame ) ( device_t *device, UINT8* data, int length );
 
   /* control lines */
-  void ( * out_rts ) ( running_device *device, int state ); /* 1 = transmitting, 0 = idle */
-  void ( * out_dtr ) ( running_device *device, int state ); /* 1 = data transmit ready, 0 = busy */
+  void ( * out_rts ) ( device_t *device, int state ); /* 1 = transmitting, 0 = idle */
+  void ( * out_dtr ) ( device_t *device, int state ); /* 1 = data transmit ready, 0 = busy */
 };
 
 
-#define MDRV_MC6854_ADD(_tag, _intrf) \
-  MDRV_DEVICE_ADD(_tag, MC6854, 0)	      \
-  MDRV_DEVICE_CONFIG(_intrf)
+#define MCFG_MC6854_ADD(_tag, _intrf) \
+  MCFG_DEVICE_ADD(_tag, MC6854, 0)	      \
+  MCFG_DEVICE_CONFIG(_intrf)
 
-#define MDRV_MC6854_REMOVE(_tag)		\
-  MDRV_DEVICE_REMOVE(_tag)
+#define MCFG_MC6854_REMOVE(_tag)		\
+  MCFG_DEVICE_REMOVE(_tag)
 
 
 /* ---------- functions ------------ */
@@ -63,13 +63,13 @@ extern READ8_DEVICE_HANDLER  ( mc6854_r );
 extern WRITE8_DEVICE_HANDLER ( mc6854_w );
 
 /* low-level, bit-based interface */
-extern void mc6854_set_rx ( running_device *device, int state );
+extern void mc6854_set_rx ( device_t *device, int state );
 
 /* high-level, frame-based interface */
-extern int mc6854_send_frame( running_device *device, UINT8* data, int length ); /* ret -1 if busy */
+extern int mc6854_send_frame( device_t *device, UINT8* data, int length ); /* ret -1 if busy */
 
 /* control lines */
-extern void mc6854_set_cts ( running_device *device, int state ); /* 1 = clear-to-send, 0 = busy */
-extern void mc6854_set_dcd ( running_device *device, int state ); /* 1 = carrier, 0 = no carrier */
+extern void mc6854_set_cts ( device_t *device, int state ); /* 1 = clear-to-send, 0 = busy */
+extern void mc6854_set_dcd ( device_t *device, int state ); /* 1 = carrier, 0 = no carrier */
 
 #endif

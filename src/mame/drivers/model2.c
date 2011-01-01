@@ -132,7 +132,7 @@ static int dsp_type;
 static int copro_fifoin_rpos, copro_fifoin_wpos;
 static UINT32 copro_fifoin_data[COPRO_FIFOIN_SIZE];
 static int copro_fifoin_num = 0;
-static int copro_fifoin_pop(running_device *device, UINT32 *result)
+static int copro_fifoin_pop(device_t *device, UINT32 *result)
 {
 	UINT32 r;
 
@@ -170,7 +170,7 @@ static int copro_fifoin_pop(running_device *device, UINT32 *result)
 	return 1;
 }
 
-static void copro_fifoin_push(running_device *device, UINT32 data)
+static void copro_fifoin_push(device_t *device, UINT32 data)
 {
 	if (copro_fifoin_num == COPRO_FIFOIN_SIZE)
 	{
@@ -242,7 +242,7 @@ static UINT32 copro_fifoout_pop(address_space *space)
 	return r;
 }
 
-static void copro_fifoout_push(running_device *device, UINT32 data)
+static void copro_fifoout_push(device_t *device, UINT32 data)
 {
 	//if (copro_fifoout_wpos == copro_fifoout_rpos)
 	if (copro_fifoout_num == COPRO_FIFOOUT_SIZE)
@@ -367,11 +367,11 @@ static MACHINE_RESET(model2o)
 
 static MACHINE_RESET(model2_scsp)
 {
-	memory_set_bankptr(machine, "bank4", memory_region(machine, "scsp") + 0x200000);
-	memory_set_bankptr(machine, "bank5", memory_region(machine, "scsp") + 0x600000);
+	memory_set_bankptr(machine, "bank4", machine->region("scsp")->base() + 0x200000);
+	memory_set_bankptr(machine, "bank5", machine->region("scsp")->base() + 0x600000);
 
 	// copy the 68k vector table into RAM
-	memcpy(model2_soundram, memory_region(machine, "audiocpu") + 0x80000, 16);
+	memcpy(model2_soundram, machine->region("audiocpu")->base() + 0x80000, 16);
 	machine->device("audiocpu")->reset();
 }
 
@@ -1171,7 +1171,7 @@ static int model2_maxxstate = 0;
 
 static READ32_HANDLER( maxx_r )
 {
-	UINT32 *ROM = (UINT32 *)memory_region(space->machine, "maincpu");
+	UINT32 *ROM = (UINT32 *)space->machine->region("maincpu")->base();
 
 	if (offset <= 0x1f/4)
 	{
@@ -1863,9 +1863,9 @@ ADDRESS_MAP_END
 static WRITE16_HANDLER( model2snd_ctrl )
 {
 	// handle sample banking
-	if (memory_region_length(space->machine, "scsp") > 0x800000)
+	if (space->machine->region("scsp")->bytes() > 0x800000)
 	{
-		UINT8 *snd = memory_region(space->machine, "scsp");
+		UINT8 *snd = space->machine->region("scsp")->base();
 		if (data & 0x20)
 		{
 			memory_set_bankptr(space->machine, "bank4", snd + 0x200000);
@@ -1891,7 +1891,7 @@ ADDRESS_MAP_END
 
 static int scsp_last_line = 0;
 
-static void scsp_irq(running_device *device, int irq)
+static void scsp_irq(device_t *device, int irq)
 {
 	if (irq > 0)
 	{
@@ -1983,108 +1983,108 @@ static const mb86233_cpu_core tgp_config =
 
 /* original Model 2 */
 static MACHINE_CONFIG_START( model2o, driver_device )
-	MDRV_CPU_ADD("maincpu", I960, 25000000)
-	MDRV_CPU_PROGRAM_MAP(model2o_mem)
-	MDRV_CPU_VBLANK_INT_HACK(model2_interrupt,2)
+	MCFG_CPU_ADD("maincpu", I960, 25000000)
+	MCFG_CPU_PROGRAM_MAP(model2o_mem)
+	MCFG_CPU_VBLANK_INT_HACK(model2_interrupt,2)
 
-	MDRV_CPU_ADD("audiocpu", M68000, 10000000)
-	MDRV_CPU_PROGRAM_MAP(model1_snd)
+	MCFG_CPU_ADD("audiocpu", M68000, 10000000)
+	MCFG_CPU_PROGRAM_MAP(model1_snd)
 
-	MDRV_CPU_ADD("tgp", MB86233, 16000000)
-	MDRV_CPU_CONFIG(tgp_config)
-	MDRV_CPU_PROGRAM_MAP(copro_tgp_map)
+	MCFG_CPU_ADD("tgp", MB86233, 16000000)
+	MCFG_CPU_CONFIG(tgp_config)
+	MCFG_CPU_PROGRAM_MAP(copro_tgp_map)
 
-	MDRV_MACHINE_RESET(model2o)
+	MCFG_MACHINE_RESET(model2o)
 
-	MDRV_EEPROM_93C46_ADD("eeprom")
-	MDRV_NVRAM_ADD_1FILL("backup1")
-	MDRV_NVRAM_ADD_1FILL("backup2")
+	MCFG_EEPROM_93C46_ADD("eeprom")
+	MCFG_NVRAM_ADD_1FILL("backup1")
+	MCFG_NVRAM_ADD_1FILL("backup2")
 
-	MDRV_TIMER_ADD("timer0", model2_timer_cb)
-	MDRV_TIMER_PTR((FPTR)0)
-	MDRV_TIMER_ADD("timer1", model2_timer_cb)
-	MDRV_TIMER_PTR((FPTR)1)
-	MDRV_TIMER_ADD("timer2", model2_timer_cb)
-	MDRV_TIMER_PTR((FPTR)2)
-	MDRV_TIMER_ADD("timer3", model2_timer_cb)
-	MDRV_TIMER_PTR((FPTR)3)
+	MCFG_TIMER_ADD("timer0", model2_timer_cb)
+	MCFG_TIMER_PTR((FPTR)0)
+	MCFG_TIMER_ADD("timer1", model2_timer_cb)
+	MCFG_TIMER_PTR((FPTR)1)
+	MCFG_TIMER_ADD("timer2", model2_timer_cb)
+	MCFG_TIMER_PTR((FPTR)2)
+	MCFG_TIMER_ADD("timer3", model2_timer_cb)
+	MCFG_TIMER_PTR((FPTR)3)
 
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK )
+	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK )
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_SIZE(62*8, 48*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 62*8-1, 0*8, 48*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_SIZE(62*8, 48*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 62*8-1, 0*8, 48*8-1)
 
-	MDRV_PALETTE_LENGTH(8192)
+	MCFG_PALETTE_LENGTH(8192)
 
-	MDRV_VIDEO_START(model2)
-	MDRV_VIDEO_UPDATE(model2)
+	MCFG_VIDEO_START(model2)
+	MCFG_VIDEO_UPDATE(model2)
 
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ymsnd", YM3438, 8000000)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 0.60)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 0.60)
+	MCFG_SOUND_ADD("ymsnd", YM3438, 8000000)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.60)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.60)
 
-	MDRV_SOUND_ADD("sega1", MULTIPCM, 8000000)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("sega1", MULTIPCM, 8000000)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MDRV_SOUND_ADD("sega2", MULTIPCM, 8000000)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("sega2", MULTIPCM, 8000000)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 /* 2A-CRX */
 static MACHINE_CONFIG_START( model2a, driver_device )
-	MDRV_CPU_ADD("maincpu", I960, 25000000)
-	MDRV_CPU_PROGRAM_MAP(model2a_crx_mem)
-	MDRV_CPU_VBLANK_INT_HACK(model2_interrupt,2)
+	MCFG_CPU_ADD("maincpu", I960, 25000000)
+	MCFG_CPU_PROGRAM_MAP(model2a_crx_mem)
+	MCFG_CPU_VBLANK_INT_HACK(model2_interrupt,2)
 
-	MDRV_CPU_ADD("audiocpu", M68000, 12000000)
-	MDRV_CPU_PROGRAM_MAP(model2_snd)
+	MCFG_CPU_ADD("audiocpu", M68000, 12000000)
+	MCFG_CPU_PROGRAM_MAP(model2_snd)
 
-	MDRV_CPU_ADD("tgp", MB86233, 16000000)
-	MDRV_CPU_CONFIG(tgp_config)
-	MDRV_CPU_PROGRAM_MAP(copro_tgp_map)
+	MCFG_CPU_ADD("tgp", MB86233, 16000000)
+	MCFG_CPU_CONFIG(tgp_config)
+	MCFG_CPU_PROGRAM_MAP(copro_tgp_map)
 
-	MDRV_MACHINE_RESET(model2)
+	MCFG_MACHINE_RESET(model2)
 
-	MDRV_EEPROM_93C46_ADD("eeprom")
-	MDRV_NVRAM_ADD_1FILL("backup1")
+	MCFG_EEPROM_93C46_ADD("eeprom")
+	MCFG_NVRAM_ADD_1FILL("backup1")
 
-	MDRV_TIMER_ADD("timer0", model2_timer_cb)
-	MDRV_TIMER_PTR((FPTR)0)
-	MDRV_TIMER_ADD("timer1", model2_timer_cb)
-	MDRV_TIMER_PTR((FPTR)1)
-	MDRV_TIMER_ADD("timer2", model2_timer_cb)
-	MDRV_TIMER_PTR((FPTR)2)
-	MDRV_TIMER_ADD("timer3", model2_timer_cb)
-	MDRV_TIMER_PTR((FPTR)3)
+	MCFG_TIMER_ADD("timer0", model2_timer_cb)
+	MCFG_TIMER_PTR((FPTR)0)
+	MCFG_TIMER_ADD("timer1", model2_timer_cb)
+	MCFG_TIMER_PTR((FPTR)1)
+	MCFG_TIMER_ADD("timer2", model2_timer_cb)
+	MCFG_TIMER_PTR((FPTR)2)
+	MCFG_TIMER_ADD("timer3", model2_timer_cb)
+	MCFG_TIMER_PTR((FPTR)3)
 
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK )
+	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK )
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_SIZE(62*8, 48*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 62*8-1, 0*8, 48*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_SIZE(62*8, 48*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 62*8-1, 0*8, 48*8-1)
 
-	MDRV_PALETTE_LENGTH(8192)
+	MCFG_PALETTE_LENGTH(8192)
 
-	MDRV_VIDEO_START(model2)
-	MDRV_VIDEO_UPDATE(model2)
+	MCFG_VIDEO_START(model2)
+	MCFG_VIDEO_UPDATE(model2)
 
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("scsp", SCSP, 0)
-	MDRV_SOUND_CONFIG(scsp_config)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 2.0)
-	MDRV_SOUND_ROUTE(0, "rspeaker", 2.0)
+	MCFG_SOUND_ADD("scsp", SCSP, 0)
+	MCFG_SOUND_CONFIG(scsp_config)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
+	MCFG_SOUND_ROUTE(0, "rspeaker", 2.0)
 MACHINE_CONFIG_END
 
 static READ8_HANDLER( driveio_port_r )
@@ -2122,10 +2122,10 @@ ADDRESS_MAP_END
 
 static MACHINE_CONFIG_DERIVED( srallyc, model2a )
 
-	MDRV_CPU_ADD("drivecpu", Z80, 16000000/4) //???
-	MDRV_CPU_PROGRAM_MAP(drive_map)
-	MDRV_CPU_IO_MAP(drive_io_map)
-//  MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_ADD("drivecpu", Z80, 16000000/4) //???
+	MCFG_CPU_PROGRAM_MAP(drive_map)
+	MCFG_CPU_IO_MAP(drive_io_map)
+//  MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 MACHINE_CONFIG_END
 
 static const sharc_config sharc_cfg =
@@ -2135,102 +2135,102 @@ static const sharc_config sharc_cfg =
 
 /* 2B-CRX */
 static MACHINE_CONFIG_START( model2b, driver_device )
-	MDRV_CPU_ADD("maincpu", I960, 25000000)
-	MDRV_CPU_PROGRAM_MAP(model2b_crx_mem)
-	MDRV_CPU_VBLANK_INT_HACK(model2_interrupt,2)
+	MCFG_CPU_ADD("maincpu", I960, 25000000)
+	MCFG_CPU_PROGRAM_MAP(model2b_crx_mem)
+	MCFG_CPU_VBLANK_INT_HACK(model2_interrupt,2)
 
-	MDRV_CPU_ADD("audiocpu", M68000, 12000000)
-	MDRV_CPU_PROGRAM_MAP(model2_snd)
+	MCFG_CPU_ADD("audiocpu", M68000, 12000000)
+	MCFG_CPU_PROGRAM_MAP(model2_snd)
 
-	MDRV_CPU_ADD("dsp", ADSP21062, 40000000)
-	MDRV_CPU_CONFIG(sharc_cfg)
-	MDRV_CPU_DATA_MAP(copro_sharc_map)
+	MCFG_CPU_ADD("dsp", ADSP21062, 40000000)
+	MCFG_CPU_CONFIG(sharc_cfg)
+	MCFG_CPU_DATA_MAP(copro_sharc_map)
 
-	//MDRV_CPU_ADD("dsp2", ADSP21062, 40000000)
-	//MDRV_CPU_CONFIG(sharc_cfg)
-	//MDRV_CPU_DATA_MAP(geo_sharc_map)
+	//MCFG_CPU_ADD("dsp2", ADSP21062, 40000000)
+	//MCFG_CPU_CONFIG(sharc_cfg)
+	//MCFG_CPU_DATA_MAP(geo_sharc_map)
 
-	MDRV_QUANTUM_TIME(HZ(18000))
+	MCFG_QUANTUM_TIME(HZ(18000))
 
-	MDRV_MACHINE_RESET(model2b)
+	MCFG_MACHINE_RESET(model2b)
 
-	MDRV_EEPROM_93C46_ADD("eeprom")
-	MDRV_NVRAM_ADD_1FILL("backup1")
+	MCFG_EEPROM_93C46_ADD("eeprom")
+	MCFG_NVRAM_ADD_1FILL("backup1")
 
-	MDRV_TIMER_ADD("timer0", model2_timer_cb)
-	MDRV_TIMER_PTR((FPTR)0)
-	MDRV_TIMER_ADD("timer1", model2_timer_cb)
-	MDRV_TIMER_PTR((FPTR)1)
-	MDRV_TIMER_ADD("timer2", model2_timer_cb)
-	MDRV_TIMER_PTR((FPTR)2)
-	MDRV_TIMER_ADD("timer3", model2_timer_cb)
-	MDRV_TIMER_PTR((FPTR)3)
+	MCFG_TIMER_ADD("timer0", model2_timer_cb)
+	MCFG_TIMER_PTR((FPTR)0)
+	MCFG_TIMER_ADD("timer1", model2_timer_cb)
+	MCFG_TIMER_PTR((FPTR)1)
+	MCFG_TIMER_ADD("timer2", model2_timer_cb)
+	MCFG_TIMER_PTR((FPTR)2)
+	MCFG_TIMER_ADD("timer3", model2_timer_cb)
+	MCFG_TIMER_PTR((FPTR)3)
 
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK )
+	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK )
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_SIZE(62*8, 48*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 62*8-1, 0*8, 48*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_SIZE(62*8, 48*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 62*8-1, 0*8, 48*8-1)
 
-	MDRV_PALETTE_LENGTH(8192)
+	MCFG_PALETTE_LENGTH(8192)
 
-	MDRV_VIDEO_START(model2)
-	MDRV_VIDEO_UPDATE(model2)
+	MCFG_VIDEO_START(model2)
+	MCFG_VIDEO_UPDATE(model2)
 
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("scsp", SCSP, 0)
-	MDRV_SOUND_CONFIG(scsp_config)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 2.0)
-	MDRV_SOUND_ROUTE(0, "rspeaker", 2.0)
+	MCFG_SOUND_ADD("scsp", SCSP, 0)
+	MCFG_SOUND_CONFIG(scsp_config)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
+	MCFG_SOUND_ROUTE(0, "rspeaker", 2.0)
 MACHINE_CONFIG_END
 
 /* 2C-CRX */
 static MACHINE_CONFIG_START( model2c, driver_device )
-	MDRV_CPU_ADD("maincpu", I960, 25000000)
-	MDRV_CPU_PROGRAM_MAP(model2c_crx_mem)
-	MDRV_CPU_VBLANK_INT_HACK(model2c_interrupt,3)
+	MCFG_CPU_ADD("maincpu", I960, 25000000)
+	MCFG_CPU_PROGRAM_MAP(model2c_crx_mem)
+	MCFG_CPU_VBLANK_INT_HACK(model2c_interrupt,3)
 
-	MDRV_CPU_ADD("audiocpu", M68000, 12000000)
-	MDRV_CPU_PROGRAM_MAP(model2_snd)
+	MCFG_CPU_ADD("audiocpu", M68000, 12000000)
+	MCFG_CPU_PROGRAM_MAP(model2_snd)
 
-	MDRV_MACHINE_RESET(model2c)
+	MCFG_MACHINE_RESET(model2c)
 
-	MDRV_EEPROM_93C46_ADD("eeprom")
-	MDRV_NVRAM_ADD_1FILL("backup1")
+	MCFG_EEPROM_93C46_ADD("eeprom")
+	MCFG_NVRAM_ADD_1FILL("backup1")
 
-	MDRV_TIMER_ADD("timer0", model2_timer_cb)
-	MDRV_TIMER_PTR((FPTR)0)
-	MDRV_TIMER_ADD("timer1", model2_timer_cb)
-	MDRV_TIMER_PTR((FPTR)1)
-	MDRV_TIMER_ADD("timer2", model2_timer_cb)
-	MDRV_TIMER_PTR((FPTR)2)
-	MDRV_TIMER_ADD("timer3", model2_timer_cb)
-	MDRV_TIMER_PTR((FPTR)3)
+	MCFG_TIMER_ADD("timer0", model2_timer_cb)
+	MCFG_TIMER_PTR((FPTR)0)
+	MCFG_TIMER_ADD("timer1", model2_timer_cb)
+	MCFG_TIMER_PTR((FPTR)1)
+	MCFG_TIMER_ADD("timer2", model2_timer_cb)
+	MCFG_TIMER_PTR((FPTR)2)
+	MCFG_TIMER_ADD("timer3", model2_timer_cb)
+	MCFG_TIMER_PTR((FPTR)3)
 
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK )
+	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK )
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_SIZE(62*8, 48*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 62*8-1, 0*8, 48*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_SIZE(62*8, 48*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 62*8-1, 0*8, 48*8-1)
 
-	MDRV_PALETTE_LENGTH(8192)
+	MCFG_PALETTE_LENGTH(8192)
 
-	MDRV_VIDEO_START(model2)
-	MDRV_VIDEO_UPDATE(model2)
+	MCFG_VIDEO_START(model2)
+	MCFG_VIDEO_UPDATE(model2)
 
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("scsp", SCSP, 0)
-	MDRV_SOUND_CONFIG(scsp_config)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 2.0)
-	MDRV_SOUND_ROUTE(0, "rspeaker", 2.0)
+	MCFG_SOUND_ADD("scsp", SCSP, 0)
+	MCFG_SOUND_CONFIG(scsp_config)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
+	MCFG_SOUND_ROUTE(0, "rspeaker", 2.0)
 MACHINE_CONFIG_END
 
 /* ROM definitions */
@@ -4825,7 +4825,7 @@ static DRIVER_INIT( genprot )
 
 static DRIVER_INIT( pltkids )
 {
-	UINT32 *ROM = (UINT32 *)memory_region(machine, "maincpu");
+	UINT32 *ROM = (UINT32 *)machine->region("maincpu")->base();
 
 	memory_install_readwrite32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x01d80000, 0x01dfffff, 0, 0, model2_prot_r, model2_prot_w);
 	protstate = protpos = 0;
@@ -4836,7 +4836,7 @@ static DRIVER_INIT( pltkids )
 
 static DRIVER_INIT( zerogun )
 {
-	UINT32 *ROM = (UINT32 *)memory_region(machine, "maincpu");
+	UINT32 *ROM = (UINT32 *)machine->region("maincpu")->base();
 
 	memory_install_readwrite32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x01d80000, 0x01dfffff, 0, 0, model2_prot_r, model2_prot_w);
 	protstate = protpos = 0;
@@ -4879,7 +4879,7 @@ static WRITE32_HANDLER( jaleco_network_w )
 
 static DRIVER_INIT( sgt24h )
 {
-	UINT32 *ROM = (UINT32 *)memory_region(machine, "maincpu");
+	UINT32 *ROM = (UINT32 *)machine->region("maincpu")->base();
 
 	memory_install_readwrite32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x01d80000, 0x01dfffff, 0, 0, model2_prot_r, model2_prot_w);
 	memory_install_readwrite32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x01a10000, 0x01a1ffff, 0, 0, jaleco_network_r, jaleco_network_w);
@@ -4900,7 +4900,7 @@ static DRIVER_INIT( overrev )
 
 static DRIVER_INIT( doa )
 {
-	UINT32 *ROM = (UINT32 *)memory_region(machine, "maincpu");
+	UINT32 *ROM = (UINT32 *)machine->region("maincpu")->base();
 
 	memory_install_readwrite32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x01d80000, 0x01dfffff, 0, 0, model2_prot_r, model2_prot_w);
 	protstate = protpos = 0;

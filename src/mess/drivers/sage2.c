@@ -44,7 +44,7 @@ INPUT_PORTS_END
 static MACHINE_RESET(sage2)
 {
 	sage2_state *state = machine->driver_data<sage2_state>();
-	UINT8* user1 = memory_region(machine, "user1");
+	UINT8* user1 = machine->region("user1")->base();
 
 	memcpy((UINT8*)state->ram,user1,0x2000);
 
@@ -62,17 +62,17 @@ static GENERIC_TERMINAL_INTERFACE( sage2_terminal_intf )
 
 static MACHINE_CONFIG_START( sage2, sage2_state )
     /* basic machine hardware */
-    MDRV_CPU_ADD("maincpu",M68000, XTAL_8MHz)
-    MDRV_CPU_PROGRAM_MAP(sage2_mem)
+    MCFG_CPU_ADD("maincpu",M68000, XTAL_8MHz)
+    MCFG_CPU_PROGRAM_MAP(sage2_mem)
 
-    MDRV_MACHINE_RESET(sage2)
+    MCFG_MACHINE_RESET(sage2)
 
     /* video hardware */
-    MDRV_FRAGMENT_ADD( generic_terminal )
-	MDRV_GENERIC_TERMINAL_ADD(TERMINAL_TAG,sage2_terminal_intf)
+    MCFG_FRAGMENT_ADD( generic_terminal )
+	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG,sage2_terminal_intf)
 
 	/* uart */
-	MDRV_MSM8251_ADD("uart", default_msm8251_interface)
+	MCFG_MSM8251_ADD("uart", default_msm8251_interface)
 MACHINE_CONFIG_END
 
 /* ROM definition */

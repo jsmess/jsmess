@@ -453,7 +453,7 @@ located at I/O port 0x3CE, and a data register located at I/O port 0x3CF.
 
 static struct
 {
-	running_device *crtc_ega;
+	device_t *crtc_ega;
 	crtc_ega_update_row_func	update_row;
 
 	/* Video memory and related variables */
@@ -546,17 +546,17 @@ static const crtc_ega_interface crtc_ega_ega_intf =
 
 
 MACHINE_CONFIG_FRAGMENT( pcvideo_ega )
-	MDRV_SCREEN_ADD(EGA_SCREEN_NAME, RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_RAW_PARAMS(16257000,912,0,640,262,0,200)
-	MDRV_PALETTE_LENGTH( 64 )
+	MCFG_SCREEN_ADD(EGA_SCREEN_NAME, RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_RAW_PARAMS(16257000,912,0,640,262,0,200)
+	MCFG_PALETTE_LENGTH( 64 )
 
-	MDRV_PALETTE_INIT(pc_ega)
+	MCFG_PALETTE_INIT(pc_ega)
 
-	MDRV_CRTC_EGA_ADD(EGA_CRTC_NAME, 16257000/8, crtc_ega_ega_intf)
+	MCFG_CRTC_EGA_ADD(EGA_CRTC_NAME, 16257000/8, crtc_ega_ega_intf)
 
-	MDRV_VIDEO_START( pc_ega )
-	MDRV_VIDEO_UPDATE( pc_ega )
+	MCFG_VIDEO_START( pc_ega )
+	MCFG_VIDEO_UPDATE( pc_ega )
 MACHINE_CONFIG_END
 
 
@@ -662,7 +662,7 @@ static VIDEO_START( pc_ega )
 	memset( &ega, 0, sizeof( ega ) );
 
 	/* Install 256KB Video ram on our EGA card */
-	ega.videoram = memory_region( machine, "gfx2" );
+	ega.videoram = machine->region( "gfx2" )->base();
 
 	memset( ega.videoram + 256 * 1024, 0xFF, 64 * 1024 );
 
@@ -775,7 +775,7 @@ static CRTC_EGA_UPDATE_ROW( pc_ega_text )
 }
 
 
-static void pc_ega_change_mode( running_device *device )
+static void pc_ega_change_mode( device_t *device )
 {
 	int clock, pixels;
 

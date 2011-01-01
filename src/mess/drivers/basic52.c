@@ -71,32 +71,32 @@ static I8255A_INTERFACE( ppi8255_intf )
 
 static MACHINE_CONFIG_START( basic31, basic52_state )
     /* basic machine hardware */
-    MDRV_CPU_ADD("maincpu", I8031, XTAL_11_0592MHz)
-    MDRV_CPU_PROGRAM_MAP(basic52_mem)
-    MDRV_CPU_IO_MAP(basic52_io)
+    MCFG_CPU_ADD("maincpu", I8031, XTAL_11_0592MHz)
+    MCFG_CPU_PROGRAM_MAP(basic52_mem)
+    MCFG_CPU_IO_MAP(basic52_io)
 
-    MDRV_MACHINE_RESET(basic52)
+    MCFG_MACHINE_RESET(basic52)
 
     /* video hardware */
-    MDRV_FRAGMENT_ADD( generic_terminal )
-	MDRV_GENERIC_TERMINAL_ADD(TERMINAL_TAG,basic52_terminal_intf)
+    MCFG_FRAGMENT_ADD( generic_terminal )
+	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG,basic52_terminal_intf)
 
-	MDRV_I8255A_ADD("ppi8255", ppi8255_intf )
+	MCFG_I8255A_ADD("ppi8255", ppi8255_intf )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( basic52, basic52_state )
     /* basic machine hardware */
-    MDRV_CPU_ADD("maincpu", I8052, XTAL_11_0592MHz)
-    MDRV_CPU_PROGRAM_MAP(basic52_mem)
-    MDRV_CPU_IO_MAP(basic52_io)
+    MCFG_CPU_ADD("maincpu", I8052, XTAL_11_0592MHz)
+    MCFG_CPU_PROGRAM_MAP(basic52_mem)
+    MCFG_CPU_IO_MAP(basic52_io)
 
-    MDRV_MACHINE_RESET(basic52)
+    MCFG_MACHINE_RESET(basic52)
 
     /* video hardware */
-    MDRV_FRAGMENT_ADD( generic_terminal )
-	MDRV_GENERIC_TERMINAL_ADD(TERMINAL_TAG,basic52_terminal_intf)
+    MCFG_FRAGMENT_ADD( generic_terminal )
+	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG,basic52_terminal_intf)
 
-	MDRV_I8255A_ADD("ppi8255", ppi8255_intf )
+	MCFG_I8255A_ADD("ppi8255", ppi8255_intf )
 MACHINE_CONFIG_END
 
 /* ROM definition */

@@ -81,7 +81,7 @@ static WRITE8_HANDLER( trvmadns_banking_w )
 	}
 	else if((data & 0xf0) == 0x80 || (data & 0xf0) == 0x90)
 	{
-		rom = memory_region(space->machine, "user2");
+		rom = space->machine->region("user2")->base();
 
 		switch(data & 0xf)
 		{
@@ -109,7 +109,7 @@ static WRITE8_HANDLER( trvmadns_banking_w )
 				//logerror("port80 = %02X\n",data);
 			}
 
-		rom = memory_region(space->machine, "user1");
+		rom = space->machine->region("user1")->base();
 
 		/*
         7
@@ -323,32 +323,32 @@ static MACHINE_RESET( trvmadns )
 }
 
 static MACHINE_CONFIG_START( trvmadns, driver_device )
-	MDRV_CPU_ADD("maincpu", Z80,10000000/2) // ?
-	MDRV_CPU_PROGRAM_MAP(cpu_map)
-	MDRV_CPU_IO_MAP(io_map)
-	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
+	MCFG_CPU_ADD("maincpu", Z80,10000000/2) // ?
+	MCFG_CPU_PROGRAM_MAP(cpu_map)
+	MCFG_CPU_IO_MAP(io_map)
+	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
-	MDRV_MACHINE_RESET(trvmadns)
+	MCFG_MACHINE_RESET(trvmadns)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(256, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 31*8-1, 0*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(256, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 31*8-1, 0*8, 30*8-1)
 
-	MDRV_GFXDECODE(trvmadns)
-	MDRV_PALETTE_LENGTH(16)
+	MCFG_GFXDECODE(trvmadns)
+	MCFG_PALETTE_LENGTH(16)
 
-	MDRV_VIDEO_START(trvmadns)
-	MDRV_VIDEO_UPDATE(trvmadns)
+	MCFG_VIDEO_START(trvmadns)
+	MCFG_VIDEO_UPDATE(trvmadns)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("aysnd", AY8910, 10000000/2/4) //?
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("aysnd", AY8910, 10000000/2/4) //?
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 

@@ -545,91 +545,91 @@ static const cassette_config pmd85_cassette_config =
 /* machine definition */
 static MACHINE_CONFIG_START( pmd85, pmd85_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", I8080, 2000000)		/* 2.048MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(pmd85_mem)
-	MDRV_CPU_IO_MAP(pmd85_io_map)
-	MDRV_QUANTUM_TIME(HZ(60))
+	MCFG_CPU_ADD("maincpu", I8080, 2000000)		/* 2.048MHz ??? */
+	MCFG_CPU_PROGRAM_MAP(pmd85_mem)
+	MCFG_CPU_IO_MAP(pmd85_io_map)
+	MCFG_QUANTUM_TIME(HZ(60))
 
-	MDRV_MACHINE_RESET( pmd85 )
+	MCFG_MACHINE_RESET( pmd85 )
 
-	MDRV_PIT8253_ADD( "pit8253", pmd85_pit8253_interface )
+	MCFG_PIT8253_ADD( "pit8253", pmd85_pit8253_interface )
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(50)
-	MDRV_SCREEN_VBLANK_TIME(0)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(288, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 288-1, 0, 256-1)
-	MDRV_PALETTE_LENGTH(sizeof (pmd85_palette) / 3)
-	MDRV_PALETTE_INIT( pmd85 )
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(0)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(288, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 288-1, 0, 256-1)
+	MCFG_PALETTE_LENGTH(sizeof (pmd85_palette) / 3)
+	MCFG_PALETTE_INIT( pmd85 )
 
-	MDRV_VIDEO_START( pmd85 )
-	MDRV_VIDEO_UPDATE( pmd85 )
+	MCFG_VIDEO_START( pmd85 )
+	MCFG_VIDEO_UPDATE( pmd85 )
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_WAVE_ADD("wave", "cassette")
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_WAVE_ADD("wave", "cassette")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* cassette */
-	MDRV_CASSETTE_ADD( "cassette", pmd85_cassette_config )
+	MCFG_CASSETTE_ADD( "cassette", pmd85_cassette_config )
 
 	/* uart */
-	MDRV_MSM8251_ADD("uart", default_msm8251_interface)
+	MCFG_MSM8251_ADD("uart", default_msm8251_interface)
 
 	/* internal ram */
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("64K")
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("64K")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( pmd851, pmd85 )
 
-	MDRV_I8255A_ADD( "ppi8255_0", pmd85_ppi8255_interface[0] )
+	MCFG_I8255A_ADD( "ppi8255_0", pmd85_ppi8255_interface[0] )
 
-	MDRV_I8255A_ADD( "ppi8255_1", pmd85_ppi8255_interface[1] )
+	MCFG_I8255A_ADD( "ppi8255_1", pmd85_ppi8255_interface[1] )
 
-	MDRV_I8255A_ADD( "ppi8255_2", pmd85_ppi8255_interface[2] )
+	MCFG_I8255A_ADD( "ppi8255_2", pmd85_ppi8255_interface[2] )
 
-	MDRV_I8255A_ADD( "ppi8255_3", pmd85_ppi8255_interface[3] )
+	MCFG_I8255A_ADD( "ppi8255_3", pmd85_ppi8255_interface[3] )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( pmd852a, pmd851 )
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(pmd852a_mem)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(pmd852a_mem)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( pmd853, pmd851 )
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(pmd853_mem)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(pmd853_mem)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( alfa, pmd85 )
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(alfa_mem)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(alfa_mem)
 
-	MDRV_I8255A_ADD( "ppi8255_0", alfa_ppi8255_interface[0] )
+	MCFG_I8255A_ADD( "ppi8255_0", alfa_ppi8255_interface[0] )
 
-	MDRV_I8255A_ADD( "ppi8255_1", alfa_ppi8255_interface[1] )
+	MCFG_I8255A_ADD( "ppi8255_1", alfa_ppi8255_interface[1] )
 
-	MDRV_I8255A_ADD( "ppi8255_2", alfa_ppi8255_interface[1] )
+	MCFG_I8255A_ADD( "ppi8255_2", alfa_ppi8255_interface[1] )
 
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mato, pmd85 )
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(mato_mem)
-	MDRV_CPU_IO_MAP(mato_io_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(mato_mem)
+	MCFG_CPU_IO_MAP(mato_io_map)
 
-	MDRV_I8255A_ADD( "ppi8255_0", mato_ppi8255_interface )
+	MCFG_I8255A_ADD( "ppi8255_0", mato_ppi8255_interface )
 
 	/* no uart */
-	MDRV_DEVICE_REMOVE( "uart" )
+	MCFG_DEVICE_REMOVE( "uart" )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( c2717, pmd851 )
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(c2717_mem)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(c2717_mem)
 MACHINE_CONFIG_END
 
 

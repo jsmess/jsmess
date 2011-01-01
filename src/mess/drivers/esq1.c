@@ -67,7 +67,7 @@ public:
 };
 
 
-static void esq1_doc_irq(running_device *device, int state)
+static void esq1_doc_irq(device_t *device, int state)
 {
 }
 
@@ -94,10 +94,10 @@ static VIDEO_UPDATE( esq1 )
 
 static MACHINE_RESET( esq1 )
 {
-	es5503_set_base(machine->device("es5503"), memory_region(machine, "ensoniq"));
+	es5503_set_base(machine->device("es5503"), machine->region("ensoniq")->base());
 
 	// set default OSROM banking
-	memory_set_bankptr(machine, "osbank", memory_region(machine, "osrom") );
+	memory_set_bankptr(machine, "osbank", machine->region("osrom")->base() );
 }
 
 static ADDRESS_MAP_START( esq1_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -124,26 +124,26 @@ ADDRESS_MAP_END
 // OP5 = metronome hi
 // OP6/7 = tape out
 
-static void duart_irq_handler(running_device *device, UINT8 vector)
+static void duart_irq_handler(device_t *device, UINT8 vector)
 {
 	cputag_set_input_line(device->machine, "maincpu", 0, HOLD_LINE);
 };
 
-static UINT8 duart_input(running_device *device)
+static UINT8 duart_input(device_t *device)
 {
 	return 0;
 }
 
-static void duart_output(running_device *device, UINT8 data)
+static void duart_output(device_t *device, UINT8 data)
 {
 	int bank = ((data >> 1) & 0x7);
 
 //  printf("DP [%02x]: %d mlo %d mhi %d tape %d\n", data, data&1, (data>>4)&1, (data>>5)&1, (data>>6)&3);
 //  printf("[%02x] bank %d => offset %x (PC=%x)\n", data, bank, bank * 0x1000, cpu_get_pc(device->machine->firstcpu));
-	memory_set_bankptr(device->machine, "osbank", memory_region(device->machine, "osrom") + (bank * 0x1000) );
+	memory_set_bankptr(device->machine, "osbank", device->machine->region("osrom")->base() + (bank * 0x1000) );
 }
 
-static void duart_tx(running_device *device, int channel, UINT8 data)
+static void duart_tx(device_t *device, int channel, UINT8 data)
 {
 	if ((data != 0) && (channel == 1)) printf("[%d]: %02x %c\n", channel, data, data);
 }
@@ -160,26 +160,26 @@ static const duart68681_config duart_config =
 };
 
 static MACHINE_CONFIG_START( esq1, esq1_state )
-	MDRV_CPU_ADD("maincpu", M6809E, 4000000)	// how fast is it?
-	MDRV_CPU_PROGRAM_MAP(esq1_map)
+	MCFG_CPU_ADD("maincpu", M6809E, 4000000)	// how fast is it?
+	MCFG_CPU_PROGRAM_MAP(esq1_map)
 
-	MDRV_MACHINE_RESET( esq1 )
+	MCFG_MACHINE_RESET( esq1 )
 
-	MDRV_DUART68681_ADD("duart", 40000000, duart_config)
+	MCFG_DUART68681_ADD("duart", 40000000, duart_config)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_VIDEO_START(esq1)
-	MDRV_VIDEO_UPDATE(esq1)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_SIZE(320, 240)
-	MDRV_SCREEN_VISIBLE_AREA(0, 319, 1, 239)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_VIDEO_START(esq1)
+	MCFG_VIDEO_UPDATE(esq1)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_SIZE(320, 240)
+	MCFG_SCREEN_VISIBLE_AREA(0, 319, 1, 239)
 
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MDRV_SOUND_ADD("es5503", ES5503, 7000000)
-	MDRV_SOUND_CONFIG(esq1_es5503_interface)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SOUND_ADD("es5503", ES5503, 7000000)
+	MCFG_SOUND_CONFIG(esq1_es5503_interface)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( esq1 )

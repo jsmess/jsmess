@@ -253,7 +253,7 @@ static void arm_check_irq_state(ARM_REGS* cpustate);
 
 /***************************************************************************/
 
-INLINE ARM_REGS *get_safe_token(running_device *device)
+INLINE ARM_REGS *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == ARM || device->type() == ARM_BE);
@@ -320,6 +320,17 @@ INLINE void SetRegister( ARM_REGS* cpustate, int rIndex, UINT32 value )
 {
 	cpustate->sArmRegister[sRegisterTable[MODE][rIndex]] = value;
 }
+
+INLINE UINT32 GetModeRegister( ARM_REGS* cpustate, int mode, int rIndex )
+{
+	return cpustate->sArmRegister[sRegisterTable[mode][rIndex]];
+}
+
+INLINE void SetModeRegister( ARM_REGS* cpustate, int mode, int rIndex, UINT32 value )
+{
+	cpustate->sArmRegister[sRegisterTable[mode][rIndex]] = value;
+}
+
 
 /***************************************************************************/
 
@@ -593,11 +604,17 @@ static void HandleMemSingle( ARM_REGS* cpustate, UINT32 insn )
 		/* Pre-indexed addressing */
 		if (insn & INSN_SDT_U)
 		{
-			rnv = (GetRegister(cpustate, rn) + off);
+			if (rn != eR15)
+				rnv = (GetRegister(cpustate, rn) + off);
+			else
+				rnv = (R15 & ADDRESS_MASK) + off;
 		}
 		else
 		{
-			rnv = (GetRegister(cpustate, rn) - off);
+			if (rn != eR15)
+				rnv = (GetRegister(cpustate, rn) - off);
+			else
+				rnv = (R15 & ADDRESS_MASK) - off;
 		}
 
 		if (insn & INSN_SDT_W)
@@ -608,7 +625,7 @@ static void HandleMemSingle( ARM_REGS* cpustate, UINT32 insn )
 		}
 		else if (rn == eR15)
 		{
-			rnv = (rnv & ADDRESS_MASK) + 8;
+			rnv = rnv + 8;
 		}
 	}
 	else
@@ -1071,6 +1088,8 @@ static void HandleMemBlock( ARM_REGS* cpustate, UINT32 insn )
 		/* Loading */
 		if (insn & INSN_BDT_U)
 		{
+			int mode = MODE;
+
 			/* Incrementing */
 			if (!(insn & INSN_BDT_P)) rbp = rbp + (- 4);
 
@@ -1098,7 +1117,7 @@ static void HandleMemBlock( ARM_REGS* cpustate, UINT32 insn )
 					logerror("%08x:  Illegal LDRM writeback to r15\n",R15);
 
 				if ((insn&(1<<rb))==0)
-					SetRegister(cpustate,rb,GetRegister(cpustate, rb)+result*4);
+					SetModeRegister(cpustate, mode, rb, GetModeRegister(cpustate, mode, rb) + result * 4);
 				else if (ARM_DEBUG_CORE)
 					logerror("%08x:  Illegal LDRM writeback to base register (%d)\n",R15, rb);
 			}

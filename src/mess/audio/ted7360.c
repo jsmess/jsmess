@@ -496,7 +496,7 @@ static int TEDTIME_TO_CYCLES(int pal, attotime t)
     INLINE FUNCTIONS
 *****************************************************************************/
 
-INLINE ted7360_state *get_safe_token( running_device *device )
+INLINE ted7360_state *get_safe_token( device_t *device )
 {
 	assert(device != NULL);
 	assert(device->type() == TED7360);
@@ -504,7 +504,7 @@ INLINE ted7360_state *get_safe_token( running_device *device )
 	return (ted7360_state *)downcast<legacy_device_base *>(device)->token();
 }
 
-INLINE const ted7360_interface *get_interface( running_device *device )
+INLINE const ted7360_interface *get_interface( device_t *device )
 {
 	assert(device != NULL);
 	assert(device->type() == TED7360);
@@ -516,7 +516,7 @@ INLINE const ted7360_interface *get_interface( running_device *device )
     IMPLEMENTATION
 *****************************************************************************/
 
-static void ted7360_soundport_w( running_device *device, int offset, int data );
+static void ted7360_soundport_w( device_t *device, int offset, int data );
 
 static void ted7360_set_interrupt( running_machine *machine, int mask, ted7360_state *ted7360 )
 {
@@ -534,7 +534,7 @@ static void ted7360_set_interrupt( running_machine *machine, int mask, ted7360_s
 	ted7360->reg[9] |= mask;
 }
 
-static void ted7360_clear_interrupt( running_device *device, int mask )
+static void ted7360_clear_interrupt( device_t *device, int mask )
 {
 	ted7360_state *ted7360 = get_safe_token(device);
 
@@ -547,7 +547,7 @@ static void ted7360_clear_interrupt( running_device *device, int mask )
 	}
 }
 
-static int ted7360_rastercolumn( running_device *device )
+static int ted7360_rastercolumn( device_t *device )
 {
 	ted7360_state *ted7360 = get_safe_token(device);
 	return (int) ((attotime_to_double(timer_get_time(device->machine)) - ted7360->rastertime) * TED7360_VRETRACERATE * ted7360->lines * 57 * 8 + 0.5);
@@ -580,7 +580,7 @@ static TIMER_CALLBACK(ted7360_timer_timeout)
 	}
 }
 
-static void ted7360_draw_character( running_device *device, int ybegin, int yend, int ch, int yoff, int xoff, UINT16 *color )
+static void ted7360_draw_character( device_t *device, int ybegin, int yend, int ch, int yoff, int xoff, UINT16 *color )
 {
 	ted7360_state *ted7360 = get_safe_token(device);
 	int y, code;
@@ -603,7 +603,7 @@ static void ted7360_draw_character( running_device *device, int ybegin, int yend
 	}
 }
 
-static void ted7360_draw_character_multi( running_device *device, int ybegin, int yend, int ch, int yoff, int xoff )
+static void ted7360_draw_character_multi( device_t *device, int ybegin, int yend, int ch, int yoff, int xoff )
 {
 	ted7360_state *ted7360 = get_safe_token(device);
 	int y, code;
@@ -626,7 +626,7 @@ static void ted7360_draw_character_multi( running_device *device, int ybegin, in
 	}
 }
 
-static void ted7360_draw_bitmap( running_device *device, int ybegin, int yend, int ch, int yoff, int xoff )
+static void ted7360_draw_bitmap( device_t *device, int ybegin, int yend, int ch, int yoff, int xoff )
 {
 	ted7360_state *ted7360 = get_safe_token(device);
 	int y, code;
@@ -645,7 +645,7 @@ static void ted7360_draw_bitmap( running_device *device, int ybegin, int yend, i
 	}
 }
 
-static void ted7360_draw_bitmap_multi( running_device *device, int ybegin, int yend, int ch, int yoff, int xoff )
+static void ted7360_draw_bitmap_multi( device_t *device, int ybegin, int yend, int ch, int yoff, int xoff )
 {
 	ted7360_state *ted7360 = get_safe_token(device);
 	int y, code;
@@ -676,7 +676,7 @@ static void *memset16 (void *dest, int value, size_t size)
 }
 #endif
 
-static void ted7360_draw_cursor( running_device *device, int ybegin, int yend, int yoff, int xoff, int color )
+static void ted7360_draw_cursor( device_t *device, int ybegin, int yend, int yoff, int xoff, int color )
 {
 	ted7360_state *ted7360 = get_safe_token(device);
 	int y;
@@ -687,7 +687,7 @@ static void ted7360_draw_cursor( running_device *device, int ybegin, int yend, i
 	}
 }
 
-static void ted7360_drawlines( running_device *device, int first, int last )
+static void ted7360_drawlines( device_t *device, int first, int last )
 {
 	ted7360_state *ted7360 = get_safe_token(device);
 	int line, vline, end;
@@ -1164,7 +1164,7 @@ READ_LINE_DEVICE_HANDLER( ted7360_rom_switch_r )
 	return ted7360->rom;
 }
 
-void ted7360_frame_interrupt_gen( running_device *device )
+void ted7360_frame_interrupt_gen( device_t *device )
 {
 	ted7360_state *ted7360 = get_safe_token(device);
 
@@ -1179,7 +1179,7 @@ void ted7360_frame_interrupt_gen( running_device *device )
 		ted7360->reg[0x1f]++;
 }
 
-void ted7360_raster_interrupt_gen( running_device *device )
+void ted7360_raster_interrupt_gen( device_t *device )
 {
 	ted7360_state *ted7360 = get_safe_token(device);
 
@@ -1199,7 +1199,7 @@ void ted7360_raster_interrupt_gen( running_device *device )
 	}
 }
 
-UINT32 ted7360_video_update( running_device *device, bitmap_t *bitmap, const rectangle *cliprect )
+UINT32 ted7360_video_update( device_t *device, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	ted7360_state *ted7360 = get_safe_token(device);
 
@@ -1230,7 +1230,7 @@ UINT32 ted7360_video_update( running_device *device, bitmap_t *bitmap, const rec
 #define NOISE_FREQUENCY_MAX         (TED7360_CLOCK / 8)
 
 
-static void ted7360_soundport_w( running_device *device, int offset, int data )
+static void ted7360_soundport_w( device_t *device, int offset, int data )
 {
 	ted7360_state *ted7360 = get_safe_token(device);
 
@@ -1342,7 +1342,7 @@ static STREAM_UPDATE( ted7360_update )
 /* Sound handler start              */
 /************************************/
 
-static void ted7360_sound_start( running_device *device )
+static void ted7360_sound_start( device_t *device )
 {
 	ted7360_state *ted7360 = get_safe_token(device);
 	int i;

@@ -59,7 +59,7 @@ typedef void (*_OP)(se3208_state_t *se3208_state, UINT16 Opcode);
 #define INST(a) static void a(se3208_state_t *se3208_state, UINT16 Opcode)
 static _OP *OpTable=NULL;
 
-INLINE se3208_state_t *get_safe_token(running_device *device)
+INLINE se3208_state_t *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == SE3208);
@@ -1760,7 +1760,7 @@ static CPU_EXECUTE( se3208 )
 
 	do
 	{
-		UINT16 Opcode=se3208_state->direct->read_decrypted_word(WORD_XOR_LE(se3208_state->PC));
+		UINT16 Opcode=se3208_state->direct->read_decrypted_word(se3208_state->PC, WORD_XOR_LE(0));
 
 		debugger_instruction_hook(device, se3208_state->PC);
 

@@ -98,40 +98,40 @@ static const ay8910_interface vectrex_ay8910_interface =
 
 static MACHINE_CONFIG_START( vectrex, vectrex_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6809, XTAL_6MHz / 4)
-	MDRV_CPU_PROGRAM_MAP(vectrex_map)
+	MCFG_CPU_ADD("maincpu", M6809, XTAL_6MHz / 4)
+	MCFG_CPU_PROGRAM_MAP(vectrex_map)
 
-	MDRV_SCREEN_ADD("screen", VECTOR)
-	MDRV_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_ADD("screen", VECTOR)
+	MCFG_SCREEN_REFRESH_RATE(60)
 
 	/* video hardware */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_SIZE(400, 300)
-	MDRV_SCREEN_VISIBLE_AREA(0, 399, 0, 299)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_SIZE(400, 300)
+	MCFG_SCREEN_VISIBLE_AREA(0, 399, 0, 299)
 
-	MDRV_VIDEO_START(vectrex)
-	MDRV_VIDEO_UPDATE(vectrex)
+	MCFG_VIDEO_START(vectrex)
+	MCFG_VIDEO_UPDATE(vectrex)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("dac", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MDRV_SOUND_ADD("ay8912", AY8912, 1500000)
-	MDRV_SOUND_CONFIG(vectrex_ay8910_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("ay8912", AY8912, 1500000)
+	MCFG_SOUND_CONFIG(vectrex_ay8910_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
 	/* via */
-	MDRV_VIA6522_ADD("via6522_0", 0, vectrex_via6522_interface)
+	MCFG_VIA6522_ADD("via6522_0", 0, vectrex_via6522_interface)
 
 	/* cartridge */
-	MDRV_CARTSLOT_ADD("cart")
-	MDRV_CARTSLOT_EXTENSION_LIST("bin,gam,vec")
-	MDRV_CARTSLOT_NOT_MANDATORY
-	MDRV_CARTSLOT_LOAD(vectrex_cart)
-	MDRV_CARTSLOT_INTERFACE("vectrex_cart")
+	MCFG_CARTSLOT_ADD("cart")
+	MCFG_CARTSLOT_EXTENSION_LIST("bin,gam,vec")
+	MCFG_CARTSLOT_NOT_MANDATORY
+	MCFG_CARTSLOT_LOAD(vectrex_cart)
+	MCFG_CARTSLOT_INTERFACE("vectrex_cart")
 
 	/* software lists */
-	MDRV_SOFTWARE_LIST_ADD("cart_list","vectrex")
+	MCFG_SOFTWARE_LIST_ADD("cart_list","vectrex")
 MACHINE_CONFIG_END
 
 ROM_START(vectrex)
@@ -204,17 +204,17 @@ INPUT_PORTS_END
 
 
 static MACHINE_CONFIG_DERIVED( raaspec, vectrex )
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(raaspec_map)
-	MDRV_NVRAM_ADD_0FILL("nvram")
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(raaspec_map)
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MDRV_VIDEO_START(raaspec)
+	MCFG_VIDEO_START(raaspec)
 
 	/* via */
-	MDRV_DEVICE_REMOVE("via6522_0")
-	MDRV_VIA6522_ADD("via6522_0", 0, spectrum1_via6522_interface)
+	MCFG_DEVICE_REMOVE("via6522_0")
+	MCFG_VIA6522_ADD("via6522_0", 0, spectrum1_via6522_interface)
 
-	MDRV_DEVICE_REMOVE("cart")
+	MCFG_DEVICE_REMOVE("cart")
 MACHINE_CONFIG_END
 
 ROM_START(raaspec)

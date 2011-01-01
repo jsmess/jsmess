@@ -119,7 +119,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 	const gfx_element *gfx = machine->gfx[0];
 	UINT32 *source = state->spriteram;
 	UINT32 *finish = state->spriteram + 0x1000 / 4;
-	UINT16 *redirect = (UINT16 *)memory_region(machine, "gfx3");
+	UINT16 *redirect = (UINT16 *)machine->region("gfx3")->base();
 
 	while (source < finish)
 	{
@@ -252,8 +252,8 @@ static READ32_HANDLER( dreamwld_protdata_r )
 {
 	dreamwld_state *state = space->machine->driver_data<dreamwld_state>();
 
-	UINT8 *protdata = memory_region(space->machine, "user1");
-	size_t protsize = memory_region_length(space->machine, "user1");
+	UINT8 *protdata = space->machine->region("user1")->base();
+	size_t protsize = space->machine->region("user1")->bytes();
 	UINT8 dat = protdata[(state->protindex++) % protsize];
 	return dat << 24;
 }
@@ -279,7 +279,7 @@ static void dreamwld_oki_setbank( running_machine *machine, UINT8 chip, UINT8 ba
 {
 	/* 0x30000-0x3ffff is banked.
         banks are at 0x30000,0x40000,0x50000 and 0x60000 in rom */
-	UINT8 *sound = memory_region(machine, chip ? "oki1" : "oki2");
+	UINT8 *sound = machine->region(chip ? "oki1" : "oki2")->base();
 	logerror("OKI%d: set bank %02x\n", chip, bank);
 	memcpy(sound + 0x30000, sound + 0xb0000 + 0x10000 * bank, 0x10000);
 }
@@ -421,36 +421,36 @@ static MACHINE_RESET( dreamwld )
 static MACHINE_CONFIG_START( dreamwld, dreamwld_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68EC020, MASTER_CLOCK/2)
-	MDRV_CPU_PROGRAM_MAP(dreamwld_map)
-	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold) // 4, 5, or 6, all point to the same place
+	MCFG_CPU_ADD("maincpu", M68EC020, MASTER_CLOCK/2)
+	MCFG_CPU_PROGRAM_MAP(dreamwld_map)
+	MCFG_CPU_VBLANK_INT("screen", irq4_line_hold) // 4, 5, or 6, all point to the same place
 
-	MDRV_MACHINE_START(dreamwld)
-	MDRV_MACHINE_RESET(dreamwld)
+	MCFG_MACHINE_START(dreamwld)
+	MCFG_MACHINE_RESET(dreamwld)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(58)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(512,256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 304-1, 0, 224-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(58)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(512,256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 304-1, 0, 224-1)
 
-	MDRV_PALETTE_LENGTH(0x1000)
-	MDRV_GFXDECODE(dreamwld)
+	MCFG_PALETTE_LENGTH(0x1000)
+	MCFG_GFXDECODE(dreamwld)
 
-	MDRV_VIDEO_START(dreamwld)
-	MDRV_VIDEO_UPDATE(dreamwld)
+	MCFG_VIDEO_START(dreamwld)
+	MCFG_VIDEO_UPDATE(dreamwld)
 
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_OKIM6295_ADD("oki1", MASTER_CLOCK/32, OKIM6295_PIN7_LOW)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
+	MCFG_OKIM6295_ADD("oki1", MASTER_CLOCK/32, OKIM6295_PIN7_LOW)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 
-	MDRV_OKIM6295_ADD("oki2", MASTER_CLOCK/32, OKIM6295_PIN7_LOW)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
+	MCFG_OKIM6295_ADD("oki2", MASTER_CLOCK/32, OKIM6295_PIN7_LOW)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 MACHINE_CONFIG_END
 
 

@@ -53,7 +53,7 @@ static int scsicd_exec_command( SCSIInstance *scsiInstance, UINT8 *statusCode )
 	SCSIGd *our_this = (SCSIGd *)SCSIThis( &SCSIClassGDROM, scsiInstance );
 
 	cdrom_file *cdrom = our_this->cdrom;
-	running_device *cdda;
+	device_t *cdda;
 	int trk;
 
 	SCSIGetCommand( scsiInstance, &command, &commandLength );
@@ -382,7 +382,7 @@ static void scsicd_read_data( SCSIInstance *scsiInstance, UINT8 *data, int dataL
 	cdrom_file *cdrom = our_this->cdrom;
 	UINT32 temp;
 	UINT8 tmp_buffer[2048];
-	running_device *cdda;
+	device_t *cdda;
 
 	SCSIGetCommand( scsiInstance, &command, &commandLength );
 

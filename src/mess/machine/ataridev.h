@@ -38,8 +38,8 @@ DEVICE_IMAGE_LOAD( xegs_cart );
 
 DECLARE_LEGACY_DEVICE(ATARI_FDC, atari_fdc);
 
-#define MDRV_ATARI_FDC_ADD(_tag)	\
-	MDRV_DEVICE_ADD((_tag),  ATARI_FDC, 0)
+#define MCFG_ATARI_FDC_ADD(_tag)	\
+	MCFG_DEVICE_ADD((_tag),  ATARI_FDC, 0)
 
 
 /***************************************************************************

@@ -141,7 +141,7 @@ static WRITE8_HANDLER( wardner_ramrom_bank_sw )
 		int bankaddress = 0;
 
 		address_space *mainspace;
-		UINT8 *RAM = memory_region(space->machine, "maincpu");
+		UINT8 *RAM = space->machine->region("maincpu")->base();
 
 		mainspace = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 		wardner_membank = data;
@@ -371,7 +371,7 @@ static const gfx_layout spritelayout =
 
 
 /* handler called by the 3812 emulator when the internal timers cause an IRQ */
-static void irqhandler(running_device *device, int linestate)
+static void irqhandler(device_t *device, int linestate)
 {
 	cputag_set_input_line(device->machine, "audiocpu", 0, linestate);
 }
@@ -395,49 +395,49 @@ GFXDECODE_END
 static MACHINE_CONFIG_START( wardner, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, XTAL_24MHz/4)		/* 6MHz */
-	MDRV_CPU_PROGRAM_MAP(main_program_map)
-	MDRV_CPU_IO_MAP(main_io_map)
-	MDRV_CPU_VBLANK_INT("screen", wardner_interrupt)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_24MHz/4)		/* 6MHz */
+	MCFG_CPU_PROGRAM_MAP(main_program_map)
+	MCFG_CPU_IO_MAP(main_io_map)
+	MCFG_CPU_VBLANK_INT("screen", wardner_interrupt)
 
-	MDRV_CPU_ADD("audiocpu", Z80, XTAL_14MHz/4)		/* 3.5MHz */
-	MDRV_CPU_PROGRAM_MAP(sound_program_map)
-	MDRV_CPU_IO_MAP(sound_io_map)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_14MHz/4)		/* 3.5MHz */
+	MCFG_CPU_PROGRAM_MAP(sound_program_map)
+	MCFG_CPU_IO_MAP(sound_io_map)
 
-	MDRV_CPU_ADD("dsp", TMS32010, XTAL_14MHz)		/* 14MHz Crystal CLKin */
-	MDRV_CPU_PROGRAM_MAP(DSP_program_map)
+	MCFG_CPU_ADD("dsp", TMS32010, XTAL_14MHz)		/* 14MHz Crystal CLKin */
+	MCFG_CPU_PROGRAM_MAP(DSP_program_map)
 	/* Data Map is internal to the CPU */
-	MDRV_CPU_IO_MAP(DSP_io_map)
+	MCFG_CPU_IO_MAP(DSP_io_map)
 
-	MDRV_QUANTUM_TIME(HZ(6000))						/* 100 CPU slices per frame */
+	MCFG_QUANTUM_TIME(HZ(6000))						/* 100 CPU slices per frame */
 
-	MDRV_MACHINE_RESET(wardner)
+	MCFG_MACHINE_RESET(wardner)
 
 	/* video hardware */
-	MDRV_MC6845_ADD("crtc", HD6845, XTAL_14MHz/4, twincobr_mc6845_intf)	/* 3.5MHz measured on CLKin */
+	MCFG_MC6845_ADD("crtc", HD6845, XTAL_14MHz/4, twincobr_mc6845_intf)	/* 3.5MHz measured on CLKin */
 
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK | VIDEO_BUFFERS_SPRITERAM)
+	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK | VIDEO_BUFFERS_SPRITERAM)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE( (XTAL_14MHz / 2) / (446 * 286) )
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*8, 64*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE( (XTAL_14MHz / 2) / (446 * 286) )
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(64*8, 64*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
 
-	MDRV_GFXDECODE(wardner)
-	MDRV_PALETTE_LENGTH(1792)
+	MCFG_GFXDECODE(wardner)
+	MCFG_PALETTE_LENGTH(1792)
 
-	MDRV_VIDEO_START(toaplan0)
-	MDRV_VIDEO_EOF(toaplan0)
-	MDRV_VIDEO_UPDATE(toaplan0)
+	MCFG_VIDEO_START(toaplan0)
+	MCFG_VIDEO_EOF(toaplan0)
+	MCFG_VIDEO_UPDATE(toaplan0)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM3812, XTAL_14MHz/4)
-	MDRV_SOUND_CONFIG(ym3812_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_14MHz/4)
+	MCFG_SOUND_CONFIG(ym3812_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 

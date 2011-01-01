@@ -37,7 +37,7 @@ struct _a2cffa_token
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE a2cffa_token *get_token(running_device *device)
+INLINE a2cffa_token *get_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == A2CFFA);
@@ -71,7 +71,7 @@ static DEVICE_RESET(a2cffa)
 	a2cffa_token *token = get_token(device);
 
 	// find card ROM
-	token->ROM = (UINT8 *)memory_region(device->machine, "cffa");
+	token->ROM = (UINT8 *)device->machine->region("cffa")->base();
 }
 
 

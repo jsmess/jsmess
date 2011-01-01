@@ -76,7 +76,7 @@ struct _dev_harddisk_t
 };
 
 
-INLINE dev_harddisk_t *get_safe_token(running_device *device)
+INLINE dev_harddisk_t *get_safe_token(device_t *device)
 {
 	assert( device != NULL );
 	assert( ( device->type() == HARDDISK ) ||
@@ -231,7 +231,7 @@ static DEVICE_IMAGE_UNLOAD( mess_hd )
  *
  *************************************/
 
-hard_disk_file *mess_hd_get_hard_disk_file(running_device *device)
+hard_disk_file *mess_hd_get_hard_disk_file(device_t *device)
 {
 	dev_harddisk_t	*harddisk = get_safe_token( device );
 
@@ -246,7 +246,7 @@ hard_disk_file *mess_hd_get_hard_disk_file(running_device *device)
  *
  *************************************/
 
-chd_file *mess_hd_get_chd_file(running_device *device)
+chd_file *mess_hd_get_chd_file(device_t *device)
 {
 	chd_file *result = NULL;
 	hard_disk_file *hd_file;

@@ -130,7 +130,7 @@ static void move_motor(running_machine *machine, stactics_state *state)
 static CUSTOM_INPUT( get_rng )
 {
 	/* this is a 555 timer, but cannot read one of the resistor values */
-	return mame_rand(field->port->machine) & 0x07;
+	return field->port->machine->rand() & 0x07;
 }
 
 
@@ -305,14 +305,14 @@ static MACHINE_START( stactics )
 static MACHINE_CONFIG_START( stactics, stactics_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", I8080, 1933560)
-	MDRV_CPU_PROGRAM_MAP(main_map)
-	MDRV_CPU_VBLANK_INT("screen", stactics_interrupt)
+	MCFG_CPU_ADD("maincpu", I8080, 1933560)
+	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_CPU_VBLANK_INT("screen", stactics_interrupt)
 
-	MDRV_MACHINE_START(stactics)
+	MCFG_MACHINE_START(stactics)
 
 	/* video hardware */
-	MDRV_FRAGMENT_ADD(stactics_video)
+	MCFG_FRAGMENT_ADD(stactics_video)
 
 	/* audio hardware */
 MACHINE_CONFIG_END

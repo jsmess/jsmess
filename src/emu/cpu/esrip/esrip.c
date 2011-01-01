@@ -121,7 +121,7 @@ typedef struct
 } esrip_state;
 
 
-INLINE esrip_state *get_safe_token(running_device *device)
+INLINE esrip_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == ESRIP);
@@ -133,7 +133,7 @@ INLINE esrip_state *get_safe_token(running_device *device)
     PUBLIC FUNCTIONS
 ***************************************************************************/
 
-UINT8 get_rip_status(running_device *cpu)
+UINT8 get_rip_status(device_t *cpu)
 {
 	esrip_state *cpustate = get_safe_token(cpu);
 	return cpustate->status_out;
@@ -256,7 +256,7 @@ static CPU_INIT( esrip )
 	/* Register configuration structure callbacks */
 	cpustate->fdt_r = _config->fdt_r;
 	cpustate->fdt_w = _config->fdt_w;
-	cpustate->lbrm = (UINT8*)memory_region(device->machine, _config->lbrm_prom);
+	cpustate->lbrm = (UINT8*)device->machine->region(_config->lbrm_prom)->base();
 	cpustate->status_in = _config->status_in;
 	cpustate->draw = _config->draw;
 

@@ -23,7 +23,7 @@ WRITE32_HANDLER ( pc32le_HDC2_w );
 int pc_hdc_dack_r(running_machine *machine);
 void pc_hdc_dack_w(running_machine *machine,int data);
 
-void pc_hdc_set_dma8237_device( running_device *dma8237 );
+void pc_hdc_set_dma8237_device( device_t *dma8237 );
 
 MACHINE_CONFIG_EXTERN( pc_hdc );
 

@@ -16,8 +16,8 @@
 
 DECLARE_LEGACY_DEVICE(ER59256, er59256);
 
-#define MDRV_ER59256_ADD(_tag)	\
-	MDRV_DEVICE_ADD((_tag), ER59256, 0)
+#define MCFG_ER59256_ADD(_tag)	\
+	MCFG_DEVICE_ADD((_tag), ER59256, 0)
 
 /***************************************************************************
     CONSTANTS
@@ -86,8 +86,8 @@ DECLARE_LEGACY_DEVICE(ER59256, er59256);
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-void er59256_set_iobits(running_device *device, UINT8 newbits);
-UINT8 er59256_get_iobits(running_device *device);
-void er59256_preload_rom(running_device *device, const UINT16 *rom_data, int count);
-UINT8 er59256_data_loaded(running_device *device);
+void er59256_set_iobits(device_t *device, UINT8 newbits);
+UINT8 er59256_get_iobits(device_t *device);
+void er59256_preload_rom(device_t *device, const UINT16 *rom_data, int count);
+UINT8 er59256_data_loaded(device_t *device);
 #endif

@@ -31,15 +31,15 @@ struct _vdc8563_interface
 
 DECLARE_LEGACY_DEVICE(VDC8563, vdc8563);
 
-#define MDRV_VDC8563_ADD(_tag, _interface) \
-	MDRV_DEVICE_ADD(_tag, VDC8563, 0) \
-	MDRV_DEVICE_CONFIG(_interface)
+#define MCFG_VDC8563_ADD(_tag, _interface) \
+	MCFG_DEVICE_ADD(_tag, VDC8563, 0) \
+	MCFG_DEVICE_CONFIG(_interface)
 
 
 /*----------- defined in video/vdc8563.c -----------*/
 
-void vdc8563_set_rastering(running_device *device, int on);
-UINT32 vdc8563_video_update(running_device *device, bitmap_t *bitmap, const rectangle *cliprect);
+void vdc8563_set_rastering(device_t *device, int on);
+UINT32 vdc8563_video_update(device_t *device, bitmap_t *bitmap, const rectangle *cliprect);
 
 WRITE8_DEVICE_HANDLER( vdc8563_port_w );
 READ8_DEVICE_HANDLER( vdc8563_port_r );

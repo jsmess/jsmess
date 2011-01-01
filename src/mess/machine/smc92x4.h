@@ -75,41 +75,41 @@ typedef struct _smc92x4_interface
        circuitry on the controller board, not within the controller itself.
        The device is this controller.
     */
-	running_device *(*current_floppy)(running_device *device);
+	device_t *(*current_floppy)(device_t *device);
 
 	/* Callback to read the contents of the external RAM via the data bus.
        Note that the address must be set and automatically increased
        by external circuitry. */
-	UINT8 (*dma_read_callback)(running_device *device);
+	UINT8 (*dma_read_callback)(device_t *device);
 
 	/* Callback to write the contents of the external RAM via the data bus.
        Note that the address must be set and automatically increased
        by external circuitry. */
-	void (*dma_write_callback)(running_device *device, UINT8 data);
+	void (*dma_write_callback)(device_t *device, UINT8 data);
 
 	/* Preliminary MFM hard disk interface. Gets next id. */
-	void (*mfmhd_get_next_id)(running_device *device, int head, chrn_id_hd *id);
+	void (*mfmhd_get_next_id)(device_t *device, int head, chrn_id_hd *id);
 
 	/* Preliminary MFM hard disk interface. Performs a seek. */
-	void (*mfmhd_seek)(running_device *device, int direction);
+	void (*mfmhd_seek)(device_t *device, int direction);
 
 	/* Preliminary MFM hard disk interface. Reads a sector. */
-	void (*mfmhd_read_sector)(running_device *device, int cylinder, int head, int sector, UINT8 **buf, int *sector_length);
+	void (*mfmhd_read_sector)(device_t *device, int cylinder, int head, int sector, UINT8 **buf, int *sector_length);
 
 	/* Preliminary MFM hard disk interface. Writes a sector. */
-	void (*mfmhd_write_sector)(running_device *device, int cylinder, int head, int sector, UINT8 *buf, int sector_length);
+	void (*mfmhd_write_sector)(device_t *device, int cylinder, int head, int sector, UINT8 *buf, int sector_length);
 
 	/* Preliminary MFM hard disk interface. Reads a track. */
-	void (*mfmhd_read_track)(running_device *device, int head, UINT8 **buffer, int *data_count);
+	void (*mfmhd_read_track)(device_t *device, int head, UINT8 **buffer, int *data_count);
 
 	/* Preliminary MFM hard disk interface. Writes a track. */
-	void (*mfmhd_write_track)(running_device *device, int head, UINT8 *buffer, int data_count);
+	void (*mfmhd_write_track)(device_t *device, int head, UINT8 *buffer, int data_count);
 } smc92x4_interface;
 
-void smc92x4_reset(running_device *device);
+void smc92x4_reset(device_t *device);
 
 /* Used to turn off the delays. */
-void smc92x4_set_timing(running_device *device, int realistic);
+void smc92x4_set_timing(device_t *device, int realistic);
 
 /* Generic function to translate between cylinders and idents */
 UINT8 cylinder_to_ident(int cylinder);
@@ -117,8 +117,8 @@ UINT8 cylinder_to_ident(int cylinder);
 READ8_DEVICE_HANDLER( smc92x4_r );
 WRITE8_DEVICE_HANDLER( smc92x4_w );
 
-#define MDRV_SMC92X4_ADD(_tag, _intrf) \
-	MDRV_DEVICE_ADD(_tag, SMC92X4, 0) \
-	MDRV_DEVICE_CONFIG(_intrf)
+#define MCFG_SMC92X4_ADD(_tag, _intrf) \
+	MCFG_DEVICE_ADD(_tag, SMC92X4, 0) \
+	MCFG_DEVICE_CONFIG(_intrf)
 
 #endif

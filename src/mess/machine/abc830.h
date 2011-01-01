@@ -27,40 +27,40 @@ DECLARE_LEGACY_DEVICE(ABC838, abc838);
 #define DRIVE_BASF_6105			0x0e
 #define DRIVE_BASF_6106			0x0f
 
-#define MDRV_ABC830_PIO_ADD(_tag, _bus_tag, _drive) \
-	MDRV_DEVICE_ADD(_tag, ABC830_PIO, 0) \
-	MDRV_DEVICE_CONFIG_DATAPTR(conkort_config, bus_tag, _bus_tag) \
-    MDRV_DEVICE_CONFIG_DATA32(conkort_config, sw1, 0x03) \
-    MDRV_DEVICE_CONFIG_DATA32(conkort_config, sw2, _drive) \
-    MDRV_DEVICE_CONFIG_DATA32(conkort_config, address, ADDRESS_ABC830)
+#define MCFG_ABC830_PIO_ADD(_tag, _bus_tag, _drive) \
+	MCFG_DEVICE_ADD(_tag, ABC830_PIO, 0) \
+	MCFG_DEVICE_CONFIG_DATAPTR(conkort_config, bus_tag, _bus_tag) \
+    MCFG_DEVICE_CONFIG_DATA32(conkort_config, sw1, 0x03) \
+    MCFG_DEVICE_CONFIG_DATA32(conkort_config, sw2, _drive) \
+    MCFG_DEVICE_CONFIG_DATA32(conkort_config, address, ADDRESS_ABC830)
 
-#define MDRV_ABC830_ADD(_tag, _bus_tag, _drive) \
-	MDRV_DEVICE_ADD(_tag, ABC830, 0) \
-	MDRV_DEVICE_CONFIG_DATAPTR(conkort_config, bus_tag, _bus_tag) \
-    MDRV_DEVICE_CONFIG_DATA32(conkort_config, sw1, 0x03) \
-    MDRV_DEVICE_CONFIG_DATA32(conkort_config, sw2, _drive) \
-    MDRV_DEVICE_CONFIG_DATA32(conkort_config, address, ADDRESS_ABC830)
+#define MCFG_ABC830_ADD(_tag, _bus_tag, _drive) \
+	MCFG_DEVICE_ADD(_tag, ABC830, 0) \
+	MCFG_DEVICE_CONFIG_DATAPTR(conkort_config, bus_tag, _bus_tag) \
+    MCFG_DEVICE_CONFIG_DATA32(conkort_config, sw1, 0x03) \
+    MCFG_DEVICE_CONFIG_DATA32(conkort_config, sw2, _drive) \
+    MCFG_DEVICE_CONFIG_DATA32(conkort_config, address, ADDRESS_ABC830)
 
-#define MDRV_ABC832_ADD(_tag, _bus_tag, _drive) \
-	MDRV_DEVICE_ADD(_tag, ABC832, 0) \
-	MDRV_DEVICE_CONFIG_DATAPTR(conkort_config, bus_tag, _bus_tag) \
-    MDRV_DEVICE_CONFIG_DATA32(conkort_config, sw1, 0x03) \
-    MDRV_DEVICE_CONFIG_DATA32(conkort_config, sw2, _drive) \
-    MDRV_DEVICE_CONFIG_DATA32(conkort_config, address, ADDRESS_ABC832)
+#define MCFG_ABC832_ADD(_tag, _bus_tag, _drive) \
+	MCFG_DEVICE_ADD(_tag, ABC832, 0) \
+	MCFG_DEVICE_CONFIG_DATAPTR(conkort_config, bus_tag, _bus_tag) \
+    MCFG_DEVICE_CONFIG_DATA32(conkort_config, sw1, 0x03) \
+    MCFG_DEVICE_CONFIG_DATA32(conkort_config, sw2, _drive) \
+    MCFG_DEVICE_CONFIG_DATA32(conkort_config, address, ADDRESS_ABC832)
 
-#define MDRV_ABC834_ADD(_tag, _bus_tag) \
-	MDRV_DEVICE_ADD(_tag, ABC832, 0) \
-	MDRV_DEVICE_CONFIG_DATAPTR(conkort_config, bus_tag, _bus_tag) \
-    MDRV_DEVICE_CONFIG_DATA32(conkort_config, sw1, 0x03) \
-    MDRV_DEVICE_CONFIG_DATA32(conkort_config, sw2, DRIVE_TEAC_FD55F) \
-    MDRV_DEVICE_CONFIG_DATA32(conkort_config, address, ADDRESS_ABC832)
+#define MCFG_ABC834_ADD(_tag, _bus_tag) \
+	MCFG_DEVICE_ADD(_tag, ABC832, 0) \
+	MCFG_DEVICE_CONFIG_DATAPTR(conkort_config, bus_tag, _bus_tag) \
+    MCFG_DEVICE_CONFIG_DATA32(conkort_config, sw1, 0x03) \
+    MCFG_DEVICE_CONFIG_DATA32(conkort_config, sw2, DRIVE_TEAC_FD55F) \
+    MCFG_DEVICE_CONFIG_DATA32(conkort_config, address, ADDRESS_ABC832)
 
-#define MDRV_ABC838_ADD(_tag, _bus_tag, _drive) \
-	MDRV_DEVICE_ADD(_tag, ABC838, 0) \
-	MDRV_DEVICE_CONFIG_DATAPTR(conkort_config, bus_tag, _bus_tag) \
-    MDRV_DEVICE_CONFIG_DATA32(conkort_config, sw1, 0x03) \
-    MDRV_DEVICE_CONFIG_DATA32(conkort_config, sw2, _drive) \
-    MDRV_DEVICE_CONFIG_DATA32(conkort_config, address, ADDRESS_ABC838)
+#define MCFG_ABC838_ADD(_tag, _bus_tag, _drive) \
+	MCFG_DEVICE_ADD(_tag, ABC838, 0) \
+	MCFG_DEVICE_CONFIG_DATAPTR(conkort_config, bus_tag, _bus_tag) \
+    MCFG_DEVICE_CONFIG_DATA32(conkort_config, sw1, 0x03) \
+    MCFG_DEVICE_CONFIG_DATA32(conkort_config, sw2, _drive) \
+    MCFG_DEVICE_CONFIG_DATA32(conkort_config, address, ADDRESS_ABC838)
 
 #define LUXOR_55_10828_ABCBUS(_tag) \
 	_tag, DEVCB_DEVICE_HANDLER(_tag, luxor_55_10828_cs_w), DEVCB_DEVICE_HANDLER(_tag, luxor_55_10828_stat_r), \

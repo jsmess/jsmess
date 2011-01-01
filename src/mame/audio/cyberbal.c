@@ -20,7 +20,7 @@ void cyberbal_sound_reset(running_machine *machine)
 	cyberbal_state *state = machine->driver_data<cyberbal_state>();
 
 	/* reset the sound system */
-	state->bank_base = &memory_region(machine, "audiocpu")[0x10000];
+	state->bank_base = &machine->region("audiocpu")->base()[0x10000];
 	memory_set_bankptr(machine, "soundbank", &state->bank_base[0x0000]);
 	state->fast_68k_int = state->io_68k_int = 0;
 	state->sound_data_from_68k = state->sound_data_from_6502 = 0;
@@ -154,7 +154,7 @@ WRITE16_HANDLER( cyberbal_sound_68k_w )
 WRITE16_HANDLER( cyberbal_sound_68k_dac_w )
 {
 	cyberbal_state *state = space->machine->driver_data<cyberbal_state>();
-	running_device *dac = space->machine->device((offset & 8) ? "dac2" : "dac1");
+	device_t *dac = space->machine->device((offset & 8) ? "dac2" : "dac1");
 	dac_data_16_w(dac, (((data >> 3) & 0x800) | ((data >> 2) & 0x7ff)) << 4);
 
 	if (state->fast_68k_int)

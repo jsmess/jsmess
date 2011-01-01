@@ -54,17 +54,17 @@ struct cassette_config_t
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-cassette_state cassette_get_state(running_device *cassette);
-void cassette_set_state(running_device *cassette, cassette_state state);
-void cassette_change_state(running_device *cassette, cassette_state state, cassette_state mask);
+cassette_state cassette_get_state(device_t *cassette);
+void cassette_set_state(device_t *cassette, cassette_state state);
+void cassette_change_state(device_t *cassette, cassette_state state, cassette_state mask);
 
-double cassette_input(running_device *cassette);
-void cassette_output(running_device *cassette, double value);
+double cassette_input(device_t *cassette);
+void cassette_output(device_t *cassette, double value);
 
-cassette_image *cassette_get_image(running_device *cassette);
-double cassette_get_position(running_device *cassette);
-double cassette_get_length(running_device *cassette);
-void cassette_seek(running_device *cassette, double time, int origin);
+cassette_image *cassette_get_image(device_t *cassette);
+double cassette_get_position(device_t *cassette);
+double cassette_get_length(device_t *cassette);
+void cassette_seek(device_t *cassette, double time, int origin);
 
 DECLARE_LEGACY_IMAGE_DEVICE(CASSETTE, cassette);
 
@@ -72,13 +72,13 @@ DECLARE_LEGACY_IMAGE_DEVICE(CASSETTE, cassette);
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MDRV_CASSETTE_ADD(_tag, _config)	\
-	MDRV_DEVICE_ADD(_tag, CASSETTE, 0)			\
-	MDRV_DEVICE_CONFIG(_config)
+#define MCFG_CASSETTE_ADD(_tag, _config)	\
+	MCFG_DEVICE_ADD(_tag, CASSETTE, 0)			\
+	MCFG_DEVICE_CONFIG(_config)
 
-#define MDRV_CASSETTE_MODIFY(_tag, _config)	\
-	MDRV_DEVICE_MODIFY(_tag)		\
-	MDRV_DEVICE_CONFIG(_config)
+#define MCFG_CASSETTE_MODIFY(_tag, _config)	\
+	MCFG_DEVICE_MODIFY(_tag)		\
+	MCFG_DEVICE_CONFIG(_config)
 
 extern const cassette_config default_cassette_config;
 

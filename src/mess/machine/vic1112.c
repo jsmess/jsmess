@@ -40,14 +40,14 @@ struct _vic1112_t
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE vic1112_t *get_safe_token(running_device *device)
+INLINE vic1112_t *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == VIC1112);
 	return (vic1112_t *)downcast<legacy_device_base *>(device)->token();
 }
 
-INLINE vic1112_config *get_safe_config(running_device *device)
+INLINE vic1112_config *get_safe_config(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == VIC1112);
@@ -274,8 +274,8 @@ static const via6522_interface vic1112_via1_intf =
 -------------------------------------------------*/
 
 static MACHINE_CONFIG_FRAGMENT( vic1112 )
-	MDRV_VIA6522_ADD(M6522_0_TAG, 0, vic1112_via0_intf)
-	MDRV_VIA6522_ADD(M6522_1_TAG, 0, vic1112_via1_intf)
+	MCFG_VIA6522_ADD(M6522_0_TAG, 0, vic1112_via0_intf)
+	MCFG_VIA6522_ADD(M6522_1_TAG, 0, vic1112_via1_intf)
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------
@@ -311,7 +311,7 @@ static DEVICE_START( vic1112 )
 	program->install_handler(0x9810, 0x981f, 0, 0, read8_delegate_create(via6522_device, read, *vic1112->via1), write8_delegate_create(via6522_device, write, *vic1112->via1));
 
 	/* map ROM to memory */
-	memory_install_rom(program, 0xb000, 0xb7ff, 0, 0, memory_region(device->machine, "vic1112:vic1112"));
+	memory_install_rom(program, 0xb000, 0xb7ff, 0, 0, device->machine->region("vic1112:vic1112")->base());
 
 	/* ground REN */
 	ieee488_ren_w(vic1112->bus, device, 0);

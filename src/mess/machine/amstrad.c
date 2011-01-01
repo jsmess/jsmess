@@ -329,7 +329,7 @@ PALETTE_INIT( aleste )
 	int i;
 
 	/* CPC Colour data is stored in the colour ROM (RFCOLDAT.BIN) at 0x140-0x17f */
-	unsigned char* pal = memory_region(machine,"user4");
+	unsigned char* pal = machine->region("user4")->base();
 
 	for(i=0; i<32; i++)
 	{
@@ -513,7 +513,7 @@ static void amstrad_plus_dma_parse(running_machine *machine, int channel)
 	{
 	case 0x0000:  // Load PSG register
 		{
-			running_device *ay8910 = machine->device("ay");
+			device_t *ay8910 = machine->device("ay");
 			ay8910_address_w(ay8910, 0, (command & 0x0f00) >> 8);
 			ay8910_data_w(ay8910, 0, command & 0x00ff);
 			ay8910_address_w(ay8910, 0, state->prev_reg);
@@ -992,7 +992,7 @@ static WRITE_LINE_DEVICE_HANDLER( amstrad_de_changed )
 	if ( ! drvstate->gate_array.de && state )
 	{
 		/* DE became active, store the starting MA and RA signals */
-		running_device *mc6845 = device->machine->device("mc6845" );
+		device_t *mc6845 = device->machine->device("mc6845" );
 
 		drvstate->gate_array.ma = mc6845_get_ma( mc6845 );
 		drvstate->gate_array.ra = mc6845_get_ra( mc6845 );
@@ -1013,7 +1013,7 @@ static WRITE_LINE_DEVICE_HANDLER( amstrad_plus_de_changed )
 	if ( ! drvstate->gate_array.de && state )
 	{
 		/* DE became active, store the starting MA and RA signals */
-		running_device *mc6845 = device->machine->device("mc6845" );
+		device_t *mc6845 = device->machine->device("mc6845" );
 
 		drvstate->gate_array.ma = mc6845_get_ma( mc6845 );
 		drvstate->gate_array.ra = mc6845_get_ra( mc6845 );
@@ -1209,7 +1209,7 @@ static void multiface_rethink_memory(running_machine *machine)
 	if (!multiface_hardware_enabled(machine))
 		return;
 
-	multiface_rom = &memory_region(machine, "maincpu")[0x01C000];
+	multiface_rom = &machine->region("maincpu")->base()[0x01C000];
 
 	if (
 		((state->multiface_flags & MULTIFACE_RAM_ROM_ENABLED)!=0) &&
@@ -1407,7 +1407,7 @@ static void amstrad_setLowerRom(running_machine *machine)
 	{
 		if ((state->gate_array.mrer & (1<<2)) == 0)
 		{
-			bank_base = &memory_region(machine, "maincpu")[0x010000];
+			bank_base = &machine->region("maincpu")->base()[0x010000];
 		}
 		else
 		{
@@ -1453,7 +1453,7 @@ static void amstrad_setLowerRom(running_machine *machine)
 			if ( state->asic.enabled )
 			{
 //              logerror("L-ROM: Lower ROM enabled, cart bank %i\n", state->asic.rmr2 & 0x07 );
-				bank_base = &memory_region(machine, "maincpu")[0x4000 * ( state->asic.rmr2 & 0x07 )];
+				bank_base = &machine->region("maincpu")->base()[0x4000 * ( state->asic.rmr2 & 0x07 )];
 				switch( state->asic.rmr2 & 0x18 )
 				{
 				case 0x00:
@@ -1480,8 +1480,8 @@ static void amstrad_setLowerRom(running_machine *machine)
 			}
 			else
 			{
-				memory_set_bankptr( machine, "bank1", memory_region( machine,"maincpu" ) );
-				memory_set_bankptr( machine, "bank2", memory_region( machine,"maincpu" ) + 0x2000 );
+				memory_set_bankptr( machine, "bank1", machine->region( "maincpu" )->base() );
+				memory_set_bankptr( machine, "bank2", machine->region( "maincpu" )->base() + 0x2000 );
 			}
 		}
 	}
@@ -2067,8 +2067,8 @@ Expansion Peripherals Read/Write -   -   -   -   -   0   -   -   -   -   -   -  
 READ8_HANDLER ( amstrad_cpc_io_r )
 {
 	amstrad_state *state = space->machine->driver_data<amstrad_state>();
-	running_device *fdc = space->machine->device("upd765");
-	running_device *mc6845 = space->machine->device("mc6845" );
+	device_t *fdc = space->machine->device("upd765");
+	device_t *mc6845 = space->machine->device("mc6845" );
 
 	unsigned char data = 0xFF;
 	unsigned int r1r0 = (unsigned int)((offset & 0x0300) >> 8);
@@ -2203,8 +2203,8 @@ static void amstrad_plus_seqcheck(amstrad_state *state, int data)
 WRITE8_HANDLER ( amstrad_cpc_io_w )
 {
 	amstrad_state *state = space->machine->driver_data<amstrad_state>();
-	running_device *fdc = space->machine->device("upd765");
-	running_device *mc6845 = space->machine->device("mc6845");
+	device_t *fdc = space->machine->device("upd765");
+	device_t *mc6845 = space->machine->device("mc6845");
 
 	if ((offset & (1<<15)) == 0)
 	{
@@ -2250,7 +2250,7 @@ WRITE8_HANDLER ( amstrad_cpc_io_w )
 			/* printer port bit 8 */
 			if (state->printer_bit8_selected && state->system_type == SYSTEM_PLUS)
 			{
-				running_device *printer = space->machine->device("centronics");
+				device_t *printer = space->machine->device("centronics");
 				centronics_d7_w(printer, BIT(data, 3));
 				state->printer_bit8_selected = FALSE;
 			}
@@ -2277,7 +2277,7 @@ WRITE8_HANDLER ( amstrad_cpc_io_w )
 	{
 		if ((offset & (1<<12)) == 0)
 		{
-			running_device *printer = space->machine->device("centronics");
+			device_t *printer = space->machine->device("centronics");
 
 			/* CPC has a 7-bit data port, bit 8 is the STROBE signal */
 			centronics_data_w(printer, 0, data & 0x7f);
@@ -2371,8 +2371,8 @@ static void amstrad_handle_snapshot(running_machine *machine, unsigned char *pSn
 {
 	amstrad_state *state = machine->driver_data<amstrad_state>();
 	address_space* space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	running_device *mc6845 = space->machine->device("mc6845" );
-	running_device *ay8910 = machine->device("ay");
+	device_t *mc6845 = space->machine->device("mc6845" );
+	device_t *ay8910 = machine->device("ay");
 	int RegData;
 	int i;
 
@@ -2644,7 +2644,7 @@ static void update_psg(running_machine *machine)
 {
 	amstrad_state *state = machine->driver_data<amstrad_state>();
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	running_device *ay8910 = machine->device("ay");
+	device_t *ay8910 = machine->device("ay");
 	mc146818_device *rtc = space->machine->device<mc146818_device>("rtc");
 
 	if(state->aleste_mode & 0x20)  // RTC selected
@@ -2749,7 +2749,7 @@ READ8_DEVICE_HANDLER (amstrad_ppi_portb_r)
 /* Set b6 with Parallel/Printer port ready */
 	if(state->system_type != SYSTEM_GX4000)
 	{
-		running_device *printer = device->machine->device("centronics");
+		device_t *printer = device->machine->device("centronics");
 		data |= centronics_busy_r(printer) << 6;
 	}
 /* Set b4-b1 50Hz/60Hz state and manufacturer name defined by links on PCB */
@@ -3123,7 +3123,7 @@ MACHINE_RESET( amstrad )
 {
 	amstrad_state *state = machine->driver_data<amstrad_state>();
 	int i;
-	UINT8 *rom = memory_region(machine, "maincpu");
+	UINT8 *rom = machine->region("maincpu")->base();
 
 	for (i=0; i<256; i++)
 	{
@@ -3147,7 +3147,7 @@ MACHINE_RESET( amstrad )
 MACHINE_START( plus )
 {
 	amstrad_state *state = machine->driver_data<amstrad_state>();
-	state->asic.ram = memory_region(machine, "user1");  // 16kB RAM for ASIC, memory-mapped registers.
+	state->asic.ram = machine->region("user1")->base();  // 16kB RAM for ASIC, memory-mapped registers.
 	state->system_type = SYSTEM_PLUS;
 }
 
@@ -3156,7 +3156,7 @@ MACHINE_RESET( plus )
 {
 	amstrad_state *state = machine->driver_data<amstrad_state>();
 	int i;
-	UINT8 *rom = memory_region(machine, "maincpu");
+	UINT8 *rom = machine->region("maincpu")->base();
 
 	for (i=0; i<128; i++)  // fill ROM table
 	{
@@ -3194,7 +3194,7 @@ MACHINE_RESET( plus )
 MACHINE_START( gx4000 )
 {
 	amstrad_state *state = machine->driver_data<amstrad_state>();
-	state->asic.ram = memory_region(machine, "user1");  // 16kB RAM for ASIC, memory-mapped registers.
+	state->asic.ram = machine->region("user1")->base();  // 16kB RAM for ASIC, memory-mapped registers.
 	state->system_type = SYSTEM_GX4000;
 }
 
@@ -3202,7 +3202,7 @@ MACHINE_RESET( gx4000 )
 {
 	amstrad_state *state = machine->driver_data<amstrad_state>();
 	int i;
-	UINT8 *rom = memory_region(machine, "maincpu");
+	UINT8 *rom = machine->region("maincpu")->base();
 
 	for (i=0; i<128; i++)  // fill ROM table
 	{
@@ -3249,7 +3249,7 @@ MACHINE_RESET( kccomp )
 {
 	amstrad_state *state = machine->driver_data<amstrad_state>();
 	int i;
-	UINT8 *rom = memory_region(machine, "maincpu");
+	UINT8 *rom = machine->region("maincpu")->base();
 
 	for (i=0; i<256; i++)
 	{
@@ -3280,7 +3280,7 @@ MACHINE_RESET( aleste )
 {
 	amstrad_state *state = machine->driver_data<amstrad_state>();
 	int i;
-	UINT8 *rom = memory_region(machine, "maincpu");
+	UINT8 *rom = machine->region("maincpu")->base();
 
 	for (i=0; i<256; i++)
 	{
@@ -3341,7 +3341,7 @@ DEVICE_IMAGE_LOAD(amstrad_plus_cartridge)
 	int chunksize;                // chunk length, calcaulated from the above
 	int ramblock;                 // 16k RAM block chunk is to be loaded in to
 	unsigned int bytes_to_read;   // total bytes to read, as mame_feof doesn't react to EOF without trying to go past it.
-	unsigned char* mem = memory_region(image.device().machine, "maincpu");
+	unsigned char* mem = image.device().machine->region("maincpu")->base();
 
 	if (image.software_entry() == NULL)
 	{

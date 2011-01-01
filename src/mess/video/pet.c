@@ -12,7 +12,7 @@
 
 void pet_vh_init (running_machine *machine)
 {
-	UINT8 *gfx = memory_region(machine, "gfx1");
+	UINT8 *gfx = machine->region("gfx1")->base();
 	int i;
 
 	/* inversion logic on board */
@@ -26,7 +26,7 @@ void pet_vh_init (running_machine *machine)
 
 void pet80_vh_init (running_machine *machine)
 {
-	UINT8 *gfx = memory_region(machine, "gfx1");
+	UINT8 *gfx = machine->region("gfx1")->base();
 	int i;
 
 	/* inversion logic on board */
@@ -45,7 +45,7 @@ void pet80_vh_init (running_machine *machine)
 
 void superpet_vh_init (running_machine *machine)
 {
-	UINT8 *gfx = memory_region(machine, "gfx1");
+	UINT8 *gfx = machine->region("gfx1")->base();
 	int i;
 
 	for (i=0; i<0x400; i++) {

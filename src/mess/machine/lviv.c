@@ -88,7 +88,7 @@ static WRITE8_DEVICE_HANDLER ( lviv_ppi_0_portb_w )
 static WRITE8_DEVICE_HANDLER ( lviv_ppi_0_portc_w )	/* tape in/out, video memory on/off */
 {
 	lviv_state *state = device->machine->driver_data<lviv_state>();
-	running_device *speaker = device->machine->device("speaker");
+	device_t *speaker = device->machine->device("speaker");
 	state->ppi_port_outputs[0][2] = data;
 	if (state->ppi_port_outputs[0][1]&0x80)
 		speaker_level_w(speaker, data&0x01);
@@ -185,7 +185,7 @@ WRITE8_HANDLER ( lviv_io_w )
 		memory_set_bankptr(space->machine,"bank1", messram_get_ptr(space->machine->device("messram")));
 		memory_set_bankptr(space->machine,"bank2", messram_get_ptr(space->machine->device("messram")) + 0x4000);
 		memory_set_bankptr(space->machine,"bank3", messram_get_ptr(space->machine->device("messram")) + 0x8000);
-		memory_set_bankptr(space->machine,"bank4", memory_region(space->machine, "maincpu") + 0x010000);
+		memory_set_bankptr(space->machine,"bank4", space->machine->region("maincpu")->base() + 0x010000);
 	}
 	else
 	{
@@ -243,10 +243,10 @@ MACHINE_RESET( lviv )
 	memory_unmap_write(space, 0x8000, 0xbfff, 0, 0);
 	memory_unmap_write(space, 0xC000, 0xffff, 0, 0);
 
-	memory_set_bankptr(machine,"bank1", memory_region(machine, "maincpu") + 0x010000);
-	memory_set_bankptr(machine,"bank2", memory_region(machine, "maincpu") + 0x010000);
-	memory_set_bankptr(machine,"bank3", memory_region(machine, "maincpu") + 0x010000);
-	memory_set_bankptr(machine,"bank4", memory_region(machine, "maincpu") + 0x010000);
+	memory_set_bankptr(machine,"bank1", machine->region("maincpu")->base() + 0x010000);
+	memory_set_bankptr(machine,"bank2", machine->region("maincpu")->base() + 0x010000);
+	memory_set_bankptr(machine,"bank3", machine->region("maincpu")->base() + 0x010000);
+	memory_set_bankptr(machine,"bank4", machine->region("maincpu")->base() + 0x010000);
 
 	/*timer_pulse(machine, TIME_IN_NSEC(200), NULL, 0, lviv_draw_pixel);*/
 

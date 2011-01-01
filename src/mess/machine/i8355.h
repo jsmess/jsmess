@@ -50,9 +50,9 @@
 //  INTERFACE CONFIGURATION MACROS
 ///*************************************************************************
 
-#define MDRV_I8355_ADD(_tag, _clock, _config) \
-	MDRV_DEVICE_ADD((_tag), I8355, _clock)	\
-	MDRV_DEVICE_CONFIG(_config)
+#define MCFG_I8355_ADD(_tag, _clock, _config) \
+	MCFG_DEVICE_ADD((_tag), I8355, _clock)	\
+	MCFG_DEVICE_CONFIG(_config)
 
 #define I8355_INTERFACE(name) \
 	const i8355_interface (name) =

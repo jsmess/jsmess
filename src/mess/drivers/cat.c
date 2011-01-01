@@ -353,16 +353,16 @@ static VIDEO_UPDATE( swyft )
 	return 0;
 }
 
-static void duart_irq_handler(running_device *device, UINT8 vector)
+static void duart_irq_handler(device_t *device, UINT8 vector)
 {
 	logerror("duart_irq_handler\n");
 }
 
-static void duart_tx(running_device *device, int channel, UINT8 data)
+static void duart_tx(device_t *device, int channel, UINT8 data)
 {
 }
 
-static UINT8 duart_input(running_device *device)
+static UINT8 duart_input(device_t *device)
 {
 	cat_state *state = device->machine->driver_data<cat_state>();
 
@@ -406,51 +406,51 @@ static NVRAM_HANDLER( cat )
 static MACHINE_CONFIG_START( cat, cat_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu",M68000, XTAL_5MHz)
-	MDRV_CPU_PROGRAM_MAP(cat_mem)
+	MCFG_CPU_ADD("maincpu",M68000, XTAL_5MHz)
+	MCFG_CPU_PROGRAM_MAP(cat_mem)
 
-	MDRV_MACHINE_START(cat)
-	MDRV_MACHINE_RESET(cat)
+	MCFG_MACHINE_START(cat)
+	MCFG_MACHINE_RESET(cat)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(50)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(672, 344)
-	MDRV_SCREEN_VISIBLE_AREA(0, 672-1, 0, 344-1)
-	MDRV_PALETTE_LENGTH(2)
-	MDRV_PALETTE_INIT(black_and_white)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(672, 344)
+	MCFG_SCREEN_VISIBLE_AREA(0, 672-1, 0, 344-1)
+	MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_INIT(black_and_white)
 
-	MDRV_VIDEO_START(cat)
-	MDRV_VIDEO_UPDATE(cat)
+	MCFG_VIDEO_START(cat)
+	MCFG_VIDEO_UPDATE(cat)
 
-	MDRV_DUART68681_ADD( "duart68681", XTAL_5MHz, cat_duart68681_config )
+	MCFG_DUART68681_ADD( "duart68681", XTAL_5MHz, cat_duart68681_config )
 
-	MDRV_NVRAM_HANDLER( cat )
+	MCFG_NVRAM_HANDLER( cat )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( swyft, cat_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu",M68000, XTAL_5MHz)
-	MDRV_CPU_PROGRAM_MAP(swyft_mem)
+	MCFG_CPU_ADD("maincpu",M68000, XTAL_5MHz)
+	MCFG_CPU_PROGRAM_MAP(swyft_mem)
 
-	MDRV_MACHINE_START(swyft)
-	MDRV_MACHINE_RESET(swyft)
+	MCFG_MACHINE_START(swyft)
+	MCFG_MACHINE_RESET(swyft)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(50)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(320, 242)
-	MDRV_SCREEN_VISIBLE_AREA(0, 320-1, 0, 242-1)
-	MDRV_PALETTE_LENGTH(2)
-	MDRV_PALETTE_INIT(black_and_white)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(320, 242)
+	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 242-1)
+	MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_INIT(black_and_white)
 
-	MDRV_VIDEO_START(swyft)
-	MDRV_VIDEO_UPDATE(swyft)
+	MCFG_VIDEO_START(swyft)
+	MCFG_VIDEO_UPDATE(swyft)
 MACHINE_CONFIG_END
 
 /* ROM definition */

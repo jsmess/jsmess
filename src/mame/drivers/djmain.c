@@ -114,7 +114,7 @@ static WRITE32_HANDLER( paletteram32_w )
 
 static void sndram_set_bank(running_machine *machine)
 {
-	sndram = memory_region(machine, "shared") + 0x80000 * sndram_bank;
+	sndram = machine->region("shared")->base() + 0x80000 * sndram_bank;
 }
 
 static WRITE32_HANDLER( sndram_bank_w )
@@ -203,7 +203,7 @@ static WRITE32_HANDLER( obj_ctrl_w )
 
 static READ32_HANDLER( obj_rom_r )
 {
-	UINT8 *mem8 = memory_region(space->machine, "gfx1");
+	UINT8 *mem8 = space->machine->region("gfx1")->base();
 	int bank = obj_regs[0x28/4] >> 16;
 
 	offset += bank * 0x200;
@@ -239,8 +239,8 @@ static WRITE32_HANDLER( v_ctrl_w )
 
 static READ32_HANDLER( v_rom_r )
 {
-	running_device *k056832 = space->machine->device("k056832");
-	UINT8 *mem8 = memory_region(space->machine, "gfx2");
+	device_t *k056832 = space->machine->device("k056832");
+	UINT8 *mem8 = space->machine->region("gfx2")->base();
 	int bank = k056832_word_r(k056832, 0x34/2, 0xffff);
 
 	offset *= 2;
@@ -440,7 +440,7 @@ static INTERRUPT_GEN( vb_interrupt )
 }
 
 
-static void ide_interrupt(running_device *device, int state)
+static void ide_interrupt(device_t *device, int state)
 {
 	if (state != CLEAR_LINE)
 	{
@@ -1430,7 +1430,7 @@ static STATE_POSTLOAD( djmain_postload )
 
 static MACHINE_START( djmain )
 {
-	running_device *ide = machine->device("ide");
+	device_t *ide = machine->device("ide");
 
 	if (ide != NULL && ide_master_password != NULL)
 		ide_set_master_password(ide, ide_master_password);
@@ -1482,44 +1482,44 @@ static MACHINE_CONFIG_START( djmain, driver_device )
 
 	/* basic machine hardware */
 	// popn3 works 9.6 MHz or slower in some songs */
-	//MDRV_CPU_ADD("maincpu", M68EC020, 18432000/2)    /*  9.216 MHz!? */
-	MDRV_CPU_ADD("maincpu", M68EC020, 32000000/4)	/*  8.000 MHz!? */
-	MDRV_CPU_PROGRAM_MAP(memory_map)
-	MDRV_CPU_VBLANK_INT("screen", vb_interrupt)
+	//MCFG_CPU_ADD("maincpu", M68EC020, 18432000/2)    /*  9.216 MHz!? */
+	MCFG_CPU_ADD("maincpu", M68EC020, 32000000/4)	/*  8.000 MHz!? */
+	MCFG_CPU_PROGRAM_MAP(memory_map)
+	MCFG_CPU_VBLANK_INT("screen", vb_interrupt)
 
-	MDRV_MACHINE_START(djmain)
-	MDRV_MACHINE_RESET(djmain)
+	MCFG_MACHINE_START(djmain)
+	MCFG_MACHINE_RESET(djmain)
 
-	MDRV_IDE_CONTROLLER_ADD("ide", ide_interrupt)
+	MCFG_IDE_CONTROLLER_ADD("ide", ide_interrupt)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(58)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_SIZE(64*8, 64*8)
-	MDRV_SCREEN_VISIBLE_AREA(12, 512-12-1, 0, 384-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(58)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_SIZE(64*8, 64*8)
+	MCFG_SCREEN_VISIBLE_AREA(12, 512-12-1, 0, 384-1)
 
-	MDRV_PALETTE_LENGTH(0x4440/4)
-	MDRV_GFXDECODE(djmain)
-	MDRV_VIDEO_START(djmain)
-	MDRV_VIDEO_UPDATE(djmain)
+	MCFG_PALETTE_LENGTH(0x4440/4)
+	MCFG_GFXDECODE(djmain)
+	MCFG_VIDEO_START(djmain)
+	MCFG_VIDEO_UPDATE(djmain)
 
-	MDRV_K056832_ADD("k056832", djmain_k056832_intf)
-	MDRV_K055555_ADD("k055555")
+	MCFG_K056832_ADD("k056832", djmain_k056832_intf)
+	MCFG_K055555_ADD("k055555")
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("konami1", K054539, 48000)
-	MDRV_SOUND_CONFIG(k054539_config)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("konami1", K054539, 48000)
+	MCFG_SOUND_CONFIG(k054539_config)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MDRV_SOUND_ADD("konami2", K054539, 48000)
-	MDRV_SOUND_CONFIG(k054539_config)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("konami2", K054539, 48000)
+	MCFG_SOUND_CONFIG(k054539_config)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 

@@ -27,7 +27,7 @@ struct _cdp1863_t
 	int incr;						/* initial wave state */
 };
 
-INLINE cdp1863_t *get_safe_token(running_device *device)
+INLINE cdp1863_t *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 
@@ -59,7 +59,7 @@ WRITE8_DEVICE_HANDLER( cdp1863_str_w )
 
 /* Output Enable */
 
-void cdp1863_oe_w(running_device *device, int level)
+void cdp1863_oe_w(device_t *device, int level)
 {
 	cdp1863_t *cdp1863 = get_safe_token(device);
 
@@ -69,7 +69,7 @@ void cdp1863_oe_w(running_device *device, int level)
 }
 
 #ifdef UNUSED_FUNCTION
-static void cdp1863_sound_update(running_device *device, stream_sample_t **inputs, stream_sample_t **_buffer, int length)
+static void cdp1863_sound_update(device_t *device, stream_sample_t **inputs, stream_sample_t **_buffer, int length)
 {
 	cdp1863_t *cdp1863 = get_safe_token(device);
 

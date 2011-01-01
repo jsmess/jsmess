@@ -56,8 +56,8 @@ static VIDEO_UPDATE( multi8 )
 	int x,y,count;
 	int x_width;
 	int xi,yi;
-	UINT8 *vram = memory_region(screen->machine, "vram");
-	UINT8 *gfx_rom = memory_region(screen->machine, "chargen");
+	UINT8 *vram = screen->machine->region("vram")->base();
+	UINT8 *gfx_rom = screen->machine->region("chargen")->base();
 
 	count = 0x0000;
 
@@ -197,8 +197,8 @@ static READ8_HANDLER( key_status_r )
 static READ8_HANDLER( multi8_vram_r )
 {
 	multi8_state *state = space->machine->driver_data<multi8_state>();
-	UINT8 *vram = memory_region(space->machine, "vram");
-	UINT8 *wram = memory_region(space->machine, "wram");
+	UINT8 *vram = space->machine->region("vram")->base();
+	UINT8 *wram = space->machine->region("wram")->base();
 	UINT8 res;
 
 	if(!(state->vram_bank & 0x10)) //select plain work ram
@@ -216,8 +216,8 @@ static READ8_HANDLER( multi8_vram_r )
 static WRITE8_HANDLER( multi8_vram_w )
 {
 	multi8_state *state = space->machine->driver_data<multi8_state>();
-	UINT8 *vram = memory_region(space->machine, "vram");
-	UINT8 *wram = memory_region(space->machine, "wram");
+	UINT8 *vram = space->machine->region("vram")->base();
+	UINT8 *wram = space->machine->region("wram")->base();
 
 	if(!(state->vram_bank & 0x10)) //select plain work ram
 	{
@@ -576,39 +576,39 @@ static MACHINE_RESET(multi8)
 
 static MACHINE_CONFIG_START( multi8, multi8_state )
     /* basic machine hardware */
-    MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz)
-    MDRV_CPU_PROGRAM_MAP(multi8_mem)
-    MDRV_CPU_IO_MAP(multi8_io)
+    MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
+    MCFG_CPU_PROGRAM_MAP(multi8_mem)
+    MCFG_CPU_IO_MAP(multi8_io)
 
-    MDRV_MACHINE_START(multi8)
-    MDRV_MACHINE_RESET(multi8)
+    MCFG_MACHINE_START(multi8)
+    MCFG_MACHINE_RESET(multi8)
 
-	MDRV_I8255A_ADD( "ppi8255_0", ppi8255_intf_0 )
+	MCFG_I8255A_ADD( "ppi8255_0", ppi8255_intf_0 )
 
     /* video hardware */
-    MDRV_SCREEN_ADD("screen", RASTER)
-    MDRV_SCREEN_REFRESH_RATE(60)
-    MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-    MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-    MDRV_SCREEN_SIZE(640, 200)
-    MDRV_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
-    MDRV_PALETTE_LENGTH(8)
-    MDRV_PALETTE_INIT(multi8)
-	MDRV_GFXDECODE(multi8)
+    MCFG_SCREEN_ADD("screen", RASTER)
+    MCFG_SCREEN_REFRESH_RATE(60)
+    MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+    MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+    MCFG_SCREEN_SIZE(640, 200)
+    MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
+    MCFG_PALETTE_LENGTH(8)
+    MCFG_PALETTE_INIT(multi8)
+	MCFG_GFXDECODE(multi8)
 
-	MDRV_MC6845_ADD("crtc", H46505, XTAL_3_579545MHz/2, mc6845_intf)	/* unknown clock, hand tuned to get ~60 fps */
+	MCFG_MC6845_ADD("crtc", H46505, XTAL_3_579545MHz/2, mc6845_intf)	/* unknown clock, hand tuned to get ~60 fps */
 
-    MDRV_VIDEO_START(multi8)
-    MDRV_VIDEO_UPDATE(multi8)
+    MCFG_VIDEO_START(multi8)
+    MCFG_VIDEO_UPDATE(multi8)
 
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM2203, 1500000) //unknown clock / divider
-	MDRV_SOUND_CONFIG(ym2203_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("ymsnd", YM2203, 1500000) //unknown clock / divider
+	MCFG_SOUND_CONFIG(ym2203_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD("beeper", BEEP, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
+	MCFG_SOUND_ADD("beeper", BEEP, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
 MACHINE_CONFIG_END
 
 /* ROM definition */

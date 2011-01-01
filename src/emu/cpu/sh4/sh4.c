@@ -30,7 +30,7 @@
 
 CPU_DISASSEMBLE( sh4 );
 
-INLINE sh4_state *get_safe_token(running_device *device)
+INLINE sh4_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == SH4);
@@ -3341,11 +3341,11 @@ static CPU_EXECUTE( sh4 )
 
 		if (sh4->delay)
 		{
-			opcode = sh4->direct->read_decrypted_word(WORD2_XOR_LE((UINT32)(sh4->delay & AM)));
+			opcode = sh4->direct->read_decrypted_word((UINT32)(sh4->delay & AM), WORD2_XOR_LE(0));
 			sh4->pc -= 2;
 		}
 		else
-			opcode = sh4->direct->read_decrypted_word(WORD2_XOR_LE((UINT32)(sh4->pc & AM)));
+			opcode = sh4->direct->read_decrypted_word((UINT32)(sh4->pc & AM), WORD2_XOR_LE(0));
 
 		debugger_instruction_hook(device, sh4->pc & AM);
 
@@ -3606,7 +3606,7 @@ static CPU_SET_INFO( sh4 )
 	}
 }
 
-void sh4_set_ftcsr_callback(running_device *device, sh4_ftcsr_callback callback)
+void sh4_set_ftcsr_callback(device_t *device, sh4_ftcsr_callback callback)
 {
 	sh4_state *sh4 = get_safe_token(device);
 	sh4->ftcsr_read_callback = callback;

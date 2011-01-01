@@ -72,7 +72,7 @@ static VIDEO_START( pc88va )
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	pc88va_state *state = machine->driver_data<pc88va_state>();
-	UINT16 *tvram = (UINT16 *)memory_region(machine, "tvram");
+	UINT16 *tvram = (UINT16 *)machine->region("tvram")->base();
 	int offs,i;
 
 	offs = state->tsp.spr_offset;
@@ -182,8 +182,8 @@ static UINT32 calc_kanji_rom_addr(UINT8 jis1,UINT8 jis2,int x,int y)
 static void draw_text(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	pc88va_state *state = machine->driver_data<pc88va_state>();
-	UINT8 *tvram = memory_region(machine, "tvram");
-	UINT8 *kanji = memory_region(machine, "kanji");
+	UINT8 *tvram = machine->region("tvram")->base();
+	UINT8 *kanji = machine->region("kanji")->base();
 	int xi,yi;
 	int x,y;
 	int res_x,res_y;
@@ -426,7 +426,7 @@ static READ16_HANDLER( sys_mem_r )
 			return 0xffff;
 		case 1: // TVRAM
 		{
-			UINT16 *tvram = (UINT16 *)memory_region(space->machine, "tvram");
+			UINT16 *tvram = (UINT16 *)space->machine->region("tvram")->base();
 
 			if(((offset*2) & 0x30000) == 0)
 				return tvram[offset];
@@ -435,14 +435,14 @@ static READ16_HANDLER( sys_mem_r )
 		}
 		case 4:
 		{
-			UINT16 *gvram = (UINT16 *)memory_region(space->machine, "gvram");
+			UINT16 *gvram = (UINT16 *)space->machine->region("gvram")->base();
 
 			return gvram[offset];
 		}
 		case 8: // kanji ROM
 		case 9:
 		{
-			UINT16 *knj_ram = (UINT16 *)memory_region(space->machine, "kanji");
+			UINT16 *knj_ram = (UINT16 *)space->machine->region("kanji")->base();
 			UINT32 knj_offset;
 
 			knj_offset = (offset + (((state->bank_reg & 0x100) >> 8)*0x20000));
@@ -458,7 +458,7 @@ static READ16_HANDLER( sys_mem_r )
 		case 0xc: // Dictionary ROM
 		case 0xd:
 		{
-			UINT16 *dic_rom = (UINT16 *)memory_region(space->machine, "dictionary");
+			UINT16 *dic_rom = (UINT16 *)space->machine->region("dictionary")->base();
 			UINT32 dic_offset;
 
 			dic_offset = (offset + (((state->bank_reg & 0x100) >> 8)*0x20000));
@@ -479,7 +479,7 @@ static WRITE16_HANDLER( sys_mem_w )
 			break;
 		case 1: // TVRAM
 		{
-			UINT16 *tvram = (UINT16 *)memory_region(space->machine, "tvram");
+			UINT16 *tvram = (UINT16 *)space->machine->region("tvram")->base();
 
 			if(((offset*2) & 0x30000) == 0)
 				COMBINE_DATA(&tvram[offset]);
@@ -487,7 +487,7 @@ static WRITE16_HANDLER( sys_mem_w )
 		break;
 		case 4: // TVRAM
 		{
-			UINT16 *gvram = (UINT16 *)memory_region(space->machine, "gvram");
+			UINT16 *gvram = (UINT16 *)space->machine->region("gvram")->base();
 
 			COMBINE_DATA(&gvram[offset]);
 		}
@@ -495,7 +495,7 @@ static WRITE16_HANDLER( sys_mem_w )
 		case 8: // kanji ROM, backup RAM at 0xb0000 - 0xb3fff
 		case 9:
 		{
-			UINT16 *knj_ram = (UINT16 *)memory_region(space->machine, "kanji");
+			UINT16 *knj_ram = (UINT16 *)space->machine->region("kanji")->base();
 			UINT32 knj_offset;
 
 			knj_offset = ((offset) + (((state->bank_reg & 0x100) >> 8)*0x20000));
@@ -858,7 +858,7 @@ static WRITE16_HANDLER( bios_bank_w )
 
 	/* RBC1 */
 	{
-		UINT8 *ROM10 = memory_region(space->machine, "rom10");
+		UINT8 *ROM10 = space->machine->region("rom10")->base();
 
 		if((state->bank_reg & 0xe0) == 0x00)
 			memory_set_bankptr(space->machine, "rom10_bank", &ROM10[(state->bank_reg & 0x10) ? 0x10000 : 0x00000]);
@@ -866,7 +866,7 @@ static WRITE16_HANDLER( bios_bank_w )
 
 	/* RBC0 */
 	{
-		UINT8 *ROM00 = memory_region(space->machine, "rom00");
+		UINT8 *ROM00 = space->machine->region("rom00")->base();
 
 		memory_set_bankptr(space->machine, "rom00_bank", &ROM00[(state->bank_reg & 0xf)*0x10000]); // TODO: docs says that only 0 - 5 are used, dunno why ...
 	}
@@ -1017,7 +1017,7 @@ static WRITE16_HANDLER( video_pri_w )
 
 static READ8_HANDLER( backupram_dsw_r )
 {
-	UINT16 *knj_ram = (UINT16 *)memory_region(space->machine, "kanji");
+	UINT16 *knj_ram = (UINT16 *)space->machine->region("kanji")->base();
 
 	if(offset == 0)
 		return knj_ram[(0x50000 + 0x1fc2) / 2] & 0xff;
@@ -1474,8 +1474,8 @@ static MACHINE_START( pc88va )
 static MACHINE_RESET( pc88va )
 {
 	pc88va_state *state = machine->driver_data<pc88va_state>();
-	UINT8 *ROM00 = memory_region(machine, "rom00");
-	UINT8 *ROM10 = memory_region(machine, "rom10");
+	UINT8 *ROM00 = machine->region("rom00")->base();
+	UINT8 *ROM10 = machine->region("rom10")->base();
 
 	memory_set_bankptr(machine, "rom10_bank", &ROM10[0x00000]);
 	memory_set_bankptr(machine, "rom00_bank", &ROM00[0x00000]);
@@ -1572,48 +1572,48 @@ static const ym2203_interface pc88va_ym2203_intf =
 
 static MACHINE_CONFIG_START( pc88va, pc88va_state )
 
-	MDRV_CPU_ADD("maincpu", V30, 8000000)        /* 8 MHz */
-	MDRV_CPU_PROGRAM_MAP(pc88va_map)
-	MDRV_CPU_IO_MAP(pc88va_io_map)
-	MDRV_CPU_VBLANK_INT("screen",pc88va_vrtc_irq)
+	MCFG_CPU_ADD("maincpu", V30, 8000000)        /* 8 MHz */
+	MCFG_CPU_PROGRAM_MAP(pc88va_map)
+	MCFG_CPU_IO_MAP(pc88va_io_map)
+	MCFG_CPU_VBLANK_INT("screen",pc88va_vrtc_irq)
 
-	MDRV_CPU_ADD("fdccpu", Z80, 8000000)        /* 8 MHz */
-	MDRV_CPU_PROGRAM_MAP(pc88va_z80_map)
-	MDRV_CPU_IO_MAP(pc88va_z80_io_map)
+	MCFG_CPU_ADD("fdccpu", Z80, 8000000)        /* 8 MHz */
+	MCFG_CPU_PROGRAM_MAP(pc88va_z80_map)
+	MCFG_CPU_IO_MAP(pc88va_z80_io_map)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_SIZE(640, 480)
-	MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
-	MDRV_PALETTE_LENGTH(32)
-//	MDRV_PALETTE_INIT( pc8801 )
-	MDRV_GFXDECODE( pc88va )
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_SIZE(640, 480)
+	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
+	MCFG_PALETTE_LENGTH(32)
+//	MCFG_PALETTE_INIT( pc8801 )
+	MCFG_GFXDECODE( pc88va )
 
-	MDRV_VIDEO_START( pc88va )
-	MDRV_VIDEO_UPDATE( pc88va )
+	MCFG_VIDEO_START( pc88va )
+	MCFG_VIDEO_UPDATE( pc88va )
 
-	MDRV_MACHINE_START( pc88va )
-	MDRV_MACHINE_RESET( pc88va )
+	MCFG_MACHINE_START( pc88va )
+	MCFG_MACHINE_RESET( pc88va )
 
-	MDRV_I8255A_ADD( "d8255_2", fdd_intf )
-	MDRV_I8255A_ADD( "d8255_3", r232c_ctrl_intf )
+	MCFG_I8255A_ADD( "d8255_2", fdd_intf )
+	MCFG_I8255A_ADD( "d8255_3", r232c_ctrl_intf )
 
-	MDRV_PIC8259_ADD( "pic8259_master", pc88va_pic8259_master_config )
-	MDRV_PIC8259_ADD( "pic8259_slave", pc88va_pic8259_slave_config )
+	MCFG_PIC8259_ADD( "pic8259_master", pc88va_pic8259_master_config )
+	MCFG_PIC8259_ADD( "pic8259_slave", pc88va_pic8259_slave_config )
 
-	MDRV_UPD765A_ADD("upd765", pc88va_upd765_interface)
-	MDRV_FLOPPY_2_DRIVES_ADD(pc88va_floppy_config)
+	MCFG_UPD765A_ADD("upd765", pc88va_upd765_interface)
+	MCFG_FLOPPY_2_DRIVES_ADD(pc88va_floppy_config)
 
-    MDRV_PIT8253_ADD("pit8253",pc88va_pit8253_config)
+    MCFG_PIT8253_ADD("pit8253",pc88va_pit8253_config)
 
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("ym", YM2203, 3993600) //unknown clock / divider
-	MDRV_SOUND_CONFIG(pc88va_ym2203_intf)
-	MDRV_SOUND_ROUTE(0, "mono", 0.25)
-	MDRV_SOUND_ROUTE(1, "mono", 0.25)
-	MDRV_SOUND_ROUTE(2, "mono", 0.50)
-	MDRV_SOUND_ROUTE(3, "mono", 0.50)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("ym", YM2203, 3993600) //unknown clock / divider
+	MCFG_SOUND_CONFIG(pc88va_ym2203_intf)
+	MCFG_SOUND_ROUTE(0, "mono", 0.25)
+	MCFG_SOUND_ROUTE(1, "mono", 0.25)
+	MCFG_SOUND_ROUTE(2, "mono", 0.50)
+	MCFG_SOUND_ROUTE(3, "mono", 0.50)
 MACHINE_CONFIG_END
 
 

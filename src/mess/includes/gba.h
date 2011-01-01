@@ -194,7 +194,7 @@ public:
 	/* nvram-specific for MESS */
 	UINT8 *nvptr;
 	UINT32 nvsize;
-	running_device *nvimage;
+	device_t *nvimage;
 
 	emu_timer *dma_timer[4], *tmr_timer[4], *irq_timer;
 	emu_timer *scan_timer, *hbl_timer;

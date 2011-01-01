@@ -245,7 +245,7 @@ static INTERRUPT_GEN( cvs_main_cpu_interrupt )
 }
 
 
-static void cvs_slave_cpu_interrupt( running_device *cpu, int state )
+static void cvs_slave_cpu_interrupt( device_t *cpu, int state )
 {
 	cpu_set_input_line_vector(cpu, 0, 0x03);
 	//cpu_set_input_line(cpu, 0, state ? ASSERT_LINE : CLEAR_LINE);
@@ -437,15 +437,15 @@ static WRITE8_DEVICE_HANDLER( cvs_tms5110_pdc_w )
 }
 
 
-static int speech_rom_read_bit( running_device *device )
+static int speech_rom_read_bit( device_t *device )
 {
 	cvs_state *state = device->machine->driver_data<cvs_state>();
 	running_machine *machine = device->machine;
-	UINT8 *ROM = memory_region(machine, "speechdata");
+	UINT8 *ROM = machine->region("speechdata")->base();
 	int bit;
 
 	/* before reading the bit, clamp the address to the region length */
-	state->speech_rom_bit_address = state->speech_rom_bit_address & ((memory_region_length(machine, "speechdata") * 8) - 1);
+	state->speech_rom_bit_address = state->speech_rom_bit_address & ((machine->region("speechdata")->bytes() * 8) - 1);
 	bit = (ROM[state->speech_rom_bit_address >> 3] >> (state->speech_rom_bit_address & 0x07)) & 0x01;
 
 	/* prepare for next bit */
@@ -1064,60 +1064,60 @@ MACHINE_RESET( cvs )
 static MACHINE_CONFIG_START( cvs, cvs_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", S2650, 894886.25)
-	MDRV_CPU_PROGRAM_MAP(cvs_main_cpu_map)
-	MDRV_CPU_IO_MAP(cvs_main_cpu_io_map)
-	MDRV_CPU_VBLANK_INT("screen", cvs_main_cpu_interrupt)
+	MCFG_CPU_ADD("maincpu", S2650, 894886.25)
+	MCFG_CPU_PROGRAM_MAP(cvs_main_cpu_map)
+	MCFG_CPU_IO_MAP(cvs_main_cpu_io_map)
+	MCFG_CPU_VBLANK_INT("screen", cvs_main_cpu_interrupt)
 
-	MDRV_CPU_ADD("audiocpu", S2650, 894886.25)
-	MDRV_CPU_PROGRAM_MAP(cvs_dac_cpu_map)
-	MDRV_CPU_IO_MAP(cvs_dac_cpu_io_map)
+	MCFG_CPU_ADD("audiocpu", S2650, 894886.25)
+	MCFG_CPU_PROGRAM_MAP(cvs_dac_cpu_map)
+	MCFG_CPU_IO_MAP(cvs_dac_cpu_io_map)
 
-	MDRV_CPU_ADD("speech", S2650, 894886.25)
-	MDRV_CPU_PROGRAM_MAP(cvs_speech_cpu_map)
-	MDRV_CPU_IO_MAP(cvs_speech_cpu_io_map)
+	MCFG_CPU_ADD("speech", S2650, 894886.25)
+	MCFG_CPU_PROGRAM_MAP(cvs_speech_cpu_map)
+	MCFG_CPU_IO_MAP(cvs_speech_cpu_io_map)
 
-	MDRV_MACHINE_START(cvs)
-	MDRV_MACHINE_RESET(cvs)
+	MCFG_MACHINE_START(cvs)
+	MCFG_MACHINE_RESET(cvs)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
-	MDRV_VIDEO_START(cvs)
-	MDRV_VIDEO_UPDATE(cvs)
+	MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
+	MCFG_VIDEO_START(cvs)
+	MCFG_VIDEO_UPDATE(cvs)
 
-	MDRV_GFXDECODE(cvs)
-	MDRV_PALETTE_LENGTH((256+4)*8+8+1)
-	MDRV_PALETTE_INIT(cvs)
+	MCFG_GFXDECODE(cvs)
+	MCFG_PALETTE_LENGTH((256+4)*8+8+1)
+	MCFG_PALETTE_INIT(cvs)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 30*8-1, 1*8, 32*8-1)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1000))
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 30*8-1, 1*8, 32*8-1)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1000))
 
-	MDRV_S2636_ADD("s2636_0", s2636_0_config)
-	MDRV_S2636_ADD("s2636_1", s2636_1_config)
-	MDRV_S2636_ADD("s2636_2", s2636_2_config)
+	MCFG_S2636_ADD("s2636_0", s2636_0_config)
+	MCFG_S2636_ADD("s2636_1", s2636_1_config)
+	MCFG_S2636_ADD("s2636_2", s2636_2_config)
 
 	/* audio hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("dac1", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("dac1", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	//MDRV_SOUND_ADD("dac1a", DAC, 0)
-	//MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	//MCFG_SOUND_ADD("dac1a", DAC, 0)
+	//MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD("dac2", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("dac2", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD("dac3", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("dac3", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD("tms", TMS5100, 640000)
-	MDRV_SOUND_CONFIG(tms5100_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("tms", TMS5100, 640000)
+	MCFG_SOUND_CONFIG(tms5100_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -1598,7 +1598,7 @@ ROM_END
 
 static DRIVER_INIT( huncholy )
 {
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 
 	/* patch out protection */
 	ROM[0x0082] = 0xc0;
@@ -1618,7 +1618,7 @@ static DRIVER_INIT( huncholy )
 
 static DRIVER_INIT( hunchbaka )
 {
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 
 	offs_t offs;
 
@@ -1630,7 +1630,7 @@ static DRIVER_INIT( hunchbaka )
 
 static DRIVER_INIT( superbik )
 {
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 
 	/* patch out protection */
 	ROM[0x0079] = 0xc0;
@@ -1658,7 +1658,7 @@ static DRIVER_INIT( superbik )
 
 static DRIVER_INIT( hero )
 {
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 
 	/* patch out protection */
 	ROM[0x0087] = 0xc0;
@@ -1680,7 +1680,7 @@ static DRIVER_INIT( hero )
 
 static DRIVER_INIT( raiders )
 {
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 
 	offs_t offs;
 

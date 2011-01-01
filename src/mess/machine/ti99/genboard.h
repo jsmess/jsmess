@@ -19,7 +19,7 @@ WRITE_LINE_DEVICE_HANDLER( board_inta );
 WRITE_LINE_DEVICE_HANDLER( board_intb );
 WRITE_LINE_DEVICE_HANDLER( board_ready );
 
-#define MDRV_GENEVE_BOARD_ADD(_tag )			\
-	MDRV_DEVICE_ADD(_tag, GENBOARD, 0)
+#define MCFG_GENEVE_BOARD_ADD(_tag )			\
+	MCFG_DEVICE_ADD(_tag, GENBOARD, 0)
 
 #endif

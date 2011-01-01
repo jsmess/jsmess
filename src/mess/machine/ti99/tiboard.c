@@ -24,15 +24,15 @@ typedef struct _tiboard_state
 	int				alphaLockLine;
 
 	/* Devices */
-	running_device	*cpu;
-	running_device	*video;
-	running_device  *tms9901;
-	running_device	*peribox;
-	running_device	*sound;
+	device_t	*cpu;
+	device_t	*video;
+	device_t  *tms9901;
+	device_t	*peribox;
+	device_t	*sound;
 
-	running_device	*handset;
-	running_device	*mecmouse;
-	running_device	*gromport;
+	device_t	*handset;
+	device_t	*mecmouse;
+	device_t	*gromport;
 
 } tiboard_state;
 
@@ -42,14 +42,14 @@ static const char *const keynames8[] = {
 		"KEY8", "KEY9", "KEY10", "KEY11", "KEY12", "KEY13", "KEY14", "KEY15"
 	};
 
-INLINE tiboard_state *get_safe_token(running_device *device)
+INLINE tiboard_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(downcast<legacy_device_base *>(device)->token() != NULL);
 	return (tiboard_state *)downcast<legacy_device_base *>(device)->token();
 }
 
-INLINE const tiboard_config *get_config(running_device *device)
+INLINE const tiboard_config *get_config(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type()==TIBOARD);
@@ -65,7 +65,7 @@ INLINE const tiboard_config *get_config(running_device *device)
 */
 INTERRUPT_GEN( ti99_vblank_interrupt )
 {
-	running_device *dev = device->machine->device("ti_board");
+	device_t *dev = device->machine->device("ti_board");
 	tiboard_state *board = get_safe_token(dev);
 
 	TMS9928A_interrupt(device->machine);
@@ -154,7 +154,7 @@ static TMS9901_INT_CALLBACK( tms9901_interrupt_callback )
 */
 static WRITE8_DEVICE_HANDLER( ti99_handset_set_ack )
 {
-	running_device *dev = device->machine->device("ti_board");
+	device_t *dev = device->machine->device("ti_board");
 	tiboard_state *board = get_safe_token(dev);
 
 	if (board->handset != NULL)
@@ -172,7 +172,7 @@ static WRITE8_DEVICE_HANDLER( ti99_handset_set_ack )
 static READ8_DEVICE_HANDLER( ti99_R9901_0 )
 {
 	int answer = 0;
-	running_device *dev = device->machine->device("ti_board");
+	device_t *dev = device->machine->device("ti_board");
 	tiboard_state *board = get_safe_token(dev);
 
 	if (board->keyCol == 7)
@@ -203,7 +203,7 @@ static READ8_DEVICE_HANDLER( ti99_R9901_0 )
 static READ8_DEVICE_HANDLER( ti99_R9901_0a )
 {
 	int answer;
-	running_device *dev = device->machine->device("ti_board");
+	device_t *dev = device->machine->device("ti_board");
 	tiboard_state *board = get_safe_token(dev);
 
 	if ((board->mecmouse != NULL) && (board->keyCol == 7))
@@ -230,7 +230,7 @@ static READ8_DEVICE_HANDLER( ti99_R9901_0a )
 static READ8_DEVICE_HANDLER( ti99_R9901_1 )
 {
 	int answer;
-	running_device *dev = device->machine->device("ti_board");
+	device_t *dev = device->machine->device("ti_board");
 	tiboard_state *board = get_safe_token(dev);
 
 	if (board->keyCol == 7)
@@ -254,7 +254,7 @@ static READ8_DEVICE_HANDLER( ti99_R9901_1 )
 */
 static READ8_DEVICE_HANDLER( ti99_R9901_2 )
 {
-	running_device *dev = device->machine->device("ti_board");
+	device_t *dev = device->machine->device("ti_board");
 	tiboard_state *board = get_safe_token(dev);
 
 	if (board->handset != NULL)
@@ -271,7 +271,7 @@ static READ8_DEVICE_HANDLER( ti99_R9901_2 )
 static READ8_DEVICE_HANDLER( ti99_R9901_3 )
 {
 	int answer = 4;
-	running_device *dev = device->machine->device("ti_board");
+	device_t *dev = device->machine->device("ti_board");
 	tiboard_state *board = get_safe_token(dev);
 
 	/* on systems without handset, the pin is pulled up to avoid spurious interrupts */
@@ -304,7 +304,7 @@ static READ8_DEVICE_HANDLER( ti99_8_R9901_3 )
 */
 static WRITE8_DEVICE_HANDLER( ti99_KeyC )
 {
-	running_device *dev = device->machine->device("ti_board");
+	device_t *dev = device->machine->device("ti_board");
 	tiboard_state *board = get_safe_token(dev);
 
 	int index=5;
@@ -326,7 +326,7 @@ static WRITE8_DEVICE_HANDLER( ti99_KeyC )
 */
 static WRITE8_DEVICE_HANDLER( ti99_AlphaW )
 {
-	running_device *dev = device->machine->device("ti_board");
+	device_t *dev = device->machine->device("ti_board");
 	tiboard_state *board = get_safe_token(dev);
 	board->alphaLockLine = data;
 }
@@ -336,7 +336,7 @@ static WRITE8_DEVICE_HANDLER( ti99_AlphaW )
 */
 static WRITE8_DEVICE_HANDLER( ti99_CS1_motor )
 {
-	running_device *img = device->machine->device("cassette1");
+	device_t *img = device->machine->device("cassette1");
 	cassette_change_state(img, data ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 }
 
@@ -345,7 +345,7 @@ static WRITE8_DEVICE_HANDLER( ti99_CS1_motor )
 */
 static WRITE8_DEVICE_HANDLER( ti99_CS2_motor )
 {
-	running_device *img = device->machine->device("cassette2");
+	device_t *img = device->machine->device("cassette2");
 	cassette_change_state(img, data ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 }
 
@@ -354,7 +354,7 @@ static WRITE8_DEVICE_HANDLER( ti99_CS2_motor )
 */
 static WRITE8_DEVICE_HANDLER( ti99_CS_motor )
 {
-	running_device *img = device->machine->device("cassette");
+	device_t *img = device->machine->device("cassette");
 	cassette_change_state(img, data ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 }
 
@@ -395,7 +395,7 @@ static WRITE8_DEVICE_HANDLER( ti99_CS_output )
 */
 static WRITE8_DEVICE_HANDLER( ti99_8_KeyC )
 {
-	running_device *dev = device->machine->device("ti_board");
+	device_t *dev = device->machine->device("ti_board");
 	tiboard_state *board = get_safe_token(dev);
 
 	if (data)
@@ -409,13 +409,13 @@ static WRITE8_DEVICE_HANDLER( ti99_8_KeyC )
 
 static WRITE8_DEVICE_HANDLER( ti99_8_CRUS )
 {
-	running_device *mapper = device->machine->device("mapper");
+	device_t *mapper = device->machine->device("mapper");
 	mapper8_CRUS_w(mapper, 0, data);
 }
 
 static WRITE8_DEVICE_HANDLER( ti99_8_PTGEN )
 {
-	running_device *mapper = device->machine->device("mapper");
+	device_t *mapper = device->machine->device("mapper");
 	mapper8_PTGEN_w(mapper, 0, data);
 }
 
@@ -432,7 +432,7 @@ static WRITE8_DEVICE_HANDLER( ti99_8_PTGEN )
 static READ8_DEVICE_HANDLER( ti99_8_R9901_0 )
 {
 	int answer;
-	running_device *dev = device->machine->device("ti_board");
+	device_t *dev = device->machine->device("ti_board");
 	tiboard_state *board = get_safe_token(dev);
 
 	if (board->mecmouse != NULL && (board->keyCol == 15))
@@ -459,7 +459,7 @@ static READ8_DEVICE_HANDLER( ti99_8_R9901_0 )
 */
 static READ8_DEVICE_HANDLER( ti99_8_R9901_1 )
 {
-	running_device *dev = device->machine->device("ti_board");
+	device_t *dev = device->machine->device("ti_board");
 	tiboard_state *board = get_safe_token(dev);
 	int answer;
 

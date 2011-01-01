@@ -153,7 +153,7 @@ static void microtan_set_irq_line(running_machine *machine)
     cputag_set_input_line(machine, "maincpu", 0, state->via_0_irq_line | state->via_1_irq_line | state->kbd_irq_line);
 }
 
-static running_device *cassette_device_image(running_machine *machine)
+static device_t *cassette_device_image(running_machine *machine)
 {
 	return machine->device("cassette");
 }
@@ -225,7 +225,7 @@ static WRITE8_DEVICE_HANDLER (via_0_out_cb2 )
     LOG(("microtan_via_0_out_cb2 %d\n", data));
 }
 
-static void via_0_irq(running_device *device, int state)
+static void via_0_irq(device_t *device, int state)
 {
 	microtan_state *drvstate = device->machine->driver_data<microtan_state>();
     LOG(("microtan_via_0_irq %d\n", state));
@@ -298,7 +298,7 @@ static WRITE8_DEVICE_HANDLER ( via_1_out_cb2 )
     LOG(("microtan_via_1_out_cb2 %d\n", data));
 }
 
-static void via_1_irq(running_device *device, int state)
+static void via_1_irq(device_t *device, int state)
 {
 	microtan_state *drvstate = device->machine->driver_data<microtan_state>();
     LOG(("microtan_via_1_irq %d\n", state));
@@ -516,7 +516,7 @@ INTERRUPT_GEN( microtan_interrupt )
 DRIVER_INIT( microtan )
 {
 	microtan_state *state = machine->driver_data<microtan_state>();
-    UINT8 *dst = memory_region(machine, "gfx2");
+    UINT8 *dst = machine->region("gfx2")->base();
     int i;
     address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 

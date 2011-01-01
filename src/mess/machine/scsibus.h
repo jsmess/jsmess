@@ -20,9 +20,9 @@
 
 DECLARE_LEGACY_DEVICE(SCSIBUS, scsibus);
 
-#define MDRV_SCSIBUS_ADD(_tag, _intrf) \
-	MDRV_DEVICE_ADD(_tag, SCSIBUS, 0) \
-	MDRV_DEVICE_CONFIG(_intrf)
+#define MCFG_SCSIBUS_ADD(_tag, _intrf) \
+	MCFG_DEVICE_ADD(_tag, SCSIBUS, 0) \
+	MCFG_DEVICE_CONFIG(_intrf)
 
 
 /***************************************************************************
@@ -71,23 +71,23 @@ typedef struct _SCSIBus_interface SCSIBus_interface;
 struct _SCSIBus_interface
 {
     const SCSIConfigTable *scsidevs;		/* SCSI devices */
-    void (*line_change_cb)(running_device *device, UINT8 line, UINT8 state);
+    void (*line_change_cb)(device_t *device, UINT8 line, UINT8 state);
 };
 
 /* SCSI Bus read/write */
 
-UINT8 scsi_data_r(running_device *device);
-void scsi_data_w(running_device *device, UINT8 data);
+UINT8 scsi_data_r(device_t *device);
+void scsi_data_w(device_t *device, UINT8 data);
 
 /* Get/Set lines */
 
-UINT8 get_scsi_lines(running_device *device);
-UINT8 get_scsi_line(running_device *device, UINT8 lineno);
-void set_scsi_line(running_device *device, UINT8 line, UINT8 state);
+UINT8 get_scsi_lines(device_t *device);
+UINT8 get_scsi_line(device_t *device, UINT8 lineno);
+void set_scsi_line(device_t *device, UINT8 line, UINT8 state);
 
 /* Get current bus phase */
 
-UINT8 get_scsi_phase(running_device *device);
+UINT8 get_scsi_phase(device_t *device);
 
 /* utility functions */
 
@@ -98,6 +98,6 @@ UINT8 scsibus_driveno(UINT8  drivesel);
 int get_scsi_cmd_len(int cbyte);
 
 /* Initialisation at machine reset time */
-void init_scsibus(running_device *device);
+void init_scsibus(device_t *device);
 
 #endif

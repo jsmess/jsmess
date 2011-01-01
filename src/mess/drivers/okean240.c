@@ -18,7 +18,7 @@ public:
 };
 
 
-static READ8_HANDLER( okean240_rand_r ) { return mame_rand(space->machine); } // so we can start booting
+static READ8_HANDLER( okean240_rand_r ) { return space->machine->rand(); } // so we can start booting
 
 
 static ADDRESS_MAP_START(okean240_mem, ADDRESS_SPACE_PROGRAM, 8)
@@ -55,7 +55,7 @@ static MACHINE_RESET(okean240)
 
 DRIVER_INIT( okean240 )
 {
-	UINT8 *RAM = memory_region(machine, "maincpu");
+	UINT8 *RAM = machine->region("maincpu")->base();
 	memory_configure_bank(machine, "boot", 0, 2, &RAM[0x0000], 0xe000);
 }
 
@@ -112,25 +112,25 @@ GFXDECODE_END
 
 static MACHINE_CONFIG_START( okean240, okean240_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu",I8080, XTAL_12MHz / 6)
-	MDRV_CPU_PROGRAM_MAP(okean240_mem)
-	MDRV_CPU_IO_MAP(okean240_io)	
+	MCFG_CPU_ADD("maincpu",I8080, XTAL_12MHz / 6)
+	MCFG_CPU_PROGRAM_MAP(okean240_mem)
+	MCFG_CPU_IO_MAP(okean240_io)	
 
-	MDRV_MACHINE_RESET(okean240)
+	MCFG_MACHINE_RESET(okean240)
 	
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(50)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(640, 480)
-	MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MDRV_PALETTE_LENGTH(2)
-	MDRV_PALETTE_INIT(black_and_white)
-	MDRV_GFXDECODE(okean240)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(640, 480)
+	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+	MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_INIT(black_and_white)
+	MCFG_GFXDECODE(okean240)
 
-	MDRV_VIDEO_START(okean240)
-	MDRV_VIDEO_UPDATE(okean240)
+	MCFG_VIDEO_START(okean240)
+	MCFG_VIDEO_UPDATE(okean240)
 MACHINE_CONFIG_END
 
 /* ROM definition */

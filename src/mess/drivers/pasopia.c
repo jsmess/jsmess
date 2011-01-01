@@ -148,7 +148,7 @@ static void fake_keyboard_data(running_machine *machine)
 
 static void draw_cg4_screen(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int width)
 {
-	UINT8 *vram = memory_region(machine, "vram");
+	UINT8 *vram = machine->region("vram")->base();
 	int x,y,xi,yi;
 	int count;
 
@@ -180,7 +180,7 @@ static void draw_cg4_screen(running_machine *machine, bitmap_t *bitmap,const rec
 static void draw_tv_screen(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int width)
 {
 	pasopia_state *state = machine->driver_data<pasopia_state>();
-	UINT8 *vram = memory_region(machine, "vram");
+	UINT8 *vram = machine->region("vram")->base();
 	int x,y/*,xi,yi*/;
 	int count;
 
@@ -229,8 +229,8 @@ static void draw_tv_screen(running_machine *machine, bitmap_t *bitmap,const rect
 static void draw_mixed_screen(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int width)
 {
 	pasopia_state *state = machine->driver_data<pasopia_state>();
-	UINT8 *vram = memory_region(machine, "vram");
-	UINT8 *gfx_data = memory_region(machine,"font");
+	UINT8 *vram = machine->region("vram")->base();
+	UINT8 *gfx_data = machine->region("font")->base();
 	int x,y,xi,yi;
 	int count;
 
@@ -332,12 +332,12 @@ static VIDEO_UPDATE( paso7 )
 static READ8_HANDLER( vram_r )
 {
 	pasopia_state *state = space->machine->driver_data<pasopia_state>();
-	UINT8 *vram = memory_region(space->machine, "vram");
+	UINT8 *vram = space->machine->region("vram")->base();
 	UINT8 res;
 
 	if(state->vram_sel == 0)
 	{
-		UINT8 *work_ram = memory_region(space->machine, "maincpu");
+		UINT8 *work_ram = space->machine->region("maincpu")->base();
 
 		return work_ram[offset+0x8000];
 	}
@@ -363,7 +363,7 @@ static READ8_HANDLER( vram_r )
 static WRITE8_HANDLER( vram_w )
 {
 	pasopia_state *state = space->machine->driver_data<pasopia_state>();
-	UINT8 *vram = memory_region(space->machine, "vram");
+	UINT8 *vram = space->machine->region("vram")->base();
 
 	if(state->vram_sel)
 	{
@@ -386,7 +386,7 @@ static WRITE8_HANDLER( vram_w )
 	}
 	else
 	{
-		UINT8 *work_ram = memory_region(space->machine, "maincpu");
+		UINT8 *work_ram = space->machine->region("maincpu")->base();
 
 		work_ram[offset+0x8000] = data;
 	}
@@ -395,8 +395,8 @@ static WRITE8_HANDLER( vram_w )
 static WRITE8_HANDLER( pasopia7_memory_ctrl_w )
 {
 	pasopia_state *state = space->machine->driver_data<pasopia_state>();
-	UINT8 *work_ram = memory_region(space->machine, "maincpu");
-	UINT8 *basic = memory_region(space->machine, "basic");
+	UINT8 *work_ram = space->machine->region("maincpu")->base();
+	UINT8 *basic = space->machine->region("basic")->base();
 
 	switch(data & 3)
 	{
@@ -427,7 +427,7 @@ static WRITE8_HANDLER( pasopia7_memory_ctrl_w )
 #if 0
 static READ8_HANDLER( fdc_r )
 {
-	return mame_rand(space->machine);
+	return space->machine->rand();
 }
 #endif
 
@@ -454,7 +454,7 @@ static WRITE8_HANDLER( pac2_w )
 			{
 				UINT8 *pac2_ram;
 
-				pac2_ram = memory_region(space->machine, ((state->pac2_bank_select-3) & 1) ? "rampac2" : "rampac1");
+				pac2_ram = space->machine->region(((state->pac2_bank_select-3) & 1) ? "rampac2" : "rampac1")->base();
 
 				pac2_ram[state->pac2_index[(state->pac2_bank_select-3) & 1]] = data;
 			}
@@ -490,13 +490,13 @@ static READ8_HANDLER( pac2_r )
 		{
 			UINT8 *pac2_ram;
 
-			pac2_ram = memory_region(space->machine, ((state->pac2_bank_select-3) & 1) ? "rampac2" : "rampac1");
+			pac2_ram = space->machine->region(((state->pac2_bank_select-3) & 1) ? "rampac2" : "rampac1")->base();
 
 			return pac2_ram[state->pac2_index[(state->pac2_bank_select-3) & 1]];
 		}
 		else if(state->pac2_bank_select == 2)
 		{
-			UINT8 *kanji_rom = memory_region(space->machine, "kanji");
+			UINT8 *kanji_rom = space->machine->region("kanji")->base();
 
 			return kanji_rom[state->kanji_index];
 		}
@@ -512,7 +512,7 @@ static READ8_HANDLER( pac2_r )
 /* writes always occurs to the RAM banks, even if the ROMs are selected. */
 static WRITE8_HANDLER( ram_bank_w )
 {
-	UINT8 *work_ram = memory_region(space->machine, "maincpu");
+	UINT8 *work_ram = space->machine->region("maincpu")->base();
 
 	work_ram[offset] = data;
 }
@@ -712,7 +712,7 @@ static Z80CTC_INTERFACE( ctc_intf )
 
 static READ8_DEVICE_HANDLER( test_r )
 {
-	return mame_rand(device->machine);
+	return device->machine->rand();
 }
 
 static WRITE_LINE_DEVICE_HANDLER( testa_w )
@@ -827,14 +827,14 @@ static WRITE8_DEVICE_HANDLER( nmi_mask_w )
 /* TODO: investigate on these. */
 static READ8_DEVICE_HANDLER( unk_r )
 {
-	return 0xff;//mame_rand(device->machine);
+	return 0xff;//device->machine->rand();
 }
 
 static READ8_DEVICE_HANDLER( nmi_reg_r )
 {
 	pasopia_state *state = device->machine->driver_data<pasopia_state>();
 	//printf("C\n");
-	return 0xfc | state->bank_reg;//mame_rand(device->machine);
+	return 0xfc | state->bank_reg;//device->machine->rand();
 }
 
 static WRITE8_DEVICE_HANDLER( nmi_reg_w )
@@ -892,7 +892,7 @@ static I8255A_INTERFACE( ppi8255_intf_2 )
 static MACHINE_RESET( paso7 )
 {
 	pasopia_state *state = machine->driver_data<pasopia_state>();
-	UINT8 *bios = memory_region(machine, "maincpu");
+	UINT8 *bios = machine->region("maincpu")->base();
 
 	memory_set_bankptr(machine, "bank1", bios + 0x10000);
 	memory_set_bankptr(machine, "bank2", bios + 0x10000);
@@ -926,44 +926,44 @@ static PALETTE_INIT( pasopia7 )
 
 static MACHINE_CONFIG_START( paso7, pasopia_state )
     /* basic machine hardware */
-    MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz)
-    MDRV_CPU_PROGRAM_MAP(paso7_mem)
-    MDRV_CPU_IO_MAP(paso7_io)
-//  MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
-	MDRV_CPU_CONFIG(p7_daisy)
+    MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
+    MCFG_CPU_PROGRAM_MAP(paso7_mem)
+    MCFG_CPU_IO_MAP(paso7_io)
+//  MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_CONFIG(p7_daisy)
 
-	MDRV_Z80CTC_ADD( "ctc", XTAL_4MHz, ctc_intf )
+	MCFG_Z80CTC_ADD( "ctc", XTAL_4MHz, ctc_intf )
 
-    MDRV_MACHINE_RESET(paso7)
+    MCFG_MACHINE_RESET(paso7)
 
-	MDRV_I8255A_ADD( "ppi8255_0", ppi8255_intf_0 )
-	MDRV_I8255A_ADD( "ppi8255_1", ppi8255_intf_1 )
-	MDRV_I8255A_ADD( "ppi8255_2", ppi8255_intf_2 )
-	MDRV_Z80PIO_ADD( "z80pio_0", XTAL_4MHz, z80pio_intf )
+	MCFG_I8255A_ADD( "ppi8255_0", ppi8255_intf_0 )
+	MCFG_I8255A_ADD( "ppi8255_1", ppi8255_intf_1 )
+	MCFG_I8255A_ADD( "ppi8255_2", ppi8255_intf_2 )
+	MCFG_Z80PIO_ADD( "z80pio_0", XTAL_4MHz, z80pio_intf )
 
     /* video hardware */
-    MDRV_SCREEN_ADD("screen", RASTER)
-    MDRV_SCREEN_REFRESH_RATE(60)
-    MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-    MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-    MDRV_SCREEN_SIZE(640, 480)
-    MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
-	MDRV_MC6845_ADD("crtc", H46505, VDP_CLOCK, mc6845_intf)	/* unknown clock, hand tuned to get ~60 fps */
-    MDRV_PALETTE_LENGTH(0x28)
-    MDRV_PALETTE_INIT(pasopia7)
+    MCFG_SCREEN_ADD("screen", RASTER)
+    MCFG_SCREEN_REFRESH_RATE(60)
+    MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+    MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+    MCFG_SCREEN_SIZE(640, 480)
+    MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
+	MCFG_MC6845_ADD("crtc", H46505, VDP_CLOCK, mc6845_intf)	/* unknown clock, hand tuned to get ~60 fps */
+    MCFG_PALETTE_LENGTH(0x28)
+    MCFG_PALETTE_INIT(pasopia7)
 
-	MDRV_GFXDECODE( pasopia7 )
+	MCFG_GFXDECODE( pasopia7 )
 
-    MDRV_VIDEO_START(paso7)
-    MDRV_VIDEO_UPDATE(paso7)
+    MCFG_VIDEO_START(paso7)
+    MCFG_VIDEO_UPDATE(paso7)
 
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("sn1", SN76489A, 1996800) // unknown clock / divider
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("sn1", SN76489A, 1996800) // unknown clock / divider
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD("sn2", SN76489A, 1996800) // unknown clock / divider
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("sn2", SN76489A, 1996800) // unknown clock / divider
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 /* ROM definition */

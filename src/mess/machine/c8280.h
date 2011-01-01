@@ -18,10 +18,10 @@
 
 DECLARE_LEGACY_DEVICE(C8280, c8280);
 
-#define MDRV_C8280_ADD(_tag, _bus_tag, _address) \
-	MDRV_DEVICE_ADD(_tag, C8280, 0) \
-	MDRV_DEVICE_CONFIG_DATAPTR(c8280_config, bus_tag, _bus_tag) \
-	MDRV_DEVICE_CONFIG_DATA32(c8280_config, address, _address)
+#define MCFG_C8280_ADD(_tag, _bus_tag, _address) \
+	MCFG_DEVICE_ADD(_tag, C8280, 0) \
+	MCFG_DEVICE_CONFIG_DATAPTR(c8280_config, bus_tag, _bus_tag) \
+	MCFG_DEVICE_CONFIG_DATA32(c8280_config, address, _address)
 
 #define C8280_IEEE488(_tag) \
 	_tag, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_DEVICE_LINE(_tag, c8280_ieee488_ifc_w), DEVCB_NULL, DEVCB_DEVICE_LINE(_tag, c8280_ieee488_atn_w), DEVCB_NULL

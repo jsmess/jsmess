@@ -61,7 +61,7 @@
 */
 static READ8_HANDLER( cassette_r )
 {
-	running_device *cassette = space->machine->device("cassette");
+	device_t *cassette = space->machine->device("cassette");
 	return (cassette_input(cassette) < +0.0) ? 0 : 1;
 }
 
@@ -73,8 +73,8 @@ static READ8_HANDLER( cassette_r )
 */
 static WRITE8_HANDLER( cassette_w )
 {
-	running_device *speaker = space->machine->device("speaker");
-	running_device *cassette = space->machine->device("cassette");
+	device_t *speaker = space->machine->device("speaker");
+	device_t *cassette = space->machine->device("cassette");
 
 	speaker_level_w(speaker, BIT(data, 0));
 	cassette_output(cassette, BIT(data, 0) ? +1.0 : -1.0);
@@ -187,7 +187,7 @@ static WRITE8_HANDLER( scrambler_w )
 static READ8_HANDLER( cartridge_r )
 {
 	aquarius_state *state = space->machine->driver_data<aquarius_state>();
-	UINT8 *rom = memory_region(space->machine, "maincpu") + 0xc000;
+	UINT8 *rom = space->machine->region("maincpu")->base() + 0xc000;
 	return rom[offset] ^ state->scrambler;
 }
 
@@ -395,49 +395,49 @@ static const cassette_config aquarius_cassette_config =
 
 static MACHINE_CONFIG_START( aquarius, aquarius_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, XTAL_3_579545MHz) // ???
-	MDRV_CPU_PROGRAM_MAP(aquarius_mem)
-	MDRV_CPU_IO_MAP(aquarius_io)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_3_579545MHz) // ???
+	MCFG_CPU_PROGRAM_MAP(aquarius_mem)
+	MCFG_CPU_IO_MAP(aquarius_io)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
     /* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2800))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(40 * 8, 25 * 8)
-	MDRV_SCREEN_VISIBLE_AREA(0, 40 * 8 - 1, 0 * 8, 25 * 8 - 1)
-	MDRV_GFXDECODE( aquarius )
-	MDRV_PALETTE_LENGTH(512)
-	MDRV_PALETTE_INIT( aquarius )
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2800))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(40 * 8, 25 * 8)
+	MCFG_SCREEN_VISIBLE_AREA(0, 40 * 8 - 1, 0 * 8, 25 * 8 - 1)
+	MCFG_GFXDECODE( aquarius )
+	MCFG_PALETTE_LENGTH(512)
+	MCFG_PALETTE_INIT( aquarius )
 
-	MDRV_VIDEO_START( aquarius )
-	MDRV_VIDEO_UPDATE( aquarius )
+	MCFG_VIDEO_START( aquarius )
+	MCFG_VIDEO_UPDATE( aquarius )
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MDRV_SOUND_ADD("ay8910", AY8910, XTAL_3_579545MHz/2) // ??? AY-3-8914
-	MDRV_SOUND_CONFIG(aquarius_ay8910_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD("ay8910", AY8910, XTAL_3_579545MHz/2) // ??? AY-3-8914
+	MCFG_SOUND_CONFIG(aquarius_ay8910_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* printer */
-	MDRV_PRINTER_ADD("printer")
+	MCFG_PRINTER_ADD("printer")
 
 	/* cassette */
-	MDRV_CASSETTE_ADD( "cassette", aquarius_cassette_config )
+	MCFG_CASSETTE_ADD( "cassette", aquarius_cassette_config )
 
 	/* cartridge */
-	MDRV_CARTSLOT_ADD("cart")
-	MDRV_CARTSLOT_EXTENSION_LIST("bin")
-	MDRV_CARTSLOT_NOT_MANDATORY
+	MCFG_CARTSLOT_ADD("cart")
+	MCFG_CARTSLOT_EXTENSION_LIST("bin")
+	MCFG_CARTSLOT_NOT_MANDATORY
 
 	/* internal ram */
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("4K")
-	MDRV_RAM_EXTRA_OPTIONS("8K,20K,36K")
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("4K")
+	MCFG_RAM_EXTRA_OPTIONS("8K,20K,36K")
 MACHINE_CONFIG_END
 
 static FLOPPY_OPTIONS_START(aquarius)
@@ -458,12 +458,12 @@ static const floppy_config aquarius_floppy_config =
 
 static MACHINE_CONFIG_DERIVED( aquarius_qd, aquarius )
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(aquarius_qd_io)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_IO_MAP(aquarius_qd_io)
 
-	MDRV_DEVICE_REMOVE("cart")
+	MCFG_DEVICE_REMOVE("cart")
 
-	MDRV_FLOPPY_2_DRIVES_ADD(aquarius_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_ADD(aquarius_floppy_config)
 MACHINE_CONFIG_END
 
 

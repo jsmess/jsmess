@@ -23,12 +23,12 @@ struct _terminal_interface
 
 DECLARE_LEGACY_DEVICE(GENERIC_TERMINAL, terminal);
 
-#define MDRV_GENERIC_TERMINAL_ADD(_tag, _intrf) \
-	MDRV_DEVICE_ADD(_tag, GENERIC_TERMINAL, 0) \
-	MDRV_DEVICE_CONFIG(_intrf)
+#define MCFG_GENERIC_TERMINAL_ADD(_tag, _intrf) \
+	MCFG_DEVICE_ADD(_tag, GENERIC_TERMINAL, 0) \
+	MCFG_DEVICE_CONFIG(_intrf)
 
-#define MDRV_GENERIC_TERMINAL_REMOVE(_tag)		\
-    MDRV_DEVICE_REMOVE(_tag)
+#define MCFG_GENERIC_TERMINAL_REMOVE(_tag)		\
+    MCFG_DEVICE_REMOVE(_tag)
 
 
 /***************************************************************************

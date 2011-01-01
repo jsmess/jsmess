@@ -519,7 +519,7 @@ static WRITE32_HANDLER( control_w )
 {
 	ksys573_state *state = space->machine->driver_data<ksys573_state>();
 	UINT32 control;
-//  int old_bank = flash_bank;
+	int old_bank = state->flash_bank;
 
 	COMBINE_DATA(&state->control);
 	control = state->control;
@@ -538,27 +538,27 @@ static WRITE32_HANDLER( control_w )
 	if( state->flash_device[0][0] != NULL && ( control & ~0x43 ) == 0x00 )
 	{
 		state->flash_bank = (0 << 8) + ( ( control & 3 ) * 2 );
-//      if( state->flash_bank != old_bank ) mame_printf_debug( "onboard %d\r", control & 3 );
+		if( state->flash_bank != old_bank ) verboselog( space->machine, 1, "onboard %d\n", control & 3 );
 	}
 	else if( state->flash_device[1][0] != NULL && ( control & ~0x47 ) == 0x10 )
 	{
 		state->flash_bank = (1 << 8) + ( ( control & 7 ) * 2 );
-//      if( state->flash_bank != old_bank ) mame_printf_debug( "pccard1 %d\r", control & 7 );
+		if( state->flash_bank != old_bank ) verboselog( space->machine, 1, "pccard1 %d\n", control & 7 );
 	}
 	else if( state->flash_device[2][0] != NULL && ( control & ~0x47 ) == 0x20 )
 	{
 		state->flash_bank = (2 << 8) + ( ( control & 7 ) * 2 );
-//      if( state->flash_bank != old_bank ) mame_printf_debug( "pccard2 %d\r", control & 7 );
+		if( state->flash_bank != old_bank ) verboselog( space->machine, 1, "pccard2 %d\n", control & 7 );
 	}
 	else if( state->flash_device[3][0] != NULL && ( control & ~0x47 ) == 0x20 )
 	{
 		state->flash_bank = (3 << 8) + ( ( control & 7 ) * 2 );
-//      if( state->flash_bank != old_bank ) mame_printf_debug( "pccard3 %d\r", control & 7 );
+		if( state->flash_bank != old_bank ) verboselog( space->machine, 1, "pccard3 %d\n", control & 7 );
 	}
 	else if( state->flash_device[4][0] != NULL && ( control & ~0x47 ) == 0x28 )
 	{
 		state->flash_bank = (4 << 8) + ( ( control & 7 ) * 2 );
-//      if( state->flash_bank != old_bank ) mame_printf_debug( "pccard4 %d\r", control & 7 );
+		if( state->flash_bank != old_bank ) verboselog( space->machine, 1, "pccard4 %d\n", control & 7 );
 	}
 }
 
@@ -1214,7 +1214,7 @@ static READ32_HANDLER( flash_r )
 		}
 	}
 
-	verboselog( space->machine, 2, "flash_r( %08x, %08x, %08x)\n", offset, mem_mask, data );
+	verboselog( space->machine, 2, "flash_r( %08x, %08x, %08x) bank = %08x\n", offset, mem_mask, data, state->flash_bank );
 
 	return data;
 }
@@ -1461,7 +1461,7 @@ static ADDRESS_MAP_START( konami573_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x1f801c00, 0x1f801dff) AM_DEVREADWRITE("spu", psx_spu_r, psx_spu_w)
 	AM_RANGE(0x1f802020, 0x1f802033) AM_RAM /* ?? */
 	AM_RANGE(0x1f802040, 0x1f802043) AM_WRITENOP
-	AM_RANGE(0x1fc00000, 0x1fc7ffff) AM_ROM AM_SHARE("share2") AM_REGION("user1", 0) /* bios */
+	AM_RANGE(0x1fc00000, 0x1fc7ffff) AM_ROM AM_SHARE("share2") AM_REGION("bios", 0)
 	AM_RANGE(0x80000000, 0x803fffff) AM_RAM AM_SHARE("share1") /* ram mirror */
 	AM_RANGE(0x9fc00000, 0x9fc7ffff) AM_ROM AM_SHARE("share2") /* bios mirror */
 	AM_RANGE(0xa0000000, 0xa03fffff) AM_RAM AM_SHARE("share1") /* ram mirror */
@@ -1499,9 +1499,9 @@ static void *atapi_get_device(running_machine *machine)
 static void security_cart_init( running_machine *machine, int cart, const char *eeprom_region, const char *ds2401_region )
 {
 	ksys573_state *state = machine->driver_data<ksys573_state>();
-	UINT8 *eeprom_rom = memory_region( machine, eeprom_region );
-	int eeprom_length = memory_region_length( machine, eeprom_region );
-	UINT8 *ds2401_rom = memory_region( machine, ds2401_region );
+	UINT8 *eeprom_rom = machine->region( eeprom_region )->base();
+	int eeprom_length = machine->region( eeprom_region )->bytes();
+	UINT8 *ds2401_rom = machine->region( ds2401_region )->base();
 
 	if( eeprom_rom != NULL )
 	{
@@ -1619,7 +1619,7 @@ static MACHINE_RESET( konami573 )
 	state->flash_bank = -1;
 }
 
-static void spu_irq(running_device *device, UINT32 data)
+static void spu_irq(device_t *device, UINT32 data)
 {
 	psx_irq_set(device->machine, data);
 }
@@ -1697,7 +1697,7 @@ todo:
 
 static READ32_HANDLER( ge765pwbba_r )
 {
-	running_device *upd4701 = space->machine->device("upd4701");
+	device_t *upd4701 = space->machine->device("upd4701");
 	UINT32 data = 0;
 
 	switch (offset)
@@ -1735,7 +1735,7 @@ static READ32_HANDLER( ge765pwbba_r )
 
 static WRITE32_HANDLER( ge765pwbba_w )
 {
-	running_device *upd4701 = space->machine->device("upd4701");
+	device_t *upd4701 = space->machine->device("upd4701");
 	switch (offset)
 	{
 	case 0x04:
@@ -2839,21 +2839,78 @@ static DRIVER_INIT( hyperbbc )
 	state_save_register_global( machine, state->hyperbbc_lamp_strobe2 );
 }
 
+/* Mambo A Go Go */
+
+static void mamboagg_output_callback( running_machine *machine, int offset, int data )
+{
+	switch( offset )
+	{
+	case 4:
+		output_set_value( "fire lamp left", !data );
+		break;
+	case 5:
+		output_set_value( "fire fan left", !data );
+		break;
+	case 6:
+		output_set_value( "fire fan right", !data );
+		break;
+	case 7:
+		output_set_value( "fire lamp right", !data );
+		break;
+	case 28:
+		output_set_value( "conga left", !data );
+		break;
+	case 29:
+		output_set_value( "conga right", !data );
+		break;
+	case 31:
+		output_set_value( "conga centre", !data );
+		break;
+	}
+}
+
+static WRITE32_HANDLER( mamboagg_io_w )
+{
+	verboselog( space->machine, 2, "mamboagg_io_w( %08x, %08x ) %08x\n", offset, mem_mask, data );
+
+	switch( offset )
+	{
+	case 0:
+		output_set_led_value( 0, !( ( data >> 3 ) & 1 ) ); // start 1p
+		output_set_value( "select right", !( ( data >> 4 ) & 1 ) );
+		output_set_value( "select left", !( ( data >> 5 ) & 1 ) );
+		break;
+
+	default:
+		verboselog( space->machine, 0, "mamboagg_io_w: unhandled offset %08x, %08x\n", offset, mem_mask );
+		break;
+	}
+}
+
+static DRIVER_INIT( mamboagg )
+{
+	DRIVER_INIT_CALL(konami573);
+
+	gx894pwbba_init( machine, mamboagg_output_callback );
+
+	memory_install_write32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f600000, 0x1f6000ff, 0, 0, mamboagg_io_w );
+}
+
 
 /* ADC0834 Interface */
 
-static double analogue_inputs_callback( running_device *device, UINT8 input )
+static double analogue_inputs_callback( device_t *device, UINT8 input )
 {
 	switch (input)
 	{
 	case ADC083X_CH0:
-		return (double)(5 * input_port_read_safe( device->machine, "analog0", 0 )) / 255.0;
+		return (double)( 5 * input_port_read_safe( device->machine, "analog0", 0 ) ) / 255.0;
 	case ADC083X_CH1:
-		return (double)(5 * input_port_read_safe( device->machine, "analog1", 0 )) / 255.0;
+		return (double)( 5 * input_port_read_safe( device->machine, "analog1", 0 ) ) / 255.0;
 	case ADC083X_CH2:
-		return (double)(5 * input_port_read_safe( device->machine, "analog2", 0 )) / 255.0;
+		return (double)( 5 * input_port_read_safe( device->machine, "analog2", 0 ) ) / 255.0;
 	case ADC083X_CH3:
-		return (double)(5 * input_port_read_safe( device->machine, "analog3", 0 )) / 255.0;
+		return (double)( 5 * input_port_read_safe( device->machine, "analog3", 0 ) ) / 255.0;
 	case ADC083X_AGND:
 		return 0;
 	case ADC083X_VREF:
@@ -2869,99 +2926,99 @@ static const adc083x_interface konami573_adc_interface = {
 
 static MACHINE_CONFIG_START( konami573, ksys573_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD( "maincpu", PSXCPU, XTAL_67_7376MHz )
-	MDRV_CPU_PROGRAM_MAP( konami573_map)
-	MDRV_CPU_VBLANK_INT("screen", sys573_vblank)
+	MCFG_CPU_ADD( "maincpu", PSXCPU, XTAL_67_7376MHz )
+	MCFG_CPU_PROGRAM_MAP( konami573_map)
+	MCFG_CPU_VBLANK_INT("screen", sys573_vblank)
 
-	MDRV_MACHINE_RESET( konami573 )
-	MDRV_NVRAM_HANDLER( konami573 )
+	MCFG_MACHINE_RESET( konami573 )
+	MCFG_NVRAM_HANDLER( konami573 )
 
 	// onboard flash
-	MDRV_FUJITSU_29F016A_ADD("onboard.0")
-	MDRV_FUJITSU_29F016A_ADD("onboard.1")
-	MDRV_FUJITSU_29F016A_ADD("onboard.2")
-	MDRV_FUJITSU_29F016A_ADD("onboard.3")
-	MDRV_FUJITSU_29F016A_ADD("onboard.4")
-	MDRV_FUJITSU_29F016A_ADD("onboard.5")
-	MDRV_FUJITSU_29F016A_ADD("onboard.6")
-	MDRV_FUJITSU_29F016A_ADD("onboard.7")
+	MCFG_FUJITSU_29F016A_ADD("onboard.0")
+	MCFG_FUJITSU_29F016A_ADD("onboard.1")
+	MCFG_FUJITSU_29F016A_ADD("onboard.2")
+	MCFG_FUJITSU_29F016A_ADD("onboard.3")
+	MCFG_FUJITSU_29F016A_ADD("onboard.4")
+	MCFG_FUJITSU_29F016A_ADD("onboard.5")
+	MCFG_FUJITSU_29F016A_ADD("onboard.6")
+	MCFG_FUJITSU_29F016A_ADD("onboard.7")
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE( 60 )
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC( 0 ))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE( 1024, 1024 )
-	MDRV_SCREEN_VISIBLE_AREA( 0, 639, 0, 479 )
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE( 60 )
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC( 0 ))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE( 1024, 1024 )
+	MCFG_SCREEN_VISIBLE_AREA( 0, 639, 0, 479 )
 
-	MDRV_PALETTE_LENGTH( 65536 )
+	MCFG_PALETTE_LENGTH( 65536 )
 
-	MDRV_PALETTE_INIT( psx )
-	MDRV_VIDEO_START( psx_type2 )
-	MDRV_VIDEO_UPDATE( psx )
+	MCFG_PALETTE_INIT( psx )
+	MCFG_VIDEO_START( psx_type2 )
+	MCFG_VIDEO_UPDATE( psx )
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD( "spu", PSXSPU, 0 )
-	MDRV_SOUND_CONFIG( konami573_psxspu_interface )
-	MDRV_SOUND_ROUTE( 0, "lspeaker", 1.0 )
-	MDRV_SOUND_ROUTE( 1, "rspeaker", 1.0 )
+	MCFG_SOUND_ADD( "spu", PSXSPU, 0 )
+	MCFG_SOUND_CONFIG( konami573_psxspu_interface )
+	MCFG_SOUND_ROUTE( 0, "lspeaker", 1.0 )
+	MCFG_SOUND_ROUTE( 1, "rspeaker", 1.0 )
 
-	MDRV_SOUND_ADD( "cdda", CDDA, 0 )
-	MDRV_SOUND_ROUTE( 0, "lspeaker", 1.0 )
-	MDRV_SOUND_ROUTE( 1, "rspeaker", 1.0 )
+	MCFG_SOUND_ADD( "cdda", CDDA, 0 )
+	MCFG_SOUND_ROUTE( 0, "lspeaker", 1.0 )
+	MCFG_SOUND_ROUTE( 1, "rspeaker", 1.0 )
 
-	MDRV_M48T58_ADD( "m48t58" )
+	MCFG_M48T58_ADD( "m48t58" )
 
-	MDRV_ADC0834_ADD( "adc0834", konami573_adc_interface )
+	MCFG_ADC0834_ADD( "adc0834", konami573_adc_interface )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( pccard1, konami573 )
 	// flash for pccard 1
-	MDRV_FUJITSU_29F016A_ADD("pccard1.0")
-	MDRV_FUJITSU_29F016A_ADD("pccard1.1")
-	MDRV_FUJITSU_29F016A_ADD("pccard1.2")
-	MDRV_FUJITSU_29F016A_ADD("pccard1.3")
-	MDRV_FUJITSU_29F016A_ADD("pccard1.4")
-	MDRV_FUJITSU_29F016A_ADD("pccard1.5")
-	MDRV_FUJITSU_29F016A_ADD("pccard1.6")
-	MDRV_FUJITSU_29F016A_ADD("pccard1.7")
-	MDRV_FUJITSU_29F016A_ADD("pccard1.8")
-	MDRV_FUJITSU_29F016A_ADD("pccard1.9")
-	MDRV_FUJITSU_29F016A_ADD("pccard1.10")
-	MDRV_FUJITSU_29F016A_ADD("pccard1.11")
-	MDRV_FUJITSU_29F016A_ADD("pccard1.12")
-	MDRV_FUJITSU_29F016A_ADD("pccard1.13")
-	MDRV_FUJITSU_29F016A_ADD("pccard1.14")
-	MDRV_FUJITSU_29F016A_ADD("pccard1.15")
+	MCFG_FUJITSU_29F016A_ADD("pccard1.0")
+	MCFG_FUJITSU_29F016A_ADD("pccard1.1")
+	MCFG_FUJITSU_29F016A_ADD("pccard1.2")
+	MCFG_FUJITSU_29F016A_ADD("pccard1.3")
+	MCFG_FUJITSU_29F016A_ADD("pccard1.4")
+	MCFG_FUJITSU_29F016A_ADD("pccard1.5")
+	MCFG_FUJITSU_29F016A_ADD("pccard1.6")
+	MCFG_FUJITSU_29F016A_ADD("pccard1.7")
+	MCFG_FUJITSU_29F016A_ADD("pccard1.8")
+	MCFG_FUJITSU_29F016A_ADD("pccard1.9")
+	MCFG_FUJITSU_29F016A_ADD("pccard1.10")
+	MCFG_FUJITSU_29F016A_ADD("pccard1.11")
+	MCFG_FUJITSU_29F016A_ADD("pccard1.12")
+	MCFG_FUJITSU_29F016A_ADD("pccard1.13")
+	MCFG_FUJITSU_29F016A_ADD("pccard1.14")
+	MCFG_FUJITSU_29F016A_ADD("pccard1.15")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( pccard2, konami573 )
 	// flash for pccard 2
-	MDRV_FUJITSU_29F016A_ADD("pccard2.0")
-	MDRV_FUJITSU_29F016A_ADD("pccard2.1")
-	MDRV_FUJITSU_29F016A_ADD("pccard2.2")
-	MDRV_FUJITSU_29F016A_ADD("pccard2.3")
-	MDRV_FUJITSU_29F016A_ADD("pccard2.4")
-	MDRV_FUJITSU_29F016A_ADD("pccard2.5")
-	MDRV_FUJITSU_29F016A_ADD("pccard2.6")
-	MDRV_FUJITSU_29F016A_ADD("pccard2.7")
-	MDRV_FUJITSU_29F016A_ADD("pccard2.8")
-	MDRV_FUJITSU_29F016A_ADD("pccard2.9")
-	MDRV_FUJITSU_29F016A_ADD("pccard2.10")
-	MDRV_FUJITSU_29F016A_ADD("pccard2.11")
-	MDRV_FUJITSU_29F016A_ADD("pccard2.12")
-	MDRV_FUJITSU_29F016A_ADD("pccard2.13")
-	MDRV_FUJITSU_29F016A_ADD("pccard2.14")
-	MDRV_FUJITSU_29F016A_ADD("pccard2.15")
+	MCFG_FUJITSU_29F016A_ADD("pccard2.0")
+	MCFG_FUJITSU_29F016A_ADD("pccard2.1")
+	MCFG_FUJITSU_29F016A_ADD("pccard2.2")
+	MCFG_FUJITSU_29F016A_ADD("pccard2.3")
+	MCFG_FUJITSU_29F016A_ADD("pccard2.4")
+	MCFG_FUJITSU_29F016A_ADD("pccard2.5")
+	MCFG_FUJITSU_29F016A_ADD("pccard2.6")
+	MCFG_FUJITSU_29F016A_ADD("pccard2.7")
+	MCFG_FUJITSU_29F016A_ADD("pccard2.8")
+	MCFG_FUJITSU_29F016A_ADD("pccard2.9")
+	MCFG_FUJITSU_29F016A_ADD("pccard2.10")
+	MCFG_FUJITSU_29F016A_ADD("pccard2.11")
+	MCFG_FUJITSU_29F016A_ADD("pccard2.12")
+	MCFG_FUJITSU_29F016A_ADD("pccard2.13")
+	MCFG_FUJITSU_29F016A_ADD("pccard2.14")
+	MCFG_FUJITSU_29F016A_ADD("pccard2.15")
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( k573bait, konami573 )
 
 	/* Additional NEC Encoder */
-	MDRV_UPD4701_ADD( "upd4701" )
+	MCFG_UPD4701_ADD( "upd4701" )
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( konami573 )
@@ -3057,8 +3114,6 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( fbaitbc )
 	PORT_INCLUDE( konami573 )
-
-	PORT_MODIFY("IN3")
 
 	PORT_START( "uPD4701_y" )
 	PORT_BIT( 0x0fff, 0, IPT_MOUSE_Y ) PORT_MINMAX( 0, 0xfff ) PORT_SENSITIVITY( 15 ) PORT_KEYDELTA( 8 ) PORT_RESET
@@ -3223,19 +3278,50 @@ static INPUT_PORTS_START( hyperbbc )
 
 	PORT_MODIFY("IN2")
 	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_START2 ) /* P1 UP */
+	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_UNUSED ) /* P2 START */
 INPUT_PORTS_END
 
-#define SYS573_BIOS_A ROM_LOAD( "700a01.22g",   0x0000000, 0x080000, CRC(11812ef8) SHA1(e1284add4aaddd5337bd7f4e27614460d52b5b48))
+static INPUT_PORTS_START( mamboagg )
+	PORT_INCLUDE( konami573 )
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x02000000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME( "Right Pad 1 (Top Right)" ) /* COIN2 */
+
+	PORT_MODIFY("IN2")
+	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_PLAYER(1) PORT_NAME( "Centre Pad 3 (Middle Right)" ) /* P1 UP */
+	PORT_BIT( 0x00000800, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME( "Centre Pad 1 (Top Right)" ) /* P1 DOWN */
+	PORT_BIT( 0x00001000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME( "Left Pad 2 (Bottom Left)" ) /* P1 BUTTON 1 */
+	PORT_BIT( 0x00002000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME( "Left Pad 1 (Top Left)" ) /* P1 BUTTON 2 */
+	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_PLAYER(1) PORT_NAME( "Left Pad 3 (Bottom Right)" ) /* P1 BUTTON 3 */
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1) PORT_NAME( "Centre Pad 2 (Bottom Left)" ) /* P2 LEFT */
+	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_PLAYER(1) PORT_NAME( "Centre Pad 3 (Bottom Right)" ) /* P2 RIGHT */
+	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME( "Centre Pad 1 (Top Left)" ) /* P2 UP */
+	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1) PORT_NAME( "Centre Pad 2 (Middle Left)" ) /* P2 DOWN */
+	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1) PORT_NAME( "Right Pad 2 (Bottom Left)" ) /* P2 BUTTON1 */
+	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME( "Right Pad 1 (Top Left)" ) /* P2 BUTTON2 */
+	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_PLAYER(1) PORT_NAME( "Right Pad 3 (Bottom Right)" ) /* P2 BUTTON3 */
+	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME( "Left Pad 1 (Top Right)" ) /* P2 START */
+
+	PORT_MODIFY("IN3")
+	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_PLAYER(1) PORT_NAME( "Left Pad 3 (Middle Right)" ) /* P1 BUTTON4 */
+	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME( "Left Pad 2 (Middle Left)" ) /* P1 BUTTON5 */
+	PORT_BIT( 0x00000800, IP_ACTIVE_LOW, IPT_UNUSED ) /* P1 BUTTON6 */
+	PORT_BIT( 0x01000000, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_PLAYER(1) PORT_NAME( "Right Pad 3 (Middle Right)" ) /* P2 BUTTON4 */
+	PORT_BIT( 0x02000000, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1) PORT_NAME( "Right Pad 2 (Middle Left)" ) /* P2 BUTTON5 */
+	PORT_BIT( 0x08000000, IP_ACTIVE_LOW, IPT_UNUSED ) /* P2 BUTTON6 */
+INPUT_PORTS_END
+
+#define SYS573_BIOS_A \
+	ROM_REGION32_LE( 0x080000, "bios", 0 ) \
+	ROM_LOAD( "700a01.22g",   0x0000000, 0x080000, CRC(11812ef8) SHA1(e1284add4aaddd5337bd7f4e27614460d52b5b48))
 
 // BIOS
 ROM_START( sys573 )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 ROM_END
 
 // Games
 ROM_START( bassangl )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
@@ -3246,7 +3332,6 @@ ROM_START( bassangl )
 ROM_END
 
 ROM_START( bassang2 )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
@@ -3257,7 +3342,6 @@ ROM_START( bassang2 )
 ROM_END
 
 ROM_START( cr589fw )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	DISK_REGION( "cdrom0" )
@@ -3265,7 +3349,6 @@ ROM_START( cr589fw )
 ROM_END
 
 ROM_START( cr589fwa )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	DISK_REGION( "cdrom0" )
@@ -3273,7 +3356,6 @@ ROM_START( cr589fwa )
 ROM_END
 
 ROM_START( darkhleg )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
@@ -3284,7 +3366,6 @@ ROM_START( darkhleg )
 ROM_END
 
 ROM_START( fmania )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
@@ -3295,7 +3376,6 @@ ROM_START( fmania )
 ROM_END
 
 ROM_START( ddrextrm )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0001014, "user2", 0 ) /* security cart eeprom */
@@ -3309,7 +3389,6 @@ ROM_START( ddrextrm )
 ROM_END
 
 ROM_START( ddru )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
@@ -3320,7 +3399,6 @@ ROM_START( ddru )
 ROM_END
 
 ROM_START( ddrj )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
@@ -3331,7 +3409,6 @@ ROM_START( ddrj )
 ROM_END
 
 ROM_START( ddrja )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
@@ -3362,7 +3439,6 @@ ROM_START( ddrja )
 ROM_END
 
 ROM_START( ddrjb )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
@@ -3393,7 +3469,6 @@ ROM_START( ddrjb )
 ROM_END
 
 ROM_START( ddra )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
@@ -3404,7 +3479,6 @@ ROM_START( ddra )
 ROM_END
 
 ROM_START( ddr2m )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
@@ -3415,7 +3489,6 @@ ROM_START( ddr2m )
 ROM_END
 
 ROM_START( ddr2mc )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
@@ -3429,7 +3502,6 @@ ROM_START( ddr2mc )
 ROM_END
 
 ROM_START( ddr2mc2 )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
@@ -3443,7 +3515,6 @@ ROM_START( ddr2mc2 )
 ROM_END
 
 ROM_START( ddr2ml )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x080000, "cpu2", 0 ) /* memory card reader */
@@ -3457,7 +3528,6 @@ ROM_START( ddr2ml )
 ROM_END
 
 ROM_START( ddr3ma )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000084, "user2", 0 ) /* install security cart eeprom */
@@ -3477,7 +3547,6 @@ ROM_START( ddr3ma )
 ROM_END
 
 ROM_START( ddr3mj )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000084, "user2", 0 ) /* install security cart eeprom */
@@ -3497,7 +3566,6 @@ ROM_START( ddr3mj )
 ROM_END
 
 ROM_START( ddr3mk )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000084, "user2", 0 ) /* install security cart eeprom */
@@ -3517,7 +3585,6 @@ ROM_START( ddr3mk )
 ROM_END
 
 ROM_START( ddr3mka )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000084, "user2", 0 ) /* install security cart eeprom */
@@ -3537,7 +3604,6 @@ ROM_START( ddr3mka )
 ROM_END
 
 ROM_START( ddr3mp )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000224, "user2", 0 ) /* install security cart eeprom */
@@ -3557,7 +3623,6 @@ ROM_START( ddr3mp )
 ROM_END
 
 ROM_START( ddr4m )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000224, "user2", 0 ) /* install security cart eeprom */
@@ -3577,7 +3642,6 @@ ROM_START( ddr4m )
 ROM_END
 
 ROM_START( ddr4mj )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000224, "user2", 0 ) /* install security cart eeprom */
@@ -3597,7 +3661,6 @@ ROM_START( ddr4mj )
 ROM_END
 
 ROM_START( ddr4ms )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000224, "user2", 0 ) /* install security cart eeprom */
@@ -3617,7 +3680,6 @@ ROM_START( ddr4ms )
 ROM_END
 
 ROM_START( ddr4msj )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000224, "user2", 0 ) /* install security cart eeprom */
@@ -3637,7 +3699,6 @@ ROM_START( ddr4msj )
 ROM_END
 
 ROM_START( ddr4mp )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000224, "user2", 0 ) /* install security cart eeprom */
@@ -3660,7 +3721,6 @@ ROM_START( ddr4mp )
 ROM_END
 
 ROM_START( ddr4mps )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000224, "user2", 0 ) /* install security cart eeprom */
@@ -3683,7 +3743,6 @@ ROM_START( ddr4mps )
 ROM_END
 
 ROM_START( ddr5m )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0001014, "user2", 0 ) /* security cart eeprom */
@@ -3697,7 +3756,6 @@ ROM_START( ddr5m )
 ROM_END
 
 ROM_START( ddrbocd )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
@@ -3711,7 +3769,6 @@ ROM_START( ddrbocd )
 ROM_END
 
 ROM_START( ddrs2k )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000084, "user2", 0 ) /* install security cart eeprom */
@@ -3731,7 +3788,6 @@ ROM_START( ddrs2k )
 ROM_END
 
 ROM_START( ddrs2kj )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000084, "user2", 0 ) /* install security cart eeprom */
@@ -3751,7 +3807,6 @@ ROM_START( ddrs2kj )
 ROM_END
 
 ROM_START( ddrmax )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0001014, "user2", 0 ) /* security cart eeprom */
@@ -3765,7 +3820,6 @@ ROM_START( ddrmax )
 ROM_END
 
 ROM_START( ddrmax2 )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0001014, "user2", 0 ) /* security cart eeprom */
@@ -3779,7 +3833,6 @@ ROM_START( ddrmax2 )
 ROM_END
 
 ROM_START( ddrsbm )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000084, "user2", 0 ) /* security cart eeprom */
@@ -3793,7 +3846,6 @@ ROM_START( ddrsbm )
 ROM_END
 
 ROM_START( ddrusa )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0001014, "user2", 0 ) /* security cart eeprom */
@@ -3807,7 +3859,6 @@ ROM_START( ddrusa )
 ROM_END
 
 ROM_START( drmn )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
@@ -3829,7 +3880,6 @@ ROM_START( drmn )
 ROM_END
 
 ROM_START( drmn2m )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000224, "user2", 0 ) /* install security cart eeprom */
@@ -3849,7 +3899,6 @@ ROM_START( drmn2m )
 ROM_END
 
 ROM_START( drmn2mpu )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000224, "user2", 0 ) /* install security cart eeprom */
@@ -3872,7 +3921,6 @@ ROM_START( drmn2mpu )
 ROM_END
 
 ROM_START( drmn3m )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000224, "user2", 0 ) /* install security cart eeprom */
@@ -3892,7 +3940,6 @@ ROM_START( drmn3m )
 ROM_END
 
 ROM_START( dmx )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0001014, "user2", 0 ) /* security cart eeprom */
@@ -3906,7 +3953,6 @@ ROM_START( dmx )
 ROM_END
 
 ROM_START( dmx2m )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0001014, "user2", 0 ) /* security cart eeprom */
@@ -3920,7 +3966,6 @@ ROM_START( dmx2m )
 ROM_END
 
 ROM_START( dmx2majp )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0001014, "user2", 0 ) /* security cart eeprom */
@@ -3939,7 +3984,6 @@ ROM_START( dmx2majp )
 ROM_END
 
 ROM_START( dncfrks )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0001014, "user2", 0 ) /* security cart eeprom */
@@ -3953,13 +3997,12 @@ ROM_START( dncfrks )
 ROM_END
 
 ROM_START( dsem )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
-	ROM_REGION( 0x0000224, "user2", 0 ) /* install security cart eeprom */
+	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
 	ROM_LOAD( "ge936ea.u1",   0x000000, 0x000224, BAD_DUMP CRC(0f5b7ae3) SHA1(646dd49da1216cc2d3d6920bc9b3447d55ebfbf0) )
 
-	ROM_REGION( 0x000008, "user9", 0 ) /* install security cart id */
+	ROM_REGION( 0x000008, "user9", 0 ) /* security cart id */
 	ROM_LOAD( "ge936ea.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
 	DISK_REGION( "cdrom0" )
@@ -3967,7 +4010,6 @@ ROM_START( dsem )
 ROM_END
 
 ROM_START( dsem2 )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0001014, "user2", 0 ) /* security cart eeprom */
@@ -3981,7 +4023,6 @@ ROM_START( dsem2 )
 ROM_END
 
 ROM_START( dsfdct )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000084, "user2", 0 ) /* install security cart eeprom */
@@ -4001,7 +4042,6 @@ ROM_START( dsfdct )
 ROM_END
 
 ROM_START( dsfdcta )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000084, "user2", 0 ) /* install security cart eeprom */
@@ -4021,14 +4061,13 @@ ROM_START( dsfdcta )
 ROM_END
 
 ROM_START( dsfdr )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000224, "user2", 0 ) /* install security cart eeprom */
 	ROM_LOAD( "gea37ja.u1",   0x000000, 0x000224, BAD_DUMP CRC(5321055e) SHA1(d06b0dca9caba8249d71340469ad9083b02fd087) )
 
 	ROM_REGION( 0x0001014, "user8", 0 ) /* game security cart eeprom */
-        ROM_LOAD( "gca37ja.u1",   0x000000, 0x001014, BAD_DUMP CRC(b6d9e7f9) SHA1(bc5f491de53a96d46745df09bc94e7853052296c) )
+	ROM_LOAD( "gca37ja.u1",   0x000000, 0x001014, BAD_DUMP CRC(b6d9e7f9) SHA1(bc5f491de53a96d46745df09bc94e7853052296c) )
 
 	ROM_REGION( 0x000008, "user9", 0 ) /* install security cart id */
 	ROM_LOAD( "gea37ja.u6",    0x000000, 0x000008, BAD_DUMP CRC(af09e43c) SHA1(d8372f2d6e0ae07061b496a2242a63e5bc2e54dc) )
@@ -4041,7 +4080,6 @@ ROM_START( dsfdr )
 ROM_END
 
 ROM_START( dsftkd )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000084, "user2", 0 ) /* security cart eeprom */
@@ -4055,7 +4093,6 @@ ROM_START( dsftkd )
 ROM_END
 
 ROM_START( dstage )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
@@ -4066,7 +4103,6 @@ ROM_START( dstage )
 ROM_END
 
 ROM_START( fbait2bc )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
@@ -4077,7 +4113,6 @@ ROM_START( fbait2bc )
 ROM_END
 
 ROM_START( fbaitbc )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
@@ -4088,7 +4123,6 @@ ROM_START( fbaitbc )
 ROM_END
 
 ROM_START( fbaitmc )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
@@ -4099,7 +4133,6 @@ ROM_START( fbaitmc )
 ROM_END
 
 ROM_START( fbaitmca )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
@@ -4110,7 +4143,6 @@ ROM_START( fbaitmca )
 ROM_END
 
 ROM_START( fbaitmcj )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
@@ -4121,7 +4153,6 @@ ROM_START( fbaitmcj )
 ROM_END
 
 ROM_START( fbaitmcu )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
@@ -4132,7 +4163,6 @@ ROM_START( fbaitmcu )
 ROM_END
 
 ROM_START( gtrfrks )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
@@ -4143,7 +4173,6 @@ ROM_START( gtrfrks )
 ROM_END
 
 ROM_START( gtrfrksu )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
@@ -4154,7 +4183,6 @@ ROM_START( gtrfrksu )
 ROM_END
 
 ROM_START( gtrfrksj )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
@@ -4165,7 +4193,6 @@ ROM_START( gtrfrksj )
 ROM_END
 
 ROM_START( gtrfrksa )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
@@ -4176,7 +4203,6 @@ ROM_START( gtrfrksa )
 ROM_END
 
 ROM_START( gtrfrk2m )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000084, "user2", 0 ) /* security cart eeprom */
@@ -4190,7 +4216,6 @@ ROM_START( gtrfrk2m )
 ROM_END
 
 ROM_START( gtrfrk3m )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000224, "user2", 0 ) /* install security cart eeprom */
@@ -4213,7 +4238,6 @@ ROM_START( gtrfrk3m )
 ROM_END
 
 ROM_START( gtfrk3ma )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000224, "user2", 0 ) /* install security cart eeprom */
@@ -4233,7 +4257,6 @@ ROM_START( gtfrk3ma )
 ROM_END
 
 ROM_START( gtfrk3mb )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0001014, "user2", 0 ) /* game security cart eeprom */
@@ -4247,7 +4270,6 @@ ROM_START( gtfrk3mb )
 ROM_END
 
 ROM_START( gtrfrk4m )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000224, "user2", 0 ) /* install security cart eeprom */
@@ -4267,7 +4289,6 @@ ROM_START( gtrfrk4m )
 ROM_END
 
 ROM_START( gtrfrk5m )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0001014, "user2", 0 ) /* security cart eeprom */
@@ -4278,7 +4299,7 @@ ROM_START( gtrfrk5m )
 	ROM_REGION( 0x200000, "onboard.1", 0 ) /* onboard flash */
 	ROM_LOAD( "gea26jaa.27m", 0x000000, 0x200000, CRC(345dc5f2) SHA1(61af3fcfe6119c1e8e18b92693855ab4fe708b30) )
 
-	ROM_REGION( 0x000008, "user9", 0 ) /* install security cart id */
+	ROM_REGION( 0x000008, "user9", 0 ) /* security cart id */
 	ROM_LOAD( "gea26jaa.u6",    0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
 	DISK_REGION( "cdrom0" )
@@ -4286,13 +4307,12 @@ ROM_START( gtrfrk5m )
 ROM_END
 
 ROM_START( gtrfrk6m )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
-	ROM_REGION( 0x0001014, "user2", 0 ) /* install security cart eeprom */
+	ROM_REGION( 0x0001014, "user2", 0 ) /* security cart eeprom */
 	ROM_LOAD( "gcb06ja.u1",   0x000000, 0x001014, BAD_DUMP CRC(673c98ab) SHA1(b1d889bf4fc5e425056acb6b72b2c563966fb7d7) )
 
-	ROM_REGION( 0x000008, "user9", 0 ) /* install security cart id */
+	ROM_REGION( 0x000008, "user9", 0 ) /* security cart id */
 	ROM_LOAD( "gcb06ja.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
 	DISK_REGION( "cdrom0" )
@@ -4300,10 +4320,9 @@ ROM_START( gtrfrk6m )
 ROM_END
 
 ROM_START( gtrfrk7m )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
-	ROM_REGION( 0x0001014, "user2", 0 ) /* install security cart eeprom */
+	ROM_REGION( 0x0001014, "user2", 0 ) /* security cart eeprom */
 	ROM_LOAD( "gcb17jaa.u1",   0x000000, 0x001014, BAD_DUMP CRC(5a338c31) SHA1(0fd9ee306335858dd6bef680a62557a8bf055cc3) )
 
 	ROM_REGION( 0x200000, "onboard.0", 0 ) /* onboard flash */
@@ -4311,7 +4330,7 @@ ROM_START( gtrfrk7m )
 	ROM_REGION( 0x200000, "onboard.1", 0 ) /* onboard flash */
 	ROM_LOAD( "gcb17jaa.27m", 0x000000, 0x200000, CRC(7e7da9a9) SHA1(1882418779a48b5aefd113895756116379a6a4f7) )
 
-	ROM_REGION( 0x000008, "user9", 0 ) /* install security cart id */
+	ROM_REGION( 0x000008, "user9", 0 ) /* security cart id */
 	ROM_LOAD( "gcb17jaa.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
 	DISK_REGION( "cdrom0" )
@@ -4319,13 +4338,12 @@ ROM_START( gtrfrk7m )
 ROM_END
 
 ROM_START( gtfrk11m )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0001014, "user2", 0 ) /* security cart eeprom */
 	ROM_LOAD( "gcd39ja.u1",   0x000000, 0x001014, BAD_DUMP CRC(9bd81d0a) SHA1(c95f6d7317bf88177f7217de4ba4376485d5cdbf) )
 
-	ROM_REGION( 0x000008, "user9", 0 ) /* install security cart id */
+	ROM_REGION( 0x000008, "user9", 0 ) /* security cart id */
 	ROM_LOAD( "gcd39ja.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
 	DISK_REGION( "cdrom0" )
@@ -4333,7 +4351,6 @@ ROM_START( gtfrk11m )
 ROM_END
 
 ROM_START( hyperbbc )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000084, "user2", 0 ) /* security cart eeprom */
@@ -4344,7 +4361,6 @@ ROM_START( hyperbbc )
 ROM_END
 
 ROM_START( hyperbbck )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000084, "user2", 0 ) /* security cart eeprom */
@@ -4355,7 +4371,6 @@ ROM_START( hyperbbck )
 ROM_END
 
 ROM_START( konam80a )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
@@ -4366,7 +4381,6 @@ ROM_START( konam80a )
 ROM_END
 
 ROM_START( konam80j )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
@@ -4377,7 +4391,6 @@ ROM_START( konam80j )
 ROM_END
 
 ROM_START( konam80k )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
@@ -4388,7 +4401,6 @@ ROM_START( konam80k )
 ROM_END
 
 ROM_START( konam80s )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
@@ -4399,7 +4411,6 @@ ROM_START( konam80s )
 ROM_END
 
 ROM_START( konam80u )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
@@ -4409,8 +4420,20 @@ ROM_START( konam80u )
 	DISK_IMAGE_READONLY( "826uaa01", 0, SHA1(be5f8b31fd18ba631fe98c2132c56abf20193419) )
 ROM_END
 
+ROM_START( mamboagg )
+	SYS573_BIOS_A
+
+	ROM_REGION( 0x0001014, "user2", 0 ) /* security cart eeprom */
+	ROM_LOAD( "gqa40jab.u1",  0x000000, 0x001014, BAD_DUMP CRC(fd9e7c1f) SHA1(6dd4790589d48803f58328d099c908f0565b2c01) )
+
+	ROM_REGION( 0x000008, "user9", 0 ) /* security cart id */
+	ROM_LOAD( "gqa40jab.u6",  0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
+
+	DISK_REGION( "cdrom0" )
+	DISK_IMAGE_READONLY( "a40jab02", 0, SHA1(a914842442b2f63465e16f979f06da0b78a5f13e) )
+ROM_END
+
 ROM_START( pbballex )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
@@ -4421,7 +4444,6 @@ ROM_START( pbballex )
 ROM_END
 
 ROM_START( pcnfrk3m )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000224, "user2", 0 ) /* install security cart eeprom */
@@ -4441,7 +4463,6 @@ ROM_START( pcnfrk3m )
 ROM_END
 
 ROM_START( salarymc )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000084, "user2", 0 ) /* security cart eeprom */
@@ -4529,6 +4550,7 @@ GAME( 2000, fmania,   sys573,   konami573, konami573, konami573,  ROT0, "Konami"
 GAME( 2001, gtrfrk5m, sys573,   pccard1,   gtrfrks,   gtrfrkdigital,ROT0, "Konami", "Guitar Freaks 5th Mix (G*A26 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.9 */
 GAME( 2001, ddr5m,    sys573,   pccard2,   ddr,       ddrdigital, ROT0, "Konami", "Dance Dance Revolution 5th Mix (G*A27 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.9 */
 GAME( 2001, dmx2majp, sys573,   konami573, dmx,       dmx,        ROT0, "Konami", "Dance Maniax 2nd Mix Append J-Paradise (G*A38 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.9 */
+GAME( 2001, mamboagg, sys573,   konami573, mamboagg,  mamboagg,   ROT0, "Konami", "Mambo A Go-Go (GQA40 VER. JAB)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.95 */
 GAME( 2001, gtrfrk6m, sys573,   pccard1,   gtrfrks,   gtrfrkdigital,ROT0, "Konami", "Guitar Freaks 6th Mix (G*B06 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.9 */
 GAME( 2001, gtrfrk7m, sys573,   pccard1,   gtrfrks,   gtrfrkdigital,ROT0, "Konami", "Guitar Freaks 7th Mix (G*B17 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.95 */
 GAME( 2001, ddrmax,   sys573,   pccard2,   ddr,       ddrdigital, ROT0, "Konami", "DDR Max - Dance Dance Revolution 6th Mix (G*B19 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.9 */

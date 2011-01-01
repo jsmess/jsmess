@@ -663,7 +663,7 @@ void psion_state::machine_start()
 
 	if (m_rom_bank_count)
 	{
-		UINT8* rom_base = (UINT8 *)memory_region(machine, "maincpu");
+		UINT8* rom_base = (UINT8 *)machine->region("maincpu")->base();
 
 		memory_configure_bank(machine, "rombank", 0, 1, rom_base + 0x8000, 0x4000);
 		memory_configure_bank(machine, "rombank", 1, m_rom_bank_count-1, rom_base + 0x10000, 0x4000);
@@ -737,18 +737,18 @@ GFXDECODE_END
 
 static MACHINE_CONFIG_FRAGMENT( psion_slot )
 	/* Datapack slot 1 */
-	MDRV_CARTSLOT_ADD("pack1")
-	MDRV_CARTSLOT_EXTENSION_LIST("opk")
-	MDRV_CARTSLOT_NOT_MANDATORY
-	MDRV_CARTSLOT_LOAD(psion_pack1)
-	MDRV_CARTSLOT_UNLOAD(psion_pack1)
+	MCFG_CARTSLOT_ADD("pack1")
+	MCFG_CARTSLOT_EXTENSION_LIST("opk")
+	MCFG_CARTSLOT_NOT_MANDATORY
+	MCFG_CARTSLOT_LOAD(psion_pack1)
+	MCFG_CARTSLOT_UNLOAD(psion_pack1)
 
 	/* Datapack slot 2 */
-	MDRV_CARTSLOT_ADD("pack2")
-	MDRV_CARTSLOT_EXTENSION_LIST("opk")
-	MDRV_CARTSLOT_NOT_MANDATORY
-	MDRV_CARTSLOT_LOAD(psion_pack2)
-	MDRV_CARTSLOT_UNLOAD(psion_pack2)
+	MCFG_CARTSLOT_ADD("pack2")
+	MCFG_CARTSLOT_EXTENSION_LIST("opk")
+	MCFG_CARTSLOT_NOT_MANDATORY
+	MCFG_CARTSLOT_LOAD(psion_pack2)
+	MCFG_CARTSLOT_UNLOAD(psion_pack2)
 MACHINE_CONFIG_END
 
 static const hd44780_interface psion_2line_display =
@@ -761,30 +761,30 @@ static const hd44780_interface psion_2line_display =
 /* basic configuration for 2 lines display */
 static MACHINE_CONFIG_START( psion_2lines, psion_state )
 	/* basic machine hardware */
-    MDRV_CPU_ADD("maincpu", HD63701, 980000) // should be HD6303 at 0.98MHz
+    MCFG_CPU_ADD("maincpu", HD63701, 980000) // should be HD6303 at 0.98MHz
 
     /* video hardware */
-    MDRV_SCREEN_ADD("screen", RASTER)
-    MDRV_SCREEN_REFRESH_RATE(50)
-    MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-    MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(6*16, 9*2)
-	MDRV_SCREEN_VISIBLE_AREA(0, 6*16-1, 0, 9*2-1)
-	MDRV_DEFAULT_LAYOUT(layout_lcd)
-    MDRV_PALETTE_LENGTH(2)
-    MDRV_PALETTE_INIT(psion)
-	MDRV_GFXDECODE(psion)
+    MCFG_SCREEN_ADD("screen", RASTER)
+    MCFG_SCREEN_REFRESH_RATE(50)
+    MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+    MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(6*16, 9*2)
+	MCFG_SCREEN_VISIBLE_AREA(0, 6*16-1, 0, 9*2-1)
+	MCFG_DEFAULT_LAYOUT(layout_lcd)
+    MCFG_PALETTE_LENGTH(2)
+    MCFG_PALETTE_INIT(psion)
+	MCFG_GFXDECODE(psion)
 
-	MDRV_HD44780_ADD("hd44780", psion_2line_display)
+	MCFG_HD44780_ADD("hd44780", psion_2line_display)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO( "mono" )
-	MDRV_SOUND_ADD( "beep", BEEP, 0 )
-	MDRV_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
+	MCFG_SPEAKER_STANDARD_MONO( "mono" )
+	MCFG_SOUND_ADD( "beep", BEEP, 0 )
+	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 
-	MDRV_NVRAM_HANDLER(psion)
+	MCFG_NVRAM_HANDLER(psion)
 
-	MDRV_FRAGMENT_ADD( psion_slot )
+	MCFG_FRAGMENT_ADD( psion_slot )
 MACHINE_CONFIG_END
 
 static const UINT8 psion_4line_layout[] =
@@ -805,60 +805,60 @@ static const hd44780_interface psion_4line_display =
 /* basic configuration for 4 lines display */
 static MACHINE_CONFIG_START( psion_4lines, psion_state )
 	/* basic machine hardware */
-    MDRV_CPU_ADD("maincpu",HD63701, 980000) // should be HD6303 at 0.98MHz
+    MCFG_CPU_ADD("maincpu",HD63701, 980000) // should be HD6303 at 0.98MHz
 
     /* video hardware */
-    MDRV_SCREEN_ADD("screen", RASTER)
-    MDRV_SCREEN_REFRESH_RATE(50)
-    MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-    MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(6*20, 9*4)
-	MDRV_SCREEN_VISIBLE_AREA(0, 6*20-1, 0, 9*4-1)
-	MDRV_DEFAULT_LAYOUT(layout_lcd)
-    MDRV_PALETTE_LENGTH(2)
-    MDRV_PALETTE_INIT(psion)
-	MDRV_GFXDECODE(psion)
+    MCFG_SCREEN_ADD("screen", RASTER)
+    MCFG_SCREEN_REFRESH_RATE(50)
+    MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+    MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(6*20, 9*4)
+	MCFG_SCREEN_VISIBLE_AREA(0, 6*20-1, 0, 9*4-1)
+	MCFG_DEFAULT_LAYOUT(layout_lcd)
+    MCFG_PALETTE_LENGTH(2)
+    MCFG_PALETTE_INIT(psion)
+	MCFG_GFXDECODE(psion)
 
-	MDRV_HD44780_ADD("hd44780", psion_4line_display)
+	MCFG_HD44780_ADD("hd44780", psion_4line_display)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO( "mono" )
-	MDRV_SOUND_ADD( "beep", BEEP, 0 )
-	MDRV_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
+	MCFG_SPEAKER_STANDARD_MONO( "mono" )
+	MCFG_SOUND_ADD( "beep", BEEP, 0 )
+	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 
-	MDRV_NVRAM_HANDLER(psion)
+	MCFG_NVRAM_HANDLER(psion)
 
-	MDRV_FRAGMENT_ADD( psion_slot )
+	MCFG_FRAGMENT_ADD( psion_slot )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( psioncm, psion_2lines )
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(psioncm_mem)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(psioncm_mem)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( psionla, psion_2lines )
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(psionla_mem)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(psionla_mem)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( psionlam, psion_2lines )
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(psionlam_mem)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(psionlam_mem)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( psionp350, psion_2lines )
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(psionp350_mem)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(psionp350_mem)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( psionlz, psion_4lines )
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(psionlz_mem)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(psionlz_mem)
 MACHINE_CONFIG_END
 
 /* ROM definition */

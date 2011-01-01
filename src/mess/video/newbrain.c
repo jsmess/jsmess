@@ -7,7 +7,7 @@ static VIDEO_START( newbrain )
 
 	/* find memory regions */
 
-	state->char_rom = memory_region(machine, "chargen");
+	state->char_rom = machine->region("chargen")->base();
 
 	/* register for state saving */
 
@@ -126,16 +126,16 @@ static VIDEO_UPDATE( newbrain )
 /* Machine Drivers */
 
 MACHINE_CONFIG_FRAGMENT( newbrain_video )
-	MDRV_SCREEN_ADD(SCREEN_TAG, RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_REFRESH_RATE(50)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MDRV_SCREEN_SIZE(640, 250)
-	MDRV_SCREEN_VISIBLE_AREA(0, 639, 0, 249)
+	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_SIZE(640, 250)
+	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 249)
 
-	MDRV_PALETTE_LENGTH(2)
-	MDRV_PALETTE_INIT(black_and_white)
+	MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_INIT(black_and_white)
 
-	MDRV_VIDEO_START(newbrain)
-	MDRV_VIDEO_UPDATE(newbrain)
+	MCFG_VIDEO_START(newbrain)
+	MCFG_VIDEO_UPDATE(newbrain)
 MACHINE_CONFIG_END

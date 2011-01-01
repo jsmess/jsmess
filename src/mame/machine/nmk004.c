@@ -96,7 +96,7 @@ static struct
 	int protection_check;
 
 	running_machine *machine;
-	running_device *ymdevice;
+	device_t *ymdevice;
 	okim6295_device *oki1device;
 	okim6295_device *oki2device;
 
@@ -167,7 +167,7 @@ static void oki_play_sample(int sample_no)
 
 		if (sample != 0)
 		{
-			UINT8 *rom = memory_region(NMK004_state.machine, (chip == 0) ? "oki1" : "oki2");
+			UINT8 *rom = NMK004_state.machine->region((chip == 0) ? "oki1" : "oki2")->base();
 			int bank = (byte2 & 0x0c) >> 2;
 			int vol = (byte2 & 0x70) >> 4;
 
@@ -988,7 +988,7 @@ static void update_music(void)
 
 
 
-void NMK004_irq(running_device *device, int irq)
+void NMK004_irq(device_t *device, int irq)
 {
 	if (irq)
 	{
@@ -1025,7 +1025,7 @@ static TIMER_CALLBACK( real_nmk004_init )
 	NMK004_state.oki1device = machine->device<okim6295_device>("oki1");
 	NMK004_state.oki2device = machine->device<okim6295_device>("oki2");
 
-	NMK004_state.rom = memory_region(machine, "audiocpu");
+	NMK004_state.rom = machine->region("audiocpu")->base();
 
 	ym2203_control_port_w(NMK004_state.ymdevice, 0, 0x2f);
 

@@ -107,7 +107,7 @@ static const char *const mc6843_cmd[16] =
 
 
 
-INLINE mc6843_t* get_safe_token( running_device *device )
+INLINE mc6843_t* get_safe_token( device_t *device )
 {
 	assert( device != NULL );
 	assert( device->type() == MC6843 );
@@ -119,7 +119,7 @@ INLINE mc6843_t* get_safe_token( running_device *device )
 
 
 
-static running_device* mc6843_floppy_image ( running_device *device )
+static device_t* mc6843_floppy_image ( device_t *device )
 {
 	mc6843_t* mc6843 = get_safe_token( device );
 	return floppy_get_device( device->machine, mc6843->drive );
@@ -127,7 +127,7 @@ static running_device* mc6843_floppy_image ( running_device *device )
 
 
 
-void mc6843_set_drive( running_device *device, int drive )
+void mc6843_set_drive( device_t *device, int drive )
 {
 	mc6843_t* mc6843 = get_safe_token( device );
 	mc6843->drive = drive;
@@ -135,7 +135,7 @@ void mc6843_set_drive( running_device *device, int drive )
 
 
 
-void mc6843_set_side( running_device *device, int side )
+void mc6843_set_side( device_t *device, int side )
 {
 	mc6843_t* mc6843 = get_safe_token( device );
 	mc6843->side = side;
@@ -144,7 +144,7 @@ void mc6843_set_side( running_device *device, int side )
 
 
 /* called after ISR or STRB has changed */
-static void mc6843_status_update( running_device *device )
+static void mc6843_status_update( device_t *device )
 {
 	mc6843_t* mc6843 = get_safe_token( device );
 	int irq = 0;
@@ -173,7 +173,7 @@ static void mc6843_status_update( running_device *device )
 }
 
 
-void mc6843_set_index_pulse  ( running_device *device, int index_pulse )
+void mc6843_set_index_pulse  ( device_t *device, int index_pulse )
 {
 	mc6843_t* mc6843 = get_safe_token( device );
 	mc6843->index_pulse = index_pulse;
@@ -181,7 +181,7 @@ void mc6843_set_index_pulse  ( running_device *device, int index_pulse )
 
 
 /* called at end of command */
-static void mc6843_cmd_end( running_device *device )
+static void mc6843_cmd_end( device_t *device )
 {
 	mc6843_t* mc6843 = get_safe_token( device );
 	int cmd = mc6843->CMR & 0x0f;
@@ -201,10 +201,10 @@ static void mc6843_cmd_end( running_device *device )
 
 
 /* Seek Track Zero bottom half */
-static void mc6843_finish_STZ( running_device *device )
+static void mc6843_finish_STZ( device_t *device )
 {
 	mc6843_t* mc6843 = get_safe_token( device );
-	running_device* img = mc6843_floppy_image( device );
+	device_t* img = mc6843_floppy_image( device );
 	int i;
 
 	/* seek to track zero */
@@ -229,10 +229,10 @@ static void mc6843_finish_STZ( running_device *device )
 
 
 /* Seek bottom half */
-static void mc6843_finish_SEK( running_device *device )
+static void mc6843_finish_SEK( device_t *device )
 {
 	mc6843_t* mc6843 = get_safe_token( device );
-	running_device* img = mc6843_floppy_image( device );
+	device_t* img = mc6843_floppy_image( device );
 
 	/* seek to track */
 	floppy_drive_seek( img, mc6843->GCR - mc6843->CTAR );
@@ -248,10 +248,10 @@ static void mc6843_finish_SEK( running_device *device )
 
 
 /* preamble to all sector read / write commands, returns 1 if found */
-static int mc6843_address_search( running_device *device, chrn_id* id )
+static int mc6843_address_search( device_t *device, chrn_id* id )
 {
 	mc6843_t* mc6843 = get_safe_token( device );
-	running_device* img = mc6843_floppy_image( device );
+	device_t* img = mc6843_floppy_image( device );
 	int r = 0;
 
 	while ( 1 )
@@ -307,7 +307,7 @@ static int mc6843_address_search( running_device *device, chrn_id* id )
 
 
 /* preamble specific to read commands (adds extra checks) */
-static int mc6843_address_search_read( running_device *device, chrn_id* id )
+static int mc6843_address_search_read( device_t *device, chrn_id* id )
 {
 	mc6843_t* mc6843 = get_safe_token( device );
 	if ( ! mc6843_address_search( device, id ) )
@@ -334,7 +334,7 @@ static int mc6843_address_search_read( running_device *device, chrn_id* id )
 
 
 /* Read CRC bottom half */
-static void mc6843_finish_RCR( running_device *device )
+static void mc6843_finish_RCR( device_t *device )
 {
 	chrn_id id;
 	if ( ! mc6843_address_search_read( device, &id ) )
@@ -345,11 +345,11 @@ static void mc6843_finish_RCR( running_device *device )
 
 
 /* Single / Multiple Sector Read bottom half */
-static void mc6843_cont_SR( running_device *device )
+static void mc6843_cont_SR( device_t *device )
 {
 	mc6843_t* mc6843 = get_safe_token( device );
 	chrn_id id;
-	running_device* img = mc6843_floppy_image( device );
+	device_t* img = mc6843_floppy_image( device );
 
 	/* sector seek */
 	if ( ! mc6843_address_search_read( device, &id ) )
@@ -366,7 +366,7 @@ static void mc6843_cont_SR( running_device *device )
 
 
 /* Single / Multiple Sector Write bottom half */
-static void mc6843_cont_SW( running_device *device )
+static void mc6843_cont_SW( device_t *device )
 {
 	mc6843_t* mc6843 = get_safe_token( device );
 	chrn_id id;
@@ -388,7 +388,7 @@ static void mc6843_cont_SW( running_device *device )
 /* bottom halves, called to continue / finish a command after some delay */
 static TIMER_CALLBACK( mc6843_cont )
 {
-	running_device* device = (running_device*) ptr;
+	device_t* device = (device_t*) ptr;
 	mc6843_t* mc6843 = get_safe_token( device );
 	int cmd = mc6843->CMR & 0x0f;
 
@@ -510,7 +510,7 @@ READ8_DEVICE_HANDLER ( mc6843_r )
 	case 3: /* Status Register A (STRA) */
 	{
 		/* update */
-		running_device* img = mc6843_floppy_image( device );
+		device_t* img = mc6843_floppy_image( device );
 		int flag = floppy_drive_get_flag_state( img, FLOPPY_DRIVE_READY);
 		mc6843->STRA &= 0xa3;
 		if ( flag & FLOPPY_DRIVE_READY )
@@ -582,7 +582,7 @@ WRITE8_DEVICE_HANDLER ( mc6843_w )
 			if ( mc6843->data_idx >= mc6843->data_size )
 			{
 				/* end of sector write */
-				running_device* img = mc6843_floppy_image( device );
+				device_t* img = mc6843_floppy_image( device );
 
 				LOG(( "%f $%04x mc6843_w: write sector %i\n", attotime_to_double(timer_get_time(device->machine)), cpu_get_previouspc( device->machine->firstcpu ), mc6843->data_id ));
 
@@ -644,7 +644,7 @@ WRITE8_DEVICE_HANDLER ( mc6843_w )
 				if ( (mc6843->data[2] == 0) && (mc6843->data[4] == 0) )
 				{
 					/* valid address id field */
-					running_device* img = mc6843_floppy_image( device );
+					device_t* img = mc6843_floppy_image( device );
 					UINT8 track  = mc6843->data[1];
 					UINT8 sector = mc6843->data[3];
 					UINT8 filler = 0xe5; /* standard Thomson filler */
@@ -780,7 +780,7 @@ static DEVICE_RESET( mc6843 )
 	/* setup/reset floppy drive */
 	for ( i = 0; i < 4; i++ )
 	{
-		running_device * img = floppy_get_device( device->machine, i );
+		device_t * img = floppy_get_device( device->machine, i );
 		floppy_mon_w(img, CLEAR_LINE);
 		floppy_drive_set_ready_state( img, FLOPPY_DRIVE_READY, 0 );
 		floppy_drive_set_rpm( img, 300. );

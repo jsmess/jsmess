@@ -220,7 +220,7 @@ static const mc6845_interface crtc_intf =
 void abc802_state::video_start()
 {
 	// find memory regions
-	m_char_rom = memory_region(machine, MC6845_TAG);
+	m_char_rom = machine->region(MC6845_TAG)->base();
 
 	// register for state saving
 	state_save_register_global(machine, m_flshclk_ctr);
@@ -250,16 +250,16 @@ bool abc802_state::video_update(screen_device &screen, bitmap_t &bitmap, const r
 //-------------------------------------------------
 
 MACHINE_CONFIG_FRAGMENT( abc802_video )
-	MDRV_MC6845_ADD(MC6845_TAG, MC6845, ABC800_CCLK, crtc_intf)
+	MCFG_MC6845_ADD(MC6845_TAG, MC6845, ABC800_CCLK, crtc_intf)
 
-	MDRV_SCREEN_ADD(SCREEN_TAG, RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MDRV_SCREEN_SIZE(640, 400)
-	MDRV_SCREEN_VISIBLE_AREA(0,640-1, 0, 400-1)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
+	MCFG_SCREEN_SIZE(640, 400)
+	MCFG_SCREEN_VISIBLE_AREA(0,640-1, 0, 400-1)
 
-	MDRV_PALETTE_LENGTH(2)
-	MDRV_PALETTE_INIT(monochrome_amber)
+	MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_INIT(monochrome_amber)
 MACHINE_CONFIG_END

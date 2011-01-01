@@ -60,13 +60,13 @@ typedef struct _ti99_mecmouse_state
 
 } ti99_mecmouse_state;
 
-INLINE ti99_mecmouse_state *get_safe_token(running_device *device)
+INLINE ti99_mecmouse_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	return (ti99_mecmouse_state *)downcast<legacy_device_base *>(device)->token();
 }
 
-void mecmouse_select(running_device *device, int selnow, int stick1, int stick2)
+void mecmouse_select(device_t *device, int selnow, int stick1, int stick2)
 {
 	ti99_mecmouse_state *mouse = get_safe_token(device);
 
@@ -115,7 +115,7 @@ void mecmouse_select(running_device *device, int selnow, int stick1, int stick2)
 	}
 }
 
-void mecmouse_poll(running_device *device)
+void mecmouse_poll(device_t *device)
 {
 	ti99_mecmouse_state *mouse = get_safe_token(device);
 
@@ -157,7 +157,7 @@ void mecmouse_poll(running_device *device)
 	mouse->y += delta_y;
 }
 
-int mecmouse_get_values(running_device *device)
+int mecmouse_get_values(device_t *device)
 {
 	ti99_mecmouse_state *mouse = get_safe_token(device);
 	int answer;
@@ -176,7 +176,7 @@ int mecmouse_get_values(running_device *device)
 /*
     Variation for TI-99/8
 */
-int mecmouse_get_values8(running_device *device, int mode)
+int mecmouse_get_values8(device_t *device, int mode)
 {
 	ti99_mecmouse_state *mouse = get_safe_token(device);
 	int answer;

@@ -487,8 +487,8 @@ DRIVER_INIT( mekd2 )
 		"........................"
 	};
 
-	dst = memory_region(machine, "gfx1");
-	memset(dst, 0, memory_region_length(machine, "gfx1"));
+	dst = machine->region("gfx1")->base();
+	memset(dst, 0, machine->region("gfx1")->bytes());
 	for (i = 0; i < 128; i++)
 	{
 		for (y = 0; y < 24; y++)
@@ -533,8 +533,8 @@ DRIVER_INIT( mekd2 )
 		}
 	}
 
-	dst = memory_region(machine, "gfx2");
-	memset(dst, 0, memory_region_length(machine, "gfx2"));
+	dst = machine->region("gfx2")->base();
+	memset(dst, 0, machine->region("gfx2")->bytes());
 	for (i = 0; (i < 24)&&(keys[i]); i++) // only 23 keys inited!
 	{
 		for (y = 0; y < 18; y++)
@@ -565,7 +565,7 @@ DEVICE_IMAGE_LOAD( mekd2_cart )
 	static const char magic[] = "MEK6800D2";
 	char buff[9];
 	UINT16 addr, size;
-	UINT8 ident, *RAM = memory_region(image.device().machine, "maincpu");
+	UINT8 ident, *RAM = image.device().machine->region("maincpu")->base();
 
 	image.fread( buff, sizeof (buff));
 	if (memcmp(buff, magic, sizeof (buff)))

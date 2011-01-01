@@ -71,8 +71,8 @@
 #define SR			mips3.core.cpr[0][COP0_Status]
 #define CAUSE		mips3.core.cpr[0][COP0_Cause]
 
-#define GET_FCC(n)	(mips3.core.cf[1][n])
-#define SET_FCC(n,v) (mips3.core.cf[1][n] = (v))
+#define GET_FCC(n)	(mips3.cf[1][n])
+#define SET_FCC(n,v) (mips3.cf[1][n] = (v))
 
 #define IS_FR0		(!(SR & SR_FR))
 #define IS_FR1		(SR & SR_FR)
@@ -93,10 +93,12 @@ typedef struct
 	UINT32		ppc;
 	UINT32		nextpc;
 	UINT32		pcbase;
+	UINT8		cf[4][8];
 	int			op;
 	int			interrupt_cycles;
 	UINT32		ll_value;
 	UINT64		lld_value;
+	const vtlb_entry *tlb_table;
 
 	/* endian-dependent load/store */
 	void		(*lwl)(UINT32 op);
@@ -151,7 +153,7 @@ static mips3_regs mips3;
     MEMORY ACCESSORS
 ***************************************************************************/
 
-#define ROPCODE(pc)		memory_decrypted_read_dword(mips3.core.program, pc)
+#define ROPCODE(pc)		mips3.core.direct->read_decrypted_dword(pc)
 
 
 
@@ -250,6 +252,7 @@ static CPU_RESET( mips3 )
 	/* common reset */
 	mips3com_reset(&mips3.core);
 	mips3.nextpc = ~0;
+	memset(mips3.cf, 0, sizeof(mips3.cf));
 
 	/* set up the endianness */
 	if (mips3.core.bigendian)
@@ -298,7 +301,7 @@ CPU_DISASSEMBLE( mips3 )
 
 static int update_pcbase(void)
 {
-	UINT32 entry = mips3.core.tlb_table[mips3.core.pc >> 12];
+	UINT32 entry = mips3.tlb_table[mips3.core.pc >> 12];
 	if (entry == 0xffffffff)
 	{
 		generate_tlb_exception(EXCEPTION_TLBLOAD, mips3.core.pc);
@@ -311,139 +314,139 @@ static int update_pcbase(void)
 
 INLINE int RBYTE(offs_t address, UINT32 *result)
 {
-	UINT32 tlbval = mips3.core.tlb_table[address >> 12];
+	UINT32 tlbval = mips3.tlb_table[address >> 12];
 	if (tlbval == 0xffffffff)
 	{
 		generate_tlb_exception(EXCEPTION_TLBLOAD, address);
 		return 0;
 	}
-	*result = (*mips3.core.memory.readbyte)((tlbval & ~0xfff) | (address & 0xfff));
+	*result = (*mips3.core.memory.read_byte)(mips3.core.program, (tlbval & ~0xfff) | (address & 0xfff));
 	return 1;
 }
 
 
 INLINE int RHALF(offs_t address, UINT32 *result)
 {
-	UINT32 tlbval = mips3.core.tlb_table[address >> 12];
+	UINT32 tlbval = mips3.tlb_table[address >> 12];
 	if (tlbval == 0xffffffff)
 	{
 		generate_tlb_exception(EXCEPTION_TLBLOAD, address);
 		return 0;
 	}
-	*result = (*mips3.core.memory.readhalf)((tlbval & ~0xfff) | (address & 0xfff));
+	*result = (*mips3.core.memory.read_word)(mips3.core.program, (tlbval & ~0xfff) | (address & 0xfff));
 	return 1;
 }
 
 
 INLINE int RWORD(offs_t address, UINT32 *result)
 {
-	UINT32 tlbval = mips3.core.tlb_table[address >> 12];
+	UINT32 tlbval = mips3.tlb_table[address >> 12];
 	if (tlbval == 0xffffffff)
 	{
 		generate_tlb_exception(EXCEPTION_TLBLOAD, address);
 		return 0;
 	}
-	*result = (*mips3.core.memory.readword)((tlbval & ~0xfff) | (address & 0xfff));
+	*result = (*mips3.core.memory.read_dword)(mips3.core.program, (tlbval & ~0xfff) | (address & 0xfff));
 	return 1;
 }
 
 
 INLINE int RWORD_MASKED(offs_t address, UINT32 *result, UINT32 mem_mask)
 {
-	UINT32 tlbval = mips3.core.tlb_table[address >> 12];
+	UINT32 tlbval = mips3.tlb_table[address >> 12];
 	if (tlbval == 0xffffffff)
 	{
 		generate_tlb_exception(EXCEPTION_TLBLOAD, address);
 		return 0;
 	}
-	*result = (*mips3.core.memory.readword_masked)((tlbval & ~0xfff) | (address & 0xfff), mem_mask);
+	*result = (*mips3.core.memory.read_dword_masked)(mips3.core.program, (tlbval & ~0xfff) | (address & 0xfff), mem_mask);
 	return 1;
 }
 
 
 INLINE int RDOUBLE(offs_t address, UINT64 *result)
 {
-	UINT32 tlbval = mips3.core.tlb_table[address >> 12];
+	UINT32 tlbval = mips3.tlb_table[address >> 12];
 	if (tlbval == 0xffffffff)
 	{
 		generate_tlb_exception(EXCEPTION_TLBLOAD, address);
 		return 0;
 	}
-	*result = (*mips3.core.memory.readdouble)((tlbval & ~0xfff) | (address & 0xfff));
+	*result = (*mips3.core.memory.read_qword)(mips3.core.program, (tlbval & ~0xfff) | (address & 0xfff));
 	return 1;
 }
 
 
 INLINE int RDOUBLE_MASKED(offs_t address, UINT64 *result, UINT64 mem_mask)
 {
-	UINT32 tlbval = mips3.core.tlb_table[address >> 12];
+	UINT32 tlbval = mips3.tlb_table[address >> 12];
 	if (tlbval == 0xffffffff)
 	{
 		generate_tlb_exception(EXCEPTION_TLBLOAD, address);
 		return 0;
 	}
-	*result = (*mips3.core.memory.readdouble_masked)((tlbval & ~0xfff) | (address & 0xfff), mem_mask);
+	*result = (*mips3.core.memory.read_qword_masked)(mips3.core.program, (tlbval & ~0xfff) | (address & 0xfff), mem_mask);
 	return 1;
 }
 
 
 INLINE void WBYTE(offs_t address, UINT8 data)
 {
-	UINT32 tlbval = mips3.core.tlb_table[address >> 12];
-	if (tlbval & 1)
-		generate_tlb_exception(EXCEPTION_TLBSTORE, address);
+	UINT32 tlbval = mips3.tlb_table[address >> 12];
+	if (tlbval & VTLB_WRITE_ALLOWED)
+		(*mips3.core.memory.write_byte)(mips3.core.program, (tlbval & ~0xfff) | (address & 0xfff), data);
 	else
-		(*mips3.core.memory.writebyte)(tlbval | (address & 0xfff), data);
+		generate_tlb_exception(EXCEPTION_TLBSTORE, address);
 }
 
 
 INLINE void WHALF(offs_t address, UINT16 data)
 {
-	UINT32 tlbval = mips3.core.tlb_table[address >> 12];
-	if (tlbval & 1)
-		generate_tlb_exception(EXCEPTION_TLBSTORE, address);
+	UINT32 tlbval = mips3.tlb_table[address >> 12];
+	if (tlbval & VTLB_WRITE_ALLOWED)
+		(*mips3.core.memory.write_word)(mips3.core.program, (tlbval & ~0xfff) | (address & 0xfff), data);
 	else
-		(*mips3.core.memory.writehalf)(tlbval | (address & 0xfff), data);
+		generate_tlb_exception(EXCEPTION_TLBSTORE, address);
 }
 
 
 INLINE void WWORD(offs_t address, UINT32 data)
 {
-	UINT32 tlbval = mips3.core.tlb_table[address >> 12];
-	if (tlbval & 1)
-		generate_tlb_exception(EXCEPTION_TLBSTORE, address);
+	UINT32 tlbval = mips3.tlb_table[address >> 12];
+	if (tlbval & VTLB_WRITE_ALLOWED)
+		(*mips3.core.memory.write_dword)(mips3.core.program, (tlbval & ~0xfff) | (address & 0xfff), data);
 	else
-		(*mips3.core.memory.writeword)(tlbval | (address & 0xfff), data);
+		generate_tlb_exception(EXCEPTION_TLBSTORE, address);
 }
 
 
 INLINE void WWORD_MASKED(offs_t address, UINT32 data, UINT32 mem_mask)
 {
-	UINT32 tlbval = mips3.core.tlb_table[address >> 12];
-	if (tlbval & 1)
-		generate_tlb_exception(EXCEPTION_TLBSTORE, address);
+	UINT32 tlbval = mips3.tlb_table[address >> 12];
+	if (tlbval & VTLB_WRITE_ALLOWED)
+		(*mips3.core.memory.write_dword_masked)(mips3.core.program, (tlbval & ~0xfff) | (address & 0xfff), data, mem_mask);
 	else
-		(*mips3.core.memory.writeword_masked)(tlbval | (address & 0xfff), data, mem_mask);
+		generate_tlb_exception(EXCEPTION_TLBSTORE, address);
 }
 
 
 INLINE void WDOUBLE(offs_t address, UINT64 data)
 {
-	UINT32 tlbval = mips3.core.tlb_table[address >> 12];
-	if (tlbval & 1)
-		generate_tlb_exception(EXCEPTION_TLBSTORE, address);
+	UINT32 tlbval = mips3.tlb_table[address >> 12];
+	if (tlbval & VTLB_WRITE_ALLOWED)
+		(*mips3.core.memory.write_qword)(mips3.core.program, (tlbval & ~0xfff)  | (address & 0xfff), data);
 	else
-		(*mips3.core.memory.writedouble)(tlbval | (address & 0xfff), data);
+		generate_tlb_exception(EXCEPTION_TLBSTORE, address);
 }
 
 
 INLINE void WDOUBLE_MASKED(offs_t address, UINT64 data, UINT64 mem_mask)
 {
-	UINT32 tlbval = mips3.core.tlb_table[address >> 12];
-	if (tlbval & 1)
-		generate_tlb_exception(EXCEPTION_TLBSTORE, address);
+	UINT32 tlbval = mips3.tlb_table[address >> 12];
+	if (tlbval & VTLB_WRITE_ALLOWED)
+		(*mips3.core.memory.write_qword_masked)(mips3.core.program, (tlbval & ~0xfff)  | (address & 0xfff), data, mem_mask);
 	else
-		(*mips3.core.memory.writedouble_masked)(tlbval | (address & 0xfff), data, mem_mask);
+		generate_tlb_exception(EXCEPTION_TLBSTORE, address);
 }
 
 
@@ -577,8 +580,8 @@ INLINE void handle_cop0(UINT32 op)
 		case 0x08:	/* BC */
 			switch (RTREG)
 			{
-				case 0x00:	/* BCzF */	if (!mips3.core.cf[0]) ADDPC(SIMMVAL);				break;
-				case 0x01:	/* BCzF */	if (mips3.core.cf[0]) ADDPC(SIMMVAL);				break;
+				case 0x00:	/* BCzF */	if (!mips3.cf[0]) ADDPC(SIMMVAL);				break;
+				case 0x01:	/* BCzF */	if (mips3.cf[0]) ADDPC(SIMMVAL);				break;
 				case 0x02:	/* BCzFL */	invalid_instruction(op);							break;
 				case 0x03:	/* BCzTL */	invalid_instruction(op);							break;
 				default:	invalid_instruction(op);										break;
@@ -674,7 +677,7 @@ INLINE UINT64 get_cop1_creg(int idx)
 		int i;
 
 		for (i = 0; i < 8; i++)
-			if (mips3.core.cf[1][i])
+			if (mips3.cf[1][i])
 				result |= 1 << fcc_shift[i];
 		return result;
 	}
@@ -689,7 +692,7 @@ INLINE void set_cop1_creg(int idx, UINT64 val)
 		int i;
 
 		for (i = 0; i < 8; i++)
-			mips3.core.cf[1][i] = (val >> fcc_shift[i]) & 1;
+			mips3.cf[1][i] = (val >> fcc_shift[i]) & 1;
 	}
 }
 
@@ -1603,8 +1606,8 @@ INLINE void handle_cop2(UINT32 op)
 		case 0x08:	/* BC */
 			switch (RTREG)
 			{
-				case 0x00:	/* BCzF */	if (!mips3.core.cf[2]) ADDPC(SIMMVAL);				break;
-				case 0x01:	/* BCzF */	if (mips3.core.cf[2]) ADDPC(SIMMVAL);				break;
+				case 0x00:	/* BCzF */	if (!mips3.cf[2]) ADDPC(SIMMVAL);				break;
+				case 0x01:	/* BCzF */	if (mips3.cf[2]) ADDPC(SIMMVAL);				break;
 				case 0x02:	/* BCzFL */	invalid_instruction(op);							break;
 				case 0x03:	/* BCzTL */	invalid_instruction(op);							break;
 				default:	invalid_instruction(op);										break;
@@ -2117,7 +2120,7 @@ static CPU_GET_INFO( mips3 )
 		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(mips3);				break;
 		case CPUINFO_FCT_EXECUTE:						info->execute = CPU_EXECUTE_NAME(mips3);			break;
 		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(mips3);			break;
-		case CPUINFO_FCT_TRANSLATE:						info->translate = CPU_GET_TRANSLATE_NAME(mips3);		break;
+		case CPUINFO_FCT_TRANSLATE:						info->translate = CPU_TRANSLATE_NAME(mips3);		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);				break;
@@ -2130,21 +2133,110 @@ static CPU_GET_INFO( mips3 )
 
 
 /***************************************************************************
+    NEC VR4300 VARIANTS
+***************************************************************************/
+
+// NEC VR4300 series is MIPS III with 32-bit address bus and slightly custom COP0/TLB
+static CPU_INIT( vr4300be )
+{
+	mips3com_init(&mips3.core, MIPS3_TYPE_VR4300, TRUE, device, irqcallback);
+	mips3.tlb_table = vtlb_table(mips3.core.vtlb);
+}
+
+static CPU_INIT( vr4300le )
+{
+	mips3com_init(&mips3.core, MIPS3_TYPE_VR4300, FALSE, device, irqcallback);
+	mips3.tlb_table = vtlb_table(mips3.core.vtlb);
+}
+
+CPU_GET_INFO( vr4300be )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;					break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(vr4300be);				break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							strcpy(info->s, "VR4300 (big)");			break;
+
+		/* --- everything else is handled generically --- */
+		default:										CPU_GET_INFO_CALL(mips3);			break;
+	}
+}
+
+CPU_GET_INFO( vr4300le )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;					break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(vr4300le);				break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							strcpy(info->s, "VR4300 (little)");		break;
+
+		/* --- everything else is handled generically --- */
+		default:										CPU_GET_INFO_CALL(mips3);			break;
+	}
+}
+
+// VR4310 = VR4300 with different speed bin
+CPU_GET_INFO( vr4310be )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;					break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(vr4300be);				break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							strcpy(info->s, "VR4310 (big)");			break;
+
+		/* --- everything else is handled generically --- */
+		default:										CPU_GET_INFO_CALL(mips3);			break;
+	}
+}
+
+CPU_GET_INFO( vr4310le )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;					break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(vr4300le);				break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							strcpy(info->s, "VR4310 (little)");		break;
+
+		/* --- everything else is handled generically --- */
+		default:										CPU_GET_INFO_CALL(mips3);			break;
+	}
+}
+
+
+/***************************************************************************
     R4600 VARIANTS
 ***************************************************************************/
 
 static CPU_INIT( r4600be )
 {
-	size_t memsize = mips3com_init(&mips3.core, MIPS3_TYPE_R4600, TRUE, device, index, clock, irqcallback, NULL);
-	void *memory = auto_alloc_array(device->machine, UINT8, memsize);
-	mips3com_init(&mips3.core, MIPS3_TYPE_R4600, TRUE, index, clock, irqcallback, memory);
+	mips3com_init(&mips3.core, MIPS3_TYPE_R4600, TRUE, device, irqcallback);
+	mips3.tlb_table = vtlb_table(mips3.core.vtlb);
 }
 
 static CPU_INIT( r4600le )
 {
-	size_t memsize = mips3com_init(&mips3.core, MIPS3_TYPE_R4600, FALSE, device, index, clock, irqcallback, NULL);
-	void *memory = auto_alloc_array(device->machine, UINT8, memsize);
-	mips3com_init(&mips3.core, MIPS3_TYPE_R4600, FALSE, index, clock, irqcallback, memory);
+	mips3com_init(&mips3.core, MIPS3_TYPE_R4600, FALSE, device, irqcallback);
+	mips3.tlb_table = vtlb_table(mips3.core.vtlb);
 }
 
 CPU_GET_INFO( r4600be )
@@ -2191,16 +2283,14 @@ CPU_GET_INFO( r4600le )
 
 static CPU_INIT( r4650be )
 {
-	size_t memsize = mips3com_init(&mips3.core, MIPS3_TYPE_R4650, TRUE, device, index, clock, irqcallback, NULL);
-	void *memory = auto_alloc_array(device->machine, UINT8, memsize);
-	mips3com_init(&mips3.core, MIPS3_TYPE_R4650, TRUE, index, clock, irqcallback, memory);
+	mips3com_init(&mips3.core, MIPS3_TYPE_R4650, TRUE, device, irqcallback);
+	mips3.tlb_table = vtlb_table(mips3.core.vtlb);
 }
 
 static CPU_INIT( r4650le )
 {
-	size_t memsize = mips3com_init(&mips3.core, MIPS3_TYPE_R4650, FALSE, device, index, clock, irqcallback, NULL);
-	void *memory = auto_alloc_array(device->machine, UINT8, memsize);
-	mips3com_init(&mips3.core, MIPS3_TYPE_R4650, FALSE, index, clock, irqcallback, memory);
+	mips3com_init(&mips3.core, MIPS3_TYPE_R4650, FALSE, device, irqcallback);
+	mips3.tlb_table = vtlb_table(mips3.core.vtlb);
 }
 
 CPU_GET_INFO( r4650be )
@@ -2247,16 +2337,14 @@ CPU_GET_INFO( r4650le )
 
 static CPU_INIT( r4700be )
 {
-	size_t memsize = mips3com_init(&mips3.core, MIPS3_TYPE_R4700, TRUE, device, index, clock, irqcallback, NULL);
-	void *memory = auto_alloc_array(device->machine, UINT8, memsize);
-	mips3com_init(&mips3.core, MIPS3_TYPE_R4700, TRUE, index, clock, irqcallback, memory);
+	mips3com_init(&mips3.core, MIPS3_TYPE_R4700, TRUE, device, irqcallback);
+	mips3.tlb_table = vtlb_table(mips3.core.vtlb);
 }
 
 static CPU_INIT( r4700le )
 {
-	size_t memsize = mips3com_init(&mips3.core, MIPS3_TYPE_R4700, FALSE, device, index, clock, irqcallback, NULL);
-	void *memory = auto_alloc_array(device->machine, UINT8, memsize);
-	mips3com_init(&mips3.core, MIPS3_TYPE_R4700, FALSE, index, clock, irqcallback, memory);
+	mips3com_init(&mips3.core, MIPS3_TYPE_R4700, FALSE, device, irqcallback);
+	mips3.tlb_table = vtlb_table(mips3.core.vtlb);
 }
 
 CPU_GET_INFO( r4700be )
@@ -2304,16 +2392,14 @@ CPU_GET_INFO( r4700le )
 
 static CPU_INIT( r5000be )
 {
-	size_t memsize = mips3com_init(&mips3.core, MIPS3_TYPE_R5000, TRUE, device, index, clock, irqcallback, NULL);
-	void *memory = auto_alloc_array(device->machine, UINT8, memsize);
-	mips3com_init(&mips3.core, MIPS3_TYPE_R5000, TRUE, index, clock, irqcallback, memory);
+	mips3com_init(&mips3.core, MIPS3_TYPE_R5000, TRUE, device, irqcallback);
+	mips3.tlb_table = vtlb_table(mips3.core.vtlb);
 }
 
 static CPU_INIT( r5000le )
 {
-	size_t memsize = mips3com_init(&mips3.core, MIPS3_TYPE_R5000, FALSE, device, index, clock, irqcallback, NULL);
-	void *memory = auto_alloc_array(device->machine, UINT8, memsize);
-	mips3com_init(&mips3.core, MIPS3_TYPE_R5000, FALSE, index, clock, irqcallback, memory);
+	mips3com_init(&mips3.core, MIPS3_TYPE_R5000, FALSE, device, irqcallback);
+	mips3.tlb_table = vtlb_table(mips3.core.vtlb);
 }
 
 CPU_GET_INFO( r5000be )
@@ -2360,16 +2446,14 @@ CPU_GET_INFO( r5000le )
 
 static CPU_INIT( qed5271be )
 {
-	size_t memsize = mips3com_init(&mips3.core, MIPS3_TYPE_QED5271, TRUE, device, index, clock, irqcallback, NULL);
-	void *memory = auto_alloc_array(device->machine, UINT8, memsize);
-	mips3com_init(&mips3.core, MIPS3_TYPE_QED5271, TRUE, index, clock, irqcallback, memory);
+	mips3com_init(&mips3.core, MIPS3_TYPE_QED5271, TRUE, device, irqcallback);
+	mips3.tlb_table = vtlb_table(mips3.core.vtlb);
 }
 
 static CPU_INIT( qed5271le )
 {
-	size_t memsize = mips3com_init(&mips3.core, MIPS3_TYPE_QED5271, FALSE, device, index, clock, irqcallback, NULL);
-	void *memory = auto_alloc_array(device->machine, UINT8, memsize);
-	mips3com_init(&mips3.core, MIPS3_TYPE_QED5271, FALSE, index, clock, irqcallback, memory);
+	mips3com_init(&mips3.core, MIPS3_TYPE_QED5271, FALSE, device, irqcallback);
+	mips3.tlb_table = vtlb_table(mips3.core.vtlb);
 }
 
 CPU_GET_INFO( qed5271be )
@@ -2416,16 +2500,14 @@ CPU_GET_INFO( qed5271le )
 
 static CPU_INIT( rm7000be )
 {
-	size_t memsize = mips3com_init(&mips3.core, MIPS3_TYPE_RM7000, TRUE, device, index, clock, irqcallback, NULL);
-	void *memory = auto_alloc_array(device->machine, UINT8, memsize);
-	mips3com_init(&mips3.core, MIPS3_TYPE_RM7000, TRUE, index, clock, irqcallback, memory);
+	mips3com_init(&mips3.core, MIPS3_TYPE_RM7000, TRUE, device, irqcallback);
+	mips3.tlb_table = vtlb_table(mips3.core.vtlb);
 }
 
 static CPU_INIT( rm7000le )
 {
-	size_t memsize = mips3com_init(&mips3.core, MIPS3_TYPE_RM7000, FALSE, device, index, clock, irqcallback, NULL);
-	void *memory = auto_alloc_array(device->machine, UINT8, memsize);
-	mips3com_init(&mips3.core, MIPS3_TYPE_RM7000, FALSE, index, clock, irqcallback, memory);
+	mips3com_init(&mips3.core, MIPS3_TYPE_RM7000, FALSE, device, irqcallback);
+	mips3.tlb_table = vtlb_table(mips3.core.vtlb);
 }
 
 CPU_GET_INFO( rm7000be )
@@ -2462,6 +2544,14 @@ CPU_GET_INFO( rm7000le )
 		/* --- everything else is handled generically --- */
 		default:										CPU_GET_INFO_CALL(mips3);			break;
 	}
+}
+
+void mips3drc_set_options(running_device *device, UINT32 options)
+{
+}
+
+void mips3drc_add_fastram(running_device *device, offs_t start, offs_t end, UINT8 readonly, void *base)
+{
 }
 
 DEFINE_LEGACY_CPU_DEVICE(VR4300BE, vr4300be);

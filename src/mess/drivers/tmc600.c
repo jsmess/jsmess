@@ -291,23 +291,23 @@ static const floppy_config tmc600_floppy_config =
 
 static MACHINE_CONFIG_START( tmc600, tmc600_state )
 	// basic system hardware
-	MDRV_CPU_ADD(CDP1802_TAG, COSMAC, 3579545)	// ???
-	MDRV_CPU_PROGRAM_MAP(tmc600_map)
-	MDRV_CPU_IO_MAP(tmc600_io_map)
-	MDRV_CPU_CONFIG(cosmac_intf)
+	MCFG_CPU_ADD(CDP1802_TAG, COSMAC, 3579545)	// ???
+	MCFG_CPU_PROGRAM_MAP(tmc600_map)
+	MCFG_CPU_IO_MAP(tmc600_io_map)
+	MCFG_CPU_CONFIG(cosmac_intf)
 
 	// sound and video hardware
-	MDRV_FRAGMENT_ADD(tmc600_video)
+	MCFG_FRAGMENT_ADD(tmc600_video)
 
 	/* devices */
-	MDRV_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
-	MDRV_CASSETTE_ADD(CASSETTE_TAG, tmc600_cassette_config)
-	MDRV_FLOPPY_2_DRIVES_ADD(tmc600_floppy_config)
+	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
+	MCFG_CASSETTE_ADD(CASSETTE_TAG, tmc600_cassette_config)
+	MCFG_FLOPPY_2_DRIVES_ADD(tmc600_floppy_config)
 
 	/* internal ram */
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("8K")
-	MDRV_RAM_EXTRA_OPTIONS("16K,24K")
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("8K")
+	MCFG_RAM_EXTRA_OPTIONS("16K,24K")
 MACHINE_CONFIG_END
 
 /* ROMs */

@@ -144,8 +144,8 @@ static int sprites_gfx_size;
 // This routine expands each word into three bytes.
 static void expand_sprites(running_machine *machine)
 {
-	UINT8 *rom	=	memory_region(machine, "sprites");
-	int size	=	memory_region_length(machine, "sprites");
+	UINT8 *rom	=	machine->region("sprites")->base();
+	int size	=	machine->region("sprites")->bytes();
 	int i;
 
 	sprites_gfx_size	=	size / 2 * 3;
@@ -341,8 +341,8 @@ static VIDEO_UPDATE( igs017 )
 
 static void decrypt_program_rom(running_machine *machine, int mask, int a7, int a6, int a5, int a4, int a3, int a2, int a1, int a0)
 {
-	int length = memory_region_length(machine, "maincpu");
-	UINT8 *rom = memory_region(machine, "maincpu");
+	int length = machine->region("maincpu")->bytes();
+	UINT8 *rom = machine->region("maincpu")->base();
 	UINT8 *tmp = auto_alloc_array(machine, UINT8, length);
 	int i;
 
@@ -394,7 +394,7 @@ static void decrypt_program_rom(running_machine *machine, int mask, int a7, int 
 
 static void iqblocka_patch_rom(running_machine *machine)
 {
-	UINT8 *rom = memory_region(machine, "maincpu");
+	UINT8 *rom = machine->region("maincpu")->base();
 
 //  rom[0x7b64] = 0xc9;
 
@@ -435,8 +435,8 @@ static DRIVER_INIT( iqblockf )
 
 static void tjsb_decrypt_sprites(running_machine *machine)
 {
-	int length = memory_region_length(machine, "sprites");
-	UINT8 *rom = memory_region(machine, "sprites");
+	int length = machine->region("sprites")->bytes();
+	UINT8 *rom = machine->region("sprites")->base();
 	UINT8 *tmp = auto_alloc_array(machine, UINT8, length);
 	int i;
 
@@ -465,7 +465,7 @@ static void tjsb_decrypt_sprites(running_machine *machine)
 
 static void tjsb_patch_rom(running_machine *machine)
 {
-	UINT8 *rom = memory_region(machine, "maincpu");
+	UINT8 *rom = machine->region("maincpu")->base();
 	rom[0x011df] = 0x18;
 }
 
@@ -483,7 +483,7 @@ static DRIVER_INIT( tjsb )
 static void mgcs_decrypt_program_rom(running_machine *machine)
 {
 	int i;
-	UINT16 *src = (UINT16 *)memory_region(machine, "maincpu");
+	UINT16 *src = (UINT16 *)machine->region("maincpu")->base();
 
 	int rom_size = 0x80000;
 
@@ -532,8 +532,8 @@ static void mgcs_decrypt_program_rom(running_machine *machine)
 
 static void mgcs_decrypt_tiles(running_machine *machine)
 {
-	int length = memory_region_length(machine, "tilemaps");
-	UINT8 *rom = memory_region(machine, "tilemaps");
+	int length = machine->region("tilemaps")->bytes();
+	UINT8 *rom = machine->region("tilemaps")->base();
 	UINT8 *tmp = auto_alloc_array(machine, UINT8, length);
 	int i;
 
@@ -549,8 +549,8 @@ static void mgcs_decrypt_tiles(running_machine *machine)
 
 static void mgcs_flip_sprites(running_machine *machine)
 {
-	int length = memory_region_length(machine, "sprites");
-	UINT8 *rom = memory_region(machine, "sprites");
+	int length = machine->region("sprites")->bytes();
+	UINT8 *rom = machine->region("sprites")->base();
 	int i;
 
 	for (i = 0;i < length;i+=2)
@@ -570,7 +570,7 @@ static void mgcs_flip_sprites(running_machine *machine)
 
 static void mgcs_patch_rom(running_machine *machine)
 {
-	UINT16 *rom = (UINT16 *)memory_region(machine, "maincpu");
+	UINT16 *rom = (UINT16 *)machine->region("maincpu")->base();
 
 	rom[0x4e036/2] = 0x6006;
 
@@ -596,7 +596,7 @@ static DRIVER_INIT( mgcs )
 // decryption is incomplete, the first part of code doesn't seem right.
 static DRIVER_INIT( tarzan )
 {
-	UINT16 *ROM = (UINT16 *)memory_region(machine,"maincpu");
+	UINT16 *ROM = (UINT16 *)machine->region("maincpu")->base();
 	int i;
 	int size = 0x40000;
 
@@ -622,7 +622,7 @@ static DRIVER_INIT( tarzan )
 // by iq_132
 static DRIVER_INIT( tarzana )
 {
-	UINT8 *ROM = memory_region(machine,"maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 	int i;
 	int size = 0x80000;
 
@@ -644,7 +644,7 @@ static DRIVER_INIT( tarzana )
 // decryption is incomplete, the first part of code doesn't seem right.
 static DRIVER_INIT( starzan )
 {
-	UINT8 *ROM = memory_region(machine,"maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 	int i;
 	int size = 0x040000;
 
@@ -699,7 +699,7 @@ static DRIVER_INIT( starzan )
 static DRIVER_INIT( sdmg2 )
 {
 	int i;
-	UINT16 *src = (UINT16 *)memory_region(machine, "maincpu");
+	UINT16 *src = (UINT16 *)machine->region("maincpu")->base();
 
 	int rom_size = 0x80000;
 
@@ -756,7 +756,7 @@ static DRIVER_INIT( sdmg2 )
 static DRIVER_INIT( mgdh )
 {
 	int i;
-	UINT16 *src = (UINT16 *)memory_region(machine, "maincpu");
+	UINT16 *src = (UINT16 *)machine->region("maincpu")->base();
 
 	int rom_size = 0x80000;
 
@@ -793,7 +793,7 @@ static DRIVER_INIT( mgdh )
 static DRIVER_INIT( lhzb2 )
 {
 	int i;
-	UINT16 *src = (UINT16 *) (memory_region(machine, "maincpu"));
+	UINT16 *src = (UINT16 *) (machine->region("maincpu")->base());
 
 	int rom_size = 0x80000;
 
@@ -883,7 +883,7 @@ static DRIVER_INIT( lhzb2 )
 static DRIVER_INIT( lhzb2a )
 {
 	int i;
-	UINT16 *src = (UINT16 *) (memory_region(machine, "maincpu"));
+	UINT16 *src = (UINT16 *) (machine->region("maincpu")->base());
 
 	int rom_size = 0x80000;
 
@@ -945,7 +945,7 @@ static DRIVER_INIT( lhzb2a )
 static DRIVER_INIT( slqz2 )
 {
 	int i;
-	UINT16 *src = (UINT16 *) (memory_region(machine, "maincpu"));
+	UINT16 *src = (UINT16 *) (machine->region("maincpu")->base());
 
 	int rom_size = 0x80000;
 
@@ -2028,37 +2028,37 @@ static MACHINE_RESET( iqblocka )
 }
 
 static MACHINE_CONFIG_START( iqblocka, driver_device )
-	MDRV_CPU_ADD("maincpu", Z180, XTAL_16MHz / 2)
-	MDRV_CPU_PROGRAM_MAP(iqblocka_map)
-	MDRV_CPU_IO_MAP(iqblocka_io)
-	MDRV_CPU_VBLANK_INT_HACK(iqblocka_interrupt,2)
+	MCFG_CPU_ADD("maincpu", Z180, XTAL_16MHz / 2)
+	MCFG_CPU_PROGRAM_MAP(iqblocka_map)
+	MCFG_CPU_IO_MAP(iqblocka_io)
+	MCFG_CPU_VBLANK_INT_HACK(iqblocka_interrupt,2)
 
-	MDRV_PPI8255_ADD( "ppi8255", iqblocka_ppi8255_intf )
+	MCFG_PPI8255_ADD( "ppi8255", iqblocka_ppi8255_intf )
 
-	MDRV_MACHINE_RESET(iqblocka)
+	MCFG_MACHINE_RESET(iqblocka)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(512, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 512-1, 0, 240-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(512, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 240-1)
 
-	MDRV_GFXDECODE(igs017)
-	MDRV_PALETTE_LENGTH(0x100*2)
+	MCFG_GFXDECODE(igs017)
+	MCFG_PALETTE_LENGTH(0x100*2)
 
-	MDRV_VIDEO_START(igs017)
-	MDRV_VIDEO_UPDATE(igs017)
-	MDRV_VIDEO_RESET(igs017)
+	MCFG_VIDEO_START(igs017)
+	MCFG_VIDEO_UPDATE(igs017)
+	MCFG_VIDEO_RESET(igs017)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
-	MDRV_OKIM6295_ADD("oki", XTAL_16MHz / 16, OKIM6295_PIN7_HIGH)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+	MCFG_OKIM6295_ADD("oki", XTAL_16MHz / 16, OKIM6295_PIN7_HIGH)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
 
@@ -2100,33 +2100,33 @@ static const ppi8255_interface mgcs_ppi8255_intf =
 };
 
 static MACHINE_CONFIG_START( mgcs, driver_device )
-	MDRV_CPU_ADD("maincpu", M68000, XTAL_22MHz / 2)
-	MDRV_CPU_PROGRAM_MAP(mgcs)
-	MDRV_CPU_VBLANK_INT_HACK(mgcs_interrupt,2)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_22MHz / 2)
+	MCFG_CPU_PROGRAM_MAP(mgcs)
+	MCFG_CPU_VBLANK_INT_HACK(mgcs_interrupt,2)
 
-	MDRV_MACHINE_RESET(mgcs)
+	MCFG_MACHINE_RESET(mgcs)
 
-	MDRV_PPI8255_ADD( "ppi8255", mgcs_ppi8255_intf )
+	MCFG_PPI8255_ADD( "ppi8255", mgcs_ppi8255_intf )
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(512, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 512-1, 0, 240-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(512, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 240-1)
 
-	MDRV_GFXDECODE(igs017_flipped)
-	MDRV_PALETTE_LENGTH(0x100*2)
+	MCFG_GFXDECODE(igs017_flipped)
+	MCFG_PALETTE_LENGTH(0x100*2)
 
-	MDRV_VIDEO_START(igs017)
-	MDRV_VIDEO_UPDATE(igs017)
-	MDRV_VIDEO_RESET(igs017)
+	MCFG_VIDEO_START(igs017)
+	MCFG_VIDEO_UPDATE(igs017)
+	MCFG_VIDEO_RESET(igs017)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_OKIM6295_ADD("oki", XTAL_8MHz / 8, OKIM6295_PIN7_HIGH)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_OKIM6295_ADD("oki", XTAL_8MHz / 8, OKIM6295_PIN7_HIGH)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
 
@@ -2145,33 +2145,33 @@ static const ppi8255_interface sdmg2_ppi8255_intf =
 };
 
 static MACHINE_CONFIG_START( sdmg2, driver_device )
-	MDRV_CPU_ADD("maincpu", M68000, XTAL_22MHz/2)
-	MDRV_CPU_PROGRAM_MAP(sdmg2)
-	MDRV_CPU_VBLANK_INT_HACK(mgcs_interrupt,2)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_22MHz/2)
+	MCFG_CPU_PROGRAM_MAP(sdmg2)
+	MCFG_CPU_VBLANK_INT_HACK(mgcs_interrupt,2)
 
-	MDRV_MACHINE_RESET(mgcs)
+	MCFG_MACHINE_RESET(mgcs)
 
-	MDRV_PPI8255_ADD( "ppi8255", sdmg2_ppi8255_intf )
+	MCFG_PPI8255_ADD( "ppi8255", sdmg2_ppi8255_intf )
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)	// VSync 60Hz, HSync 15.3kHz
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(512, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-16-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)	// VSync 60Hz, HSync 15.3kHz
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(512, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-16-1)
 
-	MDRV_GFXDECODE(igs017)
-	MDRV_PALETTE_LENGTH(0x100*2)
+	MCFG_GFXDECODE(igs017)
+	MCFG_PALETTE_LENGTH(0x100*2)
 
-	MDRV_VIDEO_START(igs017)
-	MDRV_VIDEO_UPDATE(igs017)
-	MDRV_VIDEO_RESET(igs017)
+	MCFG_VIDEO_START(igs017)
+	MCFG_VIDEO_UPDATE(igs017)
+	MCFG_VIDEO_RESET(igs017)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_OKIM6295_ADD("oki", XTAL_22MHz / 22, OKIM6295_PIN7_HIGH)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_OKIM6295_ADD("oki", XTAL_22MHz / 22, OKIM6295_PIN7_HIGH)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
 
@@ -2203,33 +2203,33 @@ static const ppi8255_interface mgdh_ppi8255_intf =
 };
 
 static MACHINE_CONFIG_START( mgdh, driver_device )
-	MDRV_CPU_ADD("maincpu", M68000, XTAL_22MHz / 2)
-	MDRV_CPU_PROGRAM_MAP(mgdh_map)
-	MDRV_CPU_VBLANK_INT_HACK(mgdh_interrupt,2)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_22MHz / 2)
+	MCFG_CPU_PROGRAM_MAP(mgdh_map)
+	MCFG_CPU_VBLANK_INT_HACK(mgdh_interrupt,2)
 
-	MDRV_MACHINE_RESET(mgcs)
+	MCFG_MACHINE_RESET(mgcs)
 
-	MDRV_PPI8255_ADD( "ppi8255", mgdh_ppi8255_intf )
+	MCFG_PPI8255_ADD( "ppi8255", mgdh_ppi8255_intf )
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(512, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-16-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(512, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-16-1)
 
-	MDRV_GFXDECODE(igs017_swapped)
-	MDRV_PALETTE_LENGTH(0x100*2)
+	MCFG_GFXDECODE(igs017_swapped)
+	MCFG_PALETTE_LENGTH(0x100*2)
 
-	MDRV_VIDEO_START(igs017)
-	MDRV_VIDEO_UPDATE(igs017)
-	MDRV_VIDEO_RESET(igs017)
+	MCFG_VIDEO_START(igs017)
+	MCFG_VIDEO_UPDATE(igs017)
+	MCFG_VIDEO_RESET(igs017)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_OKIM6295_ADD("oki", XTAL_22MHz / 22, OKIM6295_PIN7_HIGH)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_OKIM6295_ADD("oki", XTAL_22MHz / 22, OKIM6295_PIN7_HIGH)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
 

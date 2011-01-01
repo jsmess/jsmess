@@ -1669,7 +1669,7 @@ static void setup_cart_banks( running_machine *machine )
 static void setup_banks( running_machine *machine )
 {
 	sms_state *state = machine->driver_data<sms_state>();
-	UINT8 *mem = memory_region(machine, "maincpu");
+	UINT8 *mem = machine->region("maincpu")->base();
 	state->banking_bios[1] = state->banking_cart[1] = state->banking_none[1] = mem;
 	state->banking_bios[2] = state->banking_cart[2] = state->banking_none[2] = mem;
 	state->banking_bios[3] = state->banking_cart[3] = state->banking_none[3] = mem;
@@ -1677,9 +1677,9 @@ static void setup_banks( running_machine *machine )
 	state->banking_bios[5] = state->banking_cart[5] = state->banking_none[5] = mem;
 	state->banking_bios[6] = state->banking_cart[6] = state->banking_none[6] = mem;
 
-	state->BIOS = memory_region(machine, "user1");
+	state->BIOS = machine->region("user1")->base();
 
-	state->bios_page_count = (state->BIOS ? memory_region_length(machine, "user1") / 0x4000 : 0);
+	state->bios_page_count = (state->BIOS ? machine->region("user1")->bytes() / 0x4000 : 0);
 
 	setup_cart_banks(machine);
 

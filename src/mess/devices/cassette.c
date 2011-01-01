@@ -43,7 +43,7 @@ const cassette_config default_cassette_config =
 };
 
 
-INLINE dev_cassette_t *get_safe_token(running_device *device)
+INLINE dev_cassette_t *get_safe_token(device_t *device)
 {
 	assert( device != NULL );
 	assert( device->type() == CASSETTE );
@@ -55,7 +55,7 @@ INLINE dev_cassette_t *get_safe_token(running_device *device)
     cassette IO
 *********************************************************************/
 
-INLINE int cassette_is_motor_on(running_device *device)
+INLINE int cassette_is_motor_on(device_t *device)
 {
 	dev_cassette_t	*cassette = get_safe_token( device );
 
@@ -68,7 +68,7 @@ INLINE int cassette_is_motor_on(running_device *device)
 
 
 
-static void cassette_update(running_device *device)
+static void cassette_update(device_t *device)
 {
 	dev_cassette_t	*cassette = get_safe_token( device );
 	double cur_time = attotime_to_double(timer_get_time(device->machine));
@@ -103,7 +103,7 @@ static void cassette_update(running_device *device)
 
 
 
-cassette_state cassette_get_state(running_device *device)
+cassette_state cassette_get_state(device_t *device)
 {
 	dev_cassette_t	*cassette = get_safe_token( device );
 	return cassette->state;
@@ -111,7 +111,7 @@ cassette_state cassette_get_state(running_device *device)
 
 
 
-void cassette_change_state(running_device *device, cassette_state state, cassette_state mask)
+void cassette_change_state(device_t *device, cassette_state state, cassette_state mask)
 {
 	dev_cassette_t	*cassette = get_safe_token( device );
 	cassette_state new_state;
@@ -129,14 +129,14 @@ void cassette_change_state(running_device *device, cassette_state state, cassett
 
 
 
-void cassette_set_state(running_device *device, cassette_state state)
+void cassette_set_state(device_t *device, cassette_state state)
 {
 	cassette_change_state(device, state, (cassette_state)(~0));
 }
 
 
 
-double cassette_input(running_device *device)
+double cassette_input(device_t *device)
 {
 	dev_cassette_t	*cassette = get_safe_token( device );
 	INT32 sample;
@@ -153,7 +153,7 @@ double cassette_input(running_device *device)
 
 
 
-void cassette_output(running_device *device, double value)
+void cassette_output(device_t *device, double value)
 {
 	dev_cassette_t	*cassette = get_safe_token( device );
 
@@ -170,7 +170,7 @@ void cassette_output(running_device *device, double value)
 
 
 
-cassette_image *cassette_get_image(running_device *device)
+cassette_image *cassette_get_image(device_t *device)
 {
 	dev_cassette_t	*cassette = get_safe_token( device );
 
@@ -179,7 +179,7 @@ cassette_image *cassette_get_image(running_device *device)
 
 
 
-double cassette_get_position(running_device *device)
+double cassette_get_position(device_t *device)
 {
 	dev_cassette_t	*cassette = get_safe_token( device );
 	double position;
@@ -193,7 +193,7 @@ double cassette_get_position(running_device *device)
 
 
 
-double cassette_get_length(running_device *device)
+double cassette_get_length(device_t *device)
 {
 	dev_cassette_t	*cassette = get_safe_token( device );
 	struct CassetteInfo info;
@@ -204,7 +204,7 @@ double cassette_get_length(running_device *device)
 
 
 
-void cassette_seek(running_device *device, double time, int origin)
+void cassette_seek(device_t *device, double time, int origin)
 {
 	dev_cassette_t	*cassette = get_safe_token( device );
 
@@ -342,7 +342,7 @@ static DEVICE_IMAGE_DISPLAY(cassette)
 	int n;
 	double position, length;
 	cassette_state uistate;
-	running_device *dev;
+	device_t *dev;
 	static const UINT8 shapes[8] = { 0x2d, 0x5c, 0x7c, 0x2f, 0x2d, 0x20, 0x20, 0x20 };
 
 	/* abort if we should not be showing the image */

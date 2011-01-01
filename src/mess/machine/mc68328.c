@@ -27,10 +27,10 @@ INLINE void verboselog(running_machine *machine, int n_level, const char *s_fmt,
     }
 }
 
-static void mc68328_set_interrupt_line(running_device *device, UINT32 line, UINT32 active)
+static void mc68328_set_interrupt_line(device_t *device, UINT32 line, UINT32 active)
 {
     mc68328_t* mc68328 = mc68328_get_safe_token( device );
-    running_device *cpu = device->machine->device(mc68328->iface->m68k_cpu_tag);
+    device_t *cpu = device->machine->device(mc68328->iface->m68k_cpu_tag);
 
     if(active)
     {
@@ -105,7 +105,7 @@ static void mc68328_set_interrupt_line(running_device *device, UINT32 line, UINT
     }
 }
 
-static void mc68328_poll_port_d_interrupts(running_device *device)
+static void mc68328_poll_port_d_interrupts(device_t *device)
 {
     mc68328_t* mc68328 = mc68328_get_safe_token( device );
     UINT8 line_transitions = mc68328->regs.pddataedge & mc68328->regs.pdirqedge;
@@ -122,7 +122,7 @@ static void mc68328_poll_port_d_interrupts(running_device *device)
     }
 }
 
-void mc68328_set_penirq_line(running_device *device, int state)
+void mc68328_set_penirq_line(device_t *device, int state)
 {
     mc68328_t* mc68328 = mc68328_get_safe_token( device );
 
@@ -137,7 +137,7 @@ void mc68328_set_penirq_line(running_device *device, int state)
     }
 }
 
-void mc68328_set_port_d_lines(running_device *device, UINT8 state, int bit)
+void mc68328_set_port_d_lines(device_t *device, UINT8 state, int bit)
 {
     mc68328_t* mc68328 = mc68328_get_safe_token( device );
     UINT8 old_button_state = mc68328->regs.pddata;
@@ -156,7 +156,7 @@ void mc68328_set_port_d_lines(running_device *device, UINT8 state, int bit)
     mc68328_poll_port_d_interrupts(device);
 }
 
-static UINT32 mc68328_get_timer_frequency(running_device *device, UINT32 index)
+static UINT32 mc68328_get_timer_frequency(device_t *device, UINT32 index)
 {
     mc68328_t* mc68328 = mc68328_get_safe_token( device );
     UINT32 frequency = 0;
@@ -183,7 +183,7 @@ static UINT32 mc68328_get_timer_frequency(running_device *device, UINT32 index)
     return frequency;
 }
 
-static void mc68328_maybe_start_timer(running_device *device, UINT32 index, UINT32 new_enable)
+static void mc68328_maybe_start_timer(device_t *device, UINT32 index, UINT32 new_enable)
 {
     mc68328_t* mc68328 = mc68328_get_safe_token( device );
 
@@ -216,7 +216,7 @@ static void mc68328_maybe_start_timer(running_device *device, UINT32 index, UINT
     }
 }
 
-static void mc68328_timer_compare_event(running_device *device, UINT32 index)
+static void mc68328_timer_compare_event(device_t *device, UINT32 index)
 {
     mc68328_t* mc68328 = mc68328_get_safe_token( device );
 
@@ -263,21 +263,21 @@ static void mc68328_timer_compare_event(running_device *device, UINT32 index)
 
 static TIMER_CALLBACK( mc68328_timer1_hit )
 {
-    running_device *device = machine->device(MC68328_TAG);
+    device_t *device = machine->device(MC68328_TAG);
 
     mc68328_timer_compare_event(device, 0);
 }
 
 static TIMER_CALLBACK( mc68328_timer2_hit )
 {
-    running_device *device = machine->device(MC68328_TAG);
+    device_t *device = machine->device(MC68328_TAG);
 
     mc68328_timer_compare_event(device, 1);
 }
 
 static TIMER_CALLBACK( mc68328_pwm_transition )
 {
-    running_device *device = machine->device(MC68328_TAG);
+    device_t *device = machine->device(MC68328_TAG);
     mc68328_t* mc68328 = mc68328_get_safe_token( device );
 
     if(mc68328->regs.pwmw >= mc68328->regs.pwmp || mc68328->regs.pwmw == 0 || mc68328->regs.pwmp == 0)
@@ -325,7 +325,7 @@ static TIMER_CALLBACK( mc68328_pwm_transition )
 
 static TIMER_CALLBACK( mc68328_rtc_tick )
 {
-    running_device *device = machine->device(MC68328_TAG);
+    device_t *device = machine->device(MC68328_TAG);
     mc68328_t* mc68328 = mc68328_get_safe_token( device );
 
     if(mc68328->regs.rtcctl & RTCCTL_ENABLE)
@@ -2654,7 +2654,7 @@ static DEVICE_RESET( mc68328 )
     timer_adjust_periodic(mc68328->rtc, ATTOTIME_IN_HZ(1), 0, ATTOTIME_IN_HZ(1));
 }
 
-static void mc68328_register_state_save(running_device *device)
+static void mc68328_register_state_save(device_t *device)
 {
     mc68328_t* mc68328 = mc68328_get_safe_token( device );
 

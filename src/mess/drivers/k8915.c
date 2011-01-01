@@ -76,14 +76,14 @@ static MACHINE_RESET(k8915)
 
 static DRIVER_INIT(k8915)
 {
-	UINT8 *RAM = memory_region(machine, "maincpu");
+	UINT8 *RAM = machine->region("maincpu")->base();
 	memory_configure_bank(machine, "boot", 0, 2, &RAM[0x0000], 0x10000);
 }
 
 static VIDEO_START( k8915 )
 {
 	k8915_state *state = machine->driver_data<k8915_state>();
-	state->charrom = memory_region(machine, "chargen");
+	state->charrom = machine->region("chargen")->base();
 }
 
 static VIDEO_UPDATE( k8915 )
@@ -153,27 +153,27 @@ static GENERIC_TERMINAL_INTERFACE( k8915_terminal_intf )
 
 static MACHINE_CONFIG_START( k8915, k8915_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, XTAL_16MHz / 4)
-	MDRV_CPU_PROGRAM_MAP(k8915_mem)
-	MDRV_CPU_IO_MAP(k8915_io)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz / 4)
+	MCFG_CPU_PROGRAM_MAP(k8915_mem)
+	MCFG_CPU_IO_MAP(k8915_io)
 
-	MDRV_MACHINE_RESET(k8915)
+	MCFG_MACHINE_RESET(k8915)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(640, 250)
-	MDRV_SCREEN_VISIBLE_AREA(0, 639, 0, 249)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(640, 250)
+	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 249)
 
-	MDRV_PALETTE_LENGTH(2)
-	MDRV_PALETTE_INIT(k8915)
+	MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_INIT(k8915)
 
-	MDRV_VIDEO_START(k8915)
-	MDRV_VIDEO_UPDATE(k8915)
+	MCFG_VIDEO_START(k8915)
+	MCFG_VIDEO_UPDATE(k8915)
 
-	MDRV_GENERIC_TERMINAL_ADD("terminal", k8915_terminal_intf) // keyboard only
+	MCFG_GENERIC_TERMINAL_ADD("terminal", k8915_terminal_intf) // keyboard only
 MACHINE_CONFIG_END
 
 

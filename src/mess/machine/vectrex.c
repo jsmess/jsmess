@@ -68,7 +68,7 @@ static int vectrex_verify_cart(char *data)
 DEVICE_IMAGE_LOAD(vectrex_cart)
 {
 	vectrex_state *state = image.device().machine->driver_data<vectrex_state>();
-	UINT8 *mem = memory_region(image.device().machine, "maincpu");
+	UINT8 *mem = image.device().machine->region("maincpu")->base();
 	if (image.software_entry() == NULL)
 	{
 		image.fread( mem, 0x8000);
@@ -213,7 +213,7 @@ void vectrex_configuration(running_machine *machine)
 
 *********************************************************************/
 
-void vectrex_via_irq(running_device *device, int level)
+void vectrex_via_irq(device_t *device, int level)
 {
 	cputag_set_input_line(device->machine, "maincpu", M6809_IRQ_LINE, level);
 }
@@ -242,7 +242,7 @@ READ8_DEVICE_HANDLER(vectrex_via_pa_r)
 	if ((!(state->via_out[PORTB] & 0x10)) && (state->via_out[PORTB] & 0x08))
 		/* BDIR inactive, we can read the PSG. BC1 has to be active. */
 	{
-		running_device *ay = device->machine->device("ay8912");
+		device_t *ay = device->machine->device("ay8912");
 
 		state->via_out[PORTA] = ay8910_r(ay, 0)
 			& ~(state->imager_pinlevel & 0x80);

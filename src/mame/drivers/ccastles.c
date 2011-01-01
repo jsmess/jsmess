@@ -192,7 +192,7 @@ static MACHINE_START( ccastles )
 	rectangle visarea;
 
 	/* initialize globals */
-	state->syncprom = memory_region(machine, "proms") + 0x000;
+	state->syncprom = machine->region("proms")->base() + 0x000;
 
 	/* find the start of VBLANK in the SYNC PROM */
 	for (state->vblank_start = 0; state->vblank_start < 256; state->vblank_start++)
@@ -217,7 +217,7 @@ static MACHINE_START( ccastles )
 	machine->primary_screen->configure(320, 256, visarea, HZ_TO_ATTOSECONDS(PIXEL_CLOCK) * VTOTAL * HTOTAL);
 
 	/* configure the ROM banking */
-	memory_configure_bank(machine, "bank1", 0, 2, memory_region(machine, "maincpu") + 0xa000, 0x6000);
+	memory_configure_bank(machine, "bank1", 0, 2, machine->region("maincpu")->base() + 0xa000, 0x6000);
 
 	/* create a timer for IRQs and set up the first callback */
 	state->irq_timer = timer_alloc(machine, clock_irq, NULL);
@@ -481,36 +481,36 @@ static const pokey_interface pokey_config =
 static MACHINE_CONFIG_START( ccastles, ccastles_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6502, MASTER_CLOCK/8)
-	MDRV_CPU_PROGRAM_MAP(main_map)
+	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK/8)
+	MCFG_CPU_PROGRAM_MAP(main_map)
 
-	MDRV_MACHINE_START(ccastles)
-	MDRV_MACHINE_RESET(ccastles)
-	MDRV_WATCHDOG_VBLANK_INIT(8)
+	MCFG_MACHINE_START(ccastles)
+	MCFG_MACHINE_RESET(ccastles)
+	MCFG_WATCHDOG_VBLANK_INIT(8)
 
-	MDRV_X2212_ADD_AUTOSAVE("nvram_4b")
-	MDRV_X2212_ADD_AUTOSAVE("nvram_4a")
+	MCFG_X2212_ADD_AUTOSAVE("nvram_4b")
+	MCFG_X2212_ADD_AUTOSAVE("nvram_4a")
 
 	/* video hardware */
-	MDRV_GFXDECODE(ccastles)
-	MDRV_PALETTE_LENGTH(32)
+	MCFG_GFXDECODE(ccastles)
+	MCFG_PALETTE_LENGTH(32)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, 0, HTOTAL - 1, VTOTAL, 0, VTOTAL - 1)	/* will be adjusted later */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, 0, HTOTAL - 1, VTOTAL, 0, VTOTAL - 1)	/* will be adjusted later */
 
-	MDRV_VIDEO_START(ccastles)
-	MDRV_VIDEO_UPDATE(ccastles)
+	MCFG_VIDEO_START(ccastles)
+	MCFG_VIDEO_UPDATE(ccastles)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("pokey1", POKEY, MASTER_CLOCK/8)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("pokey1", POKEY, MASTER_CLOCK/8)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD("pokey2", POKEY, MASTER_CLOCK/8)
-	MDRV_SOUND_CONFIG(pokey_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("pokey2", POKEY, MASTER_CLOCK/8)
+	MCFG_SOUND_CONFIG(pokey_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 

@@ -26,9 +26,9 @@ struct _mea8000_interface
 };
 
 
-#define MDRV_MEA8000_ADD(_tag, _intrf)	      \
-  MDRV_DEVICE_ADD(_tag, MEA8000, 0)	      \
-  MDRV_DEVICE_CONFIG(_intrf)
+#define MCFG_MEA8000_ADD(_tag, _intrf)	      \
+  MCFG_DEVICE_ADD(_tag, MEA8000, 0)	      \
+  MCFG_DEVICE_CONFIG(_intrf)
 
 /* interface to CPU via address/data bus*/
 extern READ8_DEVICE_HANDLER  ( mea8000_r );

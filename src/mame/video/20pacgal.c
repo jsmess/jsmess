@@ -25,7 +25,7 @@
 static void get_pens(running_machine *machine, const _20pacgal_state *state, pen_t *pens)
 {
 	offs_t offs;
-	UINT8 *color_prom = memory_region(machine, "proms") + (NUM_PENS * state->game_selected);
+	UINT8 *color_prom = machine->region("proms")->base() + (NUM_PENS * state->game_selected);
 
 	for (offs = 0; offs < NUM_PENS ;offs++)
 	{
@@ -429,12 +429,12 @@ static VIDEO_UPDATE( 20pacgal )
 
 MACHINE_CONFIG_FRAGMENT( 20pacgal_video )
 
-	MDRV_VIDEO_UPDATE(20pacgal)
+	MCFG_VIDEO_UPDATE(20pacgal)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_SIZE(SCREEN_WIDTH, SCREEN_HEIGHT)
-	MDRV_SCREEN_VISIBLE_AREA(0, SCREEN_WIDTH - 1, 0, SCREEN_HEIGHT - 1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_SIZE(SCREEN_WIDTH, SCREEN_HEIGHT)
+	MCFG_SCREEN_VISIBLE_AREA(0, SCREEN_WIDTH - 1, 0, SCREEN_HEIGHT - 1)
 MACHINE_CONFIG_END

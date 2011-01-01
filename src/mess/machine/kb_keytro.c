@@ -84,7 +84,7 @@ are attached to two switches. The keys appear twice in the keyboard matrix.
 typedef struct _kb_keytr_state kb_keytr_state;
 struct _kb_keytr_state
 {
-	running_device *cpu;
+	device_t *cpu;
 
 	devcb_resolved_write_line out_clock_func;
 	devcb_resolved_write_line out_data_func;
@@ -106,7 +106,7 @@ struct _kb_keytr_state
     INLINE FUNCTIONS
 *****************************************************************************/
 
-INLINE kb_keytr_state *get_safe_token(running_device *device)
+INLINE kb_keytr_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == KB_KEYTRONIC);
@@ -578,9 +578,9 @@ ADDRESS_MAP_END
 *****************************************************************************/
 
 MACHINE_CONFIG_FRAGMENT( kb_keytr )
-	MDRV_CPU_ADD("kb_keytr", I8051, 11060250)
-	MDRV_CPU_PROGRAM_MAP(keytronic_program)
-	MDRV_CPU_IO_MAP(keytronic_io)
+	MCFG_CPU_ADD("kb_keytr", I8051, 11060250)
+	MCFG_CPU_PROGRAM_MAP(keytronic_program)
+	MCFG_CPU_IO_MAP(keytronic_io)
 MACHINE_CONFIG_END
 
 

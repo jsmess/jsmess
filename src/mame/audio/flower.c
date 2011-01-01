@@ -53,7 +53,7 @@ struct _flower_sound_state
 	UINT8 soundregs2[0x40];
 };
 
-INLINE flower_sound_state *get_safe_token( running_device *device )
+INLINE flower_sound_state *get_safe_token( device_t *device )
 {
 	assert(device != NULL);
 	assert(device->type() == FLOWER);
@@ -62,7 +62,7 @@ INLINE flower_sound_state *get_safe_token( running_device *device )
 }
 
 /* build a table to divide by the number of voices; gain is specified as gain*16 */
-static void make_mixer_table(running_device *device, int voices, int gain)
+static void make_mixer_table(device_t *device, int voices, int gain)
 {
 	flower_sound_state *state = get_safe_token(device);
 	int count = voices * 128;
@@ -185,8 +185,8 @@ static DEVICE_START( flower_sound )
 	state->num_voices = 8;
 	state->last_channel = state->channel_list + state->num_voices;
 
-	state->sound_rom1 = memory_region(machine, "sound1");
-	state->sound_rom2 = memory_region(machine, "sound2");
+	state->sound_rom1 = machine->region("sound1")->base();
+	state->sound_rom2 = machine->region("sound2")->base();
 
 	/* start with sound enabled, many games don't have a sound enable register */
 	state->sound_enable = 1;

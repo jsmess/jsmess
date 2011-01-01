@@ -17,7 +17,7 @@ typedef struct _ti99_myarcmem_state
 
 } ti99_myarcmem_state;
 
-INLINE ti99_myarcmem_state *get_safe_token(running_device *device)
+INLINE ti99_myarcmem_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	return (ti99_myarcmem_state *)downcast<legacy_device_base *>(device)->token();
@@ -109,7 +109,7 @@ static DEVICE_RESET( ti99_myarcmem )
 {
 	ti99_myarcmem_state *card = (ti99_myarcmem_state*)downcast<legacy_device_base *>(device)->token();
 	/* Register the card */
-	running_device *peb = device->owner();
+	device_t *peb = device->owner();
 
 	if (input_port_read(device->machine, "RAM")==RAM_MYARC512)
 	{

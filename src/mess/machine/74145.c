@@ -92,7 +92,7 @@ const ttl74145_interface default_ttl74145 =
     IMPLEMENTATION
 ***************************************************************************/
 
-INLINE ttl74145_t *get_safe_token(running_device *device)
+INLINE ttl74145_t *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == TTL74145);

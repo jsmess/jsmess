@@ -17,7 +17,7 @@
 typedef struct _coco_pak_pcb_t coco_pak_pcb_t;
 struct _coco_pak_pcb_t
 {
-	running_device *cococart;
+	device_t *cococart;
 	device_image_interface *cart;
 };
 
@@ -26,7 +26,7 @@ struct _coco_pak_pcb_t
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE coco_pak_pcb_t *get_token(running_device *device)
+INLINE coco_pak_pcb_t *get_token(device_t *device)
 {
 	assert(device != NULL);
 	assert((device->type() == COCO_CARTRIDGE_PCB_PAK) || (device->type() == COCO_CARTRIDGE_PCB_PAK_BANKED16K));
@@ -110,14 +110,14 @@ DEVICE_GET_INFO(coco_cartridge_pcb_pak)
     banked_pak_set_bank - function to set the bank
 -------------------------------------------------*/
 
-static void banked_pak_set_bank(running_device *device, UINT32 bank)
+static void banked_pak_set_bank(device_t *device, UINT32 bank)
 {
 	coco_pak_pcb_t *pak_pcb = get_token(device);
 
 	UINT64 pos;
 	UINT32 i;
-	UINT8 *rom = memory_region(device->machine, "cart");
-	UINT32 rom_length = memory_region_length(device->machine, "cart");
+	UINT8 *rom = device->machine->region("cart")->base();
+	UINT32 rom_length = device->machine->region("cart")->bytes();
 
 	pos = (bank * 0x4000) % pak_pcb->cart->length();
 

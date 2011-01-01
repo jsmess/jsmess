@@ -31,9 +31,9 @@ public:
 	apricot_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	running_device *pic8259;
-	running_device *wd2793;
-	running_device *mc6845;
+	device_t *pic8259;
+	device_t *wd2793;
+	device_t *mc6845;
 
 	int video_mode;
 	int display_on;
@@ -98,7 +98,7 @@ static const struct pit8253_config apricot_pit8253_intf =
 	}
 };
 
-static void apricot_sio_irq_w(running_device *device, int state)
+static void apricot_sio_irq_w(device_t *device, int state)
 {
 	apricot_state *apricot = device->machine->driver_data<apricot_state>();
 	pic8259_ir5_w(apricot->pic8259, state);
@@ -236,7 +236,7 @@ static const mc6845_interface apricot_mc6845_intf =
 static DRIVER_INIT( apricot )
 {
 	apricot_state *apricot = machine->driver_data<apricot_state>();
-	running_device *maincpu = machine->device("maincpu");
+	device_t *maincpu = machine->device("maincpu");
 	address_space *prg = cpu_get_address_space(maincpu, ADDRESS_SPACE_PROGRAM);
 
 	UINT8 *ram = messram_get_ptr(machine->device("messram"));
@@ -333,44 +333,44 @@ static const floppy_config apricot_floppy_config =
 static MACHINE_CONFIG_START( apricot, apricot_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", I8086, XTAL_15MHz / 3)
-	MDRV_CPU_PROGRAM_MAP(apricot_mem)
-	MDRV_CPU_IO_MAP(apricot_io)
+	MCFG_CPU_ADD("maincpu", I8086, XTAL_15MHz / 3)
+	MCFG_CPU_PROGRAM_MAP(apricot_mem)
+	MCFG_CPU_IO_MAP(apricot_io)
 
-//  MDRV_CPU_ADD("ic71", I8089, XTAL_15MHz / 3)
+//  MCFG_CPU_ADD("ic71", I8089, XTAL_15MHz / 3)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(800, 400)
-	MDRV_SCREEN_VISIBLE_AREA(0, 800-1, 0, 400-1)
-	MDRV_SCREEN_REFRESH_RATE(72)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(800, 400)
+	MCFG_SCREEN_VISIBLE_AREA(0, 800-1, 0, 400-1)
+	MCFG_SCREEN_REFRESH_RATE(72)
 
-	MDRV_PALETTE_LENGTH(3)
-	MDRV_PALETTE_INIT(apricot)
+	MCFG_PALETTE_LENGTH(3)
+	MCFG_PALETTE_INIT(apricot)
 
-	MDRV_VIDEO_UPDATE(apricot)
+	MCFG_VIDEO_UPDATE(apricot)
 
-	MDRV_MC6845_ADD("ic30", MC6845, XTAL_15MHz / 10, apricot_mc6845_intf)
+	MCFG_MC6845_ADD("ic30", MC6845, XTAL_15MHz / 10, apricot_mc6845_intf)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("ic7", SN76489, XTAL_4MHz / 2)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("ic7", SN76489, XTAL_4MHz / 2)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	/* internal ram */
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("256k")
-	MDRV_RAM_EXTRA_OPTIONS("384k,512k") /* with 1 or 2 128k expansion boards */
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("256k")
+	MCFG_RAM_EXTRA_OPTIONS("384k,512k") /* with 1 or 2 128k expansion boards */
 
-	MDRV_I8255A_ADD("ic17", apricot_i8255a_intf)
-	MDRV_PIC8259_ADD("ic31", apricot_pic8259_intf)
-	MDRV_PIT8253_ADD("ic16", apricot_pit8253_intf)
-	MDRV_Z80SIO_ADD("ic15", 0, apricot_z80sio_intf)
+	MCFG_I8255A_ADD("ic17", apricot_i8255a_intf)
+	MCFG_PIC8259_ADD("ic31", apricot_pic8259_intf)
+	MCFG_PIT8253_ADD("ic16", apricot_pit8253_intf)
+	MCFG_Z80SIO_ADD("ic15", 0, apricot_z80sio_intf)
 
 	/* floppy */
-	MDRV_WD2793_ADD("ic68", apricot_wd17xx_intf)
-	MDRV_FLOPPY_2_DRIVES_ADD(apricot_floppy_config)
+	MCFG_WD2793_ADD("ic68", apricot_wd17xx_intf)
+	MCFG_FLOPPY_2_DRIVES_ADD(apricot_floppy_config)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( apricotxi, apricot )

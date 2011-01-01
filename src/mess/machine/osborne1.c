@@ -54,9 +54,9 @@ READ8_HANDLER( osborne1_2000_r )
 {
 	osborne1_state *state = space->machine->driver_data<osborne1_state>();
 	UINT8	data = 0xFF;
-	running_device *fdc = space->machine->device("mb8877");
-	running_device *pia_0 = space->machine->device("pia_0" );
-	running_device *pia_1 = space->machine->device("pia_1" );
+	device_t *fdc = space->machine->device("mb8877");
+	device_t *pia_0 = space->machine->device("pia_0" );
+	device_t *pia_1 = space->machine->device("pia_1" );
 
 	/* Check whether regular RAM is enabled */
 	if ( ! state->bank2_enabled )
@@ -105,9 +105,9 @@ READ8_HANDLER( osborne1_2000_r )
 WRITE8_HANDLER( osborne1_2000_w )
 {
 	osborne1_state *state = space->machine->driver_data<osborne1_state>();
-	running_device *fdc = space->machine->device("mb8877");
-	running_device *pia_0 = space->machine->device("pia_0" );
-	running_device *pia_1 = space->machine->device("pia_1" );
+	device_t *fdc = space->machine->device("mb8877");
+	device_t *pia_0 = space->machine->device("pia_0" );
+	device_t *pia_1 = space->machine->device("pia_1" );
 
 	/* Check whether regular RAM is enabled */
 	if ( ! state->bank2_enabled )
@@ -186,7 +186,7 @@ WRITE8_HANDLER( osborne1_bankswitch_w )
 	}
 	if ( state->bank2_enabled )
 	{
-		memory_set_bankptr(space->machine,"bank1", memory_region(space->machine, "maincpu") );
+		memory_set_bankptr(space->machine,"bank1", space->machine->region("maincpu")->base() );
 		memory_set_bankptr(space->machine,"bank2", state->empty_4K );
 		memory_set_bankptr(space->machine,"bank3", state->empty_4K );
 	}
@@ -267,7 +267,7 @@ static WRITE8_DEVICE_HANDLER( video_pia_out_cb2_dummy )
 static WRITE8_DEVICE_HANDLER( video_pia_port_a_w )
 {
 	osborne1_state *state = device->machine->driver_data<osborne1_state>();
-	running_device *fdc = device->machine->device("mb8877");
+	device_t *fdc = device->machine->device("mb8877");
 
 	state->new_start_x = data >> 1;
 	wd17xx_dden_w(fdc, BIT(data, 0));
@@ -279,7 +279,7 @@ static WRITE8_DEVICE_HANDLER( video_pia_port_a_w )
 static WRITE8_DEVICE_HANDLER( video_pia_port_b_w )
 {
 	osborne1_state *state = device->machine->driver_data<osborne1_state>();
-	running_device *fdc = device->machine->device("mb8877");
+	device_t *fdc = device->machine->device("mb8877");
 
 	state->new_start_y = data & 0x1F;
 	state->beep = ( data & 0x20 ) ? 1 : 0;
@@ -337,8 +337,8 @@ static TIMER_CALLBACK(osborne1_video_callback)
 {
 	osborne1_state *state = machine->driver_data<osborne1_state>();
 	address_space* space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	running_device *speaker = space->machine->device("beep");
-	running_device *pia_1 = space->machine->device("pia_1");
+	device_t *speaker = space->machine->device("beep");
+	device_t *pia_1 = space->machine->device("pia_1");
 	int y = machine->primary_screen->vpos();
 
 	/* Check for start of frame */
@@ -402,8 +402,8 @@ static TIMER_CALLBACK(osborne1_video_callback)
 
 static TIMER_CALLBACK( setup_osborne1 )
 {
-	running_device *speaker = machine->device("beep");
-	running_device *pia_1 = machine->device("pia_1");
+	device_t *speaker = machine->device("beep");
+	device_t *pia_1 = machine->device("pia_1");
 
 	beep_set_state( speaker, 0 );
 	beep_set_frequency( speaker, 300 /* 60 * 240 / 2 */ );
@@ -413,7 +413,7 @@ static TIMER_CALLBACK( setup_osborne1 )
 static void osborne1_load_proc(device_image_interface &image)
 {
 	int size = image.length();
-	running_device *fdc = image.device().machine->device("mb8877");
+	device_t *fdc = image.device().machine->device("mb8877");
 
 	switch( size )
 	{
@@ -449,7 +449,7 @@ MACHINE_RESET( osborne1 )
 	state->pia_1_irq_state = 0;
 	state->in_irq_handler = 0;
 
-	state->charrom = memory_region( machine, "gfx1" );
+	state->charrom = machine->region( "gfx1" )->base();
 
 	memset( messram_get_ptr(machine->device("messram")) + 0x10000, 0xFF, 0x1000 );
 

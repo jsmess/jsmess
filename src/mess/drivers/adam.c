@@ -480,7 +480,7 @@ Lineal virtual memory map:
 0x3A000, 0x41fff -> Used to Write Protect ROMs
 */
 	UINT8 *BankBase;
-	BankBase = &memory_region(machine, "maincpu")[0x00000];
+	BankBase = &machine->region("maincpu")->base()[0x00000];
 
 	switch (state->lower_memory)
 	{
@@ -580,10 +580,10 @@ void adam_reset_pcb(running_machine *machine)
 {
 	adam_state *state = machine->driver_data<adam_state>();
 	int i;
-	memory_region(machine, "maincpu")[state->pcb] = 0x01;
+	machine->region("maincpu")->base()[state->pcb] = 0x01;
 
 	for (i = 0; i < 15; i++)
-		memory_region(machine, "maincpu")[(state->pcb+4+i*21)&0xFFFF]=i+1;
+		machine->region("maincpu")->base()[(state->pcb+4+i*21)&0xFFFF]=i+1;
 }
 
 static const TMS9928a_interface tms9928a_interface =
@@ -623,7 +623,7 @@ static MACHINE_RESET( adam )
 	state->pcb=0xFEC0;
 	adam_clear_keyboard_buffer(machine);
 
-	memset(&memory_region(machine, "maincpu")[0x0000], 0xFF, 0x20000); /* Initializing RAM */
+	memset(&machine->region("maincpu")->base()[0x0000], 0xFF, 0x20000); /* Initializing RAM */
 }
 
 static const floppy_config adam_floppy_config =
@@ -640,35 +640,35 @@ static const floppy_config adam_floppy_config =
 
 static MACHINE_CONFIG_START( adam, adam_state )
 	/* Machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, 3579545)       /* 3.579545 MHz */
-	MDRV_CPU_PROGRAM_MAP(adam_mem)
-	MDRV_CPU_IO_MAP(adam_io)
+	MCFG_CPU_ADD("maincpu", Z80, 3579545)       /* 3.579545 MHz */
+	MCFG_CPU_PROGRAM_MAP(adam_mem)
+	MCFG_CPU_IO_MAP(adam_io)
 
 	/* Master M6801 AdamNet controller */
-	//MDRV_CPU_ADD("adamnet", M6800, 4000000)       /* 4.0 MHz */
-	//MDRV_CPU_PROGRAM_MAP(master6801_mem, 0)
+	//MCFG_CPU_ADD("adamnet", M6800, 4000000)       /* 4.0 MHz */
+	//MCFG_CPU_PROGRAM_MAP(master6801_mem, 0)
 
-	MDRV_CPU_VBLANK_INT("screen", adam_interrupt)
+	MCFG_CPU_VBLANK_INT("screen", adam_interrupt)
 
-	MDRV_MACHINE_START( adam )
-	MDRV_MACHINE_RESET( adam )
+	MCFG_MACHINE_START( adam )
+	MCFG_MACHINE_RESET( adam )
 
 	/* video hardware */
-	MDRV_FRAGMENT_ADD(tms9928a)
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_REFRESH_RATE(50)
+	MCFG_FRAGMENT_ADD(tms9928a)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_REFRESH_RATE(50)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("sn76489a", SN76489A, 3579545)	/* 3.579545 MHz */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("sn76489a", SN76489A, 3579545)	/* 3.579545 MHz */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* cartridge */
-	MDRV_CARTSLOT_ADD("cart")
-	MDRV_CARTSLOT_EXTENSION_LIST("rom,col,bin")
-	MDRV_CARTSLOT_NOT_MANDATORY
+	MCFG_CARTSLOT_ADD("cart")
+	MCFG_CARTSLOT_EXTENSION_LIST("rom,col,bin")
+	MCFG_CARTSLOT_NOT_MANDATORY
 
-	MDRV_FLOPPY_4_DRIVES_ADD(adam_floppy_config)
+	MCFG_FLOPPY_4_DRIVES_ADD(adam_floppy_config)
 MACHINE_CONFIG_END
 
 

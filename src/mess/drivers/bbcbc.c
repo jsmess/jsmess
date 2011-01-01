@@ -131,7 +131,7 @@ static const z80_daisy_config bbcbc_daisy_chain[] =
 
 static DEVICE_START( bbcbc_cart )
 {
-	UINT8 *cart = memory_region(device->machine,  "maincpu" ) + 0x4000;
+	UINT8 *cart = device->machine->region("maincpu" )->base() + 0x4000;
 
 	memset( cart, 0xFF, 0x8000 );
 }
@@ -139,7 +139,7 @@ static DEVICE_START( bbcbc_cart )
 
 static DEVICE_IMAGE_LOAD( bbcbc_cart )
 {
-	UINT8 *cart = memory_region(image.device().machine,  "maincpu" ) + 0x4000;
+	UINT8 *cart = image.device().machine->region("maincpu" )->base() + 0x4000;
 
 	if ( image.software_entry() == NULL )
 	{
@@ -172,29 +172,29 @@ static MACHINE_RESET( bbcbc )
 
 
 static MACHINE_CONFIG_START( bbcbc, bbcbc_state )
-	MDRV_CPU_ADD( "maincpu", Z80, MAIN_CLOCK / 8 )
-	MDRV_CPU_PROGRAM_MAP( bbcbc_prg)
-	MDRV_CPU_IO_MAP( bbcbc_io)
-	MDRV_CPU_CONFIG(bbcbc_daisy_chain)
-	MDRV_CPU_VBLANK_INT("screen", bbcbc_interrupt)
+	MCFG_CPU_ADD( "maincpu", Z80, MAIN_CLOCK / 8 )
+	MCFG_CPU_PROGRAM_MAP( bbcbc_prg)
+	MCFG_CPU_IO_MAP( bbcbc_io)
+	MCFG_CPU_CONFIG(bbcbc_daisy_chain)
+	MCFG_CPU_VBLANK_INT("screen", bbcbc_interrupt)
 
-	MDRV_MACHINE_START( bbcbc )
-	MDRV_MACHINE_RESET( bbcbc )
+	MCFG_MACHINE_START( bbcbc )
+	MCFG_MACHINE_RESET( bbcbc )
 
-	MDRV_Z80PIO_ADD( "z80pio", MAIN_CLOCK / 8, bbcbc_z80pio_intf )
+	MCFG_Z80PIO_ADD( "z80pio", MAIN_CLOCK / 8, bbcbc_z80pio_intf )
 
-	MDRV_FRAGMENT_ADD( tms9928a )
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_REFRESH_RATE( 50 )
+	MCFG_FRAGMENT_ADD( tms9928a )
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_REFRESH_RATE( 50 )
 
-	MDRV_CARTSLOT_ADD("cart")
-	MDRV_CARTSLOT_NOT_MANDATORY
-	MDRV_CARTSLOT_INTERFACE("bbcbc_cart")
-	MDRV_CARTSLOT_START( bbcbc_cart )
-	MDRV_CARTSLOT_LOAD( bbcbc_cart )
+	MCFG_CARTSLOT_ADD("cart")
+	MCFG_CARTSLOT_NOT_MANDATORY
+	MCFG_CARTSLOT_INTERFACE("bbcbc_cart")
+	MCFG_CARTSLOT_START( bbcbc_cart )
+	MCFG_CARTSLOT_LOAD( bbcbc_cart )
 
 	/* Software lists */
-	MDRV_SOFTWARE_LIST_ADD("cart_list","bbcbc")
+	MCFG_SOFTWARE_LIST_ADD("cart_list","bbcbc")
 MACHINE_CONFIG_END
 
 

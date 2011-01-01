@@ -106,7 +106,7 @@ void seibu_sound_decrypt(running_machine *machine,const char *cpu,int length)
 {
 	address_space *space = cputag_get_address_space(machine, cpu, ADDRESS_SPACE_PROGRAM);
 	UINT8 *decrypt = auto_alloc_array(machine, UINT8, length);
-	UINT8 *rom = memory_region(machine, cpu);
+	UINT8 *rom = machine->region(cpu)->base();
 	int i;
 
 	space->set_decrypted_region(0x0000, (length < 0x10000) ? (length - 1) : 0x1fff, decrypt);
@@ -176,7 +176,7 @@ static DEVICE_START( seibu_adpcm )
 
 	state->playing = 0;
 	state->stream = stream_create(device, 0, 1, device->clock(), state, seibu_adpcm_callback);
-	state->base = memory_region(machine, "adpcm");
+	state->base = machine->region("adpcm")->base();
 	state->adpcm.reset();
 }
 
@@ -203,8 +203,8 @@ DEVICE_GET_INFO( seibu_adpcm )
 
 void seibu_adpcm_decrypt(running_machine *machine, const char *region)
 {
-	UINT8 *ROM = memory_region(machine, region);
-	int len = memory_region_length(machine, region);
+	UINT8 *ROM = machine->region(region)->base();
+	int len = machine->region(region)->bytes();
 	int i;
 
 	for (i = 0; i < len; i++)
@@ -253,7 +253,7 @@ WRITE8_DEVICE_HANDLER( seibu_adpcm_ctl_w )
 
 /***************************************************************************/
 
-static running_device *sound_cpu;
+static device_t *sound_cpu;
 
 enum
 {
@@ -313,17 +313,17 @@ WRITE8_HANDLER( seibu_rst18_ack_w )
 	update_irq_lines(space->machine, RST18_CLEAR);
 }
 
-void seibu_ym3812_irqhandler(running_device *device, int linestate)
+void seibu_ym3812_irqhandler(device_t *device, int linestate)
 {
 	update_irq_lines(device->machine, linestate ? RST10_ASSERT : RST10_CLEAR);
 }
 
-void seibu_ym2151_irqhandler(running_device *device, int linestate)
+void seibu_ym2151_irqhandler(device_t *device, int linestate)
 {
 	update_irq_lines(device->machine, linestate ? RST10_ASSERT : RST10_CLEAR);
 }
 
-void seibu_ym2203_irqhandler(running_device *device, int linestate)
+void seibu_ym2203_irqhandler(device_t *device, int linestate)
 {
 	update_irq_lines(device->machine, linestate ? RST10_ASSERT : RST10_CLEAR);
 }
@@ -332,16 +332,18 @@ void seibu_ym2203_irqhandler(running_device *device, int linestate)
 
 MACHINE_RESET( seibu_sound )
 {
-	int romlength = memory_region_length(machine, "audiocpu");
-	UINT8 *rom = memory_region(machine, "audiocpu");
+	int romlength = machine->region("audiocpu")->bytes();
+	UINT8 *rom = machine->region("audiocpu")->base();
 
 	sound_cpu = machine->device("audiocpu");
 	update_irq_lines(machine, VECTOR_INIT);
 	if (romlength > 0x10000)
+	{
 		memory_configure_bank(machine, "bank1", 0, (romlength - 0x10000) / 0x8000, rom + 0x10000, 0x8000);
 
-	/* Denjin Makai definitely needs this at start-up, it never writes to the bankswitch */
-	memory_set_bank(machine, "bank1", 0);
+		/* Denjin Makai definitely needs this at start-up, it never writes to the bankswitch */
+		memory_set_bank(machine, "bank1", 0);
+	}
 }
 
 /***************************************************************************/

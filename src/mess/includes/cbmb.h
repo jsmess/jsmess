@@ -59,7 +59,7 @@ WRITE8_DEVICE_HANDLER( cbmb_keyboard_line_select_c );
 READ8_DEVICE_HANDLER( cbmb_keyboard_line_a );
 READ8_DEVICE_HANDLER( cbmb_keyboard_line_b );
 READ8_DEVICE_HANDLER( cbmb_keyboard_line_c );
-void cbmb_irq(running_device *device, int level);
+void cbmb_irq(device_t *device, int level);
 
 int cbmb_dma_read(running_machine *machine, int offset);
 int cbmb_dma_read_color(running_machine *machine, int offset);

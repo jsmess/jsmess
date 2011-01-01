@@ -21,7 +21,7 @@ struct _specimx_sound_state
 
 static STREAM_UPDATE( specimx_sh_update );
 
-INLINE specimx_sound_state *get_safe_token(running_device *device)
+INLINE specimx_sound_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == SPECIMX);
@@ -65,7 +65,7 @@ static STREAM_UPDATE( specimx_sh_update )
 	}
 }
 
-void specimx_set_input(running_device *device, int index, int state)
+void specimx_set_input(device_t *device, int index, int state)
 {
 	specimx_sound_state *sndstate = get_safe_token(device);
 	if (sndstate->mixer_channel!=NULL) {

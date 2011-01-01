@@ -22,14 +22,14 @@ struct _lmc1992_t
 	int fader_lr;					/* left rear fader */
 };
 
-INLINE lmc1992_t *get_safe_token(running_device *device)
+INLINE lmc1992_t *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 
 	return (lmc1992_t *)downcast<legacy_device_base *>(device)->token();
 }
 
-static void lmc1992_command_w(running_device *device, int addr, int data)
+static void lmc1992_command_w(device_t *device, int addr, int data)
 {
 	lmc1992_t *lmc1992 = get_safe_token(device);
 
@@ -84,7 +84,7 @@ static void lmc1992_command_w(running_device *device, int addr, int data)
 	}
 }
 
-void lmc1992_clock_w(running_device *device, int level)
+void lmc1992_clock_w(device_t *device, int level)
 {
 	lmc1992_t *lmc1992 = get_safe_token(device);
 
@@ -104,14 +104,14 @@ void lmc1992_clock_w(running_device *device, int level)
 	lmc1992->clock = level;
 }
 
-void lmc1992_data_w(running_device *device, int level)
+void lmc1992_data_w(device_t *device, int level)
 {
 	lmc1992_t *lmc1992 = get_safe_token(device);
 
 	lmc1992->data = level;
 }
 
-void lmc1992_enable_w(running_device *device, int level)
+void lmc1992_enable_w(device_t *device, int level)
 {
 	lmc1992_t *lmc1992 = get_safe_token(device);
 

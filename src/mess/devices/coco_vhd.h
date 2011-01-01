@@ -17,7 +17,7 @@ WRITE8_DEVICE_HANDLER(coco_vhd_io_w);
 
 DECLARE_LEGACY_IMAGE_DEVICE(COCO_VHD, coco_vhd);
 
-#define MDRV_COCO_VHD_ADD(_tag) \
-	MDRV_DEVICE_ADD(_tag, COCO_VHD, 0) \
+#define MCFG_COCO_VHD_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, COCO_VHD, 0) \
 
 #endif /* COCOVHD_H */

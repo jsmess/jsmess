@@ -41,11 +41,11 @@ static const UPD7810_CONFIG gamepock_cpu_config = { TYPE_78C06, gamepock_io_call
 
 static DEVICE_START(gamepock_cart)
 {
-	memory_set_bankptr( device->machine, "bank1", memory_region(device->machine,  "user1" ) );
+	memory_set_bankptr( device->machine, "bank1", device->machine->region("user1" )->base() );
 }
 
 static DEVICE_IMAGE_LOAD(gamepock_cart) {
-	UINT8 *cart = memory_region(image.device().machine,  "user1" );
+	UINT8 *cart = image.device().machine->region("user1" )->base();
 
 	if ( image.software_entry() == NULL )
 	{
@@ -66,39 +66,39 @@ static DEVICE_IMAGE_LOAD(gamepock_cart) {
 }
 
 static MACHINE_CONFIG_START( gamepock, gamepock_state )
-	MDRV_CPU_ADD("maincpu", UPD78C06, XTAL_6MHz)	/* uPD78C06AG */
-	MDRV_CPU_PROGRAM_MAP( gamepock_mem)
-	MDRV_CPU_IO_MAP( gamepock_io)
-	MDRV_CPU_CONFIG( gamepock_cpu_config )
+	MCFG_CPU_ADD("maincpu", UPD78C06, XTAL_6MHz)	/* uPD78C06AG */
+	MCFG_CPU_PROGRAM_MAP( gamepock_mem)
+	MCFG_CPU_IO_MAP( gamepock_io)
+	MCFG_CPU_CONFIG( gamepock_cpu_config )
 
-	MDRV_MACHINE_RESET( gamepock )
+	MCFG_MACHINE_RESET( gamepock )
 
-	MDRV_SCREEN_ADD("screen", LCD)
-	MDRV_SCREEN_REFRESH_RATE( 60 )
-	MDRV_SCREEN_FORMAT( BITMAP_FORMAT_INDEXED16 )
-	MDRV_SCREEN_SIZE( 75, 64 )
-	MDRV_SCREEN_VISIBLE_AREA( 0, 74, 0, 63 )
-	MDRV_DEFAULT_LAYOUT(layout_lcd)
+	MCFG_SCREEN_ADD("screen", LCD)
+	MCFG_SCREEN_REFRESH_RATE( 60 )
+	MCFG_SCREEN_FORMAT( BITMAP_FORMAT_INDEXED16 )
+	MCFG_SCREEN_SIZE( 75, 64 )
+	MCFG_SCREEN_VISIBLE_AREA( 0, 74, 0, 63 )
+	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
-	MDRV_PALETTE_LENGTH( 2 )
-	MDRV_PALETTE_INIT(black_and_white)
-	MDRV_VIDEO_UPDATE( gamepock )
+	MCFG_PALETTE_LENGTH( 2 )
+	MCFG_PALETTE_INIT(black_and_white)
+	MCFG_VIDEO_UPDATE( gamepock )
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* cartridge */
-	MDRV_CARTSLOT_ADD("cart")
-	MDRV_CARTSLOT_INTERFACE("gamepock_cart")
-	MDRV_CARTSLOT_EXTENSION_LIST("bin")
-	MDRV_CARTSLOT_NOT_MANDATORY
-	MDRV_CARTSLOT_START(gamepock_cart)
-	MDRV_CARTSLOT_LOAD(gamepock_cart)
+	MCFG_CARTSLOT_ADD("cart")
+	MCFG_CARTSLOT_INTERFACE("gamepock_cart")
+	MCFG_CARTSLOT_EXTENSION_LIST("bin")
+	MCFG_CARTSLOT_NOT_MANDATORY
+	MCFG_CARTSLOT_START(gamepock_cart)
+	MCFG_CARTSLOT_LOAD(gamepock_cart)
 
 	/* Software lists */
-	MDRV_SOFTWARE_LIST_ADD("cart_list","gamepock")
+	MCFG_SOFTWARE_LIST_ADD("cart_list","gamepock")
 MACHINE_CONFIG_END
 
 

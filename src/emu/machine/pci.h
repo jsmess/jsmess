@@ -16,8 +16,8 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef UINT32 (*pci_read_func)(running_device *pcibus, running_device *device, int function, int reg, UINT32 mem_mask);
-typedef void (*pci_write_func)(running_device *pcibus, running_device *device, int function, int reg, UINT32 data, UINT32 mem_mask);
+typedef UINT32 (*pci_read_func)(device_t *pcibus, device_t *device, int function, int reg, UINT32 mem_mask);
+typedef void (*pci_write_func)(device_t *pcibus, device_t *device, int function, int reg, UINT32 data, UINT32 mem_mask);
 
 typedef struct _pci_device_entry pci_device_entry;
 struct _pci_device_entry
@@ -41,17 +41,17 @@ struct _pci_bus_config
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MDRV_PCI_BUS_ADD(_tag, _busnum) \
-	MDRV_DEVICE_ADD(_tag, PCI_BUS, 0) \
-	MDRV_DEVICE_CONFIG_DATA32(pci_bus_config, busnum, _busnum)
+#define MCFG_PCI_BUS_ADD(_tag, _busnum) \
+	MCFG_DEVICE_ADD(_tag, PCI_BUS, 0) \
+	MCFG_DEVICE_CONFIG_DATA32(pci_bus_config, busnum, _busnum)
 
-#define MDRV_PCI_BUS_DEVICE(_devnum, _devtag, _configread, _configwrite) \
-	MDRV_DEVICE_CONFIG_DATAPTR_ARRAY_MEMBER(pci_bus_config, device, _devnum, pci_device_entry, devtag, _devtag) \
-	MDRV_DEVICE_CONFIG_DATAPTR_ARRAY_MEMBER(pci_bus_config, device, _devnum, pci_device_entry, read_callback, _configread) \
-	MDRV_DEVICE_CONFIG_DATAPTR_ARRAY_MEMBER(pci_bus_config, device, _devnum, pci_device_entry, write_callback, _configwrite)
+#define MCFG_PCI_BUS_DEVICE(_devnum, _devtag, _configread, _configwrite) \
+	MCFG_DEVICE_CONFIG_DATAPTR_ARRAY_MEMBER(pci_bus_config, device, _devnum, pci_device_entry, devtag, _devtag) \
+	MCFG_DEVICE_CONFIG_DATAPTR_ARRAY_MEMBER(pci_bus_config, device, _devnum, pci_device_entry, read_callback, _configread) \
+	MCFG_DEVICE_CONFIG_DATAPTR_ARRAY_MEMBER(pci_bus_config, device, _devnum, pci_device_entry, write_callback, _configwrite)
 
-#define MDRV_PCI_BUS_SIBLING(_father_tag) \
-	MDRV_DEVICE_CONFIG_DATAPTR(pci_bus_config, father, _father_tag)
+#define MCFG_PCI_BUS_SIBLING(_father_tag) \
+	MCFG_DEVICE_CONFIG_DATAPTR(pci_bus_config, father, _father_tag)
 
 
 /***************************************************************************

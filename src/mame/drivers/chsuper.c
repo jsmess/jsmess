@@ -24,7 +24,7 @@ static VIDEO_START(chsuper)
 static VIDEO_UPDATE(chsuper)
 {
 	const gfx_element *gfx = screen->machine->gfx[0];
-	UINT8 *vram = memory_region(screen->machine, "vram");
+	UINT8 *vram = screen->machine->region("vram")->base();
 	int count = 0x0000;
 	int y,x;
 
@@ -86,7 +86,7 @@ static READ8_HANDLER( ff_r )
 
 static WRITE8_HANDLER( chsuper_vram_w )
 {
-	UINT8 *vram = memory_region(space->machine, "vram");
+	UINT8 *vram = space->machine->region("vram")->base();
 
 	vram[offset] = data;
 }
@@ -193,32 +193,32 @@ GFXDECODE_END
 static MACHINE_CONFIG_START( chsuper, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z180, XTAL_12MHz / 2)	/* HD64180RP8, 8 MHz? */
-	MDRV_CPU_PROGRAM_MAP(chsuper_prg_map)
-	MDRV_CPU_IO_MAP(chsuper_portmap)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_ADD("maincpu", Z180, XTAL_12MHz / 2)	/* HD64180RP8, 8 MHz? */
+	MCFG_CPU_PROGRAM_MAP(chsuper_prg_map)
+	MCFG_CPU_IO_MAP(chsuper_portmap)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(57)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*8, 64*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 0, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(57)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(64*8, 64*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 0, 30*8-1)
 
-	MDRV_NVRAM_ADD_0FILL("nvram")
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MDRV_GFXDECODE(chsuper)
-	MDRV_PALETTE_LENGTH(0x100)
+	MCFG_GFXDECODE(chsuper)
+	MCFG_PALETTE_LENGTH(0x100)
 
-	MDRV_VIDEO_START(chsuper)
-	MDRV_VIDEO_UPDATE(chsuper)
+	MCFG_VIDEO_START(chsuper)
+	MCFG_VIDEO_UPDATE(chsuper)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("dac", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 
@@ -270,7 +270,7 @@ ROM_END
 static DRIVER_INIT( chsuper2 )
 {
 	UINT8 *buffer;
-	UINT8 *rom = memory_region(machine,"gfx1");
+	UINT8 *rom = machine->region("gfx1")->base();
 	int i;
 
 	chsuper_tilexor = 0x7f00;
@@ -294,7 +294,7 @@ static DRIVER_INIT( chsuper2 )
 static DRIVER_INIT( chsuper3 )
 {
 	UINT8 *buffer;
-	UINT8 *rom = memory_region(machine,"gfx1");
+	UINT8 *rom = machine->region("gfx1")->base();
 	int i;
 
 	chsuper_tilexor = 0x0e00;
@@ -318,7 +318,7 @@ static DRIVER_INIT( chsuper3 )
 static DRIVER_INIT( chmpnum )
 {
 	UINT8 *buffer;
-	UINT8 *rom = memory_region(machine,"gfx1");
+	UINT8 *rom = machine->region("gfx1")->base();
 	int i;
 
 	chsuper_tilexor = 0x1800;

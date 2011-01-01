@@ -91,7 +91,7 @@ static void sfkick_remap_banks(running_machine *machine)
 	{
 		case 0: /* bios */
 		{
-			UINT8 *mem = memory_region(machine, "bios");
+			UINT8 *mem = machine->region("bios")->base();
 			memory_set_bankptr(machine,"bank1", mem);
 			memory_set_bankptr(machine,"bank2", mem+0x2000);
 		}
@@ -99,7 +99,7 @@ static void sfkick_remap_banks(running_machine *machine)
 
 		case 1: /* ext rom */
 		{
-			UINT8 *mem = memory_region(machine, "extrom");
+			UINT8 *mem = machine->region("extrom")->base();
 			memory_set_bankptr(machine,"bank1", mem+0x4000);
 			memory_set_bankptr(machine,"bank2", mem+0x6000);
 		}
@@ -107,7 +107,7 @@ static void sfkick_remap_banks(running_machine *machine)
 
 		case 2: /* banked */
 		{
-			UINT8 *mem = memory_region(machine, "banked");
+			UINT8 *mem = machine->region("banked")->base();
 			memory_set_bankptr(machine,"bank1", mem+0x2000*sfkick_bank[0]);
 			memory_set_bankptr(machine,"bank2", mem+0x2000*sfkick_bank[1]);
 		}
@@ -115,7 +115,7 @@ static void sfkick_remap_banks(running_machine *machine)
 
 		case 3: /* unknown */
 		{
-			UINT8 *mem = memory_region(machine, "banked");
+			UINT8 *mem = machine->region("banked")->base();
 			memory_set_bankptr(machine,"bank1", mem+0x18000);
 			memory_set_bankptr(machine,"bank2", mem+0x18000);
 		}
@@ -127,7 +127,7 @@ static void sfkick_remap_banks(running_machine *machine)
 	{
 		case 0: /* bios - upper part */
 		{
-			UINT8 *mem = memory_region(machine, "bios");
+			UINT8 *mem = machine->region("bios")->base();
 			memory_set_bankptr(machine,"bank3", mem+0x4000);
 			memory_set_bankptr(machine,"bank4", mem+0x6000);
 		}
@@ -136,7 +136,7 @@ static void sfkick_remap_banks(running_machine *machine)
 		case 1:  /* unknown */
 		case 3:
 		{
-			UINT8 *mem = memory_region(machine, "banked");
+			UINT8 *mem = machine->region("banked")->base();
 			memory_set_bankptr(machine,"bank3", mem+0x18000);
 			memory_set_bankptr(machine,"bank4", mem+0x18000);
 		}
@@ -144,7 +144,7 @@ static void sfkick_remap_banks(running_machine *machine)
 
 		case 2: /* banked */
 		{
-			UINT8 *mem = memory_region(machine, "banked");
+			UINT8 *mem = machine->region("banked")->base();
 			memory_set_bankptr(machine,"bank3", mem+0x2000*sfkick_bank[2]);
 			memory_set_bankptr(machine,"bank4", mem+0x2000*sfkick_bank[3]);
 		}
@@ -156,7 +156,7 @@ static void sfkick_remap_banks(running_machine *machine)
 	{
 		case 0: /* cartridge */
 		{
-			UINT8 *mem = memory_region(machine, "cartridge");
+			UINT8 *mem = machine->region("cartridge")->base();
 			memory_set_bankptr(machine,"bank5", mem+0x4000);
 			memory_set_bankptr(machine,"bank6", mem+0x6000);
 		}
@@ -165,7 +165,7 @@ static void sfkick_remap_banks(running_machine *machine)
 		case 1: /* unknown */
 		case 3:
 		{
-			UINT8 *mem = memory_region(machine, "banked");
+			UINT8 *mem = machine->region("banked")->base();
 			memory_set_bankptr(machine,"bank5", mem+0x18000);
 			memory_set_bankptr(machine,"bank6", mem+0x18000);
 		}
@@ -173,7 +173,7 @@ static void sfkick_remap_banks(running_machine *machine)
 
 		case 2: /* banked */
 		{
-			UINT8 *mem = memory_region(machine, "banked");
+			UINT8 *mem = machine->region("banked")->base();
 			memory_set_bankptr(machine,"bank5", mem+0x2000*sfkick_bank[4]);
 			memory_set_bankptr(machine,"bank6", mem+0x2000*sfkick_bank[5]);
 		}
@@ -186,7 +186,7 @@ static void sfkick_remap_banks(running_machine *machine)
 		case 0: /* unknown */
 		case 1:
 		{
-			UINT8 *mem = memory_region(machine, "banked");
+			UINT8 *mem = machine->region("banked")->base();
 			memory_set_bankptr(machine,"bank7", mem+0x18000);
 			memory_set_bankptr(machine,"bank8", mem+0x18000);
 		}
@@ -194,7 +194,7 @@ static void sfkick_remap_banks(running_machine *machine)
 
 		case 2: /* banked */
 		{
-			UINT8 *mem = memory_region(machine, "banked");
+			UINT8 *mem = machine->region("banked")->base();
 			memory_set_bankptr(machine,"bank7", mem+0x2000*sfkick_bank[6]);
 			memory_set_bankptr(machine,"bank8", mem+0x2000*sfkick_bank[7]);
 		}
@@ -442,7 +442,7 @@ static INTERRUPT_GEN( sfkick_interrupt )
 {
 	v9938_interrupt(device->machine, 0);
 }
-static void irqhandler(running_device *device, int irq)
+static void irqhandler(device_t *device, int irq)
 {
 	cputag_set_input_line_and_vector(device->machine, "soundcpu", 0, irq ? ASSERT_LINE : CLEAR_LINE, 0xff);
 }
@@ -459,42 +459,42 @@ static const ym2203_interface ym2203_config =
 
 static MACHINE_CONFIG_START( sfkick, driver_device )
 
-	MDRV_CPU_ADD("maincpu",Z80,MASTER_CLOCK/6)
-	MDRV_CPU_PROGRAM_MAP(sfkick_map)
-	MDRV_CPU_IO_MAP(sfkick_io_map)
-	MDRV_CPU_VBLANK_INT_HACK(sfkick_interrupt,262)
+	MCFG_CPU_ADD("maincpu",Z80,MASTER_CLOCK/6)
+	MCFG_CPU_PROGRAM_MAP(sfkick_map)
+	MCFG_CPU_IO_MAP(sfkick_io_map)
+	MCFG_CPU_VBLANK_INT_HACK(sfkick_interrupt,262)
 
-	MDRV_QUANTUM_TIME(HZ(60000))
+	MCFG_QUANTUM_TIME(HZ(60000))
 
-	MDRV_CPU_ADD("soundcpu",Z80,MASTER_CLOCK/6)
-	MDRV_CPU_PROGRAM_MAP(sfkick_sound_map)
-	MDRV_CPU_IO_MAP(sfkick_sound_io_map)
+	MCFG_CPU_ADD("soundcpu",Z80,MASTER_CLOCK/6)
+	MCFG_CPU_PROGRAM_MAP(sfkick_sound_map)
+	MCFG_CPU_IO_MAP(sfkick_sound_io_map)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(MSX2_TOTAL_XRES_PIXELS, MSX2_TOTAL_YRES_PIXELS)
-	MDRV_SCREEN_VISIBLE_AREA(MSX2_XBORDER_PIXELS - MSX2_VISIBLE_XBORDER_PIXELS, MSX2_TOTAL_XRES_PIXELS - MSX2_XBORDER_PIXELS + MSX2_VISIBLE_XBORDER_PIXELS - 1, MSX2_YBORDER_PIXELS - MSX2_VISIBLE_YBORDER_PIXELS, MSX2_TOTAL_YRES_PIXELS - MSX2_YBORDER_PIXELS + MSX2_VISIBLE_YBORDER_PIXELS - 1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(MSX2_TOTAL_XRES_PIXELS, MSX2_TOTAL_YRES_PIXELS)
+	MCFG_SCREEN_VISIBLE_AREA(MSX2_XBORDER_PIXELS - MSX2_VISIBLE_XBORDER_PIXELS, MSX2_TOTAL_XRES_PIXELS - MSX2_XBORDER_PIXELS + MSX2_VISIBLE_XBORDER_PIXELS - 1, MSX2_YBORDER_PIXELS - MSX2_VISIBLE_YBORDER_PIXELS, MSX2_TOTAL_YRES_PIXELS - MSX2_YBORDER_PIXELS + MSX2_VISIBLE_YBORDER_PIXELS - 1)
 
-	MDRV_PALETTE_LENGTH(512)
+	MCFG_PALETTE_LENGTH(512)
 
-	MDRV_PPI8255_ADD( "ppi8255", ppi8255_intf )
+	MCFG_PPI8255_ADD( "ppi8255", ppi8255_intf )
 
-	MDRV_MACHINE_RESET(sfkick)
+	MCFG_MACHINE_RESET(sfkick)
 
-	MDRV_PALETTE_INIT( v9938 )
+	MCFG_PALETTE_INIT( v9938 )
 
-	MDRV_VIDEO_START(sfkick)
-	MDRV_VIDEO_UPDATE(generic_bitmapped)
+	MCFG_VIDEO_START(sfkick)
+	MCFG_VIDEO_UPDATE(generic_bitmapped)
 
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("ym1", YM2203, MASTER_CLOCK/6)
-	MDRV_SOUND_CONFIG(ym2203_config)
-	MDRV_SOUND_ROUTE(0, "mono", 0.25)
-	MDRV_SOUND_ROUTE(1, "mono", 0.25)
-	MDRV_SOUND_ROUTE(2, "mono", 0.25)
-	MDRV_SOUND_ROUTE(3, "mono", 0.50)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("ym1", YM2203, MASTER_CLOCK/6)
+	MCFG_SOUND_CONFIG(ym2203_config)
+	MCFG_SOUND_ROUTE(0, "mono", 0.25)
+	MCFG_SOUND_ROUTE(1, "mono", 0.25)
+	MCFG_SOUND_ROUTE(2, "mono", 0.25)
+	MCFG_SOUND_ROUTE(3, "mono", 0.50)
 
 MACHINE_CONFIG_END
 

@@ -237,38 +237,38 @@ static MACHINE_RESET( dynadice )
 static MACHINE_CONFIG_START( dynadice, dynadice_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", I8080,18432000/8)
-	MDRV_CPU_PROGRAM_MAP(dynadice_map)
-	MDRV_CPU_IO_MAP(dynadice_io_map)
+	MCFG_CPU_ADD("maincpu", I8080,18432000/8)
+	MCFG_CPU_PROGRAM_MAP(dynadice_map)
+	MCFG_CPU_IO_MAP(dynadice_io_map)
 
-	MDRV_CPU_ADD("audiocpu", Z80,18432000/6)
-	MDRV_CPU_PROGRAM_MAP(dynadice_sound_map)
-	MDRV_CPU_IO_MAP(dynadice_sound_io_map)
+	MCFG_CPU_ADD("audiocpu", Z80,18432000/6)
+	MCFG_CPU_PROGRAM_MAP(dynadice_sound_map)
+	MCFG_CPU_IO_MAP(dynadice_sound_io_map)
 
-	MDRV_MACHINE_START(dynadice)
-	MDRV_MACHINE_RESET(dynadice)
+	MCFG_MACHINE_START(dynadice)
+	MCFG_MACHINE_RESET(dynadice)
 
-	MDRV_NVRAM_ADD_0FILL("nvram")
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(256+16, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 34*8-1, 3*8, 28*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(256+16, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 34*8-1, 3*8, 28*8-1)
 
-	MDRV_GFXDECODE(dynadice)
-	MDRV_PALETTE_LENGTH(8)
-	MDRV_PALETTE_INIT(dynadice)
+	MCFG_GFXDECODE(dynadice)
+	MCFG_PALETTE_LENGTH(8)
+	MCFG_PALETTE_INIT(dynadice)
 
-	MDRV_VIDEO_START(dynadice)
-	MDRV_VIDEO_UPDATE(dynadice)
+	MCFG_VIDEO_START(dynadice)
+	MCFG_VIDEO_UPDATE(dynadice)
 
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("aysnd", AY8910, 2000000)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("aysnd", AY8910, 2000000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 ROM_START( dynadice )
@@ -293,10 +293,10 @@ ROM_END
 static DRIVER_INIT( dynadice )
 {
 	int i, j;
-	UINT8 *usr1 = memory_region(machine, "user1");
-	UINT8 *cpu2 = memory_region(machine, "audiocpu");
-	UINT8 *gfx1 = memory_region(machine, "gfx1");
-	UINT8 *gfx2 = memory_region(machine, "gfx2");
+	UINT8 *usr1 = machine->region("user1")->base();
+	UINT8 *cpu2 = machine->region("audiocpu")->base();
+	UINT8 *gfx1 = machine->region("gfx1")->base();
+	UINT8 *gfx2 = machine->region("gfx2")->base();
 
 	cpu2[0x0b] = 0x23;	/* bug in game code  Dec HL -> Inc HL*/
 

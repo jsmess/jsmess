@@ -485,7 +485,7 @@ static void zn_driver_init( running_machine *machine )
 	state->dip_timer = timer_alloc( machine, dip_timer_fired, NULL );
 }
 
-static void psx_spu_irq(running_device *device, UINT32 data)
+static void psx_spu_irq(device_t *device, UINT32 data)
 {
 	psx_irq_set(device->machine, data);
 }
@@ -508,70 +508,70 @@ static void zn_machine_init( running_machine *machine )
 
 static MACHINE_CONFIG_START( zn1_1mb_vram, zn_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD( "maincpu", PSXCPU, XTAL_67_7376MHz )
-	MDRV_CPU_PROGRAM_MAP( zn_map)
-	MDRV_CPU_VBLANK_INT("screen", psx_vblank)
+	MCFG_CPU_ADD( "maincpu", PSXCPU, XTAL_67_7376MHz )
+	MCFG_CPU_PROGRAM_MAP( zn_map)
+	MCFG_CPU_VBLANK_INT("screen", psx_vblank)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE( 60 )
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE( 1024, 512 )
-	MDRV_SCREEN_VISIBLE_AREA( 0, 639, 0, 479 )
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE( 60 )
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE( 1024, 512 )
+	MCFG_SCREEN_VISIBLE_AREA( 0, 639, 0, 479 )
 
-	MDRV_PALETTE_LENGTH( 65536 )
+	MCFG_PALETTE_LENGTH( 65536 )
 
-	MDRV_PALETTE_INIT( psx )
-	MDRV_VIDEO_START( psx_type2 )
-	MDRV_VIDEO_UPDATE( psx )
+	MCFG_PALETTE_INIT( psx )
+	MCFG_VIDEO_START( psx_type2 )
+	MCFG_VIDEO_UPDATE( psx )
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD( "spu", PSXSPU, 0 )
-	MDRV_SOUND_CONFIG( psxspu_interface )
-	MDRV_SOUND_ROUTE(0, "lspeaker", 0.35)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 0.35)
+	MCFG_SOUND_ADD( "spu", PSXSPU, 0 )
+	MCFG_SOUND_CONFIG( psxspu_interface )
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.35)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.35)
 
-	MDRV_AT28C16_ADD( "at28c16", NULL )
+	MCFG_AT28C16_ADD( "at28c16", NULL )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( zn1_2mb_vram, zn1_1mb_vram )
 
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_SIZE( 1024, 1024 )
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_SIZE( 1024, 1024 )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( zn2, zn_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD( "maincpu", PSXCPU, XTAL_100MHz )
-	MDRV_CPU_PROGRAM_MAP( zn_map)
-	MDRV_CPU_VBLANK_INT("screen", psx_vblank)
+	MCFG_CPU_ADD( "maincpu", PSXCPU, XTAL_100MHz )
+	MCFG_CPU_PROGRAM_MAP( zn_map)
+	MCFG_CPU_VBLANK_INT("screen", psx_vblank)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE( 60 )
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE( 1024, 1024 )
-	MDRV_SCREEN_VISIBLE_AREA( 0, 639, 0, 479 )
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE( 60 )
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE( 1024, 1024 )
+	MCFG_SCREEN_VISIBLE_AREA( 0, 639, 0, 479 )
 
-	MDRV_PALETTE_LENGTH( 65536 )
+	MCFG_PALETTE_LENGTH( 65536 )
 
-	MDRV_PALETTE_INIT( psx )
-	MDRV_VIDEO_START( psx_type2 )
-	MDRV_VIDEO_UPDATE( psx )
+	MCFG_PALETTE_INIT( psx )
+	MCFG_VIDEO_START( psx_type2 )
+	MCFG_VIDEO_UPDATE( psx )
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD( "spu", PSXSPU, 0 )
-	MDRV_SOUND_CONFIG( psxspu_interface )
-	MDRV_SOUND_ROUTE(0, "lspeaker", 0.35)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 0.35)
+	MCFG_SOUND_ADD( "spu", PSXSPU, 0 )
+	MCFG_SOUND_CONFIG( psxspu_interface )
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.35)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.35)
 
-	MDRV_AT28C16_ADD( "at28c16", NULL )
+	MCFG_AT28C16_ADD( "at28c16", NULL )
 MACHINE_CONFIG_END
 
 /*
@@ -696,12 +696,12 @@ static READ32_HANDLER( capcom_kickharness_r )
 
 static WRITE32_HANDLER( bank_coh1000c_w )
 {
-	memory_set_bankptr( space->machine, "bank2", memory_region( space->machine, "user2" ) + 0x400000 + ( data * 0x400000 ) );
+	memory_set_bankptr( space->machine, "bank2", space->machine->region( "user2" )->base() + 0x400000 + ( data * 0x400000 ) );
 }
 
 static WRITE8_HANDLER( qsound_bankswitch_w )
 {
-	memory_set_bankptr( space->machine, "bank10", memory_region( space->machine, "audiocpu" ) + 0x10000 + ( ( data & 0x0f ) * 0x4000 ) );
+	memory_set_bankptr( space->machine, "bank10", space->machine->region( "audiocpu" )->base() + 0x10000 + ( ( data & 0x0f ) * 0x4000 ) );
 }
 
 static INTERRUPT_GEN( qsound_interrupt )
@@ -739,9 +739,9 @@ static DRIVER_INIT( coh1000c )
 
 static MACHINE_RESET( coh1000c )
 {
-	memory_set_bankptr( machine, "bank1", memory_region( machine, "user2" ) ); /* fixed game rom */
-	memory_set_bankptr( machine, "bank2", memory_region( machine, "user2" ) + 0x400000 ); /* banked game rom */
-	memory_set_bankptr( machine, "bank3", memory_region( machine, "user3" ) ); /* country rom */
+	memory_set_bankptr( machine, "bank1", machine->region( "user2" )->base() ); /* fixed game rom */
+	memory_set_bankptr( machine, "bank2", machine->region( "user2" )->base() + 0x400000 ); /* banked game rom */
+	memory_set_bankptr( machine, "bank3", machine->region( "user3" )->base() ); /* country rom */
 	zn_machine_init(machine);
 }
 
@@ -761,30 +761,30 @@ ADDRESS_MAP_END
 
 static MACHINE_CONFIG_DERIVED( coh1000c, zn1_1mb_vram )
 
-	MDRV_CPU_ADD( "audiocpu", Z80, 8000000 )  /* 8MHz ?? */
-	MDRV_CPU_PROGRAM_MAP( qsound_map)
-	MDRV_CPU_IO_MAP( qsound_portmap)
-	MDRV_CPU_VBLANK_INT_HACK( qsound_interrupt, 4 ) /* 4 interrupts per frame ?? */
+	MCFG_CPU_ADD( "audiocpu", Z80, 8000000 )  /* 8MHz ?? */
+	MCFG_CPU_PROGRAM_MAP( qsound_map)
+	MCFG_CPU_IO_MAP( qsound_portmap)
+	MCFG_CPU_VBLANK_INT_HACK( qsound_interrupt, 4 ) /* 4 interrupts per frame ?? */
 
-	MDRV_MACHINE_RESET( coh1000c )
+	MCFG_MACHINE_RESET( coh1000c )
 
-	MDRV_SOUND_ADD( "qsound", QSOUND, QSOUND_CLOCK )
-	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_SOUND_ADD( "qsound", QSOUND, QSOUND_CLOCK )
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( coh1002c, zn1_2mb_vram )
 
-	MDRV_CPU_ADD( "audiocpu", Z80, 8000000 )  /* 8MHz ?? */
-	MDRV_CPU_PROGRAM_MAP( qsound_map)
-	MDRV_CPU_IO_MAP( qsound_portmap)
-	MDRV_CPU_VBLANK_INT_HACK( qsound_interrupt, 4 ) /* 4 interrupts per frame ?? */
+	MCFG_CPU_ADD( "audiocpu", Z80, 8000000 )  /* 8MHz ?? */
+	MCFG_CPU_PROGRAM_MAP( qsound_map)
+	MCFG_CPU_IO_MAP( qsound_portmap)
+	MCFG_CPU_VBLANK_INT_HACK( qsound_interrupt, 4 ) /* 4 interrupts per frame ?? */
 
-	MDRV_MACHINE_RESET( coh1000c )
+	MCFG_MACHINE_RESET( coh1000c )
 
-	MDRV_SOUND_ADD( "qsound", QSOUND, QSOUND_CLOCK )
-	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_SOUND_ADD( "qsound", QSOUND, QSOUND_CLOCK )
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 /*
@@ -929,7 +929,7 @@ Notes:
 
 static WRITE32_HANDLER( bank_coh3002c_w )
 {
-	memory_set_bankptr( space->machine, "bank2", memory_region( space->machine, "user2" ) + 0x400000 + ( data * 0x400000 ) );
+	memory_set_bankptr( space->machine, "bank2", space->machine->region( "user2" )->base() + 0x400000 + ( data * 0x400000 ) );
 }
 
 static DRIVER_INIT( coh3002c )
@@ -947,24 +947,24 @@ static DRIVER_INIT( coh3002c )
 
 static MACHINE_RESET( coh3002c )
 {
-	memory_set_bankptr( machine, "bank1", memory_region( machine, "user2" ) ); /* fixed game rom */
-	memory_set_bankptr( machine, "bank2", memory_region( machine, "user2" ) + 0x400000 ); /* banked game rom */
-	memory_set_bankptr( machine, "bank3", memory_region( machine, "user3" ) ); /* country rom */
+	memory_set_bankptr( machine, "bank1", machine->region( "user2" )->base() ); /* fixed game rom */
+	memory_set_bankptr( machine, "bank2", machine->region( "user2" )->base() + 0x400000 ); /* banked game rom */
+	memory_set_bankptr( machine, "bank3", machine->region( "user3" )->base() ); /* country rom */
 	zn_machine_init(machine);
 }
 
 static MACHINE_CONFIG_DERIVED( coh3002c, zn2 )
 
-	MDRV_CPU_ADD("audiocpu", Z80, 8000000 )	/* 8MHz ?? */
-	MDRV_CPU_PROGRAM_MAP( qsound_map)
-	MDRV_CPU_IO_MAP( qsound_portmap)
-	MDRV_CPU_VBLANK_INT_HACK( qsound_interrupt, 4 ) /* 4 interrupts per frame ?? */
+	MCFG_CPU_ADD("audiocpu", Z80, 8000000 )	/* 8MHz ?? */
+	MCFG_CPU_PROGRAM_MAP( qsound_map)
+	MCFG_CPU_IO_MAP( qsound_portmap)
+	MCFG_CPU_VBLANK_INT_HACK( qsound_interrupt, 4 ) /* 4 interrupts per frame ?? */
 
-	MDRV_MACHINE_RESET( coh3002c )
+	MCFG_MACHINE_RESET( coh3002c )
 
-	MDRV_SOUND_ADD( "qsound", QSOUND, QSOUND_CLOCK )
-	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_SOUND_ADD( "qsound", QSOUND, QSOUND_CLOCK )
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 /*
@@ -1187,26 +1187,26 @@ Notes:
 
 static WRITE32_HANDLER( bank_coh1000t_w )
 {
-	running_device *mb3773 = space->machine->device("mb3773");
+	device_t *mb3773 = space->machine->device("mb3773");
 	mb3773_set_ck(mb3773, (data & 0x20) >> 5);
 	verboselog( space->machine, 1, "bank_coh1000t_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
-	memory_set_bankptr( space->machine, "bank1", memory_region( space->machine, "user2" ) + ( ( data & 3 ) * 0x800000 ) );
+	memory_set_bankptr( space->machine, "bank1", space->machine->region( "user2" )->base() + ( ( data & 3 ) * 0x800000 ) );
 }
 
 static WRITE8_HANDLER( fx1a_sound_bankswitch_w )
 {
-	memory_set_bankptr( space->machine, "bank10", memory_region( space->machine, "audiocpu" ) + 0x10000 + ( ( ( data - 1 ) & 0x07 ) * 0x4000 ) );
+	memory_set_bankptr( space->machine, "bank10", space->machine->region( "audiocpu" )->base() + 0x10000 + ( ( ( data - 1 ) & 0x07 ) * 0x4000 ) );
 }
 
 static READ32_HANDLER( taitofx1a_ymsound_r )
 {
-	running_device *tc0140syt = space->machine->device("tc0140syt");
+	device_t *tc0140syt = space->machine->device("tc0140syt");
 	return tc0140syt_comm_r(tc0140syt, 0) << 16;
 }
 
 static WRITE32_HANDLER( taitofx1a_ymsound_w )
 {
-	running_device *tc0140syt = space->machine->device("tc0140syt");
+	device_t *tc0140syt = space->machine->device("tc0140syt");
 
 	if (mem_mask == 0x0000ffff)
 	{
@@ -1235,7 +1235,7 @@ static DRIVER_INIT( coh1000ta )
 static MACHINE_RESET( coh1000ta )
 {
 	zn_state *state = machine->driver_data<zn_state>();
-	memory_set_bankptr( machine, "bank1", memory_region( machine, "user2" ) ); /* banked game rom */
+	memory_set_bankptr( machine, "bank1", machine->region( "user2" )->base() ); /* banked game rom */
 	memory_set_bankptr( machine, "bank2", state->taitofx1_eeprom1 );
 	zn_machine_init(machine);
 }
@@ -1254,7 +1254,7 @@ static ADDRESS_MAP_START( fx1a_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 /* handler called by the YM2610 emulator when the internal timers cause an IRQ */
-static void irq_handler(running_device *device, int irq)
+static void irq_handler(device_t *device, int irq)
 {
 	cputag_set_input_line(device->machine, "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -1271,21 +1271,21 @@ static const tc0140syt_interface coh1000ta_tc0140syt_intf =
 
 static MACHINE_CONFIG_DERIVED( coh1000ta, zn1_1mb_vram )
 
-	MDRV_CPU_ADD("audiocpu", Z80, 16000000 / 4 )	/* 4 MHz */
-	MDRV_CPU_PROGRAM_MAP( fx1a_sound_map)
-	MDRV_MACHINE_RESET( coh1000ta )
-	MDRV_NVRAM_ADD_0FILL("eeprom1")
+	MCFG_CPU_ADD("audiocpu", Z80, 16000000 / 4 )	/* 4 MHz */
+	MCFG_CPU_PROGRAM_MAP( fx1a_sound_map)
+	MCFG_MACHINE_RESET( coh1000ta )
+	MCFG_NVRAM_ADD_0FILL("eeprom1")
 
-	MDRV_SOUND_ADD("ymsnd", YM2610B, 16000000/2)
-	MDRV_SOUND_CONFIG(ym2610_config)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 0.25)
-	MDRV_SOUND_ROUTE(0, "rspeaker", 0.25)
-	MDRV_SOUND_ROUTE(1, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(2, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("ymsnd", YM2610B, 16000000/2)
+	MCFG_SOUND_CONFIG(ym2610_config)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.25)
+	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
+	MCFG_SOUND_ROUTE(1, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(2, "rspeaker", 1.0)
 
-	MDRV_MB3773_ADD("mb3773")
+	MCFG_MB3773_ADD("mb3773")
 
-	MDRV_TC0140SYT_ADD("tc0140syt", coh1000ta_tc0140syt_intf)
+	MCFG_TC0140SYT_ADD("tc0140syt", coh1000ta_tc0140syt_intf)
 MACHINE_CONFIG_END
 
 static WRITE32_HANDLER( taitofx1b_volume_w )
@@ -1330,7 +1330,7 @@ static MACHINE_RESET( coh1000tb )
 {
 	zn_state *state = machine->driver_data<zn_state>();
 
-	memory_set_bankptr( machine, "bank1", memory_region( machine, "user2" ) ); /* banked game rom */
+	memory_set_bankptr( machine, "bank1", machine->region( "user2" )->base() ); /* banked game rom */
 	memory_set_bankptr( machine, "bank2", state->taitofx1_eeprom1 );
 	memory_set_bankptr( machine, "bank3", state->taitofx1_eeprom2 );
 	zn_machine_init(machine);
@@ -1338,13 +1338,13 @@ static MACHINE_RESET( coh1000tb )
 
 static MACHINE_CONFIG_DERIVED( coh1000tb, zn1_2mb_vram )
 
-	MDRV_MACHINE_RESET( coh1000tb )
-	MDRV_NVRAM_ADD_0FILL("eeprom1")
-	MDRV_NVRAM_ADD_0FILL("eeprom2")
+	MCFG_MACHINE_RESET( coh1000tb )
+	MCFG_NVRAM_ADD_0FILL("eeprom1")
+	MCFG_NVRAM_ADD_0FILL("eeprom2")
 
-	MDRV_MB3773_ADD("mb3773")
+	MCFG_MB3773_ADD("mb3773")
 
-	MDRV_FRAGMENT_ADD( taito_zoom_sound )
+	MCFG_FRAGMENT_ADD( taito_zoom_sound )
 MACHINE_CONFIG_END
 
 /*
@@ -1463,7 +1463,7 @@ Notes:
       *2                  - Unpopulated DIP28 socket
 */
 
-static void atpsx_interrupt(running_device *device, int state)
+static void atpsx_interrupt(device_t *device, int state)
 {
 	if (state)
 	{
@@ -1475,7 +1475,7 @@ static void atpsx_dma_read( running_machine *machine, UINT32 n_address, INT32 n_
 {
 	zn_state *state = machine->driver_data<zn_state>();
 	UINT32 *p_n_psxram = state->p_n_psxram;
-	running_device *ide = machine->device("ide");
+	device_t *ide = machine->device("ide");
 
 	logerror("DMA read: %d bytes (%d words) to %08x\n", n_size<<2, n_size, n_address);
 
@@ -1503,7 +1503,7 @@ static void atpsx_dma_write( running_machine *machine, UINT32 n_address, INT32 n
 
 static DRIVER_INIT( coh1000w )
 {
-	running_device *ide = machine->device("ide");
+	device_t *ide = machine->device("ide");
 
 	memory_install_read_bank         ( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f000000, 0x1f1fffff, 0, 0, "bank1" );
 	memory_nop_write                         ( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f000000, 0x1f000003, 0, 0 );
@@ -1516,7 +1516,7 @@ static DRIVER_INIT( coh1000w )
 
 static MACHINE_RESET( coh1000w )
 {
-	memory_set_bankptr( machine, "bank1", memory_region( machine, "user2" ) ); /* fixed game rom */
+	memory_set_bankptr( machine, "bank1", machine->region( "user2" )->base() ); /* fixed game rom */
 	zn_machine_init(machine);
 
 	devtag_reset(machine, "ide");
@@ -1526,9 +1526,9 @@ static MACHINE_RESET( coh1000w )
 
 static MACHINE_CONFIG_DERIVED( coh1000w, zn1_2mb_vram )
 
-	MDRV_MACHINE_RESET( coh1000w )
+	MCFG_MACHINE_RESET( coh1000w )
 
-	MDRV_IDE_CONTROLLER_ADD("ide", atpsx_interrupt)
+	MCFG_IDE_CONTROLLER_ADD("ide", atpsx_interrupt)
 MACHINE_CONFIG_END
 
 /*
@@ -1682,7 +1682,7 @@ static WRITE32_HANDLER( coh1002e_bank_w )
 {
 	znsecsel_w( space, offset, data, mem_mask );
 
-	memory_set_bankptr( space->machine, "bank1", memory_region( space->machine, "user2" ) + ( ( data & 3 ) * 0x800000 ) );
+	memory_set_bankptr( space->machine, "bank1", space->machine->region( "user2" )->base() + ( ( data & 3 ) * 0x800000 ) );
 }
 
 static WRITE32_HANDLER( coh1002e_latch_w )
@@ -1704,7 +1704,7 @@ static DRIVER_INIT( coh1002e )
 
 static MACHINE_RESET( coh1002e )
 {
-	memory_set_bankptr( machine, "bank1", memory_region( machine, "user2" ) ); /* banked game rom */
+	memory_set_bankptr( machine, "bank1", machine->region( "user2" )->base() ); /* banked game rom */
 	zn_machine_init(machine);
 }
 
@@ -1719,14 +1719,14 @@ ADDRESS_MAP_END
 
 static MACHINE_CONFIG_DERIVED( coh1002e, zn1_2mb_vram )
 
-	MDRV_CPU_ADD("audiocpu", M68000, 12000000 )
-	MDRV_CPU_PROGRAM_MAP( psarc_snd_map)
+	MCFG_CPU_ADD("audiocpu", M68000, 12000000 )
+	MCFG_CPU_PROGRAM_MAP( psarc_snd_map)
 
-	MDRV_MACHINE_RESET( coh1002e )
+	MCFG_MACHINE_RESET( coh1002e )
 
-	MDRV_SOUND_ADD( "ymf", YMF271, 16934400 )
-	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_SOUND_ADD( "ymf", YMF271, 16934400 )
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -1796,7 +1796,7 @@ static WRITE32_HANDLER( bam2_mcu_w )
 	{
 		if (ACCESSING_BITS_0_15)
 		{
-			memory_set_bankptr( space->machine, "bank2", memory_region( space->machine, "user2" ) + ( ( data & 0xf ) * 0x400000 ) );
+			memory_set_bankptr( space->machine, "bank2", space->machine->region( "user2" )->base() + ( ( data & 0xf ) * 0x400000 ) );
 		}
 		else if (ACCESSING_BITS_16_31)
 		{
@@ -1851,15 +1851,15 @@ static DRIVER_INIT( bam2 )
 
 static MACHINE_RESET( bam2 )
 {
-	memory_set_bankptr( machine, "bank1", memory_region( machine, "user2" ) ); /* fixed game rom */
-	memory_set_bankptr( machine, "bank2", memory_region( machine, "user2" ) + 0x400000 ); /* banked game rom */
+	memory_set_bankptr( machine, "bank1", machine->region( "user2" )->base() ); /* fixed game rom */
+	memory_set_bankptr( machine, "bank2", machine->region( "user2" )->base() + 0x400000 ); /* banked game rom */
 
 	zn_machine_init(machine);
 }
 
 static MACHINE_CONFIG_DERIVED( bam2, zn1_2mb_vram )
 
-	MDRV_MACHINE_RESET( bam2 )
+	MCFG_MACHINE_RESET( bam2 )
 MACHINE_CONFIG_END
 
 /*
@@ -2032,7 +2032,7 @@ Notes:
       *         - Unpopulated DIP42 socket
 */
 
-static void jdredd_ide_interrupt(running_device *device, int state)
+static void jdredd_ide_interrupt(device_t *device, int state)
 {
 	if (state)
 	{
@@ -2177,7 +2177,7 @@ static DRIVER_INIT( coh1000a )
 	if( ( !strcmp( machine->gamedrv->name, "jdredd" ) ) ||
 		( !strcmp( machine->gamedrv->name, "jdreddb" ) ) )
 	{
-		running_device *ide = machine->device("ide");
+		device_t *ide = machine->device("ide");
 
 		memory_install_read32_device_handler( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), ide, 0x1fbfff8c, 0x1fbfff8f, 0, 0, jdredd_idestat_r );
 		memory_nop_write                    ( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1fbfff8c, 0x1fbfff8f, 0, 0 );
@@ -2189,7 +2189,7 @@ static DRIVER_INIT( coh1000a )
 
 static MACHINE_RESET( coh1000a )
 {
-	memory_set_bankptr( machine, "bank1", memory_region( machine, "user2" ) ); /* fixed game rom */
+	memory_set_bankptr( machine, "bank1", machine->region( "user2" )->base() ); /* fixed game rom */
 	zn_machine_init(machine);
 	if( ( !strcmp( machine->gamedrv->name, "jdredd" ) ) ||
 		( !strcmp( machine->gamedrv->name, "jdreddb" ) ) )
@@ -2200,17 +2200,17 @@ static MACHINE_RESET( coh1000a )
 
 static MACHINE_CONFIG_DERIVED( coh1000a, zn1_2mb_vram )
 
-	MDRV_MACHINE_RESET( coh1000a )
+	MCFG_MACHINE_RESET( coh1000a )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( coh1000a_ide, zn1_2mb_vram )
 
-	MDRV_CPU_MODIFY( "maincpu" )
-	MDRV_CPU_VBLANK_INT("screen", jdredd_vblank)
+	MCFG_CPU_MODIFY( "maincpu" )
+	MCFG_CPU_VBLANK_INT("screen", jdredd_vblank)
 
-	MDRV_MACHINE_RESET( coh1000a )
+	MCFG_MACHINE_RESET( coh1000a )
 
-	MDRV_IDE_CONTROLLER_ADD("ide", jdredd_ide_interrupt)
+	MCFG_IDE_CONTROLLER_ADD("ide", jdredd_ide_interrupt)
 MACHINE_CONFIG_END
 
 /*
@@ -2331,7 +2331,7 @@ Notes:
 
 static WRITE32_HANDLER( coh1001l_bnk_w )
 {
-	memory_set_bankptr( space->machine, "bank1", memory_region( space->machine, "user2" ) + ( ( ( data >> 16 ) & 3 ) * 0x800000 ) );
+	memory_set_bankptr( space->machine, "bank1", space->machine->region( "user2" )->base() + ( ( ( data >> 16 ) & 3 ) * 0x800000 ) );
 }
 
 static DRIVER_INIT( coh1001l )
@@ -2344,18 +2344,18 @@ static DRIVER_INIT( coh1001l )
 
 static MACHINE_RESET( coh1001l )
 {
-	memory_set_bankptr( machine, "bank1", memory_region( machine, "user2" ) ); /* banked rom */
+	memory_set_bankptr( machine, "bank1", machine->region( "user2" )->base() ); /* banked rom */
 	zn_machine_init(machine);
 }
 
 static MACHINE_CONFIG_DERIVED( coh1001l, zn1_2mb_vram )
 
-//  MDRV_CPU_ADD("audiocpu", M68000, 10000000 )
-//  MDRV_CPU_PROGRAM_MAP( atlus_snd_map)
+//  MCFG_CPU_ADD("audiocpu", M68000, 10000000 )
+//  MCFG_CPU_PROGRAM_MAP( atlus_snd_map)
 
-	MDRV_MACHINE_RESET( coh1001l )
+	MCFG_MACHINE_RESET( coh1001l )
 
-//  MDRV_SOUND_ADD( "ymz", wYMZ280B, ymz280b_intf )
+//  MCFG_SOUND_ADD( "ymz", wYMZ280B, ymz280b_intf )
 MACHINE_CONFIG_END
 
 /*
@@ -2373,7 +2373,7 @@ Key:    Mother    KN01
 
 static WRITE32_HANDLER( coh1002v_bnk_w )
 {
-	memory_set_bankptr( space->machine, "bank2", memory_region( space->machine, "user3" ) + ( data * 0x100000 ) );
+	memory_set_bankptr( space->machine, "bank2", space->machine->region( "user3" )->base() + ( data * 0x100000 ) );
 }
 
 static DRIVER_INIT( coh1002v )
@@ -2387,14 +2387,14 @@ static DRIVER_INIT( coh1002v )
 
 static MACHINE_RESET( coh1002v )
 {
-	memory_set_bankptr( machine, "bank1", memory_region( machine, "user2" ) ); /* fixed game rom */
-	memory_set_bankptr( machine, "bank2", memory_region( machine, "user3" ) ); /* banked rom */
+	memory_set_bankptr( machine, "bank1", machine->region( "user2" )->base() ); /* fixed game rom */
+	memory_set_bankptr( machine, "bank2", machine->region( "user3" )->base() ); /* banked rom */
 	zn_machine_init(machine);
 }
 
 static MACHINE_CONFIG_DERIVED( coh1002v, zn1_2mb_vram )
 
-	MDRV_MACHINE_RESET( coh1002v )
+	MCFG_MACHINE_RESET( coh1002v )
 MACHINE_CONFIG_END
 
 /*
@@ -2557,7 +2557,7 @@ Notes:
 static WRITE32_HANDLER( coh1002m_bank_w )
 {
 	verboselog( space->machine, 1, "coh1002m_bank_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
-	memory_set_bankptr( space->machine, "bank1", memory_region( space->machine, "user2" ) + ((data>>16) * 0x800000) );
+	memory_set_bankptr( space->machine, "bank1", space->machine->region( "user2" )->base() + ((data>>16) * 0x800000) );
 }
 
 static READ32_HANDLER( cbaj_z80_r )
@@ -2589,7 +2589,7 @@ static DRIVER_INIT( coh1002m )
 
 static MACHINE_RESET( coh1002m )
 {
-	memory_set_bankptr( machine, "bank1", memory_region( machine, "user2" ) );
+	memory_set_bankptr( machine, "bank1", machine->region( "user2" )->base() );
 	zn_machine_init(machine);
 }
 
@@ -2635,28 +2635,28 @@ ADDRESS_MAP_END
 
 static MACHINE_CONFIG_DERIVED( coh1002m, zn1_2mb_vram )
 
-	MDRV_MACHINE_RESET( coh1002m )
+	MCFG_MACHINE_RESET( coh1002m )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( coh1002msnd, zn1_2mb_vram )
 
-	MDRV_CPU_ADD("audiocpu", Z80, 32000000/8 )
-	MDRV_CPU_PROGRAM_MAP( cbaj_z80_map)
-	MDRV_CPU_IO_MAP( cbaj_z80_port_map)
+	MCFG_CPU_ADD("audiocpu", Z80, 32000000/8 )
+	MCFG_CPU_PROGRAM_MAP( cbaj_z80_map)
+	MCFG_CPU_IO_MAP( cbaj_z80_port_map)
 
-	MDRV_MACHINE_RESET( coh1002m )
+	MCFG_MACHINE_RESET( coh1002m )
 
-	MDRV_SOUND_ADD("ymz", YMZ280B, 16934400)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("ymz", YMZ280B, 16934400)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( coh1002ml, zn1_2mb_vram )
 
-	MDRV_CPU_ADD("link", Z80, 8000000 )
-	MDRV_CPU_PROGRAM_MAP( link_map)
+	MCFG_CPU_ADD("link", Z80, 8000000 )
+	MCFG_CPU_PROGRAM_MAP( link_map)
 
-	MDRV_MACHINE_RESET( coh1002m )
+	MCFG_MACHINE_RESET( coh1002m )
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( zn )

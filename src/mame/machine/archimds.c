@@ -119,7 +119,7 @@ static TIMER_CALLBACK( vidc_vblank )
 static TIMER_CALLBACK( vidc_video_tick )
 {
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	static UINT8 *vram = memory_region(machine,"vram");
+	static UINT8 *vram = machine->region("vram")->base();
 	UINT32 size;
 
 	size = vidc_vidend-vidc_vidstart+0x10;
@@ -257,7 +257,7 @@ READ32_HANDLER(archimedes_memc_logical_r)
 	{
 		UINT32 *rom;
 
-		rom = (UINT32 *)memory_region(space->machine, "maincpu");
+		rom = (UINT32 *)space->machine->region("maincpu")->base();
 
 		return rom[offset & 0x1fffff];
 	}
@@ -582,7 +582,7 @@ READ32_HANDLER(archimedes_ioc_r)
 {
 	UINT32 ioc_addr;
 	#ifdef MESS
-	running_device *fdc = (running_device *)space->machine->device("wd1772");
+	device_t *fdc = (device_t *)space->machine->device("wd1772");
 	#endif
 
 	ioc_addr = offset*4;
@@ -640,7 +640,7 @@ WRITE32_HANDLER(archimedes_ioc_w)
 {
 	UINT32 ioc_addr;
 	#ifdef MESS
-	running_device *fdc = (running_device *)space->machine->device("wd1772");
+	device_t *fdc = (device_t *)space->machine->device("wd1772");
 	#endif
 
 	ioc_addr = offset*4;

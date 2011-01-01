@@ -26,7 +26,7 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<running_device> m_crtc;
+	required_device<device_t> m_crtc;
 
 	virtual void machine_start();
 

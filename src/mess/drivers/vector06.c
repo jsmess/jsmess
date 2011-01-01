@@ -169,50 +169,50 @@ const wd17xx_interface vector06_wd17xx_interface =
 /* Machine driver */
 static MACHINE_CONFIG_START( vector06, vector06_state )
   /* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", I8080, 3000000)
-//  MDRV_CPU_ADD("maincpu", Z80, 3000000)
-	MDRV_CPU_PROGRAM_MAP(vector06_mem)
-	MDRV_CPU_IO_MAP(vector06_io)
-	MDRV_CPU_VBLANK_INT("screen", vector06_interrupt)
+	MCFG_CPU_ADD("maincpu", I8080, 3000000)
+//  MCFG_CPU_ADD("maincpu", Z80, 3000000)
+	MCFG_CPU_PROGRAM_MAP(vector06_mem)
+	MCFG_CPU_IO_MAP(vector06_io)
+	MCFG_CPU_VBLANK_INT("screen", vector06_interrupt)
 
-	MDRV_MACHINE_START( vector06 )
-	MDRV_MACHINE_RESET( vector06 )
+	MCFG_MACHINE_START( vector06 )
+	MCFG_MACHINE_RESET( vector06 )
 
-	MDRV_I8255A_ADD( "ppi8255", vector06_ppi8255_interface )
+	MCFG_I8255A_ADD( "ppi8255", vector06_ppi8255_interface )
 
-	MDRV_I8255A_ADD( "ppi8255_2", vector06_ppi8255_2_interface )
+	MCFG_I8255A_ADD( "ppi8255_2", vector06_ppi8255_2_interface )
 
     /* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(50)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(256+64, 256+64)
-	MDRV_SCREEN_VISIBLE_AREA(0, 256+64-1, 0, 256+64-1)
-	MDRV_PALETTE_LENGTH(16)
-	MDRV_PALETTE_INIT(vector06)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(256+64, 256+64)
+	MCFG_SCREEN_VISIBLE_AREA(0, 256+64-1, 0, 256+64-1)
+	MCFG_PALETTE_LENGTH(16)
+	MCFG_PALETTE_INIT(vector06)
 
-	MDRV_VIDEO_START(vector06)
-	MDRV_VIDEO_UPDATE(vector06)
+	MCFG_VIDEO_START(vector06)
+	MCFG_VIDEO_UPDATE(vector06)
 
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_WAVE_ADD("wave", "cassette")
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_WAVE_ADD("wave", "cassette")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MDRV_CASSETTE_ADD( "cassette", vector_cassette_config )
+	MCFG_CASSETTE_ADD( "cassette", vector_cassette_config )
 
-	MDRV_WD1793_ADD("wd1793", vector06_wd17xx_interface)
-	MDRV_FLOPPY_2_DRIVES_ADD(vector_floppy_config)
+	MCFG_WD1793_ADD("wd1793", vector06_wd17xx_interface)
+	MCFG_FLOPPY_2_DRIVES_ADD(vector_floppy_config)
 
 	/* cartridge */
-	MDRV_CARTSLOT_ADD("cart")
-	MDRV_CARTSLOT_EXTENSION_LIST("emr")
-	MDRV_CARTSLOT_NOT_MANDATORY
+	MCFG_CARTSLOT_ADD("cart")
+	MCFG_CARTSLOT_EXTENSION_LIST("emr")
+	MCFG_CARTSLOT_NOT_MANDATORY
 
 	/* internal ram */
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("64K")
-	MDRV_RAM_DEFAULT_VALUE(0x00)
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("64K")
+	MCFG_RAM_DEFAULT_VALUE(0x00)
 MACHINE_CONFIG_END
 
 /* ROM definition */

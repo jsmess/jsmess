@@ -39,9 +39,9 @@
 
 DECLARE_LEGACY_DEVICE(MOS6530, mos6530);
 
-#define MDRV_MOS6530_ADD(_tag, _clock, _config) \
-	MDRV_DEVICE_ADD((_tag), MOS6530, _clock)	\
-	MDRV_DEVICE_CONFIG(_config)
+#define MCFG_MOS6530_ADD(_tag, _clock, _config) \
+	MCFG_DEVICE_ADD((_tag), MOS6530, _clock)	\
+	MCFG_DEVICE_CONFIG(_config)
 
 #define MOS6530_INTERFACE(name) \
 	const mos6530_interface (name) =
@@ -67,13 +67,13 @@ struct _mos6530_interface
 READ8_DEVICE_HANDLER( mos6530_r );
 WRITE8_DEVICE_HANDLER( mos6530_w );
 
-void mos6530_porta_in_set(running_device *device, UINT8 data, UINT8 mask);
-void mos6530_portb_in_set(running_device *device, UINT8 data, UINT8 mask);
+void mos6530_porta_in_set(device_t *device, UINT8 data, UINT8 mask);
+void mos6530_portb_in_set(device_t *device, UINT8 data, UINT8 mask);
 
-UINT8 mos6530_porta_in_get(running_device *device);
-UINT8 mos6530_portb_in_get(running_device *device);
+UINT8 mos6530_porta_in_get(device_t *device);
+UINT8 mos6530_portb_in_get(device_t *device);
 
-UINT8 mos6530_porta_out_get(running_device *device);
-UINT8 mos6530_portb_out_get(running_device *device);
+UINT8 mos6530_porta_out_get(device_t *device);
+UINT8 mos6530_portb_out_get(device_t *device);
 
 #endif

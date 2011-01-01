@@ -209,7 +209,7 @@ static void astrof_get_pens( running_machine *machine, pen_t *pens )
 	offs_t i;
 	UINT8 bank = (state->astrof_palette_bank ? 0x10 : 0x00);
 	UINT8 config = input_port_read_safe(machine, "FAKE", 0x00);
-	UINT8 *prom = memory_region(machine, "proms");
+	UINT8 *prom = machine->region("proms")->base();
 
 	/* a common wire hack to the pcb causes the prom halves to be inverted */
 	/* this results in e.g. astrof background being black */
@@ -243,7 +243,7 @@ static void astrof_get_pens( running_machine *machine, pen_t *pens )
 static void tomahawk_get_pens( running_machine *machine, pen_t *pens )
 {
 	offs_t i;
-	UINT8 *prom = memory_region(machine, "proms");
+	UINT8 *prom = machine->region("proms")->base();
 	UINT8 config = input_port_read_safe(machine, "FAKE", 0x00);
 
 	for (i = 0; i < TOMAHAWK_NUM_PENS; i++)
@@ -455,7 +455,7 @@ static VIDEO_UPDATE( tomahawk )
 static READ8_HANDLER( shoot_r )
 {
 	/* not really sure about this */
-	return mame_rand(space->machine) & 8;
+	return space->machine->rand() & 8;
 }
 
 
@@ -958,31 +958,31 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( base, astrof_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6502, MAIN_CPU_CLOCK)
-	MDRV_TIMER_ADD_SCANLINE("vblank", irq_callback, "screen", VBSTART, 0)
+	MCFG_CPU_ADD("maincpu", M6502, MAIN_CPU_CLOCK)
+	MCFG_TIMER_ADD_SCANLINE("vblank", irq_callback, "screen", VBSTART, 0)
 
 	/* video hardware */
-	MDRV_VIDEO_START(astrof)
+	MCFG_VIDEO_START(astrof)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( astrof, base )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(astrof_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(astrof_map)
 
-	MDRV_MACHINE_START(astrof)
+	MCFG_MACHINE_START(astrof)
 
 	/* video hardware */
-	MDRV_VIDEO_UPDATE(astrof)
+	MCFG_VIDEO_UPDATE(astrof)
 
 	/* audio hardware */
-	MDRV_FRAGMENT_ADD(astrof_audio)
+	MCFG_FRAGMENT_ADD(astrof_audio)
 MACHINE_CONFIG_END
 
 
@@ -990,40 +990,40 @@ static MACHINE_CONFIG_DERIVED( abattle, astrof )
 
 	/* basic machine hardware */
 
-	MDRV_MACHINE_START(abattle)
-	MDRV_MACHINE_RESET(abattle)
+	MCFG_MACHINE_START(abattle)
+	MCFG_MACHINE_RESET(abattle)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( spfghmk2, base )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(spfghmk2_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(spfghmk2_map)
 
-	MDRV_MACHINE_START(spfghmk2)
+	MCFG_MACHINE_START(spfghmk2)
 
 	/* video hardware */
-	MDRV_VIDEO_UPDATE(astrof)
+	MCFG_VIDEO_UPDATE(astrof)
 
 	/* audio hardware */
-	MDRV_FRAGMENT_ADD(spfghmk2_audio)
+	MCFG_FRAGMENT_ADD(spfghmk2_audio)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( tomahawk, base )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(tomahawk_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(tomahawk_map)
 
-	MDRV_MACHINE_START(tomahawk)
+	MCFG_MACHINE_START(tomahawk)
 
 	/* video hardware */
-	MDRV_VIDEO_UPDATE(tomahawk)
+	MCFG_VIDEO_UPDATE(tomahawk)
 
 	/* audio hardware */
-	MDRV_FRAGMENT_ADD(tomahawk_audio)
+	MCFG_FRAGMENT_ADD(tomahawk_audio)
 MACHINE_CONFIG_END
 
 
@@ -1297,8 +1297,8 @@ ROM_END
 static DRIVER_INIT( abattle )
 {
 	/* use the protection PROM to decrypt the ROMs */
-	UINT8 *rom = memory_region(machine, "maincpu");
-	UINT8 *prom = memory_region(machine, "user1");
+	UINT8 *rom = machine->region("maincpu")->base();
+	UINT8 *prom = machine->region("user1")->base();
 	int i;
 
 	for(i = 0xd000; i < 0x10000; i++)
@@ -1312,7 +1312,7 @@ static DRIVER_INIT( abattle )
 
 static DRIVER_INIT( afire )
 {
-	UINT8 *rom = memory_region(machine, "maincpu");
+	UINT8 *rom = machine->region("maincpu")->base();
 	int i;
 
 	for(i = 0xd000; i < 0x10000; i++)
@@ -1326,7 +1326,7 @@ static DRIVER_INIT( afire )
 
 static DRIVER_INIT( sstarbtl )
 {
-	UINT8 *rom = memory_region(machine, "maincpu");
+	UINT8 *rom = machine->region("maincpu")->base();
 	int i;
 
 	for(i = 0xd000; i < 0x10000; i++)

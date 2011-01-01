@@ -467,7 +467,7 @@ static MACHINE_RESET( opwolf )
 	msm5205_reset_w(machine->device("msm2"), 1);
 }
 
-static void opwolf_msm5205_vck( running_device *device )
+static void opwolf_msm5205_vck( device_t *device )
 {
 	opwolf_state *state = device->machine->driver_data<opwolf_state>();
 	int chip = (strcmp(device->tag(), "msm1") == 0) ? 0 : 1;
@@ -480,7 +480,7 @@ static void opwolf_msm5205_vck( running_device *device )
 	}
 	else
 	{
-		state->adpcm_data[chip] = memory_region(device->machine, "adpcm")[state->adpcm_pos[chip]];
+		state->adpcm_data[chip] = device->machine->region("adpcm")->base()[state->adpcm_pos[chip]];
 		state->adpcm_pos[chip] = (state->adpcm_pos[chip] + 1) & 0x7ffff;
 		msm5205_data_w(device, state->adpcm_data[chip] >> 4);
 	}
@@ -694,7 +694,7 @@ GFXDECODE_END
 
 /* handler called by the YM2151 emulator when the internal timers cause an IRQ */
 
-static void irq_handler( running_device *device, int irq )
+static void irq_handler( device_t *device, int irq )
 {
 	opwolf_state *state = device->machine->driver_data<opwolf_state>();
 	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
@@ -739,109 +739,109 @@ static const tc0140syt_interface opwolf_tc0140syt_intf =
 static MACHINE_CONFIG_START( opwolf, opwolf_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, CPU_CLOCK )	/* 8 MHz */
-	MDRV_CPU_PROGRAM_MAP(opwolf_map)
-	MDRV_CPU_VBLANK_INT("screen", irq5_line_hold)
+	MCFG_CPU_ADD("maincpu", M68000, CPU_CLOCK )	/* 8 MHz */
+	MCFG_CPU_PROGRAM_MAP(opwolf_map)
+	MCFG_CPU_VBLANK_INT("screen", irq5_line_hold)
 
-	MDRV_CPU_ADD("audiocpu", Z80, SOUND_CPU_CLOCK )	/* 4 MHz */
-	MDRV_CPU_PROGRAM_MAP(opwolf_sound_z80_map)
+	MCFG_CPU_ADD("audiocpu", Z80, SOUND_CPU_CLOCK )	/* 4 MHz */
+	MCFG_CPU_PROGRAM_MAP(opwolf_sound_z80_map)
 
-	MDRV_QUANTUM_TIME(HZ(600))	/* 10 CPU slices per frame - enough for the sound CPU to read all commands */
+	MCFG_QUANTUM_TIME(HZ(600))	/* 10 CPU slices per frame - enough for the sound CPU to read all commands */
 
-	MDRV_MACHINE_START(opwolf)
-	MDRV_MACHINE_RESET(opwolf)
+	MCFG_MACHINE_START(opwolf)
+	MCFG_MACHINE_RESET(opwolf)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(40*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(40*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 
-	MDRV_GFXDECODE(opwolf)
-	MDRV_PALETTE_LENGTH(8192)
+	MCFG_GFXDECODE(opwolf)
+	MCFG_PALETTE_LENGTH(8192)
 
-	MDRV_VIDEO_UPDATE(opwolf)
+	MCFG_VIDEO_UPDATE(opwolf)
 
-	MDRV_PC080SN_ADD("pc080sn", opwolf_pc080sn_intf)
-	MDRV_PC090OJ_ADD("pc090oj", opwolf_pc090oj_intf)
+	MCFG_PC080SN_ADD("pc080sn", opwolf_pc080sn_intf)
+	MCFG_PC090OJ_ADD("pc090oj", opwolf_pc090oj_intf)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ymsnd", YM2151, SOUND_CPU_CLOCK )	/* 4 MHz */
-	MDRV_SOUND_CONFIG(ym2151_config)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 0.75)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 0.75)
+	MCFG_SOUND_ADD("ymsnd", YM2151, SOUND_CPU_CLOCK )	/* 4 MHz */
+	MCFG_SOUND_CONFIG(ym2151_config)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.75)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.75)
 
-	MDRV_SOUND_ADD("msm1", MSM5205, 384000)
-	MDRV_SOUND_CONFIG(msm5205_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.60)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.60)
+	MCFG_SOUND_ADD("msm1", MSM5205, 384000)
+	MCFG_SOUND_CONFIG(msm5205_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.60)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.60)
 
-	MDRV_SOUND_ADD("msm2", MSM5205, 384000)
-	MDRV_SOUND_CONFIG(msm5205_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.60)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.60)
+	MCFG_SOUND_ADD("msm2", MSM5205, 384000)
+	MCFG_SOUND_CONFIG(msm5205_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.60)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.60)
 
-	MDRV_TC0140SYT_ADD("tc0140syt", opwolf_tc0140syt_intf)
+	MCFG_TC0140SYT_ADD("tc0140syt", opwolf_tc0140syt_intf)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_START( opwolfb, opwolf_state ) /* OSC clocks unknown for the bootleg, but changed to match original sets */
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, CPU_CLOCK )	/* 8 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(opwolfb_map)
-	MDRV_CPU_VBLANK_INT("screen", irq5_line_hold)
+	MCFG_CPU_ADD("maincpu", M68000, CPU_CLOCK )	/* 8 MHz ??? */
+	MCFG_CPU_PROGRAM_MAP(opwolfb_map)
+	MCFG_CPU_VBLANK_INT("screen", irq5_line_hold)
 
-	MDRV_CPU_ADD("audiocpu", Z80, SOUND_CPU_CLOCK )	/* 4 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(opwolf_sound_z80_map)
+	MCFG_CPU_ADD("audiocpu", Z80, SOUND_CPU_CLOCK )	/* 4 MHz ??? */
+	MCFG_CPU_PROGRAM_MAP(opwolf_sound_z80_map)
 
-	MDRV_CPU_ADD("sub", Z80, SOUND_CPU_CLOCK )	/* 4 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(opwolfb_sub_z80_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_ADD("sub", Z80, SOUND_CPU_CLOCK )	/* 4 MHz ??? */
+	MCFG_CPU_PROGRAM_MAP(opwolfb_sub_z80_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_QUANTUM_TIME(HZ(600))	/* 10 CPU slices per frame - enough for the sound CPU to read all commands */
+	MCFG_QUANTUM_TIME(HZ(600))	/* 10 CPU slices per frame - enough for the sound CPU to read all commands */
 
-	MDRV_MACHINE_START(opwolf)
+	MCFG_MACHINE_START(opwolf)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(40*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(40*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 
-	MDRV_GFXDECODE(opwolfb)
-	MDRV_PALETTE_LENGTH(8192)
+	MCFG_GFXDECODE(opwolfb)
+	MCFG_PALETTE_LENGTH(8192)
 
-	MDRV_VIDEO_UPDATE(opwolf)
+	MCFG_VIDEO_UPDATE(opwolf)
 
-	MDRV_PC080SN_ADD("pc080sn", opwolf_pc080sn_intf)
-	MDRV_PC090OJ_ADD("pc090oj", opwolf_pc090oj_intf)
+	MCFG_PC080SN_ADD("pc080sn", opwolf_pc080sn_intf)
+	MCFG_PC090OJ_ADD("pc090oj", opwolf_pc090oj_intf)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ymsnd", YM2151, SOUND_CPU_CLOCK )
-	MDRV_SOUND_CONFIG(ym2151_config)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 0.75)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 0.75)
+	MCFG_SOUND_ADD("ymsnd", YM2151, SOUND_CPU_CLOCK )
+	MCFG_SOUND_CONFIG(ym2151_config)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.75)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.75)
 
-	MDRV_SOUND_ADD("msm1", MSM5205, 384000)
-	MDRV_SOUND_CONFIG(msm5205_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.60)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.60)
+	MCFG_SOUND_ADD("msm1", MSM5205, 384000)
+	MCFG_SOUND_CONFIG(msm5205_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.60)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.60)
 
-	MDRV_SOUND_ADD("msm2", MSM5205, 384000)
-	MDRV_SOUND_CONFIG(msm5205_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.60)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.60)
+	MCFG_SOUND_ADD("msm2", MSM5205, 384000)
+	MCFG_SOUND_CONFIG(msm5205_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.60)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.60)
 
-	MDRV_TC0140SYT_ADD("tc0140syt", opwolf_tc0140syt_intf)
+	MCFG_TC0140SYT_ADD("tc0140syt", opwolf_tc0140syt_intf)
 MACHINE_CONFIG_END
 
 
@@ -987,7 +987,7 @@ ROM_END
 static DRIVER_INIT( opwolf )
 {
 	opwolf_state *state = machine->driver_data<opwolf_state>();
-	UINT16* rom = (UINT16*)memory_region(machine, "maincpu");
+	UINT16* rom = (UINT16*)machine->region("maincpu")->base();
 
 	state->opwolf_region = rom[0x03fffe / 2] & 0xff;
 
@@ -997,14 +997,14 @@ static DRIVER_INIT( opwolf )
 	state->opwolf_gun_xoffs = 0xec - (rom[0x03ffb0 / 2] & 0xff);
 	state->opwolf_gun_yoffs = 0x1c - (rom[0x03ffae / 2] & 0xff);
 
-	memory_configure_bank(machine, "bank10", 0, 4, memory_region(machine, "audiocpu") + 0x10000, 0x4000);
+	memory_configure_bank(machine, "bank10", 0, 4, machine->region("audiocpu")->base() + 0x10000, 0x4000);
 }
 
 
 static DRIVER_INIT( opwolfb )
 {
 	opwolf_state *state = machine->driver_data<opwolf_state>();
-	UINT16* rom = (UINT16*)memory_region(machine, "maincpu");
+	UINT16* rom = (UINT16*)machine->region("maincpu")->base();
 
 	state->opwolf_region = rom[0x03fffe / 2] & 0xff;
 
@@ -1012,7 +1012,7 @@ static DRIVER_INIT( opwolfb )
 	state->opwolf_gun_xoffs = -2;
 	state->opwolf_gun_yoffs = 17;
 
-	memory_configure_bank(machine, "bank10", 0, 4, memory_region(machine, "audiocpu") + 0x10000, 0x4000);
+	memory_configure_bank(machine, "bank10", 0, 4, machine->region("audiocpu")->base() + 0x10000, 0x4000);
 }
 
 

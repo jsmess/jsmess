@@ -88,8 +88,8 @@ int c128_dma_read(running_machine *machine, int offset);
 int c128_dma_read_color(running_machine *machine, int offset);
 void c128_vic_interrupt(running_machine *machine, int level);
 
-UINT8 c128_m6510_port_read(running_device *device, UINT8 direction);
-void c128_m6510_port_write(running_device *device, UINT8 direction, UINT8 data);
+UINT8 c128_m6510_port_read(device_t *device, UINT8 direction);
+void c128_m6510_port_write(device_t *device, UINT8 direction, UINT8 data);
 
 extern const mos6526_interface c128_ntsc_cia0, c128_pal_cia0;
 extern const mos6526_interface c128_ntsc_cia1, c128_pal_cia1;

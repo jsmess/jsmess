@@ -27,7 +27,7 @@ struct _i82439tx_state
     INLINE FUNCTIONS
 *****************************************************************************/
 
-INLINE i82439tx_state *get_safe_token(running_device *device)
+INLINE i82439tx_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == I82439TX);
@@ -40,7 +40,7 @@ INLINE i82439tx_state *get_safe_token(running_device *device)
     IMPLEMENTATION
 ***************************************************************************/
 
-static void i82439tx_configure_memory(running_device *device, UINT8 val, offs_t begin, offs_t end)
+static void i82439tx_configure_memory(device_t *device, UINT8 val, offs_t begin, offs_t end)
 {
 	i82439tx_state *i82439tx = get_safe_token(device);
 
@@ -69,7 +69,7 @@ static void i82439tx_configure_memory(running_device *device, UINT8 val, offs_t 
     PCI INTERFACE
 ***************************************************************************/
 
-UINT32 i82439tx_pci_read(running_device *busdevice, running_device *device, int function, int offset, UINT32 mem_mask)
+UINT32 i82439tx_pci_read(device_t *busdevice, device_t *device, int function, int offset, UINT32 mem_mask)
 {
 	i82439tx_state *i82439tx = get_safe_token(device);
 	UINT32 result = 0;
@@ -122,7 +122,7 @@ UINT32 i82439tx_pci_read(running_device *busdevice, running_device *device, int 
 	return result;
 }
 
-void i82439tx_pci_write(running_device *busdevice, running_device *device, int function, int offset, UINT32 data, UINT32 mem_mask)
+void i82439tx_pci_write(device_t *busdevice, device_t *device, int function, int offset, UINT32 data, UINT32 mem_mask)
 {
 	i82439tx_state *i82439tx = get_safe_token(device);
 
@@ -215,13 +215,13 @@ static DEVICE_START( i82439tx )
 	i82439tx_config *config = (i82439tx_config *)downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
 
 	/* get address space we are working on */
-	running_device *cpu = device->machine->device(config->cputag);
+	device_t *cpu = device->machine->device(config->cputag);
 	assert(cpu != NULL);
 
 	i82439tx->space = cpu_get_address_space(cpu, ADDRESS_SPACE_PROGRAM);
 
 	/* get rom region */
-	i82439tx->rom = memory_region(device->machine, config->rom_region);
+	i82439tx->rom = device->machine->region(config->rom_region)->base();
 
 	/* setup save states */
 	state_save_register_device_item_array(device, 0, i82439tx->regs);

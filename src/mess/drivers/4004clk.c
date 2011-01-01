@@ -19,7 +19,7 @@ public:
 
 	UINT16 nixie[16];
 	UINT8 timer;
-	running_device *dac;
+	device_t *dac;
 };
 
 static READ8_HANDLER(data_r)
@@ -147,20 +147,20 @@ static MACHINE_START(4004clk)
 static MACHINE_CONFIG_START( 4004clk, _4004clk_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu",I4004, XTAL_5MHz / 8)
-	MDRV_CPU_PROGRAM_MAP(4004clk_rom)
-	MDRV_CPU_DATA_MAP(4004clk_mem)
-	MDRV_CPU_IO_MAP(4004clk_io)
+	MCFG_CPU_ADD("maincpu",I4004, XTAL_5MHz / 8)
+	MCFG_CPU_PROGRAM_MAP(4004clk_rom)
+	MCFG_CPU_DATA_MAP(4004clk_mem)
+	MCFG_CPU_IO_MAP(4004clk_io)
 
-	MDRV_MACHINE_START(4004clk)
+	MCFG_MACHINE_START(4004clk)
 
 	/* video hardware */
-	//MDRV_DEFAULT_LAYOUT(layout_4004clk)
+	//MCFG_DEFAULT_LAYOUT(layout_4004clk)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("dac", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 /* ROM definition */

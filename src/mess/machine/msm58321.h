@@ -29,9 +29,9 @@
 
 DECLARE_LEGACY_DEVICE(MSM58321RS, msm58321rs);
 
-#define MDRV_MSM58321RS_ADD(_tag, _clock, _intrf) \
-	MDRV_DEVICE_ADD(_tag, MSM58321RS, _clock) \
-	MDRV_DEVICE_CONFIG(_intrf)
+#define MCFG_MSM58321RS_ADD(_tag, _clock, _intrf) \
+	MCFG_DEVICE_ADD(_tag, MSM58321RS, _clock) \
+	MCFG_DEVICE_CONFIG(_intrf)
 
 #define MSM58321_INTERFACE(name) \
 	const msm58321_interface (name) =

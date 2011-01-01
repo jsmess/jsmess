@@ -153,7 +153,7 @@ static WRITE8_HANDLER( fd5_drive_control_w )
 
 static WRITE8_HANDLER( fd5_tc_w )
 {
-	running_device *fdc = space->machine->device("upd765");
+	device_t *fdc = space->machine->device("upd765");
 	upd765_tc_w(fdc, 1);
 	upd765_tc_w(fdc, 0);
 }
@@ -329,8 +329,8 @@ static INTERRUPT_GEN( sord_interrupt )
 /* bit 7 is the reset/halt key */
 static READ8_HANDLER( sord_sts_r )
 {
-	running_device *printer = space->machine->device("centronics");
-	running_device *cassette = space->machine->device("cassette");
+	device_t *printer = space->machine->device("centronics");
+	device_t *cassette = space->machine->device("cassette");
 	UINT8 data = 0;
 
 	data |= cassette_input(cassette) >= 0 ? 1 : 0;
@@ -347,8 +347,8 @@ static READ8_HANDLER( sord_sts_r )
 /* bit 1 is cassette remote */
 static WRITE8_HANDLER( sord_com_w )
 {
-	running_device *printer = space->machine->device("centronics");
-	running_device *cassette = space->machine->device("cassette");
+	device_t *printer = space->machine->device("centronics");
+	device_t *cassette = space->machine->device("cassette");
 
 	/* cassette data */
 	cassette_output(cassette, BIT(data, 0) ? -1.0 : 1.0);
@@ -532,7 +532,7 @@ static const TMS9928a_interface tms9928a_interface =
 static DEVICE_IMAGE_LOAD( sord_cart )
 {
 	UINT32 size;
-	UINT8 *ptr = memory_region(image.device().machine, "maincpu");
+	UINT8 *ptr = image.device().machine->region("maincpu")->base();
 
 	if (image.software_entry() == NULL)
 	{
@@ -563,42 +563,42 @@ static MACHINE_RESET( sord_m5 )
 static MACHINE_CONFIG_START( sord_m5, sord_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, XTAL_14_31818MHz/4)
-	MDRV_CPU_PROGRAM_MAP(sord_m5_mem)
-	MDRV_CPU_IO_MAP(sord_m5_io)
-	MDRV_CPU_VBLANK_INT("screen", sord_interrupt)
-	MDRV_CPU_CONFIG(sord_m5_daisy_chain)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_14_31818MHz/4)
+	MCFG_CPU_PROGRAM_MAP(sord_m5_mem)
+	MCFG_CPU_IO_MAP(sord_m5_io)
+	MCFG_CPU_VBLANK_INT("screen", sord_interrupt)
+	MCFG_CPU_CONFIG(sord_m5_daisy_chain)
 
-	MDRV_MACHINE_START(sord_m5)
-	MDRV_MACHINE_RESET(sord_m5)
+	MCFG_MACHINE_START(sord_m5)
+	MCFG_MACHINE_RESET(sord_m5)
 
 	/* video hardware */
-	MDRV_FRAGMENT_ADD(tms9928a)
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_REFRESH_RATE(50)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_FRAGMENT_ADD(tms9928a)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("sn76489a", SN76489A, XTAL_14_31818MHz/4)	/* 3.579545 MHz */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("sn76489a", SN76489A, XTAL_14_31818MHz/4)	/* 3.579545 MHz */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MDRV_Z80CTC_ADD("z80ctc", XTAL_14_31818MHz/4, sord_m5_ctc_intf)
+	MCFG_Z80CTC_ADD("z80ctc", XTAL_14_31818MHz/4, sord_m5_ctc_intf)
 
 	/* printer */
-	MDRV_CENTRONICS_ADD("centronics", standard_centronics)
+	MCFG_CENTRONICS_ADD("centronics", standard_centronics)
 
-	MDRV_CASSETTE_ADD("cassette", sordm5_cassette_config)
+	MCFG_CASSETTE_ADD("cassette", sordm5_cassette_config)
 
 	/* cartridge */
-	MDRV_CARTSLOT_ADD("cart")
-	MDRV_CARTSLOT_EXTENSION_LIST("bin,rom")
-	MDRV_CARTSLOT_MANDATORY
-	MDRV_CARTSLOT_LOAD(sord_cart)
-	MDRV_CARTSLOT_INTERFACE("m5_cart")
+	MCFG_CARTSLOT_ADD("cart")
+	MCFG_CARTSLOT_EXTENSION_LIST("bin,rom")
+	MCFG_CARTSLOT_MANDATORY
+	MCFG_CARTSLOT_LOAD(sord_cart)
+	MCFG_CARTSLOT_INTERFACE("m5_cart")
 
 	/* software lists */
-	MDRV_SOFTWARE_LIST_ADD("cart_list","sordm5")
+	MCFG_SOFTWARE_LIST_ADD("cart_list","sordm5")
 
 MACHINE_CONFIG_END
 
@@ -626,24 +626,24 @@ static const floppy_config sordm5_floppy_config =
 
 static MACHINE_CONFIG_DERIVED( sord_m5_fd5, sord_m5 )
 
-	MDRV_CPU_REPLACE("maincpu", Z80, XTAL_14_31818MHz/4)
-	MDRV_CPU_IO_MAP(srdm5fd5_io)
+	MCFG_CPU_REPLACE("maincpu", Z80, XTAL_14_31818MHz/4)
+	MCFG_CPU_IO_MAP(srdm5fd5_io)
 
 	/* floppy */
-	MDRV_CPU_ADD("floppy", Z80, XTAL_14_31818MHz/4)
-	MDRV_CPU_PROGRAM_MAP(sord_fd5_mem)
-	MDRV_CPU_IO_MAP(sord_fd5_io)
+	MCFG_CPU_ADD("floppy", Z80, XTAL_14_31818MHz/4)
+	MCFG_CPU_PROGRAM_MAP(sord_fd5_mem)
+	MCFG_CPU_IO_MAP(sord_fd5_io)
 
-	MDRV_PPI8255_ADD("ppi8255", sord_ppi8255_interface)
-	MDRV_UPD765A_ADD("upd765", sord_fd5_upd765_interface)
+	MCFG_PPI8255_ADD("ppi8255", sord_ppi8255_interface)
+	MCFG_UPD765A_ADD("upd765", sord_fd5_upd765_interface)
 
-	MDRV_QUANTUM_TIME(HZ(1200))
-	MDRV_MACHINE_RESET(sord_m5_fd5)
+	MCFG_QUANTUM_TIME(HZ(1200))
+	MCFG_MACHINE_RESET(sord_m5_fd5)
 
-	MDRV_FLOPPY_4_DRIVES_ADD(sordm5_floppy_config)
+	MCFG_FLOPPY_4_DRIVES_ADD(sordm5_floppy_config)
 
-	MDRV_CARTSLOT_MODIFY("cart")
-	MDRV_CARTSLOT_NOT_MANDATORY
+	MCFG_CARTSLOT_MODIFY("cart")
+	MCFG_CARTSLOT_NOT_MANDATORY
 MACHINE_CONFIG_END
 
 

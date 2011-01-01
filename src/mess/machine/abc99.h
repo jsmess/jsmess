@@ -19,8 +19,8 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MDRV_ABC99_ADD() \
-    MDRV_DEVICE_ADD(ABC99_TAG, ABC99, 0)
+#define MCFG_ABC99_ADD() \
+    MCFG_DEVICE_ADD(ABC99_TAG, ABC99, 0)
 
 
 

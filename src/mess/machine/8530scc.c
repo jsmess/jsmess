@@ -82,14 +82,14 @@ struct _scc8530_t
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE scc8530_t *get_token(running_device *device)
+INLINE scc8530_t *get_token(device_t *device)
 {
 	assert(device->type() == SCC8530);
 	return (scc8530_t *) downcast<legacy_device_base *>(device)->token();
 }
 
 
-INLINE const scc8530_interface *get_interface(running_device *device)
+INLINE const scc8530_interface *get_interface(device_t *device)
 {
 	assert(device->type() == SCC8530);
 	return (const scc8530_interface *) downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
@@ -104,7 +104,7 @@ INLINE const scc8530_interface *get_interface(running_device *device)
     scc_updateirqs
 -------------------------------------------------*/
 
-static void scc_updateirqs(running_device *device)
+static void scc_updateirqs(device_t *device)
 {
 	scc8530_t *scc = get_token(device);
 	int irqstat;
@@ -188,7 +188,7 @@ static void scc8530_resetchannel(scc8530_t *scc, int ch)
 
 static TIMER_CALLBACK( scc8530_baud_expire )
 {
-	running_device *device = (running_device *)ptr;
+	device_t *device = (device_t *)ptr;
 	scc8530_t *scc = get_token(device);
 	sccChan *pChan = &scc->channel[param];
 	int brconst = pChan->reg_val[13]<<8 | pChan->reg_val[14];
@@ -247,7 +247,7 @@ static DEVICE_RESET( scc8530 )
     scc_set_status
 -------------------------------------------------*/
 
-void scc8530_set_status(running_device *device, int status)
+void scc8530_set_status(device_t *device, int status)
 {
 	scc8530_t *scc = get_token(device);
 	scc->status = status;
@@ -257,7 +257,7 @@ void scc8530_set_status(running_device *device, int status)
     scc_acknowledge
 -------------------------------------------------*/
 
-static void scc_acknowledge(running_device *device)
+static void scc_acknowledge(device_t *device)
 {
 	const scc8530_interface *intf = get_interface(device);
 	if ((intf != NULL) && (intf->irq != NULL))
@@ -268,7 +268,7 @@ static void scc_acknowledge(running_device *device)
     scc_getareg
 -------------------------------------------------*/
 
-static int scc_getareg(running_device *device)
+static int scc_getareg(device_t *device)
 {
 	scc8530_t *scc = get_token(device);
 
@@ -285,7 +285,7 @@ static int scc_getareg(running_device *device)
     scc_getareg
 -------------------------------------------------*/
 
-static int scc_getbreg(running_device *device)
+static int scc_getbreg(device_t *device)
 {
 	scc8530_t *scc = get_token(device);
 
@@ -310,7 +310,7 @@ static int scc_getbreg(running_device *device)
     scc_putreg
 -------------------------------------------------*/
 
-static void scc_putreg(running_device *device, int ch, int data)
+static void scc_putreg(device_t *device, int ch, int data)
 {
 	scc8530_t *scc = get_token(device);
 	sccChan *pChan = &scc->channel[ch];
@@ -443,7 +443,7 @@ static void scc_putreg(running_device *device, int ch, int data)
     scc8530_get_reg_a
 -------------------------------------------------*/
 
-UINT8 scc8530_get_reg_a(running_device *device, int reg)
+UINT8 scc8530_get_reg_a(device_t *device, int reg)
 {
 	scc8530_t *scc = get_token(device);
 	return scc->channel[0].reg_val[reg];
@@ -455,7 +455,7 @@ UINT8 scc8530_get_reg_a(running_device *device, int reg)
     scc8530_get_reg_b
 -------------------------------------------------*/
 
-UINT8 scc8530_get_reg_b(running_device *device, int reg)
+UINT8 scc8530_get_reg_b(device_t *device, int reg)
 {
 	scc8530_t *scc = get_token(device);
 	return scc->channel[1].reg_val[reg];
@@ -467,7 +467,7 @@ UINT8 scc8530_get_reg_b(running_device *device, int reg)
     scc8530_set_reg_a
 -------------------------------------------------*/
 
-void scc8530_set_reg_a(running_device *device, int reg, UINT8 data)
+void scc8530_set_reg_a(device_t *device, int reg, UINT8 data)
 {
 	scc8530_t *scc = get_token(device);
 	scc->channel[0].reg_val[reg] = data;
@@ -479,7 +479,7 @@ void scc8530_set_reg_a(running_device *device, int reg, UINT8 data)
     scc8530_set_reg_a
 -------------------------------------------------*/
 
-void scc8530_set_reg_b(running_device *device, int reg, UINT8 data)
+void scc8530_set_reg_b(device_t *device, int reg, UINT8 data)
 {
 	scc8530_t *scc = get_token(device);
 	scc->channel[1].reg_val[reg] = data;

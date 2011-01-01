@@ -49,8 +49,8 @@ static MACHINE_RESET(beehive)
 static VIDEO_START( beehive )
 {
 	beehive_state *state = machine->driver_data<beehive_state>();
-	state->FNT = memory_region(machine, "chargen");
-	state->videoram = memory_region(machine, "maincpu")+0x81fa;
+	state->FNT = machine->region("chargen")->base();
+	state->videoram = machine->region("maincpu")->base()+0x81fa;
 }
 
 /* This system appears to have inline attribute bytes of unknown meaning.
@@ -108,24 +108,24 @@ static VIDEO_UPDATE( beehive )
 
 static MACHINE_CONFIG_START( beehive, beehive_state )
     /* basic machine hardware */
-    MDRV_CPU_ADD("maincpu",I8085A, XTAL_4MHz)
-    MDRV_CPU_PROGRAM_MAP(beehive_mem)
-    MDRV_CPU_IO_MAP(beehive_io)
+    MCFG_CPU_ADD("maincpu",I8085A, XTAL_4MHz)
+    MCFG_CPU_PROGRAM_MAP(beehive_mem)
+    MCFG_CPU_IO_MAP(beehive_io)
 
-    MDRV_MACHINE_RESET(beehive)
+    MCFG_MACHINE_RESET(beehive)
 
     /* video hardware */
-    MDRV_SCREEN_ADD("screen", RASTER)
-    MDRV_SCREEN_REFRESH_RATE(50)
-    MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-    MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-    MDRV_SCREEN_SIZE(640, 250)
-    MDRV_SCREEN_VISIBLE_AREA(0, 639, 0, 249)
-    MDRV_PALETTE_LENGTH(2)
-    MDRV_PALETTE_INIT(black_and_white)
+    MCFG_SCREEN_ADD("screen", RASTER)
+    MCFG_SCREEN_REFRESH_RATE(50)
+    MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+    MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+    MCFG_SCREEN_SIZE(640, 250)
+    MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 249)
+    MCFG_PALETTE_LENGTH(2)
+    MCFG_PALETTE_INIT(black_and_white)
 
-    MDRV_VIDEO_START(beehive)
-    MDRV_VIDEO_UPDATE(beehive)
+    MCFG_VIDEO_START(beehive)
+    MCFG_VIDEO_UPDATE(beehive)
 MACHINE_CONFIG_END
 
 /* ROM definition */

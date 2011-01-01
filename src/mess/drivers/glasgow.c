@@ -71,7 +71,7 @@ static WRITE16_HANDLER( glasgow_lcd_w )
 
 static WRITE16_HANDLER( glasgow_lcd_flag_w )
 {
-	running_device *speaker = space->machine->device("beep");
+	device_t *speaker = space->machine->device("beep");
 	UINT16 lcd_flag = data & 0x8100;
 
 	beep_set_state(speaker, (lcd_flag & 0x100) ? 1 : 0);
@@ -137,7 +137,7 @@ static WRITE16_HANDLER( write_lcd_flag )
 
 static WRITE16_HANDLER( write_irq_flag )
 {
-	running_device *speaker = space->machine->device("beep");
+	device_t *speaker = space->machine->device("beep");
 
 	beep_set_state(speaker, data & 0x100);
 	logerror("Write 0x800004 = %x \n", data);
@@ -227,7 +227,7 @@ static READ16_HANDLER(read_board_amsterd)
 
 static WRITE32_HANDLER ( write_beeper32 )
 {
-	running_device *speaker = space->machine->device("beep");
+	device_t *speaker = space->machine->device("beep");
 	beep_set_state(speaker, data & 0x01000000);
 	logerror("Write 0x8000004 = %x \n", data);
 	irq_flag = 1;
@@ -252,7 +252,7 @@ static TIMER_CALLBACK( update_nmi32 )
 
 static MACHINE_START( glasgow )
 {
-	running_device *speaker = machine->device("beep");
+	device_t *speaker = machine->device("beep");
 
 	mboard_key_selector = 0;
 	irq_flag = 0;
@@ -267,7 +267,7 @@ static MACHINE_START( glasgow )
 
 static MACHINE_START( dallas32 )
 {
-	running_device *speaker = machine->device("beep");
+	device_t *speaker = machine->device("beep");
 
 	lcd_shift_counter = 3;
 	timer_pulse(machine, ATTOTIME_IN_HZ(50), NULL, 0, update_nmi32);
@@ -481,26 +481,26 @@ INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( glasgow, driver_device )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 12000000)
-	MDRV_CPU_PROGRAM_MAP(glasgow_mem)
-	MDRV_MACHINE_START(glasgow)
-	MDRV_MACHINE_RESET(glasgow)
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("beep", BEEP, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_CPU_ADD("maincpu", M68000, 12000000)
+	MCFG_CPU_PROGRAM_MAP(glasgow_mem)
+	MCFG_MACHINE_START(glasgow)
+	MCFG_MACHINE_RESET(glasgow)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("beep", BEEP, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( amsterd, glasgow )
     /* basic machine hardware */
-    MDRV_CPU_MODIFY("maincpu")
-    MDRV_CPU_PROGRAM_MAP(amsterd_mem)
+    MCFG_CPU_MODIFY("maincpu")
+    MCFG_CPU_PROGRAM_MAP(amsterd_mem)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( dallas32, glasgow )
     /* basic machine hardware */
-    MDRV_CPU_REPLACE("maincpu", M68020, 14000000)
-    MDRV_CPU_PROGRAM_MAP(dallas32_mem)
-    MDRV_MACHINE_START( dallas32 )
+    MCFG_CPU_REPLACE("maincpu", M68020, 14000000)
+    MCFG_CPU_PROGRAM_MAP(dallas32_mem)
+    MCFG_MACHINE_START( dallas32 )
 MACHINE_CONFIG_END
 
 /***************************************************************************

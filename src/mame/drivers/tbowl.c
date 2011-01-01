@@ -37,7 +37,7 @@ note: check this, its borrowed from tecmo.c / wc90.c at the moment and could wel
 static WRITE8_HANDLER( tbowlb_bankswitch_w )
 {
 	int bankaddress;
-	UINT8 *RAM = memory_region(space->machine, "maincpu");
+	UINT8 *RAM = space->machine->region("maincpu")->base();
 
 
 	bankaddress = 0x10000 + ((data & 0xf8) << 8);
@@ -47,7 +47,7 @@ static WRITE8_HANDLER( tbowlb_bankswitch_w )
 static WRITE8_HANDLER( tbowlc_bankswitch_w )
 {
 	int bankaddress;
-	UINT8 *RAM = memory_region(space->machine, "sub");
+	UINT8 *RAM = space->machine->region("sub")->base();
 
 
 	bankaddress = 0x10000 + ((data & 0xf8) << 8);
@@ -148,7 +148,7 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( tbowl_adpcm_start_w )
 {
-	running_device *adpcm = space->machine->device((offset & 1) ? "msm2" : "msm1");
+	device_t *adpcm = space->machine->device((offset & 1) ? "msm2" : "msm1");
 	adpcm_pos[offset & 1] = data << 8;
 	msm5205_reset_w(adpcm,0);
 }
@@ -160,15 +160,15 @@ static WRITE8_HANDLER( tbowl_adpcm_end_w )
 
 static WRITE8_HANDLER( tbowl_adpcm_vol_w )
 {
-	running_device *adpcm = space->machine->device((offset & 1) ? "msm2" : "msm1");
+	device_t *adpcm = space->machine->device((offset & 1) ? "msm2" : "msm1");
 	msm5205_set_volume(adpcm, (data & 0x7f) * 100 / 0x7f);
 }
 
-static void tbowl_adpcm_int(running_device *device)
+static void tbowl_adpcm_int(device_t *device)
 {
 	int num = (strcmp(device->tag(), "msm1") == 0) ? 0 : 1;
 	if (adpcm_pos[num] >= adpcm_end[num] ||
-				adpcm_pos[num] >= memory_region_length(device->machine, "adpcm")/2)
+				adpcm_pos[num] >= device->machine->region("adpcm")->bytes()/2)
 		msm5205_reset_w(device,1);
 	else if (adpcm_data[num] != -1)
 	{
@@ -177,7 +177,7 @@ static void tbowl_adpcm_int(running_device *device)
 	}
 	else
 	{
-		UINT8 *ROM = memory_region(device->machine, "adpcm") + 0x10000 * num;
+		UINT8 *ROM = device->machine->region("adpcm")->base() + 0x10000 * num;
 
 		adpcm_data[num] = ROM[adpcm_pos[num]++];
 		msm5205_data_w(device,adpcm_data[num] >> 4);
@@ -427,7 +427,7 @@ GFXDECODE_END
 
 */
 
-static void irqhandler(running_device *device, int linestate)
+static void irqhandler(device_t *device, int linestate)
 {
 	cputag_set_input_line(device->machine, "audiocpu", 0, linestate);
 }
@@ -465,63 +465,63 @@ static MACHINE_RESET( tbowl )
 static MACHINE_CONFIG_START( tbowl, driver_device )
 
 	/* CPU on Board '6206B' */
-	MDRV_CPU_ADD("maincpu", Z80, 8000000) /* NEC D70008AC-8 (Z80 Clone) */
-	MDRV_CPU_PROGRAM_MAP(6206B_map)
-	MDRV_CPU_VBLANK_INT("lscreen", irq0_line_hold)
+	MCFG_CPU_ADD("maincpu", Z80, 8000000) /* NEC D70008AC-8 (Z80 Clone) */
+	MCFG_CPU_PROGRAM_MAP(6206B_map)
+	MCFG_CPU_VBLANK_INT("lscreen", irq0_line_hold)
 
 	/* CPU on Board '6206C' */
-	MDRV_CPU_ADD("sub", Z80, 8000000) /* NEC D70008AC-8 (Z80 Clone) */
-	MDRV_CPU_PROGRAM_MAP(6206C_map)
-	MDRV_CPU_VBLANK_INT("lscreen", irq0_line_hold)
+	MCFG_CPU_ADD("sub", Z80, 8000000) /* NEC D70008AC-8 (Z80 Clone) */
+	MCFG_CPU_PROGRAM_MAP(6206C_map)
+	MCFG_CPU_VBLANK_INT("lscreen", irq0_line_hold)
 
 	/* CPU on Board '6206A' */
-	MDRV_CPU_ADD("audiocpu", Z80, 4000000) /* Actual Z80 */
-	MDRV_CPU_PROGRAM_MAP(6206A_map)
+	MCFG_CPU_ADD("audiocpu", Z80, 4000000) /* Actual Z80 */
+	MCFG_CPU_PROGRAM_MAP(6206A_map)
 
-	MDRV_QUANTUM_TIME(HZ(6000))
+	MCFG_QUANTUM_TIME(HZ(6000))
 
 	/* video hardware */
-	MDRV_GFXDECODE(tbowl)
-	MDRV_PALETTE_LENGTH(1024*2)
-	MDRV_DEFAULT_LAYOUT(layout_dualhsxs)
+	MCFG_GFXDECODE(tbowl)
+	MCFG_PALETTE_LENGTH(1024*2)
+	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
 
-	MDRV_SCREEN_ADD("lscreen", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("lscreen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
-	MDRV_SCREEN_ADD("rscreen", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("rscreen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
-	MDRV_VIDEO_START(tbowl)
-	MDRV_VIDEO_UPDATE(tbowl)
+	MCFG_VIDEO_START(tbowl)
+	MCFG_VIDEO_UPDATE(tbowl)
 
-	MDRV_MACHINE_RESET( tbowl )
+	MCFG_MACHINE_RESET( tbowl )
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym1", YM3812, 4000000)
-	MDRV_SOUND_CONFIG(ym3812_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	MCFG_SOUND_ADD("ym1", YM3812, 4000000)
+	MCFG_SOUND_CONFIG(ym3812_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MDRV_SOUND_ADD("ym2", YM3812, 4000000)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	MCFG_SOUND_ADD("ym2", YM3812, 4000000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	/* something for the samples? */
-	MDRV_SOUND_ADD("msm1", MSM5205, 384000)
-	MDRV_SOUND_CONFIG(msm5205_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("msm1", MSM5205, 384000)
+	MCFG_SOUND_CONFIG(msm5205_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD("msm2", MSM5205, 384000)
-	MDRV_SOUND_CONFIG(msm5205_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("msm2", MSM5205, 384000)
+	MCFG_SOUND_CONFIG(msm5205_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 

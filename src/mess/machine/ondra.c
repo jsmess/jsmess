@@ -14,7 +14,7 @@
 #include "devices/messram.h"
 
 
-static running_device *cassette_device_image(running_machine *machine)
+static device_t *cassette_device_image(running_machine *machine)
 {
 	return machine->device("cassette");
 }
@@ -40,7 +40,7 @@ static READ8_HANDLER( ondra_keyboard_r )
 static void ondra_update_banks(running_machine *machine)
 {
 	ondra_state *state = machine->driver_data<ondra_state>();
-	UINT8 *mem = memory_region(machine, "maincpu");
+	UINT8 *mem = machine->region("maincpu")->base();
 	if (state->bank1_status==0) {
 		memory_unmap_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000, 0x3fff, 0, 0);
 		memory_set_bankptr(machine, "bank1", mem + 0x010000);

@@ -110,17 +110,17 @@ static DRIVER_INIT( ti99_2_32 )
 	state->ROM_paged = 1;
 }
 
-#define TI99_2_32_ROMPAGE0 (memory_region(space->machine, "maincpu")+0x4000)
-#define TI99_2_32_ROMPAGE1 (memory_region(space->machine, "maincpu")+0x10000)
+#define TI99_2_32_ROMPAGE0 (space->machine->region("maincpu")->base()+0x4000)
+#define TI99_2_32_ROMPAGE1 (space->machine->region("maincpu")->base()+0x10000)
 
 static MACHINE_RESET( ti99_2 )
 {
 	ti99_2_state *state = machine->driver_data<ti99_2_state>();
 	state->irq_state = ASSERT_LINE;
 	if (! state->ROM_paged)
-		memory_set_bankptr(machine, "bank1", memory_region(machine, "maincpu")+0x4000);
+		memory_set_bankptr(machine, "bank1", machine->region("maincpu")->base()+0x4000);
 	else
-		memory_set_bankptr(machine, "bank1", (memory_region(machine, "maincpu")+0x4000));
+		memory_set_bankptr(machine, "bank1", (machine->region("maincpu")->base()+0x4000));
 }
 
 static INTERRUPT_GEN( ti99_2_vblank_interrupt )
@@ -372,27 +372,27 @@ static const struct tms9995reset_param ti99_2_processor_config =
 
 static MACHINE_CONFIG_START( ti99_2, ti99_2_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", TMS9995, 10700000)
-	MDRV_CPU_CONFIG(ti99_2_processor_config)
-	MDRV_CPU_PROGRAM_MAP(ti99_2_memmap)
-	MDRV_CPU_IO_MAP(ti99_2_io)
-	MDRV_CPU_VBLANK_INT("screen", ti99_2_vblank_interrupt)
+	MCFG_CPU_ADD("maincpu", TMS9995, 10700000)
+	MCFG_CPU_CONFIG(ti99_2_processor_config)
+	MCFG_CPU_PROGRAM_MAP(ti99_2_memmap)
+	MCFG_CPU_IO_MAP(ti99_2_io)
+	MCFG_CPU_VBLANK_INT("screen", ti99_2_vblank_interrupt)
 
-	MDRV_MACHINE_RESET( ti99_2 )
+	MCFG_MACHINE_RESET( ti99_2 )
 
 	/* video hardware */
-	/*MDRV_TMS9928A( &tms9918_interface )*/
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(256, 192)
-	MDRV_SCREEN_VISIBLE_AREA(0, 256-1, 0, 192-1)
-	MDRV_GFXDECODE(ti99_2)
-	MDRV_PALETTE_LENGTH(2)
-	MDRV_PALETTE_INIT(ti99_2)
+	/*MCFG_TMS9928A( &tms9918_interface )*/
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(256, 192)
+	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 192-1)
+	MCFG_GFXDECODE(ti99_2)
+	MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_INIT(ti99_2)
 
-	MDRV_VIDEO_UPDATE(ti99_2)
+	MCFG_VIDEO_UPDATE(ti99_2)
 MACHINE_CONFIG_END
 
 

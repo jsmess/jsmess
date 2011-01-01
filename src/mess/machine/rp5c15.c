@@ -115,14 +115,14 @@ struct _rp5c15_t
 
 static emu_timer* rtc_timer;
 
-static void rtc_add_second(running_device*);
-static void rtc_add_minute(running_device*);
-static void rtc_add_day(running_device*);
-static void rtc_add_month(running_device*);
+static void rtc_add_second(device_t*);
+static void rtc_add_minute(device_t*);
+static void rtc_add_day(device_t*);
+static void rtc_add_month(device_t*);
 
 static TIMER_CALLBACK(rtc_alarm_pulse)
 {
-	running_device* device = (running_device*)ptr;
+	device_t* device = (device_t*)ptr;
 	rp5c15_t* rtc = (rp5c15_t*)downcast<legacy_device_base *>(device)->token();
 
 	if(rtc->pulse16_state == 0)  // low
@@ -190,7 +190,7 @@ static DEVICE_START( rp5c15 )
 	timer_adjust_periodic(rtc_timer, attotime_zero, 0, ATTOTIME_IN_HZ(32));
 }
 
-static int rp5c15_read(running_device* device, int offset, UINT16 mem_mask)
+static int rp5c15_read(device_t* device, int offset, UINT16 mem_mask)
 {
 	rp5c15_t* rtc = (rp5c15_t*)downcast<legacy_device_base *>(device)->token();
 	if((rtc->mode & 0x01) == 0x00)  // BANK 0 selected
@@ -262,7 +262,7 @@ static int rp5c15_read(running_device* device, int offset, UINT16 mem_mask)
 	return 0;
 }
 
-static void rp5c15_write(running_device* device, int offset, int data, UINT16 mem_mask)
+static void rp5c15_write(device_t* device, int offset, int data, UINT16 mem_mask)
 {
 	rp5c15_t* rtc = (rp5c15_t*)downcast<legacy_device_base *>(device)->token();
 	if(offset == 13)
@@ -357,7 +357,7 @@ static void rp5c15_write(running_device* device, int offset, int data, UINT16 me
 	}
 }
 
-static void rtc_add_second(running_device* device)  // add one second to current time
+static void rtc_add_second(device_t* device)  // add one second to current time
 {
 	rp5c15_t* rtc = (rp5c15_t*)downcast<legacy_device_base *>(device)->token();
 
@@ -374,7 +374,7 @@ static void rtc_add_second(running_device* device)  // add one second to current
 	rtc_add_minute(device);
 }
 
-static void rtc_add_minute(running_device* device)
+static void rtc_add_minute(device_t* device)
 {
 	rp5c15_t* rtc = (rp5c15_t*)downcast<legacy_device_base *>(device)->token();
 
@@ -399,7 +399,7 @@ static void rtc_add_minute(running_device* device)
 	rtc_add_day(device);
 }
 
-static void rtc_add_day(running_device* device)
+static void rtc_add_day(device_t* device)
 {
 	rp5c15_t* rtc = (rp5c15_t*)downcast<legacy_device_base *>(device)->token();
 	int d,m;
@@ -467,7 +467,7 @@ static void rtc_add_day(running_device* device)
 	}
 }
 
-static void rtc_add_month(running_device* device)
+static void rtc_add_month(device_t* device)
 {
 	rp5c15_t* rtc = (rp5c15_t*)downcast<legacy_device_base *>(device)->token();
 

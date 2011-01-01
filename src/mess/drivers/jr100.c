@@ -172,7 +172,7 @@ static VIDEO_UPDATE( jr100 )
 	jr100_state *state = screen->machine->driver_data<jr100_state>();
 	int x,y,xi,yi;
 
-	UINT8 *rom_pcg = memory_region(screen->machine, "maincpu") + 0xe000;
+	UINT8 *rom_pcg = screen->machine->region("maincpu")->base() + 0xe000;
 	for (y = 0; y < 24; y++)
 	{
 		for (x = 0; x < 32; x++)
@@ -275,7 +275,7 @@ static const cassette_config jr100_cassette_config =
 static TIMER_DEVICE_CALLBACK( sound_tick )
 {
 	jr100_state *state = timer.machine->driver_data<jr100_state>();
-	running_device *speaker = timer.machine->device("speaker");
+	device_t *speaker = timer.machine->device("speaker");
 	speaker_level_w(speaker,state->speaker);
 	state->speaker = 0;
 
@@ -348,44 +348,44 @@ static QUICKLOAD_LOAD(jr100)
 
 static MACHINE_CONFIG_START( jr100, jr100_state )
     /* basic machine hardware */
-    MDRV_CPU_ADD("maincpu",M6802, XTAL_14_31818MHz / 4) // clock devided internaly by 4
-    MDRV_CPU_PROGRAM_MAP(jr100_mem)
+    MCFG_CPU_ADD("maincpu",M6802, XTAL_14_31818MHz / 4) // clock devided internaly by 4
+    MCFG_CPU_PROGRAM_MAP(jr100_mem)
 
-    MDRV_MACHINE_START(jr100)
-    MDRV_MACHINE_RESET(jr100)
+    MCFG_MACHINE_START(jr100)
+    MCFG_MACHINE_RESET(jr100)
 
     /* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(256, 192) /* border size not accurate */
-	MDRV_SCREEN_VISIBLE_AREA(0, 256 - 1, 0, 192 - 1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(256, 192) /* border size not accurate */
+	MCFG_SCREEN_VISIBLE_AREA(0, 256 - 1, 0, 192 - 1)
 
-	MDRV_GFXDECODE(jr100)
-    MDRV_PALETTE_LENGTH(2)
-    MDRV_PALETTE_INIT(black_and_white)
+	MCFG_GFXDECODE(jr100)
+    MCFG_PALETTE_LENGTH(2)
+    MCFG_PALETTE_INIT(black_and_white)
 
-    MDRV_VIDEO_START(jr100)
-    MDRV_VIDEO_UPDATE(jr100)
+    MCFG_VIDEO_START(jr100)
+    MCFG_VIDEO_UPDATE(jr100)
 
-	MDRV_VIA6522_ADD("via", XTAL_14_31818MHz / 16, jr100_via_intf)
+	MCFG_VIA6522_ADD("via", XTAL_14_31818MHz / 16, jr100_via_intf)
 
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_WAVE_ADD("wave", "cassette")
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	MDRV_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_WAVE_ADD("wave", "cassette")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MDRV_SOUND_ADD("beeper", BEEP, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
+	MCFG_SOUND_ADD("beeper", BEEP, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
 
-	MDRV_CASSETTE_ADD( "cassette", jr100_cassette_config )
+	MCFG_CASSETTE_ADD( "cassette", jr100_cassette_config )
 
-	MDRV_TIMER_ADD_PERIODIC("sound_tick", sound_tick, HZ(XTAL_14_31818MHz / 16))
+	MCFG_TIMER_ADD_PERIODIC("sound_tick", sound_tick, HZ(XTAL_14_31818MHz / 16))
 
 	/* quickload */
-	MDRV_QUICKLOAD_ADD("quickload", jr100, "prg", 2)
+	MCFG_QUICKLOAD_ADD("quickload", jr100, "prg", 2)
 MACHINE_CONFIG_END
 
 

@@ -727,11 +727,11 @@ static const ay8910_interface ay8912_interface =
 
 
 static MACHINE_CONFIG_FRAGMENT( coco_sound )
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("dac", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MDRV_SOUND_WAVE_ADD("wave", "cassette")
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_WAVE_ADD("wave", "cassette")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 static const cassette_config coco_cassette_config =
@@ -756,475 +756,475 @@ static const floppy_config coco_floppy_config =
 
 static MACHINE_CONFIG_START( dragon32, coco_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6809E, COCO_CPU_SPEED_HZ * 4)        /* 0,894886 MHz */
-	MDRV_CPU_PROGRAM_MAP(dragon_map)
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(M6847_PAL_FRAMES_PER_SECOND)
+	MCFG_CPU_ADD("maincpu", M6809E, COCO_CPU_SPEED_HZ * 4)        /* 0,894886 MHz */
+	MCFG_CPU_PROGRAM_MAP(dragon_map)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(M6847_PAL_FRAMES_PER_SECOND)
 
-	MDRV_MACHINE_START( dragon32 )
+	MCFG_MACHINE_START( dragon32 )
 
 	/* video hardware */
-	MDRV_VIDEO_START(dragon)
-	MDRV_VIDEO_UPDATE(m6847)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_SIZE(320, 25+192+26)
-	MDRV_SCREEN_VISIBLE_AREA(0, 319, 1, 239)
+	MCFG_VIDEO_START(dragon)
+	MCFG_VIDEO_UPDATE(m6847)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_SIZE(320, 25+192+26)
+	MCFG_SCREEN_VISIBLE_AREA(0, 319, 1, 239)
 
 	/* sound hardware */
-	MDRV_FRAGMENT_ADD( coco_sound )
+	MCFG_FRAGMENT_ADD( coco_sound )
 
 	/* printer */
-	MDRV_PRINTER_ADD("printer")
+	MCFG_PRINTER_ADD("printer")
 
 	/* snapshot/quickload */
-	MDRV_SNAPSHOT_ADD("snapshot", coco_pak, "pak", 0)
+	MCFG_SNAPSHOT_ADD("snapshot", coco_pak, "pak", 0)
 
-	MDRV_CASSETTE_ADD( "cassette", coco_cassette_config )
+	MCFG_CASSETTE_ADD( "cassette", coco_cassette_config )
 
-	MDRV_PIA6821_ADD( "pia_0", dragon32_pia_intf_0 )
-	MDRV_PIA6821_ADD( "pia_1", dragon32_pia_intf_1 )
+	MCFG_PIA6821_ADD( "pia_0", dragon32_pia_intf_0 )
+	MCFG_PIA6821_ADD( "pia_1", dragon32_pia_intf_1 )
 
-	MDRV_SAM6883_ADD("sam", coco_sam_intf)
+	MCFG_SAM6883_ADD("sam", coco_sam_intf)
 
-	MDRV_DRAGON_CARTRIDGE_ADD("coco_cartslot")
-	MDRV_DRAGON_CARTRIDGE_CART_CALLBACK(coco_cart_w)
-	MDRV_DRAGON_CARTRIDGE_HALT_CALLBACK(coco_halt_w)
-	MDRV_DRAGON_CARTRIDGE_NMI_CALLBACK(coco_nmi_w)
+	MCFG_DRAGON_CARTRIDGE_ADD("coco_cartslot")
+	MCFG_DRAGON_CARTRIDGE_CART_CALLBACK(coco_cart_w)
+	MCFG_DRAGON_CARTRIDGE_HALT_CALLBACK(coco_halt_w)
+	MCFG_DRAGON_CARTRIDGE_NMI_CALLBACK(coco_nmi_w)
 
 	/* internal ram */
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("32K")
-	MDRV_RAM_EXTRA_OPTIONS("64K")
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("32K")
+	MCFG_RAM_EXTRA_OPTIONS("64K")
 
-	MDRV_FLOPPY_4_DRIVES_ADD(coco_floppy_config)
+	MCFG_FLOPPY_4_DRIVES_ADD(coco_floppy_config)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( dragon64, coco_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6809E, COCO_CPU_SPEED_HZ * 4)        /* 0,894886 MHz */
-	MDRV_CPU_PROGRAM_MAP(d64_map)
+	MCFG_CPU_ADD("maincpu", M6809E, COCO_CPU_SPEED_HZ * 4)        /* 0,894886 MHz */
+	MCFG_CPU_PROGRAM_MAP(d64_map)
 
-	MDRV_MACHINE_START( dragon64 )
+	MCFG_MACHINE_START( dragon64 )
 
 	/* video hardware */
-	MDRV_VIDEO_START(dragon)
-	MDRV_VIDEO_UPDATE(m6847)
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(M6847_PAL_FRAMES_PER_SECOND)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_SIZE(320, 25+192+26)
-	MDRV_SCREEN_VISIBLE_AREA(0, 319, 1, 239)
+	MCFG_VIDEO_START(dragon)
+	MCFG_VIDEO_UPDATE(m6847)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(M6847_PAL_FRAMES_PER_SECOND)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_SIZE(320, 25+192+26)
+	MCFG_SCREEN_VISIBLE_AREA(0, 319, 1, 239)
 
 	/* sound hardware */
-	MDRV_FRAGMENT_ADD( coco_sound )
+	MCFG_FRAGMENT_ADD( coco_sound )
 
 	/* printer */
-	MDRV_PRINTER_ADD("printer")
+	MCFG_PRINTER_ADD("printer")
 
 	/* snapshot/quickload */
-	MDRV_SNAPSHOT_ADD("snapshot", coco_pak, "pak", 0)
+	MCFG_SNAPSHOT_ADD("snapshot", coco_pak, "pak", 0)
 
 	/* cassette */
-	MDRV_CASSETTE_ADD( "cassette", coco_cassette_config )
+	MCFG_CASSETTE_ADD( "cassette", coco_cassette_config )
 
 	/* acia */
-	MDRV_ACIA6551_ADD("acia")
+	MCFG_ACIA6551_ADD("acia")
 
-	MDRV_PIA6821_ADD( "pia_0", dragon64_pia_intf_0 )
-	MDRV_PIA6821_ADD( "pia_1", dragon64_pia_intf_1 )
+	MCFG_PIA6821_ADD( "pia_0", dragon64_pia_intf_0 )
+	MCFG_PIA6821_ADD( "pia_1", dragon64_pia_intf_1 )
 
-	MDRV_SAM6883_ADD("sam", coco_sam_intf)
+	MCFG_SAM6883_ADD("sam", coco_sam_intf)
 
-	MDRV_DRAGON_CARTRIDGE_ADD("coco_cartslot")
-	MDRV_DRAGON_CARTRIDGE_CART_CALLBACK(coco_cart_w)
-	MDRV_DRAGON_CARTRIDGE_HALT_CALLBACK(coco_halt_w)
-	MDRV_DRAGON_CARTRIDGE_NMI_CALLBACK(coco_nmi_w)
+	MCFG_DRAGON_CARTRIDGE_ADD("coco_cartslot")
+	MCFG_DRAGON_CARTRIDGE_CART_CALLBACK(coco_cart_w)
+	MCFG_DRAGON_CARTRIDGE_HALT_CALLBACK(coco_halt_w)
+	MCFG_DRAGON_CARTRIDGE_NMI_CALLBACK(coco_nmi_w)
 
 	/* internal ram */
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("64K")
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("64K")
 
-	MDRV_FLOPPY_4_DRIVES_ADD(coco_floppy_config)
+	MCFG_FLOPPY_4_DRIVES_ADD(coco_floppy_config)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( d64plus, coco_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6809E, COCO_CPU_SPEED_HZ * 4)        /* 0,894886 MHz */
-	MDRV_CPU_PROGRAM_MAP(d64_plus_map)
+	MCFG_CPU_ADD("maincpu", M6809E, COCO_CPU_SPEED_HZ * 4)        /* 0,894886 MHz */
+	MCFG_CPU_PROGRAM_MAP(d64_plus_map)
 
-	MDRV_MACHINE_START( dragon64 )
+	MCFG_MACHINE_START( dragon64 )
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(M6847_PAL_FRAMES_PER_SECOND)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_SIZE(320, 25+192+26)
-	MDRV_SCREEN_VISIBLE_AREA(0, 319, 1, 239)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(M6847_PAL_FRAMES_PER_SECOND)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_SIZE(320, 25+192+26)
+	MCFG_SCREEN_VISIBLE_AREA(0, 319, 1, 239)
 
-	MDRV_VIDEO_START(dragon)
-	MDRV_VIDEO_UPDATE(m6847)
+	MCFG_VIDEO_START(dragon)
+	MCFG_VIDEO_UPDATE(m6847)
 
 	/* sound hardware */
-	MDRV_FRAGMENT_ADD( coco_sound )
+	MCFG_FRAGMENT_ADD( coco_sound )
 
 	/* printer */
-	MDRV_PRINTER_ADD("printer")
+	MCFG_PRINTER_ADD("printer")
 
 	/* snapshot/quickload */
-	MDRV_SNAPSHOT_ADD("snapshot", coco_pak, "pak", 0)
+	MCFG_SNAPSHOT_ADD("snapshot", coco_pak, "pak", 0)
 
 	/* cassette */
-	MDRV_CASSETTE_ADD( "cassette", coco_cassette_config )
+	MCFG_CASSETTE_ADD( "cassette", coco_cassette_config )
 
 	/* acia */
-	MDRV_ACIA6551_ADD("acia")
+	MCFG_ACIA6551_ADD("acia")
 
-	MDRV_PIA6821_ADD( "pia_0", dragon64_pia_intf_0 )
-	MDRV_PIA6821_ADD( "pia_1", dragon64_pia_intf_1 )
+	MCFG_PIA6821_ADD( "pia_0", dragon64_pia_intf_0 )
+	MCFG_PIA6821_ADD( "pia_1", dragon64_pia_intf_1 )
 
-	MDRV_SAM6883_ADD("sam", coco_sam_intf)
+	MCFG_SAM6883_ADD("sam", coco_sam_intf)
 
-	MDRV_DRAGON_CARTRIDGE_ADD("coco_cartslot")
-	MDRV_DRAGON_CARTRIDGE_CART_CALLBACK(coco_cart_w)
-	MDRV_DRAGON_CARTRIDGE_HALT_CALLBACK(coco_halt_w)
-	MDRV_DRAGON_CARTRIDGE_NMI_CALLBACK(coco_nmi_w)
+	MCFG_DRAGON_CARTRIDGE_ADD("coco_cartslot")
+	MCFG_DRAGON_CARTRIDGE_CART_CALLBACK(coco_cart_w)
+	MCFG_DRAGON_CARTRIDGE_HALT_CALLBACK(coco_halt_w)
+	MCFG_DRAGON_CARTRIDGE_NMI_CALLBACK(coco_nmi_w)
 
 	/* internal ram */
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("128K")
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("128K")
 
-	MDRV_FLOPPY_4_DRIVES_ADD(coco_floppy_config)
+	MCFG_FLOPPY_4_DRIVES_ADD(coco_floppy_config)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( dgnalpha, coco_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6809E, COCO_CPU_SPEED_HZ * 4)        /* 0,894886 MHz */
-	MDRV_CPU_PROGRAM_MAP(dgnalpha_map)
+	MCFG_CPU_ADD("maincpu", M6809E, COCO_CPU_SPEED_HZ * 4)        /* 0,894886 MHz */
+	MCFG_CPU_PROGRAM_MAP(dgnalpha_map)
 
-	MDRV_MACHINE_START( dgnalpha )
-    MDRV_MACHINE_RESET( dgnalpha )
+	MCFG_MACHINE_START( dgnalpha )
+    MCFG_MACHINE_RESET( dgnalpha )
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(M6847_PAL_FRAMES_PER_SECOND)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_SIZE(320, 25+192+26)
-	MDRV_SCREEN_VISIBLE_AREA(0, 319, 1, 239)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(M6847_PAL_FRAMES_PER_SECOND)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_SIZE(320, 25+192+26)
+	MCFG_SCREEN_VISIBLE_AREA(0, 319, 1, 239)
 
-	MDRV_VIDEO_START(dragon)
-	MDRV_VIDEO_UPDATE(m6847)
+	MCFG_VIDEO_START(dragon)
+	MCFG_VIDEO_UPDATE(m6847)
 
 	/* sound hardware */
-	MDRV_FRAGMENT_ADD( coco_sound )
-	MDRV_SOUND_ADD("ay8912", AY8912, 1000000)
-	MDRV_SOUND_CONFIG(ay8912_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+	MCFG_FRAGMENT_ADD( coco_sound )
+	MCFG_SOUND_ADD("ay8912", AY8912, 1000000)
+	MCFG_SOUND_CONFIG(ay8912_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
 	/* onboard fdc */
-	MDRV_WD179X_ADD("wd2797", dgnalpha_wd17xx_interface)
+	MCFG_WD179X_ADD("wd2797", dgnalpha_wd17xx_interface)
 
 	/* printer */
-	MDRV_PRINTER_ADD("printer")
+	MCFG_PRINTER_ADD("printer")
 
 	/* snapshot/quickload */
-	MDRV_SNAPSHOT_ADD("snapshot", coco_pak, "pak", 0)
+	MCFG_SNAPSHOT_ADD("snapshot", coco_pak, "pak", 0)
 
 	/* cassette */
-	MDRV_CASSETTE_ADD( "cassette", coco_cassette_config )
+	MCFG_CASSETTE_ADD( "cassette", coco_cassette_config )
 
 	/* acia */
-	MDRV_ACIA6551_ADD("acia")
+	MCFG_ACIA6551_ADD("acia")
 
-	MDRV_PIA6821_ADD( "pia_0", dgnalpha_pia_intf_0 )
-	MDRV_PIA6821_ADD( "pia_1", dgnalpha_pia_intf_1 )
-	MDRV_PIA6821_ADD( "pia_2", dgnalpha_pia_intf_2 )
+	MCFG_PIA6821_ADD( "pia_0", dgnalpha_pia_intf_0 )
+	MCFG_PIA6821_ADD( "pia_1", dgnalpha_pia_intf_1 )
+	MCFG_PIA6821_ADD( "pia_2", dgnalpha_pia_intf_2 )
 
-	MDRV_SAM6883_ADD("sam", coco_sam_intf)
+	MCFG_SAM6883_ADD("sam", coco_sam_intf)
 
-	MDRV_DRAGON_CARTRIDGE_ADD("coco_cartslot")
-	MDRV_DRAGON_CARTRIDGE_CART_CALLBACK(coco_cart_w)
-	MDRV_DRAGON_CARTRIDGE_HALT_CALLBACK(coco_halt_w)
-	MDRV_DRAGON_CARTRIDGE_NMI_CALLBACK(coco_nmi_w)
+	MCFG_DRAGON_CARTRIDGE_ADD("coco_cartslot")
+	MCFG_DRAGON_CARTRIDGE_CART_CALLBACK(coco_cart_w)
+	MCFG_DRAGON_CARTRIDGE_HALT_CALLBACK(coco_halt_w)
+	MCFG_DRAGON_CARTRIDGE_NMI_CALLBACK(coco_nmi_w)
 
-	MDRV_FLOPPY_4_DRIVES_ADD(coco_floppy_config)
+	MCFG_FLOPPY_4_DRIVES_ADD(coco_floppy_config)
 
 	/* internal ram */
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("64K")
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("64K")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( tanodr64, coco_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6809E, COCO_CPU_SPEED_HZ * 4)        /* 0,894886 MHz */
-	MDRV_CPU_PROGRAM_MAP(d64_map)
+	MCFG_CPU_ADD("maincpu", M6809E, COCO_CPU_SPEED_HZ * 4)        /* 0,894886 MHz */
+	MCFG_CPU_PROGRAM_MAP(d64_map)
 
-	MDRV_MACHINE_START( tanodr64 )
+	MCFG_MACHINE_START( tanodr64 )
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(COCO_FRAMES_PER_SECOND)			/* Tano Dragon 64 is NTSC */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_SIZE(320, 25+192+26)
-	MDRV_SCREEN_VISIBLE_AREA(0, 319, 1, 239)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(COCO_FRAMES_PER_SECOND)			/* Tano Dragon 64 is NTSC */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_SIZE(320, 25+192+26)
+	MCFG_SCREEN_VISIBLE_AREA(0, 319, 1, 239)
 
-	MDRV_VIDEO_START(dragon)
-	MDRV_VIDEO_UPDATE(m6847)
+	MCFG_VIDEO_START(dragon)
+	MCFG_VIDEO_UPDATE(m6847)
 
 	/* sound hardware */
-	MDRV_FRAGMENT_ADD( coco_sound )
+	MCFG_FRAGMENT_ADD( coco_sound )
 
 	/* printer */
-	MDRV_PRINTER_ADD("printer")
+	MCFG_PRINTER_ADD("printer")
 
 	/* snapshot/quickload */
-	MDRV_SNAPSHOT_ADD("snapshot", coco_pak, "pak", 0)
+	MCFG_SNAPSHOT_ADD("snapshot", coco_pak, "pak", 0)
 
 	/* cassette */
-	MDRV_CASSETTE_ADD( "cassette", coco_cassette_config )
+	MCFG_CASSETTE_ADD( "cassette", coco_cassette_config )
 
 	/* acia */
-	MDRV_ACIA6551_ADD("acia")
+	MCFG_ACIA6551_ADD("acia")
 
-	MDRV_PIA6821_ADD( "pia_0", dragon64_pia_intf_0 )
-	MDRV_PIA6821_ADD( "pia_1", dragon64_pia_intf_1 )
+	MCFG_PIA6821_ADD( "pia_0", dragon64_pia_intf_0 )
+	MCFG_PIA6821_ADD( "pia_1", dragon64_pia_intf_1 )
 
-	MDRV_SAM6883_ADD("sam", coco_sam_intf)
+	MCFG_SAM6883_ADD("sam", coco_sam_intf)
 
-	MDRV_DRAGON_CARTRIDGE_ADD("coco_cartslot")
-	MDRV_DRAGON_CARTRIDGE_CART_CALLBACK(coco_cart_w)
-	MDRV_DRAGON_CARTRIDGE_HALT_CALLBACK(coco_halt_w)
-	MDRV_DRAGON_CARTRIDGE_NMI_CALLBACK(coco_nmi_w)
+	MCFG_DRAGON_CARTRIDGE_ADD("coco_cartslot")
+	MCFG_DRAGON_CARTRIDGE_CART_CALLBACK(coco_cart_w)
+	MCFG_DRAGON_CARTRIDGE_HALT_CALLBACK(coco_halt_w)
+	MCFG_DRAGON_CARTRIDGE_NMI_CALLBACK(coco_nmi_w)
 
 	/* internal ram */
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("64K")
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("64K")
 
-	MDRV_FLOPPY_4_DRIVES_ADD(coco_floppy_config)
+	MCFG_FLOPPY_4_DRIVES_ADD(coco_floppy_config)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( coco, coco_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6809E, COCO_CPU_SPEED_HZ * 4)        /* 0,894886 MHz */
-	MDRV_CPU_PROGRAM_MAP(coco_map)
+	MCFG_CPU_ADD("maincpu", M6809E, COCO_CPU_SPEED_HZ * 4)        /* 0,894886 MHz */
+	MCFG_CPU_PROGRAM_MAP(coco_map)
 
-	MDRV_MACHINE_START( coco )
+	MCFG_MACHINE_START( coco )
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(M6847_NTSC_FRAMES_PER_SECOND)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_SIZE(320, 25+192+26)
-	MDRV_SCREEN_VISIBLE_AREA(0, 319, 1, 239)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(M6847_NTSC_FRAMES_PER_SECOND)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_SIZE(320, 25+192+26)
+	MCFG_SCREEN_VISIBLE_AREA(0, 319, 1, 239)
 
-	MDRV_VIDEO_START(coco)
-	MDRV_VIDEO_UPDATE(m6847)
+	MCFG_VIDEO_START(coco)
+	MCFG_VIDEO_UPDATE(m6847)
 
 	/* sound hardware */
-	MDRV_FRAGMENT_ADD( coco_sound )
+	MCFG_FRAGMENT_ADD( coco_sound )
 
 	/* bitbanger/printer */
-	MDRV_BITBANGER_ADD("bitbanger", coco_bitbanger_config)
+	MCFG_BITBANGER_ADD("bitbanger", coco_bitbanger_config)
 
 	/* snapshot/quickload */
-	MDRV_SNAPSHOT_ADD("snapshot", coco_pak, "pak", 0)
-	MDRV_QUICKLOAD_ADD("quickload", coco, "bin", 0.5)
+	MCFG_SNAPSHOT_ADD("snapshot", coco_pak, "pak", 0)
+	MCFG_QUICKLOAD_ADD("quickload", coco, "bin", 0.5)
 
 	/* cassette */
-	MDRV_CASSETTE_ADD( "cassette", coco_cassette_config )
+	MCFG_CASSETTE_ADD( "cassette", coco_cassette_config )
 
-	MDRV_PIA6821_ADD( "pia_0", coco_pia_intf_0 )
-	MDRV_PIA6821_ADD( "pia_1", coco_pia_intf_1 )
+	MCFG_PIA6821_ADD( "pia_0", coco_pia_intf_0 )
+	MCFG_PIA6821_ADD( "pia_1", coco_pia_intf_1 )
 
-	MDRV_SAM6883_ADD("sam", coco_sam_intf)
+	MCFG_SAM6883_ADD("sam", coco_sam_intf)
 
-	MDRV_COCO_CARTRIDGE_ADD("coco_cartslot")
-	MDRV_COCO_CARTRIDGE_CART_CALLBACK(coco_cart_w)
-	MDRV_COCO_CARTRIDGE_HALT_CALLBACK(coco_halt_w)
-	MDRV_COCO_CARTRIDGE_NMI_CALLBACK(coco_nmi_w)
+	MCFG_COCO_CARTRIDGE_ADD("coco_cartslot")
+	MCFG_COCO_CARTRIDGE_CART_CALLBACK(coco_cart_w)
+	MCFG_COCO_CARTRIDGE_HALT_CALLBACK(coco_halt_w)
+	MCFG_COCO_CARTRIDGE_NMI_CALLBACK(coco_nmi_w)
 
 	/* internal ram */
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("16K")
-	MDRV_RAM_EXTRA_OPTIONS("4K,32K,64K")
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("16K")
+	MCFG_RAM_EXTRA_OPTIONS("4K,32K,64K")
 
-	MDRV_FLOPPY_4_DRIVES_ADD(coco_floppy_config)
+	MCFG_FLOPPY_4_DRIVES_ADD(coco_floppy_config)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( coco2, coco_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6809E, COCO_CPU_SPEED_HZ * 4)        /* 0,894886 MHz */
-	MDRV_CPU_PROGRAM_MAP(coco_map)
+	MCFG_CPU_ADD("maincpu", M6809E, COCO_CPU_SPEED_HZ * 4)        /* 0,894886 MHz */
+	MCFG_CPU_PROGRAM_MAP(coco_map)
 
-	MDRV_MACHINE_START( coco2 )
+	MCFG_MACHINE_START( coco2 )
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(M6847_NTSC_FRAMES_PER_SECOND)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_SIZE(320, 25+192+26)
-	MDRV_SCREEN_VISIBLE_AREA(0, 319, 1, 239)
-	MDRV_VIDEO_START(coco)
-	MDRV_VIDEO_UPDATE(m6847)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(M6847_NTSC_FRAMES_PER_SECOND)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_SIZE(320, 25+192+26)
+	MCFG_SCREEN_VISIBLE_AREA(0, 319, 1, 239)
+	MCFG_VIDEO_START(coco)
+	MCFG_VIDEO_UPDATE(m6847)
 
 	/* sound hardware */
-	MDRV_FRAGMENT_ADD( coco_sound )
+	MCFG_FRAGMENT_ADD( coco_sound )
 
 	/* bitbanger/printer */
-	MDRV_BITBANGER_ADD("bitbanger", coco_bitbanger_config)
+	MCFG_BITBANGER_ADD("bitbanger", coco_bitbanger_config)
 
 	/* snapshot/quickload */
-	MDRV_SNAPSHOT_ADD("snapshot", coco_pak, "pak", 0)
-	MDRV_QUICKLOAD_ADD("quickload", coco, "bin", 0.5)
+	MCFG_SNAPSHOT_ADD("snapshot", coco_pak, "pak", 0)
+	MCFG_QUICKLOAD_ADD("quickload", coco, "bin", 0.5)
 
 	/* cassette */
-	MDRV_CASSETTE_ADD( "cassette", coco_cassette_config )
+	MCFG_CASSETTE_ADD( "cassette", coco_cassette_config )
 
-	MDRV_PIA6821_ADD( "pia_0", coco2_pia_intf_0 )
-	MDRV_PIA6821_ADD( "pia_1", coco2_pia_intf_1 )
+	MCFG_PIA6821_ADD( "pia_0", coco2_pia_intf_0 )
+	MCFG_PIA6821_ADD( "pia_1", coco2_pia_intf_1 )
 
-	MDRV_SAM6883_ADD("sam", coco_sam_intf)
+	MCFG_SAM6883_ADD("sam", coco_sam_intf)
 
-	MDRV_COCO_CARTRIDGE_ADD("coco_cartslot")
-	MDRV_COCO_CARTRIDGE_CART_CALLBACK(coco_cart_w)
-	MDRV_COCO_CARTRIDGE_HALT_CALLBACK(coco_halt_w)
-	MDRV_COCO_CARTRIDGE_NMI_CALLBACK(coco_nmi_w)
+	MCFG_COCO_CARTRIDGE_ADD("coco_cartslot")
+	MCFG_COCO_CARTRIDGE_CART_CALLBACK(coco_cart_w)
+	MCFG_COCO_CARTRIDGE_HALT_CALLBACK(coco_halt_w)
+	MCFG_COCO_CARTRIDGE_NMI_CALLBACK(coco_nmi_w)
 
 	/* internal ram */
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("64K")
-	MDRV_RAM_EXTRA_OPTIONS("16K")
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("64K")
+	MCFG_RAM_EXTRA_OPTIONS("16K")
 
-	MDRV_FLOPPY_4_DRIVES_ADD(coco_floppy_config)
+	MCFG_FLOPPY_4_DRIVES_ADD(coco_floppy_config)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( coco2b, coco_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6809E, COCO_CPU_SPEED_HZ * 4)        /* 0,894886 MHz */
-	MDRV_CPU_PROGRAM_MAP(coco_map)
+	MCFG_CPU_ADD("maincpu", M6809E, COCO_CPU_SPEED_HZ * 4)        /* 0,894886 MHz */
+	MCFG_CPU_PROGRAM_MAP(coco_map)
 
-	MDRV_MACHINE_START( coco2 )
+	MCFG_MACHINE_START( coco2 )
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(M6847_NTSC_FRAMES_PER_SECOND)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_SIZE(320, 25+192+26)
-	MDRV_SCREEN_VISIBLE_AREA(0, 319, 1, 239)
-	MDRV_VIDEO_START(coco2b)
-	MDRV_VIDEO_UPDATE(m6847)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(M6847_NTSC_FRAMES_PER_SECOND)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_SIZE(320, 25+192+26)
+	MCFG_SCREEN_VISIBLE_AREA(0, 319, 1, 239)
+	MCFG_VIDEO_START(coco2b)
+	MCFG_VIDEO_UPDATE(m6847)
 
 	/* sound hardware */
-	MDRV_FRAGMENT_ADD( coco_sound )
+	MCFG_FRAGMENT_ADD( coco_sound )
 
 	/* bitbanger/printer */
-	MDRV_BITBANGER_ADD("bitbanger", coco_bitbanger_config)
+	MCFG_BITBANGER_ADD("bitbanger", coco_bitbanger_config)
 
 	/* snapshot/quickload */
-	MDRV_SNAPSHOT_ADD("snapshot", coco_pak, "pak", 0)
-	MDRV_QUICKLOAD_ADD("quickload", coco, "bin", 0.5)
+	MCFG_SNAPSHOT_ADD("snapshot", coco_pak, "pak", 0)
+	MCFG_QUICKLOAD_ADD("quickload", coco, "bin", 0.5)
 
 	/* cassette */
-	MDRV_CASSETTE_ADD( "cassette", coco_cassette_config )
+	MCFG_CASSETTE_ADD( "cassette", coco_cassette_config )
 
-	MDRV_PIA6821_ADD( "pia_0", coco2_pia_intf_0 )
-	MDRV_PIA6821_ADD( "pia_1", coco2_pia_intf_1 )
+	MCFG_PIA6821_ADD( "pia_0", coco2_pia_intf_0 )
+	MCFG_PIA6821_ADD( "pia_1", coco2_pia_intf_1 )
 
-	MDRV_SAM6883_ADD("sam", coco_sam_intf)
+	MCFG_SAM6883_ADD("sam", coco_sam_intf)
 
-	MDRV_COCO_CARTRIDGE_ADD("coco_cartslot")
-	MDRV_COCO_CARTRIDGE_CART_CALLBACK(coco_cart_w)
-	MDRV_COCO_CARTRIDGE_HALT_CALLBACK(coco_halt_w)
-	MDRV_COCO_CARTRIDGE_NMI_CALLBACK(coco_nmi_w)
+	MCFG_COCO_CARTRIDGE_ADD("coco_cartslot")
+	MCFG_COCO_CARTRIDGE_CART_CALLBACK(coco_cart_w)
+	MCFG_COCO_CARTRIDGE_HALT_CALLBACK(coco_halt_w)
+	MCFG_COCO_CARTRIDGE_NMI_CALLBACK(coco_nmi_w)
 
 	/* internal ram */
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("64K")
-	MDRV_RAM_EXTRA_OPTIONS("16K")
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("64K")
+	MCFG_RAM_EXTRA_OPTIONS("16K")
 
-	MDRV_FLOPPY_4_DRIVES_ADD(coco_floppy_config)
+	MCFG_FLOPPY_4_DRIVES_ADD(coco_floppy_config)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( coco3, coco3_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6809E, COCO_CPU_SPEED_HZ * 4)        /* 0,894886 MHz */
-	MDRV_CPU_PROGRAM_MAP(coco3_map)
+	MCFG_CPU_ADD("maincpu", M6809E, COCO_CPU_SPEED_HZ * 4)        /* 0,894886 MHz */
+	MCFG_CPU_PROGRAM_MAP(coco3_map)
 
-	MDRV_MACHINE_START( coco3 )
-	MDRV_MACHINE_RESET( coco3 )
+	MCFG_MACHINE_START( coco3 )
+	MCFG_MACHINE_RESET( coco3 )
 
 	/* video hardware */
-	MDRV_VIDEO_START(coco3)
-	MDRV_VIDEO_UPDATE(coco3)
-	MDRV_DEFAULT_LAYOUT(layout_coco3)
+	MCFG_VIDEO_START(coco3)
+	MCFG_VIDEO_UPDATE(coco3)
+	MCFG_DEFAULT_LAYOUT(layout_coco3)
 
-	MDRV_SCREEN_ADD("composite", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_REFRESH_RATE(M6847_NTSC_FRAMES_PER_SECOND)
-	MDRV_SCREEN_SIZE(640, 25+192+26)
-	MDRV_SCREEN_VISIBLE_AREA(0, 639, 0, 239)
+	MCFG_SCREEN_ADD("composite", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_REFRESH_RATE(M6847_NTSC_FRAMES_PER_SECOND)
+	MCFG_SCREEN_SIZE(640, 25+192+26)
+	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 239)
 
-	MDRV_SCREEN_ADD("rgb", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_REFRESH_RATE(M6847_NTSC_FRAMES_PER_SECOND)
-	MDRV_SCREEN_SIZE(640, 25+192+26)
-	MDRV_SCREEN_VISIBLE_AREA(0, 639, 0, 239)
+	MCFG_SCREEN_ADD("rgb", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_REFRESH_RATE(M6847_NTSC_FRAMES_PER_SECOND)
+	MCFG_SCREEN_SIZE(640, 25+192+26)
+	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 239)
 
-	MDRV_PIA6821_ADD( "pia_0", coco3_pia_intf_0 )
-	MDRV_PIA6821_ADD( "pia_1", coco3_pia_intf_1 )
+	MCFG_PIA6821_ADD( "pia_0", coco3_pia_intf_0 )
+	MCFG_PIA6821_ADD( "pia_1", coco3_pia_intf_1 )
 
 	/* sound hardware */
-	MDRV_FRAGMENT_ADD( coco_sound )
+	MCFG_FRAGMENT_ADD( coco_sound )
 
 	/* bitbanger/printer */
-	MDRV_BITBANGER_ADD("bitbanger", coco3_bitbanger_config)
+	MCFG_BITBANGER_ADD("bitbanger", coco3_bitbanger_config)
 
 	/* snapshot/quickload */
-	MDRV_SNAPSHOT_ADD("snapshot", coco3_pak, "pak", 0)
-	MDRV_QUICKLOAD_ADD("quickload", coco, "bin", 0.5)
+	MCFG_SNAPSHOT_ADD("snapshot", coco3_pak, "pak", 0)
+	MCFG_QUICKLOAD_ADD("quickload", coco, "bin", 0.5)
 
 	/* devices */
-	MDRV_COCO_VHD_ADD("vhd")
+	MCFG_COCO_VHD_ADD("vhd")
 
 	/* cassette */
-	MDRV_CASSETTE_ADD( "cassette", coco_cassette_config )
+	MCFG_CASSETTE_ADD( "cassette", coco_cassette_config )
 
-	MDRV_SAM6883_GIME_ADD("sam", coco3_sam_intf)
+	MCFG_SAM6883_GIME_ADD("sam", coco3_sam_intf)
 
-	MDRV_COCO_CARTRIDGE_ADD("coco_cartslot")
-	MDRV_COCO_CARTRIDGE_CART_CALLBACK(coco3_cart_w)
-	MDRV_COCO_CARTRIDGE_HALT_CALLBACK(coco_halt_w)
-	MDRV_COCO_CARTRIDGE_NMI_CALLBACK(coco_nmi_w)
+	MCFG_COCO_CARTRIDGE_ADD("coco_cartslot")
+	MCFG_COCO_CARTRIDGE_CART_CALLBACK(coco3_cart_w)
+	MCFG_COCO_CARTRIDGE_HALT_CALLBACK(coco_halt_w)
+	MCFG_COCO_CARTRIDGE_NMI_CALLBACK(coco_nmi_w)
 
 	/* internal ram */
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("512K")
-	MDRV_RAM_EXTRA_OPTIONS("128K,2M,8M")
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("512K")
+	MCFG_RAM_EXTRA_OPTIONS("128K,2M,8M")
 
-	MDRV_FLOPPY_4_DRIVES_ADD(coco_floppy_config)
+	MCFG_FLOPPY_4_DRIVES_ADD(coco_floppy_config)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( coco3p, coco3 )
 
 	/* video hardware */
-	MDRV_VIDEO_START(coco3p)
-	MDRV_VIDEO_UPDATE(coco3)
-	MDRV_SCREEN_MODIFY("composite")
-	MDRV_SCREEN_REFRESH_RATE(M6847_PAL_FRAMES_PER_SECOND)
-	MDRV_SCREEN_MODIFY("rgb")
-	MDRV_SCREEN_REFRESH_RATE(M6847_PAL_FRAMES_PER_SECOND)
+	MCFG_VIDEO_START(coco3p)
+	MCFG_VIDEO_UPDATE(coco3)
+	MCFG_SCREEN_MODIFY("composite")
+	MCFG_SCREEN_REFRESH_RATE(M6847_PAL_FRAMES_PER_SECOND)
+	MCFG_SCREEN_MODIFY("rgb")
+	MCFG_SCREEN_REFRESH_RATE(M6847_PAL_FRAMES_PER_SECOND)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( coco3h, coco3 )
-	MDRV_CPU_REPLACE( "maincpu", HD6309, COCO_CPU_SPEED_HZ * 4)
-	MDRV_CPU_PROGRAM_MAP(coco3_map)
+	MCFG_CPU_REPLACE( "maincpu", HD6309, COCO_CPU_SPEED_HZ * 4)
+	MCFG_CPU_PROGRAM_MAP(coco3_map)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( cocoe, coco )
 
 	/* internal ram */
-	MDRV_RAM_MODIFY("messram")
-	MDRV_RAM_DEFAULT_SIZE("64K")
-	MDRV_RAM_EXTRA_OPTIONS("4K,16K,32K")
+	MCFG_RAM_MODIFY("messram")
+	MCFG_RAM_DEFAULT_SIZE("64K")
+	MCFG_RAM_EXTRA_OPTIONS("4K,16K,32K")
 MACHINE_CONFIG_END
 
 /***************************************************************************

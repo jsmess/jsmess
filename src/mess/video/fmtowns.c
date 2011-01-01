@@ -258,7 +258,7 @@ static void towns_update_kanji_offset(running_machine* machine)
 READ8_HANDLER( towns_video_cff80_r )
 {
 	towns_state* state = space->machine->driver_data<towns_state>();
-	UINT8* ROM = memory_region(space->machine,"user");
+	UINT8* ROM = space->machine->region("user")->base();
 
 	switch(offset)
 	{
@@ -485,7 +485,7 @@ READ8_HANDLER(towns_video_5c8_r)
 WRITE8_HANDLER(towns_video_5c8_w)
 {
 	towns_state* state = space->machine->driver_data<towns_state>();
-	running_device* dev = state->pic_slave;
+	device_t* dev = state->pic_slave;
 
 	switch(offset)
 	{
@@ -610,7 +610,7 @@ READ8_HANDLER(towns_spriteram_low_r)
 {
 	towns_state* state = space->machine->driver_data<towns_state>();
 	UINT8* RAM = messram_get_ptr(state->messram);
-	UINT8* ROM = memory_region(space->machine,"user");
+	UINT8* ROM = space->machine->region("user")->base();
 
 	if(offset < 0x1000)
 	{  // 0xc8000-0xc8fff
@@ -1677,7 +1677,7 @@ static void render_text_char(running_machine* machine, UINT8 x, UINT8 y, UINT8 a
 	UINT8 colour;
 	UINT8 data;
 	UINT8 temp;
-	UINT8* font_rom = memory_region(machine,"user");
+	UINT8* font_rom = machine->region("user")->base();
 	int a,b;
 
 	// all characters are 16 pixels high
@@ -1793,7 +1793,7 @@ static TIMER_CALLBACK( towns_vblank_end )
 {
 	// here we'll clear the vsync signal, I presume it goes low on it's own eventually
 	towns_state* state = machine->driver_data<towns_state>();
-	running_device* dev = (running_device*)ptr;
+	device_t* dev = (device_t*)ptr;
 	pic8259_ir3_w(dev, 0);  // IRQ11 = VSync
 	if(IRQ_LOG) logerror("PIC: IRQ11 (VSync) set low\n");
 	state->video.towns_vblank_flag = 0;
@@ -1802,7 +1802,7 @@ static TIMER_CALLBACK( towns_vblank_end )
 INTERRUPT_GEN( towns_vsync_irq )
 {
 	towns_state* state = device->machine->driver_data<towns_state>();
-	running_device* dev = state->pic_slave;
+	device_t* dev = state->pic_slave;
 	pic8259_ir3_w(dev, 1);  // IRQ11 = VSync
 	if(IRQ_LOG) logerror("PIC: IRQ11 (VSync) set high\n");
 	state->video.towns_vblank_flag = 1;

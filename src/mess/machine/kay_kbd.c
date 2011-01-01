@@ -66,7 +66,7 @@
 
 typedef struct _kay_kbd_t
 {
-	running_device *beeper;
+	device_t *beeper;
 	UINT8 buff[16];
 	UINT8 head;
 	UINT8 tail;

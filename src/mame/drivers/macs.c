@@ -123,14 +123,14 @@ static READ8_HANDLER( macs_input_r )
 
 static WRITE8_HANDLER( macs_rom_bank_w )
 {
-	memory_set_bankptr(space->machine,  "bank1", memory_region(space->machine, "maincpu") + (data* 0x4000) + 0x10000 + macs_cart_slot*0x400000 );
+	memory_set_bankptr(space->machine,  "bank1", space->machine->region("maincpu")->base() + (data* 0x4000) + 0x10000 + macs_cart_slot*0x400000 );
 
 	st0016_rom_bank=data;
 }
 
 static WRITE8_HANDLER( macs_output_w )
 {
-	UINT8 *ROM = memory_region(space->machine, "maincpu");
+	UINT8 *ROM = space->machine->region("maincpu")->base();
 
 	switch(offset)
 	{
@@ -459,34 +459,34 @@ static const st0016_interface st0016_config =
 
 static MACHINE_CONFIG_START( macs, driver_device )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu",Z80,8000000) /* 8 MHz ? */
-	MDRV_CPU_PROGRAM_MAP(macs_mem)
-	MDRV_CPU_IO_MAP(macs_io)
+	MCFG_CPU_ADD("maincpu",Z80,8000000) /* 8 MHz ? */
+	MCFG_CPU_PROGRAM_MAP(macs_mem)
+	MCFG_CPU_IO_MAP(macs_io)
 
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_MACHINE_RESET(macs)
+	MCFG_MACHINE_RESET(macs)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(128*8, 128*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 128*8-1, 0*8, 128*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(128*8, 128*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 128*8-1, 0*8, 128*8-1)
 
-	MDRV_GFXDECODE(macs)
-	MDRV_PALETTE_LENGTH(16*16*4+1)
+	MCFG_GFXDECODE(macs)
+	MCFG_PALETTE_LENGTH(16*16*4+1)
 
-	MDRV_VIDEO_START(st0016)
-	MDRV_VIDEO_UPDATE(st0016)
+	MCFG_VIDEO_START(st0016)
+	MCFG_VIDEO_UPDATE(st0016)
 
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("stsnd", ST0016, 0)
-	MDRV_SOUND_CONFIG(st0016_config)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("stsnd", ST0016, 0)
+	MCFG_SOUND_CONFIG(st0016_config)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -661,11 +661,11 @@ static MACHINE_RESET(macs)
         730E: ED B0         ldir
         ...
 */
-		memcpy(macs_ram1 + 0x0e9f, memory_region(machine, "user1")+0x7327, 0xc7);
-		memcpy(macs_ram1 + 0x1e9f, memory_region(machine, "user1")+0x7327, 0xc7);
+		memcpy(macs_ram1 + 0x0e9f, machine->region("user1")->base()+0x7327, 0xc7);
+		memcpy(macs_ram1 + 0x1e9f, machine->region("user1")->base()+0x7327, 0xc7);
 
-		memcpy(macs_ram1 + 0x0800, memory_region(machine, "user1")+0x73fa, 0x507);
-		memcpy(macs_ram1 + 0x1800, memory_region(machine, "user1")+0x73fa, 0x507);
+		memcpy(macs_ram1 + 0x0800, machine->region("user1")->base()+0x73fa, 0x507);
+		memcpy(macs_ram1 + 0x1800, machine->region("user1")->base()+0x73fa, 0x507);
 
 #define MAKEJMP(n,m)	macs_ram2[(n) - 0xe800 + 0]=0xc3;\
 						macs_ram2[(n) - 0xe800 + 1]=(m)&0xff;\
@@ -701,10 +701,10 @@ static MACHINE_RESET(macs)
 		macs_ram1[0x1ff9]=0x07;
 		#endif
 
-		memory_set_bankptr(machine,  "bank1", memory_region(machine, "maincpu") + 0x10000 );
+		memory_set_bankptr(machine,  "bank1", machine->region("maincpu")->base() + 0x10000 );
 		memory_set_bankptr(machine,  "bank2", macs_ram1+0x800);
 		memory_set_bankptr(machine,  "bank3", macs_ram1+0x10000);
-		memory_set_bankptr(machine,  "bank4", memory_region(machine, "maincpu") );
+		memory_set_bankptr(machine,  "bank4", machine->region("maincpu")->base() );
 }
 
 static DRIVER_INIT(macs)

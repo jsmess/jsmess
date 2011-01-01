@@ -89,7 +89,7 @@ DEVICE_START( svi318_cart )
 DEVICE_IMAGE_LOAD( svi318_cart )
 {
 	svi318_state *state = image.device().machine->driver_data<svi318_state>();
-	UINT8 *p = memory_region(image.device().machine, "user1");
+	UINT8 *p = image.device().machine->region("user1")->base();
 	UINT32 size;
 
 	if (image.software_entry() == NULL)
@@ -314,7 +314,7 @@ const wd17xx_interface svi_wd17xx_interface =
 static WRITE8_HANDLER( svi318_fdc_drive_motor_w )
 {
 	svi318_state *state = space->machine->driver_data<svi318_state>();
-	running_device *fdc = space->machine->device("wd179x");
+	device_t *fdc = space->machine->device("wd179x");
 	switch (data & 3)
 	{
 	case 1:
@@ -330,7 +330,7 @@ static WRITE8_HANDLER( svi318_fdc_drive_motor_w )
 
 static WRITE8_HANDLER( svi318_fdc_density_side_w )
 {
-	running_device *fdc = space->machine->device("wd179x");
+	device_t *fdc = space->machine->device("wd179x");
 
 	wd17xx_dden_w(fdc, BIT(data, 0));
 	wd17xx_set_side(fdc, BIT(data, 1));
@@ -380,7 +380,7 @@ static void svi318_80col_init(running_machine *machine)
 	state->svi.svi806_ram = machine->region_alloc("gfx2", 0x1000, 0 );
 	memset( state->svi.svi806_ram->base(), 0x00, 0x800 );
 	memset( state->svi.svi806_ram->base() + 0x800, 0xFF, 0x800 );
-	state->svi.svi806_gfx = memory_region(machine, "gfx1");
+	state->svi.svi806_gfx = machine->region("gfx1")->base();
 }
 
 
@@ -404,7 +404,7 @@ VIDEO_UPDATE( svi328_806 )
 	}
 	else if (!strcmp(screen->tag(), "svi806"))
 	{
-		running_device *mc6845 = screen->machine->device("crtc");
+		device_t *mc6845 = screen->machine->device("crtc");
 		mc6845_update(mc6845, bitmap, cliprect);
 	}
 	else
@@ -708,7 +708,7 @@ static void svi318_set_banks(running_machine *machine)
 	switch( state->svi.bankLow )
 	{
 	case SVI_INTERNAL:
-		state->svi.bankLow_ptr = memory_region(machine, "maincpu");
+		state->svi.bankLow_ptr = machine->region("maincpu")->base();
 		break;
 	case SVI_CART:
 		if ( state->pcart )
@@ -823,7 +823,7 @@ READ8_HANDLER( svi318_io_ext_r )
 {
 	svi318_state *state = space->machine->driver_data<svi318_state>();
 	UINT8 data = 0xff;
-	running_device *device;
+	device_t *device;
 
 	if (state->svi.bankLow == SVI_CART)
 	{
@@ -892,7 +892,7 @@ READ8_HANDLER( svi318_io_ext_r )
 WRITE8_HANDLER( svi318_io_ext_w )
 {
 	svi318_state *state = space->machine->driver_data<svi318_state>();
-	running_device *device;
+	device_t *device;
 
 	if (state->svi.bankLow == SVI_CART)
 	{

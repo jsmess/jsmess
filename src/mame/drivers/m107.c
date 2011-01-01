@@ -50,7 +50,7 @@ static WRITE16_HANDLER( bankswitch_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		UINT8 *RAM = memory_region(space->machine, "maincpu");
+		UINT8 *RAM = space->machine->region("maincpu")->base();
 		memory_set_bankptr(space->machine, "bank1",&RAM[0x100000 + ((data&0x7)*0x10000)]);
 	}
 }
@@ -800,7 +800,7 @@ GFXDECODE_END
 
 /***************************************************************************/
 
-static void sound_irq(running_device *device, int state)
+static void sound_irq(device_t *device, int state)
 {
 	if (state)
 		timer_call_after_resynch(device->machine, NULL, YM2151_ASSERT,setvector_callback);
@@ -820,67 +820,67 @@ static const nec_config firebarr_config ={ rtypeleo_decryption_table, };
 static MACHINE_CONFIG_START( firebarr, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", V33, 28000000/2)	/* NEC V33, 28MHz clock */
-	MDRV_CPU_PROGRAM_MAP(main_map)
-	MDRV_CPU_IO_MAP(main_portmap)
+	MCFG_CPU_ADD("maincpu", V33, 28000000/2)	/* NEC V33, 28MHz clock */
+	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_CPU_IO_MAP(main_portmap)
 
-	MDRV_CPU_ADD("soundcpu", V35, 14318000/2)
-	MDRV_CPU_PROGRAM_MAP(sound_map)
-	MDRV_CPU_CONFIG(firebarr_config)
+	MCFG_CPU_ADD("soundcpu", V35, 14318000/2)
+	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_CPU_CONFIG(firebarr_config)
 
-	MDRV_MACHINE_START(m107)
-	MDRV_MACHINE_RESET(m107)
+	MCFG_MACHINE_START(m107)
+	MCFG_MACHINE_RESET(m107)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(512, 256)
-	MDRV_SCREEN_VISIBLE_AREA(80, 511-112, 8, 247) /* 320 x 240 */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(512, 256)
+	MCFG_SCREEN_VISIBLE_AREA(80, 511-112, 8, 247) /* 320 x 240 */
 
-	MDRV_GFXDECODE(firebarr)
-	MDRV_PALETTE_LENGTH(2048)
+	MCFG_GFXDECODE(firebarr)
+	MCFG_PALETTE_LENGTH(2048)
 
-	MDRV_VIDEO_START(m107)
-	MDRV_VIDEO_UPDATE(m107)
+	MCFG_VIDEO_START(m107)
+	MCFG_VIDEO_UPDATE(m107)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ymsnd", YM2151, 14318180/4)
-	MDRV_SOUND_CONFIG(ym2151_config)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 0.40)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 0.40)
+	MCFG_SOUND_ADD("ymsnd", YM2151, 14318180/4)
+	MCFG_SOUND_CONFIG(ym2151_config)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.40)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.40)
 
-	MDRV_SOUND_ADD("irem", IREMGA20, 14318180/4)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("irem", IREMGA20, 14318180/4)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 static const nec_config dsoccr94_config ={ dsoccr94_decryption_table, };
 static MACHINE_CONFIG_DERIVED( dsoccr94, firebarr )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_CLOCK(20000000/2)	/* NEC V33, Could be 28MHz clock? */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_CLOCK(20000000/2)	/* NEC V33, Could be 28MHz clock? */
 
-	MDRV_CPU_MODIFY("soundcpu")
-	MDRV_CPU_CONFIG(dsoccr94_config)
+	MCFG_CPU_MODIFY("soundcpu")
+	MCFG_CPU_CONFIG(dsoccr94_config)
 
 	/* video hardware */
-	MDRV_GFXDECODE(m107)
+	MCFG_GFXDECODE(m107)
 MACHINE_CONFIG_END
 
 
 static const nec_config wpksoc_config ={ leagueman_decryption_table, };
 static MACHINE_CONFIG_DERIVED( wpksoc, firebarr )
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(wpksoc_map)
-	MDRV_CPU_IO_MAP(wpksoc_io_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(wpksoc_map)
+	MCFG_CPU_IO_MAP(wpksoc_io_map)
 
-	MDRV_CPU_MODIFY("soundcpu")
-	MDRV_CPU_CONFIG(wpksoc_config)
+	MCFG_CPU_MODIFY("soundcpu")
+	MCFG_CPU_CONFIG(wpksoc_config)
 MACHINE_CONFIG_END
 
 /***************************************************************************/
@@ -1002,7 +1002,7 @@ ROM_START( kftgoal )
 	ROM_LOAD16_BYTE( "pk-031-usa.031", 0x300001, 0x80000, CRC(8aa7dc04) SHA1(8aebdf50a832acf00fcfebb35ab49a06d13bc444) )
 
 	ROM_REGION( 0x100000, "irem", 0 )	 /* ADPCM samples */
-	ROM_LOAD( "pk-da0.da0", 0x000000, 0x80000, CRC(26a34cf4) SHA1(a8a7cd91cdc6d644ee02ca16e7fdc8debf8f3a5f) )
+	ROM_LOAD( "pk-da0.da0", 0x000000, 0x80000, BAD_DUMP CRC(26a34cf4) SHA1(a8a7cd91cdc6d644ee02ca16e7fdc8debf8f3a5f) ) //clearly taken from World PK Soccer, it says "World PK Soccer" at title screen
 
 	ROM_REGION( 0x2000, "user1", 0 ) /* ST M28C64C-20PI Eeprom */
 	ROM_LOAD( "st-m28c64c.eeprom", 0x000, 0x2000, CRC(8e0c8b7c) SHA1(0b57290d709e6d54ce1bb3a5c01b80590203c1dd) )
@@ -1012,12 +1012,12 @@ ROM_END
 
 static DRIVER_INIT( firebarr )
 {
-	UINT8 *RAM = memory_region(machine, "maincpu");
+	UINT8 *RAM = machine->region("maincpu")->base();
 
 	memcpy(RAM + 0xffff0, RAM + 0x7fff0, 0x10); /* Start vector */
 	memory_set_bankptr(machine, "bank1", &RAM[0xa0000]); /* Initial bank */
 
-	RAM = memory_region(machine, "soundcpu");
+	RAM = machine->region("soundcpu")->base();
 	memcpy(RAM + 0xffff0,RAM + 0x1fff0, 0x10); /* Sound cpu Start vector */
 
 	m107_irq_vectorbase = 0x20;
@@ -1026,12 +1026,12 @@ static DRIVER_INIT( firebarr )
 
 static DRIVER_INIT( dsoccr94 )
 {
-	UINT8 *RAM = memory_region(machine, "maincpu");
+	UINT8 *RAM = machine->region("maincpu")->base();
 
 	memcpy(RAM + 0xffff0, RAM + 0x7fff0, 0x10); /* Start vector */
 	memory_set_bankptr(machine, "bank1", &RAM[0xa0000]); /* Initial bank */
 
-	RAM = memory_region(machine, "soundcpu");
+	RAM = machine->region("soundcpu")->base();
 	memcpy(RAM + 0xffff0, RAM + 0x1fff0, 0x10); /* Sound cpu Start vector */
 
 	m107_irq_vectorbase = 0x80;
@@ -1040,12 +1040,12 @@ static DRIVER_INIT( dsoccr94 )
 
 static DRIVER_INIT( wpksoc )
 {
-	UINT8 *RAM = memory_region(machine, "maincpu");
+	UINT8 *RAM = machine->region("maincpu")->base();
 
 	memcpy(RAM + 0xffff0, RAM + 0x7fff0, 0x10); /* Start vector */
 	memory_set_bankptr(machine, "bank1", &RAM[0xa0000]); /* Initial bank */
 
-	RAM = memory_region(machine, "soundcpu");
+	RAM = machine->region("soundcpu")->base();
 	memcpy(RAM + 0xffff0, RAM + 0x1fff0, 0x10); /* Sound cpu Start vector */
 
 

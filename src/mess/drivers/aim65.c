@@ -189,42 +189,42 @@ static const pia6821_interface aim65_pia_config =
 
 static MACHINE_CONFIG_START( aim65, aim65_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6502, AIM65_CLOCK) /* 1 MHz */
-	MDRV_CPU_PROGRAM_MAP(aim65_mem)
+	MCFG_CPU_ADD("maincpu", M6502, AIM65_CLOCK) /* 1 MHz */
+	MCFG_CPU_PROGRAM_MAP(aim65_mem)
 
-	MDRV_MACHINE_START(aim65)
+	MCFG_MACHINE_START(aim65)
 
-	MDRV_DEFAULT_LAYOUT(layout_aim65)
+	MCFG_DEFAULT_LAYOUT(layout_aim65)
 
 	/* alpha-numeric display */
-	MDRV_DL1416T_ADD("ds1", aim65_update_ds1)
-	MDRV_DL1416T_ADD("ds2", aim65_update_ds2)
-	MDRV_DL1416T_ADD("ds3", aim65_update_ds3)
-	MDRV_DL1416T_ADD("ds4", aim65_update_ds4)
-	MDRV_DL1416T_ADD("ds5", aim65_update_ds5)
+	MCFG_DL1416T_ADD("ds1", aim65_update_ds1)
+	MCFG_DL1416T_ADD("ds2", aim65_update_ds2)
+	MCFG_DL1416T_ADD("ds3", aim65_update_ds3)
+	MCFG_DL1416T_ADD("ds4", aim65_update_ds4)
+	MCFG_DL1416T_ADD("ds5", aim65_update_ds5)
 
-	MDRV_VIDEO_START(aim65)
+	MCFG_VIDEO_START(aim65)
 
 	/* other devices */
-	MDRV_RIOT6532_ADD("riot", AIM65_CLOCK, aim65_riot_interface)
-	MDRV_VIA6522_ADD("via6522_0", 0, aim65_system_via)
-	MDRV_VIA6522_ADD("via6522_1", 0, aim65_user_via)
-	MDRV_PIA6821_ADD("pia6821", aim65_pia_config)
+	MCFG_RIOT6532_ADD("riot", AIM65_CLOCK, aim65_riot_interface)
+	MCFG_VIA6522_ADD("via6522_0", 0, aim65_system_via)
+	MCFG_VIA6522_ADD("via6522_1", 0, aim65_user_via)
+	MCFG_PIA6821_ADD("pia6821", aim65_pia_config)
 
-	MDRV_CARTSLOT_ADD("cart1")
-	MDRV_CARTSLOT_EXTENSION_LIST("z26")
-	MDRV_CARTSLOT_NOT_MANDATORY
-	MDRV_CARTSLOT_ADD("cart2")
-	MDRV_CARTSLOT_EXTENSION_LIST("z25")
-	MDRV_CARTSLOT_NOT_MANDATORY
-	MDRV_CARTSLOT_ADD("cart3")
-	MDRV_CARTSLOT_EXTENSION_LIST("z24")
-	MDRV_CARTSLOT_NOT_MANDATORY
+	MCFG_CARTSLOT_ADD("cart1")
+	MCFG_CARTSLOT_EXTENSION_LIST("z26")
+	MCFG_CARTSLOT_NOT_MANDATORY
+	MCFG_CARTSLOT_ADD("cart2")
+	MCFG_CARTSLOT_EXTENSION_LIST("z25")
+	MCFG_CARTSLOT_NOT_MANDATORY
+	MCFG_CARTSLOT_ADD("cart3")
+	MCFG_CARTSLOT_EXTENSION_LIST("z24")
+	MCFG_CARTSLOT_NOT_MANDATORY
 
 	/* internal ram */
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("4K")
-	MDRV_RAM_EXTRA_OPTIONS("1K,2K,3K")
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("4K")
+	MCFG_RAM_EXTRA_OPTIONS("1K,2K,3K")
 MACHINE_CONFIG_END
 
 

@@ -197,7 +197,7 @@ static VIDEO_START( cgc7900 )
 	cgc7900_state *state = machine->driver_data<cgc7900_state>();
 
 	/* find memory regions */
-	state->char_rom = memory_region(machine, "gfx1");
+	state->char_rom = machine->region("gfx1")->base();
 }
 
 /*-------------------------------------------------
@@ -245,20 +245,20 @@ GFXDECODE_END
 -------------------------------------------------*/
 
 MACHINE_CONFIG_FRAGMENT( cgc7900_video )
-    MDRV_SCREEN_ADD(SCREEN_TAG, RASTER)
-    MDRV_SCREEN_REFRESH_RATE(60)
-    MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-    MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-    MDRV_SCREEN_SIZE(1024, 768)
-    MDRV_SCREEN_VISIBLE_AREA(0, 1024-1, 0, 768-1)
+    MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
+    MCFG_SCREEN_REFRESH_RATE(60)
+    MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+    MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+    MCFG_SCREEN_SIZE(1024, 768)
+    MCFG_SCREEN_VISIBLE_AREA(0, 1024-1, 0, 768-1)
 
-	MDRV_GFXDECODE(cgc7900)
+	MCFG_GFXDECODE(cgc7900)
 
-	MDRV_PALETTE_LENGTH(8+256) /* 8 overlay colors + 256 bitmap colors */
-	MDRV_PALETTE_INIT(cgc7900)
+	MCFG_PALETTE_LENGTH(8+256) /* 8 overlay colors + 256 bitmap colors */
+	MCFG_PALETTE_INIT(cgc7900)
 
-	MDRV_VIDEO_START(cgc7900)
-    MDRV_VIDEO_UPDATE(cgc7900)
+	MCFG_VIDEO_START(cgc7900)
+    MCFG_VIDEO_UPDATE(cgc7900)
 
-	MDRV_TIMER_ADD_PERIODIC("blink", blink_tick, HZ(XTAL_28_48MHz/7500000))
+	MCFG_TIMER_ADD_PERIODIC("blink", blink_tick, HZ(XTAL_28_48MHz/7500000))
 MACHINE_CONFIG_END

@@ -940,88 +940,88 @@ static const char layout_hp48s [] = "hp48s";
 
 
 static MACHINE_CONFIG_START( hp48_common, hp48_state )
-	MDRV_MACHINE_RESET ( hp48 )
+	MCFG_MACHINE_RESET ( hp48 )
 
 	/* cpu */
-	MDRV_CPU_ADD ( "maincpu", SATURN, 3937007 ) /* almost 4 MHz */
-	MDRV_CPU_PROGRAM_MAP ( hp48)
-	MDRV_CPU_CONFIG( hp48_config )
+	MCFG_CPU_ADD ( "maincpu", SATURN, 3937007 ) /* almost 4 MHz */
+	MCFG_CPU_PROGRAM_MAP ( hp48)
+	MCFG_CPU_CONFIG( hp48_config )
 
 	/* memory */
-	MDRV_NVRAM_ADD_0FILL("nvram")
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video */
-	MDRV_SCREEN_ADD( "screen", RASTER )
-	MDRV_SCREEN_REFRESH_RATE( 64 )
-	MDRV_SCREEN_VBLANK_TIME(0)
-	MDRV_SCREEN_FORMAT( BITMAP_FORMAT_INDEXED16 )
-	MDRV_SCREEN_SIZE ( 131, 64 )
-	MDRV_SCREEN_VISIBLE_AREA( 0, 130, 0, 63 )
-	MDRV_PALETTE_LENGTH( 256 ) /* monochrome, but with varying contrast and grayscale */
-	MDRV_PALETTE_INIT( hp48 )
-	MDRV_VIDEO_UPDATE( hp48 )
+	MCFG_SCREEN_ADD( "screen", RASTER )
+	MCFG_SCREEN_REFRESH_RATE( 64 )
+	MCFG_SCREEN_VBLANK_TIME(0)
+	MCFG_SCREEN_FORMAT( BITMAP_FORMAT_INDEXED16 )
+	MCFG_SCREEN_SIZE ( 131, 64 )
+	MCFG_SCREEN_VISIBLE_AREA( 0, 130, 0, 63 )
+	MCFG_PALETTE_LENGTH( 256 ) /* monochrome, but with varying contrast and grayscale */
+	MCFG_PALETTE_INIT( hp48 )
+	MCFG_VIDEO_UPDATE( hp48 )
 
 	/* sound */
-	MDRV_SPEAKER_STANDARD_MONO( "mono" )
-	MDRV_SOUND_ADD( "dac",  DAC, 0 )
-	MDRV_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.) /* 1-bit beeper */
+	MCFG_SPEAKER_STANDARD_MONO( "mono" )
+	MCFG_SOUND_ADD( "dac",  DAC, 0 )
+	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.) /* 1-bit beeper */
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( hp48gx, hp48_common )
-	MDRV_MACHINE_START  ( hp48gx )
-	MDRV_DEFAULT_LAYOUT ( layout_hp48gx )
+	MCFG_MACHINE_START  ( hp48gx )
+	MCFG_DEFAULT_LAYOUT ( layout_hp48gx )
 
 	/* expansion ports */
-	MDRV_HP48_PORT_ADD ( "port1", hp48gx_port1_config )
-	MDRV_HP48_PORT_ADD ( "port2", hp48gx_port2_config )
+	MCFG_HP48_PORT_ADD ( "port1", hp48gx_port1_config )
+	MCFG_HP48_PORT_ADD ( "port2", hp48gx_port2_config )
 
 	/* serial I/O */
-	MDRV_XMODEM_ADD( "rs232_x", hp48_xmodem_rs232_conf )
-	MDRV_KERMIT_ADD( "rs232_k", hp48_kermit_rs232_conf )
+	MCFG_XMODEM_ADD( "rs232_x", hp48_xmodem_rs232_conf )
+	MCFG_KERMIT_ADD( "rs232_k", hp48_kermit_rs232_conf )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( hp48g, hp48_common )
-	MDRV_MACHINE_START  ( hp48g )
-	MDRV_DEFAULT_LAYOUT ( layout_hp48g )
+	MCFG_MACHINE_START  ( hp48g )
+	MCFG_DEFAULT_LAYOUT ( layout_hp48g )
 
 	/* serial I/O */
-	MDRV_XMODEM_ADD( "rs232_x", hp48_xmodem_rs232_conf )
-	MDRV_KERMIT_ADD( "rs232_k", hp48_kermit_rs232_conf )
+	MCFG_XMODEM_ADD( "rs232_x", hp48_xmodem_rs232_conf )
+	MCFG_KERMIT_ADD( "rs232_k", hp48_kermit_rs232_conf )
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( hp48gp, hp48_common )
-	MDRV_MACHINE_START  ( hp48gp )
-	MDRV_DEFAULT_LAYOUT ( layout_hp48gp )
+	MCFG_MACHINE_START  ( hp48gp )
+	MCFG_DEFAULT_LAYOUT ( layout_hp48gp )
 
 	/* serial I/O */
-	MDRV_XMODEM_ADD( "rs232_x", hp48_xmodem_rs232_conf )
-	MDRV_KERMIT_ADD( "rs232_k", hp48_kermit_rs232_conf )
+	MCFG_XMODEM_ADD( "rs232_x", hp48_xmodem_rs232_conf )
+	MCFG_KERMIT_ADD( "rs232_k", hp48_kermit_rs232_conf )
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( hp48sx, hp48_common )
-	MDRV_CPU_MODIFY     ( "maincpu" )
-	MDRV_CPU_CLOCK      ( 2000000 )
-	MDRV_MACHINE_START  ( hp48sx )
-	MDRV_DEFAULT_LAYOUT ( layout_hp48sx )
+	MCFG_CPU_MODIFY     ( "maincpu" )
+	MCFG_CPU_CLOCK      ( 2000000 )
+	MCFG_MACHINE_START  ( hp48sx )
+	MCFG_DEFAULT_LAYOUT ( layout_hp48sx )
 
 	/* expansion ports */
-	MDRV_HP48_PORT_ADD  ( "port1", hp48sx_port1_config )
-	MDRV_HP48_PORT_ADD  ( "port2", hp48sx_port2_config )
+	MCFG_HP48_PORT_ADD  ( "port1", hp48sx_port1_config )
+	MCFG_HP48_PORT_ADD  ( "port2", hp48sx_port2_config )
 
 	/* serial I/O */
-	MDRV_KERMIT_ADD( "rs232_k", hp48_kermit_rs232_conf )
+	MCFG_KERMIT_ADD( "rs232_k", hp48_kermit_rs232_conf )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( hp48s, hp48_common )
-	MDRV_CPU_MODIFY     ( "maincpu" )
-	MDRV_CPU_CLOCK      ( 2000000 )
-	MDRV_MACHINE_START  ( hp48s )
-	MDRV_DEFAULT_LAYOUT ( layout_hp48s )
+	MCFG_CPU_MODIFY     ( "maincpu" )
+	MCFG_CPU_CLOCK      ( 2000000 )
+	MCFG_MACHINE_START  ( hp48s )
+	MCFG_DEFAULT_LAYOUT ( layout_hp48s )
 
 	/* serial I/O */
-	MDRV_KERMIT_ADD( "rs232_k", hp48_kermit_rs232_conf )
+	MCFG_KERMIT_ADD( "rs232_k", hp48_kermit_rs232_conf )
 MACHINE_CONFIG_END
 
 

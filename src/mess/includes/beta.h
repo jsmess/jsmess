@@ -27,7 +27,7 @@ public:
 	emu_timer *led_refresh_timer;
 
 	/* devices */
-	running_device *speaker;
+	device_t *speaker;
 };
 
 #endif

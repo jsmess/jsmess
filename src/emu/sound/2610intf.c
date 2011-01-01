@@ -25,11 +25,11 @@ struct _ym2610_state
 	void *			chip;
 	void *			psg;
 	const ym2610_interface *intf;
-	running_device *device;
+	device_t *device;
 };
 
 
-INLINE ym2610_state *get_safe_token(running_device *device)
+INLINE ym2610_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == YM2610 || device->type() == YM2610B);
@@ -166,8 +166,8 @@ static DEVICE_START( ym2610 )
 	pcmbufa  = *device->region();
 	pcmsizea = device->region()->bytes();
 	name.printf("%s.deltat", device->tag());
-	pcmbufb  = (void *)(memory_region(device->machine, name));
-	pcmsizeb = memory_region_length(device->machine, name);
+	pcmbufb  = (void *)(device->machine->region(name)->base());
+	pcmsizeb = device->machine->region(name)->bytes();
 	if (pcmbufb == NULL || pcmsizeb == 0)
 	{
 		pcmbufb = pcmbufa;

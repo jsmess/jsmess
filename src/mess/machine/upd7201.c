@@ -31,7 +31,7 @@ struct _upd7201_state
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE upd7201_state *get_safe_token(running_device *device)
+INLINE upd7201_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == UPD7201);

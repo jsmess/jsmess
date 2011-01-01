@@ -156,20 +156,20 @@ void tx0_tape_get_open_mode(int id,	unsigned int *readable, unsigned int *writea
 DEVICE_START( tx0_tape );
 DEVICE_IMAGE_LOAD( tx0_tape );
 DEVICE_IMAGE_UNLOAD( tx0_tape );
-void tx0_io_r1l(running_device *device);
-void tx0_io_r3l(running_device *device);
-void tx0_io_p6h(running_device *device);
-void tx0_io_p7h(running_device *device);
+void tx0_io_r1l(device_t *device);
+void tx0_io_r3l(device_t *device);
+void tx0_io_p6h(device_t *device);
+void tx0_io_p7h(device_t *device);
 DEVICE_IMAGE_LOAD(tx0_typewriter);
 DEVICE_IMAGE_UNLOAD(tx0_typewriter);
-void tx0_io_prt(running_device *device);
-void tx0_io_dis(running_device *device);
+void tx0_io_prt(device_t *device);
+void tx0_io_dis(device_t *device);
 DEVICE_START( tx0_magtape );
 DEVICE_IMAGE_LOAD( tx0_magtape );
 DEVICE_IMAGE_UNLOAD( tx0_magtape );
-void tx0_sel(running_device *device);
-void tx0_io_cpy(running_device *device);
-void tx0_io_reset_callback(running_device *device);
+void tx0_sel(device_t *device);
+void tx0_io_cpy(device_t *device);
+void tx0_io_reset_callback(device_t *device);
 INTERRUPT_GEN( tx0_interrupt );
 
 

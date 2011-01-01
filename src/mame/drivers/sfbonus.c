@@ -1085,7 +1085,7 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( sfbonus_bank_w )
 {
-	UINT8 *ROM = memory_region(space->machine, "maincpu");
+	UINT8 *ROM = space->machine->region("maincpu")->base();
 	UINT8 bank;
 
 	bank = data & 7;
@@ -1097,22 +1097,22 @@ static WRITE8_HANDLER( sfbonus_bank_w )
 
 static READ8_HANDLER( sfbonus_2800_r )
 {
-	return mame_rand(space->machine);
+	return space->machine->rand();
 }
 
 static READ8_HANDLER( sfbonus_2801_r )
 {
-	return mame_rand(space->machine);
+	return space->machine->rand();
 }
 
 static READ8_HANDLER( sfbonus_2c00_r )
 {
-	return mame_rand(space->machine);
+	return space->machine->rand();
 }
 
 static READ8_HANDLER( sfbonus_2c01_r )
 {
-	return mame_rand(space->machine);
+	return space->machine->rand();
 }
 
 static READ8_HANDLER( sfbonus_3800_r )
@@ -1217,7 +1217,7 @@ GFXDECODE_END
 
 static MACHINE_RESET( sfbonus )
 {
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 
 	memory_set_bankptr(machine, "bank1", &ROM[0]);
 }
@@ -1235,47 +1235,47 @@ static NVRAM_HANDLER( sfbonus )
 		}
 		else
 		{
-			UINT8* defaultram = memory_region(machine, "defaults");
+			UINT8* defaultram = machine->region("defaults")->base();
 			memset(nvram,0x00,nvram_size);
 
 			if (defaultram)
 				if ((defaultram[0x02]==0x00) && (defaultram[0x03]==0x00)) // hack! rom region optional regions get cleared with garbage if no rom is present, this is not good!
-					memcpy(nvram, memory_region(machine, "defaults"), memory_region_length(machine, "defaults"));
+					memcpy(nvram, machine->region("defaults")->base(), machine->region("defaults")->bytes());
 		}
 	}
 }
 
 
 static MACHINE_CONFIG_START( sfbonus, driver_device )
-	MDRV_CPU_ADD("maincpu", Z80, 6000000) // custom packaged z80 CPU ?? Mhz
-	MDRV_CPU_PROGRAM_MAP(sfbonus_map)
-	MDRV_CPU_IO_MAP(sfbonus_io)
-	MDRV_CPU_VBLANK_INT("screen",irq0_line_hold)
-	//MDRV_CPU_PERIODIC_INT(nmi_line_pulse,100)
+	MCFG_CPU_ADD("maincpu", Z80, 6000000) // custom packaged z80 CPU ?? Mhz
+	MCFG_CPU_PROGRAM_MAP(sfbonus_map)
+	MCFG_CPU_IO_MAP(sfbonus_io)
+	MCFG_CPU_VBLANK_INT("screen",irq0_line_hold)
+	//MCFG_CPU_PERIODIC_INT(nmi_line_pulse,100)
 
-	MDRV_MACHINE_RESET( sfbonus )
+	MCFG_MACHINE_RESET( sfbonus )
 
-	MDRV_NVRAM_HANDLER(sfbonus)
+	MCFG_NVRAM_HANDLER(sfbonus)
 
 
-	MDRV_GFXDECODE(sfbonus)
+	MCFG_GFXDECODE(sfbonus)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(128*8, 64*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 512-1, 0*8, 288-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(128*8, 64*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 512-1, 0*8, 288-1)
 
-	MDRV_PALETTE_LENGTH(0x100*2) // *2 for priority workaraound / custom drawing
+	MCFG_PALETTE_LENGTH(0x100*2) // *2 for priority workaraound / custom drawing
 
-	MDRV_VIDEO_START(sfbonus)
-	MDRV_VIDEO_UPDATE(sfbonus)
+	MCFG_VIDEO_START(sfbonus)
+	MCFG_VIDEO_UPDATE(sfbonus)
 
 	/* Parrot 3 seems fine at 1 Mhz, but Double Challenge isn't? */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
 
@@ -5465,7 +5465,7 @@ static DRIVER_INIT( sfbonus_common)
 	state_save_register_global_pointer(machine, sfbonus_reel4_ram , 0x0800);
 
 	// hack, because the debugger is broken
-	sfbonus_videoram = memory_region(machine, "debugram");
+	sfbonus_videoram = machine->region("debugram")->base();
 	if (!sfbonus_videoram)
 		sfbonus_videoram = auto_alloc_array(machine, UINT8, 0x10000);
 
@@ -5475,9 +5475,9 @@ static DRIVER_INIT( sfbonus_common)
 
 	// dummy.rom helper
 	{
-		UINT8 *ROM = memory_region(machine, "maincpu");
-		int length = memory_region_length(machine, "maincpu");
-		UINT8* ROM2 = memory_region(machine, "user1");
+		UINT8 *ROM = machine->region("maincpu")->base();
+		int length = machine->region("maincpu")->bytes();
+		UINT8* ROM2 = machine->region("user1")->base();
 
 		if (ROM2)
 		{
@@ -5527,9 +5527,9 @@ static void sfbonus_bitswap( running_machine* machine,
 {
 
 	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 
-	for(i = 0; i < memory_region_length(machine, "maincpu"); i++)
+	for(i = 0; i < machine->region("maincpu")->bytes(); i++)
 	{
 		UINT8 x = ROM[i];
 

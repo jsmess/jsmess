@@ -224,7 +224,7 @@ static void sdwx_decrypt(running_machine *machine)
 {
 
 	int i;
-	UINT16 *src = (UINT16 *) memory_region(machine, "user1");
+	UINT16 *src = (UINT16 *) machine->region("user1")->base();
 
 	int rom_size = 0x80000;
 
@@ -269,7 +269,7 @@ static void sdwx_gfx_decrypt(running_machine *machine)
 {
 	int i;
 	unsigned rom_size = 0x80000;
-	UINT8 *src = (UINT8 *) (memory_region(machine, "gfx1"));
+	UINT8 *src = (UINT8 *) (machine->region("gfx1")->base());
 	UINT8 *result_data = auto_alloc_array(machine, UINT8, rom_size);
 
 	for (i=0; i<rom_size; i++)
@@ -366,27 +366,27 @@ static INTERRUPT_GEN( igs_majhong_interrupt )
 
 
 static MACHINE_CONFIG_START( igs_majhong, driver_device )
-	MDRV_CPU_ADD("maincpu",ARM7, 20000000)
+	MCFG_CPU_ADD("maincpu",ARM7, 20000000)
 
-	MDRV_CPU_PROGRAM_MAP(igs_majhong_map)
+	MCFG_CPU_PROGRAM_MAP(igs_majhong_map)
 
-	MDRV_CPU_VBLANK_INT("screen", igs_majhong_interrupt)
-	//MDRV_NVRAM_ADD_0FILL("nvram")
+	MCFG_CPU_VBLANK_INT("screen", igs_majhong_interrupt)
+	//MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MDRV_GFXDECODE(igs_m027)
+	MCFG_GFXDECODE(igs_m027)
 
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(512, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(512, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
 
-	MDRV_PALETTE_LENGTH(0x200)
+	MCFG_PALETTE_LENGTH(0x200)
 
-	MDRV_VIDEO_START( igs_majhong )
-	MDRV_VIDEO_UPDATE( igs_majhong )
+	MCFG_VIDEO_START( igs_majhong )
+	MCFG_VIDEO_UPDATE( igs_majhong )
 
 	/* sound hardware */
 

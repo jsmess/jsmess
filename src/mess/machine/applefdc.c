@@ -154,7 +154,7 @@ static TIMER_CALLBACK(iwm_turnmotor_onoff);
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE void assert_is_applefdc(running_device *device)
+INLINE void assert_is_applefdc(device_t *device)
 {
 	assert(device != NULL);
 	assert((device->type() == APPLEFDC) || (device->type() == IWM) || (device->type() == SWIM));
@@ -162,7 +162,7 @@ INLINE void assert_is_applefdc(running_device *device)
 
 
 
-INLINE applefdc_token *get_token(running_device *device)
+INLINE applefdc_token *get_token(device_t *device)
 {
 	assert_is_applefdc(device);
 	return (applefdc_token *) downcast<legacy_device_base *>(device)->token();
@@ -170,7 +170,7 @@ INLINE applefdc_token *get_token(running_device *device)
 
 
 
-INLINE const applefdc_interface *get_interface(running_device *device)
+INLINE const applefdc_interface *get_interface(device_t *device)
 {
 	static const applefdc_interface dummy_interface = {0, };
 
@@ -190,7 +190,7 @@ INLINE const applefdc_interface *get_interface(running_device *device)
     applefdc_start - starts up an FDC
 -------------------------------------------------*/
 
-static void applefdc_start(running_device *device, applefdc_t type)
+static void applefdc_start(device_t *device, applefdc_t type)
 {
 	applefdc_token *fdc = get_token(device);
 
@@ -244,7 +244,7 @@ static DEVICE_RESET(applefdc)
     iwm_enable2 - hackish function
 -------------------------------------------------*/
 
-static int iwm_enable2(running_device *device)
+static int iwm_enable2(device_t *device)
 {
 	applefdc_token *fdc = get_token(device);
 
@@ -259,7 +259,7 @@ static int iwm_enable2(running_device *device)
     iwm_readenable2handshake - hackish function
 -------------------------------------------------*/
 
-static UINT8 iwm_readenable2handshake(running_device *device)
+static UINT8 iwm_readenable2handshake(device_t *device)
 {
 	applefdc_token *fdc = get_token(device);
 
@@ -276,7 +276,7 @@ static UINT8 iwm_readenable2handshake(running_device *device)
     applefdc_statusreg_r - reads the status register
 -------------------------------------------------*/
 
-static UINT8 applefdc_statusreg_r(running_device *device)
+static UINT8 applefdc_statusreg_r(device_t *device)
 {
 	UINT8 result;
 	int status;
@@ -306,7 +306,7 @@ static UINT8 applefdc_statusreg_r(running_device *device)
     iwm_modereg_w - changes the mode register
 -------------------------------------------------*/
 
-static void iwm_modereg_w(running_device *device, UINT8 data)
+static void iwm_modereg_w(device_t *device, UINT8 data)
 {
 	applefdc_token *fdc = get_token(device);
 
@@ -361,7 +361,7 @@ static void iwm_modereg_w(running_device *device, UINT8 data)
     applefdc_read_reg - reads a register
 -------------------------------------------------*/
 
-static UINT8 applefdc_read_reg(running_device *device, int lines)
+static UINT8 applefdc_read_reg(device_t *device, int lines)
 {
 	applefdc_token *fdc = get_token(device);
 	const applefdc_interface *intf = get_interface(device);
@@ -416,7 +416,7 @@ static UINT8 applefdc_read_reg(running_device *device, int lines)
     applefdc_write_reg - writes a register
 -------------------------------------------------*/
 
-static void applefdc_write_reg(running_device *device, UINT8 data)
+static void applefdc_write_reg(device_t *device, UINT8 data)
 {
 	applefdc_token *fdc = get_token(device);
 	const applefdc_interface *intf = get_interface(device);
@@ -457,7 +457,7 @@ static void applefdc_write_reg(running_device *device, UINT8 data)
 
 static TIMER_CALLBACK(iwm_turnmotor_onoff)
 {
-	running_device *device = (running_device *) ptr;
+	device_t *device = (device_t *) ptr;
 	applefdc_token *fdc = get_token(device);
 	const applefdc_interface *intf = get_interface(device);
 	int status = param;
@@ -492,7 +492,7 @@ static TIMER_CALLBACK(iwm_turnmotor_onoff)
     iwm_access
 -------------------------------------------------*/
 
-static void iwm_access(running_device *device, int offset)
+static void iwm_access(device_t *device, int offset)
 {
 	static const char *const lines[] =
 	{
@@ -722,7 +722,7 @@ WRITE8_DEVICE_HANDLER( applefdc_w )
     applefdc_w - writes a byte to the FDC
 -------------------------------------------------*/
 
-UINT8 applefdc_get_lines(running_device *device)
+UINT8 applefdc_get_lines(device_t *device)
 {
 	applefdc_token *fdc = get_token(device);
 	return fdc->lines & 0x0f;

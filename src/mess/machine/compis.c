@@ -168,7 +168,7 @@ static void compis_keyb_init(compis_state *state)
 /*-------------------------------------------------------------------------*/
 static void compis_fdc_reset(running_machine *machine)
 {
-	running_device *fdc = machine->device("upd765");
+	device_t *fdc = machine->device("upd765");
 
 	upd765_reset(fdc, 0);
 
@@ -178,7 +178,7 @@ static void compis_fdc_reset(running_machine *machine)
 
 static void compis_fdc_tc(running_machine *machine, int state)
 {
-	running_device *fdc = machine->device("upd765");
+	device_t *fdc = machine->device("upd765");
 	/* Terminal count if iSBX-218A has DMA enabled */
 	if (input_port_read(machine, "DSW1"))
 	{
@@ -220,7 +220,7 @@ const upd765_interface compis_fdc_interface =
 
 READ16_HANDLER (compis_fdc_dack_r)
 {
-	running_device *fdc = space->machine->device("upd765");
+	device_t *fdc = space->machine->device("upd765");
 	UINT16 data;
 	data = 0xffff;
 	/* DMA acknowledge if iSBX-218A has DMA enabled */
@@ -234,7 +234,7 @@ READ16_HANDLER (compis_fdc_dack_r)
 
 WRITE16_HANDLER (compis_fdc_w)
 {
-	running_device *fdc = space->machine->device("upd765");
+	device_t *fdc = space->machine->device("upd765");
 	switch(offset)
 	{
 		case 2:
@@ -248,7 +248,7 @@ WRITE16_HANDLER (compis_fdc_w)
 
 READ16_HANDLER (compis_fdc_r)
 {
-	running_device *fdc = space->machine->device("upd765");
+	device_t *fdc = space->machine->device("upd765");
 	UINT16 data;
 	data = 0xffff;
 	switch(offset)
@@ -373,7 +373,7 @@ WRITE16_DEVICE_HANDLER ( compis_osp_pit_w )
 /*-------------------------------------------------------------------------*/
 /*  USART 8251                                                             */
 /*-------------------------------------------------------------------------*/
-static void compis_usart_rxready(running_device *device, int state)
+static void compis_usart_rxready(device_t *device, int state)
 {
 #if 0
 	if (state)
@@ -390,13 +390,13 @@ const msm8251_interface compis_usart_interface=
 
 READ16_HANDLER ( compis_usart_r )
 {
-	running_device *uart = space->machine->device("uart");
+	device_t *uart = space->machine->device("uart");
 	return msm8251_data_r(uart, offset);
 }
 
 WRITE16_HANDLER ( compis_usart_w )
 {
-	running_device *uart = space->machine->device("uart");
+	device_t *uart = space->machine->device("uart");
 	switch (offset)
 	{
 		case 0x00:

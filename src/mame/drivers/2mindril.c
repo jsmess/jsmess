@@ -70,7 +70,7 @@ public:
 	UINT16        defender_sensor, shutter_sensor;
 
 	/* devices */
-	running_device *maincpu;
+	device_t *maincpu;
 };
 
 
@@ -412,7 +412,7 @@ static INTERRUPT_GEN( drill_interrupt )
 }
 
 /* WRONG,it does something with 60000c & 700002,likely to be called when the player throws the ball.*/
-static void irqhandler(running_device *device, int irq)
+static void irqhandler(device_t *device, int irq)
 {
 //  _2mindril_state *state = machine->driver_data<_2mindril_state>();
 //  cpu_set_input_line(state->maincpu, 5, irq ? ASSERT_LINE : CLEAR_LINE);
@@ -444,33 +444,33 @@ static MACHINE_RESET( drill )
 
 static MACHINE_CONFIG_START( drill, _2mindril_state )
 
-	MDRV_CPU_ADD("maincpu", M68000, 16000000 )
-	MDRV_CPU_PROGRAM_MAP(drill_map)
-	MDRV_CPU_VBLANK_INT("screen", drill_interrupt)
-	MDRV_GFXDECODE(2mindril)
+	MCFG_CPU_ADD("maincpu", M68000, 16000000 )
+	MCFG_CPU_PROGRAM_MAP(drill_map)
+	MCFG_CPU_VBLANK_INT("screen", drill_interrupt)
+	MCFG_GFXDECODE(2mindril)
 
-	MDRV_MACHINE_START(drill)
-	MDRV_MACHINE_RESET(drill)
+	MCFG_MACHINE_START(drill)
+	MCFG_MACHINE_RESET(drill)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(128*16, 64*8)
-	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 239-16)
-	MDRV_PALETTE_LENGTH(0x1000)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(128*16, 64*8)
+	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239-16)
+	MCFG_PALETTE_LENGTH(0x1000)
 
-	MDRV_VIDEO_START(drill)
-	MDRV_VIDEO_UPDATE(drill)
+	MCFG_VIDEO_START(drill)
+	MCFG_VIDEO_UPDATE(drill)
 
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ymsnd", YM2610, 16000000/2)
-	MDRV_SOUND_CONFIG(ym2610_config)
-	MDRV_SOUND_ROUTE(0, "lspeaker",  0.25)
-	MDRV_SOUND_ROUTE(0, "rspeaker", 0.25)
-	MDRV_SOUND_ROUTE(1, "lspeaker",  1.0)
-	MDRV_SOUND_ROUTE(2, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("ymsnd", YM2610, 16000000/2)
+	MCFG_SOUND_CONFIG(ym2610_config)
+	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
+	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
+	MCFG_SOUND_ROUTE(1, "lspeaker",  1.0)
+	MCFG_SOUND_ROUTE(2, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -493,9 +493,9 @@ ROM_END
 static DRIVER_INIT( drill )
 {
 	// rearrange gfx roms to something we can decode, two of the roms form 4bpp of the graphics, the third forms another 2bpp but is in a different format
-	UINT32 *src = (UINT32*)memory_region( machine, "gfx2" );
-	UINT32 *dst = (UINT32*)memory_region( machine, "gfx1" );// + 0x400000;
-//  UINT8 *rom = memory_region( machine, "maincpu" );
+	UINT32 *src = (UINT32*)machine->region( "gfx2" )->base();
+	UINT32 *dst = (UINT32*)machine->region( "gfx1" )->base();// + 0x400000;
+//  UINT8 *rom = machine->region( "maincpu" )->base();
 	int i;
 
 	for (i = 0; i < 0x400000 / 4; i++)

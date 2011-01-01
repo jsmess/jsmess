@@ -167,7 +167,7 @@ static WRITE8_DEVICE_HANDLER( exerion_portb_w )
 {
 	exerion_state *state = device->machine->driver_data<exerion_state>();
 	/* pull the expected value from the ROM */
-	state->porta = memory_region(device->machine, "maincpu")[0x5f76];
+	state->porta = device->machine->region("maincpu")->base()[0x5f76];
 	state->portb = data;
 
 	logerror("Port B = %02X\n", data);
@@ -178,7 +178,7 @@ static READ8_HANDLER( exerion_protection_r )
 {
 	exerion_state *state = space->machine->driver_data<exerion_state>();
 	if (cpu_get_pc(space->cpu) == 0x4143)
-		return memory_region(space->machine, "maincpu")[0x33c0 + (state->main_ram[0xd] << 2) + offset];
+		return space->machine->region("maincpu")->base()[0x33c0 + (state->main_ram[0xd] << 2) + offset];
 	else
 		return state->main_ram[0x8 + offset];
 }
@@ -415,36 +415,36 @@ static MACHINE_RESET( exerion )
 
 static MACHINE_CONFIG_START( exerion, exerion_state )
 
-	MDRV_CPU_ADD("maincpu", Z80, EXERION_CPU_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(main_map)
+	MCFG_CPU_ADD("maincpu", Z80, EXERION_CPU_CLOCK)
+	MCFG_CPU_PROGRAM_MAP(main_map)
 
-	MDRV_CPU_ADD("sub", Z80, EXERION_CPU_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(sub_map)
+	MCFG_CPU_ADD("sub", Z80, EXERION_CPU_CLOCK)
+	MCFG_CPU_PROGRAM_MAP(sub_map)
 
-	MDRV_MACHINE_START(exerion)
-	MDRV_MACHINE_RESET(exerion)
+	MCFG_MACHINE_START(exerion)
+	MCFG_MACHINE_RESET(exerion)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_RAW_PARAMS(EXERION_PIXEL_CLOCK, EXERION_HTOTAL, EXERION_HBEND, EXERION_HBSTART, EXERION_VTOTAL, EXERION_VBEND, EXERION_VBSTART)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_RAW_PARAMS(EXERION_PIXEL_CLOCK, EXERION_HTOTAL, EXERION_HBEND, EXERION_HBSTART, EXERION_VTOTAL, EXERION_VBEND, EXERION_VBSTART)
 
-	MDRV_GFXDECODE(exerion)
-	MDRV_PALETTE_LENGTH(256*3)
+	MCFG_GFXDECODE(exerion)
+	MCFG_PALETTE_LENGTH(256*3)
 
-	MDRV_PALETTE_INIT(exerion)
-	MDRV_VIDEO_START(exerion)
-	MDRV_VIDEO_UPDATE(exerion)
+	MCFG_PALETTE_INIT(exerion)
+	MCFG_VIDEO_START(exerion)
+	MCFG_VIDEO_UPDATE(exerion)
 
 	/* audio hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay1", AY8910, EXERION_AY8910_CLOCK)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	MCFG_SOUND_ADD("ay1", AY8910, EXERION_AY8910_CLOCK)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MDRV_SOUND_ADD("ay2", AY8910, EXERION_AY8910_CLOCK)
-	MDRV_SOUND_CONFIG(ay8910_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	MCFG_SOUND_ADD("ay2", AY8910, EXERION_AY8910_CLOCK)
+	MCFG_SOUND_CONFIG(ay8910_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
 
@@ -562,8 +562,8 @@ static DRIVER_INIT( exerion )
 
 	/* make a temporary copy of the character data */
 	src = temp;
-	dst = memory_region(machine, "gfx1");
-	length = memory_region_length(machine, "gfx1");
+	dst = machine->region("gfx1")->base();
+	length = machine->region("gfx1")->bytes();
 	memcpy(src, dst, length);
 
 	/* decode the characters */
@@ -580,8 +580,8 @@ static DRIVER_INIT( exerion )
 
 	/* make a temporary copy of the sprite data */
 	src = temp;
-	dst = memory_region(machine, "gfx2");
-	length = memory_region_length(machine, "gfx2");
+	dst = machine->region("gfx2")->base();
+	length = machine->region("gfx2")->bytes();
 	memcpy(src, dst, length);
 
 	/* decode the sprites */
@@ -603,7 +603,7 @@ static DRIVER_INIT( exerion )
 
 static DRIVER_INIT( exerionb )
 {
-	UINT8 *ram = memory_region(machine, "maincpu");
+	UINT8 *ram = machine->region("maincpu")->base();
 	int addr;
 
 	/* the program ROMs have data lines D1 and D2 swapped. Decode them. */

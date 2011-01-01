@@ -40,8 +40,8 @@ static WRITE8_HANDLER(spc1000_iplk_w)
 	spc1000_state *state = space->machine->driver_data<spc1000_state>();
 	state->IPLK = state->IPLK ? 0 : 1;
 	if (state->IPLK == 1) {
-		memory_set_bankptr(space->machine, "bank1", memory_region(space->machine, "maincpu"));
-		memory_set_bankptr(space->machine, "bank3", memory_region(space->machine, "maincpu"));
+		memory_set_bankptr(space->machine, "bank1", space->machine->region("maincpu")->base());
+		memory_set_bankptr(space->machine, "bank3", space->machine->region("maincpu")->base());
 	} else {
 		memory_set_bankptr(space->machine, "bank1", messram_get_ptr(space->machine->device("messram")));
 		memory_set_bankptr(space->machine, "bank3", messram_get_ptr(space->machine->device("messram")) + 0x8000);
@@ -53,8 +53,8 @@ static READ8_HANDLER(spc1000_iplk_r)
 	spc1000_state *state = space->machine->driver_data<spc1000_state>();
 	state->IPLK = state->IPLK ? 0 : 1;
 	if (state->IPLK == 1) {
-		memory_set_bankptr(space->machine, "bank1", memory_region(space->machine, "maincpu"));
-		memory_set_bankptr(space->machine, "bank3", memory_region(space->machine, "maincpu"));
+		memory_set_bankptr(space->machine, "bank1", space->machine->region("maincpu")->base());
+		memory_set_bankptr(space->machine, "bank3", space->machine->region("maincpu")->base());
 	} else {
 		memory_set_bankptr(space->machine, "bank1", messram_get_ptr(space->machine->device("messram")));
 		memory_set_bankptr(space->machine, "bank3", messram_get_ptr(space->machine->device("messram")) + 0x8000);
@@ -219,9 +219,9 @@ static MACHINE_RESET(spc1000)
 	memory_install_write_bank(space, 0x0000, 0x7fff, 0, 0, "bank2");
 	memory_install_write_bank(space, 0x8000, 0xffff, 0, 0, "bank4");
 
-	memory_set_bankptr(machine, "bank1", memory_region(machine, "maincpu"));
+	memory_set_bankptr(machine, "bank1", machine->region("maincpu")->base());
 	memory_set_bankptr(machine, "bank2", messram_get_ptr(machine->device("messram")));
-	memory_set_bankptr(machine, "bank3", memory_region(machine, "maincpu"));
+	memory_set_bankptr(machine, "bank3", machine->region("maincpu")->base());
 	memory_set_bankptr(machine, "bank4", messram_get_ptr(machine->device("messram")) + 0x8000);
 
 	state->IPLK = 1;
@@ -259,7 +259,7 @@ static VIDEO_START( spc1000 )
 
 static VIDEO_UPDATE( spc1000 )
 {
-	running_device *mc6847 = screen->machine->device("mc6847");
+	device_t *mc6847 = screen->machine->device("mc6847");
 	return mc6847_update(mc6847, bitmap, cliprect);
 }
 
@@ -296,39 +296,39 @@ static const mc6847_interface spc1000_mc6847_intf =
 
 static MACHINE_CONFIG_START( spc1000, spc1000_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz)
-	MDRV_CPU_PROGRAM_MAP(spc1000_mem)
-	MDRV_CPU_IO_MAP(spc1000_io)
+	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
+	MCFG_CPU_PROGRAM_MAP(spc1000_mem)
+	MCFG_CPU_IO_MAP(spc1000_io)
 
-	MDRV_MACHINE_RESET(spc1000)
+	MCFG_MACHINE_RESET(spc1000)
 
     /* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(M6847_NTSC_FRAMES_PER_SECOND)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_SIZE(320, 25+192+26)
-	MDRV_SCREEN_VISIBLE_AREA(0, 319, 1, 239)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(M6847_NTSC_FRAMES_PER_SECOND)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_SIZE(320, 25+192+26)
+	MCFG_SCREEN_VISIBLE_AREA(0, 319, 1, 239)
 
-	MDRV_VIDEO_START(spc1000)
-	MDRV_VIDEO_UPDATE(spc1000)
+	MCFG_VIDEO_START(spc1000)
+	MCFG_VIDEO_UPDATE(spc1000)
 
-	MDRV_MC6847_ADD("mc6847", spc1000_mc6847_intf)
-	MDRV_MC6847_TYPE(M6847_VERSION_ORIGINAL_NTSC)
-	MDRV_MC6847_CHAR_ROM(spc1000_get_char_rom)
+	MCFG_MC6847_ADD("mc6847", spc1000_mc6847_intf)
+	MCFG_MC6847_TYPE(M6847_VERSION_ORIGINAL_NTSC)
+	MCFG_MC6847_CHAR_ROM(spc1000_get_char_rom)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("ay8910", AY8910, XTAL_4MHz / 1)
-	MDRV_SOUND_CONFIG(spc1000_ay_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MDRV_SOUND_WAVE_ADD("wave", "cassette")
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("ay8910", AY8910, XTAL_4MHz / 1)
+	MCFG_SOUND_CONFIG(spc1000_ay_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_WAVE_ADD("wave", "cassette")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MDRV_CASSETTE_ADD( "cassette", spc1000_cassette_config )
+	MCFG_CASSETTE_ADD( "cassette", spc1000_cassette_config )
 
 	/* internal ram */
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("64K")
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("64K")
 MACHINE_CONFIG_END
 
 /* ROM definition */

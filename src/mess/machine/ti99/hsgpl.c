@@ -98,7 +98,7 @@ typedef ti99_pebcard_config hsgpl_config;
 
 typedef struct _hsgpl_state
 {
-	running_device	*dsr, *rom6, *groma, *gromb;
+	device_t	*dsr, *rom6, *groma, *gromb;
 	UINT8	*ram6;
 	UINT8	*gram;
 	UINT8	*flashrom;
@@ -126,7 +126,7 @@ typedef struct _hsgpl_state
 
 } hsgpl_state;
 
-INLINE hsgpl_state *get_safe_token(running_device *device)
+INLINE hsgpl_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	return (hsgpl_state *)downcast<legacy_device_base *>(device)->token();
@@ -581,7 +581,7 @@ static DEVICE_RESET( hsgpl )
 	/* If the card is selected in the menu, register the card */
 	if (input_port_read(device->machine, "EXTCARD") & (EXT_HSGPL_ON | EXT_HSGPL_FLASH))
 	{
-		running_device *peb = device->owner();
+		device_t *peb = device->owner();
 		int success = mount_card(peb, device, &hsgpl_card, get_pebcard_config(device)->slot);
 		if (!success)
 		{
@@ -688,17 +688,17 @@ static DEVICE_NVRAM( hsgpl )
 /*
     Get the pointer to the memory data from the HSGPL card. Called by the FEEPROM.
 */
-static UINT8 *get_mem_ptr(running_device *device)
+static UINT8 *get_mem_ptr(device_t *device)
 {
 	hsgpl_state *card = get_safe_token(device);
 	return card->flashrom;
 }
 
 MACHINE_CONFIG_FRAGMENT( hsgpl )
-	MDRV_AT29C040_ADD_P( "u9_dsr",  get_mem_ptr, 0x000001)
-	MDRV_AT29C040_ADD_P( "u4_grom", get_mem_ptr, 0x080003)
-	MDRV_AT29C040_ADD_P( "u1_grom", get_mem_ptr, 0x100005)
-	MDRV_AT29C040_ADD_P( "u6_rom6", get_mem_ptr, 0x180007)
+	MCFG_AT29C040_ADD_P( "u9_dsr",  get_mem_ptr, 0x000001)
+	MCFG_AT29C040_ADD_P( "u4_grom", get_mem_ptr, 0x080003)
+	MCFG_AT29C040_ADD_P( "u1_grom", get_mem_ptr, 0x100005)
+	MCFG_AT29C040_ADD_P( "u6_rom6", get_mem_ptr, 0x180007)
 MACHINE_CONFIG_END
 
 static const char DEVTEMPLATE_SOURCE[] = __FILE__;

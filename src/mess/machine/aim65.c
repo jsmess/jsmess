@@ -62,7 +62,7 @@
  * PB7: CU (Cursor)
  */
 
-static void dl1416_update(running_device *device, int index)
+static void dl1416_update(device_t *device, int index)
 {
 	aim65_state *state = device->machine->driver_data<aim65_state>();
 	dl1416_ce_w(device, state->pia_a & (0x04 << index));
@@ -97,27 +97,27 @@ WRITE8_DEVICE_HANDLER(aim65_pia_b_w)
 }
 
 
-void aim65_update_ds1(running_device *device, int digit, int data)
+void aim65_update_ds1(device_t *device, int digit, int data)
 {
 	output_set_digit_value(0 + (digit ^ 3), data);
 }
 
-void aim65_update_ds2(running_device *device, int digit, int data)
+void aim65_update_ds2(device_t *device, int digit, int data)
 {
 	output_set_digit_value(4 + (digit ^ 3), data);
 }
 
-void aim65_update_ds3(running_device *device, int digit, int data)
+void aim65_update_ds3(device_t *device, int digit, int data)
 {
 	output_set_digit_value(8 + (digit ^ 3), data);
 }
 
-void aim65_update_ds4(running_device *device, int digit, int data)
+void aim65_update_ds4(device_t *device, int digit, int data)
 {
 	output_set_digit_value(12 + (digit ^ 3), data);
 }
 
-void aim65_update_ds5(running_device *device, int digit, int data)
+void aim65_update_ds5(device_t *device, int digit, int data)
 {
 	output_set_digit_value(16 + (digit ^ 3), data);
 }
@@ -171,7 +171,7 @@ WRITE_LINE_DEVICE_HANDLER(aim65_riot_irq)
 
 MACHINE_START( aim65 )
 {
-	running_device *ram = machine->device("messram");
+	device_t *ram = machine->device("messram");
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	/* Init RAM */

@@ -51,33 +51,33 @@ struct _c9060_t
 	int atna;							/* attention acknowledge */
 
 	/* devices */
-	running_device *cpu_dos;
-	running_device *cpu_hdc;
-	running_device *riot0;
-	running_device *riot1;
-	running_device *via;
-	running_device *bus;
+	device_t *cpu_dos;
+	device_t *cpu_hdc;
+	device_t *riot0;
+	device_t *riot1;
+	device_t *via;
+	device_t *bus;
 };
 
 /***************************************************************************
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE c9060_t *get_safe_token(running_device *device)
+INLINE c9060_t *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert((device->type() == C9060) || (device->type() == C9090));
 	return (c9060_t *)downcast<legacy_device_base *>(device)->token();
 }
 
-INLINE c9060_config *get_safe_config(running_device *device)
+INLINE c9060_config *get_safe_config(device_t *device)
 {
 	assert(device != NULL);
 	assert((device->type() == C9060) || (device->type() == C9090));
 	return (c9060_config *)downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
 }
 
-INLINE void update_ieee_signals(running_device *device)
+INLINE void update_ieee_signals(device_t *device)
 {
 	c9060_t *c9060 = get_safe_token(device);
 
@@ -454,17 +454,17 @@ static const via6522_interface via_intf =
 
 static MACHINE_CONFIG_FRAGMENT( c9060 )
 	/* DOS */
-	MDRV_CPU_ADD(M6502_TAG, M6502, XTAL_16MHz/16)
-	MDRV_CPU_PROGRAM_MAP(c9060_dos_map)
+	MCFG_CPU_ADD(M6502_TAG, M6502, XTAL_16MHz/16)
+	MCFG_CPU_PROGRAM_MAP(c9060_dos_map)
 
-	MDRV_RIOT6532_ADD(M6532_0_TAG, XTAL_16MHz/16, riot0_intf)
-	MDRV_RIOT6532_ADD(M6532_1_TAG, XTAL_16MHz/16, riot1_intf)
+	MCFG_RIOT6532_ADD(M6532_0_TAG, XTAL_16MHz/16, riot0_intf)
+	MCFG_RIOT6532_ADD(M6532_1_TAG, XTAL_16MHz/16, riot1_intf)
 
 	/* controller */
-	MDRV_CPU_ADD(M6504_TAG, M6502, XTAL_16MHz/16)
-	MDRV_CPU_PROGRAM_MAP(c9060_fdc_map)
+	MCFG_CPU_ADD(M6504_TAG, M6502, XTAL_16MHz/16)
+	MCFG_CPU_PROGRAM_MAP(c9060_fdc_map)
 
-	MDRV_VIA6522_ADD(M6522_TAG, XTAL_16MHz/16, via_intf)
+	MCFG_VIA6522_ADD(M6522_TAG, XTAL_16MHz/16, via_intf)
 
 	// Tandon TM602S
 MACHINE_CONFIG_END
@@ -474,7 +474,7 @@ MACHINE_CONFIG_END
 -------------------------------------------------*/
 
 static MACHINE_CONFIG_FRAGMENT( c9090 )
-	MDRV_FRAGMENT_ADD(c9060)
+	MCFG_FRAGMENT_ADD(c9060)
 
 	// Tandon TM603S
 MACHINE_CONFIG_END

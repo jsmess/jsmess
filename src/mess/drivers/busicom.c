@@ -218,26 +218,26 @@ static const char layout_busicom [] = "busicom";
 
 static MACHINE_CONFIG_START( busicom, busicom_state )
     /* basic machine hardware */
-    MDRV_CPU_ADD("maincpu",I4004, 750000)
-    MDRV_CPU_PROGRAM_MAP(busicom_rom)
-    MDRV_CPU_DATA_MAP(busicom_mem)
-    MDRV_CPU_IO_MAP(busicom_io)
+    MCFG_CPU_ADD("maincpu",I4004, 750000)
+    MCFG_CPU_PROGRAM_MAP(busicom_rom)
+    MCFG_CPU_DATA_MAP(busicom_mem)
+    MCFG_CPU_IO_MAP(busicom_io)
 
-    MDRV_MACHINE_RESET(busicom)
-	MDRV_MACHINE_START(busicom)
+    MCFG_MACHINE_RESET(busicom)
+	MCFG_MACHINE_START(busicom)
 
     /* video hardware */
-    MDRV_SCREEN_ADD("screen", RASTER)
-    MDRV_SCREEN_REFRESH_RATE(50)
-    MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-    MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-    MDRV_SCREEN_SIZE(40*17, 44*11)
-    MDRV_SCREEN_VISIBLE_AREA(0, 40*17-1, 0, 44*11-1)
-    MDRV_PALETTE_LENGTH(16)
-    MDRV_PALETTE_INIT(busicom)
+    MCFG_SCREEN_ADD("screen", RASTER)
+    MCFG_SCREEN_REFRESH_RATE(50)
+    MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+    MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+    MCFG_SCREEN_SIZE(40*17, 44*11)
+    MCFG_SCREEN_VISIBLE_AREA(0, 40*17-1, 0, 44*11-1)
+    MCFG_PALETTE_LENGTH(16)
+    MCFG_PALETTE_INIT(busicom)
 
-	MDRV_VIDEO_START(busicom)
-	MDRV_VIDEO_UPDATE(busicom)
+	MCFG_VIDEO_START(busicom)
+	MCFG_VIDEO_UPDATE(busicom)
 MACHINE_CONFIG_END
 
 /* ROM definition */

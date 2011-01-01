@@ -810,7 +810,7 @@ static UINT8 funquiz_question_bank = 0x80;
 
 static READ8_HANDLER( questions_r )
 {
-	UINT8* quiz = memory_region(space->machine,"questions");
+	UINT8* quiz = space->machine->region("questions")->base();
 	int extraoffset = ((funquiz_question_bank & 0x1f) * 0x8000);
 
 	// if 0x80 is set, read the 2nd half of the question rom (contains header info)
@@ -2109,104 +2109,104 @@ static const mc6845_interface mc6845_intf =
 
 static MACHINE_CONFIG_START( fw1stpal, driver_device )
     /* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M65SC02, MASTER_CLOCK/8)	/* 2MHz */
-	MDRV_CPU_PROGRAM_MAP(funworld_map)
-	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
+	MCFG_CPU_ADD("maincpu", M65SC02, MASTER_CLOCK/8)	/* 2MHz */
+	MCFG_CPU_PROGRAM_MAP(funworld_map)
+	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
-	MDRV_NVRAM_ADD_0FILL("nvram")
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MDRV_PIA6821_ADD("pia0", pia0_intf)
-	MDRV_PIA6821_ADD("pia1", pia1_intf)
+	MCFG_PIA6821_ADD("pia0", pia0_intf)
+	MCFG_PIA6821_ADD("pia1", pia1_intf)
 
     /* video hardware */
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE((124+1)*4, (30+1)*8)				/* Taken from MC6845 init, registers 00 & 04. Normally programmed with (value-1) */
-	MDRV_SCREEN_VISIBLE_AREA(0*4, 96*4-1, 0*8, 29*8-1)	/* Taken from MC6845 init, registers 01 & 06 */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE((124+1)*4, (30+1)*8)				/* Taken from MC6845 init, registers 00 & 04. Normally programmed with (value-1) */
+	MCFG_SCREEN_VISIBLE_AREA(0*4, 96*4-1, 0*8, 29*8-1)	/* Taken from MC6845 init, registers 01 & 06 */
 
-	MDRV_GFXDECODE(fw1stpal)
+	MCFG_GFXDECODE(fw1stpal)
 
-	MDRV_PALETTE_LENGTH(0x200)
-	MDRV_PALETTE_INIT(funworld)
-	MDRV_VIDEO_START(funworld)
-	MDRV_VIDEO_UPDATE(funworld)
+	MCFG_PALETTE_LENGTH(0x200)
+	MCFG_PALETTE_INIT(funworld)
+	MCFG_VIDEO_START(funworld)
+	MCFG_VIDEO_UPDATE(funworld)
 
-	MDRV_MC6845_ADD("crtc", MC6845, MASTER_CLOCK/8, mc6845_intf)	/* 2MHz, veryfied on jollycrd & royalcrd */
+	MCFG_MC6845_ADD("crtc", MC6845, MASTER_CLOCK/8, mc6845_intf)	/* 2MHz, veryfied on jollycrd & royalcrd */
 
     /* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay8910", AY8910, MASTER_CLOCK/8)	/* 2MHz */
-	MDRV_SOUND_CONFIG(ay8910_intf)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.5)	/* analyzed to avoid clips */
+	MCFG_SOUND_ADD("ay8910", AY8910, MASTER_CLOCK/8)	/* 2MHz */
+	MCFG_SOUND_CONFIG(ay8910_intf)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.5)	/* analyzed to avoid clips */
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( fw2ndpal, fw1stpal )
 
-	MDRV_CPU_REPLACE("maincpu", M65C02, MASTER_CLOCK/8)	/* 2MHz */
-	MDRV_CPU_PROGRAM_MAP(funworld_map)
-	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
+	MCFG_CPU_REPLACE("maincpu", M65C02, MASTER_CLOCK/8)	/* 2MHz */
+	MCFG_CPU_PROGRAM_MAP(funworld_map)
+	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
-	MDRV_GFXDECODE(fw2ndpal)
+	MCFG_GFXDECODE(fw2ndpal)
 MACHINE_CONFIG_END
 
 
 
 static MACHINE_CONFIG_DERIVED( funquiz, fw1stpal )
-//  MDRV_FRAGMENT_ADD(fw2ndpal)
+//  MCFG_FRAGMENT_ADD(fw2ndpal)
 
-	MDRV_CPU_REPLACE("maincpu", M65C02, MASTER_CLOCK/8)	/* 2MHz */
-	MDRV_CPU_PROGRAM_MAP(funquiz_map)
-	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
+	MCFG_CPU_REPLACE("maincpu", M65C02, MASTER_CLOCK/8)	/* 2MHz */
+	MCFG_CPU_PROGRAM_MAP(funquiz_map)
+	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
-	MDRV_SOUND_REPLACE("ay8910", AY8910, MASTER_CLOCK/8)	/* 2MHz */
-	MDRV_SOUND_CONFIG(funquiz_ay8910_intf)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.5)
+	MCFG_SOUND_REPLACE("ay8910", AY8910, MASTER_CLOCK/8)	/* 2MHz */
+	MCFG_SOUND_CONFIG(funquiz_ay8910_intf)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.5)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( magicrd2, fw1stpal )
 
-	MDRV_CPU_REPLACE("maincpu", M65C02, MASTER_CLOCK/8)	/* 2MHz */
-	MDRV_CPU_PROGRAM_MAP(magicrd2_map)
-	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
+	MCFG_CPU_REPLACE("maincpu", M65C02, MASTER_CLOCK/8)	/* 2MHz */
+	MCFG_CPU_PROGRAM_MAP(magicrd2_map)
+	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
-	MDRV_VIDEO_START(magicrd2)
+	MCFG_VIDEO_START(magicrd2)
 
-	MDRV_SOUND_REPLACE("ay8910", AY8910, MASTER_CLOCK/8)	/* 2MHz */
-	MDRV_SOUND_CONFIG(ay8910_intf)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.5)	/* analyzed to avoid clips */
+	MCFG_SOUND_REPLACE("ay8910", AY8910, MASTER_CLOCK/8)	/* 2MHz */
+	MCFG_SOUND_CONFIG(ay8910_intf)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.5)	/* analyzed to avoid clips */
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( royalcd1, fw1stpal )
 
-	MDRV_CPU_REPLACE("maincpu", M65C02, MASTER_CLOCK/8)	/* (G65SC02P in pro version) 2MHz */
-	MDRV_CPU_PROGRAM_MAP(magicrd2_map)
-	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
+	MCFG_CPU_REPLACE("maincpu", M65C02, MASTER_CLOCK/8)	/* (G65SC02P in pro version) 2MHz */
+	MCFG_CPU_PROGRAM_MAP(magicrd2_map)
+	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( royalcd2, fw2ndpal )
 
-	MDRV_CPU_REPLACE("maincpu", M65C02, MASTER_CLOCK/8)	/* 2MHz */
-	MDRV_CPU_PROGRAM_MAP(magicrd2_map)
-	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
+	MCFG_CPU_REPLACE("maincpu", M65C02, MASTER_CLOCK/8)	/* 2MHz */
+	MCFG_CPU_PROGRAM_MAP(magicrd2_map)
+	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( cuoreuno, fw1stpal )
 
-	MDRV_CPU_REPLACE("maincpu", M65C02, MASTER_CLOCK/8)	/* 2MHz */
-	MDRV_CPU_PROGRAM_MAP(cuoreuno_map)
-	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
+	MCFG_CPU_REPLACE("maincpu", M65C02, MASTER_CLOCK/8)	/* 2MHz */
+	MCFG_CPU_PROGRAM_MAP(cuoreuno_map)
+	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( saloon, fw1stpal )
 
-	MDRV_CPU_REPLACE("maincpu", M65C02, MASTER_CLOCK/8)	/* 2MHz */
-	MDRV_CPU_PROGRAM_MAP(saloon_map)
-	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
+	MCFG_CPU_REPLACE("maincpu", M65C02, MASTER_CLOCK/8)	/* 2MHz */
+	MCFG_CPU_PROGRAM_MAP(saloon_map)
+	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
 MACHINE_CONFIG_END
 
 
@@ -4049,7 +4049,7 @@ static DRIVER_INIT( tabblue )
 *****************************************************************************************************/
 
 	int x, na, nb, nad, nbd;
-	UINT8 *src = memory_region( machine, "gfx1" );
+	UINT8 *src = machine->region( "gfx1" )->base();
 
 
 	for (x=0x0000; x < 0x10000; x++)
@@ -4079,7 +4079,7 @@ static DRIVER_INIT( magicd2a )
 
 ******************************************************************/
 {
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 
 	ROM[0xc1c6] = 0x92;
 }
@@ -4088,8 +4088,8 @@ static DRIVER_INIT( magicd2b )
 /*** same as blue TAB PCB, with the magicd2a patch ***/
 {
 	int x, na, nb, nad, nbd;
-	UINT8 *src = memory_region( machine, "gfx1" );
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *src = machine->region( "gfx1" )->base();
+	UINT8 *ROM = machine->region("maincpu")->base();
 
 	for (x=0x0000; x < 0x10000; x++)
 	{
@@ -4108,7 +4108,7 @@ static DRIVER_INIT( magicd2b )
 static DRIVER_INIT( soccernw )
 {
 /* temporary patch to avoid hardware errors for debug purposes */
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 
 	ROM[0x80b2] = 0xa9;
 	ROM[0x80b3] = 0x00;
@@ -4143,16 +4143,16 @@ static DRIVER_INIT( saloon )
 
 *************************************************/
 {
-	UINT8 *rom = memory_region(machine, "maincpu");
-	int size = memory_region_length(machine, "maincpu");
+	UINT8 *rom = machine->region("maincpu")->base();
+	int size = machine->region("maincpu")->bytes();
 	int start = 0x8000;
 
-	UINT8 *gfxrom = memory_region(machine, "gfx1");
-	int sizeg = memory_region_length(machine, "gfx1");
+	UINT8 *gfxrom = machine->region("gfx1")->base();
+	int sizeg = machine->region("gfx1")->bytes();
 	int startg = 0;
 
-	UINT8 *prom = memory_region(machine, "proms");
-	int sizep = memory_region_length(machine, "proms");
+	UINT8 *prom = machine->region("proms")->base();
+	int sizep = machine->region("proms")->bytes();
 	int startp = 0;
 
 	UINT8 *buffer;
@@ -4237,7 +4237,7 @@ static DRIVER_INIT( multiwin )
 
 ******************************************************/
 {
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	int x;
@@ -4256,7 +4256,7 @@ static DRIVER_INIT( multiwin )
 		ROM[x+0x10000] = code;
 	}
 
-	space->set_decrypted_region(0x8000, 0xffff, memory_region(machine, "maincpu") + 0x18000);
+	space->set_decrypted_region(0x8000, 0xffff, machine->region("maincpu")->base() + 0x18000);
 }
 
 static DRIVER_INIT( royalcdc )
@@ -4270,7 +4270,7 @@ static DRIVER_INIT( royalcdc )
 
 ******************************************************/
 
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	int x;
@@ -4309,7 +4309,7 @@ static DRIVER_INIT( royalcdc )
 		ROM[x+0x10000] = code;
 	}
 
-	space->set_decrypted_region(0x6000, 0xffff, memory_region(machine, "maincpu") + 0x16000);
+	space->set_decrypted_region(0x6000, 0xffff, machine->region("maincpu")->base() + 0x16000);
 }
 
 

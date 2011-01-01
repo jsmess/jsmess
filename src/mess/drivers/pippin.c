@@ -139,32 +139,32 @@ static VIDEO_UPDATE( pippin )
 
 static MACHINE_CONFIG_START( pippin, pippin_state )
     /* basic machine hardware */
-    MDRV_CPU_ADD("maincpu",PPC603, 66000000)
-    MDRV_CPU_PROGRAM_MAP(pippin_mem)
+    MCFG_CPU_ADD("maincpu",PPC603, 66000000)
+    MCFG_CPU_PROGRAM_MAP(pippin_mem)
 
-    MDRV_MACHINE_RESET(pippin)
+    MCFG_MACHINE_RESET(pippin)
 
     /* video hardware */
-    MDRV_SCREEN_ADD("screen", RASTER)
-    MDRV_SCREEN_REFRESH_RATE(60)
-    MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-    MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-    MDRV_SCREEN_SIZE(640, 480)
-    MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-    MDRV_PALETTE_LENGTH(2)
-    MDRV_PALETTE_INIT(black_and_white)
+    MCFG_SCREEN_ADD("screen", RASTER)
+    MCFG_SCREEN_REFRESH_RATE(60)
+    MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+    MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+    MCFG_SCREEN_SIZE(640, 480)
+    MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+    MCFG_PALETTE_LENGTH(2)
+    MCFG_PALETTE_INIT(black_and_white)
 
-    MDRV_VIDEO_START(pippin)
-    MDRV_VIDEO_UPDATE(pippin)
+    MCFG_VIDEO_START(pippin)
+    MCFG_VIDEO_UPDATE(pippin)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD( "cdda", CDDA, 0 )
-	MDRV_SOUND_ROUTE( 0, "lspeaker", 1.00 )
-	MDRV_SOUND_ROUTE( 1, "rspeaker", 1.00 )
+	MCFG_SOUND_ADD( "cdda", CDDA, 0 )
+	MCFG_SOUND_ROUTE( 0, "lspeaker", 1.00 )
+	MCFG_SOUND_ROUTE( 1, "rspeaker", 1.00 )
 
-	MDRV_CDROM_ADD("cdrom")
+	MCFG_CDROM_ADD("cdrom")
 MACHINE_CONFIG_END
 
 /* ROM definition */

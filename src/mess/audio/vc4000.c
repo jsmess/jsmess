@@ -20,7 +20,7 @@ struct _vc4000_sound
 };
 
 
-static vc4000_sound *get_token(running_device *device)
+static vc4000_sound *get_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == VC4000);
@@ -28,7 +28,7 @@ static vc4000_sound *get_token(running_device *device)
 }
 
 
-void vc4000_soundport_w (running_device *device, int offset, int data)
+void vc4000_soundport_w (device_t *device, int offset, int data)
 {
 	vc4000_sound *token = get_token(device);
 

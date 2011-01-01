@@ -50,10 +50,10 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MDRV_CRT9007_ADD(_tag, _clock, _config, _map) \
-	MDRV_DEVICE_ADD(_tag, CRT9007, _clock) \
-	MDRV_DEVICE_CONFIG(_config) \
-	MDRV_DEVICE_ADDRESS_MAP(0, _map)
+#define MCFG_CRT9007_ADD(_tag, _clock, _config, _map) \
+	MCFG_DEVICE_ADD(_tag, CRT9007, _clock) \
+	MCFG_DEVICE_CONFIG(_config) \
+	MCFG_DEVICE_ADDRESS_MAP(0, _map)
 
 
 #define CRT9007_INTERFACE(name) \

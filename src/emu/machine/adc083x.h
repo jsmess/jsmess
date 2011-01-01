@@ -37,28 +37,28 @@ DECLARE_LEGACY_DEVICE(ADC0832, adc0832);
 DECLARE_LEGACY_DEVICE(ADC0834, adc0834);
 DECLARE_LEGACY_DEVICE(ADC0838, adc0838);
 
-#define MDRV_ADC0831_ADD(_tag, _config) \
-	MDRV_DEVICE_ADD(_tag, ADC0831, 0) \
-	MDRV_DEVICE_CONFIG(_config)
+#define MCFG_ADC0831_ADD(_tag, _config) \
+	MCFG_DEVICE_ADD(_tag, ADC0831, 0) \
+	MCFG_DEVICE_CONFIG(_config)
 
-#define MDRV_ADC0832_ADD(_tag, _config) \
-	MDRV_DEVICE_ADD(_tag, ADC0832, 0) \
-	MDRV_DEVICE_CONFIG(_config)
+#define MCFG_ADC0832_ADD(_tag, _config) \
+	MCFG_DEVICE_ADD(_tag, ADC0832, 0) \
+	MCFG_DEVICE_CONFIG(_config)
 
-#define MDRV_ADC0834_ADD(_tag, _config) \
-	MDRV_DEVICE_ADD(_tag, ADC0834, 0) \
-	MDRV_DEVICE_CONFIG(_config)
+#define MCFG_ADC0834_ADD(_tag, _config) \
+	MCFG_DEVICE_ADD(_tag, ADC0834, 0) \
+	MCFG_DEVICE_CONFIG(_config)
 
-#define MDRV_ADC0838_ADD(_tag, _config) \
-	MDRV_DEVICE_ADD(_tag, ADC0838, 0) \
-	MDRV_DEVICE_CONFIG(_config)
+#define MCFG_ADC0838_ADD(_tag, _config) \
+	MCFG_DEVICE_ADD(_tag, ADC0838, 0) \
+	MCFG_DEVICE_CONFIG(_config)
 
 
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef double (*adc083x_input_convert_func)(running_device *device, UINT8 input);
+typedef double (*adc083x_input_convert_func)(device_t *device, UINT8 input);
 
 typedef struct _adc083x_interface adc083x_interface;
 struct _adc083x_interface

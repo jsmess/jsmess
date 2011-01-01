@@ -27,7 +27,7 @@
     apple2_langcard_touch - device read callback
 -------------------------------------------------*/
 
-static void apple2_langcard_touch(running_device *device, offs_t offset)
+static void apple2_langcard_touch(device_t *device, offs_t offset)
 {
 	UINT32 val, mask;
 

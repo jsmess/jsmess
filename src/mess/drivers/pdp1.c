@@ -350,29 +350,29 @@ static MACHINE_CONFIG_START( pdp1, pdp1_state )
 
 	/* basic machine hardware */
 	/* PDP1 CPU @ 200 kHz (no master clock, but the instruction and memory rate is 200 kHz) */
-	MDRV_CPU_ADD("maincpu", PDP1, 1000000/*the CPU core uses microsecond counts*/)
-	MDRV_CPU_CONFIG(pdp1_reset_param)
-	MDRV_CPU_PROGRAM_MAP(pdp1_map)
-	MDRV_CPU_VBLANK_INT("screen", pdp1_interrupt)	/* dummy interrupt: handles input */
+	MCFG_CPU_ADD("maincpu", PDP1, 1000000/*the CPU core uses microsecond counts*/)
+	MCFG_CPU_CONFIG(pdp1_reset_param)
+	MCFG_CPU_PROGRAM_MAP(pdp1_map)
+	MCFG_CPU_VBLANK_INT("screen", pdp1_interrupt)	/* dummy interrupt: handles input */
 
-	MDRV_MACHINE_START( pdp1 )
-	MDRV_MACHINE_RESET( pdp1 )
+	MCFG_MACHINE_START( pdp1 )
+	MCFG_MACHINE_RESET( pdp1 )
 
 	/* video hardware (includes the control panel and typewriter output) */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(refresh_rate)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(virtual_width, virtual_height)
-	MDRV_SCREEN_VISIBLE_AREA(0, virtual_width-1, 0, virtual_height-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(refresh_rate)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(virtual_width, virtual_height)
+	MCFG_SCREEN_VISIBLE_AREA(0, virtual_width-1, 0, virtual_height-1)
 
-	MDRV_GFXDECODE(pdp1)
-	MDRV_PALETTE_LENGTH(pen_crt_num_levels + sizeof(pdp1_colors) / 3 + sizeof(pdp1_palette))
+	MCFG_GFXDECODE(pdp1)
+	MCFG_PALETTE_LENGTH(pen_crt_num_levels + sizeof(pdp1_colors) / 3 + sizeof(pdp1_palette))
 
-	MDRV_PALETTE_INIT(pdp1)
-	MDRV_VIDEO_START(pdp1)
-	MDRV_VIDEO_EOF(crt)
-	MDRV_VIDEO_UPDATE(pdp1)
+	MCFG_PALETTE_INIT(pdp1)
+	MCFG_VIDEO_START(pdp1)
+	MCFG_VIDEO_EOF(crt)
+	MCFG_VIDEO_UPDATE(pdp1)
 MACHINE_CONFIG_END
 
 /*

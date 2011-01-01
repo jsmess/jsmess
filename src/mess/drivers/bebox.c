@@ -87,7 +87,7 @@ ADDRESS_MAP_END
 
 static READ64_HANDLER(bb_slave_64be_r)
 {
-	running_device *device = space->machine->device("pcibus");
+	device_t *device = space->machine->device("pcibus");
 
 	// 2e94 is the real address, 2e84 is where the PC appears to be under full DRC
 	if ((cpu_get_pc(space->cpu) == 0xfff02e94) || (cpu_get_pc(space->cpu) == 0xfff02e84))
@@ -118,73 +118,73 @@ static const floppy_config bebox_floppy_config =
 
 static MACHINE_CONFIG_START( bebox, bebox_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("ppc1", PPC603, 66000000)	/* 66 MHz */
-	MDRV_CPU_PROGRAM_MAP(bebox_mem)
+	MCFG_CPU_ADD("ppc1", PPC603, 66000000)	/* 66 MHz */
+	MCFG_CPU_PROGRAM_MAP(bebox_mem)
 
-	MDRV_CPU_ADD("ppc2", PPC603, 66000000)	/* 66 MHz */
-	MDRV_CPU_PROGRAM_MAP(bebox_slave_mem)
+	MCFG_CPU_ADD("ppc2", PPC603, 66000000)	/* 66 MHz */
+	MCFG_CPU_PROGRAM_MAP(bebox_slave_mem)
 
-	MDRV_QUANTUM_TIME(HZ(60))
+	MCFG_QUANTUM_TIME(HZ(60))
 
-	MDRV_PIT8254_ADD( "pit8254", bebox_pit8254_config )
+	MCFG_PIT8254_ADD( "pit8254", bebox_pit8254_config )
 
-	MDRV_I8237_ADD( "dma8237_1", XTAL_14_31818MHz/3, bebox_dma8237_1_config )
+	MCFG_I8237_ADD( "dma8237_1", XTAL_14_31818MHz/3, bebox_dma8237_1_config )
 
-	MDRV_I8237_ADD( "dma8237_2", XTAL_14_31818MHz/3, bebox_dma8237_2_config )
+	MCFG_I8237_ADD( "dma8237_2", XTAL_14_31818MHz/3, bebox_dma8237_2_config )
 
-	MDRV_PIC8259_ADD( "pic8259_master", bebox_pic8259_master_config )
+	MCFG_PIC8259_ADD( "pic8259_master", bebox_pic8259_master_config )
 
-	MDRV_PIC8259_ADD( "pic8259_slave", bebox_pic8259_slave_config )
+	MCFG_PIC8259_ADD( "pic8259_slave", bebox_pic8259_slave_config )
 
-	MDRV_NS16550_ADD( "ns16550_0", bebox_uart_inteface_0 )			/* TODO: Verify model */
-	MDRV_NS16550_ADD( "ns16550_1", bebox_uart_inteface_1 )			/* TODO: Verify model */
-	MDRV_NS16550_ADD( "ns16550_2", bebox_uart_inteface_2 )			/* TODO: Verify model */
-	MDRV_NS16550_ADD( "ns16550_3", bebox_uart_inteface_3 )			/* TODO: Verify model */
+	MCFG_NS16550_ADD( "ns16550_0", bebox_uart_inteface_0 )			/* TODO: Verify model */
+	MCFG_NS16550_ADD( "ns16550_1", bebox_uart_inteface_1 )			/* TODO: Verify model */
+	MCFG_NS16550_ADD( "ns16550_2", bebox_uart_inteface_2 )			/* TODO: Verify model */
+	MCFG_NS16550_ADD( "ns16550_3", bebox_uart_inteface_3 )			/* TODO: Verify model */
 
-	MDRV_IDE_CONTROLLER_ADD( "ide", bebox_ide_interrupt )	/* FIXME */
+	MCFG_IDE_CONTROLLER_ADD( "ide", bebox_ide_interrupt )	/* FIXME */
 
 	/* video hardware */
-	MDRV_FRAGMENT_ADD( pcvideo_vga )
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_FRAGMENT_ADD( pcvideo_vga )
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 
-	MDRV_MACHINE_START( bebox )
-	MDRV_MACHINE_RESET( bebox )
+	MCFG_MACHINE_START( bebox )
+	MCFG_MACHINE_RESET( bebox )
 
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("ym3812", YM3812, 3579545)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("ym3812", YM3812, 3579545)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MDRV_FUJITSU_29F016A_ADD("flash")
+	MCFG_FUJITSU_29F016A_ADD("flash")
 
-	MDRV_CDROM_ADD( "cdrom" )
-	MDRV_HARDDISK_ADD( "harddisk1" )
+	MCFG_CDROM_ADD( "cdrom" )
+	MCFG_HARDDISK_ADD( "harddisk1" )
 
 	/* pci */
-	MDRV_PCI_BUS_ADD("pcibus", 0)
-	MDRV_PCI_BUS_DEVICE(0, NULL, mpc105_pci_read, mpc105_pci_write)
-	MDRV_PCI_BUS_DEVICE(1, NULL, cirrus5430_pci_read, cirrus5430_pci_write)
-	/*MDRV_PCI_BUS_DEVICE(12, NULL, scsi53c810_pci_read, scsi53c810_pci_write)*/
+	MCFG_PCI_BUS_ADD("pcibus", 0)
+	MCFG_PCI_BUS_DEVICE(0, NULL, mpc105_pci_read, mpc105_pci_write)
+	MCFG_PCI_BUS_DEVICE(1, NULL, cirrus5430_pci_read, cirrus5430_pci_write)
+	/*MCFG_PCI_BUS_DEVICE(12, NULL, scsi53c810_pci_read, scsi53c810_pci_write)*/
 
-	MDRV_SMC37C78_ADD("smc37c78", pc_fdc_upd765_connected_1_drive_interface)
+	MCFG_SMC37C78_ADD("smc37c78", pc_fdc_upd765_connected_1_drive_interface)
 
-	MDRV_FLOPPY_DRIVE_ADD(FLOPPY_0, bebox_floppy_config)
+	MCFG_FLOPPY_DRIVE_ADD(FLOPPY_0, bebox_floppy_config)
 
-	MDRV_MC146818_ADD( "rtc", MC146818_STANDARD )
+	MCFG_MC146818_ADD( "rtc", MC146818_STANDARD )
 	
 	/* internal ram */
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("32M")
-	MDRV_RAM_EXTRA_OPTIONS("8M,16M")
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("32M")
+	MCFG_RAM_EXTRA_OPTIONS("8M,16M")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( bebox2, bebox )
-	MDRV_CPU_REPLACE("ppc1", PPC603E, 133000000)	/* 133 MHz */
-	MDRV_CPU_PROGRAM_MAP(bebox_mem)
+	MCFG_CPU_REPLACE("ppc1", PPC603E, 133000000)	/* 133 MHz */
+	MCFG_CPU_PROGRAM_MAP(bebox_mem)
 
-	MDRV_CPU_REPLACE("ppc2", PPC603E, 133000000)	/* 133 MHz */
-	MDRV_CPU_PROGRAM_MAP(bebox_slave_mem)
+	MCFG_CPU_REPLACE("ppc2", PPC603E, 133000000)	/* 133 MHz */
+	MCFG_CPU_PROGRAM_MAP(bebox_slave_mem)
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( bebox )

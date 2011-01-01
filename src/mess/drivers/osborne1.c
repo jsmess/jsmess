@@ -239,38 +239,38 @@ static GFXDECODE_START( osborne1 )
 GFXDECODE_END
 
 static MACHINE_CONFIG_START( osborne1, osborne1_state )
-	MDRV_CPU_ADD( "maincpu", Z80, MAIN_CLOCK/4 )
-	MDRV_CPU_PROGRAM_MAP( osborne1_mem)
-	MDRV_CPU_IO_MAP( osborne1_io)
-	MDRV_CPU_CONFIG( osborne1_daisy_chain )
+	MCFG_CPU_ADD( "maincpu", Z80, MAIN_CLOCK/4 )
+	MCFG_CPU_PROGRAM_MAP( osborne1_mem)
+	MCFG_CPU_IO_MAP( osborne1_io)
+	MCFG_CPU_CONFIG( osborne1_daisy_chain )
 
-	MDRV_MACHINE_RESET( osborne1 )
+	MCFG_MACHINE_RESET( osborne1 )
 
-	MDRV_DEVICE_ADD( "osborne1_daisy", OSBORNE1_DAISY, 0 )
+	MCFG_DEVICE_ADD( "osborne1_daisy", OSBORNE1_DAISY, 0 )
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_FORMAT( BITMAP_FORMAT_INDEXED16 )
-	MDRV_SCREEN_RAW_PARAMS( MAIN_CLOCK/2, 512, 0, 416, 260, 0, 240 )
-	MDRV_VIDEO_START( generic_bitmapped )
-	MDRV_VIDEO_UPDATE( generic_bitmapped )
-	MDRV_GFXDECODE(osborne1)
-	MDRV_PALETTE_LENGTH( 3 )
-	MDRV_PALETTE_INIT( osborne1 )
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_FORMAT( BITMAP_FORMAT_INDEXED16 )
+	MCFG_SCREEN_RAW_PARAMS( MAIN_CLOCK/2, 512, 0, 416, 260, 0, 240 )
+	MCFG_VIDEO_START( generic_bitmapped )
+	MCFG_VIDEO_UPDATE( generic_bitmapped )
+	MCFG_GFXDECODE(osborne1)
+	MCFG_PALETTE_LENGTH( 3 )
+	MCFG_PALETTE_INIT( osborne1 )
 
-	MDRV_SPEAKER_STANDARD_MONO( "mono" )
-	MDRV_SOUND_ADD( "beep", BEEP, 0 )
-	MDRV_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
+	MCFG_SPEAKER_STANDARD_MONO( "mono" )
+	MCFG_SOUND_ADD( "beep", BEEP, 0 )
+	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 
-	MDRV_PIA6821_ADD( "pia_0", osborne1_ieee_pia_config )
-	MDRV_PIA6821_ADD( "pia_1", osborne1_video_pia_config )
+	MCFG_PIA6821_ADD( "pia_0", osborne1_ieee_pia_config )
+	MCFG_PIA6821_ADD( "pia_1", osborne1_video_pia_config )
 
-	MDRV_MB8877_ADD("mb8877", default_wd17xx_interface_2_drives )
+	MCFG_MB8877_ADD("mb8877", default_wd17xx_interface_2_drives )
 
-	MDRV_FLOPPY_2_DRIVES_ADD(osborne1_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_ADD(osborne1_floppy_config)
 
 	/* internal ram */
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("68K")	/* 64KB Main RAM and 4Kbit video attribute RAM */
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("68K")	/* 64KB Main RAM and 4Kbit video attribute RAM */
 MACHINE_CONFIG_END
 
 

@@ -137,29 +137,29 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MDRV_CDP1869_ADD(_tag, _pixclock, _config, _map) \
-	MDRV_DEVICE_ADD(_tag, CDP1869, _pixclock) \
-	MDRV_DEVICE_CONFIG(_config) \
-	MDRV_DEVICE_ADDRESS_MAP(0, _map)
+#define MCFG_CDP1869_ADD(_tag, _pixclock, _config, _map) \
+	MCFG_DEVICE_ADD(_tag, CDP1869, _pixclock) \
+	MCFG_DEVICE_CONFIG(_config) \
+	MCFG_DEVICE_ADDRESS_MAP(0, _map)
 
-#define MDRV_CDP1869_SCREEN_PAL_ADD(_tag, _clock) \
-	MDRV_SCREEN_ADD(_tag, RASTER) \
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16) \
-	MDRV_SCREEN_RAW_PARAMS(_clock, CDP1869_SCREEN_WIDTH, CDP1869_HBLANK_END, CDP1869_HBLANK_START, CDP1869_TOTAL_SCANLINES_PAL, CDP1869_SCANLINE_VBLANK_END_PAL, CDP1869_SCANLINE_VBLANK_START_PAL) \
-	MDRV_PALETTE_LENGTH(8+64)
+#define MCFG_CDP1869_SCREEN_PAL_ADD(_tag, _clock) \
+	MCFG_SCREEN_ADD(_tag, RASTER) \
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16) \
+	MCFG_SCREEN_RAW_PARAMS(_clock, CDP1869_SCREEN_WIDTH, CDP1869_HBLANK_END, CDP1869_HBLANK_START, CDP1869_TOTAL_SCANLINES_PAL, CDP1869_SCANLINE_VBLANK_END_PAL, CDP1869_SCANLINE_VBLANK_START_PAL) \
+	MCFG_PALETTE_LENGTH(8+64)
 
-#define MDRV_CDP1869_SCREEN_NTSC_ADD(_tag, _clock) \
-	MDRV_SCREEN_ADD(_tag, RASTER) \
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16) \
-	MDRV_SCREEN_RAW_PARAMS(_clock, CDP1869_SCREEN_WIDTH, CDP1869_HBLANK_END, CDP1869_HBLANK_START, CDP1869_TOTAL_SCANLINES_NTSC, CDP1869_SCANLINE_VBLANK_END_NTSC, CDP1869_SCANLINE_VBLANK_START_NTSC) \
-	MDRV_PALETTE_LENGTH(8+64)
+#define MCFG_CDP1869_SCREEN_NTSC_ADD(_tag, _clock) \
+	MCFG_SCREEN_ADD(_tag, RASTER) \
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16) \
+	MCFG_SCREEN_RAW_PARAMS(_clock, CDP1869_SCREEN_WIDTH, CDP1869_HBLANK_END, CDP1869_HBLANK_START, CDP1869_TOTAL_SCANLINES_NTSC, CDP1869_SCANLINE_VBLANK_END_NTSC, CDP1869_SCANLINE_VBLANK_START_NTSC) \
+	MCFG_PALETTE_LENGTH(8+64)
 
 #define CDP1869_INTERFACE(_name) \
 	const cdp1869_interface (_name) =
 
-#define CDP1869_CHAR_RAM_READ(name) UINT8 name(running_device *device, UINT16 pma, UINT8 cma, UINT8 pmd)
-#define CDP1869_CHAR_RAM_WRITE(name) void name(running_device *device, UINT16 pma, UINT8 cma, UINT8 pmd, UINT8 data)
-#define CDP1869_PCB_READ(name) int name(running_device *device, UINT16 pma, UINT8 cma, UINT8 pmd)
+#define CDP1869_CHAR_RAM_READ(name) UINT8 name(device_t *device, UINT16 pma, UINT8 cma, UINT8 pmd)
+#define CDP1869_CHAR_RAM_WRITE(name) void name(device_t *device, UINT16 pma, UINT8 cma, UINT8 pmd, UINT8 data)
+#define CDP1869_PCB_READ(name) int name(device_t *device, UINT16 pma, UINT8 cma, UINT8 pmd)
 
 #define CDP1869_PAL \
 	DEVCB_LINE_VCC
@@ -173,9 +173,9 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-typedef UINT8 (*cdp1869_char_ram_read_func)(running_device *device, UINT16 pma, UINT8 cma, UINT8 pmd);
-typedef void (*cdp1869_char_ram_write_func)(running_device *device, UINT16 pma, UINT8 cma, UINT8 pmd, UINT8 data);
-typedef int (*cdp1869_pcb_read_func)(running_device *device, UINT16 pma, UINT8 cma, UINT8 pmd);
+typedef UINT8 (*cdp1869_char_ram_read_func)(device_t *device, UINT16 pma, UINT8 cma, UINT8 pmd);
+typedef void (*cdp1869_char_ram_write_func)(device_t *device, UINT16 pma, UINT8 cma, UINT8 pmd, UINT8 data);
+typedef int (*cdp1869_pcb_read_func)(device_t *device, UINT16 pma, UINT8 cma, UINT8 pmd);
 
 
 // ======================> cdp1869_interface

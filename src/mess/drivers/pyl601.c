@@ -46,7 +46,7 @@ static WRITE8_HANDLER (rom_page_w)
 	{
 		int chip = (data >> 4) % 5;
 		int page = data & 7;
-		memory_set_bankptr(space->machine, "bank2", memory_region(space->machine, "romdisk") + chip*0x10000 + page * 0x2000);
+		memory_set_bankptr(space->machine, "bank2", space->machine->region("romdisk")->base() + chip*0x10000 + page * 0x2000);
 	}
 	else
 	{
@@ -113,7 +113,7 @@ static READ8_HANDLER ( keycheck_r )
 {
 	pyl601_state *state = space->machine->driver_data<pyl601_state>();
 	UINT8 retVal = 0x3f;
-	UINT8 *keyboard = memory_region(space->machine, "keyboard");
+	UINT8 *keyboard = space->machine->region("keyboard")->base();
 	UINT16 row1 = input_port_read(space->machine, "ROW1");
 	UINT16 row2 = input_port_read(space->machine, "ROW2");
 	UINT16 row3 = input_port_read(space->machine, "ROW3");
@@ -169,7 +169,7 @@ static WRITE8_HANDLER (led_w)
 //  UINT8 caps_led = BIT(data,4);
 }
 
-INLINE running_device *get_floppy_image(running_machine *machine, int drive)
+INLINE device_t *get_floppy_image(running_machine *machine, int drive)
 {
 	return floppy_get_device(machine, drive);
 }
@@ -185,7 +185,7 @@ static WRITE8_HANDLER( floppy_w )
 	// bit 1 is TC state
 	// bit 2 is drive selected
 	// bit 3 is motor state
-	running_device *floppy = space->machine->device("upd765");
+	device_t *floppy = space->machine->device("upd765");
 	if (BIT(data,0)==0) {
 		//reset
 		upd765_reset(floppy,0);
@@ -348,7 +348,7 @@ static MACHINE_RESET(pyl601)
 	memory_set_bankptr(machine, "bank2", messram_get_ptr(machine->device("messram")) + 0xc000);
 	memory_set_bankptr(machine, "bank3", messram_get_ptr(machine->device("messram")) + 0xe000);
 	memory_set_bankptr(machine, "bank4", messram_get_ptr(machine->device("messram")) + 0xe700);
-	memory_set_bankptr(machine, "bank5", memory_region(machine, "maincpu") + 0xf000);
+	memory_set_bankptr(machine, "bank5", machine->region("maincpu")->base() + 0xf000);
 	memory_set_bankptr(machine, "bank6", messram_get_ptr(machine->device("messram")) + 0xf000);
 
 	machine->device("maincpu")->reset();
@@ -360,7 +360,7 @@ static VIDEO_START( pyl601 )
 
 static VIDEO_UPDATE( pyl601 )
 {
-	running_device *mc6845 = screen->machine->device("crtc");
+	device_t *mc6845 = screen->machine->device("crtc");
 	mc6845_update(mc6845, bitmap, cliprect);
 	return 0;
 }
@@ -368,7 +368,7 @@ static VIDEO_UPDATE( pyl601 )
 static MC6845_UPDATE_ROW( pyl601_update_row )
 {
 	pyl601_state *state = device->machine->driver_data<pyl601_state>();
-	UINT8 *charrom = memory_region(device->machine, "gfx1");
+	UINT8 *charrom = device->machine->region("gfx1")->base();
 
 	int column, bit, i;
 	UINT8 data;
@@ -414,7 +414,7 @@ static MC6845_UPDATE_ROW( pyl601_update_row )
 static MC6845_UPDATE_ROW( pyl601a_update_row )
 {
 	pyl601_state *state = device->machine->driver_data<pyl601_state>();
-	UINT8 *charrom = memory_region(device->machine, "gfx1");
+	UINT8 *charrom = device->machine->region("gfx1")->base();
 
 	int column, bit, i;
 	UINT8 data;
@@ -553,44 +553,44 @@ GFXDECODE_END
 
 static MACHINE_CONFIG_START( pyl601, pyl601_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu",M6800, XTAL_1MHz)
-	MDRV_CPU_PROGRAM_MAP(pyl601_mem)
-	MDRV_CPU_VBLANK_INT("screen", pyl601_interrupt)
+	MCFG_CPU_ADD("maincpu",M6800, XTAL_1MHz)
+	MCFG_CPU_PROGRAM_MAP(pyl601_mem)
+	MCFG_CPU_VBLANK_INT("screen", pyl601_interrupt)
 
-	MDRV_MACHINE_RESET(pyl601)
+	MCFG_MACHINE_RESET(pyl601)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(50)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(640, 200)
-	MDRV_SCREEN_VISIBLE_AREA(0, 640 - 1, 0, 200 - 1)
-	MDRV_GFXDECODE(pyl601)
-	MDRV_PALETTE_LENGTH(2)
-	MDRV_PALETTE_INIT(monochrome_green)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(640, 200)
+	MCFG_SCREEN_VISIBLE_AREA(0, 640 - 1, 0, 200 - 1)
+	MCFG_GFXDECODE(pyl601)
+	MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_INIT(monochrome_green)
 
-	MDRV_MC6845_ADD("crtc", MC6845, XTAL_2MHz, pyl601_crtc6845_interface)
+	MCFG_MC6845_ADD("crtc", MC6845, XTAL_2MHz, pyl601_crtc6845_interface)
 
-	MDRV_VIDEO_START( pyl601 )
-	MDRV_VIDEO_UPDATE( pyl601 )
+	MCFG_VIDEO_START( pyl601 )
+	MCFG_VIDEO_UPDATE( pyl601 )
 
-	MDRV_UPD765A_ADD("upd765", pyldin_upd765_interface)
+	MCFG_UPD765A_ADD("upd765", pyldin_upd765_interface)
 
-	MDRV_FLOPPY_2_DRIVES_ADD(pyldin_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_ADD(pyldin_floppy_config)
 
 	/* internal ram */
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("576K") // 64 + 512
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("576K") // 64 + 512
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( pyl601a, pyl601 )
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_CLOCK( XTAL_2MHz)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_CLOCK( XTAL_2MHz)
 
-	MDRV_GFXDECODE(pyl601a)
-	MDRV_DEVICE_REMOVE("crtc")
-	MDRV_MC6845_ADD("crtc", MC6845, XTAL_2MHz, pyl601a_crtc6845_interface)
+	MCFG_GFXDECODE(pyl601a)
+	MCFG_DEVICE_REMOVE("crtc")
+	MCFG_MC6845_ADD("crtc", MC6845, XTAL_2MHz, pyl601a_crtc6845_interface)
 MACHINE_CONFIG_END
 
 /* ROM definition */

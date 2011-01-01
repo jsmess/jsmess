@@ -45,15 +45,15 @@ struct pic8259_interface
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MDRV_PIC8259_ADD(_tag, _intrf) \
-	MDRV_DEVICE_ADD(_tag, PIC8259, 0) \
-	MDRV_DEVICE_CONFIG(_intrf)
+#define MCFG_PIC8259_ADD(_tag, _intrf) \
+	MCFG_DEVICE_ADD(_tag, PIC8259, 0) \
+	MCFG_DEVICE_CONFIG(_intrf)
 
 
 /* device interface */
 READ8_DEVICE_HANDLER( pic8259_r );
 WRITE8_DEVICE_HANDLER( pic8259_w );
-int pic8259_acknowledge(running_device *device);
+int pic8259_acknowledge(device_t *device);
 
 /* interrupt requests */
 WRITE_LINE_DEVICE_HANDLER( pic8259_ir0_w );

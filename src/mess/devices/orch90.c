@@ -22,8 +22,8 @@
 typedef struct _orch90_t orch90_t;
 struct _orch90_t
 {
-	running_device *left_dac;
-	running_device *right_dac;
+	device_t *left_dac;
+	device_t *right_dac;
 };
 
 
@@ -32,7 +32,7 @@ struct _orch90_t
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE orch90_t *get_token(running_device *device)
+INLINE orch90_t *get_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == COCO_CARTRIDGE_PCB_ORCH90);

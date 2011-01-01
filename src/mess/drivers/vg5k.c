@@ -57,9 +57,9 @@ public:
 		: driver_device(machine, config) { }
 
 	ef9345_device *ef9345;
-	running_device *dac;
-	running_device *printer;
-	running_device *cassette;
+	device_t *dac;
+	device_t *printer;
+	device_t *cassette;
 
 	offs_t ef9345_offset;
 };
@@ -349,7 +349,7 @@ GFXDECODE_END
 
 static DRIVER_INIT( vg5k )
 {
-	UINT8 *FNT = memory_region(machine, "ef9345");
+	UINT8 *FNT = machine->region("ef9345")->base();
 	UINT16 a,b,c,d,dest=0x2000;
 
 	/* Unscramble the chargen rom as the format is too complex for gfxdecode to handle unaided */
@@ -394,49 +394,49 @@ static const cassette_config vg5k_cassette_config =
 static MACHINE_CONFIG_START( vg5k, vg5k_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz)
-	MDRV_CPU_PROGRAM_MAP(vg5k_mem)
-	MDRV_CPU_IO_MAP(vg5k_io)
+	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
+	MCFG_CPU_PROGRAM_MAP(vg5k_mem)
+	MCFG_CPU_IO_MAP(vg5k_io)
 
-	MDRV_TIMER_ADD_SCANLINE("vg5k_scanline", vg5k_scanline, "screen", 0, 10)
+	MCFG_TIMER_ADD_SCANLINE("vg5k_scanline", vg5k_scanline, "screen", 0, 10)
 
-	MDRV_EF9345_ADD("ef9345", vg5k_ef9345_config)
+	MCFG_EF9345_ADD("ef9345", vg5k_ef9345_config)
 
-	MDRV_MACHINE_START(vg5k)
-	MDRV_MACHINE_RESET(vg5k)
+	MCFG_MACHINE_START(vg5k)
+	MCFG_MACHINE_RESET(vg5k)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(50)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(336, 300)
-	MDRV_SCREEN_VISIBLE_AREA(00, 336-1, 00, 270-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(336, 300)
+	MCFG_SCREEN_VISIBLE_AREA(00, 336-1, 00, 270-1)
 
-	MDRV_GFXDECODE(vg5k)
-	MDRV_PALETTE_LENGTH(8)
+	MCFG_GFXDECODE(vg5k)
+	MCFG_PALETTE_LENGTH(8)
 
-	MDRV_VIDEO_START(vg5k)
-	MDRV_VIDEO_UPDATE(vg5k)
+	MCFG_VIDEO_START(vg5k)
+	MCFG_VIDEO_UPDATE(vg5k)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("dac", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	/* cassette */
-	MDRV_SOUND_WAVE_ADD("wave", "cassette")
-	MDRV_SOUND_ROUTE(0, "mono", 0.1)
+	MCFG_SOUND_WAVE_ADD("wave", "cassette")
+	MCFG_SOUND_ROUTE(0, "mono", 0.1)
 
-	MDRV_CASSETTE_ADD( "cassette", vg5k_cassette_config )
+	MCFG_CASSETTE_ADD( "cassette", vg5k_cassette_config )
 
 	/* printer */
-	MDRV_PRINTER_ADD("printer")
+	MCFG_PRINTER_ADD("printer")
 
 	/* internal ram */
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("16K")
-	MDRV_RAM_EXTRA_OPTIONS("32K,48k")
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("16K")
+	MCFG_RAM_EXTRA_OPTIONS("32K,48k")
 MACHINE_CONFIG_END
 
 /* ROM definition */

@@ -38,7 +38,7 @@ struct _vic3_state
 
 	screen_device *main_screen;			// screen which sets bitmap properties
 
-	running_device *cpu;
+	device_t *cpu;
 
 	UINT8 reg[0x80];
 	int on;								/* rastering of the screen */
@@ -224,7 +224,7 @@ struct _vic3_state
     INLINE FUNCTIONS
 *****************************************************************************/
 
-INLINE vic3_state *get_safe_token( running_device *device )
+INLINE vic3_state *get_safe_token( device_t *device )
 {
 	assert(device != NULL);
 	assert(device->type() == VIC3);
@@ -232,7 +232,7 @@ INLINE vic3_state *get_safe_token( running_device *device )
 	return (vic3_state *)downcast<legacy_device_base *>(device)->token();
 }
 
-INLINE const vic3_interface *get_interface( running_device *device )
+INLINE const vic3_interface *get_interface( device_t *device )
 {
 	assert(device != NULL);
 	assert((device->type() == VIC3));
@@ -243,13 +243,13 @@ INLINE const vic3_interface *get_interface( running_device *device )
     IMPLEMENTATION
 *****************************************************************************/
 
-INLINE int vic3_getforeground( running_device *device, int y, int x )
+INLINE int vic3_getforeground( device_t *device, int y, int x )
 {
 	vic3_state *vic3 = get_safe_token(device);
 	return ((vic3->screen[y][x >> 3] << 8) | (vic3->screen[y][(x >> 3) + 1])) >> (8 - (x & 7));
 }
 
-INLINE int vic3_getforeground16(running_device *device, int y, int x )
+INLINE int vic3_getforeground16(device_t *device, int y, int x )
 {
 	vic3_state *vic3 = get_safe_token(device);
 	return ((vic3->screen[y][x >> 3] << 16) | (vic3->screen[y][(x >> 3) + 1] << 8) | (vic3->screen[y][(x >> 3) + 2])) >> (8 - (x & 7));
@@ -298,7 +298,7 @@ static TIMER_CALLBACK(vic3_timer_timeout)
 		break;
 	}
 }
-static void vic3_draw_character( running_device *device, int ybegin, int yend, int ch, int yoff, int xoff, UINT16 *color, int start_x, int end_x )
+static void vic3_draw_character( device_t *device, int ybegin, int yend, int ch, int yoff, int xoff, UINT16 *color, int start_x, int end_x )
 {
 	vic3_state *vic3 = get_safe_token(device);
 	int y, code;
@@ -318,7 +318,7 @@ static void vic3_draw_character( running_device *device, int ybegin, int yend, i
 	}
 }
 
-static void vic3_draw_character_multi( running_device *device, int ybegin, int yend, int ch, int yoff, int xoff, int start_x, int end_x )
+static void vic3_draw_character_multi( device_t *device, int ybegin, int yend, int ch, int yoff, int xoff, int start_x, int end_x )
 {
 	vic3_state *vic3 = get_safe_token(device);
 	int y, code;
@@ -338,7 +338,7 @@ static void vic3_draw_character_multi( running_device *device, int ybegin, int y
 	}
 }
 
-static void vic3_draw_bitmap( running_device *device, int ybegin, int yend, int ch, int yoff, int xoff, int start_x, int end_x )
+static void vic3_draw_bitmap( device_t *device, int ybegin, int yend, int ch, int yoff, int xoff, int start_x, int end_x )
 {
 	vic3_state *vic3 = get_safe_token(device);
 	int y, code;
@@ -358,7 +358,7 @@ static void vic3_draw_bitmap( running_device *device, int ybegin, int yend, int 
 	}
 }
 
-static void vic3_draw_bitmap_multi( running_device *device, int ybegin, int yend, int ch, int yoff, int xoff, int start_x, int end_x )
+static void vic3_draw_bitmap_multi( device_t *device, int ybegin, int yend, int ch, int yoff, int xoff, int start_x, int end_x )
 {
 	vic3_state *vic3 = get_safe_token(device);
 	int y, code;
@@ -378,7 +378,7 @@ static void vic3_draw_bitmap_multi( running_device *device, int ybegin, int yend
 	}
 }
 
-static void vic3_draw_sprite_code( running_device *device, int y, int xbegin, int code, int color, int start_x, int end_x )
+static void vic3_draw_sprite_code( device_t *device, int y, int xbegin, int code, int color, int start_x, int end_x )
 {
 	vic3_state *vic3 = get_safe_token(device);
 	register int mask, x;
@@ -396,7 +396,7 @@ static void vic3_draw_sprite_code( running_device *device, int y, int xbegin, in
 	}
 }
 
-static void vic3_draw_sprite_code_multi( running_device *device, int y, int xbegin, int code, int prior, int start_x, int end_x )
+static void vic3_draw_sprite_code_multi( device_t *device, int y, int xbegin, int code, int prior, int start_x, int end_x )
 {
 	vic3_state *vic3 = get_safe_token(device);
 	register int x, mask, shift;
@@ -431,7 +431,7 @@ static void vic3_draw_sprite_code_multi( running_device *device, int y, int xbeg
 	}
 }
 
-static void vic3_sprite_collision( running_device *device, int nr, int y, int x, int mask )
+static void vic3_sprite_collision( device_t *device, int nr, int y, int x, int mask )
 {
 	vic3_state *vic3 = get_safe_token(device);
 	int i, value, xdiff;
@@ -464,7 +464,7 @@ static void vic3_sprite_collision( running_device *device, int nr, int y, int x,
 	}
 }
 
-static void vic3_draw_sprite( running_device *device, int nr, int yoff, int ybegin, int yend, int start_x, int end_x )
+static void vic3_draw_sprite( device_t *device, int nr, int yoff, int ybegin, int yend, int start_x, int end_x )
 {
 	vic3_state *vic3 = get_safe_token(device);
 	int y, i, addr, xbegin, color, prior, collision;
@@ -559,7 +559,7 @@ static void vic3_draw_sprite( running_device *device, int nr, int yoff, int ybeg
 	}
 }
 
-static void vic3_draw_sprite_multi( running_device *device, int nr, int yoff, int ybegin, int yend, int start_x, int end_x )
+static void vic3_draw_sprite_multi( device_t *device, int nr, int yoff, int ybegin, int yend, int start_x, int end_x )
 {
 	vic3_state *vic3 = get_safe_token(device);
 	int y, i, prior, addr, xbegin, collision;
@@ -683,7 +683,7 @@ static void *memset16 (void *dest, int value, size_t size)
 }
 #endif
 
-static void vic3_drawlines( running_device *device, int first, int last, int start_x, int end_x )
+static void vic3_drawlines( device_t *device, int first, int last, int start_x, int end_x )
 {
 	vic3_state *vic3 = get_safe_token(device);
 	int line, vline, end;
@@ -905,7 +905,7 @@ static void vic3_drawlines( running_device *device, int first, int last, int sta
 	}
 }
 
-static void vic2_drawlines( running_device *device, int first, int last, int start_x, int end_x )
+static void vic2_drawlines( device_t *device, int first, int last, int start_x, int end_x )
 {
 	vic3_state *vic3 = get_safe_token(device);
 	int line, vline, end;
@@ -1619,7 +1619,7 @@ READ8_DEVICE_HANDLER( vic3_port_r )
     }
 
 #define VIC3_ADDR(a) VIC3_BITPLANE_IADDR(a)
-static void vic3_interlace_draw_block( running_device *device, int x, int y, int offset )
+static void vic3_interlace_draw_block( device_t *device, int x, int y, int offset )
 {
 	vic3_state *vic3 = get_safe_token(device);
 	int colors[8] = {0};
@@ -1691,7 +1691,7 @@ static void vic3_interlace_draw_block( running_device *device, int x, int y, int
 
 #undef VIC3_ADDR
 #define VIC3_ADDR(a) VIC3_BITPLANE_ADDR(a)
-static void vic3_draw_block( running_device *device, int x, int y, int offset )
+static void vic3_draw_block( device_t *device, int x, int y, int offset )
 {
 	vic3_state *vic3 = get_safe_token(device);
 	int colors[8] = {0};
@@ -1762,7 +1762,7 @@ static void vic3_draw_block( running_device *device, int x, int y, int offset )
 }
 
 
-static void vic3_draw_bitplanes( running_device *device )
+static void vic3_draw_bitplanes( device_t *device )
 {
 	vic3_state *vic3 = get_safe_token(device);
 	int x, y, y1s, offset;
@@ -1837,7 +1837,7 @@ static void vic3_draw_bitplanes( running_device *device )
 	}
 }
 
-void vic3_raster_interrupt_gen( running_device *device )
+void vic3_raster_interrupt_gen( device_t *device )
 {
 	vic3_state *vic3 = get_safe_token(device);
 	running_machine *machine = device->machine;
@@ -1949,7 +1949,7 @@ void vic3_raster_interrupt_gen( running_device *device )
 		}
 }
 
-UINT32 vic3_video_update( running_device *device, bitmap_t *bitmap, const rectangle *cliprect )
+UINT32 vic3_video_update( device_t *device, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	vic3_state *vic3 = get_safe_token(device);
 

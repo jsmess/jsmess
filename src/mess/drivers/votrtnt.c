@@ -70,23 +70,23 @@ INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( votrtnt, votrtnt_state )
     /* basic machine hardware */
-    MDRV_CPU_ADD("maincpu", M6802, XTAL_2_4576MHz)  /* 2.4576MHz XTAL, verified; divided by 4 inside the m6802*/
-    MDRV_CPU_PROGRAM_MAP(6802_mem)
-    MDRV_QUANTUM_TIME(HZ(60))
+    MCFG_CPU_ADD("maincpu", M6802, XTAL_2_4576MHz)  /* 2.4576MHz XTAL, verified; divided by 4 inside the m6802*/
+    MCFG_CPU_PROGRAM_MAP(6802_mem)
+    MCFG_QUANTUM_TIME(HZ(60))
 
     /* video hardware */
-    MDRV_DEFAULT_LAYOUT(layout_votrtnt)
+    MCFG_DEFAULT_LAYOUT(layout_votrtnt)
 
     /* serial hardware */
-    //MDRV_ACIA6850_ADD("acia_0", acia_intf)
+    //MCFG_ACIA6850_ADD("acia_0", acia_intf)
 
     /* sound hardware */
-	//MDRV_SPEAKER_STANDARD_MONO("mono")
-	//MDRV_SOUND_ADD("sc-01-a", VOTRAX, 1700000) /* 1.70 MHz? needs verify */
-	//MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	//MCFG_SPEAKER_STANDARD_MONO("mono")
+	//MCFG_SOUND_ADD("sc-01-a", VOTRAX, 1700000) /* 1.70 MHz? needs verify */
+	//MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* printer */
-	//MDRV_PRINTER_ADD("printer")
+	//MCFG_PRINTER_ADD("printer")
 
 MACHINE_CONFIG_END
 

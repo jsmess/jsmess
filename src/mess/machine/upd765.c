@@ -144,13 +144,13 @@ struct _upd765_t
 };
 
 //static void upd765_setup_data_request(unsigned char Data);
-static void upd765_setup_command(running_device *device);
+static void upd765_setup_command(device_t *device);
 static TIMER_CALLBACK(upd765_continue_command);
-static int upd765_sector_count_complete(running_device *device);
-static void upd765_increment_sector(running_device *device);
-static void upd765_update_state(running_device *device);
-static void upd765_set_dma_drq(running_device *device,int state);
-static void upd765_set_int(running_device *device,int state);
+static int upd765_sector_count_complete(device_t *device);
+static void upd765_increment_sector(device_t *device);
+static void upd765_update_state(device_t *device);
+static void upd765_set_dma_drq(device_t *device,int state);
+static void upd765_set_int(device_t *device,int state);
 
 static const INT8 upd765_cmd_size[32] =
 {
@@ -158,16 +158,16 @@ static const INT8 upd765_cmd_size[32] =
 	1,9,1,1,1,1,9,1,1,9,1,1,1,9,1,1
 };
 
-INLINE upd765_t *get_safe_token(running_device *device)
+INLINE upd765_t *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 
 	return (upd765_t *)downcast<legacy_device_base *>(device)->token();
 }
 
-static running_device *current_image(running_device *device)
+static device_t *current_image(device_t *device)
 {
-	running_device *image = NULL;
+	device_t *image = NULL;
 	upd765_t *fdc = get_safe_token(device);
 
 	if (!fdc->intf->get_image)
@@ -187,7 +187,7 @@ static running_device *current_image(running_device *device)
 	return image;
 }
 
-static void upd765_setup_drive_and_side(running_device *device)
+static void upd765_setup_drive_and_side(device_t *device)
 {
 	upd765_t *fdc = get_safe_token(device);
 	/* drive index upd765 sees */
@@ -198,7 +198,7 @@ static void upd765_setup_drive_and_side(running_device *device)
 
 
 /* setup status register 0 based on data in status register 1 and 2 */
-static void upd765_setup_st0(running_device *device)
+static void upd765_setup_st0(device_t *device)
 {
 	upd765_t *fdc = get_safe_token(device);
 	/* clear completition status bits, drive bits and side bits */
@@ -224,32 +224,32 @@ static int upd765_n_to_bytes(int n)
 	return 1<<(n+7);
 }
 
-static void upd765_set_data_request(running_device *device)
+static void upd765_set_data_request(device_t *device)
 {
 	upd765_t *fdc = get_safe_token(device);
 	fdc->FDC_main |= 0x080;
 }
 
-static void upd765_clear_data_request(running_device *device)
+static void upd765_clear_data_request(device_t *device)
 {
 	upd765_t *fdc = get_safe_token(device);
 	fdc->FDC_main &= ~0x080;
 }
 
-static int upd765_get_rdy(running_device *device)
+static int upd765_get_rdy(device_t *device)
 {
 	upd765_t *fdc = get_safe_token(device);
 
 	if (fdc->intf->rdy_pin == UPD765_RDY_PIN_CONNECTED)
 	{
-		running_device *img = current_image(device);
+		device_t *img = current_image(device);
 		return floppy_drive_get_flag_state(img, FLOPPY_DRIVE_READY);
 	}
 	else
 		return 1;
 }
 
-static void upd765_seek_complete(running_device *device)
+static void upd765_seek_complete(device_t *device)
 {
 	/* tested on Amstrad CPC */
 
@@ -304,7 +304,7 @@ static void upd765_seek_complete(running_device *device)
         This indicates it is always ready!!!!!
     */
 
-	running_device *img = current_image(device);
+	device_t *img = current_image(device);
 	upd765_t *fdc = get_safe_token(device);
 
 	fdc->pcn[fdc->drive] = fdc->ncn;
@@ -342,7 +342,7 @@ static void upd765_seek_complete(running_device *device)
 
 static TIMER_CALLBACK(upd765_seek_timer_callback)
 {
-	running_device *device = (running_device *)ptr;
+	device_t *device = (device_t *)ptr;
 	upd765_t *fdc = get_safe_token(device);
 	/* seek complete */
 	upd765_seek_complete(device);
@@ -350,7 +350,7 @@ static TIMER_CALLBACK(upd765_seek_timer_callback)
 	timer_reset(fdc->seek_timer, attotime_never);
 }
 
-static void upd765_timer_func(running_device *device, int timer_type)
+static void upd765_timer_func(device_t *device, int timer_type)
 {
 	upd765_t *fdc = get_safe_token(device);
 	/* type 0 = data transfer mode in execution phase */
@@ -429,7 +429,7 @@ static void upd765_timer_func(running_device *device, int timer_type)
 
 static TIMER_CALLBACK(upd765_timer_callback)
 {
-	running_device *device = (running_device *)ptr;
+	device_t *device = (device_t *)ptr;
 	upd765_timer_func(device,param);
 }
 
@@ -439,7 +439,7 @@ In this driver, the first NMI calls the handler function, furthur NMI's are
 effectively disabled by reading the data before the NMI int can be set.
 */
 
-static void upd765_setup_timed_generic(running_device *device, int timer_type, attotime duration)
+static void upd765_setup_timed_generic(device_t *device, int timer_type, attotime duration)
 {
 	upd765_t *fdc = get_safe_token(device);
 
@@ -457,30 +457,30 @@ static void upd765_setup_timed_generic(running_device *device, int timer_type, a
 }
 
 /* setup data request */
-static void upd765_setup_timed_data_request(running_device *device, int bytes)
+static void upd765_setup_timed_data_request(device_t *device, int bytes)
 {
 	/* setup timer to trigger in UPD765_DATA_RATE us */
 	upd765_setup_timed_generic(device, 0, ATTOTIME_IN_USEC(32-27)	/*UPD765_DATA_RATE)*bytes*/);
 }
 
 /* setup result data request */
-static void upd765_setup_timed_result_data_request(running_device *device)
+static void upd765_setup_timed_result_data_request(device_t *device)
 {
 	upd765_setup_timed_generic(device, 2, ATTOTIME_IN_USEC(UPD765_DATA_RATE*2));
 }
 
 
 /* sets up a timer to issue a seek complete in signed_tracks time */
-static void upd765_setup_timed_int(running_device *device,int signed_tracks)
+static void upd765_setup_timed_int(device_t *device,int signed_tracks)
 {
 	upd765_t *fdc = get_safe_token(device);
 	/* setup timer to signal after seek time is complete */
 	timer_adjust_oneshot(fdc->seek_timer, double_to_attotime(fdc->srt_in_ms*abs(signed_tracks)*0.001), 0);
 }
 
-static void upd765_seek_setup(running_device *device, int is_recalibrate)
+static void upd765_seek_setup(device_t *device, int is_recalibrate)
 {
-	running_device *img;
+	device_t *img;
 	int signed_tracks;
 	upd765_t *fdc = get_safe_token(device);
 
@@ -580,7 +580,7 @@ static void upd765_seek_setup(running_device *device, int is_recalibrate)
 
 
 
-static void upd765_setup_execution_phase_read(running_device *device, char *ptr, int size)
+static void upd765_setup_execution_phase_read(device_t *device, char *ptr, int size)
 {
 	upd765_t *fdc = get_safe_token(device);
 
@@ -594,7 +594,7 @@ static void upd765_setup_execution_phase_read(running_device *device, char *ptr,
 	upd765_setup_timed_data_request(device, 1);
 }
 
-static void upd765_setup_execution_phase_write(running_device *device, char *ptr, int size)
+static void upd765_setup_execution_phase_write(device_t *device, char *ptr, int size)
 {
 	upd765_t *fdc = get_safe_token(device);
 
@@ -610,7 +610,7 @@ static void upd765_setup_execution_phase_write(running_device *device, char *ptr
 }
 
 
-static void upd765_setup_result_phase(running_device *device, int byte_count)
+static void upd765_setup_result_phase(device_t *device, int byte_count)
 {
 	upd765_t *fdc = get_safe_token(device);
 
@@ -624,7 +624,7 @@ static void upd765_setup_result_phase(running_device *device, int byte_count)
 	upd765_setup_timed_result_data_request(device);
 }
 
-void upd765_idle(running_device *device)
+void upd765_idle(device_t *device)
 {
 	upd765_t *fdc = get_safe_token(device);
 
@@ -639,7 +639,7 @@ void upd765_idle(running_device *device)
 
 
 /* change flags */
-static void upd765_change_flags(running_device *device,unsigned int flags, unsigned int mask)
+static void upd765_change_flags(device_t *device,unsigned int flags, unsigned int mask)
 {
 	unsigned int new_flags;
 	unsigned int changed_flags;
@@ -665,7 +665,7 @@ static void upd765_change_flags(running_device *device,unsigned int flags, unsig
 
 
 /* set int output */
-static void upd765_set_int(running_device *device, int state)
+static void upd765_set_int(device_t *device, int state)
 {
 	if (LOG_INTERRUPT)
 		logerror("upd765_set_int(): state=%d\n", state);
@@ -675,7 +675,7 @@ static void upd765_set_int(running_device *device, int state)
 
 
 /* set dma request output */
-static void upd765_set_dma_drq(running_device *device, int state)
+static void upd765_set_dma_drq(device_t *device, int state)
 {
 	upd765_change_flags(device, state ? UPD765_DMA_DRQ : 0, UPD765_DMA_DRQ);
 }
@@ -710,7 +710,7 @@ is not ready.
 /* done when ready state of drive changes */
 /* this ignores if command is active, in which case command should terminate immediatly
 with error */
-static void upd765_set_ready_change_callback(running_device *controller, running_device *img, int state)
+static void upd765_set_ready_change_callback(device_t *controller, device_t *img, int state)
 {
 	upd765_t *fdc = get_safe_token(controller);
 	int drive = floppy_get_drive(img);
@@ -789,7 +789,7 @@ skip it.
 if SK==1, and we are executing a read deleted data command, and a data mark is found,
 skip it. */
 
-static int upd765_read_skip_sector(running_device *device)
+static int upd765_read_skip_sector(device_t *device)
 {
 	upd765_t *fdc = get_safe_token(device);
 	/* skip set? */
@@ -833,10 +833,10 @@ static int upd765_read_skip_sector(running_device *device)
   - if the index is seen twice while it is searching for a sector, then the sector cannot be found
 */
 
-static void upd765_get_next_id(running_device *device, chrn_id *id)
+static void upd765_get_next_id(device_t *device, chrn_id *id)
 {
 	upd765_t *fdc = get_safe_token(device);
-	running_device *img = current_image(device);
+	device_t *img = current_image(device);
 
 	/* get next id from disc */
 	floppy_drive_get_next_id(img, fdc->side,id);
@@ -851,10 +851,10 @@ static void upd765_get_next_id(running_device *device, chrn_id *id)
 	}
 }
 
-static int upd765_get_matching_sector(running_device *device)
+static int upd765_get_matching_sector(device_t *device)
 {
 	upd765_t *fdc = get_safe_token(device);
-	running_device *img = current_image(device);
+	device_t *img = current_image(device);
 	chrn_id id;
 
 	/* number of times we have seen index hole */
@@ -929,7 +929,7 @@ static int upd765_get_matching_sector(running_device *device)
 	return 0;
 }
 
-static void upd765_read_complete(running_device *device)
+static void upd765_read_complete(device_t *device)
 {
 	upd765_t *fdc = get_safe_token(device);
 /* causes problems!!! - need to fix */
@@ -966,10 +966,10 @@ static void upd765_read_complete(running_device *device)
 	upd765_setup_result_phase(device,7);
 }
 
-static void upd765_read_data(running_device *device)
+static void upd765_read_data(device_t *device)
 {
 	upd765_t *fdc = get_safe_token(device);
-	running_device *img = current_image(device);
+	device_t *img = current_image(device);
 
 	if (!upd765_get_rdy(device))
 	{
@@ -1049,10 +1049,10 @@ static void upd765_read_data(running_device *device)
 }
 
 
-static void upd765_format_track(running_device *device)
+static void upd765_format_track(device_t *device)
 {
 	upd765_t *fdc = get_safe_token(device);
-	running_device *img = current_image(device);
+	device_t *img = current_image(device);
 
 	/* write protected? */
 	if (floppy_wpt_r(img) == CLEAR_LINE)
@@ -1076,7 +1076,7 @@ static void upd765_format_track(running_device *device)
     upd765_setup_execution_phase_write(device, &fdc->format_data[0], 4);
 }
 
-static void upd765_read_a_track(running_device *device)
+static void upd765_read_a_track(device_t *device)
 {
 	upd765_t *fdc = get_safe_token(device);
 	int data_size;
@@ -1114,14 +1114,14 @@ static void upd765_read_a_track(running_device *device)
 	upd765_setup_execution_phase_read(device,fdc->data_buffer, data_size);
 }
 
-static int upd765_just_read_last_sector_on_track(running_device *device)
+static int upd765_just_read_last_sector_on_track(device_t *device)
 {
 	if (floppy_drive_get_flag_state(current_image(device), FLOPPY_DRIVE_INDEX))
 		return 1;
 	return 0;
 }
 
-static void upd765_write_complete(running_device *device)
+static void upd765_write_complete(device_t *device)
 {
 	upd765_t *fdc = get_safe_token(device);
 
@@ -1160,7 +1160,7 @@ static void upd765_write_complete(running_device *device)
 }
 
 
-static void upd765_write_data(running_device *device)
+static void upd765_write_data(device_t *device)
 {
 	upd765_t *fdc = get_safe_token(device);
 	if (!upd765_get_rdy(device))
@@ -1205,7 +1205,7 @@ static void upd765_write_data(running_device *device)
 
 
 /* return true if we have read all sectors, false if not */
-static int upd765_sector_count_complete(running_device *device)
+static int upd765_sector_count_complete(device_t *device)
 {
 	upd765_t *fdc = get_safe_token(device);
 /* this is not correct?? */
@@ -1342,7 +1342,7 @@ static int upd765_sector_count_complete(running_device *device)
 	return 0;
 }
 
-static void	upd765_increment_sector(running_device *device)
+static void	upd765_increment_sector(device_t *device)
 {
 	upd765_t *fdc = get_safe_token(device);
 	/* multi-track? */
@@ -1381,7 +1381,7 @@ static void	upd765_increment_sector(running_device *device)
 the data is not skipped. The data is read, but the control mark is set and the read is stopped */
 /* if SK==0, and we are executing a read deleted data command, and a data sector is found,
 the data is not skipped. The data is read, but the control mark is set and the read is stopped */
-static int upd765_read_data_stop(running_device *device)
+static int upd765_read_data_stop(device_t *device)
 {
 	upd765_t *fdc = get_safe_token(device);
 	/* skip not set? */
@@ -1422,7 +1422,7 @@ static int upd765_read_data_stop(running_device *device)
 
 static TIMER_CALLBACK(upd765_continue_command)
 {
-	running_device *device = (running_device *)ptr;
+	device_t *device = (device_t *)ptr;
 	upd765_t *fdc = get_safe_token(device);
 	if ((fdc->upd765_phase == UPD765_EXECUTION_PHASE_READ) ||
 		(fdc->upd765_phase == UPD765_EXECUTION_PHASE_WRITE))
@@ -1546,7 +1546,7 @@ static TIMER_CALLBACK(upd765_continue_command)
 }
 
 
-static int upd765_get_command_byte_count(running_device *device)
+static int upd765_get_command_byte_count(device_t *device)
 {
 	upd765_t *fdc = get_safe_token(device);
 	fdc->command = fdc->upd765_command_bytes[0] & 0x01f;
@@ -1612,7 +1612,7 @@ static int upd765_get_command_byte_count(running_device *device)
 
 
 
-void upd765_update_state(running_device *device)
+void upd765_update_state(device_t *device)
 {
 	upd765_t *fdc = get_safe_token(device);
 	switch (fdc->upd765_phase) {
@@ -1807,7 +1807,7 @@ WRITE8_DEVICE_HANDLER(upd765_data_w)
 	}
 }
 
-static void upd765_setup_invalid(running_device *device)
+static void upd765_setup_invalid(device_t *device)
 {
 	upd765_t *fdc = get_safe_token(device);
 
@@ -1816,7 +1816,7 @@ static void upd765_setup_invalid(running_device *device)
 	upd765_setup_result_phase(device,1);
 }
 
-static void upd765_setup_command(running_device *device)
+static void upd765_setup_command(device_t *device)
 {
 	upd765_t *fdc = get_safe_token(device);
 
@@ -1845,7 +1845,7 @@ static void upd765_setup_command(running_device *device)
 		"Lock"						/* [14] */
 	};
 
-	running_device *img;
+	device_t *img;
 	const char *cmd = NULL;
 	chrn_id id;
 
@@ -2197,7 +2197,7 @@ READ8_DEVICE_HANDLER(upd765_dack_r)
 }
 
 
-void upd765_reset(running_device *device, int offset)
+void upd765_reset(device_t *device, int offset)
 {
 	upd765_t *fdc = get_safe_token(device);
 
@@ -2229,7 +2229,7 @@ void upd765_reset(running_device *device, int offset)
 		{
 			if (fdc->intf->floppy_drive_tags[i]!=NULL)
 			{
-				running_device *img;
+				device_t *img;
 
 				if (device->owner() != NULL)
 					img = device->owner()->subdevice(fdc->intf->floppy_drive_tags[i]);
@@ -2307,7 +2307,7 @@ WRITE_LINE_DEVICE_HANDLER( upd765_ready_w )
 
 /* Device Interface */
 
-static void common_start(running_device *device, int device_type)
+static void common_start(device_t *device, int device_type)
 {
 	upd765_t *fdc = get_safe_token(device);
 	// validate arguments
@@ -2360,7 +2360,7 @@ static DEVICE_RESET( upd765 )
 	for (i = 0; i < 4; i++) {
 		if (fdc->intf->floppy_drive_tags[i]!=NULL)
 		{
-			running_device *img;
+			device_t *img;
 
 			if (device->owner() != NULL)
 				img = device->owner()->subdevice(fdc->intf->floppy_drive_tags[i]);

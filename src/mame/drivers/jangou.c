@@ -59,10 +59,10 @@ public:
 	UINT8        nsc_latch, z80_latch;
 
 	/* devices */
-	running_device *cpu_0;
-	running_device *cpu_1;
-	running_device *cvsd;
-	running_device *nsc;
+	device_t *cpu_0;
+	device_t *cpu_1;
+	device_t *cvsd;
+	device_t *nsc;
 };
 
 
@@ -154,7 +154,7 @@ w [$17]
 
 static UINT8 jangou_gfx_nibble( running_machine *machine, UINT16 niboffset )
 {
-	const UINT8 *const blit_rom = memory_region(machine, "gfx");
+	const UINT8 *const blit_rom = machine->region("gfx")->base();
 
 	if (niboffset & 1)
 		return (blit_rom[(niboffset >> 1) & 0xffff] & 0xf0) >> 4;
@@ -331,7 +331,7 @@ static WRITE8_HANDLER( adpcm_w )
 	state->adpcm_byte = data;
 }
 
-static void jngolady_vclk_cb( running_device *device )
+static void jngolady_vclk_cb( device_t *device )
 {
 	jangou_state *state = device->machine->driver_data<jangou_state>();
 
@@ -981,108 +981,108 @@ static MACHINE_RESET( jngolady )
 static MACHINE_CONFIG_START( jangou, jangou_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("cpu0", Z80, MASTER_CLOCK / 8)
-	MDRV_CPU_PROGRAM_MAP(cpu0_map)
-	MDRV_CPU_IO_MAP(cpu0_io)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_ADD("cpu0", Z80, MASTER_CLOCK / 8)
+	MCFG_CPU_PROGRAM_MAP(cpu0_map)
+	MCFG_CPU_IO_MAP(cpu0_io)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("cpu1", Z80, MASTER_CLOCK / 8)
-	MDRV_CPU_PROGRAM_MAP(cpu1_map)
-	MDRV_CPU_IO_MAP(cpu1_io)
+	MCFG_CPU_ADD("cpu1", Z80, MASTER_CLOCK / 8)
+	MCFG_CPU_PROGRAM_MAP(cpu1_map)
+	MCFG_CPU_IO_MAP(cpu1_io)
 
-	MDRV_MACHINE_START(jangou)
-	MDRV_MACHINE_RESET(jangou)
+	MCFG_MACHINE_START(jangou)
+	MCFG_MACHINE_RESET(jangou)
 
 	/* video hardware */
-	MDRV_PALETTE_INIT(jangou)
+	MCFG_PALETTE_INIT(jangou)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) //not accurate
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(256, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 256-1, 16, 240-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) //not accurate
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(256, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 240-1)
 
-	MDRV_PALETTE_LENGTH(32)
+	MCFG_PALETTE_LENGTH(32)
 
-	MDRV_VIDEO_START(jangou)
-	MDRV_VIDEO_UPDATE(jangou)
+	MCFG_VIDEO_START(jangou)
+	MCFG_VIDEO_UPDATE(jangou)
 
 	/* sound hardware */
-	MDRV_SOUND_START(jangou)
+	MCFG_SOUND_START(jangou)
 
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("aysnd", AY8910, MASTER_CLOCK / 16)
-	MDRV_SOUND_CONFIG(ay8910_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	MCFG_SOUND_ADD("aysnd", AY8910, MASTER_CLOCK / 16)
+	MCFG_SOUND_CONFIG(ay8910_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-	MDRV_SOUND_ADD("cvsd", HC55516, MASTER_CLOCK / 1024)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
+	MCFG_SOUND_ADD("cvsd", HC55516, MASTER_CLOCK / 1024)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( jngolady, jangou )
 
 	/* basic machine hardware */
 
-	MDRV_CPU_MODIFY("cpu0")
-	MDRV_CPU_PROGRAM_MAP(jngolady_cpu0_map)
+	MCFG_CPU_MODIFY("cpu0")
+	MCFG_CPU_PROGRAM_MAP(jngolady_cpu0_map)
 
-	MDRV_CPU_MODIFY("cpu1")
-	MDRV_CPU_PROGRAM_MAP(jngolady_cpu1_map)
-	MDRV_CPU_IO_MAP(jngolady_cpu1_io)
+	MCFG_CPU_MODIFY("cpu1")
+	MCFG_CPU_PROGRAM_MAP(jngolady_cpu1_map)
+	MCFG_CPU_IO_MAP(jngolady_cpu1_io)
 
-	MDRV_CPU_ADD("nsc", NSC8105, MASTER_CLOCK / 8)
-	MDRV_CPU_PROGRAM_MAP(nsc_map)
+	MCFG_CPU_ADD("nsc", NSC8105, MASTER_CLOCK / 8)
+	MCFG_CPU_PROGRAM_MAP(nsc_map)
 
-	MDRV_MACHINE_START(jngolady)
-	MDRV_MACHINE_RESET(jngolady)
+	MCFG_MACHINE_START(jngolady)
+	MCFG_MACHINE_RESET(jngolady)
 
 	/* sound hardware */
-	MDRV_SOUND_START(0)
-	MDRV_DEVICE_REMOVE("cvsd")
+	MCFG_SOUND_START(0)
+	MCFG_DEVICE_REMOVE("cvsd")
 
-	MDRV_SOUND_ADD("msm", MSM5205, XTAL_400kHz)
-	MDRV_SOUND_CONFIG(msm5205_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	MCFG_SOUND_ADD("msm", MSM5205, XTAL_400kHz)
+	MCFG_SOUND_CONFIG(msm5205_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( cntrygrl, jangou )
 
 	/* basic machine hardware */
 
-	MDRV_CPU_MODIFY("cpu0")
-	MDRV_CPU_PROGRAM_MAP(cntrygrl_cpu0_map )
-	MDRV_CPU_IO_MAP(cntrygrl_cpu0_io )
+	MCFG_CPU_MODIFY("cpu0")
+	MCFG_CPU_PROGRAM_MAP(cntrygrl_cpu0_map )
+	MCFG_CPU_IO_MAP(cntrygrl_cpu0_io )
 
-	MDRV_DEVICE_REMOVE("cpu1")
+	MCFG_DEVICE_REMOVE("cpu1")
 
-	MDRV_MACHINE_START(common)
-	MDRV_MACHINE_RESET(common)
+	MCFG_MACHINE_START(common)
+	MCFG_MACHINE_RESET(common)
 
 	/* sound hardware */
-	MDRV_SOUND_START(0)
-	MDRV_DEVICE_REMOVE("cvsd")
+	MCFG_SOUND_START(0)
+	MCFG_DEVICE_REMOVE("cvsd")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( roylcrdn, jangou )
 
 	/* basic machine hardware */
 
-	MDRV_CPU_MODIFY("cpu0")
-	MDRV_CPU_PROGRAM_MAP(roylcrdn_cpu0_map )
-	MDRV_CPU_IO_MAP(roylcrdn_cpu0_io )
+	MCFG_CPU_MODIFY("cpu0")
+	MCFG_CPU_PROGRAM_MAP(roylcrdn_cpu0_map )
+	MCFG_CPU_IO_MAP(roylcrdn_cpu0_io )
 
-	MDRV_DEVICE_REMOVE("cpu1")
+	MCFG_DEVICE_REMOVE("cpu1")
 
-	MDRV_NVRAM_ADD_0FILL("nvram")
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MDRV_MACHINE_START(common)
-	MDRV_MACHINE_RESET(common)
+	MCFG_MACHINE_START(common)
+	MCFG_MACHINE_RESET(common)
 
 	/* sound hardware */
-	MDRV_SOUND_START(0)
-	MDRV_DEVICE_REMOVE("cvsd")
+	MCFG_SOUND_START(0)
+	MCFG_DEVICE_REMOVE("cvsd")
 MACHINE_CONFIG_END
 
 
@@ -1356,7 +1356,7 @@ ROM_END
 /*Temporary kludge for make the RNG work*/
 static READ8_HANDLER( jngolady_rng_r )
 {
-	return mame_rand(space->machine);
+	return space->machine->rand();
 }
 
 static DRIVER_INIT( jngolady )
@@ -1368,7 +1368,7 @@ static DRIVER_INIT (luckygrl)
 {
 	// this is WRONG
 	int A;
-	UINT8 *ROM = memory_region(machine, "cpu0");
+	UINT8 *ROM = machine->region("cpu0")->base();
 
 	unsigned char patn1[32] = {
 		0x00, 0xA0, 0x00, 0xA0, 0x00, 0xA0, 0x00, 0xA0, 0x00, 0xA0, 0x00, 0xA0, 0x00, 0xA0, 0x00, 0xA0,

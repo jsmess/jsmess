@@ -191,29 +191,29 @@ static const mc6845_interface mc6845_cga_intf =
 
 
 MACHINE_CONFIG_FRAGMENT( pcvideo_cga )
-	MDRV_SCREEN_ADD(CGA_SCREEN_NAME, RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_RAW_PARAMS(XTAL_14_31818MHz,912,0,640,262,0,200)
-	MDRV_PALETTE_LENGTH(/* CGA_PALETTE_SETS * 16*/ 65536 )
+	MCFG_SCREEN_ADD(CGA_SCREEN_NAME, RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_14_31818MHz,912,0,640,262,0,200)
+	MCFG_PALETTE_LENGTH(/* CGA_PALETTE_SETS * 16*/ 65536 )
 
-	MDRV_PALETTE_INIT(pc_cga)
+	MCFG_PALETTE_INIT(pc_cga)
 
-	MDRV_MC6845_ADD(CGA_MC6845_NAME, MC6845, XTAL_14_31818MHz/8, mc6845_cga_intf)
+	MCFG_MC6845_ADD(CGA_MC6845_NAME, MC6845, XTAL_14_31818MHz/8, mc6845_cga_intf)
 
-	MDRV_VIDEO_START( pc_cga )
-	MDRV_VIDEO_UPDATE( mc6845_cga )
+	MCFG_VIDEO_START( pc_cga )
+	MCFG_VIDEO_UPDATE( mc6845_cga )
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_FRAGMENT( pcvideo_poisk2 )
-	MDRV_FRAGMENT_ADD( pcvideo_cga )
-	MDRV_VIDEO_START( cga_poisk2 )
-	MDRV_VIDEO_UPDATE( cga_poisk2 )
+	MCFG_FRAGMENT_ADD( pcvideo_cga )
+	MCFG_VIDEO_START( cga_poisk2 )
+	MCFG_VIDEO_UPDATE( cga_poisk2 )
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_FRAGMENT( pcvideo_pc1512 )
-	MDRV_FRAGMENT_ADD( pcvideo_cga )
-	MDRV_VIDEO_START( pc1512 )
-	MDRV_VIDEO_UPDATE( mc6845_pc1512 )
+	MCFG_FRAGMENT_ADD( pcvideo_cga )
+	MCFG_VIDEO_START( pc1512 )
+	MCFG_VIDEO_UPDATE( mc6845_pc1512 )
 MACHINE_CONFIG_END
 
 
@@ -441,7 +441,7 @@ static int internal_pc_cga_video_start(running_machine *machine, int personality
 	memset(&cga, 0, sizeof(cga));
 	cga.update_row = NULL;
 
-	cga.chr_gen = memory_region( machine, "gfx1" ) + 0x1000;
+	cga.chr_gen = machine->region( "gfx1" )->base() + 0x1000;
 
 	state_save_register_item(machine, "pccga", NULL, 0, cga.mode_control);
 	state_save_register_item(machine, "pccga", NULL, 0, cga.color_select);
@@ -508,8 +508,8 @@ static VIDEO_START( pc_cga )
 
 static VIDEO_UPDATE( mc6845_cga )
 {
-	UINT8 *gfx = memory_region(screen->machine, "gfx1");
-	running_device *devconf = screen->machine->device(CGA_MC6845_NAME);
+	UINT8 *gfx = screen->machine->region("gfx1")->base();
+	device_t *devconf = screen->machine->device(CGA_MC6845_NAME);
 	mc6845_update( devconf, bitmap, cliprect);
 
 	/* Check for changes in font dipsetting */
@@ -529,13 +529,13 @@ static VIDEO_UPDATE( mc6845_cga )
 static VIDEO_START( cga_poisk2 )
 {
 	VIDEO_START_CALL(pc_cga);
-	cga.chr_gen = memory_region( machine, "gfx1" ) + 0x0000;
+	cga.chr_gen = machine->region( "gfx1" )->base() + 0x0000;
 }
 
 static VIDEO_UPDATE( cga_poisk2 )
 {
-	UINT8 *gfx = memory_region(screen->machine, "gfx1");
-	running_device *devconf = screen->machine->device(CGA_MC6845_NAME);
+	UINT8 *gfx = screen->machine->region("gfx1")->base();
+	device_t *devconf = screen->machine->device(CGA_MC6845_NAME);
 	mc6845_update( devconf, bitmap, cliprect);
 
 	/* Check for changes in font dipsetting */
@@ -1085,7 +1085,7 @@ static void pc_cga_set_palette_luts(void)
  */
 static void pc_cga_mode_control_w(running_machine *machine, int data)
 {
-	running_device *devconf = machine->device(CGA_MC6845_NAME);
+	device_t *devconf = machine->device(CGA_MC6845_NAME);
 
 	CGA_LOG(1,"CGA_mode_control_w",("$%02x: columns %d, gfx %d, hires %d, blink %d\n",
 		data, (data&1)?80:40, (data>>1)&1, (data>>4)&1, (data>>5)&1));
@@ -1223,7 +1223,7 @@ static void pc_cga_plantronics_w(running_machine *machine, int data)
 
 static WRITE8_HANDLER ( char_ram_w )
 {
-	UINT8 *gfx = memory_region(space->machine, "gfx1");
+	UINT8 *gfx = space->machine->region("gfx1")->base();
 	logerror("write char ram %04x %02x\n",offset,data);
 	gfx[offset + 0x0000] = data;
 	gfx[offset + 0x0800] = data;
@@ -1236,7 +1236,7 @@ static WRITE32_HANDLER( char_ram_32_w )   { write32le_with_write8_handler(char_r
 
 static READ8_HANDLER ( char_ram_r )
 {
-	UINT8 *gfx = memory_region(space->machine, "gfx1");
+	UINT8 *gfx = space->machine->region("gfx1")->base();
 	return gfx[offset];
 }
 
@@ -1245,7 +1245,7 @@ static READ32_HANDLER( char_ram_32_r )   { return read32le_with_read8_handler(ch
 
 static READ8_HANDLER( pc_cga8_r )
 {
-	running_device *devconf = space->machine->device(CGA_MC6845_NAME);
+	device_t *devconf = space->machine->device(CGA_MC6845_NAME);
 	int data = 0xff;
 	switch( offset )
 	{
@@ -1269,7 +1269,7 @@ static READ8_HANDLER( pc_cga8_r )
 
 static WRITE8_HANDLER( pc_cga8_w )
 {
-	running_device *devconf;
+	device_t *devconf;
 
 	switch(offset) {
 	case 0: case 2: case 4: case 6:
@@ -1589,7 +1589,7 @@ static MC6845_UPDATE_ROW( pc1512_gfx_4bpp_update_row )
 static WRITE8_HANDLER ( pc1512_w )
 {
 	UINT8 *videoram = pc_videoram;
-	running_device *devconf = space->machine->device(CGA_MC6845_NAME);
+	device_t *devconf = space->machine->device(CGA_MC6845_NAME);
 
 	switch (offset)
 	{
@@ -1753,8 +1753,8 @@ static VIDEO_START( pc1512 )
 
 static VIDEO_UPDATE( mc6845_pc1512 )
 {
-	UINT8 *gfx = memory_region(screen->machine, "gfx1");
-	running_device *devconf = screen->machine->device(CGA_MC6845_NAME);
+	UINT8 *gfx = screen->machine->region("gfx1")->base();
+	device_t *devconf = screen->machine->device(CGA_MC6845_NAME);
 	mc6845_update( devconf, bitmap, cliprect);
 
 	/* Check for changes in font dipsetting */

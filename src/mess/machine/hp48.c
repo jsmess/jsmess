@@ -261,7 +261,7 @@ static const chardev_interface hp48_chardev_iface =
 
 
 /* CPU sets OUT register (keyboard + beeper) */
-void hp48_reg_out( running_device *device, int out )
+void hp48_reg_out( device_t *device, int out )
 {
 	hp48_state *state = device->machine->driver_data<hp48_state>();
 	LOG(( "%05x %f hp48_reg_out: %03x\n",
@@ -299,7 +299,7 @@ static int hp48_get_in( running_machine *machine )
 }
 
 /* CPU reads IN register (keyboard) */
-int hp48_reg_in( running_device *device )
+int hp48_reg_in( device_t *device )
 {
 	int in = hp48_get_in( device->machine );
 	LOG(( "%05x %f hp48_reg_in: %04x\n",
@@ -345,7 +345,7 @@ static TIMER_CALLBACK( hp48_kbd_cb )
 }
 
 /* RSI opcode */
-void hp48_rsi( running_device *device )
+void hp48_rsi( device_t *device )
 {
 	hp48_state *state = device->machine->driver_data<hp48_state>();
 	LOG(( "%05x %f hp48_rsi\n", cpu_get_previouspc(device->machine->device("maincpu")), attotime_to_double(timer_get_time(device->machine)) ));
@@ -855,7 +855,7 @@ static void hp48_reset_modules( running_machine *machine )
 
 
 /* RESET opcode */
-void hp48_mem_reset( running_device *device )
+void hp48_mem_reset( device_t *device )
 {
 	LOG(( "%05x %f hp48_mem_reset\n", cpu_get_previouspc(device->machine->device("maincpu")), attotime_to_double(timer_get_time(device->machine)) ));
 	hp48_reset_modules( device->machine );
@@ -863,7 +863,7 @@ void hp48_mem_reset( running_device *device )
 
 
 /* CONFIG opcode */
-void hp48_mem_config( running_device *device, int v )
+void hp48_mem_config( device_t *device, int v )
 {
 	hp48_state *state = device->machine->driver_data<hp48_state>();
 	int i;
@@ -896,7 +896,7 @@ void hp48_mem_config( running_device *device, int v )
 
 
 /* UNCFG opcode */
-void hp48_mem_unconfig( running_device *device, int v )
+void hp48_mem_unconfig( device_t *device, int v )
 {
 	hp48_state *state = device->machine->driver_data<hp48_state>();
 	int i;
@@ -919,7 +919,7 @@ void hp48_mem_unconfig( running_device *device, int v )
 
 
 /* C=ID opcode */
-int  hp48_mem_id( running_device *device )
+int  hp48_mem_id( device_t *device )
 {
 	hp48_state *state = device->machine->driver_data<hp48_state>();
 	int i;
@@ -954,7 +954,7 @@ int  hp48_mem_id( running_device *device )
 /* --------- CRC ---------- */
 
 /* each memory read by the CPU updates the internal CRC state */
-void hp48_mem_crc( running_device *device, int addr, int data )
+void hp48_mem_crc( device_t *device, int addr, int data )
 {
 	hp48_state *state = device->machine->driver_data<hp48_state>();
 	/* no CRC for I/O RAM */
@@ -1000,7 +1000,7 @@ const struct hp48_port_config hp48gx_port1_config = { 0, 3,    128*1024, "p1", "
 const struct hp48_port_config hp48gx_port2_config = { 1, 4, 4*1024*1024, "p2", "port2" };
 
 /* helper for load and create */
-static void hp48_fill_port( running_device* image )
+static void hp48_fill_port( device_t* image )
 {
 	hp48_state *state = image->machine->driver_data<hp48_state>();
 	struct hp48_port_config* conf = (struct hp48_port_config*) image->baseconfig().static_config();
@@ -1020,7 +1020,7 @@ static void hp48_fill_port( running_device* image )
 }
 
 /* helper for start and unload */
-static void hp48_unfill_port( running_device* image )
+static void hp48_unfill_port( device_t* image )
 {
 	hp48_state *state = image->machine->driver_data<hp48_state>();
 	struct hp48_port_config* conf = (struct hp48_port_config*) image->baseconfig().static_config();
@@ -1170,7 +1170,7 @@ static void hp48_machine_start( running_machine *machine, hp48_models model )
 	/* ROM load */
 	rom_size = HP48_S_SERIES ? (256 * 1024) : (512 * 1024);
 	rom = auto_alloc_array(machine, UINT8, 2 * rom_size);
-	hp48_decode_nibble( rom, memory_region( machine, "maincpu" ), rom_size );
+	hp48_decode_nibble( rom, machine->region( "maincpu" )->base(), rom_size );
 
 	/* init state */
 	memset( ram, 0, 2 * ram_size );

@@ -38,7 +38,7 @@ struct _e0516_t
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE e0516_t *get_safe_token(running_device *device)
+INLINE e0516_t *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	return (e0516_t *)downcast<legacy_device_base *>(device)->token();
@@ -54,7 +54,7 @@ INLINE e0516_t *get_safe_token(running_device *device)
 
 static TIMER_CALLBACK( clock_tick )
 {
-	running_device *device = (running_device *)ptr;
+	device_t *device = (device_t *)ptr;
 	e0516_t *e0516 = get_safe_token(device);
 
 	e0516->reg[E0516_REGISTER_SECOND]++;

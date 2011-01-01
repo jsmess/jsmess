@@ -222,46 +222,46 @@ static MACHINE_CONFIG_START( apple1, apple1_state )
 	/* basic machine hardware */
 	/* Actual CPU speed is 1.023 MHz, but RAM refresh effectively
        slows it to 960 kHz. */
-	MDRV_CPU_ADD("maincpu", M6502, 960000)        /* 1.023 MHz */
-	MDRV_CPU_PROGRAM_MAP(apple1_map)
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
+	MCFG_CPU_ADD("maincpu", M6502, 960000)        /* 1.023 MHz */
+	MCFG_CPU_PROGRAM_MAP(apple1_map)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
 	/* Video is blanked for 70 out of 262 scanlines per refresh cycle.
        Each scanline is composed of 65 character times, 40 of which
        are visible, and each character time is 7 dot times; a dot time
        is 2 cycles of the fundamental 14.31818 MHz oscillator.  The
        total blanking time is about 4450 microseconds. */
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC((int) (70 * 65 * 7 * 2 / 14.31818)))
-	MDRV_QUANTUM_TIME(HZ(60))
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC((int) (70 * 65 * 7 * 2 / 14.31818)))
+	MCFG_QUANTUM_TIME(HZ(60))
 
-	MDRV_MACHINE_RESET( apple1 )
+	MCFG_MACHINE_RESET( apple1 )
 
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	/* It would be nice if we could implement some sort of display
        overscan here. */
-	MDRV_SCREEN_SIZE(40 * 7, 24 * 8)
-	MDRV_SCREEN_VISIBLE_AREA(0, 40 * 7 - 1, 0, 24 * 8 - 1)
-	MDRV_GFXDECODE(apple1)
-	MDRV_PALETTE_LENGTH(2)
-	MDRV_PALETTE_INIT(black_and_white)
+	MCFG_SCREEN_SIZE(40 * 7, 24 * 8)
+	MCFG_SCREEN_VISIBLE_AREA(0, 40 * 7 - 1, 0, 24 * 8 - 1)
+	MCFG_GFXDECODE(apple1)
+	MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_INIT(black_and_white)
 
-	MDRV_VIDEO_START(apple1)
-	MDRV_VIDEO_UPDATE(apple1)
+	MCFG_VIDEO_START(apple1)
+	MCFG_VIDEO_UPDATE(apple1)
 
-	MDRV_PIA6821_ADD( "pia", apple1_pia0 )
+	MCFG_PIA6821_ADD( "pia", apple1_pia0 )
 
 	/* snapshot */
-	MDRV_SNAPSHOT_ADD("snapshot", apple1, "snp", 0)
+	MCFG_SNAPSHOT_ADD("snapshot", apple1, "snp", 0)
 
-	MDRV_CASSETTE_ADD( "cassette", apple1_cassette_config )
+	MCFG_CASSETTE_ADD( "cassette", apple1_cassette_config )
 
 	/* Note that because we always include 4K of RAM at $E000-$EFFF,
        the RAM amounts listed here will be 4K below the actual RAM
        total. */
 	/* internal ram */
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("48K")
-	MDRV_RAM_EXTRA_OPTIONS("4K,8K,12K,16K,20K,24K,28K,32K,36K,40K,44K")
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("48K")
+	MCFG_RAM_EXTRA_OPTIONS("4K,8K,12K,16K,20K,24K,28K,32K,36K,40K,44K")
 
 MACHINE_CONFIG_END
 

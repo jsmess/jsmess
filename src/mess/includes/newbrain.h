@@ -97,11 +97,11 @@ public:
 	emu_timer *pwrup_timer;	/* power up timer */
 
 	/* devices */
-	running_device *mc6850;
-	running_device *z80ctc;
-	running_device *upd765;
-	running_device *cassette1;
-	running_device *cassette2;
+	device_t *mc6850;
+	device_t *z80ctc;
+	device_t *upd765;
+	device_t *cassette1;
+	device_t *cassette2;
 	UINT8 copdata;
 	int copstate;
 	int copbytes;

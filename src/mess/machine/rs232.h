@@ -18,9 +18,9 @@
 
 DECLARE_LEGACY_DEVICE(RS232, rs232);
 
-#define MDRV_RS232_ADD(_tag, _intf) \
-	MDRV_DEVICE_ADD(_tag, RS232, 0) \
-	MDRV_DEVICE_CONFIG(_intf)
+#define MCFG_RS232_ADD(_tag, _intf) \
+	MCFG_DEVICE_ADD(_tag, RS232, 0) \
+	MCFG_DEVICE_CONFIG(_intf)
 
 #define RS232_INTERFACE(_name) \
 	const rs232_interface (_name)[] =
@@ -57,7 +57,7 @@ struct _rs232_interface
 
 /* receive/transmit data */
 READ_LINE_DEVICE_HANDLER( rs232_rd_r );
-void rs232_td_w(running_device *rs232, running_device *device, int state);
+void rs232_td_w(device_t *rs232, device_t *device, int state);
 
 /* data carrier detect */
 READ_LINE_DEVICE_HANDLER( rs232_dcd_r );

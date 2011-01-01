@@ -1839,7 +1839,7 @@ static const ym2203_interface ym2203_config =
 	}
 };
 
-static void YM3812_irq( running_device *device, int param )
+static void YM3812_irq( device_t *device, int param )
 {
 	alpha68k_state *state = device->machine->driver_data<alpha68k_state>();
 	cpu_set_input_line(state->audiocpu, 0, (param) ? HOLD_LINE : CLEAR_LINE);
@@ -1895,7 +1895,7 @@ static MACHINE_RESET( common )
 static MACHINE_START( alpha68k_V )
 {
 	alpha68k_state *state = machine->driver_data<alpha68k_state>();
-	UINT8 *ROM = memory_region(machine, "audiocpu");
+	UINT8 *ROM = machine->region("audiocpu")->base();
 
 	memory_configure_bank(machine, "bank7", 0, 32, &ROM[0x10000], 0x4000);
 
@@ -1931,7 +1931,7 @@ static MACHINE_RESET( alpha68k_II )
 static MACHINE_START( alpha68k_II )
 {
 	alpha68k_state *state = machine->driver_data<alpha68k_state>();
-	UINT8 *ROM = memory_region(machine, "audiocpu");
+	UINT8 *ROM = machine->region("audiocpu")->base();
 
 	memory_configure_bank(machine, "bank7", 0, 28, &ROM[0x10000], 0x4000);
 
@@ -1948,381 +1948,381 @@ static MACHINE_START( alpha68k_II )
 static MACHINE_CONFIG_START( sstingry, alpha68k_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 6000000) /* 24MHz/4? */
-	MDRV_CPU_PROGRAM_MAP(kyros_map)
-	MDRV_CPU_VBLANK_INT_HACK(alpha68k_interrupt,2)
+	MCFG_CPU_ADD("maincpu", M68000, 6000000) /* 24MHz/4? */
+	MCFG_CPU_PROGRAM_MAP(kyros_map)
+	MCFG_CPU_VBLANK_INT_HACK(alpha68k_interrupt,2)
 
-	MDRV_CPU_ADD("audiocpu", Z80, 3579545)
-	MDRV_CPU_PROGRAM_MAP(sstingry_sound_map)
-	MDRV_CPU_IO_MAP(kyros_sound_portmap)
+	MCFG_CPU_ADD("audiocpu", Z80, 3579545)
+	MCFG_CPU_PROGRAM_MAP(sstingry_sound_map)
+	MCFG_CPU_IO_MAP(kyros_sound_portmap)
 //AT
-	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold, 2)
-	MDRV_CPU_PERIODIC_INT(nmi_line_pulse, 4000)
+	MCFG_CPU_VBLANK_INT_HACK(irq0_line_hold, 2)
+	MCFG_CPU_PERIODIC_INT(nmi_line_pulse, 4000)
 //ZT
 
-	MDRV_MACHINE_START(common)
-	MDRV_MACHINE_RESET(common)
+	MCFG_MACHINE_START(common)
+	MCFG_MACHINE_RESET(common)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(sstingry)
-	MDRV_PALETTE_LENGTH(256 + 1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_GFXDECODE(sstingry)
+	MCFG_PALETTE_LENGTH(256 + 1)
 //AT
-	MDRV_PALETTE_INIT(kyros)
+	MCFG_PALETTE_INIT(kyros)
 //ZT
-	MDRV_VIDEO_UPDATE(sstingry)
+	MCFG_VIDEO_UPDATE(sstingry)
 
 	/* sound hardware */
 //AT
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym1", YM2203, 3000000)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
+	MCFG_SOUND_ADD("ym1", YM2203, 3000000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
 
-	MDRV_SOUND_ADD("ym2", YM2203, 3000000)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
+	MCFG_SOUND_ADD("ym2", YM2203, 3000000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
 
-	MDRV_SOUND_ADD("ym3", YM2203, 3000000)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("ym3", YM2203, 3000000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD("dac", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 //ZT
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( kyros, alpha68k_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, XTAL_24MHz/4)	/* Verified on bootleg PCB */
-	MDRV_CPU_PROGRAM_MAP(kyros_map)
-	MDRV_CPU_VBLANK_INT_HACK(alpha68k_interrupt,2)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/4)	/* Verified on bootleg PCB */
+	MCFG_CPU_PROGRAM_MAP(kyros_map)
+	MCFG_CPU_VBLANK_INT_HACK(alpha68k_interrupt,2)
 
-	MDRV_CPU_ADD("audiocpu", Z80, XTAL_24MHz/6)	/* Verified on bootleg PCB */
-	MDRV_CPU_PROGRAM_MAP(kyros_sound_map)
-	MDRV_CPU_IO_MAP(kyros_sound_portmap)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_24MHz/6)	/* Verified on bootleg PCB */
+	MCFG_CPU_PROGRAM_MAP(kyros_sound_map)
+	MCFG_CPU_IO_MAP(kyros_sound_portmap)
 //AT
-	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold, 2)
-	MDRV_CPU_PERIODIC_INT(nmi_line_pulse, 4000)
+	MCFG_CPU_VBLANK_INT_HACK(irq0_line_hold, 2)
+	MCFG_CPU_PERIODIC_INT(nmi_line_pulse, 4000)
 //ZT
 
-	MDRV_MACHINE_START(common)
-	MDRV_MACHINE_RESET(common)
+	MCFG_MACHINE_START(common)
+	MCFG_MACHINE_RESET(common)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(kyros)
-	MDRV_PALETTE_LENGTH(256 + 1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_GFXDECODE(kyros)
+	MCFG_PALETTE_LENGTH(256 + 1)
 
-	MDRV_PALETTE_INIT(kyros)
-	MDRV_VIDEO_UPDATE(kyros)
+	MCFG_PALETTE_INIT(kyros)
+	MCFG_VIDEO_UPDATE(kyros)
 
 	/* sound hardware */
 //AT
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym1", YM2203, XTAL_24MHz/12)	/* Verified on bootleg PCB */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
+	MCFG_SOUND_ADD("ym1", YM2203, XTAL_24MHz/12)	/* Verified on bootleg PCB */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
 
-	MDRV_SOUND_ADD("ym2", YM2203, XTAL_24MHz/12)	/* Verified on bootleg PCB */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
+	MCFG_SOUND_ADD("ym2", YM2203, XTAL_24MHz/12)	/* Verified on bootleg PCB */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
 
-	MDRV_SOUND_ADD("ym3", YM2203, XTAL_24MHz/12)	/* Verified on bootleg PCB */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
+	MCFG_SOUND_ADD("ym3", YM2203, XTAL_24MHz/12)	/* Verified on bootleg PCB */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 
-	MDRV_SOUND_ADD("dac", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 //ZT
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( jongbou, alpha68k_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 8000000)
-	MDRV_CPU_PROGRAM_MAP(kyros_map)
-	MDRV_CPU_VBLANK_INT_HACK(alpha68k_interrupt,17) // must be at least 4 for the controls to be smooth
+	MCFG_CPU_ADD("maincpu", M68000, 8000000)
+	MCFG_CPU_PROGRAM_MAP(kyros_map)
+	MCFG_CPU_VBLANK_INT_HACK(alpha68k_interrupt,17) // must be at least 4 for the controls to be smooth
 
-	MDRV_CPU_ADD("audiocpu", Z80, 4000000)
-	MDRV_CPU_PROGRAM_MAP(jongbou_sound_map)
-	MDRV_CPU_IO_MAP(jongbou_sound_portmap)
-	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold, 160) // guess, controls sound speed
+	MCFG_CPU_ADD("audiocpu", Z80, 4000000)
+	MCFG_CPU_PROGRAM_MAP(jongbou_sound_map)
+	MCFG_CPU_IO_MAP(jongbou_sound_portmap)
+	MCFG_CPU_VBLANK_INT_HACK(irq0_line_hold, 160) // guess, controls sound speed
 
-	MDRV_MACHINE_START(common)
-	MDRV_MACHINE_RESET(common)
+	MCFG_MACHINE_START(common)
+	MCFG_MACHINE_RESET(common)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(jongbou)
-	MDRV_PALETTE_LENGTH(256 + 1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_GFXDECODE(jongbou)
+	MCFG_PALETTE_LENGTH(256 + 1)
 
-	MDRV_PALETTE_INIT(kyros)
-	MDRV_VIDEO_UPDATE(kyros)
+	MCFG_PALETTE_INIT(kyros)
+	MCFG_VIDEO_UPDATE(kyros)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("aysnd", AY8910, 2000000)
-	MDRV_SOUND_CONFIG(ay8910_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.65)
+	MCFG_SOUND_ADD("aysnd", AY8910, 2000000)
+	MCFG_SOUND_CONFIG(ay8910_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.65)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( alpha68k_I, alpha68k_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 6000000) /* 24MHz/4? */
-	MDRV_CPU_PROGRAM_MAP(alpha68k_I_map)
-	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)/* VBL */
+	MCFG_CPU_ADD("maincpu", M68000, 6000000) /* 24MHz/4? */
+	MCFG_CPU_PROGRAM_MAP(alpha68k_I_map)
+	MCFG_CPU_VBLANK_INT("screen", irq1_line_hold)/* VBL */
 
-	MDRV_CPU_ADD("audiocpu", Z80, 4000000) // 4Mhz seems to yield the correct tone
-	MDRV_CPU_PROGRAM_MAP(alpha68k_I_s_map)
+	MCFG_CPU_ADD("audiocpu", Z80, 4000000) // 4Mhz seems to yield the correct tone
+	MCFG_CPU_PROGRAM_MAP(alpha68k_I_s_map)
 
-	MDRV_MACHINE_START(common)
-	MDRV_MACHINE_RESET(common)
+	MCFG_MACHINE_START(common)
+	MCFG_MACHINE_RESET(common)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(paddle)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_GFXDECODE(paddle)
 //AT
-	MDRV_PALETTE_LENGTH(1024)
-	MDRV_PALETTE_INIT(paddlem)
+	MCFG_PALETTE_LENGTH(1024)
+	MCFG_PALETTE_INIT(paddlem)
 //ZT
-	MDRV_VIDEO_UPDATE(alpha68k_I)
+	MCFG_VIDEO_UPDATE(alpha68k_I)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM3812, 4000000)
-	MDRV_SOUND_CONFIG(ym3812_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("ymsnd", YM3812, 4000000)
+	MCFG_SOUND_CONFIG(ym3812_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( alpha68k_II, alpha68k_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 8000000) /* Correct */
-	MDRV_CPU_PROGRAM_MAP(alpha68k_II_map)
-	MDRV_CPU_VBLANK_INT("screen", irq3_line_hold)/* VBL */
+	MCFG_CPU_ADD("maincpu", M68000, 8000000) /* Correct */
+	MCFG_CPU_PROGRAM_MAP(alpha68k_II_map)
+	MCFG_CPU_VBLANK_INT("screen", irq3_line_hold)/* VBL */
 
-	MDRV_CPU_ADD("audiocpu", Z80, /*3579545*/3579545*2) /* Unlikely but needed to stop nested NMI's */
-	MDRV_CPU_PROGRAM_MAP(sound_map)
-	MDRV_CPU_IO_MAP(sound_portmap)
-	MDRV_CPU_PERIODIC_INT(nmi_line_pulse, 7500) //AT
+	MCFG_CPU_ADD("audiocpu", Z80, /*3579545*/3579545*2) /* Unlikely but needed to stop nested NMI's */
+	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_CPU_IO_MAP(sound_portmap)
+	MCFG_CPU_PERIODIC_INT(nmi_line_pulse, 7500) //AT
 
-	MDRV_MACHINE_START(alpha68k_II)
-	MDRV_MACHINE_RESET(alpha68k_II)
+	MCFG_MACHINE_START(alpha68k_II)
+	MCFG_MACHINE_RESET(alpha68k_II)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(alpha68k_II)
-	MDRV_PALETTE_LENGTH(2048)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_GFXDECODE(alpha68k_II)
+	MCFG_PALETTE_LENGTH(2048)
 
-	MDRV_VIDEO_START(alpha68k)
-	MDRV_VIDEO_UPDATE(alpha68k_II)
+	MCFG_VIDEO_START(alpha68k)
+	MCFG_VIDEO_UPDATE(alpha68k_II)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym1", YM2203, 3000000)
-	MDRV_SOUND_CONFIG(ym2203_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.65)
+	MCFG_SOUND_ADD("ym1", YM2203, 3000000)
+	MCFG_SOUND_CONFIG(ym2203_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.65)
 
-	MDRV_SOUND_ADD("ym2", YM2413, 3579545)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("ym2", YM2413, 3579545)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD("dac", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( btlfieldb, alpha68k_II )
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_VBLANK_INT_HACK(alpha68k_interrupt,2)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_VBLANK_INT_HACK(alpha68k_interrupt,2)
 MACHINE_CONFIG_END
 
 //AT
 static MACHINE_CONFIG_START( alpha68k_II_gm, alpha68k_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 8000000)
-	MDRV_CPU_PROGRAM_MAP(alpha68k_II_map)
-	MDRV_CPU_VBLANK_INT_HACK(alpha68k_interrupt, 4)
+	MCFG_CPU_ADD("maincpu", M68000, 8000000)
+	MCFG_CPU_PROGRAM_MAP(alpha68k_II_map)
+	MCFG_CPU_VBLANK_INT_HACK(alpha68k_interrupt, 4)
 
-	MDRV_CPU_ADD("audiocpu", Z80, 4000000*2)
-	MDRV_CPU_PROGRAM_MAP(sound_map)
-	MDRV_CPU_IO_MAP(sound_portmap)
-	MDRV_CPU_PERIODIC_INT(nmi_line_pulse, 7500)
+	MCFG_CPU_ADD("audiocpu", Z80, 4000000*2)
+	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_CPU_IO_MAP(sound_portmap)
+	MCFG_CPU_PERIODIC_INT(nmi_line_pulse, 7500)
 
-	MDRV_MACHINE_START(alpha68k_II)
-	MDRV_MACHINE_RESET(alpha68k_II)
+	MCFG_MACHINE_START(alpha68k_II)
+	MCFG_MACHINE_RESET(alpha68k_II)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(alpha68k_II)
-	MDRV_PALETTE_LENGTH(2048)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_GFXDECODE(alpha68k_II)
+	MCFG_PALETTE_LENGTH(2048)
 
-	MDRV_VIDEO_START(alpha68k)
-	MDRV_VIDEO_UPDATE(alpha68k_II)
+	MCFG_VIDEO_START(alpha68k)
+	MCFG_VIDEO_UPDATE(alpha68k_II)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym1", YM2203, 3000000)
-	MDRV_SOUND_CONFIG(ym2203_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.65)
+	MCFG_SOUND_ADD("ym1", YM2203, 3000000)
+	MCFG_SOUND_CONFIG(ym2203_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.65)
 
-	MDRV_SOUND_ADD("ym2", YM2413, 3579545)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("ym2", YM2413, 3579545)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD("dac", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_CONFIG_END
 //ZT
 
 static MACHINE_CONFIG_START( alpha68k_V, alpha68k_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 10000000) /* ? */
-	MDRV_CPU_PROGRAM_MAP(alpha68k_V_map)
-	MDRV_CPU_VBLANK_INT("screen", irq3_line_hold)/* VBL */
+	MCFG_CPU_ADD("maincpu", M68000, 10000000) /* ? */
+	MCFG_CPU_PROGRAM_MAP(alpha68k_V_map)
+	MCFG_CPU_VBLANK_INT("screen", irq3_line_hold)/* VBL */
 
-	MDRV_CPU_ADD("audiocpu", Z80, /*3579545*/3579545*2) /* Unlikely but needed to stop nested NMI's */
-	MDRV_CPU_PROGRAM_MAP(sound_map)
-	MDRV_CPU_IO_MAP(sound_portmap)
-	MDRV_CPU_PERIODIC_INT(nmi_line_pulse, 8500) //AT
+	MCFG_CPU_ADD("audiocpu", Z80, /*3579545*/3579545*2) /* Unlikely but needed to stop nested NMI's */
+	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_CPU_IO_MAP(sound_portmap)
+	MCFG_CPU_PERIODIC_INT(nmi_line_pulse, 8500) //AT
 
-	MDRV_MACHINE_START(alpha68k_V)
-	MDRV_MACHINE_RESET(alpha68k_V)
+	MCFG_MACHINE_START(alpha68k_V)
+	MCFG_MACHINE_RESET(alpha68k_V)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(alpha68k_V)
-	MDRV_PALETTE_LENGTH(4096)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_GFXDECODE(alpha68k_V)
+	MCFG_PALETTE_LENGTH(4096)
 
-	MDRV_VIDEO_START(alpha68k)
-	MDRV_VIDEO_UPDATE(alpha68k_V)
+	MCFG_VIDEO_START(alpha68k)
+	MCFG_VIDEO_UPDATE(alpha68k_V)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym1", YM2203, 3000000)
-	MDRV_SOUND_CONFIG(ym2203_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.65)
+	MCFG_SOUND_ADD("ym1", YM2203, 3000000)
+	MCFG_SOUND_CONFIG(ym2203_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.65)
 
-	MDRV_SOUND_ADD("ym2", YM2413, 3579545)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("ym2", YM2413, 3579545)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD("dac", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( alpha68k_V_sb, alpha68k_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 10000000) /* ? */
-	MDRV_CPU_PROGRAM_MAP(alpha68k_V_map)
-	MDRV_CPU_VBLANK_INT("screen", irq3_line_hold)/* VBL */
+	MCFG_CPU_ADD("maincpu", M68000, 10000000) /* ? */
+	MCFG_CPU_PROGRAM_MAP(alpha68k_V_map)
+	MCFG_CPU_VBLANK_INT("screen", irq3_line_hold)/* VBL */
 
-	MDRV_CPU_ADD("audiocpu", Z80, /*3579545*/3579545*2) /* Unlikely but needed to stop nested NMI's */
-	MDRV_CPU_PROGRAM_MAP(sound_map)
-	MDRV_CPU_IO_MAP(sound_portmap)
-	MDRV_CPU_PERIODIC_INT(nmi_line_pulse, 8500) //AT
+	MCFG_CPU_ADD("audiocpu", Z80, /*3579545*/3579545*2) /* Unlikely but needed to stop nested NMI's */
+	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_CPU_IO_MAP(sound_portmap)
+	MCFG_CPU_PERIODIC_INT(nmi_line_pulse, 8500) //AT
 
-	MDRV_MACHINE_START(alpha68k_V)
-	MDRV_MACHINE_RESET(alpha68k_V)
+	MCFG_MACHINE_START(alpha68k_V)
+	MCFG_MACHINE_RESET(alpha68k_V)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(alpha68k_V)
-	MDRV_PALETTE_LENGTH(4096)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_GFXDECODE(alpha68k_V)
+	MCFG_PALETTE_LENGTH(4096)
 
-	MDRV_VIDEO_START(alpha68k)
-	MDRV_VIDEO_UPDATE(alpha68k_V_sb)
+	MCFG_VIDEO_START(alpha68k)
+	MCFG_VIDEO_UPDATE(alpha68k_V_sb)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym1", YM2203, 3000000)
-	MDRV_SOUND_CONFIG(ym2203_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.65)
+	MCFG_SOUND_ADD("ym1", YM2203, 3000000)
+	MCFG_SOUND_CONFIG(ym2203_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.65)
 
-	MDRV_SOUND_ADD("ym2", YM2413, 3579545)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("ym2", YM2413, 3579545)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD("dac", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( tnextspc, alpha68k_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 9000000) /* Confirmed 18 MHz/2 */
-	MDRV_CPU_PROGRAM_MAP(tnextspc_map)
-	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)/* VBL */
+	MCFG_CPU_ADD("maincpu", M68000, 9000000) /* Confirmed 18 MHz/2 */
+	MCFG_CPU_PROGRAM_MAP(tnextspc_map)
+	MCFG_CPU_VBLANK_INT("screen", irq1_line_hold)/* VBL */
 
-	MDRV_CPU_ADD("audiocpu", Z80, 4000000)
-	MDRV_CPU_PROGRAM_MAP(tnextspc_sound_map)
-	MDRV_CPU_IO_MAP(tnextspc_sound_portmap)
+	MCFG_CPU_ADD("audiocpu", Z80, 4000000)
+	MCFG_CPU_PROGRAM_MAP(tnextspc_sound_map)
+	MCFG_CPU_IO_MAP(tnextspc_sound_portmap)
 
-	MDRV_MACHINE_START(common)
-	MDRV_MACHINE_RESET(common)
+	MCFG_MACHINE_START(common)
+	MCFG_MACHINE_RESET(common)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(tnextspc)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_GFXDECODE(tnextspc)
 
-	MDRV_PALETTE_LENGTH(1024)
-	MDRV_PALETTE_INIT(paddlem)
-	MDRV_VIDEO_UPDATE(alpha68k_I)
+	MCFG_PALETTE_LENGTH(1024)
+	MCFG_PALETTE_INIT(paddlem)
+	MCFG_VIDEO_UPDATE(alpha68k_I)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM3812, 4000000)
-	MDRV_SOUND_CONFIG(ym3812_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("ymsnd", YM3812, 4000000)
+	MCFG_SOUND_CONFIG(ym3812_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -3152,7 +3152,7 @@ static DRIVER_INIT( btlfieldb )
 static DRIVER_INIT( skysoldr )
 {
 	alpha68k_state *state = machine->driver_data<alpha68k_state>();
-	memory_set_bankptr(machine, "bank8", (memory_region(machine, "user1")) + 0x40000);
+	memory_set_bankptr(machine, "bank8", (machine->region("user1")->base()) + 0x40000);
 	state->invert_controls = 0;
 	state->microcontroller_id = 0;
 	state->coin_id = 0x22 | (0x22 << 8);
@@ -3171,7 +3171,7 @@ static DRIVER_INIT( goldmedl )
 static DRIVER_INIT( goldmedla )
 {
 	alpha68k_state *state = machine->driver_data<alpha68k_state>();
-	memory_set_bankptr(machine, "bank8", memory_region(machine, "maincpu") + 0x20000);
+	memory_set_bankptr(machine, "bank8", machine->region("maincpu")->base() + 0x20000);
 	state->invert_controls = 0;
 	state->microcontroller_id = 0x8803; //Guess - routine to handle coinage is the same as in 'goldmedl'
 	state->coin_id = 0x23 | (0x24 << 8);
@@ -3199,7 +3199,7 @@ static DRIVER_INIT( skyadvntu )
 static DRIVER_INIT( gangwarsu )
 {
 	alpha68k_state *state = machine->driver_data<alpha68k_state>();
-	memory_set_bankptr(machine, "bank8", memory_region(machine, "user1"));
+	memory_set_bankptr(machine, "bank8", machine->region("user1")->base());
 	state->invert_controls = 0;
 	state->microcontroller_id = 0x8512;
 	state->coin_id = 0x23 | (0x24 << 8);
@@ -3209,7 +3209,7 @@ static DRIVER_INIT( gangwarsu )
 static DRIVER_INIT( gangwars )
 {
 	alpha68k_state *state = machine->driver_data<alpha68k_state>();
-	memory_set_bankptr(machine, "bank8", memory_region(machine, "user1"));
+	memory_set_bankptr(machine, "bank8", machine->region("user1")->base());
 	state->invert_controls = 0;
 	state->microcontroller_id = 0x8512;
 	state->coin_id = 0x23 | (0x24 << 8);
@@ -3219,7 +3219,7 @@ static DRIVER_INIT( gangwars )
 static DRIVER_INIT( sbasebal )
 {
 	alpha68k_state *state = machine->driver_data<alpha68k_state>();
-	UINT16 *rom = (UINT16 *)memory_region(machine, "maincpu");
+	UINT16 *rom = (UINT16 *)machine->region("maincpu")->base();
 
 	/* Patch protection check, it does a divide by zero because the MCU is trying to
        calculate the ball speed when a strike is scored, notice that current emulation

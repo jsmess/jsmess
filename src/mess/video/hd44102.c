@@ -63,13 +63,13 @@ struct _hd44102_t
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE hd44102_t *get_safe_token(running_device *device)
+INLINE hd44102_t *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	return (hd44102_t *)downcast<legacy_device_base *>(device)->token();
 }
 
-INLINE hd44102_config *get_safe_config(running_device *device)
+INLINE hd44102_config *get_safe_config(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == HD44102);
@@ -203,7 +203,7 @@ static WRITE8_DEVICE_HANDLER( hd44102_data_w )
     hd44102_update - update screen
 -------------------------------------------------*/
 
-void hd44102_update(running_device *device, bitmap_t *bitmap, const rectangle *cliprect)
+void hd44102_update(device_t *device, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	hd44102_t *hd44102 = get_safe_token(device);
 	const hd44102_config *config = get_safe_config(device);

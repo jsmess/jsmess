@@ -426,7 +426,7 @@ static WRITE16_HANDLER( fdc_w )
 				break;
 			case 0x9:
 				logerror("Read multiple [%02x] %d..%d side %d track %d\n", data, fdc_sector, fdc_sector+fdc_data-1, data & 8 ? 1 : 0, fdc_phys_track);
-				fdc_pt = memory_region(space->machine, "floppy") + track_size*(2*fdc_phys_track+(data & 8 ? 1 : 0));
+				fdc_pt = space->machine->region("floppy")->base() + track_size*(2*fdc_phys_track+(data & 8 ? 1 : 0));
 				fdc_span = track_size;
 				fdc_status = 3;
 				fdc_drq = 1;
@@ -434,7 +434,7 @@ static WRITE16_HANDLER( fdc_w )
 				break;
 			case 0xb:
 				logerror("Write multiple [%02x] %d..%d side %d track %d\n", data, fdc_sector, fdc_sector+fdc_data-1, data & 8 ? 1 : 0, fdc_phys_track);
-				fdc_pt = memory_region(space->machine, "floppy") + track_size*(2*fdc_phys_track+(data & 8 ? 1 : 0));
+				fdc_pt = space->machine->region("floppy")->base() + track_size*(2*fdc_phys_track+(data & 8 ? 1 : 0));
 				fdc_span = track_size;
 				fdc_status = 3;
 				fdc_drq = 1;
@@ -710,7 +710,7 @@ static UINT8 curbank;
 
 static void reset_bank(running_machine *machine)
 {
-	if (memory_region(machine, "romboard"))
+	if (machine->region("romboard")->base())
 	{
 		memory_set_bank(machine, "bank1", curbank & 15);
 		memory_set_bank(machine, "bank2", curbank & 15);
@@ -935,7 +935,7 @@ static INTERRUPT_GEN(irq_vbl)
 	}
 }
 
-static void irq_ym(running_device *device, int irq)
+static void irq_ym(device_t *device, int irq)
 {
 	irq_yms = irq;
 	cputag_set_input_line(device->machine, "maincpu", IRQ_YM2151+1, irq_yms && (irq_allow0 & (1 << IRQ_YM2151)) ? ASSERT_LINE : CLEAR_LINE);
@@ -1071,14 +1071,14 @@ static NVRAM_HANDLER(system24)
 	if(!track_size || !file)
 		return;
 	if(read_or_write)
-		mame_fwrite(file, memory_region(machine, "floppy"), 2*track_size);
+		mame_fwrite(file, machine->region("floppy")->base(), 2*track_size);
 	else
-		mame_fread(file, memory_region(machine, "floppy"), 2*track_size);
+		mame_fread(file, machine->region("floppy")->base(), 2*track_size);
 }
 
 static MACHINE_START( system24 )
 {
-	UINT8 *usr1 = memory_region(machine, "romboard");
+	UINT8 *usr1 = machine->region("romboard")->base();
 	if (usr1)
 	{
 		memory_configure_bank(machine, "bank1", 0, 16, usr1, 0x40000);
@@ -1774,46 +1774,46 @@ static const ym2151_interface ym2151_config =
 
 static MACHINE_CONFIG_START( system24, driver_device )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, MASTER_CLOCK/2)
-	MDRV_CPU_PROGRAM_MAP(system24_cpu1_map)
-	MDRV_CPU_VBLANK_INT_HACK(irq_vbl, 2)
+	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK/2)
+	MCFG_CPU_PROGRAM_MAP(system24_cpu1_map)
+	MCFG_CPU_VBLANK_INT_HACK(irq_vbl, 2)
 
-	MDRV_CPU_ADD("sub", M68000, MASTER_CLOCK/2)
-	MDRV_CPU_PROGRAM_MAP(system24_cpu2_map)
+	MCFG_CPU_ADD("sub", M68000, MASTER_CLOCK/2)
+	MCFG_CPU_PROGRAM_MAP(system24_cpu2_map)
 
-	MDRV_QUANTUM_TIME(HZ(6000))
+	MCFG_QUANTUM_TIME(HZ(6000))
 
-	MDRV_MACHINE_START(system24)
-	MDRV_MACHINE_RESET(system24)
+	MCFG_MACHINE_START(system24)
+	MCFG_MACHINE_RESET(system24)
 
-	MDRV_TIMER_ADD("irq_timer", irq_timer_cb)
-	MDRV_TIMER_ADD("irq_timer_clear", irq_timer_clear_cb)
+	MCFG_TIMER_ADD("irq_timer", irq_timer_cb)
+	MCFG_TIMER_ADD("irq_timer_clear", irq_timer_clear_cb)
 
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
+	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_RAW_PARAMS(VIDEO_CLOCK/2, 656, 0/*+69*/, 496/*+69*/, 424, 0/*+25*/, 384/*+25*/)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS(VIDEO_CLOCK/2, 656, 0/*+69*/, 496/*+69*/, 424, 0/*+25*/, 384/*+25*/)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 
-	MDRV_PALETTE_LENGTH(8192*2)
+	MCFG_PALETTE_LENGTH(8192*2)
 
-	MDRV_VIDEO_START(system24)
-	MDRV_VIDEO_UPDATE(system24)
+	MCFG_VIDEO_START(system24)
+	MCFG_VIDEO_UPDATE(system24)
 
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ymsnd", YM2151, 4000000)
-	MDRV_SOUND_CONFIG(ym2151_config)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 0.50)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 0.50)
+	MCFG_SOUND_ADD("ymsnd", YM2151, 4000000)
+	MCFG_SOUND_CONFIG(ym2151_config)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
-	MDRV_SOUND_ADD("dac", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
+	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( system24_floppy, system24 )
-	MDRV_NVRAM_HANDLER(system24)
+	MCFG_NVRAM_HANDLER(system24)
 MACHINE_CONFIG_END
 
 

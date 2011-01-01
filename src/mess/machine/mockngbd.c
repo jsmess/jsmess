@@ -56,7 +56,7 @@ struct _mockingboard_token
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE mockingboard_token *get_token(running_device *device)
+INLINE mockingboard_token *get_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == MOCKINGBOARD);
@@ -144,8 +144,8 @@ READ8_DEVICE_HANDLER(mockingboard_r)
 
 WRITE8_DEVICE_HANDLER(mockingboard_w)
 {
-	running_device *ay8910_1 = device->machine->device("ay8910.1");
-	running_device *ay8910_2 = device->machine->device("ay8910.2");
+	device_t *ay8910_1 = device->machine->device("ay8910.1");
+	device_t *ay8910_2 = device->machine->device("ay8910.2");
 	mockingboard_token *token = get_token(device);
 
 	if (LOG_MOCKINGBOARD)

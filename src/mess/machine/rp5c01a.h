@@ -30,12 +30,12 @@
 
 DECLARE_LEGACY_DEVICE(RP5C01A, rp5c01a);
 
-#define MDRV_RP5C01A_ADD(_tag, _clock, _config) \
-	MDRV_DEVICE_ADD(_tag, RP5C01A, _clock) \
-	MDRV_DEVICE_CONFIG(_config)
+#define MCFG_RP5C01A_ADD(_tag, _clock, _config) \
+	MCFG_DEVICE_ADD(_tag, RP5C01A, _clock) \
+	MCFG_DEVICE_CONFIG(_config)
 
-#define MDRV_RP5C01A_REMOVE(_tag) \
-	MDRV_DEVICE_REMOVE(_tag)
+#define MCFG_RP5C01A_REMOVE(_tag) \
+	MCFG_DEVICE_REMOVE(_tag)
 
 #define RP5C01A_INTERFACE(name) \
 	const rp5c01a_interface (name)=

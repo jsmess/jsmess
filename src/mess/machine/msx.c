@@ -520,7 +520,7 @@ INTERRUPT_GEN( msx_interrupt )
 ** The I/O funtions
 */
 
-static running_device *cassette_device_image(running_machine *machine)
+static device_t *cassette_device_image(running_machine *machine)
 {
 	return machine->device("cassette");
 }
@@ -650,7 +650,7 @@ WRITE8_HANDLER (msx_fmpac_w)
 	msx_state *state = space->machine->driver_data<msx_state>();
 	if (state->opll_active)
 	{
-		running_device *ym = space->machine->device("ym2413");
+		device_t *ym = space->machine->device("ym2413");
 
 		if (offset == 1)
 			ym2413_w (ym, 1, data);
@@ -672,20 +672,20 @@ WRITE8_HANDLER (msx_rtc_latch_w)
 WRITE8_HANDLER (msx_rtc_reg_w)
 {
 	msx_state *state = space->machine->driver_data<msx_state>();
-	running_device *rtc = space->machine->device("rtc");
+	device_t *rtc = space->machine->device("rtc");
 	tc8521_w(rtc, state->rtc_latch, data);
 }
 
 READ8_HANDLER (msx_rtc_reg_r)
 {
 	msx_state *state = space->machine->driver_data<msx_state>();
-	running_device *rtc = space->machine->device("rtc");
+	device_t *rtc = space->machine->device("rtc");
 	return tc8521_r(rtc, state->rtc_latch);
 }
 
 NVRAM_HANDLER( msx2 )
 {
-	running_device *rtc = machine->device("rtc");
+	device_t *rtc = machine->device("rtc");
 	if (file)
 	{
 		if (read_or_write)
@@ -908,8 +908,8 @@ static void msx_memory_init (running_machine *machine)
 					/* Check whether the optional FM-PAC rom is present */
 					option = 0x10000;
 					size = 0x10000;
-					mem = memory_region(machine, "maincpu") + option;
-					if (memory_region_length(machine, "maincpu") >= size + option && mem[0] == 'A' && mem[1] == 'B') {
+					mem = machine->region("maincpu")->base() + option;
+					if (machine->region("maincpu")->bytes() >= size + option && mem[0] == 'A' && mem[1] == 'B') {
 						slot = &msx_slot_list[SLOT_FMPAC];
 					}
 					else {
@@ -923,7 +923,7 @@ static void msx_memory_init (running_machine *machine)
 
 				case MSX_MEM_HANDLER:
 				case MSX_MEM_ROM:
-					mem = memory_region(machine, "maincpu") + option;
+					mem = machine->region("maincpu")->base() + option;
 					break;
 				case MSX_MEM_RAM:
 					mem = NULL;
@@ -948,7 +948,7 @@ static void msx_memory_init (running_machine *machine)
 			}
 			break;
 		case MSX_LAYOUT_KANJI_ENTRY:
-			state->kanji_mem = memory_region(machine, "maincpu") + layout->option;
+			state->kanji_mem = machine->region("maincpu")->base() + layout->option;
 			break;
 		case MSX_LAYOUT_RAMIO_SET_BITS_ENTRY:
 			state->ramio_set_bits = (UINT8)layout->option;

@@ -33,10 +33,10 @@ public:
 	UINT16 kanji;
 	UINT16 kanji2;
 
-	running_device *upd765;
-	running_device *upd1990a;
-	running_device *cassette;
-	running_device *centronics;
+	device_t *upd765;
+	device_t *upd1990a;
+	device_t *cassette;
+	device_t *centronics;
 	unsigned char *mainRAM;
 	int pc88sr_is_highspeed;
 	unsigned char *pc88sr_textRAM;
@@ -132,7 +132,7 @@ MACHINE_RESET( pc88srh );
 
 void pc8801_update_bank(running_machine *machine);
 READ8_HANDLER(pc8801fd_upd765_tc);
-void pc88sr_sound_interupt(running_device *device, int irq);
+void pc88sr_sound_interupt(device_t *device, int irq);
 WRITE8_HANDLER(pc88_kanji_w);
 READ8_HANDLER(pc88_kanji_r);
 WRITE8_HANDLER(pc88_kanji2_w);

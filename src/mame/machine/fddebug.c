@@ -482,11 +482,11 @@ void fd1094_init_debugging(running_machine *machine, const char *cpureg, const c
 	key_changed = changed;
 
 	/* set up the regions */
-	coderegion = (UINT16 *)memory_region(machine, cpureg);
-	coderegion_words = memory_region_length(machine, cpureg) / 2;
-	keyregion = (UINT8 *)memory_region(machine, keyreg);
-	keystatus = (UINT16 *)memory_region(machine, statreg);
-	keystatus_words = memory_region_length(machine, statreg) / 2;
+	coderegion = (UINT16 *)machine->region(cpureg)->base();
+	coderegion_words = machine->region(cpureg)->bytes() / 2;
+	keyregion = (UINT8 *)machine->region(keyreg)->base();
+	keystatus = (UINT16 *)machine->region(statreg)->base();
+	keystatus_words = machine->region(statreg)->bytes() / 2;
 	assert(coderegion_words == keystatus_words);
 
 	/* allocate memory for the ignore table */
@@ -887,7 +887,7 @@ static void execute_fdeliminate(running_machine *machine, int ref, int params, c
 
 static void execute_fdunlock(running_machine *machine, int ref, int params, const char **param)
 {
-	running_device *cpu = debug_cpu_get_visible_cpu(machine);
+	device_t *cpu = debug_cpu_get_visible_cpu(machine);
 	int reps = keystatus_words / KEY_SIZE;
 	int keyaddr, repnum;
 	UINT64 offset;
@@ -925,7 +925,7 @@ static void execute_fdunlock(running_machine *machine, int ref, int params, cons
 
 static void execute_fdignore(running_machine *machine, int ref, int params, const char **param)
 {
-	running_device *cpu = debug_cpu_get_visible_cpu(machine);
+	device_t *cpu = debug_cpu_get_visible_cpu(machine);
 	UINT64 offset;
 
 	/* support 0 or 1 parameters */
@@ -1030,7 +1030,7 @@ static void execute_fdstate(running_machine *machine, int ref, int params, const
 
 static void execute_fdpc(running_machine *machine, int ref, int params, const char **param)
 {
-	running_device *cpu = debug_cpu_get_visible_cpu(machine);
+	device_t *cpu = debug_cpu_get_visible_cpu(machine);
 	UINT64 newpc;
 
 	/* support 0 or 1 parameters */

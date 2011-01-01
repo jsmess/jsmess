@@ -20,14 +20,14 @@ struct _channelf_sound_state
 	int min_ontime;              //  added for improved sound
 };
 
-INLINE channelf_sound_state *get_safe_token(running_device *device)
+INLINE channelf_sound_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == CHANNELF);
 	return (channelf_sound_state *)downcast<legacy_device_base *>(device)->token();
 }
 
-void channelf_sound_w(running_device *device, int mode)
+void channelf_sound_w(device_t *device, int mode)
 {
 	channelf_sound_state *state = get_safe_token(device);
 	if (mode == state->sound_mode)

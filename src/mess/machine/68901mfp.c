@@ -320,13 +320,13 @@ struct _mc68901_t
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE mc68901_t *get_safe_token(running_device *device)
+INLINE mc68901_t *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	return (mc68901_t *)downcast<legacy_device_base *>(device)->token();
 }
 
-INLINE const mc68901_interface *get_interface(running_device *device)
+INLINE const mc68901_interface *get_interface(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == MC68901);
@@ -342,7 +342,7 @@ INLINE const mc68901_interface *get_interface(running_device *device)
     line state
 -------------------------------------------------*/
 
-static void check_interrupts(running_device *device)
+static void check_interrupts(device_t *device)
 {
 	mc68901_t *mc68901 = get_safe_token(device);
 
@@ -360,7 +360,7 @@ static void check_interrupts(running_device *device)
     take_interrupt - mark an interrupt pending
 -------------------------------------------------*/
 
-static void take_interrupt(running_device *device, UINT16 mask)
+static void take_interrupt(device_t *device, UINT16 mask)
 {
 	mc68901_t *mc68901 = get_safe_token(device);
 
@@ -375,7 +375,7 @@ static void take_interrupt(running_device *device, UINT16 mask)
 
 static TIMER_CALLBACK( gpio_poll_tick )
 {
-	running_device *device = (running_device *)ptr;
+	device_t *device = (device_t *)ptr;
 	mc68901_t *mc68901 = get_safe_token(device);
 
 	UINT8 gpio = devcb_call_read8(&mc68901->in_gpio_func, 0);
@@ -408,7 +408,7 @@ static TIMER_CALLBACK( gpio_poll_tick )
     interrupt
 -------------------------------------------------*/
 
-static void rx_buffer_full(running_device *device)
+static void rx_buffer_full(device_t *device)
 {
 	mc68901_t *mc68901 = get_safe_token(device);
 
@@ -422,7 +422,7 @@ static void rx_buffer_full(running_device *device)
     rx_error - signal receive error interrupt
 -------------------------------------------------*/
 
-static void rx_error(running_device *device)
+static void rx_error(device_t *device)
 {
 	mc68901_t *mc68901 = get_safe_token(device);
 
@@ -441,7 +441,7 @@ static void rx_error(running_device *device)
     empty interrupt
 -------------------------------------------------*/
 
-static void tx_buffer_empty(running_device *device)
+static void tx_buffer_empty(device_t *device)
 {
 	mc68901_t *mc68901 = get_safe_token(device);
 
@@ -455,7 +455,7 @@ static void tx_buffer_empty(running_device *device)
     tx_error - signal transmit error interrupt
 -------------------------------------------------*/
 
-static void tx_error(running_device *device)
+static void tx_error(device_t *device)
 {
 	mc68901_t *mc68901 = get_safe_token(device);
 
@@ -485,7 +485,7 @@ static int get_parity_bit(UINT8 b)
     serial_receive - receive serial bit
 -------------------------------------------------*/
 
-static void serial_receive(running_device *device)
+static void serial_receive(device_t *device)
 {
 	mc68901_t *mc68901 = get_safe_token(device);
 	int rxd;
@@ -590,7 +590,7 @@ static void serial_receive(running_device *device)
 
 static TIMER_CALLBACK( rx_tick )
 {
-	running_device *device = (running_device *)ptr;
+	device_t *device = (device_t *)ptr;
 
 	serial_receive(device);
 }
@@ -599,7 +599,7 @@ static TIMER_CALLBACK( rx_tick )
     tx_disabled - transmitter disabled handler
 -------------------------------------------------*/
 
-static void tx_disabled(running_device *device)
+static void tx_disabled(device_t *device)
 {
 	mc68901_t *mc68901 = get_safe_token(device);
 
@@ -622,7 +622,7 @@ static void tx_disabled(running_device *device)
     tx_starting - transmitter starting handler
 -------------------------------------------------*/
 
-static void tx_starting(running_device *device)
+static void tx_starting(device_t *device)
 {
 	mc68901_t *mc68901 = get_safe_token(device);
 
@@ -644,7 +644,7 @@ static void tx_starting(running_device *device)
     tx_break - transmit break handler
 -------------------------------------------------*/
 
-static void tx_break(running_device *device)
+static void tx_break(device_t *device)
 {
 	mc68901_t *mc68901 = get_safe_token(device);
 
@@ -673,7 +673,7 @@ static void tx_break(running_device *device)
     tx_enabled - transmitter enabled handler
 -------------------------------------------------*/
 
-static void tx_enabled(running_device *device)
+static void tx_enabled(device_t *device)
 {
 	mc68901_t *mc68901 = get_safe_token(device);
 
@@ -811,7 +811,7 @@ static void tx_enabled(running_device *device)
     serial_transmit - transmit serial bit
 -------------------------------------------------*/
 
-static void serial_transmit(running_device *device)
+static void serial_transmit(device_t *device)
 {
 	mc68901_t *mc68901 = get_safe_token(device);
 
@@ -830,7 +830,7 @@ static void serial_transmit(running_device *device)
 
 static TIMER_CALLBACK( tx_tick )
 {
-	running_device *device = (running_device *)ptr;
+	device_t *device = (device_t *)ptr;
 
 	serial_transmit(device);
 }
@@ -1366,7 +1366,7 @@ WRITE8_DEVICE_HANDLER( mc68901_register_w )
     timer_count - timer count down
 -------------------------------------------------*/
 
-static void timer_count(running_device *device, int index)
+static void timer_count(device_t *device, int index)
 {
 	mc68901_t *mc68901 = get_safe_token(device);
 
@@ -1403,7 +1403,7 @@ static void timer_count(running_device *device, int index)
     timer_input - timer input
 -------------------------------------------------*/
 
-static void timer_input(running_device *device, int index, int value)
+static void timer_input(device_t *device, int index, int value)
 {
 	mc68901_t *mc68901 = get_safe_token(device);
 
@@ -1448,16 +1448,16 @@ static void timer_input(running_device *device, int index, int value)
     TIMER_CALLBACK( timer_a )
 -------------------------------------------------*/
 
-static TIMER_CALLBACK( timer_a ) { timer_count((running_device *)ptr, MC68901_TIMER_A); }
-static TIMER_CALLBACK( timer_b ) { timer_count((running_device *)ptr, MC68901_TIMER_B); }
-static TIMER_CALLBACK( timer_c ) { timer_count((running_device *)ptr, MC68901_TIMER_C); }
-static TIMER_CALLBACK( timer_d ) { timer_count((running_device *)ptr, MC68901_TIMER_D); }
+static TIMER_CALLBACK( timer_a ) { timer_count((device_t *)ptr, MC68901_TIMER_A); }
+static TIMER_CALLBACK( timer_b ) { timer_count((device_t *)ptr, MC68901_TIMER_B); }
+static TIMER_CALLBACK( timer_c ) { timer_count((device_t *)ptr, MC68901_TIMER_C); }
+static TIMER_CALLBACK( timer_d ) { timer_count((device_t *)ptr, MC68901_TIMER_D); }
 
 /*-------------------------------------------------
     mc68901_get_vector - get interrupt vector
 -------------------------------------------------*/
 
-int mc68901_get_vector(running_device *device)
+int mc68901_get_vector(device_t *device)
 {
 	mc68901_t *mc68901 = (mc68901_t *)get_safe_token(device);
 

@@ -263,30 +263,30 @@ WRITE8_HANDLER( trs80m4_84_w )
 			if (state->model4 & 4)	/* Model 4P gets RAM while Model 4 gets ROM */
 			{
 				if (state->model4 & 8)
-					memory_set_bankptr(mem->machine, "bank1", memory_region(mem->machine, "maincpu"));
+					memory_set_bankptr(mem->machine, "bank1", mem->machine->region("maincpu")->base());
 				else
-					memory_set_bankptr(mem->machine, "bank1", memory_region(mem->machine, "maincpu") + 0x10000);
+					memory_set_bankptr(mem->machine, "bank1", mem->machine->region("maincpu")->base() + 0x10000);
 
-				memory_set_bankptr(mem->machine, "bank2", memory_region(mem->machine, "maincpu") + 0x11000);
-				memory_set_bankptr(mem->machine, "bank4", memory_region(mem->machine, "maincpu") + 0x137ea);
+				memory_set_bankptr(mem->machine, "bank2", mem->machine->region("maincpu")->base() + 0x11000);
+				memory_set_bankptr(mem->machine, "bank4", mem->machine->region("maincpu")->base() + 0x137ea);
 			}
 			else
 			{
-				memory_set_bankptr(mem->machine, "bank1", memory_region(mem->machine, "maincpu"));
-				memory_set_bankptr(mem->machine, "bank2", memory_region(mem->machine, "maincpu") + 0x01000);
-				memory_set_bankptr(mem->machine, "bank4", memory_region(mem->machine, "maincpu") + 0x037ea);
+				memory_set_bankptr(mem->machine, "bank1", mem->machine->region("maincpu")->base());
+				memory_set_bankptr(mem->machine, "bank2", mem->machine->region("maincpu")->base() + 0x01000);
+				memory_set_bankptr(mem->machine, "bank4", mem->machine->region("maincpu")->base() + 0x037ea);
 			}
 
-			memory_set_bankptr(mem->machine, "bank7", memory_region(mem->machine, "maincpu") + 0x14000);
-			memory_set_bankptr(mem->machine, "bank8", memory_region(mem->machine, "maincpu") + 0x1f400);
-			memory_set_bankptr(mem->machine, "bank9", memory_region(mem->machine, "maincpu") + 0x1f800);
-			memory_set_bankptr(mem->machine, "bank11", memory_region(mem->machine, "maincpu") + 0x05000);
-			memory_set_bankptr(mem->machine, "bank12", memory_region(mem->machine, "maincpu") + 0x06000);
-			memory_set_bankptr(mem->machine, "bank14", memory_region(mem->machine, "maincpu") + 0x09000);
-			memory_set_bankptr(mem->machine, "bank15", memory_region(mem->machine, "maincpu") + 0x0a000);
-			memory_set_bankptr(mem->machine, "bank17", memory_region(mem->machine, "maincpu") + 0x14000);
-			memory_set_bankptr(mem->machine, "bank18", memory_region(mem->machine, "maincpu") + 0x1f400);
-			memory_set_bankptr(mem->machine, "bank19", memory_region(mem->machine, "maincpu") + 0x1f800);
+			memory_set_bankptr(mem->machine, "bank7", mem->machine->region("maincpu")->base() + 0x14000);
+			memory_set_bankptr(mem->machine, "bank8", mem->machine->region("maincpu")->base() + 0x1f400);
+			memory_set_bankptr(mem->machine, "bank9", mem->machine->region("maincpu")->base() + 0x1f800);
+			memory_set_bankptr(mem->machine, "bank11", mem->machine->region("maincpu")->base() + 0x05000);
+			memory_set_bankptr(mem->machine, "bank12", mem->machine->region("maincpu")->base() + 0x06000);
+			memory_set_bankptr(mem->machine, "bank14", mem->machine->region("maincpu")->base() + 0x09000);
+			memory_set_bankptr(mem->machine, "bank15", mem->machine->region("maincpu")->base() + 0x0a000);
+			memory_set_bankptr(mem->machine, "bank17", mem->machine->region("maincpu")->base() + 0x14000);
+			memory_set_bankptr(mem->machine, "bank18", mem->machine->region("maincpu")->base() + 0x1f400);
+			memory_set_bankptr(mem->machine, "bank19", mem->machine->region("maincpu")->base() + 0x1f800);
 			memory_install_readwrite8_handler (mem, 0x37e8, 0x37e9, 0, 0, trs80_printer_r, trs80_printer_w);	/* 3 & 13 */
 			memory_install_read8_handler (mem, 0x3800, 0x3bff, 0, 0, trs80_keyboard_r);	/* 5 */
 			memory_install_readwrite8_handler (mem, 0x3c00, 0x3fff, 0, 0, trs80_videoram_r, trs80_videoram_w);	/* 6 & 16 */
@@ -297,77 +297,77 @@ WRITE8_HANDLER( trs80m4_84_w )
 			if (state->model4 & 4)	/* Model 4P gets RAM while Model 4 gets ROM */
 			{
 				if (state->model4 & 8)
-					memory_set_bankptr(mem->machine, "bank1", memory_region(mem->machine, "maincpu"));
+					memory_set_bankptr(mem->machine, "bank1", mem->machine->region("maincpu")->base());
 				else
-					memory_set_bankptr(mem->machine, "bank1", memory_region(mem->machine, "maincpu") + 0x10000);
+					memory_set_bankptr(mem->machine, "bank1", mem->machine->region("maincpu")->base() + 0x10000);
 
-				memory_set_bankptr(mem->machine, "bank2", memory_region(mem->machine, "maincpu") + 0x11000);
-				memory_set_bankptr(mem->machine, "bank3", memory_region(mem->machine, "maincpu") + 0x137e8);
-				memory_set_bankptr(mem->machine, "bank4", memory_region(mem->machine, "maincpu") + 0x137ea);
+				memory_set_bankptr(mem->machine, "bank2", mem->machine->region("maincpu")->base() + 0x11000);
+				memory_set_bankptr(mem->machine, "bank3", mem->machine->region("maincpu")->base() + 0x137e8);
+				memory_set_bankptr(mem->machine, "bank4", mem->machine->region("maincpu")->base() + 0x137ea);
 			}
 			else
 			{
-				memory_set_bankptr(mem->machine, "bank1", memory_region(mem->machine, "maincpu"));
-				memory_set_bankptr(mem->machine, "bank2", memory_region(mem->machine, "maincpu") + 0x01000);
-				memory_set_bankptr(mem->machine, "bank3", memory_region(mem->machine, "maincpu") + 0x037e8);
-				memory_set_bankptr(mem->machine, "bank4", memory_region(mem->machine, "maincpu") + 0x037ea);
+				memory_set_bankptr(mem->machine, "bank1", mem->machine->region("maincpu")->base());
+				memory_set_bankptr(mem->machine, "bank2", mem->machine->region("maincpu")->base() + 0x01000);
+				memory_set_bankptr(mem->machine, "bank3", mem->machine->region("maincpu")->base() + 0x037e8);
+				memory_set_bankptr(mem->machine, "bank4", mem->machine->region("maincpu")->base() + 0x037ea);
 			}
 
-			memory_set_bankptr(mem->machine, "bank7", memory_region(mem->machine, "maincpu") + 0x14000);
-			memory_set_bankptr(mem->machine, "bank8", memory_region(mem->machine, "maincpu") + 0x1f400);
-			memory_set_bankptr(mem->machine, "bank9", memory_region(mem->machine, "maincpu") + 0x1f800);
-			memory_set_bankptr(mem->machine, "bank11", memory_region(mem->machine, "maincpu") + 0x10000);
-			memory_set_bankptr(mem->machine, "bank12", memory_region(mem->machine, "maincpu") + 0x11000);
-			memory_set_bankptr(mem->machine, "bank13", memory_region(mem->machine, "maincpu") + 0x137e8);
-			memory_set_bankptr(mem->machine, "bank14", memory_region(mem->machine, "maincpu") + 0x137ea);
-			memory_set_bankptr(mem->machine, "bank15", memory_region(mem->machine, "maincpu") + 0x0a000);
-			memory_set_bankptr(mem->machine, "bank17", memory_region(mem->machine, "maincpu") + 0x14000);
-			memory_set_bankptr(mem->machine, "bank18", memory_region(mem->machine, "maincpu") + 0x1f400);
-			memory_set_bankptr(mem->machine, "bank19", memory_region(mem->machine, "maincpu") + 0x1f800);
+			memory_set_bankptr(mem->machine, "bank7", mem->machine->region("maincpu")->base() + 0x14000);
+			memory_set_bankptr(mem->machine, "bank8", mem->machine->region("maincpu")->base() + 0x1f400);
+			memory_set_bankptr(mem->machine, "bank9", mem->machine->region("maincpu")->base() + 0x1f800);
+			memory_set_bankptr(mem->machine, "bank11", mem->machine->region("maincpu")->base() + 0x10000);
+			memory_set_bankptr(mem->machine, "bank12", mem->machine->region("maincpu")->base() + 0x11000);
+			memory_set_bankptr(mem->machine, "bank13", mem->machine->region("maincpu")->base() + 0x137e8);
+			memory_set_bankptr(mem->machine, "bank14", mem->machine->region("maincpu")->base() + 0x137ea);
+			memory_set_bankptr(mem->machine, "bank15", mem->machine->region("maincpu")->base() + 0x0a000);
+			memory_set_bankptr(mem->machine, "bank17", mem->machine->region("maincpu")->base() + 0x14000);
+			memory_set_bankptr(mem->machine, "bank18", mem->machine->region("maincpu")->base() + 0x1f400);
+			memory_set_bankptr(mem->machine, "bank19", mem->machine->region("maincpu")->base() + 0x1f800);
 			memory_install_read8_handler (mem, 0x3800, 0x3bff, 0, 0, trs80_keyboard_r);	/* 5 */
 			memory_install_readwrite8_handler (mem, 0x3c00, 0x3fff, 0, 0, trs80_videoram_r, trs80_videoram_w);	/* 6 & 16 */
 			break;
 
 		case 2:	/* keyboard and video are moved to high memory, and the rest is ram */
-			memory_set_bankptr(mem->machine, "bank1", memory_region(mem->machine, "maincpu") + 0x10000);
-			memory_set_bankptr(mem->machine, "bank2", memory_region(mem->machine, "maincpu") + 0x11000);
-			memory_set_bankptr(mem->machine, "bank3", memory_region(mem->machine, "maincpu") + 0x137e8);
-			memory_set_bankptr(mem->machine, "bank4", memory_region(mem->machine, "maincpu") + 0x137ea);
-			memory_set_bankptr(mem->machine, "bank5", memory_region(mem->machine, "maincpu") + 0x13800);
-			memory_set_bankptr(mem->machine, "bank6", memory_region(mem->machine, "maincpu") + 0x13c00);
-			memory_set_bankptr(mem->machine, "bank7", memory_region(mem->machine, "maincpu") + 0x14000);
-			memory_set_bankptr(mem->machine, "bank11", memory_region(mem->machine, "maincpu") + 0x10000);
-			memory_set_bankptr(mem->machine, "bank12", memory_region(mem->machine, "maincpu") + 0x11000);
-			memory_set_bankptr(mem->machine, "bank13", memory_region(mem->machine, "maincpu") + 0x137e8);
-			memory_set_bankptr(mem->machine, "bank14", memory_region(mem->machine, "maincpu") + 0x137ea);
-			memory_set_bankptr(mem->machine, "bank15", memory_region(mem->machine, "maincpu") + 0x13800);
-			memory_set_bankptr(mem->machine, "bank16", memory_region(mem->machine, "maincpu") + 0x13c00);
-			memory_set_bankptr(mem->machine, "bank17", memory_region(mem->machine, "maincpu") + 0x14000);
-			memory_set_bankptr(mem->machine, "bank18", memory_region(mem->machine, "maincpu") + 0x0a000);
+			memory_set_bankptr(mem->machine, "bank1", mem->machine->region("maincpu")->base() + 0x10000);
+			memory_set_bankptr(mem->machine, "bank2", mem->machine->region("maincpu")->base() + 0x11000);
+			memory_set_bankptr(mem->machine, "bank3", mem->machine->region("maincpu")->base() + 0x137e8);
+			memory_set_bankptr(mem->machine, "bank4", mem->machine->region("maincpu")->base() + 0x137ea);
+			memory_set_bankptr(mem->machine, "bank5", mem->machine->region("maincpu")->base() + 0x13800);
+			memory_set_bankptr(mem->machine, "bank6", mem->machine->region("maincpu")->base() + 0x13c00);
+			memory_set_bankptr(mem->machine, "bank7", mem->machine->region("maincpu")->base() + 0x14000);
+			memory_set_bankptr(mem->machine, "bank11", mem->machine->region("maincpu")->base() + 0x10000);
+			memory_set_bankptr(mem->machine, "bank12", mem->machine->region("maincpu")->base() + 0x11000);
+			memory_set_bankptr(mem->machine, "bank13", mem->machine->region("maincpu")->base() + 0x137e8);
+			memory_set_bankptr(mem->machine, "bank14", mem->machine->region("maincpu")->base() + 0x137ea);
+			memory_set_bankptr(mem->machine, "bank15", mem->machine->region("maincpu")->base() + 0x13800);
+			memory_set_bankptr(mem->machine, "bank16", mem->machine->region("maincpu")->base() + 0x13c00);
+			memory_set_bankptr(mem->machine, "bank17", mem->machine->region("maincpu")->base() + 0x14000);
+			memory_set_bankptr(mem->machine, "bank18", mem->machine->region("maincpu")->base() + 0x0a000);
 			memory_install_read8_handler (mem, 0xf400, 0xf7ff, 0, 0, trs80_keyboard_r);	/* 8 */
 			memory_install_readwrite8_handler (mem, 0xf800, 0xffff, 0, 0, trs80_videoram_r, trs80_videoram_w);	/* 9 & 19 */
 			state->model4++;
 			break;
 
 		case 3:	/* 64k of ram */
-			memory_set_bankptr(mem->machine, "bank1", memory_region(mem->machine, "maincpu") + 0x10000);
-			memory_set_bankptr(mem->machine, "bank2", memory_region(mem->machine, "maincpu") + 0x11000);
-			memory_set_bankptr(mem->machine, "bank3", memory_region(mem->machine, "maincpu") + 0x137e8);
-			memory_set_bankptr(mem->machine, "bank4", memory_region(mem->machine, "maincpu") + 0x137ea);
-			memory_set_bankptr(mem->machine, "bank5", memory_region(mem->machine, "maincpu") + 0x13800);
-			memory_set_bankptr(mem->machine, "bank6", memory_region(mem->machine, "maincpu") + 0x13c00);
-			memory_set_bankptr(mem->machine, "bank7", memory_region(mem->machine, "maincpu") + 0x14000);
-			memory_set_bankptr(mem->machine, "bank8", memory_region(mem->machine, "maincpu") + 0x1f400);
-			memory_set_bankptr(mem->machine, "bank9", memory_region(mem->machine, "maincpu") + 0x1f800);
-			memory_set_bankptr(mem->machine, "bank11", memory_region(mem->machine, "maincpu") + 0x10000);
-			memory_set_bankptr(mem->machine, "bank12", memory_region(mem->machine, "maincpu") + 0x11000);
-			memory_set_bankptr(mem->machine, "bank13", memory_region(mem->machine, "maincpu") + 0x137e8);
-			memory_set_bankptr(mem->machine, "bank14", memory_region(mem->machine, "maincpu") + 0x137ea);
-			memory_set_bankptr(mem->machine, "bank15", memory_region(mem->machine, "maincpu") + 0x13800);
-			memory_set_bankptr(mem->machine, "bank16", memory_region(mem->machine, "maincpu") + 0x13c00);
-			memory_set_bankptr(mem->machine, "bank17", memory_region(mem->machine, "maincpu") + 0x14000);
-			memory_set_bankptr(mem->machine, "bank18", memory_region(mem->machine, "maincpu") + 0x1f400);
-			memory_set_bankptr(mem->machine, "bank19", memory_region(mem->machine, "maincpu") + 0x1f800);
+			memory_set_bankptr(mem->machine, "bank1", mem->machine->region("maincpu")->base() + 0x10000);
+			memory_set_bankptr(mem->machine, "bank2", mem->machine->region("maincpu")->base() + 0x11000);
+			memory_set_bankptr(mem->machine, "bank3", mem->machine->region("maincpu")->base() + 0x137e8);
+			memory_set_bankptr(mem->machine, "bank4", mem->machine->region("maincpu")->base() + 0x137ea);
+			memory_set_bankptr(mem->machine, "bank5", mem->machine->region("maincpu")->base() + 0x13800);
+			memory_set_bankptr(mem->machine, "bank6", mem->machine->region("maincpu")->base() + 0x13c00);
+			memory_set_bankptr(mem->machine, "bank7", mem->machine->region("maincpu")->base() + 0x14000);
+			memory_set_bankptr(mem->machine, "bank8", mem->machine->region("maincpu")->base() + 0x1f400);
+			memory_set_bankptr(mem->machine, "bank9", mem->machine->region("maincpu")->base() + 0x1f800);
+			memory_set_bankptr(mem->machine, "bank11", mem->machine->region("maincpu")->base() + 0x10000);
+			memory_set_bankptr(mem->machine, "bank12", mem->machine->region("maincpu")->base() + 0x11000);
+			memory_set_bankptr(mem->machine, "bank13", mem->machine->region("maincpu")->base() + 0x137e8);
+			memory_set_bankptr(mem->machine, "bank14", mem->machine->region("maincpu")->base() + 0x137ea);
+			memory_set_bankptr(mem->machine, "bank15", mem->machine->region("maincpu")->base() + 0x13800);
+			memory_set_bankptr(mem->machine, "bank16", mem->machine->region("maincpu")->base() + 0x13c00);
+			memory_set_bankptr(mem->machine, "bank17", mem->machine->region("maincpu")->base() + 0x14000);
+			memory_set_bankptr(mem->machine, "bank18", mem->machine->region("maincpu")->base() + 0x1f400);
+			memory_set_bankptr(mem->machine, "bank19", mem->machine->region("maincpu")->base() + 0x1f800);
 			break;
 	}
 }
@@ -399,10 +399,10 @@ WRITE8_HANDLER( trs80m4p_9c_w )		/* model 4P only - swaps the ROM with read-only
 		switch (state->model4 & 8)
 		{
 			case 0:		/* Read-only RAM replaces rom */
-				memory_set_bankptr(mem->machine, "bank1", memory_region(mem->machine, "maincpu") + 0x10000);
+				memory_set_bankptr(mem->machine, "bank1", mem->machine->region("maincpu")->base() + 0x10000);
 				break;
 			case 8:		/* Normal setup - rom enabled */
-				memory_set_bankptr(mem->machine, "bank1", memory_region(mem->machine, "maincpu"));
+				memory_set_bankptr(mem->machine, "bank1", mem->machine->region("maincpu")->base());
 				break;
 		}
 	}
@@ -621,7 +621,7 @@ WRITE8_HANDLER( lnw80_fe_w )
 	{
 		memory_unmap_readwrite (mem, 0x0000, 0x3fff, 0, 0);
 		memory_install_read_bank (mem, 0x0000, 0x2fff, 0, 0, "bank1");
-		memory_set_bankptr(mem->machine, "bank1", memory_region(mem->machine, "maincpu"));
+		memory_set_bankptr(mem->machine, "bank1", mem->machine->region("maincpu")->base());
 		memory_install_readwrite8_handler (mem, 0x37e0, 0x37e3, 0, 0, trs80_irq_status_r, trs80_motor_w);
 		memory_install_readwrite8_handler (mem, 0x37e8, 0x37eb, 0, 0, trs80_printer_r, trs80_printer_w);
 		memory_install_readwrite8_device_handler (mem, state->fdc, 0x37ec, 0x37ec, 0, 0, trs80_wd179x_r, wd17xx_command_w);

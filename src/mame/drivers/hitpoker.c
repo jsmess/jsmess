@@ -90,7 +90,7 @@ static VIDEO_UPDATE(hitpoker)
 
 static READ8_HANDLER( hitpoker_vram_r )
 {
-	UINT8 *ROM = memory_region(space->machine, "maincpu");
+	UINT8 *ROM = space->machine->region("maincpu")->base();
 
 	if(hitpoker_pic_data & 0x10)
 		return videoram[offset];
@@ -100,7 +100,7 @@ static READ8_HANDLER( hitpoker_vram_r )
 
 static WRITE8_HANDLER( hitpoker_vram_w )
 {
-//  UINT8 *ROM = memory_region(space->machine, "maincpu");
+//  UINT8 *ROM = space->machine->region("maincpu")->base();
 
 //  if(hitpoker_sys_regs[0x00] & 0x10)
 	videoram[offset] = data;
@@ -108,7 +108,7 @@ static WRITE8_HANDLER( hitpoker_vram_w )
 
 static READ8_HANDLER( hitpoker_cram_r )
 {
-	UINT8 *ROM = memory_region(space->machine, "maincpu");
+	UINT8 *ROM = space->machine->region("maincpu")->base();
 
 	if(hitpoker_pic_data & 0x10)
 		return colorram[offset];
@@ -123,7 +123,7 @@ static WRITE8_HANDLER( hitpoker_cram_w )
 
 static READ8_HANDLER( hitpoker_paletteram_r )
 {
-	UINT8 *ROM = memory_region(space->machine, "maincpu");
+	UINT8 *ROM = space->machine->region("maincpu")->base();
 
 	if(hitpoker_pic_data & 0x10)
 		return paletteram[offset];
@@ -211,7 +211,7 @@ static WRITE8_HANDLER( hitpoker_pic_w )
 #if 0
 static READ8_HANDLER( test_r )
 {
-	return mame_rand(space->machine);
+	return space->machine->rand();
 }
 #endif
 
@@ -462,38 +462,38 @@ static INTERRUPT_GEN( hitpoker_irq )
 }
 
 static MACHINE_CONFIG_START( hitpoker, driver_device )
-	MDRV_CPU_ADD("maincpu", MC68HC11,1000000)
-	MDRV_CPU_PROGRAM_MAP(hitpoker_map)
-	MDRV_CPU_IO_MAP(hitpoker_io)
-	MDRV_CPU_CONFIG(hitpoker_config)
-	MDRV_CPU_VBLANK_INT("screen", hitpoker_irq)
+	MCFG_CPU_ADD("maincpu", MC68HC11,1000000)
+	MCFG_CPU_PROGRAM_MAP(hitpoker_map)
+	MCFG_CPU_IO_MAP(hitpoker_io)
+	MCFG_CPU_CONFIG(hitpoker_config)
+	MCFG_CPU_VBLANK_INT("screen", hitpoker_irq)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // not accurate
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(648, 480) //setted by the CRTC
-	MDRV_SCREEN_VISIBLE_AREA(0, 648-1, 0, 240-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // not accurate
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(648, 480) //setted by the CRTC
+	MCFG_SCREEN_VISIBLE_AREA(0, 648-1, 0, 240-1)
 
-	MDRV_MC6845_ADD("crtc", H46505, CRTC_CLOCK/2, mc6845_intf)	/* hand tuned to get ~60 fps */
+	MCFG_MC6845_ADD("crtc", H46505, CRTC_CLOCK/2, mc6845_intf)	/* hand tuned to get ~60 fps */
 
-	MDRV_GFXDECODE(hitpoker)
-	MDRV_PALETTE_LENGTH(0x800)
+	MCFG_GFXDECODE(hitpoker)
+	MCFG_PALETTE_LENGTH(0x800)
 
-	MDRV_VIDEO_START(hitpoker)
-	MDRV_VIDEO_UPDATE(hitpoker)
+	MCFG_VIDEO_START(hitpoker)
+	MCFG_VIDEO_UPDATE(hitpoker)
 
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("aysnd", AY8910, 1500000)
-	MDRV_SOUND_CONFIG(ay8910_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("aysnd", AY8910, 1500000)
+	MCFG_SOUND_CONFIG(ay8910_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 static DRIVER_INIT(hitpoker)
 {
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 
 	ROM[0x1220] = 0x01; //patch eeprom write?
 	ROM[0x1221] = 0x01;

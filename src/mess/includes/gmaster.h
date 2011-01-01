@@ -32,6 +32,6 @@ public:
 
 DECLARE_LEGACY_SOUND_DEVICE(GMASTER, gmaster_sound);
 
-int gmaster_io_callback(running_device *device, int ioline, int state);
+int gmaster_io_callback(device_t *device, int ioline, int state);
 
 #endif /* __GMASTER_H__ */

@@ -270,56 +270,56 @@ static const floppy_config compis_floppy_config =
 
 static MACHINE_CONFIG_START( compis, compis_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", I80186, 8000000)	/* 8 MHz */
-	MDRV_CPU_PROGRAM_MAP(compis_mem)
-	MDRV_CPU_IO_MAP(compis_io)
-	MDRV_CPU_VBLANK_INT("screen", compis_vblank_int)
-	MDRV_CPU_CONFIG(i86_address_mask)
+	MCFG_CPU_ADD("maincpu", I80186, 8000000)	/* 8 MHz */
+	MCFG_CPU_PROGRAM_MAP(compis_mem)
+	MCFG_CPU_IO_MAP(compis_io)
+	MCFG_CPU_VBLANK_INT("screen", compis_vblank_int)
+	MCFG_CPU_CONFIG(i86_address_mask)
 
-	MDRV_CPU_ADD("i8749", I8749, 1000000)
-	MDRV_CPU_IO_MAP(keyboard_io)
+	MCFG_CPU_ADD("i8749", I8749, 1000000)
+	MCFG_CPU_IO_MAP(keyboard_io)
 
-	MDRV_QUANTUM_TIME(HZ(60))
+	MCFG_QUANTUM_TIME(HZ(60))
 
-	MDRV_MACHINE_START(compis)
-	MDRV_MACHINE_RESET(compis)
+	MCFG_MACHINE_START(compis)
+	MCFG_MACHINE_RESET(compis)
 
-	MDRV_PIT8253_ADD( "pit8253", compis_pit8253_config )
+	MCFG_PIT8253_ADD( "pit8253", compis_pit8253_config )
 
-	MDRV_PIT8254_ADD( "pit8254", compis_pit8254_config )
+	MCFG_PIT8254_ADD( "pit8254", compis_pit8254_config )
 
-	MDRV_PIC8259_ADD( "pic8259_master", compis_pic8259_master_config )
+	MCFG_PIC8259_ADD( "pic8259_master", compis_pic8259_master_config )
 
-	MDRV_PIC8259_ADD( "pic8259_slave", compis_pic8259_slave_config )
+	MCFG_PIC8259_ADD( "pic8259_slave", compis_pic8259_slave_config )
 
-	MDRV_I8255A_ADD( "ppi8255", compis_ppi_interface )
+	MCFG_I8255A_ADD( "ppi8255", compis_ppi_interface )
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(50)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(640, 480)
-	MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MDRV_PALETTE_LENGTH(COMPIS_PALETTE_SIZE)
-	MDRV_PALETTE_INIT(compis_gdc)
+	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(640, 480)
+	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+	MCFG_PALETTE_LENGTH(COMPIS_PALETTE_SIZE)
+	MCFG_PALETTE_INIT(compis_gdc)
 
-	MDRV_VIDEO_START(compis_gdc)
-	MDRV_VIDEO_UPDATE(compis_gdc)
+	MCFG_VIDEO_START(compis_gdc)
+	MCFG_VIDEO_UPDATE(compis_gdc)
 
 	/* printer */
-	MDRV_CENTRONICS_ADD("centronics", standard_centronics)
+	MCFG_CENTRONICS_ADD("centronics", standard_centronics)
 
 	/* uart */
-	MDRV_MSM8251_ADD("uart", compis_usart_interface)
+	MCFG_MSM8251_ADD("uart", compis_usart_interface)
 
 	/* rtc */
-	MDRV_MM58274C_ADD("mm58274c", compis_mm58274c_interface)
+	MCFG_MM58274C_ADD("mm58274c", compis_mm58274c_interface)
 
-	MDRV_UPD765A_ADD("upd765", compis_fdc_interface)
+	MCFG_UPD765A_ADD("upd765", compis_fdc_interface)
 
-	MDRV_FLOPPY_2_DRIVES_ADD(compis_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_ADD(compis_floppy_config)
 MACHINE_CONFIG_END
 
 /***************************************************************************

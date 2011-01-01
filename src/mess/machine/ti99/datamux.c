@@ -71,7 +71,7 @@
 typedef struct _attached_device
 {
 	/* The device. */
-	running_device	*device;
+	device_t	*device;
 
 	/* Address bits involved */
 	UINT16			address_mask;
@@ -124,14 +124,14 @@ typedef struct _datamux_state
 } datamux_state;
 
 
-INLINE datamux_state *get_safe_token(running_device *device)
+INLINE datamux_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(downcast<legacy_device_base *>(device)->token() != NULL);
 	return (datamux_state *)downcast<legacy_device_base *>(device)->token();
 }
 
-static void dmux_mount_device(running_device *dmuxdev, running_device *busdevice, UINT16 address_mask, UINT16 address_bits, UINT16 write_sel, databus_read_function read, databus_write_function write)
+static void dmux_mount_device(device_t *dmuxdev, device_t *busdevice, UINT16 address_mask, UINT16 address_bits, UINT16 write_sel, databus_read_function read, databus_write_function write)
 {
 	datamux_state *dmux = get_safe_token(dmuxdev);
 	int index = dmux->devindex++;
@@ -357,7 +357,7 @@ static DEVICE_RESET( datamux )
 	{
 		if (cons[i].name != NULL)
 		{
-			running_device *dev = device->machine->device(cons[i].name);
+			device_t *dev = device->machine->device(cons[i].name);
 			if (dev!=NULL)
 			{
 				UINT32 set = 0;

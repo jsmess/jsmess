@@ -62,10 +62,10 @@ public:
 	int video_on;
 
 	/* devices */
-	running_device *dm9368;
-	running_device *cdp1864;
-	running_device *cassette;
-	running_device *speaker;
+	device_t *dm9368;
+	device_t *cdp1864;
+	device_t *cassette;
+	device_t *speaker;
 };
 
 #endif

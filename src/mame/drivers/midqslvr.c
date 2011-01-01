@@ -44,21 +44,21 @@ static INPUT_PORTS_START( midqslvr )
 INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( midqslvr, driver_device )
-	MDRV_CPU_ADD("maincpu", PENTIUM, 333000000)	// actually Celeron 333
-	MDRV_CPU_PROGRAM_MAP(midqslvr_map)
-	MDRV_CPU_IO_MAP(midqslvr_io)
+	MCFG_CPU_ADD("maincpu", PENTIUM, 333000000)	// actually Celeron 333
+	MCFG_CPU_PROGRAM_MAP(midqslvr_map)
+	MCFG_CPU_IO_MAP(midqslvr_io)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(640, 480)
-	MDRV_SCREEN_VISIBLE_AREA(0, 639, 0, 199)
-	MDRV_PALETTE_LENGTH(16)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(640, 480)
+	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 199)
+	MCFG_PALETTE_LENGTH(16)
 
-	MDRV_VIDEO_START(midqslvr)
-	MDRV_VIDEO_UPDATE(midqslvr)
+	MCFG_VIDEO_START(midqslvr)
+	MCFG_VIDEO_UPDATE(midqslvr)
 MACHINE_CONFIG_END
 
 ROM_START( offrthnd )
@@ -74,8 +74,9 @@ ROM_START( hydrthnd )
 	ROM_LOAD( "lh28f004sct.u8b1", 0x000000, 0x080000, CRC(ab04a343) SHA1(ba77933400fe470f45ab187bc0d315922caadb12) )
 
 	DISK_REGION( "disk" )
-	DISK_IMAGE( "hydro", 0, SHA1(3e9956dd4a62f540ea2900f857611ff9f035b76a) )
+	DISK_IMAGE( "hydro", 0,  SHA1(d481d178782943c066b41764628a419cd55f676d) )
 ROM_END
 
+// there are almost certainly multiple versions of these; updates were offered on floppy disk.  The version numbers for the existing CHDs are unknown.
 GAME(1999, hydrthnd, 0, midqslvr, midqslvr, 0, ROT0, "Midway Games", "Hydro Thunder", GAME_NO_SOUND|GAME_NOT_WORKING)
 GAME(2000, offrthnd, 0, midqslvr, midqslvr, 0, ROT0, "Midway Games", "Offroad Thunder", GAME_NO_SOUND|GAME_NOT_WORKING)

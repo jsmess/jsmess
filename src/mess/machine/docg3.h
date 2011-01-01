@@ -19,9 +19,9 @@ struct _diskonchip_g3_config
 
 DEVICE_GET_INFO( diskonchip_g3 );
 
-#define MDRV_DISKONCHIP_G3_ADD(_tag, _size) \
-	MDRV_DEVICE_ADD(_tag, DISKONCHIP_G3, 0) \
-	MDRV_DEVICE_CONFIG_DATA32(diskonchip_g3_config, size, _size)
+#define MCFG_DISKONCHIP_G3_ADD(_tag, _size) \
+	MCFG_DEVICE_ADD(_tag, DISKONCHIP_G3, 0) \
+	MCFG_DEVICE_CONFIG_DATA32(diskonchip_g3_config, size, _size)
 
 READ16_DEVICE_HANDLER( diskonchip_g3_sec_1_r );
 WRITE16_DEVICE_HANDLER( diskonchip_g3_sec_1_w );

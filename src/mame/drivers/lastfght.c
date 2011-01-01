@@ -88,7 +88,7 @@ public:
 	UINT16 c00006;
 
 	/* devices */
-	running_device *maincpu;
+	device_t *maincpu;
 };
 
 
@@ -121,7 +121,7 @@ static VIDEO_UPDATE( lastfght )
 	int x, y, count = 0;
 	static unsigned base = 0;
 	static int view_roms = 0;
-	UINT8 *gfxdata = memory_region(screen->machine, "gfx1");
+	UINT8 *gfxdata = screen->machine->region("gfx1")->base();
 	UINT8 data;
 
 	if (input_code_pressed_once(screen->machine, KEYCODE_ENTER))	view_roms ^= 1;
@@ -129,7 +129,7 @@ static VIDEO_UPDATE( lastfght )
 	{
 		if (input_code_pressed_once(screen->machine, KEYCODE_PGDN))	base += 512 * 256;
 		if (input_code_pressed_once(screen->machine, KEYCODE_PGUP))	base -= 512 * 256;
-		base %= memory_region_length(screen->machine, "gfx1");
+		base %= screen->machine->region("gfx1")->bytes();
 
 		count = base;
 
@@ -313,7 +313,7 @@ static WRITE16_HANDLER( lastfght_blit_w )
 	if (ACCESSING_BITS_8_15)
 	{
 		int x, y, addr;
-		UINT8 *gfxdata = memory_region( space->machine, "gfx1" );
+		UINT8 *gfxdata = space->machine->region( "gfx1" )->base();
 		bitmap_t *dest = state->bitmap[state->dest];
 
 #if 0
@@ -366,7 +366,7 @@ static READ16_HANDLER( lastfght_c00002_r )
 {
 	// high byte:
 	// mask 0x1c: from sound?
-	return (mame_rand(space->machine) & 0x1c00) | input_port_read(space->machine, "IN0");
+	return (space->machine->rand() & 0x1c00) | input_port_read(space->machine, "IN0");
 }
 
 static READ16_HANDLER( lastfght_c00004_r )
@@ -572,26 +572,26 @@ static MACHINE_RESET( lastfght )
 static MACHINE_CONFIG_START( lastfght, lastfght_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", H83044, 32000000/2)
-	MDRV_CPU_PROGRAM_MAP( lastfght_map)
-	MDRV_CPU_VBLANK_INT_HACK(unknown_interrupt,2)
+	MCFG_CPU_ADD("maincpu", H83044, 32000000/2)
+	MCFG_CPU_PROGRAM_MAP( lastfght_map)
+	MCFG_CPU_VBLANK_INT_HACK(unknown_interrupt,2)
 
-	MDRV_NVRAM_ADD_0FILL("nvram")
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MDRV_MACHINE_START(lastfght)
-	MDRV_MACHINE_RESET(lastfght)
+	MCFG_MACHINE_START(lastfght)
+	MCFG_MACHINE_RESET(lastfght)
 
 	/* video hardware */
-	MDRV_PALETTE_LENGTH( 256 )
+	MCFG_PALETTE_LENGTH( 256 )
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE( 512, 256 )
-	MDRV_SCREEN_VISIBLE_AREA( 0, 512-1, 0, 256-16-1 )
-	MDRV_SCREEN_REFRESH_RATE( 60 )
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE( 512, 256 )
+	MCFG_SCREEN_VISIBLE_AREA( 0, 512-1, 0, 256-16-1 )
+	MCFG_SCREEN_REFRESH_RATE( 60 )
 
-	MDRV_VIDEO_START( lastfght )
-	MDRV_VIDEO_UPDATE( lastfght )
+	MCFG_VIDEO_START( lastfght )
+	MCFG_VIDEO_UPDATE( lastfght )
 MACHINE_CONFIG_END
 
 
@@ -615,7 +615,7 @@ ROM_END
 
 static DRIVER_INIT(lastfght)
 {
-	UINT16 *rom = (UINT16*)memory_region(machine, "maincpu");
+	UINT16 *rom = (UINT16*)machine->region("maincpu")->base();
 
 	// pass initial check (protection ? hw?)
 	rom[0x00354 / 2] = 0x403e;

@@ -160,7 +160,7 @@ static void xmodem_make_idle( xmodem* state )
 }
 
 /* emulated machine has read the last byte we sent */
-void xmodem_byte_transmitted( running_device *device )
+void xmodem_byte_transmitted( device_t *device )
 {
 	xmodem* state = (xmodem*) downcast<legacy_device_base *>(device)->token();
 	if ( (state->state == XMODEM_SENDING) && (state->pos < 132) )
@@ -171,7 +171,7 @@ void xmodem_byte_transmitted( running_device *device )
 }
 
 /* emulated machine sends a byte to the outside (us) */
-void xmodem_receive_byte( running_device *device, UINT8 data )
+void xmodem_receive_byte( device_t *device, UINT8 data )
 {
 	xmodem* state = (xmodem*) downcast<legacy_device_base *>(device)->token();
 	switch ( state->state )

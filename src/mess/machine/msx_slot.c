@@ -441,7 +441,7 @@ MSX_SLOT_WRITE(konami_scc)
 	}
 	else if (state->cart.scc.active && addr >= 0x9800 && addr < 0xa000)
 	{
-		running_device *k051649 = space->machine->device("k051649");
+		device_t *k051649 = space->machine->device("k051649");
 		int offset = addr & 0xff;
 
 		if (offset < 0x80)
@@ -1271,14 +1271,14 @@ MSX_SLOT_INIT(diskrom)
 
 MSX_SLOT_RESET(diskrom)
 {
-	running_device *fdc = machine->device("wd179x");
+	device_t *fdc = machine->device("wd179x");
 	wd17xx_reset(fdc);
 }
 
 static READ8_HANDLER (msx_diskrom_page1_r)
 {
 	msx_state *state = space->machine->driver_data<msx_state>();
-	running_device *fdc = space->machine->device("wd179x");
+	device_t *fdc = space->machine->device("wd179x");
 	switch (offset)
 	{
 	case 0: return wd17xx_status_r (fdc, 0);
@@ -1294,7 +1294,7 @@ static READ8_HANDLER (msx_diskrom_page1_r)
 static READ8_HANDLER (msx_diskrom_page2_r)
 {
 	msx_state *state = space->machine->driver_data<msx_state>();
-	running_device *fdc = space->machine->device("wd179x");
+	device_t *fdc = space->machine->device("wd179x");
 	if (offset >= 0x7f8)
 	{
 		switch (offset)
@@ -1348,7 +1348,7 @@ MSX_SLOT_MAP(diskrom)
 
 MSX_SLOT_WRITE(diskrom)
 {
-	running_device *fdc = machine->device("wd179x");
+	device_t *fdc = machine->device("wd179x");
 	if (addr >= 0xa000 && addr < 0xc000)
 	{
 		addr -= 0x4000;
@@ -1399,14 +1399,14 @@ MSX_SLOT_INIT(diskrom2)
 
 MSX_SLOT_RESET(diskrom2)
 {
-	running_device *fdc = machine->device("wd179x");
+	device_t *fdc = machine->device("wd179x");
 	wd17xx_reset (fdc);
 }
 
 static READ8_HANDLER (msx_diskrom2_page1_r)
 {
 	msx_state *state = space->machine->driver_data<msx_state>();
-	running_device *fdc = space->machine->device("wd179x");
+	device_t *fdc = space->machine->device("wd179x");
 	switch (offset)
 	{
 	case 0: return wd17xx_status_r(fdc, 0);
@@ -1422,7 +1422,7 @@ static READ8_HANDLER (msx_diskrom2_page1_r)
 static  READ8_HANDLER (msx_diskrom2_page2_r)
 {
 	msx_state *state = space->machine->driver_data<msx_state>();
-	running_device *fdc = space->machine->device("wd179x");
+	device_t *fdc = space->machine->device("wd179x");
 	if (offset >= 0x7b8)
 	{
 		switch (offset)
@@ -1475,7 +1475,7 @@ MSX_SLOT_MAP(diskrom2)
 
 MSX_SLOT_WRITE(diskrom2)
 {
-	running_device *fdc = machine->device("wd179x");
+	device_t *fdc = machine->device("wd179x");
 	if (addr >= 0xa000 && addr < 0xc000)
 	{
 		addr -= 0x4000;
@@ -2394,7 +2394,7 @@ MSX_SLOT_WRITE(soundcartridge)
 		}
 		else if (addr >= 0x9800 && state->cart.sccp.scc_active)
 		{
-			running_device *k051649 = space->machine->device("k051649");
+			device_t *k051649 = space->machine->device("k051649");
 			int offset = addr & 0xff;
 
 			if (offset < 0x80)
@@ -2446,7 +2446,7 @@ MSX_SLOT_WRITE(soundcartridge)
 		}
 		else if (addr >= 0xb800 && state->cart.sccp.sccp_active)
 		{
-			running_device *k051649 = space->machine->device("k051649");
+			device_t *k051649 = space->machine->device("k051649");
 			int offset = addr & 0xff;
 
 			if (offset < 0xa0)

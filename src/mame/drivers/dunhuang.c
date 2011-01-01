@@ -338,7 +338,7 @@ static WRITE8_HANDLER( dunhuang_block_h_w )
 
 	state->block_h = data;
 
-	tile_addr = memory_region(space->machine, "gfx2") + ((state->block_addr_hi << 8) + state->block_addr_lo) * 4;
+	tile_addr = space->machine->region("gfx2")->base() + ((state->block_addr_hi << 8) + state->block_addr_lo) * 4;
 
 	switch (state->block_dest)
 	{
@@ -765,7 +765,7 @@ static const ay8910_interface dunhuang_ay8910_interface =
 static MACHINE_START( dunhuang )
 {
 	dunhuang_state *state = machine->driver_data<dunhuang_state>();
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 
 	memory_configure_bank(machine, "bank1", 0, 8, &ROM[0x10000], 0x8000);
 
@@ -815,42 +815,42 @@ static MACHINE_RESET( dunhuang )
 static MACHINE_CONFIG_START( dunhuang, dunhuang_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80,12000000/2)
-	MDRV_CPU_PROGRAM_MAP(dunhuang_map)
-	MDRV_CPU_IO_MAP(dunhuang_io_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_ADD("maincpu", Z80,12000000/2)
+	MCFG_CPU_PROGRAM_MAP(dunhuang_map)
+	MCFG_CPU_IO_MAP(dunhuang_io_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_MACHINE_START(dunhuang)
-	MDRV_MACHINE_RESET(dunhuang)
+	MCFG_MACHINE_START(dunhuang)
+	MCFG_MACHINE_RESET(dunhuang)
 
-	MDRV_WATCHDOG_TIME_INIT(SEC(5))
+	MCFG_WATCHDOG_TIME_INIT(SEC(5))
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(512, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0+8, 512-8-1, 0+16, 256-16-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(512, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0+8, 512-8-1, 0+16, 256-16-1)
 
-	MDRV_GFXDECODE(dunhuang)
-	MDRV_PALETTE_LENGTH(0x100)
+	MCFG_GFXDECODE(dunhuang)
+	MCFG_PALETTE_LENGTH(0x100)
 
-	MDRV_VIDEO_START(dunhuang)
-	MDRV_VIDEO_UPDATE(dunhuang)
+	MCFG_VIDEO_START(dunhuang)
+	MCFG_VIDEO_UPDATE(dunhuang)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM2413, 3579545)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	MCFG_SOUND_ADD("ymsnd", YM2413, 3579545)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MDRV_SOUND_ADD("ay8910", AY8910, 12000000/8)
-	MDRV_SOUND_CONFIG(dunhuang_ay8910_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	MCFG_SOUND_ADD("ay8910", AY8910, 12000000/8)
+	MCFG_SOUND_CONFIG(dunhuang_ay8910_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MDRV_OKIM6295_ADD("oki", 12000000/8, OKIM6295_PIN7_HIGH)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	MCFG_OKIM6295_ADD("oki", 12000000/8, OKIM6295_PIN7_HIGH)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
 

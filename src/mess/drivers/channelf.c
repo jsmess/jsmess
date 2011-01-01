@@ -252,7 +252,7 @@ static DEVICE_IMAGE_LOAD( channelf_cart )
 			return IMAGE_INIT_FAIL;
 		}
 
-		if (image.fread( memory_region(image.device().machine, "maincpu") + 0x0800, size) != size)
+		if (image.fread( image.device().machine->region("maincpu")->base() + 0x0800, size) != size)
 		{
 			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unable to fully read from file");
 			return IMAGE_INIT_FAIL;
@@ -262,7 +262,7 @@ static DEVICE_IMAGE_LOAD( channelf_cart )
 	else
 	{
 		size = image.get_software_region_length("rom");
-		memcpy(memory_region(image.device().machine, "maincpu") + 0x0800, image.get_software_region("rom"), size);
+		memcpy(image.device().machine->region("maincpu")->base() + 0x0800, image.get_software_region("rom"), size);
 	}
 
 	return IMAGE_INIT_PASS;
@@ -270,127 +270,127 @@ static DEVICE_IMAGE_LOAD( channelf_cart )
 
 static MACHINE_CONFIG_FRAGMENT( channelf_cart )
 	/* cartridge */
-	MDRV_CARTSLOT_ADD("cart")
-	MDRV_CARTSLOT_EXTENSION_LIST("bin,chf")
-	MDRV_CARTSLOT_INTERFACE("channelf_cart")
-	MDRV_CARTSLOT_LOAD(channelf_cart)
+	MCFG_CARTSLOT_ADD("cart")
+	MCFG_CARTSLOT_EXTENSION_LIST("bin,chf")
+	MCFG_CARTSLOT_INTERFACE("channelf_cart")
+	MCFG_CARTSLOT_LOAD(channelf_cart)
 
 	/* Software lists */
-	MDRV_SOFTWARE_LIST_ADD("cart_list","channelf")
+	MCFG_SOFTWARE_LIST_ADD("cart_list","channelf")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( channelf, channelf_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", F8, 3579545/2)        /* Colorburst/2 */
-	MDRV_CPU_PROGRAM_MAP(channelf_map)
-	MDRV_CPU_IO_MAP(channelf_io)
-	MDRV_QUANTUM_TIME(HZ(60))
+	MCFG_CPU_ADD("maincpu", F8, 3579545/2)        /* Colorburst/2 */
+	MCFG_CPU_PROGRAM_MAP(channelf_map)
+	MCFG_CPU_IO_MAP(channelf_io)
+	MCFG_QUANTUM_TIME(HZ(60))
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(128, 64)
-	MDRV_SCREEN_VISIBLE_AREA(4, 112 - 7, 4, 64 - 3)
-	MDRV_PALETTE_LENGTH(8)
-	MDRV_PALETTE_INIT( channelf )
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(128, 64)
+	MCFG_SCREEN_VISIBLE_AREA(4, 112 - 7, 4, 64 - 3)
+	MCFG_PALETTE_LENGTH(8)
+	MCFG_PALETTE_INIT( channelf )
 
-	MDRV_VIDEO_START( channelf )
-	MDRV_VIDEO_UPDATE( channelf )
+	MCFG_VIDEO_START( channelf )
+	MCFG_VIDEO_UPDATE( channelf )
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("custom", CHANNELF, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("custom", CHANNELF, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MDRV_FRAGMENT_ADD( channelf_cart )
+	MCFG_FRAGMENT_ADD( channelf_cart )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( sabavdpl, channelf_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", F8, MASTER_CLOCK_PAL)        /* PAL speed */
-	MDRV_CPU_PROGRAM_MAP(channelf_map)
-	MDRV_CPU_IO_MAP(channelf_io)
-	MDRV_QUANTUM_TIME(HZ(50))
+	MCFG_CPU_ADD("maincpu", F8, MASTER_CLOCK_PAL)        /* PAL speed */
+	MCFG_CPU_PROGRAM_MAP(channelf_map)
+	MCFG_CPU_IO_MAP(channelf_io)
+	MCFG_QUANTUM_TIME(HZ(50))
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(50)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(PAL_VBLANK_TIME)) /* approximate */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(128, 64)
-	MDRV_SCREEN_VISIBLE_AREA(4, 112 - 7, 4, 64 - 3)
-	MDRV_PALETTE_LENGTH(8)
-	MDRV_PALETTE_INIT( channelf )
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(PAL_VBLANK_TIME)) /* approximate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(128, 64)
+	MCFG_SCREEN_VISIBLE_AREA(4, 112 - 7, 4, 64 - 3)
+	MCFG_PALETTE_LENGTH(8)
+	MCFG_PALETTE_INIT( channelf )
 
-	MDRV_VIDEO_START( channelf )
-	MDRV_VIDEO_UPDATE( channelf )
+	MCFG_VIDEO_START( channelf )
+	MCFG_VIDEO_UPDATE( channelf )
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("custom", CHANNELF, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("custom", CHANNELF, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MDRV_FRAGMENT_ADD( channelf_cart )
+	MCFG_FRAGMENT_ADD( channelf_cart )
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_START( channlf2, channelf_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", F8, 3579545/2)        /* Colorburst / 2 */
-	MDRV_CPU_PROGRAM_MAP(channelf_map)
-	MDRV_CPU_IO_MAP(channelf_io)
-	MDRV_QUANTUM_TIME(HZ(60))
+	MCFG_CPU_ADD("maincpu", F8, 3579545/2)        /* Colorburst / 2 */
+	MCFG_CPU_PROGRAM_MAP(channelf_map)
+	MCFG_CPU_IO_MAP(channelf_io)
+	MCFG_QUANTUM_TIME(HZ(60))
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(128, 64)
-	MDRV_SCREEN_VISIBLE_AREA(4, 112 - 7, 4, 64 - 3)
-	MDRV_PALETTE_LENGTH(8)
-	MDRV_PALETTE_INIT( channelf )
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(128, 64)
+	MCFG_SCREEN_VISIBLE_AREA(4, 112 - 7, 4, 64 - 3)
+	MCFG_PALETTE_LENGTH(8)
+	MCFG_PALETTE_INIT( channelf )
 
-	MDRV_VIDEO_START( channelf )
-	MDRV_VIDEO_UPDATE( channelf )
+	MCFG_VIDEO_START( channelf )
+	MCFG_VIDEO_UPDATE( channelf )
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("custom", CHANNELF, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("custom", CHANNELF, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MDRV_FRAGMENT_ADD( channelf_cart )
+	MCFG_FRAGMENT_ADD( channelf_cart )
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_START( sabavpl2, channelf_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", F8, MASTER_CLOCK_PAL)        /* PAL speed */
-	MDRV_CPU_PROGRAM_MAP(channelf_map)
-	MDRV_CPU_IO_MAP(channelf_io)
-	MDRV_QUANTUM_TIME(HZ(50))
+	MCFG_CPU_ADD("maincpu", F8, MASTER_CLOCK_PAL)        /* PAL speed */
+	MCFG_CPU_PROGRAM_MAP(channelf_map)
+	MCFG_CPU_IO_MAP(channelf_io)
+	MCFG_QUANTUM_TIME(HZ(50))
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(50)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(PAL_VBLANK_TIME)) /* not accurate */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(128, 64)
-	MDRV_SCREEN_VISIBLE_AREA(4, 112 - 7, 4, 64 - 3)
-	MDRV_PALETTE_LENGTH(8)
-	MDRV_PALETTE_INIT( channelf )
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(PAL_VBLANK_TIME)) /* not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(128, 64)
+	MCFG_SCREEN_VISIBLE_AREA(4, 112 - 7, 4, 64 - 3)
+	MCFG_PALETTE_LENGTH(8)
+	MCFG_PALETTE_INIT( channelf )
 
-	MDRV_VIDEO_START( channelf )
-	MDRV_VIDEO_UPDATE( channelf )
+	MCFG_VIDEO_START( channelf )
+	MCFG_VIDEO_UPDATE( channelf )
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("custom", CHANNELF, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("custom", CHANNELF, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MDRV_FRAGMENT_ADD( channelf_cart )
+	MCFG_FRAGMENT_ADD( channelf_cart )
 MACHINE_CONFIG_END
 
 ROM_START( channelf )

@@ -104,7 +104,7 @@ struct nand_t
 
 static struct nand_t nand;
 
-static UINT32 s3c2410_gpio_port_r( running_device *device, int port)
+static UINT32 s3c2410_gpio_port_r( device_t *device, int port)
 {
 	UINT32 data = bballoon_port[port];
 	switch (port)
@@ -124,7 +124,7 @@ static UINT32 s3c2410_gpio_port_r( running_device *device, int port)
 	return data;
 }
 
-static void s3c2410_gpio_port_w( running_device *device, int port, UINT32 data)
+static void s3c2410_gpio_port_w( device_t *device, int port, UINT32 data)
 {
 	UINT32 old_value = bballoon_port[port];
 	bballoon_port[port] = data;
@@ -155,7 +155,7 @@ static void s3c2410_gpio_port_w( running_device *device, int port, UINT32 data)
 
 static WRITE8_DEVICE_HANDLER( s3c2410_nand_command_w )
 {
-//  running_device *nand = device->machine->device( "nand");
+//  device_t *nand = device->machine->device( "nand");
 	logerror( "s3c2410_nand_command_w %02X\n", data);
 	switch (data)
 	{
@@ -177,7 +177,7 @@ static WRITE8_DEVICE_HANDLER( s3c2410_nand_command_w )
 
 static WRITE8_DEVICE_HANDLER( s3c2410_nand_address_w )
 {
-//  running_device *nand = device->machine->device( "nand");
+//  device_t *nand = device->machine->device( "nand");
 	logerror( "s3c2410_nand_address_w %02X\n", data);
 	switch (nand.mode)
 	{
@@ -209,7 +209,7 @@ static WRITE8_DEVICE_HANDLER( s3c2410_nand_address_w )
 
 static READ8_DEVICE_HANDLER( s3c2410_nand_data_r )
 {
-//  running_device *nand = device->machine->device( "nand");
+//  device_t *nand = device->machine->device( "nand");
 	UINT8 data = 0;
 	switch (nand.mode)
 	{
@@ -220,7 +220,7 @@ static READ8_DEVICE_HANDLER( s3c2410_nand_data_r )
 		break;
 		case NAND_M_READ :
 		{
-			UINT8 *flash = (UINT8 *)memory_region( device->machine, "user1");
+			UINT8 *flash = (UINT8 *)device->machine->region( "user1")->base();
 			if (nand.byte_addr < 0x200)
 			{
 				data = *(flash + nand.page_addr * 0x200 + nand.byte_addr);
@@ -254,20 +254,20 @@ static READ8_DEVICE_HANDLER( s3c2410_nand_data_r )
 
 static WRITE8_DEVICE_HANDLER( s3c2410_nand_data_w )
 {
-//  running_device *nand = device->machine->device( "nand");
+//  device_t *nand = device->machine->device( "nand");
 	logerror( "s3c2410_nand_data_w %02X\n", data);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( s3c2410_i2c_scl_w )
 {
-	running_device *i2cmem = device->machine->device( "i2cmem");
+	device_t *i2cmem = device->machine->device( "i2cmem");
 //  logerror( "s3c2410_i2c_scl_w %d\n", state ? 1 : 0);
 	i2cmem_scl_write( i2cmem, state);
 }
 
 static READ_LINE_DEVICE_HANDLER( s3c2410_i2c_sda_r )
 {
-	running_device *i2cmem = device->machine->device( "i2cmem");
+	device_t *i2cmem = device->machine->device( "i2cmem");
 	int state;
 	state = i2cmem_sda_read( i2cmem);
 //  logerror( "s3c2410_i2c_sda_r %d\n", state ? 1 : 0);
@@ -276,7 +276,7 @@ static READ_LINE_DEVICE_HANDLER( s3c2410_i2c_sda_r )
 
 static WRITE_LINE_DEVICE_HANDLER( s3c2410_i2c_sda_w )
 {
-	running_device *i2cmem = device->machine->device( "i2cmem");
+	device_t *i2cmem = device->machine->device( "i2cmem");
 //  logerror( "s3c2410_i2c_sda_w %d\n", state ? 1 : 0);
 	i2cmem_sda_write( i2cmem, state);
 }
@@ -391,7 +391,7 @@ static const i2cmem_interface i2cmem_interface =
 };
 
 
-running_device* s3c2410;
+device_t* s3c2410;
 
 static READ32_HANDLER( bballoon_speedup_r )
 {
@@ -426,30 +426,30 @@ static MACHINE_RESET( bballoon )
 static MACHINE_CONFIG_START( bballoon, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", ARM9, 200000000)
-	MDRV_CPU_PROGRAM_MAP(bballoon_map)
+	MCFG_CPU_ADD("maincpu", ARM9, 200000000)
+	MCFG_CPU_PROGRAM_MAP(bballoon_map)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_SIZE(455, 262)
-	MDRV_SCREEN_VISIBLE_AREA(0, 320-1, 0, 256-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_SIZE(455, 262)
+	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 256-1)
 
-	MDRV_PALETTE_LENGTH(256)
+	MCFG_PALETTE_LENGTH(256)
 
-	MDRV_MACHINE_RESET( bballoon )
+	MCFG_MACHINE_RESET( bballoon )
 
-	MDRV_VIDEO_START(s3c2410)
-	MDRV_VIDEO_UPDATE(s3c2410)
+	MCFG_VIDEO_START(s3c2410)
+	MCFG_VIDEO_UPDATE(s3c2410)
 
-	MDRV_S3C2410_ADD("s3c2410", 12000000, bballoon_s3c2410_intf)
+	MCFG_S3C2410_ADD("s3c2410", 12000000, bballoon_s3c2410_intf)
 
-//  MDRV_NAND_ADD("nand", 0xEC, 0x75)
-//  MDRV_DEVICE_CONFIG(bballoon_nand_intf)
+//  MCFG_NAND_ADD("nand", 0xEC, 0x75)
+//  MCFG_DEVICE_CONFIG(bballoon_nand_intf)
 
-//  MDRV_I2CMEM_ADD("i2cmem", 0xA0, 0, 0x100, NULL)
-	MDRV_I2CMEM_ADD("i2cmem", i2cmem_interface)
+//  MCFG_I2CMEM_ADD("i2cmem", 0xA0, 0, 0x100, NULL)
+	MCFG_I2CMEM_ADD("i2cmem", i2cmem_interface)
 
 	/* sound hardware */
 MACHINE_CONFIG_END
@@ -531,7 +531,7 @@ ROM_END
 
 static DRIVER_INIT( bballoon )
 {
-	memcpy( steppingstone, memory_region( machine, "user1"), 4 * 1024);
+	memcpy( steppingstone, machine->region( "user1")->base(), 4 * 1024);
 }
 
 GAME( 2003, bballoon, 0, bballoon, bballoon, bballoon, ROT0, "Eolith", "BnB Arcade", GAME_NO_SOUND )

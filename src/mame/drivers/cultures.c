@@ -43,7 +43,7 @@ public:
 static TILE_GET_INFO( get_bg1_tile_info )
 {
 	cultures_state *state = machine->driver_data<cultures_state>();
-	UINT8 *region = memory_region(machine, "gfx3") + 0x200000 + 0x80000 * state->bg1_bank;
+	UINT8 *region = machine->region("gfx3")->base() + 0x200000 + 0x80000 * state->bg1_bank;
 	int code = region[tile_index * 2] + (region[tile_index * 2 + 1] << 8);
 	SET_TILE_INFO(2, code, code >> 12, 0);
 }
@@ -51,7 +51,7 @@ static TILE_GET_INFO( get_bg1_tile_info )
 static TILE_GET_INFO( get_bg2_tile_info )
 {
 	cultures_state *state = machine->driver_data<cultures_state>();
-	UINT8 *region = memory_region(machine, "gfx2") + 0x200000 + 0x80000 * state->bg2_bank;
+	UINT8 *region = machine->region("gfx2")->base() + 0x200000 + 0x80000 * state->bg2_bank;
 	int code = region[tile_index * 2] + (region[tile_index * 2 + 1] << 8);
 	SET_TILE_INFO(1, code, code >> 12, 0);
 }
@@ -150,8 +150,8 @@ static WRITE8_HANDLER( misc_w )
 	if (state->old_bank != new_bank)
 	{
 		// oki banking
-		UINT8 *src = memory_region(space->machine, "oki") + 0x40000 + 0x20000 * new_bank;
-		UINT8 *dst = memory_region(space->machine, "oki") + 0x20000;
+		UINT8 *src = space->machine->region("oki")->base() + 0x40000 + 0x20000 * new_bank;
+		UINT8 *dst = space->machine->region("oki")->base() + 0x20000;
 		memcpy(dst, src, 0x20000);
 
 		state->old_bank = new_bank;
@@ -360,7 +360,7 @@ static INTERRUPT_GEN( cultures_interrupt )
 static MACHINE_START( cultures )
 {
 	cultures_state *state = machine->driver_data<cultures_state>();
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 
 	memory_configure_bank(machine, "bank1", 0, 16, &ROM[0x0000], 0x4000);
 
@@ -387,33 +387,33 @@ static MACHINE_RESET( cultures )
 static MACHINE_CONFIG_START( cultures, cultures_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, MCLK/2) /* 8.000 MHz */
-	MDRV_CPU_PROGRAM_MAP(cultures_map)
-	MDRV_CPU_IO_MAP(cultures_io_map)
-	MDRV_CPU_VBLANK_INT("screen", cultures_interrupt)
+	MCFG_CPU_ADD("maincpu", Z80, MCLK/2) /* 8.000 MHz */
+	MCFG_CPU_PROGRAM_MAP(cultures_map)
+	MCFG_CPU_IO_MAP(cultures_io_map)
+	MCFG_CPU_VBLANK_INT("screen", cultures_interrupt)
 
-	MDRV_MACHINE_START(cultures)
-	MDRV_MACHINE_RESET(cultures)
+	MCFG_MACHINE_START(cultures)
+	MCFG_MACHINE_RESET(cultures)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 0*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 0*8, 30*8-1)
 
-	MDRV_GFXDECODE(culture)
-	MDRV_PALETTE_LENGTH(0x2000)
+	MCFG_GFXDECODE(culture)
+	MCFG_PALETTE_LENGTH(0x2000)
 
-	MDRV_VIDEO_START(cultures)
-	MDRV_VIDEO_UPDATE(cultures)
+	MCFG_VIDEO_START(cultures)
+	MCFG_VIDEO_UPDATE(cultures)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_OKIM6295_ADD("oki", (MCLK/1024)*132, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	MCFG_OKIM6295_ADD("oki", (MCLK/1024)*132, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
 /*

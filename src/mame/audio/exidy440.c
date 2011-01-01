@@ -165,7 +165,7 @@ static DEVICE_START( exidy440_sound )
 	stream = stream_create(device, 0, 2, device->clock(), NULL, channel_update);
 
 	/* allocate the sample cache */
-	length = memory_region_length(machine, "cvsd") * 16 + MAX_CACHE_ENTRIES * sizeof(sound_cache_entry);
+	length = machine->region("cvsd")->bytes() * 16 + MAX_CACHE_ENTRIES * sizeof(sound_cache_entry);
 	sound_cache = (sound_cache_entry *)auto_alloc_array(machine, UINT8, length);
 
 	/* determine the hard end of the cache and reset */
@@ -652,7 +652,7 @@ static INT16 *find_or_add_to_sound_cache(running_machine *machine, int address, 
 		if (current->address == address && current->length == length && current->bits == bits && current->frequency == frequency)
 			return current->data;
 
-	return add_to_sound_cache(&memory_region(machine, "cvsd")[address], address, length, bits, frequency);
+	return add_to_sound_cache(&machine->region("cvsd")->base()[address], address, length, bits, frequency);
 }
 
 
@@ -941,25 +941,25 @@ DEFINE_LEGACY_SOUND_DEVICE(EXIDY440, exidy440_sound);
 
 MACHINE_CONFIG_FRAGMENT( exidy440_audio )
 
-	MDRV_CPU_ADD("audiocpu", M6809, EXIDY440_AUDIO_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(exidy440_audio_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_assert)
+	MCFG_CPU_ADD("audiocpu", M6809, EXIDY440_AUDIO_CLOCK)
+	MCFG_CPU_PROGRAM_MAP(exidy440_audio_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_assert)
 
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("custom", EXIDY440, EXIDY440_MASTER_CLOCK/256)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("custom", EXIDY440, EXIDY440_MASTER_CLOCK/256)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-//  MDRV_SOUND_ADD("cvsd1", MC3418, EXIDY440_MC3418_CLOCK)
-//  MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+//  MCFG_SOUND_ADD("cvsd1", MC3418, EXIDY440_MC3418_CLOCK)
+//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 
-//  MDRV_SOUND_ADD("cvsd2", MC3418, EXIDY440_MC3418_CLOCK)
-//  MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+//  MCFG_SOUND_ADD("cvsd2", MC3418, EXIDY440_MC3418_CLOCK)
+//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-//  MDRV_SOUND_ADD("cvsd3", MC3417, EXIDY440_MC3417_CLOCK)
-//  MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+//  MCFG_SOUND_ADD("cvsd3", MC3417, EXIDY440_MC3417_CLOCK)
+//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 
-//  MDRV_SOUND_ADD("cvsd4", MC3417, EXIDY440_MC3417_CLOCK)
-//  MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+//  MCFG_SOUND_ADD("cvsd4", MC3417, EXIDY440_MC3417_CLOCK)
+//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END

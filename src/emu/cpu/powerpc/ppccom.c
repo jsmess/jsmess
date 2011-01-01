@@ -676,7 +676,7 @@ void ppccom_execute_tlbl(powerpc_state *ppc)
 	int entrynum;
 
 	/* determine entry number; we use rand() for associativity */
-	entrynum = ((address >> 12) & 0x1f) | (mame_rand(ppc->device->machine) & 0x20) | (isitlb ? 0x40 : 0);
+	entrynum = ((address >> 12) & 0x1f) | (ppc->device->machine->rand() & 0x20) | (isitlb ? 0x40 : 0);
 
 	/* determine the flags */
 	flags = VTLB_FLAG_VALID | VTLB_READ_ALLOWED | VTLB_FETCH_ALLOWED;
@@ -2102,7 +2102,7 @@ ADDRESS_MAP_END
     specific TX handler configuration
 -------------------------------------------------*/
 
-void ppc4xx_spu_set_tx_handler(running_device *device, ppc4xx_spu_tx_handler handler)
+void ppc4xx_spu_set_tx_handler(device_t *device, ppc4xx_spu_tx_handler handler)
 {
 	powerpc_state *ppc = *(powerpc_state **)downcast<legacy_cpu_device *>(device)->token();
 	ppc->spu.tx_handler = handler;
@@ -2114,7 +2114,7 @@ void ppc4xx_spu_set_tx_handler(running_device *device, ppc4xx_spu_tx_handler han
     specific serial byte receive
 -------------------------------------------------*/
 
-void ppc4xx_spu_receive_byte(running_device *device, UINT8 byteval)
+void ppc4xx_spu_receive_byte(device_t *device, UINT8 byteval)
 {
 	powerpc_state *ppc = *(powerpc_state **)downcast<legacy_cpu_device *>(device)->token();
 	ppc4xx_spu_rx_data(ppc, byteval);

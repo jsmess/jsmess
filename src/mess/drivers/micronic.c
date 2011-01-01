@@ -460,7 +460,7 @@ static MACHINE_START( micronic )
 	state->speaker = machine->device("beep");
 
 	/* ROM banks */
-	memory_configure_bank(machine, "bank1", 0x00, 0x02, memory_region(machine, Z80_TAG), 0x10000);
+	memory_configure_bank(machine, "bank1", 0x00, 0x02, machine->region(Z80_TAG)->base(), 0x10000);
 
 	/* RAM banks */
 	memory_configure_bank(machine, "bank1", 0x02, 0x07, messram_get_ptr(machine->device("messram")), 0x8000);
@@ -478,42 +478,42 @@ static MACHINE_RESET( micronic )
 
 static MACHINE_CONFIG_START( micronic, micronic_state )
 	/* basic machine hardware */
-    MDRV_CPU_ADD(Z80_TAG, Z80, XTAL_3_579545MHz)
-    MDRV_CPU_PROGRAM_MAP(micronic_mem)
-    MDRV_CPU_IO_MAP(micronic_io)
+    MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_3_579545MHz)
+    MCFG_CPU_PROGRAM_MAP(micronic_mem)
+    MCFG_CPU_IO_MAP(micronic_io)
 
-    MDRV_MACHINE_START(micronic)
-	MDRV_MACHINE_RESET(micronic)
+    MCFG_MACHINE_START(micronic)
+	MCFG_MACHINE_RESET(micronic)
 
     /* video hardware */
-	MDRV_SCREEN_ADD(SCREEN_TAG, LCD)
-	MDRV_SCREEN_REFRESH_RATE(80)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(120, 64)	//6x20, 8x8
-	MDRV_SCREEN_VISIBLE_AREA(0, 120-1, 0, 64-1)
+	MCFG_SCREEN_ADD(SCREEN_TAG, LCD)
+	MCFG_SCREEN_REFRESH_RATE(80)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(120, 64)	//6x20, 8x8
+	MCFG_SCREEN_VISIBLE_AREA(0, 120-1, 0, 64-1)
 
-	MDRV_DEFAULT_LAYOUT(layout_lcd)
+	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
-	MDRV_PALETTE_LENGTH(2)
-	MDRV_PALETTE_INIT(micronic)
+	MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_INIT(micronic)
 
-    MDRV_VIDEO_START(micronic)
-    MDRV_VIDEO_UPDATE(micronic)
+    MCFG_VIDEO_START(micronic)
+    MCFG_VIDEO_UPDATE(micronic)
 
-	MDRV_HD61830_ADD(HD61830_TAG, XTAL_4_9152MHz/2/2, lcdc_intf)
+	MCFG_HD61830_ADD(HD61830_TAG, XTAL_4_9152MHz/2/2, lcdc_intf)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO( "mono" )
-	MDRV_SOUND_ADD( "beep", BEEP, 0 )
-	MDRV_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
+	MCFG_SPEAKER_STANDARD_MONO( "mono" )
+	MCFG_SOUND_ADD( "beep", BEEP, 0 )
+	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 
 	/* ram banks */
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("224K")
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("224K")
 
-	MDRV_NVRAM_HANDLER(micronic)
+	MCFG_NVRAM_HANDLER(micronic)
 	
-	MDRV_MC146818_ADD( "rtc", MC146818_IGNORE_CENTURY )
+	MCFG_MC146818_ADD( "rtc", MC146818_IGNORE_CENTURY )
 MACHINE_CONFIG_END
 
 /* ROM definition */

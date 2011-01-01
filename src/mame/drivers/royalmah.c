@@ -117,8 +117,8 @@ static UINT8 *janptr96_nvram;
 static PALETTE_INIT( royalmah )
 {
 	offs_t i;
-	const UINT8 *prom = memory_region(machine, "proms");
-	int len = memory_region_length(machine, "proms");
+	const UINT8 *prom = machine->region("proms")->base();
+	int len = machine->region("proms")->bytes();
 
 	for (i = 0; i < len; i++)
 	{
@@ -152,8 +152,8 @@ static PALETTE_INIT( royalmah )
 static PALETTE_INIT( mjderngr )
 {
 	offs_t i;
-	const UINT8 *prom = memory_region(machine, "proms");
-	int len = memory_region_length(machine, "proms");
+	const UINT8 *prom = machine->region("proms")->base();
+	int len = machine->region("proms")->bytes();
 
 	for (i = 0; i < len / 2; i++)
 	{
@@ -306,7 +306,7 @@ static READ8_HANDLER ( suzume_dsw_r )
 
 static WRITE8_HANDLER ( suzume_bank_w )
 {
-	UINT8 *rom = memory_region(space->machine, "maincpu");
+	UINT8 *rom = space->machine->region("maincpu")->base();
 	int address;
 
 	suzume_bank = data;
@@ -322,7 +322,7 @@ logerror("%04x: bank %02x\n",cpu_get_pc(space->cpu),data);
 
 static WRITE8_HANDLER ( mjapinky_bank_w )
 {
-	UINT8 *ROM = memory_region(space->machine, "maincpu");
+	UINT8 *ROM = space->machine->region("maincpu")->base();
 	rombank = data;
 	memory_set_bankptr(space->machine, "bank1",ROM + 0x10000 + 0x8000 * data);
 }
@@ -338,12 +338,12 @@ static WRITE8_HANDLER( mjapinky_palbank_w )
 static READ8_HANDLER( mjapinky_dsw_r )
 {
 	if (rombank == 0x0e)	return input_port_read(space->machine, "DSW3");
-	else					return *(memory_region(space->machine, "maincpu") + 0x10000 + 0x8000 * rombank);
+	else					return *(space->machine->region("maincpu")->base() + 0x10000 + 0x8000 * rombank);
 }
 
 static WRITE8_HANDLER ( tontonb_bank_w )
 {
-	UINT8 *rom = memory_region(space->machine, "maincpu");
+	UINT8 *rom = space->machine->region("maincpu")->base();
 	int address;
 
 logerror("%04x: bank %02x\n",cpu_get_pc(space->cpu),data);
@@ -361,7 +361,7 @@ logerror("%04x: bank %02x\n",cpu_get_pc(space->cpu),data);
 /* bits 5 and 6 seem to affect which Dip Switch to read in 'majs101b' */
 static WRITE8_HANDLER ( dynax_bank_w )
 {
-	UINT8 *rom = memory_region(space->machine, "maincpu");
+	UINT8 *rom = space->machine->region("maincpu")->base();
 	int address;
 
 //logerror("%04x: bank %02x\n",cpu_get_pc(space->cpu),data);
@@ -390,7 +390,7 @@ static READ8_HANDLER ( daisyari_dsw_r )
 
 static WRITE8_HANDLER ( daisyari_bank_w )
 {
-	UINT8 *rom = memory_region(space->machine, "maincpu");
+	UINT8 *rom = space->machine->region("maincpu")->base();
 	int address;
 
 	dsw_select = (data & 0xc);
@@ -418,7 +418,7 @@ static READ8_HANDLER ( mjclub_dsw_r )
 
 static WRITE8_HANDLER ( mjclub_bank_w )
 {
-	UINT8 *rom = memory_region(space->machine, "maincpu");
+	UINT8 *rom = space->machine->region("maincpu")->base();
 	int address;
 
 	dsw_select = data & 0xc0;
@@ -651,7 +651,7 @@ static WRITE8_HANDLER( jansou_6402_w )
 
 static READ8_HANDLER( jansou_6403_r )
 {
-	UINT8 *GFXROM = memory_region(space->machine, "gfx1");
+	UINT8 *GFXROM = space->machine->region("gfx1")->base();
 	int d0 = GFXROM[gfx_adr];
 	int d1 = GFXROM[gfx_adr+1];
 	int c0 = jansou_colortable[d1 & 0x0f] & 0x0f;
@@ -752,7 +752,7 @@ static READ8_HANDLER( janptr96_dsw_r )
 
 static WRITE8_HANDLER( janptr96_rombank_w )
 {
-	UINT8 *ROM = memory_region(space->machine, "maincpu");
+	UINT8 *ROM = space->machine->region("maincpu")->base();
 	memory_set_bankptr(space->machine, "bank1",ROM + 0x10000 + 0x8000 * data);
 }
 
@@ -805,7 +805,7 @@ static WRITE8_HANDLER( mjifb_coin_counter_w )
 static READ8_HANDLER( mjifb_rom_io_r )
 {
 	if (mjifb_rom_enable)
-		return ((UINT8*)(memory_region(space->machine, "maincpu") + 0x10000 + rombank * 0x4000))[offset];
+		return ((UINT8*)(space->machine->region("maincpu")->base() + 0x10000 + rombank * 0x4000))[offset];
 
 	offset += 0x8000;
 
@@ -916,7 +916,7 @@ ADDRESS_MAP_END
 static READ8_HANDLER( mjdejavu_rom_io_r )
 {
 	if (mjifb_rom_enable)
-		return ((UINT8*)(memory_region(space->machine, "maincpu") + 0x10000 + rombank * 0x4000))[offset];
+		return ((UINT8*)(space->machine->region("maincpu")->base() + 0x10000 + rombank * 0x4000))[offset];
 
 	offset += 0x8000;
 
@@ -977,7 +977,7 @@ static READ8_HANDLER( mjtensin_p3_r )
 
 static void mjtensin_update_rombank(running_machine *machine)
 {
-	memory_set_bankptr(machine,  "bank1", memory_region(machine, "maincpu") + 0x10000 + rombank * 0x8000 );
+	memory_set_bankptr(machine,  "bank1", machine->region("maincpu")->base() + 0x10000 + rombank * 0x8000 );
 }
 static WRITE8_HANDLER( mjtensin_p4_w )
 {
@@ -1018,7 +1018,7 @@ ADDRESS_MAP_END
 
 static void cafetime_update_rombank(running_machine *machine)
 {
-	memory_set_bankptr(machine,  "bank1", memory_region(machine, "maincpu") + 0x10000 + rombank * 0x8000 );
+	memory_set_bankptr(machine,  "bank1", machine->region("maincpu")->base() + 0x10000 + rombank * 0x8000 );
 }
 static WRITE8_HANDLER( cafetime_p4_w )
 {
@@ -1103,7 +1103,7 @@ static WRITE8_HANDLER( mjvegasa_rombank_w )
 static READ8_HANDLER( mjvegasa_rom_io_r )
 {
 	if ((rombank & 0x70) != 0x70)
-		return memory_region(space->machine, "maincpu")[0x10000 + rombank * 0x8000 + offset];
+		return space->machine->region("maincpu")->base()[0x10000 + rombank * 0x8000 + offset];
 
 	offset += 0x8000;
 
@@ -1126,7 +1126,7 @@ static READ8_HANDLER( mjvegasa_rom_io_r )
 		case 0x800e:
 		case 0x800f:
 		{
-			running_device *rtc = space->machine->device("rtc");
+			device_t *rtc = space->machine->device("rtc");
 			return msm6242_r(rtc, offset-0x8000);
 		}
 	}
@@ -1165,7 +1165,7 @@ static WRITE8_HANDLER( mjvegasa_rom_io_w )
 		case 0x800e:
 		case 0x800f:
 		{
-			running_device *rtc = space->machine->device("rtc");
+			device_t *rtc = space->machine->device("rtc");
 			msm6242_w(rtc, offset-0x8000, data);
 			return;
 		}
@@ -3119,86 +3119,86 @@ static const ay8910_interface ay8910_config =
 static MACHINE_CONFIG_START( royalmah, royalmah_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, 18432000/6)        /* 3.072 MHz */
-	MDRV_CPU_PROGRAM_MAP(royalmah_map)
-	MDRV_CPU_IO_MAP(royalmah_iomap)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_ADD("maincpu", Z80, 18432000/6)        /* 3.072 MHz */
+	MCFG_CPU_PROGRAM_MAP(royalmah_map)
+	MCFG_CPU_IO_MAP(royalmah_iomap)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_NVRAM_ADD_0FILL("nvram")
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
-	MDRV_VIDEO_UPDATE(royalmah)
-	MDRV_PALETTE_LENGTH(16*2)
-	MDRV_PALETTE_INIT(royalmah)
+	MCFG_VIDEO_UPDATE(royalmah)
+	MCFG_PALETTE_LENGTH(16*2)
+	MCFG_PALETTE_INIT(royalmah)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(256, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 255, 8, 247)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(256, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 255, 8, 247)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("aysnd", AY8910, 18432000/12)
-	MDRV_SOUND_CONFIG(ay8910_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
+	MCFG_SOUND_ADD("aysnd", AY8910, 18432000/12)
+	MCFG_SOUND_CONFIG(ay8910_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( janoh, royalmah )
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_CLOCK(8000000/2)	/* 4 MHz ? */
-	MDRV_CPU_PROGRAM_MAP(janho_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_CLOCK(8000000/2)	/* 4 MHz ? */
+	MCFG_CPU_PROGRAM_MAP(janho_map)
 
-	MDRV_CPU_ADD("sub", Z80, 4000000)        /* 4 MHz ? */
-	MDRV_CPU_PROGRAM_MAP(janoh_sub_map)
-	MDRV_CPU_IO_MAP(janoh_sub_iomap)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_ADD("sub", Z80, 4000000)        /* 4 MHz ? */
+	MCFG_CPU_PROGRAM_MAP(janoh_sub_map)
+	MCFG_CPU_IO_MAP(janoh_sub_iomap)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( jansou, royalmah )
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(jansou_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(jansou_map)
 
-	MDRV_CPU_ADD("audiocpu", Z80, 4000000) /* 4.000 MHz */
-	MDRV_CPU_PROGRAM_MAP(jansou_sub_map)
-	MDRV_CPU_IO_MAP(jansou_sub_iomap)
-	MDRV_CPU_PERIODIC_INT(irq0_line_hold,4000000/512)
+	MCFG_CPU_ADD("audiocpu", Z80, 4000000) /* 4.000 MHz */
+	MCFG_CPU_PROGRAM_MAP(jansou_sub_map)
+	MCFG_CPU_IO_MAP(jansou_sub_iomap)
+	MCFG_CPU_PERIODIC_INT(irq0_line_hold,4000000/512)
 
-	MDRV_SOUND_ADD("dac", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( dondenmj, royalmah )
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_CLOCK(8000000/2)	/* 4 MHz ? */
-	MDRV_CPU_IO_MAP(dondenmj_iomap)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_CLOCK(8000000/2)	/* 4 MHz ? */
+	MCFG_CPU_IO_MAP(dondenmj_iomap)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( makaijan, royalmah )
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_CLOCK(8000000/2)	/* 4 MHz ? */
-	MDRV_CPU_IO_MAP(makaijan_iomap)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_CLOCK(8000000/2)	/* 4 MHz ? */
+	MCFG_CPU_IO_MAP(makaijan_iomap)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( daisyari, royalmah )
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_CLOCK(8000000/2)	/* 4 MHz ? */
-	MDRV_CPU_IO_MAP(daisyari_iomap)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_CLOCK(8000000/2)	/* 4 MHz ? */
+	MCFG_CPU_IO_MAP(daisyari_iomap)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mjclub, royalmah )
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_CLOCK(8000000/2)	/* 4 MHz ? */
-	MDRV_CPU_IO_MAP(mjclub_iomap)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_CLOCK(8000000/2)	/* 4 MHz ? */
+	MCFG_CPU_IO_MAP(mjclub_iomap)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ippatsu, dondenmj )
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(ippatsu_iomap)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_IO_MAP(ippatsu_iomap)
 MACHINE_CONFIG_END
 
 static INTERRUPT_GEN( suzume_irq )
@@ -3208,39 +3208,39 @@ static INTERRUPT_GEN( suzume_irq )
 }
 
 static MACHINE_CONFIG_DERIVED( suzume, dondenmj )
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(suzume_iomap)
-	MDRV_CPU_VBLANK_INT("screen", suzume_irq)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_IO_MAP(suzume_iomap)
+	MCFG_CPU_VBLANK_INT("screen", suzume_irq)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( tontonb, dondenmj )
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(tontonb_iomap)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_IO_MAP(tontonb_iomap)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mjdiplob, dondenmj )
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(mjdiplob_iomap)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_IO_MAP(mjdiplob_iomap)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( majs101b, dondenmj )
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(majs101b_iomap)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_IO_MAP(majs101b_iomap)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mjapinky, dondenmj )
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(mjapinky_map)
-	MDRV_CPU_IO_MAP(mjapinky_iomap)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(mjapinky_map)
+	MCFG_CPU_IO_MAP(mjapinky_iomap)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mjderngr, dondenmj )
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(mjderngr_iomap)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_IO_MAP(mjderngr_iomap)
 
 	/* video hardware */
-	MDRV_PALETTE_LENGTH(16*32)
-	MDRV_PALETTE_INIT(mjderngr)
+	MCFG_PALETTE_LENGTH(16*32)
+	MCFG_PALETTE_INIT(mjderngr)
 MACHINE_CONFIG_END
 
 /* It runs in IM 2, thus needs a vector on the data bus */
@@ -3255,38 +3255,38 @@ static INTERRUPT_GEN( janptr96_interrupt )
 }
 
 static MACHINE_CONFIG_DERIVED( janptr96, mjderngr )
-	MDRV_CPU_REPLACE("maincpu",Z80,XTAL_16MHz/2)	/* 8 MHz? */
-	MDRV_CPU_PROGRAM_MAP(janptr96_map)
-	MDRV_CPU_IO_MAP(janptr96_iomap)
-	MDRV_CPU_VBLANK_INT_HACK(janptr96_interrupt,3)	/* IM 2 needs a vector on the data bus */
+	MCFG_CPU_REPLACE("maincpu",Z80,XTAL_16MHz/2)	/* 8 MHz? */
+	MCFG_CPU_PROGRAM_MAP(janptr96_map)
+	MCFG_CPU_IO_MAP(janptr96_iomap)
+	MCFG_CPU_VBLANK_INT_HACK(janptr96_interrupt,3)	/* IM 2 needs a vector on the data bus */
 
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_VISIBLE_AREA(0, 255, 9, 255-8)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_VISIBLE_AREA(0, 255, 9, 255-8)
 
 	/* devices */
-	MDRV_MSM6242_ADD("rtc")
+	MCFG_MSM6242_ADD("rtc")
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( mjifb, mjderngr )
-	MDRV_CPU_REPLACE("maincpu",TMP90841, 8000000)	/* ? */
-	MDRV_CPU_PROGRAM_MAP(mjifb_map)
-	MDRV_CPU_IO_MAP(mjifb_iomap)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_REPLACE("maincpu",TMP90841, 8000000)	/* ? */
+	MCFG_CPU_PROGRAM_MAP(mjifb_map)
+	MCFG_CPU_IO_MAP(mjifb_iomap)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_VISIBLE_AREA(0, 255, 8, 255-8)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_VISIBLE_AREA(0, 255, 8, 255-8)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( mjdejavu, mjderngr )
-	MDRV_CPU_REPLACE("maincpu",TMP90841, 8000000)	/* ? */
-	MDRV_CPU_PROGRAM_MAP(mjdejavu_map)
-	MDRV_CPU_IO_MAP(mjifb_iomap)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_REPLACE("maincpu",TMP90841, 8000000)	/* ? */
+	MCFG_CPU_PROGRAM_MAP(mjdejavu_map)
+	MCFG_CPU_IO_MAP(mjifb_iomap)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_VISIBLE_AREA(0, 255, 8, 255-8)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_VISIBLE_AREA(0, 255, 8, 255-8)
 MACHINE_CONFIG_END
 
 
@@ -3300,42 +3300,42 @@ static INTERRUPT_GEN( mjtensin_interrupt )
 }
 
 static MACHINE_CONFIG_DERIVED( mjtensin, mjderngr )
-	MDRV_CPU_REPLACE("maincpu",TMP90841, 12000000)	/* ? */
-	MDRV_CPU_PROGRAM_MAP(mjtensin_map)
-	MDRV_CPU_IO_MAP(mjtensin_iomap)
-	MDRV_CPU_VBLANK_INT_HACK( mjtensin_interrupt,2 )
+	MCFG_CPU_REPLACE("maincpu",TMP90841, 12000000)	/* ? */
+	MCFG_CPU_PROGRAM_MAP(mjtensin_map)
+	MCFG_CPU_IO_MAP(mjtensin_iomap)
+	MCFG_CPU_VBLANK_INT_HACK( mjtensin_interrupt,2 )
 
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_VISIBLE_AREA(0, 255, 8, 255-8)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_VISIBLE_AREA(0, 255, 8, 255-8)
 
 	/* devices */
-	MDRV_MSM6242_ADD("rtc")
+	MCFG_MSM6242_ADD("rtc")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( cafetime, mjderngr )
-	MDRV_CPU_REPLACE("maincpu",TMP90841, 12000000)	/* ? */
-	MDRV_CPU_PROGRAM_MAP(cafetime_map)
-	MDRV_CPU_IO_MAP(cafetime_iomap)
-	MDRV_CPU_VBLANK_INT_HACK(mjtensin_interrupt,2)
+	MCFG_CPU_REPLACE("maincpu",TMP90841, 12000000)	/* ? */
+	MCFG_CPU_PROGRAM_MAP(cafetime_map)
+	MCFG_CPU_IO_MAP(cafetime_iomap)
+	MCFG_CPU_VBLANK_INT_HACK(mjtensin_interrupt,2)
 
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_VISIBLE_AREA(0, 255, 8, 255-8)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_VISIBLE_AREA(0, 255, 8, 255-8)
 
 	/* devices */
-	MDRV_MSM6242_ADD("rtc")
+	MCFG_MSM6242_ADD("rtc")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mjvegasa, mjderngr )
-	MDRV_CPU_REPLACE("maincpu",TMP90841, XTAL_8MHz)	/* ? */
-	MDRV_CPU_PROGRAM_MAP(mjvegasa_map)
-	MDRV_CPU_IO_MAP(mjvegasa_iomap)
-	MDRV_CPU_VBLANK_INT_HACK(mjtensin_interrupt,2)
+	MCFG_CPU_REPLACE("maincpu",TMP90841, XTAL_8MHz)	/* ? */
+	MCFG_CPU_PROGRAM_MAP(mjvegasa_map)
+	MCFG_CPU_IO_MAP(mjvegasa_iomap)
+	MCFG_CPU_VBLANK_INT_HACK(mjtensin_interrupt,2)
 
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_VISIBLE_AREA(0, 255, 8, 255-8)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_VISIBLE_AREA(0, 255, 8, 255-8)
 
 	/* devices */
-	MDRV_MSM6242_ADD("rtc")
+	MCFG_MSM6242_ADD("rtc")
 MACHINE_CONFIG_END
 
 
@@ -4641,7 +4641,7 @@ ROM_START( jansoua )
 ROM_END
 
 
-static DRIVER_INIT( ippatsu )	{	memory_set_bankptr(machine, "bank1", memory_region(machine, "maincpu") + 0x8000 );	}
+static DRIVER_INIT( ippatsu )	{	memory_set_bankptr(machine, "bank1", machine->region("maincpu")->base() + 0x8000 );	}
 
 static DRIVER_INIT( janptr96 )
 {

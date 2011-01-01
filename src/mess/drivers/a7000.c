@@ -277,7 +277,7 @@ static VIDEO_UPDATE( a7000 )
 	int x_size,y_size,x_start,y_start;
 	int x,y,xi;
 	UINT32 count;
-	UINT8 *vram = memory_region(screen->machine, "vram");
+	UINT8 *vram = screen->machine->region("vram")->base();
 
 	bitmap_fill(bitmap, cliprect, screen->machine->pens[0x100]);
 
@@ -621,7 +621,7 @@ static void viddma_transfer_start(address_space *space)
 	UINT32 dst = 0;
 	UINT32 size = state->viddma_addr_end;
 	UINT32 dma_index;
-	UINT8 *vram = memory_region(space->machine, "vram");
+	UINT8 *vram = space->machine->region("vram")->base();
 
 	/* TODO: this should actually be a qword transfer */
 	for(dma_index = 0;dma_index < size;dma_index++)
@@ -807,30 +807,30 @@ static MACHINE_RESET(a7000)
 static MACHINE_CONFIG_START( a7000, a7000_state )
 
 	/* Basic machine hardware */
-	MDRV_CPU_ADD( "maincpu", ARM7, XTAL_32MHz )
-	MDRV_CPU_PROGRAM_MAP(a7000_mem)
+	MCFG_CPU_ADD( "maincpu", ARM7, XTAL_32MHz )
+	MCFG_CPU_PROGRAM_MAP(a7000_mem)
 
-	MDRV_MACHINE_START( a7000 )
-	MDRV_MACHINE_RESET( a7000 )
+	MCFG_MACHINE_START( a7000 )
+	MCFG_MACHINE_RESET( a7000 )
 
     /* video hardware */
-    MDRV_SCREEN_ADD("screen", RASTER)
-    MDRV_SCREEN_REFRESH_RATE(60)
-    MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-    MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_SIZE(1900, 1080) //max available size
-    MDRV_SCREEN_VISIBLE_AREA(0, 1900-1, 0, 1080-1)
-    MDRV_PALETTE_LENGTH(0x200)
-//  MDRV_PALETTE_INIT(black_and_white)
+    MCFG_SCREEN_ADD("screen", RASTER)
+    MCFG_SCREEN_REFRESH_RATE(60)
+    MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+    MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_SIZE(1900, 1080) //max available size
+    MCFG_SCREEN_VISIBLE_AREA(0, 1900-1, 0, 1080-1)
+    MCFG_PALETTE_LENGTH(0x200)
+//  MCFG_PALETTE_INIT(black_and_white)
 
-    MDRV_VIDEO_START(a7000)
-    MDRV_VIDEO_UPDATE(a7000)
+    MCFG_VIDEO_START(a7000)
+    MCFG_VIDEO_UPDATE(a7000)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( a7000p, a7000 )
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_CLOCK(XTAL_48MHz)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_CLOCK(XTAL_48MHz)
 MACHINE_CONFIG_END
 
 ROM_START(a7000)

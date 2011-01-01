@@ -741,7 +741,7 @@ void bw2_state::machine_start()
 	/* memory banking */
 	memory_configure_bank(machine, "bank1", BANK_RAM1, 1, m_work_ram, 0);
 	memory_configure_bank(machine, "bank1", BANK_VRAM, 1, m_video_ram, 0);
-	memory_configure_bank(machine, "bank1", BANK_ROM, 1, memory_region(machine, "ic1"), 0);
+	memory_configure_bank(machine, "bank1", BANK_ROM, 1, machine->region("ic1")->base(), 0);
 
 	/* register for state saving */
 	state_save_register_global(machine, m_kb_row);
@@ -762,7 +762,7 @@ void bw2_state::machine_reset()
 	{
 		// RAMCARD installed
 
-		memory_configure_bank(machine, "bank1", BANK_RAMCARD_ROM, 1, memory_region(machine, "ramcard"), 0);
+		memory_configure_bank(machine, "bank1", BANK_RAMCARD_ROM, 1, machine->region("ramcard")->base(), 0);
 		memory_configure_bank(machine, "bank1", BANK_RAM3, 2, m_work_ram + 0x8000, 0x8000);
 		memory_configure_bank(machine, "bank1", BANK_RAMCARD_RAM, 1, m_ramcard_ram, 0);
 		memory_configure_bank(machine, "bank1", BANK_RAM6, 1, m_work_ram + 0x18000, 0);
@@ -781,48 +781,48 @@ void bw2_state::machine_reset()
 	memory_set_bank(machine, "bank1", BANK_ROM);
 }
 
-#define MDRV_BW2_SERIAL_ADD(_tag) \
-	MDRV_DEVICE_ADD(_tag, BW2_SERIAL, 0)
+#define MCFG_BW2_SERIAL_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, BW2_SERIAL, 0)
 
 static MACHINE_CONFIG_START( bw2, bw2_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD( Z80_TAG, Z80, XTAL_16MHz/4 )
-	MDRV_CPU_PROGRAM_MAP( bw2_mem)
-	MDRV_CPU_IO_MAP( bw2_io)
+	MCFG_CPU_ADD( Z80_TAG, Z80, XTAL_16MHz/4 )
+	MCFG_CPU_PROGRAM_MAP( bw2_mem)
+	MCFG_CPU_IO_MAP( bw2_io)
 
-	MDRV_PIT8253_ADD( PIT8253_TAG, bw2_pit8253_interface )
-	MDRV_I8255A_ADD( I8255A_TAG, ppi_intf )
+	MCFG_PIT8253_ADD( PIT8253_TAG, bw2_pit8253_interface )
+	MCFG_I8255A_ADD( I8255A_TAG, ppi_intf )
 
 	/* video hardware */
-	MDRV_SCREEN_ADD( SCREEN_TAG, LCD )
-	MDRV_SCREEN_REFRESH_RATE( 60 )
-	MDRV_SCREEN_FORMAT( BITMAP_FORMAT_INDEXED16 )
-	MDRV_SCREEN_SIZE( 640, 200 )
-	MDRV_SCREEN_VISIBLE_AREA( 0, 640-1, 0, 200-1 )
-	MDRV_DEFAULT_LAYOUT( layout_lcd )
+	MCFG_SCREEN_ADD( SCREEN_TAG, LCD )
+	MCFG_SCREEN_REFRESH_RATE( 60 )
+	MCFG_SCREEN_FORMAT( BITMAP_FORMAT_INDEXED16 )
+	MCFG_SCREEN_SIZE( 640, 200 )
+	MCFG_SCREEN_VISIBLE_AREA( 0, 640-1, 0, 200-1 )
+	MCFG_DEFAULT_LAYOUT( layout_lcd )
 
-	MDRV_PALETTE_LENGTH( 2 )
-	MDRV_PALETTE_INIT( bw2 )
+	MCFG_PALETTE_LENGTH( 2 )
+	MCFG_PALETTE_INIT( bw2 )
 
-	MDRV_MSM6255_ADD(MSM6255_TAG, XTAL_16MHz, bw2_msm6255_intf)
+	MCFG_MSM6255_ADD(MSM6255_TAG, XTAL_16MHz, bw2_msm6255_intf)
 
 	/* printer */
-	MDRV_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
+	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
 
 	/* uart */
-	MDRV_MSM8251_ADD(MSM8251_TAG, default_msm8251_interface)
+	MCFG_MSM8251_ADD(MSM8251_TAG, default_msm8251_interface)
 
-	MDRV_WD179X_ADD(WD2797_TAG, bw2_wd17xx_interface )
+	MCFG_WD179X_ADD(WD2797_TAG, bw2_wd17xx_interface )
 
-	MDRV_FLOPPY_2_DRIVES_ADD(bw2_floppy_config)
-	MDRV_SOFTWARE_LIST_ADD("flop_list","bw2")
+	MCFG_FLOPPY_2_DRIVES_ADD(bw2_floppy_config)
+	MCFG_SOFTWARE_LIST_ADD("flop_list","bw2")
 
 	/* internal ram */
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("64K")
-	MDRV_RAM_EXTRA_OPTIONS("96K,128K,160K,192K,224K")
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("64K")
+	MCFG_RAM_EXTRA_OPTIONS("96K,128K,160K,192K,224K")
 
-	MDRV_BW2_SERIAL_ADD("serial")
+	MCFG_BW2_SERIAL_ADD("serial")
 MACHINE_CONFIG_END
 
 /***************************************************************************

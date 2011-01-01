@@ -30,7 +30,7 @@
 static READ8_DEVICE_HANDLER (orion_romdisk_porta_r )
 {
 	orion_state *state = device->machine->driver_data<orion_state>();
-	UINT8 *romdisk = memory_region(device->machine, "maincpu") + 0x10000;
+	UINT8 *romdisk = device->machine->region("maincpu")->base() + 0x10000;
 	return romdisk[state->romdisk_msb*256+state->romdisk_lsb];
 }
 
@@ -169,7 +169,7 @@ MACHINE_RESET ( orion128 )
 	state->orion128_video_page = 0;
 	state->orion128_video_mode = 0;
 	state->orion128_memory_page = -1;
-	memory_set_bankptr(machine, "bank1", memory_region(machine, "maincpu") + 0xf800);
+	memory_set_bankptr(machine, "bank1", machine->region("maincpu")->base() + 0xf800);
 	memory_set_bankptr(machine, "bank2", messram_get_ptr(machine->device("messram")) + 0xf000);
 	state->orion128_video_width = SCREEN_WIDTH_384;
 	orion_set_video_mode(machine,384);
@@ -178,7 +178,7 @@ MACHINE_RESET ( orion128 )
 
 static WRITE8_HANDLER ( orion_disk_control_w )
 {
-	running_device *fdc = space->machine->device("wd1793");
+	device_t *fdc = space->machine->device("wd1793");
 
 	wd17xx_set_side(fdc,((data & 0x10) >> 4) ^ 1);
 	wd17xx_set_drive(fdc,data & 3);
@@ -186,7 +186,7 @@ static WRITE8_HANDLER ( orion_disk_control_w )
 
 READ8_HANDLER ( orion128_floppy_r )
 {
-	running_device *fdc = space->machine->device("wd1793");
+	device_t *fdc = space->machine->device("wd1793");
 
 	switch(offset)
 	{
@@ -204,7 +204,7 @@ READ8_HANDLER ( orion128_floppy_r )
 
 WRITE8_HANDLER ( orion128_floppy_w )
 {
-	running_device *fdc = space->machine->device("wd1793");
+	device_t *fdc = space->machine->device("wd1793");
 
 	switch(offset)
 	{
@@ -255,7 +255,7 @@ MACHINE_START( orionz80 )
 WRITE8_HANDLER ( orionz80_sound_w )
 {
 	orion_state *state = space->machine->driver_data<orion_state>();
-	running_device *speaker = space->machine->device("speaker");
+	device_t *speaker = space->machine->device("speaker");
 	if (state->speaker == 0)
 	{
 		state->speaker = data;
@@ -270,7 +270,7 @@ WRITE8_HANDLER ( orionz80_sound_w )
 
 static WRITE8_HANDLER ( orionz80_sound_fe_w )
 {
-	running_device *speaker = space->machine->device("speaker");
+	device_t *speaker = space->machine->device("speaker");
 	speaker_level_w(speaker,(data>>4) & 0x01);
 }
 
@@ -314,7 +314,7 @@ static void orionz80_switch_bank(running_machine *machine)
 		memory_install_write8_handler(space, 0xff00, 0xffff, 0, 0, orionz80_sound_w);
 
 		memory_set_bankptr(machine, "bank3", messram_get_ptr(machine->device("messram")) + 0xf000);
-		memory_set_bankptr(machine, "bank5", memory_region(machine, "maincpu") + 0xf800);
+		memory_set_bankptr(machine, "bank5", machine->region("maincpu")->base() + 0xf800);
 
 	}
 	else
@@ -364,10 +364,10 @@ MACHINE_RESET ( orionz80 )
 	memory_install_write8_handler(space, 0xff00, 0xffff, 0, 0, orionz80_sound_w);
 
 
-	memory_set_bankptr(machine, "bank1", memory_region(machine, "maincpu") + 0xf800);
+	memory_set_bankptr(machine, "bank1", machine->region("maincpu")->base() + 0xf800);
 	memory_set_bankptr(machine, "bank2", messram_get_ptr(machine->device("messram")) + 0x4000);
 	memory_set_bankptr(machine, "bank3", messram_get_ptr(machine->device("messram")) + 0xf000);
-	memory_set_bankptr(machine, "bank5", memory_region(machine, "maincpu") + 0xf800);
+	memory_set_bankptr(machine, "bank5", machine->region("maincpu")->base() + 0xf800);
 
 
 	state->orion128_video_page = 0;
@@ -458,12 +458,12 @@ static void orionpro_bank_switch(running_machine *machine)
 	if ((state->orionpro_dispatcher & 0x10)==0x10)
 	{	// ROM1 enabled
 		memory_unmap_write(space, 0x0000, 0x1fff, 0, 0);
-		memory_set_bankptr(machine, "bank1", memory_region(machine, "maincpu") + 0x20000);
+		memory_set_bankptr(machine, "bank1", machine->region("maincpu")->base() + 0x20000);
 	}
 	if ((state->orionpro_dispatcher & 0x08)==0x08)
 	{	// ROM2 enabled
 		memory_unmap_write(space, 0x2000, 0x3fff, 0, 0);
-		memory_set_bankptr(machine, "bank2", memory_region(machine, "maincpu") + 0x22000 + (state->orionpro_rom2_segment & 7) * 0x2000);
+		memory_set_bankptr(machine, "bank2", machine->region("maincpu")->base() + 0x22000 + (state->orionpro_rom2_segment & 7) * 0x2000);
 	}
 
 	if ((state->orionpro_dispatcher & 0x02)==0x00)
@@ -561,7 +561,7 @@ MACHINE_RESET ( orionpro )
 READ8_HANDLER ( orionpro_io_r )
 {
 	orion_state *state = space->machine->driver_data<orion_state>();
-	running_device *fdc = space->machine->device("wd1793");
+	device_t *fdc = space->machine->device("wd1793");
 
 	switch (offset & 0xff)
 	{
@@ -596,7 +596,7 @@ READ8_HANDLER ( orionpro_io_r )
 WRITE8_HANDLER ( orionpro_io_w )
 {
 	orion_state *state = space->machine->driver_data<orion_state>();
-	running_device *fdc = space->machine->device("wd1793");
+	device_t *fdc = space->machine->device("wd1793");
 
 	switch (offset & 0xff)
 	{

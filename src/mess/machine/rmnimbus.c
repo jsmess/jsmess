@@ -29,10 +29,10 @@
 
 #include "includes/rmnimbus.h"
 
-static void sio_interrupt(running_device *device, int state);
+static void sio_interrupt(device_t *device, int state);
 //static WRITE8_DEVICE_HANDLER( sio_dtr_w );
 static WRITE8_DEVICE_HANDLER( sio_serial_transmit );
-static int sio_serial_receive( running_device *device, int channel );
+static int sio_serial_receive( device_t *device, int channel );
 
 
 /*-------------------------------------------------------------------------*/
@@ -116,12 +116,12 @@ static void execute_debug_intmasks(running_machine *machine, int ref, int params
 static void nimbus_debug(running_machine *machine, int ref, int params, const char *param[]);
 
 static int instruction_hook(device_t &device, offs_t curpc);
-static void decode_subbios(running_device *device,offs_t pc);
-static void decode_dssi_f_fill_area(running_device *device,UINT16  ds, UINT16 si);
-static void decode_dssi_f_plot_character_string(running_device *device,UINT16  ds, UINT16 si);
-static void decode_dssi_f_set_new_clt(running_device *device,UINT16  ds, UINT16 si);
-static void decode_dssi_f_plonk_char(running_device *device,UINT16  ds, UINT16 si);
-static void decode_dssi_f_rw_sectors(running_device *device,UINT16  ds, UINT16 si);
+static void decode_subbios(device_t *device,offs_t pc);
+static void decode_dssi_f_fill_area(device_t *device,UINT16  ds, UINT16 si);
+static void decode_dssi_f_plot_character_string(device_t *device,UINT16  ds, UINT16 si);
+static void decode_dssi_f_set_new_clt(device_t *device,UINT16  ds, UINT16 si);
+static void decode_dssi_f_plonk_char(device_t *device,UINT16  ds, UINT16 si);
+static void decode_dssi_f_rw_sectors(device_t *device,UINT16  ds, UINT16 si);
 
 static void nimbus_bank_memory(running_machine *machine);
 static void memory_reset(running_machine *machine);
@@ -1321,15 +1321,15 @@ static int instruction_hook(device_t &device, offs_t curpc)
 #define set_drv(drv_name)       sprintf(drv_str,drv_name)
 #define set_func(func_name)     sprintf(func_str,func_name)
 
-static void decode_subbios(running_device *device,offs_t pc)
+static void decode_subbios(device_t *device,offs_t pc)
 {
     char    type_str[80];
     char    drv_str[80];
     char    func_str[80];
 
-    void (*dump_dssi)(running_device *,UINT16, UINT16) = NULL;
+    void (*dump_dssi)(device_t *,UINT16, UINT16) = NULL;
 
-    running_device *cpu = device->machine->device(MAINCPU_TAG);
+    device_t *cpu = device->machine->device(MAINCPU_TAG);
 
     UINT16  ax = cpu_get_reg(cpu,I8086_AX);
     UINT16  bx = cpu_get_reg(cpu,I8086_BX);
@@ -1656,7 +1656,7 @@ static void *get_dssi_ptr(address_space *space, UINT16   ds, UINT16 si)
     return space->get_read_ptr(addr);
 }
 
-static void decode_dssi_f_fill_area(running_device *device,UINT16  ds, UINT16 si)
+static void decode_dssi_f_fill_area(device_t *device,UINT16  ds, UINT16 si)
 {
     address_space *space = cputag_get_address_space(device->machine,MAINCPU_TAG, ADDRESS_SPACE_PROGRAM);
 
@@ -1686,7 +1686,7 @@ static void decode_dssi_f_fill_area(running_device *device,UINT16  ds, UINT16 si
     }
 }
 
-static void decode_dssi_f_plot_character_string(running_device *device,UINT16  ds, UINT16 si)
+static void decode_dssi_f_plot_character_string(device_t *device,UINT16  ds, UINT16 si)
 {
     address_space *space = cputag_get_address_space(device->machine,MAINCPU_TAG, ADDRESS_SPACE_PROGRAM);
 
@@ -1712,7 +1712,7 @@ static void decode_dssi_f_plot_character_string(running_device *device,UINT16  d
     logerror("\n");
 }
 
-static void decode_dssi_f_set_new_clt(running_device *device,UINT16  ds, UINT16 si)
+static void decode_dssi_f_set_new_clt(device_t *device,UINT16  ds, UINT16 si)
 {
     address_space *space = cputag_get_address_space(device->machine,MAINCPU_TAG, ADDRESS_SPACE_PROGRAM);
     UINT16  *new_colours;
@@ -1726,7 +1726,7 @@ static void decode_dssi_f_set_new_clt(running_device *device,UINT16  ds, UINT16 
 
 }
 
-static void decode_dssi_f_plonk_char(running_device *device,UINT16  ds, UINT16 si)
+static void decode_dssi_f_plonk_char(device_t *device,UINT16  ds, UINT16 si)
 {
     address_space *space = cputag_get_address_space(device->machine,MAINCPU_TAG, ADDRESS_SPACE_PROGRAM);
     UINT16  *params;
@@ -1737,7 +1737,7 @@ static void decode_dssi_f_plonk_char(running_device *device,UINT16  ds, UINT16 s
     logerror("plonked_char=%c\n",params[0]);
 }
 
-static void decode_dssi_f_rw_sectors(running_device *device,UINT16  ds, UINT16 si)
+static void decode_dssi_f_rw_sectors(device_t *device,UINT16  ds, UINT16 si)
 {
     address_space *space = cputag_get_address_space(device->machine,MAINCPU_TAG, ADDRESS_SPACE_PROGRAM);
     UINT16  *params;
@@ -2049,7 +2049,7 @@ Z80SIO, used for the keyboard interface
 
 /* Z80 SIO/2 */
 
-static void sio_interrupt(running_device *device, int state)
+static void sio_interrupt(device_t *device, int state)
 {
 	rmnimbus_state *drvstate = device->machine->driver_data<rmnimbus_state>();
     if(LOG_SIO)
@@ -2078,7 +2078,7 @@ static WRITE8_DEVICE_HANDLER( sio_serial_transmit )
 {
 }
 
-static int sio_serial_receive( running_device *device, int channel )
+static int sio_serial_receive( device_t *device, int channel )
 {
     if(channel==0)
     {
@@ -2093,7 +2093,7 @@ static int sio_serial_receive( running_device *device, int channel )
 static void fdc_reset(running_machine *machine)
 {
 	rmnimbus_state *state = machine->driver_data<rmnimbus_state>();
-    running_device *fdc = machine->device(FDC_TAG);
+    device_t *fdc = machine->device(FDC_TAG);
 	
 	state->nimbus_drives.reg400=0;
     state->nimbus_drives.reg410_in=0;
@@ -2150,11 +2150,11 @@ READ8_HANDLER( nimbus_disk_r )
 {
 	rmnimbus_state *state = space->machine->driver_data<rmnimbus_state>();
 	int result = 0;
-	running_device *fdc = space->machine->device(FDC_TAG);
-	running_device *hdc = space->machine->device(SCSIBUS_TAG);
+	device_t *fdc = space->machine->device(FDC_TAG);
+	device_t *hdc = space->machine->device(SCSIBUS_TAG);
 
 	int pc=cpu_get_pc(space->cpu);
-	running_device *drive = space->machine->device(nimbus_wd17xx_interface.floppy_drive_tags[FDC_DRIVE()]);
+	device_t *drive = space->machine->device(nimbus_wd17xx_interface.floppy_drive_tags[FDC_DRIVE()]);
 
 	switch(offset*2)
 	{
@@ -2218,8 +2218,8 @@ READ8_HANDLER( nimbus_disk_r )
 WRITE8_HANDLER( nimbus_disk_w )
 {
 	rmnimbus_state *state = space->machine->driver_data<rmnimbus_state>();
-	running_device *fdc = space->machine->device(FDC_TAG);
-    running_device *hdc = space->machine->device(SCSIBUS_TAG);
+	device_t *fdc = space->machine->device(FDC_TAG);
+    device_t *hdc = space->machine->device(SCSIBUS_TAG);
     int                 pc=cpu_get_pc(space->cpu);
     UINT8               reg400_old = state->nimbus_drives.reg400;
 
@@ -2271,7 +2271,7 @@ WRITE8_HANDLER( nimbus_disk_w )
 static void hdc_reset(running_machine *machine)
 {
 	rmnimbus_state *state = machine->driver_data<rmnimbus_state>();
-    running_device *hdc = machine->device(SCSIBUS_TAG);
+    device_t *hdc = machine->device(SCSIBUS_TAG);
 
     init_scsibus(hdc);
 
@@ -2288,7 +2288,7 @@ static void hdc_reset(running_machine *machine)
 static void hdc_ctrl_write(running_machine *machine, UINT8 data)
 {
 	rmnimbus_state *state = machine->driver_data<rmnimbus_state>();
-	running_device *hdc = machine->device(SCSIBUS_TAG);
+	device_t *hdc = machine->device(SCSIBUS_TAG);
 
     // If we enable the HDC interupt, and an interrupt is pending, go deal with it.
     if(((data & HDC_IRQ_MASK) && (~state->nimbus_drives.reg410_out & HDC_IRQ_MASK)) &&
@@ -2304,7 +2304,7 @@ static void hdc_ctrl_write(running_machine *machine, UINT8 data)
 static void hdc_post_rw(running_machine *machine)
 {
 	rmnimbus_state *state = machine->driver_data<rmnimbus_state>();
-    running_device *hdc = machine->device(SCSIBUS_TAG);
+    device_t *hdc = machine->device(SCSIBUS_TAG);
 
     if((state->nimbus_drives.reg410_in & HDC_REQ_MASK)==0)
         set_scsi_line(hdc,SCSI_LINE_ACK,0);
@@ -2321,7 +2321,7 @@ static void hdc_drq(running_machine *machine)
     }
 }
 
-void nimbus_scsi_linechange(running_device *device, UINT8 line, UINT8 state)
+void nimbus_scsi_linechange(device_t *device, UINT8 line, UINT8 state)
 {
 	rmnimbus_state *drvstate = device->machine->driver_data<rmnimbus_state>();
     UINT8   mask = 0;
@@ -2369,7 +2369,7 @@ void nimbus_scsi_linechange(running_device *device, UINT8 line, UINT8 state)
 static void pc8031_reset(running_machine *machine)
 {
 	rmnimbus_state *state = machine->driver_data<rmnimbus_state>();
-    running_device *er59256 = machine->device(ER59256_TAG);
+    device_t *er59256 = machine->device(ER59256_TAG);
 
     logerror("peripheral controler reset\n");
 
@@ -2511,7 +2511,7 @@ WRITE8_HANDLER( nimbus_pc8031_iou_w )
 
 READ8_HANDLER( nimbus_pc8031_port_r )
 {
-	running_device *er59256 = space->machine->device(ER59256_TAG);
+	device_t *er59256 = space->machine->device(ER59256_TAG);
     int pc=cpu_get_pc(space->cpu);
     UINT8   result = 0;
 
@@ -2528,7 +2528,7 @@ READ8_HANDLER( nimbus_pc8031_port_r )
 
 WRITE8_HANDLER( nimbus_pc8031_port_w )
 {
-	running_device *er59256 = space->machine->device(ER59256_TAG);
+	device_t *er59256 = space->machine->device(ER59256_TAG);
     int pc=cpu_get_pc(space->cpu);
 
     switch (offset)
@@ -2564,7 +2564,7 @@ WRITE8_HANDLER( nimbus_iou_w )
 {
 	rmnimbus_state *state = space->machine->driver_data<rmnimbus_state>();
 	int pc=cpu_get_pc(space->cpu);
-    running_device *msm5205 = space->machine->device(MSM5205_TAG);
+    device_t *msm5205 = space->machine->device(MSM5205_TAG);
 
     if(LOG_IOU)
         logerror("Nimbus IOUW %08X write of %02X to %04X\n",pc,data,(offset*2)+0x92);
@@ -2599,8 +2599,8 @@ static void iou_reset(running_machine *machine)
 static void sound_reset(running_machine *machine)
 {
 	rmnimbus_state *state = machine->driver_data<rmnimbus_state>();
-    //running_device *ay8910 = machine->device(AY8910_TAG);
-    running_device *msm5205 = machine->device(MSM5205_TAG);
+    //device_t *ay8910 = machine->device(AY8910_TAG);
+    device_t *msm5205 = machine->device(MSM5205_TAG);
 
     //ay8910_reset_ym(ay8910);
     msm5205_reset_w(msm5205, 1);
@@ -2613,7 +2613,7 @@ static void sound_reset(running_machine *machine)
 
 READ8_HANDLER( nimbus_sound_ay8910_r )
 {
-	running_device *ay8910 = space->machine->device(AY8910_TAG);
+	device_t *ay8910 = space->machine->device(AY8910_TAG);
     UINT8   result=0;
 
     if ((offset*2)==0)
@@ -2625,7 +2625,7 @@ READ8_HANDLER( nimbus_sound_ay8910_r )
 WRITE8_HANDLER( nimbus_sound_ay8910_w )
 {
 	int pc=cpu_get_pc(space->cpu);
-	running_device *ay8910 = space->machine->device(AY8910_TAG);
+	device_t *ay8910 = space->machine->device(AY8910_TAG);
 
     if(LOG_SOUND)
         logerror("Nimbus SoundW %05X write of %02X to %04X\n",pc,data,(offset*2)+0xE0);
@@ -2641,7 +2641,7 @@ WRITE8_HANDLER( nimbus_sound_ay8910_w )
 WRITE8_HANDLER( nimbus_sound_ay8910_porta_w )
 {
 	rmnimbus_state *state = space->machine->driver_data<rmnimbus_state>();
-    running_device *msm5205 = space->machine->device(MSM5205_TAG);
+    device_t *msm5205 = space->machine->device(MSM5205_TAG);
 
     msm5205_data_w(msm5205, data);
 
@@ -2652,7 +2652,7 @@ WRITE8_HANDLER( nimbus_sound_ay8910_porta_w )
 WRITE8_HANDLER( nimbus_sound_ay8910_portb_w )
 {
 	rmnimbus_state *state = space->machine->driver_data<rmnimbus_state>();
-    running_device *msm5205 = space->machine->device(MSM5205_TAG);
+    device_t *msm5205 = space->machine->device(MSM5205_TAG);
 
     if((data & 0x07)!=state->last_playmode)
     {
@@ -2661,7 +2661,7 @@ WRITE8_HANDLER( nimbus_sound_ay8910_portb_w )
     }
 }
 
-void nimbus_msm5205_vck(running_device *device)
+void nimbus_msm5205_vck(device_t *device)
 {
 	rmnimbus_state *state = device->machine->driver_data<rmnimbus_state>();
     if(state->iou_reg092 & MSM5205_INT_ENABLE)

@@ -372,25 +372,25 @@ static MACHINE_START( mc1000 )
 
 	/* setup memory banking */
 	memory_install_readwrite_bank(program, 0x0000, 0x1fff, 0, 0, "bank1");
-	memory_configure_bank(machine, "bank1", 0, 1, memory_region(machine, Z80_TAG), 0);
-	memory_configure_bank(machine, "bank1", 1, 1, memory_region(machine, Z80_TAG) + 0xc000, 0);
+	memory_configure_bank(machine, "bank1", 0, 1, machine->region(Z80_TAG)->base(), 0);
+	memory_configure_bank(machine, "bank1", 1, 1, machine->region(Z80_TAG)->base() + 0xc000, 0);
 	memory_set_bank(machine, "bank1", 1);
 
 	state->rom0000 = 1;
 
 	memory_install_readwrite_bank(program, 0x2000, 0x27ff, 0, 0, "bank2");
-	memory_configure_bank(machine, "bank2", 0, 1, memory_region(machine, Z80_TAG) + 0x2000, 0);
+	memory_configure_bank(machine, "bank2", 0, 1, machine->region(Z80_TAG)->base() + 0x2000, 0);
 	memory_configure_bank(machine, "bank2", 1, 1, state->mc6845_video_ram, 0);
 	memory_set_bank(machine, "bank2", 0);
 
-	memory_configure_bank(machine, "bank3", 0, 1, memory_region(machine, Z80_TAG) + 0x4000, 0);
+	memory_configure_bank(machine, "bank3", 0, 1, machine->region(Z80_TAG)->base() + 0x4000, 0);
 	memory_set_bank(machine, "bank3", 0);
 
 	memory_configure_bank(machine, "bank4", 0, 1, state->mc6847_video_ram, 0);
-	memory_configure_bank(machine, "bank4", 1, 1, memory_region(machine, Z80_TAG) + 0x8000, 0);
+	memory_configure_bank(machine, "bank4", 1, 1, machine->region(Z80_TAG)->base() + 0x8000, 0);
 	memory_set_bank(machine, "bank4", 0);
 
-	memory_configure_bank(machine, "bank5", 0, 1, memory_region(machine, Z80_TAG) + 0x9800, 0);
+	memory_configure_bank(machine, "bank5", 0, 1, machine->region(Z80_TAG)->base() + 0x9800, 0);
 	memory_set_bank(machine, "bank5", 0);
 
 	mc1000_bankswitch(machine);
@@ -491,50 +491,50 @@ static const mc6847_interface mc1000_mc6847_intf =
 static MACHINE_CONFIG_START( mc1000, mc1000_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80_TAG, Z80, 3579545)
-	MDRV_CPU_PROGRAM_MAP(mc1000_mem)
-	MDRV_CPU_IO_MAP(mc1000_io)
+	MCFG_CPU_ADD(Z80_TAG, Z80, 3579545)
+	MCFG_CPU_PROGRAM_MAP(mc1000_mem)
+	MCFG_CPU_IO_MAP(mc1000_io)
 
-	MDRV_MACHINE_START(mc1000)
-	MDRV_MACHINE_RESET(mc1000)
+	MCFG_MACHINE_START(mc1000)
+	MCFG_MACHINE_RESET(mc1000)
 
 	/* timers */
-	MDRV_TIMER_ADD_PERIODIC("ne555clear", ne555_tick, HZ(MC1000_NE555_FREQ))
-	MDRV_TIMER_PARAM(CLEAR_LINE)
+	MCFG_TIMER_ADD_PERIODIC("ne555clear", ne555_tick, HZ(MC1000_NE555_FREQ))
+	MCFG_TIMER_PARAM(CLEAR_LINE)
 
-	MDRV_TIMER_ADD_PERIODIC("ne555assert", ne555_tick, HZ(MC1000_NE555_FREQ))
-	MDRV_TIMER_START_DELAY(HZ(MC1000_NE555_FREQ * 100 / MC1000_NE555_DUTY_CYCLE))
-	MDRV_TIMER_PARAM(ASSERT_LINE)
+	MCFG_TIMER_ADD_PERIODIC("ne555assert", ne555_tick, HZ(MC1000_NE555_FREQ))
+	MCFG_TIMER_START_DELAY(HZ(MC1000_NE555_FREQ * 100 / MC1000_NE555_DUTY_CYCLE))
+	MCFG_TIMER_PARAM(ASSERT_LINE)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD(SCREEN_TAG, RASTER)
-	MDRV_SCREEN_REFRESH_RATE(M6847_NTSC_FRAMES_PER_SECOND)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_SIZE(320, 25+192+26)
-	MDRV_SCREEN_VISIBLE_AREA(0, 319, 1, 239)
-	MDRV_PALETTE_LENGTH(16)
+	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
+	MCFG_SCREEN_REFRESH_RATE(M6847_NTSC_FRAMES_PER_SECOND)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_SIZE(320, 25+192+26)
+	MCFG_SCREEN_VISIBLE_AREA(0, 319, 1, 239)
+	MCFG_PALETTE_LENGTH(16)
 
-	MDRV_VIDEO_UPDATE(mc1000)
+	MCFG_VIDEO_UPDATE(mc1000)
 
-	MDRV_MC6847_ADD(MC6847_TAG, mc1000_mc6847_intf)
-	MDRV_MC6847_TYPE(M6847_VERSION_ORIGINAL_NTSC)
-	MDRV_MC6847_CHAR_ROM(mc1000_get_char_rom)
+	MCFG_MC6847_ADD(MC6847_TAG, mc1000_mc6847_intf)
+	MCFG_MC6847_TYPE(M6847_VERSION_ORIGINAL_NTSC)
+	MCFG_MC6847_CHAR_ROM(mc1000_get_char_rom)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD(AY8910_TAG, AY8910, 3579545/2)
-	MDRV_SOUND_CONFIG(ay8910_intf)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD(AY8910_TAG, AY8910, 3579545/2)
+	MCFG_SOUND_CONFIG(ay8910_intf)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* devices */
-	MDRV_CASSETTE_ADD(CASSETTE_TAG, mc1000_cassette_config)
-	MDRV_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
+	MCFG_CASSETTE_ADD(CASSETTE_TAG, mc1000_cassette_config)
+	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
 
 	/* internal ram */
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("16K")
-	MDRV_RAM_EXTRA_OPTIONS("48K")
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("16K")
+	MCFG_RAM_EXTRA_OPTIONS("48K")
 MACHINE_CONFIG_END
 
 /* ROMs */

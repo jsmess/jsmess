@@ -219,7 +219,7 @@ MACHINE_RESET( super80 )
 
 static void driver_init_common( running_machine *machine )
 {
-	UINT8 *RAM = memory_region(machine, "maincpu");
+	UINT8 *RAM = machine->region("maincpu")->base();
 	memory_configure_bank(machine, "bank1", 0, 2, &RAM[0x0000], 0xc000);
 	timer_pulse(machine, ATTOTIME_IN_HZ(200000),NULL,0,super80_timer);	/* timer for keyboard and cassette */
 }

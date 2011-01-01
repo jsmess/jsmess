@@ -377,7 +377,7 @@ static UINT8 cannonb_bit_to_read;
 
 static MACHINE_RESET( mschamp )
 {
-	UINT8 *rom = memory_region(machine, "maincpu") + 0x10000;
+	UINT8 *rom = machine->region("maincpu")->base() + 0x10000;
 	int whichbank = input_port_read(machine, "GAME") & 1;
 
 	memory_configure_bank(machine, "bank1", 0, 2, &rom[0x0000], 0x8000);
@@ -540,7 +540,7 @@ static READ8_HANDLER( alibaba_mystery_1_r )
 {
 	/* The return value determines what the mystery item is.  Each bit corresponds
        to a question mark */
-	return mame_rand(space->machine) & 0x0f;
+	return space->machine->rand() & 0x0f;
 }
 
 
@@ -674,7 +674,7 @@ static WRITE8_HANDLER( bigbucks_bank_w )
 static READ8_HANDLER( bigbucks_question_r )
 {
 
-	UINT8 *question = memory_region(space->machine, "user1");
+	UINT8 *question = space->machine->region("user1")->base();
 	UINT8 ret;
 
 	ret = question[(bigbucks_bank << 16) | (offset ^ 0xffff)];
@@ -779,7 +779,7 @@ static WRITE8_HANDLER( rocktrv2_question_bank_w )
 
 static READ8_HANDLER( rocktrv2_question_r )
 {
-	UINT8 *question = memory_region(space->machine, "user1");
+	UINT8 *question = space->machine->region("user1")->base();
 
 	return question[offset | (rocktrv2_question_bank * 0x8000)];
 }
@@ -868,17 +868,17 @@ static READ8_HANDLER( pacman_read_nop )
 #define mspacman_disable_decode_latch(m) memory_set_bank(m, "bank1", 0)
 
 // any access to these ROM addresses disables the decoder, and all you see is the original Pac-Man code
-static READ8_HANDLER(  mspacman_disable_decode_r_0x0038 ) { mspacman_disable_decode_latch(space->machine); return memory_region(space->machine, "maincpu")[offset+0x0038]; }
-static READ8_HANDLER(  mspacman_disable_decode_r_0x03b0 ) { mspacman_disable_decode_latch(space->machine); return memory_region(space->machine, "maincpu")[offset+0x03b0]; }
-static READ8_HANDLER(  mspacman_disable_decode_r_0x1600 ) { mspacman_disable_decode_latch(space->machine); return memory_region(space->machine, "maincpu")[offset+0x1600]; }
-static READ8_HANDLER(  mspacman_disable_decode_r_0x2120 ) { mspacman_disable_decode_latch(space->machine); return memory_region(space->machine, "maincpu")[offset+0x2120]; }
-static READ8_HANDLER(  mspacman_disable_decode_r_0x3ff0 ) { mspacman_disable_decode_latch(space->machine); return memory_region(space->machine, "maincpu")[offset+0x3ff0]; }
-static READ8_HANDLER(  mspacman_disable_decode_r_0x8000 ) { mspacman_disable_decode_latch(space->machine); return memory_region(space->machine, "maincpu")[offset+0x8000]; }
-static READ8_HANDLER(  mspacman_disable_decode_r_0x97f0 ) { mspacman_disable_decode_latch(space->machine); return memory_region(space->machine, "maincpu")[offset+0x97f0]; }
+static READ8_HANDLER(  mspacman_disable_decode_r_0x0038 ) { mspacman_disable_decode_latch(space->machine); return space->machine->region("maincpu")->base()[offset+0x0038]; }
+static READ8_HANDLER(  mspacman_disable_decode_r_0x03b0 ) { mspacman_disable_decode_latch(space->machine); return space->machine->region("maincpu")->base()[offset+0x03b0]; }
+static READ8_HANDLER(  mspacman_disable_decode_r_0x1600 ) { mspacman_disable_decode_latch(space->machine); return space->machine->region("maincpu")->base()[offset+0x1600]; }
+static READ8_HANDLER(  mspacman_disable_decode_r_0x2120 ) { mspacman_disable_decode_latch(space->machine); return space->machine->region("maincpu")->base()[offset+0x2120]; }
+static READ8_HANDLER(  mspacman_disable_decode_r_0x3ff0 ) { mspacman_disable_decode_latch(space->machine); return space->machine->region("maincpu")->base()[offset+0x3ff0]; }
+static READ8_HANDLER(  mspacman_disable_decode_r_0x8000 ) { mspacman_disable_decode_latch(space->machine); return space->machine->region("maincpu")->base()[offset+0x8000]; }
+static READ8_HANDLER(  mspacman_disable_decode_r_0x97f0 ) { mspacman_disable_decode_latch(space->machine); return space->machine->region("maincpu")->base()[offset+0x97f0]; }
 static WRITE8_HANDLER( mspacman_disable_decode_w )        { mspacman_disable_decode_latch(space->machine); }
 
 // any access to these ROM addresses enables the decoder, and you'll see the Ms. Pac-Man code
-static READ8_HANDLER(  mspacman_enable_decode_r_0x3ff8 )  { mspacman_enable_decode_latch(space->machine); return memory_region(space->machine, "maincpu")[offset+0x3ff8+0x10000]; }
+static READ8_HANDLER(  mspacman_enable_decode_r_0x3ff8 )  { mspacman_enable_decode_latch(space->machine); return space->machine->region("maincpu")->base()[offset+0x3ff8+0x10000]; }
 static WRITE8_HANDLER( mspacman_enable_decode_w )         { mspacman_enable_decode_latch(space->machine); }
 
 
@@ -3165,30 +3165,30 @@ static const namco_interface namco_config =
 static MACHINE_CONFIG_START( pacman, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)
-	MDRV_CPU_PROGRAM_MAP(pacman_map)
-	MDRV_CPU_IO_MAP(writeport)
-	MDRV_CPU_VBLANK_INT_HACK(pacman_interrupt,2)
-	MDRV_WATCHDOG_VBLANK_INIT(16)
+	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)
+	MCFG_CPU_PROGRAM_MAP(pacman_map)
+	MCFG_CPU_IO_MAP(writeport)
+	MCFG_CPU_VBLANK_INT_HACK(pacman_interrupt,2)
+	MCFG_WATCHDOG_VBLANK_INIT(16)
 
 	/* video hardware */
-	MDRV_GFXDECODE(pacman)
-	MDRV_PALETTE_LENGTH(128*4)
+	MCFG_GFXDECODE(pacman)
+	MCFG_PALETTE_LENGTH(128*4)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 
-	MDRV_PALETTE_INIT(pacman)
-	MDRV_VIDEO_START(pacman)
-	MDRV_VIDEO_UPDATE(pacman)
+	MCFG_PALETTE_INIT(pacman)
+	MCFG_VIDEO_START(pacman)
+	MCFG_VIDEO_UPDATE(pacman)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("namco", NAMCO, MASTER_CLOCK/6/32)
-	MDRV_SOUND_CONFIG(namco_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("namco", NAMCO, MASTER_CLOCK/6/32)
+	MCFG_SOUND_CONFIG(namco_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -3196,8 +3196,8 @@ static MACHINE_CONFIG_DERIVED( piranha, pacman )
 
 	/* basic machine hardware */
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(piranha_portmap)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_IO_MAP(piranha_portmap)
 MACHINE_CONFIG_END
 
 
@@ -3205,8 +3205,8 @@ static MACHINE_CONFIG_DERIVED( nmouse, pacman )
 
 	/* basic machine hardware */
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(nmouse_portmap)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_IO_MAP(nmouse_portmap)
 MACHINE_CONFIG_END
 
 
@@ -3214,8 +3214,8 @@ static MACHINE_CONFIG_DERIVED( mspacman, pacman )
 
 	/* basic machine hardware */
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(mspacman_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(mspacman_map)
 MACHINE_CONFIG_END
 
 
@@ -3223,8 +3223,8 @@ static MACHINE_CONFIG_DERIVED( woodpek, pacman )
 
 	/* basic machine hardware */
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(woodpek_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(woodpek_map)
 
 MACHINE_CONFIG_END
 
@@ -3233,9 +3233,9 @@ static MACHINE_CONFIG_DERIVED( alibaba, pacman )
 
 	/* basic machine hardware */
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(alibaba_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(alibaba_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 MACHINE_CONFIG_END
 
 
@@ -3243,14 +3243,14 @@ static MACHINE_CONFIG_DERIVED( dremshpr, pacman )
 
 	/* basic machine hardware */
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(dremshpr_map)
-	MDRV_CPU_IO_MAP(dremshpr_portmap)
-	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(dremshpr_map)
+	MCFG_CPU_IO_MAP(dremshpr_portmap)
+	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	/* sound hardware */
-	MDRV_SOUND_REPLACE("namco", AY8910, 14318000/8)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_REPLACE("namco", AY8910, 14318000/8)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 
@@ -3258,12 +3258,12 @@ static MACHINE_CONFIG_DERIVED( theglobp, pacman )
 
 	/* basic machine hardware */
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(epos_map)
-	MDRV_CPU_IO_MAP(theglobp_portmap)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(epos_map)
+	MCFG_CPU_IO_MAP(theglobp_portmap)
 
-	MDRV_MACHINE_START(theglobp)
-	MDRV_MACHINE_RESET(theglobp)
+	MCFG_MACHINE_START(theglobp)
+	MCFG_MACHINE_RESET(theglobp)
 MACHINE_CONFIG_END
 
 
@@ -3271,12 +3271,12 @@ static MACHINE_CONFIG_DERIVED( acitya, pacman )
 
 	/* basic machine hardware */
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(epos_map)
-	MDRV_CPU_IO_MAP(acitya_portmap)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(epos_map)
+	MCFG_CPU_IO_MAP(acitya_portmap)
 
-	MDRV_MACHINE_START(acitya)
-	MDRV_MACHINE_RESET(acitya)
+	MCFG_MACHINE_START(acitya)
+	MCFG_MACHINE_RESET(acitya)
 MACHINE_CONFIG_END
 
 
@@ -3284,20 +3284,20 @@ static MACHINE_CONFIG_DERIVED( vanvan, pacman )
 
 	/* basic machine hardware */
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(vanvan_map)
-	MDRV_CPU_IO_MAP(vanvan_portmap)
-	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(vanvan_map)
+	MCFG_CPU_IO_MAP(vanvan_portmap)
+	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	/* video hardware */
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_VISIBLE_AREA(2*8, 34*8-1, 0*8, 28*8-1)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_VISIBLE_AREA(2*8, 34*8-1, 0*8, 28*8-1)
 
 	/* sound hardware */
-	MDRV_SOUND_REPLACE("namco", SN76496, 1789750)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
-	MDRV_SOUND_ADD("sn2", SN76496, 1789750)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+	MCFG_SOUND_REPLACE("namco", SN76496, 1789750)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+	MCFG_SOUND_ADD("sn2", SN76496, 1789750)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_CONFIG_END
 
 
@@ -3305,13 +3305,13 @@ static MACHINE_CONFIG_DERIVED( bigbucks, pacman )
 
 	/* basic machine hardware */
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(bigbucks_map)
-	MDRV_CPU_IO_MAP(bigbucks_portmap)
-	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,20)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(bigbucks_map)
+	MCFG_CPU_IO_MAP(bigbucks_portmap)
+	MCFG_CPU_VBLANK_INT_HACK(irq0_line_hold,20)
 
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
 MACHINE_CONFIG_END
 
 
@@ -3319,24 +3319,24 @@ static MACHINE_CONFIG_DERIVED( s2650games, pacman )
 
 	/* basic machine hardware */
 
-	MDRV_DEVICE_REMOVE("maincpu")
-	MDRV_CPU_ADD("maincpu", S2650, MASTER_CLOCK/6/2)	/* 2H */
-	MDRV_CPU_PROGRAM_MAP(s2650games_map)
-	MDRV_CPU_VBLANK_INT("screen", s2650_interrupt)
+	MCFG_DEVICE_REMOVE("maincpu")
+	MCFG_CPU_ADD("maincpu", S2650, MASTER_CLOCK/6/2)	/* 2H */
+	MCFG_CPU_PROGRAM_MAP(s2650games_map)
+	MCFG_CPU_VBLANK_INT("screen", s2650_interrupt)
 
-	MDRV_GFXDECODE(s2650games)
+	MCFG_GFXDECODE(s2650games)
 
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 
-	MDRV_VIDEO_START(s2650games)
-	MDRV_VIDEO_UPDATE(s2650games)
+	MCFG_VIDEO_START(s2650games)
+	MCFG_VIDEO_UPDATE(s2650games)
 
 	/* sound hardware */
-	MDRV_SOUND_REPLACE("namco", SN76496, MASTER_CLOCK/6)	/* 1H */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+	MCFG_SOUND_REPLACE("namco", SN76496, MASTER_CLOCK/6)	/* 1H */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_CONFIG_END
 
 
@@ -3344,8 +3344,8 @@ static MACHINE_CONFIG_DERIVED( drivfrcp, s2650games )
 
 	/* basic machine hardware */
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(drivfrcp_portmap)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_IO_MAP(drivfrcp_portmap)
 MACHINE_CONFIG_END
 
 
@@ -3353,8 +3353,8 @@ static MACHINE_CONFIG_DERIVED( 8bpm, s2650games )
 
 	/* basic machine hardware */
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(_8bpm_portmap)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_IO_MAP(_8bpm_portmap)
 MACHINE_CONFIG_END
 
 
@@ -3362,8 +3362,8 @@ static MACHINE_CONFIG_DERIVED( porky, s2650games )
 
 	/* basic machine hardware */
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(porky_portmap)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_IO_MAP(porky_portmap)
 MACHINE_CONFIG_END
 
 
@@ -3371,12 +3371,12 @@ static MACHINE_CONFIG_DERIVED( rocktrv2, pacman )
 
 	/* basic machine hardware */
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(rocktrv2_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(rocktrv2_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
 MACHINE_CONFIG_END
 
 
@@ -3384,12 +3384,12 @@ static MACHINE_CONFIG_DERIVED( mschamp, pacman )
 
 	/* basic machine hardware */
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(mschamp_map)
-	MDRV_CPU_IO_MAP(mschamp_portmap)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(mschamp_map)
+	MCFG_CPU_IO_MAP(mschamp_portmap)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_MACHINE_RESET(mschamp)
+	MCFG_MACHINE_RESET(mschamp)
 MACHINE_CONFIG_END
 
 
@@ -3397,7 +3397,7 @@ static MACHINE_CONFIG_DERIVED( crush4, mschamp )
 
 	/* basic machine hardware */
 
-	MDRV_GFXDECODE(crush4)
+	MCFG_GFXDECODE(crush4)
 MACHINE_CONFIG_END
 
 static const ay8910_interface crushs_ay8910_interface =
@@ -3414,14 +3414,14 @@ static MACHINE_CONFIG_DERIVED( crushs, pacman )
 
 	/* basic machine hardware */
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(crushs_map)
-	MDRV_CPU_IO_MAP(crushs_portmap)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(crushs_map)
+	MCFG_CPU_IO_MAP(crushs_portmap)
 
 	/* sound hardware */
-	MDRV_SOUND_REPLACE("namco", AY8912, 1789750)
-	MDRV_SOUND_CONFIG(crushs_ay8910_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+	MCFG_SOUND_REPLACE("namco", AY8912, 1789750)
+	MCFG_SOUND_CONFIG(crushs_ay8910_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_CONFIG_END
 
 
@@ -5349,7 +5349,7 @@ static void maketrax_rom_decode(running_machine *machine)
 {
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT8 *decrypted = auto_alloc_array(machine, UINT8, 0x4000);
-	UINT8 *rom = memory_region(machine, "maincpu");
+	UINT8 *rom = machine->region("maincpu")->base();
 
 	/* patch protection using a copy of the opcodes so ROM checksum */
 	/* tests will not fail */
@@ -5381,7 +5381,7 @@ static void korosuke_rom_decode(running_machine *machine)
 {
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT8 *decrypted = auto_alloc_array(machine, UINT8, 0x4000);
-	UINT8 *rom = memory_region(machine, "maincpu");
+	UINT8 *rom = machine->region("maincpu")->base();
 
 	/* patch protection using a copy of the opcodes so ROM checksum */
 	/* tests will not fail */
@@ -5416,10 +5416,10 @@ static DRIVER_INIT( ponpoko )
 
 	int i, j;
 	UINT8 *RAM, temp;
-	int length = memory_region_length(machine, "gfx1")/2;
+	int length = machine->region("gfx1")->bytes()/2;
 
 	/* Characters */
-	RAM = memory_region(machine, "gfx1");
+	RAM = machine->region("gfx1")->base();
 	for (i = 0;i < length;i += 0x10)
 	{
 		for (j = 0; j < 8; j++)
@@ -5431,7 +5431,7 @@ static DRIVER_INIT( ponpoko )
 	}
 
 	/* Sprites */
-	RAM = memory_region(machine, "gfx1")+length;
+	RAM = machine->region("gfx1")->base()+length;
 	for (i = 0;i < length;i += 0x20)
 	{
 		for (j = 0; j < 8; j++)
@@ -5469,7 +5469,7 @@ static DRIVER_INIT( eyes )
 	/* CPU ROMs */
 
 	/* Data lines D3 and D5 swapped */
-	RAM = memory_region(machine, "maincpu");
+	RAM = machine->region("maincpu")->base();
 	for (i = 0; i < 0x4000; i++)
 	{
 		RAM[i] = BITSWAP8(RAM[i],7,6,3,4,5,2,1,0);
@@ -5479,8 +5479,8 @@ static DRIVER_INIT( eyes )
 	/* Graphics ROMs */
 
 	/* Data lines D4 and D6 and address lines A0 and A2 are swapped */
-	RAM = memory_region(machine, "gfx1");
-	len = memory_region_length(machine, "gfx1");
+	RAM = machine->region("gfx1")->base();
+	len = machine->region("gfx1")->bytes();
 	for (i = 0;i < len;i += 8)
 		eyes_decode(&RAM[i]);
 }
@@ -5553,10 +5553,10 @@ static DRIVER_INIT( mspacman )
 	/* CPU ROMs */
 
 	/* Pac-Man code is in low bank */
-	ROM = memory_region(machine, "maincpu");
+	ROM = machine->region("maincpu")->base();
 
 	/* decrypted Ms. Pac-Man code is in high bank */
-	DROM = &memory_region(machine, "maincpu")[0x10000];
+	DROM = &machine->region("maincpu")->base()[0x10000];
 
 	/* copy ROMs into decrypted bank */
 	for (i = 0; i < 0x1000; i++)
@@ -5603,8 +5603,8 @@ static DRIVER_INIT( woodpek )
 	/* Graphics ROMs */
 
 	/* Data lines D4 and D6 and address lines A0 and A2 are swapped */
-	RAM = memory_region(machine, "gfx1");
-	len = memory_region_length(machine, "gfx1");
+	RAM = machine->region("gfx1")->base();
+	len = machine->region("gfx1")->bytes();
 	for (i = 0;i < len;i += 8)
 		eyes_decode(&RAM[i]);
 }
@@ -5621,7 +5621,7 @@ static DRIVER_INIT( jumpshot )
 
 static DRIVER_INIT( drivfrcp )
 {
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 	memory_set_bankptr(machine, "bank1", &ROM[0 * 0x2000]);
 	memory_set_bankptr(machine, "bank2", &ROM[1 * 0x2000]);
 	memory_set_bankptr(machine, "bank3", &ROM[2 * 0x2000]);
@@ -5630,7 +5630,7 @@ static DRIVER_INIT( drivfrcp )
 
 static DRIVER_INIT( 8bpm )
 {
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 	int i;
 
 	/* Data lines D0 and D6 swapped */
@@ -5647,7 +5647,7 @@ static DRIVER_INIT( 8bpm )
 
 static DRIVER_INIT( porky )
 {
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 	int i;
 
 	/* Data lines D0 and D4 swapped */
@@ -5670,7 +5670,7 @@ static DRIVER_INIT( porky )
 static DRIVER_INIT( rocktrv2 )
 {
 	/* hack to pass the rom check for the bad rom */
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 
 	ROM[0x7ffe] = 0xa7;
 	ROM[0x7fee] = 0x6d;
@@ -5682,7 +5682,7 @@ socket and run through the 74298.  Clock is tied to system clock.  */
 static DRIVER_INIT( mspacmbe )
 {
 	UINT8 temp;
-	UINT8 *RAM = memory_region(machine, "maincpu");
+	UINT8 *RAM = machine->region("maincpu")->base();
 	int i;
 
 	/* Address lines A1 and A0 swapped if A2=0 */

@@ -154,35 +154,35 @@ GFXDECODE_END
 /* Machine driver */
 static MACHINE_CONFIG_START( irisha, irisha_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", I8080, XTAL_16MHz / 9)
-	MDRV_CPU_PROGRAM_MAP(irisha_mem)
-	MDRV_CPU_IO_MAP(irisha_io)
+	MCFG_CPU_ADD("maincpu", I8080, XTAL_16MHz / 9)
+	MCFG_CPU_PROGRAM_MAP(irisha_mem)
+	MCFG_CPU_IO_MAP(irisha_io)
 
-	MDRV_MACHINE_START( irisha )
-	MDRV_MACHINE_RESET( irisha )
+	MCFG_MACHINE_START( irisha )
+	MCFG_MACHINE_RESET( irisha )
 
-	MDRV_I8255A_ADD( "ppi8255", irisha_ppi8255_interface )
+	MCFG_I8255A_ADD( "ppi8255", irisha_ppi8255_interface )
 
-	MDRV_PIT8253_ADD( "pit8253", irisha_pit8253_intf )
+	MCFG_PIT8253_ADD( "pit8253", irisha_pit8253_intf )
 
-	MDRV_PIC8259_ADD( "pic8259", irisha_pic8259_config )
+	MCFG_PIC8259_ADD( "pic8259", irisha_pic8259_config )
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(50)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(320, 200)
-	MDRV_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
-	MDRV_GFXDECODE(irisha)
-	MDRV_PALETTE_LENGTH(2)
-	MDRV_PALETTE_INIT(black_and_white)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(320, 200)
+	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
+	MCFG_GFXDECODE(irisha)
+	MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_INIT(black_and_white)
 
-	MDRV_VIDEO_START(irisha)
-	MDRV_VIDEO_UPDATE(irisha)
+	MCFG_VIDEO_START(irisha)
+	MCFG_VIDEO_UPDATE(irisha)
 
 	/* uart */
-	MDRV_MSM8251_ADD("uart", default_msm8251_interface)
+	MCFG_MSM8251_ADD("uart", default_msm8251_interface)
 MACHINE_CONFIG_END
 
 /* ROM definition */

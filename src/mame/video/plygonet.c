@@ -106,7 +106,7 @@ VIDEO_START( polygonet )
 	assert(state->ttl_gfx_index != MAX_GFX_ELEMENTS);
 
 	/* decode the ttl layer's gfx */
-	machine->gfx[state->ttl_gfx_index] = gfx_element_alloc(machine, &charlayout, memory_region(machine, "gfx1"), machine->total_colors() / 16, 0);
+	machine->gfx[state->ttl_gfx_index] = gfx_element_alloc(machine, &charlayout, machine->region("gfx1")->base(), machine->total_colors() / 16, 0);
 
 	/* create the tilemap */
 	state->ttl_tilemap = tilemap_create(machine, ttl_get_tile_info, plygonet_scan,  8, 8, 64, 32);
@@ -126,7 +126,7 @@ VIDEO_START( polygonet )
 VIDEO_UPDATE( polygonet )
 {
 	polygonet_state *state = screen->machine->driver_data<polygonet_state>();
-	running_device *k053936 = screen->machine->device("k053936");
+	device_t *k053936 = screen->machine->device("k053936");
 	bitmap_fill(screen->machine->priority_bitmap, NULL, 0);
 	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 

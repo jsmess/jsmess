@@ -141,8 +141,8 @@ static MACHINE_RESET( segac2 )
 
 	/* determine how many sound banks */
 	sound_banks = 0;
-	if (memory_region(machine, "upd"))
-		sound_banks = memory_region_length(machine, "upd") / 0x20000;
+	if (machine->region("upd")->base())
+		sound_banks = machine->region("upd")->bytes() / 0x20000;
 
 	/* reset the protection */
 	prot_write_buf = 0;
@@ -430,7 +430,7 @@ static WRITE16_HANDLER( io_chip_w )
 			}
 			if (sound_banks > 1)
 			{
-				running_device *upd = space->machine->device("upd");
+				device_t *upd = space->machine->device("upd");
 				newbank = (data >> 2) & (sound_banks - 1);
 				upd7759_set_bank_base(upd, newbank * 0x20000);
 			}
@@ -440,7 +440,7 @@ static WRITE16_HANDLER( io_chip_w )
 		case 0x1c/2:
 			if (sound_banks > 1)
 			{
-				running_device *upd = space->machine->device("upd");
+				device_t *upd = space->machine->device("upd");
 				upd7759_reset_w(upd, (data >> 1) & 1);
 			}
 			break;
@@ -1314,7 +1314,7 @@ INPUT_PORTS_END
     Sound interfaces
 ******************************************************************************/
 
-static void  segac2_irq2_interrupt(running_device *device, int state)
+static void  segac2_irq2_interrupt(device_t *device, int state)
 {
 	//printf("sound irq %d\n", state);
 	cputag_set_input_line(device->machine, "maincpu", 2, state ? ASSERT_LINE : CLEAR_LINE);
@@ -1365,41 +1365,41 @@ static VIDEO_UPDATE(segac2_new)
 static MACHINE_CONFIG_START( segac, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, XL2_CLOCK/6)
-	MDRV_CPU_PROGRAM_MAP(main_map)
+	MCFG_CPU_ADD("maincpu", M68000, XL2_CLOCK/6)
+	MCFG_CPU_PROGRAM_MAP(main_map)
 
-	MDRV_MACHINE_START(segac2)
-	MDRV_MACHINE_RESET(segac2)
-	MDRV_NVRAM_ADD_RANDOM_FILL("nvram")
+	MCFG_MACHINE_START(segac2)
+	MCFG_MACHINE_RESET(segac2)
+	MCFG_NVRAM_ADD_RANDOM_FILL("nvram")
 
-	MDRV_FRAGMENT_ADD(megadriv_timers)
+	MCFG_FRAGMENT_ADD(megadriv_timers)
 
 	/* video hardware */
-	//MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS | VIDEO_HAS_HIGHLIGHTS)
+	//MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS | VIDEO_HAS_HIGHLIGHTS)
 
-	MDRV_SCREEN_ADD("megadriv", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB15)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0)) // Vblank handled manually.
-	MDRV_SCREEN_SIZE(64*8, 64*8)
-	MDRV_SCREEN_VISIBLE_AREA(0, 32*8-1, 0, 28*8-1)
+	MCFG_SCREEN_ADD("megadriv", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB15)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0)) // Vblank handled manually.
+	MCFG_SCREEN_SIZE(64*8, 64*8)
+	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 0, 28*8-1)
 
-	MDRV_PALETTE_LENGTH(2048)
+	MCFG_PALETTE_LENGTH(2048)
 
-	MDRV_VIDEO_START(segac2_new)
-	MDRV_VIDEO_UPDATE(segac2_new)
-	MDRV_VIDEO_EOF( megadriv )
+	MCFG_VIDEO_START(segac2_new)
+	MCFG_VIDEO_UPDATE(segac2_new)
+	MCFG_VIDEO_EOF( megadriv )
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM3438, XL2_CLOCK/7)
-	MDRV_SOUND_CONFIG(ym3438_intf)
-	MDRV_SOUND_ROUTE(0, "mono", 0.50)
+	MCFG_SOUND_ADD("ymsnd", YM3438, XL2_CLOCK/7)
+	MCFG_SOUND_CONFIG(ym3438_intf)
+	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	/* right channel not connected */
 
-	MDRV_SOUND_ADD("snsnd", SN76496, XL2_CLOCK/15)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("snsnd", SN76496, XL2_CLOCK/15)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 
@@ -1408,8 +1408,8 @@ static MACHINE_CONFIG_DERIVED( segac2, segac )
 	/* basic machine hardware */
 
 	/* sound hardware */
-	MDRV_SOUND_ADD("upd", UPD7759, XL1_CLOCK)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("upd", UPD7759, XL1_CLOCK)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 
@@ -1834,7 +1834,7 @@ it should be, otherwise I don't see how the formula could be computed.
 
 static void segac2_common_init(running_machine* machine, int (*func)(int in))
 {
-	running_device *upd = machine->device("upd");
+	device_t *upd = machine->device("upd");
 
 	DRIVER_INIT_CALL( megadriv_c2 );
 
@@ -2169,7 +2169,7 @@ static DRIVER_INIT( ichirjbl )
 {
 
 	/* when did this actually work? - the protection is patched but the new check fails? */
-	UINT16 *rom = (UINT16 *)memory_region(machine, "maincpu");
+	UINT16 *rom = (UINT16 *)machine->region("maincpu")->base();
 	rom[0x390/2] = 0x6600;
 
 	segac2_common_init(machine, NULL);

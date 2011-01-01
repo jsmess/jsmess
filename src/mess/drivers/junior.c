@@ -207,17 +207,17 @@ static MACHINE_RESET(junior)
 
 static MACHINE_CONFIG_START( junior, junior_state )
     /* basic machine hardware */
-    MDRV_CPU_ADD("maincpu",M6502, XTAL_1MHz)
-    MDRV_CPU_PROGRAM_MAP(junior_mem)
-	MDRV_QUANTUM_TIME(HZ(50))
+    MCFG_CPU_ADD("maincpu",M6502, XTAL_1MHz)
+    MCFG_CPU_PROGRAM_MAP(junior_mem)
+	MCFG_QUANTUM_TIME(HZ(50))
 
-	MDRV_MACHINE_START( junior )
-    MDRV_MACHINE_RESET(junior)
+	MCFG_MACHINE_START( junior )
+    MCFG_MACHINE_RESET(junior)
 
     /* video hardware */
-    MDRV_DEFAULT_LAYOUT( layout_junior )
+    MCFG_DEFAULT_LAYOUT( layout_junior )
 
-    MDRV_RIOT6532_ADD("riot", XTAL_1MHz, junior_riot_interface)
+    MCFG_RIOT6532_ADD("riot", XTAL_1MHz, junior_riot_interface)
 MACHINE_CONFIG_END
 
 

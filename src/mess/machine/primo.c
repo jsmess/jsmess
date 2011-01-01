@@ -52,19 +52,19 @@ static void primo_update_memory(running_machine *machine)
 	{
 		case 0x00:	/* Original ROM */
 			memory_unmap_write(space, 0x0000, 0x3fff, 0, 0);
-			memory_set_bankptr(machine,"bank1", memory_region(machine, "maincpu")+0x10000);
+			memory_set_bankptr(machine,"bank1", machine->region("maincpu")->base()+0x10000);
 			break;
 		case 0x01:	/* EPROM extension 1 */
 			memory_unmap_write(space, 0x0000, 0x3fff, 0, 0);
-			memory_set_bankptr(machine,"bank1", memory_region(machine, "maincpu")+0x14000);
+			memory_set_bankptr(machine,"bank1", machine->region("maincpu")->base()+0x14000);
 			break;
 		case 0x02:	/* RAM */
 			memory_install_write_bank(space, 0x0000, 0x3fff, 0, 0, "bank1");
-			memory_set_bankptr(machine,"bank1", memory_region(machine, "maincpu"));
+			memory_set_bankptr(machine,"bank1", machine->region("maincpu")->base());
 			break;
 		case 0x03:	/* EPROM extension 2 */
 			memory_unmap_write(space, 0x0000, 0x3fff, 0, 0);
-			memory_set_bankptr(machine,"bank1", memory_region(machine, "maincpu")+0x18000);
+			memory_set_bankptr(machine,"bank1", machine->region("maincpu")->base()+0x18000);
 			break;
 	}
 	logerror ("Memory update: %02x\n", state->port_FD);
@@ -105,7 +105,7 @@ READ8_HANDLER( primo_be_1_r )
 READ8_HANDLER( primo_be_2_r )
 {
 	UINT8 data = 0xff;
-	running_device *serbus = space->machine->device("serial_bus");
+	device_t *serbus = space->machine->device("serial_bus");
 
 	// bit 7, 6 - not used
 
@@ -136,7 +136,7 @@ READ8_HANDLER( primo_be_2_r )
 WRITE8_HANDLER( primo_ki_1_w )
 {
 	primo_state *state = space->machine->driver_data<primo_state>();
-	running_device *speaker = space->machine->device("speaker");
+	device_t *speaker = space->machine->device("speaker");
 	// bit 7 - NMI generator enable/disable
 	state->nmi = (data & 0x80) ? 1 : 0;
 
@@ -173,7 +173,7 @@ WRITE8_HANDLER( primo_ki_1_w )
 
 WRITE8_HANDLER( primo_ki_2_w )
 {
-	running_device *serbus = space->machine->device("serial_bus");
+	device_t *serbus = space->machine->device("serial_bus");
 
 	// bit 7, 6 - not used
 
@@ -276,7 +276,7 @@ static void primo_setup_pss (running_machine *machine, UINT8* snapshot_data, UIN
 {
 	primo_state *state = machine->driver_data<primo_state>();
 	int i;
-	running_device *speaker = machine->device("speaker");
+	device_t *speaker = machine->device("speaker");
 
 	/* Z80 registers */
 

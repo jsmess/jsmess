@@ -77,40 +77,40 @@ static const floppy_config apple3_floppy_config =
 
 static MACHINE_CONFIG_START( apple3, apple3_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6502, 2000000)        /* 2 MHz */
-	MDRV_CPU_PROGRAM_MAP(apple3_map)
-	MDRV_CPU_CONFIG( apple3_m6502_interface )
-	MDRV_CPU_PERIODIC_INT(apple3_interrupt, 192)
-	MDRV_QUANTUM_TIME(HZ(60))
+	MCFG_CPU_ADD("maincpu", M6502, 2000000)        /* 2 MHz */
+	MCFG_CPU_PROGRAM_MAP(apple3_map)
+	MCFG_CPU_CONFIG( apple3_m6502_interface )
+	MCFG_CPU_PERIODIC_INT(apple3_interrupt, 192)
+	MCFG_QUANTUM_TIME(HZ(60))
 
-	MDRV_MACHINE_RESET( apple3 )
+	MCFG_MACHINE_RESET( apple3 )
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(280*2, 192)
-	MDRV_SCREEN_VISIBLE_AREA(0, (280*2)-1,0,192-1)
-	MDRV_PALETTE_LENGTH(16)
-	MDRV_PALETTE_INIT( apple2 )
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(280*2, 192)
+	MCFG_SCREEN_VISIBLE_AREA(0, (280*2)-1,0,192-1)
+	MCFG_PALETTE_LENGTH(16)
+	MCFG_PALETTE_INIT( apple2 )
 
-	MDRV_VIDEO_START( apple3 )
-	MDRV_VIDEO_UPDATE( apple3 )
+	MCFG_VIDEO_START( apple3 )
+	MCFG_VIDEO_UPDATE( apple3 )
 
 	/* fdc */
-	MDRV_APPLEFDC_ADD("fdc", apple3_fdc_interface)
-	MDRV_FLOPPY_APPLE_4_DRIVES_ADD(apple3_floppy_config,1,4)
+	MCFG_APPLEFDC_ADD("fdc", apple3_fdc_interface)
+	MCFG_FLOPPY_APPLE_4_DRIVES_ADD(apple3_floppy_config,1,4)
 	/* acia */
-	MDRV_ACIA6551_ADD("acia")
+	MCFG_ACIA6551_ADD("acia")
 
 	/* via */
-	MDRV_VIA6522_ADD("via6522_0", 1000000, apple3_via_0_intf)
-	MDRV_VIA6522_ADD("via6522_1", 2000000, apple3_via_1_intf)
+	MCFG_VIA6522_ADD("via6522_0", 1000000, apple3_via_0_intf)
+	MCFG_VIA6522_ADD("via6522_1", 2000000, apple3_via_1_intf)
 
 	/* internal ram */
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("512K")
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("512K")
 MACHINE_CONFIG_END
 
 

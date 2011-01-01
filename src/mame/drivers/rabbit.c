@@ -486,13 +486,13 @@ static READ32_HANDLER( rabbit_tilemap3_r )
 
 static READ32_HANDLER( randomrabbits )
 {
-	return mame_rand(space->machine);
+	return space->machine->rand();
 }
 
 /* rom bank is used when testing roms, not currently hooked up */
 static WRITE32_HANDLER ( rabbit_rombank_w )
 {
-	UINT8 *dataroms = memory_region(space->machine, "gfx1");
+	UINT8 *dataroms = space->machine->region("gfx1")->base();
 #if 0
 	int bank;
 	printf("rabbit rombank %08x\n",data);
@@ -591,7 +591,7 @@ static TIMER_CALLBACK( rabbit_blit_done )
 
 static void rabbit_do_blit(running_machine *machine)
 {
-	UINT8 *blt_data = memory_region(machine, "gfx1");
+	UINT8 *blt_data = machine->region("gfx1")->base();
 	int blt_source = (rabbit_blitterregs[0]&0x000fffff)>>0;
 	int blt_column = (rabbit_blitterregs[1]&0x00ff0000)>>16;
 	int blt_line   = (rabbit_blitterregs[1]&0x000000ff);
@@ -936,27 +936,27 @@ static INTERRUPT_GEN( rabbit_interrupts )
 }
 
 static MACHINE_CONFIG_START( rabbit, driver_device )
-	MDRV_CPU_ADD("maincpu",M68EC020,24000000) /* 24 MHz */
-	MDRV_CPU_PROGRAM_MAP(rabbit_map)
-	MDRV_CPU_VBLANK_INT_HACK(rabbit_interrupts,262)
-	MDRV_EEPROM_93C46_ADD("eeprom")
+	MCFG_CPU_ADD("maincpu",M68EC020,24000000) /* 24 MHz */
+	MCFG_CPU_PROGRAM_MAP(rabbit_map)
+	MCFG_CPU_VBLANK_INT_HACK(rabbit_interrupts,262)
+	MCFG_EEPROM_93C46_ADD("eeprom")
 
-	MDRV_GFXDECODE(rabbit)
+	MCFG_GFXDECODE(rabbit)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*16, 64*16)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
-//  MDRV_SCREEN_VISIBLE_AREA(0*8, 64*16-1, 0*16, 64*16-1)
-//  MDRV_SCREEN_VISIBLE_AREA(0*8, 20*16-1, 32*16, 48*16-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(64*16, 64*16)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
+//  MCFG_SCREEN_VISIBLE_AREA(0*8, 64*16-1, 0*16, 64*16-1)
+//  MCFG_SCREEN_VISIBLE_AREA(0*8, 20*16-1, 32*16, 48*16-1)
 
-	MDRV_PALETTE_LENGTH(0x4000)
-	MDRV_PALETTE_INIT( all_black ) // the status bar palette doesn't get transfered (or our colour select is wrong).. more obvious when it's black than in 'MAME default' colours
+	MCFG_PALETTE_LENGTH(0x4000)
+	MCFG_PALETTE_INIT( all_black ) // the status bar palette doesn't get transfered (or our colour select is wrong).. more obvious when it's black than in 'MAME default' colours
 
-	MDRV_VIDEO_START(rabbit)
-	MDRV_VIDEO_UPDATE(rabbit)
+	MCFG_VIDEO_START(rabbit)
+	MCFG_VIDEO_UPDATE(rabbit)
 MACHINE_CONFIG_END
 
 

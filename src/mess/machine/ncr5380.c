@@ -525,17 +525,17 @@ void ncr5380_device::ncr5380_scan_devices()
 	}
 }
 
-void ncr5380_read_data(running_device *dev, UINT8 bytes, UINT8 *pData)
+void ncr5380_read_data(device_t *dev, UINT8 bytes, UINT8 *pData)
 {
 	return downcast<ncr5380_device*>(dev)->ncr5380_read_data(bytes, pData);
 }
 
-void ncr5380_write_data(running_device *dev, UINT8 bytes, UINT8 *pData)
+void ncr5380_write_data(device_t *dev, UINT8 bytes, UINT8 *pData)
 {
 	downcast<ncr5380_device*>(dev)->ncr5380_write_data(bytes, pData);
 }
 
-void ncr5380_scan_devices(running_device *dev)
+void ncr5380_scan_devices(device_t *dev)
 {
 	downcast<ncr5380_device*>(dev)->ncr5380_scan_devices();
 }

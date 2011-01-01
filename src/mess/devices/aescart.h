@@ -23,11 +23,11 @@ DECLARE_LEGACY_CART_SLOT_DEVICE(AES_CARTRIDGE_PCB_STD, aes_cartridge_pcb_std);
 struct _aescartridge_t
 {
 	/* PCB device associated to this cartridge. If NULL, the slot is empty. */
-	running_device *pcb;
+	device_t *pcb;
 };
 typedef struct _aescartridge_t aescartridge_t;
 
-#define MDRV_AES_CARTRIDGE_ADD(_tag) \
-	MDRV_DEVICE_ADD(_tag, AES_MULTICART, 0)
+#define MCFG_AES_CARTRIDGE_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, AES_MULTICART, 0)
 
 #endif /* __AESCART_H__ */

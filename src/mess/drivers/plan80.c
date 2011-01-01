@@ -47,7 +47,7 @@ static VIDEO_START( plan80 )
 static VIDEO_UPDATE( plan80 )
 {
 	plan80_state *state = screen->machine->driver_data<plan80_state>();
-	UINT8 *gfx = memory_region(screen->machine, "gfx");
+	UINT8 *gfx = screen->machine->region("gfx")->base();
 	int x,y,j,b;
 	UINT16 addr;
 
@@ -92,25 +92,25 @@ GFXDECODE_END
 
 static MACHINE_CONFIG_START( plan80, plan80_state )
     /* basic machine hardware */
-    MDRV_CPU_ADD("maincpu",I8080, 2048000)
-    MDRV_CPU_PROGRAM_MAP(plan80_mem)
-    MDRV_CPU_IO_MAP(plan80_io)
+    MCFG_CPU_ADD("maincpu",I8080, 2048000)
+    MCFG_CPU_PROGRAM_MAP(plan80_mem)
+    MCFG_CPU_IO_MAP(plan80_io)
 
-    MDRV_MACHINE_RESET(plan80)
+    MCFG_MACHINE_RESET(plan80)
 
     /* video hardware */
-    MDRV_SCREEN_ADD("screen", RASTER)
-    MDRV_SCREEN_REFRESH_RATE(50)
-    MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-    MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-    MDRV_SCREEN_SIZE(48*6, 32*8)
-    MDRV_SCREEN_VISIBLE_AREA(0, 48*6-1, 0, 32*8-1)
-	MDRV_GFXDECODE(plan80)
-    MDRV_PALETTE_LENGTH(2)
-    MDRV_PALETTE_INIT(black_and_white)
+    MCFG_SCREEN_ADD("screen", RASTER)
+    MCFG_SCREEN_REFRESH_RATE(50)
+    MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+    MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+    MCFG_SCREEN_SIZE(48*6, 32*8)
+    MCFG_SCREEN_VISIBLE_AREA(0, 48*6-1, 0, 32*8-1)
+	MCFG_GFXDECODE(plan80)
+    MCFG_PALETTE_LENGTH(2)
+    MCFG_PALETTE_INIT(black_and_white)
 
-    MDRV_VIDEO_START(plan80)
-    MDRV_VIDEO_UPDATE(plan80)
+    MCFG_VIDEO_START(plan80)
+    MCFG_VIDEO_UPDATE(plan80)
 MACHINE_CONFIG_END
 
 /* ROM definition */

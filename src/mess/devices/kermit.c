@@ -399,7 +399,7 @@ static void kermit_reset( kermit* state )
 
 
 /* emulated machine sends a byte to the outside (us) */
-void kermit_receive_byte( running_device *device, UINT8 data )
+void kermit_receive_byte( device_t *device, UINT8 data )
 {
 	kermit* state = (kermit*) downcast<legacy_device_base *>(device)->token();
 
@@ -608,7 +608,7 @@ void kermit_receive_byte( running_device *device, UINT8 data )
 	}
 }
 
-void kermit_byte_transmitted( running_device *device )
+void kermit_byte_transmitted( device_t *device )
 {
 	kermit* state = (kermit*) downcast<legacy_device_base *>(device)->token();
 

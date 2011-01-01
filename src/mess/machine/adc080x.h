@@ -27,28 +27,28 @@
 #ifndef __ADC080X__
 #define __ADC080X__
 
-typedef void (*adc080x_on_eoc_changed_func) (running_device *device, int level);
-#define ADC080X_ON_EOC_CHANGED(name) void name(running_device *device, int level)
+typedef void (*adc080x_on_eoc_changed_func) (device_t *device, int level);
+#define ADC080X_ON_EOC_CHANGED(name) void name(device_t *device, int level)
 
-typedef double (*adc080x_vref_pos_read) (running_device *device);
-#define ADC080X_VREF_POSITIVE_READ(name) double name(running_device *device)
+typedef double (*adc080x_vref_pos_read) (device_t *device);
+#define ADC080X_VREF_POSITIVE_READ(name) double name(device_t *device)
 
-typedef double (*adc080x_vref_neg_read) (running_device *device);
-#define ADC080X_VREF_NEGATIVE_READ(name) double name(running_device *device)
+typedef double (*adc080x_vref_neg_read) (device_t *device);
+#define ADC080X_VREF_NEGATIVE_READ(name) double name(device_t *device)
 
-typedef double (*adc080x_input_read) (running_device *device, int channel);
-#define ADC080X_INPUT_READ(name) double name(running_device *device, int channel)
+typedef double (*adc080x_input_read) (device_t *device, int channel);
+#define ADC080X_INPUT_READ(name) double name(device_t *device, int channel)
 
 DECLARE_LEGACY_DEVICE(ADC0808, adc0808);
 DECLARE_LEGACY_DEVICE(ADC0809, adc0809);
 
-#define MDRV_ADC0808_ADD(_tag, _clock, _intrf) \
-	MDRV_DEVICE_ADD(_tag, ADC0808, _clock) \
-	MDRV_DEVICE_CONFIG(_intrf)
+#define MCFG_ADC0808_ADD(_tag, _clock, _intrf) \
+	MCFG_DEVICE_ADD(_tag, ADC0808, _clock) \
+	MCFG_DEVICE_CONFIG(_intrf)
 
-#define MDRV_ADC0809_ADD(_tag, _clock, _intrf) \
-	MDRV_DEVICE_ADD(_tag, ADC0809, _clock) \
-	MDRV_DEVICE_CONFIG(_intrf)
+#define MCFG_ADC0809_ADD(_tag, _clock, _intrf) \
+	MCFG_DEVICE_ADD(_tag, ADC0809, _clock) \
+	MCFG_DEVICE_CONFIG(_intrf)
 
 
 /* interface */
@@ -70,10 +70,10 @@ struct _adc080x_interface
 #define ADC080X_INTERFACE(name) const adc080x_interface (name)=
 
 /* address latching */
-void adc080x_ale_w(running_device *device, int level, int address);
+void adc080x_ale_w(device_t *device, int level, int address);
 
 /* start conversion */
-void adc080x_start_w(running_device *device, int level);
+void adc080x_start_w(device_t *device, int level);
 
 /* conversion data */
 READ8_DEVICE_HANDLER( adc080x_data_r );

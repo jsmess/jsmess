@@ -203,50 +203,50 @@ GFXDECODE_END
 /* machine definition */
 static MACHINE_CONFIG_START( dai, dai_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", I8080, 2000000)
-	MDRV_CPU_PROGRAM_MAP(dai_mem)
-	MDRV_CPU_IO_MAP(dai_io)
-	MDRV_QUANTUM_TIME(HZ(60))
+	MCFG_CPU_ADD("maincpu", I8080, 2000000)
+	MCFG_CPU_PROGRAM_MAP(dai_mem)
+	MCFG_CPU_IO_MAP(dai_io)
+	MCFG_QUANTUM_TIME(HZ(60))
 
-	MDRV_MACHINE_START( dai )
-	MDRV_MACHINE_RESET( dai )
+	MCFG_MACHINE_START( dai )
+	MCFG_MACHINE_RESET( dai )
 
-	MDRV_PIT8253_ADD( "pit8253", dai_pit8253_intf )
+	MCFG_PIT8253_ADD( "pit8253", dai_pit8253_intf )
 
-	MDRV_I8255A_ADD( "ppi8255", dai_ppi82555_intf )
+	MCFG_I8255A_ADD( "ppi8255", dai_ppi82555_intf )
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(50)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(1056, 542)
-	MDRV_SCREEN_VISIBLE_AREA(0, 1056-1, 0, 302-1)
-	MDRV_GFXDECODE(dai)
-	MDRV_PALETTE_LENGTH(sizeof (dai_palette) / 3)
-	MDRV_PALETTE_INIT( dai )
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(1056, 542)
+	MCFG_SCREEN_VISIBLE_AREA(0, 1056-1, 0, 302-1)
+	MCFG_GFXDECODE(dai)
+	MCFG_PALETTE_LENGTH(sizeof (dai_palette) / 3)
+	MCFG_PALETTE_INIT( dai )
 
-	MDRV_VIDEO_START( dai )
-	MDRV_VIDEO_UPDATE( dai )
+	MCFG_VIDEO_START( dai )
+	MCFG_VIDEO_UPDATE( dai )
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_WAVE_ADD("wave", "cassette")
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MDRV_SOUND_ADD("custom", DAI, 0)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 0.50)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 0.50)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_WAVE_ADD("wave", "cassette")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SOUND_ADD("custom", DAI, 0)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
 	/* cassette */
-	MDRV_CASSETTE_ADD( "cassette", dai_cassette_config )
+	MCFG_CASSETTE_ADD( "cassette", dai_cassette_config )
 
 	/* tms5501 */
-	MDRV_TMS5501_ADD( "tms5501", dai_tms5501_interface )
+	MCFG_TMS5501_ADD( "tms5501", dai_tms5501_interface )
 
 	/* internal ram */
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("48K")
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("48K")
 MACHINE_CONFIG_END
 
 #define io_dai		io_NULL

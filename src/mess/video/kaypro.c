@@ -338,5 +338,5 @@ VIDEO_START( kaypro )
 {
 	kaypro_state *state = machine->driver_data<kaypro_state>();
 	state->mc6845 = machine->device("crtc");
-	state->FNT = memory_region(machine, "gfx1");
+	state->FNT = machine->region("gfx1")->base();
 }

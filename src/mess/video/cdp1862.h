@@ -38,9 +38,9 @@
 
 DECLARE_LEGACY_DEVICE(CDP1862, cdp1862);
 
-#define MDRV_CDP1862_ADD(_tag, _clock, _config) \
-	MDRV_DEVICE_ADD(_tag, CDP1862, _clock) \
-	MDRV_DEVICE_CONFIG(_config)
+#define MCFG_CDP1862_ADD(_tag, _clock, _config) \
+	MCFG_DEVICE_ADD(_tag, CDP1862, _clock) \
+	MCFG_DEVICE_CONFIG(_config)
 
 #define CDP1862_INTERFACE(name) \
 	const cdp1862_interface (name) =
@@ -83,6 +83,6 @@ WRITE_LINE_DEVICE_HANDLER( cdp1862_con_w ) ATTR_NONNULL(1);
 WRITE8_DEVICE_HANDLER( cdp1862_dma_w ) ATTR_NONNULL(1);
 
 /* screen update */
-void cdp1862_update(running_device *device, bitmap_t *bitmap, const rectangle *cliprect) ATTR_NONNULL(1) ATTR_NONNULL(2) ATTR_NONNULL(3);
+void cdp1862_update(device_t *device, bitmap_t *bitmap, const rectangle *cliprect) ATTR_NONNULL(1) ATTR_NONNULL(2) ATTR_NONNULL(3);
 
 #endif

@@ -36,7 +36,7 @@ DECLARE_LEGACY_IMAGE_DEVICE(CARTSLOT, cartslot);
 typedef struct _cartslot_t cartslot_t;
 struct _cartslot_t
 {
-	running_device *pcb_device;
+	device_t *pcb_device;
 	multicart_t *mc;
 };
 
@@ -68,52 +68,52 @@ struct _cartslot_config
 ***************************************************************************/
 
 /* accesses the PCB associated with this cartslot */
-running_device *cartslot_get_pcb(running_device *device);
+device_t *cartslot_get_pcb(device_t *device);
 
 /* accesses a particular socket */
-void *cartslot_get_socket(running_device *device, const char *socket_name);
+void *cartslot_get_socket(device_t *device, const char *socket_name);
 
 /* accesses a particular socket; gets the length of the associated resource */
-int cartslot_get_resource_length(running_device *device, const char *socket_name);
+int cartslot_get_resource_length(device_t *device, const char *socket_name);
 
 
 /***************************************************************************
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MDRV_CARTSLOT_ADD(_tag) 										\
-	MDRV_DEVICE_ADD(_tag, CARTSLOT, 0)									\
+#define MCFG_CARTSLOT_ADD(_tag) 										\
+	MCFG_DEVICE_ADD(_tag, CARTSLOT, 0)									\
 
-#define MDRV_CARTSLOT_MODIFY(_tag)										\
-	MDRV_DEVICE_MODIFY(_tag)									\
+#define MCFG_CARTSLOT_MODIFY(_tag)										\
+	MCFG_DEVICE_MODIFY(_tag)									\
 
-#define MDRV_CARTSLOT_EXTENSION_LIST(_extensions)						\
-	MDRV_DEVICE_CONFIG_DATAPTR(cartslot_config, extensions, _extensions)
+#define MCFG_CARTSLOT_EXTENSION_LIST(_extensions)						\
+	MCFG_DEVICE_CONFIG_DATAPTR(cartslot_config, extensions, _extensions)
 
-#define MDRV_CARTSLOT_NOT_MANDATORY										\
-	MDRV_DEVICE_CONFIG_DATA32(cartslot_config, must_be_loaded, FALSE)
+#define MCFG_CARTSLOT_NOT_MANDATORY										\
+	MCFG_DEVICE_CONFIG_DATA32(cartslot_config, must_be_loaded, FALSE)
 
-#define MDRV_CARTSLOT_MANDATORY											\
-	MDRV_DEVICE_CONFIG_DATA32(cartslot_config, must_be_loaded, TRUE)
+#define MCFG_CARTSLOT_MANDATORY											\
+	MCFG_DEVICE_CONFIG_DATA32(cartslot_config, must_be_loaded, TRUE)
 
-#define MDRV_CARTSLOT_START(_start)										\
-	MDRV_DEVICE_CONFIG_DATAPTR(cartslot_config, device_start, DEVICE_START_NAME(_start))
+#define MCFG_CARTSLOT_START(_start)										\
+	MCFG_DEVICE_CONFIG_DATAPTR(cartslot_config, device_start, DEVICE_START_NAME(_start))
 
-#define MDRV_CARTSLOT_LOAD(_load)										\
-	MDRV_DEVICE_CONFIG_DATAPTR(cartslot_config, device_load, DEVICE_IMAGE_LOAD_NAME(_load))
+#define MCFG_CARTSLOT_LOAD(_load)										\
+	MCFG_DEVICE_CONFIG_DATAPTR(cartslot_config, device_load, DEVICE_IMAGE_LOAD_NAME(_load))
 
-#define MDRV_CARTSLOT_UNLOAD(_unload)									\
-	MDRV_DEVICE_CONFIG_DATAPTR(cartslot_config, device_unload, DEVICE_IMAGE_UNLOAD_NAME(_unload))
+#define MCFG_CARTSLOT_UNLOAD(_unload)									\
+	MCFG_DEVICE_CONFIG_DATAPTR(cartslot_config, device_unload, DEVICE_IMAGE_UNLOAD_NAME(_unload))
 
-#define MDRV_CARTSLOT_PARTIALHASH(_partialhash)							\
-	MDRV_DEVICE_CONFIG_DATAPTR(cartslot_config, device_partialhash, _partialhash)
+#define MCFG_CARTSLOT_PARTIALHASH(_partialhash)							\
+	MCFG_DEVICE_CONFIG_DATAPTR(cartslot_config, device_partialhash, _partialhash)
 
-#define MDRV_CARTSLOT_PCBTYPE(_index, _pcb_type_name, _pcb_devtype)			\
-	MDRV_DEVICE_CONFIG_DATAPTR_ARRAY_MEMBER(cartslot_config, pcb_types, _index, cartslot_pcb_type, name, _pcb_type_name) \
-	MDRV_DEVICE_CONFIG_DATAPTR_ARRAY_MEMBER(cartslot_config, pcb_types, _index, cartslot_pcb_type, devtype, _pcb_devtype)
+#define MCFG_CARTSLOT_PCBTYPE(_index, _pcb_type_name, _pcb_devtype)			\
+	MCFG_DEVICE_CONFIG_DATAPTR_ARRAY_MEMBER(cartslot_config, pcb_types, _index, cartslot_pcb_type, name, _pcb_type_name) \
+	MCFG_DEVICE_CONFIG_DATAPTR_ARRAY_MEMBER(cartslot_config, pcb_types, _index, cartslot_pcb_type, devtype, _pcb_devtype)
 
-#define MDRV_CARTSLOT_INTERFACE(_interface)							\
-	MDRV_DEVICE_CONFIG_DATAPTR(cartslot_config, interface, _interface )
+#define MCFG_CARTSLOT_INTERFACE(_interface)							\
+	MCFG_DEVICE_CONFIG_DATAPTR(cartslot_config, interface, _interface )
 
 #define DECLARE_LEGACY_CART_SLOT_DEVICE(name, basename) _DECLARE_LEGACY_DEVICE(name, basename, basename##_device_config, basename##_device, legacy_cart_slot_device_config_base, legacy_cart_slot_device_base)
 #define DEFINE_LEGACY_CART_SLOT_DEVICE(name, basename) _DEFINE_LEGACY_DEVICE(name, basename, basename##_device_config, basename##_device, legacy_cart_slot_device_config_base, legacy_cart_slot_device_base)

@@ -358,24 +358,24 @@ static GENERIC_TERMINAL_INTERFACE( dectalk_terminal_intf )
 
 static MACHINE_CONFIG_START( rvoicepc, rvoice_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", HD63701, XTAL_7_3728MHz)
-	MDRV_CPU_PROGRAM_MAP(hd63701_main_mem)
-	MDRV_CPU_IO_MAP(hd63701_main_io)
+	MCFG_CPU_ADD("maincpu", HD63701, XTAL_7_3728MHz)
+	MCFG_CPU_PROGRAM_MAP(hd63701_main_mem)
+	MCFG_CPU_IO_MAP(hd63701_main_io)
 
-	//MDRV_CPU_ADD("playercpu", HD63701, XTAL_7_3728MHz) // not dumped yet
-	//MDRV_CPU_PROGRAM_MAP(hd63701_slave_mem)
-	//MDRV_CPU_IO_MAP(hd63701_slave_io)
-	MDRV_QUANTUM_TIME(HZ(60))
-	MDRV_MACHINE_RESET(rvoicepc)
+	//MCFG_CPU_ADD("playercpu", HD63701, XTAL_7_3728MHz) // not dumped yet
+	//MCFG_CPU_PROGRAM_MAP(hd63701_slave_mem)
+	//MCFG_CPU_IO_MAP(hd63701_slave_io)
+	MCFG_QUANTUM_TIME(HZ(60))
+	MCFG_MACHINE_RESET(rvoicepc)
 
-	MDRV_ACIA6551_ADD("acia65c51")
+	MCFG_ACIA6551_ADD("acia65c51")
 
 	/* video hardware */
-	//MDRV_DEFAULT_LAYOUT(layout_dectalk) // hack to avoid screenless system crash
+	//MCFG_DEFAULT_LAYOUT(layout_dectalk) // hack to avoid screenless system crash
 
 	/* sound hardware */
-	MDRV_FRAGMENT_ADD( generic_terminal )
-	MDRV_GENERIC_TERMINAL_ADD(TERMINAL_TAG,dectalk_terminal_intf)
+	MCFG_FRAGMENT_ADD( generic_terminal )
+	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG,dectalk_terminal_intf)
 
 MACHINE_CONFIG_END
 

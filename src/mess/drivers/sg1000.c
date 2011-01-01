@@ -791,14 +791,14 @@ void sg1000_state::install_cartridge(UINT8 *ptr, int size)
 	case 40 * 1024:
 		memory_install_read_bank(program, 0x8000, 0x9fff, 0, 0, "bank1");
 		memory_unmap_write(program, 0x8000, 0x9fff, 0, 0);
-		memory_configure_bank(machine, "bank1", 0, 1, memory_region(machine, Z80_TAG) + 0x8000, 0);
+		memory_configure_bank(machine, "bank1", 0, 1, machine->region(Z80_TAG)->base() + 0x8000, 0);
 		memory_set_bank(machine, "bank1", 0);
 		break;
 
 	case 48 * 1024:
 		memory_install_read_bank(program, 0x8000, 0xbfff, 0, 0, "bank1");
 		memory_unmap_write(program, 0x8000, 0xbfff, 0, 0);
-		memory_configure_bank(machine, "bank1", 0, 1, memory_region(machine, Z80_TAG) + 0x8000, 0);
+		memory_configure_bank(machine, "bank1", 0, 1, machine->region(Z80_TAG)->base() + 0x8000, 0);
 		memory_set_bank(machine, "bank1", 0);
 		break;
 
@@ -827,7 +827,7 @@ static DEVICE_IMAGE_LOAD( sg1000_cart )
 	running_machine *machine = image.device().machine;
 	sg1000_state *state = machine->driver_data<sg1000_state>();
 	address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
-	UINT8 *ptr = memory_region(machine, Z80_TAG);
+	UINT8 *ptr = machine->region(Z80_TAG)->base();
 	UINT32 size;
 
 	if (image.software_entry() == NULL)
@@ -860,7 +860,7 @@ static DEVICE_IMAGE_LOAD( omv_cart )
 	running_machine *machine = image.device().machine;
 	sg1000_state *state = machine->driver_data<sg1000_state>();
 	UINT32 size;
-	UINT8 *ptr = memory_region(machine, Z80_TAG);
+	UINT8 *ptr = machine->region(Z80_TAG)->base();
 
 	if (image.software_entry() == NULL)
 	{
@@ -916,7 +916,7 @@ static DEVICE_IMAGE_LOAD( sc3000_cart )
 {
 	running_machine *machine = image.device().machine;
 	sc3000_state *state = machine->driver_data<sc3000_state>();
-	UINT8 *ptr = memory_region(machine, Z80_TAG);
+	UINT8 *ptr = machine->region(Z80_TAG)->base();
 	UINT32 size;
 
 	if (image.software_entry() == NULL)
@@ -947,7 +947,7 @@ static DEVICE_IMAGE_LOAD( sc3000_cart )
 
 static TIMER_CALLBACK( lightgun_tick )
 {
-	UINT8 *rom = memory_region(machine, Z80_TAG);
+	UINT8 *rom = machine->region(Z80_TAG)->base();
 
 	if (IS_CARTRIDGE_TV_DRAW(rom))
 	{
@@ -998,7 +998,7 @@ void sc3000_state::machine_start()
     sf7000_fdc_index_callback -
 -------------------------------------------------*/
 
-static void sf7000_fdc_index_callback(running_device *controller, running_device *img, int state)
+static void sf7000_fdc_index_callback(device_t *controller, device_t *img, int state)
 {
 	sf7000_state *driver_state = img->machine->driver_data<sf7000_state>();
 
@@ -1018,7 +1018,7 @@ void sf7000_state::machine_start()
 	floppy_drive_set_index_pulse_callback(m_floppy0, sf7000_fdc_index_callback);
 
 	/* configure memory banking */
-	memory_configure_bank(machine, "bank1", 0, 1, memory_region(machine, Z80_TAG), 0);
+	memory_configure_bank(machine, "bank1", 0, 1, machine->region(Z80_TAG)->base(), 0);
 	memory_configure_bank(machine, "bank1", 1, 1, messram_get_ptr(m_ram), 0);
 	memory_configure_bank(machine, "bank2", 0, 1, messram_get_ptr(m_ram), 0);
 
@@ -1048,35 +1048,35 @@ void sf7000_state::machine_reset()
 
 static MACHINE_CONFIG_START( sg1000, sg1000_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80_TAG, Z80, XTAL_10_738635MHz/3)
-	MDRV_CPU_PROGRAM_MAP(sg1000_map)
-	MDRV_CPU_IO_MAP(sg1000_io_map)
-	MDRV_CPU_VBLANK_INT(SCREEN_TAG, sg1000_int)
+	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_10_738635MHz/3)
+	MCFG_CPU_PROGRAM_MAP(sg1000_map)
+	MCFG_CPU_IO_MAP(sg1000_io_map)
+	MCFG_CPU_VBLANK_INT(SCREEN_TAG, sg1000_int)
 
     /* video hardware */
-	MDRV_FRAGMENT_ADD(tms9928a)
-	MDRV_SCREEN_MODIFY(SCREEN_TAG)
-	MDRV_SCREEN_REFRESH_RATE((float)XTAL_10_738635MHz/2/342/262)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_FRAGMENT_ADD(tms9928a)
+	MCFG_SCREEN_MODIFY(SCREEN_TAG)
+	MCFG_SCREEN_REFRESH_RATE((float)XTAL_10_738635MHz/2/342/262)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD(SN76489A_TAG, SN76489A, XTAL_10_738635MHz/3)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD(SN76489A_TAG, SN76489A, XTAL_10_738635MHz/3)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* cartridge */
-	MDRV_CARTSLOT_ADD("cart")
-	MDRV_CARTSLOT_EXTENSION_LIST("sg,bin")
-	MDRV_CARTSLOT_MANDATORY
-	MDRV_CARTSLOT_INTERFACE("sg1000_cart")
-	MDRV_CARTSLOT_LOAD(sg1000_cart)
+	MCFG_CARTSLOT_ADD("cart")
+	MCFG_CARTSLOT_EXTENSION_LIST("sg,bin")
+	MCFG_CARTSLOT_MANDATORY
+	MCFG_CARTSLOT_INTERFACE("sg1000_cart")
+	MCFG_CARTSLOT_LOAD(sg1000_cart)
 
 	/* software lists */
-	MDRV_SOFTWARE_LIST_ADD("cart_list","sg1000")
+	MCFG_SOFTWARE_LIST_ADD("cart_list","sg1000")
 
 	/* internal ram */
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("1K")
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("1K")
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------
@@ -1084,17 +1084,17 @@ MACHINE_CONFIG_END
 -------------------------------------------------*/
 
 static MACHINE_CONFIG_DERIVED( omv, sg1000 )
-	MDRV_CPU_MODIFY(Z80_TAG)
-	MDRV_CPU_PROGRAM_MAP(omv_map)
-	MDRV_CPU_IO_MAP(omv_io_map)
+	MCFG_CPU_MODIFY(Z80_TAG)
+	MCFG_CPU_PROGRAM_MAP(omv_map)
+	MCFG_CPU_IO_MAP(omv_io_map)
 
-	MDRV_CARTSLOT_MODIFY("cart")
-	MDRV_CARTSLOT_EXTENSION_LIST("sg,bin")
-	MDRV_CARTSLOT_NOT_MANDATORY
-	MDRV_CARTSLOT_LOAD(omv_cart)
+	MCFG_CARTSLOT_MODIFY("cart")
+	MCFG_CARTSLOT_EXTENSION_LIST("sg,bin")
+	MCFG_CARTSLOT_NOT_MANDATORY
+	MCFG_CARTSLOT_LOAD(omv_cart)
 
-	MDRV_RAM_MODIFY("messram")
-	MDRV_RAM_DEFAULT_SIZE("2K")
+	MCFG_RAM_MODIFY("messram")
+	MCFG_RAM_DEFAULT_SIZE("2K")
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------
@@ -1103,39 +1103,39 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( sc3000, sc3000_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80_TAG, Z80, XTAL_10_738635MHz/3) // LH0080A
-	MDRV_CPU_PROGRAM_MAP(sc3000_map)
-	MDRV_CPU_IO_MAP(sc3000_io_map)
-	MDRV_CPU_VBLANK_INT(SCREEN_TAG, sg1000_int)
+	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_10_738635MHz/3) // LH0080A
+	MCFG_CPU_PROGRAM_MAP(sc3000_map)
+	MCFG_CPU_IO_MAP(sc3000_io_map)
+	MCFG_CPU_VBLANK_INT(SCREEN_TAG, sg1000_int)
 
     /* video hardware */
-	MDRV_FRAGMENT_ADD(tms9928a)
-	MDRV_SCREEN_MODIFY(SCREEN_TAG)
-	MDRV_SCREEN_REFRESH_RATE((float)XTAL_10_738635MHz/2/342/262)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_FRAGMENT_ADD(tms9928a)
+	MCFG_SCREEN_MODIFY(SCREEN_TAG)
+	MCFG_SCREEN_REFRESH_RATE((float)XTAL_10_738635MHz/2/342/262)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD(SN76489A_TAG, SN76489A, XTAL_10_738635MHz/3)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD(SN76489A_TAG, SN76489A, XTAL_10_738635MHz/3)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* devices */
-	MDRV_I8255A_ADD(UPD9255_TAG, sc3000_ppi_intf)
-//  MDRV_PRINTER_ADD("sp400") /* serial printer */
-	MDRV_CASSETTE_ADD(CASSETTE_TAG, sc3000_cassette_config)
+	MCFG_I8255A_ADD(UPD9255_TAG, sc3000_ppi_intf)
+//  MCFG_PRINTER_ADD("sp400") /* serial printer */
+	MCFG_CASSETTE_ADD(CASSETTE_TAG, sc3000_cassette_config)
 
 	/* cartridge */
-	MDRV_CARTSLOT_ADD("cart")
-	MDRV_CARTSLOT_EXTENSION_LIST("sg,sc,bin")
-	MDRV_CARTSLOT_INTERFACE("sg1000_cart")
-	MDRV_CARTSLOT_LOAD(sc3000_cart)
+	MCFG_CARTSLOT_ADD("cart")
+	MCFG_CARTSLOT_EXTENSION_LIST("sg,sc,bin")
+	MCFG_CARTSLOT_INTERFACE("sg1000_cart")
+	MCFG_CARTSLOT_LOAD(sc3000_cart)
 
 	/* software lists */
-	MDRV_SOFTWARE_LIST_ADD("cart_list","sg1000")
+	MCFG_SOFTWARE_LIST_ADD("cart_list","sg1000")
 
 	/* internal ram */
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("2K")
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("2K")
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------
@@ -1144,35 +1144,35 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( sf7000, sf7000_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80_TAG, Z80, XTAL_10_738635MHz/3)
-	MDRV_CPU_PROGRAM_MAP(sf7000_map)
-	MDRV_CPU_IO_MAP(sf7000_io_map)
-	MDRV_CPU_VBLANK_INT(SCREEN_TAG, sg1000_int)
+	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_10_738635MHz/3)
+	MCFG_CPU_PROGRAM_MAP(sf7000_map)
+	MCFG_CPU_IO_MAP(sf7000_io_map)
+	MCFG_CPU_VBLANK_INT(SCREEN_TAG, sg1000_int)
 
     /* video hardware */
-	MDRV_FRAGMENT_ADD(tms9928a)
-	MDRV_SCREEN_MODIFY(SCREEN_TAG)
-	MDRV_SCREEN_REFRESH_RATE((float)XTAL_10_738635MHz/2/342/262)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_FRAGMENT_ADD(tms9928a)
+	MCFG_SCREEN_MODIFY(SCREEN_TAG)
+	MCFG_SCREEN_REFRESH_RATE((float)XTAL_10_738635MHz/2/342/262)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD(SN76489A_TAG, SN76489A, XTAL_10_738635MHz/3)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD(SN76489A_TAG, SN76489A, XTAL_10_738635MHz/3)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* devices */
-	MDRV_I8255A_ADD(UPD9255_0_TAG, sc3000_ppi_intf)
-	MDRV_I8255A_ADD(UPD9255_1_TAG, sf7000_ppi_intf)
-	MDRV_MSM8251_ADD(UPD8251_TAG, default_msm8251_interface)
-	MDRV_UPD765A_ADD(UPD765_TAG, sf7000_upd765_interface)
-	MDRV_FLOPPY_DRIVE_ADD(FLOPPY_0, sf7000_floppy_config)
-//  MDRV_PRINTER_ADD("sp400") /* serial printer */
-	MDRV_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
-	MDRV_CASSETTE_ADD(CASSETTE_TAG, sc3000_cassette_config)
+	MCFG_I8255A_ADD(UPD9255_0_TAG, sc3000_ppi_intf)
+	MCFG_I8255A_ADD(UPD9255_1_TAG, sf7000_ppi_intf)
+	MCFG_MSM8251_ADD(UPD8251_TAG, default_msm8251_interface)
+	MCFG_UPD765A_ADD(UPD765_TAG, sf7000_upd765_interface)
+	MCFG_FLOPPY_DRIVE_ADD(FLOPPY_0, sf7000_floppy_config)
+//  MCFG_PRINTER_ADD("sp400") /* serial printer */
+	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
+	MCFG_CASSETTE_ADD(CASSETTE_TAG, sc3000_cassette_config)
 
 	/* internal ram */
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("64K")
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("64K")
 MACHINE_CONFIG_END
 
 /***************************************************************************

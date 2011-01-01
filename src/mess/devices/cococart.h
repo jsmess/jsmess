@@ -58,9 +58,9 @@ typedef enum _cococart_line_value cococart_line_value;
 typedef struct _cococart_config cococart_config;
 struct _cococart_config
 {
-	void (*cart_callback)(running_device *device, int line);
-	void (*nmi_callback)(running_device *device, int line);
-	void (*halt_callback)(running_device *device, int line);
+	void (*cart_callback)(device_t *device, int line);
+	void (*nmi_callback)(device_t *device, int line);
+	void (*halt_callback)(device_t *device, int line);
 };
 
 
@@ -75,38 +75,38 @@ READ8_DEVICE_HANDLER(coco_cartridge_r);
 WRITE8_DEVICE_HANDLER(coco_cartridge_w);
 
 /* sets a cartridge line */
-void coco_cartridge_set_line(running_device *device, cococart_line line, cococart_line_value value);
+void coco_cartridge_set_line(device_t *device, cococart_line line, cococart_line_value value);
 
 /* hack to support twiddling the Q line */
-void coco_cartridge_twiddle_q_lines(running_device *device);
+void coco_cartridge_twiddle_q_lines(device_t *device);
 
 
 /***************************************************************************
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MDRV_COCO_CARTRIDGE_ADD(_tag) \
-	MDRV_DEVICE_ADD(_tag, COCO_CARTRIDGE, 0)
+#define MCFG_COCO_CARTRIDGE_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, COCO_CARTRIDGE, 0)
 
-#define MDRV_COCO_CARTRIDGE_CART_CALLBACK(_callback) \
-	MDRV_DEVICE_CONFIG_DATAPTR(cococart_config, cart_callback, _callback)
+#define MCFG_COCO_CARTRIDGE_CART_CALLBACK(_callback) \
+	MCFG_DEVICE_CONFIG_DATAPTR(cococart_config, cart_callback, _callback)
 
-#define MDRV_COCO_CARTRIDGE_NMI_CALLBACK(_callback) \
-	MDRV_DEVICE_CONFIG_DATAPTR(cococart_config, nmi_callback, _callback)
+#define MCFG_COCO_CARTRIDGE_NMI_CALLBACK(_callback) \
+	MCFG_DEVICE_CONFIG_DATAPTR(cococart_config, nmi_callback, _callback)
 
-#define MDRV_COCO_CARTRIDGE_HALT_CALLBACK(_callback) \
-	MDRV_DEVICE_CONFIG_DATAPTR(cococart_config, halt_callback, _callback)
+#define MCFG_COCO_CARTRIDGE_HALT_CALLBACK(_callback) \
+	MCFG_DEVICE_CONFIG_DATAPTR(cococart_config, halt_callback, _callback)
 
-#define MDRV_DRAGON_CARTRIDGE_ADD(_tag) \
-	MDRV_DEVICE_ADD(_tag, DRAGON_CARTRIDGE, 0)
+#define MCFG_DRAGON_CARTRIDGE_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, DRAGON_CARTRIDGE, 0)
 
-#define MDRV_DRAGON_CARTRIDGE_CART_CALLBACK(_callback) \
-	MDRV_COCO_CARTRIDGE_CART_CALLBACK(_callback)
+#define MCFG_DRAGON_CARTRIDGE_CART_CALLBACK(_callback) \
+	MCFG_COCO_CARTRIDGE_CART_CALLBACK(_callback)
 
-#define MDRV_DRAGON_CARTRIDGE_NMI_CALLBACK(_callback) \
-	MDRV_COCO_CARTRIDGE_NMI_CALLBACK(_callback)
+#define MCFG_DRAGON_CARTRIDGE_NMI_CALLBACK(_callback) \
+	MCFG_COCO_CARTRIDGE_NMI_CALLBACK(_callback)
 
-#define MDRV_DRAGON_CARTRIDGE_HALT_CALLBACK(_callback) \
-	MDRV_COCO_CARTRIDGE_HALT_CALLBACK(_callback)
+#define MCFG_DRAGON_CARTRIDGE_HALT_CALLBACK(_callback) \
+	MCFG_COCO_CARTRIDGE_HALT_CALLBACK(_callback)
 
 #endif /* __COCOCART_H__ */

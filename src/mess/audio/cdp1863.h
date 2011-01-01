@@ -34,6 +34,6 @@ struct _cdp1863_interface
 WRITE8_DEVICE_HANDLER( cdp1863_str_w );
 
 /* output enable */
-void cdp1863_oe_w(running_device *device, int level);
+void cdp1863_oe_w(device_t *device, int level);
 
 #endif

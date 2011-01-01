@@ -19,22 +19,22 @@ static void odyssey2_switch_banks(running_machine *machine)
 	switch ( state->cart_size ) {
 	case 12288:
 		/* 12KB cart support (for instance, KTAA as released) */
-		memory_set_bankptr( machine, "bank1", memory_region(machine, "user1") + (state->p1 & 0x03) * 0xC00 );
-		memory_set_bankptr( machine, "bank2", memory_region(machine, "user1") + (state->p1 & 0x03) * 0xC00 + 0x800 );
+		memory_set_bankptr( machine, "bank1", machine->region("user1")->base() + (state->p1 & 0x03) * 0xC00 );
+		memory_set_bankptr( machine, "bank2", machine->region("user1")->base() + (state->p1 & 0x03) * 0xC00 + 0x800 );
 		break;
 	case 16384:
 		/* 16KB cart support (for instance, full sized version KTAA) */
-		memory_set_bankptr( machine, "bank1", memory_region(machine, "user1") + (state->p1 & 0x03) * 0x1000 + 0x400 );
-		memory_set_bankptr( machine, "bank2", memory_region(machine, "user1") + (state->p1 & 0x03) * 0x1000 + 0xC00 );
+		memory_set_bankptr( machine, "bank1", machine->region("user1")->base() + (state->p1 & 0x03) * 0x1000 + 0x400 );
+		memory_set_bankptr( machine, "bank2", machine->region("user1")->base() + (state->p1 & 0x03) * 0x1000 + 0xC00 );
 		break;
 	default:
-		memory_set_bankptr(machine, "bank1", memory_region(machine, "user1") + (state->p1 & 0x03) * 0x800);
-		memory_set_bankptr(machine, "bank2", memory_region(machine, "user1") + (state->p1 & 0x03) * 0x800 );
+		memory_set_bankptr(machine, "bank1", machine->region("user1")->base() + (state->p1 & 0x03) * 0x800);
+		memory_set_bankptr(machine, "bank2", machine->region("user1")->base() + (state->p1 & 0x03) * 0x800 );
 		break;
 	}
 }
 
-void odyssey2_the_voice_lrq_callback(running_device *device, int state) {
+void odyssey2_the_voice_lrq_callback(device_t *device, int state) {
 	odyssey2_state *drvstate = device->machine->driver_data<odyssey2_state>();
 	drvstate->the_voice_lrq_state = state;
 }
@@ -48,7 +48,7 @@ DRIVER_INIT( odyssey2 )
 {
 	odyssey2_state *state = machine->driver_data<odyssey2_state>();
 	int i;
-	UINT8 *gfx = memory_region(machine, "gfx1");
+	UINT8 *gfx = machine->region("gfx1")->base();
 	state->ram        = auto_alloc_array(machine, UINT8, 256);
 
 	for (i = 0; i < 256; i++)

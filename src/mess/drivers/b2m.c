@@ -200,58 +200,58 @@ static const floppy_config b2m_floppy_config =
 /* Machine driver */
 static MACHINE_CONFIG_START( b2m, b2m_state )
     /* basic machine hardware */
-    MDRV_CPU_ADD("maincpu", I8080, 2000000)
-    MDRV_CPU_PROGRAM_MAP(b2m_mem)
-    MDRV_CPU_IO_MAP(b2m_io)
-    MDRV_CPU_VBLANK_INT("screen", b2m_vblank_interrupt)
+    MCFG_CPU_ADD("maincpu", I8080, 2000000)
+    MCFG_CPU_PROGRAM_MAP(b2m_mem)
+    MCFG_CPU_IO_MAP(b2m_io)
+    MCFG_CPU_VBLANK_INT("screen", b2m_vblank_interrupt)
 
-    MDRV_MACHINE_START( b2m )
-    MDRV_MACHINE_RESET( b2m )
+    MCFG_MACHINE_START( b2m )
+    MCFG_MACHINE_RESET( b2m )
 
     /* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(50)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(384, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 384-1, 0, 256-1)
-	MDRV_PALETTE_LENGTH(4)
-	MDRV_PALETTE_INIT(b2m)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(384, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 256-1)
+	MCFG_PALETTE_LENGTH(4)
+	MCFG_PALETTE_INIT(b2m)
 
-	MDRV_PIT8253_ADD( "pit8253", b2m_pit8253_intf )
+	MCFG_PIT8253_ADD( "pit8253", b2m_pit8253_intf )
 
-	MDRV_I8255A_ADD( "ppi8255_1", b2m_ppi8255_interface_1 )
+	MCFG_I8255A_ADD( "ppi8255_1", b2m_ppi8255_interface_1 )
 
-	MDRV_I8255A_ADD( "ppi8255_2", b2m_ppi8255_interface_2 )
+	MCFG_I8255A_ADD( "ppi8255_2", b2m_ppi8255_interface_2 )
 
-	MDRV_I8255A_ADD( "ppi8255_3", b2m_ppi8255_interface_3 )
+	MCFG_I8255A_ADD( "ppi8255_3", b2m_ppi8255_interface_3 )
 
-	MDRV_PIC8259_ADD( "pic8259", b2m_pic8259_config )
+	MCFG_PIC8259_ADD( "pic8259", b2m_pic8259_config )
 
-	MDRV_VIDEO_START(b2m)
-    MDRV_VIDEO_UPDATE(b2m)
+	MCFG_VIDEO_START(b2m)
+    MCFG_VIDEO_UPDATE(b2m)
 
 	/* sound */
-    MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+    MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* uart */
-	MDRV_MSM8251_ADD("uart", default_msm8251_interface)
+	MCFG_MSM8251_ADD("uart", default_msm8251_interface)
 
-	MDRV_WD1793_ADD("wd1793", default_wd17xx_interface_2_drives )
+	MCFG_WD1793_ADD("wd1793", default_wd17xx_interface_2_drives )
 
-	MDRV_FLOPPY_2_DRIVES_ADD(b2m_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_ADD(b2m_floppy_config)
 
 	/* internal ram */
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("128K")
-	MDRV_RAM_DEFAULT_VALUE(0x00)
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("128K")
+	MCFG_RAM_DEFAULT_VALUE(0x00)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( b2mrom, b2m )
-    MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(b2m_rom_io)
+    MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_IO_MAP(b2m_rom_io)
 MACHINE_CONFIG_END
 
 /* ROM definition */

@@ -107,7 +107,7 @@ static MACHINE_START( rt1715 )
 static MACHINE_RESET( rt1715 )
 {
 	/* on reset, enable ROM */
-	memory_set_bankptr(machine, "bank1", memory_region(machine, "ipl"));
+	memory_set_bankptr(machine, "bank1", machine->region("ipl")->base());
 }
 
 static WRITE8_HANDLER( rt1715_rom_disable )
@@ -312,45 +312,45 @@ static const z80_daisy_config rt1715_daisy_chain[] =
 
 static MACHINE_CONFIG_START( rt1715, rt1715_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, XTAL_2_4576MHz)
-	MDRV_CPU_PROGRAM_MAP(rt1715_mem)
-	MDRV_CPU_IO_MAP(rt1715_io)
-	MDRV_CPU_CONFIG(rt1715_daisy_chain)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_2_4576MHz)
+	MCFG_CPU_PROGRAM_MAP(rt1715_mem)
+	MCFG_CPU_IO_MAP(rt1715_io)
+	MCFG_CPU_CONFIG(rt1715_daisy_chain)
 
-	MDRV_MACHINE_START(rt1715)
-	MDRV_MACHINE_RESET(rt1715)
+	MCFG_MACHINE_START(rt1715)
+	MCFG_MACHINE_RESET(rt1715)
 
 	/* keyboard */
-	MDRV_CPU_ADD("keyboard", Z80, 683000)
-	MDRV_CPU_PROGRAM_MAP(k7658_mem)
-	MDRV_CPU_IO_MAP(k7658_io)
+	MCFG_CPU_ADD("keyboard", Z80, 683000)
+	MCFG_CPU_PROGRAM_MAP(k7658_mem)
+	MCFG_CPU_IO_MAP(k7658_io)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(50)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(78*6, 30*10)
-	MDRV_SCREEN_VISIBLE_AREA(0, 78*6-1, 0, 30*10-1)
-	MDRV_GFXDECODE(rt1715)
-	MDRV_PALETTE_LENGTH(3)
-	MDRV_PALETTE_INIT(rt1715)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(78*6, 30*10)
+	MCFG_SCREEN_VISIBLE_AREA(0, 78*6-1, 0, 30*10-1)
+	MCFG_GFXDECODE(rt1715)
+	MCFG_PALETTE_LENGTH(3)
+	MCFG_PALETTE_INIT(rt1715)
 
-	MDRV_VIDEO_START(generic_bitmapped)
-	MDRV_VIDEO_UPDATE(rt1715)
+	MCFG_VIDEO_START(generic_bitmapped)
+	MCFG_VIDEO_UPDATE(rt1715)
 
-	MDRV_I8275_ADD("a26", rt1715_i8275_intf)
-	MDRV_Z80CTC_ADD("a30", XTAL_10MHz/4 /* ? */, rt1715_ctc_intf)
-	MDRV_Z80SIO_ADD("a29", XTAL_10MHz/4 /* ? */, rt1715_sio_intf)
+	MCFG_I8275_ADD("a26", rt1715_i8275_intf)
+	MCFG_Z80CTC_ADD("a30", XTAL_10MHz/4 /* ? */, rt1715_ctc_intf)
+	MCFG_Z80SIO_ADD("a29", XTAL_10MHz/4 /* ? */, rt1715_sio_intf)
 
 	/* floppy */
-	MDRV_Z80PIO_ADD("a71", XTAL_10MHz/4 /* ? */, rt1715_pio_data_intf)
-	MDRV_Z80PIO_ADD("a72", XTAL_10MHz/4 /* ? */, rt1715_pio_control_intf)
+	MCFG_Z80PIO_ADD("a71", XTAL_10MHz/4 /* ? */, rt1715_pio_data_intf)
+	MCFG_Z80PIO_ADD("a72", XTAL_10MHz/4 /* ? */, rt1715_pio_control_intf)
 
 	/* internal ram */
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("64K")
-	MDRV_RAM_DEFAULT_VALUE(0x00)
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("64K")
+	MCFG_RAM_DEFAULT_VALUE(0x00)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( rt1715w, rt1715 )

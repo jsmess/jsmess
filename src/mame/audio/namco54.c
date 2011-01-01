@@ -54,13 +54,13 @@
 typedef struct _namco_54xx_state namco_54xx_state;
 struct _namco_54xx_state
 {
-	running_device *cpu;
-	running_device *discrete;
+	device_t *cpu;
+	device_t *discrete;
 	int basenode;
 	UINT8 latched_cmd;
 };
 
-INLINE namco_54xx_state *get_safe_token(running_device *device)
+INLINE namco_54xx_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == NAMCO_54XX);
@@ -72,7 +72,7 @@ INLINE namco_54xx_state *get_safe_token(running_device *device)
 
 static TIMER_CALLBACK( namco_54xx_latch_callback )
 {
-	namco_54xx_state *state = get_safe_token((running_device *)ptr);
+	namco_54xx_state *state = get_safe_token((device_t *)ptr);
 	state->latched_cmd = param;
 }
 
@@ -112,7 +112,7 @@ static WRITE8_HANDLER( namco_54xx_R1_w )
 
 static TIMER_CALLBACK( namco_54xx_irq_clear )
 {
-	namco_54xx_state *state = get_safe_token((running_device *)ptr);
+	namco_54xx_state *state = get_safe_token((device_t *)ptr);
 	cpu_set_input_line(state->cpu, 0, CLEAR_LINE);
 }
 
@@ -147,8 +147,8 @@ ADDRESS_MAP_END
 
 
 static MACHINE_CONFIG_FRAGMENT( namco_54xx )
-	MDRV_CPU_ADD("mcu", MB8844, DERIVED_CLOCK(1,1))		/* parent clock, internally divided by 6 */
-	MDRV_CPU_IO_MAP(namco_54xx_map_io)
+	MCFG_CPU_ADD("mcu", MB8844, DERIVED_CLOCK(1,1))		/* parent clock, internally divided by 6 */
+	MCFG_CPU_IO_MAP(namco_54xx_map_io)
 MACHINE_CONFIG_END
 
 

@@ -200,13 +200,13 @@ ADDRESS_MAP_END
 
 static MACHINE_RESET( dc_console )
 {
-	running_device *aica = machine->device("aica");
+	device_t *aica = machine->device("aica");
 	MACHINE_RESET_CALL(dc);
 	aica_set_ram_base(aica, dc_sound_ram, 2*1024*1024);
 	dreamcast_atapi_reset(machine);
 }
 
-static void aica_irq(running_device *device, int irq)
+static void aica_irq(device_t *device, int irq)
 {
 	cputag_set_input_line(device->machine, "soundcpu", ARM7_FIRQ_LINE, irq ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -222,37 +222,37 @@ static const struct sh4_config sh4cpu_config = {  1,  0,  1,  0,  0,  0,  1,  1,
 
 static MACHINE_CONFIG_START( dc, driver_device )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", SH4, CPU_CLOCK)
-	MDRV_CPU_CONFIG(sh4cpu_config)
-	MDRV_CPU_PROGRAM_MAP(dc_map)
-	MDRV_CPU_IO_MAP(dc_port)
+	MCFG_CPU_ADD("maincpu", SH4, CPU_CLOCK)
+	MCFG_CPU_CONFIG(sh4cpu_config)
+	MCFG_CPU_PROGRAM_MAP(dc_map)
+	MCFG_CPU_IO_MAP(dc_port)
 
-	MDRV_CPU_ADD("soundcpu", ARM7, ((XTAL_33_8688MHz*2)/3)/8)	// AICA bus clock is 2/3rds * 33.8688.  ARM7 gets 1 bus cycle out of each 8.
-	MDRV_CPU_PROGRAM_MAP(dc_audio_map)
+	MCFG_CPU_ADD("soundcpu", ARM7, ((XTAL_33_8688MHz*2)/3)/8)	// AICA bus clock is 2/3rds * 33.8688.  ARM7 gets 1 bus cycle out of each 8.
+	MCFG_CPU_PROGRAM_MAP(dc_audio_map)
 
-	MDRV_MACHINE_START( dc )
-	MDRV_MACHINE_RESET( dc_console )
+	MCFG_MACHINE_START( dc )
+	MCFG_MACHINE_RESET( dc_console )
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_SIZE(640, 480)
-	MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_SIZE(640, 480)
+	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 
-	MDRV_PALETTE_LENGTH(0x1000)
+	MCFG_PALETTE_LENGTH(0x1000)
 
-	MDRV_VIDEO_START(dc)
-	MDRV_VIDEO_UPDATE(dc)
+	MCFG_VIDEO_START(dc)
+	MCFG_VIDEO_UPDATE(dc)
 
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MDRV_SOUND_ADD("aica", AICA, 0)
-	MDRV_SOUND_CONFIG(dc_aica_interface)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 2.0)
-	MDRV_SOUND_ROUTE(0, "rspeaker", 2.0)
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SOUND_ADD("aica", AICA, 0)
+	MCFG_SOUND_CONFIG(dc_aica_interface)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
+	MCFG_SOUND_ROUTE(0, "rspeaker", 2.0)
 
-	MDRV_CDROM_ADD( "cdrom" )
+	MCFG_CDROM_ADD( "cdrom" )
 MACHINE_CONFIG_END
 
 ROM_START(dc)

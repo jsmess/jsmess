@@ -165,7 +165,7 @@ typedef struct {
 static pce_cd_t pce_cd;
 
 /* MSM5205 ADPCM decoder definition */
-static void pce_cd_msm5205_int(running_device *device);
+static void pce_cd_msm5205_int(device_t *device);
 const msm5205_interface pce_cd_msm5205_interface = {
 	pce_cd_msm5205_int,	/* interrupt function */
 	MSM5205_S48_4B		/* 1/48 prescaler, 4bit data */
@@ -192,9 +192,9 @@ static TIMER_CALLBACK( pce_cd_adpcm_fadein_callback );
 
 static WRITE8_HANDLER( pce_sf2_banking_w )
 {
-	memory_set_bankptr( space->machine, "bank2", memory_region(space->machine, "user1") + offset * 0x080000 + 0x080000 );
-	memory_set_bankptr( space->machine, "bank3", memory_region(space->machine, "user1") + offset * 0x080000 + 0x088000 );
-	memory_set_bankptr( space->machine, "bank4", memory_region(space->machine, "user1") + offset * 0x080000 + 0x0D0000 );
+	memory_set_bankptr( space->machine, "bank2", space->machine->region("user1")->base() + offset * 0x080000 + 0x080000 );
+	memory_set_bankptr( space->machine, "bank3", space->machine->region("user1")->base() + offset * 0x080000 + 0x088000 );
+	memory_set_bankptr( space->machine, "bank4", space->machine->region("user1")->base() + offset * 0x080000 + 0x0D0000 );
 }
 
 static WRITE8_HANDLER( pce_cartridge_ram_w )
@@ -211,7 +211,7 @@ DEVICE_IMAGE_LOAD(pce_cart)
 	logerror("*** DEVICE_IMAGE_LOAD(pce_cart) : %s\n", image.filename());
 
 	/* open file to get size */
-	ROM = memory_region(image.device().machine, "user1");
+	ROM = image.device().machine->region("user1")->base();
 
 	if (image.software_entry() == NULL)
 		size = image.length();
@@ -497,7 +497,7 @@ static void adpcm_play(running_machine *machine)
   the MSM5205. Currently we can only use static clocks for the
   MSM5205.
  */
-static void pce_cd_msm5205_int(running_device *device)
+static void pce_cd_msm5205_int(device_t *device)
 {
 	UINT8 msm_data;
 
@@ -1214,7 +1214,7 @@ static TIMER_CALLBACK( pce_cd_data_timer_callback )
 
 static void pce_cd_init( running_machine *machine )
 {
-	running_device *device;
+	device_t *device;
 
 	/* Initialize pce_cd struct */
 	memset( &pce_cd, 0, sizeof(pce_cd) );

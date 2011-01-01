@@ -688,7 +688,7 @@ static WRITE8_DEVICE_HANDLER(d_pia1_pa_w)
 {
 	dgn_beta_state *state = device->machine->driver_data<dgn_beta_state>();
 	int	HALT_DMA;
-	running_device *fdc = device->machine->device(FDC_TAG);
+	device_t *fdc = device->machine->device(FDC_TAG);
 
 	/* Only play with halt line if halt bit changed since last write */
 	if((data & 0x80) != state->d_pia1_pa_last)
@@ -862,9 +862,9 @@ static WRITE_LINE_DEVICE_HANDLER( d_pia2_irq_b )
 /* CPU 0 */
 static void cpu0_recalc_irq(running_machine *machine, int state)
 {
-	running_device *pia_0 = machine->device( PIA_0_TAG );
-	running_device *pia_1 = machine->device( PIA_1_TAG );
-	running_device *pia_2 = machine->device( PIA_2_TAG );
+	device_t *pia_0 = machine->device( PIA_0_TAG );
+	device_t *pia_1 = machine->device( PIA_1_TAG );
+	device_t *pia_2 = machine->device( PIA_2_TAG );
 	UINT8 pia0_irq_a = pia6821_get_irq_a(pia_0);
 	UINT8 pia1_irq_a = pia6821_get_irq_a(pia_1);
 	UINT8 pia1_irq_b = pia6821_get_irq_b(pia_1);
@@ -883,7 +883,7 @@ static void cpu0_recalc_irq(running_machine *machine, int state)
 
 static void cpu0_recalc_firq(running_machine *machine, int state)
 {
-	running_device *pia_0 = machine->device( PIA_0_TAG );
+	device_t *pia_0 = machine->device( PIA_0_TAG );
 	UINT8 pia0_irq_b = pia6821_get_irq_b(pia_0);
 	UINT8 FIRQ;
 
@@ -936,7 +936,7 @@ const wd17xx_interface dgnbeta_wd17xx_interface =
 READ8_HANDLER(dgnbeta_wd2797_r)
 {
 	int result = 0;
-	running_device *fdc = space->machine->device(FDC_TAG);
+	device_t *fdc = space->machine->device(FDC_TAG);
 
 	switch(offset & 0x03)
 	{
@@ -963,7 +963,7 @@ READ8_HANDLER(dgnbeta_wd2797_r)
 WRITE8_HANDLER(dgnbeta_wd2797_w)
 {
 	dgn_beta_state *state = space->machine->driver_data<dgn_beta_state>();
-	running_device *fdc = space->machine->device(FDC_TAG);
+	device_t *fdc = space->machine->device(FDC_TAG);
 
     state->wd2797_written=1;
 
@@ -1026,7 +1026,7 @@ static void ScanInKeyboard(void)
 /* VBlank inturrupt */
 void dgn_beta_frame_interrupt (running_machine *machine, int data)
 {
-	running_device *pia_2 = machine->device( PIA_2_TAG );
+	device_t *pia_2 = machine->device( PIA_2_TAG );
 
     /* Set PIA line, so it recognises inturrupt */
     if (!data)
@@ -1058,14 +1058,14 @@ void dgn_beta_line_interrupt (int data)
 static void dgnbeta_reset(running_machine &machine)
 {
 	dgn_beta_state *state = machine.driver_data<dgn_beta_state>();
-	running_device *fdc = machine.device(FDC_TAG);
-	running_device *pia_0 = machine.device( PIA_0_TAG );
-	running_device *pia_1 = machine.device( PIA_1_TAG );
-	running_device *pia_2 = machine.device( PIA_2_TAG );
+	device_t *fdc = machine.device(FDC_TAG);
+	device_t *pia_0 = machine.device( PIA_0_TAG );
+	device_t *pia_1 = machine.device( PIA_1_TAG );
+	device_t *pia_2 = machine.device( PIA_2_TAG );
 
     logerror("MACHINE_RESET( dgnbeta )\n");
 
-	state->system_rom = memory_region(&machine, MAINCPU_TAG);
+	state->system_rom = machine.region(MAINCPU_TAG)->base();
 
 	/* Make sure CPU 1 is started out halted ! */
 	cputag_set_input_line(&machine, DMACPU_TAG, INPUT_LINE_HALT, ASSERT_LINE);

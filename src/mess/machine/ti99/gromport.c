@@ -17,7 +17,7 @@ typedef UINT8	(*read8z_device_func)  (ATTR_UNUSED device_t *device, ATTR_UNUSED 
    the first 16 banks. */
 #define NUMBER_OF_CARTRIDGE_SLOTS 8
 
-typedef int assmfct(running_device *);
+typedef int assmfct(device_t *);
 
 DECLARE_LEGACY_CART_SLOT_DEVICE(TI99_CARTRIDGE_PCB_NONE, ti99_cartridge_pcb_none);
 DECLARE_LEGACY_CART_SLOT_DEVICE(TI99_CARTRIDGE_PCB_STD, ti99_cartridge_pcb_std);
@@ -43,7 +43,7 @@ DEFINE_LEGACY_CART_SLOT_DEVICE(TI99_CARTRIDGE_PCB_GRAMKRACKER, ti99_cartridge_pc
 struct _cartridge_t
 {
 	// PCB device associated to this cartridge. If NULL, the slot is empty.
-	running_device *pcb;
+	device_t *pcb;
 
 	// ROM page.
 	int rom_page;
@@ -158,24 +158,24 @@ struct _ti99_pcb_t
 	assmfct	*disassemble;
 
 	/* Points to the (max 5) GROM devices. */
-	running_device *grom[5];
+	device_t *grom[5];
 };
 typedef struct _ti99_pcb_t ti99_pcb_t;
 
-INLINE ti99_multicart_state *get_safe_token(running_device *device)
+INLINE ti99_multicart_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	return (ti99_multicart_state *)downcast<legacy_device_base *>(device)->token();
 }
 
-INLINE const ti99_multicart_config *get_config(running_device *device)
+INLINE const ti99_multicart_config *get_config(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == TI99_MULTICART);
 	return (const ti99_multicart_config *) downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
 }
 
-INLINE ti99_pcb_t *get_safe_pcb_token(running_device *device)
+INLINE ti99_pcb_t *get_safe_pcb_token(device_t *device)
 {
 	assert(device != NULL);
 	return (ti99_pcb_t *)downcast<legacy_device_base *>(device)->token();
@@ -183,7 +183,7 @@ INLINE ti99_pcb_t *get_safe_pcb_token(running_device *device)
 
 static WRITE_LINE_DEVICE_HANDLER( cart_grom_ready )
 {
-	running_device *cartdev = device->owner()->owner();
+	device_t *cartdev = device->owner()->owner();
 	ti99_multicart_state *cartslots = get_safe_token(cartdev);
 	devcb_call_write_line( &cartslots->ready, state );
 }
@@ -191,19 +191,19 @@ static WRITE_LINE_DEVICE_HANDLER( cart_grom_ready )
 /*
     The console writes the values in this array to cache them.
 */
-void set_gk_switches(running_device *cartsys, int number, int value)
+void set_gk_switches(device_t *cartsys, int number, int value)
 {
 	ti99_multicart_state *cartslots = get_safe_token(cartsys);
 	cartslots->gk_switch[number] = value;
 }
 
-static int get_gk_switch(running_device *cartsys, int number)
+static int get_gk_switch(device_t *cartsys, int number)
 {
 	ti99_multicart_state *cartslots = get_safe_token(cartsys);
 	return cartslots->gk_switch[number];
 }
 
-static int in_legacy_mode(running_device *device)
+static int in_legacy_mode(device_t *device)
 {
 	ti99_multicart_state *cartslots = (ti99_multicart_state *)downcast<legacy_device_base *>(device)->token();
 	return ((cartslots->legacy_slots>0) && (cartslots->multi_slots==0));
@@ -212,7 +212,7 @@ static int in_legacy_mode(running_device *device)
 /*
     Activates a slot in the multi-cartridge extender.
 */
-static void cartridge_slot_set(running_device *cartsys, UINT8 slotnumber)
+static void cartridge_slot_set(device_t *cartsys, UINT8 slotnumber)
 {
 	ti99_multicart_state *cartslots = get_safe_token(cartsys);
 //  if (cartslots->active_slot != slotnumber) printf("Setting cartslot to %d\n", slotnumber);
@@ -222,7 +222,7 @@ static void cartridge_slot_set(running_device *cartsys, UINT8 slotnumber)
 		cartslots->active_slot = cartslots->fixed_slot;
 }
 
-static int slot_is_empty(running_device *cartsys, int slotnumber)
+static int slot_is_empty(device_t *cartsys, int slotnumber)
 {
 	cartridge_t *cart;
 	ti99_multicart_state *cartslots = get_safe_token(cartsys);
@@ -234,7 +234,7 @@ static int slot_is_empty(running_device *cartsys, int slotnumber)
 	return FALSE;
 }
 
-static void clear_slot(running_device *cartsys, int slotnumber)
+static void clear_slot(device_t *cartsys, int slotnumber)
 {
 	cartridge_t *cart;
 	ti99_multicart_state *cartslots = get_safe_token(cartsys);
@@ -252,7 +252,7 @@ static void clear_slot(running_device *cartsys, int slotnumber)
     <name><number>, i.e. the number is the longest string from the right
     which can be interpreted as a number.
 */
-static int get_index_from_tagname(running_device *image)
+static int get_index_from_tagname(device_t *image)
 {
 	const char *tag = image->tag();
 	int maxlen = strlen(tag);
@@ -266,13 +266,13 @@ static int get_index_from_tagname(running_device *image)
 /*
     Common routine to assemble cartridges from resources.
 */
-static cartridge_t *assemble_common(running_device *cartslot)
+static cartridge_t *assemble_common(device_t *cartslot)
 {
 	/* Pointer to the cartridge structure. */
 	cartridge_t *cartridge;
-	running_device *cartsys = cartslot->owner();
+	device_t *cartsys = cartslot->owner();
 	ti99_multicart_state *cartslots = get_safe_token(cartsys);
-	running_device *pcb = cartslot->subdevice("pcb");
+	device_t *pcb = cartslot->subdevice("pcb");
 	ti99_pcb_t *pcb_def;
 
 	void *socketcont;
@@ -336,9 +336,9 @@ static cartridge_t *assemble_common(running_device *cartslot)
 	return cartridge;
 }
 
-static void set_pointers(running_device *pcb, int index)
+static void set_pointers(device_t *pcb, int index)
 {
-	running_device *cartsys = pcb->owner()->owner();
+	device_t *cartsys = pcb->owner()->owner();
 	ti99_multicart_state *cartslots = get_safe_token(cartsys);
 	ti99_pcb_t *pcb_def = (ti99_pcb_t *)downcast<legacy_device_base *>(pcb)->token();
 
@@ -403,7 +403,7 @@ static WRITE8_DEVICE_HANDLER( write_cart_std )
     The standard cartridge assemble routine. We just call the common
     function here.
 */
-static int assemble_std(running_device *image)
+static int assemble_std(device_t *image)
 {
 	assemble_common(image);
 	return IMAGE_INIT_PASS;
@@ -416,12 +416,12 @@ static int assemble_std(running_device *image)
     As it seems, we can use the same function for the disassembling of all
     cartridge types.
 */
-static int disassemble_std(running_device *image)
+static int disassemble_std(device_t *image)
 {
 	int slotnumber;
 	int i;
 //  cartridge_t *cart;
-	running_device *cartsys = image->owner();
+	device_t *cartsys = image->owner();
 	ti99_multicart_state *cartslots = get_safe_token(cartsys);
 
 	slotnumber = get_index_from_tagname(image)-1;
@@ -502,7 +502,7 @@ static WRITE8_DEVICE_HANDLER( write_cart_paged )
 /*
     We require paged modules to have at least those two rom banks.
 */
-static int assemble_paged(running_device *image)
+static int assemble_paged(device_t *image)
 {
 	cartridge_t *cart;
 
@@ -575,7 +575,7 @@ static WRITE8_DEVICE_HANDLER( write_cart_minimem )
 	}
 }
 
-static int assemble_minimem(running_device *image)
+static int assemble_minimem(device_t *image)
 {
 	cartridge_t *cart;
 
@@ -720,7 +720,7 @@ static WRITE8_DEVICE_HANDLER( write_cart_super )
 	}
 }
 
-static int assemble_super(running_device *image)
+static int assemble_super(device_t *image)
 {
 	cartridge_t *cart;
 
@@ -793,7 +793,7 @@ static WRITE8_DEVICE_HANDLER( write_cart_mbx )
 }
 
 
-static int assemble_mbx(running_device *image)
+static int assemble_mbx(device_t *image)
 {
 	assemble_common(image);
 	return IMAGE_INIT_PASS;
@@ -898,7 +898,7 @@ static WRITE8_DEVICE_HANDLER( write_cart_paged379i )
 /*
     Paged379i modules have one EPROM dump.
 */
-static int assemble_paged379i(running_device *image)
+static int assemble_paged379i(device_t *image)
 {
 	cartridge_t *cart;
 
@@ -1005,7 +1005,7 @@ static WRITE8_DEVICE_HANDLER( write_cart_cru_paged )
 /*
     Pagedcru modules have one EPROM dump.
 */
-static int assemble_pagedcru(running_device *image)
+static int assemble_pagedcru(device_t *image)
 {
 	cartridge_t *cart;
 
@@ -1033,12 +1033,12 @@ static DEVICE_START(ti99_pcb_gramkracker)
 /*
     The GRAM Kracker contains one GROM and several buffered RAM chips
 */
-static int assemble_gramkracker(running_device *image)
+static int assemble_gramkracker(device_t *image)
 {
 	cartridge_t *cart;
 	int id,i;
 
-	running_device *cartsys = image->owner();
+	device_t *cartsys = image->owner();
 	ti99_multicart_state *cartslots = get_safe_token(cartsys);
 
 	cart = assemble_common(image);
@@ -1076,9 +1076,9 @@ static int assemble_gramkracker(running_device *image)
     Unplugs the GRAM Kracker. The "guest" is still plugged in, but will be
     treated as normal.
 */
-static int disassemble_gramkracker(running_device *cartslot)
+static int disassemble_gramkracker(device_t *cartslot)
 {
-	running_device *cartsys = cartslot->owner();
+	device_t *cartsys = cartslot->owner();
 	ti99_multicart_state *cartslots = get_safe_token(cartsys);
 
 	//int slotnumber = get_index_from_tagname(cartslot)-1;
@@ -1098,18 +1098,18 @@ static int disassemble_gramkracker(running_device *cartslot)
 /*
     Get the pointer to the GROM data from the cartridge. Called by the GROM.
 */
-static UINT8 *get_grom_ptr(running_device *device)
+static UINT8 *get_grom_ptr(device_t *device)
 {
 	ti99_pcb_t *pcb = get_safe_pcb_token(device);
 	return pcb->cartridge->grom_ptr;
 }
 
 static MACHINE_CONFIG_FRAGMENT(ti99_cart_common)
-	MDRV_GROM_ADD_P( "grom_3", 3, get_grom_ptr, 0x0000, 0x1800, cart_grom_ready )
-	MDRV_GROM_ADD_P( "grom_4", 4, get_grom_ptr, 0x2000, 0x1800, cart_grom_ready )
-	MDRV_GROM_ADD_P( "grom_5", 5, get_grom_ptr, 0x4000, 0x1800, cart_grom_ready )
-	MDRV_GROM_ADD_P( "grom_6", 6, get_grom_ptr, 0x6000, 0x1800, cart_grom_ready )
-	MDRV_GROM_ADD_P( "grom_7", 7, get_grom_ptr, 0x8000, 0x1800, cart_grom_ready )
+	MCFG_GROM_ADD_P( "grom_3", 3, get_grom_ptr, 0x0000, 0x1800, cart_grom_ready )
+	MCFG_GROM_ADD_P( "grom_4", 4, get_grom_ptr, 0x2000, 0x1800, cart_grom_ready )
+	MCFG_GROM_ADD_P( "grom_5", 5, get_grom_ptr, 0x4000, 0x1800, cart_grom_ready )
+	MCFG_GROM_ADD_P( "grom_6", 6, get_grom_ptr, 0x6000, 0x1800, cart_grom_ready )
+	MCFG_GROM_ADD_P( "grom_7", 7, get_grom_ptr, 0x8000, 0x1800, cart_grom_ready )
 MACHINE_CONFIG_END
 
 static DEVICE_GET_INFO(ti99_cart_common)
@@ -1445,8 +1445,8 @@ static DEVICE_START( ti99_cartridge )
 */
 static DEVICE_IMAGE_LOAD( ti99_cartridge )
 {
-	running_device *pcbdev = cartslot_get_pcb(&image.device());
-//  running_device *cartsys = image.device().owner();
+	device_t *pcbdev = cartslot_get_pcb(&image.device());
+//  device_t *cartsys = image.device().owner();
 //  ti99_multicart_state *cartslots = get_safe_token(cartsys);
 
 	int result;
@@ -1485,7 +1485,7 @@ static DEVICE_IMAGE_LOAD( ti99_cartridge )
 */
 static DEVICE_IMAGE_UNLOAD( ti99_cartridge )
 {
-	running_device *pcbdev;
+	device_t *pcbdev;
 //  ti99_multicart_state *cartslots = (ti99_multicart_state *)downcast<legacy_device_base *>(image.device().owner())->token();
 
 	if (downcast<legacy_device_base *>(&image.device())->token() == NULL)
@@ -1531,8 +1531,8 @@ static DEVICE_IMAGE_UNLOAD( ti99_cartridge )
 
 static READ8Z_DEVICE_HANDLER( ti99_cart_gk_rz );
 static WRITE8_DEVICE_HANDLER( ti99_cart_gk_w );
-static void cartridge_gram_kracker_writeg(running_device *cartsys, int offset, UINT8 data);
-static void cartridge_gram_kracker_readg(running_device *device, UINT8 *value);
+static void cartridge_gram_kracker_writeg(device_t *cartsys, int offset, UINT8 data);
+static void cartridge_gram_kracker_readg(device_t *device, UINT8 *value);
 static READ8Z_DEVICE_HANDLER( ti99_cart_cru_gk_rz );
 static WRITE8_DEVICE_HANDLER( ti99_cart_cru_gk_w );
 
@@ -1857,7 +1857,7 @@ WRITE8_DEVICE_HANDLER( gromportc_w )
 /*
     Reads from the GRAM space of the GRAM Kracker.
 */
-static void cartridge_gram_kracker_readg(running_device *cartsys, UINT8 *value)
+static void cartridge_gram_kracker_readg(device_t *cartsys, UINT8 *value)
 {
 	// gk_slot is the slot where the GK module is plugged in
 	// gk_guest_slot is the slot where the cartridge is plugged in
@@ -1937,7 +1937,7 @@ static void cartridge_gram_kracker_readg(running_device *cartsys, UINT8 *value)
 /*
     Writes to the GRAM space of the GRAM Kracker.
 */
-static void cartridge_gram_kracker_writeg(running_device *cartsys, int offset, UINT8 data)
+static void cartridge_gram_kracker_writeg(device_t *cartsys, int offset, UINT8 data)
 {
 	// gk_slot is the slot where the GK module is plugged in
 	// gk_guest_slot is the slot where the cartridge is plugged in
@@ -2124,20 +2124,20 @@ static WRITE8_DEVICE_HANDLER( ti99_cart_cru_gk_w )
 }
 
 /*****************************************************************************/
-#define TI99_CARTRIDGE_SLOT(p)  MDRV_CARTSLOT_ADD(p) \
-	MDRV_CARTSLOT_EXTENSION_LIST("rpk,bin") \
-	MDRV_CARTSLOT_PCBTYPE(0, "none", TI99_CARTRIDGE_PCB_NONE) \
-	MDRV_CARTSLOT_PCBTYPE(1, "standard", TI99_CARTRIDGE_PCB_STD) \
-	MDRV_CARTSLOT_PCBTYPE(2, "paged", TI99_CARTRIDGE_PCB_PAGED) \
-	MDRV_CARTSLOT_PCBTYPE(3, "minimem", TI99_CARTRIDGE_PCB_MINIMEM) \
-	MDRV_CARTSLOT_PCBTYPE(4, "super", TI99_CARTRIDGE_PCB_SUPER) \
-	MDRV_CARTSLOT_PCBTYPE(5, "mbx", TI99_CARTRIDGE_PCB_MBX) \
-	MDRV_CARTSLOT_PCBTYPE(6, "paged379i", TI99_CARTRIDGE_PCB_PAGED379I) \
-	MDRV_CARTSLOT_PCBTYPE(7, "pagedcru", TI99_CARTRIDGE_PCB_PAGEDCRU) \
-	MDRV_CARTSLOT_PCBTYPE(8, "gramkracker", TI99_CARTRIDGE_PCB_GRAMKRACKER) \
-	MDRV_CARTSLOT_START(ti99_cartridge) \
-	MDRV_CARTSLOT_LOAD(ti99_cartridge) \
-	MDRV_CARTSLOT_UNLOAD(ti99_cartridge)
+#define TI99_CARTRIDGE_SLOT(p)  MCFG_CARTSLOT_ADD(p) \
+	MCFG_CARTSLOT_EXTENSION_LIST("rpk,bin") \
+	MCFG_CARTSLOT_PCBTYPE(0, "none", TI99_CARTRIDGE_PCB_NONE) \
+	MCFG_CARTSLOT_PCBTYPE(1, "standard", TI99_CARTRIDGE_PCB_STD) \
+	MCFG_CARTSLOT_PCBTYPE(2, "paged", TI99_CARTRIDGE_PCB_PAGED) \
+	MCFG_CARTSLOT_PCBTYPE(3, "minimem", TI99_CARTRIDGE_PCB_MINIMEM) \
+	MCFG_CARTSLOT_PCBTYPE(4, "super", TI99_CARTRIDGE_PCB_SUPER) \
+	MCFG_CARTSLOT_PCBTYPE(5, "mbx", TI99_CARTRIDGE_PCB_MBX) \
+	MCFG_CARTSLOT_PCBTYPE(6, "paged379i", TI99_CARTRIDGE_PCB_PAGED379I) \
+	MCFG_CARTSLOT_PCBTYPE(7, "pagedcru", TI99_CARTRIDGE_PCB_PAGEDCRU) \
+	MCFG_CARTSLOT_PCBTYPE(8, "gramkracker", TI99_CARTRIDGE_PCB_GRAMKRACKER) \
+	MCFG_CARTSLOT_START(ti99_cartridge) \
+	MCFG_CARTSLOT_LOAD(ti99_cartridge) \
+	MCFG_CARTSLOT_UNLOAD(ti99_cartridge)
 
 static MACHINE_CONFIG_FRAGMENT(ti99_multicart)
 	TI99_CARTRIDGE_SLOT("cartridge1")

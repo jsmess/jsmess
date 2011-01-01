@@ -114,7 +114,7 @@ struct _upd71071_t
 static TIMER_CALLBACK(dma_transfer_timer)
 {
 	// single byte or word transfer
-	running_device* device = (running_device*)ptr;
+	device_t* device = (device_t*)ptr;
 	upd71071_t* dmac = (upd71071_t*)downcast<legacy_device_base *>(device)->token();
 	address_space* space = cputag_get_address_space(device->machine,dmac->intf->cputag,ADDRESS_SPACE_PROGRAM);
 	int channel = param;
@@ -169,7 +169,7 @@ static TIMER_CALLBACK(dma_transfer_timer)
 	}
 }
 
-static void upd71071_soft_reset(running_device* device)
+static void upd71071_soft_reset(device_t* device)
 {
 	upd71071_t* dmac = (upd71071_t*)downcast<legacy_device_base *>(device)->token();
 	int x;
@@ -187,7 +187,7 @@ static void upd71071_soft_reset(running_device* device)
 	dmac->reg.request = 0;
 }
 
-int upd71071_dmarq(running_device* device, int state,int channel)
+int upd71071_dmarq(device_t* device, int state,int channel)
 {
 	upd71071_t* dmac = (upd71071_t*)downcast<legacy_device_base *>(device)->token();
 

@@ -34,8 +34,8 @@ WRITE8_DEVICE_HANDLER( mapper8c_w );
 /* device interface */
 DECLARE_LEGACY_DEVICE( MAPPER8, mapper8 );
 
-#define MDRV_MAPPER8_ADD(_tag, _devices)			\
-	MDRV_DEVICE_ADD(_tag, MAPPER8, 0) \
-	MDRV_DEVICE_CONFIG( _devices )
+#define MCFG_MAPPER8_ADD(_tag, _devices)			\
+	MCFG_DEVICE_ADD(_tag, MAPPER8, 0) \
+	MCFG_DEVICE_CONFIG( _devices )
 
 #endif

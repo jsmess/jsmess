@@ -17,10 +17,10 @@ public:
 		: driver_device(machine, config) { }
 
 	/* devices */
-	running_device *via0;
-	running_device *via1;
-	running_device *via2;
-	running_device *speaker;
+	device_t *via0;
+	device_t *via1;
+	device_t *via2;
+	device_t *speaker;
 };
 
 #endif

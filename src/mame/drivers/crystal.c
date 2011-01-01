@@ -152,9 +152,9 @@ public:
 	UINT8     OldPort4;
 	UINT32    *ResetPatch;
 
-	running_device *maincpu;
-	running_device *ds1302;
-	running_device *vr0video;
+	device_t *maincpu;
+	device_t *ds1302;
+	device_t *vr0video;
 };
 
 static void IntReq( running_machine *machine, int num )
@@ -262,9 +262,9 @@ static WRITE32_HANDLER( Banksw_w )
 
 	state->Bank = (data >> 1) & 7;
 	if (state->Bank <= 2)
-		memory_set_bankptr(space->machine, "bank1", memory_region(space->machine, "user1") + state->Bank * 0x1000000);
+		memory_set_bankptr(space->machine, "bank1", space->machine->region("user1")->base() + state->Bank * 0x1000000);
 	else
-		memory_set_bankptr(space->machine, "bank1", memory_region(space->machine, "user2"));
+		memory_set_bankptr(space->machine, "bank1", space->machine->region("user2")->base());
 }
 
 static TIMER_CALLBACK( Timercb )
@@ -349,7 +349,7 @@ static READ32_HANDLER( FlashCmd_r )
 	{
 		if (state->Bank <= 2)
 		{
-			UINT32 *ptr = (UINT32*)(memory_region(space->machine, "user1") + state->Bank * 0x1000000);
+			UINT32 *ptr = (UINT32*)(space->machine->region("user1")->base() + state->Bank * 0x1000000);
 			return ptr[0];
 		}
 		else
@@ -553,9 +553,9 @@ static STATE_POSTLOAD( crystal_banksw_postload )
 	crystal_state *state = machine->driver_data<crystal_state>();
 
 	if (state->Bank <= 2)
-		memory_set_bankptr(machine, "bank1", memory_region(machine, "user1") + state->Bank * 0x1000000);
+		memory_set_bankptr(machine, "bank1", machine->region("user1")->base() + state->Bank * 0x1000000);
 	else
-		memory_set_bankptr(machine, "bank1", memory_region(machine, "user2"));
+		memory_set_bankptr(machine, "bank1", machine->region("user2")->base());
 }
 
 static MACHINE_START( crystal )
@@ -599,7 +599,7 @@ static MACHINE_RESET( crystal )
 	state->IntHigh = 0;
 	cpu_set_irq_callback(machine->device("maincpu"), icallback);
 	state->Bank = 0;
-	memory_set_bankptr(machine, "bank1", memory_region(machine, "user1") + 0);
+	memory_set_bankptr(machine, "bank1", machine->region("user1")->base() + 0);
 	state->FlashCmd = 0xff;
 	state->OldPort4 = 0;
 
@@ -817,38 +817,38 @@ static const vr0video_interface vr0video_config =
 
 static MACHINE_CONFIG_START( crystal, crystal_state )
 
-	MDRV_CPU_ADD("maincpu", SE3208, 43000000)
-	MDRV_CPU_PROGRAM_MAP(crystal_mem)
-	MDRV_CPU_VBLANK_INT("screen", crystal_interrupt)
+	MCFG_CPU_ADD("maincpu", SE3208, 43000000)
+	MCFG_CPU_PROGRAM_MAP(crystal_mem)
+	MCFG_CPU_VBLANK_INT("screen", crystal_interrupt)
 
-	MDRV_MACHINE_START(crystal)
-	MDRV_MACHINE_RESET(crystal)
+	MCFG_MACHINE_START(crystal)
+	MCFG_MACHINE_RESET(crystal)
 
-	MDRV_NVRAM_ADD_0FILL("nvram")
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(320, 240)
-	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(320, 240)
+	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 
-	MDRV_VIDEO_UPDATE(crystal)
-	MDRV_VIDEO_EOF(crystal)
+	MCFG_VIDEO_UPDATE(crystal)
+	MCFG_VIDEO_EOF(crystal)
 
-	MDRV_VIDEO_VRENDER0_ADD("vr0", vr0video_config)
+	MCFG_VIDEO_VRENDER0_ADD("vr0", vr0video_config)
 
-	MDRV_PALETTE_INIT(RRRRR_GGGGGG_BBBBB)
-	MDRV_PALETTE_LENGTH(65536)
+	MCFG_PALETTE_INIT(RRRRR_GGGGGG_BBBBB)
+	MCFG_PALETTE_LENGTH(65536)
 
-	MDRV_DS1302_ADD("rtc")
+	MCFG_DS1302_ADD("rtc")
 
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("vrender", VRENDER0, 0)
-	MDRV_SOUND_CONFIG(vr0_config)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("vrender", VRENDER0, 0)
+	MCFG_SOUND_CONFIG(vr0_config)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 /*
@@ -856,9 +856,9 @@ MACHINE_CONFIG_END
 */
 static MACHINE_CONFIG_DERIVED( topbladv, crystal )
 
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_SIZE(320+32, 240)
-	MDRV_SCREEN_VISIBLE_AREA(0, 319+32, 0, 239)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_SIZE(320+32, 240)
+	MCFG_SCREEN_VISIBLE_AREA(0, 319+32, 0, 239)
 
 MACHINE_CONFIG_END
 
@@ -928,7 +928,7 @@ ROM_END
 
 static DRIVER_INIT(crysking)
 {
-	UINT16 *Rom = (UINT16*) memory_region(machine, "user1");
+	UINT16 *Rom = (UINT16*) machine->region("user1")->base();
 
 	//patch the data feed by the protection
 
@@ -947,7 +947,7 @@ static DRIVER_INIT(crysking)
 
 static DRIVER_INIT(evosocc)
 {
-	UINT16 *Rom = (UINT16*) memory_region(machine, "user1");
+	UINT16 *Rom = (UINT16*) machine->region("user1")->base();
 	Rom += 0x1000000 * 2 / 2;
 
 	Rom[WORD_XOR_LE(0x97388E/2)] = 0x90FC;	//PUSH R2..R7
@@ -965,7 +965,7 @@ static DRIVER_INIT(evosocc)
 
 static DRIVER_INIT(topbladv)
 {
-	UINT16 *Rom = (UINT16*) memory_region(machine, "user1");
+	UINT16 *Rom = (UINT16*) machine->region("user1")->base();
 
 	Rom[WORD_XOR_LE(0x12d7a/2)] = 0x90FC;	//PUSH R7-R6-R5-R4-R3-R2
 	Rom[WORD_XOR_LE(0x12d7c/2)] = 0x9001;	//PUSH R0
@@ -983,7 +983,7 @@ static DRIVER_INIT(topbladv)
 
 static DRIVER_INIT(officeye)
 {
-	UINT16 *Rom = (UINT16*) memory_region(machine, "user1");
+	UINT16 *Rom = (UINT16*) machine->region("user1")->base();
 
 	Rom[WORD_XOR_LE(0x9c9e/2)] = 0x901C;	//PUSH R4-R3-R2
 	Rom[WORD_XOR_LE(0x9ca0/2)] = 0x9001;	//PUSH R0

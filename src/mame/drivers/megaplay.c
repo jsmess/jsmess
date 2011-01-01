@@ -435,7 +435,7 @@ static READ16_HANDLER( megaplay_io_read )
 static READ8_HANDLER( bank_r )
 {
 	UINT32 fulladdress;
-	UINT8* bank = memory_region(space->machine, "mtbios");
+	UINT8* bank = space->machine->region("mtbios")->base();
 
 	fulladdress = mplay_bios.mp_bios_bank_addr + offset;
 
@@ -460,7 +460,7 @@ static READ8_HANDLER( bank_r )
 		}
 		else
 		{
-			return memory_region(space->machine, "maincpu")[fulladdress ^ 1];
+			return space->machine->region("maincpu")->base()[fulladdress ^ 1];
 		}
 	}
 	else if (fulladdress >= 0xa10000 && fulladdress <= 0xa1001f) // IO Acess
@@ -653,23 +653,23 @@ static MACHINE_CONFIG_DERIVED( mpnew, megadriv )
 
 	/* The Megaplay has an extra BIOS cpu which drives an SMS VDP
        which includes an SN76496 for sound */
-	MDRV_CPU_ADD("mtbios", Z80, MASTER_CLOCK / 15) /* ?? */
-	MDRV_CPU_PROGRAM_MAP(megaplay_bios_map)
-	MDRV_CPU_IO_MAP(megaplay_bios_io_map)
-	//MDRV_CPU_VBLANK_INT_HACK(megaplay_bios_irq, 262)
+	MCFG_CPU_ADD("mtbios", Z80, MASTER_CLOCK / 15) /* ?? */
+	MCFG_CPU_PROGRAM_MAP(megaplay_bios_map)
+	MCFG_CPU_IO_MAP(megaplay_bios_io_map)
+	//MCFG_CPU_VBLANK_INT_HACK(megaplay_bios_irq, 262)
 
-	MDRV_MACHINE_RESET( mpnew )
-	MDRV_VIDEO_EOF( mpnew )
+	MCFG_MACHINE_RESET( mpnew )
+	MCFG_VIDEO_EOF( mpnew )
 
-	MDRV_QUANTUM_TIME(HZ(6000))
+	MCFG_QUANTUM_TIME(HZ(6000))
 
-	MDRV_SOUND_ADD("sn2", SN76496, MASTER_CLOCK/15)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25) /* 3.58 MHz */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker",0.25) /* 3.58 MHz */
+	MCFG_SOUND_ADD("sn2", SN76496, MASTER_CLOCK/15)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25) /* 3.58 MHz */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker",0.25) /* 3.58 MHz */
 
 	/* New update functions to handle the extra layer */
-	MDRV_VIDEO_START(megplay)
-	MDRV_VIDEO_UPDATE(megplay)
+	MCFG_VIDEO_START(megplay)
+	MCFG_VIDEO_UPDATE(megplay)
 MACHINE_CONFIG_END
 
 
@@ -831,9 +831,9 @@ ROM_END
 
 static void mplay_start(running_machine *machine)
 {
-	UINT8 *src = memory_region(machine, "mtbios");
-	UINT8 *instruction_rom = memory_region(machine, "user1");
-	UINT8 *game_rom = memory_region(machine, "maincpu");
+	UINT8 *src = machine->region("mtbios")->base();
+	UINT8 *instruction_rom = machine->region("user1")->base();
+	UINT8 *game_rom = machine->region("maincpu")->base();
 	int offs;
 
 

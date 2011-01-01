@@ -43,9 +43,9 @@ INPUT_PORTS_EXTERN( kb_keytronic_at );
 
 DECLARE_LEGACY_DEVICE(KB_KEYTRONIC, kb_keytr);
 
-#define MDRV_KB_KEYTRONIC_ADD(_tag, _interface) \
-	MDRV_DEVICE_ADD(_tag, KB_KEYTRONIC, 0) \
-	MDRV_DEVICE_CONFIG(_interface)
+#define MCFG_KB_KEYTRONIC_ADD(_tag, _interface) \
+	MCFG_DEVICE_ADD(_tag, KB_KEYTRONIC, 0) \
+	MCFG_DEVICE_CONFIG(_interface)
 
 
 #endif  /* __KB_KEYTRO_H__ */

@@ -82,7 +82,7 @@ WRITE8_HANDLER(vector06_color_set)
 static READ8_DEVICE_HANDLER (vector06_romdisk_portb_r )
 {
 	vector06_state *state = device->machine->driver_data<vector06_state>();
-	UINT8 *romdisk = memory_region(device->machine, "maincpu") + 0x18000;
+	UINT8 *romdisk = device->machine->region("maincpu")->base() + 0x18000;
 	UINT16 addr = (state->romdisk_msb*256+state->romdisk_lsb) & 0x7fff;
 	return romdisk[addr];
 }
@@ -157,7 +157,7 @@ static TIMER_CALLBACK(reset_check_callback)
 {
 	UINT8 val = input_port_read(machine, "RESET");
 	if ((val & 1)==1) {
-		memory_set_bankptr(machine, "bank1", memory_region(machine, "maincpu") + 0x10000);
+		memory_set_bankptr(machine, "bank1", machine->region("maincpu")->base() + 0x10000);
 		machine->device("maincpu")->reset();
 	}
 	if ((val & 2)==2) {
@@ -168,7 +168,7 @@ static TIMER_CALLBACK(reset_check_callback)
 
 WRITE8_HANDLER(vector06_disc_w)
 {
-	running_device *fdc = space->machine->device("wd1793");
+	device_t *fdc = space->machine->device("wd1793");
 	wd17xx_set_side (fdc,((data & 4) >> 2) ^ 1);
 	wd17xx_set_drive(fdc,data & 1);
 }
@@ -189,7 +189,7 @@ MACHINE_RESET( vector06 )
 	memory_install_read_bank (space, 0x8000, 0xffff, 0, 0, "bank3");
 	memory_install_write_bank(space, 0x8000, 0xffff, 0, 0, "bank4");
 
-	memory_set_bankptr(machine, "bank1", memory_region(machine, "maincpu") + 0x10000);
+	memory_set_bankptr(machine, "bank1", machine->region("maincpu")->base() + 0x10000);
 	memory_set_bankptr(machine, "bank2", messram_get_ptr(machine->device("messram")) + 0x0000);
 	memory_set_bankptr(machine, "bank3", messram_get_ptr(machine->device("messram")) + 0x8000);
 	memory_set_bankptr(machine, "bank4", messram_get_ptr(machine->device("messram")) + 0x8000);

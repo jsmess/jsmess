@@ -20,7 +20,7 @@ struct k1ge
 	UINT8 *vram;
 	UINT8 wba_h, wba_v, wsi_h, wsi_v;
 
-	void (*draw)( running_device *device, int line );
+	void (*draw)( device_t *device, int line );
 
 	emu_timer *timer;
 	emu_timer *hblank_on_timer;
@@ -58,7 +58,7 @@ PALETTE_INIT( k2ge )
 }
 
 
-INLINE k1ge_t *get_safe_token( running_device *device )
+INLINE k1ge_t *get_safe_token( device_t *device )
 {
 	assert( device != NULL );
 	assert( device->type() == K1GE || device->type() == K2GE );
@@ -268,7 +268,7 @@ INLINE void k1ge_draw_sprite_plane( k1ge_t *k1ge, UINT16 *p, UINT16 priority, in
 }
 
 
-static void k1ge_draw( running_device *device, int line )
+static void k1ge_draw( device_t *device, int line )
 {
 	k1ge_t *k1ge = get_safe_token( device );
 	UINT16 *p = BITMAP_ADDR16( k1ge->bitmap, line, 0 );
@@ -631,7 +631,7 @@ INLINE void k2ge_k1ge_draw_sprite_plane( k1ge_t *k1ge, UINT16 *p, UINT16 priorit
 }
 
 
-static void k2ge_draw( running_device *device, int line )
+static void k2ge_draw( device_t *device, int line )
 {
 	k1ge_t *k1ge = get_safe_token( device );
 	UINT16 *p = BITMAP_ADDR16( k1ge->bitmap, line, 0 );
@@ -756,7 +756,7 @@ static void k2ge_draw( running_device *device, int line )
 
 static TIMER_CALLBACK( k1ge_hblank_on_timer_callback )
 {
-	running_device *device = (running_device *)ptr;
+	device_t *device = (device_t *)ptr;
 	k1ge_t *k1ge = get_safe_token( device );
 
 	if ( k1ge->hblank_pin_w.write != NULL )
@@ -766,7 +766,7 @@ static TIMER_CALLBACK( k1ge_hblank_on_timer_callback )
 
 static TIMER_CALLBACK( k1ge_timer_callback )
 {
-	running_device *device = (running_device *)ptr;
+	device_t *device = (device_t *)ptr;
 	k1ge_t *k1ge = get_safe_token( device );
 	int y = k1ge->screen->vpos();
 
@@ -811,7 +811,7 @@ static TIMER_CALLBACK( k1ge_timer_callback )
 }
 
 
-void k1ge_update( running_device *device, bitmap_t *bitmap, const rectangle *cliprect )
+void k1ge_update( device_t *device, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	k1ge_t *k1ge = get_safe_token( device );
 
@@ -831,7 +831,7 @@ static DEVICE_START( k1ge )
 	k1ge->timer = timer_alloc( device->machine, k1ge_timer_callback, (void *) device );
 	k1ge->hblank_on_timer = timer_alloc( device->machine, k1ge_hblank_on_timer_callback, (void *) device );
 	k1ge->screen = device->machine->device<screen_device>(k1ge->intf->screen_tag);
-	k1ge->vram = memory_region( device->machine, k1ge->intf->vram_tag );
+	k1ge->vram = device->machine->region( k1ge->intf->vram_tag )->base();
 	k1ge->bitmap = auto_bitmap_alloc( device->machine, k1ge->screen->width(), k1ge->screen->height(), k1ge->screen->format() );
 	k1ge->draw = k1ge_draw;
 }

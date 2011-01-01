@@ -35,7 +35,7 @@ public:
 	UINT8 pot_latch;
 
 	/* devices */
-	running_device *maincpu;
+	device_t *maincpu;
 };
 
 /*************************************
@@ -116,7 +116,7 @@ static void draw_boxer( running_machine *machine, bitmap_t* bitmap, const rectan
 
 	for (n = 0; n < 2; n++)
 	{
-		const UINT8* p = memory_region(machine, n == 0 ? "user1" : "user2");
+		const UINT8* p = machine->region(n == 0 ? "user1" : "user2")->base();
 
 		int i, j;
 
@@ -438,23 +438,23 @@ static MACHINE_RESET( boxer )
 static MACHINE_CONFIG_START( boxer, boxer_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6502, MASTER_CLOCK / 16)
-	MDRV_CPU_PROGRAM_MAP(boxer_map)
+	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK / 16)
+	MCFG_CPU_PROGRAM_MAP(boxer_map)
 
-	MDRV_MACHINE_START(boxer)
-	MDRV_MACHINE_RESET(boxer)
+	MCFG_MACHINE_START(boxer)
+	MCFG_MACHINE_RESET(boxer)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(256, 262)
-	MDRV_SCREEN_VISIBLE_AREA(8, 247, 0, 239)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(256, 262)
+	MCFG_SCREEN_VISIBLE_AREA(8, 247, 0, 239)
 
-	MDRV_GFXDECODE(boxer)
-	MDRV_PALETTE_LENGTH(4)
-	MDRV_PALETTE_INIT(boxer)
-	MDRV_VIDEO_UPDATE(boxer)
+	MCFG_GFXDECODE(boxer)
+	MCFG_PALETTE_LENGTH(4)
+	MCFG_PALETTE_INIT(boxer)
+	MCFG_VIDEO_UPDATE(boxer)
 
 	/* sound hardware */
 MACHINE_CONFIG_END

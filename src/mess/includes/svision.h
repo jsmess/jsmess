@@ -36,7 +36,7 @@ public:
 
 	UINT8 *videoram;
 	UINT8 *reg;
-	running_device *sound;
+	device_t *sound;
 	int *dma_finished;
 	svision_t svision;
 	svision_pet_t pet;
@@ -53,9 +53,9 @@ void svision_irq( running_machine *machine );
 
 DECLARE_LEGACY_SOUND_DEVICE(SVISION, svision_sound);
 
-int *svision_dma_finished(running_device *device);
-void svision_sound_decrement(running_device *device);
-void svision_soundport_w(running_device *device, int which, int offset, int data);
+int *svision_dma_finished(device_t *device);
+void svision_sound_decrement(device_t *device);
+void svision_soundport_w(device_t *device, int which, int offset, int data);
 WRITE8_DEVICE_HANDLER( svision_sounddma_w );
 WRITE8_DEVICE_HANDLER( svision_noise_w );
 

@@ -22,8 +22,8 @@ public:
 	int pio1_brdy;
 
 	/* devices */
-	running_device *z80pio;
-	running_device *cassette;
+	device_t *z80pio;
+	device_t *cassette;
 };
 
 #endif

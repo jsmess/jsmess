@@ -40,11 +40,11 @@ public:
 #endif
 	UINT8 cassette_data;
 	emu_timer *cassette_data_timer;
-	running_device *printer;
-	running_device *ay31015;
-	running_device *cass;
-	running_device *speaker;
-	running_device *fdc;
+	device_t *printer;
+	device_t *ay31015;
+	device_t *cass;
+	device_t *speaker;
+	device_t *fdc;
 	double old_cassette_val;
 	UINT16 start_address;
 	UINT8 crtc_reg;

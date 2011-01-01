@@ -29,12 +29,12 @@
  *
  *************************************/
 
-void micro3d_duart_irq_handler(running_device *device, UINT8 vector)
+void micro3d_duart_irq_handler(device_t *device, UINT8 vector)
 {
 	cputag_set_input_line_and_vector(device->machine, "maincpu", 3, HOLD_LINE, vector);
 };
 
-void micro3d_duart_tx(running_device *device, int channel, UINT8 data)
+void micro3d_duart_tx(device_t *device, int channel, UINT8 data)
 {
 	micro3d_state *state = device->machine->driver_data<micro3d_state>();
 
@@ -51,13 +51,13 @@ void micro3d_duart_tx(running_device *device, int channel, UINT8 data)
 	}
 };
 
-static int data_to_i8031(running_device *device)
+static int data_to_i8031(device_t *device)
 {
 	micro3d_state *state = device->machine->driver_data<micro3d_state>();
 	return state->m68681_tx0;
 }
 
-static void data_from_i8031(running_device *device, int data)
+static void data_from_i8031(device_t *device, int data)
 {
 	micro3d_state *state = device->machine->driver_data<micro3d_state>();
 	duart68681_rx_data(state->duart68681, 1, data);
@@ -71,7 +71,7 @@ static void data_from_i8031(running_device *device, int data)
  * 4: -
  * 5: -
  */
-UINT8 micro3d_duart_input_r(running_device *device)
+UINT8 micro3d_duart_input_r(device_t *device)
 {
 	return 0x2;
 }
@@ -80,7 +80,7 @@ UINT8 micro3d_duart_input_r(running_device *device)
  * 5: /I8051 reset
  * 7: Status LED
 */
-void micro3d_duart_output_w(running_device *device, UINT8 data)
+void micro3d_duart_output_w(device_t *device, UINT8 data)
 {
 	cputag_set_input_line(device->machine, "audiocpu", INPUT_LINE_RESET, data & 0x20 ? CLEAR_LINE : ASSERT_LINE);
 }
@@ -443,7 +443,7 @@ WRITE32_HANDLER( micro3d_mac2_w )
 		case 0x08:
 		{
 			int i;
-			const UINT16 *rom = (UINT16*)memory_region(space->machine, "vertex");
+			const UINT16 *rom = (UINT16*)space->machine->region("vertex")->base();
 
 			for (i = 0; i <= cnt; ++i)
 			{
@@ -482,7 +482,7 @@ WRITE32_HANDLER( micro3d_mac2_w )
 		case 0x0c:
 		{
 			int i;
-			const UINT16 *rom = (UINT16*)memory_region(space->machine, "vertex");
+			const UINT16 *rom = (UINT16*)space->machine->region("vertex")->base();
 
 			for (i = 0; i <= cnt; ++i)
 			{
@@ -515,7 +515,7 @@ WRITE32_HANDLER( micro3d_mac2_w )
 		case 0x0f:
 		{
 			int i;
-			const UINT16 *rom = (UINT16*)memory_region(space->machine, "vertex");
+			const UINT16 *rom = (UINT16*)space->machine->region("vertex")->base();
 
 			for (i = 0; i <= cnt; ++i, vtx_addr += 4)
 			{

@@ -41,9 +41,9 @@
 
 DECLARE_LEGACY_DEVICE(UPD7201, upd7201);
 
-#define MDRV_UPD7201_ADD(_tag, _clock, _intrf) \
-	MDRV_DEVICE_ADD(_tag, UPD7201, _clock) \
-	MDRV_DEVICE_CONFIG(_intrf)
+#define MCFG_UPD7201_ADD(_tag, _clock, _intrf) \
+	MCFG_DEVICE_ADD(_tag, UPD7201, _clock) \
+	MCFG_DEVICE_CONFIG(_intrf)
 
 #define UPD7201_INTERFACE(name) \
 	const upd7201_interface (name)=

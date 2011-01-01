@@ -97,11 +97,11 @@ INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( et3400, et3400_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6800, XTAL_4MHz / 8 )
-	MDRV_CPU_PROGRAM_MAP(et3400_mem)
+	MCFG_CPU_ADD("maincpu", M6800, XTAL_4MHz / 8 )
+	MCFG_CPU_PROGRAM_MAP(et3400_mem)
 
 	/* video hardware */
-	MDRV_DEFAULT_LAYOUT(layout_et3400)
+	MCFG_DEFAULT_LAYOUT(layout_et3400)
 MACHINE_CONFIG_END
 
 /* ROM definition */

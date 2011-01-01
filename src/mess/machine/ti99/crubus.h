@@ -23,8 +23,8 @@ WRITE8_DEVICE_HANDLER( ti99_crubus_w );
 /* device interface */
 DECLARE_LEGACY_DEVICE( CRUBUS, crubus );
 
-#define MDRV_CRUBUS_ADD(_tag, _devices)			\
-	MDRV_DEVICE_ADD(_tag, CRUBUS, 0) \
-	MDRV_DEVICE_CONFIG( _devices )
+#define MCFG_CRUBUS_ADD(_tag, _devices)			\
+	MCFG_DEVICE_ADD(_tag, CRUBUS, 0) \
+	MCFG_DEVICE_CONFIG( _devices )
 
 #endif

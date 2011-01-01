@@ -39,7 +39,7 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER(nanos_tc_w)
 {
-	running_device *fdc = space->machine->device("upd765");
+	device_t *fdc = space->machine->device("upd765");
 	upd765_tc_w(fdc, BIT(data,1));
 }
 
@@ -93,7 +93,7 @@ static Z80PIO_INTERFACE( pio2_intf )
 
 /* Z80-SIO Interface */
 
-static void z80daisy_interrupt(running_device *device, int state)
+static void z80daisy_interrupt(device_t *device, int state)
 {
 	cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_IRQ0, state);
 }
@@ -241,7 +241,7 @@ INPUT_PORTS_END
 static VIDEO_START( nanos )
 {
 	nanos_state *state = machine->driver_data<nanos_state>();
-	state->FNT = memory_region(machine, "gfx1");
+	state->FNT = machine->region("gfx1")->base();
 }
 
 static VIDEO_UPDATE( nanos )
@@ -311,7 +311,7 @@ static WRITE8_DEVICE_HANDLER (nanos_port_b_w)
 	nanos_state *state = device->machine->driver_data<nanos_state>();
 	state->key_command = BIT(data,1);
 	if (BIT(data,7)) {
-		memory_set_bankptr(device->machine, "bank1", memory_region(device->machine, "maincpu"));
+		memory_set_bankptr(device->machine, "bank1", device->machine->region("maincpu")->base());
 	} else {
 		memory_set_bankptr(device->machine, "bank1", messram_get_ptr(device->machine->device("messram")));
 	}
@@ -426,7 +426,7 @@ static MACHINE_RESET(nanos)
 	memory_install_write_bank(space, 0x0000, 0x0fff, 0, 0, "bank3");
 	memory_install_write_bank(space, 0x1000, 0xffff, 0, 0, "bank2");
 
-	memory_set_bankptr(machine, "bank1", memory_region(machine, "maincpu"));
+	memory_set_bankptr(machine, "bank1", machine->region("maincpu")->base());
 	memory_set_bankptr(machine, "bank2", messram_get_ptr(machine->device("messram")) + 0x1000);
 	memory_set_bankptr(machine, "bank3", messram_get_ptr(machine->device("messram")));
 
@@ -496,44 +496,44 @@ GFXDECODE_END
 
 static MACHINE_CONFIG_START( nanos, nanos_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz)
-	MDRV_CPU_PROGRAM_MAP(nanos_mem)
-	MDRV_CPU_IO_MAP(nanos_io)
-	MDRV_CPU_CONFIG(nanos_daisy_chain)
+	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
+	MCFG_CPU_PROGRAM_MAP(nanos_mem)
+	MCFG_CPU_IO_MAP(nanos_io)
+	MCFG_CPU_CONFIG(nanos_daisy_chain)
 
-	MDRV_MACHINE_START(nanos)
-	MDRV_MACHINE_RESET(nanos)
+	MCFG_MACHINE_START(nanos)
+	MCFG_MACHINE_RESET(nanos)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(50)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(80*8, 25*10)
-	MDRV_SCREEN_VISIBLE_AREA(0,80*8-1,0,25*10-1)
-	MDRV_GFXDECODE(nanos)
-	MDRV_PALETTE_LENGTH(2)
-	MDRV_PALETTE_INIT(black_and_white)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(80*8, 25*10)
+	MCFG_SCREEN_VISIBLE_AREA(0,80*8-1,0,25*10-1)
+	MCFG_GFXDECODE(nanos)
+	MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_INIT(black_and_white)
 
-	MDRV_VIDEO_START(nanos)
-	MDRV_VIDEO_UPDATE(nanos)
+	MCFG_VIDEO_START(nanos)
+	MCFG_VIDEO_UPDATE(nanos)
 
 	/* devices */
-	MDRV_Z80CTC_ADD( "z80ctc_0", XTAL_4MHz, ctc_intf)
-	MDRV_Z80CTC_ADD( "z80ctc_1", XTAL_4MHz, ctc_intf)
-	MDRV_Z80PIO_ADD( "z80pio_0", XTAL_4MHz, pio1_intf)
-	MDRV_Z80PIO_ADD( "z80pio_1", XTAL_4MHz, pio2_intf)
-	MDRV_Z80SIO_ADD( "z80sio_0", XTAL_4MHz, sio_intf)
-	MDRV_Z80SIO_ADD( "z80sio_1", XTAL_4MHz, sio_intf)
-	MDRV_Z80PIO_ADD( "z80pio", XTAL_4MHz, nanos_z80pio_intf )
+	MCFG_Z80CTC_ADD( "z80ctc_0", XTAL_4MHz, ctc_intf)
+	MCFG_Z80CTC_ADD( "z80ctc_1", XTAL_4MHz, ctc_intf)
+	MCFG_Z80PIO_ADD( "z80pio_0", XTAL_4MHz, pio1_intf)
+	MCFG_Z80PIO_ADD( "z80pio_1", XTAL_4MHz, pio2_intf)
+	MCFG_Z80SIO_ADD( "z80sio_0", XTAL_4MHz, sio_intf)
+	MCFG_Z80SIO_ADD( "z80sio_1", XTAL_4MHz, sio_intf)
+	MCFG_Z80PIO_ADD( "z80pio", XTAL_4MHz, nanos_z80pio_intf )
 	/* UPD765 */
-	MDRV_UPD765A_ADD("upd765", nanos_upd765_interface)
+	MCFG_UPD765A_ADD("upd765", nanos_upd765_interface)
 
-	MDRV_FLOPPY_4_DRIVES_ADD(nanos_floppy_config)
+	MCFG_FLOPPY_4_DRIVES_ADD(nanos_floppy_config)
 
 	/* internal ram */
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("64K")
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("64K")
 MACHINE_CONFIG_END
 
 /* ROM definition */

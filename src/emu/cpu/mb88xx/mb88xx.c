@@ -82,7 +82,7 @@ struct _mb88_state
     int icount;
 };
 
-INLINE mb88_state *get_safe_token(running_device *device)
+INLINE mb88_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == MB88 ||
@@ -303,26 +303,38 @@ static void update_pio( mb88_state *cpustate, int cycles )
 	/* process pending interrupts */
 	if (cpustate->pending_interrupt & cpustate->pio)
 	{
-		/* if we have a live external source, call the irqcallback */
-		if (cpustate->pending_interrupt & cpustate->pio & INT_CAUSE_EXTERNAL)
-			(*cpustate->irqcallback)(cpustate->device, 0);
-
-		cpustate->pending_interrupt = 0;
-
 		cpustate->SP[cpustate->SI] = GETPC();
 		cpustate->SP[cpustate->SI] |= TEST_CF() << 15;
 		cpustate->SP[cpustate->SI] |= TEST_ZF() << 14;
 		cpustate->SP[cpustate->SI] |= TEST_ST() << 13;
 		cpustate->SI = ( cpustate->SI + 1 ) & 3;
-		cpustate->PC = 0x02;
+
+		/* the datasheet doesn't mention interrupt vectors but
+        the Arabian MCU program expects the following */
+		if (cpustate->pending_interrupt & cpustate->pio & INT_CAUSE_EXTERNAL)
+		{
+			/* if we have a live external source, call the irqcallback */
+			(*cpustate->irqcallback)(cpustate->device, 0);
+			cpustate->PC = 0x02;
+		}
+		else if (cpustate->pending_interrupt & cpustate->pio & INT_CAUSE_TIMER)
+		{
+			cpustate->PC = 0x04;
+		}
+		else if (cpustate->pending_interrupt & cpustate->pio & INT_CAUSE_SERIAL)
+		{
+			cpustate->PC = 0x06;
+		}
+
 		cpustate->PA = 0x00;
 		cpustate->st = 1;
+		cpustate->pending_interrupt = 0;
 
 		CYCLES(3); /* ? */
 	}
 }
 
-void mb88_external_clock_w(running_device *device, int state)
+void mb88_external_clock_w(device_t *device, int state)
 {
 	mb88_state *cpustate = get_safe_token(device);
 	if (state != cpustate->ctr)

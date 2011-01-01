@@ -312,7 +312,7 @@ static void set_indicator_leds(int data, const char *output_name, int base_index
 static void update_artwork(running_machine *machine, stactics_state *state)
 {
 	int i;
-	UINT8 *beam_region = memory_region(machine, "user1");
+	UINT8 *beam_region = machine->region("user1")->base();
 
 	/* set the lamps first */
 	output_set_indexed_value("base_lamp", 4, state->lamps[0] & 0x01);
@@ -411,18 +411,18 @@ static VIDEO_UPDATE( stactics )
 
 MACHINE_CONFIG_FRAGMENT( stactics_video )
 
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
+	MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
 
-	MDRV_PALETTE_LENGTH(0x400)
+	MCFG_PALETTE_LENGTH(0x400)
 
-	MDRV_PALETTE_INIT(stactics)
-	MDRV_VIDEO_START(stactics)
-	MDRV_VIDEO_UPDATE(stactics)
+	MCFG_PALETTE_INIT(stactics)
+	MCFG_VIDEO_START(stactics)
+	MCFG_VIDEO_UPDATE(stactics)
 MACHINE_CONFIG_END

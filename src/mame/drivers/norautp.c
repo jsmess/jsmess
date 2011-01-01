@@ -658,7 +658,7 @@ static WRITE8_DEVICE_HANDLER( soundlamps_w )
   xxxx ----  * Discrete Sound Lines.
 */
 
-	running_device *discrete = device->machine->device("discrete");
+	device_t *discrete = device->machine->device("discrete");
 
 	output_set_lamp_value(8, (data >> 0) & 1);	/* DEAL / DRAW lamp */
 	output_set_lamp_value(9, (data >> 1) & 1);	/* BET / COLLECT lamp */
@@ -1239,84 +1239,84 @@ static I8255A_INTERFACE (ppi8255_intf_1)
 static MACHINE_CONFIG_START( noraut_base, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, NORAUT_CPU_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(norautp_map)
-	MDRV_CPU_IO_MAP(norautp_portmap)
+	MCFG_CPU_ADD("maincpu", Z80, NORAUT_CPU_CLOCK)
+	MCFG_CPU_PROGRAM_MAP(norautp_map)
+	MCFG_CPU_IO_MAP(norautp_portmap)
 
-	MDRV_NVRAM_ADD_0FILL("nvram")	/* doesn't work if placed at derivative drivers */
+	MCFG_NVRAM_ADD_0FILL("nvram")	/* doesn't work if placed at derivative drivers */
 
 	/* 3x 8255 */
-	MDRV_I8255A_ADD( "ppi8255_0", ppi8255_intf_0 )
-	MDRV_I8255A_ADD( "ppi8255_1", ppi8255_intf_1 )
-//  MDRV_I8255A_ADD( "ppi8255_2", ppi8255_intf_2 )
+	MCFG_I8255A_ADD( "ppi8255_0", ppi8255_intf_0 )
+	MCFG_I8255A_ADD( "ppi8255_1", ppi8255_intf_1 )
+//  MCFG_I8255A_ADD( "ppi8255_2", ppi8255_intf_2 )
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*16, 32*16)
-	MDRV_SCREEN_VISIBLE_AREA(2*16, 31*16-1, (0*16) + 8, 16*16-1)	/* the hardware clips the top 8 pixels */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*16, 32*16)
+	MCFG_SCREEN_VISIBLE_AREA(2*16, 31*16-1, (0*16) + 8, 16*16-1)	/* the hardware clips the top 8 pixels */
 
-	MDRV_GFXDECODE(norautp)
+	MCFG_GFXDECODE(norautp)
 
-	MDRV_PALETTE_INIT(norautp)
-	MDRV_PALETTE_LENGTH(8)
-	MDRV_VIDEO_START(norautp)
-	MDRV_VIDEO_UPDATE(norautp)
+	MCFG_PALETTE_INIT(norautp)
+	MCFG_PALETTE_LENGTH(8)
+	MCFG_VIDEO_START(norautp)
+	MCFG_VIDEO_UPDATE(norautp)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
-	MDRV_SOUND_CONFIG_DISCRETE(norautp)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
+	MCFG_SOUND_CONFIG_DISCRETE(norautp)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( norautp, noraut_base )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( norautpl, noraut_base )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* sound hardware */
-	MDRV_SOUND_MODIFY("discrete")
-	MDRV_SOUND_CONFIG_DISCRETE(kimble)
+	MCFG_SOUND_MODIFY("discrete")
+	MCFG_SOUND_CONFIG_DISCRETE(kimble)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( norautxp, noraut_base )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(norautxp_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(norautxp_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( nortest1, noraut_base )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(nortest1_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(nortest1_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( norautx4, noraut_base )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(norautx4_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(norautx4_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 MACHINE_CONFIG_END
 
 
@@ -1324,9 +1324,9 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( norautx8, noraut_base )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(norautx8_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(norautx8_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 MACHINE_CONFIG_END
 #endif
 
@@ -1334,13 +1334,13 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( kimble, noraut_base )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(kimble_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(kimble_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* sound hardware */
-	MDRV_SOUND_MODIFY("discrete")
-	MDRV_SOUND_CONFIG_DISCRETE(kimble)
+	MCFG_SOUND_MODIFY("discrete")
+	MCFG_SOUND_CONFIG_DISCRETE(kimble)
 MACHINE_CONFIG_END
 
 
@@ -1350,78 +1350,78 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( dphl, noraut_base )
 
 	/* basic machine hardware */
-	MDRV_CPU_REPLACE("maincpu", I8080, DPHL_CPU_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(dphl_map)
-	MDRV_CPU_IO_MAP(norautp_portmap)
+	MCFG_CPU_REPLACE("maincpu", I8080, DPHL_CPU_CLOCK)
+	MCFG_CPU_PROGRAM_MAP(dphl_map)
+	MCFG_CPU_IO_MAP(norautp_portmap)
 
 	/* sound hardware */
-	MDRV_SOUND_MODIFY("discrete")
-	MDRV_SOUND_CONFIG_DISCRETE(dphl)
+	MCFG_SOUND_MODIFY("discrete")
+	MCFG_SOUND_CONFIG_DISCRETE(dphl)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( dphla, noraut_base )
 
 	/* basic machine hardware */
-	MDRV_CPU_REPLACE("maincpu", I8080, DPHL_CPU_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(dphla_map)
-	MDRV_CPU_IO_MAP(norautp_portmap)
+	MCFG_CPU_REPLACE("maincpu", I8080, DPHL_CPU_CLOCK)
+	MCFG_CPU_PROGRAM_MAP(dphla_map)
+	MCFG_CPU_IO_MAP(norautp_portmap)
 
 	/* sound hardware */
-	MDRV_SOUND_MODIFY("discrete")
-	MDRV_SOUND_CONFIG_DISCRETE(dphl)
+	MCFG_SOUND_MODIFY("discrete")
+	MCFG_SOUND_CONFIG_DISCRETE(dphl)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( kimbldhl, noraut_base )
 
 	/* basic machine hardware */
-	MDRV_CPU_REPLACE("maincpu", I8080, DPHL_CPU_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(kimbldhl_map)
-	MDRV_CPU_IO_MAP(norautp_portmap)
+	MCFG_CPU_REPLACE("maincpu", I8080, DPHL_CPU_CLOCK)
+	MCFG_CPU_PROGRAM_MAP(kimbldhl_map)
+	MCFG_CPU_IO_MAP(norautp_portmap)
 
 	/* sound hardware */
-	MDRV_SOUND_MODIFY("discrete")
-	MDRV_SOUND_CONFIG_DISCRETE(kimble)
+	MCFG_SOUND_MODIFY("discrete")
+	MCFG_SOUND_CONFIG_DISCRETE(kimble)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( dphltest, noraut_base )
 
 	/* basic machine hardware */
-	MDRV_CPU_REPLACE("maincpu", I8080, DPHL_CPU_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(dphltest_map)
-	MDRV_CPU_IO_MAP(norautp_portmap)
+	MCFG_CPU_REPLACE("maincpu", I8080, DPHL_CPU_CLOCK)
+	MCFG_CPU_PROGRAM_MAP(dphltest_map)
+	MCFG_CPU_IO_MAP(norautp_portmap)
 
 	/* sound hardware */
-	MDRV_SOUND_MODIFY("discrete")
-	MDRV_SOUND_CONFIG_DISCRETE(dphl)
+	MCFG_SOUND_MODIFY("discrete")
+	MCFG_SOUND_CONFIG_DISCRETE(dphl)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( drhl, noraut_base )
 
 	/* basic machine hardware */
-	MDRV_CPU_REPLACE("maincpu", I8080, DPHL_CPU_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(drhl_map)
-	MDRV_CPU_IO_MAP(norautp_portmap)
+	MCFG_CPU_REPLACE("maincpu", I8080, DPHL_CPU_CLOCK)
+	MCFG_CPU_PROGRAM_MAP(drhl_map)
+	MCFG_CPU_IO_MAP(norautp_portmap)
 
 	/* sound hardware */
-	MDRV_SOUND_MODIFY("discrete")
-	MDRV_SOUND_CONFIG_DISCRETE(dphl)
+	MCFG_SOUND_MODIFY("discrete")
+	MCFG_SOUND_CONFIG_DISCRETE(dphl)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( ssjkrpkr, noraut_base )
 
 	/* basic machine hardware */
-	MDRV_CPU_REPLACE("maincpu", I8080, DPHL_CPU_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(ssjkrpkr_map)
-	MDRV_CPU_IO_MAP(norautp_portmap)
+	MCFG_CPU_REPLACE("maincpu", I8080, DPHL_CPU_CLOCK)
+	MCFG_CPU_PROGRAM_MAP(ssjkrpkr_map)
+	MCFG_CPU_IO_MAP(norautp_portmap)
 
 	/* sound hardware */
-	MDRV_SOUND_MODIFY("discrete")
-	MDRV_SOUND_CONFIG_DISCRETE(dphl)
+	MCFG_SOUND_MODIFY("discrete")
+	MCFG_SOUND_CONFIG_DISCRETE(dphl)
 MACHINE_CONFIG_END
 
 
@@ -3343,21 +3343,21 @@ ROM_END
 */
 //static DRIVER_INIT( norautrh )
 //{
-//  UINT8 *ROM = memory_region(machine, "maincpu");
+//  UINT8 *ROM = machine->region("maincpu")->base();
 //  ROM[0x1110] = 0x00;
 //  ROM[0x1111] = 0x00;
 //}
 
 //static DRIVER_INIT( norautpn )
 //{
-//  UINT8 *ROM = memory_region(machine, "maincpu");
+//  UINT8 *ROM = machine->region("maincpu")->base();
 //  ROM[0x0827] = 0x00;
 //  ROM[0x0828] = 0x00;
 //}
 
 //static DRIVER_INIT( norautu )
 //{
-//  UINT8 *ROM = memory_region(machine, "maincpu");
+//  UINT8 *ROM = machine->region("maincpu")->base();
 //  ROM[0x083c] = 0x00;
 //  ROM[0x083d] = 0x00;
 //  ROM[0x083e] = 0x00;
@@ -3365,7 +3365,7 @@ ROM_END
 
 //static DRIVER_INIT( gtipoker )
 //{
-//  UINT8 *ROM = memory_region(machine, "maincpu");
+//  UINT8 *ROM = machine->region("maincpu")->base();
 //  ROM[0x0cc6] = 0x00;
 //  ROM[0x0cc7] = 0x00;
 //  ROM[0x0cc8] = 0x00;
@@ -3376,7 +3376,7 @@ ROM_END
 
 //static DRIVER_INIT( dphl )
 //{
-//  UINT8 *ROM = memory_region(machine, "maincpu");
+//  UINT8 *ROM = machine->region("maincpu")->base();
 //  ROM[0x1510] = 0x00;
 //  ROM[0x1511] = 0x00;
 //  ROM[0x1512] = 0x00;
@@ -3384,7 +3384,7 @@ ROM_END
 
 //static DRIVER_INIT( dphla )
 //{
-//  UINT8 *ROM = memory_region(machine, "maincpu");
+//  UINT8 *ROM = machine->region("maincpu")->base();
 //  ROM[0x0b09] = 0x00;
 //  ROM[0x0b0a] = 0x00;
 //  ROM[0x0b0b] = 0x00;
@@ -3394,9 +3394,9 @@ static DRIVER_INIT( enc )
 {
 /* Attempt to decrypt the program ROM */
 
-//  UINT8 *rom = memory_region(machine, "maincpu");
+//  UINT8 *rom = machine->region("maincpu")->base();
 //  UINT8 *buffer;
-//  int size = 0x2000; //memory_region_length(machine, "maincpu");
+//  int size = 0x2000; //machine->region("maincpu")->bytes();
 //  int start = 0;
 //  int i;
 
@@ -3433,7 +3433,7 @@ static DRIVER_INIT( deb )
 /* Just for debugging purposes */
 /*   Should be removed soon    */
 {
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 	ROM[0x02f7] = 0xca;
 	ROM[0x02f8] = 0x18;
 	ROM[0x206c] = 0xff;
@@ -3443,7 +3443,7 @@ static DRIVER_INIT( ssa )
 /* Passing the video PPI handshaking lines */
 /* Just for debugging purposes */
 {
-//  UINT8 *ROM = memory_region(machine, "maincpu");
+//  UINT8 *ROM = machine->region("maincpu")->base();
 
 //  ROM[0x073b] = 0x00;
 //  ROM[0x073c] = 0x00;

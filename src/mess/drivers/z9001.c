@@ -51,7 +51,7 @@ static VIDEO_UPDATE( z9001 )
 	UINT8 line;
 	int y, x, j, b;
 
-	UINT8 *gfx = memory_region(screen->machine, "gfx1");
+	UINT8 *gfx = screen->machine->region("gfx1")->base();
 
 	for (y = 0; y < 24; y++)
 	{
@@ -93,25 +93,25 @@ GFXDECODE_END
 static MACHINE_CONFIG_START( z9001, z9001_state )
 
     /* basic machine hardware */
-    MDRV_CPU_ADD("maincpu",Z80, XTAL_9_8304MHz / 4)
-    MDRV_CPU_PROGRAM_MAP(z9001_mem)
-    MDRV_CPU_IO_MAP(z9001_io)
+    MCFG_CPU_ADD("maincpu",Z80, XTAL_9_8304MHz / 4)
+    MCFG_CPU_PROGRAM_MAP(z9001_mem)
+    MCFG_CPU_IO_MAP(z9001_io)
 
-    MDRV_MACHINE_RESET(z9001)
+    MCFG_MACHINE_RESET(z9001)
 
     /* video hardware */
-    MDRV_SCREEN_ADD("screen", RASTER)
-    MDRV_SCREEN_REFRESH_RATE(50)
-    MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-    MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-    MDRV_SCREEN_SIZE(40*8, 24*8)
-    MDRV_SCREEN_VISIBLE_AREA(0, 40*8-1, 0, 24*8-1)
-	MDRV_GFXDECODE(z9001)
-    MDRV_PALETTE_LENGTH(2)
-    MDRV_PALETTE_INIT(black_and_white)
+    MCFG_SCREEN_ADD("screen", RASTER)
+    MCFG_SCREEN_REFRESH_RATE(50)
+    MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+    MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+    MCFG_SCREEN_SIZE(40*8, 24*8)
+    MCFG_SCREEN_VISIBLE_AREA(0, 40*8-1, 0, 24*8-1)
+	MCFG_GFXDECODE(z9001)
+    MCFG_PALETTE_LENGTH(2)
+    MCFG_PALETTE_INIT(black_and_white)
 
-    MDRV_VIDEO_START(z9001)
-    MDRV_VIDEO_UPDATE(z9001)
+    MCFG_VIDEO_START(z9001)
+    MCFG_VIDEO_UPDATE(z9001)
 MACHINE_CONFIG_END
 
 /* ROM definition */

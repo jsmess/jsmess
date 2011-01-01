@@ -46,7 +46,7 @@ struct _c64h156_t
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE c64h156_t *get_safe_token(running_device *device)
+INLINE c64h156_t *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == C64H156);
@@ -76,7 +76,7 @@ READ_LINE_DEVICE_HANDLER( c64h156_byte_r )
 	return 0;
 }
 
-void c64h156_stp_w(running_device *device, int stp)
+void c64h156_stp_w(device_t *device, int stp)
 {
 }
 
@@ -88,7 +88,7 @@ WRITE_LINE_DEVICE_HANDLER( c64h156_mtr_w )
 {
 }
 
-void c64h156_ds_w(running_device *device, int data)
+void c64h156_ds_w(device_t *device, int data)
 {
 }
 

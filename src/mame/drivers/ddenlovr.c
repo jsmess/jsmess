@@ -436,8 +436,8 @@ INLINE void log_draw_error( int src, int cmd )
 static int blit_draw( running_machine *machine, int src, int sx )
 {
 	dynax_state *state = machine->driver_data<dynax_state>();
-	UINT8 *src_data = memory_region(machine, "blitter");
-	int src_len = memory_region_length(machine, "blitter");
+	UINT8 *src_data = machine->region("blitter")->base();
+	int src_len = machine->region("blitter")->bytes();
 	int bit_addr = (src & 0xffffff) * state->ddenlovr_blit_rom_bits;	/* convert to bit address */
 	int pen_size, arg_size, cmd;
 	int x;
@@ -1245,8 +1245,8 @@ static WRITE16_HANDLER( ddenlovr_blitter_irq_ack_w )
 static READ8_HANDLER( rongrong_gfxrom_r )
 {
 	dynax_state *state = space->machine->driver_data<dynax_state>();
-	UINT8 *rom  = memory_region(space->machine, "blitter");
-	size_t size = memory_region_length(space->machine, "blitter");
+	UINT8 *rom  = space->machine->region("blitter")->base();
+	size_t size = space->machine->region("blitter")->bytes();
 	int address = state->ddenlovr_blit_address;
 
 	if (address >= size)
@@ -1319,7 +1319,7 @@ VIDEO_UPDATE(ddenlovr)
 
 #if 0
 	static int base = 0x0;
-	const UINT8 *gfx = memory_region(screen->machine, "blitter");
+	const UINT8 *gfx = screen->machine->region("blitter")->base();
 	int next;
 	memset(state->ddenlovr_pixmap[0], 0, 512 * 512);
 	memset(state->ddenlovr_pixmap[1], 0, 512 * 512);
@@ -1640,8 +1640,8 @@ static READ8_DEVICE_HANDLER( quiz365_input_r )
 	if (!BIT(state->dsw_sel, 0))	return input_port_read(device->machine, "DSW1");
 	if (!BIT(state->dsw_sel, 1))	return input_port_read(device->machine, "DSW2");
 	if (!BIT(state->dsw_sel, 2))	return input_port_read(device->machine, "DSW3");
-	if (!BIT(state->dsw_sel, 3))	return 0xff;//mame_rand(device->machine);
-	if (!BIT(state->dsw_sel, 4))	return 0xff;//mame_rand(device->machine);
+	if (!BIT(state->dsw_sel, 3))	return 0xff;//device->machine->rand();
+	if (!BIT(state->dsw_sel, 4))	return 0xff;//device->machine->rand();
 	return 0xff;
 }
 
@@ -2016,8 +2016,8 @@ static READ8_HANDLER( rongrong_input_r )
 
 	if (!BIT(state->dsw_sel, 0))	return input_port_read(space->machine, "DSW1");
 	if (!BIT(state->dsw_sel, 1))	return input_port_read(space->machine, "DSW2");
-	if (!BIT(state->dsw_sel, 2))	return 0xff;//mame_rand(space->machine);
-	if (!BIT(state->dsw_sel, 3))	return 0xff;//mame_rand(space->machine);
+	if (!BIT(state->dsw_sel, 2))	return 0xff;//space->machine->rand();
+	if (!BIT(state->dsw_sel, 3))	return 0xff;//space->machine->rand();
 	if (!BIT(state->dsw_sel, 4))	return input_port_read(space->machine, "DSW3");
 	return 0xff;
 }
@@ -2465,8 +2465,8 @@ static READ8_HANDLER( hanakanz_busy_r )
 static READ8_HANDLER( hanakanz_gfxrom_r )
 {
 	dynax_state *state = space->machine->driver_data<dynax_state>();
-	UINT8 *rom  = memory_region(space->machine, "blitter");
-	size_t size = memory_region_length(space->machine, "blitter");
+	UINT8 *rom  = space->machine->region("blitter")->base();
+	size_t size = space->machine->region("blitter")->bytes();
 	int address = (state->ddenlovr_blit_address & 0xffffff) * 2;
 
 	if (address >= size)
@@ -2536,7 +2536,7 @@ static WRITE8_DEVICE_HANDLER( hanakanz_oki_bank_w )
 
 static READ8_HANDLER( hanakanz_rand_r )
 {
-	return mame_rand(space->machine);
+	return space->machine->rand();
 }
 
 static ADDRESS_MAP_START( hanakanz_portmap, ADDRESS_SPACE_IO, 8 )
@@ -2647,8 +2647,8 @@ static WRITE8_HANDLER( mjchuuka_blitter_w )
 static void mjchuuka_get_romdata(running_machine *machine)
 {
 	dynax_state *state = machine->driver_data<dynax_state>();
-	UINT8 *rom = memory_region(machine, "blitter");
-	size_t size = memory_region_length(machine, "blitter");
+	UINT8 *rom = machine->region("blitter")->base();
+	size_t size = machine->region("blitter")->bytes();
 	int address = (state->ddenlovr_blit_address & 0xffffff) * 2;
 
 	if (address >= size)
@@ -2892,7 +2892,7 @@ static WRITE8_HANDLER( hginga_rombank_w )
 static READ8_HANDLER( hginga_protection_r )
 {
 	dynax_state *state = space->machine->driver_data<dynax_state>();
-	UINT8 *rom = memory_region(space->machine, "maincpu");
+	UINT8 *rom = space->machine->region("maincpu")->base();
 
 	if (state->hginga_rombank & 0x10)
 		return hanakanz_rand_r(space, 0);
@@ -3126,7 +3126,7 @@ static WRITE8_HANDLER( hgokou_input_w )
 static READ8_HANDLER( hgokou_protection_r )
 {
 	dynax_state *state = space->machine->driver_data<dynax_state>();
-	UINT8 *rom = memory_region(space->machine, "maincpu");
+	UINT8 *rom = space->machine->region("maincpu")->base();
 
 	if (state->hginga_rombank == 0)
 		return hanakanz_rand_r(space, 0);
@@ -7637,7 +7637,7 @@ static MACHINE_RESET( ddenlovr )
 
 static MACHINE_START( rongrong )
 {
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 	memory_configure_bank(machine, "bank1", 0, 0x20, &ROM[0x010000], 0x8000);
 	memory_configure_bank(machine, "bank2", 0, 8,    &ROM[0x110000], 0x1000);
 
@@ -7646,7 +7646,7 @@ static MACHINE_START( rongrong )
 
 static MACHINE_START( mmpanic )
 {
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 	memory_configure_bank(machine, "bank1", 0, 8,    &ROM[0x10000], 0x8000);
 
 	MACHINE_START_CALL(ddenlovr);
@@ -7654,7 +7654,7 @@ static MACHINE_START( mmpanic )
 
 static MACHINE_START( funkyfig )
 {
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 	memory_configure_bank(machine, "bank1", 0, 0x10, &ROM[0x10000], 0x8000);
 	memory_configure_bank(machine, "bank2", 0, 8,    &ROM[0x90000], 0x1000);
 
@@ -7663,7 +7663,7 @@ static MACHINE_START( funkyfig )
 
 static MACHINE_START( hanakanz )
 {
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 	memory_configure_bank(machine, "bank1", 0, 0x10, &ROM[0x10000], 0x8000);
 	memory_configure_bank(machine, "bank2", 0, 0x10, &ROM[0x90000], 0x1000);
 
@@ -7672,7 +7672,7 @@ static MACHINE_START( hanakanz )
 
 static MACHINE_START( mjmyster )
 {
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 	memory_configure_bank(machine, "bank1", 0, 8,    &ROM[0x10000], 0x8000);
 	memory_configure_bank(machine, "bank2", 0, 8,    &ROM[0x90000], 0x1000);
 
@@ -7681,7 +7681,7 @@ static MACHINE_START( mjmyster )
 
 static MACHINE_START( hparadis )
 {
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 	memory_configure_bank(machine, "bank1", 0, 8,    &ROM[0x10000], 0x8000);
 	memory_configure_bank(machine, "bank2", 0, 8,    &ROM[0x50000], 0x1000);
 
@@ -7690,7 +7690,7 @@ static MACHINE_START( hparadis )
 
 static MACHINE_START( mjflove )
 {
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 	memory_configure_bank(machine, "bank1", 0, 0x10, &ROM[0x10000], 0x8000);
 	memory_configure_bank(machine, "bank2", 0, 8,    &ROM[0x90000], 0x1000);
 
@@ -7699,7 +7699,7 @@ static MACHINE_START( mjflove )
 
 static MACHINE_START( sryudens )
 {
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 	memory_configure_bank(machine, "bank1", 0, 0x10, &ROM[0x10000], 0x8000);
 	memory_configure_bank(machine, "bank2", 0, 0x10, &ROM[0x90000], 0x1000);
 
@@ -7713,60 +7713,60 @@ static MACHINE_START( sryudens )
 static MACHINE_CONFIG_START( ddenlovr, dynax_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu",M68000, XTAL_24MHz / 2)
-	MDRV_CPU_PROGRAM_MAP(ddenlovr_map)
-	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
+	MCFG_CPU_ADD("maincpu",M68000, XTAL_24MHz / 2)
+	MCFG_CPU_PROGRAM_MAP(ddenlovr_map)
+	MCFG_CPU_VBLANK_INT("screen", irq1_line_hold)
 
-	MDRV_MACHINE_START(ddenlovr)
-	MDRV_MACHINE_RESET(ddenlovr)
+	MCFG_MACHINE_START(ddenlovr)
+	MCFG_MACHINE_RESET(ddenlovr)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(336, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 336-1, 5, 256-16+5-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(336, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 336-1, 5, 256-16+5-1)
 
-	MDRV_PALETTE_LENGTH(0x100)
+	MCFG_PALETTE_LENGTH(0x100)
 
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
-	MDRV_VIDEO_START(ddenlovr)
-	MDRV_VIDEO_UPDATE(ddenlovr)
+	MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
+	MCFG_VIDEO_START(ddenlovr)
+	MCFG_VIDEO_UPDATE(ddenlovr)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM2413, XTAL_28_63636MHz / 8)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_28_63636MHz / 8)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MDRV_SOUND_ADD("aysnd", AY8910, XTAL_28_63636MHz / 16)	// or /8 ?
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_28_63636MHz / 16)	// or /8 ?
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MDRV_OKIM6295_ADD("oki", XTAL_28_63636MHz / 28, OKIM6295_PIN7_HIGH)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	MCFG_OKIM6295_ADD("oki", XTAL_28_63636MHz / 28, OKIM6295_PIN7_HIGH)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	/* devices */
-	MDRV_MSM6242_ADD("rtc")
+	MCFG_MSM6242_ADD("rtc")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ddenlovj, ddenlovr )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(ddenlovj_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(ddenlovj_map)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ddenlovrk, ddenlovr )
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(ddenlovrk_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(ddenlovrk_map)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( akamaru, ddenlovr )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(akamaru_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(akamaru_map)
 MACHINE_CONFIG_END
 
 
@@ -7783,19 +7783,19 @@ static const ay8910_interface quiz365_ay8910_interface =
 static MACHINE_CONFIG_DERIVED( quiz365, ddenlovr )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(quiz365_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(quiz365_map)
 
-	MDRV_SOUND_MODIFY("aysnd")
-	MDRV_SOUND_CONFIG(quiz365_ay8910_interface)
+	MCFG_SOUND_MODIFY("aysnd")
+	MCFG_SOUND_CONFIG(quiz365_ay8910_interface)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( nettoqc, ddenlovr )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(nettoqc_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(nettoqc_map)
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -7835,47 +7835,47 @@ static INTERRUPT_GEN( rtc_irq )
 static MACHINE_CONFIG_START( quizchq, dynax_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, XTAL_16MHz/2)	/* Verified */
-	MDRV_CPU_PROGRAM_MAP(quizchq_map)
-	MDRV_CPU_IO_MAP(quizchq_portmap)
-	MDRV_CPU_VBLANK_INT("screen", quizchq_irq)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz/2)	/* Verified */
+	MCFG_CPU_PROGRAM_MAP(quizchq_map)
+	MCFG_CPU_IO_MAP(quizchq_portmap)
+	MCFG_CPU_VBLANK_INT("screen", quizchq_irq)
 
-	MDRV_MACHINE_START(rongrong)
-	MDRV_MACHINE_RESET(ddenlovr)
+	MCFG_MACHINE_START(rongrong)
+	MCFG_MACHINE_RESET(ddenlovr)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(336, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 336-1, 5, 256-16+5-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(336, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 336-1, 5, 256-16+5-1)
 
-	MDRV_PALETTE_LENGTH(0x100)
+	MCFG_PALETTE_LENGTH(0x100)
 
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
-	MDRV_VIDEO_START(ddenlovr)
-	MDRV_VIDEO_UPDATE(ddenlovr)
+	MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
+	MCFG_VIDEO_START(ddenlovr)
+	MCFG_VIDEO_UPDATE(ddenlovr)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM2413, XTAL_28_63636MHz/8) // 3.579545Mhz, verified
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.50)
+	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_28_63636MHz/8) // 3.579545Mhz, verified
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.50)
 
-	MDRV_OKIM6295_ADD("oki", XTAL_28_63636MHz/28, OKIM6295_PIN7_HIGH) // clock frequency verified 1.022MHz, pin 7 verified high
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_OKIM6295_ADD("oki", XTAL_28_63636MHz/28, OKIM6295_PIN7_HIGH) // clock frequency verified 1.022MHz, pin 7 verified high
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* devices */
-	MDRV_MSM6242_ADD("rtc")
+	MCFG_MSM6242_ADD("rtc")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( rongrong, quizchq )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(rongrong_map)
-	MDRV_CPU_IO_MAP(rongrong_portmap)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(rongrong_map)
+	MCFG_CPU_IO_MAP(rongrong_portmap)
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -7909,47 +7909,47 @@ static INTERRUPT_GEN( mmpanic_irq )
 static MACHINE_CONFIG_START( mmpanic, dynax_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, 8000000)
-	MDRV_CPU_PROGRAM_MAP(mmpanic_map)
-	MDRV_CPU_IO_MAP(mmpanic_portmap)
-	MDRV_CPU_VBLANK_INT("screen", mmpanic_irq)
+	MCFG_CPU_ADD("maincpu", Z80, 8000000)
+	MCFG_CPU_PROGRAM_MAP(mmpanic_map)
+	MCFG_CPU_IO_MAP(mmpanic_portmap)
+	MCFG_CPU_VBLANK_INT("screen", mmpanic_irq)
 
-	MDRV_CPU_ADD("soundcpu", Z80, 3579545)
-	MDRV_CPU_PROGRAM_MAP(mmpanic_sound_map)
-	MDRV_CPU_IO_MAP(mmpanic_sound_portmap)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)	// NMI by main cpu
+	MCFG_CPU_ADD("soundcpu", Z80, 3579545)
+	MCFG_CPU_PROGRAM_MAP(mmpanic_sound_map)
+	MCFG_CPU_IO_MAP(mmpanic_sound_portmap)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)	// NMI by main cpu
 
-	MDRV_MACHINE_START(mmpanic)
-	MDRV_MACHINE_RESET(ddenlovr)
+	MCFG_MACHINE_START(mmpanic)
+	MCFG_MACHINE_RESET(ddenlovr)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(336, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 336-1, 5, 256-16+5-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(336, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 336-1, 5, 256-16+5-1)
 
-	MDRV_PALETTE_LENGTH(0x100)
+	MCFG_PALETTE_LENGTH(0x100)
 
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
-	MDRV_VIDEO_START(mmpanic)	// extra layers
-	MDRV_VIDEO_UPDATE(ddenlovr)
+	MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
+	MCFG_VIDEO_START(mmpanic)	// extra layers
+	MCFG_VIDEO_UPDATE(ddenlovr)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM2413, 3579545)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	MCFG_SOUND_ADD("ymsnd", YM2413, 3579545)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MDRV_SOUND_ADD("aysnd", AY8910, 3579545)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	MCFG_SOUND_ADD("aysnd", AY8910, 3579545)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MDRV_OKIM6295_ADD("oki", 1022720, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	MCFG_OKIM6295_ADD("oki", 1022720, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	/* devices */
-	MDRV_MSM6242_ADD("rtc")
+	MCFG_MSM6242_ADD("rtc")
 MACHINE_CONFIG_END
 
 
@@ -7983,53 +7983,53 @@ static INTERRUPT_GEN( hanakanz_irq )
 static MACHINE_CONFIG_START( hanakanz, dynax_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu",Z80,8000000)	// TMPZ84C015BF-8
-	MDRV_CPU_PROGRAM_MAP(hanakanz_map)
-	MDRV_CPU_IO_MAP(hanakanz_portmap)
-	MDRV_CPU_VBLANK_INT("screen", hanakanz_irq)
+	MCFG_CPU_ADD("maincpu",Z80,8000000)	// TMPZ84C015BF-8
+	MCFG_CPU_PROGRAM_MAP(hanakanz_map)
+	MCFG_CPU_IO_MAP(hanakanz_portmap)
+	MCFG_CPU_VBLANK_INT("screen", hanakanz_irq)
 
-	MDRV_MACHINE_START(hanakanz)
-	MDRV_MACHINE_RESET(ddenlovr)
+	MCFG_MACHINE_START(hanakanz)
+	MCFG_MACHINE_RESET(ddenlovr)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(336, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 336-1, 5, 256-11-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(336, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 336-1, 5, 256-11-1)
 
-	MDRV_PALETTE_LENGTH(0x200)
+	MCFG_PALETTE_LENGTH(0x200)
 
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
-	MDRV_VIDEO_START(hanakanz)	// blitter commands in the roms are shuffled around
-	MDRV_VIDEO_UPDATE(ddenlovr)
+	MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
+	MCFG_VIDEO_START(hanakanz)	// blitter commands in the roms are shuffled around
+	MCFG_VIDEO_UPDATE(ddenlovr)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM2413, 3579545)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	MCFG_SOUND_ADD("ymsnd", YM2413, 3579545)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MDRV_OKIM6295_ADD("oki", 1022720, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	MCFG_OKIM6295_ADD("oki", 1022720, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	/* devices */
-	MDRV_MSM6242_ADD("rtc")
+	MCFG_MSM6242_ADD("rtc")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( hkagerou, hanakanz )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(hkagerou_portmap)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_IO_MAP(hkagerou_portmap)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mjreach1, hanakanz )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(mjreach1_portmap)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_IO_MAP(mjreach1_portmap)
 MACHINE_CONFIG_END
 
 
@@ -8062,27 +8062,27 @@ static INTERRUPT_GEN( mjchuuka_irq )
 static MACHINE_CONFIG_DERIVED( mjchuuka, hanakanz )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(mjchuuka_portmap)
-	MDRV_CPU_VBLANK_INT("screen", mjchuuka_irq)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_IO_MAP(mjchuuka_portmap)
+	MCFG_CPU_VBLANK_INT("screen", mjchuuka_irq)
 
-	MDRV_SOUND_ADD("aysnd", AY8910, 1789772)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("aysnd", AY8910, 1789772)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( funkyfig, mmpanic )
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(funkyfig_map)
-	MDRV_CPU_IO_MAP(funkyfig_portmap)
-	MDRV_CPU_VBLANK_INT("screen", mjchuuka_irq)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(funkyfig_map)
+	MCFG_CPU_IO_MAP(funkyfig_portmap)
+	MCFG_CPU_VBLANK_INT("screen", mjchuuka_irq)
 
-	MDRV_MACHINE_START(funkyfig)
+	MCFG_MACHINE_START(funkyfig)
 
-	MDRV_CPU_MODIFY("soundcpu")
-	MDRV_CPU_IO_MAP(funkyfig_sound_portmap)
+	MCFG_CPU_MODIFY("soundcpu")
+	MCFG_CPU_IO_MAP(funkyfig_sound_portmap)
 
-	MDRV_VIDEO_START(ddenlovr)	// no extra layers?
+	MCFG_VIDEO_START(ddenlovr)	// no extra layers?
 MACHINE_CONFIG_END
 
 
@@ -8135,17 +8135,17 @@ static const ay8910_interface mjmyster_ay8910_interface =
 static MACHINE_CONFIG_DERIVED( mjmyster, quizchq )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(mjmyster_map)
-	MDRV_CPU_IO_MAP(mjmyster_portmap)
-	MDRV_CPU_VBLANK_INT_HACK(mjmyster_irq, 2)
-	MDRV_CPU_PERIODIC_INT(rtc_nmi_irq, 1)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(mjmyster_map)
+	MCFG_CPU_IO_MAP(mjmyster_portmap)
+	MCFG_CPU_VBLANK_INT_HACK(mjmyster_irq, 2)
+	MCFG_CPU_PERIODIC_INT(rtc_nmi_irq, 1)
 
-	MDRV_MACHINE_START(mjmyster)
+	MCFG_MACHINE_START(mjmyster)
 
-	MDRV_SOUND_ADD("aysnd", AY8910, 3579545)
-	MDRV_SOUND_CONFIG(mjmyster_ay8910_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	MCFG_SOUND_ADD("aysnd", AY8910, 3579545)
+	MCFG_SOUND_CONFIG(mjmyster_ay8910_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -8186,70 +8186,70 @@ static const ay8910_interface hginga_ay8910_interface =
 static MACHINE_CONFIG_DERIVED( hginga, quizchq )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(hginga_map)
-	MDRV_CPU_IO_MAP(hginga_portmap)
-	MDRV_CPU_VBLANK_INT("screen", hginga_irq)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(hginga_map)
+	MCFG_CPU_IO_MAP(hginga_portmap)
+	MCFG_CPU_VBLANK_INT("screen", hginga_irq)
 
-	MDRV_MACHINE_START(mjmyster)
+	MCFG_MACHINE_START(mjmyster)
 
-	MDRV_SOUND_ADD("aysnd", AY8910, 3579545)
-	MDRV_SOUND_CONFIG(hginga_ay8910_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	MCFG_SOUND_ADD("aysnd", AY8910, 3579545)
+	MCFG_SOUND_CONFIG(hginga_ay8910_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( hgokou, quizchq )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(hgokou_map)
-	MDRV_CPU_IO_MAP(hgokou_portmap)
-	MDRV_CPU_VBLANK_INT("screen", hginga_irq)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(hgokou_map)
+	MCFG_CPU_IO_MAP(hgokou_portmap)
+	MCFG_CPU_VBLANK_INT("screen", hginga_irq)
 
-	MDRV_MACHINE_START(mjmyster)
+	MCFG_MACHINE_START(mjmyster)
 
-	MDRV_SOUND_ADD("aysnd", AY8910, 3579545)
-	MDRV_SOUND_CONFIG(hginga_ay8910_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	MCFG_SOUND_ADD("aysnd", AY8910, 3579545)
+	MCFG_SOUND_CONFIG(hginga_ay8910_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mjmywrld, mjmyster )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(hginga_map)
-	MDRV_CPU_IO_MAP(mjmywrld_portmap)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(hginga_map)
+	MCFG_CPU_IO_MAP(mjmywrld_portmap)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mjmyuniv, quizchq )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(mjmyster_map)
-	MDRV_CPU_IO_MAP(mjmyster_portmap)
-	MDRV_CPU_VBLANK_INT_HACK(mjmyster_irq, 2)
-	MDRV_CPU_PERIODIC_INT(rtc_nmi_irq, 1)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(mjmyster_map)
+	MCFG_CPU_IO_MAP(mjmyster_portmap)
+	MCFG_CPU_VBLANK_INT_HACK(mjmyster_irq, 2)
+	MCFG_CPU_PERIODIC_INT(rtc_nmi_irq, 1)
 
-	MDRV_MACHINE_START(mjmyster)
+	MCFG_MACHINE_START(mjmyster)
 
-	MDRV_SOUND_ADD("aysnd", AY8910, 1789772)
-	MDRV_SOUND_CONFIG(mjmyster_ay8910_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	MCFG_SOUND_ADD("aysnd", AY8910, 1789772)
+	MCFG_SOUND_CONFIG(mjmyster_ay8910_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mjmyornt, quizchq )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(mjmyster_portmap)
-	MDRV_CPU_VBLANK_INT_HACK(mjmyster_irq, 2)
-	MDRV_CPU_PERIODIC_INT(rtc_nmi_irq, 1)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_IO_MAP(mjmyster_portmap)
+	MCFG_CPU_VBLANK_INT_HACK(mjmyster_irq, 2)
+	MCFG_CPU_PERIODIC_INT(rtc_nmi_irq, 1)
 
-	MDRV_MACHINE_START(mjmyster)
+	MCFG_MACHINE_START(mjmyster)
 
-	MDRV_SOUND_ADD("aysnd", AY8910, 1789772)
-	MDRV_SOUND_CONFIG(mjmyster_ay8910_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	MCFG_SOUND_ADD("aysnd", AY8910, 1789772)
+	MCFG_SOUND_CONFIG(mjmyster_ay8910_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
 static INTERRUPT_GEN( mjflove_irq )
@@ -8274,17 +8274,17 @@ static INTERRUPT_GEN( mjflove_irq )
 static MACHINE_CONFIG_DERIVED( mjflove, quizchq )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(rongrong_map)
-	MDRV_CPU_IO_MAP(mjflove_portmap)
-	MDRV_CPU_VBLANK_INT_HACK(mjflove_irq, 2)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(rongrong_map)
+	MCFG_CPU_IO_MAP(mjflove_portmap)
+	MCFG_CPU_VBLANK_INT_HACK(mjflove_irq, 2)
 
-	MDRV_MACHINE_START(mjflove)
+	MCFG_MACHINE_START(mjflove)
 
-	MDRV_VIDEO_START(mjflove)	// blitter commands in the roms are shuffled around
+	MCFG_VIDEO_START(mjflove)	// blitter commands in the roms are shuffled around
 
-	MDRV_SOUND_ADD("aysnd", AY8910, 28636363/8)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	MCFG_SOUND_ADD("aysnd", AY8910, 28636363/8)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
 /*  It runs in IM 2, thus needs a vector on the data bus:
@@ -8297,50 +8297,50 @@ static INTERRUPT_GEN( hparadis_irq )
 static MACHINE_CONFIG_DERIVED( hparadis, quizchq )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(hparadis_map)
-	MDRV_CPU_IO_MAP(hparadis_portmap)
-	MDRV_CPU_VBLANK_INT("screen", hparadis_irq)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(hparadis_map)
+	MCFG_CPU_IO_MAP(hparadis_portmap)
+	MCFG_CPU_VBLANK_INT("screen", hparadis_irq)
 
-	MDRV_MACHINE_START(hparadis)
+	MCFG_MACHINE_START(hparadis)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( jongtei, dynax_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu",Z80, XTAL_20MHz / 2)	// ?
-	MDRV_CPU_PROGRAM_MAP(hanakanz_map)
-	MDRV_CPU_IO_MAP(jongtei_portmap)
-	MDRV_CPU_VBLANK_INT("screen", hanakanz_irq)
+	MCFG_CPU_ADD("maincpu",Z80, XTAL_20MHz / 2)	// ?
+	MCFG_CPU_PROGRAM_MAP(hanakanz_map)
+	MCFG_CPU_IO_MAP(jongtei_portmap)
+	MCFG_CPU_VBLANK_INT("screen", hanakanz_irq)
 
-	MDRV_MACHINE_START(hanakanz)
-	MDRV_MACHINE_RESET(ddenlovr)
+	MCFG_MACHINE_START(hanakanz)
+	MCFG_MACHINE_RESET(ddenlovr)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(336, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 336-1, 5, 256-11-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(336, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 336-1, 5, 256-11-1)
 
-	MDRV_PALETTE_LENGTH(0x200)
+	MCFG_PALETTE_LENGTH(0x200)
 
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
-	MDRV_VIDEO_START(hanakanz)	// blitter commands in the roms are shuffled around
-	MDRV_VIDEO_UPDATE(ddenlovr)
+	MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
+	MCFG_VIDEO_START(hanakanz)	// blitter commands in the roms are shuffled around
+	MCFG_VIDEO_UPDATE(ddenlovr)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM2413, XTAL_28_63636MHz / 8)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_28_63636MHz / 8)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MDRV_OKIM6295_ADD("oki", XTAL_28_63636MHz / 28, OKIM6295_PIN7_HIGH)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	MCFG_OKIM6295_ADD("oki", XTAL_28_63636MHz / 28, OKIM6295_PIN7_HIGH)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	/* devices */
-	MDRV_MSM6242_ADD("rtc")
+	MCFG_MSM6242_ADD("rtc")
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -8350,42 +8350,42 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( sryudens, dynax_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu",Z80, XTAL_16MHz / 2)	// ?
-	MDRV_CPU_PROGRAM_MAP(sryudens_map)
-	MDRV_CPU_IO_MAP(sryudens_portmap)
-	MDRV_CPU_VBLANK_INT("screen", mjchuuka_irq)
+	MCFG_CPU_ADD("maincpu",Z80, XTAL_16MHz / 2)	// ?
+	MCFG_CPU_PROGRAM_MAP(sryudens_map)
+	MCFG_CPU_IO_MAP(sryudens_portmap)
+	MCFG_CPU_VBLANK_INT("screen", mjchuuka_irq)
 
-	MDRV_MACHINE_START(sryudens)
-	MDRV_MACHINE_RESET(ddenlovr)
+	MCFG_MACHINE_START(sryudens)
+	MCFG_MACHINE_RESET(ddenlovr)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60.8532)	// VSync 60.8532Hz, HSync 15.2790kHz
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(336, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 336-1, 0+5, 256-12-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60.8532)	// VSync 60.8532Hz, HSync 15.2790kHz
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(336, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 336-1, 0+5, 256-12-1)
 
-	MDRV_PALETTE_LENGTH(0x100)
+	MCFG_PALETTE_LENGTH(0x100)
 
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
-	MDRV_VIDEO_START(mjflove)	// blitter commands in the roms are shuffled around
-	MDRV_VIDEO_UPDATE(ddenlovr)
+	MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
+	MCFG_VIDEO_START(mjflove)	// blitter commands in the roms are shuffled around
+	MCFG_VIDEO_UPDATE(ddenlovr)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM2413, XTAL_28_63636MHz / 8)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_28_63636MHz / 8)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MDRV_SOUND_ADD("aysnd", AY8910, XTAL_28_63636MHz / 8)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_28_63636MHz / 8)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MDRV_OKIM6295_ADD("oki", XTAL_28_63636MHz / 28, OKIM6295_PIN7_HIGH)	// ?
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	MCFG_OKIM6295_ADD("oki", XTAL_28_63636MHz / 28, OKIM6295_PIN7_HIGH)	// ?
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	/* devices */
-	MDRV_MSM6242_ADD("rtc")
+	MCFG_MSM6242_ADD("rtc")
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -8395,39 +8395,39 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( daimyojn, dynax_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu",Z80, XTAL_20MHz / 2)
-	MDRV_CPU_PROGRAM_MAP(hanakanz_map)
-	MDRV_CPU_IO_MAP(daimyojn_portmap)
-	MDRV_CPU_VBLANK_INT("screen", hanakanz_irq)
+	MCFG_CPU_ADD("maincpu",Z80, XTAL_20MHz / 2)
+	MCFG_CPU_PROGRAM_MAP(hanakanz_map)
+	MCFG_CPU_IO_MAP(daimyojn_portmap)
+	MCFG_CPU_VBLANK_INT("screen", hanakanz_irq)
 
-	MDRV_MACHINE_START(mjflove)
-	MDRV_MACHINE_RESET(ddenlovr)
+	MCFG_MACHINE_START(mjflove)
+	MCFG_MACHINE_RESET(ddenlovr)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(59.7922)	// HSync 15.4248kHz
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(336, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 336-1-1, 1, 256-15-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(59.7922)	// HSync 15.4248kHz
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(336, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 336-1-1, 1, 256-15-1)
 
-	MDRV_PALETTE_LENGTH(0x200)
+	MCFG_PALETTE_LENGTH(0x200)
 
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
-	MDRV_VIDEO_START(hanakanz)	// blitter commands in the roms are shuffled around
-	MDRV_VIDEO_UPDATE(ddenlovr)
+	MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
+	MCFG_VIDEO_START(hanakanz)	// blitter commands in the roms are shuffled around
+	MCFG_VIDEO_UPDATE(ddenlovr)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM2413, XTAL_28_63636MHz / 8)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_28_63636MHz / 8)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MDRV_OKIM6295_ADD("oki", XTAL_28_63636MHz / 28, OKIM6295_PIN7_HIGH)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	MCFG_OKIM6295_ADD("oki", XTAL_28_63636MHz / 28, OKIM6295_PIN7_HIGH)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	/* devices */
-	MDRV_MSM6242_ADD("rtc")
+	MCFG_MSM6242_ADD("rtc")
 MACHINE_CONFIG_END
 
 

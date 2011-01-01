@@ -25,7 +25,7 @@ public:
 static WRITE8_HANDLER(out_w)
 {
 	mod8_state *state = space->machine->driver_data<mod8_state>();
-	running_device *devconf = space->machine->device(TELEPRINTER_TAG);
+	device_t *devconf = space->machine->device(TELEPRINTER_TAG);
 
 	state->tty_data >>= 1;
 	state->tty_data |= (data & 0x01) ? 0x8000 : 0;
@@ -97,15 +97,15 @@ static GENERIC_TELEPRINTER_INTERFACE( mod8_teleprinter_intf )
 static MACHINE_CONFIG_START( mod8, mod8_state )
 
     /* basic machine hardware */
-    MDRV_CPU_ADD("maincpu",I8008, 800000)
-    MDRV_CPU_PROGRAM_MAP(mod8_mem)
-    MDRV_CPU_IO_MAP(mod8_io)
+    MCFG_CPU_ADD("maincpu",I8008, 800000)
+    MCFG_CPU_PROGRAM_MAP(mod8_mem)
+    MCFG_CPU_IO_MAP(mod8_io)
 
-    MDRV_MACHINE_RESET(mod8)
+    MCFG_MACHINE_RESET(mod8)
 
     /* video hardware */
-    MDRV_FRAGMENT_ADD( generic_teleprinter )
-	MDRV_GENERIC_TELEPRINTER_ADD(TELEPRINTER_TAG,mod8_teleprinter_intf)
+    MCFG_FRAGMENT_ADD( generic_teleprinter )
+	MCFG_GENERIC_TELEPRINTER_ADD(TELEPRINTER_TAG,mod8_teleprinter_intf)
 
 MACHINE_CONFIG_END
 

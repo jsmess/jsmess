@@ -31,7 +31,7 @@ struct _terminal_state
 /*****************************************************************************
     INLINE FUNCTIONS
 *****************************************************************************/
-INLINE terminal_state *get_safe_token(running_device *device)
+INLINE terminal_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == GENERIC_TERMINAL);
@@ -39,7 +39,7 @@ INLINE terminal_state *get_safe_token(running_device *device)
 	return (terminal_state *)downcast<legacy_device_base *>(device)->token();
 }
 
-INLINE const terminal_interface *get_interface(running_device *device)
+INLINE const terminal_interface *get_interface(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == GENERIC_TERMINAL);
@@ -182,7 +182,7 @@ static const UINT8 terminal_font[256*16] =
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 };
 
-static void terminal_scroll_line(running_device *device)
+static void terminal_scroll_line(device_t *device)
 {
 	terminal_state *term = get_safe_token(device);
 
@@ -190,7 +190,7 @@ static void terminal_scroll_line(running_device *device)
 	memset(term->buffer + TERMINAL_WIDTH*(TERMINAL_HEIGHT-1),0x20,TERMINAL_WIDTH);
 }
 
-static void terminal_write_char(running_device *device,UINT8 data) {
+static void terminal_write_char(device_t *device,UINT8 data) {
 	terminal_state *term = get_safe_token(device);
 
 	term->buffer[term->y_pos*TERMINAL_WIDTH+term->x_pos] = data;
@@ -207,7 +207,7 @@ static void terminal_write_char(running_device *device,UINT8 data) {
 	}
 }
 
-static void terminal_clear(running_device *device) {
+static void terminal_clear(device_t *device) {
 	terminal_state *term = get_safe_token(device);
 
 	memset(term->buffer,0x20,TERMINAL_WIDTH*TERMINAL_HEIGHT);
@@ -314,7 +314,7 @@ WRITE8_DEVICE_HANDLER ( terminal_write )
 /***************************************************************************
     VIDEO HARDWARE
 ***************************************************************************/
-static void generic_terminal_update(running_device *device, bitmap_t *bitmap, const rectangle *cliprect)
+static void generic_terminal_update(device_t *device, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	terminal_state *term = get_safe_token(device);
 	UINT8 options = input_port_read(device->machine, "TERM_CONF");
@@ -479,7 +479,7 @@ UINT8 terminal_keyboard_handler(running_machine *machine, devcb_resolved_write8 
 
 static TIMER_CALLBACK(keyboard_callback)
 {
-	terminal_state *term = get_safe_token((running_device *)ptr);
+	terminal_state *term = get_safe_token((device_t *)ptr);
 	term->last_code = terminal_keyboard_handler(machine, &term->terminal_keyboard_func, term->last_code, &term->scan_line, &term->tx_shift, &term->tx_state);
 }
 
@@ -493,23 +493,23 @@ static VIDEO_START( terminal )
 
 static VIDEO_UPDATE(terminal )
 {
-	running_device *devconf = screen->machine->device(TERMINAL_TAG);
+	device_t *devconf = screen->machine->device(TERMINAL_TAG);
 	generic_terminal_update( devconf, bitmap, cliprect);
 	return 0;
 }
 
 MACHINE_CONFIG_FRAGMENT( generic_terminal )
-	MDRV_SCREEN_ADD(TERMINAL_SCREEN_TAG, RASTER)
-	MDRV_SCREEN_REFRESH_RATE(50)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(TERMINAL_WIDTH*8, TERMINAL_HEIGHT*10)
-	MDRV_SCREEN_VISIBLE_AREA(0, TERMINAL_WIDTH*8-1, 0, TERMINAL_HEIGHT*10-1)
-	MDRV_PALETTE_LENGTH(2)
-	MDRV_PALETTE_INIT(black_and_white)
+	MCFG_SCREEN_ADD(TERMINAL_SCREEN_TAG, RASTER)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(TERMINAL_WIDTH*8, TERMINAL_HEIGHT*10)
+	MCFG_SCREEN_VISIBLE_AREA(0, TERMINAL_WIDTH*8-1, 0, TERMINAL_HEIGHT*10-1)
+	MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_INIT(black_and_white)
 
-	MDRV_VIDEO_START(terminal)
-	MDRV_VIDEO_UPDATE(terminal)
+	MCFG_VIDEO_START(terminal)
+	MCFG_VIDEO_UPDATE(terminal)
 MACHINE_CONFIG_END
 
 

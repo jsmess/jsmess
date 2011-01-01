@@ -42,7 +42,7 @@
 static void c65_nmi( running_machine *machine )
 {
 	c65_state *state = machine->driver_data<c65_state>();
-	running_device *cia_1 = machine->device("cia_1");
+	device_t *cia_1 = machine->device("cia_1");
 	int cia1irq = mos6526_irq_r(cia_1);
 
 	if (state->nmilevel != (input_port_read(machine, "SPECIAL") & 0x80) || cia1irq)	/* KEY_RESTORE */
@@ -94,7 +94,7 @@ static READ8_DEVICE_HANDLER( c65_cia0_port_b_r )
 static WRITE8_DEVICE_HANDLER( c65_cia0_port_b_w )
 {
 //  was there lightpen support in c65 video chip?
-//  running_device *vic3 = device->machine->device("vic3");
+//  device_t *vic3 = device->machine->device("vic3");
 //  vic3_lightpen_write(vic3, data & 0x10);
 }
 
@@ -110,7 +110,7 @@ static void c65_irq( running_machine *machine, int level )
 }
 
 /* is this correct for c65 as well as c64? */
-static void c65_cia0_interrupt( running_device *device, int level )
+static void c65_cia0_interrupt( device_t *device, int level )
 {
 	c65_state *state = device->machine->driver_data<c65_state>();
 	c65_irq (device->machine, level || state->vicirq);
@@ -120,7 +120,7 @@ static void c65_cia0_interrupt( running_device *device, int level )
 void c65_vic_interrupt( running_machine *machine, int level )
 {
 	c65_state *state = machine->driver_data<c65_state>();
-	running_device *cia_0 = machine->device("cia_0");
+	device_t *cia_0 = machine->device("cia_0");
 #if 1
 	if (level != state->vicirq)
 	{
@@ -182,7 +182,7 @@ const mos6526_interface c65_pal_cia0 =
 static READ8_DEVICE_HANDLER( c65_cia1_port_a_r )
 {
 	UINT8 value = 0xff;
-	running_device *serbus = device->machine->device("serial_bus");
+	device_t *serbus = device->machine->device("serial_bus");
 
 	if (!cbm_iec_clk_r(serbus))
 		value &= ~0x40;
@@ -197,7 +197,7 @@ static WRITE8_DEVICE_HANDLER( c65_cia1_port_a_w )
 {
 	c65_state *state = device->machine->driver_data<c65_state>();
 	static const int helper[4] = {0xc000, 0x8000, 0x4000, 0x0000};
-	running_device *serbus = device->machine->device("serial_bus");
+	device_t *serbus = device->machine->device("serial_bus");
 
 	cbm_iec_atn_w(serbus, device, !BIT(data, 3));
 	cbm_iec_clk_w(serbus, device, !BIT(data, 4));
@@ -675,9 +675,9 @@ static WRITE8_HANDLER( c65_ram_expansion_w )
 
 static WRITE8_HANDLER( c65_write_io )
 {
-	running_device *sid_0 = space->machine->device("sid_r");
-	running_device *sid_1 = space->machine->device("sid_l");
-	running_device *vic3 = space->machine->device("vic3");
+	device_t *sid_0 = space->machine->device("sid_r");
+	device_t *sid_1 = space->machine->device("sid_l");
+	device_t *vic3 = space->machine->device("vic3");
 
 	switch (offset & 0xf00)
 	{
@@ -719,8 +719,8 @@ static WRITE8_HANDLER( c65_write_io )
 
 static WRITE8_HANDLER( c65_write_io_dc00 )
 {
-	running_device *cia_0 = space->machine->device("cia_0");
-	running_device *cia_1 = space->machine->device("cia_1");
+	device_t *cia_0 = space->machine->device("cia_0");
+	device_t *cia_1 = space->machine->device("cia_1");
 
 	switch (offset & 0xf00)
 	{
@@ -739,9 +739,9 @@ static WRITE8_HANDLER( c65_write_io_dc00 )
 
 static READ8_HANDLER( c65_read_io )
 {
-	running_device *sid_0 = space->machine->device("sid_r");
-	running_device *sid_1 = space->machine->device("sid_l");
-	running_device *vic3 = space->machine->device("vic3");
+	device_t *sid_0 = space->machine->device("sid_r");
+	device_t *sid_1 = space->machine->device("sid_l");
+	device_t *vic3 = space->machine->device("vic3");
 
 	switch (offset & 0xf00)
 	{
@@ -782,8 +782,8 @@ static READ8_HANDLER( c65_read_io )
 
 static READ8_HANDLER( c65_read_io_dc00 )
 {
-	running_device *cia_0 = space->machine->device("cia_0");
-	running_device *cia_1 = space->machine->device("cia_1");
+	device_t *cia_0 = space->machine->device("cia_0");
+	device_t *cia_1 = space->machine->device("cia_1");
 
 	switch (offset & 0x300)
 	{

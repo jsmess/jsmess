@@ -41,9 +41,9 @@
 
 DECLARE_LEGACY_DEVICE(UPD3301, upd3301);
 
-#define MDRV_UPD3301_ADD(_tag, _clock, _intrf) \
-	MDRV_DEVICE_ADD(_tag, UPD3301, _clock) \
-	MDRV_DEVICE_CONFIG(_intrf)
+#define MCFG_UPD3301_ADD(_tag, _clock, _intrf) \
+	MCFG_DEVICE_ADD(_tag, UPD3301, _clock) \
+	MCFG_DEVICE_CONFIG(_intrf)
 
 #define UPD3301_INTERFACE(name) \
 	const upd3301_interface (name) =
@@ -52,8 +52,8 @@ DECLARE_LEGACY_DEVICE(UPD3301, upd3301);
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef void (*upd3301_display_pixels_func)(running_device *device, bitmap_t *bitmap, int y, int sx, UINT8 cc, UINT8 lc, int hlgt, int rvv, int vsp, int sl0, int sl12, int csr, int gpa);
-#define UPD3301_DISPLAY_PIXELS(name) void name(running_device *device, bitmap_t *bitmap, int y, int sx, UINT8 cc, UINT8 lc, int hlgt, int rvv, int vsp, int sl0, int sl12, int csr, int gpa)
+typedef void (*upd3301_display_pixels_func)(device_t *device, bitmap_t *bitmap, int y, int sx, UINT8 cc, UINT8 lc, int hlgt, int rvv, int vsp, int sl0, int sl12, int csr, int gpa);
+#define UPD3301_DISPLAY_PIXELS(name) void name(device_t *device, bitmap_t *bitmap, int y, int sx, UINT8 cc, UINT8 lc, int hlgt, int rvv, int vsp, int sl0, int sl12, int csr, int gpa)
 
 typedef struct _upd3301_interface upd3301_interface;
 struct _upd3301_interface
@@ -90,6 +90,6 @@ READ_LINE_DEVICE_HANDLER( upd3301_hrtc_r );
 READ_LINE_DEVICE_HANDLER( upd3301_vrtc_r );
 
 /* screen update */
-void upd3301_update(running_device *device, bitmap_t *bitmap, const rectangle *cliprect);
+void upd3301_update(device_t *device, bitmap_t *bitmap, const rectangle *cliprect);
 
 #endif

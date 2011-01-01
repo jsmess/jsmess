@@ -1304,7 +1304,7 @@ ADDRESS_MAP_END
 
 static MACHINE_RESET( ms32 )
 {
-	memory_set_bankptr(machine, "bank1", memory_region(machine, "maincpu"));
+	memory_set_bankptr(machine, "bank1", machine->region("maincpu")->base());
 	memory_set_bank(machine, "bank4", 0);
 	memory_set_bank(machine, "bank5", 1);
 	irq_init(machine);
@@ -1315,47 +1315,47 @@ static MACHINE_RESET( ms32 )
 static MACHINE_CONFIG_START( ms32, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", V70, 20000000) // 20MHz
-	MDRV_CPU_PROGRAM_MAP(ms32_map)
-	MDRV_CPU_VBLANK_INT_HACK(ms32_interrupt,32)
+	MCFG_CPU_ADD("maincpu", V70, 20000000) // 20MHz
+	MCFG_CPU_PROGRAM_MAP(ms32_map)
+	MCFG_CPU_VBLANK_INT_HACK(ms32_interrupt,32)
 
-	MDRV_CPU_ADD("audiocpu", Z80, 4000000)
-	MDRV_CPU_PROGRAM_MAP(ms32_sound_map)
+	MCFG_CPU_ADD("audiocpu", Z80, 4000000)
+	MCFG_CPU_PROGRAM_MAP(ms32_sound_map)
 
-	MDRV_QUANTUM_TIME(HZ(60000))
+	MCFG_QUANTUM_TIME(HZ(60000))
 
-	MDRV_MACHINE_RESET(ms32)
+	MCFG_MACHINE_RESET(ms32)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_SIZE(40*8, 28*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_SIZE(40*8, 28*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
 
-	MDRV_GFXDECODE(ms32)
-	MDRV_PALETTE_LENGTH(0x10000)
+	MCFG_GFXDECODE(ms32)
+	MCFG_PALETTE_LENGTH(0x10000)
 
-	MDRV_VIDEO_START(ms32)
-	MDRV_VIDEO_UPDATE(ms32)
+	MCFG_VIDEO_START(ms32)
+	MCFG_VIDEO_UPDATE(ms32)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ymf", YMF271, 16934400)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("ymf", YMF271, 16934400)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( f1superb, ms32 )
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(f1superb_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(f1superb_map)
 
-	MDRV_GFXDECODE(f1superb)
+	MCFG_GFXDECODE(f1superb)
 
-	MDRV_VIDEO_START(f1superb)
+	MCFG_VIDEO_START(f1superb)
 MACHINE_CONFIG_END
 
 
@@ -2143,8 +2143,8 @@ void ms32_rearrange_sprites(running_machine *machine, const char *region)
 
 	UINT8 *result_data;
 
-	source_data = memory_region       ( machine, region );
-	source_size = memory_region_length( machine, region );
+	source_data = machine->region       ( region )->base();
+	source_size = machine->region( region )->bytes();
 
 	result_data = auto_alloc_array(machine, UINT8, source_size);
 
@@ -2168,8 +2168,8 @@ void decrypt_ms32_tx(running_machine *machine, int addr_xor,int data_xor, const 
 
 	UINT8 *result_data;
 
-	source_data = memory_region       ( machine, region );
-	source_size = memory_region_length( machine, region );
+	source_data = machine->region       ( region )->base();
+	source_size = machine->region( region )->bytes();
 
 	result_data = auto_alloc_array(machine, UINT8, source_size);
 
@@ -2222,8 +2222,8 @@ void decrypt_ms32_bg(running_machine *machine, int addr_xor,int data_xor, const 
 
 	UINT8 *result_data;
 
-	source_data = memory_region       ( machine, region );
-	source_size = memory_region_length( machine, region );
+	source_data = machine->region       ( region )->base();
+	source_size = machine->region( region )->bytes();
 
 	result_data = auto_alloc_array(machine, UINT8, source_size);
 
@@ -2274,8 +2274,8 @@ void decrypt_ms32_bg(running_machine *machine, int addr_xor,int data_xor, const 
 static void configure_banks(running_machine *machine)
 {
 	state_save_register_global(machine, to_main);
-	memory_configure_bank(machine, "bank4", 0, 16, memory_region(machine, "audiocpu") + 0x14000, 0x4000);
-	memory_configure_bank(machine, "bank5", 0, 16, memory_region(machine, "audiocpu") + 0x14000, 0x4000);
+	memory_configure_bank(machine, "bank4", 0, 16, machine->region("audiocpu")->base() + 0x14000, 0x4000);
+	memory_configure_bank(machine, "bank5", 0, 16, machine->region("audiocpu")->base() + 0x14000, 0x4000);
 }
 
 static DRIVER_INIT( ms32_common )
@@ -2333,7 +2333,7 @@ static DRIVER_INIT (47pie2)
 static DRIVER_INIT (f1superb)
 {
 #if 0 // we shouldn't need this hack, something else is wrong, and the x offsets are never copied either, v70 problems??
-	UINT32 *pROM = (UINT32 *)memory_region(machine, "maincpu");
+	UINT32 *pROM = (UINT32 *)machine->region("maincpu")->base();
 	pROM[0x19d04/4]=0x167a021a; // bne->br  : sprite Y offset table is always copied to RAM
 #endif
 	DRIVER_INIT_CALL(ss92046_01);

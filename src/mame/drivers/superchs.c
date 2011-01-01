@@ -147,7 +147,7 @@ static WRITE32_HANDLER( superchs_input_w )
 
 			if (ACCESSING_BITS_0_7)
 			{
-				running_device *device = space->machine->device("eeprom");
+				device_t *device = space->machine->device("eeprom");
 				eeprom_set_clock_line(device, (data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
 				eeprom_write_bit(device, data & 0x40);
 				eeprom_set_cs_line(device, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
@@ -261,7 +261,7 @@ static INPUT_PORTS_START( superchs )
 	PORT_BIT( 0x00000020, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x00000040, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_SPECIAL )	PORT_READ_LINE_DEVICE("eeprom", eeprom_read_bit)	/* reserved for EEROM */
-	PORT_BIT( 0x00000100, IP_ACTIVE_LOW,  IPT_BUTTON5 ) PORT_PLAYER(1)	/* seat center (cockpit only) */
+	PORT_BIT( 0x00000100, IP_ACTIVE_LOW,  IPT_BUTTON5 ) PORT_PLAYER(1) PORT_NAME("Seat Center")	/* seat center (cockpit only) */
 	PORT_BIT( 0x00000200, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x00000400, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x00000800, IP_ACTIVE_LOW,  IPT_UNKNOWN )
@@ -273,7 +273,9 @@ static INPUT_PORTS_START( superchs )
 	PORT_BIT( 0x00010000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x00020000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x00040000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x00080000, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_PLAYER(1)	/* Freeze input */
+	PORT_DIPNAME( 0x00080000, 0x00, "Freeze Screen" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00080000, DEF_STR( On ) )
 	PORT_SERVICE_NO_TOGGLE( 0x00100000, IP_ACTIVE_LOW )
 	PORT_BIT( 0x00200000, IP_ACTIVE_LOW,  IPT_SERVICE1 )
 	PORT_BIT( 0x00400000, IP_ACTIVE_LOW,  IPT_COIN2 )
@@ -300,7 +302,7 @@ static INPUT_PORTS_START( superchs )
 	PORT_BIT( 0xff, 0x00, IPT_AD_STICK_Y ) PORT_SENSITIVITY(20) PORT_KEYDELTA(10) PORT_PLAYER(2)
 
 	PORT_START("FAKE")		/* inputs and DSW all fake */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("Accelerator")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_PLAYER(1)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(1)
 	PORT_DIPNAME( 0x10, 0x00, "Steering type" )
@@ -369,36 +371,36 @@ static const tc0480scp_interface superchs_tc0480scp_intf =
 static MACHINE_CONFIG_START( superchs, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68EC020, 16000000)	/* 16 MHz */
-	MDRV_CPU_PROGRAM_MAP(superchs_map)
-	MDRV_CPU_VBLANK_INT("screen", irq2_line_hold)/* VBL */
+	MCFG_CPU_ADD("maincpu", M68EC020, 16000000)	/* 16 MHz */
+	MCFG_CPU_PROGRAM_MAP(superchs_map)
+	MCFG_CPU_VBLANK_INT("screen", irq2_line_hold)/* VBL */
 
-	MDRV_CPU_ADD("sub", M68000, 16000000)	/* 16 MHz */
-	MDRV_CPU_PROGRAM_MAP(superchs_cpub_map)
-	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)/* VBL */
+	MCFG_CPU_ADD("sub", M68000, 16000000)	/* 16 MHz */
+	MCFG_CPU_PROGRAM_MAP(superchs_cpub_map)
+	MCFG_CPU_VBLANK_INT("screen", irq4_line_hold)/* VBL */
 
-	MDRV_QUANTUM_TIME(HZ(480))	/* CPU slices - Need to interleave Cpu's 1 & 3 */
+	MCFG_QUANTUM_TIME(HZ(480))	/* CPU slices - Need to interleave Cpu's 1 & 3 */
 
-	MDRV_EEPROM_ADD("eeprom", superchs_eeprom_interface)
+	MCFG_EEPROM_ADD("eeprom", superchs_eeprom_interface)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(40*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0, 40*8-1, 2*8, 32*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(40*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0, 40*8-1, 2*8, 32*8-1)
 
-	MDRV_GFXDECODE(superchs)
-	MDRV_PALETTE_LENGTH(8192)
+	MCFG_GFXDECODE(superchs)
+	MCFG_PALETTE_LENGTH(8192)
 
-	MDRV_VIDEO_START(superchs)
-	MDRV_VIDEO_UPDATE(superchs)
+	MCFG_VIDEO_START(superchs)
+	MCFG_VIDEO_UPDATE(superchs)
 
-	MDRV_TC0480SCP_ADD("tc0480scp", superchs_tc0480scp_intf)
+	MCFG_TC0480SCP_ADD("tc0480scp", superchs_tc0480scp_intf)
 
 	/* sound hardware */
-	MDRV_FRAGMENT_ADD(taito_f3_sound)
+	MCFG_FRAGMENT_ADD(taito_f3_sound)
 MACHINE_CONFIG_END
 
 /***************************************************************************/

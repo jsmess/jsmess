@@ -668,9 +668,9 @@ INLINE void gdc_cmd_pitch(void)
 /*-------------------------------------------------------------------------*/
 INLINE void gdc_cmd_start(void)
 {
-  /*   MDRV_SCREEN_SIZE(gdc.registers.display.words_per_line*16, */
+  /*   MCFG_SCREEN_SIZE(gdc.registers.display.words_per_line*16, */
 /*                      gdc.registers.display.lines_per_field); */
-/*     MDRV_SCREEN_VISIBLE_AREA(0, */
+/*     MCFG_SCREEN_VISIBLE_AREA(0, */
 /*                       gdc.registers.display.words_per_line*16-1, */
 /*                       0, */
 /*                       gdc.registers.display.lines_per_field-1); */

@@ -98,13 +98,13 @@ typedef struct _ti99_pcoden_state
 	UINT8 *rom2;
 	UINT8 *grom;
 
-	running_device *gromdev[8];
+	device_t *gromdev[8];
 
 	ti99_peb_connect		lines;
 
 } ti99_pcoden_state;
 
-INLINE ti99_pcoden_state *get_safe_token(running_device *device)
+INLINE ti99_pcoden_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	return (ti99_pcoden_state *)downcast<legacy_device_base *>(device)->token();
@@ -218,14 +218,14 @@ static DEVICE_RESET( ti99_pcoden )
 	/* If the card is selected in the menu, register the card */
 	if (input_port_read(device->machine, "EXTCARD") & EXT_PCODE)
 	{
-		running_device *peb = device->owner();
+		device_t *peb = device->owner();
 		int success = mount_card(peb, device, &pcode_ncard, get_pebcard_config(device)->slot);
 		if (!success) return;
 
 		astring *region = new astring();
 		astring_assemble_3(region, device->tag(), ":", pcode_region);
 
-		pcode->rom0 = memory_region(device->machine, astring_c(region));
+		pcode->rom0 = device->machine->region(astring_c(region))->base();
 		pcode->rom1 = pcode->rom0 + 0x1000;
 		pcode->rom2 = pcode->rom0 + 0x2000;
 		pcode->grom = pcode->rom0 + 0x3000;
@@ -252,21 +252,21 @@ static WRITE_LINE_DEVICE_HANDLER( pcode_ready )
 /*
     Get the pointer to the GROM data from the P-Code card. Called by the GROM.
 */
-static UINT8 *get_grom_ptr(running_device *device)
+static UINT8 *get_grom_ptr(device_t *device)
 {
 	ti99_pcoden_state *pcode = (ti99_pcoden_state*)downcast<legacy_device_base *>(device)->token();
 	return pcode->grom;
 }
 
 MACHINE_CONFIG_FRAGMENT( ti99_pcoden )
-	MDRV_GROM_ADD_P( "grom_0", 0, get_grom_ptr, 0x0000, 0x1800, pcode_ready )
-	MDRV_GROM_ADD_P( "grom_1", 1, get_grom_ptr, 0x2000, 0x1800, pcode_ready )
-	MDRV_GROM_ADD_P( "grom_2", 2, get_grom_ptr, 0x4000, 0x1800, pcode_ready )
-	MDRV_GROM_ADD_P( "grom_3", 3, get_grom_ptr, 0x6000, 0x1800, pcode_ready )
-	MDRV_GROM_ADD_P( "grom_4", 4, get_grom_ptr, 0x8000, 0x1800, pcode_ready )
-	MDRV_GROM_ADD_P( "grom_5", 5, get_grom_ptr, 0xa000, 0x1800, pcode_ready )
-	MDRV_GROM_ADD_P( "grom_6", 6, get_grom_ptr, 0xc000, 0x1800, pcode_ready )
-	MDRV_GROM_ADD_P( "grom_7", 7, get_grom_ptr, 0xe000, 0x1800, pcode_ready )
+	MCFG_GROM_ADD_P( "grom_0", 0, get_grom_ptr, 0x0000, 0x1800, pcode_ready )
+	MCFG_GROM_ADD_P( "grom_1", 1, get_grom_ptr, 0x2000, 0x1800, pcode_ready )
+	MCFG_GROM_ADD_P( "grom_2", 2, get_grom_ptr, 0x4000, 0x1800, pcode_ready )
+	MCFG_GROM_ADD_P( "grom_3", 3, get_grom_ptr, 0x6000, 0x1800, pcode_ready )
+	MCFG_GROM_ADD_P( "grom_4", 4, get_grom_ptr, 0x8000, 0x1800, pcode_ready )
+	MCFG_GROM_ADD_P( "grom_5", 5, get_grom_ptr, 0xa000, 0x1800, pcode_ready )
+	MCFG_GROM_ADD_P( "grom_6", 6, get_grom_ptr, 0xc000, 0x1800, pcode_ready )
+	MCFG_GROM_ADD_P( "grom_7", 7, get_grom_ptr, 0xe000, 0x1800, pcode_ready )
 MACHINE_CONFIG_END
 
 ROM_START( ti99_pcoden )

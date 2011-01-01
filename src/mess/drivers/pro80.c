@@ -128,12 +128,12 @@ void pro80_state::machine_reset()
 
 static MACHINE_CONFIG_START( pro80, pro80_state )
     /* basic machine hardware */
-    MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz)
-    MDRV_CPU_PROGRAM_MAP(pro80_mem)
-    MDRV_CPU_IO_MAP(pro80_io)
+    MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
+    MCFG_CPU_PROGRAM_MAP(pro80_mem)
+    MCFG_CPU_IO_MAP(pro80_io)
 
     /* video hardware */
-    MDRV_DEFAULT_LAYOUT(layout_pro80)
+    MCFG_DEFAULT_LAYOUT(layout_pro80)
 MACHINE_CONFIG_END
 
 /* ROM definition */

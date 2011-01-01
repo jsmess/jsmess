@@ -403,7 +403,7 @@ static MACHINE_RESET( mermaid )
 }
 
 /* Similar to Jantotsu, apparently the HW has three ports that controls what kind of sample should be played. Every sample size is 0x1000. */
-static void rougien_adpcm_int( running_device *device )
+static void rougien_adpcm_int( device_t *device )
 {
 	mermaid_state *state = device->machine->driver_data<mermaid_state>();
 
@@ -417,7 +417,7 @@ static void rougien_adpcm_int( running_device *device )
 	}
 	else
 	{
-		UINT8 *ROM = memory_region(device->machine, "adpcm");
+		UINT8 *ROM = device->machine->region("adpcm")->base();
 
 		state->adpcm_data = ((state->adpcm_trigger ? (ROM[state->adpcm_pos] & 0x0f) : (ROM[state->adpcm_pos] & 0xf0) >> 4));
 		msm5205_data_w(device, state->adpcm_data & 0xf);
@@ -442,48 +442,48 @@ static const msm5205_interface msm5205_config =
 static MACHINE_CONFIG_START( mermaid, mermaid_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, 4000000)	// ???
-	MDRV_CPU_PROGRAM_MAP(mermaid_map)
-	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
+	MCFG_CPU_ADD("maincpu", Z80, 4000000)	// ???
+	MCFG_CPU_PROGRAM_MAP(mermaid_map)
+	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
-	MDRV_MACHINE_START(mermaid)
-	MDRV_MACHINE_RESET(mermaid)
+	MCFG_MACHINE_START(mermaid)
+	MCFG_MACHINE_RESET(mermaid)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(mermaid)
-	MDRV_PALETTE_LENGTH(4*16+2*2)
+	MCFG_GFXDECODE(mermaid)
+	MCFG_PALETTE_LENGTH(4*16+2*2)
 
-	MDRV_PALETTE_INIT(mermaid)
-	MDRV_VIDEO_START(mermaid)
-	MDRV_VIDEO_UPDATE(mermaid)
-	MDRV_VIDEO_EOF(mermaid)
+	MCFG_PALETTE_INIT(mermaid)
+	MCFG_VIDEO_START(mermaid)
+	MCFG_VIDEO_UPDATE(mermaid)
+	MCFG_VIDEO_EOF(mermaid)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay1", AY8910, 1500000)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD("ay1", AY8910, 1500000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MDRV_SOUND_ADD("ay2", AY8910, 1500000)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD("ay2", AY8910, 1500000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( rougien, mermaid )
 
-	MDRV_DEVICE_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(rougien_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(rougien_map)
 
-	MDRV_SOUND_ADD("adpcm", MSM5205, 384000)
-	MDRV_SOUND_CONFIG(msm5205_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SOUND_ADD("adpcm", MSM5205, 384000)
+	MCFG_SOUND_CONFIG(msm5205_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
 /* ROMs */

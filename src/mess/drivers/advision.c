@@ -71,13 +71,13 @@ static DEVICE_IMAGE_LOAD( advision_cart )
 	{
 		size = image.length();
 
-		if (size > memory_region_length(image.device().machine, I8048_TAG))
+		if (size > image.device().machine->region(I8048_TAG)->bytes())
 		{
 			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
 			return IMAGE_INIT_FAIL;
 		}
 
-		if (image.fread( memory_region(image.device().machine, I8048_TAG), size) != size)
+		if (image.fread( image.device().machine->region(I8048_TAG)->base(), size) != size)
 		{
 			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unable to fully read from file");
 			return IMAGE_INIT_FAIL;
@@ -87,7 +87,7 @@ static DEVICE_IMAGE_LOAD( advision_cart )
 	else
 	{
 		size = image.get_software_region_length("rom");
-		memcpy(memory_region(image.device().machine, I8048_TAG), image.get_software_region("rom"), size);
+		memcpy(image.device().machine->region(I8048_TAG)->base(), image.get_software_region("rom"), size);
 	}
 
 	return IMAGE_INIT_PASS;
@@ -104,39 +104,39 @@ static COP400_INTERFACE( advision_cop411_interface )
 
 static MACHINE_CONFIG_START( advision, advision_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD(I8048_TAG, I8048, XTAL_11MHz)
-	MDRV_CPU_PROGRAM_MAP(program_map)
-	MDRV_CPU_IO_MAP(io_map)
+	MCFG_CPU_ADD(I8048_TAG, I8048, XTAL_11MHz)
+	MCFG_CPU_PROGRAM_MAP(program_map)
+	MCFG_CPU_IO_MAP(io_map)
 
-	MDRV_CPU_ADD(COP411_TAG, COP411, 52631*16) // COP411L-KCN/N
-	MDRV_CPU_CONFIG(advision_cop411_interface)
-	MDRV_CPU_IO_MAP(sound_io_map)
+	MCFG_CPU_ADD(COP411_TAG, COP411, 52631*16) // COP411L-KCN/N
+	MCFG_CPU_CONFIG(advision_cop411_interface)
+	MCFG_CPU_IO_MAP(sound_io_map)
 
     /* video hardware */
-	MDRV_SCREEN_ADD(SCREEN_TAG, RASTER)
-	MDRV_SCREEN_REFRESH_RATE(4*15)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(320, 200)
-	MDRV_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
-	MDRV_PALETTE_LENGTH(8)
-	MDRV_PALETTE_INIT(advision)
+	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
+	MCFG_SCREEN_REFRESH_RATE(4*15)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(320, 200)
+	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
+	MCFG_PALETTE_LENGTH(8)
+	MCFG_PALETTE_INIT(advision)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("dac", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	/* cartridge */
-	MDRV_CARTSLOT_ADD("cart")
-	MDRV_CARTSLOT_EXTENSION_LIST("bin")
-	MDRV_CARTSLOT_MANDATORY
-	MDRV_CARTSLOT_INTERFACE("advision_cart")
-	MDRV_CARTSLOT_LOAD(advision_cart)
+	MCFG_CARTSLOT_ADD("cart")
+	MCFG_CARTSLOT_EXTENSION_LIST("bin")
+	MCFG_CARTSLOT_MANDATORY
+	MCFG_CARTSLOT_INTERFACE("advision_cart")
+	MCFG_CARTSLOT_LOAD(advision_cart)
 
 	/* Software lists */
-	MDRV_SOFTWARE_LIST_ADD("cart_list","advision")
+	MCFG_SOFTWARE_LIST_ADD("cart_list","advision")
 MACHINE_CONFIG_END
 
 /* ROMs */

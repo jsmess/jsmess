@@ -63,10 +63,10 @@ static const tms0980_config stopthie_tms0980_config =
 
 
 static MACHINE_CONFIG_START( stopthie, stopthie_state )
-	MDRV_CPU_ADD( "maincpu", TMS0980, 5000000 )	/* Clock is wrong */
-	MDRV_CPU_CONFIG( stopthie_tms0980_config )
+	MCFG_CPU_ADD( "maincpu", TMS0980, 5000000 )	/* Clock is wrong */
+	MCFG_CPU_CONFIG( stopthie_tms0980_config )
 
-	MDRV_DEFAULT_LAYOUT(layout_stopthie)
+	MCFG_DEFAULT_LAYOUT(layout_stopthie)
 MACHINE_CONFIG_END
 
 ROM_START( stopthie )

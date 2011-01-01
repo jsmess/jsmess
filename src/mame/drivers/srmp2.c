@@ -79,7 +79,7 @@ static INTERRUPT_GEN( srmp2_interrupt )
 
 static DRIVER_INIT( srmp2 )
 {
-	UINT16 *RAM = (UINT16 *) memory_region(machine, "maincpu");
+	UINT16 *RAM = (UINT16 *) machine->region("maincpu")->base();
 
 	/* Fix "ERROR BACK UP" and "ERROR IOX" */
 	RAM[0x20c80 / 2] = 0x4e75;								// RTS
@@ -87,7 +87,7 @@ static DRIVER_INIT( srmp2 )
 
 static DRIVER_INIT( srmp3 )
 {
-	UINT8 *RAM = memory_region(machine, "maincpu");
+	UINT8 *RAM = machine->region("maincpu")->base();
 
 	/* BANK ROM (0x08000 - 0x1ffff) Check skip [MAIN ROM side] */
 	RAM[0x00000 + 0x7b69] = 0x00;							// NOP
@@ -183,7 +183,7 @@ static WRITE16_DEVICE_HANDLER( srmp2_adpcm_code_w )
 */
 
 	srmp2_state *state = device->machine->driver_data<srmp2_state>();
-	UINT8 *ROM = memory_region(device->machine, "adpcm");
+	UINT8 *ROM = device->machine->region("adpcm")->base();
 
 	state->adpcm_sptr = (ROM[((state->adpcm_bank * 0x10000) + (data << 2) + 0)] << 8);
 	state->adpcm_eptr = (ROM[((state->adpcm_bank * 0x10000) + (data << 2) + 1)] << 8);
@@ -207,7 +207,7 @@ static WRITE8_DEVICE_HANDLER( srmp3_adpcm_code_w )
 */
 
 	srmp2_state *state = device->machine->driver_data<srmp2_state>();
-	UINT8 *ROM = memory_region(device->machine, "adpcm");
+	UINT8 *ROM = device->machine->region("adpcm")->base();
 
 	state->adpcm_sptr = (ROM[((state->adpcm_bank * 0x10000) + (data << 2) + 0)] << 8);
 	state->adpcm_eptr = (ROM[((state->adpcm_bank * 0x10000) + (data << 2) + 1)] << 8);
@@ -221,10 +221,10 @@ static WRITE8_DEVICE_HANDLER( srmp3_adpcm_code_w )
 }
 
 
-static void srmp2_adpcm_int(running_device *device)
+static void srmp2_adpcm_int(device_t *device)
 {
 	srmp2_state *state = device->machine->driver_data<srmp2_state>();
-	UINT8 *ROM = memory_region(device->machine, "adpcm");
+	UINT8 *ROM = device->machine->region("adpcm")->base();
 
 	if (state->adpcm_sptr)
 	{
@@ -346,7 +346,7 @@ static WRITE8_HANDLER( srmp3_rombank_w )
 */
 
 	srmp2_state *state = space->machine->driver_data<srmp2_state>();
-	UINT8 *ROM = memory_region(space->machine, "maincpu");
+	UINT8 *ROM = space->machine->region("maincpu")->base();
 	int addr;
 
 	state->adpcm_bank = ((data & 0xe0) >> 5);
@@ -1011,37 +1011,37 @@ GFXDECODE_END
 static MACHINE_CONFIG_START( srmp2, srmp2_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000,16000000/2)				/* 8.00 MHz */
-	MDRV_CPU_PROGRAM_MAP(srmp2_map)
-	MDRV_CPU_VBLANK_INT_HACK(srmp2_interrupt,16)		/* Interrupt times is not understood */
+	MCFG_CPU_ADD("maincpu", M68000,16000000/2)				/* 8.00 MHz */
+	MCFG_CPU_PROGRAM_MAP(srmp2_map)
+	MCFG_CPU_VBLANK_INT_HACK(srmp2_interrupt,16)		/* Interrupt times is not understood */
 
-	MDRV_MACHINE_RESET(srmp2)
-	MDRV_NVRAM_ADD_0FILL("nvram")
+	MCFG_MACHINE_RESET(srmp2)
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(464, 256-16)
-	MDRV_SCREEN_VISIBLE_AREA(16, 464-1, 8, 256-1-24)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(464, 256-16)
+	MCFG_SCREEN_VISIBLE_AREA(16, 464-1, 8, 256-1-24)
 
-	MDRV_GFXDECODE(srmp2)
-	MDRV_PALETTE_LENGTH(1024)	/* sprites only */
+	MCFG_GFXDECODE(srmp2)
+	MCFG_PALETTE_LENGTH(1024)	/* sprites only */
 
-	MDRV_PALETTE_INIT(srmp2)
-	MDRV_VIDEO_UPDATE(srmp2)		/* just draw the sprites */
+	MCFG_PALETTE_INIT(srmp2)
+	MCFG_VIDEO_UPDATE(srmp2)		/* just draw the sprites */
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("aysnd", AY8910, 20000000/16)
-	MDRV_SOUND_CONFIG(srmp2_ay8910_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	MCFG_SOUND_ADD("aysnd", AY8910, 20000000/16)
+	MCFG_SOUND_CONFIG(srmp2_ay8910_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-	MDRV_SOUND_ADD("msm", MSM5205, 384000)
-	MDRV_SOUND_CONFIG(msm5205_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
+	MCFG_SOUND_ADD("msm", MSM5205, 384000)
+	MCFG_SOUND_CONFIG(msm5205_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
 MACHINE_CONFIG_END
 
 
@@ -1049,75 +1049,75 @@ static MACHINE_CONFIG_START( srmp3, srmp2_state )
 
 	/* basic machine hardware */
 
-	MDRV_CPU_ADD("maincpu", Z80, 3500000)		/* 3.50 MHz ? */
+	MCFG_CPU_ADD("maincpu", Z80, 3500000)		/* 3.50 MHz ? */
 	//      4000000,                /* 4.00 MHz ? */
-	MDRV_CPU_PROGRAM_MAP(srmp3_map)
-	MDRV_CPU_IO_MAP(srmp3_io_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_PROGRAM_MAP(srmp3_map)
+	MCFG_CPU_IO_MAP(srmp3_io_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_MACHINE_RESET(srmp3)
-	MDRV_NVRAM_ADD_0FILL("nvram")
+	MCFG_MACHINE_RESET(srmp3)
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(400, 256-16)
-	MDRV_SCREEN_VISIBLE_AREA(16, 400-1, 8, 256-1-24)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(400, 256-16)
+	MCFG_SCREEN_VISIBLE_AREA(16, 400-1, 8, 256-1-24)
 
-	MDRV_GFXDECODE(srmp3)
-	MDRV_PALETTE_LENGTH(512)	/* sprites only */
+	MCFG_GFXDECODE(srmp3)
+	MCFG_PALETTE_LENGTH(512)	/* sprites only */
 
-	MDRV_PALETTE_INIT(srmp3)
-	MDRV_VIDEO_UPDATE(srmp3)	/* just draw the sprites */
+	MCFG_PALETTE_INIT(srmp3)
+	MCFG_VIDEO_UPDATE(srmp3)	/* just draw the sprites */
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("aysnd", AY8910, 16000000/16)
-	MDRV_SOUND_CONFIG(srmp2_ay8910_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+	MCFG_SOUND_ADD("aysnd", AY8910, 16000000/16)
+	MCFG_SOUND_CONFIG(srmp2_ay8910_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
-	MDRV_SOUND_ADD("msm", MSM5205, 384000)
-	MDRV_SOUND_CONFIG(msm5205_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
+	MCFG_SOUND_ADD("msm", MSM5205, 384000)
+	MCFG_SOUND_CONFIG(msm5205_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_START( mjyuugi, srmp2_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000,16000000/2)				/* 8.00 MHz */
-	MDRV_CPU_PROGRAM_MAP(mjyuugi_map)
-	MDRV_CPU_VBLANK_INT_HACK(srmp2_interrupt,16)		/* Interrupt times is not understood */
+	MCFG_CPU_ADD("maincpu", M68000,16000000/2)				/* 8.00 MHz */
+	MCFG_CPU_PROGRAM_MAP(mjyuugi_map)
+	MCFG_CPU_VBLANK_INT_HACK(srmp2_interrupt,16)		/* Interrupt times is not understood */
 
-	MDRV_MACHINE_RESET(srmp2)
-	MDRV_NVRAM_ADD_0FILL("nvram")
+	MCFG_MACHINE_RESET(srmp2)
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(400, 256-16)
-	MDRV_SCREEN_VISIBLE_AREA(16, 400-1, 0, 256-1-16)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(400, 256-16)
+	MCFG_SCREEN_VISIBLE_AREA(16, 400-1, 0, 256-1-16)
 
-	MDRV_GFXDECODE(srmp3)
-	MDRV_PALETTE_LENGTH(512)			/* sprites only */
+	MCFG_GFXDECODE(srmp3)
+	MCFG_PALETTE_LENGTH(512)			/* sprites only */
 
-	MDRV_VIDEO_UPDATE(mjyuugi)			/* just draw the sprites */
+	MCFG_VIDEO_UPDATE(mjyuugi)			/* just draw the sprites */
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("aysnd", AY8910, 16000000/16)
-	MDRV_SOUND_CONFIG(srmp2_ay8910_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+	MCFG_SOUND_ADD("aysnd", AY8910, 16000000/16)
+	MCFG_SOUND_CONFIG(srmp2_ay8910_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
-	MDRV_SOUND_ADD("msm", MSM5205, 384000)
-	MDRV_SOUND_CONFIG(msm5205_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
+	MCFG_SOUND_ADD("msm", MSM5205, 384000)
+	MCFG_SOUND_CONFIG(msm5205_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
 MACHINE_CONFIG_END
 
 

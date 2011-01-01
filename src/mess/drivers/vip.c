@@ -603,7 +603,7 @@ void vip_state::machine_start()
 	/* randomize RAM contents */
 	for (UINT16 addr = 0; addr < messram_get_size(m_ram); addr++)
 	{
-		ram[addr] = mame_rand(machine) & 0xff;
+		ram[addr] = machine->rand() & 0xff;
 	}
 
 	/* allocate color RAM */
@@ -681,7 +681,7 @@ void vip_state::machine_reset()
 	}
 
 	/* enable ROM all thru address space */
-	memory_install_rom(program, 0x0000, 0x01ff, 0, 0xfe00, memory_region(&m_machine, CDP1802_TAG));
+	memory_install_rom(program, 0x0000, 0x01ff, 0, 0xfe00, machine->region(CDP1802_TAG)->base());
 }
 
 /* Machine Drivers */
@@ -696,46 +696,46 @@ static const cassette_config vip_cassette_config =
 
 static MACHINE_CONFIG_START( vip, vip_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD(CDP1802_TAG, COSMAC, XTAL_3_52128MHz/2)
-	MDRV_CPU_PROGRAM_MAP(vip_map)
-	MDRV_CPU_IO_MAP(vip_io_map)
-	MDRV_CPU_CONFIG(cosmac_intf)
+	MCFG_CPU_ADD(CDP1802_TAG, COSMAC, XTAL_3_52128MHz/2)
+	MCFG_CPU_PROGRAM_MAP(vip_map)
+	MCFG_CPU_IO_MAP(vip_io_map)
+	MCFG_CPU_CONFIG(cosmac_intf)
 
     /* video hardware */
-	MDRV_CDP1861_SCREEN_ADD(SCREEN_TAG, XTAL_3_52128MHz/2)
+	MCFG_CDP1861_SCREEN_ADD(SCREEN_TAG, XTAL_3_52128MHz/2)
 
-	MDRV_PALETTE_LENGTH(16)
-	MDRV_PALETTE_INIT(black_and_white)
+	MCFG_PALETTE_LENGTH(16)
+	MCFG_PALETTE_INIT(black_and_white)
 
-	MDRV_CDP1861_ADD(CDP1861_TAG, XTAL_3_52128MHz, vip_cdp1861_intf)
-	MDRV_CDP1862_ADD(CDP1862_TAG, CPD1862_CLOCK, vip_cdp1862_intf)
+	MCFG_CDP1861_ADD(CDP1861_TAG, XTAL_3_52128MHz, vip_cdp1861_intf)
+	MCFG_CDP1862_ADD(CDP1862_TAG, CPD1862_CLOCK, vip_cdp1862_intf)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(DISCRETE_TAG, DISCRETE, 0)
-	MDRV_SOUND_CONFIG_DISCRETE(vip)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	MCFG_SOUND_ADD(DISCRETE_TAG, DISCRETE, 0)
+	MCFG_SOUND_CONFIG_DISCRETE(vip)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MDRV_VP595_ADD
-	MDRV_VP550_ADD(XTAL_3_52128MHz/2)
-	MDRV_VP551_ADD(XTAL_3_52128MHz/2)
+	MCFG_VP595_ADD
+	MCFG_VP550_ADD(XTAL_3_52128MHz/2)
+	MCFG_VP551_ADD(XTAL_3_52128MHz/2)
 
 	/* devices */
-	MDRV_QUICKLOAD_ADD("quickload", vip, "bin,c8,c8x", 0)
-	MDRV_CASSETTE_ADD("cassette", vip_cassette_config)
+	MCFG_QUICKLOAD_ADD("quickload", vip, "bin,c8,c8x", 0)
+	MCFG_CASSETTE_ADD("cassette", vip_cassette_config)
 
 	/* internal ram */
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("2K")
-	MDRV_RAM_EXTRA_OPTIONS("4K")
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("2K")
+	MCFG_RAM_EXTRA_OPTIONS("4K")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( vp111, vip )
 	/* internal ram */
-	MDRV_RAM_MODIFY("messram")
-	MDRV_RAM_DEFAULT_SIZE("1K")
-	MDRV_RAM_EXTRA_OPTIONS("2K,4K")
+	MCFG_RAM_MODIFY("messram")
+	MCFG_RAM_DEFAULT_SIZE("1K")
+	MCFG_RAM_EXTRA_OPTIONS("2K,4K")
 MACHINE_CONFIG_END
 
 /* ROMs */
@@ -760,7 +760,7 @@ ROM_END
 
 static QUICKLOAD_LOAD( vip )
 {
-	UINT8 *ptr = memory_region(image.device().machine, CDP1802_TAG);
+	UINT8 *ptr = image.device().machine->region(CDP1802_TAG)->base();
 	UINT8 *chip8_ptr = NULL;
 	int chip8_size = 0;
 	int size = image.length();
@@ -768,14 +768,14 @@ static QUICKLOAD_LOAD( vip )
 	if (strcmp(image.filetype(), "c8") == 0)
 	{
 		/* CHIP-8 program */
-		chip8_ptr = memory_region(image.device().machine, "chip8");
-		chip8_size = memory_region_length(image.device().machine, "chip8");
+		chip8_ptr = image.device().machine->region("chip8")->base();
+		chip8_size = image.device().machine->region("chip8")->bytes();
 	}
 	else if (strcmp(image.filename(), "c8x") == 0)
 	{
 		/* CHIP-8X program */
-		chip8_ptr = memory_region(image.device().machine, "chip8x");
-		chip8_size = memory_region_length(image.device().machine, "chip8x");
+		chip8_ptr = image.device().machine->region("chip8x")->base();
+		chip8_size = image.device().machine->region("chip8x")->bytes();
 	}
 
 	if ((size + chip8_size) > messram_get_size(image.device().machine->device("messram")))

@@ -17,9 +17,9 @@
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MDRV_K033906_ADD(_tag, _config) \
-	MDRV_DEVICE_ADD(_tag, K033906, 0) \
-	MDRV_DEVICE_CONFIG(_config)
+#define MCFG_K033906_ADD(_tag, _config) \
+	MCFG_DEVICE_ADD(_tag, K033906, 0) \
+	MCFG_DEVICE_CONFIG(_config)
 
 
 /***************************************************************************
@@ -91,7 +91,7 @@ private:
 
 	int          m_reg_set;	// 1 = access reg / 0 = access ram
 
-	running_device *m_voodoo;
+	device_t *m_voodoo;
 
     const k033906_device_config &m_config;
 };

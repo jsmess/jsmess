@@ -10,8 +10,6 @@
 
     * Golden Poker Double Up (Big Boy).         1981, Bonanza Enterprises, Ltd.
     * Golden Poker Double Up (Mini Boy).        1981, Bonanza Enterprises, Ltd.
-    * PlayMan Poker (german).                   1981, PlayMan.
-    * Super Double (french).                    198?, Karateco.
     * Jack Potten's Poker (set 1).              198?, Bootleg.
     * Jack Potten's Poker (set 2).              198?, Bootleg in Coinmaster H/W.
     * Jack Potten's Poker (set 3).              198?, Bootleg.
@@ -19,8 +17,10 @@
     * Jack Potten's Poker (set 5).              198?, Bootleg.
     * Jack Potten's Poker (set 6).              198?, Bootleg.
     * Good Luck.                                198?, Unknown.
-    * Royale (set 1).                           198?, Unknown.
-    * Royale (set 2).                           198?, Unknown.
+    * Super Double (french).                    198?, Karateco.
+    * Jack Potten's Poker (NGold, set 1).       198?, Unknown.
+    * Jack Potten's Poker (NGold, set 2).       198?, Unknown.
+    * Jack Potten's Poker (NGold, set 3).       198?, Unknown.
     * Witch Card (Video Klein).                 1991, Video Klein.
     * Witch Card (Spanish, witch game, set 1).  1991, Unknown.
     * Witch Card (Spanish, witch game, set 2).  1991, Unknown.
@@ -28,11 +28,9 @@
     * Witch Card (German, set 1).               1994, Proma.
     * Witch Card (German, set 2).               1994, Unknown.
     * Witch Card (English, witch game, lamps).  1985, PlayMan.
-    * Super Loco 93 (Spanish, set 1).           1993, Unknown.
-    * Super Loco 93 (Spanish, set 2).           1993, Unknown.
-    * Maverik.                                  198?, Unknown.
-    * Brasil'89.                                1989, Unknown.
-    * Poker 91.                                 1991, Unknown.
+    * Witch Card (Falcon, enhanced sound).      199?, Falcon.
+    * Witch Card (German, set 3, alt gfx).      1994, TV Game Elektronik.
+    * Witch Game (Video Klein).                 1991, Video Klein.
     * Buena Suerte (Spanish, set 1).            1990, Unknown.
     * Buena Suerte (Spanish, set 2).            1991, Unknown.
     * Buena Suerte (Spanish, set 3).            1991, Unknown.
@@ -55,7 +53,21 @@
     * Buena Suerte (Spanish, set 20).           1991, Unknown.
     * Buena Suerte (Spanish, set 21).           1991, Unknown.
     * Buena Suerte (Spanish, set 22).           1991, Unknown.
+    * Falcons Wild - World Wide Poker.          1983, Falcon.
+    * Falcons Wild - World Wide Poker.          1990, Video Klein.
+    * Falcons Wild - Wild Card 1991.            1991, TVG.
+    * PlayMan Poker (german).                   1981, PlayMan.
+    * Super Loco 93 (Spanish, set 1).           1993, Unknown.
+    * Super Loco 93 (Spanish, set 2).           1993, Unknown.
+    * Royale (set 1).                           198?, Unknown.
+    * Royale (set 2).                           198?, Unknown.
+    * Maverik.                                  198?, Unknown.
+    * Brasil'89.                                1989, Unknown.
+    * Poker 91.                                 1991, Unknown.
     * Genie.                                    198?, Video Fun Games Ltd.
+    * Silver Game.                              1983, Unknown.
+    * "Unknown french poker game".              198?, Unknown.
+    * "Unknown encrypted poker game".           198?, Unknown.
 
 
 *******************************************************************************
@@ -1364,6 +1376,77 @@ static INPUT_PORTS_START( potnpkrc )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( ngold)
+	/* Multiplexed - 4x5bits */
+	PORT_START("IN0-0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) PORT_NAME("Meters")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL ) PORT_NAME("Deal / Draw")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_CANCEL )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN0-1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_IMPULSE(3) PORT_NAME("Manual Collect") PORT_CODE(KEYCODE_Q)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Payout") PORT_CODE(KEYCODE_W)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH ) PORT_NAME("Big")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_LOW ) PORT_NAME("Small")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN0-2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN0-3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Settings") PORT_CODE(KEYCODE_F2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )   PORT_IMPULSE(3) PORT_NAME("Coin In")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )   PORT_NAME("Coupon (Note In)")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("SW1")
+	/* only bits 4-7 are connected here and were routed to SW1 1-4 */
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x00, "Minimal Hand" )	PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x00, "Pair of Aces" )
+	PORT_DIPSETTING(    0x10, "Double Pair" )
+	PORT_DIPNAME( 0x20, 0x00, "50hz/60hz" )			PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x20, "50hz" )
+	PORT_DIPSETTING(    0x00, "60hz" )
+	/* listed in the manual as "Play Mode" */
+	PORT_DIPNAME( 0x40, 0x00, "Payout Mode" )		PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x40, "Manual" )			/*  listed in the manual as "Out Play" */
+	PORT_DIPSETTING(    0x00, "Auto" )				/*  listed in the manual as "Credit Play" */
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( goodluck )
 	/* Multiplexed - 4x5bits */
 	PORT_INCLUDE( goldnpkr )
@@ -2546,161 +2629,161 @@ static const ay8910_interface ay8910_config =
 static MACHINE_CONFIG_START( goldnpkr_base, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6502, CPU_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(goldnpkr_map)
-	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
+	MCFG_CPU_ADD("maincpu", M6502, CPU_CLOCK)
+	MCFG_CPU_PROGRAM_MAP(goldnpkr_map)
+	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
-	MDRV_NVRAM_ADD_0FILL("nvram")
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MDRV_PIA6821_ADD("pia0", goldnpkr_pia0_intf)
-	MDRV_PIA6821_ADD("pia1", goldnpkr_pia1_intf)
+	MCFG_PIA6821_ADD("pia0", goldnpkr_pia0_intf)
+	MCFG_PIA6821_ADD("pia1", goldnpkr_pia1_intf)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE((39+1)*8, (31+1)*8)                  /* From MC6845 init, registers 00 & 04 (programmed with value-1). */
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 29*8-1)    /* From MC6845 init, registers 01 & 06. */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE((39+1)*8, (31+1)*8)                  /* From MC6845 init, registers 00 & 04 (programmed with value-1). */
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 29*8-1)    /* From MC6845 init, registers 01 & 06. */
 
-	MDRV_MC6845_ADD("crtc", MC6845, CPU_CLOCK, mc6845_intf)	/* 68B45 or 6845s @ CPU clock */
+	MCFG_MC6845_ADD("crtc", MC6845, CPU_CLOCK, mc6845_intf)	/* 68B45 or 6845s @ CPU clock */
 
-	MDRV_GFXDECODE(goldnpkr)
-	MDRV_PALETTE_INIT(goldnpkr)
-	MDRV_PALETTE_LENGTH(256)
-	MDRV_VIDEO_START(goldnpkr)
-	MDRV_VIDEO_UPDATE(goldnpkr)
+	MCFG_GFXDECODE(goldnpkr)
+	MCFG_PALETTE_INIT(goldnpkr)
+	MCFG_PALETTE_LENGTH(256)
+	MCFG_VIDEO_START(goldnpkr)
+	MCFG_VIDEO_UPDATE(goldnpkr)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( goldnpkr, goldnpkr_base )
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
-	MDRV_SOUND_CONFIG_DISCRETE(goldnpkr)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
+	MCFG_SOUND_CONFIG_DISCRETE(goldnpkr)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( pottnpkr, goldnpkr_base )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(pottnpkr_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(pottnpkr_map)
 
-	MDRV_PIA6821_MODIFY("pia0", pottnpkr_pia0_intf)
+	MCFG_PIA6821_MODIFY("pia0", pottnpkr_pia0_intf)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
-	MDRV_SOUND_CONFIG_DISCRETE(pottnpkr)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
+	MCFG_SOUND_CONFIG_DISCRETE(pottnpkr)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( witchcrd, goldnpkr_base )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(witchcrd_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(witchcrd_map)
 
-	MDRV_PIA6821_MODIFY("pia0", pottnpkr_pia0_intf)
+	MCFG_PIA6821_MODIFY("pia0", pottnpkr_pia0_intf)
 
 	/* video hardware */
-	MDRV_PALETTE_INIT(witchcrd)
+	MCFG_PALETTE_INIT(witchcrd)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
-	MDRV_SOUND_CONFIG_DISCRETE(goldnpkr)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
+	MCFG_SOUND_CONFIG_DISCRETE(goldnpkr)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( wcfalcon, goldnpkr_base )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(witchcrd_falcon_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(witchcrd_falcon_map)
 
-	MDRV_PIA6821_MODIFY("pia0", wcfalcon_pia0_intf)
-	MDRV_PIA6821_MODIFY("pia1", wcfalcon_pia1_intf)
+	MCFG_PIA6821_MODIFY("pia0", wcfalcon_pia0_intf)
+	MCFG_PIA6821_MODIFY("pia1", wcfalcon_pia1_intf)
 
 	/* video hardware */
-	MDRV_PALETTE_INIT(witchcrd)
+	MCFG_PALETTE_INIT(witchcrd)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("ay8910", AY8910, MASTER_CLOCK/4)	/* guess, seems ok */
-	MDRV_SOUND_CONFIG(ay8910_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("ay8910", AY8910, MASTER_CLOCK/4)	/* guess, seems ok */
+	MCFG_SOUND_CONFIG(ay8910_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( wildcard, goldnpkr_base )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(wildcard_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(wildcard_map)
 
-	MDRV_PIA6821_MODIFY("pia0", pottnpkr_pia0_intf)
+	MCFG_PIA6821_MODIFY("pia0", pottnpkr_pia0_intf)
 
 	/* video hardware */
-//  MDRV_GFXDECODE(wildcard)
-	MDRV_PALETTE_INIT(witchcrd)
-//  MDRV_VIDEO_START(wildcard)
+//  MCFG_GFXDECODE(wildcard)
+	MCFG_PALETTE_INIT(witchcrd)
+//  MCFG_VIDEO_START(wildcard)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
-	MDRV_SOUND_CONFIG_DISCRETE(goldnpkr)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
+	MCFG_SOUND_CONFIG_DISCRETE(goldnpkr)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( wildcrdb, goldnpkr_base )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(wildcrdb_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(wildcrdb_map)
 
-	MDRV_CPU_ADD("mcu", Z80, MASTER_CLOCK/4)	/* guess */
-	MDRV_CPU_PROGRAM_MAP(wildcrdb_mcu_map)
-	MDRV_CPU_IO_MAP(wildcrdb_mcu_io_map)
+	MCFG_CPU_ADD("mcu", Z80, MASTER_CLOCK/4)	/* guess */
+	MCFG_CPU_PROGRAM_MAP(wildcrdb_mcu_map)
+	MCFG_CPU_IO_MAP(wildcrdb_mcu_io_map)
 
-	MDRV_PIA6821_MODIFY("pia0", wcfalcon_pia0_intf)
-	MDRV_PIA6821_MODIFY("pia1", wcfalcon_pia1_intf)
+	MCFG_PIA6821_MODIFY("pia0", wcfalcon_pia0_intf)
+	MCFG_PIA6821_MODIFY("pia1", wcfalcon_pia1_intf)
 
 	/* video hardware */
-//  MDRV_GFXDECODE(wildcard)
-	MDRV_PALETTE_INIT(witchcrd)
-//  MDRV_VIDEO_START(wildcard)
+//  MCFG_GFXDECODE(wildcard)
+	MCFG_PALETTE_INIT(witchcrd)
+//  MCFG_VIDEO_START(wildcard)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("ay8910", AY8910, MASTER_CLOCK/4)	/* guess, seems ok */
-	MDRV_SOUND_CONFIG(ay8910_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("ay8910", AY8910, MASTER_CLOCK/4)	/* guess, seems ok */
+	MCFG_SOUND_CONFIG(ay8910_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( genie, goldnpkr_base )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(genie_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(genie_map)
 
-	MDRV_PIA6821_MODIFY("pia0", pottnpkr_pia0_intf)
+	MCFG_PIA6821_MODIFY("pia0", pottnpkr_pia0_intf)
 
 	/* video hardware */
-	MDRV_PALETTE_INIT(witchcrd)
+	MCFG_PALETTE_INIT(witchcrd)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
-	MDRV_SOUND_CONFIG_DISCRETE(goldnpkr)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
+	MCFG_SOUND_CONFIG_DISCRETE(goldnpkr)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -2898,6 +2981,120 @@ ROM_START( potnpkre )
 
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "tbp24s10n.7d",		0x0000, 0x0100, BAD_DUMP CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) /* PROM dump needed */
+ROM_END
+
+ROM_START( goodluck )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "goodluck_glh6b.bin",	0x0000, 0x8000, CRC(2cfa4a2c) SHA1(720e2900f3a0ef2632aa201a63b5eba0570e6aa3) )
+
+	ROM_REGION( 0x3000, "gfx1", 0 )
+	ROM_FILL(			0x0000, 0x2000, 0 ) /* filling the R-G bitplanes */
+	ROM_LOAD( "4.bin",	0x2000, 0x1000, CRC(41924d13) SHA1(8ab69b6efdc20858960fa5df669470ba90b5f8d7) )    /* text layer */
+
+	ROM_REGION( 0x3000, "gfx2", 0 )
+	ROM_LOAD( "7.bin",	0x0000, 0x1000, CRC(28ecfaea) SHA1(19d73ed0fdb5a873447b46e250ad6e71abe257cd) )    /* cards deck gfx, bitplane1 */
+	ROM_LOAD( "6.bin",	0x1000, 0x1000, CRC(eeec8862) SHA1(ae03aba1bd43c3ffd140f76770fc1c8cf89ea115) )    /* cards deck gfx, bitplane2 */
+	ROM_LOAD( "5.bin",	0x2000, 0x1000, CRC(2712f297) SHA1(d3cc1469d07c3febbbe4a645cd6bdb57e09cf504) )    /* cards deck gfx, bitplane3 */
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "82s129.9c",		0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) /* PROM dump needed */
+ROM_END
+
+/****************************************************
+
+  Super Double (Karateco)
+
+  French text with some intentional typos to fit size.
+  Uses both 0x2000..0x3fff and 0x7000..0x7fff ROM range.
+
+  This is either the game advertised as "The Double",
+  or a successor thereof.
+
+*****************************************************/
+
+ROM_START( superdbl )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "sd6",  0x7000, 0x1000, CRC(3cf1ccb8) SHA1(c589ddf2e97abb9d95375d0964fd0aa6f7e2e468) )
+	ROM_LOAD( "sd7",  0x2000, 0x1000, CRC(f5136f82) SHA1(f086cd5495097ede037ea6cae584e95bfcd7b239) )
+	ROM_LOAD( "8",	  0x3000, 0x1000, CRC(157332c2) SHA1(3c66200c49641b9d876c5fa134dd2f0e80136beb) )
+
+	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_FILL(				  0x0000, 0x1000, 0 ) /* filling the R-G bitplanes */
+	ROM_LOAD( "4",	  0x1000, 0x0800, CRC(1e1d4e33) SHA1(22831984489fdf712ca616c1af3c874a5b12b522) )    /* text layer */
+
+	ROM_REGION( 0x1800, "gfx2", 0 )
+	ROM_LOAD( "1",	  0x0000, 0x0800, CRC(f2f94661) SHA1(f37f7c0dff680fd02897dae64e13e297d0fdb3e7) )    /* cards deck gfx, bitplane1 */
+	ROM_LOAD( "2",	  0x0800, 0x0800, CRC(6bbb1e2d) SHA1(51ee282219bf84218886ad11a24bc6a8e7337527) )    /* cards deck gfx, bitplane2 */
+	ROM_LOAD( "3",	  0x1000, 0x0800, CRC(6e3e9b1d) SHA1(14eb8d14ce16719a6ad7d13db01e47c8f05955f0) )    /* cards deck gfx, bitplane3 */
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "tbp24sa10n.7d",		0x0000, 0x0100, BAD_DUMP CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) /* PROM dump needed */
+ROM_END
+
+/************************************************************
+
+  Ngold (3 sets).
+  198?.
+
+  Nothing about them, except that they are running
+  on ICP-1 type boards.
+
+  It's a supossed Jack Potten's Poker upgrade.
+
+*************************************************************/
+
+ROM_START( ngold )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ngold_1a.16a",	0x2000, 0x1000, CRC(ca259396) SHA1(32bd647fcba99029f916c2a6df4152efc5a70fcb) )
+	ROM_LOAD( "ngold_2a.17a",	0x3000, 0x1000, CRC(9d07f0fc) SHA1(493b2e778342e1d6b7753902b714c5478bd22bd5) )
+
+	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_FILL(			0x0000, 0x1000, 0 ) /* filling the R-G bitplanes */
+	ROM_LOAD( "4.8a",	0x1000, 0x0800, CRC(f54c6f43) SHA1(fe66542b95259c10f7954d52d1bd5747ce99df42) )    /* char ROM */
+
+	ROM_REGION( 0x1800, "gfx2", 0 )
+	ROM_LOAD( "1.4a",	0x0000, 0x0800, CRC(f2f94661) SHA1(f37f7c0dff680fd02897dae64e13e297d0fdb3e7) )    /* cards deck gfx, bitplane1 */
+	ROM_LOAD( "2.5a",	0x0800, 0x0800, CRC(6bbb1e2d) SHA1(51ee282219bf84218886ad11a24bc6a8e7337527) )    /* cards deck gfx, bitplane2 */
+	ROM_LOAD( "3.7a",	0x1000, 0x0800, CRC(6e3e9b1d) SHA1(14eb8d14ce16719a6ad7d13db01e47c8f05955f0) )    /* cards deck gfx, bitplane3 */
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "n82s129n.9c",	0x0000, 0x0100, BAD_DUMP CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )	/* PROM dump needed */
+ROM_END
+
+ROM_START( ngolda )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1b.bin",	0x2000, 0x1000, CRC(c7b0585c) SHA1(6ed57ee2045991e3f233aecea7e0f147f3e41977) )
+	ROM_LOAD( "2a.bin",	0x3000, 0x1000, CRC(9d07f0fc) SHA1(493b2e778342e1d6b7753902b714c5478bd22bd5) )
+
+	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_FILL(			0x0000, 0x1000, 0 ) /* filling the R-G bitplanes */
+	ROM_LOAD( "4.8a",	0x1000, 0x0800, CRC(f54c6f43) SHA1(fe66542b95259c10f7954d52d1bd5747ce99df42) )    /* char ROM */
+
+	ROM_REGION( 0x1800, "gfx2", 0 )
+	ROM_LOAD( "1.4a",	0x0000, 0x0800, CRC(f2f94661) SHA1(f37f7c0dff680fd02897dae64e13e297d0fdb3e7) )    /* cards deck gfx, bitplane1 */
+	ROM_LOAD( "2.5a",	0x0800, 0x0800, CRC(6bbb1e2d) SHA1(51ee282219bf84218886ad11a24bc6a8e7337527) )    /* cards deck gfx, bitplane2 */
+	ROM_LOAD( "3.7a",	0x1000, 0x0800, CRC(6e3e9b1d) SHA1(14eb8d14ce16719a6ad7d13db01e47c8f05955f0) )    /* cards deck gfx, bitplane3 */
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "n82s129n.9c",	0x0000, 0x0100, BAD_DUMP CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )	/* PROM dump needed */
+ROM_END
+
+ROM_START( ngoldb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "pkr_1a.bin",	0x2000, 0x1000, CRC(9140b1dc) SHA1(1fbbe5479c7fac0a3f667ca5a20f2119620c54b1) )
+	ROM_LOAD( "pkr_2.bin",	0x3000, 0x1000, CRC(de03a57d) SHA1(db696a892497ead7aa4ed2c600ba819c3b41a082) )
+
+	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_FILL(			0x0000, 0x1000, 0 ) /* filling the R-G bitplanes */
+	ROM_LOAD( "0.bin",	0x1000, 0x0800, BAD_DUMP CRC(396ac32f) SHA1(14106f4c8765abd0192342de930b1f6656adb1b2) )    /* char ROM. need to be redumped */
+
+	ROM_REGION( 0x1800, "gfx2", 0 )
+	ROM_LOAD( "7.bin",	0x0000, 0x0800, CRC(f2f94661) SHA1(f37f7c0dff680fd02897dae64e13e297d0fdb3e7) )    /* cards deck gfx, bitplane1 */
+	ROM_LOAD( "8.bin",	0x0800, 0x0800, CRC(6bbb1e2d) SHA1(51ee282219bf84218886ad11a24bc6a8e7337527) )    /* cards deck gfx, bitplane2 */
+	ROM_LOAD( "9.bin",	0x1000, 0x0800, BAD_DUMP CRC(d5471775) SHA1(ce3953ef1a21db055f92a6eeb7a64ea32bb539da) )    /* cards deck gfx, bitplane3. need to be redumped */
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "n82s129n.9c",	0x0000, 0x0100, BAD_DUMP CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )	/* PROM dump needed */
 ROM_END
 
 
@@ -3670,23 +3867,6 @@ ROM_START( pmpoker )
 	ROM_LOAD( "tbp24sa10n.7d",		0x0000, 0x0100, BAD_DUMP CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) /* PROM dump needed */
 ROM_END
 
-ROM_START( goodluck )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "goodluck_glh6b.bin",	0x0000, 0x8000, CRC(2cfa4a2c) SHA1(720e2900f3a0ef2632aa201a63b5eba0570e6aa3) )
-
-	ROM_REGION( 0x3000, "gfx1", 0 )
-	ROM_FILL(			0x0000, 0x2000, 0 ) /* filling the R-G bitplanes */
-	ROM_LOAD( "4.bin",	0x2000, 0x1000, CRC(41924d13) SHA1(8ab69b6efdc20858960fa5df669470ba90b5f8d7) )    /* text layer */
-
-	ROM_REGION( 0x3000, "gfx2", 0 )
-	ROM_LOAD( "7.bin",	0x0000, 0x1000, CRC(28ecfaea) SHA1(19d73ed0fdb5a873447b46e250ad6e71abe257cd) )    /* cards deck gfx, bitplane1 */
-	ROM_LOAD( "6.bin",	0x1000, 0x1000, CRC(eeec8862) SHA1(ae03aba1bd43c3ffd140f76770fc1c8cf89ea115) )    /* cards deck gfx, bitplane2 */
-	ROM_LOAD( "5.bin",	0x2000, 0x1000, CRC(2712f297) SHA1(d3cc1469d07c3febbbe4a645cd6bdb57e09cf504) )    /* cards deck gfx, bitplane3 */
-
-	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "82s129.9c",		0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) /* PROM dump needed */
-ROM_END
-
 ROM_START( royale )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "royalex.bin",	0x4000, 0x4000, CRC(ef370617) SHA1(0fc5679e9787aeea3bc592b36efcaa20e859f912) )
@@ -3863,33 +4043,101 @@ ROM_END
 
 /****************************************************
 
-  Super Double (Karateco)
+  Silver Game.
+  1983.
 
-  French text with some intentional typos to fit size.
-  Uses both 0x2000..0x3fff and 0x7000..0x7fff ROM range.
+  6502 CPU
+  2*6821 ios
+  mc6845 video chip
+  10mhz (?) xtal
 
-  This is either the game advertised as "The Double",
-  or a successor thereof.
+  There are french strings related to the game, so maybe is
+  a leftover, or maybe there is a unknown way to switch the
+  language.
+
 
 *****************************************************/
 
-ROM_START( superdbl )
+ROM_START( silverga )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "sd6",	0x7000, 0x1000, CRC(3cf1ccb8) SHA1(c589ddf2e97abb9d95375d0964fd0aa6f7e2e468) )
-	ROM_LOAD( "sd7",  0x2000, 0x1000, CRC(f5136f82) SHA1(f086cd5495097ede037ea6cae584e95bfcd7b239) )
-	ROM_LOAD( "8",	  0x3000, 0x1000, CRC(157332c2) SHA1(3c66200c49641b9d876c5fa134dd2f0e80136beb) )
+	ROM_LOAD( "14",	0x5000, 0x1000, CRC(e4691878) SHA1(376c3910030f27517d798aac759553d5634b8ffc) )
+	ROM_LOAD( "55",	0x6000, 0x2000, CRC(aad57b3c) SHA1(9508026c1a7b227a70d89ad2f7245e75a615b932) )
 
-	ROM_REGION( 0x1800, "gfx1", 0 )
-	ROM_FILL(				  0x0000, 0x1000, 0 ) /* filling the R-G bitplanes */
-	ROM_LOAD( "4",	  0x1000, 0x0800, CRC(1e1d4e33) SHA1(22831984489fdf712ca616c1af3c874a5b12b522) )    /* text layer */
+	ROM_REGION( 0x3000, "gfx1", 0 )
+	ROM_FILL(			0x0000, 0x2000, 0 ) /* filling the R-G bitplanes */
+	ROM_LOAD( "13",		0x2000, 0x1000, CRC(98b8cb4f) SHA1(420ea544a41e24478a8eb1c7076f4569607d0379) )    /* text layer */
 
 	ROM_REGION( 0x1800, "gfx2", 0 )
-	ROM_LOAD( "1",	  0x0000, 0x0800, CRC(f2f94661) SHA1(f37f7c0dff680fd02897dae64e13e297d0fdb3e7) )    /* cards deck gfx, bitplane1 */
-	ROM_LOAD( "2",	  0x0800, 0x0800, CRC(6bbb1e2d) SHA1(51ee282219bf84218886ad11a24bc6a8e7337527) )    /* cards deck gfx, bitplane2 */
-	ROM_LOAD( "3",	  0x1000, 0x0800, CRC(6e3e9b1d) SHA1(14eb8d14ce16719a6ad7d13db01e47c8f05955f0) )    /* cards deck gfx, bitplane3 */
+	ROM_LOAD( "11",		0x0000, 0x0800, CRC(1f41c541) SHA1(00df5079193f78db0617a6b8a613d8a0616fc8e9) )    /* cards deck gfx, bitplane1 */
+	ROM_LOAD( "12",		0x0800, 0x0800, CRC(6bbb1e2d) SHA1(51ee282219bf84218886ad11a24bc6a8e7337527) )    /* cards deck gfx, bitplane2 */
+	ROM_COPY( "gfx1",	0x2800, 0x1000, 0x0800 )    /* cards deck gfx, bitplane3. found in the 2nd half of the char rom */
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "tbp24sa10n.7d",		0x0000, 0x0100, BAD_DUMP CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) /* PROM dump needed */
+	ROM_LOAD( "s287",		0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
+ROM_END
+
+/****************************************************
+
+  Unknown poker game, set 1.
+  198?.
+
+  There are french strings related to the game into
+  the program ROM.
+
+  The dump lacks of 1 program ROM located at 17a.
+  (empty socket in the PCB picture)
+
+*****************************************************/
+
+ROM_START( pokerdub )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "15a_f_83.15a",	0x2000, 0x1000, CRC(06571884) SHA1(6823f5d4a2fc5adf51f1588273f808a2a25a15bc) )
+	ROM_LOAD( "unknown.17a",	0x3000, 0x1000, NO_DUMP )
+
+	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_FILL(			0x0000, 0x1000, 0 ) /* filling the R-G bitplanes */
+	ROM_LOAD( "4.8a",	0x1000, 0x0800, CRC(1e1d4e33) SHA1(22831984489fdf712ca616c1af3c874a5b12b522) )    /* char ROM (cracked title) */
+
+	ROM_REGION( 0x1800, "gfx2", 0 )
+	ROM_LOAD( "1.4a",	0x0000, 0x0800, CRC(f2f94661) SHA1(f37f7c0dff680fd02897dae64e13e297d0fdb3e7) )    /* cards deck gfx, bitplane1 */
+	ROM_LOAD( "2.6a",	0x0800, 0x0800, CRC(6bbb1e2d) SHA1(51ee282219bf84218886ad11a24bc6a8e7337527) )    /* cards deck gfx, bitplane2 */
+	ROM_LOAD( "3.7a",	0x1000, 0x0800, CRC(6e3e9b1d) SHA1(14eb8d14ce16719a6ad7d13db01e47c8f05955f0) )    /* cards deck gfx, bitplane3 */
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "s287.8c",	0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
+ROM_END
+
+/****************************************************
+
+  Unknown poker game, set 2.
+  198?.
+
+  This one is totally encrypted.
+  The PCB has a daughterboard coated with some plastic
+  or epoxy resin.
+
+  Char ROM is identical to the Witch Card one.
+
+*****************************************************/
+
+ROM_START( pokerduc )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "b",	0x5000, 0x1000, CRC(8627fba5) SHA1(b94665f0bf425ff71f78c1258f910323c2a948f0) )
+	ROM_LOAD( "c",	0x6000, 0x1000, CRC(b35b4108) SHA1(6504ba55511637334c65e88ee5c60b1503b854b3) )
+	ROM_LOAD( "d",	0x7000, 0x1000, CRC(c48096ed) SHA1(279ba433369c7dc9cd902a19200e889eea45d115) )
+
+	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_FILL(			0x0000, 0x1000, 0 ) /* filling the R-G bitplanes */
+	ROM_LOAD( "a.8a",	0x1000, 0x0800, CRC(c70a3e49) SHA1(eb2f15b344f4dec5f05701415848c854bb27aaa3) )    /* char ROM (cracked title) */
+
+	ROM_REGION( 0x1800, "gfx2", 0 )
+	ROM_LOAD( "1.4a",	0x0000, 0x0800, CRC(f2f94661) SHA1(f37f7c0dff680fd02897dae64e13e297d0fdb3e7) )    /* cards deck gfx, bitplane1 */
+	ROM_LOAD( "2.6a",	0x0800, 0x0800, CRC(6bbb1e2d) SHA1(51ee282219bf84218886ad11a24bc6a8e7337527) )    /* cards deck gfx, bitplane2 */
+	ROM_LOAD( "3.7a",	0x1000, 0x0800, CRC(232374f3) SHA1(b75907edbf769b8c46fb1ebdb301c325c556e6c2) )    /* cards deck gfx, bitplane3 */
+	ROM_IGNORE(                 0x0800)	/* identical halves */
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "tbp24s10.9c",	0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
 ROM_END
 
 
@@ -3938,7 +4186,7 @@ static DRIVER_INIT( royale )
 {
     /* $60bb, NOPing the ORA #$F0 (after read the PIA1 port B */
 
-//  UINT8 *ROM = memory_region(machine, "maincpu");
+//  UINT8 *ROM = machine->region("maincpu")->base();
 
 //  ROM[0x60bb] = 0xea;
 //  ROM[0x60bc] = 0xea;
@@ -3968,8 +4216,8 @@ static DRIVER_INIT( flcnw )
 
     /* Attempt to decrypt the MCU program (we're sooo close!) */
 
-	UINT8 *ROM = memory_region(machine, "mcu");
-	int size = memory_region_length(machine, "mcu");
+	UINT8 *ROM = machine->region("mcu")->base();
+	int size = machine->region("mcu")->bytes();
 	int start = 0x0000;
 	int i;
 
@@ -3978,6 +4226,87 @@ static DRIVER_INIT( flcnw )
 		ROM[i] = ROM[i] ^ 0xa0;
 		ROM[i] = BITSWAP8(ROM[i], 7, 6, 3, 4, 5, 2, 1, 0);
 	}
+}
+
+
+/***********************************************
+
+  ICP1 Daughterboard encryption
+
+  The PCB has a daughterboard coated with some plastic
+  or epoxy resin.
+
+  pattern:
+
+  0000:  FF FF FF FF FF FF FF FF | FB FB FB FB FB FB FB FB
+  0010:  FD FD FD FD FD FD FD FD | F9 F9 F9 F9 F9 F9 F9 F9
+  0020:  FF FF FF FF FF FF FF FF | FB FB FB FB FB FB FB FB
+  0030:  FD FD FD FD FD FD FD FD | F9 F9 F9 F9 F9 F9 F9 F9
+
+  0040:  FE FE FE FE FE FE FE FE | FA FA FA FA FA FA FA FA
+  0050:  FC FC FC FC FC FC FC FC | F8 F8 F8 F8 F8 F8 F8 F8
+  0060:  FE FE FE FE FE FE FE FE | FA FA FA FA FA FA FA FA
+  0070:  FC FC FC FC FC FC FC FC | F8 F8 F8 F8 F8 F8 F8 F8
+
+  0080:  BF BF BF BF BF BF BF BF | BB BB BB BB BB BB BB BB
+  0090:  BD BD BD BD BD BD BD BD | B9 B9 B9 B9 B9 B9 B9 B9
+  00A0:  BF BF BF BF BF BF BF BF | BB BB BB BB BB BB BB BB
+  00B0:  BD BD BD BD BD BD BD BD | B9 B9 B9 B9 B9 B9 B9 B9
+
+  00C0:  BE BE BE BE BE BE BE BE | BA BA BA BA BA BA BA BA
+  00D0:  BC BC BC BC BC BC BC BC | B8 B8 B8 B8 B8 B8 B8 B8
+  00E0:  BE BE BE BE BE BE BE BE | BA BA BA BA BA BA BA BA
+  00F0:  BC BC BC BC BC BC BC BC | B8 B8 B8 B8 B8 B8 B8 B8
+
+  And repeat for every 0x100 segments...
+
+  So...
+
+  0000-0007 ok.
+  0008-000f XOR 0x04
+  0010-0017 XOR 0x02
+  0018-001f XOR 0x06
+
+  0020-0027 ok.
+  0028-002f XOR 0x04
+  0030-0037 XOR 0x02
+  0038-003f XOR 0x06
+
+  0040-0047 XOR 0x01
+  0048-004f XOR 0x05
+  0050-0057 XOR 0x03
+  0058-005f XOR 0x07
+
+  0060-0067 XOR 0x01
+  0068-006f XOR 0x05
+  0070-0077 XOR 0x03
+  0078-007f XOR 0x07
+
+  0080-0087 XOR 0x40
+  0088-008f XOR 0x44
+  0090-0097 XOR 0x42
+  0098-009f XOR 0x46
+
+  00a0-00a7 XOR 0x40
+  00a8-00af XOR 0x44
+  00b0-00b7 XOR 0x42
+  00b8-00bf XOR 0x46
+
+  00c0-00c7 XOR 0x41
+  00c8-00cf XOR 0x45
+  00d0-00d7 XOR 0x43
+  00d8-00df XOR 0x47
+
+  00e0-00e7 XOR 0x41
+  00e8-00ef XOR 0x45
+  00f0-00f7 XOR 0x43
+  00f8-00ff XOR 0x47
+
+***********************************************/
+
+static DRIVER_INIT( icp1db )
+{
+	/* nothing yet... */
 }
 
 
@@ -3995,6 +4324,11 @@ GAMEL( 198?, potnpkrb, pottnpkr, pottnpkr, pottnpkr, 0,        ROT0,   "bootleg"
 GAMEL( 198?, potnpkrc, pottnpkr, pottnpkr, potnpkrc, 0,        ROT0,   "bootleg",                  "Jack Potten's Poker (set 4)",             0,                layout_goldnpkr )
 GAMEL( 198?, potnpkrd, pottnpkr, pottnpkr, potnpkrc, 0,        ROT0,   "bootleg",                  "Jack Potten's Poker (set 5)",             0,                layout_goldnpkr )
 GAMEL( 198?, potnpkre, pottnpkr, pottnpkr, pottnpkr, 0,        ROT0,   "bootleg",                  "Jack Potten's Poker (set 6)",             0,                layout_goldnpkr )
+GAMEL( 1991, goodluck, pottnpkr, witchcrd, goodluck, 0,        ROT0,   "<unknown>",                "Good Luck",                               0,                layout_goldnpkr )
+GAMEL( 198?, superdbl, pottnpkr, goldnpkr, goldnpkr, 0,        ROT0,   "Karateco",                 "Super Double (French)",                   0,                layout_goldnpkr )
+GAMEL( 198?, ngold,    pottnpkr, pottnpkr, ngold,    0,        ROT0,   "<unknown>",                "Jack Potten's Poker (NGold, set 1)",      0,                layout_goldnpkr )
+GAMEL( 198?, ngolda,   pottnpkr, pottnpkr, ngold,    0,        ROT0,   "<unknown>",                "Jack Potten's Poker (NGold, set 2)",      0,                layout_goldnpkr )
+GAMEL( 198?, ngoldb,   pottnpkr, pottnpkr, ngold,    0,        ROT0,   "<unknown>",                "Jack Potten's Poker (NGold, set 3)",      GAME_IMPERFECT_GRAPHICS, layout_goldnpkr )
 
 GAME(  1991, witchcrd, 0,        witchcrd, witchcrd, 0,        ROT0,   "Video Klein",              "Witch Card (Video Klein)",                GAME_NOT_WORKING )
 GAME(  1991, witchcda, witchcrd, witchcrd, witchcda, 0,        ROT0,   "<unknown>",                "Witch Card (Spanish, witch game, set 1)", 0 )
@@ -4038,7 +4372,6 @@ GAME(  1983, falcnwldb, falcnwld, wildcrdb, wildcard, flcnw,   ROT0,   "Falcon",
 
 /*     YEAR  NAME      PARENT    MACHINE   INPUT     INIT      ROT      COMPANY                     FULLNAME                                  FLAGS             LAYOUT  */
 GAMEL( 1981, pmpoker,  0,        goldnpkr, pmpoker,  0,        ROT0,   "PlayMan",                  "PlayMan Poker (German)",                  0,                layout_pmpoker  )
-GAMEL( 1991, goodluck, 0,        witchcrd, goodluck, 0,        ROT0,   "<unknown>",                "Good Luck",                               0,                layout_goldnpkr )
 GAMEL( 198?, royale,   0,        goldnpkr, royale,   royale,   ROT0,   "<unknown>",                "Royale (set 1)",                          GAME_NOT_WORKING, layout_goldnpkr )
 GAMEL( 198?, royalea,  royale,   goldnpkr, royale,   royale,   ROT0,   "<unknown>",                "Royale (set 2)",                          GAME_NOT_WORKING, layout_goldnpkr )
 GAME(  1993, sloco93,  0,        witchcrd, sloco93,  0,        ROT0,   "<unknown>",                "Super Loco 93 (Spanish, set 1)",          0 )
@@ -4047,4 +4380,8 @@ GAME(  198?, maverik,  0,        witchcrd, bsuerte,  0,        ROT0,   "<unknown
 GAMEL( 1989, brasil89, 0,        witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                "Brasil 89",                               0,                layout_goldnpkr )
 GAME(  1991, poker91,  0,        witchcrd, poker91,  0,        ROT0,   "<unknown>",                "Poker 91",                                0 )
 GAME(  198?, genie,    0,        genie,    genie,    0,        ROT0,   "Video Fun Games Ltd.",     "Genie",                                   0 )
-GAMEL( 198?, superdbl, goldnpkr, goldnpkr, goldnpkr, 0,        ROT0,   "Karateco",                 "Super Double (French)",                   0,                layout_goldnpkr )
+
+GAMEL( 1983, silverga, 0,        goldnpkr, goldnpkr, 0,        ROT0,   "<unknown>",                "Silver Game",                             0,                layout_goldnpkr )
+GAME(  198?, pokerdub, 0,        pottnpkr, goldnpkr, 0,        ROT0,   "<unknown>",                "unknown French poker game",               GAME_NOT_WORKING )	// lacks of 2nd program ROM.
+GAME(  198?, pokerduc, 0,        goldnpkr, goldnpkr, icp1db,   ROT0,   "<unknown>",                "unknown encrypted poker game",            GAME_NOT_WORKING )	// encrypted.
+

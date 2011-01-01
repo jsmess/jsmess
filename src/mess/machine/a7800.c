@@ -66,7 +66,7 @@ static void a7800_driver_init(running_machine *machine, int ispal, int lines)
 {
 	a7800_state *state = machine->driver_data<a7800_state>();
 	address_space* space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	state->ROM = memory_region(machine, "maincpu");
+	state->ROM = machine->region("maincpu")->base();
 	state->ispal = ispal;
 	state->lines = lines;
 
@@ -106,7 +106,7 @@ MACHINE_RESET( a7800 )
 	state->maria_flag = 0;
 
 	/* set banks to default states */
-	memory = memory_region(machine, "maincpu");
+	memory = machine->region("maincpu")->base();
 	memory_set_bankptr(machine,  "bank1", memory + 0x4000 );
 	memory_set_bankptr(machine,  "bank2", memory + 0x8000 );
 	memory_set_bankptr(machine,  "bank3", memory + 0xA000 );
@@ -115,7 +115,7 @@ MACHINE_RESET( a7800 )
 	/* pokey cartridge */
 	if (state->cart_type & 0x01)
 	{
-		running_device *pokey = machine->device("pokey");
+		device_t *pokey = machine->device("pokey");
 		memory_install_read8_device_handler(space, pokey, 0x4000, 0x7FFF, 0, 0, pokey_r);
 		memory_install_write8_device_handler(space, pokey, 0x4000, 0x7FFF, 0, 0, pokey_w);
 	}
@@ -191,7 +191,7 @@ DEVICE_START( a7800_cart )
 	a7800_state *state = device->machine->driver_data<a7800_state>();
 	UINT8	*memory;
 
-	memory = memory_region(device->machine, "maincpu");
+	memory = device->machine->region("maincpu")->base();
 	state->bios_bkup = NULL;
 	state->cart_bkup = NULL;
 
@@ -215,7 +215,7 @@ DEVICE_IMAGE_LOAD( a7800_cart )
 	unsigned char header[128];
 	UINT8 *memory;
 
-	memory = memory_region(image.device().machine, "maincpu");
+	memory = image.device().machine->region("maincpu")->base();
 
 	/* Load and decode the header */
 	image.fread(header, 128 );
@@ -332,7 +332,7 @@ WRITE8_HANDLER( a7800_RAM0_w )
 WRITE8_HANDLER( a7800_cart_w )
 {
 	a7800_state *state = space->machine->driver_data<a7800_state>();
-	UINT8 *memory = memory_region(space->machine, "maincpu");
+	UINT8 *memory = space->machine->region("maincpu")->base();
 
 	if(offset < 0x4000)
 	{
@@ -342,7 +342,7 @@ WRITE8_HANDLER( a7800_cart_w )
 		}
 		else if(state->cart_type & 0x01)
 		{
-			running_device *pokey = space->machine->device("pokey");
+			device_t *pokey = space->machine->device("pokey");
 			pokey_w(pokey, offset, data);
 		}
 		else

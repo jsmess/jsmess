@@ -19,7 +19,7 @@ struct _ti990_tpc_interface
 
 DECLARE_LEGACY_DEVICE(TI990_TAPE_CTRL, tap_990);
 
-#define MDRV_TI990_TAPE_CTRL_ADD(_tag, _intrf)	\
-	MDRV_DEVICE_ADD((_tag),  TI990_TAPE_CTRL, 0)\
-	MDRV_DEVICE_CONFIG(_intrf)
+#define MCFG_TI990_TAPE_CTRL_ADD(_tag, _intrf)	\
+	MCFG_DEVICE_ADD((_tag),  TI990_TAPE_CTRL, 0)\
+	MCFG_DEVICE_CONFIG(_intrf)
 

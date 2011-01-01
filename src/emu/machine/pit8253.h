@@ -45,14 +45,14 @@ DECLARE_LEGACY_DEVICE(PIT8254, pit8254);
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MDRV_PIT8253_ADD(_tag, _intrf) \
-	MDRV_DEVICE_ADD(_tag, PIT8253, 0) \
-	MDRV_DEVICE_CONFIG(_intrf)
+#define MCFG_PIT8253_ADD(_tag, _intrf) \
+	MCFG_DEVICE_ADD(_tag, PIT8253, 0) \
+	MCFG_DEVICE_CONFIG(_intrf)
 
 
-#define MDRV_PIT8254_ADD(_tag, _intrf) \
-	MDRV_DEVICE_ADD(_tag, PIT8254, 0) \
-	MDRV_DEVICE_CONFIG(_intrf)
+#define MCFG_PIT8254_ADD(_tag, _intrf) \
+	MCFG_DEVICE_ADD(_tag, PIT8254, 0) \
+	MCFG_DEVICE_CONFIG(_intrf)
 
 
 READ8_DEVICE_HANDLER( pit8253_r );
@@ -76,8 +76,8 @@ WRITE_LINE_DEVICE_HANDLER( pit8253_gate2_w );
    to 0 with pit8253_set_clockin and call pit8253_clkX_w to change
    the state of the input CLKx signal.
  */
-int pit8253_get_output(running_device *device, int timer);
-void pit8253_set_clockin(running_device *device, int timer, double new_clockin);
+int pit8253_get_output(device_t *device, int timer);
+void pit8253_set_clockin(device_t *device, int timer, double new_clockin);
 
 
 #endif	/* __PIT8253_H__ */

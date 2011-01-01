@@ -15,9 +15,9 @@ struct rp5c15_interface
 
 DECLARE_LEGACY_DEVICE(RP5C15, rp5c15);
 
-#define MDRV_RP5C15_ADD(_tag, _config) \
-	MDRV_DEVICE_ADD(_tag, RP5C15, 0) \
-	MDRV_DEVICE_CONFIG(_config)
+#define MCFG_RP5C15_ADD(_tag, _config) \
+	MCFG_DEVICE_ADD(_tag, RP5C15, 0) \
+	MCFG_DEVICE_CONFIG(_config)
 
 READ16_DEVICE_HANDLER( rp5c15_r );
 WRITE16_DEVICE_HANDLER( rp5c15_w );

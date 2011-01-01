@@ -139,9 +139,9 @@ struct _vic3_interface
 
 DECLARE_LEGACY_DEVICE(VIC3, vic3);
 
-#define MDRV_VIC3_ADD(_tag, _interface) \
-	MDRV_DEVICE_ADD(_tag, VIC3, 0) \
-	MDRV_DEVICE_CONFIG(_interface)
+#define MCFG_VIC3_ADD(_tag, _interface) \
+	MCFG_DEVICE_ADD(_tag, VIC3, 0) \
+	MCFG_DEVICE_CONFIG(_interface)
 
 
 /*----------- defined in video/vic4567.c -----------*/
@@ -150,8 +150,8 @@ WRITE8_DEVICE_HANDLER( vic3_port_w );
 WRITE8_DEVICE_HANDLER( vic3_palette_w );
 READ8_DEVICE_HANDLER( vic3_port_r );
 
-void vic3_raster_interrupt_gen( running_device *device );
-UINT32 vic3_video_update( running_device *device, bitmap_t *bitmap, const rectangle *cliprect );
+void vic3_raster_interrupt_gen( device_t *device );
+UINT32 vic3_video_update( device_t *device, bitmap_t *bitmap, const rectangle *cliprect );
 
 
 #endif /* __VIC4567_H__ */

@@ -56,7 +56,7 @@ struct _wiping_sound_state
 };
 
 
-INLINE wiping_sound_state *get_safe_token( running_device *device )
+INLINE wiping_sound_state *get_safe_token( device_t *device )
 {
 	assert(device != NULL);
 	assert(device->type() == WIPING);
@@ -65,7 +65,7 @@ INLINE wiping_sound_state *get_safe_token( running_device *device )
 }
 
 /* build a table to divide by the number of voices; gain is specified as gain*16 */
-static void make_mixer_table(running_device *device, int voices, int gain)
+static void make_mixer_table(device_t *device, int voices, int gain)
 {
 	wiping_sound_state *state = get_safe_token(device);
 	int count = voices * 128;
@@ -193,8 +193,8 @@ static DEVICE_START( wiping_sound )
 	state->num_voices = 8;
 	state->last_channel = state->channel_list + state->num_voices;
 
-	state->sound_rom = memory_region(machine, "samples");
-	state->sound_prom = memory_region(machine, "soundproms");
+	state->sound_rom = machine->region("samples")->base();
+	state->sound_prom = machine->region("soundproms")->base();
 
 	/* start with sound enabled, many games don't have a sound enable register */
 	state->sound_enable = 1;

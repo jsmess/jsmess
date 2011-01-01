@@ -25,9 +25,9 @@
 typedef struct _coco_rs232_pcb_t coco_rs232_pcb_t;
 struct _coco_rs232_pcb_t
 {
-	running_device *cococart;
-	running_device *cart;
-	running_device *uart;
+	device_t *cococart;
+	device_t *cart;
+	device_t *uart;
 };
 
 
@@ -35,7 +35,7 @@ struct _coco_rs232_pcb_t
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE coco_rs232_pcb_t *get_token(running_device *device)
+INLINE coco_rs232_pcb_t *get_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == COCO_CARTRIDGE_PCB_RS232);
@@ -95,7 +95,7 @@ static WRITE8_DEVICE_HANDLER(coco_rs232_ff40_w)
     DEVICE_GET_INFO(coco_cartridge_pcb_rs232)
 -------------------------------------------------*/
 static MACHINE_CONFIG_FRAGMENT(coco_rs232)
-	MDRV_ACIA6551_ADD(UART_TAG)
+	MCFG_ACIA6551_ADD(UART_TAG)
 MACHINE_CONFIG_END
 
 DEVICE_GET_INFO(coco_cartridge_pcb_rs232)

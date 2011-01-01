@@ -24,40 +24,40 @@ DECLARE_LEGACY_DEVICE(SX1541, sx1541);
 DECLARE_LEGACY_DEVICE(C2031, c2031);
 DECLARE_LEGACY_DEVICE(OC118, oc118);
 
-#define MDRV_C1540_ADD(_tag, _bus_tag, _address) \
-	MDRV_DEVICE_ADD(_tag, C1540, 0) \
-	MDRV_DEVICE_CONFIG_DATAPTR(c1541_config, bus_tag, _bus_tag) \
-	MDRV_DEVICE_CONFIG_DATA32(c1541_config, address, _address)
+#define MCFG_C1540_ADD(_tag, _bus_tag, _address) \
+	MCFG_DEVICE_ADD(_tag, C1540, 0) \
+	MCFG_DEVICE_CONFIG_DATAPTR(c1541_config, bus_tag, _bus_tag) \
+	MCFG_DEVICE_CONFIG_DATA32(c1541_config, address, _address)
 
-#define MDRV_C1541_ADD(_tag, _bus_tag, _address) \
-	MDRV_DEVICE_ADD(_tag, C1541, 0) \
-	MDRV_DEVICE_CONFIG_DATAPTR(c1541_config, bus_tag, _bus_tag) \
-	MDRV_DEVICE_CONFIG_DATA32(c1541_config, address, _address)
+#define MCFG_C1541_ADD(_tag, _bus_tag, _address) \
+	MCFG_DEVICE_ADD(_tag, C1541, 0) \
+	MCFG_DEVICE_CONFIG_DATAPTR(c1541_config, bus_tag, _bus_tag) \
+	MCFG_DEVICE_CONFIG_DATA32(c1541_config, address, _address)
 
-#define MDRV_C1541C_ADD(_tag, _bus_tag, _address) \
-	MDRV_DEVICE_ADD(_tag, C1541C, 0) \
-	MDRV_DEVICE_CONFIG_DATAPTR(c1541_config, bus_tag, _bus_tag) \
-	MDRV_DEVICE_CONFIG_DATA32(c1541_config, address, _address)
+#define MCFG_C1541C_ADD(_tag, _bus_tag, _address) \
+	MCFG_DEVICE_ADD(_tag, C1541C, 0) \
+	MCFG_DEVICE_CONFIG_DATAPTR(c1541_config, bus_tag, _bus_tag) \
+	MCFG_DEVICE_CONFIG_DATA32(c1541_config, address, _address)
 
-#define MDRV_C1541II_ADD(_tag, _bus_tag, _address) \
-	MDRV_DEVICE_ADD(_tag, C1541II, 0) \
-	MDRV_DEVICE_CONFIG_DATAPTR(c1541_config, bus_tag, _bus_tag) \
-	MDRV_DEVICE_CONFIG_DATA32(c1541_config, address, _address)
+#define MCFG_C1541II_ADD(_tag, _bus_tag, _address) \
+	MCFG_DEVICE_ADD(_tag, C1541II, 0) \
+	MCFG_DEVICE_CONFIG_DATAPTR(c1541_config, bus_tag, _bus_tag) \
+	MCFG_DEVICE_CONFIG_DATA32(c1541_config, address, _address)
 
-#define MDRV_SX1541_ADD(_tag, _bus_tag, _address) \
-	MDRV_DEVICE_ADD(_tag, SX1541, 0) \
-	MDRV_DEVICE_CONFIG_DATAPTR(c1541_config, bus_tag, _bus_tag) \
-	MDRV_DEVICE_CONFIG_DATA32(c1541_config, address, _address)
+#define MCFG_SX1541_ADD(_tag, _bus_tag, _address) \
+	MCFG_DEVICE_ADD(_tag, SX1541, 0) \
+	MCFG_DEVICE_CONFIG_DATAPTR(c1541_config, bus_tag, _bus_tag) \
+	MCFG_DEVICE_CONFIG_DATA32(c1541_config, address, _address)
 
-#define MDRV_C2031_ADD(_tag, _bus_tag, _address) \
-	MDRV_DEVICE_ADD(_tag, C2031, 0) \
-	MDRV_DEVICE_CONFIG_DATAPTR(c1541_config, bus_tag, _bus_tag) \
-	MDRV_DEVICE_CONFIG_DATA32(c1541_config, address, _address)
+#define MCFG_C2031_ADD(_tag, _bus_tag, _address) \
+	MCFG_DEVICE_ADD(_tag, C2031, 0) \
+	MCFG_DEVICE_CONFIG_DATAPTR(c1541_config, bus_tag, _bus_tag) \
+	MCFG_DEVICE_CONFIG_DATA32(c1541_config, address, _address)
 
-#define MDRV_OC118_ADD(_tag, _bus_tag, _address) \
-	MDRV_DEVICE_ADD(_tag, OC118, 0) \
-	MDRV_DEVICE_CONFIG_DATAPTR(c1541_config, bus_tag, _bus_tag) \
-	MDRV_DEVICE_CONFIG_DATA32(c1541_config, address, _address)
+#define MCFG_OC118_ADD(_tag, _bus_tag, _address) \
+	MCFG_DEVICE_ADD(_tag, OC118, 0) \
+	MCFG_DEVICE_CONFIG_DATAPTR(c1541_config, bus_tag, _bus_tag) \
+	MCFG_DEVICE_CONFIG_DATA32(c1541_config, address, _address)
 
 #define C1541_IEC(_tag) \
 	_tag, DEVCB_NULL, DEVCB_DEVICE_LINE(_tag, c1541_iec_atn_w), DEVCB_NULL, DEVCB_NULL, DEVCB_DEVICE_LINE(_tag, c1541_iec_reset_w)

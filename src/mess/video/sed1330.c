@@ -128,13 +128,13 @@ struct _sed1330_t
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE sed1330_t *get_safe_token(running_device *device)
+INLINE sed1330_t *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	return (sed1330_t *)downcast<legacy_device_base *>(device)->token();
 }
 
-INLINE const sed1330_interface *get_interface(running_device *device)
+INLINE const sed1330_interface *get_interface(device_t *device)
 {
 	assert(device != NULL);
 	assert((device->type() == SED1330));
@@ -615,7 +615,7 @@ static void update_text(sed1330_t *sed1330, bitmap_t *bitmap, const rectangle *c
     sed1330_update - update screen
 -------------------------------------------------*/
 
-void sed1330_update(running_device *device, bitmap_t *bitmap, const rectangle *cliprect)
+void sed1330_update(device_t *device, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	sed1330_t *sed1330 = get_safe_token(device);
 

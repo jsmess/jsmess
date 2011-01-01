@@ -8,6 +8,7 @@ Angelo Salese
 Olivier Galibert
 
 TODO:
+- sound is hacky at the moment, so it can't be 100% trusted
 - sprite offsets?
 - score / credits display should stay above the sprites?
 
@@ -376,35 +377,35 @@ static INTERRUPT_GEN( mirax_vblank_irq )
 }
 
 static MACHINE_CONFIG_START( mirax, driver_device )
-	MDRV_CPU_ADD("maincpu", Z80, 12000000/4) // ceramic potted module, encrypted z80
-	MDRV_CPU_PROGRAM_MAP(mirax_main_map)
-	MDRV_CPU_VBLANK_INT("screen",mirax_vblank_irq)
+	MCFG_CPU_ADD("maincpu", Z80, 12000000/4) // ceramic potted module, encrypted z80
+	MCFG_CPU_PROGRAM_MAP(mirax_main_map)
+	MCFG_CPU_VBLANK_INT("screen",mirax_vblank_irq)
 
-	MDRV_CPU_ADD("audiocpu", Z80, 12000000/4)
-	MDRV_CPU_PROGRAM_MAP(mirax_sound_map)
-	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold, 4)
+	MCFG_CPU_ADD("audiocpu", Z80, 12000000/4)
+	MCFG_CPU_PROGRAM_MAP(mirax_sound_map)
+	MCFG_CPU_VBLANK_INT_HACK(irq0_line_hold, 4)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(256, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(256, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 
-	MDRV_PALETTE_LENGTH(0x40)
-	MDRV_PALETTE_INIT(mirax)
-	MDRV_GFXDECODE(mirax)
-	MDRV_VIDEO_START(mirax)
-	MDRV_VIDEO_UPDATE(mirax)
+	MCFG_PALETTE_LENGTH(0x40)
+	MCFG_PALETTE_INIT(mirax)
+	MCFG_GFXDECODE(mirax)
+	MCFG_VIDEO_START(mirax)
+	MCFG_VIDEO_UPDATE(mirax)
 
-	MDRV_SOUND_START(mirax)
+	MCFG_SOUND_START(mirax)
 
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("ay1", AY8910, 12000000/4)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-	MDRV_SOUND_ADD("ay2", AY8910, 12000000/4)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("ay1", AY8910, 12000000/4)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	MCFG_SOUND_ADD("ay2", AY8910, 12000000/4)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
 
@@ -465,14 +466,13 @@ ROM_START( miraxa )
 	ROM_REGION( 0x0060, "proms", 0 ) // data ? encrypted roms for cpu1 ?
 	ROM_LOAD( "mra3.prm",   0x0000, 0x0020, CRC(ae7e1a63) SHA1(f5596db77c1e352ef7845465db3e54e19cd5df9e) )
 	ROM_LOAD( "mrb3.prm",   0x0020, 0x0020, CRC(e3f3d0f5) SHA1(182b06c9db5bec1e3030f705247763bd2380ba83) )
-	ROM_LOAD( "mirax.prm",	0x0040, 0x0020, NO_DUMP )
 ROM_END
 
 
 static DRIVER_INIT( mirax )
 {
-	UINT8 *DATA = memory_region(machine, "data_code");
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *DATA = machine->region("data_code")->base();
+	UINT8 *ROM = machine->region("maincpu")->base();
 	int i;
 
 	for(i=0x0000;i<0x4000;i++)
@@ -486,5 +486,5 @@ static DRIVER_INIT( mirax )
 
 }
 
-GAME( 1985, mirax,  0,     mirax, mirax, mirax, ROT90, "Current Technologies", "Mirax",         0 )
-GAME( 1985, miraxa, mirax, mirax, mirax, mirax, ROT90, "Current Technologies", "Mirax (set 2)", 0 )
+GAME( 1985, mirax,  0,     mirax, mirax, mirax, ROT90, "Current Technologies", "Mirax",         GAME_IMPERFECT_SOUND )
+GAME( 1985, miraxa, mirax, mirax, mirax, mirax, ROT90, "Current Technologies", "Mirax (set 2)", GAME_IMPERFECT_SOUND )

@@ -182,8 +182,8 @@ static MACHINE_START( exp85 )
 	/* setup memory banking */
 	memory_install_read_bank(program, 0x0000, 0x07ff, 0, 0, "bank1");
 	memory_unmap_write(program, 0x0000, 0x07ff, 0, 0 );
-	memory_configure_bank(machine, "bank1", 0, 1, memory_region(machine, I8085A_TAG) + 0xf000, 0);
-	memory_configure_bank(machine, "bank1", 1, 1, memory_region(machine, I8085A_TAG), 0);
+	memory_configure_bank(machine, "bank1", 0, 1, machine->region(I8085A_TAG)->base() + 0xf000, 0);
+	memory_configure_bank(machine, "bank1", 1, 1, machine->region(I8085A_TAG)->base(), 0);
 	memory_set_bank(machine, "bank1", 0);
 
 	/* find devices */
@@ -203,42 +203,42 @@ static const cassette_config exp85_cassette_config =
 
 static MACHINE_CONFIG_START( exp85, exp85_state )
     /* basic machine hardware */
-    MDRV_CPU_ADD(I8085A_TAG, I8085A, XTAL_6_144MHz)
-    MDRV_CPU_PROGRAM_MAP(exp85_mem)
-    MDRV_CPU_IO_MAP(exp85_io)
-	MDRV_CPU_CONFIG(exp85_i8085_config)
+    MCFG_CPU_ADD(I8085A_TAG, I8085A, XTAL_6_144MHz)
+    MCFG_CPU_PROGRAM_MAP(exp85_mem)
+    MCFG_CPU_IO_MAP(exp85_io)
+	MCFG_CPU_CONFIG(exp85_i8085_config)
 
-    MDRV_MACHINE_START(exp85)
+    MCFG_MACHINE_START(exp85)
 
     /* video hardware */
-    MDRV_SCREEN_ADD(SCREEN_TAG, RASTER)
-    MDRV_SCREEN_REFRESH_RATE(50)
-    MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-    MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-    MDRV_SCREEN_SIZE(640, 480)
-    MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+    MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
+    MCFG_SCREEN_REFRESH_RATE(50)
+    MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+    MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+    MCFG_SCREEN_SIZE(640, 480)
+    MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 
-	MDRV_PALETTE_LENGTH(2)
-    MDRV_PALETTE_INIT(black_and_white)
+	MCFG_PALETTE_LENGTH(2)
+    MCFG_PALETTE_INIT(black_and_white)
 
-	MDRV_VIDEO_START(exp85)
-    MDRV_VIDEO_UPDATE(exp85)
+	MCFG_VIDEO_START(exp85)
+    MCFG_VIDEO_UPDATE(exp85)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* devices */
-	MDRV_I8155_ADD(I8155_TAG, XTAL_6_144MHz/2, i8155_intf)
-	MDRV_I8355_ADD(I8355_TAG, XTAL_6_144MHz/2, i8355_intf)
+	MCFG_I8155_ADD(I8155_TAG, XTAL_6_144MHz/2, i8155_intf)
+	MCFG_I8355_ADD(I8355_TAG, XTAL_6_144MHz/2, i8355_intf)
 
-	MDRV_CASSETTE_ADD(CASSETTE_TAG, exp85_cassette_config)
+	MCFG_CASSETTE_ADD(CASSETTE_TAG, exp85_cassette_config)
 
 	/* internal ram */
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("256")
-	MDRV_RAM_EXTRA_OPTIONS("4K")
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("256")
+	MCFG_RAM_EXTRA_OPTIONS("4K")
 MACHINE_CONFIG_END
 
 /* ROMs */

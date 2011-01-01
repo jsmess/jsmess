@@ -66,7 +66,7 @@ struct _mb86233_state
 	UINT32			*Tables;
 };
 
-INLINE mb86233_state *get_safe_token(running_device *device)
+INLINE mb86233_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == MB86233);
@@ -125,7 +125,7 @@ static CPU_INIT( mb86233 )
 	memset( cpustate->RAM, 0, 2 * 0x200 * sizeof(UINT32) );
 	cpustate->ARAM = &cpustate->RAM[0];
 	cpustate->BRAM = &cpustate->RAM[0x200];
-	cpustate->Tables = (UINT32*) memory_region(device->machine, _config->tablergn);
+	cpustate->Tables = (UINT32*) device->machine->region(_config->tablergn)->base();
 
 	state_save_register_global_pointer(device->machine, cpustate->RAM,2 * 0x200 * sizeof(UINT32));
 }

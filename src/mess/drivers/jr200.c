@@ -139,7 +139,7 @@ static VIDEO_UPDATE( jr200 )
 					}
 					else // tile mode
 					{
-						gfx_data = memory_region(screen->machine, attr & 0x40 ? "pcg" : "gfx_ram");
+						gfx_data = screen->machine->region(attr & 0x40 ? "pcg" : "gfx_ram")->base();
 
 						pen = (gfx_data[(tile*8)+yi]>>(7-xi) & 1) ? (attr & 0x7) : ((attr & 0x38) >> 3);
 					}
@@ -155,21 +155,21 @@ static VIDEO_UPDATE( jr200 )
 
 static READ8_HANDLER( jr200_pcg_1_r )
 {
-	UINT8 *pcg = memory_region(space->machine, "pcg");
+	UINT8 *pcg = space->machine->region("pcg")->base();
 
 	return pcg[offset+0x000];
 }
 
 static READ8_HANDLER( jr200_pcg_2_r )
 {
-	UINT8 *pcg = memory_region(space->machine, "pcg");
+	UINT8 *pcg = space->machine->region("pcg")->base();
 
 	return pcg[offset+0x400];
 }
 
 static WRITE8_HANDLER( jr200_pcg_1_w )
 {
-	UINT8 *pcg = memory_region(space->machine, "pcg");
+	UINT8 *pcg = space->machine->region("pcg")->base();
 
 	pcg[offset+0x000] = data;
 	gfx_element_mark_dirty(space->machine->gfx[1], (offset+0x000) >> 3);
@@ -177,7 +177,7 @@ static WRITE8_HANDLER( jr200_pcg_1_w )
 
 static WRITE8_HANDLER( jr200_pcg_2_w )
 {
-	UINT8 *pcg = memory_region(space->machine, "pcg");
+	UINT8 *pcg = space->machine->region("pcg")->base();
 
 	pcg[offset+0x400] = data;
 	gfx_element_mark_dirty(space->machine->gfx[1], (offset+0x400) >> 3);
@@ -185,7 +185,7 @@ static WRITE8_HANDLER( jr200_pcg_2_w )
 
 static READ8_HANDLER( jr200_bios_char_r )
 {
-	UINT8 *gfx = memory_region(space->machine, "gfx_ram");
+	UINT8 *gfx = space->machine->region("gfx_ram")->base();
 
 	return gfx[offset];
 }
@@ -193,7 +193,7 @@ static READ8_HANDLER( jr200_bios_char_r )
 
 static WRITE8_HANDLER( jr200_bios_char_w )
 {
-//  UINT8 *gfx = memory_region(space->machine, "gfx_ram");
+//  UINT8 *gfx = space->machine->region("gfx_ram")->base();
 
 	/* TODO: writing is presumably controlled by an I/O bit */
 //  gfx[offset] = data;
@@ -477,8 +477,8 @@ static MACHINE_START(jr200)
 static MACHINE_RESET(jr200)
 {
 	jr200_state *state = machine->driver_data<jr200_state>();
-	UINT8 *gfx_rom = memory_region(machine, "gfx_rom");
-	UINT8 *gfx_ram = memory_region(machine, "gfx_ram");
+	UINT8 *gfx_rom = machine->region("gfx_rom")->base();
+	UINT8 *gfx_ram = machine->region("gfx_ram")->base();
 	int i;
 	memset(state->mn1271_ram,0,0x800);
 
@@ -492,35 +492,35 @@ static MACHINE_RESET(jr200)
 
 static MACHINE_CONFIG_START( jr200, jr200_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6802, XTAL_14_31818MHz / 4) /* MN1800A, ? Mhz assumption that it is same as JR-100*/
-	MDRV_CPU_PROGRAM_MAP(jr200_mem)
+	MCFG_CPU_ADD("maincpu", M6802, XTAL_14_31818MHz / 4) /* MN1800A, ? Mhz assumption that it is same as JR-100*/
+	MCFG_CPU_PROGRAM_MAP(jr200_mem)
 
-//  MDRV_CPU_ADD("mn1544", MN1544, ?)
+//  MCFG_CPU_ADD("mn1544", MN1544, ?)
 
-	MDRV_MACHINE_START(jr200)
-	MDRV_MACHINE_RESET(jr200)
+	MCFG_MACHINE_START(jr200)
+	MCFG_MACHINE_RESET(jr200)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(16 + 256 + 16, 16 + 192 + 16) /* border size not accurate */
-	MDRV_SCREEN_VISIBLE_AREA(0, 16 + 256 + 16 - 1, 0, 16 + 192 + 16 - 1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(16 + 256 + 16, 16 + 192 + 16) /* border size not accurate */
+	MCFG_SCREEN_VISIBLE_AREA(0, 16 + 256 + 16 - 1, 0, 16 + 192 + 16 - 1)
 
-	MDRV_GFXDECODE(jr200)
-	MDRV_PALETTE_LENGTH(8)
-	MDRV_PALETTE_INIT(jr200)
+	MCFG_GFXDECODE(jr200)
+	MCFG_PALETTE_LENGTH(8)
+	MCFG_PALETTE_INIT(jr200)
 
-	MDRV_VIDEO_START(jr200)
-	MDRV_VIDEO_UPDATE(jr200)
+	MCFG_VIDEO_START(jr200)
+	MCFG_VIDEO_UPDATE(jr200)
 
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	// AY-8910 ?
 
-	MDRV_SOUND_ADD("beeper", BEEP, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
+	MCFG_SOUND_ADD("beeper", BEEP, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
 MACHINE_CONFIG_END
 
 

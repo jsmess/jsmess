@@ -59,17 +59,17 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
-	required_device<running_device> m_pic;
-	required_device<running_device> m_rtc;
-	required_device<running_device> m_uart_kb;
-	required_device<running_device> m_uart_sio;
-	required_device<running_device> m_fdc;
-	required_device<running_device> m_crtc;
-	required_device<running_device> m_centronics;
-	required_device<running_device> m_ram;
-	required_device<running_device> m_discrete;
-	required_device<running_device> m_floppy0;
-	required_device<running_device> m_floppy1;
+	required_device<device_t> m_pic;
+	required_device<device_t> m_rtc;
+	required_device<device_t> m_uart_kb;
+	required_device<device_t> m_uart_sio;
+	required_device<device_t> m_fdc;
+	required_device<device_t> m_crtc;
+	required_device<device_t> m_centronics;
+	required_device<device_t> m_ram;
+	required_device<device_t> m_discrete;
+	required_device<device_t> m_floppy0;
+	required_device<device_t> m_floppy1;
 	required_device<timer_device> m_timer_sio;
 	
 	virtual void machine_start();

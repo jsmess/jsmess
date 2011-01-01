@@ -75,7 +75,7 @@ struct _gaelco_sound_state
 
 static wav_file *	wavraw;					/* raw waveform */
 
-INLINE gaelco_sound_state *get_safe_token(running_device *device)
+INLINE gaelco_sound_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == GAELCO_GAE1 || device->type() == GAELCO_CG1V);
@@ -261,7 +261,7 @@ static DEVICE_START( gaelco )
 		info->banks[j] = intf->banks[j];
 	}
 	info->stream = stream_create(device, 0, 2, 8000, info, gaelco_update);
-	info->snd_data = (UINT8 *)memory_region(device->machine, intf->gfxregion);
+	info->snd_data = (UINT8 *)device->machine->region(intf->gfxregion)->base();
 	if (info->snd_data == NULL)
 		info->snd_data = *device->region();
 

@@ -67,7 +67,7 @@ struct _dev_cdrom_t
 };
 
 
-INLINE dev_cdrom_t *get_safe_token(running_device *device) {
+INLINE dev_cdrom_t *get_safe_token(device_t *device) {
 	assert( device != NULL );
 	assert( ( device->type() == CDROM ) );
 	return (dev_cdrom_t *)  downcast<legacy_device_base *>(device)->token();
@@ -117,7 +117,7 @@ static DEVICE_IMAGE_UNLOAD(cdrom)
  *
  *************************************/
 
-cdrom_file *mess_cd_get_cdrom_file(running_device *image)
+cdrom_file *mess_cd_get_cdrom_file(device_t *image)
 {
 	dev_cdrom_t	*cdrom = get_safe_token( image );
 

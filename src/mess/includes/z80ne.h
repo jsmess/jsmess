@@ -69,9 +69,9 @@ public:
 	int lx383_downsampler;
 	int nmi_delay_counter;
 	int reset_delay_counter;
-	running_device *ay31015;
+	device_t *ay31015;
 	UINT8 lx385_ctrl;
-	running_device *lx388_kr2376;
+	device_t *lx388_kr2376;
 	emu_timer *cassette_timer;
 	cass_data_t cass_data;
 	wd17xx_state_t wd17xx_state;

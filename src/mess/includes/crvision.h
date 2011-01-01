@@ -25,9 +25,9 @@ public:
 	UINT8 joylatch;
 
 	/* devices */
-	running_device *psg;
-	running_device *cassette;
-	running_device *centronics;
+	device_t *psg;
+	device_t *cassette;
+	device_t *centronics;
 };
 
 #endif

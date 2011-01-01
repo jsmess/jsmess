@@ -9,8 +9,8 @@
 
 DECLARE_LEGACY_DEVICE(E0516 , e0516);
 
-#define MDRV_E0516_ADD(_tag, _clock) \
-	MDRV_DEVICE_ADD(_tag, E0516, _clock)
+#define MCFG_E0516_ADD(_tag, _clock) \
+	MCFG_DEVICE_ADD(_tag, E0516, _clock)
 
 /***************************************************************************
     PROTOTYPES

@@ -208,34 +208,34 @@ static DEVICE_IMAGE_LOAD( vc4000_cart )
 	if (size > 0x1000)	/* 6k rom + 1k ram - Chess2 only */
 	{
 		memory_install_read_bank(memspace, 0x0800, 0x15ff, 0, 0, "bank1");	/* extra rom */
-		memory_set_bankptr(machine, "bank1", memory_region(machine, "maincpu") + 0x1000);
+		memory_set_bankptr(machine, "bank1", machine->region("maincpu")->base() + 0x1000);
 
 		memory_install_readwrite_bank(memspace, 0x1800, 0x1bff, 0, 0, "bank2");	/* ram */
-		memory_set_bankptr(machine, "bank2", memory_region(machine, "maincpu") + 0x1800);
+		memory_set_bankptr(machine, "bank2", machine->region("maincpu")->base() + 0x1800);
 	}
 	else if (size > 0x0800)	/* some 4k roms have 1k of mirrored ram */
 	{
 		memory_install_read_bank(memspace, 0x0800, 0x0fff, 0, 0, "bank1");	/* extra rom */
-		memory_set_bankptr(machine, "bank1", memory_region(machine, "maincpu") + 0x0800);
+		memory_set_bankptr(machine, "bank1", machine->region("maincpu")->base() + 0x0800);
 
 		memory_install_readwrite_bank(memspace, 0x1000, 0x15ff, 0, 0x800, "bank2"); /* ram */
-		memory_set_bankptr(machine, "bank2", memory_region(machine, "maincpu") + 0x1000);
+		memory_set_bankptr(machine, "bank2", machine->region("maincpu")->base() + 0x1000);
 	}
 	else if (size == 0x0800)	/* 2k roms + 2k ram - Hobby Module(Radofin) and elektor TVGC*/
 	{
 		memory_install_readwrite_bank(memspace, 0x0800, 0x0fff, 0, 0, "bank1"); /* ram */
-		memory_set_bankptr(machine, "bank1", memory_region(machine, "maincpu") + 0x0800);
+		memory_set_bankptr(machine, "bank1", machine->region("maincpu")->base() + 0x0800);
 	}
 
 	if (size > 0)
 	{
 		if (image.software_entry() == NULL)
 		{
-			if (image.fread( memory_region(machine, "maincpu"), size) != size)
+			if (image.fread( machine->region("maincpu")->base(), size) != size)
 				return IMAGE_INIT_FAIL;
 		}
 		else
-			memcpy(memory_region(machine, "maincpu"), image.get_software_region("rom"), size);
+			memcpy(machine->region("maincpu")->base(), image.get_software_region("rom"), size);
 	}
 
 	return IMAGE_INIT_PASS;
@@ -243,41 +243,41 @@ static DEVICE_IMAGE_LOAD( vc4000_cart )
 
 static MACHINE_CONFIG_START( vc4000, vc4000_state )
 	/* basic machine hardware */
-//  MDRV_CPU_ADD("maincpu", S2650, 865000)        /* 3550000/4, 3580000/3, 4430000/3 */
-	MDRV_CPU_ADD("maincpu", S2650, 3546875/4)
-	MDRV_CPU_PROGRAM_MAP(vc4000_mem)
-	MDRV_CPU_IO_MAP(vc4000_io)
-	MDRV_CPU_PERIODIC_INT(vc4000_video_line, 312*53)	// GOLF needs this exact value
+//  MCFG_CPU_ADD("maincpu", S2650, 865000)        /* 3550000/4, 3580000/3, 4430000/3 */
+	MCFG_CPU_ADD("maincpu", S2650, 3546875/4)
+	MCFG_CPU_PROGRAM_MAP(vc4000_mem)
+	MCFG_CPU_IO_MAP(vc4000_io)
+	MCFG_CPU_PERIODIC_INT(vc4000_video_line, 312*53)	// GOLF needs this exact value
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(50)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(226, 312)
-	MDRV_SCREEN_VISIBLE_AREA(8, 184, 0, 269)
-	MDRV_PALETTE_LENGTH(8)
-	MDRV_PALETTE_INIT( vc4000 )
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(226, 312)
+	MCFG_SCREEN_VISIBLE_AREA(8, 184, 0, 269)
+	MCFG_PALETTE_LENGTH(8)
+	MCFG_PALETTE_INIT( vc4000 )
 
-	MDRV_VIDEO_START( vc4000 )
-	MDRV_VIDEO_UPDATE( vc4000 )
+	MCFG_VIDEO_START( vc4000 )
+	MCFG_VIDEO_UPDATE( vc4000 )
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("custom", VC4000, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("custom", VC4000, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* quickload */
-	MDRV_QUICKLOAD_ADD("quickload", vc4000, "tvc", 0)
+	MCFG_QUICKLOAD_ADD("quickload", vc4000, "tvc", 0)
 
 	/* cartridge */
-	MDRV_CARTSLOT_ADD("cart")
-	MDRV_CARTSLOT_EXTENSION_LIST("rom,bin")
-	MDRV_CARTSLOT_NOT_MANDATORY
-	MDRV_CARTSLOT_INTERFACE("vc4000_cart")
-	MDRV_CARTSLOT_LOAD(vc4000_cart)
+	MCFG_CARTSLOT_ADD("cart")
+	MCFG_CARTSLOT_EXTENSION_LIST("rom,bin")
+	MCFG_CARTSLOT_NOT_MANDATORY
+	MCFG_CARTSLOT_INTERFACE("vc4000_cart")
+	MCFG_CARTSLOT_LOAD(vc4000_cart)
 
 	/* software lists */
-	MDRV_SOFTWARE_LIST_ADD("cart_list","vc4000")
+	MCFG_SOFTWARE_LIST_ADD("cart_list","vc4000")
 MACHINE_CONFIG_END
 
 

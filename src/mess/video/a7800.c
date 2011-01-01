@@ -321,7 +321,7 @@ INTERRUPT_GEN( a7800_interrupt )
 {
 	a7800_state *state = device->machine->driver_data<a7800_state>();
 	int frame_scanline;
-	UINT8 *ROM = memory_region(device->machine, "maincpu");
+	UINT8 *ROM = device->machine->region("maincpu")->base();
 	address_space* space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	state->maria_scanline++;
@@ -443,7 +443,7 @@ VIDEO_UPDATE( a7800 )
  READ8_HANDLER( a7800_MARIA_r )
 {
 	a7800_state *state = space->machine->driver_data<a7800_state>();
-	UINT8 *ROM = memory_region(space->machine, "maincpu");
+	UINT8 *ROM = space->machine->region("maincpu")->base();
 	switch (offset)
 	{
 		case 0x08:
@@ -458,7 +458,7 @@ VIDEO_UPDATE( a7800 )
 WRITE8_HANDLER( a7800_MARIA_w )
 {
 	a7800_state *state = space->machine->driver_data<a7800_state>();
-	UINT8 *ROM = memory_region(space->machine, "maincpu");
+	UINT8 *ROM = space->machine->region("maincpu")->base();
 	switch (offset)
 	{
 		case 0x00:

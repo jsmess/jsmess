@@ -277,7 +277,7 @@ static VIDEO_UPDATE( pc9801 )
 //  const gfx_element *gfx = screen->machine->gfx[0];
 	int y,x;
 	int yi,xi;
-	UINT8 *gfx_data = memory_region(screen->machine, "gfx1");
+	UINT8 *gfx_data = screen->machine->region("gfx1")->base();
 
 	for (y=0;y<25;y++)
 	{
@@ -392,12 +392,12 @@ static READ8_HANDLER( crtc_status_r )
 {
 	UINT8 vsync = input_port_read(space->machine, "VBLANK") & 0x20;
 
-	return 0x04 | vsync;//mame_rand(space->machine);
+	return 0x04 | vsync;//space->machine->rand();
 }
 
 static READ8_HANDLER( crtc_fifo_r )
 {
-	return 0x00;//mame_rand(space->machine);
+	return 0x00;//space->machine->rand();
 }
 
 static WRITE8_HANDLER( crtc_param_w )
@@ -453,7 +453,7 @@ static WRITE8_HANDLER( ems_sel_w )
 
 	if(offset == 1)
 	{
-		UINT8 *ROM = memory_region(space->machine, "cpudata");
+		UINT8 *ROM = space->machine->region("cpudata")->base();
 
 		if(data == 0x00 || data == 0x10)
 		{
@@ -481,7 +481,7 @@ static WRITE8_HANDLER( ems_sel_w )
 static WRITE8_HANDLER( rom_bank_w )
 {
 	pc98_state *state = space->machine->driver_data<pc98_state>();
-	UINT8 *ROM = memory_region(space->machine, "cpudata");
+	UINT8 *ROM = space->machine->region("cpudata")->base();
 
 //  printf("%08x %04x %08x\n",ROM[offset+(state->rom_bank*0x20000/4)],offset+(state->rom_bank*0x20000/4),data);
 
@@ -739,7 +739,7 @@ static IRQ_CALLBACK(irq_callback)
 static MACHINE_RESET(pc9801)
 {
 	pc98_state *state = machine->driver_data<pc98_state>();
-	UINT8 *ROM = memory_region(machine, "cpudata");
+	UINT8 *ROM = machine->region("cpudata")->base();
 
 	cpu_set_irq_callback(machine->device("maincpu"), irq_callback);
 
@@ -986,7 +986,7 @@ static WRITE8_HANDLER( pc_dma_write_byte )
 	space->write_byte(page_offset + offset, data);
 }
 
-static void set_dma_channel(running_device *device, int channel, int state)
+static void set_dma_channel(device_t *device, int channel, int state)
 {
 	pc98_state *drvstate = device->machine->driver_data<pc98_state>();
 	if (!state) drvstate->dma_channel = channel;
@@ -1012,39 +1012,39 @@ static I8237_INTERFACE( dma8237_1_config )
 /* More investigations are required, but in the meanwhile I set a I386 as main CPU */
 static MACHINE_CONFIG_START( pc9801, pc98_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", I386, 16000000)
-	MDRV_CPU_PROGRAM_MAP(pc9801_mem)
-	MDRV_CPU_IO_MAP(pc9801_io)
+	MCFG_CPU_ADD("maincpu", I386, 16000000)
+	MCFG_CPU_PROGRAM_MAP(pc9801_mem)
+	MCFG_CPU_IO_MAP(pc9801_io)
 
-	MDRV_MACHINE_RESET(pc9801)
+	MCFG_MACHINE_RESET(pc9801)
 
-	MDRV_I8255A_ADD( "ppi8255_0", ppi8255_intf )
-	MDRV_I8255A_ADD( "ppi8255_1", printer_intf )
-	MDRV_PIT8253_ADD( "pit8253", pit8253_config )
-	MDRV_I8237_ADD( "dma8237_1", XTAL_14_31818MHz/3, dma8237_1_config )
-	MDRV_PIC8259_ADD( "pic8259_master", pic8259_master_config )
-	MDRV_PIC8259_ADD( "pic8259_slave", pic8259_slave_config )
+	MCFG_I8255A_ADD( "ppi8255_0", ppi8255_intf )
+	MCFG_I8255A_ADD( "ppi8255_1", printer_intf )
+	MCFG_PIT8253_ADD( "pit8253", pit8253_config )
+	MCFG_I8237_ADD( "dma8237_1", XTAL_14_31818MHz/3, dma8237_1_config )
+	MCFG_PIC8259_ADD( "pic8259_master", pic8259_master_config )
+	MCFG_PIC8259_ADD( "pic8259_slave", pic8259_slave_config )
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(640, 480)
-	MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
-	MDRV_PALETTE_LENGTH(8)
-	MDRV_PALETTE_INIT(pc9801)
-	MDRV_GFXDECODE(pc9801)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(640, 480)
+	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
+	MCFG_PALETTE_LENGTH(8)
+	MCFG_PALETTE_INIT(pc9801)
+	MCFG_GFXDECODE(pc9801)
 
-	MDRV_VIDEO_START(pc9801)
-	MDRV_VIDEO_UPDATE(pc9801)
+	MCFG_VIDEO_START(pc9801)
+	MCFG_VIDEO_UPDATE(pc9801)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( pc9821, pc9801 )
 
-	MDRV_CPU_REPLACE("maincpu", I486, 25000000)
-	MDRV_CPU_PROGRAM_MAP(pc9801_mem)
-	MDRV_CPU_IO_MAP(pc9821_io)
+	MCFG_CPU_REPLACE("maincpu", I486, 25000000)
+	MCFG_CPU_PROGRAM_MAP(pc9801_mem)
+	MCFG_CPU_IO_MAP(pc9821_io)
 MACHINE_CONFIG_END
 
 
@@ -1114,7 +1114,7 @@ ROM_END
 static DRIVER_INIT( pc9801 )
 {
 	#if 0
-	UINT8 *ROM = memory_region(machine, "cpudata");
+	UINT8 *ROM = machine->region("cpudata")->base();
 
 	/* patch unimplemented opcodes verr / verw */
 	ROM[0xf90be & 0x3ffff] = 0x90;

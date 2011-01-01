@@ -586,7 +586,7 @@ INLINE void cps3_drawgfxzoom(bitmap_t *dest_bmp,const rectangle *clip,const gfx_
 											if (c&0x02) dest[x] |= 0x4000;
 											if (c&0x04) dest[x] |= 0x8000;
 											if (c&0x08) dest[x] |= 0x10000;
-											if (c&0xf0) dest[x] |= mame_rand(gfx->machine); // ?? not used?
+											if (c&0xf0) dest[x] |= gfx->machine->rand(); // ?? not used?
 										}
 										else
 										{
@@ -658,9 +658,9 @@ static UINT32 cps3_mask(UINT32 address, UINT32 key1, UINT32 key2)
 static void cps3_decrypt_bios(running_machine *machine)
 {
 	int i;
-	UINT32 *coderegion = (UINT32*)memory_region(machine, "user1");
+	UINT32 *coderegion = (UINT32*)machine->region("user1")->base();
 
-	decrypted_bios = (UINT32*)memory_region(machine, "user1");
+	decrypted_bios = (UINT32*)machine->region("user1")->base();
 
 	for (i=0;i<0x80000;i+=4)
 	{
@@ -690,8 +690,8 @@ static void cps3_decrypt_bios(running_machine *machine)
 static DRIVER_INIT( cps3 )
 {
 	// cache pointers to regions
-	cps3_user4region = memory_region(machine,"user4");
-	cps3_user5region = memory_region(machine,"user5");
+	cps3_user4region = machine->region("user4")->base();
+	cps3_user5region = machine->region("user5")->base();
 
 	if (!cps3_user4region) cps3_user4region = auto_alloc_array(machine, UINT8, USER4REGION_LENGTH);
 	if (!cps3_user5region) cps3_user5region = auto_alloc_array(machine, UINT8, USER5REGION_LENGTH);
@@ -2447,80 +2447,80 @@ static const sh2_cpu_core sh2_conf_cps3 = {
 };
 
 static MACHINE_CONFIG_FRAGMENT( simm1_64mbit )
-	MDRV_FUJITSU_29F016A_ADD("simm1.0")
-	MDRV_FUJITSU_29F016A_ADD("simm1.1")
-	MDRV_FUJITSU_29F016A_ADD("simm1.2")
-	MDRV_FUJITSU_29F016A_ADD("simm1.3")
+	MCFG_FUJITSU_29F016A_ADD("simm1.0")
+	MCFG_FUJITSU_29F016A_ADD("simm1.1")
+	MCFG_FUJITSU_29F016A_ADD("simm1.2")
+	MCFG_FUJITSU_29F016A_ADD("simm1.3")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_FRAGMENT( simm2_64mbit )
-	MDRV_FUJITSU_29F016A_ADD("simm2.0")
-	MDRV_FUJITSU_29F016A_ADD("simm2.1")
-	MDRV_FUJITSU_29F016A_ADD("simm2.2")
-	MDRV_FUJITSU_29F016A_ADD("simm2.3")
+	MCFG_FUJITSU_29F016A_ADD("simm2.0")
+	MCFG_FUJITSU_29F016A_ADD("simm2.1")
+	MCFG_FUJITSU_29F016A_ADD("simm2.2")
+	MCFG_FUJITSU_29F016A_ADD("simm2.3")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_FRAGMENT( simm3_128mbit )
-	MDRV_FUJITSU_29F016A_ADD("simm3.0")
-	MDRV_FUJITSU_29F016A_ADD("simm3.1")
-	MDRV_FUJITSU_29F016A_ADD("simm3.2")
-	MDRV_FUJITSU_29F016A_ADD("simm3.3")
-	MDRV_FUJITSU_29F016A_ADD("simm3.4")
-	MDRV_FUJITSU_29F016A_ADD("simm3.5")
-	MDRV_FUJITSU_29F016A_ADD("simm3.6")
-	MDRV_FUJITSU_29F016A_ADD("simm3.7")
+	MCFG_FUJITSU_29F016A_ADD("simm3.0")
+	MCFG_FUJITSU_29F016A_ADD("simm3.1")
+	MCFG_FUJITSU_29F016A_ADD("simm3.2")
+	MCFG_FUJITSU_29F016A_ADD("simm3.3")
+	MCFG_FUJITSU_29F016A_ADD("simm3.4")
+	MCFG_FUJITSU_29F016A_ADD("simm3.5")
+	MCFG_FUJITSU_29F016A_ADD("simm3.6")
+	MCFG_FUJITSU_29F016A_ADD("simm3.7")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_FRAGMENT( simm4_128mbit )
-	MDRV_FUJITSU_29F016A_ADD("simm4.0")
-	MDRV_FUJITSU_29F016A_ADD("simm4.1")
-	MDRV_FUJITSU_29F016A_ADD("simm4.2")
-	MDRV_FUJITSU_29F016A_ADD("simm4.3")
-	MDRV_FUJITSU_29F016A_ADD("simm4.4")
-	MDRV_FUJITSU_29F016A_ADD("simm4.5")
-	MDRV_FUJITSU_29F016A_ADD("simm4.6")
-	MDRV_FUJITSU_29F016A_ADD("simm4.7")
+	MCFG_FUJITSU_29F016A_ADD("simm4.0")
+	MCFG_FUJITSU_29F016A_ADD("simm4.1")
+	MCFG_FUJITSU_29F016A_ADD("simm4.2")
+	MCFG_FUJITSU_29F016A_ADD("simm4.3")
+	MCFG_FUJITSU_29F016A_ADD("simm4.4")
+	MCFG_FUJITSU_29F016A_ADD("simm4.5")
+	MCFG_FUJITSU_29F016A_ADD("simm4.6")
+	MCFG_FUJITSU_29F016A_ADD("simm4.7")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_FRAGMENT( simm5_128mbit )
-	MDRV_FUJITSU_29F016A_ADD("simm5.0")
-	MDRV_FUJITSU_29F016A_ADD("simm5.1")
-	MDRV_FUJITSU_29F016A_ADD("simm5.2")
-	MDRV_FUJITSU_29F016A_ADD("simm5.3")
-	MDRV_FUJITSU_29F016A_ADD("simm5.4")
-	MDRV_FUJITSU_29F016A_ADD("simm5.5")
-	MDRV_FUJITSU_29F016A_ADD("simm5.6")
-	MDRV_FUJITSU_29F016A_ADD("simm5.7")
+	MCFG_FUJITSU_29F016A_ADD("simm5.0")
+	MCFG_FUJITSU_29F016A_ADD("simm5.1")
+	MCFG_FUJITSU_29F016A_ADD("simm5.2")
+	MCFG_FUJITSU_29F016A_ADD("simm5.3")
+	MCFG_FUJITSU_29F016A_ADD("simm5.4")
+	MCFG_FUJITSU_29F016A_ADD("simm5.5")
+	MCFG_FUJITSU_29F016A_ADD("simm5.6")
+	MCFG_FUJITSU_29F016A_ADD("simm5.7")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_FRAGMENT( simm5_32mbit )
-	MDRV_FUJITSU_29F016A_ADD("simm5.0")
-	MDRV_FUJITSU_29F016A_ADD("simm5.1")
+	MCFG_FUJITSU_29F016A_ADD("simm5.0")
+	MCFG_FUJITSU_29F016A_ADD("simm5.1")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_FRAGMENT( simm6_128mbit )
-	MDRV_FUJITSU_29F016A_ADD("simm6.0")
-	MDRV_FUJITSU_29F016A_ADD("simm6.1")
-	MDRV_FUJITSU_29F016A_ADD("simm6.2")
-	MDRV_FUJITSU_29F016A_ADD("simm6.3")
-	MDRV_FUJITSU_29F016A_ADD("simm6.4")
-	MDRV_FUJITSU_29F016A_ADD("simm6.5")
-	MDRV_FUJITSU_29F016A_ADD("simm6.6")
-	MDRV_FUJITSU_29F016A_ADD("simm6.7")
+	MCFG_FUJITSU_29F016A_ADD("simm6.0")
+	MCFG_FUJITSU_29F016A_ADD("simm6.1")
+	MCFG_FUJITSU_29F016A_ADD("simm6.2")
+	MCFG_FUJITSU_29F016A_ADD("simm6.3")
+	MCFG_FUJITSU_29F016A_ADD("simm6.4")
+	MCFG_FUJITSU_29F016A_ADD("simm6.5")
+	MCFG_FUJITSU_29F016A_ADD("simm6.6")
+	MCFG_FUJITSU_29F016A_ADD("simm6.7")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( cps3, driver_device )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", SH2, 6250000*4) // external clock is 6.25 Mhz, it sets the intenral multiplier to 4x (this should probably be handled in the core..)
-	MDRV_CPU_PROGRAM_MAP(cps3_map)
-	MDRV_CPU_VBLANK_INT("screen", cps3_vbl_interrupt)
-	MDRV_CPU_PERIODIC_INT(cps3_other_interrupt,80) /* ?source? */
-	MDRV_CPU_CONFIG(sh2_conf_cps3)
+	MCFG_CPU_ADD("maincpu", SH2, 6250000*4) // external clock is 6.25 Mhz, it sets the intenral multiplier to 4x (this should probably be handled in the core..)
+	MCFG_CPU_PROGRAM_MAP(cps3_map)
+	MCFG_CPU_VBLANK_INT("screen", cps3_vbl_interrupt)
+	MCFG_CPU_PERIODIC_INT(cps3_other_interrupt,80) /* ?source? */
+	MCFG_CPU_CONFIG(sh2_conf_cps3)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_RAW_PARAMS(XTAL_60MHz/8, 486, 0, 384, 259, 0, 224)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_60MHz/8, 486, 0, 384, 259, 0, 224)
 /*
     Measured clocks:
         V = 59.5992Hz
@@ -2532,69 +2532,69 @@ static MACHINE_CONFIG_START( cps3, driver_device )
          42.9545MHz / 15.4445kHz = 2781.217 / 6 = 463.536 -> unlikely
 */
 
-	MDRV_MACHINE_START(cps3)
-	MDRV_MACHINE_RESET(cps3)
-	MDRV_NVRAM_ADD_0FILL("eeprom")
-	MDRV_PALETTE_LENGTH(0x10000) // actually 0x20000 ...
+	MCFG_MACHINE_START(cps3)
+	MCFG_MACHINE_RESET(cps3)
+	MCFG_NVRAM_ADD_0FILL("eeprom")
+	MCFG_PALETTE_LENGTH(0x10000) // actually 0x20000 ...
 
-	MDRV_VIDEO_START(cps3)
-	MDRV_VIDEO_UPDATE(cps3)
+	MCFG_VIDEO_START(cps3)
+	MCFG_VIDEO_UPDATE(cps3)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("cps3", CPS3, MASTER_CLOCK / 3)
-	MDRV_SOUND_ROUTE(1, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(0, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("cps3", CPS3, MASTER_CLOCK / 3)
+	MCFG_SOUND_ROUTE(1, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(0, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 
 /* individual configs for each machine, depending on the SIMMs installed */
 MACHINE_CONFIG_DERIVED( jojo, cps3 )
-	MDRV_FRAGMENT_ADD(simm1_64mbit)
-	MDRV_FRAGMENT_ADD(simm2_64mbit)
-	MDRV_FRAGMENT_ADD(simm3_128mbit)
-	MDRV_FRAGMENT_ADD(simm4_128mbit)
-	MDRV_FRAGMENT_ADD(simm5_32mbit)
+	MCFG_FRAGMENT_ADD(simm1_64mbit)
+	MCFG_FRAGMENT_ADD(simm2_64mbit)
+	MCFG_FRAGMENT_ADD(simm3_128mbit)
+	MCFG_FRAGMENT_ADD(simm4_128mbit)
+	MCFG_FRAGMENT_ADD(simm5_32mbit)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED( jojoba, cps3 )
-	MDRV_FRAGMENT_ADD(simm1_64mbit)
-	MDRV_FRAGMENT_ADD(simm2_64mbit)
-	MDRV_FRAGMENT_ADD(simm3_128mbit)
-	MDRV_FRAGMENT_ADD(simm4_128mbit)
-	MDRV_FRAGMENT_ADD(simm5_128mbit)
+	MCFG_FRAGMENT_ADD(simm1_64mbit)
+	MCFG_FRAGMENT_ADD(simm2_64mbit)
+	MCFG_FRAGMENT_ADD(simm3_128mbit)
+	MCFG_FRAGMENT_ADD(simm4_128mbit)
+	MCFG_FRAGMENT_ADD(simm5_128mbit)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED( sfiii, cps3 )
-	MDRV_FRAGMENT_ADD(simm1_64mbit)
-	MDRV_FRAGMENT_ADD(simm3_128mbit)
-	MDRV_FRAGMENT_ADD(simm4_128mbit)
-	MDRV_FRAGMENT_ADD(simm5_32mbit)
+	MCFG_FRAGMENT_ADD(simm1_64mbit)
+	MCFG_FRAGMENT_ADD(simm3_128mbit)
+	MCFG_FRAGMENT_ADD(simm4_128mbit)
+	MCFG_FRAGMENT_ADD(simm5_32mbit)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED( sfiii2, cps3 )
-	MDRV_FRAGMENT_ADD(simm1_64mbit)
-	MDRV_FRAGMENT_ADD(simm2_64mbit)
-	MDRV_FRAGMENT_ADD(simm3_128mbit)
-	MDRV_FRAGMENT_ADD(simm4_128mbit)
-	MDRV_FRAGMENT_ADD(simm5_128mbit)
+	MCFG_FRAGMENT_ADD(simm1_64mbit)
+	MCFG_FRAGMENT_ADD(simm2_64mbit)
+	MCFG_FRAGMENT_ADD(simm3_128mbit)
+	MCFG_FRAGMENT_ADD(simm4_128mbit)
+	MCFG_FRAGMENT_ADD(simm5_128mbit)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED( sfiii3, cps3 )
-	MDRV_FRAGMENT_ADD(simm1_64mbit)
-	MDRV_FRAGMENT_ADD(simm2_64mbit)
-	MDRV_FRAGMENT_ADD(simm3_128mbit)
-	MDRV_FRAGMENT_ADD(simm4_128mbit)
-	MDRV_FRAGMENT_ADD(simm5_128mbit)
-	MDRV_FRAGMENT_ADD(simm6_128mbit)
+	MCFG_FRAGMENT_ADD(simm1_64mbit)
+	MCFG_FRAGMENT_ADD(simm2_64mbit)
+	MCFG_FRAGMENT_ADD(simm3_128mbit)
+	MCFG_FRAGMENT_ADD(simm4_128mbit)
+	MCFG_FRAGMENT_ADD(simm5_128mbit)
+	MCFG_FRAGMENT_ADD(simm6_128mbit)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED( redearth, cps3 )
-	MDRV_FRAGMENT_ADD(simm1_64mbit)
-	MDRV_FRAGMENT_ADD(simm3_128mbit)
-	MDRV_FRAGMENT_ADD(simm4_128mbit)
-	MDRV_FRAGMENT_ADD(simm5_32mbit)
+	MCFG_FRAGMENT_ADD(simm1_64mbit)
+	MCFG_FRAGMENT_ADD(simm3_128mbit)
+	MCFG_FRAGMENT_ADD(simm4_128mbit)
+	MCFG_FRAGMENT_ADD(simm5_32mbit)
 MACHINE_CONFIG_END
 
 
@@ -3361,7 +3361,7 @@ ROM_END
 
     DEVELOPMENT VERSION add 0x70 mask!
 
-    UINT32 *rom =  (UINT32*)memory_region ( machine, "user1" );
+    UINT32 *rom =  (UINT32*)machine->region ( "user1" )->base();
     rom[0x1fec8/4]^=0x00000001; // region hack (clear jpn)
 
     rom[0x1fec8/4]^=0x00000004; // region
@@ -3386,7 +3386,7 @@ ROM_END
 
     DEVELOPMENT VERSION add 0x70 mask!
 
-    UINT32 *rom =  (UINT32*)memory_region ( machine, "user1" );
+    UINT32 *rom =  (UINT32*)machine->region ( "user1" )->base();
     rom[0x1fec8/4]^=0x00000001; // region (clear jpn)
     rom[0x1fec8/4]^=0x00000002; // region
     rom[0x1fec8/4]^=0x00000070; // DEV mode
@@ -3407,7 +3407,7 @@ ROM_END
     OCEANIA 7
     ASIA NCD 8
 
-    UINT32 *rom =  (UINT32*)memory_region ( machine, "user1" );
+    UINT32 *rom =  (UINT32*)machine->region ( "user1" )->base();
     rom[0x1fed8/4]^=0x00000001; // clear region to 0 (invalid)
     rom[0x1fed8/4]^=0x00000008; // region 8 - ASIA NO CD - doesn't actually skip the CD
                                 // test on startup, only during game, must be another flag
@@ -3432,7 +3432,7 @@ ROM_END
 
     // bios rom also lists korea, but game rom does not.
 
-    UINT32 *rom =  (UINT32*)memory_region ( machine, "user1" );
+    UINT32 *rom =  (UINT32*)machine->region ( "user1" )->base();
     rom[0x1fec8/4]^=0x00000001; // region (clear region)
     rom[0x1fec8/4]^=0x00000008; // region
     rom[0x1fecc/4]^=0x01000000; // nocd - this ONLY skips the cd check in the bios test
@@ -3454,7 +3454,7 @@ ROM_END
     OCEANIA 7
     ASIA 8
 
-    UINT32 *rom =  (UINT32*)memory_region ( machine, "user1" );
+    UINT32 *rom =  (UINT32*)machine->region ( "user1" )->base();
     rom[0x1fec8/4]^=0x00000001; // region (clear region)
     rom[0x1fec8/4]^=0x00000008; // region
     rom[0x1fecc/4]^=0x01000000; // nocd - this ONLY skips the cd check in the bios test
@@ -3476,7 +3476,7 @@ ROM_END
     BRAZIL 6
     OCEANIA 7
 
-    UINT32 *rom =  (UINT32*)memory_region ( machine, "user1" );
+    UINT32 *rom =  (UINT32*)machine->region ( "user1" )->base();
     rom[0x1fec8/4]^=0x00000004; // region (clear region)
     rom[0x1fec8/4]^=0x00000001; // region
     rom[0x1fecc/4]^=0x01000000; // nocd

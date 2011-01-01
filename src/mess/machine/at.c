@@ -77,7 +77,7 @@ static UINT8 at_speaker_get_spk(void)
 
 static void at_speaker_set_spkrdata(running_machine *machine, UINT8 data)
 {
-	running_device *speaker = machine->device("speaker");
+	device_t *speaker = machine->device("speaker");
 	at_spkrdata = data ? 1 : 0;
 	speaker_level_w( speaker, at_speaker_get_spk() );
 }
@@ -85,7 +85,7 @@ static void at_speaker_set_spkrdata(running_machine *machine, UINT8 data)
 
 static void at_speaker_set_input(running_machine *machine, UINT8 data)
 {
-	running_device *speaker = machine->device("speaker");
+	device_t *speaker = machine->device("speaker");
 	at_speaker_input = data ? 1 : 0;
 	speaker_level_w( speaker, at_speaker_get_spk() );
 }
@@ -305,7 +305,7 @@ static WRITE_LINE_DEVICE_HANDLER( at_dma8237_out_eop ) {
 	pc_fdc_set_tc_state( device->machine, state );
 }
 
-static void set_dma_channel(running_device *device, int channel, int state)
+static void set_dma_channel(device_t *device, int channel, int state)
 {
 	if (!state) dma_channel = channel;
 }
@@ -361,7 +361,7 @@ static INS8250_INTERRUPT( at_com_interrupt_2 )
 
 /* called when com registers read/written - used to update peripherals that
 are connected */
-static void at_com_refresh_connected_common(running_device *device, int n, int data)
+static void at_com_refresh_connected_common(device_t *device, int n, int data)
 {
 	/* mouse connected to this port? */
 	if (input_port_read(device->machine, "DSW2") & (0x80>>n))
@@ -431,7 +431,7 @@ static void at_fdc_dma_drq(running_machine *machine, int state)
 	i8237_dreq2_w( st->dma8237_1, state);
 }
 
-static running_device *at_get_device(running_machine *machine)
+static device_t *at_get_device(running_machine *machine)
 {
 	return machine->device("upd765");
 }
@@ -510,7 +510,7 @@ static READ8_HANDLER( at_kbdc8042_p2_r )
 static WRITE8_HANDLER( at_kbdc8042_p2_w )
 {
 	at_state *st = space->machine->driver_data<at_state>();
-	running_device *keyboard = space->machine->device("keyboard");
+	device_t *keyboard = space->machine->device("keyboard");
 
 	//logerror("%04x: writing $%02x to P2\n", cpu_get_pc(space->machine->device("maincpu")), data );
 
@@ -563,8 +563,8 @@ ADDRESS_MAP_END
 
 
 MACHINE_CONFIG_FRAGMENT( at_kbdc8042 )
-	MDRV_CPU_ADD("kbdc8042", I8042, XTAL_12MHz )
-	MDRV_CPU_IO_MAP( kbdc8042_io)
+	MCFG_CPU_ADD("kbdc8042", I8042, XTAL_12MHz )
+	MCFG_CPU_IO_MAP( kbdc8042_io)
 MACHINE_CONFIG_END
 
 
@@ -679,8 +679,8 @@ DRIVER_INIT( atega )
 	{
 		KBDC8042_STANDARD, at_set_gate_a20, at_keyboard_interrupt, at_get_out2
 	};
-	UINT8	*dst = memory_region( machine, "maincpu" ) + 0xc0000;
-	UINT8	*src = memory_region( machine, "user1" ) + 0x3fff;
+	UINT8	*dst = machine->region( "maincpu" )->base() + 0xc0000;
+	UINT8	*src = machine->region( "user1" )->base() + 0x3fff;
 	int		i;
 
 	init_at_common(machine, &at8042);

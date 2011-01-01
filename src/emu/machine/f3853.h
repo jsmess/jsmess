@@ -45,9 +45,9 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MDRV_F3853_ADD(_tag, _clock, _intrf) \
-	MDRV_DEVICE_ADD(_tag, F3853, _clock) \
-	MDRV_DEVICE_CONFIG(_intrf)
+#define MCFG_F3853_ADD(_tag, _clock, _intrf) \
+	MCFG_DEVICE_ADD(_tag, F3853, _clock) \
+	MCFG_DEVICE_CONFIG(_intrf)
 
 
 
@@ -60,7 +60,7 @@
 
 struct f3853_interface
 {
-    void (*m_interrupt_request)(running_device *device, UINT16 addr, int level);
+    void (*m_interrupt_request)(device_t *device, UINT16 addr, int level);
 };
 
 
@@ -147,7 +147,7 @@ extern const device_type F3853;
 READ8_DEVICE_HANDLER( f3853_r );
 WRITE8_DEVICE_HANDLER( f3853_w );
 
-void f3853_set_external_interrupt_in_line(running_device *device, int level);
-void f3853_set_priority_in_line(running_device *device, int level);
+void f3853_set_external_interrupt_in_line(device_t *device, int level);
+void f3853_set_priority_in_line(device_t *device, int level);
 
 #endif /* __F3853_H__ */

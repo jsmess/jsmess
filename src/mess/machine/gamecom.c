@@ -10,7 +10,7 @@ static const int gamecom_timer_limit[8] = { 2, 1024, 2048, 4096, 8192, 16384, 32
 
 static TIMER_CALLBACK(gamecom_clock_timer_callback)
 {
-	UINT8 * RAM = memory_region(machine, "maincpu");
+	UINT8 * RAM = machine->region("maincpu")->base();
 	UINT8 val = ( ( RAM[SM8521_CLKT] & 0x3F ) + 1 ) & 0x3F;
 	RAM[SM8521_CLKT] = ( RAM[SM8521_CLKT] & 0xC0 ) | val;
 	cputag_set_input_line(machine, "maincpu", CK_INT, ASSERT_LINE );
@@ -19,7 +19,7 @@ static TIMER_CALLBACK(gamecom_clock_timer_callback)
 MACHINE_RESET( gamecom )
 {
 	gamecom_state *state = machine->driver_data<gamecom_state>();
-	UINT8 *rom = memory_region(machine, "kernel");
+	UINT8 *rom = machine->region("kernel")->base();
 	memory_set_bankptr( machine, "bank1", rom );
 	memory_set_bankptr( machine, "bank2", rom );
 	memory_set_bankptr( machine, "bank3", rom );
@@ -36,7 +36,7 @@ static void gamecom_set_mmu( running_machine *machine, int mmu, UINT8 data )
 	if ( data < 0x20 )
 	{
 		/* select internal ROM bank */
-		memory_set_bankptr( machine, bank, memory_region(machine, "kernel") + (data << 13) );
+		memory_set_bankptr( machine, bank, machine->region("kernel")->base() + (data << 13) );
 	}
 	else
 	{
@@ -49,7 +49,7 @@ static void gamecom_set_mmu( running_machine *machine, int mmu, UINT8 data )
 static void handle_stylus_press( running_machine *machine, UINT8 column )
 {
 	gamecom_state *state = machine->driver_data<gamecom_state>();
-	UINT8 * RAM = memory_region(machine, "maincpu");
+	UINT8 * RAM = machine->region("maincpu")->base();
 	static const UINT16 row_data[10] = { 0x3FE, 0x3FD, 0x3FB, 0x3F7, 0x3EF, 0x3DF, 0x3BF, 0x37F, 0x2FF, 0x1FF };
 
 	if ( column == 0 )
@@ -81,7 +81,7 @@ static void handle_stylus_press( running_machine *machine, UINT8 column )
 WRITE8_HANDLER( gamecom_pio_w )
 {
 	gamecom_state *state = space->machine->driver_data<gamecom_state>();
-	UINT8 * RAM = memory_region(space->machine, "maincpu");
+	UINT8 * RAM = space->machine->region("maincpu")->base();
 	offset += 0x14;
 	RAM[offset] = data;
 	switch( offset )
@@ -182,20 +182,20 @@ WRITE8_HANDLER( gamecom_pio_w )
 
 READ8_HANDLER( gamecom_pio_r )
 {
-	UINT8 * RAM = memory_region(space->machine, "maincpu");
+	UINT8 * RAM = space->machine->region("maincpu")->base();
 	return RAM[offset + 0x14];
 }
 
 READ8_HANDLER( gamecom_internal_r )
 {
-	UINT8 * RAM = memory_region(space->machine, "maincpu");
+	UINT8 * RAM = space->machine->region("maincpu")->base();
 	return RAM[offset + 0x20];
 }
 
 WRITE8_HANDLER( gamecom_internal_w )
 {
 	gamecom_state *state = space->machine->driver_data<gamecom_state>();
-	UINT8 * RAM = memory_region(space->machine, "maincpu");
+	UINT8 * RAM = space->machine->region("maincpu")->base();
 	offset += 0x20;
 	switch( offset )
 	{
@@ -354,10 +354,10 @@ WRITE8_HANDLER( gamecom_internal_w )
    Their usage is also not explained properly in the manuals. Guess we'll have to wait
    for them to show up in some rom images...
  */
-void gamecom_handle_dma( running_device *device, int cycles )
+void gamecom_handle_dma( device_t *device, int cycles )
 {
 	gamecom_state *state = device->machine->driver_data<gamecom_state>();
-	UINT8 * RAM = memory_region(device->machine, "maincpu");
+	UINT8 * RAM = device->machine->region("maincpu")->base();
 	UINT8 data = RAM[SM8521_DMC];
 	state->dma.overwrite_mode = data & 0x01;
 	state->dma.transfer_mode = data & 0x06;
@@ -405,7 +405,7 @@ void gamecom_handle_dma( running_device *device, int cycles )
 		state->dma.source_mask = 0x3FFF;
 		if ( RAM[SM8521_DMBR] < 16 )
 		{
-			state->dma.source_bank = memory_region(device->machine, "kernel") + (RAM[SM8521_DMBR] << 14);
+			state->dma.source_bank = device->machine->region("kernel")->base() + (RAM[SM8521_DMBR] << 14);
 		}
 		else
 		{
@@ -523,10 +523,10 @@ void gamecom_handle_dma( running_device *device, int cycles )
 	cputag_set_input_line(device->machine, "maincpu", DMA_INT, ASSERT_LINE );
 }
 
-void gamecom_update_timers( running_device *device, int cycles )
+void gamecom_update_timers( device_t *device, int cycles )
 {
 	gamecom_state *state = device->machine->driver_data<gamecom_state>();
-	UINT8 * RAM = memory_region(device->machine, "maincpu");
+	UINT8 * RAM = device->machine->region("maincpu")->base();
 	if ( state->timer[0].enabled )
 	{
 		state->timer[0].state_count += cycles;
@@ -569,7 +569,7 @@ DEVICE_IMAGE_LOAD( gamecom_cart1 )
 	UINT32 filesize;
 	UINT32 load_offset = 0;
 
-	state->cartridge1 = memory_region(image.device().machine, "cart1");
+	state->cartridge1 = image.device().machine->region("cart1")->base();
 
 	if (image.software_entry() == NULL)
 		filesize = image.length();
@@ -616,7 +616,7 @@ DEVICE_IMAGE_LOAD( gamecom_cart2 )
 	UINT32 filesize;
 	UINT32 load_offset = 0;
 
-	state->cartridge2 = memory_region(image.device().machine, "cart2");
+	state->cartridge2 = image.device().machine->region("cart2")->base();
 
 //  if (image.software_entry() == NULL)
 		filesize = image.length();

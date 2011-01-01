@@ -681,7 +681,7 @@ void bullet_state::machine_start()
 	UINT8 *ram = messram_get_ptr(m_ram);
 
 	memory_configure_bank(machine, "bank1", 0, 2, ram, 0x10000);
-	memory_configure_bank(machine, "bank1", 2, 1, memory_region(machine, Z80_TAG), 0);
+	memory_configure_bank(machine, "bank1", 2, 1, machine->region(Z80_TAG)->base(), 0);
 	memory_configure_bank(machine, "bank2", 0, 2, ram, 0x10000);
 	memory_configure_bank(machine, "bank3", 0, 2, ram + 0x0020, 0x10000);
 	memory_configure_bank(machine, "bank4", 0, 1, ram + 0xc000, 0);
@@ -728,28 +728,28 @@ void bullet_state::machine_reset()
 
 static MACHINE_CONFIG_START( bullet, bullet_state )
     // basic machine hardware
-    MDRV_CPU_ADD(Z80_TAG, Z80, XTAL_16MHz/4)
-    MDRV_CPU_PROGRAM_MAP(bullet_mem)
-    MDRV_CPU_IO_MAP(bullet_io)	
-	MDRV_CPU_CONFIG(daisy_chain)
+    MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_16MHz/4)
+    MCFG_CPU_PROGRAM_MAP(bullet_mem)
+    MCFG_CPU_IO_MAP(bullet_io)	
+	MCFG_CPU_CONFIG(daisy_chain)
 	
     // video hardware
-	MDRV_FRAGMENT_ADD( generic_terminal )
+	MCFG_FRAGMENT_ADD( generic_terminal )
 	
 	// devices
-	MDRV_Z80CTC_ADD(Z80CTC_TAG, XTAL_16MHz/4, ctc_intf)
-	MDRV_TIMER_ADD_PERIODIC("ctc", ctc_tick, HZ(XTAL_4_9152MHz/4))
-	MDRV_Z80DART_ADD(Z80DART_TAG, XTAL_16MHz/4, dart_intf)
-	MDRV_Z80DMA_ADD(Z80DMA_TAG, XTAL_16MHz/4, dma_intf)
-	MDRV_Z80PIO_ADD(Z80PIO_TAG, XTAL_16MHz/4, pio_intf)
-	MDRV_WD179X_ADD(MB8877_TAG, fdc_intf)
-	MDRV_FLOPPY_2_DRIVES_ADD(bullet_floppy_config)
-	MDRV_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
-	MDRV_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
+	MCFG_Z80CTC_ADD(Z80CTC_TAG, XTAL_16MHz/4, ctc_intf)
+	MCFG_TIMER_ADD_PERIODIC("ctc", ctc_tick, HZ(XTAL_4_9152MHz/4))
+	MCFG_Z80DART_ADD(Z80DART_TAG, XTAL_16MHz/4, dart_intf)
+	MCFG_Z80DMA_ADD(Z80DMA_TAG, XTAL_16MHz/4, dma_intf)
+	MCFG_Z80PIO_ADD(Z80PIO_TAG, XTAL_16MHz/4, pio_intf)
+	MCFG_WD179X_ADD(MB8877_TAG, fdc_intf)
+	MCFG_FLOPPY_2_DRIVES_ADD(bullet_floppy_config)
+	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
+	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
 	
 	// internal ram
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("128K")
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("128K")
 MACHINE_CONFIG_END
 
 

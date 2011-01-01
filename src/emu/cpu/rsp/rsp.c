@@ -30,7 +30,7 @@ CPU_DISASSEMBLE( rsp );
 
 extern offs_t rsp_dasm_one(char *buffer, offs_t pc, UINT32 op);
 
-INLINE rsp_state *get_safe_token(running_device *device)
+INLINE rsp_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == RSP);
@@ -303,7 +303,7 @@ static CPU_INIT( rsp )
 #endif
 
 	// ...except for the accumulators.
-	// We're not calling mame_rand() because initializing something with mame_rand()
+	// We're not calling machine->rand() because initializing something with machine->rand()
 	//   makes me retch uncontrollably.
 	for(accumIdx = 0; accumIdx < 8; accumIdx++ )
 	{
@@ -1710,8 +1710,8 @@ static void handle_vector_ops(rsp_state *rsp, UINT32 op)
 					}
 					break;
 				}
-				default:	//fatalerror("RSP: VSAW: el = %d\n", EL);//потупим
-					printf("RSP: VSAW: el = %d\n", EL);//мой код
+				default:	//fatalerror("RSP: VSAW: el = %d\n", EL);//???????
+					printf("RSP: VSAW: el = %d\n", EL);//??? ???
 					exit(0);
 			}
 			break;
@@ -1810,7 +1810,7 @@ static void handle_vector_ops(rsp_state *rsp, UINT32 op)
 			int sel;
 			rsp->flag[1] = 0;
 
-			for (i=0; i < 8; i++)//переписано мной
+			for (i=0; i < 8; i++)//?????????? ????
 			{
 				sel = VEC_EL_2(EL, i);
 
@@ -2151,7 +2151,7 @@ static void handle_vector_ops(rsp_state *rsp, UINT32 op)
 				}
 				else
 				{
-					vres[i] = VREG_S(VS2REG, sel);//моё исправление
+					vres[i] = VREG_S(VS2REG, sel);//??? ???????????
 				}
 
 				ACCUM_L(i) = vres[i];
@@ -2292,7 +2292,7 @@ static void handle_vector_ops(rsp_state *rsp, UINT32 op)
 			{
 				for (i = 0; i < 32; i++)
 				{
-					if (datainput & (1 << ((~i) & 0x1f)))//т.ж.что 31 - i
+					if (datainput & (1 << ((~i) & 0x1f)))//?.?.??? 31 - i
 					{
 						shifter = i;
 						break;
@@ -2377,7 +2377,7 @@ static void handle_vector_ops(rsp_state *rsp, UINT32 op)
 			{
 				for (i = 0; i < 32; i++)
 				{
-					if (datainput & (1 << ((~i) & 0x1f)))//т.ж.что 31 - i
+					if (datainput & (1 << ((~i) & 0x1f)))//?.?.??? 31 - i
 					{
 						shifter = i;
 						break;
@@ -2493,7 +2493,7 @@ static void handle_vector_ops(rsp_state *rsp, UINT32 op)
 			{
 				for (i = 0; i < 32; i++)
 				{
-					if (datainput & (1 << ((~i) & 0x1f)))//т.ж.что 31 - i
+					if (datainput & (1 << ((~i) & 0x1f)))//?.?.??? 31 - i
 					{
 						shifter = i;
 						break;
@@ -3123,19 +3123,19 @@ CPU_GET_INFO( rsp )
 	}
 }
 
-void rspdrc_set_options(running_device *device, UINT32 options)
+void rspdrc_set_options(device_t *device, UINT32 options)
 {
 }
 
-void rspdrc_add_imem(running_device *device, void *base)
+void rspdrc_add_imem(device_t *device, void *base)
 {
 }
 
-void rspdrc_add_dmem(running_device *device, void *base)
+void rspdrc_add_dmem(device_t *device, void *base)
 {
 }
 
-void rspdrc_flush_drc_cache(running_device *device)
+void rspdrc_flush_drc_cache(device_t *device)
 {
 }
 

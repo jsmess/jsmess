@@ -49,8 +49,8 @@ MACHINE_RESET( cgenie )
 {
 	cgenie_state *state = machine->driver_data<cgenie_state>();
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	running_device *ay8910 = machine->device("ay8910");
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	device_t *ay8910 = machine->device("ay8910");
+	UINT8 *ROM = machine->region("maincpu")->base();
 
 	/* reset the AY8910 to be quiet, since the cgenie BIOS doesn't */
 	AYWriteReg(0, 0, 0);
@@ -101,7 +101,7 @@ MACHINE_RESET( cgenie )
 	{
 		memory_nop_readwrite(space, 0xc000, 0xdfff, 0, 0);
 		logerror("cgenie DOS disabled\n");
-		memset(&memory_region(machine, "maincpu")[0x0c000], 0x00, 0x2000);
+		memset(&machine->region("maincpu")->base()[0x0c000], 0x00, 0x2000);
 	}
 
 	/* copy EXT ROM, if enabled or wipe out that memory area */
@@ -109,14 +109,14 @@ MACHINE_RESET( cgenie )
 	{
 		memory_install_rom(space, 0xe000, 0xefff, 0, 0, 0); // mess 0135u3 need to check
 		logerror("cgenie EXT enabled\n");
-		memcpy(&memory_region(machine, "maincpu")[0x0e000],
-			   &memory_region(machine, "maincpu")[0x12000], 0x1000);
+		memcpy(&machine->region("maincpu")->base()[0x0e000],
+			   &machine->region("maincpu")->base()[0x12000], 0x1000);
 	}
 	else
 	{
 		memory_nop_readwrite(space, 0xe000, 0xefff, 0, 0);
 		logerror("cgenie EXT disabled\n");
-		memset(&memory_region(machine, "maincpu")[0x0e000], 0x00, 0x1000);
+		memset(&machine->region("maincpu")->base()[0x0e000], 0x00, 0x1000);
 	}
 
 	state->cass_level = 0;
@@ -127,7 +127,7 @@ MACHINE_START( cgenie )
 {
 	cgenie_state *state = machine->driver_data<cgenie_state>();
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	UINT8 *gfx = memory_region(machine, "gfx2");
+	UINT8 *gfx = machine->region("gfx2")->base();
 	int i;
 
 	/* initialize static variables */
@@ -334,7 +334,7 @@ WRITE8_HANDLER( cgenie_psg_port_b_w )
 
  READ8_HANDLER( cgenie_status_r )
 {
-	running_device *fdc = space->machine->device("wd179x");
+	device_t *fdc = space->machine->device("wd179x");
 	/* If the floppy isn't emulated, return 0 */
 	if( (input_port_read(space->machine, "DSW0") & 0x80) == 0 )
 		return 0;
@@ -343,7 +343,7 @@ WRITE8_HANDLER( cgenie_psg_port_b_w )
 
  READ8_HANDLER( cgenie_track_r )
 {
-	running_device *fdc = space->machine->device("wd179x");
+	device_t *fdc = space->machine->device("wd179x");
 	/* If the floppy isn't emulated, return 0xff */
 	if( (input_port_read(space->machine, "DSW0") & 0x80) == 0 )
 		return 0xff;
@@ -352,7 +352,7 @@ WRITE8_HANDLER( cgenie_psg_port_b_w )
 
  READ8_HANDLER( cgenie_sector_r )
 {
-	running_device *fdc = space->machine->device("wd179x");
+	device_t *fdc = space->machine->device("wd179x");
 	/* If the floppy isn't emulated, return 0xff */
 	if( (input_port_read(space->machine, "DSW0") & 0x80) == 0 )
 		return 0xff;
@@ -361,7 +361,7 @@ WRITE8_HANDLER( cgenie_psg_port_b_w )
 
  READ8_HANDLER(cgenie_data_r )
 {
-	running_device *fdc = space->machine->device("wd179x");
+	device_t *fdc = space->machine->device("wd179x");
 	/* If the floppy isn't emulated, return 0xff */
 	if( (input_port_read(space->machine, "DSW0") & 0x80) == 0 )
 		return 0xff;
@@ -370,7 +370,7 @@ WRITE8_HANDLER( cgenie_psg_port_b_w )
 
 WRITE8_HANDLER( cgenie_command_w )
 {
-	running_device *fdc = space->machine->device("wd179x");
+	device_t *fdc = space->machine->device("wd179x");
 	/* If the floppy isn't emulated, return immediately */
 	if( (input_port_read(space->machine, "DSW0") & 0x80) == 0 )
 		return;
@@ -379,7 +379,7 @@ WRITE8_HANDLER( cgenie_command_w )
 
 WRITE8_HANDLER( cgenie_track_w )
 {
-	running_device *fdc = space->machine->device("wd179x");
+	device_t *fdc = space->machine->device("wd179x");
 	/* If the floppy isn't emulated, ignore the write */
 	if( (input_port_read(space->machine, "DSW0") & 0x80) == 0 )
 		return;
@@ -388,7 +388,7 @@ WRITE8_HANDLER( cgenie_track_w )
 
 WRITE8_HANDLER( cgenie_sector_w )
 {
-	running_device *fdc = space->machine->device("wd179x");
+	device_t *fdc = space->machine->device("wd179x");
 	/* If the floppy isn't emulated, ignore the write */
 	if( (input_port_read(space->machine, "DSW0") & 0x80) == 0 )
 		return;
@@ -397,7 +397,7 @@ WRITE8_HANDLER( cgenie_sector_w )
 
 WRITE8_HANDLER( cgenie_data_w )
 {
-	running_device *fdc = space->machine->device("wd179x");
+	device_t *fdc = space->machine->device("wd179x");
 	/* If the floppy isn't emulated, ignore the write */
 	if( (input_port_read(space->machine, "DSW0") & 0x80) == 0 )
 		return;
@@ -455,7 +455,7 @@ const wd17xx_interface cgenie_wd17xx_interface =
 WRITE8_HANDLER( cgenie_motor_w )
 {
 	cgenie_state *state = space->machine->driver_data<cgenie_state>();
-	running_device *fdc = space->machine->device("wd179x");
+	device_t *fdc = space->machine->device("wd179x");
 	UINT8 drive = 255;
 
 	logerror("cgenie motor_w $%02X\n", data);

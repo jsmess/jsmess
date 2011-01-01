@@ -169,7 +169,7 @@ Language
 #include "sound/sn76496.h"
 
 
-static void appoooh_adpcm_int(running_device *device)
+static void appoooh_adpcm_int(device_t *device)
 {
 	appoooh_state *state = device->machine->driver_data<appoooh_state>();
 
@@ -177,7 +177,7 @@ static void appoooh_adpcm_int(running_device *device)
 	{
 		if (state->adpcm_data == 0xffffffff)
 		{
-			UINT8 *RAM = memory_region(device->machine, "adpcm");
+			UINT8 *RAM = device->machine->region("adpcm")->base();
 
 			state->adpcm_data = RAM[state->adpcm_address++];
 			msm5205_data_w(device, state->adpcm_data >> 4);
@@ -424,65 +424,65 @@ static MACHINE_RESET( appoooh )
 static MACHINE_CONFIG_START( appoooh_common, appoooh_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80,18432000/6)	/* ??? the main xtal is 18.432 MHz */
-	MDRV_CPU_PROGRAM_MAP(main_map)
-	MDRV_CPU_IO_MAP(main_portmap)
-	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
+	MCFG_CPU_ADD("maincpu", Z80,18432000/6)	/* ??? the main xtal is 18.432 MHz */
+	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_CPU_IO_MAP(main_portmap)
+	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
-	MDRV_MACHINE_START(appoooh)
-	MDRV_MACHINE_RESET(appoooh)
+	MCFG_MACHINE_START(appoooh)
+	MCFG_MACHINE_RESET(appoooh)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("sn1", SN76489, 18432000/6)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	MCFG_SOUND_ADD("sn1", SN76489, 18432000/6)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MDRV_SOUND_ADD("sn2", SN76489, 18432000/6)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	MCFG_SOUND_ADD("sn2", SN76489, 18432000/6)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MDRV_SOUND_ADD("sn3", SN76489, 18432000/6)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	MCFG_SOUND_ADD("sn3", SN76489, 18432000/6)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MDRV_SOUND_ADD("msm", MSM5205, 384000)
-	MDRV_SOUND_CONFIG(msm5205_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("msm", MSM5205, 384000)
+	MCFG_SOUND_CONFIG(msm5205_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( appoooh, appoooh_common )
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(appoooh)
-	MDRV_PALETTE_LENGTH(32*8+32*8)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_GFXDECODE(appoooh)
+	MCFG_PALETTE_LENGTH(32*8+32*8)
 
-	MDRV_PALETTE_INIT(appoooh)
-	MDRV_VIDEO_START(appoooh)
-	MDRV_VIDEO_UPDATE(appoooh)
+	MCFG_PALETTE_INIT(appoooh)
+	MCFG_VIDEO_START(appoooh)
+	MCFG_VIDEO_UPDATE(appoooh)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( robowres, appoooh_common )
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(robowres)
-	MDRV_PALETTE_LENGTH(32*8+32*8)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_GFXDECODE(robowres)
+	MCFG_PALETTE_LENGTH(32*8+32*8)
 
-	MDRV_PALETTE_INIT(robowres)
-	MDRV_VIDEO_START(appoooh)
-	MDRV_VIDEO_UPDATE(robowres)
+	MCFG_PALETTE_INIT(robowres)
+	MCFG_VIDEO_START(appoooh)
+	MCFG_VIDEO_UPDATE(robowres)
 MACHINE_CONFIG_END
 
 /*************************************
@@ -597,7 +597,7 @@ static DRIVER_INIT(robowres)
 static DRIVER_INIT(robowresb)
 {
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	space->set_decrypted_region(0x0000, 0x7fff, memory_region(machine, "maincpu") + 0x1c000);
+	space->set_decrypted_region(0x0000, 0x7fff, machine->region("maincpu")->base() + 0x1c000);
 }
 
 

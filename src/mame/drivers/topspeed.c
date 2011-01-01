@@ -371,7 +371,7 @@ static READ16_HANDLER( topspeed_motor_r )
 	switch (offset)
 	{
 		case 0x0:
-			return (mame_rand(space->machine) & 0xff);	/* motor status ?? */
+			return (space->machine->rand() & 0xff);	/* motor status ?? */
 
 		case 0x101:
 			return 0x55;	/* motor cpu status ? */
@@ -406,7 +406,7 @@ static WRITE8_DEVICE_HANDLER( sound_bankswitch_w )	/* assumes Z80 sandwiched bet
 	reset_sound_region(device->machine);
 }
 
-static void topspeed_msm5205_vck( running_device *device )
+static void topspeed_msm5205_vck( device_t *device )
 {
 	topspeed_state *state = device->machine->driver_data<topspeed_state>();
 	if (state->adpcm_data != -1)
@@ -416,7 +416,7 @@ static void topspeed_msm5205_vck( running_device *device )
 	}
 	else
 	{
-		state->adpcm_data = memory_region(device->machine, "adpcm")[state->adpcm_pos];
+		state->adpcm_data = device->machine->region("adpcm")->base()[state->adpcm_pos];
 		state->adpcm_pos = (state->adpcm_pos + 1) & 0x1ffff;
 		msm5205_data_w(device, state->adpcm_data >> 4);
 	}
@@ -617,7 +617,7 @@ GFXDECODE_END
 
 /* handler called by the YM2151 emulator when the internal timers cause an IRQ */
 
-static void irq_handler( running_device *device, int irq )	/* assumes Z80 sandwiched between 68Ks */
+static void irq_handler( device_t *device, int irq )	/* assumes Z80 sandwiched between 68Ks */
 {
 	topspeed_state *state = device->machine->driver_data<topspeed_state>();
 	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
@@ -650,7 +650,7 @@ static MACHINE_START( topspeed )
 {
 	topspeed_state *state = machine->driver_data<topspeed_state>();
 
-	memory_configure_bank(machine, "bank10", 0, 4, memory_region(machine, "audiocpu") + 0xc000, 0x4000);
+	memory_configure_bank(machine, "bank10", 0, 4, machine->region("audiocpu")->base() + 0xc000, 0x4000);
 
 	state->maincpu = machine->device("maincpu");
 	state->subcpu = machine->device("sub");
@@ -696,51 +696,51 @@ static const tc0140syt_interface topspeed_tc0140syt_intf =
 static MACHINE_CONFIG_START( topspeed, topspeed_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* 12 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(topspeed_map)
-	MDRV_CPU_VBLANK_INT("screen", topspeed_interrupt)
+	MCFG_CPU_ADD("maincpu", M68000, 12000000)	/* 12 MHz ??? */
+	MCFG_CPU_PROGRAM_MAP(topspeed_map)
+	MCFG_CPU_VBLANK_INT("screen", topspeed_interrupt)
 
-	MDRV_CPU_ADD("audiocpu", Z80,16000000/4)	/* 4 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(z80_map)
+	MCFG_CPU_ADD("audiocpu", Z80,16000000/4)	/* 4 MHz ??? */
+	MCFG_CPU_PROGRAM_MAP(z80_map)
 
-	MDRV_CPU_ADD("sub", M68000, 12000000)	/* 12 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(topspeed_cpub_map)
-	MDRV_CPU_VBLANK_INT("screen", topspeed_cpub_interrupt)
+	MCFG_CPU_ADD("sub", M68000, 12000000)	/* 12 MHz ??? */
+	MCFG_CPU_PROGRAM_MAP(topspeed_cpub_map)
+	MCFG_CPU_VBLANK_INT("screen", topspeed_cpub_interrupt)
 
-	MDRV_MACHINE_START(topspeed)
-	MDRV_MACHINE_RESET(topspeed)
+	MCFG_MACHINE_START(topspeed)
+	MCFG_MACHINE_RESET(topspeed)
 
-	MDRV_TC0220IOC_ADD("tc0220ioc", topspeed_io_intf)
+	MCFG_TC0220IOC_ADD("tc0220ioc", topspeed_io_intf)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(40*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 32*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(40*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 32*8-1)
 
-	MDRV_GFXDECODE(topspeed)
-	MDRV_PALETTE_LENGTH(8192)
+	MCFG_GFXDECODE(topspeed)
+	MCFG_PALETTE_LENGTH(8192)
 
-	MDRV_VIDEO_UPDATE(topspeed)
+	MCFG_VIDEO_UPDATE(topspeed)
 
-	MDRV_PC080SN_ADD("pc080sn_1", topspeed_pc080sn_intf)
-	MDRV_PC080SN_ADD("pc080sn_2", topspeed_pc080sn_intf)
+	MCFG_PC080SN_ADD("pc080sn_1", topspeed_pc080sn_intf)
+	MCFG_PC080SN_ADD("pc080sn_2", topspeed_pc080sn_intf)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM2151, 4000000)
-	MDRV_SOUND_CONFIG(ym2151_config)
-	MDRV_SOUND_ROUTE(0, "mono", 0.30)
-	MDRV_SOUND_ROUTE(1, "mono", 0.30)
+	MCFG_SOUND_ADD("ymsnd", YM2151, 4000000)
+	MCFG_SOUND_CONFIG(ym2151_config)
+	MCFG_SOUND_ROUTE(0, "mono", 0.30)
+	MCFG_SOUND_ROUTE(1, "mono", 0.30)
 
-	MDRV_SOUND_ADD("msm", MSM5205, 384000)
-	MDRV_SOUND_CONFIG(msm5205_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
+	MCFG_SOUND_ADD("msm", MSM5205, 384000)
+	MCFG_SOUND_CONFIG(msm5205_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 
-	MDRV_TC0140SYT_ADD("tc0140syt", topspeed_tc0140syt_intf)
+	MCFG_TC0140SYT_ADD("tc0140syt", topspeed_tc0140syt_intf)
 MACHINE_CONFIG_END
 
 

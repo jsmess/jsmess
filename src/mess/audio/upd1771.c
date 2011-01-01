@@ -124,7 +124,7 @@ struct _upd1771_state
 };
 
 
-INLINE upd1771_state *get_safe_token(running_device *device)
+INLINE upd1771_state *get_safe_token(device_t *device)
 {
     assert(device != NULL);
     assert(device->type() == UPD1771C);
@@ -334,7 +334,7 @@ static STREAM_UPDATE( upd1771c_update )
 
 static TIMER_CALLBACK( upd1771c_callback )
 {
-    running_device *device = (running_device *)ptr;
+    device_t *device = (device_t *)ptr;
     upd1771_state *state = get_safe_token( device );
 
     devcb_call_write_line( &state->ack_out_func, 1 );

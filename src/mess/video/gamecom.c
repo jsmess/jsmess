@@ -6,7 +6,7 @@
 
 static TIMER_CALLBACK( gamecom_scanline ) {
 	gamecom_state *state = machine->driver_data<gamecom_state>();
-	UINT8 * RAM = memory_region(machine, "maincpu");
+	UINT8 * RAM = machine->region("maincpu")->base();
 	// draw line
 	if ( state->scanline == 0 ) {
 		state->base_address = ( RAM[SM8521_LCDC] & 0x40 ) ? 0x2000 : 0x0000;

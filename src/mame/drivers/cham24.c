@@ -172,11 +172,11 @@ static WRITE8_HANDLER( cham24_mapper_w )
 	UINT32 prg_bank_page_size = (offset >> 12) & 0x01;
 	UINT32 gfx_mirroring = (offset >> 13) & 0x01;
 
-	UINT8* dst = memory_region(space->machine, "maincpu");
-	UINT8* src = memory_region(space->machine, "user1");
+	UINT8* dst = space->machine->region("maincpu")->base();
+	UINT8* src = space->machine->region("user1")->base();
 
 	// switch PPU VROM bank
-	memory_set_bankptr(space->machine, "bank1", memory_region(space->machine, "gfx1") + (0x2000 * gfx_bank));
+	memory_set_bankptr(space->machine, "bank1", space->machine->region("gfx1")->base() + (0x2000 * gfx_bank));
 
 	// set gfx mirroring
 	cham24_set_mirroring(gfx_mirroring != 0 ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
@@ -251,7 +251,7 @@ static PALETTE_INIT( cham24 )
 	ppu2c0x_init_palette(machine, 0);
 }
 
-static void ppu_irq( running_device *device, int *ppu_regs )
+static void ppu_irq( device_t *device, int *ppu_regs )
 {
 	cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
 }
@@ -280,15 +280,15 @@ static VIDEO_UPDATE( cham24 )
 static MACHINE_START( cham24 )
 {
 	/* switch PRG rom */
-	UINT8* dst = memory_region(machine, "maincpu");
-	UINT8* src = memory_region(machine, "user1");
+	UINT8* dst = machine->region("maincpu")->base();
+	UINT8* src = machine->region("user1")->base();
 
 	memcpy(&dst[0x8000], &src[0x0f8000], 0x4000);
 	memcpy(&dst[0xc000], &src[0x0f8000], 0x4000);
 
 	/* uses 8K swapping, all ROM!*/
 	memory_install_read_bank(cpu_get_address_space(machine->device("ppu"), ADDRESS_SPACE_PROGRAM), 0x0000, 0x1fff, 0, 0, "bank1");
-	memory_set_bankptr(machine, "bank1", memory_region(machine, "gfx1"));
+	memory_set_bankptr(machine, "bank1", machine->region("gfx1")->base());
 
 	/* need nametable ram, though. I doubt this uses more than 2k, but it starts up configured for 4 */
 	nt_ram = auto_alloc_array(machine, UINT8, 0x1000);
@@ -311,37 +311,37 @@ GFXDECODE_END
 
 static MACHINE_CONFIG_START( cham24, driver_device )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", N2A03, N2A03_DEFAULTCLOCK)
-	MDRV_CPU_PROGRAM_MAP(cham24_map)
+	MCFG_CPU_ADD("maincpu", N2A03, N2A03_DEFAULTCLOCK)
+	MCFG_CPU_PROGRAM_MAP(cham24_map)
 
-	MDRV_MACHINE_RESET( cham24 )
-	MDRV_MACHINE_START( cham24 )
+	MCFG_MACHINE_RESET( cham24 )
+	MCFG_MACHINE_START( cham24 )
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 262)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 262)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
 
-	MDRV_GFXDECODE(cham24)
-	MDRV_PALETTE_LENGTH(8*4*16)
+	MCFG_GFXDECODE(cham24)
+	MCFG_PALETTE_LENGTH(8*4*16)
 
-	MDRV_PALETTE_INIT(cham24)
-	MDRV_VIDEO_START(cham24)
-	MDRV_VIDEO_UPDATE(cham24)
+	MCFG_PALETTE_INIT(cham24)
+	MCFG_VIDEO_START(cham24)
+	MCFG_VIDEO_UPDATE(cham24)
 
-	MDRV_PPU2C04_ADD("ppu", ppu_interface)
+	MCFG_PPU2C04_ADD("ppu", ppu_interface)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("nes", NES, N2A03_DEFAULTCLOCK)
-	MDRV_SOUND_CONFIG(cham24_interface_1)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("nes", NES, N2A03_DEFAULTCLOCK)
+	MCFG_SOUND_CONFIG(cham24_interface_1)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD("dac", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 ROM_START( cham24 )

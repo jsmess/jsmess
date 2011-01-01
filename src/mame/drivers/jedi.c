@@ -162,7 +162,7 @@ static MACHINE_START( jedi )
 	timer_adjust_oneshot(state->interrupt_timer, machine->primary_screen->time_until_pos(32), 32);
 
 	/* configure the banks */
-	memory_configure_bank(machine, "bank1", 0, 3, memory_region(machine, "maincpu") + 0x10000, 0x4000);
+	memory_configure_bank(machine, "bank1", 0, 3, machine->region("maincpu")->base() + 0x10000, 0x4000);
 
 	/* set up save state */
 	state_save_register_global(machine, state->nvram_enabled);
@@ -345,20 +345,20 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( jedi, jedi_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6502, JEDI_MAIN_CPU_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(main_map)
+	MCFG_CPU_ADD("maincpu", M6502, JEDI_MAIN_CPU_CLOCK)
+	MCFG_CPU_PROGRAM_MAP(main_map)
 
-	MDRV_QUANTUM_TIME(HZ(240))
+	MCFG_QUANTUM_TIME(HZ(240))
 
-	MDRV_MACHINE_START(jedi)
-	MDRV_MACHINE_RESET(jedi)
-	MDRV_NVRAM_ADD_0FILL("nvram")
+	MCFG_MACHINE_START(jedi)
+	MCFG_MACHINE_RESET(jedi)
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
-	MDRV_FRAGMENT_ADD(jedi_video)
+	MCFG_FRAGMENT_ADD(jedi_video)
 
 	/* audio hardware */
-	MDRV_FRAGMENT_ADD(jedi_audio)
+	MCFG_FRAGMENT_ADD(jedi_audio)
 MACHINE_CONFIG_END
 
 

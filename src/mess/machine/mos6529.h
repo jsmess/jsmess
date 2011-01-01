@@ -32,9 +32,9 @@
 
 DECLARE_LEGACY_DEVICE(MOS6529, mos6529);
 
-#define MDRV_MOS6529_ADD(_tag, _clock, _config) \
-	MDRV_DEVICE_ADD((_tag), MOS6529, _clock)	\
-	MDRV_DEVICE_CONFIG(_config)
+#define MCFG_MOS6529_ADD(_tag, _clock, _config) \
+	MCFG_DEVICE_ADD((_tag), MOS6529, _clock)	\
+	MCFG_DEVICE_CONFIG(_config)
 
 #define MOS6529_INTERFACE(name) \
 	const mos6529_interface (name) =

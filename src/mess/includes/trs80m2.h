@@ -45,11 +45,11 @@ public:
 	int enable_rtc_int;
 
 	/* devices */
-	running_device *z80ctc;
-	running_device *z80pio;
-	running_device *mc6845;
-	running_device *centronics;
-	running_device *floppy;
+	device_t *z80ctc;
+	device_t *z80pio;
+	device_t *mc6845;
+	device_t *centronics;
+	device_t *floppy;
 };
 
 #endif

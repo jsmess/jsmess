@@ -18,9 +18,9 @@
 
 DECLARE_LEGACY_DEVICE(CBM_IEC, cbm_iec);
 
-#define MDRV_CBM_IEC_ADD(_tag, _daisy_chain) \
-	MDRV_DEVICE_ADD(_tag, CBM_IEC, 0) \
-	MDRV_DEVICE_CONFIG(_daisy_chain)
+#define MCFG_CBM_IEC_ADD(_tag, _daisy_chain) \
+	MCFG_DEVICE_ADD(_tag, CBM_IEC, 0) \
+	MCFG_DEVICE_CONFIG(_daisy_chain)
 
 #define CBM_IEC_DAISY(_name) \
 	const cbm_iec_daisy_chain (_name)[] =
@@ -45,23 +45,23 @@ struct _cbm_iec_daisy_chain
     PROTOTYPES
 ***************************************************************************/
 /* service request */
-void cbm_iec_srq_w(running_device *iec, running_device *device, int state);
+void cbm_iec_srq_w(device_t *iec, device_t *device, int state);
 READ_LINE_DEVICE_HANDLER( cbm_iec_srq_r );
 
 /* attention */
-void cbm_iec_atn_w(running_device *iec, running_device *device, int state);
+void cbm_iec_atn_w(device_t *iec, device_t *device, int state);
 READ_LINE_DEVICE_HANDLER( cbm_iec_atn_r );
 
 /* clock */
-void cbm_iec_clk_w(running_device *iec, running_device *device, int state);
+void cbm_iec_clk_w(device_t *iec, device_t *device, int state);
 READ_LINE_DEVICE_HANDLER( cbm_iec_clk_r );
 
 /* data */
-void cbm_iec_data_w(running_device *iec, running_device *device, int state);
+void cbm_iec_data_w(device_t *iec, device_t *device, int state);
 READ_LINE_DEVICE_HANDLER( cbm_iec_data_r );
 
 /* reset */
-void cbm_iec_reset_w(running_device *iec, running_device *device, int state);
+void cbm_iec_reset_w(device_t *iec, device_t *device, int state);
 READ_LINE_DEVICE_HANDLER( cbm_iec_reset_r );
 
 #endif

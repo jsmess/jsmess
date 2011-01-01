@@ -39,20 +39,20 @@ enum
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MDRV_ASC_ADD(_tag, _clock, _type, _irqf) \
-	MDRV_DEVICE_ADD(_tag, ASC, _clock) \
-	MDRV_ASC_TYPE(_type) \
-	MDRV_IRQ_FUNC(_irqf)
+#define MCFG_ASC_ADD(_tag, _clock, _type, _irqf) \
+	MCFG_DEVICE_ADD(_tag, ASC, _clock) \
+	MCFG_ASC_TYPE(_type) \
+	MCFG_IRQ_FUNC(_irqf)
 
-#define MDRV_ASC_REPLACE(_tag, _clock, _type, _irqf) \
-	MDRV_DEVICE_REPLACE(_tag, ASC, _clock) \
-	MDRV_ASC_TYPE(_type) \
-	MDRV_IRQ_FUNC(_irqf)
+#define MCFG_ASC_REPLACE(_tag, _clock, _type, _irqf) \
+	MCFG_DEVICE_REPLACE(_tag, ASC, _clock) \
+	MCFG_ASC_TYPE(_type) \
+	MCFG_IRQ_FUNC(_irqf)
 
-#define MDRV_ASC_TYPE(_type) \
+#define MCFG_ASC_TYPE(_type) \
 	asc_device_config::static_set_type(device, _type); \
 
-#define MDRV_IRQ_FUNC(_irqf) \
+#define MCFG_IRQ_FUNC(_irqf) \
 	asc_device_config::static_set_irqf(device, _irqf); \
 
 
@@ -76,12 +76,12 @@ public:
 
 	// inline configuration helpers
 	static void static_set_type(device_config *device, int type);
-	static void static_set_irqf(device_config *device, void (*irqf)(running_device *device, int state));
+	static void static_set_irqf(device_config *device, void (*irqf)(device_t *device, int state));
 
 protected:
 	// inline data
 	UINT8			m_type;
-	void (*m_irq_func)(running_device *device, int state);
+	void (*m_irq_func)(device_t *device, int state);
 };
 
 
@@ -134,7 +134,7 @@ protected:
 	const asc_device_config &m_config;
 
 	UINT8	m_chip_type;
-	void (*m_irq_cb)(running_device *device, int state);
+	void (*m_irq_cb)(device_t *device, int state);
 
 	UINT8	m_fifo_a[0x400];
 	UINT8	m_fifo_b[0x400];

@@ -18,10 +18,10 @@
 
 DECLARE_LEGACY_DEVICE(C1551, c1551);
 
-#define MDRV_C1551_ADD(_tag, _cpu_tag, _address) \
-	MDRV_DEVICE_ADD(_tag, C1551, 0) \
-	MDRV_DEVICE_CONFIG_DATAPTR(c1551_config, cpu_tag, _cpu_tag) \
-	MDRV_DEVICE_CONFIG_DATA32(c1551_config, address, _address)
+#define MCFG_C1551_ADD(_tag, _cpu_tag, _address) \
+	MCFG_DEVICE_ADD(_tag, C1551, 0) \
+	MCFG_DEVICE_CONFIG_DATAPTR(c1551_config, cpu_tag, _cpu_tag) \
+	MCFG_DEVICE_CONFIG_DATA32(c1551_config, address, _address)
 
 /***************************************************************************
     TYPE DEFINITIONS

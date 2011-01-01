@@ -34,7 +34,7 @@ static int amiga_cart_type;
 
 static int check_kickstart_12_13( running_machine *machine, const char *cart_name )
 {
-	UINT16 * ksmem = (UINT16 *)memory_region( machine, "user1" );
+	UINT16 * ksmem = (UINT16 *)machine->region( "user1" )->base();
 
 	if ( ksmem[2] == 0x00FC )
 		return 1;
@@ -155,7 +155,7 @@ static void amiga_ar1_init( running_machine *machine )
 	memory_install_readwrite_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x9fc000, 0x9fffff, 0, 0, "bank3");
 
 	/* Configure Banks */
-	memory_set_bankptr(machine, "bank2", memory_region(machine, "user2"));
+	memory_set_bankptr(machine, "bank2", machine->region("user2")->base());
 	memory_set_bankptr(machine, "bank3", ar_ram);
 
 	amiga_ar1_spurious = 0;
@@ -219,7 +219,7 @@ static WRITE16_HANDLER( amiga_ar23_mode_w )
 static READ16_HANDLER( amiga_ar23_mode_r )
 {
 	amiga_state *state = space->machine->driver_data<amiga_state>();
-	UINT16 *mem = (UINT16 *)memory_region( space->machine, "user2" );
+	UINT16 *mem = (UINT16 *)space->machine->region( "user2" )->base();
 
 	if ( ACCESSING_BITS_0_7 )
 	{
@@ -380,12 +380,12 @@ static void amiga_ar23_init( running_machine *machine, int ar3 )
 	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x400000, 0x400003, 0, mirror, amiga_ar23_mode_w);
 
 	/* Configure Banks */
-	memory_set_bankptr(machine, "bank2", memory_region(machine, "user2"));
+	memory_set_bankptr(machine, "bank2", machine->region("user2")->base());
 	memory_set_bankptr(machine, "bank3", ar_ram);
 
 	memory_configure_bank(machine, "bank1", 0, 2, state->chip_ram, 0);
-	memory_configure_bank(machine, "bank1", 1, 2, memory_region(machine, "user1"), 0);
-	memory_configure_bank(machine, "bank1", 2, 2, memory_region(machine, "user2"), 0);
+	memory_configure_bank(machine, "bank1", 1, 2, machine->region("user1")->base(), 0);
+	memory_configure_bank(machine, "bank1", 2, 2, machine->region("user2")->base(), 0);
 
 	amiga_ar23_mode = 3;
 }
@@ -399,7 +399,7 @@ static void amiga_ar23_init( running_machine *machine, int ar3 )
 void amiga_cart_init( running_machine *machine )
 {
 	/* see what is there */
-	UINT16 *mem = (UINT16 *)memory_region( machine, "user2" );
+	UINT16 *mem = (UINT16 *)machine->region( "user2" )->base();
 
 	amiga_cart_type = -1;
 

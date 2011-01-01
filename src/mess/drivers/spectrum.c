@@ -295,7 +295,7 @@ SamRam
 WRITE8_HANDLER(spectrum_port_fe_w)
 {
 	spectrum_state *state = space->machine->driver_data<spectrum_state>();
-	running_device *speaker = space->machine->device("speaker");
+	device_t *speaker = space->machine->device("speaker");
 	unsigned char Changed;
 
 	Changed = state->port_fe_data^data;
@@ -690,7 +690,7 @@ static DEVICE_IMAGE_LOAD( spectrum_cart )
 			return IMAGE_INIT_FAIL;
 		}
 
-		if (image.fread(memory_region(image.device().machine, "maincpu"), filesize) != filesize)
+		if (image.fread(image.device().machine->region("maincpu")->base(), filesize) != filesize)
 		{
 			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Error loading file");
 			return IMAGE_INIT_FAIL;
@@ -699,7 +699,7 @@ static DEVICE_IMAGE_LOAD( spectrum_cart )
 	else
 	{
 		filesize = image.get_software_region_length("rom");
-		memcpy(memory_region(image.device().machine, "maincpu"), image.get_software_region("rom"), filesize);
+		memcpy(image.device().machine->region("maincpu")->base(), image.get_software_region("rom"), filesize);
 	}
 	return IMAGE_INIT_PASS;
 }
@@ -707,56 +707,56 @@ static DEVICE_IMAGE_LOAD( spectrum_cart )
 MACHINE_CONFIG_START( spectrum_common, spectrum_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, X1 / 4)        /* This is verified only for the ZX Spectum. Other clones are reported to have different clocks */
-	MDRV_CPU_PROGRAM_MAP(spectrum_mem)
-	MDRV_CPU_IO_MAP(spectrum_io)
-	MDRV_CPU_VBLANK_INT("screen", spec_interrupt)
-	MDRV_QUANTUM_TIME(HZ(60))
+	MCFG_CPU_ADD("maincpu", Z80, X1 / 4)        /* This is verified only for the ZX Spectum. Other clones are reported to have different clocks */
+	MCFG_CPU_PROGRAM_MAP(spectrum_mem)
+	MCFG_CPU_IO_MAP(spectrum_io)
+	MCFG_CPU_VBLANK_INT("screen", spec_interrupt)
+	MCFG_QUANTUM_TIME(HZ(60))
 
-	MDRV_MACHINE_RESET( spectrum )
+	MCFG_MACHINE_RESET( spectrum )
 
     /* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(50.08)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(SPEC_SCREEN_WIDTH, SPEC_SCREEN_HEIGHT)
-	MDRV_SCREEN_VISIBLE_AREA(0, SPEC_SCREEN_WIDTH-1, 0, SPEC_SCREEN_HEIGHT-1)
-	MDRV_PALETTE_LENGTH(16)
-	MDRV_PALETTE_INIT( spectrum )
-	MDRV_GFXDECODE(spectrum)
-	MDRV_VIDEO_START( spectrum )
-	MDRV_VIDEO_UPDATE( spectrum )
-	MDRV_VIDEO_EOF( spectrum )
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(50.08)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(SPEC_SCREEN_WIDTH, SPEC_SCREEN_HEIGHT)
+	MCFG_SCREEN_VISIBLE_AREA(0, SPEC_SCREEN_WIDTH-1, 0, SPEC_SCREEN_HEIGHT-1)
+	MCFG_PALETTE_LENGTH(16)
+	MCFG_PALETTE_INIT( spectrum )
+	MCFG_GFXDECODE(spectrum)
+	MCFG_VIDEO_START( spectrum )
+	MCFG_VIDEO_UPDATE( spectrum )
+	MCFG_VIDEO_EOF( spectrum )
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_WAVE_ADD("wave", "cassette")
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MDRV_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_WAVE_ADD("wave", "cassette")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* devices */
-	MDRV_SNAPSHOT_ADD("snapshot", spectrum, "ach,frz,plusd,prg,sem,sit,sna,snp,snx,sp,z80,zx", 0)
-	MDRV_QUICKLOAD_ADD("quickload", spectrum, "raw,scr", 2) // The delay prevents the screen from being cleared by the RAM test at boot
-	MDRV_CASSETTE_ADD( "cassette", spectrum_cassette_config )
+	MCFG_SNAPSHOT_ADD("snapshot", spectrum, "ach,frz,plusd,prg,sem,sit,sna,snp,snx,sp,z80,zx", 0)
+	MCFG_QUICKLOAD_ADD("quickload", spectrum, "raw,scr", 2) // The delay prevents the screen from being cleared by the RAM test at boot
+	MCFG_CASSETTE_ADD( "cassette", spectrum_cassette_config )
 
 	/* cartridge */
-	MDRV_CARTSLOT_ADD("cart")
-	MDRV_CARTSLOT_EXTENSION_LIST("rom")
-	MDRV_CARTSLOT_NOT_MANDATORY
-	MDRV_CARTSLOT_LOAD(spectrum_cart)
-	MDRV_CARTSLOT_INTERFACE("spectrum_cart")
-	MDRV_SOFTWARE_LIST_ADD("cart_list","spectrum")
+	MCFG_CARTSLOT_ADD("cart")
+	MCFG_CARTSLOT_EXTENSION_LIST("rom")
+	MCFG_CARTSLOT_NOT_MANDATORY
+	MCFG_CARTSLOT_LOAD(spectrum_cart)
+	MCFG_CARTSLOT_INTERFACE("spectrum_cart")
+	MCFG_SOFTWARE_LIST_ADD("cart_list","spectrum")
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED( spectrum, spectrum_common )
 
 	/* internal ram */
-	MDRV_RAM_ADD("messram")				// This configuration is verified only for the original ZX Spectrum.
-	MDRV_RAM_DEFAULT_SIZE("48K")		// It's likely, but still to be checked, that many clones were produced only
-	MDRV_RAM_EXTRA_OPTIONS("16K")		// in the 48k configuration, while others have extra memory (80k, 128K, 1024K)
-	MDRV_RAM_DEFAULT_VALUE(0xff)		// available via bankswitching.
+	MCFG_RAM_ADD("messram")				// This configuration is verified only for the original ZX Spectrum.
+	MCFG_RAM_DEFAULT_SIZE("48K")		// It's likely, but still to be checked, that many clones were produced only
+	MCFG_RAM_EXTRA_OPTIONS("16K")		// in the 48k configuration, while others have extra memory (80k, 128K, 1024K)
+	MCFG_RAM_DEFAULT_VALUE(0xff)		// available via bankswitching.
 MACHINE_CONFIG_END
 
 /***************************************************************************

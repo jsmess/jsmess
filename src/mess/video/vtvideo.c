@@ -53,14 +53,14 @@ struct _vt_video_t
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE vt_video_t *get_safe_token(running_device *device)
+INLINE vt_video_t *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 
 	return (vt_video_t *)downcast<legacy_device_base *>(device)->token();
 }
 
-INLINE const vt_video_interface *get_interface(running_device *device)
+INLINE const vt_video_interface *get_interface(device_t *device)
 {
 	assert(device != NULL);
 //  assert((device->type() == dc012));
@@ -71,7 +71,7 @@ INLINE const vt_video_interface *get_interface(running_device *device)
     IMPLEMENTATION
 ***************************************************************************/
 
-static void vt_video_recompute_parameters(running_device *device)
+static void vt_video_recompute_parameters(device_t *device)
 {
 	vt_video_t *vt = get_safe_token(device);
 	int horiz_pix_total = 0;
@@ -177,7 +177,7 @@ WRITE8_DEVICE_HANDLER( vt_video_brightness_w )
 	//palette_set_color_rgb(device->machine, 1, data, data, data);
 }
 
-static void vt_video_display_char(running_device *device,bitmap_t *bitmap, UINT8 code,
+static void vt_video_display_char(device_t *device,bitmap_t *bitmap, UINT8 code,
 	int x, int y,UINT8 scroll_region,UINT8 display_type)
 {
 	UINT8 line=0;
@@ -231,7 +231,7 @@ static void vt_video_display_char(running_device *device,bitmap_t *bitmap, UINT8
 	}
 }
 
-void vt_video_update(running_device *device, bitmap_t *bitmap, const rectangle *cliprect)
+void vt_video_update(device_t *device, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	vt_video_t *vt = get_safe_token(device);
 
@@ -289,7 +289,7 @@ void vt_video_update(running_device *device, bitmap_t *bitmap, const rectangle *
 -------------------------------------------------*/
 static TIMER_CALLBACK(lba7_change)
 {
-	running_device *device = (running_device *)ptr;
+	device_t *device = (device_t *)ptr;
 	vt_video_t *vt = get_safe_token(device);
 
 	vt->lba7 = (vt->lba7) ? 0 : 1;
@@ -308,7 +308,7 @@ static DEVICE_START( vt_video )
 	vt->screen = device->machine->device<screen_device>(intf->screen_tag);
 	assert(vt->screen != NULL);
 
-	vt->gfx = memory_region(device->machine, intf->char_rom_region_tag);
+	vt->gfx = device->machine->region(intf->char_rom_region_tag)->base();
 	assert(vt->gfx != NULL);
 
     // LBA7 is scan line frequency update

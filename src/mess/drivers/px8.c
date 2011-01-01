@@ -88,7 +88,7 @@ static void bankswitch(running_machine *machine)
 	px8_state *state = machine->driver_data<px8_state>();
 	address_space *program = cputag_get_address_space(machine, UPD70008_TAG, ADDRESS_SPACE_PROGRAM);
 	UINT8 *ram = messram_get_ptr(machine->device("messram"));
-	UINT8 *ipl_rom = memory_region(machine, UPD70008_TAG);
+	UINT8 *ipl_rom = machine->region(UPD70008_TAG)->base();
 
 	if (!state->bank0)
 	{
@@ -853,58 +853,58 @@ static MACHINE_RESET( px8 )
 static MACHINE_CONFIG_START( px8, px8_state )
 
 	/* main cpu (uPD70008) */
-	MDRV_CPU_ADD(UPD70008_TAG, Z80, XTAL_CR1 / 4) /* 2.45 MHz */
-	MDRV_CPU_PROGRAM_MAP(px8_mem)
-	MDRV_CPU_IO_MAP(px8_io)
+	MCFG_CPU_ADD(UPD70008_TAG, Z80, XTAL_CR1 / 4) /* 2.45 MHz */
+	MCFG_CPU_PROGRAM_MAP(px8_mem)
+	MCFG_CPU_IO_MAP(px8_io)
 
     /* slave cpu (HD6303) */
-	MDRV_CPU_ADD(HD6303_TAG, M6803, XTAL_CR1 / 4) /* 614 kHz */
-	MDRV_CPU_PROGRAM_MAP(px8_slave_mem)
-	MDRV_CPU_IO_MAP(px8_slave_io)
-	MDRV_DEVICE_DISABLE()
+	MCFG_CPU_ADD(HD6303_TAG, M6803, XTAL_CR1 / 4) /* 614 kHz */
+	MCFG_CPU_PROGRAM_MAP(px8_slave_mem)
+	MCFG_CPU_IO_MAP(px8_slave_io)
+	MCFG_DEVICE_DISABLE()
 
     /* sub CPU (uPD7508) */
-//  MDRV_CPU_ADD(UPD7508_TAG, UPD7508, 200000) /* 200 kHz */
-//  MDRV_CPU_IO_MAP(px8_sub_io)
-//  MDRV_DEVICE_DISABLE()
+//  MCFG_CPU_ADD(UPD7508_TAG, UPD7508, 200000) /* 200 kHz */
+//  MCFG_CPU_IO_MAP(px8_sub_io)
+//  MCFG_DEVICE_DISABLE()
 
-	MDRV_MACHINE_START(px8)
-	MDRV_MACHINE_RESET(px8)
+	MCFG_MACHINE_START(px8)
+	MCFG_MACHINE_RESET(px8)
 
 	/* video hardware */
-	MDRV_DEFAULT_LAYOUT(layout_px8)
+	MCFG_DEFAULT_LAYOUT(layout_px8)
 
-	MDRV_SCREEN_ADD(SCREEN_TAG, LCD)
-	MDRV_SCREEN_REFRESH_RATE(72)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(480, 64)
-	MDRV_SCREEN_VISIBLE_AREA(0, 479, 0, 63)
-	MDRV_GFXDECODE(px8)
-	MDRV_PALETTE_LENGTH(2)
-	MDRV_PALETTE_INIT(px8)
-	MDRV_VIDEO_START(px8)
-	MDRV_VIDEO_UPDATE(px8)
-	MDRV_SED1330_ADD(SED1320_TAG, 0, sed1320_intf)
+	MCFG_SCREEN_ADD(SCREEN_TAG, LCD)
+	MCFG_SCREEN_REFRESH_RATE(72)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(480, 64)
+	MCFG_SCREEN_VISIBLE_AREA(0, 479, 0, 63)
+	MCFG_GFXDECODE(px8)
+	MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_INIT(px8)
+	MCFG_VIDEO_START(px8)
+	MCFG_VIDEO_UPDATE(px8)
+	MCFG_SED1330_ADD(SED1320_TAG, 0, sed1320_intf)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_WAVE_ADD("wave", CASSETTE_TAG)
-	MDRV_SOUND_ROUTE(0, "mono", 0.25)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_WAVE_ADD("wave", CASSETTE_TAG)
+	MCFG_SOUND_ROUTE(0, "mono", 0.25)
 
 	/* cartridge */
-	MDRV_CARTSLOT_ADD("capsule1")
-	MDRV_CARTSLOT_EXTENSION_LIST("bin,rom")
+	MCFG_CARTSLOT_ADD("capsule1")
+	MCFG_CARTSLOT_EXTENSION_LIST("bin,rom")
 
-	MDRV_CARTSLOT_ADD("capsule2")
-	MDRV_CARTSLOT_EXTENSION_LIST("bin,rom")
+	MCFG_CARTSLOT_ADD("capsule2")
+	MCFG_CARTSLOT_EXTENSION_LIST("bin,rom")
 
 	/* devices */
-	MDRV_MSM8251_ADD(I8251_TAG, i8251_intf)
-	MDRV_CASSETTE_ADD(CASSETTE_TAG, px8_cassette_config)
+	MCFG_MSM8251_ADD(I8251_TAG, i8251_intf)
+	MCFG_CASSETTE_ADD(CASSETTE_TAG, px8_cassette_config)
 
 	/* internal ram */
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("64K")
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("64K")
 MACHINE_CONFIG_END
 
 /***************************************************************************

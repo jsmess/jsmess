@@ -895,7 +895,7 @@ static UINT16 vdp_get_word_from_68k_mem_default(running_machine *machine, UINT32
 	else
 	{
 		printf("DMA Read unmapped %06x\n",source);
-		return mame_rand(machine);
+		return machine->rand();
 	}
 
 
@@ -1275,7 +1275,7 @@ static UINT16 megadriv_vdp_data_port_r(running_machine *machine)
 {
 	UINT16 retdata=0;
 
-	//return mame_rand(machine);
+	//return machine->rand();
 
 	megadrive_vdp_command_pending = 0;
 
@@ -1289,12 +1289,12 @@ static UINT16 megadriv_vdp_data_port_r(running_machine *machine)
 
 		case 0x0001:
 			logerror("Attempting to READ from DATA PORT in VRAM WRITE MODE\n");
-			retdata = mame_rand(machine);
+			retdata = machine->rand();
 			break;
 
 		case 0x0003:
 			logerror("Attempting to READ from DATA PORT in CRAM WRITE MODE\n");
-			retdata = mame_rand(machine);
+			retdata = machine->rand();
 			break;
 
 		case 0x0004:
@@ -1315,7 +1315,7 @@ static UINT16 megadriv_vdp_data_port_r(running_machine *machine)
 
 		default:
 			logerror("Attempting to READ from DATA PORT in #UNDEFINED# MODE\n");
-			retdata = mame_rand(machine);
+			retdata = machine->rand();
 			break;
 	}
 
@@ -1622,7 +1622,7 @@ READ16_HANDLER( megadriv_vdp_r )
 		case 0x06:
 		//  if ((!ACCESSING_BITS_8_15) || (!ACCESSING_BITS_0_7)) mame_printf_debug("8-bit VDP read control port access, offset %04x mem_mask %04x\n",offset,mem_mask);
 			retvalue = megadriv_vdp_ctrl_port_r();
-		//  retvalue = mame_rand(space->machine);
+		//  retvalue = space->machine->rand();
 		//  mame_printf_debug("%06x: Read Control Port at scanline %d hpos %d (return %04x)\n",cpu_get_pc(space->cpu),genesis_scanline_counter, get_hposition(),retvalue);
 			break;
 
@@ -1632,7 +1632,7 @@ READ16_HANDLER( megadriv_vdp_r )
 		case 0x0e:
 		//  if ((!ACCESSING_BITS_8_15) || (!ACCESSING_BITS_0_7)) mame_printf_debug("8-bit VDP read HV counter port access, offset %04x mem_mask %04x\n",offset,mem_mask);
 			retvalue = megadriv_read_hv_counters();
-		//  retvalue = mame_rand(space->machine);
+		//  retvalue = space->machine->rand();
 		//  mame_printf_debug("%06x: Read HV counters at scanline %d hpos %d (return %04x)\n",cpu_get_pc(space->cpu),genesis_scanline_counter, get_hposition(),retvalue);
 			break;
 
@@ -1979,7 +1979,7 @@ READ16_HANDLER( megadriv_68k_io_read )
           D0 : Bit 0 of version number
       */
 
-	//return (mame_rand(space->machine)&0x0f0f)|0xf0f0;//0x0000;
+	//return (space->machine->rand()&0x0f0f)|0xf0f0;//0x0000;
 	switch (offset)
 	{
 		case 0:
@@ -2172,7 +2172,7 @@ static READ16_HANDLER( megadriv_68k_read_z80_ram )
 	else
 	{
 		logerror("%06x: 68000 attempting to access Z80 (read) address space without bus\n", cpu_get_pc(space->cpu));
-		return mame_rand(space->machine);
+		return space->machine->rand();
 	}
 }
 
@@ -2214,7 +2214,7 @@ static READ16_HANDLER( megadriv_68k_check_z80_bus )
        the value is never zero.  Time Killers is the most fussy, and doesn't like the
        read_next_instruction function from system16, so I just return a random value
        in the unused bits */
-	UINT16 nextvalue = mame_rand(space->machine);//read_next_instruction(space)&0xff00;
+	UINT16 nextvalue = space->machine->rand();//read_next_instruction(space)&0xff00;
 
 
 	/* Check if the 68k has the z80 bus */
@@ -2404,7 +2404,7 @@ static WRITE8_HANDLER( megadriv_z80_vdp_write )
 static READ8_HANDLER( megadriv_z80_vdp_read )
 {
 	mame_printf_debug("megadriv_z80_vdp_read %02x\n",offset);
-	return mame_rand(space->machine);
+	return space->machine->rand();
 }
 
 static READ8_HANDLER( megadriv_z80_unmapped_read )
@@ -2456,8 +2456,8 @@ ADDRESS_MAP_END
 
 MACHINE_CONFIG_DERIVED( md_bootleg, megadriv )
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(md_bootleg_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(md_bootleg_map)
 MACHINE_CONFIG_END
 
 
@@ -2619,7 +2619,7 @@ static WRITE16_HANDLER( _32x_68k_a15106_w )
 
 			// install the game rom in the normal 0x000000-0x03fffff space used by the genesis - this allows VDP DMA operations to work as they have to be from this area or RAM
 			// it should also UNMAP the banked rom area...
-			memory_install_rom(space, 0x0000100, 0x03fffff, 0, 0, memory_region(space->machine, "gamecart") + 0x100);
+			memory_install_rom(space, 0x0000100, 0x03fffff, 0, 0, space->machine->region("gamecart")->base() + 0x100);
 		}
 		else
 		{
@@ -2627,7 +2627,7 @@ static WRITE16_HANDLER( _32x_68k_a15106_w )
 
 			// this is actually blank / nop area
 			// we should also map the banked area back (we don't currently unmap it tho)
-			memory_install_rom(space, 0x0000100, 0x03fffff, 0, 0, memory_region(space->machine, "maincpu")+0x100);
+			memory_install_rom(space, 0x0000100, 0x03fffff, 0, 0, space->machine->region("maincpu")->base()+0x100);
 		}
 
 		if((a15106_reg & 4) == 0) // clears the FIFO state
@@ -2919,12 +2919,12 @@ static WRITE16_HANDLER( _32x_68k_a15100_w )
 		if (data & 0x01)
 		{
 			_32x_adapter_enabled = 1;
-			memory_install_rom(space, 0x0880000, 0x08fffff, 0, 0, memory_region(space->machine, "gamecart")); // 'fixed' 512kb rom bank
+			memory_install_rom(space, 0x0880000, 0x08fffff, 0, 0, space->machine->region("gamecart")->base()); // 'fixed' 512kb rom bank
 
 			memory_install_read_bank(space, 0x0900000, 0x09fffff, 0, 0, "bank12"); // 'bankable' 1024kb rom bank
-			memory_set_bankptr(space->machine,  "bank12", memory_region(space->machine, "gamecart")+((_32x_68k_a15104_reg&0x3)*0x100000) );
+			memory_set_bankptr(space->machine,  "bank12", space->machine->region("gamecart")->base()+((_32x_68k_a15104_reg&0x3)*0x100000) );
 
-			memory_install_rom(space, 0x0000000, 0x03fffff, 0, 0, memory_region(space->machine, "32x_68k_bios"));
+			memory_install_rom(space, 0x0000000, 0x03fffff, 0, 0, space->machine->region("32x_68k_bios")->base());
 
 			/* VDP area */
 			memory_install_readwrite16_handler(space, 0x0a15180, 0x0a1518b, 0, 0, _32x_common_vdp_regs_r, _32x_common_vdp_regs_w); // common / shared VDP regs
@@ -2940,7 +2940,7 @@ static WRITE16_HANDLER( _32x_68k_a15100_w )
 		{
 			_32x_adapter_enabled = 0;
 
-			memory_install_rom(space, 0x0000000, 0x03fffff, 0, 0, memory_region(space->machine, "gamecart"));
+			memory_install_rom(space, 0x0000000, 0x03fffff, 0, 0, space->machine->region("gamecart")->base());
 			memory_install_readwrite16_handler(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x000070, 0x000073, 0, 0, _32x_68k_hint_vector_r, _32x_68k_hint_vector_w); // h interrupt vector
 		}
 	}
@@ -3008,7 +3008,7 @@ static WRITE16_HANDLER( _32x_68k_a15104_w )
 		_32x_68k_a15104_reg = (_32x_68k_a15104_reg & 0x00ff) | (data & 0xff00);
 	}
 
-	memory_set_bankptr(space->machine,  "bank12", memory_region(space->machine, "gamecart")+((_32x_68k_a15104_reg&0x3)*0x100000) );
+	memory_set_bankptr(space->machine,  "bank12", space->machine->region("gamecart")->base()+((_32x_68k_a15104_reg&0x3)*0x100000) );
 }
 
 /**********************************************************************************************/
@@ -5133,7 +5133,7 @@ static MACHINE_RESET( segacd )
 
 	#ifdef MESS
 	{
-		running_device *device;
+		device_t *device;
 
 		device = machine->device("cdrom");
 		if ( device )
@@ -5670,7 +5670,7 @@ INLINE UINT8 read_pixel_from_stampmap( running_machine* machine, bitmap_t* srcbi
 /*
     if (!srcbitmap)
     {
-        return mame_rand(machine);
+        return machine->rand();
     }
 
     if (x >= srcbitmap->width) return 0;
@@ -5739,8 +5739,8 @@ INLINE void write_pixel_to_imagebuffer( running_machine* machine, UINT32 pix, in
 
 		default:
 		case 0x03: // invalid?
-			segacd_dataram[offset] = mame_rand(machine);
-			segacd_dataram[offset+1] = mame_rand(machine);
+			segacd_dataram[offset] = machine->rand();
+			segacd_dataram[offset+1] = machine->rand();
 			break;
 
 	}
@@ -6106,7 +6106,7 @@ static UINT32 pm_io(address_space *space, int reg, int write, UINT32 d)
 			int addr = svp.pmac_read[reg]&0xffff;
 			if      ((mode & 0xfff0) == 0x0800) // ROM, inc 1, verified to be correct
 			{
-				UINT16 *ROM = (UINT16 *) memory_region(space->machine, "maincpu");
+				UINT16 *ROM = (UINT16 *) space->machine->region("maincpu")->base();
 				svp.pmac_read[reg] += 1;
 				d = ROM[addr|((mode&0xf)<<16)];
 			}
@@ -6340,7 +6340,7 @@ static void svp_init(running_machine *machine)
 	svp.iram = auto_alloc_array(machine, UINT8, 0x800);
 	memory_set_bankptr(machine,  "bank3", svp.iram );
 	/* SVP ROM just shares m68k region.. */
-	ROM = memory_region(machine, "maincpu");
+	ROM = machine->region("maincpu")->base();
 	memory_set_bankptr(machine,  "bank4", ROM + 0x800 );
 
 	megadrive_io_read_data_port_ptr	= megadrive_io_read_data_port_svp;
@@ -6359,17 +6359,17 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_DERIVED( megdsvp, megadriv )
 
-	MDRV_CPU_ADD("svp", SSP1601, MASTER_CLOCK_NTSC / 7 * 3) /* ~23 MHz (guessed) */
-	MDRV_CPU_PROGRAM_MAP(svp_ssp_map)
-	MDRV_CPU_IO_MAP(svp_ext_map)
+	MCFG_CPU_ADD("svp", SSP1601, MASTER_CLOCK_NTSC / 7 * 3) /* ~23 MHz (guessed) */
+	MCFG_CPU_PROGRAM_MAP(svp_ssp_map)
+	MCFG_CPU_IO_MAP(svp_ext_map)
 	/* IRQs are not used by this CPU */
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED( megdsvppal, megadpal )
 
-	MDRV_CPU_ADD("svp", SSP1601, MASTER_CLOCK_PAL / 7 * 3) /* ~23 MHz (guessed) */
-	MDRV_CPU_PROGRAM_MAP(svp_ssp_map)
-	MDRV_CPU_IO_MAP(svp_ext_map)
+	MCFG_CPU_ADD("svp", SSP1601, MASTER_CLOCK_PAL / 7 * 3) /* ~23 MHz (guessed) */
+	MCFG_CPU_PROGRAM_MAP(svp_ssp_map)
+	MCFG_CPU_IO_MAP(svp_ext_map)
 	/* IRQs are not used by this CPU */
 MACHINE_CONFIG_END
 
@@ -6759,7 +6759,7 @@ static void genesis_render_videoline_to_videobuffer(int scanline)
 
 	//mame_printf_debug("screenwidth %d\n",screenwidth);
 
-	//base_w = mame_rand(Machine)&0xff;
+	//base_w = Machine->rand()&0xff;
 
 	/* Calculate Exactly where we're going to draw the Window, and if the Window Bug applies */
 	window_is_bugged = 0;
@@ -7930,7 +7930,7 @@ static void genesis_render_videobuffer_to_screenbuffer(running_machine *machine,
 					case 0x1a000: // (sprite)shadow set, highlight set - not possible
 					case 0x1e000: // (sprite)shadow set, highlight set, normal set, not possible
 					default:
-						lineptr[x] = mame_rand(machine)&0x3f;
+						lineptr[x] = machine->rand()&0x3f;
 					break;
 				}
 			}
@@ -8681,7 +8681,7 @@ static NVRAM_HANDLER( megadriv )
 			{
 				int x;
 				for (x=0;x<megadriv_backupram_length/2;x++)
-					megadriv_backupram[x]=0xffff;//mame_rand(machine); // dino dini's needs 0xff or game rules are broken
+					megadriv_backupram[x]=0xffff;//machine->rand(); // dino dini's needs 0xff or game rules are broken
 			}
 		}
 	}
@@ -8690,104 +8690,104 @@ static NVRAM_HANDLER( megadriv )
 
 
 MACHINE_CONFIG_FRAGMENT( megadriv_timers )
-	MDRV_TIMER_ADD("frame_timer", frame_timer_callback)
-	MDRV_TIMER_ADD("scanline_timer", scanline_timer_callback)
-	MDRV_TIMER_ADD("render_timer", render_timer_callback)
-	MDRV_TIMER_ADD("irq6_timer", irq6_on_callback)
-	MDRV_TIMER_ADD("irq4_timer", irq4_on_callback)
+	MCFG_TIMER_ADD("frame_timer", frame_timer_callback)
+	MCFG_TIMER_ADD("scanline_timer", scanline_timer_callback)
+	MCFG_TIMER_ADD("render_timer", render_timer_callback)
+	MCFG_TIMER_ADD("irq6_timer", irq6_on_callback)
+	MCFG_TIMER_ADD("irq4_timer", irq4_on_callback)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START( megadriv, driver_device )
-	MDRV_CPU_ADD("maincpu", M68000, MASTER_CLOCK_NTSC / 7) /* 7.67 MHz */
-	MDRV_CPU_PROGRAM_MAP(megadriv_map)
+	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK_NTSC / 7) /* 7.67 MHz */
+	MCFG_CPU_PROGRAM_MAP(megadriv_map)
 	/* IRQs are handled via the timers */
 
-	MDRV_CPU_ADD("genesis_snd_z80", Z80, MASTER_CLOCK_NTSC / 15) /* 3.58 MHz */
-	MDRV_CPU_PROGRAM_MAP(megadriv_z80_map)
-	MDRV_CPU_IO_MAP(megadriv_z80_io_map)
+	MCFG_CPU_ADD("genesis_snd_z80", Z80, MASTER_CLOCK_NTSC / 15) /* 3.58 MHz */
+	MCFG_CPU_PROGRAM_MAP(megadriv_z80_map)
+	MCFG_CPU_IO_MAP(megadriv_z80_io_map)
 	/* IRQ handled via the timers */
 
-	MDRV_MACHINE_START(megadriv)
-	MDRV_MACHINE_RESET(megadriv)
+	MCFG_MACHINE_START(megadriv)
+	MCFG_MACHINE_RESET(megadriv)
 
-	MDRV_FRAGMENT_ADD(megadriv_timers)
+	MCFG_FRAGMENT_ADD(megadriv_timers)
 
-	MDRV_SCREEN_ADD("megadriv", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB15)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0)) // Vblank handled manually.
-	MDRV_SCREEN_SIZE(64*8, 64*8)
-	MDRV_SCREEN_VISIBLE_AREA(0, 32*8-1, 0, 28*8-1)
+	MCFG_SCREEN_ADD("megadriv", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB15)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0)) // Vblank handled manually.
+	MCFG_SCREEN_SIZE(64*8, 64*8)
+	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 0, 28*8-1)
 
 #ifndef MESS
-	MDRV_NVRAM_HANDLER(megadriv)
+	MCFG_NVRAM_HANDLER(megadriv)
 #endif
 
-	MDRV_PALETTE_LENGTH(0x200)
+	MCFG_PALETTE_LENGTH(0x200)
 
-	MDRV_VIDEO_START(megadriv)
-	MDRV_VIDEO_UPDATE(megadriv) /* Copies a bitmap */
-	MDRV_VIDEO_EOF(megadriv) /* Used to Sync the timing */
-
-	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-
-	MDRV_SOUND_ADD("ymsnd", YM2612, MASTER_CLOCK_NTSC/7) /* 7.67 MHz */
-	MDRV_SOUND_ROUTE(0, "lspeaker", 0.50)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 0.50)
+	MCFG_VIDEO_START(megadriv)
+	MCFG_VIDEO_UPDATE(megadriv) /* Copies a bitmap */
+	MCFG_VIDEO_EOF(megadriv) /* Used to Sync the timing */
 
 	/* sound hardware */
-	MDRV_SOUND_ADD("snsnd", SMSIII, MASTER_CLOCK_NTSC/15)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25) /* 3.58 MHz */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker",0.25) /* 3.58 MHz */
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_SOUND_ADD("ymsnd", YM2612, MASTER_CLOCK_NTSC/7) /* 7.67 MHz */
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
+
+	/* sound hardware */
+	MCFG_SOUND_ADD("snsnd", SMSIII, MASTER_CLOCK_NTSC/15)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25) /* 3.58 MHz */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker",0.25) /* 3.58 MHz */
 MACHINE_CONFIG_END
 
 /************ PAL hardware has a different master clock *************/
 
 MACHINE_CONFIG_START( megadpal, driver_device )
-	MDRV_CPU_ADD("maincpu", M68000, MASTER_CLOCK_PAL / 7) /* 7.67 MHz */
-	MDRV_CPU_PROGRAM_MAP(megadriv_map)
+	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK_PAL / 7) /* 7.67 MHz */
+	MCFG_CPU_PROGRAM_MAP(megadriv_map)
 	/* IRQs are handled via the timers */
 
-	MDRV_CPU_ADD("genesis_snd_z80", Z80, MASTER_CLOCK_PAL / 15) /* 3.58 MHz */
-	MDRV_CPU_PROGRAM_MAP(megadriv_z80_map)
-	MDRV_CPU_IO_MAP(megadriv_z80_io_map)
+	MCFG_CPU_ADD("genesis_snd_z80", Z80, MASTER_CLOCK_PAL / 15) /* 3.58 MHz */
+	MCFG_CPU_PROGRAM_MAP(megadriv_z80_map)
+	MCFG_CPU_IO_MAP(megadriv_z80_io_map)
 	/* IRQ handled via the timers */
 
-	MDRV_MACHINE_START(megadriv)
-	MDRV_MACHINE_RESET(megadriv)
+	MCFG_MACHINE_START(megadriv)
+	MCFG_MACHINE_RESET(megadriv)
 
-	MDRV_FRAGMENT_ADD(megadriv_timers)
+	MCFG_FRAGMENT_ADD(megadriv_timers)
 
-	MDRV_SCREEN_ADD("megadriv", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB15)
-	MDRV_SCREEN_REFRESH_RATE(50)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0)) // Vblank handled manually.
-	MDRV_SCREEN_SIZE(64*8, 64*8)
-	MDRV_SCREEN_VISIBLE_AREA(0, 32*8-1, 0, 28*8-1)
+	MCFG_SCREEN_ADD("megadriv", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB15)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0)) // Vblank handled manually.
+	MCFG_SCREEN_SIZE(64*8, 64*8)
+	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 0, 28*8-1)
 
 #ifndef MESS
-	MDRV_NVRAM_HANDLER(megadriv)
+	MCFG_NVRAM_HANDLER(megadriv)
 #endif
 
-	MDRV_PALETTE_LENGTH(0x200)
+	MCFG_PALETTE_LENGTH(0x200)
 
-	MDRV_VIDEO_START(megadriv)
-	MDRV_VIDEO_UPDATE(megadriv) /* Copies a bitmap */
-	MDRV_VIDEO_EOF(megadriv) /* Used to Sync the timing */
-
-	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-
-	MDRV_SOUND_ADD("ymsnd", YM2612, MASTER_CLOCK_PAL/7) /* 7.67 MHz */
-	MDRV_SOUND_ROUTE(0, "lspeaker", 0.50)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 0.50)
+	MCFG_VIDEO_START(megadriv)
+	MCFG_VIDEO_UPDATE(megadriv) /* Copies a bitmap */
+	MCFG_VIDEO_EOF(megadriv) /* Used to Sync the timing */
 
 	/* sound hardware */
-	MDRV_SOUND_ADD("snsnd", SMSIII, MASTER_CLOCK_PAL/15)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25) /* 3.58 MHz */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker",0.25) /* 3.58 MHz */
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_SOUND_ADD("ymsnd", YM2612, MASTER_CLOCK_PAL/7) /* 7.67 MHz */
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
+
+	/* sound hardware */
+	MCFG_SOUND_ADD("snsnd", SMSIII, MASTER_CLOCK_PAL/15)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25) /* 3.58 MHz */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker",0.25) /* 3.58 MHz */
 MACHINE_CONFIG_END
 
 
@@ -8815,19 +8815,19 @@ static const sh2_cpu_core sh2_conf_slave  = { 1, NULL, _32x_fifo_available_callb
 MACHINE_CONFIG_DERIVED( genesis_32x, megadriv )
 
 #ifndef _32X_SWAP_MASTER_SLAVE_HACK
-	MDRV_CPU_ADD("32x_master_sh2", SH2, (MASTER_CLOCK_NTSC*3)/7 )
-	MDRV_CPU_PROGRAM_MAP(sh2_main_map)
-	MDRV_CPU_CONFIG(sh2_conf_master)
+	MCFG_CPU_ADD("32x_master_sh2", SH2, (MASTER_CLOCK_NTSC*3)/7 )
+	MCFG_CPU_PROGRAM_MAP(sh2_main_map)
+	MCFG_CPU_CONFIG(sh2_conf_master)
 #endif
 
-	MDRV_CPU_ADD("32x_slave_sh2", SH2, (MASTER_CLOCK_NTSC*3)/7 )
-	MDRV_CPU_PROGRAM_MAP(sh2_slave_map)
-	MDRV_CPU_CONFIG(sh2_conf_slave)
+	MCFG_CPU_ADD("32x_slave_sh2", SH2, (MASTER_CLOCK_NTSC*3)/7 )
+	MCFG_CPU_PROGRAM_MAP(sh2_slave_map)
+	MCFG_CPU_CONFIG(sh2_conf_slave)
 
 #ifdef _32X_SWAP_MASTER_SLAVE_HACK
-	MDRV_CPU_ADD("32x_master_sh2", SH2, (MASTER_CLOCK_NTSC*3)/7 )
-	MDRV_CPU_PROGRAM_MAP(sh2_main_map)
-	MDRV_CPU_CONFIG(sh2_conf_master)
+	MCFG_CPU_ADD("32x_master_sh2", SH2, (MASTER_CLOCK_NTSC*3)/7 )
+	MCFG_CPU_PROGRAM_MAP(sh2_main_map)
+	MCFG_CPU_CONFIG(sh2_conf_master)
 #endif
 
 	// brutal needs at least 30000 or the backgrounds don't animate properly / lock up, and the game
@@ -8835,47 +8835,47 @@ MACHINE_CONFIG_DERIVED( genesis_32x, megadriv )
 	//
 	// boosting the interleave here actually makes Kolibri run incorrectly however, that
 	// one works best just boosting the interleave on communications?!
-	MDRV_QUANTUM_TIME(HZ(1800000))
+	MCFG_QUANTUM_TIME(HZ(1800000))
 
 	// we need to remove and re-add the sound system because the balance is different
 	// due to MAME / MESS having severe issues if the dac output is > 0.40? (sound is corrupted even if DAC is slient?!)
-	MDRV_DEVICE_REMOVE("ymsnd")
-	MDRV_DEVICE_REMOVE("snsnd")
+	MCFG_DEVICE_REMOVE("ymsnd")
+	MCFG_DEVICE_REMOVE("snsnd")
 
 
-	MDRV_SOUND_ADD("ymsnd", YM2612, MASTER_CLOCK_NTSC/7)
-	MDRV_SOUND_ROUTE(0, "lspeaker", (0.50)/2)
-	MDRV_SOUND_ROUTE(1, "rspeaker", (0.50)/2)
+	MCFG_SOUND_ADD("ymsnd", YM2612, MASTER_CLOCK_NTSC/7)
+	MCFG_SOUND_ROUTE(0, "lspeaker", (0.50)/2)
+	MCFG_SOUND_ROUTE(1, "rspeaker", (0.50)/2)
 
 	/* sound hardware */
-	MDRV_SOUND_ADD("snsnd", SMSIII, MASTER_CLOCK_NTSC/15)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", (0.25)/2)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", (0.25)/2)
+	MCFG_SOUND_ADD("snsnd", SMSIII, MASTER_CLOCK_NTSC/15)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", (0.25)/2)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", (0.25)/2)
 
-	MDRV_SOUND_ADD("lch_pwm", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
+	MCFG_SOUND_ADD("lch_pwm", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
 
-	MDRV_SOUND_ADD("rch_pwm", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
+	MCFG_SOUND_ADD("rch_pwm", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_DERIVED( genesis_32x_pal, megadpal )
 
 #ifndef _32X_SWAP_MASTER_SLAVE_HACK
-	MDRV_CPU_ADD("32x_master_sh2", SH2, (MASTER_CLOCK_PAL*3)/7 )
-	MDRV_CPU_PROGRAM_MAP(sh2_main_map)
-	MDRV_CPU_CONFIG(sh2_conf_master)
+	MCFG_CPU_ADD("32x_master_sh2", SH2, (MASTER_CLOCK_PAL*3)/7 )
+	MCFG_CPU_PROGRAM_MAP(sh2_main_map)
+	MCFG_CPU_CONFIG(sh2_conf_master)
 #endif
 
-	MDRV_CPU_ADD("32x_slave_sh2", SH2, (MASTER_CLOCK_PAL*3)/7 )
-	MDRV_CPU_PROGRAM_MAP(sh2_slave_map)
-	MDRV_CPU_CONFIG(sh2_conf_slave)
+	MCFG_CPU_ADD("32x_slave_sh2", SH2, (MASTER_CLOCK_PAL*3)/7 )
+	MCFG_CPU_PROGRAM_MAP(sh2_slave_map)
+	MCFG_CPU_CONFIG(sh2_conf_slave)
 
 #ifdef _32X_SWAP_MASTER_SLAVE_HACK
-	MDRV_CPU_ADD("32x_master_sh2", SH2, (MASTER_CLOCK_PAL*3)/7 )
-	MDRV_CPU_PROGRAM_MAP(sh2_main_map)
-	MDRV_CPU_CONFIG(sh2_conf_master)
+	MCFG_CPU_ADD("32x_master_sh2", SH2, (MASTER_CLOCK_PAL*3)/7 )
+	MCFG_CPU_PROGRAM_MAP(sh2_main_map)
+	MCFG_CPU_CONFIG(sh2_conf_master)
 #endif
 
 	// brutal needs at least 30000 or the backgrounds don't animate properly / lock up, and the game
@@ -8883,65 +8883,65 @@ MACHINE_CONFIG_DERIVED( genesis_32x_pal, megadpal )
 	//
 	// boosting the interleave here actually makes Kolibri run incorrectly however, that
 	// one works best just boosting the interleave on communications?!
-	MDRV_QUANTUM_TIME(HZ(1800000))
+	MCFG_QUANTUM_TIME(HZ(1800000))
 
 	// we need to remove and re-add the sound system because the balance is different
 	// due to MAME / MESS having severe issues if the dac output is > 0.40? (sound is corrupted even if DAC is slient?!)
-	MDRV_DEVICE_REMOVE("ymsnd")
-	MDRV_DEVICE_REMOVE("snsnd")
+	MCFG_DEVICE_REMOVE("ymsnd")
+	MCFG_DEVICE_REMOVE("snsnd")
 
 
-	MDRV_SOUND_ADD("ymsnd", YM2612, MASTER_CLOCK_PAL/7)
-	MDRV_SOUND_ROUTE(0, "lspeaker", (0.50)/2)
-	MDRV_SOUND_ROUTE(1, "rspeaker", (0.50)/2)
+	MCFG_SOUND_ADD("ymsnd", YM2612, MASTER_CLOCK_PAL/7)
+	MCFG_SOUND_ROUTE(0, "lspeaker", (0.50)/2)
+	MCFG_SOUND_ROUTE(1, "rspeaker", (0.50)/2)
 
 	/* sound hardware */
-	MDRV_SOUND_ADD("snsnd", SMSIII, MASTER_CLOCK_PAL/15)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", (0.25)/2)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", (0.25)/2)
+	MCFG_SOUND_ADD("snsnd", SMSIII, MASTER_CLOCK_PAL/15)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", (0.25)/2)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", (0.25)/2)
 
-	MDRV_SOUND_ADD("lch_pwm", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
+	MCFG_SOUND_ADD("lch_pwm", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
 
-	MDRV_SOUND_ADD("rch_pwm", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
+	MCFG_SOUND_ADD("rch_pwm", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 MACHINE_CONFIG_END
 
 
 
 MACHINE_CONFIG_DERIVED( genesis_scd, megadriv )
 
-	MDRV_CPU_ADD("segacd_68k", M68000, SEGACD_CLOCK ) /* 12.5 MHz */
-	MDRV_CPU_PROGRAM_MAP(segacd_map)
+	MCFG_CPU_ADD("segacd_68k", M68000, SEGACD_CLOCK ) /* 12.5 MHz */
+	MCFG_CPU_PROGRAM_MAP(segacd_map)
 
-	MDRV_SOUND_ADD( "cdda", CDDA, 0 )
-	MDRV_SOUND_ROUTE( 0, "lspeaker", 1.00 )
-	MDRV_SOUND_ROUTE( 1, "rspeaker", 1.00 )
+	MCFG_SOUND_ADD( "cdda", CDDA, 0 )
+	MCFG_SOUND_ROUTE( 0, "lspeaker", 1.00 )
+	MCFG_SOUND_ROUTE( 1, "rspeaker", 1.00 )
 
-	MDRV_SOUND_ADD("rfsnd", RF5C68, SEGACD_CLOCK) // RF5C164!
-	MDRV_SOUND_ROUTE( 0, "lspeaker", 0.25 )
-	MDRV_SOUND_ROUTE( 1, "rspeaker", 0.25 )
+	MCFG_SOUND_ADD("rfsnd", RF5C68, SEGACD_CLOCK) // RF5C164!
+	MCFG_SOUND_ROUTE( 0, "lspeaker", 0.25 )
+	MCFG_SOUND_ROUTE( 1, "rspeaker", 0.25 )
 
 	#ifdef MESS
-	MDRV_CDROM_ADD( "cdrom" )
+	MCFG_CDROM_ADD( "cdrom" )
 	#endif
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED( genesis_32x_scd, genesis_32x )
 
-	MDRV_CPU_ADD("segacd_68k", M68000, SEGACD_CLOCK ) /* 12.5 MHz */
-	MDRV_CPU_PROGRAM_MAP(segacd_map)
+	MCFG_CPU_ADD("segacd_68k", M68000, SEGACD_CLOCK ) /* 12.5 MHz */
+	MCFG_CPU_PROGRAM_MAP(segacd_map)
 
-	MDRV_SOUND_ADD( "cdda", CDDA, 0 )
-	MDRV_SOUND_ROUTE( 0, "lspeaker", 1.00 )
-	MDRV_SOUND_ROUTE( 1, "rspeaker", 1.00 )
+	MCFG_SOUND_ADD( "cdda", CDDA, 0 )
+	MCFG_SOUND_ROUTE( 0, "lspeaker", 1.00 )
+	MCFG_SOUND_ROUTE( 1, "rspeaker", 1.00 )
 
-	MDRV_SOUND_ADD("rfsnd", RF5C68, SEGACD_CLOCK) // RF5C164
-	MDRV_SOUND_ROUTE( 0, "lspeaker", 0.25 )
-	MDRV_SOUND_ROUTE( 1, "rspeaker", 0.25 )
+	MCFG_SOUND_ADD("rfsnd", RF5C68, SEGACD_CLOCK) // RF5C164
+	MCFG_SOUND_ROUTE( 0, "lspeaker", 0.25 )
+	MCFG_SOUND_ROUTE( 1, "rspeaker", 0.25 )
 
 	#ifdef MESS
-	MDRV_CDROM_ADD( "cdrom" )
+	MCFG_CDROM_ADD( "cdrom" )
 	#endif
 MACHINE_CONFIG_END
 
@@ -8963,7 +8963,7 @@ static IRQ_CALLBACK(genesis_int_callback)
 	return (0x60+irqline*4)/4; // vector address
 }
 
-static int megadriv_tas_callback(running_device *device)
+static int megadriv_tas_callback(device_t *device)
 {
 	return 0; // writeback not allowed
 }
@@ -9054,7 +9054,7 @@ static void megadriv_init_common(running_machine *machine)
           some games specify a single address, (start 200001, end 200001)
           this usually means there is serial eeprom instead */
 		int i;
-		UINT16 *rom = (UINT16*)memory_region(machine, "maincpu");
+		UINT16 *rom = (UINT16*)machine->region("maincpu")->base();
 
 		mame_printf_debug("DEBUG:: Header: Backup RAM string (ignore for games without)\n");
 		for (i=0;i<12;i++)
@@ -9161,7 +9161,7 @@ static WRITE8_HANDLER( z80_unmapped_w )
 /* sets the megadrive z80 to it's normal ports / map */
 void megatech_set_megadrive_z80_as_megadrive_z80(running_machine *machine, const char* tag)
 {
-	running_device *ym = machine->device("ymsnd");
+	device_t *ym = machine->device("ymsnd");
 
 	/* INIT THE PORTS *********************************************************************************************/
 	memory_install_readwrite8_handler(cputag_get_address_space(machine, tag, ADDRESS_SPACE_IO), 0x0000, 0xffff, 0, 0, z80_unmapped_port_r, z80_unmapped_port_w);
@@ -9214,7 +9214,7 @@ DRIVER_INIT( _32x )
 
 	if (_32x_adapter_enabled == 0)
 	{
-		memory_install_rom(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000000, 0x03fffff, 0, 0, memory_region(machine, "gamecart"));
+		memory_install_rom(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000000, 0x03fffff, 0, 0, machine->region("gamecart")->base());
 		memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x000070, 0x000073, 0, 0, _32x_68k_hint_vector_r, _32x_68k_hint_vector_w); // h interrupt vector
 	};
 

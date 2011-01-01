@@ -569,7 +569,7 @@ GFXDECODE_END
 ************************************************************/
 
 /* Handler called by the YM2610 emulator when the internal timers cause an IRQ */
-static void irqhandler( running_device *device, int irq )
+static void irqhandler( device_t *device, int irq )
 {
 	taitoair_state *state = device->machine->driver_data<taitoair_state>();
 	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
@@ -611,7 +611,7 @@ static STATE_POSTLOAD( taitoair_postload )
 static MACHINE_START( taitoair )
 {
 	taitoair_state *state = machine->driver_data<taitoair_state>();
-	UINT8 *ROM = memory_region(machine, "audiocpu");
+	UINT8 *ROM = machine->region("audiocpu")->base();
 	int i;
 
 	memory_configure_bank(machine, "bank1", 0, 4, &ROM[0xc000], 0x4000);
@@ -651,50 +651,50 @@ static MACHINE_RESET( taitoair )
 static MACHINE_CONFIG_START( airsys, taitoair_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000,24000000 / 2)		/* 12 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(airsys_map)
-	MDRV_CPU_VBLANK_INT("screen", irq5_line_hold)
+	MCFG_CPU_ADD("maincpu", M68000,24000000 / 2)		/* 12 MHz ??? */
+	MCFG_CPU_PROGRAM_MAP(airsys_map)
+	MCFG_CPU_VBLANK_INT("screen", irq5_line_hold)
 
-	MDRV_CPU_ADD("audiocpu", Z80,8000000 / 2)			/* 4 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(sound_map)
+	MCFG_CPU_ADD("audiocpu", Z80,8000000 / 2)			/* 4 MHz ??? */
+	MCFG_CPU_PROGRAM_MAP(sound_map)
 
-	MDRV_CPU_ADD("dsp", TMS32025,24000000)			/* 24 MHz ??? *///
-	MDRV_CPU_PROGRAM_MAP(DSP_map_program)
-	MDRV_CPU_DATA_MAP(DSP_map_data)
-	MDRV_CPU_IO_MAP(DSP_map_io)
+	MCFG_CPU_ADD("dsp", TMS32025,24000000)			/* 24 MHz ??? *///
+	MCFG_CPU_PROGRAM_MAP(DSP_map_program)
+	MCFG_CPU_DATA_MAP(DSP_map_data)
+	MCFG_CPU_IO_MAP(DSP_map_io)
 
-	MDRV_QUANTUM_TIME(HZ(600))
+	MCFG_QUANTUM_TIME(HZ(600))
 
-	MDRV_MACHINE_START(taitoair)
-	MDRV_MACHINE_RESET(taitoair)
+	MCFG_MACHINE_START(taitoair)
+	MCFG_MACHINE_RESET(taitoair)
 
-	MDRV_TC0220IOC_ADD("tc0220ioc", airsys_io_intf)
+	MCFG_TC0220IOC_ADD("tc0220ioc", airsys_io_intf)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*16, 64*16)
-	MDRV_SCREEN_VISIBLE_AREA(0*16, 32*16-1, 3*16, 28*16-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(64*16, 64*16)
+	MCFG_SCREEN_VISIBLE_AREA(0*16, 32*16-1, 3*16, 28*16-1)
 
-	MDRV_GFXDECODE(airsys)
-	MDRV_PALETTE_LENGTH(512*16)
+	MCFG_GFXDECODE(airsys)
+	MCFG_PALETTE_LENGTH(512*16)
 
-	MDRV_VIDEO_UPDATE(taitoair)
+	MCFG_VIDEO_UPDATE(taitoair)
 
-	MDRV_TC0080VCO_ADD("tc0080vco", airsys_tc0080vco_intf)
+	MCFG_TC0080VCO_ADD("tc0080vco", airsys_tc0080vco_intf)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM2610, 8000000)
-	MDRV_SOUND_CONFIG(airsys_ym2610_interface)
-	MDRV_SOUND_ROUTE(0, "mono", 0.30)
-	MDRV_SOUND_ROUTE(1, "mono", 0.60)
-	MDRV_SOUND_ROUTE(2, "mono", 0.60)
+	MCFG_SOUND_ADD("ymsnd", YM2610, 8000000)
+	MCFG_SOUND_CONFIG(airsys_ym2610_interface)
+	MCFG_SOUND_ROUTE(0, "mono", 0.30)
+	MCFG_SOUND_ROUTE(1, "mono", 0.60)
+	MCFG_SOUND_ROUTE(2, "mono", 0.60)
 
-	MDRV_TC0140SYT_ADD("tc0140syt", airsys_tc0140syt_intf)
+	MCFG_TC0140SYT_ADD("tc0140syt", airsys_tc0140syt_intf)
 MACHINE_CONFIG_END
 
 

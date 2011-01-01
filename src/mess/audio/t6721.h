@@ -14,8 +14,8 @@
 
 DECLARE_LEGACY_DEVICE(T6721, t6721);
 
-#define MDRV_T6721_ADD(_tag) \
-	MDRV_DEVICE_ADD(_tag, T6721, 0) \
+#define MCFG_T6721_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, T6721, 0) \
 
 
 /*----------- defined in audio/t6721.c -----------*/

@@ -145,7 +145,7 @@ void xerox820_state::bankswitch(int bank)
 	if (bank)
 	{
 		/* ROM */
-		memory_install_rom(program, 0x0000, 0x0fff, 0, 0, memory_region(machine, "monitor"));
+		memory_install_rom(program, 0x0000, 0x0fff, 0, 0, machine->region("monitor")->base());
 		memory_unmap_readwrite(program, 0x1000, 0x1fff, 0, 0);
 		memory_install_ram(program, 0x3000, 0x3fff, 0, 0, m_video_ram);
 		memory_unmap_readwrite(program, 0x4000, 0xbfff, 0, 0);
@@ -165,7 +165,7 @@ void xerox820ii_state::bankswitch(int bank)
 	if (bank)
 	{
 		/* ROM */
-		memory_install_rom(program, 0x0000, 0x17ff, 0, 0, memory_region(machine, "monitor"));
+		memory_install_rom(program, 0x0000, 0x17ff, 0, 0, machine->region("monitor")->base());
 		memory_unmap_readwrite(program, 0x1800, 0x2fff, 0, 0);
 		memory_install_ram(program, 0x3000, 0x3fff, 0, 0, m_video_ram);
 		memory_unmap_readwrite(program, 0x4000, 0xbfff, 0, 0);
@@ -615,7 +615,7 @@ static COM8116_INTERFACE( com8116_intf )
 void xerox820_state::video_start()
 {
 	/* find memory regions */
-	m_char_rom = memory_region(machine, "chargen");
+	m_char_rom = machine->region("chargen")->base();
 }
 
 
@@ -806,80 +806,80 @@ GFXDECODE_END
 
 static MACHINE_CONFIG_START( xerox820, xerox820_state )
     /* basic machine hardware */
-    MDRV_CPU_ADD(Z80_TAG, Z80, XTAL_20MHz/8)
-    MDRV_CPU_PROGRAM_MAP(xerox820_mem)
-    MDRV_CPU_IO_MAP(xerox820_io)
-	MDRV_CPU_CONFIG(xerox820_daisy_chain)
+    MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_20MHz/8)
+    MCFG_CPU_PROGRAM_MAP(xerox820_mem)
+    MCFG_CPU_IO_MAP(xerox820_io)
+	MCFG_CPU_CONFIG(xerox820_daisy_chain)
 
     /* video hardware */
-    MDRV_SCREEN_ADD(SCREEN_TAG, RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_RAW_PARAMS(XTAL_10_69425MHz, 700, 0, 560, 260, 0, 240)
+    MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_10_69425MHz, 700, 0, 560, 260, 0, 240)
 
-	MDRV_GFXDECODE(xerox820)
-	MDRV_PALETTE_LENGTH(2)
-    MDRV_PALETTE_INIT(black_and_white)
+	MCFG_GFXDECODE(xerox820)
+	MCFG_PALETTE_LENGTH(2)
+    MCFG_PALETTE_INIT(black_and_white)
 
 	/* keyboard */
-	MDRV_TIMER_ADD_PERIODIC("keyboard", xerox820_keyboard_tick, HZ(60))
-	MDRV_TIMER_ADD_PERIODIC("ctc", ctc_tick, HZ(XTAL_20MHz/8))
+	MCFG_TIMER_ADD_PERIODIC("keyboard", xerox820_keyboard_tick, HZ(60))
+	MCFG_TIMER_ADD_PERIODIC("ctc", ctc_tick, HZ(XTAL_20MHz/8))
 
 	/* devices */
-	MDRV_Z80SIO0_ADD(Z80SIO_TAG, XTAL_20MHz/8, sio_intf)
-	MDRV_Z80PIO_ADD(Z80KBPIO_TAG, XTAL_20MHz/8, xerox820_kbpio_intf)
-	MDRV_Z80PIO_ADD(Z80GPPIO_TAG, XTAL_20MHz/8, gppio_intf)
-	MDRV_Z80CTC_ADD(Z80CTC_TAG, XTAL_20MHz/8, ctc_intf)
-	MDRV_WD1771_ADD(WD1771_TAG, fdc_intf)
-	MDRV_FLOPPY_2_DRIVES_ADD(xerox820_floppy_config)
-	MDRV_COM8116_ADD(COM8116_TAG, XTAL_5_0688MHz, com8116_intf)
+	MCFG_Z80SIO0_ADD(Z80SIO_TAG, XTAL_20MHz/8, sio_intf)
+	MCFG_Z80PIO_ADD(Z80KBPIO_TAG, XTAL_20MHz/8, xerox820_kbpio_intf)
+	MCFG_Z80PIO_ADD(Z80GPPIO_TAG, XTAL_20MHz/8, gppio_intf)
+	MCFG_Z80CTC_ADD(Z80CTC_TAG, XTAL_20MHz/8, ctc_intf)
+	MCFG_WD1771_ADD(WD1771_TAG, fdc_intf)
+	MCFG_FLOPPY_2_DRIVES_ADD(xerox820_floppy_config)
+	MCFG_COM8116_ADD(COM8116_TAG, XTAL_5_0688MHz, com8116_intf)
 
 	/* internal ram */
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("64K")
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("64K")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( xerox820ii, xerox820ii_state )
     /* basic machine hardware */
-    MDRV_CPU_ADD(Z80_TAG, Z80, XTAL_16MHz/4)
-    MDRV_CPU_PROGRAM_MAP(xerox820ii_mem)
-    MDRV_CPU_IO_MAP(xerox820ii_io)
-	MDRV_CPU_CONFIG(xerox820_daisy_chain)
+    MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_16MHz/4)
+    MCFG_CPU_PROGRAM_MAP(xerox820ii_mem)
+    MCFG_CPU_IO_MAP(xerox820ii_io)
+	MCFG_CPU_CONFIG(xerox820_daisy_chain)
 
     /* video hardware */
-    MDRV_SCREEN_ADD(SCREEN_TAG, RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_RAW_PARAMS(XTAL_10_69425MHz, 700, 0, 560, 260, 0, 240)
+    MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_10_69425MHz, 700, 0, 560, 260, 0, 240)
 
-	MDRV_GFXDECODE(xerox820ii)
-	MDRV_PALETTE_LENGTH(2)
-    MDRV_PALETTE_INIT(black_and_white)
+	MCFG_GFXDECODE(xerox820ii)
+	MCFG_PALETTE_LENGTH(2)
+    MCFG_PALETTE_INIT(black_and_white)
 
 	/* keyboard */
-	MDRV_TIMER_ADD_PERIODIC("keyboard", xerox820_keyboard_tick, HZ(60))
-	MDRV_TIMER_ADD_PERIODIC("ctc", ctc_tick, HZ(XTAL_16MHz/4))
+	MCFG_TIMER_ADD_PERIODIC("keyboard", xerox820_keyboard_tick, HZ(60))
+	MCFG_TIMER_ADD_PERIODIC("ctc", ctc_tick, HZ(XTAL_16MHz/4))
 
 	/* devices */
-	MDRV_Z80SIO0_ADD(Z80SIO_TAG, XTAL_16MHz/4, sio_intf)
-	MDRV_Z80PIO_ADD(Z80KBPIO_TAG, XTAL_16MHz/4, xerox820ii_kbpio_intf)
-	MDRV_Z80PIO_ADD(Z80GPPIO_TAG, XTAL_16MHz/4, gppio_intf)
-	MDRV_Z80CTC_ADD(Z80CTC_TAG, XTAL_16MHz/4, ctc_intf)
-	MDRV_WD179X_ADD(WD1771_TAG, fdc_intf) // WD1797
-	MDRV_FLOPPY_2_DRIVES_ADD(xerox820_floppy_config)
-	MDRV_COM8116_ADD(COM8116_TAG, XTAL_5_0688MHz, com8116_intf)
+	MCFG_Z80SIO0_ADD(Z80SIO_TAG, XTAL_16MHz/4, sio_intf)
+	MCFG_Z80PIO_ADD(Z80KBPIO_TAG, XTAL_16MHz/4, xerox820ii_kbpio_intf)
+	MCFG_Z80PIO_ADD(Z80GPPIO_TAG, XTAL_16MHz/4, gppio_intf)
+	MCFG_Z80CTC_ADD(Z80CTC_TAG, XTAL_16MHz/4, ctc_intf)
+	MCFG_WD179X_ADD(WD1771_TAG, fdc_intf) // WD1797
+	MCFG_FLOPPY_2_DRIVES_ADD(xerox820_floppy_config)
+	MCFG_COM8116_ADD(COM8116_TAG, XTAL_5_0688MHz, com8116_intf)
 
 	/* internal ram */
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("64K")
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("64K")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( xerox168, xerox820ii )
-	MDRV_CPU_ADD(I8086_TAG, I8086, 4770000)
-    MDRV_CPU_PROGRAM_MAP(xerox168_mem)
+	MCFG_CPU_ADD(I8086_TAG, I8086, 4770000)
+    MCFG_CPU_PROGRAM_MAP(xerox168_mem)
 
 	/* internal ram */
-	MDRV_RAM_MODIFY("messram")
-	MDRV_RAM_DEFAULT_SIZE("192K")
-	MDRV_RAM_EXTRA_OPTIONS("320K")
+	MCFG_RAM_MODIFY("messram")
+	MCFG_RAM_DEFAULT_SIZE("192K")
+	MCFG_RAM_EXTRA_OPTIONS("320K")
 MACHINE_CONFIG_END
 
 /* ROMs */

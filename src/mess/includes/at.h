@@ -17,12 +17,12 @@ public:
 	at_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	running_device *maincpu;
-	running_device *pic8259_master;
-	running_device *pic8259_slave;
-	running_device *dma8237_1;
-	running_device *dma8237_2;
-	running_device *pit8254;
+	device_t *maincpu;
+	device_t *pic8259_master;
+	device_t *pic8259_slave;
+	device_t *dma8237_1;
+	device_t *dma8237_2;
+	device_t *pit8254;
 };
 
 

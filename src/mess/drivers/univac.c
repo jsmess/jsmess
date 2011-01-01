@@ -39,14 +39,14 @@ static WRITE8_HANDLER( uts20_43_w )
 static READ8_HANDLER( uts20_vram_r )
 {
 	univac_state *state = space->machine->driver_data<univac_state>();
-	UINT8 *RAM = memory_region(space->machine, "maincpu");
+	UINT8 *RAM = space->machine->region("maincpu")->base();
 	return RAM[offset | ((state->uts20_screen) ? 0xe000 : 0xc000)];
 }
 
 static WRITE8_HANDLER( uts20_vram_w )
 {
 	univac_state *state = space->machine->driver_data<univac_state>();
-	UINT8 *RAM = memory_region(space->machine, "maincpu");
+	UINT8 *RAM = space->machine->region("maincpu")->base();
 	RAM[offset | ((state->uts20_screen) ? 0xe000 : 0xc000)] = data;
 }
 
@@ -79,7 +79,7 @@ static MACHINE_RESET(uts20)
 static VIDEO_START( uts20 )
 {
 	univac_state *state = machine->driver_data<univac_state>();
-	state->FNT = memory_region(machine, "chargen");
+	state->FNT = machine->region("chargen")->base();
 }
 
 static VIDEO_UPDATE( uts20 )
@@ -87,7 +87,7 @@ static VIDEO_UPDATE( uts20 )
 	univac_state *state = screen->machine->driver_data<univac_state>();
 	UINT8 y,ra,chr,gfx;
 	UINT16 sy=0,ma=0,x;
-	UINT8 *videoram = memory_region(screen->machine, "maincpu")+((state->uts20_screen) ? 0xe000 : 0xc000);
+	UINT8 *videoram = screen->machine->region("maincpu")->base()+((state->uts20_screen) ? 0xe000 : 0xc000);
 
 	state->framecnt++;
 
@@ -132,24 +132,24 @@ static VIDEO_UPDATE( uts20 )
 
 static MACHINE_CONFIG_START( uts20, univac_state )
     /* basic machine hardware */
-    MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz)
-    MDRV_CPU_PROGRAM_MAP(uts20_mem)
-    MDRV_CPU_IO_MAP(uts20_io)
+    MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
+    MCFG_CPU_PROGRAM_MAP(uts20_mem)
+    MCFG_CPU_IO_MAP(uts20_io)
 
-    MDRV_MACHINE_RESET(uts20)
+    MCFG_MACHINE_RESET(uts20)
 
     /* video hardware */
-    MDRV_SCREEN_ADD("screen", RASTER)
-    MDRV_SCREEN_REFRESH_RATE(50)
-    MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-    MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-    MDRV_SCREEN_SIZE(640, 250)
-    MDRV_SCREEN_VISIBLE_AREA(0, 639, 0, 249)
-    MDRV_PALETTE_LENGTH(2)
-    MDRV_PALETTE_INIT(black_and_white)
+    MCFG_SCREEN_ADD("screen", RASTER)
+    MCFG_SCREEN_REFRESH_RATE(50)
+    MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+    MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+    MCFG_SCREEN_SIZE(640, 250)
+    MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 249)
+    MCFG_PALETTE_LENGTH(2)
+    MCFG_PALETTE_INIT(black_and_white)
 
-    MDRV_VIDEO_START(uts20)
-    MDRV_VIDEO_UPDATE(uts20)
+    MCFG_VIDEO_START(uts20)
+    MCFG_VIDEO_UPDATE(uts20)
 MACHINE_CONFIG_END
 
 

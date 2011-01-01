@@ -501,7 +501,7 @@ If you have the source listing or the Rom dump, please send us.
 	device_image_interface *image;
 	UINT8 *ram;
 
-	ram = memory_region(machine, "maincpu");
+	ram = machine->region("maincpu")->base();
 	if (offset == state->pcb)
 	{
 		switch (data)
@@ -662,13 +662,13 @@ WRITE8_HANDLER( adam_common_writes_w )
     switch (state->upper_memory)
     {
         case 0: /* Internal RAM */
-            memory_region(space->machine, "maincpu")[0x08000+offset] = data;
+            space->machine->region("maincpu")->base()[0x08000+offset] = data;
             if (offset>=(state->pcb-0x08000)) master6801_behaviour(space->machine, offset+0x08000, data);
             break;
         case 1: /* ROM Expansion */
             break;
         case 2: /* RAM Expansion */
-            memory_region(space->machine, "maincpu")[0x18000+offset] = data;
+            space->machine->region("maincpu")->base()[0x18000+offset] = data;
         	break;
     	case 3: /* Cartridge ROM */
         	break;
@@ -690,7 +690,7 @@ WRITE8_HANDLER( adamnet_w )
     if data bit1 is 1 -> Lower 32k = EOS otherwise Lower 32k = SmartWriter
     */
 	UINT8 *BankBase;
-	BankBase = &memory_region(space->machine, "maincpu")[0x00000];
+	BankBase = &space->machine->region("maincpu")->base()[0x00000];
 
 	if (data==0x0F)
 		adam_reset_pcb(space->machine);
@@ -771,13 +771,13 @@ WRITE8_HANDLER(adam_video_w)
 #ifdef UNUSED_FUNCTION
 READ8_HANDLER( master6801_ram_r )
 {
-    /*logerror("Offset %04Xh = %02Xh\n",offset ,memory_region(machine, "maincpu")[offset]);*/
-    return memory_region(space->machine, "maincpu")[offset+0x4000];
+    /*logerror("Offset %04Xh = %02Xh\n",offset ,machine->region("maincpu")->base()[offset]);*/
+    return space->machine->region("maincpu")->base()[offset+0x4000];
 }
 
 WRITE8_HANDLER( master6801_ram_w )
 {
-    memory_region(space->machine, "maincpu")[offset+0x4000] = data;
+    space->machine->region("maincpu")->base()[offset+0x4000] = data;
 }
 #endif
 

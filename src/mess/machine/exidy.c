@@ -43,7 +43,7 @@ static TIMER_CALLBACK(exidy_serial_timer_callback)
 /* timer to read cassette waveforms */
 
 
-static running_device *cassette_device_image(running_machine *machine)
+static device_t *cassette_device_image(running_machine *machine)
 {
 	exidy_state *state = machine->driver_data<exidy_state>();
 	if (state->fe & 0x20)
@@ -244,8 +244,8 @@ WRITE8_HANDLER(exidy_fe_w)
 
 WRITE8_HANDLER(exidy_ff_w)
 {
-	running_device *printer = space->machine->device("centronics");
-	running_device *dac_device = space->machine->device("dac");
+	device_t *printer = space->machine->device("centronics");
+	device_t *dac_device = space->machine->device("dac");
 	/* reading the config switch */
 	switch (input_port_read(space->machine, "CONFIG") & 0x06)
 	{
@@ -324,7 +324,7 @@ READ8_HANDLER(exidy_ff_r)
     This uses bit 7. The other bits have been set high (=nothing plugged in).
     This fixes those games that use a joystick. */
 
-	running_device *printer = space->machine->device("centronics");
+	device_t *printer = space->machine->device("centronics");
 	UINT8 data=0x7f;
 
 	/* bit 7 = printer busy
@@ -392,8 +392,8 @@ Z80BIN_EXECUTE( exidy )
 
 SNAPSHOT_LOAD(exidy)
 {
-	UINT8 *ptr = memory_region(image.device().machine, "maincpu");
-	running_device *cpu = image.device().machine->device("maincpu");
+	UINT8 *ptr = image.device().machine->region("maincpu")->base();
+	device_t *cpu = image.device().machine->device("maincpu");
 	UINT8 header[28];
 
 	/* check size */

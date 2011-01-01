@@ -182,7 +182,7 @@ void Processor::VideoUpdate16(bitmap_t *bitmap)
 				/*
                 if (gamma_dither)
                 {
-                    dith = mame_rand(screen->machine) & 0x3f;
+                    dith = screen->machine->rand() & 0x3f;
                 }
                 if (gamma)
                 {
@@ -339,7 +339,7 @@ void Processor::TCDiv(INT32 ss, INT32 st, INT32 sw, INT32* sss, INT32* sst)
 	int outofbounds_t = tprod & tempmask;
 	if (shift == 0xe)//tc.c, 664
 	{
-		*sss = sprod << 1;//sw, tw здесь не изменились
+		*sss = sprod << 1;//sw, tw ????? ?? ??????????
 		*sst = tprod << 1;
 	}
 	else
@@ -412,7 +412,7 @@ void Processor::ColorCombiner1Cycle(bool noisecompute)
 {
 	if (noisecompute)
 	{
-		m_noise_color.i.r = m_noise_color.i.g = m_noise_color.i.b = mame_rand(m_machine) & 0xff; // Not accurate...
+		m_noise_color.i.r = m_noise_color.i.g = m_noise_color.i.b = m_machine->rand() & 0xff; // Not accurate...
 	}
 
 	m_pixel_color.i.r = ColorCombinerEquation(*m_color_inputs.combiner_rgbsub_a_r[1],*m_color_inputs.combiner_rgbsub_b_r[1],*m_color_inputs.combiner_rgbmul_r[1],*m_color_inputs.combiner_rgbadd_r[1]);
@@ -428,7 +428,7 @@ void Processor::ColorCombiner2Cycle(bool noisecompute)
 {
 	if (noisecompute)
 	{
-		m_noise_color.i.r = m_noise_color.i.g = m_noise_color.i.b = mame_rand(m_machine) & 0xff; // HACK
+		m_noise_color.i.r = m_noise_color.i.g = m_noise_color.i.b = m_machine->rand() & 0xff; // HACK
 	}
 
 	m_combined_color.i.r = ColorCombinerEquation(*m_color_inputs.combiner_rgbsub_a_r[0],*m_color_inputs.combiner_rgbsub_b_r[0],*m_color_inputs.combiner_rgbmul_r[0],*m_color_inputs.combiner_rgbadd_r[0]);
@@ -861,12 +861,12 @@ void Processor::lookup_cvmask_derivatives(UINT32 mask, UINT8* offx, UINT8* offy)
 {
 	UINT32 index;
 	/*
-	if (mask != (mask & 0xa5a5))//never happens
-		stricterror("wrong cvmask computed: %x", mask);
-	*/
-	index = compressed_cvmasks[mask];//согласно VTune, где-то на 50% быстрее, чем сжатие до 8 бит на месте в этой ф-ии
+    if (mask != (mask & 0xa5a5))//never happens
+        stricterror("wrong cvmask computed: %x", mask);
+    */
+	index = compressed_cvmasks[mask];//???????? VTune, ???-?? ?? 50% ???????, ??? ?????? ?? 8 ??? ?? ????? ? ???? ?-??
 	m_misc_state.m_curpixel_cvg = cvarray[index].cvg;
-	m_misc_state.m_curpixel_cvbit = cvarray[index].cvbit;//бит mask15b: cv.c, bl.c
+	m_misc_state.m_curpixel_cvbit = cvarray[index].cvbit;//??? mask15b: cv.c, bl.c
 	*offx = cvarray[index].xoff;
 	*offy = cvarray[index].yoff;
 }
@@ -939,7 +939,7 @@ void Processor::GetDitherValues(int x, int y, int* cdith, int* adith)
 		break;
 	case 2:
 		*cdith = s_magic_matrix[dithindex];
-		*adith = mame_rand(m_machine) & 7;
+		*adith = m_machine->rand() & 7;
 		break;
 	case 3:
 		*cdith = s_magic_matrix[dithindex];
@@ -954,26 +954,26 @@ void Processor::GetDitherValues(int x, int y, int* cdith, int* adith)
 		break;
 	case 6:
 		*cdith = s_bayer_matrix[dithindex];
-		*adith = mame_rand(m_machine) & 7;
+		*adith = m_machine->rand() & 7;
 		break;
 	case 7:
 		*cdith = s_bayer_matrix[dithindex];
 		*adith = 0;
 		break;
 	case 8:
-		*cdith = mame_rand(m_machine) & 7;
+		*cdith = m_machine->rand() & 7;
 		*adith = s_magic_matrix[dithindex];
 		break;
 	case 9:
-		*cdith = mame_rand(m_machine) & 7;
+		*cdith = m_machine->rand() & 7;
 		*adith = (~s_magic_matrix[dithindex]) & 7;
 		break;
 	case 10:
-		*cdith = mame_rand(m_machine) & 7;
+		*cdith = m_machine->rand() & 7;
 		*adith = (*cdith + 17) & 7;
 		break;
 	case 11:
-		*cdith = mame_rand(m_machine) & 7;
+		*cdith = m_machine->rand() & 7;
 		*adith = 0;
 		break;
 	case 12:
@@ -986,7 +986,7 @@ void Processor::GetDitherValues(int x, int y, int* cdith, int* adith)
 		break;
 	case 14:
 		*cdith = 0;
-		*adith = mame_rand(m_machine) & 7;
+		*adith = m_machine->rand() & 7;
 		break;
 	case 15:
 		*adith = *cdith = 0;
@@ -2335,7 +2335,7 @@ void N64::RDP::Processor::CmdTexRect(UINT32 w1, UINT32 w2)
 
 	UINT32* ewdata = GetTempRectData();
 	ewdata[0] = (0x24 << 24) | ((0x80 | tilenum) << 16) | yl;	// command, flipped, tile, yl
-	ewdata[1] = (yl << 16) | yh; 								// ym, yh
+	ewdata[1] = (yl << 16) | yh;								// ym, yh
 	ewdata[2] = (xlint << 16) | ((xl & 3) << 14);				// xl, xl frac
 	ewdata[3] = 0;												// dxldy, dxldy frac
 	ewdata[4] = (xhint << 16) | ((xh & 3) << 14);				// xh, xh frac
@@ -2808,7 +2808,7 @@ void N64::RDP::Processor::CmdLoadTile(UINT32 w1, UINT32 w2)
 				int tline = tb + ((tile[tilenum].line << 3) * j);
 				int s = ((j + tl) * m_misc_state.m_ti_width) + sl;
 
-				int xorval8 = ((j & 1) ? BYTE_XOR_DWORD_SWAP : BYTE_ADDR_XOR);//попроще,чем у Ziggy
+				int xorval8 = ((j & 1) ? BYTE_XOR_DWORD_SWAP : BYTE_ADDR_XOR);//???????,??? ? Ziggy
 				for (int i = 0; i < width; i++)
 				{
 					tc[((tline + i) ^ xorval8) & 0xfff] = RREADADDR8(src + s + i);

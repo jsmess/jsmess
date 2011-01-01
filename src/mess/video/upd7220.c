@@ -126,7 +126,7 @@ enum
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef void (*upd7220_command) (running_device *device);
+typedef void (*upd7220_command) (device_t *device);
 
 typedef struct _upd7220_t upd7220_t;
 struct _upd7220_t
@@ -194,14 +194,14 @@ struct _upd7220_t
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE upd7220_t *get_safe_token(running_device *device)
+INLINE upd7220_t *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert((device->type() == UPD7220));
 	return (upd7220_t *)downcast<legacy_device_base *>(device)->token();
 }
 
-INLINE const upd7220_interface *get_interface(running_device *device)
+INLINE const upd7220_interface *get_interface(device_t *device)
 {
 	assert(device != NULL);
 	assert((device->type() == UPD7220));
@@ -320,7 +320,7 @@ static void update_vsync_timer(upd7220_t *upd7220, int state)
 
 static TIMER_CALLBACK( vsync_tick )
 {
-	running_device *device = (running_device *)ptr;
+	device_t *device = (device_t *)ptr;
 	upd7220_t *upd7220 = get_safe_token(device);
 
 	if (param)
@@ -359,7 +359,7 @@ static void update_hsync_timer(upd7220_t *upd7220, int state)
 
 static TIMER_CALLBACK( hsync_tick )
 {
-	running_device *device = (running_device *)ptr;
+	device_t *device = (device_t *)ptr;
 	upd7220_t *upd7220 = get_safe_token(device);
 
 	devcb_call_write_line(&upd7220->out_hsync_func, param);
@@ -389,7 +389,7 @@ static void update_blank_timer(upd7220_t *upd7220, int state)
 
 static TIMER_CALLBACK( blank_tick )
 {
-	running_device *device = (running_device *)ptr;
+	device_t *device = (device_t *)ptr;
 	upd7220_t *upd7220 = get_safe_token(device);
 
 	if (param)
@@ -410,7 +410,7 @@ static TIMER_CALLBACK( blank_tick )
     recompute_parameters -
 -------------------------------------------------*/
 
-static void recompute_parameters(running_device *device)
+static void recompute_parameters(device_t *device)
 {
 	upd7220_t *upd7220 = get_safe_token(device);
 
@@ -560,7 +560,7 @@ static int translate_command(UINT8 data)
     process_fifo - process a single byte in FIFO
 -------------------------------------------------*/
 
-static void process_fifo(running_device *device)
+static void process_fifo(device_t *device)
 {
 	upd7220_t *upd7220 = get_safe_token(device);
 	UINT8 data;
@@ -933,7 +933,7 @@ WRITE_LINE_DEVICE_HANDLER( upd7220_lpen_w )
     draw_text_line - draw text scanline
 -------------------------------------------------*/
 
-static void draw_text_line(running_device *device, bitmap_t *bitmap, UINT32 addr, int y, int wd)
+static void draw_text_line(device_t *device, bitmap_t *bitmap, UINT32 addr, int y, int wd)
 {
 }
 
@@ -949,7 +949,7 @@ INLINE void get_text_partition(upd7220_t *upd7220, int index, UINT32 *sad, UINT1
     update_text - update text mode screen
 -------------------------------------------------*/
 
-static void update_text(running_device *device, bitmap_t *bitmap, const rectangle *cliprect)
+static void update_text(device_t *device, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	upd7220_t *upd7220 = get_safe_token(device);
 
@@ -976,7 +976,7 @@ static void update_text(running_device *device, bitmap_t *bitmap, const rectangl
     draw_graphics_line - draw graphics scanline
 -------------------------------------------------*/
 
-static void draw_graphics_line(running_device *device, bitmap_t *bitmap, UINT32 addr, int y, int wd)
+static void draw_graphics_line(device_t *device, bitmap_t *bitmap, UINT32 addr, int y, int wd)
 {
 	upd7220_t *upd7220 = get_safe_token(device);
 	address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
@@ -1002,7 +1002,7 @@ INLINE void get_graphics_partition(upd7220_t *upd7220, int index, UINT32 *sad, U
     update_graphics - update graphics mode screen
 -------------------------------------------------*/
 
-static void update_graphics(running_device *device, bitmap_t *bitmap, const rectangle *cliprect)
+static void update_graphics(device_t *device, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	upd7220_t *upd7220 = get_safe_token(device);
 
@@ -1033,7 +1033,7 @@ static void update_graphics(running_device *device, bitmap_t *bitmap, const rect
     upd7220_update - update screen
 -------------------------------------------------*/
 
-void upd7220_update(running_device *device, bitmap_t *bitmap, const rectangle *cliprect)
+void upd7220_update(device_t *device, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	upd7220_t *upd7220 = get_safe_token(device);
 

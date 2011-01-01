@@ -74,7 +74,7 @@ static VIDEO_UPDATE( act_f1 )
 static READ8_HANDLER( act_fdc_r )
 {
 	act_state *state = space->machine->driver_data<act_state>();
-	running_device* dev = space->machine->device("fdc");
+	device_t* dev = space->machine->device("fdc");
 
 //  printf("%02x\n",offset);
 
@@ -102,7 +102,7 @@ static READ8_HANDLER( act_fdc_r )
 static WRITE8_HANDLER( act_fdc_w )
 {
 	act_state *state = space->machine->driver_data<act_state>();
-	running_device* dev = space->machine->device("fdc");
+	device_t* dev = space->machine->device("fdc");
 
 //  printf("%02x %02x\n",offset,data);
 
@@ -165,7 +165,7 @@ ADDRESS_MAP_END
 static WRITE8_HANDLER( actf1_sys_w )
 {
 //  static UINT8 cur_fdrv;
-//  running_device* dev = space->machine->device("fdc");
+//  device_t* dev = space->machine->device("fdc");
 
 	switch(offset)
 	{
@@ -292,34 +292,34 @@ static const floppy_config act_floppy_config =
 static MACHINE_CONFIG_START( act_f1, act_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", I8086, 4670000)
-	MDRV_CPU_PROGRAM_MAP(act_f1_mem)
-	MDRV_CPU_IO_MAP(act_f1_io)
-	MDRV_CPU_VBLANK_INT("screen",act_f1_irq )
-//  MDRV_CPU_CONFIG(x1_daisy)
+	MCFG_CPU_ADD("maincpu", I8086, 4670000)
+	MCFG_CPU_PROGRAM_MAP(act_f1_mem)
+	MCFG_CPU_IO_MAP(act_f1_io)
+	MCFG_CPU_VBLANK_INT("screen",act_f1_irq )
+//  MCFG_CPU_CONFIG(x1_daisy)
 
-	MDRV_Z80CTC_ADD( "ctc", 4670000 , ctc_intf )
+	MCFG_Z80CTC_ADD( "ctc", 4670000 , ctc_intf )
 
-	MDRV_MACHINE_RESET(act)
+	MCFG_MACHINE_RESET(act)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(50)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(640, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 256-1)
-	MDRV_PALETTE_LENGTH(16)
-//  MDRV_PALETTE_INIT(black_and_white)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(640, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 256-1)
+	MCFG_PALETTE_LENGTH(16)
+//  MCFG_PALETTE_INIT(black_and_white)
 
-	MDRV_WD2793_ADD("fdc", default_wd17xx_interface_2_drives )
+	MCFG_WD2793_ADD("fdc", default_wd17xx_interface_2_drives )
 
-	MDRV_GFXDECODE(act_f1)
+	MCFG_GFXDECODE(act_f1)
 
-	MDRV_VIDEO_START(act_f1)
-	MDRV_VIDEO_UPDATE(act_f1)
+	MCFG_VIDEO_START(act_f1)
+	MCFG_VIDEO_UPDATE(act_f1)
 
-	MDRV_FLOPPY_2_DRIVES_ADD(act_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_ADD(act_floppy_config)
 MACHINE_CONFIG_END
 
 /* ROM definition */

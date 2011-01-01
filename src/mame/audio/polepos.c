@@ -47,7 +47,7 @@ static const double volume_table[8] =
 static const double r_filt_out[3] = {RES_K(4.7), RES_K(7.5), RES_K(10)};
 static const double r_filt_total = 1.0 / (1.0/RES_K(4.7) + 1.0/RES_K(7.5) + 1.0/RES_K(10));
 
-INLINE polepos_sound_state *get_safe_token( running_device *device )
+INLINE polepos_sound_state *get_safe_token( device_t *device )
 {
 	assert(device != NULL);
 	assert(device->type() == POLEPOS);
@@ -81,7 +81,7 @@ static STREAM_UPDATE( engine_sound_update )
 	/* determine the volume */
 	slot = (state->sample_msb >> 3) & 7;
 	volume = volume_table[slot];
-	base = &memory_region(device->machine, "engine")[slot * 0x800];
+	base = &device->machine->region("engine")->base()[slot * 0x800];
 
 	/* fill in the sample */
 	while (samples--)

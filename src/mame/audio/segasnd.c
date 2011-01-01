@@ -80,7 +80,7 @@ typedef struct _usb_state usb_state;
 struct _usb_state
 {
 	sound_stream *		stream;				/* output stream */
-	running_device *cpu;				/* CPU index of the 8035 */
+	device_t *cpu;				/* CPU index of the 8035 */
 	UINT8				in_latch;			/* input latch */
 	UINT8				out_latch;			/* output latch */
 	UINT8				last_p2_value;		/* current P2 output value */
@@ -169,7 +169,7 @@ static READ8_HANDLER( speech_p1_r )
 
 static READ8_HANDLER( speech_rom_r )
 {
-	return memory_region(space->machine, "speech")[0x100 * (speech_p2 & 0x3f) + offset];
+	return space->machine->region("speech")->base()[0x100 * (speech_p2 & 0x3f) + offset];
 }
 
 static WRITE8_HANDLER( speech_p1_w )
@@ -191,7 +191,7 @@ static WRITE8_HANDLER( speech_p2_w )
  *
  *************************************/
 
-static void speech_drq_w(running_device *device, int level)
+static void speech_drq_w(device_t *device, int level)
 {
 	speech_drq = (level == ASSERT_LINE);
 }
@@ -278,14 +278,14 @@ static const struct sp0250_interface sp0250_interface =
 MACHINE_CONFIG_FRAGMENT( sega_speech_board )
 
 	/* CPU for the speech board */
-	MDRV_CPU_ADD("audiocpu", I8035, SPEECH_MASTER_CLOCK)		/* divide by 15 in CPU */
-	MDRV_CPU_PROGRAM_MAP(speech_map)
-	MDRV_CPU_IO_MAP(speech_portmap)
+	MCFG_CPU_ADD("audiocpu", I8035, SPEECH_MASTER_CLOCK)		/* divide by 15 in CPU */
+	MCFG_CPU_PROGRAM_MAP(speech_map)
+	MCFG_CPU_IO_MAP(speech_portmap)
 
 	/* sound hardware */
-	MDRV_SOUND_ADD("speech", SP0250, SPEECH_MASTER_CLOCK)
-	MDRV_SOUND_CONFIG(sp0250_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("speech", SP0250, SPEECH_MASTER_CLOCK)
+	MCFG_SOUND_CONFIG(sp0250_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -918,21 +918,21 @@ ADDRESS_MAP_END
 MACHINE_CONFIG_FRAGMENT( sega_universal_sound_board )
 
 	/* CPU for the usb board */
-	MDRV_CPU_ADD("usbcpu", I8035, USB_MASTER_CLOCK)		/* divide by 15 in CPU */
-	MDRV_CPU_PROGRAM_MAP(usb_map)
-	MDRV_CPU_IO_MAP(usb_portmap)
+	MCFG_CPU_ADD("usbcpu", I8035, USB_MASTER_CLOCK)		/* divide by 15 in CPU */
+	MCFG_CPU_PROGRAM_MAP(usb_map)
+	MCFG_CPU_IO_MAP(usb_portmap)
 
-	MDRV_TIMER_ADD_PERIODIC("usb_timer", increment_t1_clock, HZ(USB_2MHZ_CLOCK / 256))
+	MCFG_TIMER_ADD_PERIODIC("usb_timer", increment_t1_clock, HZ(USB_2MHZ_CLOCK / 256))
 
 	/* sound hardware */
-	MDRV_SOUND_ADD("usbsnd", USB, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("usbsnd", USB, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_DERIVED( sega_universal_sound_board_rom, sega_universal_sound_board )
 
 	/* CPU for the usb board */
-	MDRV_CPU_MODIFY("usbcpu")
-	MDRV_CPU_PROGRAM_MAP(usb_map_rom)
+	MCFG_CPU_MODIFY("usbcpu")
+	MCFG_CPU_PROGRAM_MAP(usb_map_rom)
 MACHINE_CONFIG_END

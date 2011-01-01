@@ -122,7 +122,7 @@ static WRITE8_HANDLER(vt100_keyboard_w)
 {
 	vt100_state *state = space->machine->driver_data<vt100_state>();
 
-	running_device *speaker = space->machine->device("speaker");
+	device_t *speaker = space->machine->device("speaker");
 
 	output_set_value("online_led",BIT(data,5) ? 0 : 1);
 	output_set_value("local_led", BIT(data,5));
@@ -302,7 +302,7 @@ INPUT_PORTS_END
 
 static VIDEO_UPDATE( vt100 )
 {
-	running_device *devconf = screen->machine->device("vt100_video");
+	device_t *devconf = screen->machine->device("vt100_video");
 	vt_video_update( devconf, bitmap, cliprect);
 	return 0;
 }
@@ -394,41 +394,41 @@ GFXDECODE_END
 
 static MACHINE_CONFIG_START( vt100, vt100_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu",I8080, XTAL_24_8832MHz / 9)
-	MDRV_CPU_PROGRAM_MAP(vt100_mem)
-	MDRV_CPU_IO_MAP(vt100_io)
-	MDRV_CPU_VBLANK_INT("screen", vt100_vertical_interrupt)
+	MCFG_CPU_ADD("maincpu",I8080, XTAL_24_8832MHz / 9)
+	MCFG_CPU_PROGRAM_MAP(vt100_mem)
+	MCFG_CPU_IO_MAP(vt100_io)
+	MCFG_CPU_VBLANK_INT("screen", vt100_vertical_interrupt)
 
-	MDRV_MACHINE_START(vt100)
-	MDRV_MACHINE_RESET(vt100)
+	MCFG_MACHINE_START(vt100)
+	MCFG_MACHINE_RESET(vt100)
 
     /* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(80*10, 25*10)
-	MDRV_SCREEN_VISIBLE_AREA(0, 80*10-1, 0, 25*10-1)
-	MDRV_GFXDECODE(vt100)
-	MDRV_PALETTE_LENGTH(2)
-	MDRV_PALETTE_INIT(monochrome_green)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(80*10, 25*10)
+	MCFG_SCREEN_VISIBLE_AREA(0, 80*10-1, 0, 25*10-1)
+	MCFG_GFXDECODE(vt100)
+	MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_INIT(monochrome_green)
 
-	MDRV_DEFAULT_LAYOUT( layout_vt100 )
-	MDRV_VIDEO_START(generic_bitmapped)
-	MDRV_VIDEO_UPDATE(vt100)
+	MCFG_DEFAULT_LAYOUT( layout_vt100 )
+	MCFG_VIDEO_START(generic_bitmapped)
+	MCFG_VIDEO_UPDATE(vt100)
 
-	MDRV_VT100_VIDEO_ADD("vt100_video", vt100_video_interface)
+	MCFG_VT100_VIDEO_ADD("vt100_video", vt100_video_interface)
 
 	/* audio hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( vt180, vt100 )
-	MDRV_CPU_ADD("z80cpu", Z80, XTAL_24_8832MHz / 9)
-	MDRV_CPU_PROGRAM_MAP(vt180_mem)
-    MDRV_CPU_IO_MAP(vt180_io)	
+	MCFG_CPU_ADD("z80cpu", Z80, XTAL_24_8832MHz / 9)
+	MCFG_CPU_PROGRAM_MAP(vt180_mem)
+    MCFG_CPU_IO_MAP(vt180_io)	
 MACHINE_CONFIG_END
 
 /* VT1xx models:

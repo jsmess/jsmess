@@ -262,7 +262,7 @@ static TIMER_CALLBACK(puncher_callback)
 /*
     Initiate read of a 6-bit word from tape
 */
-void tx0_io_r1l(running_device *device)
+void tx0_io_r1l(device_t *device)
 {
 	tx0_state *state = device->machine->driver_data<tx0_state>();
 	begin_tape_read(state, 0);
@@ -271,7 +271,7 @@ void tx0_io_r1l(running_device *device)
 /*
     Initiate read of a 18-bit word from tape (used in read-in mode)
 */
-void tx0_io_r3l(running_device *device)
+void tx0_io_r3l(device_t *device)
 {
 	tx0_state *state = device->machine->driver_data<tx0_state>();
 	begin_tape_read(state, 1);
@@ -280,7 +280,7 @@ void tx0_io_r3l(running_device *device)
 /*
     Write a 7-bit word to tape (7th bit clear)
 */
-void tx0_io_p6h(running_device *device)
+void tx0_io_p6h(device_t *device)
 {
 	tx0_state *state = device->machine->driver_data<tx0_state>();
 	int ac;
@@ -296,7 +296,7 @@ void tx0_io_p6h(running_device *device)
 /*
     Write a 7-bit word to tape (7th bit set)
 */
-void tx0_io_p7h(running_device *device)
+void tx0_io_p7h(device_t *device)
 {
 	tx0_state *state = device->machine->driver_data<tx0_state>();
 	int ac;
@@ -357,7 +357,7 @@ static TIMER_CALLBACK(prt_callback)
 /*
     prt io callback
 */
-void tx0_io_prt(running_device *device)
+void tx0_io_prt(device_t *device)
 {
 	tx0_state *state = device->machine->driver_data<tx0_state>();
 	int ac;
@@ -384,7 +384,7 @@ static TIMER_CALLBACK(dis_callback)
 /*
     Plot one point on crt
 */
-void tx0_io_dis(running_device *device)
+void tx0_io_dis(device_t *device)
 {
 	tx0_state *state = device->machine->driver_data<tx0_state>();
 	int ac;
@@ -502,7 +502,7 @@ DEVICE_IMAGE_UNLOAD( tx0_magtape )
 	}
 }
 
-static void magtape_callback(running_device *device)
+static void magtape_callback(device_t *device)
 {
 	tx0_state *state = device->machine->driver_data<tx0_state>();
 	UINT8 buf = 0;
@@ -943,7 +943,7 @@ static void magtape_callback(running_device *device)
 	}
 }
 
-void tx0_sel(running_device *device)
+void tx0_sel(device_t *device)
 {
 	tx0_state *state = device->machine->driver_data<tx0_state>();
 	state->magtape.sel_pending = TRUE;
@@ -956,7 +956,7 @@ void tx0_sel(running_device *device)
 	}
 }
 
-void tx0_io_cpy(running_device *device)
+void tx0_io_cpy(device_t *device)
 {
 	tx0_state *state = device->machine->driver_data<tx0_state>();
 	switch (state->magtape.state)
@@ -991,7 +991,7 @@ void tx0_io_cpy(running_device *device)
 
     IO devices should reset
 */
-void tx0_io_reset_callback(running_device *device)
+void tx0_io_reset_callback(device_t *device)
 {
 	tx0_state *state = device->machine->driver_data<tx0_state>();
 	state->tape_reader.rcl = state->tape_reader.rc = 0;

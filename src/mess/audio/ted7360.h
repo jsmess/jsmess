@@ -71,9 +71,9 @@ struct _ted7360_interface
 
 DECLARE_LEGACY_SOUND_DEVICE(TED7360, ted7360);
 
-#define MDRV_TED7360_ADD(_tag, _interface) \
-	MDRV_SOUND_ADD(_tag, TED7360, 0) \
-	MDRV_DEVICE_CONFIG(_interface)
+#define MCFG_TED7360_ADD(_tag, _interface) \
+	MCFG_SOUND_ADD(_tag, TED7360, 0) \
+	MCFG_DEVICE_CONFIG(_interface)
 
 
 /*----------- defined in audio/ted7360.c -----------*/
@@ -84,9 +84,9 @@ READ8_DEVICE_HANDLER( ted7360_port_r );
 WRITE_LINE_DEVICE_HANDLER( ted7360_rom_switch_w );
 READ_LINE_DEVICE_HANDLER( ted7360_rom_switch_r );
 
-void ted7360_frame_interrupt_gen(running_device *device);
-void ted7360_raster_interrupt_gen(running_device *device);
-UINT32 ted7360_video_update(running_device *device, bitmap_t *bitmap, const rectangle *cliprect);
+void ted7360_frame_interrupt_gen(device_t *device);
+void ted7360_raster_interrupt_gen(device_t *device);
+UINT32 ted7360_video_update(device_t *device, bitmap_t *bitmap, const rectangle *cliprect);
 
 
 #endif /* __TED7360_H__ */

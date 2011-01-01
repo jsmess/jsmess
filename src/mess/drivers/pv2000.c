@@ -368,12 +368,12 @@ static MACHINE_RESET( pv2000 )
 	state->keyb_column = 0;
 
 	cpu_set_input_line_vector(machine->device("maincpu"), INPUT_LINE_IRQ0, 0xff);
-	memset(&memory_region(machine, "maincpu")[0x7000], 0xff, 0x1000);	// initialize RAM
+	memset(&machine->region("maincpu")->base()[0x7000], 0xff, 0x1000);	// initialize RAM
 }
 
 static DEVICE_IMAGE_LOAD( pv2000_cart )
 {
-	UINT8 *cart = memory_region(image.device().machine, "maincpu") + 0xC000;
+	UINT8 *cart = image.device().machine->region("maincpu")->base() + 0xC000;
 	UINT32 size;
 
 	if (image.software_entry() == NULL)
@@ -414,37 +414,37 @@ static const cassette_config pv2000_cassette_config =
 static MACHINE_CONFIG_START( pv2000, pv2000_state )
 
 	// basic machine hardware
-	MDRV_CPU_ADD("maincpu", Z80, XTAL_7_15909MHz/2)	// 3.579545 MHz
-	MDRV_CPU_PROGRAM_MAP(pv2000_map)
-	MDRV_CPU_IO_MAP(pv2000_io_map)
-	MDRV_CPU_VBLANK_INT("screen", pv2000_interrupt)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_7_15909MHz/2)	// 3.579545 MHz
+	MCFG_CPU_PROGRAM_MAP(pv2000_map)
+	MCFG_CPU_IO_MAP(pv2000_io_map)
+	MCFG_CPU_VBLANK_INT("screen", pv2000_interrupt)
 
-	MDRV_MACHINE_START(pv2000)
-	MDRV_MACHINE_RESET(pv2000)
+	MCFG_MACHINE_START(pv2000)
+	MCFG_MACHINE_RESET(pv2000)
 
     // video hardware
-	MDRV_FRAGMENT_ADD(tms9928a)
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_REFRESH_RATE((float)XTAL_10_738635MHz/2/342/262)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_FRAGMENT_ADD(tms9928a)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_REFRESH_RATE((float)XTAL_10_738635MHz/2/342/262)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 
 	// sound hardware
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("sn76489a", SN76489A, XTAL_7_15909MHz/2)	/* 3.579545 MHz */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("sn76489a", SN76489A, XTAL_7_15909MHz/2)	/* 3.579545 MHz */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* cassette */
-	MDRV_CASSETTE_ADD( "cassette", pv2000_cassette_config )
+	MCFG_CASSETTE_ADD( "cassette", pv2000_cassette_config )
 
 	/* cartridge */
-	MDRV_CARTSLOT_ADD("cart")
-	MDRV_CARTSLOT_EXTENSION_LIST("rom,col,bin")
-	MDRV_CARTSLOT_NOT_MANDATORY
-	MDRV_CARTSLOT_LOAD(pv2000_cart)
-	MDRV_CARTSLOT_INTERFACE("pv2000_cart")
+	MCFG_CARTSLOT_ADD("cart")
+	MCFG_CARTSLOT_EXTENSION_LIST("rom,col,bin")
+	MCFG_CARTSLOT_NOT_MANDATORY
+	MCFG_CARTSLOT_LOAD(pv2000_cart)
+	MCFG_CARTSLOT_INTERFACE("pv2000_cart")
 
 	/* Software lists */
-	MDRV_SOFTWARE_LIST_ADD("cart_list","pv2000")
+	MCFG_SOFTWARE_LIST_ADD("cart_list","pv2000")
 MACHINE_CONFIG_END
 
 

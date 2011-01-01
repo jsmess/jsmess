@@ -201,7 +201,7 @@ WRITE8_HANDLER( pc1640_port60_w )
 
 READ8_HANDLER( pc200_port378_r )
 {
-	running_device *lpt = space->machine->device("lpt_1");
+	device_t *lpt = space->machine->device("lpt_1");
 	UINT8 data = pc_lpt_r(lpt, offset);
 
 	if (offset == 1)
@@ -214,7 +214,7 @@ READ8_HANDLER( pc200_port378_r )
 
 static READ8_HANDLER( pc200_port278_r )
 {
-	running_device *lpt = space->machine->device("lpt_2");
+	device_t *lpt = space->machine->device("lpt_2");
 	UINT8 data = pc_lpt_r(lpt, offset);
 
 	if (offset == 1)
@@ -228,7 +228,7 @@ static READ8_HANDLER( pc200_port278_r )
 
 READ8_HANDLER( pc1640_port378_r )
 {
-	 running_device *lpt = space->machine->device("lpt_1");
+	 device_t *lpt = space->machine->device("lpt_1");
 	 UINT8 data = pc_lpt_r(lpt, offset);
 
 	if (offset == 1)

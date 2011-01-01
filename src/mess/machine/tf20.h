@@ -51,8 +51,8 @@ INPUT_PORTS_EXTERN( tf20 );
 
 DECLARE_LEGACY_DEVICE(TF20, tf20);
 
-#define MDRV_TF20_ADD(_tag) \
-	MDRV_DEVICE_ADD(_tag, TF20, 0) \
+#define MCFG_TF20_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, TF20, 0) \
 
 
 #endif /* __TF20_H__ */

@@ -135,7 +135,7 @@ struct _tc8521_t
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE tc8521_t *get_token(running_device *device)
+INLINE tc8521_t *get_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == TC8521);
@@ -143,7 +143,7 @@ INLINE tc8521_t *get_token(running_device *device)
 }
 
 
-INLINE const tc8521_interface *get_interface(running_device *device)
+INLINE const tc8521_interface *get_interface(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == TC8521);
@@ -182,7 +182,7 @@ static const UINT8 rtc_write_masks[16*4]=
     supplied file
 -------------------------------------------------*/
 
-void tc8521_load_stream(running_device *device, mame_file *file)
+void tc8521_load_stream(device_t *device, mame_file *file)
 {
 	tc8521_t *rtc = get_token(device);
 
@@ -201,7 +201,7 @@ void tc8521_load_stream(running_device *device, mame_file *file)
     supplied file
 -------------------------------------------------*/
 
-void tc8521_save_stream(running_device *device, mame_file *file)
+void tc8521_save_stream(device_t *device, mame_file *file)
 {
 	tc8521_t *rtc = get_token(device);
 
@@ -219,7 +219,7 @@ void tc8521_save_stream(running_device *device, mame_file *file)
     tc8521_set_alarm_output
 -------------------------------------------------*/
 
-static void tc8521_set_alarm_output(running_device *device)
+static void tc8521_set_alarm_output(device_t *device)
 {
 	tc8521_t *rtc = get_token(device);
 	const tc8521_interface *rtc_interface = get_interface(device);
@@ -266,7 +266,7 @@ static void tc8521_set_alarm_output(running_device *device)
     tc8521_alarm_check
 -------------------------------------------------*/
 
-static void tc8521_alarm_check(running_device *device)
+static void tc8521_alarm_check(device_t *device)
 {
 	tc8521_t *rtc = get_token(device);
 
@@ -295,7 +295,7 @@ static void tc8521_alarm_check(running_device *device)
 
 static TIMER_CALLBACK(tc8521_timer_callback)
 {
-	running_device *device = (running_device *)ptr;
+	device_t *device = (device_t *)ptr;
 	tc8521_t *rtc = get_token(device);
 
 	/* Assumption how it works */

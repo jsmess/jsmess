@@ -127,7 +127,7 @@ static WRITE8_HANDLER(svision_w)
 			break;
 		case 0x26: /* bits 5,6 memory management for a000? */
 			logerror("%.6f svision write %04x %02x\n", attotime_to_double(timer_get_time(space->machine)),offset,data);
-			memory_set_bankptr(space->machine, "bank1", memory_region(space->machine, "user1") + ((state->reg[0x26] & 0xe0) << 9));
+			memory_set_bankptr(space->machine, "bank1", space->machine->region("user1")->base() + ((state->reg[0x26] & 0xe0) << 9));
 			svision_irq( space->machine );
 			break;
 		case 0x23: /* delta hero irq routine write */
@@ -429,7 +429,7 @@ static DRIVER_INIT( svision )
 	state->sound = machine->device("custom");
 	state->dma_finished = svision_dma_finished(state->sound);
 	state->pet.on = FALSE;
-	memory_set_bankptr(machine, "bank2", memory_region(machine, "user1") + 0x1c000);
+	memory_set_bankptr(machine, "bank2", machine->region("user1")->base() + 0x1c000);
 }
 
 static DRIVER_INIT( svisions )
@@ -438,7 +438,7 @@ static DRIVER_INIT( svisions )
 	state->svision.timer1 = timer_alloc(machine, svision_timer, NULL);
 	state->sound = machine->device("custom");
 	state->dma_finished = svision_dma_finished(state->sound);
-	memory_set_bankptr(machine, "bank2", memory_region(machine, "user1") + 0x1c000);
+	memory_set_bankptr(machine, "bank2", machine->region("user1")->base() + 0x1c000);
 	state->svision.timer1 = timer_alloc(machine, svision_timer, NULL);
 	state->pet.on = TRUE;
 	state->pet.timer = timer_alloc(machine, svision_pet_timer, NULL);
@@ -456,7 +456,7 @@ static DEVICE_IMAGE_LOAD( svision_cart )
 		size = image.length();
 		temp_copy = auto_alloc_array(image.device().machine, UINT8, size);
 
-		if (size > memory_region_length(image.device().machine, "user1"))
+		if (size > image.device().machine->region("user1")->bytes())
 		{
 			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
 			auto_free(image.device().machine, temp_copy);
@@ -477,11 +477,11 @@ static DEVICE_IMAGE_LOAD( svision_cart )
 		memcpy(temp_copy, image.get_software_region("rom"), size);
 	}
 
-	mirror = memory_region_length(image.device().machine, "user1") / size;
+	mirror = image.device().machine->region("user1")->bytes() / size;
 
 	/* With the following, we mirror the cart in the whole "user1" memory region */
 	for (i = 0; i < mirror; i++)
-		memcpy(memory_region(image.device().machine, "user1") + i * size, temp_copy, size);
+		memcpy(image.device().machine->region("user1")->base() + i * size, temp_copy, size);
 
 	auto_free(image.device().machine, temp_copy);
 
@@ -493,7 +493,7 @@ static MACHINE_RESET( svision )
 	svision_state *state = machine->driver_data<svision_state>();
 	state->svision.timer_shot = FALSE;
 	*state->dma_finished = FALSE;
-	memory_set_bankptr(machine, "bank1", memory_region(machine, "user1"));
+	memory_set_bankptr(machine, "bank1", machine->region("user1")->base());
 }
 
 
@@ -502,7 +502,7 @@ static MACHINE_RESET( tvlink )
 	svision_state *state = machine->driver_data<svision_state>();
 	state->svision.timer_shot = FALSE;
 	*state->dma_finished = FALSE;
-	memory_set_bankptr(machine, "bank1", memory_region(machine, "user1"));
+	memory_set_bankptr(machine, "bank1", machine->region("user1")->base());
 	state->tvlink.palette_on = FALSE;
 
 	memset(state->reg + 0x800, 0xff, 0x40); // normally done from state->tvlink microcontroller
@@ -516,66 +516,66 @@ static MACHINE_RESET( tvlink )
 
 static MACHINE_CONFIG_START( svision, svision_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M65C02, 4000000)        /* ? stz used! speed? */
-	MDRV_CPU_PROGRAM_MAP(svision_mem)
-	MDRV_CPU_VBLANK_INT("screen", svision_frame_int)
+	MCFG_CPU_ADD("maincpu", M65C02, 4000000)        /* ? stz used! speed? */
+	MCFG_CPU_PROGRAM_MAP(svision_mem)
+	MCFG_CPU_VBLANK_INT("screen", svision_frame_int)
 
-	MDRV_MACHINE_RESET( svision )
+	MCFG_MACHINE_RESET( svision )
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", LCD)
-	MDRV_SCREEN_REFRESH_RATE(61)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(3+160+3, 160)
-	MDRV_SCREEN_VISIBLE_AREA(3+0, 3+160-1, 0, 160-1)
-	MDRV_PALETTE_LENGTH(ARRAY_LENGTH(svision_palette) * 3)
-	MDRV_PALETTE_INIT( svision )
+	MCFG_SCREEN_ADD("screen", LCD)
+	MCFG_SCREEN_REFRESH_RATE(61)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(3+160+3, 160)
+	MCFG_SCREEN_VISIBLE_AREA(3+0, 3+160-1, 0, 160-1)
+	MCFG_PALETTE_LENGTH(ARRAY_LENGTH(svision_palette) * 3)
+	MCFG_PALETTE_INIT( svision )
 
-	MDRV_VIDEO_UPDATE( svision )
-	MDRV_DEFAULT_LAYOUT(layout_svision)
+	MCFG_VIDEO_UPDATE( svision )
+	MCFG_DEFAULT_LAYOUT(layout_svision)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MDRV_SOUND_ADD("custom", SVISION, 0)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 0.50)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 0.50)
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SOUND_ADD("custom", SVISION, 0)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
 	/* cartridge */
-	MDRV_CARTSLOT_ADD("cart")
-	MDRV_CARTSLOT_EXTENSION_LIST("bin,ws,sv")
-	MDRV_CARTSLOT_MANDATORY
-	MDRV_CARTSLOT_INTERFACE("svision_cart")
-	MDRV_CARTSLOT_LOAD(svision_cart)
+	MCFG_CARTSLOT_ADD("cart")
+	MCFG_CARTSLOT_EXTENSION_LIST("bin,ws,sv")
+	MCFG_CARTSLOT_MANDATORY
+	MCFG_CARTSLOT_INTERFACE("svision_cart")
+	MCFG_CARTSLOT_LOAD(svision_cart)
 
 	/* Software lists */
-	MDRV_SOFTWARE_LIST_ADD("cart_list","svision")
+	MCFG_SOFTWARE_LIST_ADD("cart_list","svision")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( svisionp, svision )
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_CLOCK(4430000)
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_REFRESH_RATE(50)
-	MDRV_PALETTE_INIT( svisionp )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_CLOCK(4430000)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_PALETTE_INIT( svisionp )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( svisionn, svision )
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_CLOCK(3560000/*?*/)
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_PALETTE_INIT( svisionn )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_CLOCK(3560000/*?*/)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_PALETTE_INIT( svisionn )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( tvlinkp, svisionp )
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(tvlink_mem)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(tvlink_mem)
 
-	MDRV_MACHINE_RESET( tvlink )
+	MCFG_MACHINE_RESET( tvlink )
 
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB15)
-	MDRV_VIDEO_UPDATE( tvlink )
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB15)
+	MCFG_VIDEO_UPDATE( tvlink )
 
 MACHINE_CONFIG_END
 

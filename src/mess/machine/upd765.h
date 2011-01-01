@@ -37,8 +37,8 @@ typedef enum
 #define UPD765_DAM_DELETED_DATA 0x0f8
 #define UPD765_DAM_DATA 0x0fb
 
-typedef running_device *(*upd765_get_image_func)(running_device *device, int floppy_index);
-#define UPD765_GET_IMAGE(name)	running_device *name(running_device *device, int floppy_index )
+typedef device_t *(*upd765_get_image_func)(device_t *device, int floppy_index);
+#define UPD765_GET_IMAGE(name)	device_t *name(device_t *device, int floppy_index )
 
 
 typedef struct upd765_interface
@@ -75,7 +75,7 @@ WRITE8_DEVICE_HANDLER(upd765_dack_w);
 READ8_DEVICE_HANDLER(upd765_dack_r);
 
 /* reset upd765 */
-void upd765_reset(running_device *device, int);
+void upd765_reset(device_t *device, int);
 
 /* reset pin of upd765 */
 WRITE_LINE_DEVICE_HANDLER(upd765_reset_w);
@@ -86,7 +86,7 @@ WRITE_LINE_DEVICE_HANDLER(upd765_tc_w);
 /* set upd765 ready input*/
 WRITE_LINE_DEVICE_HANDLER(upd765_ready_w);
 
-void upd765_idle(running_device *device);
+void upd765_idle(device_t *device);
 
 /*********************/
 /* STATUS REGISTER 1 */
@@ -113,49 +113,49 @@ command, or FDC encounters a Data Mark when executing a read deleted data comman
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MDRV_UPD765A_ADD(_tag, _intrf) \
-	MDRV_DEVICE_ADD(_tag, UPD765A, 0) \
-	MDRV_DEVICE_CONFIG(_intrf)
+#define MCFG_UPD765A_ADD(_tag, _intrf) \
+	MCFG_DEVICE_ADD(_tag, UPD765A, 0) \
+	MCFG_DEVICE_CONFIG(_intrf)
 
-#define MDRV_UPD765A_MODIFY(_tag, _intrf) \
-  MDRV_DEVICE_MODIFY(_tag)	      \
-  MDRV_DEVICE_CONFIG(_intrf)
+#define MCFG_UPD765A_MODIFY(_tag, _intrf) \
+  MCFG_DEVICE_MODIFY(_tag)	      \
+  MCFG_DEVICE_CONFIG(_intrf)
 
-#define MDRV_UPD765A_REMOVE(_tag)		\
-  MDRV_DEVICE_REMOVE(_tag)
+#define MCFG_UPD765A_REMOVE(_tag)		\
+  MCFG_DEVICE_REMOVE(_tag)
 
-#define MDRV_UPD765B_ADD(_tag, _intrf) \
-	MDRV_DEVICE_ADD(_tag, UPD765B, 0) \
-	MDRV_DEVICE_CONFIG(_intrf)
+#define MCFG_UPD765B_ADD(_tag, _intrf) \
+	MCFG_DEVICE_ADD(_tag, UPD765B, 0) \
+	MCFG_DEVICE_CONFIG(_intrf)
 
-#define MDRV_UPD765B_MODIFY(_tag, _intrf) \
-  MDRV_DEVICE_MODIFY(_tag)	      \
-  MDRV_DEVICE_CONFIG(_intrf)
+#define MCFG_UPD765B_MODIFY(_tag, _intrf) \
+  MCFG_DEVICE_MODIFY(_tag)	      \
+  MCFG_DEVICE_CONFIG(_intrf)
 
-#define MDRV_UPD765B_REMOVE(_tag)		\
-  MDRV_DEVICE_REMOVE(_tag)
+#define MCFG_UPD765B_REMOVE(_tag)		\
+  MCFG_DEVICE_REMOVE(_tag)
 
-#define MDRV_SMC37C78_ADD(_tag, _intrf) \
-	MDRV_DEVICE_ADD(_tag, SMC37C78, 0) \
-	MDRV_DEVICE_CONFIG(_intrf)
+#define MCFG_SMC37C78_ADD(_tag, _intrf) \
+	MCFG_DEVICE_ADD(_tag, SMC37C78, 0) \
+	MCFG_DEVICE_CONFIG(_intrf)
 
-#define MDRV_SMC37C78_MODIFY(_tag, _intrf) \
-  MDRV_DEVICE_MODIFY(_tag)	      \
-  MDRV_DEVICE_CONFIG(_intrf)
+#define MCFG_SMC37C78_MODIFY(_tag, _intrf) \
+  MCFG_DEVICE_MODIFY(_tag)	      \
+  MCFG_DEVICE_CONFIG(_intrf)
 
-#define MDRV_SMC37C78_REMOVE(_tag)		\
-  MDRV_DEVICE_REMOVE(_tag)
+#define MCFG_SMC37C78_REMOVE(_tag)		\
+  MCFG_DEVICE_REMOVE(_tag)
 
-#define MDRV_UPD72065_ADD(_tag, _intrf) \
-	MDRV_DEVICE_ADD(_tag, UPD72065, 0) \
-	MDRV_DEVICE_CONFIG(_intrf)
+#define MCFG_UPD72065_ADD(_tag, _intrf) \
+	MCFG_DEVICE_ADD(_tag, UPD72065, 0) \
+	MCFG_DEVICE_CONFIG(_intrf)
 
-#define MDRV_UPD72065_MODIFY(_tag, _intrf) \
-  MDRV_DEVICE_MODIFY(_tag)	      \
-  MDRV_DEVICE_CONFIG(_intrf)
+#define MCFG_UPD72065_MODIFY(_tag, _intrf) \
+  MCFG_DEVICE_MODIFY(_tag)	      \
+  MCFG_DEVICE_CONFIG(_intrf)
 
-#define MDRV_UPD72065_REMOVE(_tag)		\
-  MDRV_DEVICE_REMOVE(_tag)
+#define MCFG_UPD72065_REMOVE(_tag)		\
+  MCFG_DEVICE_REMOVE(_tag)
 
 
 #endif /* __UPD765_H__ */

@@ -379,7 +379,7 @@ static void beta_plot_char_line(running_machine *machine, int x,int y, bitmap_t 
 	dgn_beta_state *state = machine->driver_data<dgn_beta_state>();
 	UINT8 *videoram = state->videoram;
 	int CharsPerLine	= m6845_get_register(H_DISPLAYED);	// Get chars per line.
-	unsigned char *data = memory_region(machine, "gfx1");		// ptr to char rom
+	unsigned char *data = machine->region("gfx1")->base();		// ptr to char rom
 	int Dot;
 	unsigned char data_byte;
 	int char_code;

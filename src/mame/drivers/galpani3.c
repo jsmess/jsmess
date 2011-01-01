@@ -297,20 +297,20 @@ static VIDEO_UPDATE(galpani3)
 				/*
                 else if (pridat==0x2f) // area outside of the girl
                 {
-                    //dst[0] = mame_rand(screen->machine)&0x3fff;
+                    //dst[0] = screen->machine->rand()&0x3fff;
                 }
 
                 else if (pridat==0x00) // the initial line / box that gets drawn
                 {
-                    //dst[0] = mame_rand(screen->machine)&0x3fff;
+                    //dst[0] = screen->machine->rand()&0x3fff;
                 }
                 else if (pridat==0x30) // during the 'gals boxes' on the intro
                 {
-                    //dst[0] = mame_rand(screen->machine)&0x3fff;
+                    //dst[0] = screen->machine->rand()&0x3fff;
                 }
                 else if (pridat==0x0c) // 'nice' at end of level
                 {
-                    //dst[0] = mame_rand(screen->machine)&0x3fff;
+                    //dst[0] = screen->machine->rand()&0x3fff;
                 }
                 else
                 {
@@ -323,7 +323,7 @@ static VIDEO_UPDATE(galpani3)
 
 	bitmap_fill(sprite_bitmap_1, cliprect, 0x0000);
 
-	skns_draw_sprites(screen->machine, sprite_bitmap_1, cliprect, galpani3_spriteram32, screen->machine->generic.spriteram_size, memory_region(screen->machine,"gfx1"), memory_region_length (screen->machine, "gfx1"), galpani3_spc_regs );
+	skns_draw_sprites(screen->machine, sprite_bitmap_1, cliprect, galpani3_spriteram32, screen->machine->generic.spriteram_size, screen->machine->region("gfx1")->base(), screen->machine->region ("gfx1")->bytes(), galpani3_spc_regs );
 
 	// ignoring priority bits for now..
 	for (y=0;y<240;y++)
@@ -669,7 +669,7 @@ static WRITE16_HANDLER( galpani3_regs1_address_w )
 static WRITE16_HANDLER( galpani3_regs1_go_w )
 {
 	UINT32 address = galpani3_regs1_address_regs[1]| (galpani3_regs1_address_regs[0]<<16);
-	UINT8* rledata = memory_region(space->machine,"gfx2");
+	UINT8* rledata = space->machine->region("gfx2")->base();
 
 	printf("galpani3_regs1_go_w? %08x\n",address );
 	if ((data==0x2000) || (data==0x3000)) gp3_do_rle(address, galpani3_framebuffer1, rledata);
@@ -685,7 +685,7 @@ static WRITE16_HANDLER( galpani3_regs2_address_w )
 static WRITE16_HANDLER( galpani3_regs2_go_w )
 {
 	UINT32 address = galpani3_regs2_address_regs[1]| (galpani3_regs2_address_regs[0]<<16);
-	UINT8* rledata = memory_region(space->machine,"gfx2");
+	UINT8* rledata = space->machine->region("gfx2")->base();
 
 	printf("galpani3_regs2_go_w? %08x\n", address );
 
@@ -705,7 +705,7 @@ static WRITE16_HANDLER( galpani3_regs3_address_w )
 static WRITE16_HANDLER( galpani3_regs3_go_w )
 {
 	UINT32 address =  galpani3_regs3_address_regs[1]| (galpani3_regs3_address_regs[0]<<16);
-	UINT8* rledata = memory_region(space->machine,"gfx2");
+	UINT8* rledata = space->machine->region("gfx2")->base();
 
 	printf("galpani3_regs3_go_w? %08x\n",address );
 
@@ -899,31 +899,31 @@ static const ymz280b_interface ymz280b_intf =
 };
 
 static MACHINE_CONFIG_START( galpani3, driver_device )
-	MDRV_CPU_ADD("maincpu", M68000, 16000000)	 // ? (from which clock?)
-	MDRV_CPU_PROGRAM_MAP(galpani3_map)
-	MDRV_CPU_VBLANK_INT_HACK(galpani3_vblank, 3)
+	MCFG_CPU_ADD("maincpu", M68000, 16000000)	 // ? (from which clock?)
+	MCFG_CPU_PROGRAM_MAP(galpani3_map)
+	MCFG_CPU_VBLANK_INT_HACK(galpani3_vblank, 3)
 
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_SIZE(64*8, 64*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
-	//MDRV_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 64*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_SIZE(64*8, 64*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
+	//MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 64*8-1)
 
-	MDRV_PALETTE_LENGTH(0x4303)
+	MCFG_PALETTE_LENGTH(0x4303)
 
-	MDRV_VIDEO_START(galpani3)
-	MDRV_VIDEO_UPDATE(galpani3)
+	MCFG_VIDEO_START(galpani3)
+	MCFG_VIDEO_UPDATE(galpani3)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymz", YMZ280B, 28636400 / 2)
-	MDRV_SOUND_CONFIG(ymz280b_intf)
-	MDRV_SOUND_ROUTE(0, "mono", 1.0)
-	MDRV_SOUND_ROUTE(1, "mono", 1.0)
+	MCFG_SOUND_ADD("ymz", YMZ280B, 28636400 / 2)
+	MCFG_SOUND_CONFIG(ymz280b_intf)
+	MCFG_SOUND_ROUTE(0, "mono", 1.0)
+	MCFG_SOUND_ROUTE(1, "mono", 1.0)
 MACHINE_CONFIG_END
 
 

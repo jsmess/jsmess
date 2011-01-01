@@ -130,7 +130,7 @@ INPUT_PORTS_END
 
 static READ8_HANDLER( jupiter_io_r )
 {
-	running_device *speaker = space->machine->device("speaker");
+	device_t *speaker = space->machine->device("speaker");
 	UINT8 data = 0xff;
 
 	if ( ( offset & 0xff ) != 0xfe )
@@ -180,7 +180,7 @@ static READ8_HANDLER( jupiter_io_r )
 
 static WRITE8_HANDLER( jupiter_io_w )
 {
-	running_device *speaker = space->machine->device("speaker");
+	device_t *speaker = space->machine->device("speaker");
 //  cassette_output( space->machine->device("cassette"), 1 );
 	speaker_level_w(speaker,1);
 }
@@ -300,33 +300,33 @@ static const cassette_config jupiter_cassette_config =
 /* machine definition */
 static MACHINE_CONFIG_START( jupiter, jupiter_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, XTAL_6_5MHz/2)        /* 3.25 MHz */
-	MDRV_CPU_PROGRAM_MAP(jupiter_mem)
-	MDRV_CPU_IO_MAP(jupiter_io)
-	MDRV_QUANTUM_TIME(HZ(60))
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_6_5MHz/2)        /* 3.25 MHz */
+	MCFG_CPU_PROGRAM_MAP(jupiter_mem)
+	MCFG_CPU_IO_MAP(jupiter_io)
+	MCFG_QUANTUM_TIME(HZ(60))
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_RAW_PARAMS( XTAL_6_5MHz, 416, 0, 256, 264, 0, 192 )
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_RAW_PARAMS( XTAL_6_5MHz, 416, 0, 256, 264, 0, 192 )
 
-	MDRV_GFXDECODE( jupiter )
-	MDRV_PALETTE_LENGTH(2)
-	MDRV_PALETTE_INIT(black_and_white)
+	MCFG_GFXDECODE( jupiter )
+	MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_INIT(black_and_white)
 
-	MDRV_VIDEO_START( jupiter )
-	MDRV_VIDEO_UPDATE( jupiter )
+	MCFG_VIDEO_START( jupiter )
+	MCFG_VIDEO_UPDATE( jupiter )
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_WAVE_ADD("wave", "cassette")
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MDRV_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_WAVE_ADD("wave", "cassette")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* Devices */
-	MDRV_CASSETTE_ADD( "cassette", jupiter_cassette_config )
-	MDRV_SNAPSHOT_ADD("snapshot", jupiter, "ace", 1)
+	MCFG_CASSETTE_ADD( "cassette", jupiter_cassette_config )
+	MCFG_SNAPSHOT_ADD("snapshot", jupiter, "ace", 1)
 MACHINE_CONFIG_END
 
 

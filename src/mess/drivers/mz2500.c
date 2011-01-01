@@ -167,7 +167,7 @@ static void mz2500_draw_pixel(running_machine *machine, bitmap_t *bitmap,int x,i
 static void draw_80x25(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,UINT16 map_addr)
 {
 	mz2500_state *state = machine->driver_data<mz2500_state>();
-	UINT8 *vram = memory_region(machine, "maincpu");
+	UINT8 *vram = machine->region("maincpu")->base();
 	int x,y,count,xi,yi;
 	UINT8 *gfx_data;
 	UINT8 y_step;
@@ -192,17 +192,17 @@ static void draw_80x25(running_machine *machine, bitmap_t *bitmap,const rectangl
 			int inv_col = (attr & 0x40) >> 6;
 
 			if(gfx_sel & 8) // Xevious, PCG 8 colors have priority above kanji roms
-				gfx_data = memory_region(machine,"pcg");
+				gfx_data = machine->region("pcg")->base();
 			else if(gfx_sel == 0x80)
 			{
-				gfx_data = memory_region(machine,"kanji");
+				gfx_data = machine->region("kanji")->base();
 				tile|= tile_bank << 8;
 				if(y_step == 2)
 					tile &= 0x3ffe;
 			}
 			else if(gfx_sel == 0xc0)
 			{
-				gfx_data = memory_region(machine,"kanji");
+				gfx_data = machine->region("kanji")->base();
 				tile|= (tile_bank << 8);
 				if(y_step == 2)
 					tile &= 0x3ffe;
@@ -210,7 +210,7 @@ static void draw_80x25(running_machine *machine, bitmap_t *bitmap,const rectangl
 			}
 			else
 			{
-				gfx_data = memory_region(machine,"pcg");
+				gfx_data = machine->region("pcg")->base();
 			}
 
 			for(yi=0;yi<8*y_step;yi++)
@@ -258,7 +258,7 @@ static void draw_80x25(running_machine *machine, bitmap_t *bitmap,const rectangl
 static void draw_40x25(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int plane,UINT16 map_addr)
 {
 	mz2500_state *state = machine->driver_data<mz2500_state>();
-	UINT8 *vram = memory_region(machine, "maincpu");
+	UINT8 *vram = machine->region("maincpu")->base();
 	int x,y,count,xi,yi;
 	UINT8 *gfx_data;
 	UINT8 y_step;
@@ -284,17 +284,17 @@ static void draw_40x25(running_machine *machine, bitmap_t *bitmap,const rectangl
 			int inv_col = (attr & 0x40) >> 6;
 
 			if(gfx_sel & 8) // Xevious, PCG 8 colors have priority above kanji roms
-				gfx_data = memory_region(machine,"pcg");
+				gfx_data = machine->region("pcg")->base();
 			else if(gfx_sel == 0x80)
 			{
-				gfx_data = memory_region(machine,"kanji");
+				gfx_data = machine->region("kanji")->base();
 				tile|= tile_bank << 8;
 				if(y_step == 2)
 					tile &= 0x3ffe;
 			}
 			else if(gfx_sel == 0xc0)
 			{
-				gfx_data = memory_region(machine,"kanji");
+				gfx_data = machine->region("kanji")->base();
 				tile|= (tile_bank << 8);
 				if(y_step == 2)
 					tile &= 0x3ffe;
@@ -302,7 +302,7 @@ static void draw_40x25(running_machine *machine, bitmap_t *bitmap,const rectangl
 			}
 			else
 			{
-				gfx_data = memory_region(machine,"pcg");
+				gfx_data = machine->region("pcg")->base();
 			}
 
 			for(yi=0;yi<8*y_step;yi++)
@@ -350,7 +350,7 @@ static void draw_cg4_screen(running_machine *machine, bitmap_t *bitmap,const rec
 {
 	//mz2500_state *state = machine->driver_data<mz2500_state>();
 	UINT32 count;
-	UINT8 *vram = memory_region(machine, "maincpu");
+	UINT8 *vram = machine->region("maincpu")->base();
 	UINT8 pen,pen_bit[2];
 	int x,y,xi,pen_i;
 	int res_x,res_y;
@@ -392,7 +392,7 @@ static void draw_cg16_screen(running_machine *machine, bitmap_t *bitmap,const re
 {
 	mz2500_state *state = machine->driver_data<mz2500_state>();
 	UINT32 count;
-	UINT8 *vram = memory_region(machine, "maincpu");
+	UINT8 *vram = machine->region("maincpu")->base();
 	UINT8 pen,pen_bit[4];
 	int x,y,xi,pen_i;
 	UINT32 wa_reg;
@@ -450,7 +450,7 @@ static void draw_cg256_screen(running_machine *machine, bitmap_t *bitmap,const r
 {
 	mz2500_state *state = machine->driver_data<mz2500_state>();
 	UINT32 count;
-	UINT8 *vram = memory_region(machine, "maincpu");
+	UINT8 *vram = machine->region("maincpu")->base();
 	UINT8 pen,pen_bit[8];
 	int x,y,xi,pen_i;
 	UINT32 wa_reg;
@@ -686,7 +686,7 @@ static UINT8 mz2500_cg_latch_compare(mz2500_state *state)
 static UINT8 mz2500_ram_read(running_machine *machine, UINT16 offset, UINT8 bank_num)
 {
 	mz2500_state *state = machine->driver_data<mz2500_state>();
-	UINT8 *ram = memory_region(machine, "maincpu");
+	UINT8 *ram = machine->region("maincpu")->base();
 	UINT8 cur_bank = state->bank_val[bank_num];
 
 	switch(cur_bank)
@@ -721,13 +721,13 @@ static UINT8 mz2500_ram_read(running_machine *machine, UINT16 offset, UINT8 bank
 		{
 			if(state->kanji_bank & 0x80) //kanji ROM
 			{
-				UINT8 *knj_rom = memory_region(machine, "kanji");
+				UINT8 *knj_rom = machine->region("kanji")->base();
 
 				return knj_rom[(offset & 0x7ff)+((state->kanji_bank & 0x7f)*0x800)];
 			}
 			else //PCG RAM
 			{
-				UINT8 *pcg_ram = memory_region(machine, "pcg");
+				UINT8 *pcg_ram = machine->region("pcg")->base();
 
 				return pcg_ram[offset];
 			}
@@ -735,7 +735,7 @@ static UINT8 mz2500_ram_read(running_machine *machine, UINT16 offset, UINT8 bank
 		break;
 		case 0x3a:
 		{
-			UINT8 *dic_rom = memory_region(machine, "dictionary");
+			UINT8 *dic_rom = machine->region("dictionary")->base();
 
 			return dic_rom[(offset & 0x1fff) + ((state->dic_bank & 0x1f)*0x2000)];
 		}
@@ -745,7 +745,7 @@ static UINT8 mz2500_ram_read(running_machine *machine, UINT16 offset, UINT8 bank
 		case 0x3e:
 		case 0x3f:
 		{
-			UINT8 *phone_rom = memory_region(machine, "phone");
+			UINT8 *phone_rom = machine->region("phone")->base();
 
 			return phone_rom[offset+(cur_bank & 3)*0x2000];
 		}
@@ -759,7 +759,7 @@ static UINT8 mz2500_ram_read(running_machine *machine, UINT16 offset, UINT8 bank
 static void mz2500_ram_write(running_machine *machine, UINT16 offset, UINT8 data, UINT8 bank_num)
 {
 	mz2500_state *state = machine->driver_data<mz2500_state>();
-	UINT8 *ram = memory_region(machine, "maincpu");
+	UINT8 *ram = machine->region("maincpu")->base();
 	UINT8 cur_bank = state->bank_val[bank_num];
 
 //  if(cur_bank >= 0x30 && cur_bank <= 0x33)
@@ -852,7 +852,7 @@ static void mz2500_ram_write(running_machine *machine, UINT16 offset, UINT8 data
 			}
 			else //PCG RAM
 			{
-				UINT8 *pcg_ram = memory_region(machine, "pcg");
+				UINT8 *pcg_ram = machine->region("pcg")->base();
 				pcg_ram[offset] = data;
 				if((offset & 0x1800) == 0x0000)
 					gfx_element_mark_dirty(machine->gfx[3], (offset) >> 3);
@@ -925,7 +925,7 @@ static READ8_HANDLER( mz2500_bank_data_r )
 static WRITE8_HANDLER( mz2500_bank_data_w )
 {
 	mz2500_state *state = space->machine->driver_data<mz2500_state>();
-//  UINT8 *ROM = memory_region(space->machine, "maincpu");
+//  UINT8 *ROM = space->machine->region("maincpu")->base();
 //  static const char *const bank_name[] = { "bank0", "bank1", "bank2", "bank3", "bank4", "bank5", "bank6", "bank7" };
 
 	state->bank_val[state->bank_addr] = data & 0x3f;
@@ -1111,7 +1111,7 @@ static WRITE8_HANDLER( mz2500_irq_data_w )
 
 static WRITE8_HANDLER( mz2500_fdc_w )
 {
-	running_device* dev = space->machine->device("mb8877a");
+	device_t* dev = space->machine->device("mb8877a");
 
 	switch(offset+0xdc)
 	{
@@ -1170,7 +1170,7 @@ ADDRESS_MAP_END
 static READ8_HANDLER( mz2500_rom_r )
 {
 	mz2500_state *state = space->machine->driver_data<mz2500_state>();
-	UINT8 *rom = memory_region(space->machine, "rom");
+	UINT8 *rom = space->machine->region("rom")->base();
 	UINT8 res;
 
 	state->lrom_index = (cpu_get_reg(space->machine->device("maincpu"), Z80_B));
@@ -1311,7 +1311,7 @@ static WRITE8_HANDLER( mz2500_cg_data_w )
 	if((state->cg_reg_index & 0x1f) == 0x05 && (state->cg_reg[0x05] & 0xc0) == 0x80) //clear bitmap buffer
 	{
 		UINT32 i;
-		UINT8 *vram = memory_region(space->machine, "maincpu");
+		UINT8 *vram = space->machine->region("maincpu")->base();
 		UINT32 layer_bank;
 
 		layer_bank = (state->cg_reg[0x0e] & 0x80) ? 0x10000 : 0x00000;
@@ -1350,7 +1350,7 @@ static WRITE8_HANDLER( mz2500_cg_data_w )
 
 static WRITE8_HANDLER( timer_w )
 {
-	running_device *pit8253 = space->machine->device("pit");
+	device_t *pit8253 = space->machine->device("pit");
 
 	pit8253_gate0_w(pit8253, 1);
 	pit8253_gate1_w(pit8253, 1);
@@ -1400,7 +1400,7 @@ static WRITE8_HANDLER( mz2500_joystick_w )
 static READ8_HANDLER( mz2500_kanji_r )
 {
 	mz2500_state *state = space->machine->driver_data<mz2500_state>();
-	UINT8 *knj2_rom = memory_region(space->machine, "kanji2");
+	UINT8 *knj2_rom = space->machine->region("kanji2")->base();
 
 	printf("Read from kanji 2 ROM\n");
 
@@ -1435,7 +1435,7 @@ static WRITE8_DEVICE_HANDLER( rp5c15_8_w )
 static READ8_HANDLER( mz2500_emm_data_r )
 {
 	mz2500_state *state = space->machine->driver_data<mz2500_state>();
-	UINT8 *emm_ram = memory_region(space->machine, "emm");
+	UINT8 *emm_ram = space->machine->region("emm")->base();
 	UINT8 emm_lo_index;
 
 	emm_lo_index = (cpu_get_reg(space->machine->device("maincpu"), Z80_B));
@@ -1461,7 +1461,7 @@ static WRITE8_HANDLER( mz2500_emm_addr_w )
 static WRITE8_HANDLER( mz2500_emm_data_w )
 {
 	mz2500_state *state = space->machine->driver_data<mz2500_state>();
-	UINT8 *emm_ram = memory_region(space->machine, "emm");
+	UINT8 *emm_ram = space->machine->region("emm")->base();
 	UINT8 emm_lo_index;
 
 	emm_lo_index = (cpu_get_reg(space->machine->device("maincpu"), Z80_B));
@@ -1700,8 +1700,8 @@ static void mz2500_reset(mz2500_state *state, UINT8 type)
 static MACHINE_RESET(mz2500)
 {
 	mz2500_state *state = machine->driver_data<mz2500_state>();
-	UINT8 *RAM = memory_region(machine, "maincpu");
-	UINT8 *IPL = memory_region(machine, "ipl");
+	UINT8 *RAM = machine->region("maincpu")->base();
+	UINT8 *IPL = machine->region("ipl")->base();
 	UINT32 i;
 
 	mz2500_reset(state, IPL_RESET);
@@ -2073,46 +2073,46 @@ static const z80sio_interface mz2500_sio_intf =
 
 static MACHINE_CONFIG_START( mz2500, mz2500_state )
     /* basic machine hardware */
-    MDRV_CPU_ADD("maincpu", Z80, 6000000)
-    MDRV_CPU_PROGRAM_MAP(mz2500_map)
-    MDRV_CPU_IO_MAP(mz2500_io)
-	MDRV_CPU_VBLANK_INT("screen", mz2500_vbl)
+    MCFG_CPU_ADD("maincpu", Z80, 6000000)
+    MCFG_CPU_PROGRAM_MAP(mz2500_map)
+    MCFG_CPU_IO_MAP(mz2500_io)
+	MCFG_CPU_VBLANK_INT("screen", mz2500_vbl)
 
-    MDRV_MACHINE_RESET(mz2500)
+    MCFG_MACHINE_RESET(mz2500)
 
-	MDRV_I8255A_ADD( "i8255_0", ppi8255_intf )
-	MDRV_Z80PIO_ADD( "z80pio_1", 6000000, mz2500_pio1_intf )
-	MDRV_Z80SIO_ADD( "z80sio", 6000000, mz2500_sio_intf )
-	MDRV_RP5C15_ADD( "rp5c15" , rtc_intf)
-	MDRV_PIT8253_ADD("pit", mz2500_pit8253_intf)
+	MCFG_I8255A_ADD( "i8255_0", ppi8255_intf )
+	MCFG_Z80PIO_ADD( "z80pio_1", 6000000, mz2500_pio1_intf )
+	MCFG_Z80SIO_ADD( "z80sio", 6000000, mz2500_sio_intf )
+	MCFG_RP5C15_ADD( "rp5c15" , rtc_intf)
+	MCFG_PIT8253_ADD("pit", mz2500_pit8253_intf)
 
-	MDRV_MB8877_ADD("mb8877a",mz2500_mb8877a_interface)
-	MDRV_FLOPPY_4_DRIVES_ADD(mz2500_floppy_config)
-	MDRV_SOFTWARE_LIST_ADD("flop_list","mz2500")
+	MCFG_MB8877_ADD("mb8877a",mz2500_mb8877a_interface)
+	MCFG_FLOPPY_4_DRIVES_ADD(mz2500_floppy_config)
+	MCFG_SOFTWARE_LIST_ADD("flop_list","mz2500")
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_RAW_PARAMS(XTAL_21_4772MHz, 640+108, 0, 640, 480, 0, 200) //unknown clock / divider
-	MDRV_PALETTE_LENGTH(0x200)
-	MDRV_PALETTE_INIT(mz2500)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_21_4772MHz, 640+108, 0, 640, 480, 0, 200) //unknown clock / divider
+	MCFG_PALETTE_LENGTH(0x200)
+	MCFG_PALETTE_INIT(mz2500)
 
-	MDRV_GFXDECODE(mz2500)
+	MCFG_GFXDECODE(mz2500)
 
-    MDRV_VIDEO_START(mz2500)
-    MDRV_VIDEO_UPDATE(mz2500)
+    MCFG_VIDEO_START(mz2500)
+    MCFG_VIDEO_UPDATE(mz2500)
 
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", YM2203, 2000000) //unknown clock / divider
-	MDRV_SOUND_CONFIG(ym2203_interface_1)
-	MDRV_SOUND_ROUTE(0, "mono", 0.25)
-	MDRV_SOUND_ROUTE(1, "mono", 0.25)
-	MDRV_SOUND_ROUTE(2, "mono", 0.50)
-	MDRV_SOUND_ROUTE(3, "mono", 0.50)
+	MCFG_SOUND_ADD("ym", YM2203, 2000000) //unknown clock / divider
+	MCFG_SOUND_CONFIG(ym2203_interface_1)
+	MCFG_SOUND_ROUTE(0, "mono", 0.25)
+	MCFG_SOUND_ROUTE(1, "mono", 0.25)
+	MCFG_SOUND_ROUTE(2, "mono", 0.50)
+	MCFG_SOUND_ROUTE(3, "mono", 0.50)
 
-	MDRV_SOUND_ADD("beeper", BEEP, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
+	MCFG_SOUND_ADD("beeper", BEEP, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
 MACHINE_CONFIG_END
 
 

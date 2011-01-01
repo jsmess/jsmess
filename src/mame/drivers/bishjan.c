@@ -325,9 +325,9 @@ static WRITE16_HANDLER( bishjan_sel_w )
 static READ16_HANDLER( bishjan_serial_r )
 {
 	return
-		(mame_rand(space->machine) & 0x9800)	|	// bit 7 - serial communication
+		(space->machine->rand() & 0x9800)	|	// bit 7 - serial communication
 		(((bishjan_sel==0x12) ? 0x40:0x00) << 8) |
-//      (mame_rand() & 0xff);
+//      (machine->rand() & 0xff);
 //      (((space->machine->primary_screen->frame_number()%60)==0)?0x18:0x00);
 		0x18;
 }
@@ -827,24 +827,24 @@ static INTERRUPT_GEN( bishjan_interrupt )
 }
 
 static MACHINE_CONFIG_START( bishjan, driver_device )
-	MDRV_CPU_ADD("maincpu", H83044, XTAL_44_1MHz / 3)
-	MDRV_CPU_PROGRAM_MAP( bishjan_map)
-	MDRV_CPU_VBLANK_INT_HACK(bishjan_interrupt,2)
+	MCFG_CPU_ADD("maincpu", H83044, XTAL_44_1MHz / 3)
+	MCFG_CPU_PROGRAM_MAP( bishjan_map)
+	MCFG_CPU_VBLANK_INT_HACK(bishjan_interrupt,2)
 
-	MDRV_NVRAM_ADD_0FILL("nvram")
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE( 512, 256 )
-	MDRV_SCREEN_VISIBLE_AREA( 0, 512-1, 0, 256-16-1 )
-	MDRV_SCREEN_REFRESH_RATE( 60 )
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE( 512, 256 )
+	MCFG_SCREEN_VISIBLE_AREA( 0, 512-1, 0, 256-16-1 )
+	MCFG_SCREEN_REFRESH_RATE( 60 )
 
-	MDRV_GFXDECODE(bishjan)
-	MDRV_PALETTE_LENGTH( 256 )
+	MCFG_GFXDECODE(bishjan)
+	MCFG_PALETTE_LENGTH( 256 )
 
-	MDRV_VIDEO_START( bishjan )
-	MDRV_VIDEO_UPDATE( bishjan )
+	MCFG_VIDEO_START( bishjan )
+	MCFG_VIDEO_UPDATE( bishjan )
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -858,35 +858,35 @@ static INTERRUPT_GEN( saklove_interrupt )
 }
 
 static MACHINE_CONFIG_START( saklove, driver_device )
-	MDRV_CPU_ADD("maincpu", I80188, XTAL_20MHz )	// !! AMD AM188-EM !!
-	MDRV_CPU_PROGRAM_MAP( saklove_map)
-	MDRV_CPU_IO_MAP( saklove_io)
-	MDRV_CPU_VBLANK_INT( "screen", saklove_interrupt )
+	MCFG_CPU_ADD("maincpu", I80188, XTAL_20MHz )	// !! AMD AM188-EM !!
+	MCFG_CPU_PROGRAM_MAP( saklove_map)
+	MCFG_CPU_IO_MAP( saklove_io)
+	MCFG_CPU_VBLANK_INT( "screen", saklove_interrupt )
 
-	MDRV_MACHINE_RESET(saklove)
-	MDRV_NVRAM_ADD_0FILL("nvram")
+	MCFG_MACHINE_RESET(saklove)
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE( 512, 256 )
-	MDRV_SCREEN_VISIBLE_AREA( 0, 512-1, 0, 256-16-1 )
-	MDRV_SCREEN_REFRESH_RATE( 58.7270 )
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE( 512, 256 )
+	MCFG_SCREEN_VISIBLE_AREA( 0, 512-1, 0, 256-16-1 )
+	MCFG_SCREEN_REFRESH_RATE( 58.7270 )
 
-	MDRV_GFXDECODE(bishjan)
-	MDRV_PALETTE_LENGTH( 256 )
+	MCFG_GFXDECODE(bishjan)
+	MCFG_PALETTE_LENGTH( 256 )
 
-	MDRV_VIDEO_START( bishjan )
-	MDRV_VIDEO_UPDATE( bishjan )
+	MCFG_VIDEO_START( bishjan )
+	MCFG_VIDEO_UPDATE( bishjan )
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_OKIM6295_ADD("oki", XTAL_8_4672MHz / 8, OKIM6295_PIN7_HIGH)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	MCFG_OKIM6295_ADD("oki", XTAL_8_4672MHz / 8, OKIM6295_PIN7_HIGH)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MDRV_SOUND_ADD("ymsnd", YM3812, XTAL_12MHz / 4)	// ? chip and clock unknown
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_12MHz / 4)	// ? chip and clock unknown
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
 
@@ -956,7 +956,7 @@ ROM_END
 
 static DRIVER_INIT(bishjan)
 {
-	UINT16 *rom = (UINT16*)memory_region(machine, "maincpu");
+	UINT16 *rom = (UINT16*)machine->region("maincpu")->base();
 
 	// check
 	rom[0x042EA/2] = 0x4008;
@@ -1014,7 +1014,7 @@ ROM_END
 
 static DRIVER_INIT(saklove)
 {
-	UINT8 *rom = memory_region(machine, "maincpu");
+	UINT8 *rom = machine->region("maincpu")->base();
 
 	// patch protection test (it always enters test mode on boot otherwise)
 	rom[0x0e029] = 0xeb;

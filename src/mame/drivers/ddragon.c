@@ -150,7 +150,7 @@ static MACHINE_START( ddragon )
 	ddragon_state *state = machine->driver_data<ddragon_state>();
 
 	/* configure banks */
-	memory_configure_bank(machine, "bank1", 0, 8, memory_region(machine, "maincpu") + 0x10000, 0x4000);
+	memory_configure_bank(machine, "bank1", 0, 8, machine->region("maincpu")->base() + 0x10000, 0x4000);
 
 	state->maincpu = machine->device("maincpu");
 	state->sub_cpu = machine->device("sub");
@@ -341,7 +341,7 @@ static WRITE8_HANDLER( ddragon2_sub_irq_w )
 }
 
 
-static void irq_handler( running_device *device, int irq )
+static void irq_handler( device_t *device, int irq )
 {
 	ddragon_state *state = device->machine->driver_data<ddragon_state>();
 	cpu_set_input_line(state->snd_cpu, state->ym_irq , irq ? ASSERT_LINE : CLEAR_LINE );
@@ -436,7 +436,7 @@ static WRITE8_HANDLER( ddragon_spriteram_w )
 static WRITE8_HANDLER( dd_adpcm_w )
 {
 	ddragon_state *state = space->machine->driver_data<ddragon_state>();
-	running_device *adpcm = (offset & 1) ? state->adpcm_2 : state->adpcm_1;
+	device_t *adpcm = (offset & 1) ? state->adpcm_2 : state->adpcm_1;
 	int chip = (adpcm == state->adpcm_1) ? 0 : 1;
 
 	switch (offset / 2)
@@ -462,7 +462,7 @@ static WRITE8_HANDLER( dd_adpcm_w )
 }
 
 
-static void dd_adpcm_int( running_device *device )
+static void dd_adpcm_int( device_t *device )
 {
 	ddragon_state *state = device->machine->driver_data<ddragon_state>();
 	int chip = (device == state->adpcm_1) ? 0 : 1;
@@ -479,7 +479,7 @@ static void dd_adpcm_int( running_device *device )
 	}
 	else
 	{
-		UINT8 *ROM = memory_region(device->machine, "adpcm") + 0x10000 * chip;
+		UINT8 *ROM = device->machine->region("adpcm")->base() + 0x10000 * chip;
 
 		state->adpcm_data[chip] = ROM[state->adpcm_pos[chip]++];
 		msm5205_data_w(device, state->adpcm_data[chip] >> 4);
@@ -977,161 +977,161 @@ static const msm5205_interface msm5205_config =
 static MACHINE_CONFIG_START( ddragon, ddragon_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", HD6309, MAIN_CLOCK)		/* 12 MHz / 4 internally */
-	MDRV_CPU_PROGRAM_MAP(ddragon_map)
-	MDRV_TIMER_ADD_SCANLINE("scantimer", ddragon_scanline, "screen", 0, 1)
+	MCFG_CPU_ADD("maincpu", HD6309, MAIN_CLOCK)		/* 12 MHz / 4 internally */
+	MCFG_CPU_PROGRAM_MAP(ddragon_map)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", ddragon_scanline, "screen", 0, 1)
 
-	MDRV_CPU_ADD("sub", HD63701, MAIN_CLOCK / 2)	/* 6 MHz / 4 internally */
-	MDRV_CPU_PROGRAM_MAP(sub_map)
+	MCFG_CPU_ADD("sub", HD63701, MAIN_CLOCK / 2)	/* 6 MHz / 4 internally */
+	MCFG_CPU_PROGRAM_MAP(sub_map)
 
-	MDRV_CPU_ADD("soundcpu", M6809, MAIN_CLOCK / 8)	/* 1.5 MHz */
-	MDRV_CPU_PROGRAM_MAP(sound_map)
+	MCFG_CPU_ADD("soundcpu", M6809, MAIN_CLOCK / 8)	/* 1.5 MHz */
+	MCFG_CPU_PROGRAM_MAP(sound_map)
 
-	MDRV_QUANTUM_TIME(HZ(60000))	/* heavy interleaving to sync up sprite<->main cpu's */
+	MCFG_QUANTUM_TIME(HZ(60000))	/* heavy interleaving to sync up sprite<->main cpu's */
 
-	MDRV_MACHINE_START(ddragon)
-	MDRV_MACHINE_RESET(ddragon)
+	MCFG_MACHINE_START(ddragon)
+	MCFG_MACHINE_RESET(ddragon)
 
 	/* video hardware */
-	MDRV_GFXDECODE(ddragon)
-	MDRV_PALETTE_LENGTH(384)
+	MCFG_GFXDECODE(ddragon)
+	MCFG_PALETTE_LENGTH(384)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 384, 0, 256, 272, 0, 240)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 384, 0, 256, 272, 0, 240)
 
-	MDRV_VIDEO_START(ddragon)
-	MDRV_VIDEO_UPDATE(ddragon)
+	MCFG_VIDEO_START(ddragon)
+	MCFG_VIDEO_UPDATE(ddragon)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("fmsnd", YM2151, SOUND_CLOCK)
-	MDRV_SOUND_CONFIG(ym2151_config)
-	MDRV_SOUND_ROUTE(0, "mono", 0.60)
-	MDRV_SOUND_ROUTE(1, "mono", 0.60)
+	MCFG_SOUND_ADD("fmsnd", YM2151, SOUND_CLOCK)
+	MCFG_SOUND_CONFIG(ym2151_config)
+	MCFG_SOUND_ROUTE(0, "mono", 0.60)
+	MCFG_SOUND_ROUTE(1, "mono", 0.60)
 
-	MDRV_SOUND_ADD("adpcm1", MSM5205, MAIN_CLOCK/32)
-	MDRV_SOUND_CONFIG(msm5205_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("adpcm1", MSM5205, MAIN_CLOCK/32)
+	MCFG_SOUND_CONFIG(msm5205_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD("adpcm2", MSM5205, MAIN_CLOCK/32)
-	MDRV_SOUND_CONFIG(msm5205_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("adpcm2", MSM5205, MAIN_CLOCK/32)
+	MCFG_SOUND_CONFIG(msm5205_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( ddragonb, ddragon )
 
 	/* basic machine hardware */
-	MDRV_CPU_REPLACE("sub", M6809, MAIN_CLOCK / 8)	/* 1.5Mhz */
-	MDRV_CPU_PROGRAM_MAP(sub_map)
+	MCFG_CPU_REPLACE("sub", M6809, MAIN_CLOCK / 8)	/* 1.5Mhz */
+	MCFG_CPU_PROGRAM_MAP(sub_map)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( ddragonba, ddragon )
 
 	/* basic machine hardware */
-	MDRV_CPU_REPLACE("sub", M6803, MAIN_CLOCK / 2)	/* 6Mhz / 4 internally */
-	MDRV_CPU_PROGRAM_MAP(ddragonba_sub_map)
-	MDRV_CPU_IO_MAP(ddragonba_sub_portmap)
+	MCFG_CPU_REPLACE("sub", M6803, MAIN_CLOCK / 2)	/* 6Mhz / 4 internally */
+	MCFG_CPU_PROGRAM_MAP(ddragonba_sub_map)
+	MCFG_CPU_IO_MAP(ddragonba_sub_portmap)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_START( ddragon6809, ddragon_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6809, MAIN_CLOCK / 8)	/* 1.5 MHz */
-	MDRV_CPU_PROGRAM_MAP(ddragon_map)
-	MDRV_TIMER_ADD_SCANLINE("scantimer", ddragon_scanline, "screen", 0, 1)
+	MCFG_CPU_ADD("maincpu", M6809, MAIN_CLOCK / 8)	/* 1.5 MHz */
+	MCFG_CPU_PROGRAM_MAP(ddragon_map)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", ddragon_scanline, "screen", 0, 1)
 
-	MDRV_CPU_ADD("sub", M6809, MAIN_CLOCK / 8)	/* 1.5 Mhz */
-	MDRV_CPU_PROGRAM_MAP(sub_map)
+	MCFG_CPU_ADD("sub", M6809, MAIN_CLOCK / 8)	/* 1.5 Mhz */
+	MCFG_CPU_PROGRAM_MAP(sub_map)
 
-	MDRV_CPU_ADD("soundcpu", M6809, MAIN_CLOCK / 8)	/* 1.5 MHz */
-	MDRV_CPU_PROGRAM_MAP(sound_map)
+	MCFG_CPU_ADD("soundcpu", M6809, MAIN_CLOCK / 8)	/* 1.5 MHz */
+	MCFG_CPU_PROGRAM_MAP(sound_map)
 
-	MDRV_QUANTUM_TIME(HZ(60000)) /* heavy interleaving to sync up sprite<->main cpu's */
+	MCFG_QUANTUM_TIME(HZ(60000)) /* heavy interleaving to sync up sprite<->main cpu's */
 
-	MDRV_MACHINE_START(ddragon)
-	MDRV_MACHINE_RESET(ddragon)
+	MCFG_MACHINE_START(ddragon)
+	MCFG_MACHINE_RESET(ddragon)
 
 	/* video hardware */
-	MDRV_GFXDECODE(ddragon)
-	MDRV_PALETTE_LENGTH(384)
+	MCFG_GFXDECODE(ddragon)
+	MCFG_PALETTE_LENGTH(384)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 384, 0, 256, 272, 0, 240)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 384, 0, 256, 272, 0, 240)
 
-	MDRV_VIDEO_START(ddragon)
-	MDRV_VIDEO_UPDATE(ddragon)
+	MCFG_VIDEO_START(ddragon)
+	MCFG_VIDEO_UPDATE(ddragon)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("fmsnd", YM2151, SOUND_CLOCK)
-	MDRV_SOUND_CONFIG(ym2151_config)
-	MDRV_SOUND_ROUTE(0, "mono", 0.60)
-	MDRV_SOUND_ROUTE(1, "mono", 0.60)
+	MCFG_SOUND_ADD("fmsnd", YM2151, SOUND_CLOCK)
+	MCFG_SOUND_CONFIG(ym2151_config)
+	MCFG_SOUND_ROUTE(0, "mono", 0.60)
+	MCFG_SOUND_ROUTE(1, "mono", 0.60)
 
-	MDRV_SOUND_ADD("adpcm1", MSM5205, MAIN_CLOCK/32)
-	MDRV_SOUND_CONFIG(msm5205_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("adpcm1", MSM5205, MAIN_CLOCK/32)
+	MCFG_SOUND_CONFIG(msm5205_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD("adpcm2", MSM5205, MAIN_CLOCK/32)
-	MDRV_SOUND_CONFIG(msm5205_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("adpcm2", MSM5205, MAIN_CLOCK/32)
+	MCFG_SOUND_CONFIG(msm5205_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_START( ddragon2, ddragon_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", HD6309, MAIN_CLOCK)		/* 12 MHz / 4 internally */
-	MDRV_CPU_PROGRAM_MAP(dd2_map)
-	MDRV_TIMER_ADD_SCANLINE("scantimer", ddragon_scanline, "screen", 0, 1)
+	MCFG_CPU_ADD("maincpu", HD6309, MAIN_CLOCK)		/* 12 MHz / 4 internally */
+	MCFG_CPU_PROGRAM_MAP(dd2_map)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", ddragon_scanline, "screen", 0, 1)
 
-	MDRV_CPU_ADD("sub", Z80, MAIN_CLOCK / 3)		/* 4 MHz */
-	MDRV_CPU_PROGRAM_MAP(dd2_sub_map)
+	MCFG_CPU_ADD("sub", Z80, MAIN_CLOCK / 3)		/* 4 MHz */
+	MCFG_CPU_PROGRAM_MAP(dd2_sub_map)
 
-	MDRV_CPU_ADD("soundcpu", Z80, 3579545)
-	MDRV_CPU_PROGRAM_MAP(dd2_sound_map)
+	MCFG_CPU_ADD("soundcpu", Z80, 3579545)
+	MCFG_CPU_PROGRAM_MAP(dd2_sound_map)
 
-	MDRV_QUANTUM_TIME(HZ(60000)) /* heavy interleaving to sync up sprite<->main cpu's */
+	MCFG_QUANTUM_TIME(HZ(60000)) /* heavy interleaving to sync up sprite<->main cpu's */
 
-	MDRV_MACHINE_START(ddragon)
-	MDRV_MACHINE_RESET(ddragon)
+	MCFG_MACHINE_START(ddragon)
+	MCFG_MACHINE_RESET(ddragon)
 
 	/* video hardware */
-	MDRV_GFXDECODE(ddragon)
-	MDRV_PALETTE_LENGTH(384)
+	MCFG_GFXDECODE(ddragon)
+	MCFG_PALETTE_LENGTH(384)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 384, 0, 256, 272, 0, 240)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 384, 0, 256, 272, 0, 240)
 
-	MDRV_VIDEO_START(ddragon)
-	MDRV_VIDEO_UPDATE(ddragon)
+	MCFG_VIDEO_START(ddragon)
+	MCFG_VIDEO_UPDATE(ddragon)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("fmsnd", YM2151, SOUND_CLOCK)
-	MDRV_SOUND_CONFIG(ym2151_config)
-	MDRV_SOUND_ROUTE(0, "mono", 0.60)
-	MDRV_SOUND_ROUTE(1, "mono", 0.60)
+	MCFG_SOUND_ADD("fmsnd", YM2151, SOUND_CLOCK)
+	MCFG_SOUND_CONFIG(ym2151_config)
+	MCFG_SOUND_ROUTE(0, "mono", 0.60)
+	MCFG_SOUND_ROUTE(1, "mono", 0.60)
 
-	MDRV_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+	MCFG_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( darktowr, ddragon )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("mcu", M68705,XTAL_4MHz)
-	MDRV_CPU_PROGRAM_MAP(mcu_map)
+	MCFG_CPU_ADD("mcu", M68705,XTAL_4MHz)
+	MCFG_CPU_PROGRAM_MAP(mcu_map)
 
 	/* video hardware */
 MACHINE_CONFIG_END
@@ -1140,11 +1140,11 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( toffy, ddragon )
 
 	/* basic machine hardware */
-	MDRV_DEVICE_REMOVE("sub")
+	MCFG_DEVICE_REMOVE("sub")
 
 	/* sound hardware */
-	MDRV_DEVICE_REMOVE("adpcm1")
-	MDRV_DEVICE_REMOVE("adpcm2")
+	MCFG_DEVICE_REMOVE("adpcm1")
+	MCFG_DEVICE_REMOVE("adpcm2")
 MACHINE_CONFIG_END
 
 
@@ -1163,7 +1163,7 @@ ROM_START( ddragon )
 	ROM_LOAD( "21j-4-1.23",   0x20000, 0x08000, CRC(728f87b9) SHA1(d7442be24d41bb9fc021587ef44ae5b830e4503d) ) /* banked at 0x4000-0x8000 */
 
 	ROM_REGION( 0x10000, "sub", 0 ) /* sprite cpu */
-	ROM_LOAD( "63701.bin",    0xc000, 0x4000, CRC(f5232d03) SHA1(e2a194e38633592fd6587690b3cb2669d93985c7) )
+	ROM_LOAD( "21jm-0.ic55",    0xc000, 0x4000, CRC(f5232d03) SHA1(e2a194e38633592fd6587690b3cb2669d93985c7) ) /* 63701Y0P MCU */
 
 	ROM_REGION( 0x10000, "soundcpu", 0 ) /* audio cpu */
 	ROM_LOAD( "21j-0-1",      0x08000, 0x08000, CRC(9efa95bb) SHA1(da997d9cc7b9e7b2c70a4b6d30db693086a6f7d8) )
@@ -1204,7 +1204,7 @@ ROM_START( ddragonw )
 	ROM_LOAD( "21j-4.23",     0x20000, 0x08000, CRC(6c9f46fa) SHA1(df251a4aea69b2328f7a543bf085b9c35933e2c1) ) /* banked at 0x4000-0x8000 */
 
 	ROM_REGION( 0x10000, "sub", 0 ) /* sprite cpu */
-	ROM_LOAD( "63701.bin",    0xc000, 0x4000, CRC(f5232d03) SHA1(e2a194e38633592fd6587690b3cb2669d93985c7) )
+	ROM_LOAD( "21jm-0.ic55",    0xc000, 0x4000, CRC(f5232d03) SHA1(e2a194e38633592fd6587690b3cb2669d93985c7) ) /* 63701Y0P MCU */
 
 	ROM_REGION( 0x10000, "soundcpu", 0 ) /* audio cpu */
 	ROM_LOAD( "21j-0-1",      0x08000, 0x08000, CRC(9efa95bb) SHA1(da997d9cc7b9e7b2c70a4b6d30db693086a6f7d8) )
@@ -1245,7 +1245,7 @@ ROM_START( ddragonw1 )
 	ROM_LOAD( "e4-1.23",       0x20000, 0x08000, CRC(b1e26935) SHA1(dfff666fd5e9dc4dfb2a1d891eced88730cbaf30) ) /* banked at 0x4000-0x8000 */
 
 	ROM_REGION( 0x10000, "sub", 0 ) /* sprite cpu */
-	ROM_LOAD( "63701.bin",    0xc000, 0x4000, CRC(f5232d03) SHA1(e2a194e38633592fd6587690b3cb2669d93985c7) ) /* Labeled as 21JM-0 */
+	ROM_LOAD( "21jm-0.ic55",    0xc000, 0x4000, CRC(f5232d03) SHA1(e2a194e38633592fd6587690b3cb2669d93985c7) ) /* 63701Y0P MCU */
 
 	ROM_REGION( 0x10000, "soundcpu", 0 ) /* audio cpu */
 	ROM_LOAD( "21j-0-1",      0x08000, 0x08000, CRC(9efa95bb) SHA1(da997d9cc7b9e7b2c70a4b6d30db693086a6f7d8) )
@@ -1286,7 +1286,7 @@ ROM_START( ddragonu )
 	ROM_LOAD( "21a-4.23",     0x20000, 0x08000, CRC(6ea16072) SHA1(0b3b84a0d54f7a3aba411586009babbfee653f9a) ) /* banked at 0x4000-0x8000 */
 
 	ROM_REGION( 0x10000, "sub", 0 ) /* sprite cpu */
-	ROM_LOAD( "63701.bin",    0xc000, 0x4000, CRC(f5232d03) SHA1(e2a194e38633592fd6587690b3cb2669d93985c7) )
+	ROM_LOAD( "21jm-0.ic55",    0xc000, 0x4000, CRC(f5232d03) SHA1(e2a194e38633592fd6587690b3cb2669d93985c7) ) /* 63701Y0P MCU */
 
 	ROM_REGION( 0x10000, "soundcpu", 0 ) /* audio cpu */
 	ROM_LOAD( "21j-0-1",      0x08000, 0x08000, CRC(9efa95bb) SHA1(da997d9cc7b9e7b2c70a4b6d30db693086a6f7d8) )
@@ -1327,7 +1327,7 @@ ROM_START( ddragonua )
 	ROM_LOAD( "21a-4_2",   0x20000, 0x08000, CRC(9b019598) SHA1(59f3aa15389f53c4646d21a39634cb1502e66ff6) ) /* banked at 0x4000-0x8000 */
 
 	ROM_REGION( 0x10000, "sub", 0 ) /* sprite cpu */
-	ROM_LOAD( "63701.bin",    0xc000, 0x4000, CRC(f5232d03) SHA1(e2a194e38633592fd6587690b3cb2669d93985c7) )
+	ROM_LOAD( "21jm-0.ic55",    0xc000, 0x4000, CRC(f5232d03) SHA1(e2a194e38633592fd6587690b3cb2669d93985c7) ) /* 63701Y0P MCU */
 
 	ROM_REGION( 0x10000, "soundcpu", 0 ) /* audio cpu */
 	ROM_LOAD( "21j-0-1",      0x08000, 0x08000, CRC(9efa95bb) SHA1(da997d9cc7b9e7b2c70a4b6d30db693086a6f7d8) )
@@ -1369,7 +1369,7 @@ ROM_START( ddragonub )
 	ROM_LOAD( "21a-4_2",   0x20000, 0x08000, CRC(9b019598) SHA1(59f3aa15389f53c4646d21a39634cb1502e66ff6) ) /* banked at 0x4000-0x8000 */
 
 	ROM_REGION( 0x10000, "sub", 0 ) /* sprite cpu */
-	ROM_LOAD( "63701.bin",    0xc000, 0x4000, CRC(f5232d03) SHA1(e2a194e38633592fd6587690b3cb2669d93985c7) )
+	ROM_LOAD( "21jm-0.ic55",    0xc000, 0x4000, CRC(f5232d03) SHA1(e2a194e38633592fd6587690b3cb2669d93985c7) ) /* 63701Y0P MCU */
 
 	ROM_REGION( 0x10000, "soundcpu", 0 ) /* audio cpu */
 	ROM_LOAD( "21j-0-1",      0x08000, 0x08000, CRC(9efa95bb) SHA1(da997d9cc7b9e7b2c70a4b6d30db693086a6f7d8) )
@@ -2037,26 +2037,26 @@ static DRIVER_INIT( toffy )
 	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x3808, 0x3808, 0, 0, toffy_bankswitch_w);
 
 	/* the program rom has a simple bitswap encryption */
-	rom = memory_region(machine, "maincpu");
-	length = memory_region_length(machine, "maincpu");
+	rom = machine->region("maincpu")->base();
+	length = machine->region("maincpu")->bytes();
 	for (i = 0; i < length; i++)
 		rom[i] = BITSWAP8(rom[i], 6,7,5,4,3,2,1,0);
 
 	/* and the fg gfx ... */
-	rom = memory_region(machine, "gfx1");
-	length = memory_region_length(machine, "gfx1");
+	rom = machine->region("gfx1")->base();
+	length = machine->region("gfx1")->bytes();
 	for (i = 0; i < length; i++)
 		rom[i] = BITSWAP8(rom[i], 7,6,5,3,4,2,1,0);
 
 	/* and the sprites gfx */
-	rom = memory_region(machine, "gfx2");
-	length = memory_region_length(machine, "gfx2");
+	rom = machine->region("gfx2")->base();
+	length = machine->region("gfx2")->bytes();
 	for (i = 0; i < length; i++)
 		rom[i] = BITSWAP8(rom[i], 7,6,5,4,3,2,0,1);
 
 	/* and the bg gfx */
-	rom = memory_region(machine, "gfx3");
-	length = memory_region_length(machine, "gfx3");
+	rom = machine->region("gfx3")->base();
+	length = machine->region("gfx3")->bytes();
 	for (i = 0; i < length / 2; i++)
 	{
 		rom[i + 0*length/2] = BITSWAP8(rom[i + 0*length/2], 7,6,1,4,3,2,5,0);
@@ -2072,8 +2072,8 @@ static DRIVER_INIT( ddragon6809 )
 	int i;
 	UINT8 *dst,*src;
 
-	src = memory_region(machine, "chars");
-	dst = memory_region(machine, "gfx1");
+	src = machine->region("chars")->base();
+	dst = machine->region("gfx1")->base();
 
 	for (i = 0; i < 0x8000; i++)
 	{

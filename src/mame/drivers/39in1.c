@@ -829,23 +829,23 @@ static READ32_HANDLER( pxa255_gpio_r )
 			verboselog( space->machine, 3, "pxa255_gpio_r: GPIO Pin Direction Register 2: %08x & %08x\n", gpio_regs->gpdr2, mem_mask );
 			return gpio_regs->gpdr2;
 		case PXA255_GPSR0:
-			verboselog( space->machine, 3, "pxa255_gpio_r: (Invalid Read) GPIO Pin Output Set Register 0: %08x & %08x\n", mame_rand(space->machine), mem_mask );
-			return mame_rand(space->machine);
+			verboselog( space->machine, 3, "pxa255_gpio_r: (Invalid Read) GPIO Pin Output Set Register 0: %08x & %08x\n", space->machine->rand(), mem_mask );
+			return space->machine->rand();
 		case PXA255_GPSR1:
-			verboselog( space->machine, 3, "pxa255_gpio_r: (Invalid Read) GPIO Pin Output Set Register 1: %08x & %08x\n", mame_rand(space->machine), mem_mask );
-			return mame_rand(space->machine);
+			verboselog( space->machine, 3, "pxa255_gpio_r: (Invalid Read) GPIO Pin Output Set Register 1: %08x & %08x\n", space->machine->rand(), mem_mask );
+			return space->machine->rand();
 		case PXA255_GPSR2:
-			verboselog( space->machine, 3, "pxa255_gpio_r: (Invalid Read) GPIO Pin Output Set Register 2: %08x & %08x\n", mame_rand(space->machine), mem_mask );
-			return mame_rand(space->machine);
+			verboselog( space->machine, 3, "pxa255_gpio_r: (Invalid Read) GPIO Pin Output Set Register 2: %08x & %08x\n", space->machine->rand(), mem_mask );
+			return space->machine->rand();
 		case PXA255_GPCR0:
-			verboselog( space->machine, 3, "pxa255_gpio_r: (Invalid Read) GPIO Pin Output Clear Register 0: %08x & %08x\n", mame_rand(space->machine), mem_mask );
-			return mame_rand(space->machine);
+			verboselog( space->machine, 3, "pxa255_gpio_r: (Invalid Read) GPIO Pin Output Clear Register 0: %08x & %08x\n", space->machine->rand(), mem_mask );
+			return space->machine->rand();
 		case PXA255_GPCR1:
-			verboselog( space->machine, 3, "pxa255_gpio_r: (Invalid Read) GPIO Pin Output Clear Register 1: %08x & %08x\n", mame_rand(space->machine), mem_mask );
-			return mame_rand(space->machine);
+			verboselog( space->machine, 3, "pxa255_gpio_r: (Invalid Read) GPIO Pin Output Clear Register 1: %08x & %08x\n", space->machine->rand(), mem_mask );
+			return space->machine->rand();
 		case PXA255_GPCR2:
-			verboselog( space->machine, 3, "pxa255_gpio_r: (Invalid Read) GPIO Pin Output Clear Register 2: %08x & %08x\n", mame_rand(space->machine), mem_mask );
-			return mame_rand(space->machine);
+			verboselog( space->machine, 3, "pxa255_gpio_r: (Invalid Read) GPIO Pin Output Clear Register 2: %08x & %08x\n", space->machine->rand(), mem_mask );
+			return space->machine->rand();
 		case PXA255_GRER0:
 			verboselog( space->machine, 3, "pxa255_gpio_r: GPIO Rising Edge Detect Enable Register 0: %08x & %08x\n", gpio_regs->grer0, mem_mask );
 			return gpio_regs->grer0;
@@ -1565,7 +1565,7 @@ static void pxa255_start(running_machine* machine)
 
 static MACHINE_START(39in1)
 {
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 	int i;
 
 	for (i = 0; i < 0x80000; i += 2)
@@ -1584,31 +1584,31 @@ static MACHINE_START(39in1)
 
 static MACHINE_CONFIG_START( 39in1, _39in1_state )
 
-	MDRV_CPU_ADD("maincpu", PXA255, 200000000)
-	MDRV_CPU_PROGRAM_MAP(39in1_map)
-	MDRV_CPU_VBLANK_INT("screen", pxa255_vblank_start)
+	MCFG_CPU_ADD("maincpu", PXA255, 200000000)
+	MCFG_CPU_PROGRAM_MAP(39in1_map)
+	MCFG_CPU_VBLANK_INT("screen", pxa255_vblank_start)
 
-	MDRV_PALETTE_LENGTH(32768)
+	MCFG_PALETTE_LENGTH(32768)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_SIZE(1024, 1024)
-	MDRV_SCREEN_VISIBLE_AREA(0, 295, 0, 479)
-	MDRV_PALETTE_LENGTH(256)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_SIZE(1024, 1024)
+	MCFG_SCREEN_VISIBLE_AREA(0, 295, 0, 479)
+	MCFG_PALETTE_LENGTH(256)
 
-	MDRV_MACHINE_START(39in1)
-	MDRV_EEPROM_93C66B_ADD("eeprom")
+	MCFG_MACHINE_START(39in1)
+	MCFG_EEPROM_93C66B_ADD("eeprom")
 
-	MDRV_VIDEO_UPDATE(39in1)
+	MCFG_VIDEO_UPDATE(39in1)
 
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("dac1", DMADAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MDRV_SOUND_ADD("dac2", DMADAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("dac1", DMADAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MCFG_SOUND_ADD("dac2", DMADAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 ROM_START( 39in1 )

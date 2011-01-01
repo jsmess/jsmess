@@ -1006,7 +1006,7 @@ static READ8_HANDLER( suzy_read )
 			value = input_port_read(space->machine, "PAUSE");
 			break;
 		case 0xb2:
-			value = *(memory_region(space->machine, "user1") + (state->suzy.high * state->granularity) + state->suzy.low);
+			value = *(space->machine->region("user1")->base() + (state->suzy.high * state->granularity) + state->suzy.low);
 			state->suzy.low = (state->suzy.low + 1) & (state->granularity - 1);
 			break;
 		case 0xb3: /* we need bank 1 emulation!!! */
@@ -1802,9 +1802,9 @@ MACHINE_START( lynx )
 	state_save_register_global_pointer(machine, state->mem_fe00, state->mem_fe00_size);
 	state_save_register_postload(machine, lynx_postload, NULL);
 
-	memory_configure_bank(machine, "bank3", 0, 1, memory_region(machine, "maincpu") + 0x0000, 0);
+	memory_configure_bank(machine, "bank3", 0, 1, machine->region("maincpu")->base() + 0x0000, 0);
 	memory_configure_bank(machine, "bank3", 1, 1, state->mem_fe00, 0);
-	memory_configure_bank(machine, "bank4", 0, 1, memory_region(machine, "maincpu") + 0x01fa, 0);
+	memory_configure_bank(machine, "bank4", 0, 1, machine->region("maincpu")->base() + 0x01fa, 0);
 	memory_configure_bank(machine, "bank4", 1, 1, state->mem_fffa, 0);
 
 	state->audio = machine->device("custom");
@@ -1894,7 +1894,7 @@ void lynx_crc_keyword(device_image_interface &image)
 static DEVICE_IMAGE_LOAD( lynx_cart )
 {
 	lynx_state *state = image.device().machine->driver_data<lynx_state>();
-	UINT8 *rom = memory_region(image.device().machine, "user1");
+	UINT8 *rom = image.device().machine->region("user1")->base();
 	UINT32 size;
 	UINT8 header[0x40];
 
@@ -1977,13 +1977,13 @@ static DEVICE_IMAGE_LOAD( lynx_cart )
 }
 
 MACHINE_CONFIG_FRAGMENT(lynx_cartslot)
-	MDRV_CARTSLOT_ADD("cart")
-	MDRV_CARTSLOT_EXTENSION_LIST("lnx,lyx")
-	MDRV_CARTSLOT_NOT_MANDATORY
-	MDRV_CARTSLOT_INTERFACE("lynx_cart")
-	MDRV_CARTSLOT_LOAD(lynx_cart)
-	MDRV_CARTSLOT_PARTIALHASH(lynx_partialhash)
+	MCFG_CARTSLOT_ADD("cart")
+	MCFG_CARTSLOT_EXTENSION_LIST("lnx,lyx")
+	MCFG_CARTSLOT_NOT_MANDATORY
+	MCFG_CARTSLOT_INTERFACE("lynx_cart")
+	MCFG_CARTSLOT_LOAD(lynx_cart)
+	MCFG_CARTSLOT_PARTIALHASH(lynx_partialhash)
 
 	/* Software lists */
-	MDRV_SOFTWARE_LIST_ADD("cart_list","lynx")
+	MCFG_SOFTWARE_LIST_ADD("cart_list","lynx")
 MACHINE_CONFIG_END

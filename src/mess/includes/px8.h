@@ -42,8 +42,8 @@ public:
 	UINT8 *video_ram;		/* LCD video RAM */
 
 	/* devices */
-	running_device *sed1320;
-	running_device *cassette;
+	device_t *sed1320;
+	device_t *cassette;
 };
 
 #endif

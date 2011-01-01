@@ -41,10 +41,10 @@
 
 DECLARE_LEGACY_MEMORY_DEVICE(UPD7220, upd7220);
 
-#define MDRV_UPD7220_ADD(_tag, _clock, _config, _map) \
-	MDRV_DEVICE_ADD(_tag, UPD7220, _clock) \
-	MDRV_DEVICE_CONFIG(_config) \
-	MDRV_DEVICE_ADDRESS_MAP(0, _map)
+#define MCFG_UPD7220_ADD(_tag, _clock, _config, _map) \
+	MCFG_DEVICE_ADD(_tag, UPD7220, _clock) \
+	MCFG_DEVICE_CONFIG(_config) \
+	MCFG_DEVICE_ADDRESS_MAP(0, _map)
 
 #define UPD7220_INTERFACE(name) \
 	const upd7220_interface (name) =
@@ -53,8 +53,8 @@ DECLARE_LEGACY_MEMORY_DEVICE(UPD7220, upd7220);
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef void (*upd7220_display_pixels_func)(running_device *device, bitmap_t *bitmap, int y, int x, UINT32 address, UINT16 data);
-#define UPD7220_DISPLAY_PIXELS(name) void name(running_device *device, bitmap_t *bitmap, int y, int x, UINT32 address, UINT16 data)
+typedef void (*upd7220_display_pixels_func)(device_t *device, bitmap_t *bitmap, int y, int x, UINT32 address, UINT16 data);
+#define UPD7220_DISPLAY_PIXELS(name) void name(device_t *device, bitmap_t *bitmap, int y, int x, UINT32 address, UINT16 data)
 
 typedef struct _upd7220_interface upd7220_interface;
 struct _upd7220_interface
@@ -97,6 +97,6 @@ WRITE_LINE_DEVICE_HANDLER( upd7220_ext_sync_w );
 WRITE_LINE_DEVICE_HANDLER( upd7220_lpen_w );
 
 /* screen update */
-void upd7220_update(running_device *device, bitmap_t *bitmap, const rectangle *cliprect);
+void upd7220_update(device_t *device, bitmap_t *bitmap, const rectangle *cliprect);
 
 #endif

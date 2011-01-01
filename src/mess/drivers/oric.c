@@ -386,64 +386,64 @@ static const floppy_config prav8d_floppy_config =
 
 static MACHINE_CONFIG_START( oric, oric_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6502, 1000000)
-	MDRV_CPU_PROGRAM_MAP(oric_mem)
-	MDRV_QUANTUM_TIME(HZ(60))
+	MCFG_CPU_ADD("maincpu", M6502, 1000000)
+	MCFG_CPU_PROGRAM_MAP(oric_mem)
+	MCFG_QUANTUM_TIME(HZ(60))
 
-	MDRV_MACHINE_START( oric )
-	MDRV_MACHINE_RESET( oric )
+	MCFG_MACHINE_START( oric )
+	MCFG_MACHINE_RESET( oric )
 
     /* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(40*6, 28*8)
-	MDRV_SCREEN_VISIBLE_AREA(0, 40*6-1, 0, 28*8-1)
-	MDRV_PALETTE_LENGTH(8)
-	MDRV_PALETTE_INIT( oric )
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(40*6, 28*8)
+	MCFG_SCREEN_VISIBLE_AREA(0, 40*6-1, 0, 28*8-1)
+	MCFG_PALETTE_LENGTH(8)
+	MCFG_PALETTE_INIT( oric )
 
-	MDRV_VIDEO_START( oric )
-	MDRV_VIDEO_UPDATE( oric )
+	MCFG_VIDEO_START( oric )
+	MCFG_VIDEO_UPDATE( oric )
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_WAVE_ADD("wave", "cassette")
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MDRV_SOUND_ADD("ay8912", AY8912, 1000000)
-	MDRV_SOUND_CONFIG(oric_ay_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_WAVE_ADD("wave", "cassette")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("ay8912", AY8912, 1000000)
+	MCFG_SOUND_CONFIG(oric_ay_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* printer */
-	MDRV_CENTRONICS_ADD("centronics", oric_centronics_config)
+	MCFG_CENTRONICS_ADD("centronics", oric_centronics_config)
 
 	/* cassette */
-	MDRV_CASSETTE_ADD( "cassette", oric_cassette_config )
+	MCFG_CASSETTE_ADD( "cassette", oric_cassette_config )
 
 	/* via */
-	MDRV_VIA6522_ADD( "via6522_0", 1000000, oric_6522_interface )
+	MCFG_VIA6522_ADD( "via6522_0", 1000000, oric_6522_interface )
 
-	MDRV_WD179X_ADD("wd179x", oric_wd17xx_interface )
+	MCFG_WD179X_ADD("wd179x", oric_wd17xx_interface )
 
-	MDRV_FLOPPY_4_DRIVES_ADD(oric1_floppy_config)
+	MCFG_FLOPPY_4_DRIVES_ADD(oric1_floppy_config)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( prav8d, oric )
-	MDRV_FLOPPY_4_DRIVES_REMOVE()
-	MDRV_FLOPPY_DRIVE_ADD(FLOPPY_0, prav8d_floppy_config)
+	MCFG_FLOPPY_4_DRIVES_REMOVE()
+	MCFG_FLOPPY_DRIVE_ADD(FLOPPY_0, prav8d_floppy_config)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( telstrat, oric )
-	MDRV_CPU_MODIFY( "maincpu" )
-	MDRV_CPU_PROGRAM_MAP( telestrat_mem)
+	MCFG_CPU_MODIFY( "maincpu" )
+	MCFG_CPU_PROGRAM_MAP( telestrat_mem)
 
-	MDRV_MACHINE_START( telestrat )
+	MCFG_MACHINE_START( telestrat )
 
 	/* acia */
-	MDRV_ACIA6551_ADD("acia")
+	MCFG_ACIA6551_ADD("acia")
 
 	/* via */
-	MDRV_VIA6522_ADD( "via6522_1", 1000000, telestrat_via2_interface )
+	MCFG_VIA6522_ADD( "via6522_1", 1000000, telestrat_via2_interface )
 MACHINE_CONFIG_END
 
 

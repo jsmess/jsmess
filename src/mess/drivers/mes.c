@@ -43,8 +43,8 @@ static MACHINE_RESET(mes)
 static VIDEO_START( mes )
 {
 	mes_state *state = machine->driver_data<mes_state>();
-	state->FNT = memory_region(machine, "chargen");
-	state->videoram = memory_region(machine, "maincpu")+0xf000;
+	state->FNT = machine->region("chargen")->base();
+	state->videoram = machine->region("maincpu")->base()+0xf000;
 }
 
 /* This system appears to have 2 screens. Not implemented.
@@ -102,25 +102,25 @@ static VIDEO_UPDATE( mes )
 
 static MACHINE_CONFIG_START( mes, mes_state )
     /* basic machine hardware */
-    MDRV_CPU_ADD("maincpu", Z80, XTAL_16MHz / 4)
-    MDRV_CPU_PROGRAM_MAP(mes_mem)
-	MDRV_CPU_IO_MAP(mes_io)
+    MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz / 4)
+    MCFG_CPU_PROGRAM_MAP(mes_mem)
+	MCFG_CPU_IO_MAP(mes_io)
 
-    MDRV_MACHINE_RESET(mes)
+    MCFG_MACHINE_RESET(mes)
 
     /* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(640, 250)
-	MDRV_SCREEN_VISIBLE_AREA(0, 639, 0, 249)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(640, 250)
+	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 249)
 
-    MDRV_PALETTE_LENGTH(2)
-    MDRV_PALETTE_INIT(black_and_white)
+    MCFG_PALETTE_LENGTH(2)
+    MCFG_PALETTE_INIT(black_and_white)
 
-    MDRV_VIDEO_START(mes)
-    MDRV_VIDEO_UPDATE(mes)
+    MCFG_VIDEO_START(mes)
+    MCFG_VIDEO_UPDATE(mes)
 MACHINE_CONFIG_END
 
 

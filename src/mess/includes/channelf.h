@@ -44,7 +44,7 @@ VIDEO_UPDATE( channelf );
 
 DECLARE_LEGACY_SOUND_DEVICE(CHANNELF, channelf_sound);
 
-void channelf_sound_w(running_device *device, int mode);
+void channelf_sound_w(device_t *device, int mode);
 
 
 #endif /* CHANNELF_H_ */

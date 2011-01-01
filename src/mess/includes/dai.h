@@ -22,8 +22,8 @@ public:
 	UINT8 paddle_select;
 	UINT8 paddle_enable;
 	UINT8 cassette_motor[2];
-	running_device *sound;
-	running_device *tms5501;
+	device_t *sound;
+	device_t *tms5501;
 	UINT8 keyboard_scan_mask;
 	unsigned short _4_colours_palette[4];
 };
@@ -57,8 +57,8 @@ PALETTE_INIT( dai );
 
 DECLARE_LEGACY_SOUND_DEVICE(DAI, dai_sound);
 
-void dai_set_input(running_device *device, int index, int state);
-void dai_set_volume(running_device *device, int offset, UINT8 data);
+void dai_set_input(device_t *device, int index, int state);
+void dai_set_volume(device_t *device, int offset, UINT8 data);
 
 
 #endif /* DAI_H_ */

@@ -96,50 +96,50 @@ static INTERRUPT_GEN( gamecom_interrupt )
 
 static MACHINE_CONFIG_START( gamecom, gamecom_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD( "maincpu", SM8500, XTAL_11_0592MHz/2 )   /* actually it's an sm8521 microcontroller containing an sm8500 cpu */
-	MDRV_CPU_PROGRAM_MAP( gamecom_mem_map)
-	MDRV_CPU_CONFIG( gamecom_cpu_config )
-	MDRV_CPU_VBLANK_INT("screen", gamecom_interrupt)
+	MCFG_CPU_ADD( "maincpu", SM8500, XTAL_11_0592MHz/2 )   /* actually it's an sm8521 microcontroller containing an sm8500 cpu */
+	MCFG_CPU_PROGRAM_MAP( gamecom_mem_map)
+	MCFG_CPU_CONFIG( gamecom_cpu_config )
+	MCFG_CPU_VBLANK_INT("screen", gamecom_interrupt)
 
-	MDRV_SCREEN_ADD("screen", LCD)
-	MDRV_SCREEN_REFRESH_RATE( 59.732155 )
-	MDRV_SCREEN_VBLANK_TIME(500)
-	MDRV_QUANTUM_TIME(HZ(60))
+	MCFG_SCREEN_ADD("screen", LCD)
+	MCFG_SCREEN_REFRESH_RATE( 59.732155 )
+	MCFG_SCREEN_VBLANK_TIME(500)
+	MCFG_QUANTUM_TIME(HZ(60))
 
-	//MDRV_NVRAM_ADD_0FILL("nvram")
+	//MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MDRV_MACHINE_RESET( gamecom )
+	MCFG_MACHINE_RESET( gamecom )
 
 	/* video hardware */
-	MDRV_VIDEO_START( gamecom )
-	MDRV_VIDEO_UPDATE( generic_bitmapped )
+	MCFG_VIDEO_START( gamecom )
+	MCFG_VIDEO_UPDATE( generic_bitmapped )
 
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE( 200, 200 )
-	MDRV_SCREEN_VISIBLE_AREA( 0, 199, 0, 159 )
-	MDRV_DEFAULT_LAYOUT(layout_lcd)
-	MDRV_PALETTE_LENGTH( GAMECOM_PALETTE_LENGTH )
-	MDRV_PALETTE_INIT( gamecom )
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE( 200, 200 )
+	MCFG_SCREEN_VISIBLE_AREA( 0, 199, 0, 159 )
+	MCFG_DEFAULT_LAYOUT(layout_lcd)
+	MCFG_PALETTE_LENGTH( GAMECOM_PALETTE_LENGTH )
+	MCFG_PALETTE_INIT( gamecom )
 
 	/* sound hardware */
 #if 0
-	MDRV_SPEAKER_STANDARD_STEREO( "left", "right" )
-	/* MDRV_SOUND_ADD( "custom", CUSTOM, 0 ) */
-	/* MDRV_SOUND_CONFIG */
-	MDRV_SOUND_ROUTE( 0, "left", 0.50 )
-	MDRV_SOUND_ROUTE( 1, "right", 0.50 )
+	MCFG_SPEAKER_STANDARD_STEREO( "left", "right" )
+	/* MCFG_SOUND_ADD( "custom", CUSTOM, 0 ) */
+	/* MCFG_SOUND_CONFIG */
+	MCFG_SOUND_ROUTE( 0, "left", 0.50 )
+	MCFG_SOUND_ROUTE( 1, "right", 0.50 )
 #endif
 
 	/* cartridge */
-	MDRV_CARTSLOT_ADD("cart1")
-	MDRV_CARTSLOT_EXTENSION_LIST("bin,tgc")
-	MDRV_CARTSLOT_INTERFACE("gamecom_cart1")
-	MDRV_CARTSLOT_LOAD(gamecom_cart1)
-	MDRV_SOFTWARE_LIST_ADD("cart_list","gamecom")
-	MDRV_CARTSLOT_ADD("cart2")
-	MDRV_CARTSLOT_EXTENSION_LIST("bin,tgc")
-	MDRV_CARTSLOT_INTERFACE("gamecom_cart2")
-	MDRV_CARTSLOT_LOAD(gamecom_cart2)
+	MCFG_CARTSLOT_ADD("cart1")
+	MCFG_CARTSLOT_EXTENSION_LIST("bin,tgc")
+	MCFG_CARTSLOT_INTERFACE("gamecom_cart1")
+	MCFG_CARTSLOT_LOAD(gamecom_cart1)
+	MCFG_SOFTWARE_LIST_ADD("cart_list","gamecom")
+	MCFG_CARTSLOT_ADD("cart2")
+	MCFG_CARTSLOT_EXTENSION_LIST("bin,tgc")
+	MCFG_CARTSLOT_INTERFACE("gamecom_cart2")
+	MCFG_CARTSLOT_LOAD(gamecom_cart2)
 MACHINE_CONFIG_END
 
 ROM_START( gamecom )

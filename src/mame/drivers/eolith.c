@@ -87,7 +87,7 @@ static READ32_HANDLER( eolith_custom_r )
     */
 	eolith_speedup_read(space);
 
-	return (input_port_read(space->machine, "IN0") & ~0x300) | (mame_rand(space->machine) & 0x300);
+	return (input_port_read(space->machine, "IN0") & ~0x300) | (space->machine->rand() & 0x300);
 }
 
 static WRITE32_HANDLER( systemcontrol_w )
@@ -332,39 +332,39 @@ INPUT_PORTS_END
 
 
 static MACHINE_CONFIG_START( eolith45, driver_device )
-	MDRV_CPU_ADD("maincpu", E132N, 45000000)		 /* 45 MHz */
-	MDRV_CPU_PROGRAM_MAP(eolith_map)
-	MDRV_CPU_VBLANK_INT_HACK(eolith_speedup,262)
+	MCFG_CPU_ADD("maincpu", E132N, 45000000)		 /* 45 MHz */
+	MCFG_CPU_PROGRAM_MAP(eolith_map)
+	MCFG_CPU_VBLANK_INT_HACK(eolith_speedup,262)
 
 	/* sound cpu */
 
-	MDRV_EEPROM_ADD("eeprom", eeprom_interface_93C66)
+	MCFG_EEPROM_ADD("eeprom", eeprom_interface_93C66)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(512, 512)
-	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(512, 512)
+	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 
-	MDRV_PALETTE_INIT(RRRRR_GGGGG_BBBBB)
-	MDRV_PALETTE_LENGTH(32768)
+	MCFG_PALETTE_INIT(RRRRR_GGGGG_BBBBB)
+	MCFG_PALETTE_LENGTH(32768)
 
-	MDRV_VIDEO_START(eolith)
-	MDRV_VIDEO_UPDATE(eolith)
+	MCFG_VIDEO_START(eolith)
+	MCFG_VIDEO_UPDATE(eolith)
 
 	/* sound hardware */
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( eolith50, eolith45 )
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_CLOCK(50000000)		 /* 50 MHz */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_CLOCK(50000000)		 /* 50 MHz */
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ironfort, eolith45 )
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_CLOCK(44900000) /* Normaly 45MHz??? but PCB actually had a 44.9MHz OSC, so it's value is used */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_CLOCK(44900000) /* Normaly 45MHz??? but PCB actually had a 44.9MHz OSC, so it's value is used */
 MACHINE_CONFIG_END
 
 
@@ -1041,7 +1041,7 @@ static DRIVER_INIT( landbrka )
 	//it fails compares with memories:
 	//$4002d338 -> $4002d348 .... $4002d33f -> $4002d34f
 	//related with bits 0x100 - 0x200 read at startup from input(0) ?
-	UINT32 *rombase = (UINT32*)memory_region(machine, "maincpu");
+	UINT32 *rombase = (UINT32*)machine->region("maincpu")->base();
 	rombase[0x14f00/4] = (rombase[0x14f00/4] & 0xffff) | 0x03000000; /* Change BR to NOP */
 
 	coin_counter_bit = 0x2000;
@@ -1051,7 +1051,7 @@ static DRIVER_INIT( landbrka )
 static DRIVER_INIT( hidctch2 )
 {
 	//it fails compares in memory like in landbrka
-	UINT32 *rombase = (UINT32*)memory_region(machine, "maincpu");
+	UINT32 *rombase = (UINT32*)machine->region("maincpu")->base();
 	rombase[0xbcc8/4] = (rombase[0xbcc8/4] & 0xffff) | 0x03000000; /* Change BR to NOP */
 	init_eolith_speedup(machine);
 }

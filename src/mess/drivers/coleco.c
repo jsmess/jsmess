@@ -557,7 +557,7 @@ static MACHINE_RESET( coleco )
 	coleco_state *state = machine->driver_data<coleco_state>();
 	state->last_state = 0;
 	cpu_set_input_line_vector(machine->device("maincpu"), INPUT_LINE_IRQ0, 0xff);
-	memset(&memory_region(machine, "maincpu")[0x6000], 0xff, 0x400);	// initialize RAM
+	memset(&machine->region("maincpu")->base()[0x6000], 0xff, 0x400);	// initialize RAM
 }
 
 //static int coleco_cart_verify(const UINT8 *cartdata, size_t size)
@@ -576,7 +576,7 @@ static MACHINE_RESET( coleco )
 static DEVICE_IMAGE_LOAD( czz50_cart )
 {
 	int size = image.length();
-	UINT8 *ptr = memory_region(image.device().machine, "maincpu") + 0x8000;
+	UINT8 *ptr = image.device().machine->region("maincpu")->base() + 0x8000;
 
 	if (image.fread( ptr, size ) != size)
 	{
@@ -590,62 +590,62 @@ static DEVICE_IMAGE_LOAD( czz50_cart )
 
 static MACHINE_CONFIG_START( coleco, coleco_state )
 	// basic machine hardware
-	MDRV_CPU_ADD("maincpu", Z80, XTAL_7_15909MHz/2)	// 3.579545 MHz
-	MDRV_CPU_PROGRAM_MAP(coleco_map)
-	MDRV_CPU_IO_MAP(coleco_io_map)
-	MDRV_CPU_VBLANK_INT("screen", coleco_interrupt)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_7_15909MHz/2)	// 3.579545 MHz
+	MCFG_CPU_PROGRAM_MAP(coleco_map)
+	MCFG_CPU_IO_MAP(coleco_io_map)
+	MCFG_CPU_VBLANK_INT("screen", coleco_interrupt)
 
-	MDRV_MACHINE_START(coleco)
-	MDRV_MACHINE_RESET(coleco)
+	MCFG_MACHINE_START(coleco)
+	MCFG_MACHINE_RESET(coleco)
 
     // video hardware
-	MDRV_FRAGMENT_ADD(tms9928a)
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_REFRESH_RATE((float)XTAL_10_738635MHz/2/342/262)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_FRAGMENT_ADD(tms9928a)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_REFRESH_RATE((float)XTAL_10_738635MHz/2/342/262)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 
 	// sound hardware
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("sn76489a", SN76489A, XTAL_7_15909MHz/2)	/* 3.579545 MHz */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("sn76489a", SN76489A, XTAL_7_15909MHz/2)	/* 3.579545 MHz */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* cartridge */
-	MDRV_CARTSLOT_ADD("cart")
-	MDRV_CARTSLOT_EXTENSION_LIST("rom,col,bin")
-	MDRV_CARTSLOT_NOT_MANDATORY
+	MCFG_CARTSLOT_ADD("cart")
+	MCFG_CARTSLOT_EXTENSION_LIST("rom,col,bin")
+	MCFG_CARTSLOT_NOT_MANDATORY
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( czz50, coleco_state )
 	// basic machine hardware
-	MDRV_CPU_ADD("maincpu", Z80, XTAL_7_15909MHz/2)	// ???
-	MDRV_CPU_PROGRAM_MAP(czz50_map)
-	MDRV_CPU_IO_MAP(czz50_io_map)
-	MDRV_CPU_VBLANK_INT("screen", coleco_interrupt)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_7_15909MHz/2)	// ???
+	MCFG_CPU_PROGRAM_MAP(czz50_map)
+	MCFG_CPU_IO_MAP(czz50_io_map)
+	MCFG_CPU_VBLANK_INT("screen", coleco_interrupt)
 
-	MDRV_MACHINE_START(coleco)
-	MDRV_MACHINE_RESET(coleco)
+	MCFG_MACHINE_START(coleco)
+	MCFG_MACHINE_RESET(coleco)
 
     // video hardware
-	MDRV_FRAGMENT_ADD(tms9928a)
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_REFRESH_RATE((float)XTAL_10_738635MHz/2/342/262)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_FRAGMENT_ADD(tms9928a)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_REFRESH_RATE((float)XTAL_10_738635MHz/2/342/262)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 
 	// sound hardware
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("sn76489a", SN76489A, XTAL_7_15909MHz/2)	// ???
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("sn76489a", SN76489A, XTAL_7_15909MHz/2)	// ???
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* cartridge */
-	MDRV_CARTSLOT_ADD("cart")
-	MDRV_CARTSLOT_EXTENSION_LIST("rom,col,bin")
-	MDRV_CARTSLOT_NOT_MANDATORY
-	MDRV_CARTSLOT_LOAD(czz50_cart)
+	MCFG_CARTSLOT_ADD("cart")
+	MCFG_CARTSLOT_EXTENSION_LIST("rom,col,bin")
+	MCFG_CARTSLOT_NOT_MANDATORY
+	MCFG_CARTSLOT_LOAD(czz50_cart)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( dina, czz50 )
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_REFRESH_RATE((float)XTAL_10_738635MHz/2/342/313)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_REFRESH_RATE((float)XTAL_10_738635MHz/2/342/313)
 MACHINE_CONFIG_END
 
 /* ROMs */

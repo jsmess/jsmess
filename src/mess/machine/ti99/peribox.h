@@ -35,18 +35,18 @@ typedef struct _ti99_peb_config
 */
 typedef struct _ti99_peb_card_interface
 {
-	void			(*card_read_data)(running_device *card, offs_t offset, UINT8 *value);
-	void			(*card_write_data)(running_device *card, offs_t offset, UINT8 value);
+	void			(*card_read_data)(device_t *card, offs_t offset, UINT8 *value);
+	void			(*card_write_data)(device_t *card, offs_t offset, UINT8 value);
 
-	void			(*card_read_cru)(running_device *card, offs_t offset, UINT8 *value);
-	void			(*card_write_cru)(running_device *card, offs_t offset, UINT8 value);
+	void			(*card_read_cru)(device_t *card, offs_t offset, UINT8 *value);
+	void			(*card_write_cru)(device_t *card, offs_t offset, UINT8 value);
 
-	void			(*senila)(running_device *card, int value);
-	void			(*senilb)(running_device *card, int value);
+	void			(*senila)(device_t *card, int value);
+	void			(*senilb)(device_t *card, int value);
 
 	/* For SGCPU only ("expansion bus") */
-	void			(*card_read_data16)(running_device *card, offs_t offset, UINT16 *value);
-	void			(*card_write_data16)(running_device *card, offs_t offset, UINT16 value);
+	void			(*card_read_data16)(device_t *card, offs_t offset, UINT16 *value);
+	void			(*card_write_data16)(device_t *card, offs_t offset, UINT16 value);
 
 } ti99_peb_card;
 
@@ -103,7 +103,7 @@ typedef struct _ti99_pebcard_config
 	int slot;
 } ti99_pebcard_config;
 
-INLINE const ti99_pebcard_config *get_pebcard_config(running_device *device)
+INLINE const ti99_pebcard_config *get_pebcard_config(device_t *device)
 {
 	assert(device != NULL);
 	return (const ti99_pebcard_config *) downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
@@ -112,8 +112,8 @@ INLINE const ti99_pebcard_config *get_pebcard_config(running_device *device)
 /*
     Management functions
 */
-int mount_card(running_device *device, running_device *cardptr, const ti99_peb_card *card, int slotindex);
-void unmount_card(running_device *device, int slotindex);
+int mount_card(device_t *device, device_t *cardptr, const ti99_peb_card *card, int slotindex);
+void unmount_card(device_t *device, int slotindex);
 
 
 /* device interface */
@@ -124,40 +124,40 @@ DECLARE_LEGACY_DEVICE( PBOX8, ti998_peb );
 DECLARE_LEGACY_DEVICE( PBOXSG, ti99sg_peb );
 DECLARE_LEGACY_DEVICE( PBOXGEN, geneve_peb );
 
-#define MDRV_PBOX4_ADD(_tag, _inta, _intb, _ready)			\
-	MDRV_DEVICE_ADD(_tag, PBOX4, 0)							\
-	MDRV_DEVICE_CONFIG_DATAPTR(ti99_peb_config, inta, _inta)		\
-	MDRV_DEVICE_CONFIG_DATAPTR(ti99_peb_config, intb, _intb)		\
-	MDRV_DEVICE_CONFIG_DATAPTR(ti99_peb_config, ready, _ready)
+#define MCFG_PBOX4_ADD(_tag, _inta, _intb, _ready)			\
+	MCFG_DEVICE_ADD(_tag, PBOX4, 0)							\
+	MCFG_DEVICE_CONFIG_DATAPTR(ti99_peb_config, inta, _inta)		\
+	MCFG_DEVICE_CONFIG_DATAPTR(ti99_peb_config, intb, _intb)		\
+	MCFG_DEVICE_CONFIG_DATAPTR(ti99_peb_config, ready, _ready)
 
-#define MDRV_PBOX4A_ADD(_tag, _inta, _intb, _ready)			\
-	MDRV_DEVICE_ADD(_tag, PBOX4A, 0)							\
-	MDRV_DEVICE_CONFIG_DATAPTR(ti99_peb_config, inta, _inta)		\
-	MDRV_DEVICE_CONFIG_DATAPTR(ti99_peb_config, intb, _intb)		\
-	MDRV_DEVICE_CONFIG_DATAPTR(ti99_peb_config, ready, _ready)
+#define MCFG_PBOX4A_ADD(_tag, _inta, _intb, _ready)			\
+	MCFG_DEVICE_ADD(_tag, PBOX4A, 0)							\
+	MCFG_DEVICE_CONFIG_DATAPTR(ti99_peb_config, inta, _inta)		\
+	MCFG_DEVICE_CONFIG_DATAPTR(ti99_peb_config, intb, _intb)		\
+	MCFG_DEVICE_CONFIG_DATAPTR(ti99_peb_config, ready, _ready)
 
-#define MDRV_PBOXEV_ADD(_tag, _inta, _intb, _ready)			\
-	MDRV_DEVICE_ADD(_tag, PBOXEV, 0)							\
-	MDRV_DEVICE_CONFIG_DATAPTR(ti99_peb_config, inta, _inta)		\
-	MDRV_DEVICE_CONFIG_DATAPTR(ti99_peb_config, intb, _intb)		\
-	MDRV_DEVICE_CONFIG_DATAPTR(ti99_peb_config, ready, _ready)
+#define MCFG_PBOXEV_ADD(_tag, _inta, _intb, _ready)			\
+	MCFG_DEVICE_ADD(_tag, PBOXEV, 0)							\
+	MCFG_DEVICE_CONFIG_DATAPTR(ti99_peb_config, inta, _inta)		\
+	MCFG_DEVICE_CONFIG_DATAPTR(ti99_peb_config, intb, _intb)		\
+	MCFG_DEVICE_CONFIG_DATAPTR(ti99_peb_config, ready, _ready)
 
-#define MDRV_PBOX8_ADD(_tag, _inta, _intb, _ready)			\
-	MDRV_DEVICE_ADD(_tag, PBOX8, 0)							\
-	MDRV_DEVICE_CONFIG_DATAPTR(ti99_peb_config, inta, _inta)		\
-	MDRV_DEVICE_CONFIG_DATAPTR(ti99_peb_config, intb, _intb)		\
-	MDRV_DEVICE_CONFIG_DATAPTR(ti99_peb_config, ready, _ready)
+#define MCFG_PBOX8_ADD(_tag, _inta, _intb, _ready)			\
+	MCFG_DEVICE_ADD(_tag, PBOX8, 0)							\
+	MCFG_DEVICE_CONFIG_DATAPTR(ti99_peb_config, inta, _inta)		\
+	MCFG_DEVICE_CONFIG_DATAPTR(ti99_peb_config, intb, _intb)		\
+	MCFG_DEVICE_CONFIG_DATAPTR(ti99_peb_config, ready, _ready)
 
-#define MDRV_PBOXSG_ADD(_tag, _inta, _intb, _ready)			\
-	MDRV_DEVICE_ADD(_tag, PBOXSG, 0)							\
-	MDRV_DEVICE_CONFIG_DATAPTR(ti99_peb_config, inta, _inta)		\
-	MDRV_DEVICE_CONFIG_DATAPTR(ti99_peb_config, intb, _intb)		\
-	MDRV_DEVICE_CONFIG_DATAPTR(ti99_peb_config, ready, _ready)
+#define MCFG_PBOXSG_ADD(_tag, _inta, _intb, _ready)			\
+	MCFG_DEVICE_ADD(_tag, PBOXSG, 0)							\
+	MCFG_DEVICE_CONFIG_DATAPTR(ti99_peb_config, inta, _inta)		\
+	MCFG_DEVICE_CONFIG_DATAPTR(ti99_peb_config, intb, _intb)		\
+	MCFG_DEVICE_CONFIG_DATAPTR(ti99_peb_config, ready, _ready)
 
-#define MDRV_PBOXGEN_ADD(_tag, _inta, _intb, _ready)			\
-	MDRV_DEVICE_ADD(_tag, PBOXGEN, 0)							\
-	MDRV_DEVICE_CONFIG_DATAPTR(ti99_peb_config, inta, _inta)		\
-	MDRV_DEVICE_CONFIG_DATAPTR(ti99_peb_config, intb, _intb)		\
-	MDRV_DEVICE_CONFIG_DATAPTR(ti99_peb_config, ready, _ready)
+#define MCFG_PBOXGEN_ADD(_tag, _inta, _intb, _ready)			\
+	MCFG_DEVICE_ADD(_tag, PBOXGEN, 0)							\
+	MCFG_DEVICE_CONFIG_DATAPTR(ti99_peb_config, inta, _inta)		\
+	MCFG_DEVICE_CONFIG_DATAPTR(ti99_peb_config, intb, _intb)		\
+	MCFG_DEVICE_CONFIG_DATAPTR(ti99_peb_config, ready, _ready)
 
 #endif /* __PBOX__ */

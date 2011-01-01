@@ -15,14 +15,14 @@
 DECLARE_LEGACY_IMAGE_DEVICE(HARDDISK, mess_hd);
 DECLARE_LEGACY_IMAGE_DEVICE(IDE_HARDDISK, mess_ide);
 
-#define MDRV_HARDDISK_ADD(_tag) \
-	MDRV_DEVICE_ADD(_tag, HARDDISK, 0) \
+#define MCFG_HARDDISK_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, HARDDISK, 0) \
 
-#define MDRV_IDE_HARDDISK_ADD(_tag) \
-	MDRV_DEVICE_ADD(_tag, IDE_HARDDISK, 0) \
+#define MCFG_IDE_HARDDISK_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, IDE_HARDDISK, 0) \
 
-hard_disk_file *mess_hd_get_hard_disk_file(running_device *device);
-chd_file *mess_hd_get_chd_file(running_device *device);
+hard_disk_file *mess_hd_get_hard_disk_file(device_t *device);
+chd_file *mess_hd_get_chd_file(device_t *device);
 
 struct harddisk_callback_config
 {

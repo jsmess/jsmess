@@ -34,7 +34,7 @@ INPUT_PORTS_END
 static MACHINE_RESET(dim68k) 
 {
 	dim68k_state *state = machine->driver_data<dim68k_state>();
-	UINT8* user1 = memory_region(machine, "user1");
+	UINT8* user1 = machine->region("user1")->base();
 
 	memcpy((UINT8*)state->ram,user1,0x20000);
 
@@ -52,23 +52,23 @@ static VIDEO_UPDATE( dim68k )
 
 static MACHINE_CONFIG_START( dim68k, dim68k_state )
     /* basic machine hardware */
-    MDRV_CPU_ADD("maincpu", M68000, XTAL_10MHz)
-    MDRV_CPU_PROGRAM_MAP(dim68k_mem)    
+    MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)
+    MCFG_CPU_PROGRAM_MAP(dim68k_mem)    
 
-    MDRV_MACHINE_RESET(dim68k)
+    MCFG_MACHINE_RESET(dim68k)
 	
     /* video hardware */
-    MDRV_SCREEN_ADD("screen", RASTER)
-    MDRV_SCREEN_REFRESH_RATE(50)
-    MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-    MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-    MDRV_SCREEN_SIZE(640, 480)
-    MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-    MDRV_PALETTE_LENGTH(2)
-    MDRV_PALETTE_INIT(black_and_white)
+    MCFG_SCREEN_ADD("screen", RASTER)
+    MCFG_SCREEN_REFRESH_RATE(50)
+    MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+    MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+    MCFG_SCREEN_SIZE(640, 480)
+    MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+    MCFG_PALETTE_LENGTH(2)
+    MCFG_PALETTE_INIT(black_and_white)
 
-    MDRV_VIDEO_START(dim68k)
-    MDRV_VIDEO_UPDATE(dim68k)
+    MCFG_VIDEO_START(dim68k)
+    MCFG_VIDEO_UPDATE(dim68k)
 MACHINE_CONFIG_END
 
 /*

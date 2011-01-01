@@ -227,12 +227,12 @@ static GFXDECODE_START( shootout )
 	GFXDECODE_ENTRY( "gfx3", 0, tile_layout,   0,        16 ) /* tiles */
 GFXDECODE_END
 
-static void shootout_snd_irq(running_device *device, int linestate)
+static void shootout_snd_irq(device_t *device, int linestate)
 {
 	cputag_set_input_line(device->machine, "audiocpu", 0, linestate);
 }
 
-static void shootout_snd2_irq(running_device *device, int linestate)
+static void shootout_snd2_irq(device_t *device, int linestate)
 {
 	cputag_set_input_line(device->machine, "maincpu", 0, linestate);
 }
@@ -263,63 +263,63 @@ static const ym2203_interface ym2203_interface2 =
 static MACHINE_CONFIG_START( shootout, shootout_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6502, 2000000)	/* 2 MHz? */
-	MDRV_CPU_PROGRAM_MAP(shootout_map)
+	MCFG_CPU_ADD("maincpu", M6502, 2000000)	/* 2 MHz? */
+	MCFG_CPU_PROGRAM_MAP(shootout_map)
 
-	MDRV_CPU_ADD("audiocpu", M6502, 1500000)
-	MDRV_CPU_PROGRAM_MAP(shootout_sound_map)
+	MCFG_CPU_ADD("audiocpu", M6502, 1500000)
+	MCFG_CPU_PROGRAM_MAP(shootout_sound_map)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 
-	MDRV_GFXDECODE(shootout)
-	MDRV_PALETTE_LENGTH(256)
+	MCFG_GFXDECODE(shootout)
+	MCFG_PALETTE_LENGTH(256)
 
-	MDRV_PALETTE_INIT(shootout)
-	MDRV_VIDEO_START(shootout)
-	MDRV_VIDEO_UPDATE(shootout)
+	MCFG_PALETTE_INIT(shootout)
+	MCFG_VIDEO_START(shootout)
+	MCFG_VIDEO_UPDATE(shootout)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM2203, 1500000)
-	MDRV_SOUND_CONFIG(ym2203_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("ymsnd", YM2203, 1500000)
+	MCFG_SOUND_CONFIG(ym2203_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_START( shootouj, shootout_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6502, 2000000)	/* 2 MHz? */
-	MDRV_CPU_PROGRAM_MAP(shootouj_map)
+	MCFG_CPU_ADD("maincpu", M6502, 2000000)	/* 2 MHz? */
+	MCFG_CPU_PROGRAM_MAP(shootouj_map)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 
-	MDRV_GFXDECODE(shootout)
-	MDRV_PALETTE_LENGTH(256)
+	MCFG_GFXDECODE(shootout)
+	MCFG_PALETTE_LENGTH(256)
 
-	MDRV_PALETTE_INIT(shootout)
-	MDRV_VIDEO_START(shootout)
-	MDRV_VIDEO_UPDATE(shootouj)
+	MCFG_PALETTE_INIT(shootout)
+	MCFG_VIDEO_START(shootout)
+	MCFG_VIDEO_UPDATE(shootouj)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM2203, 1500000)
-	MDRV_SOUND_CONFIG(ym2203_interface2)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("ymsnd", YM2203, 1500000)
+	MCFG_SOUND_CONFIG(ym2203_interface2)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 
@@ -410,9 +410,9 @@ ROM_END
 static DRIVER_INIT( shootout )
 {
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	int length = memory_region_length(machine, "maincpu");
+	int length = machine->region("maincpu")->bytes();
 	UINT8 *decrypt = auto_alloc_array(machine, UINT8, length - 0x8000);
-	UINT8 *rom = memory_region(machine, "maincpu");
+	UINT8 *rom = machine->region("maincpu")->base();
 	int A;
 
 	space->set_decrypted_region(0x8000, 0xffff, decrypt);
@@ -420,13 +420,13 @@ static DRIVER_INIT( shootout )
 	for (A = 0x8000;A < length;A++)
 		decrypt[A-0x8000] = (rom[A] & 0x9f) | ((rom[A] & 0x40) >> 1) | ((rom[A] & 0x20) << 1);
 
-	memory_configure_bank(machine, "bank1", 0, 16, memory_region(machine, "maincpu") + 0x10000, 0x4000);
+	memory_configure_bank(machine, "bank1", 0, 16, machine->region("maincpu")->base() + 0x10000, 0x4000);
 	memory_configure_bank_decrypted(machine, "bank1", 0, 16, decrypt + 0x8000, 0x4000);
 }
 
 static DRIVER_INIT( shootouj )
 {
-	memory_configure_bank(machine, "bank1", 0, 16, memory_region(machine, "maincpu") + 0x10000, 0x4000);
+	memory_configure_bank(machine, "bank1", 0, 16, machine->region("maincpu")->base() + 0x10000, 0x4000);
 }
 
 

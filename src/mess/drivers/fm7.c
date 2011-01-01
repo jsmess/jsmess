@@ -291,8 +291,8 @@ READ8_HANDLER( fm7_sub_beeper_r )
 static READ8_HANDLER( vector_r )
 {
 	fm7_state *state = space->machine->driver_data<fm7_state>();
-	UINT8* RAM = memory_region(space->machine,"maincpu");
-	UINT8* ROM = memory_region(space->machine,"init");
+	UINT8* RAM = space->machine->region("maincpu")->base();
+	UINT8* ROM = space->machine->region("init")->base();
 
 	if(state->init_rom_en)
 		return ROM[0x1ff0+offset];
@@ -308,7 +308,7 @@ static READ8_HANDLER( vector_r )
 static WRITE8_HANDLER( vector_w )
 {
 	fm7_state *state = space->machine->driver_data<fm7_state>();
-	UINT8* RAM = memory_region(space->machine,"maincpu");
+	UINT8* RAM = space->machine->region("maincpu")->base();
 
 	if(state->type == SYS_FM7)
 		RAM[0xfff0+offset] = data;
@@ -348,7 +348,7 @@ static READ8_HANDLER( fm7_fd04_r )
 static READ8_HANDLER( fm7_rom_en_r )
 {
 	fm7_state *state = space->machine->driver_data<fm7_state>();
-	UINT8* RAM = memory_region(space->machine,"maincpu");
+	UINT8* RAM = space->machine->region("maincpu")->base();
 
 	state->basic_rom_en = 1;
 	if(state->type == SYS_FM7)
@@ -366,7 +366,7 @@ static READ8_HANDLER( fm7_rom_en_r )
 static WRITE8_HANDLER( fm7_rom_en_w )
 {
 	fm7_state *state = space->machine->driver_data<fm7_state>();
-	UINT8* RAM = memory_region(space->machine,"maincpu");
+	UINT8* RAM = space->machine->region("maincpu")->base();
 
 	state->basic_rom_en = 0;
 	if(state->type == SYS_FM7)
@@ -419,7 +419,7 @@ static WRITE_LINE_DEVICE_HANDLER( fm7_fdc_drq_w )
 static READ8_HANDLER( fm7_fdc_r )
 {
 	fm7_state *state = space->machine->driver_data<fm7_state>();
-	running_device* dev = space->machine->device("fdc");
+	device_t* dev = space->machine->device("fdc");
 	UINT8 ret = 0;
 
 	switch(offset)
@@ -454,7 +454,7 @@ static READ8_HANDLER( fm7_fdc_r )
 static WRITE8_HANDLER( fm7_fdc_w )
 {
 	fm7_state *state = space->machine->driver_data<fm7_state>();
-	running_device* dev = space->machine->device("fdc");
+	device_t* dev = space->machine->device("fdc");
 	switch(offset)
 	{
 		case 0:
@@ -747,7 +747,7 @@ static READ8_HANDLER( fm7_cassette_printer_r )
 	// bit 0: printer busy
 	UINT8 ret = 0x00;
 	double data = cassette_input(space->machine->device("cass"));
-	running_device* printer_dev = space->machine->device("lpt");
+	device_t* printer_dev = space->machine->device("lpt");
 	UINT8 pdata;
 	int x;
 
@@ -1011,7 +1011,7 @@ static READ8_HANDLER( fm7_mmr_r )
 static void fm7_update_bank(address_space* space, int bank, UINT8 physical)
 {
 	fm7_state *state = space->machine->driver_data<fm7_state>();
-	UINT8* RAM = memory_region(space->machine,"maincpu");
+	UINT8* RAM = space->machine->region("maincpu")->base();
 	UINT16 size = 0xfff;
 	char bank_name[10];
 
@@ -1078,7 +1078,7 @@ static void fm7_update_bank(address_space* space, int bank, UINT8 physical)
 	{
 		if(state->init_rom_en)
 		{
-			RAM = memory_region(space->machine,"init");
+			RAM = space->machine->region("init")->base();
 			memory_install_read_bank(space,bank*0x1000,(bank*0x1000)+size,0,0,bank_name);
 			memory_nop_write(space,bank*0x1000,(bank*0x1000)+size,0,0);
 			memory_set_bankptr(space->machine,bank_name,RAM+(physical<<12)-0x36000);
@@ -1089,7 +1089,7 @@ static void fm7_update_bank(address_space* space, int bank, UINT8 physical)
 	{
 		if(state->basic_rom_en)
 		{
-			RAM = memory_region(space->machine,"fbasic");
+			RAM = space->machine->region("fbasic")->base();
 			memory_install_read_bank(space,bank*0x1000,(bank*0x1000)+size,0,0,bank_name);
 			memory_nop_write(space,bank*0x1000,(bank*0x1000)+size,0,0);
 			memory_set_bankptr(space->machine,bank_name,RAM+(physical<<12)-0x38000);
@@ -1105,7 +1105,7 @@ static void fm7_mmr_refresh(address_space* space)
 	fm7_state *state = space->machine->driver_data<fm7_state>();
 	int x;
 	UINT16 window_addr;
-	UINT8* RAM = memory_region(space->machine,"maincpu");
+	UINT8* RAM = space->machine->region("maincpu")->base();
 
 	if(state->mmr.enabled)
 	{
@@ -1178,7 +1178,7 @@ static WRITE8_HANDLER( fm7_mmr_w )
 static READ8_HANDLER( fm7_kanji_r )
 {
 	fm7_state *state = space->machine->driver_data<fm7_state>();
-	UINT8* KROM = memory_region(space->machine,"kanji1");
+	UINT8* KROM = space->machine->region("kanji1")->base();
 	UINT32 addr = state->kanji_address << 1;
 
 	switch(offset)
@@ -1370,7 +1370,7 @@ static IRQ_CALLBACK(fm7_sub_irq_ack)
 	return -1;
 }
 
-static void fm77av_fmirq(running_device* device,int irq)
+static void fm77av_fmirq(device_t* device,int irq)
 {
 	fm7_state *state = device->machine->driver_data<fm7_state>();
 	if(irq == 1)
@@ -1709,7 +1709,7 @@ static MACHINE_START(fm7)
 	fm7_state *state = machine->driver_data<fm7_state>();
 	// The FM-7 has no initialisation ROM, and no other obvious
 	// way to set the reset vector, so for now this will have to do.
-	UINT8* RAM = memory_region(machine,"maincpu");
+	UINT8* RAM = machine->region("maincpu")->base();
 
 	RAM[0xfffe] = 0xfe;
 	RAM[0xffff] = 0x00;
@@ -1724,8 +1724,8 @@ static MACHINE_START(fm7)
 static MACHINE_START(fm77av)
 {
 	fm7_state *state = machine->driver_data<fm7_state>();
-	UINT8* RAM = memory_region(machine,"maincpu");
-	UINT8* ROM = memory_region(machine,"init");
+	UINT8* RAM = machine->region("maincpu")->base();
+	UINT8* ROM = machine->region("init")->base();
 
 	memset(state->shared_ram,0xff,0x80);
 
@@ -1733,9 +1733,9 @@ static MACHINE_START(fm77av)
 	memcpy(RAM+0x3fff0,ROM+0x1ff0,16);
 
 	state->video.subrom = 0;  // default sub CPU ROM is type C.
-	RAM = memory_region(machine,"subsyscg");
+	RAM = machine->region("subsyscg")->base();
 	memory_set_bankptr(machine,"bank20",RAM);
-	RAM = memory_region(machine,"subsys_c");
+	RAM = machine->region("subsys_c")->base();
 	memory_set_bankptr(machine,"bank21",RAM+0x800);
 
 	state->type = SYS_FM77AV;
@@ -1746,8 +1746,8 @@ static MACHINE_START(fm77av)
 static MACHINE_RESET(fm7)
 {
 	fm7_state *state = machine->driver_data<fm7_state>();
-	UINT8* RAM = memory_region(machine,"maincpu");
-	UINT8* ROM = memory_region(machine,"init");
+	UINT8* RAM = machine->region("maincpu")->base();
+	UINT8* ROM = machine->region("init")->base();
 
 	timer_adjust_periodic(state->timer,ATTOTIME_IN_NSEC(2034500),0,ATTOTIME_IN_NSEC(2034500));
 	timer_adjust_periodic(state->subtimer,ATTOTIME_IN_MSEC(20),0,ATTOTIME_IN_MSEC(20));
@@ -1789,11 +1789,11 @@ static MACHINE_RESET(fm7)
 	{
 		if(!(input_port_read(machine,"DSW") & 0x02))
 		{  // DOS mode
-			memory_set_bankptr(machine,"bank17",memory_region(machine,"dos"));
+			memory_set_bankptr(machine,"bank17",machine->region("dos")->base());
 		}
 		else
 		{  // BASIC mode
-			memory_set_bankptr(machine,"bank17",memory_region(machine,"basic"));
+			memory_set_bankptr(machine,"bank17",machine->region("basic")->base());
 		}
 	}
 	if(state->type != SYS_FM7)  // set default RAM banks
@@ -1855,98 +1855,98 @@ static const floppy_config fm7_floppy_config =
 
 static MACHINE_CONFIG_START( fm7, fm7_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6809, XTAL_2MHz)
-	MDRV_CPU_PROGRAM_MAP(fm7_mem)
-	MDRV_QUANTUM_PERFECT_CPU("maincpu")
+	MCFG_CPU_ADD("maincpu", M6809, XTAL_2MHz)
+	MCFG_CPU_PROGRAM_MAP(fm7_mem)
+	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	MDRV_CPU_ADD("sub", M6809, XTAL_2MHz)
-	MDRV_CPU_PROGRAM_MAP(fm7_sub_mem)
-	MDRV_QUANTUM_PERFECT_CPU("sub")
+	MCFG_CPU_ADD("sub", M6809, XTAL_2MHz)
+	MCFG_CPU_PROGRAM_MAP(fm7_sub_mem)
+	MCFG_QUANTUM_PERFECT_CPU("sub")
 
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("psg", AY8910, XTAL_4_9152MHz / 4)
-	MDRV_SOUND_CONFIG(fm7_psg_intf)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS,"mono",1.0)
-	MDRV_SOUND_ADD("beeper", BEEP, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS,"mono",1.0)
-	MDRV_SOUND_WAVE_ADD("wave","cass")
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.20)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("psg", AY8910, XTAL_4_9152MHz / 4)
+	MCFG_SOUND_CONFIG(fm7_psg_intf)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",1.0)
+	MCFG_SOUND_ADD("beeper", BEEP, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",1.0)
+	MCFG_SOUND_WAVE_ADD("wave","cass")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.20)
 
-	MDRV_MACHINE_START(fm7)
-	MDRV_MACHINE_RESET(fm7)
+	MCFG_MACHINE_START(fm7)
+	MCFG_MACHINE_RESET(fm7)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_ADD("screen", RASTER)
 
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(640, 200)
-	MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
-	MDRV_PALETTE_LENGTH(8)
-	MDRV_PALETTE_INIT(fm7)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(640, 200)
+	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
+	MCFG_PALETTE_LENGTH(8)
+	MCFG_PALETTE_INIT(fm7)
 
-	MDRV_VIDEO_START(fm7)
-	MDRV_VIDEO_UPDATE(fm7)
+	MCFG_VIDEO_START(fm7)
+	MCFG_VIDEO_UPDATE(fm7)
 
-	MDRV_CASSETTE_ADD("cass",fm7_cassette_config)
+	MCFG_CASSETTE_ADD("cass",fm7_cassette_config)
 
-	MDRV_MB8877_ADD("fdc",fm7_mb8877a_interface)
+	MCFG_MB8877_ADD("fdc",fm7_mb8877a_interface)
 
-	MDRV_CENTRONICS_ADD("lpt",standard_centronics)
+	MCFG_CENTRONICS_ADD("lpt",standard_centronics)
 
-	MDRV_FLOPPY_2_DRIVES_ADD(fm7_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_ADD(fm7_floppy_config)
 
-	MDRV_SOFTWARE_LIST_ADD("cass_list","fm7_cass")
-	MDRV_SOFTWARE_LIST_ADD("flop_list","fm7_disk")
+	MCFG_SOFTWARE_LIST_ADD("cass_list","fm7_cass")
+	MCFG_SOFTWARE_LIST_ADD("flop_list","fm7_disk")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( fm77av, fm7_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6809, XTAL_2MHz)  // actually MB68B09E, but the 6809E core runs too slowly
-	MDRV_CPU_PROGRAM_MAP(fm77av_mem)
-	MDRV_QUANTUM_PERFECT_CPU("maincpu")
+	MCFG_CPU_ADD("maincpu", M6809, XTAL_2MHz)  // actually MB68B09E, but the 6809E core runs too slowly
+	MCFG_CPU_PROGRAM_MAP(fm77av_mem)
+	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	MDRV_CPU_ADD("sub", M6809, XTAL_2MHz)
-	MDRV_CPU_PROGRAM_MAP(fm77av_sub_mem)
-	MDRV_QUANTUM_PERFECT_CPU("sub")
+	MCFG_CPU_ADD("sub", M6809, XTAL_2MHz)
+	MCFG_CPU_PROGRAM_MAP(fm77av_sub_mem)
+	MCFG_QUANTUM_PERFECT_CPU("sub")
 
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("ym", YM2203, XTAL_4_9152MHz / 4)
-	MDRV_SOUND_CONFIG(fm7_ym_intf)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS,"mono",1.0)
-	MDRV_SOUND_ADD("beeper", BEEP, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS,"mono",1.0)
-	MDRV_SOUND_WAVE_ADD("wave","cass")
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.20)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("ym", YM2203, XTAL_4_9152MHz / 4)
+	MCFG_SOUND_CONFIG(fm7_ym_intf)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",1.0)
+	MCFG_SOUND_ADD("beeper", BEEP, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",1.0)
+	MCFG_SOUND_WAVE_ADD("wave","cass")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.20)
 
-	MDRV_MACHINE_START(fm77av)
-	MDRV_MACHINE_RESET(fm7)
+	MCFG_MACHINE_START(fm77av)
+	MCFG_MACHINE_RESET(fm7)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(640, 200)
-	MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
-	MDRV_PALETTE_LENGTH(8 + 4096)
-	MDRV_PALETTE_INIT(fm7)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(640, 200)
+	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
+	MCFG_PALETTE_LENGTH(8 + 4096)
+	MCFG_PALETTE_INIT(fm7)
 
-	MDRV_VIDEO_START(fm7)
-	MDRV_VIDEO_UPDATE(fm7)
+	MCFG_VIDEO_START(fm7)
+	MCFG_VIDEO_UPDATE(fm7)
 
-	MDRV_CASSETTE_ADD("cass",fm7_cassette_config)
+	MCFG_CASSETTE_ADD("cass",fm7_cassette_config)
 
-	MDRV_MB8877_ADD("fdc",fm7_mb8877a_interface)
+	MCFG_MB8877_ADD("fdc",fm7_mb8877a_interface)
 
-	MDRV_CENTRONICS_ADD("lpt",standard_centronics)
+	MCFG_CENTRONICS_ADD("lpt",standard_centronics)
 
-	MDRV_FLOPPY_2_DRIVES_ADD(fm7_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_ADD(fm7_floppy_config)
 
-	MDRV_SOFTWARE_LIST_ADD("av_flop_list","fm77av")
-	MDRV_SOFTWARE_LIST_COMPATIBLE_ADD("cass_list","fm7_cass")
-	MDRV_SOFTWARE_LIST_COMPATIBLE_ADD("flop_list","fm7_disk")
+	MCFG_SOFTWARE_LIST_ADD("av_flop_list","fm77av")
+	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("cass_list","fm7_cass")
+	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("flop_list","fm7_disk")
 MACHINE_CONFIG_END
 
 /* ROM definition */

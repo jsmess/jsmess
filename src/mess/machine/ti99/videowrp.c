@@ -17,17 +17,17 @@
 typedef struct _ti99_video_state
 {
 	address_space	*space;
-	running_device	*cpu;
+	device_t	*cpu;
 	int				chip;
 } ti99_video_state;
 
-INLINE ti99_video_state *get_safe_token(running_device *device)
+INLINE ti99_video_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	return (ti99_video_state *)downcast<legacy_device_base *>(device)->token();
 }
 
-INLINE const ti99_video_config *get_config(running_device *device)
+INLINE const ti99_video_config *get_config(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == TIVIDEO);
@@ -218,7 +218,7 @@ WRITE16_DEVICE_HANDLER ( ti_video_wnop )
 /**************************************************************************/
 // Interfacing to mouse attached to v9938
 
-void video_update_mouse( running_device *device, int delta_x, int delta_y, int buttons)
+void video_update_mouse( device_t *device, int delta_x, int delta_y, int buttons)
 {
 	ti99_video_state *video = get_safe_token(device);
 	// TODO: V9938 to be devicified

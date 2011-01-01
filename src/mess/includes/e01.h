@@ -29,7 +29,7 @@ public:
 	int adlc_irq;
 
 	/* devices */
-	running_device *fdc;
+	device_t *fdc;
 };
 
 #endif

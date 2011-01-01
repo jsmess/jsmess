@@ -74,8 +74,8 @@ static WRITE_LINE_DEVICE_HANDLER( flipscreen_w );
 
 static WRITE_LINE_DEVICE_HANDLER( main_cpu_irq )
 {
-	running_device *pia0 = device->machine->device("pia_main");
-	running_device *pia1 = device->machine->device("pia_audio");
+	device_t *pia0 = device->machine->device("pia_main");
+	device_t *pia1 = device->machine->device("pia_audio");
 	int combined_state = pia6821_get_irq_a(pia0) | pia6821_get_irq_b(pia0) |
 						 pia6821_get_irq_a(pia1) | pia6821_get_irq_b(pia1);
 
@@ -207,7 +207,7 @@ static const ay8910_interface ay8910_2_interface =
 
 static WRITE8_DEVICE_HANDLER( ttl74123_output_changed )
 {
-	running_device *pia = device->machine->device("pia_main");
+	device_t *pia = device->machine->device("pia_main");
 	pia6821_ca1_w(pia, data);
 	ttl74123_output = data;
 }
@@ -384,7 +384,7 @@ static const mc6845_interface mc6845_intf =
 
 static VIDEO_UPDATE( r2dtank )
 {
-	running_device *mc6845 = screen->machine->device("crtc");
+	device_t *mc6845 = screen->machine->device("crtc");
 	mc6845_update(mc6845, bitmap, cliprect);
 
 	return 0;
@@ -517,41 +517,41 @@ INPUT_PORTS_END
  *************************************/
 
 static MACHINE_CONFIG_START( r2dtank, driver_device )
-	MDRV_CPU_ADD("maincpu", M6809,3000000)		 /* ?? too fast ? */
-	MDRV_CPU_PROGRAM_MAP(r2dtank_main_map)
+	MCFG_CPU_ADD("maincpu", M6809,3000000)		 /* ?? too fast ? */
+	MCFG_CPU_PROGRAM_MAP(r2dtank_main_map)
 
-	MDRV_CPU_ADD("audiocpu", M6802,3000000)			/* ?? */
-	MDRV_CPU_PROGRAM_MAP(r2dtank_audio_map)
+	MCFG_CPU_ADD("audiocpu", M6802,3000000)			/* ?? */
+	MCFG_CPU_PROGRAM_MAP(r2dtank_audio_map)
 
-	MDRV_MACHINE_START(r2dtank)
-	MDRV_NVRAM_ADD_0FILL("nvram")
+	MCFG_MACHINE_START(r2dtank)
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
-	MDRV_VIDEO_UPDATE(r2dtank)
+	MCFG_VIDEO_UPDATE(r2dtank)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 256, 0, 256, 256, 0, 256)	/* temporary, CRTC will configure screen */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 256, 0, 256, 256, 0, 256)	/* temporary, CRTC will configure screen */
 
-	MDRV_MC6845_ADD("crtc", MC6845, CRTC_CLOCK, mc6845_intf)
+	MCFG_MC6845_ADD("crtc", MC6845, CRTC_CLOCK, mc6845_intf)
 
 	/* 74LS123 */
 
-	MDRV_TTL74123_ADD("74123", ttl74123_intf)
+	MCFG_TTL74123_ADD("74123", ttl74123_intf)
 
-	MDRV_PIA6821_ADD("pia_main", pia_main_intf)
-	MDRV_PIA6821_ADD("pia_audio", pia_audio_intf)
+	MCFG_PIA6821_ADD("pia_main", pia_main_intf)
+	MCFG_PIA6821_ADD("pia_audio", pia_audio_intf)
 
 	/* audio hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay1", AY8910, (4000000 / 4))
-	MDRV_SOUND_CONFIG(ay8910_1_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD("ay1", AY8910, (4000000 / 4))
+	MCFG_SOUND_CONFIG(ay8910_1_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MDRV_SOUND_ADD("ay2", AY8910, (4000000 / 4))
-	MDRV_SOUND_CONFIG(ay8910_2_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD("ay2", AY8910, (4000000 / 4))
+	MCFG_SOUND_CONFIG(ay8910_2_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 MACHINE_CONFIG_END
 

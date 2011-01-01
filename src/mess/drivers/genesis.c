@@ -393,26 +393,26 @@ static MACHINE_RESET( ms_megadriv )
 
 static MACHINE_CONFIG_DERIVED( ms_megadriv, megadriv )
 
-	MDRV_MACHINE_START( ms_megadriv )
-	MDRV_MACHINE_RESET( ms_megadriv )
+	MCFG_MACHINE_START( ms_megadriv )
+	MCFG_MACHINE_RESET( ms_megadriv )
 
-	MDRV_FRAGMENT_ADD( genesis_cartslot )
+	MCFG_FRAGMENT_ADD( genesis_cartslot )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ms_megadpal, megadpal )
 
-	MDRV_MACHINE_START( ms_megadriv )
-	MDRV_MACHINE_RESET( ms_megadriv )
+	MCFG_MACHINE_START( ms_megadriv )
+	MCFG_MACHINE_RESET( ms_megadriv )
 
-	MDRV_FRAGMENT_ADD( genesis_cartslot )
+	MCFG_FRAGMENT_ADD( genesis_cartslot )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ms_megdsvp, megdsvp )
 
-	MDRV_MACHINE_START( ms_megadriv )
-	MDRV_MACHINE_RESET( ms_megadriv )
+	MCFG_MACHINE_START( ms_megadriv )
+	MCFG_MACHINE_RESET( ms_megadriv )
 
-	MDRV_FRAGMENT_ADD( genesis_cartslot )
+	MCFG_FRAGMENT_ADD( genesis_cartslot )
 MACHINE_CONFIG_END
 
 
@@ -496,7 +496,7 @@ static DRIVER_INIT( mess_32x )
 
 static MACHINE_CONFIG_DERIVED( ms_32x, genesis_32x )
 
-	MDRV_FRAGMENT_ADD( _32x_cartslot )
+	MCFG_FRAGMENT_ADD( _32x_cartslot )
 MACHINE_CONFIG_END
 
 
@@ -833,26 +833,26 @@ INPUT_PORTS_END
 
 static MACHINE_CONFIG_DERIVED( pico, megadriv )
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(_pico_mem)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(_pico_mem)
 
-	MDRV_DEVICE_REMOVE("genesis_snd_z80")
+	MCFG_DEVICE_REMOVE("genesis_snd_z80")
 
-	MDRV_MACHINE_RESET( ms_megadriv )
+	MCFG_MACHINE_RESET( ms_megadriv )
 
-	MDRV_FRAGMENT_ADD( pico_cartslot )
+	MCFG_FRAGMENT_ADD( pico_cartslot )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( picopal, megadpal )
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(_pico_mem)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(_pico_mem)
 
-	MDRV_DEVICE_REMOVE("genesis_snd_z80")
+	MCFG_DEVICE_REMOVE("genesis_snd_z80")
 
-	MDRV_MACHINE_RESET( ms_megadriv )
+	MCFG_MACHINE_RESET( ms_megadriv )
 
-	MDRV_FRAGMENT_ADD( pico_cartslot )
+	MCFG_FRAGMENT_ADD( pico_cartslot )
 MACHINE_CONFIG_END
 
 

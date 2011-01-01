@@ -760,7 +760,7 @@ static STATE_POSTLOAD( coco3_video_postload )
 
 static const UINT8 *get_video_ram_coco3(running_machine *machine,int scanline)
 {
-	running_device *sam = machine->device("sam");
+	device_t *sam = machine->device("sam");
 	return sam6883_videoram(sam,scanline);
 }
 
@@ -788,7 +788,7 @@ static void internal_video_start_coco3(running_machine *machine, m6847_type type
 	memory_set_bankptr(machine, "bank10", machine->generic.paletteram.u8);
 
 	/* font */
-	rom = memory_region(machine, "maincpu");
+	rom = machine->region("maincpu")->base();
 	for (i = 0; i < 32; i++)
 	{
 		/* characters 0-31 are at $FA10 - $FB0F */

@@ -274,7 +274,7 @@ static GFXDECODE_START( ashnojoe )
 GFXDECODE_END
 
 
-static void ym2203_irq_handler( running_device *device, int irq )
+static void ym2203_irq_handler( device_t *device, int irq )
 {
 	ashnojoe_state *state = device->machine->driver_data<ashnojoe_state>();
 	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
@@ -307,7 +307,7 @@ static const ym2203_interface ym2203_config =
 	ym2203_irq_handler
 };
 
-static void ashnojoe_vclk_cb( running_device *device )
+static void ashnojoe_vclk_cb( device_t *device )
 {
 	ashnojoe_state *state = device->machine->driver_data<ashnojoe_state>();
 	if (state->msm5205_vclk_toggle == 0)
@@ -354,41 +354,41 @@ static MACHINE_RESET( ashnojoe )
 static MACHINE_CONFIG_START( ashnojoe, ashnojoe_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 8000000)
-	MDRV_CPU_PROGRAM_MAP(ashnojoe_map)
-	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
+	MCFG_CPU_ADD("maincpu", M68000, 8000000)
+	MCFG_CPU_PROGRAM_MAP(ashnojoe_map)
+	MCFG_CPU_VBLANK_INT("screen", irq1_line_hold)
 
-	MDRV_CPU_ADD("audiocpu", Z80, 4000000)
-	MDRV_CPU_PROGRAM_MAP(sound_map)
-	MDRV_CPU_IO_MAP(sound_portmap)
+	MCFG_CPU_ADD("audiocpu", Z80, 4000000)
+	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_CPU_IO_MAP(sound_portmap)
 
-	MDRV_MACHINE_START(ashnojoe)
-	MDRV_MACHINE_RESET(ashnojoe)
+	MCFG_MACHINE_START(ashnojoe)
+	MCFG_MACHINE_RESET(ashnojoe)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(512, 512)
-	MDRV_SCREEN_VISIBLE_AREA(14*8, 50*8-1, 3*8, 29*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(512, 512)
+	MCFG_SCREEN_VISIBLE_AREA(14*8, 50*8-1, 3*8, 29*8-1)
 
-	MDRV_GFXDECODE(ashnojoe)
-	MDRV_PALETTE_LENGTH(0x1000/2)
+	MCFG_GFXDECODE(ashnojoe)
+	MCFG_PALETTE_LENGTH(0x1000/2)
 
-	MDRV_VIDEO_START(ashnojoe)
-	MDRV_VIDEO_UPDATE(ashnojoe)
+	MCFG_VIDEO_START(ashnojoe)
+	MCFG_VIDEO_UPDATE(ashnojoe)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM2203, 4000000)
-	MDRV_SOUND_CONFIG(ym2203_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.1)
+	MCFG_SOUND_ADD("ymsnd", YM2203, 4000000)
+	MCFG_SOUND_CONFIG(ym2203_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.1)
 
-	MDRV_SOUND_ADD("msm", MSM5205, 384000)
-	MDRV_SOUND_CONFIG(msm5205_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("msm", MSM5205, 384000)
+	MCFG_SOUND_CONFIG(msm5205_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 ROM_START( scessjoe )
@@ -467,7 +467,7 @@ ROM_END
 
 static DRIVER_INIT( ashnojoe )
 {
-	UINT8 *ROM = memory_region(machine, "adpcm");
+	UINT8 *ROM = machine->region("adpcm")->base();
 	memory_configure_bank(machine, "bank4", 0, 16, &ROM[0x00000], 0x8000);
 
 	memory_set_bank(machine, "bank4", 0);

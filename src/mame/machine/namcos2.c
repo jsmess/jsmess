@@ -153,7 +153,7 @@ READ16_HANDLER( namcos2_68k_eeprom_r ){
 /* 68000 Shared memory area - Data ROM area                  */
 /*************************************************************/
 READ16_HANDLER( namcos2_68k_data_rom_r ){
-	UINT16 *ROM = (UINT16 *)memory_region(space->machine, "user1");
+	UINT16 *ROM = (UINT16 *)space->machine->region("user1")->base();
 	return ROM[offset];
 }
 
@@ -343,7 +343,7 @@ READ16_HANDLER( namcos2_68k_key_r )
 	//  case 3: return 0x142;
 		case 4: return 0x142;
 	//  case 3: popmessage("blah %08x",cpu_get_pc(space->cpu));
-		default: return mame_rand(space->machine);
+		default: return space->machine->rand();
 		}
 		break;
 
@@ -400,7 +400,7 @@ READ16_HANDLER( namcos2_68k_key_r )
 
 
 
-	return mame_rand(space->machine)&0xffff;
+	return space->machine->rand()&0xffff;
 }
 
 WRITE16_HANDLER( namcos2_68k_key_w )
@@ -468,7 +468,7 @@ static UINT16
 ReadWriteC148( address_space *space, offs_t offset, UINT16 data, int bWrite )
 {
 	offs_t addr = ((offset * 2) + 0x1c0000) & 0x1fe000;
-	running_device *altcpu = NULL;
+	device_t *altcpu = NULL;
 	UINT16 *pC148Reg = NULL;
 	UINT16 *pC148RegAlt = NULL;
 	UINT16 result = 0;
@@ -701,8 +701,8 @@ INTERRUPT_GEN( namcos2_68k_gpu_vblank )
 
 WRITE8_HANDLER( namcos2_sound_bankselect_w )
 {
-	UINT8 *RAM=memory_region(space->machine, "audiocpu");
-	UINT32 max = (memory_region_length(space->machine, "audiocpu") - 0x10000) / 0x4000;
+	UINT8 *RAM=space->machine->region("audiocpu")->base();
+	UINT32 max = (space->machine->region("audiocpu")->bytes() - 0x10000) / 0x4000;
 	int bank = ( data >> 4 ) % max;	/* 991104.CAB */
 	memory_set_bankptr(space->machine,  BANKED_SOUND_ROM, &RAM[ 0x10000 + ( 0x4000 * bank ) ] );
 }

@@ -31,8 +31,8 @@ WRITE8_DEVICE_HANDLER( mm58274c_w );
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MDRV_MM58274C_ADD(_tag, _intrf) \
-	MDRV_DEVICE_ADD(_tag, MM58274C, 0) \
-	MDRV_DEVICE_CONFIG(_intrf)
+#define MCFG_MM58274C_ADD(_tag, _intrf) \
+	MCFG_DEVICE_ADD(_tag, MM58274C, 0) \
+	MCFG_DEVICE_CONFIG(_intrf)
 
 #endif /* MM58274C_H */

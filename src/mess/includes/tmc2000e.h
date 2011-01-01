@@ -24,8 +24,8 @@ public:
 	int reset;				/* reset activated */
 
 	/* devices */
-	running_device *cdp1864;
-	running_device *cassette;
+	device_t *cdp1864;
+	device_t *cassette;
 };
 
 #endif

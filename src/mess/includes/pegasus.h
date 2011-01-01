@@ -6,7 +6,7 @@ public:
 
 	UINT8 kbd_row;
 	UINT8 kbd_irq;
-	running_device *cass;
+	device_t *cass;
 	UINT8 *FNT;
 	UINT8 control_bits;
 	UINT8 *video_ram;

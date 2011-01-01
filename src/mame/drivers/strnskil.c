@@ -41,7 +41,7 @@ static READ8_HANDLER( pettanp_protection_r )
 		case 0x6066:	res = 0xa5;	break;
 		case 0x60dc:	res = 0x20;	break;	/* bits 0-3 unknown */
 		case 0x615d:	res = 0x30;	break;	/* bits 0-3 unknown */
-		case 0x61b9:	res = 0x60|(mame_rand(space->machine)&0x0f);	break;	/* bits 0-3 unknown */
+		case 0x61b9:	res = 0x60|(space->machine->rand()&0x0f);	break;	/* bits 0-3 unknown */
 		case 0x6219:	res = 0x77;	break;
 		case 0x626c:	res = 0xb4;	break;
 		default:		res = 0xff; break;
@@ -60,7 +60,7 @@ static READ8_HANDLER( banbam_protection_r )
 		case 0x6094:	res = 0xa5;	break;
 		case 0x6118:	res = 0x20;	break;	/* bits 0-3 unknown */
 		case 0x6199:	res = 0x30;	break;	/* bits 0-3 unknown */
-		case 0x61f5:	res = 0x60|(mame_rand(space->machine)&0x0f);	break;	/* bits 0-3 unknown */
+		case 0x61f5:	res = 0x60|(space->machine->rand()&0x0f);	break;	/* bits 0-3 unknown */
 		case 0x6255:	res = 0x77;	break;
 		case 0x62a8:	res = 0xb4;	break;
 		default:		res = 0xff; break;
@@ -318,45 +318,45 @@ GFXDECODE_END
 static MACHINE_CONFIG_START( strnskil, strnskil_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80,8000000/2) /* 4.000MHz */
-	MDRV_CPU_PROGRAM_MAP(strnskil_map1)
-	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)
+	MCFG_CPU_ADD("maincpu", Z80,8000000/2) /* 4.000MHz */
+	MCFG_CPU_PROGRAM_MAP(strnskil_map1)
+	MCFG_CPU_VBLANK_INT_HACK(irq0_line_hold,2)
 
-	MDRV_CPU_ADD("sub", Z80,8000000/2) /* 4.000MHz */
-	MDRV_CPU_PROGRAM_MAP(strnskil_map2)
-	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)
+	MCFG_CPU_ADD("sub", Z80,8000000/2) /* 4.000MHz */
+	MCFG_CPU_PROGRAM_MAP(strnskil_map2)
+	MCFG_CPU_VBLANK_INT_HACK(irq0_line_hold,2)
 
-	MDRV_QUANTUM_TIME(HZ(6000))
+	MCFG_QUANTUM_TIME(HZ(6000))
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(strnskil)
-	MDRV_PALETTE_LENGTH(1024)
+	MCFG_GFXDECODE(strnskil)
+	MCFG_PALETTE_LENGTH(1024)
 
-	MDRV_PALETTE_INIT(strnskil)
-	MDRV_VIDEO_START(strnskil)
-	MDRV_VIDEO_UPDATE(strnskil)
+	MCFG_PALETTE_INIT(strnskil)
+	MCFG_VIDEO_START(strnskil)
+	MCFG_VIDEO_UPDATE(strnskil)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("sn1", SN76496, 8000000/4)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+	MCFG_SOUND_ADD("sn1", SN76496, 8000000/4)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
-	MDRV_SOUND_ADD("sn2", SN76496, 8000000/2)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+	MCFG_SOUND_ADD("sn2", SN76496, 8000000/2)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( banbam, strnskil )
-    MDRV_CPU_ADD("mcu", MB8841, 8000000/2)
-    MDRV_CPU_IO_MAP(mcu_io_map)
+    MCFG_CPU_ADD("mcu", MB8841, 8000000/2)
+    MCFG_CPU_IO_MAP(mcu_io_map)
 MACHINE_CONFIG_END
 
 /****************************************************************************/

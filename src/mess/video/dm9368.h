@@ -30,10 +30,10 @@
 
 DECLARE_LEGACY_DEVICE(DM9368, dm9368);
 
-#define MDRV_DM9368_ADD(_tag, _digit, _rbo_tag) \
-	MDRV_DEVICE_ADD((_tag), DM9368, 0) \
-	MDRV_DEVICE_CONFIG_DATA32(dm9368_config, digit, _digit) \
-	MDRV_DEVICE_CONFIG_DATAPTR(dm9368_config, rbo_tag, _rbo_tag) \
+#define MCFG_DM9368_ADD(_tag, _digit, _rbo_tag) \
+	MCFG_DEVICE_ADD((_tag), DM9368, 0) \
+	MCFG_DEVICE_CONFIG_DATA32(dm9368_config, digit, _digit) \
+	MCFG_DEVICE_CONFIG_DATAPTR(dm9368_config, rbo_tag, _rbo_tag) \
 
 /***************************************************************************
     TYPE DEFINITIONS

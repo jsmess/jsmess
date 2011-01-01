@@ -234,7 +234,7 @@ INTERRUPT_GEN( poly88_interrupt )
 	state->int_vector = 0xf7;
 	cpu_set_input_line(device, 0, HOLD_LINE);
 }
-static void poly88_usart_rxready (running_device *device, int state)
+static void poly88_usart_rxready (device_t *device, int state)
 {
 	//poly88_state *drvstate = device->machine->driver_data<poly88_state>();
 	//drvstate->int_vector = 0xe7;

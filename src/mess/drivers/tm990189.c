@@ -371,7 +371,7 @@ static WRITE8_DEVICE_HANDLER( sys9901_shiftlight_w )
 
 static WRITE8_DEVICE_HANDLER( sys9901_spkrdrive_w )
 {
-	running_device *speaker = device->machine->device("speaker");
+	device_t *speaker = device->machine->device("speaker");
 	speaker_level_w(speaker, data);
 }
 
@@ -438,8 +438,8 @@ DEVICE_GET_INFO( tm990_189_rs232 )
 DECLARE_LEGACY_IMAGE_DEVICE(TM990_189_RS232, tm990_189_rs232);
 DEFINE_LEGACY_IMAGE_DEVICE(TM990_189_RS232, tm990_189_rs232);
 
-#define MDRV_TM990_189_RS232_ADD(_tag) \
-	MDRV_DEVICE_ADD(_tag, TM990_189_RS232, 0)
+#define MCFG_TM990_189_RS232_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, TM990_189_RS232, 0)
 
 
 static TMS9902_RST_CALLBACK( rts_callback )
@@ -481,7 +481,7 @@ static WRITE8_HANDLER(ext_instr_decode)
 	case 5: /* CKON: set DECKCONTROL */
 		state->LED_state |= 0x20;
 		{
-			running_device *img = space->machine->device("cassette");
+			device_t *img = space->machine->device("cassette");
 			cassette_change_state(img, CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
 		}
 		break;
@@ -489,7 +489,7 @@ static WRITE8_HANDLER(ext_instr_decode)
 	case 6: /* CKOF: clear DECKCONTROL */
 		state->LED_state &= ~0x20;
 		{
-			running_device *img = space->machine->device("cassette");
+			device_t *img = space->machine->device("cassette");
 			cassette_change_state(img, CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 		}
 		break;
@@ -500,7 +500,7 @@ static WRITE8_HANDLER(ext_instr_decode)
 	}
 }
 
-static void idle_callback(running_device *device, int state)
+static void idle_callback(device_t *device, int state)
 {
 	tm990189_state *drvstate = device->machine->driver_data<tm990189_state>();
 	if (state)
@@ -793,47 +793,47 @@ static const tms9980areset_param reset_params =
 static MACHINE_CONFIG_START( tm990_189, tm990189_state )
 	/* basic machine hardware */
 	/* TMS9980 CPU @ 2.0 MHz */
-	MDRV_CPU_ADD("maincpu", TMS9980, 2000000)
-	MDRV_CPU_CONFIG(reset_params)
-	MDRV_CPU_PROGRAM_MAP(tm990_189_memmap)
-	MDRV_CPU_IO_MAP(tm990_189_cru_map)
+	MCFG_CPU_ADD("maincpu", TMS9980, 2000000)
+	MCFG_CPU_CONFIG(reset_params)
+	MCFG_CPU_PROGRAM_MAP(tm990_189_memmap)
+	MCFG_CPU_IO_MAP(tm990_189_cru_map)
 
-	MDRV_MACHINE_START( tm990_189 )
-	MDRV_MACHINE_RESET( tm990_189 )
+	MCFG_MACHINE_START( tm990_189 )
+	MCFG_MACHINE_RESET( tm990_189 )
 
 	/* video hardware - we emulate a 8-segment LED display */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(75)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(750, 532)
-	MDRV_SCREEN_VISIBLE_AREA(0, 750-1, 0, 532-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(75)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(750, 532)
+	MCFG_SCREEN_VISIBLE_AREA(0, 750-1, 0, 532-1)
 
-	/*MDRV_GFXDECODE(tm990_189)*/
-	MDRV_PALETTE_LENGTH(tm990_189_palette_size)
+	/*MCFG_GFXDECODE(tm990_189)*/
+	MCFG_PALETTE_LENGTH(tm990_189_palette_size)
 
-	MDRV_PALETTE_INIT(tm990_189)
-	/*MDRV_VIDEO_START(tm990_189)*/
-	MDRV_VIDEO_EOF(tm990_189)
-	MDRV_VIDEO_UPDATE(tm990_189)
+	MCFG_PALETTE_INIT(tm990_189)
+	/*MCFG_VIDEO_START(tm990_189)*/
+	MCFG_VIDEO_EOF(tm990_189)
+	MCFG_VIDEO_UPDATE(tm990_189)
 
 	/* sound hardware */
 	/* one two-level buzzer */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_WAVE_ADD("wave", "cassette")
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MDRV_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_WAVE_ADD("wave", "cassette")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )
+	MCFG_CASSETTE_ADD( "cassette", default_cassette_config )
 
 	/* tms9901 */
-	MDRV_TMS9901_ADD("tms9901_0", usr9901reset_param)
-	MDRV_TMS9901_ADD("tms9901_1", sys9901reset_param)
+	MCFG_TMS9901_ADD("tms9901_0", usr9901reset_param)
+	MCFG_TMS9901_ADD("tms9901_1", sys9901reset_param)
 	/* tms9902 */
-	MDRV_TMS9902_ADD("tms9902", tms9902_params)
+	MCFG_TMS9902_ADD("tms9902", tms9902_params)
 
-	MDRV_TM990_189_RS232_ADD("rs232")
+	MCFG_TM990_189_RS232_ADD("rs232")
 MACHINE_CONFIG_END
 
 #define LEFT_BORDER		15
@@ -844,42 +844,42 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( tm990_189_v, tm990189_state )
 	/* basic machine hardware */
 	/* TMS9980 CPU @ 2.0 MHz */
-	MDRV_CPU_ADD("maincpu", TMS9980, 2000000)
-	MDRV_CPU_CONFIG(reset_params)
-	MDRV_CPU_PROGRAM_MAP(tm990_189_v_memmap)
-	MDRV_CPU_IO_MAP(tm990_189_cru_map)
+	MCFG_CPU_ADD("maincpu", TMS9980, 2000000)
+	MCFG_CPU_CONFIG(reset_params)
+	MCFG_CPU_PROGRAM_MAP(tm990_189_v_memmap)
+	MCFG_CPU_IO_MAP(tm990_189_cru_map)
 
-	MDRV_MACHINE_START( tm990_189_v )
-	MDRV_MACHINE_RESET( tm990_189_v )
+	MCFG_MACHINE_START( tm990_189_v )
+	MCFG_MACHINE_RESET( tm990_189_v )
 
 	/* video hardware */
-	MDRV_FRAGMENT_ADD(tms9928a)
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MDRV_SCREEN_SIZE(LEFT_BORDER+32*8+RIGHT_BORDER, TOP_BORDER_60HZ+24*8+BOTTOM_BORDER_60HZ + 32)
-	MDRV_SCREEN_VISIBLE_AREA(LEFT_BORDER-12, LEFT_BORDER+32*8+12-1, TOP_BORDER_60HZ-9, TOP_BORDER_60HZ+24*8+9-1 + 32)
-	MDRV_VIDEO_EOF(tm990_189)
-	MDRV_VIDEO_START(tm990_189_v)
-	MDRV_VIDEO_UPDATE(tm990_189_v)
+	MCFG_FRAGMENT_ADD(tms9928a)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_SIZE(LEFT_BORDER+32*8+RIGHT_BORDER, TOP_BORDER_60HZ+24*8+BOTTOM_BORDER_60HZ + 32)
+	MCFG_SCREEN_VISIBLE_AREA(LEFT_BORDER-12, LEFT_BORDER+32*8+12-1, TOP_BORDER_60HZ-9, TOP_BORDER_60HZ+24*8+9-1 + 32)
+	MCFG_VIDEO_EOF(tm990_189)
+	MCFG_VIDEO_START(tm990_189_v)
+	MCFG_VIDEO_UPDATE(tm990_189_v)
 
 	/* sound hardware */
 	/* one two-level buzzer */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_WAVE_ADD("wave", "cassette")
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MDRV_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_WAVE_ADD("wave", "cassette")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )
+	MCFG_CASSETTE_ADD( "cassette", default_cassette_config )
 
 	/* tms9901 */
-	MDRV_TMS9901_ADD("tms9901_0", usr9901reset_param)
-	MDRV_TMS9901_ADD("tms9901_1", sys9901reset_param)
+	MCFG_TMS9901_ADD("tms9901_0", usr9901reset_param)
+	MCFG_TMS9901_ADD("tms9901_1", sys9901reset_param)
 	/* tms9902 */
-	MDRV_TMS9902_ADD("tms9902", tms9902_params)
+	MCFG_TMS9902_ADD("tms9902", tms9902_params)
 
-	MDRV_TM990_189_RS232_ADD("rs232")
+	MCFG_TM990_189_RS232_ADD("rs232")
 MACHINE_CONFIG_END
 
 

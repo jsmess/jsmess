@@ -284,7 +284,7 @@ void spectrum_setup_sp(running_machine *machine, UINT8 *snapdata, UINT32 snapsiz
     UINT8 intr;
     UINT16 start, size, data, status;
     spectrum_state *state = machine->driver_data<spectrum_state>();
-    running_device *cpu = machine->device("maincpu");
+    device_t *cpu = machine->device("maincpu");
     address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
     if (snapsize == SP_NEW_SIZE_16K || snapsize == SP_NEW_SIZE_48K)
@@ -484,7 +484,7 @@ void spectrum_setup_sna(running_machine *machine, UINT8 *snapdata, UINT32 snapsi
     UINT8 intr;
     UINT16 data, addr;
     spectrum_state *state = machine->driver_data<spectrum_state>();
-    running_device *cpu = machine->device("maincpu");
+    device_t *cpu = machine->device("maincpu");
     address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
     if ((snapsize != SNA48_SIZE) && (state->port_7ffd_data == -1))
@@ -703,7 +703,7 @@ void spectrum_setup_ach(running_machine *machine, UINT8 *snapdata, UINT32 snapsi
     UINT8 intr;
     UINT16 data;
     spectrum_state *state = machine->driver_data<spectrum_state>();
-    running_device *cpu = machine->device("maincpu");
+    device_t *cpu = machine->device("maincpu");
     address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
     data = (snapdata[ACH_OFFSET +   0] << 8) | snapdata[ACH_OFFSET +   4];
@@ -836,7 +836,7 @@ void spectrum_setup_prg(running_machine *machine, UINT8 *snapdata, UINT32 snapsi
     UINT8 intr;
     UINT16 addr, data;
     spectrum_state *state = machine->driver_data<spectrum_state>();
-    running_device *cpu = machine->device("maincpu");
+    device_t *cpu = machine->device("maincpu");
     address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
     data = snapdata[PRG_OFFSET +   0];
@@ -1006,7 +1006,7 @@ void spectrum_setup_plusd(running_machine *machine, UINT8 *snapdata, UINT32 snap
     UINT8 intr;
     UINT16 addr = 0, data;
     spectrum_state *state = machine->driver_data<spectrum_state>();
-    running_device *cpu = machine->device("maincpu");
+    device_t *cpu = machine->device("maincpu");
     address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
     data = (snapdata[PLUSD_OFFSET + 15] << 8) | snapdata[PLUSD_OFFSET + 14];
@@ -1174,7 +1174,7 @@ void spectrum_setup_sem(running_machine *machine, UINT8 *snapdata, UINT32 snapsi
     UINT8 intr;
     UINT16 data;
     spectrum_state *state = machine->driver_data<spectrum_state>();
-    running_device *cpu = machine->device("maincpu");
+    device_t *cpu = machine->device("maincpu");
     address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
     data = (snapdata[SEM_OFFSET +  1] << 8) | snapdata[SEM_OFFSET +  0];
@@ -1293,7 +1293,7 @@ void spectrum_setup_sit(running_machine *machine, UINT8 *snapdata, UINT32 snapsi
     UINT8 intr;
     UINT16 data;
     spectrum_state *state = machine->driver_data<spectrum_state>();
-    running_device *cpu = machine->device("maincpu");
+    device_t *cpu = machine->device("maincpu");
     address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
     data = (snapdata[SIT_OFFSET +  7] << 8) | snapdata[SIT_OFFSET +  6];
@@ -1423,7 +1423,7 @@ void spectrum_setup_zx(running_machine *machine, UINT8 *snapdata, UINT32 snapsiz
     UINT8 intr;
     UINT16 data, mode;
     spectrum_state *state = machine->driver_data<spectrum_state>();
-    running_device *cpu = machine->device("maincpu");
+    device_t *cpu = machine->device("maincpu");
     address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
     logerror("Skipping last 132 bytes of the 16K ROM dump at offset:0000\n");
@@ -1555,7 +1555,7 @@ void spectrum_setup_snp(running_machine *machine, UINT8 *snapdata, UINT32 snapsi
     UINT8 intr;
     UINT16 data;
     spectrum_state *state = machine->driver_data<spectrum_state>();
-    running_device *cpu = machine->device("maincpu");
+    device_t *cpu = machine->device("maincpu");
     address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
     data = (snapdata[SNP_OFFSET +  1] << 8) | snapdata[SNP_OFFSET +  0];
@@ -1782,7 +1782,7 @@ void spectrum_setup_snx(running_machine *machine, UINT8 *snapdata, UINT32 snapsi
     UINT8 intr;
     UINT16 data, addr;
     spectrum_state *state = machine->driver_data<spectrum_state>();
-    running_device *cpu = machine->device("maincpu");
+    device_t *cpu = machine->device("maincpu");
     address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
     data = (snapdata[SNX_OFFSET +  4] << 8) | snapdata[SNX_OFFSET +  5];
@@ -1936,7 +1936,7 @@ void spectrum_setup_frz(running_machine *machine, UINT8 *snapdata, UINT32 snapsi
     UINT8 intr;
     UINT16 addr, data;
     spectrum_state *state = machine->driver_data<spectrum_state>();
-    running_device *cpu = machine->device("maincpu");
+    device_t *cpu = machine->device("maincpu");
     address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
     if (state->port_7ffd_data == -1)
@@ -2317,7 +2317,7 @@ void spectrum_setup_z80(running_machine *machine, UINT8 *snapdata, UINT32 snapsi
 
         if ((z80_type == SPECTRUM_Z80_SNAPSHOT_128K) || ((z80_type == SPECTRUM_Z80_SNAPSHOT_TS2068) && !strcmp(machine->gamedrv->name,"ts2068")))
         {
-            running_device *ay8912 = machine->device("ay8912");
+            device_t *ay8912 = machine->device("ay8912");
 
             /* Only set up sound registers for 128K machine or TS2068! */
             for (i = 0; i < 16; i++)

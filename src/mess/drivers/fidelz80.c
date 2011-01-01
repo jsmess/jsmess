@@ -367,7 +367,7 @@ READ8_MEMBER(fidelz80_state::unknown_r)
 
 READ8_MEMBER(fidelz80_state::rand_r)
 {
-	return mame_rand(space.machine);
+	return space.machine->rand();
 }
 
 /******************************************************************************
@@ -608,62 +608,62 @@ INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( cc10, fidelz80_state )
     /* basic machine hardware */
-    MDRV_CPU_ADD("maincpu", Z80, XTAL_4MHz)
-    MDRV_CPU_PROGRAM_MAP(cc10_z80_mem)
-    MDRV_CPU_IO_MAP(fidel_z80_io)
-    MDRV_QUANTUM_TIME(HZ(60))
+    MCFG_CPU_ADD("maincpu", Z80, XTAL_4MHz)
+    MCFG_CPU_PROGRAM_MAP(cc10_z80_mem)
+    MCFG_CPU_IO_MAP(fidel_z80_io)
+    MCFG_QUANTUM_TIME(HZ(60))
 
     /* video hardware */
-	MDRV_DEFAULT_LAYOUT(layout_fidelz80)
+	MCFG_DEFAULT_LAYOUT(layout_fidelz80)
 
 	/* other hardware */
-	MDRV_I8255A_ADD("ppi8255", cc10_ppi8255_intf)
+	MCFG_I8255A_ADD("ppi8255", cc10_ppi8255_intf)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO( "mono" )
-	MDRV_SOUND_ADD( "beep", BEEP, 0 )
-	MDRV_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
+	MCFG_SPEAKER_STANDARD_MONO( "mono" )
+	MCFG_SOUND_ADD( "beep", BEEP, 0 )
+	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( vcc, fidelz80_state )
     /* basic machine hardware */
-    MDRV_CPU_ADD("maincpu", Z80, XTAL_4MHz)
-    MDRV_CPU_PROGRAM_MAP(vcc_z80_mem)
-    MDRV_CPU_IO_MAP(fidel_z80_io)
-    MDRV_QUANTUM_TIME(HZ(60))
+    MCFG_CPU_ADD("maincpu", Z80, XTAL_4MHz)
+    MCFG_CPU_PROGRAM_MAP(vcc_z80_mem)
+    MCFG_CPU_IO_MAP(fidel_z80_io)
+    MCFG_QUANTUM_TIME(HZ(60))
 
     /* video hardware */
-	MDRV_DEFAULT_LAYOUT(layout_fidelz80)
+	MCFG_DEFAULT_LAYOUT(layout_fidelz80)
 
 	/* other hardware */
-	MDRV_I8255A_ADD("ppi8255", vcc_ppi8255_intf)
+	MCFG_I8255A_ADD("ppi8255", vcc_ppi8255_intf)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("speech", S14001A, 25000) // around 25khz
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speech", S14001A, 25000) // around 25khz
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( abc, fidelz80_state )
     /* basic machine hardware */
-    MDRV_CPU_ADD("maincpu", Z80, XTAL_4MHz) // unknown clock/divider
-    MDRV_CPU_PROGRAM_MAP(abc_z80_mem)
-    MDRV_CPU_IO_MAP(abc_z80_io)
-    MDRV_QUANTUM_TIME(HZ(60))
+    MCFG_CPU_ADD("maincpu", Z80, XTAL_4MHz) // unknown clock/divider
+    MCFG_CPU_PROGRAM_MAP(abc_z80_mem)
+    MCFG_CPU_IO_MAP(abc_z80_io)
+    MCFG_QUANTUM_TIME(HZ(60))
 
     /* video hardware */
-	MDRV_DEFAULT_LAYOUT(layout_abc)
+	MCFG_DEFAULT_LAYOUT(layout_abc)
 
 	/* other hardware */
-	MDRV_CPU_ADD("mcu", I8041, XTAL_4MHz) // unknown clock/divider
-	MDRV_CPU_IO_MAP(abc_mcu_io)
+	MCFG_CPU_ADD("mcu", I8041, XTAL_4MHz) // unknown clock/divider
+	MCFG_CPU_IO_MAP(abc_mcu_io)
 
-	MDRV_I8243_ADD("i8243", NULL, digit_w)
+	MCFG_I8243_ADD("i8243", NULL, digit_w)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO( "mono" )
-	MDRV_SOUND_ADD( "beep", BEEP, 0 )
-	MDRV_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
+	MCFG_SPEAKER_STANDARD_MONO( "mono" )
+	MCFG_SOUND_ADD( "beep", BEEP, 0 )
+	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 MACHINE_CONFIG_END
 
 

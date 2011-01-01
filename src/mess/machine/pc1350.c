@@ -7,24 +7,24 @@
 
 
 
-void pc1350_outa(running_device *device, int data)
+void pc1350_outa(device_t *device, int data)
 {
 	pc1350_state *state = device->machine->driver_data<pc1350_state>();
 	state->outa=data;
 }
 
-void pc1350_outb(running_device *device, int data)
+void pc1350_outb(device_t *device, int data)
 {
 	pc1350_state *state = device->machine->driver_data<pc1350_state>();
 	state->outb=data;
 }
 
-void pc1350_outc(running_device *device, int data)
+void pc1350_outc(device_t *device, int data)
 {
 
 }
 
-int pc1350_ina(running_device *device)
+int pc1350_ina(device_t *device)
 {
 	pc1350_state *state = device->machine->driver_data<pc1350_state>();
 	running_machine *machine = device->machine;
@@ -78,14 +78,14 @@ int pc1350_ina(running_device *device)
 	return data;
 }
 
-int pc1350_inb(running_device *device)
+int pc1350_inb(device_t *device)
 {
 	pc1350_state *state = device->machine->driver_data<pc1350_state>();
 	int data=state->outb;
 	return data;
 }
 
-int pc1350_brk(running_device *device)
+int pc1350_brk(device_t *device)
 {
 	return (input_port_read(device->machine, "EXTRA") & 0x01);
 }
@@ -93,8 +93,8 @@ int pc1350_brk(running_device *device)
 /* currently enough to save the external ram */
 NVRAM_HANDLER( pc1350 )
 {
-	running_device *main_cpu = machine->device("maincpu");
-	UINT8 *ram = memory_region(machine, "maincpu") + 0x2000;
+	device_t *main_cpu = machine->device("maincpu");
+	UINT8 *ram = machine->region("maincpu")->base() + 0x2000;
 	UINT8 *cpu = sc61860_internal_ram(main_cpu);
 
 	if (read_or_write)

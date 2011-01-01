@@ -32,17 +32,17 @@ DECLARE_LEGACY_DEVICE(SAA5050, saa5050);
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MDRV_SAA5050_ADD(_tag, _interface) \
-	MDRV_DEVICE_ADD(_tag, SAA5050, 0) \
-	MDRV_DEVICE_CONFIG(_interface)
+#define MCFG_SAA5050_ADD(_tag, _interface) \
+	MCFG_DEVICE_ADD(_tag, SAA5050, 0) \
+	MCFG_DEVICE_CONFIG(_interface)
 
 
 /***************************************************************************
     DEVICE I/O FUNCTIONS
 ***************************************************************************/
 
-void saa5050_update(running_device *device, bitmap_t *bitmap, const rectangle *cliprect);
-void saa5050_frame_advance(running_device *device);
+void saa5050_update(device_t *device, bitmap_t *bitmap, const rectangle *cliprect);
+void saa5050_frame_advance(device_t *device);
 
 GFXDECODE_EXTERN( saa5050 );
 PALETTE_INIT( saa5050 );

@@ -215,7 +215,7 @@ static WRITE16_HANDLER ( ssmissin_sound_w )
 
 static WRITE8_HANDLER ( ssmissin_soundbank_w )
 {
-	UINT8 *rom = memory_region(space->machine, "oki1");
+	UINT8 *rom = space->machine->region("oki1")->base();
 	int bank;
 
 	bank = data & 0x3;
@@ -277,14 +277,14 @@ static WRITE16_HANDLER( macross2_sound_command_w )
 
 static WRITE8_HANDLER( macross2_sound_bank_w )
 {
-	UINT8 *rom = memory_region(space->machine, "audiocpu") + 0x10000;
+	UINT8 *rom = space->machine->region("audiocpu")->base() + 0x10000;
 
 	memory_set_bankptr(space->machine, "bank1",rom + (data & 0x07) * 0x4000);
 }
 
 static WRITE8_HANDLER( tharrier_oki6295_bankswitch_0_w )
 {
-	UINT8 *rom = memory_region(space->machine, "oki1");
+	UINT8 *rom = space->machine->region("oki1")->base();
 
 	data &= 3;
 	if (data != 3)
@@ -293,7 +293,7 @@ static WRITE8_HANDLER( tharrier_oki6295_bankswitch_0_w )
 
 static WRITE8_HANDLER( tharrier_oki6295_bankswitch_1_w )
 {
-	UINT8 *rom = memory_region(space->machine, "oki2");
+	UINT8 *rom = space->machine->region("oki2")->base();
 
 	data &= 3;
 	if (data != 3)
@@ -1072,7 +1072,7 @@ static WRITE8_HANDLER( okibank_w )
 
 static WRITE8_HANDLER( raphero_sound_rombank_w )
 {
-	memory_set_bankptr(space->machine, "bank1",memory_region(space->machine, "audiocpu") + 0x10000 + (data & 0x07) * 0x4000);
+	memory_set_bankptr(space->machine, "bank1",space->machine->region("audiocpu")->base() + 0x10000 + (data & 0x07) * 0x4000);
 }
 
 static ADDRESS_MAP_START( raphero_sound_mem_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -3502,7 +3502,7 @@ static const ym2203_interface ym2203_nmk004_interface =
 	NMK004_irq
 };
 
-static void ym2203_irqhandler(running_device *device, int irq)
+static void ym2203_irqhandler(device_t *device, int irq)
 {
 	cputag_set_input_line(device->machine, "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -3552,162 +3552,162 @@ static const nmk112_interface nmk16_nmk112_intf =
 static MACHINE_CONFIG_START( tharrier, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 10000000) /* 10 MHz */
-	MDRV_CPU_PROGRAM_MAP(tharrier_map)
-	MDRV_CPU_PERIODIC_INT(irq1_line_hold,112)/* ???????? */
-	MDRV_TIMER_ADD_SCANLINE("scantimer", nmk16_scanline, "screen", 0, 1)
+	MCFG_CPU_ADD("maincpu", M68000, 10000000) /* 10 MHz */
+	MCFG_CPU_PROGRAM_MAP(tharrier_map)
+	MCFG_CPU_PERIODIC_INT(irq1_line_hold,112)/* ???????? */
+	MCFG_TIMER_ADD_SCANLINE("scantimer", nmk16_scanline, "screen", 0, 1)
 
-	MDRV_CPU_ADD("audiocpu", Z80, 3000000)
-	MDRV_CPU_PROGRAM_MAP(tharrier_sound_map)
-	MDRV_CPU_IO_MAP(tharrier_sound_io_map)
+	MCFG_CPU_ADD("audiocpu", Z80, 3000000)
+	MCFG_CPU_PROGRAM_MAP(tharrier_sound_map)
+	MCFG_CPU_IO_MAP(tharrier_sound_io_map)
 
-	MDRV_MACHINE_RESET(mustang_sound)
+	MCFG_MACHINE_RESET(mustang_sound)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(56)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(256, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(56)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(256, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(tharrier)
-	MDRV_PALETTE_LENGTH(512)
+	MCFG_GFXDECODE(tharrier)
+	MCFG_PALETTE_LENGTH(512)
 
-	MDRV_VIDEO_START(macross)
-	MDRV_VIDEO_EOF(nmk)
-	MDRV_VIDEO_UPDATE(tharrier)
+	MCFG_VIDEO_START(macross)
+	MCFG_VIDEO_EOF(nmk)
+	MCFG_VIDEO_UPDATE(tharrier)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM2203, 1500000)
-	MDRV_SOUND_CONFIG(ym2203_config)
-	MDRV_SOUND_ROUTE(0, "mono", 0.50)
-	MDRV_SOUND_ROUTE(1, "mono", 0.50)
-	MDRV_SOUND_ROUTE(2, "mono", 0.50)
-	MDRV_SOUND_ROUTE(3, "mono", 2.00)
+	MCFG_SOUND_ADD("ymsnd", YM2203, 1500000)
+	MCFG_SOUND_CONFIG(ym2203_config)
+	MCFG_SOUND_ROUTE(0, "mono", 0.50)
+	MCFG_SOUND_ROUTE(1, "mono", 0.50)
+	MCFG_SOUND_ROUTE(2, "mono", 0.50)
+	MCFG_SOUND_ROUTE(3, "mono", 2.00)
 
-	MDRV_OKIM6295_ADD("oki1", 16000000/4, OKIM6295_PIN7_LOW)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+	MCFG_OKIM6295_ADD("oki1", 16000000/4, OKIM6295_PIN7_LOW)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
-	MDRV_OKIM6295_ADD("oki2", 16000000/4, OKIM6295_PIN7_LOW)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+	MCFG_OKIM6295_ADD("oki2", 16000000/4, OKIM6295_PIN7_LOW)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( manybloc, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 10000000) /* 10? MHz - check */
-	MDRV_CPU_PROGRAM_MAP(manybloc_map)
-	MDRV_CPU_PERIODIC_INT(irq1_line_hold,56)/* this needs to equal the framerate on this, rather than being double it .. */
-	MDRV_TIMER_ADD_SCANLINE("scantimer", manybloc_scanline, "screen", 0, 1)
+	MCFG_CPU_ADD("maincpu", M68000, 10000000) /* 10? MHz - check */
+	MCFG_CPU_PROGRAM_MAP(manybloc_map)
+	MCFG_CPU_PERIODIC_INT(irq1_line_hold,56)/* this needs to equal the framerate on this, rather than being double it .. */
+	MCFG_TIMER_ADD_SCANLINE("scantimer", manybloc_scanline, "screen", 0, 1)
 
-	MDRV_CPU_ADD("audiocpu", Z80, 3000000)
-	MDRV_CPU_PROGRAM_MAP(tharrier_sound_map)
-	MDRV_CPU_IO_MAP(tharrier_sound_io_map)
+	MCFG_CPU_ADD("audiocpu", Z80, 3000000)
+	MCFG_CPU_PROGRAM_MAP(tharrier_sound_map)
+	MCFG_CPU_IO_MAP(tharrier_sound_io_map)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(56)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(256, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(56)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(256, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 
-	MDRV_GFXDECODE(tharrier)
-	MDRV_PALETTE_LENGTH(512)
+	MCFG_GFXDECODE(tharrier)
+	MCFG_PALETTE_LENGTH(512)
 
-	MDRV_VIDEO_START(macross)
-	MDRV_VIDEO_EOF(nmk)
-	MDRV_VIDEO_UPDATE(manybloc)
+	MCFG_VIDEO_START(macross)
+	MCFG_VIDEO_EOF(nmk)
+	MCFG_VIDEO_UPDATE(manybloc)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM2203, 1500000)
-	MDRV_SOUND_CONFIG(ym2203_config)
-	MDRV_SOUND_ROUTE(0, "mono", 0.50)
-	MDRV_SOUND_ROUTE(1, "mono", 0.50)
-	MDRV_SOUND_ROUTE(2, "mono", 0.50)
-	MDRV_SOUND_ROUTE(3, "mono", 2.00)
+	MCFG_SOUND_ADD("ymsnd", YM2203, 1500000)
+	MCFG_SOUND_CONFIG(ym2203_config)
+	MCFG_SOUND_ROUTE(0, "mono", 0.50)
+	MCFG_SOUND_ROUTE(1, "mono", 0.50)
+	MCFG_SOUND_ROUTE(2, "mono", 0.50)
+	MCFG_SOUND_ROUTE(3, "mono", 2.00)
 
-	MDRV_OKIM6295_ADD("oki1", 16000000/4, OKIM6295_PIN7_LOW)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+	MCFG_OKIM6295_ADD("oki1", 16000000/4, OKIM6295_PIN7_LOW)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
-	MDRV_OKIM6295_ADD("oki2", 16000000/4, OKIM6295_PIN7_LOW)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+	MCFG_OKIM6295_ADD("oki2", 16000000/4, OKIM6295_PIN7_LOW)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( mustang, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 10000000) /* 10 MHz ? */
-	MDRV_CPU_PROGRAM_MAP(mustang_map)
-	MDRV_CPU_PERIODIC_INT(irq1_line_hold,112)/* ???????? */
-	MDRV_TIMER_ADD_SCANLINE("scantimer", nmk16_scanline, "screen", 0, 1)
+	MCFG_CPU_ADD("maincpu", M68000, 10000000) /* 10 MHz ? */
+	MCFG_CPU_PROGRAM_MAP(mustang_map)
+	MCFG_CPU_PERIODIC_INT(irq1_line_hold,112)/* ???????? */
+	MCFG_TIMER_ADD_SCANLINE("scantimer", nmk16_scanline, "screen", 0, 1)
 
-	MDRV_MACHINE_RESET(NMK004)
+	MCFG_MACHINE_RESET(NMK004)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(56)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(256, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(56)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(256, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(macross)
-	MDRV_PALETTE_LENGTH(1024)
+	MCFG_GFXDECODE(macross)
+	MCFG_PALETTE_LENGTH(1024)
 
-	MDRV_VIDEO_START(macross)
-	MDRV_VIDEO_EOF(nmk)
-	MDRV_VIDEO_UPDATE(macross)
+	MCFG_VIDEO_START(macross)
+	MCFG_VIDEO_EOF(nmk)
+	MCFG_VIDEO_UPDATE(macross)
 
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM2203, 1500000)
-	MDRV_SOUND_CONFIG(ym2203_nmk004_interface)
-	MDRV_SOUND_ROUTE(0, "mono", 0.50)
-	MDRV_SOUND_ROUTE(1, "mono", 0.50)
-	MDRV_SOUND_ROUTE(2, "mono", 0.50)
-	MDRV_SOUND_ROUTE(3, "mono", 2.00)
+	MCFG_SOUND_ADD("ymsnd", YM2203, 1500000)
+	MCFG_SOUND_CONFIG(ym2203_nmk004_interface)
+	MCFG_SOUND_ROUTE(0, "mono", 0.50)
+	MCFG_SOUND_ROUTE(1, "mono", 0.50)
+	MCFG_SOUND_ROUTE(2, "mono", 0.50)
+	MCFG_SOUND_ROUTE(3, "mono", 2.00)
 
-	MDRV_OKIM6295_ADD("oki1", 16000000/4, OKIM6295_PIN7_LOW)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+	MCFG_OKIM6295_ADD("oki1", 16000000/4, OKIM6295_PIN7_LOW)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
-	MDRV_OKIM6295_ADD("oki2", 16000000/4, OKIM6295_PIN7_LOW)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+	MCFG_OKIM6295_ADD("oki2", 16000000/4, OKIM6295_PIN7_LOW)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( mustangb, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 10000000) /* 10 MHz ? */
-	MDRV_CPU_PROGRAM_MAP(mustangb_map)
-	MDRV_CPU_PERIODIC_INT(irq1_line_hold,112)/* ???????? */
-	MDRV_TIMER_ADD_SCANLINE("scantimer", nmk16_scanline, "screen", 0, 1)
+	MCFG_CPU_ADD("maincpu", M68000, 10000000) /* 10 MHz ? */
+	MCFG_CPU_PROGRAM_MAP(mustangb_map)
+	MCFG_CPU_PERIODIC_INT(irq1_line_hold,112)/* ???????? */
+	MCFG_TIMER_ADD_SCANLINE("scantimer", nmk16_scanline, "screen", 0, 1)
 
 	SEIBU_SOUND_SYSTEM_CPU(14318180/4)
 
-	MDRV_MACHINE_RESET(mustang_sound)
+	MCFG_MACHINE_RESET(mustang_sound)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(56)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(256, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(56)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(256, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(macross)
-	MDRV_PALETTE_LENGTH(1024)
+	MCFG_GFXDECODE(macross)
+	MCFG_PALETTE_LENGTH(1024)
 
-	MDRV_VIDEO_START(macross)
-	MDRV_VIDEO_EOF(nmk)
-	MDRV_VIDEO_UPDATE(macross)
+	MCFG_VIDEO_START(macross)
+	MCFG_VIDEO_EOF(nmk)
+	MCFG_VIDEO_UPDATE(macross)
 
 	/* sound hardware */
 	SEIBU_SOUND_SYSTEM_YM3812_INTERFACE(14318180/4, 1320000)
@@ -3720,192 +3720,192 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( bioship, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, BIOSHIP_CRYSTAL1 ) /* 10.0 MHz (verified) */
-	MDRV_CPU_PROGRAM_MAP(bioship_map)
-	MDRV_CPU_PERIODIC_INT(irq1_line_hold,100)/* 112 breaks the title screen */
-	MDRV_TIMER_ADD_SCANLINE("scantimer", nmk16_scanline, "screen", 0, 1)
+	MCFG_CPU_ADD("maincpu", M68000, BIOSHIP_CRYSTAL1 ) /* 10.0 MHz (verified) */
+	MCFG_CPU_PROGRAM_MAP(bioship_map)
+	MCFG_CPU_PERIODIC_INT(irq1_line_hold,100)/* 112 breaks the title screen */
+	MCFG_TIMER_ADD_SCANLINE("scantimer", nmk16_scanline, "screen", 0, 1)
 
-	MDRV_MACHINE_RESET(NMK004)
+	MCFG_MACHINE_RESET(NMK004)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(56)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(256, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(56)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(256, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(bioship)
-	MDRV_PALETTE_LENGTH(1024)
+	MCFG_GFXDECODE(bioship)
+	MCFG_PALETTE_LENGTH(1024)
 
-	MDRV_VIDEO_START(bioship)
-	MDRV_VIDEO_EOF(nmk)
-	MDRV_VIDEO_UPDATE(bioship)
+	MCFG_VIDEO_START(bioship)
+	MCFG_VIDEO_EOF(nmk)
+	MCFG_VIDEO_UPDATE(bioship)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM2203, BIOSHIP_CRYSTAL2 / 8) /* 1.5 Mhz (verified) */
-	MDRV_SOUND_CONFIG(ym2203_nmk004_interface)
-	MDRV_SOUND_ROUTE(0, "mono", 0.50)
-	MDRV_SOUND_ROUTE(1, "mono", 0.50)
-	MDRV_SOUND_ROUTE(2, "mono", 0.50)
-	MDRV_SOUND_ROUTE(3, "mono", 2.00)
+	MCFG_SOUND_ADD("ymsnd", YM2203, BIOSHIP_CRYSTAL2 / 8) /* 1.5 Mhz (verified) */
+	MCFG_SOUND_CONFIG(ym2203_nmk004_interface)
+	MCFG_SOUND_ROUTE(0, "mono", 0.50)
+	MCFG_SOUND_ROUTE(1, "mono", 0.50)
+	MCFG_SOUND_ROUTE(2, "mono", 0.50)
+	MCFG_SOUND_ROUTE(3, "mono", 2.00)
 
-	MDRV_OKIM6295_ADD("oki1", BIOSHIP_CRYSTAL2 / 3 , OKIM6295_PIN7_HIGH) /* 4.0 Mhz, Pin 7 High (verified) */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+	MCFG_OKIM6295_ADD("oki1", BIOSHIP_CRYSTAL2 / 3 , OKIM6295_PIN7_HIGH) /* 4.0 Mhz, Pin 7 High (verified) */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
-	MDRV_OKIM6295_ADD("oki2", BIOSHIP_CRYSTAL2 / 3 , OKIM6295_PIN7_HIGH) /* 4.0 Mhz, Pin 7 High (verified) */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+	MCFG_OKIM6295_ADD("oki2", BIOSHIP_CRYSTAL2 / 3 , OKIM6295_PIN7_HIGH) /* 4.0 Mhz, Pin 7 High (verified) */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( vandyke, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, XTAL_10MHz) /* 68000p12 running at 10Mhz, verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(vandyke_map)
-	MDRV_CPU_PERIODIC_INT(irq1_line_hold,112)/* ???????? */
-	MDRV_TIMER_ADD_SCANLINE("scantimer", nmk16_scanline, "screen", 0, 1)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz) /* 68000p12 running at 10Mhz, verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(vandyke_map)
+	MCFG_CPU_PERIODIC_INT(irq1_line_hold,112)/* ???????? */
+	MCFG_TIMER_ADD_SCANLINE("scantimer", nmk16_scanline, "screen", 0, 1)
 
-	MDRV_MACHINE_RESET(NMK004)
+	MCFG_MACHINE_RESET(NMK004)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(56)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(256, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(56)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(256, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(macross)
-	MDRV_PALETTE_LENGTH(1024)
+	MCFG_GFXDECODE(macross)
+	MCFG_PALETTE_LENGTH(1024)
 
-	MDRV_VIDEO_START(macross)
-	MDRV_VIDEO_EOF(nmk)
-	MDRV_VIDEO_UPDATE(macross)
+	MCFG_VIDEO_START(macross)
+	MCFG_VIDEO_EOF(nmk)
+	MCFG_VIDEO_UPDATE(macross)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz/8) /* verified on pcb */
-	MDRV_SOUND_CONFIG(ym2203_nmk004_interface)
-	MDRV_SOUND_ROUTE(0, "mono", 0.50)
-	MDRV_SOUND_ROUTE(1, "mono", 0.50)
-	MDRV_SOUND_ROUTE(2, "mono", 0.50)
-	MDRV_SOUND_ROUTE(3, "mono", 2.00)
+	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz/8) /* verified on pcb */
+	MCFG_SOUND_CONFIG(ym2203_nmk004_interface)
+	MCFG_SOUND_ROUTE(0, "mono", 0.50)
+	MCFG_SOUND_ROUTE(1, "mono", 0.50)
+	MCFG_SOUND_ROUTE(2, "mono", 0.50)
+	MCFG_SOUND_ROUTE(3, "mono", 2.00)
 
-	MDRV_OKIM6295_ADD("oki1", XTAL_12MHz/3, OKIM6295_PIN7_LOW) /* verified on pcb */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+	MCFG_OKIM6295_ADD("oki1", XTAL_12MHz/3, OKIM6295_PIN7_LOW) /* verified on pcb */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
-	MDRV_OKIM6295_ADD("oki2", XTAL_12MHz/3, OKIM6295_PIN7_LOW) /* verified on pcb */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+	MCFG_OKIM6295_ADD("oki2", XTAL_12MHz/3, OKIM6295_PIN7_LOW) /* verified on pcb */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( vandykeb, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 10000000) /* 10 MHz ? */
-	MDRV_CPU_PROGRAM_MAP(vandykeb_map)
-	MDRV_CPU_PERIODIC_INT(irq1_line_hold,112)/* ???????? */
-	MDRV_TIMER_ADD_SCANLINE("scantimer", nmk16_scanline, "screen", 0, 1)
+	MCFG_CPU_ADD("maincpu", M68000, 10000000) /* 10 MHz ? */
+	MCFG_CPU_PROGRAM_MAP(vandykeb_map)
+	MCFG_CPU_PERIODIC_INT(irq1_line_hold,112)/* ???????? */
+	MCFG_TIMER_ADD_SCANLINE("scantimer", nmk16_scanline, "screen", 0, 1)
 
-	MDRV_CPU_ADD("mcu", PIC16C57, 12000000)	/* 3MHz */
-	MDRV_DEVICE_DISABLE()
+	MCFG_CPU_ADD("mcu", PIC16C57, 12000000)	/* 3MHz */
+	MCFG_DEVICE_DISABLE()
 
-	//MDRV_MACHINE_RESET(NMK004) // no NMK004
+	//MCFG_MACHINE_RESET(NMK004) // no NMK004
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(56)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(256, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(56)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(256, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(macross)
-	MDRV_PALETTE_LENGTH(1024)
+	MCFG_GFXDECODE(macross)
+	MCFG_PALETTE_LENGTH(1024)
 
-	MDRV_VIDEO_START(macross)
-	MDRV_VIDEO_EOF(nmk)
-	MDRV_VIDEO_UPDATE(macross)
+	MCFG_VIDEO_START(macross)
+	MCFG_VIDEO_EOF(nmk)
+	MCFG_VIDEO_UPDATE(macross)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_OKIM6295_ADD("oki1", 16000000/4, OKIM6295_PIN7_LOW)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+	MCFG_OKIM6295_ADD("oki1", 16000000/4, OKIM6295_PIN7_LOW)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( acrobatm, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 10000000) /* 10 MHz (verified on pcb) */
-	MDRV_CPU_PROGRAM_MAP(acrobatm_map)
-	MDRV_CPU_PERIODIC_INT(irq1_line_hold,112)/* ???????? */
-	MDRV_TIMER_ADD_SCANLINE("scantimer", nmk16_scanline, "screen", 0, 1)
+	MCFG_CPU_ADD("maincpu", M68000, 10000000) /* 10 MHz (verified on pcb) */
+	MCFG_CPU_PROGRAM_MAP(acrobatm_map)
+	MCFG_CPU_PERIODIC_INT(irq1_line_hold,112)/* ???????? */
+	MCFG_TIMER_ADD_SCANLINE("scantimer", nmk16_scanline, "screen", 0, 1)
 
-	MDRV_MACHINE_RESET(NMK004)
+	MCFG_MACHINE_RESET(NMK004)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(56)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(256, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(56)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(256, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(macross)
-	MDRV_PALETTE_LENGTH(1024)
+	MCFG_GFXDECODE(macross)
+	MCFG_PALETTE_LENGTH(1024)
 
-	MDRV_VIDEO_START(macross)
-	MDRV_VIDEO_EOF(nmk)
-	MDRV_VIDEO_UPDATE(macross)
+	MCFG_VIDEO_START(macross)
+	MCFG_VIDEO_EOF(nmk)
+	MCFG_VIDEO_UPDATE(macross)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM2203, 1500000) /* (verified on pcb) */
-	MDRV_SOUND_CONFIG(ym2203_nmk004_interface)
-	MDRV_SOUND_ROUTE(0, "mono", 0.50)
-	MDRV_SOUND_ROUTE(1, "mono", 0.50)
-	MDRV_SOUND_ROUTE(2, "mono", 0.50)
-	MDRV_SOUND_ROUTE(3, "mono", 2.00)
+	MCFG_SOUND_ADD("ymsnd", YM2203, 1500000) /* (verified on pcb) */
+	MCFG_SOUND_CONFIG(ym2203_nmk004_interface)
+	MCFG_SOUND_ROUTE(0, "mono", 0.50)
+	MCFG_SOUND_ROUTE(1, "mono", 0.50)
+	MCFG_SOUND_ROUTE(2, "mono", 0.50)
+	MCFG_SOUND_ROUTE(3, "mono", 2.00)
 
-	MDRV_OKIM6295_ADD("oki1", 16000000/4, OKIM6295_PIN7_LOW) /* (verified on pcb) on the pcb pin7 is not connected to gnd or +5v! */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+	MCFG_OKIM6295_ADD("oki1", 16000000/4, OKIM6295_PIN7_LOW) /* (verified on pcb) on the pcb pin7 is not connected to gnd or +5v! */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
-	MDRV_OKIM6295_ADD("oki2", 16000000/4, OKIM6295_PIN7_LOW) /* (verified on pcb) on the pcb pin7 is not connected to gnd or +5v! */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+	MCFG_OKIM6295_ADD("oki2", 16000000/4, OKIM6295_PIN7_LOW) /* (verified on pcb) on the pcb pin7 is not connected to gnd or +5v! */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_START( tdragonb, driver_device )	/* bootleg using Raiden sound hardware */
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 10000000)
-	MDRV_CPU_PROGRAM_MAP(tdragonb_map)
-	//MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
-	MDRV_CPU_PERIODIC_INT(irq1_line_hold,112)/* ?? drives music */
-	MDRV_TIMER_ADD_SCANLINE("scantimer", nmk16_scanline, "screen", 0, 1)
+	MCFG_CPU_ADD("maincpu", M68000, 10000000)
+	MCFG_CPU_PROGRAM_MAP(tdragonb_map)
+	//MCFG_CPU_VBLANK_INT("screen", irq4_line_hold)
+	MCFG_CPU_PERIODIC_INT(irq1_line_hold,112)/* ?? drives music */
+	MCFG_TIMER_ADD_SCANLINE("scantimer", nmk16_scanline, "screen", 0, 1)
 
 	SEIBU_SOUND_SYSTEM_CPU(14318180/4)
 
-	MDRV_MACHINE_RESET(mustang_sound)
+	MCFG_MACHINE_RESET(mustang_sound)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(56)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(256, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(56)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(256, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(macross)
-	MDRV_PALETTE_LENGTH(1024)
+	MCFG_GFXDECODE(macross)
+	MCFG_PALETTE_LENGTH(1024)
 
-	MDRV_VIDEO_START(macross)
-	MDRV_VIDEO_EOF(nmk)
-	MDRV_VIDEO_UPDATE(macross)
+	MCFG_VIDEO_START(macross)
+	MCFG_VIDEO_EOF(nmk)
+	MCFG_VIDEO_UPDATE(macross)
 
 	/* sound hardware */
 	SEIBU_SOUND_SYSTEM_YM3812_INTERFACE(14318180/4, 1320000)
@@ -3914,454 +3914,454 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( tdragon, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, XTAL_8MHz) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(tdragon_map)
-	//MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
-	MDRV_CPU_PERIODIC_INT(irq1_line_hold,112)/* ?? drives music */
-	MDRV_TIMER_ADD_SCANLINE("scantimer", nmk16_scanline, "screen", 0, 1)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_8MHz) /* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(tdragon_map)
+	//MCFG_CPU_VBLANK_INT("screen", irq4_line_hold)
+	MCFG_CPU_PERIODIC_INT(irq1_line_hold,112)/* ?? drives music */
+	MCFG_TIMER_ADD_SCANLINE("scantimer", nmk16_scanline, "screen", 0, 1)
 
-	MDRV_MACHINE_RESET(NMK004)
+	MCFG_MACHINE_RESET(NMK004)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(56)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(256, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(56)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(256, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(macross)
-	MDRV_PALETTE_LENGTH(1024)
+	MCFG_GFXDECODE(macross)
+	MCFG_PALETTE_LENGTH(1024)
 
-	MDRV_VIDEO_START(macross)
-	MDRV_VIDEO_EOF(nmk)
-	MDRV_VIDEO_UPDATE(tdragon)
-	MDRV_TIMER_ADD_PERIODIC("coinsim", tdragon_mcu_sim, HZ(10000)) // not real, but for simulating the MCU
+	MCFG_VIDEO_START(macross)
+	MCFG_VIDEO_EOF(nmk)
+	MCFG_VIDEO_UPDATE(tdragon)
+	MCFG_TIMER_ADD_PERIODIC("coinsim", tdragon_mcu_sim, HZ(10000)) // not real, but for simulating the MCU
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz/8) /* verified on pcb */
-	MDRV_SOUND_CONFIG(ym2203_nmk004_interface)
-	MDRV_SOUND_ROUTE(0, "mono", 0.50)
-	MDRV_SOUND_ROUTE(1, "mono", 0.50)
-	MDRV_SOUND_ROUTE(2, "mono", 0.50)
-	MDRV_SOUND_ROUTE(3, "mono", 2.00)
+	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz/8) /* verified on pcb */
+	MCFG_SOUND_CONFIG(ym2203_nmk004_interface)
+	MCFG_SOUND_ROUTE(0, "mono", 0.50)
+	MCFG_SOUND_ROUTE(1, "mono", 0.50)
+	MCFG_SOUND_ROUTE(2, "mono", 0.50)
+	MCFG_SOUND_ROUTE(3, "mono", 2.00)
 
-	MDRV_OKIM6295_ADD("oki1", XTAL_8MHz/2, OKIM6295_PIN7_LOW) /* verified on pcb */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+	MCFG_OKIM6295_ADD("oki1", XTAL_8MHz/2, OKIM6295_PIN7_LOW) /* verified on pcb */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
-	MDRV_OKIM6295_ADD("oki2", XTAL_8MHz/2, OKIM6295_PIN7_LOW) /* verified on pcb */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+	MCFG_OKIM6295_ADD("oki2", XTAL_8MHz/2, OKIM6295_PIN7_LOW) /* verified on pcb */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( ssmissin, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 8000000) /* 8 Mhz */
-	MDRV_CPU_PROGRAM_MAP(ssmissin_map)
-	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
-	MDRV_CPU_PERIODIC_INT(irq1_line_hold,112) /* input related */
+	MCFG_CPU_ADD("maincpu", M68000, 8000000) /* 8 Mhz */
+	MCFG_CPU_PROGRAM_MAP(ssmissin_map)
+	MCFG_CPU_VBLANK_INT("screen", irq4_line_hold)
+	MCFG_CPU_PERIODIC_INT(irq1_line_hold,112) /* input related */
 
-	MDRV_CPU_ADD("audiocpu", Z80, 8000000/2) /* 4 Mhz */
-	MDRV_CPU_PROGRAM_MAP(ssmissin_sound_map)
+	MCFG_CPU_ADD("audiocpu", Z80, 8000000/2) /* 4 Mhz */
+	MCFG_CPU_PROGRAM_MAP(ssmissin_sound_map)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(56)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(256, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(56)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(256, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(macross)
-	MDRV_PALETTE_LENGTH(1024)
+	MCFG_GFXDECODE(macross)
+	MCFG_PALETTE_LENGTH(1024)
 
-	MDRV_VIDEO_START(macross)
-	MDRV_VIDEO_EOF(nmk)
-	MDRV_VIDEO_UPDATE(macross)
+	MCFG_VIDEO_START(macross)
+	MCFG_VIDEO_EOF(nmk)
+	MCFG_VIDEO_UPDATE(macross)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_OKIM6295_ADD("oki1", 8000000/8, OKIM6295_PIN7_HIGH) /* 1 Mhz, pin 7 high */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_OKIM6295_ADD("oki1", 8000000/8, OKIM6295_PIN7_HIGH) /* 1 Mhz, pin 7 high */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_NMK112_ADD("nmk112", nmk16_nmk112_intf)
+	MCFG_NMK112_ADD("nmk112", nmk16_nmk112_intf)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( strahl, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 12000000) /* 12 MHz ? */
-	MDRV_CPU_PROGRAM_MAP(strahl_map)
-	MDRV_CPU_PERIODIC_INT(irq1_line_hold,112)/* ???????? */
-	MDRV_TIMER_ADD_SCANLINE("scantimer", nmk16_scanline, "screen", 0, 1)
+	MCFG_CPU_ADD("maincpu", M68000, 12000000) /* 12 MHz ? */
+	MCFG_CPU_PROGRAM_MAP(strahl_map)
+	MCFG_CPU_PERIODIC_INT(irq1_line_hold,112)/* ???????? */
+	MCFG_TIMER_ADD_SCANLINE("scantimer", nmk16_scanline, "screen", 0, 1)
 
-	MDRV_MACHINE_RESET(NMK004)
+	MCFG_MACHINE_RESET(NMK004)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(56)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(256, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(56)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(256, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(strahl)
-	MDRV_PALETTE_LENGTH(1024)
+	MCFG_GFXDECODE(strahl)
+	MCFG_PALETTE_LENGTH(1024)
 
-	MDRV_VIDEO_START(strahl)
-	MDRV_VIDEO_EOF(strahl)
-	MDRV_VIDEO_UPDATE(strahl)
+	MCFG_VIDEO_START(strahl)
+	MCFG_VIDEO_EOF(strahl)
+	MCFG_VIDEO_UPDATE(strahl)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM2203, 1500000)
-	MDRV_SOUND_CONFIG(ym2203_nmk004_interface)
-	MDRV_SOUND_ROUTE(0, "mono", 0.50)
-	MDRV_SOUND_ROUTE(1, "mono", 0.50)
-	MDRV_SOUND_ROUTE(2, "mono", 0.50)
-	MDRV_SOUND_ROUTE(3, "mono", 2.00)
+	MCFG_SOUND_ADD("ymsnd", YM2203, 1500000)
+	MCFG_SOUND_CONFIG(ym2203_nmk004_interface)
+	MCFG_SOUND_ROUTE(0, "mono", 0.50)
+	MCFG_SOUND_ROUTE(1, "mono", 0.50)
+	MCFG_SOUND_ROUTE(2, "mono", 0.50)
+	MCFG_SOUND_ROUTE(3, "mono", 2.00)
 
-	MDRV_OKIM6295_ADD("oki1", 16000000/4, OKIM6295_PIN7_LOW)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+	MCFG_OKIM6295_ADD("oki1", 16000000/4, OKIM6295_PIN7_LOW)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
-	MDRV_OKIM6295_ADD("oki2", 16000000/4, OKIM6295_PIN7_LOW)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+	MCFG_OKIM6295_ADD("oki2", 16000000/4, OKIM6295_PIN7_LOW)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( hachamf, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 10000000) /* 10 MHz ? */
-	MDRV_CPU_PROGRAM_MAP(hachamf_map)
-	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
-	MDRV_CPU_PERIODIC_INT(irq1_line_hold,112)/* ???????? */
+	MCFG_CPU_ADD("maincpu", M68000, 10000000) /* 10 MHz ? */
+	MCFG_CPU_PROGRAM_MAP(hachamf_map)
+	MCFG_CPU_VBLANK_INT("screen", irq4_line_hold)
+	MCFG_CPU_PERIODIC_INT(irq1_line_hold,112)/* ???????? */
 
-	MDRV_MACHINE_RESET(NMK004)
+	MCFG_MACHINE_RESET(NMK004)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(56)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(256, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(56)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(256, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(macross)
-	MDRV_PALETTE_LENGTH(1024)
+	MCFG_GFXDECODE(macross)
+	MCFG_PALETTE_LENGTH(1024)
 
-	MDRV_VIDEO_START(macross)
-	MDRV_VIDEO_EOF(nmk)
-	MDRV_VIDEO_UPDATE(hachamf)
-	MDRV_TIMER_ADD_PERIODIC("coinsim", hachamf_mcu_sim, HZ(10000)) // not real, but for simulating the MCU
+	MCFG_VIDEO_START(macross)
+	MCFG_VIDEO_EOF(nmk)
+	MCFG_VIDEO_UPDATE(hachamf)
+	MCFG_TIMER_ADD_PERIODIC("coinsim", hachamf_mcu_sim, HZ(10000)) // not real, but for simulating the MCU
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM2203, 1500000)
-	MDRV_SOUND_CONFIG(ym2203_nmk004_interface)
-	MDRV_SOUND_ROUTE(0, "mono", 0.50)
-	MDRV_SOUND_ROUTE(1, "mono", 0.50)
-	MDRV_SOUND_ROUTE(2, "mono", 0.50)
-	MDRV_SOUND_ROUTE(3, "mono", 2.00)
+	MCFG_SOUND_ADD("ymsnd", YM2203, 1500000)
+	MCFG_SOUND_CONFIG(ym2203_nmk004_interface)
+	MCFG_SOUND_ROUTE(0, "mono", 0.50)
+	MCFG_SOUND_ROUTE(1, "mono", 0.50)
+	MCFG_SOUND_ROUTE(2, "mono", 0.50)
+	MCFG_SOUND_ROUTE(3, "mono", 2.00)
 
-	MDRV_OKIM6295_ADD("oki1", 16000000/4, OKIM6295_PIN7_LOW)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+	MCFG_OKIM6295_ADD("oki1", 16000000/4, OKIM6295_PIN7_LOW)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
-	MDRV_OKIM6295_ADD("oki2", 16000000/4, OKIM6295_PIN7_LOW)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+	MCFG_OKIM6295_ADD("oki2", 16000000/4, OKIM6295_PIN7_LOW)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( macross, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 10000000) /* 10 MHz ? */
-	MDRV_CPU_PROGRAM_MAP(macross_map)
-	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
-	MDRV_CPU_PERIODIC_INT(irq1_line_hold,112)/* ???????? */
+	MCFG_CPU_ADD("maincpu", M68000, 10000000) /* 10 MHz ? */
+	MCFG_CPU_PROGRAM_MAP(macross_map)
+	MCFG_CPU_VBLANK_INT("screen", irq4_line_hold)
+	MCFG_CPU_PERIODIC_INT(irq1_line_hold,112)/* ???????? */
 
-	MDRV_MACHINE_RESET(NMK004)
+	MCFG_MACHINE_RESET(NMK004)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(56)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(256, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(56)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(256, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(macross)
-	MDRV_PALETTE_LENGTH(1024)
+	MCFG_GFXDECODE(macross)
+	MCFG_PALETTE_LENGTH(1024)
 
-	MDRV_VIDEO_START(macross)
-	MDRV_VIDEO_EOF(nmk)
-	MDRV_VIDEO_UPDATE(macross)
+	MCFG_VIDEO_START(macross)
+	MCFG_VIDEO_EOF(nmk)
+	MCFG_VIDEO_UPDATE(macross)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM2203, 1500000)
-	MDRV_SOUND_CONFIG(ym2203_nmk004_interface)
-	MDRV_SOUND_ROUTE(0, "mono", 0.50)
-	MDRV_SOUND_ROUTE(1, "mono", 0.50)
-	MDRV_SOUND_ROUTE(2, "mono", 0.50)
-	MDRV_SOUND_ROUTE(3, "mono", 2.00)
+	MCFG_SOUND_ADD("ymsnd", YM2203, 1500000)
+	MCFG_SOUND_CONFIG(ym2203_nmk004_interface)
+	MCFG_SOUND_ROUTE(0, "mono", 0.50)
+	MCFG_SOUND_ROUTE(1, "mono", 0.50)
+	MCFG_SOUND_ROUTE(2, "mono", 0.50)
+	MCFG_SOUND_ROUTE(3, "mono", 2.00)
 
-	MDRV_OKIM6295_ADD("oki1", 16000000/4, OKIM6295_PIN7_LOW)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+	MCFG_OKIM6295_ADD("oki1", 16000000/4, OKIM6295_PIN7_LOW)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
-	MDRV_OKIM6295_ADD("oki2", 16000000/4, OKIM6295_PIN7_LOW)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+	MCFG_OKIM6295_ADD("oki2", 16000000/4, OKIM6295_PIN7_LOW)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( blkheart, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, XTAL_8MHz) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(macross_map)
-	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
-	MDRV_CPU_PERIODIC_INT(irq1_line_hold,112)/* ???????? */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_8MHz) /* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(macross_map)
+	MCFG_CPU_VBLANK_INT("screen", irq4_line_hold)
+	MCFG_CPU_PERIODIC_INT(irq1_line_hold,112)/* ???????? */
 
-	MDRV_MACHINE_RESET(NMK004)
+	MCFG_MACHINE_RESET(NMK004)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(56.18) /* verified on pcb */
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(256, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(56.18) /* verified on pcb */
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(256, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(macross)
-	MDRV_PALETTE_LENGTH(1024)
+	MCFG_GFXDECODE(macross)
+	MCFG_PALETTE_LENGTH(1024)
 
-	MDRV_VIDEO_START(macross)
-	MDRV_VIDEO_EOF(nmk)
-	MDRV_VIDEO_UPDATE(macross)
+	MCFG_VIDEO_START(macross)
+	MCFG_VIDEO_EOF(nmk)
+	MCFG_VIDEO_UPDATE(macross)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz/8 ) /* verified on pcb */
-	MDRV_SOUND_CONFIG(ym2203_nmk004_interface)
-	MDRV_SOUND_ROUTE(0, "mono", 0.50)
-	MDRV_SOUND_ROUTE(1, "mono", 0.50)
-	MDRV_SOUND_ROUTE(2, "mono", 0.50)
-	MDRV_SOUND_ROUTE(3, "mono", 2.00)
+	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz/8 ) /* verified on pcb */
+	MCFG_SOUND_CONFIG(ym2203_nmk004_interface)
+	MCFG_SOUND_ROUTE(0, "mono", 0.50)
+	MCFG_SOUND_ROUTE(1, "mono", 0.50)
+	MCFG_SOUND_ROUTE(2, "mono", 0.50)
+	MCFG_SOUND_ROUTE(3, "mono", 2.00)
 
-	MDRV_OKIM6295_ADD("oki1", XTAL_8MHz/2, OKIM6295_PIN7_LOW) /* verified on pcb */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+	MCFG_OKIM6295_ADD("oki1", XTAL_8MHz/2, OKIM6295_PIN7_LOW) /* verified on pcb */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
-	MDRV_OKIM6295_ADD("oki2", XTAL_8MHz/2, OKIM6295_PIN7_LOW) /* verified on pcb */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+	MCFG_OKIM6295_ADD("oki2", XTAL_8MHz/2, OKIM6295_PIN7_LOW) /* verified on pcb */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( gunnail, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 12000000) /* 12 MHz? */
-	MDRV_CPU_PROGRAM_MAP(gunnail_map)
-	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
-	MDRV_CPU_PERIODIC_INT(irq1_line_hold,112)
+	MCFG_CPU_ADD("maincpu", M68000, 12000000) /* 12 MHz? */
+	MCFG_CPU_PROGRAM_MAP(gunnail_map)
+	MCFG_CPU_VBLANK_INT("screen", irq4_line_hold)
+	MCFG_CPU_PERIODIC_INT(irq1_line_hold,112)
 
-	MDRV_MACHINE_RESET(NMK004)
+	MCFG_MACHINE_RESET(NMK004)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(56)
-//  MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(512, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(56)
+//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(512, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(macross)
-	MDRV_PALETTE_LENGTH(1024)
+	MCFG_GFXDECODE(macross)
+	MCFG_PALETTE_LENGTH(1024)
 
-	MDRV_VIDEO_START(gunnail)
-	MDRV_VIDEO_EOF(nmk)
-	MDRV_VIDEO_UPDATE(gunnail)
+	MCFG_VIDEO_START(gunnail)
+	MCFG_VIDEO_EOF(nmk)
+	MCFG_VIDEO_UPDATE(gunnail)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM2203, 1500000)
-	MDRV_SOUND_CONFIG(ym2203_nmk004_interface)
-	MDRV_SOUND_ROUTE(0, "mono", 0.50)
-	MDRV_SOUND_ROUTE(1, "mono", 0.50)
-	MDRV_SOUND_ROUTE(2, "mono", 0.50)
-	MDRV_SOUND_ROUTE(3, "mono", 2.00)
+	MCFG_SOUND_ADD("ymsnd", YM2203, 1500000)
+	MCFG_SOUND_CONFIG(ym2203_nmk004_interface)
+	MCFG_SOUND_ROUTE(0, "mono", 0.50)
+	MCFG_SOUND_ROUTE(1, "mono", 0.50)
+	MCFG_SOUND_ROUTE(2, "mono", 0.50)
+	MCFG_SOUND_ROUTE(3, "mono", 2.00)
 
-	MDRV_OKIM6295_ADD("oki1", 16000000/4, OKIM6295_PIN7_LOW)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+	MCFG_OKIM6295_ADD("oki1", 16000000/4, OKIM6295_PIN7_LOW)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
-	MDRV_OKIM6295_ADD("oki2", 16000000/4, OKIM6295_PIN7_LOW)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+	MCFG_OKIM6295_ADD("oki2", 16000000/4, OKIM6295_PIN7_LOW)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( macross2, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 10000000) /* 10 MHz ? */
-	MDRV_CPU_PROGRAM_MAP(macross2_map)
-	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
-	MDRV_CPU_PERIODIC_INT(irq1_line_hold,112)/* ???????? */
+	MCFG_CPU_ADD("maincpu", M68000, 10000000) /* 10 MHz ? */
+	MCFG_CPU_PROGRAM_MAP(macross2_map)
+	MCFG_CPU_VBLANK_INT("screen", irq4_line_hold)
+	MCFG_CPU_PERIODIC_INT(irq1_line_hold,112)/* ???????? */
 
-	MDRV_CPU_ADD("audiocpu", Z80, 4000000) /* 4 MHz ? */
-	MDRV_CPU_PROGRAM_MAP(macross2_sound_map)
-	MDRV_CPU_IO_MAP(macross2_sound_io_map)
+	MCFG_CPU_ADD("audiocpu", Z80, 4000000) /* 4 MHz ? */
+	MCFG_CPU_PROGRAM_MAP(macross2_sound_map)
+	MCFG_CPU_IO_MAP(macross2_sound_io_map)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(56)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(512, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(56)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(512, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(macross2)
-	MDRV_PALETTE_LENGTH(1024)
+	MCFG_GFXDECODE(macross2)
+	MCFG_PALETTE_LENGTH(1024)
 
-	MDRV_VIDEO_START(macross2)
-	MDRV_VIDEO_EOF(nmk)
-	MDRV_VIDEO_UPDATE(gunnail)
+	MCFG_VIDEO_START(macross2)
+	MCFG_VIDEO_EOF(nmk)
+	MCFG_VIDEO_UPDATE(gunnail)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM2203, 1500000)
-	MDRV_SOUND_CONFIG(ym2203_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
+	MCFG_SOUND_ADD("ymsnd", YM2203, 1500000)
+	MCFG_SOUND_CONFIG(ym2203_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 
-	MDRV_OKIM6295_ADD("oki1", 16000000/4, OKIM6295_PIN7_LOW)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+	MCFG_OKIM6295_ADD("oki1", 16000000/4, OKIM6295_PIN7_LOW)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
-	MDRV_OKIM6295_ADD("oki2", 16000000/4, OKIM6295_PIN7_LOW)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+	MCFG_OKIM6295_ADD("oki2", 16000000/4, OKIM6295_PIN7_LOW)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
-	MDRV_NMK112_ADD("nmk112", nmk16_nmk112_intf)
+	MCFG_NMK112_ADD("nmk112", nmk16_nmk112_intf)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( tdragon2, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 10000000) /* 10 MHz  */
-	MDRV_CPU_PROGRAM_MAP(macross2_map)
-	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
-	MDRV_CPU_PERIODIC_INT(irq1_line_hold,112)/* ???????? */
+	MCFG_CPU_ADD("maincpu", M68000, 10000000) /* 10 MHz  */
+	MCFG_CPU_PROGRAM_MAP(macross2_map)
+	MCFG_CPU_VBLANK_INT("screen", irq4_line_hold)
+	MCFG_CPU_PERIODIC_INT(irq1_line_hold,112)/* ???????? */
 
-	MDRV_CPU_ADD("audiocpu", Z80, 4000000) /* 4 MHz  */
-	MDRV_CPU_PROGRAM_MAP(macross2_sound_map)
-	MDRV_CPU_IO_MAP(macross2_sound_io_map)
+	MCFG_CPU_ADD("audiocpu", Z80, 4000000) /* 4 MHz  */
+	MCFG_CPU_PROGRAM_MAP(macross2_sound_map)
+	MCFG_CPU_IO_MAP(macross2_sound_io_map)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(56)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(512, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(56)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(512, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(macross2)
-	MDRV_PALETTE_LENGTH(1024)
+	MCFG_GFXDECODE(macross2)
+	MCFG_PALETTE_LENGTH(1024)
 
-	MDRV_VIDEO_START(macross2)
-	MDRV_VIDEO_EOF(nmk)
-	MDRV_VIDEO_UPDATE(gunnail)
+	MCFG_VIDEO_START(macross2)
+	MCFG_VIDEO_EOF(nmk)
+	MCFG_VIDEO_UPDATE(gunnail)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM2203, 1500000)
-	MDRV_SOUND_CONFIG(ym2203_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SOUND_ADD("ymsnd", YM2203, 1500000)
+	MCFG_SOUND_CONFIG(ym2203_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MDRV_OKIM6295_ADD("oki1", 16000000/4, OKIM6295_PIN7_LOW)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.08)
+	MCFG_OKIM6295_ADD("oki1", 16000000/4, OKIM6295_PIN7_LOW)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.08)
 
-	MDRV_OKIM6295_ADD("oki2", 16000000/4, OKIM6295_PIN7_LOW)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.08)
+	MCFG_OKIM6295_ADD("oki2", 16000000/4, OKIM6295_PIN7_LOW)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.08)
 
-	MDRV_NMK112_ADD("nmk112", nmk16_nmk112_intf)
+	MCFG_NMK112_ADD("nmk112", nmk16_nmk112_intf)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( raphero, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 14000000) /* 14 MHz measured */
-	MDRV_CPU_PROGRAM_MAP(raphero_map)
-	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
-	MDRV_CPU_PERIODIC_INT(irq1_line_hold,112)/* ???????? */
+	MCFG_CPU_ADD("maincpu", M68000, 14000000) /* 14 MHz measured */
+	MCFG_CPU_PROGRAM_MAP(raphero_map)
+	MCFG_CPU_VBLANK_INT("screen", irq4_line_hold)
+	MCFG_CPU_PERIODIC_INT(irq1_line_hold,112)/* ???????? */
 
-	MDRV_CPU_ADD("audiocpu",TMP90841, 8000000)
-	MDRV_CPU_PROGRAM_MAP(raphero_sound_mem_map)
+	MCFG_CPU_ADD("audiocpu",TMP90841, 8000000)
+	MCFG_CPU_PROGRAM_MAP(raphero_sound_mem_map)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(56) // measured
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(512, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(56) // measured
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(512, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(macross2)
-	MDRV_PALETTE_LENGTH(1024)
+	MCFG_GFXDECODE(macross2)
+	MCFG_PALETTE_LENGTH(1024)
 
-	MDRV_VIDEO_START(raphero)
-	MDRV_VIDEO_EOF(nmk)
-	MDRV_VIDEO_UPDATE(gunnail)
+	MCFG_VIDEO_START(raphero)
+	MCFG_VIDEO_EOF(nmk)
+	MCFG_VIDEO_UPDATE(gunnail)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM2203, 1500000)
-	MDRV_SOUND_CONFIG(ym2203_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
+	MCFG_SOUND_ADD("ymsnd", YM2203, 1500000)
+	MCFG_SOUND_CONFIG(ym2203_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 
-	MDRV_OKIM6295_ADD("oki1", 16000000/4, OKIM6295_PIN7_LOW)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+	MCFG_OKIM6295_ADD("oki1", 16000000/4, OKIM6295_PIN7_LOW)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
-	MDRV_OKIM6295_ADD("oki2", 16000000/4, OKIM6295_PIN7_LOW)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+	MCFG_OKIM6295_ADD("oki2", 16000000/4, OKIM6295_PIN7_LOW)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
-	MDRV_NMK112_ADD("nmk112", nmk16_nmk112_intf)
+	MCFG_NMK112_ADD("nmk112", nmk16_nmk112_intf)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( bjtwin, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 10000000) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(bjtwin_map)
-	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
-	MDRV_CPU_PERIODIC_INT(irq1_line_hold,112)/* ?? drives music */
+	MCFG_CPU_ADD("maincpu", M68000, 10000000) /* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(bjtwin_map)
+	MCFG_CPU_VBLANK_INT("screen", irq4_line_hold)
+	MCFG_CPU_PERIODIC_INT(irq1_line_hold,112)/* ?? drives music */
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(56)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(512, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(56)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(512, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(bjtwin)
-	MDRV_PALETTE_LENGTH(1024)
+	MCFG_GFXDECODE(bjtwin)
+	MCFG_PALETTE_LENGTH(1024)
 
-	MDRV_VIDEO_START(bjtwin)
-	MDRV_VIDEO_EOF(nmk)
-	MDRV_VIDEO_UPDATE(bjtwin)
+	MCFG_VIDEO_START(bjtwin)
+	MCFG_VIDEO_EOF(nmk)
+	MCFG_VIDEO_UPDATE(bjtwin)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_OKIM6295_ADD("oki1", 16000000/4, OKIM6295_PIN7_LOW)  /* verified on pcb */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+	MCFG_OKIM6295_ADD("oki1", 16000000/4, OKIM6295_PIN7_LOW)  /* verified on pcb */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
-	MDRV_OKIM6295_ADD("oki2", 16000000/4, OKIM6295_PIN7_LOW) /* verified on pcb */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+	MCFG_OKIM6295_ADD("oki2", 16000000/4, OKIM6295_PIN7_LOW) /* verified on pcb */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
-	MDRV_NMK112_ADD("nmk112", nmk16_nmk112_intf)
+	MCFG_NMK112_ADD("nmk112", nmk16_nmk112_intf)
 MACHINE_CONFIG_END
 
 
@@ -4433,16 +4433,16 @@ static void decode_gfx(running_machine *machine)
 
 
 	/* background */
-	rom = memory_region(machine, "gfx2");
-	len = memory_region_length(machine, "gfx2");
+	rom = machine->region("gfx2")->base();
+	len = machine->region("gfx2")->bytes();
 	for (A = 0;A < len;A++)
 	{
 		rom[A] = decode_byte( rom[A], decode_data_bg[bjtwin_address_map_bg0(A)]);
 	}
 
 	/* sprites */
-	rom = memory_region(machine, "gfx3");
-	len = memory_region_length(machine, "gfx3");
+	rom = machine->region("gfx3")->base();
+	len = machine->region("gfx3")->bytes();
 	for (A = 0;A < len;A += 2)
 	{
 		UINT16 tmp = decode_word( rom[A+1]*256 + rom[A], decode_data_sprite[bjtwin_address_map_sprites(A)]);
@@ -4471,8 +4471,8 @@ static void decode_tdragonb(running_machine *machine)
 		{0x7,0x6,0x5,0x3,0x4,0x2,0x1,0x0},
 	};
 
-	rom = memory_region(machine, "maincpu");
-	len = memory_region_length(machine, "maincpu");
+	rom = machine->region("maincpu")->base();
+	len = machine->region("maincpu")->bytes();
 	for (A = 0;A < len;A += 2)
 	{
 		int h = A+NATIVE_ENDIAN_VALUE_LE_BE(1,0), l = A+NATIVE_ENDIAN_VALUE_LE_BE(0,1);
@@ -4481,15 +4481,15 @@ static void decode_tdragonb(running_machine *machine)
 		rom[l] = tmp & 0xff;
 	}
 
-	rom = memory_region(machine, "gfx2");
-	len = memory_region_length(machine, "gfx2");
+	rom = machine->region("gfx2")->base();
+	len = machine->region("gfx2")->bytes();
 	for (A = 0;A < len;A++)
 	{
 		rom[A] = decode_byte( rom[A], decode_data_tdragonbgfx[0]);
 	}
 
-	rom = memory_region(machine, "gfx3");
-	len = memory_region_length(machine, "gfx3");
+	rom = machine->region("gfx3")->base();
+	len = machine->region("gfx3")->bytes();
 	for (A = 0;A < len;A++)
 	{
 		rom[A] = decode_byte( rom[A], decode_data_tdragonbgfx[0]);
@@ -4508,15 +4508,15 @@ static void decode_ssmissin(running_machine *machine)
 		{0x7,0x6,0x5,0x3,0x4,0x2,0x1,0x0},
 	};
 
-	rom = memory_region(machine, "gfx2");
-	len = memory_region_length(machine, "gfx2");
+	rom = machine->region("gfx2")->base();
+	len = machine->region("gfx2")->bytes();
 	for (A = 0;A < len;A++)
 	{
 		rom[A] = decode_byte( rom[A], decode_data_tdragonbgfx[0]);
 	}
 
-	rom = memory_region(machine, "gfx3");
-	len = memory_region_length(machine, "gfx3");
+	rom = machine->region("gfx3")->base();
+	len = machine->region("gfx3")->bytes();
 	for (A = 0;A < len;A++)
 	{
 		rom[A] = decode_byte( rom[A], decode_data_tdragonbgfx[0]);
@@ -4531,7 +4531,7 @@ static DRIVER_INIT( nmk )
 
 static DRIVER_INIT( hachamf )
 {
-	UINT16 *rom = (UINT16 *)memory_region(machine, "maincpu");
+	UINT16 *rom = (UINT16 *)machine->region("maincpu")->base();
 
 	//rom[0x0006/2] = 0x7dc2;   /* replace reset vector with the "real" one */
 
@@ -4542,7 +4542,7 @@ static DRIVER_INIT( hachamf )
 
 static DRIVER_INIT( tdragonb )
 {
-	UINT16 *rom = (UINT16 *)memory_region(machine, "maincpu");
+	UINT16 *rom = (UINT16 *)machine->region("maincpu")->base();
 
 	decode_tdragonb(machine);
 
@@ -4553,7 +4553,7 @@ static DRIVER_INIT( tdragonb )
 
 static DRIVER_INIT( tdragon )
 {
-	UINT16 *rom = (UINT16 *)memory_region(machine, "maincpu");
+	UINT16 *rom = (UINT16 *)machine->region("maincpu")->base();
 
 	//rom[0x94b0/2] = 0; /* Patch out JMP to shared memory (protection) */
 	//rom[0x94b2/2] = 0x92f4;
@@ -4587,7 +4587,7 @@ static DRIVER_INIT( bjtwin )
  *  008F7E: 207C 000F 9000           movea.l #$f9000, A0
  */
 #if 0
-	UINT16 *rom = (UINT16 *)memory_region(machine, "maincpu");
+	UINT16 *rom = (UINT16 *)machine->region("maincpu")->base();
 	rom[0x09172/2] = 0x6006;    /* patch checksum error */
 	rom[0x08f74/2] = 0x4e71;
 #endif
@@ -4824,7 +4824,7 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-static void irq_handler(running_device *device, int irq)
+static void irq_handler(device_t *device, int irq)
 {
 	cputag_set_input_line(device->machine, "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -4838,54 +4838,54 @@ static const ym2151_interface afega_ym2151_intf =
 static MACHINE_CONFIG_START( stagger1, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000,XTAL_12MHz) /* 68000p10 running at 12mhz, verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(afega)
-	MDRV_TIMER_ADD_SCANLINE("scantimer", nmk16_scanline, "screen", 0, 1)
+	MCFG_CPU_ADD("maincpu", M68000,XTAL_12MHz) /* 68000p10 running at 12mhz, verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(afega)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", nmk16_scanline, "screen", 0, 1)
 
-	MDRV_CPU_ADD("audiocpu", Z80, XTAL_4MHz) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(afega_sound_cpu)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_4MHz) /* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(afega_sound_cpu)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(56)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(256, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(56)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(256, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(stagger1)
-	MDRV_PALETTE_LENGTH(768)
+	MCFG_GFXDECODE(stagger1)
+	MCFG_PALETTE_LENGTH(768)
 
-	MDRV_VIDEO_START(afega)
-	MDRV_VIDEO_UPDATE(afega)
-	MDRV_VIDEO_EOF(nmk)
+	MCFG_VIDEO_START(afega)
+	MCFG_VIDEO_UPDATE(afega)
+	MCFG_VIDEO_EOF(nmk)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ymsnd", YM2151, XTAL_4MHz) /* verified on pcb */
-	MDRV_SOUND_CONFIG(afega_ym2151_intf)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 0.30)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 0.30)
+	MCFG_SOUND_ADD("ymsnd", YM2151, XTAL_4MHz) /* verified on pcb */
+	MCFG_SOUND_CONFIG(afega_ym2151_intf)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.30)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.30)
 
-	MDRV_OKIM6295_ADD("oki1", XTAL_4MHz/4, OKIM6295_PIN7_HIGH) /* verified on pcb */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.70)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.70)
+	MCFG_OKIM6295_ADD("oki1", XTAL_4MHz/4, OKIM6295_PIN7_HIGH) /* verified on pcb */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.70)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.70)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( redhawki, stagger1 )
 
 	/* basic machine hardware */
 	/* video hardware */
-	MDRV_VIDEO_UPDATE(redhawki)
+	MCFG_VIDEO_UPDATE(redhawki)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( redhawkb, stagger1 )
 
 	/* basic machine hardware */
 	/* video hardware */
-	MDRV_GFXDECODE(redhawkb)
-	MDRV_VIDEO_UPDATE(redhawkb)
+	MCFG_GFXDECODE(redhawkb)
+	MCFG_VIDEO_UPDATE(redhawkb)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( grdnstrm, stagger1 )
@@ -4893,9 +4893,9 @@ static MACHINE_CONFIG_DERIVED( grdnstrm, stagger1 )
 	/* basic machine hardware */
 
 	/* video hardware */
-	MDRV_GFXDECODE(grdnstrm)
-	MDRV_VIDEO_START(firehawk)
-	MDRV_VIDEO_UPDATE(firehawk)
+	MCFG_GFXDECODE(grdnstrm)
+	MCFG_VIDEO_START(firehawk)
+	MCFG_VIDEO_UPDATE(firehawk)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( grdnstrmk, stagger1 )
@@ -4903,8 +4903,8 @@ static MACHINE_CONFIG_DERIVED( grdnstrmk, stagger1 )
 	/* basic machine hardware */
 
 	/* video hardware */
-	MDRV_GFXDECODE(grdnstrm)
-	MDRV_VIDEO_START(grdnstrm)
+	MCFG_GFXDECODE(grdnstrm)
+	MCFG_VIDEO_START(grdnstrm)
 MACHINE_CONFIG_END
 
 
@@ -4913,76 +4913,76 @@ static MACHINE_CONFIG_DERIVED( popspops, grdnstrm )
 	/* basic machine hardware */
 
 	/* video hardware */
-	MDRV_VIDEO_UPDATE(bubl2000)
+	MCFG_VIDEO_UPDATE(bubl2000)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( firehawk, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000,12000000)
-	MDRV_CPU_PROGRAM_MAP(afega)
-	MDRV_TIMER_ADD_SCANLINE("scantimer", nmk16_scanline, "screen", 0, 1)
+	MCFG_CPU_ADD("maincpu", M68000,12000000)
+	MCFG_CPU_PROGRAM_MAP(afega)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", nmk16_scanline, "screen", 0, 1)
 
-	MDRV_CPU_ADD("audiocpu", Z80,4000000)
-	MDRV_CPU_PROGRAM_MAP(firehawk_sound_cpu)
+	MCFG_CPU_ADD("audiocpu", Z80,4000000)
+	MCFG_CPU_PROGRAM_MAP(firehawk_sound_cpu)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(56)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(256, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(56)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(256, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(grdnstrm)
-	MDRV_PALETTE_LENGTH(768)
+	MCFG_GFXDECODE(grdnstrm)
+	MCFG_PALETTE_LENGTH(768)
 
-	MDRV_VIDEO_START(firehawk)
-	MDRV_VIDEO_UPDATE(firehawk)
-	MDRV_VIDEO_EOF(nmk)
+	MCFG_VIDEO_START(firehawk)
+	MCFG_VIDEO_UPDATE(firehawk)
+	MCFG_VIDEO_EOF(nmk)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_OKIM6295_ADD("oki1", 1000000, OKIM6295_PIN7_HIGH)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_OKIM6295_ADD("oki1", 1000000, OKIM6295_PIN7_HIGH)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_OKIM6295_ADD("oki2", 1000000, OKIM6295_PIN7_HIGH)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_OKIM6295_ADD("oki2", 1000000, OKIM6295_PIN7_HIGH)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( twinactn, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000,12000000)
-	MDRV_CPU_PROGRAM_MAP(twinactn_map)
-	MDRV_CPU_PERIODIC_INT(irq1_line_hold,112)/* ???????? */
-	MDRV_TIMER_ADD_SCANLINE("scantimer", nmk16_scanline, "screen", 0, 1)
+	MCFG_CPU_ADD("maincpu", M68000,12000000)
+	MCFG_CPU_PROGRAM_MAP(twinactn_map)
+	MCFG_CPU_PERIODIC_INT(irq1_line_hold,112)/* ???????? */
+	MCFG_TIMER_ADD_SCANLINE("scantimer", nmk16_scanline, "screen", 0, 1)
 
-	MDRV_CPU_ADD("audiocpu", Z80, 4000000)
-	MDRV_CPU_PROGRAM_MAP(twinactn_sound_cpu)
+	MCFG_CPU_ADD("audiocpu", Z80, 4000000)
+	MCFG_CPU_PROGRAM_MAP(twinactn_sound_cpu)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(56)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(256, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(56)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(256, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(macross)
-	MDRV_PALETTE_LENGTH(1024)
+	MCFG_GFXDECODE(macross)
+	MCFG_PALETTE_LENGTH(1024)
 
-	MDRV_VIDEO_START(macross)
-	MDRV_VIDEO_EOF(nmk)
-	MDRV_VIDEO_UPDATE(macross)
+	MCFG_VIDEO_START(macross)
+	MCFG_VIDEO_EOF(nmk)
+	MCFG_VIDEO_UPDATE(macross)
 
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_OKIM6295_ADD("oki1", 1000000, OKIM6295_PIN7_HIGH)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_OKIM6295_ADD("oki1", 1000000, OKIM6295_PIN7_HIGH)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -5000,8 +5000,8 @@ static void decryptcode( running_machine *machine, int a23, int a22, int a21, in
 	int a11, int a10, int a9, int a8, int a7, int a6, int a5, int a4, int a3, int a2, int a1, int a0 )
 {
 	int i;
-	UINT8 *RAM = memory_region( machine, "maincpu" );
-	size_t  size = memory_region_length( machine, "maincpu" );
+	UINT8 *RAM = machine->region( "maincpu" )->base();
+	size_t  size = machine->region( "maincpu" )->bytes();
 	UINT8 *buffer = auto_alloc_array(machine, UINT8,  size );
 
 	memcpy( buffer, RAM, size );

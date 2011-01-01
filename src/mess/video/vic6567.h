@@ -138,9 +138,9 @@ struct _vic2_interface
 
 DECLARE_LEGACY_DEVICE(VIC2, vic2);
 
-#define MDRV_VIC2_ADD(_tag, _interface) \
-	MDRV_DEVICE_ADD(_tag, VIC2, 0) \
-	MDRV_DEVICE_CONFIG(_interface)
+#define MCFG_VIC2_ADD(_tag, _interface) \
+	MCFG_DEVICE_ADD(_tag, VIC2, 0) \
+	MCFG_DEVICE_CONFIG(_interface)
 
 
 /*----------- defined in video/vic6567.c -----------*/
@@ -148,16 +148,16 @@ DECLARE_LEGACY_DEVICE(VIC2, vic2);
 WRITE8_DEVICE_HANDLER ( vic2_port_w );
 READ8_DEVICE_HANDLER ( vic2_port_r );
 
-int vic2e_k0_r(running_device *device);
-int vic2e_k1_r(running_device *device);
-int vic2e_k2_r(running_device *device);
+int vic2e_k0_r(device_t *device);
+int vic2e_k1_r(device_t *device);
+int vic2e_k2_r(device_t *device);
 
-void vic2_raster_interrupt_gen( running_device *device );
-UINT32 vic2_video_update( running_device *device, bitmap_t *bitmap, const rectangle *cliprect );
+void vic2_raster_interrupt_gen( device_t *device );
+UINT32 vic2_video_update( device_t *device, bitmap_t *bitmap, const rectangle *cliprect );
 
 
-extern void vic2_set_rastering(running_device *device, int onoff);
-extern void vic2_lightpen_write(running_device *device, int level);
+extern void vic2_set_rastering(device_t *device, int onoff);
+extern void vic2_lightpen_write(device_t *device, int level);
 
 
 

@@ -19,7 +19,7 @@ public:
 	UINT8 segment;
 
 	/* devices */
-	running_device *cassette;
+	device_t *cassette;
 };
 
 #endif

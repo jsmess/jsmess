@@ -55,8 +55,8 @@
 struct _ldplayer_data
 {
 	/* low-level emulation data */
-	running_device *cpu;					/* CPU index of the Z80 */
-	running_device *ctc;					/* CTC device */
+	device_t *cpu;					/* CPU index of the Z80 */
+	device_t *ctc;					/* CTC device */
 	timer_device *		multitimer;			/* multi-jump timer device */
 
 	/* communication status */
@@ -98,7 +98,7 @@ static TIMER_CALLBACK( vsync_off );
 static TIMER_CALLBACK( vbi_data_fetch );
 static TIMER_DEVICE_CALLBACK( multijump_timer );
 
-static void ctc_interrupt(running_device *device, int state);
+static void ctc_interrupt(device_t *device, int state);
 
 static WRITE8_HANDLER( decoder_display_port_w );
 static READ8_HANDLER( decoder_display_port_r );
@@ -167,15 +167,15 @@ static const z80_daisy_config daisy_chain[] =
 
 
 static MACHINE_CONFIG_FRAGMENT( ldv1000 )
-	MDRV_CPU_ADD("ldv1000", Z80, XTAL_5MHz/2)
-	MDRV_CPU_CONFIG(daisy_chain)
-	MDRV_CPU_PROGRAM_MAP(ldv1000_map)
-	MDRV_CPU_IO_MAP(ldv1000_portmap)
+	MCFG_CPU_ADD("ldv1000", Z80, XTAL_5MHz/2)
+	MCFG_CPU_CONFIG(daisy_chain)
+	MCFG_CPU_PROGRAM_MAP(ldv1000_map)
+	MCFG_CPU_IO_MAP(ldv1000_portmap)
 
-	MDRV_Z80CTC_ADD("ldvctc", XTAL_5MHz/2 /* same as "ldv1000" */, ctcintf)
-	MDRV_PPI8255_ADD("ldvppi0", ppi0intf)
-	MDRV_PPI8255_ADD("ldvppi1", ppi1intf)
-	MDRV_TIMER_ADD("multitimer", multijump_timer)
+	MCFG_Z80CTC_ADD("ldvctc", XTAL_5MHz/2 /* same as "ldv1000" */, ctcintf)
+	MCFG_PPI8255_ADD("ldvppi0", ppi0intf)
+	MCFG_PPI8255_ADD("ldvppi1", ppi1intf)
+	MCFG_TIMER_ADD("multitimer", multijump_timer)
 MACHINE_CONFIG_END
 
 

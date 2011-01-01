@@ -157,8 +157,8 @@ static READ8_DEVICE_HANDLER(mac_via2_in_a);
 static READ8_DEVICE_HANDLER(mac_via2_in_b);
 static WRITE8_DEVICE_HANDLER(mac_via2_out_a);
 static WRITE8_DEVICE_HANDLER(mac_via2_out_b);
-static void mac_via_irq(running_device *device, int state);
-static void mac_via2_irq(running_device *device, int state);
+static void mac_via_irq(device_t *device, int state);
+static void mac_via2_irq(device_t *device, int state);
 static offs_t mac_dasm_override(device_t &device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, int options);
 
 const via6522_interface mac_via6522_intf =
@@ -201,7 +201,7 @@ int mac_state::has_adb()
 }
 
 // handle disk enable lines
-void mac_fdc_set_enable_lines(running_device *device, int enable_mask)
+void mac_fdc_set_enable_lines(device_t *device, int enable_mask)
 {
 	mac_state *mac = device->machine->driver_data<mac_state>();
 
@@ -323,7 +323,7 @@ void mac_state::set_via2_interrupt(int value)
 	this->field_interrupts();
 }
 
-void mac_asc_irq(running_device *device, int state)
+void mac_asc_irq(device_t *device, int state)
 {
 	mac_state *mac = device->machine->driver_data<mac_state>();
 
@@ -395,8 +395,8 @@ void mac_state::v8_resize()
 	if (is_rom)
 	{
 		/* ROM mirror */
-		memory_size = memory_region_length(machine, "bootrom");
-		memory_data = memory_region(machine, "bootrom");
+		memory_size = machine->region("bootrom")->bytes();
+		memory_data = machine->region("bootrom")->base();
 		is_rom = TRUE;
 	}
 	else
@@ -473,8 +473,8 @@ void mac_state::set_memory_overlay(int overlay)
 		if (overlay)
 		{
 			/* ROM mirror */
-			memory_size = memory_region_length(machine, "bootrom");
-			memory_data = memory_region(machine, "bootrom");
+			memory_size = machine->region("bootrom")->bytes();
+			memory_data = machine->region("bootrom")->base();
 			is_rom = TRUE;
 		}
 		else
@@ -970,7 +970,7 @@ Note:  Asserting the DACK signal applies only to write operations to
 READ16_MEMBER ( mac_state::macplus_scsi_r )
 {
 	int reg = (offset>>3) & 0xf;
-	running_device *ncr = space.machine->device("ncr5380");
+	device_t *ncr = space.machine->device("ncr5380");
 
 //  logerror("macplus_scsi_r: offset %x mask %x\n", offset, mem_mask);
 
@@ -984,7 +984,7 @@ READ16_MEMBER ( mac_state::macplus_scsi_r )
 
 READ32_MEMBER (mac_state::macii_scsi_drq_r)
 {
-	running_device *ncr = space.machine->device("ncr5380");
+	device_t *ncr = space.machine->device("ncr5380");
 
 	switch (mem_mask)
 	{
@@ -1006,7 +1006,7 @@ READ32_MEMBER (mac_state::macii_scsi_drq_r)
 
 WRITE32_MEMBER (mac_state::macii_scsi_drq_w)
 {
-	running_device *ncr = space.machine->device("ncr5380");
+	device_t *ncr = space.machine->device("ncr5380");
 
 	switch (mem_mask)
 	{
@@ -1035,7 +1035,7 @@ WRITE32_MEMBER (mac_state::macii_scsi_drq_w)
 WRITE16_MEMBER ( mac_state::macplus_scsi_w )
 {
 	int reg = (offset>>3) & 0xf;
-	running_device *ncr = space.machine->device("ncr5380");
+	device_t *ncr = space.machine->device("ncr5380");
 
 //  logerror("macplus_scsi_w: data %x offset %x mask %x\n", data, offset, mem_mask);
 
@@ -1050,7 +1050,7 @@ WRITE16_MEMBER ( mac_state::macplus_scsi_w )
 WRITE16_MEMBER ( mac_state::macii_scsi_w )
 {
 	int reg = (offset>>3) & 0xf;
-	running_device *ncr = space.machine->device("ncr5380");
+	device_t *ncr = space.machine->device("ncr5380");
 
 //  logerror("macplus_scsi_w: data %x offset %x mask %x (PC=%x)\n", data, offset, mem_mask, cpu_get_pc(space->cpu));
 
@@ -1079,7 +1079,7 @@ void mac_scsi_irq(running_machine *machine, int state)
  * Serial Communications Controller
  * *************************************************************************/
 
-void mac_scc_irq(running_device *device, int status)
+void mac_scc_irq(device_t *device, int status)
 {
 	mac_state *mac = device->machine->driver_data<mac_state>();
 
@@ -1090,7 +1090,7 @@ void mac_scc_irq(running_device *device, int status)
 
 void mac_state::scc_mouse_irq(int x, int y)
 {
-	running_device *scc = machine->device("scc");
+	device_t *scc = machine->device("scc");
 	if (x && y)
 	{
 		if (last_was_x)
@@ -1116,7 +1116,7 @@ void mac_state::scc_mouse_irq(int x, int y)
 
 READ16_MEMBER ( mac_state::mac_scc_r )
 {
-	running_device *scc = space.machine->device("scc");
+	device_t *scc = space.machine->device("scc");
 	UINT16 result;
 
 	result = scc8530_r(scc, offset);
@@ -1127,13 +1127,13 @@ READ16_MEMBER ( mac_state::mac_scc_r )
 
 WRITE16_MEMBER ( mac_state::mac_scc_w )
 {
-	running_device *scc = space.machine->device("scc");
+	device_t *scc = space.machine->device("scc");
 	scc8530_w(scc, offset, (UINT8) data);
 }
 
 WRITE16_MEMBER ( mac_state::mac_scc_2_w )
 {
-	running_device *scc = space.machine->device("scc");
+	device_t *scc = space.machine->device("scc");
 	UINT8 wdata = data>>8;
 	scc8530_w(scc, offset, wdata);
 }
@@ -1485,7 +1485,7 @@ READ16_MEMBER ( mac_state::mac_iwm_r )
      */
 
 	UINT16 result = 0;
-	running_device *fdc = space.machine->device("fdc");
+	device_t *fdc = space.machine->device("fdc");
 
 	result = applefdc_r(fdc, (offset >> 8));
 
@@ -1497,7 +1497,7 @@ READ16_MEMBER ( mac_state::mac_iwm_r )
 
 WRITE16_MEMBER ( mac_state::mac_iwm_w )
 {
-	running_device *fdc = space.machine->device("fdc");
+	device_t *fdc = space.machine->device("fdc");
 
 	if (LOG_MAC_IWM)
 		printf("mac_iwm_w: offset=0x%08x data=0x%04x mask %04x (PC=%x)\n", offset, data, mem_mask, cpu_get_pc(space.cpu));
@@ -2739,8 +2739,8 @@ static READ8_DEVICE_HANDLER(mac_via_in_b)
 
 static WRITE8_DEVICE_HANDLER(mac_via_out_a)
 {
-	running_device *sound = device->machine->device("custom");
-	running_device *fdc = device->machine->device("fdc");
+	device_t *sound = device->machine->device("custom");
+	device_t *fdc = device->machine->device("fdc");
 	mac_state *mac = device->machine->driver_data<mac_state>();
 
 //  printf("VIA1 OUT A: %02x (PC %x)\n", data, cpu_get_pc(device->machine->device("maincpu")));
@@ -2783,7 +2783,7 @@ static WRITE8_DEVICE_HANDLER(mac_via_out_a)
 
 static WRITE8_DEVICE_HANDLER(mac_via_out_b)
 {
-	running_device *sound = device->machine->device("custom");
+	device_t *sound = device->machine->device("custom");
 	int new_rtc_rTCClk;
 	mac_state *mac = device->machine->driver_data<mac_state>();
 
@@ -2791,7 +2791,7 @@ static WRITE8_DEVICE_HANDLER(mac_via_out_b)
 
 	if (mac->m_model >= MODEL_MAC_PORTABLE && mac->m_model <= MODEL_MAC_PB100)
 	{
-		running_device *fdc = device->machine->device("fdc");
+		device_t *fdc = device->machine->device("fdc");
 
 		sony_set_sel_line(fdc,(data & 0x20) >> 5);
 		mac->m_drive_select = ((data & 0x10) >> 4);
@@ -2893,7 +2893,7 @@ static WRITE8_DEVICE_HANDLER(mac_via_out_b)
 	}
 }
 
-static void mac_via_irq(running_device *device, int state)
+static void mac_via_irq(device_t *device, int state)
 {
 	mac_state *mac = device->machine->driver_data<mac_state>();
 
@@ -2931,7 +2931,7 @@ WRITE16_MEMBER ( mac_state::mac_via_w )
  * VIA 2 (on Mac IIs and PowerMacs)
  * *************************************************************************/
 
-static void mac_via2_irq(running_device *device, int state)
+static void mac_via2_irq(device_t *device, int state)
 {
 	mac_state *mac = device->machine->driver_data<mac_state>();
 	mac->set_via2_interrupt(state);
@@ -3212,7 +3212,7 @@ static void mac_driver_init(running_machine *machine, model_t model)
 
 		/* set up ROM at 0x400000-0x43ffff (-0x5fffff for mac 128k/512k/512ke) */
 		mac_install_memory(machine, 0x400000, (model >= MODEL_MAC_PLUS) ? 0x43ffff : 0x5fffff,
-			memory_region_length(machine, "bootrom"), memory_region(machine, "bootrom"), TRUE, "bank3");
+			machine->region("bootrom")->bytes(), machine->region("bootrom")->base(), TRUE, "bank3");
 	}
 
 	mac->m_overlay = -1;
@@ -3266,7 +3266,7 @@ MAC_DRIVER_INIT(macpb100, MODEL_MAC_PB100)
 // make the appletalk init fail instead of hanging on the II FDHD/IIx/IIcx/SE30 ROM
 static void patch_appletalk_iix(running_machine *machine)
 {
-	UINT32 *ROM = (UINT32 *)memory_region(machine, "bootrom");
+	UINT32 *ROM = (UINT32 *)machine->region("bootrom")->base();
 
 	ROM[0x2cc94/4] = 0x6bbe709e;	// bmi 82cc54 moveq #-$62, d0
 	ROM[0x370c/4] = 0x4e714e71;	// nop nop - disable ROM checksum

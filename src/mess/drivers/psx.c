@@ -83,7 +83,7 @@ static void psxexe_conv32( UINT32 *p_uint32 )
 		( p_uint8[ 3 ] << 24 );
 }
 
-static int load_psxexe( running_device *cpu, unsigned char *p_n_file, int n_len )
+static int load_psxexe( device_t *cpu, unsigned char *p_n_file, int n_len )
 {
 	psx_state *state = cpu->machine->driver_data<psx_state>();
 	struct PSXEXE_HEADER
@@ -176,7 +176,7 @@ static int load_psxexe( running_device *cpu, unsigned char *p_n_file, int n_len 
 	return 0;
 }
 
-static void cpe_set_register( running_device *cpu, int n_reg, int n_value )
+static void cpe_set_register( device_t *cpu, int n_reg, int n_value )
 {
 	if( n_reg < 0x80 && ( n_reg % 4 ) == 0 )
 	{
@@ -219,7 +219,7 @@ static void cpe_set_register( running_device *cpu, int n_reg, int n_value )
 	}
 }
 
-static int load_cpe( running_device *cpu, unsigned char *p_n_file, int n_len )
+static int load_cpe( device_t *cpu, unsigned char *p_n_file, int n_len )
 {
 	psx_state *state = cpu->machine->driver_data<psx_state>();
 	if( n_len >= 4 &&
@@ -354,7 +354,7 @@ static int load_cpe( running_device *cpu, unsigned char *p_n_file, int n_len )
 	return 0;
 }
 
-static int load_psf( running_device *cpu, unsigned char *p_n_file, int n_len )
+static int load_psf( device_t *cpu, unsigned char *p_n_file, int n_len )
 {
 	int n_return;
 	unsigned long n_crc;
@@ -427,7 +427,7 @@ DIRECT_UPDATE_HANDLER( psx_setopbase )
 	psx1_state *state = machine->driver_data<psx1_state>();
 	if( address == 0x80030000 )
 	{
-		running_device *cpu = machine->device("maincpu");
+		device_t *cpu = machine->device("maincpu");
 
 		cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(psx_default, *machine));
 		
@@ -1031,7 +1031,7 @@ ADDRESS_MAP_END
 static MACHINE_RESET( psx )
 {
 	psx1_state *state = machine->driver_data<psx1_state>();
-	running_device *cdrom_dev = machine->device("cdrom");
+	device_t *cdrom_dev = machine->device("cdrom");
 	if( cdrom_dev )
 	{
 		state->cdrom = mess_cd_get_cdrom_file(cdrom_dev);
@@ -1088,7 +1088,7 @@ static INPUT_PORTS_START( psx )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_PLAYER(2) PORT_NAME("P2 L2")
 INPUT_PORTS_END
 
-static void spu_irq(running_device *device, UINT32 data)
+static void spu_irq(device_t *device, UINT32 data)
 {
 	psx_irq_set(device->machine, data);
 }
@@ -1102,72 +1102,72 @@ static const psx_spu_interface psxspu_interface =
 
 static MACHINE_CONFIG_START( psxntsc, psx1_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD( "maincpu", PSXCPU, XTAL_67_7376MHz )
-	MDRV_CPU_PROGRAM_MAP( psx_map)
-	MDRV_CPU_VBLANK_INT("screen", psx_vblank)
+	MCFG_CPU_ADD( "maincpu", PSXCPU, XTAL_67_7376MHz )
+	MCFG_CPU_PROGRAM_MAP( psx_map)
+	MCFG_CPU_VBLANK_INT("screen", psx_vblank)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE( 60 )
-	MDRV_SCREEN_VBLANK_TIME(0)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE( 60 )
+	MCFG_SCREEN_VBLANK_TIME(0)
 
-	MDRV_MACHINE_RESET( psx )
+	MCFG_MACHINE_RESET( psx )
 
 	/* video hardware */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE( 1024, 512 )
-	MDRV_SCREEN_VISIBLE_AREA( 0, 639, 0, 479 )
-	MDRV_PALETTE_LENGTH( 65536 )
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE( 1024, 512 )
+	MCFG_SCREEN_VISIBLE_AREA( 0, 639, 0, 479 )
+	MCFG_PALETTE_LENGTH( 65536 )
 
-	MDRV_PALETTE_INIT( psx )
-	MDRV_VIDEO_START( psx_type2 )
-	MDRV_VIDEO_UPDATE( psx )
+	MCFG_PALETTE_INIT( psx )
+	MCFG_VIDEO_START( psx_type2 )
+	MCFG_VIDEO_UPDATE( psx )
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MDRV_SOUND_ADD( "psxspu", PSXSPU, 0 )
-	MDRV_SOUND_CONFIG( psxspu_interface )
-	MDRV_SOUND_ROUTE( 0, "lspeaker", 1.00 )
-	MDRV_SOUND_ROUTE( 1, "rspeaker", 1.00 )
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SOUND_ADD( "psxspu", PSXSPU, 0 )
+	MCFG_SOUND_CONFIG( psxspu_interface )
+	MCFG_SOUND_ROUTE( 0, "lspeaker", 1.00 )
+	MCFG_SOUND_ROUTE( 1, "rspeaker", 1.00 )
 
 	/* quickload */
-	MDRV_QUICKLOAD_ADD("quickload", psx_exe_load, "cpe,exe,psf,psx", 0)
+	MCFG_QUICKLOAD_ADD("quickload", psx_exe_load, "cpe,exe,psf,psx", 0)
 
-	MDRV_CDROM_ADD("cdrom")
+	MCFG_CDROM_ADD("cdrom")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( psxpal, psx1_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD( "maincpu", PSXCPU, XTAL_67_7376MHz )
-	MDRV_CPU_PROGRAM_MAP( psx_map)
-	MDRV_CPU_VBLANK_INT("screen", psx_vblank)
+	MCFG_CPU_ADD( "maincpu", PSXCPU, XTAL_67_7376MHz )
+	MCFG_CPU_PROGRAM_MAP( psx_map)
+	MCFG_CPU_VBLANK_INT("screen", psx_vblank)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE( 50 )
-	MDRV_SCREEN_VBLANK_TIME(0)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE( 50 )
+	MCFG_SCREEN_VBLANK_TIME(0)
 
-	MDRV_MACHINE_RESET( psx )
+	MCFG_MACHINE_RESET( psx )
 
 	/* video hardware */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE( 1024, 512 )
-	MDRV_SCREEN_VISIBLE_AREA( 0, 639, 0, 511 )
-	MDRV_PALETTE_LENGTH( 65536 )
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE( 1024, 512 )
+	MCFG_SCREEN_VISIBLE_AREA( 0, 639, 0, 511 )
+	MCFG_PALETTE_LENGTH( 65536 )
 
-	MDRV_PALETTE_INIT( psx )
-	MDRV_VIDEO_START( psx_type2 )
-	MDRV_VIDEO_UPDATE( psx )
+	MCFG_PALETTE_INIT( psx )
+	MCFG_VIDEO_START( psx_type2 )
+	MCFG_VIDEO_UPDATE( psx )
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MDRV_SOUND_ADD( "psxspu", PSXSPU, 0 )
-	MDRV_SOUND_CONFIG( psxspu_interface )
-	MDRV_SOUND_ROUTE( 0, "lspeaker", 1.00 )
-	MDRV_SOUND_ROUTE( 1, "rspeaker", 1.00 )
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SOUND_ADD( "psxspu", PSXSPU, 0 )
+	MCFG_SOUND_CONFIG( psxspu_interface )
+	MCFG_SOUND_ROUTE( 0, "lspeaker", 1.00 )
+	MCFG_SOUND_ROUTE( 1, "rspeaker", 1.00 )
 
 	/* quickload */
-	MDRV_QUICKLOAD_ADD("quickload", psx_exe_load, "cpe,exe,psf,psx", 0)
+	MCFG_QUICKLOAD_ADD("quickload", psx_exe_load, "cpe,exe,psf,psx", 0)
 
-	MDRV_CDROM_ADD("cdrom")
+	MCFG_CDROM_ADD("cdrom")
 MACHINE_CONFIG_END
 
 ROM_START( psj )

@@ -131,7 +131,7 @@ WRITE8_HANDLER( pc88sr_outport_40 )
 	/* bit 3,4,6 not implemented */
 	/* bit 7 incorrect behavior */
 	pc88_state *state = space->machine->driver_data<pc88_state>();
-	running_device *speaker = space->machine->device("beep");
+	device_t *speaker = space->machine->device("beep");
 
 	/* printer */
 	centronics_strobe_w(state->centronics, BIT(data, 0));
@@ -505,7 +505,7 @@ static void pc8801_init_bank(running_machine *machine, int hireso)
 	state->no4throm2=0;
 	state->port71_save=0xff;
 	state->port32_save=0x80;
-	state->mainROM = memory_region(machine, "maincpu");
+	state->mainROM = machine->region("maincpu")->base();
 	state->mainRAM = auto_alloc_array_clear(machine, UINT8, 0x10000);
 
 	state->extmem_ctrl[0]=state->extmem_ctrl[1]=0;
@@ -656,7 +656,7 @@ static void fix_V1V2(pc88_state *state)
 static void pc88sr_ch_reset(running_machine *machine, int hireso)
 {
 	pc88_state *state = machine->driver_data<pc88_state>();
-	running_device *speaker = machine->device("beep");
+	device_t *speaker = machine->device("beep");
 	int a;
 
 	// old code was allocating/freeing a smaller region depending on the "MEM" config,
@@ -784,7 +784,7 @@ static void pc88sr_init_fmsound(running_machine *machine)
   state->FM_IRQ_save=0;
 }
 
-void pc88sr_sound_interupt(running_device *device, int irq)
+void pc88sr_sound_interupt(device_t *device, int irq)
 {
 	pc88_state *state = device->machine->driver_data<pc88_state>();
 	state->FM_IRQ_save=irq;
@@ -800,7 +800,7 @@ READ8_HANDLER( pc88_kanji_r )
 {
 	pc88_state *state = space->machine->driver_data<pc88_state>();
 
-	UINT8 *kanji = memory_region(space->machine, "gfx1");
+	UINT8 *kanji = space->machine->region("gfx1")->base();
 	UINT32 addr = (state->kanji << 1) | !offset;
 
 	return kanji[addr];
@@ -826,7 +826,7 @@ READ8_HANDLER( pc88_kanji2_r )
 {
 	pc88_state *state = space->machine->driver_data<pc88_state>();
 
-	UINT8 *kanji2 = memory_region(space->machine, "kanji2");
+	UINT8 *kanji2 = space->machine->region("kanji2")->base();
 	UINT32 addr = (state->kanji2 << 1) | !offset;
 
 	return kanji2[addr];

@@ -232,7 +232,7 @@ static WRITE8_HANDLER ( cshooter_c700_w )
 
 static WRITE8_HANDLER ( bank_w )
 {
-	memory_set_bankptr(space->machine, "bank1",&memory_region(space->machine, "user1")[0x4000*((data>>4)&3)]);
+	memory_set_bankptr(space->machine, "bank1",&space->machine->region("user1")->base()[0x4000*((data>>4)&3)]);
 }
 
 
@@ -417,28 +417,28 @@ static GFXDECODE_START( cshooter )
 GFXDECODE_END
 
 static MACHINE_CONFIG_START( cshooter, driver_device )
-	MDRV_CPU_ADD("maincpu", Z80,XTAL_12MHz/2)		 /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(cshooter_map)
-	MDRV_CPU_VBLANK_INT_HACK(cshooter_interrupt,2)
+	MCFG_CPU_ADD("maincpu", Z80,XTAL_12MHz/2)		 /* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(cshooter_map)
+	MCFG_CPU_VBLANK_INT_HACK(cshooter_interrupt,2)
 
-	MDRV_CPU_ADD("audiocpu", Z80,XTAL_14_31818MHz/4)		 /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(sound_map)
+	MCFG_CPU_ADD("audiocpu", Z80,XTAL_14_31818MHz/4)		 /* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(sound_map)
 
-	MDRV_MACHINE_RESET(cshooter)
+	MCFG_MACHINE_RESET(cshooter)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(256, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-1-16)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(256, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-1-16)
 
-	MDRV_GFXDECODE(cshooter)
-	MDRV_PALETTE_LENGTH(0x1000)
+	MCFG_GFXDECODE(cshooter)
+	MCFG_PALETTE_LENGTH(0x1000)
 
-	MDRV_VIDEO_START(cshooter)
-	MDRV_VIDEO_UPDATE(cshooter)
+	MCFG_VIDEO_START(cshooter)
+	MCFG_VIDEO_UPDATE(cshooter)
 
 	/* sound hardware */
 	/* YM2151 and ym3931 seibu custom cpu running at XTAL_14_31818MHz/4 */
@@ -446,28 +446,28 @@ static MACHINE_CONFIG_START( cshooter, driver_device )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( airraid, driver_device )
-	MDRV_CPU_ADD("maincpu", Z80,XTAL_12MHz/2)		 /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(airraid_map)
-	MDRV_CPU_VBLANK_INT_HACK(cshooter_interrupt,2)
+	MCFG_CPU_ADD("maincpu", Z80,XTAL_12MHz/2)		 /* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(airraid_map)
+	MCFG_CPU_VBLANK_INT_HACK(cshooter_interrupt,2)
 
-	MDRV_CPU_ADD("audiocpu", Z80,XTAL_14_31818MHz/4)		 /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(sound_map2)
+	MCFG_CPU_ADD("audiocpu", Z80,XTAL_14_31818MHz/4)		 /* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(sound_map2)
 
-	MDRV_MACHINE_RESET(cshooter)
+	MCFG_MACHINE_RESET(cshooter)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(256, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-1-16)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(256, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-1-16)
 
-	MDRV_GFXDECODE(cshooter)
-	MDRV_PALETTE_LENGTH(0x1000)
+	MCFG_GFXDECODE(cshooter)
+	MCFG_PALETTE_LENGTH(0x1000)
 
-	MDRV_VIDEO_START(cshooter)
-	MDRV_VIDEO_UPDATE(cshooter)
+	MCFG_VIDEO_START(cshooter)
+	MCFG_VIDEO_UPDATE(cshooter)
 
 	/* sound hardware */
 	/* YM2151 and ym3931 seibu custom cpu running at XTAL_14_31818MHz/4 */
@@ -651,19 +651,19 @@ ROM_END
 static DRIVER_INIT( cshooter )
 {
 	/* temp so it boots */
-	UINT8 *rom = memory_region(machine, "maincpu");
+	UINT8 *rom = machine->region("maincpu")->base();
 
 	rom[0xa2] = 0x00;
 	rom[0xa3] = 0x00;
 	rom[0xa4] = 0x00;
-	memory_set_bankptr(machine, "bank1",&memory_region(machine, "user1")[0]);
+	memory_set_bankptr(machine, "bank1",&machine->region("user1")->base()[0]);
 }
 
 static DRIVER_INIT( cshootere )
 {
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	int A;
-	UINT8 *rom = memory_region(machine, "maincpu");
+	UINT8 *rom = machine->region("maincpu")->base();
 	UINT8 *decrypt = auto_alloc_array(machine, UINT8, 0x8000);
 
 	space->set_decrypted_region(0x0000, 0x7fff, decrypt);
@@ -693,7 +693,7 @@ static DRIVER_INIT( cshootere )
 			rom[A] = BITSWAP8(rom[A],7,6,1,4,3,2,5,0);
 	}
 
-	memory_set_bankptr(machine, "bank1",&memory_region(machine, "user1")[0]);
+	memory_set_bankptr(machine, "bank1",&machine->region("user1")->base()[0]);
 	seibu_sound_decrypt(machine,"audiocpu",0x2000);
 }
 

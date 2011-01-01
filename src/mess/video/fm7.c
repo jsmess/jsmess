@@ -1113,7 +1113,7 @@ READ8_HANDLER( fm77av_video_flags_r )
 WRITE8_HANDLER( fm77av_video_flags_w )
 {
 	fm7_state *state = space->machine->driver_data<fm7_state>();
-	UINT8* RAM = memory_region(space->machine,"subsyscg");
+	UINT8* RAM = space->machine->region("subsyscg")->base();
 
 	state->video.cgrom = data & 0x03;
 	memory_set_bankptr(space->machine,"bank20",RAM+(state->video.cgrom*0x800));
@@ -1178,7 +1178,7 @@ WRITE8_HANDLER( fm77av_sub_modestatus_w )
 WRITE8_HANDLER( fm77av_sub_bank_w )
 {
 	fm7_state *state = space->machine->driver_data<fm7_state>();
-//  UINT8* RAM = memory_region(space->machine,"sub");
+//  UINT8* RAM = space->machine->region("sub")->base();
 	UINT8* ROM;
 
 	if((data & 0x03) == (state->sb_prev & 0x03))
@@ -1188,25 +1188,25 @@ WRITE8_HANDLER( fm77av_sub_bank_w )
 	switch (data & 0x03)
 	{
 		case 0x00:  // Type C, 640x200 (as used on the FM-7)
-			ROM = memory_region(space->machine,"subsys_c");
+			ROM = space->machine->region("subsys_c")->base();
 		//  memory_set_bankptr(space->machine,20,ROM);
 			memory_set_bankptr(space->machine,"bank21",ROM+0x800);
 			logerror("VID: Sub ROM Type C selected\n");
 			break;
 		case 0x01:  // Type A, 640x200
-			ROM = memory_region(space->machine,"subsys_a");
+			ROM = space->machine->region("subsys_a")->base();
 		//  memory_set_bankptr(space->machine,20,RAM+0xd800);
 			memory_set_bankptr(space->machine,"bank21",ROM);
 			logerror("VID: Sub ROM Type A selected\n");
 			break;
 		case 0x02:  // Type B, 320x200
-			ROM = memory_region(space->machine,"subsys_b");
+			ROM = space->machine->region("subsys_b")->base();
 		//  memory_set_bankptr(space->machine,20,RAM+0xd800);
 			memory_set_bankptr(space->machine,"bank21",ROM);
 			logerror("VID: Sub ROM Type B selected\n");
 			break;
 		case 0x03:  // CG Font?
-			ROM = memory_region(space->machine,"subsyscg");
+			ROM = space->machine->region("subsyscg")->base();
 		//  memory_set_bankptr(space->machine,20,RAM+0xd800);
 			memory_set_bankptr(space->machine,"bank21",ROM);
 			logerror("VID: Sub ROM CG selected\n");
@@ -1407,7 +1407,7 @@ TIMER_CALLBACK( fm77av_vsync )
 READ8_HANDLER( fm7_sub_ram_ports_banked_r )
 {
 	fm7_state *state = space->machine->driver_data<fm7_state>();
-	UINT8* RAM = memory_region(space->machine,"maincpu");
+	UINT8* RAM = space->machine->region("maincpu")->base();
 	UINT8* ROM;
 
 	if(!state->video.sub_halt)
@@ -1421,7 +1421,7 @@ READ8_HANDLER( fm7_sub_ram_ports_banked_r )
 		return RAM[0x1d000+offset];
 	if(offset > 0x800) // CGROM
 	{
-		ROM = memory_region(space->machine,"subsyscg");
+		ROM = space->machine->region("subsyscg")->base();
 		return ROM[(state->video.cgrom*0x800)+(offset-0x800)];
 	}
 
@@ -1460,7 +1460,7 @@ READ8_HANDLER( fm7_sub_ram_ports_banked_r )
 WRITE8_HANDLER( fm7_sub_ram_ports_banked_w )
 {
 	fm7_state *state = space->machine->driver_data<fm7_state>();
-	UINT8* RAM = memory_region(space->machine,"maincpu");
+	UINT8* RAM = space->machine->region("maincpu")->base();
 
 	if(!state->video.sub_halt)
 		return;
@@ -1517,7 +1517,7 @@ WRITE8_HANDLER( fm7_sub_ram_ports_banked_w )
 READ8_HANDLER( fm7_console_ram_banked_r )
 {
 	fm7_state *state = space->machine->driver_data<fm7_state>();
-	UINT8* RAM = memory_region(space->machine,"maincpu");
+	UINT8* RAM = space->machine->region("maincpu")->base();
 
 	if(!state->video.sub_halt)
 		return 0xff;
@@ -1528,7 +1528,7 @@ READ8_HANDLER( fm7_console_ram_banked_r )
 WRITE8_HANDLER( fm7_console_ram_banked_w )
 {
 	fm7_state *state = space->machine->driver_data<fm7_state>();
-	UINT8* RAM = memory_region(space->machine,"maincpu");
+	UINT8* RAM = space->machine->region("maincpu")->base();
 
 	if(!state->video.sub_halt)
 		return;

@@ -53,7 +53,7 @@ struct _gomoku_sound_state
 	UINT8 soundregs2[0x20];
 };
 
-INLINE gomoku_sound_state *get_safe_token( running_device *device )
+INLINE gomoku_sound_state *get_safe_token( device_t *device )
 {
 	assert(device != NULL);
 	assert(device->type() == GOMOKU);
@@ -63,7 +63,7 @@ INLINE gomoku_sound_state *get_safe_token( running_device *device )
 
 
 /* build a table to divide by the number of voices; gain is specified as gain*16 */
-static void make_mixer_table(running_device *device, int voices, int gain)
+static void make_mixer_table(device_t *device, int voices, int gain)
 {
 	gomoku_sound_state *state = get_safe_token(device);
 	int count = voices * 128;
@@ -193,7 +193,7 @@ static DEVICE_START( gomoku_sound )
 	state->num_voices = MAX_VOICES;
 	state->last_channel = state->channel_list + state->num_voices;
 
-	state->sound_rom = memory_region(machine, "gomoku");
+	state->sound_rom = machine->region("gomoku")->base();
 
 	/* start with sound enabled, many games don't have a sound enable register */
 	state->sound_enable = 1;

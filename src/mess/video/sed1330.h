@@ -19,9 +19,9 @@
 
 DECLARE_LEGACY_DEVICE(SED1330, sed1330);
 
-#define MDRV_SED1330_ADD(_tag, _clock, _config) \
-	MDRV_DEVICE_ADD(_tag, SED1330, _clock) \
-	MDRV_DEVICE_CONFIG(_config)
+#define MCFG_SED1330_ADD(_tag, _clock, _config) \
+	MCFG_DEVICE_ADD(_tag, SED1330, _clock) \
+	MCFG_DEVICE_CONFIG(_config)
 
 #define SED1330_INTERFACE(name) \
 	const sed1330_interface (name) =
@@ -51,6 +51,6 @@ READ8_DEVICE_HANDLER( sed1330_data_r );
 WRITE8_DEVICE_HANDLER( sed1330_data_w );
 
 /* screen update */
-void sed1330_update(running_device *device, bitmap_t *bitmap, const rectangle *cliprect);
+void sed1330_update(device_t *device, bitmap_t *bitmap, const rectangle *cliprect);
 
 #endif

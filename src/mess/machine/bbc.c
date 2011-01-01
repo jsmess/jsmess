@@ -55,14 +55,14 @@ Model A memory handling functions
 /* for the model A just address the 4 on board ROM sockets */
 WRITE8_HANDLER ( bbc_page_selecta_w )
 {
-	memory_set_bankptr(space->machine,"bank4",memory_region(space->machine, "user1")+((data&0x03)<<14));
+	memory_set_bankptr(space->machine,"bank4",space->machine->region("user1")->base()+((data&0x03)<<14));
 }
 
 
 WRITE8_HANDLER ( bbc_memorya1_w )
 {
 	bbc_state *state = space->machine->driver_data<bbc_state>();
-	memory_region(space->machine, "maincpu")[offset]=data;
+	space->machine->region("maincpu")->base()[offset]=data;
 
 	// this array is set so that the video emulator know which addresses to redraw
 	state->vidmem[offset]=1;
@@ -80,11 +80,11 @@ WRITE8_HANDLER ( bbc_page_selectb_w )
 	state->rombank=data&0x0f;
 	if (state->rombank!=1)
 	{
-		memory_set_bankptr(space->machine, "bank4", memory_region(space->machine, "user1") + (state->rombank << 14));
+		memory_set_bankptr(space->machine, "bank4", space->machine->region("user1")->base() + (state->rombank << 14));
 	}
 	else
 	{
-		memory_set_bankptr(space->machine, "bank4", memory_region(space->machine, "user2") + ((state->DFSType) << 14));
+		memory_set_bankptr(space->machine, "bank4", space->machine->region("user2")->base() + ((state->DFSType) << 14));
 	}
 }
 
@@ -94,13 +94,13 @@ WRITE8_HANDLER ( bbc_memoryb3_w )
 	bbc_state *state = space->machine->driver_data<bbc_state>();
 	if (state->RAMSize)
 	{
-		memory_region(space->machine, "maincpu")[offset + 0x4000] = data;
+		space->machine->region("maincpu")->base()[offset + 0x4000] = data;
 		// this array is set so that the video emulator know which addresses to redraw
 		state->vidmem[offset + 0x4000] = 1;
 	}
 	else
 	{
-		memory_region(space->machine, "maincpu")[offset] = data;
+		space->machine->region("maincpu")->base()[offset] = data;
 		state->vidmem[offset] = 1;
 	}
 
@@ -122,14 +122,14 @@ WRITE8_HANDLER ( bbc_memoryb4_w )
 	if (state->rombank == 1)
 	{
 		// special DFS case for Acorn DFS E00 Hack that can write to the DFS RAM Bank;
-		if (state->DFSType == 3) memory_region(space->machine, "user2")[((state->DFSType) << 14) + offset] = data;
+		if (state->DFSType == 3) space->machine->region("user2")->base()[((state->DFSType) << 14) + offset] = data;
 	} else
 	{
 		switch (state->SWRAMtype)
 		{
-			case 1:	if (bbc_SWRAMtype1[state->userport]) memory_region(space->machine, "user1")[(state->userport << 14) + offset] = data;
-			case 2:	if (bbc_SWRAMtype2[state->rombank])  memory_region(space->machine, "user1")[(state->rombank << 14) + offset] = data;
-			case 3:	if (bbc_SWRAMtype3[state->rombank])  memory_region(space->machine, "user1")[(state->rombank << 14) + offset] = data;
+			case 1:	if (bbc_SWRAMtype1[state->userport]) space->machine->region("user1")->base()[(state->userport << 14) + offset] = data;
+			case 2:	if (bbc_SWRAMtype2[state->rombank])  space->machine->region("user1")->base()[(state->rombank << 14) + offset] = data;
+			case 3:	if (bbc_SWRAMtype3[state->rombank])  space->machine->region("user1")->base()[(state->rombank << 14) + offset] = data;
 		}
 	}
 }
@@ -167,12 +167,12 @@ WRITE8_HANDLER ( bbc_page_selectbp_w )
 		if (state->pagedRAM)
 		{
 			/* if paged ram then set 8000 to afff to read from the ram 8000 to afff */
-			memory_set_bankptr(space->machine, "bank4", memory_region(space->machine, "maincpu") + 0x8000);
+			memory_set_bankptr(space->machine, "bank4", space->machine->region("maincpu")->base() + 0x8000);
 		}
 		else
 		{
 			/* if paged rom then set the rom to be read from 8000 to afff */
-			memory_set_bankptr(space->machine, "bank4", memory_region(space->machine, "user1") + (state->rombank << 14));
+			memory_set_bankptr(space->machine, "bank4", space->machine->region("user1")->base() + (state->rombank << 14));
 		};
 
 		/* set the rom to be read from b000 to bfff */
@@ -184,7 +184,7 @@ WRITE8_HANDLER ( bbc_page_selectbp_w )
 		state->vdusel=(data>>7)&0x01;
 		bbcbp_setvideoshadow(space->machine, state->vdusel);
 		//need to make the video display do a full screen refresh for the new memory area
-		memory_set_bankptr(space->machine, "bank2", memory_region(space->machine, "maincpu")+0x3000);
+		memory_set_bankptr(space->machine, "bank2", space->machine->region("maincpu")->base()+0x3000);
 	}
 }
 
@@ -196,7 +196,7 @@ WRITE8_HANDLER ( bbc_page_selectbp_w )
 WRITE8_HANDLER ( bbc_memorybp1_w )
 {
 	bbc_state *state = space->machine->driver_data<bbc_state>();
-	memory_region(space->machine, "maincpu")[offset]=data;
+	space->machine->region("maincpu")->base()[offset]=data;
 
 	// this array is set so that the video emulator know which addresses to redraw
 	state->vidmem[offset]=1;
@@ -219,7 +219,7 @@ WRITE8_HANDLER ( bbc_memorybp1_w )
 DIRECT_UPDATE_HANDLER( bbcbp_direct_handler )
 {
 	bbc_state *state = machine->driver_data<bbc_state>();
-	UINT8 *ram = memory_region(machine, "maincpu");
+	UINT8 *ram = machine->region("maincpu")->base();
 	if (state->vdusel == 0)
 	{
 		// not in shadow ram mode so just read normal ram
@@ -245,7 +245,7 @@ DIRECT_UPDATE_HANDLER( bbcbp_direct_handler )
 WRITE8_HANDLER ( bbc_memorybp2_w )
 {
 	bbc_state *state = space->machine->driver_data<bbc_state>();
-	UINT8 *ram = memory_region(space->machine, "maincpu");
+	UINT8 *ram = space->machine->region("maincpu")->base();
 	if (state->vdusel==0)
 	{
 		// not in shadow ram mode so just write to normal ram
@@ -277,7 +277,7 @@ WRITE8_HANDLER ( bbc_memorybp4_w )
 	bbc_state *state = space->machine->driver_data<bbc_state>();
 	if (state->pagedRAM)
 	{
-		memory_region(space->machine, "maincpu")[offset+0x8000]=data;
+		space->machine->region("maincpu")->base()[offset+0x8000]=data;
 	}
 }
 
@@ -298,13 +298,13 @@ WRITE8_HANDLER ( bbc_memorybp4_128_w )
 	bbc_state *state = space->machine->driver_data<bbc_state>();
 	if (state->pagedRAM)
 	{
-		memory_region(space->machine, "maincpu")[offset+0x8000]=data;
+		space->machine->region("maincpu")->base()[offset+0x8000]=data;
 	}
 	else
 	{
 		if (bbc_b_plus_sideways_ram_banks[state->rombank])
 		{
-			memory_region(space->machine, "user1")[offset+(state->rombank<<14)]=data;
+			space->machine->region("user1")->base()[offset+(state->rombank<<14)]=data;
 		}
 	}
 }
@@ -314,7 +314,7 @@ WRITE8_HANDLER ( bbc_memorybp6_128_w )
 	bbc_state *state = space->machine->driver_data<bbc_state>();
 	if (bbc_b_plus_sideways_ram_banks[state->rombank])
 	{
-		memory_region(space->machine, "user1")[offset+(state->rombank<<14)+0x3000]=data;
+		space->machine->region("user1")->base()[offset+(state->rombank<<14)+0x3000]=data;
 	}
 }
 
@@ -406,11 +406,11 @@ WRITE8_HANDLER ( bbcm_ACCCON_write )
 
 	if (state->ACCCON_Y)
 	{
-		memory_set_bankptr(space->machine, "bank7", memory_region(space->machine, "maincpu") + 0x9000);
+		memory_set_bankptr(space->machine, "bank7", space->machine->region("maincpu")->base() + 0x9000);
 	}
 	else
 	{
-		memory_set_bankptr(space->machine, "bank7", memory_region(space->machine, "user1") + 0x40000);
+		memory_set_bankptr(space->machine, "bank7", space->machine->region("user1")->base() + 0x40000);
 	}
 
 	bbcbp_setvideoshadow(space->machine, state->ACCCON_D);
@@ -418,11 +418,11 @@ WRITE8_HANDLER ( bbcm_ACCCON_write )
 
 	if (state->ACCCON_X)
 	{
-		memory_set_bankptr( space->machine, "bank2", memory_region( space->machine, "maincpu" ) + 0xb000 );
+		memory_set_bankptr( space->machine, "bank2", space->machine->region( "maincpu" )->base() + 0xb000 );
 	}
 	else
 	{
-		memory_set_bankptr( space->machine, "bank2", memory_region( space->machine, "maincpu" ) + 0x3000 );
+		memory_set_bankptr( space->machine, "bank2", space->machine->region( "maincpu" )->base() + 0x3000 );
 	}
 
 	/* ACCCON_TST controls paging of rom reads in the 0xFC00-0xFEFF reigon */
@@ -430,7 +430,7 @@ WRITE8_HANDLER ( bbcm_ACCCON_write )
 	/* if 1 the the ROM is paged in for reads but writes still go to I/O   */
 	if (state->ACCCON_TST)
 	{
-		memory_set_bankptr( space->machine, "bank8", memory_region(space->machine, "user1")+0x43c00);
+		memory_set_bankptr( space->machine, "bank8", space->machine->region("user1")->base()+0x43c00);
 		memory_install_read_bank(space, 0xFC00,0xFEFF,0,0,"bank8");
 	}
 	else
@@ -457,12 +457,12 @@ static WRITE8_HANDLER ( page_selectbm_w )
 
 	if (state->pagedRAM)
 	{
-		memory_set_bankptr(space->machine, "bank4", memory_region(space->machine, "maincpu") + 0x8000);
+		memory_set_bankptr(space->machine, "bank4", space->machine->region("maincpu")->base() + 0x8000);
 		memory_set_bank(space->machine, "bank5", state->rombank);
 	}
 	else
 	{
-		memory_set_bankptr(space->machine, "bank4", memory_region(space->machine, "user1") + ((state->rombank) << 14));
+		memory_set_bankptr(space->machine, "bank4", space->machine->region("user1")->base() + ((state->rombank) << 14));
 		memory_set_bank(space->machine, "bank5", state->rombank);
 	}
 }
@@ -472,7 +472,7 @@ static WRITE8_HANDLER ( page_selectbm_w )
 WRITE8_HANDLER ( bbc_memorybm1_w )
 {
 	bbc_state *state = space->machine->driver_data<bbc_state>();
-	memory_region(space->machine, "maincpu")[offset] = data;
+	space->machine->region("maincpu")->base()[offset] = data;
 	state->vidmem[offset] = 1;
 }
 
@@ -482,17 +482,17 @@ DIRECT_UPDATE_HANDLER( bbcm_direct_handler )
 	bbc_state *state = machine->driver_data<bbc_state>();
 	if (state->ACCCON_X)
 	{
-		memory_set_bankptr( machine, "bank2", memory_region( machine, "maincpu" ) + 0xb000 );
+		memory_set_bankptr( machine, "bank2", machine->region( "maincpu" )->base() + 0xb000 );
 	}
 	else
 	{
 		if (state->ACCCON_E && bbcm_vdudriverset(machine))
 		{
-			memory_set_bankptr( machine, "bank2", memory_region( machine, "maincpu" ) + 0xb000 );
+			memory_set_bankptr( machine, "bank2", machine->region( "maincpu" )->base() + 0xb000 );
 		}
 		else
 		{
-			memory_set_bankptr( machine, "bank2", memory_region( machine, "maincpu" ) + 0x3000 );
+			memory_set_bankptr( machine, "bank2", machine->region( "maincpu" )->base() + 0x3000 );
 		}
 	}
 
@@ -504,7 +504,7 @@ DIRECT_UPDATE_HANDLER( bbcm_direct_handler )
 WRITE8_HANDLER ( bbc_memorybm2_w )
 {
 	bbc_state *state = space->machine->driver_data<bbc_state>();
-	UINT8 *ram = memory_region(space->machine, "maincpu");
+	UINT8 *ram = space->machine->region("maincpu")->base();
 	if (state->ACCCON_X)
 	{
 		ram[offset + 0xb000] = data;
@@ -536,13 +536,13 @@ WRITE8_HANDLER ( bbc_memorybm4_w )
 	bbc_state *state = space->machine->driver_data<bbc_state>();
 	if (state->pagedRAM)
 	{
-		memory_region(space->machine, "maincpu")[offset+0x8000]=data;
+		space->machine->region("maincpu")->base()[offset+0x8000]=data;
 	}
 	else
 	{
 		if (bbc_master_sideways_ram_banks[state->rombank])
 		{
-			memory_region(space->machine, "user1")[offset+(state->rombank<<14)]=data;
+			space->machine->region("user1")->base()[offset+(state->rombank<<14)]=data;
 		}
 	}
 }
@@ -553,7 +553,7 @@ WRITE8_HANDLER ( bbc_memorybm5_w )
 	bbc_state *state = space->machine->driver_data<bbc_state>();
 	if (bbc_master_sideways_ram_banks[state->rombank])
 	{
-		memory_region(space->machine, "user1")[offset+(state->rombank<<14)+0x1000]=data;
+		space->machine->region("user1")->base()[offset+(state->rombank<<14)+0x1000]=data;
 	}
 }
 
@@ -563,7 +563,7 @@ WRITE8_HANDLER ( bbc_memorybm7_w )
 	bbc_state *state = space->machine->driver_data<bbc_state>();
 	if (state->ACCCON_Y)
 	{
-		memory_region(space->machine, "maincpu")[offset+0x9000]=data;
+		space->machine->region("maincpu")->base()[offset+0x9000]=data;
 	}
 }
 
@@ -599,7 +599,7 @@ long myo;
 	/* Now handled in bbcm_ACCCON_write PHS - 2008-10-11 */
 //  if ( state->ACCCON_TST )
 //  {
-//      return memory_region(space->machine, "user1")[offset+0x43c00];
+//      return space->machine->region("user1")->base()[offset+0x43c00];
 //  };
 
 	if ((offset>=0x000) && (offset<=0x0ff)) /* FRED */
@@ -622,7 +622,7 @@ long myo;
 		if ((myo>=0x00) && (myo<=0x07)) return bbc_6845_r(space, myo-0x00);		/* Video Controller */
 		if ((myo>=0x08) && (myo<=0x0f))
 		{
-			running_device *acia = space->machine->device("acia6850");
+			device_t *acia = space->machine->device("acia6850");
 
 			if ((myo - 0x08) & 1)
 				return acia6850_stat_r(acia, 0);
@@ -662,7 +662,7 @@ long myo;
 		if ((myo>=0x00) && (myo<=0x07)) bbc_6845_w(space, myo-0x00,data);			/* Video Controller */
 		if ((myo>=0x08) && (myo<=0x0f))
 		{
-			running_device *acia = space->machine->device("acia6850");
+			device_t *acia = space->machine->device("acia6850");
 
 			if ((myo - 0x08) & 1)
 				acia6850_ctrl_w(acia, 0, data);
@@ -1369,7 +1369,7 @@ static void MC6850_Receive_Clock(running_machine *machine, int new_clock)
 	bbc_state *state = machine->driver_data<bbc_state>();
 	if (!state->mc6850_clock && new_clock)
 	{
-		running_device *acia = machine->device("acia6850");
+		device_t *acia = machine->device("acia6850");
 		acia6850_tx_clock_in(acia);
 	}
 	state->mc6850_clock = new_clock;
@@ -1467,7 +1467,7 @@ WRITE8_HANDLER ( bbc_SerialULA_w )
 ***************************************/
 
 
-static void	bbc_i8271_interrupt(running_device *device, int state)
+static void	bbc_i8271_interrupt(device_t *device, int state)
 {
 	bbc_state *drvstate = device->machine->driver_data<bbc_state>();
 	/* I'm assuming that the nmi is edge triggered */
@@ -1501,7 +1501,7 @@ const i8271_interface bbc_i8271_interface=
 static READ8_HANDLER( bbc_i8271_read )
 {
 	int ret;
-	running_device *i8271 = space->machine->device("i8271");
+	device_t *i8271 = space->machine->device("i8271");
 	ret=0x0ff;
 	logerror("i8271 read %d  ",offset);
 	switch (offset)
@@ -1527,7 +1527,7 @@ static READ8_HANDLER( bbc_i8271_read )
 
 static WRITE8_HANDLER( bbc_i8271_write )
 {
-	running_device *i8271 = space->machine->device("i8271");
+	device_t *i8271 = space->machine->device("i8271");
 	logerror("i8271 write  %d  %d\n",offset,data);
 
 	switch (offset)
@@ -1649,7 +1649,7 @@ const wd17xx_interface bbc_wd17xx_interface =
 static WRITE8_HANDLER(bbc_wd177x_status_w)
 {
 	bbc_state *state = space->machine->driver_data<bbc_state>();
-	running_device *fdc = space->machine->device("wd177x");
+	device_t *fdc = space->machine->device("wd177x");
 	state->drive_control = data;
 
 	/* set drive */
@@ -1671,7 +1671,7 @@ static WRITE8_HANDLER(bbc_wd177x_status_w)
 READ8_HANDLER ( bbc_wd1770_read )
 {
 	int retval=0xff;
-	running_device *fdc = space->machine->device("wd177x");
+	device_t *fdc = space->machine->device("wd177x");
 	switch (offset)
 	{
 	case 4:
@@ -1696,7 +1696,7 @@ READ8_HANDLER ( bbc_wd1770_read )
 
 WRITE8_HANDLER ( bbc_wd1770_write )
 {
-	running_device *fdc = space->machine->device("wd177x");
+	device_t *fdc = space->machine->device("wd177x");
 	logerror("wd177x write: $%02X  $%02X\n", offset,data);
 	switch (offset)
 	{
@@ -1760,7 +1760,7 @@ AM_RANGE(0xfc00, 0xfdff) AM_READWRITE(bbc_opus_read     , bbc_opus_write    )
 static WRITE8_HANDLER( bbc_opus_status_w )
 {
 	bbc_state *state = space->machine->driver_data<bbc_state>();
-	running_device *fdc = space->machine->device("wd177x");
+	device_t *fdc = space->machine->device("wd177x");
 	state->drive_control = data;
 
 	/* set drive */
@@ -1780,7 +1780,7 @@ static WRITE8_HANDLER( bbc_opus_status_w )
 READ8_HANDLER( bbc_opus_read )
 {
 	bbc_state *state = space->machine->driver_data<bbc_state>();
-	running_device *fdc = space->machine->device("wd177x");
+	device_t *fdc = space->machine->device("wd177x");
 	logerror("wd177x read: $%02X\n", offset);
 
 	if (state->DFSType==6)
@@ -1802,7 +1802,7 @@ READ8_HANDLER( bbc_opus_read )
 		}
 		else
 		{
-			return memory_region(space->machine, "disks")[offset + (state->opusbank << 8)];
+			return space->machine->region("disks")->base()[offset + (state->opusbank << 8)];
 		}
 	}
 	return 0xff;
@@ -1811,7 +1811,7 @@ READ8_HANDLER( bbc_opus_read )
 WRITE8_HANDLER (bbc_opus_write)
 {
 	bbc_state *state = space->machine->driver_data<bbc_state>();
-	running_device *fdc = space->machine->device("wd177x");
+	device_t *fdc = space->machine->device("wd177x");
 	logerror("wd177x write: $%02X  $%02X\n", offset,data);
 
 	if (state->DFSType==6)
@@ -1845,7 +1845,7 @@ WRITE8_HANDLER (bbc_opus_write)
 		}
 		else
 		{
-			memory_region(space->machine, "disks")[offset + (state->opusbank << 8)] = data;
+			space->machine->region("disks")->base()[offset + (state->opusbank << 8)] = data;
 		}
 	}
 }
@@ -1859,7 +1859,7 @@ BBC MASTER DISC SUPPORT
 READ8_HANDLER ( bbcm_wd1770_read )
 {
 	int retval=0xff;
-	running_device *fdc = space->machine->device("wd177x");
+	device_t *fdc = space->machine->device("wd177x");
 	switch (offset)
 	{
 	case 0:
@@ -1883,7 +1883,7 @@ READ8_HANDLER ( bbcm_wd1770_read )
 
 WRITE8_HANDLER ( bbcm_wd1770_write )
 {
-	running_device *fdc = space->machine->device("wd177x");
+	device_t *fdc = space->machine->device("wd177x");
 	//logerror("wd177x write: $%02X  $%02X\n", offset,data);
 	switch (offset)
 	{
@@ -1914,7 +1914,7 @@ READ8_HANDLER ( bbcm_wd1770l_read )
 WRITE8_HANDLER ( bbcm_wd1770l_write )
 {
 	bbc_state *state = space->machine->driver_data<bbc_state>();
-	running_device *fdc = space->machine->device("wd177x");
+	device_t *fdc = space->machine->device("wd177x");
 	state->drive_control = data;
 
 	/* set drive */
@@ -1994,7 +1994,7 @@ WRITE8_HANDLER ( bbc_disc_w )
 ***************************************/
 DEVICE_IMAGE_LOAD( bbcb_cart )
 {
-	UINT8 *mem = memory_region (image.device().machine, "user1");
+	UINT8 *mem = image.device().machine->region("user1")->base();
 	int size, read_;
 	int addr = 0;
 	int index = 0;
@@ -2071,13 +2071,13 @@ MACHINE_START( bbca )
 MACHINE_RESET( bbca )
 {
 	bbc_state *state = machine->driver_data<bbc_state>();
-	UINT8 *ram = memory_region(machine, "maincpu");
+	UINT8 *ram = machine->region("maincpu")->base();
 	state->RAMSize = 1;
 	memory_set_bankptr(machine, "bank1",ram);
 	memory_set_bankptr(machine, "bank3",ram);
 
-	memory_set_bankptr(machine, "bank4",memory_region(machine, "user1"));          /* bank 4 is the paged ROMs     from 8000 to bfff */
-	memory_set_bankptr(machine, "bank7",memory_region(machine, "user1")+0x10000);  /* bank 7 points at the OS rom  from c000 to ffff */
+	memory_set_bankptr(machine, "bank4",machine->region("user1")->base());          /* bank 4 is the paged ROMs     from 8000 to bfff */
+	memory_set_bankptr(machine, "bank7",machine->region("user1")->base()+0x10000);  /* bank 7 points at the OS rom  from c000 to ffff */
 
 	bbcb_IC32_initialise(state);
 }
@@ -2106,7 +2106,7 @@ MACHINE_START( bbcb )
 MACHINE_RESET( bbcb )
 {
 	bbc_state *state = machine->driver_data<bbc_state>();
-	UINT8 *ram = memory_region(machine, "maincpu");
+	UINT8 *ram = machine->region("maincpu")->base();
 	state->DFSType=    (input_port_read(machine, "BBCCONFIG") >> 0) & 0x07;
 	state->SWRAMtype = (input_port_read(machine, "BBCCONFIG") >> 3) & 0x03;
 	state->RAMSize=    (input_port_read(machine, "BBCCONFIG") >> 5) & 0x01;
@@ -2125,8 +2125,8 @@ MACHINE_RESET( bbcb )
 		bbc_set_video_memory_lookups(machine, 16);
 	}
 
-	memory_set_bankptr(machine, "bank4", memory_region(machine, "user1"));          /* bank 4 is the paged ROMs     from 8000 to bfff */
-	memory_set_bankptr(machine, "bank7", memory_region(machine, "user1") + 0x40000);  /* bank 7 points at the OS rom  from c000 to ffff */
+	memory_set_bankptr(machine, "bank4", machine->region("user1")->base());          /* bank 4 is the paged ROMs     from 8000 to bfff */
+	memory_set_bankptr(machine, "bank7", machine->region("user1")->base() + 0x40000);  /* bank 7 points at the OS rom  from c000 to ffff */
 
 	bbcb_IC32_initialise(state);
 
@@ -2150,17 +2150,17 @@ MACHINE_START( bbcbp )
 	cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(bbcbp_direct_handler, *machine));
 
 	/* bank 6 is the paged ROMs     from b000 to bfff */
-	memory_configure_bank(machine, "bank6", 0, 16, memory_region(machine, "user1") + 0x3000, 1<<14);
+	memory_configure_bank(machine, "bank6", 0, 16, machine->region("user1")->base() + 0x3000, 1<<14);
 }
 
 MACHINE_RESET( bbcbp )
 {
 	bbc_state *state = machine->driver_data<bbc_state>();
-	memory_set_bankptr(machine, "bank1",memory_region(machine, "maincpu"));
-	memory_set_bankptr(machine, "bank2",memory_region(machine, "maincpu")+0x03000);  /* bank 2 screen/shadow ram     from 3000 to 7fff */
-	memory_set_bankptr(machine, "bank4",memory_region(machine, "user1"));         /* bank 4 is paged ROM or RAM   from 8000 to afff */
+	memory_set_bankptr(machine, "bank1",machine->region("maincpu")->base());
+	memory_set_bankptr(machine, "bank2",machine->region("maincpu")->base()+0x03000);  /* bank 2 screen/shadow ram     from 3000 to 7fff */
+	memory_set_bankptr(machine, "bank4",machine->region("user1")->base());         /* bank 4 is paged ROM or RAM   from 8000 to afff */
 	memory_set_bank(machine, "bank6", 0);
-	memory_set_bankptr(machine, "bank7",memory_region(machine, "user1")+0x40000); /* bank 7 points at the OS rom  from c000 to ffff */
+	memory_set_bankptr(machine, "bank7",machine->region("user1")->base()+0x40000); /* bank 7 points at the OS rom  from c000 to ffff */
 
 	bbcb_IC32_initialise(state);
 
@@ -2178,21 +2178,21 @@ MACHINE_START( bbcm )
 	cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(bbcm_direct_handler, *machine));
 
 	/* bank 5 is the paged ROMs     from 9000 to bfff */
-	memory_configure_bank(machine, "bank5", 0, 16, memory_region(machine, "user1")+0x01000, 1<<14);
+	memory_configure_bank(machine, "bank5", 0, 16, machine->region("user1")->base()+0x01000, 1<<14);
 
 	/* Set ROM/IO bank to point to rom */
-	memory_set_bankptr( machine, "bank8", memory_region(machine, "user1")+0x43c00);
+	memory_set_bankptr( machine, "bank8", machine->region("user1")->base()+0x43c00);
 	memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xFC00, 0xFEFF, 0, 0, "bank8");
 }
 
 MACHINE_RESET( bbcm )
 {
 	bbc_state *state = machine->driver_data<bbc_state>();
-	memory_set_bankptr(machine, "bank1", memory_region(machine, "maincpu"));			/* bank 1 regular lower ram     from 0000 to 2fff */
-	memory_set_bankptr(machine, "bank2", memory_region(machine, "maincpu") + 0x3000);	/* bank 2 screen/shadow ram     from 3000 to 7fff */
-	memory_set_bankptr(machine, "bank4", memory_region(machine, "user1"));         /* bank 4 is paged ROM or RAM   from 8000 to 8fff */
+	memory_set_bankptr(machine, "bank1", machine->region("maincpu")->base());			/* bank 1 regular lower ram     from 0000 to 2fff */
+	memory_set_bankptr(machine, "bank2", machine->region("maincpu")->base() + 0x3000);	/* bank 2 screen/shadow ram     from 3000 to 7fff */
+	memory_set_bankptr(machine, "bank4", machine->region("user1")->base());         /* bank 4 is paged ROM or RAM   from 8000 to 8fff */
 	memory_set_bank(machine, "bank5", 0);
-	memory_set_bankptr(machine, "bank7", memory_region(machine, "user1") + 0x40000); /* bank 6 OS rom of RAM          from c000 to dfff */
+	memory_set_bankptr(machine, "bank7", machine->region("user1")->base() + 0x40000); /* bank 6 OS rom of RAM          from c000 to dfff */
 
 	bbcb_IC32_initialise(state);
 

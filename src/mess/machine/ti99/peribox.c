@@ -150,7 +150,7 @@ static const floppy_config ti99_4_floppy_config =
 
 typedef struct _ti99_peb_slot
 {
-	running_device		*card;
+	device_t		*card;
 	const ti99_peb_card	*intf;
 } ti99_peb_slot;
 
@@ -171,13 +171,13 @@ typedef struct _ti99_peb_state
 
 } ti99_peb_state;
 
-INLINE ti99_peb_state *get_safe_token(running_device *device)
+INLINE ti99_peb_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	return (ti99_peb_state *)downcast<legacy_device_base *>(device)->token();
 }
 
-INLINE const ti99_peb_config *get_config(running_device *device)
+INLINE const ti99_peb_config *get_config(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == PBOX4 || device->type() == PBOX4A || device->type() == PBOX8 || device->type() == PBOXEV || device->type() == PBOXSG || device->type() == PBOXGEN);
@@ -228,7 +228,7 @@ static WRITE_LINE_DEVICE_HANDLER( ready )
 
 /*
     Declares the callbacks above that are called from the cards. This instance
-    is passed to the cards with MDRV_PBOXCARD_ADD and must be handled as a
+    is passed to the cards with MCFG_PBOXCARD_ADD and must be handled as a
     static_config.
 */
 const peb_callback_if peb_callback =
@@ -246,7 +246,7 @@ const peb_callback_if peb_callback =
     other cards are stillborn.
     Returns TRUE when the card could be mounted.
 */
-int mount_card(running_device *device, running_device *cardptr, const ti99_peb_card *cardintf, int slotindex)
+int mount_card(device_t *device, device_t *cardptr, const ti99_peb_card *cardintf, int slotindex)
 {
 	ti99_peb_state *peb = get_safe_token(device);
 	if ((slotindex > 0) &&  (slotindex < MAXSLOTS))
@@ -269,7 +269,7 @@ int mount_card(running_device *device, running_device *cardptr, const ti99_peb_c
 	return FALSE;
 }
 
-void unmount_card(running_device *device, int slotindex)
+void unmount_card(device_t *device, int slotindex)
 {
 	ti99_peb_state *peb = get_safe_token(device);
 	peb->slot[slotindex].card = NULL;
@@ -416,10 +416,10 @@ static DEVICE_RESET( ti99_peb )
 	for (int i=0; i < MAXSLOTS; i++) unmount_card(device, i);
 }
 
-#define MDRV_PBOXCARD_ADD( _tag, _type, _slot ) \
-	MDRV_DEVICE_ADD(_tag, _type, 0) \
-	MDRV_DEVICE_CONFIG_DATA32( ti99_pebcard_config, slot, _slot ) \
-	MDRV_DEVICE_CONFIG( peb_callback )
+#define MCFG_PBOXCARD_ADD( _tag, _type, _slot ) \
+	MCFG_DEVICE_ADD(_tag, _type, 0) \
+	MCFG_DEVICE_CONFIG_DATA32( ti99_pebcard_config, slot, _slot ) \
+	MCFG_DEVICE_CONFIG( peb_callback )
 
 /*
     We're emulating a "super box" with more than 8 slots. The original
@@ -432,105 +432,105 @@ static DEVICE_RESET( ti99_peb )
     in parallel anyway. The config switch will determine which one to use.
     Future works:
     // WHTech SCSI controller
-    // MDRV_PBOXCARD_ADD("SCSI", 4, scsi_intf)
+    // MCFG_PBOXCARD_ADD("SCSI", 4, scsi_intf)
 
     // Horizon Ramdisk
-    // MDRV_PBOXCARD_ADD("HRD", 10, ramdisk_intf)
+    // MCFG_PBOXCARD_ADD("HRD", 10, ramdisk_intf)
 */
 
 static MACHINE_CONFIG_FRAGMENT( ti99_peb )
-	MDRV_PBOXCARD_ADD( "mem_ti32k", 	TI32KMEM, 1 )
-	MDRV_PBOXCARD_ADD( "mem_sams1m",	SAMSMEM,  1 )
-	MDRV_PBOXCARD_ADD( "mem_myarc512",	MYARCMEM, 1 )
-	MDRV_PBOXCARD_ADD( "speech",		TISPEECH, 2 )
-	MDRV_PBOXCARD_ADD( "usbsmart",		USBSMART, 3 )
-	MDRV_PBOXCARD_ADD( "ide",			TNIDE,	  4 )
-	MDRV_PBOXCARD_ADD( "hsgpl", 		HSGPL,    5 )
-	MDRV_PBOXCARD_ADD( "rs232_card",	TIRS232,  7 )
-	MDRV_PBOXCARD_ADD( "ti_fdc",		TIFDC,	  8 )
-	MDRV_PBOXCARD_ADD( "hfdc",			HFDC,	  8 )
-	MDRV_PBOXCARD_ADD( "bwg",			BWG,	  8 )
+	MCFG_PBOXCARD_ADD( "mem_ti32k", 	TI32KMEM, 1 )
+	MCFG_PBOXCARD_ADD( "mem_sams1m",	SAMSMEM,  1 )
+	MCFG_PBOXCARD_ADD( "mem_myarc512",	MYARCMEM, 1 )
+	MCFG_PBOXCARD_ADD( "speech",		TISPEECH, 2 )
+	MCFG_PBOXCARD_ADD( "usbsmart",		USBSMART, 3 )
+	MCFG_PBOXCARD_ADD( "ide",			TNIDE,	  4 )
+	MCFG_PBOXCARD_ADD( "hsgpl", 		HSGPL,    5 )
+	MCFG_PBOXCARD_ADD( "rs232_card",	TIRS232,  7 )
+	MCFG_PBOXCARD_ADD( "ti_fdc",		TIFDC,	  8 )
+	MCFG_PBOXCARD_ADD( "hfdc",			HFDC,	  8 )
+	MCFG_PBOXCARD_ADD( "bwg",			BWG,	  8 )
 
-	MDRV_FLOPPY_4_DRIVES_ADD(ti99_4_floppy_config)
-	MDRV_MFMHD_3_DRIVES_ADD()
+	MCFG_FLOPPY_4_DRIVES_ADD(ti99_4_floppy_config)
+	MCFG_MFMHD_3_DRIVES_ADD()
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_FRAGMENT( ti994a_peb )
-	MDRV_PBOXCARD_ADD( "mem_ti32k", 	TI32KMEM, 1 )
-	MDRV_PBOXCARD_ADD( "mem_sams1m",	SAMSMEM,  1 )
-	MDRV_PBOXCARD_ADD( "mem_myarc512",	MYARCMEM, 1 )
-	MDRV_PBOXCARD_ADD( "speech",		TISPEECH, 2 )
-	MDRV_PBOXCARD_ADD( "usbsmart",		USBSMART, 3 )
-	MDRV_PBOXCARD_ADD( "ide",			TNIDE,	  4 )
-	MDRV_PBOXCARD_ADD( "hsgpl", 		HSGPL,    5 )
-	MDRV_PBOXCARD_ADD( "p_code_card",	PCODEN,   6 )
-	MDRV_PBOXCARD_ADD( "rs232_card",	TIRS232,  7 )
-	MDRV_PBOXCARD_ADD( "ti_fdc",		TIFDC,	  8 )
-	MDRV_PBOXCARD_ADD( "hfdc",			HFDC,	  8 )
-	MDRV_PBOXCARD_ADD( "bwg",			BWG,	  8 )
+	MCFG_PBOXCARD_ADD( "mem_ti32k", 	TI32KMEM, 1 )
+	MCFG_PBOXCARD_ADD( "mem_sams1m",	SAMSMEM,  1 )
+	MCFG_PBOXCARD_ADD( "mem_myarc512",	MYARCMEM, 1 )
+	MCFG_PBOXCARD_ADD( "speech",		TISPEECH, 2 )
+	MCFG_PBOXCARD_ADD( "usbsmart",		USBSMART, 3 )
+	MCFG_PBOXCARD_ADD( "ide",			TNIDE,	  4 )
+	MCFG_PBOXCARD_ADD( "hsgpl", 		HSGPL,    5 )
+	MCFG_PBOXCARD_ADD( "p_code_card",	PCODEN,   6 )
+	MCFG_PBOXCARD_ADD( "rs232_card",	TIRS232,  7 )
+	MCFG_PBOXCARD_ADD( "ti_fdc",		TIFDC,	  8 )
+	MCFG_PBOXCARD_ADD( "hfdc",			HFDC,	  8 )
+	MCFG_PBOXCARD_ADD( "bwg",			BWG,	  8 )
 
-	MDRV_FLOPPY_4_DRIVES_ADD(ti99_4_floppy_config)
-	MDRV_MFMHD_3_DRIVES_ADD()
+	MCFG_FLOPPY_4_DRIVES_ADD(ti99_4_floppy_config)
+	MCFG_MFMHD_3_DRIVES_ADD()
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_FRAGMENT( ti99ev_peb )
-	MDRV_PBOXCARD_ADD( "mem_ti32k", 	TI32KMEM, 1 )
-	MDRV_PBOXCARD_ADD( "mem_sams1m",	SAMSMEM,  1 )
-	MDRV_PBOXCARD_ADD( "mem_myarc512",	MYARCMEM, 1 )
-	MDRV_PBOXCARD_ADD( "speech",		TISPEECH, 2 )
-	MDRV_PBOXCARD_ADD( "usbsmart",		USBSMART, 3 )
-	MDRV_PBOXCARD_ADD( "ide",			TNIDE,	  4 )
-	MDRV_PBOXCARD_ADD( "hsgpl", 		HSGPL,    5 )
-	MDRV_PBOXCARD_ADD( "p_code_card",	PCODEN,   6 )
-	MDRV_PBOXCARD_ADD( "rs232_card",	TIRS232,  7 )
-	MDRV_PBOXCARD_ADD( "ti_fdc",		TIFDC,	  8 )
-	MDRV_PBOXCARD_ADD( "hfdc",			HFDC,	  8 )
-	MDRV_PBOXCARD_ADD( "bwg",			BWG,	  8 )
-	MDRV_PBOXCARD_ADD( "evpc",			EVPC,	  9 )
+	MCFG_PBOXCARD_ADD( "mem_ti32k", 	TI32KMEM, 1 )
+	MCFG_PBOXCARD_ADD( "mem_sams1m",	SAMSMEM,  1 )
+	MCFG_PBOXCARD_ADD( "mem_myarc512",	MYARCMEM, 1 )
+	MCFG_PBOXCARD_ADD( "speech",		TISPEECH, 2 )
+	MCFG_PBOXCARD_ADD( "usbsmart",		USBSMART, 3 )
+	MCFG_PBOXCARD_ADD( "ide",			TNIDE,	  4 )
+	MCFG_PBOXCARD_ADD( "hsgpl", 		HSGPL,    5 )
+	MCFG_PBOXCARD_ADD( "p_code_card",	PCODEN,   6 )
+	MCFG_PBOXCARD_ADD( "rs232_card",	TIRS232,  7 )
+	MCFG_PBOXCARD_ADD( "ti_fdc",		TIFDC,	  8 )
+	MCFG_PBOXCARD_ADD( "hfdc",			HFDC,	  8 )
+	MCFG_PBOXCARD_ADD( "bwg",			BWG,	  8 )
+	MCFG_PBOXCARD_ADD( "evpc",			EVPC,	  9 )
 
-	MDRV_FLOPPY_4_DRIVES_ADD(ti99_4_floppy_config)
-	MDRV_MFMHD_3_DRIVES_ADD()
+	MCFG_FLOPPY_4_DRIVES_ADD(ti99_4_floppy_config)
+	MCFG_MFMHD_3_DRIVES_ADD()
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_FRAGMENT( ti998_peb )
-	MDRV_PBOXCARD_ADD( "usbsmart",		USBSMART, 1 )
-	MDRV_PBOXCARD_ADD( "ide",			TNIDE,	  2 )
-	MDRV_PBOXCARD_ADD( "rs232_card",	TIRS232,  3 )
-	MDRV_PBOXCARD_ADD( "ti_fdc",		TIFDC,	  8 )
-	MDRV_PBOXCARD_ADD( "hfdc",			HFDC,	  8 )
-	MDRV_PBOXCARD_ADD( "bwg",			BWG,	  8 )
+	MCFG_PBOXCARD_ADD( "usbsmart",		USBSMART, 1 )
+	MCFG_PBOXCARD_ADD( "ide",			TNIDE,	  2 )
+	MCFG_PBOXCARD_ADD( "rs232_card",	TIRS232,  3 )
+	MCFG_PBOXCARD_ADD( "ti_fdc",		TIFDC,	  8 )
+	MCFG_PBOXCARD_ADD( "hfdc",			HFDC,	  8 )
+	MCFG_PBOXCARD_ADD( "bwg",			BWG,	  8 )
 
-	MDRV_FLOPPY_4_DRIVES_ADD(ti99_4_floppy_config)
-	MDRV_MFMHD_3_DRIVES_ADD()
+	MCFG_FLOPPY_4_DRIVES_ADD(ti99_4_floppy_config)
+	MCFG_MFMHD_3_DRIVES_ADD()
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_FRAGMENT( ti99sg_peb )
-	MDRV_PBOXCARD_ADD( "speech",		TISPEECH, 1 )
-	MDRV_PBOXCARD_ADD( "usbsmart",		USBSMART, 2 )
-	MDRV_PBOXCARD_ADD( "ide",			TNIDE,	  3 )
-	MDRV_PBOXCARD_ADD( "hsgpl", 		HSGPL,    4 )
-	MDRV_PBOXCARD_ADD( "rs232_card",	TIRS232,  6 )
-	MDRV_PBOXCARD_ADD( "ti_fdc",		TIFDC,	  7 )
-	MDRV_PBOXCARD_ADD( "hfdc",			HFDC,	  7 )
-	MDRV_PBOXCARD_ADD( "bwg",			BWG,	  7 )
-	MDRV_PBOXCARD_ADD( "evpc",			EVPC,	  8 )
+	MCFG_PBOXCARD_ADD( "speech",		TISPEECH, 1 )
+	MCFG_PBOXCARD_ADD( "usbsmart",		USBSMART, 2 )
+	MCFG_PBOXCARD_ADD( "ide",			TNIDE,	  3 )
+	MCFG_PBOXCARD_ADD( "hsgpl", 		HSGPL,    4 )
+	MCFG_PBOXCARD_ADD( "rs232_card",	TIRS232,  6 )
+	MCFG_PBOXCARD_ADD( "ti_fdc",		TIFDC,	  7 )
+	MCFG_PBOXCARD_ADD( "hfdc",			HFDC,	  7 )
+	MCFG_PBOXCARD_ADD( "bwg",			BWG,	  7 )
+	MCFG_PBOXCARD_ADD( "evpc",			EVPC,	  8 )
 
-	MDRV_FLOPPY_4_DRIVES_ADD(ti99_4_floppy_config)
-	MDRV_MFMHD_3_DRIVES_ADD()
+	MCFG_FLOPPY_4_DRIVES_ADD(ti99_4_floppy_config)
+	MCFG_MFMHD_3_DRIVES_ADD()
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_FRAGMENT( geneve_peb )
-	MDRV_PBOXCARD_ADD( "speech",		TISPEECH, 1 )
-	MDRV_PBOXCARD_ADD( "usbsmart",		USBSMART, 2 )
-	MDRV_PBOXCARD_ADD( "ide",			TNIDE,	  3 )
-	MDRV_PBOXCARD_ADD( "rs232_card",	TIRS232,  6 )
-	MDRV_PBOXCARD_ADD( "ti_fdc",		TIFDC,	  7 )
-	MDRV_PBOXCARD_ADD( "hfdc",			HFDC,	  7 )
-	MDRV_PBOXCARD_ADD( "bwg",			BWG,	  7 )
+	MCFG_PBOXCARD_ADD( "speech",		TISPEECH, 1 )
+	MCFG_PBOXCARD_ADD( "usbsmart",		USBSMART, 2 )
+	MCFG_PBOXCARD_ADD( "ide",			TNIDE,	  3 )
+	MCFG_PBOXCARD_ADD( "rs232_card",	TIRS232,  6 )
+	MCFG_PBOXCARD_ADD( "ti_fdc",		TIFDC,	  7 )
+	MCFG_PBOXCARD_ADD( "hfdc",			HFDC,	  7 )
+	MCFG_PBOXCARD_ADD( "bwg",			BWG,	  7 )
 
-	MDRV_FLOPPY_4_DRIVES_ADD(ti99_4_floppy_config)
-	MDRV_MFMHD_3_DRIVES_ADD()
+	MCFG_FLOPPY_4_DRIVES_ADD(ti99_4_floppy_config)
+	MCFG_MFMHD_3_DRIVES_ADD()
 MACHINE_CONFIG_END
 
 static const char DEVTEMPLATE_SOURCE[] = __FILE__;

@@ -60,9 +60,9 @@ READ_LINE_DEVICE_HANDLER( centronics_fault_r );
 
 DECLARE_LEGACY_DEVICE(CENTRONICS, centronics);
 
-#define MDRV_CENTRONICS_ADD(_tag, _intf) \
-	MDRV_DEVICE_ADD(_tag, CENTRONICS, 0) \
-	MDRV_DEVICE_CONFIG(_intf)
+#define MCFG_CENTRONICS_ADD(_tag, _intf) \
+	MCFG_DEVICE_ADD(_tag, CENTRONICS, 0) \
+	MCFG_DEVICE_CONFIG(_intf)
 
 
 /***************************************************************************

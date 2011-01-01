@@ -26,7 +26,7 @@ public:
 
 static WRITE8_HANDLER( mccpm_f0_w )
 {
-	running_device *terminal = space->machine->device("terminal");
+	device_t *terminal = space->machine->device("terminal");
 
 	terminal_write(terminal, 0, data);
 }
@@ -59,7 +59,7 @@ INPUT_PORTS_END
 static MACHINE_RESET(mccpm)
 {
 	mccpm_state *state = machine->driver_data<mccpm_state>();
-	UINT8* bios = memory_region(machine, "maincpu");
+	UINT8* bios = machine->region("maincpu")->base();
 
 	memcpy(state->ram,bios, 0x1000);
 }
@@ -77,16 +77,16 @@ static GENERIC_TERMINAL_INTERFACE( mccpm_terminal_intf )
 
 static MACHINE_CONFIG_START( mccpm, mccpm_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz)
-	MDRV_CPU_PROGRAM_MAP(mccpm_mem)
-	MDRV_CPU_IO_MAP(mccpm_io)
+	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
+	MCFG_CPU_PROGRAM_MAP(mccpm_mem)
+	MCFG_CPU_IO_MAP(mccpm_io)
 
-	MDRV_MACHINE_RESET(mccpm)
+	MCFG_MACHINE_RESET(mccpm)
 
 	/* video hardware */
-	MDRV_FRAGMENT_ADD( generic_terminal )
+	MCFG_FRAGMENT_ADD( generic_terminal )
 
-	MDRV_GENERIC_TERMINAL_ADD("terminal", mccpm_terminal_intf)
+	MCFG_GENERIC_TERMINAL_ADD("terminal", mccpm_terminal_intf)
 MACHINE_CONFIG_END
 
 /* ROM definition */

@@ -73,7 +73,7 @@ DEVICE_IMAGE_LOAD( st2_cartslot_load )
 	for (int block = 0; block < (header.blocks - 1); block++)
 	{
 		UINT16 offset = header.page[block] << 8;
-		UINT8 *ptr = ((UINT8 *) memory_region(image.device().machine, CDP1802_TAG)) + offset;
+		UINT8 *ptr = ((UINT8 *) image.device().machine->region(CDP1802_TAG)->base()) + offset;
 
 		if (LOG) logerror("ST2 Reading block %u to %04x\n", block, offset);
 

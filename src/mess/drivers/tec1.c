@@ -59,7 +59,7 @@ public:
 	UINT8 kbd;
 	UINT8 segment;
 	UINT8 digit;
-	running_device *speaker;
+	device_t *speaker;
 	UINT8 kbd_row;
 };
 
@@ -258,20 +258,20 @@ INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( tec1, tec1_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, 500000)	/* speed can be varied between 250kHz and 2MHz */
-	MDRV_CPU_PROGRAM_MAP(tec1_map)
-	MDRV_CPU_IO_MAP(tec1_io)
+	MCFG_CPU_ADD("maincpu", Z80, 500000)	/* speed can be varied between 250kHz and 2MHz */
+	MCFG_CPU_PROGRAM_MAP(tec1_map)
+	MCFG_CPU_IO_MAP(tec1_io)
 
-	MDRV_MACHINE_START(tec1)
-	MDRV_MACHINE_RESET(tec1)
+	MCFG_MACHINE_START(tec1)
+	MCFG_MACHINE_RESET(tec1)
 
 	/* video hardware */
-	MDRV_DEFAULT_LAYOUT(layout_tec1)
+	MCFG_DEFAULT_LAYOUT(layout_tec1)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
 

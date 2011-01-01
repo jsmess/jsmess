@@ -58,7 +58,7 @@ public:
 		: driver_device(machine, config) { }
 
 	UINT32 port[9];
-	running_device *s3c2440;
+	device_t *s3c2440;
 };
 
 /*******************************************************************************
@@ -67,7 +67,7 @@ public:
 
 // I/O PORT
 
-static UINT32 s3c2440_gpio_port_r( running_device *device, int port)
+static UINT32 s3c2440_gpio_port_r( device_t *device, int port)
 {
 	gizmondo_state *gizmondo = device->machine->driver_data<gizmondo_state>();
 	UINT32 data = gizmondo->port[port];
@@ -107,7 +107,7 @@ static UINT32 s3c2440_gpio_port_r( running_device *device, int port)
 	return data;
 }
 
-static void s3c2440_gpio_port_w( running_device *device, int port, UINT32 data)
+static void s3c2440_gpio_port_w( device_t *device, int port, UINT32 data)
 {
 	gizmondo_state *gizmondo = device->machine->driver_data<gizmondo_state>();
 	gizmondo->port[port] = data;
@@ -185,31 +185,31 @@ static S3C2440_INTERFACE( gizmondo_s3c2440_intf )
 };
 
 static MACHINE_CONFIG_START( gizmondo, gizmondo_state )
-	MDRV_CPU_ADD("maincpu", ARM9, 40000000)
-	MDRV_CPU_PROGRAM_MAP(gizmondo_map)
+	MCFG_CPU_ADD("maincpu", ARM9, 40000000)
+	MCFG_CPU_PROGRAM_MAP(gizmondo_map)
 
-	MDRV_PALETTE_LENGTH(32768)
+	MCFG_PALETTE_LENGTH(32768)
 
-	MDRV_SCREEN_ADD("screen", LCD)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MDRV_SCREEN_SIZE(320, 240)
-	MDRV_SCREEN_VISIBLE_AREA(0, 320 - 1, 0, 240 - 1)
-	MDRV_DEFAULT_LAYOUT(layout_lcd)
+	MCFG_SCREEN_ADD("screen", LCD)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_SIZE(320, 240)
+	MCFG_SCREEN_VISIBLE_AREA(0, 320 - 1, 0, 240 - 1)
+	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
-	MDRV_VIDEO_START(gf4500)
-	MDRV_VIDEO_UPDATE(gf4500)
+	MCFG_VIDEO_START(gf4500)
+	MCFG_VIDEO_UPDATE(gf4500)
 
-	MDRV_MACHINE_START(gizmondo)
-	MDRV_MACHINE_RESET(gizmondo)
+	MCFG_MACHINE_START(gizmondo)
+	MCFG_MACHINE_RESET(gizmondo)
 
-	MDRV_S3C2440_ADD("s3c2440", 12000000, gizmondo_s3c2440_intf)
+	MCFG_S3C2440_ADD("s3c2440", 12000000, gizmondo_s3c2440_intf)
 
-	MDRV_DISKONCHIP_G3_ADD("diskonchip", 64)
+	MCFG_DISKONCHIP_G3_ADD("diskonchip", 64)
 
 #if 0
-	MDRV_QUICKLOAD_ADD("quickload", wince, "bin", 0)
+	MCFG_QUICKLOAD_ADD("quickload", wince, "bin", 0)
 #endif
 MACHINE_CONFIG_END
 

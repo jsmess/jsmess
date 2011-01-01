@@ -168,9 +168,9 @@ static MACHINE_START(prestige)
 {
 	UINT8 *ram = messram_get_ptr(machine->device("messram"));
 
-	memory_configure_bank(machine, "bank1", 0, 64, memory_region(machine, "maincpu"), 0x4000);
-	memory_configure_bank(machine, "bank2", 0, 64, memory_region(machine, "maincpu"), 0x4000);
-	memory_configure_bank(machine, "bank3", 0, 64, memory_region(machine, "maincpu"), 0x4000);
+	memory_configure_bank(machine, "bank1", 0, 64, machine->region("maincpu")->base(), 0x4000);
+	memory_configure_bank(machine, "bank2", 0, 64, machine->region("maincpu")->base(), 0x4000);
+	memory_configure_bank(machine, "bank3", 0, 64, machine->region("maincpu")->base(), 0x4000);
 	memory_configure_bank(machine, "bank3", 64, 2, ram + 0x8000, 0x4000);
 	memory_configure_bank(machine, "bank4", 0, 4, ram, 0x2000);
 	memory_configure_bank(machine, "bank5", 0, 4, ram, 0x2000);
@@ -224,37 +224,37 @@ static DEVICE_IMAGE_LOAD( prestige_cart )
 
 static MACHINE_CONFIG_START( prestige, prestige_state )
     /* basic machine hardware */
-    MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz)
-    MDRV_CPU_PROGRAM_MAP(prestige_mem)
-    MDRV_CPU_IO_MAP(prestige_io)
+    MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
+    MCFG_CPU_PROGRAM_MAP(prestige_mem)
+    MCFG_CPU_IO_MAP(prestige_io)
 
-    MDRV_MACHINE_START(prestige)
+    MCFG_MACHINE_START(prestige)
 
     /* video hardware */
-    MDRV_SCREEN_ADD("screen", LCD)
-    MDRV_SCREEN_REFRESH_RATE(50)
-    MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-    MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE( 240, 100 )
-	MDRV_SCREEN_VISIBLE_AREA( 0, 240-1, 0, 100-1 )
-	MDRV_DEFAULT_LAYOUT( layout_lcd )
+    MCFG_SCREEN_ADD("screen", LCD)
+    MCFG_SCREEN_REFRESH_RATE(50)
+    MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+    MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE( 240, 100 )
+	MCFG_SCREEN_VISIBLE_AREA( 0, 240-1, 0, 100-1 )
+	MCFG_DEFAULT_LAYOUT( layout_lcd )
 
-    MDRV_PALETTE_LENGTH(2)
-    MDRV_PALETTE_INIT(prestige)
+    MCFG_PALETTE_LENGTH(2)
+    MCFG_PALETTE_INIT(prestige)
 
-    MDRV_VIDEO_START(prestige)
-    MDRV_VIDEO_UPDATE(prestige)
+    MCFG_VIDEO_START(prestige)
+    MCFG_VIDEO_UPDATE(prestige)
 
 	/* cartridge */
-	MDRV_CARTSLOT_ADD("cart")
-	MDRV_CARTSLOT_EXTENSION_LIST("bin")
-	MDRV_CARTSLOT_INTERFACE("prestige_cart")
-	MDRV_CARTSLOT_LOAD(prestige_cart)
+	MCFG_CARTSLOT_ADD("cart")
+	MCFG_CARTSLOT_EXTENSION_LIST("bin")
+	MCFG_CARTSLOT_INTERFACE("prestige_cart")
+	MCFG_CARTSLOT_LOAD(prestige_cart)
 
 	/* internal ram */
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("32K")
-	MDRV_RAM_EXTRA_OPTIONS("64K")
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("32K")
+	MCFG_RAM_EXTRA_OPTIONS("64K")
 MACHINE_CONFIG_END
 
 /* ROM definition */

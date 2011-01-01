@@ -316,7 +316,7 @@ READ8_HANDLER( hector_disc2_io50_port_r)	/*Read memory info write ready*/
 WRITE8_HANDLER( hector_disc2_io50_port_w) /* I/O Port to the stuff of Disc2*/
 {
 
-	running_device *fdc = space->machine->device("upd765");
+	device_t *fdc = space->machine->device("upd765");
 
 	/* FDC Motor Control - Bit 0/1 defines the state of the FDD 0/1 motor */
 	floppy_mon_w(floppy_get_device(space->machine, 0), BIT(data, 0));	// Moteur floppy A:
@@ -343,7 +343,7 @@ WRITE8_HANDLER( hector_disc2_io50_port_w) /* I/O Port to the stuff of Disc2*/
 READ8_HANDLER( hector_disc2_io61_port_r)  
 {
 	UINT8 data;
-	running_device *fdc = space->machine->device("upd765");
+	device_t *fdc = space->machine->device("upd765");
 	data = upd765_data_r(fdc,0); //Get the result
 
 // if ST0 == 0x28 (drive A:) or 0x29 (drive B:) => add 0x40
@@ -403,7 +403,7 @@ else
 	print=0;
 #endif
 
-running_device *fdc = space->machine->device("upd765");
+device_t *fdc = space->machine->device("upd765");
 upd765_data_w(fdc,0, data); 
 }
 
@@ -411,12 +411,12 @@ upd765_data_w(fdc,0, data);
 READ8_HANDLER( hector_disc2_io70_port_r) // Gestion du DMA
 {
 	UINT8 data;
-	running_device *fdc = space->machine->device("upd765");
+	device_t *fdc = space->machine->device("upd765");
 	data = upd765_dack_r(fdc,0);
 	return data;
 }
 WRITE8_HANDLER( hector_disc2_io70_port_w)
 {
-	running_device *fdc = space->machine->device("upd765");
+	device_t *fdc = space->machine->device("upd765");
 	upd765_dack_w(fdc,0, data); 
 }

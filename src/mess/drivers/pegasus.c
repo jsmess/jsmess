@@ -40,7 +40,7 @@ UINT8 pegasus_control_bits = 0;
 
 static TIMER_DEVICE_CALLBACK( pegasus_firq )
 {
-	running_device *cpu = timer.machine->device( "maincpu" );
+	device_t *cpu = timer.machine->device( "maincpu" );
 	cpu_set_input_line(cpu, M6809_FIRQ_LINE, HOLD_LINE);
 }
 
@@ -279,7 +279,7 @@ static const cassette_config pegasus_cassette_config =
     multipart roms will have. */
 static void pegasus_decrypt_rom( running_machine *machine, UINT16 addr )
 {
-	UINT8 b, *ROM = memory_region(machine, "maincpu");
+	UINT8 b, *ROM = machine->region("maincpu")->base();
 	UINT16 i, j;
 	UINT8 buff[0x1000];
 	if (ROM[addr] == 0x02)
@@ -298,7 +298,7 @@ static void pegasus_decrypt_rom( running_machine *machine, UINT16 addr )
 
 static DEVICE_IMAGE_LOAD( pegasus_cart_1 )
 {
-	image.fread(memory_region(image.device().machine, "maincpu") + 0x0000, 0x1000);
+	image.fread(image.device().machine->region("maincpu")->base() + 0x0000, 0x1000);
 	pegasus_decrypt_rom( image.device().machine, 0x0000 );
 
 	return IMAGE_INIT_PASS;
@@ -306,7 +306,7 @@ static DEVICE_IMAGE_LOAD( pegasus_cart_1 )
 
 static DEVICE_IMAGE_LOAD( pegasus_cart_2 )
 {
-	image.fread(memory_region(image.device().machine, "maincpu") + 0x1000, 0x1000);
+	image.fread(image.device().machine->region("maincpu")->base() + 0x1000, 0x1000);
 	pegasus_decrypt_rom( image.device().machine, 0x1000 );
 
 	return IMAGE_INIT_PASS;
@@ -314,7 +314,7 @@ static DEVICE_IMAGE_LOAD( pegasus_cart_2 )
 
 static DEVICE_IMAGE_LOAD( pegasus_cart_3 )
 {
-	image.fread(memory_region(image.device().machine, "maincpu") + 0x2000, 0x1000);
+	image.fread(image.device().machine->region("maincpu")->base() + 0x2000, 0x1000);
 	pegasus_decrypt_rom( image.device().machine, 0x2000 );
 
 	return IMAGE_INIT_PASS;
@@ -322,7 +322,7 @@ static DEVICE_IMAGE_LOAD( pegasus_cart_3 )
 
 static DEVICE_IMAGE_LOAD( pegasus_cart_4 )
 {
-	image.fread(memory_region(image.device().machine, "maincpu") + 0xc000, 0x1000);
+	image.fread(image.device().machine->region("maincpu")->base() + 0xc000, 0x1000);
 	pegasus_decrypt_rom( image.device().machine, 0xc000 );
 
 	return IMAGE_INIT_PASS;
@@ -330,7 +330,7 @@ static DEVICE_IMAGE_LOAD( pegasus_cart_4 )
 
 static DEVICE_IMAGE_LOAD( pegasus_cart_5 )
 {
-	image.fread( memory_region(image.device().machine, "maincpu") + 0xd000, 0x1000);
+	image.fread( image.device().machine->region("maincpu")->base() + 0xd000, 0x1000);
 	pegasus_decrypt_rom( image.device().machine, 0xd000 );
 
 	return IMAGE_INIT_PASS;
@@ -340,7 +340,7 @@ static MACHINE_START( pegasus )
 {
 	pegasus_state *state = machine->driver_data<pegasus_state>();
 	state->cass = machine->device("cassette");
-	state->FNT = memory_region(machine, "pcg");
+	state->FNT = machine->region("pcg")->base();
 }
 
 static MACHINE_RESET( pegasus )
@@ -358,47 +358,47 @@ static DRIVER_INIT( pegasus )
 
 static MACHINE_CONFIG_START( pegasus, pegasus_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6809E, XTAL_4MHz)	// actually a 6809C
-	MDRV_CPU_PROGRAM_MAP(pegasus_mem)
+	MCFG_CPU_ADD("maincpu", M6809E, XTAL_4MHz)	// actually a 6809C
+	MCFG_CPU_PROGRAM_MAP(pegasus_mem)
 
-	MDRV_TIMER_ADD_PERIODIC("pegasus_firq", pegasus_firq, HZ(400))	// controls accuracy of the clock (ctrl-P)
-	MDRV_MACHINE_START(pegasus)
-	MDRV_MACHINE_RESET(pegasus)
+	MCFG_TIMER_ADD_PERIODIC("pegasus_firq", pegasus_firq, HZ(400))	// controls accuracy of the clock (ctrl-P)
+	MCFG_MACHINE_START(pegasus)
+	MCFG_MACHINE_RESET(pegasus)
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(50)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 16*16)
-	MDRV_SCREEN_VISIBLE_AREA(0, 32*8-1, 0, 16*16-1)
-	MDRV_PALETTE_LENGTH(2)
-	MDRV_PALETTE_INIT(black_and_white)
-	MDRV_VIDEO_UPDATE(pegasus)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 16*16)
+	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 0, 16*16-1)
+	MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_INIT(black_and_white)
+	MCFG_VIDEO_UPDATE(pegasus)
 
 	/* devices */
-	MDRV_PIA6821_ADD( "pegasus_pia_s", pegasus_pia_s_intf )
-	MDRV_PIA6821_ADD( "pegasus_pia_u", pegasus_pia_u_intf )
-	MDRV_CARTSLOT_ADD("cart1")
-	MDRV_CARTSLOT_EXTENSION_LIST("bin")
-	MDRV_CARTSLOT_LOAD(pegasus_cart_1)
-	MDRV_CARTSLOT_ADD("cart2")
-	MDRV_CARTSLOT_EXTENSION_LIST("bin")
-	MDRV_CARTSLOT_LOAD(pegasus_cart_2)
-	MDRV_CARTSLOT_ADD("cart3")
-	MDRV_CARTSLOT_EXTENSION_LIST("bin")
-	MDRV_CARTSLOT_LOAD(pegasus_cart_3)
-	MDRV_CARTSLOT_ADD("cart4")
-	MDRV_CARTSLOT_EXTENSION_LIST("bin")
-	MDRV_CARTSLOT_LOAD(pegasus_cart_4)
-	MDRV_CARTSLOT_ADD("cart5")
-	MDRV_CARTSLOT_EXTENSION_LIST("bin")
-	MDRV_CARTSLOT_LOAD(pegasus_cart_5)
-	MDRV_CASSETTE_ADD( "cassette", pegasus_cassette_config )
+	MCFG_PIA6821_ADD( "pegasus_pia_s", pegasus_pia_s_intf )
+	MCFG_PIA6821_ADD( "pegasus_pia_u", pegasus_pia_u_intf )
+	MCFG_CARTSLOT_ADD("cart1")
+	MCFG_CARTSLOT_EXTENSION_LIST("bin")
+	MCFG_CARTSLOT_LOAD(pegasus_cart_1)
+	MCFG_CARTSLOT_ADD("cart2")
+	MCFG_CARTSLOT_EXTENSION_LIST("bin")
+	MCFG_CARTSLOT_LOAD(pegasus_cart_2)
+	MCFG_CARTSLOT_ADD("cart3")
+	MCFG_CARTSLOT_EXTENSION_LIST("bin")
+	MCFG_CARTSLOT_LOAD(pegasus_cart_3)
+	MCFG_CARTSLOT_ADD("cart4")
+	MCFG_CARTSLOT_EXTENSION_LIST("bin")
+	MCFG_CARTSLOT_LOAD(pegasus_cart_4)
+	MCFG_CARTSLOT_ADD("cart5")
+	MCFG_CARTSLOT_EXTENSION_LIST("bin")
+	MCFG_CARTSLOT_LOAD(pegasus_cart_5)
+	MCFG_CASSETTE_ADD( "cassette", pegasus_cassette_config )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( pegasusm, pegasus )
-	MDRV_CPU_MODIFY( "maincpu" )
-	MDRV_CPU_PROGRAM_MAP(pegasusm_mem)
+	MCFG_CPU_MODIFY( "maincpu" )
+	MCFG_CPU_PROGRAM_MAP(pegasusm_mem)
 MACHINE_CONFIG_END
 
 

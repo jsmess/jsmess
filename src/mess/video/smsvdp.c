@@ -113,8 +113,8 @@ struct _smsvdp_t
 	int              y_pixels;                 /* 192, 224, 240 */
 	UINT8            line_counter;
 	UINT8            hcounter;
-	region_info            *VRAM;                    /* Pointer to VRAM */
-	region_info            *CRAM;                    /* Pointer to CRAM */
+	memory_region            *VRAM;                    /* Pointer to VRAM */
+	memory_region            *CRAM;                    /* Pointer to CRAM */
 	const UINT8      *sms_frame_timing;
 	bitmap_t         *tmpbitmap;
 	UINT8            *collision_buffer;
@@ -138,7 +138,7 @@ static void sms_update_palette( smsvdp_t *smsvdp );
     INLINE FUNCTIONS
 *****************************************************************************/
 
-INLINE smsvdp_t *get_safe_token(running_device *device)
+INLINE smsvdp_t *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == SMSVDP);
@@ -146,7 +146,7 @@ INLINE smsvdp_t *get_safe_token(running_device *device)
 	return (smsvdp_t *)downcast<legacy_device_base *>(device)->token();
 }
 
-INLINE const smsvdp_interface *get_interface(running_device *device)
+INLINE const smsvdp_interface *get_interface(device_t *device)
 {
 	assert(device != NULL);
 	assert((device->type() == SMSVDP));
@@ -159,7 +159,7 @@ INLINE const smsvdp_interface *get_interface(running_device *device)
  *
  *************************************/
 
-static void set_display_settings( running_device *device )
+static void set_display_settings( device_t *device )
 {
 	smsvdp_t *smsvdp = get_safe_token(device);
 
@@ -260,7 +260,7 @@ WRITE8_DEVICE_HANDLER( sms_vdp_hcount_latch_w )
 }
 
 
-void sms_vdp_set_ggsmsmode( running_device *device, int mode )
+void sms_vdp_set_ggsmsmode( device_t *device, int mode )
 {
 	smsvdp_t *smsvdp = get_safe_token(device);
 
@@ -1342,7 +1342,7 @@ static void sms_refresh_line( running_machine *machine, smsvdp_t *smsvdp, bitmap
 
 
 // This is only used by Light Phaser. Should it be moved elsewhere?
-int sms_vdp_check_brightness(running_device *device, int x, int y)
+int sms_vdp_check_brightness(device_t *device, int x, int y)
 {
 	/* brightness of the lightgray color in the frame drawn by Light Phaser games */
 	const UINT8 sensor_min_brightness = 0x7f;
@@ -1410,7 +1410,7 @@ static void sms_update_palette( smsvdp_t *smsvdp )
 }
 
 
-UINT32 sms_vdp_update( running_device *device, bitmap_t *bitmap, const rectangle *cliprect )
+UINT32 sms_vdp_update( device_t *device, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	smsvdp_t *smsvdp = get_safe_token(device);
 	copybitmap(bitmap, smsvdp->tmpbitmap, 0, 0, 0, 0, cliprect);

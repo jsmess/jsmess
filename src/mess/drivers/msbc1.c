@@ -68,7 +68,7 @@ INPUT_PORTS_END
 void msbc1_state::machine_reset()
 {
 	void *ram = cpu_get_address_space(machine->firstcpu, ADDRESS_SPACE_PROGRAM)->get_write_ptr(0);
-	UINT8 *rom = memory_region(machine, MC68000R12_TAG);
+	UINT8 *rom = machine->region(MC68000R12_TAG)->base();
 
 	memcpy(ram, rom, 8);
 
@@ -82,14 +82,14 @@ static GENERIC_TERMINAL_INTERFACE( terminal_intf )
 
 static MACHINE_CONFIG_START( msbc1, msbc1_state )
     /* basic machine hardware */
-    MDRV_CPU_ADD(MC68000R12_TAG, M68000, XTAL_12_5MHz)
-    MDRV_CPU_PROGRAM_MAP(msbc1_mem)
+    MCFG_CPU_ADD(MC68000R12_TAG, M68000, XTAL_12_5MHz)
+    MCFG_CPU_PROGRAM_MAP(msbc1_mem)
 
     /* video hardware */
-	MDRV_FRAGMENT_ADD( generic_terminal )
+	MCFG_FRAGMENT_ADD( generic_terminal )
 
 	// devices
-	MDRV_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
+	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
 MACHINE_CONFIG_END
 
 /* ROM definition */

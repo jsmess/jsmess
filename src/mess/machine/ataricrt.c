@@ -51,7 +51,7 @@ static void a800_setbank(running_machine *machine, int n)
 {
 	void *read_addr;
 	void *write_addr;
-	UINT8 *mem = memory_region(machine, "maincpu");
+	UINT8 *mem = machine->region("maincpu")->base();
 
 	switch (n)
 	{
@@ -166,7 +166,7 @@ MACHINE_START( a800 )
 
 DEVICE_IMAGE_LOAD( a800_cart )
 {
-	UINT8 *mem = memory_region(image.device().machine, "maincpu");
+	UINT8 *mem = image.device().machine->region("maincpu")->base();
 	int size;
 
 	/* load an optional (dual) cartridge (e.g. basic.rom) */
@@ -216,7 +216,7 @@ MACHINE_START( a800xl )
 
 DEVICE_IMAGE_LOAD( a800xl_cart )
 {
-	UINT8 *mem = memory_region(image.device().machine, "maincpu");
+	UINT8 *mem = image.device().machine->region("maincpu")->base();
 	astring *fname;
 	mame_file *basic_fp;
 	file_error filerr;
@@ -270,7 +270,7 @@ MACHINE_START( a5200 )
 
 DEVICE_IMAGE_LOAD( a5200_cart )
 {
-	UINT8 *mem = memory_region(image.device().machine, "maincpu");
+	UINT8 *mem = image.device().machine->region("maincpu")->base();
 	int size;
 	if (image.software_entry() == NULL)
 	{
@@ -302,7 +302,7 @@ DEVICE_IMAGE_LOAD( a5200_cart )
 
 DEVICE_IMAGE_UNLOAD( a5200_cart )
 {
-	UINT8 *mem = memory_region(image.device().machine, "maincpu");
+	UINT8 *mem = image.device().machine->region("maincpu")->base();
 	/* zap the cartridge memory (again) */
 	memset(&mem[0x4000], 0x00, 0x8000);
 }
@@ -318,7 +318,7 @@ static UINT8 xegs_cart = 0;
 
 static WRITE8_HANDLER( xegs_bankswitch )
 {
-	UINT8 *cart = memory_region(space->machine, "user1");
+	UINT8 *cart = space->machine->region("user1")->base();
 	data &= xegs_banks - 1;
 	memory_set_bankptr(space->machine, "bank0", cart + data * 0x2000);
 }
@@ -326,8 +326,8 @@ static WRITE8_HANDLER( xegs_bankswitch )
 MACHINE_START( xegs )
 {
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	UINT8 *cart = memory_region(space->machine, "user1");
-	UINT8 *cpu  = memory_region(space->machine, "maincpu");
+	UINT8 *cart = space->machine->region("user1")->base();
+	UINT8 *cpu  = space->machine->region("maincpu")->base();
 
 	atari_machine_start(machine);
 	memory_install_write8_handler(space, 0xd500, 0xd5ff, 0, 0, xegs_bankswitch);
@@ -348,7 +348,7 @@ MACHINE_START( xegs )
 DEVICE_IMAGE_LOAD( xegs_cart )
 {
 	UINT32 size;
-	UINT8 *ptr = memory_region(image.device().machine, "user1");
+	UINT8 *ptr = image.device().machine->region("user1")->base();
 
 	if (image.software_entry() == NULL)
 	{

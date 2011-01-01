@@ -13,9 +13,9 @@
 #define __EF9345_H__
 
 
-#define MDRV_EF9345_ADD(_tag, _config) \
-	MDRV_DEVICE_ADD(_tag, EF9345, 0) \
-	MDRV_DEVICE_CONFIG(_config)
+#define MCFG_EF9345_ADD(_tag, _config) \
+	MCFG_DEVICE_ADD(_tag, EF9345, 0) \
+	MCFG_DEVICE_CONFIG(_config)
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -113,7 +113,7 @@ private:
 	static const device_timer_id BUSY_TIMER = 0;
 	static const device_timer_id BLINKING_TIMER = 1;
 
-	const region_info *charset;
+	const memory_region *charset;
 	address_space *videoram;
 
 	screen_device *screen;			//screen we are acting on

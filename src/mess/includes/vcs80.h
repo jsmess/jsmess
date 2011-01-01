@@ -16,7 +16,7 @@ public:
 	int keyclk;
 
 	/* devices */
-	running_device *z80pio;
+	device_t *z80pio;
 };
 
 #endif

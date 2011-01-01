@@ -645,7 +645,7 @@ static WRITE8_HANDLER( itech8_nmi_ack_w )
 }
 
 
-static void generate_sound_irq(running_device *device, int state)
+static void generate_sound_irq(device_t *device, int state)
 {
 	cputag_set_input_line(device->machine, "soundcpu", M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -674,7 +674,7 @@ static MACHINE_RESET( itech8 )
 	/* make sure bank 0 is selected */
 	if (main_cpu_type == M6809 || main_cpu_type == HD6309)
 	{
-		memory_set_bankptr(machine, "bank1", &memory_region(machine, "maincpu")[0x4000]);
+		memory_set_bankptr(machine, "bank1", &machine->region("maincpu")->base()[0x4000]);
 		machine->device("maincpu")->reset();
 	}
 
@@ -722,7 +722,7 @@ static WRITE8_HANDLER( blitter_w )
 {
 	/* bit 0x20 on address 7 controls CPU banking */
 	if (offset / 2 == 7)
-		memory_set_bankptr(space->machine, "bank1", &memory_region(space->machine, "maincpu")[0x4000 + 0xc000 * ((data >> 5) & 1)]);
+		memory_set_bankptr(space->machine, "bank1", &space->machine->region("maincpu")->base()[0x4000 + 0xc000 * ((data >> 5) & 1)]);
 
 	/* the rest is handled by the video hardware */
 	itech8_blitter_w(space, offset, data);
@@ -732,7 +732,7 @@ static WRITE8_HANDLER( blitter_w )
 static WRITE8_HANDLER( rimrockn_bank_w )
 {
 	/* banking is controlled here instead of by the blitter output */
-	memory_set_bankptr(space->machine, "bank1", &memory_region(space->machine, "maincpu")[0x4000 + 0xc000 * (data & 3)]);
+	memory_set_bankptr(space->machine, "bank1", &space->machine->region("maincpu")->base()[0x4000 + 0xc000 * (data & 3)]);
 }
 
 
@@ -1694,105 +1694,105 @@ static const ym3812_interface ym3812_config =
 static MACHINE_CONFIG_START( itech8_core_lo, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6809, CLOCK_8MHz/4)
-	MDRV_CPU_PROGRAM_MAP(tmslo_map)
-	MDRV_CPU_VBLANK_INT("screen", generate_nmi)
+	MCFG_CPU_ADD("maincpu", M6809, CLOCK_8MHz/4)
+	MCFG_CPU_PROGRAM_MAP(tmslo_map)
+	MCFG_CPU_VBLANK_INT("screen", generate_nmi)
 
-	MDRV_MACHINE_RESET(itech8)
-	MDRV_NVRAM_ADD_RANDOM_FILL("nvram")
+	MCFG_MACHINE_RESET(itech8)
+	MCFG_NVRAM_ADD_RANDOM_FILL("nvram")
 
-	MDRV_TICKET_DISPENSER_ADD("ticket", 200, TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW)
+	MCFG_TICKET_DISPENSER_ADD("ticket", 200, TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW)
 
 	/* video hardware */
-	MDRV_TLC34076_ADD("tlc34076", TLC34076_6_BIT)
+	MCFG_TLC34076_ADD("tlc34076", TLC34076_6_BIT)
 
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MDRV_VIDEO_START(itech8)
+	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
+	MCFG_VIDEO_START(itech8)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_SIZE(512, 263)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_SIZE(512, 263)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	/* via */
-	MDRV_VIA6522_ADD("via6522_0", CLOCK_8MHz/4, via_interface)
+	MCFG_VIA6522_ADD("via6522_0", CLOCK_8MHz/4, via_interface)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( itech8_core_hi, itech8_core_lo )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(tmshi_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(tmshi_map)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_FRAGMENT( itech8_sound_ym2203 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("soundcpu", M6809, CLOCK_8MHz/4)
-	MDRV_CPU_PROGRAM_MAP(sound2203_map)
+	MCFG_CPU_ADD("soundcpu", M6809, CLOCK_8MHz/4)
+	MCFG_CPU_PROGRAM_MAP(sound2203_map)
 
 	/* sound hardware */
-	MDRV_SOUND_ADD("ymsnd", YM2203, CLOCK_8MHz/2)
-	MDRV_SOUND_CONFIG(ym2203_config)
-	MDRV_SOUND_ROUTE(0, "mono", 0.07)
-	MDRV_SOUND_ROUTE(1, "mono", 0.07)
-	MDRV_SOUND_ROUTE(2, "mono", 0.07)
-	MDRV_SOUND_ROUTE(3, "mono", 0.75)
+	MCFG_SOUND_ADD("ymsnd", YM2203, CLOCK_8MHz/2)
+	MCFG_SOUND_CONFIG(ym2203_config)
+	MCFG_SOUND_ROUTE(0, "mono", 0.07)
+	MCFG_SOUND_ROUTE(1, "mono", 0.07)
+	MCFG_SOUND_ROUTE(2, "mono", 0.07)
+	MCFG_SOUND_ROUTE(3, "mono", 0.75)
 
-	MDRV_OKIM6295_ADD("oki", CLOCK_8MHz/8, OKIM6295_PIN7_HIGH) // was /128, not /132, so unsure so pin 7 not verified
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+	MCFG_OKIM6295_ADD("oki", CLOCK_8MHz/8, OKIM6295_PIN7_HIGH) // was /128, not /132, so unsure so pin 7 not verified
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_FRAGMENT( itech8_sound_ym2608b )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("soundcpu", M6809, CLOCK_8MHz/4)
-	MDRV_CPU_PROGRAM_MAP(sound2608b_map)
+	MCFG_CPU_ADD("soundcpu", M6809, CLOCK_8MHz/4)
+	MCFG_CPU_PROGRAM_MAP(sound2608b_map)
 
 	/* sound hardware */
-	MDRV_SOUND_ADD("ymsnd", YM2608, CLOCK_8MHz)
-	MDRV_SOUND_CONFIG(ym2608b_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+	MCFG_SOUND_ADD("ymsnd", YM2608, CLOCK_8MHz)
+	MCFG_SOUND_CONFIG(ym2608b_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_FRAGMENT( itech8_sound_ym3812 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("soundcpu", M6809, CLOCK_8MHz/4)
-	MDRV_CPU_PROGRAM_MAP(sound3812_map)
+	MCFG_CPU_ADD("soundcpu", M6809, CLOCK_8MHz/4)
+	MCFG_CPU_PROGRAM_MAP(sound3812_map)
 
-	MDRV_PIA6821_ADD("pia", pia_interface)
+	MCFG_PIA6821_ADD("pia", pia_interface)
 
 	/* sound hardware */
-	MDRV_SOUND_ADD("ymsnd", YM3812, CLOCK_8MHz/2)
-	MDRV_SOUND_CONFIG(ym3812_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+	MCFG_SOUND_ADD("ymsnd", YM3812, CLOCK_8MHz/2)
+	MCFG_SOUND_CONFIG(ym3812_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
-	MDRV_OKIM6295_ADD("oki", CLOCK_8MHz/8, OKIM6295_PIN7_HIGH) // was /128, not /132, so unsure so pin 7 not verified
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+	MCFG_OKIM6295_ADD("oki", CLOCK_8MHz/8, OKIM6295_PIN7_HIGH) // was /128, not /132, so unsure so pin 7 not verified
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_FRAGMENT( itech8_sound_ym3812_external )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("soundcpu", M6809, CLOCK_8MHz/4)
-	MDRV_CPU_PROGRAM_MAP(sound3812_external_map)
+	MCFG_CPU_ADD("soundcpu", M6809, CLOCK_8MHz/4)
+	MCFG_CPU_PROGRAM_MAP(sound3812_external_map)
 
 	/* sound hardware */
-	MDRV_SOUND_ADD("ymsnd", YM3812, CLOCK_8MHz/2)
-	MDRV_SOUND_CONFIG(ym3812_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+	MCFG_SOUND_ADD("ymsnd", YM3812, CLOCK_8MHz/2)
+	MCFG_SOUND_CONFIG(ym3812_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
-	MDRV_OKIM6295_ADD("oki", CLOCK_8MHz/8, OKIM6295_PIN7_HIGH) // was /128, not /132, so unsure so pin 7 not verified
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+	MCFG_OKIM6295_ADD("oki", CLOCK_8MHz/8, OKIM6295_PIN7_HIGH) // was /128, not /132, so unsure so pin 7 not verified
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_CONFIG_END
 
 
@@ -1801,104 +1801,104 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( wfortune, itech8_core_hi )
 
 	/* basic machine hardware */
-	MDRV_FRAGMENT_ADD(itech8_sound_ym2203)
+	MCFG_FRAGMENT_ADD(itech8_sound_ym2203)
 
 	/* video hardware */
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
-	MDRV_VIDEO_UPDATE(itech8_2layer)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
+	MCFG_VIDEO_UPDATE(itech8_2layer)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( grmatch, itech8_core_hi )
 
 	/* basic machine hardware */
-	MDRV_FRAGMENT_ADD(itech8_sound_ym2608b)
+	MCFG_FRAGMENT_ADD(itech8_sound_ym2608b)
 
 	/* video hardware */
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_VISIBLE_AREA(0, 399, 0, 239)
-	MDRV_VIDEO_UPDATE(itech8_grmatch)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_VISIBLE_AREA(0, 399, 0, 239)
+	MCFG_VIDEO_UPDATE(itech8_grmatch)
 
 	/* palette updater */
-	MDRV_TIMER_ADD_SCANLINE("palette", grmatch_palette_update, "screen", 0, 0)
+	MCFG_TIMER_ADD_SCANLINE("palette", grmatch_palette_update, "screen", 0, 0)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( stratab_hi, itech8_core_hi )
 
 	/* basic machine hardware */
-	MDRV_FRAGMENT_ADD(itech8_sound_ym2203)
+	MCFG_FRAGMENT_ADD(itech8_sound_ym2203)
 
 	/* video hardware */
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
-	MDRV_VIDEO_UPDATE(itech8_2layer)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
+	MCFG_VIDEO_UPDATE(itech8_2layer)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( stratab_lo, itech8_core_lo )
 
 	/* basic machine hardware */
-	MDRV_FRAGMENT_ADD(itech8_sound_ym2203)
+	MCFG_FRAGMENT_ADD(itech8_sound_ym2203)
 
 	/* video hardware */
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
-	MDRV_VIDEO_UPDATE(itech8_2layer)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
+	MCFG_VIDEO_UPDATE(itech8_2layer)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( slikshot_hi, itech8_core_hi )
 
 	/* basic machine hardware */
-	MDRV_FRAGMENT_ADD(itech8_sound_ym2203)
+	MCFG_FRAGMENT_ADD(itech8_sound_ym2203)
 
-	MDRV_CPU_ADD("sub", Z80, CLOCK_8MHz/2)
-	MDRV_CPU_PROGRAM_MAP(slikz80_mem_map)
-	MDRV_CPU_IO_MAP(slikz80_io_map)
+	MCFG_CPU_ADD("sub", Z80, CLOCK_8MHz/2)
+	MCFG_CPU_PROGRAM_MAP(slikz80_mem_map)
+	MCFG_CPU_IO_MAP(slikz80_io_map)
 
 	/* video hardware */
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
-	MDRV_VIDEO_START(slikshot)
-	MDRV_VIDEO_UPDATE(slikshot)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
+	MCFG_VIDEO_START(slikshot)
+	MCFG_VIDEO_UPDATE(slikshot)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( slikshot_lo, itech8_core_lo )
 
 	/* basic machine hardware */
-	MDRV_FRAGMENT_ADD(itech8_sound_ym2203)
+	MCFG_FRAGMENT_ADD(itech8_sound_ym2203)
 
-	MDRV_CPU_ADD("sub", Z80, CLOCK_8MHz/2)
-	MDRV_CPU_PROGRAM_MAP(slikz80_mem_map)
-	MDRV_CPU_IO_MAP(slikz80_io_map)
+	MCFG_CPU_ADD("sub", Z80, CLOCK_8MHz/2)
+	MCFG_CPU_PROGRAM_MAP(slikz80_mem_map)
+	MCFG_CPU_IO_MAP(slikz80_io_map)
 
 	/* video hardware */
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
-	MDRV_VIDEO_START(slikshot)
-	MDRV_VIDEO_UPDATE(slikshot)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
+	MCFG_VIDEO_START(slikshot)
+	MCFG_VIDEO_UPDATE(slikshot)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( slikshot_lo_noz80, itech8_core_lo )
 
 	/* basic machine hardware */
-	MDRV_FRAGMENT_ADD(itech8_sound_ym2203)
+	MCFG_FRAGMENT_ADD(itech8_sound_ym2203)
 
 	/* video hardware */
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
-	MDRV_VIDEO_UPDATE(itech8_2page)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
+	MCFG_VIDEO_UPDATE(itech8_2page)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( sstrike, slikshot_lo )
 
 	/* basic machine hardware */
-	MDRV_MACHINE_START(sstrike)
+	MCFG_MACHINE_START(sstrike)
 
 MACHINE_CONFIG_END
 
@@ -1906,71 +1906,71 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( hstennis_hi, itech8_core_hi )
 
 	/* basic machine hardware */
-	MDRV_FRAGMENT_ADD(itech8_sound_ym3812)
+	MCFG_FRAGMENT_ADD(itech8_sound_ym3812)
 
 	/* video hardware */
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_VISIBLE_AREA(0, 399, 0, 239)
-	MDRV_VIDEO_UPDATE(itech8_2page_large)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_VISIBLE_AREA(0, 399, 0, 239)
+	MCFG_VIDEO_UPDATE(itech8_2page_large)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( hstennis_lo, itech8_core_lo )
 
 	/* basic machine hardware */
-	MDRV_FRAGMENT_ADD(itech8_sound_ym3812)
+	MCFG_FRAGMENT_ADD(itech8_sound_ym3812)
 
 	/* video hardware */
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_VISIBLE_AREA(0, 399, 0, 239)
-	MDRV_VIDEO_UPDATE(itech8_2page_large)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_VISIBLE_AREA(0, 399, 0, 239)
+	MCFG_VIDEO_UPDATE(itech8_2page_large)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( rimrockn, itech8_core_hi )
 
 	/* basic machine hardware */
-	MDRV_FRAGMENT_ADD(itech8_sound_ym3812_external)
+	MCFG_FRAGMENT_ADD(itech8_sound_ym3812_external)
 
-	MDRV_CPU_REPLACE("maincpu", HD6309, CLOCK_12MHz)
-	MDRV_CPU_PROGRAM_MAP(tmshi_map)
-	MDRV_CPU_VBLANK_INT("screen", generate_nmi)
+	MCFG_CPU_REPLACE("maincpu", HD6309, CLOCK_12MHz)
+	MCFG_CPU_PROGRAM_MAP(tmshi_map)
+	MCFG_CPU_VBLANK_INT("screen", generate_nmi)
 
 	/* video hardware */
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_VISIBLE_AREA(24, 375, 0, 239)
-	MDRV_VIDEO_UPDATE(itech8_2page_large)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_VISIBLE_AREA(24, 375, 0, 239)
+	MCFG_VIDEO_UPDATE(itech8_2page_large)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( ninclown, itech8_core_hi )
 
 	/* basic machine hardware */
-	MDRV_FRAGMENT_ADD(itech8_sound_ym3812_external)
+	MCFG_FRAGMENT_ADD(itech8_sound_ym3812_external)
 
-	MDRV_CPU_REPLACE("maincpu", M68000, CLOCK_12MHz)
-	MDRV_CPU_PROGRAM_MAP(ninclown_map)
-	MDRV_CPU_VBLANK_INT("screen", generate_nmi)
+	MCFG_CPU_REPLACE("maincpu", M68000, CLOCK_12MHz)
+	MCFG_CPU_PROGRAM_MAP(ninclown_map)
+	MCFG_CPU_VBLANK_INT("screen", generate_nmi)
 
 	/* video hardware */
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_VISIBLE_AREA(64, 423, 0, 239)
-	MDRV_VIDEO_UPDATE(itech8_2page_large)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_VISIBLE_AREA(64, 423, 0, 239)
+	MCFG_VIDEO_UPDATE(itech8_2page_large)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( gtg2, itech8_core_lo )
 
 	/* basic machine hardware */
-	MDRV_FRAGMENT_ADD(itech8_sound_ym3812_external)
+	MCFG_FRAGMENT_ADD(itech8_sound_ym3812_external)
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(gtg2_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(gtg2_map)
 
 	/* video hardware */
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
-	MDRV_VIDEO_UPDATE(itech8_2layer)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
+	MCFG_VIDEO_UPDATE(itech8_2layer)
 MACHINE_CONFIG_END
 
 
@@ -2101,8 +2101,28 @@ ROM_START( gtg )
 	ROM_LOAD( "srom0.bin", 0x00000, 0x20000, CRC(1cccbfdf) SHA1(546059fea2e7cd5627a666d80b1fc3ed8fcc0762) )
 ROM_END
 
-
 ROM_START( gtgt )
+	ROM_REGION( 0x1c000, "maincpu", 0 )
+	ROM_LOAD( "gtg.bim_2.0.u5",     0x4000, 0x4000, CRC(4c907166) SHA1(338a599645fa49c9fcbfbe5ba3431dafffddacc7) )
+	ROM_CONTINUE(       0x10000, 0xc000 )
+	ROM_COPY( "maincpu", 0x14000, 0x8000, 0x8000 )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 )
+	ROM_LOAD( "golf-snd.u27", 0x08000, 0x8000, CRC(f6a7429b) SHA1(0fb378606c12c3543aa1ff603101e262acb9c692) )
+
+	ROM_REGION( 0xc0000, "grom", 0 )
+	ROM_LOAD( "grom0.bin", 0x00000, 0x20000, CRC(a29c688a) SHA1(32dbb996a5e4c23cfd44b79312ac4a767658f20a) )
+	ROM_LOAD( "grom1.bin", 0x20000, 0x20000, CRC(b52a23f6) SHA1(092961acf47875179b44342e2dd8955670e67ea2) )
+	ROM_LOAD( "grom2.bin", 0x40000, 0x20000, CRC(9b8e3a61) SHA1(1b5682b1328d6c97b604fb71512e8f72322a688f) )
+	ROM_LOAD( "grom3.bin", 0x60000, 0x20000, CRC(b6e9fb15) SHA1(c1b28ea911696cb4ed56bfba212848693530b59f) )
+	ROM_LOAD( "grom4.bin", 0x80000, 0x20000, CRC(faa16729) SHA1(5d46cddda66b6d23c9ebdf2fb4cebce15586b4ad) )
+	ROM_LOAD( "golf-grom5", 0xa0000, 0x10000, CRC(62a523d2) SHA1(431f89fa044bf0ed3c197745d9c1a61f666da658) )
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "srom0.bin", 0x00000, 0x20000, CRC(1cccbfdf) SHA1(546059fea2e7cd5627a666d80b1fc3ed8fcc0762) )
+ROM_END
+
+ROM_START( gtgt1 )
 	ROM_REGION( 0x1c000, "maincpu", 0 )
 	ROM_LOAD( "pgm-u5.512", 0x04000, 0x4000, CRC(ec70b510) SHA1(318984d77eb1df6258b855781ae1c9a09aa74f15) )
 	ROM_CONTINUE(       0x10000, 0xc000 )
@@ -2148,6 +2168,7 @@ ROM_START( gtg2t )
 	ROM_REGION( 0x0200, "plds", 0 )
 	ROM_LOAD( "tibpal16l8.u11", 0x0000, 0x0104, CRC(9bf5a75f) SHA1(79786f7ce656f30a33a92887a290b767a7cbbf31) )
 ROM_END
+
 
 
 ROM_START( gtg2j )
@@ -2706,7 +2727,8 @@ GAME( 1989, grmatch,  0,        grmatch,           grmatch,  grmatch,  ROT0,   "
 GAME( 1990, stratab,  0,        stratab_hi,        stratab,  0,        ROT270, "Strata/Incredible Technologies", "Strata Bowling (V3)", 0 )
 GAME( 1990, stratab1, stratab,  stratab_hi,        stratab,  0,        ROT270, "Strata/Incredible Technologies", "Strata Bowling (V1)", 0 )
 GAME( 1990, gtg,      0,        stratab_hi,        gtg,      0,        ROT0,   "Strata/Incredible Technologies", "Golden Tee Golf (Joystick, v3.1)", 0 )
-GAME( 1989, gtgt,     gtg,      stratab_hi,        gtgt,     0,        ROT0,   "Strata/Incredible Technologies", "Golden Tee Golf (Trackball, v1.0)", 0 )
+GAME( 1989, gtgt,     gtg,      stratab_hi,        gtgt,     0,        ROT0,   "Strata/Incredible Technologies", "Golden Tee Golf (Trackball, v2.0)", 0 )
+GAME( 1989, gtgt1,    gtg,      stratab_hi,        gtgt,     0,        ROT0,   "Strata/Incredible Technologies", "Golden Tee Golf (Trackball, v1.0)", 0 )
 GAME( 1989, gtg2t,    gtg2,     stratab_hi,        gtg2t,    0,        ROT0,   "Strata/Incredible Technologies", "Golden Tee Golf II (Trackball, V1.1)", 0 )
 GAME( 1991, gtg2j,    gtg2,     stratab_lo,        gtg,      0,        ROT0,   "Strata/Incredible Technologies", "Golden Tee Golf II (Joystick, V1.0)", 0 )
 

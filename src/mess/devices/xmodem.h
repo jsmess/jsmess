@@ -23,15 +23,15 @@ typedef struct {
 } xmodem_config;
 
 
-#define MDRV_XMODEM_ADD(_tag, _intrf) \
-  MDRV_DEVICE_ADD(_tag, XMODEM, 0)	      \
-  MDRV_DEVICE_CONFIG(_intrf)
+#define MCFG_XMODEM_ADD(_tag, _intrf) \
+  MCFG_DEVICE_ADD(_tag, XMODEM, 0)	      \
+  MCFG_DEVICE_CONFIG(_intrf)
 
 
 
 /* call when the emulated machine has read the last byte sent by
    XMODEM through the send call-back */
-extern void xmodem_byte_transmitted( running_device *device );
+extern void xmodem_byte_transmitted( device_t *device );
 
 /* call when the emulated machine sends a byte to XMODEM */
-extern void xmodem_receive_byte( running_device *device, UINT8 data );
+extern void xmodem_receive_byte( device_t *device, UINT8 data );

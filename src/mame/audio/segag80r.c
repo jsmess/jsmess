@@ -210,12 +210,12 @@ static const samples_interface astrob_samples_interface =
 
 MACHINE_CONFIG_FRAGMENT( astrob_sound_board )
 
-	MDRV_SOUND_START(astrob)
+	MCFG_SOUND_START(astrob)
 
 	/* sound hardware */
-	MDRV_SOUND_ADD("samples", SAMPLES, 0)
-	MDRV_SOUND_CONFIG(astrob_samples_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SOUND_CONFIG(astrob_samples_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 
@@ -246,7 +246,7 @@ WRITE8_HANDLER( astrob_sound_w )
 	{
 		120.0f, 82.0f, 62.0f, 56.0f, 47.0f, 39.0f, 33.0f, 27.0f, 24.0f, 22.0f
 	};
-	running_device *samples = space->machine->device("samples");
+	device_t *samples = space->machine->device("samples");
 	float freq_factor;
 
 	UINT8 diff = data ^ sound_state[offset];
@@ -438,17 +438,17 @@ static const ppi8255_interface ppi8255_005_intf =
 
 MACHINE_CONFIG_FRAGMENT( 005_sound_board )
 
-	MDRV_PPI8255_ADD( "ppi8255", ppi8255_005_intf )
+	MCFG_PPI8255_ADD( "ppi8255", ppi8255_005_intf )
 
 	/* sound hardware */
-	MDRV_SOUND_START(sega005)
+	MCFG_SOUND_START(sega005)
 
-	MDRV_SOUND_ADD("samples", SAMPLES, 0)
-	MDRV_SOUND_CONFIG(sega005_samples_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SOUND_CONFIG(sega005_samples_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MDRV_SOUND_ADD("005", SEGA005, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD("005", SEGA005, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 
@@ -478,7 +478,7 @@ static SOUND_START( sega005 )
 
 static WRITE8_DEVICE_HANDLER( sega005_sound_a_w )
 {
-	running_device *samples = device->machine->device("samples");
+	device_t *samples = device->machine->device("samples");
 	UINT8 diff = data ^ sound_state[0];
 	sound_state[0] = data;
 
@@ -509,7 +509,7 @@ static WRITE8_DEVICE_HANDLER( sega005_sound_a_w )
 
 INLINE void sega005_update_sound_data(running_machine *machine)
 {
-	UINT8 newval = memory_region(machine, "005")[sound_addr];
+	UINT8 newval = machine->region("005")->base()[sound_addr];
 	UINT8 diff = newval ^ sound_data;
 
 	//mame_printf_debug("  [%03X] = %02X\n", sound_addr, newval);
@@ -607,7 +607,7 @@ DEVICE_GET_INFO( sega005_sound )
 
 static STREAM_UPDATE( sega005_stream_update )
 {
-	const UINT8 *sound_prom = memory_region(device->machine, "proms");
+	const UINT8 *sound_prom = device->machine->region("proms")->base();
 	int i;
 
 	/* no implementation yet */
@@ -676,11 +676,11 @@ static const samples_interface spaceod_samples_interface =
 MACHINE_CONFIG_FRAGMENT( spaceod_sound_board )
 
 	/* sound hardware */
-	MDRV_SOUND_START(spaceod)
+	MCFG_SOUND_START(spaceod)
 
-	MDRV_SOUND_ADD("samples", SAMPLES, 0)
-	MDRV_SOUND_CONFIG(spaceod_samples_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SOUND_CONFIG(spaceod_samples_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 
@@ -706,7 +706,7 @@ static SOUND_START( spaceod )
 
 WRITE8_HANDLER( spaceod_sound_w )
 {
-	running_device *samples = space->machine->device("samples");
+	device_t *samples = space->machine->device("samples");
 	UINT8 diff = data ^ sound_state[offset];
 	sound_state[offset] = data;
 
@@ -842,27 +842,27 @@ static const ppi8255_interface monsterb_ppi_intf =
 
 MACHINE_CONFIG_FRAGMENT( monsterb_sound_board )
 
-	MDRV_PPI8255_ADD( "ppi8255", monsterb_ppi_intf )
+	MCFG_PPI8255_ADD( "ppi8255", monsterb_ppi_intf )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("audiocpu", N7751, 6000000)
-	MDRV_CPU_IO_MAP(monsterb_7751_portmap)
+	MCFG_CPU_ADD("audiocpu", N7751, 6000000)
+	MCFG_CPU_IO_MAP(monsterb_7751_portmap)
 
-	MDRV_I8243_ADD("audio_8243", NULL, n7751_rom_control_w)
+	MCFG_I8243_ADD("audio_8243", NULL, n7751_rom_control_w)
 
 	/* sound hardware */
-	MDRV_SOUND_START(monsterb)
+	MCFG_SOUND_START(monsterb)
 
-	MDRV_SOUND_ADD("samples", SAMPLES, 0)
-	MDRV_SOUND_CONFIG(monsterb_samples_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SOUND_CONFIG(monsterb_samples_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MDRV_SOUND_ADD("music", TMS36XX, 247)
-	MDRV_SOUND_CONFIG(monsterb_tms3617_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("music", TMS36XX, 247)
+	MCFG_SOUND_CONFIG(monsterb_tms3617_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD("dac", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -891,14 +891,14 @@ static SOUND_START( monsterb )
 
 static WRITE8_DEVICE_HANDLER( monsterb_sound_a_w )
 {
-	running_device *tms = device->machine->device("music");
+	device_t *tms = device->machine->device("music");
 	int enable_val;
 
 	/* Lower four data lines get decoded into 13 control lines */
 	tms36xx_note_w(tms, 0, data & 15);
 
 	/* Top four data lines address an 82S123 ROM that enables/disables voices */
-	enable_val = memory_region(device->machine, "prom")[(data & 0xF0) >> 4];
+	enable_val = device->machine->region("prom")->base()[(data & 0xF0) >> 4];
 	tms3617_enable_w(tms, enable_val >> 2);
 }
 
@@ -912,7 +912,7 @@ static WRITE8_DEVICE_HANDLER( monsterb_sound_a_w )
 
 static WRITE8_DEVICE_HANDLER( monsterb_sound_b_w )
 {
-	running_device *samples = device->machine->device("samples");
+	device_t *samples = device->machine->device("samples");
 	UINT8 diff = data ^ sound_state[1];
 	sound_state[1] = data;
 
@@ -976,7 +976,7 @@ static WRITE8_DEVICE_HANDLER( n7751_rom_control_w )
 		case 3:
 			sound_addr &= 0xfff;
 			{
-				int numroms = memory_region_length(device->machine, "n7751") / 0x1000;
+				int numroms = device->machine->region("n7751")->bytes() / 0x1000;
 				if (!(data & 0x01) && numroms >= 1) sound_addr |= 0x0000;
 				if (!(data & 0x02) && numroms >= 2) sound_addr |= 0x1000;
 				if (!(data & 0x04) && numroms >= 3) sound_addr |= 0x2000;
@@ -990,7 +990,7 @@ static WRITE8_DEVICE_HANDLER( n7751_rom_control_w )
 static READ8_HANDLER( n7751_rom_r )
 {
 	/* read from BUS */
-	return memory_region(space->machine, "n7751")[sound_addr];
+	return space->machine->region("n7751")->base()[sound_addr];
 }
 
 

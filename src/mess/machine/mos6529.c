@@ -30,13 +30,13 @@ struct _mos6529_t
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE mos6529_t *get_safe_token(running_device *device)
+INLINE mos6529_t *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	return (mos6529_t *)downcast<legacy_device_base *>(device)->token();
 }
 
-INLINE const mos6529_interface *get_interface(running_device *device)
+INLINE const mos6529_interface *get_interface(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == MOS6529);

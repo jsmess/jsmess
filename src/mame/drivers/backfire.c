@@ -42,11 +42,11 @@ public:
 	bitmap_t  *right;
 
 	/* devices */
-	running_device *maincpu;
-	running_device *deco16ic;
-	running_device *lscreen;
-	running_device *rscreen;
-	running_device *eeprom;
+	device_t *maincpu;
+	device_t *deco16ic;
+	device_t *lscreen;
+	device_t *rscreen;
+	device_t *eeprom;
 };
 
 //UINT32 *backfire_180010, *backfire_188010;
@@ -215,7 +215,7 @@ static VIDEO_UPDATE( backfire )
 static READ32_DEVICE_HANDLER( backfire_eeprom_r )
 {
 	/* some kind of screen indicator?  checked by backfirea set before it will boot */
-	int backfire_screen = mame_rand(device->machine) & 1;
+	int backfire_screen = device->machine->rand() & 1;
 	return ((eeprom_read_bit(device) << 24) | input_port_read(device->machine, "IN0")
 			| ((input_port_read(device->machine, "IN2") & 0xbf) << 16)
 			| ((input_port_read(device->machine, "IN3") & 0x40) << 16)) ^ (backfire_screen << 26) ;
@@ -278,12 +278,12 @@ READ32_HANDLER( backfire_unknown_wheel_r )
 
 READ32_HANDLER( backfire_wheel1_r )
 {
-	return mame_rand(space->machine);
+	return space->machine->rand();
 }
 
 READ32_HANDLER( backfire_wheel2_r )
 {
-	return mame_rand(space->machine);
+	return space->machine->rand();
 }
 #endif
 
@@ -427,7 +427,7 @@ static GFXDECODE_START( backfire )
 GFXDECODE_END
 
 
-static void sound_irq_gen(running_device *device, int state)
+static void sound_irq_gen(device_t *device, int state)
 {
 	logerror("sound irq\n");
 }
@@ -480,45 +480,45 @@ static MACHINE_START( backfire )
 static MACHINE_CONFIG_START( backfire, backfire_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", ARM, 28000000/4) /* Unconfirmed */
-	MDRV_CPU_PROGRAM_MAP(backfire_map)
-	MDRV_CPU_VBLANK_INT("lscreen", deco32_vbl_interrupt)	/* or is it "rscreen?" */
+	MCFG_CPU_ADD("maincpu", ARM, 28000000/4) /* Unconfirmed */
+	MCFG_CPU_PROGRAM_MAP(backfire_map)
+	MCFG_CPU_VBLANK_INT("lscreen", deco32_vbl_interrupt)	/* or is it "rscreen?" */
 
-	MDRV_EEPROM_93C46_ADD("eeprom")
+	MCFG_EEPROM_93C46_ADD("eeprom")
 
-	MDRV_MACHINE_START(backfire)
+	MCFG_MACHINE_START(backfire)
 
 	/* video hardware */
-	MDRV_PALETTE_LENGTH(2048)
-	MDRV_GFXDECODE(backfire)
-	MDRV_DEFAULT_LAYOUT(layout_dualhsxs)
+	MCFG_PALETTE_LENGTH(2048)
+	MCFG_GFXDECODE(backfire)
+	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
 
-	MDRV_SCREEN_ADD("lscreen", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_SIZE(40*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_ADD("lscreen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_SIZE(40*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 
-	MDRV_SCREEN_ADD("rscreen", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_SIZE(40*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_ADD("rscreen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_SIZE(40*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 
-	MDRV_VIDEO_START(backfire)
-	MDRV_VIDEO_UPDATE(backfire)
+	MCFG_VIDEO_START(backfire)
+	MCFG_VIDEO_UPDATE(backfire)
 
-	MDRV_DECO16IC_ADD("deco_custom", backfire_deco16ic_intf)
+	MCFG_DECO16IC_ADD("deco_custom", backfire_deco16ic_intf)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ymz", YMZ280B, 28000000 / 2)
-	MDRV_SOUND_CONFIG(ymz280b_intf)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("ymz", YMZ280B, 28000000 / 2)
+	MCFG_SOUND_CONFIG(ymz280b_intf)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -645,7 +645,7 @@ ROM_END
 
 static void descramble_sound( running_machine *machine )
 {
-	UINT8 *rom = memory_region(machine, "ymz");
+	UINT8 *rom = machine->region("ymz")->base();
 	int length = 0x200000; // only the first rom is swapped on backfire!
 	UINT8 *buf1 = auto_alloc_array(machine, UINT8, length);
 	UINT32 x;

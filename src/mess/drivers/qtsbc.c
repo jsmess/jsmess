@@ -27,7 +27,7 @@ public:
 
 static WRITE8_HANDLER( qtsbc_06_w )
 {
-	running_device *terminal = space->machine->device("terminal");
+	device_t *terminal = space->machine->device("terminal");
 
 	terminal_write(terminal, 0, data);
 }
@@ -66,7 +66,7 @@ INPUT_PORTS_END
 static MACHINE_RESET(qtsbc)
 {
 	qtsbc_state *state = machine->driver_data<qtsbc_state>();
-	UINT8* bios = memory_region(machine, "maincpu")+0x10000;
+	UINT8* bios = machine->region("maincpu")->base()+0x10000;
 	memcpy(state->ram,bios, 0x800);
 }
 
@@ -83,16 +83,16 @@ static GENERIC_TERMINAL_INTERFACE( qtsbc_terminal_intf )
 
 static MACHINE_CONFIG_START( qtsbc, qtsbc_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz) // Mostek MK3880
-	MDRV_CPU_PROGRAM_MAP(qtsbc_mem)
-	MDRV_CPU_IO_MAP(qtsbc_io)
+	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz) // Mostek MK3880
+	MCFG_CPU_PROGRAM_MAP(qtsbc_mem)
+	MCFG_CPU_IO_MAP(qtsbc_io)
 
-	MDRV_MACHINE_RESET(qtsbc)
+	MCFG_MACHINE_RESET(qtsbc)
 
 	/* video hardware */
-	MDRV_FRAGMENT_ADD( generic_terminal )
+	MCFG_FRAGMENT_ADD( generic_terminal )
 
-	MDRV_GENERIC_TERMINAL_ADD("terminal", qtsbc_terminal_intf)
+	MCFG_GENERIC_TERMINAL_ADD("terminal", qtsbc_terminal_intf)
 MACHINE_CONFIG_END
 
 /* ROM definition */

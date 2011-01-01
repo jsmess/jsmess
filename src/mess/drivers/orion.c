@@ -123,53 +123,53 @@ static const floppy_config orion_floppy_config =
 
 /* Machine driver */
 static MACHINE_CONFIG_START( orion128, orion_state )
-    MDRV_CPU_ADD("maincpu", I8080, 2000000)
-    MDRV_CPU_PROGRAM_MAP(orion128_mem)
-    MDRV_CPU_IO_MAP(orion128_io)
+    MCFG_CPU_ADD("maincpu", I8080, 2000000)
+    MCFG_CPU_PROGRAM_MAP(orion128_mem)
+    MCFG_CPU_IO_MAP(orion128_io)
 
-    MDRV_MACHINE_START( orion128 )
-    MDRV_MACHINE_RESET( orion128 )
+    MCFG_MACHINE_START( orion128 )
+    MCFG_MACHINE_RESET( orion128 )
 
-	MDRV_I8255A_ADD( "ppi8255_1", orion128_ppi8255_interface_1 )
+	MCFG_I8255A_ADD( "ppi8255_1", orion128_ppi8255_interface_1 )
 
-	MDRV_I8255A_ADD( "ppi8255_2", radio86_ppi8255_interface_1 )
+	MCFG_I8255A_ADD( "ppi8255_2", radio86_ppi8255_interface_1 )
 
     /* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(50)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(384, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 384-1, 0, 256-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(384, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 256-1)
 
-	MDRV_PALETTE_LENGTH(18)
-	MDRV_PALETTE_INIT( orion128 )
+	MCFG_PALETTE_LENGTH(18)
+	MCFG_PALETTE_INIT( orion128 )
 
 
-	MDRV_VIDEO_START(orion128)
-    MDRV_VIDEO_UPDATE(orion128)
+	MCFG_VIDEO_START(orion128)
+    MCFG_VIDEO_UPDATE(orion128)
 
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_WAVE_ADD("wave", "cassette")
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_WAVE_ADD("wave", "cassette")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MDRV_CASSETTE_ADD( "cassette", orion_cassette_config )
+	MCFG_CASSETTE_ADD( "cassette", orion_cassette_config )
 
-	MDRV_WD1793_ADD("wd1793", orion_wd17xx_interface )
+	MCFG_WD1793_ADD("wd1793", orion_wd17xx_interface )
 
-	MDRV_FLOPPY_4_DRIVES_ADD(orion_floppy_config)
+	MCFG_FLOPPY_4_DRIVES_ADD(orion_floppy_config)
 
-	MDRV_CARTSLOT_ADD("cart")
+	MCFG_CARTSLOT_ADD("cart")
 
 	/* internal ram */
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("256K")
-	MDRV_RAM_DEFAULT_VALUE(0x00)
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("256K")
+	MCFG_RAM_DEFAULT_VALUE(0x00)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( orion128ms, orion128 )
-	MDRV_DEVICE_REMOVE("ppi8255_2")
-	MDRV_I8255A_ADD( "ppi8255_2", rk7007_ppi8255_interface )
+	MCFG_DEVICE_REMOVE("ppi8255_2")
+	MCFG_I8255A_ADD( "ppi8255_2", rk7007_ppi8255_interface )
 MACHINE_CONFIG_END
 
 static const ay8910_interface orionz80_ay_interface =
@@ -180,109 +180,109 @@ static const ay8910_interface orionz80_ay_interface =
 };
 
 static MACHINE_CONFIG_START( orionz80, orion_state )
-    MDRV_CPU_ADD("maincpu", Z80, 2500000)
-    MDRV_CPU_PROGRAM_MAP(orionz80_mem)
-    MDRV_CPU_IO_MAP(orionz80_io)
-    MDRV_CPU_VBLANK_INT("screen",orionz80_interrupt)
+    MCFG_CPU_ADD("maincpu", Z80, 2500000)
+    MCFG_CPU_PROGRAM_MAP(orionz80_mem)
+    MCFG_CPU_IO_MAP(orionz80_io)
+    MCFG_CPU_VBLANK_INT("screen",orionz80_interrupt)
 
-    MDRV_MACHINE_START( orionz80 )
-    MDRV_MACHINE_RESET( orionz80 )
+    MCFG_MACHINE_START( orionz80 )
+    MCFG_MACHINE_RESET( orionz80 )
 
-	MDRV_I8255A_ADD( "ppi8255_1", orion128_ppi8255_interface_1 )
+	MCFG_I8255A_ADD( "ppi8255_1", orion128_ppi8255_interface_1 )
 
-	MDRV_I8255A_ADD( "ppi8255_2", radio86_ppi8255_interface_1 )
+	MCFG_I8255A_ADD( "ppi8255_2", radio86_ppi8255_interface_1 )
 
     /* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(50)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(384, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 384-1, 0, 256-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(384, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 256-1)
 
-	MDRV_PALETTE_LENGTH(18)
-	MDRV_PALETTE_INIT( orion128 )
+	MCFG_PALETTE_LENGTH(18)
+	MCFG_PALETTE_INIT( orion128 )
 
-	MDRV_VIDEO_START(orion128)
-	MDRV_VIDEO_UPDATE(orion128)
+	MCFG_VIDEO_START(orion128)
+	MCFG_VIDEO_UPDATE(orion128)
 
-	MDRV_MC146818_ADD( "rtc", MC146818_IGNORE_CENTURY )
+	MCFG_MC146818_ADD( "rtc", MC146818_IGNORE_CENTURY )
 
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MDRV_SOUND_WAVE_ADD("wave", "cassette")
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MDRV_SOUND_ADD("ay8912", AY8912, 1773400)
-	MDRV_SOUND_CONFIG(orionz80_ay_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_WAVE_ADD("wave", "cassette")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD("ay8912", AY8912, 1773400)
+	MCFG_SOUND_CONFIG(orionz80_ay_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MDRV_CASSETTE_ADD( "cassette", orion_cassette_config )
+	MCFG_CASSETTE_ADD( "cassette", orion_cassette_config )
 
-	MDRV_WD1793_ADD("wd1793", orion_wd17xx_interface )
+	MCFG_WD1793_ADD("wd1793", orion_wd17xx_interface )
 
-	MDRV_FLOPPY_4_DRIVES_ADD(orion_floppy_config)
+	MCFG_FLOPPY_4_DRIVES_ADD(orion_floppy_config)
 
-	MDRV_CARTSLOT_ADD("cart")
+	MCFG_CARTSLOT_ADD("cart")
 
 	/* internal ram */
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("512K")
-	MDRV_RAM_DEFAULT_VALUE(0x00)
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("512K")
+	MCFG_RAM_DEFAULT_VALUE(0x00)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( orionz80ms, orionz80 )
 
-	MDRV_DEVICE_REMOVE("ppi8255_2")
-	MDRV_I8255A_ADD( "ppi8255_2", rk7007_ppi8255_interface )
+	MCFG_DEVICE_REMOVE("ppi8255_2")
+	MCFG_I8255A_ADD( "ppi8255_2", rk7007_ppi8255_interface )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( orionpro, orion_state )
-    MDRV_CPU_ADD("maincpu", Z80, 5000000)
-    MDRV_CPU_PROGRAM_MAP(orionpro_mem)
-    MDRV_CPU_IO_MAP(orionpro_io)
+    MCFG_CPU_ADD("maincpu", Z80, 5000000)
+    MCFG_CPU_PROGRAM_MAP(orionpro_mem)
+    MCFG_CPU_IO_MAP(orionpro_io)
 
-    MDRV_MACHINE_RESET( orionpro )
+    MCFG_MACHINE_RESET( orionpro )
 
-	MDRV_I8255A_ADD( "ppi8255_1", orion128_ppi8255_interface_1 )
+	MCFG_I8255A_ADD( "ppi8255_1", orion128_ppi8255_interface_1 )
 
-	MDRV_I8255A_ADD( "ppi8255_2", radio86_ppi8255_interface_1 )
+	MCFG_I8255A_ADD( "ppi8255_2", radio86_ppi8255_interface_1 )
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(50)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(384, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 384-1, 0, 256-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(384, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 256-1)
 
-	MDRV_PALETTE_LENGTH(18)
-	MDRV_PALETTE_INIT( orion128 )
+	MCFG_PALETTE_LENGTH(18)
+	MCFG_PALETTE_INIT( orion128 )
 
-	MDRV_VIDEO_START(orion128)
-    MDRV_VIDEO_UPDATE(orion128)
+	MCFG_VIDEO_START(orion128)
+    MCFG_VIDEO_UPDATE(orion128)
 
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MDRV_SOUND_WAVE_ADD("wave", "cassette")
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MDRV_SOUND_ADD("ay8912", AY8912, 1773400)
-	MDRV_SOUND_CONFIG(orionz80_ay_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_WAVE_ADD("wave", "cassette")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD("ay8912", AY8912, 1773400)
+	MCFG_SOUND_CONFIG(orionz80_ay_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MDRV_CASSETTE_ADD( "cassette", orion_cassette_config )
+	MCFG_CASSETTE_ADD( "cassette", orion_cassette_config )
 
-	MDRV_WD1793_ADD("wd1793", orion_wd17xx_interface )
+	MCFG_WD1793_ADD("wd1793", orion_wd17xx_interface )
 
-	MDRV_FLOPPY_4_DRIVES_ADD(orion_floppy_config)
+	MCFG_FLOPPY_4_DRIVES_ADD(orion_floppy_config)
 
-	MDRV_CARTSLOT_ADD("cart")
+	MCFG_CARTSLOT_ADD("cart")
 
 	/* internal ram */
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("512K")
-	MDRV_RAM_DEFAULT_VALUE(0x00)
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("512K")
+	MCFG_RAM_DEFAULT_VALUE(0x00)
 MACHINE_CONFIG_END
 
 /* ROM definition */

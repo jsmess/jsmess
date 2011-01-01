@@ -31,12 +31,12 @@ public:
 	UINT8 fdc_intrq;
 	UINT8 fdc_drq;
 	UINT8 _0a;
-	running_device *fdc;
+	device_t *fdc;
 	mc146818_device *rtc;
-	running_device *z80pio;
-	running_device *speaker;
-	running_device *cassette;
-	running_device *printer;
+	device_t *z80pio;
+	device_t *speaker;
+	device_t *cassette;
+	device_t *printer;
 	UINT8 mbee256_was_pressed[15];
 	UINT8 mbee256_q[20];
 	UINT8 mbee256_q_pos;
@@ -51,7 +51,7 @@ public:
 	UINT8 is_premium;
 	UINT8 sy6545_cursor[16];
 	UINT8 sy6545_status;
-	running_device *mc6845;
+	device_t *mc6845;
 	UINT8 speed;
 	UINT8 flash;
 	UINT16 cursor;

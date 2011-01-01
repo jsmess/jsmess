@@ -18,8 +18,8 @@ public:
 	int tape_control;
 
 	/* devices */
-	running_device *cassette;
-	running_device *speaker;
+	device_t *cassette;
+	device_t *speaker;
 };
 
 #endif

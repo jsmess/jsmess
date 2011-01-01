@@ -42,9 +42,9 @@ DECLARE_LEGACY_IMAGE_DEVICE(MICRODRIVE, microdrive);
 #define MDV_1 "mdv1"
 #define MDV_2 "mdv2"
 
-#define MDRV_MICRODRIVE_ADD(_tag, _config) \
-	MDRV_DEVICE_ADD(_tag, MICRODRIVE, 0) \
-	MDRV_DEVICE_CONFIG(_config)
+#define MCFG_MICRODRIVE_ADD(_tag, _config) \
+	MCFG_DEVICE_ADD(_tag, MICRODRIVE, 0) \
+	MCFG_DEVICE_CONFIG(_config)
 
 #define MICRODRIVE_CONFIG(_name) \
 	const microdrive_config (_name) = 

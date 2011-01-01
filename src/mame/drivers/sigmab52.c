@@ -146,7 +146,7 @@ static VIDEO_START( jwildb52 )
 
 static VIDEO_UPDATE( jwildb52 )
 {
-	running_device *hd63484 = screen->machine->device("hd63484");
+	device_t *hd63484 = screen->machine->device("hd63484");
 
 	int x, y, b, src;
 
@@ -226,7 +226,7 @@ static WRITE8_HANDLER(acrtc_w)
 {
 	static int latch=0;
 	static unsigned int acrtc_data=0;
-	running_device *hd63484 = space->machine->device("hd63484");
+	device_t *hd63484 = space->machine->device("hd63484");
 	if(!offset)
 	{
 		//address select
@@ -257,7 +257,7 @@ static READ8_HANDLER(acrtc_r)
 {
 	if(offset&1)
 	{
-		running_device *hd63484 = space->machine->device("hd63484");
+		device_t *hd63484 = space->machine->device("hd63484");
 		return hd63484_data_r(hd63484, 0, 0xff);
 	}
 
@@ -279,7 +279,7 @@ static READ8_HANDLER(unk_f700_r)
 
 static WRITE8_HANDLER(unk_f710_w)
 {
-	memory_set_bankptr(space->machine, "bank1" ,&memory_region(space->machine, "maincpu")[0x10000 + ((data&0x80)?0x4000:0x0000)]);
+	memory_set_bankptr(space->machine, "bank1" ,&space->machine->region("maincpu")->base()[0x10000 + ((data&0x80)?0x4000:0x0000)]);
 }
 
 static READ8_HANDLER(unk_f721_r)
@@ -527,11 +527,11 @@ static INTERRUPT_GEN( timer_irq )
 
 static MACHINE_START(jwildb52)
 {
-	memory_set_bankptr(machine, "bank1", &memory_region(machine, "maincpu")[0x10000 + 0x0000]);
+	memory_set_bankptr(machine, "bank1", &machine->region("maincpu")->base()[0x10000 + 0x0000]);
 
-	memory_set_bankptr(machine, "bank2", &memory_region(machine, "maincpu")[0x10000 + 0xf800]);
+	memory_set_bankptr(machine, "bank2", &machine->region("maincpu")->base()[0x10000 + 0xf800]);
 
-	memory_set_bankptr(machine, "bank3", &memory_region(machine, "maincpu")[0x10000 + 0x8000]);
+	memory_set_bankptr(machine, "bank3", &machine->region("maincpu")->base()[0x10000 + 0x8000]);
 
 /*
 
@@ -545,10 +545,10 @@ static MACHINE_START(jwildb52)
 */
 
 	{
-		UINT16 *rom = (UINT16*)memory_region(machine, "gfx1");
+		UINT16 *rom = (UINT16*)machine->region("gfx1")->base();
 		int i;
 
-		running_device *hd63484 = machine->device("hd63484");
+		device_t *hd63484 = machine->device("hd63484");
 
 		for(i = 0; i < 0x40000/2; ++i)
 		{
@@ -567,33 +567,33 @@ static const hd63484_interface jwildb52_hd63484_intf = { 1 };
 static MACHINE_CONFIG_START( jwildb52, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6809, MAIN_CLOCK/9)	/* 2 MHz */
-	MDRV_CPU_PROGRAM_MAP(jwildb52_map)
-	MDRV_CPU_VBLANK_INT("screen", timer_irq)	/* Fix me */
+	MCFG_CPU_ADD("maincpu", M6809, MAIN_CLOCK/9)	/* 2 MHz */
+	MCFG_CPU_PROGRAM_MAP(jwildb52_map)
+	MCFG_CPU_VBLANK_INT("screen", timer_irq)	/* Fix me */
 
 #if 0
-	MDRV_CPU_ADD("audiocpu", M6809, MAIN_CLOCK/9)	/* 2 MHz */
-	MDRV_CPU_PROGRAM_MAP(sound_prog_map)
+	MCFG_CPU_ADD("audiocpu", M6809, MAIN_CLOCK/9)	/* 2 MHz */
+	MCFG_CPU_PROGRAM_MAP(sound_prog_map)
 	//temporary teh same int as for main cpu
-	MDRV_CPU_PERIODIC_INT(timer_irq, 1000)			/* Fix me */
+	MCFG_CPU_PERIODIC_INT(timer_irq, 1000)			/* Fix me */
 #endif
 
-	MDRV_MACHINE_START(jwildb52)
+	MCFG_MACHINE_START(jwildb52)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(30)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(1024, 1024)
-	MDRV_SCREEN_VISIBLE_AREA(0, 512-1, 0, 384-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(30)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(1024, 1024)
+	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 384-1)
 
-	MDRV_HD63484_ADD("hd63484", jwildb52_hd63484_intf)
+	MCFG_HD63484_ADD("hd63484", jwildb52_hd63484_intf)
 
-	MDRV_PALETTE_INIT(jwildb52)
-	MDRV_PALETTE_LENGTH(256)
+	MCFG_PALETTE_INIT(jwildb52)
+	MCFG_PALETTE_LENGTH(256)
 
-	MDRV_VIDEO_START(jwildb52)
-	MDRV_VIDEO_UPDATE(jwildb52)
+	MCFG_VIDEO_START(jwildb52)
+	MCFG_VIDEO_UPDATE(jwildb52)
 
 MACHINE_CONFIG_END
 

@@ -50,9 +50,9 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MDRV_I8155_ADD(_tag, _clock, _config) \
-	MDRV_DEVICE_ADD((_tag), I8155, _clock)	\
-	MDRV_DEVICE_CONFIG(_config)
+#define MCFG_I8155_ADD(_tag, _clock, _config) \
+	MCFG_DEVICE_ADD((_tag), I8155, _clock)	\
+	MCFG_DEVICE_CONFIG(_config)
 
 #define I8155_INTERFACE(name) \
 	const i8155_interface (name) =

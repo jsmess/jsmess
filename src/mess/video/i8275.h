@@ -24,8 +24,8 @@ DECLARE_LEGACY_DEVICE(I8275, i8275);
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef void (*i8275_display_pixels_func)(running_device *device, int x, int y, UINT8 linecount, UINT8 charcode, UINT8 lineattr, UINT8 lten, UINT8 rvv, UINT8 vsp, UINT8 gpa, UINT8 hlgt);
-#define I8275_DISPLAY_PIXELS(name)	void name(running_device *device, int x, int y, UINT8 linecount, UINT8 charcode, UINT8 lineattr, UINT8 lten, UINT8 rvv, UINT8 vsp, UINT8 gpa, UINT8 hlgt)
+typedef void (*i8275_display_pixels_func)(device_t *device, int x, int y, UINT8 linecount, UINT8 charcode, UINT8 lineattr, UINT8 lten, UINT8 rvv, UINT8 vsp, UINT8 gpa, UINT8 hlgt);
+#define I8275_DISPLAY_PIXELS(name)	void name(device_t *device, int x, int y, UINT8 linecount, UINT8 charcode, UINT8 lineattr, UINT8 lten, UINT8 rvv, UINT8 vsp, UINT8 gpa, UINT8 hlgt)
 
 /* interface */
 typedef struct _i8275_interface i8275_interface;
@@ -51,7 +51,7 @@ READ8_DEVICE_HANDLER ( i8275_r );
 WRITE8_DEVICE_HANDLER ( i8275_w );
 
 /* updates the screen */
-void i8275_update(running_device *device, bitmap_t *bitmap, const rectangle *cliprect);
+void i8275_update(device_t *device, bitmap_t *bitmap, const rectangle *cliprect);
 
 WRITE8_DEVICE_HANDLER( i8275_dack_w );
 
@@ -59,8 +59,8 @@ WRITE8_DEVICE_HANDLER( i8275_dack_w );
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MDRV_I8275_ADD(_tag, _intrf) \
-	MDRV_DEVICE_ADD(_tag, I8275, 0) \
-	MDRV_DEVICE_CONFIG(_intrf)
+#define MCFG_I8275_ADD(_tag, _intrf) \
+	MCFG_DEVICE_ADD(_tag, I8275, 0) \
+	MCFG_DEVICE_CONFIG(_intrf)
 
 #endif

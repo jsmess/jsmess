@@ -40,12 +40,12 @@ WRITE8_DEVICE_HANDLER( pc_lpt_control_w );
 
 DECLARE_LEGACY_DEVICE(PC_LPT, pc_lpt);
 
-#define MDRV_PC_LPT_ADD(_tag, _intf) \
-	MDRV_DEVICE_ADD(_tag, PC_LPT, 0) \
-	MDRV_DEVICE_CONFIG(_intf)
+#define MCFG_PC_LPT_ADD(_tag, _intf) \
+	MCFG_DEVICE_ADD(_tag, PC_LPT, 0) \
+	MCFG_DEVICE_CONFIG(_intf)
 
-#define MDRV_PC_LPT_REMOVE(_tag) \
-	MDRV_DEVICE_REMOVE(_tag)
+#define MCFG_PC_LPT_REMOVE(_tag) \
+	MCFG_DEVICE_REMOVE(_tag)
 
 
 #endif /* __PC_LPT__ */

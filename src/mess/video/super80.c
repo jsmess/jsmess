@@ -94,7 +94,7 @@ VIDEO_UPDATE( super80 )
 	super80_state *state = screen->machine->driver_data<super80_state>();
 	UINT8 y,ra,chr=32,gfx,screen_on=0;
 	UINT16 sy=0,ma=state->vidpg,x;
-	UINT8 *RAM = memory_region(screen->machine, "maincpu");
+	UINT8 *RAM = screen->machine->region("maincpu")->base();
 
 	output_set_value("cass_led",(state->super80_shared & 0x20) ? 1 : 0);
 
@@ -136,7 +136,7 @@ VIDEO_UPDATE( super80d )
 	super80_state *state = screen->machine->driver_data<super80_state>();
 	UINT8 y,ra,chr=32,gfx,screen_on=0;
 	UINT16 sy=0,ma=state->vidpg,x;
-	UINT8 *RAM = memory_region(screen->machine, "maincpu");
+	UINT8 *RAM = screen->machine->region("maincpu")->base();
 
 	output_set_value("cass_led",(state->super80_shared & 0x20) ? 1 : 0);
 
@@ -178,7 +178,7 @@ VIDEO_UPDATE( super80e )
 	super80_state *state = screen->machine->driver_data<super80_state>();
 	UINT8 y,ra,chr=32,gfx,screen_on=0;
 	UINT16 sy=0,ma=state->vidpg,x;
-	UINT8 *RAM = memory_region(screen->machine, "maincpu");
+	UINT8 *RAM = screen->machine->region("maincpu")->base();
 
 	output_set_value("cass_led",(state->super80_shared & 0x20) ? 1 : 0);
 
@@ -221,7 +221,7 @@ VIDEO_UPDATE( super80m )
 	UINT8 y,ra,chr=32,gfx,screen_on=0;
 	UINT16 sy=0,ma=state->vidpg,x;
 	UINT8 col, bg=0, fg=0, options=input_port_read(screen->machine, "CONFIG");
-	UINT8 *RAM = memory_region(screen->machine, "maincpu");
+	UINT8 *RAM = screen->machine->region("maincpu")->base();
 
 	/* get selected character generator */
 	UINT8 cgen = state->current_charset ^ ((options & 0x10)>>4);	/* bit 0 of port F1 and cgen config switch */
@@ -283,7 +283,7 @@ VIDEO_START( super80 )
 {
 	super80_state *state = machine->driver_data<super80_state>();
 	state->vidpg = 0xfe00;
-	state->FNT = memory_region(machine, "gfx1");
+	state->FNT = machine->region("gfx1")->base();
 }
 
 /**************************** I/O PORTS *****************************************************************/
@@ -390,9 +390,9 @@ VIDEO_START( super80v )
 {
 	super80_state *state = machine->driver_data<super80_state>();
 	state->mc6845 = machine->device("crtc");
-	state->pcgram = memory_region(machine, "maincpu")+0xf000;
-	state->videoram = memory_region(machine, "videoram");
-	state->colorram = memory_region(machine, "colorram");
+	state->pcgram = machine->region("maincpu")->base()+0xf000;
+	state->videoram = machine->region("videoram")->base();
+	state->colorram = machine->region("colorram")->base();
 }
 
 VIDEO_UPDATE( super80v )

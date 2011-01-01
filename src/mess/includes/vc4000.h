@@ -98,7 +98,7 @@ extern VIDEO_UPDATE( vc4000 );
 /*----------- defined in audio/vc4000.c -----------*/
 
 DECLARE_LEGACY_SOUND_DEVICE(VC4000, vc4000_sound);
-void vc4000_soundport_w (running_device *device, int mode, int data);
+void vc4000_soundport_w (device_t *device, int mode, int data);
 
 
 #endif /* VC4000_H_ */

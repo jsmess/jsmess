@@ -43,17 +43,17 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MDRV_MOS6526R1_ADD(_tag, _clock, _config) \
-	MDRV_DEVICE_ADD(_tag, MOS6526R1, _clock) \
-	MDRV_DEVICE_CONFIG(_config)
+#define MCFG_MOS6526R1_ADD(_tag, _clock, _config) \
+	MCFG_DEVICE_ADD(_tag, MOS6526R1, _clock) \
+	MCFG_DEVICE_CONFIG(_config)
 
-#define MDRV_MOS6526R2_ADD(_tag, _clock, _config) \
-	MDRV_DEVICE_ADD(_tag, MOS6526R2, _clock) \
-	MDRV_DEVICE_CONFIG(_config)
+#define MCFG_MOS6526R2_ADD(_tag, _clock, _config) \
+	MCFG_DEVICE_ADD(_tag, MOS6526R2, _clock) \
+	MCFG_DEVICE_CONFIG(_config)
 
-#define MDRV_MOS8520_ADD(_tag, _clock, _config) \
-	MDRV_DEVICE_ADD(_tag, MOS8520, _clock) \
-	MDRV_DEVICE_CONFIG(_config)
+#define MCFG_MOS8520_ADD(_tag, _clock, _config) \
+	MCFG_DEVICE_ADD(_tag, MOS8520, _clock) \
+	MCFG_DEVICE_CONFIG(_config)
 
 #define MOS6526_INTERFACE(name) \
 	const mos6526_interface (name)=
@@ -263,6 +263,6 @@ WRITE_LINE_DEVICE_HANDLER( mos6526_sp_w );
 WRITE_LINE_DEVICE_HANDLER( mos6526_flag_w );
 
 /* port mask */
-void cia_set_port_mask_value(running_device *device, int port, int data);
+void cia_set_port_mask_value(device_t *device, int port, int data);
 
 #endif /* __6526CIA_H__ */

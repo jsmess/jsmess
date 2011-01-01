@@ -158,7 +158,7 @@ static WRITE_LINE_DEVICE_HANDLER( pc_dma8237_out_eop )
 	pc_fdc_set_tc_state( device->machine, state == ASSERT_LINE ? 0 : 1 );
 }
 
-static void set_dma_channel(running_device *device, int channel, int state)
+static void set_dma_channel(device_t *device, int channel, int state)
 {
 	pc_state *st = device->machine->driver_data<pc_state>();
 
@@ -248,7 +248,7 @@ UINT8 pc_speaker_get_spk(running_machine *machine)
 
 void pc_speaker_set_spkrdata(running_machine *machine, UINT8 data)
 {
-	running_device *speaker = machine->device("speaker");
+	device_t *speaker = machine->device("speaker");
 	pc_state *st = machine->driver_data<pc_state>();
 	st->pc_spkrdata = data ? 1 : 0;
 	speaker_level_w( speaker, pc_speaker_get_spk(machine) );
@@ -257,7 +257,7 @@ void pc_speaker_set_spkrdata(running_machine *machine, UINT8 data)
 
 void pc_speaker_set_input(running_machine *machine, UINT8 data)
 {
-	running_device *speaker = machine->device("speaker");
+	device_t *speaker = machine->device("speaker");
 	pc_state *st = machine->driver_data<pc_state>();
 	st->pc_input = data ? 1 : 0;
 	speaker_level_w( speaker, pc_speaker_get_spk(machine) );
@@ -355,7 +355,7 @@ static INS8250_INTERRUPT( pc_com_interrupt_2 )
 
 /* called when com registers read/written - used to update peripherals that
 are connected */
-static void pc_com_refresh_connected_common(running_device *device, int n, int data)
+static void pc_com_refresh_connected_common(device_t *device, int n, int data)
 {
 	/* mouse connected to this port? */
 	if (input_port_read(device->machine, "DSW2") & (0x80>>n))
@@ -737,7 +737,7 @@ static WRITE8_DEVICE_HANDLER ( ibm5150_ppi_porta_w )
 static WRITE8_DEVICE_HANDLER ( ibm5150_ppi_portb_w )
 {
 	pc_state *st = device->machine->driver_data<pc_state>();
-	running_device *keyboard = device->machine->device("keyboard");
+	device_t *keyboard = device->machine->device("keyboard");
 
 	/* KB controller port B */
 	st->ppi_portb = data;
@@ -774,7 +774,7 @@ static WRITE8_DEVICE_HANDLER ( ibm5150_ppi_portc_w )
 WRITE8_HANDLER( ibm5150_kb_set_clock_signal )
 {
 	pc_state *st = space->machine->driver_data<pc_state>();
-	running_device *keyboard = space->machine->device("keyboard");
+	device_t *keyboard = space->machine->device("keyboard");
 
 	if ( st->ppi_clock_signal != data )
 	{
@@ -808,7 +808,7 @@ WRITE8_HANDLER( ibm5150_kb_set_clock_signal )
 WRITE8_HANDLER( ibm5150_kb_set_data_signal )
 {
 	pc_state *st = space->machine->driver_data<pc_state>();
-	running_device *keyboard = space->machine->device("keyboard");
+	device_t *keyboard = space->machine->device("keyboard");
 
 	st->ppi_data_signal = data;
 
@@ -895,7 +895,7 @@ static READ8_DEVICE_HANDLER ( ibm5160_ppi_portc_r )
 static WRITE8_DEVICE_HANDLER( ibm5160_ppi_portb_w )
 {
 	pc_state *st = device->machine->driver_data<pc_state>();
-	running_device *keyboard = device->machine->device("keyboard");
+	device_t *keyboard = device->machine->device("keyboard");
 
 	/* PPI controller port B*/
 	st->ppi_portb = data;
@@ -1094,7 +1094,7 @@ static void pc_fdc_dma_drq(running_machine *machine, int state)
 	i8237_dreq2_w( st->dma8237, state);
 }
 
-static running_device * pc_get_device(running_machine *machine )
+static device_t * pc_get_device(running_machine *machine )
 {
 	return machine->device("upd765");
 }
@@ -1190,8 +1190,8 @@ DRIVER_INIT( pcmda )
 
 DRIVER_INIT( europc )
 {
-	UINT8 *gfx = &memory_region(machine, "gfx1")[0x8000];
-	UINT8 *rom = &memory_region(machine, "maincpu")[0];
+	UINT8 *gfx = &machine->region("gfx1")->base()[0x8000];
+	UINT8 *rom = &machine->region("maincpu")->base()[0];
 	int i;
 
     /* just a plain bit pattern for graphics data generation */
@@ -1224,7 +1224,7 @@ DRIVER_INIT( t1000hx )
 DRIVER_INIT( pc200 )
 {
 	address_space *space = cpu_get_address_space( machine->firstcpu, ADDRESS_SPACE_PROGRAM );
-	UINT8 *gfx = &memory_region(machine, "gfx1")[0x8000];
+	UINT8 *gfx = &machine->region("gfx1")->base()[0x8000];
 	int i;
 
     /* just a plain bit pattern for graphics data generation */
@@ -1234,14 +1234,14 @@ DRIVER_INIT( pc200 )
 	memory_install_read16_handler( space, 0xb0000, 0xbffff, 0, 0, pc200_videoram16le_r );
 	memory_install_write16_handler( space, 0xb0000, 0xbffff, 0, 0, pc200_videoram16le_w );
 	pc_videoram_size = 0x10000;
-	pc_videoram = memory_region(machine, "maincpu")+0xb0000;
+	pc_videoram = machine->region("maincpu")->base()+0xb0000;
 	mess_init_pc_common(machine, PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
 }
 
 DRIVER_INIT( ppc512 )
 {
 	address_space *space = cpu_get_address_space( machine->firstcpu, ADDRESS_SPACE_PROGRAM );
-	UINT8 *gfx = &memory_region(machine, "gfx1")[0x8000];
+	UINT8 *gfx = &machine->region("gfx1")->base()[0x8000];
 	int i;
 
     /* just a plain bit pattern for graphics data generation */
@@ -1251,14 +1251,14 @@ DRIVER_INIT( ppc512 )
 	memory_install_read16_handler( space, 0xb0000, 0xbffff, 0, 0, pc200_videoram16le_r );
 	memory_install_write16_handler( space, 0xb0000, 0xbffff, 0, 0, pc200_videoram16le_w );
 	pc_videoram_size = 0x10000;
-	pc_videoram = memory_region(machine, "maincpu")+0xb0000;
+	pc_videoram = machine->region("maincpu")->base()+0xb0000;
 	mess_init_pc_common(machine, PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
 }
 DRIVER_INIT( pc1512 )
 {
 	address_space *space = cpu_get_address_space( machine->firstcpu, ADDRESS_SPACE_PROGRAM );
 	address_space *io_space = cpu_get_address_space( machine->firstcpu, ADDRESS_SPACE_IO );
-	UINT8 *gfx = &memory_region(machine, "gfx1")[0x8000];
+	UINT8 *gfx = &machine->region("gfx1")->base()[0x8000];
 	int i;
 
     /* just a plain bit pattern for graphics data generation */
@@ -1332,7 +1332,7 @@ MACHINE_START( pc )
 
 MACHINE_RESET( pc )
 {
-	running_device *speaker = machine->device("speaker");
+	device_t *speaker = machine->device("speaker");
 	pc_state *st = machine->driver_data<pc_state>();
 	st->maincpu = machine->device("maincpu" );
 	cpu_set_irq_callback(st->maincpu, pc_irq_callback);
@@ -1376,7 +1376,7 @@ MACHINE_START( pcjr )
 
 MACHINE_RESET( pcjr )
 {
-	running_device *speaker = machine->device("speaker");
+	device_t *speaker = machine->device("speaker");
 	pc_state *st = machine->driver_data<pc_state>();
 	st->u73_q2 = 0;
 	st->out1 = 0;
@@ -1414,7 +1414,7 @@ DEVICE_IMAGE_LOAD( pcjr_cartridge )
 
 		size = image.get_software_region_length("rom" );
 
-		memcpy( memory_region(image.device().machine, "maincpu") + address, cart, size );
+		memcpy( image.device().machine->region("maincpu")->base() + address, cart, size );
 	}
 	else
 	{
@@ -1443,7 +1443,7 @@ DEVICE_IMAGE_LOAD( pcjr_cartridge )
 		}
 
 		/* Read the cartridge contents */
-		if ( ( size - 0x200 ) != image.fread(memory_region(image.device().machine, "maincpu") + address, size - 0x200 ) )
+		if ( ( size - 0x200 ) != image.fread(image.device().machine->region("maincpu")->base() + address, size - 0x200 ) )
 		{
 			image.seterror(IMAGE_ERROR_UNSUPPORTED, "Unable to read cartridge contents" );
 			return IMAGE_INIT_FAIL;

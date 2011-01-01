@@ -275,36 +275,36 @@ INTERRUPT_GEN( ti99_4p_hblank_interrupt )
 static MACHINE_CONFIG_START( ti99_4p_60hz, ti99_4p_state )
 	/* basic machine hardware */
 	/* TMS9900 CPU @ 3.0 MHz */
-	MDRV_CPU_ADD("maincpu", TMS9900, 3000000)
-	MDRV_CPU_PROGRAM_MAP(memmap)
-	MDRV_CPU_IO_MAP(cru_map)
-	MDRV_CPU_VBLANK_INT_HACK(ti99_4p_hblank_interrupt, 262)	/* 262.5 in 60Hz, 312.5 in 50Hz */
+	MCFG_CPU_ADD("maincpu", TMS9900, 3000000)
+	MCFG_CPU_PROGRAM_MAP(memmap)
+	MCFG_CPU_IO_MAP(cru_map)
+	MCFG_CPU_VBLANK_INT_HACK(ti99_4p_hblank_interrupt, 262)	/* 262.5 in 60Hz, 312.5 in 50Hz */
 
 	/* video hardware */
-	MDRV_TI_V9938_ADD("video", 60, "screen", 2500, 512+32, (212+28)*2, tms9901_sg_set_int2)
+	MCFG_TI_V9938_ADD("video", 60, "screen", 2500, 512+32, (212+28)*2, tms9901_sg_set_int2)
 
-	MDRV_MACHINE_START( ti99_4p )
-	MDRV_MACHINE_RESET( ti99_4p )
+	MCFG_MACHINE_START( ti99_4p )
+	MCFG_MACHINE_RESET( ti99_4p )
 
 // Didn't work, probably just done wrong by me:
-//  MDRV_TIMER_ADD_SCANLINE("v9938_scanline", ti99_4ev_scanline_interrupt , "screen", 0, 1)
+//  MCFG_TIMER_ADD_SCANLINE("v9938_scanline", ti99_4ev_scanline_interrupt , "screen", 0, 1)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("dac", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
-	MDRV_SOUND_WAVE_ADD("wave", "cassette")
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
-	MDRV_SOUND_ADD("soundgen", SN76496, 3579545)	/* 3.579545 MHz */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+	MCFG_SOUND_WAVE_ADD("wave", "cassette")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+	MCFG_SOUND_ADD("soundgen", SN76496, 3579545)	/* 3.579545 MHz */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
 	/* tms9901 */
-	MDRV_TMS9901_ADD("tms9901", tms9901_wiring_ti99_4p)
+	MCFG_TMS9901_ADD("tms9901", tms9901_wiring_ti99_4p)
 
 	/* devices */
-	MDRV_PBOXSG_ADD( "peribox", card_extint, card_notconnected, card_ready )
-	MDRV_SGCPUB_ADD( "sgcpu_board" )
-	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )
+	MCFG_PBOXSG_ADD( "peribox", card_extint, card_notconnected, card_ready )
+	MCFG_SGCPUB_ADD( "sgcpu_board" )
+	MCFG_CASSETTE_ADD( "cassette", default_cassette_config )
 MACHINE_CONFIG_END
 
 

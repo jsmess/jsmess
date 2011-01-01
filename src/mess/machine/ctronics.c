@@ -25,7 +25,7 @@ static TIMER_CALLBACK( busy_callback );
 typedef struct _centronics_state centronics_state;
 struct _centronics_state
 {
-	running_device *printer;
+	device_t *printer;
 
 	devcb_resolved_write_line out_ack_func;
 	devcb_resolved_write_line out_busy_func;
@@ -46,7 +46,7 @@ struct _centronics_state
     INLINE FUNCTIONS
 *****************************************************************************/
 
-INLINE centronics_state *get_safe_token(running_device *device)
+INLINE centronics_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == CENTRONICS);
@@ -73,8 +73,8 @@ const centronics_interface standard_centronics =
 *****************************************************************************/
 
 static MACHINE_CONFIG_FRAGMENT( centronics )
-	MDRV_PRINTER_ADD("printer")
-	MDRV_PRINTER_ONLINE(centronics_printer_online)
+	MCFG_PRINTER_ADD("printer")
+	MCFG_PRINTER_ONLINE(centronics_printer_online)
 MACHINE_CONFIG_END
 
 
@@ -151,7 +151,7 @@ DEVICE_GET_INFO( centronics )
     sets us busy when the printer goes offline
 -------------------------------------------------*/
 
-void centronics_printer_online(running_device *device, int state)
+void centronics_printer_online(device_t *device, int state)
 {
 	centronics_state *centronics = get_safe_token(device->owner());
 
@@ -229,7 +229,7 @@ READ8_DEVICE_HANDLER( centronics_data_r )
     set_line - helper to set individual bits
 -------------------------------------------------*/
 
-static void set_line(running_device *device, int line, int state)
+static void set_line(device_t *device, int line, int state)
 {
 	centronics_state *centronics = get_safe_token(device);
 

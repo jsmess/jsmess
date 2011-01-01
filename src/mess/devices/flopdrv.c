@@ -72,15 +72,15 @@ struct _floppy_drive
 	/* index pulse timer */
 	void	*index_timer;
 	/* index pulse callback */
-	void	(*index_pulse_callback)(running_device *controller,running_device *image, int state);
+	void	(*index_pulse_callback)(device_t *controller,device_t *image, int state);
 	/* rotation per minute => gives index pulse frequency */
 	float rpm;
 
-	void	(*ready_state_change_callback)(running_device *controller,running_device *img, int state);
+	void	(*ready_state_change_callback)(device_t *controller,device_t *img, int state);
 
 	int id_index;
 
-	running_device *controller;
+	device_t *controller;
 
 	floppy_image *floppy;
 	int track;
@@ -120,31 +120,31 @@ static const floppy_error_map errmap[] =
 DECLARE_LEGACY_IMAGE_DEVICE(FLOPPY_APPLE, apple525);
 DECLARE_LEGACY_IMAGE_DEVICE(FLOPPY_SONY, sonydriv);
 
-INLINE floppy_drive *get_safe_token(running_device *device)
+INLINE floppy_drive *get_safe_token(device_t *device)
 {
 	assert( device != NULL );
 	assert( device->type() == FLOPPY || device->type() == FLOPPY_APPLE || device->type() == FLOPPY_SONY);
 	return (floppy_drive *) downcast<legacy_device_base *>(device)->token();
 }
 
-floppy_image *flopimg_get_image(running_device *image)
+floppy_image *flopimg_get_image(device_t *image)
 {
 	return get_safe_token(image)->floppy;
 }
 
-void *flopimg_get_custom_data(running_device *image)
+void *flopimg_get_custom_data(device_t *image)
 {
 	floppy_drive *flopimg = get_safe_token( image );
 	return flopimg->custom_data;
 }
 
-void flopimg_alloc_custom_data(running_device *image,void *custom)
+void flopimg_alloc_custom_data(device_t *image,void *custom)
 {
 	floppy_drive *flopimg = get_safe_token( image );
 	flopimg->custom_data = custom;
 }
 
-static int flopimg_get_sectors_per_track(running_device *image, int side)
+static int flopimg_get_sectors_per_track(device_t *image, int side)
 {
 	floperr_t err;
 	int sector_count;
@@ -159,7 +159,7 @@ static int flopimg_get_sectors_per_track(running_device *image, int side)
 	return sector_count;
 }
 
-static void flopimg_get_id_callback(running_device *image, chrn_id *id, int id_index, int side)
+static void flopimg_get_id_callback(device_t *image, chrn_id *id, int id_index, int side)
 {
 	floppy_drive *flopimg;
 	int cylinder, sector, N;
@@ -191,14 +191,14 @@ static void log_readwrite(const char *name, int head, int track, int sector, con
 	logerror("%s:  head=%i track=%i sector=%i buffer='%s'\n", name, head, track, sector, membuf);
 }
 
-static void floppy_drive_set_geometry_absolute(running_device *img, int tracks, int sides)
+static void floppy_drive_set_geometry_absolute(device_t *img, int tracks, int sides)
 {
 	floppy_drive *pDrive = get_safe_token( img );
 	pDrive->max_track = tracks;
 	pDrive->num_sides = sides;
 }
 
-void floppy_drive_set_geometry(running_device *img, floppy_type_t type)
+void floppy_drive_set_geometry(device_t *img, floppy_type_t type)
 {
 	floppy_drive_set_geometry_absolute(img, type.max_track_number, type.head_number);
 }
@@ -206,7 +206,7 @@ void floppy_drive_set_geometry(running_device *img, floppy_type_t type)
 static TIMER_CALLBACK(floppy_drive_index_callback);
 
 /* this is called on device init */
-static void floppy_drive_init(running_device *img)
+static void floppy_drive_init(device_t *img)
 {
 	floppy_drive *pDrive = get_safe_token( img );
 
@@ -235,7 +235,7 @@ static void floppy_drive_init(running_device *img)
 }
 
 /* index pulses at rpm/60 Hz, and stays high 1/20th of time */
-static void floppy_drive_index_func(running_device *img)
+static void floppy_drive_index_func(device_t *img)
 {
 	floppy_drive *drive = get_safe_token( img );
 
@@ -260,7 +260,7 @@ static void floppy_drive_index_func(running_device *img)
 
 static TIMER_CALLBACK(floppy_drive_index_callback)
 {
-	running_device *image = (running_device *) ptr;
+	device_t *image = (device_t *) ptr;
 	floppy_drive_index_func(image);
 }
 
@@ -268,7 +268,7 @@ static TIMER_CALLBACK(floppy_drive_index_callback)
 /* IO_FLOPPY device functions */
 
 /* set flag state */
-void floppy_drive_set_flag_state(running_device *img, int flag, int state)
+void floppy_drive_set_flag_state(device_t *img, int flag, int state)
 {
 	floppy_drive *drv = get_safe_token( img );
 	int prev_state;
@@ -302,7 +302,7 @@ void floppy_drive_set_flag_state(running_device *img, int flag, int state)
 /* for pc, drive is always ready, for amstrad,pcw,spectrum it is only ready under
 a fixed set of circumstances */
 /* use this to set ready state of drive */
-void floppy_drive_set_ready_state(running_device *img, int state, int flag)
+void floppy_drive_set_ready_state(device_t *img, int state, int flag)
 {
 	floppy_drive *drive = get_safe_token(img);
 	device_image_interface *image = dynamic_cast<device_image_interface *>(img);
@@ -332,7 +332,7 @@ void floppy_drive_set_ready_state(running_device *img, int state, int flag)
 }
 
 /* get flag state */
-int	floppy_drive_get_flag_state(running_device *img, int flag)
+int	floppy_drive_get_flag_state(device_t *img, int flag)
 {
 	floppy_drive *drv = get_safe_token( img );
 	int drive_flags;
@@ -351,7 +351,7 @@ int	floppy_drive_get_flag_state(running_device *img, int flag)
 }
 
 
-void floppy_drive_seek(running_device *img, signed int signed_tracks)
+void floppy_drive_seek(device_t *img, signed int signed_tracks)
 {
 	device_image_interface *image = dynamic_cast<device_image_interface *>(img);
 	floppy_drive *pDrive;
@@ -390,7 +390,7 @@ void floppy_drive_seek(running_device *img, signed int signed_tracks)
 
 
 /* this is not accurate. But it will do for now */
-int	floppy_drive_get_next_id(running_device *img, int side, chrn_id *id)
+int	floppy_drive_get_next_id(device_t *img, int side, chrn_id *id)
 {
 	floppy_drive *pDrive;
 	int spt;
@@ -425,7 +425,7 @@ int	floppy_drive_get_next_id(running_device *img, int side, chrn_id *id)
 	return (spt == 0) ? 0 : 1;
 }
 
-void floppy_drive_read_track_data_info_buffer(running_device *img, int side, void *ptr, int *length )
+void floppy_drive_read_track_data_info_buffer(device_t *img, int side, void *ptr, int *length )
 {
 	floppy_drive *flopimg;
 	device_image_interface *image = dynamic_cast<device_image_interface *>(img);
@@ -440,7 +440,7 @@ void floppy_drive_read_track_data_info_buffer(running_device *img, int side, voi
 	}
 }
 
-void floppy_drive_write_track_data_info_buffer(running_device *img, int side, const void *ptr, int *length )
+void floppy_drive_write_track_data_info_buffer(device_t *img, int side, const void *ptr, int *length )
 {
 	floppy_drive *flopimg;
 	device_image_interface *image = dynamic_cast<device_image_interface *>(img);
@@ -455,7 +455,7 @@ void floppy_drive_write_track_data_info_buffer(running_device *img, int side, co
 	}
 }
 
-void floppy_drive_format_sector(running_device *img, int side, int sector_index,int c,int h, int r, int n, int filler)
+void floppy_drive_format_sector(device_t *img, int side, int sector_index,int c,int h, int r, int n, int filler)
 {
 	device_image_interface *image = dynamic_cast<device_image_interface *>(img);
 
@@ -466,7 +466,7 @@ void floppy_drive_format_sector(running_device *img, int side, int sector_index,
 	}
 }
 
-void floppy_drive_read_sector_data(running_device *img, int side, int index1, void *ptr, int length)
+void floppy_drive_read_sector_data(device_t *img, int side, int index1, void *ptr, int length)
 {
 	floppy_drive *flopimg;
 	device_image_interface *image = dynamic_cast<device_image_interface *>(img);
@@ -485,7 +485,7 @@ void floppy_drive_read_sector_data(running_device *img, int side, int index1, vo
 	}
 }
 
-void floppy_drive_write_sector_data(running_device *img, int side, int index1, const void *ptr,int length, int ddam)
+void floppy_drive_write_sector_data(device_t *img, int side, int index1, const void *ptr,int length, int ddam)
 {
 	floppy_drive *flopimg;
 	device_image_interface *image = dynamic_cast<device_image_interface *>(img);
@@ -503,39 +503,39 @@ void floppy_drive_write_sector_data(running_device *img, int side, int index1, c
 	}
 }
 
-void floppy_install_load_proc(running_device *image, void (*proc)(device_image_interface &image))
+void floppy_install_load_proc(device_t *image, void (*proc)(device_image_interface &image))
 {
 	floppy_drive *flopimg = get_safe_token( image );
 	flopimg->load_proc = proc;
 }
 
-void floppy_install_unload_proc(running_device *image, void (*proc)(device_image_interface &image))
+void floppy_install_unload_proc(device_t *image, void (*proc)(device_image_interface &image))
 {
 	floppy_drive *flopimg = get_safe_token( image );
 	flopimg->unload_proc = proc;
 }
 
 /* set the callback for the index pulse */
-void floppy_drive_set_index_pulse_callback(running_device *img, void (*callback)(running_device *controller,running_device *image, int state))
+void floppy_drive_set_index_pulse_callback(device_t *img, void (*callback)(device_t *controller,device_t *image, int state))
 {
 	floppy_drive *pDrive = get_safe_token( img );
 	pDrive->index_pulse_callback = callback;
 }
 
 
-void floppy_drive_set_ready_state_change_callback(running_device *img, void (*callback)(running_device *controller,running_device *img, int state))
+void floppy_drive_set_ready_state_change_callback(device_t *img, void (*callback)(device_t *controller,device_t *img, int state))
 {
 	floppy_drive *pDrive = get_safe_token( img );
 	pDrive->ready_state_change_callback = callback;
 }
 
-int	floppy_drive_get_current_track(running_device *img)
+int	floppy_drive_get_current_track(device_t *img)
 {
 	floppy_drive *drv = get_safe_token( img );
 	return drv->current_track;
 }
 
-UINT64 floppy_drive_get_current_track_size(running_device *img, int head)
+UINT64 floppy_drive_get_current_track_size(device_t *img, int head)
 {
 	floppy_drive *drv = get_safe_token( img );
 	int size = 0;
@@ -549,13 +549,13 @@ UINT64 floppy_drive_get_current_track_size(running_device *img, int head)
 	return size;
 }
 
-void floppy_drive_set_rpm(running_device *img, float rpm)
+void floppy_drive_set_rpm(device_t *img, float rpm)
 {
 	floppy_drive *drv = get_safe_token( img );
 	drv->rpm = rpm;
 }
 
-void floppy_drive_set_controller(running_device *img, running_device *controller)
+void floppy_drive_set_controller(device_t *img, device_t *controller)
 {
 	floppy_drive *drv = get_safe_token( img );
 	drv->controller = controller;
@@ -705,7 +705,7 @@ DEVICE_IMAGE_UNLOAD( floppy )
 	timer_set(image.device().machine, ATTOTIME_IN_MSEC(250), flopimg, ASSERT_LINE, set_wpt);
 }
 
-running_device *floppy_get_device(running_machine *machine,int drive)
+device_t *floppy_get_device(running_machine *machine,int drive)
 {
 	switch(drive) {
 		case 0 : return machine->device(FLOPPY_0);
@@ -716,24 +716,24 @@ running_device *floppy_get_device(running_machine *machine,int drive)
 	return NULL;
 }
 
-int floppy_get_drive_type(running_device *image)
+int floppy_get_drive_type(device_t *image)
 {
 	floppy_drive *flopimg = get_safe_token( image );
 	return flopimg->floppy_drive_type;
 }
 
-void floppy_set_type(running_device *image,int ftype)
+void floppy_set_type(device_t *image,int ftype)
 {
 	floppy_drive *flopimg = get_safe_token( image );
 	flopimg->floppy_drive_type = ftype;
 }
 
-running_device *floppy_get_device_by_type(running_machine *machine,int ftype,int drive)
+device_t *floppy_get_device_by_type(running_machine *machine,int ftype,int drive)
 {
 	int i;
 	int cnt = 0;
 	for (i=0;i<4;i++) {
-		running_device *disk = floppy_get_device(machine,i);
+		device_t *disk = floppy_get_device(machine,i);
 		if (floppy_get_drive_type(disk)==ftype) {
 			if (cnt==drive) {
 				return disk;
@@ -744,7 +744,7 @@ running_device *floppy_get_device_by_type(running_machine *machine,int ftype,int
 	return NULL;
 }
 
-int floppy_get_drive(running_device *image)
+int floppy_get_drive(device_t *image)
 {
 	int drive =0;
 	if (strcmp(image->tag(), FLOPPY_0) == 0) drive = 0;
@@ -754,11 +754,11 @@ int floppy_get_drive(running_device *image)
 	return drive;
 }
 
-int floppy_get_drive_by_type(running_device *image,int ftype)
+int floppy_get_drive_by_type(device_t *image,int ftype)
 {
 	int i,drive =0;
 	for (i=0;i<4;i++) {
-		running_device *disk = floppy_get_device(image->machine,i);
+		device_t *disk = floppy_get_device(image->machine,i);
 		if (floppy_get_drive_type(disk)==ftype) {
 			if (image==disk) {
 				return drive;

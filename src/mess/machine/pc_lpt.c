@@ -23,7 +23,7 @@ static WRITE_LINE_DEVICE_HANDLER( pc_lpt_ack_w );
 typedef struct _pc_lpt_state pc_lpt_state;
 struct _pc_lpt_state
 {
-	running_device *centronics;
+	device_t *centronics;
 
 	devcb_resolved_write_line out_irq_func;
 
@@ -51,7 +51,7 @@ static const centronics_interface pc_centronics_config =
 };
 
 static MACHINE_CONFIG_FRAGMENT( pc_lpt )
-	MDRV_CENTRONICS_ADD("centronics", pc_centronics_config)
+	MCFG_CENTRONICS_ADD("centronics", pc_centronics_config)
 MACHINE_CONFIG_END
 
 
@@ -59,7 +59,7 @@ MACHINE_CONFIG_END
     INLINE FUNCTIONS
 *****************************************************************************/
 
-INLINE pc_lpt_state *get_safe_token(running_device *device)
+INLINE pc_lpt_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == PC_LPT);

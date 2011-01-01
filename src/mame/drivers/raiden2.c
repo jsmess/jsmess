@@ -859,6 +859,8 @@ static MACHINE_RESET(raiden2)
 	sprcpt_init();
 	MACHINE_RESET_CALL(seibu_sound);
 
+	memory_set_bank(machine, "mainbank", 1);
+
 	//cop_init();
 }
 
@@ -870,6 +872,22 @@ static MACHINE_RESET(zeroteam)
 	state->mid_bank = 1;
 	sprcpt_init();
 	MACHINE_RESET_CALL(seibu_sound);
+
+	memory_set_bank(machine, "mainbank", 1);
+
+	//cop_init();
+}
+
+static MACHINE_RESET(xsedae)
+{
+	raiden2_state *state = machine->driver_data<raiden2_state>();
+	state->bg_bank = 0;
+	state->fg_bank = 2;
+	state->mid_bank = 1;
+	sprcpt_init();
+	MACHINE_RESET_CALL(seibu_sound);
+
+	//memory_set_bank(machine, "mainbank", 1);
 
 	//cop_init();
 }
@@ -897,6 +915,13 @@ WRITE16_MEMBER(raiden2_state::raiden2_sound_comms_w)
 	}
 }
 
+WRITE16_MEMBER(raiden2_state::raiden2_bank_w)
+{
+	if(ACCESSING_BITS_8_15) {
+		logerror("select bank %d %04x\n", (data >> 15) & 1, data);
+		memory_set_bank(space.machine, "mainbank", !((data >> 15) & 1));
+	}
+}
 
 /* MEMORY MAPS */
 static ADDRESS_MAP_START( raiden2_cop_mem, ADDRESS_SPACE_PROGRAM, 16, raiden2_state )
@@ -920,7 +945,7 @@ static ADDRESS_MAP_START( raiden2_cop_mem, ADDRESS_SPACE_PROGRAM, 16, raiden2_st
 	AM_RANGE(0x0047e, 0x0047f) AM_WRITE(cop_dma_mode_w)
 	AM_RANGE(0x004a0, 0x004a7) AM_READWRITE(cop_reg_high_r, cop_reg_high_w)
 	AM_RANGE(0x004c0, 0x004c7) AM_READWRITE(cop_reg_low_r, cop_reg_low_w)
-	AM_RANGE(0x00500, 0x00503) AM_WRITE(cop_cmd_w)
+	AM_RANGE(0x00500, 0x00505) AM_WRITE(cop_cmd_w)
 	AM_RANGE(0x00590, 0x00599) AM_READ(cop_itoa_digits_r)
 	AM_RANGE(0x005b0, 0x005b1) AM_READ(cop_status_r)
 	AM_RANGE(0x005b2, 0x005b3) AM_READ(cop_dist_r)
@@ -936,6 +961,7 @@ static ADDRESS_MAP_START( raiden2_cop_mem, ADDRESS_SPACE_PROGRAM, 16, raiden2_st
 	AM_RANGE(0x006b4, 0x006b7) AM_WRITE(sprcpt_data_2_w)
 	AM_RANGE(0x006b8, 0x006bb) AM_WRITE(sprcpt_val_2_w)
 	AM_RANGE(0x006bc, 0x006bf) AM_WRITE(sprcpt_adr_w)
+	AM_RANGE(0x006ca, 0x006cb) AM_WRITE(raiden2_bank_w)
 	AM_RANGE(0x006cc, 0x006cd) AM_WRITE(tile_bank_01_w)
 	AM_RANGE(0x006ce, 0x006cf) AM_WRITE(sprcpt_flags_2_w)
 	AM_RANGE(0x006fc, 0x006fd) AM_WRITE(cop_dma_trigger_w)
@@ -1368,29 +1394,29 @@ GFXDECODE_END
 static MACHINE_CONFIG_START( raiden2, raiden2_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", V30,XTAL_32MHz/2) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(raiden2_mem)
-	MDRV_CPU_VBLANK_INT("screen", raiden2_interrupt)
+	MCFG_CPU_ADD("maincpu", V30,XTAL_32MHz/2) /* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(raiden2_mem)
+	MCFG_CPU_VBLANK_INT("screen", raiden2_interrupt)
 
-	MDRV_MACHINE_RESET(raiden2)
+	MCFG_MACHINE_RESET(raiden2)
 
 	SEIBU2_RAIDEN2_SOUND_SYSTEM_CPU(14318180/4)
 
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
+	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(55.47)    /* verified on pcb */
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate *//2)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*8, 64*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0, 30*8-1)
-	MDRV_GFXDECODE(raiden2)
-	MDRV_PALETTE_LENGTH(2048)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(55.47)    /* verified on pcb */
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate *//2)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(64*8, 64*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0, 30*8-1)
+	MCFG_GFXDECODE(raiden2)
+	MCFG_PALETTE_LENGTH(2048)
 
-	MDRV_VIDEO_START(raiden2)
-	MDRV_VIDEO_UPDATE(raiden2)
+	MCFG_VIDEO_START(raiden2)
+	MCFG_VIDEO_UPDATE(raiden2)
 
 	/* sound hardware */
 	SEIBU_SOUND_SYSTEM_YM2151_RAIDEN2_INTERFACE(28636360/8,28636360/28,1,2)
@@ -1402,42 +1428,42 @@ static MACHINE_CONFIG_START( raiden2, raiden2_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( xsedae, raiden2 )
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(xsedae_mem)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(xsedae_mem)
 
-	MDRV_MACHINE_RESET(zeroteam)
+	MCFG_MACHINE_RESET(xsedae)
 
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0, 32*8-1)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0, 32*8-1)
 
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( zeroteam, raiden2_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", V30,XTAL_32MHz/2) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(zeroteam_mem)
-	MDRV_CPU_VBLANK_INT("screen", raiden2_interrupt)
+	MCFG_CPU_ADD("maincpu", V30,XTAL_32MHz/2) /* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(zeroteam_mem)
+	MCFG_CPU_VBLANK_INT("screen", raiden2_interrupt)
 
-	MDRV_MACHINE_RESET(zeroteam)
+	MCFG_MACHINE_RESET(zeroteam)
 
 	SEIBU_NEWZEROTEAM_SOUND_SYSTEM_CPU(14318180/4)
 
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
+	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(55.47)    /* verified on pcb */
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate *//2)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*8, 64*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0, 32*8-1)
-	MDRV_GFXDECODE(raiden2)
-	MDRV_PALETTE_LENGTH(2048)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(55.47)    /* verified on pcb */
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate *//2)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(64*8, 64*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0, 32*8-1)
+	MCFG_GFXDECODE(raiden2)
+	MCFG_PALETTE_LENGTH(2048)
 
-	MDRV_VIDEO_START(raiden2)
-	MDRV_VIDEO_UPDATE(raiden2)
+	MCFG_VIDEO_START(raiden2)
+	MCFG_VIDEO_UPDATE(raiden2)
 
 	/* sound hardware */
 	SEIBU_SOUND_SYSTEM_YM3812_INTERFACE(14318180/4,1320000)
@@ -2219,8 +2245,8 @@ ROM_START( xsedae )
 	ROM_LOAD( "7.u0714",     0x100000, 0x080000, CRC(296105dc) SHA1(c2b80d681646f504b03c2dde13e37b1d820f82d2) )
 
 	ROM_REGION( 0x800000, "gfx3", 0 ) /* sprite gfx (not encrypted) */
-	ROM_LOAD32_WORD( "obj-1.u0811",  0x000000, 0x100000, BAD_DUMP CRC(e65f1b4e) SHA1(b04be9af41ce868e64071715252c4ff228891cf0) ) //half size
-	ROM_LOAD32_WORD( "obj-2.u082",   0x000002, 0x100000, BAD_DUMP CRC(e753e7ad) SHA1(643ab39ac1b7df686a16b1ed6fdcb686720ca8e8) ) //half size
+	ROM_LOAD32_WORD( "obj-1.u0811",  0x000000, 0x200000, CRC(6ae993eb) SHA1(d9713c79eacb4b3ce5e82dd3ce39003e3a433d8f) )
+	ROM_LOAD32_WORD( "obj-2.u082",   0x000002, 0x200000, CRC(26c806ee) SHA1(899a76a1b3f933c6f5cb6b5dcdf5b58e1b7e49c6) )
 
 	ROM_REGION( 0x100000, "oki1", 0 )	/* ADPCM samples */
 	ROM_LOAD( "9.u105", 0x00000, 0x40000, CRC(a7a0c5f9) SHA1(7882681ac152642aa4f859071f195842068b214b) )
@@ -2230,14 +2256,14 @@ ROM_END
 
 static DRIVER_INIT (raiden2)
 {
-	memory_configure_bank(machine, "mainbank", 0, 2, memory_region(machine, "mainprg"), 0x20000);
+	memory_configure_bank(machine, "mainbank", 0, 2, machine->region("mainprg")->base(), 0x20000);
 	raiden2_decrypt_sprites(machine);
 }
 
 static DRIVER_INIT (xsedae)
 {
 	/* doesn't have banking */
-	//memory_configure_bank(machine, "mainbank", 0, 2, memory_region(machine, "mainprg"), 0x20000);
+	//memory_configure_bank(machine, "mainbank", 0, 2, machine->region("mainprg")->base(), 0x20000);
 }
 
 /* GAME DRIVERS */

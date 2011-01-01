@@ -45,9 +45,9 @@ const int CRT9212_RAM_SIZE	= 135;
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MDRV_CRT9212_ADD(_tag, _config) \
-	MDRV_DEVICE_ADD(_tag, CRT9212, 0) \
-	MDRV_DEVICE_CONFIG(_config)
+#define MCFG_CRT9212_ADD(_tag, _config) \
+	MCFG_DEVICE_ADD(_tag, CRT9212, 0) \
+	MCFG_DEVICE_CONFIG(_config)
 
 
 #define CRT9212_INTERFACE(name) \

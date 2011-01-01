@@ -410,7 +410,7 @@ static UINT8 sonic_last[6];
 typedef void (*sys32_output_callback)(int which, UINT16 data);
 static sys32_output_callback segas32_sw1_output, segas32_sw2_output, segas32_sw3_output;
 
-static void (*system32_prot_vblank)(running_device *device);
+static void (*system32_prot_vblank)(device_t *device);
 
 
 /*************************************
@@ -1020,7 +1020,7 @@ static WRITE16_HANDLER( random_number_16_w )
 
 static READ16_HANDLER( random_number_16_r )
 {
-	return mame_rand(space->machine);
+	return space->machine->rand();
 }
 
 static WRITE32_HANDLER( random_number_32_w )
@@ -1030,7 +1030,7 @@ static WRITE32_HANDLER( random_number_32_w )
 
 static READ32_HANDLER( random_number_32_r )
 {
-	return mame_rand(space->machine) ^ (mame_rand(space->machine) << 16);
+	return space->machine->rand() ^ (space->machine->rand() << 16);
 }
 
 
@@ -1147,7 +1147,7 @@ static WRITE8_HANDLER( sound_int_control_hi_w )
 }
 
 
-static void ym3438_irq_handler(running_device *device, int state)
+static void ym3438_irq_handler(device_t *device, int state)
 {
 	if (state)
 		signal_sound_irq(device->machine, SOUND_IRQ_YM3438);
@@ -1166,14 +1166,14 @@ static void ym3438_irq_handler(running_device *device, int state)
 static WRITE8_HANDLER( sound_bank_lo_w )
 {
 	sound_bank = (sound_bank & ~0x3f) | (data & 0x3f);
-	memory_set_bankptr(space->machine, "bank1", memory_region(space->machine, "soundcpu") + 0x100000 + 0x2000 * sound_bank);
+	memory_set_bankptr(space->machine, "bank1", space->machine->region("soundcpu")->base() + 0x100000 + 0x2000 * sound_bank);
 }
 
 
 static WRITE8_HANDLER( sound_bank_hi_w )
 {
 	sound_bank = (sound_bank & 0x3f) | ((data & 0x04) << 4) | ((data & 0x03) << 7);
-	memory_set_bankptr(space->machine, "bank1", memory_region(space->machine, "soundcpu") + 0x100000 + 0x2000 * sound_bank);
+	memory_set_bankptr(space->machine, "bank1", space->machine->region("soundcpu")->base() + 0x100000 + 0x2000 * sound_bank);
 }
 
 
@@ -2186,49 +2186,49 @@ static READ16_HANDLER( dual_pcb_masterslave )
 static MACHINE_CONFIG_START( system32, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", V60, MASTER_CLOCK/2)
-	MDRV_CPU_PROGRAM_MAP(system32_map)
-	MDRV_CPU_VBLANK_INT("screen", start_of_vblank_int)
+	MCFG_CPU_ADD("maincpu", V60, MASTER_CLOCK/2)
+	MCFG_CPU_PROGRAM_MAP(system32_map)
+	MCFG_CPU_VBLANK_INT("screen", start_of_vblank_int)
 
-	MDRV_CPU_ADD("soundcpu", Z80, MASTER_CLOCK/4)
-	MDRV_CPU_PROGRAM_MAP(system32_sound_map)
-	MDRV_CPU_IO_MAP(system32_sound_portmap)
+	MCFG_CPU_ADD("soundcpu", Z80, MASTER_CLOCK/4)
+	MCFG_CPU_PROGRAM_MAP(system32_sound_map)
+	MCFG_CPU_IO_MAP(system32_sound_portmap)
 
-	MDRV_MACHINE_RESET(system32)
+	MCFG_MACHINE_RESET(system32)
 
-	MDRV_EEPROM_93C46_ADD("eeprom")
+	MCFG_EEPROM_93C46_ADD("eeprom")
 
-	MDRV_TIMER_ADD("v60_irq0", signal_v60_irq_callback)
-	MDRV_TIMER_ADD("v60_irq1", signal_v60_irq_callback)
+	MCFG_TIMER_ADD("v60_irq0", signal_v60_irq_callback)
+	MCFG_TIMER_ADD("v60_irq1", signal_v60_irq_callback)
 
 	/* video hardware */
-	MDRV_GFXDECODE(segas32)
-	MDRV_PALETTE_LENGTH(0x4000)
+	MCFG_GFXDECODE(segas32)
+	MCFG_PALETTE_LENGTH(0x4000)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_SIZE(52*8, 262)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 52*8-1, 0*8, 28*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_SIZE(52*8, 262)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 52*8-1, 0*8, 28*8-1)
 
-	MDRV_VIDEO_START(system32)
-	MDRV_VIDEO_UPDATE(system32)
+	MCFG_VIDEO_START(system32)
+	MCFG_VIDEO_UPDATE(system32)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ym1", YM3438, MASTER_CLOCK/4)
-	MDRV_SOUND_CONFIG(ym3438_config)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 0.40)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 0.40)
+	MCFG_SOUND_ADD("ym1", YM3438, MASTER_CLOCK/4)
+	MCFG_SOUND_CONFIG(ym3438_config)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.40)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.40)
 
-	MDRV_SOUND_ADD("ym2", YM3438, MASTER_CLOCK/4)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 0.40)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 0.40)
+	MCFG_SOUND_ADD("ym2", YM3438, MASTER_CLOCK/4)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.40)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.40)
 
-	MDRV_SOUND_ADD("rfsnd", RF5C68, RFC_CLOCK/4)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 0.55)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 0.55)
+	MCFG_SOUND_ADD("rfsnd", RF5C68, RFC_CLOCK/4)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.55)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.55)
 MACHINE_CONFIG_END
 
 
@@ -2237,61 +2237,61 @@ static const nec_config ga2_v25_config ={ ga2_v25_opcode_table, };
 static MACHINE_CONFIG_DERIVED( system32_v25, system32 )
 
 	/* add a V25 for protection */
-	MDRV_CPU_ADD("mcu", V25, 10000000)
-	MDRV_CPU_PROGRAM_MAP(ga2_v25_map)
-	MDRV_CPU_CONFIG(ga2_v25_config)
+	MCFG_CPU_ADD("mcu", V25, 10000000)
+	MCFG_CPU_PROGRAM_MAP(ga2_v25_map)
+	MCFG_CPU_CONFIG(ga2_v25_config)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_START( multi32, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", V70, MULTI32_CLOCK/2)
-	MDRV_CPU_PROGRAM_MAP(multi32_map)
-	MDRV_CPU_VBLANK_INT("lscreen", start_of_vblank_int)
+	MCFG_CPU_ADD("maincpu", V70, MULTI32_CLOCK/2)
+	MCFG_CPU_PROGRAM_MAP(multi32_map)
+	MCFG_CPU_VBLANK_INT("lscreen", start_of_vblank_int)
 
-	MDRV_CPU_ADD("soundcpu", Z80, MASTER_CLOCK/4)
-	MDRV_CPU_PROGRAM_MAP(multi32_sound_map)
-	MDRV_CPU_IO_MAP(multi32_sound_portmap)
+	MCFG_CPU_ADD("soundcpu", Z80, MASTER_CLOCK/4)
+	MCFG_CPU_PROGRAM_MAP(multi32_sound_map)
+	MCFG_CPU_IO_MAP(multi32_sound_portmap)
 
-	MDRV_MACHINE_RESET(system32)
+	MCFG_MACHINE_RESET(system32)
 
-	MDRV_EEPROM_93C46_ADD("eeprom")
+	MCFG_EEPROM_93C46_ADD("eeprom")
 
-	MDRV_TIMER_ADD("v60_irq0", signal_v60_irq_callback)
-	MDRV_TIMER_ADD("v60_irq1", signal_v60_irq_callback)
+	MCFG_TIMER_ADD("v60_irq0", signal_v60_irq_callback)
+	MCFG_TIMER_ADD("v60_irq1", signal_v60_irq_callback)
 
 	/* video hardware */
-	MDRV_GFXDECODE(segas32)
-	MDRV_PALETTE_LENGTH(0x8000)
-	MDRV_DEFAULT_LAYOUT(layout_dualhsxs)
+	MCFG_GFXDECODE(segas32)
+	MCFG_PALETTE_LENGTH(0x8000)
+	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
 
-	MDRV_SCREEN_ADD("lscreen", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_SIZE(52*8, 262)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 52*8-1, 0*8, 28*8-1)
+	MCFG_SCREEN_ADD("lscreen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_SIZE(52*8, 262)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 52*8-1, 0*8, 28*8-1)
 
-	MDRV_SCREEN_ADD("rscreen", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_SIZE(52*8, 262)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 52*8-1, 0*8, 28*8-1)
+	MCFG_SCREEN_ADD("rscreen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_SIZE(52*8, 262)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 52*8-1, 0*8, 28*8-1)
 
-	MDRV_VIDEO_START(multi32)
-	MDRV_VIDEO_UPDATE(multi32)
+	MCFG_VIDEO_START(multi32)
+	MCFG_VIDEO_UPDATE(multi32)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ymsnd", YM3438, MASTER_CLOCK/4)
-	MDRV_SOUND_CONFIG(ym3438_config)
-	MDRV_SOUND_ROUTE(1, "lspeaker", 0.40)
-	MDRV_SOUND_ROUTE(0, "rspeaker", 0.40)
+	MCFG_SOUND_ADD("ymsnd", YM3438, MASTER_CLOCK/4)
+	MCFG_SOUND_CONFIG(ym3438_config)
+	MCFG_SOUND_ROUTE(1, "lspeaker", 0.40)
+	MCFG_SOUND_ROUTE(0, "rspeaker", 0.40)
 
-	MDRV_SOUND_ADD("sega", MULTIPCM, MASTER_CLOCK/4)
-	MDRV_SOUND_ROUTE(1, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(0, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("sega", MULTIPCM, MASTER_CLOCK/4)
+	MCFG_SOUND_ROUTE(1, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(0, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -4126,7 +4126,7 @@ static DRIVER_INIT( holo )
 static DRIVER_INIT( jpark )
 {
 	/* Temp. Patch until we emulate the 'Drive Board', thanks to Malice */
-	UINT16 *pROM = (UINT16 *)memory_region(machine, "maincpu");
+	UINT16 *pROM = (UINT16 *)machine->region("maincpu")->base();
 
 	segas32_common_init(analog_custom_io_r, analog_custom_io_w);
 

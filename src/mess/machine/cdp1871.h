@@ -50,9 +50,9 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MDRV_CDP1871_ADD(_tag, _intrf, _clock) \
-	MDRV_DEVICE_ADD(_tag, CDP1871, _clock) \
-	MDRV_DEVICE_CONFIG(_intrf)
+#define MCFG_CDP1871_ADD(_tag, _intrf, _clock) \
+	MCFG_DEVICE_ADD(_tag, CDP1871, _clock) \
+	MCFG_DEVICE_CONFIG(_intrf)
 
 #define CDP1871_INTERFACE(name) \
 	const cdp1871_interface (name)=

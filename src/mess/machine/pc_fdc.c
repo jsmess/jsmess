@@ -87,7 +87,7 @@ const upd765_interface pc_fdc_upd765_not_connected_interface =
 	{FLOPPY_0, FLOPPY_1, NULL, NULL}
 };
 
-static running_device* pc_get_device(running_machine *machine)
+static device_t* pc_get_device(running_machine *machine)
 {
 	return (*fdc->fdc_interface.get_device)(machine);
 }
@@ -127,7 +127,7 @@ void pc_fdc_init(running_machine *machine, const struct pc_fdc_interface *iface)
 
 static UPD765_GET_IMAGE ( pc_fdc_get_image )
 {
-	running_device *image = NULL;
+	device_t *image = NULL;
 
 	if (!fdc->fdc_interface.get_image)
 	{

@@ -25,7 +25,7 @@
 DRIVER_INIT(special)
 {
 	/* set initialy ROM to be visible on first bank */
-	UINT8 *RAM = memory_region(machine, "maincpu");
+	UINT8 *RAM = machine->region("maincpu")->base();
 	memset(RAM,0x0000,0x3000); // make frist page empty by default
 	memory_configure_bank(machine, "bank1", 1, 2, RAM, 0x0000);
 	memory_configure_bank(machine, "bank1", 0, 2, RAM, 0xc000);
@@ -98,7 +98,7 @@ static WRITE8_DEVICE_HANDLER (specialist_8255_portb_w )
 static WRITE8_DEVICE_HANDLER (specialist_8255_portc_w )
 {
 	special_state *state = device->machine->driver_data<special_state>();
-	running_device *dac_device = device->machine->device("dac");
+	device_t *dac_device = device->machine->device("dac");
 
 	state->specialist_8255_portc = data;
 
@@ -192,8 +192,8 @@ static void specimx_set_bank(running_machine *machine, int i,int data)
 				memory_unmap_write(space, 0x0000, 0x8fff, 0, 0);
 				memory_unmap_write(space, 0x9000, 0xbfff, 0, 0);
 
-				memory_set_bankptr(machine, "bank1", memory_region(machine, "maincpu") + 0x10000);
-				memory_set_bankptr(machine, "bank2", memory_region(machine, "maincpu") + 0x19000);
+				memory_set_bankptr(machine, "bank1", machine->region("maincpu")->base() + 0x10000);
+				memory_set_bankptr(machine, "bank2", machine->region("maincpu")->base() + 0x19000);
 				if (data & 0x80)
 				{
 					memory_set_bankptr(machine, "bank3", messram_get_ptr(machine->device("messram")) + 0x1c000);
@@ -263,7 +263,7 @@ MACHINE_START( specimx )
 
 static TIMER_CALLBACK( setup_pit8253_gates )
 {
-	running_device *pit8253 = machine->device("pit8253");
+	device_t *pit8253 = machine->device("pit8253");
 
 	pit8253_gate0_w(pit8253, 0);
 	pit8253_gate1_w(pit8253, 0);
@@ -276,7 +276,7 @@ MACHINE_RESET( specimx )
 	specimx_set_bank(machine, 2,0x00); // Initiali load ROM disk
 	state->specimx_color = 0x70;
 	timer_set(machine,  attotime_zero, NULL, 0, setup_pit8253_gates );
-	running_device *fdc = machine->device("wd1793");
+	device_t *fdc = machine->device("wd1793");
 	wd17xx_set_pause_time(fdc,12);
 	wd17xx_dden_w(fdc, 0);
 }
@@ -288,7 +288,7 @@ READ8_HANDLER ( specimx_disk_ctrl_r )
 
 WRITE8_HANDLER( specimx_disk_ctrl_w )
 {
-	running_device *fdc = space->machine->device("wd1793");
+	device_t *fdc = space->machine->device("wd1793");
 
 	switch(offset)
 	{
@@ -313,7 +313,7 @@ static void erik_set_bank(running_machine *machine)
 	UINT8 bank2 = ((state->RR_register >> 2) & 3);
 	UINT8 bank3 = ((state->RR_register >> 4) & 3);
 	UINT8 bank4 = ((state->RR_register >> 6) & 3);
-	UINT8 *mem = memory_region(machine, "maincpu");
+	UINT8 *mem = machine->region("maincpu")->base();
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	memory_install_write_bank(space, 0x0000, 0x3fff, 0, 0, "bank1");
@@ -430,7 +430,7 @@ READ8_HANDLER ( erik_disk_reg_r )
 
 WRITE8_HANDLER( erik_disk_reg_w )
 {
-	running_device *fdc = space->machine->device("wd1793");
+	device_t *fdc = space->machine->device("wd1793");
 
 	wd17xx_set_side (fdc,data & 1);
 	wd17xx_set_drive(fdc,(data >> 1) & 1);

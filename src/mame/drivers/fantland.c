@@ -311,7 +311,7 @@ ADDRESS_MAP_END
                            Born To Fight
 ***************************************************************************/
 
-static void borntofi_adpcm_start( running_device *device, int voice )
+static void borntofi_adpcm_start( device_t *device, int voice )
 {
 	fantland_state *state = device->machine->driver_data<fantland_state>();
 	msm5205_reset_w(device, 0);
@@ -320,7 +320,7 @@ static void borntofi_adpcm_start( running_device *device, int voice )
 //  logerror("%s: adpcm start = %06x, stop = %06x\n", cpuexec_describe_context(device->machine), state->adpcm_addr[0][voice], state->adpcm_addr[1][voice]);
 }
 
-static void borntofi_adpcm_stop( running_device *device, int voice )
+static void borntofi_adpcm_stop( device_t *device, int voice )
 {
 	fantland_state *state = device->machine->driver_data<fantland_state>();
 	msm5205_reset_w(device, 1);
@@ -332,7 +332,7 @@ static WRITE8_HANDLER( borntofi_msm5205_w )
 	fantland_state *state = space->machine->driver_data<fantland_state>();
 	int voice = offset / 8;
 	int reg = offset % 8;
-	running_device *msm;
+	device_t *msm;
 
 	switch (voice)
 	{
@@ -363,7 +363,7 @@ static WRITE8_HANDLER( borntofi_msm5205_w )
 	}
 }
 
-static void borntofi_adpcm_int( running_device *device, int voice )
+static void borntofi_adpcm_int( device_t *device, int voice )
 {
 	fantland_state *state = device->machine->driver_data<fantland_state>();
 	UINT8 *rom;
@@ -373,8 +373,8 @@ static void borntofi_adpcm_int( running_device *device, int voice )
 	if (!state->adpcm_playing[voice])
 		return;
 
-	rom = memory_region(device->machine, "adpcm");
-	len = memory_region_length(device->machine, "adpcm") * 2;
+	rom = device->machine->region("adpcm")->base();
+	len = device->machine->region("adpcm")->bytes() * 2;
 
 	start = state->adpcm_addr[0][voice] + state->adpcm_nibble[voice];
 	stop = state->adpcm_addr[1][voice];
@@ -397,10 +397,10 @@ static void borntofi_adpcm_int( running_device *device, int voice )
 	}
 }
 
-static void borntofi_adpcm_int_0(running_device *device) { borntofi_adpcm_int(device, 0); }
-static void borntofi_adpcm_int_1(running_device *device) { borntofi_adpcm_int(device, 1); }
-static void borntofi_adpcm_int_2(running_device *device) { borntofi_adpcm_int(device, 2); }
-static void borntofi_adpcm_int_3(running_device *device) { borntofi_adpcm_int(device, 3); }
+static void borntofi_adpcm_int_0(device_t *device) { borntofi_adpcm_int(device, 0); }
+static void borntofi_adpcm_int_1(device_t *device) { borntofi_adpcm_int(device, 1); }
+static void borntofi_adpcm_int_2(device_t *device) { borntofi_adpcm_int(device, 2); }
+static void borntofi_adpcm_int_3(device_t *device) { borntofi_adpcm_int(device, 3); }
 
 
 static ADDRESS_MAP_START( borntofi_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -855,47 +855,47 @@ static INTERRUPT_GEN( fantland_sound_irq )
 static MACHINE_CONFIG_START( fantland, fantland_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", I8086, 8000000)        // ?
-	MDRV_CPU_PROGRAM_MAP(fantland_map)
-	MDRV_CPU_VBLANK_INT("screen", fantland_irq)
+	MCFG_CPU_ADD("maincpu", I8086, 8000000)        // ?
+	MCFG_CPU_PROGRAM_MAP(fantland_map)
+	MCFG_CPU_VBLANK_INT("screen", fantland_irq)
 
-	MDRV_CPU_ADD("audiocpu", I8088, 8000000)        // ?
-	MDRV_CPU_PROGRAM_MAP(fantland_sound_map)
-	MDRV_CPU_IO_MAP(fantland_sound_iomap)
-	MDRV_CPU_PERIODIC_INT(fantland_sound_irq, 8000)
+	MCFG_CPU_ADD("audiocpu", I8088, 8000000)        // ?
+	MCFG_CPU_PROGRAM_MAP(fantland_sound_map)
+	MCFG_CPU_IO_MAP(fantland_sound_iomap)
+	MCFG_CPU_PERIODIC_INT(fantland_sound_irq, 8000)
 	// NMI when soundlatch is written
 
-	MDRV_MACHINE_START(fantland)
-	MDRV_MACHINE_RESET(fantland)
+	MCFG_MACHINE_START(fantland)
+	MCFG_MACHINE_RESET(fantland)
 
-	MDRV_QUANTUM_TIME(HZ(8000))	// sound irq must feed the DAC at 8kHz
+	MCFG_QUANTUM_TIME(HZ(8000))	// sound irq must feed the DAC at 8kHz
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(352,256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 352-1, 0, 256-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(352,256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 352-1, 0, 256-1)
 
-	MDRV_GFXDECODE(fantland)
-	MDRV_PALETTE_LENGTH(256)
+	MCFG_GFXDECODE(fantland)
+	MCFG_PALETTE_LENGTH(256)
 
-	MDRV_VIDEO_UPDATE(fantland)
+	MCFG_VIDEO_UPDATE(fantland)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM2151, 3000000)
-	MDRV_SOUND_ROUTE(0, "mono", 0.35)
-	MDRV_SOUND_ROUTE(1, "mono", 0.35)
+	MCFG_SOUND_ADD("ymsnd", YM2151, 3000000)
+	MCFG_SOUND_ROUTE(0, "mono", 0.35)
+	MCFG_SOUND_ROUTE(1, "mono", 0.35)
 
-	MDRV_SOUND_ADD("dac", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 
-static void galaxygn_sound_irq( running_device *device, int line )
+static void galaxygn_sound_irq( device_t *device, int line )
 {
 	fantland_state *state = device->machine->driver_data<fantland_state>();
 	cpu_set_input_line_and_vector(state->audio_cpu, 0, line ? ASSERT_LINE : CLEAR_LINE, 0x80/4);
@@ -909,38 +909,38 @@ static const ym2151_interface galaxygn_ym2151_interface =
 static MACHINE_CONFIG_START( galaxygn, fantland_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", I8088, 8000000)        // ?
-	MDRV_CPU_PROGRAM_MAP(galaxygn_map)
-	MDRV_CPU_VBLANK_INT("screen", fantland_irq)
+	MCFG_CPU_ADD("maincpu", I8088, 8000000)        // ?
+	MCFG_CPU_PROGRAM_MAP(galaxygn_map)
+	MCFG_CPU_VBLANK_INT("screen", fantland_irq)
 
-	MDRV_CPU_ADD("audiocpu", I8088, 8000000)        // ?
-	MDRV_CPU_PROGRAM_MAP(fantland_sound_map)
-	MDRV_CPU_IO_MAP(galaxygn_sound_iomap)
+	MCFG_CPU_ADD("audiocpu", I8088, 8000000)        // ?
+	MCFG_CPU_PROGRAM_MAP(fantland_sound_map)
+	MCFG_CPU_IO_MAP(galaxygn_sound_iomap)
 	// IRQ by YM2151, NMI when soundlatch is written
 
-	MDRV_MACHINE_START(fantland)
-	MDRV_MACHINE_RESET(fantland)
+	MCFG_MACHINE_START(fantland)
+	MCFG_MACHINE_RESET(fantland)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(352,256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 352-1, 0, 256-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(352,256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 352-1, 0, 256-1)
 
-	MDRV_GFXDECODE(fantland)
-	MDRV_PALETTE_LENGTH(256)
+	MCFG_GFXDECODE(fantland)
+	MCFG_PALETTE_LENGTH(256)
 
-	MDRV_VIDEO_UPDATE(fantland)
+	MCFG_VIDEO_UPDATE(fantland)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM2151, 3000000)
-	MDRV_SOUND_CONFIG(galaxygn_ym2151_interface)
-	MDRV_SOUND_ROUTE(0, "mono", 1.0)
-	MDRV_SOUND_ROUTE(1, "mono", 1.0)
+	MCFG_SOUND_ADD("ymsnd", YM2151, 3000000)
+	MCFG_SOUND_CONFIG(galaxygn_ym2151_interface)
+	MCFG_SOUND_ROUTE(0, "mono", 1.0)
+	MCFG_SOUND_ROUTE(1, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -1019,41 +1019,41 @@ static MACHINE_RESET( borntofi )
 static MACHINE_CONFIG_START( borntofi, fantland_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", V20, 16000000/2)        // D701080C-8 - NEC D70108C-8 V20 CPU, running at 8.000MHz [16/2]
-	MDRV_CPU_PROGRAM_MAP(borntofi_map)
-	MDRV_CPU_VBLANK_INT("screen", fantland_irq)
+	MCFG_CPU_ADD("maincpu", V20, 16000000/2)        // D701080C-8 - NEC D70108C-8 V20 CPU, running at 8.000MHz [16/2]
+	MCFG_CPU_PROGRAM_MAP(borntofi_map)
+	MCFG_CPU_VBLANK_INT("screen", fantland_irq)
 
-	MDRV_CPU_ADD("audiocpu", I8088, 18432000/3)        // 8088 - AMD P8088-2 CPU, running at 6.144MHz [18.432/3]
-	MDRV_CPU_PROGRAM_MAP(borntofi_sound_map)
+	MCFG_CPU_ADD("audiocpu", I8088, 18432000/3)        // 8088 - AMD P8088-2 CPU, running at 6.144MHz [18.432/3]
+	MCFG_CPU_PROGRAM_MAP(borntofi_sound_map)
 
-	MDRV_MACHINE_START(borntofi)
-	MDRV_MACHINE_RESET(borntofi)
+	MCFG_MACHINE_START(borntofi)
+	MCFG_MACHINE_RESET(borntofi)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(54)	// 54 Hz
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(352,256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 352-1, 0, 256-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(54)	// 54 Hz
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(352,256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 352-1, 0, 256-1)
 
-	MDRV_GFXDECODE(fantland)
-	MDRV_PALETTE_LENGTH(256)
+	MCFG_GFXDECODE(fantland)
+	MCFG_PALETTE_LENGTH(256)
 
-	MDRV_VIDEO_UPDATE(fantland)
+	MCFG_VIDEO_UPDATE(fantland)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("msm1", MSM5205, 384000) MDRV_SOUND_CONFIG(msm5205_config_0) MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MDRV_SOUND_ADD("msm2", MSM5205, 384000) MDRV_SOUND_CONFIG(msm5205_config_1) MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MDRV_SOUND_ADD("msm3", MSM5205, 384000) MDRV_SOUND_CONFIG(msm5205_config_2) MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MDRV_SOUND_ADD("msm4", MSM5205, 384000) MDRV_SOUND_CONFIG(msm5205_config_3) MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("msm1", MSM5205, 384000) MCFG_SOUND_CONFIG(msm5205_config_0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("msm2", MSM5205, 384000) MCFG_SOUND_CONFIG(msm5205_config_1) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("msm3", MSM5205, 384000) MCFG_SOUND_CONFIG(msm5205_config_2) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("msm4", MSM5205, 384000) MCFG_SOUND_CONFIG(msm5205_config_3) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
 
-static void wheelrun_ym3526_irqhandler( running_device *device, int state )
+static void wheelrun_ym3526_irqhandler( device_t *device, int state )
 {
 	fantland_state *driver = device->machine->driver_data<fantland_state>();
 	cpu_set_input_line(driver->audio_cpu, INPUT_LINE_IRQ0, state);
@@ -1067,36 +1067,36 @@ static const ym3526_interface wheelrun_ym3526_interface =
 static MACHINE_CONFIG_START( wheelrun, fantland_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", V20, XTAL_18MHz/2)		// D701080C-8 (V20)
-	MDRV_CPU_PROGRAM_MAP(wheelrun_map)
-	MDRV_CPU_VBLANK_INT("screen", fantland_irq)
+	MCFG_CPU_ADD("maincpu", V20, XTAL_18MHz/2)		// D701080C-8 (V20)
+	MCFG_CPU_PROGRAM_MAP(wheelrun_map)
+	MCFG_CPU_VBLANK_INT("screen", fantland_irq)
 
-	MDRV_CPU_ADD("audiocpu", Z80, XTAL_18MHz/2)		// Z8400BB1 (Z80B)
-	MDRV_CPU_PROGRAM_MAP(wheelrun_sound_map)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_18MHz/2)		// Z8400BB1 (Z80B)
+	MCFG_CPU_PROGRAM_MAP(wheelrun_sound_map)
 	// IRQ by YM3526, NMI when soundlatch is written
 
-	MDRV_MACHINE_START(fantland)
-	MDRV_MACHINE_RESET(fantland)
+	MCFG_MACHINE_START(fantland)
+	MCFG_MACHINE_RESET(fantland)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(256,224)
-	MDRV_SCREEN_VISIBLE_AREA(0, 256-1, 0, 224-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(256,224)
+	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 224-1)
 
-	MDRV_GFXDECODE(fantland)
-	MDRV_PALETTE_LENGTH(256)
+	MCFG_GFXDECODE(fantland)
+	MCFG_PALETTE_LENGTH(256)
 
-	MDRV_VIDEO_UPDATE(fantland)
+	MCFG_VIDEO_UPDATE(fantland)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM3526, XTAL_14MHz/4)
-	MDRV_SOUND_CONFIG(wheelrun_ym3526_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("ymsnd", YM3526, XTAL_14MHz/4)
+	MCFG_SOUND_CONFIG(wheelrun_ym3526_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 

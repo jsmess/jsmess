@@ -76,7 +76,7 @@ static void get_pens(running_machine *machine, pen_t *pens)
 	double charmap_b_weights[2];
 	double back_r_weight[1];
 	double back_gb_weight[1];
-	const UINT8 *prom = memory_region(machine, "proms");
+	const UINT8 *prom = machine->region("proms")->base();
 
 	scaler = compute_resistor_weights(0, 0xff, -1,
 									  1, resistances_bitmap,     bitmap_weight,      470, 0,
@@ -141,7 +141,7 @@ static void get_panther_pens(running_machine *machine, pen_t *pens)
 	double charmap_b_weights[2];
 	double back_r_weight[1];
 	double back_gb_weight[1];
-	const UINT8 *prom = memory_region(machine, "proms");
+	const UINT8 *prom = machine->region("proms")->base();
 
 	scaler = compute_resistor_weights(0, 0xff, -1,
 									  1, resistances_bitmap,     bitmap_weight,      470, 0,
@@ -427,28 +427,28 @@ static VIDEO_UPDATE( panther )
 
 static MACHINE_CONFIG_FRAGMENT( redalert_video_common )
 
-	MDRV_VIDEO_UPDATE(redalert)
+	MCFG_VIDEO_UPDATE(redalert)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_FRAGMENT( redalert_video )
 
-	MDRV_VIDEO_START(redalert)
-	MDRV_FRAGMENT_ADD( redalert_video_common )
+	MCFG_VIDEO_START(redalert)
+	MCFG_FRAGMENT_ADD( redalert_video_common )
 
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_FRAGMENT( ww3_video )
 
-	MDRV_VIDEO_START( ww3 )
-	MDRV_FRAGMENT_ADD( redalert_video_common )
+	MCFG_VIDEO_START( ww3 )
+	MCFG_FRAGMENT_ADD( redalert_video_common )
 
 MACHINE_CONFIG_END
 
@@ -461,30 +461,30 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_FRAGMENT( demoneye_video )
 
-	MDRV_VIDEO_START(redalert)
-	MDRV_VIDEO_UPDATE(demoneye)
+	MCFG_VIDEO_START(redalert)
+	MCFG_VIDEO_UPDATE(demoneye)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_FRAGMENT( panther_video )
 
-	MDRV_VIDEO_START(ww3)
-	MDRV_VIDEO_UPDATE(panther)
+	MCFG_VIDEO_START(ww3)
+	MCFG_VIDEO_UPDATE(panther)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 
 MACHINE_CONFIG_END
 

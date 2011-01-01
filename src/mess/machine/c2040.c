@@ -73,7 +73,7 @@ struct _c2040_unit_t
 	int bit_pos;							/* bit position within track buffer byte */
 
 	/* devices */
-	running_device *image;
+	device_t *image;
 };
 
 typedef struct _c2040_t c2040_t;
@@ -106,13 +106,13 @@ struct _c2040_t
 	int miot_irq;						/* MIOT interrupt */
 
 	/* devices */
-	running_device *cpu_dos;
-	running_device *cpu_fdc;
-	running_device *riot0;
-	running_device *riot1;
-	running_device *miot;
+	device_t *cpu_dos;
+	device_t *cpu_fdc;
+	device_t *riot0;
+	device_t *riot1;
+	device_t *miot;
 	via6522_device *via;
-	running_device *bus;
+	device_t *bus;
 
 	/* timers */
 	emu_timer *bit_timer;
@@ -122,7 +122,7 @@ struct _c2040_t
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE c2040_t *get_safe_token(running_device *device)
+INLINE c2040_t *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert((device->type() == C2040) || (device->type() == C3040) || (device->type() == C4040) ||
@@ -130,7 +130,7 @@ INLINE c2040_t *get_safe_token(running_device *device)
 	return (c2040_t *)downcast<legacy_device_base *>(device)->token();
 }
 
-INLINE c2040_config *get_safe_config(running_device *device)
+INLINE c2040_config *get_safe_config(device_t *device)
 {
 	assert(device != NULL);
 	assert((device->type() == C2040) || (device->type() == C3040) || (device->type() == C4040) ||
@@ -138,7 +138,7 @@ INLINE c2040_config *get_safe_config(running_device *device)
 	return (c2040_config *)downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
 }
 
-INLINE void update_ieee_signals(running_device *device)
+INLINE void update_ieee_signals(device_t *device)
 {
 	c2040_t *c2040 = get_safe_token(device);
 
@@ -214,7 +214,7 @@ INLINE void update_gcr_data(c2040_t *c2040)
 
 static TIMER_CALLBACK( bit_tick )
 {
-	running_device *device = (running_device *)ptr;
+	device_t *device = (device_t *)ptr;
 	c2040_t *c2040 = get_safe_token(device);
 	int ready = 1;
 
@@ -1289,20 +1289,20 @@ static const floppy_config c8250_floppy_config =
 
 static MACHINE_CONFIG_FRAGMENT( c2040 )
 	/* DOS */
-	MDRV_CPU_ADD(M6502_TAG, M6502, XTAL_16MHz/16)
-	MDRV_CPU_PROGRAM_MAP(c2040_dos_map)
+	MCFG_CPU_ADD(M6502_TAG, M6502, XTAL_16MHz/16)
+	MCFG_CPU_PROGRAM_MAP(c2040_dos_map)
 
-	MDRV_RIOT6532_ADD(M6532_0_TAG, XTAL_16MHz/16, riot0_intf)
-	MDRV_RIOT6532_ADD(M6532_1_TAG, XTAL_16MHz/16, riot1_intf)
+	MCFG_RIOT6532_ADD(M6532_0_TAG, XTAL_16MHz/16, riot0_intf)
+	MCFG_RIOT6532_ADD(M6532_1_TAG, XTAL_16MHz/16, riot1_intf)
 
 	/* controller */
-	MDRV_CPU_ADD(M6504_TAG, M6502, XTAL_16MHz/16)
-	MDRV_CPU_PROGRAM_MAP(c2040_fdc_map)
+	MCFG_CPU_ADD(M6504_TAG, M6502, XTAL_16MHz/16)
+	MCFG_CPU_PROGRAM_MAP(c2040_fdc_map)
 
-	MDRV_VIA6522_ADD(M6522_TAG, XTAL_16MHz/16, via_intf)
-	MDRV_MOS6530_ADD(M6530_TAG, XTAL_16MHz/16, miot_intf)
+	MCFG_VIA6522_ADD(M6522_TAG, XTAL_16MHz/16, via_intf)
+	MCFG_MOS6530_ADD(M6530_TAG, XTAL_16MHz/16, miot_intf)
 
-	MDRV_FLOPPY_2_DRIVES_ADD(c2040_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_ADD(c2040_floppy_config)
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------
@@ -1311,20 +1311,20 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_FRAGMENT( c4040 )
 	/* DOS */
-	MDRV_CPU_ADD(M6502_TAG, M6502, XTAL_16MHz/16)
-	MDRV_CPU_PROGRAM_MAP(c4040_dos_map)
+	MCFG_CPU_ADD(M6502_TAG, M6502, XTAL_16MHz/16)
+	MCFG_CPU_PROGRAM_MAP(c4040_dos_map)
 
-	MDRV_RIOT6532_ADD(M6532_0_TAG, XTAL_16MHz/16, riot0_intf)
-	MDRV_RIOT6532_ADD(M6532_1_TAG, XTAL_16MHz/16, riot1_intf)
+	MCFG_RIOT6532_ADD(M6532_0_TAG, XTAL_16MHz/16, riot0_intf)
+	MCFG_RIOT6532_ADD(M6532_1_TAG, XTAL_16MHz/16, riot1_intf)
 
 	/* controller */
-	MDRV_CPU_ADD(M6504_TAG, M6502, XTAL_16MHz/16)
-	MDRV_CPU_PROGRAM_MAP(c4040_fdc_map)
+	MCFG_CPU_ADD(M6504_TAG, M6502, XTAL_16MHz/16)
+	MCFG_CPU_PROGRAM_MAP(c4040_fdc_map)
 
-	MDRV_VIA6522_ADD(M6522_TAG, XTAL_16MHz/16, via_intf)
-	MDRV_MOS6530_ADD(M6530_TAG, XTAL_16MHz/16, miot_intf)
+	MCFG_VIA6522_ADD(M6522_TAG, XTAL_16MHz/16, via_intf)
+	MCFG_MOS6530_ADD(M6530_TAG, XTAL_16MHz/16, miot_intf)
 
-	MDRV_FLOPPY_2_DRIVES_ADD(c4040_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_ADD(c4040_floppy_config)
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------
@@ -1333,20 +1333,20 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_FRAGMENT( c8050 )
 	/* DOS */
-	MDRV_CPU_ADD(M6502_TAG, M6502, XTAL_12MHz/12)
-	MDRV_CPU_PROGRAM_MAP(c8050_dos_map)
+	MCFG_CPU_ADD(M6502_TAG, M6502, XTAL_12MHz/12)
+	MCFG_CPU_PROGRAM_MAP(c8050_dos_map)
 
-	MDRV_RIOT6532_ADD(M6532_0_TAG, XTAL_12MHz/12, riot0_intf)
-	MDRV_RIOT6532_ADD(M6532_1_TAG, XTAL_12MHz/12, riot1_intf)
+	MCFG_RIOT6532_ADD(M6532_0_TAG, XTAL_12MHz/12, riot0_intf)
+	MCFG_RIOT6532_ADD(M6532_1_TAG, XTAL_12MHz/12, riot1_intf)
 
 	/* controller */
-	MDRV_CPU_ADD(M6504_TAG, M6502, XTAL_12MHz/12)
-	MDRV_CPU_PROGRAM_MAP(c8050_fdc_map)
+	MCFG_CPU_ADD(M6504_TAG, M6502, XTAL_12MHz/12)
+	MCFG_CPU_PROGRAM_MAP(c8050_fdc_map)
 
-	MDRV_VIA6522_ADD(M6522_TAG, XTAL_12MHz/12, c8050_via_intf)
-	MDRV_MOS6530_ADD(M6530_TAG, XTAL_12MHz/12, c8050_miot_intf)
+	MCFG_VIA6522_ADD(M6522_TAG, XTAL_12MHz/12, c8050_via_intf)
+	MCFG_MOS6530_ADD(M6530_TAG, XTAL_12MHz/12, c8050_miot_intf)
 
-	MDRV_FLOPPY_2_DRIVES_ADD(c8050_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_ADD(c8050_floppy_config)
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------
@@ -1355,20 +1355,20 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_FRAGMENT( c8250 )
 	/* DOS */
-	MDRV_CPU_ADD(M6502_TAG, M6502, XTAL_12MHz/12)
-	MDRV_CPU_PROGRAM_MAP(c8050_dos_map)
+	MCFG_CPU_ADD(M6502_TAG, M6502, XTAL_12MHz/12)
+	MCFG_CPU_PROGRAM_MAP(c8050_dos_map)
 
-	MDRV_RIOT6532_ADD(M6532_0_TAG, XTAL_12MHz/12, riot0_intf)
-	MDRV_RIOT6532_ADD(M6532_1_TAG, XTAL_12MHz/12, riot1_intf)
+	MCFG_RIOT6532_ADD(M6532_0_TAG, XTAL_12MHz/12, riot0_intf)
+	MCFG_RIOT6532_ADD(M6532_1_TAG, XTAL_12MHz/12, riot1_intf)
 
 	/* controller */
-	MDRV_CPU_ADD(M6504_TAG, M6502, XTAL_12MHz/12)
-	MDRV_CPU_PROGRAM_MAP(c8050_fdc_map)
+	MCFG_CPU_ADD(M6504_TAG, M6502, XTAL_12MHz/12)
+	MCFG_CPU_PROGRAM_MAP(c8050_fdc_map)
 
-	MDRV_VIA6522_ADD(M6522_TAG, XTAL_12MHz/12, c8050_via_intf)
-	MDRV_MOS6530_ADD(M6530_TAG, XTAL_12MHz/12, c8050_miot_intf)
+	MCFG_VIA6522_ADD(M6522_TAG, XTAL_12MHz/12, c8050_via_intf)
+	MCFG_MOS6530_ADD(M6530_TAG, XTAL_12MHz/12, c8050_miot_intf)
 
-	MDRV_FLOPPY_2_DRIVES_ADD(c8250_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_ADD(c8250_floppy_config)
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------
@@ -1377,20 +1377,20 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_FRAGMENT( sfd1001 )
 	/* DOS */
-	MDRV_CPU_ADD(M6502_TAG, M6502, XTAL_12MHz/12)
-	MDRV_CPU_PROGRAM_MAP(sfd1001_dos_map)
+	MCFG_CPU_ADD(M6502_TAG, M6502, XTAL_12MHz/12)
+	MCFG_CPU_PROGRAM_MAP(sfd1001_dos_map)
 
-	MDRV_RIOT6532_ADD(M6532_0_TAG, XTAL_12MHz/12, riot0_intf)
-	MDRV_RIOT6532_ADD(M6532_1_TAG, XTAL_12MHz/12, riot1_intf)
+	MCFG_RIOT6532_ADD(M6532_0_TAG, XTAL_12MHz/12, riot0_intf)
+	MCFG_RIOT6532_ADD(M6532_1_TAG, XTAL_12MHz/12, riot1_intf)
 
 	/* controller */
-	MDRV_CPU_ADD(M6504_TAG, M6502, XTAL_12MHz/12)
-	MDRV_CPU_PROGRAM_MAP(sfd1001_fdc_map)
+	MCFG_CPU_ADD(M6504_TAG, M6502, XTAL_12MHz/12)
+	MCFG_CPU_PROGRAM_MAP(sfd1001_fdc_map)
 
-	MDRV_VIA6522_ADD(M6522_TAG, XTAL_12MHz/12, c8050_via_intf)
-	MDRV_MOS6530_ADD(M6530_TAG, XTAL_12MHz/12, c8050_miot_intf)
+	MCFG_VIA6522_ADD(M6522_TAG, XTAL_12MHz/12, c8050_via_intf)
+	MCFG_MOS6530_ADD(M6530_TAG, XTAL_12MHz/12, c8050_miot_intf)
 
-	MDRV_FLOPPY_DRIVE_ADD(FLOPPY_0, c8250_floppy_config)
+	MCFG_FLOPPY_DRIVE_ADD(FLOPPY_0, c8250_floppy_config)
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------
@@ -1523,7 +1523,7 @@ static DEVICE_START( c2040 )
 	floppy_install_load_proc(c2040->unit[1].image, on_disk_1_change);
 
 	/* find GCR ROM */
-	const region_info *region = device->subregion(C4040_REGION);
+	const memory_region *region = device->subregion(C4040_REGION);
 
 	if ((device->type() == C2040) || (device->type() == C3040))
 	{

@@ -189,7 +189,7 @@ WRITE8_HANDLER(kc85_disc_interface_latch_w)
 
 WRITE8_HANDLER(kc85_disc_hw_terminal_count_w)
 {
-	running_device *fdc = space->machine->device("upd765");
+	device_t *fdc = space->machine->device("upd765");
 	logerror("kc85 disc hw tc w: %02x\n",data);
 	upd765_tc_w(fdc, data & 0x01);
 }
@@ -1191,7 +1191,7 @@ static void kc85_4_update_0x00000(running_machine *machine)
 	{
 		LOG(("no memory at ram0!\n"));
 
-//      memory_set_bankptr(machine, 1,memory_region(machine, "maincpu") + 0x013000);
+//      memory_set_bankptr(machine, 1,machine->region("maincpu")->base() + 0x013000);
 		/* ram is disabled */
 		memory_nop_readwrite(space, 0x0000, 0x3fff, 0, 0);
 	}
@@ -1256,7 +1256,7 @@ static void kc85_4_update_0x0c000(running_machine *machine)
 		/* CAOS rom takes priority */
 		LOG(("CAOS rom 0x0c000\n"));
 
-		memory_set_bankptr(machine, "bank5",memory_region(machine, "maincpu") + 0x012000);
+		memory_set_bankptr(machine, "bank5",machine->region("maincpu")->base() + 0x012000);
 		memory_install_read_bank(space, 0xc000, 0xdfff, 0, 0, "bank5");
 	}
 	else if (state->kc85_pio_data[0] & (1<<7))
@@ -1264,7 +1264,7 @@ static void kc85_4_update_0x0c000(running_machine *machine)
 		/* BASIC takes next priority */
         	LOG(("BASIC rom 0x0c000\n"));
 
-        memory_set_bankptr(machine, "bank5", memory_region(machine, "maincpu") + 0x010000);
+        memory_set_bankptr(machine, "bank5", machine->region("maincpu")->base() + 0x010000);
 		memory_install_read_bank(space, 0xc000, 0xdfff, 0, 0, "bank5");
 	}
 	else
@@ -1295,7 +1295,7 @@ static void kc85_4_update_0x0e000(running_machine *machine)
 		/* enable CAOS rom in memory range 0x0e000-0x0ffff */
 		LOG(("CAOS rom 0x0e000\n"));
 		/* read will access the rom */
-		memory_set_bankptr(machine, "bank6",memory_region(machine, "maincpu") + 0x013000);
+		memory_set_bankptr(machine, "bank6",machine->region("maincpu")->base() + 0x013000);
 		memory_install_read_bank(space, 0xe000, 0xffff, 0, 0,"bank6");
 	}
 	else
@@ -1330,7 +1330,7 @@ bit 0: TRUCK */
 WRITE8_HANDLER ( kc85_4_pio_data_w )
 {
 	kc_state *state = space->machine->driver_data<kc_state>();
-	running_device *speaker = space->machine->device("speaker");
+	device_t *speaker = space->machine->device("speaker");
 	state->kc85_pio_data[offset] = data;
 	z80pio_d_w(state->kc85_z80pio, offset, data);
 
@@ -1414,7 +1414,7 @@ static void kc85_3_update_0x0c000(running_machine *machine)
 		/* BASIC takes next priority */
 		LOG(("BASIC rom 0x0c000\n"));
 
-		memory_set_bankptr(machine, "bank4", memory_region(machine, "maincpu") + 0x010000);
+		memory_set_bankptr(machine, "bank4", machine->region("maincpu")->base() + 0x010000);
 		memory_install_read_bank(space, 0xc000, 0xdfff, 0, 0, "bank4");
 	}
 	else
@@ -1436,7 +1436,7 @@ static void kc85_3_update_0x0e000(running_machine *machine)
 		/* enable CAOS rom in memory range 0x0e000-0x0ffff */
 		LOG(("CAOS rom 0x0e000\n"));
 
-		memory_set_bankptr(machine, "bank5",memory_region(machine, "maincpu") + 0x012000);
+		memory_set_bankptr(machine, "bank5",machine->region("maincpu")->base() + 0x012000);
 		memory_install_read_bank(space, 0xe000, 0xffff, 0, 0, "bank5");
 	}
 	else
@@ -1568,7 +1568,7 @@ bit 0: TRUCK */
 WRITE8_HANDLER ( kc85_3_pio_data_w )
 {
 	kc_state *state = space->machine->driver_data<kc_state>();
-	running_device *speaker = space->machine->device("speaker");
+	device_t *speaker = space->machine->device("speaker");
 	state->kc85_pio_data[offset] = data;
 	z80pio_d_w(state->kc85_z80pio, offset, data);
 
@@ -1676,14 +1676,14 @@ WRITE8_DEVICE_HANDLER ( kc85_ctc_w )
 	z80ctc_w(device, offset,data);
 }
 
-static void kc85_pio_interrupt(running_device *device, int state)
+static void kc85_pio_interrupt(device_t *device, int state)
 {
 	cputag_set_input_line(device->machine, "maincpu", 0, state);
 }
 
 /* callback for ardy output from PIO */
 /* used in KC85/4 & KC85/3 cassette interface */
-static void kc85_pio_ardy_callback(running_device *device, int state)
+static void kc85_pio_ardy_callback(device_t *device, int state)
 {
 	kc_state *drvstate = device->machine->driver_data<kc_state>();
 	drvstate->ardy = state & 0x01;
@@ -1696,7 +1696,7 @@ static void kc85_pio_ardy_callback(running_device *device, int state)
 
 /* callback for brdy output from PIO */
 /* used in KC85/4 & KC85/3 keyboard interface */
-static void kc85_pio_brdy_callback(running_device *device, int state)
+static void kc85_pio_brdy_callback(device_t *device, int state)
 {
 	kc_state *drvstate = device->machine->driver_data<kc_state>();
 	drvstate->brdy = state & 0x01;
@@ -1735,7 +1735,7 @@ static WRITE_LINE_DEVICE_HANDLER(kc85_zc1_callback)
 
 static TIMER_CALLBACK(kc85_15khz_timer_callback)
 {
-	running_device *device = (running_device *)ptr;
+	device_t *device = (device_t *)ptr;
 	kc_state *state = device->machine->driver_data<kc_state>();
 
 	/* toggle state of square wave */

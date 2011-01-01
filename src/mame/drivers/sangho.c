@@ -65,7 +65,7 @@ static void pzlestar_map_banks(running_machine *machine)
 		case 2:
 			memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000, 0x3fff, 0, 0, "bank1");
 			memory_unmap_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000, 0x3fff, 0, 0);
-			memory_set_bankptr(machine, "bank1", memory_region(machine, "user1")+ 0x10000);
+			memory_set_bankptr(machine, "bank1", machine->region("user1")->base()+ 0x10000);
 			break;
 		case 1:
 		case 3:
@@ -87,12 +87,12 @@ static void pzlestar_map_banks(running_machine *machine)
 		case 2:
 			memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x4000, 0x7fff, 0, 0, "bank2");
 			memory_unmap_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x4000, 0x7fff, 0, 0);
-			memory_set_bankptr(machine, "bank2", memory_region(machine, "user1")+ 0x18000);
+			memory_set_bankptr(machine, "bank2", machine->region("user1")->base()+ 0x18000);
 			break;
 		case 3:
 			memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x4000, 0x7fff, 0, 0, "bank2");
 			memory_unmap_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x4000, 0x7fff, 0, 0);
-			memory_set_bankptr(machine, "bank2", memory_region(machine, "user1")+ 0x20000 + (pzlestar_rom_bank*0x8000) + 0x4000);
+			memory_set_bankptr(machine, "bank2", machine->region("user1")->base()+ 0x20000 + (pzlestar_rom_bank*0x8000) + 0x4000);
 			break;
 		case 1:
 			memory_unmap_read(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x4000, 0x7fff, 0, 0);
@@ -113,7 +113,7 @@ static void pzlestar_map_banks(running_machine *machine)
 		case 3:
 			memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0xbfff, 0, 0, "bank3");
 			memory_unmap_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0xbfff, 0, 0);
-			memory_set_bankptr(machine, "bank3", memory_region(machine, "user1")+ 0x20000 + (pzlestar_rom_bank*0x8000));
+			memory_set_bankptr(machine, "bank3", machine->region("user1")->base()+ 0x20000 + (pzlestar_rom_bank*0x8000));
 			break;
 		case 1:
 		case 2:
@@ -183,18 +183,18 @@ static void sexyboom_map_bank(running_machine *machine, int bank)
 		else
 		{
 			// rom 0
-			memory_set_bankptr(machine, read_bank_name, memory_region(machine, "user1")+0x4000*banknum);
+			memory_set_bankptr(machine, read_bank_name, machine->region("user1")->base()+0x4000*banknum);
 			memory_unmap_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), bank*0x4000, (bank+1)*0x4000 - 1, 0, 0);
 		}
 	}
 	else if (banktype == 0x82)
 	{
-		memory_set_bankptr(machine, read_bank_name, memory_region(machine, "user1")+0x20000+banknum*0x4000);
+		memory_set_bankptr(machine, read_bank_name, machine->region("user1")->base()+0x20000+banknum*0x4000);
 		memory_unmap_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), bank*0x4000, (bank+1)*0x4000 - 1, 0, 0);
 	}
 	else if (banktype == 0x80)
 	{
-		memory_set_bankptr(machine, read_bank_name, memory_region(machine, "user1")+0x120000+banknum*0x4000);
+		memory_set_bankptr(machine, read_bank_name, machine->region("user1")->base()+0x120000+banknum*0x4000);
 		memory_unmap_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), bank*0x4000, (bank+1)*0x4000 - 1, 0, 0);
 	}
 	else
@@ -354,66 +354,66 @@ static VIDEO_START( sangho )
 
 static MACHINE_CONFIG_START( pzlestar, driver_device )
 
-	MDRV_CPU_ADD("maincpu", Z80,8000000) // ?
-	MDRV_CPU_PROGRAM_MAP(sangho_map)
-	MDRV_CPU_IO_MAP(pzlestar_io_map)
-	MDRV_CPU_VBLANK_INT_HACK(sangho_interrupt,262)
+	MCFG_CPU_ADD("maincpu", Z80,8000000) // ?
+	MCFG_CPU_PROGRAM_MAP(sangho_map)
+	MCFG_CPU_IO_MAP(pzlestar_io_map)
+	MCFG_CPU_VBLANK_INT_HACK(sangho_interrupt,262)
 
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
+	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(512 + 32, (212 + 28) * 2)
-	MDRV_SCREEN_VISIBLE_AREA(0, 512 + 32 - 1, 0, (212 + 28) * 2 - 1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(512 + 32, (212 + 28) * 2)
+	MCFG_SCREEN_VISIBLE_AREA(0, 512 + 32 - 1, 0, (212 + 28) * 2 - 1)
 
-	MDRV_PALETTE_LENGTH(512)
+	MCFG_PALETTE_LENGTH(512)
 
-	MDRV_MACHINE_RESET(pzlestar)
+	MCFG_MACHINE_RESET(pzlestar)
 
-	MDRV_PALETTE_INIT( v9938 )
+	MCFG_PALETTE_INIT( v9938 )
 
-	MDRV_VIDEO_START( sangho )
-	MDRV_VIDEO_UPDATE( generic_bitmapped )
+	MCFG_VIDEO_START( sangho )
+	MCFG_VIDEO_UPDATE( generic_bitmapped )
 
 
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("ymsnd", YM2413, 3580000)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("ymsnd", YM2413, 3580000)
 
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_START( sexyboom, driver_device )
 
-	MDRV_CPU_ADD("maincpu", Z80,8000000) // ?
-	MDRV_CPU_PROGRAM_MAP(sangho_map)
-	MDRV_CPU_IO_MAP(sexyboom_io_map)
-	MDRV_CPU_VBLANK_INT_HACK(sangho_interrupt,262)
+	MCFG_CPU_ADD("maincpu", Z80,8000000) // ?
+	MCFG_CPU_PROGRAM_MAP(sangho_map)
+	MCFG_CPU_IO_MAP(sexyboom_io_map)
+	MCFG_CPU_VBLANK_INT_HACK(sangho_interrupt,262)
 
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
+	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(512 + 32, (212 + 28) * 2)
-	MDRV_SCREEN_VISIBLE_AREA(0, 512 + 32 - 1, 0, (212 + 28) * 2 - 1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(512 + 32, (212 + 28) * 2)
+	MCFG_SCREEN_VISIBLE_AREA(0, 512 + 32 - 1, 0, (212 + 28) * 2 - 1)
 
-	MDRV_PALETTE_LENGTH(512)
+	MCFG_PALETTE_LENGTH(512)
 
-	MDRV_MACHINE_RESET(sexyboom)
+	MCFG_MACHINE_RESET(sexyboom)
 
-	MDRV_PALETTE_INIT( v9938 )
+	MCFG_PALETTE_INIT( v9938 )
 
-	MDRV_VIDEO_START( sangho )
-	MDRV_VIDEO_UPDATE( generic_bitmapped )
+	MCFG_VIDEO_START( sangho )
+	MCFG_VIDEO_UPDATE( generic_bitmapped )
 
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("ymsnd", YM2413, 3580000)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("ymsnd", YM2413, 3580000)
 
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 ROM_START( pzlestar )

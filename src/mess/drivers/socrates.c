@@ -113,14 +113,14 @@ public:
 static void socrates_set_rom_bank( running_machine *machine )
 {
 	socrates_state *state = machine->driver_data<socrates_state>();
-	memory_set_bankptr( machine, "bank1", memory_region(machine, "maincpu") + ( state->rom_bank * 0x4000 ));
+	memory_set_bankptr( machine, "bank1", machine->region("maincpu")->base() + ( state->rom_bank * 0x4000 ));
 }
 
 static void socrates_set_ram_bank( running_machine *machine )
 {
 	socrates_state *state = machine->driver_data<socrates_state>();
-	memory_set_bankptr( machine, "bank2", memory_region(machine, "vram") + ( (state->ram_bank&0x3) * 0x4000 )); // window 0
-	memory_set_bankptr( machine, "bank3", memory_region(machine, "vram") + ( ((state->ram_bank&0xC)>>2) * 0x4000 )); // window 1
+	memory_set_bankptr( machine, "bank2", machine->region("vram")->base() + ( (state->ram_bank&0x3) * 0x4000 )); // window 0
+	memory_set_bankptr( machine, "bank3", machine->region("vram")->base() + ( ((state->ram_bank&0xC)>>2) * 0x4000 )); // window 1
 }
 
 static void socrates_update_kb( running_machine *machine )
@@ -206,7 +206,7 @@ static MACHINE_RESET( socrates )
 
 static DRIVER_INIT( socrates )
 {
-	UINT8 *gfx = memory_region(machine, "vram");
+	UINT8 *gfx = machine->region("vram")->base();
 	int i;
     /* fill vram with its init powerup bit pattern, so startup has the checkerboard screen */
     for (i = 0; i < 0x10000; i++)
@@ -266,8 +266,8 @@ static READ8_HANDLER( status_and_speech ) // read 0x4x, some sort of status reg
 // bit 2 - speech chip bit 2
 // bit 1 - speech chip bit 1
 // bit 0 - speech chip bit 0
-UINT8 *speechromint = memory_region(space->machine, "speechint");
-UINT8 *speechromext = memory_region(space->machine, "speechext");
+UINT8 *speechromint = space->machine->region("speechint")->base();
+UINT8 *speechromext = space->machine->region("speechext")->base();
 	int temp = 0;
 	temp |= (state->speech_running)?0x80:0;
 	temp |= 0x40; // unknown
@@ -585,7 +585,7 @@ static PALETTE_INIT( socrates )
 static VIDEO_START( socrates )
 {
 	socrates_state *state = machine->driver_data<socrates_state>();
-	state->videoram = memory_region(machine, "vram");
+	state->videoram = machine->region("vram")->base();
 	state->scroll_offset = 0;
 }
 
@@ -630,7 +630,7 @@ static VIDEO_UPDATE( socrates )
 
 static WRITE8_HANDLER(socrates_sound_w)
 {
-	running_device *socr_snd = space->machine->device("soc_snd");
+	device_t *socr_snd = space->machine->device("soc_snd");
 	switch(offset)
 	{
 		case 0:
@@ -901,30 +901,30 @@ static INTERRUPT_GEN( assert_irq )
 
 static MACHINE_CONFIG_START( socrates, socrates_state )
     /* basic machine hardware */
-    MDRV_CPU_ADD("maincpu", Z80, XTAL_21_4772MHz/6)  /* Toshiba TMPZ84C00AP @ 3.579545 MHz, verified, xtal is divided by 6 */
-    MDRV_CPU_PROGRAM_MAP(z80_mem)
-    MDRV_CPU_IO_MAP(z80_io)
-    MDRV_QUANTUM_TIME(HZ(60))
-    MDRV_CPU_VBLANK_INT("screen", assert_irq)
-    //MDRV_MACHINE_START(socrates)
-    MDRV_MACHINE_RESET(socrates)
+    MCFG_CPU_ADD("maincpu", Z80, XTAL_21_4772MHz/6)  /* Toshiba TMPZ84C00AP @ 3.579545 MHz, verified, xtal is divided by 6 */
+    MCFG_CPU_PROGRAM_MAP(z80_mem)
+    MCFG_CPU_IO_MAP(z80_io)
+    MCFG_QUANTUM_TIME(HZ(60))
+    MCFG_CPU_VBLANK_INT("screen", assert_irq)
+    //MCFG_MACHINE_START(socrates)
+    MCFG_MACHINE_RESET(socrates)
 
     /* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(264, 228) // technically the screen size is 256x228 but super painter abuses what I suspect is a hardware bug to display repeated pixels of the very last pixel beyond this horizontal space, well into hblank
-	MDRV_SCREEN_VISIBLE_AREA(0, 263, 0, 219) // the last few rows are usually cut off by the screen bottom but are indeed displayed if you mess with v-hold
-	MDRV_PALETTE_LENGTH(256)
-	MDRV_PALETTE_INIT(socrates)
-	MDRV_VIDEO_START(socrates)
-	MDRV_VIDEO_UPDATE(socrates)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(264, 228) // technically the screen size is 256x228 but super painter abuses what I suspect is a hardware bug to display repeated pixels of the very last pixel beyond this horizontal space, well into hblank
+	MCFG_SCREEN_VISIBLE_AREA(0, 263, 0, 219) // the last few rows are usually cut off by the screen bottom but are indeed displayed if you mess with v-hold
+	MCFG_PALETTE_LENGTH(256)
+	MCFG_PALETTE_INIT(socrates)
+	MCFG_VIDEO_START(socrates)
+	MCFG_VIDEO_UPDATE(socrates)
 
     /* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("soc_snd", SOCRATES, XTAL_21_4772MHz/(512+256)) // this is correct, as strange as it sounds.
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("soc_snd", SOCRATES, XTAL_21_4772MHz/(512+256)) // this is correct, as strange as it sounds.
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 MACHINE_CONFIG_END
 

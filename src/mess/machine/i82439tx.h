@@ -25,8 +25,8 @@ struct _i82439tx_config
 /***************************************************************************
     FUNCTION PROTOTYPES
 ***************************************************************************/
-UINT32 i82439tx_pci_read(running_device *busdevice, running_device *device, int function, int offset, UINT32 mem_mask);
-void i82439tx_pci_write(running_device *busdevice, running_device *device, int function, int offset, UINT32 data, UINT32 mem_mask);
+UINT32 i82439tx_pci_read(device_t *busdevice, device_t *device, int function, int offset, UINT32 mem_mask);
+void i82439tx_pci_write(device_t *busdevice, device_t *device, int function, int offset, UINT32 data, UINT32 mem_mask);
 
 
 /***************************************************************************
@@ -35,10 +35,10 @@ void i82439tx_pci_write(running_device *busdevice, running_device *device, int f
 
 DECLARE_LEGACY_DEVICE(I82439TX, i82439tx);
 
-#define MDRV_I82439TX_ADD(_tag, _cputag, _rom_region) \
-	MDRV_DEVICE_ADD(_tag, I82439TX, 0) \
-	MDRV_DEVICE_CONFIG_DATAPTR(i82439tx_config, cputag, _cputag) \
-	MDRV_DEVICE_CONFIG_DATAPTR(i82439tx_config, rom_region, _rom_region)
+#define MCFG_I82439TX_ADD(_tag, _cputag, _rom_region) \
+	MCFG_DEVICE_ADD(_tag, I82439TX, 0) \
+	MCFG_DEVICE_CONFIG_DATAPTR(i82439tx_config, cputag, _cputag) \
+	MCFG_DEVICE_CONFIG_DATAPTR(i82439tx_config, rom_region, _rom_region)
 
 
 #endif /* __I82439TX_H__ */

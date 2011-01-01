@@ -37,9 +37,9 @@ struct _s2636_interface
 
 DECLARE_LEGACY_DEVICE(S2636, s2636);
 
-#define MDRV_S2636_ADD(_tag, _interface) \
-	MDRV_DEVICE_ADD(_tag, S2636, 0) \
-	MDRV_DEVICE_CONFIG(_interface)
+#define MCFG_S2636_ADD(_tag, _interface) \
+	MCFG_DEVICE_ADD(_tag, S2636, 0) \
+	MCFG_DEVICE_CONFIG(_interface)
 
 
 /*************************************
@@ -53,7 +53,7 @@ DECLARE_LEGACY_DEVICE(S2636, s2636);
    D0-D2 of each pixel is the pixel color
    D3 indicates whether the S2636 drew this pixel - 0 = not drawn, 1 = drawn */
 
-bitmap_t *s2636_update( running_device *device, const rectangle *cliprect );
+bitmap_t *s2636_update( device_t *device, const rectangle *cliprect );
 WRITE8_DEVICE_HANDLER( s2636_work_ram_w );
 READ8_DEVICE_HANDLER( s2636_work_ram_r );
 

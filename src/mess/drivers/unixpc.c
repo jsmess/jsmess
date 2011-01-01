@@ -35,9 +35,9 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<running_device> m_ram;
-	required_device<running_device> m_wd2797;
-	required_device<running_device> m_floppy;
+	required_device<device_t> m_ram;
+	required_device<device_t> m_wd2797;
+	required_device<device_t> m_floppy;
 
 	virtual bool video_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 
@@ -65,7 +65,7 @@ WRITE16_MEMBER( unixpc_state::romlmap_w )
 	if (BIT(data, 15))
 		memory_install_ram(&space, 0x000000, 0x3fffff, 0, 0, messram_get_ptr(m_ram));
 	else
-		memory_install_rom(&space, 0x000000, 0x3fffff, 0, 0, memory_region(space.machine, "bootrom"));
+		memory_install_rom(&space, 0x000000, 0x3fffff, 0, 0, space.machine->region("bootrom")->base());
 }
 
 void unixpc_state::machine_reset()
@@ -200,28 +200,28 @@ static const wd17xx_interface unixpc_wd17xx_intf =
 
 static MACHINE_CONFIG_START( unixpc, unixpc_state )
 	// basic machine hardware
-	MDRV_CPU_ADD("maincpu", M68010, XTAL_10MHz)
-	MDRV_CPU_PROGRAM_MAP(unixpc_mem)
+	MCFG_CPU_ADD("maincpu", M68010, XTAL_10MHz)
+	MCFG_CPU_PROGRAM_MAP(unixpc_mem)
 
 	// video hardware
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_RAW_PARAMS(XTAL_20MHz, 896, 0, 720, 367, 0, 348)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_20MHz, 896, 0, 720, 367, 0, 348)
 	// vsync should actually last 17264 pixels
 
-	MDRV_DEFAULT_LAYOUT(layout_unixpc)
+	MCFG_DEFAULT_LAYOUT(layout_unixpc)
 
-	MDRV_PALETTE_LENGTH(2)
-	MDRV_PALETTE_INIT(black_and_white)
+	MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_INIT(black_and_white)
 
 	// internal ram
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("1M")
-	MDRV_RAM_EXTRA_OPTIONS("2M")
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("1M")
+	MCFG_RAM_EXTRA_OPTIONS("2M")
 
 	// floppy
-	MDRV_WD2797_ADD("wd2797", unixpc_wd17xx_intf)
-	MDRV_FLOPPY_DRIVE_ADD(FLOPPY_0, unixpc_floppy_config)
+	MCFG_WD2797_ADD("wd2797", unixpc_wd17xx_intf)
+	MCFG_FLOPPY_DRIVE_ADD(FLOPPY_0, unixpc_floppy_config)
 MACHINE_CONFIG_END
 
 

@@ -351,7 +351,7 @@ static dsp_state *mpDspState;
 static INT32
 ReadPointROMData( running_machine *machine, unsigned offset )
 {
-	const INT32 *pPointData = (INT32 *)memory_region( machine, "user2" );
+	const INT32 *pPointData = (INT32 *)machine->region( "user2" )->base();
 	INT32 result = pPointData[offset];
 	return result;
 }
@@ -625,7 +625,7 @@ static WRITE16_HANDLER( dspram16_w )
 static int
 InitDSP( running_machine *machine )
 {
-	UINT16 *pMem = (UINT16 *)memory_region(machine, "dspmaster");
+	UINT16 *pMem = (UINT16 *)machine->region("dspmaster")->base();
 	/**
      * DSP BIOS tests "CPU ID" on startup
      * "JAPAN (C)1990 NAMCO LTD. by H.F "
@@ -1260,7 +1260,7 @@ static WRITE16_HANDLER( winrun_dsp_pointrom_addr_w )
 
 static READ16_HANDLER( winrun_dsp_pointrom_data_r )
 {
-	UINT16 *ptrom = (UINT16 *)memory_region(space->machine, "user2");
+	UINT16 *ptrom = (UINT16 *)space->machine->region("user2")->base();
 	return ptrom[winrun_pointrom_addr++];
 } /* winrun_dsp_pointrom_data_r */
 
@@ -1302,7 +1302,7 @@ ADDRESS_MAP_END
 
 static READ16_HANDLER( gpu_data_r )
 {
-	const UINT16 *pSrc = (UINT16 *)memory_region( space->machine, "user3" );
+	const UINT16 *pSrc = (UINT16 *)space->machine->region( "user3" )->base();
 	return pSrc[offset];
 }
 
@@ -1320,7 +1320,7 @@ static WRITE16_HANDLER( winrun_dspbios_w )
 	COMBINE_DATA( &winrun_dspbios[offset] );
 	if( offset==0xfff )
 	{
-		UINT16 *mem = (UINT16 *)memory_region(space->machine, "dsp");
+		UINT16 *mem = (UINT16 *)space->machine->region("dsp")->base();
 		memcpy( mem, winrun_dspbios, 0x2000 );
 		winrun_dsp_alive = 1;
 	}
@@ -1524,193 +1524,193 @@ static const c140_interface C140_interface_typeB =
 };
 
 static MACHINE_CONFIG_START( s21base, namcos21_state )
-	MDRV_CPU_ADD("maincpu", M68000,12288000) /* Master */
-	MDRV_CPU_PROGRAM_MAP(namcos21_68k_master)
-	MDRV_CPU_VBLANK_INT("screen", namcos2_68k_master_vblank)
+	MCFG_CPU_ADD("maincpu", M68000,12288000) /* Master */
+	MCFG_CPU_PROGRAM_MAP(namcos21_68k_master)
+	MCFG_CPU_VBLANK_INT("screen", namcos2_68k_master_vblank)
 
-	MDRV_CPU_ADD("slave", M68000,12288000) /* Slave */
-	MDRV_CPU_PROGRAM_MAP(namcos21_68k_slave)
-	MDRV_CPU_VBLANK_INT("screen", namcos2_68k_slave_vblank)
+	MCFG_CPU_ADD("slave", M68000,12288000) /* Slave */
+	MCFG_CPU_PROGRAM_MAP(namcos21_68k_slave)
+	MCFG_CPU_VBLANK_INT("screen", namcos2_68k_slave_vblank)
 
-	MDRV_CPU_ADD("audiocpu", M6809,3072000) /* Sound */
-	MDRV_CPU_PROGRAM_MAP(am_sound_winrun)
-	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)
-	MDRV_CPU_PERIODIC_INT(irq1_line_hold,120)
+	MCFG_CPU_ADD("audiocpu", M6809,3072000) /* Sound */
+	MCFG_CPU_PROGRAM_MAP(am_sound_winrun)
+	MCFG_CPU_VBLANK_INT_HACK(irq0_line_hold,2)
+	MCFG_CPU_PERIODIC_INT(irq1_line_hold,120)
 
-	MDRV_CPU_ADD("mcu", HD63705,2048000) /* IO */
-	MDRV_CPU_PROGRAM_MAP(am_mcu_winrun)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_ADD("mcu", HD63705,2048000) /* IO */
+	MCFG_CPU_PROGRAM_MAP(am_mcu_winrun)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("dspmaster", TMS32025,24000000) /* 24 MHz? overclocked */
-	MDRV_CPU_PROGRAM_MAP(master_dsp_program)
-	MDRV_CPU_DATA_MAP(master_dsp_data)
-	MDRV_CPU_IO_MAP(master_dsp_io)
+	MCFG_CPU_ADD("dspmaster", TMS32025,24000000) /* 24 MHz? overclocked */
+	MCFG_CPU_PROGRAM_MAP(master_dsp_program)
+	MCFG_CPU_DATA_MAP(master_dsp_data)
+	MCFG_CPU_IO_MAP(master_dsp_io)
 
-	MDRV_CPU_ADD("dspslave", TMS32025,24000000*4) /* 24 MHz?; overclocked */
-	MDRV_CPU_PROGRAM_MAP(slave_dsp_program)
-	MDRV_CPU_DATA_MAP(slave_dsp_data)
-	MDRV_CPU_IO_MAP(slave_dsp_io)
+	MCFG_CPU_ADD("dspslave", TMS32025,24000000*4) /* 24 MHz?; overclocked */
+	MCFG_CPU_PROGRAM_MAP(slave_dsp_program)
+	MCFG_CPU_DATA_MAP(slave_dsp_data)
+	MCFG_CPU_IO_MAP(slave_dsp_io)
 
-	MDRV_QUANTUM_TIME(HZ(12000))
+	MCFG_QUANTUM_TIME(HZ(12000))
 
-	MDRV_MACHINE_START(namcos2)
-	MDRV_MACHINE_RESET(namcos2)
-	MDRV_NVRAM_ADD_1FILL("nvram")
+	MCFG_MACHINE_START(namcos2)
+	MCFG_MACHINE_RESET(namcos2)
+	MCFG_NVRAM_ADD_1FILL("nvram")
 
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(NAMCOS21_POLY_FRAME_WIDTH,NAMCOS21_POLY_FRAME_HEIGHT)
-	MDRV_SCREEN_VISIBLE_AREA(0,495,0,479)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(NAMCOS21_POLY_FRAME_WIDTH,NAMCOS21_POLY_FRAME_HEIGHT)
+	MCFG_SCREEN_VISIBLE_AREA(0,495,0,479)
 
-	MDRV_GFXDECODE(namcos21)
-	MDRV_PALETTE_LENGTH(NAMCOS21_NUM_COLORS)
+	MCFG_GFXDECODE(namcos21)
+	MCFG_PALETTE_LENGTH(NAMCOS21_NUM_COLORS)
 
-	MDRV_VIDEO_START(namcos21)
-	MDRV_VIDEO_UPDATE(namcos21)
+	MCFG_VIDEO_START(namcos21)
+	MCFG_VIDEO_UPDATE(namcos21)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( poly_c140_typeA, s21base )
 
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("c140", C140, 8000000/374)
-	MDRV_SOUND_CONFIG(C140_interface_typeA)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 0.50)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 0.50)
+	MCFG_SOUND_ADD("c140", C140, 8000000/374)
+	MCFG_SOUND_CONFIG(C140_interface_typeA)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
-	MDRV_SOUND_ADD("ymsnd", YM2151, 3579580)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 0.30)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 0.30)
+	MCFG_SOUND_ADD("ymsnd", YM2151, 3579580)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.30)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.30)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( poly_c140_typeB, s21base )
 
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("c140", C140, 8000000/374)
-	MDRV_SOUND_CONFIG(C140_interface_typeB)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 0.50)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 0.50)
+	MCFG_SOUND_ADD("c140", C140, 8000000/374)
+	MCFG_SOUND_CONFIG(C140_interface_typeB)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
-	MDRV_SOUND_ADD("ymsnd", YM2151, 3579580)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 0.30)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 0.30)
+	MCFG_SOUND_ADD("ymsnd", YM2151, 3579580)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.30)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.30)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( driveyes, namcos21_state )
-	MDRV_CPU_ADD("maincpu", M68000,12288000) /* Master */
-	MDRV_CPU_PROGRAM_MAP(driveyes_68k_master)
-	MDRV_CPU_VBLANK_INT("screen", namcos2_68k_master_vblank)
+	MCFG_CPU_ADD("maincpu", M68000,12288000) /* Master */
+	MCFG_CPU_PROGRAM_MAP(driveyes_68k_master)
+	MCFG_CPU_VBLANK_INT("screen", namcos2_68k_master_vblank)
 
-	MDRV_CPU_ADD("slave", M68000,12288000) /* Slave */
-	MDRV_CPU_PROGRAM_MAP(driveyes_68k_slave)
-	MDRV_CPU_VBLANK_INT("screen", namcos2_68k_slave_vblank)
+	MCFG_CPU_ADD("slave", M68000,12288000) /* Slave */
+	MCFG_CPU_PROGRAM_MAP(driveyes_68k_slave)
+	MCFG_CPU_VBLANK_INT("screen", namcos2_68k_slave_vblank)
 
-	MDRV_CPU_ADD("audiocpu", M6809,3072000) /* Sound */
-	MDRV_CPU_PROGRAM_MAP(am_sound_winrun)
-	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)
-	MDRV_CPU_PERIODIC_INT(irq1_line_hold,120)
+	MCFG_CPU_ADD("audiocpu", M6809,3072000) /* Sound */
+	MCFG_CPU_PROGRAM_MAP(am_sound_winrun)
+	MCFG_CPU_VBLANK_INT_HACK(irq0_line_hold,2)
+	MCFG_CPU_PERIODIC_INT(irq1_line_hold,120)
 
-	MDRV_CPU_ADD("mcu", HD63705,2048000) /* IO */
-	MDRV_CPU_PROGRAM_MAP(am_mcu_winrun)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_ADD("mcu", HD63705,2048000) /* IO */
+	MCFG_CPU_PROGRAM_MAP(am_mcu_winrun)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("dsp", TMS32025,24000000*2) /* 24 MHz? overclocked */
-	MDRV_CPU_PROGRAM_MAP(winrun_dsp_program)
-	MDRV_CPU_DATA_MAP(winrun_dsp_data)
-	MDRV_CPU_IO_MAP(winrun_dsp_io)
+	MCFG_CPU_ADD("dsp", TMS32025,24000000*2) /* 24 MHz? overclocked */
+	MCFG_CPU_PROGRAM_MAP(winrun_dsp_program)
+	MCFG_CPU_DATA_MAP(winrun_dsp_data)
+	MCFG_CPU_IO_MAP(winrun_dsp_io)
 
-	MDRV_QUANTUM_TIME(HZ(6000)) /* 100 CPU slices per frame */
+	MCFG_QUANTUM_TIME(HZ(6000)) /* 100 CPU slices per frame */
 
-	MDRV_MACHINE_START(namcos2)
-	MDRV_MACHINE_RESET(namcos2)
-	MDRV_NVRAM_ADD_1FILL("nvram")
+	MCFG_MACHINE_START(namcos2)
+	MCFG_MACHINE_RESET(namcos2)
+	MCFG_NVRAM_ADD_1FILL("nvram")
 
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(NAMCOS21_POLY_FRAME_WIDTH,NAMCOS21_POLY_FRAME_HEIGHT)
-	MDRV_SCREEN_VISIBLE_AREA(0,495,0,479)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(NAMCOS21_POLY_FRAME_WIDTH,NAMCOS21_POLY_FRAME_HEIGHT)
+	MCFG_SCREEN_VISIBLE_AREA(0,495,0,479)
 
-	MDRV_GFXDECODE(namcos21)
-	MDRV_PALETTE_LENGTH(NAMCOS21_NUM_COLORS)
+	MCFG_GFXDECODE(namcos21)
+	MCFG_PALETTE_LENGTH(NAMCOS21_NUM_COLORS)
 
-	MDRV_VIDEO_START(namcos21)
-	MDRV_VIDEO_UPDATE(namcos21)
+	MCFG_VIDEO_START(namcos21)
+	MCFG_VIDEO_UPDATE(namcos21)
 
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("c140", C140, 8000000/374)
-	MDRV_SOUND_CONFIG(C140_interface_typeA)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 0.50)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 0.50)
+	MCFG_SOUND_ADD("c140", C140, 8000000/374)
+	MCFG_SOUND_CONFIG(C140_interface_typeA)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
-	MDRV_SOUND_ADD("ymsnd", YM2151, 3579580)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 0.30)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 0.30)
+	MCFG_SOUND_ADD("ymsnd", YM2151, 3579580)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.30)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.30)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( winrun_c140_typeB, namcos21_state )
-	MDRV_CPU_ADD("maincpu", M68000,12288000) /* Master */
-	MDRV_CPU_PROGRAM_MAP(am_master_winrun)
-	MDRV_CPU_VBLANK_INT("screen", namcos2_68k_master_vblank)
+	MCFG_CPU_ADD("maincpu", M68000,12288000) /* Master */
+	MCFG_CPU_PROGRAM_MAP(am_master_winrun)
+	MCFG_CPU_VBLANK_INT("screen", namcos2_68k_master_vblank)
 
-	MDRV_CPU_ADD("slave", M68000,12288000) /* Slave */
-	MDRV_CPU_PROGRAM_MAP(am_slave_winrun)
-	MDRV_CPU_VBLANK_INT("screen", namcos2_68k_slave_vblank)
+	MCFG_CPU_ADD("slave", M68000,12288000) /* Slave */
+	MCFG_CPU_PROGRAM_MAP(am_slave_winrun)
+	MCFG_CPU_VBLANK_INT("screen", namcos2_68k_slave_vblank)
 
-	MDRV_CPU_ADD("audiocpu", M6809,3072000) /* Sound */
-	MDRV_CPU_PROGRAM_MAP(am_sound_winrun)
-	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)
-	MDRV_CPU_PERIODIC_INT(irq1_line_hold,120)
+	MCFG_CPU_ADD("audiocpu", M6809,3072000) /* Sound */
+	MCFG_CPU_PROGRAM_MAP(am_sound_winrun)
+	MCFG_CPU_VBLANK_INT_HACK(irq0_line_hold,2)
+	MCFG_CPU_PERIODIC_INT(irq1_line_hold,120)
 
-	MDRV_CPU_ADD("mcu", HD63705,2048000) /* IO */
-	MDRV_CPU_PROGRAM_MAP(am_mcu_winrun)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_ADD("mcu", HD63705,2048000) /* IO */
+	MCFG_CPU_PROGRAM_MAP(am_mcu_winrun)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("dsp", TMS32025,24000000) /* 24 MHz? overclocked */
-	MDRV_CPU_PROGRAM_MAP(winrun_dsp_program)
-	MDRV_CPU_DATA_MAP(winrun_dsp_data)
-	MDRV_CPU_IO_MAP(winrun_dsp_io)
+	MCFG_CPU_ADD("dsp", TMS32025,24000000) /* 24 MHz? overclocked */
+	MCFG_CPU_PROGRAM_MAP(winrun_dsp_program)
+	MCFG_CPU_DATA_MAP(winrun_dsp_data)
+	MCFG_CPU_IO_MAP(winrun_dsp_io)
 
-	MDRV_CPU_ADD("gpu", M68000,12288000) /* graphics coprocessor */
-	MDRV_CPU_PROGRAM_MAP(am_gpu_winrun)
-	MDRV_CPU_VBLANK_INT("screen", namcos2_68k_gpu_vblank)
+	MCFG_CPU_ADD("gpu", M68000,12288000) /* graphics coprocessor */
+	MCFG_CPU_PROGRAM_MAP(am_gpu_winrun)
+	MCFG_CPU_VBLANK_INT("screen", namcos2_68k_gpu_vblank)
 
-	MDRV_QUANTUM_TIME(HZ(6000)) /* 100 CPU slices per frame */
+	MCFG_QUANTUM_TIME(HZ(6000)) /* 100 CPU slices per frame */
 
-	MDRV_MACHINE_START(namcos2)
-	MDRV_MACHINE_RESET(namcos2)
-	MDRV_NVRAM_ADD_1FILL("nvram")
+	MCFG_MACHINE_START(namcos2)
+	MCFG_MACHINE_RESET(namcos2)
+	MCFG_NVRAM_ADD_1FILL("nvram")
 
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(NAMCOS21_POLY_FRAME_WIDTH,NAMCOS21_POLY_FRAME_HEIGHT)
-	MDRV_SCREEN_VISIBLE_AREA(0,495,0,479)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(NAMCOS21_POLY_FRAME_WIDTH,NAMCOS21_POLY_FRAME_HEIGHT)
+	MCFG_SCREEN_VISIBLE_AREA(0,495,0,479)
 
-	MDRV_PALETTE_LENGTH(NAMCOS21_NUM_COLORS)
+	MCFG_PALETTE_LENGTH(NAMCOS21_NUM_COLORS)
 
-	MDRV_VIDEO_START(namcos21)
-	MDRV_VIDEO_UPDATE(namcos21)
+	MCFG_VIDEO_START(namcos21)
+	MCFG_VIDEO_UPDATE(namcos21)
 
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("c140", C140, 8000000/374)
-	MDRV_SOUND_CONFIG(C140_interface_typeB)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 0.50)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 0.50)
+	MCFG_SOUND_ADD("c140", C140, 8000000/374)
+	MCFG_SOUND_CONFIG(C140_interface_typeB)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
-	MDRV_SOUND_ADD("ymsnd", YM2151, 3579580)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 0.30)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 0.30)
+	MCFG_SOUND_ADD("ymsnd", YM2151, 3579580)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.30)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.30)
 MACHINE_CONFIG_END
 
 ROM_START( aircomb )
@@ -2199,7 +2199,7 @@ static void namcos21_init( running_machine *machine, int game_type )
 {
 	namcos2_gametype = game_type;
 	pointram = auto_alloc_array(machine, UINT8, PTRAM_SIZE);
-	mpDataROM = (UINT16 *)memory_region( machine, "user1" );
+	mpDataROM = (UINT16 *)machine->region( "user1" )->base();
 	InitDSP(machine);
 	mbNeedsKickstart = 20;
 	if( game_type==NAMCOS21_CYBERSLED )
@@ -2210,7 +2210,7 @@ static void namcos21_init( running_machine *machine, int game_type )
 
 static DRIVER_INIT( winrun )
 {
-	UINT16 *pMem = (UINT16 *)memory_region(machine, "dsp");
+	UINT16 *pMem = (UINT16 *)machine->region("dsp")->base();
 	int pc = 0;
 	pMem[pc++] = 0xff80; /* b */
 	pMem[pc++] = 0;
@@ -2218,7 +2218,7 @@ static DRIVER_INIT( winrun )
 	winrun_dspcomram = auto_alloc_array(machine, UINT16, 0x1000*2);
 
 	namcos2_gametype = NAMCOS21_WINRUN91;
-	mpDataROM = (UINT16 *)memory_region( machine, "user1" );
+	mpDataROM = (UINT16 *)machine->region( "user1" )->base();
 	pointram = auto_alloc_array(machine, UINT8, PTRAM_SIZE);
 	pointram_idx = 0;
 	mbNeedsKickstart = 0;
@@ -2242,7 +2242,7 @@ static DRIVER_INIT( cybsled )
 
 static DRIVER_INIT( solvalou )
 {
-	UINT16 *mem = (UINT16 *)memory_region(machine, "maincpu");
+	UINT16 *mem = (UINT16 *)machine->region("maincpu")->base();
 	mem[0x20ce4/2+1] = 0x0000; // $200128
 	mem[0x20cf4/2+0] = 0x4e71; // 2nd ptr_booting
 	mem[0x20cf4/2+1] = 0x4e71;
@@ -2253,13 +2253,13 @@ static DRIVER_INIT( solvalou )
 
 static DRIVER_INIT( driveyes )
 {
-	UINT16 *pMem = (UINT16 *)memory_region(machine, "dsp");
+	UINT16 *pMem = (UINT16 *)machine->region("dsp")->base();
 	int pc = 0;
 	pMem[pc++] = 0xff80; /* b */
 	pMem[pc++] = 0;
 	winrun_dspcomram = auto_alloc_array(machine, UINT16, 0x1000*2);
 	namcos2_gametype = NAMCOS21_DRIVERS_EYES;
-	mpDataROM = (UINT16 *)memory_region( machine, "user1" );
+	mpDataROM = (UINT16 *)machine->region( "user1" )->base();
 	pointram = auto_alloc_array(machine, UINT8, PTRAM_SIZE);
 	pointram_idx = 0;
 	mbNeedsKickstart = 0;

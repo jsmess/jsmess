@@ -167,7 +167,7 @@ static const UINT16 w_mask[8] =
 static hdc_t hdc;
 
 
-static int get_id_from_device( running_device *device )
+static int get_id_from_device( device_t *device )
 {
 	int id = -1;
 
@@ -1043,13 +1043,13 @@ static const struct harddisk_callback_config ti990_harddisk_config =
 };
 
 MACHINE_CONFIG_FRAGMENT( ti990_hdc )
-	MDRV_DEVICE_ADD( "harddisk1", HARDDISK, 0 )
-	MDRV_DEVICE_CONFIG( ti990_harddisk_config )
-	MDRV_DEVICE_ADD( "harddisk2", HARDDISK, 0 )
-	MDRV_DEVICE_CONFIG( ti990_harddisk_config )
-	MDRV_DEVICE_ADD( "harddisk3", HARDDISK, 0 )
-	MDRV_DEVICE_CONFIG( ti990_harddisk_config )
-	MDRV_DEVICE_ADD( "harddisk4", HARDDISK, 0 )
-	MDRV_DEVICE_CONFIG( ti990_harddisk_config )
+	MCFG_DEVICE_ADD( "harddisk1", HARDDISK, 0 )
+	MCFG_DEVICE_CONFIG( ti990_harddisk_config )
+	MCFG_DEVICE_ADD( "harddisk2", HARDDISK, 0 )
+	MCFG_DEVICE_CONFIG( ti990_harddisk_config )
+	MCFG_DEVICE_ADD( "harddisk3", HARDDISK, 0 )
+	MCFG_DEVICE_CONFIG( ti990_harddisk_config )
+	MCFG_DEVICE_ADD( "harddisk4", HARDDISK, 0 )
+	MCFG_DEVICE_CONFIG( ti990_harddisk_config )
 MACHINE_CONFIG_END
 

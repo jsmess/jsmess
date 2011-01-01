@@ -15,7 +15,7 @@ static struct {
 
 	PC_MOUSE_PROTOCOL protocol;
 
-	running_device *ins8250;
+	device_t *ins8250;
 	int inputs;
 
 	UINT8 queue[256];
@@ -35,7 +35,7 @@ void pc_mouse_initialise(running_machine *machine)
 	pc_mouse.ins8250 = NULL;
 }
 
-void pc_mouse_set_serial_port(running_device *ins8250)
+void pc_mouse_set_serial_port(device_t *ins8250)
 {
 	if ( pc_mouse.ins8250 != ins8250 ) {
 		pc_mouse.ins8250 = ins8250;

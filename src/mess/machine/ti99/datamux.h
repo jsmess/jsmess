@@ -23,7 +23,7 @@ typedef struct _bus_device
 	UINT8					unset;
 } bus_device;
 
-#define MDRV_DMUX_ADD(_tag, _devices)			\
-	MDRV_DEVICE_ADD(_tag, DMUX, 0) \
-	MDRV_DEVICE_CONFIG( _devices )
+#define MCFG_DMUX_ADD(_tag, _devices)			\
+	MCFG_DEVICE_ADD(_tag, DMUX, 0) \
+	MCFG_DEVICE_CONFIG( _devices )
 #endif

@@ -146,7 +146,7 @@ READ16_MEMBER ( ti68k_state::flash_r )
 	}
 	else
 	{
-		UINT16 *rom_base = (UINT16 *)memory_region(space.machine, "flash");
+		UINT16 *rom_base = (UINT16 *)space.machine->region("flash")->base();
 
 		return rom_base[offset];
 	}
@@ -421,7 +421,7 @@ INPUT_PORTS_END
 
 void ti68k_state::machine_start()
 {
-	UINT16 *rom = (UINT16 *)memory_region(machine, "flash");
+	UINT16 *rom = (UINT16 *)machine->region("flash")->base();
 	int i;
 
 	m_flash_mem = !((rom[0x32] & 0x0f) != 0);
@@ -515,51 +515,51 @@ static PALETTE_INIT( ti68k )
 
 static MACHINE_CONFIG_START( ti89, ti68k_state )
     /* basic machine hardware */
-    MDRV_CPU_ADD("maincpu", M68000, XTAL_10MHz)
-    MDRV_CPU_PROGRAM_MAP(ti89_mem)
+    MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)
+    MCFG_CPU_PROGRAM_MAP(ti89_mem)
 
-	MDRV_NVRAM_ADD_0FILL("nvram")
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
     /* video hardware */
-    MDRV_SCREEN_ADD("screen", RASTER)
-    MDRV_SCREEN_REFRESH_RATE(50)
-    MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-    MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-    MDRV_SCREEN_SIZE(240, 128)
-    MDRV_SCREEN_VISIBLE_AREA(0, 160-1, 0, 100-1)
-    MDRV_PALETTE_LENGTH(2)
-	MDRV_PALETTE_INIT(ti68k)
-	MDRV_DEFAULT_LAYOUT(layout_lcd)
+    MCFG_SCREEN_ADD("screen", RASTER)
+    MCFG_SCREEN_REFRESH_RATE(50)
+    MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+    MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+    MCFG_SCREEN_SIZE(240, 128)
+    MCFG_SCREEN_VISIBLE_AREA(0, 160-1, 0, 100-1)
+    MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_INIT(ti68k)
+	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
-	MDRV_SHARP_UNK128MBIT_ADD("flash")	//should be LH28F320 for ti89t and v200 and LH28F160S3T for other models
+	MCFG_SHARP_UNK128MBIT_ADD("flash")	//should be LH28F320 for ti89t and v200 and LH28F160S3T for other models
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( ti92, ti89 )
-    MDRV_CPU_MODIFY("maincpu")
-    MDRV_CPU_PROGRAM_MAP(ti92_mem)
+    MCFG_CPU_MODIFY("maincpu")
+    MCFG_CPU_PROGRAM_MAP(ti92_mem)
 
     /* video hardware */
-    MDRV_SCREEN_MODIFY("screen")
-    MDRV_SCREEN_VISIBLE_AREA(0, 240-1, 0, 128-1)
+    MCFG_SCREEN_MODIFY("screen")
+    MCFG_SCREEN_VISIBLE_AREA(0, 240-1, 0, 128-1)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( ti92p, ti92 )
-    MDRV_CPU_REPLACE("maincpu", M68000, XTAL_12MHz)
-    MDRV_CPU_PROGRAM_MAP(ti92p_mem)
+    MCFG_CPU_REPLACE("maincpu", M68000, XTAL_12MHz)
+    MCFG_CPU_PROGRAM_MAP(ti92p_mem)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( v200, ti92 )
-    MDRV_CPU_REPLACE("maincpu", M68000, XTAL_12MHz)
-    MDRV_CPU_PROGRAM_MAP(v200_mem)
+    MCFG_CPU_REPLACE("maincpu", M68000, XTAL_12MHz)
+    MCFG_CPU_PROGRAM_MAP(v200_mem)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( ti89t, ti89 )
-    MDRV_CPU_REPLACE("maincpu", M68000, XTAL_16MHz)
-    MDRV_CPU_PROGRAM_MAP(ti89t_mem)
+    MCFG_CPU_REPLACE("maincpu", M68000, XTAL_16MHz)
+    MCFG_CPU_PROGRAM_MAP(ti89t_mem)
 MACHINE_CONFIG_END
 
 

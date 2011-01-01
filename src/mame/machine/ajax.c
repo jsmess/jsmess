@@ -113,7 +113,7 @@ READ8_HANDLER( ajax_ls138_f10_r )
 	switch ((offset & 0x01c0) >> 6)
 	{
 		case 0x00:	/* ??? */
-			data = mame_rand(space->machine);
+			data = space->machine->rand();
 			break;
 		case 0x04:	/* 2P inputs */
 			data = input_port_read(space->machine, "P2");
@@ -200,8 +200,8 @@ WRITE8_HANDLER( ajax_bankswitch_2_w )
 MACHINE_START( ajax )
 {
 	ajax_state *state = machine->driver_data<ajax_state>();
-	UINT8 *MAIN = memory_region(machine, "maincpu");
-	UINT8 *SUB  = memory_region(machine, "sub");
+	UINT8 *MAIN = machine->region("maincpu")->base();
+	UINT8 *SUB  = machine->region("sub")->base();
 
 	memory_configure_bank(machine, "bank1", 0,  9,  &SUB[0x10000], 0x2000);
 	memory_configure_bank(machine, "bank2", 0, 12, &MAIN[0x10000], 0x2000);

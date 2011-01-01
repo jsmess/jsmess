@@ -4,12 +4,12 @@
 #include "devlegcy.h"
 
 
-#define MDRV_NAMCO_50XX_ADD(_tag, _clock) \
-	MDRV_DEVICE_ADD(_tag, NAMCO_50XX, _clock) \
+#define MCFG_NAMCO_50XX_ADD(_tag, _clock) \
+	MCFG_DEVICE_ADD(_tag, NAMCO_50XX, _clock) \
 
 
 READ8_DEVICE_HANDLER( namco_50xx_read );
-void namco_50xx_read_request(running_device *device);
+void namco_50xx_read_request(device_t *device);
 WRITE8_DEVICE_HANDLER( namco_50xx_write );
 
 

@@ -344,7 +344,7 @@ static void pcw_update_mem(running_machine *machine, int block, int data)
     {
         unsigned char *FakeROM;
 
-        FakeROM = &memory_region(machine, "maincpu")[0x010000];
+        FakeROM = &machine->region("maincpu")->base()[0x010000];
 
         memory_set_bankptr(machine, "bank1", FakeROM);
     }*/
@@ -426,8 +426,8 @@ static WRITE8_HANDLER(pcw_vdu_video_control_register_w)
 static WRITE8_HANDLER(pcw_system_control_w)
 {
 	pcw_state *state = space->machine->driver_data<pcw_state>();
-	running_device *fdc = space->machine->device("upd765");
-	running_device *speaker = space->machine->device("beep");
+	device_t *fdc = space->machine->device("upd765");
+	device_t *speaker = space->machine->device("beep");
 	LOG(("SYSTEM CONTROL: %d\n",data));
 
 	switch (data)
@@ -644,7 +644,7 @@ static WRITE8_HANDLER(pcw_expansion_w)
 
 static READ8_HANDLER(pcw_fdc_r)
 {
-	running_device *fdc = space->machine->device("upd765");
+	device_t *fdc = space->machine->device("upd765");
 	/* from Jacob Nevins docs. FDC I/O is not fully decoded */
 	if (offset & 1)
 	{
@@ -656,7 +656,7 @@ static READ8_HANDLER(pcw_fdc_r)
 
 static WRITE8_HANDLER(pcw_fdc_w)
 {
-	running_device *fdc = space->machine->device("upd765");
+	device_t *fdc = space->machine->device("upd765");
 	/* from Jacob Nevins docs. FDC I/O is not fully decoded */
 	if (offset & 1)
 	{
@@ -1055,7 +1055,7 @@ ADDRESS_MAP_END
 
 static TIMER_CALLBACK(setup_beep)
 {
-	running_device *speaker = machine->device("beep");
+	device_t *speaker = machine->device("beep");
 	beep_set_state(speaker, 0);
 	beep_set_frequency(speaker, 3750);
 }
@@ -1070,7 +1070,7 @@ static MACHINE_START( pcw )
 static MACHINE_RESET( pcw )
 {
 	pcw_state *state = machine->driver_data<pcw_state>();
-	UINT8* code = memory_region(machine,"printer_mcu");
+	UINT8* code = machine->region("printer_mcu")->base();
 	int x;
 	/* ram paging is actually undefined at power-on */
 
@@ -1334,82 +1334,82 @@ static const floppy_config pcw_floppy_config =
 /* PCW8256, PCW8512, PCW9256 */
 static MACHINE_CONFIG_START( pcw, pcw_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, 4000000)       /* clock supplied to chip, but in reality it is 3.4 MHz */
-	MDRV_CPU_PROGRAM_MAP(pcw_map)
-	MDRV_CPU_IO_MAP(pcw_io)
+	MCFG_CPU_ADD("maincpu", Z80, 4000000)       /* clock supplied to chip, but in reality it is 3.4 MHz */
+	MCFG_CPU_PROGRAM_MAP(pcw_map)
+	MCFG_CPU_IO_MAP(pcw_io)
 
-	MDRV_CPU_ADD("printer_mcu", I8041, 11000000)  // 11MHz
-	MDRV_CPU_IO_MAP(pcw_printer_io)
+	MCFG_CPU_ADD("printer_mcu", I8041, 11000000)  // 11MHz
+	MCFG_CPU_IO_MAP(pcw_printer_io)
 
-	MDRV_CPU_ADD("keyboard_mcu", I8048, 5000000) // 5MHz
-	MDRV_CPU_IO_MAP(pcw_keyboard_io)
+	MCFG_CPU_ADD("keyboard_mcu", I8048, 5000000) // 5MHz
+	MCFG_CPU_IO_MAP(pcw_keyboard_io)
 
-//	MDRV_QUANTUM_TIME(HZ(50))
-	MDRV_QUANTUM_PERFECT_CPU("maincpu")
+//	MCFG_QUANTUM_TIME(HZ(50))
+	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	MDRV_MACHINE_START(pcw)
-	MDRV_MACHINE_RESET(pcw)
+	MCFG_MACHINE_START(pcw)
+	MCFG_MACHINE_RESET(pcw)
 
     /* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(50)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(PCW_SCREEN_WIDTH, PCW_SCREEN_HEIGHT)
-	MDRV_SCREEN_VISIBLE_AREA(0, PCW_SCREEN_WIDTH-1, 0, PCW_SCREEN_HEIGHT-1)
-	MDRV_PALETTE_LENGTH(PCW_NUM_COLOURS)
-	MDRV_PALETTE_INIT( pcw )
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(PCW_SCREEN_WIDTH, PCW_SCREEN_HEIGHT)
+	MCFG_SCREEN_VISIBLE_AREA(0, PCW_SCREEN_WIDTH-1, 0, PCW_SCREEN_HEIGHT-1)
+	MCFG_PALETTE_LENGTH(PCW_NUM_COLOURS)
+	MCFG_PALETTE_INIT( pcw )
 
-	MDRV_VIDEO_START( pcw )
-	MDRV_VIDEO_UPDATE( pcw )
+	MCFG_VIDEO_START( pcw )
+	MCFG_VIDEO_UPDATE( pcw )
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("beep", BEEP, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("beep", BEEP, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MDRV_UPD765A_ADD("upd765", pcw_upd765_interface)
+	MCFG_UPD765A_ADD("upd765", pcw_upd765_interface)
 
-	MDRV_FLOPPY_2_DRIVES_ADD(pcw_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_ADD(pcw_floppy_config)
 
 	/* internal ram */
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("256K")
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("256K")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( pcw8256, pcw )
-	MDRV_SCREEN_ADD("printer",RASTER)
-	MDRV_SCREEN_REFRESH_RATE(50)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE( PCW_PRINTER_WIDTH, PCW_PRINTER_HEIGHT )
-	MDRV_SCREEN_VISIBLE_AREA(0, PCW_PRINTER_WIDTH-1, 0, PCW_PRINTER_HEIGHT-1)
+	MCFG_SCREEN_ADD("printer",RASTER)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE( PCW_PRINTER_WIDTH, PCW_PRINTER_HEIGHT )
+	MCFG_SCREEN_VISIBLE_AREA(0, PCW_PRINTER_WIDTH-1, 0, PCW_PRINTER_HEIGHT-1)
 
-	MDRV_DEFAULT_LAYOUT( layout_pcw )
+	MCFG_DEFAULT_LAYOUT( layout_pcw )
 
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( pcw8512, pcw )
-	MDRV_SCREEN_ADD("printer",RASTER)
-	MDRV_SCREEN_REFRESH_RATE(50)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE( PCW_PRINTER_WIDTH, PCW_PRINTER_HEIGHT )
-	MDRV_SCREEN_VISIBLE_AREA(0, PCW_PRINTER_WIDTH-1, 0, PCW_PRINTER_HEIGHT-1)
+	MCFG_SCREEN_ADD("printer",RASTER)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE( PCW_PRINTER_WIDTH, PCW_PRINTER_HEIGHT )
+	MCFG_SCREEN_VISIBLE_AREA(0, PCW_PRINTER_WIDTH-1, 0, PCW_PRINTER_HEIGHT-1)
 
-	MDRV_DEFAULT_LAYOUT( layout_pcw )
+	MCFG_DEFAULT_LAYOUT( layout_pcw )
 
 	/* internal ram */
-	MDRV_RAM_MODIFY("messram")
-	MDRV_RAM_DEFAULT_SIZE("512K")
+	MCFG_RAM_MODIFY("messram")
+	MCFG_RAM_DEFAULT_SIZE("512K")
 MACHINE_CONFIG_END
 
 /* PCW9512, PCW9512+, PCW10 */
 static MACHINE_CONFIG_DERIVED( pcw9512, pcw )
-	MDRV_CPU_MODIFY( "maincpu" )
-	MDRV_CPU_IO_MAP(pcw9512_io)
+	MCFG_CPU_MODIFY( "maincpu" )
+	MCFG_CPU_IO_MAP(pcw9512_io)
 
 	/* internal ram */
-	MDRV_RAM_MODIFY("messram")
-	MDRV_RAM_DEFAULT_SIZE("512K")
+	MCFG_RAM_MODIFY("messram")
+	MCFG_RAM_DEFAULT_SIZE("512K")
 MACHINE_CONFIG_END
 
 

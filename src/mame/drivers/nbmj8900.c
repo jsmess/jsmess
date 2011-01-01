@@ -45,7 +45,7 @@ TODO:
 static DRIVER_INIT( ohpaipee )
 {
 #if 0
-	UINT8 *prot = memory_region(machine, "protdata");
+	UINT8 *prot = machine->region("protdata")->base();
 	int i;
 
 	/* this is one possible way to rearrange the protection ROM data to get the
@@ -59,7 +59,7 @@ static DRIVER_INIT( ohpaipee )
 		prot[i] = BITSWAP8(prot[i],2,7,3,5,0,6,4,1);
 	}
 #else
-	unsigned char *ROM = memory_region(machine, "maincpu");
+	unsigned char *ROM = machine->region("maincpu")->base();
 
 	// Protection ROM check skip
 	ROM[0x00e4] = 0x00;
@@ -78,7 +78,7 @@ static DRIVER_INIT( ohpaipee )
 static DRIVER_INIT( togenkyo )
 {
 #if 0
-	UINT8 *prot = memory_region(machine, "protdata");
+	UINT8 *prot = machine->region("protdata")->base();
 	int i;
 
 	/* this is one possible way to rearrange the protection ROM data to get the
@@ -91,7 +91,7 @@ static DRIVER_INIT( togenkyo )
 		prot[i] = BITSWAP8(prot[i],2,7,3,5,0,6,4,1);
 	}
 #else
-	unsigned char *ROM = memory_region(machine, "maincpu");
+	unsigned char *ROM = machine->region("maincpu")->base();
 
 	// Protection ROM check skip
 	ROM[0x010b] = 0x00;
@@ -319,41 +319,41 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( ohpaipee, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, 20000000/4)	/* 5.00 MHz ? */
-	MDRV_CPU_PROGRAM_MAP(ohpaipee_map)
-	MDRV_CPU_IO_MAP(ohpaipee_io_map)
-	MDRV_CPU_VBLANK_INT("screen", nb1413m3_interrupt)
+	MCFG_CPU_ADD("maincpu", Z80, 20000000/4)	/* 5.00 MHz ? */
+	MCFG_CPU_PROGRAM_MAP(ohpaipee_map)
+	MCFG_CPU_IO_MAP(ohpaipee_io_map)
+	MCFG_CPU_VBLANK_INT("screen", nb1413m3_interrupt)
 
-	MDRV_MACHINE_RESET(nb1413m3)
+	MCFG_MACHINE_RESET(nb1413m3)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(512, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 512-1, 8, 248-1)
-	MDRV_PALETTE_LENGTH(256)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(512, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 8, 248-1)
+	MCFG_PALETTE_LENGTH(256)
 
-	MDRV_VIDEO_START(nbmj8900_2layer)
-	MDRV_VIDEO_UPDATE(nbmj8900)
+	MCFG_VIDEO_START(nbmj8900_2layer)
+	MCFG_VIDEO_UPDATE(nbmj8900)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM3812, 2500000)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("ymsnd", YM3812, 2500000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD("dac", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( togenkyo, ohpaipee )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(togenkyo_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(togenkyo_map)
 MACHINE_CONFIG_END
 
 

@@ -284,7 +284,7 @@ static TIMER_CALLBACK(apple1_kbd_poll)
 	int port, bit;
 	int key_pressed;
 	UINT32 shiftkeys, ctrlkeys;
-	running_device *pia = machine->device( "pia" );
+	device_t *pia = machine->device( "pia" );
 	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3" };
 
 	/* This holds the values of all the input ports for ordinary keys
@@ -373,7 +373,7 @@ static TIMER_CALLBACK(apple1_kbd_poll)
 
 static TIMER_CALLBACK(apple1_kbd_strobe_end)
 {
-	running_device *pia = machine->device( "pia" );
+	device_t *pia = machine->device( "pia" );
 
 	/* End of the keyboard strobe pulse. */
 	pia6821_ca1_w(pia, 0);
@@ -418,7 +418,7 @@ static WRITE8_DEVICE_HANDLER( apple1_pia0_dsp_write_signal )
 
 static TIMER_CALLBACK(apple1_dsp_ready_start)
 {
-	running_device *pia = machine->device( "pia" );
+	device_t *pia = machine->device( "pia" );
 
 	/* When the display asserts \RDA to signal it is ready, it
        triggers a 74123 one-shot to send a 3.5-usec low pulse to PIA
@@ -430,7 +430,7 @@ static TIMER_CALLBACK(apple1_dsp_ready_start)
 
 static TIMER_CALLBACK(apple1_dsp_ready_end)
 {
-	running_device *pia = machine->device( "pia" );
+	device_t *pia = machine->device( "pia" );
 
 	/* The one-shot pulse has ended; return CB1 to high, so we can do
        another display write. */
@@ -490,7 +490,7 @@ static TIMER_CALLBACK(apple1_dsp_ready_end)
 **  could be placed on a single tape.
 *****************************************************************************/
 
-static running_device *cassette_device_image(running_machine *machine)
+static device_t *cassette_device_image(running_machine *machine)
 {
 	return machine->device("cassette");
 }

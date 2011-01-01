@@ -33,17 +33,17 @@
 #ifndef __KR2376__
 #define __KR2376__
 
-typedef void (*kr2376_on_strobe_changed_func) (running_device *device, int level);
-#define KR2376_ON_STROBE_CHANGED(name) void name(running_device *device, int level)
+typedef void (*kr2376_on_strobe_changed_func) (device_t *device, int level);
+#define KR2376_ON_STROBE_CHANGED(name) void name(device_t *device, int level)
 
 DECLARE_LEGACY_DEVICE(KR2376, kr2376);
 
-#define MDRV_KR2376_ADD(_tag, _intrf) \
-	MDRV_DEVICE_ADD(_tag, KR2376, 0) \
-	MDRV_DEVICE_CONFIG(_intrf)
+#define MCFG_KR2376_ADD(_tag, _intrf) \
+	MCFG_DEVICE_ADD(_tag, KR2376, 0) \
+	MCFG_DEVICE_CONFIG(_intrf)
 
-#define MDRV_KR2376_REMOVE(_tag) \
-	MDRV_DEVICE_REMOVE(_tag, KR2376)
+#define MCFG_KR2376_REMOVE(_tag) \
+	MCFG_DEVICE_REMOVE(_tag, KR2376)
 
 /*
  * Input pins
@@ -79,10 +79,10 @@ INPUT_PORTS_EXTERN( kr2376 );
 READ8_DEVICE_HANDLER( kr2376_data_r );
 
 /* Set an input pin */
-void kr2376_set_input_pin( running_device *device, kr2376_input_pin_t pin, int data );
+void kr2376_set_input_pin( device_t *device, kr2376_input_pin_t pin, int data );
 
 
 /* Get an output pin */
-int kr2376_get_output_pin( running_device *device, kr2376_output_pin_t pin );
+int kr2376_get_output_pin( device_t *device, kr2376_output_pin_t pin );
 
 #endif

@@ -50,7 +50,7 @@ struct SND {
 };
 
 
-INLINE wswan_sound_state *get_safe_token(running_device *device)
+INLINE wswan_sound_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == WSWAN);

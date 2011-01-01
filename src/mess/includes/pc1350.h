@@ -27,13 +27,13 @@ public:
 
 /*----------- defined in machine/pc1350.c -----------*/
 
-void pc1350_outa(running_device *device, int data);
-void pc1350_outb(running_device *device, int data);
-void pc1350_outc(running_device *device, int data);
+void pc1350_outa(device_t *device, int data);
+void pc1350_outb(device_t *device, int data);
+void pc1350_outc(device_t *device, int data);
 
-int pc1350_brk(running_device *device);
-int pc1350_ina(running_device *device);
-int pc1350_inb(running_device *device);
+int pc1350_brk(device_t *device);
+int pc1350_ina(device_t *device);
+int pc1350_inb(device_t *device);
 
 MACHINE_START( pc1350 );
 NVRAM_HANDLER( pc1350 );

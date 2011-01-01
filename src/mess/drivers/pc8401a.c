@@ -281,7 +281,7 @@ static READ8_HANDLER( io_rom_data_r )
 {
 	pc8401a_state *state = space->machine->driver_data<pc8401a_state>();
 
-	UINT8 *iorom = memory_region(space->machine, "iorom");
+	UINT8 *iorom = space->machine->region("iorom")->base();
 
 	//logerror("I/O ROM read from %05x\n", state->io_addr);
 
@@ -526,7 +526,7 @@ static MACHINE_START( pc8401a )
 	state->crt_ram = auto_alloc_array(machine, UINT8, PC8401A_CRT_VIDEORAM_SIZE);
 
 	/* set up A0/A1 memory banking */
-	memory_configure_bank(machine, "bank1", 0, 4, memory_region(machine, Z80_TAG), 0x8000);
+	memory_configure_bank(machine, "bank1", 0, 4, machine->region(Z80_TAG)->base(), 0x8000);
 	memory_configure_bank(machine, "bank1", 4, 2, messram_get_ptr(machine->device("messram")), 0x8000);
 	memory_set_bank(machine, "bank1", 0);
 
@@ -638,54 +638,54 @@ static const msm8251_interface pc8401a_msm8251_interface =
 static MACHINE_CONFIG_START( common, pc8401a_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80_TAG, Z80, 4000000) // NEC uPD70008C
-	MDRV_CPU_PROGRAM_MAP(pc8401a_mem)
-	MDRV_CPU_IO_MAP(pc8401a_io)
+	MCFG_CPU_ADD(Z80_TAG, Z80, 4000000) // NEC uPD70008C
+	MCFG_CPU_PROGRAM_MAP(pc8401a_mem)
+	MCFG_CPU_IO_MAP(pc8401a_io)
 
-	MDRV_MACHINE_START(pc8401a)
+	MCFG_MACHINE_START(pc8401a)
 
 	/* fake keyboard */
-	MDRV_TIMER_ADD_PERIODIC("keyboard", pc8401a_keyboard_tick, HZ(64))
+	MCFG_TIMER_ADD_PERIODIC("keyboard", pc8401a_keyboard_tick, HZ(64))
 
 	/* devices */
-	MDRV_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, pc8401a_upd1990a_intf)
-	MDRV_I8255A_ADD(I8255A_TAG, pc8401a_8255_interface)
-	MDRV_MSM8251_ADD(MSM8251_TAG, pc8401a_msm8251_interface)
+	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, pc8401a_upd1990a_intf)
+	MCFG_I8255A_ADD(I8255A_TAG, pc8401a_8255_interface)
+	MCFG_MSM8251_ADD(MSM8251_TAG, pc8401a_msm8251_interface)
 
 	/* option ROM cartridge */
-	MDRV_CARTSLOT_ADD("cart")
-	MDRV_CARTSLOT_EXTENSION_LIST("rom,bin")
-	MDRV_CARTSLOT_NOT_MANDATORY
+	MCFG_CARTSLOT_ADD("cart")
+	MCFG_CARTSLOT_EXTENSION_LIST("rom,bin")
+	MCFG_CARTSLOT_NOT_MANDATORY
 
 	/* I/O ROM cartridge */
-	MDRV_CARTSLOT_ADD("iocart")
-	MDRV_CARTSLOT_EXTENSION_LIST("rom,bin")
-	MDRV_CARTSLOT_NOT_MANDATORY
+	MCFG_CARTSLOT_ADD("iocart")
+	MCFG_CARTSLOT_EXTENSION_LIST("rom,bin")
+	MCFG_CARTSLOT_NOT_MANDATORY
 
 	/* internal ram */
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("64K")
-	MDRV_RAM_EXTRA_OPTIONS("96K")
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("64K")
+	MCFG_RAM_EXTRA_OPTIONS("96K")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( pc8401a, common )
 
 	/* video hardware */
-	MDRV_FRAGMENT_ADD(pc8401a_video)
+	MCFG_FRAGMENT_ADD(pc8401a_video)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( pc8500, common )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY(Z80_TAG)
-	MDRV_CPU_IO_MAP(pc8500_io)
+	MCFG_CPU_MODIFY(Z80_TAG)
+	MCFG_CPU_IO_MAP(pc8500_io)
 
 	/* video hardware */
-	MDRV_FRAGMENT_ADD(pc8500_video)
+	MCFG_FRAGMENT_ADD(pc8500_video)
 
 	/* internal ram */
-	MDRV_RAM_MODIFY("messram")
-	MDRV_RAM_DEFAULT_SIZE("64K")
+	MCFG_RAM_MODIFY("messram")
+	MCFG_RAM_DEFAULT_SIZE("64K")
 MACHINE_CONFIG_END
 
 /* ROMs */

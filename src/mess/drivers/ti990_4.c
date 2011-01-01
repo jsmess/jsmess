@@ -101,7 +101,7 @@ static WRITE8_HANDLER ( rset_callback )
 
 static WRITE8_HANDLER ( ckon_ckof_callback )
 {
-	running_device *maincpu = space->machine->device("maincpu");
+	device_t *maincpu = space->machine->device("maincpu");
 	ti990_ckon_ckof_callback(maincpu, (offset & 0x1000) ? 1 : 0);
 }
 
@@ -230,50 +230,50 @@ static const floppy_config ti990_4_floppy_config =
 static MACHINE_CONFIG_START( ti990_4, ti990_4_state )
 	/* basic machine hardware */
 	/* TMS9900 CPU @ 3.0(???) MHz */
-	MDRV_CPU_ADD("maincpu", TMS9900, 3000000)
-	MDRV_CPU_PROGRAM_MAP(ti990_4_memmap)
-	MDRV_CPU_IO_MAP(ti990_4_cru_map)
-	MDRV_CPU_PERIODIC_INT(ti990_4_line_interrupt, 120/*or TIME_IN_HZ(100) in Europe*/)
+	MCFG_CPU_ADD("maincpu", TMS9900, 3000000)
+	MCFG_CPU_PROGRAM_MAP(ti990_4_memmap)
+	MCFG_CPU_IO_MAP(ti990_4_cru_map)
+	MCFG_CPU_PERIODIC_INT(ti990_4_line_interrupt, 120/*or TIME_IN_HZ(100) in Europe*/)
 
-	MDRV_MACHINE_RESET( ti990_4 )
+	MCFG_MACHINE_RESET( ti990_4 )
 
 	/* video hardware - we emulate a single 911 vdt display */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 
 #if VIDEO_911
-	MDRV_SCREEN_SIZE(560, 280)
-	MDRV_SCREEN_VISIBLE_AREA(0, 560-1, 0, /*250*/280-1)
+	MCFG_SCREEN_SIZE(560, 280)
+	MCFG_SCREEN_VISIBLE_AREA(0, 560-1, 0, /*250*/280-1)
 #else
-	MDRV_SCREEN_SIZE(640, 480)
-	MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+	MCFG_SCREEN_SIZE(640, 480)
+	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 #endif
 
 #if VIDEO_911
-	MDRV_GFXDECODE(vdt911)
-	MDRV_PALETTE_LENGTH(8)
+	MCFG_GFXDECODE(vdt911)
+	MCFG_PALETTE_LENGTH(8)
 #else
-	MDRV_GFXDECODE(asr733)
-	MDRV_PALETTE_LENGTH(2)
+	MCFG_GFXDECODE(asr733)
+	MCFG_PALETTE_LENGTH(2)
 #endif
 
 #if VIDEO_911
-	MDRV_PALETTE_INIT(vdt911)
+	MCFG_PALETTE_INIT(vdt911)
 #else
-	MDRV_PALETTE_INIT(asr733)
+	MCFG_PALETTE_INIT(asr733)
 #endif
-	MDRV_VIDEO_START(ti990_4)
-	MDRV_VIDEO_UPDATE(ti990_4)
+	MCFG_VIDEO_START(ti990_4)
+	MCFG_VIDEO_UPDATE(ti990_4)
 
 #if VIDEO_911
 	/* 911 VDT has a beep tone generator */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("beep", BEEP, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("beep", BEEP, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 #endif
-	MDRV_FLOPPY_4_DRIVES_ADD(ti990_4_floppy_config)
+	MCFG_FLOPPY_4_DRIVES_ADD(ti990_4_floppy_config)
 
 MACHINE_CONFIG_END
 

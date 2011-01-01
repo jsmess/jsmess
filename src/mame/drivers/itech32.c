@@ -656,7 +656,7 @@ static READ32_HANDLER( gtclass_prot_result_r )
 
 static WRITE8_HANDLER( sound_bank_w )
 {
-	memory_set_bankptr(space->machine, "bank1", &memory_region(space->machine, "soundcpu")[0x10000 + data * 0x4000]);
+	memory_set_bankptr(space->machine, "bank1", &space->machine->region("soundcpu")->base()[0x10000 + data * 0x4000]);
 }
 
 
@@ -912,7 +912,7 @@ void itech32_state::nvram_init(nvram_device &nvram, void *base, size_t length)
 	// if nvram is the main RAM, don't overwrite exception vectors
 	int start = (base == main_ram) ? 0x80 : 0x00;
 	for (int i = start; i < length; i++)
-		((UINT8 *)base)[i] = mame_rand(machine);
+		((UINT8 *)base)[i] = machine->rand();
 
 	// due to accessing uninitialized RAM, we need this hack
 	if (is_drivedge)
@@ -1706,38 +1706,38 @@ static const es5506_interface es5506_config =
 static MACHINE_CONFIG_START( timekill, itech32_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, CPU_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(timekill_map)
-	MDRV_CPU_VBLANK_INT("screen", generate_int1)
+	MCFG_CPU_ADD("maincpu", M68000, CPU_CLOCK)
+	MCFG_CPU_PROGRAM_MAP(timekill_map)
+	MCFG_CPU_VBLANK_INT("screen", generate_int1)
 
-	MDRV_CPU_ADD("soundcpu", M6809, SOUND_CLOCK/8)
-	MDRV_CPU_PROGRAM_MAP(sound_map)
+	MCFG_CPU_ADD("soundcpu", M6809, SOUND_CLOCK/8)
+	MCFG_CPU_PROGRAM_MAP(sound_map)
 
-	MDRV_MACHINE_RESET(itech32)
-	MDRV_NVRAM_ADD_CUSTOM("nvram", itech32_state, nvram_init)
+	MCFG_MACHINE_RESET(itech32)
+	MCFG_NVRAM_ADD_CUSTOM("nvram", itech32_state, nvram_init)
 
-	MDRV_TICKET_DISPENSER_ADD("ticket", 200, TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
+	MCFG_TICKET_DISPENSER_ADD("ticket", 200, TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MDRV_PALETTE_LENGTH(8192)
+	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
+	MCFG_PALETTE_LENGTH(8192)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_RAW_PARAMS(VIDEO_CLOCK, 508, 0, 384, 262, 0, 256)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS(VIDEO_CLOCK, 508, 0, 384, 262, 0, 256)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 
-	MDRV_VIDEO_START(itech32)
-	MDRV_VIDEO_UPDATE(itech32)
+	MCFG_VIDEO_START(itech32)
+	MCFG_VIDEO_UPDATE(itech32)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ensoniq", ES5506, SOUND_CLOCK)
-	MDRV_SOUND_CONFIG(es5506_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("ensoniq", ES5506, SOUND_CLOCK)
+	MCFG_SOUND_CONFIG(es5506_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	/* via */
-	MDRV_VIA6522_ADD("via6522_0", SOUND_CLOCK/8, via_interface)
+	MCFG_VIA6522_ADD("via6522_0", SOUND_CLOCK/8, via_interface)
 MACHINE_CONFIG_END
 
 
@@ -1745,11 +1745,11 @@ static MACHINE_CONFIG_DERIVED( bloodstm, timekill )
 
 	/* basic machine hardware */
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(bloodstm_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(bloodstm_map)
 
 	/* video hardware */
-	MDRV_PALETTE_LENGTH(32768)
+	MCFG_PALETTE_LENGTH(32768)
 MACHINE_CONFIG_END
 
 
@@ -1757,19 +1757,19 @@ static MACHINE_CONFIG_DERIVED( drivedge, bloodstm )
 
 	/* basic machine hardware */
 
-	MDRV_CPU_REPLACE("maincpu", M68EC020, CPU020_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(drivedge_map)
+	MCFG_CPU_REPLACE("maincpu", M68EC020, CPU020_CLOCK)
+	MCFG_CPU_PROGRAM_MAP(drivedge_map)
 
-	MDRV_CPU_ADD("dsp1", TMS32031, TMS_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(drivedge_tms1_map)
+	MCFG_CPU_ADD("dsp1", TMS32031, TMS_CLOCK)
+	MCFG_CPU_PROGRAM_MAP(drivedge_tms1_map)
 
-	MDRV_CPU_ADD("dsp2", TMS32031, TMS_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(drivedge_tms2_map)
+	MCFG_CPU_ADD("dsp2", TMS32031, TMS_CLOCK)
+	MCFG_CPU_PROGRAM_MAP(drivedge_tms2_map)
 
-//  MDRV_CPU_ADD("comm", M6803, 8000000/4) -- network CPU
+//  MCFG_CPU_ADD("comm", M6803, 8000000/4) -- network CPU
 
-	MDRV_MACHINE_RESET(drivedge)
-	MDRV_QUANTUM_TIME(HZ(6000))
+	MCFG_MACHINE_RESET(drivedge)
+	MCFG_QUANTUM_TIME(HZ(6000))
 MACHINE_CONFIG_END
 
 
@@ -1777,16 +1777,16 @@ static MACHINE_CONFIG_DERIVED( sftm, bloodstm )
 
 	/* basic machine hardware */
 
-	MDRV_CPU_REPLACE("maincpu", M68EC020, CPU020_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(itech020_map)
-	MDRV_CPU_VBLANK_INT("screen", generate_int1)
+	MCFG_CPU_REPLACE("maincpu", M68EC020, CPU020_CLOCK)
+	MCFG_CPU_PROGRAM_MAP(itech020_map)
+	MCFG_CPU_VBLANK_INT("screen", generate_int1)
 
-	MDRV_CPU_MODIFY("soundcpu")
-	MDRV_CPU_PROGRAM_MAP(sound_020_map)
-	MDRV_CPU_VBLANK_INT_HACK(irq1_line_assert,4)
+	MCFG_CPU_MODIFY("soundcpu")
+	MCFG_CPU_PROGRAM_MAP(sound_020_map)
+	MCFG_CPU_VBLANK_INT_HACK(irq1_line_assert,4)
 
 	/* via */
-	MDRV_DEVICE_REMOVE("via6522_0")
+	MCFG_DEVICE_REMOVE("via6522_0")
 MACHINE_CONFIG_END
 
 
@@ -1794,7 +1794,7 @@ static MACHINE_CONFIG_DERIVED( tourny, sftm )
 
 	/* basic machine hardware */
 
-	MDRV_M48T02_ADD( "m48t02"  )
+	MCFG_M48T02_ADD( "m48t02"  )
 MACHINE_CONFIG_END
 
 
@@ -4073,7 +4073,7 @@ static DRIVER_INIT( wcbowln )	/* PIC 16C54 labeled as ITBWL-3 */
 
 static void install_timekeeper(running_machine *machine)
 {
-	running_device *device = machine->device("m48t02");
+	device_t *device = machine->device("m48t02");
 	memory_install_readwrite32_device_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), device, 0x681000, 0x6817ff, 0, 0, timekeeper_32be_r, timekeeper_32be_w);
 }
 

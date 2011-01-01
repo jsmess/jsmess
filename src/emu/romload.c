@@ -64,7 +64,7 @@ struct _romload_private
 	open_chd *		chd_list;			/* disks */
 	open_chd **		chd_list_tailptr;
 
-	region_info *	region;				/* info about current region */
+	memory_region *	region;				/* info about current region */
 
 	astring			errorstring;		/* error string */
 };
@@ -375,7 +375,7 @@ static void count_roms(rom_load_data *romdata)
 static void fill_random(running_machine *machine, UINT8 *base, UINT32 length)
 {
 	while (length--)
-		*base++ = mame_rand(machine);
+		*base++ = machine->rand();
 }
 
 
@@ -562,7 +562,7 @@ static void display_rom_load_results(rom_load_data *romdata)
 
 static void region_post_process(rom_load_data *romdata, const char *rgntag)
 {
-	const region_info *region = romdata->machine->region(rgntag);
+	const memory_region *region = romdata->machine->region(rgntag);
 	UINT8 *base;
 	int i, j;
 
@@ -832,7 +832,7 @@ static void copy_rom_data(rom_load_data *romdata, const rom_entry *romp)
 		fatalerror("Error in RomModule definition: COPY has an invalid length\n");
 
 	/* make sure the source was valid */
-	const region_info *region = romdata->machine->region(srcrgntag);
+	const memory_region *region = romdata->machine->region(srcrgntag);
 	if (region == NULL)
 		fatalerror("Error in RomModule definition: COPY from an invalid region\n");
 
@@ -1226,7 +1226,7 @@ static UINT32 normalize_flags_for_device(running_machine *machine, UINT32 startf
     more general process_region_list.
 -------------------------------------------------*/
 
-void load_software_part_region(running_device *device, char *swlist, char *swname, rom_entry *start_region)
+void load_software_part_region(device_t *device, char *swlist, char *swname, rom_entry *start_region)
 {
 	astring locationtag(swlist, PATH_SEPARATOR, swname);
 	rom_load_data *romdata = device->machine->romload_data;
@@ -1251,7 +1251,7 @@ void load_software_part_region(running_device *device, char *swlist, char *swnam
 		assert(ROMENTRY_ISREGION(region));
 
 		/* if this is a device region, override with the device width and endianness */
-		const region_info *memregion = romdata->machine->region(regiontag);
+		const memory_region *memregion = romdata->machine->region(regiontag);
 		if (memregion != NULL)
 		{
 			if (romdata->machine->device(regiontag) != NULL)

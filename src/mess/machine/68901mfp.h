@@ -47,13 +47,13 @@
 DECLARE_LEGACY_DEVICE(MC68901, mc68901);
 DECLARE_LEGACY_DEVICE(MK68901, mk68901);
 
-#define MDRV_MC68901_ADD(_tag, _clock, _config) \
-	MDRV_DEVICE_ADD((_tag), MC68901, _clock)	\
-	MDRV_DEVICE_CONFIG(_config)
+#define MCFG_MC68901_ADD(_tag, _clock, _config) \
+	MCFG_DEVICE_ADD((_tag), MC68901, _clock)	\
+	MCFG_DEVICE_CONFIG(_config)
 
-#define MDRV_MK68901_ADD(_tag, _clock, _config) \
-	MDRV_DEVICE_ADD((_tag), MK68901, _clock)	\
-	MDRV_DEVICE_CONFIG(_config)
+#define MCFG_MK68901_ADD(_tag, _clock, _config) \
+	MCFG_DEVICE_ADD((_tag), MK68901, _clock)	\
+	MCFG_DEVICE_CONFIG(_config)
 
 #define MC68901_INTERFACE(name) const mc68901_interface (name) =
 
@@ -105,7 +105,7 @@ READ8_DEVICE_HANDLER( mc68901_register_r );
 WRITE8_DEVICE_HANDLER( mc68901_register_w );
 
 /* get interrupt vector */
-int mc68901_get_vector(running_device *device) ATTR_NONNULL(1);
+int mc68901_get_vector(device_t *device) ATTR_NONNULL(1);
 
 /* write to Timer A input (pin 19) */
 WRITE_LINE_DEVICE_HANDLER( mc68901_tai_w ) ATTR_NONNULL(1);

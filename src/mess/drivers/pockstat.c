@@ -784,11 +784,11 @@ static READ32_HANDLER(ps_rombank_r)
 			if(state->ftlb_regs.entry[index] == bank)
 			{
 				//printf( "Address %08x is assigned to %08x in entry %d\n", 0x02000000 + (offset << 2), index * 0x2000 + ((offset << 2) & 0x1fff), index );
-				return ((UINT32*)memory_region(space->machine, "flash"))[index * (0x2000/4) + (offset & (0x1fff/4))];
+				return ((UINT32*)space->machine->region("flash")->base())[index * (0x2000/4) + (offset & (0x1fff/4))];
 			}
 		}
 	}
-	return ((UINT32*)memory_region(space->machine, "flash"))[offset & 0x7fff];
+	return ((UINT32*)space->machine->region("flash")->base())[offset & 0x7fff];
 }
 
 
@@ -815,7 +815,7 @@ static WRITE32_HANDLER(ps_flash_w)
 	if(state->ps_flash_write_count)
 	{
 		state->ps_flash_write_count--;
-		COMBINE_DATA(&((UINT32*)memory_region(space->machine, "flash"))[offset]);
+		COMBINE_DATA(&((UINT32*)space->machine->region("flash")->base())[offset]);
 	}
 }
 
@@ -954,7 +954,7 @@ static VIDEO_UPDATE( pockstat )
 static DEVICE_IMAGE_LOAD( pockstat_flash )
 {
 	int i, length;
-	UINT8 *cart = memory_region(image.device().machine, "flash");
+	UINT8 *cart = image.device().machine->region("flash")->base();
 	static const char *gme_id = "123-456-STD";
 
 	length = image.fread( cart, 0x20f40);
@@ -979,34 +979,34 @@ static DEVICE_IMAGE_LOAD( pockstat_flash )
 
 static MACHINE_CONFIG_START( pockstat, pockstat_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", ARM7, DEFAULT_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(pockstat_mem)
+	MCFG_CPU_ADD("maincpu", ARM7, DEFAULT_CLOCK)
+	MCFG_CPU_PROGRAM_MAP(pockstat_mem)
 
-	MDRV_MACHINE_RESET(pockstat)
-	MDRV_MACHINE_START(pockstat)
+	MCFG_MACHINE_RESET(pockstat)
+	MCFG_MACHINE_START(pockstat)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", LCD)
-	MDRV_SCREEN_REFRESH_RATE(50)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_SIZE(32, 32)
-	MDRV_SCREEN_VISIBLE_AREA(0, 32-1, 0, 32-1)
-	MDRV_PALETTE_LENGTH(2)
-	MDRV_PALETTE_INIT(black_and_white)
+	MCFG_SCREEN_ADD("screen", LCD)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_SIZE(32, 32)
+	MCFG_SCREEN_VISIBLE_AREA(0, 32-1, 0, 32-1)
+	MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_INIT(black_and_white)
 
-	MDRV_VIDEO_START(generic_bitmapped)
-	MDRV_VIDEO_UPDATE(pockstat)
+	MCFG_VIDEO_START(generic_bitmapped)
+	MCFG_VIDEO_UPDATE(pockstat)
 
-    MDRV_SPEAKER_STANDARD_MONO("mono")
-    MDRV_SOUND_ADD("dac", DAC, 0)
-    MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+    MCFG_SPEAKER_STANDARD_MONO("mono")
+    MCFG_SOUND_ADD("dac", DAC, 0)
+    MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	/* cartridge */
-	MDRV_CARTSLOT_ADD("cart")
-	MDRV_CARTSLOT_EXTENSION_LIST("gme")
-	MDRV_CARTSLOT_NOT_MANDATORY
-	MDRV_CARTSLOT_LOAD(pockstat_flash)
+	MCFG_CARTSLOT_ADD("cart")
+	MCFG_CARTSLOT_EXTENSION_LIST("gme")
+	MCFG_CARTSLOT_NOT_MANDATORY
+	MCFG_CARTSLOT_LOAD(pockstat_flash)
 MACHINE_CONFIG_END
 
 /* ROM definition */

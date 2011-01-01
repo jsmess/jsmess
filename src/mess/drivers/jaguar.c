@@ -204,7 +204,7 @@ static mame_file *jaguar_nvram_fopen( running_machine *machine, UINT32 openflags
 static void jaguar_nvram_load(running_machine *machine)
 {
     mame_file *nvram_file = NULL;
-    running_device *device;
+    device_t *device;
 
     for (device = machine->m_devicelist.first(); device != NULL; device = device->next())
     {
@@ -224,7 +224,7 @@ static void jaguar_nvram_load(running_machine *machine)
 static void jaguar_nvram_save(running_machine *machine)
 {
     mame_file *nvram_file = NULL;
-    running_device *device;
+    device_t *device;
 
     for (device = machine->m_devicelist.first(); device != NULL; device = device->next())
     {
@@ -257,7 +257,7 @@ static NVRAM_HANDLER( jaguar )
 */
 static WRITE32_HANDLER( jaguar_eeprom_w )
 {
-	running_device *eeprom = space->machine->device("eeprom");
+	device_t *eeprom = space->machine->device("eeprom");
 	eeprom_bit_count++;
 	if (eeprom_bit_count != 9)		/* kill extra bit at end of address */
 	{
@@ -268,14 +268,14 @@ static WRITE32_HANDLER( jaguar_eeprom_w )
 
 static READ32_HANDLER( jaguar_eeprom_clk )
 {
-	running_device *eeprom = space->machine->device("eeprom");
+	device_t *eeprom = space->machine->device("eeprom");
 	eeprom_set_clock_line(eeprom,PULSE_LINE);	/* get next bit when reading */
 	return 0;
 }
 
 static READ32_HANDLER( jaguar_eeprom_cs )
 {
-	running_device *eeprom = space->machine->device("eeprom");
+	device_t *eeprom = space->machine->device("eeprom");
 	eeprom_set_cs_line(eeprom,ASSERT_LINE);	/* must do at end of an operation */
 	eeprom_set_cs_line(eeprom,CLEAR_LINE);		/* enable chip for next operation */
 	eeprom_write_bit(eeprom,1);			/* write a start bit */
@@ -612,53 +612,53 @@ static const jaguar_cpu_config dsp_config =
 static MACHINE_CONFIG_START( jaguar, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68EC020, JAGUAR_CLOCK/2)
-	MDRV_CPU_PROGRAM_MAP(jaguar_map)
+	MCFG_CPU_ADD("maincpu", M68EC020, JAGUAR_CLOCK/2)
+	MCFG_CPU_PROGRAM_MAP(jaguar_map)
 
-	MDRV_CPU_ADD("gpu", JAGUARGPU, JAGUAR_CLOCK)
-	MDRV_CPU_CONFIG(gpu_config)
-	MDRV_CPU_PROGRAM_MAP(gpu_map)
+	MCFG_CPU_ADD("gpu", JAGUARGPU, JAGUAR_CLOCK)
+	MCFG_CPU_CONFIG(gpu_config)
+	MCFG_CPU_PROGRAM_MAP(gpu_map)
 
-	MDRV_CPU_ADD("audiocpu", JAGUARDSP, JAGUAR_CLOCK)
-	MDRV_CPU_CONFIG(dsp_config)
-	MDRV_CPU_PROGRAM_MAP(gpu_map)
+	MCFG_CPU_ADD("audiocpu", JAGUARDSP, JAGUAR_CLOCK)
+	MCFG_CPU_CONFIG(dsp_config)
+	MCFG_CPU_PROGRAM_MAP(gpu_map)
 
-	MDRV_MACHINE_RESET(jaguar)
-//  MDRV_NVRAM_HANDLER(jaguar)
+	MCFG_MACHINE_RESET(jaguar)
+//  MCFG_NVRAM_HANDLER(jaguar)
 
-	MDRV_TIMER_ADD("serial_timer", jaguar_serial_callback)
+	MCFG_TIMER_ADD("serial_timer", jaguar_serial_callback)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MDRV_SCREEN_RAW_PARAMS(COJAG_PIXEL_CLOCK/2, 456, 42, 402, 262, 17, 257)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_RAW_PARAMS(COJAG_PIXEL_CLOCK/2, 456, 42, 402, 262, 17, 257)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 
-	MDRV_VIDEO_START(cojag)
-	MDRV_VIDEO_UPDATE(cojag)
+	MCFG_VIDEO_START(cojag)
+	MCFG_VIDEO_UPDATE(cojag)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MDRV_SOUND_ADD("dac1", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MDRV_SOUND_ADD("dac2", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SOUND_ADD("dac1", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MCFG_SOUND_ADD("dac2", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
 	/* quickload */
-	MDRV_QUICKLOAD_ADD("quickload", jaguar, "abs,bin,cof,jag,prg", 0)
+	MCFG_QUICKLOAD_ADD("quickload", jaguar, "abs,bin,cof,jag,prg", 0)
 
 	/* cartridge */
-	MDRV_CARTSLOT_ADD("cart")
-	MDRV_CARTSLOT_EXTENSION_LIST("j64,rom")
-	MDRV_CARTSLOT_INTERFACE("jaguar_cart")
-	MDRV_CARTSLOT_LOAD(jaguar)
+	MCFG_CARTSLOT_ADD("cart")
+	MCFG_CARTSLOT_EXTENSION_LIST("j64,rom")
+	MCFG_CARTSLOT_INTERFACE("jaguar_cart")
+	MCFG_CARTSLOT_LOAD(jaguar)
 
 	/* software lists */
-	MDRV_SOFTWARE_LIST_ADD("cart_list","jaguar")
+	MCFG_SOFTWARE_LIST_ADD("cart_list","jaguar")
 
-	MDRV_EEPROM_93C46_ADD("eeprom")
+	MCFG_EEPROM_93C46_ADD("eeprom")
 MACHINE_CONFIG_END
 
 
@@ -694,7 +694,7 @@ ROM_END
 
 static void jaguar_fix_endian( running_machine *machine, UINT32 addr, UINT32 size )
 {
-	UINT8 j[4], *RAM = memory_region(machine, "maincpu");
+	UINT8 j[4], *RAM = machine->region("maincpu")->base();
 	UINT32 i;
 	size += addr;
 	logerror("File Loaded to address range %X to %X\n",addr,size-1);
@@ -723,7 +723,7 @@ static QUICKLOAD_LOAD( jaguar )
 	memset(jaguar_shared_ram, 0, 0x200000);
 	quickload_size = MIN(quickload_size, 0x200000 - quickload_begin);
 
-	image.fread( &memory_region(image.device().machine, "maincpu")[quickload_begin], quickload_size);
+	image.fread( &image.device().machine->region("maincpu")->base()[quickload_begin], quickload_size);
 
 	jaguar_fix_endian(image.device().machine, quickload_begin, quickload_size);
 
@@ -768,7 +768,7 @@ static QUICKLOAD_LOAD( jaguar )
 	{
 		memset(jaguar_shared_ram, 0, 0x200000);
 		image.fseek(0, SEEK_SET);
-		image.fread( &memory_region(image.device().machine, "maincpu")[start-skip], quickload_size);
+		image.fread( &image.device().machine->region("maincpu")->base()[start-skip], quickload_size);
 		quickload_begin = start;
 		jaguar_fix_endian(image.device().machine, (start-skip)&0xfffffc, quickload_size);
 	}
@@ -800,7 +800,7 @@ static DEVICE_IMAGE_LOAD( jaguar )
 		}
 
 		/* Load cart into memory */
-		image.fread( &memory_region(image.device().machine, "maincpu")[0x800000+load_offset], size);
+		image.fread( &image.device().machine->region("maincpu")->base()[0x800000+load_offset], size);
 	}
 	else
 	{

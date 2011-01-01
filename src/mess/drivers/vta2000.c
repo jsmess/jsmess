@@ -45,8 +45,8 @@ static MACHINE_RESET(vta2000)
 static VIDEO_START( vta2000 )
 {
 	vta2000_state *state = machine->driver_data<vta2000_state>();
-	state->FNT = memory_region(machine, "chargen");
-	state->videoram = memory_region(machine, "maincpu")+0x80a0;
+	state->FNT = machine->region("chargen")->base();
+	state->videoram = machine->region("maincpu")->base()+0x80a0;
 }
 
 static VIDEO_UPDATE( vta2000 )
@@ -119,25 +119,25 @@ GFXDECODE_END
 
 static MACHINE_CONFIG_START( vta2000, vta2000_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu",I8080, XTAL_4MHz / 4)
-	MDRV_CPU_PROGRAM_MAP(vta2000_mem)
-	MDRV_CPU_IO_MAP(vta2000_io)	
+	MCFG_CPU_ADD("maincpu",I8080, XTAL_4MHz / 4)
+	MCFG_CPU_PROGRAM_MAP(vta2000_mem)
+	MCFG_CPU_IO_MAP(vta2000_io)	
 
-	MDRV_MACHINE_RESET(vta2000)
+	MCFG_MACHINE_RESET(vta2000)
 	
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(50)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(80*8, 25*12)
-	MDRV_SCREEN_VISIBLE_AREA(0, 80*8-1, 0, 25*12-1)
-	MDRV_PALETTE_LENGTH(2)
-	MDRV_PALETTE_INIT(black_and_white)
-	MDRV_GFXDECODE(vta2000)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(80*8, 25*12)
+	MCFG_SCREEN_VISIBLE_AREA(0, 80*8-1, 0, 25*12-1)
+	MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_INIT(black_and_white)
+	MCFG_GFXDECODE(vta2000)
 
-	MDRV_VIDEO_START(vta2000)
-	MDRV_VIDEO_UPDATE(vta2000)
+	MCFG_VIDEO_START(vta2000)
+	MCFG_VIDEO_UPDATE(vta2000)
 MACHINE_CONFIG_END
 
 

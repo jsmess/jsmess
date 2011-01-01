@@ -126,14 +126,14 @@ struct _upd3301_t
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE upd3301_t *get_safe_token(running_device *device)
+INLINE upd3301_t *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert((device->type() == UPD3301));
 	return (upd3301_t *)downcast<legacy_device_base *>(device)->token();
 }
 
-INLINE const upd3301_interface *get_interface(running_device *device)
+INLINE const upd3301_interface *get_interface(device_t *device)
 {
 	assert(device != NULL);
 	assert((device->type() == UPD3301));
@@ -148,7 +148,7 @@ INLINE const upd3301_interface *get_interface(running_device *device)
     set_interrupt - set interrupt line state
 -------------------------------------------------*/
 
-static void set_interrupt(running_device *device, int state)
+static void set_interrupt(device_t *device, int state)
 {
 	upd3301_t *upd3301 = get_safe_token(device);
 
@@ -166,7 +166,7 @@ static void set_interrupt(running_device *device, int state)
     set_drq - set data request line state
 -------------------------------------------------*/
 
-static void set_drq(running_device *device, int state)
+static void set_drq(device_t *device, int state)
 {
 	upd3301_t *upd3301 = get_safe_token(device);
 
@@ -179,7 +179,7 @@ static void set_drq(running_device *device, int state)
     set_display - set display state
 -------------------------------------------------*/
 
-static void set_display(running_device *device, int state)
+static void set_display(device_t *device, int state)
 {
 	upd3301_t *upd3301 = get_safe_token(device);
 
@@ -197,7 +197,7 @@ static void set_display(running_device *device, int state)
     reset_counters - reset screen counters
 -------------------------------------------------*/
 
-static void reset_counters(running_device *device)
+static void reset_counters(device_t *device)
 {
 	set_interrupt(device, 0);
 	set_drq(device, 0);
@@ -239,7 +239,7 @@ static void update_vrtc_timer(upd3301_t *upd3301, int state)
     geometry parameters
 -------------------------------------------------*/
 
-static void recompute_parameters(running_device *device)
+static void recompute_parameters(device_t *device)
 {
 	upd3301_t *upd3301 = get_safe_token(device);
 
@@ -273,7 +273,7 @@ static void recompute_parameters(running_device *device)
 
 static TIMER_CALLBACK( vrtc_tick )
 {
-	running_device *device = (running_device *)ptr;
+	device_t *device = (device_t *)ptr;
 	upd3301_t *upd3301 = get_safe_token(device);
 
 	if (LOG) logerror("UPD3301 '%s' VRTC: %u\n", device->tag(), param);
@@ -296,7 +296,7 @@ static TIMER_CALLBACK( vrtc_tick )
 
 static TIMER_CALLBACK( hrtc_tick )
 {
-	running_device *device = (running_device *)ptr;
+	device_t *device = (device_t *)ptr;
 	upd3301_t *upd3301 = get_safe_token(device);
 
 	if (LOG) logerror("UPD3301 '%s' HRTC: %u\n", device->tag(), param);
@@ -506,7 +506,7 @@ READ_LINE_DEVICE_HANDLER( upd3301_vrtc_r )
     draw_row - draw character row
 -------------------------------------------------*/
 
-static void draw_row(running_device *device, bitmap_t *bitmap)
+static void draw_row(device_t *device, bitmap_t *bitmap)
 {
 	upd3301_t *upd3301 = get_safe_token(device);
 	int sx, lc;
@@ -575,7 +575,7 @@ WRITE8_DEVICE_HANDLER( upd3301_dack_w )
     upd3301_update - screen update
 -------------------------------------------------*/
 
-void upd3301_update(running_device *device, bitmap_t *bitmap, const rectangle *cliprect)
+void upd3301_update(device_t *device, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	upd3301_t *upd3301 = get_safe_token(device);
 

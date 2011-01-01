@@ -18,7 +18,7 @@ VIDEO_UPDATE( pk8020 )
 {
 	pk8020_state *state = screen->machine->driver_data<pk8020_state>();
 	int y, x, b, j;
-	UINT8 *gfx = memory_region(screen->machine, "gfx1");
+	UINT8 *gfx = screen->machine->region("gfx1")->base();
 
 	for (y = 0; y < 16; y++)
 	{

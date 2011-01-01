@@ -43,7 +43,7 @@ const wd17xx_interface partner_wd17xx_interface =
 
 MACHINE_START( partner )
 {
-	running_device *fdc = machine->device("wd1793");
+	device_t *fdc = machine->device("wd1793");
 	wd17xx_set_pause_time(fdc, 10);
 }
 
@@ -81,7 +81,7 @@ static void partner_window_2(running_machine *machine, UINT8 bank_num, UINT16 of
 }
 
 static READ8_HANDLER ( partner_floppy_r ) {
-	running_device *fdc = space->machine->device("wd1793");
+	device_t *fdc = space->machine->device("wd1793");
 
 	if (offset<0x100) {
 		switch(offset & 3) {
@@ -97,7 +97,7 @@ static READ8_HANDLER ( partner_floppy_r ) {
 }
 
 static WRITE8_HANDLER ( partner_floppy_w ) {
-	running_device *fdc = space->machine->device("wd1793");
+	device_t *fdc = space->machine->device("wd1793");
 
 	if (offset<0x100) {
 		switch(offset & 3) {
@@ -145,7 +145,7 @@ static void partner_bank_switch(running_machine *machine)
 {
 	partner_state *state = machine->driver_data<partner_state>();
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	UINT8 *rom = memory_region(machine, "maincpu");
+	UINT8 *rom = machine->region("maincpu")->base();
 
 	memory_install_write_bank(space, 0x0000, 0x07ff, 0, 0, "bank1");
 	memory_install_write_bank(space, 0x0800, 0x3fff, 0, 0, "bank2");

@@ -111,7 +111,7 @@ static void fd1094_setstate_and_decrypt(running_machine *machine, int state)
 }
 
 /* Callback for CMP.L instructions (state change) */
-static void fd1094_cmp_callback(running_device *device, UINT32 val, UINT8 reg)
+static void fd1094_cmp_callback(device_t *device, UINT32 val, UINT8 reg)
 {
 	if (reg == 0 && (val & 0x0000ffff) == 0x0000ffff) // ?
 	{
@@ -126,7 +126,7 @@ static IRQ_CALLBACK(fd1094_int_callback)
 	return (0x60+irqline*4)/4; // vector address
 }
 
-static void fd1094_rte_callback (running_device *device)
+static void fd1094_rte_callback (device_t *device)
 {
 	fd1094_setstate_and_decrypt(device->machine, FD1094_STATE_RTE);
 }
@@ -143,7 +143,7 @@ static void fd1094_kludge_reset_values(void)
 
 
 /* function, to be called from MACHINE_RESET (every reset) */
-void fd1094_machine_init(running_device *device)
+void fd1094_machine_init(device_t *device)
 {
 	/* punt if no key; this allows us to be called even for non-FD1094 games */
 	if (!fd1094_key)
@@ -203,9 +203,9 @@ void fd1094_driver_init(running_machine *machine, const char* tag, void (*set_de
 
 	strcpy(fd1094_cputag, tag);
 
-	fd1094_cpuregion = (UINT16*)memory_region(machine, fd1094_cputag);
-	fd1094_cpuregionsize = memory_region_length(machine, fd1094_cputag);
-	fd1094_key = memory_region(machine, "user1");
+	fd1094_cpuregion = (UINT16*)machine->region(fd1094_cputag)->base();
+	fd1094_cpuregionsize = machine->region(fd1094_cputag)->bytes();
+	fd1094_key = machine->region("user1")->base();
 	fd1094_set_decrypted = set_decrypted;
 
 	/* punt if no key; this allows us to be called even for non-FD1094 games */
@@ -221,7 +221,7 @@ void fd1094_driver_init(running_machine *machine, const char* tag, void (*set_de
 	fd1094_state = -1;
 
 	/* key debugging */
-	if ((machine->debug_flags & DEBUG_FLAG_ENABLED) != 0 && memory_region(machine, "user2") != NULL)
+	if ((machine->debug_flags & DEBUG_FLAG_ENABLED) != 0 && machine->region("user2")->base() != NULL)
 	{
 		fd1094_init_debugging(machine, fd1094_cputag, "user1", "user2", key_changed);
 	}

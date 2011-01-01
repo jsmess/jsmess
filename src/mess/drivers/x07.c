@@ -97,7 +97,7 @@ public:
 	emu_timer *kb_clear;
 
 	/* Printer */
-	running_device *printer;
+	device_t *printer;
 	UINT8 send_bit;
 	UINT8 char_code;
 	UINT8 printer_buffer[0xff];
@@ -351,7 +351,7 @@ static void t6834_cmd (running_machine *machine, UINT8 cmd)
 		break;
 
 	case 0x1c:	//udc Init
-		memcpy(&state->udc, (UINT8*)memory_region(machine, "gfx1"), memory_region_length(machine, "gfx1"));
+		memcpy(&state->udc, (UINT8*)machine->region("gfx1")->base(), machine->region("gfx1")->bytes());
 		break;
 
 	case 0x1d:	//Pgm Write
@@ -976,7 +976,7 @@ static WRITE8_HANDLER( x07_IO_w )
 		state->enable_k7=((data & 0x0c) == 8) ? 1 : 0;
 		if((data & 0x0e) == 0x0e)
 		{
-			running_device *speaker = space->machine->device("beep");
+			device_t *speaker = space->machine->device("beep");
 
 			beep_set_state(speaker, 1);
 			beep_set_frequency(speaker, 192000 / (state->regs_w[2] | (state->regs_w[3] << 8)));
@@ -1134,7 +1134,7 @@ static NVRAM_HANDLER( x07 )
 			for(int i = 0; i < 12; i++)
 				strcpy((char*)state->t6834_ram + udk_ptr[i], udk_ini[i]);
 
-			memcpy(&state->udc, (UINT8*)memory_region(machine, "gfx1"), memory_region_length(machine, "gfx1"));
+			memcpy(&state->udc, (UINT8*)machine->region("gfx1")->base(), machine->region("gfx1")->bytes());
 		}
 	}
 }
@@ -1147,7 +1147,7 @@ static TIMER_CALLBACK( irq_clear )
 
 static TIMER_CALLBACK( beep_stop )
 {
-	running_device *speaker = machine->device("beep");
+	device_t *speaker = machine->device("beep");
 	beep_set_state(speaker, 0);
 }
 
@@ -1286,37 +1286,37 @@ static MACHINE_RESET( x07 )
 static MACHINE_CONFIG_START( x07, t6834_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", NSC800, XTAL_15_36MHz / 4)
-	MDRV_CPU_PROGRAM_MAP(x07_mem)
-	MDRV_CPU_IO_MAP(x07_io)
+	MCFG_CPU_ADD("maincpu", NSC800, XTAL_15_36MHz / 4)
+	MCFG_CPU_PROGRAM_MAP(x07_mem)
+	MCFG_CPU_IO_MAP(x07_io)
 
-	MDRV_MACHINE_START(x07)
-	MDRV_MACHINE_RESET(x07)
+	MCFG_MACHINE_START(x07)
+	MCFG_MACHINE_RESET(x07)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("lcd", LCD)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(120, 32)
-	MDRV_SCREEN_VISIBLE_AREA(0, 120-1, 0, 32-1)
-	MDRV_PALETTE_LENGTH(2)
-	MDRV_PALETTE_INIT(x07)
-	MDRV_DEFAULT_LAYOUT(layout_lcd)
-	MDRV_GFXDECODE(x07)
-	MDRV_VIDEO_UPDATE(x07)
+	MCFG_SCREEN_ADD("lcd", LCD)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(120, 32)
+	MCFG_SCREEN_VISIBLE_AREA(0, 120-1, 0, 32-1)
+	MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_INIT(x07)
+	MCFG_DEFAULT_LAYOUT(layout_lcd)
+	MCFG_GFXDECODE(x07)
+	MCFG_VIDEO_UPDATE(x07)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO( "mono" )
-	MDRV_SOUND_ADD( "beep", BEEP, 0 )
-	MDRV_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
+	MCFG_SPEAKER_STANDARD_MONO( "mono" )
+	MCFG_SOUND_ADD( "beep", BEEP, 0 )
+	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 
 	/* printer */
-	MDRV_PRINTER_ADD("printer")
+	MCFG_PRINTER_ADD("printer")
 
-	MDRV_TIMER_ADD_PERIODIC("keyboard", keyboard_poll, USEC(2500))
+	MCFG_TIMER_ADD_PERIODIC("keyboard", keyboard_poll, USEC(2500))
 
-	MDRV_NVRAM_HANDLER(x07)
+	MCFG_NVRAM_HANDLER(x07)
 
 MACHINE_CONFIG_END
 

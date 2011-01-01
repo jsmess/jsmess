@@ -319,26 +319,26 @@ static const cassette_config kim1_cassette_config =
 
 static MACHINE_CONFIG_START( kim1, kim1_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6502, 1000000)        /* 1 MHz */
-	MDRV_CPU_PROGRAM_MAP(kim1_map)
-	MDRV_QUANTUM_TIME(HZ(60))
+	MCFG_CPU_ADD("maincpu", M6502, 1000000)        /* 1 MHz */
+	MCFG_CPU_PROGRAM_MAP(kim1_map)
+	MCFG_QUANTUM_TIME(HZ(60))
 
-	MDRV_MACHINE_START( kim1 )
-	MDRV_MACHINE_RESET( kim1 )
+	MCFG_MACHINE_START( kim1 )
+	MCFG_MACHINE_RESET( kim1 )
 
-	MDRV_MOS6530_ADD( "miot_u2", 1000000, kim1_u2_mos6530_interface )
-	MDRV_MOS6530_ADD( "miot_u3", 1000000, kim1_u3_mos6530_interface )
+	MCFG_MOS6530_ADD( "miot_u2", 1000000, kim1_u2_mos6530_interface )
+	MCFG_MOS6530_ADD( "miot_u3", 1000000, kim1_u3_mos6530_interface )
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("dac", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MDRV_CASSETTE_ADD( "cassette", kim1_cassette_config )
+	MCFG_CASSETTE_ADD( "cassette", kim1_cassette_config )
 
 	/* video */
-	MDRV_DEFAULT_LAYOUT( layout_kim1 )
+	MCFG_DEFAULT_LAYOUT( layout_kim1 )
 MACHINE_CONFIG_END
 
 

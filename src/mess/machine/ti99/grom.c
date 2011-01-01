@@ -89,14 +89,14 @@ struct _ti99grom_state
 };
 typedef struct _ti99grom_state ti99grom_state;
 
-INLINE ti99grom_state *get_safe_token(running_device *device)
+INLINE ti99grom_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(downcast<legacy_device_base *>(device)->token() != NULL);
 	return (ti99grom_state *)downcast<legacy_device_base *>(device)->token();
 }
 
-INLINE const ti99grom_config *get_config(running_device *device)
+INLINE const ti99grom_config *get_config(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == GROM);
@@ -108,7 +108,7 @@ INLINE const ti99grom_config *get_config(running_device *device)
     access. We do not have a tri-state handling on the read handlers, so this
     serves to avoid the read access.
 */
-static int is_selected(running_device *chip)
+static int is_selected(device_t *chip)
 {
 	ti99grom_state *grom = get_safe_token(chip);
 	return (((grom->address >> 13)&0x07)==grom->ident);
@@ -290,7 +290,7 @@ static DEVICE_RESET( ti99grom )
 	if (gromconf->region==NULL)
 		grom->memptr = (*gromconf->get_memory)(device->owner());
 	else
-		grom->memptr = memory_region(device->machine, gromconf->region);
+		grom->memptr = device->machine->region(gromconf->region)->base();
 
 	//  TODO: Check whether this may be 0 for console GROMs.
 	//  assert (grom->memptr!=NULL);

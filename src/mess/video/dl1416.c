@@ -106,7 +106,7 @@ struct _dl1416_state
     INLINE FUNCTIONS
 *****************************************************************************/
 
-INLINE dl1416_state *get_safe_token(running_device *device)
+INLINE dl1416_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == DL1416);
@@ -147,7 +147,7 @@ static DEVICE_RESET( dl1416 )
 
 	/* randomize cursor memory */
 	for (i = 0; i < 4; i++)
-		chip->cursor_ram[i] = mame_rand(device->machine);
+		chip->cursor_ram[i] = device->machine->rand();
 }
 
 

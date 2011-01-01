@@ -210,14 +210,14 @@ static void oric_psg_connection_refresh(running_machine *machine)
 			/* write register data */
 			case 2:
 			{
-				running_device *ay8912 = machine->device("ay8912");
+				device_t *ay8912 = machine->device("ay8912");
 				ay8910_data_w(ay8912, 0, state->via_port_a_data);
 			}
 			break;
 			/* write register index */
 			case 3:
 			{
-				running_device *ay8912 = machine->device("ay8912");
+				device_t *ay8912 = machine->device("ay8912");
 				ay8910_address_w(ay8912, 0, state->via_port_a_data);
 			}
 			break;
@@ -241,7 +241,7 @@ static WRITE8_DEVICE_HANDLER ( oric_via_out_a_func )
 	if (state->psg_control==0)
 	{
 		/* if psg not selected, write to printer */
-		running_device *printer = device->machine->device("centronics");
+		device_t *printer = device->machine->device("centronics");
 		centronics_data_w(printer, 0, data);
 	}
 }
@@ -268,7 +268,7 @@ PB7
  */
 
 
-static running_device *cassette_device_image(running_machine *machine)
+static device_t *cassette_device_image(running_machine *machine)
 {
 	return machine->device("cassette");
 }
@@ -305,7 +305,7 @@ static TIMER_CALLBACK(oric_refresh_tape)
 static WRITE8_DEVICE_HANDLER ( oric_via_out_b_func )
 {
 	oric_state *state = device->machine->driver_data<oric_state>();
-	running_device *printer = device->machine->device("centronics");
+	device_t *printer = device->machine->device("centronics");
 
 	/* KEYBOARD */
 	state->keyboard_line = data & 0x07;
@@ -375,7 +375,7 @@ static WRITE8_DEVICE_HANDLER ( oric_via_out_cb2_func )
 }
 
 
-static void oric_via_irq_func(running_device *device, int state)
+static void oric_via_irq_func(device_t *device, int state)
 {
 	oric_state *drvstate = device->machine->driver_data<oric_state>();
 	drvstate->irqs &= ~(1<<0);
@@ -467,7 +467,7 @@ CALL &320 to start, or use BOBY rom.
 static void oric_install_apple2_interface(running_machine *machine)
 {
 	oric_state *state = machine->driver_data<oric_state>();
-	running_device *fdc = machine->device("fdc");
+	device_t *fdc = machine->device("fdc");
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	if (state->is_telestrat)
@@ -479,7 +479,7 @@ static void oric_install_apple2_interface(running_machine *machine)
 
 	memory_install_write8_handler(space, 0x0300, 0x030f, 0, 0, oric_IO_w);
 	memory_install_write8_device_handler(space, fdc, 0x0310, 0x031f, 0, 0, applefdc_w);
-	memory_set_bankptr(machine, "bank4",	memory_region(machine, "maincpu") + 0x014000 + 0x020);
+	memory_set_bankptr(machine, "bank4",	machine->region("maincpu")->base() + 0x014000 + 0x020);
 }
 
 
@@ -553,7 +553,7 @@ static WRITE8_HANDLER(apple2_v2_interface_w)
 /*  logerror("apple 2 interface v2 rom page: %01x\n",(offset & 0x02)>>1); */
 
 	/* bit 0 is 0 for page 0, 1 for page 1 */
-	memory_set_bankptr(space->machine, "bank4", memory_region(space->machine, "maincpu") + 0x014000 + 0x0100 + (((offset & 0x02)>>1)<<8));
+	memory_set_bankptr(space->machine, "bank4", space->machine->region("maincpu")->base() + 0x014000 + 0x0100 + (((offset & 0x02)>>1)<<8));
 
 	oric_enable_memory(space->machine, 1, 3, TRUE, TRUE);
 
@@ -565,7 +565,7 @@ static WRITE8_HANDLER(apple2_v2_interface_w)
 		/* logerror("apple 2 interface v2: rom enabled\n"); */
 
 		/* enable rom */
-		rom_ptr = memory_region(space->machine, "maincpu") + 0x010000;
+		rom_ptr = space->machine->region("maincpu")->base() + 0x010000;
 		memory_set_bankptr(space->machine, "bank1", rom_ptr);
 		memory_set_bankptr(space->machine, "bank2", rom_ptr+0x02000);
 		memory_set_bankptr(space->machine, "bank3", rom_ptr+0x03800);
@@ -591,7 +591,7 @@ static WRITE8_HANDLER(apple2_v2_interface_w)
 /* APPLE 2 INTERFACE V2 */
 static void oric_install_apple2_v2_interface(running_machine *machine)
 {
-	running_device *fdc = machine->device("fdc");
+	device_t *fdc = machine->device("fdc");
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	memory_install_read8_handler(space, 0x0300, 0x030f, 0, 0, oric_IO_r);
@@ -643,7 +643,7 @@ static void oric_jasmin_set_mem_0x0c000(running_machine *machine)
 
 			oric_enable_memory(machine, 1, 3, TRUE, FALSE);
 
-			rom_ptr = memory_region(machine, "maincpu") + 0x010000;
+			rom_ptr = machine->region("maincpu")->base() + 0x010000;
 			memory_set_bankptr(machine, "bank1", rom_ptr);
 			memory_set_bankptr(machine, "bank2", rom_ptr+0x02000);
 			memory_set_bankptr(machine, "bank3", rom_ptr+0x03800);
@@ -691,7 +691,7 @@ static void oric_jasmin_set_mem_0x0c000(running_machine *machine)
 			/*logerror("&f800-&ffff is jasmin rom\n"); */
 			/* jasmin rom enabled */
 			oric_enable_memory(machine, 3, 3, TRUE, TRUE);
-			rom_ptr = memory_region(machine, "maincpu") + 0x010000+0x04000+0x02000;
+			rom_ptr = machine->region("maincpu")->base() + 0x010000+0x04000+0x02000;
 			memory_set_bankptr(machine, "bank3", rom_ptr);
 			memory_set_bankptr(machine, "bank7", rom_ptr);
 		}
@@ -713,7 +713,7 @@ static WRITE_LINE_DEVICE_HANDLER( oric_jasmin_wd179x_drq_w )
 static READ8_HANDLER (oric_jasmin_r)
 {
 	via6522_device *via_0 = space->machine->device<via6522_device>("via6522_0");
-	running_device *fdc = space->machine->device("wd179x");
+	device_t *fdc = space->machine->device("wd179x");
 	unsigned char data = 0x0ff;
 
 	switch (offset & 0x0f)
@@ -745,7 +745,7 @@ static WRITE8_HANDLER(oric_jasmin_w)
 {
 	oric_state *state = space->machine->driver_data<oric_state>();
 	via6522_device *via_0 = space->machine->device<via6522_device>("via6522_0");;
-	running_device *fdc = space->machine->device("wd179x");
+	device_t *fdc = space->machine->device("wd179x");
 	switch (offset & 0x0f)
 	{
 		/* microdisc floppy disc interface */
@@ -882,7 +882,7 @@ static void oric_microdisc_set_mem_0x0c000(running_machine *machine)
 		/*logerror("&c000-&dfff is os rom\n"); */
 		/* basic rom */
 		oric_enable_memory(machine, 1, 1, TRUE, FALSE);
-		rom_ptr = memory_region(machine, "maincpu") + 0x010000;
+		rom_ptr = machine->region("maincpu")->base() + 0x010000;
 		memory_set_bankptr(machine, "bank1", rom_ptr);
 		memory_set_bankptr(machine, "bank5", rom_ptr);
 	}
@@ -895,7 +895,7 @@ static void oric_microdisc_set_mem_0x0c000(running_machine *machine)
 		/*logerror("&e000-&ffff is os rom\n"); */
 		/* basic rom */
 		oric_enable_memory(machine, 2, 3, TRUE, FALSE);
-		rom_ptr = memory_region(machine, "maincpu") + 0x010000;
+		rom_ptr = machine->region("maincpu")->base() + 0x010000;
 		memory_set_bankptr(machine, "bank2", rom_ptr+0x02000);
 		memory_set_bankptr(machine, "bank3", rom_ptr+0x03800);
 		memory_set_bankptr(machine, "bank6", rom_ptr+0x02000);
@@ -911,7 +911,7 @@ static void oric_microdisc_set_mem_0x0c000(running_machine *machine)
 			/*logerror("&e000-&ffff is disk rom\n"); */
 			oric_enable_memory(machine, 2, 3, TRUE, FALSE);
 			/* enable rom of microdisc interface */
-			rom_ptr = memory_region(machine, "maincpu") + 0x014000;
+			rom_ptr = machine->region("maincpu")->base() + 0x014000;
 			memory_set_bankptr(machine, "bank2", rom_ptr);
 			memory_set_bankptr(machine, "bank3", rom_ptr+0x01800);
 		}
@@ -934,7 +934,7 @@ READ8_HANDLER (oric_microdisc_r)
 {
 	oric_state *state = space->machine->driver_data<oric_state>();
 	unsigned char data = 0x0ff;
-	running_device *fdc = space->machine->device("wd179x");
+	device_t *fdc = space->machine->device("wd179x");
 
 	switch (offset & 0x0ff)
 	{
@@ -975,7 +975,7 @@ READ8_HANDLER (oric_microdisc_r)
 WRITE8_HANDLER(oric_microdisc_w)
 {
 	oric_state *state = space->machine->driver_data<oric_state>();
-	running_device *fdc = space->machine->device("wd179x");
+	device_t *fdc = space->machine->device("wd179x");
 	switch (offset & 0x0ff)
 	{
 		/* microdisc floppy disc interface */
@@ -1115,7 +1115,7 @@ MACHINE_RESET( oric )
 
 			/* os rom */
 			oric_enable_memory(machine, 1, 3, TRUE, FALSE);
-			rom_ptr = memory_region(machine, "maincpu") + 0x010000;
+			rom_ptr = machine->region("maincpu")->base() + 0x010000;
 			memory_set_bankptr(machine, "bank1", rom_ptr);
 			memory_set_bankptr(machine, "bank2", rom_ptr+0x02000);
 			memory_set_bankptr(machine, "bank3", rom_ptr+0x03800);
@@ -1375,7 +1375,7 @@ static WRITE8_DEVICE_HANDLER(telestrat_via2_out_b_func)
 }
 
 
-static void telestrat_via2_irq_func(running_device *device, int state)
+static void telestrat_via2_irq_func(device_t *device, int state)
 {
 	oric_state *drvstate = device->machine->driver_data<oric_state>();
     drvstate->irqs &=~(1<<2);
@@ -1440,22 +1440,22 @@ MACHINE_START( telestrat )
 
 	/* initialise default cartridge */
 	state->telestrat_blocks[3].MemType = TELESTRAT_MEM_BLOCK_ROM;
-	state->telestrat_blocks[3].ptr = memory_region(machine, "maincpu")+0x010000;
+	state->telestrat_blocks[3].ptr = machine->region("maincpu")->base()+0x010000;
 
 	state->telestrat_blocks[4].MemType = TELESTRAT_MEM_BLOCK_RAM;
 	state->telestrat_blocks[4].ptr = auto_alloc_array(machine, UINT8, 16384);
 
 	/* initialise default cartridge */
 	state->telestrat_blocks[5].MemType = TELESTRAT_MEM_BLOCK_ROM;
-	state->telestrat_blocks[5].ptr = memory_region(machine, "maincpu")+0x014000;
+	state->telestrat_blocks[5].ptr = machine->region("maincpu")->base()+0x014000;
 
 	/* initialise default cartridge */
 	state->telestrat_blocks[6].MemType = TELESTRAT_MEM_BLOCK_ROM;
-	state->telestrat_blocks[6].ptr = memory_region(machine, "maincpu")+0x018000;
+	state->telestrat_blocks[6].ptr = machine->region("maincpu")->base()+0x018000;
 
 	/* initialise default cartridge */
 	state->telestrat_blocks[7].MemType = TELESTRAT_MEM_BLOCK_ROM;
-	state->telestrat_blocks[7].ptr = memory_region(machine, "maincpu")+0x01c000;
+	state->telestrat_blocks[7].ptr = machine->region("maincpu")->base()+0x01c000;
 
 	state->telestrat_bank_selection = 7;
 	telestrat_refresh_mem(machine);

@@ -57,7 +57,7 @@ public:
 		: driver_device(machine, config) { }
 
 	int kc85_pio_data[2];
-	running_device *kc85_z80pio;
+	device_t *kc85_z80pio;
 	unsigned char kc85_disc_hw_input_gate;
 	unsigned char *kc85_module_rom;
 	emu_timer *cassette_timer;

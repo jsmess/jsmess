@@ -224,7 +224,7 @@ static WRITE8_DEVICE_HANDLER( saiyugoub1_adpcm_control_w )
 	ddragon_state *state = device->machine->driver_data<ddragon_state>();
 
 	/* i8748 Port 2 write */
-	UINT8 *saiyugoub1_adpcm_rom = memory_region(device->machine, "adpcm");
+	UINT8 *saiyugoub1_adpcm_rom = device->machine->region("adpcm")->base();
 
 	if (data & 0x80)	/* Reset m5205 and disable ADPCM ROM outputs */
 	{
@@ -299,7 +299,7 @@ static READ8_HANDLER( saiyugoub1_m5205_irq_r )
 	return 0;
 }
 
-static void saiyugoub1_m5205_irq_w( running_device *device )
+static void saiyugoub1_m5205_irq_w( device_t *device )
 {
 	ddragon_state *state = device->machine->driver_data<ddragon_state>();
 	state->adpcm_sound_irq = 1;
@@ -492,7 +492,7 @@ static GFXDECODE_START( chinagat )
 GFXDECODE_END
 
 
-static void chinagat_irq_handler( running_device *device, int irq )
+static void chinagat_irq_handler( device_t *device, int irq )
 {
 	ddragon_state *state = device->machine->driver_data<ddragon_state>();
 	cpu_set_input_line(state->snd_cpu, 0, irq ? ASSERT_LINE : CLEAR_LINE );
@@ -531,7 +531,7 @@ static MACHINE_START( chinagat )
 	state->snd_cpu = machine->device("audiocpu");
 
 	/* configure banks */
-	memory_configure_bank(machine, "bank1", 0, 8, memory_region(machine, "maincpu") + 0x10000, 0x4000);
+	memory_configure_bank(machine, "bank1", 0, 8, machine->region("maincpu")->base() + 0x10000, 0x4000);
 
 	/* register for save states */
 	state_save_register_global(machine, state->scrollx_hi);
@@ -571,134 +571,134 @@ static MACHINE_RESET( chinagat )
 static MACHINE_CONFIG_START( chinagat, ddragon_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", HD6309, MAIN_CLOCK / 2)		/* 1.5 MHz (12MHz oscillator / 4 internally) */
-	MDRV_CPU_PROGRAM_MAP(main_map)
-	MDRV_TIMER_ADD_SCANLINE("scantimer", chinagat_scanline, "screen", 0, 1)
+	MCFG_CPU_ADD("maincpu", HD6309, MAIN_CLOCK / 2)		/* 1.5 MHz (12MHz oscillator / 4 internally) */
+	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", chinagat_scanline, "screen", 0, 1)
 
-	MDRV_CPU_ADD("sub", HD6309, MAIN_CLOCK / 2)		/* 1.5 MHz (12MHz oscillator / 4 internally) */
-	MDRV_CPU_PROGRAM_MAP(sub_map)
+	MCFG_CPU_ADD("sub", HD6309, MAIN_CLOCK / 2)		/* 1.5 MHz (12MHz oscillator / 4 internally) */
+	MCFG_CPU_PROGRAM_MAP(sub_map)
 
-	MDRV_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)		/* 3.579545 MHz */
-	MDRV_CPU_PROGRAM_MAP(sound_map)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)		/* 3.579545 MHz */
+	MCFG_CPU_PROGRAM_MAP(sound_map)
 
-	MDRV_QUANTUM_TIME(HZ(6000)) /* heavy interleaving to sync up sprite<->main cpu's */
+	MCFG_QUANTUM_TIME(HZ(6000)) /* heavy interleaving to sync up sprite<->main cpu's */
 
-	MDRV_MACHINE_START(chinagat)
-	MDRV_MACHINE_RESET(chinagat)
+	MCFG_MACHINE_START(chinagat)
+	MCFG_MACHINE_RESET(chinagat)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 384, 0, 256, 272, 0, 240)	/* based on ddragon driver */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 384, 0, 256, 272, 0, 240)	/* based on ddragon driver */
 
-	MDRV_GFXDECODE(chinagat)
-	MDRV_PALETTE_LENGTH(384)
+	MCFG_GFXDECODE(chinagat)
+	MCFG_PALETTE_LENGTH(384)
 
-	MDRV_VIDEO_START(chinagat)
-	MDRV_VIDEO_UPDATE(ddragon)
+	MCFG_VIDEO_START(chinagat)
+	MCFG_VIDEO_UPDATE(ddragon)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM2151, 3579545)
-	MDRV_SOUND_CONFIG(ym2151_config)
-	MDRV_SOUND_ROUTE(0, "mono", 0.80)
-	MDRV_SOUND_ROUTE(1, "mono", 0.80)
+	MCFG_SOUND_ADD("ymsnd", YM2151, 3579545)
+	MCFG_SOUND_CONFIG(ym2151_config)
+	MCFG_SOUND_ROUTE(0, "mono", 0.80)
+	MCFG_SOUND_ROUTE(1, "mono", 0.80)
 
-	MDRV_OKIM6295_ADD("oki", 1065000, OKIM6295_PIN7_HIGH) // pin 7 not verified, clock frequency estimated with recording
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	MCFG_OKIM6295_ADD("oki", 1065000, OKIM6295_PIN7_HIGH) // pin 7 not verified, clock frequency estimated with recording
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( saiyugoub1, ddragon_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6809, MAIN_CLOCK / 8)		/* 68B09EP 1.5 MHz (12MHz oscillator) */
-	MDRV_CPU_PROGRAM_MAP(main_map)
-	MDRV_TIMER_ADD_SCANLINE("scantimer", chinagat_scanline, "screen", 0, 1)
+	MCFG_CPU_ADD("maincpu", M6809, MAIN_CLOCK / 8)		/* 68B09EP 1.5 MHz (12MHz oscillator) */
+	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", chinagat_scanline, "screen", 0, 1)
 
-	MDRV_CPU_ADD("sub", M6809, MAIN_CLOCK / 8)		/* 68B09EP 1.5 MHz (12MHz oscillator) */
-	MDRV_CPU_PROGRAM_MAP(sub_map)
+	MCFG_CPU_ADD("sub", M6809, MAIN_CLOCK / 8)		/* 68B09EP 1.5 MHz (12MHz oscillator) */
+	MCFG_CPU_PROGRAM_MAP(sub_map)
 
-	MDRV_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)		/* 3.579545 MHz oscillator */
-	MDRV_CPU_PROGRAM_MAP(saiyugoub1_sound_map)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)		/* 3.579545 MHz oscillator */
+	MCFG_CPU_PROGRAM_MAP(saiyugoub1_sound_map)
 
-	MDRV_CPU_ADD("mcu", I8748, 9263750)		/* 9.263750 MHz oscillator, divided by 3*5 internally */
-	MDRV_CPU_PROGRAM_MAP(i8748_map)
-	MDRV_CPU_IO_MAP(i8748_portmap)
+	MCFG_CPU_ADD("mcu", I8748, 9263750)		/* 9.263750 MHz oscillator, divided by 3*5 internally */
+	MCFG_CPU_PROGRAM_MAP(i8748_map)
+	MCFG_CPU_IO_MAP(i8748_portmap)
 
-	MDRV_QUANTUM_TIME(HZ(6000))	/* heavy interleaving to sync up sprite<->main cpu's */
+	MCFG_QUANTUM_TIME(HZ(6000))	/* heavy interleaving to sync up sprite<->main cpu's */
 
-	MDRV_MACHINE_START(chinagat)
-	MDRV_MACHINE_RESET(chinagat)
+	MCFG_MACHINE_START(chinagat)
+	MCFG_MACHINE_RESET(chinagat)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 384, 0, 256, 272, 0, 240)	/* based on ddragon driver */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 384, 0, 256, 272, 0, 240)	/* based on ddragon driver */
 
-	MDRV_GFXDECODE(chinagat)
-	MDRV_PALETTE_LENGTH(384)
+	MCFG_GFXDECODE(chinagat)
+	MCFG_PALETTE_LENGTH(384)
 
-	MDRV_VIDEO_START(chinagat)
-	MDRV_VIDEO_UPDATE(ddragon)
+	MCFG_VIDEO_START(chinagat)
+	MCFG_VIDEO_UPDATE(ddragon)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM2151, 3579545)
-	MDRV_SOUND_CONFIG(ym2151_config)
-	MDRV_SOUND_ROUTE(0, "mono", 0.80)
-	MDRV_SOUND_ROUTE(1, "mono", 0.80)
+	MCFG_SOUND_ADD("ymsnd", YM2151, 3579545)
+	MCFG_SOUND_CONFIG(ym2151_config)
+	MCFG_SOUND_ROUTE(0, "mono", 0.80)
+	MCFG_SOUND_ROUTE(1, "mono", 0.80)
 
-	MDRV_SOUND_ADD("adpcm", MSM5205, 9263750 / 24)
-	MDRV_SOUND_CONFIG(msm5205_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
+	MCFG_SOUND_ADD("adpcm", MSM5205, 9263750 / 24)
+	MCFG_SOUND_CONFIG(msm5205_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( saiyugoub2, ddragon_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6809, MAIN_CLOCK / 8)		/* 1.5 MHz (12MHz oscillator) */
-	MDRV_CPU_PROGRAM_MAP(main_map)
-	MDRV_TIMER_ADD_SCANLINE("scantimer", chinagat_scanline, "screen", 0, 1)
+	MCFG_CPU_ADD("maincpu", M6809, MAIN_CLOCK / 8)		/* 1.5 MHz (12MHz oscillator) */
+	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", chinagat_scanline, "screen", 0, 1)
 
-	MDRV_CPU_ADD("sub", M6809, MAIN_CLOCK / 8)		/* 1.5 MHz (12MHz oscillator) */
-	MDRV_CPU_PROGRAM_MAP(sub_map)
+	MCFG_CPU_ADD("sub", M6809, MAIN_CLOCK / 8)		/* 1.5 MHz (12MHz oscillator) */
+	MCFG_CPU_PROGRAM_MAP(sub_map)
 
-	MDRV_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)		/* 3.579545 MHz oscillator */
-	MDRV_CPU_PROGRAM_MAP(ym2203c_sound_map)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)		/* 3.579545 MHz oscillator */
+	MCFG_CPU_PROGRAM_MAP(ym2203c_sound_map)
 
-	MDRV_QUANTUM_TIME(HZ(6000)) /* heavy interleaving to sync up sprite<->main cpu's */
+	MCFG_QUANTUM_TIME(HZ(6000)) /* heavy interleaving to sync up sprite<->main cpu's */
 
-	MDRV_MACHINE_START(chinagat)
-	MDRV_MACHINE_RESET(chinagat)
+	MCFG_MACHINE_START(chinagat)
+	MCFG_MACHINE_RESET(chinagat)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 384, 0, 256, 272, 0, 240)	/* based on ddragon driver */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 384, 0, 256, 272, 0, 240)	/* based on ddragon driver */
 
-	MDRV_GFXDECODE(chinagat)
-	MDRV_PALETTE_LENGTH(384)
+	MCFG_GFXDECODE(chinagat)
+	MCFG_PALETTE_LENGTH(384)
 
-	MDRV_VIDEO_START(chinagat)
-	MDRV_VIDEO_UPDATE(ddragon)
+	MCFG_VIDEO_START(chinagat)
+	MCFG_VIDEO_UPDATE(ddragon)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym1", YM2203, 3579545)
-	MDRV_SOUND_CONFIG(ym2203_config)
-	MDRV_SOUND_ROUTE(0, "mono", 0.50)
-	MDRV_SOUND_ROUTE(1, "mono", 0.50)
-	MDRV_SOUND_ROUTE(2, "mono", 0.50)
-	MDRV_SOUND_ROUTE(3, "mono", 0.80)
+	MCFG_SOUND_ADD("ym1", YM2203, 3579545)
+	MCFG_SOUND_CONFIG(ym2203_config)
+	MCFG_SOUND_ROUTE(0, "mono", 0.50)
+	MCFG_SOUND_ROUTE(1, "mono", 0.50)
+	MCFG_SOUND_ROUTE(2, "mono", 0.50)
+	MCFG_SOUND_ROUTE(3, "mono", 0.80)
 
-	MDRV_SOUND_ADD("ym2", YM2203, 3579545)
-	MDRV_SOUND_ROUTE(0, "mono", 0.50)
-	MDRV_SOUND_ROUTE(1, "mono", 0.50)
-	MDRV_SOUND_ROUTE(2, "mono", 0.50)
-	MDRV_SOUND_ROUTE(3, "mono", 0.80)
+	MCFG_SOUND_ADD("ym2", YM2203, 3579545)
+	MCFG_SOUND_ROUTE(0, "mono", 0.50)
+	MCFG_SOUND_ROUTE(1, "mono", 0.50)
+	MCFG_SOUND_ROUTE(2, "mono", 0.50)
+	MCFG_SOUND_ROUTE(3, "mono", 0.80)
 MACHINE_CONFIG_END
 
 
@@ -915,8 +915,8 @@ ROM_END
 static DRIVER_INIT( chinagat )
 {
 	ddragon_state *state = machine->driver_data<ddragon_state>();
-	UINT8 *MAIN = memory_region(machine, "maincpu");
-	UINT8 *SUB = memory_region(machine, "sub");
+	UINT8 *MAIN = machine->region("maincpu")->base();
+	UINT8 *SUB = machine->region("sub")->base();
 
 	state->technos_video_hw = 1;
 	state->sprite_irq = M6809_IRQ_LINE;

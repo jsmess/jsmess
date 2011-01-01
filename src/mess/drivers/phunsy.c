@@ -66,13 +66,13 @@ static WRITE8_HANDLER( phunsy_ctrl_w )
 	case 0x01:	/* MDCR program */
 	case 0x02:	/* Disassembler */
 	case 0x03:	/* Label handler */
-		memory_set_bankptr( space->machine, "bank1", memory_region(space->machine, "maincpu") + ( 0x800 * state->u_bank ) );
+		memory_set_bankptr( space->machine, "bank1", space->machine->region("maincpu")->base() + ( 0x800 * state->u_bank ) );
 		break;
 	default:	/* Not used */
 		break;
 	}
 
-	memory_set_bankptr( space->machine, "bank2", memory_region(space->machine, "ram_4000") + 0x4000 * state->q_bank );
+	memory_set_bankptr( space->machine, "bank2", space->machine->region("ram_4000")->base() + 0x4000 * state->q_bank );
 }
 
 
@@ -182,7 +182,7 @@ static MACHINE_RESET(phunsy)
 	phunsy_state *state = machine->driver_data<phunsy_state>();
 
 	memory_set_bankptr( machine, "bank1", state->ram_1800 );
-	memory_set_bankptr( machine, "bank2", memory_region(machine, "ram_4000") );
+	memory_set_bankptr( machine, "bank2", machine->region("ram_4000")->base() );
 
 	state->u_bank = 0;
 	state->q_bank = 0;
@@ -209,7 +209,7 @@ static VIDEO_START( phunsy )
 static VIDEO_UPDATE( phunsy )
 {
 	phunsy_state *state = screen->machine->driver_data<phunsy_state>();
-	UINT8	*gfx = memory_region( screen->machine, "gfx" );
+	UINT8	*gfx = screen->machine->region( "gfx" )->base();
 	UINT8	*v = state->video_ram;
 
 	for ( int h = 0; h < 32; h++ )
@@ -276,29 +276,29 @@ static VIDEO_UPDATE( phunsy )
 
 static MACHINE_CONFIG_START( phunsy, phunsy_state )
     /* basic machine hardware */
-	MDRV_CPU_ADD("maincpu",S2650, XTAL_1MHz)
-	MDRV_CPU_PROGRAM_MAP(phunsy_mem)
-	MDRV_CPU_IO_MAP(phunsy_io)	
+	MCFG_CPU_ADD("maincpu",S2650, XTAL_1MHz)
+	MCFG_CPU_PROGRAM_MAP(phunsy_mem)
+	MCFG_CPU_IO_MAP(phunsy_io)	
 
-	MDRV_MACHINE_RESET(phunsy)
+	MCFG_MACHINE_RESET(phunsy)
 	
     /* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_ADD("screen", RASTER)
 	/* Display (page 12 of pdf)
 	   - 8Mhz clock
 	   - 64 6 pixel characters on a line.
 	   - 16us not active, 48us active: ( 64 * 6 ) * 60 / 48 => 480 pixels wide
 	   - 313 line display of which 256 are displayed.
 	*/
-	MDRV_SCREEN_RAW_PARAMS(XTAL_8MHz, 480, 0, 64*6, 313, 0, 256)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_PALETTE_LENGTH(8)
-	MDRV_PALETTE_INIT(phunsy)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_8MHz, 480, 0, 64*6, 313, 0, 256)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_PALETTE_LENGTH(8)
+	MCFG_PALETTE_INIT(phunsy)
 
-	MDRV_VIDEO_START(phunsy)
-	MDRV_VIDEO_UPDATE(phunsy)
+	MCFG_VIDEO_START(phunsy)
+	MCFG_VIDEO_UPDATE(phunsy)
 
-	MDRV_GENERIC_TERMINAL_ADD("ascii_keyboard",phunsy_terminal_intf)
+	MCFG_GENERIC_TERMINAL_ADD("ascii_keyboard",phunsy_terminal_intf)
 MACHINE_CONFIG_END
 
 

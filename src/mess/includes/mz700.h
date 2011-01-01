@@ -25,8 +25,8 @@ public:
 
 	int mz700;				/* 1 if running on an mz700 */
 
-	running_device *pit;
-	running_device *ppi;
+	device_t *pit;
+	device_t *ppi;
 
 	int cursor_timer;
 	int other_timer;

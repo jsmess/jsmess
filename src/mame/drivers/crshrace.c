@@ -139,7 +139,7 @@ Dip locations verified with Service Mode.
 
 static READ16_HANDLER( extrarom1_r )
 {
-	UINT8 *rom = memory_region(space->machine, "user1");
+	UINT8 *rom = space->machine->region("user1")->base();
 
 	offset *= 2;
 
@@ -148,7 +148,7 @@ static READ16_HANDLER( extrarom1_r )
 
 static READ16_HANDLER( extrarom2_r )
 {
-	UINT8 *rom = memory_region(space->machine, "user2");
+	UINT8 *rom = space->machine->region("user2")->base();
 
 	offset *= 2;
 
@@ -425,7 +425,7 @@ GFXDECODE_END
 
 
 
-static void irqhandler( running_device *device, int irq )
+static void irqhandler( device_t *device, int irq )
 {
 	crshrace_state *state = device->machine->driver_data<crshrace_state>();
 	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
@@ -446,7 +446,7 @@ static MACHINE_START( crshrace )
 {
 	crshrace_state *state = machine->driver_data<crshrace_state>();
 
-	memory_configure_bank(machine, "bank1", 0, 4, memory_region(machine, "audiocpu") + 0x10000, 0x8000);
+	memory_configure_bank(machine, "bank1", 0, 4, machine->region("audiocpu")->base() + 0x10000, 0x8000);
 
 	state->audiocpu = machine->device("audiocpu");
 	state->k053936 = machine->device("k053936");
@@ -470,44 +470,44 @@ static MACHINE_RESET( crshrace )
 static MACHINE_CONFIG_START( crshrace, crshrace_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000,16000000)	/* 16 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(crshrace_map)
-	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
+	MCFG_CPU_ADD("maincpu", M68000,16000000)	/* 16 MHz ??? */
+	MCFG_CPU_PROGRAM_MAP(crshrace_map)
+	MCFG_CPU_VBLANK_INT("screen", irq1_line_hold)
 
-	MDRV_CPU_ADD("audiocpu", Z80,4000000)	/* 4 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(sound_map)
-	MDRV_CPU_IO_MAP(sound_io_map)
+	MCFG_CPU_ADD("audiocpu", Z80,4000000)	/* 4 MHz ??? */
+	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_CPU_IO_MAP(sound_io_map)
 
-	MDRV_MACHINE_START(crshrace)
-	MDRV_MACHINE_RESET(crshrace)
+	MCFG_MACHINE_START(crshrace)
+	MCFG_MACHINE_RESET(crshrace)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
+	MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
 
-	MDRV_GFXDECODE(crshrace)
-	MDRV_PALETTE_LENGTH(2048)
+	MCFG_GFXDECODE(crshrace)
+	MCFG_PALETTE_LENGTH(2048)
 
-	MDRV_K053936_ADD("k053936", crshrace_k053936_intf)
+	MCFG_K053936_ADD("k053936", crshrace_k053936_intf)
 
-	MDRV_VIDEO_START(crshrace)
-	MDRV_VIDEO_EOF(crshrace)
-	MDRV_VIDEO_UPDATE(crshrace)
+	MCFG_VIDEO_START(crshrace)
+	MCFG_VIDEO_EOF(crshrace)
+	MCFG_VIDEO_UPDATE(crshrace)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ymsnd", YM2610, 8000000)
-	MDRV_SOUND_CONFIG(ym2610_config)
-	MDRV_SOUND_ROUTE(0, "lspeaker",  0.25)
-	MDRV_SOUND_ROUTE(0, "rspeaker", 0.25)
-	MDRV_SOUND_ROUTE(1, "lspeaker",  1.0)
-	MDRV_SOUND_ROUTE(2, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("ymsnd", YM2610, 8000000)
+	MCFG_SOUND_CONFIG(ym2610_config)
+	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
+	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
+	MCFG_SOUND_ROUTE(1, "lspeaker",  1.0)
+	MCFG_SOUND_ROUTE(2, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -584,7 +584,7 @@ ROM_END
 void crshrace_patch_code( UINT16 offset )
 {
 	/* A hack which shows 3 player mode in code which is disabled */
-	UINT16 *RAM = (UINT16 *)memory_region(machine, "maincpu");
+	UINT16 *RAM = (UINT16 *)machine->region("maincpu")->base();
 	RAM[(offset + 0)/2] = 0x4e71;
 	RAM[(offset + 2)/2] = 0x4e71;
 	RAM[(offset + 4)/2] = 0x4e71;

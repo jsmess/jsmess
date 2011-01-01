@@ -140,16 +140,16 @@ static const ins8154_interface mk14_ins8154 =
 static MACHINE_CONFIG_START( mk14, mk14_state )
     /* basic machine hardware */
 	// IC1 1SP-8A/600 (8060) SC/MP Microprocessor
-    MDRV_CPU_ADD("maincpu", INS8060, XTAL_4_433619MHz)
-    MDRV_CPU_PROGRAM_MAP(mk14_mem)
+    MCFG_CPU_ADD("maincpu", INS8060, XTAL_4_433619MHz)
+    MCFG_CPU_PROGRAM_MAP(mk14_mem)
 
-    MDRV_MACHINE_RESET(mk14)
+    MCFG_MACHINE_RESET(mk14)
 
 	/* video hardware */
-	MDRV_DEFAULT_LAYOUT(layout_mk14)
+	MCFG_DEFAULT_LAYOUT(layout_mk14)
 
 	/* devices */
-	MDRV_INS8154_ADD("ic8", mk14_ins8154)
+	MCFG_INS8154_ADD("ic8", mk14_ins8154)
 MACHINE_CONFIG_END
 
 /* ROM definition */

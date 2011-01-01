@@ -29,7 +29,7 @@ public:
 	UINT8 tape_switch;
 	UINT8 xor_display;
 	UINT8 key_mux;
-	running_device *cassette;
+	device_t *cassette;
 };
 
 
@@ -42,7 +42,7 @@ static VIDEO_UPDATE( bmjr )
 {
 	bmjr_state *state = screen->machine->driver_data<bmjr_state>();
 	int x,y,xi,yi,count;
-	UINT8 *gfx_rom = memory_region(screen->machine, "char");
+	UINT8 *gfx_rom = screen->machine->region("char")->base();
 
 	count = 0x0100;
 
@@ -335,37 +335,37 @@ static MACHINE_RESET(bmjr)
 
 static MACHINE_CONFIG_START( bmjr, bmjr_state )
     /* basic machine hardware */
-    MDRV_CPU_ADD("maincpu",M6800, XTAL_4MHz/4) //unknown clock / divider
-    MDRV_CPU_PROGRAM_MAP(bmjr_mem)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+    MCFG_CPU_ADD("maincpu",M6800, XTAL_4MHz/4) //unknown clock / divider
+    MCFG_CPU_PROGRAM_MAP(bmjr_mem)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_MACHINE_START(bmjr)
-    MDRV_MACHINE_RESET(bmjr)
+	MCFG_MACHINE_START(bmjr)
+    MCFG_MACHINE_RESET(bmjr)
 
     /* video hardware */
-    MDRV_SCREEN_ADD("screen", RASTER)
-    MDRV_SCREEN_REFRESH_RATE(50)
-    MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-    MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-    MDRV_SCREEN_SIZE(256, 192)
-    MDRV_SCREEN_VISIBLE_AREA(0, 256-1, 0, 192-1)
-    MDRV_PALETTE_LENGTH(8)
-    MDRV_PALETTE_INIT(bmjr)
+    MCFG_SCREEN_ADD("screen", RASTER)
+    MCFG_SCREEN_REFRESH_RATE(50)
+    MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+    MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+    MCFG_SCREEN_SIZE(256, 192)
+    MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 192-1)
+    MCFG_PALETTE_LENGTH(8)
+    MCFG_PALETTE_INIT(bmjr)
 
-    MDRV_GFXDECODE(bmjr)
+    MCFG_GFXDECODE(bmjr)
 
-    MDRV_VIDEO_START(bmjr)
-    MDRV_VIDEO_UPDATE(bmjr)
+    MCFG_VIDEO_START(bmjr)
+    MCFG_VIDEO_UPDATE(bmjr)
 
-	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )
+	MCFG_CASSETTE_ADD( "cassette", default_cassette_config )
 
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("beeper", BEEP, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
+	MCFG_SOUND_ADD("beeper", BEEP, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
 
-	MDRV_SOUND_WAVE_ADD("wave", "cassette")
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+	MCFG_SOUND_WAVE_ADD("wave", "cassette")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_CONFIG_END
 
 /* ROM definition */

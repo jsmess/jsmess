@@ -136,7 +136,7 @@ struct _tms9901_t
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE tms9901_t *get_token(running_device *device)
+INLINE tms9901_t *get_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == TMS9901);
@@ -192,7 +192,7 @@ static int find_first_bit(int value)
 /*
     should be called after any change to int_state or enabled_ints.
 */
-static void tms9901_field_interrupts(running_device *device)
+static void tms9901_field_interrupts(device_t *device)
 {
 	int current_ints;
 	tms9901_t *tms = get_token(device);
@@ -241,7 +241,7 @@ static void tms9901_field_interrupts(running_device *device)
 
     0<=pin_number<=15
 */
-void tms9901_set_single_int(running_device *device, int pin_number, int state)
+void tms9901_set_single_int(device_t *device, int pin_number, int state)
 {
 	tms9901_t *tms = get_token(device);
 	/* remember new state of INTn* pin state */
@@ -261,7 +261,7 @@ void tms9901_set_single_int(running_device *device, int pin_number, int state)
 */
 static TIMER_CALLBACK(decrementer_callback)
 {
-	running_device *device = (running_device *) ptr;
+	device_t *device = (device_t *) ptr;
 	tms9901_t *tms = get_token(device);
 
 	tms->timer_int_pending = TRUE;			/* decrementer interrupt requested */
@@ -272,7 +272,7 @@ static TIMER_CALLBACK(decrementer_callback)
 /*
     load the content of clockinvl into the decrementer
 */
-static void tms9901_timer_reload(running_device *device)
+static void tms9901_timer_reload(device_t *device)
 {
 	tms9901_t *tms = get_token(device);
 	if (tms->clockinvl)

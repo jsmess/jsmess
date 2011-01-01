@@ -23,14 +23,14 @@ typedef struct {
 } kermit_config;
 
 
-#define MDRV_KERMIT_ADD(_tag, _intrf) \
-  MDRV_DEVICE_ADD(_tag, KERMIT, 0)	      \
-  MDRV_DEVICE_CONFIG(_intrf)
+#define MCFG_KERMIT_ADD(_tag, _intrf) \
+  MCFG_DEVICE_ADD(_tag, KERMIT, 0)	      \
+  MCFG_DEVICE_CONFIG(_intrf)
 
 
 /* call this when the emulated machine has read the last byte sent by
    Kermit through the send call-back */
-extern void kermit_byte_transmitted( running_device *device );
+extern void kermit_byte_transmitted( device_t *device );
 
 /* call this when the emulated machine sends a byte to Kermit */
-extern void kermit_receive_byte( running_device *device, UINT8 data );
+extern void kermit_receive_byte( device_t *device, UINT8 data );

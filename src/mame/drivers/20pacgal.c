@@ -147,7 +147,7 @@ static void set_bankptr(running_machine *machine)
 	_20pacgal_state *state =  machine->driver_data<_20pacgal_state>();
 	if (state->game_selected == 0)
 	{
-		UINT8 *rom = memory_region(machine, "maincpu");
+		UINT8 *rom = machine->region("maincpu")->base();
 		memory_set_bankptr(machine, "bank1", rom + 0x08000);
 	}
 	else
@@ -351,28 +351,28 @@ static MACHINE_RESET( 20pacgal )
 static MACHINE_CONFIG_START( 20pacgal, _20pacgal_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z180, MAIN_CPU_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(20pacgal_map)
-	MDRV_CPU_IO_MAP(20pacgal_io_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold) // assert breaks the inputs in 25pacman test mode
+	MCFG_CPU_ADD("maincpu", Z180, MAIN_CPU_CLOCK)
+	MCFG_CPU_PROGRAM_MAP(20pacgal_map)
+	MCFG_CPU_IO_MAP(20pacgal_io_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold) // assert breaks the inputs in 25pacman test mode
 
-	MDRV_MACHINE_START(20pacgal)
-	MDRV_MACHINE_RESET(20pacgal)
+	MCFG_MACHINE_START(20pacgal)
+	MCFG_MACHINE_RESET(20pacgal)
 
-	MDRV_EEPROM_ADD("eeprom", _20pacgal_eeprom_intf)
+	MCFG_EEPROM_ADD("eeprom", _20pacgal_eeprom_intf)
 
 	/* video hardware */
-	MDRV_FRAGMENT_ADD(20pacgal_video)
+	MCFG_FRAGMENT_ADD(20pacgal_video)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("namco", NAMCO, NAMCO_AUDIO_CLOCK)
-	MDRV_SOUND_CONFIG(namco_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("namco", NAMCO, NAMCO_AUDIO_CLOCK)
+	MCFG_SOUND_CONFIG(namco_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD("dac", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 

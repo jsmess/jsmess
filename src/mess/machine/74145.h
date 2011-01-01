@@ -47,9 +47,9 @@ READ16_DEVICE_HANDLER( ttl74145_r );
 
 DECLARE_LEGACY_DEVICE(TTL74145, ttl74145);
 
-#define MDRV_TTL74145_ADD(_tag, _intf) \
-	MDRV_DEVICE_ADD(_tag, TTL74145, 0) \
-	MDRV_DEVICE_CONFIG(_intf)
+#define MCFG_TTL74145_ADD(_tag, _intf) \
+	MCFG_DEVICE_ADD(_tag, TTL74145, 0) \
+	MCFG_DEVICE_CONFIG(_intf)
 
 
 /***************************************************************************

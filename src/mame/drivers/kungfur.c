@@ -259,7 +259,7 @@ static const ppi8255_interface ppi8255_intf[2] =
 	}
 };
 
-static void kfr_adpcm1_int(running_device *device)
+static void kfr_adpcm1_int(device_t *device)
 {
 	static UINT8 trigger,adpcm_data;
 
@@ -270,7 +270,7 @@ static void kfr_adpcm1_int(running_device *device)
 	}
 	else
 	{
-		UINT8 *ROM = memory_region(device->machine, "adpcm1");
+		UINT8 *ROM = device->machine->region("adpcm1")->base();
 
 		adpcm_data = ((trigger ? (ROM[adpcm_pos[0]] & 0x0f) : (ROM[adpcm_pos[0]] & 0xf0)>>4) );
 		msm5205_data_w(device->machine->device("adpcm1"),adpcm_data & 0xf);
@@ -285,7 +285,7 @@ static void kfr_adpcm1_int(running_device *device)
 }
 
 
-static void kfr_adpcm2_int(running_device *device)
+static void kfr_adpcm2_int(device_t *device)
 {
 	static UINT8 trigger,adpcm_data;
 
@@ -296,7 +296,7 @@ static void kfr_adpcm2_int(running_device *device)
 	}
 	else
 	{
-		UINT8 *ROM = memory_region(device->machine, "adpcm2");
+		UINT8 *ROM = device->machine->region("adpcm2")->base();
 
 		adpcm_data = ((trigger ? (ROM[adpcm_pos[1]] & 0x0f) : (ROM[adpcm_pos[1]] & 0xf0)>>4) );
 		msm5205_data_w(device->machine->device("adpcm2"),adpcm_data & 0xf);
@@ -336,36 +336,36 @@ static INTERRUPT_GEN( kungfur_irq )
 static MACHINE_CONFIG_START( kungfur, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu",M6809,8000000/2)
-	MDRV_CPU_PROGRAM_MAP(kungfur_map)
-	MDRV_CPU_VBLANK_INT("screen",kungfur_irq)
+	MCFG_CPU_ADD("maincpu",M6809,8000000/2)
+	MCFG_CPU_PROGRAM_MAP(kungfur_map)
+	MCFG_CPU_VBLANK_INT("screen",kungfur_irq)
 
-	MDRV_PPI8255_ADD( "ppi8255_0", ppi8255_intf[0] )
-	MDRV_PPI8255_ADD( "ppi8255_1", ppi8255_intf[1] )
+	MCFG_PPI8255_ADD( "ppi8255_0", ppi8255_intf[0] )
+	MCFG_PPI8255_ADD( "ppi8255_1", ppi8255_intf[1] )
 
-	MDRV_MACHINE_RESET( kungfur )
+	MCFG_MACHINE_RESET( kungfur )
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_PALETTE_LENGTH(512)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_PALETTE_LENGTH(512)
 
-	MDRV_VIDEO_START(kungfur)
-	MDRV_VIDEO_UPDATE(kungfur)
+	MCFG_VIDEO_START(kungfur)
+	MCFG_VIDEO_UPDATE(kungfur)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("adpcm1", MSM5205, 400000)
-	MDRV_SOUND_CONFIG(msm5205_config_1)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("adpcm1", MSM5205, 400000)
+	MCFG_SOUND_CONFIG(msm5205_config_1)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD("adpcm2", MSM5205, 400000)
-	MDRV_SOUND_CONFIG(msm5205_config_2)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("adpcm2", MSM5205, 400000)
+	MCFG_SOUND_CONFIG(msm5205_config_2)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 /***************************************************************************

@@ -23,35 +23,35 @@ DECLARE_LEGACY_DEVICE(C8050, c8050);
 DECLARE_LEGACY_DEVICE(C8250, c8250);
 DECLARE_LEGACY_DEVICE(SFD1001, sfd1001);
 
-#define MDRV_C2040_ADD(_tag, _bus_tag, _address) \
-	MDRV_DEVICE_ADD(_tag, C2040, 0) \
-	MDRV_DEVICE_CONFIG_DATAPTR(c2040_config, bus_tag, _bus_tag) \
-	MDRV_DEVICE_CONFIG_DATA32(c2040_config, address, _address)
+#define MCFG_C2040_ADD(_tag, _bus_tag, _address) \
+	MCFG_DEVICE_ADD(_tag, C2040, 0) \
+	MCFG_DEVICE_CONFIG_DATAPTR(c2040_config, bus_tag, _bus_tag) \
+	MCFG_DEVICE_CONFIG_DATA32(c2040_config, address, _address)
 
-#define MDRV_C3040_ADD(_tag, _bus_tag, _address) \
-	MDRV_DEVICE_ADD(_tag, C3040, 0) \
-	MDRV_DEVICE_CONFIG_DATAPTR(c2040_config, bus_tag, _bus_tag) \
-	MDRV_DEVICE_CONFIG_DATA32(c2040_config, address, _address)
+#define MCFG_C3040_ADD(_tag, _bus_tag, _address) \
+	MCFG_DEVICE_ADD(_tag, C3040, 0) \
+	MCFG_DEVICE_CONFIG_DATAPTR(c2040_config, bus_tag, _bus_tag) \
+	MCFG_DEVICE_CONFIG_DATA32(c2040_config, address, _address)
 
-#define MDRV_C4040_ADD(_tag, _bus_tag, _address) \
-	MDRV_DEVICE_ADD(_tag, C4040, 0) \
-	MDRV_DEVICE_CONFIG_DATAPTR(c2040_config, bus_tag, _bus_tag) \
-	MDRV_DEVICE_CONFIG_DATA32(c2040_config, address, _address)
+#define MCFG_C4040_ADD(_tag, _bus_tag, _address) \
+	MCFG_DEVICE_ADD(_tag, C4040, 0) \
+	MCFG_DEVICE_CONFIG_DATAPTR(c2040_config, bus_tag, _bus_tag) \
+	MCFG_DEVICE_CONFIG_DATA32(c2040_config, address, _address)
 
-#define MDRV_C8050_ADD(_tag, _bus_tag, _address) \
-	MDRV_DEVICE_ADD(_tag, C8050, 0) \
-	MDRV_DEVICE_CONFIG_DATAPTR(c2040_config, bus_tag, _bus_tag) \
-	MDRV_DEVICE_CONFIG_DATA32(c2040_config, address, _address)
+#define MCFG_C8050_ADD(_tag, _bus_tag, _address) \
+	MCFG_DEVICE_ADD(_tag, C8050, 0) \
+	MCFG_DEVICE_CONFIG_DATAPTR(c2040_config, bus_tag, _bus_tag) \
+	MCFG_DEVICE_CONFIG_DATA32(c2040_config, address, _address)
 
-#define MDRV_C8250_ADD(_tag, _bus_tag, _address) \
-	MDRV_DEVICE_ADD(_tag, C8250, 0) \
-	MDRV_DEVICE_CONFIG_DATAPTR(c2040_config, bus_tag, _bus_tag) \
-	MDRV_DEVICE_CONFIG_DATA32(c2040_config, address, _address)
+#define MCFG_C8250_ADD(_tag, _bus_tag, _address) \
+	MCFG_DEVICE_ADD(_tag, C8250, 0) \
+	MCFG_DEVICE_CONFIG_DATAPTR(c2040_config, bus_tag, _bus_tag) \
+	MCFG_DEVICE_CONFIG_DATA32(c2040_config, address, _address)
 
-#define MDRV_SFD1001_ADD(_tag, _bus_tag, _address) \
-	MDRV_DEVICE_ADD(_tag, SFD1001, 0) \
-	MDRV_DEVICE_CONFIG_DATAPTR(c2040_config, bus_tag, _bus_tag) \
-	MDRV_DEVICE_CONFIG_DATA32(c2040_config, address, _address)
+#define MCFG_SFD1001_ADD(_tag, _bus_tag, _address) \
+	MCFG_DEVICE_ADD(_tag, SFD1001, 0) \
+	MCFG_DEVICE_CONFIG_DATAPTR(c2040_config, bus_tag, _bus_tag) \
+	MCFG_DEVICE_CONFIG_DATA32(c2040_config, address, _address)
 
 #define C2040_IEEE488(_tag) \
 	_tag, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_DEVICE_LINE(_tag, c2040_ieee488_ifc_w), DEVCB_NULL, DEVCB_DEVICE_LINE(_tag, c2040_ieee488_atn_w), DEVCB_NULL

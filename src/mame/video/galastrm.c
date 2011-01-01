@@ -104,7 +104,7 @@ static struct tempsprite *sprite_ptr_pre;
 static void draw_sprites_pre(running_machine *machine, int x_offs, int y_offs)
 {
 	UINT32 *spriteram32 = machine->generic.spriteram.u32;
-	UINT16 *spritemap = (UINT16 *)memory_region(machine, "user1");
+	UINT16 *spritemap = (UINT16 *)machine->region("user1")->base();
 	int offs, data, tilenum, color, flipx, flipy;
 	int x, y, priority, dblsize, curx, cury;
 	int sprites_flipscreen = 0;
@@ -450,8 +450,8 @@ static void tc0610_rotate_draw(running_machine *machine, bitmap_t *bitmap, bitma
 
 VIDEO_UPDATE( galastrm )
 {
-	running_device *tc0100scn = screen->machine->device("tc0100scn");
-	running_device *tc0480scp = screen->machine->device("tc0480scp");
+	device_t *tc0100scn = screen->machine->device("tc0100scn");
+	device_t *tc0480scp = screen->machine->device("tc0480scp");
 	UINT8 layer[5];
 	UINT8 pivlayer[3];
 	UINT16 priority;

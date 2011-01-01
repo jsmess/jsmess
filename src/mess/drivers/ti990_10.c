@@ -113,7 +113,7 @@ static void idle_callback(int state)
 }
 #endif
 
-static void rset_callback(running_device *device)
+static void rset_callback(device_t *device)
 {
 	ti990_cpuboard_reset();
 
@@ -123,7 +123,7 @@ static void rset_callback(running_device *device)
 	/* clear controller panel and smi fault LEDs */
 }
 
-static void lrex_callback(running_device *device)
+static void lrex_callback(device_t *device)
 {
 	/* right??? */
 	ti990_hold_load(device->machine);
@@ -207,39 +207,39 @@ static const ti990_tpc_interface ti990_tpc =
 static MACHINE_CONFIG_START( ti990_10, ti990_10_state )
 	/* basic machine hardware */
 	/* TI990/10 CPU @ 4.0(???) MHz */
-	MDRV_CPU_ADD("maincpu", TI990_10, 4000000)
-	MDRV_CPU_CONFIG(reset_params)
-	MDRV_CPU_PROGRAM_MAP(ti990_10_memmap)
-	MDRV_CPU_IO_MAP(ti990_10_io)
-	MDRV_CPU_PERIODIC_INT(ti990_10_line_interrupt, 120/*or 100 in Europe*/)
+	MCFG_CPU_ADD("maincpu", TI990_10, 4000000)
+	MCFG_CPU_CONFIG(reset_params)
+	MCFG_CPU_PROGRAM_MAP(ti990_10_memmap)
+	MCFG_CPU_IO_MAP(ti990_10_io)
+	MCFG_CPU_PERIODIC_INT(ti990_10_line_interrupt, 120/*or 100 in Europe*/)
 
-	MDRV_MACHINE_START( ti990_10 )
-	MDRV_MACHINE_RESET( ti990_10 )
+	MCFG_MACHINE_START( ti990_10 )
+	MCFG_MACHINE_RESET( ti990_10 )
 
 	/* video hardware - we emulate a single 911 vdt display */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(560, 280)
-	MDRV_SCREEN_VISIBLE_AREA(0, 560-1, 0, /*250*/280-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(560, 280)
+	MCFG_SCREEN_VISIBLE_AREA(0, 560-1, 0, /*250*/280-1)
 
-	MDRV_GFXDECODE(vdt911)
-	MDRV_PALETTE_LENGTH(8)
+	MCFG_GFXDECODE(vdt911)
+	MCFG_PALETTE_LENGTH(8)
 
-	MDRV_PALETTE_INIT(vdt911)
-	MDRV_VIDEO_START(ti990_10)
-	/*MDRV_VIDEO_EOF(name)*/
-	MDRV_VIDEO_UPDATE(ti990_10)
+	MCFG_PALETTE_INIT(vdt911)
+	MCFG_VIDEO_START(ti990_10)
+	/*MCFG_VIDEO_EOF(name)*/
+	MCFG_VIDEO_UPDATE(ti990_10)
 
 	/* 911 VDT has a beep tone generator */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("beep", BEEP, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("beep", BEEP, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_FRAGMENT_ADD( ti990_hdc )
+	MCFG_FRAGMENT_ADD( ti990_hdc )
 
-	MDRV_TI990_TAPE_CTRL_ADD("tpc",ti990_tpc)
+	MCFG_TI990_TAPE_CTRL_ADD("tpc",ti990_tpc)
 MACHINE_CONFIG_END
 
 
@@ -293,7 +293,7 @@ static DRIVER_INIT( ti990_10 )
 	/* load specific ti990/12 rom page */
 	const int page = 3;
 
-	memmove(memory_region(machine, "maincpu")+0x1FFC00, memory_region(machine, "maincpu")+0x1FFC00+(page*0x400), 0x400);
+	memmove(machine->region("maincpu")->base()+0x1FFC00, machine->region("maincpu")->base()+0x1FFC00+(page*0x400), 0x400);
 #endif
 	vdt911_init(machine);
 }

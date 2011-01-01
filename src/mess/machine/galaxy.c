@@ -71,7 +71,7 @@ static IRQ_CALLBACK ( galaxy_irq_callback )
 
 static void galaxy_setup_snapshot (running_machine *machine, const UINT8 * data, UINT32 size)
 {
-	running_device *cpu = machine->device("maincpu");
+	device_t *cpu = machine->device("maincpu");
 
 	switch (size)
 	{
@@ -187,7 +187,7 @@ MACHINE_RESET( galaxy )
 	memory_nop_write(space, 0x1000, 0x1fff, 0, 0);
 
 	if (input_port_read(machine, "ROM2"))
-		memory_set_bankptr(machine,"bank10", memory_region(machine, "maincpu") + 0x1000);
+		memory_set_bankptr(machine,"bank10", machine->region("maincpu")->base() + 0x1000);
 
 	cpu_set_irq_callback(machine->device("maincpu"), galaxy_irq_callback);
 	state->interrupts_enabled = TRUE;
@@ -201,7 +201,7 @@ DRIVER_INIT( galaxyp )
 MACHINE_RESET( galaxyp )
 {
 	galaxy_state *state = machine->driver_data<galaxy_state>();
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	cpu_set_irq_callback(machine->device("maincpu"), galaxy_irq_callback);
@@ -213,6 +213,6 @@ MACHINE_RESET( galaxyp )
 
 	memory_install_read_bank(space, 0xe000, 0xefff, 0, 0, "bank11");
 	memory_nop_write(space, 0xe000, 0xefff, 0, 0);
-	memory_set_bankptr(machine,"bank11", memory_region(machine, "maincpu") + 0xe000);
+	memory_set_bankptr(machine,"bank11", machine->region("maincpu")->base() + 0xe000);
 	state->interrupts_enabled = TRUE;
 }

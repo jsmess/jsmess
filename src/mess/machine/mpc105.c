@@ -87,7 +87,7 @@ static void mpc105_update_memory(running_machine *machine)
 
 
 
-UINT32 mpc105_pci_read(running_device *busdevice, running_device *device, int function, int offset, UINT32 mem_mask)
+UINT32 mpc105_pci_read(device_t *busdevice, device_t *device, int function, int offset, UINT32 mem_mask)
 {
 	UINT32 result;
 
@@ -163,7 +163,7 @@ UINT32 mpc105_pci_read(running_device *busdevice, running_device *device, int fu
 
 
 
-void mpc105_pci_write(running_device *busdevice, running_device *device, int function, int offset, UINT32 data, UINT32 mem_mask)
+void mpc105_pci_write(device_t *busdevice, device_t *device, int function, int offset, UINT32 data, UINT32 mem_mask)
 {
 	int i;
 	running_machine *machine = busdevice->machine;

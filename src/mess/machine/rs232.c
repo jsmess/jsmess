@@ -22,7 +22,7 @@
 typedef struct _rs232_equipment rs232_equipment;
 struct _rs232_equipment
 {
-	running_device *device;
+	device_t *device;
 
 	devcb_resolved_write_line		out_rd_func;
 	devcb_resolved_write_line		out_dcd_func;
@@ -52,14 +52,14 @@ struct _rs232_t
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE rs232_t *get_safe_token(running_device *device)
+INLINE rs232_t *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == RS232);
 	return (rs232_t *)downcast<legacy_device_base *>(device)->token();
 }
 
-INLINE const rs232_interface *get_interface(running_device *device)
+INLINE const rs232_interface *get_interface(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == RS232);
@@ -77,7 +77,7 @@ READ_LINE_DEVICE_HANDLER( rs232_rd_r )
 	return rs232->data;
 }
 
-void rs232_td_w(running_device *bus, running_device *device, int state)
+void rs232_td_w(device_t *bus, device_t *device, int state)
 {
 	rs232_t *rs232 = get_safe_token(bus);
 

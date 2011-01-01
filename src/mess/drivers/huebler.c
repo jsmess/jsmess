@@ -224,7 +224,7 @@ INPUT_PORTS_END
 void amu880_state::video_start()
 {
 	// find memory regions
-	m_char_rom = memory_region(machine, "chargen");
+	m_char_rom = machine->region("chargen")->base();
 }
 
 bool amu880_state::video_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
@@ -350,7 +350,7 @@ static const z80_daisy_config amu880_daisy_chain[] =
 void amu880_state::machine_start()
 {
 	/* find memory regions */
-	m_kb_rom = memory_region(machine, "keyboard");
+	m_kb_rom = machine->region("keyboard")->base();
 
 	/* register for state saving */
 	state_save_register_global(machine, m_key_d6);
@@ -391,33 +391,33 @@ GFXDECODE_END
 
 static MACHINE_CONFIG_START( amu880, amu880_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80_TAG, Z80, XTAL_10MHz/4) // U880D
-	MDRV_CPU_PROGRAM_MAP(amu880_mem)
-	MDRV_CPU_IO_MAP(amu880_io)
-	MDRV_CPU_CONFIG(amu880_daisy_chain)
+	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_10MHz/4) // U880D
+	MCFG_CPU_PROGRAM_MAP(amu880_mem)
+	MCFG_CPU_IO_MAP(amu880_io)
+	MCFG_CPU_CONFIG(amu880_daisy_chain)
 
-	MDRV_TIMER_ADD_PERIODIC("keyboard", keyboard_tick, HZ(1500))
+	MCFG_TIMER_ADD_PERIODIC("keyboard", keyboard_tick, HZ(1500))
 
 	/* video hardware */
-	MDRV_SCREEN_ADD(SCREEN_TAG, RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_RAW_PARAMS(9000000, 576, 0*6, 64*6, 320, 0*10, 24*10)
+	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_RAW_PARAMS(9000000, 576, 0*6, 64*6, 320, 0*10, 24*10)
 
-	MDRV_GFXDECODE(amu880)
-	MDRV_PALETTE_LENGTH(2)
-	MDRV_PALETTE_INIT(black_and_white)
+	MCFG_GFXDECODE(amu880)
+	MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_INIT(black_and_white)
 
 	/* devices */
-	MDRV_Z80CTC_ADD(Z80CTC_TAG, XTAL_10MHz/4, ctc_intf)
-	MDRV_Z80PIO_ADD(Z80PIO1_TAG, XTAL_10MHz/4, pio1_intf)
-	MDRV_Z80PIO_ADD(Z80PIO2_TAG, XTAL_10MHz/4, pio2_intf)
-	MDRV_Z80SIO0_ADD(Z80SIO_TAG, XTAL_10MHz/4, sio_intf) // U856
+	MCFG_Z80CTC_ADD(Z80CTC_TAG, XTAL_10MHz/4, ctc_intf)
+	MCFG_Z80PIO_ADD(Z80PIO1_TAG, XTAL_10MHz/4, pio1_intf)
+	MCFG_Z80PIO_ADD(Z80PIO2_TAG, XTAL_10MHz/4, pio2_intf)
+	MCFG_Z80SIO0_ADD(Z80SIO_TAG, XTAL_10MHz/4, sio_intf) // U856
 
-	MDRV_CASSETTE_ADD(CASSETTE_TAG, amu880_cassette_config)
+	MCFG_CASSETTE_ADD(CASSETTE_TAG, amu880_cassette_config)
 
 	/* internal ram */
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("64K")
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("64K")
 MACHINE_CONFIG_END
 
 /* ROMs */

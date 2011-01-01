@@ -28,12 +28,12 @@
 
 DECLARE_LEGACY_DEVICE(UPD1990A, upd1990a);
 
-#define MDRV_UPD1990A_ADD(_tag, _clock, _config) \
-	MDRV_DEVICE_ADD(_tag, UPD1990A, _clock) \
-	MDRV_DEVICE_CONFIG(_config)
+#define MCFG_UPD1990A_ADD(_tag, _clock, _config) \
+	MCFG_DEVICE_ADD(_tag, UPD1990A, _clock) \
+	MCFG_DEVICE_CONFIG(_config)
 
-#define MDRV_UPD1990A_REMOVE(_tag) \
-	MDRV_DEVICE_REMOVE(_tag)
+#define MCFG_UPD1990A_REMOVE(_tag) \
+	MCFG_DEVICE_REMOVE(_tag)
 
 #define UPD1990A_INTERFACE(name) \
 	const upd1990a_interface (name)=

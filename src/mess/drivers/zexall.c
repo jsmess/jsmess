@@ -57,7 +57,7 @@ static DRIVER_INIT( zexall )
 static MACHINE_RESET( zexall )
 {
 	zexall_state *state = machine->driver_data<zexall_state>();
-	UINT8 *rom = memory_region(machine, "romcode");
+	UINT8 *rom = machine->region("romcode")->base();
 	UINT8 *ram = state->main_ram;
 	int i;
 	/* fill main ram with zexall code */
@@ -69,7 +69,7 @@ static MACHINE_RESET( zexall )
 static READ8_HANDLER( zexall_output_ack_r )
 {
 	zexall_state *state = space->machine->driver_data<zexall_state>();
-	running_device *devconf = space->machine->device("terminal");
+	device_t *devconf = space->machine->device("terminal");
 // spit out the byte in out_byte if out_req is not equal to out_req_last
 	if (state->out_req != state->out_req_last)
 	{
@@ -151,15 +151,15 @@ static GENERIC_TERMINAL_INTERFACE( dectalk_terminal_intf )
 
 static MACHINE_CONFIG_START( zexall, zexall_state )
     /* basic machine hardware */
-    MDRV_CPU_ADD("maincpu", Z80, XTAL_3_579545MHz*10)
-    MDRV_CPU_PROGRAM_MAP(z80_mem)
-    MDRV_CPU_IO_MAP(z80_io)
-    MDRV_QUANTUM_TIME(HZ(60))
-    MDRV_MACHINE_RESET(zexall)
+    MCFG_CPU_ADD("maincpu", Z80, XTAL_3_579545MHz*10)
+    MCFG_CPU_PROGRAM_MAP(z80_mem)
+    MCFG_CPU_IO_MAP(z80_io)
+    MCFG_QUANTUM_TIME(HZ(60))
+    MCFG_MACHINE_RESET(zexall)
 
     /* video hardware */
-	MDRV_FRAGMENT_ADD( generic_terminal )
-	MDRV_GENERIC_TERMINAL_ADD(TERMINAL_TAG,dectalk_terminal_intf)
+	MCFG_FRAGMENT_ADD( generic_terminal )
+	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG,dectalk_terminal_intf)
 
 MACHINE_CONFIG_END
 

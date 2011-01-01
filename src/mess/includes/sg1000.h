@@ -34,7 +34,7 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<running_device> m_ram;
+	required_device<device_t> m_ram;
 
 	virtual void machine_start();
 	
@@ -60,7 +60,7 @@ public:
 		  m_cassette(*this, CASSETTE_TAG)
 	{ }
 
-	required_device<running_device> m_cassette;
+	required_device<device_t> m_cassette;
 
 	virtual void machine_start();
 
@@ -81,9 +81,9 @@ public:
 		  m_floppy0(*this, FLOPPY_0)
 	{ }
 
-	required_device<running_device> m_fdc;
-	required_device<running_device> m_centronics;
-	required_device<running_device> m_floppy0;
+	required_device<device_t> m_fdc;
+	required_device<device_t> m_centronics;
+	required_device<device_t> m_floppy0;
 
 	virtual void machine_start();
 	virtual void machine_reset();

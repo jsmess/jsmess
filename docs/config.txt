@@ -705,6 +705,23 @@ Core screen options
 	This controls the brightness level when MAME is paused. The default
 	value is 0.65.
 
+-effect <filename>
+
+	Specifies a single PNG file that is used as an overlay over any game
+	screens in the video display. This PNG file is assumed to live in the
+	root of one of the artpath directories. The pattern in the PNG file is
+	repeated both horizontally and vertically to cover the entire game
+	screen areas (but not any external artwork), and is rendered at
+	the target resolution of the game image. For -video gdi and -video d3d
+	modes, this means that one pixel in the PNG will map to one pixel on
+	your output display. For -video ddraw, this means that one pixel in the
+	PNG will map to one pixel in the prescaled game screen. If you wish to
+	use an effect that requires mapping n PNG pixels to each game screen
+	pixel with -video ddraw, you need to specify a -prescale factor of n as
+	well. The RGB values of each pixel in the PNG are multiplied against the
+	RGB values of the target screen. The default is 'none', meaning no
+	effect.
+
 
 
 Core vector options
@@ -987,3 +1004,11 @@ Core misc options
 
 	Forces MAME to skip displaying the game info screen. The default is
 	OFF (-noskip_gameinfo).
+
+-uifont <fontname>
+
+	Specifies the name of a BDF font file to use for the UI font. If this
+	font cannot be found or cannot be loaded, the system will fall back
+	to its built-in UI font. On some platforms 'fontname' can be a system
+	font name instead of a BDF font file. The default is 'default' (use 
+	the OSD-determined default font).

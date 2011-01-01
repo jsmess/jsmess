@@ -108,7 +108,7 @@ static TILEMAP_MAPPER( scan_mode3 )
 
 static TILE_GET_INFO( get_tile_info_BG_1 )
 {
-	UINT8 *map = memory_region(machine, "user1") + ((*madalien_video_flags & 0x08) << 6);
+	UINT8 *map = machine->region("user1")->base() + ((*madalien_video_flags & 0x08) << 6);
 
 	SET_TILE_INFO(1, map[tile_index], BIT(*madalien_video_flags, 2) ? 2 : 0, 0);
 }
@@ -116,7 +116,7 @@ static TILE_GET_INFO( get_tile_info_BG_1 )
 
 static TILE_GET_INFO( get_tile_info_BG_2 )
 {
-	UINT8 *map = memory_region(machine, "user1") + ((*madalien_video_flags & 0x08) << 6) + 0x80;
+	UINT8 *map = machine->region("user1")->base() + ((*madalien_video_flags & 0x08) << 6) + 0x80;
 
 	SET_TILE_INFO(1, map[tile_index], BIT(*madalien_video_flags, 2) ? 2 : 0, 0);
 }
@@ -401,15 +401,15 @@ static const mc6845_interface mc6845_intf =
 
 
 MACHINE_CONFIG_FRAGMENT( madalien_video )
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 336, 0, 256, 288, 0, 256)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 336, 0, 256, 288, 0, 256)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 
-	MDRV_GFXDECODE(madalien)
-	MDRV_PALETTE_LENGTH(0x30)
-	MDRV_PALETTE_INIT(madalien)
-	MDRV_VIDEO_START(madalien)
-	MDRV_VIDEO_UPDATE(madalien)
+	MCFG_GFXDECODE(madalien)
+	MCFG_PALETTE_LENGTH(0x30)
+	MCFG_PALETTE_INIT(madalien)
+	MCFG_VIDEO_START(madalien)
+	MCFG_VIDEO_UPDATE(madalien)
 
-	MDRV_MC6845_ADD("crtc", MC6845, PIXEL_CLOCK / 8, mc6845_intf)
+	MCFG_MC6845_ADD("crtc", MC6845, PIXEL_CLOCK / 8, mc6845_intf)
 MACHINE_CONFIG_END

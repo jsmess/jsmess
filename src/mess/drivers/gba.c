@@ -293,13 +293,13 @@ static void audio_tick(running_machine *machine, int ref)
 
 			if (state->SOUNDCNT_H & 0x200)
 			{
-				running_device *dac_device = machine->device("direct_a_left");
+				device_t *dac_device = machine->device("direct_a_left");
 
 				dac_signed_data_w(dac_device, state->fifo_a[state->fifo_a_ptr]^0x80);
 			}
 			if (state->SOUNDCNT_H & 0x100)
 			{
-				running_device *dac_device = machine->device("direct_a_right");
+				device_t *dac_device = machine->device("direct_a_right");
 
 				dac_signed_data_w(dac_device, state->fifo_a[state->fifo_a_ptr]^0x80);
 			}
@@ -333,13 +333,13 @@ static void audio_tick(running_machine *machine, int ref)
 
 			if (state->SOUNDCNT_H & 0x2000)
 			{
-				running_device *dac_device = machine->device("direct_b_left");
+				device_t *dac_device = machine->device("direct_b_left");
 
 				dac_signed_data_w(dac_device, state->fifo_b[state->fifo_b_ptr]^0x80);
 			}
 			if (state->SOUNDCNT_H & 0x1000)
 			{
-				running_device *dac_device = machine->device("direct_b_right");
+				device_t *dac_device = machine->device("direct_b_right");
 
 				dac_signed_data_w(dac_device, state->fifo_b[state->fifo_b_ptr]^0x80);
 			}
@@ -501,7 +501,7 @@ static READ32_HANDLER( gba_io_r )
 {
 	UINT32 retval = 0;
 	running_machine *machine = space->machine;
-	running_device *gb_device = space->machine->device("custom");
+	device_t *gb_device = space->machine->device("custom");
 	gba_state *state = machine->driver_data<gba_state>();
 
 	switch( offset )
@@ -1022,7 +1022,7 @@ static READ32_HANDLER( gba_io_r )
 static WRITE32_HANDLER( gba_io_w )
 {
 	running_machine *machine = space->machine;
-	running_device *gb_device = space->machine->device("custom");
+	device_t *gb_device = space->machine->device("custom");
 	gba_state *state = machine->driver_data<gba_state>();
 
 	switch( offset )
@@ -1422,8 +1422,8 @@ static WRITE32_HANDLER( gba_io_w )
 				// DAC A reset?
 				if (data & 0x0800)
 				{
-					running_device *gb_a_l = machine->device("direct_a_left");
-					running_device *gb_a_r = machine->device("direct_a_right");
+					device_t *gb_a_l = machine->device("direct_a_left");
+					device_t *gb_a_r = machine->device("direct_a_right");
 
 					state->fifo_a_ptr = 17;
 					state->fifo_a_in = 17;
@@ -1434,8 +1434,8 @@ static WRITE32_HANDLER( gba_io_w )
 				// DAC B reset?
 				if (data & 0x8000)
 				{
-					running_device *gb_b_l = machine->device("direct_b_left");
-					running_device *gb_b_r = machine->device("direct_b_right");
+					device_t *gb_b_l = machine->device("direct_b_left");
+					device_t *gb_b_r = machine->device("direct_b_right");
 
 					state->fifo_b_ptr = 17;
 					state->fifo_b_in = 17;
@@ -1447,10 +1447,10 @@ static WRITE32_HANDLER( gba_io_w )
 		case 0x0084/4:
 			if( (mem_mask) & 0x000000ff )
 			{
-				running_device *gb_a_l = machine->device("direct_a_left");
-				running_device *gb_a_r = machine->device("direct_a_right");
-				running_device *gb_b_l = machine->device("direct_b_left");
-				running_device *gb_b_r = machine->device("direct_b_right");
+				device_t *gb_a_l = machine->device("direct_a_left");
+				device_t *gb_a_r = machine->device("direct_a_right");
+				device_t *gb_b_l = machine->device("direct_b_left");
+				device_t *gb_b_r = machine->device("direct_b_right");
 
 				gb_sound_w(gb_device, 0x16, data);
 				if ((data & 0x80) && !(state->SOUNDCNT_X & 0x80))
@@ -1898,7 +1898,7 @@ static READ32_HANDLER(gba_bios_r)
 {
 	running_machine *machine = space->machine;
 	gba_state *state = machine->driver_data<gba_state>();
-	UINT32 *rom = (UINT32 *)memory_region(space->machine, "maincpu");
+	UINT32 *rom = (UINT32 *)space->machine->region("maincpu")->base();
 	if (state->bios_protected != 0)
 	{
 		offset = (state->bios_last_address + 8) / 4;
@@ -2023,10 +2023,10 @@ static TIMER_CALLBACK( perform_scan )
 
 static MACHINE_RESET( gba )
 {
-	running_device *gb_a_l = machine->device("direct_a_left");
-	running_device *gb_a_r = machine->device("direct_a_right");
-	running_device *gb_b_l = machine->device("direct_b_left");
-	running_device *gb_b_r = machine->device("direct_b_right");
+	device_t *gb_a_l = machine->device("direct_a_left");
+	device_t *gb_a_r = machine->device("direct_a_right");
+	device_t *gb_b_l = machine->device("direct_b_left");
+	device_t *gb_b_r = machine->device("direct_b_right");
 	gba_state *state = machine->driver_data<gba_state>();
 
 	//memset(state, 0, sizeof(state));
@@ -2323,7 +2323,7 @@ static WRITE32_HANDLER( eeprom_w )
 
 static DEVICE_IMAGE_LOAD( gba_cart )
 {
-	UINT8 *ROM = memory_region(image.device().machine, "cartridge");
+	UINT8 *ROM = image.device().machine->region("cartridge")->base();
 	int i;
 	UINT32 cart_size;
 	UINT8 game_code[4] = { 0 };
@@ -2465,43 +2465,43 @@ static DEVICE_IMAGE_LOAD( gba_cart )
 
 static MACHINE_CONFIG_START( gbadv, gba_state )
 
-	MDRV_CPU_ADD("maincpu", ARM7, 16777216)
-	MDRV_CPU_PROGRAM_MAP(gbadvance_map)
+	MCFG_CPU_ADD("maincpu", ARM7, 16777216)
+	MCFG_CPU_PROGRAM_MAP(gbadvance_map)
 
-	MDRV_MACHINE_START(gba)
-	MDRV_MACHINE_RESET(gba)
+	MCFG_MACHINE_START(gba)
+	MCFG_MACHINE_RESET(gba)
 
-	MDRV_SCREEN_ADD("gbalcd", RASTER)	// htot hst vwid vtot vst vis
-	MDRV_SCREEN_RAW_PARAMS(16777216/4, 308, 0,  240, 228, 0,  160)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_DEFAULT_LAYOUT(layout_lcd)
-	MDRV_PALETTE_LENGTH(32768)
-	MDRV_PALETTE_INIT( gba )
+	MCFG_SCREEN_ADD("gbalcd", RASTER)	// htot hst vwid vtot vst vis
+	MCFG_SCREEN_RAW_PARAMS(16777216/4, 308, 0,  240, 228, 0,  160)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_DEFAULT_LAYOUT(layout_lcd)
+	MCFG_PALETTE_LENGTH(32768)
+	MCFG_PALETTE_INIT( gba )
 
-	MDRV_VIDEO_START(generic_bitmapped)
-	MDRV_VIDEO_UPDATE(generic_bitmapped)
+	MCFG_VIDEO_START(generic_bitmapped)
+	MCFG_VIDEO_UPDATE(generic_bitmapped)
 
-	MDRV_SPEAKER_STANDARD_STEREO("spkleft", "spkright")
-	MDRV_SOUND_ADD("custom", GAMEBOY, 0)
-	MDRV_SOUND_ROUTE(0, "spkleft", 0.50)
-	MDRV_SOUND_ROUTE(1, "spkright", 0.50)
-	MDRV_SOUND_ADD("direct_a_left", DAC, 0)			// GBA direct sound A left
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "spkleft", 0.50)
-	MDRV_SOUND_ADD("direct_a_right", DAC, 0)		// GBA direct sound A right
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "spkright", 0.50)
-	MDRV_SOUND_ADD("direct_b_left", DAC, 0)			// GBA direct sound B left
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "spkleft", 0.50)
-	MDRV_SOUND_ADD("direct_b_right", DAC, 0)		// GBA direct sound B right
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "spkright", 0.50)
+	MCFG_SPEAKER_STANDARD_STEREO("spkleft", "spkright")
+	MCFG_SOUND_ADD("custom", GAMEBOY, 0)
+	MCFG_SOUND_ROUTE(0, "spkleft", 0.50)
+	MCFG_SOUND_ROUTE(1, "spkright", 0.50)
+	MCFG_SOUND_ADD("direct_a_left", DAC, 0)			// GBA direct sound A left
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "spkleft", 0.50)
+	MCFG_SOUND_ADD("direct_a_right", DAC, 0)		// GBA direct sound A right
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "spkright", 0.50)
+	MCFG_SOUND_ADD("direct_b_left", DAC, 0)			// GBA direct sound B left
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "spkleft", 0.50)
+	MCFG_SOUND_ADD("direct_b_right", DAC, 0)		// GBA direct sound B right
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "spkright", 0.50)
 
-	MDRV_PANASONIC_MN63F805MNP_ADD("pflash")
-	MDRV_SANYO_LE26FV10N1TS_ADD("sflash")
+	MCFG_PANASONIC_MN63F805MNP_ADD("pflash")
+	MCFG_SANYO_LE26FV10N1TS_ADD("sflash")
 
-	MDRV_CARTSLOT_ADD("cart")
-	MDRV_CARTSLOT_EXTENSION_LIST("gba,bin")
-	MDRV_CARTSLOT_INTERFACE("gba_cart")
-	MDRV_CARTSLOT_LOAD(gba_cart)
-	MDRV_SOFTWARE_LIST_ADD("cart_list","gba")
+	MCFG_CARTSLOT_ADD("cart")
+	MCFG_CARTSLOT_EXTENSION_LIST("gba,bin")
+	MCFG_CARTSLOT_INTERFACE("gba_cart")
+	MCFG_CARTSLOT_LOAD(gba_cart)
+	MCFG_SOFTWARE_LIST_ADD("cart_list","gba")
 MACHINE_CONFIG_END
 
 /* this emulates the GBA's hardware protection: the BIOS returns only zeros when the PC is not in it,

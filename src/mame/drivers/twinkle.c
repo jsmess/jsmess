@@ -672,7 +672,7 @@ ADDRESS_MAP_END
 
 /* SPU board */
 
-static void ide_interrupt(running_device *device, int state_)
+static void ide_interrupt(device_t *device, int state_)
 {
 	twinkle_state *state = device->machine->driver_data<twinkle_state>();
 
@@ -736,14 +736,14 @@ static WRITE16_HANDLER( twinkle_spu_ctrl_w )
 
 static READ16_HANDLER( twinkle_waveram_r )
 {
-	UINT16 *waveram = (UINT16 *)memory_region(space->machine, "rfsnd");
+	UINT16 *waveram = (UINT16 *)space->machine->region("rfsnd")->base();
 
 	return waveram[offset];
 }
 
 static WRITE16_HANDLER( twinkle_waveram_w )
 {
-	UINT16 *waveram = (UINT16 *)memory_region(space->machine, "rfsnd");
+	UINT16 *waveram = (UINT16 *)space->machine->region("rfsnd")->base();
 
 	COMBINE_DATA(&waveram[offset]);
 }
@@ -889,7 +889,7 @@ static DRIVER_INIT( twinkle )
 	psx_dma_install_read_handler(machine, 5, scsi_dma_read);
 	psx_dma_install_write_handler(machine, 5, scsi_dma_write);
 
-	running_device *i2cmem = machine->device("security");
+	device_t *i2cmem = machine->device("security");
 	i2cmem_e0_write( i2cmem, 0 );
 	i2cmem_e1_write( i2cmem, 0 );
 	i2cmem_e2_write( i2cmem, 0 );
@@ -904,7 +904,7 @@ static MACHINE_RESET( twinkle )
 	cdda_set_cdrom(machine->device("cdda"), am53cf96_get_device(SCSI_ID_4));
 }
 
-static void spu_irq(running_device *device, UINT32 data)
+static void spu_irq(device_t *device, UINT32 data)
 {
 	psx_irq_set(device->machine, data);
 }
@@ -923,50 +923,50 @@ static const i2cmem_interface i2cmem_interface =
 
 static MACHINE_CONFIG_START( twinkle, twinkle_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD( "maincpu", PSXCPU, XTAL_67_7376MHz )
-	MDRV_CPU_PROGRAM_MAP( main_map )
-	MDRV_CPU_VBLANK_INT( "mainscreen", psx_vblank )
+	MCFG_CPU_ADD( "maincpu", PSXCPU, XTAL_67_7376MHz )
+	MCFG_CPU_PROGRAM_MAP( main_map )
+	MCFG_CPU_VBLANK_INT( "mainscreen", psx_vblank )
 
-	MDRV_CPU_ADD("audiocpu", M68000, 32000000/2)	/* 16.000 MHz */
-	MDRV_CPU_PROGRAM_MAP( sound_map )
+	MCFG_CPU_ADD("audiocpu", M68000, 32000000/2)	/* 16.000 MHz */
+	MCFG_CPU_PROGRAM_MAP( sound_map )
 
-	MDRV_WATCHDOG_TIME_INIT(MSEC(1200)) /* check TD pin on LTC1232 */
+	MCFG_WATCHDOG_TIME_INIT(MSEC(1200)) /* check TD pin on LTC1232 */
 
-	MDRV_MACHINE_RESET( twinkle )
-	MDRV_I2CMEM_ADD("security",i2cmem_interface)
+	MCFG_MACHINE_RESET( twinkle )
+	MCFG_I2CMEM_ADD("security",i2cmem_interface)
 
-	MDRV_IDE_CONTROLLER_ADD("ide", ide_interrupt)
-	MDRV_RTC65271_ADD("rtc", NULL)
+	MCFG_IDE_CONTROLLER_ADD("ide", ide_interrupt)
+	MCFG_RTC65271_ADD("rtc", NULL)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("mainscreen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE( 60 )
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC( 0 ))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE( 1024, 1024 )
-	MDRV_SCREEN_VISIBLE_AREA( 0, 639, 0, 479 )
+	MCFG_SCREEN_ADD("mainscreen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE( 60 )
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC( 0 ))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE( 1024, 1024 )
+	MCFG_SCREEN_VISIBLE_AREA( 0, 639, 0, 479 )
 
-	MDRV_PALETTE_LENGTH( 65536 )
+	MCFG_PALETTE_LENGTH( 65536 )
 
-	MDRV_PALETTE_INIT( psx )
-	MDRV_VIDEO_START( psx_type2 )
-	MDRV_VIDEO_UPDATE( psx )
+	MCFG_PALETTE_INIT( psx )
+	MCFG_VIDEO_START( psx_type2 )
+	MCFG_VIDEO_UPDATE( psx )
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("speakerleft", "speakerright")
+	MCFG_SPEAKER_STANDARD_STEREO("speakerleft", "speakerright")
 
-	MDRV_SOUND_ADD( "spu", PSXSPU, 0 )
-	MDRV_SOUND_CONFIG( twinkle_psxspu_interface )
-	MDRV_SOUND_ROUTE( 0, "speakerleft", 0.75 )
-	MDRV_SOUND_ROUTE( 1, "speakerright", 0.75 )
+	MCFG_SOUND_ADD( "spu", PSXSPU, 0 )
+	MCFG_SOUND_CONFIG( twinkle_psxspu_interface )
+	MCFG_SOUND_ROUTE( 0, "speakerleft", 0.75 )
+	MCFG_SOUND_ROUTE( 1, "speakerright", 0.75 )
 
-	MDRV_SOUND_ADD("rfsnd", RF5C400, 32000000/2)
-	MDRV_SOUND_ROUTE(0, "speakerleft", 1.0)
-	MDRV_SOUND_ROUTE(1, "speakerright", 1.0)
+	MCFG_SOUND_ADD("rfsnd", RF5C400, 32000000/2)
+	MCFG_SOUND_ROUTE(0, "speakerleft", 1.0)
+	MCFG_SOUND_ROUTE(1, "speakerright", 1.0)
 
-	MDRV_SOUND_ADD( "cdda", CDDA, 0 )
-	MDRV_SOUND_ROUTE( 0, "speakerleft", 1.0 )
-	MDRV_SOUND_ROUTE( 1, "speakerright", 1.0 )
+	MCFG_SOUND_ADD( "cdda", CDDA, 0 )
+	MCFG_SOUND_ROUTE( 0, "speakerleft", 1.0 )
+	MCFG_SOUND_ROUTE( 1, "speakerright", 1.0 )
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( twinkle )

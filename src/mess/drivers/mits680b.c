@@ -50,17 +50,17 @@ static GENERIC_TERMINAL_INTERFACE( mits680b_terminal_intf )
 
 static MACHINE_CONFIG_START( mits680b, mits680b_state )
     /* basic machine hardware */
-    MDRV_CPU_ADD("maincpu",M6800, XTAL_1MHz / 2)
-    MDRV_CPU_PROGRAM_MAP(mits680b_mem)
+    MCFG_CPU_ADD("maincpu",M6800, XTAL_1MHz / 2)
+    MCFG_CPU_PROGRAM_MAP(mits680b_mem)
 
-    MDRV_MACHINE_RESET(mits680b)
+    MCFG_MACHINE_RESET(mits680b)
 
     /* video hardware */
-    MDRV_FRAGMENT_ADD( generic_terminal )
-	MDRV_GENERIC_TERMINAL_ADD(TERMINAL_TAG,mits680b_terminal_intf)
+    MCFG_FRAGMENT_ADD( generic_terminal )
+	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG,mits680b_terminal_intf)
 
 	/* acia */
-	MDRV_ACIA6551_ADD("acia")
+	MCFG_ACIA6551_ADD("acia")
 MACHINE_CONFIG_END
 
 /* ROM definition */

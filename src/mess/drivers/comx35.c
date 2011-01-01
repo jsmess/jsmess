@@ -357,50 +357,50 @@ static const floppy_config comx35_floppy_config =
 
 static MACHINE_CONFIG_START( pal, comx35_state )
 	/* basic system hardware */
-	MDRV_CPU_ADD(CDP1802_TAG, COSMAC, CDP1869_CPU_CLK_PAL)
-	MDRV_CPU_PROGRAM_MAP(comx35_map)
-	MDRV_CPU_IO_MAP(comx35_io_map)
-	MDRV_CPU_CONFIG(cosmac_intf)
+	MCFG_CPU_ADD(CDP1802_TAG, COSMAC, CDP1869_CPU_CLK_PAL)
+	MCFG_CPU_PROGRAM_MAP(comx35_map)
+	MCFG_CPU_IO_MAP(comx35_io_map)
+	MCFG_CPU_CONFIG(cosmac_intf)
 
 	/* sound and video hardware */
-	MDRV_FRAGMENT_ADD(comx35_pal_video)
+	MCFG_FRAGMENT_ADD(comx35_pal_video)
 
 	/* peripheral hardware */
-	MDRV_CDP1871_ADD(CDP1871_TAG, comx35_cdp1871_intf, CDP1869_CPU_CLK_PAL / 8)
-	MDRV_WD1770_ADD(WD1770_TAG, comx35_wd17xx_interface )
-	MDRV_QUICKLOAD_ADD("quickload", comx35_comx, "comx", 0)
-	MDRV_CASSETTE_ADD(CASSETTE_TAG, comx35_cassette_config)
-	MDRV_PRINTER_ADD("printer")
+	MCFG_CDP1871_ADD(CDP1871_TAG, comx35_cdp1871_intf, CDP1869_CPU_CLK_PAL / 8)
+	MCFG_WD1770_ADD(WD1770_TAG, comx35_wd17xx_interface )
+	MCFG_QUICKLOAD_ADD("quickload", comx35_comx, "comx", 0)
+	MCFG_CASSETTE_ADD(CASSETTE_TAG, comx35_cassette_config)
+	MCFG_PRINTER_ADD("printer")
 
-	MDRV_FLOPPY_2_DRIVES_ADD(comx35_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_ADD(comx35_floppy_config)
 
 	/* internal ram */
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("32K")
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("32K")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( ntsc, comx35_state )
 	/* basic system hardware */
-	MDRV_CPU_ADD(CDP1802_TAG, COSMAC, CDP1869_CPU_CLK_NTSC)
-	MDRV_CPU_PROGRAM_MAP(comx35_map)
-	MDRV_CPU_IO_MAP(comx35_io_map)
-	MDRV_CPU_CONFIG(cosmac_intf)
+	MCFG_CPU_ADD(CDP1802_TAG, COSMAC, CDP1869_CPU_CLK_NTSC)
+	MCFG_CPU_PROGRAM_MAP(comx35_map)
+	MCFG_CPU_IO_MAP(comx35_io_map)
+	MCFG_CPU_CONFIG(cosmac_intf)
 
 	/* sound and video hardware */
-	MDRV_FRAGMENT_ADD(comx35_ntsc_video)
+	MCFG_FRAGMENT_ADD(comx35_ntsc_video)
 
 	/* peripheral hardware */
-	MDRV_CDP1871_ADD(CDP1871_TAG, comx35_cdp1871_intf, CDP1869_CPU_CLK_NTSC / 8)
-	MDRV_WD1770_ADD(WD1770_TAG, comx35_wd17xx_interface )
-	MDRV_QUICKLOAD_ADD("quickload", comx35_comx, "comx", 0)
-	MDRV_CASSETTE_ADD(CASSETTE_TAG, comx35_cassette_config)
-	MDRV_PRINTER_ADD("printer")
+	MCFG_CDP1871_ADD(CDP1871_TAG, comx35_cdp1871_intf, CDP1869_CPU_CLK_NTSC / 8)
+	MCFG_WD1770_ADD(WD1770_TAG, comx35_wd17xx_interface )
+	MCFG_QUICKLOAD_ADD("quickload", comx35_comx, "comx", 0)
+	MCFG_CASSETTE_ADD(CASSETTE_TAG, comx35_cassette_config)
+	MCFG_PRINTER_ADD("printer")
 
-	MDRV_FLOPPY_2_DRIVES_ADD(comx35_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_ADD(comx35_floppy_config)
 
 	/* internal ram */
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("32K")
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("32K")
 MACHINE_CONFIG_END
 
 /* ROMs */

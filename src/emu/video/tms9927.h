@@ -19,14 +19,14 @@ DECLARE_LEGACY_DEVICE(CRT5037, crt5037);
 DECLARE_LEGACY_DEVICE(CRT5057, crt5057);
 
 
-#define MDRV_TMS9927_ADD(_tag, _clock, _config) \
-	MDRV_DEVICE_ADD(_tag, TMS9927, _clock) \
-	MDRV_DEVICE_CONFIG(_config)
+#define MCFG_TMS9927_ADD(_tag, _clock, _config) \
+	MCFG_DEVICE_ADD(_tag, TMS9927, _clock) \
+	MCFG_DEVICE_CONFIG(_config)
 
-#define MDRV_TMS9927_RECONFIG(_tag, _clock, _config) \
-	MDRV_DEVICE_MODIFY(_tag) \
-	MDRV_DEVICE_CLOCK(_clock) \
-	MDRV_DEVICE_CONFIG(_config)
+#define MCFG_TMS9927_RECONFIG(_tag, _clock, _config) \
+	MCFG_DEVICE_MODIFY(_tag) \
+	MCFG_DEVICE_CLOCK(_clock) \
+	MCFG_DEVICE_CONFIG(_config)
 
 
 
@@ -47,9 +47,9 @@ WRITE8_DEVICE_HANDLER( tms9927_w );
 READ8_DEVICE_HANDLER( tms9927_r );
 
 /* other queries */
-int tms9927_screen_reset(running_device *device);
-int tms9927_upscroll_offset(running_device *device);
-int tms9927_cursor_bounds(running_device *device, rectangle *bounds);
+int tms9927_screen_reset(device_t *device);
+int tms9927_upscroll_offset(device_t *device);
+int tms9927_cursor_bounds(device_t *device, rectangle *bounds);
 
 
 

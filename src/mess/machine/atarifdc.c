@@ -69,7 +69,7 @@ struct _atari_fdc_t
 /*****************************************************************************
     INLINE FUNCTIONS
 *****************************************************************************/
-INLINE atari_fdc_t *get_safe_token(running_device *device)
+INLINE atari_fdc_t *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 
@@ -400,7 +400,7 @@ static void make_chksum(UINT8 * chksum, UINT8 data)
 	*chksum = newone;
 }
 
-static void clr_serout(running_device *device,int expect_data)
+static void clr_serout(device_t *device,int expect_data)
 {
 	atari_fdc_t *fdc = get_safe_token(device);
 
@@ -409,7 +409,7 @@ static void clr_serout(running_device *device,int expect_data)
 	fdc->serout_count = expect_data + 1;
 }
 
-static void add_serout(running_device *device,int expect_data)
+static void add_serout(device_t *device,int expect_data)
 {
 	atari_fdc_t *fdc = get_safe_token(device);
 
@@ -417,17 +417,17 @@ static void add_serout(running_device *device,int expect_data)
 	fdc->serout_count = expect_data + 1;
 }
 
-static void clr_serin(running_device *device, int ser_delay)
+static void clr_serin(device_t *device, int ser_delay)
 {
 	atari_fdc_t *fdc = get_safe_token(device);
-	running_device *pokey = device->machine->device("pokey");
+	device_t *pokey = device->machine->device("pokey");
 	fdc->serin_chksum = 0;
 	fdc->serin_offs = 0;
 	fdc->serin_count = 0;
 	pokey_serin_ready(pokey, ser_delay * 40);
 }
 
-static void add_serin(running_device *device,UINT8 data, int with_checksum)
+static void add_serin(device_t *device,UINT8 data, int with_checksum)
 {
 	atari_fdc_t *fdc = get_safe_token(device);
 	fdc->serin_buff[fdc->serin_count++] = data;
@@ -435,7 +435,7 @@ static void add_serin(running_device *device,UINT8 data, int with_checksum)
 		make_chksum(&fdc->serin_chksum, data);
 }
 
-static void ATTR_PRINTF(2,3) atari_set_frame_message(running_device *device,const char *fmt, ...)
+static void ATTR_PRINTF(2,3) atari_set_frame_message(device_t *device,const char *fmt, ...)
 {
 	va_list arg;
 	va_start(arg, fmt);
@@ -446,7 +446,7 @@ static void ATTR_PRINTF(2,3) atari_set_frame_message(running_device *device,cons
 	va_end(arg);
 }
 
-static void a800_serial_command(running_device *device)
+static void a800_serial_command(device_t *device)
 {
 	int i, drive, sector, offset;
 	atari_fdc_t *fdc = get_safe_token(device);
@@ -634,7 +634,7 @@ static void a800_serial_command(running_device *device)
 		logerror("atari %d bytes to read\n", fdc->serin_count);
 }
 
-static void a800_serial_write(running_device *device)
+static void a800_serial_write(device_t *device)
 {
 	int i, drive, sector, offset;
 	atari_fdc_t *fdc = get_safe_token(device);
@@ -705,7 +705,7 @@ READ8_DEVICE_HANDLER ( atari_serin_r )
 
 	if (fdc->serin_count)
 	{
-		running_device *pokey = device->machine->device("pokey");
+		device_t *pokey = device->machine->device("pokey");
 
 		data = fdc->serin_buff[fdc->serin_offs];
 		ser_delay = 2 * 40;
@@ -730,7 +730,7 @@ READ8_DEVICE_HANDLER ( atari_serin_r )
 
 WRITE8_DEVICE_HANDLER ( atari_serout_w )
 {
-	running_device *pia = device->machine->device( "pia" );
+	device_t *pia = device->machine->device( "pia" );
 	atari_fdc_t *fdc = get_safe_token(device);
 
 	/* ignore serial commands if no floppy image is specified */
@@ -810,10 +810,10 @@ static const floppy_config atari_floppy_config =
 };
 
 static MACHINE_CONFIG_FRAGMENT( atari_fdc )
-	MDRV_FLOPPY_4_DRIVES_ADD(atari_floppy_config)
+	MCFG_FLOPPY_4_DRIVES_ADD(atari_floppy_config)
 MACHINE_CONFIG_END
 
-running_device *atari_floppy_get_device_child(running_device *device,int drive)
+device_t *atari_floppy_get_device_child(device_t *device,int drive)
 {
 	switch(drive) {
 		case 0 : return device->subdevice(FLOPPY_0);

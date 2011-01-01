@@ -45,16 +45,16 @@ struct _apple2_slot_config
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MDRV_APPLE2_SLOT_ADD(_slot_number, _slot_device_tag, _rh, _wh, _rhc800, _whc800, _rhcnxx, _whcnxx)		\
-	MDRV_DEVICE_ADD("slot_" #_slot_number, APPLE2_SLOT, 0)			\
-	MDRV_DEVICE_CONFIG_DATAPTR(apple2_slot_config, tag, _slot_device_tag)	\
-	MDRV_DEVICE_CONFIG_DATA32(apple2_slot_config, slotnum, _slot_number)		\
-	MDRV_DEVICE_CONFIG_DATAPTR(apple2_slot_config, rh, _rh)		\
-	MDRV_DEVICE_CONFIG_DATAPTR(apple2_slot_config, wh, _wh)		\
-	MDRV_DEVICE_CONFIG_DATAPTR(apple2_slot_config, rhc800, _rhc800)		\
-	MDRV_DEVICE_CONFIG_DATAPTR(apple2_slot_config, whc800, _whc800)		\
-	MDRV_DEVICE_CONFIG_DATAPTR(apple2_slot_config, rhcnxx, _rhcnxx)		\
-	MDRV_DEVICE_CONFIG_DATAPTR(apple2_slot_config, whcnxx, _whcnxx)		\
+#define MCFG_APPLE2_SLOT_ADD(_slot_number, _slot_device_tag, _rh, _wh, _rhc800, _whc800, _rhcnxx, _whcnxx)		\
+	MCFG_DEVICE_ADD("slot_" #_slot_number, APPLE2_SLOT, 0)			\
+	MCFG_DEVICE_CONFIG_DATAPTR(apple2_slot_config, tag, _slot_device_tag)	\
+	MCFG_DEVICE_CONFIG_DATA32(apple2_slot_config, slotnum, _slot_number)		\
+	MCFG_DEVICE_CONFIG_DATAPTR(apple2_slot_config, rh, _rh)		\
+	MCFG_DEVICE_CONFIG_DATAPTR(apple2_slot_config, wh, _wh)		\
+	MCFG_DEVICE_CONFIG_DATAPTR(apple2_slot_config, rhc800, _rhc800)		\
+	MCFG_DEVICE_CONFIG_DATAPTR(apple2_slot_config, whc800, _whc800)		\
+	MCFG_DEVICE_CONFIG_DATAPTR(apple2_slot_config, rhcnxx, _rhcnxx)		\
+	MCFG_DEVICE_CONFIG_DATAPTR(apple2_slot_config, whcnxx, _whcnxx)		\
 
 
 
@@ -80,6 +80,6 @@ READ8_DEVICE_HANDLER(apple2_c800_slot_r);
 WRITE8_DEVICE_HANDLER(apple2_c800_slot_w);
 
 /* slot device lookup */
-running_device *apple2_slot(running_machine *machine, int slotnum);
+device_t *apple2_slot(running_machine *machine, int slotnum);
 
 #endif /* __AP2_SLOT__ */

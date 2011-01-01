@@ -72,10 +72,10 @@ typedef struct _ti99_bwg_state
 	emu_timer			*motor_on_timer;
 
 	/* Link to the FDC1771 controller on the board. */
-	running_device		*controller;
+	device_t		*controller;
 
 	/* Link to the real-time clock on the board. */
-	running_device		*clock;
+	device_t		*clock;
 
 	/* DSR ROM */
 	UINT8				*rom;
@@ -91,7 +91,7 @@ typedef struct _ti99_bwg_state
 
 } ti99_bwg_state;
 
-INLINE ti99_bwg_state *get_safe_token(running_device *device)
+INLINE ti99_bwg_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	return (ti99_bwg_state *)downcast<legacy_device_base *>(device)->token();
@@ -106,7 +106,7 @@ INLINE ti99_bwg_state *get_safe_token(running_device *device)
     TODO: This has to be replaced by the proper READY handling that is already
     prepared here. (Requires READY handling by the CPU.)
 */
-static void bwg_handle_hold(running_device *device)
+static void bwg_handle_hold(device_t *device)
 {
 	ti99_bwg_state *card = get_safe_token(device);
 	line_state state;
@@ -125,7 +125,7 @@ static void bwg_handle_hold(running_device *device)
     the default implementation sets the drive geometry to the geometry
     of the medium.
 */
-static void set_geometry(running_device *drive, floppy_type_t type)
+static void set_geometry(device_t *drive, floppy_type_t type)
 {
 	if (drive!=NULL)
 		floppy_drive_set_geometry(drive, type);
@@ -143,7 +143,7 @@ the controller. */
 #define PFLOPPY_2 "peribox:floppy2"
 #define PFLOPPY_3 "peribox:floppy3"
 
-static void set_all_geometries(running_device *device, floppy_type_t type)
+static void set_all_geometries(device_t *device, floppy_type_t type)
 {
 	set_geometry(device->machine->device(PFLOPPY_0), type);
 	set_geometry(device->machine->device(PFLOPPY_1), type);
@@ -159,7 +159,7 @@ static void set_all_geometries(running_device *device, floppy_type_t type)
 */
 static WRITE_LINE_DEVICE_HANDLER( ti_bwg_intrq_w )
 {
-	running_device *carddev = device->owner();
+	device_t *carddev = device->owner();
 	ti99_bwg_state *card = get_safe_token(carddev);
 
 	if (state)
@@ -179,7 +179,7 @@ static WRITE_LINE_DEVICE_HANDLER( ti_bwg_intrq_w )
 
 static WRITE_LINE_DEVICE_HANDLER( ti_bwg_drq_w )
 {
-	running_device *carddev = device->owner();
+	device_t *carddev = device->owner();
 	ti99_bwg_state *card = get_safe_token(carddev);
 
 	if (state)
@@ -195,7 +195,7 @@ static WRITE_LINE_DEVICE_HANDLER( ti_bwg_drq_w )
 */
 static TIMER_CALLBACK(motor_on_timer_callback)
 {
-	running_device *device = (running_device *)ptr;
+	device_t *device = (device_t *)ptr;
 	ti99_bwg_state *card = get_safe_token(device);
 	card->DVENA = 0;
 	bwg_handle_hold(device);
@@ -485,7 +485,7 @@ static DEVICE_START( ti99_bwg )
 	card->clock = device->subdevice("mm58274c");
 	astring *region = new astring();
 	astring_assemble_3(region, device->tag(), ":", bwg_region);
-	card->rom = memory_region(device->machine, astring_c(region));
+	card->rom = device->machine->region(astring_c(region))->base();
 	card->ram = NULL;
 }
 
@@ -512,7 +512,7 @@ static DEVICE_RESET( ti99_bwg )
 	/* If the card is selected in the menu, register the card */
 	if (input_port_read(device->machine, "DISKCTRL") == DISK_BWG)
 	{
-		running_device *peb = device->owner();
+		device_t *peb = device->owner();
 		int success = mount_card(peb, device, &bwg_card, get_pebcard_config(device)->slot);
 		if (!success) return;
 
@@ -561,8 +561,8 @@ static const mm58274c_interface floppy_mm58274c_interface =
 };
 
 MACHINE_CONFIG_FRAGMENT( ti99_bwg )
-	MDRV_WD1773_ADD("wd1773", ti_wd17xx_interface )
-	MDRV_MM58274C_ADD("mm58274c", floppy_mm58274c_interface)
+	MCFG_WD1773_ADD("wd1773", ti_wd17xx_interface )
+	MCFG_MM58274C_ADD("mm58274c", floppy_mm58274c_interface)
 MACHINE_CONFIG_END
 
 ROM_START( ti99_bwg )

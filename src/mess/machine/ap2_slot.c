@@ -16,7 +16,7 @@
 typedef struct _apple2_slot_token apple2_slot_token;
 struct _apple2_slot_token
 {
-	running_device *slot_device;
+	device_t *slot_device;
 };
 
 
@@ -25,7 +25,7 @@ struct _apple2_slot_token
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE void assert_valid(running_device *device)
+INLINE void assert_valid(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == APPLE2_SLOT);
@@ -33,7 +33,7 @@ INLINE void assert_valid(running_device *device)
 
 
 
-INLINE const apple2_slot_config *get_config(running_device *device)
+INLINE const apple2_slot_config *get_config(device_t *device)
 {
 	assert_valid(device);
 	return (const apple2_slot_config *) downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
@@ -41,7 +41,7 @@ INLINE const apple2_slot_config *get_config(running_device *device)
 
 
 
-INLINE apple2_slot_token *get_token(running_device *device)
+INLINE apple2_slot_token *get_token(device_t *device)
 {
 	assert_valid(device);
 	return (apple2_slot_token *) downcast<legacy_device_base *>(device)->token();
@@ -57,7 +57,7 @@ INLINE apple2_slot_token *get_token(running_device *device)
     apple2_slot - looks up a slot
 -------------------------------------------------*/
 
-running_device *apple2_slot(running_machine *machine, int slotnum)
+device_t *apple2_slot(running_machine *machine, int slotnum)
 {
 	char buffer[7];
 

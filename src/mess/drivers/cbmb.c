@@ -339,7 +339,7 @@ static PALETTE_INIT( p500 )
 
 static VIDEO_UPDATE( p500 )
 {
-	running_device *vic2 = screen->machine->device("vic6567");
+	device_t *vic2 = screen->machine->device("vic6567");
 
 	vic2_video_update(vic2, bitmap, cliprect);
 	return 0;
@@ -421,124 +421,124 @@ static IEEE488_DAISY( ieee488_daisy )
 
 static MACHINE_CONFIG_START( cbm600, cbmb_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6509, 7833600)        /* 7.8336 MHz */
-	MDRV_CPU_PROGRAM_MAP(cbmb_mem)
+	MCFG_CPU_ADD("maincpu", M6509, 7833600)        /* 7.8336 MHz */
+	MCFG_CPU_PROGRAM_MAP(cbmb_mem)
 
-	MDRV_MACHINE_RESET( cbmb )
+	MCFG_MACHINE_RESET( cbmb )
 
     /* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(640, 200)
-	MDRV_SCREEN_VISIBLE_AREA(0, 640 - 1, 0, 200 - 1)
-	MDRV_GFXDECODE( cbm600 )
-	MDRV_PALETTE_LENGTH(ARRAY_LENGTH(cbm700_palette) / 3)
-	MDRV_PALETTE_INIT( cbm700 )
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(640, 200)
+	MCFG_SCREEN_VISIBLE_AREA(0, 640 - 1, 0, 200 - 1)
+	MCFG_GFXDECODE( cbm600 )
+	MCFG_PALETTE_LENGTH(ARRAY_LENGTH(cbm700_palette) / 3)
+	MCFG_PALETTE_INIT( cbm700 )
 
-	MDRV_MC6845_ADD("crtc", MC6845, XTAL_18MHz / 8 /*?*/ /*  I do not know if this is correct, please verify */, cbm600_crtc)
+	MCFG_MC6845_ADD("crtc", MC6845, XTAL_18MHz / 8 /*?*/ /*  I do not know if this is correct, please verify */, cbm600_crtc)
 
-	MDRV_VIDEO_START( cbmb_crtc )
-	MDRV_VIDEO_UPDATE( cbmb_crtc )
+	MCFG_VIDEO_START( cbmb_crtc )
+	MCFG_VIDEO_UPDATE( cbmb_crtc )
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("sid6581", SID6581, 1000000)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("sid6581", SID6581, 1000000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* quickload */
-	MDRV_QUICKLOAD_ADD("quickload", cbmb, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
+	MCFG_QUICKLOAD_ADD("quickload", cbmb, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
 
 	/* cia */
-	MDRV_MOS6526R1_ADD("cia", 7833600, cbmb_cia)
+	MCFG_MOS6526R1_ADD("cia", 7833600, cbmb_cia)
 
 	/* tpi */
-	MDRV_TPI6525_ADD("tpi6525_0", cbmb_tpi_0_intf)
-	MDRV_TPI6525_ADD("tpi6525_1", cbmb_tpi_1_intf)
+	MCFG_TPI6525_ADD("tpi6525_0", cbmb_tpi_0_intf)
+	MCFG_TPI6525_ADD("tpi6525_1", cbmb_tpi_1_intf)
 
 	/* IEEE bus */
-	MDRV_IEEE488_ADD("ieee_bus", ieee488_daisy)
-	MDRV_C8250_ADD("drive", "ieee_bus", 8)
+	MCFG_IEEE488_ADD("ieee_bus", ieee488_daisy)
+	MCFG_C8250_ADD("drive", "ieee_bus", 8)
 
-	MDRV_FRAGMENT_ADD(cbmb_cartslot)
+	MCFG_FRAGMENT_ADD(cbmb_cartslot)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( cbm600pal, cbm600 )
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_REFRESH_RATE(50)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( cbm700, cbm600 )
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_SIZE(720, 350)
-	MDRV_SCREEN_VISIBLE_AREA(0, 720 - 1, 0, 350 - 1)
-	MDRV_GFXDECODE( cbm700 )
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_SIZE(720, 350)
+	MCFG_SCREEN_VISIBLE_AREA(0, 720 - 1, 0, 350 - 1)
+	MCFG_GFXDECODE( cbm700 )
 
-	MDRV_DEVICE_REMOVE("crtc")
-	MDRV_MC6845_ADD("crtc", MC6845, XTAL_18MHz / 8 /*? I do not know if this is correct, please verify */, cbm700_crtc)
+	MCFG_DEVICE_REMOVE("crtc")
+	MCFG_MC6845_ADD("crtc", MC6845, XTAL_18MHz / 8 /*? I do not know if this is correct, please verify */, cbm700_crtc)
 
-	MDRV_VIDEO_START( cbm700 )
+	MCFG_VIDEO_START( cbm700 )
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( cbm700pal, cbm700 )
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_REFRESH_RATE(50)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( bx256hp, cbm700 )
 
-//  MDRV_CPU_ADD("8088", I8088, /* ? */)
+//  MCFG_CPU_ADD("8088", I8088, /* ? */)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_START( p500, cbmb_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6509, VIC6567_CLOCK)        /* 7.8336 MHz */
-	MDRV_CPU_PROGRAM_MAP(p500_mem)
-	//MDRV_CPU_PERIODIC_INT(vic2_raster_irq, VIC6567_HRETRACERATE)
+	MCFG_CPU_ADD("maincpu", M6509, VIC6567_CLOCK)        /* 7.8336 MHz */
+	MCFG_CPU_PROGRAM_MAP(p500_mem)
+	//MCFG_CPU_PERIODIC_INT(vic2_raster_irq, VIC6567_HRETRACERATE)
 
-	MDRV_MACHINE_RESET( cbmb )
+	MCFG_MACHINE_RESET( cbmb )
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(VIC6567_COLUMNS, VIC6567_LINES)
-	MDRV_SCREEN_VISIBLE_AREA(0, VIC6567_VISIBLECOLUMNS - 1, 0, VIC6567_VISIBLELINES - 1)
-	MDRV_SCREEN_REFRESH_RATE(VIC6567_VRETRACERATE)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(VIC6567_COLUMNS, VIC6567_LINES)
+	MCFG_SCREEN_VISIBLE_AREA(0, VIC6567_VISIBLECOLUMNS - 1, 0, VIC6567_VISIBLELINES - 1)
+	MCFG_SCREEN_REFRESH_RATE(VIC6567_VRETRACERATE)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 
-	MDRV_PALETTE_INIT( p500 )
-	MDRV_PALETTE_LENGTH(ARRAY_LENGTH(p500_palette) / 3)
+	MCFG_PALETTE_INIT( p500 )
+	MCFG_PALETTE_LENGTH(ARRAY_LENGTH(p500_palette) / 3)
 
-	MDRV_VIDEO_UPDATE( p500 )
+	MCFG_VIDEO_UPDATE( p500 )
 
-	MDRV_VIC2_ADD("vic6567", p500_vic2_intf)
+	MCFG_VIC2_ADD("vic6567", p500_vic2_intf)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("sid6581", SID6581, 1000000)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("sid6581", SID6581, 1000000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* devices */
-	MDRV_QUICKLOAD_ADD("quickload", p500, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
+	MCFG_QUICKLOAD_ADD("quickload", p500, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
 
 	/* cia */
-	MDRV_MOS6526R1_ADD("cia", VIC6567_CLOCK, cbmb_cia)
+	MCFG_MOS6526R1_ADD("cia", VIC6567_CLOCK, cbmb_cia)
 
 	/* tpi */
-	MDRV_TPI6525_ADD("tpi6525_0", cbmb_tpi_0_intf)
-	MDRV_TPI6525_ADD("tpi6525_1", cbmb_tpi_1_intf)
+	MCFG_TPI6525_ADD("tpi6525_0", cbmb_tpi_0_intf)
+	MCFG_TPI6525_ADD("tpi6525_1", cbmb_tpi_1_intf)
 
 	/* IEEE bus */
-	MDRV_IEEE488_ADD("ieee_bus", ieee488_daisy)
-	MDRV_C8250_ADD("drive", "ieee_bus", 8)
+	MCFG_IEEE488_ADD("ieee_bus", ieee488_daisy)
+	MCFG_C8250_ADD("drive", "ieee_bus", 8)
 
-	MDRV_FRAGMENT_ADD(cbmb_cartslot)
+	MCFG_FRAGMENT_ADD(cbmb_cartslot)
 MACHINE_CONFIG_END
 
 

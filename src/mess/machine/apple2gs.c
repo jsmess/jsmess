@@ -303,7 +303,7 @@ static void apple2gs_remove_irq(running_machine *machine, UINT8 irq_mask)
 	}
 }
 
-void apple2gs_doc_irq(running_device *device, int state)
+void apple2gs_doc_irq(device_t *device, int state)
 {
 	if (state)
 	{
@@ -555,7 +555,7 @@ static void adb_write_datareg(running_machine *machine, UINT8 data)
 					break;
 
 				case 0x07:	/* synchronize */
-					if (memory_region_length(machine, "maincpu") == 0x40000)	/* HACK */
+					if (machine->region("maincpu")->bytes() == 0x40000)	/* HACK */
 						state->adb_command_length = 8;
 					else
 						state->adb_command_length = 4;
@@ -815,7 +815,7 @@ static READ8_HANDLER( gssnd_r )
 			}
 			else
 			{
-				running_device *es5503 = space->machine->device("es5503");
+				device_t *es5503 = space->machine->device("es5503");
 				state->sndglu_dummy_read = es5503_r(es5503, state->sndglu_addr);
 			}
 
@@ -856,7 +856,7 @@ static WRITE8_HANDLER( gssnd_w )
 			}
 			else
 			{
-				running_device *es5503 = space->machine->device("es5503");
+				device_t *es5503 = space->machine->device("es5503");
 				es5503_w(es5503, state->sndglu_addr, data);
 			}
 
@@ -911,7 +911,7 @@ static READ8_HANDLER( apple2gs_c0xx_r )
 {
 	apple2gs_state *state = space->machine->driver_data<apple2gs_state>();
 	UINT8 result;
-	running_device *scc;
+	device_t *scc;
 
 	offset &= 0xFF;
 
@@ -1032,8 +1032,8 @@ static READ8_HANDLER( apple2gs_c0xx_r )
 		case 0x74: case 0x75: case 0x76: case 0x77:
 		case 0x78: case 0x79: case 0x7a: case 0x7b:
 		case 0x7c: case 0x7d: case 0x7e: case 0x7f:
-			offset |= (memory_region_length(space->machine, "maincpu") - 1) & ~0x3FFF;
-			result = memory_region(space->machine, "maincpu")[offset];
+			offset |= (space->machine->region("maincpu")->bytes() - 1) & ~0x3FFF;
+			result = space->machine->region("maincpu")->base()[offset];
 			break;
 
 		case 0x21:	/* C021 - MONOCOLOR */
@@ -1055,7 +1055,7 @@ static READ8_HANDLER( apple2gs_c0xx_r )
 static WRITE8_HANDLER( apple2gs_c0xx_w )
 {
 	apple2gs_state *state = space->machine->driver_data<apple2gs_state>();
-	running_device *scc;
+	device_t *scc;
 
 	offset &= 0xFF;
 
@@ -1487,8 +1487,8 @@ static UINT8 *apple2gs_getslotmem(running_machine *machine, offs_t address)
 	assert(address >= 0xC000);
 	assert(address <= 0xCFFF);
 
-	rom = memory_region(machine, "maincpu");
-	rom += 0x030000 % memory_region_length(machine, "maincpu");
+	rom = machine->region("maincpu")->base();
+	rom += 0x030000 % machine->region("maincpu")->bytes();
 	return &rom[address];
 }
 
@@ -1647,10 +1647,10 @@ static void apple2gs_setup_memory(running_machine *machine)
 	memory_set_bankptr(machine,"bank2", state->slowmem);
 
 	/* install alternate ROM bank */
-	begin = 0x1000000 - memory_region_length(machine, "maincpu");
+	begin = 0x1000000 - machine->region("maincpu")->bytes();
 	end = 0xffffff;
 	memory_install_read_bank(space, begin, end, 0, 0, "bank3");
-	memory_set_bankptr(machine,"bank3", memory_region(machine, "maincpu"));
+	memory_set_bankptr(machine,"bank3", machine->region("maincpu")->base());
 
 	/* install new xxC000-xxCFFF handlers */
 	memory_install_read8_handler(space, 0x00c000, 0x00cfff, 0, 0, apple2gs_00Cxxx_r);

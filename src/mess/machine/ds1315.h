@@ -26,8 +26,8 @@ DECLARE_LEGACY_DEVICE(DS1315, ds1315);
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MDRV_DS1315_ADD(_tag) \
-	MDRV_DEVICE_ADD(_tag, DS1315, 0)
+#define MCFG_DS1315_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, DS1315, 0)
 
 
 /***************************************************************************

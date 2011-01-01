@@ -18,7 +18,7 @@ DRIVER_INIT(mikro80)
 {
 	mikro80_state *state = machine->driver_data<mikro80_state>();
 	/* set initialy ROM to be visible on first bank */
-	UINT8 *RAM = memory_region(machine, "maincpu");
+	UINT8 *RAM = machine->region("maincpu")->base();
 	memset(RAM,0x0000,0x0800); // make frist page empty by default
 	memory_configure_bank(machine, "bank1", 1, 2, RAM, 0x0000);
 	memory_configure_bank(machine, "bank1", 0, 2, RAM, 0xf800);

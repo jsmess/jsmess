@@ -69,23 +69,23 @@ static GENERIC_TERMINAL_INTERFACE( horizon_terminal_intf )
 
 static MACHINE_CONFIG_START( horizon, horizon_state )
     /* basic machine hardware */
-    MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz)
-    MDRV_CPU_PROGRAM_MAP(horizon_mem)
-    MDRV_CPU_IO_MAP(horizon_io)
+    MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
+    MCFG_CPU_PROGRAM_MAP(horizon_mem)
+    MCFG_CPU_IO_MAP(horizon_io)
 
-    MDRV_MACHINE_RESET(horizon)
+    MCFG_MACHINE_RESET(horizon)
 
     /* video hardware */
-    MDRV_FRAGMENT_ADD( generic_terminal )
-	MDRV_GENERIC_TERMINAL_ADD(TERMINAL_TAG,horizon_terminal_intf)
+    MCFG_FRAGMENT_ADD( generic_terminal )
+	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG,horizon_terminal_intf)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( horizsd, horizon )
-	MDRV_CPU_MODIFY( "maincpu" )
-	MDRV_CPU_PROGRAM_MAP( horizon_sd_mem)
-    MDRV_CPU_IO_MAP(horizon_sd_io)
+	MCFG_CPU_MODIFY( "maincpu" )
+	MCFG_CPU_PROGRAM_MAP( horizon_sd_mem)
+    MCFG_CPU_IO_MAP(horizon_sd_io)
 
-    MDRV_MACHINE_RESET(horizon_sd)
+    MCFG_MACHINE_RESET(horizon_sd)
 MACHINE_CONFIG_END
 
 /* ROM definition */

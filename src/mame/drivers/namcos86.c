@@ -184,18 +184,18 @@ TODO:
 
 static WRITE8_HANDLER( bankswitch1_w )
 {
-	UINT8 *base = memory_region(space->machine, "cpu1") + 0x10000;
+	UINT8 *base = space->machine->region("cpu1")->base() + 0x10000;
 
 	/* if the ROM expansion module is available, don't do anything. This avoids conflict */
 	/* with bankswitch1_ext_w() in wndrmomo */
-	if (memory_region(space->machine, "user1")) return;
+	if (space->machine->region("user1")->base()) return;
 
 	memory_set_bankptr(space->machine, "bank1",base + ((data & 0x03) * 0x2000));
 }
 
 static WRITE8_HANDLER( bankswitch1_ext_w )
 {
-	UINT8 *base = memory_region(space->machine, "user1");
+	UINT8 *base = space->machine->region("user1")->base();
 
 	if (base == 0) return;
 
@@ -204,7 +204,7 @@ static WRITE8_HANDLER( bankswitch1_ext_w )
 
 static WRITE8_HANDLER( bankswitch2_w )
 {
-	UINT8 *base = memory_region(space->machine, "cpu2") + 0x10000;
+	UINT8 *base = space->machine->region("cpu2")->base() + 0x10000;
 
 	memory_set_bankptr(space->machine, "bank2",base + ((data & 0x03) * 0x2000));
 }
@@ -296,7 +296,7 @@ static WRITE8_HANDLER( namcos86_led_w )
 static WRITE8_HANDLER( cus115_w )
 {
 	/* make sure the expansion board is present */
-	if (!memory_region(space->machine, "user1"))
+	if (!space->machine->region("user1")->base())
 	{
 		popmessage("expansion board not present");
 		return;
@@ -326,7 +326,7 @@ static WRITE8_HANDLER( cus115_w )
 
 static MACHINE_RESET( namco86 )
 {
-	UINT8 *base = memory_region(machine, "cpu1") + 0x10000;
+	UINT8 *base = machine->region("cpu1")->base() + 0x10000;
 
 	memory_set_bankptr(machine, "bank1",base);
 }
@@ -997,116 +997,116 @@ static const namco_interface namco_config =
 static MACHINE_CONFIG_START( hopmappy, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("cpu1", M6809, 49152000/32)
-	MDRV_CPU_PROGRAM_MAP(cpu1_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_assert)
+	MCFG_CPU_ADD("cpu1", M6809, 49152000/32)
+	MCFG_CPU_PROGRAM_MAP(cpu1_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_assert)
 
-	MDRV_CPU_ADD("cpu2", M6809, 49152000/32)
-	MDRV_CPU_PROGRAM_MAP(hopmappy_cpu2_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_assert)
+	MCFG_CPU_ADD("cpu2", M6809, 49152000/32)
+	MCFG_CPU_PROGRAM_MAP(hopmappy_cpu2_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_assert)
 
-	MDRV_CPU_ADD("mcu", HD63701, 49152000/8)	/* or compatible 6808 with extra instructions */
-	MDRV_CPU_PROGRAM_MAP(hopmappy_mcu_map)
-	MDRV_CPU_IO_MAP(mcu_port_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)	/* ??? */
+	MCFG_CPU_ADD("mcu", HD63701, 49152000/8)	/* or compatible 6808 with extra instructions */
+	MCFG_CPU_PROGRAM_MAP(hopmappy_mcu_map)
+	MCFG_CPU_IO_MAP(mcu_port_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)	/* ??? */
 
-	MDRV_QUANTUM_TIME(HZ(48000))	/* heavy interleaving needed to avoid hangs in rthunder */
+	MCFG_QUANTUM_TIME(HZ(48000))	/* heavy interleaving needed to avoid hangs in rthunder */
 
-	MDRV_MACHINE_RESET(namco86)
+	MCFG_MACHINE_RESET(namco86)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60.606060)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(3 + 8*8, 3 + 44*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60.606060)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(3 + 8*8, 3 + 44*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(namcos86)
-	MDRV_PALETTE_LENGTH(4096)
+	MCFG_GFXDECODE(namcos86)
+	MCFG_PALETTE_LENGTH(4096)
 
-	MDRV_PALETTE_INIT(namcos86)
-	MDRV_VIDEO_START(namcos86)
-	MDRV_VIDEO_UPDATE(namcos86)
-	MDRV_VIDEO_EOF(namcos86)
+	MCFG_PALETTE_INIT(namcos86)
+	MCFG_VIDEO_START(namcos86)
+	MCFG_VIDEO_UPDATE(namcos86)
+	MCFG_VIDEO_EOF(namcos86)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM2151, 3579580)
-	MDRV_SOUND_ROUTE(0, "mono", 0.0)
-	MDRV_SOUND_ROUTE(1, "mono", 0.60)	/* only right channel is connected */
+	MCFG_SOUND_ADD("ymsnd", YM2151, 3579580)
+	MCFG_SOUND_ROUTE(0, "mono", 0.0)
+	MCFG_SOUND_ROUTE(1, "mono", 0.60)	/* only right channel is connected */
 
-	MDRV_SOUND_ADD("namco", NAMCO_CUS30, 49152000/2048)
-	MDRV_SOUND_CONFIG(namco_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("namco", NAMCO_CUS30, 49152000/2048)
+	MCFG_SOUND_CONFIG(namco_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( skykiddx, hopmappy )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("cpu2")
-	MDRV_CPU_PROGRAM_MAP(skykiddx_cpu2_map)
+	MCFG_CPU_MODIFY("cpu2")
+	MCFG_CPU_PROGRAM_MAP(skykiddx_cpu2_map)
 
-	MDRV_CPU_MODIFY("mcu")
-	MDRV_CPU_PROGRAM_MAP(skykiddx_mcu_map)
+	MCFG_CPU_MODIFY("mcu")
+	MCFG_CPU_PROGRAM_MAP(skykiddx_mcu_map)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( roishtar, hopmappy )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("cpu2")
-	MDRV_CPU_PROGRAM_MAP(roishtar_cpu2_map)
+	MCFG_CPU_MODIFY("cpu2")
+	MCFG_CPU_PROGRAM_MAP(roishtar_cpu2_map)
 
-	MDRV_CPU_MODIFY("mcu")
-	MDRV_CPU_PROGRAM_MAP(roishtar_mcu_map)
+	MCFG_CPU_MODIFY("mcu")
+	MCFG_CPU_PROGRAM_MAP(roishtar_mcu_map)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( genpeitd, hopmappy )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("cpu2")
-	MDRV_CPU_PROGRAM_MAP(genpeitd_cpu2_map)
+	MCFG_CPU_MODIFY("cpu2")
+	MCFG_CPU_PROGRAM_MAP(genpeitd_cpu2_map)
 
-	MDRV_CPU_MODIFY("mcu")
-	MDRV_CPU_PROGRAM_MAP(genpeitd_mcu_map)
+	MCFG_CPU_MODIFY("mcu")
+	MCFG_CPU_PROGRAM_MAP(genpeitd_mcu_map)
 
 	/* sound hardware */
-	MDRV_SOUND_ADD("namco2", NAMCO_63701X, 6000000)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("namco2", NAMCO_63701X, 6000000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( rthunder, hopmappy )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("cpu2")
-	MDRV_CPU_PROGRAM_MAP(rthunder_cpu2_map)
+	MCFG_CPU_MODIFY("cpu2")
+	MCFG_CPU_PROGRAM_MAP(rthunder_cpu2_map)
 
-	MDRV_CPU_MODIFY("mcu")
-	MDRV_CPU_PROGRAM_MAP(rthunder_mcu_map)
+	MCFG_CPU_MODIFY("mcu")
+	MCFG_CPU_PROGRAM_MAP(rthunder_mcu_map)
 
 	/* sound hardware */
-	MDRV_SOUND_ADD("namco2", NAMCO_63701X, 6000000)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("namco2", NAMCO_63701X, 6000000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( wndrmomo, hopmappy )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("cpu2")
-	MDRV_CPU_PROGRAM_MAP(wndrmomo_cpu2_map)
+	MCFG_CPU_MODIFY("cpu2")
+	MCFG_CPU_PROGRAM_MAP(wndrmomo_cpu2_map)
 
-	MDRV_CPU_MODIFY("mcu")
-	MDRV_CPU_PROGRAM_MAP(wndrmomo_mcu_map)
+	MCFG_CPU_MODIFY("mcu")
+	MCFG_CPU_PROGRAM_MAP(wndrmomo_mcu_map)
 
 	/* sound hardware */
-	MDRV_SOUND_ADD("namco2", NAMCO_63701X, 6000000)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("namco2", NAMCO_63701X, 6000000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -1479,8 +1479,8 @@ static DRIVER_INIT( namco86 )
 	UINT8 *buffer;
 
 	/* shuffle tile ROMs so regular gfx unpack routines can be used */
-	gfx = memory_region(machine, "gfx1");
-	size = memory_region_length(machine, "gfx1") * 2 / 3;
+	gfx = machine->region("gfx1")->base();
+	size = machine->region("gfx1")->bytes() * 2 / 3;
 	buffer = auto_alloc_array(machine, UINT8,  size );
 
 	{
@@ -1504,8 +1504,8 @@ static DRIVER_INIT( namco86 )
 		auto_free( machine, buffer );
 	}
 
-	gfx = memory_region(machine, "gfx2");
-	size = memory_region_length(machine, "gfx2") * 2 / 3;
+	gfx = machine->region("gfx2")->base();
+	size = machine->region("gfx2")->bytes() * 2 / 3;
 	buffer = auto_alloc_array(machine, UINT8,  size );
 
 	{

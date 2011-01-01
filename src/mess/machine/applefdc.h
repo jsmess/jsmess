@@ -41,12 +41,12 @@ DECLARE_LEGACY_DEVICE(SWIM, swim);
 typedef struct _applefdc_interface applefdc_interface;
 struct _applefdc_interface
 {
-	void (*set_lines)(running_device *device, UINT8 lines);
-	void (*set_enable_lines)(running_device *device, int enable_mask);
+	void (*set_lines)(device_t *device, UINT8 lines);
+	void (*set_enable_lines)(device_t *device, int enable_mask);
 
-	UINT8 (*read_data)(running_device *device);
-	void (*write_data)(running_device *device, UINT8 data);
-	int (*read_status)(running_device *device);
+	UINT8 (*read_data)(device_t *device);
+	void (*write_data)(device_t *device, UINT8 data);
+	int (*read_status)(device_t *device);
 };
 
 
@@ -59,35 +59,35 @@ READ8_DEVICE_HANDLER(applefdc_r);
 WRITE8_DEVICE_HANDLER(applefdc_w);
 
 /* accessor */
-UINT8 applefdc_get_lines(running_device *device);
+UINT8 applefdc_get_lines(device_t *device);
 
 /***************************************************************************
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MDRV_APPLEFDC_ADD(_tag, _intrf) \
-	MDRV_DEVICE_ADD(_tag, APPLEFDC, 0) \
-	MDRV_DEVICE_CONFIG(_intrf)
+#define MCFG_APPLEFDC_ADD(_tag, _intrf) \
+	MCFG_DEVICE_ADD(_tag, APPLEFDC, 0) \
+	MCFG_DEVICE_CONFIG(_intrf)
 
-#define MDRV_APPLEFDC_MODIFY(_tag, _intrf) \
-  MDRV_DEVICE_MODIFY(_tag)	      \
-  MDRV_DEVICE_CONFIG(_intrf)
+#define MCFG_APPLEFDC_MODIFY(_tag, _intrf) \
+  MCFG_DEVICE_MODIFY(_tag)	      \
+  MCFG_DEVICE_CONFIG(_intrf)
 
-#define MDRV_IWM_ADD(_tag, _intrf) \
-	MDRV_DEVICE_ADD(_tag, IWM, 0) \
-	MDRV_DEVICE_CONFIG(_intrf)
+#define MCFG_IWM_ADD(_tag, _intrf) \
+	MCFG_DEVICE_ADD(_tag, IWM, 0) \
+	MCFG_DEVICE_CONFIG(_intrf)
 
-#define MDRV_IWM_MODIFY(_tag, _intrf) \
-  MDRV_DEVICE_MODIFY(_tag)	      \
-  MDRV_DEVICE_CONFIG(_intrf)
+#define MCFG_IWM_MODIFY(_tag, _intrf) \
+  MCFG_DEVICE_MODIFY(_tag)	      \
+  MCFG_DEVICE_CONFIG(_intrf)
 
-#define MDRV_SWIM_ADD(_tag, _intrf) \
-	MDRV_DEVICE_ADD(_tag, SWIM, 0) \
-	MDRV_DEVICE_CONFIG(_intrf)
+#define MCFG_SWIM_ADD(_tag, _intrf) \
+	MCFG_DEVICE_ADD(_tag, SWIM, 0) \
+	MCFG_DEVICE_CONFIG(_intrf)
 
-#define MDRV_SWIM_MODIFY(_tag, _intrf) \
-  MDRV_DEVICE_MODIFY(_tag)	      \
-  MDRV_DEVICE_CONFIG(_intrf)
+#define MCFG_SWIM_MODIFY(_tag, _intrf) \
+  MCFG_DEVICE_MODIFY(_tag)	      \
+  MCFG_DEVICE_CONFIG(_intrf)
 
 
 #endif /* __APPLEFDC_H__ */

@@ -37,7 +37,7 @@ typedef struct _ti99_handset_state
 	UINT8		previous_key[MAX_HANDSETS];
 
 	emu_timer		*timer;
-	running_device	*console9901;
+	device_t	*console9901;
 
 } ti99_handset_state;
 
@@ -49,13 +49,13 @@ static const char *const joynames[2][4] =
 
 static const char *const keynames[] = { "KP0", "KP1", "KP2", "KP3", "KP4" };
 
-INLINE ti99_handset_state *get_safe_token(running_device *device)
+INLINE ti99_handset_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	return (ti99_handset_state *)downcast<legacy_device_base *>(device)->token();
 }
 
-INLINE const ti99_handset_config *get_config(running_device *device)
+INLINE const ti99_handset_config *get_config(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == HANDSET);
@@ -70,19 +70,19 @@ INLINE const ti99_handset_config *get_config(running_device *device)
     Poll the current state of the 4-bit data bus that goes from the I/R
     receiver to the tms9901.
 */
-int ti99_handset_poll_bus(running_device *device)
+int ti99_handset_poll_bus(device_t *device)
 {
 	ti99_handset_state *handset = get_safe_token(device);
 	return (handset->buf & 0xf);
 }
 
-int ti99_handset_get_clock(running_device *device)
+int ti99_handset_get_clock(device_t *device)
 {
 	ti99_handset_state *handset = get_safe_token(device);
 	return handset->clock;
 }
 
-int ti99_handset_get_int(running_device *device)
+int ti99_handset_get_int(device_t *device)
 {
 	ti99_handset_state *handset = get_safe_token(device);
 	return handset->buflen==3;
@@ -98,7 +98,7 @@ int ti99_handset_get_int(running_device *device)
 */
 static TIMER_CALLBACK(ti99_handset_ack_callback)
 {
-	running_device *device = (running_device *)ptr;
+	device_t *device = (device_t *)ptr;
 	ti99_handset_state *handset = get_safe_token(device);
 
 	handset->clock = !handset->clock;
@@ -126,7 +126,7 @@ static TIMER_CALLBACK(ti99_handset_ack_callback)
     ti99_handset_set_ack()
     Handler for tms9901 P0 pin (handset data acknowledge)
 */
-void ti99_handset_set_acknowledge(running_device *device, UINT8 data)
+void ti99_handset_set_acknowledge(device_t *device, UINT8 data)
 {
 	ti99_handset_state *handset = get_safe_token(device);
 	if (handset->buflen && (data != handset->ack))
@@ -147,7 +147,7 @@ void ti99_handset_set_acknowledge(running_device *device, UINT8 data)
 
     message: 12-bit message to post (only the 12 LSBits are meaningful)
 */
-static void ti99_handset_post_message(running_device *device, int message)
+static void ti99_handset_post_message(device_t *device, int message)
 {
 	ti99_handset_state *handset = get_safe_token(device);
 	/* post message and assert interrupt */
@@ -164,7 +164,7 @@ static void ti99_handset_post_message(running_device *device, int message)
     num: number of the keypad to poll (0-3)
     Returns TRUE if the handset state has changed and a message was posted.
 */
-static int ti99_handset_poll_keyboard(running_device *device, int num)
+static int ti99_handset_poll_keyboard(device_t *device, int num)
 {
 	ti99_handset_state *handset = get_safe_token(device);
 	UINT32 key_buf;
@@ -239,7 +239,7 @@ static int ti99_handset_poll_keyboard(running_device *device, int num)
     num: number of the joystick to poll (0-3)
     Returns TRUE if the handset state has changed and a message was posted.
 */
-static int ti99_handset_poll_joystick(running_device *device, int num)
+static int ti99_handset_poll_joystick(device_t *device, int num)
 {
 	ti99_handset_state *handset = get_safe_token(device);
 
@@ -306,7 +306,7 @@ static int ti99_handset_poll_joystick(running_device *device, int num)
     ti99_handset_task()
     Manage handsets, posting an event if the state of any handset has changed.
 */
-void ti99_handset_task(running_device *device)
+void ti99_handset_task(device_t *device)
 {
 	int i;
 	ti99_handset_state *handset = get_safe_token(device);

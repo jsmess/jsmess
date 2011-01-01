@@ -59,7 +59,7 @@ static MACHINE_RESET(sm1800)
 
 static VIDEO_UPDATE( sm1800 )
 {
-	running_device *devconf = screen->machine->device("i8275");
+	device_t *devconf = screen->machine->device("i8275");
 	i8275_update( devconf, bitmap, cliprect);
 	VIDEO_UPDATE_CALL ( generic_bitmapped );
 	return 0;
@@ -77,7 +77,7 @@ I8275_DISPLAY_PIXELS(sm1800_display_pixels)
 {
 	int i;
 	bitmap_t *bitmap = device->machine->generic.tmpbitmap;
-	UINT8 *charmap = memory_region(device->machine, "gfx1");
+	UINT8 *charmap = device->machine->region("gfx1")->base();
 	UINT8 pixels = charmap[(linecount & 7) + (charcode << 3)] ^ 0xff;
 	if (vsp) {
 		pixels = 0;
@@ -142,28 +142,28 @@ static PALETTE_INIT( sm1800 )
 
 static MACHINE_CONFIG_START( sm1800, sm1800_state )
     /* basic machine hardware */
-    MDRV_CPU_ADD("maincpu",I8080, XTAL_2MHz)
-    MDRV_CPU_PROGRAM_MAP(sm1800_mem)
-    MDRV_CPU_IO_MAP(sm1800_io)	
-	MDRV_CPU_VBLANK_INT("screen", sm1800_vblank_interrupt)
+    MCFG_CPU_ADD("maincpu",I8080, XTAL_2MHz)
+    MCFG_CPU_PROGRAM_MAP(sm1800_mem)
+    MCFG_CPU_IO_MAP(sm1800_io)	
+	MCFG_CPU_VBLANK_INT("screen", sm1800_vblank_interrupt)
 	
-    MDRV_MACHINE_RESET(sm1800)
+    MCFG_MACHINE_RESET(sm1800)
 	
-	MDRV_I8255A_ADD ("i8255", sm1800_ppi8255_interface )
-	MDRV_I8275_ADD	("i8275", sm1800_i8275_interface)
-	MDRV_MSM8251_ADD("i8251", default_msm8251_interface)
+	MCFG_I8255A_ADD ("i8255", sm1800_ppi8255_interface )
+	MCFG_I8275_ADD	("i8275", sm1800_i8275_interface)
+	MCFG_MSM8251_ADD("i8251", default_msm8251_interface)
     /* video hardware */
-    MDRV_SCREEN_ADD("screen", RASTER)
-    MDRV_SCREEN_REFRESH_RATE(50)
-    MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-    MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-    MDRV_SCREEN_SIZE(640, 480)
-    MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-    MDRV_PALETTE_LENGTH(3)
-    MDRV_PALETTE_INIT(sm1800)
+    MCFG_SCREEN_ADD("screen", RASTER)
+    MCFG_SCREEN_REFRESH_RATE(50)
+    MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+    MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+    MCFG_SCREEN_SIZE(640, 480)
+    MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+    MCFG_PALETTE_LENGTH(3)
+    MCFG_PALETTE_INIT(sm1800)
 
-    MDRV_VIDEO_START(generic_bitmapped)
-    MDRV_VIDEO_UPDATE(sm1800)
+    MCFG_VIDEO_START(generic_bitmapped)
+    MCFG_VIDEO_UPDATE(sm1800)
 MACHINE_CONFIG_END
 
 /* ROM definition */

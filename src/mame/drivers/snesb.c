@@ -500,37 +500,37 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( kinstb, snes_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", _5A22, 3580000*6)	/* 2.68Mhz, also 3.58Mhz */
-	MDRV_CPU_PROGRAM_MAP(snesb_map)
+	MCFG_CPU_ADD("maincpu", _5A22, 3580000*6)	/* 2.68Mhz, also 3.58Mhz */
+	MCFG_CPU_PROGRAM_MAP(snesb_map)
 
 	/* audio CPU */
-	MDRV_CPU_ADD("soundcpu", SPC700, 2048000/2)	/* 2.048 Mhz, but internal divider */
-	MDRV_CPU_PROGRAM_MAP(spc_mem)
+	MCFG_CPU_ADD("soundcpu", SPC700, 2048000/2)	/* 2.048 Mhz, but internal divider */
+	MCFG_CPU_PROGRAM_MAP(spc_mem)
 
-	MDRV_QUANTUM_PERFECT_CPU("maincpu")
+	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	MDRV_MACHINE_START( snes )
-	MDRV_MACHINE_RESET( snes )
+	MCFG_MACHINE_START( snes )
+	MCFG_MACHINE_RESET( snes )
 
 	/* video hardware */
-	MDRV_VIDEO_START( snes )
-	MDRV_VIDEO_UPDATE( snes )
+	MCFG_VIDEO_START( snes )
+	MCFG_VIDEO_UPDATE( snes )
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_RAW_PARAMS(DOTCLK_NTSC, SNES_HTOTAL, 0, SNES_SCR_WIDTH, SNES_VTOTAL_NTSC, 0, SNES_SCR_HEIGHT_NTSC)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_RAW_PARAMS(DOTCLK_NTSC, SNES_HTOTAL, 0, SNES_SCR_WIDTH, SNES_VTOTAL_NTSC, 0, SNES_SCR_HEIGHT_NTSC)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MDRV_SOUND_ADD("spc700", SNES, 0)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 1.00)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 1.00)
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SOUND_ADD("spc700", SNES, 0)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
 MACHINE_CONFIG_END
 
 static DRIVER_INIT(kinstb)
 {
 	INT32 i;
-	UINT8 *rom = memory_region(machine, "user3");
+	UINT8 *rom = machine->region("user3")->base();
 
 	for (i = 0; i < 0x400000; i++)
 	{
@@ -546,7 +546,7 @@ static DRIVER_INIT(kinstb)
 static DRIVER_INIT( ffight2b )
 {
 	INT32 i;
-	UINT8 *rom = memory_region(machine, "user3");
+	UINT8 *rom = machine->region("user3")->base();
 
 	for(i = 0; i < 0x200000; i++)
 	{
@@ -605,8 +605,8 @@ static const UINT8  address_substitution_high[] =
 static DRIVER_INIT( sblast2b )
 {
 	int i, cipherText, plainText, newAddress;
-	UINT8 *src = memory_region(machine, "user7");
-	UINT8 *dst = memory_region(machine, "user3");
+	UINT8 *src = machine->region("user7")->base();
+	UINT8 *dst = machine->region("user3")->base();
 
 	for (i =0; i < 0x80000 * 3; i++)
 	{
@@ -654,7 +654,7 @@ static DRIVER_INIT( sblast2b )
 static DRIVER_INIT( iron )
 {
 	INT32 i;
-	UINT8 *rom = memory_region(machine, "user3");
+	UINT8 *rom = machine->region("user3")->base();
 
 	for (i = 0; i < 0x140000; i++)
 	{
@@ -679,7 +679,7 @@ static DRIVER_INIT( iron )
 static DRIVER_INIT( endless )
 {
 	INT32 i;
-	UINT8 *rom = memory_region(machine, "user3");
+	UINT8 *rom = machine->region("user3")->base();
 
 	/* there is more to this, 0x800 based block swaps? */
 	for (i = 0; i < 0x200000; i++)
@@ -692,7 +692,7 @@ static DRIVER_INIT( endless )
 
 static DRIVER_INIT( denseib )
 {
-	UINT8 *rom = memory_region(machine, "user3");
+	UINT8 *rom = machine->region("user3")->base();
 	INT32 i;
 
 	for (i = 0; i < 0x200000; i++)

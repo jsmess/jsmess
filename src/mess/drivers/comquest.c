@@ -205,7 +205,7 @@ GFXDECODE_END
 
 static MACHINE_RESET( comquest )
 {
-//  UINT8 *mem=memory_region(machine, "user1");
+//  UINT8 *mem=machine->region("user1")->base();
 //  memory_set_bankptr(machine, 1,mem+0x00000);
 }
 
@@ -214,9 +214,9 @@ static const UINT32 amask= 0xffff;
 
 static MACHINE_CONFIG_START( comquest, comquest_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6805, 4000000)		/* 4000000? */
-	/*MDRV_CPU_ADD("maincpu", HD63705, 4000000)    instruction set looks like m6805/m6808 */
-	/*MDRV_CPU_ADD("maincpu", M68705, 4000000) instruction set looks like m6805/m6808 */
+	MCFG_CPU_ADD("maincpu", M6805, 4000000)		/* 4000000? */
+	/*MCFG_CPU_ADD("maincpu", HD63705, 4000000)    instruction set looks like m6805/m6808 */
+	/*MCFG_CPU_ADD("maincpu", M68705, 4000000) instruction set looks like m6805/m6808 */
 
 /*
     8 bit bus, integrated io, serial io?,
@@ -242,24 +242,24 @@ static MACHINE_CONFIG_START( comquest, comquest_state )
     not epson e0c88
 */
 
-	MDRV_CPU_PROGRAM_MAP(comquest_mem)
-	MDRV_CPU_CONFIG( amask )
+	MCFG_CPU_PROGRAM_MAP(comquest_mem)
+	MCFG_CPU_CONFIG( amask )
 
-	MDRV_MACHINE_RESET( comquest )
+	MCFG_MACHINE_RESET( comquest )
 
     /* video hardware */
-	MDRV_SCREEN_ADD("screen", LCD)
-	MDRV_SCREEN_REFRESH_RATE(LCD_FRAMES_PER_SECOND)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*4, 128)	/* 160 x 102 */
-	MDRV_SCREEN_VISIBLE_AREA(0, 64*4-1, 0, 128-1)
-	MDRV_GFXDECODE( comquest )
-	MDRV_PALETTE_LENGTH(2)
-	MDRV_PALETTE_INIT(black_and_white)
+	MCFG_SCREEN_ADD("screen", LCD)
+	MCFG_SCREEN_REFRESH_RATE(LCD_FRAMES_PER_SECOND)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(64*4, 128)	/* 160 x 102 */
+	MCFG_SCREEN_VISIBLE_AREA(0, 64*4-1, 0, 128-1)
+	MCFG_GFXDECODE( comquest )
+	MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_INIT(black_and_white)
 
-	MDRV_VIDEO_START( comquest )
-	MDRV_VIDEO_UPDATE( comquest )
+	MCFG_VIDEO_START( comquest )
+	MCFG_VIDEO_UPDATE( comquest )
 
 	/* sound hardware */
 	/* unknown ? */

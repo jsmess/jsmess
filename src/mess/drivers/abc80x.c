@@ -513,7 +513,7 @@ void abc800_state::bankswitch()
 	else
 	{
 		// BASIC ROM selected
-		memory_install_rom(program, 0x0000, 0x3fff, 0, 0, memory_region(machine, Z80_TAG));
+		memory_install_rom(program, 0x0000, 0x3fff, 0, 0, machine->region(Z80_TAG)->base());
 	}
 }
 
@@ -529,7 +529,7 @@ void abc802_state::bankswitch()
 	if (m_lrs)
 	{
 		// ROM and video RAM selected
-		memory_install_rom(program, 0x0000, 0x77ff, 0, 0, memory_region(machine, Z80_TAG));
+		memory_install_rom(program, 0x0000, 0x77ff, 0, 0, machine->region(Z80_TAG)->base());
 		memory_install_ram(program, 0x7800, 0x7fff, 0, 0, m_char_ram);
 	}
 	else
@@ -1223,7 +1223,7 @@ static ABC77_INTERFACE( abc800_abc77_intf )
 
 static TIMER_DEVICE_CALLBACK( ctc_tick )
 {
-	running_device *z80ctc = timer.machine->device(Z80CTC_TAG);
+	device_t *z80ctc = timer.machine->device(Z80CTC_TAG);
 
 	z80ctc_trg0_w(z80ctc, 1);
 	z80ctc_trg0_w(z80ctc, 0);
@@ -1238,7 +1238,7 @@ static TIMER_DEVICE_CALLBACK( ctc_tick )
 static WRITE_LINE_DEVICE_HANDLER( ctc_z0_w )
 {
 	abc800_state *drvstate = device->machine->driver_data<abc800_state>();
-	running_device *sio = device->machine->device(Z80SIO_TAG);
+	device_t *sio = device->machine->device(Z80SIO_TAG);
 
 
 	UINT8 sb = input_port_read(device->machine, "SB");
@@ -1261,7 +1261,7 @@ static WRITE_LINE_DEVICE_HANDLER( ctc_z0_w )
 
 static WRITE_LINE_DEVICE_HANDLER( ctc_z1_w )
 {
-	running_device *sio = device->machine->device(Z80SIO_TAG);
+	device_t *sio = device->machine->device(Z80SIO_TAG);
 
 	UINT8 sb = input_port_read(device->machine, "SB");
 
@@ -1281,7 +1281,7 @@ static WRITE_LINE_DEVICE_HANDLER( ctc_z1_w )
 
 static WRITE_LINE_DEVICE_HANDLER( ctc_z2_w )
 {
-	running_device *m_dart = device->machine->device(Z80DART_TAG);
+	device_t *m_dart = device->machine->device(Z80DART_TAG);
 
 	// connected to DART channel A clock inputs
 	z80dart_rxca_w(m_dart, state);
@@ -1559,7 +1559,7 @@ void abc802_state::machine_reset()
 
 void abc806_state::machine_start()
 {
-	UINT8 *mem = memory_region(machine, Z80_TAG);
+	UINT8 *mem = machine->region(Z80_TAG)->base();
 	UINT32 videoram_size = messram_get_size(m_ram) - (32 * 1024);
 	int bank;
 	char bank_name[10];
@@ -1628,40 +1628,40 @@ void abc806_state::machine_reset()
 
 static MACHINE_CONFIG_START( abc800c, abc800c_state )
 	// basic machine hardware
-	MDRV_CPU_ADD(Z80_TAG, Z80, ABC800_X01/2/2)
-	MDRV_CPU_CONFIG(abc800_daisy_chain)
-	MDRV_CPU_PROGRAM_MAP(abc800c_mem)
-	MDRV_CPU_IO_MAP(abc800c_io)
+	MCFG_CPU_ADD(Z80_TAG, Z80, ABC800_X01/2/2)
+	MCFG_CPU_CONFIG(abc800_daisy_chain)
+	MCFG_CPU_PROGRAM_MAP(abc800c_mem)
+	MCFG_CPU_IO_MAP(abc800c_io)
 
-	MDRV_CPU_ADD(I8048_TAG, I8048, XTAL_5_9904MHz)
-	MDRV_CPU_IO_MAP(abc800_keyboard_io)
+	MCFG_CPU_ADD(I8048_TAG, I8048, XTAL_5_9904MHz)
+	MCFG_CPU_IO_MAP(abc800_keyboard_io)
 
 	// video hardware
-	MDRV_FRAGMENT_ADD(abc800c_video)
+	MCFG_FRAGMENT_ADD(abc800c_video)
 
 	// sound hardware
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
-	MDRV_SOUND_CONFIG_DISCRETE(abc800)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
+	MCFG_SOUND_CONFIG_DISCRETE(abc800)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	// peripheral hardware
-	MDRV_Z80CTC_ADD(Z80CTC_TAG, ABC800_X01/2/2, ctc_intf)
-	MDRV_TIMER_ADD_PERIODIC("ctc", ctc_tick, HZ(ABC800_X01/2/2/2))
-	MDRV_Z80SIO2_ADD(Z80SIO_TAG, ABC800_X01/2/2, sio_intf)
-	MDRV_Z80DART_ADD(Z80DART_TAG, ABC800_X01/2/2, abc800_dart_intf)
-	MDRV_PRINTER_ADD("printer")
-	MDRV_CASSETTE_ADD(CASSETTE_TAG, abc800_cassette_config)
-	MDRV_TIMER_ADD_PERIODIC("keyboard_t1", keyboard_t1_tick, HZ(XTAL_5_9904MHz/(3*5)/20)) // TODO correct frequency?
+	MCFG_Z80CTC_ADD(Z80CTC_TAG, ABC800_X01/2/2, ctc_intf)
+	MCFG_TIMER_ADD_PERIODIC("ctc", ctc_tick, HZ(ABC800_X01/2/2/2))
+	MCFG_Z80SIO2_ADD(Z80SIO_TAG, ABC800_X01/2/2, sio_intf)
+	MCFG_Z80DART_ADD(Z80DART_TAG, ABC800_X01/2/2, abc800_dart_intf)
+	MCFG_PRINTER_ADD("printer")
+	MCFG_CASSETTE_ADD(CASSETTE_TAG, abc800_cassette_config)
+	MCFG_TIMER_ADD_PERIODIC("keyboard_t1", keyboard_t1_tick, HZ(XTAL_5_9904MHz/(3*5)/20)) // TODO correct frequency?
 
 	// ABC bus
-	MDRV_ABCBUS_ADD(ABCBUS_TAG, abcbus_daisy, Z80_TAG)
-	MDRV_ABC830_ADD("luxor_55_21046", ABCBUS_TAG, DRIVE_BASF_6106_08)
+	MCFG_ABCBUS_ADD(ABCBUS_TAG, abcbus_daisy, Z80_TAG)
+	MCFG_ABC830_ADD("luxor_55_21046", ABCBUS_TAG, DRIVE_BASF_6106_08)
 
 	// internal ram
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("16K")
-	MDRV_RAM_EXTRA_OPTIONS("32K")
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("16K")
+	MCFG_RAM_EXTRA_OPTIONS("32K")
 MACHINE_CONFIG_END
 
 
@@ -1671,40 +1671,40 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( abc800m, abc800m_state )
 	// basic machine hardware
-	MDRV_CPU_ADD(Z80_TAG, Z80, ABC800_X01/2/2)
-	MDRV_CPU_CONFIG(abc800_daisy_chain)
-	MDRV_CPU_PROGRAM_MAP(abc800m_mem)
-	MDRV_CPU_IO_MAP(abc800m_io)
+	MCFG_CPU_ADD(Z80_TAG, Z80, ABC800_X01/2/2)
+	MCFG_CPU_CONFIG(abc800_daisy_chain)
+	MCFG_CPU_PROGRAM_MAP(abc800m_mem)
+	MCFG_CPU_IO_MAP(abc800m_io)
 	
-	MDRV_CPU_ADD(I8048_TAG, I8048, XTAL_5_9904MHz)
-	MDRV_CPU_IO_MAP(abc800_keyboard_io)
+	MCFG_CPU_ADD(I8048_TAG, I8048, XTAL_5_9904MHz)
+	MCFG_CPU_IO_MAP(abc800_keyboard_io)
 
 	// video hardware
-	MDRV_FRAGMENT_ADD(abc800m_video)
+	MCFG_FRAGMENT_ADD(abc800m_video)
 
 	// sound hardware
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
-	MDRV_SOUND_CONFIG_DISCRETE(abc800)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
+	MCFG_SOUND_CONFIG_DISCRETE(abc800)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	// peripheral hardware
-	MDRV_Z80CTC_ADD(Z80CTC_TAG, ABC800_X01/2/2, ctc_intf)
-	MDRV_TIMER_ADD_PERIODIC("ctc", ctc_tick, HZ(ABC800_X01/2/2/2))
-	MDRV_Z80SIO2_ADD(Z80SIO_TAG, ABC800_X01/2/2, sio_intf)
-	MDRV_Z80DART_ADD(Z80DART_TAG, ABC800_X01/2/2, abc800_dart_intf)
-	MDRV_PRINTER_ADD("printer")
-	MDRV_CASSETTE_ADD(CASSETTE_TAG, abc800_cassette_config)
-	MDRV_TIMER_ADD_PERIODIC("keyboard_t1", keyboard_t1_tick, HZ(XTAL_5_9904MHz/(3*5)/20)) // TODO correct frequency?
+	MCFG_Z80CTC_ADD(Z80CTC_TAG, ABC800_X01/2/2, ctc_intf)
+	MCFG_TIMER_ADD_PERIODIC("ctc", ctc_tick, HZ(ABC800_X01/2/2/2))
+	MCFG_Z80SIO2_ADD(Z80SIO_TAG, ABC800_X01/2/2, sio_intf)
+	MCFG_Z80DART_ADD(Z80DART_TAG, ABC800_X01/2/2, abc800_dart_intf)
+	MCFG_PRINTER_ADD("printer")
+	MCFG_CASSETTE_ADD(CASSETTE_TAG, abc800_cassette_config)
+	MCFG_TIMER_ADD_PERIODIC("keyboard_t1", keyboard_t1_tick, HZ(XTAL_5_9904MHz/(3*5)/20)) // TODO correct frequency?
 
 	// ABC bus
-	MDRV_ABCBUS_ADD(ABCBUS_TAG, abcbus_daisy, Z80_TAG)
-	MDRV_ABC830_ADD("luxor_55_21046", ABCBUS_TAG, DRIVE_BASF_6106_08)
+	MCFG_ABCBUS_ADD(ABCBUS_TAG, abcbus_daisy, Z80_TAG)
+	MCFG_ABC830_ADD("luxor_55_21046", ABCBUS_TAG, DRIVE_BASF_6106_08)
 
 	// internal ram
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("16K")
-	MDRV_RAM_EXTRA_OPTIONS("32K")
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("16K")
+	MCFG_RAM_EXTRA_OPTIONS("32K")
 MACHINE_CONFIG_END
 
 
@@ -1714,39 +1714,39 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( abc802, abc802_state )
 	// basic machine hardware
-	MDRV_CPU_ADD(Z80_TAG, Z80, ABC800_X01/2/2)
-	MDRV_CPU_CONFIG(abc800_daisy_chain)
-	MDRV_CPU_PROGRAM_MAP(abc802_mem)
-	MDRV_CPU_IO_MAP(abc802_io)
+	MCFG_CPU_ADD(Z80_TAG, Z80, ABC800_X01/2/2)
+	MCFG_CPU_CONFIG(abc800_daisy_chain)
+	MCFG_CPU_PROGRAM_MAP(abc802_mem)
+	MCFG_CPU_IO_MAP(abc802_io)
 
 	// video hardware
-	MDRV_FRAGMENT_ADD(abc802_video)
+	MCFG_FRAGMENT_ADD(abc802_video)
 
 	// sound hardware
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
-	MDRV_SOUND_CONFIG_DISCRETE(abc800)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
+	MCFG_SOUND_CONFIG_DISCRETE(abc800)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	// peripheral hardware
-	MDRV_Z80CTC_ADD(Z80CTC_TAG, ABC800_X01/2/2, ctc_intf)
-	MDRV_TIMER_ADD_PERIODIC("ctc", ctc_tick, HZ(ABC800_X01/2/2/2))
-	MDRV_Z80SIO2_ADD(Z80SIO_TAG, ABC800_X01/2/2, sio_intf)
-	MDRV_Z80DART_ADD(Z80DART_TAG, ABC800_X01/2/2, abc802_dart_intf)
-	//MDRV_ABC77_ADD(abc800_abc77_intf)
-	MDRV_PRINTER_ADD("printer")
-	MDRV_CASSETTE_ADD(CASSETTE_TAG, abc800_cassette_config)
+	MCFG_Z80CTC_ADD(Z80CTC_TAG, ABC800_X01/2/2, ctc_intf)
+	MCFG_TIMER_ADD_PERIODIC("ctc", ctc_tick, HZ(ABC800_X01/2/2/2))
+	MCFG_Z80SIO2_ADD(Z80SIO_TAG, ABC800_X01/2/2, sio_intf)
+	MCFG_Z80DART_ADD(Z80DART_TAG, ABC800_X01/2/2, abc802_dart_intf)
+	//MCFG_ABC77_ADD(abc800_abc77_intf)
+	MCFG_PRINTER_ADD("printer")
+	MCFG_CASSETTE_ADD(CASSETTE_TAG, abc800_cassette_config)
 
 	// ABC bus
-	MDRV_ABCBUS_ADD(ABCBUS_TAG, abcbus_daisy, Z80_TAG)
-	MDRV_ABC834_ADD("luxor_55_21046", ABCBUS_TAG)
+	MCFG_ABCBUS_ADD(ABCBUS_TAG, abcbus_daisy, Z80_TAG)
+	MCFG_ABC834_ADD("luxor_55_21046", ABCBUS_TAG)
 
 	// fake keyboard
-	MDRV_TIMER_ADD_PERIODIC("keyboard", keyboard_tick, USEC(2500))
+	MCFG_TIMER_ADD_PERIODIC("keyboard", keyboard_tick, USEC(2500))
 
 	// internal ram
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("64K")
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("64K")
 MACHINE_CONFIG_END
 
 
@@ -1756,38 +1756,38 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( abc806, abc806_state )
 	// basic machine hardware
-	MDRV_CPU_ADD(Z80_TAG, Z80, ABC800_X01/2/2)
-	MDRV_CPU_CONFIG(abc800_daisy_chain)
-	MDRV_CPU_PROGRAM_MAP(abc806_mem)
-	MDRV_CPU_IO_MAP(abc806_io)
+	MCFG_CPU_ADD(Z80_TAG, Z80, ABC800_X01/2/2)
+	MCFG_CPU_CONFIG(abc800_daisy_chain)
+	MCFG_CPU_PROGRAM_MAP(abc806_mem)
+	MCFG_CPU_IO_MAP(abc806_io)
 
 	// video hardware
-	MDRV_FRAGMENT_ADD(abc806_video)
+	MCFG_FRAGMENT_ADD(abc806_video)
 
 	// sound hardware
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	// peripheral hardware
-	MDRV_E0516_ADD(E0516_TAG, ABC806_X02)
-	MDRV_Z80CTC_ADD(Z80CTC_TAG, ABC800_X01/2/2, ctc_intf)
-	MDRV_TIMER_ADD_PERIODIC("ctc", ctc_tick, HZ(ABC800_X01/2/2/2))
-	MDRV_Z80SIO2_ADD(Z80SIO_TAG, ABC800_X01/2/2, sio_intf)
-	MDRV_Z80DART_ADD(Z80DART_TAG, ABC800_X01/2/2, abc806_dart_intf)
-	//MDRV_ABC77_ADD(abc800_abc77_intf)
-	MDRV_PRINTER_ADD("printer")
-	MDRV_CASSETTE_ADD(CASSETTE_TAG, abc800_cassette_config)
+	MCFG_E0516_ADD(E0516_TAG, ABC806_X02)
+	MCFG_Z80CTC_ADD(Z80CTC_TAG, ABC800_X01/2/2, ctc_intf)
+	MCFG_TIMER_ADD_PERIODIC("ctc", ctc_tick, HZ(ABC800_X01/2/2/2))
+	MCFG_Z80SIO2_ADD(Z80SIO_TAG, ABC800_X01/2/2, sio_intf)
+	MCFG_Z80DART_ADD(Z80DART_TAG, ABC800_X01/2/2, abc806_dart_intf)
+	//MCFG_ABC77_ADD(abc800_abc77_intf)
+	MCFG_PRINTER_ADD("printer")
+	MCFG_CASSETTE_ADD(CASSETTE_TAG, abc800_cassette_config)
 
 	// ABC bus
-	MDRV_ABCBUS_ADD(ABCBUS_TAG, abcbus_daisy, Z80_TAG)
-	MDRV_ABC832_ADD("luxor_55_21046", ABCBUS_TAG, DRIVE_TEAC_FD55F)
+	MCFG_ABCBUS_ADD(ABCBUS_TAG, abcbus_daisy, Z80_TAG)
+	MCFG_ABC832_ADD("luxor_55_21046", ABCBUS_TAG, DRIVE_TEAC_FD55F)
 
 	// fake keyboard
-	MDRV_TIMER_ADD_PERIODIC("keyboard", keyboard_tick, USEC(2500))
+	MCFG_TIMER_ADD_PERIODIC("keyboard", keyboard_tick, USEC(2500))
 
 	// internal ram
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("160K") // 32KB + 128KB
-	MDRV_RAM_EXTRA_OPTIONS("544K") // 32KB + 512KB
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("160K") // 32KB + 128KB
+	MCFG_RAM_EXTRA_OPTIONS("544K") // 32KB + 512KB
 MACHINE_CONFIG_END
 
 
@@ -1973,7 +1973,7 @@ DIRECT_UPDATE_HANDLER( abc800c_direct_update_handler )
 
 	if (address >= 0x7c00 && address < 0x8000)
 	{
-		direct.explicit_configure(0x7c00, 0x7fff, 0x3ff, memory_region(machine, Z80_TAG) + 0x7c00);
+		direct.explicit_configure(0x7c00, 0x7fff, 0x3ff, machine->region(Z80_TAG)->base() + 0x7c00);
 
 		if (!state->m_fetch_charram)
 		{
@@ -2010,7 +2010,7 @@ DIRECT_UPDATE_HANDLER( abc800m_direct_update_handler )
 
 	if (address >= 0x7800 && address < 0x8000)
 	{
-		direct.explicit_configure(0x7800, 0x7fff, 0x7ff, memory_region(machine, Z80_TAG) + 0x7800);
+		direct.explicit_configure(0x7800, 0x7fff, 0x7ff, machine->region(Z80_TAG)->base() + 0x7800);
 
 		if (!state->m_fetch_charram)
 		{
@@ -2049,7 +2049,7 @@ DIRECT_UPDATE_HANDLER( abc802_direct_update_handler )
 	{
 		if (address >= 0x7800 && address < 0x8000)
 		{
-			direct.explicit_configure(0x7800, 0x7fff, 0x7ff, memory_region(machine, Z80_TAG) + 0x7800);
+			direct.explicit_configure(0x7800, 0x7fff, 0x7ff, machine->region(Z80_TAG)->base() + 0x7800);
 			return ~0;
 		}
 	}
@@ -2074,7 +2074,7 @@ DIRECT_UPDATE_HANDLER( abc806_direct_update_handler )
 
 	if (address >= 0x7800 && address < 0x8000)
 	{
-		direct.explicit_configure(0x7800, 0x7fff, 0x7ff, memory_region(machine, Z80_TAG) + 0x7800);
+		direct.explicit_configure(0x7800, 0x7fff, 0x7ff, machine->region(Z80_TAG)->base() + 0x7800);
 
 		if (!state->m_fetch_charram)
 		{

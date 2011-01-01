@@ -65,23 +65,23 @@ struct _snapquick_config
     SNAPSHOT DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MDRV_SNAPSHOT_ADD(_tag, _load, _file_extensions, _delay)	\
-	MDRV_DEVICE_ADD(_tag, SNAPSHOT, 0) \
-	MDRV_DEVICE_CONFIG_DATAPTR(snapquick_config, load, SNAPSHOT_LOAD_NAME(_load))	\
-	MDRV_DEVICE_CONFIG_DATAPTR(snapquick_config, file_extensions, _file_extensions) \
-	MDRV_DEVICE_CONFIG_DATA64(snapquick_config, delay_seconds, (seconds_t) (_delay)) \
-	MDRV_DEVICE_CONFIG_DATA64(snapquick_config, delay_attoseconds, (attoseconds_t) (((_delay) - (int)(_delay)) * ATTOSECONDS_PER_SECOND)) \
+#define MCFG_SNAPSHOT_ADD(_tag, _load, _file_extensions, _delay)	\
+	MCFG_DEVICE_ADD(_tag, SNAPSHOT, 0) \
+	MCFG_DEVICE_CONFIG_DATAPTR(snapquick_config, load, SNAPSHOT_LOAD_NAME(_load))	\
+	MCFG_DEVICE_CONFIG_DATAPTR(snapquick_config, file_extensions, _file_extensions) \
+	MCFG_DEVICE_CONFIG_DATA64(snapquick_config, delay_seconds, (seconds_t) (_delay)) \
+	MCFG_DEVICE_CONFIG_DATA64(snapquick_config, delay_attoseconds, (attoseconds_t) (((_delay) - (int)(_delay)) * ATTOSECONDS_PER_SECOND)) \
 
 /***************************************************************************
     QUICKLOAD DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MDRV_QUICKLOAD_ADD(_tag, _load, _file_extensions, _delay)	\
-	MDRV_DEVICE_ADD(_tag, QUICKLOAD, 0) \
-	MDRV_DEVICE_CONFIG_DATAPTR(snapquick_config, load, QUICKLOAD_LOAD_NAME(_load))	\
-	MDRV_DEVICE_CONFIG_DATAPTR(snapquick_config, file_extensions, _file_extensions) \
-	MDRV_DEVICE_CONFIG_DATA64(snapquick_config, delay_seconds, (seconds_t) (_delay)) \
-	MDRV_DEVICE_CONFIG_DATA64(snapquick_config, delay_attoseconds, (attoseconds_t) (((_delay) - (int)(_delay)) * ATTOSECONDS_PER_SECOND)) \
+#define MCFG_QUICKLOAD_ADD(_tag, _load, _file_extensions, _delay)	\
+	MCFG_DEVICE_ADD(_tag, QUICKLOAD, 0) \
+	MCFG_DEVICE_CONFIG_DATAPTR(snapquick_config, load, QUICKLOAD_LOAD_NAME(_load))	\
+	MCFG_DEVICE_CONFIG_DATAPTR(snapquick_config, file_extensions, _file_extensions) \
+	MCFG_DEVICE_CONFIG_DATA64(snapquick_config, delay_seconds, (seconds_t) (_delay)) \
+	MCFG_DEVICE_CONFIG_DATA64(snapquick_config, delay_attoseconds, (attoseconds_t) (((_delay) - (int)(_delay)) * ATTOSECONDS_PER_SECOND)) \
 
 /***************************************************************************
     FUNCTION PROTOTYPES

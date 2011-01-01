@@ -76,15 +76,15 @@ static GENERIC_TERMINAL_INTERFACE( pimps_terminal_intf )
 
 static MACHINE_CONFIG_START( pimps, pimps_state )
     /* basic machine hardware */
-    MDRV_CPU_ADD("maincpu",I8085A, XTAL_2MHz)
-    MDRV_CPU_PROGRAM_MAP(pimps_mem)
-    MDRV_CPU_IO_MAP(pimps_io)
+    MCFG_CPU_ADD("maincpu",I8085A, XTAL_2MHz)
+    MCFG_CPU_PROGRAM_MAP(pimps_mem)
+    MCFG_CPU_IO_MAP(pimps_io)
 
-    MDRV_MACHINE_RESET(pimps)
+    MCFG_MACHINE_RESET(pimps)
 
     /* video hardware */
-    MDRV_FRAGMENT_ADD( generic_terminal )
-	MDRV_GENERIC_TERMINAL_ADD(TERMINAL_TAG,pimps_terminal_intf)
+    MCFG_FRAGMENT_ADD( generic_terminal )
+	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG,pimps_terminal_intf)
 MACHINE_CONFIG_END
 
 /* ROM definition */

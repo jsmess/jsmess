@@ -28,7 +28,7 @@ struct _nes_mmc
 /* Here, IRQ counter decrements every CPU cycle. Since we update it every scanline,
 we need to decrement it by 114 (Each scanline consists of 341 dots and, on NTSC,
 there are 3 dots to every 1 CPU cycle, hence 114 is the number of cycles per scanline ) */
-static void ffe_irq( running_device *device, int scanline, int vblank, int blanked )
+static void ffe_irq( device_t *device, int scanline, int vblank, int blanked )
 {
 	nes_state *state = device->machine->driver_data<nes_state>();
 

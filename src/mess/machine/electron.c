@@ -13,7 +13,7 @@
 #include "devices/cassette.h"
 
 
-static running_device *cassette_device_image( running_machine *machine )
+static device_t *cassette_device_image( running_machine *machine )
 {
 	return machine->device("cassette");
 }
@@ -156,7 +156,7 @@ WRITE8_HANDLER( electron_1mhz_w )
 READ8_HANDLER( electron_ula_r )
 {
 	electron_state *state = space->machine->driver_data<electron_state>();
-	UINT8 data = ((UINT8 *)memory_region(space->machine, "user1"))[0x43E00 + offset];
+	UINT8 data = ((UINT8 *)space->machine->region("user1")->base())[0x43E00 + offset];
 	switch ( offset & 0x0f )
 	{
 	case 0x00:	/* Interrupt status */
@@ -180,7 +180,7 @@ static const UINT16 electron_screen_base[8] = { 0x3000, 0x3000, 0x3000, 0x4000, 
 WRITE8_HANDLER( electron_ula_w )
 {
 	electron_state *state = space->machine->driver_data<electron_state>();
-	running_device *speaker = space->machine->device("beep");
+	device_t *speaker = space->machine->device("beep");
 	int i = electron_palette_offset[(( offset >> 1 ) & 0x03)];
 	logerror( "ULA: write offset %02x <- %02x\n", offset & 0x0f, data );
 	switch( offset & 0x0f )
@@ -319,7 +319,7 @@ void electron_interrupt_handler(running_machine *machine, int mode, int interrup
 
 static TIMER_CALLBACK(setup_beep)
 {
-	running_device *speaker = machine->device("beep");
+	device_t *speaker = machine->device("beep");
 	beep_set_state( speaker, 0 );
 	beep_set_frequency( speaker, 300 );
 }
@@ -345,7 +345,7 @@ static void electron_reset(running_machine &machine)
 MACHINE_START( electron )
 {
 	electron_state *state = machine->driver_data<electron_state>();
-	memory_configure_bank(machine, "bank2", 0, 16, memory_region(machine, "user1"), 0x4000);
+	memory_configure_bank(machine, "bank2", 0, 16, machine->region("user1")->base(), 0x4000);
 
 	state->ula.interrupt_status = 0x82;
 	state->ula.interrupt_control = 0x00;

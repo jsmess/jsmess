@@ -79,7 +79,7 @@ READ8_DEVICE_HANDLER( frogger_portB_r )
 
 WRITE8_DEVICE_HANDLER( scramble_sh_irqtrigger_w )
 {
-	running_device *target = device->machine->device("konami_7474");
+	device_t *target = device->machine->device("konami_7474");
 
 	/* the complement of bit 3 is connected to the flip-flop's clock */
 	ttl7474_clock_w(target, (~data & 0x08) >> 3);
@@ -90,7 +90,7 @@ WRITE8_DEVICE_HANDLER( scramble_sh_irqtrigger_w )
 
 WRITE8_DEVICE_HANDLER( mrkougar_sh_irqtrigger_w )
 {
-	running_device *target = device->machine->device("konami_7474");
+	device_t *target = device->machine->device("konami_7474");
 
 	/* the complement of bit 3 is connected to the flip-flop's clock */
 	ttl7474_clock_w(target, (~data & 0x08) >> 3);
@@ -98,7 +98,7 @@ WRITE8_DEVICE_HANDLER( mrkougar_sh_irqtrigger_w )
 
 static IRQ_CALLBACK(scramble_sh_irq_callback)
 {
-	running_device *target = device->machine->device("konami_7474");
+	device_t *target = device->machine->device("konami_7474");
 
 	/* interrupt acknowledge clears the flip-flop --
        we need to pulse the CLR line because MAME's core never clears this
@@ -128,7 +128,7 @@ READ8_DEVICE_HANDLER( hotshock_soundlatch_r )
 	return soundlatch_r(cputag_get_address_space(device->machine, "audiocpu", ADDRESS_SPACE_PROGRAM),0);
 }
 
-static void filter_w(running_device *device, int data)
+static void filter_w(device_t *device, int data)
 {
 	int C;
 
@@ -340,25 +340,25 @@ static const tms5110_interface ad2083_tms5110_interface =
 
 MACHINE_CONFIG_FRAGMENT( ad2083_audio )
 
-	MDRV_CPU_ADD("audiocpu", Z80, 14318000/8)	/* 1.78975 MHz */
-	MDRV_CPU_PROGRAM_MAP(ad2083_sound_map)
-	MDRV_CPU_IO_MAP(ad2083_sound_io_map)
+	MCFG_CPU_ADD("audiocpu", Z80, 14318000/8)	/* 1.78975 MHz */
+	MCFG_CPU_PROGRAM_MAP(ad2083_sound_map)
+	MCFG_CPU_IO_MAP(ad2083_sound_io_map)
 
-	MDRV_DEVICE_ADD("tmsprom", TMSPROM, AD2083_TMS5110_CLOCK / 2)  /* rom clock */
-	MDRV_DEVICE_CONFIG(prom_intf)
+	MCFG_DEVICE_ADD("tmsprom", TMSPROM, AD2083_TMS5110_CLOCK / 2)  /* rom clock */
+	MCFG_DEVICE_CONFIG(prom_intf)
 
-	MDRV_SOUND_START(ad2083)
+	MCFG_SOUND_START(ad2083)
 
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("ay1", AY8910, 14318000/8)
-	MDRV_SOUND_CONFIG(ad2083_ay8910_interface_1)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("ay1", AY8910, 14318000/8)
+	MCFG_SOUND_CONFIG(ad2083_ay8910_interface_1)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD("ay2", AY8910, 14318000/8)
-	MDRV_SOUND_CONFIG(ad2083_ay8910_interface_2)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SOUND_ADD("ay2", AY8910, 14318000/8)
+	MCFG_SOUND_CONFIG(ad2083_ay8910_interface_2)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MDRV_SOUND_ADD("tms", TMS5110A, AD2083_TMS5110_CLOCK)
-	MDRV_SOUND_CONFIG(ad2083_tms5110_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("tms", TMS5110A, AD2083_TMS5110_CLOCK)
+	MCFG_SOUND_CONFIG(ad2083_tms5110_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END

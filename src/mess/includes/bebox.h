@@ -14,10 +14,10 @@
 
 typedef struct
 {
-	running_device *pic8259_master;
-	running_device *pic8259_slave;
-	running_device *dma8237_1;
-	running_device *dma8237_2;
+	device_t *pic8259_master;
+	device_t *pic8259_slave;
+	device_t *dma8237_1;
+	device_t *dma8237_2;
 } bebox_devices_t;
 
 
@@ -75,9 +75,9 @@ WRITE64_HANDLER( bebox_page_w );
 WRITE64_HANDLER( bebox_80000480_w );
 WRITE64_HANDLER( bebox_flash_w );
 
-void bebox_ide_interrupt(running_device *device, int state);
+void bebox_ide_interrupt(device_t *device, int state);
 
-UINT32 scsi53c810_pci_read(running_device *busdevice, running_device *device, int function, int offset, UINT32 mem_mask);
-void scsi53c810_pci_write(running_device *busdevice, running_device *device, int function, int offset, UINT32 data, UINT32 mem_mask);
+UINT32 scsi53c810_pci_read(device_t *busdevice, device_t *device, int function, int offset, UINT32 mem_mask);
+void scsi53c810_pci_write(device_t *busdevice, device_t *device, int function, int offset, UINT32 data, UINT32 mem_mask);
 
 #endif /* BEBOX_H_ */

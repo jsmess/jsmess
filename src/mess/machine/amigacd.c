@@ -214,7 +214,7 @@ static READ16_HANDLER( amiga_dmac_r )
 		case 0x66:
 		case 0x67:
 		{
-			running_device *tpi = space->machine->device("tpi6525");
+			device_t *tpi = space->machine->device("tpi6525");
 			LOG(( "DMAC: PC=%08x - TPI6525 Read(%d)\n", cpu_get_pc(space->cpu), (offset - 0x58) ));
 			return tpi6525_r(tpi, offset - 0x58);
 		}
@@ -341,7 +341,7 @@ static WRITE16_HANDLER( amiga_dmac_w )
 		case 0x66:
 		case 0x67:
 		{
-			running_device *tpi = space->machine->device("tpi6525");
+			device_t *tpi = space->machine->device("tpi6525");
 			LOG(( "DMAC: PC=%08x - TPI6525 Write(%d) - data = %04x\n", cpu_get_pc(space->cpu), (offset - 0x58), data ));
 			tpi6525_w(tpi, offset - 0x58, data);
 		}
@@ -465,7 +465,7 @@ static TIMER_CALLBACK(tp6525_delayed_irq)
 	}
 }
 
-void amigacd_tpi6525_irq(running_device *device, int level)
+void amigacd_tpi6525_irq(device_t *device, int level)
 {
 	amiga_state *state = device->machine->driver_data<amiga_state>();
 	LOG(( "TPI6525 Interrupt: level = %d\n", level ));
@@ -486,7 +486,7 @@ void amigacd_tpi6525_irq(running_device *device, int level)
 
 static void cdrom_status_enabled( running_machine *machine, int level )
 {
-	running_device *tpi = machine->device("tpi6525");
+	device_t *tpi = machine->device("tpi6525");
 
 	/* PC3 on the 6525 */
 	tpi6525_irq3_level(tpi, level);
@@ -494,7 +494,7 @@ static void cdrom_status_enabled( running_machine *machine, int level )
 
 static void cdrom_status_change( running_machine *machine, int level )
 {
-	running_device *tpi = machine->device("tpi6525");
+	device_t *tpi = machine->device("tpi6525");
 
 	/* invert */
 	level = level ? 0 : 1;
@@ -505,7 +505,7 @@ static void cdrom_status_change( running_machine *machine, int level )
 
 static void cdrom_subcode_ready( running_machine *machine, int level )
 {
-	running_device *tpi = machine->device("tpi6525");
+	device_t *tpi = machine->device("tpi6525");
 
 	/* PC1 on the 6525 */
 	tpi6525_irq1_level(tpi, level);

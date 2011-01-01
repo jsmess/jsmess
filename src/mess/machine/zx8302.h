@@ -50,9 +50,9 @@
 //  INTERFACE CONFIGURATION MACROS
 ///*************************************************************************
 
-#define MDRV_ZX8302_ADD(_tag, _clock, _intrf) \
-	MDRV_DEVICE_ADD(_tag, ZX8302, _clock) \
-	MDRV_DEVICE_CONFIG(_intrf)
+#define MCFG_ZX8302_ADD(_tag, _clock, _intrf) \
+	MCFG_DEVICE_ADD(_tag, ZX8302, _clock) \
+	MCFG_DEVICE_CONFIG(_intrf)
 
 #define ZX8302_INTERFACE(name) \
 	const zx8302_interface (name)=

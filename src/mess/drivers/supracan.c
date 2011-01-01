@@ -391,9 +391,9 @@ static VIDEO_START( supracan )
     supracan_state *state = machine->driver_data<supracan_state>();
     state->sprite_final_bitmap = auto_bitmap_alloc(machine, 1024, 1024, BITMAP_FORMAT_INDEXED16);
 
-	state->vram = (UINT16*)memory_region(machine,"ram_gfx");
-	state->vram_swapped = (UINT16*)memory_region(machine,"ram_gfx2");
-	state->vram_addr_swapped = (UINT8*)memory_region(machine,"ram_gfx3"); // hack for 1bpp layer at startup
+	state->vram = (UINT16*)machine->region("ram_gfx")->base();
+	state->vram_swapped = (UINT16*)machine->region("ram_gfx2")->base();
+	state->vram_addr_swapped = (UINT8*)machine->region("ram_gfx3")->base(); // hack for 1bpp layer at startup
 
 	state->tilemap_sizes[0][0] = tilemap_create(machine, get_supracan_tilemap0_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 	state->tilemap_sizes[0][1] = tilemap_create(machine, get_supracan_tilemap0_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
@@ -1748,7 +1748,7 @@ static WRITE16_HANDLER( supracan_video_w )
 
 static DEVICE_IMAGE_LOAD( supracan_cart )
 {
-    UINT8 *cart = memory_region(image.device().machine, "cart");
+    UINT8 *cart = image.device().machine->region("cart")->base();
 	UINT32 size;
 
     if (image.software_entry() == NULL)
@@ -1910,43 +1910,43 @@ static INTERRUPT_GEN( supracan_sound_irq )
 
 static MACHINE_CONFIG_START( supracan, supracan_state )
 
-	MDRV_CPU_ADD( "maincpu", M68000, XTAL_10_738635MHz )		/* Correct frequency unknown */
-	MDRV_CPU_PROGRAM_MAP( supracan_mem )
-	MDRV_CPU_VBLANK_INT("screen", supracan_irq)
+	MCFG_CPU_ADD( "maincpu", M68000, XTAL_10_738635MHz )		/* Correct frequency unknown */
+	MCFG_CPU_PROGRAM_MAP( supracan_mem )
+	MCFG_CPU_VBLANK_INT("screen", supracan_irq)
 
-	MDRV_CPU_ADD( "soundcpu", M6502, XTAL_3_579545MHz )		/* TODO: Verfiy actual clock */
-	MDRV_CPU_PROGRAM_MAP( supracan_sound_mem )
-    MDRV_CPU_VBLANK_INT("screen", supracan_sound_irq)
+	MCFG_CPU_ADD( "soundcpu", M6502, XTAL_3_579545MHz )		/* TODO: Verfiy actual clock */
+	MCFG_CPU_PROGRAM_MAP( supracan_sound_mem )
+    MCFG_CPU_VBLANK_INT("screen", supracan_sound_irq)
 
 #if !(SOUNDCPU_BOOT_HACK)
-    MDRV_QUANTUM_PERFECT_CPU("maincpu")
-    MDRV_QUANTUM_PERFECT_CPU("soundcpu")
+    MCFG_QUANTUM_PERFECT_CPU("maincpu")
+    MCFG_QUANTUM_PERFECT_CPU("soundcpu")
 #endif
 
-	MDRV_MACHINE_START( supracan )
-	MDRV_MACHINE_RESET( supracan )
+	MCFG_MACHINE_START( supracan )
+	MCFG_MACHINE_RESET( supracan )
 
-	MDRV_SCREEN_ADD( "screen", RASTER )
-	MDRV_SCREEN_FORMAT( BITMAP_FORMAT_INDEXED16 )
-    //MDRV_SCREEN_FORMAT( BITMAP_FORMAT_RGB32 )
-	MDRV_SCREEN_RAW_PARAMS(XTAL_10_738635MHz/2, 348, 0, 256, 256, 0, 240 )	/* No idea if this is correct */
+	MCFG_SCREEN_ADD( "screen", RASTER )
+	MCFG_SCREEN_FORMAT( BITMAP_FORMAT_INDEXED16 )
+    //MCFG_SCREEN_FORMAT( BITMAP_FORMAT_RGB32 )
+	MCFG_SCREEN_RAW_PARAMS(XTAL_10_738635MHz/2, 348, 0, 256, 256, 0, 240 )	/* No idea if this is correct */
 
-	MDRV_PALETTE_LENGTH( 32768 )
-	MDRV_PALETTE_INIT( supracan )
+	MCFG_PALETTE_LENGTH( 32768 )
+	MCFG_PALETTE_INIT( supracan )
 
-	MDRV_GFXDECODE(supracan)
+	MCFG_GFXDECODE(supracan)
 
 
-	MDRV_CARTSLOT_ADD("cart")
-	MDRV_CARTSLOT_EXTENSION_LIST("bin")
-	MDRV_CARTSLOT_MANDATORY
-	MDRV_CARTSLOT_INTERFACE("supracan_cart")
-	MDRV_CARTSLOT_LOAD(supracan_cart)
+	MCFG_CARTSLOT_ADD("cart")
+	MCFG_CARTSLOT_EXTENSION_LIST("bin")
+	MCFG_CARTSLOT_MANDATORY
+	MCFG_CARTSLOT_INTERFACE("supracan_cart")
+	MCFG_CARTSLOT_LOAD(supracan_cart)
 
-	MDRV_SOFTWARE_LIST_ADD("cart_list","supracan")
+	MCFG_SOFTWARE_LIST_ADD("cart_list","supracan")
 
-	MDRV_VIDEO_START( supracan )
-	MDRV_VIDEO_UPDATE( supracan )
+	MCFG_VIDEO_START( supracan )
+	MCFG_VIDEO_UPDATE( supracan )
 MACHINE_CONFIG_END
 
 

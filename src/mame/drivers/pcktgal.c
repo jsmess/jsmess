@@ -23,7 +23,7 @@
 
 static WRITE8_HANDLER( pcktgal_bank_w )
 {
-	UINT8 *RAM = memory_region(space->machine, "maincpu");
+	UINT8 *RAM = space->machine->region("maincpu")->base();
 
 	if (data & 1) { memory_set_bankptr(space->machine, "bank1", &RAM[0x4000]); }
 	else { memory_set_bankptr(space->machine, "bank1", &RAM[0x10000]); }
@@ -45,7 +45,7 @@ static WRITE8_HANDLER( pcktgal_sound_w )
 
 static int msm5205next;
 
-static void pcktgal_adpcm_int(running_device *device)
+static void pcktgal_adpcm_int(device_t *device)
 {
 	static int toggle;
 
@@ -218,47 +218,47 @@ static const msm5205_interface msm5205_config =
 static MACHINE_CONFIG_START( pcktgal, pcktgal_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6502, 2000000)
-	MDRV_CPU_PROGRAM_MAP(pcktgal_map)
-	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
+	MCFG_CPU_ADD("maincpu", M6502, 2000000)
+	MCFG_CPU_PROGRAM_MAP(pcktgal_map)
+	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
-	MDRV_CPU_ADD("audiocpu", M6502, 1500000)
-	MDRV_CPU_PROGRAM_MAP(pcktgal_sound_map)
+	MCFG_CPU_ADD("audiocpu", M6502, 1500000)
+	MCFG_CPU_PROGRAM_MAP(pcktgal_sound_map)
 							/* IRQs are caused by the ADPCM chip */
 							/* NMIs are caused by the main CPU */
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(pcktgal)
-	MDRV_PALETTE_LENGTH(512)
+	MCFG_GFXDECODE(pcktgal)
+	MCFG_PALETTE_LENGTH(512)
 
-	MDRV_PALETTE_INIT(pcktgal)
-	MDRV_VIDEO_START(pcktgal)
-	MDRV_VIDEO_UPDATE(pcktgal)
+	MCFG_PALETTE_INIT(pcktgal)
+	MCFG_VIDEO_START(pcktgal)
+	MCFG_VIDEO_UPDATE(pcktgal)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym1", YM2203, 1500000)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
+	MCFG_SOUND_ADD("ym1", YM2203, 1500000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 
-	MDRV_SOUND_ADD("ym2", YM3812, 3000000)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("ym2", YM3812, 3000000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD("msm", MSM5205, 384000)
-	MDRV_SOUND_CONFIG(msm5205_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
+	MCFG_SOUND_ADD("msm", MSM5205, 384000)
+	MCFG_SOUND_CONFIG(msm5205_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( bootleg, pcktgal )
-	MDRV_GFXDECODE(bootleg)
+	MCFG_GFXDECODE(bootleg)
 MACHINE_CONFIG_END
 
 /***************************************************************************/
@@ -409,7 +409,7 @@ static DRIVER_INIT( deco222 )
 	int A;
 	address_space *space = cputag_get_address_space(machine, "audiocpu", ADDRESS_SPACE_PROGRAM);
 	UINT8 *decrypted = auto_alloc_array(machine, UINT8, 0x10000);
-	UINT8 *rom = memory_region(machine, "audiocpu");
+	UINT8 *rom = machine->region("audiocpu")->base();
 
 	space->set_decrypted_region(0x8000, 0xffff, decrypted);
 
@@ -417,17 +417,17 @@ static DRIVER_INIT( deco222 )
 	for (A = 0x8000;A < 0x18000;A++)
 		decrypted[A-0x8000] = (rom[A] & 0x9f) | ((rom[A] & 0x20) << 1) | ((rom[A] & 0x40) >> 1);
 
-	memory_configure_bank(machine, "bank3", 0, 2, memory_region(machine, "audiocpu") + 0x10000, 0x4000);
+	memory_configure_bank(machine, "bank3", 0, 2, machine->region("audiocpu")->base() + 0x10000, 0x4000);
 	memory_configure_bank_decrypted(machine, "bank3", 0, 2, &decrypted[0x8000], 0x4000);
 }
 
 static DRIVER_INIT( graphics )
 {
-	UINT8 *rom = memory_region(machine, "gfx1");
-	int len = memory_region_length(machine, "gfx1");
+	UINT8 *rom = machine->region("gfx1")->base();
+	int len = machine->region("gfx1")->bytes();
 	int i,j,temp[16];
 
-	memory_configure_bank(machine, "bank3", 0, 2, memory_region(machine, "audiocpu") + 0x10000, 0x4000);
+	memory_configure_bank(machine, "bank3", 0, 2, machine->region("audiocpu")->base() + 0x10000, 0x4000);
 
 	/* Tile graphics roms have some swapped lines, original version only */
 	for (i = 0x00000;i < len;i += 32)

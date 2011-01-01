@@ -75,7 +75,7 @@ public:
 		: driver_device(machine, config) { }
 
 	/* internal ram */
-	running_device *ram;
+	device_t *ram;
 
 	/* gapnit register */
 	UINT8 ctrl1;
@@ -113,20 +113,20 @@ public:
 	UINT8 interrupt_status;
 
 	/* centronics printer */
-	running_device *printer;
+	device_t *printer;
 
 	/* external ramdisk */
 	offs_t ramdisk_address;
 	UINT8 *ramdisk;
 
 	/* external cassette/barcode reader */
-	running_device *ext_cas;
+	device_t *ext_cas;
 	emu_timer *ext_cas_timer;
 	int ear_last_state;
 
 	/* external devices */
-	running_device *sio_device;
-	running_device *rs232c_device;
+	device_t *sio_device;
+	device_t *rs232c_device;
 };
 
 
@@ -480,14 +480,14 @@ static void install_rom_capsule(address_space *space, int size, const char *regi
 	/* actual rom data, part 1 */
 	memory_install_read_bank(space, 0xe000 - size, 0xffff - size, 0, 0, "bank2");
 	memory_nop_write(space, 0xe000 - size, 0xffff - size, 0, 0);
-	memory_set_bankptr(space->machine, "bank2", memory_region(space->machine, region) + (size - 0x2000));
+	memory_set_bankptr(space->machine, "bank2", space->machine->region(region)->base() + (size - 0x2000));
 
 	/* rom data, part 2 */
 	if (size != 0x2000)
 	{
 		memory_install_read_bank(space, 0x10000 - size, 0xdfff, 0, 0, "bank3");
 		memory_nop_write(space, 0x10000 - size, 0xdfff, 0, 0);
-		memory_set_bankptr(space->machine, "bank3", memory_region(space->machine, region));
+		memory_set_bankptr(space->machine, "bank3", space->machine->region(region)->base());
 	}
 
 	/* ram, continued */
@@ -513,7 +513,7 @@ static WRITE8_HANDLER( px4_bankr_w )
 		/* system bank */
 		memory_install_read_bank(space_program, 0x0000, 0x7fff, 0, 0, "bank1");
 		memory_nop_write(space_program, 0x0000, 0x7fff, 0, 0);
-		memory_set_bankptr(space->machine, "bank1", memory_region(space->machine, "os"));
+		memory_set_bankptr(space->machine, "bank1", space->machine->region("os")->base());
 		memory_install_readwrite_bank(space_program, 0x8000, 0xffff, 0, 0, "bank2");
 		memory_set_bankptr(space->machine, "bank2", messram_get_ptr(px4->ram) + 0x8000);
 		break;
@@ -986,7 +986,7 @@ static READ8_HANDLER( px4_ramdisk_data_r )
 	else if (px4->ramdisk_address < 0x40000)
 	{
 		/* read from rom */
-		ret = memory_region(space->machine, "ramdisk")[px4->ramdisk_address];
+		ret = space->machine->region("ramdisk")->base()[px4->ramdisk_address];
 	}
 
 	px4->ramdisk_address = (px4->ramdisk_address & 0xffff00) | ((px4->ramdisk_address & 0xff) + 1);
@@ -1104,7 +1104,7 @@ static DRIVER_INIT( px4 )
 	px4->rs232c_device = NULL;
 
 	/* map os rom and last half of memory */
-	memory_set_bankptr(machine, "bank1", memory_region(machine, "os"));
+	memory_set_bankptr(machine, "bank1", machine->region("os")->base());
 	memory_set_bankptr(machine, "bank2", messram_get_ptr(px4->ram) + 0x8000);
 }
 
@@ -1358,60 +1358,60 @@ static const cassette_config px4_cassette_config =
 static MACHINE_CONFIG_START( px4, px4_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, XTAL_7_3728MHz / 2)	/* uPD70008 */
-	MDRV_CPU_PROGRAM_MAP(px4_mem)
-	MDRV_CPU_IO_MAP(px4_io)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_7_3728MHz / 2)	/* uPD70008 */
+	MCFG_CPU_PROGRAM_MAP(px4_mem)
+	MCFG_CPU_IO_MAP(px4_io)
 
-	MDRV_MACHINE_RESET(px4)
+	MCFG_MACHINE_RESET(px4)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", LCD)
-	MDRV_SCREEN_REFRESH_RATE(72)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(240, 64)
-	MDRV_SCREEN_VISIBLE_AREA(0, 239, 0, 63)
+	MCFG_SCREEN_ADD("screen", LCD)
+	MCFG_SCREEN_REFRESH_RATE(72)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(240, 64)
+	MCFG_SCREEN_VISIBLE_AREA(0, 239, 0, 63)
 
-	MDRV_DEFAULT_LAYOUT(layout_px4)
+	MCFG_DEFAULT_LAYOUT(layout_px4)
 
-	MDRV_PALETTE_LENGTH(2)
-	MDRV_PALETTE_INIT(px4)
+	MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_INIT(px4)
 
-	MDRV_VIDEO_UPDATE(px4)
+	MCFG_VIDEO_UPDATE(px4)
 
-	MDRV_TIMER_ADD_PERIODIC("one_sec", upd7508_1sec_callback, SEC(1))
-	MDRV_TIMER_ADD_PERIODIC("frc", frc_tick, HZ(XTAL_7_3728MHz / 2 / 6))
+	MCFG_TIMER_ADD_PERIODIC("one_sec", upd7508_1sec_callback, SEC(1))
+	MCFG_TIMER_ADD_PERIODIC("frc", frc_tick, HZ(XTAL_7_3728MHz / 2 / 6))
 
 	/* internal ram */
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("64k")
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("64k")
 
 	/* centronics printer */
-	MDRV_CENTRONICS_ADD("centronics", standard_centronics)
+	MCFG_CENTRONICS_ADD("centronics", standard_centronics)
 
 	/* external cassette */
-	MDRV_CASSETTE_ADD("extcas", px4_cassette_config)
+	MCFG_CASSETTE_ADD("extcas", px4_cassette_config)
 
 	/* rom capsules */
-	MDRV_CARTSLOT_ADD("capsule1")
-	MDRV_CARTSLOT_NOT_MANDATORY
-	MDRV_CARTSLOT_ADD("capsule2")
-	MDRV_CARTSLOT_NOT_MANDATORY
+	MCFG_CARTSLOT_ADD("capsule1")
+	MCFG_CARTSLOT_NOT_MANDATORY
+	MCFG_CARTSLOT_ADD("capsule2")
+	MCFG_CARTSLOT_NOT_MANDATORY
 
 	/* tf20 floppy drive */
-  MDRV_TF20_ADD("floppy")
+  MCFG_TF20_ADD("floppy")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( px4p, px4 )
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(px4p_io)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_IO_MAP(px4p_io)
 
-	MDRV_NVRAM_HANDLER(px4_ramdisk)
+	MCFG_NVRAM_HANDLER(px4_ramdisk)
 
-	MDRV_PALETTE_INIT(px4p)
+	MCFG_PALETTE_INIT(px4p)
 
-	MDRV_CARTSLOT_ADD("ramdisk")
-	MDRV_CARTSLOT_NOT_MANDATORY
+	MCFG_CARTSLOT_ADD("ramdisk")
+	MCFG_CARTSLOT_NOT_MANDATORY
 MACHINE_CONFIG_END
 
 

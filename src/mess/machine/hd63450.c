@@ -43,10 +43,10 @@ struct _hd63450_t
 };
 
 static TIMER_CALLBACK(dma_transfer_timer);
-static void dma_transfer_abort(running_device* device, int channel);
-static void dma_transfer_halt(running_device* device, int channel);
-static void dma_transfer_continue(running_device* device, int channel);
-static void dma_transfer_start(running_device* device, int channel, int dir);
+static void dma_transfer_abort(device_t* device, int channel);
+static void dma_transfer_halt(device_t* device, int channel);
+static void dma_transfer_continue(device_t* device, int channel);
+static void dma_transfer_start(device_t* device, int channel, int dir);
 
 static DEVICE_START(hd63450)
 {
@@ -66,7 +66,7 @@ static DEVICE_START(hd63450)
 	}
 }
 
-int hd63450_read(running_device* device, int offset, UINT16 mem_mask)
+int hd63450_read(device_t* device, int offset, UINT16 mem_mask)
 {
 	int channel,reg;
 	hd63450_t* dmac = (hd63450_t*)downcast<legacy_device_base *>(device)->token();
@@ -116,7 +116,7 @@ int hd63450_read(running_device* device, int offset, UINT16 mem_mask)
 	return 0xff;
 }
 
-void hd63450_write(running_device* device, int offset, int data, UINT16 mem_mask)
+void hd63450_write(device_t* device, int offset, int data, UINT16 mem_mask)
 {
 	int channel,reg;
 
@@ -229,7 +229,7 @@ void hd63450_write(running_device* device, int offset, int data, UINT16 mem_mask
 	}
 }
 
-static void dma_transfer_start(running_device* device, int channel, int dir)
+static void dma_transfer_start(device_t* device, int channel, int dir)
 {
 	address_space *space = cpu_get_address_space(device->machine->firstcpu, ADDRESS_SPACE_PROGRAM);
 	hd63450_t* dmac = (hd63450_t*)downcast<legacy_device_base *>(device)->token();
@@ -249,7 +249,7 @@ static void dma_transfer_start(running_device* device, int channel, int dir)
 	// Burst transfers will halt the CPU until the transfer is complete
 	if((dmac->reg[channel].dcr & 0xc0) == 0x00)  // Burst transfer
 	{
-		running_device *cpu = device->machine->device(dmac->intf->cpu_tag);
+		device_t *cpu = device->machine->device(dmac->intf->cpu_tag);
 		cpu_set_input_line(cpu, INPUT_LINE_HALT, ASSERT_LINE);
 		timer_adjust_periodic(dmac->timer[channel], attotime_zero, channel, dmac->burst_clock[channel]);
 	}
@@ -261,7 +261,7 @@ static void dma_transfer_start(running_device* device, int channel, int dir)
 	logerror("DMA: Transfer begins: size=0x%08x\n",dmac->transfer_size[channel]);
 }
 
-void hd63450_set_timer(running_device* device, int channel, attotime tm)
+void hd63450_set_timer(device_t* device, int channel, attotime tm)
 {
 	hd63450_t* dmac = (hd63450_t*)downcast<legacy_device_base *>(device)->token();
 
@@ -272,10 +272,10 @@ void hd63450_set_timer(running_device* device, int channel, attotime tm)
 
 static TIMER_CALLBACK(dma_transfer_timer)
 {
-	hd63450_single_transfer((running_device*)ptr, param);
+	hd63450_single_transfer((device_t*)ptr, param);
 }
 
-static void dma_transfer_abort(running_device* device, int channel)
+static void dma_transfer_abort(device_t* device, int channel)
 {
 	hd63450_t* dmac = (hd63450_t*)downcast<legacy_device_base *>(device)->token();
 
@@ -287,7 +287,7 @@ static void dma_transfer_abort(running_device* device, int channel)
 	dmac->reg[channel].csr &= ~0x08;  // channel no longer active
 }
 
-static void dma_transfer_halt(running_device* device, int channel)
+static void dma_transfer_halt(device_t* device, int channel)
 {
 	hd63450_t* dmac = (hd63450_t*)downcast<legacy_device_base *>(device)->token();
 
@@ -295,7 +295,7 @@ static void dma_transfer_halt(running_device* device, int channel)
 	timer_adjust_oneshot(dmac->timer[channel], attotime_zero, 0);
 }
 
-static void dma_transfer_continue(running_device* device, int channel)
+static void dma_transfer_continue(device_t* device, int channel)
 {
 	hd63450_t* dmac = (hd63450_t*)downcast<legacy_device_base *>(device)->token();
 
@@ -306,7 +306,7 @@ static void dma_transfer_continue(running_device* device, int channel)
 	}
 }
 
-void hd63450_single_transfer(running_device* device, int x)
+void hd63450_single_transfer(device_t* device, int x)
 {
 	address_space *space = cpu_get_address_space(device->machine->firstcpu, ADDRESS_SPACE_PROGRAM);
 	int data;
@@ -431,7 +431,7 @@ void hd63450_single_transfer(running_device* device, int x)
 				// Burst transfer
 				if((dmac->reg[x].dcr & 0xc0) == 0x00)
 				{
-					running_device *cpu = device->machine->device(dmac->intf->cpu_tag);
+					device_t *cpu = device->machine->device(dmac->intf->cpu_tag);
 					cpu_set_input_line(cpu, INPUT_LINE_HALT, CLEAR_LINE);
 				}
 
@@ -441,13 +441,13 @@ void hd63450_single_transfer(running_device* device, int x)
 		}
 }
 
-int hd63450_get_vector(running_device* device, int channel)
+int hd63450_get_vector(device_t* device, int channel)
 {
 	hd63450_t* dmac = (hd63450_t*)downcast<legacy_device_base *>(device)->token();
 	return dmac->reg[channel].niv;
 }
 
-int hd63450_get_error_vector(running_device* device, int channel)
+int hd63450_get_error_vector(device_t* device, int channel)
 {
 	hd63450_t* dmac = (hd63450_t*)downcast<legacy_device_base *>(device)->token();
 	return dmac->reg[channel].eiv;

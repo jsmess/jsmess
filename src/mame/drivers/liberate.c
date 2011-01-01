@@ -28,7 +28,7 @@
 static READ8_HANDLER( deco16_bank_r )
 {
 	liberate_state *state = space->machine->driver_data<liberate_state>();
-	const UINT8 *ROM = memory_region(space->machine, "user1");
+	const UINT8 *ROM = space->machine->region("user1")->base();
 
 	/* The tilemap bank can be swapped into main memory */
 	if (state->bank)
@@ -79,7 +79,7 @@ static WRITE8_HANDLER( deco16_bank_w )
 static READ8_HANDLER( prosoccr_bank_r )
 {
 	liberate_state *state = space->machine->driver_data<liberate_state>();
-	const UINT8 *ROM = memory_region(space->machine, "user1");
+	const UINT8 *ROM = space->machine->region("user1")->base();
 
 	/* The tilemap bank can be swapped into main memory */
 	if (state->bank)
@@ -109,7 +109,7 @@ static READ8_HANDLER( prosoccr_bank_r )
 static READ8_HANDLER( prosoccr_charram_r )
 {
 	liberate_state *state = space->machine->driver_data<liberate_state>();
-	UINT8 *SRC_GFX = memory_region(space->machine, "shared_gfx");
+	UINT8 *SRC_GFX = space->machine->region("shared_gfx")->base();
 
 	if (state->gfx_rom_readback)
 	{
@@ -131,7 +131,7 @@ static READ8_HANDLER( prosoccr_charram_r )
 static WRITE8_HANDLER( prosoccr_charram_w )
 {
 	liberate_state *state = space->machine->driver_data<liberate_state>();
-	UINT8 *FG_GFX = memory_region(space->machine, "fg_gfx");
+	UINT8 *FG_GFX = space->machine->region("fg_gfx")->base();
 
 	if (state->bank)
 	{
@@ -189,7 +189,7 @@ static WRITE8_HANDLER( prosoccr_io_bank_w )
 
 static READ8_HANDLER( prosport_charram_r )
 {
-	UINT8 *FG_GFX = memory_region(space->machine, "progolf_fg_gfx");
+	UINT8 *FG_GFX = space->machine->region("progolf_fg_gfx")->base();
 
 	switch (offset & 0x1800)
 	{
@@ -209,7 +209,7 @@ static READ8_HANDLER( prosport_charram_r )
 
 static WRITE8_HANDLER( prosport_charram_w )
 {
-	UINT8 *FG_GFX = memory_region(space->machine, "progolf_fg_gfx");
+	UINT8 *FG_GFX = space->machine->region("progolf_fg_gfx")->base();
 
 	switch (offset & 0x1800)
 	{
@@ -829,121 +829,121 @@ static MACHINE_RESET( liberate )
 static MACHINE_CONFIG_START( liberate, liberate_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu",DECO16, 2000000)
-	MDRV_CPU_PROGRAM_MAP(liberate_map)
-	MDRV_CPU_IO_MAP(deco16_io_map)
-	MDRV_CPU_VBLANK_INT("screen", deco16_interrupt)
+	MCFG_CPU_ADD("maincpu",DECO16, 2000000)
+	MCFG_CPU_PROGRAM_MAP(liberate_map)
+	MCFG_CPU_IO_MAP(deco16_io_map)
+	MCFG_CPU_VBLANK_INT("screen", deco16_interrupt)
 
-	MDRV_CPU_ADD("audiocpu",M6502, 1500000)
-	MDRV_CPU_PROGRAM_MAP(liberate_sound_map)
-	MDRV_CPU_PERIODIC_INT(nmi_line_pulse,16*60) /* ??? */
+	MCFG_CPU_ADD("audiocpu",M6502, 1500000)
+	MCFG_CPU_PROGRAM_MAP(liberate_sound_map)
+	MCFG_CPU_PERIODIC_INT(nmi_line_pulse,16*60) /* ??? */
 
-	MDRV_QUANTUM_TIME(HZ(12000))
+	MCFG_QUANTUM_TIME(HZ(12000))
 
-	MDRV_MACHINE_START(liberate)
-	MDRV_MACHINE_RESET(liberate)
+	MCFG_MACHINE_START(liberate)
+	MCFG_MACHINE_RESET(liberate)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529) /* 529ms Vblank duration?? */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529) /* 529ms Vblank duration?? */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 
-	MDRV_GFXDECODE(liberate)
-	MDRV_PALETTE_LENGTH(33)
-	MDRV_PALETTE_INIT(liberate)
+	MCFG_GFXDECODE(liberate)
+	MCFG_PALETTE_LENGTH(33)
+	MCFG_PALETTE_INIT(liberate)
 
-	MDRV_VIDEO_START(liberate)
-	MDRV_VIDEO_UPDATE(liberate)
+	MCFG_VIDEO_START(liberate)
+	MCFG_VIDEO_UPDATE(liberate)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay1", AY8910, 1500000)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	MCFG_SOUND_ADD("ay1", AY8910, 1500000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MDRV_SOUND_ADD("ay2", AY8910, 1500000)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("ay2", AY8910, 1500000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( liberatb, liberate )
 
 	/* basic machine hardware */
-	MDRV_CPU_REPLACE("maincpu", M6502, 2000000)
-	MDRV_CPU_PROGRAM_MAP(liberatb_map)
-	MDRV_CPU_VBLANK_INT("screen", deco16_interrupt)
+	MCFG_CPU_REPLACE("maincpu", M6502, 2000000)
+	MCFG_CPU_PROGRAM_MAP(liberatb_map)
+	MCFG_CPU_VBLANK_INT("screen", deco16_interrupt)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( boomrang, liberate )
 
-	MDRV_VIDEO_START(boomrang)
-	MDRV_VIDEO_UPDATE(boomrang)
+	MCFG_VIDEO_START(boomrang)
+	MCFG_VIDEO_UPDATE(boomrang)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( prosoccr, liberate )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_CLOCK(10000000/8) //xtal is unknown?
-	MDRV_CPU_PROGRAM_MAP(prosoccr_map)
-	MDRV_CPU_IO_MAP(prosoccr_io_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_CLOCK(10000000/8) //xtal is unknown?
+	MCFG_CPU_PROGRAM_MAP(prosoccr_map)
+	MCFG_CPU_IO_MAP(prosoccr_io_map)
 
-	MDRV_CPU_MODIFY("audiocpu")
-	MDRV_CPU_CLOCK(10000000/8) //xtal is 12 Mhz, divider is unknown
-	MDRV_CPU_PROGRAM_MAP(prosoccr_sound_map)
+	MCFG_CPU_MODIFY("audiocpu")
+	MCFG_CPU_CLOCK(10000000/8) //xtal is 12 Mhz, divider is unknown
+	MCFG_CPU_PROGRAM_MAP(prosoccr_sound_map)
 
-	MDRV_QUANTUM_TIME(HZ(12000))
+	MCFG_QUANTUM_TIME(HZ(12000))
 
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 0*8, 32*8-1)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 0*8, 32*8-1)
 
-	MDRV_GFXDECODE(prosoccr)
+	MCFG_GFXDECODE(prosoccr)
 
-	MDRV_VIDEO_START(prosoccr)
-	MDRV_VIDEO_UPDATE(prosoccr)
+	MCFG_VIDEO_START(prosoccr)
+	MCFG_VIDEO_UPDATE(prosoccr)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( prosport, liberate_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", DECO16, 2000000)
-	MDRV_CPU_PROGRAM_MAP(prosport_map)
-	MDRV_CPU_IO_MAP(deco16_io_map)
-	MDRV_CPU_VBLANK_INT("screen", deco16_interrupt)
+	MCFG_CPU_ADD("maincpu", DECO16, 2000000)
+	MCFG_CPU_PROGRAM_MAP(prosport_map)
+	MCFG_CPU_IO_MAP(deco16_io_map)
+	MCFG_CPU_VBLANK_INT("screen", deco16_interrupt)
 
-	MDRV_CPU_ADD("audiocpu", M6502, 1500000/2)
-	MDRV_CPU_PROGRAM_MAP(liberate_sound_map)
-	MDRV_CPU_PERIODIC_INT(nmi_line_pulse,16*60) /* ??? */
+	MCFG_CPU_ADD("audiocpu", M6502, 1500000/2)
+	MCFG_CPU_PROGRAM_MAP(liberate_sound_map)
+	MCFG_CPU_PERIODIC_INT(nmi_line_pulse,16*60) /* ??? */
 
-//  MDRV_QUANTUM_TIME(HZ(12000))
+//  MCFG_QUANTUM_TIME(HZ(12000))
 
-	MDRV_MACHINE_START(liberate)
-	MDRV_MACHINE_RESET(liberate)
+	MCFG_MACHINE_START(liberate)
+	MCFG_MACHINE_RESET(liberate)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1529) /* 529ms Vblank duration?? */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1529) /* 529ms Vblank duration?? */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 
-	MDRV_GFXDECODE(prosport)
-	MDRV_PALETTE_LENGTH(256)
+	MCFG_GFXDECODE(prosport)
+	MCFG_PALETTE_LENGTH(256)
 
-	MDRV_VIDEO_START(prosport)
-	MDRV_VIDEO_UPDATE(prosport)
+	MCFG_VIDEO_START(prosport)
+	MCFG_VIDEO_UPDATE(prosport)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay1", AY8910, 1500000)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	MCFG_SOUND_ADD("ay1", AY8910, 1500000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MDRV_SOUND_ADD("ay2", AY8910, 1500000)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("ay2", AY8910, 1500000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 
@@ -1358,7 +1358,7 @@ static void sound_cpu_decrypt(running_machine *machine)
 {
 	address_space *space = cputag_get_address_space(machine, "audiocpu", ADDRESS_SPACE_PROGRAM);
 	UINT8 *decrypted = auto_alloc_array(machine, UINT8, 0x4000);
-	UINT8 *rom = memory_region(machine, "audiocpu");
+	UINT8 *rom = machine->region("audiocpu")->base();
 	int i;
 
 	/* Bit swapping on sound cpu - Opcodes only */
@@ -1370,7 +1370,7 @@ static void sound_cpu_decrypt(running_machine *machine)
 
 static DRIVER_INIT( prosport )
 {
-	UINT8 *RAM = memory_region(machine, "maincpu");
+	UINT8 *RAM = machine->region("maincpu")->base();
 	int i;
 
 	/* Main cpu has the nibbles swapped */
@@ -1392,7 +1392,7 @@ static DRIVER_INIT( liberate )
 	int A;
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT8 *decrypted = auto_alloc_array(machine, UINT8, 0x10000);
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 
 	space->set_decrypted_region(0x0000, 0xffff, decrypted);
 

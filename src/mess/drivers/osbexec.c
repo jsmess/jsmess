@@ -35,15 +35,15 @@ public:
 	{ }
 
 	required_device<cpu_device>	maincpu;
-	required_device<running_device>	mb8877;
-	required_device<running_device>	messram;
+	required_device<device_t>	mb8877;
+	required_device<device_t>	messram;
 	required_device<pia6821_device>	pia_0;
 	required_device<pia6821_device>	pia_1;
 	required_device<z80dart_device>	sio;
-	required_device<running_device>	speaker;
+	required_device<device_t>	speaker;
 
-	region_info	*fontram_region;
-	region_info *vram_region;
+	memory_region	*fontram_region;
+	memory_region *vram_region;
 	UINT8	*fontram;
 	UINT8	*vram;
 	UINT8	*ram_0000;
@@ -78,7 +78,7 @@ public:
 
 		if ( pia0_porta & 0x80 )
 		{
-			memory_set_bankptr( machine, "0000", memory_region(machine, "maincpu") );
+			memory_set_bankptr( machine, "0000", machine->region("maincpu")->base());
 			/* When BIOS is enabled 2000-3FFF (or maybe 2000-2FFF) is taken from the first 64KB ) */
 			memory_set_bankptr( machine, "2000", messram_ptr + 0x2000 );
 		}
@@ -594,39 +594,39 @@ static const z80_daisy_config osbexec_daisy_config[] =
 
 
 static MACHINE_CONFIG_START( osbexec, osbexec_state )
-	MDRV_CPU_ADD( "maincpu", Z80, MAIN_CLOCK/6 )
-	MDRV_CPU_PROGRAM_MAP( osbexec_mem)
-	MDRV_CPU_IO_MAP( osbexec_io)
-	MDRV_CPU_CONFIG( osbexec_daisy_config )
+	MCFG_CPU_ADD( "maincpu", Z80, MAIN_CLOCK/6 )
+	MCFG_CPU_PROGRAM_MAP( osbexec_mem)
+	MCFG_CPU_IO_MAP( osbexec_io)
+	MCFG_CPU_CONFIG( osbexec_daisy_config )
 
-	MDRV_MACHINE_RESET( osbexec )
+	MCFG_MACHINE_RESET( osbexec )
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_FORMAT( BITMAP_FORMAT_INDEXED16 )
-	MDRV_SCREEN_RAW_PARAMS( MAIN_CLOCK/2, 768, 0, 640, 260, 0, 240 )	/* May not be correct */
-	MDRV_VIDEO_START( generic_bitmapped )
-	MDRV_VIDEO_UPDATE( generic_bitmapped )
-	MDRV_PALETTE_LENGTH( 3 )
-	MDRV_PALETTE_INIT( osbexec )
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_FORMAT( BITMAP_FORMAT_INDEXED16 )
+	MCFG_SCREEN_RAW_PARAMS( MAIN_CLOCK/2, 768, 0, 640, 260, 0, 240 )	/* May not be correct */
+	MCFG_VIDEO_START( generic_bitmapped )
+	MCFG_VIDEO_UPDATE( generic_bitmapped )
+	MCFG_PALETTE_LENGTH( 3 )
+	MCFG_PALETTE_INIT( osbexec )
 
-	MDRV_SPEAKER_STANDARD_MONO( "mono" )
-	MDRV_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MDRV_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
+	MCFG_SPEAKER_STANDARD_MONO( "mono" )
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 
-//	MDRV_PIT8253_ADD( "pit", osbexec_pit_config )
+//	MCFG_PIT8253_ADD( "pit", osbexec_pit_config )
 
-	MDRV_PIA6821_ADD( "pia_0", osbexec_pia0_config )
-	MDRV_PIA6821_ADD( "pia_1", osbexec_pia1_config )
+	MCFG_PIA6821_ADD( "pia_0", osbexec_pia0_config )
+	MCFG_PIA6821_ADD( "pia_1", osbexec_pia1_config )
 
-	MDRV_Z80SIO2_ADD( "sio", MAIN_CLOCK/6, osbexec_sio_config )
+	MCFG_Z80SIO2_ADD( "sio", MAIN_CLOCK/6, osbexec_sio_config )
 
-	MDRV_MB8877_ADD("mb8877", default_wd17xx_interface_2_drives )
+	MCFG_MB8877_ADD("mb8877", default_wd17xx_interface_2_drives )
 
-	MDRV_FLOPPY_2_DRIVES_ADD(osbexec_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_ADD(osbexec_floppy_config)
 
 	/* internal ram */
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("128K")	/* 128KB Main RAM */
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("128K")	/* 128KB Main RAM */
 MACHINE_CONFIG_END
 
 

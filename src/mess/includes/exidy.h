@@ -29,7 +29,7 @@ public:
 	exidy_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	running_device *ay31015;
+	device_t *ay31015;
 	UINT8 fe;
 	UINT8 keyboard_line;
 	emu_timer *serial_timer;

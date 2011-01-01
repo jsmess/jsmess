@@ -23,9 +23,9 @@ public:
 	UINT8 *color_ram_b;
 
 	/* devices */
-	running_device *cassette;
-	running_device *speaker;
-	running_device *centronics;
+	device_t *cassette;
+	device_t *speaker;
+	device_t *centronics;
 };
 
 #endif

@@ -124,7 +124,7 @@ static int has_serial_eeprom;
 static WRITE16_HANDLER( genesis_ssf2_bank_w )
 {
 	static int lastoffset = -1,lastdata = -1;
-	UINT8 *ROM = memory_region(space->machine, "maincpu");
+	UINT8 *ROM = space->machine->region("maincpu")->base();
 
 	if ((lastoffset != offset) || (lastdata != data))
 	{
@@ -247,7 +247,7 @@ static WRITE16_HANDLER( g_l3alt_bank_w )
 	{
 		case 0:
 		{
-		UINT8 *ROM = memory_region(space->machine, "maincpu");
+		UINT8 *ROM = space->machine->region("maincpu")->base();
 		/* printf("%06x data %04x\n",activecpu_get_pc(), data); */
 		memcpy(&ROM[0x000000], &ROM[VIRGIN_COPY_GEN + (data & 0xffff) * 0x8000], 0x8000);
 		}
@@ -272,7 +272,7 @@ static WRITE16_HANDLER( realtec_400000_w )
 {
 	int bankdata = (data >> 9) & 0x7;
 
-	UINT8 *ROM = memory_region(space->machine, "maincpu");
+	UINT8 *ROM = space->machine->region("maincpu")->base();
 
 	realtec_old_bank_addr = realtec_bank_addr;
 	realtec_bank_addr = (realtec_bank_addr & 0x7) | bankdata << 3;
@@ -284,7 +284,7 @@ static WRITE16_HANDLER( realtec_400000_w )
 static WRITE16_HANDLER( realtec_404000_w )
 {
 	int bankdata = (data >> 8) & 0x3;
-	UINT8 *ROM = memory_region(space->machine, "maincpu");
+	UINT8 *ROM = space->machine->region("maincpu")->base();
 
 	realtec_old_bank_addr = realtec_bank_addr;
 	realtec_bank_addr = (realtec_bank_addr & 0xf8) | bankdata;
@@ -298,7 +298,7 @@ static WRITE16_HANDLER( realtec_404000_w )
 
 static WRITE16_HANDLER( g_chifi3_bank_w )
 {
-	UINT8 *ROM = memory_region(space->machine, "maincpu");
+	UINT8 *ROM = space->machine->region("maincpu")->base();
 
 	if (data == 0xf100) // *hit player
 	{
@@ -365,11 +365,11 @@ static READ16_HANDLER( g_chifi3_prot_r )
 	}
 	else if (cpu_get_pc(space->cpu) == 0x10c4a) // unknown
 	{
-		return mame_rand(space->machine);
+		return space->machine->rand();
 	}
 	else if (cpu_get_pc(space->cpu) == 0x10c50) // unknown
 	{
-		return mame_rand(space->machine);
+		return space->machine->rand();
 	}
 	else if (cpu_get_pc(space->cpu) == 0x10c52) // relates to the game speed..
 	{
@@ -399,14 +399,14 @@ static READ16_HANDLER( g_chifi3_prot_r )
 
 static WRITE16_HANDLER( s19in1_bank )
 {
-	UINT8 *ROM = memory_region(space->machine, "maincpu");
+	UINT8 *ROM = space->machine->region("maincpu")->base();
 	memcpy(ROM + 0x000000, ROM + 0x400000 + ((offset << 1) * 0x10000), 0x80000);
 }
 
 // Kaiju? (Pokemon Stadium) handler from HazeMD
 static WRITE16_HANDLER( g_kaiju_bank_w )
 {
-	UINT8 *ROM = memory_region(space->machine, "maincpu");
+	UINT8 *ROM = space->machine->region("maincpu")->base();
 	memcpy(ROM + 0x000000, ROM + 0x400000 + (data & 0x7f) * 0x8000, 0x8000);
 }
 
@@ -493,7 +493,7 @@ static READ16_HANDLER( kof99_0xA13000_r )
 static READ16_HANDLER( radica_bank_select )
 {
 	int bank = offset&0x3f;
-	UINT8 *ROM = memory_region(space->machine, "maincpu");
+	UINT8 *ROM = space->machine->region("maincpu")->base();
 	memcpy(ROM, ROM +  (bank * 0x10000) + 0x400000, 0x400000);
 	return 0;
 }
@@ -631,7 +631,7 @@ static READ16_HANDLER( genesis_sram_read )
 	}
 	else
 	{
-		ROM = memory_region(space->machine, "maincpu");
+		ROM = space->machine->region("maincpu")->base();
 		rom_offset = genesis_sram_start + (offset << 1);
 
 		return (UINT16) ROM[rom_offset] | (ROM[rom_offset + 1] << 8);
@@ -774,7 +774,7 @@ static void setup_megadriv_custom_mappers(running_machine *machine)
 	genesis_sram_readonly = 0;
 	genesis_sram_active = 0;
 
-	ROM = memory_region(machine, "maincpu");
+	ROM = machine->region("maincpu")->base();
 
 	if (cart_type == SSF2)
 	{
@@ -1145,7 +1145,7 @@ static DEVICE_IMAGE_LOAD( genesis_cart )
 
 	if (image.software_entry() == NULL)
 	{
-		rawROM = memory_region(image.device().machine, "maincpu");
+		rawROM = image.device().machine->region("maincpu")->base();
 		ROM = rawROM /*+ 512 */;
 
 		genesis_last_loaded_image_length = -1;
@@ -1488,7 +1488,7 @@ static DEVICE_IMAGE_LOAD( genesis_cart )
 		const char	*pcb_name;
 
 		length = image.get_software_region_length("rom");
-		ROM = memory_region(image.device().machine, "maincpu");
+		ROM = image.device().machine->region("maincpu")->base();
 		memcpy(ROM, image.get_software_region("rom"), length);
 
 		genesis_last_loaded_image_length = length;
@@ -1574,15 +1574,15 @@ static DEVICE_IMAGE_LOAD( _32x_cart )
 
 	/* Copy the cart image in the locations the driver expects */
 	// Notice that, by using pick_integer, we are sure the code works on both LE and BE machines
-	ROM16 = (UINT16 *) memory_region(image.device().machine, "gamecart");
+	ROM16 = (UINT16 *) image.device().machine->region("gamecart")->base();
 	for (i = 0; i < length; i += 2)
 		ROM16[i / 2] = pick_integer_be(temp_copy, i, 2);
 
-	ROM32 = (UINT32 *) memory_region(image.device().machine, "gamecart_sh2");
+	ROM32 = (UINT32 *) image.device().machine->region("gamecart_sh2")->base();
 	for (i = 0; i < length; i += 4)
 		ROM32[i / 4] = pick_integer_be(temp_copy, i, 4);
 
-	ROM16 = (UINT16 *) memory_region(image.device().machine, "maincpu");
+	ROM16 = (UINT16 *) image.device().machine->region("maincpu")->base();
 	for (i = 0x00; i < length; i += 2)
 		ROM16[i / 2] = pick_integer_be(temp_copy, i, 2);
 
@@ -1596,30 +1596,30 @@ static DEVICE_IMAGE_LOAD( _32x_cart )
 /******* Cart getinfo *******/
 
 MACHINE_CONFIG_FRAGMENT( genesis_cartslot )
-	MDRV_CARTSLOT_ADD("cart")
-	MDRV_CARTSLOT_EXTENSION_LIST("smd,bin,md,gen")
-	MDRV_CARTSLOT_MANDATORY
-	MDRV_CARTSLOT_INTERFACE("megadriv_cart")
-	MDRV_CARTSLOT_LOAD(genesis_cart)
-	MDRV_CARTSLOT_UNLOAD(genesis_cart)
-	MDRV_SOFTWARE_LIST_ADD("cart_list","megadriv")
+	MCFG_CARTSLOT_ADD("cart")
+	MCFG_CARTSLOT_EXTENSION_LIST("smd,bin,md,gen")
+	MCFG_CARTSLOT_MANDATORY
+	MCFG_CARTSLOT_INTERFACE("megadriv_cart")
+	MCFG_CARTSLOT_LOAD(genesis_cart)
+	MCFG_CARTSLOT_UNLOAD(genesis_cart)
+	MCFG_SOFTWARE_LIST_ADD("cart_list","megadriv")
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_FRAGMENT( _32x_cartslot )
-	MDRV_CARTSLOT_ADD("cart")
-	MDRV_CARTSLOT_EXTENSION_LIST("32x,bin")
-	MDRV_CARTSLOT_MANDATORY
-	MDRV_CARTSLOT_INTERFACE("_32x_cart")
-	MDRV_CARTSLOT_LOAD(_32x_cart)
-	MDRV_SOFTWARE_LIST_ADD("cart_list","32x")
+	MCFG_CARTSLOT_ADD("cart")
+	MCFG_CARTSLOT_EXTENSION_LIST("32x,bin")
+	MCFG_CARTSLOT_MANDATORY
+	MCFG_CARTSLOT_INTERFACE("_32x_cart")
+	MCFG_CARTSLOT_LOAD(_32x_cart)
+	MCFG_SOFTWARE_LIST_ADD("cart_list","32x")
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_FRAGMENT( pico_cartslot )
-	MDRV_CARTSLOT_ADD("cart")
-	MDRV_CARTSLOT_EXTENSION_LIST("bin")
-	MDRV_CARTSLOT_MANDATORY
-	MDRV_CARTSLOT_INTERFACE("pico_cart")
-	MDRV_CARTSLOT_LOAD(genesis_cart)
-	MDRV_CARTSLOT_UNLOAD(genesis_cart)
-	MDRV_SOFTWARE_LIST_ADD("cart_list","pico")
+	MCFG_CARTSLOT_ADD("cart")
+	MCFG_CARTSLOT_EXTENSION_LIST("bin")
+	MCFG_CARTSLOT_MANDATORY
+	MCFG_CARTSLOT_INTERFACE("pico_cart")
+	MCFG_CARTSLOT_LOAD(genesis_cart)
+	MCFG_CARTSLOT_UNLOAD(genesis_cart)
+	MCFG_SOFTWARE_LIST_ADD("cart_list","pico")
 MACHINE_CONFIG_END

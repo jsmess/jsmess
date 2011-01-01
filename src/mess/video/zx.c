@@ -138,7 +138,7 @@ void zx_ula_r(running_machine *machine, int offs, const char *region, const UINT
 	zx_state *state = machine->driver_data<zx_state>();
 	screen_device *screen = machine->first_screen();
 	int offs0 = offs & 0x7fff;
-	UINT8 *rom = memory_region(machine, "maincpu");
+	UINT8 *rom = machine->region("maincpu")->base();
 	UINT8 chr = rom[offs0];
 
 	if ((!state->ula_irq_active) && (chr == 0x76))
@@ -153,7 +153,7 @@ void zx_ula_r(running_machine *machine, int offs, const char *region, const UINT
 		else
 			creg = cpu_get_reg(machine->device("maincpu"), Z80_C);
 
-		chrgen = memory_region(machine, region);
+		chrgen = machine->region(region)->base();
 
 		if ((++state->ula_scanline_count == screen->height()) || (creg == 32))
 		{

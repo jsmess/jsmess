@@ -19,8 +19,8 @@ DECLARE_LEGACY_DEVICE(I8271, i8271);
 
 typedef struct i8271_interface
 {
-	void (*interrupt)(running_device *device, int state);
-	void (*dma_request)(running_device *device, int state, int read_);
+	void (*interrupt)(device_t *device, int state);
+	void (*dma_request)(device_t *device, int state, int read_);
 	const char *floppy_drive_tags[2];
 } i8271_interface;
 
@@ -41,8 +41,8 @@ WRITE8_DEVICE_HANDLER(i8271_data_w);
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MDRV_I8271_ADD(_tag, _intrf) \
-	MDRV_DEVICE_ADD(_tag, I8271, 0) \
-	MDRV_DEVICE_CONFIG(_intrf)
+#define MCFG_I8271_ADD(_tag, _intrf) \
+	MCFG_DEVICE_ADD(_tag, I8271, 0) \
+	MCFG_DEVICE_CONFIG(_intrf)
 
 #endif /* I8271_H_ */

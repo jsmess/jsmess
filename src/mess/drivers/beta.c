@@ -118,7 +118,7 @@ static READ8_DEVICE_HANDLER( beta_riot_a_r )
 	default:
 		if (!state->eprom_oe && !state->eprom_ce)
 		{
-			data = memory_region(device->machine, EPROM_TAG)[state->eprom_addr & 0x7ff];
+			data = device->machine->region(EPROM_TAG)->base()[state->eprom_addr & 0x7ff];
 			popmessage("EPROM read %04x = %02x\n", state->eprom_addr & 0x7ff, data);
 		}
 	}
@@ -209,7 +209,7 @@ static WRITE8_DEVICE_HANDLER( beta_riot_b_w )
 	if (BIT(data, 6) && (!BIT(state->old_data, 7) && BIT(data, 7)))
 	{
 		popmessage("EPROM write %04x = %02x\n", state->eprom_addr & 0x7ff, state->eprom_data);
-		memory_region(device->machine, EPROM_TAG)[state->eprom_addr & 0x7ff] &= state->eprom_data;
+		device->machine->region(EPROM_TAG)->base()[state->eprom_addr & 0x7ff] &= state->eprom_data;
 	}
 
 	state->old_data = data;
@@ -228,7 +228,7 @@ static const riot6532_interface beta_riot_interface =
 
 static DEVICE_IMAGE_UNLOAD( beta_eprom )
 {
-	UINT8 *ptr = memory_region(image.device().machine, EPROM_TAG);
+	UINT8 *ptr = image.device().machine->region(EPROM_TAG)->base();
 
 	image.fwrite(ptr, 0x800);
 }
@@ -259,31 +259,31 @@ static MACHINE_START( beta )
 static MACHINE_CONFIG_START( beta, beta_state )
 
 	/* basic machine hardware */
-    MDRV_CPU_ADD(M6502_TAG, M6502, XTAL_4MHz/4)
-    MDRV_CPU_PROGRAM_MAP(beta_mem)
+    MCFG_CPU_ADD(M6502_TAG, M6502, XTAL_4MHz/4)
+    MCFG_CPU_PROGRAM_MAP(beta_mem)
 
-    MDRV_MACHINE_START(beta)
+    MCFG_MACHINE_START(beta)
 
     /* video hardware */
-	MDRV_DEFAULT_LAYOUT( layout_beta )
+	MCFG_DEFAULT_LAYOUT( layout_beta )
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* devices */
-	MDRV_RIOT6532_ADD(M6532_TAG, XTAL_4MHz/4, beta_riot_interface)
+	MCFG_RIOT6532_ADD(M6532_TAG, XTAL_4MHz/4, beta_riot_interface)
 
 	/* EPROM socket */
-	MDRV_CARTSLOT_ADD(EPROM_TAG)
-	MDRV_CARTSLOT_EXTENSION_LIST("bin,rom")
-	MDRV_CARTSLOT_NOT_MANDATORY
-	MDRV_CARTSLOT_UNLOAD(beta_eprom)
+	MCFG_CARTSLOT_ADD(EPROM_TAG)
+	MCFG_CARTSLOT_EXTENSION_LIST("bin,rom")
+	MCFG_CARTSLOT_NOT_MANDATORY
+	MCFG_CARTSLOT_UNLOAD(beta_eprom)
 
 	/* internal ram */
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("256")
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("256")
 MACHINE_CONFIG_END
 
 /* ROMs */

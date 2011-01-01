@@ -31,30 +31,30 @@ struct _sst39vfx_config
 
 DECLARE_LEGACY_DEVICE(SST39VF020, sst39vf020);
 
-#define MDRV_SST39VF020_ADD(_tag,_cpu_datawidth,_cpu_endianess) \
-	MDRV_DEVICE_ADD(_tag, SST39VF020, 0) \
-	MDRV_DEVICE_CONFIG_DATA32(sst39vfx_config, cpu_datawidth, _cpu_datawidth) \
-	MDRV_DEVICE_CONFIG_DATA32(sst39vfx_config, cpu_endianess, _cpu_endianess)
+#define MCFG_SST39VF020_ADD(_tag,_cpu_datawidth,_cpu_endianess) \
+	MCFG_DEVICE_ADD(_tag, SST39VF020, 0) \
+	MCFG_DEVICE_CONFIG_DATA32(sst39vfx_config, cpu_datawidth, _cpu_datawidth) \
+	MCFG_DEVICE_CONFIG_DATA32(sst39vfx_config, cpu_endianess, _cpu_endianess)
 
-#define MDRV_SST39VF020_REMOVE(_tag) \
-	MDRV_DEVICE_REMOVE(_tag)
+#define MCFG_SST39VF020_REMOVE(_tag) \
+	MCFG_DEVICE_REMOVE(_tag)
 
 DECLARE_LEGACY_DEVICE(SST39VF400A, sst39vf400a);
 
-#define MDRV_SST39VF400A_ADD(_tag,_cpu_datawidth,_cpu_endianess) \
-	MDRV_DEVICE_ADD(_tag, SST39VF400A, 0) \
-	MDRV_DEVICE_CONFIG_DATA32(sst39vfx_config, cpu_datawidth, _cpu_datawidth) \
-	MDRV_DEVICE_CONFIG_DATA32(sst39vfx_config, cpu_endianess, _cpu_endianess)
+#define MCFG_SST39VF400A_ADD(_tag,_cpu_datawidth,_cpu_endianess) \
+	MCFG_DEVICE_ADD(_tag, SST39VF400A, 0) \
+	MCFG_DEVICE_CONFIG_DATA32(sst39vfx_config, cpu_datawidth, _cpu_datawidth) \
+	MCFG_DEVICE_CONFIG_DATA32(sst39vfx_config, cpu_endianess, _cpu_endianess)
 
-#define MDRV_SST39VF400A_REMOVE(_tag) \
-	MDRV_DEVICE_REMOVE(_tag)
+#define MCFG_SST39VF400A_REMOVE(_tag) \
+	MCFG_DEVICE_REMOVE(_tag)
 
 /***************************************************************************
     FUNCTION PROTOTYPES
 ***************************************************************************/
 // get base/size
-UINT8* sst39vfx_get_base( running_device *device );
-UINT32 sst39vfx_get_size( running_device *device );
+UINT8* sst39vfx_get_base( device_t *device );
+UINT32 sst39vfx_get_size( device_t *device );
 
 // read/write handler
 #if 0
@@ -63,8 +63,8 @@ WRITE8_HANDLER( sst39vfx_w );
 #endif
 
 // load/save
-void sst39vfx_load(running_device *device, mame_file *file);
-void sst39vfx_save(running_device *device, mame_file *file);
+void sst39vfx_load(device_t *device, mame_file *file);
+void sst39vfx_save(device_t *device, mame_file *file);
 
 // non-volatile ram handler
 //NVRAM_HANDLER( sst39vfx );

@@ -478,9 +478,9 @@ void abc806_state::video_start()
 	m_40 = 1;
 
 	// find memory regions
-	m_char_rom = memory_region(machine, MC6845_TAG);
-	m_rad_prom = memory_region(machine, "rad");
-	m_hru2_prom = memory_region(machine, "hru2");
+	m_char_rom = machine->region(MC6845_TAG)->base();
+	m_rad_prom = machine->region("rad")->base();
+	m_hru2_prom = machine->region("hru2")->base();
 
 	// allocate memory
 	m_char_ram = auto_alloc_array(machine, UINT8, ABC806_CHAR_RAM_SIZE);
@@ -536,17 +536,17 @@ bool abc806_state::video_update(screen_device &screen, bitmap_t &bitmap, const r
 //-------------------------------------------------
 
 MACHINE_CONFIG_FRAGMENT( abc806_video )
-	MDRV_MC6845_ADD(MC6845_TAG, MC6845, ABC800_CCLK, crtc_intf)
+	MCFG_MC6845_ADD(MC6845_TAG, MC6845, ABC800_CCLK, crtc_intf)
 
-	MDRV_SCREEN_ADD(SCREEN_TAG, RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MDRV_SCREEN_SIZE(640, 400)
-	MDRV_SCREEN_VISIBLE_AREA(0,640-1, 0, 400-1)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
+	MCFG_SCREEN_SIZE(640, 400)
+	MCFG_SCREEN_VISIBLE_AREA(0,640-1, 0, 400-1)
 
-	MDRV_PALETTE_LENGTH(8)
+	MCFG_PALETTE_LENGTH(8)
 
-	MDRV_PALETTE_INIT(abc806)
+	MCFG_PALETTE_INIT(abc806)
 MACHINE_CONFIG_END

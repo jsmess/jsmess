@@ -1193,6 +1193,7 @@ const game_driver * const drivers[] =
 	DRIVER( iceclimb )	/* (c) 1984 Nintendo */
 	DRIVER( iceclimbj )	/* (c) 1984 Nintendo */
 	DRIVER( ladygolf )	/* (c) 1984 Nintendo */
+    DRIVER( ladygolfe ) /* (c) 1984 Nintendo */
 	DRIVER( machridr )	/* (c) 1985 Nintendo */
 	DRIVER( machridrj )	/* (c) 1985 Nintendo */
 	DRIVER( rbibb )		/* (c) 1987 Namco */
@@ -3467,6 +3468,7 @@ V-V                           TP-027
 	DRIVER( gtrfrk5m )	/* 2001 - Guitar Freaks 5th Mix (G*A26 VER. JAA) */
 	DRIVER( ddr5m )		/* 2001 - Dance Dance Revolution 5th Mix (G*A27 VER. JAA) */
 	DRIVER( dmx2majp )	/* 2001 - Dance Maniax 2nd Mix Append J-Paradise (G*A38 VER. JAA ) */
+	DRIVER( mamboagg )	/* 2001 - Mambo A Go-Go (GQA40 VER. JAB) */
 	DRIVER( gtrfrk6m )	/* 2001 - Guitar Freaks 6th Mix (G*B06 VER. JAA) */
 	DRIVER( gtrfrk7m )	/* 2001 - Guitar Freaks 6th Mix (G*B17 VER. JAA) */
 	DRIVER( ddrmax )	/* 2001 - DDR Max - Dance Dance Revolution 6th Mix (G*B19 VER. JAA) */
@@ -3568,6 +3570,7 @@ V-V                           TP-027
 	DRIVER( sstrike )	/* (c) 1990 Strata/Incredible Technologies */
 	DRIVER( gtg )		/* (c) 1990 Strata/Incredible Technologies */
 	DRIVER( gtgt )		/* (c) 1990 Strata/Incredible Technologies */
+	DRIVER( gtgt1 )		/* (c) 1990 Strata/Incredible Technologies */
 	DRIVER( hstennis )	/* (c) 1990 Strata/Incredible Technologies */
 	DRIVER( hstennis10 )/* (c) 1990 Strata/Incredible Technologies */
 	DRIVER( slikshot )	/* (c) 1990 Grand Products/Incredible Technologies */
@@ -5708,6 +5711,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( asterixaad )	/* GX068 (c) 1992 (Asia) */
 	DRIVER( asterixj )	/* GX068 (c) 1992 (Japan) */
 	DRIVER( gijoe )		/* GX069 (c) 1991 (World) */
+	DRIVER( gijoea )	/* GX069 (c) 1991 (World) */
 	DRIVER( gijoeu )	/* GX069 (c) 1991 (US) */
 	DRIVER( gijoej )	/* GX069 (c) 1991 (Japan) */
 	DRIVER( thndrx2 )	/* GX073 (c) 1991 (World) */
@@ -6381,6 +6385,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( guardian )	/* 136092           (c) 1992 */
 	DRIVER( relief )	/* 136093           (c) 1992 */
 	DRIVER( relief2 )	/* 136093           (c) 1992 */
+	DRIVER( relief3 )	/* 136093           (c) 1992 */
 	DRIVER( arcadecl )	/* (proto)          (c) 1992 */
 	DRIVER( sparkz )	/* (proto)          (c) 1992 */
 	DRIVER( motofren )	/* 136094           (c) 1992 */
@@ -6792,6 +6797,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 
 	/* The BrezzaSoft games don't have proper ID codes */
 	DRIVER( jockeygp )
+	DRIVER( jockeygpa )
 	DRIVER( vliner )
 	DRIVER( vlinero )
 
@@ -7377,6 +7383,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( raidenk )	/* (c) 1990 Seibu Kaihatsu + IBL Corporation license */
 	DRIVER( raident )	/* (c) 1990 Seibu Kaihatsu + Liang HWA Electronics license */
 	DRIVER( raidenu )	/* (c) 1990 Seibu Kaihatsu + Fabtek license */
+	DRIVER( raidenua )	/* (c) 1990 Seibu Kaihatsu + Fabtek license */
 	DRIVER( sdgndmps )	/* (c) Banpresto / Bandai (Japan) */
 	DRIVER( dcon )		/* (c) 1992 Success */
 	DRIVER( sengokmj )	/* (c) 1991 Sigma */
@@ -7782,6 +7789,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( bang )		/* (c) 1998 - Ref ??? */
 	DRIVER( bangj )		/* (c) 1999 - Ref ??? */
 	DRIVER( grtesoro )	/* (c) 1999 - Ref ??? */
+	DRIVER( grtesoro4 )	/* (c) 1999 - Ref ??? */
 
 	/* Gaelco 3D games */
 	DRIVER( speedup )	/* (c) 1996 - Ref ??? */
@@ -8324,6 +8332,7 @@ Other Sun games
 	DRIVER( multchmpk )	/* (c) 1998 (Korea) */
 	DRIVER( mchampdx )	/* (c) 1999 ESD */
 	DRIVER( mchampdxa )	/* (c) 1999 ESD */
+	DRIVER( mchampdxb )	/* (c) 1999 ESD */
 	DRIVER( hedpanic )	/* (c) 2000 ESD */
 	DRIVER( hedpanicf )	/* (c) 2000 ESD + Fuuki, Co. Ltd. */
 	DRIVER( hedpanico )	/* (c) 1999 ESD */
@@ -8968,6 +8977,8 @@ Other Sun games
 	DRIVER( spaceint )	/* [1980] Shoei */
 	DRIVER( spaceintj )	/* [1980] Shoei */
 	DRIVER( spacefb )	/* (c) [1980?] Nintendo */
+	DRIVER( spacefbu )	/* (c) [1980?] Nintendo */
+	DRIVER( spacefbe )	/* (c) [1980?] Nintendo */
 	DRIVER( spacefbg )	/* 834-0031 (c) 1980 Gremlin */
 	DRIVER( spacefbb )	/* bootleg */
 	DRIVER( spacebrd )	/* bootleg */
@@ -9533,6 +9544,11 @@ Other Sun games
 	DRIVER( potnpkrc )	/* Bootleg */
 	DRIVER( potnpkrd )	/* Bootleg */
 	DRIVER( potnpkre )	/* Bootleg */
+	DRIVER( goodluck )	/* Unknown */
+	DRIVER( superdbl )	/* 198? Karateco */
+	DRIVER( ngold )		/* 198? Unknown */
+	DRIVER( ngolda )	/* 198? Unknown */
+	DRIVER( ngoldb )	/* 198? Unknown */
 	DRIVER( witchcrd )	/* (c) 1991, Video Klein */
 	DRIVER( witchcda )	/* 1991, Unknown */
 	DRIVER( witchcdb )	/* 1991, Unknown */
@@ -9569,7 +9585,6 @@ Other Sun games
 	DRIVER( bsuertet )	/* 1991, Unknown */
 	DRIVER( bsuerteu )	/* 1991, Unknown */
 	DRIVER( pmpoker )	/* (c) 1981 PlayMan */
-	DRIVER( goodluck )	/* Unknown */
 	DRIVER( royale )	/* Unknown */
 	DRIVER( royalea )	/* Unknown */
 	DRIVER( sloco93 )	/* 1993, Unknown */
@@ -9578,7 +9593,9 @@ Other Sun games
 	DRIVER( brasil89 )	/* 1989, Unknown */
 	DRIVER( poker91 )	/* 1991, Unknown */
 	DRIVER( genie )		/* (c) 198? Video Fun Games Ltd. */
-	DRIVER( superdbl )	/* 198? Karateco */
+	DRIVER( silverga )	/* 1983, Unknown */
+	DRIVER( pokerdub )	/* 198?, Unknown */
+	DRIVER( pokerduc )	/* 198?, Unknown */
 
 	/* Cal Omega */
 	DRIVER( comg074 )	/* (c) 1981 Cal Omega Inc. */
@@ -9777,11 +9794,6 @@ Other Sun games
 	DRIVER( cfever61 )	/* (c) 2000 High Video */
 	DRIVER( cfever1k )	/* (c) 2000 High Video */
 	DRIVER( girotutt )	/* (c) 2000 High Video */
-
-	/* 68000+MCU+blitter gambling games */
-	DRIVER( steaser )	/* (c) 1993 unknown */
-	DRIVER( ilpag )		/* (c) 199? unknown */
-	DRIVER( cjffruit )	/* (c) 1998 Cadillac Jack */
 
 	/* Sure games */
 	DRIVER( mil4000 )	/* (c) 2000 Sure Milano */
@@ -10532,6 +10544,20 @@ Other Sun games
 	DRIVER( megadpkr )	/* (c) 1990 Blitz System Inc */
 	DRIVER( megadpkrb )	/* (c) 1990 Blitz System Inc */
 
+	/* Blitz System Inc. 68k + Blitter Hardware */
+	DRIVER( megadblj )	/* (c) 1990 Blitz Systems Inc. */
+	DRIVER( megadble )	/* (c) 1990 Blitz Systems Inc. */
+	DRIVER( maxidbl )	/* (c) 1992 Blitz Systems Inc. */
+	DRIVER( bankrob )	/* (c) 1993 Entertainment Technology Corp. */
+	DRIVER( bankroba )	/* (c) 1993 Entertainment Technology Corp. */
+	DRIVER( poker52 )	/* (c) 1993 Blitz Systems Inc. ? */
+	DRIVER( steaser )	/* (c) 1993 unknown */
+	DRIVER( dualgame )	/* (c) 1995 Labtronix Technologies */
+	DRIVER( hermit )	/* (c) 1995 Dugamex */
+	DRIVER( deucesw2 )	/* (c) 1997 */
+	DRIVER( cjffruit )	/* (c) 1998 Cadillac Jack */
+	DRIVER( ilpag )		/* (c) 199? unknown */
+
 	/* Olympic Video Gaming */
 	DRIVER( hotstuff )
 
@@ -10550,9 +10576,6 @@ Other Sun games
 
 	/* NSM */
 	DRIVER( nsmpoker )
-
-	/* Labtronix Technologies */
-	DRIVER( dualgame )	/* (c) 1995 Labtronix Technologies */
 
 	/* Advanced Video Technologies */
 	DRIVER( avtsym14 )	/* (c) 1985 AVT */

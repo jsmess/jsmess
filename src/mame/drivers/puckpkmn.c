@@ -166,20 +166,20 @@ ADDRESS_MAP_END
 
 static MACHINE_CONFIG_DERIVED( puckpkmn, megadriv )
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(puckpkmn_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(puckpkmn_map)
 
-	MDRV_DEVICE_REMOVE("genesis_snd_z80")
+	MCFG_DEVICE_REMOVE("genesis_snd_z80")
 
-	MDRV_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker",0.25)
+	MCFG_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker",0.25)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( puckpkmna, puckpkmn )
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(puckpkmna_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(puckpkmna_map)
 
 MACHINE_CONFIG_END
 
@@ -259,8 +259,8 @@ Screenshots available on my site at http://guru.mameworld.info/oldnews2001.html 
 
 static DRIVER_INIT( puckpkmn )
 {
-	UINT8 *rom	=	memory_region(machine, "maincpu");
-	size_t len		=	memory_region_length(machine, "maincpu");
+	UINT8 *rom	=	machine->region("maincpu")->base();
+	size_t len		=	machine->region("maincpu")->bytes();
 	int i;
 
 	for (i = 0; i < len; i++)

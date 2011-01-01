@@ -217,7 +217,7 @@ static void int3_lower_local1_irq(UINT8 source_mask)
 static READ32_HANDLER( hpc3_pbus6_r )
 {
 	ip22_state *state = space->machine->driver_data<ip22_state>();
-	running_device *lpt = space->machine->device("lpt_0");
+	device_t *lpt = space->machine->device("lpt_0");
 	UINT8 ret8;
 	running_machine *machine = space->machine;
 
@@ -293,7 +293,7 @@ static READ32_HANDLER( hpc3_pbus6_r )
 static WRITE32_HANDLER( hpc3_pbus6_w )
 {
 	ip22_state *state = space->machine->driver_data<ip22_state>();
-	running_device *lpt = space->machine->device("lpt_0");
+	device_t *lpt = space->machine->device("lpt_0");
 	char cChar;
 	running_machine *machine = space->machine;
 
@@ -1655,58 +1655,58 @@ static const pc_lpt_interface ip22_lpt_config =
 };
 
 static MACHINE_CONFIG_START( ip225015, ip22_state )
-	MDRV_CPU_ADD( "maincpu", R5000BE, 50000000*3 )
-	MDRV_CPU_CONFIG( config )
-	MDRV_CPU_PROGRAM_MAP( ip225015_map)
-	MDRV_CPU_VBLANK_INT("screen", ip22_vbl)
+	MCFG_CPU_ADD( "maincpu", R5000BE, 50000000*3 )
+	MCFG_CPU_CONFIG( config )
+	MCFG_CPU_PROGRAM_MAP( ip225015_map)
+	MCFG_CPU_VBLANK_INT("screen", ip22_vbl)
 
-	MDRV_MACHINE_START( ip225015 )
-	MDRV_MACHINE_RESET( ip225015 )
-	MDRV_NVRAM_HANDLER( ip22 )
+	MCFG_MACHINE_START( ip225015 )
+	MCFG_MACHINE_RESET( ip225015 )
+	MCFG_NVRAM_HANDLER( ip22 )
 
-	MDRV_PIT8254_ADD( "pit8254", ip22_pit8254_config )
+	MCFG_PIT8254_ADD( "pit8254", ip22_pit8254_config )
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE( 60 )
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB15)
-	MDRV_SCREEN_SIZE(1280+64, 1024+64)
-	MDRV_SCREEN_VISIBLE_AREA(0, 1279, 0, 1023)
-	MDRV_PALETTE_LENGTH(65536)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE( 60 )
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB15)
+	MCFG_SCREEN_SIZE(1280+64, 1024+64)
+	MCFG_SCREEN_VISIBLE_AREA(0, 1279, 0, 1023)
+	MCFG_PALETTE_LENGTH(65536)
 
-	MDRV_MACHINE_START( ip22 )
+	MCFG_MACHINE_START( ip22 )
 
-	MDRV_VIDEO_START( newport )
-	MDRV_VIDEO_UPDATE( newport )
+	MCFG_VIDEO_START( newport )
+	MCFG_VIDEO_UPDATE( newport )
 
-	MDRV_PC_LPT_ADD("lpt_0", ip22_lpt_config)
+	MCFG_PC_LPT_ADD("lpt_0", ip22_lpt_config)
 
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD( "dac", DAC, 0 )
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5)
+	MCFG_SOUND_ADD( "dac", DAC, 0 )
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5)
 
-	MDRV_SOUND_ADD( "cdda",  CDDA, 0 )
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	MCFG_SOUND_ADD( "cdda",  CDDA, 0 )
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MDRV_CDROM_ADD( "cdrom" )
-	MDRV_HARDDISK_ADD( "harddisk1" )
+	MCFG_CDROM_ADD( "cdrom" )
+	MCFG_HARDDISK_ADD( "harddisk1" )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ip224613, ip225015 )
-	MDRV_CPU_REPLACE( "maincpu", R4600BE, 133333333 )
-	MDRV_CPU_CONFIG( config )
-	MDRV_CPU_PROGRAM_MAP( ip225015_map)
-	MDRV_CPU_VBLANK_INT("screen", ip22_vbl)
+	MCFG_CPU_REPLACE( "maincpu", R4600BE, 133333333 )
+	MCFG_CPU_CONFIG( config )
+	MCFG_CPU_PROGRAM_MAP( ip225015_map)
+	MCFG_CPU_VBLANK_INT("screen", ip22_vbl)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ip244415, ip225015 )
-	MDRV_CPU_REPLACE( "maincpu", R4600BE, 150000000 )
-	MDRV_CPU_CONFIG( config )
-	MDRV_CPU_PROGRAM_MAP( ip225015_map)
-	MDRV_CPU_VBLANK_INT("screen", ip22_vbl)
+	MCFG_CPU_REPLACE( "maincpu", R4600BE, 150000000 )
+	MCFG_CPU_CONFIG( config )
+	MCFG_CPU_PROGRAM_MAP( ip225015_map)
+	MCFG_CPU_VBLANK_INT("screen", ip22_vbl)
 MACHINE_CONFIG_END
 
 ROM_START( ip225015 )

@@ -51,7 +51,7 @@ struct _e05a03_state
     INLINE FUNCTIONS
 *****************************************************************************/
 
-INLINE e05a03_state *get_safe_token(running_device *device)
+INLINE e05a03_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == E05A03);

@@ -50,8 +50,8 @@ public:
 	UINT8 gripc;			/* GRIP status */
 
 	/* devices */
-	running_device *upd765;
-	running_device *upd1990a;
+	device_t *upd765;
+	device_t *upd1990a;
 
 	/* timers */
 	emu_timer	*floppy_motor_off_timer;
@@ -73,10 +73,10 @@ public:
 	int flash;				/* flash */
 
 	/* devices */
-	running_device *mc6845;
-	running_device *ppi8255;
-	running_device *z80sti;
-	running_device *centronics;
+	device_t *mc6845;
+	device_t *ppi8255;
+	device_t *z80sti;
+	device_t *centronics;
 };
 
 #endif

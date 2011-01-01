@@ -57,9 +57,9 @@ enum
 ***************************************************************************/
 DECLARE_LEGACY_IMAGE_DEVICE(BITBANGER, bitbanger);
 
-#define MDRV_BITBANGER_ADD(_tag, _intrf) \
-	MDRV_DEVICE_ADD(_tag, BITBANGER, 0) \
-	MDRV_DEVICE_CONFIG(_intrf)
+#define MCFG_BITBANGER_ADD(_tag, _intrf) \
+	MCFG_DEVICE_ADD(_tag, BITBANGER, 0) \
+	MCFG_DEVICE_CONFIG(_intrf)
 
 
 /***************************************************************************
@@ -83,17 +83,17 @@ struct _bitbanger_config
 ***************************************************************************/
 
 /* outputs data to a bitbanger port */
-void bitbanger_output(running_device *device, int value);
+void bitbanger_output(device_t *device, int value);
 
 /* ui functions */
-const char *bitbanger_mode_string(running_device *device);
-const char *bitbanger_baud_string(running_device *device);
-const char *bitbanger_tune_string(running_device *device);
-bool bitbanger_inc_mode(running_device *device, bool test);
-bool bitbanger_dec_mode(running_device *device, bool test);
-bool bitbanger_inc_tune(running_device *device, bool test);
-bool bitbanger_dec_tune(running_device *device, bool test);
-bool bitbanger_inc_baud(running_device *device, bool test);
-bool bitbanger_dec_baud(running_device *device, bool test);
+const char *bitbanger_mode_string(device_t *device);
+const char *bitbanger_baud_string(device_t *device);
+const char *bitbanger_tune_string(device_t *device);
+bool bitbanger_inc_mode(device_t *device, bool test);
+bool bitbanger_dec_mode(device_t *device, bool test);
+bool bitbanger_inc_tune(device_t *device, bool test);
+bool bitbanger_dec_tune(device_t *device, bool test);
+bool bitbanger_inc_baud(device_t *device, bool test);
+bool bitbanger_dec_baud(device_t *device, bool test);
 
 #endif /* __BITBNGR_H__ */

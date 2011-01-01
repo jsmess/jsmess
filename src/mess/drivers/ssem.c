@@ -85,7 +85,7 @@ static INPUT_CHANGED( panel_check )
     UINT8 edit2_state = input_port_read(field->port->machine, "EDIT2");
     UINT8 edit3_state = input_port_read(field->port->machine, "EDIT3");
     UINT8 misc_state = input_port_read(field->port->machine, "MISC");
-    running_device *ssem_cpu = field->port->machine->device("maincpu");
+    device_t *ssem_cpu = field->port->machine->device("maincpu");
 
     switch( (int)(FPTR)param )
     {
@@ -443,7 +443,7 @@ static VIDEO_UPDATE( ssem )
 {
 	ssem_state *state = screen->machine->driver_data<ssem_state>();
     UINT32 line = 0;
-    running_device *ssem_cpu = screen->machine->device("maincpu");
+    device_t *ssem_cpu = screen->machine->device("maincpu");
     UINT32 accum = cpu_get_reg(ssem_cpu, SSEM_A);
     UINT32 bit = 0;
     UINT32 word = 0;
@@ -630,29 +630,29 @@ static MACHINE_RESET( ssem )
 
 static MACHINE_CONFIG_START( ssem, ssem_state )
     /* basic machine hardware */
-    MDRV_CPU_ADD("maincpu", SSEM, 700)
-    MDRV_CPU_PROGRAM_MAP(ssem_map)
+    MCFG_CPU_ADD("maincpu", SSEM, 700)
+    MCFG_CPU_PROGRAM_MAP(ssem_map)
 
-    MDRV_MACHINE_RESET(ssem)
+    MCFG_MACHINE_RESET(ssem)
 
     /* video hardware */
-    MDRV_SCREEN_ADD("screen", RASTER)
-    MDRV_SCREEN_REFRESH_RATE(50)
-    MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-    MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-    MDRV_SCREEN_SIZE(256, 280)
-    MDRV_SCREEN_VISIBLE_AREA(0, 255, 0, 279)
-    MDRV_PALETTE_LENGTH(2)
-    MDRV_PALETTE_INIT(black_and_white)
+    MCFG_SCREEN_ADD("screen", RASTER)
+    MCFG_SCREEN_REFRESH_RATE(50)
+    MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+    MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+    MCFG_SCREEN_SIZE(256, 280)
+    MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 279)
+    MCFG_PALETTE_LENGTH(2)
+    MCFG_PALETTE_INIT(black_and_white)
 
-    MDRV_VIDEO_START(generic_bitmapped)
-    MDRV_VIDEO_UPDATE(ssem)
+    MCFG_VIDEO_START(generic_bitmapped)
+    MCFG_VIDEO_UPDATE(ssem)
 
     /* cartridge */
-    MDRV_CARTSLOT_ADD("cart")
-    MDRV_CARTSLOT_EXTENSION_LIST("snp,asm")
-    MDRV_CARTSLOT_MANDATORY
-    MDRV_CARTSLOT_LOAD(ssem_store)
+    MCFG_CARTSLOT_ADD("cart")
+    MCFG_CARTSLOT_EXTENSION_LIST("snp,asm")
+    MCFG_CARTSLOT_MANDATORY
+    MCFG_CARTSLOT_LOAD(ssem_store)
 MACHINE_CONFIG_END
 
 ROM_START( ssem )

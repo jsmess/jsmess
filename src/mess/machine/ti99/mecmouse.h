@@ -6,13 +6,13 @@
 #ifndef __MECMOUSE__
 #define __MECMOUSE__
 
-void mecmouse_select(running_device *device, int selnow, int stick1, int stick2);
-void mecmouse_poll(running_device *device);
-int mecmouse_get_values(running_device *device);
-int mecmouse_get_values8(running_device *device, int mode);
+void mecmouse_select(device_t *device, int selnow, int stick1, int stick2);
+void mecmouse_poll(device_t *device);
+int mecmouse_get_values(device_t *device);
+int mecmouse_get_values8(device_t *device, int mode);
 
-#define MDRV_MECMOUSE_ADD(_tag )	\
-	MDRV_DEVICE_ADD(_tag, MECMOUSE, 0)
+#define MCFG_MECMOUSE_ADD(_tag )	\
+	MCFG_DEVICE_ADD(_tag, MECMOUSE, 0)
 
 DECLARE_LEGACY_DEVICE( MECMOUSE, ti99_mecmouse );
 #endif

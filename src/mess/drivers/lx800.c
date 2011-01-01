@@ -23,7 +23,7 @@ public:
 	lx800_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	running_device *speaker;
+	device_t *speaker;
 };
 
 
@@ -241,22 +241,22 @@ static const e05a03_interface lx800_e05a03_intf =
 
 static MACHINE_CONFIG_START( lx800, lx800_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", UPD7810, XTAL_14_7456MHz)
-	MDRV_CPU_CONFIG(lx800_cpu_config)
-	MDRV_CPU_PROGRAM_MAP(lx800_mem)
-	MDRV_CPU_IO_MAP(lx800_io)
+	MCFG_CPU_ADD("maincpu", UPD7810, XTAL_14_7456MHz)
+	MCFG_CPU_CONFIG(lx800_cpu_config)
+	MCFG_CPU_PROGRAM_MAP(lx800_mem)
+	MCFG_CPU_IO_MAP(lx800_io)
 
-	MDRV_MACHINE_START(lx800)
+	MCFG_MACHINE_START(lx800)
 
-	MDRV_DEFAULT_LAYOUT(layout_lx800)
+	MCFG_DEFAULT_LAYOUT(layout_lx800)
 
 	/* audio hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("beep", BEEP, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("beep", BEEP, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	/* gate array */
-	MDRV_E05A03_ADD("ic3b", lx800_e05a03_intf)
+	MCFG_E05A03_ADD("ic3b", lx800_e05a03_intf)
 MACHINE_CONFIG_END
 
 

@@ -38,7 +38,7 @@ int darkmist_hw;
 static WRITE8_HANDLER(darkmist_hw_w)
 {
   darkmist_hw=data;
-  memory_set_bankptr(space->machine, "bank1",&memory_region(space->machine, "maincpu")[0x010000+((data&0x80)?0x4000:0)]);
+  memory_set_bankptr(space->machine, "bank1",&space->machine->region("maincpu")->base()[0x010000+((data&0x80)?0x4000:0)]);
 }
 
 static READ8_HANDLER(t5182shared_r)
@@ -242,35 +242,35 @@ static INTERRUPT_GEN( darkmist_interrupt )
 
 static MACHINE_CONFIG_START( darkmist, darkmist_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80,4000000)		 /* ? MHz */
-	MDRV_CPU_PROGRAM_MAP(memmap)
-	MDRV_CPU_VBLANK_INT_HACK(darkmist_interrupt,2)
+	MCFG_CPU_ADD("maincpu", Z80,4000000)		 /* ? MHz */
+	MCFG_CPU_PROGRAM_MAP(memmap)
+	MCFG_CPU_VBLANK_INT_HACK(darkmist_interrupt,2)
 
-	MDRV_CPU_ADD(CPUTAG_T5182,Z80,14318180/4)	/* 3.579545 MHz */
-	MDRV_CPU_PROGRAM_MAP(t5182_map)
-	MDRV_CPU_IO_MAP(t5182_io)
+	MCFG_CPU_ADD(CPUTAG_T5182,Z80,14318180/4)	/* 3.579545 MHz */
+	MCFG_CPU_PROGRAM_MAP(t5182_map)
+	MCFG_CPU_IO_MAP(t5182_io)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(256, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-16-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(256, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-16-1)
 
-	MDRV_GFXDECODE(darkmist)
-	MDRV_PALETTE_INIT(darkmist)
-	MDRV_PALETTE_LENGTH(0x100*4)
-	MDRV_VIDEO_START(darkmist)
-	MDRV_VIDEO_UPDATE(darkmist)
+	MCFG_GFXDECODE(darkmist)
+	MCFG_PALETTE_INIT(darkmist)
+	MCFG_PALETTE_LENGTH(0x100*4)
+	MCFG_VIDEO_START(darkmist)
+	MCFG_VIDEO_UPDATE(darkmist)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM2151, 14318180/4)	/* 3.579545 MHz */
-	MDRV_SOUND_CONFIG(t5182_ym2151_interface)
-	MDRV_SOUND_ROUTE(0, "mono", 1.0)
-	MDRV_SOUND_ROUTE(1, "mono", 1.0)
+	MCFG_SOUND_ADD("ymsnd", YM2151, 14318180/4)	/* 3.579545 MHz */
+	MCFG_SOUND_CONFIG(t5182_ym2151_interface)
+	MCFG_SOUND_ROUTE(0, "mono", 1.0)
+	MCFG_SOUND_ROUTE(1, "mono", 1.0)
 
 MACHINE_CONFIG_END
 
@@ -335,8 +335,8 @@ static void decrypt_gfx(running_machine *machine)
 	int size;
 	int i;
 
-	rom = memory_region(machine, "gfx1");
-	size = memory_region_length(machine, "gfx1");
+	rom = machine->region("gfx1")->base();
+	size = machine->region("gfx1")->bytes();
 
 	/* data lines */
 	for (i = 0;i < size/2;i++)
@@ -358,8 +358,8 @@ static void decrypt_gfx(running_machine *machine)
 	}
 
 
-	rom = memory_region(machine, "gfx2");
-	size = memory_region_length(machine, "gfx2");
+	rom = machine->region("gfx2")->base();
+	size = machine->region("gfx2")->bytes();
 
 	/* data lines */
 	for (i = 0;i < size/2;i++)
@@ -381,8 +381,8 @@ static void decrypt_gfx(running_machine *machine)
 	}
 
 
-	rom = memory_region(machine, "gfx3");
-	size = memory_region_length(machine, "gfx3");
+	rom = machine->region("gfx3")->base();
+	size = machine->region("gfx3")->bytes();
 
 	/* data lines */
 	for (i = 0;i < size/2;i++)
@@ -409,7 +409,7 @@ static void decrypt_gfx(running_machine *machine)
 static void decrypt_snd(running_machine *machine)
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "t5182");
+	UINT8 *ROM = machine->region("t5182")->base();
 
 	for(i=0x8000;i<0x10000;i++)
 		ROM[i] = BITSWAP8(ROM[i], 7,1,2,3,4,5,6,0);
@@ -419,7 +419,7 @@ static DRIVER_INIT(darkmist)
 {
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	int i, len;
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 	UINT8 *buffer = auto_alloc_array(machine, UINT8, 0x10000);
 	UINT8 *decrypt = auto_alloc_array(machine, UINT8, 0x8000);
 
@@ -455,8 +455,8 @@ static DRIVER_INIT(darkmist)
 	memory_set_bankptr(space->machine, "bank1",&ROM[0x010000]);
 
 	/* adr line swaps */
-	ROM = memory_region(machine, "user1");
-	len = memory_region_length(machine, "user1");
+	ROM = machine->region("user1")->base();
+	len = machine->region("user1")->bytes();
 	memcpy( buffer, ROM, len );
 
 	for(i=0;i<len;i++)
@@ -464,24 +464,24 @@ static DRIVER_INIT(darkmist)
 		ROM[i]=buffer[BITSWAP24(i,23,22,21,20,19,18,17,16,15,6,5,4,3,2,14,13,12,11,8,7,1,0,10,9)];
 	}
 
-	ROM = memory_region(machine, "user2");
-	len = memory_region_length(machine, "user2");
+	ROM = machine->region("user2")->base();
+	len = machine->region("user2")->bytes();
 	memcpy( buffer, ROM, len );
 	for(i=0;i<len;i++)
 	{
 		ROM[i]=buffer[BITSWAP24(i,23,22,21,20,19,18,17,16,15,6,5,4,3,2,14,13,12,11,8,7,1,0,10,9)];
 	}
 
-	ROM = memory_region(machine, "user3");
-	len = memory_region_length(machine, "user3");
+	ROM = machine->region("user3")->base();
+	len = machine->region("user3")->bytes();
 	memcpy( buffer, ROM, len );
 	for(i=0;i<len;i++)
 	{
 		ROM[i]=buffer[BITSWAP24(i,23,22,21,20,19,18,17,16,15,14 ,5,4,3,2,11,10,9,8,13,12,1,0,7,6)];
 	}
 
-	ROM = memory_region(machine, "user4");
-	len = memory_region_length(machine, "user4");
+	ROM = machine->region("user4")->base();
+	len = machine->region("user4")->bytes();
 	memcpy( buffer, ROM, len );
 	for(i=0;i<len;i++)
 	{

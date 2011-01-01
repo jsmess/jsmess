@@ -33,12 +33,12 @@ static void tvc_set_mem_page(running_machine *machine, UINT8 data)
 		case 0x00 : // system ROM selected
 				memory_install_read_bank(space, 0x0000, 0x3fff, 0, 0, "bank1");
 				memory_unmap_write(space, 0x0000, 0x3fff, 0, 0);
-				memory_set_bankptr(space->machine, "bank1", memory_region(machine, "sys"));
+				memory_set_bankptr(space->machine, "bank1", machine->region("sys")->base());
 				break;
 		case 0x08 : // Cart ROM selected
 				memory_install_read_bank(space, 0x0000, 0x3fff, 0, 0, "bank1");
 				memory_unmap_write(space, 0x0000, 0x3fff, 0, 0);
-				memory_set_bankptr(space->machine, "bank1", memory_region(machine, "cart"));
+				memory_set_bankptr(space->machine, "bank1", machine->region("cart")->base());
 				break;
 		case 0x10 : // RAM selected
 				memory_install_readwrite_bank(space, 0x0000, 0x3fff, 0, 0, "bank1");
@@ -58,12 +58,12 @@ static void tvc_set_mem_page(running_machine *machine, UINT8 data)
 		case 0x00 : // Cart ROM selected
 				memory_install_read_bank(space, 0xc000, 0xffff, 0, 0, "bank4");
 				memory_unmap_write(space, 0xc000, 0xffff, 0, 0);
-				memory_set_bankptr(space->machine, "bank4", memory_region(machine, "cart"));
+				memory_set_bankptr(space->machine, "bank4", machine->region("cart")->base());
 				break;
 		case 0x40 : // System ROM selected
 				memory_install_read_bank(space, 0xc000, 0xffff, 0, 0, "bank4");
 				memory_unmap_write(space, 0xc000, 0xffff, 0, 0);
-				memory_set_bankptr(space->machine, "bank4", memory_region(machine, "sys"));
+				memory_set_bankptr(space->machine, "bank4", machine->region("sys")->base());
 				break;
 		case 0x80 : // RAM selected
 				memory_install_readwrite_bank(space, 0xc000, 0xffff, 0, 0, "bank4");
@@ -72,7 +72,7 @@ static void tvc_set_mem_page(running_machine *machine, UINT8 data)
 		case 0xc0 : // External ROM selected
 				memory_install_read_bank(space, 0xc000, 0xffff, 0, 0, "bank4");
 				memory_unmap_write(space, 0xc000, 0xffff, 0, 0);
-				memory_set_bankptr(space->machine, "bank4", memory_region(machine, "ext"));
+				memory_set_bankptr(space->machine, "bank4", machine->region("ext")->base());
 				break;
 
 	}
@@ -276,7 +276,7 @@ static VIDEO_START( tvc )
 
 static VIDEO_UPDATE( tvc )
 {
-	running_device *mc6845 = screen->machine->device("crtc");
+	device_t *mc6845 = screen->machine->device("crtc");
 	mc6845_update(mc6845, bitmap, cliprect);
 	return 0;
 }
@@ -387,33 +387,33 @@ static INTERRUPT_GEN( tvc_interrupt )
 
 static MACHINE_CONFIG_START( tvc, tvc_state )
     /* basic machine hardware */
-    MDRV_CPU_ADD("maincpu",Z80, 3125000)
-    MDRV_CPU_PROGRAM_MAP(tvc_mem)
-    MDRV_CPU_IO_MAP(tvc_io)
+    MCFG_CPU_ADD("maincpu",Z80, 3125000)
+    MCFG_CPU_PROGRAM_MAP(tvc_mem)
+    MCFG_CPU_IO_MAP(tvc_io)
 
-    MDRV_MACHINE_START(tvc)
-    MDRV_MACHINE_RESET(tvc)
+    MCFG_MACHINE_START(tvc)
+    MCFG_MACHINE_RESET(tvc)
 
-	MDRV_CPU_VBLANK_INT("screen", tvc_interrupt)
+	MCFG_CPU_VBLANK_INT("screen", tvc_interrupt)
 
  /* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(50)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(512, 240)
-	MDRV_SCREEN_VISIBLE_AREA(0, 512 - 1, 0, 240 - 1)
-	MDRV_PALETTE_LENGTH( 16 )
-	MDRV_PALETTE_INIT(tvc)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(512, 240)
+	MCFG_SCREEN_VISIBLE_AREA(0, 512 - 1, 0, 240 - 1)
+	MCFG_PALETTE_LENGTH( 16 )
+	MCFG_PALETTE_INIT(tvc)
 
-	MDRV_MC6845_ADD("crtc", MC6845, 3125000, tvc_crtc6845_interface) // clk taken from schematics
+	MCFG_MC6845_ADD("crtc", MC6845, 3125000, tvc_crtc6845_interface) // clk taken from schematics
 
-    MDRV_VIDEO_START(tvc)
-    MDRV_VIDEO_UPDATE(tvc)
+    MCFG_VIDEO_START(tvc)
+    MCFG_VIDEO_UPDATE(tvc)
 
 	/* internal ram */
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("80K")
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("80K")
 MACHINE_CONFIG_END
 
 /* ROM definition */

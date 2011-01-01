@@ -17,7 +17,7 @@
 #include "multcart.h"
 #include "includes/neogeo.h"
 
-typedef int assmfct(running_machine *machine, running_device *);
+typedef int assmfct(running_machine *machine, device_t *);
 
 enum
 {
@@ -77,7 +77,7 @@ typedef struct _aes_pcb_t aes_pcb_t;
     <name><number>, i.e. the number is the longest string from the right
     which can be interpreted as a number.
 */
-static int get_index_from_tagname(running_device *image)
+static int get_index_from_tagname(device_t *image)
 {
 	const char *tag = image->tag();
 	int maxlen = strlen(tag);
@@ -91,11 +91,11 @@ static int get_index_from_tagname(running_device *image)
 /*
     Common routine to assemble cartridges from resources.
 */
-static aescartridge_t *assemble_common(running_machine *machine, running_device *cartslot)
+static aescartridge_t *assemble_common(running_machine *machine, device_t *cartslot)
 {
 	/* Pointer to the cartridge structure. */
 	aescartridge_t *cartridge;
-	running_device *cartsys = cartslot->owner();
+	device_t *cartsys = cartslot->owner();
 	aes_multicart_t *cartslots = (aes_multicart_t *)downcast<legacy_device_base *>(cartsys)->token();
 	UINT8 *socketcont, *romrgn;
 	int reslength, i, blockofs;
@@ -112,7 +112,7 @@ static aescartridge_t *assemble_common(running_machine *machine, running_device 
 	cartridge = &cartslots->cartridge[slotnumber];
 
 	// check for up to 4 program ROMs
-	romrgn = (UINT8 *)memory_region(machine, "maincpu");
+	romrgn = (UINT8 *)machine->region("maincpu")->base();
 	blockofs = 0;
 	for (i = 0; i < 4; i++)
 	{
@@ -133,7 +133,7 @@ static aescartridge_t *assemble_common(running_machine *machine, running_device 
 	reslength = cartslot_get_resource_length(cartslot, "m1");
 	if (socketcont != NULL)
 	{
-		romrgn = (UINT8 *)memory_region(machine, "audiocpu");
+		romrgn = (UINT8 *)machine->region("audiocpu")->base();
 
 		memcpy(romrgn, socketcont, reslength);
 		// mirror (how does this really work?)
@@ -141,7 +141,7 @@ static aescartridge_t *assemble_common(running_machine *machine, running_device 
 	}
 
 	// up to 8 YM sample ROMs
-	romrgn = (UINT8 *)memory_region(machine, "ymsnd");
+	romrgn = (UINT8 *)machine->region("ymsnd")->base();
 	blockofs = 0;
 	for (i = 0; i < 8; i++)
 	{
@@ -158,7 +158,7 @@ static aescartridge_t *assemble_common(running_machine *machine, running_device 
 	}
 
 	// up to 8 YM delta-T sample ROMs
-	romrgn = (UINT8 *)memory_region(machine, "ymsnd.deltat");
+	romrgn = (UINT8 *)machine->region("ymsnd.deltat")->base();
 	blockofs = 0;
 	for (i = 0; i < 8; i++)
 	{
@@ -179,13 +179,13 @@ static aescartridge_t *assemble_common(running_machine *machine, running_device 
 	reslength = cartslot_get_resource_length(cartslot, "s1");
 	if (socketcont != NULL)
 	{
-		romrgn = (UINT8 *)memory_region(machine, "fixed");
+		romrgn = (UINT8 *)machine->region("fixed")->base();
 
 		memcpy(romrgn, socketcont, reslength);
 	}
 
 	// up to 8 sprite ROMs in byte-interleaved pairs
-	romrgn = (UINT8 *)memory_region(machine, "sprites");
+	romrgn = (UINT8 *)machine->region("sprites")->base();
 	blockofs = 0;
 	for (i = 0; i < 8; i+=2)
 	{
@@ -214,9 +214,9 @@ static aescartridge_t *assemble_common(running_machine *machine, running_device 
 	return cartridge;
 }
 
-static void set_pointers(running_device *pcb, int index)
+static void set_pointers(device_t *pcb, int index)
 {
-	running_device *cartsys = pcb->owner()->owner();
+	device_t *cartsys = pcb->owner()->owner();
 	aes_multicart_t *cartslots = (aes_multicart_t *)downcast<legacy_device_base *>(cartsys)->token();
 	aes_pcb_t *pcb_def = (aes_pcb_t *)downcast<legacy_device_base *>(pcb)->token();
 
@@ -256,7 +256,7 @@ static DEVICE_START(aes_pcb_std)
     The standard cartridge assemble routine. We just call the common
     function here.
 */
-static int assemble_std(running_machine *machine, running_device *image)
+static int assemble_std(running_machine *machine, device_t *image)
 {
 //  aescartridge_t *cart;
 //  printf("assemble_std, %s\n", image->tag);
@@ -272,12 +272,12 @@ static int assemble_std(running_machine *machine, running_device *image)
     As it seems, we can use the same function for the disassembling of all
     cartridge types.
 */
-static int disassemble_std(running_device *image)
+static int disassemble_std(device_t *image)
 {
 //  int slotnumber;
 //  int i;
 //  aescartridge_t *cart;
-//  running_device *cartsys = image->owner();
+//  device_t *cartsys = image->owner();
 //  aes_multicart_t *cartslots = (aes_multicart_t *)cartsys->token;
 
 //  slotnumber = get_index_from_tagname(image)-1;
@@ -524,12 +524,12 @@ static void install_protection(device_image_interface& image)
 */
 static DEVICE_IMAGE_LOAD( aes_cartridge )
 {
-	running_device *pcbdev = cartslot_get_pcb(image);
+	device_t *pcbdev = cartslot_get_pcb(image);
 	aes_pcb_t *pcb;
 	cartslot_t *cart;
 	multicart_open_error me;
 	UINT32 size;
-	running_device* ym = image.device().machine->device("ymsnd");
+	device_t* ym = image.device().machine->device("ymsnd");
 
 	// first check software list
 	if(image.software_entry() != NULL)
@@ -538,25 +538,25 @@ static DEVICE_IMAGE_LOAD( aes_cartridge )
 		size = image.get_software_region_length("maincpu");
 		image.device().machine->region_free("maincpu");
 		image.device().machine->region_alloc("maincpu",size,0);
-		memcpy(memory_region(image.device().machine,"maincpu"),image.get_software_region("maincpu"),size);
+		memcpy(image.device().machine->region("maincpu")->base(),image.get_software_region("maincpu"),size);
 		size = image.get_software_region_length("fixed");
 		image.device().machine->region_free("fixed");
 		image.device().machine->region_alloc("fixed",size,ROMREGION_ERASEFF);
-		memcpy(memory_region(image.device().machine,"fixed"),image.get_software_region("fixed"),size);
+		memcpy(image.device().machine->region("fixed")->base(),image.get_software_region("fixed"),size);
 		size = image.get_software_region_length("audiocpu");
 		image.device().machine->region_free("audiocpu");
 		image.device().machine->region_alloc("audiocpu",size,ROMREGION_ERASEFF);
-		memcpy(memory_region(image.device().machine,"audiocpu"),image.get_software_region("audiocpu"),size);
+		memcpy(image.device().machine->region("audiocpu")->base(),image.get_software_region("audiocpu"),size);
 		size = image.get_software_region_length("ymsnd");
 		image.device().machine->region_free("ymsnd");
 		image.device().machine->region_alloc("ymsnd",size,ROMREGION_ERASEFF);
-		memcpy(memory_region(image.device().machine,"ymsnd"),image.get_software_region("ymsnd"),size);
+		memcpy(image.device().machine->region("ymsnd")->base(),image.get_software_region("ymsnd"),size);
 		if(image.get_software_region("ymsnd.deltat") != NULL)
 		{
 			size = image.get_software_region_length("ymsnd.deltat");
 			image.device().machine->region_free("ymsnd.deltat");
 			image.device().machine->region_alloc("ymsnd.deltat",size,ROMREGION_ERASEFF);
-			memcpy(memory_region(image.device().machine,"ymsnd.deltat"),image.get_software_region("ymsnd.deltat"),size);
+			memcpy(image.device().machine->region("ymsnd.deltat")->base(),image.get_software_region("ymsnd.deltat"),size);
 		}
 		else
 			image.device().machine->region_free("ymsnd.deltat");  // removing the region will fix sound glitches in non-Delta-T games
@@ -564,17 +564,17 @@ static DEVICE_IMAGE_LOAD( aes_cartridge )
 		size = image.get_software_region_length("sprites");
 		image.device().machine->region_free("sprites");
 		image.device().machine->region_alloc("sprites",size,ROMREGION_ERASEFF);
-		memcpy(memory_region(image.device().machine,"sprites"),image.get_software_region("sprites"),size);
+		memcpy(image.device().machine->region("sprites")->base(),image.get_software_region("sprites"),size);
 		if(image.get_software_region("audiocrypt") != NULL)  // encrypted Z80 code
 		{
 			size = image.get_software_region_length("audiocrypt");
 			image.device().machine->region_alloc("audiocrypt",size,ROMREGION_ERASEFF);
-			memcpy(memory_region(image.device().machine,"audiocrypt"),image.get_software_region("audiocrypt"),size);
+			memcpy(image.device().machine->region("audiocrypt")->base(),image.get_software_region("audiocrypt"),size);
 		}
 
 		// setup cartridge ROM area
 		memory_install_read_bank(cputag_get_address_space(image.device().machine,"maincpu",ADDRESS_SPACE_PROGRAM),0x000080,0x0fffff,0,0,"cart_rom");
-		memory_set_bankptr(image.device().machine,"cart_rom",&memory_region(image.device().machine,"maincpu")[0x80]);
+		memory_set_bankptr(image.device().machine,"cart_rom",&image.device().machine->region("maincpu")->base()[0x80]);
 
 		// handle possible protection
 		install_protection(image);
@@ -611,7 +611,7 @@ static DEVICE_IMAGE_LOAD( aes_cartridge )
 */
 static DEVICE_IMAGE_UNLOAD( aes_cartridge )
 {
-	running_device *pcbdev;
+	device_t *pcbdev;
 
 	if (downcast<legacy_device_base *>(&image.device())->token() == NULL)
 	{
@@ -688,16 +688,16 @@ static DEVICE_STOP(aes_multicart)
 }
 
 static MACHINE_CONFIG_FRAGMENT(aes_multicart)
-	MDRV_CARTSLOT_ADD("cartridge1")
-	MDRV_CARTSLOT_EXTENSION_LIST("rpk,bin")
-	MDRV_CARTSLOT_PCBTYPE(0, "none", AES_CARTRIDGE_PCB_NONE)
-	MDRV_CARTSLOT_PCBTYPE(1, "standard", AES_CARTRIDGE_PCB_STD)
+	MCFG_CARTSLOT_ADD("cartridge1")
+	MCFG_CARTSLOT_EXTENSION_LIST("rpk,bin")
+	MCFG_CARTSLOT_PCBTYPE(0, "none", AES_CARTRIDGE_PCB_NONE)
+	MCFG_CARTSLOT_PCBTYPE(1, "standard", AES_CARTRIDGE_PCB_STD)
 
-	MDRV_CARTSLOT_START(aes_cartridge)
-	MDRV_CARTSLOT_LOAD(aes_cartridge)
-	MDRV_CARTSLOT_UNLOAD(aes_cartridge)
-	MDRV_CARTSLOT_INTERFACE("aes_cart")
-	MDRV_CARTSLOT_MANDATORY
+	MCFG_CARTSLOT_START(aes_cartridge)
+	MCFG_CARTSLOT_LOAD(aes_cartridge)
+	MCFG_CARTSLOT_UNLOAD(aes_cartridge)
+	MCFG_CARTSLOT_INTERFACE("aes_cart")
+	MCFG_CARTSLOT_MANDATORY
 MACHINE_CONFIG_END
 
 

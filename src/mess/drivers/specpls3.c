@@ -255,7 +255,7 @@ void spectrum_plus3_update_memory(running_machine *machine)
 
 			/* rom 0 is editor, rom 1 is syntax, rom 2 is DOS, rom 3 is 48 BASIC */
 
-			ChosenROM = memory_region(machine, "maincpu") + 0x010000 + (ROMSelection << 14);
+			ChosenROM = machine->region("maincpu")->base() + 0x010000 + (ROMSelection << 14);
 
 			memory_set_bankptr(machine, "bank1", ChosenROM);
 			memory_unmap_write(space, 0x0000, 0x3fff, 0, 0);
@@ -409,16 +409,16 @@ static GFXDECODE_START( specpls3 )
 GFXDECODE_END
 
 static MACHINE_CONFIG_DERIVED( spectrum_plus3, spectrum_128 )
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(spectrum_plus3_io)
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_REFRESH_RATE(50.01)
-	MDRV_GFXDECODE(specpls3)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_IO_MAP(spectrum_plus3_io)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_REFRESH_RATE(50.01)
+	MCFG_GFXDECODE(specpls3)
 
-	MDRV_MACHINE_RESET( spectrum_plus3 )
+	MCFG_MACHINE_RESET( spectrum_plus3 )
 
-	MDRV_UPD765A_ADD("upd765", spectrum_plus3_upd765_interface)
-	MDRV_FLOPPY_2_DRIVES_ADD(specpls3_floppy_config)
+	MCFG_UPD765A_ADD("upd765", spectrum_plus3_upd765_interface)
+	MCFG_FLOPPY_2_DRIVES_ADD(specpls3_floppy_config)
 MACHINE_CONFIG_END
 
 /***************************************************************************

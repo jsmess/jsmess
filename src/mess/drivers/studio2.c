@@ -404,7 +404,7 @@ static READ_LINE_DEVICE_HANDLER( ef4_r )
 
 static WRITE_LINE_DEVICE_HANDLER( studio2_q_w )
 {
-	running_device *speaker = device->machine->device("beep");
+	device_t *speaker = device->machine->device("beep");
 	beep_set_state(speaker, state);
 }
 
@@ -468,82 +468,82 @@ void studio2_state::machine_reset()
 /* Machine Drivers */
 
 static MACHINE_CONFIG_FRAGMENT( studio2_cartslot )
-	MDRV_CARTSLOT_ADD("cart")
-	MDRV_CARTSLOT_EXTENSION_LIST("st2")
-	MDRV_CARTSLOT_NOT_MANDATORY
-	MDRV_CARTSLOT_LOAD(st2_cartslot_load)
+	MCFG_CARTSLOT_ADD("cart")
+	MCFG_CARTSLOT_EXTENSION_LIST("st2")
+	MCFG_CARTSLOT_NOT_MANDATORY
+	MCFG_CARTSLOT_LOAD(st2_cartslot_load)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( studio2, studio2_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD(CDP1802_TAG, COSMAC, 1760000) /* the real clock is derived from an oscillator circuit */
-	MDRV_CPU_PROGRAM_MAP(studio2_map)
-	MDRV_CPU_IO_MAP(studio2_io_map)
-	MDRV_CPU_CONFIG(studio2_cosmac_intf)
+	MCFG_CPU_ADD(CDP1802_TAG, COSMAC, 1760000) /* the real clock is derived from an oscillator circuit */
+	MCFG_CPU_PROGRAM_MAP(studio2_map)
+	MCFG_CPU_IO_MAP(studio2_io_map)
+	MCFG_CPU_CONFIG(studio2_cosmac_intf)
 
     /* video hardware */
-	MDRV_CDP1861_SCREEN_ADD(SCREEN_TAG, 1760000)
+	MCFG_CDP1861_SCREEN_ADD(SCREEN_TAG, 1760000)
 
-	MDRV_PALETTE_LENGTH(2)
-	MDRV_PALETTE_INIT(black_and_white)
-	MDRV_VIDEO_UPDATE(studio2)
+	MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_INIT(black_and_white)
+	MCFG_VIDEO_UPDATE(studio2)
 
-	MDRV_CDP1861_ADD(CDP1861_TAG, 1760000, studio2_cdp1861_intf)
+	MCFG_CDP1861_ADD(CDP1861_TAG, 1760000, studio2_cdp1861_intf)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("beep", BEEP, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("beep", BEEP, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MDRV_FRAGMENT_ADD( studio2_cartslot )
+	MCFG_FRAGMENT_ADD( studio2_cartslot )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( visicom, studio2_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD(CDP1802_TAG, COSMAC, XTAL_3_579545MHz/2)
-	MDRV_CPU_PROGRAM_MAP(visicom_map)
-	MDRV_CPU_IO_MAP(visicom_io_map)
-	MDRV_CPU_CONFIG(studio2_cosmac_intf)
+	MCFG_CPU_ADD(CDP1802_TAG, COSMAC, XTAL_3_579545MHz/2)
+	MCFG_CPU_PROGRAM_MAP(visicom_map)
+	MCFG_CPU_IO_MAP(visicom_io_map)
+	MCFG_CPU_CONFIG(studio2_cosmac_intf)
 
     /* video hardware */
-	MDRV_CDP1861_SCREEN_ADD(SCREEN_TAG, XTAL_3_579545MHz/2)
+	MCFG_CDP1861_SCREEN_ADD(SCREEN_TAG, XTAL_3_579545MHz/2)
 
-	MDRV_PALETTE_LENGTH(4)
-	MDRV_PALETTE_INIT(visicom)
-	MDRV_VIDEO_UPDATE(studio2)
+	MCFG_PALETTE_LENGTH(4)
+	MCFG_PALETTE_INIT(visicom)
+	MCFG_VIDEO_UPDATE(studio2)
 
-	MDRV_CDP1861_ADD(CDP1861_TAG, XTAL_3_579545MHz/2/8, studio2_cdp1861_intf)
+	MCFG_CDP1861_ADD(CDP1861_TAG, XTAL_3_579545MHz/2/8, studio2_cdp1861_intf)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("beep", BEEP, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("beep", BEEP, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MDRV_FRAGMENT_ADD( studio2_cartslot )
+	MCFG_FRAGMENT_ADD( studio2_cartslot )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( mpt02, studio2_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD(CDP1802_TAG, COSMAC, CDP1864_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(mpt02_map)
-	MDRV_CPU_IO_MAP(mpt02_io_map)
-	MDRV_CPU_CONFIG(mpt02_cosmac_intf)
+	MCFG_CPU_ADD(CDP1802_TAG, COSMAC, CDP1864_CLOCK)
+	MCFG_CPU_PROGRAM_MAP(mpt02_map)
+	MCFG_CPU_IO_MAP(mpt02_io_map)
+	MCFG_CPU_CONFIG(mpt02_cosmac_intf)
 
     /* video hardware */
-	MDRV_CDP1864_SCREEN_ADD(SCREEN_TAG, CDP1864_CLOCK)
+	MCFG_CDP1864_SCREEN_ADD(SCREEN_TAG, CDP1864_CLOCK)
 
-	MDRV_PALETTE_LENGTH(8+8)
-	MDRV_VIDEO_UPDATE(mpt02)
+	MCFG_PALETTE_LENGTH(8+8)
+	MCFG_VIDEO_UPDATE(mpt02)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("beep", BEEP, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("beep", BEEP, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MDRV_CDP1864_ADD(CDP1864_TAG, CDP1864_CLOCK, mpt02_cdp1864_intf)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_CDP1864_ADD(CDP1864_TAG, CDP1864_CLOCK, mpt02_cdp1864_intf)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MDRV_FRAGMENT_ADD( studio2_cartslot )
+	MCFG_FRAGMENT_ADD( studio2_cartslot )
 MACHINE_CONFIG_END
 
 /* ROMs */
@@ -578,7 +578,7 @@ ROM_END
 
 static TIMER_CALLBACK( setup_beep )
 {
-	running_device *speaker = machine->device("beep");
+	device_t *speaker = machine->device("beep");
 	beep_set_state(speaker, 0);
 	beep_set_frequency(speaker, 300);
 }

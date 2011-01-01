@@ -56,20 +56,20 @@ struct _svision_sound_state
 };
 
 
-INLINE svision_sound_state *get_safe_token(running_device *device)
+INLINE svision_sound_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == SVISION);
 	return (svision_sound_state *)downcast<legacy_device_base *>(device)->token();
 }
 
-int *svision_dma_finished(running_device *device)
+int *svision_dma_finished(device_t *device)
 {
 	svision_sound_state *state = get_safe_token(device);
 	return &state->dma.finished;
 }
 
-void svision_sound_decrement(running_device *device)
+void svision_sound_decrement(device_t *device)
 {
 	svision_sound_state *state = get_safe_token(device);
 
@@ -137,7 +137,7 @@ WRITE8_DEVICE_HANDLER( svision_noise_w )
 	state->noise.pos=0.0;
 }
 
-void svision_soundport_w(running_device *device, int which, int offset, int data)
+void svision_soundport_w(device_t *device, int which, int offset, int data)
 {
 	svision_sound_state *state = get_safe_token(device);
 	SVISION_CHANNEL *channel = &state->channel[which];
@@ -259,7 +259,7 @@ static STREAM_UPDATE( svision_update )
 			UINT16 addr = state->dma.start + (unsigned) state->dma.pos / 2;
 			if (addr >= 0x8000 && addr < 0xc000)
 			{
-				sample = memory_region(device->machine, "user1")[(addr & 0x3fff) | state->dma.ca14to16];
+				sample = device->machine->region("user1")->base()[(addr & 0x3fff) | state->dma.ca14to16];
 			}
 			else
 			{

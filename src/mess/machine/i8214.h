@@ -33,9 +33,9 @@
 
 DECLARE_LEGACY_DEVICE(I8214, i8214);
 
-#define MDRV_I8214_ADD(_tag, _clock, _intrf) \
-	MDRV_DEVICE_ADD(_tag, I8214, _clock) \
-	MDRV_DEVICE_CONFIG(_intrf)
+#define MCFG_I8214_ADD(_tag, _clock, _intrf) \
+	MCFG_DEVICE_ADD(_tag, I8214, _clock) \
+	MCFG_DEVICE_CONFIG(_intrf)
 
 #define I8214_INTERFACE(name) \
 	const i8214_interface (name)=

@@ -634,7 +634,7 @@ GFXDECODE_END
 **************************************************************/
 
 /* handler called by the YM2610 emulator when the internal timers cause an IRQ */
-static void irqhandler( running_device *device, int irq )
+static void irqhandler( device_t *device, int irq )
 {
 	othunder_state *state = device->machine->driver_data<othunder_state>();
 	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
@@ -686,7 +686,7 @@ static MACHINE_START( othunder )
 {
 	othunder_state *state = machine->driver_data<othunder_state>();
 
-	memory_configure_bank(machine, "bank10", 0, 4, memory_region(machine, "audiocpu") + 0xc000, 0x4000);
+	memory_configure_bank(machine, "bank10", 0, 4, machine->region("audiocpu")->base() + 0xc000, 0x4000);
 
 	state->maincpu = machine->device("maincpu");
 	state->audiocpu = machine->device("audiocpu");
@@ -721,64 +721,64 @@ static MACHINE_RESET( othunder )
 static MACHINE_CONFIG_START( othunder, othunder_state )
 
 	/* basic machine hardware */
-//  MDRV_CPU_ADD("maincpu", M68000, 24000000/2 )   /* 12 MHz */
-	MDRV_CPU_ADD("maincpu", M68000, 13000000 )	/* fixes garbage graphics on startup */
-	MDRV_CPU_PROGRAM_MAP(othunder_map)
-	MDRV_CPU_VBLANK_INT("screen", vblank_interrupt)
+//  MCFG_CPU_ADD("maincpu", M68000, 24000000/2 )   /* 12 MHz */
+	MCFG_CPU_ADD("maincpu", M68000, 13000000 )	/* fixes garbage graphics on startup */
+	MCFG_CPU_PROGRAM_MAP(othunder_map)
+	MCFG_CPU_VBLANK_INT("screen", vblank_interrupt)
 
-	MDRV_CPU_ADD("audiocpu", Z80,16000000/4 )	/* 4 MHz */
-	MDRV_CPU_PROGRAM_MAP(z80_sound_map)
+	MCFG_CPU_ADD("audiocpu", Z80,16000000/4 )	/* 4 MHz */
+	MCFG_CPU_PROGRAM_MAP(z80_sound_map)
 
-	MDRV_EEPROM_ADD("eeprom", eeprom_intf)
+	MCFG_EEPROM_ADD("eeprom", eeprom_intf)
 
-	MDRV_MACHINE_START(othunder)
-	MDRV_MACHINE_RESET(othunder)
+	MCFG_MACHINE_START(othunder)
+	MCFG_MACHINE_RESET(othunder)
 
-	MDRV_TC0220IOC_ADD("tc0220ioc", othunder_io_intf)
+	MCFG_TC0220IOC_ADD("tc0220ioc", othunder_io_intf)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(40*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 32*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(40*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 32*8-1)
 
-	MDRV_GFXDECODE(othunder)
-	MDRV_PALETTE_LENGTH(4096)
+	MCFG_GFXDECODE(othunder)
+	MCFG_PALETTE_LENGTH(4096)
 
-	MDRV_VIDEO_START(othunder)
-	MDRV_VIDEO_UPDATE(othunder)
+	MCFG_VIDEO_START(othunder)
+	MCFG_VIDEO_UPDATE(othunder)
 
-	MDRV_TC0100SCN_ADD("tc0100scn", othunder_tc0100scn_intf)
-	MDRV_TC0110PCR_ADD("tc0110pcr", othunder_tc0110pcr_intf)
+	MCFG_TC0100SCN_ADD("tc0100scn", othunder_tc0100scn_intf)
+	MCFG_TC0110PCR_ADD("tc0110pcr", othunder_tc0110pcr_intf)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ymsnd", YM2610, 16000000/2)
-	MDRV_SOUND_CONFIG(ym2610_config)
-	MDRV_SOUND_ROUTE(0, "2610.0l", 0.25)
-	MDRV_SOUND_ROUTE(0, "2610.0r", 0.25)
-	MDRV_SOUND_ROUTE(1, "2610.1l", 1.0)
-	MDRV_SOUND_ROUTE(1, "2610.1r", 1.0)
-	MDRV_SOUND_ROUTE(2, "2610.2l", 1.0)
-	MDRV_SOUND_ROUTE(2, "2610.2r", 1.0)
+	MCFG_SOUND_ADD("ymsnd", YM2610, 16000000/2)
+	MCFG_SOUND_CONFIG(ym2610_config)
+	MCFG_SOUND_ROUTE(0, "2610.0l", 0.25)
+	MCFG_SOUND_ROUTE(0, "2610.0r", 0.25)
+	MCFG_SOUND_ROUTE(1, "2610.1l", 1.0)
+	MCFG_SOUND_ROUTE(1, "2610.1r", 1.0)
+	MCFG_SOUND_ROUTE(2, "2610.2l", 1.0)
+	MCFG_SOUND_ROUTE(2, "2610.2r", 1.0)
 
-	MDRV_SOUND_ADD("2610.0l", FILTER_VOLUME, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MDRV_SOUND_ADD("2610.0r", FILTER_VOLUME, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-	MDRV_SOUND_ADD("2610.1l", FILTER_VOLUME, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MDRV_SOUND_ADD("2610.1r", FILTER_VOLUME, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-	MDRV_SOUND_ADD("2610.2l", FILTER_VOLUME, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MDRV_SOUND_ADD("2610.2r", FILTER_VOLUME, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("2610.0l", FILTER_VOLUME, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MCFG_SOUND_ADD("2610.0r", FILTER_VOLUME, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("2610.1l", FILTER_VOLUME, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MCFG_SOUND_ADD("2610.1r", FILTER_VOLUME, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("2610.2l", FILTER_VOLUME, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MCFG_SOUND_ADD("2610.2r", FILTER_VOLUME, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MDRV_TC0140SYT_ADD("tc0140syt", othunder_tc0140syt_intf)
+	MCFG_TC0140SYT_ADD("tc0140syt", othunder_tc0140syt_intf)
 MACHINE_CONFIG_END
 
 

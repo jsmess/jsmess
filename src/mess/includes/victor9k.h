@@ -43,15 +43,15 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_fdc_cpu;
-	required_device<running_device> m_ieee488;
-	required_device<running_device> m_pic;
-	required_device<running_device> m_ssda;
-	required_device<running_device> m_via1;
-	required_device<running_device> m_cvsd;
-	required_device<running_device> m_crtc;
-	required_device<running_device> m_ram;
-	required_device<running_device> m_floppy0;
-	required_device<running_device> m_floppy1;
+	required_device<device_t> m_ieee488;
+	required_device<device_t> m_pic;
+	required_device<device_t> m_ssda;
+	required_device<device_t> m_via1;
+	required_device<device_t> m_cvsd;
+	required_device<device_t> m_crtc;
+	required_device<device_t> m_ram;
+	required_device<device_t> m_floppy0;
+	required_device<device_t> m_floppy1;
 	
 	virtual void machine_start();
 

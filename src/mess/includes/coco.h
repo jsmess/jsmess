@@ -77,15 +77,15 @@ public:
 	coco_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	running_device *cococart_device;
-	running_device *cassette_device;
-	running_device *bitbanger_device;
-	running_device *printer_device;
-	running_device *dac;
-	running_device *sam;
-	running_device *pia_0;
-	running_device *pia_1;
-	running_device *pia_2;
+	device_t *cococart_device;
+	device_t *cassette_device;
+	device_t *bitbanger_device;
+	device_t *printer_device;
+	device_t *dac;
+	device_t *sam;
+	device_t *pia_0;
+	device_t *pia_1;
+	device_t *pia_2;
 	UINT8 *rom;
 	int dclg_state;
 	int dclg_output_h;
@@ -198,10 +198,10 @@ void coco3_horizontal_sync_callback(running_machine *machine,int data);
 void coco3_field_sync_callback(running_machine *machine,int data);
 void coco3_gime_field_sync_callback(running_machine *machine);
 
-void coco_cart_w(running_device *device, int data);
-void coco3_cart_w(running_device *device, int data);
-void coco_nmi_w(running_device *device, int data);
-void coco_halt_w(running_device *device, int data);
+void coco_cart_w(device_t *device, int data);
+void coco3_cart_w(device_t *device, int data);
+void coco_nmi_w(device_t *device, int data);
+void coco_halt_w(device_t *device, int data);
 
 /* Compusense Dragon Plus board */
 READ8_HANDLER ( dgnplus_reg_r );

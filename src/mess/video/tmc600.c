@@ -117,7 +117,7 @@ void tmc600_state::video_start()
 	m_color_ram = auto_alloc_array(machine, UINT8, TMC600_PAGE_RAM_SIZE);
 
 	// find memory regions
-	m_char_rom = memory_region(machine, "chargen");
+	m_char_rom = machine->region("chargen")->base();
 
 	// register for state saving
 	state_save_register_global_pointer(machine, m_color_ram, TMC600_PAGE_RAM_SIZE);
@@ -147,12 +147,12 @@ GFXDECODE_END
 
 MACHINE_CONFIG_FRAGMENT( tmc600_video )
 	// video hardware
-	MDRV_CDP1869_SCREEN_PAL_ADD(SCREEN_TAG, CDP1869_DOT_CLK_PAL)
-	MDRV_TIMER_ADD_PERIODIC("blink", blink_tick, HZ(2))
-	MDRV_GFXDECODE(tmc600)
+	MCFG_CDP1869_SCREEN_PAL_ADD(SCREEN_TAG, CDP1869_DOT_CLK_PAL)
+	MCFG_TIMER_ADD_PERIODIC("blink", blink_tick, HZ(2))
+	MCFG_GFXDECODE(tmc600)
 
 	// sound hardware
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_CDP1869_ADD(CDP1869_TAG, CDP1869_DOT_CLK_PAL, vis_intf, cdp1869_page_ram)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_CDP1869_ADD(CDP1869_TAG, CDP1869_DOT_CLK_PAL, vis_intf, cdp1869_page_ram)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END

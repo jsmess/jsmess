@@ -41,8 +41,8 @@ public:
 	UINT32 dac_adr, dac_bank, dac_adr_s, dac_adr_e, dac_busy;
 
 	/* devices */
-	running_device *maincpu;
-	running_device *dac;
+	device_t *maincpu;
+	device_t *dac;
 };
 
 
@@ -155,7 +155,7 @@ static VIDEO_UPDATE( mjsister )
 static TIMER_CALLBACK( dac_callback )
 {
 	mjsister_state *state = machine->driver_data<mjsister_state>();
-	UINT8 *DACROM = memory_region(machine, "samples");
+	UINT8 *DACROM = machine->region("samples")->base();
 
 	dac_data_w(state->dac, DACROM[(state->dac_bank * 0x10000 + state->dac_adr++) & 0x1ffff]);
 
@@ -447,7 +447,7 @@ static STATE_POSTLOAD( mjsister_redraw )
 static MACHINE_START( mjsister )
 {
 	mjsister_state *state = machine->driver_data<mjsister_state>();
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 
 	memory_configure_bank(machine, "bank1", 0, 4, &ROM[0x10000], 0x8000);
 
@@ -494,37 +494,37 @@ static MACHINE_RESET( mjsister )
 static MACHINE_CONFIG_START( mjsister, mjsister_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, MCLK/2) /* 6.000 MHz */
-	MDRV_CPU_PROGRAM_MAP(mjsister_map)
-	MDRV_CPU_IO_MAP(mjsister_io_map)
-	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)
+	MCFG_CPU_ADD("maincpu", Z80, MCLK/2) /* 6.000 MHz */
+	MCFG_CPU_PROGRAM_MAP(mjsister_map)
+	MCFG_CPU_IO_MAP(mjsister_io_map)
+	MCFG_CPU_VBLANK_INT_HACK(irq0_line_hold,2)
 
-	MDRV_MACHINE_START(mjsister)
-	MDRV_MACHINE_RESET(mjsister)
+	MCFG_MACHINE_START(mjsister)
+	MCFG_MACHINE_RESET(mjsister)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(256+4, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 255+4, 8, 247)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(256+4, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 255+4, 8, 247)
 
-	MDRV_PALETTE_INIT(RRRR_GGGG_BBBB)
-	MDRV_PALETTE_LENGTH(256)
+	MCFG_PALETTE_INIT(RRRR_GGGG_BBBB)
+	MCFG_PALETTE_LENGTH(256)
 
-	MDRV_VIDEO_START(mjsister)
-	MDRV_VIDEO_UPDATE(mjsister)
+	MCFG_VIDEO_START(mjsister)
+	MCFG_VIDEO_UPDATE(mjsister)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("aysnd", AY8910, MCLK/8)
-	MDRV_SOUND_CONFIG(ay8910_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
+	MCFG_SOUND_ADD("aysnd", AY8910, MCLK/8)
+	MCFG_SOUND_CONFIG(ay8910_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MDRV_SOUND_ADD("dac", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 /*************************************

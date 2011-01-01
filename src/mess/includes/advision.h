@@ -23,7 +23,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
-	required_device<running_device> m_dac;
+	required_device<device_t> m_dac;
 
 	virtual void machine_start();
 	virtual void machine_reset();

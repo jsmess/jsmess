@@ -69,7 +69,7 @@ void samcoupe_update_memory(address_space *space)
 {
 	samcoupe_state *state = space->machine->driver_data<samcoupe_state>();
 	const int PAGE_MASK = ((messram_get_size(space->machine->device("messram")) & 0xfffff) / 0x4000) - 1;
-	UINT8 *rom = memory_region(space->machine, "maincpu");
+	UINT8 *rom = space->machine->region("maincpu")->base();
 	UINT8 *memory;
 	int is_readonly;
 
@@ -261,7 +261,7 @@ MACHINE_RESET( samcoupe )
 	if (input_port_read(machine, "config") & 0x01)
 	{
 		/* install RTC */
-		running_device *rtc = machine->device("sambus_clock");
+		device_t *rtc = machine->device("sambus_clock");
 		memory_install_readwrite8_device_handler(spaceio, rtc, 0xef, 0xef, 0xffff, 0xff00, samcoupe_rtc_r, samcoupe_rtc_w);
 	}
 	else

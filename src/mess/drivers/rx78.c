@@ -55,7 +55,7 @@ public:
 	rx78_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	running_device *cassette;
+	device_t *cassette;
 	UINT8 vram_read_bank;
 	UINT8 vram_write_bank;
 	UINT8 pal_reg[7];
@@ -93,7 +93,7 @@ static VIDEO_START( rx78 )
 static VIDEO_UPDATE( rx78 )
 {
 	rx78_state *state = screen->machine->driver_data<rx78_state>();
-	UINT8 *vram = memory_region(screen->machine,"vram");
+	UINT8 *vram = screen->machine->region("vram")->base();
 	int x,y,count;
 
 	bitmap_fill(bitmap, cliprect, screen->machine->pens[0x10]);
@@ -174,7 +174,7 @@ static WRITE8_HANDLER( key_w )
 static READ8_HANDLER( rx78_vram_r )
 {
 	rx78_state *state = space->machine->driver_data<rx78_state>();
-	UINT8 *vram = memory_region(space->machine,"vram");
+	UINT8 *vram = space->machine->region("vram")->base();
 
 	if(state->vram_read_bank == 0 || state->vram_read_bank > 6)
 		return 0xff;
@@ -185,7 +185,7 @@ static READ8_HANDLER( rx78_vram_r )
 static WRITE8_HANDLER( rx78_vram_w )
 {
 	rx78_state *state = space->machine->driver_data<rx78_state>();
-	UINT8 *vram = memory_region(space->machine,"vram");
+	UINT8 *vram = space->machine->region("vram")->base();
 
 	if(state->vram_write_bank & 0x01) { vram[offset + 0 * 0x2000] = data; }
 	if(state->vram_write_bank & 0x02) { vram[offset + 1 * 0x2000] = data; }
@@ -405,7 +405,7 @@ static MACHINE_RESET(rx78)
 
 static DEVICE_IMAGE_LOAD( rx78_cart )
 {
-	UINT8 *cart = memory_region(image.device().machine, "cart_img");
+	UINT8 *cart = image.device().machine->region("cart_img")->base();
 	UINT32 size;
 
 	if (image.software_entry() == NULL)
@@ -453,48 +453,48 @@ GFXDECODE_END
 
 static MACHINE_CONFIG_START( rx78, rx78_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu",Z80, MASTER_CLOCK/7)	// unknown divider
-	MDRV_CPU_PROGRAM_MAP(rx78_mem)
-	MDRV_CPU_IO_MAP(rx78_io)
-	MDRV_CPU_VBLANK_INT("screen",irq0_line_hold)
+	MCFG_CPU_ADD("maincpu",Z80, MASTER_CLOCK/7)	// unknown divider
+	MCFG_CPU_PROGRAM_MAP(rx78_mem)
+	MCFG_CPU_IO_MAP(rx78_io)
+	MCFG_CPU_VBLANK_INT("screen",irq0_line_hold)
 
-	MDRV_MACHINE_RESET(rx78)
+	MCFG_MACHINE_RESET(rx78)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(192, 184)
-	MDRV_SCREEN_VISIBLE_AREA(0, 192-1, 0, 184-1)
-	MDRV_PALETTE_LENGTH(16+1) //+1 for the background color
-	MDRV_GFXDECODE(rx78)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(192, 184)
+	MCFG_SCREEN_VISIBLE_AREA(0, 192-1, 0, 184-1)
+	MCFG_PALETTE_LENGTH(16+1) //+1 for the background color
+	MCFG_GFXDECODE(rx78)
 
-	MDRV_VIDEO_START(rx78)
-	MDRV_VIDEO_UPDATE(rx78)
+	MCFG_VIDEO_START(rx78)
+	MCFG_VIDEO_UPDATE(rx78)
 
-	MDRV_CARTSLOT_ADD("cart")
-	MDRV_CARTSLOT_EXTENSION_LIST("rom")
-	MDRV_CARTSLOT_NOT_MANDATORY
-	MDRV_CARTSLOT_LOAD(rx78_cart)
-	MDRV_CARTSLOT_INTERFACE("rx78_cart")
+	MCFG_CARTSLOT_ADD("cart")
+	MCFG_CARTSLOT_EXTENSION_LIST("rom")
+	MCFG_CARTSLOT_NOT_MANDATORY
+	MCFG_CARTSLOT_LOAD(rx78_cart)
+	MCFG_CARTSLOT_INTERFACE("rx78_cart")
 
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("32k")
-	MDRV_RAM_EXTRA_OPTIONS("16k")
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("32k")
+	MCFG_RAM_EXTRA_OPTIONS("16k")
 
-	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )
+	MCFG_CASSETTE_ADD( "cassette", default_cassette_config )
 
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_WAVE_ADD("wave", "cassette")
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+	MCFG_SOUND_WAVE_ADD("wave", "cassette")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
-	MDRV_SOUND_ADD("sn1", SN76489A, XTAL_28_63636MHz/8) // unknown divider
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("sn1", SN76489A, XTAL_28_63636MHz/8) // unknown divider
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Software lists */
-	MDRV_SOFTWARE_LIST_ADD("cart_list","rx78")
+	MCFG_SOFTWARE_LIST_ADD("cart_list","rx78")
 MACHINE_CONFIG_END
 
 /* ROM definition */

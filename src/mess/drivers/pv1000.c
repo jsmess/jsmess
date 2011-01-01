@@ -33,7 +33,7 @@ public:
 	emu_timer		*irq_on_timer;
 	emu_timer		*irq_off_timer;
 
-	running_device *maincpu;
+	device_t *maincpu;
 	screen_device *screen;
 	UINT8 *ram;
 };
@@ -59,7 +59,7 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( pv1000_gfxram_w )
 {
-	UINT8 *gfxram = memory_region( space->machine, "gfxram" );
+	UINT8 *gfxram = space->machine->region( "gfxram" )->base();
 
 	gfxram[ offset ] = data;
 	gfx_element_mark_dirty(space->machine->gfx[1], offset/32);
@@ -175,7 +175,7 @@ static PALETTE_INIT( pv1000 )
 
 static DEVICE_IMAGE_LOAD( pv1000_cart )
 {
-	UINT8 *cart = memory_region(image.device().machine, "cart");
+	UINT8 *cart = image.device().machine->region("cart")->base();
 	UINT32 size;
 
 	if (image.software_entry() == NULL)
@@ -373,37 +373,37 @@ GFXDECODE_END
 
 static MACHINE_CONFIG_START( pv1000, d65010_state )
 
-	MDRV_CPU_ADD( "maincpu", Z80, 17897725/5 )
-	MDRV_CPU_PROGRAM_MAP( pv1000 )
-	MDRV_CPU_IO_MAP( pv1000_io )
+	MCFG_CPU_ADD( "maincpu", Z80, 17897725/5 )
+	MCFG_CPU_PROGRAM_MAP( pv1000 )
+	MCFG_CPU_IO_MAP( pv1000_io )
 
-	MDRV_MACHINE_START( pv1000 )
-	MDRV_MACHINE_RESET( pv1000 )
+	MCFG_MACHINE_START( pv1000 )
+	MCFG_MACHINE_RESET( pv1000 )
 
-	MDRV_SCREEN_ADD( "screen", RASTER )
-	MDRV_SCREEN_FORMAT( BITMAP_FORMAT_INDEXED16 )
-	MDRV_SCREEN_RAW_PARAMS( 17897725/3, 380, 0, 256, 262, 0, 192 )
+	MCFG_SCREEN_ADD( "screen", RASTER )
+	MCFG_SCREEN_FORMAT( BITMAP_FORMAT_INDEXED16 )
+	MCFG_SCREEN_RAW_PARAMS( 17897725/3, 380, 0, 256, 262, 0, 192 )
 
-	MDRV_PALETTE_LENGTH( 8 )
-	MDRV_PALETTE_INIT( pv1000 )
-	MDRV_GFXDECODE( pv1000 )
+	MCFG_PALETTE_LENGTH( 8 )
+	MCFG_PALETTE_INIT( pv1000 )
+	MCFG_GFXDECODE( pv1000 )
 
 	/* D65010G031 - Video & sound chip */
-	MDRV_VIDEO_UPDATE( pv1000 )
+	MCFG_VIDEO_UPDATE( pv1000 )
 
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD( "pv1000_sound", PV1000, 17897725 )
-	MDRV_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD( "pv1000_sound", PV1000, 17897725 )
+	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 
 	/* Cartridge slot */
-	MDRV_CARTSLOT_ADD("cart")
-	MDRV_CARTSLOT_EXTENSION_LIST("bin")
-	MDRV_CARTSLOT_MANDATORY
-	MDRV_CARTSLOT_INTERFACE("pv1000_cart")
-	MDRV_CARTSLOT_LOAD(pv1000_cart)
+	MCFG_CARTSLOT_ADD("cart")
+	MCFG_CARTSLOT_EXTENSION_LIST("bin")
+	MCFG_CARTSLOT_MANDATORY
+	MCFG_CARTSLOT_INTERFACE("pv1000_cart")
+	MCFG_CARTSLOT_LOAD(pv1000_cart)
 
 	/* Software lists */
-	MDRV_SOFTWARE_LIST_ADD("cart_list","pv1000")
+	MCFG_SOFTWARE_LIST_ADD("cart_list","pv1000")
 MACHINE_CONFIG_END
 
 

@@ -18,7 +18,7 @@
 
 ************************************************************/
 
-static void kaypro_interrupt(running_device *device, int state)
+static void kaypro_interrupt(device_t *device, int state)
 {
 	cputag_set_input_line(device->machine, "maincpu", 0, state);
 }
@@ -55,7 +55,7 @@ static WRITE8_DEVICE_HANDLER( common_pio_system_w )
 	{
 		memory_unmap_readwrite (mem, 0x0000, 0x3fff, 0, 0);
 		memory_install_read_bank (mem, 0x0000, 0x0fff, 0, 0, "bank1");
-		memory_set_bankptr(mem->machine, "bank1", memory_region(mem->machine, "maincpu"));
+		memory_set_bankptr(mem->machine, "bank1", mem->machine->region("maincpu")->base());
 		memory_install_readwrite8_handler (mem, 0x3000, 0x3fff, 0, 0, kaypro_videoram_r, kaypro_videoram_w);
 	}
 	else
@@ -63,8 +63,8 @@ static WRITE8_DEVICE_HANDLER( common_pio_system_w )
 		memory_unmap_readwrite(mem, 0x0000, 0x3fff, 0, 0);
 		memory_install_read_bank (mem, 0x0000, 0x3fff, 0, 0, "bank2");
 		memory_install_write_bank (mem, 0x0000, 0x3fff, 0, 0, "bank3");
-		memory_set_bankptr(mem->machine, "bank2", memory_region(mem->machine, "rambank"));
-		memory_set_bankptr(mem->machine, "bank3", memory_region(mem->machine, "rambank"));
+		memory_set_bankptr(mem->machine, "bank2", mem->machine->region("rambank")->base());
+		memory_set_bankptr(mem->machine, "bank3", mem->machine->region("rambank")->base());
 	}
 
 	wd17xx_dden_w(state->fdc, BIT(data, 5));
@@ -172,15 +172,15 @@ WRITE8_HANDLER( kaypro2x_system_port_w )
 	{
 		memory_unmap_readwrite (mem, 0x0000, 0x3fff, 0, 0);
 		memory_install_read_bank (mem, 0x0000, 0x1fff, 0, 0, "bank1");
-		memory_set_bankptr(mem->machine, "bank1", memory_region(mem->machine, "maincpu"));
+		memory_set_bankptr(mem->machine, "bank1", mem->machine->region("maincpu")->base());
 	}
 	else
 	{
 		memory_unmap_readwrite (mem, 0x0000, 0x3fff, 0, 0);
 		memory_install_read_bank (mem, 0x0000, 0x3fff, 0, 0, "bank2");
 		memory_install_write_bank (mem, 0x0000, 0x3fff, 0, 0, "bank3");
-		memory_set_bankptr(mem->machine, "bank2", memory_region(mem->machine, "rambank"));
-		memory_set_bankptr(mem->machine, "bank3", memory_region(mem->machine, "rambank"));
+		memory_set_bankptr(mem->machine, "bank2", mem->machine->region("rambank")->base());
+		memory_set_bankptr(mem->machine, "bank3", mem->machine->region("rambank")->base());
 	}
 
 	wd17xx_dden_w(state->fdc, BIT(data, 5));
@@ -402,8 +402,8 @@ MACHINE_RESET( kaypro2x )
 QUICKLOAD_LOAD( kayproii )
 {
 	kaypro_state *state = image.device().machine->driver_data<kaypro_state>();
-	running_device *cpu = image.device().machine->device("maincpu");
-	UINT8 *RAM = memory_region(image.device().machine, "rambank");
+	device_t *cpu = image.device().machine->device("maincpu");
+	UINT8 *RAM = image.device().machine->region("rambank")->base();
 	UINT16 i;
 	UINT8 data;
 
@@ -430,8 +430,8 @@ QUICKLOAD_LOAD( kaypro2x )
 {
 	kaypro_state *state = image.device().machine->driver_data<kaypro_state>();
 	address_space *space = cputag_get_address_space(image.device().machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	running_device *cpu = image.device().machine->device("maincpu");
-	UINT8 *RAM = memory_region(image.device().machine, "rambank");
+	device_t *cpu = image.device().machine->device("maincpu");
+	UINT8 *RAM = image.device().machine->region("rambank")->base();
 	UINT16 i;
 	UINT8 data;
 

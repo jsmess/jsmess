@@ -675,156 +675,156 @@ static const mc6845_interface mbee256_crtc = {
 
 static MACHINE_CONFIG_START( mbee, mbee_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, XTAL_12MHz / 6)         /* 2 MHz */
-	MDRV_CPU_PROGRAM_MAP(mbee_mem)
-	MDRV_CPU_IO_MAP(mbee_io)
-	MDRV_CPU_CONFIG(mbee_daisy_chain)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz / 6)         /* 2 MHz */
+	MCFG_CPU_PROGRAM_MAP(mbee_mem)
+	MCFG_CPU_IO_MAP(mbee_io)
+	MCFG_CPU_CONFIG(mbee_daisy_chain)
 
-	MDRV_MACHINE_RESET( mbee )
+	MCFG_MACHINE_RESET( mbee )
 
-	MDRV_Z80PIO_ADD( "z80pio", XTAL_12MHz / 6, mbee_z80pio_intf )
+	MCFG_Z80PIO_ADD( "z80pio", XTAL_12MHz / 6, mbee_z80pio_intf )
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(50)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(250)) /* not accurate */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*8, 19*16)			/* need at least 17 lines for NET */
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0, 19*16-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(250)) /* not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(64*8, 19*16)			/* need at least 17 lines for NET */
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0, 19*16-1)
 
-	MDRV_GFXDECODE(mbee)
-	MDRV_PALETTE_LENGTH(2)
-	MDRV_PALETTE_INIT(black_and_white)
+	MCFG_GFXDECODE(mbee)
+	MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_INIT(black_and_white)
 
-	MDRV_VIDEO_START(mbee)
-	MDRV_VIDEO_UPDATE(mbee)
+	MCFG_VIDEO_START(mbee)
+	MCFG_VIDEO_UPDATE(mbee)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_WAVE_ADD("wave", "cassette")
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MDRV_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_WAVE_ADD("wave", "cassette")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* devices */
-	MDRV_MC6845_ADD("crtc", SY6545_1, XTAL_12MHz / 8, mbee_crtc)
-	MDRV_QUICKLOAD_ADD("quickload", mbee, "mwb,com", 2)
-	MDRV_Z80BIN_QUICKLOAD_ADD("quickload2", mbee, 2)
-	MDRV_CENTRONICS_ADD("centronics", standard_centronics)
-	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )
+	MCFG_MC6845_ADD("crtc", SY6545_1, XTAL_12MHz / 8, mbee_crtc)
+	MCFG_QUICKLOAD_ADD("quickload", mbee, "mwb,com", 2)
+	MCFG_Z80BIN_QUICKLOAD_ADD("quickload2", mbee, 2)
+	MCFG_CENTRONICS_ADD("centronics", standard_centronics)
+	MCFG_CASSETTE_ADD( "cassette", default_cassette_config )
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_START( mbeeic, mbee_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, XTAL_13_5MHz / 4)         /* 3.37500 MHz */
-	MDRV_CPU_PROGRAM_MAP(mbeeic_mem)
-	MDRV_CPU_IO_MAP(mbeeic_io)
-	MDRV_CPU_CONFIG(mbee_daisy_chain)
-	//MDRV_CPU_VBLANK_INT("screen", mbee_interrupt)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_13_5MHz / 4)         /* 3.37500 MHz */
+	MCFG_CPU_PROGRAM_MAP(mbeeic_mem)
+	MCFG_CPU_IO_MAP(mbeeic_io)
+	MCFG_CPU_CONFIG(mbee_daisy_chain)
+	//MCFG_CPU_VBLANK_INT("screen", mbee_interrupt)
 
-	MDRV_MACHINE_RESET( mbee )
+	MCFG_MACHINE_RESET( mbee )
 
-	MDRV_Z80PIO_ADD( "z80pio", 3375000, mbee_z80pio_intf )
+	MCFG_Z80PIO_ADD( "z80pio", 3375000, mbee_z80pio_intf )
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(50)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(250)) /* not accurate */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(80*8, 310)
-	MDRV_SCREEN_VISIBLE_AREA(0, 80*8-1, 0, 19*16-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(250)) /* not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(80*8, 310)
+	MCFG_SCREEN_VISIBLE_AREA(0, 80*8-1, 0, 19*16-1)
 
-	MDRV_GFXDECODE(mbeeic)
-	MDRV_PALETTE_LENGTH(96)
-	MDRV_PALETTE_INIT(mbeeic)
+	MCFG_GFXDECODE(mbeeic)
+	MCFG_PALETTE_LENGTH(96)
+	MCFG_PALETTE_INIT(mbeeic)
 
-	MDRV_VIDEO_START(mbeeic)
-	MDRV_VIDEO_UPDATE(mbee)
+	MCFG_VIDEO_START(mbeeic)
+	MCFG_VIDEO_UPDATE(mbee)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_WAVE_ADD("wave", "cassette")
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MDRV_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_WAVE_ADD("wave", "cassette")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* devices */
-	MDRV_MC6845_ADD("crtc", SY6545_1, XTAL_13_5MHz / 8, mbeeic_crtc)
-	MDRV_QUICKLOAD_ADD("quickload", mbee, "mwb,com", 2)
-	MDRV_Z80BIN_QUICKLOAD_ADD("quickload2", mbee, 2)
-	MDRV_CENTRONICS_ADD("centronics", standard_centronics)
-	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )
+	MCFG_MC6845_ADD("crtc", SY6545_1, XTAL_13_5MHz / 8, mbeeic_crtc)
+	MCFG_QUICKLOAD_ADD("quickload", mbee, "mwb,com", 2)
+	MCFG_Z80BIN_QUICKLOAD_ADD("quickload2", mbee, 2)
+	MCFG_CENTRONICS_ADD("centronics", standard_centronics)
+	MCFG_CASSETTE_ADD( "cassette", default_cassette_config )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mbeepc, mbeeic )
-	MDRV_CPU_MODIFY( "maincpu" )
-	MDRV_CPU_PROGRAM_MAP(mbeepc_mem)
-	MDRV_CPU_IO_MAP(mbeepc_io)
+	MCFG_CPU_MODIFY( "maincpu" )
+	MCFG_CPU_PROGRAM_MAP(mbeepc_mem)
+	MCFG_CPU_IO_MAP(mbeepc_io)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mbeepc85, mbeeic )
-	MDRV_CPU_MODIFY( "maincpu" )
-	MDRV_CPU_PROGRAM_MAP(mbeepc85_mem)
-	MDRV_CPU_IO_MAP(mbeepc85_io)
+	MCFG_CPU_MODIFY( "maincpu" )
+	MCFG_CPU_PROGRAM_MAP(mbeepc85_mem)
+	MCFG_CPU_IO_MAP(mbeepc85_io)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mbeepc85b, mbeepc85 )
-	MDRV_PALETTE_INIT(mbeepc85b)
+	MCFG_PALETTE_INIT(mbeepc85b)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mbeeppc, mbeeic )
-	MDRV_CPU_MODIFY( "maincpu" )
-	MDRV_CPU_PROGRAM_MAP(mbeeppc_mem)
-	MDRV_CPU_IO_MAP(mbeeppc_io)
-	MDRV_VIDEO_START(mbeeppc)
-	MDRV_GFXDECODE(mbeeppc)
-	MDRV_PALETTE_LENGTH(16)
-	MDRV_PALETTE_INIT(mbeeppc)
-	MDRV_DEVICE_REMOVE("crtc")
-	MDRV_MC6845_ADD("crtc", SY6545_1, XTAL_13_5MHz / 8, mbeeppc_crtc)
+	MCFG_CPU_MODIFY( "maincpu" )
+	MCFG_CPU_PROGRAM_MAP(mbeeppc_mem)
+	MCFG_CPU_IO_MAP(mbeeppc_io)
+	MCFG_VIDEO_START(mbeeppc)
+	MCFG_GFXDECODE(mbeeppc)
+	MCFG_PALETTE_LENGTH(16)
+	MCFG_PALETTE_INIT(mbeeppc)
+	MCFG_DEVICE_REMOVE("crtc")
+	MCFG_MC6845_ADD("crtc", SY6545_1, XTAL_13_5MHz / 8, mbeeppc_crtc)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mbee56, mbeeic )
-	MDRV_CPU_MODIFY( "maincpu" )
-	MDRV_CPU_PROGRAM_MAP(mbee56_mem)
-	MDRV_CPU_IO_MAP(mbee56_io)
-	MDRV_MACHINE_RESET( mbee56 )
-	MDRV_WD2793_ADD("fdc", mbee_wd17xx_interface )
-	MDRV_FLOPPY_2_DRIVES_ADD(mbee_floppy_config)
+	MCFG_CPU_MODIFY( "maincpu" )
+	MCFG_CPU_PROGRAM_MAP(mbee56_mem)
+	MCFG_CPU_IO_MAP(mbee56_io)
+	MCFG_MACHINE_RESET( mbee56 )
+	MCFG_WD2793_ADD("fdc", mbee_wd17xx_interface )
+	MCFG_FLOPPY_2_DRIVES_ADD(mbee_floppy_config)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mbee64, mbee56 )
-	MDRV_CPU_MODIFY( "maincpu" )
-	MDRV_CPU_PROGRAM_MAP(mbee64_mem)
-	MDRV_CPU_IO_MAP(mbee64_io)
-	MDRV_MACHINE_RESET( mbee64 )
+	MCFG_CPU_MODIFY( "maincpu" )
+	MCFG_CPU_PROGRAM_MAP(mbee64_mem)
+	MCFG_CPU_IO_MAP(mbee64_io)
+	MCFG_MACHINE_RESET( mbee64 )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mbee128, mbeeppc )
-	MDRV_CPU_MODIFY( "maincpu" )
-	MDRV_CPU_PROGRAM_MAP(mbee128_mem)
-	MDRV_CPU_IO_MAP(mbee128_io)
-	MDRV_MACHINE_RESET( mbee128 )
-	MDRV_WD2793_ADD("fdc", mbee_wd17xx_interface )
-	MDRV_FLOPPY_2_DRIVES_ADD(mbee_floppy_config)
+	MCFG_CPU_MODIFY( "maincpu" )
+	MCFG_CPU_PROGRAM_MAP(mbee128_mem)
+	MCFG_CPU_IO_MAP(mbee128_io)
+	MCFG_MACHINE_RESET( mbee128 )
+	MCFG_WD2793_ADD("fdc", mbee_wd17xx_interface )
+	MCFG_FLOPPY_2_DRIVES_ADD(mbee_floppy_config)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mbee256, mbee128 )
-	MDRV_CPU_MODIFY( "maincpu" )
-	MDRV_CPU_IO_MAP(mbee256_io)
-	MDRV_MACHINE_RESET( mbee256 )
-	MDRV_MC146818_ADD( "rtc", MC146818_STANDARD )
-	MDRV_DEVICE_REMOVE("crtc")
-	MDRV_MC6845_ADD("crtc", SY6545_1, XTAL_13_5MHz / 8, mbee256_crtc)
+	MCFG_CPU_MODIFY( "maincpu" )
+	MCFG_CPU_IO_MAP(mbee256_io)
+	MCFG_MACHINE_RESET( mbee256 )
+	MCFG_MC146818_ADD( "rtc", MC146818_STANDARD )
+	MCFG_DEVICE_REMOVE("crtc")
+	MCFG_MC6845_ADD("crtc", SY6545_1, XTAL_13_5MHz / 8, mbee256_crtc)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mbeett, mbeeppc )
-	MDRV_CPU_MODIFY( "maincpu" )
-	MDRV_CPU_PROGRAM_MAP(mbeett_mem)
-	MDRV_CPU_IO_MAP(mbeett_io)
-	MDRV_MACHINE_RESET( mbeett )
-	MDRV_MC146818_ADD( "rtc", MC146818_STANDARD )
-	MDRV_DEVICE_REMOVE("crtc")
-	MDRV_MC6845_ADD("crtc", SY6545_1, XTAL_13_5MHz / 8, mbee256_crtc)
+	MCFG_CPU_MODIFY( "maincpu" )
+	MCFG_CPU_PROGRAM_MAP(mbeett_mem)
+	MCFG_CPU_IO_MAP(mbeett_io)
+	MCFG_MACHINE_RESET( mbeett )
+	MCFG_MC146818_ADD( "rtc", MC146818_STANDARD )
+	MCFG_DEVICE_REMOVE("crtc")
+	MCFG_MC6845_ADD("crtc", SY6545_1, XTAL_13_5MHz / 8, mbee256_crtc)
 MACHINE_CONFIG_END
 
 /* Unused roms:

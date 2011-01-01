@@ -248,7 +248,7 @@ static void draw_fgtilemap(running_machine *machine, bitmap_t *bitmap,const rect
 			int width = (state->colorram[(x+(y*40*w)+state->crtc_start_addr) & screen_mask] & 0x80)>>7;
 			int height = (state->colorram[(x+(y*40*w)+state->crtc_start_addr) & screen_mask] & 0x40)>>6;
 			int pcg_bank = (state->colorram[(x+(y*40*w)+state->crtc_start_addr) & screen_mask] & 0x20)>>5;
-			UINT8 *gfx_data = pcg_bank ? memory_region(machine, "pcg") : memory_region(machine, "cgrom");
+			UINT8 *gfx_data = pcg_bank ? machine->region("pcg")->base() : machine->region("cgrom")->base();
 
 			/* skip draw if the x/y values are odd and the width/height is active, */
 			/* behaviour confirmed by Black Onyx title screen and the X1Demo */
@@ -721,7 +721,7 @@ static void cmt_command( running_machine* machine, UINT8 cmd )
 static TIMER_CALLBACK( cmt_wind_timer )
 {
 	x1_state *state = machine->driver_data<x1_state>();
-	running_device* cmt = machine->device("cass");
+	device_t* cmt = machine->device("cass");
 	switch(state->cmt_current_cmd)
 	{
 		case 0x03:
@@ -838,7 +838,7 @@ static WRITE8_HANDLER( sub_io_w )
 static READ8_HANDLER( x1_rom_r )
 {
 	x1_state *state = space->machine->driver_data<x1_state>();
-	UINT8 *rom = memory_region(space->machine, "cart_img");
+	UINT8 *rom = space->machine->region("cart_img")->base();
 
 //  printf("%06x\n",state->rom_index[0]<<16|state->rom_index[1]<<8|state->rom_index[2]<<0);
 
@@ -853,21 +853,21 @@ static WRITE8_HANDLER( x1_rom_w )
 
 static WRITE8_HANDLER( rom_bank_0_w )
 {
-	UINT8 *ROM = memory_region(space->machine, "maincpu");
+	UINT8 *ROM = space->machine->region("maincpu")->base();
 
 	memory_set_bankptr(space->machine, "bank1", &ROM[0x10000]);
 }
 
 static WRITE8_HANDLER( rom_bank_1_w )
 {
-	UINT8 *ROM = memory_region(space->machine, "maincpu");
+	UINT8 *ROM = space->machine->region("maincpu")->base();
 
 	memory_set_bankptr(space->machine, "bank1", &ROM[0x00000]);
 }
 
 static WRITE8_HANDLER( rom_data_w )
 {
-	UINT8 *ROM = memory_region(space->machine, "maincpu");
+	UINT8 *ROM = space->machine->region("maincpu")->base();
 
 	ROM[0x10000+offset] = data;
 }
@@ -886,7 +886,7 @@ static WRITE8_HANDLER( rom_data_w )
 
 static READ8_HANDLER( x1_fdc_r )
 {
-	running_device* dev = space->machine->device("fdc");
+	device_t* dev = space->machine->device("fdc");
 	//UINT8 ret = 0;
 
 	switch(offset+0xff8)
@@ -912,7 +912,7 @@ static READ8_HANDLER( x1_fdc_r )
 
 static WRITE8_HANDLER( x1_fdc_w )
 {
-	running_device* dev = space->machine->device("fdc");
+	device_t* dev = space->machine->device("fdc");
 
 	switch(offset+0xff8)
 	{
@@ -1012,7 +1012,7 @@ static READ8_HANDLER( x1_pcg_r )
 	{
 		if(state->scrn_reg.pcg_mode)
 		{
-			gfx_data = memory_region(space->machine, "kanji");
+			gfx_data = space->machine->region("kanji")->base();
 			calc_pcg_offset = (videoram[check_chr_addr(space->machine)]+(videoram[check_chr_addr(space->machine)+0x800]<<8)) & 0xfff;
 
 			state->kanji_offset = calc_pcg_offset*0x20;
@@ -1025,7 +1025,7 @@ static READ8_HANDLER( x1_pcg_r )
 		else
 		{
 //          printf("%04x %04x %02x\n",state->pcg_write_addr*4*8,state->pcg_write_addr,state->bios_offset);
-			gfx_data = memory_region(space->machine, "kanji");
+			gfx_data = space->machine->region("kanji")->base();
 			if(state->bios_offset == 0)
 				state->kanji_offset = state->pcg_write_addr*4*8;//TODO: check me
 
@@ -1038,7 +1038,7 @@ static READ8_HANDLER( x1_pcg_r )
 	}
 	else
 	{
-		gfx_data = memory_region(space->machine, "pcg");
+		gfx_data = space->machine->region("pcg")->base();
 		calc_pcg_offset = (state->pcg_index_r[addr-1]) | ((addr-1)*0x800);
 		res = gfx_data[0x0000+calc_pcg_offset+(state->pcg_write_addr*8)];
 
@@ -1047,7 +1047,7 @@ static READ8_HANDLER( x1_pcg_r )
 		return res;
 	}
 
-	return mame_rand(space->machine);
+	return space->machine->rand();
 }
 
 static WRITE8_HANDLER( x1_pcg_w )
@@ -1055,7 +1055,7 @@ static WRITE8_HANDLER( x1_pcg_w )
 	x1_state *state = space->machine->driver_data<x1_state>();
 	UINT8 *videoram = state->videoram;
 	int addr,pcg_offset;
-	UINT8 *PCG_RAM = memory_region(space->machine, "pcg");
+	UINT8 *PCG_RAM = space->machine->region("pcg")->base();
 
 	addr = (offset & 0x300) >> 8;
 
@@ -1301,7 +1301,7 @@ static WRITE8_HANDLER( x1turbo_gfxpal_w )
 static READ8_HANDLER( x1_kanji_r )
 {
 	x1_state *state = space->machine->driver_data<x1_state>();
-	UINT8 *kanji_rom = memory_region(space->machine, "kanji");
+	UINT8 *kanji_rom = space->machine->region("kanji")->base();
 	UINT8 res;
 
 	//res = 0;
@@ -1658,7 +1658,7 @@ static Z80DMA_INTERFACE( x1_dma )
 static INPUT_CHANGED( ipl_reset )
 {
 	address_space *space = cputag_get_address_space(field->port->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	UINT8 *ROM = memory_region(space->machine, "maincpu");
+	UINT8 *ROM = space->machine->region("maincpu")->base();
 
 	cputag_set_input_line(field->port->machine, "maincpu", INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
 	memory_set_bankptr(space->machine, "bank1", &ROM[0x00000]);
@@ -2136,8 +2136,8 @@ static TIMER_CALLBACK(x1_rtc_increment)
 static MACHINE_RESET( x1 )
 {
 	x1_state *state = machine->driver_data<x1_state>();
-	UINT8 *ROM = memory_region(machine, "maincpu");
-	UINT8 *PCG_RAM = memory_region(machine, "pcg");
+	UINT8 *ROM = machine->region("maincpu")->base();
+	UINT8 *PCG_RAM = machine->region("pcg")->base();
 	int i;
 
 	memory_set_bankptr(machine, "bank1", &ROM[0x00000]);
@@ -2249,75 +2249,75 @@ static const floppy_config x1_floppy_config =
 
 static MACHINE_CONFIG_START( x1, x1_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, MAIN_CLOCK/4)
-	MDRV_CPU_PROGRAM_MAP(x1_mem)
-	MDRV_CPU_IO_MAP(x1_io)
-	MDRV_CPU_VBLANK_INT("screen", x1_vbl)
-	MDRV_CPU_CONFIG(x1_daisy)
+	MCFG_CPU_ADD("maincpu", Z80, MAIN_CLOCK/4)
+	MCFG_CPU_PROGRAM_MAP(x1_mem)
+	MCFG_CPU_IO_MAP(x1_io)
+	MCFG_CPU_VBLANK_INT("screen", x1_vbl)
+	MCFG_CPU_CONFIG(x1_daisy)
 
-	MDRV_Z80CTC_ADD( "ctc", MAIN_CLOCK/4 , ctc_intf )
+	MCFG_Z80CTC_ADD( "ctc", MAIN_CLOCK/4 , ctc_intf )
 
-	MDRV_DEVICE_ADD("x1kb", X1_KEYBOARD, 0)
+	MCFG_DEVICE_ADD("x1kb", X1_KEYBOARD, 0)
 
-	MDRV_I8255A_ADD( "ppi8255_0", ppi8255_intf )
+	MCFG_I8255A_ADD( "ppi8255_0", ppi8255_intf )
 
-	MDRV_MACHINE_START(x1)
-	MDRV_MACHINE_RESET(x1)
+	MCFG_MACHINE_START(x1)
+	MCFG_MACHINE_RESET(x1)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(640, 480)
-	MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MDRV_MC6845_ADD("crtc", H46505, (VDP_CLOCK/48), mc6845_intf) //unknown divider
-	MDRV_PALETTE_LENGTH(0x300)
-	MDRV_PALETTE_INIT(x1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(640, 480)
+	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+	MCFG_MC6845_ADD("crtc", H46505, (VDP_CLOCK/48), mc6845_intf) //unknown divider
+	MCFG_PALETTE_LENGTH(0x300)
+	MCFG_PALETTE_INIT(x1)
 
-	MDRV_GFXDECODE(x1)
+	MCFG_GFXDECODE(x1)
 
-	MDRV_VIDEO_START(x1)
-	MDRV_VIDEO_UPDATE(x1)
-	MDRV_VIDEO_EOF(x1)
+	MCFG_VIDEO_START(x1)
+	MCFG_VIDEO_UPDATE(x1)
+	MCFG_VIDEO_EOF(x1)
 
-	MDRV_MB8877_ADD("fdc",x1_mb8877a_interface)
+	MCFG_MB8877_ADD("fdc",x1_mb8877a_interface)
 
-	MDRV_CARTSLOT_ADD("cart")
-	MDRV_CARTSLOT_EXTENSION_LIST("rom")
-	MDRV_CARTSLOT_NOT_MANDATORY
+	MCFG_CARTSLOT_ADD("cart")
+	MCFG_CARTSLOT_EXTENSION_LIST("rom")
+	MCFG_CARTSLOT_NOT_MANDATORY
 
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay", AY8910, MAIN_CLOCK/8)
-	MDRV_SOUND_CONFIG(ay8910_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MDRV_SOUND_WAVE_ADD("wave","cass")
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+	MCFG_SOUND_ADD("ay", AY8910, MAIN_CLOCK/8)
+	MCFG_SOUND_CONFIG(ay8910_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_WAVE_ADD("wave","cass")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
-	MDRV_CASSETTE_ADD("cass",x1_cassette_config)
-	MDRV_SOFTWARE_LIST_ADD("cass_list","x1_cass")
+	MCFG_CASSETTE_ADD("cass",x1_cassette_config)
+	MCFG_SOFTWARE_LIST_ADD("cass_list","x1_cass")
 
-	MDRV_FLOPPY_4_DRIVES_ADD(x1_floppy_config)
-	MDRV_SOFTWARE_LIST_ADD("flop_list","x1_flop")
+	MCFG_FLOPPY_4_DRIVES_ADD(x1_floppy_config)
+	MCFG_SOFTWARE_LIST_ADD("flop_list","x1_flop")
 
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( x1turbo, x1 )
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(x1turbo_io)
-	MDRV_CPU_CONFIG(x1turbo_daisy)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_IO_MAP(x1turbo_io)
+	MCFG_CPU_CONFIG(x1turbo_daisy)
 
-	MDRV_Z80SIO_ADD( "sio", MAIN_CLOCK/4 , sio_intf )
-	MDRV_Z80DMA_ADD( "dma", MAIN_CLOCK/4 , x1_dma )
+	MCFG_Z80SIO_ADD( "sio", MAIN_CLOCK/4 , sio_intf )
+	MCFG_Z80DMA_ADD( "dma", MAIN_CLOCK/4 , x1_dma )
 
-	MDRV_DEVICE_REMOVE("fdc")
-	MDRV_MB8877_ADD("fdc",x1turbo_mb8877a_interface)
+	MCFG_DEVICE_REMOVE("fdc")
+	MCFG_MB8877_ADD("fdc",x1turbo_mb8877a_interface)
 
-	MDRV_SOUND_ADD("ym", YM2151, MAIN_CLOCK/8) //option board
-//  MDRV_SOUND_CONFIG(ay8910_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("ym", YM2151, MAIN_CLOCK/8) //option board
+//  MCFG_SOUND_CONFIG(ay8910_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 /*************************************
@@ -2443,8 +2443,8 @@ ROM_END
 static DRIVER_INIT( kanji )
 {
 	UINT32 i,j,k,l;
-	UINT8 *kanji = memory_region(machine,"kanji");
-	UINT8 *raw_kanji = memory_region(machine,"raw_kanji");
+	UINT8 *kanji = machine->region("kanji")->base();
+	UINT8 *raw_kanji = machine->region("raw_kanji")->base();
 
 	k = 0;
 	for(l=0;l<2;l++)

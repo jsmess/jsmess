@@ -56,7 +56,7 @@ static MACHINE_START( crgolf )
 	state->audiocpu = machine->device("audiocpu");
 
 	/* configure the banking */
-	memory_configure_bank(machine, "bank1", 0, 16, memory_region(machine, "maincpu") + 0x10000, 0x2000);
+	memory_configure_bank(machine, "bank1", 0, 16, machine->region("maincpu")->base() + 0x10000, 0x2000);
 	memory_set_bank(machine, "bank1", 0);
 
 	/* register for save states */
@@ -190,14 +190,14 @@ static READ8_HANDLER( sound_to_main_r )
  *
  *************************************/
 
-static void vck_callback( running_device *device )
+static void vck_callback( device_t *device )
 {
 	crgolf_state *state = device->machine->driver_data<crgolf_state>();
 
 	/* only play back if we have data remaining */
 	if (state->sample_count != 0xff)
 	{
-		UINT8 data = memory_region(device->machine, "adpcm")[state->sample_offset >> 1];
+		UINT8 data = device->machine->region("adpcm")->base()[state->sample_offset >> 1];
 
 		/* write the next nibble and advance */
 		msm5205_data_w(device, (data >> (4 * (~state->sample_offset & 1))) & 0x0f);
@@ -385,33 +385,33 @@ static const msm5205_interface msm5205_intf =
 static MACHINE_CONFIG_START( crgolf, crgolf_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80,MASTER_CLOCK/3/2)
-	MDRV_CPU_PROGRAM_MAP(main_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_ADD("maincpu", Z80,MASTER_CLOCK/3/2)
+	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("audiocpu", Z80,MASTER_CLOCK/3/2)
-	MDRV_CPU_PROGRAM_MAP(sound_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_ADD("audiocpu", Z80,MASTER_CLOCK/3/2)
+	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_MACHINE_START(crgolf)
-	MDRV_MACHINE_RESET(crgolf)
-	MDRV_QUANTUM_TIME(HZ(6000))
+	MCFG_MACHINE_START(crgolf)
+	MCFG_MACHINE_RESET(crgolf)
+	MCFG_QUANTUM_TIME(HZ(6000))
 
 	/* video hardware */
-	MDRV_FRAGMENT_ADD(crgolf_video)
+	MCFG_FRAGMENT_ADD(crgolf_video)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("aysnd", AY8910, MASTER_CLOCK/3/2/2)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("aysnd", AY8910, MASTER_CLOCK/3/2/2)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( crgolfhi, crgolf )
 
-	MDRV_SOUND_ADD("msm", MSM5205, 384000)
-	MDRV_SOUND_CONFIG(msm5205_intf)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("msm", MSM5205, 384000)
+	MCFG_SOUND_CONFIG(msm5205_intf)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -599,7 +599,7 @@ ROM_END
 
 static DRIVER_INIT( crgolfhi )
 {
-	running_device *msm = machine->device("msm");
+	device_t *msm = machine->device("msm");
 	memory_install_write8_device_handler(cputag_get_address_space(machine, "audiocpu", ADDRESS_SPACE_PROGRAM), msm, 0xa000, 0xa003, 0, 0, crgolfhi_sample_w);
 }
 

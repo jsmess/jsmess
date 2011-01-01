@@ -148,19 +148,19 @@ static MACHINE_RESET(dolphin)
 
 static MACHINE_CONFIG_START( dolphin, dolphin_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu",S2650, XTAL_1MHz)
-	MDRV_CPU_PROGRAM_MAP(dolphin_mem)
-	MDRV_CPU_IO_MAP(dolphin_io)
+	MCFG_CPU_ADD("maincpu",S2650, XTAL_1MHz)
+	MCFG_CPU_PROGRAM_MAP(dolphin_mem)
+	MCFG_CPU_IO_MAP(dolphin_io)
 
-	MDRV_MACHINE_RESET(dolphin)
+	MCFG_MACHINE_RESET(dolphin)
 
 	/* video hardware */
-	MDRV_DEFAULT_LAYOUT(layout_dolphin)
+	MCFG_DEFAULT_LAYOUT(layout_dolphin)
 
 	/* sound hardware */
-	//MDRV_SPEAKER_STANDARD_MONO("mono")
-	//MDRV_SOUND_ADD("beep", BEEP, 0)
-	//MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	//MCFG_SPEAKER_STANDARD_MONO("mono")
+	//MCFG_SOUND_ADD("beep", BEEP, 0)
+	//MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
 /* ROM definition */

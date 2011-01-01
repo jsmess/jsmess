@@ -16,14 +16,14 @@ VIDEO_START( cbmb_crtc )
 
 VIDEO_UPDATE( cbmb_crtc )
 {
-	running_device *mc6845 = screen->machine->device("crtc");
+	device_t *mc6845 = screen->machine->device("crtc");
 	mc6845_update(mc6845, bitmap, cliprect);
 	return 0;
 }
 
 void cbm600_vh_init(running_machine *machine)
 {
-	UINT8 *gfx = memory_region(machine, "gfx1");
+	UINT8 *gfx = machine->region("gfx1")->base();
 	int i;
 
 	/* inversion logic on board */
@@ -36,7 +36,7 @@ void cbm600_vh_init(running_machine *machine)
 
 void cbm700_vh_init(running_machine *machine)
 {
-	UINT8 *gfx = memory_region(machine, "gfx1");
+	UINT8 *gfx = machine->region("gfx1")->base();
 	int i;
 	for (i=0; i<0x800; i++) {
 		gfx[0x1000+i]=gfx[0x800+i];

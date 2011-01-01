@@ -645,7 +645,7 @@ static int generic_pak_load(device_image_interface &image, int rambase_index, in
 	pak_decodedtrailer trailer;
 	int trailer_load = 0;
 
-	ROM = memory_region(image.device().machine, "maincpu");
+	ROM = image.device().machine->region("maincpu")->base();
 	rambase = &messram_get_ptr(image.device().machine->device("messram"))[rambase_index];
 	rombase = &ROM[rombase_index];
 	pakbase = &ROM[pakbase_index];
@@ -793,8 +793,8 @@ QUICKLOAD_LOAD ( coco )
 
 DEVICE_IMAGE_LOAD(coco_rom)
 {
-	UINT8 *dest = memory_region(image.device().machine, "cart");
-	UINT16 destlength = (UINT16) memory_region_length(image.device().machine, "cart");
+	UINT8 *dest = image.device().machine->region("cart")->base();
+	UINT16 destlength = (UINT16) image.device().machine->region("cart")->bytes();
 	UINT8 *rombase;
 	int   romsize;
 
@@ -840,8 +840,8 @@ DEVICE_IMAGE_LOAD(coco_rom)
 
 DEVICE_IMAGE_UNLOAD(coco_rom)
 {
-	UINT8 *dest = memory_region(image.device().machine, "cart");
-	UINT16 destlength = (UINT16) memory_region_length(image.device().machine, "cart");
+	UINT8 *dest = image.device().machine->region("cart")->base();
+	UINT16 destlength = (UINT16) image.device().machine->region("cart")->bytes();
 	memset(dest, 0, destlength);
 }
 
@@ -1162,25 +1162,25 @@ static int coco_hiresjoy_ry( running_machine *machine )
 #define SOUNDMUX_STATUS_SEL2	2
 #define SOUNDMUX_STATUS_SEL1	1
 
-static running_device *cassette_device_image(running_machine *machine)
+static device_t *cassette_device_image(running_machine *machine)
 {
 	coco_state *state = machine->driver_data<coco_state>();
 	return state->cassette_device;
 }
 
-static running_device *bitbanger_image(running_machine *machine)
+static device_t *bitbanger_image(running_machine *machine)
 {
 	coco_state *state = machine->driver_data<coco_state>();
 	return state->bitbanger_device;
 }
 
-static running_device *printer_image(running_machine *machine)
+static device_t *printer_image(running_machine *machine)
 {
 	coco_state *state = machine->driver_data<coco_state>();
 	return state->printer_device;
 }
 
-static running_device *cococart_device(running_machine *machine)
+static device_t *cococart_device(running_machine *machine)
 {
 	coco_state *state = machine->driver_data<coco_state>();
 	return state->cococart_device;
@@ -1272,7 +1272,7 @@ READ8_HANDLER ( dgnalpha_psg_porta_read )
 
 WRITE8_HANDLER( dgnalpha_psg_porta_write )
 {
-	running_device *fdc = space->machine->device("wd2797");
+	device_t *fdc = space->machine->device("wd2797");
 	/* Bits 0..3 are the drive select lines for the internal floppy interface */
 	/* Bit 4 is the motor on, in the real hardware these are inverted on their way to the drive */
 	/* Bits 5,6,7 are connected to /DDEN, ENP and 5/8 on the WD2797 */
@@ -1687,7 +1687,7 @@ static WRITE8_DEVICE_HANDLER( dragon64_pia1_pb_w )
 
 static WRITE8_DEVICE_HANDLER( dgnalpha_pia2_pa_w )
 {
-	running_device *ay8912 = device->machine->device("ay8912");
+	device_t *ay8912 = device->machine->device("ay8912");
 	int	bc_flags;		/* BCDDIR/BC1, as connected to PIA2 port a bits 0 and 1 */
 
 	/* If bit 2 of the pia2 ddra is 1 then this pin is an output so use it */
@@ -1774,7 +1774,7 @@ static WRITE_LINE_DEVICE_HANDLER( dgnalpha_fdc_drq_w )
 /* The Dragon Alpha hardware reverses the order of the WD2797 registers */
 READ8_HANDLER(dgnalpha_wd2797_r)
 {
-	running_device *fdc = space->machine->device("wd2797");
+	device_t *fdc = space->machine->device("wd2797");
 	int result = 0;
 
 	switch(offset & 0x03)
@@ -1800,7 +1800,7 @@ READ8_HANDLER(dgnalpha_wd2797_r)
 
 WRITE8_HANDLER(dgnalpha_wd2797_w)
 {
-	running_device *fdc = space->machine->device("wd2797");
+	device_t *fdc = space->machine->device("wd2797");
     switch(offset & 0x3)
 	{
 		case 0:
@@ -2129,8 +2129,8 @@ static void setup_memory_map(running_machine *machine)
 	/* If in maptype 0 we need to map in the rom also, for now this just maps in the system and cart roms */
 	if(!maptype)
 	{
-		UINT8 *cart_rom = memory_region(machine, "cart");
-		UINT32 cart_length = memory_region_length(machine, "cart");
+		UINT8 *cart_rom = machine->region("cart")->base();
+		UINT32 cart_length = machine->region("cart")->bytes();
 
 		for(block_index=0;block_index<=7;block_index++)
 		{
@@ -2424,7 +2424,7 @@ static void coco3_mmu_update(running_machine *machine, int lowblock, int hiblock
 	address_space *space = cputag_get_address_space( machine, "maincpu", ADDRESS_SPACE_PROGRAM );
 	int i, offset;
 	UINT8 *readbank;
-	UINT8 *cart_rom = memory_region(machine, "cart");
+	UINT8 *cart_rom = machine->region("cart")->base();
 	char bank[10];
 
 	for (i = lowblock; i <= hiblock; i++)
@@ -2559,7 +2559,7 @@ WRITE8_HANDLER(coco3_gime_w)
 			{
 				if (state->gimereg[0] & 0x04)
 				{
-					running_device *device = cococart_device(space->machine);
+					device_t *device = cococart_device(space->machine);
 					memory_install_read8_device_handler(space, device, 0xFF40, 0xFF5F, 0, 0, coco_cartridge_r);
 					memory_install_write8_device_handler(space, device, 0xFF40, 0xFF5F, 0, 0, coco_cartridge_w);
 				}
@@ -2762,7 +2762,7 @@ static SAM6883_SET_MAP_TYPE( coco3_sam_set_maptype )
     coco_cart_w - call for CART line
 -------------------------------------------------*/
 
-void coco_cart_w(running_device *device, int data)
+void coco_cart_w(device_t *device, int data)
 {
 	coco_state *state = device->machine->driver_data<coco_state>();
 	pia6821_cb1_w(state->pia_1, data ? ASSERT_LINE : CLEAR_LINE);
@@ -2774,7 +2774,7 @@ void coco_cart_w(running_device *device, int data)
     in addition will raise the GIME interrupt
 -------------------------------------------------*/
 
-void coco3_cart_w(running_device *device, int data)
+void coco3_cart_w(device_t *device, int data)
 {
 	coco3_raise_interrupt(device->machine, COCO3_INT_EI0, data ? ASSERT_LINE : CLEAR_LINE);
 	coco_cart_w(device, data);
@@ -2786,7 +2786,7 @@ void coco3_cart_w(running_device *device, int data)
     coco_halt_w - sets the HALT line
 -------------------------------------------------*/
 
-void coco_halt_w(running_device *device, int data)
+void coco_halt_w(device_t *device, int data)
 {
 	cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_HALT, data ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -2797,7 +2797,7 @@ void coco_halt_w(running_device *device, int data)
     coco_nmi_w - sets the NMI
 -------------------------------------------------*/
 
-void coco_nmi_w(running_device *device, int data)
+void coco_nmi_w(device_t *device, int data)
 {
 	cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_NMI, data ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -2866,7 +2866,7 @@ static void generic_init_machine(running_machine *machine, const machine_init_in
 	state->mux_sel2_timer = timer_alloc(machine, coco_update_sel2_timerproc, NULL);
 
 	/* setup ROM */
-	state->rom = memory_region(machine, "maincpu");
+	state->rom = machine->region("maincpu")->base();
 
 	/* setup default rom bank */
 	state->bas_rom_bank = state->rom;
@@ -2986,7 +2986,7 @@ MACHINE_START( dgnalpha )
 MACHINE_RESET( dgnalpha )
 {
 	coco_state *state = machine->driver_data<coco_state>();
-	running_device *fdc = machine->device("wd2797");
+	device_t *fdc = machine->device("wd2797");
 	wd17xx_set_complete_command_delay(fdc,20);
 
 	/* state->dgnalpha_just_reset, is here to flag that we should ignore the first irq generated */

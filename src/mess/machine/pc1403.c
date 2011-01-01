@@ -30,7 +30,7 @@ WRITE8_HANDLER(pc1403_asic_write)
 	logerror ("asic write %.4x %.2x\n",offset, data);
 	break;
     case 2/*0x3c00*/:
-	memory_set_bankptr(space->machine, "bank1", memory_region(space->machine, "user1")+((data&7)<<14));
+	memory_set_bankptr(space->machine, "bank1", space->machine->region("user1")->base()+((data&7)<<14));
 	logerror ("asic write %.4x %.2x\n",offset, data);
 	break;
     case 3/*0x3e00*/: break;
@@ -49,13 +49,13 @@ READ8_HANDLER(pc1403_asic_read)
     return data;
 }
 
-void pc1403_outa(running_device *device, int data)
+void pc1403_outa(device_t *device, int data)
 {
 	pc1403_state *state = device->machine->driver_data<pc1403_state>();
     state->outa=data;
 }
 
-int pc1403_ina(running_device *device)
+int pc1403_ina(device_t *device)
 {
 	pc1403_state *state = device->machine->driver_data<pc1403_state>();
     UINT8 data=state->outa;
@@ -124,7 +124,7 @@ int pc1403_inb(void)
 }
 #endif
 
-void pc1403_outc(running_device *device, int data)
+void pc1403_outc(device_t *device, int data)
 {
 	pc1403_state *state = device->machine->driver_data<pc1403_state>();
     state->portc = data;
@@ -132,12 +132,12 @@ void pc1403_outc(running_device *device, int data)
 }
 
 
-int pc1403_brk(running_device *device)
+int pc1403_brk(device_t *device)
 {
 	return (input_port_read(device->machine, "EXTRA") & 0x01);
 }
 
-int pc1403_reset(running_device *device)
+int pc1403_reset(device_t *device)
 {
 	return (input_port_read(device->machine, "EXTRA") & 0x02);
 }
@@ -145,8 +145,8 @@ int pc1403_reset(running_device *device)
 /* currently enough to save the external ram */
 NVRAM_HANDLER( pc1403 )
 {
-	running_device *main_cpu = machine->device("maincpu");
-	UINT8 *ram = memory_region(machine, "maincpu") + 0x8000;
+	device_t *main_cpu = machine->device("maincpu");
+	UINT8 *ram = machine->region("maincpu")->base() + 0x8000;
 	UINT8 *cpu = sc61860_internal_ram(main_cpu);
 
 	if (read_or_write)
@@ -176,12 +176,12 @@ DRIVER_INIT( pc1403 )
 {
 	pc1403_state *state = machine->driver_data<pc1403_state>();
 	int i;
-	UINT8 *gfx=memory_region(machine, "gfx1");
+	UINT8 *gfx=machine->region("gfx1")->base();
 
 	for (i=0; i<128; i++) gfx[i]=i;
 
 	state->power = 1;
 	timer_set(machine, ATTOTIME_IN_SEC(1), NULL, 0, pc1403_power_up);
 
-	memory_set_bankptr(machine, "bank1", memory_region(machine, "user1"));
+	memory_set_bankptr(machine, "bank1", machine->region("user1")->base());
 }

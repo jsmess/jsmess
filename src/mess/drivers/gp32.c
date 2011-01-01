@@ -968,7 +968,7 @@ static void smc_init( running_machine *machine)
 
 static UINT8 smc_read( running_machine *machine)
 {
-	running_device *smartmedia = machine->device( "smartmedia");
+	device_t *smartmedia = machine->device( "smartmedia");
 	UINT8 data;
 	data = smartmedia_data_r( smartmedia);
 	verboselog( machine, 5, "smc_read %08X\n", data);
@@ -981,7 +981,7 @@ static void smc_write( running_machine *machine, UINT8 data)
 	verboselog( machine, 5, "smc_write %08X\n", data);
 	if ((state->smc.chip) && (!state->smc.read))
 	{
-		running_device *smartmedia = machine->device( "smartmedia");
+		device_t *smartmedia = machine->device( "smartmedia");
 		if (state->smc.cmd_latch)
 		{
 			verboselog( machine, 5, "smartmedia_command_w %08X\n", data);
@@ -1106,7 +1106,7 @@ static READ32_HANDLER( s3c240x_gpio_r )
 		// PDDAT
 		case 0x24 / 4 :
 		{
-			running_device *smartmedia = machine->device( "smartmedia");
+			device_t *smartmedia = machine->device( "smartmedia");
 			// smartmedia
 			data = (data & ~0x000003C0);
 			if (!state->smc.busy) data = data | 0x00000200;
@@ -1118,7 +1118,7 @@ static READ32_HANDLER( s3c240x_gpio_r )
 		// PEDAT
 		case 0x30 / 4 :
 		{
-			running_device *smartmedia = machine->device( "smartmedia");
+			device_t *smartmedia = machine->device( "smartmedia");
 			// smartmedia
 			data = (data & ~0x0000003C);
 			if (state->smc.cmd_latch) data = data | 0x00000020;
@@ -1633,7 +1633,7 @@ static WRITE32_HANDLER( s3c240x_iis_w )
 			}
 			if (state->s3c240x_iis.fifo_index == 2)
 			{
-				running_device *dac[2];
+				device_t *dac[2];
 				dac[0] = machine->device( "dac1");
 				dac[1] = machine->device( "dac2");
 				state->s3c240x_iis.fifo_index = 0;
@@ -1835,35 +1835,35 @@ static MACHINE_RESET( gp32 )
 }
 
 static MACHINE_CONFIG_START( gp32, gp32_state )
-	MDRV_CPU_ADD("maincpu", ARM9, 40000000)
-	MDRV_CPU_PROGRAM_MAP(gp32_map)
+	MCFG_CPU_ADD("maincpu", ARM9, 40000000)
+	MCFG_CPU_PROGRAM_MAP(gp32_map)
 
-	MDRV_PALETTE_LENGTH(32768)
+	MCFG_PALETTE_LENGTH(32768)
 
-	MDRV_SCREEN_ADD("screen", LCD)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MDRV_SCREEN_SIZE(240, 320)
-	MDRV_SCREEN_VISIBLE_AREA(0, 239, 0, 319)
+	MCFG_SCREEN_ADD("screen", LCD)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_SIZE(240, 320)
+	MCFG_SCREEN_VISIBLE_AREA(0, 239, 0, 319)
 	/* 320x240 is 4:3 but ROT270 causes an aspect ratio of 3:4 by default */
-	MDRV_DEFAULT_LAYOUT(layout_lcd_rot)
+	MCFG_DEFAULT_LAYOUT(layout_lcd_rot)
 
-	MDRV_VIDEO_START(gp32)
-	MDRV_VIDEO_UPDATE(gp32)
+	MCFG_VIDEO_START(gp32)
+	MCFG_VIDEO_UPDATE(gp32)
 
-	MDRV_MACHINE_START(gp32)
-	MDRV_MACHINE_RESET(gp32)
+	MCFG_MACHINE_START(gp32)
+	MCFG_MACHINE_RESET(gp32)
 
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MDRV_SOUND_ADD("dac1", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MDRV_SOUND_ADD("dac2", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SOUND_ADD("dac1", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MCFG_SOUND_ADD("dac2", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MDRV_NVRAM_HANDLER(gp32)
+	MCFG_NVRAM_HANDLER(gp32)
 
-	MDRV_SMARTMEDIA_ADD("smartmedia")
+	MCFG_SMARTMEDIA_ADD("smartmedia")
 MACHINE_CONFIG_END
 
 ROM_START( gp32 )

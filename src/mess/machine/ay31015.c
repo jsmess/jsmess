@@ -137,7 +137,7 @@ struct _ay31015_t
     get_safe_token - safely gets the data
 -------------------------------------------------*/
 
-INLINE ay31015_t *get_safe_token(running_device *device)
+INLINE ay31015_t *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == AY31015);
@@ -145,7 +145,7 @@ INLINE ay31015_t *get_safe_token(running_device *device)
 }
 
 
-INLINE UINT8 ay31015_get_si( running_device *device )
+INLINE UINT8 ay31015_get_si( device_t *device )
 {
 	ay31015_t	*ay31015 = get_safe_token( device );
 
@@ -156,7 +156,7 @@ INLINE UINT8 ay31015_get_si( running_device *device )
 }
 
 
-INLINE void ay31015_set_so( running_device *device, int data )
+INLINE void ay31015_set_so( device_t *device, int data )
 {
 	ay31015_t	*ay31015 = get_safe_token( device );
 
@@ -182,7 +182,7 @@ INLINE int ay31015_update_status_pin( ay31015_t *ay31015, UINT8 reg_bit, ay31015
 /*-------------------------------------------------
     ay31015_update_status_pins - Update the status pins
 -------------------------------------------------*/
-static void ay31015_update_status_pins( running_device *device )
+static void ay31015_update_status_pins( device_t *device )
 {
 	ay31015_t	*ay31015 = get_safe_token( device );
 	int status_pins_changed = 0;
@@ -213,7 +213,7 @@ static void ay31015_update_status_pins( running_device *device )
 -------------------------------------------------*/
 static TIMER_CALLBACK( ay31015_rx_process )
 {
-	running_device *device = (running_device *)ptr;
+	device_t *device = (device_t *)ptr;
 	ay31015_t			*ay31015 = get_safe_token( device );
 
 	switch (ay31015->rx_state)
@@ -368,7 +368,7 @@ static TIMER_CALLBACK( ay31015_rx_process )
 -------------------------------------------------*/
 static TIMER_CALLBACK( ay31015_tx_process )
 {
-	running_device *device = (running_device *)ptr;
+	device_t *device = (device_t *)ptr;
 	ay31015_t			*ay31015 = get_safe_token( device );
 
 	UINT8 t1;
@@ -500,7 +500,7 @@ static TIMER_CALLBACK( ay31015_tx_process )
 /*-------------------------------------------------
     ay31015_reset - reset internal state
 -------------------------------------------------*/
-static void ay31015_reset( running_device *device )
+static void ay31015_reset( device_t *device )
 {
 	ay31015_t	*ay31015 = get_safe_token( device );
 
@@ -532,7 +532,7 @@ static void ay31015_reset( running_device *device )
 /*-------------------------------------------------
     ay31015_transfer_control_pins - transfers contents of controls pins to the control register
 -------------------------------------------------*/
-static void ay31015_transfer_control_pins( running_device *device )
+static void ay31015_transfer_control_pins( device_t *device )
 {
 	ay31015_t	*ay31015 = get_safe_token( device );
 	UINT8 control = 0;
@@ -554,7 +554,7 @@ static void ay31015_transfer_control_pins( running_device *device )
 /*-------------------------------------------------
     ay31015_set_input_pin - set an input pin
 -------------------------------------------------*/
-void ay31015_set_input_pin( running_device *device, ay31015_input_pin_t pin, int data )
+void ay31015_set_input_pin( device_t *device, ay31015_input_pin_t pin, int data )
 {
 	ay31015_t	*ay31015 = get_safe_token(device);
 
@@ -599,7 +599,7 @@ void ay31015_set_input_pin( running_device *device, ay31015_input_pin_t pin, int
 /*-------------------------------------------------
     ay31015_get_output_pin - get the status of an output pin
 -------------------------------------------------*/
-int ay31015_get_output_pin( running_device *device, ay31015_output_pin_t pin )
+int ay31015_get_output_pin( device_t *device, ay31015_output_pin_t pin )
 {
 	ay31015_t	*ay31015 = get_safe_token(device);
 
@@ -607,7 +607,7 @@ int ay31015_get_output_pin( running_device *device, ay31015_output_pin_t pin )
 }
 
 
-INLINE void ay31015_update_rx_timer( running_device *device )
+INLINE void ay31015_update_rx_timer( device_t *device )
 {
 	ay31015_t	*ay31015 = get_safe_token( device );
 
@@ -622,7 +622,7 @@ INLINE void ay31015_update_rx_timer( running_device *device )
 }
 
 
-INLINE void ay31015_update_tx_timer( running_device *device )
+INLINE void ay31015_update_tx_timer( device_t *device )
 {
 	ay31015_t	*ay31015 = get_safe_token( device );
 
@@ -640,7 +640,7 @@ INLINE void ay31015_update_tx_timer( running_device *device )
 /*-------------------------------------------------
     ay31015_set_receiver_clock - set receive clock
 -------------------------------------------------*/
-void ay31015_set_receiver_clock( running_device *device, double new_clock )
+void ay31015_set_receiver_clock( device_t *device, double new_clock )
 {
 	ay31015_t	*ay31015 = get_safe_token(device);
 
@@ -652,7 +652,7 @@ void ay31015_set_receiver_clock( running_device *device, double new_clock )
 /*-------------------------------------------------
     ay31015_set_transmitter_clock - set transmit clock
 -------------------------------------------------*/
-void ay31015_set_transmitter_clock( running_device *device, double new_clock )
+void ay31015_set_transmitter_clock( device_t *device, double new_clock )
 {
 	ay31015_t	*ay31015 = get_safe_token(device);
 
@@ -664,7 +664,7 @@ void ay31015_set_transmitter_clock( running_device *device, double new_clock )
 /*-------------------------------------------------
     ay31015_get_received_data - return a byte to the computer
 -------------------------------------------------*/
-UINT8 ay31015_get_received_data( running_device *device )
+UINT8 ay31015_get_received_data( device_t *device )
 {
 	ay31015_t	*ay31015 = get_safe_token(device);
 
@@ -675,7 +675,7 @@ UINT8 ay31015_get_received_data( running_device *device )
 /*-------------------------------------------------
     ay31015_set_transmit_data - accept a byte to transmit, if able
 -------------------------------------------------*/
-void ay31015_set_transmit_data( running_device *device, UINT8 data )
+void ay31015_set_transmit_data( device_t *device, UINT8 data )
 {
 	ay31015_t	*ay31015 = get_safe_token(device);
 

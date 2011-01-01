@@ -406,7 +406,7 @@ static MACHINE_START( cgc7900 )
 static MACHINE_RESET(cgc7900)
 {
 	cgc7900_state *state = machine->driver_data<cgc7900_state>();
-	UINT8* user1 = memory_region(machine, M68000_TAG);
+	UINT8* user1 = machine->region(M68000_TAG)->base();
 
 	memcpy((UINT8*)state->chrom_ram,user1,8);
 
@@ -424,31 +424,31 @@ static MACHINE_RESET(cgc7900)
 static MACHINE_CONFIG_START( cgc7900, cgc7900_state )
 
 	/* basic machine hardware */
-    MDRV_CPU_ADD(M68000_TAG, M68000, XTAL_28_48MHz/4)
-    MDRV_CPU_PROGRAM_MAP(cgc7900_mem)
+    MCFG_CPU_ADD(M68000_TAG, M68000, XTAL_28_48MHz/4)
+    MCFG_CPU_PROGRAM_MAP(cgc7900_mem)
 
-/*  MDRV_CPU_ADD(I8035_TAG, I8035, 1000000)
-    MDRV_CPU_PROGRAM_MAP(keyboard_mem)
-    MDRV_CPU_IO_MAP(keyboard_io)*/
+/*  MCFG_CPU_ADD(I8035_TAG, I8035, 1000000)
+    MCFG_CPU_PROGRAM_MAP(keyboard_mem)
+    MCFG_CPU_IO_MAP(keyboard_io)*/
 
-/*  MDRV_CPU_ADD(AM2910_TAG, AM2910, XTAL_17_36MHz)
-    MDRV_CPU_PROGRAM_MAP(omti10_mem)*/
+/*  MCFG_CPU_ADD(AM2910_TAG, AM2910, XTAL_17_36MHz)
+    MCFG_CPU_PROGRAM_MAP(omti10_mem)*/
 
-	MDRV_MACHINE_START(cgc7900)
-    MDRV_MACHINE_RESET(cgc7900)
+	MCFG_MACHINE_START(cgc7900)
+    MCFG_MACHINE_RESET(cgc7900)
 
     /* video hardware */
-	MDRV_FRAGMENT_ADD(cgc7900_video)
+	MCFG_FRAGMENT_ADD(cgc7900_video)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD(AY8910_TAG, AY8910, XTAL_28_48MHz/16)
-	MDRV_SOUND_CONFIG(ay8910_intf)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD(AY8910_TAG, AY8910, XTAL_28_48MHz/16)
+	MCFG_SOUND_CONFIG(ay8910_intf)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* devices */
-	MDRV_MSM8251_ADD(INS8251_0_TAG, rs232_intf)
-	MDRV_MSM8251_ADD(INS8251_1_TAG, rs449_intf)
+	MCFG_MSM8251_ADD(INS8251_0_TAG, rs232_intf)
+	MCFG_MSM8251_ADD(INS8251_1_TAG, rs449_intf)
 MACHINE_CONFIG_END
 
 /***************************************************************************

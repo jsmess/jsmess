@@ -307,7 +307,7 @@ void ob68k1a_state::machine_reset()
 
 	// set reset vector
 	void *ram = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM)->get_write_ptr(0);
-	UINT8 *rom = memory_region(machine, MC68000L10_TAG);
+	UINT8 *rom = machine->region(MC68000L10_TAG)->base();
 
 	memcpy(ram, rom, 8);
 
@@ -326,25 +326,25 @@ void ob68k1a_state::machine_reset()
 
 static MACHINE_CONFIG_START( ob68k1a, ob68k1a_state )
     // basic machine hardware
-    MDRV_CPU_ADD(MC68000L10_TAG, M68000, XTAL_10MHz)
-    MDRV_CPU_PROGRAM_MAP(ob68k1a_mem)
+    MCFG_CPU_ADD(MC68000L10_TAG, M68000, XTAL_10MHz)
+    MCFG_CPU_PROGRAM_MAP(ob68k1a_mem)
 	
     // video hardware
-	MDRV_FRAGMENT_ADD( generic_terminal )
+	MCFG_FRAGMENT_ADD( generic_terminal )
 
 	// devices
-	MDRV_PIA6821_ADD(MC6821_0_TAG, pia0_intf)
-	MDRV_PIA6821_ADD(MC6821_1_TAG, pia1_intf)
-	MDRV_PTM6840_ADD(MC6840_TAG, ptm_intf)
-	MDRV_ACIA6850_ADD(MC6850_0_TAG, acia0_intf)
-	MDRV_ACIA6850_ADD(MC6850_1_TAG, acia1_intf)
-	MDRV_COM8116_ADD(COM8116_TAG, XTAL_5_0688MHz, dbrg_intf)
-	MDRV_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
+	MCFG_PIA6821_ADD(MC6821_0_TAG, pia0_intf)
+	MCFG_PIA6821_ADD(MC6821_1_TAG, pia1_intf)
+	MCFG_PTM6840_ADD(MC6840_TAG, ptm_intf)
+	MCFG_ACIA6850_ADD(MC6850_0_TAG, acia0_intf)
+	MCFG_ACIA6850_ADD(MC6850_1_TAG, acia1_intf)
+	MCFG_COM8116_ADD(COM8116_TAG, XTAL_5_0688MHz, dbrg_intf)
+	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
 	
 	// internal ram
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("32K")
-	MDRV_RAM_EXTRA_OPTIONS("128K")
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("32K")
+	MCFG_RAM_EXTRA_OPTIONS("128K")
 MACHINE_CONFIG_END
 
 

@@ -70,7 +70,7 @@ READ8_HANDLER( nascom2_fdc_select_r )
 WRITE8_HANDLER( nascom2_fdc_select_w )
 {
 	nascom1_state *state = space->machine->driver_data<nascom1_state>();
-	running_device *fdc = space->machine->device("wd1793");
+	device_t *fdc = space->machine->device("wd1793");
 	state->nascom2_fdc.select = data;
 
 	logerror("nascom2_fdc_select_w: %02x\n", data);

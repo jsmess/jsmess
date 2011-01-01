@@ -620,7 +620,7 @@ INTERRUPT_GEN( mbee_interrupt )
 DRIVER_INIT( mbee )
 {
 	mbee_state *state = machine->driver_data<mbee_state>();
-	UINT8 *RAM = memory_region(machine, "maincpu");
+	UINT8 *RAM = machine->region("maincpu")->base();
 	memory_configure_bank(machine, "boot", 0, 2, &RAM[0x0000], 0x8000);
 	state->size = 0x4000;
 }
@@ -628,10 +628,10 @@ DRIVER_INIT( mbee )
 DRIVER_INIT( mbeeic )
 {
 	mbee_state *state = machine->driver_data<mbee_state>();
-	UINT8 *RAM = memory_region(machine, "maincpu");
+	UINT8 *RAM = machine->region("maincpu")->base();
 	memory_configure_bank(machine, "boot", 0, 2, &RAM[0x0000], 0x8000);
 
-	RAM = memory_region(machine, "pakrom");
+	RAM = machine->region("pakrom")->base();
 	memory_configure_bank(machine, "pak", 0, 16, &RAM[0x0000], 0x2000);
 
 	memory_set_bank(machine, "pak", 0);
@@ -641,13 +641,13 @@ DRIVER_INIT( mbeeic )
 DRIVER_INIT( mbeepc )
 {
 	mbee_state *state = machine->driver_data<mbee_state>();
-	UINT8 *RAM = memory_region(machine, "maincpu");
+	UINT8 *RAM = machine->region("maincpu")->base();
 	memory_configure_bank(machine, "boot", 0, 2, &RAM[0x0000], 0x8000);
 
-	RAM = memory_region(machine, "telcomrom");
+	RAM = machine->region("telcomrom")->base();
 	memory_configure_bank(machine, "telcom", 0, 2, &RAM[0x0000], 0x1000);
 
-	RAM = memory_region(machine, "pakrom");
+	RAM = machine->region("pakrom")->base();
 	memory_configure_bank(machine, "pak", 0, 16, &RAM[0x0000], 0x2000);
 
 	memory_set_bank(machine, "pak", 0);
@@ -658,13 +658,13 @@ DRIVER_INIT( mbeepc )
 DRIVER_INIT( mbeepc85 )
 {
 	mbee_state *state = machine->driver_data<mbee_state>();
-	UINT8 *RAM = memory_region(machine, "maincpu");
+	UINT8 *RAM = machine->region("maincpu")->base();
 	memory_configure_bank(machine, "boot", 0, 2, &RAM[0x0000], 0x8000);
 
-	RAM = memory_region(machine, "telcomrom");
+	RAM = machine->region("telcomrom")->base();
 	memory_configure_bank(machine, "telcom", 0, 2, &RAM[0x0000], 0x1000);
 
-	RAM = memory_region(machine, "pakrom");
+	RAM = machine->region("pakrom")->base();
 	memory_configure_bank(machine, "pak", 0, 16, &RAM[0x0000], 0x2000);
 
 	memory_set_bank(machine, "pak", 5);
@@ -675,17 +675,17 @@ DRIVER_INIT( mbeepc85 )
 DRIVER_INIT( mbeeppc )
 {
 	mbee_state *state = machine->driver_data<mbee_state>();
-	UINT8 *RAM = memory_region(machine, "maincpu");
+	UINT8 *RAM = machine->region("maincpu")->base();
 	memory_configure_bank(machine, "boot", 0, 1, &RAM[0x0000], 0x0000);
 
-	RAM = memory_region(machine, "basicrom");
+	RAM = machine->region("basicrom")->base();
 	memory_configure_bank(machine, "basic", 0, 2, &RAM[0x0000], 0x2000);
 	memory_configure_bank(machine, "boot", 1, 1, &RAM[0x0000], 0x0000);
 
-	RAM = memory_region(machine, "telcomrom");
+	RAM = machine->region("telcomrom")->base();
 	memory_configure_bank(machine, "telcom", 0, 2, &RAM[0x0000], 0x1000);
 
-	RAM = memory_region(machine, "pakrom");
+	RAM = machine->region("pakrom")->base();
 	memory_configure_bank(machine, "pak", 0, 16, &RAM[0x0000], 0x2000);
 
 	memory_set_bank(machine, "pak", 5);
@@ -697,7 +697,7 @@ DRIVER_INIT( mbeeppc )
 DRIVER_INIT( mbee56 )
 {
 	mbee_state *state = machine->driver_data<mbee_state>();
-	UINT8 *RAM = memory_region(machine, "maincpu");
+	UINT8 *RAM = machine->region("maincpu")->base();
 	memory_configure_bank(machine, "boot", 0, 2, &RAM[0x0000], 0xe000);
 	state->size = 0xe000;
 }
@@ -705,13 +705,13 @@ DRIVER_INIT( mbee56 )
 DRIVER_INIT( mbee64 )
 {
 	mbee_state *state = machine->driver_data<mbee_state>();
-	UINT8 *RAM = memory_region(machine, "maincpu");
+	UINT8 *RAM = machine->region("maincpu")->base();
 	memory_configure_bank(machine, "boot", 0, 1, &RAM[0x0000], 0x0000);
 	memory_configure_bank(machine, "bankl", 0, 1, &RAM[0x1000], 0x0000);
 	memory_configure_bank(machine, "bankl", 1, 1, &RAM[0x9000], 0x0000);
 	memory_configure_bank(machine, "bankh", 0, 1, &RAM[0x8000], 0x0000);
 
-	RAM = memory_region(machine, "bootrom");
+	RAM = machine->region("bootrom")->base();
 	memory_configure_bank(machine, "bankh", 1, 1, &RAM[0x0000], 0x0000);
 	memory_configure_bank(machine, "boot", 1, 1, &RAM[0x0000], 0x0000);
 
@@ -721,7 +721,7 @@ DRIVER_INIT( mbee64 )
 DRIVER_INIT( mbee128 )
 {
 	mbee_state *state = machine->driver_data<mbee_state>();
-	UINT8 *RAM = memory_region(machine, "maincpu");
+	UINT8 *RAM = machine->region("maincpu")->base();
 	memory_configure_bank(machine, "boot", 0, 4, &RAM[0x0000], 0x8000); // standard banks 0000
 	memory_configure_bank(machine, "bank1", 0, 4, &RAM[0x1000], 0x8000); // standard banks 1000
 	memory_configure_bank(machine, "bank8l", 1, 1, &RAM[0x0000], 0x0000); // shadow ram
@@ -730,7 +730,7 @@ DRIVER_INIT( mbee128 )
 	memory_configure_bank(machine, "bankfl", 0, 1, &RAM[0xf000], 0x0000); // shadow ram
 	memory_configure_bank(machine, "bankfh", 0, 1, &RAM[0xf800], 0x0000); // shadow ram
 
-	RAM = memory_region(machine, "bootrom");
+	RAM = machine->region("bootrom")->base();
 	memory_configure_bank(machine, "bank9", 0, 1, &RAM[0x1000], 0x0000); // rom
 	memory_configure_bank(machine, "boot", 4, 1, &RAM[0x0000], 0x0000); // rom at boot for 4usec
 	memory_configure_bank(machine, "bank8l", 0, 1, &RAM[0x0000], 0x0000); // rom
@@ -742,7 +742,7 @@ DRIVER_INIT( mbee128 )
 DRIVER_INIT( mbee256 )
 {
 	mbee_state *state = machine->driver_data<mbee_state>();
-	UINT8 *RAM = memory_region(machine, "maincpu");
+	UINT8 *RAM = machine->region("maincpu")->base();
 	memory_configure_bank(machine, "boot", 0, 8, &RAM[0x0000], 0x8000); // standard banks 0000
 	memory_configure_bank(machine, "bank1", 0, 8, &RAM[0x1000], 0x8000); // standard banks 1000
 	memory_configure_bank(machine, "bank8l", 1, 1, &RAM[0x0000], 0x0000); // shadow ram
@@ -751,7 +751,7 @@ DRIVER_INIT( mbee256 )
 	memory_configure_bank(machine, "bankfl", 0, 1, &RAM[0xf000], 0x0000); // shadow ram
 	memory_configure_bank(machine, "bankfh", 0, 1, &RAM[0xf800], 0x0000); // shadow ram
 
-	RAM = memory_region(machine, "bootrom");
+	RAM = machine->region("bootrom")->base();
 	memory_configure_bank(machine, "bank9", 0, 1, &RAM[0x1000], 0x0000); // rom
 	memory_configure_bank(machine, "boot", 8, 1, &RAM[0x0000], 0x0000); // rom at boot for 4usec
 	memory_configure_bank(machine, "bank8l", 0, 1, &RAM[0x0000], 0x0000); // rom
@@ -766,13 +766,13 @@ DRIVER_INIT( mbee256 )
 DRIVER_INIT( mbeett )
 {
 	mbee_state *state = machine->driver_data<mbee_state>();
-	UINT8 *RAM = memory_region(machine, "maincpu");
+	UINT8 *RAM = machine->region("maincpu")->base();
 	memory_configure_bank(machine, "boot", 0, 2, &RAM[0x0000], 0x8000);
 
-	RAM = memory_region(machine, "telcomrom");
+	RAM = machine->region("telcomrom")->base();
 	memory_configure_bank(machine, "telcom", 0, 2, &RAM[0x0000], 0x1000);
 
-	RAM = memory_region(machine, "pakrom");
+	RAM = machine->region("pakrom")->base();
 	memory_configure_bank(machine, "pak", 0, 16, &RAM[0x0000], 0x2000);
 
 	memory_set_bank(machine, "pak", 5);
@@ -796,7 +796,7 @@ DRIVER_INIT( mbeett )
 
 Z80BIN_EXECUTE( mbee )
 {
-	running_device *cpu = machine->device("maincpu");
+	device_t *cpu = machine->device("maincpu");
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	space->write_word(0xa6, execute_address);			/* fix the EXEC command */
@@ -815,7 +815,7 @@ Z80BIN_EXECUTE( mbee )
 QUICKLOAD_LOAD( mbee )
 {
 	mbee_state *state = image.device().machine->driver_data<mbee_state>();
-	running_device *cpu = image.device().machine->device("maincpu");
+	device_t *cpu = image.device().machine->device("maincpu");
 	address_space *space = cputag_get_address_space(image.device().machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT16 i, j;
 	UINT8 data, sw = input_port_read(image.device().machine, "CONFIG") & 1;	/* reading the dipswitch: 1 = autorun */

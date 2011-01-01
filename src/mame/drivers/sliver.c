@@ -278,7 +278,7 @@ static void blit_gfx(running_machine *machine)
 {
 	sliver_state *state = machine->driver_data<sliver_state>();
 	int tmpptr=0;
-	const UINT8 *rom = memory_region(machine, "user1");
+	const UINT8 *rom = machine->region("user1")->base();
 
 	while (tmpptr < state->fptr)
 	{
@@ -343,7 +343,7 @@ static void render_jpeg(running_machine *machine)
 		return;
 	}
 
-	rom = memory_region(machine, "user3");
+	rom = machine->region("user3")->base();
 	for (y = 0; y < state->jpeg_h; y++)
 	{
 		for (x = 0; x < state->jpeg_w; x++)
@@ -459,7 +459,7 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER(oki_setbank)
 {
-	UINT8 *sound = memory_region(space->machine, "oki");
+	UINT8 *sound = space->machine->region("oki")->base();
 	int bank=(data^0xff)&3; //xor or not ?
 	memcpy(sound+0x20000, sound+0x100000+0x20000*bank, 0x20000);
 }
@@ -570,30 +570,30 @@ static INTERRUPT_GEN( sliver_int )
 
 static MACHINE_CONFIG_START( sliver, sliver_state )
 
-	MDRV_CPU_ADD("maincpu", M68000, 12000000)
-	MDRV_CPU_PROGRAM_MAP(sliver_map)
-	MDRV_CPU_VBLANK_INT_HACK(sliver_int,3)
+	MCFG_CPU_ADD("maincpu", M68000, 12000000)
+	MCFG_CPU_PROGRAM_MAP(sliver_map)
+	MCFG_CPU_VBLANK_INT_HACK(sliver_int,3)
 
-	MDRV_CPU_ADD("audiocpu", I8051, 8000000)
-	MDRV_CPU_PROGRAM_MAP(soundmem_prg)
-	MDRV_CPU_IO_MAP(soundmem_io)
+	MCFG_CPU_ADD("audiocpu", I8051, 8000000)
+	MCFG_CPU_PROGRAM_MAP(soundmem_prg)
+	MCFG_CPU_IO_MAP(soundmem_io)
 
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_SIZE(64*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 384-1-16, 0*8, 240-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 384-1-16, 0*8, 240-1)
 
-	MDRV_VIDEO_START(sliver)
-	MDRV_VIDEO_UPDATE(sliver)
+	MCFG_VIDEO_START(sliver)
+	MCFG_VIDEO_UPDATE(sliver)
 
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.6)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.6)
+	MCFG_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.6)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.6)
 MACHINE_CONFIG_END
 
 ROM_START( sliver )

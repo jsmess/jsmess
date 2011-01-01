@@ -42,7 +42,7 @@ P0-063-A                91 Rezon                                Allumer
 P0-068-B (M6100723A)    92 Block Carnival                       Visco
 P0-072-2 (prototype)    92 Blandia (prototype)                  Allumer
 P0-077-A (BP922)        92 Ultraman Club                        Banpresto
-PO-078-A                92 Blandia                              Allumer
+PO-078-A                92 Blandia (7)                          Allumer
 P0-079-A                92 Zing Zing Zip                        Allumer / Tecmo
 P0-079-A                94 Eight Forces                         Tecmo
 PO-080-A (BP923)        92 SD Gundam Neo Battling (3)           Banpresto
@@ -79,6 +79,8 @@ PO-122-A (SZR-001)      95 Zombie Raid                          American Sammy
     sprites not leaving the screen correctly) its possible the custom hw
     doesn't behave *exactly* the same as the original seta hw
 (6) To enter test mode press 9 (open door), then F2 (turn function key), then E (bet 3-4).
+(7) Bad tilemaps colors in demo mode are real game bug. Fade-in and fade-out "bad" colors are also right.
+    Bad sprites priorities are real game bugs.
 
 Notes:
 - The NEC D4701 used by Caliber 50 is a mouse interface IC (uPD4701c).
@@ -126,6 +128,7 @@ TODO:
   all scene: when you beat enemies or yellow walking eggs
   stage 1: weasels throw eggs, white animals (shaking trees) are damaged, rabbit jump
   stage 2: when BOX-MEN gets angry
+- games using 6bpp gfx switch tilemaps color mode. Only blandia uses both, while the other ones use only mode 1, thus mode 0 is untested for them
 
 ***************************************************************************/
 
@@ -1323,7 +1326,7 @@ Note: on screen copyright is (c)1998 Coinmaster.
 /*------------------------------
     update timer
 ------------------------------*/
-static void uPD71054_update_timer( running_machine *machine, running_device *cpu, int no )
+static void uPD71054_update_timer( running_machine *machine, device_t *cpu, int no )
 {
 	seta_state *state = machine->driver_data<seta_state>();
 	uPD71054_state *uPD71054 = &state->uPD71054;
@@ -1432,7 +1435,7 @@ static const x1_010_interface seta_sound_intf2 =
 	0x1000,		/* address */
 };
 
-static void utoukond_ym3438_interrupt(running_device *device, int linestate)
+static void utoukond_ym3438_interrupt(device_t *device, int linestate)
 {
 	cputag_set_input_line(device->machine, "audiocpu", INPUT_LINE_NMI, linestate);
 }
@@ -1801,7 +1804,7 @@ static ADDRESS_MAP_START( blandia_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM								// ROM (up to 2MB)
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM								// RAM (main ram for zingzip, wrofaero writes to 20f000-20ffff)
 	AM_RANGE(0x210000, 0x21ffff) AM_RAM								// RAM (gundhara)
-	AM_RANGE(0x300000, 0x30ffff) AM_RAM								// RAM (wrofaero only?)
+	AM_RANGE(0x300000, 0x30ffff) AM_RAM								// RAM (wrofaero and blandia only?)
 	AM_RANGE(0x400000, 0x400001) AM_READ_PORT("P1")					// P1
 	AM_RANGE(0x400002, 0x400003) AM_READ_PORT("P2")					// P2
 	AM_RANGE(0x400004, 0x400005) AM_READ_PORT("COINS")				// Coins
@@ -1809,7 +1812,7 @@ static ADDRESS_MAP_START( blandia_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x600000, 0x600003) AM_READ(seta_dsw_r)				// DSW
 	AM_RANGE(0x700000, 0x7003ff) AM_RAM								// (rezon,jjsquawk)
 	AM_RANGE(0x700400, 0x700fff) AM_RAM AM_BASE_SIZE_MEMBER(seta_state, paletteram, paletteram_size)	// Palette
-	AM_RANGE(0x701000, 0x70ffff) AM_RAM								//
+	AM_RANGE(0x703c00, 0x7047ff) AM_RAM								// 2nd palette (?), written in the stage with the tilemap blending (?) effect, or just mirror
 /**/AM_RANGE(0x800000, 0x800607) AM_RAM AM_BASE_MEMBER(seta_state, spriteram)		// Sprites Y
 	AM_RANGE(0x880000, 0x880001) AM_RAM								// ? 0xc000
 	AM_RANGE(0x900000, 0x903fff) AM_RAM AM_BASE_MEMBER(seta_state, spriteram2)		// Sprites Code + X + Attr
@@ -1843,7 +1846,7 @@ static ADDRESS_MAP_START( blandiap_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x600000, 0x600003) AM_READ(seta_dsw_r)				// DSW
 	AM_RANGE(0x700000, 0x7003ff) AM_RAM								// (rezon,jjsquawk)
 	AM_RANGE(0x700400, 0x700fff) AM_RAM AM_BASE_SIZE_MEMBER(seta_state, paletteram, paletteram_size)	// Palette
-	AM_RANGE(0x701000, 0x70ffff) AM_RAM								//
+	AM_RANGE(0x703c00, 0x7047ff) AM_RAM								// 2nd palette (?), written in the stage with the tilemap blending (?) effect, or just mirror
 	AM_RANGE(0x800000, 0x803fff) AM_RAM_WRITE(seta_vram_0_w) AM_BASE_MEMBER(seta_state, vram_0)	// VRAM 0&1
 	AM_RANGE(0x804000, 0x80ffff) AM_RAM								// (jjsquawk)
 	AM_RANGE(0x880000, 0x883fff) AM_RAM_WRITE(seta_vram_2_w) AM_BASE_MEMBER(seta_state, vram_2)	// VRAM 2&3
@@ -2181,37 +2184,37 @@ ADDRESS_MAP_END
 
 static READ16_HANDLER( setaroul_c0_r )
 {
-	return 0x00;//mame_rand(space->machine);
+	return 0x00;//space->machine->rand();
 }
 
 static READ16_HANDLER( setaroul_d4_0_r )
 {
-	return 0x00;//mame_rand(space->machine);
+	return 0x00;//space->machine->rand();
 }
 
 static READ16_HANDLER( setaroul_d4_4_r )
 {
-	return 0x00;//mame_rand(space->machine);
+	return 0x00;//space->machine->rand();
 }
 
 static READ16_HANDLER( setaroul_d4_6_r )
 {
-	return 0xffff;//mame_rand(space->machine);
+	return 0xffff;//space->machine->rand();
 }
 
 static READ16_HANDLER( setaroul_d4_8_r )
 {
-	return mame_rand(space->machine)&0x000f;
+	return space->machine->rand()&0x000f;
 }
 
 static READ16_HANDLER( setaroul_d4_a_r )
 {
-	return 0x00;//mame_rand(space->machine);
+	return 0x00;//space->machine->rand();
 }
 
 static READ16_HANDLER( setaroul_d4_10_r )
 {
-	return 0x00;// mame_rand(space->machine);
+	return 0x00;// space->machine->rand();
 }
 
 
@@ -2869,7 +2872,7 @@ static WRITE16_HANDLER( jockeyc_mux_w )
 
 static READ16_HANDLER( unk_r )
 {
-	return 0xffff;//mame_rand(space->machine);
+	return 0xffff;//space->machine->rand();
 }
 
 /* same as International Toote but without the protection and different RTC hook-up */
@@ -2918,7 +2921,7 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( sub_bankswitch_w )
 {
-	UINT8 *rom = memory_region(space->machine, "sub");
+	UINT8 *rom = space->machine->region("sub")->base();
 	int bank = data >> 4;
 
 	memory_set_bankptr(space->machine, "bank1", &rom[bank * 0x4000 + 0xc000]);
@@ -6630,9 +6633,11 @@ static const gfx_layout layout_packed_6bits_2roms =
 ***************************************************************************/
 
 static GFXDECODE_START( blandia )
-	GFXDECODE_ENTRY( "gfx1", 0, layout_planes_2roms,       0,           32 ) // [0] Sprites
-	GFXDECODE_ENTRY( "gfx2", 0, layout_packed_6bits_3roms, 16*32+64*32, 32 ) // [1] Layer 1
-	GFXDECODE_ENTRY( "gfx3", 0, layout_packed_6bits_3roms, 16*32,       32 ) // [2] Layer 2
+	GFXDECODE_ENTRY( "gfx1", 0, layout_planes_2roms,       0,             32 ) // [0] Sprites
+	GFXDECODE_ENTRY( "gfx2", 0, layout_packed_6bits_3roms, 16*32+64*32*1, 32 ) // [1] Layer 1
+	GFXDECODE_ENTRY( "gfx3", 0, layout_packed_6bits_3roms, 16*32+64*32*0, 32 ) // [2] Layer 2
+	GFXDECODE_ENTRY( "gfx2", 0, layout_packed_6bits_3roms, 16*32+64*32*3, 32 ) // [3] Layer 1
+	GFXDECODE_ENTRY( "gfx3", 0, layout_packed_6bits_3roms, 16*32+64*32*2, 32 ) // [4] Layer 2
 GFXDECODE_END
 
 /***************************************************************************
@@ -6659,8 +6664,10 @@ GFXDECODE_END
 
 static GFXDECODE_START( jjsquawk )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_planes_2roms,       0,             32 ) // [0] Sprites
-	GFXDECODE_ENTRY( "gfx2", 0, layout_packed_6bits_2roms, 512 + 64*32*0, 32 ) // [1] Layer 1
-	GFXDECODE_ENTRY( "gfx3", 0, layout_packed_6bits_2roms, 512 + 64*32*1, 32 ) // [2] Layer 2
+	GFXDECODE_ENTRY( "gfx2", 0, layout_packed_6bits_2roms, 16*32+64*32*0, 32 ) // [1] Layer 1
+	GFXDECODE_ENTRY( "gfx3", 0, layout_packed_6bits_2roms, 16*32+64*32*1, 32 ) // [2] Layer 2
+	GFXDECODE_ENTRY( "gfx2", 0, layout_packed_6bits_2roms, 16*32+64*32*2, 32 ) // [3] Layer 1
+	GFXDECODE_ENTRY( "gfx3", 0, layout_packed_6bits_2roms, 16*32+64*32*3, 32 ) // [4] Layer 2
 GFXDECODE_END
 
 /***************************************************************************
@@ -6749,8 +6756,9 @@ GFXDECODE_END
 ***************************************************************************/
 
 static GFXDECODE_START( usclssic )
-	GFXDECODE_ENTRY( "gfx1", 0, layout_planes_2roms,       0, 32 ) // [0] Sprites
-	GFXDECODE_ENTRY( "gfx2", 0, layout_packed_6bits_3roms, 512, 32 ) // [1] Layer 1
+	GFXDECODE_ENTRY( "gfx1", 0, layout_planes_2roms,       0,			32 ) // [0] Sprites
+	GFXDECODE_ENTRY( "gfx2", 0, layout_packed_6bits_3roms, 512+64*32*0, 32 ) // [1] Layer 1
+	GFXDECODE_ENTRY( "gfx2", 0, layout_packed_6bits_3roms, 512+64*32*1, 32 ) // [2] Layer 1
 GFXDECODE_END
 
 
@@ -6759,9 +6767,10 @@ GFXDECODE_END
 ***************************************************************************/
 
 static GFXDECODE_START( zingzip )
-	GFXDECODE_ENTRY( "gfx1", 0, layout_planes_2roms,       512*0, 32 ) // [0] Sprites
-	GFXDECODE_ENTRY( "gfx2", 0, layout_packed_6bits_2roms, 512*2, 32 ) // [1] Layer 1
-	GFXDECODE_ENTRY( "gfx3", 0, layout_packed,             512*1, 32 ) // [2] Layer 2
+	GFXDECODE_ENTRY( "gfx1", 0, layout_planes_2roms,       16*32*0, 		32 ) // [0] Sprites
+	GFXDECODE_ENTRY( "gfx2", 0, layout_packed_6bits_2roms, 16*32*2, 		32 ) // [1] Layer 1
+	GFXDECODE_ENTRY( "gfx3", 0, layout_packed,             16*32*1, 		32 ) // [2] Layer 2
+	GFXDECODE_ENTRY( "gfx2", 0, layout_packed_6bits_2roms, 16*32*2+64*32*1, 32 ) // [3] Layer 1
 GFXDECODE_END
 
 
@@ -6770,9 +6779,11 @@ GFXDECODE_END
 ***************************************************************************/
 
 static GFXDECODE_START( crazyfgt )
-	GFXDECODE_ENTRY( "gfx1", 0, layout_planes,             0,           32 ) // [0] Sprites
-	GFXDECODE_ENTRY( "gfx2", 0, layout_packed_6bits_3roms, 16*32+64*32, 32 ) // [1] Layer 1
-	GFXDECODE_ENTRY( "gfx3", 0, layout_packed_6bits_3roms, 16*32,       32 ) // [2] Layer 2
+	GFXDECODE_ENTRY( "gfx1", 0, layout_planes,             0,             32 ) // [0] Sprites
+	GFXDECODE_ENTRY( "gfx2", 0, layout_packed_6bits_3roms, 16*32+64*32*1, 32 ) // [1] Layer 1
+	GFXDECODE_ENTRY( "gfx3", 0, layout_packed_6bits_3roms, 16*32+64*32*0, 32 ) // [2] Layer 2
+	GFXDECODE_ENTRY( "gfx2", 0, layout_packed_6bits_3roms, 16*32+64*32*3, 32 ) // [1] Layer 1
+	GFXDECODE_ENTRY( "gfx3", 0, layout_packed_6bits_3roms, 16*32+64*32*2, 32 ) // [2] Layer 2
 GFXDECODE_END
 
 /***************************************************************************
@@ -6853,39 +6864,39 @@ static INTERRUPT_GEN( tndrcade_sub_interrupt )
 static MACHINE_CONFIG_START( tndrcade, seta_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 16000000/2)	/* 8 MHz */
-	MDRV_CPU_PROGRAM_MAP(tndrcade_map)
-	MDRV_CPU_VBLANK_INT("screen", irq2_line_hold)
+	MCFG_CPU_ADD("maincpu", M68000, 16000000/2)	/* 8 MHz */
+	MCFG_CPU_PROGRAM_MAP(tndrcade_map)
+	MCFG_CPU_VBLANK_INT("screen", irq2_line_hold)
 
-	MDRV_CPU_ADD("sub", M65C02, 16000000/8)	/* 2 MHz */
-	MDRV_CPU_PROGRAM_MAP(tndrcade_sub_map)
-	MDRV_CPU_VBLANK_INT_HACK(tndrcade_sub_interrupt,TNDRCADE_SUB_INTERRUPTS_NUM)
+	MCFG_CPU_ADD("sub", M65C02, 16000000/8)	/* 2 MHz */
+	MCFG_CPU_PROGRAM_MAP(tndrcade_sub_map)
+	MCFG_CPU_VBLANK_INT_HACK(tndrcade_sub_interrupt,TNDRCADE_SUB_INTERRUPTS_NUM)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(tndrcade)
-	MDRV_PALETTE_LENGTH(512)	/* sprites only */
+	MCFG_GFXDECODE(tndrcade)
+	MCFG_PALETTE_LENGTH(512)	/* sprites only */
 
-	MDRV_VIDEO_START(seta_no_layers)
-	MDRV_VIDEO_UPDATE(seta_no_layers) /* just draw the sprites */
+	MCFG_VIDEO_START(seta_no_layers)
+	MCFG_VIDEO_UPDATE(seta_no_layers) /* just draw the sprites */
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ym1", YM2203, 16000000/4)	/* 4 MHz */
-	MDRV_SOUND_CONFIG(tndrcade_ym2203_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.35)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.35)
+	MCFG_SOUND_ADD("ym1", YM2203, 16000000/4)	/* 4 MHz */
+	MCFG_SOUND_CONFIG(tndrcade_ym2203_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.35)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.35)
 
-	MDRV_SOUND_ADD("ym2", YM3812, 16000000/4)	/* 4 MHz */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("ym2", YM3812, 16000000/4)	/* 4 MHz */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -6902,35 +6913,35 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( twineagl, seta_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 16000000/2)	/* 8 MHz */
-	MDRV_CPU_PROGRAM_MAP(downtown_map)
-	MDRV_CPU_VBLANK_INT("screen", irq3_line_hold)
+	MCFG_CPU_ADD("maincpu", M68000, 16000000/2)	/* 8 MHz */
+	MCFG_CPU_PROGRAM_MAP(downtown_map)
+	MCFG_CPU_VBLANK_INT("screen", irq3_line_hold)
 
-	MDRV_CPU_ADD("sub", M65C02, 16000000/8)	/* 2 MHz */
-	MDRV_CPU_PROGRAM_MAP(twineagl_sub_map)
-	MDRV_CPU_VBLANK_INT_HACK(seta_sub_interrupt,SETA_SUB_INTERRUPTS_NUM)
+	MCFG_CPU_ADD("sub", M65C02, 16000000/8)	/* 2 MHz */
+	MCFG_CPU_PROGRAM_MAP(twineagl_sub_map)
+	MCFG_CPU_VBLANK_INT_HACK(seta_sub_interrupt,SETA_SUB_INTERRUPTS_NUM)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 
-	MDRV_GFXDECODE(downtown)
-	MDRV_PALETTE_LENGTH(512)
+	MCFG_GFXDECODE(downtown)
+	MCFG_PALETTE_LENGTH(512)
 
-	MDRV_VIDEO_START(twineagl_1_layer)
-	MDRV_VIDEO_UPDATE(seta)
+	MCFG_VIDEO_START(twineagl_1_layer)
+	MCFG_VIDEO_UPDATE(seta)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("x1snd", X1_010, 16000000)	/* 16 MHz */
-	MDRV_SOUND_CONFIG(seta_sound_intf)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("x1snd", X1_010, 16000000)	/* 16 MHz */
+	MCFG_SOUND_CONFIG(seta_sound_intf)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -6943,33 +6954,33 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( downtown, seta_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, XTAL_16MHz/2) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(downtown_map)
-	MDRV_CPU_VBLANK_INT_HACK(seta_interrupt_1_and_2,SETA_INTERRUPTS_NUM)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2) /* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(downtown_map)
+	MCFG_CPU_VBLANK_INT_HACK(seta_interrupt_1_and_2,SETA_INTERRUPTS_NUM)
 
-	MDRV_CPU_ADD("sub", M65C02, XTAL_16MHz/8) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(downtown_sub_map)
-	MDRV_CPU_VBLANK_INT_HACK(seta_sub_interrupt,SETA_SUB_INTERRUPTS_NUM)
+	MCFG_CPU_ADD("sub", M65C02, XTAL_16MHz/8) /* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(downtown_sub_map)
+	MCFG_CPU_VBLANK_INT_HACK(seta_sub_interrupt,SETA_SUB_INTERRUPTS_NUM)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(57.42) /* verified on pcb */
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(57.42) /* verified on pcb */
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 
-	MDRV_GFXDECODE(downtown)
-	MDRV_PALETTE_LENGTH(512)
+	MCFG_GFXDECODE(downtown)
+	MCFG_PALETTE_LENGTH(512)
 
-	MDRV_VIDEO_START(seta_1_layer)
-	MDRV_VIDEO_UPDATE(seta)
+	MCFG_VIDEO_START(seta_1_layer)
+	MCFG_VIDEO_UPDATE(seta)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("x1snd", X1_010, 16000000)	/* 16 MHz */
-	MDRV_SOUND_CONFIG(seta_sound_intf)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("x1snd", X1_010, 16000000)	/* 16 MHz */
+	MCFG_SOUND_CONFIG(seta_sound_intf)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 
@@ -7000,38 +7011,38 @@ static INTERRUPT_GEN( calibr50_interrupt )
 static MACHINE_CONFIG_START( usclssic, seta_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 16000000/2)	/* 8 MHz */
-	MDRV_CPU_PROGRAM_MAP(usclssic_map)
-	MDRV_CPU_VBLANK_INT_HACK(calibr50_interrupt,calibr50_INTERRUPTS_NUM)
+	MCFG_CPU_ADD("maincpu", M68000, 16000000/2)	/* 8 MHz */
+	MCFG_CPU_PROGRAM_MAP(usclssic_map)
+	MCFG_CPU_VBLANK_INT_HACK(calibr50_interrupt,calibr50_INTERRUPTS_NUM)
 
-	MDRV_CPU_ADD("sub", M65C02, 16000000/8)	/* 2 MHz */
-	MDRV_CPU_PROGRAM_MAP(calibr50_sub_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)	/* NMI caused by main cpu when writing to the sound latch */
+	MCFG_CPU_ADD("sub", M65C02, 16000000/8)	/* 2 MHz */
+	MCFG_CPU_PROGRAM_MAP(calibr50_sub_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)	/* NMI caused by main cpu when writing to the sound latch */
 
-	MDRV_MACHINE_RESET(calibr50)
+	MCFG_MACHINE_RESET(calibr50)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 
-	MDRV_GFXDECODE(usclssic)
-	MDRV_PALETTE_LENGTH(16*32 + 64*32)		/* sprites, layer */
+	MCFG_GFXDECODE(usclssic)
+	MCFG_PALETTE_LENGTH(16*32 + 64*32*2)		/* sprites, layer */
 
-	MDRV_PALETTE_INIT(usclssic)	/* layer is 6 planes deep */
-	MDRV_VIDEO_START(seta_1_layer)
-	MDRV_VIDEO_UPDATE(usclssic)
+	MCFG_PALETTE_INIT(usclssic)	/* layer is 6 planes deep */
+	MCFG_VIDEO_START(seta_1_layer)
+	MCFG_VIDEO_UPDATE(usclssic)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("x1snd", X1_010, 16000000)	/* 16 MHz */
-	MDRV_SOUND_CONFIG(seta_sound_intf2)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("x1snd", X1_010, 16000000)	/* 16 MHz */
+	MCFG_SOUND_CONFIG(seta_sound_intf2)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -7047,36 +7058,36 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( calibr50, seta_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, XTAL_16MHz/2) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(calibr50_map)
-	MDRV_CPU_VBLANK_INT_HACK(calibr50_interrupt,calibr50_INTERRUPTS_NUM)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2) /* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(calibr50_map)
+	MCFG_CPU_VBLANK_INT_HACK(calibr50_interrupt,calibr50_INTERRUPTS_NUM)
 
-	MDRV_CPU_ADD("sub", M65C02, XTAL_16MHz/8) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(calibr50_sub_map)
-	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)	/* IRQ: 4/frame
+	MCFG_CPU_ADD("sub", M65C02, XTAL_16MHz/8) /* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(calibr50_sub_map)
+	MCFG_CPU_VBLANK_INT_HACK(irq0_line_hold,4)	/* IRQ: 4/frame
                                NMI: when the 68k writes the sound latch */
 
-	MDRV_MACHINE_RESET(calibr50)
+	MCFG_MACHINE_RESET(calibr50)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(57.42)  /* verified on pcb */
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(57.42)  /* verified on pcb */
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 
-	MDRV_GFXDECODE(downtown)
-	MDRV_PALETTE_LENGTH(512)
+	MCFG_GFXDECODE(downtown)
+	MCFG_PALETTE_LENGTH(512)
 
-	MDRV_VIDEO_START(seta_1_layer)
-	MDRV_VIDEO_UPDATE(seta)
+	MCFG_VIDEO_START(seta_1_layer)
+	MCFG_VIDEO_UPDATE(seta)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("x1snd", X1_010, 16000000)	/* 16 MHz */
-	MDRV_SOUND_CONFIG(seta_sound_intf2)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("x1snd", X1_010, 16000000)	/* 16 MHz */
+	MCFG_SOUND_CONFIG(seta_sound_intf2)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 
@@ -7089,35 +7100,35 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( metafox, seta_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 16000000/2)	/* 8 MHz */
-	MDRV_CPU_PROGRAM_MAP(downtown_map)
-	MDRV_CPU_VBLANK_INT("screen", irq3_line_hold)
+	MCFG_CPU_ADD("maincpu", M68000, 16000000/2)	/* 8 MHz */
+	MCFG_CPU_PROGRAM_MAP(downtown_map)
+	MCFG_CPU_VBLANK_INT("screen", irq3_line_hold)
 
-	MDRV_CPU_ADD("sub", M65C02, 16000000/8)	/* 2 MHz */
-	MDRV_CPU_PROGRAM_MAP(metafox_sub_map)
-	MDRV_CPU_VBLANK_INT_HACK(seta_sub_interrupt,SETA_SUB_INTERRUPTS_NUM)
+	MCFG_CPU_ADD("sub", M65C02, 16000000/8)	/* 2 MHz */
+	MCFG_CPU_PROGRAM_MAP(metafox_sub_map)
+	MCFG_CPU_VBLANK_INT_HACK(seta_sub_interrupt,SETA_SUB_INTERRUPTS_NUM)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(downtown)
-	MDRV_PALETTE_LENGTH(512)
+	MCFG_GFXDECODE(downtown)
+	MCFG_PALETTE_LENGTH(512)
 
-	MDRV_VIDEO_START(seta_1_layer)
-	MDRV_VIDEO_UPDATE(seta)
+	MCFG_VIDEO_START(seta_1_layer)
+	MCFG_VIDEO_UPDATE(seta)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("x1snd", X1_010, 16000000)	/* 16 MHz */
-	MDRV_SOUND_CONFIG(seta_sound_intf)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("x1snd", X1_010, 16000000)	/* 16 MHz */
+	MCFG_SOUND_CONFIG(seta_sound_intf)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -7128,31 +7139,31 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( atehate, seta_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz */
-	MDRV_CPU_PROGRAM_MAP(atehate_map)
-	MDRV_CPU_VBLANK_INT_HACK(seta_interrupt_1_and_2,SETA_INTERRUPTS_NUM)
+	MCFG_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz */
+	MCFG_CPU_PROGRAM_MAP(atehate_map)
+	MCFG_CPU_VBLANK_INT_HACK(seta_interrupt_1_and_2,SETA_INTERRUPTS_NUM)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 
-	MDRV_GFXDECODE(tndrcade)
-	MDRV_PALETTE_LENGTH(512)	/* sprites only */
+	MCFG_GFXDECODE(tndrcade)
+	MCFG_PALETTE_LENGTH(512)	/* sprites only */
 
-	MDRV_VIDEO_START(seta_no_layers)
-	MDRV_VIDEO_UPDATE(seta_no_layers) /* just draw the sprites */
+	MCFG_VIDEO_START(seta_no_layers)
+	MCFG_VIDEO_UPDATE(seta_no_layers) /* just draw the sprites */
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("x1snd", X1_010, 16000000)	/* 16 MHz */
-	MDRV_SOUND_CONFIG(seta_sound_intf)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("x1snd", X1_010, 16000000)	/* 16 MHz */
+	MCFG_SOUND_CONFIG(seta_sound_intf)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -7169,65 +7180,65 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( blandia, seta_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz */
-	MDRV_CPU_PROGRAM_MAP(blandia_map)
-	MDRV_CPU_VBLANK_INT_HACK(seta_interrupt_2_and_4,SETA_INTERRUPTS_NUM)
+	MCFG_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz */
+	MCFG_CPU_PROGRAM_MAP(blandia_map)
+	MCFG_CPU_VBLANK_INT_HACK(seta_interrupt_2_and_4,SETA_INTERRUPTS_NUM)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 
-	MDRV_GFXDECODE(blandia)
-	MDRV_PALETTE_LENGTH(16*32+64*32+64*32)	/* sprites, layer1, layer2 */
+	MCFG_GFXDECODE(blandia)
+	MCFG_PALETTE_LENGTH(16*32+64*32*4)	/* sprites, layer1, layer2 */
 
-	MDRV_PALETTE_INIT(blandia)				/* layers 1&2 are 6 planes deep */
-	MDRV_VIDEO_START(seta_2_layers)
-	MDRV_VIDEO_EOF(seta_buffer_sprites)		/* Blandia uses sprite buffering */
-	MDRV_VIDEO_UPDATE(seta)
+	MCFG_PALETTE_INIT(blandia)				/* layers 1&2 are 6 planes deep */
+	MCFG_VIDEO_START(seta_2_layers)
+	MCFG_VIDEO_EOF(seta_buffer_sprites)		/* Blandia uses sprite buffering */
+	MCFG_VIDEO_UPDATE(seta)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("x1snd", X1_010, 16000000)	/* 16 MHz */
-	MDRV_SOUND_CONFIG(seta_sound_intf)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("x1snd", X1_010, 16000000)	/* 16 MHz */
+	MCFG_SOUND_CONFIG(seta_sound_intf)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( blandiap, seta_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz */
-	MDRV_CPU_PROGRAM_MAP(blandiap_map)
-	MDRV_CPU_VBLANK_INT_HACK(seta_interrupt_2_and_4,SETA_INTERRUPTS_NUM)
+	MCFG_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz */
+	MCFG_CPU_PROGRAM_MAP(blandiap_map)
+	MCFG_CPU_VBLANK_INT_HACK(seta_interrupt_2_and_4,SETA_INTERRUPTS_NUM)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 
-	MDRV_GFXDECODE(blandia)
-	MDRV_PALETTE_LENGTH(16*32+64*32+64*32)	/* sprites, layer1, layer2 */
+	MCFG_GFXDECODE(blandia)
+	MCFG_PALETTE_LENGTH(16*32+64*32*4)	/* sprites, layer1, layer2 */
 
-	MDRV_PALETTE_INIT(blandia)				/* layers 1&2 are 6 planes deep */
-	MDRV_VIDEO_START(seta_2_layers)
-	MDRV_VIDEO_EOF(seta_buffer_sprites)		/* Blandia uses sprite buffering */
-	MDRV_VIDEO_UPDATE(seta)
+	MCFG_PALETTE_INIT(blandia)				/* layers 1&2 are 6 planes deep */
+	MCFG_VIDEO_START(seta_2_layers)
+	MCFG_VIDEO_EOF(seta_buffer_sprites)		/* Blandia uses sprite buffering */
+	MCFG_VIDEO_UPDATE(seta)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("x1snd", X1_010, 16000000)	/* 16 MHz */
-	MDRV_SOUND_CONFIG(seta_sound_intf)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("x1snd", X1_010, 16000000)	/* 16 MHz */
+	MCFG_SOUND_CONFIG(seta_sound_intf)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -7238,31 +7249,31 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( blockcar, seta_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 16000000/2)	/* 8 MHz */
-	MDRV_CPU_PROGRAM_MAP(blockcar_map)
-	MDRV_CPU_VBLANK_INT("screen", irq3_line_hold)
+	MCFG_CPU_ADD("maincpu", M68000, 16000000/2)	/* 8 MHz */
+	MCFG_CPU_PROGRAM_MAP(blockcar_map)
+	MCFG_CPU_VBLANK_INT("screen", irq3_line_hold)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 
-	MDRV_GFXDECODE(tndrcade)
-	MDRV_PALETTE_LENGTH(512)	/* sprites only */
+	MCFG_GFXDECODE(tndrcade)
+	MCFG_PALETTE_LENGTH(512)	/* sprites only */
 
-	MDRV_VIDEO_START(seta_no_layers)
-	MDRV_VIDEO_UPDATE(seta_no_layers) /* just draw the sprites */
+	MCFG_VIDEO_START(seta_no_layers)
+	MCFG_VIDEO_UPDATE(seta_no_layers) /* just draw the sprites */
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("x1snd", X1_010, 16000000)	/* 16 MHz */
-	MDRV_SOUND_CONFIG(seta_sound_intf)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("x1snd", X1_010, 16000000)	/* 16 MHz */
+	MCFG_SOUND_CONFIG(seta_sound_intf)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -7273,31 +7284,31 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( daioh, seta_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz */
-	MDRV_CPU_PROGRAM_MAP(daioh_map)
-	MDRV_CPU_VBLANK_INT_HACK(seta_interrupt_1_and_2,SETA_INTERRUPTS_NUM)
+	MCFG_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz */
+	MCFG_CPU_PROGRAM_MAP(daioh_map)
+	MCFG_CPU_VBLANK_INT_HACK(seta_interrupt_1_and_2,SETA_INTERRUPTS_NUM)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 
-	MDRV_GFXDECODE(msgundam)
-	MDRV_PALETTE_LENGTH(512 * 3)	/* sprites, layer1, layer2 */
+	MCFG_GFXDECODE(msgundam)
+	MCFG_PALETTE_LENGTH(512 * 3)	/* sprites, layer1, layer2 */
 
-	MDRV_VIDEO_START(seta_2_layers)
-	MDRV_VIDEO_UPDATE(seta)
+	MCFG_VIDEO_START(seta_2_layers)
+	MCFG_VIDEO_UPDATE(seta)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("x1snd", X1_010, 16000000)	/* 16 MHz */
-	MDRV_SOUND_CONFIG(seta_sound_intf)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("x1snd", X1_010, 16000000)	/* 16 MHz */
+	MCFG_SOUND_CONFIG(seta_sound_intf)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -7313,32 +7324,32 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( drgnunit, seta_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 16000000/2)	/* 8 MHz */
-	MDRV_CPU_PROGRAM_MAP(drgnunit_map)
-	MDRV_CPU_VBLANK_INT_HACK(seta_interrupt_1_and_2,SETA_INTERRUPTS_NUM)
+	MCFG_CPU_ADD("maincpu", M68000, 16000000/2)	/* 8 MHz */
+	MCFG_CPU_PROGRAM_MAP(drgnunit_map)
+	MCFG_CPU_VBLANK_INT_HACK(seta_interrupt_1_and_2,SETA_INTERRUPTS_NUM)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 
-	MDRV_GFXDECODE(downtown)
-	MDRV_PALETTE_LENGTH(512)
+	MCFG_GFXDECODE(downtown)
+	MCFG_PALETTE_LENGTH(512)
 
-	MDRV_VIDEO_START(seta_1_layer)
-	MDRV_VIDEO_EOF(seta_buffer_sprites)	/* qzkklogy uses sprite buffering */
-	MDRV_VIDEO_UPDATE(seta)
+	MCFG_VIDEO_START(seta_1_layer)
+	MCFG_VIDEO_EOF(seta_buffer_sprites)	/* qzkklogy uses sprite buffering */
+	MCFG_VIDEO_UPDATE(seta)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("x1snd", X1_010, 16000000)	/* 16 MHz */
-	MDRV_SOUND_CONFIG(seta_sound_intf)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("x1snd", X1_010, 16000000)	/* 16 MHz */
+	MCFG_SOUND_CONFIG(seta_sound_intf)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 /*  Same as qzkklogy, but with a 16MHz CPU and different
@@ -7347,32 +7358,32 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( qzkklgy2, seta_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz */
-	MDRV_CPU_PROGRAM_MAP(drgnunit_map)
-	MDRV_CPU_VBLANK_INT_HACK(seta_interrupt_1_and_2,SETA_INTERRUPTS_NUM)
+	MCFG_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz */
+	MCFG_CPU_PROGRAM_MAP(drgnunit_map)
+	MCFG_CPU_VBLANK_INT_HACK(seta_interrupt_1_and_2,SETA_INTERRUPTS_NUM)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 
-	MDRV_GFXDECODE(qzkklgy2)
-	MDRV_PALETTE_LENGTH(512)
+	MCFG_GFXDECODE(qzkklgy2)
+	MCFG_PALETTE_LENGTH(512)
 
-	MDRV_VIDEO_START(seta_1_layer)
-	MDRV_VIDEO_EOF(seta_buffer_sprites)	/* qzkklogy uses sprite buffering */
-	MDRV_VIDEO_UPDATE(seta)
+	MCFG_VIDEO_START(seta_1_layer)
+	MCFG_VIDEO_EOF(seta_buffer_sprites)	/* qzkklogy uses sprite buffering */
+	MCFG_VIDEO_UPDATE(seta)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("x1snd", X1_010, 16000000)	/* 16 MHz */
-	MDRV_SOUND_CONFIG(seta_sound_intf)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("x1snd", X1_010, 16000000)	/* 16 MHz */
+	MCFG_SOUND_CONFIG(seta_sound_intf)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -7393,33 +7404,33 @@ static INTERRUPT_GEN( setaroul_interrupt )
 static MACHINE_CONFIG_START( setaroul, seta_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 16000000/2)	/* 8 MHz */
-	MDRV_CPU_PROGRAM_MAP(setaroul_map)
-	MDRV_CPU_VBLANK_INT_HACK(setaroul_interrupt,SETAROUL_INTERRUPTS_NUM) // and 6?
+	MCFG_CPU_ADD("maincpu", M68000, 16000000/2)	/* 8 MHz */
+	MCFG_CPU_PROGRAM_MAP(setaroul_map)
+	MCFG_CPU_VBLANK_INT_HACK(setaroul_interrupt,SETAROUL_INTERRUPTS_NUM) // and 6?
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 
-	MDRV_GFXDECODE(setaroul)
-	MDRV_PALETTE_LENGTH(512)
-	MDRV_PALETTE_INIT(setaroul)
+	MCFG_GFXDECODE(setaroul)
+	MCFG_PALETTE_LENGTH(512)
+	MCFG_PALETTE_INIT(setaroul)
 
-	MDRV_VIDEO_START(seta_1_layer)
-	MDRV_VIDEO_EOF(seta_buffer_sprites)	/* qzkklogy uses sprite buffering */
-	MDRV_VIDEO_UPDATE(seta)
+	MCFG_VIDEO_START(seta_1_layer)
+	MCFG_VIDEO_EOF(seta_buffer_sprites)	/* qzkklogy uses sprite buffering */
+	MCFG_VIDEO_UPDATE(seta)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("x1snd", X1_010, 16000000)	/* 16 MHz */
-	MDRV_SOUND_CONFIG(seta_sound_intf)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("x1snd", X1_010, 16000000)	/* 16 MHz */
+	MCFG_SOUND_CONFIG(seta_sound_intf)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -7430,31 +7441,31 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( eightfrc, seta_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz */
-	MDRV_CPU_PROGRAM_MAP(wrofaero_map)
-	MDRV_CPU_VBLANK_INT_HACK(seta_interrupt_1_and_2,SETA_INTERRUPTS_NUM)
+	MCFG_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz */
+	MCFG_CPU_PROGRAM_MAP(wrofaero_map)
+	MCFG_CPU_VBLANK_INT_HACK(seta_interrupt_1_and_2,SETA_INTERRUPTS_NUM)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(msgundam)
-	MDRV_PALETTE_LENGTH(512 * 3)	/* sprites, layer1, layer2 */
+	MCFG_GFXDECODE(msgundam)
+	MCFG_PALETTE_LENGTH(512 * 3)	/* sprites, layer1, layer2 */
 
-	MDRV_VIDEO_START(seta_2_layers)
-	MDRV_VIDEO_UPDATE(seta)
+	MCFG_VIDEO_START(seta_2_layers)
+	MCFG_VIDEO_UPDATE(seta)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("x1snd", X1_010, 16000000)	/* 16 MHz */
-	MDRV_SOUND_CONFIG(seta_sound_intf)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("x1snd", X1_010, 16000000)	/* 16 MHz */
+	MCFG_SOUND_CONFIG(seta_sound_intf)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -7470,32 +7481,32 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( extdwnhl, seta_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz */
-	MDRV_CPU_PROGRAM_MAP(extdwnhl_map)
-	MDRV_CPU_VBLANK_INT_HACK(seta_interrupt_1_and_2,SETA_INTERRUPTS_NUM)
+	MCFG_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz */
+	MCFG_CPU_PROGRAM_MAP(extdwnhl_map)
+	MCFG_CPU_VBLANK_INT_HACK(seta_interrupt_1_and_2,SETA_INTERRUPTS_NUM)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 
-	MDRV_GFXDECODE(zingzip)
-	MDRV_PALETTE_LENGTH(16*32+16*32+64*32)	/* sprites, layer2, layer1 */
+	MCFG_GFXDECODE(zingzip)
+	MCFG_PALETTE_LENGTH(16*32+16*32+64*32*2)	/* sprites, layer2, layer1 */
 
-	MDRV_PALETTE_INIT(zingzip)			/* layer 1 gfx is 6 planes deep */
-	MDRV_VIDEO_START(seta_2_layers)
-	MDRV_VIDEO_UPDATE(seta)
+	MCFG_PALETTE_INIT(zingzip)			/* layer 1 gfx is 6 planes deep */
+	MCFG_VIDEO_START(seta_2_layers)
+	MCFG_VIDEO_UPDATE(seta)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("x1snd", X1_010, 16000000)	/* 16 MHz */
-	MDRV_SOUND_CONFIG(seta_sound_intf)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("x1snd", X1_010, 16000000)	/* 16 MHz */
+	MCFG_SOUND_CONFIG(seta_sound_intf)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -7522,41 +7533,41 @@ static MACHINE_START( wrofaero ) { uPD71054_timer_init(machine); }
 static MACHINE_CONFIG_START( gundhara, seta_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz */
-	MDRV_CPU_PROGRAM_MAP(wrofaero_map)
+	MCFG_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz */
+	MCFG_CPU_PROGRAM_MAP(wrofaero_map)
 #if	__uPD71054_TIMER
-//  MDRV_CPU_VBLANK_INT("screen", wrofaero_interrupt)
-	MDRV_CPU_VBLANK_INT_HACK(seta_interrupt_1_and_2,SETA_INTERRUPTS_NUM)
+//  MCFG_CPU_VBLANK_INT("screen", wrofaero_interrupt)
+	MCFG_CPU_VBLANK_INT_HACK(seta_interrupt_1_and_2,SETA_INTERRUPTS_NUM)
 #else
-	MDRV_CPU_VBLANK_INT_HACK(seta_interrupt_2_and_4,SETA_INTERRUPTS_NUM)
+	MCFG_CPU_VBLANK_INT_HACK(seta_interrupt_2_and_4,SETA_INTERRUPTS_NUM)
 #endif	// __uPD71054_TIMER
 
 #if	__uPD71054_TIMER
-	MDRV_MACHINE_START( wrofaero )
+	MCFG_MACHINE_START( wrofaero )
 #endif	// __uPD71054_TIMER
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 
-	MDRV_GFXDECODE(jjsquawk)
-	MDRV_PALETTE_LENGTH(16*32+64*32+64*32)	/* sprites, layer2, layer1 */
+	MCFG_GFXDECODE(jjsquawk)
+	MCFG_PALETTE_LENGTH(16*32+64*32*4)	/* sprites, layer2, layer1 */
 
-	MDRV_PALETTE_INIT(gundhara)				/* layers are 6 planes deep (but have only 4 palettes) */
-	MDRV_VIDEO_START(seta_2_layers)
-	MDRV_VIDEO_UPDATE(seta)
+	MCFG_PALETTE_INIT(gundhara)				/* layers are 6 planes deep (but have only 4 palettes) */
+	MCFG_VIDEO_START(seta_2_layers)
+	MCFG_VIDEO_UPDATE(seta)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("x1snd", X1_010, 16000000)	/* 16 MHz */
-	MDRV_SOUND_CONFIG(seta_sound_intf)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("x1snd", X1_010, 16000000)	/* 16 MHz */
+	MCFG_SOUND_CONFIG(seta_sound_intf)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -7571,63 +7582,63 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( jjsquawk, seta_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz */
-	MDRV_CPU_PROGRAM_MAP(wrofaero_map)
-	MDRV_CPU_VBLANK_INT_HACK(seta_interrupt_1_and_2,SETA_INTERRUPTS_NUM)
+	MCFG_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz */
+	MCFG_CPU_PROGRAM_MAP(wrofaero_map)
+	MCFG_CPU_VBLANK_INT_HACK(seta_interrupt_1_and_2,SETA_INTERRUPTS_NUM)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 
-	MDRV_GFXDECODE(jjsquawk)
-	MDRV_PALETTE_LENGTH(16*32+64*32+64*32)	/* sprites, layer2, layer1 */
+	MCFG_GFXDECODE(jjsquawk)
+	MCFG_PALETTE_LENGTH(16*32+64*32*4)	/* sprites, layer2, layer1 */
 
-	MDRV_PALETTE_INIT(jjsquawk)				/* layers are 6 planes deep */
-	MDRV_VIDEO_START(seta_2_layers)
-	MDRV_VIDEO_UPDATE(seta)
+	MCFG_PALETTE_INIT(jjsquawk)				/* layers are 6 planes deep */
+	MCFG_VIDEO_START(seta_2_layers)
+	MCFG_VIDEO_UPDATE(seta)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("x1snd", X1_010, 16000000)	/* 16 MHz */
-	MDRV_SOUND_CONFIG(seta_sound_intf)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("x1snd", X1_010, 16000000)	/* 16 MHz */
+	MCFG_SOUND_CONFIG(seta_sound_intf)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( jjsquawb, seta_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz */
-	MDRV_CPU_PROGRAM_MAP(jjsquawb_map)
-	MDRV_CPU_VBLANK_INT_HACK(seta_interrupt_1_and_2,SETA_INTERRUPTS_NUM)
+	MCFG_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz */
+	MCFG_CPU_PROGRAM_MAP(jjsquawb_map)
+	MCFG_CPU_VBLANK_INT_HACK(seta_interrupt_1_and_2,SETA_INTERRUPTS_NUM)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 
-	MDRV_GFXDECODE(jjsquawk)
-	MDRV_PALETTE_LENGTH(16*32+64*32+64*32)	/* sprites, layer2, layer1 */
+	MCFG_GFXDECODE(jjsquawk)
+	MCFG_PALETTE_LENGTH(16*32+64*32*4)	/* sprites, layer2, layer1 */
 
-	MDRV_PALETTE_INIT(jjsquawk)				/* layers are 6 planes deep */
-	MDRV_VIDEO_START(seta_2_layers)
-	MDRV_VIDEO_UPDATE(seta)
+	MCFG_PALETTE_INIT(jjsquawk)				/* layers are 6 planes deep */
+	MCFG_VIDEO_START(seta_2_layers)
+	MCFG_VIDEO_UPDATE(seta)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("x1snd", X1_010, 16000000)	/* 16 MHz */
-	MDRV_SOUND_CONFIG(seta_sound_intf)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("x1snd", X1_010, 16000000)	/* 16 MHz */
+	MCFG_SOUND_CONFIG(seta_sound_intf)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -7638,35 +7649,35 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( kamenrid, seta_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz */
-	MDRV_CPU_PROGRAM_MAP(kamenrid_map)
-	MDRV_CPU_VBLANK_INT("screen", wrofaero_interrupt)
+	MCFG_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz */
+	MCFG_CPU_PROGRAM_MAP(kamenrid_map)
+	MCFG_CPU_VBLANK_INT("screen", wrofaero_interrupt)
 
 #if	__uPD71054_TIMER
-	MDRV_MACHINE_START( wrofaero )
+	MCFG_MACHINE_START( wrofaero )
 #endif	// __uPD71054_TIMER
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 
-	MDRV_GFXDECODE(msgundam)
-	MDRV_PALETTE_LENGTH(512 * 3)	/* sprites, layer2, layer1 */
+	MCFG_GFXDECODE(msgundam)
+	MCFG_PALETTE_LENGTH(512 * 3)	/* sprites, layer2, layer1 */
 
-	MDRV_VIDEO_START(seta_2_layers)
-	MDRV_VIDEO_UPDATE(seta)
+	MCFG_VIDEO_START(seta_2_layers)
+	MCFG_VIDEO_UPDATE(seta)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("x1snd", X1_010, 16000000)	/* 16 MHz */
-	MDRV_SOUND_CONFIG(seta_sound_intf)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("x1snd", X1_010, 16000000)	/* 16 MHz */
+	MCFG_SOUND_CONFIG(seta_sound_intf)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -7678,31 +7689,31 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( orbs, seta_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 14318180/2)	/* 7.143 MHz */
-	MDRV_CPU_PROGRAM_MAP(orbs_map)
-	MDRV_CPU_VBLANK_INT_HACK(seta_interrupt_1_and_2,SETA_INTERRUPTS_NUM)
+	MCFG_CPU_ADD("maincpu", M68000, 14318180/2)	/* 7.143 MHz */
+	MCFG_CPU_PROGRAM_MAP(orbs_map)
+	MCFG_CPU_VBLANK_INT_HACK(seta_interrupt_1_and_2,SETA_INTERRUPTS_NUM)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(1*8, 39*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(1*8, 39*8-1, 1*8, 31*8-1)
 
-	MDRV_GFXDECODE(orbs)
-	MDRV_PALETTE_LENGTH(512)	/* sprites only */
+	MCFG_GFXDECODE(orbs)
+	MCFG_PALETTE_LENGTH(512)	/* sprites only */
 
-	MDRV_VIDEO_START(seta_no_layers)
-	MDRV_VIDEO_UPDATE(seta_no_layers) /* just draw the sprites */
+	MCFG_VIDEO_START(seta_no_layers)
+	MCFG_VIDEO_UPDATE(seta_no_layers) /* just draw the sprites */
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("x1snd", X1_010, 14318180)	/* 14.318180 MHz */
-	MDRV_SOUND_CONFIG(seta_sound_intf)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("x1snd", X1_010, 14318180)	/* 14.318180 MHz */
+	MCFG_SOUND_CONFIG(seta_sound_intf)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -7713,33 +7724,33 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( keroppi, seta_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 14318180/2)	/* 7.143 MHz */
-	MDRV_CPU_PROGRAM_MAP(keroppi_map)
-	MDRV_CPU_VBLANK_INT_HACK(seta_interrupt_1_and_2,SETA_INTERRUPTS_NUM)
+	MCFG_CPU_ADD("maincpu", M68000, 14318180/2)	/* 7.143 MHz */
+	MCFG_CPU_PROGRAM_MAP(keroppi_map)
+	MCFG_CPU_VBLANK_INT_HACK(seta_interrupt_1_and_2,SETA_INTERRUPTS_NUM)
 
-	MDRV_MACHINE_START(keroppi)
+	MCFG_MACHINE_START(keroppi)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 
-	MDRV_GFXDECODE(orbs)
-	MDRV_PALETTE_LENGTH(512)	/* sprites only */
+	MCFG_GFXDECODE(orbs)
+	MCFG_PALETTE_LENGTH(512)	/* sprites only */
 
-	MDRV_VIDEO_START(seta_no_layers)
-	MDRV_VIDEO_UPDATE(seta_no_layers) /* just draw the sprites */
+	MCFG_VIDEO_START(seta_no_layers)
+	MCFG_VIDEO_UPDATE(seta_no_layers) /* just draw the sprites */
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("x1snd", X1_010, 14318180)	/* 14.318180 MHz */
-	MDRV_SOUND_CONFIG(seta_sound_intf)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("x1snd", X1_010, 14318180)	/* 14.318180 MHz */
+	MCFG_SOUND_CONFIG(seta_sound_intf)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -7750,31 +7761,31 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( krzybowl, seta_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz */
-	MDRV_CPU_PROGRAM_MAP(krzybowl_map)
-	MDRV_CPU_VBLANK_INT_HACK(seta_interrupt_1_and_2,SETA_INTERRUPTS_NUM)
+	MCFG_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz */
+	MCFG_CPU_PROGRAM_MAP(krzybowl_map)
+	MCFG_CPU_VBLANK_INT_HACK(seta_interrupt_1_and_2,SETA_INTERRUPTS_NUM)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(1*8, 39*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(1*8, 39*8-1, 1*8, 31*8-1)
 
-	MDRV_GFXDECODE(tndrcade)
-	MDRV_PALETTE_LENGTH(512)	/* sprites only */
+	MCFG_GFXDECODE(tndrcade)
+	MCFG_PALETTE_LENGTH(512)	/* sprites only */
 
-	MDRV_VIDEO_START(seta_no_layers)
-	MDRV_VIDEO_UPDATE(seta_no_layers) /* just draw the sprites */
+	MCFG_VIDEO_START(seta_no_layers)
+	MCFG_VIDEO_UPDATE(seta_no_layers) /* just draw the sprites */
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("x1snd", X1_010, 16000000)	/* 16 MHz */
-	MDRV_SOUND_CONFIG(seta_sound_intf)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("x1snd", X1_010, 16000000)	/* 16 MHz */
+	MCFG_SOUND_CONFIG(seta_sound_intf)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -7786,37 +7797,37 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( madshark, seta_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz */
-	MDRV_CPU_PROGRAM_MAP(madshark_map)
-	MDRV_CPU_VBLANK_INT("screen", wrofaero_interrupt)
+	MCFG_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz */
+	MCFG_CPU_PROGRAM_MAP(madshark_map)
+	MCFG_CPU_VBLANK_INT("screen", wrofaero_interrupt)
 
 #if	__uPD71054_TIMER
-	MDRV_MACHINE_START( wrofaero )
+	MCFG_MACHINE_START( wrofaero )
 #endif	// __uPD71054_TIMER
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(jjsquawk)
-	MDRV_PALETTE_LENGTH(16*32+64*32+64*32)	/* sprites, layer2, layer1 */
+	MCFG_GFXDECODE(jjsquawk)
+	MCFG_PALETTE_LENGTH(16*32+64*32*4)	/* sprites, layer2, layer1 */
 
-	MDRV_PALETTE_INIT(jjsquawk)				/* layers are 6 planes deep */
+	MCFG_PALETTE_INIT(jjsquawk)				/* layers are 6 planes deep */
 
-	MDRV_VIDEO_START(seta_2_layers)
-	MDRV_VIDEO_UPDATE(seta)
+	MCFG_VIDEO_START(seta_2_layers)
+	MCFG_VIDEO_UPDATE(seta)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("x1snd", X1_010, 16000000)	/* 16 MHz */
-	MDRV_SOUND_CONFIG(seta_sound_intf)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("x1snd", X1_010, 16000000)	/* 16 MHz */
+	MCFG_SOUND_CONFIG(seta_sound_intf)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -7828,40 +7839,40 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( msgundam, seta_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz */
-	MDRV_CPU_PROGRAM_MAP(msgundam_map)
+	MCFG_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz */
+	MCFG_CPU_PROGRAM_MAP(msgundam_map)
 #if	__uPD71054_TIMER
-	MDRV_CPU_VBLANK_INT("screen", wrofaero_interrupt)
+	MCFG_CPU_VBLANK_INT("screen", wrofaero_interrupt)
 #else
-	MDRV_CPU_VBLANK_INT_HACK(seta_interrupt_2_and_4,SETA_INTERRUPTS_NUM)
+	MCFG_CPU_VBLANK_INT_HACK(seta_interrupt_2_and_4,SETA_INTERRUPTS_NUM)
 #endif	// __uPD71054_TIMER
 
 #if	__uPD71054_TIMER
-	MDRV_MACHINE_START( wrofaero )
+	MCFG_MACHINE_START( wrofaero )
 #endif	// __uPD71054_TIMER
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(56.66)	/* between 56 and 57 to match a real PCB's game speed */
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(56.66)	/* between 56 and 57 to match a real PCB's game speed */
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 
-	MDRV_GFXDECODE(msgundam)
-	MDRV_PALETTE_LENGTH(512 * 3)	/* sprites, layer2, layer1 */
+	MCFG_GFXDECODE(msgundam)
+	MCFG_PALETTE_LENGTH(512 * 3)	/* sprites, layer2, layer1 */
 
-	MDRV_VIDEO_START(seta_2_layers)
-	MDRV_VIDEO_EOF(seta_buffer_sprites)	/* msgundam uses sprite buffering */
-	MDRV_VIDEO_UPDATE(seta)
+	MCFG_VIDEO_START(seta_2_layers)
+	MCFG_VIDEO_EOF(seta_buffer_sprites)	/* msgundam uses sprite buffering */
+	MCFG_VIDEO_UPDATE(seta)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("x1snd", X1_010, 16000000)	/* 16 MHz */
-	MDRV_SOUND_CONFIG(seta_sound_intf)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("x1snd", X1_010, 16000000)	/* 16 MHz */
+	MCFG_SOUND_CONFIG(seta_sound_intf)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -7873,31 +7884,31 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( oisipuzl, seta_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz */
-	MDRV_CPU_PROGRAM_MAP(oisipuzl_map)
-	MDRV_CPU_VBLANK_INT_HACK(seta_interrupt_1_and_2,SETA_INTERRUPTS_NUM)
+	MCFG_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz */
+	MCFG_CPU_PROGRAM_MAP(oisipuzl_map)
+	MCFG_CPU_VBLANK_INT_HACK(seta_interrupt_1_and_2,SETA_INTERRUPTS_NUM)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(msgundam)
-	MDRV_PALETTE_LENGTH(512 * 3)	/* sprites, layer2, layer1 */
+	MCFG_GFXDECODE(msgundam)
+	MCFG_PALETTE_LENGTH(512 * 3)	/* sprites, layer2, layer1 */
 
-	MDRV_VIDEO_START(oisipuzl_2_layers)	// flip is inverted for the tilemaps
-	MDRV_VIDEO_UPDATE(seta)
+	MCFG_VIDEO_START(oisipuzl_2_layers)	// flip is inverted for the tilemaps
+	MCFG_VIDEO_UPDATE(seta)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("x1snd", X1_010, 16000000)	/* 16 MHz */
-	MDRV_SOUND_CONFIG(seta_sound_intf)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("x1snd", X1_010, 16000000)	/* 16 MHz */
+	MCFG_SOUND_CONFIG(seta_sound_intf)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -7909,30 +7920,30 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( triplfun, seta_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz */
-	MDRV_CPU_PROGRAM_MAP(triplfun_map)
-	MDRV_CPU_VBLANK_INT("screen", irq3_line_hold)
+	MCFG_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz */
+	MCFG_CPU_PROGRAM_MAP(triplfun_map)
+	MCFG_CPU_VBLANK_INT("screen", irq3_line_hold)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(msgundam)
-	MDRV_PALETTE_LENGTH(512 * 3)	/* sprites, layer2, layer1 */
+	MCFG_GFXDECODE(msgundam)
+	MCFG_PALETTE_LENGTH(512 * 3)	/* sprites, layer2, layer1 */
 
-	MDRV_VIDEO_START(oisipuzl_2_layers)	// flip is inverted for the tilemaps
-	MDRV_VIDEO_UPDATE(seta)
+	MCFG_VIDEO_START(oisipuzl_2_layers)	// flip is inverted for the tilemaps
+	MCFG_VIDEO_UPDATE(seta)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_OKIM6295_ADD("oki", 792000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	MCFG_OKIM6295_ADD("oki", 792000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -7942,32 +7953,32 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( kiwame, seta_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz */
-	MDRV_CPU_PROGRAM_MAP(kiwame_map)
-	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)/* lev 1-7 are the same. WARNING:
+	MCFG_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz */
+	MCFG_CPU_PROGRAM_MAP(kiwame_map)
+	MCFG_CPU_VBLANK_INT("screen", irq1_line_hold)/* lev 1-7 are the same. WARNING:
                                    the interrupt table is written to. */
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 56*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 56*8-1, 1*8, 31*8-1)
 
-	MDRV_GFXDECODE(tndrcade)
-	MDRV_PALETTE_LENGTH(512)	/* sprites only */
+	MCFG_GFXDECODE(tndrcade)
+	MCFG_PALETTE_LENGTH(512)	/* sprites only */
 
-	MDRV_VIDEO_START(seta_no_layers)
-	MDRV_VIDEO_UPDATE(seta_no_layers) /* just draw the sprites */
+	MCFG_VIDEO_START(seta_no_layers)
+	MCFG_VIDEO_UPDATE(seta_no_layers) /* just draw the sprites */
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("x1snd", X1_010, 16000000)	/* 16 MHz */
-	MDRV_SOUND_CONFIG(seta_sound_intf)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("x1snd", X1_010, 16000000)	/* 16 MHz */
+	MCFG_SOUND_CONFIG(seta_sound_intf)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -7981,31 +7992,31 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( rezon, seta_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz */
-	MDRV_CPU_PROGRAM_MAP(wrofaero_map)
-	MDRV_CPU_VBLANK_INT_HACK(seta_interrupt_1_and_2,SETA_INTERRUPTS_NUM)
+	MCFG_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz */
+	MCFG_CPU_PROGRAM_MAP(wrofaero_map)
+	MCFG_CPU_VBLANK_INT_HACK(seta_interrupt_1_and_2,SETA_INTERRUPTS_NUM)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 
-	MDRV_GFXDECODE(msgundam)
-	MDRV_PALETTE_LENGTH(512 * 3)	/* sprites, layer1, layer2 */
+	MCFG_GFXDECODE(msgundam)
+	MCFG_PALETTE_LENGTH(512 * 3)	/* sprites, layer1, layer2 */
 
-	MDRV_VIDEO_START(seta_2_layers)
-	MDRV_VIDEO_UPDATE(seta)
+	MCFG_VIDEO_START(seta_2_layers)
+	MCFG_VIDEO_UPDATE(seta)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("x1snd", X1_010, 16000000)	/* 16 MHz */
-	MDRV_SOUND_CONFIG(seta_sound_intf)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("x1snd", X1_010, 16000000)	/* 16 MHz */
+	MCFG_SOUND_CONFIG(seta_sound_intf)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -8019,98 +8030,98 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( thunderl, seta_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 16000000/2)	/* 8 MHz */
-	MDRV_CPU_PROGRAM_MAP(thunderl_map)
-	MDRV_CPU_VBLANK_INT("screen", irq2_line_hold)
+	MCFG_CPU_ADD("maincpu", M68000, 16000000/2)	/* 8 MHz */
+	MCFG_CPU_PROGRAM_MAP(thunderl_map)
+	MCFG_CPU_VBLANK_INT("screen", irq2_line_hold)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 
-	MDRV_GFXDECODE(tndrcade)
-	MDRV_PALETTE_LENGTH(512)	/* sprites only */
+	MCFG_GFXDECODE(tndrcade)
+	MCFG_PALETTE_LENGTH(512)	/* sprites only */
 
-	MDRV_VIDEO_START(seta_no_layers)
-	MDRV_VIDEO_UPDATE(seta_no_layers) /* just draw the sprites */
+	MCFG_VIDEO_START(seta_no_layers)
+	MCFG_VIDEO_UPDATE(seta_no_layers) /* just draw the sprites */
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("x1snd", X1_010, 16000000)	/* 16 MHz */
-	MDRV_SOUND_CONFIG(seta_sound_intf)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("x1snd", X1_010, 16000000)	/* 16 MHz */
+	MCFG_SOUND_CONFIG(seta_sound_intf)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_START( wiggie, seta_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 16000000/2)	/* 8 MHz */
-	MDRV_CPU_PROGRAM_MAP(wiggie_map)
-	MDRV_CPU_VBLANK_INT("screen", irq2_line_hold)
+	MCFG_CPU_ADD("maincpu", M68000, 16000000/2)	/* 8 MHz */
+	MCFG_CPU_PROGRAM_MAP(wiggie_map)
+	MCFG_CPU_VBLANK_INT("screen", irq2_line_hold)
 
-	MDRV_CPU_ADD("audiocpu", Z80, 16000000/4)	/* 4 MHz */
-	MDRV_CPU_PROGRAM_MAP(wiggie_sound_map)
+	MCFG_CPU_ADD("audiocpu", Z80, 16000000/4)	/* 4 MHz */
+	MCFG_CPU_PROGRAM_MAP(wiggie_sound_map)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 
-	MDRV_GFXDECODE(wiggie)
-	MDRV_PALETTE_LENGTH(512)	/* sprites only */
+	MCFG_GFXDECODE(wiggie)
+	MCFG_PALETTE_LENGTH(512)	/* sprites only */
 
-	MDRV_VIDEO_START(seta_no_layers)
-	MDRV_VIDEO_UPDATE(seta_no_layers) /* just draw the sprites */
+	MCFG_VIDEO_START(seta_no_layers)
+	MCFG_VIDEO_UPDATE(seta_no_layers) /* just draw the sprites */
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( superbar, wiggie )
 
-	MDRV_GFXDECODE(superbar)
+	MCFG_GFXDECODE(superbar)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( wits, seta_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 16000000/2)	/* 8 MHz */
-	MDRV_CPU_PROGRAM_MAP(thunderl_map)
-	MDRV_CPU_VBLANK_INT("screen", irq2_line_hold)
+	MCFG_CPU_ADD("maincpu", M68000, 16000000/2)	/* 8 MHz */
+	MCFG_CPU_PROGRAM_MAP(thunderl_map)
+	MCFG_CPU_VBLANK_INT("screen", irq2_line_hold)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 
-	MDRV_GFXDECODE(tndrcade)
-	MDRV_PALETTE_LENGTH(512)	/* sprites only */
+	MCFG_GFXDECODE(tndrcade)
+	MCFG_PALETTE_LENGTH(512)	/* sprites only */
 
-	MDRV_VIDEO_START(seta_no_layers)
-	MDRV_VIDEO_UPDATE(seta_no_layers) /* just draw the sprites */
+	MCFG_VIDEO_START(seta_no_layers)
+	MCFG_VIDEO_UPDATE(seta_no_layers) /* just draw the sprites */
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("x1snd", X1_010, 16000000)	/* 16 MHz */
-	MDRV_SOUND_CONFIG(seta_sound_intf)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("x1snd", X1_010, 16000000)	/* 16 MHz */
+	MCFG_SOUND_CONFIG(seta_sound_intf)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -8121,31 +8132,31 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( umanclub, seta_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz */
-	MDRV_CPU_PROGRAM_MAP(umanclub_map)
-	MDRV_CPU_VBLANK_INT("screen", irq3_line_hold)
+	MCFG_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz */
+	MCFG_CPU_PROGRAM_MAP(umanclub_map)
+	MCFG_CPU_VBLANK_INT("screen", irq3_line_hold)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 
-	MDRV_GFXDECODE(tndrcade)
-	MDRV_PALETTE_LENGTH(512)
+	MCFG_GFXDECODE(tndrcade)
+	MCFG_PALETTE_LENGTH(512)
 
-	MDRV_VIDEO_START(seta_no_layers)
-	MDRV_VIDEO_UPDATE(seta_no_layers) /* just draw the sprites */
+	MCFG_VIDEO_START(seta_no_layers)
+	MCFG_VIDEO_UPDATE(seta_no_layers) /* just draw the sprites */
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("x1snd", X1_010, 16000000)	/* 16 MHz */
-	MDRV_SOUND_CONFIG(seta_sound_intf)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("x1snd", X1_010, 16000000)	/* 16 MHz */
+	MCFG_SOUND_CONFIG(seta_sound_intf)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -8156,40 +8167,40 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( utoukond, seta_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz */
-	MDRV_CPU_PROGRAM_MAP(utoukond_map)
-	MDRV_CPU_VBLANK_INT_HACK(seta_interrupt_1_and_2,SETA_INTERRUPTS_NUM)
+	MCFG_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz */
+	MCFG_CPU_PROGRAM_MAP(utoukond_map)
+	MCFG_CPU_VBLANK_INT_HACK(seta_interrupt_1_and_2,SETA_INTERRUPTS_NUM)
 
-	MDRV_CPU_ADD("audiocpu", Z80, 16000000/4)	/* 4 MHz */
-	MDRV_CPU_PROGRAM_MAP(utoukond_sound_map)
-	MDRV_CPU_IO_MAP(utoukond_sound_io_map)
+	MCFG_CPU_ADD("audiocpu", Z80, 16000000/4)	/* 4 MHz */
+	MCFG_CPU_PROGRAM_MAP(utoukond_sound_map)
+	MCFG_CPU_IO_MAP(utoukond_sound_io_map)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(msgundam)
-	MDRV_PALETTE_LENGTH(512 * 3)	/* sprites, layer2, layer1 */
+	MCFG_GFXDECODE(msgundam)
+	MCFG_PALETTE_LENGTH(512 * 3)	/* sprites, layer2, layer1 */
 
-	MDRV_VIDEO_START(seta_2_layers)
-	MDRV_VIDEO_UPDATE(seta)
+	MCFG_VIDEO_START(seta_2_layers)
+	MCFG_VIDEO_UPDATE(seta)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("x1snd", X1_010, 16000000)
-	MDRV_SOUND_CONFIG(seta_sound_intf)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("x1snd", X1_010, 16000000)
+	MCFG_SOUND_CONFIG(seta_sound_intf)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MDRV_SOUND_ADD("ymsnd", YM3438, 16000000/4)	/* 4 MHz */
-	MDRV_SOUND_CONFIG(utoukond_ym3438_intf)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 0.30)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 0.30)
+	MCFG_SOUND_ADD("ymsnd", YM3438, 16000000/4)	/* 4 MHz */
+	MCFG_SOUND_CONFIG(utoukond_ym3438_intf)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.30)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.30)
 MACHINE_CONFIG_END
 
 
@@ -8200,39 +8211,39 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( wrofaero, seta_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz */
-	MDRV_CPU_PROGRAM_MAP(wrofaero_map)
+	MCFG_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz */
+	MCFG_CPU_PROGRAM_MAP(wrofaero_map)
 #if	__uPD71054_TIMER
-	MDRV_CPU_VBLANK_INT("screen", wrofaero_interrupt)
+	MCFG_CPU_VBLANK_INT("screen", wrofaero_interrupt)
 #else
-	MDRV_CPU_VBLANK_INT_HACK(seta_interrupt_2_and_4,SETA_INTERRUPTS_NUM)
+	MCFG_CPU_VBLANK_INT_HACK(seta_interrupt_2_and_4,SETA_INTERRUPTS_NUM)
 #endif	// __uPD71054_TIMER
 
 #if	__uPD71054_TIMER
-	MDRV_MACHINE_START( wrofaero )
+	MCFG_MACHINE_START( wrofaero )
 #endif	// __uPD71054_TIMER
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 
-	MDRV_GFXDECODE(msgundam)
-	MDRV_PALETTE_LENGTH(512 * 3)	/* sprites, layer1, layer2 */
+	MCFG_GFXDECODE(msgundam)
+	MCFG_PALETTE_LENGTH(512 * 3)	/* sprites, layer1, layer2 */
 
-	MDRV_VIDEO_START(seta_2_layers)
-	MDRV_VIDEO_UPDATE(seta)
+	MCFG_VIDEO_START(seta_2_layers)
+	MCFG_VIDEO_UPDATE(seta)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("x1snd", X1_010, 16000000)	/* 16 MHz */
-	MDRV_SOUND_CONFIG(seta_sound_intf)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("x1snd", X1_010, 16000000)	/* 16 MHz */
+	MCFG_SOUND_CONFIG(seta_sound_intf)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -8250,32 +8261,32 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( zingzip, seta_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz */
-	MDRV_CPU_PROGRAM_MAP(wrofaero_map)
-	MDRV_CPU_VBLANK_INT("screen", irq3_line_hold)
+	MCFG_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz */
+	MCFG_CPU_PROGRAM_MAP(wrofaero_map)
+	MCFG_CPU_VBLANK_INT("screen", irq3_line_hold)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 
-	MDRV_GFXDECODE(zingzip)
-	MDRV_PALETTE_LENGTH(16*32+16*32+64*32)	/* sprites, layer2, layer1 */
+	MCFG_GFXDECODE(zingzip)
+	MCFG_PALETTE_LENGTH(16*32+16*32+64*32*2)	/* sprites, layer2, layer1 */
 
-	MDRV_PALETTE_INIT(zingzip)				/* layer 1 gfx is 6 planes deep */
-	MDRV_VIDEO_START(seta_2_layers)
-	MDRV_VIDEO_UPDATE(seta)
+	MCFG_PALETTE_INIT(zingzip)				/* layer 1 gfx is 6 planes deep */
+	MCFG_VIDEO_START(seta_2_layers)
+	MCFG_VIDEO_UPDATE(seta)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("x1snd", X1_010, 16000000)	/* 16 MHz */
-	MDRV_SOUND_CONFIG(seta_sound_intf)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("x1snd", X1_010, 16000000)	/* 16 MHz */
+	MCFG_SOUND_CONFIG(seta_sound_intf)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -8285,31 +8296,31 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( pairlove, seta_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 16000000/2)	/* 8 MHz */
-	MDRV_CPU_PROGRAM_MAP(pairlove_map)
-	MDRV_CPU_VBLANK_INT_HACK(seta_interrupt_1_and_2,SETA_INTERRUPTS_NUM)
+	MCFG_CPU_ADD("maincpu", M68000, 16000000/2)	/* 8 MHz */
+	MCFG_CPU_PROGRAM_MAP(pairlove_map)
+	MCFG_CPU_VBLANK_INT_HACK(seta_interrupt_1_and_2,SETA_INTERRUPTS_NUM)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 
-	MDRV_GFXDECODE(tndrcade)
-	MDRV_PALETTE_LENGTH(2048)	/* sprites only */
+	MCFG_GFXDECODE(tndrcade)
+	MCFG_PALETTE_LENGTH(2048)	/* sprites only */
 
-	MDRV_VIDEO_START(seta_no_layers)
-	MDRV_VIDEO_UPDATE(seta_no_layers) /* just draw the sprites */
+	MCFG_VIDEO_START(seta_no_layers)
+	MCFG_VIDEO_UPDATE(seta_no_layers) /* just draw the sprites */
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("x1snd", X1_010, 16000000)	/* 16 MHz */
-	MDRV_SOUND_CONFIG(seta_sound_intf)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("x1snd", X1_010, 16000000)	/* 16 MHz */
+	MCFG_SOUND_CONFIG(seta_sound_intf)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -8329,33 +8340,33 @@ static INTERRUPT_GEN( crazyfgt_interrupt )
 static MACHINE_CONFIG_START( crazyfgt, seta_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz */
-	MDRV_CPU_PROGRAM_MAP(crazyfgt_map)
-	MDRV_CPU_VBLANK_INT_HACK(crazyfgt_interrupt,1+5)
+	MCFG_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz */
+	MCFG_CPU_PROGRAM_MAP(crazyfgt_map)
+	MCFG_CPU_VBLANK_INT_HACK(crazyfgt_interrupt,1+5)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 2*8-4, 30*8-1-4)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 2*8-4, 30*8-1-4)
 
-	MDRV_GFXDECODE(crazyfgt)
-	MDRV_PALETTE_LENGTH(16*32+64*32+64*32)	/* sprites, layer1, layer2 */
+	MCFG_GFXDECODE(crazyfgt)
+	MCFG_PALETTE_LENGTH(16*32+64*32*4)	/* sprites, layer1, layer2 */
 
-	MDRV_PALETTE_INIT(gundhara)				/* layers are 6 planes deep (but have only 4 palettes) */
-	MDRV_VIDEO_START(seta_2_layers)
-	MDRV_VIDEO_UPDATE(seta)
+	MCFG_PALETTE_INIT(gundhara)				/* layers are 6 planes deep (but have only 4 palettes) */
+	MCFG_VIDEO_START(seta_2_layers)
+	MCFG_VIDEO_UPDATE(seta)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM3812, 16000000/4)	/* 4 MHz */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("ymsnd", YM3812, 16000000/4)	/* 4 MHz */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH)	// clock?
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH)	// clock?
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -8419,43 +8430,43 @@ static const pia6821_interface inttoote_pia1_intf =
 static MACHINE_CONFIG_START( inttoote, seta_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 16000000)
-	MDRV_CPU_PROGRAM_MAP(inttoote_map)
-	MDRV_CPU_VBLANK_INT_HACK(inttoote_interrupt,8+1+1+1)
+	MCFG_CPU_ADD("maincpu", M68000, 16000000)
+	MCFG_CPU_PROGRAM_MAP(inttoote_map)
+	MCFG_CPU_VBLANK_INT_HACK(inttoote_interrupt,8+1+1+1)
 
-	MDRV_PIA6821_ADD("pia0", inttoote_pia0_intf)
-	MDRV_PIA6821_ADD("pia1", inttoote_pia1_intf)
+	MCFG_PIA6821_ADD("pia0", inttoote_pia0_intf)
+	MCFG_PIA6821_ADD("pia1", inttoote_pia1_intf)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 
-	MDRV_GFXDECODE(inttoote)
-	MDRV_PALETTE_LENGTH(512 * 1)
+	MCFG_GFXDECODE(inttoote)
+	MCFG_PALETTE_LENGTH(512 * 1)
 
-	MDRV_PALETTE_INIT(inttoote)
-	MDRV_VIDEO_START(seta_1_layer)
-	MDRV_VIDEO_UPDATE(inttoote)
+	MCFG_PALETTE_INIT(inttoote)
+	MCFG_VIDEO_START(seta_1_layer)
+	MCFG_VIDEO_UPDATE(inttoote)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("x1snd", X1_010, 16000000)
-	MDRV_SOUND_CONFIG(seta_sound_intf)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("x1snd", X1_010, 16000000)
+	MCFG_SOUND_CONFIG(seta_sound_intf)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
 	/* devices */
-	MDRV_MSM6242_ADD("rtc")
+	MCFG_MSM6242_ADD("rtc")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( jockeyc, inttoote )
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(jockeyc_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(jockeyc_map)
 MACHINE_CONFIG_END
 
 
@@ -9903,7 +9914,7 @@ static DRIVER_INIT( arbalest )
 
 static DRIVER_INIT( metafox )
 {
-	UINT16 *RAM = (UINT16 *) memory_region(machine, "maincpu");
+	UINT16 *RAM = (UINT16 *) machine->region("maincpu")->base();
 
 	/* This game uses the 21c000-21ffff area for protection? */
 //  memory_nop_readwrite(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x21c000, 0x21ffff, 0, 0);
@@ -9926,7 +9937,7 @@ static DRIVER_INIT ( blandia )
 	rom_size = 0x80000;
 	buf = auto_alloc_array(machine, UINT8, rom_size);
 
-	rom = memory_region(machine, "gfx2") + 0x40000;
+	rom = machine->region("gfx2")->base() + 0x40000;
 
 	for (rpos = 0; rpos < rom_size/2; rpos++) {
 		buf[rpos+0x40000] = rom[rpos*2];
@@ -9935,7 +9946,7 @@ static DRIVER_INIT ( blandia )
 
 	memcpy( rom, buf, rom_size );
 
-	rom = memory_region(machine, "gfx3") + 0x40000;
+	rom = machine->region("gfx3")->base() + 0x40000;
 
 	for (rpos = 0; rpos < rom_size/2; rpos++) {
 		buf[rpos+0x40000] = rom[rpos*2];
@@ -9963,7 +9974,7 @@ static DRIVER_INIT( zombraid )
 
 static DRIVER_INIT( kiwame )
 {
-	UINT16 *RAM = (UINT16 *) memory_region(machine, "maincpu");
+	UINT16 *RAM = (UINT16 *) machine->region("maincpu")->base();
 
 	/* WARNING: This game writes to the interrupt vector
        table. Lev 1 routine address is stored at $100 */
@@ -9985,8 +9996,8 @@ static DRIVER_INIT( wiggie )
 	UINT8 temp[16];
 	int i,j;
 
-	src = memory_region(machine, "maincpu");
-	len = memory_region_length(machine, "maincpu");
+	src = machine->region("maincpu")->base();
+	len = machine->region("maincpu")->bytes();
 	for (i = 0;i < len;i += 16)
 	{
 		memcpy(temp,&src[i],16);
@@ -10016,7 +10027,7 @@ static DRIVER_INIT( wiggie )
 static DRIVER_INIT( crazyfgt )
 {
 	seta_state *state = machine->driver_data<seta_state>();
-	UINT16 *RAM = (UINT16 *) memory_region(machine, "maincpu");
+	UINT16 *RAM = (UINT16 *) machine->region("maincpu")->base();
 
 	// protection check at boot
 	RAM[0x1078/2] = 0x4e71;
@@ -10034,7 +10045,7 @@ static DRIVER_INIT( crazyfgt )
 static DRIVER_INIT( inttoote )
 {
 	seta_state *state = machine->driver_data<seta_state>();
-	UINT16 *ROM = (UINT16 *)memory_region( machine, "maincpu" );
+	UINT16 *ROM = (UINT16 *)machine->region( "maincpu" )->base();
 
 	// missing / unused video regs
 	state->vregs = auto_alloc_array_clear(machine, UINT16, 3);
@@ -10049,7 +10060,7 @@ static DRIVER_INIT( inttoote )
 static DRIVER_INIT( inttootea )
 {
 	seta_state *state = machine->driver_data<seta_state>();
-	//UINT16 *ROM = (UINT16 *)memory_region( machine, "maincpu" );
+	//UINT16 *ROM = (UINT16 *)machine->region( "maincpu" )->base();
 
 	// missing / unused video regs
 	state->vregs = auto_alloc_array_clear(machine, UINT16, 3);

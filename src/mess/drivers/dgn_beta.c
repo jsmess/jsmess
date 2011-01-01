@@ -317,43 +317,43 @@ GFXDECODE_END
 
 static MACHINE_CONFIG_START( dgnbeta, dgn_beta_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD(MAINCPU_TAG, M6809E, DGNBETA_CPU_SPEED_HZ)        /* 2 MHz */
-	MDRV_CPU_PROGRAM_MAP(dgnbeta_map)
+	MCFG_CPU_ADD(MAINCPU_TAG, M6809E, DGNBETA_CPU_SPEED_HZ)        /* 2 MHz */
+	MCFG_CPU_PROGRAM_MAP(dgnbeta_map)
 
 	/* both cpus in the beta share the same address/data busses */
-	MDRV_CPU_ADD(DMACPU_TAG, M6809E, DGNBETA_CPU_SPEED_HZ)        /* 2 MHz */
-	MDRV_CPU_PROGRAM_MAP(dgnbeta_map)
+	MCFG_CPU_ADD(DMACPU_TAG, M6809E, DGNBETA_CPU_SPEED_HZ)        /* 2 MHz */
+	MCFG_CPU_PROGRAM_MAP(dgnbeta_map)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(DGNBETA_FRAMES_PER_SECOND)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(100))
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(DGNBETA_FRAMES_PER_SECOND)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(100))
 
-	MDRV_MACHINE_START( dgnbeta )
+	MCFG_MACHINE_START( dgnbeta )
 
 	/* video hardware */
 
-	MDRV_SCREEN_SIZE(700,550)
-	MDRV_SCREEN_VISIBLE_AREA(0, 699, 0, 549)
-	MDRV_GFXDECODE(dgnbeta)
-	MDRV_PALETTE_LENGTH(ARRAY_LENGTH(dgnbeta_palette) / 3)
-	MDRV_PALETTE_INIT( dgnbeta )
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(700,550)
+	MCFG_SCREEN_VISIBLE_AREA(0, 699, 0, 549)
+	MCFG_GFXDECODE(dgnbeta)
+	MCFG_PALETTE_LENGTH(ARRAY_LENGTH(dgnbeta_palette) / 3)
+	MCFG_PALETTE_INIT( dgnbeta )
+	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 
-	MDRV_VIDEO_UPDATE( dgnbeta )
+	MCFG_VIDEO_UPDATE( dgnbeta )
 
-	MDRV_PIA6821_ADD( PIA_0_TAG, dgnbeta_pia_intf[0] )
-	MDRV_PIA6821_ADD( PIA_1_TAG, dgnbeta_pia_intf[1] )
-	MDRV_PIA6821_ADD( PIA_2_TAG, dgnbeta_pia_intf[2] )
+	MCFG_PIA6821_ADD( PIA_0_TAG, dgnbeta_pia_intf[0] )
+	MCFG_PIA6821_ADD( PIA_1_TAG, dgnbeta_pia_intf[1] )
+	MCFG_PIA6821_ADD( PIA_2_TAG, dgnbeta_pia_intf[2] )
 
-	MDRV_WD179X_ADD(FDC_TAG, dgnbeta_wd17xx_interface )
+	MCFG_WD179X_ADD(FDC_TAG, dgnbeta_wd17xx_interface )
 
-	MDRV_FLOPPY_4_DRIVES_ADD(dgnbeta_floppy_config)
+	MCFG_FLOPPY_4_DRIVES_ADD(dgnbeta_floppy_config)
 
 	/* internal ram */
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("256K")
-	MDRV_RAM_EXTRA_OPTIONS("128K,384K,512K,640K,768K")
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("256K")
+	MCFG_RAM_EXTRA_OPTIONS("128K,384K,512K,640K,768K")
 	/* Ram size can now be configured, since the machine was known as either the Dragon Beta or */
 	/* the Dragon 128, I have added a config for 128K, however, the only working machine known  */
 	/* to exist was fitted with 256K, so I have made this the default. Also available           */

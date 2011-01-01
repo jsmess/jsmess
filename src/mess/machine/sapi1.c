@@ -54,6 +54,6 @@ MACHINE_RESET( sapizps3 )
 
 DRIVER_INIT( sapizps3 )
 {
-	UINT8 *RAM = memory_region(machine, "maincpu");
+	UINT8 *RAM = machine->region("maincpu")->base();
 	memory_configure_bank(machine, "bank1", 0, 2, &RAM[0x0000], 0xf800);
 }

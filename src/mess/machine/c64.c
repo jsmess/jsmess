@@ -50,7 +50,7 @@
 static void c64_nmi( running_machine *machine )
 {
 	c64_state *state = machine->driver_data<c64_state>();
-	running_device *cia_1 = machine->device("cia_1");
+	device_t *cia_1 = machine->device("cia_1");
 	int cia1irq = mos6526_irq_r(cia_1);
 
 	if (state->nmilevel != (input_port_read(machine, "SPECIAL") & 0x80) || cia1irq)	/* KEY_RESTORE */
@@ -94,7 +94,7 @@ static READ8_DEVICE_HANDLER( c64_cia0_port_b_r )
 
 static WRITE8_DEVICE_HANDLER( c64_cia0_port_b_w )
 {
-	running_device *vic2 = device->machine->device("vic2");
+	device_t *vic2 = device->machine->device("vic2");
 	vic2_lightpen_write(vic2, data & 0x10);
 }
 
@@ -109,7 +109,7 @@ static void c64_irq( running_machine *machine, int level )
 	}
 }
 
-static void c64_cia0_interrupt( running_device *device, int level )
+static void c64_cia0_interrupt( device_t *device, int level )
 {
 	c64_state *state = device->machine->driver_data<c64_state>();
 	c64_irq (device->machine, level || state->vicirq);
@@ -118,7 +118,7 @@ static void c64_cia0_interrupt( running_device *device, int level )
 void c64_vic_interrupt( running_machine *machine, int level )
 {
 	c64_state *state = machine->driver_data<c64_state>();
-	running_device *cia_0 = machine->device("cia_0");
+	device_t *cia_0 = machine->device("cia_0");
 #if 1
 	if (level != state->vicirq)
 	{
@@ -181,7 +181,7 @@ const mos6526_interface c64_pal_cia0 =
 static READ8_DEVICE_HANDLER( c64_cia1_port_a_r )
 {
 	UINT8 value = 0xff;
-	running_device *serbus = device->machine->device("iec");
+	device_t *serbus = device->machine->device("iec");
 
 	if (!cbm_iec_clk_r(serbus))
 		value &= ~0x40;
@@ -196,7 +196,7 @@ static WRITE8_DEVICE_HANDLER( c64_cia1_port_a_w )
 {
 	c64_state *state = device->machine->driver_data<c64_state>();
 	static const int helper[4] = {0xc000, 0x8000, 0x4000, 0x0000};
-	running_device *serbus = device->machine->device("iec");
+	device_t *serbus = device->machine->device("iec");
 
 	cbm_iec_clk_w(serbus, device, !(data & 0x10));
 	cbm_iec_data_w(serbus, device, !(data & 0x20));
@@ -204,7 +204,7 @@ static WRITE8_DEVICE_HANDLER( c64_cia1_port_a_w )
 	state->vicaddr = state->memory + helper[data & 0x03];
 }
 
-static void c64_cia1_interrupt( running_device *device, int level )
+static void c64_cia1_interrupt( device_t *device, int level )
 {
 	c64_nmi(device->machine);
 }
@@ -245,10 +245,10 @@ const mos6526_interface c64_pal_cia1 =
 WRITE8_HANDLER( c64_write_io )
 {
 	c64_state *state = space->machine->driver_data<c64_state>();
-	running_device *cia_0 = space->machine->device("cia_0");
-	running_device *cia_1 = space->machine->device("cia_1");
-	running_device *sid = space->machine->device("sid6581");
-	running_device *vic2 = space->machine->device("vic2");
+	device_t *cia_0 = space->machine->device("cia_0");
+	device_t *cia_1 = space->machine->device("cia_1");
+	device_t *sid = space->machine->device("sid6581");
+	device_t *vic2 = space->machine->device("vic2");
 
 	state->io_mirror[offset] = data;
 	if (offset < 0x400)
@@ -284,10 +284,10 @@ WRITE8_HANDLER( c64_ioarea_w )
 READ8_HANDLER( c64_read_io )
 {
 	c64_state *state = space->machine->driver_data<c64_state>();
-	running_device *cia_0 = space->machine->device("cia_0");
-	running_device *cia_1 = space->machine->device("cia_1");
-	running_device *sid = space->machine->device("sid6581");
-	running_device *vic2 = space->machine->device("vic2");
+	device_t *cia_0 = space->machine->device("cia_0");
+	device_t *cia_1 = space->machine->device("cia_1");
+	device_t *sid = space->machine->device("sid6581");
+	device_t *vic2 = space->machine->device("vic2");
 
 	if (offset < 0x400)
 		return vic2_port_r(vic2, offset & 0x3ff);
@@ -546,7 +546,7 @@ static void c64_bankswitch( running_machine *machine, int reset )
   p6,7 not available on M6510
  */
 
-void c64_m6510_port_write( running_device *device, UINT8 direction, UINT8 data )
+void c64_m6510_port_write( device_t *device, UINT8 direction, UINT8 data )
 {
 	c64_state *state = device->machine->driver_data<c64_state>();
 
@@ -595,7 +595,7 @@ void c64_m6510_port_write( running_device *device, UINT8 direction, UINT8 data )
 
 }
 
-UINT8 c64_m6510_port_read( running_device *device, UINT8 direction )
+UINT8 c64_m6510_port_read( device_t *device, UINT8 direction )
 {
 	c64_state *state = device->machine->driver_data<c64_state>();
 	UINT8 data = state->port_data;
@@ -612,7 +612,7 @@ UINT8 c64_m6510_port_read( running_device *device, UINT8 direction )
 }
 
 
-int c64_paddle_read( running_device *device, int which )
+int c64_paddle_read( device_t *device, int which )
 {
 	running_machine *machine = device->machine;
 	int pot1 = 0xff, pot2 = 0xff, pot3 = 0xff, pot4 = 0xff, temp;
@@ -741,7 +741,7 @@ WRITE8_HANDLER( c64_colorram_write )
 TIMER_CALLBACK( c64_tape_timer )
 {
 	double tmp = cassette_input(machine->device("cassette"));
-	running_device *cia_0 = machine->device("cia_0");
+	device_t *cia_0 = machine->device("cia_0");
 
 	mos6526_flag_w(cia_0, tmp > +0.0);
 }
@@ -756,7 +756,7 @@ static void c64_common_driver_init( running_machine *machine )
 
 	if (!state->ultimax)
 	{
-		UINT8 *mem = memory_region(machine, "maincpu");
+		UINT8 *mem = machine->region("maincpu")->base();
 		state->basic    = mem + 0x10000;
 		state->kernal   = mem + 0x12000;
 		state->chargen  = mem + 0x14000;
@@ -1023,7 +1023,7 @@ static int c64_crt_load( device_image_interface &image )
 	const char *filetype = image.filetype();
 	int address = 0, new_start = 0;
 	// int lbank_end_addr = 0, hbank_end_addr = 0;
-	UINT8 *cart_cpy = memory_region(image.device().machine, "user1");
+	UINT8 *cart_cpy = image.device().machine->region("user1")->base();
 
 	/* We support .crt files */
 	if (!mame_stricmp(filetype, "crt"))
@@ -1310,7 +1310,7 @@ static WRITE8_HANDLER( fc3_bank_w )
 	// not working:
 
 	UINT8 bank = data & 0x3f;
-	UINT8 *cart = memory_region(space->machine, "user1");
+	UINT8 *cart = space->machine->region("user1")->base();
 
 	if (data & 0x40)
 	{
@@ -1340,7 +1340,7 @@ static WRITE8_HANDLER( ocean1_bank_w )
 	// not working: Pang, Robocop 2, Toki
 
 	UINT8 bank = data & 0x3f;
-	UINT8 *cart = memory_region(space->machine, "user1");
+	UINT8 *cart = space->machine->region("user1")->base();
 
 	switch (state->cart.bank[bank].addr)
 	{
@@ -1375,7 +1375,7 @@ static WRITE8_HANDLER( funplay_bank_w )
 	// not working:
 
 	UINT8 bank = data & 0x39, real_bank = 0;
-	UINT8 *cart = memory_region(space->machine, "user1");
+	UINT8 *cart = space->machine->region("user1")->base();
 
 	/* This should be written after the bankswitch has happened. We log it to see if it is really working */
 	if (data == 0x86)
@@ -1405,7 +1405,7 @@ static WRITE8_HANDLER( supergames_bank_w )
 	// not working:
 
 	UINT8 bank = data & 0x03, bit2 = data & 0x04;
-	UINT8 *cart = memory_region(space->machine, "user1");
+	UINT8 *cart = space->machine->region("user1")->base();
 
 	if (data & 0x04)
 	{
@@ -1444,7 +1444,7 @@ static WRITE8_HANDLER( c64gs_bank_w )
 	// not working: The Last Ninja Remix
 
 	UINT8 bank = offset & 0xff;
-	UINT8 *cart = memory_region(space->machine, "user1");
+	UINT8 *cart = space->machine->region("user1")->base();
 
 	if (bank > 0x3f)
 		logerror("Warning: This cart type should have at most 64 banks and the cart looked for bank %d... Something strange is going on!\n", bank);
@@ -1468,7 +1468,7 @@ static READ8_HANDLER( dinamic_bank_r )
 	// not working:
 
 	UINT8 bank = offset & 0xff;
-	UINT8 *cart = memory_region(space->machine, "user1");
+	UINT8 *cart = space->machine->region("user1")->base();
 
 	if (bank > 0xf)
 		logerror("Warning: This cart type should have 16 banks and the cart looked for bank %d... Something strange is going on!\n", bank);
@@ -1493,7 +1493,7 @@ static READ8_HANDLER( zaxxon_bank_r )
 	// not working:
 
 	UINT8 bank;
-	UINT8 *cart = memory_region(space->machine, "user1");
+	UINT8 *cart = space->machine->region("user1")->base();
 
 	if (offset < 0x1000)
 		bank = 0;
@@ -1516,7 +1516,7 @@ static WRITE8_HANDLER( domark_bank_w )
 	// not working:
 
 	UINT8 bank = data & 0x7f;
-	UINT8 *cart = memory_region(space->machine, "user1");
+	UINT8 *cart = space->machine->region("user1")->base();
 
 	if (data & 0x80)
 	{
@@ -1539,7 +1539,7 @@ static WRITE8_HANDLER( comal80_bank_w )
 	// not working:
 
 	UINT8 bank = data & 0x83;
-	UINT8 *cart = memory_region(space->machine, "user1");
+	UINT8 *cart = space->machine->region("user1")->base();
 
 	/* only valid values 0x80, 0x81, 0x82, 0x83 */
 	if (!(bank & 0x80))
@@ -1632,30 +1632,30 @@ MACHINE_RESET( c64 )
 
 
 MACHINE_CONFIG_FRAGMENT( c64_cartslot )
-	MDRV_CARTSLOT_ADD("cart1")
-	MDRV_CARTSLOT_EXTENSION_LIST("crt,80")
-	MDRV_CARTSLOT_NOT_MANDATORY
-	MDRV_CARTSLOT_START(c64_cart)
-	MDRV_CARTSLOT_LOAD(c64_cart)
-	MDRV_CARTSLOT_UNLOAD(c64_cart)
+	MCFG_CARTSLOT_ADD("cart1")
+	MCFG_CARTSLOT_EXTENSION_LIST("crt,80")
+	MCFG_CARTSLOT_NOT_MANDATORY
+	MCFG_CARTSLOT_START(c64_cart)
+	MCFG_CARTSLOT_LOAD(c64_cart)
+	MCFG_CARTSLOT_UNLOAD(c64_cart)
 
-	MDRV_CARTSLOT_ADD("cart2")
-	MDRV_CARTSLOT_EXTENSION_LIST("crt,80")
-	MDRV_CARTSLOT_NOT_MANDATORY
-	MDRV_CARTSLOT_START(c64_cart)
-	MDRV_CARTSLOT_LOAD(c64_cart)
-	MDRV_CARTSLOT_UNLOAD(c64_cart)
+	MCFG_CARTSLOT_ADD("cart2")
+	MCFG_CARTSLOT_EXTENSION_LIST("crt,80")
+	MCFG_CARTSLOT_NOT_MANDATORY
+	MCFG_CARTSLOT_START(c64_cart)
+	MCFG_CARTSLOT_LOAD(c64_cart)
+	MCFG_CARTSLOT_UNLOAD(c64_cart)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_FRAGMENT( ultimax_cartslot )
-	MDRV_CARTSLOT_ADD("cart")
-	MDRV_CARTSLOT_EXTENSION_LIST("crt,e0,f0")
-	MDRV_CARTSLOT_MANDATORY
-	MDRV_CARTSLOT_INTERFACE("ultimax_cart")
-	MDRV_CARTSLOT_START(c64_cart)
-	MDRV_CARTSLOT_LOAD(max_cart)
-	MDRV_CARTSLOT_UNLOAD(c64_cart)
+	MCFG_CARTSLOT_ADD("cart")
+	MCFG_CARTSLOT_EXTENSION_LIST("crt,e0,f0")
+	MCFG_CARTSLOT_MANDATORY
+	MCFG_CARTSLOT_INTERFACE("ultimax_cart")
+	MCFG_CARTSLOT_START(c64_cart)
+	MCFG_CARTSLOT_LOAD(max_cart)
+	MCFG_CARTSLOT_UNLOAD(c64_cart)
 
 	/* software lists */
-	MDRV_SOFTWARE_LIST_ADD("cart_list","max")
+	MCFG_SOFTWARE_LIST_ADD("cart_list","max")
 MACHINE_CONFIG_END

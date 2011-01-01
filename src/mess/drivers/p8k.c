@@ -176,7 +176,7 @@ static VIDEO_UPDATE( p8k )
 
 ****************************************************************************/
 
-static void p8k_daisy_interrupt(running_device *device, int state)
+static void p8k_daisy_interrupt(device_t *device, int state)
 {
 	cputag_set_input_line(device->machine, "maincpu", 0, state);
 }
@@ -187,7 +187,7 @@ static WRITE_LINE_DEVICE_HANDLER( p8k_dma_irq_w )
 {
 	if (state)
 	{
-		running_device *i8272 = device->machine->device("i8272");
+		device_t *i8272 = device->machine->device("i8272");
 		upd765_tc_w(i8272, state);
 	}
 
@@ -328,7 +328,7 @@ static const z80_daisy_config p8k_daisy_chain[] =
 
 static WRITE_LINE_DEVICE_HANDLER( p8k_i8272_irq_w )
 {
-	running_device *z80pio = device->machine->device("z80pio_2");
+	device_t *z80pio = device->machine->device("z80pio_2");
 
 	z80pio_pb_w(z80pio, 0, (state) ? 0x10 : 0x00);
 }
@@ -360,7 +360,7 @@ static const floppy_config p8k_floppy_config =
 
 ****************************************************************************/
 
-static void p8k_16_daisy_interrupt(running_device *device, int state)
+static void p8k_16_daisy_interrupt(device_t *device, int state)
 {
 	// this must be studied a little bit more :-)
 }
@@ -501,83 +501,83 @@ GFXDECODE_END
 
 static MACHINE_CONFIG_START( p8k, p8k_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, XTAL_4MHz )
-	MDRV_CPU_CONFIG(p8k_daisy_chain)
-	MDRV_CPU_PROGRAM_MAP(p8k_memmap)
-	MDRV_CPU_IO_MAP(p8k_iomap)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_4MHz )
+	MCFG_CPU_CONFIG(p8k_daisy_chain)
+	MCFG_CPU_PROGRAM_MAP(p8k_memmap)
+	MCFG_CPU_IO_MAP(p8k_iomap)
 
-//  MDRV_MACHINE_START( p8000_8 )
-	MDRV_MACHINE_RESET(p8k)
+//  MCFG_MACHINE_START( p8000_8 )
+	MCFG_MACHINE_RESET(p8k)
 
 	/* peripheral hardware */
-	MDRV_Z80DMA_ADD("z80dma", XTAL_4MHz, p8k_dma_intf)
-	MDRV_Z80CTC_ADD("z80ctc_0", 1229000, p8k_ctc_0_intf)	/* 1.22MHz clock */
-	MDRV_Z80CTC_ADD("z80ctc_1", 1229000, p8k_ctc_1_intf)	/* 1.22MHz clock */
-	MDRV_Z80SIO_ADD("z80sio_0", 9600, p8k_sio_0_intf)	/* 9.6kBaud default */
-	MDRV_Z80SIO_ADD("z80sio_1", 9600, p8k_sio_1_intf)	/* 9.6kBaud default */
-	MDRV_Z80PIO_ADD("z80pio_0", 1229000, p8k_pio_0_intf)
-	MDRV_Z80PIO_ADD("z80pio_1", 1229000, p8k_pio_1_intf)
-	MDRV_Z80PIO_ADD("z80pio_2", 1229000, p8k_pio_2_intf)
-	MDRV_UPD765A_ADD("i8272", p8k_i8272_intf)
-	MDRV_FLOPPY_2_DRIVES_ADD(p8k_floppy_config)
+	MCFG_Z80DMA_ADD("z80dma", XTAL_4MHz, p8k_dma_intf)
+	MCFG_Z80CTC_ADD("z80ctc_0", 1229000, p8k_ctc_0_intf)	/* 1.22MHz clock */
+	MCFG_Z80CTC_ADD("z80ctc_1", 1229000, p8k_ctc_1_intf)	/* 1.22MHz clock */
+	MCFG_Z80SIO_ADD("z80sio_0", 9600, p8k_sio_0_intf)	/* 9.6kBaud default */
+	MCFG_Z80SIO_ADD("z80sio_1", 9600, p8k_sio_1_intf)	/* 9.6kBaud default */
+	MCFG_Z80PIO_ADD("z80pio_0", 1229000, p8k_pio_0_intf)
+	MCFG_Z80PIO_ADD("z80pio_1", 1229000, p8k_pio_1_intf)
+	MCFG_Z80PIO_ADD("z80pio_2", 1229000, p8k_pio_2_intf)
+	MCFG_UPD765A_ADD("i8272", p8k_i8272_intf)
+	MCFG_FLOPPY_2_DRIVES_ADD(p8k_floppy_config)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("beep", BEEP, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+	MCFG_SOUND_ADD("beep", BEEP, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB15)
-	MDRV_SCREEN_REFRESH_RATE(15)
-	MDRV_SCREEN_SIZE(640,480)
-	MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MDRV_GFXDECODE(p8k)
-	MDRV_PALETTE_LENGTH(2)
-	MDRV_PALETTE_INIT(black_and_white)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB15)
+	MCFG_SCREEN_REFRESH_RATE(15)
+	MCFG_SCREEN_SIZE(640,480)
+	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+	MCFG_GFXDECODE(p8k)
+	MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_INIT(black_and_white)
 
-	MDRV_VIDEO_START(p8k)
-	MDRV_VIDEO_UPDATE(p8k)
+	MCFG_VIDEO_START(p8k)
+	MCFG_VIDEO_UPDATE(p8k)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( p8k_16, p8k_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z8001, XTAL_4MHz )	// actually z8001, appropriate changes pending
-	MDRV_CPU_CONFIG(p8k_16_daisy_chain)
-	MDRV_CPU_PROGRAM_MAP(p8k_16_memmap)
-//  MDRV_CPU_IO_MAP(p8k_16_iomap)
+	MCFG_CPU_ADD("maincpu", Z8001, XTAL_4MHz )	// actually z8001, appropriate changes pending
+	MCFG_CPU_CONFIG(p8k_16_daisy_chain)
+	MCFG_CPU_PROGRAM_MAP(p8k_16_memmap)
+//  MCFG_CPU_IO_MAP(p8k_16_iomap)
 
-//  MDRV_MACHINE_START( p8000_16 )
-	MDRV_MACHINE_RESET(p8k_16)
+//  MCFG_MACHINE_START( p8000_16 )
+	MCFG_MACHINE_RESET(p8k_16)
 
 	/* peripheral hardware */
-	MDRV_Z80CTC_ADD("z80ctc_0", XTAL_4MHz, p8k_16_ctc_0_intf)
-	MDRV_Z80CTC_ADD("z80ctc_1", XTAL_4MHz, p8k_16_ctc_1_intf)
-	MDRV_Z80SIO_ADD("z80sio_0", 9600, p8k_16_sio_0_intf)
-	MDRV_Z80SIO_ADD("z80sio_1", 9600, p8k_16_sio_1_intf)
-	MDRV_Z80PIO_ADD("z80pio_0", XTAL_4MHz, p8k_16_pio_0_intf )
-	MDRV_Z80PIO_ADD("z80pio_1", XTAL_4MHz, p8k_16_pio_1_intf )
-	MDRV_Z80PIO_ADD("z80pio_2", XTAL_4MHz, p8k_16_pio_2_intf )
+	MCFG_Z80CTC_ADD("z80ctc_0", XTAL_4MHz, p8k_16_ctc_0_intf)
+	MCFG_Z80CTC_ADD("z80ctc_1", XTAL_4MHz, p8k_16_ctc_1_intf)
+	MCFG_Z80SIO_ADD("z80sio_0", 9600, p8k_16_sio_0_intf)
+	MCFG_Z80SIO_ADD("z80sio_1", 9600, p8k_16_sio_1_intf)
+	MCFG_Z80PIO_ADD("z80pio_0", XTAL_4MHz, p8k_16_pio_0_intf )
+	MCFG_Z80PIO_ADD("z80pio_1", XTAL_4MHz, p8k_16_pio_1_intf )
+	MCFG_Z80PIO_ADD("z80pio_2", XTAL_4MHz, p8k_16_pio_2_intf )
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("beep", BEEP, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+	MCFG_SOUND_ADD("beep", BEEP, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB15)
-	MDRV_SCREEN_REFRESH_RATE(15)
-	MDRV_SCREEN_SIZE(640,480)
-	MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MDRV_GFXDECODE(p8k)
-	MDRV_PALETTE_LENGTH(2)
-	MDRV_PALETTE_INIT(black_and_white)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB15)
+	MCFG_SCREEN_REFRESH_RATE(15)
+	MCFG_SCREEN_SIZE(640,480)
+	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+	MCFG_GFXDECODE(p8k)
+	MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_INIT(black_and_white)
 
-	MDRV_VIDEO_START(p8k)
-	MDRV_VIDEO_UPDATE(p8k)
+	MCFG_VIDEO_START(p8k)
+	MCFG_VIDEO_UPDATE(p8k)
 MACHINE_CONFIG_END
 
 /* ROM definition */

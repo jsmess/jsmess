@@ -164,7 +164,7 @@ struct _ay_ym_param
 typedef struct _ay8910_context ay8910_context;
 struct _ay8910_context
 {
-	running_device *device;
+	device_t *device;
 	int streams;
 	int ready;
 	sound_stream *channel;
@@ -197,7 +197,7 @@ struct _ay8910_context
 	devcb_resolved_write8 portBwrite;
 };
 
-INLINE ay8910_context *get_safe_token(running_device *device)
+INLINE ay8910_context *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == AY8910 ||
@@ -703,7 +703,7 @@ static void build_mixer_table(ay8910_context *psg)
 	build_3D_table(psg->intf->res_load[0], psg->par, psg->par_env, normalize, 3, psg->zero_is_off, psg->vol3d_table);
 }
 
-static void ay8910_statesave(ay8910_context *psg, running_device *device)
+static void ay8910_statesave(ay8910_context *psg, device_t *device)
 {
 	state_save_register_device_item(device, 0, psg->register_latch);
 	state_save_register_device_item_array(device, 0, psg->regs);
@@ -734,7 +734,7 @@ static void ay8910_statesave(ay8910_context *psg, running_device *device)
  *
  *************************************/
 
-void *ay8910_start_ym(void *infoptr, device_type chip_type, running_device *device, int clock, const ay8910_interface *intf)
+void *ay8910_start_ym(void *infoptr, device_type chip_type, device_t *device, int clock, const ay8910_interface *intf)
 {
 	ay8910_context *info = (ay8910_context *)infoptr;
 
@@ -826,7 +826,7 @@ void ay8910_reset_ym(void *chip)
 #endif
 }
 
-void ay8910_set_volume(running_device *device,int channel,int volume)
+void ay8910_set_volume(device_t *device,int channel,int volume)
 {
 	ay8910_context *psg = get_safe_token(device);
 	int ch;
@@ -868,6 +868,7 @@ void ay8910_write_ym(void *chip, int addr, int data)
 int ay8910_read_ym(void *chip)
 {
 	ay8910_context *psg = (ay8910_context *)chip;
+	device_type chip_type = psg->device->type();
 	int r = psg->register_latch;
 
 	if (r > 15) return 0;
@@ -898,7 +899,21 @@ int ay8910_read_ym(void *chip)
 			logerror("%s: warning - read 8910 '%s' Port B\n",cpuexec_describe_context(psg->device->machine),psg->device->tag());
 		break;
 	}
-	return psg->regs[r];
+
+	/* Depending on chip type, unused bits in registers may or may not be accessible.
+    Untested chips are assumed to regard them as 'ram'
+    Tested and confirmed on hardware:
+    - AY-3-8910: inaccessible bits (see masks below) read back as 0
+    - YM2149: no anomaly
+    */
+	if (chip_type == AY8910) {
+		const UINT8 mask[0x10]={
+			0xff,0x0f,0xff,0x0f,0xff,0x0f,0x1f,0xff,0x1f,0x1f,0x1f,0xff,0xff,0x0f,0xff,0xff
+		};
+
+		return psg->regs[r] & mask[r];
+	}
+	else return psg->regs[r];
 }
 
 /*************************************

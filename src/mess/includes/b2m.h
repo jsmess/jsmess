@@ -35,9 +35,9 @@ public:
 	UINT8 vblank_state;
 
 	/* devices */
-	running_device *fdc;
-	running_device *pic;
-	running_device *speaker;
+	device_t *fdc;
+	device_t *pic;
+	device_t *speaker;
 };
 
 /*----------- defined in machine/b2m.c -----------*/

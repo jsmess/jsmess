@@ -93,7 +93,7 @@ static WRITE16_HANDLER( paloff_w )
 static WRITE16_HANDLER( pcup_prgbank_w )
 {
     int bank;
-    UINT8 *ROM1 = memory_region(space->machine, "user1");
+    UINT8 *ROM1 = space->machine->region("user1")->base();
 
     if (ACCESSING_BITS_0_7)
     {
@@ -110,13 +110,13 @@ static WRITE16_HANDLER( paldat_w )
 
 static READ16_HANDLER( peno_rand )
 {
-    return 0xffff;// mame_rand(space->machine);
+    return 0xffff;// space->machine->rand();
 }
 
 #ifdef UNUSED_FUNCTION
 static READ16_HANDLER( peno_rand2 )
 {
-    return mame_rand(space->machine);
+    return space->machine->rand();
 }
 #endif
 
@@ -224,23 +224,23 @@ static INTERRUPT_GEN( ttchamp_irq ) /* right? */
 
 static MACHINE_CONFIG_START( ttchamp, driver_device )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", V30, 8000000)
-	MDRV_CPU_PROGRAM_MAP(ttchamp_map)
-	MDRV_CPU_IO_MAP(ttchamp_io)
-	MDRV_CPU_VBLANK_INT("screen", ttchamp_irq)
+	MCFG_CPU_ADD("maincpu", V30, 8000000)
+	MCFG_CPU_PROGRAM_MAP(ttchamp_map)
+	MCFG_CPU_IO_MAP(ttchamp_io)
+	MCFG_CPU_VBLANK_INT("screen", ttchamp_irq)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(1024,1024)
-	MDRV_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(1024,1024)
+	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
 
-	MDRV_PALETTE_LENGTH(0x8000)
+	MCFG_PALETTE_LENGTH(0x8000)
 
-	MDRV_VIDEO_START(ttchamp)
-	MDRV_VIDEO_UPDATE(ttchamp)
+	MCFG_VIDEO_START(ttchamp)
+	MCFG_VIDEO_UPDATE(ttchamp)
 MACHINE_CONFIG_END
 
 ROM_START( ttchamp )
@@ -322,7 +322,7 @@ ROM_END
 
 static DRIVER_INIT (ttchamp)
 {
-	UINT8 *ROM1 = memory_region(machine, "user1");
+	UINT8 *ROM1 = machine->region("user1")->base();
 	memory_set_bankptr(machine, "bank1",&ROM1[0x120000]);
 	memory_set_bankptr(machine, "bank2",&ROM1[0x180000]);
 }

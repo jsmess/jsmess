@@ -88,7 +88,7 @@ struct _pioneer_pia
 typedef struct _simutrek_data simutrek_data;
 struct _simutrek_data
 {
-	running_device *cpu;					/* 8748 CPU device */
+	device_t *cpu;					/* 8748 CPU device */
 	UINT8				audio_squelch;			/* audio squelch value */
 	UINT8				data;					/* parallel data for simutrek */
 	UINT8				data_ready;				/* ready flag for simutrek data */
@@ -109,7 +109,7 @@ struct _ldplayer_data
 	attotime			firstbittime;			/* time of first bit in command */
 
 	/* low-level emulation data */
-	running_device *cpu;					/* 8049 CPU device */
+	device_t *cpu;					/* 8049 CPU device */
 	attotime			slowtrg;				/* time of the last SLOW TRG */
 	pioneer_pia			pia;					/* PIA state */
 	UINT8				vsync;					/* live VSYNC state */
@@ -286,8 +286,8 @@ ADDRESS_MAP_END
 
 
 static MACHINE_CONFIG_FRAGMENT( pr8210 )
-	MDRV_CPU_ADD("pr8210", I8049, XTAL_4_41MHz)
-	MDRV_CPU_IO_MAP(pr8210_portmap)
+	MCFG_CPU_ADD("pr8210", I8049, XTAL_4_41MHz)
+	MCFG_CPU_IO_MAP(pr8210_portmap)
 MACHINE_CONFIG_END
 
 
@@ -997,10 +997,10 @@ ADDRESS_MAP_END
 
 
 static MACHINE_CONFIG_FRAGMENT( simutrek )
-	MDRV_CPU_ADD("simutrek", I8748, XTAL_6MHz)
-	MDRV_CPU_IO_MAP(simutrek_portmap)
+	MCFG_CPU_ADD("simutrek", I8748, XTAL_6MHz)
+	MCFG_CPU_IO_MAP(simutrek_portmap)
 
-	MDRV_FRAGMENT_ADD(pr8210)
+	MCFG_FRAGMENT_ADD(pr8210)
 MACHINE_CONFIG_END
 
 
@@ -1054,7 +1054,7 @@ const ldplayer_interface simutrek_interface =
     command to enable/disable audio squelch
 -------------------------------------------------*/
 
-void simutrek_set_audio_squelch(running_device *device, int state)
+void simutrek_set_audio_squelch(device_t *device, int state)
 {
 	laserdisc_state *ld = ldcore_get_safe_token(device);
 	ldplayer_data *player = ld->player;

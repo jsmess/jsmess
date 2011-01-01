@@ -30,7 +30,7 @@ struct _nmk112_state
     INLINE FUNCTIONS
 *****************************************************************************/
 
-INLINE nmk112_state *get_safe_token( running_device *device )
+INLINE nmk112_state *get_safe_token( device_t *device )
 {
 	assert(device != NULL);
 	assert(device->type() == NMK112);
@@ -38,7 +38,7 @@ INLINE nmk112_state *get_safe_token( running_device *device )
 	return (nmk112_state *)downcast<legacy_device_base *>(device)->token();
 }
 
-INLINE const nmk112_interface *get_interface( running_device *device )
+INLINE const nmk112_interface *get_interface( device_t *device )
 {
 	assert(device != NULL);
 	assert((device->type() == NMK112));
@@ -128,10 +128,10 @@ static DEVICE_START( nmk112 )
 	nmk112_state *nmk112 = get_safe_token(device);
 	const nmk112_interface *intf = get_interface(device);
 
-	nmk112->rom0 = memory_region(device->machine, intf->rgn0);
-	nmk112->size0 = memory_region_length(device->machine, intf->rgn0) - 0x40000;
-	nmk112->rom1 = memory_region(device->machine, intf->rgn1);
-	nmk112->size1 = memory_region_length(device->machine, intf->rgn1) - 0x40000;
+	nmk112->rom0 = device->machine->region(intf->rgn0)->base();
+	nmk112->size0 = device->machine->region(intf->rgn0)->bytes() - 0x40000;
+	nmk112->rom1 = device->machine->region(intf->rgn1)->base();
+	nmk112->size1 = device->machine->region(intf->rgn1)->bytes() - 0x40000;
 
 	nmk112->page_mask = ~intf->disable_page_mask;
 

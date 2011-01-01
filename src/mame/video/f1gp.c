@@ -52,10 +52,10 @@ VIDEO_START( f1gp )
 
 	tilemap_set_transparent_pen(state->fg_tilemap, 0xff);
 
-	state->zoomdata = (UINT16 *)memory_region(machine, "gfx4");
+	state->zoomdata = (UINT16 *)machine->region("gfx4")->base();
 	gfx_element_set_source(machine->gfx[3], (UINT8 *)state->zoomdata);
 
-//  state_save_register_global_pointer(machine, state->zoomdata, memory_region_length(machine, "gfx4"));
+//  state_save_register_global_pointer(machine, state->zoomdata, machine->region("gfx4")->bytes());
 }
 
 
@@ -68,10 +68,10 @@ VIDEO_START( f1gpb )
 
 	tilemap_set_transparent_pen(state->fg_tilemap, 0xff);
 
-	state->zoomdata = (UINT16 *)memory_region(machine, "gfx4");
+	state->zoomdata = (UINT16 *)machine->region("gfx4")->base();
 	gfx_element_set_source(machine->gfx[3], (UINT8 *)state->zoomdata);
 
-//  state_save_register_global_pointer(machine, state->zoomdata, memory_region_length(machine, "gfx4"));
+//  state_save_register_global_pointer(machine, state->zoomdata, machine->region("gfx4")->bytes());
 }
 
 VIDEO_START( f1gp2 )
@@ -307,7 +307,7 @@ static void f1gpb_draw_sprites( running_machine *machine, bitmap_t *bitmap,const
 		if((spriteram[attr_start + 1] & 0x00f0) && (spriteram[attr_start + 1] & 0x00f0) != 0xc0)
 		{
 			printf("attr %X\n",spriteram[attr_start + 1] & 0x00f0);
-			code = mame_rand(machine);
+			code = machine->rand();
 		}
 
 /*
@@ -405,7 +405,7 @@ static void f1gp2_draw_sprites( running_machine *machine, bitmap_t *bitmap, cons
 		zoomy = 32 - zoomy;
 
 		if (state->spritelist[attr_start + 2] & 0x20ff)
-			color = mame_rand(machine);
+			color = machine->rand();
 
 		for (y = 0; y <= ysize; y++)
 		{

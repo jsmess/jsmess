@@ -140,7 +140,7 @@ static WRITE32_HANDLER( polygonet_eeprom_w )
 static READ32_HANDLER( ttl_rom_r )
 {
 	UINT32 *ROM;
-	ROM = (UINT32 *)memory_region(space->machine, "gfx1");
+	ROM = (UINT32 *)space->machine->region("gfx1")->base();
 
 	return ROM[offset];
 }
@@ -149,7 +149,7 @@ static READ32_HANDLER( ttl_rom_r )
 static READ32_HANDLER( psac_rom_r )
 {
 	UINT32 *ROM;
-	ROM = (UINT32 *)memory_region(space->machine, "gfx2");
+	ROM = (UINT32 *)space->machine->region("gfx2")->base();
 
 	return ROM[offset];
 }
@@ -333,12 +333,12 @@ DIRECT_UPDATE_HANDLER( plygonet_dsp56k_direct_handler )
 	/* If the requested region wasn't in there, see if it needs to be caught driver-side */
 	if (address >= (0x7000<<1) && address <= (0x7fff<<1))
 	{
-		direct.explicit_configure(0x7000<<1, 0x7fff<<1, 0xfff<<1, state->dsp56k_p_mirror);
+		direct.explicit_configure(0x7000<<1, 0x7fff<<1, (0xfff<<1) | 1, state->dsp56k_p_mirror);
 		return ~0;
 	}
 	else if (address >= (0x8000<<1) && address <= (0x87ff<<1))
 	{
-		direct.explicit_configure(0x8000<<1, 0x87ff<<1, 0x7ff<<1, state->dsp56k_p_8000);
+		direct.explicit_configure(0x8000<<1, 0x87ff<<1, (0x7ff<<1) | 1, state->dsp56k_p_8000);
 		return ~0;
 	}
 
@@ -360,7 +360,7 @@ DIRECT_UPDATE_HANDLER( plygonet_dsp56k_direct_handler )
                                  bit 0002 turns on *just* before this happens.
 */
 
-static UINT8 dsp56k_bank_group(running_device* cpu)
+static UINT8 dsp56k_bank_group(device_t* cpu)
 {
 	UINT16 portC = dsp56k_get_peripheral_memory(cpu, 0xffe3);
 
@@ -373,7 +373,7 @@ static UINT8 dsp56k_bank_group(running_device* cpu)
 	return INVALID_BANK_GROUP;
 }
 
-static UINT8 dsp56k_bank_num(running_device* cpu, UINT8 bank_group)
+static UINT8 dsp56k_bank_num(device_t* cpu, UINT8 bank_group)
 {
 	UINT16 portC = dsp56k_get_peripheral_memory(cpu, 0xffe3);
 
@@ -550,7 +550,7 @@ static ADDRESS_MAP_START( dsp_program_map, ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dsp_data_map, ADDRESS_SPACE_DATA, 16 )
-	AM_RANGE(0x0800, 0x5fff) AM_RAM			/* Appears to not be affected by banking? */
+	AM_RANGE(0x0800, 0x5fff) AM_RAM      /* Appears to not be affected by banking? */
 	AM_RANGE(0x6000, 0x6fff) AM_READWRITE(dsp56k_ram_bank00_read, dsp56k_ram_bank00_write)
 	AM_RANGE(0x7000, 0x7fff) AM_READWRITE(dsp56k_ram_bank01_read, dsp56k_ram_bank01_write)	/* Mirrored in program space @ 0x7000 */
 	AM_RANGE(0x8000, 0xbfff) AM_READWRITE(dsp56k_ram_bank02_read, dsp56k_ram_bank02_write)
@@ -563,7 +563,7 @@ ADDRESS_MAP_END
 static void reset_sound_region(running_machine *machine)
 {
 	polygonet_state *state = machine->driver_data<polygonet_state>();
-	memory_set_bankptr(machine, "bank2", memory_region(machine, "soundcpu") + 0x10000 + state->cur_sound_region*0x4000);
+	memory_set_bankptr(machine, "bank2", machine->region("soundcpu")->base() + 0x10000 + state->cur_sound_region*0x4000);
 }
 
 static WRITE8_HANDLER( sound_bankswitch_w )
@@ -638,54 +638,54 @@ static const k053936_interface polygonet_k053936_intf =
 
 static MACHINE_CONFIG_START( plygonet, polygonet_state )
 
-	MDRV_CPU_ADD("maincpu", M68EC020, 16000000)	/* 16 MHz (xtal is 32.0 MHz) */
-	MDRV_CPU_PROGRAM_MAP(main_map)
-	MDRV_CPU_VBLANK_INT("screen", polygonet_interrupt)
+	MCFG_CPU_ADD("maincpu", M68EC020, 16000000)	/* 16 MHz (xtal is 32.0 MHz) */
+	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_CPU_VBLANK_INT("screen", polygonet_interrupt)
 
-	MDRV_CPU_ADD("dsp", DSP56156, 40000000)		/* xtal is 40.0 MHz, DSP has an internal divide-by-2 */
-	MDRV_CPU_PROGRAM_MAP(dsp_program_map)
-	MDRV_CPU_DATA_MAP(dsp_data_map)
+	MCFG_CPU_ADD("dsp", DSP56156, 40000000)		/* xtal is 40.0 MHz, DSP has an internal divide-by-2 */
+	MCFG_CPU_PROGRAM_MAP(dsp_program_map)
+	MCFG_CPU_DATA_MAP(dsp_data_map)
 
-	MDRV_CPU_ADD("soundcpu", Z80, 8000000)
-	MDRV_CPU_PROGRAM_MAP(sound_map)
-	MDRV_CPU_PERIODIC_INT(audio_interrupt, 480)
+	MCFG_CPU_ADD("soundcpu", Z80, 8000000)
+	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_CPU_PERIODIC_INT(audio_interrupt, 480)
 
-	MDRV_MACHINE_START(polygonet)
+	MCFG_MACHINE_START(polygonet)
 
-	MDRV_GFXDECODE(plygonet)
+	MCFG_GFXDECODE(plygonet)
 
-	MDRV_EEPROM_ADD("eeprom", eeprom_intf)
+	MCFG_EEPROM_ADD("eeprom", eeprom_intf)
 
 	/* TODO: TEMPORARY!  UNTIL A MORE LOCALIZED SYNC CAN BE MADE */
-	MDRV_QUANTUM_TIME(HZ(1200000))
+	MCFG_QUANTUM_TIME(HZ(1200000))
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(64, 64+368-1, 0, 32*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(64, 64+368-1, 0, 32*8-1)
 
-	MDRV_PALETTE_LENGTH(32768)
+	MCFG_PALETTE_LENGTH(32768)
 
-	MDRV_VIDEO_START(polygonet)
-	MDRV_VIDEO_UPDATE(polygonet)
+	MCFG_VIDEO_START(polygonet)
+	MCFG_VIDEO_UPDATE(polygonet)
 
-	MDRV_K053936_ADD("k053936", polygonet_k053936_intf)
+	MCFG_K053936_ADD("k053936", polygonet_k053936_intf)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("konami1", K054539, 48000)
-	MDRV_SOUND_CONFIG(k054539_config)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 0.75)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 0.75)
+	MCFG_SOUND_ADD("konami1", K054539, 48000)
+	MCFG_SOUND_CONFIG(k054539_config)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.75)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.75)
 
-	MDRV_SOUND_ADD("konami2", K054539, 48000)
-	MDRV_SOUND_CONFIG(k054539_config)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 0.75)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 0.75)
+	MCFG_SOUND_ADD("konami2", K054539, 48000)
+	MCFG_SOUND_CONFIG(k054539_config)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.75)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.75)
 MACHINE_CONFIG_END
 
 
@@ -766,6 +766,8 @@ static DRIVER_INIT(polygonet)
 	state->dsp56k_update_handler = space->set_direct_update_handler(direct_update_delegate_create_static(plygonet_dsp56k_direct_handler, *machine));
 
     /* save states */
+	state_save_register_global_pointer(machine, state->dsp56k_p_mirror,      2 * 0x1000);
+	state_save_register_global_pointer(machine, state->dsp56k_p_8000,        2 * 0x800);
 	state_save_register_global_pointer(machine, state->dsp56k_bank00_ram,    2 * 8 * dsp56k_bank00_size);
 	state_save_register_global_pointer(machine, state->dsp56k_bank01_ram,    2 * 8 * dsp56k_bank01_size);
 	state_save_register_global_pointer(machine, state->dsp56k_bank02_ram,    2 * 8 * dsp56k_bank02_size);

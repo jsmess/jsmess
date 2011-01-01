@@ -33,7 +33,7 @@ enum
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef void (*dl1416_update_func)(running_device *device, int digit, int data);
+typedef void (*dl1416_update_func)(device_t *device, int digit, int data);
 
 typedef struct _dl1416_interface dl1416_interface;
 struct _dl1416_interface
@@ -47,16 +47,16 @@ struct _dl1416_interface
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MDRV_DL1416_ADD(_tag, _type, _update) \
-	MDRV_DEVICE_ADD(_tag, DL1416, 0) \
-	MDRV_DEVICE_CONFIG_DATA32(dl1416_interface, type, _type) \
-	MDRV_DEVICE_CONFIG_DATAPTR(dl1416_interface, update, _update)
+#define MCFG_DL1416_ADD(_tag, _type, _update) \
+	MCFG_DEVICE_ADD(_tag, DL1416, 0) \
+	MCFG_DEVICE_CONFIG_DATA32(dl1416_interface, type, _type) \
+	MCFG_DEVICE_CONFIG_DATAPTR(dl1416_interface, update, _update)
 
-#define MDRV_DL1416B_ADD(_tag, _update_) \
-	MDRV_DL1416_ADD(_tag, DL1416B, _update)
+#define MCFG_DL1416B_ADD(_tag, _update_) \
+	MCFG_DL1416_ADD(_tag, DL1416B, _update)
 
-#define MDRV_DL1416T_ADD(_tag, _update) \
-	MDRV_DL1416_ADD(_tag, DL1416T, _update)
+#define MCFG_DL1416T_ADD(_tag, _update) \
+	MCFG_DL1416_ADD(_tag, DL1416T, _update)
 
 
 /***************************************************************************

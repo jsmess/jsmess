@@ -23,9 +23,9 @@ public:
 	emu_timer *led_refresh_timer;
 
 	/* devices */
-	running_device *z80ctc;
-	running_device *speaker;
-	running_device *cassette;
+	device_t *z80ctc;
+	device_t *speaker;
+	device_t *cassette;
 };
 
 #endif

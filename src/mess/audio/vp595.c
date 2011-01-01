@@ -26,14 +26,14 @@ typedef struct _vp595_t vp595_t;
 struct _vp595_t
 {
 	/* devices */
-	running_device *cdp1863;
+	device_t *cdp1863;
 };
 
 /***************************************************************************
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE vp595_t *get_safe_token(running_device *device)
+INLINE vp595_t *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == VP595);
@@ -72,7 +72,7 @@ static WRITE8_DEVICE_HANDLER( vp595_cdp1863_w )
     or uninstall write handlers
 -------------------------------------------------*/
 
-void vp595_install_write_handlers(running_device *device, address_space *io, int enabled)
+void vp595_install_write_handlers(device_t *device, address_space *io, int enabled)
 {
 	vp595_t *vp595 = get_safe_token(device);
 
@@ -91,8 +91,8 @@ void vp595_install_write_handlers(running_device *device, address_space *io, int
 -------------------------------------------------*/
 
 static MACHINE_CONFIG_FRAGMENT( vp595 )
-	MDRV_CDP1863_ADD(CDP1863_TAG, 0, 0) // TODO: clock2 should be CDP1863_XTAL
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_CDP1863_ADD(CDP1863_TAG, 0, 0) // TODO: clock2 should be CDP1863_XTAL
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------

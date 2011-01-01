@@ -61,9 +61,9 @@ struct _smsvdp_interface
 
 DECLARE_LEGACY_DEVICE(SMSVDP, smsvdp);
 
-#define MDRV_SMSVDP_ADD(_tag, _interface) \
-	MDRV_DEVICE_ADD(_tag, SMSVDP, 0) \
-	MDRV_DEVICE_CONFIG(_interface)
+#define MCFG_SMSVDP_ADD(_tag, _interface) \
+	MCFG_DEVICE_ADD(_tag, SMSVDP, 0) \
+	MCFG_DEVICE_CONFIG(_interface)
 
 
 /***************************************************************************
@@ -72,7 +72,7 @@ DECLARE_LEGACY_DEVICE(SMSVDP, smsvdp);
 
 /* prototypes */
 
-UINT32 sms_vdp_update( running_device *device, bitmap_t *bitmap, const rectangle *cliprect );
+UINT32 sms_vdp_update( device_t *device, bitmap_t *bitmap, const rectangle *cliprect );
 READ8_DEVICE_HANDLER( sms_vdp_vcount_r );
 READ8_DEVICE_HANDLER( sms_vdp_hcount_latch_r );
 WRITE8_DEVICE_HANDLER( sms_vdp_hcount_latch_w );
@@ -80,7 +80,7 @@ READ8_DEVICE_HANDLER( sms_vdp_data_r );
 WRITE8_DEVICE_HANDLER( sms_vdp_data_w );
 READ8_DEVICE_HANDLER( sms_vdp_ctrl_r );
 WRITE8_DEVICE_HANDLER( sms_vdp_ctrl_w );
-void sms_vdp_set_ggsmsmode( running_device *device, int mode );
-int sms_vdp_check_brightness( running_device *device, int x, int y );
+void sms_vdp_set_ggsmsmode( device_t *device, int mode );
+int sms_vdp_check_brightness( device_t *device, int x, int y );
 
 #endif /* __SMSVDP_H__ */

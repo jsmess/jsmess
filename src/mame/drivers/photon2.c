@@ -182,7 +182,7 @@ static WRITE8_HANDLER(photon2_membank_w)
 		logerror( "Unknown banking write: %02X\n", data);
 	}
 
-	memory_set_bankptr(space->machine, "bank1", memory_region(space->machine, "maincpu") + 0x4000*bank );
+	memory_set_bankptr(space->machine, "bank1", space->machine->region("maincpu")->base() + 0x4000*bank );
 }
 
 static READ8_HANDLER(photon2_fe_r)
@@ -192,7 +192,7 @@ static READ8_HANDLER(photon2_fe_r)
 
 static WRITE8_HANDLER(photon2_fe_w)
 {
-	running_device *speaker = space->machine->device("speaker");
+	device_t *speaker = space->machine->device("speaker");
 	spectrum_port_fe = data;
 
 	speaker_level_w(speaker, BIT(data,4));
@@ -293,37 +293,37 @@ static INTERRUPT_GEN( spec_interrupt_hack )
 
 static MACHINE_RESET( photon2 )
 {
-	memory_set_bankptr(machine, "bank1", memory_region(machine, "maincpu"));
+	memory_set_bankptr(machine, "bank1", machine->region("maincpu")->base());
 }
 
 static MACHINE_CONFIG_START( photon2, driver_device )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, 3500000)        /* 3.5 MHz */
-	MDRV_CPU_PROGRAM_MAP(spectrum_mem)
-	MDRV_CPU_IO_MAP(spectrum_io)
-	MDRV_CPU_VBLANK_INT_HACK(spec_interrupt_hack, 2)
-	MDRV_QUANTUM_TIME(HZ(60))
+	MCFG_CPU_ADD("maincpu", Z80, 3500000)        /* 3.5 MHz */
+	MCFG_CPU_PROGRAM_MAP(spectrum_mem)
+	MCFG_CPU_IO_MAP(spectrum_io)
+	MCFG_CPU_VBLANK_INT_HACK(spec_interrupt_hack, 2)
+	MCFG_QUANTUM_TIME(HZ(60))
 
-	MDRV_MACHINE_RESET( photon2 )
+	MCFG_MACHINE_RESET( photon2 )
 
     /* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(50.08)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(SPEC_SCREEN_WIDTH, SPEC_SCREEN_HEIGHT)
-	MDRV_SCREEN_VISIBLE_AREA(0, SPEC_SCREEN_WIDTH-1, 0, SPEC_SCREEN_HEIGHT-1)
-	MDRV_PALETTE_LENGTH(16)
-	MDRV_PALETTE_INIT( spectrum )
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(50.08)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(SPEC_SCREEN_WIDTH, SPEC_SCREEN_HEIGHT)
+	MCFG_SCREEN_VISIBLE_AREA(0, SPEC_SCREEN_WIDTH-1, 0, SPEC_SCREEN_HEIGHT-1)
+	MCFG_PALETTE_LENGTH(16)
+	MCFG_PALETTE_INIT( spectrum )
 
-	MDRV_VIDEO_START( spectrum )
-	MDRV_VIDEO_UPDATE( spectrum )
-	MDRV_VIDEO_EOF( spectrum )
+	MCFG_VIDEO_START( spectrum )
+	MCFG_VIDEO_UPDATE( spectrum )
+	MCFG_VIDEO_EOF( spectrum )
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 MACHINE_CONFIG_END
 

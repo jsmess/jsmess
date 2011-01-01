@@ -676,18 +676,18 @@ static MACHINE_START( tmc2000 )
 	UINT16 addr;
 
 	/* RAM banking */
-	memory_configure_bank(machine, "bank1", 0, 2, memory_region(machine, CDP1802_TAG), 0x8000);
+	memory_configure_bank(machine, "bank1", 0, 2, machine->region(CDP1802_TAG)->base(), 0x8000);
 
 	/* ROM/colorram banking */
 	state->colorram = auto_alloc_array(machine, UINT8, TMC2000_COLORRAM_SIZE);
 
-	memory_configure_bank(machine, "bank2", TMC2000_BANK_MONITOR, 1, memory_region(machine, CDP1802_TAG) + 0x8000, 0);
+	memory_configure_bank(machine, "bank2", TMC2000_BANK_MONITOR, 1, machine->region(CDP1802_TAG)->base() + 0x8000, 0);
 	memory_configure_bank(machine, "bank2", TMC2000_BANK_COLORRAM, 1, state->colorram, 0);
 
 	/* randomize color RAM contents */
 	for (addr = 0; addr < TMC2000_COLORRAM_SIZE; addr++)
 	{
-		state->colorram[addr] = mame_rand(machine) & 0xff;
+		state->colorram[addr] = machine->rand() & 0xff;
 	}
 
 	/* find devices */
@@ -724,7 +724,7 @@ static MACHINE_START( nano )
 	nano_state *state = machine->driver_data<nano_state>();
 
 	/* RAM/ROM banking */
-	memory_configure_bank(machine, "bank1", 0, 2, memory_region(machine, CDP1802_TAG), 0x8000);
+	memory_configure_bank(machine, "bank1", 0, 2, machine->region(CDP1802_TAG)->base(), 0x8000);
 
 	/* allocate monitor timer */
 	state->ef4_timer = timer_alloc(machine, nano_ef4_tick, NULL);
@@ -765,105 +765,105 @@ static const cassette_config tmc1800_cassette_config =
 
 static MACHINE_CONFIG_START( tmc1800, tmc1800_state )
 	// basic system hardware
-	MDRV_CPU_ADD(CDP1802_TAG, COSMAC, XTAL_1_75MHz)
-	MDRV_CPU_PROGRAM_MAP(tmc1800_map)
-	MDRV_CPU_IO_MAP(tmc1800_io_map)
-	MDRV_CPU_CONFIG(tmc1800_config)
+	MCFG_CPU_ADD(CDP1802_TAG, COSMAC, XTAL_1_75MHz)
+	MCFG_CPU_PROGRAM_MAP(tmc1800_map)
+	MCFG_CPU_IO_MAP(tmc1800_io_map)
+	MCFG_CPU_CONFIG(tmc1800_config)
 
-	MDRV_MACHINE_START(tmc1800)
-	MDRV_MACHINE_RESET(tmc1800)
+	MCFG_MACHINE_START(tmc1800)
+	MCFG_MACHINE_RESET(tmc1800)
 
 	// video hardware
-	MDRV_FRAGMENT_ADD(tmc1800_video)
+	MCFG_FRAGMENT_ADD(tmc1800_video)
 
 	// sound hardware
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("beep", BEEP, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD("beep", BEEP, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	// devices
-	MDRV_QUICKLOAD_ADD("quickload", tmc1800, "bin", 0)
-	MDRV_CASSETTE_ADD( "cassette", tmc1800_cassette_config )
+	MCFG_QUICKLOAD_ADD("quickload", tmc1800, "bin", 0)
+	MCFG_CASSETTE_ADD( "cassette", tmc1800_cassette_config )
 
 	// internal ram
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("2K")
-	MDRV_RAM_EXTRA_OPTIONS("4K")
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("2K")
+	MCFG_RAM_EXTRA_OPTIONS("4K")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( osc1000b, osc1000b_state )
 	// basic system hardware
-	MDRV_CPU_ADD(CDP1802_TAG, COSMAC, XTAL_1_75MHz)
-	MDRV_CPU_PROGRAM_MAP(osc1000b_map)
-	MDRV_CPU_IO_MAP(osc1000b_io_map)
-	MDRV_CPU_CONFIG(osc1000b_config)
+	MCFG_CPU_ADD(CDP1802_TAG, COSMAC, XTAL_1_75MHz)
+	MCFG_CPU_PROGRAM_MAP(osc1000b_map)
+	MCFG_CPU_IO_MAP(osc1000b_io_map)
+	MCFG_CPU_CONFIG(osc1000b_config)
 
-	MDRV_MACHINE_START(osc1000b)
-	MDRV_MACHINE_RESET(osc1000b)
+	MCFG_MACHINE_START(osc1000b)
+	MCFG_MACHINE_RESET(osc1000b)
 
 	// video hardware
-	MDRV_FRAGMENT_ADD(osc1000b_video)
+	MCFG_FRAGMENT_ADD(osc1000b_video)
 
 	// sound hardware
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("beep", BEEP, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD("beep", BEEP, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	// devices
-	MDRV_QUICKLOAD_ADD("quickload", tmc1800, "bin", 0)
-	MDRV_CASSETTE_ADD( "cassette", tmc1800_cassette_config )
+	MCFG_QUICKLOAD_ADD("quickload", tmc1800, "bin", 0)
+	MCFG_CASSETTE_ADD( "cassette", tmc1800_cassette_config )
 
 	/* internal ram */
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("2K")
-	MDRV_RAM_EXTRA_OPTIONS("4K")
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("2K")
+	MCFG_RAM_EXTRA_OPTIONS("4K")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( tmc2000, tmc2000_state )
 	// basic system hardware
-	MDRV_CPU_ADD(CDP1802_TAG, COSMAC, XTAL_1_75MHz)
-	MDRV_CPU_PROGRAM_MAP(tmc2000_map)
-	MDRV_CPU_IO_MAP(tmc2000_io_map)
-	MDRV_CPU_CONFIG(tmc2000_config)
+	MCFG_CPU_ADD(CDP1802_TAG, COSMAC, XTAL_1_75MHz)
+	MCFG_CPU_PROGRAM_MAP(tmc2000_map)
+	MCFG_CPU_IO_MAP(tmc2000_io_map)
+	MCFG_CPU_CONFIG(tmc2000_config)
 
-	MDRV_MACHINE_START(tmc2000)
-	MDRV_MACHINE_RESET(tmc2000)
+	MCFG_MACHINE_START(tmc2000)
+	MCFG_MACHINE_RESET(tmc2000)
 
 	// video hardware
-	MDRV_FRAGMENT_ADD(tmc2000_video)
+	MCFG_FRAGMENT_ADD(tmc2000_video)
 
 	// devices
-	MDRV_QUICKLOAD_ADD("quickload", tmc1800, "bin", 0)
-	MDRV_CASSETTE_ADD( "cassette", tmc1800_cassette_config )
+	MCFG_QUICKLOAD_ADD("quickload", tmc1800, "bin", 0)
+	MCFG_CASSETTE_ADD( "cassette", tmc1800_cassette_config )
 
 	/* internal ram */
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("4K")
-	MDRV_RAM_EXTRA_OPTIONS("16K,32K")
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("4K")
+	MCFG_RAM_EXTRA_OPTIONS("16K,32K")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( nano, nano_state )
 	// basic system hardware
-	MDRV_CPU_ADD(CDP1802_TAG, COSMAC, XTAL_1_75MHz)
-	MDRV_CPU_PROGRAM_MAP(nano_map)
-	MDRV_CPU_IO_MAP(nano_io_map)
-	MDRV_CPU_CONFIG(nano_config)
+	MCFG_CPU_ADD(CDP1802_TAG, COSMAC, XTAL_1_75MHz)
+	MCFG_CPU_PROGRAM_MAP(nano_map)
+	MCFG_CPU_IO_MAP(nano_io_map)
+	MCFG_CPU_CONFIG(nano_config)
 
-	MDRV_MACHINE_START(nano)
-	MDRV_MACHINE_RESET(nano)
+	MCFG_MACHINE_START(nano)
+	MCFG_MACHINE_RESET(nano)
 
 	// video hardware
-	MDRV_FRAGMENT_ADD(nano_video)
+	MCFG_FRAGMENT_ADD(nano_video)
 
 	// devices
-	MDRV_QUICKLOAD_ADD("quickload", tmc1800, "bin", 0)
-	MDRV_CASSETTE_ADD( "cassette", tmc1800_cassette_config )
+	MCFG_QUICKLOAD_ADD("quickload", tmc1800, "bin", 0)
+	MCFG_CASSETTE_ADD( "cassette", tmc1800_cassette_config )
 
 	/* internal ram */
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("4K")
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("4K")
 MACHINE_CONFIG_END
 
 /* ROMs */
@@ -901,7 +901,7 @@ ROM_END
 
 static QUICKLOAD_LOAD( tmc1800 )
 {
-	UINT8 *ptr = memory_region(image.device().machine, CDP1802_TAG);
+	UINT8 *ptr = image.device().machine->region(CDP1802_TAG)->base();
 	int size = image.length();
 
 	if (size > messram_get_size(image.device().machine->device("messram")))
@@ -918,7 +918,7 @@ static QUICKLOAD_LOAD( tmc1800 )
 
 static TIMER_CALLBACK(setup_beep)
 {
-	running_device *speaker = machine->device("beep");
+	device_t *speaker = machine->device("beep");
 	beep_set_state(speaker, 0);
 	beep_set_frequency( speaker, 0 );
 }

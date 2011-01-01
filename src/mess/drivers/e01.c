@@ -387,7 +387,7 @@ static MACHINE_START( e01 )
 	e01_state *state = machine->driver_data<e01_state>();
 
 	UINT8 *ram = messram_get_ptr(machine->device("messram"));
-	UINT8 *rom = memory_region(machine, R65C102_TAG);
+	UINT8 *rom = machine->region(R65C102_TAG)->base();
 
 	/* setup memory banking */
 	memory_configure_bank(machine, "bank1", 0, 1, ram, 0);
@@ -434,29 +434,29 @@ static MACHINE_RESET( e01 )
 
 static MACHINE_CONFIG_START( e01, e01_state )
     /* basic machine hardware */
-	MDRV_CPU_ADD(R65C102_TAG, M65C02, 1000000) // Rockwell R65C102P3
-    MDRV_CPU_PROGRAM_MAP(e01_mem)
+	MCFG_CPU_ADD(R65C102_TAG, M65C02, 1000000) // Rockwell R65C102P3
+    MCFG_CPU_PROGRAM_MAP(e01_mem)
 
-    MDRV_MACHINE_START(e01)
-    MDRV_MACHINE_RESET(e01)
+    MCFG_MACHINE_START(e01)
+    MCFG_MACHINE_RESET(e01)
 
-	MDRV_MC146818_ADD(HD146818_TAG, MC146818_STANDARD)
+	MCFG_MC146818_ADD(HD146818_TAG, MC146818_STANDARD)
 
-	MDRV_TIMER_ADD_PERIODIC("rtc_hack", rtc_irq_hack, HZ(2)) // HACK!
+	MCFG_TIMER_ADD_PERIODIC("rtc_hack", rtc_irq_hack, HZ(2)) // HACK!
 
 	/* video hardware */
-	MDRV_DEFAULT_LAYOUT( layout_e01 )
+	MCFG_DEFAULT_LAYOUT( layout_e01 )
 
 	/* devices */
-	MDRV_VIA6522_ADD(R6522_TAG, 100000, via_intf)
-	MDRV_MC6854_ADD(MC6854_TAG, adlc_intf)
-	MDRV_WD2793_ADD(WD2793_TAG, fdc_intf)
-	MDRV_FLOPPY_2_DRIVES_ADD(e01_floppy_config)
-//  MDRV_CENTRONICS_ADD(CENTRONICS_TAG, e01_centronics_config)
+	MCFG_VIA6522_ADD(R6522_TAG, 100000, via_intf)
+	MCFG_MC6854_ADD(MC6854_TAG, adlc_intf)
+	MCFG_WD2793_ADD(WD2793_TAG, fdc_intf)
+	MCFG_FLOPPY_2_DRIVES_ADD(e01_floppy_config)
+//  MCFG_CENTRONICS_ADD(CENTRONICS_TAG, e01_centronics_config)
 
 	/* internal ram */
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("64K")
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("64K")
 MACHINE_CONFIG_END
 
 /***************************************************************************

@@ -14,17 +14,17 @@ public:
 		: driver_device(machine, config) { }
 
 	UINT8 *videoram;
-	running_device *kayproii_z80pio_g;
-	running_device *kayproii_z80pio_s;
-	running_device *z80sio;
-	running_device *kaypro2x_z80sio;
-	running_device *printer;
-	running_device *fdc;
+	device_t *kayproii_z80pio_g;
+	device_t *kayproii_z80pio_s;
+	device_t *z80sio;
+	device_t *kaypro2x_z80sio;
+	device_t *printer;
+	device_t *fdc;
 	UINT8 system_port;
 	UINT8 mc6845_cursor[16];
 	UINT8 mc6845_reg[32];
 	UINT8 mc6845_ind;
-	running_device *mc6845;
+	device_t *mc6845;
 	const UINT8 *FNT;
 	UINT8 speed;
 	UINT8 flash;

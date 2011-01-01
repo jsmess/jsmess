@@ -36,8 +36,8 @@ public:
 	int keylatch;
 
 	/* devices */
-	running_device *fd1797;
-	running_device *z80ctc;
+	device_t *fd1797;
+	device_t *z80ctc;
 };
 
 #endif

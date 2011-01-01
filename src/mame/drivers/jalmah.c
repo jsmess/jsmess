@@ -279,7 +279,7 @@ priority = 8, then 4, 2 and finally 1).
 ***************************************************************************************/
 static void jalmah_priority_system(running_machine *machine)
 {
-    UINT8 *pri_rom = memory_region(machine, "user1");
+    UINT8 *pri_rom = machine->region("user1")->base();
     UINT8 i;
     UINT8 prinum[0x10];
 
@@ -740,7 +740,7 @@ static void mjzoomin_mcu_run(running_machine *machine)
 		MCU_READ("KEY1", 0x0002, 0x000/2, 0x13);		/*CHI   (trusted)*/
 		MCU_READ("KEY0", 0x0004, 0x000/2, 0x14);		/*START1*/
 	}
-	jm_shared_ram[0x00c/2] = mame_rand(machine) & 0xffff;
+	jm_shared_ram[0x00c/2] = machine->rand() & 0xffff;
 	prg_prot++;
 	if(prg_prot > 0x10) { prg_prot = 0; }
 	jm_shared_ram[0x00e/2] = prg_prot;
@@ -784,7 +784,7 @@ static void urashima_mcu_run(running_machine *machine)
 		MCU_READ("KEY1", 0x0002, 0x300/2, 0x13);		/*CHI   (trusted)*/
 		MCU_READ("KEY0", 0x0004, 0x300/2, 0x14);		/*START1*/
 	}
-	jm_shared_ram[0x30c/2] = mame_rand(machine) & 0xffff;
+	jm_shared_ram[0x30c/2] = machine->rand() & 0xffff;
 	prg_prot++;
 	if(prg_prot > 0x10) { prg_prot = 0; }
 	jm_shared_ram[0x30e/2] = prg_prot;
@@ -825,7 +825,7 @@ static void second_mcu_run(running_machine *machine)
 
 //      MCU_READ("KEY0", 0x0004, 0x7b8/2, 0x03);        /*START1(correct?)  */
 	}
-	jm_shared_ram[0x20c/2] = mame_rand(machine) & 0xffff; //kakumei2
+	jm_shared_ram[0x20c/2] = machine->rand() & 0xffff; //kakumei2
 
 }
 
@@ -862,7 +862,7 @@ static WRITE16_HANDLER( jalmah_okirom_w )
 {
 	if(ACCESSING_BITS_0_7)
 	{
-		UINT8 *oki = memory_region(space->machine, "oki");
+		UINT8 *oki = space->machine->region("oki")->base();
 
 		oki_rom = data & 1;
 
@@ -879,7 +879,7 @@ static WRITE16_HANDLER( jalmah_okibank_w )
 {
 	if(ACCESSING_BITS_0_7)
 	{
-		UINT8 *oki = memory_region(space->machine, "oki");
+		UINT8 *oki = space->machine->region("oki")->base();
 
 		oki_bank = data & 3;
 
@@ -1303,43 +1303,43 @@ static MACHINE_RESET ( jalmah )
 }
 
 static MACHINE_CONFIG_START( jalmah, driver_device )
-	MDRV_CPU_ADD("maincpu" , M68000, 12000000) /* 68000-8 */
-	MDRV_CPU_PROGRAM_MAP(jalmah)
-	MDRV_CPU_VBLANK_INT("screen", irq2_line_hold)
+	MCFG_CPU_ADD("maincpu" , M68000, 12000000) /* 68000-8 */
+	MCFG_CPU_PROGRAM_MAP(jalmah)
+	MCFG_CPU_VBLANK_INT("screen", irq2_line_hold)
 
 	//M50747 MCU
 
-	MDRV_GFXDECODE(jalmah)
+	MCFG_GFXDECODE(jalmah)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
-	MDRV_PALETTE_LENGTH(0x400)
-	MDRV_MACHINE_RESET(jalmah)
+	MCFG_PALETTE_LENGTH(0x400)
+	MCFG_MACHINE_RESET(jalmah)
 
-	MDRV_VIDEO_START(jalmah)
-	MDRV_VIDEO_UPDATE(jalmah)
+	MCFG_VIDEO_START(jalmah)
+	MCFG_VIDEO_UPDATE(jalmah)
 
-	MDRV_TIMER_ADD_PERIODIC("mcusim", jalmah_mcu_sim, HZ(10000)) // not real, but for simulating the MCU
+	MCFG_TIMER_ADD_PERIODIC("mcusim", jalmah_mcu_sim, HZ(10000)) // not real, but for simulating the MCU
 
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_OKIM6295_ADD("oki", 4000000, OKIM6295_PIN7_LOW)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_OKIM6295_ADD("oki", 4000000, OKIM6295_PIN7_LOW)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( urashima, jalmah )
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(urashima)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(urashima)
 
-	MDRV_GFXDECODE(urashima)
+	MCFG_GFXDECODE(urashima)
 
-	MDRV_VIDEO_START(urashima)
-	MDRV_VIDEO_UPDATE(urashima)
+	MCFG_VIDEO_START(urashima)
+	MCFG_VIDEO_UPDATE(urashima)
 MACHINE_CONFIG_END
 
 /*

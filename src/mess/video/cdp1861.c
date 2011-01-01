@@ -49,14 +49,14 @@ struct _cdp1861_t
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE cdp1861_t *get_safe_token(running_device *device)
+INLINE cdp1861_t *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == CDP1861);
 	return (cdp1861_t *)downcast<legacy_device_base *>(device)->token();
 }
 
-INLINE const cdp1861_interface *get_interface(running_device *device)
+INLINE const cdp1861_interface *get_interface(device_t *device)
 {
 	assert(device != NULL);
 	assert((device->type() == CDP1861));
@@ -73,7 +73,7 @@ INLINE const cdp1861_interface *get_interface(running_device *device)
 
 static TIMER_CALLBACK( cdp1861_int_tick )
 {
-	running_device *device = (running_device *)ptr;
+	device_t *device = (device_t *)ptr;
 	cdp1861_t *cdp1861 = get_safe_token(device);
 
 	int scanline = cdp1861->screen->vpos();
@@ -104,7 +104,7 @@ static TIMER_CALLBACK( cdp1861_int_tick )
 
 static TIMER_CALLBACK( cdp1861_efx_tick )
 {
-	running_device *device = (running_device *)ptr;
+	device_t *device = (device_t *)ptr;
 	cdp1861_t *cdp1861 = get_safe_token(device);
 
 	int scanline = cdp1861->screen->vpos();
@@ -139,7 +139,7 @@ static TIMER_CALLBACK( cdp1861_efx_tick )
 
 static TIMER_CALLBACK( cdp1861_dma_tick )
 {
-	running_device *device = (running_device *)ptr;
+	device_t *device = (device_t *)ptr;
 	cdp1861_t *cdp1861 = get_safe_token(device);
 
 	int scanline = cdp1861->screen->vpos();
@@ -227,7 +227,7 @@ WRITE8_DEVICE_HANDLER( cdp1861_dma_w )
     cdp1861_update - update screen
 -------------------------------------------------*/
 
-void cdp1861_update(running_device *device, bitmap_t *bitmap, const rectangle *cliprect)
+void cdp1861_update(device_t *device, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	cdp1861_t *cdp1861 = get_safe_token(device);
 

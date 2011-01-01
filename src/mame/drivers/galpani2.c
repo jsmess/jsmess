@@ -80,7 +80,7 @@ static MACHINE_RESET( galpani2 )
 	cpuexec_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(50)); //initial mcu xchk
 }
 
-static void galpani2_write_kaneko(running_device *device)
+static void galpani2_write_kaneko(device_t *device)
 {
 	address_space *dstspace = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
 	int i,x,tpattidx;
@@ -275,7 +275,7 @@ static WRITE8_HANDLER( galpani2_coin_lockout_w )
 
 static WRITE8_DEVICE_HANDLER( galpani2_oki1_bank_w )
 {
-		UINT8 *ROM = memory_region(device->machine, "oki1");
+		UINT8 *ROM = device->machine->region("oki1")->base();
 		logerror("%s : %s bank %08X\n",cpuexec_describe_context(device->machine),device->tag(),data);
 		memcpy(ROM + 0x30000, ROM + 0x40000 + 0x10000 * (~data & 0xf), 0x10000);
 }
@@ -350,8 +350,8 @@ static UINT16 *galpani2_rombank;
 
 static READ16_HANDLER( galpani2_bankedrom_r )
 {
-	UINT16 *ROM = (UINT16 *) memory_region( space->machine, "user1" );
-	size_t    len = memory_region_length( space->machine, "user1" ) / 2;
+	UINT16 *ROM = (UINT16 *) space->machine->region( "user1" )->base();
+	size_t    len = space->machine->region( "user1" )->bytes() / 2;
 
 	offset += (0x800000/2) * (*galpani2_rombank & 0x0003);
 
@@ -577,41 +577,41 @@ static INTERRUPT_GEN( galpani2_interrupt2 )
 static MACHINE_CONFIG_START( galpani2, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, XTAL_27MHz/2)		/* Confirmed on galpani2i PCB */
-	MDRV_CPU_PROGRAM_MAP(galpani2_mem1)
-	MDRV_CPU_VBLANK_INT_HACK(galpani2_interrupt1,GALPANI2_INTERRUPTS_NUM)
-	//MDRV_QUANTUM_PERFECT_CPU("maincpu")
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_27MHz/2)		/* Confirmed on galpani2i PCB */
+	MCFG_CPU_PROGRAM_MAP(galpani2_mem1)
+	MCFG_CPU_VBLANK_INT_HACK(galpani2_interrupt1,GALPANI2_INTERRUPTS_NUM)
+	//MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	MDRV_CPU_ADD("sub", M68000, XTAL_27MHz/2)			/* Confirmed on galpani2i PCB */
-	MDRV_CPU_PROGRAM_MAP(galpani2_mem2)
-	MDRV_CPU_VBLANK_INT_HACK(galpani2_interrupt2,GALPANI2_INTERRUPTS_NUM2)
+	MCFG_CPU_ADD("sub", M68000, XTAL_27MHz/2)			/* Confirmed on galpani2i PCB */
+	MCFG_CPU_PROGRAM_MAP(galpani2_mem2)
+	MCFG_CPU_VBLANK_INT_HACK(galpani2_interrupt2,GALPANI2_INTERRUPTS_NUM2)
 
-	MDRV_MACHINE_RESET(galpani2)
-	MDRV_EEPROM_93C46_ADD("eeprom")
+	MCFG_MACHINE_RESET(galpani2)
+	MCFG_EEPROM_93C46_ADD("eeprom")
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(320, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 320-1, 0, 256-1-16)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(320, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 256-1-16)
 
-	MDRV_GFXDECODE(galpani2)
-	MDRV_PALETTE_LENGTH(0x4000 + 0x200 + 0x8000)	// sprites, bg8, bg15
+	MCFG_GFXDECODE(galpani2)
+	MCFG_PALETTE_LENGTH(0x4000 + 0x200 + 0x8000)	// sprites, bg8, bg15
 
-	MDRV_PALETTE_INIT(galpani2)
-	MDRV_VIDEO_START(galpani2)
-	MDRV_VIDEO_UPDATE(galpani2)
+	MCFG_PALETTE_INIT(galpani2)
+	MCFG_VIDEO_START(galpani2)
+	MCFG_VIDEO_UPDATE(galpani2)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_OKIM6295_ADD("oki1", XTAL_20MHz/10, OKIM6295_PIN7_HIGH)	/* Confirmed on galpani2i PCB */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MCFG_OKIM6295_ADD("oki1", XTAL_20MHz/10, OKIM6295_PIN7_HIGH)	/* Confirmed on galpani2i PCB */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 
-	MDRV_OKIM6295_ADD("oki2", XTAL_20MHz/10, OKIM6295_PIN7_HIGH)	/* Confirmed on galpani2i PCB */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	MCFG_OKIM6295_ADD("oki2", XTAL_20MHz/10, OKIM6295_PIN7_HIGH)	/* Confirmed on galpani2i PCB */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 

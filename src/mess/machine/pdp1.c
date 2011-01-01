@@ -41,28 +41,28 @@ static TIMER_CALLBACK(tyo_callback);
 static TIMER_CALLBACK(dpy_callback);
 static void pdp1_machine_stop(running_machine &machine);
 
-static void pdp1_tape_read_binary(running_device *device);
-static void pdp1_io_sc_callback(running_device *device);
+static void pdp1_tape_read_binary(device_t *device);
+static void pdp1_io_sc_callback(device_t *device);
 
-static void iot_rpa(running_device *device, int op2, int nac, int mb, int *io, int ac);
-static void iot_rpb(running_device *device, int op2, int nac, int mb, int *io, int ac);
-static void iot_rrb(running_device *device, int op2, int nac, int mb, int *io, int ac);
-static void iot_ppa(running_device *device, int op2, int nac, int mb, int *io, int ac);
-static void iot_ppb(running_device *device, int op2, int nac, int mb, int *io, int ac);
+static void iot_rpa(device_t *device, int op2, int nac, int mb, int *io, int ac);
+static void iot_rpb(device_t *device, int op2, int nac, int mb, int *io, int ac);
+static void iot_rrb(device_t *device, int op2, int nac, int mb, int *io, int ac);
+static void iot_ppa(device_t *device, int op2, int nac, int mb, int *io, int ac);
+static void iot_ppb(device_t *device, int op2, int nac, int mb, int *io, int ac);
 
-static void iot_tyo(running_device *device, int op2, int nac, int mb, int *io, int ac);
-static void iot_tyi(running_device *device, int op2, int nac, int mb, int *io, int ac);
+static void iot_tyo(device_t *device, int op2, int nac, int mb, int *io, int ac);
+static void iot_tyi(device_t *device, int op2, int nac, int mb, int *io, int ac);
 
-static void iot_dpy(running_device *device, int op2, int nac, int mb, int *io, int ac);
+static void iot_dpy(device_t *device, int op2, int nac, int mb, int *io, int ac);
 
-static void iot_dia(running_device *device, int op2, int nac, int mb, int *io, int ac);
-static void iot_dba(running_device *device, int op2, int nac, int mb, int *io, int ac);
-static void iot_dcc(running_device *device, int op2, int nac, int mb, int *io, int ac);
-static void iot_dra(running_device *device, int op2, int nac, int mb, int *io, int ac);
+static void iot_dia(device_t *device, int op2, int nac, int mb, int *io, int ac);
+static void iot_dba(device_t *device, int op2, int nac, int mb, int *io, int ac);
+static void iot_dcc(device_t *device, int op2, int nac, int mb, int *io, int ac);
+static void iot_dra(device_t *device, int op2, int nac, int mb, int *io, int ac);
 
-static void iot_011(running_device *device, int op2, int nac, int mb, int *io, int ac);
+static void iot_011(device_t *device, int op2, int nac, int mb, int *io, int ac);
 
-static void iot_cks(running_device *device, int op2, int nac, int mb, int *io, int ac);
+static void iot_cks(device_t *device, int op2, int nac, int mb, int *io, int ac);
 
 
 /*
@@ -307,7 +307,7 @@ MACHINE_START( pdp1 )
 	};
 
 	/* set up our font */
-	dst = memory_region(machine, "gfx1");
+	dst = machine->region("gfx1")->base();
 	memcpy(dst, fontdata6x8, pdp1_fontdata_size);
 
 	machine->add_notifier(MACHINE_NOTIFY_EXIT, pdp1_machine_stop);
@@ -535,7 +535,7 @@ static TIMER_CALLBACK(puncher_callback)
 /*
     Initiate read of a 18-bit word in binary format from tape (used in read-in mode)
 */
-void pdp1_tape_read_binary(running_device *device)
+void pdp1_tape_read_binary(device_t *device)
 {
 	pdp1_state *state = device->machine->driver_data<pdp1_state>();
 	begin_tape_read(state, 1, 1);
@@ -568,7 +568,7 @@ void pdp1_tape_read_binary(running_device *device)
  * IO Bits        10 11 12 13 14 15 16 17
  * TAPE CHANNELS  8  7  6  5  4  3  2  1
  */
-static void iot_rpa(running_device *device, int op2, int nac, int mb, int *io, int ac)
+static void iot_rpa(device_t *device, int op2, int nac, int mb, int *io, int ac)
 {
 	pdp1_state *state = device->machine->driver_data<pdp1_state>();
 	if (LOG_IOT_EXTRA)
@@ -606,7 +606,7 @@ static void iot_rpa(running_device *device, int op2, int nac, int mb, int *io, i
  * different (730002 or 724002) the 18-bit word read from tape is automatically
  * transferred to the IO Register via the Reader Buffer.
  */
-static void iot_rpb(running_device *device, int op2, int nac, int mb, int *io, int ac)
+static void iot_rpb(device_t *device, int op2, int nac, int mb, int *io, int ac)
 {
 	pdp1_state *state = device->machine->driver_data<pdp1_state>();
 	if (LOG_IOT_EXTRA)
@@ -618,7 +618,7 @@ static void iot_rpb(running_device *device, int op2, int nac, int mb, int *io, i
 /*
     rrb iot callback
 */
-static void iot_rrb(running_device *device, int op2, int nac, int mb, int *io, int ac)
+static void iot_rrb(device_t *device, int op2, int nac, int mb, int *io, int ac)
 {
 	pdp1_state *state = device->machine->driver_data<pdp1_state>();
 	if (LOG_IOT_EXTRA)
@@ -642,7 +642,7 @@ static void iot_rrb(running_device *device, int op2, int nac, int mb, int *io, i
  * For each In-Out Transfer instruction one line of tape is punched. In-Out Register
  * Bit 17 conditions Hole 1. Bit 16 conditions Hole 2, etc. Bit 10 conditions Hole 8
  */
-static void iot_ppa(running_device *device, int op2, int nac, int mb, int *io, int ac)
+static void iot_ppa(device_t *device, int op2, int nac, int mb, int *io, int ac)
 {
 	pdp1_state *state = device->machine->driver_data<pdp1_state>();
 	if (LOG_IOT_EXTRA)
@@ -671,7 +671,7 @@ static void iot_ppa(running_device *device, int op2, int nac, int mb, int *io, i
  * Bit 5 conditions Hole 1. Bit 4 conditions Hole 2, etc. Bit 0 conditions Hole 6.
  * Hole 7 is left blank. Hole 8 is always punched in this mode.
  */
-static void iot_ppb(running_device *device, int op2, int nac, int mb, int *io, int ac)
+static void iot_ppb(device_t *device, int op2, int nac, int mb, int *io, int ac)
 {
 	pdp1_state *state = device->machine->driver_data<pdp1_state>();
 	if (LOG_IOT_EXTRA)
@@ -841,7 +841,7 @@ static TIMER_CALLBACK(tyo_callback)
 /*
     tyo iot callback
 */
-static void iot_tyo(running_device *device, int op2, int nac, int mb, int *io, int ac)
+static void iot_tyo(device_t *device, int op2, int nac, int mb, int *io, int ac)
 {
 	pdp1_state *state = device->machine->driver_data<pdp1_state>();
 	int ch, delay;
@@ -895,7 +895,7 @@ static void iot_tyo(running_device *device, int op2, int nac, int mb, int *io, i
  * clears the In-Out Register before transferring the information and also clears
  * the type-in status bit.
  */
-static void iot_tyi(running_device *device, int op2, int nac, int mb, int *io, int ac)
+static void iot_tyi(device_t *device, int op2, int nac, int mb, int *io, int ac)
 {
 	pdp1_state *state = device->machine->driver_data<pdp1_state>();
 	if (LOG_IOT_EXTRA)
@@ -961,7 +961,7 @@ static TIMER_CALLBACK(dpy_callback)
 
     Light on one pixel on CRT
 */
-static void iot_dpy(running_device *device, int op2, int nac, int mb, int *io, int ac)
+static void iot_dpy(device_t *device, int op2, int nac, int mb, int *io, int ac)
 {
 	pdp1_state *state = device->machine->driver_data<pdp1_state>();
 	int x;
@@ -1053,7 +1053,7 @@ DEVICE_IMAGE_UNLOAD(pdp1_drum)
 	state->parallel_drum.fd = NULL;
 }
 
-static void iot_dia(running_device *device, int op2, int nac, int mb, int *io, int ac)
+static void iot_dia(device_t *device, int op2, int nac, int mb, int *io, int ac)
 {
 	pdp1_state *state = device->machine->driver_data<pdp1_state>();
 	state->parallel_drum.wfb = ((*io) & 0370000) >> 12;
@@ -1062,7 +1062,7 @@ static void iot_dia(running_device *device, int op2, int nac, int mb, int *io, i
 	state->parallel_drum.dba = 0;	/* right? */
 }
 
-static void iot_dba(running_device *device, int op2, int nac, int mb, int *io, int ac)
+static void iot_dba(device_t *device, int op2, int nac, int mb, int *io, int ac)
 {
 	pdp1_state *state = device->machine->driver_data<pdp1_state>();
 	state->parallel_drum.wfb = ((*io) & 0370000) >> 12;
@@ -1104,7 +1104,7 @@ static void drum_write(pdp1_state *state, int field, int position, UINT32 data)
 	}
 }
 
-static void iot_dcc(running_device *device, int op2, int nac, int mb, int *io, int ac)
+static void iot_dcc(device_t *device, int op2, int nac, int mb, int *io, int ac)
 {
 	pdp1_state *state = device->machine->driver_data<pdp1_state>();
 	attotime delay;
@@ -1144,7 +1144,7 @@ static void iot_dcc(running_device *device, int op2, int nac, int mb, int *io, i
 	cpu_set_reg(device->machine->device("maincpu"), PDP1_PC, cpu_get_reg(device->machine->device("maincpu"), PDP1_PC)+1);
 }
 
-static void iot_dra(running_device *device, int op2, int nac, int mb, int *io, int ac)
+static void iot_dra(device_t *device, int op2, int nac, int mb, int *io, int ac)
 {
 	pdp1_state *state = device->machine->driver_data<pdp1_state>();
 	(*io) = attotime_mul(
@@ -1167,7 +1167,7 @@ static void iot_dra(running_device *device, int op2, int nac, int mb, int *io, i
         fire rocket, and fire torpedo. low order 4 bits, same for
         other ship. routine is entered by jsp cwg.
 */
-static void iot_011(running_device *device, int op2, int nac, int mb, int *io, int ac)
+static void iot_011(device_t *device, int op2, int nac, int mb, int *io, int ac)
 {
 	int key_state = input_port_read(device->machine, "SPACEWAR");
 	int reply;
@@ -1206,7 +1206,7 @@ static void iot_011(running_device *device, int op2, int nac, int mb, int *io, i
 
     check IO status
 */
-static void iot_cks(running_device *device, int op2, int nac, int mb, int *io, int ac)
+static void iot_cks(device_t *device, int op2, int nac, int mb, int *io, int ac)
 {
 	pdp1_state *state = device->machine->driver_data<pdp1_state>();
 	if (LOG_IOT_EXTRA)
@@ -1221,7 +1221,7 @@ static void iot_cks(running_device *device, int op2, int nac, int mb, int *io, i
 
     IO devices should reset
 */
-void pdp1_io_sc_callback(running_device *device)
+void pdp1_io_sc_callback(device_t *device)
 {
 	pdp1_state *state = device->machine->driver_data<pdp1_state>();
 	state->tape_reader.rcl = state->tape_reader.rc = 0;

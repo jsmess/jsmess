@@ -19,11 +19,11 @@
 
 DECLARE_LEGACY_DEVICE(HD44102, hd44102);
 
-#define MDRV_HD44102_ADD(_tag, _screen, _sx, _sy) \
-	MDRV_DEVICE_ADD((_tag), HD44102, 0) \
-	MDRV_DEVICE_CONFIG_DATAPTR(hd44102_config, screen_tag, _screen) \
-	MDRV_DEVICE_CONFIG_DATA32(hd44102_config, sx, _sx) \
-	MDRV_DEVICE_CONFIG_DATA32(hd44102_config, sy, _sy)
+#define MCFG_HD44102_ADD(_tag, _screen, _sx, _sy) \
+	MCFG_DEVICE_ADD((_tag), HD44102, 0) \
+	MCFG_DEVICE_CONFIG_DATAPTR(hd44102_config, screen_tag, _screen) \
+	MCFG_DEVICE_CONFIG_DATA32(hd44102_config, sx, _sx) \
+	MCFG_DEVICE_CONFIG_DATA32(hd44102_config, sy, _sy)
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -50,6 +50,6 @@ READ8_DEVICE_HANDLER( hd44102_r );
 WRITE8_DEVICE_HANDLER( hd44102_w );
 
 /* screen update */
-void hd44102_update(running_device *device, bitmap_t *bitmap, const rectangle *cliprect);
+void hd44102_update(device_t *device, bitmap_t *bitmap, const rectangle *cliprect);
 
 #endif

@@ -639,7 +639,7 @@ static VIDEO_START( pet_crtc )
 
 static VIDEO_UPDATE( pet_crtc )
 {
-	running_device *mc6845 = screen->machine->device("crtc");
+	device_t *mc6845 = screen->machine->device("crtc");
 	mc6845_update(mc6845, bitmap, cliprect);
 	return 0;
 }
@@ -661,145 +661,145 @@ static IEEE488_DAISY( ieee488_daisy )
 
 static MACHINE_CONFIG_START( pet_general, pet_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6502, XTAL_8MHz/8)
-	MDRV_CPU_PROGRAM_MAP(pet_mem)
-	MDRV_CPU_VBLANK_INT("screen", pet_frame_interrupt)
+	MCFG_CPU_ADD("maincpu", M6502, XTAL_8MHz/8)
+	MCFG_CPU_PROGRAM_MAP(pet_mem)
+	MCFG_CPU_VBLANK_INT("screen", pet_frame_interrupt)
 
-	MDRV_MACHINE_RESET( pet )
+	MCFG_MACHINE_RESET( pet )
 
     /* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(320, 200)
-	MDRV_SCREEN_VISIBLE_AREA(0, 320 - 1, 0, 200 - 1)
-	MDRV_GFXDECODE( pet )
-	MDRV_PALETTE_LENGTH(ARRAY_LENGTH(pet_palette) / 3)
-	MDRV_PALETTE_INIT( pet )
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(320, 200)
+	MCFG_SCREEN_VISIBLE_AREA(0, 320 - 1, 0, 200 - 1)
+	MCFG_GFXDECODE( pet )
+	MCFG_PALETTE_LENGTH(ARRAY_LENGTH(pet_palette) / 3)
+	MCFG_PALETTE_INIT( pet )
 
-	MDRV_VIDEO_UPDATE( pet )
+	MCFG_VIDEO_UPDATE( pet )
 
 	/* cassette */
-	MDRV_CASSETTE_ADD( "cassette1", cbm_cassette_config )
-	MDRV_CASSETTE_ADD( "cassette2", cbm_cassette_config )
+	MCFG_CASSETTE_ADD( "cassette1", cbm_cassette_config )
+	MCFG_CASSETTE_ADD( "cassette2", cbm_cassette_config )
 
 	/* via */
-	MDRV_VIA6522_ADD( "via6522_0", 0, pet_via)
+	MCFG_VIA6522_ADD( "via6522_0", 0, pet_via)
 
 	/* pias */
-	MDRV_PIA6821_ADD( "pia_0", pet_pia0)
-	MDRV_PIA6821_ADD( "pia_1", pet_pia1)
+	MCFG_PIA6821_ADD( "pia_0", pet_pia0)
+	MCFG_PIA6821_ADD( "pia_1", pet_pia1)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( pet, pet_general )
-	MDRV_QUICKLOAD_ADD("quickload", cbm_pet, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
-	MDRV_FRAGMENT_ADD(pet_cartslot)
+	MCFG_QUICKLOAD_ADD("quickload", cbm_pet, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
+	MCFG_FRAGMENT_ADD(pet_cartslot)
 
 	/* internal ram */
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("32K")
-	MDRV_RAM_EXTRA_OPTIONS("8K,16K")
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("32K")
+	MCFG_RAM_EXTRA_OPTIONS("8K,16K")
 
 	/* IEEE bus */
-	MDRV_IEEE488_ADD("ieee_bus", ieee488_daisy)
-	MDRV_C4040_ADD("drive", "ieee_bus", 8)
+	MCFG_IEEE488_ADD("ieee_bus", ieee488_daisy)
+	MCFG_C4040_ADD("drive", "ieee_bus", 8)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( petb, pet )
-	MDRV_PIA6821_MODIFY( "pia_0", petb_pia0 )
+	MCFG_PIA6821_MODIFY( "pia_0", petb_pia0 )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( pet2001, pet_general )
-	MDRV_QUICKLOAD_ADD("quickload", cbm_pet1, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
-	MDRV_FRAGMENT_ADD(pet_cartslot)
+	MCFG_QUICKLOAD_ADD("quickload", cbm_pet1, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
+	MCFG_FRAGMENT_ADD(pet_cartslot)
 
 	/* internal ram */
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("8K")
-	MDRV_RAM_EXTRA_OPTIONS("4K")
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("8K")
+	MCFG_RAM_EXTRA_OPTIONS("4K")
 
 	/* IEEE bus */
-	MDRV_IEEE488_ADD("ieee_bus", ieee488_daisy)
-	MDRV_C4040_ADD("drive", "ieee_bus", 8)
+	MCFG_IEEE488_ADD("ieee_bus", ieee488_daisy)
+	MCFG_C4040_ADD("drive", "ieee_bus", 8)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( pet40, pet )
-	MDRV_CPU_MODIFY( "maincpu" )
-	MDRV_CPU_PROGRAM_MAP( pet40_mem)
+	MCFG_CPU_MODIFY( "maincpu" )
+	MCFG_CPU_PROGRAM_MAP( pet40_mem)
 
-	MDRV_MC6845_ADD("crtc", MC6845, XTAL_17_73447MHz/3	/* This is a wild guess and mostly likely incorrect */, crtc_pet40)
+	MCFG_MC6845_ADD("crtc", MC6845, XTAL_17_73447MHz/3	/* This is a wild guess and mostly likely incorrect */, crtc_pet40)
 
-	MDRV_VIDEO_START( pet_crtc )
-	MDRV_VIDEO_UPDATE( pet_crtc )
+	MCFG_VIDEO_START( pet_crtc )
+	MCFG_VIDEO_UPDATE( pet_crtc )
 
-	MDRV_FRAGMENT_ADD(pet4_cartslot)
+	MCFG_FRAGMENT_ADD(pet4_cartslot)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( pet40pal, pet40 )
 
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_REFRESH_RATE(50)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( pet80, pet_general )
-	MDRV_QUICKLOAD_ADD("quickload", cbm_pet, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
-	MDRV_FRAGMENT_ADD(pet_cartslot)
+	MCFG_QUICKLOAD_ADD("quickload", cbm_pet, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
+	MCFG_FRAGMENT_ADD(pet_cartslot)
 
-	MDRV_CPU_MODIFY( "maincpu" )
-	MDRV_CPU_PROGRAM_MAP( pet80_mem)
+	MCFG_CPU_MODIFY( "maincpu" )
+	MCFG_CPU_PROGRAM_MAP( pet80_mem)
 
     /* video hardware */
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(640, 250)
-	MDRV_SCREEN_VISIBLE_AREA(0, 640 - 1, 0, 250 - 1)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(640, 250)
+	MCFG_SCREEN_VISIBLE_AREA(0, 640 - 1, 0, 250 - 1)
 
-	MDRV_MC6845_ADD("crtc", MC6845, XTAL_12MHz / 2	/* This is a wild guess and mostly likely incorrect */, crtc_pet80)
+	MCFG_MC6845_ADD("crtc", MC6845, XTAL_12MHz / 2	/* This is a wild guess and mostly likely incorrect */, crtc_pet80)
 
-	MDRV_GFXDECODE( pet80 )
-	MDRV_VIDEO_START( pet_crtc )
-	MDRV_VIDEO_UPDATE( pet_crtc )
+	MCFG_GFXDECODE( pet80 )
+	MCFG_VIDEO_START( pet_crtc )
+	MCFG_VIDEO_UPDATE( pet_crtc )
 
-	MDRV_PIA6821_MODIFY( "pia_0", petb_pia0 )
+	MCFG_PIA6821_MODIFY( "pia_0", petb_pia0 )
 
-	MDRV_FRAGMENT_ADD(pet4_cartslot)
+	MCFG_FRAGMENT_ADD(pet4_cartslot)
 
 	/* internal ram */
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("32K")
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("32K")
 
 	/* IEEE bus */
-	MDRV_IEEE488_ADD("ieee_bus", ieee488_daisy)
-	MDRV_C8050_ADD("drive", "ieee_bus", 8)
+	MCFG_IEEE488_ADD("ieee_bus", ieee488_daisy)
+	MCFG_C8050_ADD("drive", "ieee_bus", 8)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( pet80pal, pet80 )
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_REFRESH_RATE(50)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( superpet, pet80 )
-	MDRV_CPU_MODIFY( "maincpu" )
-	MDRV_CPU_PROGRAM_MAP( superpet_mem)
+	MCFG_CPU_MODIFY( "maincpu" )
+	MCFG_CPU_PROGRAM_MAP( superpet_mem)
 
 	/* m6809 cpu */
-	MDRV_CPU_ADD("m6809", M6809, 1000000)
-	MDRV_CPU_PROGRAM_MAP(superpet_m6809_mem)
-	MDRV_CPU_VBLANK_INT("screen", pet_frame_interrupt)
+	MCFG_CPU_ADD("m6809", M6809, 1000000)
+	MCFG_CPU_PROGRAM_MAP(superpet_m6809_mem)
+	MCFG_CPU_VBLANK_INT("screen", pet_frame_interrupt)
 
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_REFRESH_RATE(50)
-	MDRV_GFXDECODE( superpet )
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_GFXDECODE( superpet )
 
-	MDRV_PIA6821_MODIFY( "pia_0", petb_pia0 )
+	MCFG_PIA6821_MODIFY( "pia_0", petb_pia0 )
 MACHINE_CONFIG_END
 
 

@@ -67,11 +67,11 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<running_device> m_ctc;
-	required_device<running_device> m_dart;
-	required_device<running_device> m_sio;
-	required_device<running_device> m_discrete;
-	required_device<running_device> m_ram;
+	required_device<device_t> m_ctc;
+	required_device<device_t> m_dart;
+	required_device<device_t> m_sio;
+	required_device<device_t> m_discrete;
+	required_device<device_t> m_ram;
 
 	virtual void machine_start();
 	virtual void machine_reset();
@@ -123,7 +123,7 @@ public:
 		  m_crtc(*this, MC6845_TAG)
 	{ }
 
-	required_device<running_device> m_crtc;
+	required_device<device_t> m_crtc;
 
 	virtual bool video_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 
@@ -138,7 +138,7 @@ public:
 		  m_trom(*this, SAA5052_TAG)
 	{ }
 
-	required_device<running_device> m_trom;
+	required_device<device_t> m_trom;
 
 	virtual bool video_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 
@@ -163,13 +163,13 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<running_device> m_ctc;
-	required_device<running_device> m_dart;
-	required_device<running_device> m_sio;
-	required_device<running_device> m_crtc;
-	optional_device<running_device> abc77;
-	required_device<running_device> m_discrete;
-	required_device<running_device> m_ram;
+	required_device<device_t> m_ctc;
+	required_device<device_t> m_dart;
+	required_device<device_t> m_sio;
+	required_device<device_t> m_crtc;
+	optional_device<device_t> abc77;
+	required_device<device_t> m_discrete;
+	required_device<device_t> m_ram;
 
 	virtual void machine_start();
 	virtual void machine_reset();
@@ -218,13 +218,13 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<running_device> m_ctc;
-	required_device<running_device> m_dart;
-	required_device<running_device> m_sio;
-	required_device<running_device> m_crtc;
-	required_device<running_device> m_rtc;
-	optional_device<running_device> abc77;
-	required_device<running_device> m_ram;
+	required_device<device_t> m_ctc;
+	required_device<device_t> m_dart;
+	required_device<device_t> m_sio;
+	required_device<device_t> m_crtc;
+	required_device<device_t> m_rtc;
+	optional_device<device_t> abc77;
+	required_device<device_t> m_ram;
 	
 	virtual void machine_start();
 	virtual void machine_reset();

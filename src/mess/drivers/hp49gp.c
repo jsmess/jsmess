@@ -38,7 +38,7 @@ public:
 		: driver_device(machine, config) { }
 
 	UINT32 port[9];
-	running_device *s3c2410;
+	device_t *s3c2410;
 	UINT32 *steppingstone;
 	lcd_spi_t lcd_spi;
 };
@@ -157,7 +157,7 @@ static int lcd_spi_line_r( running_machine *machine, int line)
 
 // I/O PORT
 
-static UINT32 s3c2410_gpio_port_r( running_device *device, int port)
+static UINT32 s3c2410_gpio_port_r( device_t *device, int port)
 {
 	hp49gp_state *hp49gp = device->machine->driver_data<hp49gp_state>();
 	UINT32 data = hp49gp->port[port];
@@ -208,7 +208,7 @@ static UINT32 s3c2410_gpio_port_r( running_device *device, int port)
 	return data;
 }
 
-static void s3c2410_gpio_port_w( running_device *device, int port, UINT32 data)
+static void s3c2410_gpio_port_w( device_t *device, int port, UINT32 data)
 {
 	hp49gp_state *hp49gp = device->machine->driver_data<hp49gp_state>();
 	hp49gp->port[port] = data;
@@ -265,7 +265,7 @@ ADDRESS_MAP_END
 static DRIVER_INIT( hp49gp )
 {
 	hp49gp_state *hp49gp = machine->driver_data<hp49gp_state>();
-	UINT8 *rom = (UINT8 *)memory_region( machine, "maincpu");
+	UINT8 *rom = (UINT8 *)machine->region( "maincpu")->base();
 	memcpy( hp49gp->steppingstone, rom, 1024);
 	lcd_spi_init( machine);
 }
@@ -287,26 +287,26 @@ static S3C2410_INTERFACE( hp49gp_s3c2410_intf )
 };
 
 static MACHINE_CONFIG_START( hp49gp, hp49gp_state )
-	MDRV_CPU_ADD("maincpu", ARM9, 400000000)
-	MDRV_CPU_PROGRAM_MAP(hp49gp_map)
+	MCFG_CPU_ADD("maincpu", ARM9, 400000000)
+	MCFG_CPU_PROGRAM_MAP(hp49gp_map)
 
-	MDRV_PALETTE_LENGTH(32768)
+	MCFG_PALETTE_LENGTH(32768)
 
-	MDRV_SCREEN_ADD("screen", LCD)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MDRV_SCREEN_SIZE(160, 85)
-	MDRV_SCREEN_VISIBLE_AREA(0, 131 - 1, 0, 80 - 1)
-	MDRV_DEFAULT_LAYOUT(layout_lcd)
+	MCFG_SCREEN_ADD("screen", LCD)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_SIZE(160, 85)
+	MCFG_SCREEN_VISIBLE_AREA(0, 131 - 1, 0, 80 - 1)
+	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
-	MDRV_VIDEO_START(s3c2410)
-	MDRV_VIDEO_UPDATE(s3c2410)
+	MCFG_VIDEO_START(s3c2410)
+	MCFG_VIDEO_UPDATE(s3c2410)
 
-	MDRV_MACHINE_START(hp49gp)
-	MDRV_MACHINE_RESET(hp49gp)
+	MCFG_MACHINE_START(hp49gp)
+	MCFG_MACHINE_RESET(hp49gp)
 
-	MDRV_S3C2410_ADD("s3c2410", 12000000, hp49gp_s3c2410_intf)
+	MCFG_S3C2410_ADD("s3c2410", 12000000, hp49gp_s3c2410_intf)
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( hp49gp )

@@ -153,19 +153,19 @@ typedef enum
 #define I8271_STATUS_INT_REQUEST	0x008
 #define I8271_STATUS_NON_DMA_REQUEST	0x004
 
-static void i8271_command_execute(running_device *device);
-static void i8271_command_continue(running_device *device);
-static void i8271_command_complete(running_device *device,int result, int int_rq);
-static void i8271_data_request(running_device *device);
-static void i8271_timed_data_request(running_device *device);
+static void i8271_command_execute(device_t *device);
+static void i8271_command_continue(device_t *device);
+static void i8271_command_complete(device_t *device,int result, int int_rq);
+static void i8271_data_request(device_t *device);
+static void i8271_timed_data_request(device_t *device);
 /* locate sector for read/write operation */
-static int i8271_find_sector(running_device *device);
+static int i8271_find_sector(device_t *device);
 /* do a read operation */
-static void i8271_do_read(running_device *device);
-static void i8271_do_write(running_device *device);
-static void i8271_do_read_id(running_device *device);
-static void i8271_set_irq_state(running_device *device,int);
-static void i8271_set_dma_drq(running_device *device);
+static void i8271_do_read(device_t *device);
+static void i8271_do_write(device_t *device);
+static void i8271_do_read_id(device_t *device);
+static void i8271_set_irq_state(device_t *device,int);
+static void i8271_set_dma_drq(device_t *device);
 
 static TIMER_CALLBACK(i8271_data_timer_callback);
 static TIMER_CALLBACK(i8271_timed_command_complete_callback);
@@ -178,7 +178,7 @@ static TIMER_CALLBACK(i8271_timed_command_complete_callback);
 
 static DEVICE_RESET( i8271 );
 
-INLINE i8271_t *get_safe_token(running_device *device)
+INLINE i8271_t *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 
@@ -186,7 +186,7 @@ INLINE i8271_t *get_safe_token(running_device *device)
 }
 
 
-static running_device *current_image(running_device *device)
+static device_t *current_image(device_t *device)
 {
 	i8271_t *i8271 = get_safe_token(device);
 	if (i8271->intf->floppy_drive_tags[i8271->drive]!=NULL) {
@@ -197,9 +197,9 @@ static running_device *current_image(running_device *device)
 }
 
 
-static void i8271_seek_to_track(running_device *device,int track)
+static void i8271_seek_to_track(device_t *device,int track)
 {
-	running_device *img = current_image(device);
+	device_t *img = current_image(device);
 	i8271_t *i8271 = get_safe_token(device);
 	if (track==0)
 	{
@@ -257,7 +257,7 @@ static void i8271_seek_to_track(running_device *device,int track)
 
 static TIMER_CALLBACK(i8271_data_timer_callback)
 {
-	running_device *device = (running_device *)ptr;
+	device_t *device = (device_t *)ptr;
 	i8271_t *i8271 = get_safe_token(device);
 
 	/* ok, trigger data request now */
@@ -268,7 +268,7 @@ static TIMER_CALLBACK(i8271_data_timer_callback)
 }
 
 /* setup a timed data request - data request will be triggered in a few usecs time */
-static void i8271_timed_data_request(running_device *device)
+static void i8271_timed_data_request(device_t *device)
 {
 	int usecs;
 	i8271_t *i8271 = get_safe_token(device);
@@ -283,7 +283,7 @@ static void i8271_timed_data_request(running_device *device)
 
 static TIMER_CALLBACK(i8271_timed_command_complete_callback)
 {
-	running_device *device = (running_device *)ptr;
+	device_t *device = (device_t *)ptr;
 	i8271_t *i8271 = get_safe_token(device);
 
 	i8271_command_complete(device,1,1);
@@ -295,7 +295,7 @@ static TIMER_CALLBACK(i8271_timed_command_complete_callback)
 /* setup a irq to occur 128us later - in reality this would be much later, because the int would
 come after reading the two CRC bytes at least! This function is used when a irq is required at
 command completion. Required for read data and write data, where last byte could be missed! */
-static void i8271_timed_command_complete(running_device *device)
+static void i8271_timed_command_complete(device_t *device)
 {
 	int usecs;
 	i8271_t *i8271 = get_safe_token(device);
@@ -308,7 +308,7 @@ static void i8271_timed_command_complete(running_device *device)
 	timer_adjust_oneshot(i8271->command_complete_timer, ATTOTIME_IN_USEC(usecs), 0);
 }
 
-static void i8271_set_irq_state(running_device *device,int state)
+static void i8271_set_irq_state(device_t *device,int state)
 {
 	i8271_t *i8271 = get_safe_token(device);
 	i8271->StatusRegister &= ~I8271_STATUS_INT_REQUEST;
@@ -323,7 +323,7 @@ static void i8271_set_irq_state(running_device *device,int state)
 	}
 }
 
-static void i8271_set_dma_drq(running_device *device)
+static void i8271_set_dma_drq(device_t *device)
 {
 	i8271_t *i8271 = get_safe_token(device);
 	if (i8271->intf->dma_request)
@@ -332,7 +332,7 @@ static void i8271_set_dma_drq(running_device *device)
 	}
 }
 
-static void i8271_load_bad_tracks(running_device *device, int surface)
+static void i8271_load_bad_tracks(device_t *device, int surface)
 {
 	i8271_t *i8271 = get_safe_token(device);
 	i8271->BadTracks[(surface<<1) + 0] = i8271->CommandParameters[1];
@@ -340,31 +340,31 @@ static void i8271_load_bad_tracks(running_device *device, int surface)
 	i8271->CurrentTrack[surface] = i8271->CommandParameters[3];
 }
 
-static void i8271_write_bad_track(running_device *device, int surface, int track, int data)
+static void i8271_write_bad_track(device_t *device, int surface, int track, int data)
 {
 	i8271_t *i8271 = get_safe_token(device);
 	i8271->BadTracks[(surface<<1) + (track-1)] = data;
 }
 
-static void i8271_write_current_track(running_device *device,int surface, int track)
+static void i8271_write_current_track(device_t *device,int surface, int track)
 {
 	i8271_t *i8271 = get_safe_token(device);
 	i8271->CurrentTrack[surface] = track;
 }
 
-static int i8271_read_current_track(running_device *device,int surface)
+static int i8271_read_current_track(device_t *device,int surface)
 {
 	i8271_t *i8271 = get_safe_token(device);
 	return i8271->CurrentTrack[surface];
 }
 
-static int i8271_read_bad_track(running_device *device,int surface, int track)
+static int i8271_read_bad_track(device_t *device,int surface, int track)
 {
 	i8271_t *i8271 = get_safe_token(device);
 	return i8271->BadTracks[(surface<<1) + (track-1)];
 }
 
-static void i8271_get_drive(running_device *device)
+static void i8271_get_drive(device_t *device)
 {
 	i8271_t *i8271 = get_safe_token(device);
 	/* &40 = drive 0 side 0 */
@@ -384,7 +384,7 @@ static void i8271_get_drive(running_device *device)
 
 }
 
-static void i8271_check_all_parameters_written(running_device *device)
+static void i8271_check_all_parameters_written(device_t *device)
 {
 	i8271_t *i8271 = get_safe_token(device);
 	if (i8271->ParameterCount == i8271->ParameterCountWritten)
@@ -396,7 +396,7 @@ static void i8271_check_all_parameters_written(running_device *device)
 }
 
 
-static void i8271_update_state(running_device *device)
+static void i8271_update_state(device_t *device)
 {
 	i8271_t *i8271 = get_safe_token(device);
 	switch (i8271->state)
@@ -471,7 +471,7 @@ static void i8271_update_state(running_device *device)
 	}
 }
 
-static void i8271_initialise_execution_phase_read(running_device *device,int transfer_size)
+static void i8271_initialise_execution_phase_read(device_t *device,int transfer_size)
 {
 	i8271_t *i8271 = get_safe_token(device);
 	/* read */
@@ -482,7 +482,7 @@ static void i8271_initialise_execution_phase_read(running_device *device,int tra
 }
 
 
-static void i8271_initialise_execution_phase_write(running_device *device,int transfer_size)
+static void i8271_initialise_execution_phase_write(device_t *device,int transfer_size)
 {
 	i8271_t *i8271 = get_safe_token(device);
 	/* write */
@@ -493,7 +493,7 @@ static void i8271_initialise_execution_phase_write(running_device *device,int tr
 }
 
 /* for data transfers */
-static void i8271_data_request(running_device *device)
+static void i8271_data_request(device_t *device)
 {
 	i8271_t *i8271 = get_safe_token(device);
 	i8271->flags |= I8271_FLAGS_DATA_REQUEST;
@@ -514,7 +514,7 @@ static void i8271_data_request(running_device *device)
 	}
 }
 
-static void i8271_command_complete(running_device *device,int result, int int_rq)
+static void i8271_command_complete(device_t *device,int result, int int_rq)
 {
 	i8271_t *i8271 = get_safe_token(device);
 	/* not busy, and not a execution phase data request in non-dma mode */
@@ -537,7 +537,7 @@ static void i8271_command_complete(running_device *device,int result, int int_rq
 
 
 /* for data transfers */
-static void i8271_clear_data_request(running_device *device)
+static void i8271_clear_data_request(device_t *device)
 {
 	i8271_t *i8271 = get_safe_token(device);
 	i8271->flags &= ~I8271_FLAGS_DATA_REQUEST;
@@ -557,7 +557,7 @@ static void i8271_clear_data_request(running_device *device)
 }
 
 
-static void i8271_command_continue(running_device *device)
+static void i8271_command_continue(device_t *device)
 {
 	i8271_t *i8271 = get_safe_token(device);
 	switch (i8271->Command)
@@ -624,7 +624,7 @@ static void i8271_command_continue(running_device *device)
 	}
 }
 
-static void i8271_do_read(running_device *device)
+static void i8271_do_read(device_t *device)
 {
 	i8271_t *i8271 = get_safe_token(device);
 	/* find the sector */
@@ -645,7 +645,7 @@ static void i8271_do_read(running_device *device)
 	i8271_timed_command_complete(device);
 }
 
-static void i8271_do_read_id(running_device *device)
+static void i8271_do_read_id(device_t *device)
 {
 	chrn_id	id;
 	i8271_t *i8271 = get_safe_token(device);
@@ -662,7 +662,7 @@ static void i8271_do_read_id(running_device *device)
 }
 
 
-static void i8271_do_write(running_device *device)
+static void i8271_do_write(device_t *device)
 {
 	i8271_t *i8271 = get_safe_token(device);
 	/* find the sector */
@@ -682,9 +682,9 @@ static void i8271_do_write(running_device *device)
 
 
 
-static int i8271_find_sector(running_device *device)
+static int i8271_find_sector(device_t *device)
 {
-	running_device *img = current_image(device);
+	device_t *img = current_image(device);
 	i8271_t *i8271 = get_safe_token(device);
 //  int track_count_attempt;
 
@@ -738,10 +738,10 @@ static int i8271_find_sector(running_device *device)
 	return 0;
 }
 
-static void i8271_command_execute(running_device *device)
+static void i8271_command_execute(device_t *device)
 {
 	i8271_t *i8271 = get_safe_token(device);
-	running_device *img = current_image(device);
+	device_t *img = current_image(device);
 
 	/* clear it = good completion status */
 	/* this will be changed if anything bad happens! */

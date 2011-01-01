@@ -46,9 +46,9 @@ WRITE_LINE_DEVICE_HANDLER( e05a03_init_w ); /* centronics init */
 
 DECLARE_LEGACY_DEVICE(E05A03, e05a03);
 
-#define MDRV_E05A03_ADD(_tag, _intf) \
-	MDRV_DEVICE_ADD(_tag, E05A03, 0) \
-	MDRV_DEVICE_CONFIG(_intf)
+#define MCFG_E05A03_ADD(_tag, _intf) \
+	MCFG_DEVICE_ADD(_tag, E05A03, 0) \
+	MCFG_DEVICE_CONFIG(_intf)
 
 
 #endif /* __E05A03_H__ */

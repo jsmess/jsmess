@@ -26,7 +26,7 @@ public:
 
 static WRITE8_HANDLER(microdec_terminal_w)
 {
-	running_device *devconf = space->machine->device("terminal");
+	device_t *devconf = space->machine->device("terminal");
 	terminal_write(devconf,0,data);
 }
 
@@ -110,18 +110,18 @@ static const floppy_config microdec_floppy_config =
 
 static MACHINE_CONFIG_START( microdec, microdec_state )
     /* basic machine hardware */
-    MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz)
-    MDRV_CPU_PROGRAM_MAP(microdec_mem)
-    MDRV_CPU_IO_MAP(microdec_io)
+    MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
+    MCFG_CPU_PROGRAM_MAP(microdec_mem)
+    MCFG_CPU_IO_MAP(microdec_io)
 
-    MDRV_MACHINE_RESET(microdec)
+    MCFG_MACHINE_RESET(microdec)
 
     /* video hardware */
-    MDRV_FRAGMENT_ADD( generic_terminal )
-	MDRV_GENERIC_TERMINAL_ADD(TERMINAL_TAG,microdec_terminal_intf)
+    MCFG_FRAGMENT_ADD( generic_terminal )
+	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG,microdec_terminal_intf)
 
-	MDRV_UPD765A_ADD("upd765", microdec_upd765_interface)
-	MDRV_FLOPPY_2_DRIVES_ADD(microdec_floppy_config)
+	MCFG_UPD765A_ADD("upd765", microdec_upd765_interface)
+	MCFG_FLOPPY_2_DRIVES_ADD(microdec_floppy_config)
 MACHINE_CONFIG_END
 
 /* ROM definition */

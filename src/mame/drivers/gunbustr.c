@@ -111,7 +111,7 @@ popmessage(t);
 
 			if (ACCESSING_BITS_0_7)
 			{
-				running_device *device = space->machine->device("eeprom");
+				device_t *device = space->machine->device("eeprom");
 				eeprom_set_clock_line(device, (data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
 				eeprom_write_bit(device, data & 0x40);
 				eeprom_set_cs_line(device, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
@@ -345,30 +345,30 @@ static const tc0480scp_interface gunbustr_tc0480scp_intf =
 static MACHINE_CONFIG_START( gunbustr, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68EC020, 16000000)	/* 16 MHz */
-	MDRV_CPU_PROGRAM_MAP(gunbustr_map)
-	MDRV_CPU_VBLANK_INT("screen", gunbustr_interrupt) /* VBL */
+	MCFG_CPU_ADD("maincpu", M68EC020, 16000000)	/* 16 MHz */
+	MCFG_CPU_PROGRAM_MAP(gunbustr_map)
+	MCFG_CPU_VBLANK_INT("screen", gunbustr_interrupt) /* VBL */
 
-	MDRV_EEPROM_ADD("eeprom", gunbustr_eeprom_interface)
+	MCFG_EEPROM_ADD("eeprom", gunbustr_eeprom_interface)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(40*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0, 40*8-1, 2*8, 32*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(40*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0, 40*8-1, 2*8, 32*8-1)
 
-	MDRV_GFXDECODE(gunbustr)
-	MDRV_PALETTE_LENGTH(8192)
+	MCFG_GFXDECODE(gunbustr)
+	MCFG_PALETTE_LENGTH(8192)
 
-	MDRV_VIDEO_START(gunbustr)
-	MDRV_VIDEO_UPDATE(gunbustr)
+	MCFG_VIDEO_START(gunbustr)
+	MCFG_VIDEO_UPDATE(gunbustr)
 
-	MDRV_TC0480SCP_ADD("tc0480scp", gunbustr_tc0480scp_intf)
+	MCFG_TC0480SCP_ADD("tc0480scp", gunbustr_tc0480scp_intf)
 
 	/* sound hardware */
-	MDRV_FRAGMENT_ADD(taito_f3_sound)
+	MCFG_FRAGMENT_ADD(taito_f3_sound)
 MACHINE_CONFIG_END
 
 /***************************************************************************/

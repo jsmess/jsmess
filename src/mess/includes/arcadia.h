@@ -87,7 +87,7 @@ extern VIDEO_UPDATE( arcadia );
 
 DECLARE_LEGACY_SOUND_DEVICE(ARCADIA, arcadia_sound);
 
-void arcadia_soundport_w (running_device *device, int mode, int data);
+void arcadia_soundport_w (device_t *device, int mode, int data);
 
 
 #endif /* ARCADIA_H_ */

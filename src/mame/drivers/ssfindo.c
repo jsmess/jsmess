@@ -313,7 +313,7 @@ static READ32_HANDLER(PS7500_IO_r)
 	switch(offset)
 	{
 		case MSECR:
-			return mame_rand(space->machine);
+			return space->machine->rand();
 
 		case IOLINES: //TODO: eeprom  24c01
 #if 0
@@ -323,7 +323,7 @@ static READ32_HANDLER(PS7500_IO_r)
 		if(flashType == 1)
 			return 0;
 		else
-			return mame_rand(space->machine);
+			return space->machine->rand();
 
 		case IRQSTA:
 			return (PS7500_IO[offset] & (~2)) | 0x80;
@@ -351,7 +351,7 @@ static READ32_HANDLER(PS7500_IO_r)
 		//default:
 			//mame_printf_debug("ior %i @%x\n",offset,cpu_get_pc(space->cpu));
 	}
-	return mame_rand(space->machine);//PS7500_IO[offset];
+	return space->machine->rand();//PS7500_IO[offset];
 }
 
 static WRITE32_HANDLER(PS7500_IO_w)
@@ -420,7 +420,7 @@ static WRITE32_HANDLER(PS7500_IO_w)
 
 static READ32_HANDLER(io_r)
 {
-	UINT16 *FLASH = (UINT16 *)memory_region(space->machine, "user2"); //16 bit - WORD access
+	UINT16 *FLASH = (UINT16 *)space->machine->region("user2")->base(); //16 bit - WORD access
 
 	int adr=flashAdr*0x200+(flashOffset);
 
@@ -473,17 +473,17 @@ static WRITE32_HANDLER(debug_w)
 
 static READ32_HANDLER(ff4_r)
 {
-	return mame_rand(space->machine)&0x20;
+	return space->machine->rand()&0x20;
 }
 
 static READ32_HANDLER(SIMPLEIO_r)
 {
-	return mame_rand(space->machine)&1;
+	return space->machine->rand()&1;
 }
 
 static READ32_HANDLER(randomized_r)
 {
-	return mame_rand(space->machine);
+	return space->machine->rand();
 }
 
 static ADDRESS_MAP_START( ssfindo_map, ADDRESS_SPACE_PROGRAM, 32 )
@@ -596,46 +596,46 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( ssfindo, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", ARM7, 54000000) // guess...
-	MDRV_CPU_PROGRAM_MAP(ssfindo_map)
+	MCFG_CPU_ADD("maincpu", ARM7, 54000000) // guess...
+	MCFG_CPU_PROGRAM_MAP(ssfindo_map)
 
-	MDRV_CPU_VBLANK_INT("screen", ssfindo_interrupt)
-	MDRV_MACHINE_RESET(ssfindo)
+	MCFG_CPU_VBLANK_INT("screen", ssfindo_interrupt)
+	MCFG_MACHINE_RESET(ssfindo)
 
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(320, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(320, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 
-	MDRV_PALETTE_LENGTH(256)
+	MCFG_PALETTE_LENGTH(256)
 
-	MDRV_VIDEO_UPDATE(ssfindo)
+	MCFG_VIDEO_UPDATE(ssfindo)
 
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( ppcar, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", ARM7, 54000000) // guess...
-	MDRV_CPU_PROGRAM_MAP(ppcar_map)
+	MCFG_CPU_ADD("maincpu", ARM7, 54000000) // guess...
+	MCFG_CPU_PROGRAM_MAP(ppcar_map)
 
-	MDRV_CPU_VBLANK_INT("screen", ssfindo_interrupt)
-	MDRV_MACHINE_RESET(ssfindo)
+	MCFG_CPU_VBLANK_INT("screen", ssfindo_interrupt)
+	MCFG_MACHINE_RESET(ssfindo)
 
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(320, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(320, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 
-	MDRV_PALETTE_LENGTH(256)
+	MCFG_PALETTE_LENGTH(256)
 
-	MDRV_VIDEO_UPDATE(ssfindo)
+	MCFG_VIDEO_UPDATE(ssfindo)
 MACHINE_CONFIG_END
 
 

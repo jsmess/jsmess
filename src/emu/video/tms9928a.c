@@ -100,17 +100,17 @@ static const rgb_t TMS9928A_palette[16] =
 /*
 ** Forward declarations of internal functions.
 */
-static void draw_mode0 (running_device *screen, bitmap_t *bitmap, const rectangle *cliprect);
-static void draw_mode1 (running_device *screen, bitmap_t *bitmap, const rectangle *cliprect);
-static void draw_mode2 (running_device *screen, bitmap_t *bitmap, const rectangle *cliprect);
-static void draw_mode12 (running_device *screen, bitmap_t *bitmap, const rectangle *cliprect);
-static void draw_mode3 (running_device *screen, bitmap_t *bitmap, const rectangle *cliprect);
-static void draw_mode23 (running_device *screen, bitmap_t *bitmap, const rectangle *cliprect);
-static void draw_modebogus (running_device *screen, bitmap_t *bitmap, const rectangle *cliprect);
-static void draw_sprites (running_device *screen, bitmap_t *bitmap, const rectangle *cliprect);
+static void draw_mode0 (device_t *screen, bitmap_t *bitmap, const rectangle *cliprect);
+static void draw_mode1 (device_t *screen, bitmap_t *bitmap, const rectangle *cliprect);
+static void draw_mode2 (device_t *screen, bitmap_t *bitmap, const rectangle *cliprect);
+static void draw_mode12 (device_t *screen, bitmap_t *bitmap, const rectangle *cliprect);
+static void draw_mode3 (device_t *screen, bitmap_t *bitmap, const rectangle *cliprect);
+static void draw_mode23 (device_t *screen, bitmap_t *bitmap, const rectangle *cliprect);
+static void draw_modebogus (device_t *screen, bitmap_t *bitmap, const rectangle *cliprect);
+static void draw_sprites (device_t *screen, bitmap_t *bitmap, const rectangle *cliprect);
 static void change_register (running_machine *machine, int reg, UINT8 data);
 
-static void (*const ModeHandlers[])(running_device *screen, bitmap_t *bitmap, const rectangle *cliprect) = {
+static void (*const ModeHandlers[])(device_t *screen, bitmap_t *bitmap, const rectangle *cliprect) = {
         draw_mode0, draw_mode1, draw_mode2,  draw_mode12,
         draw_mode3, draw_modebogus, draw_mode23,
         draw_modebogus
@@ -450,7 +450,7 @@ int TMS9928A_interrupt(running_machine *machine) {
     return b;
 }
 
-static void draw_mode1 (running_device *screen, bitmap_t *bitmap, const rectangle *cliprect) {
+static void draw_mode1 (device_t *screen, bitmap_t *bitmap, const rectangle *cliprect) {
     int pattern,x,y,yy,xx,name,charcode;
     UINT8 fg,bg,*patternptr;
     rectangle rt;
@@ -485,7 +485,7 @@ static void draw_mode1 (running_device *screen, bitmap_t *bitmap, const rectangl
     }
 }
 
-static void draw_mode12 (running_device *screen, bitmap_t *bitmap, const rectangle *cliprect) {
+static void draw_mode12 (device_t *screen, bitmap_t *bitmap, const rectangle *cliprect) {
     int pattern,x,y,yy,xx,name,charcode;
     UINT8 fg,bg,*patternptr;
     const pen_t *pens;
@@ -520,7 +520,7 @@ static void draw_mode12 (running_device *screen, bitmap_t *bitmap, const rectang
     }
 }
 
-static void draw_mode0 (running_device *screen, bitmap_t *bitmap, const rectangle *cliprect) {
+static void draw_mode0 (device_t *screen, bitmap_t *bitmap, const rectangle *cliprect) {
     int pattern,x,y,yy,xx,name,charcode,colour;
     UINT8 fg,bg,*patternptr;
     const pen_t *pens;
@@ -546,7 +546,7 @@ static void draw_mode0 (running_device *screen, bitmap_t *bitmap, const rectangl
     }
 }
 
-static void draw_mode2 (running_device *screen, bitmap_t *bitmap, const rectangle *cliprect) {
+static void draw_mode2 (device_t *screen, bitmap_t *bitmap, const rectangle *cliprect) {
     int colour,name,x,y,yy,pattern,xx,charcode;
     UINT8 fg,bg;
     const pen_t *pens;
@@ -576,7 +576,7 @@ static void draw_mode2 (running_device *screen, bitmap_t *bitmap, const rectangl
     }
 }
 
-static void draw_mode3 (running_device *screen, bitmap_t *bitmap, const rectangle *cliprect) {
+static void draw_mode3 (device_t *screen, bitmap_t *bitmap, const rectangle *cliprect) {
     int x,y,yy,yyy,name,charcode;
     UINT8 fg,bg,*patternptr;
     const pen_t *pens;
@@ -606,7 +606,7 @@ static void draw_mode3 (running_device *screen, bitmap_t *bitmap, const rectangl
     }
 }
 
-static void draw_mode23 (running_device *screen, bitmap_t *bitmap, const rectangle *cliprect) {
+static void draw_mode23 (device_t *screen, bitmap_t *bitmap, const rectangle *cliprect) {
     int x,y,yy,yyy,name,charcode;
     UINT8 fg,bg,*patternptr;
     const pen_t *pens;
@@ -637,7 +637,7 @@ static void draw_mode23 (running_device *screen, bitmap_t *bitmap, const rectang
     }
 }
 
-static void draw_modebogus (running_device *screen, bitmap_t *bitmap, const rectangle *cliprect) {
+static void draw_modebogus (device_t *screen, bitmap_t *bitmap, const rectangle *cliprect) {
     UINT8 fg,bg;
     int x,y,n,xx;
     const pen_t *pens;
@@ -666,7 +666,7 @@ static void draw_modebogus (running_device *screen, bitmap_t *bitmap, const rect
 **
 ** This code should be optimized. One day.
 */
-static void draw_sprites (running_device *screen, bitmap_t *bitmap, const rectangle *cliprect) {
+static void draw_sprites (device_t *screen, bitmap_t *bitmap, const rectangle *cliprect) {
     UINT8 *attributeptr,*patternptr,c;
     int p,x,y,size,i,j,large,yy,xx,limit[192],
         illegalsprite,illegalspriteline;
@@ -819,17 +819,17 @@ VIDEO_START( tms9928a )
 MACHINE_CONFIG_FRAGMENT( tms9928a )
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
+	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(LEFT_BORDER+32*8+RIGHT_BORDER, TOP_BORDER_60HZ+24*8+BOTTOM_BORDER_60HZ)
-	MDRV_SCREEN_VISIBLE_AREA(LEFT_BORDER-12, LEFT_BORDER+32*8+12-1, TOP_BORDER_60HZ-9, TOP_BORDER_60HZ+24*8+9-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(LEFT_BORDER+32*8+RIGHT_BORDER, TOP_BORDER_60HZ+24*8+BOTTOM_BORDER_60HZ)
+	MCFG_SCREEN_VISIBLE_AREA(LEFT_BORDER-12, LEFT_BORDER+32*8+12-1, TOP_BORDER_60HZ-9, TOP_BORDER_60HZ+24*8+9-1)
 
-	MDRV_PALETTE_LENGTH(TMS9928A_PALETTE_SIZE)
-	MDRV_PALETTE_INIT(tms9928a)
+	MCFG_PALETTE_LENGTH(TMS9928A_PALETTE_SIZE)
+	MCFG_PALETTE_INIT(tms9928a)
 
-	MDRV_VIDEO_START(tms9928a)
-	MDRV_VIDEO_UPDATE(tms9928a)
+	MCFG_VIDEO_START(tms9928a)
+	MCFG_VIDEO_UPDATE(tms9928a)
 MACHINE_CONFIG_END
 

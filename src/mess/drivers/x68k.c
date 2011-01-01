@@ -342,13 +342,13 @@ static TIMER_CALLBACK( x68k_led_callback )
 // 4 channel DMA controller (Hitachi HD63450)
 static WRITE16_HANDLER( x68k_dmac_w )
 {
-	running_device* device = space->machine->device("hd63450");
+	device_t* device = space->machine->device("hd63450");
 	hd63450_w(device, offset, data, mem_mask);
 }
 
 static READ16_HANDLER( x68k_dmac_r )
 {
-	running_device* device = space->machine->device("hd63450");
+	device_t* device = space->machine->device("hd63450");
 	return hd63450_r(device, offset, mem_mask);
 }
 
@@ -534,7 +534,7 @@ void mfp_recv_data(int data)
 static int x68k_read_mouse(running_machine *machine)
 {
 	x68k_state *state = machine->driver_data<x68k_state>();
-	running_device *scc = machine->device("scc");
+	device_t *scc = machine->device("scc");
 	char val = 0;
 	char ipt = 0;
 
@@ -579,7 +579,7 @@ static int x68k_read_mouse(running_machine *machine)
 */
 static READ16_HANDLER( x68k_scc_r )
 {
-	running_device *scc = space->machine->device("scc");
+	device_t *scc = space->machine->device("scc");
 	offset %= 4;
 	switch(offset)
 	{
@@ -599,7 +599,7 @@ static READ16_HANDLER( x68k_scc_r )
 static WRITE16_HANDLER( x68k_scc_w )
 {
 	x68k_state *state = space->machine->driver_data<x68k_state>();
-	running_device *scc = space->machine->device("scc");
+	device_t *scc = space->machine->device("scc");
 	offset %= 4;
 
 	switch(offset)
@@ -633,7 +633,7 @@ static WRITE16_HANDLER( x68k_scc_w )
 static TIMER_CALLBACK(x68k_scc_ack)
 {
 	x68k_state *state = machine->driver_data<x68k_state>();
-	running_device *scc = machine->device("scc");
+	device_t *scc = machine->device("scc");
 	if(state->mouse.bufferempty != 0)  // nothing to do if the mouse data buffer is empty
 		return;
 
@@ -659,7 +659,7 @@ static TIMER_CALLBACK(x68k_scc_ack)
 static void x68k_set_adpcm(running_machine* machine)
 {
 	x68k_state *state = machine->driver_data<x68k_state>();
-	running_device *dev = machine->device("hd63450");
+	device_t *dev = machine->device("hd63450");
 	UINT32 rate = 0;
 
 	switch(state->adpcm.rate & 0x0c)
@@ -688,7 +688,7 @@ static void x68k_set_adpcm(running_machine* machine)
 // Button inputs (Start, A, B and C) are read in bits 5 and 6 (rather than 4
 // and 5 like on a Megadrive)
 
-static UINT8 md_3button_r(running_device* device, int port)
+static UINT8 md_3button_r(device_t* device, int port)
 {
 	x68k_state *state = device->machine->driver_data<x68k_state>();
 	if(port == 1)
@@ -740,7 +740,7 @@ static void md_6button_init(running_machine* machine)
 	state->mdctrl.io_timeout2 = timer_alloc(machine,md_6button_port2_timeout,NULL);
 }
 
-static UINT8 md_6button_r(running_device* device, int port)
+static UINT8 md_6button_r(device_t* device, int port)
 {
 	x68k_state *state = device->machine->driver_data<x68k_state>();
 	if(port == 1)
@@ -829,7 +829,7 @@ static UINT8 md_6button_r(running_device* device, int port)
 // Output is the same as for standard controllers, but when ctl is high,
 // the directions refer to the right D-pad, and when low, the left D-pad
 // The buttons are read the same as normal, regardless of ctl.
-static UINT8 xpd1lr_r(running_device* device, int port)
+static UINT8 xpd1lr_r(device_t* device, int port)
 {
 	x68k_state *state = device->machine->driver_data<x68k_state>();
 	if(port == 1)
@@ -926,7 +926,7 @@ static WRITE8_DEVICE_HANDLER( ppi_port_c_w )
 {
 	x68k_state *state = device->machine->driver_data<x68k_state>();
 	// ADPCM / Joystick control
-	running_device *oki = device->machine->device("okim6258");
+	device_t *oki = device->machine->device("okim6258");
 
 	state->ppi_port[2] = data;
 	if((data & 0x0f) != (state->ppi_prev & 0x0f))
@@ -964,7 +964,7 @@ static WRITE8_DEVICE_HANDLER( ppi_port_c_w )
 static WRITE16_HANDLER( x68k_fdc_w )
 {
 	x68k_state *state = space->machine->driver_data<x68k_state>();
-	running_device *fdc = space->machine->device("upd72065");
+	device_t *fdc = space->machine->device("upd72065");
 	unsigned int drive, x;
 	switch(offset)
 	{
@@ -1043,7 +1043,7 @@ static READ16_HANDLER( x68k_fdc_r )
 	x68k_state *state = space->machine->driver_data<x68k_state>();
 	unsigned int ret;
 	int x;
-	running_device *fdc = space->machine->device("upd72065");
+	device_t *fdc = space->machine->device("upd72065");
 
 	switch(offset)
 	{
@@ -1094,7 +1094,7 @@ static int x68k_fdc_read_byte(running_machine *machine,int addr)
 {
 	x68k_state *state = machine->driver_data<x68k_state>();
 	int data = -1;
-	running_device *fdc = machine->device("upd72065");
+	device_t *fdc = machine->device("upd72065");
 
 	if(state->fdc.drq_state != 0)
 		data = upd765_dack_r(fdc, 0);
@@ -1104,7 +1104,7 @@ static int x68k_fdc_read_byte(running_machine *machine,int addr)
 
 static void x68k_fdc_write_byte(running_machine *machine,int addr, int data)
 {
-	running_device *fdc = machine->device("upd72065");
+	device_t *fdc = machine->device("upd72065");
 	upd765_dack_w(fdc, 0, data);
 }
 
@@ -1136,8 +1136,8 @@ static READ16_HANDLER( x68k_fm_r )
 static WRITE8_DEVICE_HANDLER( x68k_ct_w )
 {
 	x68k_state *state = device->machine->driver_data<x68k_state>();
-	running_device *fdc = device->machine->device("upd72065");
-	running_device *okim = device->machine->device("okim6258");
+	device_t *fdc = device->machine->device("upd72065");
+	device_t *okim = device->machine->device("okim6258");
 
 	// CT1 and CT2 bits from YM2151 port 0x1b
 	// CT1 - ADPCM clock - 0 = 8MHz, 1 = 4MHz
@@ -1278,7 +1278,7 @@ static READ16_HANDLER( x68k_sysport_r )
 #ifdef UNUSED_FUNCTION
 static READ16_HANDLER( x68k_mfp_r )
 {
-	running_device *x68k_mfp = space->machine->device(MC68901_TAG);
+	device_t *x68k_mfp = space->machine->device(MC68901_TAG);
 
 	return mc68901_register_r(x68k_mfp, offset);
 }
@@ -1287,7 +1287,7 @@ static READ16_HANDLER( x68k_mfp_r )
 static READ16_HANDLER( x68k_mfp_r )
 {
 	x68k_state *state = space->machine->driver_data<x68k_state>();
-	running_device *x68k_mfp = space->machine->device(MC68901_TAG);
+	device_t *x68k_mfp = space->machine->device(MC68901_TAG);
     // Initial settings indicate that IRQs are generated for FM (YM2151), Receive buffer error or full,
     // MFP Timer C, and the power switch
 //  logerror("MFP: [%08x] Reading offset %i\n",cpu_get_pc(space->cpu),offset);
@@ -1352,7 +1352,7 @@ static READ16_HANDLER( x68k_mfp_r )
 static WRITE16_HANDLER( x68k_mfp_w )
 {
 	x68k_state *state = space->machine->driver_data<x68k_state>();
-	running_device *x68k_mfp = space->machine->device(MC68901_TAG);
+	device_t *x68k_mfp = space->machine->device(MC68901_TAG);
 
 	/* For the Interrupt registers, the bits are set out as such:
        Reg A - bit 7: GPIP7 (HSync)
@@ -1815,7 +1815,7 @@ static WRITE16_HANDLER( x68k_exp_w )
 static void x68k_dma_irq(running_machine *machine, int channel)
 {
 	x68k_state *state = machine->driver_data<x68k_state>();
-	running_device *device = machine->device("hd63450");
+	device_t *device = machine->device("hd63450");
 	state->current_vector[3] = hd63450_get_vector(device, channel);
 	state->current_irq_line = 3;
 	logerror("DMA#%i: DMA End (vector 0x%02x)\n",channel,state->current_vector[3]);
@@ -1833,7 +1833,7 @@ static void x68k_dma_end(running_machine *machine, int channel,int irq)
 static void x68k_dma_error(running_machine *machine, int channel, int irq)
 {
 	x68k_state *state = machine->driver_data<x68k_state>();
-	running_device *device = machine->device("hd63450");
+	device_t *device = machine->device("hd63450");
 	if(irq != 0)
 	{
 		state->current_vector[3] = hd63450_get_error_vector(device,channel);
@@ -1842,7 +1842,7 @@ static void x68k_dma_error(running_machine *machine, int channel, int irq)
 	}
 }
 
-static void x68k_fm_irq(running_device *device, int irq)
+static void x68k_fm_irq(device_t *device, int irq)
 {
 	x68k_state *state = device->machine->driver_data<x68k_state>();
 	if(irq == CLEAR_LINE)
@@ -1918,7 +1918,7 @@ static INTERRUPT_GEN( x68k_vsync_irq )
 static IRQ_CALLBACK(x68k_int_ack)
 {
 	x68k_state *state = device->machine->driver_data<x68k_state>();
-	running_device *x68k_mfp = device->machine->device(MC68901_TAG);
+	device_t *x68k_mfp = device->machine->device(MC68901_TAG);
 
 	if(irqline == 6)  // MFP
 	{
@@ -2453,7 +2453,7 @@ static MACHINE_RESET( x68000 )
        more or less do the same job */
 
 	int drive;
-	UINT8* romdata = memory_region(machine, "user2");
+	UINT8* romdata = machine->region("user2")->base();
 	attotime irq_time;
 
 	memset(messram_get_ptr(machine->device("messram")),0,messram_get_size(machine->device("messram")));
@@ -2524,7 +2524,7 @@ static MACHINE_START( x68000 )
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	x68k_state *state = machine->driver_data<x68k_state>();
 	/*  Install RAM handlers  */
-	state->spriteram = (UINT16*)memory_region(machine, "user1");
+	state->spriteram = (UINT16*)machine->region("user1")->base();
 	memory_install_read16_handler(space,0x000000,0xbffffb,0xffffffff,0,(read16_space_func)x68k_emptyram_r);
 	memory_install_write16_handler(space,0x000000,0xbffffb,0xffffffff,0,(write16_space_func)x68k_emptyram_w);
 	memory_install_readwrite_bank(space,0x000000,messram_get_size(machine->device("messram"))-1,0xffffffff,0,"bank1");
@@ -2555,7 +2555,7 @@ static MACHINE_START( x68030 )
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	x68k_state *state = machine->driver_data<x68k_state>();
 	/*  Install RAM handlers  */
-	state->spriteram = (UINT16*)memory_region(machine, "user1");
+	state->spriteram = (UINT16*)machine->region("user1")->base();
 	memory_install_read32_handler(space,0x000000,0xbffffb,0xffffffff,0,(read32_space_func)x68k_rom0_r);
 	memory_install_write32_handler(space,0x000000,0xbffffb,0xffffffff,0,(write32_space_func)x68k_rom0_w);
 	memory_install_readwrite_bank(space,0x000000,messram_get_size(machine->device("messram"))-1,0xffffffff,0,"bank1");
@@ -2587,8 +2587,8 @@ static MACHINE_START( x68030 )
 static DRIVER_INIT( x68000 )
 {
 	x68k_state *state = machine->driver_data<x68k_state>();
-	unsigned char* rom = memory_region(machine, "maincpu");
-	unsigned char* user2 = memory_region(machine, "user2");
+	unsigned char* rom = machine->region("maincpu")->base();
+	unsigned char* user2 = machine->region("user2")->base();
 	state->gvram = auto_alloc_array(machine, UINT16, 0x080000/sizeof(UINT16));
 	state->tvram = auto_alloc_array(machine, UINT16, 0x080000/sizeof(UINT16));
 	state->sram = auto_alloc_array(machine, UINT16, 0x4000/sizeof(UINT16));
@@ -2597,7 +2597,7 @@ static DRIVER_INIT( x68000 )
 
 #ifdef USE_PREDEFINED_SRAM
 	{
-		unsigned char* ramptr = memory_region(machine, "user3");
+		unsigned char* ramptr = machine->region("user3")->base();
 		memcpy(state->sram,ramptr,0x4000);
 	}
 #endif
@@ -2641,78 +2641,78 @@ static DRIVER_INIT( x68030 )
 
 static MACHINE_CONFIG_START( x68000, x68k_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 10000000)  /* 10 MHz */
-	MDRV_CPU_PROGRAM_MAP(x68k_map)
-	MDRV_CPU_VBLANK_INT("screen", x68k_vsync_irq)
-	MDRV_QUANTUM_TIME(HZ(60))
+	MCFG_CPU_ADD("maincpu", M68000, 10000000)  /* 10 MHz */
+	MCFG_CPU_PROGRAM_MAP(x68k_map)
+	MCFG_CPU_VBLANK_INT("screen", x68k_vsync_irq)
+	MCFG_QUANTUM_TIME(HZ(60))
 
-	MDRV_MACHINE_START( x68000 )
-	MDRV_MACHINE_RESET( x68000 )
+	MCFG_MACHINE_START( x68000 )
+	MCFG_MACHINE_RESET( x68000 )
 
 	/* device hardware */
-	MDRV_MC68901_ADD(MC68901_TAG, 4000000, mfp_interface)
+	MCFG_MC68901_ADD(MC68901_TAG, 4000000, mfp_interface)
 
-	MDRV_I8255A_ADD( "ppi8255",  ppi_interface )
+	MCFG_I8255A_ADD( "ppi8255",  ppi_interface )
 
-	MDRV_HD63450_ADD( "hd63450", dmac_interface )
+	MCFG_HD63450_ADD( "hd63450", dmac_interface )
 
-	MDRV_X68KHDC_ADD( "x68k_hdc" )
+	MCFG_X68KHDC_ADD( "x68k_hdc" )
 
-	MDRV_SCC8530_ADD( "scc", 5000000 )
+	MCFG_SCC8530_ADD( "scc", 5000000 )
 
-	MDRV_RP5C15_ADD( "rp5c15" , rtc_intf)
+	MCFG_RP5C15_ADD( "rp5c15" , rtc_intf)
 
     /* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(55.45)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-//  MDRV_GFXDECODE(x68k)
-	MDRV_SCREEN_SIZE(1096, 568)  // inital setting
-	MDRV_SCREEN_VISIBLE_AREA(0, 767, 0, 511)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_PALETTE_LENGTH(65536)
-	MDRV_PALETTE_INIT( x68000 )
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(55.45)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+//  MCFG_GFXDECODE(x68k)
+	MCFG_SCREEN_SIZE(1096, 568)  // inital setting
+	MCFG_SCREEN_VISIBLE_AREA(0, 767, 0, 511)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_PALETTE_LENGTH(65536)
+	MCFG_PALETTE_INIT( x68000 )
 
-	MDRV_VIDEO_START( x68000 )
-	MDRV_VIDEO_UPDATE( x68000 )
+	MCFG_VIDEO_START( x68000 )
+	MCFG_VIDEO_UPDATE( x68000 )
 
-	MDRV_DEFAULT_LAYOUT( layout_x68000 )
+	MCFG_DEFAULT_LAYOUT( layout_x68000 )
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MDRV_SOUND_ADD("ym2151", YM2151, 4000000)
-	MDRV_SOUND_CONFIG(x68k_ym2151_interface)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 0.50)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 0.50)
-    MDRV_SOUND_ADD("okim6258", OKIM6258, 4000000)
-    MDRV_SOUND_CONFIG(x68k_okim6258_interface)
-    MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
-    MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SOUND_ADD("ym2151", YM2151, 4000000)
+	MCFG_SOUND_CONFIG(x68k_ym2151_interface)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
+    MCFG_SOUND_ADD("okim6258", OKIM6258, 4000000)
+    MCFG_SOUND_CONFIG(x68k_okim6258_interface)
+    MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
+    MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 
-	MDRV_NVRAM_ADD_0FILL("nvram")
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MDRV_UPD72065_ADD("upd72065", fdc_interface)
-	MDRV_FLOPPY_4_DRIVES_ADD(x68k_floppy_config)
+	MCFG_UPD72065_ADD("upd72065", fdc_interface)
+	MCFG_FLOPPY_4_DRIVES_ADD(x68k_floppy_config)
 
 	/* internal ram */
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("4M")
-	MDRV_RAM_EXTRA_OPTIONS("1M,2M,3M,5M,6M,7M,8M,9M,10M,11M,12M")
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("4M")
+	MCFG_RAM_EXTRA_OPTIONS("1M,2M,3M,5M,6M,7M,8M,9M,10M,11M,12M")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( x68kxvi, x68000 )
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_CLOCK(16000000)  /* 16 MHz */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_CLOCK(16000000)  /* 16 MHz */
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( x68030, x68000 )
 
-	MDRV_CPU_REPLACE("maincpu", M68030, 25000000)  /* 25 MHz 68EC030 */
-	MDRV_CPU_PROGRAM_MAP(x68030_map)
+	MCFG_CPU_REPLACE("maincpu", M68030, 25000000)  /* 25 MHz 68EC030 */
+	MCFG_CPU_PROGRAM_MAP(x68030_map)
 
-	MDRV_MACHINE_START( x68030 )
-	MDRV_MACHINE_RESET( x68000 )
+	MCFG_MACHINE_START( x68030 )
+	MCFG_MACHINE_RESET( x68000 )
 MACHINE_CONFIG_END
 
 ROM_START( x68000 )

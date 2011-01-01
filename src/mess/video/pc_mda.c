@@ -78,17 +78,17 @@ static const mc6845_interface mc6845_mda_intf =
 };
 
 MACHINE_CONFIG_FRAGMENT( pcvideo_mda )
-	MDRV_SCREEN_ADD( MDA_SCREEN_NAME, RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_RAW_PARAMS(MDA_CLOCK, 882, 0, 720, 370, 0, 350 )
-	MDRV_PALETTE_LENGTH( sizeof(mda_palette) / 3 )
+	MCFG_SCREEN_ADD( MDA_SCREEN_NAME, RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_RAW_PARAMS(MDA_CLOCK, 882, 0, 720, 370, 0, 350 )
+	MCFG_PALETTE_LENGTH( sizeof(mda_palette) / 3 )
 
-	MDRV_PALETTE_INIT(pc_mda)
+	MCFG_PALETTE_INIT(pc_mda)
 
-	MDRV_MC6845_ADD( MDA_MC6845_NAME, MC6845, MDA_CLOCK/9, mc6845_mda_intf)
+	MCFG_MC6845_ADD( MDA_MC6845_NAME, MC6845, MDA_CLOCK/9, mc6845_mda_intf)
 
-	MDRV_VIDEO_START( pc_mda )
-	MDRV_VIDEO_UPDATE( mc6845_mda)
+	MCFG_VIDEO_START( pc_mda )
+	MCFG_VIDEO_UPDATE( mc6845_mda)
 MACHINE_CONFIG_END
 
 
@@ -120,7 +120,7 @@ VIDEO_START( pc_mda )
 
 	memset( &mda, 0, sizeof(mda));
 	mda.update_row = NULL;
-	mda.chr_gen = memory_region( machine, "gfx1" );
+	mda.chr_gen = machine->region( "gfx1" )->base();
 
 	pc_videoram_size = 0x1000;	/* This is actually 0x1000 in reality */
 	pc_videoram = auto_alloc_array(machine, UINT8, 0x1000);
@@ -130,7 +130,7 @@ VIDEO_START( pc_mda )
 
 static VIDEO_UPDATE( mc6845_mda )
 {
-	running_device *devconf = screen->machine->device(MDA_MC6845_NAME);
+	device_t *devconf = screen->machine->device(MDA_MC6845_NAME);
 	mc6845_update( devconf, bitmap, cliprect );
 	return 0;
 }
@@ -367,7 +367,7 @@ static int pc_mda_status_r(void)
  *************************************************************************/
 WRITE8_HANDLER ( pc_MDA_w )
 {
-	running_device *devconf = space->machine->device(MDA_MC6845_NAME);
+	device_t *devconf = space->machine->device(MDA_MC6845_NAME);
 	switch( offset )
 	{
 		case 0: case 2: case 4: case 6:
@@ -384,7 +384,7 @@ WRITE8_HANDLER ( pc_MDA_w )
 
  READ8_HANDLER ( pc_MDA_r )
 {
-	running_device *devconf = space->machine->device(MDA_MC6845_NAME);
+	device_t *devconf = space->machine->device(MDA_MC6845_NAME);
 	int data = 0xff;
 	switch( offset )
 	{
@@ -438,17 +438,17 @@ static const mc6845_interface mc6845_hercules_intf =
 };
 
 MACHINE_CONFIG_FRAGMENT( pcvideo_hercules )
-	MDRV_SCREEN_ADD( HERCULES_SCREEN_NAME, RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_RAW_PARAMS(MDA_CLOCK, 882, 0, 720, 370, 0, 350 )
-	MDRV_PALETTE_LENGTH( sizeof(mda_palette) / 3 )
+	MCFG_SCREEN_ADD( HERCULES_SCREEN_NAME, RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_RAW_PARAMS(MDA_CLOCK, 882, 0, 720, 370, 0, 350 )
+	MCFG_PALETTE_LENGTH( sizeof(mda_palette) / 3 )
 
-	MDRV_PALETTE_INIT(pc_mda)
+	MCFG_PALETTE_INIT(pc_mda)
 
-	MDRV_MC6845_ADD( HERCULES_MC6845_NAME, MC6845, MDA_CLOCK/9, mc6845_hercules_intf)
+	MCFG_MC6845_ADD( HERCULES_MC6845_NAME, MC6845, MDA_CLOCK/9, mc6845_hercules_intf)
 
-	MDRV_VIDEO_START( pc_hercules )
-	MDRV_VIDEO_UPDATE( mc6845_hercules )
+	MCFG_VIDEO_START( pc_hercules )
+	MCFG_VIDEO_UPDATE( mc6845_hercules )
 MACHINE_CONFIG_END
 
 
@@ -474,7 +474,7 @@ static VIDEO_START( pc_hercules )
 
 	memset( &mda, 0, sizeof(mda));
 	mda.update_row = NULL;
-	mda.chr_gen = memory_region( machine, "gfx1" );
+	mda.chr_gen = machine->region( "gfx1" )->base();
 
 	pc_videoram_size = 0x10000;
 	pc_videoram = auto_alloc_array(machine, UINT8, 0x10000);
@@ -527,7 +527,7 @@ static MC6845_UPDATE_ROW( hercules_gfx_update_row )
 
 static VIDEO_UPDATE( mc6845_hercules )
 {
-	running_device *devconf = screen->machine->device(HERCULES_MC6845_NAME);
+	device_t *devconf = screen->machine->device(HERCULES_MC6845_NAME);
 	mc6845_update( devconf, bitmap, cliprect );
 	return 0;
 }
@@ -535,7 +535,7 @@ static VIDEO_UPDATE( mc6845_hercules )
 
 static void hercules_mode_control_w(running_machine *machine, int data)
 {
-	running_device *devconf = machine->device(HERCULES_MC6845_NAME);
+	device_t *devconf = machine->device(HERCULES_MC6845_NAME);
 
 	MDA_LOG(1,"hercules_mode_control_w",("$%02x: colums %d, gfx %d, enable %d, blink %d\n",
 		data, (data&1)?80:40, (data>>1)&1, (data>>3)&1, (data>>5)&1));
@@ -571,7 +571,7 @@ static void hercules_config_w(running_machine *machine, int data)
 
 static WRITE8_HANDLER ( pc_hercules_w )
 {
-	running_device *devconf = space->machine->device(HERCULES_MC6845_NAME);
+	device_t *devconf = space->machine->device(HERCULES_MC6845_NAME);
 
 	switch( offset )
 	{
@@ -611,7 +611,7 @@ static int pc_hercules_status_r(void)
 
 static READ8_HANDLER ( pc_hercules_r )
 {
-	running_device *devconf = space->machine->device(HERCULES_MC6845_NAME);
+	device_t *devconf = space->machine->device(HERCULES_MC6845_NAME);
 	int data = 0xff;
 
 	switch( offset )

@@ -17,8 +17,8 @@ public:
 	int keylatch;			/* key latch */
 
 	/* devices */
-	running_device *cdp1861;
-	running_device *cassette;
+	device_t *cdp1861;
+	device_t *cassette;
 };
 
 class osc1000b_state : public driver_device
@@ -31,7 +31,7 @@ public:
 	int keylatch;			/* key latch */
 
 	/* devices */
-	running_device *cassette;
+	device_t *cassette;
 };
 
 class tmc2000_state : public driver_device
@@ -48,8 +48,8 @@ public:
 	int keylatch;			/* key latch */
 
 	/* devices */
-	running_device *cdp1864;
-	running_device *cassette;
+	device_t *cdp1864;
+	device_t *cassette;
 };
 
 class nano_state : public driver_device
@@ -65,8 +65,8 @@ public:
 	emu_timer *ef4_timer;	/* EF4 line RC timer */
 
 	/* devices */
-	running_device *cdp1864;
-	running_device *cassette;
+	device_t *cdp1864;
+	device_t *cassette;
 };
 
 /* ---------- defined in video/tmc1800.c ---------- */

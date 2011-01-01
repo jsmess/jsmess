@@ -641,7 +641,7 @@ static VIDEO_UPDATE( vboy )
 	vboy_state *state = screen->machine->driver_data<vboy_state>();
 	int i;
 	UINT8 right = 0;
-	running_device *_3d_right_screen = screen->machine->device("3dright");
+	device_t *_3d_right_screen = screen->machine->device("3dright");
 
 	bitmap_fill(state->screen_output, cliprect, state->vip_regs.BKCOL);
 
@@ -678,7 +678,7 @@ static PALETTE_INIT( vboy )
 static DEVICE_IMAGE_LOAD( vboy_cart )
 {
 	UINT32 size;
-	UINT8 *ptr = memory_region(image.device().machine, "user1");
+	UINT8 *ptr = image.device().machine->region("user1")->base();
 
 	if (image.software_entry() == NULL)
 	{
@@ -720,49 +720,49 @@ INTERRUPT_GEN( vboy_interrupt )
 static MACHINE_CONFIG_START( vboy, vboy_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD( "maincpu", V810, XTAL_20MHz )
-	MDRV_CPU_PROGRAM_MAP(vboy_mem)
-	MDRV_CPU_IO_MAP(vboy_io)
-	MDRV_CPU_VBLANK_INT("3dleft", vboy_interrupt)
+	MCFG_CPU_ADD( "maincpu", V810, XTAL_20MHz )
+	MCFG_CPU_PROGRAM_MAP(vboy_mem)
+	MCFG_CPU_IO_MAP(vboy_io)
+	MCFG_CPU_VBLANK_INT("3dleft", vboy_interrupt)
 
-	MDRV_MACHINE_RESET(vboy)
+	MCFG_MACHINE_RESET(vboy)
 
-	MDRV_TIMER_ADD_PERIODIC("video", video_tick, HZ(100))
+	MCFG_TIMER_ADD_PERIODIC("video", video_tick, HZ(100))
 
 	/* video hardware */
-	MDRV_DEFAULT_LAYOUT(layout_vboy)
+	MCFG_DEFAULT_LAYOUT(layout_vboy)
 
-	MDRV_PALETTE_LENGTH(4)
-	MDRV_PALETTE_INIT(vboy)
+	MCFG_PALETTE_LENGTH(4)
+	MCFG_PALETTE_INIT(vboy)
 
-	MDRV_VIDEO_START(vboy)
-	MDRV_VIDEO_UPDATE(vboy)
+	MCFG_VIDEO_START(vboy)
+	MCFG_VIDEO_UPDATE(vboy)
 
 	/* Left screen */
-	MDRV_SCREEN_ADD("3dleft", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_REFRESH_RATE(50.2)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MDRV_SCREEN_SIZE(384, 224)
-	MDRV_SCREEN_VISIBLE_AREA(0, 384-1, 0, 224-1)
+	MCFG_SCREEN_ADD("3dleft", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_REFRESH_RATE(50.2)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
+	MCFG_SCREEN_SIZE(384, 224)
+	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 224-1)
 
 	/* Right screen */
-	MDRV_SCREEN_ADD("3dright", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_REFRESH_RATE(50.2)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MDRV_SCREEN_SIZE(384, 224)
-	MDRV_SCREEN_VISIBLE_AREA(0, 384-1, 0, 224-1)
+	MCFG_SCREEN_ADD("3dright", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_REFRESH_RATE(50.2)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
+	MCFG_SCREEN_SIZE(384, 224)
+	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 224-1)
 
 	/* cartridge */
-	MDRV_CARTSLOT_ADD("cart")
-	MDRV_CARTSLOT_EXTENSION_LIST("vb,bin")
-	MDRV_CARTSLOT_MANDATORY
-	MDRV_CARTSLOT_INTERFACE("vboy_cart")
-	MDRV_CARTSLOT_LOAD(vboy_cart)
+	MCFG_CARTSLOT_ADD("cart")
+	MCFG_CARTSLOT_EXTENSION_LIST("vb,bin")
+	MCFG_CARTSLOT_MANDATORY
+	MCFG_CARTSLOT_INTERFACE("vboy_cart")
+	MCFG_CARTSLOT_LOAD(vboy_cart)
 
 	/* software lists */
-	MDRV_SOFTWARE_LIST_ADD("cart_list","vboy")
+	MCFG_SOFTWARE_LIST_ADD("cart_list","vboy")
 MACHINE_CONFIG_END
 
 /* ROM definition */

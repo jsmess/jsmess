@@ -63,7 +63,7 @@ static READ8_DEVICE_HANDLER( pia0_pa_r )
 
     */
 
-	running_device *ieeebus = device->machine->device("ieee_bus");
+	device_t *ieeebus = device->machine->device("ieee_bus");
 	UINT8 data = 0;
 
 	/* key */
@@ -179,7 +179,7 @@ static READ8_DEVICE_HANDLER( cass1_r )
 
 static WRITE8_DEVICE_HANDLER( eoi_w )
 {
-	running_device *ieeebus = device->machine->device("ieee_bus");
+	device_t *ieeebus = device->machine->device("ieee_bus");
 
 	ieee488_eoi_w(ieeebus, device, data);
 }
@@ -267,21 +267,21 @@ static WRITE8_DEVICE_HANDLER( do_w )
 
     */
 
-	running_device *ieeebus = device->machine->device("ieee_bus");
+	device_t *ieeebus = device->machine->device("ieee_bus");
 
 	ieee488_dio_w(ieeebus, device, data);
 }
 
 static WRITE8_DEVICE_HANDLER( ndac_w )
 {
-	running_device *ieeebus = device->machine->device("ieee_bus");
+	device_t *ieeebus = device->machine->device("ieee_bus");
 
 	ieee488_ndac_w(ieeebus, device, data);
 }
 
 static WRITE8_DEVICE_HANDLER( dav_w )
 {
-	running_device *ieeebus = device->machine->device("ieee_bus");
+	device_t *ieeebus = device->machine->device("ieee_bus");
 
 	ieee488_dav_w(ieeebus, device, data);
 }
@@ -346,7 +346,7 @@ static READ8_DEVICE_HANDLER( via_pb_r )
 
     */
 
-	running_device *ieeebus = device->machine->device("ieee_bus");
+	device_t *ieeebus = device->machine->device("ieee_bus");
 	UINT8 data = 0;
 
 	/* not data accepted in */
@@ -387,7 +387,7 @@ static WRITE8_DEVICE_HANDLER( via_pb_w )
 
     */
 
-	running_device *ieeebus = device->machine->device("ieee_bus");
+	device_t *ieeebus = device->machine->device("ieee_bus");
 
 	/* not ready for data out */
 	ieee488_nrfd_w(ieeebus, device, BIT(data, 1));
@@ -451,9 +451,9 @@ const via6522_interface pet_via =
 static WRITE8_HANDLER( cbm8096_io_w )
 {
 	via6522_device *via_0 = space->machine->device<via6522_device>("via6522_0");;
-	running_device *pia_0 = space->machine->device("pia_0");
-	running_device *pia_1 = space->machine->device("pia_1");
-	running_device *mc6845 = space->machine->device("crtc");
+	device_t *pia_0 = space->machine->device("pia_0");
+	device_t *pia_1 = space->machine->device("pia_1");
+	device_t *mc6845 = space->machine->device("crtc");
 
 	if (offset < 0x10) ;
 	else if (offset < 0x14) pia6821_w(pia_0, offset & 3, data);
@@ -469,9 +469,9 @@ static WRITE8_HANDLER( cbm8096_io_w )
 static READ8_HANDLER( cbm8096_io_r )
 {
 	via6522_device *via_0 = space->machine->device<via6522_device>("via6522_0");;
-	running_device *pia_0 = space->machine->device("pia_0");
-	running_device *pia_1 = space->machine->device("pia_1");
-	running_device *mc6845 = space->machine->device("crtc");
+	device_t *pia_0 = space->machine->device("pia_0");
+	device_t *pia_1 = space->machine->device("pia_1");
+	device_t *mc6845 = space->machine->device("crtc");
 
 	int data = 0xff;
 	if (offset < 0x10) ;
@@ -666,7 +666,7 @@ WRITE8_HANDLER( superpet_w )
 static TIMER_CALLBACK( pet_interrupt )
 {
 	pet_state *state = machine->driver_data<pet_state>();
-	running_device *pia_0 = machine->device("pia_0");
+	device_t *pia_0 = machine->device("pia_0");
 
 	pia6821_cb1_w(pia_0, state->pia_level);
 	state->pia_level = !state->pia_level;
@@ -675,7 +675,7 @@ static TIMER_CALLBACK( pet_interrupt )
 
 static TIMER_CALLBACK( pet_tape1_timer )
 {
-	running_device *pia_0 = machine->device("pia_0");
+	device_t *pia_0 = machine->device("pia_0");
 //  cassette 1
 	UINT8 data = (cassette_input(machine->device("cassette1")) > +0.0) ? 1 : 0;
 	pia6821_ca1_w(pia_0, data);
@@ -744,7 +744,7 @@ DRIVER_INIT( pet )
 DRIVER_INIT( pet80 )
 {
 	pet_state *state = machine->driver_data<pet_state>();
-	state->memory = memory_region(machine, "maincpu");
+	state->memory = machine->region("maincpu")->base();
 
 	pet_common_driver_init(machine);
 	state->cbm8096 = 1;
@@ -771,8 +771,8 @@ DRIVER_INIT( superpet )
 MACHINE_RESET( pet )
 {
 	pet_state *state = machine->driver_data<pet_state>();
-	running_device *ieeebus = machine->device("ieee_bus");
-	running_device *scapegoat = machine->device("pia_0");
+	device_t *ieeebus = machine->device("ieee_bus");
+	device_t *scapegoat = machine->device("pia_0");
 
 	if (state->superpet)
 	{
@@ -866,26 +866,26 @@ static DEVICE_IMAGE_LOAD(pet_cart)
 }
 
 MACHINE_CONFIG_FRAGMENT(pet_cartslot)
-	MDRV_CARTSLOT_ADD("cart1")
-	MDRV_CARTSLOT_EXTENSION_LIST("90,a0,b0")
-	MDRV_CARTSLOT_NOT_MANDATORY
-	MDRV_CARTSLOT_LOAD(pet_cart)
+	MCFG_CARTSLOT_ADD("cart1")
+	MCFG_CARTSLOT_EXTENSION_LIST("90,a0,b0")
+	MCFG_CARTSLOT_NOT_MANDATORY
+	MCFG_CARTSLOT_LOAD(pet_cart)
 
-	MDRV_CARTSLOT_ADD("cart2")
-	MDRV_CARTSLOT_EXTENSION_LIST("90,a0,b0")
-	MDRV_CARTSLOT_NOT_MANDATORY
-	MDRV_CARTSLOT_LOAD(pet_cart)
+	MCFG_CARTSLOT_ADD("cart2")
+	MCFG_CARTSLOT_EXTENSION_LIST("90,a0,b0")
+	MCFG_CARTSLOT_NOT_MANDATORY
+	MCFG_CARTSLOT_LOAD(pet_cart)
 MACHINE_CONFIG_END
 
 // 2010-08, FP: this is used by CBM40 & CBM80, and I actually have only found .prg files for these... does cart dumps exist?
 MACHINE_CONFIG_FRAGMENT(pet4_cartslot)
-	MDRV_CARTSLOT_MODIFY("cart1")
-	MDRV_CARTSLOT_EXTENSION_LIST("a0")
-	MDRV_CARTSLOT_NOT_MANDATORY
-	MDRV_CARTSLOT_LOAD(pet_cart)
+	MCFG_CARTSLOT_MODIFY("cart1")
+	MCFG_CARTSLOT_EXTENSION_LIST("a0")
+	MCFG_CARTSLOT_NOT_MANDATORY
+	MCFG_CARTSLOT_LOAD(pet_cart)
 
-	MDRV_CARTSLOT_MODIFY("cart2")
-	MDRV_CARTSLOT_EXTENSION_LIST("a0")
-	MDRV_CARTSLOT_NOT_MANDATORY
-	MDRV_CARTSLOT_LOAD(pet_cart)
+	MCFG_CARTSLOT_MODIFY("cart2")
+	MCFG_CARTSLOT_EXTENSION_LIST("a0")
+	MCFG_CARTSLOT_NOT_MANDATORY
+	MCFG_CARTSLOT_LOAD(pet_cart)
 MACHINE_CONFIG_END

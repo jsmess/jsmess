@@ -109,7 +109,7 @@ public:
 static TILE_GET_INFO( get_bg_tile_info )
 {
 	calorie_state *state = machine->driver_data<calorie_state>();
-	UINT8 *src = memory_region(machine, "user1");
+	UINT8 *src = machine->region("user1")->base();
 	int bg_base = (state->bg_bank & 0x0f) * 0x200;
 	int code  = src[bg_base + tile_index] | (((src[bg_base + tile_index + 0x100]) & 0x10) << 4);
 	int color = src[bg_base + tile_index + 0x100] & 0x0f;
@@ -432,43 +432,43 @@ static MACHINE_RESET( calorie )
 static MACHINE_CONFIG_START( calorie, calorie_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80,4000000)		 /* 4 MHz */
-	MDRV_CPU_PROGRAM_MAP(calorie_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_ADD("maincpu", Z80,4000000)		 /* 4 MHz */
+	MCFG_CPU_PROGRAM_MAP(calorie_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("audiocpu", Z80,3000000)		 /* 3 MHz */
-	MDRV_CPU_PROGRAM_MAP(calorie_sound_map)
-	MDRV_CPU_IO_MAP(calorie_sound_io_map)
-	MDRV_CPU_PERIODIC_INT(irq0_line_hold, 64)
+	MCFG_CPU_ADD("audiocpu", Z80,3000000)		 /* 3 MHz */
+	MCFG_CPU_PROGRAM_MAP(calorie_sound_map)
+	MCFG_CPU_IO_MAP(calorie_sound_io_map)
+	MCFG_CPU_PERIODIC_INT(irq0_line_hold, 64)
 
-	MDRV_MACHINE_START(calorie)
-	MDRV_MACHINE_RESET(calorie)
+	MCFG_MACHINE_START(calorie)
+	MCFG_MACHINE_RESET(calorie)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(256, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-16-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(256, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-16-1)
 
-	MDRV_GFXDECODE(calorie)
-	MDRV_PALETTE_LENGTH(0x100)
+	MCFG_GFXDECODE(calorie)
+	MCFG_PALETTE_LENGTH(0x100)
 
-	MDRV_VIDEO_START(calorie)
-	MDRV_VIDEO_UPDATE(calorie)
+	MCFG_VIDEO_START(calorie)
+	MCFG_VIDEO_UPDATE(calorie)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay1", AY8910, 1500000)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.8)  /* YM2149 really */
+	MCFG_SOUND_ADD("ay1", AY8910, 1500000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.8)  /* YM2149 really */
 
-	MDRV_SOUND_ADD("ay2", AY8910, 1500000)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.8)  /* YM2149 really */
+	MCFG_SOUND_ADD("ay2", AY8910, 1500000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.8)  /* YM2149 really */
 
-	MDRV_SOUND_ADD("ay3", AY8910, 1500000)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.8)  /* YM2149 really */
+	MCFG_SOUND_ADD("ay3", AY8910, 1500000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.8)  /* YM2149 really */
 MACHINE_CONFIG_END
 
 
@@ -551,7 +551,7 @@ static DRIVER_INIT( calorie )
 static DRIVER_INIT( calorieb )
 {
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	space->set_decrypted_region(0x0000, 0x7fff, memory_region(machine, "maincpu") + 0x10000);
+	space->set_decrypted_region(0x0000, 0x7fff, machine->region("maincpu")->base() + 0x10000);
 }
 
 

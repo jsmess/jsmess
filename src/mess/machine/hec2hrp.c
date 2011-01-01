@@ -56,7 +56,7 @@
 static void Mise_A_Jour_Etat(int Adresse, int Value );
 static void Update_Sound(address_space *space, UINT8 data);
 
-static running_device *cassette_device_image(running_machine *machine);
+static device_t *cassette_device_image(running_machine *machine);
 
 /* Stat for the register in 0x3000*/
 static UINT8 state3000=0;
@@ -316,7 +316,7 @@ static int counter_write=0; /* Attente de quelque cycles avant demettre en route
 }
 WRITE8_HANDLER( hector_color_b_w )
 {
-	running_device *discrete = space->machine->device("discrete");
+	device_t *discrete = space->machine->device("discrete");
 	hector_color[1] =  data        & 0x07;
 	hector_color[3] = (data >> 3)  & 0x07;
 
@@ -332,7 +332,7 @@ WRITE8_HANDLER( hector_color_b_w )
  Cassette Handling
 ******************************************************************************/
 
-static running_device *cassette_device_image(running_machine *machine)
+static device_t *cassette_device_image(running_machine *machine)
 {
 	return machine->device("cassette");
 }
@@ -684,7 +684,7 @@ static void Init_Value_SN76477_Hector(void)
 void Update_Sound(address_space *space, UINT8 data)
 {
 	/* keep device*/
-	running_device *sn76477 = space->machine->device("sn76477");
+	device_t *sn76477 = space->machine->device("sn76477");
 
 	/* MIXER*/
 	sn76477_mixer_a_w(sn76477, ((ValMixer & 0x04)==4) ? 1 : 0);
@@ -767,7 +767,7 @@ void hector_reset(running_machine *machine, int hr, int with_D2 )
 
 	{
 		cputag_set_input_line(machine, "disc2cpu", INPUT_LINE_RESET, PULSE_LINE);
-		running_device *fdc = machine->device("upd765");	
+		device_t *fdc = machine->device("upd765");	
 		cputag_set_input_line(machine, "disc2cpu", INPUT_LINE_RESET, PULSE_LINE); 
 		upd765_reset(fdc, 1);
 		upd765_reset_w(fdc, 1);

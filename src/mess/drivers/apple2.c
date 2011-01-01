@@ -605,73 +605,73 @@ static const cassette_config apple2_cassette_config =
 
 static MACHINE_CONFIG_START( apple2_common, driver_device )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6502, 1021800)		/* close to actual CPU frequency of 1.020484 MHz */
-	MDRV_CPU_PROGRAM_MAP(apple2_map)
-	MDRV_CPU_VBLANK_INT_HACK(apple2_interrupt, 192/8)
-	MDRV_QUANTUM_TIME(HZ(60))
+	MCFG_CPU_ADD("maincpu", M6502, 1021800)		/* close to actual CPU frequency of 1.020484 MHz */
+	MCFG_CPU_PROGRAM_MAP(apple2_map)
+	MCFG_CPU_VBLANK_INT_HACK(apple2_interrupt, 192/8)
+	MCFG_QUANTUM_TIME(HZ(60))
 
-	MDRV_MACHINE_START( apple2 )
+	MCFG_MACHINE_START( apple2 )
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(280*2, 192)
-	MDRV_SCREEN_VISIBLE_AREA(0, (280*2)-1,0,192-1)
-	MDRV_PALETTE_LENGTH(ARRAY_LENGTH(apple2_palette))
-	MDRV_PALETTE_INIT(apple2)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(280*2, 192)
+	MCFG_SCREEN_VISIBLE_AREA(0, (280*2)-1,0,192-1)
+	MCFG_PALETTE_LENGTH(ARRAY_LENGTH(apple2_palette))
+	MCFG_PALETTE_INIT(apple2)
 
-	MDRV_VIDEO_START(apple2)
-	MDRV_VIDEO_UPDATE(apple2)
+	MCFG_VIDEO_START(apple2)
+	MCFG_VIDEO_UPDATE(apple2)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("a2speaker", SPEAKER_SOUND, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	MDRV_SOUND_ADD("ay8913.1", AY8913, 1022727)
-	MDRV_SOUND_CONFIG(apple2_ay8910_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	MDRV_SOUND_ADD("ay8913.2", AY8913, 1022727)
-	MDRV_SOUND_CONFIG(apple2_ay8910_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("a2speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SOUND_ADD("ay8913.1", AY8913, 1022727)
+	MCFG_SOUND_CONFIG(apple2_ay8910_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SOUND_ADD("ay8913.2", AY8913, 1022727)
+	MCFG_SOUND_CONFIG(apple2_ay8910_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* slot devices */
-	MDRV_APPLE2_LANGCARD_ADD("langcard")
-	MDRV_MOCKINGBOARD_ADD("mockingboard")
-	MDRV_APPLEFDC_ADD("fdc", apple2_fdc_interface)
+	MCFG_APPLE2_LANGCARD_ADD("langcard")
+	MCFG_MOCKINGBOARD_ADD("mockingboard")
+	MCFG_APPLEFDC_ADD("fdc", apple2_fdc_interface)
 
 	/* slots */
-	MDRV_APPLE2_SLOT_ADD(0, "langcard", apple2_langcard_r, apple2_langcard_w, 0, 0, 0, 0)
-	MDRV_APPLE2_SLOT_ADD(4, "mockingboard", mockingboard_r, mockingboard_w, 0, 0, 0, 0)
-	MDRV_APPLE2_SLOT_ADD(6, "fdc", applefdc_r, applefdc_w, 0, 0, 0, 0)
+	MCFG_APPLE2_SLOT_ADD(0, "langcard", apple2_langcard_r, apple2_langcard_w, 0, 0, 0, 0)
+	MCFG_APPLE2_SLOT_ADD(4, "mockingboard", mockingboard_r, mockingboard_w, 0, 0, 0, 0)
+	MCFG_APPLE2_SLOT_ADD(6, "fdc", applefdc_r, applefdc_w, 0, 0, 0, 0)
 
-	MDRV_FLOPPY_APPLE_2_DRIVES_ADD(apple2_floppy_config,15,16)
+	MCFG_FLOPPY_APPLE_2_DRIVES_ADD(apple2_floppy_config,15,16)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( apple2, apple2_common )
 	/* internal ram */
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("64K")
-	MDRV_RAM_EXTRA_OPTIONS("4K,8K,12K,16K,20K,24K,32K,36K,48K")
-	MDRV_RAM_DEFAULT_VALUE(0x00)
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("64K")
+	MCFG_RAM_EXTRA_OPTIONS("4K,8K,12K,16K,20K,24K,32K,36K,48K")
+	MCFG_RAM_DEFAULT_VALUE(0x00)
 	/* At the moment the RAM bank $C000-$FFFF is available only if you choose   */
 	/* default configuration: on real machine is present also in configurations */
 	/* with less memory, provided that the language card is installed           */
-	MDRV_CASSETTE_ADD( "cassette", apple2_cassette_config )
+	MCFG_CASSETTE_ADD( "cassette", apple2_cassette_config )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( apple2p, apple2_common )
-	MDRV_VIDEO_START(apple2p)
+	MCFG_VIDEO_START(apple2p)
 
 	/* internal ram */
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("64K")
-	MDRV_RAM_EXTRA_OPTIONS("16K,32K,48K")
-	MDRV_RAM_DEFAULT_VALUE(0x00)
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("64K")
+	MCFG_RAM_EXTRA_OPTIONS("16K,32K,48K")
+	MCFG_RAM_DEFAULT_VALUE(0x00)
 	/* At the moment the RAM bank $C000-$FFFF is available only if you choose   */
 	/* default configuration: on real machine is present also in configurations */
 	/* with less memory, provided that the language card is installed           */
-	MDRV_CASSETTE_ADD( "cassette", apple2_cassette_config )
+	MCFG_CASSETTE_ADD( "cassette", apple2_cassette_config )
 MACHINE_CONFIG_END
 
 ROM_START(las3000)
@@ -684,53 +684,53 @@ ROM_START(las3000)
 ROM_END
 
 static MACHINE_CONFIG_DERIVED( apple2e, apple2_common )
-	MDRV_VIDEO_START(apple2e)
+	MCFG_VIDEO_START(apple2e)
 	/* internal ram */
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("128K")
-	MDRV_RAM_EXTRA_OPTIONS("64K")
-	MDRV_RAM_DEFAULT_VALUE(0x00)
-	MDRV_CASSETTE_ADD( "cassette", apple2_cassette_config )
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("128K")
+	MCFG_RAM_EXTRA_OPTIONS("64K")
+	MCFG_RAM_DEFAULT_VALUE(0x00)
+	MCFG_CASSETTE_ADD( "cassette", apple2_cassette_config )
 MACHINE_CONFIG_END
 #if 0
 MACHINE_CONFIG_DERIVED( apple2e_z80, apple2_common )
-	MDRV_VIDEO_START(apple2e)
+	MCFG_VIDEO_START(apple2e)
 
-	MDRV_CPU_ADD("softcard", Z80, 1021800*2)	// softcard Z80 runs at twice the 6502 clock
-	MDRV_CPU_PROGRAM_MAP(a2z80_map)
+	MCFG_CPU_ADD("softcard", Z80, 1021800*2)	// softcard Z80 runs at twice the 6502 clock
+	MCFG_CPU_PROGRAM_MAP(a2z80_map)
 
-	MDRV_A2Z80_ADD("a2z80")
-	MDRV_APPLE2_SLOT_ADD(7, "a2z80", 0, 0, 0, 0, 0, a2z80_cnxx_w)
+	MCFG_A2Z80_ADD("a2z80")
+	MCFG_APPLE2_SLOT_ADD(7, "a2z80", 0, 0, 0, 0, 0, a2z80_cnxx_w)
 
-	MDRV_QUANTUM_PERFECT_CPU("maincpu")
+	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
 	/* internal ram */
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("128K")
-	MDRV_RAM_EXTRA_OPTIONS("64K")
-	MDRV_RAM_DEFAULT_VALUE(0x00)
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("128K")
+	MCFG_RAM_EXTRA_OPTIONS("64K")
+	MCFG_RAM_DEFAULT_VALUE(0x00)
 MACHINE_CONFIG_END
 #endif
 static MACHINE_CONFIG_DERIVED( mprof3, apple2e )
 
 	/* internal ram */
-	MDRV_RAM_MODIFY("messram")
-	MDRV_RAM_DEFAULT_SIZE("128K")
+	MCFG_RAM_MODIFY("messram")
+	MCFG_RAM_DEFAULT_SIZE("128K")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( apple2ee, apple2e )
-	MDRV_CPU_REPLACE("maincpu", M65C02, 1021800)		/* close to actual CPU frequency of 1.020484 MHz */
+	MCFG_CPU_REPLACE("maincpu", M65C02, 1021800)		/* close to actual CPU frequency of 1.020484 MHz */
 
 	/* CFFA stuff */
-	MDRV_HARDDISK_ADD("harddisk")
-	MDRV_IDE_CONTROLLER_ADD("ide", NULL)
-	MDRV_IDE_CONTROLLER_REGIONS("harddisk", NULL)
-	MDRV_A2CFFA_ADD("cffa")
-	MDRV_APPLE2_SLOT_ADD(7, "cffa", a2cffa_r, a2cffa_w, a2cffa_c800_r, a2cffa_c800_w, a2cffa_cnxx_r, a2cffa_cnxx_w)
+	MCFG_HARDDISK_ADD("harddisk")
+	MCFG_IDE_CONTROLLER_ADD("ide", NULL)
+	MCFG_IDE_CONTROLLER_REGIONS("harddisk", NULL)
+	MCFG_A2CFFA_ADD("cffa")
+	MCFG_APPLE2_SLOT_ADD(7, "cffa", a2cffa_r, a2cffa_w, a2cffa_c800_r, a2cffa_c800_w, a2cffa_cnxx_r, a2cffa_cnxx_w)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( apple2ep, apple2e )
-	MDRV_CPU_REPLACE("maincpu", M65C02, 1021800)		/* close to actual CPU frequency of 1.020484 MHz */
+	MCFG_CPU_REPLACE("maincpu", M65C02, 1021800)		/* close to actual CPU frequency of 1.020484 MHz */
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( apple2c, apple2ee )
@@ -739,8 +739,8 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( apple2c_iwm, apple2c )
 
 	/* replace the old-style FDC with an IWM */
-	MDRV_DEVICE_REMOVE("fdc")
-	MDRV_IWM_ADD("fdc", apple2_fdc_interface)
+	MCFG_DEVICE_REMOVE("fdc")
+	MCFG_IWM_ADD("fdc", apple2_fdc_interface)
 MACHINE_CONFIG_END
 
 

@@ -61,7 +61,7 @@ public:
 	UINT8 mouse_y;
 	INT8 mouse_dx;
 	INT8 mouse_dy;
-	running_device *cur_slot6_image;
+	device_t *cur_slot6_image;
 	emu_timer *scanline_timer;
 	emu_timer *clock_timer;
 	emu_timer *qsecond_timer;
@@ -101,7 +101,7 @@ MACHINE_RESET( apple2gs );
 
 NVRAM_HANDLER( apple2gs );
 
-void apple2gs_doc_irq(running_device *device, int state);
+void apple2gs_doc_irq(device_t *device, int state);
 
 
 /*----------- defined in video/apple2gs.c -----------*/

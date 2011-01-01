@@ -243,26 +243,26 @@ static INTERRUPT_GEN( homez80_interrupt )
 
 static MACHINE_CONFIG_START( homez80, homez80_state )
     /* basic machine hardware */
-    MDRV_CPU_ADD("maincpu",Z80, XTAL_8MHz / 2)
-    MDRV_CPU_PROGRAM_MAP(homez80_mem)
-    MDRV_CPU_IO_MAP(homez80_io)	
-	MDRV_CPU_PERIODIC_INT(homez80_interrupt, 50)
+    MCFG_CPU_ADD("maincpu",Z80, XTAL_8MHz / 2)
+    MCFG_CPU_PROGRAM_MAP(homez80_mem)
+    MCFG_CPU_IO_MAP(homez80_io)	
+	MCFG_CPU_PERIODIC_INT(homez80_interrupt, 50)
 	
-    MDRV_MACHINE_RESET(homez80)
+    MCFG_MACHINE_RESET(homez80)
 	
     /* video hardware */
-    MDRV_SCREEN_ADD("screen", RASTER)
-    MDRV_SCREEN_REFRESH_RATE(50)
-    MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-    MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-    MDRV_SCREEN_SIZE(344, 32 * 8)
-    MDRV_SCREEN_VISIBLE_AREA(0, 344-1, 0, 32 * 8-1)
-    MDRV_PALETTE_LENGTH(2)
-    MDRV_PALETTE_INIT(black_and_white)
-	MDRV_GFXDECODE( homez80 )
+    MCFG_SCREEN_ADD("screen", RASTER)
+    MCFG_SCREEN_REFRESH_RATE(50)
+    MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+    MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+    MCFG_SCREEN_SIZE(344, 32 * 8)
+    MCFG_SCREEN_VISIBLE_AREA(0, 344-1, 0, 32 * 8-1)
+    MCFG_PALETTE_LENGTH(2)
+    MCFG_PALETTE_INIT(black_and_white)
+	MCFG_GFXDECODE( homez80 )
 
-    MDRV_VIDEO_START(homez80)
-    MDRV_VIDEO_UPDATE(homez80)
+    MCFG_VIDEO_START(homez80)
+    MCFG_VIDEO_UPDATE(homez80)
 MACHINE_CONFIG_END
 
 /* ROM definition */

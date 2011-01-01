@@ -231,10 +231,10 @@ public:
 	wheelfir_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	running_device *maincpu;
-	running_device *subcpu;
-	running_device *screen;
-	running_device *eeprom;
+	device_t *maincpu;
+	device_t *subcpu;
+	device_t *screen;
+	device_t *eeprom;
 
 	INT32 *zoom_table;
 	UINT16 *blitter_data;
@@ -286,7 +286,7 @@ static READ16_HANDLER( wheelfir_status_r )
 
 */
 	wheelfir_state *state = space->machine->driver_data<wheelfir_state>();
-	return state->toggle_bit| (mame_rand(space->machine)&0x2000);
+	return state->toggle_bit| (space->machine->rand()&0x2000);
 }
 
 static WRITE16_HANDLER( wheelfir_scanline_cnt_w )
@@ -372,7 +372,7 @@ static WRITE16_HANDLER(wheelfir_blit_w)
 		cputag_set_input_line(space->machine, "maincpu", 1, HOLD_LINE);
 
 		{
-			UINT8 *rom = memory_region(space->machine, "gfx1");
+			UINT8 *rom = space->machine->region("gfx1")->base();
 
 			int width = space->machine->primary_screen->width();
 			int height = space->machine->primary_screen->height();
@@ -784,7 +784,7 @@ static MACHINE_START( wheelfir )
 		state->zoom_table[i]=-1;
 	}
 
-	UINT16 *ROM = (UINT16 *)memory_region(machine, "maincpu");
+	UINT16 *ROM = (UINT16 *)machine->region("maincpu")->base();
 
 	for(int j=0;j<400;++j)
 	{
@@ -806,43 +806,43 @@ static MACHINE_START( wheelfir )
 
 static MACHINE_CONFIG_START( wheelfir, wheelfir_state )
 
-	MDRV_CPU_ADD("maincpu", M68000, 32000000/2)
-	MDRV_CPU_PROGRAM_MAP(wheelfir_main)
+	MCFG_CPU_ADD("maincpu", M68000, 32000000/2)
+	MCFG_CPU_PROGRAM_MAP(wheelfir_main)
 
-	MDRV_CPU_ADD("subcpu", M68000, 32000000/2)
-	MDRV_CPU_PROGRAM_MAP(wheelfir_sub)
-	//MDRV_CPU_VBLANK_INT_HACK(irq1_line_hold,256)
+	MCFG_CPU_ADD("subcpu", M68000, 32000000/2)
+	MCFG_CPU_PROGRAM_MAP(wheelfir_sub)
+	//MCFG_CPU_VBLANK_INT_HACK(irq1_line_hold,256)
 
-	MDRV_QUANTUM_TIME(HZ(12000))
+	MCFG_QUANTUM_TIME(HZ(12000))
 
-	MDRV_MACHINE_RESET (wheelfir)
+	MCFG_MACHINE_RESET (wheelfir)
 
-	MDRV_TIMER_ADD_SCANLINE("scan_timer", scanline_timer_callback, "screen", 0, 1)
+	MCFG_TIMER_ADD_SCANLINE("scan_timer", scanline_timer_callback, "screen", 0, 1)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
 
 
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(336, NUM_SCANLINES+NUM_VBLANK_LINES)
-	MDRV_SCREEN_VISIBLE_AREA(0,335, 0, NUM_SCANLINES-1)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(336, NUM_SCANLINES+NUM_VBLANK_LINES)
+	MCFG_SCREEN_VISIBLE_AREA(0,335, 0, NUM_SCANLINES-1)
 
-	MDRV_PALETTE_LENGTH(NUM_COLORS)
+	MCFG_PALETTE_LENGTH(NUM_COLORS)
 
-	MDRV_EEPROM_93C46_ADD("eeprom")
+	MCFG_EEPROM_93C46_ADD("eeprom")
 
-	MDRV_MACHINE_START(wheelfir)
+	MCFG_MACHINE_START(wheelfir)
 
-	MDRV_VIDEO_START(wheelfir)
-	MDRV_VIDEO_UPDATE(wheelfir)
-	MDRV_VIDEO_EOF(wheelfir)
+	MCFG_VIDEO_START(wheelfir)
+	MCFG_VIDEO_UPDATE(wheelfir)
+	MCFG_VIDEO_EOF(wheelfir)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("dac1", DAC, 0)
-	MDRV_SOUND_ADD("dac2", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("dac1", DAC, 0)
+	MCFG_SOUND_ADD("dac2", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 MACHINE_CONFIG_END
 
@@ -869,7 +869,7 @@ ROM_END
 
 static DRIVER_INIT(wheelfir)
 {
-	UINT16 *RAM = (UINT16 *)memory_region(machine, "maincpu");
+	UINT16 *RAM = (UINT16 *)machine->region("maincpu")->base();
 	RAM[0xdd3da/2] = 0x4e71; //hack
 }
 

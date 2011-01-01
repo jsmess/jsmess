@@ -20,7 +20,7 @@ VIDEO_UPDATE( z1013 )
 	z1013_state *state = screen->machine->driver_data<z1013_state>();
 	UINT8 code, line;
 	int y, x, b,i;
-	UINT8 *gfx = memory_region(screen->machine, "gfx1");
+	UINT8 *gfx = screen->machine->region("gfx1")->base();
 
 	for(y = 0; y < 32; y++ )
 	{

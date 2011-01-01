@@ -439,7 +439,7 @@ static const nes_interface nes_apu_interface =
 };
 
 
-static void ppu_nmi(running_device *device, int *ppu_regs)
+static void ppu_nmi(device_t *device, int *ppu_regs)
 {
 	cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
 }
@@ -468,96 +468,96 @@ static const floppy_config nes_floppy_config =
 
 static MACHINE_CONFIG_START( nes, nes_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", N2A03, NTSC_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(nes_map)
+	MCFG_CPU_ADD("maincpu", N2A03, NTSC_CLOCK)
+	MCFG_CPU_PROGRAM_MAP(nes_map)
 
-	MDRV_MACHINE_START( nes )
-	MDRV_MACHINE_RESET( nes )
+	MCFG_MACHINE_START( nes )
+	MCFG_MACHINE_RESET( nes )
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60.098)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60.098)
 	// This isn't used so much to calulate the vblank duration (the PPU code tracks that manually) but to determine
 	// the number of cycles in each scanline for the PPU scanline timer. Since the PPU has 20 vblank scanlines + 2
 	// non-rendering scanlines, we compensate. This ends up being 2500 cycles for the non-rendering portion, 2273
 	// cycles for the actual vblank period.
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC((113.66/(NTSC_CLOCK/1000000)) * (PPU_VBLANK_LAST_SCANLINE_NTSC-PPU_VBLANK_FIRST_SCANLINE+1+2)))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 262)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
-	MDRV_PALETTE_INIT(nes)
-	MDRV_VIDEO_START(nes)
-	MDRV_VIDEO_UPDATE(nes)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC((113.66/(NTSC_CLOCK/1000000)) * (PPU_VBLANK_LAST_SCANLINE_NTSC-PPU_VBLANK_FIRST_SCANLINE+1+2)))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 262)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
+	MCFG_PALETTE_INIT(nes)
+	MCFG_VIDEO_START(nes)
+	MCFG_VIDEO_UPDATE(nes)
 
-	MDRV_PALETTE_LENGTH(4*16*8)
+	MCFG_PALETTE_LENGTH(4*16*8)
 
-	MDRV_PPU2C02_ADD( "ppu", nes_ppu_interface )
+	MCFG_PPU2C02_ADD( "ppu", nes_ppu_interface )
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("nessound", NES, NTSC_CLOCK)
-	MDRV_SOUND_CONFIG(nes_apu_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("nessound", NES, NTSC_CLOCK)
+	MCFG_SOUND_CONFIG(nes_apu_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 
-	MDRV_CARTSLOT_ADD("cart")
-	MDRV_CARTSLOT_EXTENSION_LIST("nes,unf")
-	MDRV_CARTSLOT_MANDATORY
-	MDRV_CARTSLOT_INTERFACE("nes_cart")
-	MDRV_CARTSLOT_LOAD(nes_cart)
-	MDRV_CARTSLOT_PARTIALHASH(nes_partialhash)
-	MDRV_SOFTWARE_LIST_ADD("cart_list","nes")
+	MCFG_CARTSLOT_ADD("cart")
+	MCFG_CARTSLOT_EXTENSION_LIST("nes,unf")
+	MCFG_CARTSLOT_MANDATORY
+	MCFG_CARTSLOT_INTERFACE("nes_cart")
+	MCFG_CARTSLOT_LOAD(nes_cart)
+	MCFG_CARTSLOT_PARTIALHASH(nes_partialhash)
+	MCFG_SOFTWARE_LIST_ADD("cart_list","nes")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( nespal, nes )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY( "maincpu" )
-	MDRV_CPU_CLOCK( PAL_CLOCK )
+	MCFG_CPU_MODIFY( "maincpu" )
+	MCFG_CPU_CLOCK( PAL_CLOCK )
 
-	MDRV_DEVICE_REMOVE( "ppu" )
-	MDRV_PPU2C07_ADD( "ppu", nes_ppu_interface )
+	MCFG_DEVICE_REMOVE( "ppu" )
+	MCFG_PPU2C07_ADD( "ppu", nes_ppu_interface )
 
 	/* video hardware */
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_REFRESH_RATE(53.355)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC((106.53/(PAL_CLOCK/1000000)) * (PPU_VBLANK_LAST_SCANLINE_PAL-PPU_VBLANK_FIRST_SCANLINE+1+2)))
-	MDRV_VIDEO_START(nes)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_REFRESH_RATE(53.355)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC((106.53/(PAL_CLOCK/1000000)) * (PPU_VBLANK_LAST_SCANLINE_PAL-PPU_VBLANK_FIRST_SCANLINE+1+2)))
+	MCFG_VIDEO_START(nes)
 
 	/* sound hardware */
-	MDRV_SOUND_REPLACE("nessound", NES, PAL_CLOCK)
-	MDRV_SOUND_CONFIG(nes_apu_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
+	MCFG_SOUND_REPLACE("nessound", NES, PAL_CLOCK)
+	MCFG_SOUND_CONFIG(nes_apu_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( dendy, nes )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY( "maincpu" )
-	MDRV_CPU_CLOCK( 26601712/15 ) /* 26.601712MHz / 15 == 1.77344746666... MHz */
+	MCFG_CPU_MODIFY( "maincpu" )
+	MCFG_CPU_CLOCK( 26601712/15 ) /* 26.601712MHz / 15 == 1.77344746666... MHz */
 
-	MDRV_DEVICE_REMOVE( "ppu" )
-	MDRV_PPU2C07_ADD( "ppu", nes_ppu_interface )
+	MCFG_DEVICE_REMOVE( "ppu" )
+	MCFG_PPU2C07_ADD( "ppu", nes_ppu_interface )
 
 	/* video hardware */
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_REFRESH_RATE(50.00697796827)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC((106.53/(PAL_CLOCK/1000000)) * (PPU_VBLANK_LAST_SCANLINE_PAL-PPU_VBLANK_FIRST_SCANLINE+1+2)))
-	MDRV_VIDEO_START(nes)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_REFRESH_RATE(50.00697796827)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC((106.53/(PAL_CLOCK/1000000)) * (PPU_VBLANK_LAST_SCANLINE_PAL-PPU_VBLANK_FIRST_SCANLINE+1+2)))
+	MCFG_VIDEO_START(nes)
 
 	/* sound hardware */
-	MDRV_SOUND_REPLACE("nessound", NES, 26601712/15) /* 26.601712MHz / 15 == 1.77344746666... MHz */
-	MDRV_SOUND_CONFIG(nes_apu_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
+	MCFG_SOUND_REPLACE("nessound", NES, 26601712/15) /* 26.601712MHz / 15 == 1.77344746666... MHz */
+	MCFG_SOUND_CONFIG(nes_apu_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( famicom, nes )
 
-	MDRV_CARTSLOT_MODIFY("cart")
-	MDRV_CARTSLOT_EXTENSION_LIST("nes,unf")
-	MDRV_CARTSLOT_NOT_MANDATORY
-	MDRV_CARTSLOT_LOAD(nes_cart)
-	MDRV_CARTSLOT_PARTIALHASH(nes_partialhash)
+	MCFG_CARTSLOT_MODIFY("cart")
+	MCFG_CARTSLOT_EXTENSION_LIST("nes,unf")
+	MCFG_CARTSLOT_NOT_MANDATORY
+	MCFG_CARTSLOT_LOAD(nes_cart)
+	MCFG_CARTSLOT_PARTIALHASH(nes_partialhash)
 
-	MDRV_FLOPPY_DRIVE_ADD(FLOPPY_0, nes_floppy_config)
+	MCFG_FLOPPY_DRIVE_ADD(FLOPPY_0, nes_floppy_config)
 MACHINE_CONFIG_END
 
 

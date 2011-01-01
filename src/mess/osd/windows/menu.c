@@ -896,7 +896,7 @@ static int add_filter_entry(char *dest, size_t dest_len, const char *description
 //  build_generic_filter
 //============================================================
 
-static void build_generic_filter(running_device *device, int is_save, char *filter, size_t filter_len)
+static void build_generic_filter(device_t *device, int is_save, char *filter, size_t filter_len)
 {
 	char *s;
 

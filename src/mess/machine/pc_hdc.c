@@ -111,7 +111,7 @@ static UINT8 *buffer;					/* data buffer */
 static UINT8 *buffer_ptr = 0;			/* data pointer */
 static UINT8 hdc_control;
 static void (*hdc_set_irq)(running_machine *,int,int);
-static running_device *pc_hdc_dma8237;
+static device_t *pc_hdc_dma8237;
 
 
 static const char *const hdc_command_names[] =
@@ -218,7 +218,7 @@ int pc_hdc_setup(running_machine *machine, void (*hdc_set_irq_func)(running_mach
 }
 
 
-void pc_hdc_set_dma8237_device( running_device *dma8237 )
+void pc_hdc_set_dma8237_device( device_t *dma8237 )
 {
 	pc_hdc_dma8237 = dma8237;
 }
@@ -869,10 +869,10 @@ WRITE32_HANDLER ( pc32le_HDC2_w ) { write32le_with_write8_handler(pc_HDC2_w, spa
 
 MACHINE_CONFIG_FRAGMENT( pc_hdc )
 	/* harddisk */
-	MDRV_HARDDISK_ADD("harddisk1")
-	MDRV_HARDDISK_ADD("harddisk2")
-	MDRV_HARDDISK_ADD("harddisk3")
-	MDRV_HARDDISK_ADD("harddisk4")
+	MCFG_HARDDISK_ADD("harddisk1")
+	MCFG_HARDDISK_ADD("harddisk2")
+	MCFG_HARDDISK_ADD("harddisk3")
+	MCFG_HARDDISK_ADD("harddisk4")
 MACHINE_CONFIG_END
 
 

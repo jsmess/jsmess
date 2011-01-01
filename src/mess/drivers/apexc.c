@@ -66,13 +66,13 @@ static DEVICE_IMAGE_LOAD( apexc_cylinder )
 	apexc_cylinder_t *cyl = (apexc_cylinder_t *)downcast<legacy_device_base *>(&image.device())->token();
 	cyl->writable = image.is_writable();
 
-	image.fread( memory_region(image.device().machine, "maincpu"), /*0x8000*/0x1000);
+	image.fread( image.device().machine->region("maincpu")->base(), /*0x8000*/0x1000);
 #ifdef LSB_FIRST
 	{	/* fix endianness */
 		UINT32 *RAM;
 		int i;
 
-		RAM = (UINT32 *) memory_region(image.device().machine, "maincpu");
+		RAM = (UINT32 *) image.device().machine->region("maincpu")->base();
 
 		for (i=0; i < /*0x2000*/0x0400; i++)
 			RAM[i] = BIG_ENDIANIZE_INT32(RAM[i]);
@@ -97,14 +97,14 @@ static DEVICE_IMAGE_UNLOAD( apexc_cylinder )
 			UINT32 *RAM;
 			int i;
 
-			RAM = (UINT32 *) memory_region(image.device().machine, "maincpu");
+			RAM = (UINT32 *) image.device().machine->region("maincpu")->base();
 
 			for (i=0; i < /*0x2000*/0x0400; i++)
 				RAM[i] = BIG_ENDIANIZE_INT32(RAM[i]);
 		}
 #endif
 		/* write */
-		image.fwrite(memory_region(image.device().machine, "maincpu"), /*0x8000*/0x1000);
+		image.fwrite(image.device().machine->region("maincpu")->base(), /*0x8000*/0x1000);
 	}
 }
 
@@ -145,8 +145,8 @@ DEVICE_GET_INFO( apexc_cylinder )
 DECLARE_LEGACY_IMAGE_DEVICE(APEXC_CYLINDER, apexc_cylinder);
 DEFINE_LEGACY_IMAGE_DEVICE(APEXC_CYLINDER, apexc_cylinder);
 
-#define MDRV_APEXC_CYLINDER_ADD(_tag) \
-	MDRV_DEVICE_ADD(_tag, APEXC_CYLINDER, 0)
+#define MCFG_APEXC_CYLINDER_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, APEXC_CYLINDER, 0)
 
 
 /*
@@ -232,8 +232,8 @@ static DEVICE_GET_INFO(apexc_tape_puncher)
 DECLARE_LEGACY_IMAGE_DEVICE(APEXC_TAPE_PUNCHER, apexc_tape_puncher);
 DEFINE_LEGACY_IMAGE_DEVICE(APEXC_TAPE_PUNCHER, apexc_tape_puncher);
 
-#define MDRV_APEXC_TAPE_PUNCHER_ADD(_tag) \
-	MDRV_DEVICE_ADD(_tag, APEXC_TAPE_PUNCHER, 0)
+#define MCFG_APEXC_TAPE_PUNCHER_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, APEXC_TAPE_PUNCHER, 0)
 
 static DEVICE_GET_INFO(apexc_tape_reader)
 {
@@ -250,8 +250,8 @@ static DEVICE_GET_INFO(apexc_tape_reader)
 DECLARE_LEGACY_IMAGE_DEVICE(APEXC_TAPE_READER, apexc_tape_reader);
 DEFINE_LEGACY_IMAGE_DEVICE(APEXC_TAPE_READER, apexc_tape_reader);
 
-#define MDRV_APEXC_TAPE_READER_ADD(_tag) \
-	MDRV_DEVICE_ADD(_tag, APEXC_TAPE_READER, 0)
+#define MCFG_APEXC_TAPE_READER_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, APEXC_TAPE_READER, 0)
 
 /*
     Open a tape image
@@ -822,7 +822,7 @@ static DRIVER_INIT(apexc)
 		0x00
 	};
 
-	dst = memory_region(machine, "gfx1");
+	dst = machine->region("gfx1")->base();
 
 	memcpy(dst, fontdata6x8, apexcfontdata_size);
 }
@@ -863,34 +863,34 @@ static MACHINE_CONFIG_START( apexc, apexc_state )
 
 	/* basic machine hardware */
 	/* APEXC CPU @ 2.0 kHz (memory word clock frequency) */
-	MDRV_CPU_ADD("maincpu", APEXC, 2000)
-	/*MDRV_CPU_CONFIG(NULL)*/
-	MDRV_CPU_PROGRAM_MAP(apexc_mem_map)
-	MDRV_CPU_IO_MAP(apexc_io_map)
+	MCFG_CPU_ADD("maincpu", APEXC, 2000)
+	/*MCFG_CPU_CONFIG(NULL)*/
+	MCFG_CPU_PROGRAM_MAP(apexc_mem_map)
+	MCFG_CPU_IO_MAP(apexc_io_map)
 	/* dummy interrupt: handles the control panel */
-	MDRV_CPU_VBLANK_INT("screen", apexc_interrupt)
-	/*MDRV_CPU_PERIODIC_INT(func, rate)*/
+	MCFG_CPU_VBLANK_INT("screen", apexc_interrupt)
+	/*MCFG_CPU_PERIODIC_INT(func, rate)*/
 
-	MDRV_MACHINE_START( apexc )
+	MCFG_MACHINE_START( apexc )
 
 	/* video hardware does not exist, but we display a control panel and the typewriter output */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(256, 192)
-	MDRV_SCREEN_VISIBLE_AREA(0, 256-1, 0, 192-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(256, 192)
+	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 192-1)
 
-	MDRV_GFXDECODE(apexc)
-	MDRV_PALETTE_LENGTH(APEXC_PALETTE_SIZE)
+	MCFG_GFXDECODE(apexc)
+	MCFG_PALETTE_LENGTH(APEXC_PALETTE_SIZE)
 
-	MDRV_PALETTE_INIT(apexc)
-	MDRV_VIDEO_START(apexc)
-	MDRV_VIDEO_UPDATE(apexc)
+	MCFG_PALETTE_INIT(apexc)
+	MCFG_VIDEO_START(apexc)
+	MCFG_VIDEO_UPDATE(apexc)
 
-	MDRV_APEXC_CYLINDER_ADD("cylinder")
-	MDRV_APEXC_TAPE_PUNCHER_ADD("tape_puncher")
-	MDRV_APEXC_TAPE_READER_ADD("tape_reader")
+	MCFG_APEXC_CYLINDER_ADD("cylinder")
+	MCFG_APEXC_TAPE_PUNCHER_ADD("tape_puncher")
+	MCFG_APEXC_TAPE_READER_ADD("tape_reader")
 MACHINE_CONFIG_END
 
 ROM_START(apexc)

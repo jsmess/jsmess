@@ -53,10 +53,10 @@ public:
 	UINT8	cmosram[0x800];
 
 	/* devices */
-	running_device *pic8259_master;
-	running_device *pic8259_slave;
-	running_device *dma8237_1;
-	running_device *upd765;
+	device_t *pic8259_master;
+	device_t *pic8259_slave;
+	device_t *dma8237_1;
+	device_t *upd765;
 };
 
 /*
@@ -86,7 +86,7 @@ static void update_memory_mapping(running_machine *machine)
 
 	if (!state->memprom)
 	{
-		memory_set_bankptr(machine, "bank1", memory_region(machine, "maincpu"));
+		memory_set_bankptr(machine, "bank1", machine->region("maincpu")->base());
 	}
 	else
 	{
@@ -500,43 +500,43 @@ GFXDECODE_END
 
 static MACHINE_CONFIG_START( qx10, qx10_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu",Z80, MAIN_CLK / 4)
-	MDRV_CPU_PROGRAM_MAP(qx10_mem)
-	MDRV_CPU_IO_MAP(qx10_io)
+	MCFG_CPU_ADD("maincpu",Z80, MAIN_CLK / 4)
+	MCFG_CPU_PROGRAM_MAP(qx10_mem)
+	MCFG_CPU_IO_MAP(qx10_io)
 
-	MDRV_MACHINE_START(qx10)
-	MDRV_MACHINE_RESET(qx10)
+	MCFG_MACHINE_START(qx10)
+	MCFG_MACHINE_RESET(qx10)
 
-	MDRV_PIT8253_ADD("pit8253_1", qx10_pit8253_1_config)
-	MDRV_PIT8253_ADD("pit8253_2", qx10_pit8253_2_config)
-	MDRV_PIC8259_ADD("pic8259_master", qx10_pic8259_master_config)
-	MDRV_PIC8259_ADD("pic8259_slave", qx10_pic8259_slave_config)
-	MDRV_UPD7201_ADD("upd7201", MAIN_CLK/4, qx10_upd7201_interface)
-	MDRV_I8255A_ADD("i8255", qx10_i8255_interface)
-	MDRV_I8237_ADD("8237dma_1", MAIN_CLK/4, qx10_dma8237_1_interface)
-	MDRV_I8237_ADD("8237dma_2", MAIN_CLK/4, qx10_dma8237_2_interface)
-	MDRV_UPD765A_ADD("upd765", qx10_upd765_interface)
-	MDRV_FLOPPY_DRIVE_ADD(FLOPPY_0, qx10_floppy_config)
+	MCFG_PIT8253_ADD("pit8253_1", qx10_pit8253_1_config)
+	MCFG_PIT8253_ADD("pit8253_2", qx10_pit8253_2_config)
+	MCFG_PIC8259_ADD("pic8259_master", qx10_pic8259_master_config)
+	MCFG_PIC8259_ADD("pic8259_slave", qx10_pic8259_slave_config)
+	MCFG_UPD7201_ADD("upd7201", MAIN_CLK/4, qx10_upd7201_interface)
+	MCFG_I8255A_ADD("i8255", qx10_i8255_interface)
+	MCFG_I8237_ADD("8237dma_1", MAIN_CLK/4, qx10_dma8237_1_interface)
+	MCFG_I8237_ADD("8237dma_2", MAIN_CLK/4, qx10_dma8237_2_interface)
+	MCFG_UPD765A_ADD("upd765", qx10_upd765_interface)
+	MCFG_FLOPPY_DRIVE_ADD(FLOPPY_0, qx10_floppy_config)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(50)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(640, 480)
-	MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MDRV_GFXDECODE(qx10)
-	MDRV_PALETTE_LENGTH(COMPIS_PALETTE_SIZE)
-	MDRV_PALETTE_INIT(compis_gdc)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(640, 480)
+	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+	MCFG_GFXDECODE(qx10)
+	MCFG_PALETTE_LENGTH(COMPIS_PALETTE_SIZE)
+	MCFG_PALETTE_INIT(compis_gdc)
 
-	MDRV_VIDEO_START(compis_gdc)
-	MDRV_VIDEO_UPDATE(compis_gdc)
+	MCFG_VIDEO_START(compis_gdc)
+	MCFG_VIDEO_UPDATE(compis_gdc)
 
-	MDRV_MC146818_ADD( "rtc", MC146818_STANDARD )
+	MCFG_MC146818_ADD( "rtc", MC146818_STANDARD )
 	
 	/* internal ram */
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("256K")
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("256K")
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -575,7 +575,7 @@ ROM_END
 static DRIVER_INIT(qx10)
 {
 	// patch boot rom
-	UINT8 *bootrom = memory_region(machine, "maincpu");
+	UINT8 *bootrom = machine->region("maincpu")->base();
 	bootrom[0x250] = 0x00; /* nop */
 	bootrom[0x251] = 0x00; /* nop */
 	bootrom[0x252] = 0x00; /* nop */

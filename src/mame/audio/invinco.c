@@ -43,9 +43,9 @@ static const samples_interface invinco_samples_interface =
 
 
 MACHINE_CONFIG_FRAGMENT( invinco_audio )
-	MDRV_SOUND_ADD("samples", SAMPLES, 0)
-	MDRV_SOUND_CONFIG(invinco_samples_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SOUND_CONFIG(invinco_samples_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
 
@@ -66,7 +66,7 @@ enum
 WRITE8_HANDLER( invinco_audio_w )
 {
 	static int port2State = 0;
-	running_device *samples = space->machine->device("samples");
+	device_t *samples = space->machine->device("samples");
 	int bitsChanged;
 	//int bitsGoneHigh;
 	int bitsGoneLow;

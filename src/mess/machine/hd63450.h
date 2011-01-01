@@ -16,19 +16,19 @@ struct _hd63450_interface
 	void (*dma_write[4])(running_machine *machine,int addr,int data);
 };
 
-int hd63450_read(running_device* device, int offset, UINT16 mem_mask);
-void hd63450_write(running_device* device,int offset, int data, UINT16 mem_mask);
-void hd63450_single_transfer(running_device* device, int x);
-void hd63450_set_timer(running_device* device, int channel, attotime tm);
+int hd63450_read(device_t* device, int offset, UINT16 mem_mask);
+void hd63450_write(device_t* device,int offset, int data, UINT16 mem_mask);
+void hd63450_single_transfer(device_t* device, int x);
+void hd63450_set_timer(device_t* device, int channel, attotime tm);
 
-int hd63450_get_vector(running_device* device, int channel);
-int hd63450_get_error_vector(running_device* device, int channel);
+int hd63450_get_vector(device_t* device, int channel);
+int hd63450_get_error_vector(device_t* device, int channel);
 
 DECLARE_LEGACY_DEVICE(HD63450, hd63450);
 
-#define MDRV_HD63450_ADD(_tag, _config) \
-	MDRV_DEVICE_ADD(_tag, HD63450, 0) \
-	MDRV_DEVICE_CONFIG(_config)
+#define MCFG_HD63450_ADD(_tag, _config) \
+	MCFG_DEVICE_ADD(_tag, HD63450, 0) \
+	MCFG_DEVICE_CONFIG(_config)
 
 READ16_DEVICE_HANDLER( hd63450_r );
 WRITE16_DEVICE_HANDLER( hd63450_w );

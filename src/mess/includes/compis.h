@@ -72,8 +72,8 @@ typedef struct
 
 typedef struct
 {
-	running_device *pic8259_master;
-	running_device *pic8259_slave;
+	device_t *pic8259_master;
+	device_t *pic8259_slave;
 } compis_devices_t;
 
 /* Keyboard */

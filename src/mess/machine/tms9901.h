@@ -33,8 +33,8 @@ DECLARE_LEGACY_DEVICE(TMS9901, tms9901);
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef void (*tms9901_int_callback_func)(running_device *device, int intreq, int ic);
-#define TMS9901_INT_CALLBACK(name)	void name(running_device *device, int intreq, int ic )
+typedef void (*tms9901_int_callback_func)(device_t *device, int intreq, int ic);
+#define TMS9901_INT_CALLBACK(name)	void name(device_t *device, int intreq, int ic )
 
 typedef struct _tms9901_interface tms9901_interface;
 struct _tms9901_interface
@@ -51,7 +51,7 @@ struct _tms9901_interface
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-void tms9901_set_single_int(running_device *device, int pin_number, int state);
+void tms9901_set_single_int(device_t *device, int pin_number, int state);
 
 READ8_DEVICE_HANDLER ( tms9901_cru_r );
 WRITE8_DEVICE_HANDLER( tms9901_cru_w );
@@ -60,8 +60,8 @@ WRITE8_DEVICE_HANDLER( tms9901_cru_w );
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MDRV_TMS9901_ADD(_tag, _intrf) \
-	MDRV_DEVICE_ADD(_tag, TMS9901, 0) \
-	MDRV_DEVICE_CONFIG(_intrf)
+#define MCFG_TMS9901_ADD(_tag, _intrf) \
+	MCFG_DEVICE_ADD(_tag, TMS9901, 0) \
+	MCFG_DEVICE_CONFIG(_intrf)
 
 #endif /* __TMS9901_H__ */

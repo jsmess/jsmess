@@ -60,7 +60,7 @@ public:
 
 /*----------- defined in drivers/samcoupe.c -----------*/
 
-void samcoupe_irq(running_device *device, UINT8 src);
+void samcoupe_irq(device_t *device, UINT8 src);
 
 
 /*----------- defined in machine/samcoupe.c -----------*/

@@ -338,7 +338,7 @@ static UPD7220_INTERFACE( hgdc_intf )
 void mm1_state::video_start()
 {
 	// find memory regions
-	m_char_rom = memory_region(machine, "chargen");
+	m_char_rom = machine->region("chargen")->base();
 
 	VIDEO_START_CALL(generic_bitmapped);
 }
@@ -673,12 +673,12 @@ void mm1_state::machine_start()
 	address_space *program = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);
 
 	/* find memory regions */
-	m_key_rom = memory_region(machine, "keyboard");
+	m_key_rom = machine->region("keyboard")->base();
 
 	/* setup memory banking */
 	memory_install_read_bank(program, 0x0000, 0x0fff, 0, 0, "bank1");
 	memory_unmap_write(program, 0x0000, 0x0fff, 0, 0);
-	memory_configure_bank(machine, "bank1", 0, 1, memory_region(machine, "bios"), 0);
+	memory_configure_bank(machine, "bank1", 0, 1, machine->region("bios")->base(), 0);
 	memory_configure_bank(machine, "bank1", 1, 1, messram_get_ptr(machine->device("messram")), 0);
 	memory_set_bank(machine, "bank1", 0);
 
@@ -714,52 +714,52 @@ void mm1_state::machine_reset()
 
 static MACHINE_CONFIG_START( mm1, mm1_state )
 	/* basic system hardware */
-	MDRV_CPU_ADD(I8085A_TAG, I8085A, XTAL_6_144MHz)
-	MDRV_CPU_PROGRAM_MAP(mm1_map)
-	MDRV_CPU_CONFIG(i8085_intf)
+	MCFG_CPU_ADD(I8085A_TAG, I8085A, XTAL_6_144MHz)
+	MCFG_CPU_PROGRAM_MAP(mm1_map)
+	MCFG_CPU_CONFIG(i8085_intf)
 
-	MDRV_TIMER_ADD_PERIODIC("kbclk", kbclk_tick, HZ(2500)) //HZ(XTAL_6_144MHz/2/8))
+	MCFG_TIMER_ADD_PERIODIC("kbclk", kbclk_tick, HZ(2500)) //HZ(XTAL_6_144MHz/2/8))
 
 	/* video hardware */
-	MDRV_SCREEN_ADD( SCREEN_TAG, RASTER )
-	MDRV_SCREEN_REFRESH_RATE( 50 )
-	MDRV_SCREEN_FORMAT( BITMAP_FORMAT_INDEXED16 )
-	MDRV_SCREEN_SIZE( 800, 400 )
-	MDRV_SCREEN_VISIBLE_AREA( 0, 800-1, 0, 400-1 )
-	//MDRV_SCREEN_RAW_PARAMS(XTAL_18_720MHz, ...)
+	MCFG_SCREEN_ADD( SCREEN_TAG, RASTER )
+	MCFG_SCREEN_REFRESH_RATE( 50 )
+	MCFG_SCREEN_FORMAT( BITMAP_FORMAT_INDEXED16 )
+	MCFG_SCREEN_SIZE( 800, 400 )
+	MCFG_SCREEN_VISIBLE_AREA( 0, 800-1, 0, 400-1 )
+	//MCFG_SCREEN_RAW_PARAMS(XTAL_18_720MHz, ...)
 
-	MDRV_GFXDECODE(mm1)
-	MDRV_PALETTE_LENGTH(3)
-	MDRV_PALETTE_INIT(mm1)
+	MCFG_GFXDECODE(mm1)
+	MCFG_PALETTE_LENGTH(3)
+	MCFG_PALETTE_INIT(mm1)
 
-	MDRV_I8275_ADD(I8275_TAG, crtc_intf)
+	MCFG_I8275_ADD(I8275_TAG, crtc_intf)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* peripheral hardware */
-	MDRV_I8212_ADD(I8212_TAG, mm1_i8212_intf)
-	MDRV_I8237_ADD(I8237_TAG, XTAL_6_144MHz/2, mm1_dma8237_intf)
-	MDRV_PIT8253_ADD(I8253_TAG, mm1_pit8253_intf)
-	MDRV_UPD765A_ADD(UPD765_TAG, /* XTAL_16MHz/2/2, */ fdc_intf)
-	MDRV_UPD7201_ADD(UPD7201_TAG, XTAL_6_144MHz/2, mpsc_intf)
+	MCFG_I8212_ADD(I8212_TAG, mm1_i8212_intf)
+	MCFG_I8237_ADD(I8237_TAG, XTAL_6_144MHz/2, mm1_dma8237_intf)
+	MCFG_PIT8253_ADD(I8253_TAG, mm1_pit8253_intf)
+	MCFG_UPD765A_ADD(UPD765_TAG, /* XTAL_16MHz/2/2, */ fdc_intf)
+	MCFG_UPD7201_ADD(UPD7201_TAG, XTAL_6_144MHz/2, mpsc_intf)
 
-	MDRV_FLOPPY_2_DRIVES_ADD(mm1_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_ADD(mm1_floppy_config)
 
 	/* internal ram */
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("64K")
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("64K")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mm1m6, mm1 )
 	/* basic system hardware */
-	MDRV_CPU_MODIFY(I8085A_TAG)
-	MDRV_CPU_PROGRAM_MAP(mm1m6_map)
+	MCFG_CPU_MODIFY(I8085A_TAG)
+	MCFG_CPU_PROGRAM_MAP(mm1m6_map)
 
 	/* video hardware */
-	MDRV_UPD7220_ADD(UPD7220_TAG, XTAL_18_720MHz/8, hgdc_intf, mm1_upd7220_map)
+	MCFG_UPD7220_ADD(UPD7220_TAG, XTAL_18_720MHz/8, hgdc_intf, mm1_upd7220_map)
 MACHINE_CONFIG_END
 
 /* ROMs */

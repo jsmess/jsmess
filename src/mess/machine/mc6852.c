@@ -111,14 +111,14 @@ struct _mc6852_t
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE mc6852_t *get_safe_token(running_device *device)
+INLINE mc6852_t *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == MC6852);
 	return (mc6852_t *)downcast<legacy_device_base *>(device)->token();
 }
 
-INLINE const mc6852_interface *get_interface(running_device *device)
+INLINE const mc6852_interface *get_interface(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == MC6852);
@@ -133,7 +133,7 @@ INLINE const mc6852_interface *get_interface(running_device *device)
     receive - receiver
 -------------------------------------------------*/
 
-static void receive(running_device *device)
+static void receive(device_t *device)
 {
 };
 
@@ -141,7 +141,7 @@ static void receive(running_device *device)
     transmit - transmitter
 -------------------------------------------------*/
 
-static void transmit(running_device *device)
+static void transmit(device_t *device)
 {
 };
 
@@ -151,7 +151,7 @@ static void transmit(running_device *device)
 
 static TIMER_CALLBACK( receive_tick )
 {
-	running_device *device = (running_device *)ptr;
+	device_t *device = (device_t *)ptr;
 
 	receive(device);
 }
@@ -162,7 +162,7 @@ static TIMER_CALLBACK( receive_tick )
 
 static TIMER_CALLBACK( transmit_tick )
 {
-	running_device *device = (running_device *)ptr;
+	device_t *device = (device_t *)ptr;
 
 	transmit(device);
 }

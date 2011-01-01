@@ -515,34 +515,34 @@ GFXDECODE_END
 static MACHINE_CONFIG_START( atarig42, atarig42_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz)
-	MDRV_CPU_PROGRAM_MAP(main_map)
-	MDRV_CPU_VBLANK_INT("screen", atarigen_video_int_gen)
+	MCFG_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz)
+	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_CPU_VBLANK_INT("screen", atarigen_video_int_gen)
 
 	/* ASIC65 */
-	MDRV_FRAGMENT_ADD(asic65)
+	MCFG_FRAGMENT_ADD(asic65)
 
-	MDRV_MACHINE_START(atarig42)
-	MDRV_MACHINE_RESET(atarig42)
-	MDRV_NVRAM_ADD_1FILL("eeprom")
+	MCFG_MACHINE_START(atarig42)
+	MCFG_MACHINE_RESET(atarig42)
+	MCFG_NVRAM_ADD_1FILL("eeprom")
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MDRV_GFXDECODE(atarig42)
-	MDRV_PALETTE_LENGTH(2048)
+	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
+	MCFG_GFXDECODE(atarig42)
+	MCFG_PALETTE_LENGTH(2048)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses an SOS chip to generate video signals */
-	MDRV_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
+	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
 
-	MDRV_VIDEO_START(atarig42)
-	MDRV_VIDEO_EOF(atarirle)
-	MDRV_VIDEO_UPDATE(atarig42)
+	MCFG_VIDEO_START(atarig42)
+	MCFG_VIDEO_EOF(atarirle)
+	MCFG_VIDEO_UPDATE(atarig42)
 
 	/* sound hardware */
-	MDRV_FRAGMENT_ADD(jsa_iii_mono)
+	MCFG_FRAGMENT_ADD(jsa_iii_mono)
 MACHINE_CONFIG_END
 
 
@@ -727,7 +727,7 @@ static DRIVER_INIT( guardian )
 
 	/* it looks like they jsr to $80000 as some kind of protection */
 	/* put an RTS there so we don't die */
-	*(UINT16 *)&memory_region(machine, "maincpu")[0x80000] = 0x4E75;
+	*(UINT16 *)&machine->region("maincpu")->base()[0x80000] = 0x4E75;
 
 	address_space *main = machine->device<m68000_device>("maincpu")->space(AS_PROGRAM);
 	state->sloop_base = memory_install_readwrite16_handler(main, 0x000000, 0x07ffff, 0, 0, guardians_sloop_data_r, guardians_sloop_data_w);

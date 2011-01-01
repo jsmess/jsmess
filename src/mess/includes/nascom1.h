@@ -31,7 +31,7 @@ public:
 		: driver_device(machine, config) { }
 
 	UINT8 *videoram;
-	running_device *hd6402;
+	device_t *hd6402;
 	int tape_size;
 	UINT8 *tape_image;
 	int tape_index;

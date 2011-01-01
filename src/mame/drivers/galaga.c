@@ -814,7 +814,7 @@ static const namco_51xx_interface namco_51xx_intf =
 
 static READ8_DEVICE_HANDLER( namco_52xx_rom_r )
 {
-	UINT32 length = memory_region_length(device->machine, "52xx");
+	UINT32 length = device->machine->region("52xx")->bytes();
 //printf("ROM read %04X\n", offset);
 	if (!(offset & 0x1000))
 		offset = (offset & 0xfff) | 0x0000;
@@ -824,7 +824,7 @@ static READ8_DEVICE_HANDLER( namco_52xx_rom_r )
 		offset = (offset & 0xfff) | 0x2000;
 	else if (!(offset & 0x8000))
 		offset = (offset & 0xfff) | 0x3000;
-	return (offset < length) ? memory_region(device->machine, "52xx")[offset] : 0xff;
+	return (offset < length) ? device->machine->region("52xx")->base()[offset] : 0xff;
 }
 
 static READ8_DEVICE_HANDLER( namco_52xx_si_r )
@@ -1584,262 +1584,262 @@ static const samples_interface battles_samples_interface =
 static MACHINE_CONFIG_START( bosco, _galaga_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)	/* 3.072 MHz */
-	MDRV_CPU_PROGRAM_MAP(bosco_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_assert)
+	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)	/* 3.072 MHz */
+	MCFG_CPU_PROGRAM_MAP(bosco_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_assert)
 
-	MDRV_CPU_ADD("sub", Z80, MASTER_CLOCK/6)	/* 3.072 MHz */
-	MDRV_CPU_PROGRAM_MAP(bosco_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_assert)
+	MCFG_CPU_ADD("sub", Z80, MASTER_CLOCK/6)	/* 3.072 MHz */
+	MCFG_CPU_PROGRAM_MAP(bosco_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_assert)
 
-	MDRV_CPU_ADD("sub2", Z80, MASTER_CLOCK/6)	/* 3.072 MHz */
-	MDRV_CPU_PROGRAM_MAP(bosco_map)
+	MCFG_CPU_ADD("sub2", Z80, MASTER_CLOCK/6)	/* 3.072 MHz */
+	MCFG_CPU_PROGRAM_MAP(bosco_map)
 
-	MDRV_NAMCO_50XX_ADD("50xx_1", MASTER_CLOCK/6/2)	/* 1.536 MHz */
-	MDRV_NAMCO_50XX_ADD("50xx_2", MASTER_CLOCK/6/2)	/* 1.536 MHz */
-	MDRV_NAMCO_51XX_ADD("51xx", MASTER_CLOCK/6/2, namco_51xx_intf)		/* 1.536 MHz */
-	MDRV_NAMCO_52XX_ADD("52xx", MASTER_CLOCK/6/2, namco_52xx_intf)		/* 1.536 MHz */
-	MDRV_NAMCO_54XX_ADD("54xx", MASTER_CLOCK/6/2, "discrete", NODE_01)	/* 1.536 MHz */
+	MCFG_NAMCO_50XX_ADD("50xx_1", MASTER_CLOCK/6/2)	/* 1.536 MHz */
+	MCFG_NAMCO_50XX_ADD("50xx_2", MASTER_CLOCK/6/2)	/* 1.536 MHz */
+	MCFG_NAMCO_51XX_ADD("51xx", MASTER_CLOCK/6/2, namco_51xx_intf)		/* 1.536 MHz */
+	MCFG_NAMCO_52XX_ADD("52xx", MASTER_CLOCK/6/2, namco_52xx_intf)		/* 1.536 MHz */
+	MCFG_NAMCO_54XX_ADD("54xx", MASTER_CLOCK/6/2, "discrete", NODE_01)	/* 1.536 MHz */
 
-	MDRV_NAMCO_06XX_ADD("06xx_0", MASTER_CLOCK/6/64, "maincpu", "51xx",   NULL,   "50xx_1", "54xx")
-	MDRV_NAMCO_06XX_ADD("06xx_1", MASTER_CLOCK/6/64, "sub",     "50xx_2", "52xx", NULL,     NULL)
+	MCFG_NAMCO_06XX_ADD("06xx_0", MASTER_CLOCK/6/64, "maincpu", "51xx",   NULL,   "50xx_1", "54xx")
+	MCFG_NAMCO_06XX_ADD("06xx_1", MASTER_CLOCK/6/64, "sub",     "50xx_2", "52xx", NULL,     NULL)
 
-	MDRV_WATCHDOG_VBLANK_INIT(8)
-	MDRV_QUANTUM_TIME(HZ(6000))	/* 100 CPU slices per frame - an high value to ensure proper */
+	MCFG_WATCHDOG_VBLANK_INIT(8)
+	MCFG_QUANTUM_TIME(HZ(6000))	/* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
-	MDRV_MACHINE_START(galaga)
-	MDRV_MACHINE_RESET(galaga)
+	MCFG_MACHINE_START(galaga)
+	MCFG_MACHINE_RESET(galaga)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_RAW_PARAMS(MASTER_CLOCK/3, 384, 0, 288, 264, 16, 224+16)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/3, 384, 0, 288, 264, 16, 224+16)
 
-	MDRV_GFXDECODE(bosco)
-	MDRV_PALETTE_LENGTH(64*4+64*4+4+64)
+	MCFG_GFXDECODE(bosco)
+	MCFG_PALETTE_LENGTH(64*4+64*4+4+64)
 
-	MDRV_PALETTE_INIT(bosco)
-	MDRV_VIDEO_START(bosco)
-	MDRV_VIDEO_UPDATE(bosco)
-	MDRV_VIDEO_EOF(bosco)
+	MCFG_PALETTE_INIT(bosco)
+	MCFG_VIDEO_START(bosco)
+	MCFG_VIDEO_UPDATE(bosco)
+	MCFG_VIDEO_EOF(bosco)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("namco", NAMCO, MASTER_CLOCK/6/32)
-	MDRV_SOUND_CONFIG(namco_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90 * 10.0 / 16.0)
+	MCFG_SOUND_ADD("namco", NAMCO, MASTER_CLOCK/6/32)
+	MCFG_SOUND_CONFIG(namco_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90 * 10.0 / 16.0)
 
 	/* discrete circuit on the 54XX outputs */
-	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
-	MDRV_SOUND_CONFIG_DISCRETE(bosco)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
+	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
+	MCFG_SOUND_CONFIG_DISCRETE(bosco)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_START( galaga, _galaga_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)	/* 3.072 MHz */
-	MDRV_CPU_PROGRAM_MAP(galaga_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_assert)
+	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)	/* 3.072 MHz */
+	MCFG_CPU_PROGRAM_MAP(galaga_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_assert)
 
-	MDRV_CPU_ADD("sub", Z80, MASTER_CLOCK/6)	/* 3.072 MHz */
-	MDRV_CPU_PROGRAM_MAP(galaga_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_assert)
+	MCFG_CPU_ADD("sub", Z80, MASTER_CLOCK/6)	/* 3.072 MHz */
+	MCFG_CPU_PROGRAM_MAP(galaga_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_assert)
 
-	MDRV_CPU_ADD("sub2", Z80, MASTER_CLOCK/6)	/* 3.072 MHz */
-	MDRV_CPU_PROGRAM_MAP(galaga_map)
+	MCFG_CPU_ADD("sub2", Z80, MASTER_CLOCK/6)	/* 3.072 MHz */
+	MCFG_CPU_PROGRAM_MAP(galaga_map)
 
-	MDRV_NAMCO_51XX_ADD("51xx", MASTER_CLOCK/6/2, namco_51xx_intf)		/* 1.536 MHz */
-	MDRV_NAMCO_54XX_ADD("54xx", MASTER_CLOCK/6/2, "discrete", NODE_01)	/* 1.536 MHz */
+	MCFG_NAMCO_51XX_ADD("51xx", MASTER_CLOCK/6/2, namco_51xx_intf)		/* 1.536 MHz */
+	MCFG_NAMCO_54XX_ADD("54xx", MASTER_CLOCK/6/2, "discrete", NODE_01)	/* 1.536 MHz */
 
-	MDRV_NAMCO_06XX_ADD("06xx", MASTER_CLOCK/6/64, "maincpu", "51xx", NULL, NULL, "54xx")
+	MCFG_NAMCO_06XX_ADD("06xx", MASTER_CLOCK/6/64, "maincpu", "51xx", NULL, NULL, "54xx")
 
-	MDRV_WATCHDOG_VBLANK_INIT(8)
-	MDRV_QUANTUM_TIME(HZ(6000))	/* 100 CPU slices per frame - an high value to ensure proper */
+	MCFG_WATCHDOG_VBLANK_INIT(8)
+	MCFG_QUANTUM_TIME(HZ(6000))	/* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
-	MDRV_MACHINE_START(galaga)
-	MDRV_MACHINE_RESET(galaga)
+	MCFG_MACHINE_START(galaga)
+	MCFG_MACHINE_RESET(galaga)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_RAW_PARAMS(MASTER_CLOCK/3, 384, 0, 288, 264, 0, 224)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/3, 384, 0, 288, 264, 0, 224)
 
-	MDRV_GFXDECODE(galaga)
-	MDRV_PALETTE_LENGTH(64*4+64*4+64)
+	MCFG_GFXDECODE(galaga)
+	MCFG_PALETTE_LENGTH(64*4+64*4+64)
 
-	MDRV_PALETTE_INIT(galaga)
-	MDRV_VIDEO_START(galaga)
-	MDRV_VIDEO_UPDATE(galaga)
-	MDRV_VIDEO_EOF(galaga)
+	MCFG_PALETTE_INIT(galaga)
+	MCFG_VIDEO_START(galaga)
+	MCFG_VIDEO_UPDATE(galaga)
+	MCFG_VIDEO_EOF(galaga)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("namco", NAMCO, MASTER_CLOCK/6/32)
-	MDRV_SOUND_CONFIG(namco_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90 * 10.0 / 16.0)
+	MCFG_SOUND_ADD("namco", NAMCO, MASTER_CLOCK/6/32)
+	MCFG_SOUND_CONFIG(namco_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90 * 10.0 / 16.0)
 
 	/* discrete circuit on the 54XX outputs */
-	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
-	MDRV_SOUND_CONFIG_DISCRETE(galaga)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
+	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
+	MCFG_SOUND_CONFIG_DISCRETE(galaga)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( galagab, galaga )
 
 	/* basic machine hardware */
 
-	MDRV_DEVICE_REMOVE("54xx")
-	MDRV_DEVICE_REMOVE("06xx")
+	MCFG_DEVICE_REMOVE("54xx")
+	MCFG_DEVICE_REMOVE("06xx")
 
 	/* FIXME: bootlegs should not have any Namco custom chip. However, this workaround is needed atm */
-	MDRV_NAMCO_06XX_ADD("06xx", MASTER_CLOCK/6/64, "maincpu", "51xx", NULL, NULL, NULL)
+	MCFG_NAMCO_06XX_ADD("06xx", MASTER_CLOCK/6/64, "maincpu", "51xx", NULL, NULL, NULL)
 
-	MDRV_CPU_ADD("sub3", Z80, MASTER_CLOCK/6)	/* 3.072 MHz */
-	MDRV_CPU_PROGRAM_MAP(galaga_mem4)
+	MCFG_CPU_ADD("sub3", Z80, MASTER_CLOCK/6)	/* 3.072 MHz */
+	MCFG_CPU_PROGRAM_MAP(galaga_mem4)
 
 	/* sound hardware */
-	MDRV_DEVICE_REMOVE("discrete")
+	MCFG_DEVICE_REMOVE("discrete")
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_START( xevious, _galaga_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)	/* 3.072 MHz */
-	MDRV_CPU_PROGRAM_MAP(xevious_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_assert)
+	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)	/* 3.072 MHz */
+	MCFG_CPU_PROGRAM_MAP(xevious_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_assert)
 
-	MDRV_CPU_ADD("sub", Z80,MASTER_CLOCK/6)	/* 3.072 MHz */
-	MDRV_CPU_PROGRAM_MAP(xevious_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_assert)
+	MCFG_CPU_ADD("sub", Z80,MASTER_CLOCK/6)	/* 3.072 MHz */
+	MCFG_CPU_PROGRAM_MAP(xevious_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_assert)
 
-	MDRV_CPU_ADD("sub2", Z80, MASTER_CLOCK/6)	/* 3.072 MHz */
-	MDRV_CPU_PROGRAM_MAP(xevious_map)
+	MCFG_CPU_ADD("sub2", Z80, MASTER_CLOCK/6)	/* 3.072 MHz */
+	MCFG_CPU_PROGRAM_MAP(xevious_map)
 
-	MDRV_NAMCO_50XX_ADD("50xx", MASTER_CLOCK/6/2)	/* 1.536 MHz */
-	MDRV_NAMCO_51XX_ADD("51xx", MASTER_CLOCK/6/2, namco_51xx_intf)		/* 1.536 MHz */
-	MDRV_NAMCO_54XX_ADD("54xx", MASTER_CLOCK/6/2, "discrete", NODE_01)	/* 1.536 MHz */
+	MCFG_NAMCO_50XX_ADD("50xx", MASTER_CLOCK/6/2)	/* 1.536 MHz */
+	MCFG_NAMCO_51XX_ADD("51xx", MASTER_CLOCK/6/2, namco_51xx_intf)		/* 1.536 MHz */
+	MCFG_NAMCO_54XX_ADD("54xx", MASTER_CLOCK/6/2, "discrete", NODE_01)	/* 1.536 MHz */
 
-	MDRV_NAMCO_06XX_ADD("06xx", MASTER_CLOCK/6/64, "maincpu", "51xx", NULL, "50xx", "54xx")
+	MCFG_NAMCO_06XX_ADD("06xx", MASTER_CLOCK/6/64, "maincpu", "51xx", NULL, "50xx", "54xx")
 
-	MDRV_WATCHDOG_VBLANK_INIT(8)
-	MDRV_QUANTUM_TIME(HZ(60000))	/* 1000 CPU slices per frame - an high value to ensure proper */
+	MCFG_WATCHDOG_VBLANK_INIT(8)
+	MCFG_QUANTUM_TIME(HZ(60000))	/* 1000 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
-	MDRV_MACHINE_START(galaga)
-	MDRV_MACHINE_RESET(galaga)
+	MCFG_MACHINE_START(galaga)
+	MCFG_MACHINE_RESET(galaga)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_RAW_PARAMS(MASTER_CLOCK/3, 384, 0, 288, 264, 0, 224)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/3, 384, 0, 288, 264, 0, 224)
 
-	MDRV_GFXDECODE(xevious)
-	MDRV_PALETTE_LENGTH(128*4+64*8+64*2)
+	MCFG_GFXDECODE(xevious)
+	MCFG_PALETTE_LENGTH(128*4+64*8+64*2)
 
-	MDRV_PALETTE_INIT(xevious)
-	MDRV_VIDEO_START(xevious)
-	MDRV_VIDEO_UPDATE(xevious)
+	MCFG_PALETTE_INIT(xevious)
+	MCFG_VIDEO_START(xevious)
+	MCFG_VIDEO_UPDATE(xevious)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("namco", NAMCO, MASTER_CLOCK/6/32)
-	MDRV_SOUND_CONFIG(namco_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90 * 10.0 / 16.0)
+	MCFG_SOUND_ADD("namco", NAMCO, MASTER_CLOCK/6/32)
+	MCFG_SOUND_CONFIG(namco_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90 * 10.0 / 16.0)
 
 	/* discrete circuit on the 54XX outputs */
-	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
-	MDRV_SOUND_CONFIG_DISCRETE(galaga)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
+	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
+	MCFG_SOUND_CONFIG_DISCRETE(galaga)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( battles, xevious )
 
 	/* basic machine hardware */
 
-	MDRV_DEVICE_REMOVE("50xx")
-	MDRV_DEVICE_REMOVE("54xx")
-	MDRV_DEVICE_REMOVE("06xx")
+	MCFG_DEVICE_REMOVE("50xx")
+	MCFG_DEVICE_REMOVE("54xx")
+	MCFG_DEVICE_REMOVE("06xx")
 
 	/* FIXME: bootlegs should not have any Namco custom chip. However, this workaround is needed atm */
-	MDRV_NAMCO_06XX_ADD("06xx", MASTER_CLOCK/6/64, "maincpu", "51xx", NULL, NULL, NULL)
+	MCFG_NAMCO_06XX_ADD("06xx", MASTER_CLOCK/6/64, "maincpu", "51xx", NULL, NULL, NULL)
 
-	MDRV_CPU_ADD("sub3", Z80, MASTER_CLOCK/6)	/* 3.072 MHz */
-	MDRV_CPU_PROGRAM_MAP(battles_mem4)
-	MDRV_CPU_VBLANK_INT("screen", battles_interrupt_4)
+	MCFG_CPU_ADD("sub3", Z80, MASTER_CLOCK/6)	/* 3.072 MHz */
+	MCFG_CPU_PROGRAM_MAP(battles_mem4)
+	MCFG_CPU_VBLANK_INT("screen", battles_interrupt_4)
 
-	MDRV_TIMER_ADD("battles_nmi", battles_nmi_generate)
+	MCFG_TIMER_ADD("battles_nmi", battles_nmi_generate)
 
-	MDRV_MACHINE_RESET(battles)
+	MCFG_MACHINE_RESET(battles)
 
 	/* video hardware */
-	MDRV_PALETTE_INIT(battles)
+	MCFG_PALETTE_INIT(battles)
 
 	/* sound hardware */
-	MDRV_DEVICE_REMOVE("discrete")
+	MCFG_DEVICE_REMOVE("discrete")
 
-	MDRV_SOUND_ADD("samples", SAMPLES, 0)
-	MDRV_SOUND_CONFIG(battles_samples_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SOUND_CONFIG(battles_samples_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_START( digdug, _galaga_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)	/* 3.072 MHz */
-	MDRV_CPU_PROGRAM_MAP(digdug_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_assert)
+	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)	/* 3.072 MHz */
+	MCFG_CPU_PROGRAM_MAP(digdug_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_assert)
 
-	MDRV_CPU_ADD("sub", Z80, MASTER_CLOCK/6)	/* 3.072 MHz */
-	MDRV_CPU_PROGRAM_MAP(digdug_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_assert)
+	MCFG_CPU_ADD("sub", Z80, MASTER_CLOCK/6)	/* 3.072 MHz */
+	MCFG_CPU_PROGRAM_MAP(digdug_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_assert)
 
-	MDRV_CPU_ADD("sub2", Z80, MASTER_CLOCK/6)	/* 3.072 MHz */
-	MDRV_CPU_PROGRAM_MAP(digdug_map)
+	MCFG_CPU_ADD("sub2", Z80, MASTER_CLOCK/6)	/* 3.072 MHz */
+	MCFG_CPU_PROGRAM_MAP(digdug_map)
 
-	MDRV_NAMCO_51XX_ADD("51xx", MASTER_CLOCK/6/2, namco_51xx_intf)		/* 1.536 MHz */
-	MDRV_NAMCO_53XX_ADD("53xx", MASTER_CLOCK/6/2, namco_53xx_intf)		/* 1.536 MHz */
+	MCFG_NAMCO_51XX_ADD("51xx", MASTER_CLOCK/6/2, namco_51xx_intf)		/* 1.536 MHz */
+	MCFG_NAMCO_53XX_ADD("53xx", MASTER_CLOCK/6/2, namco_53xx_intf)		/* 1.536 MHz */
 
-	MDRV_NAMCO_06XX_ADD("06xx", MASTER_CLOCK/6/64, "maincpu", "51xx", "53xx", NULL, NULL)
+	MCFG_NAMCO_06XX_ADD("06xx", MASTER_CLOCK/6/64, "maincpu", "51xx", "53xx", NULL, NULL)
 
-	MDRV_QUANTUM_TIME(HZ(6000))	/* 100 CPU slices per frame - an high value to ensure proper */
+	MCFG_QUANTUM_TIME(HZ(6000))	/* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
-	MDRV_MACHINE_START(galaga)
-	MDRV_MACHINE_RESET(galaga)
+	MCFG_MACHINE_START(galaga)
+	MCFG_MACHINE_RESET(galaga)
 
-	MDRV_ATARIVGEAROM_ADD("earom")
+	MCFG_ATARIVGEAROM_ADD("earom")
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_RAW_PARAMS(MASTER_CLOCK/3, 384, 0, 288, 264, 0, 224)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/3, 384, 0, 288, 264, 0, 224)
 
-	MDRV_GFXDECODE(digdug)
-	MDRV_PALETTE_LENGTH(16*2+64*4+64*4)
+	MCFG_GFXDECODE(digdug)
+	MCFG_PALETTE_LENGTH(16*2+64*4+64*4)
 
-	MDRV_PALETTE_INIT(digdug)
-	MDRV_VIDEO_START(digdug)
-	MDRV_VIDEO_UPDATE(digdug)
+	MCFG_PALETTE_INIT(digdug)
+	MCFG_VIDEO_START(digdug)
+	MCFG_VIDEO_UPDATE(digdug)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("namco", NAMCO, MASTER_CLOCK/6/32)
-	MDRV_SOUND_CONFIG(namco_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90 * 10.0 / 16.0)
+	MCFG_SOUND_ADD("namco", NAMCO, MASTER_CLOCK/6/32)
+	MCFG_SOUND_CONFIG(namco_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90 * 10.0 / 16.0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( dzigzag, digdug )
 
 	/* basic machine hardware */
 
-	MDRV_CPU_ADD("sub3", Z80, MASTER_CLOCK/6)	/* 3.072 MHz */
-	MDRV_CPU_PROGRAM_MAP(dzigzag_mem4)
+	MCFG_CPU_ADD("sub3", Z80, MASTER_CLOCK/6)	/* 3.072 MHz */
+	MCFG_CPU_PROGRAM_MAP(dzigzag_mem4)
 MACHINE_CONFIG_END
 
 
@@ -3190,8 +3190,8 @@ ROM_END
 static DRIVER_INIT (galaga)
 {
 	/* swap bytes for flipped character so we can decode them together with normal characters */
-	UINT8 *rom = memory_region(machine, "gfx1");
-	int i, len = memory_region_length(machine, "gfx1");
+	UINT8 *rom = machine->region("gfx1")->base();
+	int i, len = machine->region("gfx1")->bytes();
 
 	for (i = 0;i < len;i++)
 	{
@@ -3218,7 +3218,7 @@ static DRIVER_INIT( xevious )
 	UINT8 *rom;
 	int i;
 
-	rom = memory_region(machine, "gfx3") + 0x5000;
+	rom = machine->region("gfx3")->base() + 0x5000;
 	for (i = 0;i < 0x2000;i++)
 		rom[i + 0x2000] = rom[i] >> 4;
 }
@@ -3230,14 +3230,14 @@ static DRIVER_INIT( xevios )
 
 
 	/* convert one of the sprite ROMs to the format used by Xevious */
-	rom = memory_region(machine, "gfx3");
+	rom = machine->region("gfx3")->base();
 	for (A = 0x5000;A < 0x7000;A++)
 	{
 		rom[A] = BITSWAP8(rom[A],1,3,5,7,0,2,4,6);
 	}
 
 	/* convert one of tile map ROMs to the format used by Xevious */
-	rom = memory_region(machine, "gfx4");
+	rom = machine->region("gfx4")->base();
 	for (A = 0x0000;A < 0x1000;A++)
 	{
 		rom[A] = BITSWAP8(rom[A],3,7,5,1,2,6,4,0);

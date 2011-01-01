@@ -29,7 +29,7 @@ static READ16_HANDLER( cps1_dsw_r )
 
 static WRITE8_HANDLER( cps1_snd_bankswitch_w )
 {
-	UINT8 *RAM = memory_region(space->machine, "audiocpu");
+	UINT8 *RAM = space->machine->region("audiocpu")->base();
 	int bankaddr;
 
 	bankaddr = ((data & 1) * 0x4000);
@@ -97,7 +97,7 @@ static INTERRUPT_GEN( cps1_qsound_interrupt )
 
 static READ16_HANDLER( qsound_rom_r )
 {
-	UINT8 *rom = memory_region(space->machine, "user1");
+	UINT8 *rom = space->machine->region("user1")->base();
 
 	if (rom)
 		return rom[offset] | 0xff00;
@@ -133,10 +133,10 @@ static WRITE16_HANDLER( qsound_sharedram2_w )
 
 static WRITE8_HANDLER( qsound_banksw_w )
 {
-	UINT8 *RAM = memory_region(space->machine, "audiocpu");
+	UINT8 *RAM = space->machine->region("audiocpu")->base();
 	int bankaddress=0x10000+((data&0x0f)*0x4000);
 
-	if (bankaddress >= memory_region_length(space->machine, "audiocpu"))
+	if (bankaddress >= space->machine->region("audiocpu")->bytes())
 		bankaddress=0x10000;
 
 	memory_set_bankptr(space->machine, "bank1", &RAM[bankaddress]);
@@ -164,13 +164,13 @@ static const eeprom_interface qsound_eeprom_interface =
 
 static READ16_HANDLER( cps1_eeprom_port_r )
 {
-	running_device *eeprom = space->machine->device("eeprom");
+	device_t *eeprom = space->machine->device("eeprom");
 	return eeprom_read_bit(eeprom);
 }
 
 static WRITE16_HANDLER( cps1_eeprom_port_w )
 {
-	running_device *eeprom = space->machine->device("eeprom");
+	device_t *eeprom = space->machine->device("eeprom");
 	if (ACCESSING_BITS_0_7)
 	{
 		/*
@@ -341,7 +341,7 @@ GFXDECODE_END
 
 
 
-static void cps1_irq_handler_mus(running_device *device, int irq)
+static void cps1_irq_handler_mus(device_t *device, int irq)
 {
 	cputag_set_input_line(device->machine, "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -362,71 +362,71 @@ static const ym2151_interface ym2151_config =
 static MACHINE_CONFIG_START( cps1_10MHz, cpschngr_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 10000000)
-	MDRV_CPU_PROGRAM_MAP(main_map)
-	MDRV_CPU_VBLANK_INT("screen", cps1_interrupt)
+	MCFG_CPU_ADD("maincpu", M68000, 10000000)
+	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_CPU_VBLANK_INT("screen", cps1_interrupt)
 
-	MDRV_CPU_ADD("audiocpu", Z80, 3579545)
-	MDRV_CPU_PROGRAM_MAP(sub_map)
+	MCFG_CPU_ADD("audiocpu", Z80, 3579545)
+	MCFG_CPU_PROGRAM_MAP(sub_map)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(59.61) /* verified on one of the input gates of the 74ls08@4J on GNG romboard 88620-b-2 */
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 2*8, 30*8-1 )
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(59.61) /* verified on one of the input gates of the 74ls08@4J on GNG romboard 88620-b-2 */
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 2*8, 30*8-1 )
 
-	MDRV_GFXDECODE(cps1)
-	MDRV_PALETTE_LENGTH(0xc00)
+	MCFG_GFXDECODE(cps1)
+	MCFG_PALETTE_LENGTH(0xc00)
 
-	MDRV_VIDEO_START(cps1)
-	MDRV_VIDEO_EOF(cps1)
-	MDRV_VIDEO_UPDATE(cps1)
+	MCFG_VIDEO_START(cps1)
+	MCFG_VIDEO_EOF(cps1)
+	MCFG_VIDEO_UPDATE(cps1)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("2151", YM2151, 3579545)
-	MDRV_SOUND_CONFIG(ym2151_config)
-	MDRV_SOUND_ROUTE(0, "mono", 0.35)
-	MDRV_SOUND_ROUTE(1, "mono", 0.35)
+	MCFG_SOUND_ADD("2151", YM2151, 3579545)
+	MCFG_SOUND_CONFIG(ym2151_config)
+	MCFG_SOUND_ROUTE(0, "mono", 0.35)
+	MCFG_SOUND_ROUTE(1, "mono", 0.35)
 
-	MDRV_SOUND_ADD("oki", OKIM6295, 1000000)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	MCFG_SOUND_ADD("oki", OKIM6295, 1000000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( cps1_12MHz, cps1_10MHz )
 
 	/* basic machine hardware */
 
-	MDRV_CPU_REPLACE("maincpu", M68000, 12000000)
+	MCFG_CPU_REPLACE("maincpu", M68000, 12000000)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( qsound, cps1_12MHz )
 
 	/* basic machine hardware */
 
-	MDRV_CPU_REPLACE("maincpu", M68000, 12000000)	// 12MHz verified
-	MDRV_CPU_PROGRAM_MAP(qsound_main_map)
-	MDRV_CPU_VBLANK_INT("screen", cps1_qsound_interrupt)  /* ??? interrupts per frame */
+	MCFG_CPU_REPLACE("maincpu", M68000, 12000000)	// 12MHz verified
+	MCFG_CPU_PROGRAM_MAP(qsound_main_map)
+	MCFG_CPU_VBLANK_INT("screen", cps1_qsound_interrupt)  /* ??? interrupts per frame */
 
-	MDRV_CPU_REPLACE("audiocpu", Z80, 8000000)
-	MDRV_CPU_PROGRAM_MAP(qsound_sub_map)
-	MDRV_CPU_PERIODIC_INT(irq0_line_hold, 250)	/* ?? */
+	MCFG_CPU_REPLACE("audiocpu", Z80, 8000000)
+	MCFG_CPU_PROGRAM_MAP(qsound_sub_map)
+	MCFG_CPU_PERIODIC_INT(irq0_line_hold, 250)	/* ?? */
 
 	/* sound hardware */
-	MDRV_DEVICE_REMOVE("mono")
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_DEVICE_REMOVE("mono")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_DEVICE_REMOVE("2151")
-	MDRV_DEVICE_REMOVE("oki")
+	MCFG_DEVICE_REMOVE("2151")
+	MCFG_DEVICE_REMOVE("oki")
 
-	MDRV_SOUND_ADD("qsound", QSOUND, QSOUND_CLOCK)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("qsound", QSOUND, QSOUND_CLOCK)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MDRV_EEPROM_ADD("eeprom", qsound_eeprom_interface)
+	MCFG_EEPROM_ADD("eeprom", qsound_eeprom_interface)
 MACHINE_CONFIG_END
 
 /***************************************

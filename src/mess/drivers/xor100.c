@@ -508,7 +508,7 @@ void xor100_state::machine_start()
 {
 	int banks = messram_get_size(m_ram) / 0x10000;
 	UINT8 *ram = messram_get_ptr(m_ram);
-	UINT8 *rom = memory_region(machine, Z80_TAG);
+	UINT8 *rom = machine->region(Z80_TAG)->base();
 
 	/* setup memory banking */
 	memory_configure_bank(machine, "bank1", 1, banks, ram, 0x10000);
@@ -548,28 +548,28 @@ static const floppy_config xor100_floppy_config =
 
 static MACHINE_CONFIG_START( xor100, xor100_state )
     /* basic machine hardware */
-    MDRV_CPU_ADD(Z80_TAG, Z80, XTAL_8MHz/2)
-    MDRV_CPU_PROGRAM_MAP(xor100_mem)
-    MDRV_CPU_IO_MAP(xor100_io)
+    MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_8MHz/2)
+    MCFG_CPU_PROGRAM_MAP(xor100_mem)
+    MCFG_CPU_IO_MAP(xor100_io)
 
     /* video hardware */
-	MDRV_FRAGMENT_ADD( generic_terminal )
+	MCFG_FRAGMENT_ADD( generic_terminal )
 
 	/* devices */
-	MDRV_MSM8251_ADD(I8251_A_TAG, /*XTAL_8MHz/2,*/ printer_8251_intf)
-	MDRV_MSM8251_ADD(I8251_B_TAG, /*XTAL_8MHz/2,*/ terminal_8251_intf)
-	MDRV_I8255A_ADD(I8255A_TAG, printer_8255_intf)
-	MDRV_Z80CTC_ADD(Z80CTC_TAG, XTAL_8MHz/2, ctc_intf)
-	MDRV_COM8116_ADD(COM5016_TAG, 5000000, com5016_intf)
-	MDRV_WD179X_ADD(WD1795_TAG, /*XTAL_8MHz/8,*/ fdc_intf)
-	MDRV_FLOPPY_2_DRIVES_ADD(xor100_floppy_config)
-	MDRV_CENTRONICS_ADD(CENTRONICS_TAG, xor100_centronics_intf)
-	MDRV_GENERIC_TERMINAL_ADD(TERMINAL_TAG, xor100_terminal_intf)
+	MCFG_MSM8251_ADD(I8251_A_TAG, /*XTAL_8MHz/2,*/ printer_8251_intf)
+	MCFG_MSM8251_ADD(I8251_B_TAG, /*XTAL_8MHz/2,*/ terminal_8251_intf)
+	MCFG_I8255A_ADD(I8255A_TAG, printer_8255_intf)
+	MCFG_Z80CTC_ADD(Z80CTC_TAG, XTAL_8MHz/2, ctc_intf)
+	MCFG_COM8116_ADD(COM5016_TAG, 5000000, com5016_intf)
+	MCFG_WD179X_ADD(WD1795_TAG, /*XTAL_8MHz/8,*/ fdc_intf)
+	MCFG_FLOPPY_2_DRIVES_ADD(xor100_floppy_config)
+	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, xor100_centronics_intf)
+	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, xor100_terminal_intf)
 
 	/* internal ram */
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("64K")
-	MDRV_RAM_EXTRA_OPTIONS("128K,192K,256K,320K,384K,448K,512K")
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("64K")
+	MCFG_RAM_EXTRA_OPTIONS("128K,192K,256K,320K,384K,448K,512K")
 MACHINE_CONFIG_END
 
 /* ROMs */

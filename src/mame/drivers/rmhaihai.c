@@ -133,7 +133,7 @@ logerror("%04x: keyboard_w %02x\n",cpu_get_pc(space->cpu),data);
 
 static READ8_HANDLER( samples_r )
 {
-	return memory_region(space->machine, "adpcm")[offset];
+	return space->machine->region("adpcm")->base()[offset];
 }
 
 static WRITE8_DEVICE_HANDLER( adpcm_w )
@@ -159,7 +159,7 @@ static WRITE8_HANDLER( ctrl_w )
 
 static WRITE8_HANDLER( themj_rombank_w )
 {
-	UINT8 *rom = memory_region(space->machine, "maincpu") + 0x10000;
+	UINT8 *rom = space->machine->region("maincpu")->base() + 0x10000;
 	int bank = data & 0x03;
 logerror("banksw %d\n",bank);
 	memory_set_bankptr(space->machine, "bank1", rom + bank*0x4000);
@@ -440,36 +440,36 @@ static const msm5205_interface msm5205_config =
 static MACHINE_CONFIG_START( rmhaihai, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu",Z80,20000000/4)	/* 5 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(rmhaihai_map)
-	MDRV_CPU_IO_MAP(rmhaihai_io_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_ADD("maincpu",Z80,20000000/4)	/* 5 MHz ??? */
+	MCFG_CPU_PROGRAM_MAP(rmhaihai_map)
+	MCFG_CPU_IO_MAP(rmhaihai_io_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(4*8, 60*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(4*8, 60*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(rmhaihai)
-	MDRV_PALETTE_LENGTH(0x100)
+	MCFG_GFXDECODE(rmhaihai)
+	MCFG_PALETTE_LENGTH(0x100)
 
-	MDRV_PALETTE_INIT(RRRR_GGGG_BBBB)
-	MDRV_VIDEO_START(rmhaihai)
-	MDRV_VIDEO_UPDATE(rmhaihai)
+	MCFG_PALETTE_INIT(RRRR_GGGG_BBBB)
+	MCFG_VIDEO_START(rmhaihai)
+	MCFG_VIDEO_UPDATE(rmhaihai)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("aysnd", AY8910, 20000000/16)
-	MDRV_SOUND_CONFIG(ay8910_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	MCFG_SOUND_ADD("aysnd", AY8910, 20000000/16)
+	MCFG_SOUND_CONFIG(ay8910_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MDRV_SOUND_ADD("msm", MSM5205, 500000)
-	MDRV_SOUND_CONFIG(msm5205_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("msm", MSM5205, 500000)
+	MCFG_SOUND_CONFIG(msm5205_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( rmhaisei, rmhaihai )
@@ -477,23 +477,23 @@ static MACHINE_CONFIG_DERIVED( rmhaisei, rmhaihai )
 	/* basic machine hardware */
 
 	/* video hardware */
-	MDRV_GFXDECODE(themj)
-	MDRV_PALETTE_LENGTH(0x200)
+	MCFG_GFXDECODE(themj)
+	MCFG_PALETTE_LENGTH(0x200)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( themj, rmhaihai )
 
 	/* basic machine hardware */
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(themj_map)
-	MDRV_CPU_IO_MAP(themj_io_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(themj_map)
+	MCFG_CPU_IO_MAP(themj_io_map)
 
-	MDRV_MACHINE_RESET(themj)
+	MCFG_MACHINE_RESET(themj)
 
 	/* video hardware */
-	MDRV_GFXDECODE(themj)
-	MDRV_PALETTE_LENGTH(0x200)
+	MCFG_GFXDECODE(themj)
+	MCFG_PALETTE_LENGTH(0x200)
 MACHINE_CONFIG_END
 
 
@@ -643,8 +643,8 @@ ROM_END
 
 static DRIVER_INIT( rmhaihai )
 {
-	UINT8 *rom = memory_region(machine, "gfx1");
-	int size = memory_region_length(machine, "gfx1");
+	UINT8 *rom = machine->region("gfx1")->base();
+	int size = machine->region("gfx1")->bytes();
 	int a,b;
 
 	size /= 2;

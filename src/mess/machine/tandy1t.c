@@ -245,7 +245,7 @@ WRITE8_HANDLER ( tandy1000_pio_w )
 
 static void tandy1000_set_bios_bank( running_machine *machine )
 {
-	memory_set_bankptr( machine, "bank11", memory_region(machine, "maincpu") + ( tandy.bios_bank & 0x07 ) * 0x10000 );
+	memory_set_bankptr( machine, "bank11", machine->region("maincpu")->base() + ( tandy.bios_bank & 0x07 ) * 0x10000 );
 }
 
 

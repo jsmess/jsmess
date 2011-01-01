@@ -68,14 +68,14 @@ struct _upd1990a_t
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE upd1990a_t *get_safe_token(running_device *device)
+INLINE upd1990a_t *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == UPD1990A);
 	return (upd1990a_t *)downcast<legacy_device_base *>(device)->token();
 }
 
-INLINE const upd1990a_interface *get_interface(running_device *device)
+INLINE const upd1990a_interface *get_interface(device_t *device)
 {
 	assert(device != NULL);
 	assert((device->type() == UPD1990A));
@@ -443,7 +443,7 @@ static void advance_seconds(upd1990a_t *upd1990a)
 
 static TIMER_CALLBACK( clock_tick )
 {
-	running_device *device = (running_device *)ptr;
+	device_t *device = (device_t *)ptr;
 	upd1990a_t *upd1990a = get_safe_token(device);
 
 	advance_seconds(upd1990a);
@@ -455,7 +455,7 @@ static TIMER_CALLBACK( clock_tick )
 
 static TIMER_CALLBACK( tp_tick )
 {
-	running_device *device = (running_device *)ptr;
+	device_t *device = (device_t *)ptr;
 	upd1990a_t *upd1990a = get_safe_token(device);
 
 	upd1990a->tp = !upd1990a->tp;
@@ -471,7 +471,7 @@ static TIMER_CALLBACK( tp_tick )
 
 static TIMER_CALLBACK( data_out_tick )
 {
-	running_device *device = (running_device *)ptr;
+	device_t *device = (device_t *)ptr;
 	upd1990a_t *upd1990a = get_safe_token(device);
 
 	upd1990a->data_out = !upd1990a->data_out;

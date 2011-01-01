@@ -6,14 +6,14 @@
 typedef struct _hyprolyb_adpcm_state hyprolyb_adpcm_state;
 struct _hyprolyb_adpcm_state
 {
-	running_device *msm;
+	device_t *msm;
 	address_space *space;
 	UINT8    adpcm_ready;	// only bootlegs
 	UINT8    adpcm_busy;
 	UINT8    vck_ready;
 };
 
-INLINE hyprolyb_adpcm_state *get_safe_token( running_device *device )
+INLINE hyprolyb_adpcm_state *get_safe_token( device_t *device )
 {
 	assert(device != NULL);
 	assert(device->type() == HYPROLYB_ADPCM);
@@ -111,9 +111,9 @@ static ADDRESS_MAP_START( hyprolyb_adpcm_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static void adpcm_vck_callback( running_device *device )
+static void adpcm_vck_callback( device_t *device )
 {
-	running_device *adpcm = device->machine->device("hyprolyb_adpcm");
+	device_t *adpcm = device->machine->device("hyprolyb_adpcm");
 	hyprolyb_adpcm_state *state = get_safe_token(adpcm);
 
 	state->vck_ready = 0x80;
@@ -126,14 +126,14 @@ static const msm5205_interface hyprolyb_msm5205_config =
 };
 
 MACHINE_CONFIG_FRAGMENT( hyprolyb_adpcm )
-	MDRV_CPU_ADD("adpcm", M6802, XTAL_14_31818MHz/8)	/* unknown clock */
-	MDRV_CPU_PROGRAM_MAP(hyprolyb_adpcm_map)
+	MCFG_CPU_ADD("adpcm", M6802, XTAL_14_31818MHz/8)	/* unknown clock */
+	MCFG_CPU_PROGRAM_MAP(hyprolyb_adpcm_map)
 
-	MDRV_SOUND_ADD("hyprolyb_adpcm", HYPROLYB_ADPCM, 0)
+	MCFG_SOUND_ADD("hyprolyb_adpcm", HYPROLYB_ADPCM, 0)
 
-	MDRV_SOUND_ADD("msm", MSM5205, 384000)
-	MDRV_SOUND_CONFIG(hyprolyb_msm5205_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("msm", MSM5205, 384000)
+	MCFG_SOUND_CONFIG(hyprolyb_msm5205_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 /*****************************************************************************

@@ -77,8 +77,8 @@ public:
 	emu_timer *interrupt_assert_timer;
 
 	/* devices */
-	running_device *maincpu;
-	running_device *audiocpu;
+	device_t *maincpu;
+	device_t *audiocpu;
 };
 
 
@@ -203,7 +203,7 @@ static VIDEO_UPDATE( enigma2 )
 	pen_t pens[NUM_PENS];
 
 	const rectangle &visarea = screen->visible_area();
-	UINT8 *prom = memory_region(screen->machine, "proms");
+	UINT8 *prom = screen->machine->region("proms")->base();
 	UINT8 *color_map_base = state->flip_screen ? &prom[0x0400] : &prom[0x0000];
 	UINT8 *star_map_base = (state->blink_count & 0x08) ? &prom[0x0c00] : &prom[0x0800];
 
@@ -604,59 +604,59 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( enigma2, enigma2_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, CPU_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(engima2_main_cpu_map)
+	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
+	MCFG_CPU_PROGRAM_MAP(engima2_main_cpu_map)
 
-	MDRV_CPU_ADD("audiocpu", Z80, 2500000)
-	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,8)
-	MDRV_CPU_PROGRAM_MAP(engima2_audio_cpu_map)
+	MCFG_CPU_ADD("audiocpu", Z80, 2500000)
+	MCFG_CPU_VBLANK_INT_HACK(irq0_line_hold,8)
+	MCFG_CPU_PROGRAM_MAP(engima2_audio_cpu_map)
 
-	MDRV_MACHINE_START(enigma2)
-	MDRV_MACHINE_RESET(enigma2)
+	MCFG_MACHINE_START(enigma2)
+	MCFG_MACHINE_RESET(enigma2)
 
 	/* video hardware */
-	MDRV_VIDEO_UPDATE(enigma2)
+	MCFG_VIDEO_UPDATE(enigma2)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 
 	/* audio hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("aysnd", AY8910, AY8910_CLOCK)
-	MDRV_SOUND_CONFIG(ay8910_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("aysnd", AY8910, AY8910_CLOCK)
+	MCFG_SOUND_CONFIG(ay8910_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_START( enigma2a, enigma2_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", I8080, CPU_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(engima2a_main_cpu_map)
-	MDRV_CPU_IO_MAP(engima2a_main_cpu_io_map)
+	MCFG_CPU_ADD("maincpu", I8080, CPU_CLOCK)
+	MCFG_CPU_PROGRAM_MAP(engima2a_main_cpu_map)
+	MCFG_CPU_IO_MAP(engima2a_main_cpu_io_map)
 
-	MDRV_CPU_ADD("audiocpu", Z80, 2500000)
-	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,8)
-	MDRV_CPU_PROGRAM_MAP(engima2_audio_cpu_map)
+	MCFG_CPU_ADD("audiocpu", Z80, 2500000)
+	MCFG_CPU_VBLANK_INT_HACK(irq0_line_hold,8)
+	MCFG_CPU_PROGRAM_MAP(engima2_audio_cpu_map)
 
-	MDRV_MACHINE_START(enigma2)
-	MDRV_MACHINE_RESET(enigma2)
+	MCFG_MACHINE_START(enigma2)
+	MCFG_MACHINE_RESET(enigma2)
 
 	/* video hardware */
-	MDRV_VIDEO_UPDATE(enigma2a)
+	MCFG_VIDEO_UPDATE(enigma2a)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 
 	/* audio hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("aysnd", AY8910, AY8910_CLOCK)
-	MDRV_SOUND_CONFIG(ay8910_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("aysnd", AY8910, AY8910_CLOCK)
+	MCFG_SOUND_CONFIG(ay8910_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -710,7 +710,7 @@ ROM_END
 static DRIVER_INIT(enigma2)
 {
 	offs_t i;
-	UINT8 *rom = memory_region(machine, "audiocpu");
+	UINT8 *rom = machine->region("audiocpu")->base();
 
 	for(i = 0; i < 0x2000; i++)
 	{

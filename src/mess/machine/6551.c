@@ -52,8 +52,8 @@ struct _acia6551_t
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-static void acia_6551_receive_char(running_device *device, unsigned char ch);
-static void acia_6551_refresh_ints(running_device *device);
+static void acia_6551_receive_char(device_t *device, unsigned char ch);
+static void acia_6551_refresh_ints(device_t *device);
 
 
 
@@ -61,7 +61,7 @@ static void acia_6551_refresh_ints(running_device *device);
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE acia6551_t *get_token(running_device *device)
+INLINE acia6551_t *get_token(device_t *device)
 {
 	assert(device->type() == ACIA6551);
 	return (acia6551_t *) downcast<legacy_device_base *>(device)->token();
@@ -80,7 +80,7 @@ INLINE acia6551_t *get_token(running_device *device)
 
 static void acia_6551_in_callback(running_machine *machine, int id, unsigned long state)
 {
-	running_device *device;
+	device_t *device;
 	acia6551_t *acia;
 
 	/* NPW 29-Nov-2008 - These two lines are a hack and indicate why our "serial" infrastructure needs to be updated */
@@ -98,7 +98,7 @@ static void acia_6551_in_callback(running_machine *machine, int id, unsigned lon
 
 static TIMER_CALLBACK(acia_6551_timer_callback)
 {
-	running_device *device = (running_device *)ptr;
+	device_t *device = (device_t *)ptr;
 	acia6551_t *acia = get_token(device);
 
 	/* get bit received from other side and update receive register */
@@ -162,7 +162,7 @@ static DEVICE_START( acia6551 )
     acia_6551_refresh_ints - update interrupt output
 -------------------------------------------------*/
 
-static void acia_6551_refresh_ints(running_device *device)
+static void acia_6551_refresh_ints(device_t *device)
 {
 	acia6551_t *acia = get_token(device);
 	int interrupt_state;
@@ -200,7 +200,7 @@ static void acia_6551_refresh_ints(running_device *device)
     acia_6551_receive_char
 -------------------------------------------------*/
 
-static void acia_6551_receive_char(running_device *device, unsigned char ch)
+static void acia_6551_receive_char(device_t *device, unsigned char ch)
 {
 	acia6551_t *acia = get_token(device);
 
@@ -289,7 +289,7 @@ READ8_DEVICE_HANDLER(acia_6551_r)
     acia_6551_update_data_form
 -------------------------------------------------*/
 
-static void acia_6551_update_data_form(running_device *device)
+static void acia_6551_update_data_form(device_t *device)
 {
 	acia6551_t *acia = get_token(device);
 
@@ -575,7 +575,7 @@ WRITE8_DEVICE_HANDLER(acia_6551_w)
     acia_6551_connect_to_serial_device
 -------------------------------------------------*/
 
-void acia_6551_connect_to_serial_device(running_device *device, running_device *image)
+void acia_6551_connect_to_serial_device(device_t *device, device_t *image)
 {
 	acia6551_t *acia = get_token(device);
 	serial_device_connect(image, &acia->connection);

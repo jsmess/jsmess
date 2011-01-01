@@ -37,13 +37,13 @@ public:
 	UINT8 sound_latch;
 
 	/* devices */
-	running_device *z80ctc;
-	running_device *z80dart;
-	running_device *cassette;
-	running_device *centronics;
+	device_t *z80ctc;
+	device_t *z80dart;
+	device_t *cassette;
+	device_t *centronics;
 
 	/* timers */
-	running_device *cassette_timer;
+	device_t *cassette_timer;
 };
 
 /*----------- defined in machine/mtx.c -----------*/

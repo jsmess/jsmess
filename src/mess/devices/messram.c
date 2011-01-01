@@ -38,7 +38,7 @@ struct _messram_state
     INLINE FUNCTIONS
 *****************************************************************************/
 
-INLINE messram_state *get_safe_token(running_device *device)
+INLINE messram_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == MESSRAM);
@@ -280,14 +280,14 @@ DEVICE_GET_INFO( messram )
     IMPLEMENTATION
 ***************************************************************************/
 
-UINT32 messram_get_size(running_device *device)
+UINT32 messram_get_size(device_t *device)
 {
 	messram_state *messram = get_safe_token(device);
 	return messram->size;
 }
 
 
-UINT8 *messram_get_ptr(running_device *device)
+UINT8 *messram_get_ptr(device_t *device)
 {
 	messram_state *messram = get_safe_token(device);
 	return messram->ram;
@@ -295,7 +295,7 @@ UINT8 *messram_get_ptr(running_device *device)
 
 
 #ifdef UNUSED_FUNCTION
-void messram_dump(running_device *device, const char *filename)
+void messram_dump(device_t *device, const char *filename)
 {
 	messram_state *messram = get_safe_token(device);
 	file_error filerr;

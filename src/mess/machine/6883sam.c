@@ -107,14 +107,14 @@ static const UINT8 sam_video_mode_row_pitches[] =
  Implementation
 *****************************************************************************/
 
-INLINE sam6883_t *get_safe_token(running_device *device)
+INLINE sam6883_t *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 
 	return (sam6883_t *)downcast<legacy_device_base *>(device)->token();
 }
 
-static void update_sam(running_device *device)
+static void update_sam(device_t *device)
 {
 	sam6883_t *sam = get_safe_token(device);
 	UINT16 xorval;
@@ -143,11 +143,11 @@ static void update_sam(running_device *device)
 
 static STATE_POSTLOAD( update_sam_postload )
 {
-	running_device *device = (running_device *)param;
+	device_t *device = (device_t *)param;
 	update_sam(device);
 }
 
-void sam6883_set_state(running_device *device, UINT16 state, UINT16 mask)
+void sam6883_set_state(device_t *device, UINT16 state, UINT16 mask)
 {
 	sam6883_t *sam = get_safe_token(device);
 	sam->state &= ~mask;
@@ -183,7 +183,7 @@ WRITE8_DEVICE_HANDLER( sam6883_da_w )
 }
 #endif
 
-const UINT8 *sam6883_videoram(running_device *device,int scanline)
+const UINT8 *sam6883_videoram(device_t *device,int scanline)
 {
 	sam6883_t *sam = get_safe_token(device);
 	const UINT8 *ram_base;
@@ -227,26 +227,26 @@ const UINT8 *sam6883_videoram(running_device *device,int scanline)
 	return &ram_base[video_position];
 }
 
-UINT8 sam6883_memorysize(running_device *device)
+UINT8 sam6883_memorysize(device_t *device)
 {
 	sam6883_t *sam = get_safe_token(device);
 	return (sam->state & 0x6000) / 0x2000;
 }
 
-UINT8 sam6883_pagemode(running_device *device)
+UINT8 sam6883_pagemode(device_t *device)
 {
 	sam6883_t *sam = get_safe_token(device);
 	return (sam->state & 0x0400) / 0x0400;
 }
 
-UINT8 sam6883_maptype(running_device *device)
+UINT8 sam6883_maptype(device_t *device)
 {
 	sam6883_t *sam = get_safe_token(device);
 	return (sam->state & 0x8000) / 0x8000;
 }
 
 /* Device Interface */
-static void common_start(running_device *device, SAM6883_VERSION device_type)
+static void common_start(device_t *device, SAM6883_VERSION device_type)
 {
 	sam6883_t *sam = get_safe_token(device);
 	// validate arguments

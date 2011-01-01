@@ -56,7 +56,7 @@ static UINT8* tile_RAM;
 static UINT8* sprite_RAM;
 static UINT8* palette_RAM;
 
-static running_device *laserdisc;
+static device_t *laserdisc;
 
 
 /* VIDEO GOODS */
@@ -108,7 +108,7 @@ static void gpworld_draw_sprites(running_machine *machine, bitmap_t *bitmap, con
 
 	int i;
 
-	UINT8 *GFX = memory_region(machine, "gfx2");
+	UINT8 *GFX = machine->region("gfx2")->base();
 
 	/* Heisted from Daphne which heisted it from MAME */
 	for (i = 0; i < 0x800; i += 8)
@@ -444,28 +444,28 @@ GFXDECODE_END
 static MACHINE_CONFIG_START( gpworld, driver_device )
 
 	/* main cpu */
-	MDRV_CPU_ADD("maincpu", Z80, GUESSED_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(mainmem)
-	MDRV_CPU_IO_MAP(mainport)
-	MDRV_CPU_VBLANK_INT("screen", vblank_callback_gpworld)
+	MCFG_CPU_ADD("maincpu", Z80, GUESSED_CLOCK)
+	MCFG_CPU_PROGRAM_MAP(mainmem)
+	MCFG_CPU_IO_MAP(mainport)
+	MCFG_CPU_VBLANK_INT("screen", vblank_callback_gpworld)
 
-	MDRV_MACHINE_START(gpworld)
+	MCFG_MACHINE_START(gpworld)
 
-	MDRV_LASERDISC_ADD("laserdisc", PIONEER_LDV1000, "screen", "ldsound")
-	MDRV_LASERDISC_OVERLAY(gpworld, 512, 256, BITMAP_FORMAT_INDEXED16)
+	MCFG_LASERDISC_ADD("laserdisc", PIONEER_LDV1000, "screen", "ldsound")
+	MCFG_LASERDISC_OVERLAY(gpworld, 512, 256, BITMAP_FORMAT_INDEXED16)
 
 	/* video hardware */
-	MDRV_LASERDISC_SCREEN_ADD_NTSC("screen", BITMAP_FORMAT_INDEXED16)
+	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", BITMAP_FORMAT_INDEXED16)
 
-	MDRV_GFXDECODE(gpworld)
-	MDRV_PALETTE_LENGTH(1024)
+	MCFG_GFXDECODE(gpworld)
+	MCFG_PALETTE_LENGTH(1024)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ldsound", LASERDISC_SOUND, 0)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("ldsound", LASERDISC_SOUND, 0)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 

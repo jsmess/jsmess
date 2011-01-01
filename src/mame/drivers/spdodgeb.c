@@ -51,7 +51,7 @@ static WRITE8_HANDLER( sound_command_w )
 static WRITE8_HANDLER( spd_adpcm_w )
 {
 	int chip = offset & 1;
-	running_device *adpcm = space->machine->device((chip == 0) ? "msm1" : "msm2");
+	device_t *adpcm = space->machine->device((chip == 0) ? "msm1" : "msm2");
 
 	switch (offset/2)
 	{
@@ -75,7 +75,7 @@ static WRITE8_HANDLER( spd_adpcm_w )
 	}
 }
 
-static void spd_adpcm_int(running_device *device)
+static void spd_adpcm_int(device_t *device)
 {
 	int chip = (strcmp(device->tag(), "msm1") == 0) ? 0 : 1;
 	if (adpcm_pos[chip] >= adpcm_end[chip] || adpcm_pos[chip] >= 0x10000)
@@ -90,7 +90,7 @@ static void spd_adpcm_int(running_device *device)
 	}
 	else
 	{
-		UINT8 *ROM = memory_region(device->machine, "adpcm") + 0x10000 * chip;
+		UINT8 *ROM = device->machine->region("adpcm")->base() + 0x10000 * chip;
 
 		adpcm_data[chip] = ROM[adpcm_pos[chip]++];
 		msm5205_data_w(device,adpcm_data[chip] >> 4);
@@ -390,7 +390,7 @@ static GFXDECODE_START( spdodgeb )
 GFXDECODE_END
 
 
-static void irq_handler(running_device *device, int irq)
+static void irq_handler(device_t *device, int irq)
 {
 	cputag_set_input_line(device->machine, "audiocpu", M6809_FIRQ_LINE, irq ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -424,47 +424,47 @@ static MACHINE_RESET( spdodgeb )
 static MACHINE_CONFIG_START( spdodgeb, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6502,12000000/6)	/* 2MHz ? */
-	MDRV_CPU_PROGRAM_MAP(spdodgeb_map)
-	MDRV_CPU_VBLANK_INT_HACK(spdodgeb_interrupt,33)	/* 1 IRQ every 8 visible scanlines, plus NMI for vblank */
+	MCFG_CPU_ADD("maincpu", M6502,12000000/6)	/* 2MHz ? */
+	MCFG_CPU_PROGRAM_MAP(spdodgeb_map)
+	MCFG_CPU_VBLANK_INT_HACK(spdodgeb_interrupt,33)	/* 1 IRQ every 8 visible scanlines, plus NMI for vblank */
 
-	MDRV_CPU_ADD("audiocpu", M6809,12000000/6)	/* 2MHz ? */
-	MDRV_CPU_PROGRAM_MAP(spdodgeb_sound_map)
+	MCFG_CPU_ADD("audiocpu", M6809,12000000/6)	/* 2MHz ? */
+	MCFG_CPU_PROGRAM_MAP(spdodgeb_sound_map)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(500) /* not accurate */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 1*8, 31*8-1)
 
-	MDRV_GFXDECODE(spdodgeb)
-	MDRV_PALETTE_LENGTH(1024)
+	MCFG_GFXDECODE(spdodgeb)
+	MCFG_PALETTE_LENGTH(1024)
 
-	MDRV_PALETTE_INIT(spdodgeb)
-	MDRV_VIDEO_START(spdodgeb)
-	MDRV_VIDEO_UPDATE(spdodgeb)
+	MCFG_PALETTE_INIT(spdodgeb)
+	MCFG_VIDEO_START(spdodgeb)
+	MCFG_VIDEO_UPDATE(spdodgeb)
 
-	MDRV_MACHINE_RESET( spdodgeb )
+	MCFG_MACHINE_RESET( spdodgeb )
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ymsnd", YM3812, 3000000)
-	MDRV_SOUND_CONFIG(ym3812_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("ymsnd", YM3812, 3000000)
+	MCFG_SOUND_CONFIG(ym3812_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MDRV_SOUND_ADD("msm1", MSM5205, 384000)
-	MDRV_SOUND_CONFIG(msm5205_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
+	MCFG_SOUND_ADD("msm1", MSM5205, 384000)
+	MCFG_SOUND_CONFIG(msm5205_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 
-	MDRV_SOUND_ADD("msm2", MSM5205, 384000)
-	MDRV_SOUND_CONFIG(msm5205_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
+	MCFG_SOUND_ADD("msm2", MSM5205, 384000)
+	MCFG_SOUND_CONFIG(msm5205_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 MACHINE_CONFIG_END
 
 

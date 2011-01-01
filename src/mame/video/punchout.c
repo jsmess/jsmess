@@ -333,7 +333,7 @@ static void drawbs2(running_machine *machine, bitmap_t *bitmap, const rectangle 
 static void punchout_copy_top_palette(running_machine *machine, int bank)
 {
 	int i;
-	const UINT8 *color_prom = memory_region(machine, "proms");
+	const UINT8 *color_prom = machine->region("proms")->base();
 
 	// top monitor palette
 	for (i = 0; i < 0x100; i++)
@@ -352,7 +352,7 @@ static void punchout_copy_top_palette(running_machine *machine, int bank)
 static void punchout_copy_bot_palette(running_machine *machine, int bank)
 {
 	int i;
-	const UINT8 *color_prom = memory_region(machine, "proms") + 0x600;
+	const UINT8 *color_prom = machine->region("proms")->base() + 0x600;
 
 	// bottom monitor palette
 	for (i = 0; i < 0x100; i++)
@@ -371,8 +371,8 @@ static void punchout_copy_bot_palette(running_machine *machine, int bank)
 
 VIDEO_UPDATE( punchout )
 {
-	running_device *top_screen    = screen->machine->device("top");
-	running_device *bottom_screen = screen->machine->device("bottom");
+	device_t *top_screen    = screen->machine->device("top");
+	device_t *bottom_screen = screen->machine->device("bottom");
 
 	if (screen == top_screen)
 	{
@@ -405,8 +405,8 @@ VIDEO_UPDATE( punchout )
 
 VIDEO_UPDATE( armwrest )
 {
-	running_device *top_screen    = screen->machine->device("top");
-	running_device *bottom_screen = screen->machine->device("bottom");
+	device_t *top_screen    = screen->machine->device("top");
+	device_t *bottom_screen = screen->machine->device("bottom");
 
 	if (screen == top_screen)
 	{

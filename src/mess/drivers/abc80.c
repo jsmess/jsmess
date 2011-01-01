@@ -699,38 +699,38 @@ void abc80_state::machine_start()
 
 static MACHINE_CONFIG_START( abc80, abc80_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80_TAG, Z80, ABC80_XTAL/2/2)	// 2.9952 MHz
-	MDRV_CPU_PROGRAM_MAP(abc80_mem)
-	MDRV_CPU_IO_MAP(abc80_io)
-	MDRV_CPU_CONFIG(abc80_daisy_chain)
+	MCFG_CPU_ADD(Z80_TAG, Z80, ABC80_XTAL/2/2)	// 2.9952 MHz
+	MCFG_CPU_PROGRAM_MAP(abc80_mem)
+	MCFG_CPU_IO_MAP(abc80_io)
+	MCFG_CPU_CONFIG(abc80_daisy_chain)
 
 	/* video hardware */
-	MDRV_FRAGMENT_ADD(abc80_video)
+	MCFG_FRAGMENT_ADD(abc80_video)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD(SN76477_TAG, SN76477, 0)
-	MDRV_SOUND_CONFIG(csg_intf)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD(SN76477_TAG, SN76477, 0)
+	MCFG_SOUND_CONFIG(csg_intf)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* keyboard */
-	MDRV_TIMER_ADD_PERIODIC("keyboard", abc80_keyboard_tick, USEC(2500))
+	MCFG_TIMER_ADD_PERIODIC("keyboard", abc80_keyboard_tick, USEC(2500))
 
 	/* Luxor Conkort 55-10828 */
-	MDRV_ABCBUS_ADD(ABCBUS_TAG, abcbus_daisy, Z80_TAG)
-	MDRV_ABC830_PIO_ADD("luxor_55_10828", ABCBUS_TAG, DRIVE_MPI_51)
+	MCFG_ABCBUS_ADD(ABCBUS_TAG, abcbus_daisy, Z80_TAG)
+	MCFG_ABC830_PIO_ADD("luxor_55_10828", ABCBUS_TAG, DRIVE_MPI_51)
 
 	/* devices */
-	MDRV_TIMER_ADD_SCANLINE("pio_astb", z80pio_astb_tick, SCREEN_TAG, 0, 1)
-	MDRV_Z80PIO_ADD(Z80PIO_TAG, ABC80_XTAL/2/2, pio_intf)
-	MDRV_RS232_ADD(RS232_TAG, rs232_intf)
-	MDRV_PRINTER_ADD("printer")
-	MDRV_CASSETTE_ADD(CASSETTE_TAG, abc80_cassette_config)
+	MCFG_TIMER_ADD_SCANLINE("pio_astb", z80pio_astb_tick, SCREEN_TAG, 0, 1)
+	MCFG_Z80PIO_ADD(Z80PIO_TAG, ABC80_XTAL/2/2, pio_intf)
+	MCFG_RS232_ADD(RS232_TAG, rs232_intf)
+	MCFG_PRINTER_ADD("printer")
+	MCFG_CASSETTE_ADD(CASSETTE_TAG, abc80_cassette_config)
 
 	/* internal ram */
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("16K")
-	MDRV_RAM_EXTRA_OPTIONS("32K")
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("16K")
+	MCFG_RAM_EXTRA_OPTIONS("32K")
 MACHINE_CONFIG_END
 
 

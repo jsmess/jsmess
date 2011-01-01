@@ -31,7 +31,7 @@ static VIDEO_UPDATE( pc2000 )
 {
 	pc2000_state *state = screen->machine->driver_data<pc2000_state>();
 	int x,y;
-	UINT8 *vram = memory_region(screen->machine, "lcd_vram");
+	UINT8 *vram = screen->machine->region("lcd_vram")->base();
 
 	for(y=0;y<2;y++)
 	{
@@ -56,7 +56,7 @@ static WRITE8_HANDLER( lcd_vram_addr_w )
 static WRITE8_HANDLER( lcd_vram_data_w )
 {
 	pc2000_state *state = space->machine->driver_data<pc2000_state>();
-	UINT8 *vram = memory_region(space->machine, "lcd_vram");
+	UINT8 *vram = space->machine->region("lcd_vram")->base();
 
 	vram[state->lcd_vram_index] = data;
 }
@@ -107,7 +107,7 @@ static WRITE8_HANDLER( key_matrix_w )
 
 static WRITE8_HANDLER( rombank_w )
 {
-	UINT8 *ROM = memory_region(space->machine, "bios");
+	UINT8 *ROM = space->machine->region("bios")->base();
 
 	memory_set_bankptr(space->machine, "bank1", &ROM[(data & 0xf)*0x4000]);
 }
@@ -464,7 +464,7 @@ INPUT_PORTS_END
 
 static MACHINE_RESET( pc2000 )
 {
-	UINT8 *ROM = memory_region(machine, "bios");
+	UINT8 *ROM = machine->region("bios")->base();
 
 	memory_set_bankptr(machine, "bank1", &ROM[0x00000]);
 }
@@ -487,26 +487,26 @@ GFXDECODE_END
 
 static MACHINE_CONFIG_START( pc2000, pc2000_state )
     /* basic machine hardware */
-    MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz) /* probably not accurate */
-    MDRV_CPU_PROGRAM_MAP(pc2000_mem)
-    MDRV_CPU_IO_MAP(pc2000_io)
-    MDRV_CPU_VBLANK_INT("screen",irq0_line_hold)
+    MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz) /* probably not accurate */
+    MCFG_CPU_PROGRAM_MAP(pc2000_mem)
+    MCFG_CPU_IO_MAP(pc2000_io)
+    MCFG_CPU_VBLANK_INT("screen",irq0_line_hold)
 
-    MDRV_MACHINE_RESET(pc2000)
+    MCFG_MACHINE_RESET(pc2000)
 
     /* video hardware */
-    MDRV_SCREEN_ADD("screen", RASTER)
-    MDRV_SCREEN_REFRESH_RATE(50)
-    MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-    MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-    MDRV_SCREEN_SIZE(640, 480) /* not accurate either */
-    MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-    MDRV_PALETTE_LENGTH(2)
-    MDRV_PALETTE_INIT(black_and_white)
-	MDRV_GFXDECODE(pc2000)
+    MCFG_SCREEN_ADD("screen", RASTER)
+    MCFG_SCREEN_REFRESH_RATE(50)
+    MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+    MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+    MCFG_SCREEN_SIZE(640, 480) /* not accurate either */
+    MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+    MCFG_PALETTE_LENGTH(2)
+    MCFG_PALETTE_INIT(black_and_white)
+	MCFG_GFXDECODE(pc2000)
 
-    MDRV_VIDEO_START(pc2000)
-    MDRV_VIDEO_UPDATE(pc2000)
+    MCFG_VIDEO_START(pc2000)
+    MCFG_VIDEO_UPDATE(pc2000)
 MACHINE_CONFIG_END
 
 /* ROM definition */

@@ -133,19 +133,19 @@ static const via6522_interface kb_via_intf =
 
 static MACHINE_CONFIG_START( aim65_40, aim65_40_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M6502_TAG, M6502, 1000000)
-	MDRV_CPU_PROGRAM_MAP(aim65_40_mem)
+	MCFG_CPU_ADD(M6502_TAG, M6502, 1000000)
+	MCFG_CPU_PROGRAM_MAP(aim65_40_mem)
 
 	/* video hardware */
-	MDRV_DEFAULT_LAYOUT(layout_aim65_40)
+	MCFG_DEFAULT_LAYOUT(layout_aim65_40)
 
 	/* sound hardware */
 
 	/* devices */
-	MDRV_VIA6522_ADD(M6522_0_TAG, 0, user_via_intf)
-	MDRV_VIA6522_ADD(M6522_1_TAG, 0, system_via_intf)
-	MDRV_VIA6522_ADD(M6522_2_TAG, 0, kb_via_intf)
-	MDRV_ACIA6551_ADD(M6551_TAG)
+	MCFG_VIA6522_ADD(M6522_0_TAG, 0, user_via_intf)
+	MCFG_VIA6522_ADD(M6522_1_TAG, 0, system_via_intf)
+	MCFG_VIA6522_ADD(M6522_2_TAG, 0, kb_via_intf)
+	MCFG_ACIA6551_ADD(M6551_TAG)
 MACHINE_CONFIG_END
 
 /***************************************************************************

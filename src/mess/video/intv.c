@@ -135,7 +135,7 @@ static void render_sprites(running_machine *machine)
     INT32 xInc;
     INT32 i, j;
 
-    UINT8* memory = memory_region(machine, "maincpu");
+    UINT8* memory = machine->region("maincpu")->base();
 
     for (i = 0; i < 8; i++) {
 		intv_sprite_type* s = &state->sprite[i];
@@ -271,7 +271,7 @@ static void render_color_stack_mode(running_machine *machine, bitmap_t *bitmap)
 	intv_state *state = machine->driver_data<intv_state>();
     UINT8 h, csPtr = 0, nexty = 0;
     UINT16 nextCard, nextx = 0;
-    UINT8 *ram = memory_region(machine, "maincpu");
+    UINT8 *ram = machine->region("maincpu")->base();
 
     for (h = 0; h < 240; h++) {
         nextCard = state->ram16[h];
@@ -334,7 +334,7 @@ static void render_fg_bg_mode(running_machine *machine, bitmap_t *bitmap)
     UINT8 i, j, isGrom, fgcolor, bgcolor, nexty = 0;
     UINT16 nextCard, memoryLocation, nextx = 0;
     UINT8* memory;
-    UINT8* ram = memory_region(machine, "maincpu");
+    UINT8* ram = machine->region("maincpu")->base();
 
     for (i = 0; i < 240; i++) {
         nextCard = state->ram16[i];

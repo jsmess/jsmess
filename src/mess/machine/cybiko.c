@@ -182,37 +182,37 @@ static int nvram_system_save( running_machine *machine, const char *name, nvram_
 
 static void cybiko_pcf8593_load(running_machine *machine, mame_file *file)
 {
-	running_device *device = machine->device("rtc");
+	device_t *device = machine->device("rtc");
 	pcf8593_load(device, file);
 }
 
 static void cybiko_pcf8593_save(running_machine *machine, mame_file *file)
 {
-	running_device *device = machine->device("rtc");
+	device_t *device = machine->device("rtc");
 	pcf8593_save(device, file);
 }
 
 static void cybiko_at45dbxx_load(running_machine *machine, mame_file *file)
 {
-	running_device *device = machine->device("flash1");
+	device_t *device = machine->device("flash1");
 	at45dbxx_load(device, file);
 }
 
 static void cybiko_at45dbxx_save(running_machine *machine, mame_file *file)
 {
-	running_device *device = machine->device("flash1");
+	device_t *device = machine->device("flash1");
 	at45dbxx_save(device, file);
 }
 
 static void cybiko_sst39vfx_load(running_machine *machine, mame_file *file)
 {
-	running_device *device = machine->device("flash2");
+	device_t *device = machine->device("flash2");
 	sst39vfx_load(device, file);
 }
 
 static void cybiko_sst39vfx_save(running_machine *machine, mame_file *file)
 {
-	running_device *device = machine->device("flash2");
+	device_t *device = machine->device("flash2");
 	sst39vfx_save(device, file);
 }
 
@@ -231,7 +231,7 @@ MACHINE_START( cybikov1 )
 
 MACHINE_START( cybikov2 )
 {
-	running_device *flash2 = machine->device("flash2");
+	device_t *flash2 = machine->device("flash2");
 
 	_logerror( 0, ("machine_start_cybikov2\n"));
 	// real-time clock
@@ -249,7 +249,7 @@ MACHINE_START( cybikov2 )
 
 MACHINE_START( cybikoxt )
 {
-	running_device *flash2 = machine->device("flash2");
+	device_t *flash2 = machine->device("flash2");
 	_logerror( 0, ("machine_start_cybikoxt\n"));
 	// real-time clock
 	nvram_system_load( machine, "rtc", cybiko_pcf8593_load, 0);
@@ -466,7 +466,7 @@ static READ8_HANDLER( cybiko_io_reg_r )
 		// serial dataflash
 		case H8S_IO_PORT3 :
 		{
-				running_device *device = space->machine->device("flash1");
+				device_t *device = space->machine->device("flash1");
 				if (at45dbxx_pin_so(device)) data = data | H8S_P3_RXD1;
 		}
 		break;
@@ -476,7 +476,7 @@ static READ8_HANDLER( cybiko_io_reg_r )
 		// real-time clock
 		case H8S_IO_PORTF :
 		{
-			running_device *device = space->machine->device("rtc");
+			device_t *device = space->machine->device("rtc");
 			data = H8S_PF_PF2;
 			if (pcf8593_pin_sda_r(device)) data |= H8S_PF_PF0;
 		}
@@ -494,8 +494,8 @@ static READ8_HANDLER( cybiko_io_reg_r )
 static WRITE8_HANDLER( cybiko_io_reg_w )
 {
 	cybiko_state *state = space->machine->driver_data<cybiko_state>();
-	running_device *rtc = space->machine->device("rtc");
-	running_device *speaker = space->machine->device("speaker");
+	device_t *rtc = space->machine->device("rtc");
+	device_t *speaker = space->machine->device("speaker");
 
 	_logerror( 2, ("cybiko_io_reg_w (%08X/%02X)\n", offset, data));
 	switch (offset)
@@ -505,7 +505,7 @@ static WRITE8_HANDLER( cybiko_io_reg_w )
 		// serial dataflash
 		case H8S_IO_P3DR :
 		{
-			running_device *device = space->machine->device("flash1");
+			device_t *device = space->machine->device("flash1");
 			at45dbxx_pin_cs ( device, (data & H8S_P3_SCK0) ? 0 : 1);
 			at45dbxx_pin_si ( device, (data & H8S_P3_TXD1) ? 1 : 0);
 			at45dbxx_pin_sck( device, (data & H8S_P3_SCK1) ? 1 : 0);

@@ -31,7 +31,7 @@
 
 static struct
 {
-	running_device *duart68681;
+	device_t *duart68681;
 } maygaym1_devices;
 
 static UINT8  lamppos;
@@ -462,7 +462,7 @@ static MACHINE_RESET( m1 )
 
 ///////////////////////////////////////////////////////////////////////////
 
-static void duart_irq_handler(running_device *device, UINT8 state)
+static void duart_irq_handler(device_t *device, UINT8 state)
 {
 	cputag_set_input_line(device->machine, "maincpu", M6809_IRQ_LINE, state?ASSERT_LINE:CLEAR_LINE);
 	LOG(("6809 irq%d \n",state));
@@ -698,7 +698,7 @@ static WRITE8_HANDLER( reel56_w )
 	awp_draw_reel(5);
 }
 
-static UINT8 m1_duart_r (running_device *device)
+static UINT8 m1_duart_r (device_t *device)
 {
 	return (optic_pattern);
 }
@@ -794,27 +794,27 @@ static const duart68681_config maygaym1_duart68681_config =
 
 static MACHINE_CONFIG_START( m1, driver_device )
 
-	MDRV_MACHINE_START(m1)
-	MDRV_MACHINE_RESET(m1)
-	MDRV_CPU_ADD("maincpu", M6809, M1_MASTER_CLOCK/2)
-	MDRV_CPU_PROGRAM_MAP(m1_memmap)
+	MCFG_MACHINE_START(m1)
+	MCFG_MACHINE_RESET(m1)
+	MCFG_CPU_ADD("maincpu", M6809, M1_MASTER_CLOCK/2)
+	MCFG_CPU_PROGRAM_MAP(m1_memmap)
 
-	MDRV_DUART68681_ADD("duart68681", M1_DUART_CLOCK, maygaym1_duart68681_config)
-	MDRV_PIA6821_ADD("pia", m1_pia_intf)
+	MCFG_DUART68681_ADD("duart68681", M1_DUART_CLOCK, maygaym1_duart68681_config)
+	MCFG_PIA6821_ADD("pia", m1_pia_intf)
 
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("aysnd",AY8913, M1_MASTER_CLOCK)
-	MDRV_SOUND_CONFIG(ay8910_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("aysnd",AY8913, M1_MASTER_CLOCK)
+	MCFG_SOUND_CONFIG(ay8910_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD("ymsnd", YM2413, M1_MASTER_CLOCK/4)
+	MCFG_SOUND_ADD("ymsnd", YM2413, M1_MASTER_CLOCK/4)
 
-	MDRV_SOUND_ADD("msm6376", OKIM6376, M1_MASTER_CLOCK/4) //?
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("msm6376", OKIM6376, M1_MASTER_CLOCK/4) //?
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_NVRAM_ADD_0FILL("nvram")
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MDRV_DEFAULT_LAYOUT(layout_awpvid16)
+	MCFG_DEFAULT_LAYOUT(layout_awpvid16)
 MACHINE_CONFIG_END
 
 ROM_START( m_sptlgt )

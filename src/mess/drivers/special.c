@@ -412,119 +412,119 @@ static const floppy_config specimx_floppy_config =
 /* Machine driver */
 static MACHINE_CONFIG_START( special, special_state )
     /* basic machine hardware */
-    MDRV_CPU_ADD("maincpu", I8080, 2000000)
-    MDRV_CPU_PROGRAM_MAP(specialist_mem)
-    MDRV_MACHINE_RESET( special )
+    MCFG_CPU_ADD("maincpu", I8080, 2000000)
+    MCFG_CPU_PROGRAM_MAP(specialist_mem)
+    MCFG_MACHINE_RESET( special )
 
-	MDRV_PIT8253_ADD( "pit8253", specimx_pit8253_intf )
+	MCFG_PIT8253_ADD( "pit8253", specimx_pit8253_intf )
 
-	MDRV_I8255A_ADD( "ppi8255", specialist_ppi8255_interface )
+	MCFG_I8255A_ADD( "ppi8255", specialist_ppi8255_interface )
 
     /* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(50)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(384, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 384-1, 0, 256-1)
-	MDRV_PALETTE_LENGTH(2)
-	MDRV_PALETTE_INIT(black_and_white)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(384, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 256-1)
+	MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_INIT(black_and_white)
 
-    MDRV_VIDEO_START(special)
-    MDRV_VIDEO_UPDATE(special)
+    MCFG_VIDEO_START(special)
+    MCFG_VIDEO_UPDATE(special)
 
     /* audio hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("dac", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	MDRV_SOUND_WAVE_ADD("wave", "cassette")
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SOUND_WAVE_ADD("wave", "cassette")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MDRV_CASSETTE_ADD( "cassette", special_cassette_config )
+	MCFG_CASSETTE_ADD( "cassette", special_cassette_config )
 
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( specialp, special )
 
 	/* basic machine hardware */
-    MDRV_CPU_MODIFY("maincpu")
-    MDRV_CPU_PROGRAM_MAP(specialp_mem)
+    MCFG_CPU_MODIFY("maincpu")
+    MCFG_CPU_PROGRAM_MAP(specialp_mem)
 
-    MDRV_SCREEN_MODIFY("screen")
-    MDRV_VIDEO_START(specialp)
-    MDRV_VIDEO_UPDATE(specialp)
-	MDRV_SCREEN_SIZE(512, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
+    MCFG_SCREEN_MODIFY("screen")
+    MCFG_VIDEO_START(specialp)
+    MCFG_VIDEO_UPDATE(specialp)
+	MCFG_SCREEN_SIZE(512, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( specimx, special )
-    MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(specimx_mem)
+    MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(specimx_mem)
 
-	MDRV_MACHINE_START ( specimx )
-	MDRV_MACHINE_RESET ( specimx )
+	MCFG_MACHINE_START ( specimx )
+	MCFG_MACHINE_RESET ( specimx )
 
     /* video hardware */
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_PALETTE_LENGTH(16)
-	MDRV_PALETTE_INIT( specimx )
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_PALETTE_LENGTH(16)
+	MCFG_PALETTE_INIT( specimx )
 
-	MDRV_VIDEO_START(specimx)
-	MDRV_VIDEO_UPDATE(specimx)
+	MCFG_VIDEO_START(specimx)
+	MCFG_VIDEO_UPDATE(specimx)
 
     /* audio hardware */
-	MDRV_SOUND_ADD("custom", SPECIMX, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SOUND_ADD("custom", SPECIMX, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MDRV_WD1793_ADD("wd1793", default_wd17xx_interface_2_drives )
+	MCFG_WD1793_ADD("wd1793", default_wd17xx_interface_2_drives )
 
-	MDRV_FLOPPY_2_DRIVES_ADD(specimx_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_ADD(specimx_floppy_config)
 
 	/* internal ram */
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("128K")
-	MDRV_RAM_DEFAULT_VALUE(0x00)
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("128K")
+	MCFG_RAM_DEFAULT_VALUE(0x00)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( erik, special_state )
     /* basic machine hardware */
-    MDRV_CPU_ADD("maincpu", Z80, 4000000)
-    MDRV_CPU_PROGRAM_MAP(erik_mem)
-    MDRV_CPU_IO_MAP(erik_io_map)
+    MCFG_CPU_ADD("maincpu", Z80, 4000000)
+    MCFG_CPU_PROGRAM_MAP(erik_mem)
+    MCFG_CPU_IO_MAP(erik_io_map)
 
-    MDRV_MACHINE_RESET( erik )
+    MCFG_MACHINE_RESET( erik )
 
-	MDRV_I8255A_ADD( "ppi8255", specialist_ppi8255_interface )
+	MCFG_I8255A_ADD( "ppi8255", specialist_ppi8255_interface )
 
     /* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(50)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(384, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 384-1, 0, 256-1)
-	MDRV_PALETTE_LENGTH(8)
-	MDRV_PALETTE_INIT(erik)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(384, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 256-1)
+	MCFG_PALETTE_LENGTH(8)
+	MCFG_PALETTE_INIT(erik)
 
-    MDRV_VIDEO_START(erik)
-    MDRV_VIDEO_UPDATE(erik)
+    MCFG_VIDEO_START(erik)
+    MCFG_VIDEO_UPDATE(erik)
     /* audio hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("dac", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	MDRV_SOUND_WAVE_ADD("wave", "cassette")
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SOUND_WAVE_ADD("wave", "cassette")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MDRV_CASSETTE_ADD( "cassette", special_cassette_config )
+	MCFG_CASSETTE_ADD( "cassette", special_cassette_config )
 
-	MDRV_WD1793_ADD("wd1793", default_wd17xx_interface_2_drives )
+	MCFG_WD1793_ADD("wd1793", default_wd17xx_interface_2_drives )
 
-	MDRV_FLOPPY_2_DRIVES_ADD(specimx_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_ADD(specimx_floppy_config)
 
 	/* internal ram */
-	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("192K")
-	MDRV_RAM_DEFAULT_VALUE(0x00)
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("192K")
+	MCFG_RAM_DEFAULT_VALUE(0x00)
 MACHINE_CONFIG_END
 
 /* ROM definition */

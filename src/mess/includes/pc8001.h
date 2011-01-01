@@ -24,12 +24,12 @@ public:
 	int color;
 
 	/* devices */
-	running_device *i8257;
-	running_device *upd1990a;
-	running_device *upd3301;
-	running_device *cassette;
-	running_device *centronics;
-	running_device *speaker;
+	device_t *i8257;
+	device_t *upd1990a;
+	device_t *upd3301;
+	device_t *cassette;
+	device_t *centronics;
+	device_t *speaker;
 };
 
 #endif
