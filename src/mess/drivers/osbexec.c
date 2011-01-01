@@ -529,7 +529,7 @@ static TIMER_CALLBACK( osbexec_video_callback )
 			UINT8 ch = state->vram[ row_addr + x ];
 			UINT8 attr = state->vram[ 0x1000 + row_addr + x ];
 			UINT8 fg_col = ( attr & 0x80 ) ? 1 : 2;
-			UINT8 font_bits = state->fontram[ ( ( attr & 0x10 ) ? 0x800 : 0 ) + ch * 16 + char_line ];
+			UINT8 font_bits = state->fontram[ ( ( attr & 0x10 ) ? 0x800 : 0 ) + ( ch & 0x7f ) * 16 + char_line ];
 
 			/* Check for underline */
 			if ( ( attr & 0x40 ) && char_line == 9 )
@@ -540,7 +540,7 @@ static TIMER_CALLBACK( osbexec_video_callback )
 				font_bits = 0;
 
 			/* Check for inverse video */
-			if ( attr & 0x10 )
+			if ( ( ch & 0x80 ) && ! ( attr & 0x10 ) )
 				font_bits ^= 0xFF;
 
 			for ( int b = 0; b < 8; b++ )
