@@ -11,11 +11,14 @@
 
 #include "emu.h"
 #include "debugger.h"
+#include "profiler.h"
+#include "mips3.h"
 #include "mips3com.h"
 
 
 #define ENABLE_OVERFLOWS	0
 
+#ifndef MIPS3_USE_DRC
 
 /***************************************************************************
     HELPER MACROS
@@ -98,6 +101,7 @@ typedef struct
 	int			interrupt_cycles;
 	UINT32		ll_value;
 	UINT64		lld_value;
+	UINT32		badcop_value;
 	const vtlb_entry *tlb_table;
 
 	/* endian-dependent load/store */
@@ -156,6 +160,21 @@ static mips3_regs mips3;
 #define ROPCODE(pc)		mips3.core.direct->read_decrypted_dword(pc)
 
 
+/***************************************************************************
+    DRC COMPATIBILITY
+***************************************************************************/
+
+void mips3drc_set_options(device_t *device, UINT32 options)
+{
+}
+
+void mips3drc_add_fastram(device_t *device, offs_t start, offs_t end, UINT8 readonly, void *base)
+{
+}
+
+void mips3drc_add_hotspot(device_t *device, offs_t pc, UINT32 opcode, UINT32 cycles)
+{
+}
 
 /***************************************************************************
     EXECEPTION HANDLING
@@ -182,6 +201,12 @@ INLINE void generate_exception(int exception, int backup)
 
 	/* put the cause in the low 8 bits and clear the branch delay flag */
 	CAUSE = (CAUSE & ~0x800000ff) | (exception << 2);
+
+	/* set the appropriate bits for coprocessor exceptions */
+	if(exception == EXCEPTION_BADCOP)
+	{
+		CAUSE |= mips3.badcop_value << 28;
+	}
 
 	/* if we were in a branch delay slot, adjust */
 	if (mips3.nextpc != ~0)
@@ -567,7 +592,10 @@ INLINE void set_cop0_creg(int idx, UINT64 val)
 INLINE void handle_cop0(UINT32 op)
 {
 	if ((SR & SR_KSU_MASK) != SR_KSU_KERNEL && !(SR & SR_COP0))
+	{
+		mips3.badcop_value = 0;
 		generate_exception(EXCEPTION_BADCOP, 1);
+	}
 
 	switch (RSREG)
 	{
@@ -703,7 +731,10 @@ INLINE void handle_cop1_fr0(UINT32 op)
 	/* note: additional condition codes available on R5000 only */
 
 	if (!(SR & SR_COP1))
+	{
+		mips3.badcop_value = 1;
 		generate_exception(EXCEPTION_BADCOP, 1);
+	}
 
 	switch (RSREG)
 	{
@@ -1059,7 +1090,10 @@ INLINE void handle_cop1_fr1(UINT32 op)
 	/* note: additional condition codes available on R5000 only */
 
 	if (!(SR & SR_COP1))
+	{
+		mips3.badcop_value = 1;
 		generate_exception(EXCEPTION_BADCOP, 1);
+	}
 
 	switch (RSREG)
 	{
@@ -1419,7 +1453,10 @@ INLINE void handle_cop1x_fr0(UINT32 op)
 	UINT32 temp;
 
 	if (!(SR & SR_COP1))
+	{
+		mips3.badcop_value = 1;
 		generate_exception(EXCEPTION_BADCOP, 1);
+	}
 
 	switch (op & 0x3f)
 	{
@@ -1495,7 +1532,10 @@ INLINE void handle_cop1x_fr1(UINT32 op)
 	UINT32 temp;
 
 	if (!(SR & SR_COP1))
+	{
+		mips3.badcop_value = 1;
 		generate_exception(EXCEPTION_BADCOP, 1);
+	}
 
 	switch (op & 0x3f)
 	{
@@ -1593,7 +1633,10 @@ INLINE void set_cop2_creg(int idx, UINT64 val)
 INLINE void handle_cop2(UINT32 op)
 {
 	if (!(SR & SR_COP2))
+	{
+		mips3.badcop_value = 2;
 		generate_exception(EXCEPTION_BADCOP, 1);
+	}
 
 	switch (RSREG)
 	{
@@ -2546,14 +2589,6 @@ CPU_GET_INFO( rm7000le )
 	}
 }
 
-void mips3drc_set_options(running_device *device, UINT32 options)
-{
-}
-
-void mips3drc_add_fastram(running_device *device, offs_t start, offs_t end, UINT8 readonly, void *base)
-{
-}
-
 DEFINE_LEGACY_CPU_DEVICE(VR4300BE, vr4300be);
 DEFINE_LEGACY_CPU_DEVICE(VR4300LE, vr4300le);
 DEFINE_LEGACY_CPU_DEVICE(VR4310BE, vr4310be);
@@ -2576,3 +2611,5 @@ DEFINE_LEGACY_CPU_DEVICE(QED5271LE, qed5271le);
 
 DEFINE_LEGACY_CPU_DEVICE(RM7000BE, rm7000be);
 DEFINE_LEGACY_CPU_DEVICE(RM7000LE, rm7000le);
+
+#endif
