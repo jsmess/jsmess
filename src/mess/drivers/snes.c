@@ -835,7 +835,7 @@ ROM_START( snespsfx )
 	ROM_REGION( 0x100, "user5", 0 )		/* IPL ROM */
 	ROM_LOAD( "spc700.rom", 0, 0x40, CRC(44bb3a40) SHA1(97e352553e94242ae823547cd853eecda55c20f0) )	/* boot rom */
 
-	ROM_REGION( 0x10000, "addons", 0 )		/* add-on chip ROMs (DSP, SFX, etc) */
+	ROM_REGION( 0x10000, "addons", ROMREGION_ERASE00 )		/* add-on chip ROMs (DSP, SFX, etc) */
 
 	ROM_REGION( MAX_SNES_CART_SIZE, "cart", ROMREGION_ERASE00 )
 	ROM_REGION( 0x2000, "dspprg", ROMREGION_ERASEFF)
