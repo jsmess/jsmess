@@ -598,6 +598,12 @@ ROM_START( wmega )
 	ROM_LOAD( "g301.bin", 0x000000,  0x020000, CRC(d21fe71d) SHA1(3fc9358072f74bd24e3e297ea11b2bf15a7af891) )
 ROM_END
 
+ROM_START( wmegam2 )
+	ROM_REGION16_BE( 0x400000, "maincpu", ROMREGION_ERASE00 )
+	/* v2.00 */
+	ROM_LOAD( "wondermega_m2_bios_2_00_j.bin", 0x000000,  0x020000, CRC(2b19972f) SHA1(b3f32e409bd5508c89ed8be33d41a58d791d0e5d) )
+ROM_END
+
 ROM_START( cdx )
 	ROM_REGION16_BE( 0x400000, "maincpu", ROMREGION_ERASE00 )
 	/* v2.21X */
@@ -899,6 +905,7 @@ CONS( 1993, laseract,   0,         0,      genesis_scd,     md,     genesis,   "
 CONS( 1993, laseractj,  laseract,  0,      genesis_scd,     md,     md_jpn,    "Pioneer","LaserActive (Japan, NTSC)", GAME_NOT_WORKING )
 CONS( 1993, xeye,       0,         0,      genesis_scd,     md,     genesis,   "JVC",    "X'eye (USA, NTSC)", GAME_NOT_WORKING )
 CONS( 1992, wmega,      xeye,      0,      genesis_scd,     md,     md_jpn,    "Sega",   "Wondermega (Japan, NTSC)", GAME_NOT_WORKING )
+CONS( 1993, wmegam2,    xeye,      0,      genesis_scd,     md,     md_jpn,    "Victor", "Wondermega M2 (Japan, NTSC)", GAME_NOT_WORKING )
 CONS( 1994, cdx,        0,         0,      genesis_scd,     md,     genesis,   "Sega",   "CDX (USA, NTSC)", GAME_NOT_WORKING )
 CONS( 1994, multmega,   cdx,       0,      genesis_scd,     md,     md_eur,    "Sega",   "Multi-Mega (Europe, PAL)", GAME_NOT_WORKING )
 CONS( 1994, 32x_scd,    segacd,    0,      genesis_32x_scd, md_sel, mess_32x,  "Sega",   "Sega CD (USA, NTSC, w/32X)", GAME_NOT_WORKING )

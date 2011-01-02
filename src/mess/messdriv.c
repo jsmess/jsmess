@@ -113,7 +113,8 @@ const game_driver * const drivers[] =
 	DRIVER( laseract )  /* 1993 Pioneer LaserActive (USA)      */
 	DRIVER( laseractj ) /* 1993 Pioneer LaserActive (Japan)  */
 	DRIVER( xeye )	  /* 1993 JVC X'eye (USA)    */
-	DRIVER( wmega )	 /* 1993 Sega Wondermega (Japan)     */
+	DRIVER( wmega )	 /* 1992 Sega Wondermega (Japan)     */
+	DRIVER( wmegam2 )	/* 1993 Victor Wondermega M2 (Japan)     */
 	DRIVER( cdx )	   /* 1994 Sega CDX (USA)     */
 	DRIVER( multmega )  /* 1994 Sega Multi-Mega (Europe)    */
 	DRIVER( 32x )	   /* 1994 Sega 32X (USA)     */
