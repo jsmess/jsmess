@@ -185,6 +185,9 @@ Source Changes:
 
 - Added rudimentary 8N1 serial I/O to the generic terminal device. [Curt Coder]
 
+- softlists: Added new lists, new dumps and info [anondumper, Barry Rodewald, 
+  Curt Coder, MESSfan, Fabio Priuli]
+
 
 
 0.140

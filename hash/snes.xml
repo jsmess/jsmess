@@ -706,7 +706,7 @@ The software list will be divided in four categories:
 
 	<software name="baselod3">
 		<!-- Serial:  - Release Date: 1995-02 -->
-		<description>Super Bases Loaded 3 - License to Steal (USA, Rev. 1)</description>
+		<description>Super Bases Loaded 3 - License to Steal (USA, Rev. A)</description>
 		<year>1995</year>
 		<publisher>Jaleco</publisher>
 		<part name="cart" interface="snes_cart">
@@ -1461,7 +1461,7 @@ The software list will be divided in four categories:
 
 	<software name="airmanag" cloneof="aerobiz">
 		<!-- Serial: SHVC-AL - Release Date: 1992-04-05 - Alt. Title: エアーマネジメント 大空に賭ける -->
-		<description>Air Management - Oozora ni Kakeru (Jpn, Rev. 1)</description>
+		<description>Air Management - Oozora ni Kakeru (Jpn, Rev. A)</description>
 		<year>1992</year>
 		<publisher>Koei</publisher>
 		<part name="cart" interface="snes_cart">
@@ -3061,7 +3061,7 @@ The software list will be divided in four categories:
 
 	<software name="battlety1" cloneof="battlety">
 		<!-- Serial:  - Release Date: 1995-05-19 -->
-		<description>Battle Tycoon - Flash Hiders SFX (Jpn, Rev. 1)</description>
+		<description>Battle Tycoon - Flash Hiders SFX (Jpn, rev. A)</description>
 		<year>1995</year>
 		<publisher>Right Stuff</publisher>
 		<part name="cart" interface="snes_cart">
@@ -3552,7 +3552,7 @@ The software list will be divided in four categories:
 
 	<software name="suchipai">
 		<!-- Serial: SHVC-JS - Release Date: 1993-07-30 - Alt. Title: 美少女雀士スーチーパイ -->
-		<description>Bishoujo Janshi Suchie-Pai (Jpn, Rev. 1)</description>
+		<description>Bishoujo Janshi Suchie-Pai (Jpn, rev. A)</description>
 		<year>1993</year>
 		<publisher>Jaleco</publisher>
 		<part name="cart" interface="snes_cart">
@@ -3859,7 +3859,7 @@ The software list will be divided in four categories:
 
 	<software name="bokujom1" cloneof="harvmoon">
 		<!-- Serial:  - Release Date: 1996-08-09 -->
-		<description>Bokujou Monogatari (Jpn, Rev. 1)</description>
+		<description>Bokujou Monogatari (Jpn, rev. A)</description>
 		<year>1996</year>
 		<publisher>Pack-In-Video</publisher>
 		<part name="cart" interface="snes_cart">
@@ -4165,12 +4165,12 @@ The software list will be divided in four categories:
 
 	<software name="bofj" cloneof="bof">
 		<!-- Serial: SHVC-BF - Release Date: 1993-04-03 - Alt. Title: ブレス・オブ・ファイア竜の戦士 -->
-		<description>Breath of Fire - Ryuu no Senshi (Jpn, Rev. 1)</description>
+		<description>Breath of Fire - Ryuu no Senshi (Jpn, rev. A)</description>
 		<year>1993</year>
 		<publisher>Capcom</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1572864">
-				<rom name="breath of fire - ryuu no senshi (japan) (rev. 1).sfc" size="1572864" crc="e0b0bbec" sha1="3ab85ee92f5e2c9069e3d2fa595fab3d452c5d99" offset="000000" />
+				<rom name="breath of fire - ryuu no senshi (japan) (rev. A).sfc" size="1572864" crc="e0b0bbec" sha1="3ab85ee92f5e2c9069e3d2fa595fab3d452c5d99" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -4223,7 +4223,7 @@ The software list will be divided in four categories:
 
 	<software name="bof2jnp" cloneof="bof2">
 		<!-- Serial: SHVC-AF2J - Release Date: 1994-12-02 - Alt. Title: ブレス オブ ファイアII―使命の子― -->
-		<description>Breath of Fire II - Shimei no Ko (Jpn, Rev. 1, NP)</description>
+		<description>Breath of Fire II - Shimei no Ko (Jpn, rev. A, NP)</description>
 		<year>1994</year>
 		<publisher>Capcom</publisher>
 		<part name="cart" interface="snes_cart">
@@ -4884,7 +4884,7 @@ The software list will be divided in four categories:
 
 	<software name="bsxsore">
 		<!-- Serial:  - Release Date:  -->
-		<description>BS-X - Sore wa Namae o Nusumareta Machi no Monogatari (Jpn, Rev. 1)</description>
+		<description>BS-X - Sore wa Namae o Nusumareta Machi no Monogatari (Jpn, rev. A)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
@@ -4998,7 +4998,7 @@ The software list will be divided in four categories:
 	</software>
 
 	<software name="bullsvsb">
-		<description>Bulls vs Blazers and the NBA Playoffs (Euro, Rev. 1)</description>
+		<description>Bulls vs Blazers and the NBA Playoffs (Euro, rev. A)</description>
 		<year>1992</year>
 		<publisher>Electronic Arts</publisher>
 		<part name="cart" interface="snes_cart">
@@ -5021,7 +5021,7 @@ The software list will be divided in four categories:
 
 	<software name="bullsvsbu" cloneof="bullsvsb">
 		<!-- Serial:  - Release Date: 1992-12 -->
-		<description>Bulls vs Blazers and the NBA Playoffs (USA, Rev. 1)</description>
+		<description>Bulls vs Blazers and the NBA Playoffs (USA, rev. A)</description>
 		<year>1992</year>
 		<publisher>Electronic Arts</publisher>
 		<part name="cart" interface="snes_cart">
@@ -6720,7 +6720,7 @@ The software list will be divided in four categories:
 
 	<software name="srobot3a" cloneof="srobot3">
 		<!-- Serial: SHVC-RT - Release Date: 1993-07-23 - Alt. Title: 第3次 スーパーロボット大戦 -->
-		<description>Dai-3-ji Super Robot Taisen (Jpn, Rev. 1)</description>
+		<description>Dai-3-ji Super Robot Taisen (Jpn, rev. A)</description>
 		<year>1993</year>
 		<publisher>Banpresto</publisher>
 		<part name="cart" interface="snes_cart">
@@ -6732,7 +6732,7 @@ The software list will be divided in four categories:
 
 	<software name="srobot3">
 		<!-- Serial: SHVC-RT - Release Date: 1993-07-23 - Alt. Title: 第3次 スーパーロボット大戦 -->
-		<description>Dai-3-ji Super Robot Taisen (Jpn, Rev. 2)</description>
+		<description>Dai-3-ji Super Robot Taisen (Jpn, rev. B)</description>
 		<year>1993</year>
 		<publisher>Banpresto</publisher>
 		<part name="cart" interface="snes_cart">
@@ -6756,7 +6756,7 @@ The software list will be divided in four categories:
 
 	<software name="srobot4">
 		<!-- Serial:  - Release Date: 1995-03-17 -->
-		<description>Dai-4-ji Super Robot Taisen (Jpn, Rev. 1)</description>
+		<description>Dai-4-ji Super Robot Taisen (Jpn, rev. A)</description>
 		<year>1995</year>
 		<publisher>Banpresto</publisher>
 		<part name="cart" interface="snes_cart">
@@ -6841,7 +6841,7 @@ The software list will be divided in four categories:
 
 	<software name="daimonoga" cloneof="daimonog">
 		<!-- Serial: SHVC-ADKJ - Release Date: 1994-12-22 - Alt. Title: 大貝獣物語 -->
-		<description>Daikaijuu Monogatari (Jpn, Rev. 1)</description>
+		<description>Daikaijuu Monogatari (Jpn, rev. A)</description>
 		<year>1994</year>
 		<publisher>Hudson</publisher>
 		<part name="cart" interface="snes_cart">
@@ -7265,7 +7265,7 @@ The software list will be divided in four categories:
 
 	<software name="derbyjoc">
 		<!-- Serial: SHVC-JQ - Release Date: 1994-03-18 - Alt. Title: ダービージョッキー 騎手王への道 -->
-		<description>Derby Jockey - Kishu Ou e no Michi (Jpn, Rev. 1)</description>
+		<description>Derby Jockey - Kishu Ou e no Michi (Jpn, rev. A)</description>
 		<year>1994</year>
 		<publisher>Asmik</publisher>
 		<part name="cart" interface="snes_cart">
@@ -7337,7 +7337,7 @@ The software list will be divided in four categories:
 
 	<software name="dstall3b" cloneof="dstall3">
 		<!-- Serial:  - Release Date: 1995-01-20 -->
-		<description>Derby Stallion III (Jpn, Rev. 1)</description>
+		<description>Derby Stallion III (Jpn, rev. A)</description>
 		<year>1995</year>
 		<publisher>ASCII Entertainment</publisher>
 		<part name="cart" interface="snes_cart">
@@ -7349,7 +7349,7 @@ The software list will be divided in four categories:
 
 	<software name="dstall3a" cloneof="dstall3">
 		<!-- Serial:  - Release Date: 1995-01-20 -->
-		<description>Derby Stallion III (Jpn, Rev. 2)</description>
+		<description>Derby Stallion III (Jpn, rev. B)</description>
 		<year>1995</year>
 		<publisher>ASCII Entertainment</publisher>
 		<part name="cart" interface="snes_cart">
@@ -7361,7 +7361,7 @@ The software list will be divided in four categories:
 
 	<software name="dstall3">
 		<!-- Serial:  - Release Date: 1995-01-20 -->
-		<description>Derby Stallion III (Jpn, Rev. 3)</description>
+		<description>Derby Stallion III (Jpn, rev. C)</description>
 		<year>1995</year>
 		<publisher>ASCII Entertainment</publisher>
 		<part name="cart" interface="snes_cart">
@@ -7791,7 +7791,7 @@ The software list will be divided in four categories:
 	</software>
 
 	<software name="dkongc">
-		<description>Donkey Kong Country (Euro, Rev. 1)</description>
+		<description>Donkey Kong Country (Euro, rev. A)</description>
 		<year>1994</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="snes_cart">
@@ -7825,7 +7825,7 @@ The software list will be divided in four categories:
 
 	<software name="dkongcua" cloneof="dkongc">
 		<!-- Serial:  - Release Date: 1994-11 -->
-		<description>Donkey Kong Country (USA, Rev. 1)</description>
+		<description>Donkey Kong Country (USA, rev. A)</description>
 		<year>1994</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="snes_cart">
@@ -7837,7 +7837,7 @@ The software list will be divided in four categories:
 
 	<software name="dkongcu" cloneof="dkongc">
 		<!-- Serial:  - Release Date: 1994-11 -->
-		<description>Donkey Kong Country (USA, Rev. 2)</description>
+		<description>Donkey Kong Country (USA, rev. B)</description>
 		<year>1994</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="snes_cart">
@@ -7860,7 +7860,7 @@ The software list will be divided in four categories:
 	</software>
 
 	<software name="dkongc2">
-		<description>Donkey Kong Country 2 - Diddy's Kong Quest (Euro, Rev. 1)</description>
+		<description>Donkey Kong Country 2 - Diddy's Kong Quest (Euro, rev. A)</description>
 		<year>1995</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="snes_cart">
@@ -7871,7 +7871,7 @@ The software list will be divided in four categories:
 	</software>
 
 	<software name="dkongc2g" cloneof="dkongc2">
-		<description>Donkey Kong Country 2 - Diddy's Kong Quest (Ger, Rev. 1)</description>
+		<description>Donkey Kong Country 2 - Diddy's Kong Quest (Ger, rev. A)</description>
 		<year>1995</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="snes_cart">
@@ -7894,7 +7894,7 @@ The software list will be divided in four categories:
 
 	<software name="dkongc2u" cloneof="dkongc2">
 		<!-- Serial:  - Release Date: 1995-12 -->
-		<description>Donkey Kong Country 2 - Diddy's Kong Quest (USA, Rev. 1)</description>
+		<description>Donkey Kong Country 2 - Diddy's Kong Quest (USA, rev. A)</description>
 		<year>1995</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="snes_cart">
@@ -8247,7 +8247,7 @@ The software list will be divided in four categories:
 
 	<software name="dbzbuto2" cloneof="dbzsaiya">
 		<!-- Serial: SHVC-EF - Release Date: 1993-12-17 - Alt. Title: ドラゴンボールZ 超武闘伝2 -->
-		<description>Dragon Ball Z - Super Butouden 2 (Jpn, Rev. 1)</description>
+		<description>Dragon Ball Z - Super Butouden 2 (Jpn, rev. A)</description>
 		<year>1993</year>
 		<publisher>Bandai</publisher>
 		<part name="cart" interface="snes_cart">
@@ -8307,7 +8307,7 @@ The software list will be divided in four categories:
 
 	<software name="dbzsaiyaj" cloneof="dbzsaiya">
 		<!-- Serial: SHVC-DB - Release Date: 1992-01-25 - Alt. Title: ドラゴンボールZ スーパー -->
-		<description>Dragon Ball Z - Super Saiya Densetsu (Jpn, Rev. 1)</description>
+		<description>Dragon Ball Z - Super Saiya Densetsu (Jpn, rev. A)</description>
 		<year>1992</year>
 		<publisher>Bandai</publisher>
 		<part name="cart" interface="snes_cart">
@@ -8414,7 +8414,7 @@ The software list will be divided in four categories:
 	</software>
 
 	<software name="dslayernp" cloneof="dslayer">
-		<description>Dragon Slayer - Eiyuu Densetsu (Jpn, Rev. 1, NP)</description>
+		<description>Dragon Slayer - Eiyuu Densetsu (Jpn, rev. A, NP)</description>
 		<year>1992?</year>
 		<publisher>Epoch</publisher>
 		<part name="cart" interface="snes_cart">
@@ -8718,7 +8718,7 @@ The software list will be divided in four categories:
 
 	<software name="dungmstrj" cloneof="dungmstr">
 		<!-- Serial: SHVC-V2 - Release Date: 1991-12-20 - Alt. Title: ダンジョンマスター -->
-		<description>Dungeon Master (Jpn, Rev. 1)</description>
+		<description>Dungeon Master (Jpn, rev. A)</description>
 		<year>1991</year>
 		<publisher>Victor Musical Industries</publisher>
 		<part name="cart" interface="snes_cart">
@@ -9689,7 +9689,7 @@ The software list will be divided in four categories:
 
 	<software name="famitc2">
 		<!-- Serial:  - Release Date: 1998-04-01 -->
-		<description>Famicom Tantei Club Part II - Ushiro ni Tatsu Shoujo (Jpn, Rev. 1, NP)</description>
+		<description>Famicom Tantei Club Part II - Ushiro ni Tatsu Shoujo (Jpn, rev. A, NP)</description>
 		<year>1998</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="snes_cart">
@@ -9724,7 +9724,7 @@ The software list will be divided in four categories:
 
 	<software name="familfeu">
 		<!-- Serial:  - Release Date: 1993-10 -->
-		<description>Family Feud (USA, Rev. 1)</description>
+		<description>Family Feud (USA, rev. A)</description>
 		<year>1993</year>
 		<publisher>GameTek</publisher>
 		<part name="cart" interface="snes_cart">
@@ -10025,7 +10025,7 @@ The software list will be divided in four categories:
 
 	<software name="fighth">
 		<!-- Serial:  - Release Date: 1994-08 -->
-		<description>Fighter's History (USA, Rev. 1)</description>
+		<description>Fighter's History (USA, rev. A)</description>
 		<year>1994</year>
 		<publisher>Data East</publisher>
 		<part name="cart" interface="snes_cart">
@@ -10061,7 +10061,7 @@ The software list will be divided in four categories:
 
 	<software name="ffmq" cloneof="mquest">
 		<!-- Serial:  - Release Date: 1992-10 -->
-		<description>Final Fantasy - Mystic Quest (USA, Rev. 1)</description>
+		<description>Final Fantasy - Mystic Quest (USA, rev. A)</description>
 		<year>1992</year>
 		<publisher>Square</publisher>
 		<part name="cart" interface="snes_cart">
@@ -10085,7 +10085,7 @@ The software list will be divided in four categories:
 
 	<software name="ff2">
 		<!-- Serial:  - Release Date: 1991-11 -->
-		<description>Final Fantasy II (USA, Rev. 1)</description>
+		<description>Final Fantasy II (USA, rev. A)</description>
 		<year>1991</year>
 		<publisher>Square</publisher>
 		<part name="cart" interface="snes_cart">
@@ -10109,7 +10109,7 @@ The software list will be divided in four categories:
 
 	<software name="ff3">
 		<!-- Serial:  - Release Date: 1994-10 -->
-		<description>Final Fantasy III (USA, Rev. 1)</description>
+		<description>Final Fantasy III (USA, rev. A)</description>
 		<year>1994</year>
 		<publisher>Square</publisher>
 		<part name="cart" interface="snes_cart">
@@ -10321,7 +10321,7 @@ The software list will be divided in four categories:
 
 	<software name="firembmn">
 		<!-- Serial: SHVC-EM - Release Date: 1994-01-21 - Alt. Title: ファイアーエムブレム 紋章の謎 -->
-		<description>Fire Emblem - Monshou no Nazo (Jpn, Rev. 1)</description>
+		<description>Fire Emblem - Monshou no Nazo (Jpn, rev. A)</description>
 		<year>1994</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="snes_cart">
@@ -10369,7 +10369,7 @@ The software list will be divided in four categories:
 
 	<software name="firembth">
 		<!-- Serial:  - Release Date: 2000-01-21 -->
-		<description>Fire Emblem - Thracia 776 (Jpn, Rev. 1, NP)</description>
+		<description>Fire Emblem - Thracia 776 (Jpn, rev. A, NP)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="snes_cart">
@@ -10995,7 +10995,7 @@ The software list will be divided in four categories:
 
 	<software name="frontms">
 		<!-- Serial:  - Release Date: 1995-02-24 -->
-		<description>Front Mission (Jpn, Rev. 1)</description>
+		<description>Front Mission (Jpn, rev. A)</description>
 		<year>1995</year>
 		<publisher>Square</publisher>
 		<part name="cart" interface="snes_cart">
@@ -11136,7 +11136,7 @@ The software list will be divided in four categories:
 
 	<software name="fushidn2">
 		<!-- Serial:  - Release Date:  -->
-		<description>Fushigi no Dungeon 2 - Fuurai no Shiren (Jpn, Rev. 1, NP)</description>
+		<description>Fushigi no Dungeon 2 - Fuurai no Shiren (Jpn, rev. A, NP)</description>
 		<year>1995?</year>
 		<publisher>Chunsoft?</publisher>
 		<part name="cart" interface="snes_cart">
@@ -11330,7 +11330,7 @@ The software list will be divided in four categories:
 
 	<software name="ggoemon" cloneof="mystninj">
 		<!-- Serial: SHVC-GG - Release Date: 1991-07-19 - Alt. Title: がんばれゴエモン ゆき姫救出絵巻 -->
-		<description>Ganbare Goemon - Yuki Hime Kyuushutsu Emaki (Jpn, Rev. 2)</description>
+		<description>Ganbare Goemon - Yuki Hime Kyuushutsu Emaki (Jpn, rev. B)</description>
 		<year>1991</year>
 		<publisher>Konami</publisher>
 		<part name="cart" interface="snes_cart">
@@ -11378,7 +11378,7 @@ The software list will be divided in four categories:
 
 	<software name="ggoemkir">
 		<!-- Serial:  - Release Date:  -->
-		<description>Ganbare Goemon Kirakira Douchuu - Boku ga Dancer ni Natta Wake (Jpn, Rev. 2, NP)</description>
+		<description>Ganbare Goemon Kirakira Douchuu - Boku ga Dancer ni Natta Wake (Jpn, rev. B, NP)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
@@ -11462,7 +11462,7 @@ The software list will be divided in four categories:
 
 	<software name="garou" cloneof="fatfur">
 		<!-- Serial: SHVC-GN - Release Date: 1992-11-27 - Alt. Title: 餓狼伝説 宿命の闘い -->
-		<description>Garou Densetsu - Shukumei no Tatakai (Jpn, Rev. 1)</description>
+		<description>Garou Densetsu - Shukumei no Tatakai (Jpn, rev. A)</description>
 		<year>1992</year>
 		<publisher>Takara</publisher>
 		<part name="cart" interface="snes_cart">
@@ -11486,7 +11486,7 @@ The software list will be divided in four categories:
 
 	<software name="garou2" cloneof="fatfur2">
 		<!-- Serial: SHVC-DJ - Release Date: 1993-11-26 - Alt. Title: 餓狼伝説2 ―新たなる闘い― -->
-		<description>Garou Densetsu 2 - Aratanaru Tatakai (Jpn, Rev. 1)</description>
+		<description>Garou Densetsu 2 - Aratanaru Tatakai (Jpn, rev. A)</description>
 		<year>1993</year>
 		<publisher>Takara</publisher>
 		<part name="cart" interface="snes_cart">
@@ -11522,7 +11522,7 @@ The software list will be divided in four categories:
 
 	<software name="gdleen">
 		<!-- Serial: SHVC-GD - Release Date: 1991-05-28 - Alt. Title: ガデュリン -->
-		<description>Gdleen (Jpn, Rev. 1)</description>
+		<description>Gdleen (Jpn, rev. A)</description>
 		<year>1991</year>
 		<publisher>Seta</publisher>
 		<part name="cart" interface="snes_cart">
@@ -11702,7 +11702,7 @@ The software list will be divided in four categories:
 
 	<software name="foremnkou" cloneof="foremnko">
 		<!-- Serial:  - Release Date: 1992-09 -->
-		<description>George Foreman's KO Boxing (USA, Rev. 1)</description>
+		<description>George Foreman's KO Boxing (USA, rev. A)</description>
 		<year>1992</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<part name="cart" interface="snes_cart">
@@ -11797,12 +11797,12 @@ The software list will be divided in four categories:
 
 	<software name="gindamap">
 		<!-- Serial:  - Release Date: 1995-02-17 -->
-		<description>Gindama Oyakata no Pachinko Hisshouhou (Jpn, Rev. 1)</description>
+		<description>Gindama Oyakata no Pachinko Hisshouhou (Jpn, rev. A)</description>
 		<year>1995</year>
 		<publisher>Sammy Entertainment</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1572864">
-				<rom name="gindama oyakata no pachinko hisshouhou (japan) (rev. 1).sfc" size="1572864" crc="b8c7a417" sha1="80bfa015f12a6af38aa3dcbf88560f928b07cf1d" offset="000000" />
+				<rom name="gindama oyakata no pachinko hisshouhou (japan) (rev. A).sfc" size="1572864" crc="b8c7a417" sha1="80bfa015f12a6af38aa3dcbf88560f928b07cf1d" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -11893,7 +11893,7 @@ The software list will be divided in four categories:
 
 	<software name="gogododg">
 		<!-- Serial: SHVC-R5 - Release Date: 1993-09-24 - Alt. Title: ゴー！ゴー！ドッジリーグ -->
-		<description>Go! Go! Dodge League (Jpn, Rev. 1)</description>
+		<description>Go! Go! Dodge League (Jpn, rev. A)</description>
 		<year>1993</year>
 		<publisher>Pack-In-Video</publisher>
 		<part name="cart" interface="snes_cart">
@@ -12510,7 +12510,7 @@ The software list will be divided in four categories:
 
 	<software name="hakprogl" cloneof="extrainn">
 		<!-- Serial: SHVC-GL (ESPG38) - Release Date: 1991-08-09 - Alt. Title: 白熱プロ野球 ガンバリーグ -->
-		<description>Hakunetsu Pro Yakyuu - Ganba League (Jpn, Rev. 1)</description>
+		<description>Hakunetsu Pro Yakyuu - Ganba League (Jpn, rev. A)</description>
 		<year>1991</year>
 		<publisher>Epic / Sony Records</publisher>
 		<part name="cart" interface="snes_cart">
@@ -12641,7 +12641,7 @@ The software list will be divided in four categories:
 
 	<software name="haoutryu">
 		<!-- Serial: SHVC-UR - Release Date: 1994-12-22 - Alt. Title: 覇王大系リューナイト ロードオブパラディン -->
-		<description>Haou Taikei Ryuu Knight - Lord of Paladin (Jpn, Rev. 1)</description>
+		<description>Haou Taikei Ryuu Knight - Lord of Paladin (Jpn, rev. A)</description>
 		<year>1994</year>
 		<publisher>Bandai</publisher>
 		<part name="cart" interface="snes_cart">
@@ -13509,7 +13509,7 @@ The software list will be divided in four categories:
 
 	<software name="kirbysda" cloneof="kirbyfun" supported="no">
 		<!-- Serial:  - Release Date: 1996-03-21 -->
-		<description>Hoshi no Kirby - Super Deluxe (Jpn, Rev. 1)</description>
+		<description>Hoshi no Kirby - Super Deluxe (Jpn, rev. A)</description>
 		<year>1996</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="snes_cart">
@@ -13521,7 +13521,7 @@ The software list will be divided in four categories:
 
 	<software name="kirbysd" cloneof="kirbyfun" supported="no">
 		<!-- Serial:  - Release Date: 1996-03-21 -->
-		<description>Hoshi no Kirby - Super Deluxe (Jpn, Rev. 2)</description>
+		<description>Hoshi no Kirby - Super Deluxe (Jpn, rev. B)</description>
 		<year>1996</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="snes_cart">
@@ -13941,7 +13941,7 @@ The software list will be divided in four categories:
 	</software>
 
 	<software name="illtimeg" cloneof="illtime">
-		<description>Illusion of Time (Ger, Rev. 1)</description>
+		<description>Illusion of Time (Ger, rev. A)</description>
 		<year>1994</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="snes_cart">
@@ -14162,7 +14162,7 @@ The software list will be divided in four categories:
 
 	<software name="intsensb">
 		<!-- Serial:  - Release Date:  -->
-		<description>International Sensible Soccer - World Champions Limited Edition (Euro, Rev. 1)</description>
+		<description>International Sensible Soccer - World Champions Limited Edition (Euro, rev. A)</description>
 		<year>1994</year>
 		<publisher>Sony Imagesoft</publisher>
 		<part name="cart" interface="snes_cart">
@@ -14384,7 +14384,7 @@ The software list will be divided in four categories:
 
 	<software name="itouhata">
 		<!-- Serial: SHVC-Q2 - Release Date: 1994-02-04 - Alt. Title: 伊藤果六段の将棋道場 -->
-		<description>Itou Hatasu Rokudan no Shougi Doujou (Jpn, Rev. 1)</description>
+		<description>Itou Hatasu Rokudan no Shougi Doujou (Jpn, rev. A)</description>
 		<year>1994</year>
 		<publisher>ASK Kodansha</publisher>
 		<part name="cart" interface="snes_cart">
@@ -14454,7 +14454,7 @@ The software list will be divided in four categories:
 
 	<software name="jlexct94" cloneof="sshotout">
 		<!-- Serial: SHVC-JL - Release Date: 1994-05-01 - Alt. Title: J.リーグエキサイトステージ'94 -->
-		<description>J.League Excite Stage '94 (Jpn, Rev. 1)</description>
+		<description>J.League Excite Stage '94 (Jpn, rev. A)</description>
 		<year>1994</year>
 		<publisher>Epoch</publisher>
 		<part name="cart" interface="snes_cart">
@@ -14490,7 +14490,7 @@ The software list will be divided in four categories:
 
 	<software name="jlexct96">
 		<!-- Serial:  - Release Date: 1996-04-26 -->
-		<description>J.League Excite Stage '96 (Jpn, Rev. 1)</description>
+		<description>J.League Excite Stage '96 (Jpn, rev. A)</description>
 		<year>1996</year>
 		<publisher>Epoch</publisher>
 		<part name="cart" interface="snes_cart">
@@ -14514,7 +14514,7 @@ The software list will be divided in four categories:
 
 	<software name="jlprime">
 		<!-- Serial: SHVC-JE - Release Date: 1993-08-06 - Alt. Title: Jリーグサッカープライムゴール -->
-		<description>J.League Soccer Prime Goal (Jpn, Rev. 1)</description>
+		<description>J.League Soccer Prime Goal (Jpn, rev. A)</description>
 		<year>1993</year>
 		<publisher>Namco</publisher>
 		<part name="cart" interface="snes_cart">
@@ -14902,7 +14902,7 @@ The software list will be divided in four categories:
 
 	<software name="jikkpw96">
 		<!-- Serial:  - Release Date: 1996-07-19 -->
-		<description>Jikkyou Powerful Pro Yakyuu '96 - Kaimaku Ban (Jpn, Rev. 1)</description>
+		<description>Jikkyou Powerful Pro Yakyuu '96 - Kaimaku Ban (Jpn, rev. A)</description>
 		<year>1996</year>
 		<publisher>Konami</publisher>
 		<part name="cart" interface="snes_cart">
@@ -14938,7 +14938,7 @@ The software list will be divided in four categories:
 
 	<software name="jikkpw2">
 		<!-- Serial:  - Release Date: 1995-02-24 -->
-		<description>Jikkyou Powerful Pro Yakyuu 2 (Jpn, Rev. 1)</description>
+		<description>Jikkyou Powerful Pro Yakyuu 2 (Jpn, rev. A)</description>
 		<year>1995</year>
 		<publisher>Konami</publisher>
 		<part name="cart" interface="snes_cart">
@@ -14974,7 +14974,7 @@ The software list will be divided in four categories:
 
 	<software name="jikkp397">
 		<!-- Serial:  - Release Date: 1997-03-20 -->
-		<description>Jikkyou Powerful Pro Yakyuu 3 - '97 Haru (Jpn, Rev. 1)</description>
+		<description>Jikkyou Powerful Pro Yakyuu 3 - '97 Haru (Jpn, rev. A)</description>
 		<year>1997</year>
 		<publisher>Konami</publisher>
 		<part name="cart" interface="snes_cart">
@@ -14998,7 +14998,7 @@ The software list will be divided in four categories:
 
 	<software name="jwsoccer">
 		<!-- Serial: SHVC-3U - Release Date: 1994-11-11 - Alt. Title: 実況ワールドサッカー パーフェクトイレブン -->
-		<description>Jikkyou World Soccer - Perfect Eleven (Jpn, Rev. 1)</description>
+		<description>Jikkyou World Soccer - Perfect Eleven (Jpn, rev. A)</description>
 		<year>1994</year>
 		<publisher>Konami</publisher>
 		<part name="cart" interface="snes_cart">
@@ -15371,7 +15371,7 @@ The software list will be divided in four categories:
 
 	<software name="madden93u" cloneof="madden93">
 		<!-- Serial:  - Release Date: 1992-11 -->
-		<description>John Madden Football '93 (USA, Rev. 1)</description>
+		<description>John Madden Football '93 (USA, rev. A)</description>
 		<year>1992</year>
 		<publisher>Electronic Arts</publisher>
 		<part name="cart" interface="snes_cart">
@@ -15732,7 +15732,7 @@ The software list will be divided in four categories:
 
 	<software name="jparku" cloneof="jpark">
 		<!-- Serial:  - Release Date: 1993-11 -->
-		<description>Jurassic Park (USA, Rev. 1)</description>
+		<description>Jurassic Park (USA, rev. A)</description>
 		<year>1993</year>
 		<publisher>Ocean</publisher>
 		<part name="cart" interface="snes_cart">
@@ -16134,7 +16134,7 @@ The software list will be divided in four categories:
 
 	<software name="keiba8s">
 		<!-- Serial: SHVC-8K - Release Date: 1993-12-10 - Alt. Title: 競馬エイトスペシャル ○秘 馬券購入術 -->
-		<description>Keiba Eight Special (Jpn, Rev. 1)</description>
+		<description>Keiba Eight Special (Jpn, rev. A)</description>
 		<year>1993</year>
 		<publisher>Misawa Entertainment</publisher>
 		<part name="cart" interface="snes_cart">
@@ -16499,7 +16499,7 @@ The software list will be divided in four categories:
 
 	<software name="kinstu" cloneof="kinst">
 		<!-- Serial:  - Release Date: 1995-08 -->
-		<description>Killer Instinct (USA, Rev. 1)</description>
+		<description>Killer Instinct (USA, rev. A)</description>
 		<year>1995</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="snes_cart">
@@ -17195,7 +17195,7 @@ The software list will be divided in four categories:
 	</software>
 
 	<software name="krusty">
-		<description>Krusty's Super Fun House (Euro, Rev. 1)</description>
+		<description>Krusty's Super Fun House (Euro, rev. A)</description>
 		<year>1992</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<part name="cart" interface="snes_cart">
@@ -17218,7 +17218,7 @@ The software list will be divided in four categories:
 
 	<software name="krustyu" cloneof="krusty">
 		<!-- Serial:  - Release Date: 1992-06 -->
-		<description>Krusty's Super Fun House (USA, Rev. 1)</description>
+		<description>Krusty's Super Fun House (USA, rev. A)</description>
 		<year>1992</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<part name="cart" interface="snes_cart">
@@ -17407,7 +17407,7 @@ The software list will be divided in four categories:
 
 	<software name="langriss">
 		<!-- Serial:  - Release Date: 1995-06-30 -->
-		<description>Der Langrisser (Jpn, Rev. 1)</description>
+		<description>Der Langrisser (Jpn, rev. A)</description>
 		<year>1995</year>
 		<publisher>Masaya</publisher>
 		<part name="cart" interface="snes_cart">
@@ -17443,7 +17443,7 @@ The software list will be divided in four categories:
 
 	<software name="larrynix" cloneof="tnnbass">
 		<!-- Serial: SHVC-QJ (KIS-4) - Release Date: 1994-09-23 - Alt. Title: ラリー・ニクソン スーパー・バス・フィッシング -->
-		<description>Larry Nixon's Super Bass Fishing (Jpn, Rev. 1)</description>
+		<description>Larry Nixon's Super Bass Fishing (Jpn, rev. A)</description>
 		<year>1994</year>
 		<publisher>King Records</publisher>
 		<part name="cart" interface="snes_cart">
@@ -17743,7 +17743,7 @@ The software list will be divided in four categories:
 
 	<software name="lemmingsu" cloneof="lemmings">
 		<!-- Serial:  - Release Date: 1992-03 -->
-		<description>Lemmings (USA, Rev. 1)</description>
+		<description>Lemmings (USA, rev. A)</description>
 		<year>1992</year>
 		<publisher>Sunsoft</publisher>
 		<part name="cart" interface="snes_cart">
@@ -18636,7 +18636,7 @@ The software list will be divided in four categories:
 	</software>
 
 	<software name="mickeymq">
-		<description>The Magical Quest Starring Mickey Mouse (Euro, Rev. 1)</description>
+		<description>The Magical Quest Starring Mickey Mouse (Euro, rev. A)</description>
 		<year>1992</year>
 		<publisher>Capcom</publisher>
 		<part name="cart" interface="snes_cart">
@@ -18658,7 +18658,7 @@ The software list will be divided in four categories:
 	</software>
 
 	<software name="mickeymqg" cloneof="mickeymq">
-		<description>The Magical Quest Starring Mickey Mouse (Ger, Rev. 1)</description>
+		<description>The Magical Quest Starring Mickey Mouse (Ger, rev. A)</description>
 		<year>1992</year>
 		<publisher>Capcom</publisher>
 		<part name="cart" interface="snes_cart">
@@ -18848,7 +18848,7 @@ The software list will be divided in four categories:
 
 	<software name="majtnseia" cloneof="majtnsei">
 		<!-- Serial:  - Release Date: 1994-01-28 -->
-		<description>Majin Tensei (Jpn, Rev. 1)</description>
+		<description>Majin Tensei (Jpn, rev. A)</description>
 		<year>1994</year>
 		<publisher>Atlus</publisher>
 		<part name="cart" interface="snes_cart">
@@ -18860,7 +18860,7 @@ The software list will be divided in four categories:
 
 	<software name="majtnsei">
 		<!-- Serial:  - Release Date: 1994-01-28 -->
-		<description>Majin Tensei (Jpn, Rev. 2)</description>
+		<description>Majin Tensei (Jpn, rev. B)</description>
 		<year>1994</year>
 		<publisher>Atlus</publisher>
 		<part name="cart" interface="snes_cart">
@@ -19328,7 +19328,7 @@ The software list will be divided in four categories:
 
 	<software name="haruaug3" supported="no">
 		<!-- Serial:  - Release Date: 1995-12-08 -->
-		<description>Masters New - Harukanaru Augusta 3 (Jpn, Rev. 1)</description>
+		<description>Masters New - Harukanaru Augusta 3 (Jpn, rev. A)</description>
 		<year>1993</year>
 		<publisher>T&amp;E Soft</publisher>
 		<part name="cart" interface="snes_cart">
@@ -19583,7 +19583,7 @@ The software list will be divided in four categories:
 
 	<software name="megamnxu" cloneof="megamnx">
 		<!-- Serial:  - Release Date: 1994-01 -->
-		<description>Mega Man X (USA, Rev. 1)</description>
+		<description>Mega Man X (USA, rev. A)</description>
 		<year>1994</year>
 		<publisher>Capcom</publisher>
 		<part name="cart" interface="snes_cart">
@@ -19853,7 +19853,7 @@ The software list will be divided in four categories:
 
 	<software name="mickeyma" cloneof="mickeymq">
 		<!-- Serial: SHVC-MI - Release Date: 1992-11-20 - Alt. Title: ミッキーのマジカルアドベンチャー -->
-		<description>Mickey no Magical Adventure (Jpn, Rev. 1)</description>
+		<description>Mickey no Magical Adventure (Jpn, rev. A)</description>
 		<year>1992</year>
 		<publisher>Capcom</publisher>
 		<part name="cart" interface="snes_cart">
@@ -20319,7 +20319,7 @@ The software list will be divided in four categories:
 
 	<software name="monopoly">
 		<!-- Serial:  - Release Date: 1992-09 -->
-		<description>Monopoly (USA, Rev. 1)</description>
+		<description>Monopoly (USA, rev. A)</description>
 		<year>1992</year>
 		<publisher>Parker Brothers</publisher>
 		<part name="cart" interface="snes_cart">
@@ -20401,7 +20401,7 @@ The software list will be divided in four categories:
 	</software>
 
 	<software name="mk">
-		<description>Mortal Kombat (Euro, Rev. 1)</description>
+		<description>Mortal Kombat (Euro, rev. A)</description>
 		<year>1993</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<part name="cart" interface="snes_cart">
@@ -20492,7 +20492,7 @@ The software list will be divided in four categories:
 	</software>
 
 	<software name="mk2">
-		<description>Mortal Kombat II (Euro, Rev. 1)</description>
+		<description>Mortal Kombat II (Euro, rev. A)</description>
 		<year>1994</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<part name="cart" interface="snes_cart">
@@ -20514,7 +20514,7 @@ The software list will be divided in four categories:
 	</software>
 
 	<software name="mk2u" cloneof="mk2">
-		<description>Mortal Kombat II (USA, Rev. 1)</description>
+		<description>Mortal Kombat II (USA, rev. A)</description>
 		<year>1994</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<part name="cart" interface="snes_cart">
@@ -21084,7 +21084,7 @@ The software list will be divided in four categories:
 	</software>
 
 	<software name="nbajam">
-		<description>NBA Jam (Euro, Rev. 1)</description>
+		<description>NBA Jam (Euro, rev. A)</description>
 		<year>1994</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<part name="cart" interface="snes_cart">
@@ -21119,7 +21119,7 @@ The software list will be divided in four categories:
 
 	<software name="nbajamu" cloneof="nbajam">
 		<!-- Serial:  - Release Date: 1994-03 -->
-		<description>NBA Jam (USA, Rev. 1)</description>
+		<description>NBA Jam (USA, rev. A)</description>
 		<year>1994</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<part name="cart" interface="snes_cart">
@@ -21352,7 +21352,7 @@ The software list will be divided in four categories:
 
 	<software name="ncaabask" cloneof="wlbasket">
 		<!-- Serial:  - Release Date: 1992-10 -->
-		<description>NCAA Basketball (USA, Rev. 1)</description>
+		<description>NCAA Basketball (USA, rev. A)</description>
 		<year>1992</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="snes_cart">
@@ -21458,7 +21458,7 @@ The software list will be divided in four categories:
 
 	<software name="new3daug">
 		<!-- Serial: SHVC-GA - Release Date: 1991-04-05 - ALt. Title: 遥かなるオーガスタ -->
-		<description>New 3D Golf Simulation - Harukanaru Augusta (Jpn, Rev. 1)</description>
+		<description>New 3D Golf Simulation - Harukanaru Augusta (Jpn, rev. A)</description>
 		<year>1991</year>
 		<publisher>T&amp;E Soft</publisher>
 		<part name="cart" interface="snes_cart">
@@ -21783,7 +21783,7 @@ The software list will be divided in four categories:
 	</software>
 
 	<software name="nhl97">
-		<description>NHL '97 (Euro, Rev. 1)</description>
+		<description>NHL '97 (Euro, rev. A)</description>
 		<year>1996</year>
 		<publisher>Electronic Arts</publisher>
 		<part name="cart" interface="snes_cart">
@@ -21982,7 +21982,7 @@ The software list will be divided in four categories:
 	</software>
 
 	<software name="nigelm">
-		<description>Nigel Mansell's World Championship Racing (Euro, Rev. 1)</description>
+		<description>Nigel Mansell's World Championship Racing (Euro, rev. A)</description>
 		<year>1993</year>
 		<publisher>Gremlin Interactive</publisher>
 		<part name="cart" interface="snes_cart">
@@ -22173,7 +22173,7 @@ The software list will be divided in four categories:
 
 	<software name="npmenu">
 		<!-- Serial:  - Release Date:  -->
-		<description>Nintendo Power Menu Program (Jpn, Rev. 1, NP)</description>
+		<description>Nintendo Power Menu Program (Jpn, rev. A, NP)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
@@ -22256,7 +22256,7 @@ The software list will be divided in four categories:
 
 	<software name="nobuyabh">
 		<!-- Serial: SHVC-NK - Release Date: 1993-12-09 - Alt. Title: 信長の野望 覇王伝 -->
-		<description>Nobunaga no Yabou - Haouden (Jpn, Rev. 1)</description>
+		<description>Nobunaga no Yabou - Haouden (Jpn, rev. A)</description>
 		<year>1993</year>
 		<publisher>Koei</publisher>
 		<part name="cart" interface="snes_cart">
@@ -23357,7 +23357,7 @@ The software list will be divided in four categories:
 
 	<software name="parlmini">
 		<!-- Serial:  - Release Date: 1996-04-26 -->
-		<description>Parlor! Mini - Pachinko Jikki Simulation Game (Jpn, Rev. 1)</description>
+		<description>Parlor! Mini - Pachinko Jikki Simulation Game (Jpn, rev. A)</description>
 		<year>1996</year>
 		<publisher>Nihon Telenet</publisher>
 		<part name="cart" interface="snes_cart">
@@ -23770,7 +23770,7 @@ The software list will be divided in four categories:
 
 	<software name="picrosv2">
 		<!-- Serial:  - Release Date: 1999-06-01 -->
-		<description>Picross NP Vol. 2 (Jpn, Rev. 1, NP)</description>
+		<description>Picross NP Vol. 2 (Jpn, rev. A, NP)</description>
 		<year>1999</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="snes_cart">
@@ -24910,7 +24910,7 @@ The software list will be divided in four categories:
 
 	<software name="mjkiwam2">
 		<!-- Serial:  - Release Date: 1994-07-19 -->
-		<description>Pro Mahjong Kiwame II (Jpn, Rev. 1)</description>
+		<description>Pro Mahjong Kiwame II (Jpn, rev. A)</description>
 		<year>1994</year>
 		<publisher>Athena</publisher>
 		<part name="cart" interface="snes_cart">
@@ -26114,7 +26114,7 @@ The software list will be divided in four categories:
 
 	<software name="rockmnx" cloneof="megamnx">
 		<!-- Serial: SHVC-RX - Release Date: 1993-12-17 - Alt. Title: ロックマンエックス - Notes: Also re-released through Nintendo Power -->
-		<description>Rockman X (Jpn, Rev. 1)</description>
+		<description>Rockman X (Jpn, rev. A)</description>
 		<year>1993</year>
 		<publisher>Capcom</publisher>
 		<part name="cart" interface="snes_cart">
@@ -26232,7 +26232,7 @@ The software list will be divided in four categories:
 
 	<software name="mvpbb">
 		<!-- Serial:  - Release Date: 1992-09 -->
-		<description>Roger Clemens' MVP Baseball (USA, Rev. 1)</description>
+		<description>Roger Clemens' MVP Baseball (USA, rev. A)</description>
 		<year>1992</year>
 		<publisher>LJN</publisher>
 		<part name="cart" interface="snes_cart">
@@ -26304,7 +26304,7 @@ The software list will be divided in four categories:
 
 	<software name="romsaga3">
 		<!-- Serial:  - Release Date: 1995-11-11 -->
-		<description>Romancing Sa-Ga 3 (Jpn, Rev. 1)</description>
+		<description>Romancing Sa-Ga 3 (Jpn, rev. A)</description>
 		<year>1995</year>
 		<publisher>Square</publisher>
 		<part name="cart" interface="snes_cart">
@@ -26670,7 +26670,7 @@ The software list will be divided in four categories:
 
 	<software name="sangoku3" cloneof="roman3k3">
 		<!-- Serial: SHVC-S3 - Release Date: 1992-11-08 - Alt. Title: 三国志III -->
-		<description>Sangokushi III (Jpn, Rev. 1)</description>
+		<description>Sangokushi III (Jpn, rev. A)</description>
 		<year>1992</year>
 		<publisher>Koei</publisher>
 		<part name="cart" interface="snes_cart">
@@ -26694,12 +26694,12 @@ The software list will be divided in four categories:
 
 	<software name="sangoku4" cloneof="roman3k4">
 		<!-- Serial:  - Release Date: 1994-12-09 -->
-		<description>Sangokushi IV (Jpn, Rev. 1)</description>
+		<description>Sangokushi IV (Jpn, rev. A)</description>
 		<year>1994</year>
 		<publisher>Koei</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="3145728">
-				<rom name="sangokushi iv (japan) (rev. 1).sfc" size="3145728" crc="57674647 " sha1="f1fdd94d71fbacc794a8a7ad82c217926fc94c6f" offset="000000" />
+				<rom name="sangokushi iv (japan) (rev. A).sfc" size="3145728" crc="57674647 " sha1="f1fdd94d71fbacc794a8a7ad82c217926fc94c6f" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -26885,7 +26885,7 @@ The software list will be divided in four categories:
 
 	<software name="sdgung">
 		<!-- Serial: SHVC-KG - Release Date: 1991-12-21 - Alt. Title: SDガンダム外伝 ナイトガンダム物語 大いなる遺産 -->
-		<description>SD Gundam Gaiden - Knight Gundam Monogatari - Ooinaru Isan (Jpn, Rev. 1)</description>
+		<description>SD Gundam Gaiden - Knight Gundam Monogatari - Ooinaru Isan (Jpn, rev. A)</description>
 		<year>1991</year>
 		<publisher>Angel</publisher>
 		<part name="cart" interface="snes_cart">
@@ -27163,7 +27163,7 @@ The software list will be divided in four categories:
 	</software>
 
 	<software name="mana">
-		<description>Secret of Mana (Euro, Rev. 1)</description>
+		<description>Secret of Mana (Euro, rev. A)</description>
 		<year>1993</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="snes_cart">
@@ -27185,7 +27185,7 @@ The software list will be divided in four categories:
 	</software>
 
 	<software name="manaf" cloneof="mana">
-		<description>Secret of Mana (Fra, Rev. 1)</description>
+		<description>Secret of Mana (Fra, rev. A)</description>
 		<year>1993</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="snes_cart">
@@ -27475,7 +27475,7 @@ The software list will be divided in four categories:
 
 	<software name="shangban">
 		<!-- Serial:  - Release Date: 1995-11-17 -->
-		<description>Shanghai - Banri no Choujou (Jpn, Rev. 1)</description>
+		<description>Shanghai - Banri no Choujou (Jpn, rev. A)</description>
 		<year>1995</year>
 		<publisher>Sunsoft</publisher>
 		<part name="cart" interface="snes_cart">
@@ -27699,7 +27699,7 @@ The software list will be divided in four categories:
 
 	<software name="shmegamt">
 		<!-- Serial: SHVC-ME - Release Date: 1992-10-30 - Alt. Title: 真・女神転生 - Notes: Also re-released through Nintendo Power -->
-		<description>Shin Megami Tensei (Jpn, Rev. 1)</description>
+		<description>Shin Megami Tensei (Jpn, rev. A)</description>
 		<year>1992</year>
 		<publisher>Atlus</publisher>
 		<part name="cart" interface="snes_cart">
@@ -28281,12 +28281,12 @@ The software list will be divided in four categories:
 
 	<software name="simearthj" cloneof="simearth">
 		<!-- Serial: SHVC-SE - Release Date: 1991-12-29 - Alt. Title: シムアース -->
-		<description>SimEarth - The Living Planet (Jpn, Rev. 1)</description>
+		<description>SimEarth - The Living Planet (Jpn, rev. A)</description>
 		<year>1991</year>
 		<publisher>Imagineer</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="786432">
-				<rom name="simearth - the living planet (japan) (rev. 1).sfc" size="786432" crc="df2c57ae" sha1="f8a46b9007eafd1f94cd61bf5f71bcb95465431f" offset="000000" />
+				<rom name="simearth - the living planet (japan) (rev. A).sfc" size="786432" crc="df2c57ae" sha1="f8a46b9007eafd1f94cd61bf5f71bcb95465431f" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -29279,7 +29279,7 @@ The software list will be divided in four categories:
 
 	<software name="speedyu" cloneof="speedy">
 		<!-- Serial:  - Release Date: 1995-08 -->
-		<description>Speedy Gonzales in Los Gatos Bandidos (USA, Rev. 1)</description>
+		<description>Speedy Gonzales in Los Gatos Bandidos (USA, rev. A)</description>
 		<year>1995</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<part name="cart" interface="snes_cart">
@@ -29548,7 +29548,7 @@ The software list will be divided in four categories:
 
 	<software name="starfox" cloneof="starwing">
 		<!-- Serial:  - Release Date: 1993-05 -->
-		<description>Star Fox (USA, Rev. 2)</description>
+		<description>Star Fox (USA, rev. B)</description>
 		<year>1993</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="snes_cart">
@@ -29766,7 +29766,7 @@ The software list will be divided in four categories:
 	</software>
 
 	<software name="starwing">
-		<description>Starwing (Euro, Rev. 1)</description>
+		<description>Starwing (Euro, rev. A)</description>
 		<year>1993</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="snes_cart">
@@ -29985,7 +29985,7 @@ The software list will be divided in four categories:
 	</software>
 
 	<software name="sf2t">
-		<description>Street Fighter II Turbo (Euro, Rev. 1)</description>
+		<description>Street Fighter II Turbo (Euro, rev. A)</description>
 		<year>1993</year>
 		<publisher>Capcom</publisher>
 		<part name="cart" interface="snes_cart">
@@ -30066,7 +30066,7 @@ The software list will be divided in four categories:
 	</software>
 
 	<software name="sracer">
-		<description>Street Racer (Euro, Rev. 1)</description>
+		<description>Street Racer (Euro, rev. A)</description>
 		<year>1994</year>
 		<publisher>Ubi Soft</publisher>
 		<part name="cart" interface="snes_cart">
@@ -30181,7 +30181,7 @@ The software list will be divided in four categories:
 
 	<software name="stuntfxu" cloneof="stuntfx">
 		<!-- Serial:  - Release Date: 1994-07 -->
-		<description>Stunt Race FX (USA, Rev. 1)</description>
+		<description>Stunt Race FX (USA, rev. A)</description>
 		<year>1994</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="snes_cart">
@@ -30604,7 +30604,7 @@ The software list will be divided in four categories:
 
 	<software name="sbtanku" cloneof="sbtank">
 		<!-- Serial:  - Release Date: 1992-06 -->
-		<description>Garry Kitchen's Super Battletank - War in the Gulf (USA, Rev. 1)</description>
+		<description>Garry Kitchen's Super Battletank - War in the Gulf (USA, rev. A)</description>
 		<year>1992</year>
 		<publisher>Absolute Entertainment</publisher>
 		<part name="cart" interface="snes_cart">
@@ -30746,7 +30746,7 @@ The software list will be divided in four categories:
 
 	<software name="sblkbas3">
 		<!-- Serial:  - Release Date: 1995-12-29 -->
-		<description>Super Black Bass 3 (Jpn, Rev. 1)</description>
+		<description>Super Black Bass 3 (Jpn, rev. A)</description>
 		<year>1995</year>
 		<publisher>Starfish</publisher>
 		<part name="cart" interface="snes_cart">
@@ -30991,7 +30991,7 @@ The software list will be divided in four categories:
 
 	<software name="sbbros" cloneof="spang">
 		<!-- Serial:  - Release Date: 1992-10 -->
-		<description>Super Buster Bros. (USA, Rev. 1)</description>
+		<description>Super Buster Bros. (USA, rev. A)</description>
 		<year>1992</year>
 		<publisher>Capcom</publisher>
 		<part name="cart" interface="snes_cart">
@@ -31038,7 +31038,7 @@ The software list will be divided in four categories:
 
 	<software name="scaesarj" cloneof="scaesar">
 		<!-- Serial: SHVC-KH - Release Date: 1993-10-21 - Alt. Title: スーパーカジノシーザースパレス -->
-		<description>Super Casino - Caesars Palace (Jpn, Rev. 1)</description>
+		<description>Super Casino - Caesars Palace (Jpn, rev. A)</description>
 		<year>1993</year>
 		<publisher>Coconuts Japan Entertainment</publisher>
 		<part name="cart" interface="snes_cart">
@@ -31284,7 +31284,7 @@ The software list will be divided in four categories:
 
 	<software name="dkongcj" cloneof="dkongc">
 		<!-- Serial:  - Release Date: 1994-11-26 -->
-		<description>Super Donkey Kong (Jpn, Rev. 1)</description>
+		<description>Super Donkey Kong (Jpn, rev. A)</description>
 		<year>1994</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="snes_cart">
@@ -31308,7 +31308,7 @@ The software list will be divided in four categories:
 
 	<software name="dkongc2j" cloneof="dkongc2">
 		<!-- Serial:  - Release Date: 1995-11-21 -->
-		<description>Super Donkey Kong 2 - Dixie &amp; Diddy (Jpn, Rev. 1)</description>
+		<description>Super Donkey Kong 2 - Dixie &amp; Diddy (Jpn, rev. A)</description>
 		<year>1995</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="snes_cart">
@@ -31332,7 +31332,7 @@ The software list will be divided in four categories:
 
 	<software name="dkongc3j" cloneof="dkongc3">
 		<!-- Serial:  - Release Date: 1996-11-23 -->
-		<description>Super Donkey Kong 3 - Nazo no Krems-tou (Jpn, Rev. 1)</description>
+		<description>Super Donkey Kong 3 - Nazo no Krems-tou (Jpn, rev. A)</description>
 		<year>1996</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="snes_cart">
@@ -31655,7 +31655,7 @@ The software list will be divided in four categories:
 
 	<software name="sfamist4">
 		<!-- Serial:  - Release Date: 1995-03-03 -->
-		<description>Super Famista 4 (Jpn, Rev. 1)</description>
+		<description>Super Famista 4 (Jpn, rev. A)</description>
 		<year>1995</year>
 		<publisher>Namco</publisher>
 		<part name="cart" interface="snes_cart">
@@ -31751,7 +31751,7 @@ The software list will be divided in four categories:
 
 	<software name="fireprw3">
 		<!-- Serial: SHVC-F3 - Release Date: 1993-12-29 - Alt. Title: スーパーファイヤープロレスリング3 ファイナルバウト -->
-		<description>Super Fire Pro Wrestling III - Final Bout (Jpn, Rev. 1)</description>
+		<description>Super Fire Pro Wrestling III - Final Bout (Jpn, rev. A)</description>
 		<year>1993</year>
 		<publisher>Human Entertainment</publisher>
 		<part name="cart" interface="snes_cart">
@@ -31775,7 +31775,7 @@ The software list will be divided in four categories:
 
 	<software name="fireprws">
 		<!-- Serial:  - Release Date: 1994-12-22 -->
-		<description>Super Fire Pro Wrestling Special (Jpn, Rev. 1)</description>
+		<description>Super Fire Pro Wrestling Special (Jpn, rev. A)</description>
 		<year>1994</year>
 		<publisher>Human Entertainment</publisher>
 		<part name="cart" interface="snes_cart">
@@ -32012,7 +32012,7 @@ The software list will be divided in four categories:
 
 	<software name="sgodzilj" cloneof="sgodzil">
 		<!-- Serial: SHVC-7G - Release Date: 1993-12-22 - Alt. Title: 超ゴジラ -->
-		<description>Super Godzilla (Jpn, Rev. 1)</description>
+		<description>Super Godzilla (Jpn, rev. A)</description>
 		<year>1993</year>
 		<publisher>Toho</publisher>
 		<part name="cart" interface="snes_cart">
@@ -32351,7 +32351,7 @@ The software list will be divided in four categories:
 
 	<software name="sjinsei">
 		<!-- Serial:  - Release Date: 1994-03-18 -->
-		<description>Super Jinsei Game (Jpn, Rev. 1)</description>
+		<description>Super Jinsei Game (Jpn, rev. A)</description>
 		<year>1994</year>
 		<publisher>Takara</publisher>
 		<part name="cart" interface="snes_cart">
@@ -32471,7 +32471,7 @@ The software list will be divided in four categories:
 
 	<software name="superkyo">
 		<!-- Serial:  - Release Date: 1995-06-30 -->
-		<description>Super Kyoutei (Jpn, Rev. 1)</description>
+		<description>Super Kyoutei (Jpn, rev. A)</description>
 		<year>1995</year>
 		<publisher>Nichibutsu</publisher>
 		<part name="cart" interface="snes_cart">
@@ -32579,7 +32579,7 @@ The software list will be divided in four categories:
 
 	<software name="supermj2">
 		<!-- Serial: SHVC-2A - Release Date: 1993-12-02 - Alt. Title: スーパー麻雀2 本格4人打ち！ -->
-		<description>Super Mahjong 2 - Honkaku 4-nin Uchi! (Jpn, Rev. 1)</description>
+		<description>Super Mahjong 2 - Honkaku 4-nin Uchi! (Jpn, rev. A)</description>
 		<year>1993</year>
 		<publisher>I'Max</publisher>
 		<part name="cart" interface="snes_cart">
@@ -32628,7 +32628,7 @@ The software list will be divided in four categories:
 
 	<software name="supermjtb" cloneof="supermjt">
 		<!-- Serial: SHVC-IQ - Release Date: 1992-09-12 - Alt. Title: スーパー麻雀大会 -->
-		<description>Super Mahjong Taikai (Jpn, Rev. 1)</description>
+		<description>Super Mahjong Taikai (Jpn, rev. A)</description>
 		<year>1992</year>
 		<publisher>Koei</publisher>
 		<part name="cart" interface="snes_cart">
@@ -32640,7 +32640,7 @@ The software list will be divided in four categories:
 
 	<software name="supermjta" cloneof="supermjt">
 		<!-- Serial: SHVC-IQ - Release Date: 1992-09-12 - Alt. Title: スーパー麻雀大会 -->
-		<description>Super Mahjong Taikai (Jpn, Rev. 2)</description>
+		<description>Super Mahjong Taikai (Jpn, rev. B)</description>
 		<year>1992</year>
 		<publisher>Koei</publisher>
 		<part name="cart" interface="snes_cart">
@@ -32652,7 +32652,7 @@ The software list will be divided in four categories:
 
 	<software name="supermjt">
 		<!-- Serial: SHVC-IQ - Release Date: 1992-09-12 - Alt. Title: スーパー麻雀大会 -->
-		<description>Super Mahjong Taikai (Jpn, Rev. 3)</description>
+		<description>Super Mahjong Taikai (Jpn, rev. C)</description>
 		<year>1992</year>
 		<publisher>Koei</publisher>
 		<part name="cart" interface="snes_cart">
@@ -32676,7 +32676,7 @@ The software list will be divided in four categories:
 
 	<software name="smw2ja" cloneof="smw2">
 		<!-- Serial:  - Release Date: 1995-08-05 -->
-		<description>Super Mario - Yossy Island (Jpn, Rev. 1)</description>
+		<description>Super Mario - Yossy Island (Jpn, rev. A)</description>
 		<year>1995</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="snes_cart">
@@ -32688,7 +32688,7 @@ The software list will be divided in four categories:
 
 	<software name="smw2j" cloneof="smw2">
 		<!-- Serial:  - Release Date: 1995-08-05 -->
-		<description>Super Mario - Yossy Island (Jpn, Rev. 2)</description>
+		<description>Super Mario - Yossy Island (Jpn, rev. B)</description>
 		<year>1995</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="snes_cart">
@@ -32758,7 +32758,7 @@ The software list will be divided in four categories:
 
 	<software name="smcoll" cloneof="smas">
 		<!-- Serial: SHVC-4M - Release Date: 1993-07-14 - Alt. Title: スーパーマリオコレクション - Notes: Also re-released through Nintendo Power -->
-		<description>Super Mario Collection (Jpn, Rev. 1)</description>
+		<description>Super Mario Collection (Jpn, rev. A)</description>
 		<year>1993</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="snes_cart">
@@ -32840,7 +32840,7 @@ The software list will be divided in four categories:
 	</software>
 
 	<software name="smw">
-		<description>Super Mario World (Euro, Rev. 1)</description>
+		<description>Super Mario World (Euro, rev. A)</description>
 		<year>1991</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="snes_cart">
@@ -32886,7 +32886,7 @@ The software list will be divided in four categories:
 	</software>
 
 	<software name="smw2">
-		<description>Super Mario World 2 - Yoshi's Island (Euro, Rev. 1)</description>
+		<description>Super Mario World 2 - Yoshi's Island (Euro, rev. A)</description>
 		<year>1995</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="snes_cart">
@@ -32909,7 +32909,7 @@ The software list will be divided in four categories:
 
 	<software name="smw2u" cloneof="smw2">
 		<!-- Serial:  - Release Date: 1995-10 -->
-		<description>Super Mario World 2 - Yoshi's Island (USA, Rev. 1)</description>
+		<description>Super Mario World 2 - Yoshi's Island (USA, rev. A)</description>
 		<year>1995</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="snes_cart">
@@ -33003,7 +33003,7 @@ The software list will be divided in four categories:
 
 	<software name="smomo3a" cloneof="smomo3">
 		<!-- Serial:  - Release Date: 1994-12-09 -->
-		<description>Super Momotarou Dentetsu III (Jpn, Rev. 1)</description>
+		<description>Super Momotarou Dentetsu III (Jpn, rev. A)</description>
 		<year>1994</year>
 		<publisher>Hudson</publisher>
 		<part name="cart" interface="snes_cart">
@@ -33015,7 +33015,7 @@ The software list will be divided in four categories:
 
 	<software name="smomo3b" cloneof="smomo3">
 		<!-- Serial:  - Release Date: 1994-12-09 -->
-		<description>Super Momotarou Dentetsu III (Jpn, Rev. 2)</description>
+		<description>Super Momotarou Dentetsu III (Jpn, rev. B)</description>
 		<year>1994</year>
 		<publisher>Hudson</publisher>
 		<part name="cart" interface="snes_cart">
@@ -33183,7 +33183,7 @@ The software list will be divided in four categories:
 
 	<software name="snobu" cloneof="nobunaga">
 		<!-- Serial: SHVC-IZ - Release Date: 1991-12-21 - Alt. Title: スーパー信長の野望 武将風雲録 -->
-		<description>Super Nobunaga no Yabou - Bushou Fuuunroku (Jpn, Rev. 1)</description>
+		<description>Super Nobunaga no Yabou - Bushou Fuuunroku (Jpn, rev. A)</description>
 		<year>1991</year>
 		<publisher>Koei</publisher>
 		<part name="cart" interface="snes_cart">
@@ -33394,7 +33394,7 @@ The software list will be divided in four categories:
 
 	<software name="spinbalu" cloneof="spinbal">
 		<!-- Serial:  - Release Date: 1994-11 -->
-		<description>Super Pinball - Behind the Mask (USA, Rev. 1)</description>
+		<description>Super Pinball - Behind the Mask (USA, rev. A)</description>
 		<year>1994</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="snes_cart">
@@ -33454,7 +33454,7 @@ The software list will be divided in four categories:
 
 	<software name="spleagu2">
 		<!-- Serial:  - Release Date: 1994-08-02 -->
-		<description>Super Power League 2 (Jpn, Rev. 1)</description>
+		<description>Super Power League 2 (Jpn, rev. A)</description>
 		<year>1994</year>
 		<publisher>Hudson</publisher>
 		<part name="cart" interface="snes_cart">
@@ -33595,7 +33595,7 @@ The software list will be divided in four categories:
 
 	<software name="spuyopuya" cloneof="spuyopuy">
 		<!-- Serial: SHVC-PQ - Release Date: 1993-12-10 - Alt. Title: す～ぱ～ぷよぷよ -->
-		<description>Super Puyo Puyo (Jpn, Rev. 1)</description>
+		<description>Super Puyo Puyo (Jpn, rev. A)</description>
 		<year>1993</year>
 		<publisher>Banpresto</publisher>
 		<part name="cart" interface="snes_cart">
@@ -33607,7 +33607,7 @@ The software list will be divided in four categories:
 
 	<software name="spuyopuy">
 		<!-- Serial: SHVC-PQ - Release Date: 1993-12-10 - Alt. Title: す～ぱ～ぷよぷよ -->
-		<description>Super Puyo Puyo (Jpn, Rev. 2)</description>
+		<description>Super Puyo Puyo (Jpn, rev. B)</description>
 		<year>1993</year>
 		<publisher>Banpresto</publisher>
 		<part name="cart" interface="snes_cart">
@@ -33786,7 +33786,7 @@ The software list will be divided in four categories:
 
 	<software name="ssango2" cloneof="roman3k2">
 		<!-- Serial: SHVC-XL - Release Date: 1991-09-15 - Alt. Title: スーパー 三国志II -->
-		<description>Super Sangokushi II (Jpn, Rev. 1)</description>
+		<description>Super Sangokushi II (Jpn, rev. A)</description>
 		<year>1991</year>
 		<publisher>Koei</publisher>
 		<part name="cart" interface="snes_cart">
@@ -34045,7 +34045,7 @@ The software list will be divided in four categories:
 	</software>
 
 	<software name="supersw">
-		<description>Super Star Wars (Euro, Rev. 1)</description>
+		<description>Super Star Wars (Euro, rev. A)</description>
 		<year>1992</year>
 		<publisher>JVC</publisher>
 		<part name="cart" interface="snes_cart">
@@ -34091,7 +34091,7 @@ The software list will be divided in four categories:
 
 	<software name="superswu" cloneof="supersw">
 		<!-- Serial:  - Release Date: 1992-11 -->
-		<description>Super Star Wars (USA, Rev. 1)</description>
+		<description>Super Star Wars (USA, rev. A)</description>
 		<year>1992</year>
 		<publisher>JVC</publisher>
 		<part name="cart" interface="snes_cart">
@@ -34126,7 +34126,7 @@ The software list will be divided in four categories:
 	</software>
 
 	<software name="suprjedi">
-		<description>Super Star Wars - Return of the Jedi (Euro, Rev. 1)</description>
+		<description>Super Star Wars - Return of the Jedi (Euro, rev. A)</description>
 		<year>1994</year>
 		<publisher>JVC</publisher>
 		<part name="cart" interface="snes_cart">
@@ -34149,7 +34149,7 @@ The software list will be divided in four categories:
 
 	<software name="suprjediu" cloneof="suprjedi">
 		<!-- Serial:  - Release Date: 1994-10 -->
-		<description>Super Star Wars - Return of the Jedi (USA, Rev. 1)</description>
+		<description>Super Star Wars - Return of the Jedi (USA, rev. A)</description>
 		<year>1994</year>
 		<publisher>JVC</publisher>
 		<part name="cart" interface="snes_cart">
@@ -34195,7 +34195,7 @@ The software list will be divided in four categories:
 	</software>
 
 	<software name="superesb">
-		<description>Super Star Wars - The Empire Strikes Back (Euro, Rev. 1)</description>
+		<description>Super Star Wars - The Empire Strikes Back (Euro, rev. A)</description>
 		<year>1993</year>
 		<publisher>JVC</publisher>
 		<part name="cart" interface="snes_cart">
@@ -34218,7 +34218,7 @@ The software list will be divided in four categories:
 
 	<software name="superesbu" cloneof="superesb">
 		<!-- Serial:  - Release Date: 1993-10 -->
-		<description>Super Star Wars - The Empire Strikes Back (USA, Rev. 1)</description>
+		<description>Super Star Wars - The Empire Strikes Back (USA, rev. A)</description>
 		<year>1993</year>
 		<publisher>JVC</publisher>
 		<part name="cart" interface="snes_cart">
@@ -34346,7 +34346,7 @@ The software list will be divided in four categories:
 	</software>
 
 	<software name="stennis">
-		<description>Super Tennis (Euro, Rev. 1)</description>
+		<description>Super Tennis (Euro, rev. A)</description>
 		<year>1991</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="snes_cart">
@@ -34404,7 +34404,7 @@ The software list will be divided in four categories:
 
 	<software name="stetris2">
 		<!-- Serial: SHVC-T2 - Release Date: 1992-12-18 - Alt. Title: スーパーテトリス2＋ボンブリス -->
-		<description>Super Tetris 2 + Bombliss (Jpn, Rev. 1)</description>
+		<description>Super Tetris 2 + Bombliss (Jpn, rev. A)</description>
 		<year>1992</year>
 		<publisher>Bullet-Proof Software</publisher>
 		<part name="cart" interface="snes_cart">
@@ -34639,7 +34639,7 @@ The software list will be divided in four categories:
 
 	<software name="superuno">
 		<!-- Serial: SHVC-UN - Release Date: 1993-11-12 - Alt. Title: スーパーUNO -->
-		<description>Super Uno (Jpn, Rev. 1)</description>
+		<description>Super Uno (Jpn, rev. A)</description>
 		<year>1993</year>
 		<publisher>Tomy</publisher>
 		<part name="cart" interface="snes_cart">
@@ -35141,7 +35141,7 @@ The software list will be divided in four categories:
 
 	<software name="tactogrea" cloneof="tactogre">
 		<!-- Serial:  - Release Date: 1995-10-06 -->
-		<description>Tactics Ogre - Let Us Cling Together (Jpn, Rev. 1)</description>
+		<description>Tactics Ogre - Let Us Cling Together (Jpn, rev. A)</description>
 		<year>1995</year>
 		<publisher>Quest</publisher>
 		<part name="cart" interface="snes_cart">
@@ -35153,7 +35153,7 @@ The software list will be divided in four categories:
 
 	<software name="tactogre">
 		<!-- Serial:  - Release Date: 1995-10-06 -->
-		<description>Tactics Ogre - Let Us Cling Together (Jpn, Rev. 2)</description>
+		<description>Tactics Ogre - Let Us Cling Together (Jpn, rev. B)</description>
 		<year>1995</year>
 		<publisher>Quest</publisher>
 		<part name="cart" interface="snes_cart">
@@ -35426,7 +35426,7 @@ The software list will be divided in four categories:
 
 	<software name="tazmaniau" cloneof="tazmania">
 		<!-- Serial:  - Release Date: 1993-05 -->
-		<description>Taz-Mania (USA, Rev. 1)</description>
+		<description>Taz-Mania (USA, rev. A)</description>
 		<year>1993</year>
 		<publisher>Sunsoft</publisher>
 		<part name="cart" interface="snes_cart">
@@ -35613,7 +35613,7 @@ The software list will be divided in four categories:
 
 	<software name="tecmonbaj" cloneof="tecmonba">
 		<!-- Serial: SHVC-NA - Release Date: 1992-12-25 - Alt. Title: テクモスーパーNBAバスケットボール -->
-		<description>Tecmo Super NBA Basketball (Jpn, Rev. 1)</description>
+		<description>Tecmo Super NBA Basketball (Jpn, rev. A)</description>
 		<year>1992</year>
 		<publisher>Tecmo</publisher>
 		<part name="cart" interface="snes_cart">
@@ -35763,7 +35763,7 @@ The software list will be divided in four categories:
 
 	<software name="teiketsu" cloneof="pto">
 		<!-- Serial: SHVC-TK - Release Date: 1992-09-24 - Alt. Title: 提督の決断 -->
-		<description>Teitoku no Ketsudan (Jpn, Rev. 1)</description>
+		<description>Teitoku no Ketsudan (Jpn, rev. A)</description>
 		<year>1992</year>
 		<publisher>Koei</publisher>
 		<part name="cart" interface="snes_cart">
@@ -35787,7 +35787,7 @@ The software list will be divided in four categories:
 
 	<software name="teikets2" cloneof="pto2">
 		<!-- Serial:  - Release Date: 1995-02-17 -->
-		<description>Teitoku no Ketsudan II (Jpn, Rev. 1)</description>
+		<description>Teitoku no Ketsudan II (Jpn, rev. A)</description>
 		<year>1995</year>
 		<publisher>Koei</publisher>
 		<part name="cart" interface="snes_cart">
@@ -36007,7 +36007,7 @@ The software list will be divided in four categories:
 	</software>
 
 	<software name="terranigg" cloneof="terranig">
-		<description>Terranigma (Ger, Rev. 1)</description>
+		<description>Terranigma (Ger, rev. A)</description>
 		<year>1996</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="snes_cart">
@@ -36075,7 +36075,7 @@ The software list will be divided in four categories:
 
 	<software name="tetris2u" cloneof="tetris2">
 		<!-- Serial:  - Release Date: 1994-08 -->
-		<description>Tetris 2 (USA, Rev. 1)</description>
+		<description>Tetris 2 (USA, rev. A)</description>
 		<year>1994</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="snes_cart">
@@ -36448,7 +36448,7 @@ The software list will be divided in four categories:
 
 	<software name="ttoonadv">
 		<!-- Serial: SHVC-TA - Release Date: 1992-12-18 - Alt. Title: タイニートゥーン アドベンチャーズ -->
-		<description>Tiny Toon Adventures (Jpn, Rev. 1)</description>
+		<description>Tiny Toon Adventures (Jpn, rev. A)</description>
 		<year>1992</year>
 		<publisher>Konami</publisher>
 		<part name="cart" interface="snes_cart">
@@ -36551,7 +36551,7 @@ The software list will be divided in four categories:
 	</software>
 
 	<software name="ttoonwak">
-		<description>Tiny Toon Adventures - Wild &amp; Wacky Sports (Euro, Rev. 1)</description>
+		<description>Tiny Toon Adventures - Wild &amp; Wacky Sports (Euro, rev. A)</description>
 		<year>1994</year>
 		<publisher>Konami</publisher>
 		<part name="cart" interface="snes_cart">
@@ -36620,7 +36620,7 @@ The software list will be divided in four categories:
 
 	<software name="tokimeki">
 		<!-- Serial:  - Release Date: 1996-02-09 -->
-		<description>Tokimeki Memorial - Densetsu no Ki no Shita de (Jpn, Rev. 1)</description>
+		<description>Tokimeki Memorial - Densetsu no Ki no Shita de (Jpn, rev. A)</description>
 		<year>1996</year>
 		<publisher>Konami</publisher>
 		<part name="cart" interface="snes_cart">
@@ -36854,7 +36854,7 @@ The software list will be divided in four categories:
 
 	<software name="torneco">
 		<!-- Serial: SHVC-TQ - Release Date: 1993-09-19 - Alt. Title: 不思議のダンジョン トルネコの大冒険 - Notes: Also re-released through Nintendo Power -->
-		<description>Torneco no Daibouken - Fushigi no Dungeon (Jpn, Rev. 1)</description>
+		<description>Torneco no Daibouken - Fushigi no Dungeon (Jpn, rev. A)</description>
 		<year>1993</year>
 		<publisher>Chunsoft</publisher>
 		<part name="cart" interface="snes_cart">
@@ -37766,7 +37766,7 @@ The software list will be divided in four categories:
 
 	<software name="uminushi">
 		<!-- Serial:  - Release Date: 1996-07-19 -->
-		<description>Umi no Nushi Tsuri (Jpn, Rev. 1)</description>
+		<description>Umi no Nushi Tsuri (Jpn, rev. A)</description>
 		<year>1996</year>
 		<publisher>Pack-In-Video</publisher>
 		<part name="cart" interface="snes_cart">
@@ -37931,7 +37931,7 @@ The software list will be divided in four categories:
 
 	<software name="usaiceh" cloneof="prosport">
 		<!-- Serial: SHVC-UI - Release Date: 1993-03-19 - Alt. Title: U.S.A.アイスホッケー -->
-		<description>USA Ice Hockey (Jpn, Rev. 1)</description>
+		<description>USA Ice Hockey (Jpn, rev. A)</description>
 		<year>1993</year>
 		<publisher>Jaleco</publisher>
 		<part name="cart" interface="snes_cart">
@@ -38757,7 +38757,7 @@ The software list will be divided in four categories:
 
 	<software name="wildtrax" cloneof="stuntfx">
 		<!-- Serial:  - Release Date: 1994-06-04 -->
-		<description>Wild Trax (Jpn, Rev. 1)</description>
+		<description>Wild Trax (Jpn, rev. A)</description>
 		<year>1994</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="snes_cart">
@@ -38895,7 +38895,7 @@ The software list will be divided in four categories:
 
 	<software name="winpost">
 		<!-- Serial: SHVC-WJ - Release Date: 1993-09-10 - Alt. Title: ウイニングポスト -->
-		<description>Winning Post (Jpn, Rev. 1)</description>
+		<description>Winning Post (Jpn, rev. A)</description>
 		<year>1993</year>
 		<publisher>Koei</publisher>
 		<part name="cart" interface="snes_cart">
@@ -38931,7 +38931,7 @@ The software list will be divided in four categories:
 
 	<software name="winpst96">
 		<!-- Serial:  - Release Date: 1996-10-04 -->
-		<description>Winning Post 2 - Program '96 (Jpn, Rev. 1)</description>
+		<description>Winning Post 2 - Program '96 (Jpn, rev. A)</description>
 		<year>1996</year>
 		<publisher>Koei</publisher>
 		<part name="cart" interface="snes_cart">
@@ -39024,7 +39024,7 @@ The software list will be divided in four categories:
 
 	<software name="wizardg4">
 		<!-- Serial:  - Release Date: 1996-09-20 -->
-		<description>Wizardry Gaiden IV - Taima no Kodou (Jpn, Rev. 1)</description>
+		<description>Wizardry Gaiden IV - Taima no Kodou (Jpn, rev. A)</description>
 		<year>1996</year>
 		<publisher>ASCII Entertainment</publisher>
 		<part name="cart" interface="snes_cart">
@@ -39900,7 +39900,7 @@ The software list will be divided in four categories:
 
 	<software name="yokoms">
 		<!-- Serial: SHVC-3G - Release Date: 1992-06-26 - Alt. Title: 横山光輝 三国志 -->
-		<description>Yokoyama Mitsuteru Sangokushi (Jpn, Rev. 1)</description>
+		<description>Yokoyama Mitsuteru Sangokushi (Jpn, rev. A)</description>
 		<year>1992</year>
 		<publisher>Angel</publisher>
 		<part name="cart" interface="snes_cart">
@@ -40357,7 +40357,7 @@ The software list will be divided in four categories:
 
 	<software name="zelda3ja" cloneof="zelda3">
 		<!-- Serial: SHVC-ZL - Release Date: 1991-11-21 - Alt. Title: ゼルダの伝説 神々のトライフォース - Notes: Also re-released through Nintendo Power -->
-		<description>Zelda no Densetsu - Kamigami no Triforce (Jpn, Rev. 1)</description>
+		<description>Zelda no Densetsu - Kamigami no Triforce (Jpn, rev. A)</description>
 		<year>1991</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="snes_cart">
@@ -40369,7 +40369,7 @@ The software list will be divided in four categories:
 
 	<software name="zelda3j" cloneof="zelda3">
 		<!-- Serial: SHVC-ZL - Release Date: 1991-11-21 - Alt. Title: ゼルダの伝説 神々のトライフォース - Notes: Also re-released through Nintendo Power -->
-		<description>Zelda no Densetsu - Kamigami no Triforce (Jpn, Rev. 2)</description>
+		<description>Zelda no Densetsu - Kamigami no Triforce (Jpn, rev. B)</description>
 		<year>1991</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="snes_cart">
@@ -40512,7 +40512,7 @@ The software list will be divided in four categories:
 	</software>
 
 	<software name="zero">
-		<description>Zero the Kamikaze Squirrel (Euro, Rev. 1)</description>
+		<description>Zero the Kamikaze Squirrel (Euro, rev. A)</description>
 		<year>1994</year>
 		<publisher>Sunsoft</publisher>
 		<part name="cart" interface="snes_cart">
@@ -40802,7 +40802,7 @@ The software list will be divided in four categories:
 	</software>
 
 	<software name="sgboyju">
-		<description>Super Game Boy (Jpn, USA, Rev. 1)</description>
+		<description>Super Game Boy (Jpn, USA, rev. A)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
@@ -40813,7 +40813,7 @@ The software list will be divided in four categories:
 	</software>
 
 	<software name="sgboy">
-		<description>Super Game Boy (World, Rev. 2)</description>
+		<description>Super Game Boy (World, rev. B)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
