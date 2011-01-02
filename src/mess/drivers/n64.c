@@ -109,7 +109,9 @@ static DEVICE_IMAGE_LOAD(n64_cart)
 	UINT8 *cart = image.device().machine->region("user2")->base();
 
 	if (image.software_entry() == NULL)
+	{
 		length = image.fread( cart, 0x4000000);
+	}
 	else
 	{
 		length = image.get_software_region_length("rom");
@@ -179,9 +181,9 @@ static MACHINE_CONFIG_START( n64, _n64_state )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("dac1", DMADAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ADD("dac2", DMADAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MCFG_SOUND_ADD("dac1", DMADAC, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
 	/* cartridge */
