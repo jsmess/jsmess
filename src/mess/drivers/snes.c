@@ -8,6 +8,7 @@
   Anthony Kruize
   Angelo Salese
   Fabio Priuli
+  byuu
   Based on the original MESS driver by Lee Hammerton (aka Savoury Snax)
 
   Driver is preliminary right now.
@@ -31,6 +32,7 @@
 #include "cpu/spc700/spc700.h"
 #include "cpu/superfx/superfx.h"
 #include "cpu/g65816/g65816.h"
+#include "cpu/upd7725/upd7725.h"
 #include "includes/snes.h"
 #include "machine/snescart.h"
 #include "crsshair.h"
@@ -87,7 +89,13 @@ static ADDRESS_MAP_START( spc_map, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xffc0, 0xffff) AM_DEVREAD("spc700", spc_ipl_r)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( dsp_prg_map, ADDRESS_SPACE_PROGRAM, 32 )
+	AM_RANGE(0x0000, 0x07ff) AM_ROM AM_REGION("dspprg", 0)
+ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( dsp_data_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x0000, 0x03ff) AM_ROM AM_REGION("dspdata", 0)
+ADDRESS_MAP_END
 
 /*************************************
  *
@@ -695,6 +703,10 @@ static MACHINE_CONFIG_START( snes_base, snes_state )
 	MCFG_CPU_ADD("soundcpu", SPC700, 1024000)	/* 1.024 MHz */
 	MCFG_CPU_PROGRAM_MAP(spc_map)
 
+	MCFG_CPU_ADD("dsp", UPD7725, 8000000)
+	MCFG_CPU_PROGRAM_MAP(dsp_prg_map)
+	MCFG_CPU_DATA_MAP(dsp_data_map)
+
 	//MCFG_QUANTUM_TIME(HZ(48000))
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
@@ -774,11 +786,16 @@ ROM_START( snes )
 	ROM_REGION( 0x100, "user5", 0 )		/* IPL ROM */
 	ROM_LOAD( "spc700.rom", 0, 0x40, CRC(44bb3a40) SHA1(97e352553e94242ae823547cd853eecda55c20f0) )	/* boot rom */
 
-	ROM_REGION( 0x1000, "addons", 0 )		/* add-on chip ROMs (DSP, SFX, etc) */
-	ROM_LOAD_OPTIONAL( "dsp1data.bin", 0x000000, 0x000800, CRC(4b02d66d) SHA1(1534f4403d2a0f68ba6e35186fe7595d33de34b1) )
-	ROM_LOAD_OPTIONAL( "dsp3data.bin", 0x000800, 0x000800, CRC(4a1c5453) SHA1(2f69c652109938cde21df5eb89890bf090256dbb) )
+	ROM_REGION( 0x10000, "addons", 0 )		/* add-on chip ROMs (DSP, SFX, etc) */
+	ROM_LOAD( "dsp1b.bin", SNES_DSP1B_OFFSET, 0x002800, CRC(453557e0) SHA1(3a218b0e4572a8eba6d0121b17fdac9529609220) ) 
+	ROM_LOAD( "dsp1.bin",  SNES_DSP1_OFFSET,  0x002800, CRC(2838f9f5) SHA1(0a03ccb1fd2bea91151c745a4d1f217ae784f889) ) 
+	ROM_LOAD( "dsp2.bin",  SNES_DSP2_OFFSET,  0x002800, CRC(8e9fbd9b) SHA1(06dd9fcb118d18f6bbe234e013cb8780e06d6e63) ) 
+	ROM_LOAD( "dsp3.bin",  SNES_DSP3_OFFSET,  0x002800, CRC(6b86728a) SHA1(1b133741fad810eb7320c21ecfdd427d25a46da1) ) 
+	ROM_LOAD( "dsp4.bin",  SNES_DSP4_OFFSET,  0x002800, CRC(ce0c7783) SHA1(76fd25f7dc26c3b3f7868a3aa78c7684068713e5) ) 
 
 	ROM_REGION( MAX_SNES_CART_SIZE, "cart", ROMREGION_ERASE00 )
+	ROM_REGION( 0x2000, "dspprg", ROMREGION_ERASEFF)
+	ROM_REGION( 0x800, "dspdata", ROMREGION_ERASEFF)
 ROM_END
 
 ROM_START( snessfx )
@@ -787,10 +804,11 @@ ROM_START( snessfx )
 	ROM_REGION( 0x100, "user5", 0 )		/* IPL ROM */
 	ROM_LOAD( "spc700.rom", 0, 0x40, CRC(44bb3a40) SHA1(97e352553e94242ae823547cd853eecda55c20f0) )	/* boot rom */
 
-	ROM_REGION( 0x1000, "addons", 0 )		/* add-on chip ROMs (DSP, SFX, etc) */
-	ROM_LOAD_OPTIONAL( "dsp1data.bin", 0x000000, 0x000800, CRC(4b02d66d) SHA1(1534f4403d2a0f68ba6e35186fe7595d33de34b1) )
+	ROM_REGION( 0x10000, "addons", ROMREGION_ERASE00 )		/* add-on chip ROMs (DSP, SFX, etc) */
 
 	ROM_REGION( MAX_SNES_CART_SIZE, "cart", ROMREGION_ERASE00 )
+	ROM_REGION( 0x2000, "dspprg", ROMREGION_ERASEFF)
+	ROM_REGION( 0x800, "dspdata", ROMREGION_ERASEFF)
 ROM_END
 
 ROM_START( snespal )
@@ -799,11 +817,16 @@ ROM_START( snespal )
 	ROM_REGION( 0x100, "user5", 0 )		/* IPL ROM */
 	ROM_LOAD( "spc700.rom", 0, 0x40, CRC(44bb3a40) SHA1(97e352553e94242ae823547cd853eecda55c20f0) )	/* boot rom */
 
-	ROM_REGION( 0x1000, "addons", 0 )		/* add-on chip ROMs (DSP, SFX, etc) */
-	ROM_LOAD_OPTIONAL( "dsp1data.bin", 0x000000, 0x000800, CRC(4b02d66d) SHA1(1534f4403d2a0f68ba6e35186fe7595d33de34b1) )
-	ROM_LOAD_OPTIONAL( "dsp3data.bin", 0x000800, 0x000800, CRC(4a1c5453) SHA1(2f69c652109938cde21df5eb89890bf090256dbb) )
+	ROM_REGION( 0x10000, "addons", 0 )		/* add-on chip ROMs (DSP, SFX, etc) */
+	ROM_LOAD( "dsp1b.bin", SNES_DSP1B_OFFSET, 0x002800, CRC(453557e0) SHA1(3a218b0e4572a8eba6d0121b17fdac9529609220) ) 
+	ROM_LOAD( "dsp1.bin",  SNES_DSP1_OFFSET,  0x002800, CRC(2838f9f5) SHA1(0a03ccb1fd2bea91151c745a4d1f217ae784f889) ) 
+	ROM_LOAD( "dsp2.bin",  SNES_DSP2_OFFSET,  0x002800, CRC(8e9fbd9b) SHA1(06dd9fcb118d18f6bbe234e013cb8780e06d6e63) ) 
+	ROM_LOAD( "dsp3.bin",  SNES_DSP3_OFFSET,  0x002800, CRC(6b86728a) SHA1(1b133741fad810eb7320c21ecfdd427d25a46da1) ) 
+	ROM_LOAD( "dsp4.bin",  SNES_DSP4_OFFSET,  0x002800, CRC(ce0c7783) SHA1(76fd25f7dc26c3b3f7868a3aa78c7684068713e5) ) 
 
 	ROM_REGION( MAX_SNES_CART_SIZE, "cart", ROMREGION_ERASE00 )
+	ROM_REGION( 0x2000, "dspprg", ROMREGION_ERASEFF)
+	ROM_REGION( 0x800, "dspdata", ROMREGION_ERASEFF)
 ROM_END
 
 ROM_START( snespsfx )
@@ -812,10 +835,11 @@ ROM_START( snespsfx )
 	ROM_REGION( 0x100, "user5", 0 )		/* IPL ROM */
 	ROM_LOAD( "spc700.rom", 0, 0x40, CRC(44bb3a40) SHA1(97e352553e94242ae823547cd853eecda55c20f0) )	/* boot rom */
 
-	ROM_REGION( 0x1000, "addons", 0 )		/* add-on chip ROMs (DSP, SFX, etc) */
-	ROM_LOAD_OPTIONAL( "dsp1data.bin", 0x000000, 0x000800, CRC(4b02d66d) SHA1(1534f4403d2a0f68ba6e35186fe7595d33de34b1) )
+	ROM_REGION( 0x10000, "addons", 0 )		/* add-on chip ROMs (DSP, SFX, etc) */
 
 	ROM_REGION( MAX_SNES_CART_SIZE, "cart", ROMREGION_ERASE00 )
+	ROM_REGION( 0x2000, "dspprg", ROMREGION_ERASEFF)
+	ROM_REGION( 0x800, "dspdata", ROMREGION_ERASEFF)
 ROM_END
 
 ROM_START( snesst )
@@ -824,13 +848,15 @@ ROM_START( snesst )
 	ROM_REGION( 0x100, "user5", 0 )		/* IPL ROM */
 	ROM_LOAD( "spc700.rom", 0, 0x40, CRC(44bb3a40) SHA1(97e352553e94242ae823547cd853eecda55c20f0) )	/* boot rom */
 
-	ROM_REGION( 0x1000, "addons", ROMREGION_ERASE00 )		/* add-on chip ROMs (DSP, SFX, etc) */
+	ROM_REGION( 0x10000, "addons", ROMREGION_ERASE00 )		/* add-on chip ROMs (DSP, SFX, etc) */
 
 	ROM_REGION( 0x40000, "sufami", 0 )		/* add-on chip ROMs (DSP, SFX, etc) */
 	ROM_LOAD( "shvc-qh-0.bin", 0,	0x40000, CRC(9b4ca911) SHA1(ef86ea192eed03d5c413fdbbfd46043be1d7a127) )
 
 	ROM_REGION( MAX_SNES_CART_SIZE, "slot_a", ROMREGION_ERASE00 )
 	ROM_REGION( MAX_SNES_CART_SIZE, "slot_b", ROMREGION_ERASE00 )
+	ROM_REGION( 0x2000, "dspprg", ROMREGION_ERASEFF)
+	ROM_REGION( 0x800, "dspdata", ROMREGION_ERASEFF)
 ROM_END
 
 ROM_START( snesbsx )
@@ -839,12 +865,17 @@ ROM_START( snesbsx )
 	ROM_REGION( 0x100, "user5", 0 )		/* IPL ROM */
 	ROM_LOAD( "spc700.rom", 0, 0x40, CRC(44bb3a40) SHA1(97e352553e94242ae823547cd853eecda55c20f0) )	/* boot rom */
 
-	ROM_REGION( 0x1000, "addons", 0 )		/* add-on chip ROMs (DSP, SFX, etc) */
-	ROM_LOAD_OPTIONAL( "dsp1data.bin", 0x000000, 0x000800, CRC(4b02d66d) SHA1(1534f4403d2a0f68ba6e35186fe7595d33de34b1) )
-	ROM_LOAD_OPTIONAL( "dsp3data.bin", 0x000800, 0x000800, CRC(4a1c5453) SHA1(2f69c652109938cde21df5eb89890bf090256dbb) )
+	ROM_REGION( 0x10000, "addons", 0 )		/* add-on chip ROMs (DSP, SFX, etc) */
+	ROM_LOAD( "dsp1b.bin", SNES_DSP1B_OFFSET, 0x002800, CRC(453557e0) SHA1(3a218b0e4572a8eba6d0121b17fdac9529609220) ) 
+	ROM_LOAD( "dsp1.bin",  SNES_DSP1_OFFSET,  0x002800, CRC(2838f9f5) SHA1(0a03ccb1fd2bea91151c745a4d1f217ae784f889) ) 
+	ROM_LOAD( "dsp2.bin",  SNES_DSP2_OFFSET,  0x002800, CRC(8e9fbd9b) SHA1(06dd9fcb118d18f6bbe234e013cb8780e06d6e63) ) 
+	ROM_LOAD( "dsp3.bin",  SNES_DSP3_OFFSET,  0x002800, CRC(6b86728a) SHA1(1b133741fad810eb7320c21ecfdd427d25a46da1) ) 
+	ROM_LOAD( "dsp4.bin",  SNES_DSP4_OFFSET,  0x002800, CRC(ce0c7783) SHA1(76fd25f7dc26c3b3f7868a3aa78c7684068713e5) ) 
 
 	ROM_REGION( MAX_SNES_CART_SIZE, "cart", ROMREGION_ERASE00 )
 	ROM_REGION( MAX_SNES_CART_SIZE, "flash", ROMREGION_ERASE00 )
+	ROM_REGION( 0x2000, "dspprg", ROMREGION_ERASEFF)
+	ROM_REGION( 0x800, "dspdata", ROMREGION_ERASEFF)
 ROM_END
 
 

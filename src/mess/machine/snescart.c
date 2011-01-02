@@ -506,6 +506,7 @@ static int snes_find_addon_chip( running_machine *machine )
 	snes_state *state = machine->driver_data<snes_state>();
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	int supported_type = 1;
+	int dsp_prg_offset = 0;
 
 	/* Info mostly taken from http://snesemu.black-ship.net/misc/-from%20nsrt.edgeemu.com-chipinfo.htm */
 	switch (snes_r_bank1(space, 0x00ffd6))
@@ -518,23 +519,39 @@ static int snes_find_addon_chip( running_machine *machine )
 
 		case 0x03:
 			if (snes_r_bank1(space, 0x00ffd5) == 0x30)
+			{
 				state->has_addon_chip = HAS_DSP4;
+				dsp_prg_offset = SNES_DSP4_OFFSET;
+			}
 			else
+			{
 				state->has_addon_chip = HAS_DSP1;
+				dsp_prg_offset = SNES_DSP1B_OFFSET;
+			}
 			break;
 
 		case 0x04:
 			state->has_addon_chip = HAS_DSP1;
+			dsp_prg_offset = SNES_DSP1B_OFFSET;
 			break;
 
 		case 0x05:
 			if (snes_r_bank1(space, 0x00ffd5) == 0x20)
+			{
 				state->has_addon_chip = HAS_DSP2;
+				dsp_prg_offset = SNES_DSP2_OFFSET;
+			}
 			/* DSP-3 is hard to detect. We exploit the fact that the only game has been manufactured by Bandai */
 			else if ((snes_r_bank1(space, 0x00ffd5) == 0x30) && (snes_r_bank1(space, 0x00ffda) == 0xb2))
+			{
 				state->has_addon_chip = HAS_DSP3;
-			else
+				dsp_prg_offset = SNES_DSP3_OFFSET;
+			}
+			else						  
+			{
 				state->has_addon_chip = HAS_DSP1;
+				dsp_prg_offset = SNES_DSP1B_OFFSET;
+			}
 			break;
 
 		case 0x13:	// Mario Chip 1
@@ -622,6 +639,26 @@ static int snes_find_addon_chip( running_machine *machine )
 			state->has_addon_chip = HAS_UNK;
 			supported_type = 0;
 			break;
+	}
+
+	if ((state->has_addon_chip >= HAS_DSP1) && (state->has_addon_chip <= HAS_DSP4))
+	{
+		UINT8 *dspsrc = (UINT8 *)machine->region("addons")->base();
+		UINT32 *dspprg = (UINT32 *)machine->region("dspprg")->base(); 
+		UINT16 *dspdata = (UINT16 *)machine->region("dspdata")->base(); 
+
+		// copy DSP program
+		for (int i = 0; i < 0x2000; i+= 4)
+		{
+			*dspprg = dspsrc[dsp_prg_offset+0+i]<<24 | dspsrc[dsp_prg_offset+1+i]<<16 | dspsrc[dsp_prg_offset+2+i]<<8;
+			dspprg++;
+		}
+
+		// copy DSP data
+		for (int i = 0; i < 0x800; i+= 2)
+		{
+			*dspdata++ = dspsrc[dsp_prg_offset+0x2000+i]<<8 | dspsrc[dsp_prg_offset+0x2001+i];
+		}
 	}
 
 	return supported_type;

@@ -133,6 +133,7 @@ CPUS += COSMAC
 CPUS += UNSP
 CPUS += HCD62121
 CPUS += PPS4
+CPUS += UPD7725
 
 #-------------------------------------------------
 # specify available sound cores; some of these are
@@ -1777,11 +1778,7 @@ $(MESSOBJ)/skeleton.a:			\
 # miscellaneous dependencies
 #-------------------------------------------------
 
-$(MAME_MACHINE)/snes.o: 	$(MAMESRC)/machine/snesdsp1.c \
-				$(MAMESRC)/machine/snesdsp2.c \
-				$(MAMESRC)/machine/snesdsp3.c \
-				$(MAMESRC)/machine/snesdsp4.c \
-				$(MAMESRC)/machine/snesobc1.c \
+$(MAME_MACHINE)/snes.o: $(MAMESRC)/machine/snesobc1.c \
 				$(MAMESRC)/machine/snescx4.c \
 				$(MAMESRC)/machine/cx4ops.c \
 				$(MAMESRC)/machine/cx4oam.c \
