@@ -1,4 +1,4 @@
-0.141
+﻿0.141
 
 New System Drivers Supported:
 -----------------------------
@@ -107,6 +107,8 @@ System Driver Changes:
 - [PC8201] Added a software list for option ROMs. [Curt Coder]
 
 - [PCW] Added very preliminary printer emulation, output to a separate screen.  [Barry Rodewald]
+
+- [PV1000] 4 new cartridge dumps for the software list.  [anondumper]
 
 - [QL] Added a software list for cartridges. [Curt Coder]
 
