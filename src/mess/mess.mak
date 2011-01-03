@@ -1746,6 +1746,7 @@ $(MESSOBJ)/skeleton.a:			\
 	$(MESS_DRIVERS)/pipbug.o	\
 	$(MESS_DRIVERS)/plan80.o	\
 	$(MESS_DRIVERS)/pro80.o		\
+	$(MESS_DRIVERS)/pt68k4.o	\
 	$(MESS_DRIVERS)/ptcsol.o	\
 	$(MESS_DRIVERS)/pv9234.o	\
 	$(MESS_DRIVERS)/pyl601.o	\
