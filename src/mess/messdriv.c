@@ -70,6 +70,8 @@ const game_driver * const drivers[] =
 	DRIVER( snespal )   /* Nintendo Super Nintendo PAL */
 	DRIVER( snessfx )   /* Nintendo Super Nintendo NTSC w/SuperFX CPU*/
 	DRIVER( snespsfx )  /* Nintendo Super Nintendo PAL w/SuperFX CPU */
+	DRIVER( snesdsp )   /* Nintendo Super Nintendo NTSC w/DSP-x CPU*/
+	DRIVER( snespdsp )  /* Nintendo Super Nintendo PAL w/DSP-x CPU */
 	DRIVER( snesst )    /* Nintendo Super Nintendo NTSC w/Sufami Turbo base cart */
 	DRIVER( snesbsx )   /* Nintendo Super Nintendo NTSC w/BS-X compatible cart  */
 	DRIVER( n64 )       /* Nintendo N64   */

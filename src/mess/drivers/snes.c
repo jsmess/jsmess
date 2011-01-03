@@ -703,10 +703,6 @@ static MACHINE_CONFIG_START( snes_base, snes_state )
 	MCFG_CPU_ADD("soundcpu", SPC700, 1024000)	/* 1.024 MHz */
 	MCFG_CPU_PROGRAM_MAP(spc_map)
 
-	MCFG_CPU_ADD("dsp", UPD7725, 8000000)
-	MCFG_CPU_PROGRAM_MAP(dsp_prg_map)
-	MCFG_CPU_DATA_MAP(dsp_data_map)
-
 	//MCFG_QUANTUM_TIME(HZ(48000))
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
@@ -746,6 +742,13 @@ static MACHINE_CONFIG_DERIVED( snessfx, snes )
 	MCFG_CPU_CONFIG(snes_superfx_config)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( snesdsp, snes )
+
+	MCFG_CPU_ADD("dsp", UPD7725, 8000000)
+	MCFG_CPU_PROGRAM_MAP(dsp_prg_map)
+	MCFG_CPU_DATA_MAP(dsp_data_map)
+MACHINE_CONFIG_END
+
 static MACHINE_CONFIG_DERIVED( snespal, snes )
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_CLOCK( MCLK_PAL )
@@ -759,6 +762,13 @@ static MACHINE_CONFIG_DERIVED( snespsfx, snespal )
 	MCFG_CPU_ADD("superfx", SUPERFX, 21480000)	/* 21.48MHz */
 	MCFG_CPU_PROGRAM_MAP(superfx_map)
 	MCFG_CPU_CONFIG(snes_superfx_config)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( snespdsp, snespal )
+
+	MCFG_CPU_ADD("dsp", UPD7725, 8000000)
+	MCFG_CPU_PROGRAM_MAP(dsp_prg_map)
+	MCFG_CPU_DATA_MAP(dsp_data_map)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( snesst, snes_base )
@@ -781,6 +791,19 @@ MACHINE_CONFIG_END
  *************************************/
 
 ROM_START( snes )
+	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x100, "user5", 0 )		/* IPL ROM */
+	ROM_LOAD( "spc700.rom", 0, 0x40, CRC(44bb3a40) SHA1(97e352553e94242ae823547cd853eecda55c20f0) )	/* boot rom */
+
+	ROM_REGION( 0x10000, "addons", ROMREGION_ERASE00 )		/* add-on chip ROMs (DSP, SFX, etc) */
+
+	ROM_REGION( MAX_SNES_CART_SIZE, "cart", ROMREGION_ERASE00 )
+	ROM_REGION( 0x2000, "dspprg", ROMREGION_ERASEFF)
+	ROM_REGION( 0x800, "dspdata", ROMREGION_ERASEFF)
+ROM_END
+
+ROM_START( snesdsp )
 	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
 
 	ROM_REGION( 0x100, "user5", 0 )		/* IPL ROM */
@@ -812,6 +835,19 @@ ROM_START( snessfx )
 ROM_END
 
 ROM_START( snespal )
+	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x100, "user5", 0 )		/* IPL ROM */
+	ROM_LOAD( "spc700.rom", 0, 0x40, CRC(44bb3a40) SHA1(97e352553e94242ae823547cd853eecda55c20f0) )	/* boot rom */
+
+	ROM_REGION( 0x10000, "addons", ROMREGION_ERASE00 )		/* add-on chip ROMs (DSP, SFX, etc) */
+
+	ROM_REGION( MAX_SNES_CART_SIZE, "cart", ROMREGION_ERASE00 )
+	ROM_REGION( 0x2000, "dspprg", ROMREGION_ERASEFF)
+	ROM_REGION( 0x800, "dspdata", ROMREGION_ERASEFF)
+ROM_END
+
+ROM_START( snespdsp )
 	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
 
 	ROM_REGION( 0x100, "user5", 0 )		/* IPL ROM */
@@ -893,6 +929,8 @@ CONS( 1991, snespal,  snes,   0,      snespal,  snes,  snes_mess,    "Nintendo",
 // FIXME: the "hacked" drivers below, currently needed due to limitations in the core device design, should eventually be removed
 
 // These would require CPU to be added/removed depending on the cart which is loaded
+CONS( 1989, snesdsp,  snes,   0,      snesdsp,  snes,  snes_mess,    "Nintendo", "Super Nintendo Entertainment System / Super Famicom (NTSC, w/DSP-x)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+CONS( 1991, snespdsp, snes,   0,      snespdsp, snes,  snes_mess,    "Nintendo", "Super Nintendo Entertainment System (PAL, w/DSP-x)",  GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 CONS( 1989, snessfx,  snes,   0,      snessfx,  snes,  snes_mess,    "Nintendo", "Super Nintendo Entertainment System / Super Famicom (NTSC, w/SuperFX)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 CONS( 1991, snespsfx, snes,   0,      snespsfx, snes,  snes_mess,    "Nintendo", "Super Nintendo Entertainment System (PAL, w/SuperFX)",  GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 //CONS( 1989, snessa1,  snes,   0,      snessa1,  snes,  snes_mess,    "Nintendo", "Super Nintendo Entertainment System / Super Famicom (NTSC, w/SA-1)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
