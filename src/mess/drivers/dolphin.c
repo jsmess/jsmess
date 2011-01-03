@@ -51,6 +51,7 @@
         should look like, but we DID NOT look at the source code.
 
 ****************************************************************************/
+#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/s2650/s2650.h"
@@ -61,22 +62,26 @@ class dolphin_state : public driver_device
 {
 public:
 	dolphin_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
-
+		: driver_device(machine, config),
+		  m_maincpu(*this, "maincpu")
+	{ }
+	required_device<cpu_device> m_maincpu;
+	DECLARE_READ8_MEMBER( dolphin_07_r );
+	DECLARE_WRITE8_MEMBER( dolphin_00_w );
 };
 
-static WRITE8_HANDLER( dolphin_00_w )
+WRITE8_MEMBER( dolphin_state::dolphin_00_w )
 {
 // don't know which offset does which digit
 
 	output_set_digit_value(offset, data);
 }
 
-static READ8_HANDLER( dolphin_07_r )
+READ8_MEMBER( dolphin_state::dolphin_07_r )
 {
 	UINT8 keyin, i, data = 0xff;
 
-	keyin = input_port_read(space->machine, "X0");
+	keyin = input_port_read(machine, "X0");
 	if (keyin != 0xff)
 		for (i = 0; i < 8; i++)
 			if BIT(~keyin, i)
@@ -85,7 +90,7 @@ static READ8_HANDLER( dolphin_07_r )
 				break;
 			}
 
-	keyin = input_port_read(space->machine, "X1");
+	keyin = input_port_read(machine, "X1");
 	if (keyin != 0xff)
 		for (i = 0; i < 8; i++)
 			if BIT(~keyin, i)
@@ -94,18 +99,18 @@ static READ8_HANDLER( dolphin_07_r )
 				break;
 			}
 
-	data &= input_port_read(space->machine, "X2");
+	data &= input_port_read(machine, "X2");
 
 	return data;
 }
 
-static ADDRESS_MAP_START(dolphin_mem, ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START(dolphin_mem, ADDRESS_SPACE_PROGRAM, 8, dolphin_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x01ff) AM_ROM
 	AM_RANGE( 0x0200, 0x02ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dolphin_io , ADDRESS_SPACE_IO, 8)
+static ADDRESS_MAP_START( dolphin_io , ADDRESS_SPACE_IO, 8, dolphin_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00, 0x03) AM_WRITE(dolphin_00_w) // 4-led display
 	//AM_RANGE(0x06, 0x06) AM_WRITE(dolphin_06_w)  // speaker (NOT a keyclick)
