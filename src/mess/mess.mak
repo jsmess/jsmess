@@ -1220,6 +1220,7 @@ $(MESSOBJ)/osborne.a:			\
 	$(MESS_DRIVERS)/osborne1.o	\
 	$(MESS_MACHINE)/osborne1.o	\
 	$(MESS_DRIVERS)/osbexec.o	\
+	$(MESS_DRIVERS)/vixen.o		\
 
 $(MESSOBJ)/osi.a:				\
 	$(MESS_DRIVERS)/osi.o		\

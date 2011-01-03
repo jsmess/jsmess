@@ -1832,6 +1832,7 @@ const game_driver * const drivers[] =
 	DRIVER( mikrolab )
 	DRIVER( dim68k )
 	DRIVER( okean240 )
+	DRIVER( vixen )
 	DRIVER( pt68k4 )
 	
 #endif /* DRIVER_RECURSIVE */

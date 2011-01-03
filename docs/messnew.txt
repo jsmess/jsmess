@@ -40,6 +40,8 @@ Skeleton drivers:
 - Okean-240
 - NEC PC-8300 [Incog]
 - Peripheral Technology PT68K4
+- Osborne 4 Vixen [Curt Coder]
+
 
 
 System Driver Changes:
