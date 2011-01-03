@@ -5,26 +5,69 @@
         28/12/2011 Skeleton driver.
 
 ****************************************************************************/
+//#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
+#include "sound/speaker.h"
+#include "video/mc6845.h"
 
 class dim68k_state : public driver_device
 {
 public:
 	dim68k_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+		: driver_device(machine, config),
+		  m_maincpu(*this, "maincpu"),
+		  m_crtc(*this, "crtc"),
+		  m_speaker(*this, "speaker")
+	{ }
 		
+	required_device<cpu_device> m_maincpu;
+	required_device<device_t> m_crtc;
+	required_device<device_t> m_speaker;
+	//DECLARE_READ16_MEMBER( dim68k_speaker_r );
+	//DECLARE_WRITE16_MEMBER( dim68k_speaker_w );
+	//DECLARE_READ16_MEMBER( dim68k_fdc_r );
+	//DECLARE_WRITE16_MEMBER( dim68k_fdc_w );
 	UINT16* ram;
 	UINT8 *FNT;
+	UINT8 m_speaker_bit;
 };
 
-static ADDRESS_MAP_START(dim68k_mem, ADDRESS_SPACE_PROGRAM, 16)
+static READ16_HANDLER( dim68k_speaker_r )
+{
+	dim68k_state *state = space->machine->driver_data<dim68k_state>();
+	state->m_speaker_bit ^= 1;
+	speaker_level_w(state->m_speaker, state->m_speaker_bit);
+	return 0;
+}
+
+static WRITE16_HANDLER( dim68k_speaker_w )
+{
+	dim68k_state *state = space->machine->driver_data<dim68k_state>();
+	state->m_speaker_bit ^= 1;
+	speaker_level_w(state->m_speaker, state->m_speaker_bit);
+}
+
+static READ16_HANDLER( dim68k_fdc_r )
+{
+	return 0;
+}
+
+static WRITE16_HANDLER( dim68k_fdc_w )
+{
+}
+
+static ADDRESS_MAP_START(dim68k_mem, ADDRESS_SPACE_PROGRAM, 16)//, dim68k_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000000, 0x00feffff) AM_RAM AM_BASE_MEMBER(dim68k_state, ram) // 16MB RAM / ROM at boot	
 	AM_RANGE(0x00ff0000, 0x00ff1fff) AM_ROM AM_REGION("user1",0)
-	AM_RANGE(0x00ff2000, 0x00ff7fff) AM_RAM // Video RAM
-	AM_RANGE(0x00ff8000, 0x00ffffff) AM_RAM // I/O Region
+	AM_RANGE(0x00ff2000, 0x00ff7fff) AM_RAM // Graphics Video RAM
+	AM_RANGE(0x00ff8000, 0x00ff8001) AM_DEVREADWRITE8("crtc", mc6845_status_r, mc6845_address_w, 0xffff)
+	AM_RANGE(0x00ff8002, 0x00ff8003) AM_DEVREADWRITE8("crtc", mc6845_register_r, mc6845_register_w, 0xffff)
+	AM_RANGE(0x00ffc800, 0x00ffc801) AM_READWRITE(dim68k_speaker_r,dim68k_speaker_w)
+	AM_RANGE(0x00ffd000, 0x00ffd005) AM_READWRITE(dim68k_fdc_r,dim68k_fdc_w)
+	//AM_RANGE(0x00ff8000, 0x00ffffff) AM_RAM // I/O Region
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -48,52 +91,61 @@ static VIDEO_START( dim68k )
 	state->FNT = machine->region("chargen")->base();
 }
 
-// Please note: This is NOT how the real video works. It is a sample, until the driver is rewritten.
 static VIDEO_UPDATE( dim68k )
 {
 	dim68k_state *state = screen->machine->driver_data<dim68k_state>();
-	UINT8 y,ra,chr,gfx;
-	UINT16 sy=0,ma=0x100,x,dchr;
-
-	for (y = 0; y < 25; y++)
-	{
-		for (ra = 0; ra < 10; ra++)
-		{
-			UINT16  *p = BITMAP_ADDR16(bitmap, sy++, 0);
-
-			for (x = ma; x < ma+40; x++)
-			{
-				dchr = state->ram[x]; // reads 2 characters
-				chr = dchr>>8;
-
-				gfx = state->FNT[(chr<<4) | ra] ^ ((chr & 0x80) ? 0xff : 0);
-
-				*p++ = ( gfx & 0x80 ) ? 1 : 0;
-				*p++ = ( gfx & 0x40 ) ? 1 : 0;
-				*p++ = ( gfx & 0x20 ) ? 1 : 0;
-				*p++ = ( gfx & 0x10 ) ? 1 : 0;
-				*p++ = ( gfx & 0x08 ) ? 1 : 0;
-				*p++ = ( gfx & 0x04 ) ? 1 : 0;
-				*p++ = ( gfx & 0x02 ) ? 1 : 0;
-				*p++ = ( gfx & 0x01 ) ? 1 : 0;
-
-				chr = dchr;
-
-				gfx = state->FNT[(chr<<4) | ra] ^ ((chr & 0x80) ? 0xff : 0);
-
-				*p++ = ( gfx & 0x80 ) ? 1 : 0;
-				*p++ = ( gfx & 0x40 ) ? 1 : 0;
-				*p++ = ( gfx & 0x20 ) ? 1 : 0;
-				*p++ = ( gfx & 0x10 ) ? 1 : 0;
-				*p++ = ( gfx & 0x08 ) ? 1 : 0;
-				*p++ = ( gfx & 0x04 ) ? 1 : 0;
-				*p++ = ( gfx & 0x02 ) ? 1 : 0;
-				*p++ = ( gfx & 0x01 ) ? 1 : 0;
-			}
-		}
-		ma+=40;
-	}
+	mc6845_update(state->m_crtc, bitmap, cliprect);
 	return 0;
+}
+
+// Text-only; graphics isn't emulated yet
+MC6845_UPDATE_ROW( dim68k_update_row )
+{
+	dim68k_state *state = device->machine->driver_data<dim68k_state>();
+	UINT8 chr,gfx,x,xx,inv;
+	UINT16 dchr;
+
+	UINT16 *p = BITMAP_ADDR16(bitmap, y, 0);
+
+	// need to divide everything in half to cater for 16-bit reads
+	x_count /= 2;
+	ma /= 2;
+	xx = 0;
+
+	for (x = 0; x < x_count; x++)
+	{
+		dchr = state->ram[ma+x]; // reads 2 characters
+
+		inv=0;
+		if (xx == cursor_x) inv=0xff;
+		xx++;
+
+		chr = dchr>>8;
+		gfx = state->FNT[(chr<<4) | ra] ^ inv ^ ((chr & 0x80) ? 0xff : 0);
+		*p++ = ( gfx & 0x80 ) ? 1 : 0;
+		*p++ = ( gfx & 0x40 ) ? 1 : 0;
+		*p++ = ( gfx & 0x20 ) ? 1 : 0;
+		*p++ = ( gfx & 0x10 ) ? 1 : 0;
+		*p++ = ( gfx & 0x08 ) ? 1 : 0;
+		*p++ = ( gfx & 0x04 ) ? 1 : 0;
+		*p++ = ( gfx & 0x02 ) ? 1 : 0;
+		*p++ = ( gfx & 0x01 ) ? 1 : 0;
+
+		inv = 0;
+		if (xx == cursor_x) inv=0xff;
+		xx++;
+
+		chr = dchr;
+		gfx = state->FNT[(chr<<4) | ra] ^ inv ^ ((chr & 0x80) ? 0xff : 0);
+		*p++ = ( gfx & 0x80 ) ? 1 : 0;
+		*p++ = ( gfx & 0x40 ) ? 1 : 0;
+		*p++ = ( gfx & 0x20 ) ? 1 : 0;
+		*p++ = ( gfx & 0x10 ) ? 1 : 0;
+		*p++ = ( gfx & 0x08 ) ? 1 : 0;
+		*p++ = ( gfx & 0x04 ) ? 1 : 0;
+		*p++ = ( gfx & 0x02 ) ? 1 : 0;
+		*p++ = ( gfx & 0x01 ) ? 1 : 0;
+	}
 }
 
 /* F4 Character Displayer */
@@ -113,6 +165,19 @@ static const gfx_layout dim68k_charlayout =
 static GFXDECODE_START( dim68k )
 	GFXDECODE_ENTRY( "chargen", 0x0000, dim68k_charlayout, 0, 1 )
 GFXDECODE_END
+
+static const mc6845_interface dim68k_crtc = {
+	"screen",			/* name of screen */
+	8,			/* number of dots per character - switchable 7 or 8 */
+	NULL,
+	dim68k_update_row,		/* handler to display a scanline */
+	NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	NULL
+};
 
 static MACHINE_CONFIG_START( dim68k, dim68k_state )
 	/* basic machine hardware */
@@ -134,6 +199,12 @@ static MACHINE_CONFIG_START( dim68k, dim68k_state )
 
 	MCFG_VIDEO_START(dim68k)
 	MCFG_VIDEO_UPDATE(dim68k)
+	MCFG_MC6845_ADD("crtc", MC6845, 1790000, dim68k_crtc)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 /*
@@ -193,5 +264,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1984, dim68k,  0,       0, 	dim68k, 	dim68k, 	 0,  	   "Micro Craft",   "Dimension 68000",		GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1984, dim68k,  0,       0,     dim68k,   dim68k,   0,     "Micro Craft", "Dimension 68000", GAME_NOT_WORKING | GAME_NO_SOUND)
 
