@@ -47,6 +47,8 @@ public:
 	UINT8	*fontram;
 	UINT8	*vram;
 	UINT8	*ram_0000;
+	UINT8	*ram_c000;
+	UINT8	temp_attr;
 	emu_timer *video_timer;
 
 	/* PIA 0 (UD12) */
@@ -73,7 +75,7 @@ public:
 		memory_set_bankptr( machine, "0000", ram_0000 + 0x0000 );
 		memory_set_bankptr( machine, "2000", ram_0000 + 0x2000 );
 		memory_set_bankptr( machine, "4000", ram_0000 + 0x4000 );
-		memory_set_bankptr( machine, "c000", ram_0000 + 0xc000 );
+		ram_c000 = ram_0000 + 0xc000;
 		memory_set_bankptr( machine, "e000", ram_0000 + 0xe000 );
 
 		if ( pia0_porta & 0x80 )
@@ -84,7 +86,7 @@ public:
 		}
 
 		if ( pia0_porta & 0x40 )
-			memory_set_bankptr(machine, "c000", vram_region->base() );
+			ram_c000 = vram_region->base();
 	}
 
 	void update_irq_state(running_machine *machine)
@@ -110,6 +112,33 @@ static WRITE8_HANDLER( osbexec_0000_w )
 	else
 	{
 		state->ram_0000[ offset ] = data;
+	}
+}
+
+
+static READ8_HANDLER( osbexec_c000_r )
+{
+	osbexec_state *state = space->machine->driver_data<osbexec_state>();
+	UINT8	data = state->ram_c000[offset];
+
+	if ( ( state->pia0_porta & 0x40 ) && offset < 0x1000 )
+	{
+		state->temp_attr = state->ram_c000[ 0x1000 + offset ];
+	}
+
+	return data;
+}
+
+
+static WRITE8_HANDLER( osbexec_c000_w )
+{
+	osbexec_state *state = space->machine->driver_data<osbexec_state>();
+
+	state->ram_c000[offset] = data;
+
+	if ( ( state->pia0_porta & 0x40 ) && offset < 0x1000 )
+	{
+		state->ram_c000[ 0x1000 + offset ] = state->temp_attr;
 	}
 }
 
@@ -158,7 +187,7 @@ static ADDRESS_MAP_START( osbexec_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x0000, 0x1FFF ) AM_READ_BANK("0000") AM_WRITE( osbexec_0000_w )	/* ROM and maybe also banked ram */
 	AM_RANGE( 0x2000, 0x3FFF ) AM_RAMBANK("2000")								/* Banked RAM */
 	AM_RANGE( 0x4000, 0xBFFF ) AM_RAMBANK("4000")								/* Banked RAM */
-	AM_RANGE( 0xC000, 0xDFFF ) AM_RAMBANK("c000")								/* Video ram / Banked RAM */
+	AM_RANGE( 0xC000, 0xDFFF ) AM_READWRITE( osbexec_c000_r, osbexec_c000_w )	/* Video ram / Banked RAM */
 	AM_RANGE( 0xE000, 0xEFFF ) AM_RAMBANK("e000")								/* Banked RAM */
 	AM_RANGE( 0xF000, 0xFFFF ) AM_RAM											/* 4KB of non-banked RAM for system stack etc */
 ADDRESS_MAP_END
