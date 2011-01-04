@@ -52,6 +52,7 @@ BOOL DriverUsesLightGun(int driver_index);
 BOOL DriverUsesMouse(int driver_index);
 BOOL DriverSupportsSaveState(int driver_index);
 BOOL DriverIsVertical(int driver_index);
+BOOL DriverIsMechanical(int driver_index);
 
 int isDriverVector(const machine_config *config);
 int numberOfSpeakers(const machine_config *config);

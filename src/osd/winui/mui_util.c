@@ -485,6 +485,13 @@ BOOL DriverIsBios(int driver_index)
 	return bBios;
 }
 
+BOOL DriverIsMechanical(int driver_index)
+{
+	BOOL bMechanical = FALSE;
+	if( !( (drivers[driver_index]->flags & GAME_MECHANICAL ) == 0)   )
+		bMechanical = TRUE;
+	return bMechanical;
+}
 
 BOOL DriverHasOptionalBIOS(int driver_index)
 {

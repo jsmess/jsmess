@@ -76,6 +76,8 @@ extern const FOLDERDATA g_folderData[] =
   	{"Samples",    	    "samples",           FOLDER_SAMPLES,      IDI_FOLDER,               0,             0,            NULL,                       DriverUsesSamples,       TRUE },
   	{"Save State",    	"savestate",         FOLDER_SAVESTATE,    IDI_FOLDER,               0,             0,            NULL,                       DriverSupportsSaveState, TRUE },
   	{"BIOS",	    	"bios",		         FOLDER_BIOS,		  IDI_FOLDER,               0,             0,            NULL,                       DriverIsBios,			  TRUE },
+	{"Mechanical",      "mechanical",        FOLDER_MECHANICAL,   IDI_FOLDER,				0,             0,  			 NULL,                       DriverIsMechanical,      TRUE },
+	{"Non Mechanical",  "nonmechanical",     FOLDER_NONMECHANICAL,IDI_FOLDER,				0,             0,  			 NULL,                       DriverIsMechanical,      FALSE },
 	{ NULL }
 };
 
