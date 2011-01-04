@@ -179,8 +179,8 @@ Source Changes:
 - Enabled loading ROMs from software lists to ROM_CART_LOAD entries. [Curt Coder]
 
 - Preliminary work done on these systems. Results vary from little difference
-  to almost fully working: beehive, c10, cd2650, ccs2422, czk80, d6800,
-  dolphin, et3400, h8, h19, k8915, mccpm, mekd2, mes, pipbug, qtsbc,
+  to almost fully working: beehive, c10, cd2650, ccs2422, czk80, d6800, dim68k,
+  dolphin, et3400, h8, h19, k8915, mccpm, mekd2, mes, okean240, pipbug, qtsbc,
   sapizcps3, selz80, sol20, uts20, vta2000, zsbc3 [Robbbert]
 
 - Added configurable cursor to the generic terminal device. [Robbbert]
