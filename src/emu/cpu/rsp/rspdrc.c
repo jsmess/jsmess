@@ -151,8 +151,6 @@ static void cfunc_mfc2(void *param);
 static void cfunc_cfc2(void *param);
 static void cfunc_mtc2(void *param);
 static void cfunc_ctc2(void *param);
-//static void cfunc_swc2(void *param);
-//static void cfunc_lwc2(void *param);
 static void cfunc_sp_set_status_cb(void *param);
 
 static void cfunc_rsp_lbv(void *param);
@@ -518,28 +516,6 @@ static void unimplemented_opcode(rsp_state *rsp, UINT32 op)
 
 /*****************************************************************************/
 
-/* Legacy.  Going forward, this will be transitioned into unrolled opcode decodes. */
-static const int vector_elements_1[16][8] =
-{
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },		// none
-	{ 0, 1, 2, 3, 4, 5, 6 ,7 },		// ???
-	{ 1, 3, 5, 7, 0, 2, 4, 6 },		// 0q
-	{ 0, 2, 4, 6, 1, 3, 5, 7 },		// 1q
-	{ 1, 2, 3, 5, 6, 7, 0, 4 },		// 0h
-	{ 0, 2, 3, 4, 6, 7, 1, 5 },		// 1h
-	{ 0, 1, 3, 4, 5, 7, 2, 6 },		// 2h
-	{ 0, 1, 2, 4, 5, 6, 3, 7 },		// 3h
-	{ 1, 2, 3, 4, 5, 6, 7, 0 },		// 0
-	{ 0, 2, 3, 4, 5, 6, 7, 1 },		// 1
-	{ 0, 1, 3, 4, 5, 6, 7, 2 },		// 2
-	{ 0, 1, 2, 4, 5, 6, 7, 3 },		// 3
-	{ 0, 1, 2, 3, 5, 6, 7, 4 },		// 4
-	{ 0, 1, 2, 3, 4, 6, 7, 5 },		// 5
-	{ 0, 1, 2, 3, 4, 5, 7, 6 },		// 6
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },		// 7
-};
-
-/* Legacy.  Going forward, this will be transitioned into unrolled opcode decodes. */
 static const int vector_elements_2[16][8] =
 {
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },		// none
@@ -781,6 +757,8 @@ static void cfunc_rsp_lsv(void *param)
 
 	int end = index + 2;
 
+	if(end > 16) printf("LSV past end\n");
+
 	for (int i = index; i < end; i++)
 	{
 		VREG_B(dest, i) = READ8(rsp, ea);
@@ -812,6 +790,8 @@ static void cfunc_rsp_llv(void *param)
 
 	int end = index + 4;
 
+	if(end > 16) printf("LLV past end\n");
+
 	for (int i = index; i < end; i++)
 	{
 		VREG_B(dest, i) = READ8(rsp, ea);
@@ -842,6 +822,8 @@ static void cfunc_rsp_ldv(void *param)
 	ea = (base) ? rsp->r[base] + (offset * 8) : (offset * 8);
 
 	int end = index + 8;
+
+	if(end > 16) printf("LDV past end\n");
 
 	for (int i = index; i < end; i++)
 	{
@@ -1239,6 +1221,8 @@ static void cfunc_rsp_ssv(void *param)
 
 	int end = index + 2;
 
+	if(end > 16) printf("SSV past end\n");
+
 	for (int i = index; i < end; i++)
 	{
 		WRITE8(rsp, ea, VREG_B(dest, i));
@@ -1270,6 +1254,8 @@ static void cfunc_rsp_slv(void *param)
 
 	int end = index + 4;
 
+	if(end > 16) printf("SLV past end\n");
+
 	for (int i = index; i < end; i++)
 	{
 		WRITE8(rsp, ea, VREG_B(dest, i));
@@ -1300,6 +1286,8 @@ static void cfunc_rsp_sdv(void *param)
 	ea = (base) ? rsp->r[base] + (offset * 8) : (offset * 8);
 
 	end = index + 8;
+
+	if(end > 16) printf("SDV past end\n");
 
 	for (int i = index; i < end; i++)
 	{
@@ -3825,6 +3813,14 @@ static void generate_checksum_block(rsp_state *rsp, drcuml_block *block, compile
 				UML_LOAD(block, IREG(1), base, IMM(0), DWORD);						// load    i1,base,dword
 				UML_ADD(block, IREG(0), IREG(0), IREG(1));							// add     i0,i0,i1
 				sum += curdesc->opptr.l[0];
+
+				if (curdesc->delay != NULL && (curdesc == seqlast || (curdesc->next != NULL && curdesc->next->physpc != curdesc->delay->physpc)))
+				{
+					base = rsp->direct->read_decrypted_ptr(curdesc->delay->physpc | 0x1000);
+					UML_LOAD(block, IREG(1), base, IMM(0), DWORD);					// load    i1,base,dword
+					UML_ADD(block, IREG(0), IREG(0), IREG(1));						// add     i0,i0,i1
+					sum += curdesc->delay->opptr.l[0];
+				}
 			}
 		UML_CMP(block, IREG(0), IMM(sum));											// cmp     i0,sum
 		UML_EXHc(block, IF_NE, rsp->impstate->nocode, IMM(epc(seqhead)));			// exne    nocode,seqhead->pc
@@ -4221,21 +4217,21 @@ static int generate_opcode(rsp_state *rsp, drcuml_block *block, compiler_state *
 
 		case 0x0f:	/* LUI - MIPS I */
 			if (RTREG != 0)
-				UML_MOV(block, R32(RTREG), IMM(SIMMVAL << 16));					// dmov    <rtreg>,SIMMVAL << 16
+				UML_MOV(block, R32(RTREG), IMM(SIMM16 << 16));					// dmov    <rtreg>,SIMM16 << 16
 			return TRUE;
 
 		case 0x08:	/* ADDI - MIPS I */
 		case 0x09:	/* ADDIU - MIPS I */
 			if (RTREG != 0)
 			{
-				UML_ADD(block, R32(RTREG), R32(RSREG), IMM(SIMMVAL));				// add     i0,<rsreg>,SIMMVAL,V
+				UML_ADD(block, R32(RTREG), R32(RSREG), IMM(SIMM16));				// add     i0,<rsreg>,SIMM16,V
 			}
 			return TRUE;
 
 		case 0x0a:	/* SLTI - MIPS I */
 			if (RTREG != 0)
 			{
-				UML_CMP(block, R32(RSREG), IMM(SIMMVAL));							// dcmp    <rsreg>,SIMMVAL
+				UML_CMP(block, R32(RSREG), IMM(SIMM16));							// dcmp    <rsreg>,SIMM16
 				UML_SETc(block, IF_L, R32(RTREG));									// dset    <rtreg>,l
 			}
 			return TRUE;
@@ -4243,7 +4239,7 @@ static int generate_opcode(rsp_state *rsp, drcuml_block *block, compiler_state *
 		case 0x0b:	/* SLTIU - MIPS I */
 			if (RTREG != 0)
 			{
-				UML_CMP(block, R32(RSREG), IMM(SIMMVAL));							// dcmp    <rsreg>,SIMMVAL
+				UML_CMP(block, R32(RSREG), IMM(SIMM16));							// dcmp    <rsreg>,SIMM16
 				UML_SETc(block, IF_B, R32(RTREG));									// dset    <rtreg>,b
 			}
 			return TRUE;
@@ -4251,23 +4247,23 @@ static int generate_opcode(rsp_state *rsp, drcuml_block *block, compiler_state *
 
 		case 0x0c:	/* ANDI - MIPS I */
 			if (RTREG != 0)
-				UML_AND(block, R32(RTREG), R32(RSREG), IMM(UIMMVAL));				// dand    <rtreg>,<rsreg>,UIMMVAL
+				UML_AND(block, R32(RTREG), R32(RSREG), IMM(UIMM16));				// dand    <rtreg>,<rsreg>,UIMMVAL
 			return TRUE;
 
 		case 0x0d:	/* ORI - MIPS I */
 			if (RTREG != 0)
-				UML_OR(block, R32(RTREG), R32(RSREG), IMM(UIMMVAL));				// dor     <rtreg>,<rsreg>,UIMMVAL
+				UML_OR(block, R32(RTREG), R32(RSREG), IMM(UIMM16));				// dor     <rtreg>,<rsreg>,UIMMVAL
 			return TRUE;
 
 		case 0x0e:	/* XORI - MIPS I */
 			if (RTREG != 0)
-				UML_XOR(block, R32(RTREG), R32(RSREG), IMM(UIMMVAL));				// dxor    <rtreg>,<rsreg>,UIMMVAL
+				UML_XOR(block, R32(RTREG), R32(RSREG), IMM(UIMM16));				// dxor    <rtreg>,<rsreg>,UIMMVAL
 			return TRUE;
 
 		/* ----- memory load operations ----- */
 
 		case 0x20:	/* LB - MIPS I */
-			UML_ADD(block, IREG(0), R32(RSREG), IMM(SIMMVAL));						// add     i0,<rsreg>,SIMMVAL
+			UML_ADD(block, IREG(0), R32(RSREG), IMM(SIMM16));						// add     i0,<rsreg>,SIMM16
 			UML_CALLH(block, rsp->impstate->read8);									// callh   read8
 			if (RTREG != 0)
 				UML_SEXT(block, R32(RTREG), IREG(0), BYTE);						// dsext   <rtreg>,i0,byte
@@ -4276,7 +4272,7 @@ static int generate_opcode(rsp_state *rsp, drcuml_block *block, compiler_state *
 			return TRUE;
 
 		case 0x21:	/* LH - MIPS I */
-			UML_ADD(block, IREG(0), R32(RSREG), IMM(SIMMVAL));						// add     i0,<rsreg>,SIMMVAL
+			UML_ADD(block, IREG(0), R32(RSREG), IMM(SIMM16));						// add     i0,<rsreg>,SIMM16
 			UML_CALLH(block, rsp->impstate->read16);								// callh   read16
 			if (RTREG != 0)
 				UML_SEXT(block, R32(RTREG), IREG(0), WORD);						// dsext   <rtreg>,i0,word
@@ -4285,7 +4281,7 @@ static int generate_opcode(rsp_state *rsp, drcuml_block *block, compiler_state *
 			return TRUE;
 
 		case 0x23:	/* LW - MIPS I */
-			UML_ADD(block, IREG(0), R32(RSREG), IMM(SIMMVAL));						// add     i0,<rsreg>,SIMMVAL
+			UML_ADD(block, IREG(0), R32(RSREG), IMM(SIMM16));						// add     i0,<rsreg>,SIMM16
 			UML_CALLH(block, rsp->impstate->read32);								// callh   read32
 			if (RTREG != 0)
 				UML_MOV(block, R32(RTREG), IREG(0));
@@ -4294,7 +4290,7 @@ static int generate_opcode(rsp_state *rsp, drcuml_block *block, compiler_state *
 			return TRUE;
 
 		case 0x24:	/* LBU - MIPS I */
-			UML_ADD(block, IREG(0), R32(RSREG), IMM(SIMMVAL));						// add     i0,<rsreg>,SIMMVAL
+			UML_ADD(block, IREG(0), R32(RSREG), IMM(SIMM16));						// add     i0,<rsreg>,SIMM16
 			UML_CALLH(block, rsp->impstate->read8);									// callh   read8
 			if (RTREG != 0)
 				UML_AND(block, R32(RTREG), IREG(0), IMM(0xff));					// dand    <rtreg>,i0,0xff
@@ -4303,7 +4299,7 @@ static int generate_opcode(rsp_state *rsp, drcuml_block *block, compiler_state *
 			return TRUE;
 
 		case 0x25:	/* LHU - MIPS I */
-			UML_ADD(block, IREG(0), R32(RSREG), IMM(SIMMVAL));						// add     i0,<rsreg>,SIMMVAL
+			UML_ADD(block, IREG(0), R32(RSREG), IMM(SIMM16));						// add     i0,<rsreg>,SIMM16
 			UML_CALLH(block, rsp->impstate->read16);								// callh   read16
 			if (RTREG != 0)
 				UML_AND(block, R32(RTREG), IREG(0), IMM(0xffff));					// dand    <rtreg>,i0,0xffff
@@ -4318,7 +4314,7 @@ static int generate_opcode(rsp_state *rsp, drcuml_block *block, compiler_state *
 		/* ----- memory store operations ----- */
 
 		case 0x28:	/* SB - MIPS I */
-			UML_ADD(block, IREG(0), R32(RSREG), IMM(SIMMVAL));						// add     i0,<rsreg>,SIMMVAL
+			UML_ADD(block, IREG(0), R32(RSREG), IMM(SIMM16));						// add     i0,<rsreg>,SIMM16
 			UML_MOV(block, IREG(1), R32(RTREG));									// mov     i1,<rtreg>
 			UML_CALLH(block, rsp->impstate->write8);								// callh   write8
 			if (!in_delay_slot)
@@ -4326,7 +4322,7 @@ static int generate_opcode(rsp_state *rsp, drcuml_block *block, compiler_state *
 			return TRUE;
 
 		case 0x29:	/* SH - MIPS I */
-			UML_ADD(block, IREG(0), R32(RSREG), IMM(SIMMVAL));						// add     i0,<rsreg>,SIMMVAL
+			UML_ADD(block, IREG(0), R32(RSREG), IMM(SIMM16));						// add     i0,<rsreg>,SIMM16
 			UML_MOV(block, IREG(1), R32(RTREG));									// mov     i1,<rtreg>
 			UML_CALLH(block, rsp->impstate->write16);								// callh   write16
 			if (!in_delay_slot)
@@ -4334,7 +4330,7 @@ static int generate_opcode(rsp_state *rsp, drcuml_block *block, compiler_state *
 			return TRUE;
 
 		case 0x2b:	/* SW - MIPS I */
-			UML_ADD(block, IREG(0), R32(RSREG), IMM(SIMMVAL));						// add     i0,<rsreg>,SIMMVAL
+			UML_ADD(block, IREG(0), R32(RSREG), IMM(SIMM16 ));						// add     i0,<rsreg>,SIMM16
 			UML_MOV(block, IREG(1), R32(RTREG));									// mov     i1,<rtreg>
 			UML_CALLH(block, rsp->impstate->write32);								// callh   write32
 			if (!in_delay_slot)
@@ -4673,8 +4669,8 @@ static void cfunc_mtc2(void *param)
 	rsp_state *rsp = (rsp_state*)param;
 	UINT32 op = rsp->impstate->arg0;
 	int el = (op >> 7) & 0xf;
-	VREG_B(VS1REG, (el+0) & 0xf) = (RTVAL >> 8) & 0xff;
-	VREG_B(VS1REG, (el+1) & 0xf) = (RTVAL >> 0) & 0xff;
+	VREG_B(RDREG, (el+0) & 0xf) = (RTVAL >> 8) & 0xff;
+	VREG_B(RDREG, (el+1) & 0xf) = (RTVAL >> 0) & 0xff;
 }
 
 static void cfunc_ctc2(void *param)
