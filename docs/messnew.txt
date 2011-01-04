@@ -190,6 +190,8 @@ Source Changes:
 - softlists: Added new lists, new dumps and info [anondumper, Barry Rodewald, 
   Curt Coder, MESSfan, Fabio Priuli]
 
+- Refactored the MSM8251 device to use devcb. [Curt Coder]
+
 
 
 0.140

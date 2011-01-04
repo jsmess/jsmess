@@ -596,27 +596,29 @@ static CRT9021_INTERFACE( vac_intf )
 
 /* Intel 8251A Interface */
 
-static WRITE_LINE_DEVICE_HANDLER( rxrdy_w )
+WRITE_LINE_MEMBER( tandy2k_state::rxrdy_w )
 {
-	tandy2k_state *driver_state = device->machine->driver_data<tandy2k_state>();
-
-	driver_state->m_rxrdy = state;
-	pic8259_ir2_w(driver_state->m_pic0, driver_state->m_rxrdy | driver_state->m_txrdy);
+	m_rxrdy = state;
+	pic8259_ir2_w(m_pic0, m_rxrdy | m_txrdy);
 }
 
-static WRITE_LINE_DEVICE_HANDLER( txrdy_w )
+WRITE_LINE_MEMBER( tandy2k_state::txrdy_w )
 {
-	tandy2k_state *driver_state = device->machine->driver_data<tandy2k_state>();
-
-	driver_state->m_txrdy = state;
-	pic8259_ir2_w(driver_state->m_pic0, driver_state->m_rxrdy | driver_state->m_txrdy);
+	m_txrdy = state;
+	pic8259_ir2_w(m_pic0, m_rxrdy | m_txrdy);
 }
 
 static const msm8251_interface i8251_intf =
 {
-	txrdy_w,
-	NULL,
-	rxrdy_w
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_DRIVER_LINE_MEMBER(tandy2k_state, rxrdy_w),
+	DEVCB_DRIVER_LINE_MEMBER(tandy2k_state, txrdy_w),
+	DEVCB_NULL,
+	DEVCB_NULL	
 };
 
 /* Intel 8253 Interface */

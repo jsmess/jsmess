@@ -128,6 +128,10 @@ public:
     DECLARE_READ8_MEMBER( memory_r );
     DECLARE_WRITE8_MEMBER( memory_w );
 
+    DECLARE_WRITE8_MEMBER( ale_w );
+    DECLARE_READ8_MEMBER( read );
+    DECLARE_WRITE8_MEMBER( write );
+
 protected:
     // device-level overrides
     virtual void device_start();
@@ -147,6 +151,10 @@ private:
 	devcb_resolved_read8		m_in_port_func[3];
 	devcb_resolved_write8		m_out_port_func[3];
 	devcb_resolved_write_line	m_out_to_func;
+
+	// CPU interface
+	int m_io_m;					// I/O or memory select
+	UINT8 m_ad;					// address
 
 	// registers
 	UINT8 m_command;			// command register

@@ -378,9 +378,15 @@ static UPD3301_INTERFACE( pc8001_upd3301_intf )
 
 static const msm8251_interface pc8001_8251_intf =
 {
-	NULL,
-	NULL,
-	NULL
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 /* 8255 Interface */

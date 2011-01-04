@@ -373,7 +373,7 @@ WRITE16_DEVICE_HANDLER ( compis_osp_pit_w )
 /*-------------------------------------------------------------------------*/
 /*  USART 8251                                                             */
 /*-------------------------------------------------------------------------*/
-static void compis_usart_rxready(device_t *device, int state)
+WRITE_LINE_DEVICE_HANDLER( compis_usart_rxready )
 {
 #if 0
 	if (state)
@@ -383,9 +383,15 @@ static void compis_usart_rxready(device_t *device, int state)
 
 const msm8251_interface compis_usart_interface=
 {
-	NULL,
-	NULL,
-	compis_usart_rxready
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_LINE(compis_usart_rxready),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 READ16_HANDLER ( compis_usart_r )

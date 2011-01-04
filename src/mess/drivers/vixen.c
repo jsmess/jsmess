@@ -1,6 +1,6 @@
 /*
 
-Osborne-4 "Vixen"
+Osborne 4 Vixen
 
 Main PCB Layout
 ---------------
@@ -45,14 +45,11 @@ Notes:
 
 	TODO:
 
-	- force fetch from ROM at reset
-	- frame rate should be ~60Hz
 	- video line buffer
 	- vsync
 	- floppy
-	- interrupts
 	- keyboard
-	- I/O board (8155 for IEEE488, 8251 for RS-232)
+	- RS232 RI interrupt
 	- PCB layouts
 	
 */
@@ -64,6 +61,8 @@ Notes:
 #include "devices/flopdrv.h"
 #include "devices/messram.h"
 #include "machine/i8155.h"
+#include "machine/ieee488.h"
+#include "machine/msm8251.h"
 #include "machine/wd17xx.h"
 #include "sound/discrete.h"
 #include "includes/vixen.h"
@@ -80,9 +79,21 @@ Notes:
 
 void vixen_state::update_interrupt()
 {
-	int state = ((!BIT(m_cmd, 0) & m_fdint) | m_vsync) ? ASSERT_LINE : CLEAR_LINE;
+	int state = (m_cmd_d1 & m_fdint) | m_vsync | (!m_enb_srq_int & !m_srq) | (!m_enb_atn_int & !m_atn) | (!m_enb_xmt_int & m_txrdy) | (!m_enb_rcv_int & m_rxrdy);
 
-	cpu_set_input_line(m_maincpu, INPUT_LINE_IRQ0, state);
+	cpu_set_input_line(m_maincpu, INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE);
+}
+
+
+//-------------------------------------------------
+//  ctl_w - command write
+//-------------------------------------------------
+
+WRITE8_MEMBER( vixen_state::ctl_w )
+{
+	logerror("CTL %u\n", data);
+
+	memory_set_bank(machine, "bank3", BIT(data, 0));
 }
 
 
@@ -96,21 +107,24 @@ READ8_MEMBER( vixen_state::status_r )
 		
 		bit		description
 
-		0		CMD D0
-		1		CMD D1
+		0		VSYNC enable
+		1		FDINT enable
 		2		VSYNC
-		3		
-		4		
-		5		
-		6		
-		7		
-
+		3		1
+		4		1
+		5		1
+		6		1
+		7		1
+		
 	*/
 
-	UINT8 data = 0;
+	UINT8 data = 0xf8;
 	
-	// command
-	data |= m_cmd & 0x03;
+	// vertical sync interrupt enable
+	data |= m_cmd_d0;
+
+	// floppy interrupt enable
+	data |= m_cmd_d1 << 1;
 
 	// vertical sync
 	data |= m_vsync << 2;
@@ -129,7 +143,7 @@ WRITE8_MEMBER( vixen_state::cmd_w )
 		
 		bit		description
 
-		0		VSYNC clear
+		0		VSYNC enable
 		1		FDINT enable
 		2		
 		3		
@@ -140,15 +154,54 @@ WRITE8_MEMBER( vixen_state::cmd_w )
 
 	*/
 
-	m_cmd = data;
+	logerror("CMD %u\n", data);
 
-	if (BIT(data, 0))
+	// vertical sync interrupt enable
+	m_cmd_d0 = BIT(data, 0);
+
+	if (!m_cmd_d0)
 	{
 		// clear vertical sync
 		m_vsync = 0;
 	}
 
+	// floppy interrupt enable
+	m_cmd_d1 = BIT(data, 1);
+
 	update_interrupt();
+}
+
+
+//-------------------------------------------------
+//  port3_r - serial status read
+//-------------------------------------------------
+
+READ8_MEMBER( vixen_state::port3_r )
+{
+	/*
+		
+		bit		description
+
+		0		RI
+		1		DCD
+		2		1
+		3		1
+		4		1
+		5		1
+		6		1
+		7		1
+
+	*/
+
+	UINT8 data = 0xff; //0xfc;
+
+	// TODO ring indicator
+	//data |= rs232_ri_r(m_rs232);
+
+	// TODO data carrier detect
+	//data |= rs232_dcd_r(m_rs232) << 1;
+
+	return data;
 }
 
 
@@ -163,8 +216,8 @@ WRITE8_MEMBER( vixen_state::cmd_w )
 
 static ADDRESS_MAP_START( vixen_mem, ADDRESS_SPACE_PROGRAM, 8, vixen_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0xefff) AM_RAM
-	AM_RANGE(0xf000, 0xffff) AM_READ_BANK("bank1") AM_WRITE_BANK("bank2") AM_BASE(m_video_ram)
+	AM_RANGE(0x0000, 0xefff) AM_READ_BANK("bank1") AM_WRITE_BANK("bank2")
+	AM_RANGE(0xf000, 0xffff) AM_READ_BANK("bank3") AM_WRITE_BANK("bank4") AM_BASE(m_video_ram)
 ADDRESS_MAP_END
 
 
@@ -173,17 +226,20 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 static ADDRESS_MAP_START( vixen_io, ADDRESS_SPACE_IO, 8, vixen_state )
+	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE_LEGACY(FDC1797_TAG, wd17xx_r, wd17xx_w)
-	AM_RANGE(0x04, 0x04) AM_MIRROR(0x03) AM_READWRITE(status_r, cmd_w)
-	AM_RANGE(0x08, 0x08) AM_MIRROR(0x04) AM_DEVREADWRITE(P8155H_TAG, i8155_device, memory_r, memory_w)
-	AM_RANGE(0x09, 0x09) AM_MIRROR(0x04) AM_DEVREADWRITE(P8155H_TAG, i8155_device, io_r, io_w)
-//	AM_RANGE(0x10, 0x17) aux1
-//	AM_RANGE(0x18, 0x1f) aux2
-//	AM_RANGE(0x20, 0x27) port0
-//	AM_RANGE(0x28, 0x2f) port1
-//	AM_RANGE(0x30, 0x37) port2
-//	AM_RANGE(0x38, 0x3f) port3
+	AM_RANGE(0x04, 0x04) AM_MIRROR(0x03) AM_WRITE(ctl_w)
+	AM_RANGE(0x08, 0x08) AM_DEVREADWRITE(P8155H_TAG, i8155_device, read, write)
+	AM_RANGE(0x0c, 0x0d) AM_DEVWRITE(P8155H_TAG, i8155_device, ale_w)
+	AM_RANGE(0x10, 0x10) AM_MIRROR(0x07) AM_DEVREAD_LEGACY(IEEE488_TAG, ieee488_dio_r)
+	AM_RANGE(0x18, 0x18) AM_MIRROR(0x07) AM_READ_PORT("IEEE488")
+	AM_RANGE(0x20, 0x21) AM_MIRROR(0x04) AM_DEVWRITE(P8155H_IO_TAG, i8155_device, ale_w)
+	AM_RANGE(0x28, 0x28) AM_MIRROR(0x05) AM_DEVREADWRITE(P8155H_IO_TAG, i8155_device, read, write)
+	AM_RANGE(0x30, 0x30) AM_MIRROR(0x06) AM_DEVREADWRITE_LEGACY(P8251A_TAG, msm8251_data_r, msm8251_data_w)
+	AM_RANGE(0x31, 0x31) AM_MIRROR(0x06) AM_DEVREADWRITE_LEGACY(P8251A_TAG, msm8251_status_r, msm8251_control_w)
+	AM_RANGE(0x38, 0x38) AM_MIRROR(0x07) AM_READ(port3_r)
+	AM_RANGE(0xf0, 0xf0) AM_MIRROR(0x0f) AM_READWRITE(status_r, cmd_w)
 ADDRESS_MAP_END
 
 
@@ -276,6 +332,16 @@ INPUT_PORTS_START( vixen )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+
+	PORT_START("IEEE488")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE(IEEE488_TAG, ieee488_atn_r)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE(IEEE488_TAG, ieee488_dav_r)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE(IEEE488_TAG, ieee488_ndac_r)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE(IEEE488_TAG, ieee488_nrfd_r)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE(IEEE488_TAG, ieee488_eoi_r)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE(IEEE488_TAG, ieee488_srq_r)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE(IEEE488_TAG, ieee488_ifc_r)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE(IEEE488_TAG, ieee488_ren_r)
 INPUT_PORTS_END
 
 
@@ -284,6 +350,22 @@ INPUT_PORTS_END
 //	VIDEO
 //**************************************************************************
 
+//-------------------------------------------------
+//  TIMER_DEVICE_CALLBACK( vsync_tick )
+//-------------------------------------------------
+
+static TIMER_DEVICE_CALLBACK( vsync_tick )
+{
+	vixen_state *state = timer.machine->driver_data<vixen_state>();
+
+	if (state->m_cmd_d0)
+	{
+//		state->m_vsync = 1;
+		state->update_interrupt();
+	}
+}
+
+	
 //-------------------------------------------------
 //  VIDEO_START( vixenc )
 //-------------------------------------------------
@@ -310,7 +392,7 @@ bool vixen_state::video_update(screen_device &screen, bitmap_t &bitmap, const re
 {
 	for (int txadr = 0; txadr < 27; txadr++)
 	{
-		for (int scan = 0; scan < 16; scan++)
+		for (int scan = 0; scan < 10; scan++)
 		{
 			for (int chadr = 0; chadr < 128; chadr++)
 			{
@@ -329,9 +411,8 @@ bool vixen_state::video_update(screen_device &screen, bitmap_t &bitmap, const re
 				*/
 
 				int reverse = 0;
-				int y = (txadr << 4) | scan;
 
-				UINT16 video_addr = chadr + txadr * 40;
+				UINT16 video_addr = (txadr << 7) | chadr;
 				UINT8 video_data = m_video_ram[video_addr];
 				UINT16 char_addr = 0;
 
@@ -352,7 +433,7 @@ bool vixen_state::video_update(screen_device &screen, bitmap_t &bitmap, const re
 				{
 					int color = (BIT(char_data, 7 - x) ^ reverse) & !blank;
 					
-					*BITMAP_ADDR16(&bitmap, y, chadr * 8 + x) = color;
+					*BITMAP_ADDR16(&bitmap, (txadr * 10) + scan, chadr * 8 + x) = color;
 				}
 			}
 		}
@@ -364,7 +445,7 @@ bool vixen_state::video_update(screen_device &screen, bitmap_t &bitmap, const re
 
 
 //**************************************************************************
-//	VIDEO
+//	SOUND
 //**************************************************************************
 
 //-------------------------------------------------
@@ -426,7 +507,8 @@ WRITE8_MEMBER( vixen_state::i8155_pc_w )
 	*/
 
 	// drive select
-	wd17xx_set_drive(m_fdc, data & 0x03);
+	if (!BIT(data, 0)) wd17xx_set_drive(m_fdc, 0);
+	if (!BIT(data, 1)) wd17xx_set_drive(m_fdc, 1);
 
 	// density select
 	wd17xx_dden_w(m_fdc, BIT(data, 2));
@@ -436,7 +518,7 @@ WRITE8_MEMBER( vixen_state::i8155_pc_w )
 	m_256 = BIT(data, 4);
 
 	// beep enable
-	discrete_sound_w(m_discrete, NODE_01, !BIT(data, 5));
+	discrete_sound_w(m_discrete, NODE_01, BIT(data, 5));
 }
 
 static I8155_INTERFACE( i8155_intf )
@@ -452,14 +534,158 @@ static I8155_INTERFACE( i8155_intf )
 
 
 //-------------------------------------------------
-//  wd17xx_interface fdc_intf
+//  I8155_INTERFACE( io_i8155_intf )
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( vixen_state::fdint_w )
+WRITE8_MEMBER( vixen_state::io_i8155_pa_w )
 {
-	m_fdint = state;
+	ieee488_dio_w(m_ieee488, m_io_i8155, data);
+}
+
+WRITE8_MEMBER( vixen_state::io_i8155_pb_w )
+{
+	/*
+
+        bit     description
+
+        PB0     ATN
+        PB1     DAV
+        PB2     NDAC
+        PB3     NRFD
+        PB4     EOI
+        PB5     SRQ
+        PB6     IFC
+        PB7     REN
+
+    */
+
+	/* data valid */
+	ieee488_atn_w(m_ieee488, m_io_i8155, BIT(data, 0));
+
+	/* end or identify */
+	ieee488_dav_w(m_ieee488, m_io_i8155, BIT(data, 1));
+
+	/* remote enable */
+	ieee488_ndac_w(m_ieee488, m_io_i8155, BIT(data, 2));
+
+	/* attention */
+	ieee488_nrfd_w(m_ieee488, m_io_i8155, BIT(data, 3));
+
+	/* interface clear */
+	ieee488_eoi_w(m_ieee488, m_io_i8155, BIT(data, 4));
+
+	/* service request */
+	ieee488_srq_w(m_ieee488, m_io_i8155, BIT(data, 5));
+
+	/* not ready for data */
+	ieee488_ifc_w(m_ieee488, m_io_i8155, BIT(data, 6));
+
+	/* data not accepted */
+	ieee488_ren_w(m_ieee488, m_io_i8155, BIT(data, 7));
+}
+
+WRITE8_MEMBER( vixen_state::io_i8155_pc_w )
+{
+	/*
+
+        bit     description
+
+        PC0     select internal clock
+        PC1     ENB RING INT
+        PC2     ENB RCV INT
+        PC3     ENB XMT INT
+        PC4     ENB ATN INT
+        PC5     ENB SRQ INT
+        PC6     
+        PC7     
+
+    */
+
+	m_int_clk = BIT(data, 0);
+	m_enb_ring_int = BIT(data, 1);
+	m_enb_rcv_int = BIT(data, 2);
+	m_enb_xmt_int = BIT(data, 3);
+	m_enb_atn_int = BIT(data, 4);
+	m_enb_srq_int = BIT(data, 5);
+}
+
+WRITE_LINE_MEMBER( vixen_state::io_i8155_to_w )
+{
+	if (m_int_clk && !state)
+	{
+		msm8251_transmit_clock(m_usart);
+		msm8251_receive_clock(m_usart);
+	}
+}
+
+static I8155_INTERFACE( io_i8155_intf )
+{
+    DEVCB_NULL,
+	DEVCB_DRIVER_MEMBER(vixen_state, io_i8155_pa_w),
+    DEVCB_NULL,
+	DEVCB_DRIVER_MEMBER(vixen_state, io_i8155_pb_w),
+	DEVCB_NULL,
+	DEVCB_DRIVER_MEMBER(vixen_state, io_i8155_pc_w),
+	DEVCB_DRIVER_LINE_MEMBER(vixen_state, io_i8155_to_w)
+};
+
+
+//-------------------------------------------------
+//  msm8251_interface usart_intf
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER( vixen_state::rxrdy_w )
+{
+	m_rxrdy = state;
 	update_interrupt();
 }
+
+WRITE_LINE_MEMBER( vixen_state::txrdy_w )
+{
+	m_txrdy = state;
+	update_interrupt();
+}
+
+static const msm8251_interface usart_intf =
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_DRIVER_LINE_MEMBER(vixen_state, rxrdy_w),
+	DEVCB_DRIVER_LINE_MEMBER(vixen_state, txrdy_w),
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
+
+//-------------------------------------------------
+//  IEEE488_DAISY( ieee488_daisy )
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER( vixen_state::srq_w )
+{
+	m_srq = state;
+	update_interrupt();
+}
+
+WRITE_LINE_MEMBER( vixen_state::atn_w )
+{
+	m_atn = state;
+	update_interrupt();
+}
+
+static IEEE488_DAISY( ieee488_daisy )
+{
+	{ P8155H_IO_TAG, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_DRIVER_LINE_MEMBER(vixen_state, srq_w), DEVCB_DRIVER_LINE_MEMBER(vixen_state, atn_w), DEVCB_NULL },
+	{ NULL }
+};
+
+
+//-------------------------------------------------
+//  wd17xx_interface fdc_intf
+//-------------------------------------------------
 
 static const floppy_config vixen_floppy_config =
 {
@@ -472,6 +698,12 @@ static const floppy_config vixen_floppy_config =
     FLOPPY_OPTIONS_NAME(default),
     NULL
 };
+
+WRITE_LINE_MEMBER( vixen_state::fdint_w )
+{
+	m_fdint = state;
+	update_interrupt();
+}
 
 static const wd17xx_interface fdc_intf =
 {
@@ -494,15 +726,24 @@ static const wd17xx_interface fdc_intf =
 void vixen_state::machine_start()
 {
 	// configure memory banking
-	memory_configure_bank(machine, "bank1", 0, 1, m_video_ram, 0);
+	UINT8 *ram = messram_get_ptr(m_ram);
+
+	memory_configure_bank(machine, "bank1", 0, 1, ram, 0);
 	memory_configure_bank(machine, "bank1", 1, 1, machine->region(Z8400A_TAG)->base(), 0);
-	memory_configure_bank(machine, "bank2", 0, 1, m_video_ram, 0);
-	memory_set_bank(machine, "bank2", 0);
+	
+	memory_configure_bank(machine, "bank2", 0, 1, ram, 0);
+	memory_configure_bank(machine, "bank2", 1, 1, m_video_ram, 0);
+
+	memory_configure_bank(machine, "bank3", 0, 1, m_video_ram, 0);
+	memory_configure_bank(machine, "bank3", 1, 1, machine->region(Z8400A_TAG)->base(), 0);
+	
+	memory_configure_bank(machine, "bank4", 0, 1, m_video_ram, 0);
 
 	// register for state saving
 	state_save_register_global(machine, m_reset);
 	state_save_register_global(machine, m_col);
-	state_save_register_global(machine, m_cmd);
+	state_save_register_global(machine, m_cmd_d0);
+	state_save_register_global(machine, m_cmd_d1);
 	state_save_register_global(machine, m_fdint);
 }
 
@@ -513,9 +754,20 @@ void vixen_state::machine_start()
 
 void vixen_state::machine_reset()
 {
+	const address_space *program = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);
+
+	memory_install_read_bank(program, 0x0000, 0x0fff, 0xfff, 0, "bank1");
+	memory_install_write_bank(program, 0x0000, 0x0fff, 0xfff, 0, "bank2");
+
 	memory_set_bank(machine, "bank1", 1);
+	memory_set_bank(machine, "bank2", 1);
+	memory_set_bank(machine, "bank3", 1);
 
 	m_reset = 1;
+	
+	m_cmd_d0 = 0;
+	m_cmd_d1 = 0;
+	update_interrupt();
 }
 
 
@@ -537,7 +789,8 @@ static MACHINE_CONFIG_START( vixen, vixen_state )
     // video hardware
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_23_9616MHz/2, 96*8, 0*8, 81*8, 27*16, 0*16, 26*16)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_23_9616MHz/2, 96*8, 0*8, 81*8, 27*10, 0*10, 26*10)
+	MCFG_TIMER_ADD_SCANLINE("vsync", vsync_tick, SCREEN_TAG, 26*10, 27*10)
 
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(monochrome_amber)
@@ -550,8 +803,11 @@ static MACHINE_CONFIG_START( vixen, vixen_state )
 
 	// devices
 	MCFG_I8155_ADD(P8155H_TAG, XTAL_23_9616MHz/6, i8155_intf)
+	MCFG_I8155_ADD(P8155H_IO_TAG, XTAL_23_9616MHz/6, io_i8155_intf)
+	MCFG_MSM8251_ADD(P8251A_TAG, usart_intf)
 	MCFG_WD179X_ADD(FDC1797_TAG, fdc_intf)
 	MCFG_FLOPPY_2_DRIVES_ADD(vixen_floppy_config)
+	MCFG_IEEE488_ADD(IEEE488_TAG, ieee488_daisy)
 	
 	// internal ram
 	MCFG_RAM_ADD("messram")
@@ -588,19 +844,31 @@ ROM_END
 //-------------------------------------------------
 //  DRIVER_INIT( vixen )
 //-------------------------------------------------
-/*
+
 DIRECT_UPDATE_HANDLER( vixen_direct_update_handler )
 {
 	vixen_state *state = machine->driver_data<vixen_state>();
 
-	if (state->m_reset)
+	if (address >= 0xf000)
 	{
-		direct.explicit_configure(0x0000, 0xffff, 0x10000, machine->region(Z8400A_TAG)->base());
-		state->m_reset = 0;
+		if (state->m_reset)
+		{
+			const address_space *program = cpu_get_address_space(state->m_maincpu, ADDRESS_SPACE_PROGRAM);
+
+			memory_install_read_bank(program, 0x0000, 0xefff, 0, 0, "bank1");
+			memory_install_write_bank(program, 0x0000, 0xefff, 0, 0, "bank2");
+		
+			memory_set_bank(machine, "bank1", 0);
+			memory_set_bank(machine, "bank2", 0);
+
+			state->m_reset = 0;
+		}
+
+		direct.explicit_configure(0xf000, 0xffff, 0xfff, machine->region(Z8400A_TAG)->base());
 
 		return ~0;
 	}
-	
+
 	return address;
 }
 
@@ -609,7 +877,7 @@ static DRIVER_INIT( vixen )
 	address_space *program = machine->device<cpu_device>(Z8400A_TAG)->space(AS_PROGRAM);
 	program->set_direct_update_handler(direct_update_delegate_create_static(vixen_direct_update_handler, *machine));
 }
-*/
+
 
 
 //**************************************************************************
@@ -617,4 +885,4 @@ static DRIVER_INIT( vixen )
 //**************************************************************************
 
 //    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS
-COMP( 1984, vixen,  0,       0, 	vixen, 	vixen, 	 0,  "Osborne",   "Vixen",		GAME_NOT_WORKING )
+COMP( 1984, vixen,  0,       0, 	vixen, 	vixen, 	 vixen,  "Osborne",   "Vixen",		GAME_NOT_WORKING )

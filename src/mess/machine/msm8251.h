@@ -43,12 +43,15 @@ DECLARE_LEGACY_DEVICE(MSM8251, msm8251);
 typedef struct _msm8251_interface msm8251_interface;
 struct _msm8251_interface
 {
-	/* state of txrdy output */
-	void	(*tx_ready_callback)(device_t *device, int state);
-	/* state of txempty output */
-	void	(*tx_empty_callback)(device_t *device, int state);
-	/* state of rxrdy output */
-	void	(*rx_ready_callback)(device_t *device, int state);
+	devcb_read_line		in_rxd_func;
+	devcb_write_line	out_txd_func;
+	devcb_read_line		in_dsr_func;
+	devcb_write_line	out_dtr_func;
+	devcb_write_line	out_rts_func;
+	devcb_write_line	out_rxrdy_func;
+	devcb_write_line	out_txrdy_func;
+	devcb_write_line	out_txempty_func;
+	devcb_write_line	out_syndet_func;
 };
 
 

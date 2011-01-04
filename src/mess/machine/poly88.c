@@ -234,17 +234,25 @@ INTERRUPT_GEN( poly88_interrupt )
 	state->int_vector = 0xf7;
 	cpu_set_input_line(device, 0, HOLD_LINE);
 }
-static void poly88_usart_rxready (device_t *device, int state)
+
+static WRITE_LINE_DEVICE_HANDLER( poly88_usart_rxready )
 {
 	//poly88_state *drvstate = device->machine->driver_data<poly88_state>();
 	//drvstate->int_vector = 0xe7;
 	//cpu_set_input_line(device, 0, HOLD_LINE);
 }
+
 const msm8251_interface poly88_usart_interface=
 {
-	NULL,
-	NULL,
-	poly88_usart_rxready
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_LINE(poly88_usart_rxready),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 READ8_HANDLER(poly88_keyboard_r)

@@ -94,6 +94,9 @@ public:
 	DECLARE_WRITE8_MEMBER( misc_ppi_pa_w );
 	DECLARE_WRITE8_MEMBER( misc_ppi_pc_w );
 	DECLARE_WRITE8_MEMBER( rtc_ppi_pb_w );
+	DECLARE_WRITE_LINE_MEMBER( kb_rxrdy_w );
+	DECLARE_WRITE_LINE_MEMBER( sio_rxrdy_w );
+	DECLARE_WRITE_LINE_MEMBER( sio_txrdy_w );
 	DECLARE_WRITE_LINE_MEMBER( fdc_intrq_w );
 	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
 	DECLARE_READ8_MEMBER( attr_r );

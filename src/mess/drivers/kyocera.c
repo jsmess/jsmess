@@ -1111,9 +1111,15 @@ static I8155_INTERFACE( tandy200_8155_intf )
 
 static const msm8251_interface tandy200_msm8251_interface =
 {
-	NULL,
-	NULL,
-	NULL
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 /* Machine Drivers */

@@ -984,18 +984,22 @@ static TIMER_DEVICE_CALLBACK( kb_8251_tick )
 	msm8251_receive_clock(state->m_uart_kb);
 }
 
-static WRITE_LINE_DEVICE_HANDLER( kb_8251_rxrdy_w )
+WRITE_LINE_MEMBER( v1050_state::kb_rxrdy_w )
 {
-	v1050_state *driver_state = device->machine->driver_data<v1050_state>();
-
-	driver_state->set_interrupt(INT_KEYBOARD, state);
+	set_interrupt(INT_KEYBOARD, state);
 }
 
 static const msm8251_interface kb_8251_intf =
 {
-	NULL,
-	NULL,
-	kb_8251_rxrdy_w
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_DRIVER_LINE_MEMBER(v1050_state, kb_rxrdy_w),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL	
 };
 
 /* Serial 8251A Interface */
@@ -1008,29 +1012,31 @@ static TIMER_DEVICE_CALLBACK( sio_8251_tick )
 	msm8251_receive_clock(state->m_uart_sio);
 }
 
-static WRITE_LINE_DEVICE_HANDLER( sio_8251_rxrdy_w )
+WRITE_LINE_MEMBER( v1050_state::sio_rxrdy_w )
 {
-	v1050_state *driver_state = device->machine->driver_data<v1050_state>();
+	m_rxrdy = state;
 
-	driver_state->m_rxrdy = state;
-
-	driver_state->set_interrupt(INT_RS_232, driver_state->m_rxrdy | driver_state->m_txrdy);
+	set_interrupt(INT_RS_232, m_rxrdy | m_txrdy);
 }
 
-static WRITE_LINE_DEVICE_HANDLER( sio_8251_txrdy_w )
+WRITE_LINE_MEMBER( v1050_state::sio_txrdy_w )
 {
-	v1050_state *driver_state = device->machine->driver_data<v1050_state>();
+	m_txrdy = state;
 
-	driver_state->m_txrdy = state;
-
-	driver_state->set_interrupt(INT_RS_232, driver_state->m_rxrdy | driver_state->m_txrdy);
+	set_interrupt(INT_RS_232, m_rxrdy | m_txrdy);
 }
 
 static const msm8251_interface sio_8251_intf =
 {
-	sio_8251_txrdy_w,
-	NULL,
-	sio_8251_rxrdy_w
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_DRIVER_LINE_MEMBER(v1050_state, sio_rxrdy_w),
+	DEVCB_DRIVER_LINE_MEMBER(v1050_state, sio_txrdy_w),
+	DEVCB_NULL,
+	DEVCB_NULL	
 };
 
 /* MB8877 Interface */

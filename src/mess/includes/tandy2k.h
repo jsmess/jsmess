@@ -74,6 +74,8 @@ public:
 	DECLARE_WRITE8_MEMBER( keyboard_y0_w );
 	DECLARE_WRITE8_MEMBER( keyboard_y8_w );
 	DECLARE_WRITE_LINE_MEMBER( busdmarq0_w );
+	DECLARE_WRITE_LINE_MEMBER( rxrdy_w );
+	DECLARE_WRITE_LINE_MEMBER( txrdy_w );
 	DECLARE_WRITE_LINE_MEMBER( outspkr_w );
 	DECLARE_WRITE_LINE_MEMBER( intbrclk_w );
 	DECLARE_WRITE_LINE_MEMBER( rfrqpulse_w );

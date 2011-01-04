@@ -24,7 +24,7 @@
 //	MACROS / CONSTANTS
 //**************************************************************************
 
-#define LOG 0
+#define LOG 1
 
 enum
 {
@@ -51,6 +51,12 @@ enum
 	PORT_MODE_OUTPUT,
 	PORT_MODE_STROBED_PORT_A,	// not supported
 	PORT_MODE_STROBED			// not supported
+};
+
+enum
+{
+	MEMORY = 0,
+	IO
 };
 
 #define COMMAND_PA					0x01
@@ -313,6 +319,8 @@ void i8155_device::device_start()
 	m_timer = device_timer_alloc(*this);
 
 	// register for state saving
+	state_save_register_device_item(this, 0, m_io_m);
+	state_save_register_device_item(this, 0, m_ad);
 	state_save_register_device_item(this, 0, m_command);
 	state_save_register_device_item(this, 0, m_status);
 	state_save_register_device_item_array(this, 0, m_output);
@@ -586,4 +594,60 @@ READ8_MEMBER( i8155_device::memory_r )
 WRITE8_MEMBER( i8155_device::memory_w )
 {
 	this->space()->write_byte(offset, data);
+}
+
+
+//-------------------------------------------------
+//  ale_w - address latch write
+//-------------------------------------------------
+
+WRITE8_MEMBER( i8155_device::ale_w )
+{
+	// I/O / memory select
+	m_io_m = BIT(offset, 0);
+
+	// address
+	m_ad = data;
+}
+
+
+//-------------------------------------------------
+//  read - memory or I/O read
+//-------------------------------------------------
+
+READ8_MEMBER( i8155_device::read )
+{
+	UINT8 data = 0;
+
+	switch (m_io_m)
+	{
+	case MEMORY:
+		data = memory_r(space, m_ad);
+		break;
+
+	case IO:
+		data = io_r(space, m_ad);
+		break;
+	}
+
+	return data;
+}
+
+
+//-------------------------------------------------
+//  write - memory or I/O write
+//-------------------------------------------------
+
+WRITE8_MEMBER( i8155_device::write )
+{
+	switch (m_io_m)
+	{
+	case MEMORY:
+		memory_w(space, m_ad, data);
+		break;
+
+	case IO:
+		io_w(space, m_ad, data);
+		break;
+	}
 }

@@ -875,7 +875,7 @@ static void nc100_tc8521_alarm_callback(device_t *device, int state)
 	drvstate->previous_alarm_state = state;
 }
 
-static void nc100_txrdy_callback(device_t *device, int state)
+static WRITE_LINE_DEVICE_HANDLER( nc100_txrdy_callback )
 {
 	nc_state *drvstate = device->machine->driver_data<nc_state>();
 	drvstate->irq_latch &= ~(1 << 1);
@@ -893,7 +893,7 @@ static void nc100_txrdy_callback(device_t *device, int state)
 	nc_update_interrupts(device->machine);
 }
 
-static void nc100_rxrdy_callback(device_t *device, int state)
+static WRITE_LINE_DEVICE_HANDLER( nc100_rxrdy_callback )
 {
 	nc_state *drvstate = device->machine->driver_data<nc_state>();
 	drvstate->irq_latch &= ~(1<<0);
@@ -918,9 +918,15 @@ static const tc8521_interface nc100_tc8521_interface =
 
 static const msm8251_interface nc100_uart_interface =
 {
-	nc100_txrdy_callback,
-	NULL,
-	nc100_rxrdy_callback
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_LINE(nc100_rxrdy_callback),
+	DEVCB_LINE(nc100_txrdy_callback),
+	DEVCB_NULL,
+	DEVCB_NULL	
 };
 
 
@@ -1271,7 +1277,7 @@ static void nc200_refresh_uart_interrupt(running_machine *machine)
 	nc_update_interrupts(machine);
 }
 
-static void nc200_txrdy_callback(device_t *device, int state)
+static WRITE_LINE_DEVICE_HANDLER( nc200_txrdy_callback )
 {
 	//nc_state *drvstate = machine->driver_data<nc_state>();
 //  drvstate->nc200_uart_interrupt_irq &=~(1<<0);
@@ -1284,7 +1290,7 @@ static void nc200_txrdy_callback(device_t *device, int state)
 //  nc200_refresh_uart_interrupt(device->machine);
 }
 
-static void nc200_rxrdy_callback(device_t *device, int state)
+static WRITE_LINE_DEVICE_HANDLER( nc200_rxrdy_callback )
 {
 	nc_state *drvstate = device->machine->driver_data<nc_state>();
 	drvstate->nc200_uart_interrupt_irq &=~(1<<1);
@@ -1299,9 +1305,15 @@ static void nc200_rxrdy_callback(device_t *device, int state)
 
 static const msm8251_interface nc200_uart_interface=
 {
-	nc200_rxrdy_callback,
-	NULL,
-	nc200_txrdy_callback,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_LINE(nc200_rxrdy_callback),
+	DEVCB_LINE(nc200_txrdy_callback),
+	DEVCB_NULL,
+	DEVCB_NULL	
 };
 
 

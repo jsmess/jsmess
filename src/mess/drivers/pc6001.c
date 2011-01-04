@@ -1861,9 +1861,15 @@ static I8255A_INTERFACE( pc6001_ppi8255_interface )
 
 static const msm8251_interface pc6001_usart_interface=
 {
-	NULL,
-	NULL,
-	NULL
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 
