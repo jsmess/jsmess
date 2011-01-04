@@ -333,6 +333,82 @@ The software list will be divided in four categories:
 		</part>
 	</software>
 
+	<software name="romsaga3">
+		<!-- Serial: SHVC-AL3J-JPN - Release Date: 1995-11-11 - Alt. Title:  -->
+		<description>Romancing Sa-Ga 3 (Jpn, Rev. A)</description>
+		<year>1995</year>
+		<publisher>Square</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1J3M-20" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 64K SRAM" />
+			<feature name="u3" value="U3 MAD-1" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="battery" value="CR2032" />
+			<feature name="cart_revision" value="A" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="G741812 SHVC-JPN-1" />
+			<dataarea name="rom" size="4194304">
+				<rom name="shvc-al3j-1.u1" size="4194304" crc="6c50c2cf" sha1="ed50ac054f664175a2004d3b7423daad3021fb7b" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="romsaga3a" cloneof="romsaga3">
+		<!-- Serial: SHVC-AL3J-JPN - Release Date: 1995-11-11 - Alt. Title:  -->
+		<description>Romancing Sa-Ga 3 (Jpn)</description>
+		<year>1995</year>
+		<publisher>Square</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1J3M-20" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 64K SRAM" />
+			<feature name="u3" value="U3 MAD-1" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="battery" value="CR2032" />
+			<feature name="cart_revision" value="N/A" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="G741812 SHVC-JPN-1" />
+			<dataarea name="rom" size="4194304">
+				<rom name="shvc-al3j-0.u1" size="4194304" crc="5399bddb" sha1="71b404b4f775c86b924f26203dc00d7deb72ce58" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="smkart">
+		<description>Super Mario Kart (Euro)</description> <!-- Revision A has the same ROM as the initial release -->
+		<year>1992</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1K1B-01" />
+			<feature name="u1" value="U1 MASKROM(N)" />
+			<feature name="u2" value="U2 16K SRAM" />
+			<feature name="u3" value="U3 uPD77C25" />
+			<feature name="u4" value="U4 74LS139" />
+			<feature name="u5" value="U5 74HCU04" />
+			<feature name="u6" value="U6 CIC" />
+			<feature name="battery" value="CR2032" />
+			<feature name="cart_revision" value="N/A" />
+			<feature name="cart_model" value="SNSP-006" />
+			<feature name="cart_back_label" value="unknown" />
+<!-- Revision A features:
+			<feature name="pcb" value="SHVC-1K1X-10" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 16K SRAM" />
+			<feature name="u3" value="U3 uPD77C25" />
+			<feature name="u4" value="U4 MAD-2" />
+			<feature name="u5" value="U5 CIC" />
+			<feature name="battery" value="CR2032" />
+			<feature name="cart_revision" value="A" />
+			<feature name="cart_model" value="SNSP-006" />
+			<feature name="cart_back_label" value="SNSP-EUR" />
+-->
+			<dataarea name="rom" size="524288">
+				<rom name="spal-mk-0.u1" size="524288" crc="56410e5e" sha1="27d9b4f30d39af75075691344b7bdeedbd32ac19" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="sjinsei2a" cloneof="sjinsei2">
 		<!-- Serial: SHVC-AL2J-JPN - Release Date: 1995-09-08 -->
 		<description>Super Jinsei Game 2 (Jpn)</description>
@@ -4170,7 +4246,7 @@ The software list will be divided in four categories:
 		<publisher>Capcom</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1572864">
-				<rom name="breath of fire - ryuu no senshi (japan) (rev. A).sfc" size="1572864" crc="e0b0bbec" sha1="3ab85ee92f5e2c9069e3d2fa595fab3d452c5d99" offset="000000" />
+				<rom name="breath of fire - ryuu no senshi (japan) (rev 1).sfc" size="1572864" crc="e0b0bbec" sha1="3ab85ee92f5e2c9069e3d2fa595fab3d452c5d99" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -4884,7 +4960,7 @@ The software list will be divided in four categories:
 
 	<software name="bsxsore">
 		<!-- Serial:  - Release Date:  -->
-		<description>BS-X - Sore wa Namae o Nusumareta Machi no Monogatari (Jpn, Rev. A)</description>
+		<description>BS-X - Sore wa Namae o Nusumareta Machi no Monogatari (Jpn, Rev. AB)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
@@ -7361,7 +7437,7 @@ The software list will be divided in four categories:
 
 	<software name="dstall3">
 		<!-- Serial:  - Release Date: 1995-01-20 -->
-		<description>Derby Stallion III (Jpn, Rev. C)</description>
+		<description>Derby Stallion III (Jpn, Rev. D)</description>
 		<year>1995</year>
 		<publisher>ASCII Entertainment</publisher>
 		<part name="cart" interface="snes_cart">
@@ -9548,7 +9624,7 @@ The software list will be divided in four categories:
 
 	<software name="fzeroj" cloneof="fzero">
 		<!-- Serial: SHVC-FZ - Release Date: 1990-11-21 - Alt. Title: エフゼロ - Notes: Also re-released through Nintendo Power -->
-		<description>F-Zero (Jpn)</description>
+		<description>F-Zero (Jpn)</description> <!-- Revision A has the same ROM as the initial release -->
 		<year>1990</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="snes_cart">
@@ -11802,7 +11878,7 @@ The software list will be divided in four categories:
 		<publisher>Sammy Entertainment</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1572864">
-				<rom name="gindama oyakata no pachinko hisshouhou (japan) (rev. A).sfc" size="1572864" crc="b8c7a417" sha1="80bfa015f12a6af38aa3dcbf88560f928b07cf1d" offset="000000" />
+				<rom name="gindama oyakata no pachinko hisshouhou (japan) (rev 1).sfc" size="1572864" crc="b8c7a417" sha1="80bfa015f12a6af38aa3dcbf88560f928b07cf1d" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -26302,18 +26378,6 @@ The software list will be divided in four categories:
 		</part>
 	</software>
 
-	<software name="romsaga3">
-		<!-- Serial:  - Release Date: 1995-11-11 -->
-		<description>Romancing Sa-Ga 3 (Jpn, Rev. A)</description>
-		<year>1995</year>
-		<publisher>Square</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="4194304">
-				<rom name="romancing saga 3 (japan) (rev 1).sfc" size="4194304" crc="6c50c2cf" sha1="ed50ac054f664175a2004d3b7423daad3021fb7b" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="romsaga3s" cloneof="romsaga3">
 		<description>Romancing Sa-Ga 3 (Jpn, Sample)</description>
 		<year>1995</year>
@@ -26321,18 +26385,6 @@ The software list will be divided in four categories:
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="romancing saga 3 (japan) (sample).sfc" size="4194304" crc="bbbe3253" sha1="dff363586f1e79ef336d54f9069cb59afb6c20cd" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="romsaga3a" cloneof="romsaga3">
-		<!-- Serial:  - Release Date: 1995-11-11 -->
-		<description>Romancing Sa-Ga 3 (Jpn)</description>
-		<year>1995</year>
-		<publisher>Square</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="4194304">
-				<rom name="romancing saga 3 (japan).sfc" size="4194304" crc="5399bddb" sha1="71b404b4f775c86b924f26203dc00d7deb72ce58" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -26699,7 +26751,7 @@ The software list will be divided in four categories:
 		<publisher>Koei</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="3145728">
-				<rom name="sangokushi iv (japan) (rev. A).sfc" size="3145728" crc="57674647 " sha1="f1fdd94d71fbacc794a8a7ad82c217926fc94c6f" offset="000000" />
+				<rom name="sangokushi iv (japan) (rev 1).sfc" size="3145728" crc="57674647 " sha1="f1fdd94d71fbacc794a8a7ad82c217926fc94c6f" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -28286,7 +28338,7 @@ The software list will be divided in four categories:
 		<publisher>Imagineer</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="786432">
-				<rom name="simearth - the living planet (japan) (rev. A).sfc" size="786432" crc="df2c57ae" sha1="f8a46b9007eafd1f94cd61bf5f71bcb95465431f" offset="000000" />
+				<rom name="simearth - the living planet (japan) (rev 1).sfc" size="786432" crc="df2c57ae" sha1="f8a46b9007eafd1f94cd61bf5f71bcb95465431f" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -30181,7 +30233,7 @@ The software list will be divided in four categories:
 
 	<software name="stuntfxu" cloneof="stuntfx">
 		<!-- Serial:  - Release Date: 1994-07 -->
-		<description>Stunt Race FX (USA, Rev. A)</description>
+		<description>Stunt Race FX (USA, v1.1)</description> <!-- Initial release is a v1.1 -->
 		<year>1994</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="snes_cart">
@@ -32640,7 +32692,7 @@ The software list will be divided in four categories:
 
 	<software name="supermjta" cloneof="supermjt">
 		<!-- Serial: SHVC-IQ - Release Date: 1992-09-12 - Alt. Title: スーパー麻雀大会 -->
-		<description>Super Mahjong Taikai (Jpn, Rev. B)</description>
+		<description>Super Mahjong Taikai (Jpn, Rev. C)</description>
 		<year>1992</year>
 		<publisher>Koei</publisher>
 		<part name="cart" interface="snes_cart">
@@ -32652,7 +32704,7 @@ The software list will be divided in four categories:
 
 	<software name="supermjt">
 		<!-- Serial: SHVC-IQ - Release Date: 1992-09-12 - Alt. Title: スーパー麻雀大会 -->
-		<description>Super Mahjong Taikai (Jpn, Rev. C)</description>
+		<description>Super Mahjong Taikai (Jpn, Rev. D)</description>
 		<year>1992</year>
 		<publisher>Koei</publisher>
 		<part name="cart" interface="snes_cart">
@@ -32780,17 +32832,6 @@ The software list will be divided in four categories:
 		</part>
 	</software>
 
-	<software name="smkart">
-		<description>Super Mario Kart (Euro)</description>
-		<year>1992</year>
-		<publisher>Nintendo</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="524288">
-				<rom name="super mario kart (europe).sfc" size="524288" crc="56410e5e" sha1="27d9b4f30d39af75075691344b7bdeedbd32ac19" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="smkartj" cloneof="smkart">
 		<!-- Serial: SHVC-MK - Release Date: 1992-08-27 - Alt. Title: スーパーマリオカート -->
 		<description>Super Mario Kart (Jpn)</description>
@@ -32817,7 +32858,7 @@ The software list will be divided in four categories:
 
 	<software name="smrpgj" cloneof="smrpg" supported="no">
 		<!-- Serial:  - Release Date: 1996-03-09 -->
-		<description>Super Mario RPG (Jpn)</description>
+		<description>Super Mario RPG (Jpn)</description> <!-- Revision A has the same ROM as the initial release -->
 		<year>1996</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="snes_cart">
@@ -32863,7 +32904,7 @@ The software list will be divided in four categories:
 
 	<software name="smwj" cloneof="smw">
 		<!-- Serial: SHVC-MW - Release Date: 1990-11-21 - Alt. Title: スーパーマリオワールド - Notes: Also re-released through Nintendo Power -->
-		<description>Super Mario World - Super Mario Bros. 4 (Jpn)</description>
+		<description>Super Mario World - Super Mario Bros. 4 (Jpn)</description> <!-- Revision A has the same ROM as the initial release -->
 		<year>1990</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="snes_cart">
@@ -34979,7 +35020,7 @@ The software list will be divided in four categories:
 
 	<software name="swordwl2">
 		<!-- Serial:  - Release Date: 1994-07-14 -->
-		<description>Sword World SFC 2 - Inishie no Kyojin Densetsu (Jpn)</description>
+		<description>Sword World SFC 2 - Inishie no Kyojin Densetsu (Jpn)</description> <!-- Revision A has the same ROM as the initial release -->
 		<year>1994</year>
 		<publisher>T&amp;E Soft</publisher>
 		<part name="cart" interface="snes_cart">
@@ -38757,7 +38798,7 @@ The software list will be divided in four categories:
 
 	<software name="wildtrax" cloneof="stuntfx">
 		<!-- Serial:  - Release Date: 1994-06-04 -->
-		<description>Wild Trax (Jpn, Rev. A)</description>
+		<description>Wild Trax (Jpn, v1.1)</description> <!-- Initial release is a v1.1 -->
 		<year>1994</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="snes_cart">
