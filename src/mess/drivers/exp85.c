@@ -10,12 +10,13 @@
 
     TODO:
 	
-    - needs a terminal, or a dump of the hexadecimal keyboard monitor ROM
-    - serial input/output at SID/SOD pins
+    - dump of the hexadecimal keyboard monitor ROM
     - disable ROM mirror after boot
     - RAM expansions
 
 */
+
+#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "includes/exp85.h"
@@ -23,12 +24,13 @@
 #include "imagedev/cassette.h"
 #include "machine/i8155.h"
 #include "machine/i8355.h"
+#include "machine/terminal.h"
 #include "sound/speaker.h"
 #include "machine/ram.h"
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( exp85_mem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( exp85_mem, ADDRESS_SPACE_PROGRAM, 8, exp85_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x07ff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xdfff) AM_ROM
@@ -36,10 +38,10 @@ static ADDRESS_MAP_START( exp85_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf800, 0xf8ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( exp85_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( exp85_io, ADDRESS_SPACE_IO, 8, exp85_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0xf0, 0xf3) AM_DEVREADWRITE_MODERN(I8355_TAG, i8355_device, io_r, io_w)
-	AM_RANGE(0xf8, 0xfd) AM_DEVREADWRITE_MODERN(I8155_TAG, i8155_device, io_r, io_w)
+	AM_RANGE(0xf0, 0xf3) AM_DEVREADWRITE(I8355_TAG, i8355_device, io_r, io_w)
+	AM_RANGE(0xf8, 0xfd) AM_DEVREADWRITE(I8155_TAG, i8155_device, io_r, io_w)
 //  AM_RANGE(0xfe, 0xff) AM_DEVREADWRITE(I8279_TAG, i8279_r, i8279_w)
 ADDRESS_MAP_END
 
@@ -56,21 +58,12 @@ static INPUT_CHANGED( trigger_rst75 )
 }
 
 static INPUT_PORTS_START( exp85 )
+	PORT_INCLUDE(generic_terminal)
+
 	PORT_START("SPECIAL")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("R") PORT_CODE(KEYCODE_F1) PORT_CHANGED(trigger_reset, 0)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("I") PORT_CODE(KEYCODE_F2) PORT_CHANGED(trigger_rst75, 0)
 INPUT_PORTS_END
-
-/* Video */
-
-static VIDEO_START( exp85 )
-{
-}
-
-static VIDEO_UPDATE( exp85 )
-{
-    return 0;
-}
 
 /* 8155 Interface */
 
@@ -87,7 +80,7 @@ static I8155_INTERFACE( i8155_intf )
 
 /* 8355 Interface */
 
-static READ8_DEVICE_HANDLER( i8355_a_r )
+READ8_MEMBER( exp85_state::i8355_a_r )
 {
 	/*
 
@@ -107,7 +100,7 @@ static READ8_DEVICE_HANDLER( i8355_a_r )
 	return 0x02;
 }
 
-static WRITE8_DEVICE_HANDLER( i8355_a_w )
+WRITE8_MEMBER( exp85_state::i8355_a_w )
 {
 	/*
 
@@ -124,60 +117,71 @@ static WRITE8_DEVICE_HANDLER( i8355_a_w )
 
     */
 
-	exp85_state *state = device->machine->driver_data<exp85_state>();
-
 	/* tape control */
-	state->tape_control = BIT(data, 0);
+	m_tape_control = BIT(data, 0);
 
 	/* speaker output */
-	speaker_level_w(state->speaker, !BIT(data, 7));
+	speaker_level_w(m_speaker, !BIT(data, 7));
 }
 
 static I8355_INTERFACE( i8355_intf )
 {
-	DEVCB_HANDLER(i8355_a_r),	/* port A read */
-	DEVCB_HANDLER(i8355_a_w),	/* port A write */
-	DEVCB_NULL,					/* port B read */
-	DEVCB_NULL,					/* port B write */
+	DEVCB_DRIVER_MEMBER(exp85_state, i8355_a_r),
+	DEVCB_DRIVER_MEMBER(exp85_state, i8355_a_w),
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 /* I8085A Interface */
 
-static WRITE_LINE_DEVICE_HANDLER( exp85_sod_w )
+READ_LINE_MEMBER( exp85_state::sid_r )
 {
-	exp85_state *driver_state = device->machine->driver_data<exp85_state>();
-
-	cassette_output(driver_state->cassette, state ? -1.0 : +1.0);
-}
-
-static READ_LINE_DEVICE_HANDLER( exp85_sid_r )
-{
-	exp85_state *driver_state = device->machine->driver_data<exp85_state>();
-
 	int data = 1;
 
-	if (driver_state->tape_control)
+	if (m_tape_control)
 	{
-		data = cassette_input(driver_state->cassette) > +1.0;
+		data = cassette_input(m_cassette) > +1.0;
+	}
+	else
+	{
+		data = terminal_serial_r(m_terminal);
 	}
 
 	return data;
 }
 
+WRITE_LINE_MEMBER( exp85_state::sod_w )
+{
+	if (m_tape_control)
+	{
+		cassette_output(m_cassette, state ? -1.0 : +1.0);
+	}
+	else
+	{
+		terminal_serial_w(m_terminal, state);
+	}
+}
+
 static I8085_CONFIG( exp85_i8085_config )
 {
-	DEVCB_NULL,					/* STATUS changed callback */
-	DEVCB_NULL,					/* INTE changed callback */
-	DEVCB_LINE(exp85_sid_r),	/* SID changed callback (I8085A only) */
-	DEVCB_LINE(exp85_sod_w)		/* SOD changed callback (I8085A only) */
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_DRIVER_LINE_MEMBER(exp85_state, sid_r),
+	DEVCB_DRIVER_LINE_MEMBER(exp85_state, sod_w)
+};
+
+/* Terminal Interface */
+
+static GENERIC_TERMINAL_INTERFACE( terminal_intf )
+{
+	DEVCB_NULL
 };
 
 /* Machine Initialization */
 
-static MACHINE_START( exp85 )
+void exp85_state::machine_start()
 {
-	exp85_state *state = machine->driver_data<exp85_state>();
-	address_space *program = cputag_get_address_space(machine, I8085A_TAG, ADDRESS_SPACE_PROGRAM);
+	address_space *program = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);
 
 	/* setup memory banking */
 	memory_install_read_bank(program, 0x0000, 0x07ff, 0, 0, "bank1");
@@ -185,10 +189,6 @@ static MACHINE_START( exp85 )
 	memory_configure_bank(machine, "bank1", 0, 1, machine->region(I8085A_TAG)->base() + 0xf000, 0);
 	memory_configure_bank(machine, "bank1", 1, 1, machine->region(I8085A_TAG)->base(), 0);
 	memory_set_bank(machine, "bank1", 0);
-
-	/* find devices */
-	state->speaker = machine->device(SPEAKER_TAG);
-	state->cassette = machine->device(CASSETTE_TAG);
 }
 
 /* Machine Driver */
@@ -208,21 +208,8 @@ static MACHINE_CONFIG_START( exp85, exp85_state )
     MCFG_CPU_IO_MAP(exp85_io)
 	MCFG_CPU_CONFIG(exp85_i8085_config)
 
-    MCFG_MACHINE_START(exp85)
-
     /* video hardware */
-    MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
-    MCFG_SCREEN_REFRESH_RATE(50)
-    MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-    MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-    MCFG_SCREEN_SIZE(640, 480)
-    MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-
-	MCFG_PALETTE_LENGTH(2)
-    MCFG_PALETTE_INIT(black_and_white)
-
-	MCFG_VIDEO_START(exp85)
-    MCFG_VIDEO_UPDATE(exp85)
+	MCFG_FRAGMENT_ADD( generic_terminal )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -232,8 +219,8 @@ static MACHINE_CONFIG_START( exp85, exp85_state )
 	/* devices */
 	MCFG_I8155_ADD(I8155_TAG, XTAL_6_144MHz/2, i8155_intf)
 	MCFG_I8355_ADD(I8355_TAG, XTAL_6_144MHz/2, i8355_intf)
-
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, exp85_cassette_config)
+	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -251,9 +238,9 @@ ROM_START( exp85 )
 	ROM_LOAD( "d000.bin", 0xd000, 0x0800, CRC(c10c4a22) SHA1(30588ba0b27a775d85f8c581ad54400c8521225d) )
 	ROM_LOAD( "d800.bin", 0xd800, 0x0800, CRC(dfa43ef4) SHA1(56a7e7a64928bdd1d5f0519023d1594cacef49b3) )
 	ROM_SYSTEM_BIOS( 0, "eia", "EIA Terminal" )
-	ROMX_LOAD( "eia.u105", 0xf000, 0x0800, CRC(1a99d0d9) SHA1(57b6d48e71257bc4ef2d3dddc9b30edf6c1db766), ROM_BIOS(1) )
+	ROMX_LOAD( "ex 85.u105", 0xf000, 0x0800, CRC(1a99d0d9) SHA1(57b6d48e71257bc4ef2d3dddc9b30edf6c1db766), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 1, "hex", "Hex Keyboard" )
-	ROMX_LOAD( "hex.u105", 0xf000, 0x0800, NO_DUMP, ROM_BIOS(2) )
+	ROMX_LOAD( "1kbd.u105", 0xf000, 0x0800, NO_DUMP, ROM_BIOS(2) )
 
 	ROM_REGION( 0x800, I8355_TAG, ROMREGION_ERASE00 )
 /*  ROM_DEFAULT_BIOS("terminal")
