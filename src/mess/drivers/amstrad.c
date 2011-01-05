@@ -106,7 +106,7 @@ Some bugs left :
 #include "devices/cassette.h"
 #include "formats/tzx_cas.h"
 
-#include "devices/messram.h"
+#include "machine/ram.h"
 
 #define MANUFACTURER_NAME 0x07
 #define TV_REFRESH_RATE 0x10
@@ -918,7 +918,7 @@ static MACHINE_CONFIG_START( amstrad, amstrad_state )
 	MCFG_FLOPPY_2_DRIVES_ADD(cpc6128_floppy_config)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("128K")
 MACHINE_CONFIG_END
 
@@ -982,7 +982,7 @@ static MACHINE_CONFIG_START( cpcplus, amstrad_state )
 	MCFG_FLOPPY_2_DRIVES_ADD(cpc6128_floppy_config)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("128K")
 MACHINE_CONFIG_END
 
@@ -1024,7 +1024,7 @@ static MACHINE_CONFIG_START( gx4000, amstrad_state )
 	MCFG_FRAGMENT_ADD(cpcplus_cartslot)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
 MACHINE_CONFIG_END
 
@@ -1044,7 +1044,7 @@ static MACHINE_CONFIG_DERIVED( aleste, amstrad )
 	MCFG_FLOPPY_2_DRIVES_MODIFY(aleste_floppy_config)
 
 	/* internal ram */
-	MCFG_RAM_MODIFY("messram")
+	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("2M")
 MACHINE_CONFIG_END
 

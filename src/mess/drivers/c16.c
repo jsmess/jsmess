@@ -116,7 +116,7 @@ printers and other devices; most expansion modules; userport; rs232/v.24 interfa
 #include "audio/ted7360.h"
 #include "audio/t6721.h"
 #include "cpu/m6502/m6502.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 #include "formats/cbm_snqk.h"
 #include "includes/cbm.h"
 #include "includes/c16.h"
@@ -452,7 +452,7 @@ static MACHINE_START( c16 )
 	state->ted7360 = machine->device("ted7360");
 	state->serbus = machine->device("iec");
 	state->cassette = machine->device("cassette");
-	state->messram = machine->device("messram");
+	state->messram = machine->device(RAM_TAG);
 	state->sid = machine->device("sid");
 
 	state_save_register_global(machine, state->old_level);
@@ -504,7 +504,7 @@ static MACHINE_CONFIG_START( c16, c16_state )
 	MCFG_CBM_IEC_ADD("iec", c16_iec_no_drives)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
 	MCFG_RAM_EXTRA_OPTIONS("16K,32K")
 MACHINE_CONFIG_END
@@ -551,7 +551,7 @@ static MACHINE_CONFIG_DERIVED( plus4, c16 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* internal ram */
-	MCFG_RAM_MODIFY("messram")
+	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
 MACHINE_CONFIG_END
 
@@ -598,7 +598,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( c264, c16 )
 	/* internal ram */
-	MCFG_RAM_MODIFY("messram")
+	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
 MACHINE_CONFIG_END
 

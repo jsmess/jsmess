@@ -1,6 +1,6 @@
 #include "emu.h"
 #include "includes/pcw16.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 
 
 /* 16 colours, + 1 for border */
@@ -157,7 +157,7 @@ static void pcw16_vh_decode_mode2(pcw16_state *state, bitmap_t *bitmap, int x, i
 VIDEO_UPDATE( pcw16 )
 {
 	pcw16_state *state = screen->machine->driver_data<pcw16_state>();
-	unsigned char *pScanLine = (unsigned char *)messram_get_ptr(screen->machine->device("messram")) + 0x0fc00;	//0x03c00;  //0x020FC00;
+	unsigned char *pScanLine = (unsigned char *)ram_get_ptr(screen->machine->device(RAM_TAG)) + 0x0fc00;	//0x03c00;  //0x020FC00;
 
 	int y;
 	int x;
@@ -240,7 +240,7 @@ VIDEO_UPDATE( pcw16 )
 			{
 				int byte;
 
-				byte = messram_get_ptr(screen->machine->device("messram"))[Addr];
+				byte = ram_get_ptr(screen->machine->device(RAM_TAG))[Addr];
 
 				switch (mode)
 				{

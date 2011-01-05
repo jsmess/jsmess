@@ -44,7 +44,7 @@
 #include "machine/tc8521.h"
 #include "machine/ins8250.h"
 #include "sound/speaker.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 
 /*
     bit 7:                      ?? high priority. When it occurs, clear this bit.
@@ -323,7 +323,7 @@ static void avigo_refresh_memory(running_machine *machine)
 		/* %001 */
 		/* ram */
 		case 0x01:
-			addr = messram_get_ptr(machine->device("messram")) + ((state->ram_bank_l & 0x07)<<14);
+			addr = ram_get_ptr(machine->device(RAM_TAG)) + ((state->ram_bank_l & 0x07)<<14);
 			memory_set_bankptr(machine, "bank3", addr);
 			memory_set_bankptr(machine, "bank7", addr);
 			state->banked_opbase[2] = ((UINT8 *) addr) - (2 * 0x4000);
@@ -419,12 +419,12 @@ static MACHINE_RESET( avigo )
 	state->flash_at_0x8000 = 0;
 
 	/* clear */
-	memset(messram_get_ptr(machine->device("messram")), 0, 128*1024);
+	memset(ram_get_ptr(machine->device(RAM_TAG)), 0, 128*1024);
 
 	addr = (unsigned char *)state->flashes[0]->space()->get_read_ptr(0);
 	avigo_setbank(machine, 0, addr, avigo_flash_0x0000_read_handler, avigo_flash_0x0000_write_handler);
 
-	avigo_setbank(machine, 3, messram_get_ptr(machine->device("messram")), NULL, NULL);
+	avigo_setbank(machine, 3, ram_get_ptr(machine->device(RAM_TAG)), NULL, NULL);
 
 	/* 0x08000 is specially banked! */
 	avigo_refresh_memory(machine);
@@ -983,7 +983,7 @@ static MACHINE_CONFIG_START( avigo, avigo_state )
 	MCFG_INTEL_E28F008SA_ADD("flash2")
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("128K")
 MACHINE_CONFIG_END
 

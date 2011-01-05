@@ -13,7 +13,7 @@
 #include "sound/ay8910.h"
 #include "sound/wave.h"
 #include "devices/cassette.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 
 
 class spc1000_state : public driver_device
@@ -43,8 +43,8 @@ static WRITE8_HANDLER(spc1000_iplk_w)
 		memory_set_bankptr(space->machine, "bank1", space->machine->region("maincpu")->base());
 		memory_set_bankptr(space->machine, "bank3", space->machine->region("maincpu")->base());
 	} else {
-		memory_set_bankptr(space->machine, "bank1", messram_get_ptr(space->machine->device("messram")));
-		memory_set_bankptr(space->machine, "bank3", messram_get_ptr(space->machine->device("messram")) + 0x8000);
+		memory_set_bankptr(space->machine, "bank1", ram_get_ptr(space->machine->device(RAM_TAG)));
+		memory_set_bankptr(space->machine, "bank3", ram_get_ptr(space->machine->device(RAM_TAG)) + 0x8000);
 	}
 }
 
@@ -56,8 +56,8 @@ static READ8_HANDLER(spc1000_iplk_r)
 		memory_set_bankptr(space->machine, "bank1", space->machine->region("maincpu")->base());
 		memory_set_bankptr(space->machine, "bank3", space->machine->region("maincpu")->base());
 	} else {
-		memory_set_bankptr(space->machine, "bank1", messram_get_ptr(space->machine->device("messram")));
-		memory_set_bankptr(space->machine, "bank3", messram_get_ptr(space->machine->device("messram")) + 0x8000);
+		memory_set_bankptr(space->machine, "bank1", ram_get_ptr(space->machine->device(RAM_TAG)));
+		memory_set_bankptr(space->machine, "bank3", ram_get_ptr(space->machine->device(RAM_TAG)) + 0x8000);
 	}
 	return 0;
 }
@@ -220,9 +220,9 @@ static MACHINE_RESET(spc1000)
 	memory_install_write_bank(space, 0x8000, 0xffff, 0, 0, "bank4");
 
 	memory_set_bankptr(machine, "bank1", machine->region("maincpu")->base());
-	memory_set_bankptr(machine, "bank2", messram_get_ptr(machine->device("messram")));
+	memory_set_bankptr(machine, "bank2", ram_get_ptr(machine->device(RAM_TAG)));
 	memory_set_bankptr(machine, "bank3", machine->region("maincpu")->base());
-	memory_set_bankptr(machine, "bank4", messram_get_ptr(machine->device("messram")) + 0x8000);
+	memory_set_bankptr(machine, "bank4", ram_get_ptr(machine->device(RAM_TAG)) + 0x8000);
 
 	state->IPLK = 1;
 }
@@ -327,7 +327,7 @@ static MACHINE_CONFIG_START( spc1000, spc1000_state )
 	MCFG_CASSETTE_ADD( "cassette", spc1000_cassette_config )
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
 MACHINE_CONFIG_END
 

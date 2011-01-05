@@ -15,7 +15,7 @@
 #include "devices/cassette.h"
 #include "machine/z80pio.h"
 #include "machine/z80ctc.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 #include "poly880.lh"
 
 /*
@@ -305,7 +305,7 @@ static MACHINE_CONFIG_START( poly880, poly880_state )
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, poly880_cassette_config)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("1K")
 MACHINE_CONFIG_END
 

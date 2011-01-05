@@ -277,7 +277,7 @@ SamRam
 #include "devices/snapquik.h"
 #include "devices/cartslot.h"
 #include "devices/cassette.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 #include "formats/tzx_cas.h"
 #include "formats/spec_snqk.h"
 
@@ -624,7 +624,7 @@ DRIVER_INIT( spectrum )
 {
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
-	switch (messram_get_size(machine->device("messram")))
+	switch (ram_get_size(machine->device(RAM_TAG)))
 	{
 	    case 48*1024:
 		memory_install_ram(space, 0x8000, 0xffff, 0, 0, NULL); // Fall through
@@ -753,7 +753,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_DERIVED( spectrum, spectrum_common )
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")				// This configuration is verified only for the original ZX Spectrum.
+	MCFG_RAM_ADD(RAM_TAG)				// This configuration is verified only for the original ZX Spectrum.
 	MCFG_RAM_DEFAULT_SIZE("48K")		// It's likely, but still to be checked, that many clones were produced only
 	MCFG_RAM_EXTRA_OPTIONS("16K")		// in the 48k configuration, while others have extra memory (80k, 128K, 1024K)
 	MCFG_RAM_DEFAULT_VALUE(0xff)		// available via bankswitching.

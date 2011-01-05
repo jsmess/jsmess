@@ -1,13 +1,13 @@
 /*************************************************************************
 
-    MESS RAM device
+    RAM device
 
     Provides a configurable amount of RAM to drivers
 
 **************************************************************************/
 
-#ifndef __MESSRAM_H__
-#define __MESSRAM_H__
+#ifndef __RAM_H__
+#define __RAM_H__
 
 
 /***************************************************************************
@@ -15,7 +15,7 @@
 ***************************************************************************/
 
 #define RAM_DEFAULT_VALUE	0xcd
-
+#define RAM_TAG				"ram"
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -34,10 +34,10 @@ struct _ram_config
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-DECLARE_LEGACY_DEVICE(MESSRAM, messram);
+DECLARE_LEGACY_DEVICE(RAM, ram);
 
 #define MCFG_RAM_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, MESSRAM, 0) \
+	MCFG_DEVICE_ADD(_tag, RAM, 0) \
 	MCFG_DEVICE_CONFIG_DATA32(ram_config, default_value, RAM_DEFAULT_VALUE)
 
 #define MCFG_RAM_REMOVE(_tag) \
@@ -61,12 +61,8 @@ DECLARE_LEGACY_DEVICE(MESSRAM, messram);
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-UINT32 messram_get_size(device_t *device);
-UINT8 *messram_get_ptr(device_t *device);
-#ifdef UNUSED_FUNCTION
-void messram_dump(device_t *device, const char *filename);
-const char *messram_string(char *buffer, UINT32 ram);
-#endif
-UINT32 messram_parse_string(const char *s);
+UINT32 ram_get_size(device_t *device);
+UINT8 *ram_get_ptr(device_t *device);
+UINT32 ram_parse_string(const char *s);
 
-#endif /* __MESSRAM_H__ */
+#endif /* __RAM_H__ */

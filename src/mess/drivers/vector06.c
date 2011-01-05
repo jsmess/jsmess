@@ -18,7 +18,7 @@
 #include "devices/flopdrv.h"
 #include "formats/basicdsk.h"
 #include "includes/vector06.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 
 /* Address maps */
 static ADDRESS_MAP_START(vector06_mem, ADDRESS_SPACE_PROGRAM, 8)
@@ -210,7 +210,7 @@ static MACHINE_CONFIG_START( vector06, vector06_state )
 	MCFG_CARTSLOT_NOT_MANDATORY
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
 	MCFG_RAM_DEFAULT_VALUE(0x00)
 MACHINE_CONFIG_END

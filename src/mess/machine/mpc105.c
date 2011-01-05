@@ -9,7 +9,7 @@
 #include "emu.h"
 #include "mpc105.h"
 #include "machine/pci.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 
 #define LOG_MPC105		1
 
@@ -58,12 +58,12 @@ static void mpc105_update_memory(running_machine *machine)
 				|	(((mpc105->bank_registers[(bank / 4) + 6] >> (bank % 4) * 8)) & 0x03) << 28
 				| 0x000FFFFF;
 
-			end = MIN(end, begin + messram_get_size(machine->device("messram")) - 1);
+			end = MIN(end, begin + ram_get_size(machine->device(RAM_TAG)) - 1);
 
 			if ((begin + 0x100000) <= end)
 			{
 				if (LOG_MPC105)
-					logerror("\tbank #%d [%02d]: 0x%08X - 0x%08X [%p-%p]\n", bank, bank + mpc105->bank_base, begin, end, messram_get_ptr(machine->device("messram")), messram_get_ptr(machine->device("messram")) + (end - begin));
+					logerror("\tbank #%d [%02d]: 0x%08X - 0x%08X [%p-%p]\n", bank, bank + mpc105->bank_base, begin, end, ram_get_ptr(machine->device(RAM_TAG)), ram_get_ptr(machine->device(RAM_TAG)) + (end - begin));
 
 				if (mpc105->bank_base > 0)
 				{
@@ -78,7 +78,7 @@ static void mpc105_update_memory(running_machine *machine)
 							0, 0, (write64_space_func) (FPTR)(bank + mpc105->bank_base));
 					}
 					sprintf(bank_str,"bank%d",bank + mpc105->bank_base);
-					memory_set_bankptr(machine, bank_str, messram_get_ptr(machine->device("messram")));
+					memory_set_bankptr(machine, bank_str, ram_get_ptr(machine->device(RAM_TAG)));
 				}
 			}
 		}

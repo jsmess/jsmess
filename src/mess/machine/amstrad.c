@@ -45,7 +45,7 @@ This gives a total of 19968 NOPs per frame.
 #include "devices/snapquik.h"
 #include "includes/amstrad.h"
 #include "sound/ay8910.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 
 #define MANUFACTURER_NAME 0x07
 #define TV_REFRESH_RATE 0x10
@@ -507,7 +507,7 @@ static void amstrad_plus_dma_parse(running_machine *machine, int channel)
 		}
 		return;
 	}
-	command = (messram_get_ptr(machine->device("messram"))[state->asic.dma_addr[channel]+1] << 8) + messram_get_ptr(machine->device("messram"))[state->asic.dma_addr[channel]];
+	command = (ram_get_ptr(machine->device(RAM_TAG))[state->asic.dma_addr[channel]+1] << 8) + ram_get_ptr(machine->device(RAM_TAG))[state->asic.dma_addr[channel]];
 //  logerror("DMA #%i: address %04x: command %04x\n",channel,state->asic.dma_addr[channel],command);
 	switch (command & 0xf000)
 	{
@@ -615,7 +615,7 @@ INLINE void amstrad_gate_array_get_video_data( running_machine *machine )
 		state->gate_array.address = ( ( state->gate_array.ma & 0x2000 ) << 2 ) | ( ( state->gate_array.ra & 0x06 ) << 11 ) | ( ( state->gate_array.ra & 0x01 ) << 14 ) | ( ( state->gate_array.ma & 0x7ff ) << 1 );
 	else
 		state->gate_array.address = ( ( state->gate_array.ma & 0x3000 ) << 2 ) | ( ( state->gate_array.ra & 0x07 ) << 11 ) | ( ( state->gate_array.ma & 0x3ff ) << 1 );
-	state->gate_array.data = messram_get_ptr(machine->device("messram"))[ state->gate_array.address ];
+	state->gate_array.data = ram_get_ptr(machine->device(RAM_TAG))[ state->gate_array.address ];
 	state->gate_array.colour = state->GateArray_render_colours[ state->gate_array.mode_lookup[state->gate_array.data] ];
 	state->gate_array.colour_ticks = state->gate_array.max_colour_ticks;
 	state->gate_array.ticks = 0;
@@ -651,7 +651,7 @@ INLINE void amstrad_update_video( running_machine *machine )
 				switch( state->gate_array.ticks)
 				{
 				case 8:
-					state->gate_array.data = messram_get_ptr(machine->device("messram"))[ state->gate_array.address + 1 ];
+					state->gate_array.data = ram_get_ptr(machine->device(RAM_TAG))[ state->gate_array.address + 1 ];
 					state->gate_array.colour = state->GateArray_render_colours[ state->gate_array.mode_lookup[state->gate_array.data] ];
 					break;
 				case 16:
@@ -687,7 +687,7 @@ INLINE void amstrad_plus_gate_array_get_video_data( running_machine *machine )
 		ma += state->asic.horiz_disp;
 	}
 	state->gate_array.address = ( ( ma & 0x3000 ) << 2 ) | ( ( state->gate_array.ra & 0x07 ) << 11 ) | ( ( ma & 0x3ff ) << 1 );
-	state->gate_array.data = messram_get_ptr(machine->device("messram"))[ state->gate_array.address ];
+	state->gate_array.data = ram_get_ptr(machine->device(RAM_TAG))[ state->gate_array.address ];
 	caddr = 0x2400 + state->gate_array.mode_lookup[state->gate_array.data] * 2;
 	state->gate_array.colour = state->asic.ram[caddr] + ( state->asic.ram[caddr+1] << 8 );
 	state->gate_array.colour_ticks = state->gate_array.max_colour_ticks;
@@ -739,7 +739,7 @@ INLINE void amstrad_plus_update_video( running_machine *machine )
 						{
 							UINT16 caddr;
 
-							state->gate_array.data = messram_get_ptr(machine->device("messram"))[ state->gate_array.address + 1 ];
+							state->gate_array.data = ram_get_ptr(machine->device(RAM_TAG))[ state->gate_array.address + 1 ];
 							caddr = 0x2400 + state->gate_array.mode_lookup[state->gate_array.data] * 2;
 							state->gate_array.colour = state->asic.ram[caddr] + ( state->asic.ram[caddr+1] << 8 );
 						}
@@ -1550,7 +1550,7 @@ static void AmstradCPC_GA_SetRamConfiguration(running_machine *machine)
 	    for (i=0;i<4;i++)
 		{
 			BankIndex = RamConfigurations[(ConfigurationIndex << 2) + i];
-			BankAddr = messram_get_ptr(machine->device("messram")) + (BankIndex << 14);
+			BankAddr = ram_get_ptr(machine->device(RAM_TAG)) + (BankIndex << 14);
 			state->Aleste_RamBanks[i] = BankAddr;
 			state->AmstradCPC_RamBanks[i] = BankAddr;
 		}
@@ -1962,38 +1962,38 @@ static WRITE8_HANDLER( aleste_msx_mapper )
 		switch(page)
 		{
 		case 0:  /* 0x0000 - 0x3fff */
-			memory_set_bankptr(space->machine,"bank1",messram_get_ptr(space->machine->device("messram"))+ramptr);
-			memory_set_bankptr(space->machine,"bank2",messram_get_ptr(space->machine->device("messram"))+ramptr+0x2000);
-			memory_set_bankptr(space->machine,"bank9",messram_get_ptr(space->machine->device("messram"))+ramptr);
-			memory_set_bankptr(space->machine,"bank10",messram_get_ptr(space->machine->device("messram"))+ramptr+0x2000);
-			state->Aleste_RamBanks[0] = messram_get_ptr(space->machine->device("messram"))+ramptr;
+			memory_set_bankptr(space->machine,"bank1",ram_get_ptr(space->machine->device(RAM_TAG))+ramptr);
+			memory_set_bankptr(space->machine,"bank2",ram_get_ptr(space->machine->device(RAM_TAG))+ramptr+0x2000);
+			memory_set_bankptr(space->machine,"bank9",ram_get_ptr(space->machine->device(RAM_TAG))+ramptr);
+			memory_set_bankptr(space->machine,"bank10",ram_get_ptr(space->machine->device(RAM_TAG))+ramptr+0x2000);
+			state->Aleste_RamBanks[0] = ram_get_ptr(space->machine->device(RAM_TAG))+ramptr;
 			state->aleste_active_page[0] = data;
 			logerror("RAM: RAM location 0x%06x (page %02x) mapped to 0x0000\n",ramptr,rampage);
 			break;
 		case 1:  /* 0x4000 - 0x7fff */
-			memory_set_bankptr(space->machine,"bank3",messram_get_ptr(space->machine->device("messram"))+ramptr);
-			memory_set_bankptr(space->machine,"bank4",messram_get_ptr(space->machine->device("messram"))+ramptr+0x2000);
-			memory_set_bankptr(space->machine,"bank11",messram_get_ptr(space->machine->device("messram"))+ramptr);
-			memory_set_bankptr(space->machine,"bank12",messram_get_ptr(space->machine->device("messram"))+ramptr+0x2000);
-			state->Aleste_RamBanks[1] = messram_get_ptr(space->machine->device("messram"))+ramptr;
+			memory_set_bankptr(space->machine,"bank3",ram_get_ptr(space->machine->device(RAM_TAG))+ramptr);
+			memory_set_bankptr(space->machine,"bank4",ram_get_ptr(space->machine->device(RAM_TAG))+ramptr+0x2000);
+			memory_set_bankptr(space->machine,"bank11",ram_get_ptr(space->machine->device(RAM_TAG))+ramptr);
+			memory_set_bankptr(space->machine,"bank12",ram_get_ptr(space->machine->device(RAM_TAG))+ramptr+0x2000);
+			state->Aleste_RamBanks[1] = ram_get_ptr(space->machine->device(RAM_TAG))+ramptr;
 			state->aleste_active_page[1] = data;
 			logerror("RAM: RAM location 0x%06x (page %02x) mapped to 0x4000\n",ramptr,rampage);
 			break;
 		case 2:  /* 0x8000 - 0xbfff */
-			memory_set_bankptr(space->machine,"bank5",messram_get_ptr(space->machine->device("messram"))+ramptr);
-			memory_set_bankptr(space->machine,"bank6",messram_get_ptr(space->machine->device("messram"))+ramptr+0x2000);
-			memory_set_bankptr(space->machine,"bank13",messram_get_ptr(space->machine->device("messram"))+ramptr);
-			memory_set_bankptr(space->machine,"bank14",messram_get_ptr(space->machine->device("messram"))+ramptr+0x2000);
-			state->Aleste_RamBanks[2] = messram_get_ptr(space->machine->device("messram"))+ramptr;
+			memory_set_bankptr(space->machine,"bank5",ram_get_ptr(space->machine->device(RAM_TAG))+ramptr);
+			memory_set_bankptr(space->machine,"bank6",ram_get_ptr(space->machine->device(RAM_TAG))+ramptr+0x2000);
+			memory_set_bankptr(space->machine,"bank13",ram_get_ptr(space->machine->device(RAM_TAG))+ramptr);
+			memory_set_bankptr(space->machine,"bank14",ram_get_ptr(space->machine->device(RAM_TAG))+ramptr+0x2000);
+			state->Aleste_RamBanks[2] = ram_get_ptr(space->machine->device(RAM_TAG))+ramptr;
 			state->aleste_active_page[2] = data;
 			logerror("RAM: RAM location 0x%06x (page %02x) mapped to 0x8000\n",ramptr,rampage);
 			break;
 		case 3:  /* 0xc000 - 0xffff */
-			memory_set_bankptr(space->machine,"bank7",messram_get_ptr(space->machine->device("messram"))+ramptr);
-			memory_set_bankptr(space->machine,"bank8",messram_get_ptr(space->machine->device("messram"))+ramptr+0x2000);
-			memory_set_bankptr(space->machine,"bank15",messram_get_ptr(space->machine->device("messram"))+ramptr);
-			memory_set_bankptr(space->machine,"bank16",messram_get_ptr(space->machine->device("messram"))+ramptr+0x2000);
-			state->Aleste_RamBanks[3] = messram_get_ptr(space->machine->device("messram"))+ramptr;
+			memory_set_bankptr(space->machine,"bank7",ram_get_ptr(space->machine->device(RAM_TAG))+ramptr);
+			memory_set_bankptr(space->machine,"bank8",ram_get_ptr(space->machine->device(RAM_TAG))+ramptr+0x2000);
+			memory_set_bankptr(space->machine,"bank15",ram_get_ptr(space->machine->device(RAM_TAG))+ramptr);
+			memory_set_bankptr(space->machine,"bank16",ram_get_ptr(space->machine->device(RAM_TAG))+ramptr+0x2000);
+			state->Aleste_RamBanks[3] = ram_get_ptr(space->machine->device(RAM_TAG))+ramptr;
 			state->aleste_active_page[3] = data;
 			logerror("RAM: RAM location 0x%06x (page %02x) mapped to 0xc000\n",ramptr,rampage);
 			break;
@@ -2500,7 +2500,7 @@ static void amstrad_handle_snapshot(running_machine *machine, unsigned char *pSn
 			MemorySize = 64*1024;
 		}
 
-		memcpy(messram_get_ptr(machine->device("messram")), &pSnapshot[0x0100], MemorySize);
+		memcpy(ram_get_ptr(machine->device(RAM_TAG)), &pSnapshot[0x0100], MemorySize);
 	}
 	amstrad_rethinkMemory(machine);
 }

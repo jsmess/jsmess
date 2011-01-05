@@ -12,7 +12,7 @@
 #include "video/i8275.h"
 #include "video/upd7220.h"
 #include "sound/speaker.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 #include "includes/mikromik.h"
 
 /*
@@ -679,7 +679,7 @@ void mm1_state::machine_start()
 	memory_install_read_bank(program, 0x0000, 0x0fff, 0, 0, "bank1");
 	memory_unmap_write(program, 0x0000, 0x0fff, 0, 0);
 	memory_configure_bank(machine, "bank1", 0, 1, machine->region("bios")->base(), 0);
-	memory_configure_bank(machine, "bank1", 1, 1, messram_get_ptr(machine->device("messram")), 0);
+	memory_configure_bank(machine, "bank1", 1, 1, ram_get_ptr(machine->device(RAM_TAG)), 0);
 	memory_set_bank(machine, "bank1", 0);
 
 	/* register for state saving */
@@ -749,7 +749,7 @@ static MACHINE_CONFIG_START( mm1, mm1_state )
 	MCFG_FLOPPY_2_DRIVES_ADD(mm1_floppy_config)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
 MACHINE_CONFIG_END
 

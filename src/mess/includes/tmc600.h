@@ -4,6 +4,7 @@
 #define __TMC600__
 
 #include "cpu/cosmac/cosmac.h"
+#include "machine/ram.h"
 
 #define SCREEN_TAG		"screen"
 #define CDP1802_TAG		"cdp1802"
@@ -22,7 +23,7 @@ public:
 		  m_maincpu(*this, CDP1802_TAG),
 		  m_vis(*this, CDP1869_TAG),
 		  m_cassette(*this, CASSETTE_TAG),
-		  m_ram(*this, "messram")
+		  m_ram(*this, RAM_TAG)
 	 { }
 
 	required_device<cosmac_device> m_maincpu;

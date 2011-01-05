@@ -38,7 +38,7 @@
 #include "emu.h"
 #include "cpu/lr35902/lr35902.h"
 #include "devices/cartslot.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 #include "image.h"
 #include "audio/gb.h"
 #include "includes/gb.h"
@@ -63,7 +63,7 @@ enum {
 	MBC_UNKNOWN,	/* Unknown mapper                                */
 };
 
-/* messram_get_ptr(machine->device("messram")) layout defines */
+/* ram_get_ptr(machine->device(RAM_TAG)) layout defines */
 #define CGB_START_VRAM_BANKS	0x0000
 #define CGB_START_RAM_BANKS	( 2 * 8 * 1024 )
 
@@ -373,7 +373,7 @@ MACHINE_RESET( gbc )
 	/* Allocate memory for internal ram */
 	for( ii = 0; ii < 8; ii++ )
 	{
-		state->GBC_RAMMap[ii] = messram_get_ptr(machine->device("messram")) + CGB_START_RAM_BANKS + ii * 0x1000;
+		state->GBC_RAMMap[ii] = ram_get_ptr(machine->device(RAM_TAG)) + CGB_START_RAM_BANKS + ii * 0x1000;
 		memset (state->GBC_RAMMap[ii], 0, 0x1000);
 	}
 }
@@ -1689,26 +1689,26 @@ DEVICE_IMAGE_LOAD(gb_cart)
 	{
 	case 0x00:	state->MBCType = MBC_NONE;	state->CartType = 0;				break;
 	case 0x01:	state->MBCType = MBC_MBC1;	state->CartType = 0;				break;
-	case 0x02:	state->MBCType = MBC_MBC1;	state->CartType = RAM;				break;
-	case 0x03:	state->MBCType = MBC_MBC1;	state->CartType = RAM | BATTERY;		break;
+	case 0x02:	state->MBCType = MBC_MBC1;	state->CartType = CART_RAM;				break;
+	case 0x03:	state->MBCType = MBC_MBC1;	state->CartType = CART_RAM | BATTERY;		break;
 	case 0x05:	state->MBCType = MBC_MBC2;	state->CartType = 0;				break;
 	case 0x06:	state->MBCType = MBC_MBC2;	state->CartType = BATTERY;			break;
-	case 0x08:	state->MBCType = MBC_NONE;	state->CartType = RAM;				break;
-	case 0x09:	state->MBCType = MBC_NONE;	state->CartType = RAM | BATTERY;		break;
+	case 0x08:	state->MBCType = MBC_NONE;	state->CartType = CART_RAM;				break;
+	case 0x09:	state->MBCType = MBC_NONE;	state->CartType = CART_RAM | BATTERY;		break;
 	case 0x0B:	state->MBCType = MBC_MMM01;	state->CartType = 0;				break;
-	case 0x0C:	state->MBCType = MBC_MMM01;	state->CartType = RAM;				break;
-	case 0x0D:	state->MBCType = MBC_MMM01;	state->CartType = RAM | BATTERY;		break;
+	case 0x0C:	state->MBCType = MBC_MMM01;	state->CartType = CART_RAM;				break;
+	case 0x0D:	state->MBCType = MBC_MMM01;	state->CartType = CART_RAM | BATTERY;		break;
 	case 0x0F:	state->MBCType = MBC_MBC3;	state->CartType = TIMER | BATTERY;		break;
-	case 0x10:	state->MBCType = MBC_MBC3;	state->CartType = TIMER | RAM | BATTERY;	break;
+	case 0x10:	state->MBCType = MBC_MBC3;	state->CartType = TIMER | CART_RAM | BATTERY;	break;
 	case 0x11:	state->MBCType = MBC_MBC3;	state->CartType = 0;				break;
-	case 0x12:	state->MBCType = MBC_MBC3;	state->CartType = RAM;				break;
-	case 0x13:	state->MBCType = MBC_MBC3;	state->CartType = RAM | BATTERY;		break;
+	case 0x12:	state->MBCType = MBC_MBC3;	state->CartType = CART_RAM;				break;
+	case 0x13:	state->MBCType = MBC_MBC3;	state->CartType = CART_RAM | BATTERY;		break;
 	case 0x15:	state->MBCType = MBC_MBC4;	state->CartType = 0;				break;
-	case 0x16:	state->MBCType = MBC_MBC4;	state->CartType = RAM;				break;
-	case 0x17:	state->MBCType = MBC_MBC4;	state->CartType = RAM | BATTERY;		break;
+	case 0x16:	state->MBCType = MBC_MBC4;	state->CartType = CART_RAM;				break;
+	case 0x17:	state->MBCType = MBC_MBC4;	state->CartType = CART_RAM | BATTERY;		break;
 	case 0x19:	state->MBCType = MBC_MBC5;	state->CartType = 0;				break;
-	case 0x1A:	state->MBCType = MBC_MBC5;	state->CartType = RAM;				break;
-	case 0x1B:	state->MBCType = MBC_MBC5;	state->CartType = RAM | BATTERY;		break;
+	case 0x1A:	state->MBCType = MBC_MBC5;	state->CartType = CART_RAM;				break;
+	case 0x1B:	state->MBCType = MBC_MBC5;	state->CartType = CART_RAM | BATTERY;		break;
 	case 0x1C:	state->MBCType = MBC_MBC5;	state->CartType = RUMBLE;			break;
 	case 0x1D:	state->MBCType = MBC_MBC5;	state->CartType = RUMBLE | SRAM;		break;
 	case 0x1E:	state->MBCType = MBC_MBC5;	state->CartType = RUMBLE | SRAM | BATTERY;	break;

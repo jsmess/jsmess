@@ -6,7 +6,7 @@
 #include "machine/abc77.h"
 #include "machine/z80ctc.h"
 #include "machine/z80dart.h"
-
+#include "machine/ram.h"
 
 
 //**************************************************************************
@@ -63,7 +63,7 @@ public:
 		  m_dart(*this, Z80DART_TAG),
 		  m_sio(*this, Z80SIO_TAG),
 		  m_discrete(*this, "discrete"),
-		  m_ram(*this, "messram")
+		  m_ram(*this, RAM_TAG)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -159,7 +159,7 @@ public:
 		  m_crtc(*this, MC6845_TAG),
 		  abc77(*this, ABC77_TAG),
 		  m_discrete(*this, "discrete"),
-		  m_ram(*this, "messram")
+		  m_ram(*this, RAM_TAG)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -214,7 +214,7 @@ public:
 		  m_crtc(*this, MC6845_TAG),
 		  m_rtc(*this, E0516_TAG),
 		  abc77(*this, ABC77_TAG),
-		  m_ram(*this, "messram")
+		  m_ram(*this, RAM_TAG)
 	{ }
 
 	required_device<cpu_device> m_maincpu;

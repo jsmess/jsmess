@@ -15,7 +15,7 @@
 #include "sound/speaker.h"
 #include "sound/wave.h"
 #include "includes/pk8000.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 
 
 class pk8000_state : public driver_device
@@ -45,50 +45,50 @@ static void pk8000_set_bank(running_machine *machine,UINT8 data)
 	switch(block1) {
 		case 0:
 				memory_set_bankptr(machine, "bank1", rom + 0x10000);
-				memory_set_bankptr(machine, "bank5", messram_get_ptr(machine->device("messram")));
+				memory_set_bankptr(machine, "bank5", ram_get_ptr(machine->device(RAM_TAG)));
 				break;
 		case 1: break;
 		case 2: break;
 		case 3:
-				memory_set_bankptr(machine, "bank1", messram_get_ptr(machine->device("messram")));
-				memory_set_bankptr(machine, "bank5", messram_get_ptr(machine->device("messram")));
+				memory_set_bankptr(machine, "bank1", ram_get_ptr(machine->device(RAM_TAG)));
+				memory_set_bankptr(machine, "bank5", ram_get_ptr(machine->device(RAM_TAG)));
 				break;
 	}
 
 	switch(block2) {
 		case 0:
 				memory_set_bankptr(machine, "bank2", rom + 0x14000);
-				memory_set_bankptr(machine, "bank6", messram_get_ptr(machine->device("messram")) + 0x4000);
+				memory_set_bankptr(machine, "bank6", ram_get_ptr(machine->device(RAM_TAG)) + 0x4000);
 				break;
 		case 1: break;
 		case 2: break;
 		case 3:
-				memory_set_bankptr(machine, "bank2", messram_get_ptr(machine->device("messram")) + 0x4000);
-				memory_set_bankptr(machine, "bank6", messram_get_ptr(machine->device("messram")) + 0x4000);
+				memory_set_bankptr(machine, "bank2", ram_get_ptr(machine->device(RAM_TAG)) + 0x4000);
+				memory_set_bankptr(machine, "bank6", ram_get_ptr(machine->device(RAM_TAG)) + 0x4000);
 				break;
 	}
 	switch(block3) {
 		case 0:
 				memory_set_bankptr(machine, "bank3", rom + 0x18000);
-				memory_set_bankptr(machine, "bank7", messram_get_ptr(machine->device("messram")) + 0x8000);
+				memory_set_bankptr(machine, "bank7", ram_get_ptr(machine->device(RAM_TAG)) + 0x8000);
 				break;
 		case 1: break;
 		case 2: break;
 		case 3:
-				memory_set_bankptr(machine, "bank3", messram_get_ptr(machine->device("messram")) + 0x8000);
-				memory_set_bankptr(machine, "bank7", messram_get_ptr(machine->device("messram")) + 0x8000);
+				memory_set_bankptr(machine, "bank3", ram_get_ptr(machine->device(RAM_TAG)) + 0x8000);
+				memory_set_bankptr(machine, "bank7", ram_get_ptr(machine->device(RAM_TAG)) + 0x8000);
 				break;
 	}
 	switch(block4) {
 		case 0:
 				memory_set_bankptr(machine, "bank4", rom + 0x1c000);
-				memory_set_bankptr(machine, "bank8", messram_get_ptr(machine->device("messram")) + 0xc000);
+				memory_set_bankptr(machine, "bank8", ram_get_ptr(machine->device(RAM_TAG)) + 0xc000);
 				break;
 		case 1: break;
 		case 2: break;
 		case 3:
-				memory_set_bankptr(machine, "bank4", messram_get_ptr(machine->device("messram")) + 0xc000);
-				memory_set_bankptr(machine, "bank8", messram_get_ptr(machine->device("messram")) + 0xc000);
+				memory_set_bankptr(machine, "bank4", ram_get_ptr(machine->device(RAM_TAG)) + 0xc000);
+				memory_set_bankptr(machine, "bank8", ram_get_ptr(machine->device(RAM_TAG)) + 0xc000);
 				break;
 	}
 }
@@ -324,7 +324,7 @@ static VIDEO_START( pk8000 )
 
 static VIDEO_UPDATE( pk8000 )
 {
-	return pk8000_video_update(screen, bitmap, cliprect, messram_get_ptr(screen->machine->device("messram")));
+	return pk8000_video_update(screen, bitmap, cliprect, ram_get_ptr(screen->machine->device(RAM_TAG)));
 }
 
 /* Machine driver */
@@ -371,7 +371,7 @@ static MACHINE_CONFIG_START( pk8000, pk8000_state )
     MCFG_CASSETTE_ADD( "cassette", pk8000_cassette_config )
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
 MACHINE_CONFIG_END
 

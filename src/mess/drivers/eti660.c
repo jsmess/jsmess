@@ -13,7 +13,7 @@
 #include "includes/eti660.h"
 #include "cpu/cosmac/cosmac.h"
 #include "devices/cassette.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 #include "machine/6821pia.h"
 #include "machine/rescap.h"
 #include "sound/cdp1864.h"
@@ -334,7 +334,7 @@ static MACHINE_CONFIG_START( eti660, eti660_state )
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, eti660_cassette_config)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("3K")
 MACHINE_CONFIG_END
 

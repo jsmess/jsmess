@@ -46,9 +46,6 @@ void MessSetupSettings(core_options *settings)
 
 void MessSetupGameOptions(core_options *opts, int driver_index)
 {
-	BOOL is_global = (driver_index == OPTIONS_TYPE_GLOBAL);
-	AddOptions(opts, mess_core_options, is_global);
-
 	if (driver_index >= 0)
 	{
 		image_add_device_options(opts, drivers[driver_index]);

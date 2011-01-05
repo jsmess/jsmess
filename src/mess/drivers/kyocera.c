@@ -67,7 +67,7 @@
 #include "cpu/i8085/i8085.h"
 #include "devices/cartslot.h"
 #include "devices/cassette.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 #include "machine/ctronics.h"
 #include "machine/upd1990a.h"
 #include "machine/i8155.h"
@@ -142,7 +142,7 @@ void pc8201_state::bankswitch(UINT8 data)
 	switch (ram_bank)
 	{
 	case 0:
-		if (messram_get_size(m_ram) > 16 * 1024)
+		if (ram_get_size(m_ram) > 16 * 1024)
 		{
 			memory_install_readwrite_bank(program, 0x8000, 0xffff, 0, 0, "bank2");
 		}
@@ -158,14 +158,14 @@ void pc8201_state::bankswitch(UINT8 data)
 		break;
 
 	case 2:
-		if (messram_get_size(m_ram) > 32 * 1024)
+		if (ram_get_size(m_ram) > 32 * 1024)
 			memory_install_readwrite_bank(program, 0x8000, 0xffff, 0, 0, "bank2");
 		else
 			memory_unmap_readwrite(program, 0x8000, 0xffff, 0, 0);
 		break;
 
 	case 3:
-		if (messram_get_size(m_ram) > 64 * 1024)
+		if (ram_get_size(m_ram) > 64 * 1024)
 			memory_install_readwrite_bank(program, 0x8000, 0xffff, 0, 0, "bank2");
 		else
 			memory_unmap_readwrite(program, 0x8000, 0xffff, 0, 0);
@@ -488,7 +488,7 @@ void tandy200_state::bankswitch(UINT8 data)
 		memory_set_bank(machine, "bank1", rom_bank);
 	}
 
-	if (messram_get_size(m_ram) < ((ram_bank + 1) * 24 * 1024))
+	if (ram_get_size(m_ram) < ((ram_bank + 1) * 24 * 1024))
 	{
 		/* invalid RAM bank */
 		memory_unmap_readwrite(program, 0xa000, 0xffff, 0, 0);
@@ -1140,7 +1140,7 @@ void kc85_state::machine_start()
 	memory_set_bank(machine, "bank1", 0);
 
 	/* configure RAM banking */
-	switch (messram_get_size(m_ram))
+	switch (ram_get_size(m_ram))
 	{
 	case 16 * 1024:
 		memory_unmap_readwrite(program, 0x8000, 0xbfff, 0, 0);
@@ -1152,7 +1152,7 @@ void kc85_state::machine_start()
 		break;
 	}
 
-	memory_configure_bank(machine, "bank2", 0, 1, messram_get_ptr(m_ram), 0);
+	memory_configure_bank(machine, "bank2", 0, 1, ram_get_ptr(m_ram), 0);
 	memory_set_bank(machine, "bank2", 0);
 
 	/* register for state saving */
@@ -1164,7 +1164,7 @@ void kc85_state::machine_start()
 
 void pc8201_state::machine_start()
 {
-	UINT8 *ram = messram_get_ptr(m_ram);
+	UINT8 *ram = ram_get_ptr(m_ram);
 
 	/* initialize RTC */
 	upd1990a_cs_w(m_rtc, 1);
@@ -1207,7 +1207,7 @@ void trsm100_state::machine_start()
 	memory_set_bank(machine, "bank1", 0);
 
 	/* configure RAM banking */
-	switch (messram_get_size(m_ram))
+	switch (ram_get_size(m_ram))
 	{
 	case 8 * 1024:
 		memory_unmap_readwrite(program, 0x8000, 0xcfff, 0, 0);
@@ -1229,7 +1229,7 @@ void trsm100_state::machine_start()
 		break;
 	}
 
-	memory_configure_bank(machine, "bank2", 0, 1, messram_get_ptr(m_ram), 0);
+	memory_configure_bank(machine, "bank2", 0, 1, ram_get_ptr(m_ram), 0);
 	memory_set_bank(machine, "bank2", 0);
 
 	/* register for state saving */
@@ -1248,7 +1248,7 @@ void tandy200_state::machine_start()
 	memory_set_bank(machine, "bank1", 0);
 
 	/* configure RAM banking */
-	memory_configure_bank(machine, "bank2", 0, 3, messram_get_ptr(m_ram), 0x6000);
+	memory_configure_bank(machine, "bank2", 0, 3, ram_get_ptr(m_ram), 0x6000);
 	memory_set_bank(machine, "bank2", 0);
 
 	/* register for state saving */
@@ -1325,7 +1325,7 @@ static MACHINE_CONFIG_START( kc85, kc85_state )
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "trsm100")
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("16K")
 	MCFG_RAM_EXTRA_OPTIONS("32K")
 MACHINE_CONFIG_END
@@ -1367,7 +1367,7 @@ static MACHINE_CONFIG_START( pc8201, pc8201_state )
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "pc8201")
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("16K")
 	MCFG_RAM_EXTRA_OPTIONS("32K,64K,96K")
 MACHINE_CONFIG_END
@@ -1404,13 +1404,13 @@ static MACHINE_CONFIG_START( trsm100, trsm100_state )
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "trsm100")
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("8K")
 	MCFG_RAM_EXTRA_OPTIONS("16K,24K,32K")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( tandy102, trsm100 )
-	MCFG_RAM_MODIFY("messram")
+	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("24K")
 	MCFG_RAM_EXTRA_OPTIONS("32K")
 MACHINE_CONFIG_END
@@ -1452,7 +1452,7 @@ static MACHINE_CONFIG_START( tandy200, tandy200_state )
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "tandy200")
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("24K")
 	MCFG_RAM_EXTRA_OPTIONS("48K,72K")
 MACHINE_CONFIG_END

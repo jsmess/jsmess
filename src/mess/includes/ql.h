@@ -3,6 +3,8 @@
 #ifndef __QL__
 #define __QL__
 
+#include "machine/ram.h"
+
 #define SCREEN_TAG	"screen"
 
 #define M68008_TAG	"ic18"
@@ -30,7 +32,7 @@ public:
 		  m_speaker(*this, SPEAKER_TAG),
 		  m_mdv1(*this, MDV_1),
 		  m_mdv2(*this, MDV_2),
-		  m_ram(*this, "messram")
+		  m_ram(*this, RAM_TAG)
 	{ }
 
 	required_device<cpu_device> m_maincpu;

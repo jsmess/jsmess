@@ -1,6 +1,6 @@
 /*************************************************************************
 
-    MESS RAM device
+    RAM device
 
     Provides a configurable amount of RAM to drivers
 
@@ -11,7 +11,7 @@
 
 #include "emu.h"
 #include "emuopts.h"
-#include "messram.h"
+#include "ram.h"
 
 
 /***************************************************************************
@@ -26,8 +26,8 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _messram_state messram_state;
-struct _messram_state
+typedef struct _ram_state ram_state;
+struct _ram_state
 {
 	UINT32 size; /* total amount of ram configured */
 	UINT8 *ram;  /* pointer to the start of ram */
@@ -38,12 +38,12 @@ struct _messram_state
     INLINE FUNCTIONS
 *****************************************************************************/
 
-INLINE messram_state *get_safe_token(device_t *device)
+INLINE ram_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
-	assert(device->type() == MESSRAM);
+	assert(device->type() == RAM);
 
-	return (messram_state *)downcast<legacy_device_base *>(device)->token();
+	return (ram_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -52,11 +52,11 @@ INLINE messram_state *get_safe_token(device_t *device)
 *****************************************************************************/
 
 /*-------------------------------------------------
-    messram_parse_string - convert a ram string to an
+    ram_parse_string - convert a ram string to an
     integer value
 -------------------------------------------------*/
 
-UINT32 messram_parse_string(const char *s)
+UINT32 ram_parse_string(const char *s)
 {
 	UINT32 ram;
 	char suffix = '\0';
@@ -88,65 +88,40 @@ UINT32 messram_parse_string(const char *s)
 	return ram;
 }
 
-#ifdef UNUSED_FUNCTION
-const char *messram_string(char *buffer, UINT32 ram)
-{
-	const char *suffix;
-
-	if ((ram % (1024*1024)) == 0)
-	{
-		ram /= 1024*1024;
-		suffix = "m";
-	}
-	else if ((ram % 1024) == 0)
-	{
-		ram /= 1024;
-		suffix = "k";
-	}
-	else
-	{
-		suffix = "";
-	}
-	sprintf(buffer, "%u%s", ram, suffix);
-	return buffer;
-}
-#endif
-
-
 /*****************************************************************************
     DEVICE INTERFACE
 *****************************************************************************/
 
-static DEVICE_START( messram )
+static DEVICE_START( ram )
 {
-	messram_state *messram = get_safe_token(device);
+	ram_state *ram = get_safe_token(device);
 	ram_config *config = (ram_config *)downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
 
-	/* the device named 'messram' can get ram options from command line */
-	if (strcmp(device->tag(), "messram") == 0)
+	/* the device named 'ram' can get ram options from command line */
+	if (strcmp(device->tag(), RAM_TAG) == 0)
 	{
 		const char *ramsize_string = options_get_string(mame_options(), OPTION_RAMSIZE);
 
 		if ((ramsize_string != NULL) && (ramsize_string[0] != '\0'))
-			messram->size = messram_parse_string(ramsize_string);
+			ram->size = ram_parse_string(ramsize_string);
 	}
 
 	/* if we didn't get a size yet, use the default */
-	if (messram->size == 0)
-		messram->size = messram_parse_string(config->default_size);
+	if (ram->size == 0)
+		ram->size = ram_parse_string(config->default_size);
 
 	/* allocate space for the ram */
-	messram->ram = auto_alloc_array(device->machine, UINT8, messram->size);
+	ram->ram = auto_alloc_array(device->machine, UINT8, ram->size);
 
 	/* reset ram to the default value */
-	memset(messram->ram, config->default_value, messram->size);
+	memset(ram->ram, config->default_value, ram->size);
 
 	/* register for state saving */
-	state_save_register_device_item(device, 0, messram->size);
-	state_save_register_device_item_pointer(device, 0, messram->ram, messram->size);
+	state_save_register_device_item(device, 0, ram->size);
+	state_save_register_device_item_pointer(device, 0, ram->ram, ram->size);
 }
 
-static DEVICE_VALIDITY_CHECK( messram )
+static DEVICE_VALIDITY_CHECK( ram )
 {
 	ram_config *config = (ram_config *)downcast<const legacy_device_config_base *>(device)->inline_config();
 	const char *ramsize_string = NULL;
@@ -156,14 +131,14 @@ static DEVICE_VALIDITY_CHECK( messram )
 	const char *gamename_option = NULL;
 
 	/* verify default ram value */
-	if (config!=NULL && messram_parse_string(config->default_size) == 0)
+	if (config!=NULL && ram_parse_string(config->default_size) == 0)
 	{
 		mame_printf_error("%s: '%s' has an invalid default RAM option: %s\n", driver->source_file, driver->name, config->default_size);
 		error = TRUE;
 	}
 
-	/* command line options are only parsed for the device named "messram" */
-	if (device->tag()!=NULL && strcmp(device->tag(), "messram") == 0)
+	/* command line options are only parsed for the device named RAM_TAG */
+	if (device->tag()!=NULL && strcmp(device->tag(), RAM_TAG) == 0)
 	{
 		if (mame_options()==NULL) return FALSE;
 		/* verify command line ram option */
@@ -172,7 +147,7 @@ static DEVICE_VALIDITY_CHECK( messram )
 
 		if ((ramsize_string != NULL) && (ramsize_string[0] != '\0'))
 		{
-			specified_ram = messram_parse_string(ramsize_string);
+			specified_ram = ram_parse_string(ramsize_string);
 
 			if (specified_ram == 0)
 			{
@@ -182,7 +157,7 @@ static DEVICE_VALIDITY_CHECK( messram )
 			if (gamename_option != NULL && *gamename_option != 0 && strcmp(gamename_option, driver->name) == 0)
 			{
 				/* compare command line option to default value */
-				if (messram_parse_string(config->default_size) == specified_ram)
+				if (ram_parse_string(config->default_size) == specified_ram)
 					is_valid = TRUE;
 
 				/* verify extra ram options */
@@ -200,7 +175,7 @@ static DEVICE_VALIDITY_CHECK( messram )
 					/* try to parse each option */
 					while(p <= e)
 					{
-						UINT32 option_ram_size = messram_parse_string(p);
+						UINT32 option_ram_size = ram_parse_string(p);
 
 						if (option_ram_size == 0)
 						{
@@ -252,22 +227,22 @@ static DEVICE_VALIDITY_CHECK( messram )
 }
 
 
-DEVICE_GET_INFO( messram )
+DEVICE_GET_INFO( ram )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(messram_state);			break;
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(ram_state);			break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = sizeof(ram_config);				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(messram);	break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(ram);	break;
 		case DEVINFO_FCT_STOP:							/* Nothing */								break;
 		case DEVINFO_FCT_RESET:							/* Nothing */								break;
-		case DEVINFO_FCT_VALIDITY_CHECK:				info->p = (void*)DEVICE_VALIDITY_CHECK_NAME(messram); break;
+		case DEVINFO_FCT_VALIDITY_CHECK:				info->p = (void*)DEVICE_VALIDITY_CHECK_NAME(ram); break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "MESS RAM");				break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "RAM");				break;
 		case DEVINFO_STR_FAMILY:						strcpy(info->s, "RAM");						break;
 		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.00");					break;
 		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);					break;
@@ -275,47 +250,20 @@ DEVICE_GET_INFO( messram )
 	}
 }
 
-
 /***************************************************************************
     IMPLEMENTATION
 ***************************************************************************/
 
-UINT32 messram_get_size(device_t *device)
+UINT32 ram_get_size(device_t *device)
 {
-	messram_state *messram = get_safe_token(device);
-	return messram->size;
+	ram_state *ram = get_safe_token(device);
+	return ram->size;
 }
 
-
-UINT8 *messram_get_ptr(device_t *device)
+UINT8 *ram_get_ptr(device_t *device)
 {
-	messram_state *messram = get_safe_token(device);
-	return messram->ram;
+	ram_state *ram = get_safe_token(device);
+	return ram->ram;
 }
 
-
-#ifdef UNUSED_FUNCTION
-void messram_dump(device_t *device, const char *filename)
-{
-	messram_state *messram = get_safe_token(device);
-	file_error filerr;
-	mame_file *file;
-
-	/* use a default filename */
-	if (!filename)
-		filename = "ram.bin";
-
-	/* open the file */
-	filerr = mame_fopen(NULL, filename, OPEN_FLAG_WRITE, &file);
-	if (filerr == FILERR_NONE)
-	{
-		/* write the data */
-		mame_fwrite(file, messram->ram, messram->size);
-
-		/* close file */
-		mame_fclose(file);
-	}
-}
-#endif
-
-DEFINE_LEGACY_DEVICE(MESSRAM, messram);
+DEFINE_LEGACY_DEVICE(RAM, ram);

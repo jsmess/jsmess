@@ -110,7 +110,7 @@ Notes:
 #include "cpu/m6502/m6502.h"
 #include "cpu/mcs48/mcs48.h"
 #include "devices/flopdrv.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 #include "formats/basicdsk.h"
 #include "machine/ctronics.h"
 #include "machine/i8214.h"
@@ -1124,7 +1124,7 @@ void v1050_state::machine_start()
 	cpu_set_irq_callback(m_maincpu, v1050_int_ack);
 
 	/* setup memory banking */
-	UINT8 *ram = messram_get_ptr(machine->device("messram"));
+	UINT8 *ram = ram_get_ptr(machine->device(RAM_TAG));
 
 	memory_configure_bank(machine, "bank1", 0, 2, ram, 0x10000);
 	memory_configure_bank(machine, "bank1", 2, 1, ram + 0x1c000, 0);
@@ -1215,7 +1215,7 @@ static MACHINE_CONFIG_START( v1050, v1050_state )
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("128K")
 MACHINE_CONFIG_END
 

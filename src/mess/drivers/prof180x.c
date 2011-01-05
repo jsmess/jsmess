@@ -24,7 +24,7 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 #include "machine/ctronics.h"
 #include "machine/upd765.h"
 #include "includes/prof180x.h"
@@ -248,7 +248,7 @@ static MACHINE_CONFIG_START( prof180x, prof180x_state )
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("128K")
 	MCFG_RAM_EXTRA_OPTIONS("256K,512K")
 MACHINE_CONFIG_END

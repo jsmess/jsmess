@@ -134,7 +134,7 @@
 #include "devices/harddriv.h"
 #include "machine/x68k_hdc.h"
 #include "includes/x68k.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 #include "machine/nvram.h"
 #include "x68000.lh"
 
@@ -1537,7 +1537,7 @@ static READ16_HANDLER( x68k_sram_r )
 //  if(offset == 0x5a/2)  // 0x5a should be 0 if no SASI HDs are present.
 //      return 0x0000;
 	if(offset == 0x08/2)
-		return messram_get_size(space->machine->device("messram")) >> 16;  // RAM size
+		return ram_get_size(space->machine->device(RAM_TAG)) >> 16;  // RAM size
 #if 0
 	if(offset == 0x46/2)
         return 0x0024;
@@ -1553,7 +1553,7 @@ static READ32_HANDLER( x68k_sram32_r )
 {
 	x68k_state *state = space->machine->driver_data<x68k_state>();
 	if(offset == 0x08/4)
-		return (messram_get_size(space->machine->device("messram")) & 0xffff0000);  // RAM size
+		return (ram_get_size(space->machine->device(RAM_TAG)) & 0xffff0000);  // RAM size
 #if 0
 	if(offset == 0x46/2)
         return 0x0024;
@@ -1682,28 +1682,28 @@ static TIMER_CALLBACK(x68k_fake_bus_error)
 		v = 0x09;
 
 	// rather hacky, but this generally works for programs that check for MIDI hardware
-	if(messram_get_ptr(machine->device("messram"))[v] != 0x02)  // normal vector for bus errors points to 02FF0540
+	if(ram_get_ptr(machine->device(RAM_TAG))[v] != 0x02)  // normal vector for bus errors points to 02FF0540
 	{
-		int addr = (messram_get_ptr(machine->device("messram"))[0x09] << 24) | (messram_get_ptr(machine->device("messram"))[0x08] << 16) |(messram_get_ptr(machine->device("messram"))[0x0b] << 8) | messram_get_ptr(machine->device("messram"))[0x0a];
+		int addr = (ram_get_ptr(machine->device(RAM_TAG))[0x09] << 24) | (ram_get_ptr(machine->device(RAM_TAG))[0x08] << 16) |(ram_get_ptr(machine->device(RAM_TAG))[0x0b] << 8) | ram_get_ptr(machine->device(RAM_TAG))[0x0a];
 		int sp = cpu_get_reg(machine->device("maincpu"), STATE_GENSP);
 		int pc = cpu_get_reg(machine->device("maincpu"), STATE_GENPC);
 		int sr = cpu_get_reg(machine->device("maincpu"), M68K_SR);
 		//int pda = cpu_get_reg(machine->device("maincpu"), M68K_PREF_DATA);
 		if(strcmp(machine->gamedrv->name,"x68030") == 0)
 		{  // byte order varies on the 68030
-			addr = (messram_get_ptr(machine->device("messram"))[0x0b] << 24) | (messram_get_ptr(machine->device("messram"))[0x0a] << 16) |(messram_get_ptr(machine->device("messram"))[0x09] << 8) | messram_get_ptr(machine->device("messram"))[0x08];
+			addr = (ram_get_ptr(machine->device(RAM_TAG))[0x0b] << 24) | (ram_get_ptr(machine->device(RAM_TAG))[0x0a] << 16) |(ram_get_ptr(machine->device(RAM_TAG))[0x09] << 8) | ram_get_ptr(machine->device(RAM_TAG))[0x08];
 		}
 		cpu_set_reg(machine->device("maincpu"), STATE_GENSP, sp - 14);
-		messram_get_ptr(machine->device("messram"))[sp-11] = (val & 0xff000000) >> 24;
-		messram_get_ptr(machine->device("messram"))[sp-12] = (val & 0x00ff0000) >> 16;
-		messram_get_ptr(machine->device("messram"))[sp-9] = (val & 0x0000ff00) >> 8;
-		messram_get_ptr(machine->device("messram"))[sp-10] = (val & 0x000000ff);  // place address onto the stack
-		messram_get_ptr(machine->device("messram"))[sp-3] = (pc & 0xff000000) >> 24;
-		messram_get_ptr(machine->device("messram"))[sp-4] = (pc & 0x00ff0000) >> 16;
-		messram_get_ptr(machine->device("messram"))[sp-1] = (pc & 0x0000ff00) >> 8;
-		messram_get_ptr(machine->device("messram"))[sp-2] = (pc & 0x000000ff);  // place PC onto the stack
-		messram_get_ptr(machine->device("messram"))[sp-5] = (sr & 0xff00) >> 8;
-		messram_get_ptr(machine->device("messram"))[sp-6] = (sr & 0x00ff);  // place SR onto the stack
+		ram_get_ptr(machine->device(RAM_TAG))[sp-11] = (val & 0xff000000) >> 24;
+		ram_get_ptr(machine->device(RAM_TAG))[sp-12] = (val & 0x00ff0000) >> 16;
+		ram_get_ptr(machine->device(RAM_TAG))[sp-9] = (val & 0x0000ff00) >> 8;
+		ram_get_ptr(machine->device(RAM_TAG))[sp-10] = (val & 0x000000ff);  // place address onto the stack
+		ram_get_ptr(machine->device(RAM_TAG))[sp-3] = (pc & 0xff000000) >> 24;
+		ram_get_ptr(machine->device(RAM_TAG))[sp-4] = (pc & 0x00ff0000) >> 16;
+		ram_get_ptr(machine->device(RAM_TAG))[sp-1] = (pc & 0x0000ff00) >> 8;
+		ram_get_ptr(machine->device(RAM_TAG))[sp-2] = (pc & 0x000000ff);  // place PC onto the stack
+		ram_get_ptr(machine->device(RAM_TAG))[sp-5] = (sr & 0xff00) >> 8;
+		ram_get_ptr(machine->device(RAM_TAG))[sp-6] = (sr & 0x00ff);  // place SR onto the stack
 		cpu_set_reg(machine->device("maincpu"), STATE_GENPC, addr);  // real exceptions seem to take too long to be acknowledged
 		popmessage("Expansion access [%08x]: PC jump to %08x", val, addr);
 	}
@@ -2456,8 +2456,8 @@ static MACHINE_RESET( x68000 )
 	UINT8* romdata = machine->region("user2")->base();
 	attotime irq_time;
 
-	memset(messram_get_ptr(machine->device("messram")),0,messram_get_size(machine->device("messram")));
-	memcpy(messram_get_ptr(machine->device("messram")),romdata,8);
+	memset(ram_get_ptr(machine->device(RAM_TAG)),0,ram_get_size(machine->device(RAM_TAG)));
+	memcpy(ram_get_ptr(machine->device(RAM_TAG)),romdata,8);
 
 	// init keyboard
 	state->keyboard.delay = 500;  // 3*100+200
@@ -2527,8 +2527,8 @@ static MACHINE_START( x68000 )
 	state->spriteram = (UINT16*)machine->region("user1")->base();
 	memory_install_read16_handler(space,0x000000,0xbffffb,0xffffffff,0,(read16_space_func)x68k_emptyram_r);
 	memory_install_write16_handler(space,0x000000,0xbffffb,0xffffffff,0,(write16_space_func)x68k_emptyram_w);
-	memory_install_readwrite_bank(space,0x000000,messram_get_size(machine->device("messram"))-1,0xffffffff,0,"bank1");
-	memory_set_bankptr(machine, "bank1",messram_get_ptr(machine->device("messram")));
+	memory_install_readwrite_bank(space,0x000000,ram_get_size(machine->device(RAM_TAG))-1,0xffffffff,0,"bank1");
+	memory_set_bankptr(machine, "bank1",ram_get_ptr(machine->device(RAM_TAG)));
 	memory_install_read16_handler(space,0xc00000,0xdfffff,0xffffffff,0,x68k_gvram_r);
 	memory_install_write16_handler(space,0xc00000,0xdfffff,0xffffffff,0,x68k_gvram_w);
 	memory_set_bankptr(machine, "bank2",state->gvram);  // so that code in VRAM is executable - needed for Terra Cresta
@@ -2558,11 +2558,11 @@ static MACHINE_START( x68030 )
 	state->spriteram = (UINT16*)machine->region("user1")->base();
 	memory_install_read32_handler(space,0x000000,0xbffffb,0xffffffff,0,(read32_space_func)x68k_rom0_r);
 	memory_install_write32_handler(space,0x000000,0xbffffb,0xffffffff,0,(write32_space_func)x68k_rom0_w);
-	memory_install_readwrite_bank(space,0x000000,messram_get_size(machine->device("messram"))-1,0xffffffff,0,"bank1");
+	memory_install_readwrite_bank(space,0x000000,ram_get_size(machine->device(RAM_TAG))-1,0xffffffff,0,"bank1");
 	// mirror? Human68k 3.02 explicitly adds 0x3000000 to some pointers
-	memory_install_readwrite_bank(space,0x3000000,0x3000000+messram_get_size(machine->device("messram"))-1,0xffffffff,0,"bank5");
-	memory_set_bankptr(machine, "bank1",messram_get_ptr(machine->device("messram")));
-	memory_set_bankptr(machine, "bank5",messram_get_ptr(machine->device("messram")));
+	memory_install_readwrite_bank(space,0x3000000,0x3000000+ram_get_size(machine->device(RAM_TAG))-1,0xffffffff,0,"bank5");
+	memory_set_bankptr(machine, "bank1",ram_get_ptr(machine->device(RAM_TAG)));
+	memory_set_bankptr(machine, "bank5",ram_get_ptr(machine->device(RAM_TAG)));
 	memory_install_read32_handler(space,0xc00000,0xdfffff,0xffffffff,0,x68k_gvram32_r);
 	memory_install_write32_handler(space,0xc00000,0xdfffff,0xffffffff,0,x68k_gvram32_w);
 	memory_set_bankptr(machine, "bank2",state->gvram);  // so that code in VRAM is executable - needed for Terra Cresta
@@ -2695,7 +2695,7 @@ static MACHINE_CONFIG_START( x68000, x68k_state )
 	MCFG_FLOPPY_4_DRIVES_ADD(x68k_floppy_config)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("4M")
 	MCFG_RAM_EXTRA_OPTIONS("1M,2M,3M,5M,6M,7M,8M,9M,10M,11M,12M")
 MACHINE_CONFIG_END

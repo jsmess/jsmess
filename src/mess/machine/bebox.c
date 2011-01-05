@@ -108,7 +108,7 @@
 #include "machine/intelfsh.h"
 #include "machine/8042kbdc.h"
 #include "machine/53c810.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 
 #define LOG_CPUIMASK	1
 #define LOG_UART		1
@@ -1122,9 +1122,9 @@ DRIVER_INIT( bebox )
 	memory_set_bankptr(machine, "bank2", machine->region("user2")->base());
 
 	/* install MESS managed RAM */
-	memory_install_readwrite_bank(space_0, 0, messram_get_size(machine->device("messram")) - 1, 0, 0x02000000, "bank3");
-	memory_install_readwrite_bank(space_1, 0, messram_get_size(machine->device("messram")) - 1, 0, 0x02000000, "bank3");
-	memory_set_bankptr(machine, "bank3", messram_get_ptr(machine->device("messram")));
+	memory_install_readwrite_bank(space_0, 0, ram_get_size(machine->device(RAM_TAG)) - 1, 0, 0x02000000, "bank3");
+	memory_install_readwrite_bank(space_1, 0, ram_get_size(machine->device(RAM_TAG)) - 1, 0, 0x02000000, "bank3");
+	memory_set_bankptr(machine, "bank3", ram_get_ptr(machine->device(RAM_TAG)));
 	
 	pc_vga_init(machine, &bebox_vga_interface, &cirrus_svga_interface);
 	kbdc8042_init(machine, &bebox_8042_interface);

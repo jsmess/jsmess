@@ -48,7 +48,7 @@
 #include "devices/sonydriv.h"
 #include "devices/harddriv.h"
 #include "formats/ap_dsk35.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 #include "devices/chd_cd.h"
 #include "sound/asc.h"
 #include "sound/cdda.h"
@@ -633,14 +633,14 @@ static MACHINE_CONFIG_START( mac512ke, mac_state )
 	MCFG_VIA6522_ADD("via6522_0", 1000000, mac_via6522_intf)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("512K")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mac128k, mac512ke )
 
 	/* internal ram */
-	MCFG_RAM_MODIFY("messram")
+	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("128K")
 MACHINE_CONFIG_END
 
@@ -656,7 +656,7 @@ static MACHINE_CONFIG_DERIVED( macplus, mac512ke )
 	MCFG_FLOPPY_SONY_2_DRIVES_MODIFY(mac_floppy_config)
 
 	/* internal ram */
-	MCFG_RAM_MODIFY("messram")
+	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("4M")
 	MCFG_RAM_EXTRA_OPTIONS("1M,2M,2560K,4M")
 MACHINE_CONFIG_END
@@ -667,7 +667,7 @@ static MACHINE_CONFIG_DERIVED( macse, macplus )
 	MCFG_VIA6522_ADD("via6522_0", 1000000, mac_via6522_adb_intf)
 
 	/* internal ram */
-	MCFG_RAM_MODIFY("messram")
+	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("4M")
 	MCFG_RAM_EXTRA_OPTIONS("2M,2560K,4M")
 MACHINE_CONFIG_END
@@ -716,7 +716,7 @@ static MACHINE_CONFIG_START( macprtb, mac_state )
 	MCFG_HARDDISK_ADD( "harddisk2" )
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("1M")
 	MCFG_RAM_EXTRA_OPTIONS("1M,3M,5M,7M,9M")
 
@@ -768,7 +768,7 @@ static MACHINE_CONFIG_START( macii, mac_state )
 	MCFG_HARDDISK_ADD( "harddisk2" )
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("2M")
 	MCFG_RAM_EXTRA_OPTIONS("8M,32M,64M,96M,128M")
 MACHINE_CONFIG_END
@@ -785,7 +785,7 @@ static MACHINE_CONFIG_DERIVED( maclc, macii )
 	MCFG_VIDEO_RESET(macrbv)
 	MCFG_VIDEO_UPDATE(macrbvvram)
 
-	MCFG_RAM_MODIFY("messram")
+	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("2M")
 	MCFG_RAM_EXTRA_OPTIONS("4M,6M,8M,10M")
 
@@ -800,7 +800,7 @@ static MACHINE_CONFIG_DERIVED( maclc2, maclc )
 	MCFG_CPU_PROGRAM_MAP(maclc_map)
 	MCFG_CPU_VBLANK_INT("screen", mac_rbv_vbl)
 
-	MCFG_RAM_MODIFY("messram")
+	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("4M")
 	MCFG_RAM_EXTRA_OPTIONS("6M,8M,10M")
 MACHINE_CONFIG_END
@@ -815,7 +815,7 @@ static MACHINE_CONFIG_DERIVED( maclc3, maclc )
 	MCFG_VIDEO_RESET(macrbv)
 	MCFG_VIDEO_UPDATE(macrbvvram)
 
-	MCFG_RAM_MODIFY("messram")
+	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("4M")
 	MCFG_RAM_EXTRA_OPTIONS("8M,12M,16M,20M,24M,28M,32M,36M")
 
@@ -830,7 +830,7 @@ static MACHINE_CONFIG_DERIVED( maciix, macii )
 	MCFG_CPU_PROGRAM_MAP(macii_map)
 	MCFG_CPU_VBLANK_INT("screen", mac_cb264_vbl)
 
-	MCFG_RAM_MODIFY("messram")
+	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("2M")
 	MCFG_RAM_EXTRA_OPTIONS("8M,32M,64M,96M,128M")
 MACHINE_CONFIG_END
@@ -881,7 +881,7 @@ static MACHINE_CONFIG_START( macse30, mac_state )
 	MCFG_HARDDISK_ADD( "harddisk2" )
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("2M")
 	MCFG_RAM_EXTRA_OPTIONS("8M,16M,32M,48M,64M,96M,128M")
 MACHINE_CONFIG_END
@@ -903,7 +903,7 @@ static MACHINE_CONFIG_DERIVED( macclas2, maclc )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_RAM_MODIFY("messram")
+	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("10M")
 	MCFG_RAM_EXTRA_OPTIONS("2M,4M,6M,8M,10M")
 MACHINE_CONFIG_END
@@ -925,7 +925,7 @@ static MACHINE_CONFIG_DERIVED( maciici, macii )
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 
 	/* internal ram */
-	MCFG_RAM_MODIFY("messram")
+	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("2M")
 	MCFG_RAM_EXTRA_OPTIONS("4M,8M,16M,32M,48M,64M")
 MACHINE_CONFIG_END
@@ -947,7 +947,7 @@ static MACHINE_CONFIG_DERIVED( maciisi, macii )
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 
 	/* internal ram */
-	MCFG_RAM_MODIFY("messram")
+	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("2M")
 	MCFG_RAM_EXTRA_OPTIONS("4M,8M,16M,32M,48M,64M")
 MACHINE_CONFIG_END
@@ -995,7 +995,7 @@ static MACHINE_CONFIG_START( pwrmac, mac_state )
 	MCFG_HARDDISK_ADD( "harddisk2" )
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("8M")
 	MCFG_RAM_EXTRA_OPTIONS("16M,32M,64M,128M")
 MACHINE_CONFIG_END

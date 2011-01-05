@@ -231,7 +231,7 @@ Notes:
 #include "video/cdp1861.h"
 #include "video/cdp1862.h"
 #include "machine/rescap.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 
 static QUICKLOAD_LOAD( vip );
 
@@ -261,9 +261,9 @@ WRITE8_MEMBER( vip_state::bankswitch_w )
 {
 	/* enable RAM */
 	address_space *program = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);
-	UINT8 *ram = messram_get_ptr(m_ram);
+	UINT8 *ram = ram_get_ptr(m_ram);
 
-	switch (messram_get_size(m_ram))
+	switch (ram_get_size(m_ram))
 	{
 	case 1 * 1024:
 		memory_install_ram(program, 0x0000, 0x03ff, 0, 0x7c00, ram);
@@ -598,10 +598,10 @@ static COSMAC_INTERFACE( cosmac_intf )
 
 void vip_state::machine_start()
 {
-	UINT8 *ram = messram_get_ptr(m_ram);
+	UINT8 *ram = ram_get_ptr(m_ram);
 
 	/* randomize RAM contents */
-	for (UINT16 addr = 0; addr < messram_get_size(m_ram); addr++)
+	for (UINT16 addr = 0; addr < ram_get_size(m_ram); addr++)
 	{
 		ram[addr] = machine->rand() & 0xff;
 	}
@@ -726,14 +726,14 @@ static MACHINE_CONFIG_START( vip, vip_state )
 	MCFG_CASSETTE_ADD("cassette", vip_cassette_config)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("2K")
 	MCFG_RAM_EXTRA_OPTIONS("4K")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( vp111, vip )
 	/* internal ram */
-	MCFG_RAM_MODIFY("messram")
+	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("1K")
 	MCFG_RAM_EXTRA_OPTIONS("2K,4K")
 MACHINE_CONFIG_END
@@ -778,7 +778,7 @@ static QUICKLOAD_LOAD( vip )
 		chip8_size = image.device().machine->region("chip8x")->bytes();
 	}
 
-	if ((size + chip8_size) > messram_get_size(image.device().machine->device("messram")))
+	if ((size + chip8_size) > ram_get_size(image.device().machine->device(RAM_TAG)))
 	{
 		return IMAGE_INIT_FAIL;
 	}

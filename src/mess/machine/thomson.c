@@ -12,7 +12,7 @@
 #include "includes/thomson.h"
 #include "machine/6821pia.h"
 #include "machine/ctronics.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 
 #define VERBOSE       0
 #define VERBOSE_IRQ   0
@@ -1572,22 +1572,22 @@ MACHINE_START ( to7 )
 
 	/* memory */
 	thom_cart_bank = 0;
-	thom_vram = messram_get_ptr(machine->device("messram"));
-	memory_configure_bank( machine, THOM_BASE_BANK, 0, 1, messram_get_ptr(machine->device("messram")) + 0x4000, 0x2000 );
+	thom_vram = ram_get_ptr(machine->device(RAM_TAG));
+	memory_configure_bank( machine, THOM_BASE_BANK, 0, 1, ram_get_ptr(machine->device(RAM_TAG)) + 0x4000, 0x2000 );
 	memory_configure_bank( machine, THOM_VRAM_BANK, 0, 2, thom_vram, 0x2000 );
 	memory_configure_bank( machine, THOM_CART_BANK, 0, 4, mem + 0x10000, 0x4000 );
 	memory_set_bank( machine, THOM_BASE_BANK, 0 );
 	memory_set_bank( machine, THOM_VRAM_BANK, 0 );
 	memory_set_bank( machine, THOM_CART_BANK, 0 );
 
-	if ( messram_get_size(machine->device("messram")) > 24*1024 )
+	if ( ram_get_size(machine->device(RAM_TAG)) > 24*1024 )
 	{
 		/* install 16 KB or 16 KB + 8 KB memory extensions */
 		/* BASIC instruction to see free memory: ?FRE(0) */
-		int extram = messram_get_size(machine->device("messram")) - 24*1024;
+		int extram = ram_get_size(machine->device(RAM_TAG)) - 24*1024;
 		memory_install_write_bank(space, 0x8000, 0x8000 + extram - 1, 0, 0, THOM_RAM_BANK);
 		memory_install_read_bank(space, 0x8000, 0x8000 + extram - 1, 0, 0, THOM_RAM_BANK );
-		memory_configure_bank( machine, THOM_RAM_BANK,  0, 1, messram_get_ptr(machine->device("messram")) + 0x6000, extram );
+		memory_configure_bank( machine, THOM_RAM_BANK,  0, 1, ram_get_ptr(machine->device(RAM_TAG)) + 0x6000, extram );
 		memory_set_bank( machine, THOM_RAM_BANK, 0 );
 	}
 
@@ -1665,7 +1665,7 @@ static void to770_update_ram_bank(running_machine *machine)
 	if ( bank != old_ram_bank )
 		LOG_BANK(( "to770_update_ram_bank: RAM bank change %i\n", bank ));
 
-	if ( messram_get_size(machine->device("messram")) == 128*1024 || bank < 2 )
+	if ( ram_get_size(machine->device(RAM_TAG)) == 128*1024 || bank < 2 )
 	{
 		memory_set_bank( machine, THOM_RAM_BANK, bank );
 		memory_install_write_bank(space, 0xa000, 0xdfff, 0, 0, THOM_RAM_BANK);
@@ -1829,9 +1829,9 @@ MACHINE_START ( to770 )
 
 	/* memory */
 	thom_cart_bank = 0;
-	thom_vram = messram_get_ptr(machine->device("messram"));
-	memory_configure_bank( machine, THOM_BASE_BANK, 0, 1, messram_get_ptr(machine->device("messram")) + 0x4000, 0x4000 );
-	memory_configure_bank( machine, THOM_RAM_BANK,  0, 6, messram_get_ptr(machine->device("messram")) + 0x8000, 0x4000 );
+	thom_vram = ram_get_ptr(machine->device(RAM_TAG));
+	memory_configure_bank( machine, THOM_BASE_BANK, 0, 1, ram_get_ptr(machine->device(RAM_TAG)) + 0x4000, 0x4000 );
+	memory_configure_bank( machine, THOM_RAM_BANK,  0, 6, ram_get_ptr(machine->device(RAM_TAG)) + 0x8000, 0x4000 );
 	memory_configure_bank( machine, THOM_VRAM_BANK, 0, 2, thom_vram, 0x2000 );
 	memory_configure_bank( machine, THOM_CART_BANK, 0, 4, mem + 0x10000, 0x4000 );
 	memory_set_bank( machine, THOM_BASE_BANK, 0 );
@@ -2204,10 +2204,10 @@ MACHINE_START ( mo5 )
 	/* memory */
 	thom_cart_bank = 0;
 	mo5_reg_cart = 0;
-	thom_vram = messram_get_ptr(machine->device("messram"));
-	memory_configure_bank( machine, THOM_BASE_BANK, 0, 1, messram_get_ptr(machine->device("messram")) + 0x4000, 0x8000 );
+	thom_vram = ram_get_ptr(machine->device(RAM_TAG));
+	memory_configure_bank( machine, THOM_BASE_BANK, 0, 1, ram_get_ptr(machine->device(RAM_TAG)) + 0x4000, 0x8000 );
 	memory_configure_bank( machine, THOM_CART_BANK, 0, 4, mem + 0x10000, 0x4000 );
-	memory_configure_bank( machine, THOM_CART_BANK, 4, 4, messram_get_ptr(machine->device("messram")) + 0xc000, 0x4000 );
+	memory_configure_bank( machine, THOM_CART_BANK, 4, 4, ram_get_ptr(machine->device(RAM_TAG)) + 0xc000, 0x4000 );
 	memory_configure_bank( machine, THOM_VRAM_BANK, 0, 2, thom_vram, 0x2000 );
 	memory_set_bank( machine, THOM_BASE_BANK, 0 );
 	memory_set_bank( machine, THOM_CART_BANK, 0 );
@@ -2541,7 +2541,7 @@ static void to9_update_ram_bank (running_machine *machine)
 	if ( old_ram_bank != bank )
 		LOG_BANK(( "to9_update_ram_bank: bank %i selected (pia=$%02X disk=%i)\n", bank, portb & 0xf8, disk ));
 
-	if ( messram_get_size(machine->device("messram")) == 192*1024 || bank < 6 )
+	if ( ram_get_size(machine->device(RAM_TAG)) == 192*1024 || bank < 6 )
 	{
 		memory_set_bank( machine, THOM_RAM_BANK, bank );
 		memory_install_write_bank( space, 0xa000, 0xdfff, 0, 0, THOM_RAM_BANK);
@@ -3166,12 +3166,12 @@ MACHINE_START ( to9 )
 	to7_midi_init(machine);
 
 	/* memory */
-	thom_vram = messram_get_ptr(machine->device("messram"));
+	thom_vram = ram_get_ptr(machine->device(RAM_TAG));
 	thom_cart_bank = 0;
 	memory_configure_bank( machine, THOM_VRAM_BANK, 0,  2, thom_vram, 0x2000 );
 	memory_configure_bank( machine, THOM_CART_BANK, 0, 12, mem + 0x10000, 0x4000 );
-	memory_configure_bank( machine, THOM_BASE_BANK, 0,  1, messram_get_ptr(machine->device("messram")) + 0x4000, 0x4000 );
-	memory_configure_bank( machine, THOM_RAM_BANK,  0, 10, messram_get_ptr(machine->device("messram")) + 0x8000, 0x4000 );
+	memory_configure_bank( machine, THOM_BASE_BANK, 0,  1, ram_get_ptr(machine->device(RAM_TAG)) + 0x4000, 0x4000 );
+	memory_configure_bank( machine, THOM_RAM_BANK,  0, 10, ram_get_ptr(machine->device(RAM_TAG)) + 0x8000, 0x4000 );
 	memory_set_bank( machine, THOM_VRAM_BANK, 0 );
 	memory_set_bank( machine, THOM_CART_BANK, 0 );
 	memory_set_bank( machine, THOM_BASE_BANK, 0 );
@@ -3608,7 +3608,7 @@ static void to8_update_ram_bank (running_machine *machine)
         undistorted space, such as cartridge, page 0 (video), or page 1
     */
 	to8_data_vpage = bank;
-	if ( messram_get_size(machine->device("messram")) == 512*1024 || to8_data_vpage < 16 )
+	if ( ram_get_size(machine->device(RAM_TAG)) == 512*1024 || to8_data_vpage < 16 )
 	{
 		memory_set_bank( machine, TO8_DATA_LO, to8_data_vpage );
 		memory_set_bank( machine, TO8_DATA_HI, to8_data_vpage );
@@ -3650,7 +3650,7 @@ static void to8_update_cart_bank (running_machine *machine)
 		/* RAM space */
 		to8_cart_vpage = to8_reg_cart & 31;
 		bank = 8 + to8_cart_vpage;
-		if ((to8_cart_vpage < 8 || messram_get_size(machine->device("messram")) == 512*1024) && (to8_reg_cart & 0x40)) {
+		if ((to8_cart_vpage < 8 || ram_get_size(machine->device(RAM_TAG)) == 512*1024) && (to8_reg_cart & 0x40)) {
 			if (to8_cart_vpage <= 4) {
 				memory_install_write8_handler( space, 0x0000, 0x3fff, 0, 0,to8_vcart_w);
 			} else {
@@ -3688,7 +3688,7 @@ static void to8_update_cart_bank (running_machine *machine)
 		}
 	}
 
-	if ( messram_get_size(machine->device("messram")) == 512*1024 || bank < 16 )
+	if ( ram_get_size(machine->device(RAM_TAG)) == 512*1024 || bank < 16 )
 	{
 		memory_set_bank( machine, THOM_CART_BANK, bank );
 	}
@@ -4160,14 +4160,14 @@ MACHINE_START ( to8 )
 
 	/* memory */
 	thom_cart_bank = 0;
-	thom_vram = messram_get_ptr(machine->device("messram"));
+	thom_vram = ram_get_ptr(machine->device(RAM_TAG));
 	memory_configure_bank( machine, THOM_CART_BANK, 0,  8, mem + 0x10000, 0x4000 );
-	memory_configure_bank( machine, THOM_CART_BANK, 8, 32, messram_get_ptr(machine->device("messram")), 0x4000 );
-	memory_configure_bank( machine, THOM_VRAM_BANK, 0,  2, messram_get_ptr(machine->device("messram")), 0x2000 );
-	memory_configure_bank( machine, TO8_SYS_LO,     0,  1, messram_get_ptr(machine->device("messram")) + 0x6000, 0x4000 );
-	memory_configure_bank( machine, TO8_SYS_HI,     0,  1, messram_get_ptr(machine->device("messram")) + 0x4000, 0x4000 );
-	memory_configure_bank( machine, TO8_DATA_LO,    0, 32, messram_get_ptr(machine->device("messram")) + 0x2000, 0x4000 );
-	memory_configure_bank( machine, TO8_DATA_HI,    0, 32, messram_get_ptr(machine->device("messram")) + 0x0000, 0x4000 );
+	memory_configure_bank( machine, THOM_CART_BANK, 8, 32, ram_get_ptr(machine->device(RAM_TAG)), 0x4000 );
+	memory_configure_bank( machine, THOM_VRAM_BANK, 0,  2, ram_get_ptr(machine->device(RAM_TAG)), 0x2000 );
+	memory_configure_bank( machine, TO8_SYS_LO,     0,  1, ram_get_ptr(machine->device(RAM_TAG)) + 0x6000, 0x4000 );
+	memory_configure_bank( machine, TO8_SYS_HI,     0,  1, ram_get_ptr(machine->device(RAM_TAG)) + 0x4000, 0x4000 );
+	memory_configure_bank( machine, TO8_DATA_LO,    0, 32, ram_get_ptr(machine->device(RAM_TAG)) + 0x2000, 0x4000 );
+	memory_configure_bank( machine, TO8_DATA_HI,    0, 32, ram_get_ptr(machine->device(RAM_TAG)) + 0x0000, 0x4000 );
 	memory_configure_bank( machine, TO8_BIOS_BANK,  0,  2, mem + 0x30800, 0x2000 );
 	memory_set_bank( machine, THOM_CART_BANK, 0 );
 	memory_set_bank( machine, THOM_VRAM_BANK, 0 );
@@ -4330,14 +4330,14 @@ MACHINE_START ( to9p )
 
 	/* memory */
 	thom_cart_bank = 0;
-	thom_vram = messram_get_ptr(machine->device("messram"));
+	thom_vram = ram_get_ptr(machine->device(RAM_TAG));
 	memory_configure_bank( machine, THOM_CART_BANK, 0,  8, mem + 0x10000, 0x4000 );
-	memory_configure_bank( machine, THOM_CART_BANK, 8, 32, messram_get_ptr(machine->device("messram")), 0x4000 );
-	memory_configure_bank( machine, THOM_VRAM_BANK, 0,  2, messram_get_ptr(machine->device("messram")), 0x2000 );
-	memory_configure_bank( machine, TO8_SYS_LO,     0,  1, messram_get_ptr(machine->device("messram")) + 0x6000, 0x4000 );
-	memory_configure_bank( machine, TO8_SYS_HI,     0,  1, messram_get_ptr(machine->device("messram")) + 0x4000, 0x4000 );
-	memory_configure_bank( machine, TO8_DATA_LO,    0, 32, messram_get_ptr(machine->device("messram")) + 0x2000, 0x4000 );
-	memory_configure_bank( machine, TO8_DATA_HI,    0, 32, messram_get_ptr(machine->device("messram")) + 0x0000, 0x4000 );
+	memory_configure_bank( machine, THOM_CART_BANK, 8, 32, ram_get_ptr(machine->device(RAM_TAG)), 0x4000 );
+	memory_configure_bank( machine, THOM_VRAM_BANK, 0,  2, ram_get_ptr(machine->device(RAM_TAG)), 0x2000 );
+	memory_configure_bank( machine, TO8_SYS_LO,     0,  1, ram_get_ptr(machine->device(RAM_TAG)) + 0x6000, 0x4000 );
+	memory_configure_bank( machine, TO8_SYS_HI,     0,  1, ram_get_ptr(machine->device(RAM_TAG)) + 0x4000, 0x4000 );
+	memory_configure_bank( machine, TO8_DATA_LO,    0, 32, ram_get_ptr(machine->device(RAM_TAG)) + 0x2000, 0x4000 );
+	memory_configure_bank( machine, TO8_DATA_HI,    0, 32, ram_get_ptr(machine->device(RAM_TAG)) + 0x0000, 0x4000 );
 	memory_configure_bank( machine, TO8_BIOS_BANK,  0,  2, mem + 0x30800, 0x2000 );
 	memory_set_bank( machine, THOM_CART_BANK, 0 );
 	memory_set_bank( machine, THOM_VRAM_BANK, 0 );
@@ -4954,16 +4954,16 @@ MACHINE_START ( mo6 )
 	/* memory */
 	thom_cart_bank = 0;
 	mo5_reg_cart = 0;
-	thom_vram = messram_get_ptr(machine->device("messram"));
+	thom_vram = ram_get_ptr(machine->device(RAM_TAG));
 	memory_configure_bank( machine, THOM_CART_BANK, 0, 4, mem + 0x10000, 0x4000 );
 	memory_configure_bank( machine, THOM_CART_BANK, 4, 2, mem + 0x1f000, 0x4000 );
 	memory_configure_bank( machine, THOM_CART_BANK, 6, 2, mem + 0x28000, 0x4000 );
-	memory_configure_bank( machine, THOM_CART_BANK, 8, 8, messram_get_ptr(machine->device("messram")), 0x4000 );
-	memory_configure_bank( machine, THOM_VRAM_BANK, 0, 2, messram_get_ptr(machine->device("messram")), 0x2000 );
-	memory_configure_bank( machine, TO8_SYS_LO,     0, 1, messram_get_ptr(machine->device("messram")) + 0x6000, 0x4000 );
-	memory_configure_bank( machine, TO8_SYS_HI,     0, 1, messram_get_ptr(machine->device("messram")) + 0x4000, 0x4000 );
-	memory_configure_bank( machine, TO8_DATA_LO,    0, 8, messram_get_ptr(machine->device("messram")) + 0x2000, 0x4000 );
-	memory_configure_bank( machine, TO8_DATA_HI,    0, 8, messram_get_ptr(machine->device("messram")) + 0x0000, 0x4000 );
+	memory_configure_bank( machine, THOM_CART_BANK, 8, 8, ram_get_ptr(machine->device(RAM_TAG)), 0x4000 );
+	memory_configure_bank( machine, THOM_VRAM_BANK, 0, 2, ram_get_ptr(machine->device(RAM_TAG)), 0x2000 );
+	memory_configure_bank( machine, TO8_SYS_LO,     0, 1, ram_get_ptr(machine->device(RAM_TAG)) + 0x6000, 0x4000 );
+	memory_configure_bank( machine, TO8_SYS_HI,     0, 1, ram_get_ptr(machine->device(RAM_TAG)) + 0x4000, 0x4000 );
+	memory_configure_bank( machine, TO8_DATA_LO,    0, 8, ram_get_ptr(machine->device(RAM_TAG)) + 0x2000, 0x4000 );
+	memory_configure_bank( machine, TO8_DATA_HI,    0, 8, ram_get_ptr(machine->device(RAM_TAG)) + 0x0000, 0x4000 );
 	memory_configure_bank( machine, TO8_BIOS_BANK,  0, 2, mem + 0x23000, 0x4000 );
 	memory_set_bank( machine, THOM_CART_BANK, 0 );
 	memory_set_bank( machine, THOM_VRAM_BANK, 0 );
@@ -5214,16 +5214,16 @@ MACHINE_START ( mo5nr )
 	/* memory */
 	thom_cart_bank = 0;
 	mo5_reg_cart = 0;
-	thom_vram = messram_get_ptr(machine->device("messram"));
+	thom_vram = ram_get_ptr(machine->device(RAM_TAG));
 	memory_configure_bank( machine, THOM_CART_BANK, 0, 4, mem + 0x10000, 0x4000 );
 	memory_configure_bank( machine, THOM_CART_BANK, 4, 2, mem + 0x1f000, 0x4000 );
 	memory_configure_bank( machine, THOM_CART_BANK, 6, 2, mem + 0x28000, 0x4000 );
-	memory_configure_bank( machine, THOM_CART_BANK, 8, 8, messram_get_ptr(machine->device("messram")), 0x4000 );
-	memory_configure_bank( machine, THOM_VRAM_BANK, 0, 2, messram_get_ptr(machine->device("messram")), 0x2000 );
-	memory_configure_bank( machine, TO8_SYS_LO,     0, 1, messram_get_ptr(machine->device("messram")) + 0x6000, 0x4000 );
-	memory_configure_bank( machine, TO8_SYS_HI,     0, 1, messram_get_ptr(machine->device("messram")) + 0x4000, 0x4000 );
-	memory_configure_bank( machine, TO8_DATA_LO,    0, 8, messram_get_ptr(machine->device("messram")) + 0x2000, 0x4000 );
-	memory_configure_bank( machine, TO8_DATA_HI,    0, 8, messram_get_ptr(machine->device("messram")) + 0x0000, 0x4000 );
+	memory_configure_bank( machine, THOM_CART_BANK, 8, 8, ram_get_ptr(machine->device(RAM_TAG)), 0x4000 );
+	memory_configure_bank( machine, THOM_VRAM_BANK, 0, 2, ram_get_ptr(machine->device(RAM_TAG)), 0x2000 );
+	memory_configure_bank( machine, TO8_SYS_LO,     0, 1, ram_get_ptr(machine->device(RAM_TAG)) + 0x6000, 0x4000 );
+	memory_configure_bank( machine, TO8_SYS_HI,     0, 1, ram_get_ptr(machine->device(RAM_TAG)) + 0x4000, 0x4000 );
+	memory_configure_bank( machine, TO8_DATA_LO,    0, 8, ram_get_ptr(machine->device(RAM_TAG)) + 0x2000, 0x4000 );
+	memory_configure_bank( machine, TO8_DATA_HI,    0, 8, ram_get_ptr(machine->device(RAM_TAG)) + 0x0000, 0x4000 );
 	memory_configure_bank( machine, TO8_BIOS_BANK,  0, 2, mem + 0x23000, 0x4000 );
 	memory_set_bank( machine, THOM_CART_BANK, 0 );
 	memory_set_bank( machine, THOM_VRAM_BANK, 0 );

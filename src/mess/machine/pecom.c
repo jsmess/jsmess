@@ -11,7 +11,7 @@
 #include "sound/cdp1869.h"
 #include "devices/cassette.h"
 #include "includes/pecom.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 
 static TIMER_CALLBACK( reset_tick )
 {
@@ -40,7 +40,7 @@ MACHINE_RESET( pecom )
 	memory_install_read_bank (space, 0xf000, 0xf7ff, 0, 0, "bank3");
 	memory_install_read_bank (space, 0xf800, 0xffff, 0, 0, "bank4");
 	memory_set_bankptr(machine, "bank1", rom + 0x8000);
-	memory_set_bankptr(machine, "bank2", messram_get_ptr(machine->device("messram")) + 0x4000);
+	memory_set_bankptr(machine, "bank2", ram_get_ptr(machine->device(RAM_TAG)) + 0x4000);
 	memory_set_bankptr(machine, "bank3", rom + 0xf000);
 	memory_set_bankptr(machine, "bank4", rom + 0xf800);
 
@@ -79,7 +79,7 @@ WRITE8_HANDLER( pecom_bank_w )
 	address_space *space2 = cputag_get_address_space(space->machine, CDP1802_TAG, ADDRESS_SPACE_PROGRAM);
 	UINT8 *rom = space->machine->region(CDP1802_TAG)->base();
 	memory_install_write_bank(cputag_get_address_space(space->machine, CDP1802_TAG, ADDRESS_SPACE_PROGRAM), 0x0000, 0x3fff, 0, 0, "bank1");
-	memory_set_bankptr(space->machine, "bank1", messram_get_ptr(space->machine->device("messram")) + 0x0000);
+	memory_set_bankptr(space->machine, "bank1", ram_get_ptr(space->machine->device(RAM_TAG)) + 0x0000);
 
 	if (data==2)
 	{

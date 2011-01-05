@@ -2,6 +2,7 @@
 #define __V1050__
 
 #include "devices/flopdrv.h"
+#include "machine/ram.h"
 
 #define SCREEN_TAG				"screen"
 
@@ -50,7 +51,7 @@ public:
 		  m_fdc(*this, MB8877_TAG),
 		  m_crtc(*this, H46505_TAG),
 		  m_centronics(*this, CENTRONICS_TAG),
-		  m_ram(*this, "messram"),
+		  m_ram(*this, RAM_TAG),
 		  m_discrete(*this, DISCRETE_TAG),
 		  m_floppy0(*this, FLOPPY_0),
 		  m_floppy1(*this, FLOPPY_1),

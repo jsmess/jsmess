@@ -3,7 +3,7 @@
 
 #include "includes/pocketc.h"
 #include "includes/pc1403.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 
 /* C-CE while reset, program will not be destroyed! */
 

@@ -107,7 +107,7 @@
 #include "formats/pc_dsk.h"		/* for NC200 disk image */
 #include "devices/cartslot.h"
 #include "sound/beep.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 
 
 #define VERBOSE 0
@@ -366,7 +366,7 @@ static void nc_refresh_memory_bank_config(running_machine *machine, int bank)
 
 			mem_bank = mem_bank & state->membank_internal_ram_mask;
 
-			addr = messram_get_ptr(machine->device("messram")) + (mem_bank<<14);
+			addr = ram_get_ptr(machine->device(RAM_TAG)) + (mem_bank<<14);
 
 			memory_set_bankptr(machine, bank1, addr);
 			memory_set_bankptr(machine, bank5, addr);
@@ -439,13 +439,13 @@ static void nc_common_restore_memory_from_stream(running_machine *machine)
 	/* get size of memory data stored */
 	mame_fread(state->file, &stored_size, sizeof(unsigned long));
 
-	if (stored_size > messram_get_size(machine->device("messram")))
-		restore_size = messram_get_size(machine->device("messram"));
+	if (stored_size > ram_get_size(machine->device(RAM_TAG)))
+		restore_size = ram_get_size(machine->device(RAM_TAG));
 	else
 		restore_size = stored_size;
 
 	/* read as much as will fit into memory */
-	mame_fread(state->file, messram_get_ptr(machine->device("messram")), restore_size);
+	mame_fread(state->file, ram_get_ptr(machine->device(RAM_TAG)), restore_size);
 	/* seek over remaining data */
 	mame_fseek(state->file, SEEK_CUR,stored_size - restore_size);
 }
@@ -454,7 +454,7 @@ static void nc_common_restore_memory_from_stream(running_machine *machine)
 static void nc_common_store_memory_to_stream(running_machine *machine)
 {
 	nc_state *state = machine->driver_data<nc_state>();
-	UINT32 size = messram_get_size(machine->device("messram"));
+	UINT32 size = ram_get_size(machine->device(RAM_TAG));
 	if (!state->file)
 		return;
 
@@ -463,7 +463,7 @@ static void nc_common_store_memory_to_stream(running_machine *machine)
 	mame_fwrite(state->file, &size, sizeof(UINT32));
 
 	/* write data block */
-	mame_fwrite(state->file, messram_get_ptr(machine->device("messram")), size);
+	mame_fwrite(state->file, ram_get_ptr(machine->device(RAM_TAG)), size);
 }
 
 static void nc_common_open_stream_for_reading(running_machine *machine)
@@ -1746,7 +1746,7 @@ static MACHINE_CONFIG_START( nc100, nc_state )
 	MCFG_CARTSLOT_UNLOAD(nc_pcmcia_card)
 	
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
 
 	MCFG_NC_SERIAL_ADD("serial")
@@ -1796,7 +1796,7 @@ static MACHINE_CONFIG_DERIVED( nc200, nc100 )
 	MCFG_MC146818_ADD( "mc", MC146818_STANDARD )
 
 	/* internal ram */
-	MCFG_RAM_MODIFY("messram")
+	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("128K")
 MACHINE_CONFIG_END
 

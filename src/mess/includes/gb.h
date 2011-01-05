@@ -21,7 +21,7 @@
 #endif
 
 /* Cartridge types */
-#define RAM			0x01	/* Cartridge has RAM                             */
+#define CART_RAM	0x01	/* Cartridge has RAM                             */
 #define BATTERY		0x02	/* Cartridge has a battery to save RAM           */
 #define TIMER		0x04	/* Cartridge has a real-time-clock (MBC3 only)   */
 #define RUMBLE		0x08	/* Cartridge has a rumble motor (MBC5 only)      */

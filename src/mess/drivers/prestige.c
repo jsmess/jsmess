@@ -76,7 +76,7 @@ Notes:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 #include "devices/cartslot.h"
 
 
@@ -166,7 +166,7 @@ INPUT_PORTS_END
 
 static MACHINE_START(prestige)
 {
-	UINT8 *ram = messram_get_ptr(machine->device("messram"));
+	UINT8 *ram = ram_get_ptr(machine->device(RAM_TAG));
 
 	memory_configure_bank(machine, "bank1", 0, 64, machine->region("maincpu")->base(), 0x4000);
 	memory_configure_bank(machine, "bank2", 0, 64, machine->region("maincpu")->base(), 0x4000);
@@ -252,7 +252,7 @@ static MACHINE_CONFIG_START( prestige, prestige_state )
 	MCFG_CARTSLOT_LOAD(prestige_cart)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("32K")
 	MCFG_RAM_EXTRA_OPTIONS("64K")
 MACHINE_CONFIG_END

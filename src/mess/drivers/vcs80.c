@@ -13,7 +13,7 @@
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
 #include "machine/z80pio.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 #include "vcs80.lh"
 
 /* Read/Write Handlers */
@@ -226,7 +226,7 @@ static MACHINE_CONFIG_START( vcs80, vcs80_state )
 	MCFG_Z80PIO_ADD(Z80PIO_TAG, XTAL_5MHz/2, pio_intf)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("1K")
 MACHINE_CONFIG_END
 

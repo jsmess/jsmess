@@ -12,7 +12,7 @@
 #include "cpu/z80/z80daisy.h"
 #include "machine/z80pio.h"
 #include "devices/cassette.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 #include "c80.lh"
 
 /* Memory Maps */
@@ -267,7 +267,7 @@ static MACHINE_CONFIG_START( c80, c80_state )
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, c80_cassette_config)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("1K")
 MACHINE_CONFIG_END
 

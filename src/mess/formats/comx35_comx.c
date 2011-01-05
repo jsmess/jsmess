@@ -9,7 +9,7 @@
 #include "emu.h"
 #include "imageutl.h"
 #include "formats/comx35_comx.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 
 /***************************************************************************
     PARAMETERS
@@ -52,7 +52,7 @@ QUICKLOAD_LOAD( comx35_comx )
 	UINT8 header[16] = {0};
 	int size = image.length();
 
-	if (size > messram_get_size(image.device().machine->device("messram")))
+	if (size > ram_get_size(image.device().machine->device(RAM_TAG)))
 	{
 		return IMAGE_INIT_FAIL;
 	}

@@ -82,7 +82,7 @@ the access to the video memory is unclear to me at the moment.
 #include "emu.h"
 #include "includes/dgn_beta.h"
 #include "video/m6845.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 
 #include "debug/debugcpu.h"
 #include "debug/debugcon.h"
@@ -288,7 +288,7 @@ void dgnbeta_init_video(running_machine *machine)
 
 	state->GCtrl=0;
 
-	videoram=messram_get_ptr(machine->device("messram"));
+	videoram=ram_get_ptr(machine->device(RAM_TAG));
 
 	state->ClkMax=65000;
 	state->FlashCount=0;

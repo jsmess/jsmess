@@ -14,7 +14,7 @@
 #include "includes/mc68328.h"
 #include "sound/dac.h"
 #include "debugger.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 
 
 class palm_state : public driver_device
@@ -107,9 +107,9 @@ static MACHINE_START( palm )
 {
 	palm_state *state = machine->driver_data<palm_state>();
     address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-    memory_install_read_bank (space, 0x000000, messram_get_size(machine->device("messram")) - 1, messram_get_size(machine->device("messram")) - 1, 0, "bank1");
-    memory_install_write_bank(space, 0x000000, messram_get_size(machine->device("messram")) - 1, messram_get_size(machine->device("messram")) - 1, 0, "bank1");
-    memory_set_bankptr(machine, "bank1", messram_get_ptr(machine->device("messram")));
+    memory_install_read_bank (space, 0x000000, ram_get_size(machine->device(RAM_TAG)) - 1, ram_get_size(machine->device(RAM_TAG)) - 1, 0, "bank1");
+    memory_install_write_bank(space, 0x000000, ram_get_size(machine->device(RAM_TAG)) - 1, ram_get_size(machine->device(RAM_TAG)) - 1, 0, "bank1");
+    memory_set_bankptr(machine, "bank1", ram_get_ptr(machine->device(RAM_TAG)));
 
     state_save_register_global(machine, state->port_f_latch);
     state_save_register_global(machine, state->spim_data);
@@ -122,8 +122,8 @@ static MACHINE_RESET( palm )
 {
     // Copy boot ROM
     UINT8* bios = machine->region("bios")->base();
-    memset(messram_get_ptr(machine->device("messram")), 0, messram_get_size(machine->device("messram")));
-    memcpy(messram_get_ptr(machine->device("messram")), bios, 0x20000);
+    memset(ram_get_ptr(machine->device(RAM_TAG)), 0, ram_get_size(machine->device(RAM_TAG)));
+    memcpy(ram_get_ptr(machine->device(RAM_TAG)), bios, 0x20000);
 
     machine->device("maincpu")->reset();
 }
@@ -435,7 +435,7 @@ ROM_END
 static MACHINE_CONFIG_DERIVED( pilot1k, palm )
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("128K")
 	MCFG_RAM_EXTRA_OPTIONS("512K,1M,2M,4M,8M")
 MACHINE_CONFIG_END
@@ -443,7 +443,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( pilot5k, palm )
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("512K")
 	MCFG_RAM_EXTRA_OPTIONS("1M,2M,4M,8M")
 MACHINE_CONFIG_END
@@ -451,7 +451,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( palmpro, palm )
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("1M")
 	MCFG_RAM_EXTRA_OPTIONS("2M,4M,8M")
 MACHINE_CONFIG_END
@@ -459,7 +459,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( palmiii, palm )
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("2M")
 	MCFG_RAM_EXTRA_OPTIONS("4M,8M")
 MACHINE_CONFIG_END
@@ -467,7 +467,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( palmv, palm )
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("2M")
 	MCFG_RAM_EXTRA_OPTIONS("4M,8M")
 MACHINE_CONFIG_END
@@ -475,7 +475,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( palmvx, palm )
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("8M")
 MACHINE_CONFIG_END
 

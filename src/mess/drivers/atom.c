@@ -113,7 +113,7 @@ Hardware:   PPIA 8255
 #include "devices/cartslot.h"
 #include "devices/cassette.h"
 #include "devices/flopdrv.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 #include "devices/snapquik.h"
 #include "formats/atom_atm.h"
 #include "formats/atom_tap.h"
@@ -867,7 +867,7 @@ static MACHINE_CONFIG_START( atom, atom_state )
 	MCFG_ATOM_CARTSLOT_ADD("cart")
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("2K")
 	MCFG_RAM_EXTRA_OPTIONS("4K,6K,8K,10K,12K")
 

@@ -22,7 +22,7 @@
 #include "devices/cartslot.h"
 #include "formats/rk_cas.h"
 #include "includes/orion.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 
 /* Address maps */
 
@@ -162,7 +162,7 @@ static MACHINE_CONFIG_START( orion128, orion_state )
 	MCFG_CARTSLOT_ADD("cart")
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("256K")
 	MCFG_RAM_DEFAULT_VALUE(0x00)
 MACHINE_CONFIG_END
@@ -226,7 +226,7 @@ static MACHINE_CONFIG_START( orionz80, orion_state )
 	MCFG_CARTSLOT_ADD("cart")
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("512K")
 	MCFG_RAM_DEFAULT_VALUE(0x00)
 MACHINE_CONFIG_END
@@ -280,7 +280,7 @@ static MACHINE_CONFIG_START( orionpro, orion_state )
 	MCFG_CARTSLOT_ADD("cart")
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("512K")
 	MCFG_RAM_DEFAULT_VALUE(0x00)
 MACHINE_CONFIG_END

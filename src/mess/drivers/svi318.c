@@ -25,7 +25,7 @@
 #include "formats/svi_cas.h"
 #include "sound/dac.h"
 #include "sound/ay8910.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 #include "rendlay.h"
 
 static ADDRESS_MAP_START( svi318_mem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -342,7 +342,7 @@ static MACHINE_CONFIG_START( svi318, svi318_state )
 	MCFG_FRAGMENT_ADD( svi318_cartslot )
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("16K")
 	MCFG_RAM_EXTRA_OPTIONS("32K,96K,160K")
 MACHINE_CONFIG_END
@@ -359,7 +359,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( svi328, svi318 )
 
 	/* internal ram */
-	MCFG_RAM_MODIFY("messram")
+	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
 	MCFG_RAM_EXTRA_OPTIONS("96K,160K")
 MACHINE_CONFIG_END
@@ -367,7 +367,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( svi328n, svi318n )
 
 	/* internal ram */
-	MCFG_RAM_MODIFY("messram")
+	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
 	MCFG_RAM_EXTRA_OPTIONS("96K,160K")
 MACHINE_CONFIG_END
@@ -464,7 +464,7 @@ static MACHINE_CONFIG_START( svi328_806, svi318_state )
 	MCFG_FRAGMENT_ADD( svi318_cartslot )
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
 	MCFG_RAM_EXTRA_OPTIONS("96K,160K")
 MACHINE_CONFIG_END

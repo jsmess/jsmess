@@ -34,7 +34,7 @@
 #include "machine/z80pio.h"
 #include "machine/wd17xx.h"
 #include "sound/ay8910.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 
 INLINE device_t *get_floppy_image(running_machine *machine, int drive)
 {
@@ -593,13 +593,13 @@ static MACHINE_START( tiki100 )
 
 	/* setup memory banking */
 	memory_configure_bank(machine, "bank1", BANK_ROM, 1, machine->region(Z80_TAG)->base(), 0);
-	memory_configure_bank(machine, "bank1", BANK_RAM, 1, messram_get_ptr(machine->device("messram")), 0);
+	memory_configure_bank(machine, "bank1", BANK_RAM, 1, ram_get_ptr(machine->device(RAM_TAG)), 0);
 	memory_configure_bank(machine, "bank1", BANK_VIDEO_RAM, 1, state->video_ram, 0);
 
-	memory_configure_bank(machine, "bank2", BANK_RAM, 1, messram_get_ptr(machine->device("messram")) + 0x4000, 0);
+	memory_configure_bank(machine, "bank2", BANK_RAM, 1, ram_get_ptr(machine->device(RAM_TAG)) + 0x4000, 0);
 	memory_configure_bank(machine, "bank2", BANK_VIDEO_RAM, 1, state->video_ram + 0x4000, 0);
 
-	memory_configure_bank(machine, "bank3", BANK_RAM, 1, messram_get_ptr(machine->device("messram")) + 0x8000, 0);
+	memory_configure_bank(machine, "bank3", BANK_RAM, 1, ram_get_ptr(machine->device(RAM_TAG)) + 0x8000, 0);
 
 	tiki100_bankswitch(machine);
 
@@ -691,7 +691,7 @@ static MACHINE_CONFIG_START( tiki100, tiki100_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
 MACHINE_CONFIG_END
 

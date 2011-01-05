@@ -12,7 +12,7 @@
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
 #include "cpu/t11/t11.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 
 
 class vt240_state : public driver_device

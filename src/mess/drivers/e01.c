@@ -50,7 +50,7 @@
 #include "includes/e01.h"
 #include "cpu/m6502/m6502.h"
 #include "devices/flopdrv.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 #include "machine/ctronics.h"
 #include "machine/6522via.h"
 #include "machine/mc146818.h"
@@ -386,7 +386,7 @@ static MACHINE_START( e01 )
 {
 	e01_state *state = machine->driver_data<e01_state>();
 
-	UINT8 *ram = messram_get_ptr(machine->device("messram"));
+	UINT8 *ram = ram_get_ptr(machine->device(RAM_TAG));
 	UINT8 *rom = machine->region(R65C102_TAG)->base();
 
 	/* setup memory banking */
@@ -455,7 +455,7 @@ static MACHINE_CONFIG_START( e01, e01_state )
 //  MCFG_CENTRONICS_ADD(CENTRONICS_TAG, e01_centronics_config)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
 MACHINE_CONFIG_END
 

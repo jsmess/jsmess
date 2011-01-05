@@ -45,7 +45,7 @@
 #include "devices/coco_vhd.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 #include "coco3.lh"
 
 #define SHOW_FULL_AREA			0
@@ -792,7 +792,7 @@ static MACHINE_CONFIG_START( dragon32, coco_state )
 	MCFG_DRAGON_CARTRIDGE_NMI_CALLBACK(coco_nmi_w)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("32K")
 	MCFG_RAM_EXTRA_OPTIONS("64K")
 
@@ -841,7 +841,7 @@ static MACHINE_CONFIG_START( dragon64, coco_state )
 	MCFG_DRAGON_CARTRIDGE_NMI_CALLBACK(coco_nmi_w)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
 
 	MCFG_FLOPPY_4_DRIVES_ADD(coco_floppy_config)
@@ -890,7 +890,7 @@ static MACHINE_CONFIG_START( d64plus, coco_state )
 	MCFG_DRAGON_CARTRIDGE_NMI_CALLBACK(coco_nmi_w)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("128K")
 
 	MCFG_FLOPPY_4_DRIVES_ADD(coco_floppy_config)
@@ -949,7 +949,7 @@ static MACHINE_CONFIG_START( dgnalpha, coco_state )
 	MCFG_FLOPPY_4_DRIVES_ADD(coco_floppy_config)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
 MACHINE_CONFIG_END
 
@@ -996,7 +996,7 @@ static MACHINE_CONFIG_START( tanodr64, coco_state )
 	MCFG_DRAGON_CARTRIDGE_NMI_CALLBACK(coco_nmi_w)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
 
 	MCFG_FLOPPY_4_DRIVES_ADD(coco_floppy_config)
@@ -1043,7 +1043,7 @@ static MACHINE_CONFIG_START( coco, coco_state )
 	MCFG_COCO_CARTRIDGE_NMI_CALLBACK(coco_nmi_w)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("16K")
 	MCFG_RAM_EXTRA_OPTIONS("4K,32K,64K")
 
@@ -1090,7 +1090,7 @@ static MACHINE_CONFIG_START( coco2, coco_state )
 	MCFG_COCO_CARTRIDGE_NMI_CALLBACK(coco_nmi_w)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
 	MCFG_RAM_EXTRA_OPTIONS("16K")
 
@@ -1137,7 +1137,7 @@ static MACHINE_CONFIG_START( coco2b, coco_state )
 	MCFG_COCO_CARTRIDGE_NMI_CALLBACK(coco_nmi_w)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
 	MCFG_RAM_EXTRA_OPTIONS("16K")
 
@@ -1196,7 +1196,7 @@ static MACHINE_CONFIG_START( coco3, coco3_state )
 	MCFG_COCO_CARTRIDGE_NMI_CALLBACK(coco_nmi_w)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("512K")
 	MCFG_RAM_EXTRA_OPTIONS("128K,2M,8M")
 
@@ -1222,7 +1222,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( cocoe, coco )
 
 	/* internal ram */
-	MCFG_RAM_MODIFY("messram")
+	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
 	MCFG_RAM_EXTRA_OPTIONS("4K,16K,32K")
 MACHINE_CONFIG_END

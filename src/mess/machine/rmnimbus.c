@@ -54,7 +54,7 @@ to create a blank hard disk which can then be formatted with the RM tools.
 #include "debug/debugcpu.h"
 #include "debug/debugcon.h"
 #include "devices/flopdrv.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 #include "machine/er59256.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
@@ -1881,11 +1881,11 @@ static void nimbus_bank_memory(running_machine *machine)
 {
 	rmnimbus_state *state = machine->driver_data<rmnimbus_state>();
     address_space *space = cputag_get_address_space( machine, MAINCPU_TAG, ADDRESS_SPACE_PROGRAM );
-    int     ramsize = messram_get_size(machine->device("messram"));
+    int     ramsize = ram_get_size(machine->device(RAM_TAG));
     int     ramblock = 0;
     int     blockno;
     char	bank[10];
-    UINT8   *ram    = &messram_get_ptr(machine->device("messram"))[0];
+    UINT8   *ram    = &ram_get_ptr(machine->device(RAM_TAG))[0];
     UINT8   *map_blocks[3];
     UINT8   *map_base;
     int     map_blockno;

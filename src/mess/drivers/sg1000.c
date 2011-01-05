@@ -69,7 +69,7 @@ Notes:
 #include "devices/flopdrv.h"
 #include "devices/cartslot.h"
 #include "devices/cassette.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 #include "devices/printer.h"
 #include "formats/basicdsk.h"
 #include "machine/ctronics.h"
@@ -1019,8 +1019,8 @@ void sf7000_state::machine_start()
 
 	/* configure memory banking */
 	memory_configure_bank(machine, "bank1", 0, 1, machine->region(Z80_TAG)->base(), 0);
-	memory_configure_bank(machine, "bank1", 1, 1, messram_get_ptr(m_ram), 0);
-	memory_configure_bank(machine, "bank2", 0, 1, messram_get_ptr(m_ram), 0);
+	memory_configure_bank(machine, "bank1", 1, 1, ram_get_ptr(m_ram), 0);
+	memory_configure_bank(machine, "bank2", 0, 1, ram_get_ptr(m_ram), 0);
 
 	/* register for state saving */
 	state_save_register_global(machine, m_keylatch);
@@ -1075,7 +1075,7 @@ static MACHINE_CONFIG_START( sg1000, sg1000_state )
 	MCFG_SOFTWARE_LIST_ADD("cart_list","sg1000")
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("1K")
 MACHINE_CONFIG_END
 
@@ -1093,7 +1093,7 @@ static MACHINE_CONFIG_DERIVED( omv, sg1000 )
 	MCFG_CARTSLOT_NOT_MANDATORY
 	MCFG_CARTSLOT_LOAD(omv_cart)
 
-	MCFG_RAM_MODIFY("messram")
+	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("2K")
 MACHINE_CONFIG_END
 
@@ -1134,7 +1134,7 @@ static MACHINE_CONFIG_START( sc3000, sc3000_state )
 	MCFG_SOFTWARE_LIST_ADD("cart_list","sg1000")
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("2K")
 MACHINE_CONFIG_END
 
@@ -1171,7 +1171,7 @@ static MACHINE_CONFIG_START( sf7000, sf7000_state )
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, sc3000_cassette_config)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
 MACHINE_CONFIG_END
 

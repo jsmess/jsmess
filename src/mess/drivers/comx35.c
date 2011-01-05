@@ -25,7 +25,7 @@
 #include "devices/snapquik.h"
 #include "machine/cdp1871.h"
 #include "machine/wd17xx.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 #include "video/mc6845.h"
 
 /* Memory Maps */
@@ -375,7 +375,7 @@ static MACHINE_CONFIG_START( pal, comx35_state )
 	MCFG_FLOPPY_2_DRIVES_ADD(comx35_floppy_config)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("32K")
 MACHINE_CONFIG_END
 
@@ -399,7 +399,7 @@ static MACHINE_CONFIG_START( ntsc, comx35_state )
 	MCFG_FLOPPY_2_DRIVES_ADD(comx35_floppy_config)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("32K")
 MACHINE_CONFIG_END
 

@@ -16,7 +16,7 @@
 #include "machine/pic8259.h"
 #include "machine/msm8251.h"
 #include "includes/b2m.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 #include "devices/flopdrv.h"
 
 static READ8_HANDLER (b2m_keyboard_r )
@@ -57,10 +57,10 @@ static void b2m_set_bank(running_machine *machine,int bank)
 		case 1 :
 						memory_unmap_write(space, 0xe000, 0xffff, 0, 0);
 
-						memory_set_bankptr(machine, "bank1", messram_get_ptr(machine->device("messram")));
-						memory_set_bankptr(machine, "bank2", messram_get_ptr(machine->device("messram")) + 0x2800);
-						memory_set_bankptr(machine, "bank3", messram_get_ptr(machine->device("messram")) + 0x3000);
-						memory_set_bankptr(machine, "bank4", messram_get_ptr(machine->device("messram")) + 0x7000);
+						memory_set_bankptr(machine, "bank1", ram_get_ptr(machine->device(RAM_TAG)));
+						memory_set_bankptr(machine, "bank2", ram_get_ptr(machine->device(RAM_TAG)) + 0x2800);
+						memory_set_bankptr(machine, "bank3", ram_get_ptr(machine->device(RAM_TAG)) + 0x3000);
+						memory_set_bankptr(machine, "bank4", ram_get_ptr(machine->device(RAM_TAG)) + 0x7000);
 						memory_set_bankptr(machine, "bank5", rom + 0x10000);
 						break;
 #if 0
@@ -68,8 +68,8 @@ static void b2m_set_bank(running_machine *machine,int bank)
 						memory_unmap_write(space, 0x3000, 0x6fff, 0, 0);
 						memory_unmap_write(space, 0xe000, 0xffff, 0, 0);
 
-						memory_set_bankptr(machine, "bank1", messram_get_ptr(machine->device("messram")));
-						memory_set_bankptr(machine, "bank2", messram_get_ptr(machine->device("messram")) + 0x2800);
+						memory_set_bankptr(machine, "bank1", ram_get_ptr(machine->device(RAM_TAG)));
+						memory_set_bankptr(machine, "bank2", ram_get_ptr(machine->device(RAM_TAG)) + 0x2800);
 						memory_set_bankptr(machine, "bank3", rom + 0x12000);
 						memory_set_bankptr(machine, "bank4", rom + 0x16000);
 						memory_set_bankptr(machine, "bank5", rom + 0x10000);
@@ -79,30 +79,30 @@ static void b2m_set_bank(running_machine *machine,int bank)
 						memory_unmap_write(space, 0x2800, 0x2fff, 0, 0);
 						memory_unmap_write(space, 0xe000, 0xffff, 0, 0);
 
-						memory_set_bankptr(machine, "bank1", messram_get_ptr(machine->device("messram")));
+						memory_set_bankptr(machine, "bank1", ram_get_ptr(machine->device(RAM_TAG)));
 						memory_install_read8_handler(space, 0x2800, 0x2fff, 0, 0, b2m_keyboard_r);
-						memory_set_bankptr(machine, "bank3", messram_get_ptr(machine->device("messram")) + 0x10000);
-						memory_set_bankptr(machine, "bank4", messram_get_ptr(machine->device("messram")) + 0x7000);
+						memory_set_bankptr(machine, "bank3", ram_get_ptr(machine->device(RAM_TAG)) + 0x10000);
+						memory_set_bankptr(machine, "bank4", ram_get_ptr(machine->device(RAM_TAG)) + 0x7000);
 						memory_set_bankptr(machine, "bank5", rom + 0x10000);
 						break;
 		case 3 :
 						memory_unmap_write(space, 0x2800, 0x2fff, 0, 0);
 						memory_unmap_write(space, 0xe000, 0xffff, 0, 0);
 
-						memory_set_bankptr(machine, "bank1", messram_get_ptr(machine->device("messram")));
+						memory_set_bankptr(machine, "bank1", ram_get_ptr(machine->device(RAM_TAG)));
 						memory_install_read8_handler(space, 0x2800, 0x2fff, 0, 0, b2m_keyboard_r);
-						memory_set_bankptr(machine, "bank3", messram_get_ptr(machine->device("messram")) + 0x14000);
-						memory_set_bankptr(machine, "bank4", messram_get_ptr(machine->device("messram")) + 0x7000);
+						memory_set_bankptr(machine, "bank3", ram_get_ptr(machine->device(RAM_TAG)) + 0x14000);
+						memory_set_bankptr(machine, "bank4", ram_get_ptr(machine->device(RAM_TAG)) + 0x7000);
 						memory_set_bankptr(machine, "bank5", rom + 0x10000);
 						break;
 		case 4 :
 						memory_unmap_write(space, 0x2800, 0x2fff, 0, 0);
 						memory_unmap_write(space, 0xe000, 0xffff, 0, 0);
 
-						memory_set_bankptr(machine, "bank1", messram_get_ptr(machine->device("messram")));
+						memory_set_bankptr(machine, "bank1", ram_get_ptr(machine->device(RAM_TAG)));
 						memory_install_read8_handler(space, 0x2800, 0x2fff, 0, 0, b2m_keyboard_r);
-						memory_set_bankptr(machine, "bank3", messram_get_ptr(machine->device("messram")) + 0x18000);
-						memory_set_bankptr(machine, "bank4", messram_get_ptr(machine->device("messram")) + 0x7000);
+						memory_set_bankptr(machine, "bank3", ram_get_ptr(machine->device(RAM_TAG)) + 0x18000);
+						memory_set_bankptr(machine, "bank4", ram_get_ptr(machine->device(RAM_TAG)) + 0x7000);
 						memory_set_bankptr(machine, "bank5", rom + 0x10000);
 
 						break;
@@ -110,19 +110,19 @@ static void b2m_set_bank(running_machine *machine,int bank)
 						memory_unmap_write(space, 0x2800, 0x2fff, 0, 0);
 						memory_unmap_write(space, 0xe000, 0xffff, 0, 0);
 
-						memory_set_bankptr(machine, "bank1", messram_get_ptr(machine->device("messram")));
+						memory_set_bankptr(machine, "bank1", ram_get_ptr(machine->device(RAM_TAG)));
 						memory_install_read8_handler(space, 0x2800, 0x2fff, 0, 0, b2m_keyboard_r);
-						memory_set_bankptr(machine, "bank3", messram_get_ptr(machine->device("messram")) + 0x1c000);
-						memory_set_bankptr(machine, "bank4", messram_get_ptr(machine->device("messram")) + 0x7000);
+						memory_set_bankptr(machine, "bank3", ram_get_ptr(machine->device(RAM_TAG)) + 0x1c000);
+						memory_set_bankptr(machine, "bank4", ram_get_ptr(machine->device(RAM_TAG)) + 0x7000);
 						memory_set_bankptr(machine, "bank5", rom + 0x10000);
 
 						break;
 		case 6 :
-						memory_set_bankptr(machine, "bank1", messram_get_ptr(machine->device("messram")));
-						memory_set_bankptr(machine, "bank2", messram_get_ptr(machine->device("messram")) + 0x2800);
-						memory_set_bankptr(machine, "bank3", messram_get_ptr(machine->device("messram")) + 0x3000);
-						memory_set_bankptr(machine, "bank4", messram_get_ptr(machine->device("messram")) + 0x7000);
-						memory_set_bankptr(machine, "bank5", messram_get_ptr(machine->device("messram")) + 0xe000);
+						memory_set_bankptr(machine, "bank1", ram_get_ptr(machine->device(RAM_TAG)));
+						memory_set_bankptr(machine, "bank2", ram_get_ptr(machine->device(RAM_TAG)) + 0x2800);
+						memory_set_bankptr(machine, "bank3", ram_get_ptr(machine->device(RAM_TAG)) + 0x3000);
+						memory_set_bankptr(machine, "bank4", ram_get_ptr(machine->device(RAM_TAG)) + 0x7000);
+						memory_set_bankptr(machine, "bank5", ram_get_ptr(machine->device(RAM_TAG)) + 0xe000);
 						break;
 		case 7 :
 						memory_unmap_write(space, 0x0000, 0x27ff, 0, 0);

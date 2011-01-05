@@ -18,7 +18,7 @@
 #include "cpu/i8085/i8085.h"
 #include "cpu/z80/z80.h"
 #include "includes/sapi1.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 
 
 /* switch out the rom shadow */
@@ -155,7 +155,7 @@ static MACHINE_CONFIG_START( sapi1, sapi1_state )
 	MCFG_VIDEO_UPDATE(sapi1)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
 MACHINE_CONFIG_END
 
@@ -183,7 +183,7 @@ static MACHINE_CONFIG_START( sapizps3, sapi1_state )
 	MCFG_VIDEO_UPDATE(sapizps3)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
 MACHINE_CONFIG_END
 

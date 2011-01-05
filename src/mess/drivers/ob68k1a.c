@@ -62,7 +62,7 @@ Notes:
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 #include "machine/6821pia.h"
 #include "machine/6840ptm.h"
 #include "machine/6850acia.h"
@@ -286,7 +286,7 @@ void ob68k1a_state::machine_start()
 	address_space *program = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);
 
 	// configure RAM
-	switch (messram_get_size(m_ram))
+	switch (ram_get_size(m_ram))
 	{
 	case 32*1024:
 		memory_unmap_readwrite(program, 0x008000, 0x01ffff, 0, 0);
@@ -342,7 +342,7 @@ static MACHINE_CONFIG_START( ob68k1a, ob68k1a_state )
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
 	
 	// internal ram
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("32K")
 	MCFG_RAM_EXTRA_OPTIONS("128K")
 MACHINE_CONFIG_END

@@ -41,7 +41,7 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 #include "devices/printer.h"
 #include "video/ef9345.h"
 #include "sound/dac.h"
@@ -362,8 +362,8 @@ static DRIVER_INIT( vg5k )
 
 	/* install expansion memory*/
 	address_space *program = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	UINT8 *ram = messram_get_ptr(machine->device("messram"));
-	UINT16 ram_size = messram_get_size(machine->device("messram"));
+	UINT8 *ram = ram_get_ptr(machine->device(RAM_TAG));
+	UINT16 ram_size = ram_get_size(machine->device(RAM_TAG));
 
 	if (ram_size > 0x4000)
 		memory_install_ram(program, 0x8000, 0x3fff + ram_size, 0, 0, ram);
@@ -434,7 +434,7 @@ static MACHINE_CONFIG_START( vg5k, vg5k_state )
 	MCFG_PRINTER_ADD("printer")
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("16K")
 	MCFG_RAM_EXTRA_OPTIONS("32K,48k")
 MACHINE_CONFIG_END

@@ -20,7 +20,7 @@
 /* Layout */
 #include "sym1.lh"
 
-#include "devices/messram.h"
+#include "machine/ram.h"
 
 
 /* pointers to memory locations */
@@ -138,7 +138,7 @@ static MACHINE_CONFIG_START( sym1, sym1_state )
 	MCFG_VIA6522_ADD("via6522_2", 0, sym1_via2)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("4K")
 	MCFG_RAM_EXTRA_OPTIONS("1K,2K,3K")
 MACHINE_CONFIG_END

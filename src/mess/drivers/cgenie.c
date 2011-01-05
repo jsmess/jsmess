@@ -36,7 +36,7 @@ NMI
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "formats/cgen_cas.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 
 static ADDRESS_MAP_START (cgenie_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
@@ -561,7 +561,7 @@ static MACHINE_CONFIG_START( cgenie_common, cgenie_state )
 	MCFG_CARTSLOT_NOT_MANDATORY
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("16K")
 	MCFG_RAM_EXTRA_OPTIONS("32K")
 MACHINE_CONFIG_END

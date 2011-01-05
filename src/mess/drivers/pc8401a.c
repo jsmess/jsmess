@@ -7,7 +7,7 @@
 #include "machine/upd1990a.h"
 #include "video/sed1330.h"
 #include "video/mc6845.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 
 /*
 
@@ -142,7 +142,7 @@ static void pc8401a_bankswitch(running_machine *machine, UINT8 data)
 		break;
 
 	case 3: /* RAM cartridge */
-		if (messram_get_size(machine->device("messram")) > 64)
+		if (ram_get_size(machine->device(RAM_TAG)) > 64)
 		{
 			memory_install_readwrite_bank(program, 0x8000, 0xbfff, 0, 0, "bank3");
 			memory_set_bank(machine, "bank3", 3); // TODO or 4
@@ -527,20 +527,20 @@ static MACHINE_START( pc8401a )
 
 	/* set up A0/A1 memory banking */
 	memory_configure_bank(machine, "bank1", 0, 4, machine->region(Z80_TAG)->base(), 0x8000);
-	memory_configure_bank(machine, "bank1", 4, 2, messram_get_ptr(machine->device("messram")), 0x8000);
+	memory_configure_bank(machine, "bank1", 4, 2, ram_get_ptr(machine->device(RAM_TAG)), 0x8000);
 	memory_set_bank(machine, "bank1", 0);
 
 	/* set up A2 memory banking */
-	memory_configure_bank(machine, "bank3", 0, 5, messram_get_ptr(machine->device("messram")), 0x4000);
+	memory_configure_bank(machine, "bank3", 0, 5, ram_get_ptr(machine->device(RAM_TAG)), 0x4000);
 	memory_set_bank(machine, "bank3", 0);
 
 	/* set up A3 memory banking */
-	memory_configure_bank(machine, "bank4", 0, 1, messram_get_ptr(machine->device("messram")) + 0xc000, 0);
+	memory_configure_bank(machine, "bank4", 0, 1, ram_get_ptr(machine->device(RAM_TAG)) + 0xc000, 0);
 	memory_configure_bank(machine, "bank4", 1, 1, state->crt_ram, 0);
 	memory_set_bank(machine, "bank4", 0);
 
 	/* set up A4 memory banking */
-	memory_configure_bank(machine, "bank5", 0, 1, messram_get_ptr(machine->device("messram")) + 0xe800, 0);
+	memory_configure_bank(machine, "bank5", 0, 1, ram_get_ptr(machine->device(RAM_TAG)) + 0xe800, 0);
 	memory_set_bank(machine, "bank5", 0);
 
 	/* bank switch */
@@ -669,7 +669,7 @@ static MACHINE_CONFIG_START( common, pc8401a_state )
 	MCFG_CARTSLOT_NOT_MANDATORY
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
 	MCFG_RAM_EXTRA_OPTIONS("96K")
 MACHINE_CONFIG_END
@@ -690,7 +690,7 @@ static MACHINE_CONFIG_DERIVED( pc8500, common )
 	MCFG_FRAGMENT_ADD(pc8500_video)
 
 	/* internal ram */
-	MCFG_RAM_MODIFY("messram")
+	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
 MACHINE_CONFIG_END
 

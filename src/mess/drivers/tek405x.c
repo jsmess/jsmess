@@ -26,7 +26,7 @@
 
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 #include "machine/6821pia.h"
 #include "machine/6850acia.h"
 #include "machine/ieee488.h"
@@ -1168,7 +1168,7 @@ void tek4051_state::machine_start()
 	address_space *program = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);
 
 	// configure RAM
-	switch (messram_get_size(m_ram))
+	switch (ram_get_size(m_ram))
 	{
 	case 8*1024:
 		memory_unmap_readwrite(program, 0x2000, 0x7fff, 0, 0);
@@ -1241,7 +1241,7 @@ static MACHINE_CONFIG_START( tek4051, tek4051_state )
 	//MCFG_RS232_ADD(RS232_TAG, rs232_intf)
 
 	// internal ram
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("8K")
 	MCFG_RAM_EXTRA_OPTIONS("16K,24K,32K")
 MACHINE_CONFIG_END
@@ -1274,7 +1274,7 @@ static MACHINE_CONFIG_START( tek4052, tek4052_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	// internal ram
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("32K")
 	MCFG_RAM_EXTRA_OPTIONS("64K")
 MACHINE_CONFIG_END

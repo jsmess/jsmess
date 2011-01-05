@@ -137,7 +137,7 @@ CN1     - main board connector (17x2 pin header)
 #include "sound/sn76496.h"
 #include "sound/wave.h"
 #include "video/tms9928a.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 
 /***************************************************************************
     READ/WRITE HANDLERS
@@ -1076,7 +1076,7 @@ static MACHINE_CONFIG_START( creativision, crvision_state )
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("1K")	// MAIN RAM
 	MCFG_RAM_EXTRA_OPTIONS("15K") // 16K expansion (lower 14K available only, upper 2K shared with BIOS ROM)
 MACHINE_CONFIG_END
@@ -1154,7 +1154,7 @@ static MACHINE_CONFIG_START( lasr2001, crvision_state )
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, lasr2001_centronics_intf)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("16K")
 	MCFG_RAM_EXTRA_OPTIONS("32K")
 

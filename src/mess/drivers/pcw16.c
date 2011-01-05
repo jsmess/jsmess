@@ -104,7 +104,7 @@ TODO:
 /* Devices */
 #include "formats/pc_dsk.h"		/* pc disk images */
 #include "devices/flopdrv.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 
 // interrupt counter
 /* controls which bank of 2mb address space is paged into memory */
@@ -408,7 +408,7 @@ static void pcw16_set_bank_handlers(running_machine *machine, int bank, PCW16_RA
 static void pcw16_update_bank(running_machine *machine, int bank)
 {
 	pcw16_state *state = machine->driver_data<pcw16_state>();
-	unsigned char *mem_ptr = messram_get_ptr(machine->device("messram"));
+	unsigned char *mem_ptr = ram_get_ptr(machine->device(RAM_TAG));
 	int bank_id = 0;
 	int bank_offs = 0;
 	char bank1[10];
@@ -450,7 +450,7 @@ static void pcw16_update_bank(running_machine *machine, int bank)
 	{
 		bank_offs = 128;
 		/* dram */
-		mem_ptr = messram_get_ptr(machine->device("messram"));
+		mem_ptr = ram_get_ptr(machine->device(RAM_TAG));
 	}
 
 	mem_ptr = mem_ptr + ((bank_id - bank_offs)<<14);
@@ -1453,7 +1453,7 @@ static MACHINE_CONFIG_START( pcw16, pcw16_state )
 	MCFG_FLOPPY_2_DRIVES_ADD(pcw16_floppy_config)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("2M")
 	MCFG_INTEL_E28F008SA_ADD("flash0")
 	MCFG_INTEL_E28F008SA_ADD("flash1")

@@ -45,7 +45,7 @@
 #include "machine/8237dma.h"
 
 #include "machine/kb_keytro.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 
 #define VERBOSE_PIO 0	/* PIO (keyboard controller) */
 
@@ -618,7 +618,7 @@ static READ8_DEVICE_HANDLER (ibm5150_ppi_porta_r)
          * 6-7  The number of floppy disk drives
          */
 		data = input_port_read(device->machine, "DSW0") & 0xF3;
-		switch ( messram_get_size(machine->device("messram")) )
+		switch ( ram_get_size(machine->device(RAM_TAG)) )
 		{
 		case 16 * 1024:
 			data |= 0x00;
@@ -669,7 +669,7 @@ static READ8_DEVICE_HANDLER ( ibm5150_ppi_portc_r )
 		/* read hi nibble of SW2 */
 		data = data & 0xf0;
 
-		switch ( messram_get_size(machine->device("messram")) - 64 * 1024 )
+		switch ( ram_get_size(machine->device(RAM_TAG)) - 64 * 1024 )
 		{
 		case 64 * 1024:		data |= 0x00; break;
 		case 128 * 1024:	data |= 0x02; break;
@@ -687,7 +687,7 @@ static READ8_DEVICE_HANDLER ( ibm5150_ppi_portc_r )
 		case 896 * 1024:	data |= 0x0B; break;
 		case 960 * 1024:	data |= 0x0D; break;
 		}
-		if ( messram_get_size(machine->device("messram")) > 960 * 1024 )
+		if ( ram_get_size(machine->device(RAM_TAG)) > 960 * 1024 )
 			data |= 0x0D;
 
 		PIO_LOG(1,"PIO_C_r (hi)",("$%02x\n", data));
@@ -1032,7 +1032,7 @@ static READ8_DEVICE_HANDLER ( pcjr_ppi_portc_r )
 
 	data&=~0x80;
 	data &= ~0x04;		/* floppy drive installed */
-	if ( messram_get_size(device->machine->device("messram")) > 64 * 1024 )	/* more than 64KB ram installed */
+	if ( ram_get_size(device->machine->device(RAM_TAG)) > 64 * 1024 )	/* more than 64KB ram installed */
 		data &= ~0x08;
 	data = ( data & ~0x01 ) | ( pcjr_keyb.latch ? 0x01: 0x00 );
 	if ( ! ( st->ppi_portb & 0x08 ) )
@@ -1152,8 +1152,8 @@ void mess_init_pc_common(running_machine *machine, UINT32 flags, void (*set_keyb
 		init_pc_common(machine, flags, set_keyb_int_func);
 
 	/* MESS managed RAM */
-	if ( messram_get_ptr(machine->device("messram")) )
-		memory_set_bankptr( machine, "bank10", messram_get_ptr(machine->device("messram")) );
+	if ( ram_get_ptr(machine->device(RAM_TAG)) )
+		memory_set_bankptr( machine, "bank10", ram_get_ptr(machine->device(RAM_TAG)) );
 
 	/* FDC/HDC hardware */
 	pc_hdc_setup(machine, set_hdc_int_func);

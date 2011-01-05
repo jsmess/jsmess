@@ -10,7 +10,7 @@
 #include "emu.h"
 #include "includes/mc68328.h"
 #include "machine/mc68328.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 
 /* THIS IS PRETTY MUCH TOTALLY WRONG AND DOESN'T REFLECT THE MC68328'S INTERNAL FUNCTIONALITY AT ALL! */
 PALETTE_INIT( mc68328 )
@@ -29,7 +29,7 @@ VIDEO_UPDATE( mc68328 )
     device_t *mc68328_device = screen->machine->device(MC68328_TAG);
     mc68328_t* mc68328 = mc68328_get_safe_token( mc68328_device );
 
-    const UINT16 *video_ram = (const UINT16 *)(messram_get_ptr(screen->machine->device("messram")) + (mc68328->regs.lssa & 0x00ffffff));
+    const UINT16 *video_ram = (const UINT16 *)(ram_get_ptr(screen->machine->device(RAM_TAG)) + (mc68328->regs.lssa & 0x00ffffff));
     UINT16 word;
     UINT16 *line;
     int y, x, b;

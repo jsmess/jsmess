@@ -45,7 +45,7 @@
 #include "includes/phc25.h"
 #include "cpu/z80/z80.h"
 #include "devices/cassette.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 #include "machine/ctronics.h"
 #include "video/m6847.h"
 #include "sound/ay8910.h"
@@ -391,7 +391,7 @@ static MACHINE_CONFIG_START( phc25, phc25_state )
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("16K")
 MACHINE_CONFIG_END
 

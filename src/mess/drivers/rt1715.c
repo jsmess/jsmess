@@ -18,7 +18,7 @@
 #include "machine/z80sio.h"
 #include "machine/z80pio.h"
 #include "machine/z80dma.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 #include "video/i8275.h"
 
 
@@ -100,8 +100,8 @@ static WRITE8_HANDLER( k7658_data_w )
 
 static MACHINE_START( rt1715 )
 {
-	memory_set_bankptr(machine, "bank2", messram_get_ptr(machine->device("messram")) + 0x0800);
-	memory_set_bankptr(machine, "bank3", messram_get_ptr(machine->device("messram")));
+	memory_set_bankptr(machine, "bank2", ram_get_ptr(machine->device(RAM_TAG)) + 0x0800);
+	memory_set_bankptr(machine, "bank3", ram_get_ptr(machine->device(RAM_TAG)));
 }
 
 static MACHINE_RESET( rt1715 )
@@ -115,7 +115,7 @@ static WRITE8_HANDLER( rt1715_rom_disable )
 	logerror("%s: rt1715_set_bank %02x\n", cpuexec_describe_context(space->machine), data);
 
 	/* disable ROM, enable RAM */
-	memory_set_bankptr(space->machine, "bank1", messram_get_ptr(space->machine->device("messram")));
+	memory_set_bankptr(space->machine, "bank1", ram_get_ptr(space->machine->device(RAM_TAG)));
 }
 
 
@@ -348,7 +348,7 @@ static MACHINE_CONFIG_START( rt1715, rt1715_state )
 	MCFG_Z80PIO_ADD("a72", XTAL_10MHz/4 /* ? */, rt1715_pio_control_intf)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
 	MCFG_RAM_DEFAULT_VALUE(0x00)
 MACHINE_CONFIG_END

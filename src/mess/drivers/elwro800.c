@@ -28,7 +28,7 @@
 #include "devices/flopdrv.h"
 #include "devices/cassette.h"
 #include "formats/tzx_cas.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 
 
 class elwro800_state : public spectrum_state
@@ -103,7 +103,7 @@ static WRITE8_HANDLER(elwro800jr_fdc_control_w)
 static void elwro800jr_mmu_w(running_machine *machine, UINT8 data)
 {
 	UINT8 *prom = machine->region("proms")->base() + 0x200;
-	UINT8 *messram = messram_get_ptr(machine->device("messram"));
+	UINT8 *messram = ram_get_ptr(machine->device(RAM_TAG));
 	UINT8 cs;
 	UINT8 ls175;
 	elwro800_state *state = machine->driver_data<elwro800_state>();
@@ -508,7 +508,7 @@ INPUT_PORTS_END
 static MACHINE_RESET(elwro800)
 {
 	elwro800_state *state = machine->driver_data<elwro800_state>();
-	UINT8 *messram = messram_get_ptr(machine->device("messram"));
+	UINT8 *messram = ram_get_ptr(machine->device(RAM_TAG));
 
 	state->df_on_databus = 0xdf;
 	memset(messram, 0, 64*1024);
@@ -613,7 +613,7 @@ static MACHINE_CONFIG_START( elwro800, elwro800_state )
 	MCFG_FLOPPY_2_DRIVES_ADD(elwro800jr_floppy_config)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
 MACHINE_CONFIG_END
 

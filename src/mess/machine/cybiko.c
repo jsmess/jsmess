@@ -20,7 +20,7 @@
 #include "machine/pcf8593.h"
 #include "machine/at45dbxx.h"
 #include "machine/sst39vfx.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 
 #ifndef _H8S2XXX_H_
 #define H8S_IO(xxxx) ((xxxx) - 0xFE40)
@@ -84,25 +84,25 @@ static void init_ram_handler(running_machine *machine, offs_t start, offs_t size
 {
 	memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), start, start + size - 1, 0, mirror - size, "bank1");
 	memory_install_write_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), start, start + size - 1, 0, mirror - size, "bank1");
-	memory_set_bankptr( machine, "bank1", messram_get_ptr(machine->device("messram")));
+	memory_set_bankptr( machine, "bank1", ram_get_ptr(machine->device(RAM_TAG)));
 }
 
 DRIVER_INIT( cybikov1 )
 {
 	_logerror( 0, ("init_cybikov1\n"));
-	init_ram_handler(machine, 0x200000, messram_get_size(machine->device("messram")), 0x200000);
+	init_ram_handler(machine, 0x200000, ram_get_size(machine->device(RAM_TAG)), 0x200000);
 }
 
 DRIVER_INIT( cybikov2 )
 {
 	_logerror( 0, ("init_cybikov2\n"));
-	init_ram_handler(machine, 0x200000, messram_get_size(machine->device("messram")), 0x200000);
+	init_ram_handler(machine, 0x200000, ram_get_size(machine->device(RAM_TAG)), 0x200000);
 }
 
 DRIVER_INIT( cybikoxt )
 {
 	_logerror( 0, ("init_cybikoxt\n"));
-	init_ram_handler(machine, 0x400000, messram_get_size(machine->device("messram")), 0x200000);
+	init_ram_handler(machine, 0x400000, ram_get_size(machine->device(RAM_TAG)), 0x200000);
 }
 
 ////////////////////

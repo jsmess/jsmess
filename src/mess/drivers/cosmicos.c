@@ -36,7 +36,7 @@
 #include "includes/cosmicos.h"
 #include "cpu/cosmac/cosmac.h"
 #include "devices/cassette.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 #include "devices/snapquik.h"
 #include "machine/rescap.h"
 #include "sound/cdp1864.h"
@@ -284,7 +284,7 @@ static void set_ram_mode(running_machine *machine)
 {
 	cosmicos_state *state = machine->driver_data<cosmicos_state>();
 	address_space *program = cputag_get_address_space(machine, CDP1802_TAG, ADDRESS_SPACE_PROGRAM);
-	UINT8 *ram = messram_get_ptr(machine->device("messram"));
+	UINT8 *ram = ram_get_ptr(machine->device(RAM_TAG));
 
 	if (state->ram_disable)
 	{
@@ -552,7 +552,7 @@ static MACHINE_START( cosmicos )
 	dm9368_rbi_w(state->dm9368, 1);
 
 	/* setup memory banking */
-	switch (messram_get_size(machine->device("messram")))
+	switch (ram_get_size(machine->device(RAM_TAG)))
 	{
 	case 256:
 		memory_unmap_readwrite(program, 0x0000, 0xbfff, 0, 0);
@@ -646,7 +646,7 @@ static MACHINE_CONFIG_START( cosmicos, cosmicos_state )
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, cosmicos_cassette_config)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("256")
 	MCFG_RAM_EXTRA_OPTIONS("4K,48K")
 MACHINE_CONFIG_END

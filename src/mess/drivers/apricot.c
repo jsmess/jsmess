@@ -16,7 +16,7 @@
 #include "machine/wd17xx.h"
 #include "sound/sn76496.h"
 #include "video/mc6845.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 #include "devices/flopdrv.h"
 #include "formats/apridisk.h"
 
@@ -176,7 +176,7 @@ static VIDEO_UPDATE( apricot )
 static MC6845_UPDATE_ROW( apricot_update_row )
 {
 	apricot_state *apricot = device->machine->driver_data<apricot_state>();
-	UINT8 *ram = messram_get_ptr(device->machine->device("messram"));
+	UINT8 *ram = ram_get_ptr(device->machine->device(RAM_TAG));
 	int i, x;
 
 	if (apricot->video_mode)
@@ -239,8 +239,8 @@ static DRIVER_INIT( apricot )
 	device_t *maincpu = machine->device("maincpu");
 	address_space *prg = cpu_get_address_space(maincpu, ADDRESS_SPACE_PROGRAM);
 
-	UINT8 *ram = messram_get_ptr(machine->device("messram"));
-	UINT32 ram_size = messram_get_size(machine->device("messram"));
+	UINT8 *ram = ram_get_ptr(machine->device(RAM_TAG));
+	UINT32 ram_size = ram_get_size(machine->device(RAM_TAG));
 
 	memory_unmap_readwrite(prg, 0x40000, 0xeffff, 0, 0);
 	memory_install_ram(prg, 0x00000, ram_size - 1, 0, 0, ram);
@@ -359,7 +359,7 @@ static MACHINE_CONFIG_START( apricot, apricot_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("256k")
 	MCFG_RAM_EXTRA_OPTIONS("384k,512k") /* with 1 or 2 128k expansion boards */
 

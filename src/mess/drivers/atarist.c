@@ -6,7 +6,7 @@
 #include "formats/atarist_dsk.h"
 #include "devices/cartslot.h"
 #include "devices/flopdrv.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 #include "machine/6850acia.h"
 #include "machine/68901mfp.h"
 #include "machine/8530scc.h"
@@ -483,7 +483,7 @@ static TIMER_CALLBACK( atariste_dmasound_tick )
 	if (state->dmasnd_samples == 0)
 	{
 		int i;
-		UINT8 *RAM = messram_get_ptr(machine->device("messram"));
+		UINT8 *RAM = ram_get_ptr(machine->device(RAM_TAG));
 
 		for (i = 0; i < 8; i++)
 		{
@@ -1467,9 +1467,9 @@ static MC68901_INTERFACE( mfp_intf )
 static void atarist_configure_memory(running_machine *machine)
 {
 	address_space *program = cputag_get_address_space(machine, M68000_TAG, ADDRESS_SPACE_PROGRAM);
-	UINT8 *RAM = messram_get_ptr(machine->device("messram"));
+	UINT8 *RAM = ram_get_ptr(machine->device(RAM_TAG));
 
-	switch (messram_get_size(machine->device("messram")))
+	switch (ram_get_size(machine->device(RAM_TAG)))
 	{
 	case 256 * 1024:
 		memory_install_ram(program, 0x000008, 0x03ffff, 0, 0, RAM + 8);
@@ -1654,9 +1654,9 @@ static MACHINE_START( megaste )
 static void stbook_configure_memory(running_machine *machine)
 {
 	address_space *program = cputag_get_address_space(machine, M68000_TAG, ADDRESS_SPACE_PROGRAM);
-	UINT8 *RAM = messram_get_ptr(machine->device("messram"));
+	UINT8 *RAM = ram_get_ptr(machine->device(RAM_TAG));
 
-	switch (messram_get_size(machine->device("messram")))
+	switch (ram_get_size(machine->device(RAM_TAG)))
 	{
 	case 1024 * 1024:
 		memory_install_ram(program, 0x000008, 0x07ffff, 0, 0x080000, RAM + 8);
@@ -1870,7 +1870,7 @@ static MACHINE_CONFIG_START( st, atarist_state )
 	MCFG_FRAGMENT_ADD(atarist_cartslot)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("1024K")  // 1040ST
 	MCFG_RAM_EXTRA_OPTIONS("512K,256K") // 520ST, 260ST
 MACHINE_CONFIG_END
@@ -1883,7 +1883,7 @@ static MACHINE_CONFIG_DERIVED( megast, st )
 	MCFG_MACHINE_START(megast)
 
 	/* internal ram */
-	MCFG_RAM_MODIFY("messram")
+	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("4M")  //  Mega ST 4
 	MCFG_RAM_EXTRA_OPTIONS("2M,1M") //  Mega ST 2 ,Mega ST 1
 MACHINE_CONFIG_END
@@ -1941,7 +1941,7 @@ static MACHINE_CONFIG_START( ste, atarist_state )
 	MCFG_FRAGMENT_ADD(atarist_cartslot)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("1024K")  // 1040STe
 	MCFG_RAM_EXTRA_OPTIONS("512K") //  520STe
 MACHINE_CONFIG_END
@@ -1956,7 +1956,7 @@ static MACHINE_CONFIG_DERIVED( megaste, ste )
 	MCFG_FLOPPY_2_DRIVES_MODIFY(megaste_floppy_config)
 
 	/* internal ram */
-	MCFG_RAM_MODIFY("messram")
+	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("4M")  //  Mega STe 4
 	MCFG_RAM_EXTRA_OPTIONS("2M,1M") //  Mega STe 2 ,Mega STe 1
 MACHINE_CONFIG_END
@@ -2008,7 +2008,7 @@ static MACHINE_CONFIG_START( stbook, atarist_state )
 	MCFG_FRAGMENT_ADD(atarist_cartslot)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("4M")
 	MCFG_RAM_EXTRA_OPTIONS("1M")
 MACHINE_CONFIG_END

@@ -26,7 +26,7 @@
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
 #include "devices/cassette.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 #include "devices/snapquik.h"
 #include "machine/ctronics.h"
 #include "machine/z80ctc.h"
@@ -358,7 +358,7 @@ static MACHINE_CONFIG_START( mtx512, mtx_state )
 	MCFG_TIMER_ADD_PERIODIC("cassette_timer", cassette_tick, HZ(44100))
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
 	MCFG_RAM_EXTRA_OPTIONS("96K,128K,160K,192K,224K,256K,288K,320K,352K,384K,416K,448K,480K,512K")
 MACHINE_CONFIG_END
@@ -370,7 +370,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( mtx500, mtx512 )
 
 	/* internal ram */
-	MCFG_RAM_MODIFY("messram")
+	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("32K")
 	MCFG_RAM_EXTRA_OPTIONS("64K,96K,128K,160K,192K,224K,256K,288K,320K,352K,384K,416K,448K,480K,512K")
 MACHINE_CONFIG_END
@@ -390,7 +390,7 @@ static MACHINE_CONFIG_DERIVED( rs128, mtx512 )
 	MCFG_Z80DART_ADD(Z80DART_TAG, XTAL_4MHz, dart_intf)
 
 	/* internal ram */
-	MCFG_RAM_MODIFY("messram")
+	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("128K")
 	MCFG_RAM_EXTRA_OPTIONS("160K,192K,224K,256K,288K,320K,352K,384K,416K,448K,480K,512K")
 MACHINE_CONFIG_END

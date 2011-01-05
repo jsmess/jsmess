@@ -3,6 +3,8 @@
 #ifndef __TEK405X__
 #define __TEK405X__
 
+#include "machine/ram.h"
+
 #define MC6800_TAG			"u61"
 #define MC6820_Y_TAG		"u561"
 #define MC6820_X_TAG		"u565"
@@ -29,7 +31,7 @@ public:
 		  m_acia(*this, MC6850_TAG),
 		  m_ieee(*this, IEEE488_TAG),
 		  m_speaker(*this, SPEAKER_TAG),
-		  m_ram(*this, "messram")
+		  m_ram(*this, RAM_TAG)
 	 { }
 
 	required_device<cpu_device> m_maincpu;
@@ -132,7 +134,7 @@ public:
 	tek4052_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config),
 		  m_maincpu(*this, AM2901A_TAG),
-		  m_ram(*this, "messram")
+		  m_ram(*this, RAM_TAG)
 	 { }
 
 	required_device<cpu_device> m_maincpu;

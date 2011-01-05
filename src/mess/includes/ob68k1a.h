@@ -3,6 +3,8 @@
 #ifndef __OB68K1A__
 #define __OB68K1A__
 
+#include "machine/ram.h"
+
 #define MC68000L10_TAG	"u50"
 #define MC6821_0_TAG	"u32"
 #define MC6821_1_TAG	"u33"
@@ -23,7 +25,7 @@ public:
 		  m_pia0(*this, MC6821_0_TAG),
 		  m_pia1(*this, MC6821_1_TAG),
 		  m_terminal(*this, TERMINAL_TAG),
-		  m_ram(*this, "messram")
+		  m_ram(*this, RAM_TAG)
 	{ }
 
 	required_device<cpu_device> m_maincpu;

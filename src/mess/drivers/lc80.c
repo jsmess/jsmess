@@ -26,7 +26,7 @@
 #include "machine/z80pio.h"
 #include "machine/z80ctc.h"
 #include "sound/speaker.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 #include "lc80.lh"
 
 /* Memory Maps */
@@ -319,7 +319,7 @@ static MACHINE_START( lc80 )
 	memory_install_readwrite_bank(program, 0x0800, 0x0fff, 0, 0, "bank2");
 	memory_install_readwrite_bank(program, 0x1000, 0x17ff, 0, 0, "bank3");
 
-	switch (messram_get_size(machine->device("messram")))
+	switch (ram_get_size(machine->device(RAM_TAG)))
 	{
 	case 1*1024:
 		memory_install_readwrite_bank(program, 0x2000, 0x23ff, 0, 0, "bank4");
@@ -380,7 +380,7 @@ static MACHINE_CONFIG_START( lc80, lc80_state )
 
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, lc80_cassette_config)
 
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("1K")
 	MCFG_RAM_EXTRA_OPTIONS("2K,3K,4K")
 MACHINE_CONFIG_END
@@ -410,7 +410,7 @@ static MACHINE_CONFIG_START( lc80_2, lc80_state )
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, lc80_cassette_config)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("4K")
 MACHINE_CONFIG_END
 

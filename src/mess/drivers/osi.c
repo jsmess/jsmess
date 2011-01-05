@@ -186,7 +186,7 @@ Notes:
 #include "devices/flopdrv.h"
 #include "formats/basicdsk.h"
 #include "devices/cassette.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 
 /* Sound */
 
@@ -676,7 +676,7 @@ static MACHINE_START( osi600 )
 	memory_configure_bank(machine, "bank1", 0, 1, machine->region(M6502_TAG)->base(), 0);
 	memory_set_bank(machine, "bank1", 0);
 
-	switch (messram_get_size(machine->device("messram")))
+	switch (ram_get_size(machine->device(RAM_TAG)))
 	{
 	case 4*1024:
 		memory_install_readwrite_bank(program, 0x0000, 0x0fff, 0, 0, "bank1");
@@ -706,7 +706,7 @@ static MACHINE_START( c1p )
 	memory_configure_bank(machine, "bank1", 0, 1, machine->region(M6502_TAG)->base(), 0);
 	memory_set_bank(machine, "bank1", 0);
 
-	switch (messram_get_size(machine->device("messram")))
+	switch (ram_get_size(machine->device(RAM_TAG)))
 	{
 	case 8*1024:
 		memory_install_readwrite_bank(program, 0x0000, 0x1fff, 0, 0, "bank1");
@@ -801,7 +801,7 @@ static MACHINE_CONFIG_START( osi600, osi_state )
 	MCFG_CASSETTE_ADD("cassette", default_cassette_config)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("4K")
 	MCFG_RAM_EXTRA_OPTIONS("8K")
 MACHINE_CONFIG_END
@@ -825,7 +825,7 @@ static MACHINE_CONFIG_START( uk101, osi_state )
 	MCFG_CASSETTE_ADD("cassette", default_cassette_config)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("4K")
 	MCFG_RAM_EXTRA_OPTIONS("8K")
 MACHINE_CONFIG_END
@@ -861,7 +861,7 @@ static MACHINE_CONFIG_START( c1p, osi_state )
 	MCFG_CASSETTE_ADD("cassette", default_cassette_config)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("8K")
 	MCFG_RAM_EXTRA_OPTIONS("20K")
 MACHINE_CONFIG_END
@@ -881,7 +881,7 @@ static MACHINE_CONFIG_DERIVED( c1pmf, c1p )
 	MCFG_FLOPPY_DRIVE_ADD(FLOPPY_0, osi_floppy_config)
 
 	/* internal ram */
-	MCFG_RAM_MODIFY("messram")
+	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("20K")
 MACHINE_CONFIG_END
 

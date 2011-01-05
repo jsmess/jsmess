@@ -1,6 +1,8 @@
 #ifndef __BW12__
 #define __BW12__
 
+#include "machine/ram.h"
+
 #define SCREEN_TAG			"screen"
 #define Z80_TAG				"ic35"
 #define MC6845_TAG			"ic14"
@@ -27,7 +29,7 @@ public:
 		  m_kbc(*this, AY3600_TAG),
 		  m_crtc(*this, MC6845_TAG),
 		  m_centronics(*this, CENTRONICS_TAG),
-		  m_ram(*this, "messram"),
+		  m_ram(*this, RAM_TAG),
 		  m_floppy0(*this, FLOPPY_0),
 		  m_floppy1(*this, FLOPPY_1),
 		  m_floppy_timer(*this, FLOPPY_TIMER_TAG)

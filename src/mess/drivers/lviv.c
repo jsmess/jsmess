@@ -289,7 +289,7 @@ Timings:
 #include "devices/snapquik.h"
 #include "devices/cassette.h"
 #include "formats/lviv_lvt.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 
 /* I/O ports */
 
@@ -465,7 +465,7 @@ static MACHINE_CONFIG_START( lviv, lviv_state )
 	MCFG_CASSETTE_ADD( "cassette", lviv_cassette_config )
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
 MACHINE_CONFIG_END
 

@@ -9,12 +9,12 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 #include "machine/ctronics.h"
 #include "devices/cartslot.h"
 #include "devices/cassette.h"
 #include "machine/tf20.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 #include "px4.lh"
 
 
@@ -475,7 +475,7 @@ static void install_rom_capsule(address_space *space, int size, const char *regi
 
 	/* ram, part 1 */
 	memory_install_readwrite_bank(space, 0x0000, 0xdfff - size, 0, 0, "bank1");
-	memory_set_bankptr(space->machine, "bank1", messram_get_ptr(px4->ram));
+	memory_set_bankptr(space->machine, "bank1", ram_get_ptr(px4->ram));
 
 	/* actual rom data, part 1 */
 	memory_install_read_bank(space, 0xe000 - size, 0xffff - size, 0, 0, "bank2");
@@ -492,7 +492,7 @@ static void install_rom_capsule(address_space *space, int size, const char *regi
 
 	/* ram, continued */
 	memory_install_readwrite_bank(space, 0xe000, 0xffff, 0, 0, "bank4");
-	memory_set_bankptr(space->machine, "bank4", messram_get_ptr(px4->ram) + 0xe000);
+	memory_set_bankptr(space->machine, "bank4", ram_get_ptr(px4->ram) + 0xe000);
 }
 
 /* bank register */
@@ -515,13 +515,13 @@ static WRITE8_HANDLER( px4_bankr_w )
 		memory_nop_write(space_program, 0x0000, 0x7fff, 0, 0);
 		memory_set_bankptr(space->machine, "bank1", space->machine->region("os")->base());
 		memory_install_readwrite_bank(space_program, 0x8000, 0xffff, 0, 0, "bank2");
-		memory_set_bankptr(space->machine, "bank2", messram_get_ptr(px4->ram) + 0x8000);
+		memory_set_bankptr(space->machine, "bank2", ram_get_ptr(px4->ram) + 0x8000);
 		break;
 
 	case 0x04:
 		/* memory */
 		memory_install_readwrite_bank(space_program, 0x0000, 0xffff, 0, 0, "bank1");
-		memory_set_bankptr(space->machine, "bank1", messram_get_ptr(px4->ram));
+		memory_set_bankptr(space->machine, "bank1", ram_get_ptr(px4->ram));
 		break;
 
 	case 0x08: install_rom_capsule(space_program, 0x2000, "capsule1"); break;
@@ -1036,7 +1036,7 @@ static VIDEO_UPDATE( px4 )
 		int y, x;
 
 		/* get vram start address */
-		UINT8 *vram = &messram_get_ptr(px4->ram)[(px4->vadr & 0xf8) << 8];
+		UINT8 *vram = &ram_get_ptr(px4->ram)[(px4->vadr & 0xf8) << 8];
 
 		for (y = 0; y < 64; y++)
 		{
@@ -1080,7 +1080,7 @@ static DRIVER_INIT( px4 )
 	px4_state *px4 = machine->driver_data<px4_state>();
 
 	/* find devices */
-	px4->ram = machine->device("messram");
+	px4->ram = machine->device(RAM_TAG);
 
 	/* init 7508 */
 	px4->one_sec_int_enabled = TRUE;
@@ -1105,7 +1105,7 @@ static DRIVER_INIT( px4 )
 
 	/* map os rom and last half of memory */
 	memory_set_bankptr(machine, "bank1", machine->region("os")->base());
-	memory_set_bankptr(machine, "bank2", messram_get_ptr(px4->ram) + 0x8000);
+	memory_set_bankptr(machine, "bank2", ram_get_ptr(px4->ram) + 0x8000);
 }
 
 static DRIVER_INIT( px4p )
@@ -1382,7 +1382,7 @@ static MACHINE_CONFIG_START( px4, px4_state )
 	MCFG_TIMER_ADD_PERIODIC("frc", frc_tick, HZ(XTAL_7_3728MHz / 2 / 6))
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64k")
 
 	/* centronics printer */

@@ -156,7 +156,7 @@ http://www.z88forever.org.uk/zxplus3e/
 #include "formats/spec_snqk.h"
 #include "formats/timex_dck.h"
 #include "machine/beta.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 
 static const ay8910_interface spectrum_ay_interface =
 {
@@ -227,7 +227,7 @@ static WRITE8_HANDLER(ts2068_port_ff_w)
 void ts2068_update_memory(running_machine *machine)
 {
 	spectrum_state *state = machine->driver_data<spectrum_state>();
-	UINT8 *messram = messram_get_ptr(machine->device("messram"));
+	UINT8 *messram = ram_get_ptr(machine->device(RAM_TAG));
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	unsigned char *ChosenROM, *ExROM, *DOCK;
 
@@ -599,7 +599,7 @@ ADDRESS_MAP_END
 static MACHINE_RESET( tc2048 )
 {
 	spectrum_state *state = machine->driver_data<spectrum_state>();
-	UINT8 *messram = messram_get_ptr(machine->device("messram"));
+	UINT8 *messram = ram_get_ptr(machine->device(RAM_TAG));
 
 	memory_set_bankptr(machine, "bank1", messram);
 	memory_set_bankptr(machine, "bank2", messram);
@@ -658,7 +658,7 @@ static MACHINE_CONFIG_DERIVED( ts2068, spectrum_128 )
 	MCFG_CARTSLOT_UNLOAD(timex_cart)
 
 	/* internal ram */
-	MCFG_RAM_MODIFY("messram")
+	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("48K")
 MACHINE_CONFIG_END
 
@@ -688,7 +688,7 @@ static MACHINE_CONFIG_DERIVED( tc2048, spectrum )
 	MCFG_VIDEO_UPDATE( tc2048 )
 
 	/* internal ram */
-	MCFG_RAM_MODIFY("messram")
+	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("48K")
 MACHINE_CONFIG_END
 

@@ -157,7 +157,7 @@ resulting mess can be seen in the F4 viewer display.
 #include "sound/ay8910.h"
 #include "sound/speaker.h"
 #include "formats/tzx_cas.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 
 static const ay8910_interface spectrum_ay_interface =
 {
@@ -192,7 +192,7 @@ static WRITE8_HANDLER(spectrum_128_port_7ffd_w)
 void spectrum_128_update_memory(running_machine *machine)
 {
 	spectrum_state *state = machine->driver_data<spectrum_state>();
-	UINT8 *messram = messram_get_ptr(machine->device("messram"));
+	UINT8 *messram = ram_get_ptr(machine->device(RAM_TAG));
 	unsigned char *ChosenROM;
 	int ROMSelection;
 
@@ -255,7 +255,7 @@ ADDRESS_MAP_END
 static MACHINE_RESET( spectrum_128 )
 {
 	spectrum_state *state = machine->driver_data<spectrum_state>();
-	UINT8 *messram = messram_get_ptr(machine->device("messram"));
+	UINT8 *messram = ram_get_ptr(machine->device(RAM_TAG));
 
 	memset(messram,0,128*1024);
 	/* 0x0000-0x3fff always holds ROM */
@@ -315,7 +315,7 @@ MACHINE_CONFIG_DERIVED( spectrum_128, spectrum )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* internal ram */
-	MCFG_RAM_MODIFY("messram")
+	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("128K")
 MACHINE_CONFIG_END
 

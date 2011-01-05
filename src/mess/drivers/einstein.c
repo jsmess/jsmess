@@ -61,7 +61,7 @@
 #include "sound/ay8910.h"
 #include "video/mc6845.h"
 #include "rendlay.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 #include "includes/einstein.h"
 
 /***************************************************************************
@@ -270,7 +270,7 @@ static WRITE_LINE_DEVICE_HANDLER( einstein_serial_receive_clock )
 static void einstein_page_rom(running_machine *machine)
 {
 	einstein_state *einstein = machine->driver_data<einstein_state>();
-	memory_set_bankptr(machine, "bank1", einstein->rom_enabled ? machine->region("bios")->base() : messram_get_ptr(machine->device("messram")));
+	memory_set_bankptr(machine, "bank1", einstein->rom_enabled ? machine->region("bios")->base() : ram_get_ptr(machine->device(RAM_TAG)));
 }
 
 /* writing to this port is a simple trigger, and switches between RAM and ROM */
@@ -399,8 +399,8 @@ static MACHINE_RESET( einstein )
 	einstein->ctc = machine->device(IC_I058);
 
 	/* initialize memory mapping */
-	memory_set_bankptr(machine, "bank2", messram_get_ptr(machine->device("messram")));
-	memory_set_bankptr(machine, "bank3", messram_get_ptr(machine->device("messram")) + 0x8000);
+	memory_set_bankptr(machine, "bank2", ram_get_ptr(machine->device(RAM_TAG)));
+	memory_set_bankptr(machine, "bank3", ram_get_ptr(machine->device(RAM_TAG)) + 0x8000);
 	einstein->rom_enabled = 1;
 	einstein_page_rom(machine);
 
@@ -775,7 +775,7 @@ static MACHINE_CONFIG_START( einstein, einstein_state )
 
 	/* RAM is provided by 8k DRAM ICs i009, i010, i011, i012, i013, i014, i015 and i016 */
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
 MACHINE_CONFIG_END
 

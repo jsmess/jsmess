@@ -33,7 +33,7 @@
 #include "cpu/m6800/m6800.h"
 #include "devices/cartslot.h"
 #include "devices/cassette.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 #include "machine/msm8251.h"
 #include "machine/pf10.h"
 #include "sound/wave.h"
@@ -87,7 +87,7 @@ static void bankswitch(running_machine *machine)
 {
 	px8_state *state = machine->driver_data<px8_state>();
 	address_space *program = cputag_get_address_space(machine, UPD70008_TAG, ADDRESS_SPACE_PROGRAM);
-	UINT8 *ram = messram_get_ptr(machine->device("messram"));
+	UINT8 *ram = ram_get_ptr(machine->device(RAM_TAG));
 	UINT8 *ipl_rom = machine->region(UPD70008_TAG)->base();
 
 	if (!state->bank0)
@@ -909,7 +909,7 @@ static MACHINE_CONFIG_START( px8, px8_state )
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, px8_cassette_config)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
 MACHINE_CONFIG_END
 

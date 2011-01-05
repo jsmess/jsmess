@@ -387,7 +387,7 @@ normal keyboards?
 #include "includes/pet.h"
 #include "machine/cbmipt.h"
 #include "video/mc6845.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 #include "machine/c2040.h"
 
 /* devices config */
@@ -698,7 +698,7 @@ static MACHINE_CONFIG_DERIVED( pet, pet_general )
 	MCFG_FRAGMENT_ADD(pet_cartslot)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("32K")
 	MCFG_RAM_EXTRA_OPTIONS("8K,16K")
 
@@ -717,7 +717,7 @@ static MACHINE_CONFIG_DERIVED( pet2001, pet_general )
 	MCFG_FRAGMENT_ADD(pet_cartslot)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("8K")
 	MCFG_RAM_EXTRA_OPTIONS("4K")
 
@@ -771,7 +771,7 @@ static MACHINE_CONFIG_DERIVED( pet80, pet_general )
 	MCFG_FRAGMENT_ADD(pet4_cartslot)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("32K")
 
 	/* IEEE bus */

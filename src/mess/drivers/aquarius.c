@@ -28,7 +28,7 @@
 #include "devices/cartslot.h"
 #include "devices/cassette.h"
 #include "devices/printer.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 
 /***************************************************************************
     CONSTANTS
@@ -216,12 +216,12 @@ static WRITE8_HANDLER( floppy_w )
 static DRIVER_INIT( aquarius )
 {
 	/* install expansion memory if available */
-	if (messram_get_size(machine->device("messram")) > 0x1000)
+	if (ram_get_size(machine->device(RAM_TAG)) > 0x1000)
 	{
 		address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
-		memory_install_readwrite_bank(space, 0x4000, 0x4000 + messram_get_size(machine->device("messram")) - 0x1000 - 1, 0, 0, "bank1");
-		memory_set_bankptr(machine, "bank1", messram_get_ptr(machine->device("messram")));
+		memory_install_readwrite_bank(space, 0x4000, 0x4000 + ram_get_size(machine->device(RAM_TAG)) - 0x1000 - 1, 0, 0, "bank1");
+		memory_set_bankptr(machine, "bank1", ram_get_ptr(machine->device(RAM_TAG)));
 	}
 }
 
@@ -435,7 +435,7 @@ static MACHINE_CONFIG_START( aquarius, aquarius_state )
 	MCFG_CARTSLOT_NOT_MANDATORY
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("4K")
 	MCFG_RAM_EXTRA_OPTIONS("8K,20K,36K")
 MACHINE_CONFIG_END

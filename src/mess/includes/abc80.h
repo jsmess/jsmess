@@ -7,6 +7,8 @@
 #ifndef __ABC80__
 #define __ABC80__
 
+#include "machine/ram.h"
+
 #define ABC80_XTAL		11980800.0
 
 #define ABC80_HTOTAL	384
@@ -55,7 +57,7 @@ public:
 		  m_pio(*this, Z80PIO_TAG),
 		  m_rs232(*this, RS232_TAG),
 		  m_cassette(*this, CASSETTE_TAG),
-		  m_ram(*this, "messram")
+		  m_ram(*this, RAM_TAG)
 	{ }
 
 	required_device<cpu_device> m_maincpu;

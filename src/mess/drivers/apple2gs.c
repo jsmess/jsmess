@@ -59,7 +59,7 @@
 #include "sound/ay8910.h"
 #include "sound/speaker.h"
 #include "devices/cassette.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 #include "deprecat.h"
 
 static const gfx_layout apple2gs_text_layout =
@@ -298,7 +298,7 @@ static MACHINE_CONFIG_START( apple2gs, apple2gs_state )
 	MCFG_CASSETTE_ADD( "cassette", apple2gs_cassette_config )
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("2M")
 	MCFG_RAM_EXTRA_OPTIONS("64K")
 	MCFG_RAM_DEFAULT_VALUE(0x00)

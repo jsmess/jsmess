@@ -28,7 +28,7 @@
 #include "machine/z80pio.h"
 #include "machine/z80dart.h"
 #include "machine/z80ctc.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 
 /* Keyboard */
 
@@ -416,7 +416,7 @@ static MACHINE_CONFIG_START( amu880, amu880_state )
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, amu880_cassette_config)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
 MACHINE_CONFIG_END
 

@@ -7,7 +7,7 @@
 #include "sound/speaker.h"
 #include "machine/wd17xx.h"
 #include "machine/beta.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 
 
 class atm_state : public driver_device
@@ -62,7 +62,7 @@ static void atm_update_memory(running_machine *machine)
 {
 	spectrum_state *state = machine->driver_data<spectrum_state>();
 	device_t *beta = machine->device(BETA_DISK_TAG);
-	UINT8 *messram = messram_get_ptr(machine->device("messram"));
+	UINT8 *messram = ram_get_ptr(machine->device(RAM_TAG));
 
 	state->screen_location = messram + ((state->port_7ffd_data & 8) ? (7<<14) : (5<<14));
 
@@ -111,7 +111,7 @@ ADDRESS_MAP_END
 static MACHINE_RESET( atm )
 {
 	spectrum_state *state = machine->driver_data<spectrum_state>();
-	UINT8 *messram = messram_get_ptr(machine->device("messram"));
+	UINT8 *messram = ram_get_ptr(machine->device(RAM_TAG));
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	device_t *beta = machine->device(BETA_DISK_TAG);
 

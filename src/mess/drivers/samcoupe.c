@@ -45,7 +45,7 @@
 #include "formats/tzx_cas.h"
 #include "devices/flopdrv.h"
 #include "formats/coupedsk.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 
 /***************************************************************************
     CONSTANTS
@@ -591,7 +591,7 @@ static MACHINE_CONFIG_START( samcoupe, samcoupe_state )
 	MCFG_FLOPPY_2_DRIVES_ADD(samcoupe_floppy_config)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("512K")
 	MCFG_RAM_EXTRA_OPTIONS("256K,1280K,1536K,2304K,2560K,3328K,3584K,4352K,4608K")
 MACHINE_CONFIG_END

@@ -28,7 +28,7 @@
 #include "sound/ay8910.h"
 #include "machine/ctronics.h"
 #include "machine/rescap.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 
 /* Memory Banking */
 
@@ -41,7 +41,7 @@ static void mc1000_bankswitch(running_machine *machine)
 	memory_set_bank(machine, "bank2", state->mc6845_bank);
 
 	/* extended RAM */
-	if (messram_get_size(machine->device("messram")) > 16*1024)
+	if (ram_get_size(machine->device(RAM_TAG)) > 16*1024)
 	{
 		memory_install_readwrite_bank(program, 0x4000, 0x7fff, 0, 0, "bank3");
 	}
@@ -53,7 +53,7 @@ static void mc1000_bankswitch(running_machine *machine)
 	/* MC6847 video RAM */
 	if (state->mc6847_bank)
 	{
-		if (messram_get_size(machine->device("messram")) > 16*1024)
+		if (ram_get_size(machine->device(RAM_TAG)) > 16*1024)
 		{
 			memory_install_readwrite_bank(program, 0x8000, 0x97ff, 0, 0, "bank4");
 		}
@@ -70,7 +70,7 @@ static void mc1000_bankswitch(running_machine *machine)
 	memory_set_bank(machine, "bank4", state->mc6847_bank);
 
 	/* extended RAM */
-	if (messram_get_size(machine->device("messram")) > 16*1024)
+	if (ram_get_size(machine->device(RAM_TAG)) > 16*1024)
 	{
 		memory_install_readwrite_bank(program, 0x9800, 0xbfff, 0, 0, "bank5");
 	}
@@ -532,7 +532,7 @@ static MACHINE_CONFIG_START( mc1000, mc1000_state )
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("16K")
 	MCFG_RAM_EXTRA_OPTIONS("48K")
 MACHINE_CONFIG_END

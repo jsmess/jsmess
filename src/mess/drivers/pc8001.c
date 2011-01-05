@@ -26,7 +26,7 @@
 #include "includes/pc8001.h"
 #include "cpu/z80/z80.h"
 #include "devices/cassette.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 #include "machine/i8257.h"
 #include "machine/ctronics.h"
 #include "machine/i8214.h"
@@ -441,7 +441,7 @@ static MACHINE_START( pc8001 )
 {
 	pc8001_state *state = machine->driver_data<pc8001_state>();
 	address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
-	device_t *messram = machine->device("messram");
+	device_t *messram = machine->device(RAM_TAG);
 
 	/* look up devices */
 	state->i8257 = machine->device(I8257_TAG);
@@ -463,25 +463,25 @@ static MACHINE_START( pc8001 )
 	memory_install_read_bank(program, 0x0000, 0x5fff, 0, 0, "bank1");
 	memory_unmap_write(program, 0x0000, 0x5fff, 0, 0);
 
-	switch (messram_get_size(messram))
+	switch (ram_get_size(messram))
 	{
 	case 16*1024:
-		memory_configure_bank(machine, "bank3", 0, 1, messram_get_ptr(messram), 0);
+		memory_configure_bank(machine, "bank3", 0, 1, ram_get_ptr(messram), 0);
 		memory_unmap_readwrite(program, 0x6000, 0xbfff, 0, 0);
 		memory_unmap_readwrite(program, 0x8000, 0xbfff, 0, 0);
 		memory_install_readwrite_bank(program, 0xc000, 0xffff, 0, 0, "bank3");
 		break;
 
 	case 32*1024:
-		memory_configure_bank(machine, "bank3", 0, 1, messram_get_ptr(messram), 0);
+		memory_configure_bank(machine, "bank3", 0, 1, ram_get_ptr(messram), 0);
 		memory_unmap_readwrite(program, 0x6000, 0xbfff, 0, 0);
 		memory_install_readwrite_bank(program, 0x8000, 0xffff, 0, 0, "bank3");
 		break;
 
 	case 64*1024:
-		memory_configure_bank(machine, "bank1", 0, 1, messram_get_ptr(messram), 0);
-		memory_configure_bank(machine, "bank2", 0, 1, messram_get_ptr(messram) + 0x6000, 0);
-		memory_configure_bank(machine, "bank3", 0, 1, messram_get_ptr(messram) + 0x8000, 0);
+		memory_configure_bank(machine, "bank1", 0, 1, ram_get_ptr(messram), 0);
+		memory_configure_bank(machine, "bank2", 0, 1, ram_get_ptr(messram) + 0x6000, 0);
+		memory_configure_bank(machine, "bank3", 0, 1, ram_get_ptr(messram) + 0x8000, 0);
 		memory_install_readwrite_bank(program, 0x0000, 0x5fff, 0, 0, "bank1");
 		memory_install_readwrite_bank(program, 0x6000, 0xbfff, 0, 0, "bank2");
 		memory_install_readwrite_bank(program, 0x8000, 0xffff, 0, 0, "bank3");
@@ -550,7 +550,7 @@ static MACHINE_CONFIG_START( pc8001, pc8001_state )
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, pc8001_cassette_config)
 
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("16K")
 	MCFG_RAM_EXTRA_OPTIONS("32K,64K")
 MACHINE_CONFIG_END
@@ -562,7 +562,7 @@ static MACHINE_CONFIG_DERIVED( pc8001mk2, pc8001 )
 	MCFG_CPU_IO_MAP(pc8001mk2_io)
 	MCFG_MACHINE_START(pc8001mk2)
 
-	MCFG_RAM_MODIFY("messram")
+	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
 MACHINE_CONFIG_END
 

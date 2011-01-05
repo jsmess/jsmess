@@ -106,7 +106,7 @@ struct _rspimp_state
 	/* core state */
 	drccache *			cache;						/* pointer to the DRC code cache */
 	drcuml_state *		drcuml;						/* DRC UML generator state */
-	drcfe_state *		drcfe;						/* pointer to the DRC front-end state */
+	rsp_frontend *		drcfe;						/* pointer to the DRC front-end state */
 	UINT32				drcoptions;					/* configurable DRC options */
 
 	/* internal stuff */
@@ -151,6 +151,8 @@ static void cfunc_mfc2(void *param);
 static void cfunc_cfc2(void *param);
 static void cfunc_mtc2(void *param);
 static void cfunc_ctc2(void *param);
+//static void cfunc_swc2(void *param);
+//static void cfunc_lwc2(void *param);
 static void cfunc_sp_set_status_cb(void *param);
 
 static void cfunc_rsp_lbv(void *param);
@@ -516,6 +518,28 @@ static void unimplemented_opcode(rsp_state *rsp, UINT32 op)
 
 /*****************************************************************************/
 
+/* Legacy.  Going forward, this will be transitioned into unrolled opcode decodes. */
+static const int vector_elements_1[16][8] =
+{
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },		// none
+	{ 0, 1, 2, 3, 4, 5, 6 ,7 },		// ???
+	{ 1, 3, 5, 7, 0, 2, 4, 6 },		// 0q
+	{ 0, 2, 4, 6, 1, 3, 5, 7 },		// 1q
+	{ 1, 2, 3, 5, 6, 7, 0, 4 },		// 0h
+	{ 0, 2, 3, 4, 6, 7, 1, 5 },		// 1h
+	{ 0, 1, 3, 4, 5, 7, 2, 6 },		// 2h
+	{ 0, 1, 2, 4, 5, 6, 3, 7 },		// 3h
+	{ 1, 2, 3, 4, 5, 6, 7, 0 },		// 0
+	{ 0, 2, 3, 4, 5, 6, 7, 1 },		// 1
+	{ 0, 1, 3, 4, 5, 6, 7, 2 },		// 2
+	{ 0, 1, 2, 4, 5, 6, 7, 3 },		// 3
+	{ 0, 1, 2, 3, 5, 6, 7, 4 },		// 4
+	{ 0, 1, 2, 3, 4, 6, 7, 5 },		// 5
+	{ 0, 1, 2, 3, 4, 5, 7, 6 },		// 6
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },		// 7
+};
+
+/* Legacy.  Going forward, this will be transitioned into unrolled opcode decodes. */
 static const int vector_elements_2[16][8] =
 {
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },		// none
@@ -579,13 +603,6 @@ static void rspcom_init(rsp_state *rsp, legacy_cpu_device *device, device_irq_ca
 
 static CPU_INIT( rsp )
 {
-	drcfe_config feconfig =
-	{
-		COMPILE_BACKWARDS_BYTES,	/* code window start offset = startpc - window_start */
-		COMPILE_FORWARDS_BYTES,		/* code window end offset = startpc + window_end */
-		COMPILE_MAX_SEQUENCE,		/* maximum instructions to include in a sequence */
-		rspfe_describe				/* callback to describe a single instruction */
-	};
 	rsp_state *rsp;
 	drccache *cache;
 	UINT32 flags = 0;
@@ -645,11 +662,7 @@ static CPU_INIT( rsp )
 	drcuml_symbol_add(rsp->impstate->drcuml, &rsp->impstate->numcycles, sizeof(rsp->impstate->numcycles), "numcycles");
 
 	/* initialize the front-end helper */
-	if (SINGLE_INSTRUCTION_MODE)
-	{
-		feconfig.max_sequence = 1;
-	}
-	rsp->impstate->drcfe = drcfe_init(device, &feconfig, rsp);
+	rsp->impstate->drcfe = auto_alloc(device->machine, rsp_frontend(*rsp, COMPILE_BACKWARDS_BYTES, COMPILE_FORWARDS_BYTES, SINGLE_INSTRUCTION_MODE ? 1 : COMPILE_MAX_SEQUENCE));
 
 	/* compute the register parameters */
 	for (regnum = 0; regnum < 32; regnum++)
@@ -697,7 +710,7 @@ static CPU_EXIT( rsp )
 	rsp_state *rsp = get_safe_token(device);
 
 	/* clean up the DRC */
-	drcfe_exit(rsp->impstate->drcfe);
+	auto_free(device->machine, rsp->impstate->drcfe);
 	drcuml_free(rsp->impstate->drcuml);
 	drccache_free(rsp->impstate->cache);
 }
@@ -757,8 +770,6 @@ static void cfunc_rsp_lsv(void *param)
 
 	int end = index + 2;
 
-	if(end > 16) printf("LSV past end\n");
-
 	for (int i = index; i < end; i++)
 	{
 		VREG_B(dest, i) = READ8(rsp, ea);
@@ -790,8 +801,6 @@ static void cfunc_rsp_llv(void *param)
 
 	int end = index + 4;
 
-	if(end > 16) printf("LLV past end\n");
-
 	for (int i = index; i < end; i++)
 	{
 		VREG_B(dest, i) = READ8(rsp, ea);
@@ -822,8 +831,6 @@ static void cfunc_rsp_ldv(void *param)
 	ea = (base) ? rsp->r[base] + (offset * 8) : (offset * 8);
 
 	int end = index + 8;
-
-	if(end > 16) printf("LDV past end\n");
 
 	for (int i = index; i < end; i++)
 	{
@@ -1221,8 +1228,6 @@ static void cfunc_rsp_ssv(void *param)
 
 	int end = index + 2;
 
-	if(end > 16) printf("SSV past end\n");
-
 	for (int i = index; i < end; i++)
 	{
 		WRITE8(rsp, ea, VREG_B(dest, i));
@@ -1254,8 +1259,6 @@ static void cfunc_rsp_slv(void *param)
 
 	int end = index + 4;
 
-	if(end > 16) printf("SLV past end\n");
-
 	for (int i = index; i < end; i++)
 	{
 		WRITE8(rsp, ea, VREG_B(dest, i));
@@ -1286,8 +1289,6 @@ static void cfunc_rsp_sdv(void *param)
 	ea = (base) ? rsp->r[base] + (offset * 8) : (offset * 8);
 
 	end = index + 8;
-
-	if(end > 16) printf("SDV past end\n");
 
 	for (int i = index; i < end; i++)
 	{
@@ -3467,7 +3468,7 @@ static void code_compile_block(rsp_state *rsp, offs_t pc)
 	g_profiler.start(PROFILER_DRC_COMPILE);
 
 	/* get a description of this sequence */
-	desclist = drcfe_describe_code(rsp->impstate->drcfe, pc);
+	desclist = rsp->impstate->drcfe->describe_code(pc);
 
 	/* if we get an error back, flush the cache and try again */
 	if (setjmp(errorbuf) != 0)
@@ -3479,7 +3480,7 @@ static void code_compile_block(rsp_state *rsp, offs_t pc)
 	block = drcuml_block_begin(drcuml, 8192, &errorbuf);
 
 	/* loop until we get through all instruction sequences */
-	for (seqhead = desclist; seqhead != NULL; seqhead = seqlast->next)
+	for (seqhead = desclist; seqhead != NULL; seqhead = seqlast->next())
 	{
 		const opcode_desc *curdesc;
 		UINT32 nextpc;
@@ -3489,7 +3490,7 @@ static void code_compile_block(rsp_state *rsp, offs_t pc)
 			UML_COMMENT(block, "-------------------------");						// comment
 
 		/* determine the last instruction in this sequence */
-		for (seqlast = seqhead; seqlast != NULL; seqlast = seqlast->next)
+		for (seqlast = seqhead; seqlast != NULL; seqlast = seqlast->next())
 			if (seqlast->flags & OPFLAG_END_SEQUENCE)
 				break;
 		assert(seqlast != NULL);
@@ -3524,7 +3525,7 @@ static void code_compile_block(rsp_state *rsp, offs_t pc)
 			UML_LABEL(block, seqhead->pc | 0x80000000);								// label   seqhead->pc
 
 		/* iterate over instructions in the sequence and compile them */
-		for (curdesc = seqhead; curdesc != seqlast->next; curdesc = curdesc->next)
+		for (curdesc = seqhead; curdesc != seqlast->next(); curdesc = curdesc->next())
 			generate_sequence_instruction(rsp, block, &compiler, curdesc);
 
 		/* if we need to return to the start, do it */
@@ -3539,7 +3540,7 @@ static void code_compile_block(rsp_state *rsp, offs_t pc)
 		generate_update_cycles(rsp, block, &compiler, IMM(nextpc), TRUE);			// <subtract cycles>
 
 		/* if the last instruction can change modes, use a variable mode; otherwise, assume the same mode */
-		if (seqlast->next == NULL || seqlast->next->pc != nextpc)
+		if (seqlast->next() == NULL || seqlast->next()->pc != nextpc)
 			UML_HASHJMP(block, IMM(0), IMM(nextpc), rsp->impstate->nocode);			// hashjmp <mode>,nextpc,nocode
 	}
 
@@ -3788,7 +3789,7 @@ static void generate_checksum_block(rsp_state *rsp, drcuml_block *block, compile
 		UML_COMMENT(block, "[Validation for %08X]", seqhead->pc | 0x1000);					// comment
 	}
 	/* loose verify or single instruction: just compare and fail */
-	if (!(rsp->impstate->drcoptions & RSPDRC_STRICT_VERIFY) || seqhead->next == NULL)
+	if (!(rsp->impstate->drcoptions & RSPDRC_STRICT_VERIFY) || seqhead->next() == NULL)
 	{
 		if (!(seqhead->flags & OPFLAG_VIRTUAL_NOOP))
 		{
@@ -3806,21 +3807,13 @@ static void generate_checksum_block(rsp_state *rsp, drcuml_block *block, compile
 		void *base = rsp->direct->read_decrypted_ptr(seqhead->physpc | 0x1000);
 		UML_LOAD(block, IREG(0), base, IMM(0), DWORD);								// load    i0,base,0,dword
 		sum += seqhead->opptr.l[0];
-		for (curdesc = seqhead->next; curdesc != seqlast->next; curdesc = curdesc->next)
+		for (curdesc = seqhead->next(); curdesc != seqlast->next(); curdesc = curdesc->next())
 			if (!(curdesc->flags & OPFLAG_VIRTUAL_NOOP))
 			{
 				base = rsp->direct->read_decrypted_ptr(curdesc->physpc | 0x1000);
 				UML_LOAD(block, IREG(1), base, IMM(0), DWORD);						// load    i1,base,dword
 				UML_ADD(block, IREG(0), IREG(0), IREG(1));							// add     i0,i0,i1
 				sum += curdesc->opptr.l[0];
-
-				if (curdesc->delay != NULL && (curdesc == seqlast || (curdesc->next != NULL && curdesc->next->physpc != curdesc->delay->physpc)))
-				{
-					base = rsp->direct->read_decrypted_ptr(curdesc->delay->physpc | 0x1000);
-					UML_LOAD(block, IREG(1), base, IMM(0), DWORD);					// load    i1,base,dword
-					UML_ADD(block, IREG(0), IREG(0), IREG(1));						// add     i0,i0,i1
-					sum += curdesc->delay->opptr.l[0];
-				}
 			}
 		UML_CMP(block, IREG(0), IMM(sum));											// cmp     i0,sum
 		UML_EXHc(block, IF_NE, rsp->impstate->nocode, IMM(epc(seqhead)));			// exne    nocode,seqhead->pc
@@ -3905,8 +3898,8 @@ static void generate_delay_slot_and_branch(rsp_state *rsp, drcuml_block *block, 
 	}
 
 	/* compile the delay slot using temporary compiler state */
-	assert(desc->delay != NULL);
-	generate_sequence_instruction(rsp, block, &compiler_temp, desc->delay);		// <next instruction>
+	assert(desc->delay.first() != NULL);
+	generate_sequence_instruction(rsp, block, &compiler_temp, desc->delay.first());		// <next instruction>
 
 	/* update the cycles and jump through the hash table to the target */
 	if (desc->targetpc != BRANCH_TARGET_DYNAMIC)
@@ -4217,21 +4210,21 @@ static int generate_opcode(rsp_state *rsp, drcuml_block *block, compiler_state *
 
 		case 0x0f:	/* LUI - MIPS I */
 			if (RTREG != 0)
-				UML_MOV(block, R32(RTREG), IMM(SIMM16 << 16));					// dmov    <rtreg>,SIMM16 << 16
+				UML_MOV(block, R32(RTREG), IMM(SIMMVAL << 16));					// dmov    <rtreg>,SIMMVAL << 16
 			return TRUE;
 
 		case 0x08:	/* ADDI - MIPS I */
 		case 0x09:	/* ADDIU - MIPS I */
 			if (RTREG != 0)
 			{
-				UML_ADD(block, R32(RTREG), R32(RSREG), IMM(SIMM16));				// add     i0,<rsreg>,SIMM16,V
+				UML_ADD(block, R32(RTREG), R32(RSREG), IMM(SIMMVAL));				// add     i0,<rsreg>,SIMMVAL,V
 			}
 			return TRUE;
 
 		case 0x0a:	/* SLTI - MIPS I */
 			if (RTREG != 0)
 			{
-				UML_CMP(block, R32(RSREG), IMM(SIMM16));							// dcmp    <rsreg>,SIMM16
+				UML_CMP(block, R32(RSREG), IMM(SIMMVAL));							// dcmp    <rsreg>,SIMMVAL
 				UML_SETc(block, IF_L, R32(RTREG));									// dset    <rtreg>,l
 			}
 			return TRUE;
@@ -4239,7 +4232,7 @@ static int generate_opcode(rsp_state *rsp, drcuml_block *block, compiler_state *
 		case 0x0b:	/* SLTIU - MIPS I */
 			if (RTREG != 0)
 			{
-				UML_CMP(block, R32(RSREG), IMM(SIMM16));							// dcmp    <rsreg>,SIMM16
+				UML_CMP(block, R32(RSREG), IMM(SIMMVAL));							// dcmp    <rsreg>,SIMMVAL
 				UML_SETc(block, IF_B, R32(RTREG));									// dset    <rtreg>,b
 			}
 			return TRUE;
@@ -4247,23 +4240,23 @@ static int generate_opcode(rsp_state *rsp, drcuml_block *block, compiler_state *
 
 		case 0x0c:	/* ANDI - MIPS I */
 			if (RTREG != 0)
-				UML_AND(block, R32(RTREG), R32(RSREG), IMM(UIMM16));				// dand    <rtreg>,<rsreg>,UIMM16
+				UML_AND(block, R32(RTREG), R32(RSREG), IMM(UIMMVAL));				// dand    <rtreg>,<rsreg>,UIMMVAL
 			return TRUE;
 
 		case 0x0d:	/* ORI - MIPS I */
 			if (RTREG != 0)
-				UML_OR(block, R32(RTREG), R32(RSREG), IMM(UIMM16));				// dor     <rtreg>,<rsreg>,UIMM16
+				UML_OR(block, R32(RTREG), R32(RSREG), IMM(UIMMVAL));				// dor     <rtreg>,<rsreg>,UIMMVAL
 			return TRUE;
 
 		case 0x0e:	/* XORI - MIPS I */
 			if (RTREG != 0)
-				UML_XOR(block, R32(RTREG), R32(RSREG), IMM(UIMM16));				// dxor    <rtreg>,<rsreg>,UIMM16
+				UML_XOR(block, R32(RTREG), R32(RSREG), IMM(UIMMVAL));				// dxor    <rtreg>,<rsreg>,UIMMVAL
 			return TRUE;
 
 		/* ----- memory load operations ----- */
 
 		case 0x20:	/* LB - MIPS I */
-			UML_ADD(block, IREG(0), R32(RSREG), IMM(SIMM16));						// add     i0,<rsreg>,SIMM16
+			UML_ADD(block, IREG(0), R32(RSREG), IMM(SIMMVAL));						// add     i0,<rsreg>,SIMMVAL
 			UML_CALLH(block, rsp->impstate->read8);									// callh   read8
 			if (RTREG != 0)
 				UML_SEXT(block, R32(RTREG), IREG(0), BYTE);						// dsext   <rtreg>,i0,byte
@@ -4272,7 +4265,7 @@ static int generate_opcode(rsp_state *rsp, drcuml_block *block, compiler_state *
 			return TRUE;
 
 		case 0x21:	/* LH - MIPS I */
-			UML_ADD(block, IREG(0), R32(RSREG), IMM(SIMM16));						// add     i0,<rsreg>,SIMM16
+			UML_ADD(block, IREG(0), R32(RSREG), IMM(SIMMVAL));						// add     i0,<rsreg>,SIMMVAL
 			UML_CALLH(block, rsp->impstate->read16);								// callh   read16
 			if (RTREG != 0)
 				UML_SEXT(block, R32(RTREG), IREG(0), WORD);						// dsext   <rtreg>,i0,word
@@ -4281,7 +4274,7 @@ static int generate_opcode(rsp_state *rsp, drcuml_block *block, compiler_state *
 			return TRUE;
 
 		case 0x23:	/* LW - MIPS I */
-			UML_ADD(block, IREG(0), R32(RSREG), IMM(SIMM16));						// add     i0,<rsreg>,SIMM16
+			UML_ADD(block, IREG(0), R32(RSREG), IMM(SIMMVAL));						// add     i0,<rsreg>,SIMMVAL
 			UML_CALLH(block, rsp->impstate->read32);								// callh   read32
 			if (RTREG != 0)
 				UML_MOV(block, R32(RTREG), IREG(0));
@@ -4290,7 +4283,7 @@ static int generate_opcode(rsp_state *rsp, drcuml_block *block, compiler_state *
 			return TRUE;
 
 		case 0x24:	/* LBU - MIPS I */
-			UML_ADD(block, IREG(0), R32(RSREG), IMM(SIMM16));						// add     i0,<rsreg>,SIMM16
+			UML_ADD(block, IREG(0), R32(RSREG), IMM(SIMMVAL));						// add     i0,<rsreg>,SIMMVAL
 			UML_CALLH(block, rsp->impstate->read8);									// callh   read8
 			if (RTREG != 0)
 				UML_AND(block, R32(RTREG), IREG(0), IMM(0xff));					// dand    <rtreg>,i0,0xff
@@ -4299,7 +4292,7 @@ static int generate_opcode(rsp_state *rsp, drcuml_block *block, compiler_state *
 			return TRUE;
 
 		case 0x25:	/* LHU - MIPS I */
-			UML_ADD(block, IREG(0), R32(RSREG), IMM(SIMM16));						// add     i0,<rsreg>,SIMM16
+			UML_ADD(block, IREG(0), R32(RSREG), IMM(SIMMVAL));						// add     i0,<rsreg>,SIMMVAL
 			UML_CALLH(block, rsp->impstate->read16);								// callh   read16
 			if (RTREG != 0)
 				UML_AND(block, R32(RTREG), IREG(0), IMM(0xffff));					// dand    <rtreg>,i0,0xffff
@@ -4314,7 +4307,7 @@ static int generate_opcode(rsp_state *rsp, drcuml_block *block, compiler_state *
 		/* ----- memory store operations ----- */
 
 		case 0x28:	/* SB - MIPS I */
-			UML_ADD(block, IREG(0), R32(RSREG), IMM(SIMM16));						// add     i0,<rsreg>,SIMM16
+			UML_ADD(block, IREG(0), R32(RSREG), IMM(SIMMVAL));						// add     i0,<rsreg>,SIMMVAL
 			UML_MOV(block, IREG(1), R32(RTREG));									// mov     i1,<rtreg>
 			UML_CALLH(block, rsp->impstate->write8);								// callh   write8
 			if (!in_delay_slot)
@@ -4322,7 +4315,7 @@ static int generate_opcode(rsp_state *rsp, drcuml_block *block, compiler_state *
 			return TRUE;
 
 		case 0x29:	/* SH - MIPS I */
-			UML_ADD(block, IREG(0), R32(RSREG), IMM(SIMM16));						// add     i0,<rsreg>,SIMM16
+			UML_ADD(block, IREG(0), R32(RSREG), IMM(SIMMVAL));						// add     i0,<rsreg>,SIMMVAL
 			UML_MOV(block, IREG(1), R32(RTREG));									// mov     i1,<rtreg>
 			UML_CALLH(block, rsp->impstate->write16);								// callh   write16
 			if (!in_delay_slot)
@@ -4330,7 +4323,7 @@ static int generate_opcode(rsp_state *rsp, drcuml_block *block, compiler_state *
 			return TRUE;
 
 		case 0x2b:	/* SW - MIPS I */
-			UML_ADD(block, IREG(0), R32(RSREG), IMM(SIMM16 ));						// add     i0,<rsreg>,SIMM16
+			UML_ADD(block, IREG(0), R32(RSREG), IMM(SIMMVAL));						// add     i0,<rsreg>,SIMMVAL
 			UML_MOV(block, IREG(1), R32(RTREG));									// mov     i1,<rtreg>
 			UML_CALLH(block, rsp->impstate->write32);								// callh   write32
 			if (!in_delay_slot)
@@ -4669,8 +4662,8 @@ static void cfunc_mtc2(void *param)
 	rsp_state *rsp = (rsp_state*)param;
 	UINT32 op = rsp->impstate->arg0;
 	int el = (op >> 7) & 0xf;
-	VREG_B(RDREG, (el+0) & 0xf) = (RTVAL >> 8) & 0xff;
-	VREG_B(RDREG, (el+1) & 0xf) = (RTVAL >> 0) & 0xff;
+	VREG_B(VS1REG, (el+0) & 0xf) = (RTVAL >> 8) & 0xff;
+	VREG_B(VS1REG, (el+1) & 0xf) = (RTVAL >> 0) & 0xff;
 }
 
 static void cfunc_ctc2(void *param)

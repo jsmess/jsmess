@@ -63,7 +63,7 @@ Nascom Memory map
 #include "formats/basicdsk.h"
 #include "devices/cartslot.h"
 #include "devices/cassette.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 
 
 /*************************************
@@ -306,7 +306,7 @@ static MACHINE_CONFIG_START( nascom1, nascom1_state )
 	MCFG_CASSETTE_ADD( "cassette", default_cassette_config )
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("40K")
 	MCFG_RAM_EXTRA_OPTIONS("1K,16K,32K")
 MACHINE_CONFIG_END

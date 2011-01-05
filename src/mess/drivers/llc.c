@@ -12,7 +12,7 @@
 #include "cpu/z80/z80daisy.h"
 #include "machine/z80pio.h"
 #include "machine/z80ctc.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 #include "includes/llc.h"
 
 /* Address maps */
@@ -368,7 +368,7 @@ static MACHINE_CONFIG_START( llc2, llc_state )
 	MCFG_Z80CTC_ADD( "z80ctc", XTAL_3MHz, llc2_ctc_intf )
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
 MACHINE_CONFIG_END
 /* ROM definition */

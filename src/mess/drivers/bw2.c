@@ -32,7 +32,7 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "devices/flopdrv.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 #include "formats/basicdsk.h"
 #include "machine/serial.h"
 #include "machine/i8255a.h"
@@ -71,7 +71,7 @@ void bw2_state::bankswitch(UINT8 data)
 
 	m_bank = data & 0x07;
 
-	switch (messram_get_size(m_ram))
+	switch (ram_get_size(m_ram))
 	{
 	case 64 * 1024:
 		max_ram_bank = BANK_RAM1;
@@ -153,7 +153,7 @@ void bw2_state::ramcard_bankswitch(UINT8 data)
 
 	m_bank = data & 0x07;
 
-	switch (messram_get_size(m_ram))
+	switch (ram_get_size(m_ram))
 	{
 	case 64 * 1024:
 	case 96 * 1024:
@@ -734,7 +734,7 @@ DEFINE_LEGACY_IMAGE_DEVICE(BW2_SERIAL, bw2_serial);
 void bw2_state::machine_start()
 {
 	/* allocate memory */
-	m_work_ram = auto_alloc_array(machine, UINT8, messram_get_size(m_ram));
+	m_work_ram = auto_alloc_array(machine, UINT8, ram_get_size(m_ram));
 	m_video_ram = auto_alloc_array(machine, UINT8, BW2_VIDEORAM_SIZE);
 	m_ramcard_ram = auto_alloc_array(machine, UINT8, BW2_RAMCARD_SIZE);
 
@@ -745,7 +745,7 @@ void bw2_state::machine_start()
 
 	/* register for state saving */
 	state_save_register_global(machine, m_kb_row);
-	state_save_register_global_pointer(machine, m_work_ram, messram_get_size(m_ram));
+	state_save_register_global_pointer(machine, m_work_ram, ram_get_size(m_ram));
 	state_save_register_global_pointer(machine, m_ramcard_ram, BW2_RAMCARD_SIZE);
 	state_save_register_global(machine, m_bank);
 	state_save_register_global(machine, m_drive);
@@ -818,7 +818,7 @@ static MACHINE_CONFIG_START( bw2, bw2_state )
 	MCFG_SOFTWARE_LIST_ADD("flop_list","bw2")
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
 	MCFG_RAM_EXTRA_OPTIONS("96K,128K,160K,192K,224K")
 

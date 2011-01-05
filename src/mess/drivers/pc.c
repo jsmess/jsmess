@@ -158,7 +158,7 @@ TODO: Which clock signals are available in a PC Jr?
 #include "sound/3812intf.h"
 
 #include "machine/kb_keytro.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 
 #define ym3812_StdClock 3579545
 
@@ -1603,7 +1603,7 @@ static MACHINE_CONFIG_START( pcmda, pc_state )
 	MCFG_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_config)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("640K")
 MACHINE_CONFIG_END
 
@@ -1671,7 +1671,7 @@ static MACHINE_CONFIG_START( pcherc, pc_state )
 	MCFG_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_config)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("640K")
 MACHINE_CONFIG_END
 
@@ -1752,7 +1752,7 @@ static MACHINE_CONFIG_START( ibm5150, pc_state )
 	MCFG_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_config)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("640K")
 MACHINE_CONFIG_END
 
@@ -1815,7 +1815,7 @@ static MACHINE_CONFIG_START( pccga, pc_state )
 	MCFG_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_config)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("640K")
 MACHINE_CONFIG_END
 
@@ -1900,7 +1900,7 @@ static MACHINE_CONFIG_START( europc, pc_state )
 	MCFG_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_config)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("640K")
 MACHINE_CONFIG_END
 
@@ -1961,7 +1961,7 @@ static MACHINE_CONFIG_START( ibm5160, pc_state )
 	MCFG_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_config)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("640K")
 MACHINE_CONFIG_END
 
@@ -2025,7 +2025,7 @@ static MACHINE_CONFIG_START( pc200, pc_state )
 	MCFG_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_config)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("640K")
 MACHINE_CONFIG_END
 
@@ -2097,7 +2097,7 @@ static MACHINE_CONFIG_START( ppc512, pc_state )
 	MCFG_MC146818_ADD( "rtc", MC146818_IGNORE_CENTURY )
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("512K")
 MACHINE_CONFIG_END
 
@@ -2106,7 +2106,7 @@ static MACHINE_CONFIG_DERIVED( ppc640, ppc512 )
 	MCFG_CPU_PROGRAM_MAP(ppc640_map)
 
 	/* internal ram */
-	MCFG_RAM_MODIFY("messram")
+	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("640K")
 MACHINE_CONFIG_END
 
@@ -2154,7 +2154,7 @@ static MACHINE_CONFIG_START( pc1512, pc_state )
 	MCFG_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_config)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("640K")
 MACHINE_CONFIG_END
 
@@ -2203,7 +2203,7 @@ static MACHINE_CONFIG_START( pc1640, pc_state )
 	MCFG_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_config)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("640K")
 MACHINE_CONFIG_END
 
@@ -2263,7 +2263,7 @@ static MACHINE_CONFIG_START( xtvga, pc_state )
 	MCFG_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_config)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("640K")
 MACHINE_CONFIG_END
 
@@ -2312,7 +2312,7 @@ static MACHINE_CONFIG_START( t1000hx, pc_state )
 	MCFG_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_config)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("640K")
 MACHINE_CONFIG_END
 
@@ -2361,7 +2361,7 @@ static MACHINE_CONFIG_START( t1000_16, pc_state )
 	MCFG_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_config)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("640K")
 MACHINE_CONFIG_END
 
@@ -2410,7 +2410,7 @@ static MACHINE_CONFIG_START( t1000_286, pc_state )
 	MCFG_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_config)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("640K")
 MACHINE_CONFIG_END
 
@@ -2473,7 +2473,7 @@ static MACHINE_CONFIG_START( ibmpcjr, pc_state )
 	MCFG_CARTSLOT_LOAD(pcjr_cartridge)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("640K")
 
 	/* Software lists */
@@ -2538,7 +2538,7 @@ static MACHINE_CONFIG_START( iskr1031, pc_state )
 	MCFG_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_config)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("640K")
 MACHINE_CONFIG_END
 
@@ -2601,7 +2601,7 @@ static MACHINE_CONFIG_START( poisk2, pc_state )
 	MCFG_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_config)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("640K")
 MACHINE_CONFIG_END
 

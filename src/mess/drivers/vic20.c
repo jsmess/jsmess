@@ -77,7 +77,7 @@ block of RAM instead of 8.
 #include "formats/cbm_snqk.h"
 #include "cpu/m6502/m6502.h"
 #include "devices/cartslot.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 #include "machine/6522via.h"
 #include "machine/c1541.h"
 #include "machine/cbmiec.h"
@@ -532,7 +532,7 @@ static MACHINE_START( vic20 )
 	state->via1->set_unscaled_clock(cputag_get_clock(machine, M6502_TAG));
 
 	/* memory expansions */
-	switch (messram_get_size(machine->device("messram")))
+	switch (ram_get_size(machine->device(RAM_TAG)))
 	{
 	case 32*1024:
 		memory_install_ram(program, 0x6000, 0x7fff, 0, 0, NULL);
@@ -707,7 +707,7 @@ static MACHINE_CONFIG_START( vic20_common, vic20_state )
 	MCFG_SOFTWARE_LIST_ADD("cart_list","vic1001_cart")
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("5K")
 	MCFG_RAM_EXTRA_OPTIONS("8K,16K,24K,32K")
 MACHINE_CONFIG_END

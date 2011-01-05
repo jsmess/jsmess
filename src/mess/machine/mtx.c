@@ -11,7 +11,7 @@
 #include "includes/mtx.h"
 #include "cpu/z80/z80.h"
 #include "devices/cassette.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 #include "devices/snapquik.h"
 #include "machine/ctronics.h"
 #include "machine/z80ctc.h"
@@ -74,7 +74,7 @@ static void bankswitch(running_machine *machine, UINT8 data)
     */
 
 	address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
-	device_t *messram = machine->device("messram");
+	device_t *messram = machine->device(RAM_TAG);
 
 //  UINT8 cbm_mode = data >> 7 & 0x01;
 	UINT8 rom_page = data >> 4 & 0x07;
@@ -84,12 +84,12 @@ static void bankswitch(running_machine *machine, UINT8 data)
 	memory_set_bank(machine, "bank2", rom_page);
 
 	/* set ram bank, for invalid pages a nop-handler will be installed */
-	if (ram_page >= messram_get_size(messram)/0x8000)
+	if (ram_page >= ram_get_size(messram)/0x8000)
 	{
 		memory_nop_readwrite(program, 0x4000, 0x7fff, 0, 0);
 		memory_nop_readwrite(program, 0x8000, 0xbfff, 0, 0);
 	}
-	else if (ram_page + 1 == messram_get_size(messram)/0x8000)
+	else if (ram_page + 1 == ram_get_size(messram)/0x8000)
 	{
 		memory_nop_readwrite(program, 0x4000, 0x7fff, 0, 0);
 		memory_install_readwrite_bank(program, 0x8000, 0xbfff, 0, 0, "bank4");
@@ -404,7 +404,7 @@ SNAPSHOT_LOAD( mtx )
 MACHINE_START( mtx512 )
 {
 	mtx_state *state = machine->driver_data<mtx_state>();
-	device_t *messram = machine->device("messram");
+	device_t *messram = machine->device(RAM_TAG);
 
 	/* find devices */
 	state->z80ctc = machine->device(Z80CTC_TAG);
@@ -414,8 +414,8 @@ MACHINE_START( mtx512 )
 	/* configure memory */
 	memory_set_bankptr(machine, "bank1", machine->region("user1")->base());
 	memory_configure_bank(machine, "bank2", 0, 8, machine->region("user2")->base(), 0x2000);
-	memory_configure_bank(machine, "bank3", 0, messram_get_size(messram)/0x4000/2, messram_get_ptr(messram), 0x4000);
-	memory_configure_bank(machine, "bank4", 0, messram_get_size(messram)/0x4000/2, messram_get_ptr(messram) + messram_get_size(messram)/2, 0x4000);
+	memory_configure_bank(machine, "bank3", 0, ram_get_size(messram)/0x4000/2, ram_get_ptr(messram), 0x4000);
+	memory_configure_bank(machine, "bank4", 0, ram_get_size(messram)/0x4000/2, ram_get_ptr(messram) + ram_get_size(messram)/2, 0x4000);
 
 	/* setup tms9928a */
 	TMS9928A_configure(&tms9928a_interface);

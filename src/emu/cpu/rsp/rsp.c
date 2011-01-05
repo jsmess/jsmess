@@ -37,6 +37,10 @@ INLINE rsp_state *get_safe_token(device_t *device)
 	return (rsp_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
+#define SIMM16		((INT32)(INT16)(op))
+#define UIMM16		((UINT16)(op))
+#define UIMM26		(op & 0x03ffffff)
+
 #define JUMP_ABS(addr)			{ rsp->nextpc = 0x04001000 | (((addr) << 2) & 0xfff); }
 #define JUMP_ABS_L(addr,l)		{ rsp->nextpc = 0x04001000 | (((addr) << 2) & 0xfff); rsp->r[l] = rsp->pc + 4; }
 #define JUMP_REL(offset)		{ rsp->nextpc = 0x04001000 | ((rsp->pc + ((offset) << 2)) & 0xfff); }

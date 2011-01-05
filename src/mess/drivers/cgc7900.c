@@ -38,7 +38,7 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/mcs48/mcs48.h"
 #include "formats/basicdsk.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 #include "machine/msm8251.h"
 #include "sound/ay8910.h"
 

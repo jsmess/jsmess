@@ -12,7 +12,7 @@
 #include "sound/wave.h"
 #include "devices/cassette.h"
 #include "includes/pecom.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 
 /* Address maps */
 static ADDRESS_MAP_START(pecom64_mem, ADDRESS_SPACE_PROGRAM, 8)
@@ -192,7 +192,7 @@ static MACHINE_CONFIG_START( pecom64, pecom_state )
 	MCFG_CASSETTE_ADD( "cassette", pecom_cassette_config )
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("32K")
 	MCFG_RAM_DEFAULT_VALUE(0x00)
 MACHINE_CONFIG_END

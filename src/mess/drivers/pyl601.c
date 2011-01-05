@@ -12,7 +12,7 @@
 #include "devices/flopdrv.h"
 #include "formats/basicdsk.h"
 #include "machine/upd765.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 
 
 class pyl601_state : public driver_device
@@ -50,7 +50,7 @@ static WRITE8_HANDLER (rom_page_w)
 	}
 	else
 	{
-		memory_set_bankptr(space->machine, "bank2", messram_get_ptr(space->machine->device("messram")) + 0xc000);
+		memory_set_bankptr(space->machine, "bank2", ram_get_ptr(space->machine->device(RAM_TAG)) + 0xc000);
 	}
 }
 
@@ -76,7 +76,7 @@ static WRITE8_HANDLER (vdisk_l_w)
 static WRITE8_HANDLER (vdisk_data_w)
 {
 	pyl601_state *state = space->machine->driver_data<pyl601_state>();
-	messram_get_ptr(space->machine->device("messram"))[0x10000 + (state->vdisk_addr & 0x7ffff)] = data;
+	ram_get_ptr(space->machine->device(RAM_TAG))[0x10000 + (state->vdisk_addr & 0x7ffff)] = data;
 	state->vdisk_addr++;
 	state->vdisk_addr&=0x7ffff;
 }
@@ -84,7 +84,7 @@ static WRITE8_HANDLER (vdisk_data_w)
 static READ8_HANDLER (vdisk_data_r)
 {
 	pyl601_state *state = space->machine->driver_data<pyl601_state>();
-	UINT8 retVal = messram_get_ptr(space->machine->device("messram"))[0x10000 + (state->vdisk_addr & 0x7ffff)];
+	UINT8 retVal = ram_get_ptr(space->machine->device(RAM_TAG))[0x10000 + (state->vdisk_addr & 0x7ffff)];
 	state->vdisk_addr++;
 	state->vdisk_addr &= 0x7ffff;
 	return retVal;
@@ -344,12 +344,12 @@ static MACHINE_RESET(pyl601)
 {
 	pyl601_state *state = machine->driver_data<pyl601_state>();
 	state->key_code = 0xff;
-	memory_set_bankptr(machine, "bank1", messram_get_ptr(machine->device("messram")) + 0x0000);
-	memory_set_bankptr(machine, "bank2", messram_get_ptr(machine->device("messram")) + 0xc000);
-	memory_set_bankptr(machine, "bank3", messram_get_ptr(machine->device("messram")) + 0xe000);
-	memory_set_bankptr(machine, "bank4", messram_get_ptr(machine->device("messram")) + 0xe700);
+	memory_set_bankptr(machine, "bank1", ram_get_ptr(machine->device(RAM_TAG)) + 0x0000);
+	memory_set_bankptr(machine, "bank2", ram_get_ptr(machine->device(RAM_TAG)) + 0xc000);
+	memory_set_bankptr(machine, "bank3", ram_get_ptr(machine->device(RAM_TAG)) + 0xe000);
+	memory_set_bankptr(machine, "bank4", ram_get_ptr(machine->device(RAM_TAG)) + 0xe700);
 	memory_set_bankptr(machine, "bank5", machine->region("maincpu")->base() + 0xf000);
-	memory_set_bankptr(machine, "bank6", messram_get_ptr(machine->device("messram")) + 0xf000);
+	memory_set_bankptr(machine, "bank6", ram_get_ptr(machine->device(RAM_TAG)) + 0xf000);
 
 	machine->device("maincpu")->reset();
 }
@@ -376,7 +376,7 @@ static MC6845_UPDATE_ROW( pyl601_update_row )
 	{
 		for (column = 0; column < x_count; column++)
 		{
-			UINT8 code = messram_get_ptr(device->machine->device("messram"))[(((ma + column) & 0x0fff) + 0xf000)];
+			UINT8 code = ram_get_ptr(device->machine->device(RAM_TAG))[(((ma + column) & 0x0fff) + 0xf000)];
 			code = ((code << 1) | (code >> 7)) & 0xff;
 			if (column == cursor_x-2)
 			{
@@ -401,7 +401,7 @@ static MC6845_UPDATE_ROW( pyl601_update_row )
 	{
 		for (i = 0; i < x_count; i++)
 		{
-			data = messram_get_ptr(device->machine->device("messram"))[(((ma + i) << 3) | (ra & 0x07)) & 0xffff];
+			data = ram_get_ptr(device->machine->device(RAM_TAG))[(((ma + i) << 3) | (ra & 0x07)) & 0xffff];
 			for (bit = 0; bit < 8; bit++)
 			{
 				*BITMAP_ADDR16(bitmap, y, (i * 8) + bit) = BIT(data, 7) ? 1 : 0;
@@ -422,7 +422,7 @@ static MC6845_UPDATE_ROW( pyl601a_update_row )
 	{
 		for (column = 0; column < x_count; column++)
 		{
-			UINT8 code = messram_get_ptr(device->machine->device("messram"))[(((ma + column) & 0x0fff) + 0xf000)];
+			UINT8 code = ram_get_ptr(device->machine->device(RAM_TAG))[(((ma + column) & 0x0fff) + 0xf000)];
 			data = charrom[((code << 4) | (ra & 0x07)) & 0xfff];
 			if (column == cursor_x)
 			{
@@ -444,7 +444,7 @@ static MC6845_UPDATE_ROW( pyl601a_update_row )
 	{
 		for (i = 0; i < x_count; i++)
 		{
-			data = messram_get_ptr(device->machine->device("messram"))[(((ma + i) << 3) | (ra & 0x07)) & 0xffff];
+			data = ram_get_ptr(device->machine->device(RAM_TAG))[(((ma + i) << 3) | (ra & 0x07)) & 0xffff];
 			for (bit = 0; bit < 8; bit++)
 			{
 				*BITMAP_ADDR16(bitmap, y, (i * 8) + bit) = BIT(data, 7) ? 1 : 0;
@@ -485,7 +485,7 @@ static const mc6845_interface pyl601a_crtc6845_interface =
 
 static DRIVER_INIT(pyl601)
 {
-	memset(messram_get_ptr(machine->device("messram")), 0, 64 * 1024);
+	memset(ram_get_ptr(machine->device(RAM_TAG)), 0, 64 * 1024);
 }
 
 static INTERRUPT_GEN( pyl601_interrupt )
@@ -580,7 +580,7 @@ static MACHINE_CONFIG_START( pyl601, pyl601_state )
 	MCFG_FLOPPY_2_DRIVES_ADD(pyldin_floppy_config)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("576K") // 64 + 512
 MACHINE_CONFIG_END
 

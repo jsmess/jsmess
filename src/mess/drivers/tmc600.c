@@ -90,7 +90,7 @@ Notes:
 #include "cpu/cosmac/cosmac.h"
 #include "sound/cdp1869.h"
 #include "includes/tmc600.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 
 /* Read/Write Handlers */
 
@@ -252,7 +252,7 @@ void tmc600_state::machine_start()
 	address_space *program = cputag_get_address_space(machine, CDP1802_TAG, ADDRESS_SPACE_PROGRAM);
 
 	/* configure RAM */
-	switch (messram_get_size(m_ram))
+	switch (ram_get_size(m_ram))
 	{
 	case 8*1024:
 		memory_unmap_readwrite(program, 0x8000, 0xbfff, 0, 0);
@@ -305,7 +305,7 @@ static MACHINE_CONFIG_START( tmc600, tmc600_state )
 	MCFG_FLOPPY_2_DRIVES_ADD(tmc600_floppy_config)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("8K")
 	MCFG_RAM_EXTRA_OPTIONS("16K,24K")
 MACHINE_CONFIG_END

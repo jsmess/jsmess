@@ -7,7 +7,7 @@
 #include "emu.h"
 #include "includes/samcoupe.h"
 #include "machine/msm6242.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 
 /***************************************************************************
     CONSTANTS
@@ -48,16 +48,16 @@ static void samcoupe_install_ext_mem(address_space *space)
 	UINT8 *mem;
 
 	/* bank 3 */
-	if (state->lext >> 6 < messram_get_size(space->machine->device("messram")) >> 20)
-		mem = &messram_get_ptr(space->machine->device("messram"))[(messram_get_size(space->machine->device("messram")) & 0xfffff) + (state->lext >> 6) * 0x100000 + (state->lext & 0x3f) * 0x4000];
+	if (state->lext >> 6 < ram_get_size(space->machine->device(RAM_TAG)) >> 20)
+		mem = &ram_get_ptr(space->machine->device(RAM_TAG))[(ram_get_size(space->machine->device(RAM_TAG)) & 0xfffff) + (state->lext >> 6) * 0x100000 + (state->lext & 0x3f) * 0x4000];
 	else
 		mem = NULL;
 
 	samcoupe_update_bank(space, 3, mem, FALSE);
 
 	/* bank 4 */
-	if (state->hext >> 6 < messram_get_size(space->machine->device("messram")) >> 20)
-		mem = &messram_get_ptr(space->machine->device("messram"))[(messram_get_size(space->machine->device("messram")) & 0xfffff) + (state->hext >> 6) * 0x100000 + (state->hext & 0x3f) * 0x4000];
+	if (state->hext >> 6 < ram_get_size(space->machine->device(RAM_TAG)) >> 20)
+		mem = &ram_get_ptr(space->machine->device(RAM_TAG))[(ram_get_size(space->machine->device(RAM_TAG)) & 0xfffff) + (state->hext >> 6) * 0x100000 + (state->hext & 0x3f) * 0x4000];
 	else
 		mem = NULL;
 
@@ -68,7 +68,7 @@ static void samcoupe_install_ext_mem(address_space *space)
 void samcoupe_update_memory(address_space *space)
 {
 	samcoupe_state *state = space->machine->driver_data<samcoupe_state>();
-	const int PAGE_MASK = ((messram_get_size(space->machine->device("messram")) & 0xfffff) / 0x4000) - 1;
+	const int PAGE_MASK = ((ram_get_size(space->machine->device(RAM_TAG)) & 0xfffff) / 0x4000) - 1;
 	UINT8 *rom = space->machine->region("maincpu")->base();
 	UINT8 *memory;
 	int is_readonly;
@@ -77,7 +77,7 @@ void samcoupe_update_memory(address_space *space)
     if (state->lmpr & LMPR_RAM0)   /* Is ram paged in at bank 1 */
 	{
 		if ((state->lmpr & 0x1F) <= PAGE_MASK)
-			memory = &messram_get_ptr(space->machine->device("messram"))[(state->lmpr & PAGE_MASK) * 0x4000];
+			memory = &ram_get_ptr(space->machine->device(RAM_TAG))[(state->lmpr & PAGE_MASK) * 0x4000];
 		else
 			memory = NULL;	/* Attempt to page in non existant ram region */
 		is_readonly = FALSE;
@@ -92,7 +92,7 @@ void samcoupe_update_memory(address_space *space)
 
 	/* BANK2 */
 	if (((state->lmpr + 1) & 0x1f) <= PAGE_MASK)
-		memory = &messram_get_ptr(space->machine->device("messram"))[((state->lmpr + 1) & PAGE_MASK) * 0x4000];
+		memory = &ram_get_ptr(space->machine->device(RAM_TAG))[((state->lmpr + 1) & PAGE_MASK) * 0x4000];
 	else
 		memory = NULL;	/* Attempt to page in non existant ram region */
 	samcoupe_update_bank(space, 2, memory, FALSE);
@@ -106,7 +106,7 @@ void samcoupe_update_memory(address_space *space)
 	{
 		/* BANK3 */
 		if ((state->hmpr & 0x1F) <= PAGE_MASK )
-			memory = &messram_get_ptr(space->machine->device("messram"))[(state->hmpr & PAGE_MASK)*0x4000];
+			memory = &ram_get_ptr(space->machine->device(RAM_TAG))[(state->hmpr & PAGE_MASK)*0x4000];
 		else
 			memory = NULL;	/* Attempt to page in non existant ram region */
 		samcoupe_update_bank(space, 3, memory, FALSE);
@@ -121,7 +121,7 @@ void samcoupe_update_memory(address_space *space)
 		else
 		{
 			if (((state->hmpr + 1) & 0x1f) <= PAGE_MASK)
-				memory = &messram_get_ptr(space->machine->device("messram"))[((state->hmpr + 1) & PAGE_MASK) * 0x4000];
+				memory = &ram_get_ptr(space->machine->device(RAM_TAG))[((state->hmpr + 1) & PAGE_MASK) * 0x4000];
 			else
 				memory = NULL;	/* Attempt to page in non existant ram region */
 			is_readonly = FALSE;
@@ -131,9 +131,9 @@ void samcoupe_update_memory(address_space *space)
 
 	/* video memory location */
 	if (state->vmpr & 0x40)	/* if bit set in 2 bank screen mode */
-		state->videoram = &messram_get_ptr(space->machine->device("messram"))[((state->vmpr & 0x1e) & PAGE_MASK) * 0x4000];
+		state->videoram = &ram_get_ptr(space->machine->device(RAM_TAG))[((state->vmpr & 0x1e) & PAGE_MASK) * 0x4000];
 	else
-		state->videoram = &messram_get_ptr(space->machine->device("messram"))[((state->vmpr & 0x1f) & PAGE_MASK) * 0x4000];
+		state->videoram = &ram_get_ptr(space->machine->device(RAM_TAG))[((state->vmpr & 0x1f) & PAGE_MASK) * 0x4000];
 }
 
 

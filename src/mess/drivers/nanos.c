@@ -15,7 +15,7 @@
 #include "machine/upd765.h"
 #include "devices/flopdrv.h"
 #include "formats/basicdsk.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 
 
 class nanos_state : public driver_device
@@ -263,7 +263,7 @@ static VIDEO_UPDATE( nanos )
 			{
 				if (ra < 8)
 				{
-					chr = messram_get_ptr(screen->machine->device("messram"))[0xf800+ x];
+					chr = ram_get_ptr(screen->machine->device(RAM_TAG))[0xf800+ x];
 
 					/* get pattern of pixels for that character scanline */
 					gfx = state->FNT[(chr<<3) | ra ];
@@ -313,7 +313,7 @@ static WRITE8_DEVICE_HANDLER (nanos_port_b_w)
 	if (BIT(data,7)) {
 		memory_set_bankptr(device->machine, "bank1", device->machine->region("maincpu")->base());
 	} else {
-		memory_set_bankptr(device->machine, "bank1", messram_get_ptr(device->machine->device("messram")));
+		memory_set_bankptr(device->machine, "bank1", ram_get_ptr(device->machine->device(RAM_TAG)));
 	}
 }
 static UINT8 row_number(UINT8 code) {
@@ -427,8 +427,8 @@ static MACHINE_RESET(nanos)
 	memory_install_write_bank(space, 0x1000, 0xffff, 0, 0, "bank2");
 
 	memory_set_bankptr(machine, "bank1", machine->region("maincpu")->base());
-	memory_set_bankptr(machine, "bank2", messram_get_ptr(machine->device("messram")) + 0x1000);
-	memory_set_bankptr(machine, "bank3", messram_get_ptr(machine->device("messram")));
+	memory_set_bankptr(machine, "bank2", ram_get_ptr(machine->device(RAM_TAG)) + 0x1000);
+	memory_set_bankptr(machine, "bank3", ram_get_ptr(machine->device(RAM_TAG)));
 
 	floppy_mon_w(floppy_get_device(space->machine, 0), CLEAR_LINE);
 	floppy_drive_set_ready_state(floppy_get_device(space->machine, 0), 1,1);
@@ -532,7 +532,7 @@ static MACHINE_CONFIG_START( nanos, nanos_state )
 	MCFG_FLOPPY_4_DRIVES_ADD(nanos_floppy_config)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
 MACHINE_CONFIG_END
 

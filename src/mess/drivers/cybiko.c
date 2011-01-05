@@ -21,7 +21,7 @@
 #include "machine/pcf8593.h"
 #include "machine/at45dbxx.h"
 #include "machine/sst39vfx.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 
 /* Until support for the H8Sxxxx variants used by cybiko is added, we use H8_3002 (even if opcodes differ) */
 #define H8S2241   H83002
@@ -265,7 +265,7 @@ static MACHINE_CONFIG_START( cybikov1, cybiko_state )
 	MCFG_AT45DB041_ADD("flash1")
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("512K")
 	MCFG_RAM_EXTRA_OPTIONS("1M")
 MACHINE_CONFIG_END
@@ -283,7 +283,7 @@ static MACHINE_CONFIG_DERIVED( cybikov2, cybikov1)
 	MCFG_SST39VF020_ADD("flash2", 16, ENDIANNESS_BIG)
 
 	/* internal ram */
-	MCFG_RAM_MODIFY("messram")
+	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("256K")
 	MCFG_RAM_EXTRA_OPTIONS("512K,1M")
 MACHINE_CONFIG_END
@@ -305,7 +305,7 @@ static MACHINE_CONFIG_DERIVED( cybikoxt, cybikov1)
 	MCFG_SST39VF020_ADD("flash2", 16, ENDIANNESS_BIG)
 
 	/* internal ram */
-	MCFG_RAM_MODIFY("messram")
+	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("2M")
 MACHINE_CONFIG_END
 

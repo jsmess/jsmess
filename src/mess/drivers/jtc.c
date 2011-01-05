@@ -13,7 +13,7 @@
 #include "machine/ctronics.h"
 #include "sound/speaker.h"
 #include "sound/wave.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 
 /* Read/Write Handlers */
 
@@ -707,7 +707,7 @@ static MACHINE_CONFIG_DERIVED( jtc, basic )
     MCFG_VIDEO_UPDATE(jtc)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("2K")
 MACHINE_CONFIG_END
 
@@ -718,7 +718,7 @@ static MACHINE_CONFIG_DERIVED( jtces88, jtc )
     MCFG_CPU_PROGRAM_MAP(jtc_es1988_mem)
 
 	/* internal ram */
-	MCFG_RAM_MODIFY("messram")
+	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("4K")
 MACHINE_CONFIG_END
 
@@ -743,7 +743,7 @@ static MACHINE_CONFIG_DERIVED( jtces23, basic )
     MCFG_VIDEO_UPDATE(jtc_es23)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("4K")
 MACHINE_CONFIG_END
 
@@ -768,7 +768,7 @@ static MACHINE_CONFIG_DERIVED( jtces40, basic )
     MCFG_VIDEO_UPDATE(jtc_es40)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("8K")
 	MCFG_RAM_EXTRA_OPTIONS("16K,32K")
 MACHINE_CONFIG_END

@@ -17,7 +17,7 @@
 #include "includes/dai.h"
 #include "machine/pit8253.h"
 #include "machine/tms5501.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 
 #define DEBUG_DAI_PORTS	0
 
@@ -155,7 +155,7 @@ MACHINE_START( dai )
 
 MACHINE_RESET( dai )
 {
-	memory_set_bankptr(machine, "bank1", messram_get_ptr(machine->device("messram")));
+	memory_set_bankptr(machine, "bank1", ram_get_ptr(machine->device(RAM_TAG)));
 }
 
 /***************************************************************************

@@ -75,7 +75,7 @@
 #include "sound/speaker.h"
 #include "sound/wave.h"
 #include "devices/cassette.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 #include "formats/mz_cas.h"
 
 
@@ -367,7 +367,7 @@ static MACHINE_CONFIG_START( mz700, mz_state )
 	MCFG_CASSETTE_ADD( "cassette", mz700_cassette_config )
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
 MACHINE_CONFIG_END
 

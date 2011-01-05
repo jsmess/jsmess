@@ -95,7 +95,7 @@
 #include "devices/flopdrv.h"
 #include "devices/cassette.h"
 #include "formats/z80ne_dsk.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 
 /* peripheral chips */
 #include "machine/ay31015.h"
@@ -482,7 +482,7 @@ static MACHINE_CONFIG_START( z80ne, z80ne_state )
 	MCFG_DEFAULT_LAYOUT(layout_z80ne)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("32K")
 MACHINE_CONFIG_END
 
@@ -513,7 +513,7 @@ static MACHINE_CONFIG_DERIVED( z80net, z80ne )
 	MCFG_DEFAULT_LAYOUT(layout_z80net)
 
 	/* internal ram */
-	MCFG_RAM_MODIFY("messram")
+	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("32K")
 	MCFG_RAM_EXTRA_OPTIONS("1K")
 MACHINE_CONFIG_END
@@ -549,7 +549,7 @@ static MACHINE_CONFIG_START( z80netb, z80ne_state )
 	MCFG_MC6847_PALETTE(lx388palette)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("32K")
 	MCFG_RAM_EXTRA_OPTIONS("1K")
 MACHINE_CONFIG_END
@@ -589,7 +589,7 @@ static MACHINE_CONFIG_START( z80netf, z80ne_state )
 	MCFG_DEFAULT_LAYOUT(layout_z80netf)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("56K")
 MACHINE_CONFIG_END
 

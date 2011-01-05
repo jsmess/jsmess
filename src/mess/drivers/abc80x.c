@@ -242,7 +242,7 @@ XR22-050-3B Pinout
 #include "cpu/mcs48/mcs48.h"
 #include "devices/cassette.h"
 #include "devices/printer.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 #include "machine/z80ctc.h"
 #include "machine/z80dart.h"
 #include "machine/abcbus.h"
@@ -535,7 +535,7 @@ void abc802_state::bankswitch()
 	else
 	{
 		// low RAM selected
-		memory_install_ram(program, 0x0000, 0x7fff, 0, 0, messram_get_ptr(m_ram));
+		memory_install_ram(program, 0x0000, 0x7fff, 0, 0, ram_get_ptr(m_ram));
 	}
 }
 
@@ -547,7 +547,7 @@ void abc802_state::bankswitch()
 void abc806_state::bankswitch()
 {
 	address_space *program = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);
-	UINT32 videoram_mask = messram_get_size(m_ram) - (32 * 1024) - 1;
+	UINT32 videoram_mask = ram_get_size(m_ram) - (32 * 1024) - 1;
 	int bank;
 	char bank_name[10];
 
@@ -1560,7 +1560,7 @@ void abc802_state::machine_reset()
 void abc806_state::machine_start()
 {
 	UINT8 *mem = machine->region(Z80_TAG)->base();
-	UINT32 videoram_size = messram_get_size(m_ram) - (32 * 1024);
+	UINT32 videoram_size = ram_get_size(m_ram) - (32 * 1024);
 	int bank;
 	char bank_name[10];
 
@@ -1659,7 +1659,7 @@ static MACHINE_CONFIG_START( abc800c, abc800c_state )
 	MCFG_ABC830_ADD("luxor_55_21046", ABCBUS_TAG, DRIVE_BASF_6106_08)
 
 	// internal ram
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("16K")
 	MCFG_RAM_EXTRA_OPTIONS("32K")
 MACHINE_CONFIG_END
@@ -1702,7 +1702,7 @@ static MACHINE_CONFIG_START( abc800m, abc800m_state )
 	MCFG_ABC830_ADD("luxor_55_21046", ABCBUS_TAG, DRIVE_BASF_6106_08)
 
 	// internal ram
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("16K")
 	MCFG_RAM_EXTRA_OPTIONS("32K")
 MACHINE_CONFIG_END
@@ -1745,7 +1745,7 @@ static MACHINE_CONFIG_START( abc802, abc802_state )
 	MCFG_TIMER_ADD_PERIODIC("keyboard", keyboard_tick, USEC(2500))
 
 	// internal ram
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
 MACHINE_CONFIG_END
 
@@ -1785,7 +1785,7 @@ static MACHINE_CONFIG_START( abc806, abc806_state )
 	MCFG_TIMER_ADD_PERIODIC("keyboard", keyboard_tick, USEC(2500))
 
 	// internal ram
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("160K") // 32KB + 128KB
 	MCFG_RAM_EXTRA_OPTIONS("544K") // 32KB + 512KB
 MACHINE_CONFIG_END

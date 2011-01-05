@@ -13,7 +13,7 @@
 #include "xmlfile.h"
 #include "emu.h"
 #include "hash.h"
-#include "messram.h"
+#include "machine/ram.h"
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -227,7 +227,7 @@ static multicart_open_error load_ram_resource(multicart_load_state *state, xml_d
 		return MCERR_MISSING_RAM_LENGTH;
 
 	/* ...and parse it */
-	resource->length = messram_parse_string(length_string);
+	resource->length = ram_parse_string(length_string);
 	if (resource->length <= 0)
 		return MCERR_INVALID_RAM_SPEC;
 

@@ -13,7 +13,7 @@
 #include "formats/basicdsk.h"
 #include "devices/cassette.h"
 #include "machine/rescap.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 #include "newbrain.lh"
 
 /*
@@ -1575,7 +1575,7 @@ static MACHINE_CONFIG_START( newbrain_a, newbrain_state )
 	MCFG_CASSETTE_ADD("cassette2", newbrain_cassette_config)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("32K")
 
 	MCFG_NEWBRAIN_SERIAL_ADD("serial")
@@ -1625,7 +1625,7 @@ static MACHINE_CONFIG_DERIVED( newbrain_eim, newbrain_a )
 	MCFG_FLOPPY_2_DRIVES_ADD(newbrain_floppy_config)
 
 	/* internal ram */
-	MCFG_RAM_MODIFY("messram")
+	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("96K")
 MACHINE_CONFIG_END
 

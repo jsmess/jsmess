@@ -42,7 +42,7 @@ TODO:
 #include "formats/basicdsk.h"
 #include "machine/wd17xx.h"
 #include "machine/6821pia.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 #include "includes/osborne1.h"
 
 
@@ -269,7 +269,7 @@ static MACHINE_CONFIG_START( osborne1, osborne1_state )
 	MCFG_FLOPPY_2_DRIVES_ADD(osborne1_floppy_config)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("68K")	/* 64KB Main RAM and 4Kbit video attribute RAM */
 MACHINE_CONFIG_END
 

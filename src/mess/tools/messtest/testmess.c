@@ -18,7 +18,7 @@
 #include "sound/wavwrite.h"
 #include "video/generic.h"
 #include "render.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 #include "debug/debugcpu.h"
 
 
@@ -1604,7 +1604,7 @@ void node_testmess(xml_data_node *node)
 
 	/* 'ramsize' attribute */
 	attr_node = xml_get_attribute(node, "ramsize");
-	current_testcase.ram = attr_node ? messram_parse_string(attr_node->value) : 0;
+	current_testcase.ram = attr_node ? ram_parse_string(attr_node->value) : 0;
 
 	/* 'wavwrite' attribute */
 	attr_node = xml_get_attribute(node, "wavwrite");

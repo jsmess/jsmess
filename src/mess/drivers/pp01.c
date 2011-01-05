@@ -9,7 +9,7 @@
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 #include "includes/pp01.h"
 
 
@@ -222,7 +222,7 @@ static MACHINE_CONFIG_START( pp01, pp01_state )
 	MCFG_I8255A_ADD( "ppi8255", pp01_ppi8255_interface )
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
 	MCFG_RAM_DEFAULT_VALUE(0x00)
 MACHINE_CONFIG_END

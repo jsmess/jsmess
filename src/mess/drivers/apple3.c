@@ -18,7 +18,7 @@
 #include "formats/ap2_dsk.h"
 #include "machine/6551.h"
 #include "machine/6522via.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 #include "devices/appldriv.h"
 
 static ADDRESS_MAP_START( apple3_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -109,7 +109,7 @@ static MACHINE_CONFIG_START( apple3, apple3_state )
 	MCFG_VIA6522_ADD("via6522_1", 2000000, apple3_via_1_intf)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("512K")
 MACHINE_CONFIG_END
 

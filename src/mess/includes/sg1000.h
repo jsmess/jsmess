@@ -1,6 +1,8 @@
 #ifndef __SG1000__
 #define __SG1000__
 
+#include "machine/ram.h"
+
 #define SCREEN_TAG		"screen"
 #define Z80_TAG			"z80"
 #define SN76489A_TAG	"sn76489a"
@@ -30,7 +32,7 @@ public:
 	sg1000_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config),
 		  m_maincpu(*this, Z80_TAG),
-		  m_ram(*this, "messram")
+		  m_ram(*this, RAM_TAG)
 	{ }
 
 	required_device<cpu_device> m_maincpu;

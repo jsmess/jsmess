@@ -16,7 +16,7 @@
 
 #include "devices/cartslot.h"
 #include "devices/cassette.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 
 #define VERBOSE_LEVEL 0
 #define DBG_LOG( MACHINE, N, M, A ) \
@@ -701,16 +701,16 @@ static void pet_common_driver_init( running_machine *machine )
 	state->superpet = 0;
 	state->cbm8096 = 0;
 
-	memory_install_readwrite_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000, messram_get_size(machine->device("messram")) - 1, 0, 0, "bank10");
+	memory_install_readwrite_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000, ram_get_size(machine->device(RAM_TAG)) - 1, 0, 0, "bank10");
 	memory_set_bankptr(machine, "bank10", state->memory);
 
-	if (messram_get_size(machine->device("messram")) < 0x8000)
+	if (ram_get_size(machine->device(RAM_TAG)) < 0x8000)
 	{
-		memory_nop_readwrite(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), messram_get_size(machine->device("messram")), 0x7FFF, 0, 0);
+		memory_nop_readwrite(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), ram_get_size(machine->device(RAM_TAG)), 0x7FFF, 0, 0);
 	}
 
 	/* 2114 poweron ? 64 x 0xff, 64x 0, and so on */
-	for (i = 0; i < messram_get_size(machine->device("messram")); i += 0x40)
+	for (i = 0; i < ram_get_size(machine->device(RAM_TAG)); i += 0x40)
 	{
 		memset (state->memory + i, i & 0x40 ? 0 : 0xff, 0x40);
 	}
@@ -727,7 +727,7 @@ static void pet_common_driver_init( running_machine *machine )
 DRIVER_INIT( pet2001 )
 {
 	pet_state *state = machine->driver_data<pet_state>();
-	state->memory = messram_get_ptr(machine->device("messram"));
+	state->memory = ram_get_ptr(machine->device(RAM_TAG));
 	pet_common_driver_init(machine);
 	state->pet_basic1 = 1;
 	pet_vh_init(machine);
@@ -736,7 +736,7 @@ DRIVER_INIT( pet2001 )
 DRIVER_INIT( pet )
 {
 	pet_state *state = machine->driver_data<pet_state>();
-	state->memory = messram_get_ptr(machine->device("messram"));
+	state->memory = ram_get_ptr(machine->device(RAM_TAG));
 	pet_common_driver_init(machine);
 	pet_vh_init(machine);
 }
@@ -756,7 +756,7 @@ DRIVER_INIT( pet80 )
 DRIVER_INIT( superpet )
 {
 	pet_state *state = machine->driver_data<pet_state>();
-	state->memory = messram_get_ptr(machine->device("messram"));
+	state->memory = ram_get_ptr(machine->device(RAM_TAG));
 	pet_common_driver_init(machine);
 	state->superpet = 1;
 

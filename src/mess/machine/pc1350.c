@@ -3,7 +3,7 @@
 
 #include "includes/pocketc.h"
 #include "includes/pc1350.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 
 
 
@@ -129,22 +129,22 @@ MACHINE_START( pc1350 )
 	timer_set(machine, ATTOTIME_IN_SEC(1), NULL, 0, pc1350_power_up);
 
 	memory_install_readwrite_bank(space, 0x6000, 0x6fff, 0, 0, "bank1");
-	memory_set_bankptr(machine, "bank1", &messram_get_ptr(machine->device("messram"))[0x0000]);
+	memory_set_bankptr(machine, "bank1", &ram_get_ptr(machine->device(RAM_TAG))[0x0000]);
 
-	if (messram_get_size(machine->device("messram")) >= 0x3000)
+	if (ram_get_size(machine->device(RAM_TAG)) >= 0x3000)
 	{
 		memory_install_readwrite_bank(space, 0x4000, 0x5fff, 0, 0, "bank2");
-		memory_set_bankptr(machine, "bank2", &messram_get_ptr(machine->device("messram"))[0x1000]);
+		memory_set_bankptr(machine, "bank2", &ram_get_ptr(machine->device(RAM_TAG))[0x1000]);
 	}
 	else
 	{
 		memory_nop_readwrite(space, 0x4000, 0x5fff, 0, 0);
 	}
 
-	if (messram_get_size(machine->device("messram")) >= 0x5000)
+	if (ram_get_size(machine->device(RAM_TAG)) >= 0x5000)
 	{
 		memory_install_readwrite_bank(space, 0x2000, 0x3fff, 0, 0, "bank3");
-		memory_set_bankptr(machine, "bank3", &messram_get_ptr(machine->device("messram"))[0x3000]);
+		memory_set_bankptr(machine, "bank3", &ram_get_ptr(machine->device(RAM_TAG))[0x3000]);
 	}
 	else
 	{

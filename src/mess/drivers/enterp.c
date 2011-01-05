@@ -21,7 +21,7 @@
 #include "machine/wd17xx.h"
 #include "devices/flopdrv.h"
 #include "formats/basicdsk.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 #include "includes/enterp.h"
 
 #define ENTERPRISE_XTAL_X1	XTAL_8MHz
@@ -70,10 +70,10 @@ static void enterprise_update_memory_page(address_space *space, offs_t page, int
 	case 0xfa:
 	case 0xfb:
 		/* additional 64k ram */
-		if (messram_get_size(space->machine->device("messram")) == 128*1024)
+		if (ram_get_size(space->machine->device(RAM_TAG)) == 128*1024)
 		{
 			memory_install_readwrite_bank(space, start, end, 0, 0, page_num);
-			memory_set_bankptr(space->machine, page_num, messram_get_ptr(space->machine->device("messram")) + (index - 0xf4) * 0x4000);
+			memory_set_bankptr(space->machine, page_num, ram_get_ptr(space->machine->device(RAM_TAG)) + (index - 0xf4) * 0x4000);
 		}
 		else
 		{
@@ -87,7 +87,7 @@ static void enterprise_update_memory_page(address_space *space, offs_t page, int
 	case 0xff:
 		/* basic 64k ram */
 		memory_install_readwrite_bank(space, start, end, 0, 0, page_num);
-		memory_set_bankptr(space->machine, page_num, messram_get_ptr(space->machine->device("messram")) + (index - 0xfc) * 0x4000);
+		memory_set_bankptr(space->machine, page_num, ram_get_ptr(space->machine->device(RAM_TAG)) + (index - 0xfc) * 0x4000);
 		break;
 
 	default:
@@ -476,13 +476,13 @@ static MACHINE_CONFIG_START( ep64, ep_state )
 	MCFG_FLOPPY_4_DRIVES_ADD(enterprise_floppy_config)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ep128, ep64 )
 	/* internal ram */
-	MCFG_RAM_MODIFY("messram")
+	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("128K")
 MACHINE_CONFIG_END
 

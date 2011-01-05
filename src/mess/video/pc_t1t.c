@@ -13,7 +13,7 @@
 #include "video/pc_video_mess.h"
 #include "video/mc6845.h"
 #include "machine/pic8259.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 
 /***************************************************************************
 
@@ -763,8 +763,8 @@ static void pc_pcjr_bank_w(running_machine *machine, int data)
 			dram = ((data & 0x07) << 14);
 			vram = ((data & 0x38) << (14-3));
 		}
-		memory_set_bankptr( machine, "bank14", messram_get_ptr(machine->device("messram")) + vram );
-		pcjr.displayram = messram_get_ptr(machine->device("messram")) + dram;
+		memory_set_bankptr( machine, "bank14", ram_get_ptr(machine->device(RAM_TAG)) + vram );
+		pcjr.displayram = ram_get_ptr(machine->device(RAM_TAG)) + dram;
 		pc_pcjr_mode_switch(machine);
 	}
 }

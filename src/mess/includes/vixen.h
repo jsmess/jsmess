@@ -3,6 +3,8 @@
 #ifndef __VIXEN__
 #define __VIXEN__
 
+#include "machine/ram.h"
+
 #define Z8400A_TAG		"5f"
 #define FDC1797_TAG		"5n"
 #define P8155H_TAG		"2n"
@@ -23,7 +25,7 @@ public:
 		  m_usart(*this, P8251A_TAG),
 		  m_discrete(*this, DISCRETE_TAG),
 		  m_ieee488(*this, IEEE488_TAG),
-		  m_ram(*this, "messram"),
+		  m_ram(*this, RAM_TAG),
 		  m_floppy0(*this, FLOPPY_0),
 		  m_floppy1(*this, FLOPPY_1),
 		  m_fdint(0),

@@ -46,7 +46,7 @@ documentation still exists.
 #include "formats/coco_dsk.h"
 #include "devices/flopdrv.h"
 #include "devices/coco_vhd.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 
 /*
  Colour codes are as below acording to os-9 headers, however the presise values
@@ -351,7 +351,7 @@ static MACHINE_CONFIG_START( dgnbeta, dgn_beta_state )
 	MCFG_FLOPPY_4_DRIVES_ADD(dgnbeta_floppy_config)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("256K")
 	MCFG_RAM_EXTRA_OPTIONS("128K,384K,512K,640K,768K")
 	/* Ram size can now be configured, since the machine was known as either the Dragon Beta or */

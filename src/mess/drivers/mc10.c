@@ -15,7 +15,7 @@
 #include "video/ef9345.h"
 #include "devices/cassette.h"
 #include "formats/coco_cas.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 
 
 /***************************************************************************
@@ -205,8 +205,8 @@ static DRIVER_INIT( mc10 )
 	mc10->cassette = machine->device("cassette");
 
 	/* initialize memory */
-	mc10->ram = messram_get_ptr(machine->device("messram"));
-	mc10->ram_size = messram_get_size(machine->device("messram"));
+	mc10->ram = ram_get_ptr(machine->device(RAM_TAG));
+	mc10->ram_size = ram_get_size(machine->device(RAM_TAG));
 
 	memory_set_bankptr(machine, "bank1", mc10->ram);
 
@@ -234,8 +234,8 @@ static DRIVER_INIT( alice32 )
 	mc10->cassette = machine->device("cassette");
 
 	/* initialize memory */
-	mc10->ram = messram_get_ptr(machine->device("messram"));
-	mc10->ram_size = messram_get_size(machine->device("messram"));
+	mc10->ram = ram_get_ptr(machine->device(RAM_TAG));
+	mc10->ram_size = ram_get_size(machine->device(RAM_TAG));
 
 	memory_set_bankptr(machine, "bank1", mc10->ram);
 
@@ -510,7 +510,7 @@ static MACHINE_CONFIG_START( mc10, mc10_state )
 	MCFG_CASSETTE_ADD("cassette", mc10_cassette_config)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("20K")
 	MCFG_RAM_EXTRA_OPTIONS("4K")
 MACHINE_CONFIG_END
@@ -547,7 +547,7 @@ static MACHINE_CONFIG_START( alice32, mc10_state )
 	MCFG_CASSETTE_ADD("cassette", mc10_cassette_config)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("24K")
 	MCFG_RAM_EXTRA_OPTIONS("8K")
 MACHINE_CONFIG_END

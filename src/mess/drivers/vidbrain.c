@@ -31,7 +31,7 @@
 #include "cpu/f8/f8.h"
 #include "devices/cartslot.h"
 #include "devices/cassette.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 #include "sound/discrete.h"
 
 
@@ -504,7 +504,7 @@ static MACHINE_CONFIG_START( vidbrain, vidbrain_state )
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "vidbrain")
 
 	// internal ram
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("1K")
 MACHINE_CONFIG_END
 

@@ -28,7 +28,7 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "devices/flopdrv.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 #include "formats/basicdsk.h"
 #include "machine/6821pia.h"
 #include "machine/ctronics.h"
@@ -67,7 +67,7 @@ void bw12_state::bankswitch()
 
 	case 2: /* BK1 */
 	case 3: /* BK2 */
-		if (messram_get_size(m_ram) > 64*1024)
+		if (ram_get_size(m_ram) > 64*1024)
 		{
 			memory_install_readwrite_bank(program, 0x0000, 0x7fff, 0, 0, "bank1");
 		}
@@ -655,8 +655,8 @@ void bw12_state::machine_start()
 {
 	/* setup memory banking */
 	memory_configure_bank(machine, "bank1", 0, 1, machine->region(Z80_TAG)->base(), 0);
-	memory_configure_bank(machine, "bank1", 1, 1, messram_get_ptr(m_ram), 0);
-	memory_configure_bank(machine, "bank1", 2, 2, messram_get_ptr(m_ram) + 0x10000, 0x8000);
+	memory_configure_bank(machine, "bank1", 1, 1, ram_get_ptr(m_ram), 0);
+	memory_configure_bank(machine, "bank1", 2, 2, ram_get_ptr(m_ram) + 0x10000, 0x8000);
 
 	/* register for state saving */
 	state_save_register_global(machine, m_bank);
@@ -823,7 +823,7 @@ static MACHINE_CONFIG_DERIVED( bw12, common )
 	MCFG_FLOPPY_2_DRIVES_ADD(bw12_floppy_config)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
 MACHINE_CONFIG_END
 
@@ -832,7 +832,7 @@ static MACHINE_CONFIG_DERIVED( bw14, common )
 	MCFG_FLOPPY_2_DRIVES_ADD(bw14_floppy_config)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("128K")
 MACHINE_CONFIG_END
 

@@ -17,7 +17,7 @@
 #include "machine/wd17xx.h"
 #include "devices/flopdrv.h"
 #include "formats/basicdsk.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 #include "includes/b2m.h"
 
 
@@ -244,7 +244,7 @@ static MACHINE_CONFIG_START( b2m, b2m_state )
 	MCFG_FLOPPY_2_DRIVES_ADD(b2m_floppy_config)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("128K")
 	MCFG_RAM_DEFAULT_VALUE(0x00)
 MACHINE_CONFIG_END

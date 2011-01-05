@@ -24,7 +24,7 @@
 #include "machine/i8155.h"
 #include "machine/i8355.h"
 #include "sound/speaker.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 
 /* Memory Maps */
 
@@ -236,7 +236,7 @@ static MACHINE_CONFIG_START( exp85, exp85_state )
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, exp85_cassette_config)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("256")
 	MCFG_RAM_EXTRA_OPTIONS("4K")
 MACHINE_CONFIG_END

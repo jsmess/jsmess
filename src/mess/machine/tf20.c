@@ -12,7 +12,7 @@
 #include "emu.h"
 #include "tf20.h"
 #include "cpu/z80/z80.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 #include "machine/upd7201.h"
 #include "machine/upd765.h"
 #include "devices/flopdrv.h"
@@ -76,7 +76,7 @@ static READ8_HANDLER( tf20_rom_disable )
 	address_space *prg = cpu_get_address_space(space->cpu, ADDRESS_SPACE_PROGRAM);
 
 	/* switch in ram */
-	memory_install_ram(prg, 0x0000, 0x7fff, 0, 0, messram_get_ptr(tf20->ram));
+	memory_install_ram(prg, 0x0000, 0x7fff, 0, 0, ram_get_ptr(tf20->ram));
 
 	return 0xff;
 }
@@ -345,7 +345,7 @@ static DEVICE_START( tf20 )
 	tf20->floppy_1 = device->subdevice(FLOPPY_1);
 
 	/* enable second half of ram */
-	memory_install_ram(prg, 0x8000, 0xffff, 0, 0, messram_get_ptr(tf20->ram) + 0x8000);
+	memory_install_ram(prg, 0x8000, 0xffff, 0, 0, ram_get_ptr(tf20->ram) + 0x8000);
 }
 
 static DEVICE_RESET( tf20 )

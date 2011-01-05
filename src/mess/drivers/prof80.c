@@ -33,7 +33,7 @@
 #include "video/mc6845.h"
 #include "formats/basicdsk.h"
 #include "devices/flopdrv.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 #include "machine/i8255a.h"
 #include "machine/upd765.h"
 #include "machine/upd1990a.h"
@@ -153,7 +153,7 @@ static void prof80_bankswitch(running_machine *machine)
 {
 	prof80_state *state = machine->driver_data<prof80_state>();
 	address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
-	UINT8 *ram = messram_get_ptr(machine->device("messram"));
+	UINT8 *ram = ram_get_ptr(machine->device(RAM_TAG));
 	UINT8 *rom = machine->region(Z80_TAG)->base();
 	int bank;
 
@@ -1305,7 +1305,7 @@ static MACHINE_CONFIG_START( prof80, prof80_state )
 	MCFG_FLOPPY_4_DRIVES_ADD(prof80_floppy_config)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("128K")
 MACHINE_CONFIG_END
 

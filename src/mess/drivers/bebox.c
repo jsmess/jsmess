@@ -35,7 +35,7 @@
 #include "devices/chd_cd.h"
 #include "devices/harddriv.h"
 #include "formats/pc_dsk.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 
 static READ8_HANDLER(at_dma8237_1_r)  { return i8237_r(space->machine->device("dma8237_2"), offset / 2); }
 static WRITE8_HANDLER(at_dma8237_1_w) { i8237_w(space->machine->device("dma8237_2"), offset / 2, data); }
@@ -174,7 +174,7 @@ static MACHINE_CONFIG_START( bebox, bebox_state )
 	MCFG_MC146818_ADD( "rtc", MC146818_STANDARD )
 	
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("32M")
 	MCFG_RAM_EXTRA_OPTIONS("8M,16M")
 MACHINE_CONFIG_END

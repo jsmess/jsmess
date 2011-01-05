@@ -47,7 +47,7 @@
 #include "cpu/mcs51/mcs51.h"
 #include "devices/cartslot.h"
 #include "devices/flopdrv.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 #include "devices/microdrv.h"
 #include "formats/basicdsk.h"
 #include "machine/zx8302.h"
@@ -746,7 +746,7 @@ void ql_state::machine_start()
 	address_space *program = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);
 
 	// configure RAM 
-	switch (messram_get_size(m_ram))
+	switch (ram_get_size(m_ram))
 	{
 	case 128*1024:
 		memory_unmap_readwrite(program, 0x040000, 0x0fffff, 0, 0);
@@ -829,7 +829,7 @@ static MACHINE_CONFIG_START( ql, ql_state )
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "ql")
 
 	// internal ram
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("128K")
 	MCFG_RAM_EXTRA_OPTIONS("192K,256K,384K,640K,896K")
 MACHINE_CONFIG_END
@@ -854,7 +854,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( opd, ql )
 	// internal ram
-	MCFG_RAM_MODIFY("messram")
+	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("128K")
 	MCFG_RAM_EXTRA_OPTIONS("256K")
 MACHINE_CONFIG_END
@@ -867,7 +867,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( megaopd, ql )
 	// internal ram
-	MCFG_RAM_MODIFY("messram")
+	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("256K")
 MACHINE_CONFIG_END
 */

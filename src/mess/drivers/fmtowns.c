@@ -123,7 +123,7 @@
 #include "machine/wd17xx.h"
 #include "devices/flopdrv.h"
 #include "machine/upd71071.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 #include "includes/fmtowns.h"
 #include "machine/nvram.h"
 #include "devices/harddriv.h"
@@ -993,7 +993,7 @@ static READ8_HANDLER( towns_cmos_low_r )
 {
 	towns_state* state = space->machine->driver_data<towns_state>();
 	if(state->towns_mainmem_enable != 0)
-		return messram_get_ptr(state->messram)[offset + 0xd8000];
+		return ram_get_ptr(state->messram)[offset + 0xd8000];
 
 	return state->m_nvram[offset];
 }
@@ -1002,7 +1002,7 @@ static WRITE8_HANDLER( towns_cmos_low_w )
 {
 	towns_state* state = space->machine->driver_data<towns_state>();
 	if(state->towns_mainmem_enable != 0)
-		messram_get_ptr(state->messram)[offset+0xd8000] = data;
+		ram_get_ptr(state->messram)[offset+0xd8000] = data;
 	else
 		state->m_nvram[offset] = data;
 }
@@ -1028,19 +1028,19 @@ void towns_update_video_banks(address_space* space)
 	{
 		ROM = space->machine->region("user")->base();
 
-//      memory_set_bankptr(space->machine,1,messram_get_ptr(state->messram)+0xc0000);
-//      memory_set_bankptr(space->machine,2,messram_get_ptr(state->messram)+0xc8000);
-//      memory_set_bankptr(space->machine,3,messram_get_ptr(state->messram)+0xc9000);
-//      memory_set_bankptr(space->machine,4,messram_get_ptr(state->messram)+0xca000);
-//      memory_set_bankptr(space->machine,5,messram_get_ptr(state->messram)+0xca000);
-//      memory_set_bankptr(space->machine,10,messram_get_ptr(state->messram)+0xca800);
-		memory_set_bankptr(space->machine,"bank6",messram_get_ptr(state->messram)+0xcb000);
-		memory_set_bankptr(space->machine,"bank7",messram_get_ptr(state->messram)+0xcb000);
+//      memory_set_bankptr(space->machine,1,ram_get_ptr(state->messram)+0xc0000);
+//      memory_set_bankptr(space->machine,2,ram_get_ptr(state->messram)+0xc8000);
+//      memory_set_bankptr(space->machine,3,ram_get_ptr(state->messram)+0xc9000);
+//      memory_set_bankptr(space->machine,4,ram_get_ptr(state->messram)+0xca000);
+//      memory_set_bankptr(space->machine,5,ram_get_ptr(state->messram)+0xca000);
+//      memory_set_bankptr(space->machine,10,ram_get_ptr(state->messram)+0xca800);
+		memory_set_bankptr(space->machine,"bank6",ram_get_ptr(state->messram)+0xcb000);
+		memory_set_bankptr(space->machine,"bank7",ram_get_ptr(state->messram)+0xcb000);
 		if(state->towns_system_port & 0x02)
-			memory_set_bankptr(space->machine,"bank11",messram_get_ptr(state->messram)+0xf8000);
+			memory_set_bankptr(space->machine,"bank11",ram_get_ptr(state->messram)+0xf8000);
 		else
 			memory_set_bankptr(space->machine,"bank11",ROM+0x238000);
-		memory_set_bankptr(space->machine,"bank12",messram_get_ptr(state->messram)+0xf8000);
+		memory_set_bankptr(space->machine,"bank12",ram_get_ptr(state->messram)+0xf8000);
 		return;
 	}
 	else  // enable I/O ports and VRAM
@@ -1049,23 +1049,23 @@ void towns_update_video_banks(address_space* space)
 
 //      memory_set_bankptr(space->machine,1,towns_gfxvram+(towns_vram_rplane*0x8000));
 //      memory_set_bankptr(space->machine,2,towns_txtvram);
-//      memory_set_bankptr(space->machine,3,messram_get_ptr(state->messram)+0xc9000);
+//      memory_set_bankptr(space->machine,3,ram_get_ptr(state->messram)+0xc9000);
 //      if(towns_ankcg_enable != 0)
 //          memory_set_bankptr(space->machine,4,ROM+0x180000+0x3d000);  // ANK CG 8x8
 //      else
 //          memory_set_bankptr(space->machine,4,towns_txtvram+0x2000);
 //      memory_set_bankptr(space->machine,5,towns_txtvram+0x2000);
-//      memory_set_bankptr(space->machine,10,messram_get_ptr(state->messram)+0xca800);
+//      memory_set_bankptr(space->machine,10,ram_get_ptr(state->messram)+0xca800);
 		if(state->towns_ankcg_enable != 0)
 			memory_set_bankptr(space->machine,"bank6",ROM+0x180000+0x3d800);  // ANK CG 8x16
 		else
-			memory_set_bankptr(space->machine,"bank6",messram_get_ptr(state->messram)+0xcb000);
-		memory_set_bankptr(space->machine,"bank7",messram_get_ptr(state->messram)+0xcb000);
+			memory_set_bankptr(space->machine,"bank6",ram_get_ptr(state->messram)+0xcb000);
+		memory_set_bankptr(space->machine,"bank7",ram_get_ptr(state->messram)+0xcb000);
 		if(state->towns_system_port & 0x02)
-			memory_set_bankptr(space->machine,"bank11",messram_get_ptr(state->messram)+0xf8000);
+			memory_set_bankptr(space->machine,"bank11",ram_get_ptr(state->messram)+0xf8000);
 		else
 			memory_set_bankptr(space->machine,"bank11",ROM+0x238000);
-		memory_set_bankptr(space->machine,"bank12",messram_get_ptr(state->messram)+0xf8000);
+		memory_set_bankptr(space->machine,"bank12",ram_get_ptr(state->messram)+0xf8000);
 		return;
 	}
 }
@@ -2298,7 +2298,7 @@ static MACHINE_RESET( towns )
 	state->pic_master = machine->device("pic8259_master");
 	state->pic_slave = machine->device("pic8259_slave");
 	state->pit = machine->device("pit");
-	state->messram = machine->device("messram");
+	state->messram = machine->device(RAM_TAG);
 	state->cdrom = machine->device("cdrom");
 	state->cdda = machine->device("cdda");
 	state->scsi = machine->device<fmscsi_device>("scsi");
@@ -2509,7 +2509,7 @@ static MACHINE_CONFIG_START( towns, towns_state )
     MCFG_VIDEO_UPDATE(towns)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("6M")
 MACHINE_CONFIG_END
 

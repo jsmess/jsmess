@@ -3,6 +3,8 @@
 #ifndef __XOR100__
 #define __XOR100__
 
+#include "machine/ram.h"
+
 #define SCREEN_TAG		"screen"
 #define Z80_TAG			"5b"
 #define I8251_A_TAG		"12b"
@@ -24,7 +26,7 @@ public:
 		  m_uart_b(*this, I8251_B_TAG),
 		  m_fdc(*this, WD1795_TAG),
 		  m_ctc(*this, Z80CTC_TAG),
-		  m_ram(*this, "messram"),
+		  m_ram(*this, RAM_TAG),
 		  m_terminal(*this, TERMINAL_TAG),
 		  m_floppy0(*this, FLOPPY_0),
 		  m_floppy1(*this, FLOPPY_1)

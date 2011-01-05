@@ -31,7 +31,7 @@
 #include "machine/6883sam.h"
 #include "video/coco6847.h"
 #include "includes/coco.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 
 #if defined(__GNUC__) && (__GNUC__ >= 3)
 #define RESTRICT	__restrict__
@@ -534,7 +534,7 @@ static void coco3_prepare_scanline(running_machine *machine, int scanline)
 		memcpy_dirty(&dirty, scanline_record->palette, video->palette_ram, 16);
 
 		/* get ready to copy the video memory; get position and offsets */
-		video_data = &messram_get_ptr(machine->device("messram"))[video->video_position % messram_get_size(machine->device("messram"))];
+		video_data = &ram_get_ptr(machine->device(RAM_TAG))[video->video_position % ram_get_size(machine->device(RAM_TAG))];
 		video_offset = (state->gimereg[15] & 0x7F) * 2;
 		video_data_size = sizeof(scanline_record->data);
 

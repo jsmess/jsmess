@@ -22,7 +22,7 @@
 #include "devices/flopdrv.h"
 #include "image.h"
 #include "devices/cassette.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 #include "sound/speaker.h"
 #include "profiler.h"
 
@@ -203,11 +203,11 @@ void apple2_update_memory(running_machine *machine)
 			else
 			{
 				/* RAM */
-				if (end_r >= messram_get_size(machine->device("messram")))
-					end_r = messram_get_size(machine->device("messram")) - 1;
+				if (end_r >= ram_get_size(machine->device(RAM_TAG)))
+					end_r = ram_get_size(machine->device(RAM_TAG)) - 1;
 				offset = meminfo.read_mem & APPLE2_MEM_MASK;
 				if (end_r >= begin)
-					rbase = &messram_get_ptr(machine->device("messram"))[offset];
+					rbase = &ram_get_ptr(machine->device(RAM_TAG))[offset];
 			}
 
 			/* install the actual handlers */
@@ -286,11 +286,11 @@ void apple2_update_memory(running_machine *machine)
 			else
 			{
 				/* RAM */
-				if (end_w >= messram_get_size(machine->device("messram")))
-					end_w = messram_get_size(machine->device("messram")) - 1;
+				if (end_w >= ram_get_size(machine->device(RAM_TAG)))
+					end_w = ram_get_size(machine->device(RAM_TAG)) - 1;
 				offset = meminfo.write_mem & APPLE2_MEM_MASK;
 				if (end_w >= begin)
-					wbase = &messram_get_ptr(machine->device("messram"))[offset];
+					wbase = &ram_get_ptr(machine->device(RAM_TAG))[offset];
 			}
 
 
@@ -1018,7 +1018,7 @@ UINT8 apple2_getfloatingbusvalue(running_machine *machine)
 		//CMemory::mState |= CMemory::kVBLBar; // N: VBL' is true // FIX: MESS?
 	}
 
-	return messram_get_ptr(machine->device("messram"))[address % messram_get_size(machine->device("messram"))]; // FIX: this seems to work, but is it right!?
+	return ram_get_ptr(machine->device(RAM_TAG))[address % ram_get_size(machine->device(RAM_TAG))]; // FIX: this seems to work, but is it right!?
 }
 
 
@@ -1094,25 +1094,25 @@ INTERRUPT_GEN( apple2_interrupt )
 static WRITE8_HANDLER ( apple2_mainram0400_w )
 {
 	offset += 0x400;
-	messram_get_ptr(space->machine->device("messram"))[offset] = data;
+	ram_get_ptr(space->machine->device(RAM_TAG))[offset] = data;
 }
 
 static WRITE8_HANDLER ( apple2_mainram2000_w )
 {
 	offset += 0x2000;
-	messram_get_ptr(space->machine->device("messram"))[offset] = data;
+	ram_get_ptr(space->machine->device(RAM_TAG))[offset] = data;
 }
 
 static WRITE8_HANDLER ( apple2_auxram0400_w )
 {
 	offset += 0x10400;
-	messram_get_ptr(space->machine->device("messram"))[offset] = data;
+	ram_get_ptr(space->machine->device(RAM_TAG))[offset] = data;
 }
 
 static WRITE8_HANDLER ( apple2_auxram2000_w )
 {
 	offset += 0x12000;
-	messram_get_ptr(space->machine->device("messram"))[offset] = data;
+	ram_get_ptr(space->machine->device(RAM_TAG))[offset] = data;
 }
 
 
@@ -1613,7 +1613,7 @@ void apple2_init_common(running_machine *machine)
 	if (machine->region("maincpu")->bytes() < 0x8000)
 		a2_mask &= ~VAR_ROMSWITCH;
 
-	if (messram_get_size(machine->device("messram")) <= 64*1024)
+	if (ram_get_size(machine->device(RAM_TAG)) <= 64*1024)
 		a2_mask &= ~(VAR_RAMRD | VAR_RAMWRT | VAR_80STORE | VAR_ALTZP | VAR_80COL);
 }
 

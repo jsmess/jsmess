@@ -1,6 +1,8 @@
 #ifndef __XEROX820__
 #define __XEROX820__
 
+#include "machine/ram.h"
+
 #define SCREEN_TAG		"screen"
 
 #define Z80_TAG			"u46"
@@ -24,7 +26,7 @@ public:
 		  m_kbpio(*this, Z80KBPIO_TAG),
 		  m_ctc(*this, Z80CTC_TAG),
 		  m_fdc(*this, WD1771_TAG),
-		  m_ram(*this, "messram"),
+		  m_ram(*this, RAM_TAG),
 		  m_floppy0(*this, FLOPPY_0),
 		  m_floppy1(*this, FLOPPY_1)
 	{ }

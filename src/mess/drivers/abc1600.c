@@ -29,7 +29,7 @@
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "devices/flopdrv.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 #include "machine/8530scc.h"
 #include "machine/abc99.h"
 #include "machine/s1410.h"
@@ -292,7 +292,7 @@ static MACHINE_CONFIG_START( abc1600, abc1600_state )
 	MCFG_S1410_ADD()
 
 	// internal ram
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("1M")
 MACHINE_CONFIG_END
 

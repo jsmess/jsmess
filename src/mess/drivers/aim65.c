@@ -20,7 +20,7 @@ ToDo:
 #include "machine/6532riot.h"
 #include "machine/6821pia.h"
 #include "devices/cartslot.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 #include "aim65.lh"
 
 
@@ -222,7 +222,7 @@ static MACHINE_CONFIG_START( aim65, aim65_state )
 	MCFG_CARTSLOT_NOT_MANDATORY
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("4K")
 	MCFG_RAM_EXTRA_OPTIONS("1K,2K,3K")
 MACHINE_CONFIG_END

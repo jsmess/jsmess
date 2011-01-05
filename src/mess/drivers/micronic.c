@@ -119,7 +119,7 @@
 #include "cpu/z80/z80.h"
 #include "video/hd61830.h"
 #include "machine/mc146818.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 #include "sound/beep.h"
 
 static UINT8 keypad_r (running_machine *machine)
@@ -403,14 +403,14 @@ static NVRAM_HANDLER( micronic )
 	if (read_or_write)
 	{
 		mame_fwrite(file, state->ram, 0x8000);
-		mame_fwrite(file, messram_get_ptr(machine->device("messram")), 224*1024);
+		mame_fwrite(file, ram_get_ptr(machine->device(RAM_TAG)), 224*1024);
 	}
 	else
 	{
 		if (file)
 		{
 			mame_fread(file, state->ram, 0x8000);
-			mame_fread(file, messram_get_ptr(machine->device("messram")), 224*1024);			
+			mame_fread(file, ram_get_ptr(machine->device(RAM_TAG)), 224*1024);			
 
 			/* reload register A and B for restore the periodic irq state */
 			mame_fseek(file, 0x4000a, SEEK_SET);
@@ -463,7 +463,7 @@ static MACHINE_START( micronic )
 	memory_configure_bank(machine, "bank1", 0x00, 0x02, machine->region(Z80_TAG)->base(), 0x10000);
 
 	/* RAM banks */
-	memory_configure_bank(machine, "bank1", 0x02, 0x07, messram_get_ptr(machine->device("messram")), 0x8000);
+	memory_configure_bank(machine, "bank1", 0x02, 0x07, ram_get_ptr(machine->device(RAM_TAG)), 0x8000);
 
 	state->rtc_periodic_irq = timer_alloc(machine, rtc_periodic_irq, 0);
 	/* register for state saving */
@@ -508,7 +508,7 @@ static MACHINE_CONFIG_START( micronic, micronic_state )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 
 	/* ram banks */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("224K")
 
 	MCFG_NVRAM_HANDLER(micronic)

@@ -124,7 +124,7 @@ Notes:
 #include "includes/comx35.h"
 #include "machine/rescap.h"
 #include "devices/flopdrv.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 
 enum
 {
@@ -599,7 +599,7 @@ void comx35_state::machine_start()
 	memory_configure_bank(machine, "bank1", BANK_PRINTER_THERMAL, 1, machine->region("thermal")->base(), 0);
 	memory_configure_bank(machine, "bank1", BANK_JOYCARD, 1, machine->region(CDP1802_TAG)->base(), 0);
 	memory_configure_bank(machine, "bank1", BANK_80_COLUMNS, 1, machine->region("80column")->base(), 0);
-	memory_configure_bank(machine, "bank1", BANK_RAMCARD, 4, messram_get_ptr(m_ram), 0x2000);
+	memory_configure_bank(machine, "bank1", BANK_RAMCARD, 4, ram_get_ptr(m_ram), 0x2000);
 
 	memory_set_bank(machine, "bank1", 0);
 

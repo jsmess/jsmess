@@ -44,86 +44,26 @@ struct dss_input_context
 	sound_stream *buffer_stream;
 };
 
+#if 0
 INLINE discrete_info *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == DISCRETE);
 	return (discrete_info *)downcast<legacy_device_base *>(device)->token();
 }
+#endif
 
 READ8_DEVICE_HANDLER(discrete_sound_r)
 {
-	discrete_info    *info = get_safe_token(device);
-	node_description *node = discrete_find_node(info, offset);
-
-	UINT8 data = 0;
-
-	/* Read the node input value if allowed */
-	if (node)
-	{
-		/* Bring the system up to now */
-		stream_update(info->discrete_stream);
-
-		data = (UINT8) node->output[NODE_CHILD_NODE_NUM(offset)];
-	}
-	else
-		fatalerror("discrete_sound_r read from non-existent NODE_%02d\n", offset-NODE_00);
-
-    return data;
+	discrete_device *disc_device = downcast<discrete_device *>(device);
+	return 	disc_device->read( *disc_device->machine->firstcpu->space(), offset, 0xff);
 }
 
 
 WRITE8_DEVICE_HANDLER(discrete_sound_w)
 {
-	discrete_info    *info = get_safe_token(device);
-	node_description *node = discrete_find_node(info, offset);
-
-	/* Update the node input value if it's a proper input node */
-	if (node)
-	{
-		struct dss_input_context *context = (struct dss_input_context *)node->context;
-		UINT8 new_data    = 0;
-
-		switch (node->module->type)
-		{
-			case DSS_INPUT_DATA:
-			case DSS_INPUT_BUFFER:
-				new_data = data;
-				break;
-			case DSS_INPUT_LOGIC:
-			case DSS_INPUT_PULSE:
-				new_data = data ? 1 : 0;
-				break;
-			case DSS_INPUT_NOT:
-				new_data = data ? 0 : 1;
-				break;
-		}
-
-		if (context->data != new_data)
-		{
-			if (context->is_buffered)
-			{
-				/* Bring the system up to now */
-				stream_update(context->buffer_stream);
-
-				context->data = new_data;
-			}
-			else
-			{
-				/* Bring the system up to now */
-				stream_update(info->discrete_stream);
-
-				context->data = new_data;
-
-				/* Update the node output here so we don't have to do it each step */
-				node->output[0] = new_data * context->gain + context->offset;
-			}
-		}
-	}
-	else
-	{
-		discrete_log(info, "discrete_sound_w write to non-existent NODE_%02d\n", offset-NODE_00);
-	}
+	discrete_device *disc_device = downcast<discrete_device *>(device);
+	disc_device->write(*disc_device->machine->firstcpu->space(), offset, data, 0xff);
 }
 
 /************************************************************************
@@ -172,9 +112,9 @@ DISCRETE_RESET(dss_adjustment)
 
 	double min, max;
 
-	context->port = node->info->device->machine->m_portlist.find((const char *)node->custom);
+	context->port = node->info->device->machine->m_portlist.find((const char *)node->custom_data());
 	if (context->port == NULL)
-		fatalerror("DISCRETE_ADJUSTMENT - NODE_%d has invalid tag", NODE_BLOCKINDEX(node));
+		fatalerror("DISCRETE_ADJUSTMENT - NODE_%d has invalid tag", node->index());
 
 	context->lastpval = 0x7fffffff;
 	context->pmin     = DSS_ADJUSTMENT__PMIN;
@@ -302,7 +242,7 @@ DISCRETE_START(dss_input_stream)
 {
 	DISCRETE_DECLARE_CONTEXT(dss_input)
 
-	assert(DSS_INPUT_STREAM__STREAM < linked_list_count(node->info->input_list));
+	//assert(DSS_INPUT_STREAM__STREAM < node->info->input_list.count());
 
 	context->is_stream = TRUE;
 	/* Stream out number is set during start */
@@ -312,7 +252,7 @@ DISCRETE_START(dss_input_stream)
 	context->ptr = NULL;
 	//context->data = 0;
 
-	if (node->block->type == DSS_INPUT_BUFFER)
+	if (node->block_type() == DSS_INPUT_BUFFER)
 	{
 		context->is_buffered = TRUE;
 		context->buffer_stream = stream_create(node->info->device, 0, 1, node->info->sample_rate, (void *) node, buffer_stream_update);

@@ -32,7 +32,7 @@
 #include "cpu/i86/i86.h"
 #include "formats/basicdsk.h"
 #include "devices/flopdrv.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 #include "machine/z80pio.h"
 #include "machine/z80ctc.h"
 #include "machine/z80dart.h"
@@ -140,7 +140,7 @@ static TIMER_DEVICE_CALLBACK( xerox820_keyboard_tick )
 void xerox820_state::bankswitch(int bank)
 {
 	address_space *program = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);
-	UINT8 *ram = messram_get_ptr(m_ram);
+	UINT8 *ram = ram_get_ptr(m_ram);
 
 	if (bank)
 	{
@@ -160,7 +160,7 @@ void xerox820_state::bankswitch(int bank)
 void xerox820ii_state::bankswitch(int bank)
 {
 	address_space *program = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);
-	UINT8 *ram = messram_get_ptr(m_ram);
+	UINT8 *ram = ram_get_ptr(m_ram);
 
 	if (bank)
 	{
@@ -834,7 +834,7 @@ static MACHINE_CONFIG_START( xerox820, xerox820_state )
 	MCFG_COM8116_ADD(COM8116_TAG, XTAL_5_0688MHz, com8116_intf)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
 MACHINE_CONFIG_END
 
@@ -868,7 +868,7 @@ static MACHINE_CONFIG_START( xerox820ii, xerox820ii_state )
 	MCFG_COM8116_ADD(COM8116_TAG, XTAL_5_0688MHz, com8116_intf)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
 MACHINE_CONFIG_END
 
@@ -877,7 +877,7 @@ static MACHINE_CONFIG_DERIVED( xerox168, xerox820ii )
     MCFG_CPU_PROGRAM_MAP(xerox168_mem)
 
 	/* internal ram */
-	MCFG_RAM_MODIFY("messram")
+	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("192K")
 	MCFG_RAM_EXTRA_OPTIONS("320K")
 MACHINE_CONFIG_END

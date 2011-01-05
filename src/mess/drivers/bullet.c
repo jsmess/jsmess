@@ -61,7 +61,7 @@ Notes:
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "devices/flopdrv.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 #include "machine/ctronics.h"
 #include "machine/terminal.h"
 #include "machine/wd17xx.h"
@@ -513,7 +513,7 @@ READ8_MEMBER( bullet_state::dma_mreq_r )
 		offset |= 0x10000;
 	}
 
-	UINT8 *ram = messram_get_ptr(m_ram);
+	UINT8 *ram = ram_get_ptr(m_ram);
 	UINT8 data = ram[offset];
 
 	switch (m_exdma >> 3)
@@ -534,7 +534,7 @@ WRITE8_MEMBER( bullet_state::dma_mreq_w )
 		offset |= 0x10000;
 	}
 
-	UINT8 *ram = messram_get_ptr(m_ram);
+	UINT8 *ram = ram_get_ptr(m_ram);
 	ram[offset] = data;
 
 	switch (m_exdma >> 3)
@@ -678,7 +678,7 @@ static const z80_daisy_config daisy_chain[] =
 void bullet_state::machine_start()
 {
 	// setup memory banking
-	UINT8 *ram = messram_get_ptr(m_ram);
+	UINT8 *ram = ram_get_ptr(m_ram);
 
 	memory_configure_bank(machine, "bank1", 0, 2, ram, 0x10000);
 	memory_configure_bank(machine, "bank1", 2, 1, machine->region(Z80_TAG)->base(), 0);
@@ -748,7 +748,7 @@ static MACHINE_CONFIG_START( bullet, bullet_state )
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
 	
 	// internal ram
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("128K")
 MACHINE_CONFIG_END
 

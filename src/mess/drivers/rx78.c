@@ -46,7 +46,7 @@
 #include "devices/cartslot.h"
 #include "devices/cassette.h"
 #include "sound/wave.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 
 
 class rx78_state : public driver_device
@@ -479,7 +479,7 @@ static MACHINE_CONFIG_START( rx78, rx78_state )
 	MCFG_CARTSLOT_LOAD(rx78_cart)
 	MCFG_CARTSLOT_INTERFACE("rx78_cart")
 
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("32k")
 	MCFG_RAM_EXTRA_OPTIONS("16k")
 
@@ -510,7 +510,7 @@ ROM_END
 
 static DRIVER_INIT( rx78 )
 {
-	UINT32 ram_size = messram_get_size(machine->device("messram"));
+	UINT32 ram_size = ram_get_size(machine->device(RAM_TAG));
 	address_space *prg = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	if(ram_size == 0x4000)

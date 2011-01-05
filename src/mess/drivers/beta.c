@@ -20,7 +20,7 @@
 #include "devices/cartslot.h"
 #include "machine/6532riot.h"
 #include "sound/speaker.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 #include "beta.lh"
 
 /* Memory Maps */
@@ -282,7 +282,7 @@ static MACHINE_CONFIG_START( beta, beta_state )
 	MCFG_CARTSLOT_UNLOAD(beta_eprom)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("256")
 MACHINE_CONFIG_END
 

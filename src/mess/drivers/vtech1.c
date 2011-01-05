@@ -123,7 +123,7 @@ Notes:
 #include "devices/snapquik.h"
 #include "devices/cassette.h"
 #include "devices/z80bin.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 #include "formats/vt_cas.h"
 
 
@@ -696,8 +696,8 @@ static DRIVER_INIT( vtech1 )
 	vtech1->printer = machine->device("printer");
 
 	/* ram */
-	vtech1->ram = messram_get_ptr(machine->device("messram"));
-	vtech1->ram_size = messram_get_size(machine->device("messram"));
+	vtech1->ram = ram_get_ptr(machine->device(RAM_TAG));
+	vtech1->ram_size = ram_get_size(machine->device(RAM_TAG));
 
 	/* setup memory banking */
 	memory_set_bankptr(machine, "bank1", vtech1->ram);
@@ -1047,7 +1047,7 @@ static MACHINE_CONFIG_START( laser110, vtech1_state )
 	MCFG_CARTSLOT_EXTENSION_LIST("rom")
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("66K")
 	MCFG_RAM_EXTRA_OPTIONS("2K,18K,4098K")
 
@@ -1065,7 +1065,7 @@ static MACHINE_CONFIG_DERIVED( laser210, laser200 )
     MCFG_CPU_PROGRAM_MAP(laser210_mem)
 
 	/* internal ram */
-	MCFG_RAM_MODIFY("messram")
+	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("66K")
 	MCFG_RAM_EXTRA_OPTIONS("6K,22K,4098K")
 MACHINE_CONFIG_END
@@ -1075,7 +1075,7 @@ static MACHINE_CONFIG_DERIVED( laser310, laser200 )
     MCFG_CPU_PROGRAM_MAP(laser310_mem)
 
 	/* internal ram */
-	MCFG_RAM_MODIFY("messram")
+	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("66K")
 	MCFG_RAM_EXTRA_OPTIONS("16K,32K,4098K")
 MACHINE_CONFIG_END

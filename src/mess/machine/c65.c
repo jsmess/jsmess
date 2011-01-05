@@ -14,7 +14,7 @@
 #include "sound/sid6581.h"
 #include "machine/6526cia.h"
 #include "machine/cbmiec.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 #include "video/vic4567.h"
 
 #define VERBOSE_LEVEL 0
@@ -646,7 +646,7 @@ static READ8_HANDLER( c65_ram_expansion_r )
 {
 	c65_state *state = space->machine->driver_data<c65_state>();
 	UINT8 data = 0xff;
-	if (messram_get_size(space->machine->device("messram")) > (128 * 1024))
+	if (ram_get_size(space->machine->device(RAM_TAG)) > (128 * 1024))
 		data = state->expansion_ram.reg;
 	return data;
 }
@@ -657,16 +657,16 @@ static WRITE8_HANDLER( c65_ram_expansion_w )
 	offs_t expansion_ram_begin;
 	offs_t expansion_ram_end;
 
-	if (messram_get_size(space->machine->device("messram")) > (128 * 1024))
+	if (ram_get_size(space->machine->device(RAM_TAG)) > (128 * 1024))
 	{
 		state->expansion_ram.reg = data;
 
 		expansion_ram_begin = 0x80000;
-		expansion_ram_end = 0x80000 + (messram_get_size(space->machine->device("messram")) - 128*1024) - 1;
+		expansion_ram_end = 0x80000 + (ram_get_size(space->machine->device(RAM_TAG)) - 128*1024) - 1;
 
 		if (data == 0x00) {
 			memory_install_readwrite_bank(space, expansion_ram_begin, expansion_ram_end,0,0,"bank16");
-			memory_set_bankptr(space->machine, "bank16", messram_get_ptr(space->machine->device("messram")) + 128*1024);
+			memory_set_bankptr(space->machine, "bank16", ram_get_ptr(space->machine->device(RAM_TAG)) + 128*1024);
 		} else {
 			memory_nop_readwrite(space, expansion_ram_begin, expansion_ram_end,0,0);
 		}
@@ -1040,7 +1040,7 @@ MACHINE_START( c65 )
 {
 	c65_state *state = machine->driver_data<c65_state>();
 	/* clear upper memory */
-	memset(messram_get_ptr(machine->device("messram")) + 128*1024, 0xff, messram_get_size(machine->device("messram")) -  128*1024);
+	memset(ram_get_ptr(machine->device(RAM_TAG)) + 128*1024, 0xff, ram_get_size(machine->device(RAM_TAG)) -  128*1024);
 
 //removed   cbm_drive_0_config (SERIAL, 10);
 //removed   cbm_drive_1_config (SERIAL, 11);

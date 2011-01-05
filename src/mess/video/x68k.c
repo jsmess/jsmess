@@ -28,7 +28,7 @@
 #include "emu.h"
 #include "includes/x68k.h"
 #include "machine/68901mfp.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 
 
 
@@ -1259,7 +1259,7 @@ VIDEO_UPDATE( x68000 )
 //  popmessage("Graphic layer scroll - %i, %i - %i, %i - %i, %i - %i, %i",
 //      state->crtc.reg[12],state->crtc.reg[13],state->crtc.reg[14],state->crtc.reg[15],state->crtc.reg[16],state->crtc.reg[17],state->crtc.reg[18],state->crtc.reg[19]);
 //  popmessage("IOC IRQ status - %02x",state->ioc.irqstatus);
-//  popmessage("RAM: mouse data - %02x %02x %02x %02x",messram_get_ptr(machine->device("messram"))[0x931],messram_get_ptr(machine->device("messram"))[0x930],messram_get_ptr(machine->device("messram"))[0x933],messram_get_ptr(machine->device("messram"))[0x932]);
+//  popmessage("RAM: mouse data - %02x %02x %02x %02x",ram_get_ptr(machine->device(RAM_TAG))[0x931],ram_get_ptr(machine->device(RAM_TAG))[0x930],ram_get_ptr(machine->device(RAM_TAG))[0x933],ram_get_ptr(machine->device(RAM_TAG))[0x932]);
 #endif
 	return 0;
 }

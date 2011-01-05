@@ -14,7 +14,7 @@
 #include "machine/6821pia.h"
 #include "machine/z80dart.h"
 #include "machine/pit8253.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 
 
 #define MAIN_CLOCK	23961600
@@ -27,7 +27,7 @@ public:
 		: driver_device(machine, config),
 			maincpu( *this, "maincpu" ),
 			mb8877( *this, "mb8877" ),
-			messram( *this, "messram" ),
+			messram( *this, RAM_TAG ),
 			pia_0( *this, "pia_0" ),
 			pia_1( *this, "pia_1" ),
 			sio( *this, "sio" ),
@@ -65,9 +65,9 @@ public:
 
 	void set_banks(running_machine *machine)
 	{
-		UINT8 *messram_ptr = messram_get_ptr( messram );
+		UINT8 *ram_ptr = ram_get_ptr( messram );
 
-		ram_0000 = messram_ptr;
+		ram_0000 = ram_ptr;
 
 		if ( pia0_porta & 0x01 )
 			ram_0000 += 0x10000;
@@ -82,7 +82,7 @@ public:
 		{
 			memory_set_bankptr( machine, "0000", machine->region("maincpu")->base());
 			/* When BIOS is enabled 2000-3FFF is set to the "ROM RAM" */
-			memory_set_bankptr( machine, "2000", messram_ptr + 0x20000 );
+			memory_set_bankptr( machine, "2000", ram_ptr + 0x20000 );
 		}
 
 		if ( pia0_porta & 0x40 )
@@ -654,7 +654,7 @@ static MACHINE_CONFIG_START( osbexec, osbexec_state )
 	MCFG_FLOPPY_2_DRIVES_ADD(osbexec_floppy_config)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("136K")	/* 128KB Main RAM + RAM in ROM bank (8) */
 MACHINE_CONFIG_END
 

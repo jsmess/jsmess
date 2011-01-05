@@ -19,7 +19,7 @@
 #include "formats/basicdsk.h"
 #include "formats/rk_cas.h"
 #include "includes/radio86.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 #include "includes/partner.h"
 
 /* Address maps */
@@ -224,7 +224,7 @@ static MACHINE_CONFIG_START( partner, partner_state )
 	MCFG_FLOPPY_2_DRIVES_ADD(partner_floppy_config)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
 	MCFG_RAM_DEFAULT_VALUE(0x00)
 MACHINE_CONFIG_END

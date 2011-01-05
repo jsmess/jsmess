@@ -70,7 +70,7 @@
 
 #include "debug/debugcpu.h"
 #include "debug/debugcon.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 
 
 // Ram banking handlers.
@@ -283,17 +283,17 @@ static void UpdateBanks(running_machine *machine, int first, int last)
 		//
 		// Map block, $00-$BF are ram, $FC-$FF are Boot ROM
 		//
-		if ((MapPage*4) < ((messram_get_size(machine->device("messram")) / 1024)-1))		// Block is ram
+		if ((MapPage*4) < ((ram_get_size(machine->device(RAM_TAG)) / 1024)-1))		// Block is ram
 		{
 			if (!is_last_page(Page))
 			{
-				readbank = &messram_get_ptr(machine->device("messram"))[MapPage*RamPageSize];
+				readbank = &ram_get_ptr(machine->device(RAM_TAG))[MapPage*RamPageSize];
 				if(state->LogDatWrites)
 					debug_console_printf(machine, "Mapping page %X, pageno=%X, mess_ram)[%X]\n",Page,MapPage,(MapPage*RamPageSize));
 			}
 			else
 			{
-				readbank = &messram_get_ptr(machine->device("messram"))[(MapPage*RamPageSize)-256];
+				readbank = &ram_get_ptr(machine->device(RAM_TAG))[(MapPage*RamPageSize)-256];
 				logerror("Error RAM in Last page !\n");
 			}
 			writebank=bank_info[Page].handler;
@@ -362,7 +362,7 @@ static void SetDefaultTask(running_machine *machine)
 
 	/* Map video ram to base of area it can use, that way we can take the literal RA */
 	/* from the 6845 without having to mask it ! */
-	videoram=&messram_get_ptr(machine->device("messram"))[TextVidBasePage*RamPageSize];
+	videoram=&ram_get_ptr(machine->device(RAM_TAG))[TextVidBasePage*RamPageSize];
 }
 
 // Return the value of a page register
@@ -1100,7 +1100,7 @@ static void dgnbeta_reset(running_machine &machine)
 	wd17xx_dden_w(fdc, CLEAR_LINE);
 	wd17xx_set_drive(fdc, 0);
 
-	state->videoram = messram_get_ptr(machine.device("messram"));		/* Point video ram at the start of physical ram */
+	state->videoram = ram_get_ptr(machine.device(RAM_TAG));		/* Point video ram at the start of physical ram */
 
     dgnbeta_video_reset(&machine);
     wd17xx_reset(fdc);

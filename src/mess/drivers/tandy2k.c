@@ -30,7 +30,7 @@
 #include "cpu/i86/i86.h"
 #include "cpu/mcs48/mcs48.h"
 #include "devices/flopdrv.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 #include "machine/ctronics.h"
 #include "machine/i8255a.h"
 #include "machine/msm8251.h"
@@ -842,8 +842,8 @@ void tandy2k_state::machine_start()
 {
 	/* memory banking */
 	address_space *program = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);
-	UINT8 *ram = messram_get_ptr(m_ram);
-	int ram_size = messram_get_size(m_ram);
+	UINT8 *ram = ram_get_ptr(m_ram);
+	int ram_size = ram_get_size(m_ram);
 
 	memory_install_ram(program, 0x00000, ram_size - 1, 0, 0, ram);
 
@@ -911,7 +911,7 @@ static MACHINE_CONFIG_START( tandy2k, tandy2k_state )
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("128K")
 	MCFG_RAM_EXTRA_OPTIONS("256K,384K,512K,640K,768K,896K")
 MACHINE_CONFIG_END

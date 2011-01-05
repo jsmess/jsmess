@@ -15,7 +15,7 @@
 
 #include "emu.h"
 #include "includes/spectrum.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 
 INLINE void spectrum_plot_pixel(bitmap_t *bitmap, int x, int y, UINT32 color)
 {
@@ -64,7 +64,7 @@ static void ts2068_hires_scanline(running_machine *machine,bitmap_t *bitmap, int
 	scrx=TS2068_LEFT_BORDER;
 	scry=((y&7) * 8) + ((y&0x38)>>3) + (y&0xC0);
 
-	scr=messram_get_ptr(machine->device("messram")) + y*32;
+	scr=ram_get_ptr(machine->device(RAM_TAG)) + y*32;
 	attr=scr + 0x2000;
 
 	for (x=0;x<32;x++)
@@ -108,7 +108,7 @@ static void ts2068_64col_scanline(running_machine *machine,bitmap_t *bitmap, int
 	scrx=TS2068_LEFT_BORDER;
 	scry=((y&7) * 8) + ((y&0x38)>>3) + (y&0xC0);
 
-	scr1=messram_get_ptr(machine->device("messram")) + y*32;
+	scr1=ram_get_ptr(machine->device(RAM_TAG)) + y*32;
 	scr2=scr1 + 0x2000;
 
 	for (x=0;x<32;x++)
@@ -144,8 +144,8 @@ static void ts2068_lores_scanline(running_machine *machine,bitmap_t *bitmap, int
 	scrx=TS2068_LEFT_BORDER;
 	scry=((y&7) * 8) + ((y&0x38)>>3) + (y&0xC0);
 
-	scr = messram_get_ptr(machine->device("messram")) + y*32 + screen*0x2000;
-	attr = messram_get_ptr(machine->device("messram")) + ((scry>>3)*32) + screen*0x2000 + 0x1800;
+	scr = ram_get_ptr(machine->device(RAM_TAG)) + y*32 + screen*0x2000;
+	attr = ram_get_ptr(machine->device(RAM_TAG)) + ((scry>>3)*32) + screen*0x2000 + 0x1800;
 
 	for (x=0;x<32;x++)
 	{

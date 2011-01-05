@@ -436,9 +436,9 @@ space. This mapper uses 32KB sized banks.
 ***************************************************************************/
 
 #include "emu.h"
+#include "machine/ram.h"
 #include "cpu/lr35902/lr35902.h"
 #include "devices/cartslot.h"
-#include "devices/messram.h"
 #include "rendlay.h"
 #include "audio/gb.h"
 #include "includes/gb.h"
@@ -640,7 +640,7 @@ static MACHINE_CONFIG_DERIVED( gbcolor, gb_common )
 	MCFG_PALETTE_INIT(gbc)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("48K") /* 2 pages of 8KB VRAM, 8 pages of 4KB RAM */
 
 	MCFG_CARTSLOT_ADD("cart")

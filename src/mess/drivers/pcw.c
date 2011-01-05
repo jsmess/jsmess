@@ -103,7 +103,7 @@
 #include "includes/pcw.h"
 // pcw/pcw16 beeper
 #include "sound/beep.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 
 #include "pcw.lh"
 
@@ -254,7 +254,7 @@ static void pcw_update_read_memory_block(running_machine *machine, int block, in
 		memory_install_read_bank(space,block * 0x04000 + 0x0000, block * 0x04000 + 0x3fff, 0, 0,block_name);
 //      LOG(("MEM: read block %i -> bank %i\n",block,bank));
 	}
-	memory_set_bankptr(machine, block_name, messram_get_ptr(machine->device("messram")) + ((bank * 0x4000) % messram_get_size(machine->device("messram"))));
+	memory_set_bankptr(machine, block_name, ram_get_ptr(machine->device(RAM_TAG)) + ((bank * 0x4000) % ram_get_size(machine->device(RAM_TAG))));
 }
 
 
@@ -264,7 +264,7 @@ static void pcw_update_write_memory_block(running_machine *machine, int block, i
 	char block_name[10];
 
 	sprintf(block_name,"bank%d",block+5);
-	memory_set_bankptr(machine, block_name, messram_get_ptr(machine->device("messram")) + ((bank * 0x4000) % messram_get_size(machine->device("messram"))));
+	memory_set_bankptr(machine, block_name, ram_get_ptr(machine->device(RAM_TAG)) + ((bank * 0x4000) % ram_get_size(machine->device(RAM_TAG))));
 //  LOG(("MEM: write block %i -> bank %i\n",block,bank));
 }
 
@@ -1089,9 +1089,9 @@ static MACHINE_RESET( pcw )
 	state->boot = 0;   // System starts up in bootstrap mode, disabled until it's possible to emulate it.
 
 	/* copy boot code into RAM - yes, it's skipping a step */
-	memset(messram_get_ptr(machine->device("messram")),0x00,messram_get_size(machine->device("messram")));
+	memset(ram_get_ptr(machine->device(RAM_TAG)),0x00,ram_get_size(machine->device(RAM_TAG)));
 	for(x=0;x<256;x++)
-		messram_get_ptr(machine->device("messram"))[x+2] = code[x+0x300];
+		ram_get_ptr(machine->device(RAM_TAG))[x+2] = code[x+0x300];
 
 	/* and hack our way past the MCU side of the boot process */
 	code[0x01] = 0x40;
@@ -1373,7 +1373,7 @@ static MACHINE_CONFIG_START( pcw, pcw_state )
 	MCFG_FLOPPY_2_DRIVES_ADD(pcw_floppy_config)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("256K")
 MACHINE_CONFIG_END
 
@@ -1398,7 +1398,7 @@ static MACHINE_CONFIG_DERIVED( pcw8512, pcw )
 	MCFG_DEFAULT_LAYOUT( layout_pcw )
 
 	/* internal ram */
-	MCFG_RAM_MODIFY("messram")
+	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("512K")
 MACHINE_CONFIG_END
 
@@ -1408,7 +1408,7 @@ static MACHINE_CONFIG_DERIVED( pcw9512, pcw )
 	MCFG_CPU_IO_MAP(pcw9512_io)
 
 	/* internal ram */
-	MCFG_RAM_MODIFY("messram")
+	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("512K")
 MACHINE_CONFIG_END
 

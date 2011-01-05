@@ -13,7 +13,7 @@
 #include "cpu/mcs51/mcs51.h"
 #include "devices/flopdrv.h"
 #include "devices/harddriv.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 #include "formats/flopimg.h"
 #include "formats/pc_dsk.h"
 #include "includes/rmnimbus.h"
@@ -330,7 +330,7 @@ static MACHINE_CONFIG_START( nimbus, rmnimbus_state )
     MCFG_HARDDISK_ADD(HARDDISK3_TAG)
     MCFG_SCSIBUS_ADD(SCSIBUS_TAG, scsibus_config)
 
-    MCFG_RAM_ADD("messram")
+    MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("1536K")
 	MCFG_RAM_EXTRA_OPTIONS("128K,256K,384K,512K,640K,1024K")
 

@@ -16,7 +16,7 @@
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "devices/flopdrv.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 
 #define AYWriteReg(chip,port,value) \
 	ay8910_address_w(ay8910, 0,port);  \
@@ -149,10 +149,10 @@ MACHINE_START( cgenie )
 		memset(gfx + i * 8, i, 8);
 
 	/* set up RAM */
-	memory_install_read_bank(space, 0x4000, 0x4000 + messram_get_size(machine->device("messram")) - 1, 0, 0, "bank1");
-	memory_install_write8_handler(space, 0x4000, 0x4000 + messram_get_size(machine->device("messram")) - 1, 0, 0, cgenie_videoram_w);
-	state->videoram = messram_get_ptr(machine->device("messram"));
-	memory_set_bankptr(machine, "bank1", messram_get_ptr(machine->device("messram")));
+	memory_install_read_bank(space, 0x4000, 0x4000 + ram_get_size(machine->device(RAM_TAG)) - 1, 0, 0, "bank1");
+	memory_install_write8_handler(space, 0x4000, 0x4000 + ram_get_size(machine->device(RAM_TAG)) - 1, 0, 0, cgenie_videoram_w);
+	state->videoram = ram_get_ptr(machine->device(RAM_TAG));
+	memory_set_bankptr(machine, "bank1", ram_get_ptr(machine->device(RAM_TAG)));
 	timer_pulse(machine,  ATTOTIME_IN_HZ(11025), NULL, 0, handle_cassette_input );
 }
 

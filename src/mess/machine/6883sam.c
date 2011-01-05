@@ -52,7 +52,7 @@
 **********************************************************************/
 
 #include "machine/6883sam.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 
 #define LOG_VIDEO_POSITION	0
 
@@ -223,7 +223,7 @@ const UINT8 *sam6883_videoram(device_t *device,int scanline)
 		logerror("sam_m6847_get_video_ram(): scanline=%d video_position=0x%04X\n", scanline, video_position);
 
 	/* return actual position */
-	ram_base = sam->intf->get_rambase ? sam->intf->get_rambase(device) : messram_get_ptr(device->machine->device("messram"));
+	ram_base = sam->intf->get_rambase ? sam->intf->get_rambase(device) : ram_get_ptr(device->machine->device(RAM_TAG));
 	return &ram_base[video_position];
 }
 

@@ -13,7 +13,7 @@
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 #include "machine/wd17xx.h"
 #include "devices/flopdrv.h"
 #include "unixpc.lh"
@@ -29,7 +29,7 @@ public:
 	unixpc_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config),
 		  m_maincpu(*this, "maincpu"),
-		  m_ram(*this, "messram"),
+		  m_ram(*this, RAM_TAG),
 		  m_wd2797(*this, "wd2797"),
 		  m_floppy(*this, FLOPPY_0)
 	{ }
@@ -63,7 +63,7 @@ public:
 WRITE16_MEMBER( unixpc_state::romlmap_w )
 {
 	if (BIT(data, 15))
-		memory_install_ram(&space, 0x000000, 0x3fffff, 0, 0, messram_get_ptr(m_ram));
+		memory_install_ram(&space, 0x000000, 0x3fffff, 0, 0, ram_get_ptr(m_ram));
 	else
 		memory_install_rom(&space, 0x000000, 0x3fffff, 0, 0, space.machine->region("bootrom")->base());
 }
@@ -215,7 +215,7 @@ static MACHINE_CONFIG_START( unixpc, unixpc_state )
 	MCFG_PALETTE_INIT(black_and_white)
 
 	// internal ram
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("1M")
 	MCFG_RAM_EXTRA_OPTIONS("2M")
 

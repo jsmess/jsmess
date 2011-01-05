@@ -38,7 +38,7 @@
 #include "devices/cassette.h"
 #include "sound/cdp1864.h"
 #include "machine/rescap.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 
 /* Read/Write Handlers */
 
@@ -317,7 +317,7 @@ static MACHINE_CONFIG_START( tmc2000e, tmc2000e_state )
 	MCFG_FLOPPY_2_DRIVES_ADD(tmc2000e_floppy_config)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("8K")
 	MCFG_RAM_EXTRA_OPTIONS("40K")
 MACHINE_CONFIG_END

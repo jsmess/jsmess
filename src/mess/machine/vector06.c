@@ -13,7 +13,7 @@
 #include "machine/wd17xx.h"
 #include "devices/cassette.h"
 #include "includes/vector06.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 
 
 
@@ -161,7 +161,7 @@ static TIMER_CALLBACK(reset_check_callback)
 		machine->device("maincpu")->reset();
 	}
 	if ((val & 2)==2) {
-		memory_set_bankptr(machine, "bank1", messram_get_ptr(machine->device("messram")) + 0x0000);
+		memory_set_bankptr(machine, "bank1", ram_get_ptr(machine->device(RAM_TAG)) + 0x0000);
 		machine->device("maincpu")->reset();
 	}
 }
@@ -190,9 +190,9 @@ MACHINE_RESET( vector06 )
 	memory_install_write_bank(space, 0x8000, 0xffff, 0, 0, "bank4");
 
 	memory_set_bankptr(machine, "bank1", machine->region("maincpu")->base() + 0x10000);
-	memory_set_bankptr(machine, "bank2", messram_get_ptr(machine->device("messram")) + 0x0000);
-	memory_set_bankptr(machine, "bank3", messram_get_ptr(machine->device("messram")) + 0x8000);
-	memory_set_bankptr(machine, "bank4", messram_get_ptr(machine->device("messram")) + 0x8000);
+	memory_set_bankptr(machine, "bank2", ram_get_ptr(machine->device(RAM_TAG)) + 0x0000);
+	memory_set_bankptr(machine, "bank3", ram_get_ptr(machine->device(RAM_TAG)) + 0x8000);
+	memory_set_bankptr(machine, "bank4", ram_get_ptr(machine->device(RAM_TAG)) + 0x8000);
 
 	state->keyboard_mask = 0;
 	state->color_index = 0;

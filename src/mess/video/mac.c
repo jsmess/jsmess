@@ -15,7 +15,7 @@
 #include "emu.h"
 #include "sound/asc.h"
 #include "includes/mac.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 
 PALETTE_INIT( mac )
 {
@@ -43,8 +43,8 @@ VIDEO_UPDATE( mac )
 	int y, x, b;
 	mac_state *mac = screen->machine->driver_data<mac_state>();
 
-	video_base = messram_get_size(screen->machine->device("messram")) - (mac->screen_buffer ? MAC_MAIN_SCREEN_BUF_OFFSET : MAC_ALT_SCREEN_BUF_OFFSET);
-	video_ram = (const UINT16 *) (messram_get_ptr(screen->machine->device("messram")) + video_base);
+	video_base = ram_get_size(screen->machine->device(RAM_TAG)) - (mac->screen_buffer ? MAC_MAIN_SCREEN_BUF_OFFSET : MAC_ALT_SCREEN_BUF_OFFSET);
+	video_ram = (const UINT16 *) (ram_get_ptr(screen->machine->device(RAM_TAG)) + video_base);
 
 	for (y = 0; y < MAC_V_VIS; y++)
 	{
@@ -420,7 +420,7 @@ VIDEO_UPDATE( macrbv )
 	UINT32 *scanline;
 	int x, y, hres, vres;
 	mac_state *mac = screen->machine->driver_data<mac_state>();
-	UINT8 *vram8 = (UINT8 *)messram_get_ptr(screen->machine->device("messram")); 
+	UINT8 *vram8 = (UINT8 *)ram_get_ptr(screen->machine->device(RAM_TAG)); 
 
 	switch (mac->m_rbv_montype)
 	{

@@ -86,7 +86,7 @@
 
 #include "emu.h"
 #include "machine/pic8259.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 #include "includes/fmtowns.h"
 
 //#define CRTC_REG_DISP 1
@@ -149,7 +149,7 @@ READ8_HANDLER( towns_gfx_r )
 	UINT8 ret = 0;
 
 	if(state->towns_mainmem_enable != 0)
-		return messram_get_ptr(state->messram)[offset+0xc0000];
+		return ram_get_ptr(state->messram)[offset+0xc0000];
 
 	offset = offset << 2;
 
@@ -174,7 +174,7 @@ WRITE8_HANDLER( towns_gfx_w )
 
 	if(state->towns_mainmem_enable != 0)
 	{
-		messram_get_ptr(state->messram)[offset+0xc0000] = data;
+		ram_get_ptr(state->messram)[offset+0xc0000] = data;
 		return;
 	}
 	offset = offset << 2;
@@ -335,7 +335,7 @@ READ8_HANDLER( towns_video_cff80_mem_r )
 	towns_state* state = space->machine->driver_data<towns_state>();
 
 	if(state->towns_mainmem_enable != 0)
-		return messram_get_ptr(state->messram)[offset+0xcff80];
+		return ram_get_ptr(state->messram)[offset+0xcff80];
 
 	return towns_video_cff80_r(space,offset);
 }
@@ -346,7 +346,7 @@ WRITE8_HANDLER( towns_video_cff80_mem_w )
 
 	if(state->towns_mainmem_enable != 0)
 	{
-		messram_get_ptr(state->messram)[offset+0xcff80] = data;
+		ram_get_ptr(state->messram)[offset+0xcff80] = data;
 		return;
 	}
 	towns_video_cff80_w(space,offset,data);
@@ -609,7 +609,7 @@ WRITE8_HANDLER(towns_video_ff81_w)
 READ8_HANDLER(towns_spriteram_low_r)
 {
 	towns_state* state = space->machine->driver_data<towns_state>();
-	UINT8* RAM = messram_get_ptr(state->messram);
+	UINT8* RAM = ram_get_ptr(state->messram);
 	UINT8* ROM = space->machine->region("user")->base();
 
 	if(offset < 0x1000)
@@ -648,7 +648,7 @@ READ8_HANDLER(towns_spriteram_low_r)
 WRITE8_HANDLER(towns_spriteram_low_w)
 {
 	towns_state* state = space->machine->driver_data<towns_state>();
-	UINT8* RAM = messram_get_ptr(state->messram);
+	UINT8* RAM = ram_get_ptr(state->messram);
 
 	if(offset < 0x1000)
 	{  // 0xc8000-0xc8fff

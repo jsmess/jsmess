@@ -81,7 +81,7 @@
 #include "includes/portfoli.h"
 #include "cpu/i86/i86.h"
 #include "devices/cartslot.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 #include "devices/printer.h"
 #include "machine/ctronics.h"
 #include "machine/i8255a.h"
@@ -783,7 +783,7 @@ void portfolio_state::machine_start()
 	cpu_set_irq_callback(m_maincpu, portfolio_int_ack);
 
 	/* memory expansions */
-	switch (messram_get_size(machine->device("messram")))
+	switch (ram_get_size(machine->device(RAM_TAG)))
 	{
 	case 128 * 1024:
 		memory_unmap_readwrite(program, 0x1f000, 0x9efff, 0, 0);
@@ -901,7 +901,7 @@ static MACHINE_CONFIG_START( portfolio, portfolio_state )
 //	MCFG_SOFTWARE_LIST_ADD("cart_list", "pofo")
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("128K")
 	MCFG_RAM_EXTRA_OPTIONS("384K,640K")
 

@@ -29,7 +29,7 @@ Galaksija driver by Krzysztof Strzecha and Miodrag Milanovic
 #include "devices/cassette.h"
 #include "sound/ay8910.h"
 #include "formats/gtp_cas.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 
 static ADDRESS_MAP_START (galaxyp_io, ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_GLOBAL_MASK(0x01)
@@ -213,7 +213,7 @@ static MACHINE_CONFIG_START( galaxy, galaxy_state )
 	MCFG_CASSETTE_ADD( "cassette", galaxy_cassette_config )
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("6K")
 	MCFG_RAM_EXTRA_OPTIONS("2K,22K,38K,54K")
 MACHINE_CONFIG_END
@@ -252,7 +252,7 @@ static MACHINE_CONFIG_START( galaxyp, galaxy_state )
 	MCFG_CASSETTE_ADD( "cassette", galaxy_cassette_config )
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("38K")
 MACHINE_CONFIG_END
 

@@ -156,7 +156,7 @@ http://www.z88forever.org.uk/zxplus3e/
 /* +3 hardware */
 #include "machine/upd765.h"
 #include "devices/flopdrv.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 
 /****************************************************************************************************/
 /* Spectrum + 3 specific functions */
@@ -212,7 +212,7 @@ void spectrum_plus3_update_memory(running_machine *machine)
 {
 	spectrum_state *state = machine->driver_data<spectrum_state>();
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	UINT8 *messram = messram_get_ptr(machine->device("messram"));
+	UINT8 *messram = ram_get_ptr(machine->device(RAM_TAG));
 
 	if (state->port_7ffd_data & 8)
 	{
@@ -355,7 +355,7 @@ ADDRESS_MAP_END
 static MACHINE_RESET( spectrum_plus3 )
 {
 	spectrum_state *state = machine->driver_data<spectrum_state>();
-	UINT8 *messram = messram_get_ptr(machine->device("messram"));
+	UINT8 *messram = ram_get_ptr(machine->device(RAM_TAG));
 	memset(messram,0,128*1024);
 
 	MACHINE_RESET_CALL(spectrum);

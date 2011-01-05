@@ -22,7 +22,7 @@
 #include "formats/rk_cas.h"
 #include "formats/smx_dsk.h"
 #include "machine/wd17xx.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 
 /* Address maps */
 static ADDRESS_MAP_START(specialist_mem, ADDRESS_SPACE_PROGRAM, 8)
@@ -481,7 +481,7 @@ static MACHINE_CONFIG_DERIVED( specimx, special )
 	MCFG_FLOPPY_2_DRIVES_ADD(specimx_floppy_config)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("128K")
 	MCFG_RAM_DEFAULT_VALUE(0x00)
 MACHINE_CONFIG_END
@@ -522,7 +522,7 @@ static MACHINE_CONFIG_START( erik, special_state )
 	MCFG_FLOPPY_2_DRIVES_ADD(specimx_floppy_config)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("192K")
 	MCFG_RAM_DEFAULT_VALUE(0x00)
 MACHINE_CONFIG_END

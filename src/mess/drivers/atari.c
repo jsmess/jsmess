@@ -39,7 +39,7 @@
 #include "machine/6821pia.h"
 #include "video/gtia.h"
 #include "sound/dac.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 
 /******************************************************************************
     Atari 800 memory map (preliminary)
@@ -1061,7 +1061,7 @@ static MACHINE_CONFIG_START( atari_common_nodac, driver_device )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("40K")
 
 	MCFG_ATARI_FDC_ADD("fdc")
@@ -1155,7 +1155,7 @@ static MACHINE_CONFIG_DERIVED( a600xl, atari_common )
 	MCFG_FRAGMENT_ADD(a400_cartslot)
 
 	/* internal ram */
-	MCFG_RAM_MODIFY("messram")
+	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("16K")
 MACHINE_CONFIG_END
 
@@ -1241,7 +1241,7 @@ static MACHINE_CONFIG_DERIVED( a5200, atari_common_nodac )
 	MCFG_SOFTWARE_LIST_ADD("cart_list","a5200")
 
 	/* internal ram */
-	MCFG_RAM_MODIFY("messram")
+	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("16K")
 MACHINE_CONFIG_END
 

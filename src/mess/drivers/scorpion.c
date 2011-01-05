@@ -153,7 +153,7 @@ http://www.z88forever.org.uk/zxplus3e/
 #include "sound/speaker.h"
 #include "formats/tzx_cas.h"
 #include "machine/beta.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 
 /****************************************************************************************************/
 /* Zs Scorpion 256 */
@@ -186,7 +186,7 @@ D6-D7 - not used. ( yet ? )
 static void scorpion_update_memory(running_machine *machine)
 {
 	spectrum_state *state = machine->driver_data<spectrum_state>();
-	UINT8 *messram = messram_get_ptr(machine->device("messram"));
+	UINT8 *messram = ram_get_ptr(machine->device(RAM_TAG));
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	state->screen_location = messram + ((state->port_7ffd_data & 8) ? (7<<14) : (5<<14));
@@ -305,7 +305,7 @@ ADDRESS_MAP_END
 static MACHINE_RESET( scorpion )
 {
 	spectrum_state *state = machine->driver_data<spectrum_state>();
-	UINT8 *messram = messram_get_ptr(machine->device("messram"));
+	UINT8 *messram = ram_get_ptr(machine->device(RAM_TAG));
 	device_t *beta = machine->device(BETA_DISK_TAG);
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
@@ -399,7 +399,7 @@ static MACHINE_CONFIG_DERIVED( scorpion, spectrum_128 )
 	MCFG_BETA_DISK_ADD(BETA_DISK_TAG)
 
 	/* internal ram */
-	MCFG_RAM_MODIFY("messram")
+	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("256K")
 MACHINE_CONFIG_END
 

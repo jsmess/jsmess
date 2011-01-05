@@ -1,6 +1,8 @@
 #ifndef __BW2__
 #define __BW2__
 
+#include "machine/ram.h"
+
 #define SCREEN_TAG		"screen"
 #define Z80_TAG			"ic1"
 #define I8255A_TAG		"ic4"
@@ -34,7 +36,7 @@ public:
 		  m_fdc(*this, WD2797_TAG),
 		  m_lcdc(*this, MSM6255_TAG),
 		  m_centronics(*this, CENTRONICS_TAG),
-		  m_ram(*this, "messram"),
+		  m_ram(*this, RAM_TAG),
 		  m_floppy0(*this, FLOPPY_0),
 		  m_floppy1(*this, FLOPPY_1)
 	{ }

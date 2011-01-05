@@ -22,7 +22,7 @@
 #include "cpu/mcs48/mcs48.h"
 #include "cpu/m68000/m68000.h"
 #include "devices/flopdrv.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 #include "machine/ctronics.h"
 #include "machine/wd17xx.h"
 #include "machine/z80ctc.h"
@@ -160,10 +160,10 @@ static void bankswitch(running_machine *machine)
 	trs80m2_state *state = machine->driver_data<trs80m2_state>();
 
 	address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
-	device_t *messram = machine->device("messram");
+	device_t *messram = machine->device(RAM_TAG);
 	UINT8 *rom = machine->region(Z80_TAG)->base();
-	UINT8 *ram = messram_get_ptr(messram);
-	int last_page = (messram_get_size(messram) / 0x8000) - 1;
+	UINT8 *ram = ram_get_ptr(messram);
+	int last_page = (ram_get_size(messram) / 0x8000) - 1;
 
 	if (state->boot_rom)
 	{
@@ -1047,7 +1047,7 @@ static MACHINE_CONFIG_START( trs80m2, trs80m2_state )
 	MCFG_TIMER_ADD_PERIODIC("keyboard", trs80m2_keyboard_tick, HZ(60))
 
 	/* internal RAM */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("32K")
 	MCFG_RAM_EXTRA_OPTIONS("64K,96K,128K,160K,192K,224K,256K,288K,320K,352K,384K,416K,448K,480K,512K")
 MACHINE_CONFIG_END
@@ -1062,7 +1062,7 @@ static MACHINE_CONFIG_DERIVED( trs80m16, trs80m2 )
 	MCFG_PALETTE_INIT(monochrome_green)
 
 	/* internal RAM */
-	MCFG_RAM_MODIFY("messram")
+	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("256K")
 	MCFG_RAM_EXTRA_OPTIONS("512K,768K,1M")
 MACHINE_CONFIG_END

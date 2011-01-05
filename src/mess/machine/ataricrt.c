@@ -8,7 +8,7 @@
 #include "emuopts.h"
 #include "includes/atari.h"
 #include "ataridev.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 
 static int a800_cart_loaded = 0;
 static int a800_cart_is_16k = 0;
@@ -37,12 +37,12 @@ DRIVER_INIT( atari )
 	}
 
 	/* install RAM */
-	ram_top = MIN(messram_get_size(machine->device("messram")), ram_size) - 1;
+	ram_top = MIN(ram_get_size(machine->device(RAM_TAG)), ram_size) - 1;
 	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM),
 		0x0000, ram_top, 0, 0, SMH_BANK(2));
 	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM),
 		0x0000, ram_top, 0, 0, SMH_BANK(2));
-	memory_set_bankptr(machine, 2, messram_get_ptr(machine->device("messram")));
+	memory_set_bankptr(machine, 2, ram_get_ptr(machine->device(RAM_TAG)));
 }
 #endif
 
@@ -68,8 +68,8 @@ static void a800_setbank(running_machine *machine, int n)
 			}
 			else
 			{
-				read_addr = &messram_get_ptr(machine->device("messram"))[0x08000];
-				write_addr = &messram_get_ptr(machine->device("messram"))[0x08000];
+				read_addr = &ram_get_ptr(machine->device(RAM_TAG))[0x08000];
+				write_addr = &ram_get_ptr(machine->device(RAM_TAG))[0x08000];
 			}
 			break;
 	}
@@ -119,9 +119,9 @@ static void ms_atari_machine_start(running_machine *machine, int type, int has_c
 	}
 
 	/* install RAM */
-	ram_top = MIN(messram_get_size(machine->device("messram")), ram_size) - 1;
+	ram_top = MIN(ram_get_size(machine->device(RAM_TAG)), ram_size) - 1;
 	memory_install_readwrite_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM),0x0000, ram_top, 0, 0, "bank2");
-	memory_set_bankptr(machine, "bank2", messram_get_ptr(machine->device("messram")));
+	memory_set_bankptr(machine, "bank2", ram_get_ptr(machine->device(RAM_TAG)));
 
 	/* cartridge */
 	if (has_cart)

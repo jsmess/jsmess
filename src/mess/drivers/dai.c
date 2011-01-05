@@ -66,7 +66,7 @@ Timings:
 #include "machine/pit8253.h"
 #include "machine/tms5501.h"
 #include "devices/cassette.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 
 /* I/O ports */
 static ADDRESS_MAP_START( dai_io , ADDRESS_SPACE_IO, 8)
@@ -245,7 +245,7 @@ static MACHINE_CONFIG_START( dai, dai_state )
 	MCFG_TMS5501_ADD( "tms5501", dai_tms5501_interface )
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("48K")
 MACHINE_CONFIG_END
 

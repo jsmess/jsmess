@@ -66,7 +66,7 @@ bus serial (available in all modes), a Fast and a Burst serial bus
 #include "includes/c64.h"
 #include "includes/c65.h"
 #include "machine/cbmiec.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 
 /*************************************
  *
@@ -328,7 +328,7 @@ static MACHINE_CONFIG_START( c65, c65_state )
 	MCFG_FRAGMENT_ADD(c64_cartslot)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("128K")
 	MCFG_RAM_EXTRA_OPTIONS("640K,4224K")
 MACHINE_CONFIG_END

@@ -11,7 +11,7 @@
 #include "cpu/z80/z80.h"
 #include "devices/cassette.h"
 #include "includes/ondra.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 
 
 static device_t *cassette_device_image(running_machine *machine)
@@ -46,12 +46,12 @@ static void ondra_update_banks(running_machine *machine)
 		memory_set_bankptr(machine, "bank1", mem + 0x010000);
 	} else {
 		memory_install_write_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000, 0x3fff, 0, 0, "bank1");
-		memory_set_bankptr(machine, "bank1", messram_get_ptr(machine->device("messram")) + 0x0000);
+		memory_set_bankptr(machine, "bank1", ram_get_ptr(machine->device(RAM_TAG)) + 0x0000);
 	}
-	memory_set_bankptr(machine, "bank2", messram_get_ptr(machine->device("messram")) + 0x4000);
+	memory_set_bankptr(machine, "bank2", ram_get_ptr(machine->device(RAM_TAG)) + 0x4000);
 	if (state->bank2_status==0) {
 		memory_install_readwrite_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xe000, 0xffff, 0, 0, "bank3");
-		memory_set_bankptr(machine, "bank3", messram_get_ptr(machine->device("messram")) + 0xe000);
+		memory_set_bankptr(machine, "bank3", ram_get_ptr(machine->device(RAM_TAG)) + 0xe000);
 	} else {
 		memory_unmap_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xe000, 0xffff, 0, 0);
 		memory_install_read8_handler (cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xe000, 0xffff, 0, 0, ondra_keyboard_r);

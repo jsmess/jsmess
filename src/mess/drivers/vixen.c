@@ -59,7 +59,7 @@ Notes:
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "devices/flopdrv.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 #include "machine/i8155.h"
 #include "machine/ieee488.h"
 #include "machine/msm8251.h"
@@ -726,7 +726,7 @@ static const wd17xx_interface fdc_intf =
 void vixen_state::machine_start()
 {
 	// configure memory banking
-	UINT8 *ram = messram_get_ptr(m_ram);
+	UINT8 *ram = ram_get_ptr(m_ram);
 
 	memory_configure_bank(machine, "bank1", 0, 1, ram, 0);
 	memory_configure_bank(machine, "bank1", 1, 1, machine->region(Z8400A_TAG)->base(), 0);
@@ -810,7 +810,7 @@ static MACHINE_CONFIG_START( vixen, vixen_state )
 	MCFG_IEEE488_ADD(IEEE488_TAG, ieee488_daisy)
 	
 	// internal ram
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
 MACHINE_CONFIG_END
 

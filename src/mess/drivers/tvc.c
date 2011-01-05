@@ -9,7 +9,7 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "video/mc6845.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 
 
 class tvc_state : public driver_device
@@ -42,17 +42,17 @@ static void tvc_set_mem_page(running_machine *machine, UINT8 data)
 				break;
 		case 0x10 : // RAM selected
 				memory_install_readwrite_bank(space, 0x0000, 0x3fff, 0, 0, "bank1");
-				memory_set_bankptr(space->machine, "bank1", messram_get_ptr(machine->device("messram")));
+				memory_set_bankptr(space->machine, "bank1", ram_get_ptr(machine->device(RAM_TAG)));
 				break;
 	}
 	// Bank 2 is always RAM
-	memory_set_bankptr(space->machine, "bank2", messram_get_ptr(machine->device("messram")) + 0x4000);
+	memory_set_bankptr(space->machine, "bank2", ram_get_ptr(machine->device(RAM_TAG)) + 0x4000);
 	if ((data & 0x20)==0) {
 		// Video RAM
-		memory_set_bankptr(space->machine, "bank3", messram_get_ptr(machine->device("messram")) + 0x10000);
+		memory_set_bankptr(space->machine, "bank3", ram_get_ptr(machine->device(RAM_TAG)) + 0x10000);
 	} else {
 		// System RAM page 3
-		memory_set_bankptr(space->machine, "bank3", messram_get_ptr(machine->device("messram")) + 0x8000);
+		memory_set_bankptr(space->machine, "bank3", ram_get_ptr(machine->device(RAM_TAG)) + 0x8000);
 	}
 	switch(data & 0xc0) {
 		case 0x00 : // Cart ROM selected
@@ -67,7 +67,7 @@ static void tvc_set_mem_page(running_machine *machine, UINT8 data)
 				break;
 		case 0x80 : // RAM selected
 				memory_install_readwrite_bank(space, 0xc000, 0xffff, 0, 0, "bank4");
-				memory_set_bankptr(space->machine, "bank4", messram_get_ptr(machine->device("messram"))+0xc000);
+				memory_set_bankptr(space->machine, "bank4", ram_get_ptr(machine->device(RAM_TAG))+0xc000);
 				break;
 		case 0xc0 : // External ROM selected
 				memory_install_read_bank(space, 0xc000, 0xffff, 0, 0, "bank4");
@@ -265,7 +265,7 @@ static MACHINE_START(tvc)
 static MACHINE_RESET(tvc)
 {
 	tvc_state *state = machine->driver_data<tvc_state>();
-	memset(messram_get_ptr(machine->device("messram")),0,(64+14)*1024);
+	memset(ram_get_ptr(machine->device(RAM_TAG)),0,(64+14)*1024);
 	tvc_set_mem_page(machine, 0);
 	state->video_mode = 0;
 }
@@ -292,7 +292,7 @@ static MC6845_UPDATE_ROW( tvc_update_row )
 				for ( i = 0; i < x_count; i++ )
 				{
 					UINT16 offset = i  + (y * 64);
-					UINT8 data = messram_get_ptr(device->machine->device("messram"))[ offset + 0x10000];
+					UINT8 data = ram_get_ptr(device->machine->device(RAM_TAG))[ offset + 0x10000];
 					*p++ = state->col[(data >> 7)];
 					*p++ = state->col[(data >> 6)];
 					*p++ = state->col[(data >> 5)];
@@ -307,7 +307,7 @@ static MC6845_UPDATE_ROW( tvc_update_row )
 				for ( i = 0; i < x_count; i++ )
 				{
 					UINT16 offset = i  + (y * 64);
-					UINT8 data = messram_get_ptr(device->machine->device("messram"))[ offset + 0x10000];
+					UINT8 data = ram_get_ptr(device->machine->device(RAM_TAG))[ offset + 0x10000];
 					*p++ = state->col[BIT(data,7)*2 + BIT(data,3)];
 					*p++ = state->col[BIT(data,7)*2 + BIT(data,3)];
 					*p++ = state->col[BIT(data,6)*2 + BIT(data,2)];
@@ -322,7 +322,7 @@ static MC6845_UPDATE_ROW( tvc_update_row )
 				for ( i = 0; i < x_count; i++ )
 				{
 					UINT16 offset = i  + (y * 64);
-					UINT8 data = messram_get_ptr(device->machine->device("messram"))[ offset + 0x10000];
+					UINT8 data = ram_get_ptr(device->machine->device(RAM_TAG))[ offset + 0x10000];
 					*p++ = state->col[(data >> 4) & 0xf];
 					*p++ = state->col[(data >> 4) & 0xf];
 					*p++ = state->col[(data >> 4) & 0xf];
@@ -412,7 +412,7 @@ static MACHINE_CONFIG_START( tvc, tvc_state )
     MCFG_VIDEO_UPDATE(tvc)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("80K")
 MACHINE_CONFIG_END
 

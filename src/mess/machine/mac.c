@@ -94,7 +94,7 @@
 #include "sound/asc.h"
 #include "includes/mac.h"
 #include "debug/debugcpu.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 #include "debugger.h"
 
 #define ADB_IS_BITBANG	((mac->m_model == MODEL_MAC_SE || mac->m_model == MODEL_MAC_CLASSIC) || (mac->m_model >= MODEL_MAC_II && mac->m_model <= MODEL_MAC_IICI) || (mac->m_model == MODEL_MAC_SE30))
@@ -402,8 +402,8 @@ void mac_state::v8_resize()
 	else
 	{
 		/* RAM */
-		memory_size = messram_get_size(m_ram);
-		memory_data = messram_get_ptr(m_ram);
+		memory_size = ram_get_size(m_ram);
+		memory_data = ram_get_ptr(m_ram);
 		is_rom = FALSE;
 	}
 
@@ -480,8 +480,8 @@ void mac_state::set_memory_overlay(int overlay)
 		else
 		{
 			/* RAM */
-			memory_size = messram_get_size(m_ram);
-			memory_data = messram_get_ptr(m_ram);
+			memory_size = ram_get_size(m_ram);
+			memory_data = ram_get_ptr(m_ram);
 			is_rom = FALSE;
 		}
 
@@ -3108,7 +3108,7 @@ void mac_state::machine_reset()
 		mac_set_sound_buffer(machine->device("custom"), 1);
 
 		// classic will fail RAM test and try to boot appletalk if RAM is not all zero
-		memset(messram_get_ptr(m_ram), 0, messram_get_size(m_ram));
+		memset(ram_get_ptr(m_ram), 0, ram_get_size(m_ram));
 	}
 
 	m_scsi_interrupt = 0;
@@ -3208,7 +3208,7 @@ static void mac_driver_init(running_machine *machine, model_t model)
 	else if (model < MODEL_MAC_II)
 	{
 		/* set up RAM mirror at 0x600000-0x6fffff (0x7fffff ???) */
-		mac_install_memory(machine, 0x600000, 0x6fffff, messram_get_size(mac->m_ram), messram_get_ptr(mac->m_ram), FALSE, "bank2");
+		mac_install_memory(machine, 0x600000, 0x6fffff, ram_get_size(mac->m_ram), ram_get_ptr(mac->m_ram), FALSE, "bank2");
 
 		/* set up ROM at 0x400000-0x43ffff (-0x5fffff for mac 128k/512k/512ke) */
 		mac_install_memory(machine, 0x400000, (model >= MODEL_MAC_PLUS) ? 0x43ffff : 0x5fffff,
@@ -3218,7 +3218,7 @@ static void mac_driver_init(running_machine *machine, model_t model)
 	mac->m_overlay = -1;
 	mac->set_memory_overlay(1);
 
-	memset(messram_get_ptr(mac->m_ram), 0, messram_get_size(mac->m_ram));
+	memset(ram_get_ptr(mac->m_ram), 0, ram_get_size(mac->m_ram));
 
 	if ((model == MODEL_MAC_SE) || (model == MODEL_MAC_CLASSIC) || (model == MODEL_MAC_CLASSIC_II) || (model == MODEL_MAC_LC) ||
 	    (model == MODEL_MAC_LC_II) || (model == MODEL_MAC_LC_III) || (model == MODEL_MAC_LC_III_PLUS) || ((mac->m_model >= MODEL_MAC_II) && (mac->m_model <= MODEL_MAC_SE30)) ||

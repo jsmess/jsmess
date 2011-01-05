@@ -1,6 +1,8 @@
 #ifndef __TANDY2K__
 #define __TANDY2K__
 
+#include "machine/ram.h"
+
 #define SCREEN_TAG		"screen"
 #define I80186_TAG		"u76"
 #define I8048_TAG		"m1"
@@ -35,7 +37,7 @@ public:
 		  m_vac(*this, CRT9021B_TAG),
 		  m_centronics(*this, CENTRONICS_TAG),
 		  m_speaker(*this, SPEAKER_TAG),
-		  m_ram(*this, "messram"),
+		  m_ram(*this, RAM_TAG),
 		  m_floppy0(*this, FLOPPY_0),
 		  m_floppy1(*this, FLOPPY_1)
 	{ }

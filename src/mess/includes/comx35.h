@@ -6,6 +6,7 @@
 #include "machine/cdp1871.h"
 #include "devices/snapquik.h"
 #include "machine/wd17xx.h"
+#include "machine/ram.h"
 
 #define SCREEN_TAG			"screen"
 #define MC6845_SCREEN_TAG	"screen80"
@@ -49,7 +50,7 @@ public:
 		  m_fdc(*this, WD1770_TAG),
 		  m_kbe(*this, CDP1871_TAG),
 		  m_cassette(*this, CASSETTE_TAG),
-		  m_ram(*this, "messram")
+		  m_ram(*this, RAM_TAG)
 	{ }
 
 	required_device<cosmac_device> m_maincpu;

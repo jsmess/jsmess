@@ -22,7 +22,7 @@
 #include "video/dm9368.h"
 #include "machine/rescap.h"
 #include "elf2.lh"
-#include "devices/messram.h"
+#include "machine/ram.h"
 
 #define RUN(_machine)				BIT(input_port_read((_machine), "SPECIAL"), 0)
 #define LOAD(_machine)				BIT(input_port_read((_machine), "SPECIAL"), 1)
@@ -65,12 +65,12 @@ static WRITE8_HANDLER( memory_w )
 		if (MEMORY_PROTECT(space->machine))
 		{
 			/* latch data from memory */
-			data = messram_get_ptr(space->machine->device("messram"))[offset];
+			data = ram_get_ptr(space->machine->device(RAM_TAG))[offset];
 		}
 		else
 		{
 			/* write latched data to memory */
-			messram_get_ptr(space->machine->device("messram"))[offset] = data;
+			ram_get_ptr(space->machine->device(RAM_TAG))[offset] = data;
 		}
 
 		/* write data to 7 segment displays */
@@ -274,7 +274,7 @@ static MACHINE_START( elf2 )
 	/* setup memory banking */
 	memory_install_read_bank(program, 0x0000, 0x00ff, 0, 0, "bank1");
 	memory_install_write8_handler(program, 0x0000, 0x00ff, 0, 0, memory_w);
-	memory_configure_bank(machine, "bank1", 0, 1, messram_get_ptr(machine->device("messram")), 0);
+	memory_configure_bank(machine, "bank1", 0, 1, ram_get_ptr(machine->device(RAM_TAG)), 0);
 	memory_set_bank(machine, "bank1", 0);
 
 	/* register for state saving */
@@ -320,7 +320,7 @@ static MACHINE_CONFIG_START( elf2, elf2_state )
 	MCFG_QUICKLOAD_ADD("quickload", elf, "bin", 0)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("256")
 MACHINE_CONFIG_END
 
@@ -336,12 +336,12 @@ static QUICKLOAD_LOAD( elf )
 {
 	int size = image.length();
 
-	if (size > messram_get_size(image.device().machine->device("messram")))
+	if (size > ram_get_size(image.device().machine->device(RAM_TAG)))
 	{
 		return IMAGE_INIT_FAIL;
 	}
 
-	image.fread( messram_get_ptr(image.device().machine->device("messram")), size);
+	image.fread( ram_get_ptr(image.device().machine->device(RAM_TAG)), size);
 
 	return IMAGE_INIT_PASS;
 }

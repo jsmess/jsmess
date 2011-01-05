@@ -25,7 +25,7 @@
 #include "machine/8237dma.h"
 #include "video/i82720.h"
 #include "machine/upd765.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 
 #define MAIN_CLK	15974400
 
@@ -90,7 +90,7 @@ static void update_memory_mapping(running_machine *machine)
 	}
 	else
 	{
-		memory_set_bankptr(machine, "bank1", messram_get_ptr(machine->device("messram")) + drambank*64*1024);
+		memory_set_bankptr(machine, "bank1", ram_get_ptr(machine->device(RAM_TAG)) + drambank*64*1024);
 	}
 	if (state->memcmos)
 	{
@@ -98,7 +98,7 @@ static void update_memory_mapping(running_machine *machine)
 	}
 	else
 	{
-		memory_set_bankptr(machine, "bank2", messram_get_ptr(machine->device("messram")) + drambank*64*1024 + 32*1024);
+		memory_set_bankptr(machine, "bank2", ram_get_ptr(machine->device(RAM_TAG)) + drambank*64*1024 + 32*1024);
 	}
 }
 
@@ -535,7 +535,7 @@ static MACHINE_CONFIG_START( qx10, qx10_state )
 	MCFG_MC146818_ADD( "rtc", MC146818_STANDARD )
 	
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("256K")
 MACHINE_CONFIG_END
 

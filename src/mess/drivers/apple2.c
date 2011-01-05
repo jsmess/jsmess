@@ -197,7 +197,7 @@ Apple 3.5 and Apple 5.25 drives - up to three devices
 //#include "machine/a2z80.h"
 #include "sound/ay8910.h"
 #include "sound/speaker.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 #include "machine/a2cffa.h"
 #include "machine/idectrl.h"
 #include "devices/harddriv.h"
@@ -650,7 +650,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( apple2, apple2_common )
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
 	MCFG_RAM_EXTRA_OPTIONS("4K,8K,12K,16K,20K,24K,32K,36K,48K")
 	MCFG_RAM_DEFAULT_VALUE(0x00)
@@ -664,7 +664,7 @@ static MACHINE_CONFIG_DERIVED( apple2p, apple2_common )
 	MCFG_VIDEO_START(apple2p)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
 	MCFG_RAM_EXTRA_OPTIONS("16K,32K,48K")
 	MCFG_RAM_DEFAULT_VALUE(0x00)
@@ -686,7 +686,7 @@ ROM_END
 static MACHINE_CONFIG_DERIVED( apple2e, apple2_common )
 	MCFG_VIDEO_START(apple2e)
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("128K")
 	MCFG_RAM_EXTRA_OPTIONS("64K")
 	MCFG_RAM_DEFAULT_VALUE(0x00)
@@ -705,7 +705,7 @@ MACHINE_CONFIG_DERIVED( apple2e_z80, apple2_common )
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("128K")
 	MCFG_RAM_EXTRA_OPTIONS("64K")
 	MCFG_RAM_DEFAULT_VALUE(0x00)
@@ -714,7 +714,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( mprof3, apple2e )
 
 	/* internal ram */
-	MCFG_RAM_MODIFY("messram")
+	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("128K")
 MACHINE_CONFIG_END
 

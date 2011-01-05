@@ -19,7 +19,7 @@
 #include "formats/svi_cas.h"
 #include "sound/dac.h"
 #include "sound/ay8910.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 
 enum {
 	SVI_INTERNAL	= 0,
@@ -717,16 +717,16 @@ static void svi318_set_banks(running_machine *machine)
 		}
 		break;
 	case SVI_EXPRAM2:
-		if ( messram_get_size(machine->device("messram")) >= 64 * 1024 )
+		if ( ram_get_size(machine->device(RAM_TAG)) >= 64 * 1024 )
 		{
-			state->svi.bankLow_ptr = messram_get_ptr(machine->device("messram")) + messram_get_size(machine->device("messram")) - 64 * 1024;
+			state->svi.bankLow_ptr = ram_get_ptr(machine->device(RAM_TAG)) + ram_get_size(machine->device(RAM_TAG)) - 64 * 1024;
 			state->svi.bankLow_read_only = 0;
 		}
 		break;
 	case SVI_EXPRAM3:
-		if ( messram_get_size(machine->device("messram")) > 128 * 1024 )
+		if ( ram_get_size(machine->device(RAM_TAG)) > 128 * 1024 )
 		{
-			state->svi.bankLow_ptr = messram_get_ptr(machine->device("messram")) + messram_get_size(machine->device("messram")) - 128 * 1024;
+			state->svi.bankLow_ptr = ram_get_ptr(machine->device(RAM_TAG)) + ram_get_size(machine->device(RAM_TAG)) - 128 * 1024;
 			state->svi.bankLow_read_only = 0;
 		}
 		break;
@@ -738,34 +738,34 @@ static void svi318_set_banks(running_machine *machine)
 	switch( state->svi.bankHigh1 )
 	{
 	case SVI_INTERNAL:
-		if ( messram_get_size(machine->device("messram")) == 16 * 1024 )
+		if ( ram_get_size(machine->device(RAM_TAG)) == 16 * 1024 )
 		{
-			state->svi.bankHigh2_ptr = messram_get_ptr(machine->device("messram"));
+			state->svi.bankHigh2_ptr = ram_get_ptr(machine->device(RAM_TAG));
 			state->svi.bankHigh2_read_only = 0;
 		}
 		else
 		{
-			state->svi.bankHigh1_ptr = messram_get_ptr(machine->device("messram"));
+			state->svi.bankHigh1_ptr = ram_get_ptr(machine->device(RAM_TAG));
 			state->svi.bankHigh1_read_only = 0;
-			state->svi.bankHigh2_ptr = messram_get_ptr(machine->device("messram")) + 0x4000;
+			state->svi.bankHigh2_ptr = ram_get_ptr(machine->device(RAM_TAG)) + 0x4000;
 			state->svi.bankHigh2_read_only = 0;
 		}
 		break;
 	case SVI_EXPRAM2:
-		if ( messram_get_size(machine->device("messram")) > 64 * 1024 )
+		if ( ram_get_size(machine->device(RAM_TAG)) > 64 * 1024 )
 		{
-			state->svi.bankHigh1_ptr = messram_get_ptr(machine->device("messram")) + messram_get_size(machine->device("messram")) - 64 * 1024 + 32 * 1024;
+			state->svi.bankHigh1_ptr = ram_get_ptr(machine->device(RAM_TAG)) + ram_get_size(machine->device(RAM_TAG)) - 64 * 1024 + 32 * 1024;
 			state->svi.bankHigh1_read_only = 0;
-			state->svi.bankHigh2_ptr = messram_get_ptr(machine->device("messram")) + messram_get_size(machine->device("messram")) - 64 * 1024 + 48 * 1024;
+			state->svi.bankHigh2_ptr = ram_get_ptr(machine->device(RAM_TAG)) + ram_get_size(machine->device(RAM_TAG)) - 64 * 1024 + 48 * 1024;
 			state->svi.bankHigh2_read_only = 0;
 		}
 		break;
 	case SVI_EXPRAM3:
-		if ( messram_get_size(machine->device("messram")) > 128 * 1024 )
+		if ( ram_get_size(machine->device(RAM_TAG)) > 128 * 1024 )
 		{
-			state->svi.bankHigh1_ptr = messram_get_ptr(machine->device("messram")) + messram_get_size(machine->device("messram")) - 128 * 1024 + 32 * 1024;
+			state->svi.bankHigh1_ptr = ram_get_ptr(machine->device(RAM_TAG)) + ram_get_size(machine->device(RAM_TAG)) - 128 * 1024 + 32 * 1024;
 			state->svi.bankHigh1_read_only = 0;
-			state->svi.bankHigh2_ptr = messram_get_ptr(machine->device("messram")) + messram_get_size(machine->device("messram")) - 128 * 1024 + 48 * 1024;
+			state->svi.bankHigh2_ptr = ram_get_ptr(machine->device(RAM_TAG)) + ram_get_size(machine->device(RAM_TAG)) - 128 * 1024 + 48 * 1024;
 			state->svi.bankHigh2_read_only = 0;
 		}
 		break;

@@ -73,7 +73,7 @@ $F000-$FFFF:    ROM address space
 #include "includes/apple1.h"
 #include "devices/snapquik.h"
 #include "devices/cassette.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 
 /* port i/o functions */
 
@@ -259,7 +259,7 @@ static MACHINE_CONFIG_START( apple1, apple1_state )
        the RAM amounts listed here will be 4K below the actual RAM
        total. */
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("48K")
 	MCFG_RAM_EXTRA_OPTIONS("4K,8K,12K,16K,20K,24K,28K,32K,36K,40K,44K")
 

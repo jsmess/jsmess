@@ -11,7 +11,7 @@
 #include "cpu/z80/z80.h"
 #include "includes/galaxy.h"
 #include "devices/cassette.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 
 /***************************************************************************
   I/O devices
@@ -95,7 +95,7 @@ static void galaxy_setup_snapshot (running_machine *machine, const UINT8 * data,
 			cpu_set_reg(cpu, Z80_I,    data[0x40]);
 			cpu_set_reg(cpu, Z80_R,    (data[0x44] & 0x7f) | (data[0x48] & 0x80));
 
-			memcpy (messram_get_ptr(machine->device("messram")), data + 0x084c, (messram_get_size(machine->device("messram")) < 0x1800) ? messram_get_size(machine->device("messram")) : 0x1800);
+			memcpy (ram_get_ptr(machine->device(RAM_TAG)), data + 0x084c, (ram_get_size(machine->device(RAM_TAG)) < 0x1800) ? ram_get_size(machine->device(RAM_TAG)) : 0x1800);
 
 			break;
 		case GALAXY_SNAPSHOT_V2_SIZE:
@@ -122,7 +122,7 @@ static void galaxy_setup_snapshot (running_machine *machine, const UINT8 * data,
 			cpu_set_reg(cpu, Z80_I,    data[0x19]);
 			cpu_set_reg(cpu, Z80_R,    data[0x1a]);
 
-			memcpy (messram_get_ptr(machine->device("messram")), data + 0x0834, (messram_get_size(machine->device("messram")) < 0x1800) ? messram_get_size(machine->device("messram")) : 0x1800);
+			memcpy (ram_get_ptr(machine->device(RAM_TAG)), data + 0x0834, (ram_get_size(machine->device(RAM_TAG)) < 0x1800) ? ram_get_size(machine->device(RAM_TAG)) : 0x1800);
 
 			break;
 	}
@@ -160,12 +160,12 @@ SNAPSHOT_LOAD( galaxy )
 DRIVER_INIT( galaxy )
 {
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	memory_install_readwrite_bank( space, 0x2800, 0x2800 + messram_get_size(machine->device("messram")) - 1, 0, 0, "bank1");
-	memory_set_bankptr(machine, "bank1", messram_get_ptr(machine->device("messram")));
+	memory_install_readwrite_bank( space, 0x2800, 0x2800 + ram_get_size(machine->device(RAM_TAG)) - 1, 0, 0, "bank1");
+	memory_set_bankptr(machine, "bank1", ram_get_ptr(machine->device(RAM_TAG)));
 
-	if (messram_get_size(machine->device("messram")) < (6 + 48) * 1024)
+	if (ram_get_size(machine->device(RAM_TAG)) < (6 + 48) * 1024)
 	{
-		memory_nop_readwrite( space, 0x2800 + messram_get_size(machine->device("messram")), 0xffff, 0, 0);
+		memory_nop_readwrite( space, 0x2800 + ram_get_size(machine->device(RAM_TAG)), 0xffff, 0, 0);
 	}
 }
 

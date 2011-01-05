@@ -11,7 +11,7 @@
 #include "cpu/z80/z80.h"
 #include "sound/wave.h"
 #include "devices/cassette.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 #include "includes/ondra.h"
 
 /* Address maps */
@@ -150,7 +150,7 @@ static MACHINE_CONFIG_START( ondra, ondra_state )
 	MCFG_CASSETTE_ADD( "cassette", ondra_cassette_config )
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
 	MCFG_RAM_DEFAULT_VALUE(0x00)
 MACHINE_CONFIG_END

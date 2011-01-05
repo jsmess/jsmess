@@ -29,7 +29,7 @@
 #include "devices/cassette.h"
 #include "devices/flopdrv.h"
 #include "formats/basicdsk.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 
 static READ8_HANDLER(kc85_4_port_r)
 {
@@ -419,7 +419,7 @@ static MACHINE_CONFIG_START( kc85_3, kc_state )
 	MCFG_CASSETTE_ADD( "cassette", default_cassette_config )
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
 MACHINE_CONFIG_END
 

@@ -12,7 +12,7 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 
 
 class pce220_state : public driver_device
@@ -112,8 +112,8 @@ static WRITE8_HANDLER( ram_bank_w )
 	UINT8 bank = BIT(data,2);
 	memory_install_write_bank(space_prg, 0x0000, 0x3fff, 0, 0, "bank1");
 
-	memory_set_bankptr(space->machine, "bank1", messram_get_ptr(space->machine->device("messram"))+0x0000+bank*0x8000);
-	memory_set_bankptr(space->machine, "bank2", messram_get_ptr(space->machine->device("messram"))+0x4000+bank*0x8000);
+	memory_set_bankptr(space->machine, "bank1", ram_get_ptr(space->machine->device(RAM_TAG))+0x0000+bank*0x8000);
+	memory_set_bankptr(space->machine, "bank2", ram_get_ptr(space->machine->device(RAM_TAG))+0x4000+bank*0x8000);
 }
 
 static ADDRESS_MAP_START(pce220_mem, ADDRESS_SPACE_PROGRAM, 8)
@@ -248,7 +248,7 @@ static MACHINE_CONFIG_START( pce220, pce220_state )
     MCFG_VIDEO_UPDATE(pce220)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K") // 32K internal + 32K external card
 MACHINE_CONFIG_END
 

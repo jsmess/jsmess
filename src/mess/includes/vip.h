@@ -6,6 +6,7 @@
 #include "cpu/cosmac/cosmac.h"
 #include "audio/vp550.h"
 #include "audio/vp595.h"
+#include "machine/ram.h"
 
 #define SCREEN_TAG		"screen"
 #define CDP1802_TAG		"u1"
@@ -59,7 +60,7 @@ public:
 		  m_vp595(*this, VP595_TAG),
 		  m_vp550(*this, VP550_TAG),
 		  m_vp551(*this, VP551_TAG),
-		  m_ram(*this, "messram")
+		  m_ram(*this, RAM_TAG)
 	{ }
 
 	required_device<cosmac_device> m_maincpu;

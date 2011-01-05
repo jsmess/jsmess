@@ -2,6 +2,7 @@
 #define __KYOCERA__
 
 #include "video/hd61830.h"
+#include "machine/ram.h"
 
 #define SCREEN_TAG		"screen"
 #define I8085_TAG		"m19"
@@ -51,7 +52,7 @@ public:
 		  m_centronics(*this, CENTRONICS_TAG),
 		  m_speaker(*this, SPEAKER_TAG),
 		  m_cassette(*this, CASSETTE_TAG),
-		  m_ram(*this, "messram")
+		  m_ram(*this, RAM_TAG)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -145,7 +146,7 @@ public:
 		  m_centronics(*this, CENTRONICS_TAG),
 		  m_speaker(*this, SPEAKER_TAG),
 		  m_cassette(*this, CASSETTE_TAG),
-		  m_ram(*this, "messram")
+		  m_ram(*this, RAM_TAG)
 	{ }
 
 	required_device<cpu_device> m_maincpu;

@@ -11,6 +11,7 @@
 
 #include "machine/8530scc.h"
 #include "machine/6522via.h"
+#include "machine/ram.h"
 
 /* for Egret and CUDA streaming MCU commands, command types */
 typedef enum
@@ -182,7 +183,7 @@ public:
 		m_via1(*this, "via6522_0"),
 		m_via2(*this, "via6522_1"),
 		m_asc(*this, "asc"),
-		m_ram(*this, "messram")
+		m_ram(*this, RAM_TAG)
 	 { }
 
 	required_device<cpu_device> m_maincpu;

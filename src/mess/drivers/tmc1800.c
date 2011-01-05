@@ -120,7 +120,7 @@ Notes:
 #include "devices/snapquik.h"
 #include "machine/rescap.h"
 #include "sound/beep.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 
 #define TMC2000_BANK_RAM		0
 #define TMC2000_BANK_ROM		1
@@ -198,7 +198,7 @@ static WRITE8_DEVICE_HANDLER( tmc2000_bankswitch_w )
 
 	memory_set_bank(device->machine, "bank1", TMC2000_BANK_RAM);
 
-	switch (messram_get_size(device->machine->device("messram")))
+	switch (ram_get_size(device->machine->device(RAM_TAG)))
 	{
 	case 4 * 1024:
 		memory_install_readwrite_bank(cputag_get_address_space(device->machine, CDP1802_TAG, ADDRESS_SPACE_PROGRAM), 0x0000, 0x0fff, 0, 0x7000, "bank1");
@@ -787,7 +787,7 @@ static MACHINE_CONFIG_START( tmc1800, tmc1800_state )
 	MCFG_CASSETTE_ADD( "cassette", tmc1800_cassette_config )
 
 	// internal ram
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("2K")
 	MCFG_RAM_EXTRA_OPTIONS("4K")
 MACHINE_CONFIG_END
@@ -816,7 +816,7 @@ static MACHINE_CONFIG_START( osc1000b, osc1000b_state )
 	MCFG_CASSETTE_ADD( "cassette", tmc1800_cassette_config )
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("2K")
 	MCFG_RAM_EXTRA_OPTIONS("4K")
 MACHINE_CONFIG_END
@@ -839,7 +839,7 @@ static MACHINE_CONFIG_START( tmc2000, tmc2000_state )
 	MCFG_CASSETTE_ADD( "cassette", tmc1800_cassette_config )
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("4K")
 	MCFG_RAM_EXTRA_OPTIONS("16K,32K")
 MACHINE_CONFIG_END
@@ -862,7 +862,7 @@ static MACHINE_CONFIG_START( nano, nano_state )
 	MCFG_CASSETTE_ADD( "cassette", tmc1800_cassette_config )
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("4K")
 MACHINE_CONFIG_END
 
@@ -904,7 +904,7 @@ static QUICKLOAD_LOAD( tmc1800 )
 	UINT8 *ptr = image.device().machine->region(CDP1802_TAG)->base();
 	int size = image.length();
 
-	if (size > messram_get_size(image.device().machine->device("messram")))
+	if (size > ram_get_size(image.device().machine->device(RAM_TAG)))
 	{
 		return IMAGE_INIT_FAIL;
 	}

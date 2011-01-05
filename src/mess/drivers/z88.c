@@ -17,8 +17,8 @@
 #include "cpu/z80/z80.h"
 #include "includes/z88.h"
 #include "sound/speaker.h"
-#include "devices/messram.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
+#include "machine/ram.h"
 
 
 static void blink_reset(running_machine *machine)
@@ -252,7 +252,7 @@ static void z88_refresh_memory_bank(running_machine *machine, int bank)
 		}
 		else
 		{
-			read_addr = write_addr = messram_get_ptr(machine->device("messram")) + (block<<14);
+			read_addr = write_addr = ram_get_ptr(machine->device(RAM_TAG)) + (block<<14);
 		}
 	}
 	else
@@ -289,8 +289,8 @@ static void z88_refresh_memory_bank(running_machine *machine, int bank)
 		else
 		{
 			/* ram bank 20 */
-			read_addr = messram_get_ptr(machine->device("messram"));
-			write_addr = messram_get_ptr(machine->device("messram"));
+			read_addr = ram_get_ptr(machine->device(RAM_TAG));
+			write_addr = ram_get_ptr(machine->device(RAM_TAG));
 		}
 
 		z88_install_memory_handler_pair(machine, 0x0000, 0x2000, 9, read_addr, write_addr);
@@ -304,7 +304,7 @@ static MACHINE_START( z88 )
 
 static MACHINE_RESET( z88 )
 {
-	memset(messram_get_ptr(machine->device("messram")), 0x0ff, messram_get_size(machine->device("messram")));
+	memset(ram_get_ptr(machine->device(RAM_TAG)), 0x0ff, ram_get_size(machine->device(RAM_TAG)));
 
 	blink_reset(machine);
 
@@ -773,7 +773,7 @@ static MACHINE_CONFIG_START( z88, z88_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("2M")
 MACHINE_CONFIG_END
 

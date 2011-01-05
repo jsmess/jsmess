@@ -12,7 +12,7 @@
 
 /* Devices */
 #include "devices/cassette.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 
 #define KC_DEBUG 1
 #define LOG(x) do { if (KC_DEBUG) logerror x; } while (0)
@@ -111,7 +111,7 @@ QUICKLOAD_LOAD(kc)
 	addr = (header->load_address_l & 0x0ff) | ((header->load_address_h & 0x0ff)<<8);
 
 	for (i=0; i<datasize; i++)
-		messram_get_ptr(image.device().machine->device("messram"))[(addr+i) & 0x0ffff] = data[i+128];
+		ram_get_ptr(image.device().machine->device(RAM_TAG))[(addr+i) & 0x0ffff] = data[i+128];
 	return IMAGE_INIT_PASS;
 }
 
@@ -1101,7 +1101,7 @@ static void kc85_4_update_0x08000(running_machine *machine)
 		/* ram8 block chosen */
 		ram8_block = ((state->kc85_84_data)>>4) & 0x01;
 
-		mem_ptr = messram_get_ptr(machine->device("messram"))+0x08000+(ram8_block<<14);
+		mem_ptr = ram_get_ptr(machine->device(RAM_TAG))+0x08000+(ram8_block<<14);
 
 		memory_set_bankptr(machine, "bank3", mem_ptr);
 		memory_set_bankptr(machine, "bank4", mem_ptr+0x02800);
@@ -1167,7 +1167,7 @@ static void kc85_4_update_0x00000(running_machine *machine)
 
 		/* yes; set address of bank */
 		memory_install_read_bank(space, 0x0000, 0x3fff, 0, 0, "bank1");
-		memory_set_bankptr(machine, "bank1", messram_get_ptr(machine->device("messram")));
+		memory_set_bankptr(machine, "bank1", ram_get_ptr(machine->device(RAM_TAG)));
 
 		/* write protect ram? */
 		if ((state->kc85_pio_data[0] & (1<<3))==0)
@@ -1184,7 +1184,7 @@ static void kc85_4_update_0x00000(running_machine *machine)
 
 			/* ram is enabled and write enabled; and set address of bank */
 			memory_install_write_bank(space, 0x0000, 0x3fff, 0, 0, "bank7");
-			memory_set_bankptr(machine, "bank7", messram_get_ptr(machine->device("messram")));
+			memory_set_bankptr(machine, "bank7", ram_get_ptr(machine->device(RAM_TAG)));
 		}
 	}
 	else
@@ -1208,7 +1208,7 @@ static void kc85_4_update_0x04000(running_machine *machine)
 	{
 		UINT8 *mem_ptr;
 
-		mem_ptr = messram_get_ptr(machine->device("messram")) + 0x04000;
+		mem_ptr = ram_get_ptr(machine->device(RAM_TAG)) + 0x04000;
 
 		/* yes */
 		memory_install_read_bank(space, 0x4000, 0x7fff, 0, 0, "bank2");
@@ -1462,7 +1462,7 @@ static void kc85_3_update_0x00000(running_machine *machine)
 		/* yes */
 		memory_install_read_bank(space, 0x0000, 0x3fff, 0, 0, "bank1");
 		/* set address of bank */
-		memory_set_bankptr(machine, "bank1", messram_get_ptr(machine->device("messram")));
+		memory_set_bankptr(machine, "bank1", ram_get_ptr(machine->device(RAM_TAG)));
 
 		/* write protect ram? */
 		if ((state->kc85_pio_data[0] & (1<<3))==0)
@@ -1480,7 +1480,7 @@ static void kc85_3_update_0x00000(running_machine *machine)
 			/* ram is enabled and write enabled */
 			memory_install_write_bank(space, 0x0000, 0x3fff, 0, 0, "bank6");
 			/* set address of bank */
-			memory_set_bankptr(machine, "bank6", messram_get_ptr(machine->device("messram")));
+			memory_set_bankptr(machine, "bank6", ram_get_ptr(machine->device(RAM_TAG)));
 		}
 	}
 	else
@@ -1504,7 +1504,7 @@ static void kc85_3_update_0x08000(running_machine *machine)
     {
         /* IRM enabled */
         LOG(("IRM enabled\n"));
-		ram_page = messram_get_ptr(machine->device("messram"))+0x08000;
+		ram_page = ram_get_ptr(machine->device(RAM_TAG))+0x08000;
 
 		memory_set_bankptr(machine, "bank3", ram_page);
 		memory_set_bankptr(machine, "bank8", ram_page);
@@ -1515,7 +1515,7 @@ static void kc85_3_update_0x08000(running_machine *machine)
     {
 		/* RAM8 ACCESS */
 		LOG(("RAM8 enabled\n"));
-		ram_page = messram_get_ptr(machine->device("messram")) + 0x04000;
+		ram_page = ram_get_ptr(machine->device(RAM_TAG)) + 0x04000;
 
 		memory_set_bankptr(machine, "bank3", ram_page);
 		memory_install_read_bank(space, 0x8000, 0xbfff, 0, 0, "bank3");
@@ -1858,8 +1858,8 @@ MACHINE_RESET( kc85_3 )
 	state->kc85_pio_data[0] = 0x0f;
 	state->kc85_pio_data[1] = 0x0f1;
 
-	memory_set_bankptr(machine, "bank2",messram_get_ptr(machine->device("messram"))+0x0c000);
-	memory_set_bankptr(machine, "bank7",messram_get_ptr(machine->device("messram"))+0x0c000);
+	memory_set_bankptr(machine, "bank2",ram_get_ptr(machine->device(RAM_TAG))+0x0c000);
+	memory_set_bankptr(machine, "bank7",ram_get_ptr(machine->device(RAM_TAG))+0x0c000);
 
 	state->kc85_z80pio = machine->device("z80pio");
 

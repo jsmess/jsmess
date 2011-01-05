@@ -39,7 +39,7 @@
 #include "emu.h"
 #include "coco_vhd.h"
 #include "includes/coco.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 
 
 /***************************************************************************
@@ -164,11 +164,11 @@ static void coco_vhd_readwrite(device_t *device, UINT8 data)
 	switch(data)
 	{
 		case VHDCMD_READ: /* Read sector */
-			memset(&messram_get_ptr(device->machine->device("messram"))[phyOffset], 0, 256);
+			memset(&ram_get_ptr(device->machine->device(RAM_TAG))[phyOffset], 0, 256);
 			if (total_size > seek_position)
 			{
 				bytes_to_read = (UINT32) MIN((UINT64) 256, total_size - seek_position);
-				result = image->fread(&messram_get_ptr(device->machine->device("messram"))[phyOffset], bytes_to_read);
+				result = image->fread(&ram_get_ptr(device->machine->device(RAM_TAG))[phyOffset], bytes_to_read);
 				if (result != bytes_to_read)
 				{
 					vhd->status = VHDSTATUS_ACCESS_DENIED;
@@ -180,7 +180,7 @@ static void coco_vhd_readwrite(device_t *device, UINT8 data)
 			break;
 
 		case VHDCMD_WRITE: /* Write Sector */
-			result = image->fwrite(&(messram_get_ptr(device->machine->device("messram"))[phyOffset]), 256);
+			result = image->fwrite(&(ram_get_ptr(device->machine->device(RAM_TAG))[phyOffset]), 256);
 
 			if (result != 256)
 			{

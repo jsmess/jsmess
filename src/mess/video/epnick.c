@@ -14,7 +14,7 @@
  ****************************************************************************/
 
 #include "emu.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 #include "includes/enterp.h"
 
 /* given a colour index in range 0..255 gives the Red component */
@@ -1029,7 +1029,7 @@ VIDEO_START( epnick )
 	ep_state *state = machine->driver_data<ep_state>();
 	state->nick = auto_alloc_clear(machine, NICK_STATE);
 
-	state->nick->videoram = messram_get_ptr(machine->device("messram"));
+	state->nick->videoram = ram_get_ptr(machine->device(RAM_TAG));
 	Nick_Init(state->nick);
 	VIDEO_START_CALL(generic_bitmapped);
 }

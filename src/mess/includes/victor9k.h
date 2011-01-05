@@ -3,6 +3,8 @@
 #ifndef __VICTOR9K__
 #define __VICTOR9K__
 
+#include "machine/ram.h"
+
 #define SCREEN_TAG		"screen"
 #define I8088_TAG		"8l"
 #define I8048_TAG		"5d"
@@ -36,7 +38,7 @@ public:
 		  m_via1(*this, M6522_1_TAG),
 		  m_cvsd(*this, HC55516_TAG),
 		  m_crtc(*this, HD46505S_TAG),
-		  m_ram(*this, "messram"),
+		  m_ram(*this, RAM_TAG),
 		  m_floppy0(*this, FLOPPY_0),
 		  m_floppy1(*this, FLOPPY_1)
 	{ }

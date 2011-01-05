@@ -12,7 +12,7 @@
 #include "includes/pc1251.h"
 #include "includes/pc1350.h"
 #include "includes/pc1403.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 
 /* pc1430 no peek poke operations! */
 
@@ -859,7 +859,7 @@ static MACHINE_CONFIG_START( pc1350, pc1350_state )
 	MCFG_VIDEO_UPDATE( pc1350 )
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("4K")
 	MCFG_RAM_EXTRA_OPTIONS("12K,20K")
 MACHINE_CONFIG_END

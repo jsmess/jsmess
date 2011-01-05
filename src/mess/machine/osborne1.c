@@ -23,7 +23,7 @@ be written to RAM if RAM was switched in.
 #include "sound/beep.h"
 #include "includes/osborne1.h"
 #include "devices/flopdrv.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 
 #define RAMMODE		(0x01)
 
@@ -34,7 +34,7 @@ WRITE8_HANDLER( osborne1_0000_w )
 	/* Check whether regular RAM is enabled */
 	if ( ! state->bank2_enabled || ( state->in_irq_handler && state->bankswitch == RAMMODE ) )
 	{
-		messram_get_ptr(space->machine->device("messram"))[ offset ] = data;
+		ram_get_ptr(space->machine->device(RAM_TAG))[ offset ] = data;
 	}
 }
 
@@ -45,7 +45,7 @@ WRITE8_HANDLER( osborne1_1000_w )
 	/* Check whether regular RAM is enabled */
 	if ( ! state->bank2_enabled || ( state->in_irq_handler && state->bankswitch == RAMMODE ) )
 	{
-		messram_get_ptr(space->machine->device("messram"))[ 0x1000 + offset ] = data;
+		ram_get_ptr(space->machine->device(RAM_TAG))[ 0x1000 + offset ] = data;
 	}
 }
 
@@ -61,7 +61,7 @@ READ8_HANDLER( osborne1_2000_r )
 	/* Check whether regular RAM is enabled */
 	if ( ! state->bank2_enabled )
 	{
-		data = messram_get_ptr(space->machine->device("messram"))[ 0x2000 + offset ];
+		data = ram_get_ptr(space->machine->device(RAM_TAG))[ 0x2000 + offset ];
 	}
 	else
 	{
@@ -112,13 +112,13 @@ WRITE8_HANDLER( osborne1_2000_w )
 	/* Check whether regular RAM is enabled */
 	if ( ! state->bank2_enabled )
 	{
-		messram_get_ptr(space->machine->device("messram"))[ 0x2000 + offset ] = data;
+		ram_get_ptr(space->machine->device(RAM_TAG))[ 0x2000 + offset ] = data;
 	}
 	else
 	{
 		if ( state->in_irq_handler && state->bankswitch == RAMMODE )
 		{
-			messram_get_ptr(space->machine->device("messram"))[ 0x2000 + offset ] = data;
+			ram_get_ptr(space->machine->device(RAM_TAG))[ 0x2000 + offset ] = data;
 		}
 		/* Handle writes to the I/O area */
 		switch( offset & 0x0F00 )
@@ -145,7 +145,7 @@ WRITE8_HANDLER( osborne1_3000_w )
 	/* Check whether regular RAM is enabled */
 	if ( ! state->bank2_enabled || ( state->in_irq_handler && state->bankswitch == RAMMODE ) )
 	{
-		messram_get_ptr(space->machine->device("messram"))[ 0x3000 + offset ] = data;
+		ram_get_ptr(space->machine->device(RAM_TAG))[ 0x3000 + offset ] = data;
 	}
 }
 
@@ -192,11 +192,11 @@ WRITE8_HANDLER( osborne1_bankswitch_w )
 	}
 	else
 	{
-		memory_set_bankptr(space->machine,"bank1", messram_get_ptr(space->machine->device("messram")) );
-		memory_set_bankptr(space->machine,"bank2", messram_get_ptr(space->machine->device("messram")) + 0x1000 );
-		memory_set_bankptr(space->machine,"bank3", messram_get_ptr(space->machine->device("messram")) + 0x3000 );
+		memory_set_bankptr(space->machine,"bank1", ram_get_ptr(space->machine->device(RAM_TAG)) );
+		memory_set_bankptr(space->machine,"bank2", ram_get_ptr(space->machine->device(RAM_TAG)) + 0x1000 );
+		memory_set_bankptr(space->machine,"bank3", ram_get_ptr(space->machine->device(RAM_TAG)) + 0x3000 );
 	}
-	state->bank4_ptr = messram_get_ptr(space->machine->device("messram")) + ( ( state->bank3_enabled ) ? 0x10000 : 0xF000 );
+	state->bank4_ptr = ram_get_ptr(space->machine->device(RAM_TAG)) + ( ( state->bank3_enabled ) ? 0x10000 : 0xF000 );
 	memory_set_bankptr(space->machine,"bank4", state->bank4_ptr );
 	state->bankswitch = offset;
 	state->in_irq_handler = 0;
@@ -210,7 +210,7 @@ DIRECT_UPDATE_HANDLER( osborne1_opbase )
 	{
 		if ( ! state->bank2_enabled )
 		{
-			direct.explicit_configure(0x2000, 0x2fff, 0x0fff, messram_get_ptr(machine->device("messram")) + 0x2000);
+			direct.explicit_configure(0x2000, 0x2fff, 0x0fff, ram_get_ptr(machine->device(RAM_TAG)) + 0x2000);
 			return ~0;
 		}
 	}
@@ -363,9 +363,9 @@ static TIMER_CALLBACK(osborne1_video_callback)
 
 		for ( x = 0; x < 52; x++ )
 		{
-			UINT8	character = messram_get_ptr(machine->device("messram"))[ 0xF000 + ( ( address + x ) & 0xFFF ) ];
+			UINT8	character = ram_get_ptr(machine->device(RAM_TAG))[ 0xF000 + ( ( address + x ) & 0xFFF ) ];
 			UINT8	cursor = character & 0x80;
-			UINT8	dim = messram_get_ptr(machine->device("messram"))[ 0x10000 + ( ( address + x ) & 0xFFF ) ] & 0x80;
+			UINT8	dim = ram_get_ptr(machine->device(RAM_TAG))[ 0x10000 + ( ( address + x ) & 0xFFF ) ] & 0x80;
 			UINT8	bits = state->charrom[ state->charline * 128 + ( character & 0x7F ) ];
 			int		bit;
 
@@ -451,7 +451,7 @@ MACHINE_RESET( osborne1 )
 
 	state->charrom = machine->region( "gfx1" )->base();
 
-	memset( messram_get_ptr(machine->device("messram")) + 0x10000, 0xFF, 0x1000 );
+	memset( ram_get_ptr(machine->device(RAM_TAG)) + 0x10000, 0xFF, 0x1000 );
 
 	for(drive=0;drive<2;drive++)
 	{

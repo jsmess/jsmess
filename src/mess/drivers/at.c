@@ -55,7 +55,7 @@
 #include "sound/dac.h"
 #include "sound/speaker.h"
 #include "sound/saa1099.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 
 #include "memconv.h"
 
@@ -549,7 +549,7 @@ static MACHINE_CONFIG_START( ibm5170, at_state )
 	MCFG_FLOPPY_2_DRIVES_ADD(ibmat_floppy_config)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("1664K")
 MACHINE_CONFIG_END
 
@@ -622,7 +622,7 @@ static MACHINE_CONFIG_START( ibm5162, at_state )
 	MCFG_FLOPPY_2_DRIVES_ADD(ibmat_floppy_config)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("1664K")
 MACHINE_CONFIG_END
 
@@ -693,7 +693,7 @@ static MACHINE_CONFIG_START( ps2m30286, at_state )
 	MCFG_FLOPPY_2_DRIVES_ADD(ibmat_floppy_config)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("1664K")
 MACHINE_CONFIG_END
 
@@ -766,7 +766,7 @@ static MACHINE_CONFIG_START( atvga, at_state )
 	MCFG_FLOPPY_2_DRIVES_ADD(ibmat_floppy_config)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("1664K")
 MACHINE_CONFIG_END
 
@@ -841,7 +841,7 @@ static MACHINE_CONFIG_START( at386, at_state )
 	MCFG_FLOPPY_2_DRIVES_ADD(ibmat_floppy_config)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("1664K")
 MACHINE_CONFIG_END
 

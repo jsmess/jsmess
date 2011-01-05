@@ -19,7 +19,7 @@
 #include "machine/ctronics.h"
 #include "sound/speaker.h"
 #include "devices/cassette.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 
 #ifndef VERBOSE
 #define VERBOSE 1
@@ -182,7 +182,7 @@ READ8_HANDLER( mz800_bank_0_r )
 
 			/* ram from 0xa000 to 0xbfff */
 			memory_install_readwrite_bank(spc, 0xa000, 0xbfff, 0, 0, "bank5");
-			memory_set_bankptr(space->machine, "bank5", messram_get_ptr(space->machine->device("messram")) + 0xa000);
+			memory_set_bankptr(space->machine, "bank5", ram_get_ptr(space->machine->device(RAM_TAG)) + 0xa000);
 		}
 	}
 
@@ -194,7 +194,7 @@ WRITE8_HANDLER( mz700_bank_0_w )
 	address_space *spc = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	memory_install_readwrite_bank(spc, 0x0000, 0x0fff, 0, 0, "bank1");
-	memory_set_bankptr(space->machine, "bank1", messram_get_ptr(space->machine->device("messram")));
+	memory_set_bankptr(space->machine, "bank1", ram_get_ptr(space->machine->device(RAM_TAG)));
 }
 
 WRITE8_HANDLER( mz800_bank_0_w )
@@ -202,7 +202,7 @@ WRITE8_HANDLER( mz800_bank_0_w )
 	address_space *spc = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	memory_install_readwrite_bank(spc, 0x0000, 0x7fff, 0, 0, "bank1");
-	memory_set_bankptr(space->machine, "bank1", messram_get_ptr(space->machine->device("messram")));
+	memory_set_bankptr(space->machine, "bank1", ram_get_ptr(space->machine->device(RAM_TAG)));
 }
 
 READ8_HANDLER( mz800_bank_1_r )
@@ -212,19 +212,19 @@ READ8_HANDLER( mz800_bank_1_r )
 
 	/* switch in ram from 0x1000 to 0x1fff */
 	memory_install_readwrite_bank(spc, 0x1000, 0x1fff, 0, 0, "bank2");
-	memory_set_bankptr(space->machine, "bank2", messram_get_ptr(space->machine->device("messram")) + 0x1000);
+	memory_set_bankptr(space->machine, "bank2", ram_get_ptr(space->machine->device(RAM_TAG)) + 0x1000);
 
 	if (mz->mz700_mode)
 	{
 		/* ram from 0xc000 to 0xcfff */
 		memory_install_readwrite_bank(spc, 0xc000, 0xcfff, 0, 0, "bank6");
-		memory_set_bankptr(space->machine, "bank6", messram_get_ptr(space->machine->device("messram")) + 0xc000);
+		memory_set_bankptr(space->machine, "bank6", ram_get_ptr(space->machine->device(RAM_TAG)) + 0xc000);
 	}
 	else
 	{
 		/* ram from 0x8000 to 0xbfff */
 		memory_install_readwrite_bank(spc, 0x8000, 0xbfff, 0, 0, "bank4");
-		memory_set_bankptr(space->machine, "bank4", messram_get_ptr(space->machine->device("messram")) + 0x8000);
+		memory_set_bankptr(space->machine, "bank4", ram_get_ptr(space->machine->device(RAM_TAG)) + 0x8000);
 	}
 
 	return 0xff;
@@ -241,7 +241,7 @@ WRITE8_HANDLER( mz700_bank_1_w )
 		if (!mz->mz700_ram_lock)
 		{
 			memory_install_readwrite_bank(spc, 0xd000, 0xffff, 0, 0, "bank7");
-			memory_set_bankptr(space->machine, "bank7", messram_get_ptr(space->machine->device("messram")) + 0xd000);
+			memory_set_bankptr(space->machine, "bank7", ram_get_ptr(space->machine->device(RAM_TAG)) + 0xd000);
 			mz->mz700_ram_vram = FALSE;
 		}
 	}
@@ -251,7 +251,7 @@ WRITE8_HANDLER( mz700_bank_1_w )
 		if (!mz->mz800_ram_lock)
 		{
 			memory_install_readwrite_bank(spc, 0xe000, 0xffff, 0, 0, "bank8");
-			memory_set_bankptr(space->machine, "bank8", messram_get_ptr(space->machine->device("messram")) + 0xe000);
+			memory_set_bankptr(space->machine, "bank8", ram_get_ptr(space->machine->device(RAM_TAG)) + 0xe000);
 			mz->mz800_ram_monitor = FALSE;
 		}
 	}
@@ -330,7 +330,7 @@ WRITE8_HANDLER( mz700_bank_4_w )
 
 		/* rest is ram is always ram in mz700 mode */
 		memory_install_readwrite_bank(spc, 0x1000, 0xcfff, 0, 0, "bank2");
-		memory_set_bankptr(space->machine, "bank2", messram_get_ptr(space->machine->device("messram")) + 0x1000);
+		memory_set_bankptr(space->machine, "bank2", ram_get_ptr(space->machine->device(RAM_TAG)) + 0x1000);
 	}
 	else
 	{
@@ -341,7 +341,7 @@ WRITE8_HANDLER( mz700_bank_4_w )
 
 		/* ram from 0x2000 to 0x7fff */
 		memory_install_readwrite_bank(spc, 0x2000, 0x7fff, 0, 0, "bank3");
-		memory_set_bankptr(space->machine, "bank3", messram_get_ptr(space->machine->device("messram")));
+		memory_set_bankptr(space->machine, "bank3", ram_get_ptr(space->machine->device(RAM_TAG)));
 
 		if (mz->hires_mode)
 		{
@@ -357,12 +357,12 @@ WRITE8_HANDLER( mz700_bank_4_w )
 
 			/* ram from 0xa000 to 0xbfff */
 			memory_install_readwrite_bank(spc, 0xa000, 0xbfff, 0, 0, "bank5");
-			memory_set_bankptr(space->machine, "bank5", messram_get_ptr(space->machine->device("messram")) + 0xa000);
+			memory_set_bankptr(space->machine, "bank5", ram_get_ptr(space->machine->device(RAM_TAG)) + 0xa000);
 		}
 
 		/* ram from 0xc000 to 0xdfff */
 		memory_install_readwrite_bank(spc, 0xc000, 0xdfff, 0, 0, "bank6");
-		memory_set_bankptr(space->machine, "bank6", messram_get_ptr(space->machine->device("messram")) + 0xc000);
+		memory_set_bankptr(space->machine, "bank6", ram_get_ptr(space->machine->device(RAM_TAG)) + 0xc000);
 
 		/* mz800 monitor rom from 0xe000 to 0xffff */
 		memory_install_read_bank(spc, 0xe000, 0xffff, 0, 0, "bank8");

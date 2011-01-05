@@ -183,7 +183,7 @@ Notes:
 #include "cpu/z80/z80daisy.h"
 #include "devices/cassette.h"
 #include "devices/flopdrv.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 #include "devices/printer.h"
 #include "machine/abcbus.h"
 #include "machine/abc830.h"
@@ -676,7 +676,7 @@ static RS232_INTERFACE( rs232_intf )
 void abc80_state::machine_start()
 {
 	/* configure RAM expansion */
-	if (messram_get_size(m_ram) == 16 * 1024)
+	if (ram_get_size(m_ram) == 16 * 1024)
 	{
 		memory_unmap_readwrite(cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM), 0x8000, 0xbfff, 0, 0);
 	}
@@ -728,7 +728,7 @@ static MACHINE_CONFIG_START( abc80, abc80_state )
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, abc80_cassette_config)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("16K")
 	MCFG_RAM_EXTRA_OPTIONS("32K")
 MACHINE_CONFIG_END

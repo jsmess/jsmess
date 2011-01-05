@@ -17,7 +17,7 @@
 #include "devices/snapquik.h"
 #include "devices/cassette.h"
 #include "devices/flopdrv.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 
 #define NASCOM1_KEY_RESET	0x02
 #define NASCOM1_KEY_INCR	0x01
@@ -271,7 +271,7 @@ MACHINE_RESET( nascom1 )
 
 DRIVER_INIT( nascom1 )
 {
-	switch (messram_get_size(machine->device("messram")))
+	switch (ram_get_size(machine->device(RAM_TAG)))
 	{
 	case 1 * 1024:
 		memory_nop_readwrite(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM),
@@ -283,7 +283,7 @@ DRIVER_INIT( nascom1 )
 			0x1400, 0x4fff, 0, 0, "bank1");
 		memory_nop_readwrite(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM),
 			0x5000, 0xafff, 0, 0);
-		memory_set_bankptr(machine, "bank1", messram_get_ptr(machine->device("messram")));
+		memory_set_bankptr(machine, "bank1", ram_get_ptr(machine->device(RAM_TAG)));
 		break;
 
 	case 32 * 1024:
@@ -291,13 +291,13 @@ DRIVER_INIT( nascom1 )
 			0x1400, 0x8fff, 0, 0, "bank1");
 		memory_nop_readwrite(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM),
 			0x9000, 0xafff, 0, 0);
-		memory_set_bankptr(machine, "bank1", messram_get_ptr(machine->device("messram")));
+		memory_set_bankptr(machine, "bank1", ram_get_ptr(machine->device(RAM_TAG)));
 		break;
 
 	case 40 * 1024:
 		memory_install_readwrite_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM),
 			0x1400, 0xafff, 0, 0, "bank1");
-		memory_set_bankptr(machine, "bank1", messram_get_ptr(machine->device("messram")));
+		memory_set_bankptr(machine, "bank1", ram_get_ptr(machine->device(RAM_TAG)));
 		break;
 	}
 }

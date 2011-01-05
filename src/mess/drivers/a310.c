@@ -62,7 +62,7 @@
 #include "sound/dac.h"
 #include "includes/archimds.h"
 #include "machine/i2cmem.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 
 
 class a310_state : public driver_device
@@ -103,7 +103,7 @@ static WRITE32_HANDLER( a310_psy_wram_w )
 
 static DRIVER_INIT(a310)
 {
-	UINT32 ram_size = messram_get_size(machine->device("messram"));
+	UINT32 ram_size = ram_get_size(machine->device(RAM_TAG));
 
 	archimedes_memc_physmem = auto_alloc_array(machine, UINT32, 0x01000000);
 
@@ -281,7 +281,7 @@ static MACHINE_CONFIG_START( a310, a310_state )
 	MCFG_VIDEO_START(archimds_vidc)
 	MCFG_VIDEO_UPDATE(archimds_vidc)
 
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("2M")
 	MCFG_RAM_EXTRA_OPTIONS("512K, 1M, 4M, 8M, 16M")
 

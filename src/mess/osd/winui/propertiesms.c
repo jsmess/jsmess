@@ -15,6 +15,7 @@
 #include <tchar.h>
 
 #include "emu.h"
+#include "emuopts.h"
 #include "image.h"
 #include "screenshot.h"
 #include "datamap.h"
@@ -24,13 +25,12 @@
 #include "mui_util.h"
 #include "mui_opts.h"
 #include "resourcems.h"
-#include "mess.h"
 #include "propertiesms.h"
 #include "optionsms.h"
 #include "msuiutil.h"
 #include "strconv.h"
 #include "winutf8.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 
 static BOOL SoftwareDirectories_OnInsertBrowse(HWND hDlg, BOOL bBrowse, LPCTSTR lpItem);
 static BOOL SoftwareDirectories_OnDelete(HWND hDlg);
@@ -210,7 +210,7 @@ static BOOL SoftwareDirectories_OnEndLabelEdit(HWND hDlg, NMHDR* pNMHDR)
 
 BOOL PropSheetFilter_Config(const machine_config *drv, const game_driver *gamedrv)
 {
-	return (drv->m_devicelist.first(MESSRAM)!=NULL) || DriverHasDevice(gamedrv, IO_PRINTER);
+	return (drv->m_devicelist.first(RAM)!=NULL) || DriverHasDevice(gamedrv, IO_PRINTER);
 }
 
 
@@ -405,7 +405,7 @@ static BOOL RamPopulateControl(datamap *map, HWND dialog, HWND control, core_opt
 	machine_config cfg(*gamedrv);
 
 	// identify how many options that we have
-	device = cfg.m_devicelist.first(MESSRAM);
+	device = cfg.m_devicelist.first(RAM);
 
 	EnableWindow(control, (device != NULL));
 	i = 0;
@@ -416,15 +416,15 @@ static BOOL RamPopulateControl(datamap *map, HWND dialog, HWND control, core_opt
 
 		// identify the current amount of RAM
 		this_ram_string = options_get_string(opts, OPTION_RAMSIZE);
-		current_ram = (this_ram_string != NULL) ? messram_parse_string(this_ram_string) : 0;
+		current_ram = (this_ram_string != NULL) ? ram_parse_string(this_ram_string) : 0;
 		if (current_ram == 0)
-			current_ram = messram_parse_string(config->default_size);
+			current_ram = ram_parse_string(config->default_size);
 
 		// by default, assume index 0
 		current_index = 0;
 
 		{
-			ram = messram_parse_string(config->default_size);
+			ram = ram_parse_string(config->default_size);
 			t_ramstring = tstring_from_utf8(config->default_size);
 			if( !t_ramstring )
 				return FALSE;
@@ -450,7 +450,7 @@ static BOOL RamPopulateControl(datamap *map, HWND dialog, HWND control, core_opt
 			{
 				i++;
 				// identify this option
-				ram = messram_parse_string(p);
+				ram = ram_parse_string(p);
 
 				this_ram_string = p;
 

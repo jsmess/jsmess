@@ -178,7 +178,7 @@ I/O ports
 #include "machine/pit8253.h"
 #include "machine/msm8251.h"
 #include "formats/pmd_pmd.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 
 /* I/O ports */
 
@@ -579,7 +579,7 @@ static MACHINE_CONFIG_START( pmd85, pmd85_state )
 	MCFG_MSM8251_ADD("uart", default_msm8251_interface)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
 MACHINE_CONFIG_END
 

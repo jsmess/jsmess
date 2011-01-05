@@ -8,7 +8,7 @@
 
 #include "emu.h"
 #include "cpu/mcs51/mcs51.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 
 
 class vt220_state : public driver_device
@@ -33,7 +33,7 @@ INPUT_PORTS_END
 
 static MACHINE_RESET(vt220)
 {
-	memset(messram_get_ptr(machine->device("messram")),0,16*1024);
+	memset(ram_get_ptr(machine->device(RAM_TAG)),0,16*1024);
 }
 
 static VIDEO_START( vt220 )
@@ -68,7 +68,7 @@ static MACHINE_CONFIG_START( vt220, vt220_state )
     MCFG_VIDEO_UPDATE(vt220)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("16K")
 MACHINE_CONFIG_END
 

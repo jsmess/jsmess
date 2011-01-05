@@ -10,7 +10,7 @@
 
 #include "emu.h"
 #include "includes/orion.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 
 VIDEO_START( orion128 )
 {
@@ -30,10 +30,10 @@ VIDEO_UPDATE( orion128 )
 	{
 		for (y = 0; y < 256; y++)
 		{
-			code1 = messram_get_ptr(screen->machine->device("messram"))[part1addr + y + x*256];
-			code2 = messram_get_ptr(screen->machine->device("messram"))[part2addr + y + x*256];
-			code3 = messram_get_ptr(screen->machine->device("messram"))[part1addr + y + x*256 + 0x4000];
-			code4 = messram_get_ptr(screen->machine->device("messram"))[part2addr + y + x*256 + 0x4000];
+			code1 = ram_get_ptr(screen->machine->device(RAM_TAG))[part1addr + y + x*256];
+			code2 = ram_get_ptr(screen->machine->device(RAM_TAG))[part2addr + y + x*256];
+			code3 = ram_get_ptr(screen->machine->device(RAM_TAG))[part1addr + y + x*256 + 0x4000];
+			code4 = ram_get_ptr(screen->machine->device(RAM_TAG))[part2addr + y + x*256 + 0x4000];
 			if ((video_mode==14) || (video_mode==15)) {
 				code2 = state->orionpro_pseudo_color;
 			}

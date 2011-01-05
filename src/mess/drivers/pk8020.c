@@ -14,7 +14,7 @@
 #include "devices/flopdrv.h"
 #include "formats/basicdsk.h"
 #include "includes/pk8020.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 
 /* Address maps */
 static ADDRESS_MAP_START(pk8020_mem, ADDRESS_SPACE_PROGRAM, 8)
@@ -242,7 +242,7 @@ static MACHINE_CONFIG_START( pk8020, pk8020_state )
 	MCFG_FLOPPY_4_DRIVES_ADD(pk8020_floppy_config)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("258K")	//64 + 4*48 + 2
 	MCFG_RAM_DEFAULT_VALUE(0x00)
 MACHINE_CONFIG_END

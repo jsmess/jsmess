@@ -18,7 +18,7 @@
 #include "machine/6532riot.h"
 #include "machine/74145.h"
 #include "sound/speaker.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 
 #define LED_REFRESH_DELAY  ATTOTIME_IN_USEC(70)
 
@@ -288,10 +288,10 @@ DRIVER_INIT( sym1 )
 {
 	sym1_state *state = machine->driver_data<sym1_state>();
 	/* wipe expansion memory banks that are not installed */
-	if (messram_get_size(machine->device("messram")) < 4*1024)
+	if (ram_get_size(machine->device(RAM_TAG)) < 4*1024)
 	{
 		memory_nop_readwrite(cputag_get_address_space( machine, "maincpu", ADDRESS_SPACE_PROGRAM ),
-			messram_get_size(machine->device("messram")), 0x0fff, 0, 0);
+			ram_get_size(machine->device(RAM_TAG)), 0x0fff, 0, 0);
 	}
 
 	/* allocate a timer to refresh the led display */

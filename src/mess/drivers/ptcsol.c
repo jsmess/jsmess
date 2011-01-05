@@ -27,7 +27,7 @@
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
 #include "machine/terminal.h"
-#include "devices/messram.h"
+#include "machine/ram.h"
 
 
 class ptcsol_state : public driver_device
@@ -196,7 +196,7 @@ static MACHINE_CONFIG_START( sol20, ptcsol_state )
 	MCFG_VIDEO_UPDATE(sol20)
 
 	/* internal ram */
-//  MCFG_RAM_ADD("messram")
+//  MCFG_RAM_ADD(RAM_TAG)
 //  MCFG_RAM_DEFAULT_SIZE("8K")
 //  MCFG_RAM_EXTRA_OPTIONS("16K,32K")
 	MCFG_GENERIC_TERMINAL_ADD("terminal", sol20_terminal_intf)
