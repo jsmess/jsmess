@@ -13,7 +13,7 @@
 #include "video/tms9928a.h"
 #include "machine/z80pio.h"
 #include "cpu/z80/z80daisy.h"
-#include "devices/cartslot.h"
+#include "imagedev/cartslot.h"
 
 
 class bbcbc_state : public driver_device

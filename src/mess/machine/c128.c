@@ -15,7 +15,7 @@
 #include "includes/cbm.h"
 #include "machine/cbmiec.h"
 #include "cpu/m6502/m6502.h"
-#include "devices/cassette.h"
+#include "imagedev/cassette.h"
 #include "machine/6526cia.h"
 #include "sound/sid6581.h"
 #include "video/vic6567.h"

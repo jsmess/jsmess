@@ -13,7 +13,7 @@
 #include "machine/i8255a.h"
 #include "machine/i8257.h"
 #include "video/i8275.h"
-#include "devices/cassette.h"
+#include "imagedev/cassette.h"
 #include "formats/rk_cas.h"
 #include "includes/radio86.h"
 

@@ -139,8 +139,8 @@
 #include "emu.h"
 #include "imageutl.h"
 #include "machine/wd17xx.h"
-#include "devices/flopdrv.h"
-#include "formats/flopimg.h"
+#include "imagedev/flopdrv.h"
+#include "imagedev/flopimg.h"
 
 /***************************************************************************
     CONSTANTS

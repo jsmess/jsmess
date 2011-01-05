@@ -9,7 +9,7 @@
 #ifndef ZX81_P_H
 #define ZX81_P_H
 
-#include "formats/cassimg.h"
+#include "imagedev/cassimg.h"
 
 CASSETTE_FORMATLIST_EXTERN(zx81_p_format);
 CASSETTE_FORMATLIST_EXTERN(zx80_o_format);

@@ -25,8 +25,8 @@
 #include "machine/msm8251.h"
 
 /* Devices */
-#include "devices/flopdrv.h"
-#include "devices/cassette.h"
+#include "imagedev/flopdrv.h"
+#include "imagedev/cassette.h"
 #include "formats/tzx_cas.h"
 #include "machine/ram.h"
 

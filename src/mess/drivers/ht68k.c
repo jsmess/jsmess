@@ -9,7 +9,7 @@
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/68681.h"
-#include "devices/flopdrv.h"
+#include "imagedev/flopdrv.h"
 #include "machine/wd17xx.h"
 #include "machine/terminal.h"
 

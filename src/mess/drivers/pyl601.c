@@ -9,7 +9,7 @@
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
 #include "video/mc6845.h"
-#include "devices/flopdrv.h"
+#include "imagedev/flopdrv.h"
 #include "formats/basicdsk.h"
 #include "machine/upd765.h"
 #include "machine/ram.h"

@@ -10,7 +10,7 @@
 #define SONYDRIV_H
 
 #include "image.h"
-#include "flopdrv.h"
+#include "imagedev/flopdrv.h"
 
 #if 0
 enum

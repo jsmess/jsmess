@@ -40,7 +40,7 @@
 
 #include "emu.h"
 #include "cpu/unsp/unsp.h"
-#include "devices/cartslot.h"
+#include "imagedev/cartslot.h"
 #include "machine/i2cmem.h"
 
 #define PAGE_ENABLE_MASK		0x0008

@@ -9,7 +9,7 @@
 #ifndef NES_DSK_H_
 #define NES_DSK_H_
 
-#include "formats/flopimg.h"
+#include "imagedev/flopimg.h"
 
 FLOPPY_OPTIONS_EXTERN(nes_only);
 

@@ -2,9 +2,9 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/ctronics.h"
-#include "devices/snapquik.h"
+#include "imagedev/snapquik.h"
 #include "includes/kaypro.h"
-#include "devices/flopdrv.h"
+#include "imagedev/flopdrv.h"
 
 
 

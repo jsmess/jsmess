@@ -13,7 +13,7 @@ Bruce Tomlin (hardware info)
 #include "video/vector.h"
 #include "machine/6522via.h"
 #include "includes/vectrex.h"
-#include "devices/cartslot.h"
+#include "imagedev/cartslot.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "machine/nvram.h"

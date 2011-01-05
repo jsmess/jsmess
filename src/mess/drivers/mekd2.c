@@ -37,7 +37,7 @@
 #include "sound/dac.h"
 #include "machine/6821pia.h"
 #include "machine/6850acia.h"
-#include "devices/cartslot.h"
+#include "imagedev/cartslot.h"
 #include "includes/mekd2.h"
 
 #define XTAL_MEKD2 1228800

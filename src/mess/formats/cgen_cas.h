@@ -9,7 +9,7 @@
 #ifndef __CGEN_CAS_H
 #define __CGEN_CAS_H
 
-#include "formats/cassimg.h"
+#include "imagedev/cassimg.h"
 
 CASSETTE_FORMATLIST_EXTERN(cgenie_cassette_formats);
 

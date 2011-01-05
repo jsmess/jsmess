@@ -13,7 +13,7 @@
 
 #include "emu.h"
 #include "includes/amiga.h"
-#include "devices/flopdrv.h"
+#include "imagedev/flopdrv.h"
 #include "formats/ami_dsk.h"
 #include "amigafdc.h"
 #include "machine/6526cia.h"

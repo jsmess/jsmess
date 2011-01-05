@@ -10,7 +10,7 @@
 #define __COCOCART_H__
 
 #include "image.h"
-#include "cartslot.h"
+#include "imagedev/cartslot.h"
 
 /***************************************************************************
     CONSTANTS

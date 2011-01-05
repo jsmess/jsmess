@@ -1,5 +1,5 @@
 #include "emu.h"
-#include "devices/cassette.h"
+#include "imagedev/cassette.h"
 #include "crsshair.h"
 #include "includes/cbm.h"
 #include "formats/cbm_tap.h"

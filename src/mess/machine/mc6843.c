@@ -32,7 +32,7 @@
 
 #include "emu.h"
 #include "mc6843.h"
-#include "devices/flopdrv.h"
+#include "imagedev/flopdrv.h"
 
 
 /******************* parameters ******************/

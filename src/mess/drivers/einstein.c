@@ -57,7 +57,7 @@
 #include "machine/wd17xx.h"
 #include "machine/ctronics.h"
 #include "machine/msm8251.h"
-#include "devices/flopdrv.h"
+#include "imagedev/flopdrv.h"
 #include "sound/ay8910.h"
 #include "video/mc6845.h"
 #include "rendlay.h"

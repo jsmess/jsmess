@@ -7,8 +7,8 @@
 #ifndef __SPECTRUM_H__
 #define __SPECTRUM_H__
 
-#include "devices/snapquik.h"
-#include "devices/cartslot.h"
+#include "imagedev/snapquik.h"
+#include "imagedev/cartslot.h"
 
 /* Spectrum crystals */
 

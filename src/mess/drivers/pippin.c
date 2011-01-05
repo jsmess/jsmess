@@ -30,7 +30,7 @@
 
 #include "emu.h"
 #include "cpu/powerpc/ppc.h"
-#include "devices/chd_cd.h"
+#include "imagedev/chd_cd.h"
 #include "sound/cdda.h"
 
 

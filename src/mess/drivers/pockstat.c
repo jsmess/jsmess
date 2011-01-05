@@ -31,7 +31,7 @@
 #include "emu.h"
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"
-#include "devices/cartslot.h"
+#include "imagedev/cartslot.h"
 #include "sound/dac.h"
 
 #define MAX_PS_TIMERS	3

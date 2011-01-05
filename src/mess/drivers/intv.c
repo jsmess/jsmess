@@ -35,7 +35,7 @@
 #include "cpu/m6502/m6502.h"
 #include "cpu/cp1610/cp1610.h"
 #include "includes/intv.h"
-#include "devices/cartslot.h"
+#include "imagedev/cartslot.h"
 #include "sound/ay8910.h"
 
 #ifndef VERBOSE

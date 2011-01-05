@@ -129,8 +129,8 @@ irq vector 0x26:                                                                
 #include "sound/ay8910.h"
 #include "sound/wave.h"
 
-#include "devices/cassette.h"
-#include "devices/cartslot.h"
+#include "imagedev/cassette.h"
+#include "imagedev/cartslot.h"
 #include "formats/p6001_cas.h"
 
 

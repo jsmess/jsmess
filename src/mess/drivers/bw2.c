@@ -31,7 +31,7 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "devices/flopdrv.h"
+#include "imagedev/flopdrv.h"
 #include "machine/ram.h"
 #include "formats/basicdsk.h"
 #include "machine/serial.h"

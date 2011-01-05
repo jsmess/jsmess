@@ -9,7 +9,7 @@
 #ifndef __KIM1_CAS_H
 #define __KIM1_CAS_H
 
-#include "formats/cassimg.h"
+#include "imagedev/cassimg.h"
 
 CASSETTE_FORMATLIST_EXTERN(kim1_cassette_formats);
 

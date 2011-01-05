@@ -68,12 +68,12 @@
 
 #include "emu.h"
 #include "cococart.h"
-#include "flopdrv.h"
+#include "imagedev/flopdrv.h"
 #include "includes/coco.h"
 #include "machine/wd17xx.h"
 #include "machine/ds1315.h"
 #include "machine/msm6242.h"
-#include "devices/flopdrv.h"
+#include "imagedev/flopdrv.h"
 #include "formats/coco_dsk.h"
 
 

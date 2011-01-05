@@ -34,7 +34,7 @@
 #include "machine/applefdc.h"
 #include "sonydriv.h"
 #include "formats/ap_dsk35.h"
-#include "flopdrv.h"
+#include "imagedev/flopdrv.h"
 
 
 #ifdef MAME_DEBUG

@@ -17,7 +17,7 @@
 #include "sound/sn76496.h"
 #include "video/mc6845.h"
 #include "machine/ram.h"
-#include "devices/flopdrv.h"
+#include "imagedev/flopdrv.h"
 #include "formats/apridisk.h"
 
 

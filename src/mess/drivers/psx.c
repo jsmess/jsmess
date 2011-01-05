@@ -14,8 +14,8 @@
 
 #include "emu.h"
 #include "cpu/mips/psx.h"
-#include "devices/snapquik.h"
-#include "devices/chd_cd.h"
+#include "imagedev/snapquik.h"
+#include "imagedev/chd_cd.h"
 #include "includes/psx.h"
 #include "sound/psx.h"
 #include "debugger.h"

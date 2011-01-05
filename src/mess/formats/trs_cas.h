@@ -9,7 +9,7 @@
 #ifndef __TRS_CAS_H
 #define __TRS_CAS_H
 
-#include "formats/cassimg.h"
+#include "imagedev/cassimg.h"
 
 CASSETTE_FORMATLIST_EXTERN(trs80l2_cassette_formats);
 

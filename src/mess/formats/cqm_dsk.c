@@ -8,8 +8,8 @@
 
 #include <string.h>
 #include "emu.h"
-#include "formats/flopimg.h"
-#include "devices/flopdrv.h"
+#include "imagedev/flopimg.h"
+#include "imagedev/flopdrv.h"
 
 #define CQM_HEADER_SIZE 133
 

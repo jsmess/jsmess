@@ -9,10 +9,10 @@
 #include "emu.h"
 #include "cpu/i86/i86.h"
 #include "machine/wd17xx.h"
-#include "devices/flopdrv.h"
+#include "imagedev/flopdrv.h"
 #include "cpu/z80/z80daisy.h"
 #include "machine/z80ctc.h"
-#include "devices/flopdrv.h"
+#include "imagedev/flopdrv.h"
 #include "formats/basicdsk.h"
 
 class act_state : public driver_device

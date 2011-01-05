@@ -8,7 +8,7 @@
 
 #include "emu.h"
 #include "includes/odyssey2.h"
-#include "devices/cartslot.h"
+#include "imagedev/cartslot.h"
 #include "sound/sp0256.h"
 
 

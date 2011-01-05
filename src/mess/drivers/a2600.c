@@ -9,8 +9,8 @@
 #include "cpu/m6502/m6502.h"
 #include "sound/wave.h"
 #include "sound/tiaintf.h"
-#include "devices/cartslot.h"
-#include "devices/cassette.h"
+#include "imagedev/cartslot.h"
+#include "imagedev/cassette.h"
 #include "formats/a26_cas.h"
 #include "video/tia.h"
 

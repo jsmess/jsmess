@@ -15,13 +15,13 @@
 #include "sound/tms5220.h"
 #include "machine/6522via.h"
 #include "machine/wd17xx.h"
-#include "devices/flopdrv.h"
+#include "imagedev/flopdrv.h"
 #include "includes/bbc.h"
 #include "machine/upd7002.h"
 #include "machine/i8271.h"
 #include "machine/mc146818.h"
 #include "machine/ctronics.h"
-#include "devices/cassette.h"
+#include "imagedev/cassette.h"
 
 /* BBC Memory Size */
 /* this stores the DIP switch setting for the DFS type being used */

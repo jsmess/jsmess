@@ -32,7 +32,7 @@
 #include "cpu/z80/z80daisy.h"
 #include "video/mc6845.h"
 #include "formats/basicdsk.h"
-#include "devices/flopdrv.h"
+#include "imagedev/flopdrv.h"
 #include "machine/ram.h"
 #include "machine/i8255a.h"
 #include "machine/upd765.h"

@@ -11,7 +11,7 @@
 #include "cpu/rsp/rsp.h"
 #include "cpu/mips/mips3.h"
 #include "sound/dmadac.h"
-#include "devices/cartslot.h"
+#include "imagedev/cartslot.h"
 #include "includes/n64.h"
 
 

@@ -2,7 +2,7 @@
 #define __CONKORT__
 
 #include "emu.h"
-#include "formats/flopimg.h"
+#include "imagedev/flopimg.h"
 
 /***************************************************************************
     MACROS / CONSTANTS

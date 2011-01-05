@@ -33,7 +33,7 @@
 #include "audio/spchroms.h"
 #include "sound/speaker.h"
 #include "sound/tms5220.h"
-#include "devices/cassette.h"
+#include "imagedev/cassette.h"
 #include "mpf1.lh"
 #include "mpf1b.lh"
 #include "mpf1p.lh"

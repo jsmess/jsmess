@@ -198,7 +198,7 @@ Notes:
 #include "emu.h"
 #include "includes/studio2.h"
 #include "cpu/cosmac/cosmac.h"
-#include "devices/cartslot.h"
+#include "imagedev/cartslot.h"
 #include "formats/studio2_st2.h"
 #include "sound/beep.h"
 #include "sound/cdp1864.h"

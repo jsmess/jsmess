@@ -12,7 +12,7 @@
 #include "cpu/i8085/i8085.h"
 #include "machine/wd17xx.h"
 #include "machine/ram.h"
-#include "devices/flopdrv.h"
+#include "imagedev/flopdrv.h"
 
 static void pk8020_set_bank(running_machine *machine,UINT8 data);
 

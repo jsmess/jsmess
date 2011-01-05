@@ -9,7 +9,7 @@
 #ifndef BASICDSK_H
 #define BASICDSK_H
 
-#include "formats/flopimg.h"
+#include "imagedev/flopimg.h"
 
 struct basicdsk_geometry
 {

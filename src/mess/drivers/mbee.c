@@ -94,7 +94,7 @@
 #include "cpu/z80/z80daisy.h"
 #include "machine/mc146818.h"
 #include "sound/wave.h"
-#include "devices/flopdrv.h"
+#include "imagedev/flopdrv.h"
 #include "formats/basicdsk.h"
 #include "includes/mbee.h"
 #define XTAL_13_5MHz 13500000

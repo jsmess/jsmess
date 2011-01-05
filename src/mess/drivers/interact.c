@@ -51,9 +51,9 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/i8085/i8085.h"
-#include "devices/cassette.h"
+#include "imagedev/cassette.h"
 #include "formats/hect_tap.h"
-#include "devices/printer.h"
+#include "imagedev/printer.h"
 #include "sound/wave.h"      /* for K7 sound*/
 #include "sound/sn76477.h"   /* for sn sound*/
 #include "sound/discrete.h"  /* for 1 Bit sound*/

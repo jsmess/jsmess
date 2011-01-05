@@ -7,7 +7,7 @@
 #ifndef A26_CAS_H
 #define A26_CAS_H
 
-#include "formats/cassimg.h"
+#include "imagedev/cassimg.h"
 
 CASSETTE_FORMATLIST_EXTERN(a26_cassette_formats);
 

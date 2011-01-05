@@ -117,13 +117,13 @@ Notes:
 #include "emu.h"
 #include "cpu/cosmac/cosmac.h"
 #include "machine/wd17xx.h"
-#include "devices/printer.h"
-#include "devices/snapquik.h"
+#include "imagedev/printer.h"
+#include "imagedev/snapquik.h"
 #include "sound/cdp1869.h"
 #include "video/mc6845.h"
 #include "includes/comx35.h"
 #include "machine/rescap.h"
-#include "devices/flopdrv.h"
+#include "imagedev/flopdrv.h"
 #include "machine/ram.h"
 
 enum

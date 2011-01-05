@@ -34,13 +34,13 @@
 #include "cpu/z80/z80daisy.h"
 #include "machine/ctronics.h"
 #include "machine/z80ctc.h"
-#include "devices/cartslot.h"
-#include "devices/cassette.h"
+#include "imagedev/cartslot.h"
+#include "imagedev/cassette.h"
 #include "formats/sord_cas.h"
 
 /* FD-5 floppy support */
 #include "machine/8255ppi.h"
-#include "devices/flopdrv.h"
+#include "imagedev/flopdrv.h"
 #include "formats/basicdsk.h"
 #include "machine/upd765.h"
 

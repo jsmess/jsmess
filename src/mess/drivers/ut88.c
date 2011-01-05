@@ -13,7 +13,7 @@
 #include "sound/dac.h"
 #include "sound/wave.h"
 #include "includes/ut88.h"
-#include "devices/cassette.h"
+#include "imagedev/cassette.h"
 #include "formats/rk_cas.h"
 #include "ut88mini.lh"
 

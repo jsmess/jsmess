@@ -438,7 +438,7 @@ space. This mapper uses 32KB sized banks.
 #include "emu.h"
 #include "machine/ram.h"
 #include "cpu/lr35902/lr35902.h"
-#include "devices/cartslot.h"
+#include "imagedev/cartslot.h"
 #include "rendlay.h"
 #include "audio/gb.h"
 #include "includes/gb.h"

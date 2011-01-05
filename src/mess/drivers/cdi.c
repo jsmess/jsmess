@@ -26,7 +26,7 @@ TODO:
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/dmadac.h"
-#include "devices/chd_cd.h"
+#include "imagedev/chd_cd.h"
 #include "machine/timekpr.h"
 #include "sound/cdda.h"
 #include "includes/cdi.h"

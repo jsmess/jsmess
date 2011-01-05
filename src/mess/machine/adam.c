@@ -9,8 +9,8 @@
 #include "emu.h"
 #include "video/tms9928a.h"
 #include "includes/adam.h"
-#include "devices/flopdrv.h"
-#include "devices/cartslot.h"
+#include "imagedev/flopdrv.h"
+#include "imagedev/cartslot.h"
 
 
 

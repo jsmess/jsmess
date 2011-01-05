@@ -9,7 +9,7 @@
 #ifndef __COUPEDSK_H__
 #define __COUPEDSK_H__
 
-#include "formats/flopimg.h"
+#include "imagedev/flopimg.h"
 
 
 FLOPPY_CONSTRUCT( coupe_mgt_construct );

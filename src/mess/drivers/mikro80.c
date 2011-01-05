@@ -12,8 +12,8 @@
 #include "sound/wave.h"
 #include "machine/i8255a.h"
 #include "includes/mikro80.h"
-#include "devices/cassette.h"
-#include "devices/cartslot.h"
+#include "imagedev/cassette.h"
+#include "imagedev/cartslot.h"
 #include "formats/rk_cas.h"
 #include "sound/dac.h"
 

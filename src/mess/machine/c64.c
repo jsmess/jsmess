@@ -25,8 +25,8 @@
 #include "includes/cbm.h"
 #include "includes/c64.h"
 
-#include "devices/cassette.h"
-#include "devices/cartslot.h"
+#include "imagedev/cassette.h"
+#include "imagedev/cartslot.h"
 
 #define VERBOSE_LEVEL 0
 #define DBG_LOG( MACHINE, N, M, A ) \

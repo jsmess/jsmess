@@ -76,7 +76,7 @@ block of RAM instead of 8.
 #include "includes/cbm.h"
 #include "formats/cbm_snqk.h"
 #include "cpu/m6502/m6502.h"
-#include "devices/cartslot.h"
+#include "imagedev/cartslot.h"
 #include "machine/ram.h"
 #include "machine/6522via.h"
 #include "machine/c1541.h"

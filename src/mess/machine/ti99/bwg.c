@@ -23,7 +23,7 @@
 #include "bwg.h"
 #include "machine/wd17xx.h"
 #include "formats/ti99_dsk.h"
-#include "devices/flopdrv.h"
+#include "imagedev/flopdrv.h"
 #include "machine/mm58274c.h"
 
 #define CRU_BASE 0x1100

@@ -15,7 +15,7 @@
 #include "cpu/m68000/m68000.h"
 #include "machine/ram.h"
 #include "machine/wd17xx.h"
-#include "devices/flopdrv.h"
+#include "imagedev/flopdrv.h"
 #include "unixpc.lh"
 
 

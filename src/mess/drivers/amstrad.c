@@ -98,12 +98,12 @@ Some bugs left :
 #include "machine/ctronics.h"
 
 /* Devices */
-#include "devices/flopdrv.h"
+#include "imagedev/flopdrv.h"
 #include "formats/basicdsk.h"
 #include "formats/msx_dsk.h"
-#include "devices/snapquik.h"
-#include "devices/cartslot.h"
-#include "devices/cassette.h"
+#include "imagedev/snapquik.h"
+#include "imagedev/cartslot.h"
+#include "imagedev/cassette.h"
 #include "formats/tzx_cas.h"
 
 #include "machine/ram.h"

@@ -11,13 +11,13 @@
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
 #include "sound/dac.h"
-#include "devices/cassette.h"
+#include "imagedev/cassette.h"
 #include "machine/i8255a.h"
 #include "machine/pit8253.h"
 #include "machine/wd17xx.h"
 #include "includes/special.h"
 #include "machine/ram.h"
-#include "devices/flopdrv.h"
+#include "imagedev/flopdrv.h"
 
 
 

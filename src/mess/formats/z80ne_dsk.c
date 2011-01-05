@@ -9,7 +9,7 @@
 #include "emu.h"
 #include "formats/z80ne_dsk.h"
 #include "formats/basicdsk.h"
-#include "devices/flopdrv.h"
+#include "imagedev/flopdrv.h"
 #include "imageutl.h"
 
 /* -----------------------------------------------------------------------

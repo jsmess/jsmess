@@ -31,8 +31,8 @@ For BIOS CRC confirmation
 #include "cpu/z80/z80.h"
 #include "sound/sn76496.h"
 #include "video/tms9928a.h"
-#include "devices/cartslot.h"
-#include "devices/cassette.h"
+#include "imagedev/cartslot.h"
+#include "imagedev/cassette.h"
 
 
 class pv2000_state : public driver_device

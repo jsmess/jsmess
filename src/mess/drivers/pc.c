@@ -147,10 +147,10 @@ TODO: Which clock signals are available in a PC Jr?
 #include "includes/pc.h"
 
 #include "machine/pc_hdc.h"
-#include "devices/flopdrv.h"
-#include "devices/harddriv.h"
-#include "devices/cassette.h"
-#include "devices/cartslot.h"
+#include "imagedev/flopdrv.h"
+#include "imagedev/harddriv.h"
+#include "imagedev/cassette.h"
+#include "imagedev/cartslot.h"
 #include "formats/pc_dsk.h"
 
 #include "machine/8237dma.h"

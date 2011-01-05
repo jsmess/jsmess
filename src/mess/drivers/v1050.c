@@ -109,7 +109,7 @@ Notes:
 #include "cpu/z80/z80.h"
 #include "cpu/m6502/m6502.h"
 #include "cpu/mcs48/mcs48.h"
-#include "devices/flopdrv.h"
+#include "imagedev/flopdrv.h"
 #include "machine/ram.h"
 #include "formats/basicdsk.h"
 #include "machine/ctronics.h"

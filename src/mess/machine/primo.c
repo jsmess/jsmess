@@ -19,9 +19,9 @@
 #include "sound/speaker.h"
 
 /* Devices */
-#include "devices/cassette.h"
-#include "devices/snapquik.h"
-#include "devices/cartslot.h"
+#include "imagedev/cassette.h"
+#include "imagedev/snapquik.h"
+#include "imagedev/cartslot.h"
 
 
 

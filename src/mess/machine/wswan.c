@@ -17,7 +17,7 @@ TODO:
 
 #include "emu.h"
 #include "includes/wswan.h"
-#include "devices/cartslot.h"
+#include "imagedev/cartslot.h"
 #include "image.h"
 
 #define INTERNAL_EEPROM_SIZE	1024

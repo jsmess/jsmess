@@ -7,7 +7,7 @@
 #ifndef TRS80_H_
 #define TRS80_H_
 
-#include "devices/snapquik.h"
+#include "imagedev/snapquik.h"
 #include "machine/wd17xx.h"
 
 #define FW 6

@@ -113,7 +113,7 @@
 #include "machine/applefdc.h"
 #include "devices/sonydriv.h"
 #include "machine/8530scc.h"
-#include "devices/flopdrv.h"
+#include "imagedev/flopdrv.h"
 #include "cpu/g65816/g65816.h"
 #include "sound/es5503.h"
 #include "machine/ram.h"

@@ -19,7 +19,7 @@ ToDo:
 #include "machine/6522via.h"
 #include "machine/6532riot.h"
 #include "machine/6821pia.h"
-#include "devices/cartslot.h"
+#include "imagedev/cartslot.h"
 #include "machine/ram.h"
 #include "aim65.lh"
 

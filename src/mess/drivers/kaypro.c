@@ -37,8 +37,8 @@
 #include "cpu/z80/z80daisy.h"
 #include "machine/ctronics.h"
 #include "sound/beep.h"
-#include "devices/snapquik.h"
-#include "devices/flopdrv.h"
+#include "imagedev/snapquik.h"
+#include "imagedev/flopdrv.h"
 #include "formats/basicdsk.h"
 #include "includes/kaypro.h"
 

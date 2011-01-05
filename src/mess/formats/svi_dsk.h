@@ -9,7 +9,7 @@
 #ifndef SVI_DSK_H
 #define SVI_DSK_H
 
-#include "formats/flopimg.h"
+#include "imagedev/flopimg.h"
 
 /**************************************************************************/
 

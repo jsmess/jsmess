@@ -25,7 +25,7 @@
 #include "cpu/arm7/arm7core.h"
 #include "sound/aica.h"
 #include "includes/dc.h"
-#include "devices/chd_cd.h"
+#include "imagedev/chd_cd.h"
 
 #define CPU_CLOCK (200000000)
 

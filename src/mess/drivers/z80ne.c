@@ -92,8 +92,8 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "includes/z80ne.h"
-#include "devices/flopdrv.h"
-#include "devices/cassette.h"
+#include "imagedev/flopdrv.h"
+#include "imagedev/cassette.h"
 #include "formats/z80ne_dsk.h"
 #include "machine/ram.h"
 

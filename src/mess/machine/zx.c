@@ -9,7 +9,7 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "includes/zx.h"
-#include "devices/cassette.h"
+#include "imagedev/cassette.h"
 #include "sound/speaker.h"
 #include "machine/ram.h"
 

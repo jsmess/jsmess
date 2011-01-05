@@ -12,7 +12,7 @@
 #include "emu.h"
 #include "cpu/mcs48/mcs48.h"
 #include "includes/odyssey2.h"
-#include "devices/cartslot.h"
+#include "imagedev/cartslot.h"
 #include "sound/sp0256.h"
 
 static ADDRESS_MAP_START( odyssey2_mem , ADDRESS_SPACE_PROGRAM, 8)

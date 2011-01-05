@@ -23,7 +23,7 @@
 #include "emu.h"
 #include "includes/mc1000.h"
 #include "cpu/z80/z80.h"
-#include "devices/cassette.h"
+#include "imagedev/cassette.h"
 #include "video/m6847.h"
 #include "sound/ay8910.h"
 #include "machine/ctronics.h"

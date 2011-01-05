@@ -44,7 +44,7 @@
 #include "emu.h"
 #include "includes/phc25.h"
 #include "cpu/z80/z80.h"
-#include "devices/cassette.h"
+#include "imagedev/cassette.h"
 #include "machine/ram.h"
 #include "machine/ctronics.h"
 #include "video/m6847.h"

@@ -6,7 +6,7 @@
 #include "includes/lynx.h"
 #include "cpu/m6502/m6502.h"
 
-#include "devices/cartslot.h"
+#include "imagedev/cartslot.h"
 #include "hash.h"
 
 

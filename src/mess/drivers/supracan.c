@@ -76,7 +76,7 @@ DEBUG TRICKS:
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/m6502/m6502.h"
-#include "devices/cartslot.h"
+#include "imagedev/cartslot.h"
 #include "debugger.h"
 
 #define SOUNDCPU_BOOT_HACK      (1)

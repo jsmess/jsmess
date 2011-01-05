@@ -50,8 +50,8 @@ Go to the bottom to see the game list and emulation status of each.
 #include "cpu/s2650/s2650.h"
 
 #include "includes/vc4000.h"
-#include "devices/cartslot.h"
-#include "devices/snapquik.h"
+#include "imagedev/cartslot.h"
+#include "imagedev/snapquik.h"
 
 static QUICKLOAD_LOAD( vc4000 );
 

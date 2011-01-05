@@ -10,7 +10,7 @@
 #include "emu.h"
 #include "c8280.h"
 #include "cpu/m6502/m6502.h"
-#include "devices/flopdrv.h"
+#include "imagedev/flopdrv.h"
 #include "machine/6532riot.h"
 #include "machine/ieee488.h"
 

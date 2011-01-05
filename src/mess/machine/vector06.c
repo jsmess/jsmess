@@ -11,7 +11,7 @@
 #include "cpu/i8085/i8085.h"
 #include "machine/i8255a.h"
 #include "machine/wd17xx.h"
-#include "devices/cassette.h"
+#include "imagedev/cassette.h"
 #include "includes/vector06.h"
 #include "machine/ram.h"
 

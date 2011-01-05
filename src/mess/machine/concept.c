@@ -12,7 +12,7 @@
 #include "machine/wd17xx.h"
 #include "cpu/m68000/m68000.h"
 #include "includes/corvushd.h"
-#include "devices/flopdrv.h"
+#include "imagedev/flopdrv.h"
 
 
 #define VERBOSE 1

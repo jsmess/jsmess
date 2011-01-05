@@ -2,7 +2,7 @@
 
 #include "emu.h"
 #include "formats/basicdsk.h"
-#include "devices/flopdrv.h"
+#include "imagedev/flopdrv.h"
 #include "cpu/i8085/i8085.h"
 #include "machine/8237dma.h"
 #include "machine/i8212.h"

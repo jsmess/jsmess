@@ -42,7 +42,7 @@ icq3250a-d
 #include "emu.h"
 #include "cpu/m6805/m6805.h"
 #include "includes/comquest.h"
-#include "devices/cartslot.h"
+#include "imagedev/cartslot.h"
 
 #ifdef UNUSED_FUNCTION
 static  READ8_HANDLER(comquest_read)

@@ -7,7 +7,7 @@
 #ifndef LYNX_H_
 #define LYNX_H_
 
-#include "devices/cartslot.h"
+#include "imagedev/cartslot.h"
 
 
 #define LYNX_CART		0

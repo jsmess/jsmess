@@ -7,7 +7,7 @@
 #ifndef TI85_H_
 #define TI85_H_
 
-#include "devices/snapquik.h"
+#include "imagedev/snapquik.h"
 
 
 class ti85_state : public driver_device

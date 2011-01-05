@@ -28,8 +28,8 @@
  */
 
 #include "emu.h"
-#include "formats/flopimg.h"
-#include "devices/flopdrv.h"
+#include "imagedev/flopimg.h"
+#include "imagedev/flopdrv.h"
 
 #define D88_HEADER_LEN 0x2b0
 

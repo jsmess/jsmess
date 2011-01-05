@@ -8,7 +8,7 @@
 
 #include "emu.h"
 #include "includes/snes.h"
-#include "devices/cartslot.h"
+#include "imagedev/cartslot.h"
 #include "snescart.h"
 
 #define SNES_CART_DEBUG 0

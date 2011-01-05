@@ -42,10 +42,10 @@
 #include "sound/wave.h"
 #include "sound/beep.h"
 
-#include "devices/cassette.h"
+#include "imagedev/cassette.h"
 #include "formats/fm7_cas.h"
 #include "machine/wd17xx.h"
-#include "devices/flopdrv.h"
+#include "imagedev/flopdrv.h"
 #include "machine/ctronics.h"
 
 #include "includes/fm7.h"

@@ -9,8 +9,8 @@
 #include <math.h>
 
 #include "emu.h"
-#include "devices/cassette.h"
-#include "formats/cassimg.h"
+#include "imagedev/cassette.h"
+#include "imagedev/cassimg.h"
 #include "includes/thomson.h"
 #include "formats/thom_cas.h"
 

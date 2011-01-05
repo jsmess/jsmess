@@ -7,7 +7,7 @@
 #ifndef PRIMO_H_
 #define PRIMO_H_
 
-#include "devices/snapquik.h"
+#include "imagedev/snapquik.h"
 
 
 class primo_state : public driver_device

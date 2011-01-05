@@ -7,7 +7,7 @@
 #ifndef GENESIS_H_
 #define GENESIS_H_
 
-#include "devices/cartslot.h"
+#include "imagedev/cartslot.h"
 
 /*----------- defined in machine/genesis.c -----------*/
 

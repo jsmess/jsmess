@@ -18,7 +18,7 @@
 #include "machine/74145.h"
 #include "machine/ctronics.h"
 #include "sound/speaker.h"
-#include "devices/cassette.h"
+#include "imagedev/cassette.h"
 #include "machine/ram.h"
 
 #ifndef VERBOSE

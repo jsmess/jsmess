@@ -10,7 +10,7 @@
 #include "cpu/z80/z80.h"
 #include "includes/astrocde.h"
 #include "sound/astrocde.h"
-#include "devices/cartslot.h"
+#include "imagedev/cartslot.h"
 
 
 /*************************************

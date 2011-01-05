@@ -8,7 +8,7 @@
 
 *********************************************************************/
 #include "emu.h"
-#include "devices/flopdrv.h"
+#include "imagedev/flopdrv.h"
 #include "formats/trd_dsk.h"
 #include "machine/wd17xx.h"
 #include "machine/beta.h"

@@ -10,7 +10,7 @@
 #include "cpu/cosmac/cosmac.h"
 #include "sound/cdp1869.h"
 #include "sound/wave.h"
-#include "devices/cassette.h"
+#include "imagedev/cassette.h"
 #include "includes/pecom.h"
 #include "machine/ram.h"
 

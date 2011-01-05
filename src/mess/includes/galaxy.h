@@ -7,7 +7,7 @@
 #ifndef GALAXY_H_
 #define GALAXY_H_
 
-#include "devices/snapquik.h"
+#include "imagedev/snapquik.h"
 
 
 class galaxy_state : public driver_device

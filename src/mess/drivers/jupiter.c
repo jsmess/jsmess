@@ -28,8 +28,8 @@ Ports:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "devices/cassette.h"
-#include "devices/snapquik.h"
+#include "imagedev/cassette.h"
+#include "imagedev/snapquik.h"
 #include "sound/speaker.h"
 #include "sound/wave.h"
 #include "formats/jupi_tap.h"

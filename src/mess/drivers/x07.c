@@ -28,7 +28,7 @@
 #include "cpu/z80/z80.h"
 #include "sound/beep.h"
 #include "includes/x07.h"
-#include "devices/printer.h"
+#include "imagedev/printer.h"
 
 static void t6834_cmd (running_machine *machine, UINT8 cmd);
 static void receive_from_t6834 (running_machine *machine);

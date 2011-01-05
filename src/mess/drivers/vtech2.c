@@ -68,9 +68,9 @@
 #include "sound/speaker.h"
 #include "sound/wave.h"
 #include "includes/vtech2.h"
-#include "devices/cartslot.h"
-#include "devices/cassette.h"
-#include "devices/flopdrv.h"
+#include "imagedev/cartslot.h"
+#include "imagedev/cassette.h"
+#include "imagedev/flopdrv.h"
 #include "formats/vt_cas.h"
 
 static ADDRESS_MAP_START(vtech2_mem, ADDRESS_SPACE_PROGRAM, 8 )

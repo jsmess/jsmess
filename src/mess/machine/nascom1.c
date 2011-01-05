@@ -14,9 +14,9 @@
 #include "machine/ay31015.h"
 
 /* Devices */
-#include "devices/snapquik.h"
-#include "devices/cassette.h"
-#include "devices/flopdrv.h"
+#include "imagedev/snapquik.h"
+#include "imagedev/cassette.h"
+#include "imagedev/flopdrv.h"
 #include "machine/ram.h"
 
 #define NASCOM1_KEY_RESET	0x02

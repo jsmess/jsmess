@@ -12,7 +12,7 @@
 #define __TRS_CMD__
 
 #include "emu.h"
-#include "devices/snapquik.h"
+#include "imagedev/snapquik.h"
 
 QUICKLOAD_LOAD( trs80_cmd );
 

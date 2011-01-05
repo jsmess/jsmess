@@ -8,7 +8,7 @@
 
 
 #include "emu.h"
-#include "devices/cassette.h"
+#include "imagedev/cassette.h"
 #include "machine/i8255a.h"
 #include "includes/bk.h"
 

@@ -10,7 +10,7 @@
 #include "cpu/m6502/m6502.h"
 #include "includes/lynx.h"
 
-#include "devices/snapquik.h"
+#include "imagedev/snapquik.h"
 
 static QUICKLOAD_LOAD( lynx );
 

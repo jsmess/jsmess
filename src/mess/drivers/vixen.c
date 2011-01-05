@@ -58,7 +58,7 @@ Notes:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "devices/flopdrv.h"
+#include "imagedev/flopdrv.h"
 #include "machine/ram.h"
 #include "machine/i8155.h"
 #include "machine/ieee488.h"

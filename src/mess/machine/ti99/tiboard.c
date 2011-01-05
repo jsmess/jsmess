@@ -11,7 +11,7 @@
 #include "video/tms9928a.h"
 #include "handset.h"
 #include "mecmouse.h"
-#include "devices/cassette.h"
+#include "imagedev/cassette.h"
 #include "mapper8.h"
 
 typedef struct _tiboard_state

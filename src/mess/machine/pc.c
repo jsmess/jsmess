@@ -39,7 +39,7 @@
 #include "includes/europc.h"
 #include "includes/ibmpc.h"
 #include "machine/pcshare.h"
-#include "devices/cassette.h"
+#include "imagedev/cassette.h"
 #include "sound/speaker.h"
 
 #include "machine/8237dma.h"

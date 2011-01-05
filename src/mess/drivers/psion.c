@@ -23,7 +23,7 @@
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
 #include "sound/beep.h"
-#include "devices/cartslot.h"
+#include "imagedev/cartslot.h"
 #include "video/hd44780.h"
 #include "includes/psion.h"
 

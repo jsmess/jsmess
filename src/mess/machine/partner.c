@@ -9,14 +9,14 @@
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
-#include "devices/cassette.h"
+#include "imagedev/cassette.h"
 #include "machine/i8255a.h"
 #include "machine/i8257.h"
 #include "machine/wd17xx.h"
 #include "video/i8275.h"
 #include "includes/radio86.h"
 #include "includes/partner.h"
-#include "devices/flopdrv.h"
+#include "imagedev/flopdrv.h"
 #include "machine/ram.h"
 
 

@@ -9,7 +9,7 @@
 #ifndef SVI_CAS_H
 #define SVI_CAS_H
 
-#include "formats/cassimg.h"
+#include "imagedev/cassimg.h"
 
 CASSETTE_FORMATLIST_EXTERN(svi_cassette_formats);
 

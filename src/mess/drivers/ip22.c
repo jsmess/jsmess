@@ -52,8 +52,8 @@
 #include "machine/pcshare.h"
 #include "video/newport.h"
 #include "machine/wd33c93.h"
-#include "devices/harddriv.h"
-#include "devices/chd_cd.h"
+#include "imagedev/harddriv.h"
+#include "imagedev/chd_cd.h"
 #include "sound/dac.h"
 
 

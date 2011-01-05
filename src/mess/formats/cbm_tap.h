@@ -9,7 +9,7 @@
 #ifndef CBM_TAP_H
 #define CBM_TAP_H
 
-#include "formats/cassimg.h"
+#include "imagedev/cassimg.h"
 
 CASSETTE_FORMATLIST_EXTERN(cbm_cassette_formats);
 

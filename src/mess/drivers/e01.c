@@ -49,7 +49,7 @@
 #include "emu.h"
 #include "includes/e01.h"
 #include "cpu/m6502/m6502.h"
-#include "devices/flopdrv.h"
+#include "imagedev/flopdrv.h"
 #include "machine/ram.h"
 #include "machine/ctronics.h"
 #include "machine/6522via.h"

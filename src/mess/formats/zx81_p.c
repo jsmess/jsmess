@@ -31,7 +31,7 @@ medium transfer rate is approx. 307 bps (38 bytes/sec) for files that contain
 
 #include "emu.h"
 #include "zx81_p.h"
-#include "devices/cassette.h"
+#include "imagedev/cassette.h"
 
 
 #define WAVEENTRY_LOW	-32768

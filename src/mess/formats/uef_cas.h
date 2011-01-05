@@ -7,7 +7,7 @@
 #ifndef UEF_CAS_H
 #define UEF_CAS_H
 
-#include "formats/cassimg.h"
+#include "imagedev/cassimg.h"
 
 extern const struct CassetteFormat uef_cassette_format;
 

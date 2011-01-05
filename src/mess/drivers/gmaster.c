@@ -4,7 +4,7 @@
 
 #include "emu.h"
 #include "cpu/upd7810/upd7810.h"
-#include "devices/cartslot.h"
+#include "imagedev/cartslot.h"
 
 #include "includes/gmaster.h"
 

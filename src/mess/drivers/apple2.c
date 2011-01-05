@@ -185,8 +185,8 @@ Apple 3.5 and Apple 5.25 drives - up to three devices
 #include "cpu/z80/z80.h"
 #include "deprecat.h"
 #include "devices/appldriv.h"
-#include "devices/flopdrv.h"
-#include "devices/cassette.h"
+#include "imagedev/flopdrv.h"
+#include "imagedev/cassette.h"
 #include "formats/ap2_dsk.h"
 #include "includes/apple2.h"
 #include "machine/ay3600.h"
@@ -200,7 +200,7 @@ Apple 3.5 and Apple 5.25 drives - up to three devices
 #include "machine/ram.h"
 #include "machine/a2cffa.h"
 #include "machine/idectrl.h"
-#include "devices/harddriv.h"
+#include "imagedev/harddriv.h"
 
 
 /***************************************************************************

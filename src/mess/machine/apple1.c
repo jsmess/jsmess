@@ -49,7 +49,7 @@
 #include "machine/6821pia.h"
 #include "cpu/m6502/m6502.h"
 #include "image.h"
-#include "devices/cassette.h"
+#include "imagedev/cassette.h"
 #include "machine/ram.h"
 
 static TIMER_CALLBACK(apple1_kbd_poll);

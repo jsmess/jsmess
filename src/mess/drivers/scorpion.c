@@ -146,9 +146,9 @@ http://www.z88forever.org.uk/zxplus3e/
 
 #include "emu.h"
 #include "includes/spectrum.h"
-#include "devices/snapquik.h"
-#include "devices/cartslot.h"
-#include "devices/cassette.h"
+#include "imagedev/snapquik.h"
+#include "imagedev/cartslot.h"
+#include "imagedev/cassette.h"
 #include "sound/ay8910.h"
 #include "sound/speaker.h"
 #include "formats/tzx_cas.h"

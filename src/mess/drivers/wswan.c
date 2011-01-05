@@ -34,7 +34,7 @@
 #include "emu.h"
 #include "cpu/v30mz/nec.h"
 #include "includes/wswan.h"
-#include "devices/cartslot.h"
+#include "imagedev/cartslot.h"
 
 static ADDRESS_MAP_START (wswan_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x00000, 0x03fff) AM_RAM		/* 16kb RAM / 4 colour tiles */

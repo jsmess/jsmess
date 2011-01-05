@@ -26,7 +26,7 @@
 #include "sound/wave.h"
 #include "video/v9938.h"
 #include "machine/tms9901.h"
-#include "devices/cassette.h"
+#include "imagedev/cassette.h"
 
 #include "machine/ti99/tiboard.h"
 

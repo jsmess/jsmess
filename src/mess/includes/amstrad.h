@@ -9,7 +9,7 @@
 
 #include "machine/upd765.h"
 #include "video/mc6845.h"
-#include "devices/snapquik.h"
+#include "imagedev/snapquik.h"
 
 /****************************
  * Gate Array data (CPC) -

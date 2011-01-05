@@ -29,8 +29,8 @@
 #include "emu.h"
 #include "includes/vidbrain.h"
 #include "cpu/f8/f8.h"
-#include "devices/cartslot.h"
-#include "devices/cassette.h"
+#include "imagedev/cartslot.h"
+#include "imagedev/cassette.h"
 #include "machine/ram.h"
 #include "sound/discrete.h"
 

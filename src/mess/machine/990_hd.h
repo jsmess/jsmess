@@ -4,7 +4,7 @@
 #ifndef __990_HD_H_
 #define __990_HD_H_
 
-#include "devices/harddriv.h"
+#include "imagedev/harddriv.h"
 
 MACHINE_START( ti990_hdc );
 

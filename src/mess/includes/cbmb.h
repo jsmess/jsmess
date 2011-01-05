@@ -13,7 +13,7 @@
 
 #include "video/mc6845.h"
 #include "machine/6526cia.h"
-#include "devices/cartslot.h"
+#include "imagedev/cartslot.h"
 
 class cbmb_state : public driver_device
 {

@@ -162,8 +162,8 @@ FFFF
 #include "cpu/tms9900/tms9900.h"
 #include "sound/wave.h"
 #include "video/tms9928a.h"
-#include "devices/cartslot.h"
-#include "devices/cassette.h"
+#include "imagedev/cartslot.h"
+#include "imagedev/cassette.h"
 #include "sound/sn76496.h"
 #include "machine/ctronics.h"
 

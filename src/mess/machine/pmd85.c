@@ -10,7 +10,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "devices/cassette.h"
+#include "imagedev/cassette.h"
 #include "cpu/i8085/i8085.h"
 #include "machine/i8255a.h"
 #include "includes/pmd85.h"

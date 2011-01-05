@@ -65,7 +65,7 @@ Timings:
 #include "includes/dai.h"
 #include "machine/pit8253.h"
 #include "machine/tms5501.h"
-#include "devices/cassette.h"
+#include "imagedev/cassette.h"
 #include "machine/ram.h"
 
 /* I/O ports */

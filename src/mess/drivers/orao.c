@@ -15,7 +15,7 @@
 #include "sound/dac.h"
 #include "sound/wave.h"
 #include "includes/orao.h"
-#include "devices/cassette.h"
+#include "imagedev/cassette.h"
 #include "formats/orao_cas.h"
 
 /* Address maps */

@@ -9,7 +9,7 @@
 
 #include "machine/serial.h"
 #include "machine/msm8251.h"
-#include "devices/snapquik.h"
+#include "imagedev/snapquik.h"
 
 class poly88_state : public driver_device
 {

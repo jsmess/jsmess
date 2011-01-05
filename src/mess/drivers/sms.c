@@ -66,7 +66,7 @@ DC00      - Selection buttons #2, 9-16 (R)
 #include "sound/2413intf.h"
 #include "includes/sms.h"
 #include "video/smsvdp.h"
-#include "devices/cartslot.h"
+#include "imagedev/cartslot.h"
 
 #include "sms1.lh"
 

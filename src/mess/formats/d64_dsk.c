@@ -19,9 +19,9 @@
 
 #include "emu.h"
 #include "g64_dsk.h"
-#include "formats/flopimg.h"
+#include "imagedev/flopimg.h"
 #include "formats/d64_dsk.h"
-#include "devices/flopdrv.h"
+#include "imagedev/flopdrv.h"
 
 /***************************************************************************
     PARAMETERS

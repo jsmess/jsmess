@@ -9,7 +9,7 @@
 #ifndef ATARIST_DSK_H
 #define ATARIST_DSK_H
 
-#include "formats/flopimg.h"
+#include "imagedev/flopimg.h"
 
 /**************************************************************************/
 

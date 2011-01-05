@@ -15,7 +15,7 @@
 #include "machine/ram.h"
 #include "machine/upd7201.h"
 #include "machine/upd765.h"
-#include "devices/flopdrv.h"
+#include "imagedev/flopdrv.h"
 
 
 /***************************************************************************

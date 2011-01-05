@@ -9,7 +9,7 @@
 #ifndef __TI99CART_H__
 #define __TI99CART_H__
 
-#include "devices/cartslot.h"
+#include "imagedev/cartslot.h"
 #include "ti99defs.h"
 
 typedef struct _ti99_multicart_config

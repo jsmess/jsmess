@@ -286,8 +286,8 @@ Timings:
 #include "sound/wave.h"
 #include "machine/i8255a.h"
 #include "includes/lviv.h"
-#include "devices/snapquik.h"
-#include "devices/cassette.h"
+#include "imagedev/snapquik.h"
+#include "imagedev/cassette.h"
 #include "formats/lviv_lvt.h"
 #include "machine/ram.h"
 

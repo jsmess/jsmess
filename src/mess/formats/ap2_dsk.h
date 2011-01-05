@@ -9,7 +9,7 @@
 #ifndef AP2_DISK_H
 #define AP2_DISK_H
 
-#include "formats/flopimg.h"
+#include "imagedev/flopimg.h"
 
 
 /***************************************************************************

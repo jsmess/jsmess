@@ -183,9 +183,9 @@ Notes:
 #include "machine/6821pia.h"
 #include "sound/discrete.h"
 #include "sound/beep.h"
-#include "devices/flopdrv.h"
+#include "imagedev/flopdrv.h"
 #include "formats/basicdsk.h"
-#include "devices/cassette.h"
+#include "imagedev/cassette.h"
 #include "machine/ram.h"
 
 /* Sound */

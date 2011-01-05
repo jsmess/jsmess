@@ -9,7 +9,7 @@
 #ifndef DIM_DSK_H
 #define DIM_DSK_H
 
-#include "formats/flopimg.h"
+#include "imagedev/flopimg.h"
 
 /**************************************************************************/
 

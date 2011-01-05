@@ -8,7 +8,7 @@
 #ifndef ORAO_CAS_H
 #define ORAO_CAS_H
 
-#include "formats/cassimg.h"
+#include "imagedev/cassimg.h"
 
 CASSETTE_FORMATLIST_EXTERN(orao_cassette_formats);
 

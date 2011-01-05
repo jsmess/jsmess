@@ -50,12 +50,6 @@ DRVLIBS = \
 	$(MESSOBJ)/tiny.o \
 	$(MESS_DRIVERS)/coleco.o \
 	$(EMU_VIDEO)/tms9928a.o \
-	$(MESS_DEVICES)/cartslot.o \
-	$(MESS_DEVICES)/cassette.o	\
-	$(MESS_DEVICES)/messram.o	\
-	$(MESS_DEVICES)/multcart.o	\
-	$(MESS_FORMATS)/cassimg.o	\
-	$(MESS_FORMATS)/wavfile.o	\
 
 
 

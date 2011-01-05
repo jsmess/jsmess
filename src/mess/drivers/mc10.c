@@ -13,7 +13,7 @@
 #include "sound/dac.h"
 #include "video/m6847.h"
 #include "video/ef9345.h"
-#include "devices/cassette.h"
+#include "imagedev/cassette.h"
 #include "formats/coco_cas.h"
 #include "machine/ram.h"
 

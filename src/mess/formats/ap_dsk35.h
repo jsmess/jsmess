@@ -9,7 +9,7 @@
 #ifndef AP_DSK35_H
 #define AP_DSK35_H
 
-#include "formats/flopimg.h"
+#include "imagedev/flopimg.h"
 
 void sony_filltrack(UINT8 *buffer, size_t buffer_len, size_t *pos, UINT8 data);
 UINT8 sony_fetchtrack(const UINT8 *buffer, size_t buffer_len, size_t *pos);

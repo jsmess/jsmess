@@ -5,8 +5,8 @@
 #include "video/ppu2c0x.h"
 #include "includes/nes.h"
 #include "machine/nes_mmc.h"
-#include "devices/cartslot.h"
-#include "devices/flopdrv.h"
+#include "imagedev/cartslot.h"
+#include "imagedev/flopdrv.h"
 
 /***************************************************************************
     CONSTANTS

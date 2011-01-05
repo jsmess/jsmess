@@ -11,7 +11,7 @@
 #include "sound/speaker.h"
 
 /* Devices */
-#include "devices/cassette.h"
+#include "imagedev/cassette.h"
 #include "machine/ram.h"
 
 #define KC_DEBUG 1

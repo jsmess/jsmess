@@ -83,7 +83,7 @@ change from 1 to 0.
 #include "cpu/m6502/m6502.h"
 #include "sound/dac.h"
 #include "machine/mos6530.h"
-#include "devices/cassette.h"
+#include "imagedev/cassette.h"
 #include "formats/kim1_cas.h"
 #include "kim1.lh"
 

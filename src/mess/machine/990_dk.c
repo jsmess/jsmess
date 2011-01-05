@@ -12,7 +12,7 @@
 
 #include "990_dk.h"
 #include "formats/basicdsk.h"
-#include "devices/flopdrv.h"
+#include "imagedev/flopdrv.h"
 
 #define MAX_FLOPPIES 4
 

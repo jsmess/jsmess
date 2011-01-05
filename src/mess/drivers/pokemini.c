@@ -12,7 +12,7 @@ The LCD is likely to be a SSD1828 LCD.
 #include "machine/i2cmem.h"
 #include "includes/pokemini.h"
 #include "cpu/minx/minx.h"
-#include "devices/cartslot.h"
+#include "imagedev/cartslot.h"
 
 
 static ADDRESS_MAP_START( pokemini_mem_map, ADDRESS_SPACE_PROGRAM, 8 )

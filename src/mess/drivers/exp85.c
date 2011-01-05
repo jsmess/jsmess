@@ -20,7 +20,7 @@
 #include "emu.h"
 #include "includes/exp85.h"
 #include "cpu/i8085/i8085.h"
-#include "devices/cassette.h"
+#include "imagedev/cassette.h"
 #include "machine/i8155.h"
 #include "machine/i8355.h"
 #include "sound/speaker.h"

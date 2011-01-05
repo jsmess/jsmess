@@ -10,7 +10,7 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/wave.h"
-#include "devices/cassette.h"
+#include "imagedev/cassette.h"
 #include "machine/ram.h"
 #include "includes/ondra.h"
 

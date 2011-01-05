@@ -17,8 +17,8 @@
 
 #include "emu.h"
 #include "imageutl.h"
-#include "devices/flopdrv.h"
-#include "devices/harddriv.h"
+#include "imagedev/flopdrv.h"
+#include "imagedev/harddriv.h"
 #include "harddisk.h"
 
 #include "smc92x4.h"

@@ -7,7 +7,7 @@
 #ifndef CBM_H_
 #define CBM_H_
 
-#include "devices/cassette.h"
+#include "imagedev/cassette.h"
 
 
 /* global header file for c16, c64, c65, c128, vc20 */

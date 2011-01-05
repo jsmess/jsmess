@@ -9,7 +9,7 @@
 #ifndef EXI_DSK_H
 #define EXI_DSK_H
 
-#include "formats/flopimg.h"
+#include "imagedev/flopimg.h"
 
 /**************************************************************************/
 

@@ -19,7 +19,7 @@
 #include "video/generic.h"
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"
-#include "devices/cartslot.h"
+#include "imagedev/cartslot.h"
 #include "sound/dac.h"
 #include "machine/intelfsh.h"
 #include "audio/gb.h"

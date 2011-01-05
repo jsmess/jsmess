@@ -12,7 +12,7 @@
 #include "video/m6847.h"
 #include "sound/ay8910.h"
 #include "sound/wave.h"
-#include "devices/cassette.h"
+#include "imagedev/cassette.h"
 #include "machine/ram.h"
 
 

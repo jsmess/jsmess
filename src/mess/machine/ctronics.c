@@ -6,7 +6,7 @@
 
 #include "emu.h"
 #include "ctronics.h"
-#include "devices/printer.h"
+#include "imagedev/printer.h"
 
 
 /***************************************************************************

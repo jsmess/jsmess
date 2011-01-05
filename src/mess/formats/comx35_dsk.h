@@ -9,7 +9,7 @@
 #ifndef COMX35_DSK_H
 #define COMX35_DSK_H
 
-#include "formats/flopimg.h"
+#include "imagedev/flopimg.h"
 
 /**************************************************************************/
 

@@ -152,9 +152,9 @@ There don't seem to be any JV1 boot disks for Model III/4.
 #include "sound/speaker.h"
 
 /* Devices */
-#include "devices/flopdrv.h"
+#include "imagedev/flopdrv.h"
 #include "formats/trs_dsk.h"
-#include "devices/cassette.h"
+#include "imagedev/cassette.h"
 #include "formats/trs_cas.h"
 #include "formats/trs_cmd.h"
 

@@ -44,7 +44,7 @@
 #include "cpu/g65816/g65816.h"
 #include "includes/apple2.h"
 #include "machine/ay3600.h"
-#include "devices/flopdrv.h"
+#include "imagedev/flopdrv.h"
 #include "formats/ap2_dsk.h"
 #include "formats/ap_dsk35.h"
 #include "includes/apple2gs.h"
@@ -58,7 +58,7 @@
 #include "machine/8530scc.h"
 #include "sound/ay8910.h"
 #include "sound/speaker.h"
-#include "devices/cassette.h"
+#include "imagedev/cassette.h"
 #include "machine/ram.h"
 #include "deprecat.h"
 

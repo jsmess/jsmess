@@ -9,7 +9,7 @@
 #include "cdrom.h"
 #include "sound/cdda.h"
 #ifdef MESS
-#include "devices/chd_cd.h"
+#include "imagedev/chd_cd.h"
 #endif
 #include "gdrom.h"
 

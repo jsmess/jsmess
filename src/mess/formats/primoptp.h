@@ -9,7 +9,7 @@
 #ifndef PRIMOPTP_H
 #define PRIMOPTP_H
 
-#include "formats/cassimg.h"
+#include "imagedev/cassimg.h"
 
 CASSETTE_FORMATLIST_EXTERN( primo_ptp_format );
 

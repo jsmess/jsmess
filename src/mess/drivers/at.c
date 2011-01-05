@@ -44,8 +44,8 @@
 
 #include "machine/pcshare.h"
 
-#include "devices/flopdrv.h"
-#include "devices/harddriv.h"
+#include "imagedev/flopdrv.h"
+#include "imagedev/harddriv.h"
 #include "formats/pc_dsk.h"
 
 #include "machine/8237dma.h"

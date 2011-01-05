@@ -25,7 +25,7 @@ TODO:
 #define __CDICDIC_H__
 
 #include "emu.h"
-#include "devices/chd_cd.h"
+#include "imagedev/chd_cd.h"
 
 //**************************************************************************
 //  INTERFACE CONFIGURATION MACROS

@@ -12,7 +12,7 @@
 #include "emu.h"
 #include "imageutl.h"
 #include "pool.h"
-#include "formats/cassimg.h"
+#include "cassimg.h"
 
 
 /* debugging parameters */

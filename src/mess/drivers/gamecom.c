@@ -18,7 +18,7 @@ Todo:
 #include "emu.h"
 #include "includes/gamecom.h"
 #include "cpu/sm8500/sm8500.h"
-#include "devices/cartslot.h"
+#include "imagedev/cartslot.h"
 
 
 static ADDRESS_MAP_START(gamecom_mem_map, ADDRESS_SPACE_PROGRAM, 8)

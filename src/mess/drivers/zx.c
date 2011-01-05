@@ -43,7 +43,7 @@
 #include "sound/speaker.h"
 #include "sound/wave.h"
 #include "includes/zx.h"
-#include "devices/cassette.h"
+#include "imagedev/cassette.h"
 #include "formats/zx81_p.h"
 #include "machine/ram.h"
 

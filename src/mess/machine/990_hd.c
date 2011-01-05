@@ -21,7 +21,7 @@
 #include "990_hd.h"
 
 #include "harddisk.h"
-#include "devices/harddriv.h"
+#include "imagedev/harddriv.h"
 
 static void update_interrupt(running_machine *machine);
 

@@ -57,7 +57,7 @@ CD Interface Register 0x0f - ADPCM fade in/out register
 #include "coreutil.h"
 #include "cpu/h6280/h6280.h"
 #include "includes/pce.h"
-#include "devices/chd_cd.h"
+#include "imagedev/chd_cd.h"
 #include "sound/msm5205.h"
 #include "sound/cdda.h"
 

@@ -9,7 +9,7 @@
 #include "emu.h"
 #include "machine/i8255a.h"
 #include "machine/pit8253.h"
-#include "devices/cassette.h"
+#include "imagedev/cassette.h"
 #include "sound/speaker.h"
 #include "includes/mz80.h"
 

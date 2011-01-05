@@ -9,7 +9,7 @@
 #ifndef VT_DSK_H
 #define VT_DSK_H
 
-#include "formats/flopimg.h"
+#include "imagedev/flopimg.h"
 
 FLOPPY_OPTIONS_EXTERN(vz);
 

@@ -141,7 +141,7 @@ PCB 'Z545-1 A240570-1'
 #include "emu.h"
 #include "cpu/sh2/sh2.h"
 //#include "cpu/v60/v60.h"
-#include "devices/cartslot.h"
+#include "imagedev/cartslot.h"
 
 
 class casloopy_state : public driver_device

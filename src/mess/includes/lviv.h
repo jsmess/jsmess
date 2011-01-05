@@ -7,7 +7,7 @@
 #ifndef LVIV_H_
 #define LVIV_H_
 
-#include "devices/snapquik.h"
+#include "imagedev/snapquik.h"
 #include "machine/i8255a.h"
 
 class lviv_state : public driver_device

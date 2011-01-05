@@ -10,7 +10,7 @@
 #include "emu.h"
 #include "includes/electron.h"
 #include "sound/beep.h"
-#include "devices/cassette.h"
+#include "imagedev/cassette.h"
 
 
 static device_t *cassette_device_image( running_machine *machine )

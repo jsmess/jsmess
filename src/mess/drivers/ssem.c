@@ -6,7 +6,7 @@
 
 #include "emu.h"
 #include "cpu/ssem/ssem.h"
-#include "devices/cartslot.h"
+#include "imagedev/cartslot.h"
 #include <stdarg.h>
 
 

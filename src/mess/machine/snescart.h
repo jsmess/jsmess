@@ -6,7 +6,7 @@
 #ifndef _SNESCART_H
 #define _SNESCART_H
 
-#include "devices/cartslot.h"
+#include "imagedev/cartslot.h"
 
 MACHINE_START( snes_mess );
 MACHINE_START( snesst );

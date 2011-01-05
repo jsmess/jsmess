@@ -9,7 +9,7 @@
 #ifndef HECT_TAP_H
 #define HECT_TAP_H
 
-#include "formats/cassimg.h"
+#include "imagedev/cassimg.h"
 
 CASSETTE_FORMATLIST_EXTERN(hector_cassette_formats);
 

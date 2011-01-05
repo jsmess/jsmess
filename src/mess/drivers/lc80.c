@@ -22,7 +22,7 @@
 #include "includes/lc80.h"
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
-#include "devices/cassette.h"
+#include "imagedev/cassette.h"
 #include "machine/z80pio.h"
 #include "machine/z80ctc.h"
 #include "sound/speaker.h"

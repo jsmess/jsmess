@@ -14,7 +14,7 @@
 #include "includes/cbmb.h"
 #include "crsshair.h"
 
-#include "devices/cartslot.h"
+#include "imagedev/cartslot.h"
 
 /* 2008-05 FP: Were these added as a reminder to add configs of
 drivers 8 & 9 as in pet.c ? */

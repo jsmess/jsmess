@@ -25,7 +25,7 @@
 #include "emu.h"
 #include "includes/pc8001.h"
 #include "cpu/z80/z80.h"
-#include "devices/cassette.h"
+#include "imagedev/cassette.h"
 #include "machine/ram.h"
 #include "machine/i8257.h"
 #include "machine/ctronics.h"

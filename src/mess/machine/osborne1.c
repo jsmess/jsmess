@@ -22,7 +22,7 @@ be written to RAM if RAM was switched in.
 #include "cpu/z80/z80daisy.h"
 #include "sound/beep.h"
 #include "includes/osborne1.h"
-#include "devices/flopdrv.h"
+#include "imagedev/flopdrv.h"
 #include "machine/ram.h"
 
 #define RAMMODE		(0x01)

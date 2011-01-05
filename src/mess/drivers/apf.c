@@ -19,10 +19,10 @@ todo for apf m1000:
 
 #include "machine/6821pia.h"
 #include "machine/wd17xx.h"
-#include "devices/flopdrv.h"
+#include "imagedev/flopdrv.h"
 #include "formats/basicdsk.h"
-#include "devices/cassette.h"
-#include "devices/cartslot.h"
+#include "imagedev/cassette.h"
+#include "imagedev/cartslot.h"
 #include "formats/apf_apt.h"
 #include "sound/speaker.h"
 

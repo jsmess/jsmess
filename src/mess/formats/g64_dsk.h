@@ -9,7 +9,7 @@
 #ifndef __G64_DSK__
 #define __G64_DSK__
 
-#include "formats/flopimg.h"
+#include "imagedev/flopimg.h"
 
 /***************************************************************************
     MACROS / CONSTANTS

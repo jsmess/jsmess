@@ -10,7 +10,7 @@
 #ifndef TI99_DSK_H
 #define TI99_DSK_H
 
-#include "formats/flopimg.h"
+#include "imagedev/flopimg.h"
 
 FLOPPY_OPTIONS_EXTERN(ti99);
 

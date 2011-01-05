@@ -53,7 +53,7 @@ to create a blank hard disk which can then be formatted with the RM tools.
 #include "cpu/i86/i86.h"
 #include "debug/debugcpu.h"
 #include "debug/debugcon.h"
-#include "devices/flopdrv.h"
+#include "imagedev/flopdrv.h"
 #include "machine/ram.h"
 #include "machine/er59256.h"
 #include "machine/pic8259.h"

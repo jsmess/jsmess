@@ -44,7 +44,7 @@ TODO:
 #else
 #include "video/733_asr.h"
 #endif
-#include "devices/flopdrv.h"
+#include "imagedev/flopdrv.h"
 
 
 class ti990_4_state : public driver_device

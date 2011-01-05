@@ -9,7 +9,7 @@
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
 #include "machine/terminal.h"
-#include "devices/snapquik.h"
+#include "imagedev/snapquik.h"
 
 
 class altair_state : public driver_device

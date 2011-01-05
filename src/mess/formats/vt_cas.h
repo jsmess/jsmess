@@ -9,7 +9,7 @@
 #ifndef VT_CAS_H
 #define VT_CAS_H
 
-#include "formats/cassimg.h"
+#include "imagedev/cassimg.h"
 
 CASSETTE_FORMATLIST_EXTERN(vtech1_cassette_formats);
 CASSETTE_FORMATLIST_EXTERN(vtech2_cassette_formats);

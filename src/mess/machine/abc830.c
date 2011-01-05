@@ -184,8 +184,8 @@ Notes:
 #include "cpu/z80/z80daisy.h"
 #include "machine/wd17xx.h"
 #include "machine/abcbus.h"
-#include "devices/flopdrv.h"
-#include "formats/flopimg.h"
+#include "imagedev/flopdrv.h"
+#include "imagedev/flopimg.h"
 #include "formats/basicdsk.h"
 
 /***************************************************************************

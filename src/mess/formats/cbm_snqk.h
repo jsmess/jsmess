@@ -7,7 +7,7 @@
 #ifndef __CBM_SNQK_H__
 #define __CBM_SNQK_H__
 
-#include "devices/snapquik.h"
+#include "imagedev/snapquik.h"
 
 #define CBM_QUICKLOAD_DELAY_SECONDS 3
 

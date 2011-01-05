@@ -3,7 +3,7 @@
 #include "formats/trs_dsk.h"
 #include "formats/basicdsk.h"
 #include "formats/coco_dsk.h"
-#include "devices/flopdrv.h"
+#include "imagedev/flopdrv.h"
 
 /* -----------------------------------------------------------------------
  * JV1 (Jeff Vavasour 1) format

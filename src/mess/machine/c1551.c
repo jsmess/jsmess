@@ -20,7 +20,7 @@
 #include "emu.h"
 #include "c1551.h"
 #include "cpu/m6502/m6502.h"
-#include "devices/flopdrv.h"
+#include "imagedev/flopdrv.h"
 #include "formats/d64_dsk.h"
 #include "formats/g64_dsk.h"
 #include "machine/6525tpi.h"

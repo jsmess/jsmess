@@ -25,9 +25,9 @@
 #include "machine/applefdc.h"
 #include "machine/6551.h"
 #include "machine/ctronics.h"
-#include "devices/cassette.h"
+#include "imagedev/cassette.h"
 #include "sound/ay8910.h"
-#include "devices/flopdrv.h"
+#include "imagedev/flopdrv.h"
 
 
 

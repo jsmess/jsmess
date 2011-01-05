@@ -21,7 +21,7 @@
 #include "smartmed.h"
 
 #include "harddisk.h"
-#include "devices/harddriv.h"
+#include "imagedev/harddriv.h"
 
 #define MAX_SMARTMEDIA	1
 

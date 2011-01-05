@@ -14,7 +14,7 @@
 #include <limits.h>
 
 #include "osdepend.h"
-#include "formats/flopimg.h"
+#include "flopimg.h"
 #include "pool.h"
 #include "imageutl.h"
 

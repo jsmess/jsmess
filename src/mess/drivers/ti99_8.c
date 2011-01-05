@@ -196,7 +196,7 @@ Known Issues (MZ, 2010-11-07)
 //#include "video/tms9928a.h"
 #include "sound/wave.h"
 #include "machine/tms9901.h"
-#include "devices/cassette.h"
+#include "imagedev/cassette.h"
 
 #include "machine/ti99/tiboard.h"
 

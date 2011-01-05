@@ -9,7 +9,7 @@
 #ifndef ADAM_DSK_H
 #define ADAM_DSK_H
 
-#include "formats/flopimg.h"
+#include "imagedev/flopimg.h"
 
 
 /**************************************************************************/

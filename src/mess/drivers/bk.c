@@ -11,7 +11,7 @@
 #include "cpu/t11/t11.h"
 #include "sound/wave.h"
 #include "includes/bk.h"
-#include "devices/cassette.h"
+#include "imagedev/cassette.h"
 #include "formats/rk_cas.h"
 
   /* Address maps */

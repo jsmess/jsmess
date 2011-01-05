@@ -9,7 +9,7 @@
 #include "emu.h"
 #include "imageutl.h"
 #include "cassette.h"
-#include "formats/cassimg.h"
+#include "cassimg.h"
 #include "ui.h"
 
 

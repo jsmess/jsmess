@@ -71,8 +71,8 @@ $F000-$FFFF:    ROM address space
 #include "cpu/m6502/m6502.h"
 #include "machine/6821pia.h"
 #include "includes/apple1.h"
-#include "devices/snapquik.h"
-#include "devices/cassette.h"
+#include "imagedev/snapquik.h"
+#include "imagedev/cassette.h"
 #include "machine/ram.h"
 
 /* port i/o functions */

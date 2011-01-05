@@ -14,8 +14,8 @@
 
 #include <string.h>
 #include "emu.h"
-#include "formats/flopimg.h"
-#include "devices/flopdrv.h"
+#include "imagedev/flopimg.h"
+#include "imagedev/flopdrv.h"
 
 struct td0dsk_tag
 {

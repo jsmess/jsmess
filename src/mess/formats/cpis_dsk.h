@@ -9,7 +9,7 @@
 #ifndef CPIS_DSK_H
 #define CPIS_DSK_H
 
-#include "formats/flopimg.h"
+#include "imagedev/flopimg.h"
 
 
 /**************************************************************************/

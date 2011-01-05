@@ -48,7 +48,7 @@
 #include "machine/6551.h"
 
 /* Devices */
-#include "devices/cassette.h"
+#include "imagedev/cassette.h"
 #include "formats/m65_snqk.h"
 
 

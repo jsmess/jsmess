@@ -10,7 +10,7 @@
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
-#include "devices/cassette.h"
+#include "imagedev/cassette.h"
 #include "machine/mc146818.h"
 #include "machine/wd17xx.h"
 #include "sound/speaker.h"

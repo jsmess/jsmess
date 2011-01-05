@@ -32,7 +32,7 @@
 #include "emu.h"
 #include "machine/pc_hdc.h"
 #include "machine/8237dma.h"
-#include "devices/harddriv.h"
+#include "imagedev/harddriv.h"
 #include "memconv.h"
 
 

@@ -59,10 +59,10 @@ Nascom Memory map
 #include "machine/z80pio.h"
 
 /* Devices */
-#include "devices/flopdrv.h"
+#include "imagedev/flopdrv.h"
 #include "formats/basicdsk.h"
-#include "devices/cartslot.h"
-#include "devices/cassette.h"
+#include "imagedev/cartslot.h"
+#include "imagedev/cassette.h"
 #include "machine/ram.h"
 
 

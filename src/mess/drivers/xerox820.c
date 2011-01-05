@@ -31,7 +31,7 @@
 #include "cpu/z80/z80daisy.h"
 #include "cpu/i86/i86.h"
 #include "formats/basicdsk.h"
-#include "devices/flopdrv.h"
+#include "imagedev/flopdrv.h"
 #include "machine/ram.h"
 #include "machine/z80pio.h"
 #include "machine/z80ctc.h"

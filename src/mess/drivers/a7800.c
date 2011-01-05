@@ -17,7 +17,7 @@
 #include "cpu/m6502/m6502.h"
 #include "sound/pokey.h"
 #include "sound/tiaintf.h"
-#include "devices/cartslot.h"
+#include "imagedev/cartslot.h"
 #include "machine/6532riot.h"
 #include "includes/a7800.h"
 

@@ -19,8 +19,8 @@
 #include "machine/wd17xx.h"
 
 /* Devices */
-#include "devices/cassette.h"
-#include "devices/flopdrv.h"
+#include "imagedev/cassette.h"
+#include "imagedev/flopdrv.h"
 
 #define VERBOSE 0
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)

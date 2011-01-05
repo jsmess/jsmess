@@ -83,10 +83,10 @@ Notes:
 
 #include "emu.h"
 #include "machine/ctronics.h"
-#include "devices/flopdrv.h"
+#include "imagedev/flopdrv.h"
 #include "formats/basicdsk.h"
-#include "devices/cassette.h"
-#include "devices/snapquik.h"
+#include "imagedev/cassette.h"
+#include "imagedev/snapquik.h"
 #include "cpu/cosmac/cosmac.h"
 #include "sound/cdp1869.h"
 #include "includes/tmc600.h"

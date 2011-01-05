@@ -55,8 +55,8 @@ TODO:
 #include "video/tms3556.h"
 #include "sound/tms5220.h"
 #include "audio/spchroms.h"
-/*#include "devices/cartslot.h"
-#include "devices/cassette.h"*/
+/*#include "imagedev/cartslot.h"
+#include "imagedev/cassette.h"*/
 
 
 class exelv_state : public driver_device

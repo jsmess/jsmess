@@ -14,7 +14,7 @@
 #include "emu.h"
 #include "cpu/f8/f8.h"
 #include "includes/channelf.h"
-#include "devices/cartslot.h"
+#include "imagedev/cartslot.h"
 
 
 #ifndef VERBOSE

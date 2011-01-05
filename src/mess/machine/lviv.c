@@ -10,8 +10,8 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "devices/cassette.h"
-#include "devices/snapquik.h"
+#include "imagedev/cassette.h"
+#include "imagedev/snapquik.h"
 #include "cpu/i8085/i8085.h"
 #include "machine/i8255a.h"
 #include "includes/lviv.h"

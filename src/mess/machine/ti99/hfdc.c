@@ -7,7 +7,7 @@
 #include "ti_fdc.h"
 #include "machine/wd17xx.h"
 #include "formats/ti99_dsk.h"
-#include "devices/flopdrv.h"
+#include "imagedev/flopdrv.h"
 #include "devices/ti99_hd.h"
 #include "machine/mm58274c.h"
 #include "hfdc.h"

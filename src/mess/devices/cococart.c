@@ -8,7 +8,7 @@
 
 #include "emu.h"
 #include "cococart.h"
-#include "cartslot.h"
+#include "imagedev/cartslot.h"
 
 
 /***************************************************************************

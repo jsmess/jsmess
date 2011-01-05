@@ -20,7 +20,7 @@
 
 #include "machine/wd17xx.h"
 #include "formats/basicdsk.h"
-#include "devices/flopdrv.h"
+#include "imagedev/flopdrv.h"
 
 
 class smc777_state : public driver_device

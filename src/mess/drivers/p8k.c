@@ -20,7 +20,7 @@
 #include "cpu/z8000/z8000.h"
 #include "cpu/z80/z80daisy.h"
 #include "formats/basicdsk.h"
-#include "devices/flopdrv.h"
+#include "imagedev/flopdrv.h"
 #include "machine/upd765.h"
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"

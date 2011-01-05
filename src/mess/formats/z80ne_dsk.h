@@ -9,7 +9,7 @@
 #ifndef Z80NE_DSK_H
 #define Z80NE_DSK_H
 
-#include "formats/flopimg.h"
+#include "imagedev/flopimg.h"
 
 
 /**************************************************************************/

@@ -11,7 +11,7 @@
 #ifndef __ATOM_TAP__
 #define __ATOM_TAP__
 
-#include "formats/cassimg.h"
+#include "imagedev/cassimg.h"
 
 extern const struct CassetteFormat atom_tap_format;
 

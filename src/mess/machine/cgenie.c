@@ -11,11 +11,11 @@
 #include "cpu/z80/z80.h"
 #include "includes/cgenie.h"
 #include "machine/wd17xx.h"
-#include "devices/cartslot.h"
-#include "devices/cassette.h"
+#include "imagedev/cartslot.h"
+#include "imagedev/cassette.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
-#include "devices/flopdrv.h"
+#include "imagedev/flopdrv.h"
 #include "machine/ram.h"
 
 #define AYWriteReg(chip,port,value) \

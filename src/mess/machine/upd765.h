@@ -11,7 +11,7 @@
 #define __UPD765_H__
 
 #include "devcb.h"
-#include "devices/flopdrv.h"
+#include "imagedev/flopdrv.h"
 
 
 /***************************************************************************

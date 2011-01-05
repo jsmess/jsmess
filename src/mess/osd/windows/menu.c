@@ -25,9 +25,8 @@
 #include "strconv.h"
 #include "debug/debugcpu.h"
 #include "inptport.h"
-#include "devices/cassette.h"
+#include "imagedev/cassette.h"
 #include "windows/window.h"
-#include "uimess.h"
 #include "winutf8.h"
 
 #ifdef UNDER_CE

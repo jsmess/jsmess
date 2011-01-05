@@ -5,7 +5,7 @@
 #ifndef FM7_CAS_H_
 #define FM7_CAS_H_
 
-#include "formats/cassimg.h"
+#include "imagedev/cassimg.h"
 
 CASSETTE_FORMATLIST_EXTERN( fm7_cassette_formats );
 

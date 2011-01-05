@@ -7,7 +7,7 @@
 #ifndef __APRIDISK_H__
 #define __APRIDISK_H__
 
-#include "flopimg.h"
+#include "imagedev/flopimg.h"
 
 FLOPPY_IDENTIFY( apridisk_identify );
 FLOPPY_CONSTRUCT( apridisk_construct );

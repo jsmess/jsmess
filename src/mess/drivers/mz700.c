@@ -74,7 +74,7 @@
 #include "sound/sn76496.h"
 #include "sound/speaker.h"
 #include "sound/wave.h"
-#include "devices/cassette.h"
+#include "imagedev/cassette.h"
 #include "machine/ram.h"
 #include "formats/mz_cas.h"
 

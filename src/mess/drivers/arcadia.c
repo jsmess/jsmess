@@ -121,7 +121,7 @@ anything in hardware. No cartridge has been found which uses them.
 #include "emu.h"
 #include "cpu/s2650/s2650.h"
 #include "includes/arcadia.h"
-#include "devices/cartslot.h"
+#include "imagedev/cartslot.h"
 
 static ADDRESS_MAP_START( arcadia_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE( 0x0000, 0x0fff) AM_ROM

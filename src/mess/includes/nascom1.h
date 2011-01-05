@@ -7,7 +7,7 @@
 #ifndef NASCOM1_H_
 #define NASCOM1_H_
 
-#include "devices/snapquik.h"
+#include "imagedev/snapquik.h"
 #include "machine/wd17xx.h"
 
 typedef struct

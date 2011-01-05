@@ -15,7 +15,7 @@
 #ifndef MICROTAN_H_
 #define MICROTAN_H_
 
-#include "devices/snapquik.h"
+#include "imagedev/snapquik.h"
 #include "machine/6522via.h"
 
 

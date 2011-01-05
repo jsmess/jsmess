@@ -4,7 +4,7 @@
 #include "cpu/cosmac/cosmac.h"
 #include "sound/cdp1869.h"
 #include "machine/cdp1871.h"
-#include "devices/snapquik.h"
+#include "imagedev/snapquik.h"
 #include "machine/wd17xx.h"
 #include "machine/ram.h"
 

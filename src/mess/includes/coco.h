@@ -9,7 +9,7 @@
 #ifndef __COCO_H__
 #define __COCO_H__
 
-#include "devices/snapquik.h"
+#include "imagedev/snapquik.h"
 #include "machine/wd17xx.h"
 #include "machine/6883sam.h"
 #include "machine/6821pia.h"

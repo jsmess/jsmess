@@ -42,7 +42,7 @@
 #include "sound/cdda.h"
 #include "includes/amiga.h"
 #include "includes/cubocd32.h"
-#include "devices/chd_cd.h"
+#include "imagedev/chd_cd.h"
 
 
 class ami1200_state : public cubocd32_state

@@ -9,7 +9,7 @@
 #ifndef PMD_PMD_H
 #define PMD_PMD_H
 
-#include "formats/cassimg.h"
+#include "imagedev/cassimg.h"
 
 CASSETTE_FORMATLIST_EXTERN(pmd85_pmd_format);
 

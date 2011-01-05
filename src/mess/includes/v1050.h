@@ -1,7 +1,7 @@
 #ifndef __V1050__
 #define __V1050__
 
-#include "devices/flopdrv.h"
+#include "imagedev/flopdrv.h"
 #include "machine/ram.h"
 
 #define SCREEN_TAG				"screen"

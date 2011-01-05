@@ -31,9 +31,9 @@
 #include "machine/intelfsh.h"
 
 /* Devices */
-#include "devices/flopdrv.h"
-#include "devices/chd_cd.h"
-#include "devices/harddriv.h"
+#include "imagedev/flopdrv.h"
+#include "imagedev/chd_cd.h"
+#include "imagedev/harddriv.h"
 #include "formats/pc_dsk.h"
 #include "machine/ram.h"
 

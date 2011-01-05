@@ -196,12 +196,12 @@
 #include "sound/wave.h"
 
 #include "machine/wd17xx.h"
-#include "devices/cassette.h"
-#include "devices/flopdrv.h"
-#include "formats/flopimg.h"
+#include "imagedev/cassette.h"
+#include "imagedev/flopdrv.h"
+#include "imagedev/flopimg.h"
 #include "formats/basicdsk.h"
 #include "formats/x1_tap.h"
-#include "devices/cartslot.h"
+#include "imagedev/cartslot.h"
 #include "includes/x1.h"
 //#include <ctype.h>
 

@@ -16,8 +16,8 @@
 
 #include "emu.h"
 #include "imageutl.h"
-#include "formats/flopimg.h"
-#include "devices/flopdrv.h"
+#include "imagedev/flopimg.h"
+#include "imagedev/flopdrv.h"
 
 /***************************************************************************
     PARAMETERS

@@ -9,7 +9,7 @@
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
-#include "devices/cassette.h"
+#include "imagedev/cassette.h"
 #include "machine/i8255a.h"
 #include "machine/i8257.h"
 #include "video/i8275.h"

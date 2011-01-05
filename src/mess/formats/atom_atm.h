@@ -12,7 +12,7 @@
 #define __ATOM_ATM__
 
 #include "emu.h"
-#include "devices/snapquik.h"
+#include "imagedev/snapquik.h"
 
 QUICKLOAD_LOAD( atom_atm );
 

@@ -21,7 +21,7 @@
 #include "cpu/z80/z80daisy.h"
 #include "cpu/mcs48/mcs48.h"
 #include "cpu/m68000/m68000.h"
-#include "devices/flopdrv.h"
+#include "imagedev/flopdrv.h"
 #include "machine/ram.h"
 #include "machine/ctronics.h"
 #include "machine/wd17xx.h"

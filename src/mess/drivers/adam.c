@@ -190,8 +190,8 @@ TO DO:
 #include "video/tms9928a.h"
 #include "includes/adam.h"
 #include "cpu/m6800/m6800.h"
-#include "devices/cartslot.h"
-#include "devices/flopdrv.h"
+#include "imagedev/cartslot.h"
+#include "imagedev/flopdrv.h"
 #include "formats/adam_dsk.h"
 
 static ADDRESS_MAP_START( adam_mem, ADDRESS_SPACE_PROGRAM, 8)

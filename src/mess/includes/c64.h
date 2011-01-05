@@ -14,7 +14,7 @@
 #define C64_H_
 
 #include "machine/6526cia.h"
-#include "devices/cartslot.h"
+#include "imagedev/cartslot.h"
 
 #define C64_MAX_ROMBANK 64 // .crt files contain multiple 'CHIPs', i.e. rom banks (of variable size) with headers. Known carts have at most 64 'CHIPs'.
 

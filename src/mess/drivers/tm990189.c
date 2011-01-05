@@ -42,7 +42,7 @@
 #include "machine/tms9901.h"
 #include "machine/tms9902.h"
 #include "video/tms9928a.h"
-#include "devices/cassette.h"
+#include "imagedev/cassette.h"
 #include "sound/speaker.h"
 #include "sound/wave.h"
 #include "machine/serial.h"

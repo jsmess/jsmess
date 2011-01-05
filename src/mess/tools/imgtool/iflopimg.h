@@ -9,7 +9,7 @@
 #ifndef IFLOPIMG_H
 #define IFLOPIMG_H
 
-#include "formats/flopimg.h"
+#include "imagedev/flopimg.h"
 #include "imgtoolx.h"
 #include "library.h"
 

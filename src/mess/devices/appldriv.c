@@ -7,7 +7,7 @@
 *********************************************************************/
 #include "emu.h"
 #include "appldriv.h"
-#include "flopdrv.h"
+#include "imagedev/flopdrv.h"
 #include "formats/ap2_dsk.h"
 
 struct apple525_disk

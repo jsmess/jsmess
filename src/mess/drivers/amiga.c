@@ -35,8 +35,8 @@ would commence ($C00000).
 #include "sound/cdda.h"
 
 /* Devices */
-#include "devices/chd_cd.h"
-#include "devices/cartslot.h"
+#include "imagedev/chd_cd.h"
+#include "imagedev/cartslot.h"
 
 
 static READ8_DEVICE_HANDLER( amiga_cia_0_portA_r );

@@ -1,7 +1,7 @@
 #ifndef _MACHINE_CDIC_H_
 #define _MACHINE_CDIC_H_
 
-#include "devices/chd_cd.h"
+#include "imagedev/chd_cd.h"
 
 namespace CDI
 {

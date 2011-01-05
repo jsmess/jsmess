@@ -9,7 +9,7 @@
 #ifndef SMX_DSK_H
 #define SMX_DSK_H
 
-#include "formats/flopimg.h"
+#include "imagedev/flopimg.h"
 
 /**************************************************************************/
 

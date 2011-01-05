@@ -66,7 +66,7 @@
 #include "machine/6551.h"
 #include "image.h"
 #include "machine/wd17xx.h"
-#include "devices/flopdrv.h"
+#include "imagedev/flopdrv.h"
 
 #include "debug/debugcpu.h"
 #include "debug/debugcon.h"

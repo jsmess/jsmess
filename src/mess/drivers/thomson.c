@@ -72,7 +72,7 @@
 #include "machine/6821pia.h"
 #include "machine/wd17xx.h"
 #include "machine/ctronics.h"
-#include "devices/flopdrv.h"
+#include "imagedev/flopdrv.h"
 #include "formats/basicdsk.h"
 #include "machine/ram.h"
 #include "machine/serial.h"

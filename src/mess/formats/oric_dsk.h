@@ -9,7 +9,7 @@
 #ifndef ORIC_DSK_H
 #define ORIC_DSK_H
 
-#include "formats/flopimg.h"
+#include "imagedev/flopimg.h"
 
 /**************************************************************************/
 

@@ -17,7 +17,7 @@
 #include "emu.h"
 #include "includes/beta.h"
 #include "cpu/m6502/m6502.h"
-#include "devices/cartslot.h"
+#include "imagedev/cartslot.h"
 #include "machine/6532riot.h"
 #include "sound/speaker.h"
 #include "machine/ram.h"

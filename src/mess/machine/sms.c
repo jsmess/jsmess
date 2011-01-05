@@ -4,7 +4,7 @@
 #include "includes/sms.h"
 #include "video/smsvdp.h"
 #include "sound/2413intf.h"
-#include "devices/cartslot.h"
+#include "imagedev/cartslot.h"
 
 #define VERBOSE 0
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)

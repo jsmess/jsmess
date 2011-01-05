@@ -15,9 +15,9 @@
 #include "machine/nes_mmc.h"
 #include "includes/nes.h"
 #include "cpu/m6502/m6502.h"
-#include "devices/cartslot.h"
+#include "imagedev/cartslot.h"
 #include "sound/nes_apu.h"
-#include "devices/flopdrv.h"
+#include "imagedev/flopdrv.h"
 #include "formats/nes_dsk.h"
 
 

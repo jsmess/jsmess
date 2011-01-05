@@ -16,7 +16,7 @@
 #include "emu.h"
 #include "cpu/hd61700/hd61700.h"
 #include "video/hd44352.h"
-#include "devices/cartslot.h"
+#include "imagedev/cartslot.h"
 #include "machine/nvram.h"
 #include "sound/beep.h"
 

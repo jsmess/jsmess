@@ -12,7 +12,7 @@
 #include "imageutl.h"
 #include "formats/oric_dsk.h"
 #include "formats/basicdsk.h"
-#include "devices/flopdrv.h"
+#include "imagedev/flopdrv.h"
 
 
 #define mfm_disk_header_size	0x0100

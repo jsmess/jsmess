@@ -16,7 +16,7 @@
 #include "ataridev.h"
 #include "sound/pokey.h"
 #include "machine/6821pia.h"
-#include "devices/flopdrv.h"
+#include "imagedev/flopdrv.h"
 #include "image.h"
 
 #define VERBOSE_SERIAL	0

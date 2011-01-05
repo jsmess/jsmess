@@ -16,7 +16,7 @@
 #include "sgcpu.h"
 #include "videowrp.h"
 #include "sound/sn76496.h"
-#include "devices/cassette.h"
+#include "imagedev/cassette.h"
 
 typedef struct _sgcpu_state
 {

@@ -13,8 +13,8 @@
 *********************************************************************/
 #include "emu.h"
 #include "aescart.h"
-#include "cartslot.h"
-#include "multcart.h"
+#include "imagedev/cartslot.h"
+#include "imagedev/multcart.h"
 #include "includes/neogeo.h"
 
 typedef int assmfct(running_machine *machine, device_t *);

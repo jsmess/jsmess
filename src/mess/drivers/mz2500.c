@@ -54,9 +54,9 @@
 #include "sound/beep.h"
 #include "machine/rp5c15.h"
 
-//#include "devices/cassette.h"
-#include "devices/flopdrv.h"
-#include "formats/flopimg.h"
+//#include "imagedev/cassette.h"
+#include "imagedev/flopdrv.h"
+#include "imagedev/flopimg.h"
 #include "formats/basicdsk.h"
 
 

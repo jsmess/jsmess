@@ -50,10 +50,10 @@
 #include "video/mc6845.h"
 #include "machine/i8255a.h"
 #include "sound/sn76496.h"
-#include "devices/cassette.h"
+#include "imagedev/cassette.h"
 #include "sound/wave.h"
 #include "machine/wd17xx.h"
-#include "devices/flopdrv.h"
+#include "imagedev/flopdrv.h"
 #include "formats/basicdsk.h"
 
 

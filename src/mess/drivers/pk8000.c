@@ -10,7 +10,7 @@
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
 #include "machine/i8255a.h"
-#include "devices/cassette.h"
+#include "imagedev/cassette.h"
 #include "formats/fmsx_cas.h"
 #include "sound/speaker.h"
 #include "sound/wave.h"

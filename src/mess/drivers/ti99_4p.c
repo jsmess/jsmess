@@ -57,7 +57,7 @@
 #include "machine/tms9902.h"
 #include "machine/ti99/peribox.h"
 
-#include "devices/cassette.h"
+#include "imagedev/cassette.h"
 #include "machine/ti99/videowrp.h"
 #include "machine/ti99/sgcpu.h"
 #include "machine/ti99/peribox.h"

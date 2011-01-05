@@ -8,7 +8,7 @@
 #define Z1013_H_
 
 #include "machine/z80pio.h"
-#include "devices/snapquik.h"
+#include "imagedev/snapquik.h"
 
 
 class z1013_state : public driver_device

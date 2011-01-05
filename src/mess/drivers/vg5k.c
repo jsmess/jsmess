@@ -42,10 +42,10 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/ram.h"
-#include "devices/printer.h"
+#include "imagedev/printer.h"
 #include "video/ef9345.h"
 #include "sound/dac.h"
-#include "devices/cassette.h"
+#include "imagedev/cassette.h"
 #include "sound/wave.h"
 #include "formats/vg5k_cas.h"
 

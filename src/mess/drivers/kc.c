@@ -26,8 +26,8 @@
 #include "machine/upd765.h"
 
 /* Devices */
-#include "devices/cassette.h"
-#include "devices/flopdrv.h"
+#include "imagedev/cassette.h"
+#include "imagedev/flopdrv.h"
 #include "formats/basicdsk.h"
 #include "machine/ram.h"
 

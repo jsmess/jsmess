@@ -4,7 +4,7 @@
 #include "machine/z80pio.h"
 #include "machine/z80sio.h"
 #include "machine/wd17xx.h"
-#include "devices/snapquik.h"
+#include "imagedev/snapquik.h"
 
 
 class kaypro_state : public driver_device

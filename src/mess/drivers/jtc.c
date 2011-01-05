@@ -9,7 +9,7 @@
 #include "emu.h"
 #include "includes/jtc.h"
 #include "cpu/z8/z8.h"
-#include "devices/cassette.h"
+#include "imagedev/cassette.h"
 #include "machine/ctronics.h"
 #include "sound/speaker.h"
 #include "sound/wave.h"

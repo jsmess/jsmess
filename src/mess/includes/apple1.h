@@ -7,7 +7,7 @@
 #ifndef APPLE1_H_
 #define APPLE1_H_
 
-#include "devices/snapquik.h"
+#include "imagedev/snapquik.h"
 #include "machine/6821pia.h"
 
 typedef short termchar_t;

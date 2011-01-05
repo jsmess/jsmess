@@ -8,10 +8,9 @@
 #define MBEE_H_
 
 #include "machine/wd17xx.h"
-#include "devices/snapquik.h"
-#include "devices/z80bin.h"
+#include "imagedev/snapquik.h"
 #include "machine/z80pio.h"
-#include "devices/cassette.h"
+#include "imagedev/cassette.h"
 #include "machine/ctronics.h"
 #include "machine/mc146818.h"
 #include "video/mc6845.h"

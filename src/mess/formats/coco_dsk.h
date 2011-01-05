@@ -9,7 +9,7 @@
 #ifndef COCO_DSK_H
 #define COCO_DSK_H
 
-#include "formats/flopimg.h"
+#include "imagedev/flopimg.h"
 
 
 /**************************************************************************/

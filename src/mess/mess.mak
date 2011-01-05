@@ -424,10 +424,6 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_AUDIO)/lmc1992.o		\
 	$(MESS_AUDIO)/mea8000.o		\
 	$(MESS_AUDIO)/spchroms.o	\
-	$(MESS_DEVICES)/bitbngr.o	\
-	$(MESS_DEVICES)/cartslot.o	\
-	$(MESS_DEVICES)/cassette.o	\
-	$(MESS_DEVICES)/chd_cd.o	\
 	$(MESS_FORMATS)/imd_dsk.o	\
 	$(MESS_FORMATS)/ami_dsk.o	\
 	$(MESS_FORMATS)/td0_dsk.o	\
@@ -435,21 +431,12 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_FORMATS)/dsk_dsk.o	\
 	$(MESS_FORMATS)/d88_dsk.o	\
 	$(MESS_FORMATS)/fdi_dsk.o	\
-	$(MESS_DEVICES)/flopdrv.o	\
-	$(MESS_DEVICES)/harddriv.o	\
 	$(MESS_DEVICES)/microdrv.o	\
-	$(MESS_DEVICES)/multcart.o	\
-	$(MESS_DEVICES)/printer.o	\
-	$(MESS_DEVICES)/snapquik.o	\
-	$(MESS_DEVICES)/z80bin.o	\
 	$(MESS_FORMATS)/basicdsk.o	\
-	$(MESS_FORMATS)/cassimg.o	\
 	$(MESS_FORMATS)/coco_cas.o	\
 	$(MESS_FORMATS)/coco_dsk.o	\
-	$(MESS_FORMATS)/flopimg.o	\
 	$(MESS_FORMATS)/pc_dsk.o	\
 	$(MESS_FORMATS)/rk_cas.o	\
-	$(MESS_FORMATS)/wavfile.o	\
 	$(MESS_MACHINE)/6551.o		\
 	$(MESS_MACHINE)/68901mfp.o	\
 	$(MESS_MACHINE)/74145.o		\

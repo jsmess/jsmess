@@ -166,8 +166,8 @@ cpu #0 (PC=0601023A): unmapped program memory dword write to 02000000 = 00000000
 #include "machine/stvcd.h"
 #include "machine/scudsp.h"
 #include "sound/scsp.h"
-#include "devices/chd_cd.h"
-#include "devices/cartslot.h"
+#include "imagedev/chd_cd.h"
+#include "imagedev/cartslot.h"
 #include "includes/stv.h"
 #include "coreutil.h"
 

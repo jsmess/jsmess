@@ -14,7 +14,7 @@
 
 #include "emu.h"
 #include "osdepend.h"
-#include "formats/flopimg.h"
+#include "imagedev/flopimg.h"
 #include "opresolv.h"
 #include "library.h"
 #include "filter.h"

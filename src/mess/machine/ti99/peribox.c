@@ -131,8 +131,8 @@ do not depend on the card being active at that time.
 #include "spchsyn.h"
 #include "evpc.h"
 
-#include "devices/flopdrv.h"
-#include "devices/harddriv.h"
+#include "imagedev/flopdrv.h"
+#include "imagedev/harddriv.h"
 #include "formats/ti99_dsk.h"
 #include "devices/ti99_hd.h"
 

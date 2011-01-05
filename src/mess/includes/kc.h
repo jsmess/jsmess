@@ -10,7 +10,7 @@
 #include "cpu/z80/z80daisy.h"
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"
-#include "devices/snapquik.h"
+#include "imagedev/snapquik.h"
 #include "machine/upd765.h"
 
 #define KC85_4_CLOCK 1750000

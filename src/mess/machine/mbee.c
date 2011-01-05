@@ -10,7 +10,7 @@
 
 #include "emu.h"
 #include "machine/mc146818.h"
-#include "devices/flopdrv.h"
+#include "imagedev/flopdrv.h"
 #include "includes/mbee.h"
 
 

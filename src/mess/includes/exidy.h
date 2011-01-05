@@ -7,7 +7,7 @@
 #ifndef EXIDY_H_
 #define EXIDY_H_
 
-#include "devices/z80bin.h"
+#include "imagedev/snapquik.h"
 
 typedef struct {
 	struct {

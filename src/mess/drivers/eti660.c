@@ -12,7 +12,7 @@
 #include "emu.h"
 #include "includes/eti660.h"
 #include "cpu/cosmac/cosmac.h"
-#include "devices/cassette.h"
+#include "imagedev/cassette.h"
 #include "machine/ram.h"
 #include "machine/6821pia.h"
 #include "machine/rescap.h"

@@ -9,7 +9,7 @@
 #include "cpu/m6502/m6502.h"
 
 #include "includes/svision.h"
-#include "devices/cartslot.h"
+#include "imagedev/cartslot.h"
 #include "svision.lh"
 
 #define MAKE8_RGB15(red3, green3, blue2) ( ( (red3)<<(10+2)) | ( (green3)<<(5+2)) | ( (blue2)<<(0+3)) )

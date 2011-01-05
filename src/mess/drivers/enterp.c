@@ -19,7 +19,7 @@
 #include "cpu/z80/z80.h"
 #include "audio/dave.h"
 #include "machine/wd17xx.h"
-#include "devices/flopdrv.h"
+#include "imagedev/flopdrv.h"
 #include "formats/basicdsk.h"
 #include "machine/ram.h"
 #include "includes/enterp.h"

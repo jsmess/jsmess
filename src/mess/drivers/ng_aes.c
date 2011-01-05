@@ -35,7 +35,7 @@
 #include "cpu/z80/z80.h"
 #include "sound/2610intf.h"
 #include "devices/aescart.h"
-#include "devices/cartslot.h"
+#include "imagedev/cartslot.h"
 
 #include "neogeo.lh"
 

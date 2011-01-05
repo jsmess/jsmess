@@ -15,7 +15,7 @@
 #ifndef __M65_SNQK_H__
 #define __M65_SNQK_H__
 
-#include "devices/snapquik.h"
+#include "imagedev/snapquik.h"
 
 SNAPSHOT_LOAD( microtan );
 QUICKLOAD_LOAD( microtan );

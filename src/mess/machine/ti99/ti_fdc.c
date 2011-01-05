@@ -9,7 +9,7 @@
 #include "ti_fdc.h"
 #include "machine/wd17xx.h"
 #include "formats/ti99_dsk.h"
-#include "devices/flopdrv.h"
+#include "imagedev/flopdrv.h"
 
 #define CRU_BASE 0x1100
 

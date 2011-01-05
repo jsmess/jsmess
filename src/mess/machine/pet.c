@@ -14,8 +14,8 @@
 
 #include "includes/pet.h"
 
-#include "devices/cartslot.h"
-#include "devices/cassette.h"
+#include "imagedev/cartslot.h"
+#include "imagedev/cassette.h"
 #include "machine/ram.h"
 
 #define VERBOSE_LEVEL 0

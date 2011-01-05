@@ -9,12 +9,12 @@
 #include "sound/dac.h"
 #include "sound/wave.h"
 #include "machine/ctronics.h"
-#include "devices/cassette.h"
-#include "devices/snapquik.h"
-#include "devices/cartslot.h"
+#include "imagedev/cassette.h"
+#include "imagedev/snapquik.h"
+#include "imagedev/cartslot.h"
 #include "machine/ay31015.h"
 #include "includes/exidy.h"
-#include "devices/flopdrv.h"
+#include "imagedev/flopdrv.h"
 
 
 

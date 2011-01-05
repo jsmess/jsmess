@@ -13,7 +13,7 @@ can be expanded with support for the other drives as needed.
 
 
 #include "emu.h"
-#include "devices/chd_cd.h"
+#include "imagedev/chd_cd.h"
 #include "sound/cdda.h"
 #include "machine/matsucd.h"
 

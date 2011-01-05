@@ -6,7 +6,7 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "devices/cartslot.h"
+#include "imagedev/cartslot.h"
 #include "streams.h"
 
 

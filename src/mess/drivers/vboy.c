@@ -15,7 +15,7 @@
 
 #include "emu.h"
 #include "cpu/v810/v810.h"
-#include "devices/cartslot.h"
+#include "imagedev/cartslot.h"
 #include "vboy.lh"
 
 typedef struct _vboy_regs_t vboy_regs_t;

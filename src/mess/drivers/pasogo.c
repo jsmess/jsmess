@@ -11,7 +11,7 @@ to make the standard pc driver one level more complex, so own driver
 
 #include "emu.h"
 #include "cpu/i86/i86.h"
-#include "devices/cartslot.h"
+#include "imagedev/cartslot.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
 /*

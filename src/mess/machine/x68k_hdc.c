@@ -16,7 +16,7 @@
 */
 
 #include "x68k_hdc.h"
-#include "devices/harddriv.h"
+#include "imagedev/harddriv.h"
 #include "image.h"
 
 static TIMER_CALLBACK( req_delay )

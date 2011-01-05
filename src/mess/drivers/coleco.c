@@ -66,7 +66,7 @@
 #include "cpu/z80/z80.h"
 #include "sound/sn76496.h"
 #include "video/tms9928a.h"
-#include "devices/cartslot.h"
+#include "imagedev/cartslot.h"
 
 
 class coleco_state : public driver_device

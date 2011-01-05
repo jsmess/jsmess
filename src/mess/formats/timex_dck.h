@@ -7,8 +7,8 @@
 #ifndef __TIMEX_DCK_H__
 #define __TIMEX_DCK_H__
 
-#include "devices/snapquik.h"
-#include "devices/cartslot.h"
+#include "imagedev/snapquik.h"
+#include "imagedev/cartslot.h"
 
 enum
 {

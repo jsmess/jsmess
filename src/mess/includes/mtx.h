@@ -7,7 +7,7 @@
 #ifndef __MTX__
 #define __MTX__
 
-#include "devices/snapquik.h"
+#include "imagedev/snapquik.h"
 
 #define Z80_TAG			"z80"
 #define Z80CTC_TAG		"z80ctc"

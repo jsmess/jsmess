@@ -9,7 +9,7 @@
 #ifndef __D64_DSK__
 #define __D64_DSK__
 
-#include "formats/flopimg.h"
+#include "imagedev/flopimg.h"
 
 /***************************************************************************
     PROTOTYPES

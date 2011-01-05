@@ -9,7 +9,7 @@
 #ifndef JUPI_TAP_H
 #define JUPI_TAP_H
 
-#include "formats/cassimg.h"
+#include "imagedev/cassimg.h"
 
 CASSETTE_FORMATLIST_EXTERN(jupiter_cassette_formats);
 

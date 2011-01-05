@@ -19,7 +19,7 @@
 #include "mess.h"
 #include "fileio.h"
 
-#include "devices/cassette.h"
+#include "imagedev/cassette.h"
 
 #include "formats/a26_cas.h"
 #include "formats/apf_apt.h"

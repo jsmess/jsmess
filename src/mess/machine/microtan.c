@@ -23,8 +23,8 @@
 #include "sound/ay8910.h"
 
 /* Devices */
-#include "devices/cassette.h"
-//#include "devices/snapquik.h"
+#include "imagedev/cassette.h"
+//#include "imagedev/snapquik.h"
 
 
 #ifndef VERBOSE

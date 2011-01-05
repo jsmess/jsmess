@@ -6,8 +6,8 @@
 
 #include "emu.h"
 #include "gromport.h"
-#include "devices/cartslot.h"
-#include "devices/multcart.h"
+#include "imagedev/cartslot.h"
+#include "imagedev/multcart.h"
 #include "grom.h"
 
 typedef UINT8	(*read8z_device_func)  (ATTR_UNUSED device_t *device, ATTR_UNUSED offs_t offset, UINT8 *value);

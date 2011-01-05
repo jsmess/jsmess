@@ -9,7 +9,7 @@
 #ifndef TRD_DSK_H
 #define TRD_DSK_H
 
-#include "formats/flopimg.h"
+#include "imagedev/flopimg.h"
 
 /**************************************************************************/
 

@@ -10,7 +10,7 @@
 #include "video/mc6845.h"
 #include "machine/6821pia.h"
 #include "machine/6522via.h"
-#include "devices/cartslot.h"
+#include "imagedev/cartslot.h"
 
 typedef struct
 {

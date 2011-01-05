@@ -21,7 +21,7 @@
 #include "sound/aica.h"
 #include "includes/naomi.h"
 #include "machine/gdrom.h"
-#include "devices/chd_cd.h"
+#include "imagedev/chd_cd.h"
 
 #define ATAPI_CYCLES_PER_SECTOR (5000)	// TBD for Dreamcast
 

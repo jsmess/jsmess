@@ -7,7 +7,7 @@
 #ifndef X1_TAP_H_
 #define X1_TAP_H_
 
-#include "formats/cassimg.h"
+#include "imagedev/cassimg.h"
 
 CASSETTE_FORMATLIST_EXTERN( x1_cassette_formats );
 
