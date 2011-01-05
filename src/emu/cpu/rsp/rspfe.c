@@ -62,14 +62,14 @@ int rspfe_describe(void *param, opcode_desc *desc, const opcode_desc *prev)
 
 		case 0x02:	/* J */
 			desc->flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE;
-			desc->targetpc = ((LIMMVAL << 2) & 0x00000fff) | 0x1000;
+			desc->targetpc = ((UIMM26 << 2) & 0x00000fff) | 0x1000;
 			desc->delayslots = 1;
 			return TRUE;
 
 		case 0x03:	/* JAL */
 			desc->regout[0] |= REGFLAG_R(31);
 			desc->flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE;
-			desc->targetpc = ((LIMMVAL << 2) & 0x00000fff) | 0x1000;
+			desc->targetpc = ((UIMM26 << 2) & 0x00000fff) | 0x1000;
 			desc->delayslots = 1;
 			return TRUE;
 
@@ -82,7 +82,7 @@ int rspfe_describe(void *param, opcode_desc *desc, const opcode_desc *prev)
 				desc->regin[0] |= REGFLAG_R(RSREG) | REGFLAG_R(RTREG);
 				desc->flags |= OPFLAG_IS_CONDITIONAL_BRANCH;
 			}
-			desc->targetpc = ((desc->pc + 4 + (SIMMVAL << 2)) & 0x00000fff) | 0x1000;
+			desc->targetpc = ((desc->pc + 4 + (SIMM16 << 2)) & 0x00000fff) | 0x1000;
 			desc->delayslots = 1;
 			desc->skipslots = (opswitch & 0x10) ? 1 : 0;
 			return TRUE;
@@ -96,7 +96,7 @@ int rspfe_describe(void *param, opcode_desc *desc, const opcode_desc *prev)
 				desc->regin[0] |= REGFLAG_R(RSREG);
 				desc->flags |= OPFLAG_IS_CONDITIONAL_BRANCH;
 			}
-			desc->targetpc = ((desc->pc + 4 + (SIMMVAL << 2)) & 0x00000fff) | 0x1000;
+			desc->targetpc = ((desc->pc + 4 + (SIMM16 << 2)) & 0x00000fff) | 0x1000;
 			desc->delayslots = 1;
 			desc->skipslots = (opswitch & 0x10) ? 1 : 0;
 			return TRUE;
@@ -235,7 +235,7 @@ static int describe_instruction_regimm(rsp_state *rsp, UINT32 op, opcode_desc *d
 				desc->regin[0] |= REGFLAG_R(RSREG);
 				desc->flags |= OPFLAG_IS_CONDITIONAL_BRANCH;
 			}
-			desc->targetpc = ((desc->pc + 4 + (SIMMVAL << 2)) & 0x00000fff) | 0x1000;
+			desc->targetpc = ((desc->pc + 4 + (SIMM16 << 2)) & 0x00000fff) | 0x1000;
 			desc->delayslots = 1;
 			desc->skipslots = (RTREG & 0x02) ? 1 : 0;
 			return TRUE;
@@ -250,7 +250,7 @@ static int describe_instruction_regimm(rsp_state *rsp, UINT32 op, opcode_desc *d
 				desc->flags |= OPFLAG_IS_CONDITIONAL_BRANCH;
 			}
 			desc->regout[0] |= REGFLAG_R(31);
-			desc->targetpc = ((desc->pc + 4 + (SIMMVAL << 2)) & 0x00000fff) | 0x1000;
+			desc->targetpc = ((desc->pc + 4 + (SIMM16 << 2)) & 0x00000fff) | 0x1000;
 			desc->delayslots = 1;
 			desc->skipslots = (RTREG & 0x02) ? 1 : 0;
 			return TRUE;

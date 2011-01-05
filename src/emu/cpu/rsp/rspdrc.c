@@ -4247,17 +4247,17 @@ static int generate_opcode(rsp_state *rsp, drcuml_block *block, compiler_state *
 
 		case 0x0c:	/* ANDI - MIPS I */
 			if (RTREG != 0)
-				UML_AND(block, R32(RTREG), R32(RSREG), IMM(UIMM16));				// dand    <rtreg>,<rsreg>,UIMMVAL
+				UML_AND(block, R32(RTREG), R32(RSREG), IMM(UIMM16));				// dand    <rtreg>,<rsreg>,UIMM16
 			return TRUE;
 
 		case 0x0d:	/* ORI - MIPS I */
 			if (RTREG != 0)
-				UML_OR(block, R32(RTREG), R32(RSREG), IMM(UIMM16));				// dor     <rtreg>,<rsreg>,UIMMVAL
+				UML_OR(block, R32(RTREG), R32(RSREG), IMM(UIMM16));				// dor     <rtreg>,<rsreg>,UIMM16
 			return TRUE;
 
 		case 0x0e:	/* XORI - MIPS I */
 			if (RTREG != 0)
-				UML_XOR(block, R32(RTREG), R32(RSREG), IMM(UIMM16));				// dxor    <rtreg>,<rsreg>,UIMMVAL
+				UML_XOR(block, R32(RTREG), R32(RSREG), IMM(UIMM16));				// dxor    <rtreg>,<rsreg>,UIMM16
 			return TRUE;
 
 		/* ----- memory load operations ----- */

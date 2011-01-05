@@ -119,7 +119,7 @@ void rspdrc_add_dmem(device_t *device, void *base);
 
 #define SIMM16			((INT16)(op))
 #define UIMM16			((UINT16)(op))
-#define LIMM16			(op & 0x03ffffff)
+#define UIMM26			(op & 0x03ffffff)
 
 #define RSP_STATUS_HALT          0x0001
 #define RSP_STATUS_BROKE         0x0002
