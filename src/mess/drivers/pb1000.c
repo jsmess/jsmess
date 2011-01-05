@@ -6,7 +6,6 @@
 
         TODO:
         - improve the pb2000c gate array emulation
-        - pb1000 touchscreen
         - i/o port
 
 ****************************************************************************/
@@ -44,6 +43,7 @@ public:
 	UINT16 pb2000c_kb_r(running_machine *machine);
 	UINT16 pb1000_kb_r(running_machine *machine);
 	void kb_matrix_w(running_machine *machine, UINT8 matrix);
+	UINT16 read_touchscreen(running_machine *machine, UINT8 line);
 };
 
 static ADDRESS_MAP_START(pb1000_mem, ADDRESS_SPACE_PROGRAM, 16, pb1000_state)
@@ -163,6 +163,14 @@ static INPUT_PORTS_START( pb1000 )
 		PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F")		PORT_CODE(KEYCODE_LALT)
 	PORT_START("NULL")
 		PORT_BIT(0xffff, IP_ACTIVE_HIGH, IPT_UNUSED)
+
+	//touchscreen
+	PORT_START("POSX")
+		PORT_BIT( 0xff, 0x00, IPT_MOUSE_X ) PORT_CROSSHAIR(X, 1, 0, 0) PORT_SENSITIVITY(20) PORT_KEYDELTA(0)
+	PORT_START("POSY")
+		PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y ) PORT_CROSSHAIR(Y, 1, 0, 0) PORT_SENSITIVITY(120) PORT_KEYDELTA(0)
+	PORT_START("TOUCH")
+		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(MOUSECODE_BUTTON1) PORT_NAME("Touchscreen")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( pb2000c )
@@ -345,6 +353,21 @@ void lcd_data_w(hd61700_cpu_device &device, UINT8 data)
 }
 
 
+UINT16 pb1000_state::read_touchscreen(running_machine *machine, UINT8 line)
+{
+	UINT8 x = input_port_read(machine, "POSX")/0x40;
+	UINT8 y = input_port_read(machine, "POSY")/0x40;
+
+	if (input_port_read(machine, "TOUCH"))
+	{
+		if (x == line-7)
+			return (0x1000<<y);
+	}
+
+	return 0x0000;
+}
+
+
 UINT16 pb1000_state::pb1000_kb_r(running_machine *machine)
 {
 	static const char *const bitnames[] = {"NULL", "KO1", "KO2", "KO3", "KO4", "KO5", "KO6", "KO7", "KO8", "KO9", "KO10", "KO11", "KO12", "NULL", "NULL", "NULL"};
@@ -354,12 +377,16 @@ UINT16 pb1000_state::pb1000_kb_r(running_machine *machine)
 	{
 		//Read all the input lines
 		for (int line = 1; line <= 12; line++)
+		{
 			data |= input_port_read(machine, bitnames[line]);
+			data |= read_touchscreen(machine, line);
+		}
 
 	}
 	else
 	{
 		data = input_port_read(machine, bitnames[m_kb_matrix & 0x0f]);
+		data |= read_touchscreen(machine, m_kb_matrix & 0x0f);
 	}
 
 	return data;
