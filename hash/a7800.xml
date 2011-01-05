@@ -1,8 +1,34 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-<softwarelist name="a7800" description="Atari 7800 cartridges">
+
+<!-- 
+
+Unlicensed Undumped Releases: -
+
+  - Asteroids Deluxe
+  - Beef Drop
+  - B*nQ
+  - Combat 1990
+  - Hangly-Man
+  - Jr Pac-Man
+  - Kessel Attack
+  - Ms Pac-Attack
+  - Pac-Man Collection
+  - Pac-Man
+  - Pac-Man Plus
+  - Pac-Pollux
+  - Santa Simon
+  - Space Duel
+  - Space Invaders
+  - Star Wars
+  - Super Pacman
+  - Wasp
+
+-->
+	<softwarelist name="a7800" description="Atari 7800 cartridges">		
 	<software name="32in1">
-		<description>32 in 1</description>
+		<description>32 in 1 (PAL)</description>
+		<!-- Serial: N/A -->
 		<year>1988</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -14,6 +40,7 @@
 
 	<software name="devcard">
 		<description>7800 Dev. Card</description>
+		<!-- Serial: C300358 -->
 		<year>198?</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -25,6 +52,7 @@
 
 	<software name="diagtest">
 		<description>7800 Pro System Diagnostic Test (v1.0)</description>
+		<!-- Serial: CB101195 -->
 		<year>198?</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -36,6 +64,7 @@
 
 	<software name="aceoface">
 		<description>Ace of Aces</description>
+		<!-- Serial: CX7846 -->
 		<year>1988</year>
 		<publisher>Atari / NOVA Game Design. Inc.</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -46,7 +75,8 @@
 	</software>
 
 	<software name="aceofaeu">
-		<description>Ace of Aces (Euro)</description>
+		<description>Ace of Aces (PAL)</description>
+		<!-- Serial: CX7846 -->
 		<year>1988</year>
 		<publisher>Atari / NOVA Game Design. Inc.</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -58,6 +88,8 @@
 
 	<software name="alienbrg">
 		<description>Alien Brigade</description>
+		<!-- Serial: CX7855 -->
+		<!-- Works with Lightgun -->
 		<year>1989</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -68,7 +100,8 @@
 	</software>
 
 	<software name="alienbeu">
-		<description>Alien Brigade (Euro)</description>
+		<description>Alien Brigade (PAL)</description>
+		<!-- Serial: CX7855 -->
 		<year>1989</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -79,7 +112,8 @@
 	</software>
 
 	<software name="astroids">
-		<description>Asteroids (Proto)</description>
+		<description>Asteroids (Prototype)</description>
+		<!-- Serial: CX7802 -->
 		<year>1984</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -91,6 +125,7 @@
 
 	<software name="ballblzr">
 		<description>Ballblazer</description>
+		<!-- Serial: CX7815 -->
 		<year>1987</year>
 		<publisher>Atari / Lucasfilm</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -101,7 +136,8 @@
 	</software>
 
 	<software name="ballbleu">
-		<description>Ballblazer (Euro)</description>
+		<description>Ballblazer (PAL)</description>
+		<!-- Serial: CX7815 -->
 		<year>1987</year>
 		<publisher>Atari / Lucasfilm</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -112,7 +148,9 @@
 	</software>
 
 	<software name="barnyard">
-		<description>Barnyard Blaster (Proto)</description>
+		<description>Barnyard Blaster (Prototype)</description>
+		<!-- Serial: CX7859 -->
+		<!-- Works with Lightgun -->
 		<year>1988</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -123,7 +161,8 @@
 	</software>
 
 	<software name="barnyaeu">
-		<description>Barnyard Blaster (Proto) (Euro)</description>
+		<description>Barnyard Blaster (PAL, Prototype)</description>
+		<!-- Serial: CX7859 -->
 		<year>1988</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -134,7 +173,9 @@
 	</software>
 
 	<software name="bseblleu">
-		<description>Baseball (Euro)</description>
+		<description>Baseball (PAL)</description>
+		<!-- Serial: AV-045-04 -->
+		<!-- Released in USA as "Pete Rose's Baseball") -->
 		<year>1989</year>
 		<publisher>Absolute Entertainment, Inc</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -146,6 +187,7 @@
 
 	<software name="bsktbrwl">
 		<description>Basketbrawl</description>
+		<!-- Serial: CX7880 -->
 		<year>1990</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -156,7 +198,8 @@
 	</software>
 
 	<software name="bsktbreu">
-		<description>Basketbrawl (Euro)</description>
+		<description>Basketbrawl (PAL)</description>
+		<!-- Serial: CX7880 -->
 		<year>1990</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -168,6 +211,7 @@
 
 	<software name="centpede">
 		<description>Centipede</description>
+		<!-- Serial: CX7801 -->
 		<year>1984</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -178,7 +222,8 @@
 	</software>
 
 	<software name="centpeeu">
-		<description>Centipede (Euro)</description>
+		<description>Centipede (PAL)</description>
+		<!-- Serial: CX7801 -->
 		<year>1984</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -190,6 +235,7 @@
 
 	<software name="choplift">
 		<description>Choplifter!</description>
+		<!-- Serial: CX7821 -->
 		<year>1987</year>
 		<publisher>Atari / Broderbund</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -200,7 +246,8 @@
 	</software>
 
 	<software name="choplieu">
-		<description>Choplifter! (Euro)</description>
+		<description>Choplifter! (PAL)</description>
+		<!-- Serial: CX7821 -->
 		<year>1987</year>
 		<publisher>Atari / Broderbund</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -211,7 +258,8 @@
 	</software>
 
 	<software name="commando">
-		<description>Commando (Proto)</description>
+		<description>Commando (Prototype)</description>
+		<!-- Serial: CX7838 -->
 		<year>1989</year>
 		<publisher>Atari / Data East</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -222,7 +270,8 @@
 	</software>
 
 	<software name="commaneu">
-		<description>Commando (Proto) (Euro)</description>
+		<description>Commando (PAL, Prototype)</description>
+		<!-- Serial: CX7838 -->
 		<year>1989</year>
 		<publisher>Atari / Data East</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -234,6 +283,7 @@
 
 	<software name="cracked">
 		<description>Crack'ed</description>
+		<!-- Serial: CX7836 -->
 		<year>1987</year>
 		<publisher>Atari / Data East</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -244,7 +294,8 @@
 	</software>
 
 	<software name="crackeu">
-		<description>Crack'ed (Euro)</description>
+		<description>Crack'ed (PAL)</description>
+		<!-- Serial: CX7836 -->
 		<year>1987</year>
 		<publisher>Atari / Data East</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -256,6 +307,8 @@
 
 	<software name="crossbow">
 		<description>Crossbow</description>
+		<!-- Serial: CX7844 -->
+		<!-- Works with Lightgun -->
 		<year>1988</year>
 		<publisher>Atari / Exidy</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -266,7 +319,9 @@
 	</software>
 
 	<software name="crossbeu">
-		<description>Crossbow (Euro)</description>
+		<description>Crossbow (PAL)</description>
+		<!-- Serial: CX7844 -->
+		<!-- Works with Lightgun -->
 		<year>1988</year>
 		<publisher>Atari / Exidy</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -277,7 +332,8 @@
 	</software>
 
 	<software name="darkchmb">
-		<description>Dark Chambers (Proto)</description>
+		<description>Dark Chambers (Prototype)</description>
+		<!-- Serial: CX7837 -->
 		<year>1988</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -288,7 +344,8 @@
 	</software>
 
 	<software name="darkcheu">
-		<description>Dark Chambers (Proto) (Euro)</description>
+		<description>Dark Chambers (PAL, Prototype)</description>
+		<!-- Serial: CX7837 -->
 		<year>1988</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -300,6 +357,7 @@
 
 	<software name="dsrtflcn">
 		<description>Desert Falcon</description>
+		<!-- Serial: CX7811 -->
 		<year>1987</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -310,7 +368,8 @@
 	</software>
 
 	<software name="dsrtfleu">
-		<description>Desert Falcon (Euro)</description>
+		<description>Desert Falcon (PAL)</description>
+		<!-- Serial: CX7811 -->
 		<year>1987</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -321,7 +380,8 @@
 	</software>
 
 	<software name="dsrtflcp">
-		<description>Desert Falcon (Proto)</description>
+		<description>Desert Falcon (Prototype)</description>
+		<!-- Serial: CX7811 -->
 		<year>1987</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -332,7 +392,8 @@
 	</software>
 
 	<software name="digdugp">
-		<description>Dig Dug (Proto)</description>
+		<description>Dig Dug (Prototype)</description>
+		<!-- Serial: CX7803 -->
 		<year>1984</year>
 		<publisher>Atari / Namco</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -343,7 +404,8 @@
 	</software>
 
 	<software name="digdugeu">
-		<description>Dig Dug (Proto) (Euro)</description>
+		<description>Dig Dug (PAL, Prototype)</description>
+		<!-- Serial: CX7803 -->
 		<year>1984</year>
 		<publisher>Atari / Namco</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -355,6 +417,7 @@
 
 	<software name="dnkykong">
 		<description>Donkey Kong</description>
+		<!-- Serial: CX7848 -->
 		<year>1988</year>
 		<publisher>Atari / Nintendo</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -365,7 +428,8 @@
 	</software>
 
 	<software name="dnkykoeu">
-		<description>Donkey Kong (Euro)</description>
+		<description>Donkey Kong (PAL)</description>
+		<!-- Serial: CX7848 -->
 		<year>1988</year>
 		<publisher>Atari / Nintendo</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -377,6 +441,7 @@
 
 	<software name="dnkykgjr">
 		<description>Donkey Kong Jr.</description>
+		<!-- Serial: CX7849 -->
 		<year>1988</year>
 		<publisher>Atari / Nintendo</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -387,7 +452,8 @@
 	</software>
 
 	<software name="dnkykjeu">
-		<description>Donkey Kong Jr. (Euro)</description>
+		<description>Donkey Kong Jr. (PAL)</description>
+		<!-- Serial: CX7849 -->
 		<year>1988</year>
 		<publisher>Atari / Nintendo</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -399,6 +465,7 @@
 
 	<software name="dbledrgn">
 		<description>Double Dragon</description>
+		<!-- Serial: AM-050-04 -->
 		<year>1989</year>
 		<publisher>Activision / Technos</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -409,7 +476,8 @@
 	</software>
 
 	<software name="dbledreu">
-		<description>Double Dragon (Euro)</description>
+		<description>Double Dragon (PAL)</description>
+		<!-- Serial: AM-050-04 -->
 		<year>1989</year>
 		<publisher>Activision / Technos</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -421,6 +489,7 @@
 
 	<software name="f18hornt">
 		<description>F-18 Hornet</description>
+		<!-- Serial: AP-044-04 -->
 		<year>1988</year>
 		<publisher>Absolute Entertainment</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -431,7 +500,8 @@
 	</software>
 
 	<software name="f18horeu">
-		<description>F-18 Hornet (Euro)</description>
+		<description>F-18 Hornet (PAL)</description>
+		<!-- Serial: AP044-04 -->
 		<year>1988</year>
 		<publisher>Absolute Entertainment</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -443,6 +513,7 @@
 
 	<software name="fatalrun">
 		<description>Fatal Run</description>
+		<!-- Serial: CX7854 -->
 		<year>1990</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -453,7 +524,8 @@
 	</software>
 
 	<software name="fatalreu">
-		<description>Fatal Run (Euro)</description>
+		<description>Fatal Run (PAL)</description>
+		<!-- Serial: CX7854 -->
 		<year>1990</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -465,6 +537,7 @@
 
 	<software name="fghtnght">
 		<description>Fight Night</description>
+		<!-- Serial: CX7851 -->
 		<year>1988</year>
 		<publisher>Accolde</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -475,7 +548,8 @@
 	</software>
 
 	<software name="fghtngeu">
-		<description>Fight Night (Euro)</description>
+		<description>Fight Night (PAL)</description>
+		<!-- Serial: CX7851 -->
 		<year>1988</year>
 		<publisher>Accolde</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -486,7 +560,8 @@
 	</software>
 
 	<software name="foodfght">
-		<description>Food Fight (Proto)</description>
+		<description>Food Fight (Prototype)</description>
+		<!-- Serial: CX7804 -->
 		<year>1984</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -497,7 +572,8 @@
 	</software>
 
 	<software name="foodfgeu">
-		<description>Food Fight (Proto) (Euro)</description>
+		<description>Food Fight (PAL, Prototype)</description>
+		<!-- Serial: CX7804 -->
 		<year>1984</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -508,7 +584,8 @@
 	</software>
 
 	<software name="galagap">
-		<description>Galaga (Proto)</description>
+		<description>Galaga (Prototype)</description>
+		<!-- Serial: CX7805 -->
 		<year>1984</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -519,7 +596,8 @@
 	</software>
 
 	<software name="galagaeu">
-		<description>Galaga (Proto) (Euro)</description>
+		<description>Galaga (PAL, Prototype)</description>
+		<!-- Serial: CX7805 -->
 		<year>1984</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -530,7 +608,8 @@
 	</software>
 
 	<software name="gatop1">
-		<description>GATO (Proto) (1/??/88)</description>
+		<description>GATO (Prototype, 198801xx)</description>
+		<!-- Serial: CX7827 -->
 		<year>1988</year>
 		<publisher>Atari / Spectrum Holobyte</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -540,8 +619,9 @@
 		</part>
 	</software>
 
-	<software name="gatop2">
-		<description>GATO (Proto) (12/??/87)</description>
+	<software name="gatop2" cloneof="gatop1">
+		<description>GATO (Prototype, 198712xx)</description>
+		<!-- Serial: CX7827 -->
 		<year>1987</year>
 		<publisher>Atari / Spectrum Holobyte</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -551,8 +631,9 @@
 		</part>
 	</software>
 
-	<software name="gatop3">
-		<description>GATO (Proto) (11/??/87)</description>
+	<software name="gatop3" cloneof="gatop1">
+		<description>GATO (Prototype, 198711xx)</description>
+		<!-- Serial: CX7827 -->
 		<year>1987</year>
 		<publisher>Atari / Spectrum Holobyte</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -562,8 +643,9 @@
 		</part>
 	</software>
 
-	<software name="gatop4">
-		<description>GATO (Proto) (7/27/87)</description>
+	<software name="gatop4" cloneof="gatop1">
+		<description>GATO (Prototype, 19870727)</description>
+		<!-- Serial: CX7827 -->
 		<year>1987</year>
 		<publisher>Atari / Spectrum Holobyte</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -573,8 +655,9 @@
 		</part>
 	</software>
 
-	<software name="gatop5">
-		<description>GATO (Proto) (6/23/87)</description>
+	<software name="gatop5" cloneof="gatop1">
+		<description>GATO (Prototype, 19870623)</description>
+		<!-- Serial: CX7827 -->
 		<year>1987</year>
 		<publisher>Atari / Spectrum Holobyte</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -584,8 +667,9 @@
 		</part>
 	</software>
 
-	<software name="gatop6">
-		<description>GATO (Proto) (6/11/87)</description>
+	<software name="gatop6" cloneof="gatop1">
+		<description>GATO (Prototype, 19870611)</description>
+		<!-- Serial: CX7827 -->
 		<year>1987</year>
 		<publisher>Atari / Spectrum Holobyte</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -595,8 +679,9 @@
 		</part>
 	</software>
 
-	<software name="gatop7">
-		<description>GATO (Proto) (5/23/87)</description>
+	<software name="gatop7" cloneof="gatop1">
+		<description>GATO (Prototype, 19870523)</description>
+		<!-- Serial: CX7827 -->
 		<year>1987</year>
 		<publisher>Atari / Spectrum Holobyte</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -606,8 +691,9 @@
 		</part>
 	</software>
 
-	<software name="gatop8">
-		<description>GATO (Proto) (4/24/87)</description>
+	<software name="gatop8" cloneof="gatop1">
+		<description>GATO (Prototype, 19870424)</description>
+		<!-- Serial: CX7827 -->
 		<year>1987</year>
 		<publisher>Atari / Spectrum Holobyte</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -618,7 +704,8 @@
 	</software>
 
 	<software name="hattrick">
-		<description>Hat Trick (Proto)</description>
+		<description>Hat Trick (Prototype)</description>
+		<!-- Serial: CX7829 -->
 		<year>1987</year>
 		<publisher>Atari / Bally Sente</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -629,7 +716,8 @@
 	</software>
 
 	<software name="hattrieu">
-		<description>Hat Trick (Proto) (Euro)</description>
+		<description>Hat Trick (PAL, Prototype)</description>
+		<!-- Serial: CX7829 -->
 		<year>1987</year>
 		<publisher>Atari / Bally Sente</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -641,6 +729,7 @@
 
 	<software name="highscre">
 		<description>High Score Cartridge</description>
+		<!-- Serial: CX78HSC -->
 		<year>198?</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -652,6 +741,7 @@
 
 	<software name="ikariwar">
 		<description>Ikari Warriors</description>
+		<!-- Serial: CX7862 -->
 		<year>1990</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -662,7 +752,8 @@
 	</software>
 
 	<software name="ikariweu">
-		<description>Ikari Warriors (Euro)</description>
+		<description>Ikari Warriors (PAL)</description>
+		<!-- Serial: CX7862 -->
 		<year>1990</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -674,6 +765,7 @@
 
 	<software name="impssble">
 		<description>Impossible Mission</description>
+		<!-- Serial: CX7832 -->
 		<year>1987</year>
 		<publisher>Atari / Epyx</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -684,7 +776,8 @@
 	</software>
 
 	<software name="impssbeu">
-		<description>Impossible Mission (Euro)</description>
+		<description>Impossible Mission (PAL)</description>
+		<!-- Serial: CX7832 -->
 		<year>1987</year>
 		<publisher>Atari / Epyx</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -696,6 +789,7 @@
 
 	<software name="jinks">
 		<description>Jinks</description>
+		<!-- Serial: CX7857 -->
 		<year>1989</year>
 		<publisher>Atari / Softgold</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -706,7 +800,8 @@
 	</software>
 
 	<software name="jinkseu">
-		<description>Jinks (Euro)</description>
+		<description>Jinks (PAL)</description>
+		<!-- Serial: CX7857 -->
 		<year>1989</year>
 		<publisher>Atari / Softgold</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -718,6 +813,7 @@
 
 	<software name="joust">
 		<description>Joust</description>
+		<!-- Serial: CX7806 -->
 		<year>1984</year>
 		<publisher>Atari / Williams</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -728,7 +824,8 @@
 	</software>
 
 	<software name="jousteu">
-		<description>Joust (Euro)</description>
+		<description>Joust (PAL)</description>
+		<!-- Serial: CX7806 -->
 		<year>1984</year>
 		<publisher>Atari / Williams</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -739,7 +836,8 @@
 	</software>
 
 	<software name="karateka">
-		<description>Karateka (Proto)</description>
+		<description>Karateka (Prototype)</description>
+		<!-- Serial: CX7822 -->
 		<year>1987</year>
 		<publisher>Atari / Broderbund</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -750,7 +848,8 @@
 	</software>
 
 	<software name="karateeu">
-		<description>Karateka (Proto) (Euro)</description>
+		<description>Karateka (PAL, Prototype)</description>
+		<!-- Serial: CX7822 -->
 		<year>1987</year>
 		<publisher>Atari / Broderbund</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -761,7 +860,8 @@
 	</software>
 
 	<software name="klax">
-		<description>Klax (Proto)</description>
+		<description>Klax (Prototype)</description>
+		<!-- Serial: CX7888 -->
 		<year>1989</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -773,6 +873,7 @@
 
 	<software name="kungfums">
 		<description>Kung-Fu Master</description>
+		<!-- Serial: AM-039-04 -->
 		<year>1989</year>
 		<publisher>Absolute / Data East / Irem</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -783,7 +884,8 @@
 	</software>
 
 	<software name="kungfueu">
-		<description>Kung-Fu Master (Euro)</description>
+		<description>Kung-Fu Master (PAL)</description>
+		<!-- Serial: AM-039-04 -->
 		<year>1989</year>
 		<publisher>Absolute / Data East / Irem</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -795,6 +897,7 @@
 
 	<software name="mariobro">
 		<description>Mario Bros.</description>
+		<!-- Serial: CX7850 -->
 		<year>1988</year>
 		<publisher>Atari / Nintendo</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -805,7 +908,8 @@
 	</software>
 
 	<software name="mariobeu">
-		<description>Mario Bros. (Euro)</description>
+		<description>Mario Bros. (PAL)</description>
+		<!-- Serial: CX7850 -->
 		<year>1988</year>
 		<publisher>Atari / Nintendo</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -817,6 +921,7 @@
 
 	<software name="matmania">
 		<description>Mat Mania Challenge</description>
+		<!-- Serial: CX7863 -->
 		<year>1989</year>
 		<publisher>Atari / Technos</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -827,7 +932,8 @@
 	</software>
 
 	<software name="matmaneu">
-		<description>Mat Mania Challenge (Euro)</description>
+		<description>Mat Mania Challenge (PAL)</description>
+		<!-- Serial: CX7863 -->
 		<year>1989</year>
 		<publisher>Atari / Technos</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -839,6 +945,7 @@
 
 	<software name="mean18">
 		<description>Mean 18</description>
+		<!-- Serial: CX7847 -->
 		<year>1989</year>
 		<publisher>Atari / Accolade</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -849,7 +956,8 @@
 	</software>
 
 	<software name="mean18eu">
-		<description>Mean 18 (Euro)</description>
+		<description>Mean 18 (PAL)</description>
+		<!-- Serial: CX7847 -->
 		<year>1989</year>
 		<publisher>Atari / Accolade</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -861,6 +969,8 @@
 
 	<software name="meltdown">
 		<description>Meltdown</description>
+		<!-- Serial: CX7875 -->
+		<!-- Works with Lightgun -->
 		<year>1990</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -871,7 +981,9 @@
 	</software>
 
 	<software name="meltdoeu">
-		<description>Meltdown (Euro)</description>
+		<description>Meltdown (PAL)</description>
+		<!-- Serial: CX7875 -->
+		<!-- Works with Lightgun -->
 		<year>1990</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -882,7 +994,8 @@
 	</software>
 
 	<software name="miaproto">
-		<description>Missing In Action (Proto)</description>
+		<description>Missing In Action (Prototype)</description>
+		<!-- Serial: CX7890 -->
 		<year>1989</year>
 		<publisher>TNT Games</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -893,7 +1006,8 @@
 	</software>
 
 	<software name="midmutnt">
-		<description>Midnight Mutants (Proto)</description>
+		<description>Midnight Mutants (Prototype)</description>
+		<!-- Serial: CX7879 -->
 		<year>1990</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -904,7 +1018,8 @@
 	</software>
 
 	<software name="midmuteu">
-		<description>Midnight Mutants (Proto) (Euro)</description>
+		<description>Midnight Mutants (PAL, Prototype)</description>
+		<!-- Serial: CX7879 -->
 		<year>1990</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -915,7 +1030,8 @@
 	</software>
 
 	<software name="mtrpsych">
-		<description>Motor Psycho (Proto)</description>
+		<description>Motor Psycho (Prototype)</description>
+		<!-- Serial: CX7852 -->
 		<year>1990</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -926,7 +1042,8 @@
 	</software>
 
 	<software name="mtrpsyeu">
-		<description>Motor Psycho (Proto) (Euro)</description>
+		<description>Motor Psycho (PAL, Prototype)</description>
+		<!-- Serial: CX7852 -->
 		<year>1990</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -938,6 +1055,7 @@
 
 	<software name="mspacman">
 		<description>Ms. Pac-Man</description>
+		<!-- Serial: CX7807 -->
 		<year>1984</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -948,7 +1066,8 @@
 	</software>
 
 	<software name="mspacmeu">
-		<description>Ms. Pac-Man (Euro)</description>
+		<description>Ms. Pac-Man (PAL)</description>
+		<!-- Serial: CX7807 -->
 		<year>1984</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -960,6 +1079,7 @@
 
 	<software name="ninjaglf">
 		<description>Ninja Golf</description>
+		<!-- Serial: CX7870 -->
 		<year>1990</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -970,7 +1090,8 @@
 	</software>
 
 	<software name="ninjageu">
-		<description>Ninja Golf (Euro)</description>
+		<description>Ninja Golf (PAL)</description>
+		<!-- Serial: CX7870 -->
 		<year>1990</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -982,6 +1103,7 @@
 
 	<software name="oneonone">
 		<description>One On One</description>
+		<!-- Serial: CX7824 -->
 		<year>1987</year>
 		<publisher>Atari / Electronic Arts</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -992,7 +1114,8 @@
 	</software>
 
 	<software name="oneonoeu">
-		<description>One On One (Euro)</description>
+		<description>One On One (PAL)</description>
+		<!-- Serial: CX7824 -->
 		<year>1987</year>
 		<publisher>Atari / Electronic Arts</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -1004,6 +1127,7 @@
 
 	<software name="peterose">
 		<description>Pete Rose Baseball</description>
+		<!-- Serial: AV-045-04 -->
 		<year>1989</year>
 		<publisher>Absolute Entertainment, Inc</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -1014,7 +1138,8 @@
 	</software>
 
 	<software name="pitfghtr">
-		<description>Pit Fighter (Proto)</description>
+		<description>Pit Fighter (Prototype)</description>
+		<!-- Serial: CX7891 -->
 		<year>198?</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -1026,6 +1151,7 @@
 
 	<software name="planetsm">
 		<description>Planet Smashers</description>
+		<!-- Serial: CX7868 -->
 		<year>1990</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -1036,7 +1162,8 @@
 	</software>
 
 	<software name="planeteu">
-		<description>Planet Smashers (Euro)</description>
+		<description>Planet Smashers (PAL)</description>
+		<!-- Serial: CX7868 -->
 		<year>1990</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -1047,7 +1174,8 @@
 	</software>
 
 	<software name="plutos">
-		<description>Plutos (Proto)</description>
+		<description>Plutos (Prototype)</description>
+		<!-- Serial: N/A -->
 		<year>1990</year>
 		<publisher>Tynesoft</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -1059,6 +1187,7 @@
 
 	<software name="polepos2">
 		<description>Pole Position II</description>
+		<!-- Serial: CX7808 -->
 		<year>1987</year>
 		<publisher>Atari / Namco</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -1069,7 +1198,8 @@
 	</software>
 
 	<software name="pleps2eu">
-		<description>Pole Position II (Euro)</description>
+		<description>Pole Position II (PAL)</description>
+		<!-- Serial: CX7808 -->
 		<year>1987</year>
 		<publisher>Atari / Namco</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -1081,6 +1211,7 @@
 
 	<software name="rampage">
 		<description>Rampage</description>
+		<!-- Serial: AM-049-03 -->
 		<year>1989</year>
 		<publisher>Activision</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -1091,7 +1222,8 @@
 	</software>
 
 	<software name="rampart">
-		<description>Rampart (Proto)</description>
+		<description>Rampart (Prototype)</description>
+		<!-- Serial: CX7892 -->
 		<year>1991</year>
 		<publisher>Imagitec Design</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -1102,7 +1234,8 @@
 	</software>
 
 	<software name="rescuefr">
-		<description>Rescue on Fractalus (Proto)</description>
+		<description>Rescue on Fractalus (Prototype)</description>
+		<!-- Serial: CX7816 -->
 		<year>1984</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -1114,6 +1247,7 @@
 
 	<software name="robotron">
 		<description>Robotron: 2084</description>
+		<!-- Serial: CX7809 -->
 		<year>1984</year>
 		<publisher>Atari / Williams</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -1125,6 +1259,7 @@
 
 	<software name="rsbsebll">
 		<description>Realsports Baseball</description>
+		<!-- Serial: CX7834 -->
 		<year>1988</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -1136,6 +1271,7 @@
 
 	<software name="scrpyard">
 		<description>Scrapyard Dog</description>
+		<!-- Serial: CX7879 -->
 		<year>1990</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -1146,7 +1282,8 @@
 	</software>
 
 	<software name="scrpyrde">
-		<description>Scrapyard Dog (Euro)</description>
+		<description>Scrapyard Dog (PAL)</description>
+		<!-- Serial: CX7879 -->
 		<year>1990</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -1157,7 +1294,9 @@
 	</software>
 
 	<software name="sentinel">
-		<description>Sentinel (Proto)</description>
+		<description>Sentinel (Prototype)</description>
+		<!-- Serial: CX7869 -->
+		<!-- Works with Lightgun -->
 		<year>1991</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -1168,7 +1307,9 @@
 	</software>
 
 	<software name="sentineu">
-		<description>Sentinel (Proto) (Euro)</description>
+		<description>Sentinel (PAL, Prototype)</description>
+		<!-- Serial: CX7869 -->
+		<!-- Works with Lightgun -->
 		<year>1991</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -1179,7 +1320,8 @@
 	</software>
 
 	<software name="sirius">
-		<description>Sirius (Proto)</description>
+		<description>Sirius (Prototype)</description>
+		<!-- Serial: N/A -->
 		<year>1990</year>
 		<publisher>Tynesoft</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -1191,6 +1333,7 @@
 
 	<software name="smmrgame">
 		<description>Summer Games</description>
+		<!-- Serial: CX7826 -->
 		<year>1987</year>
 		<publisher>Atari / Epyx</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -1202,6 +1345,7 @@
 
 	<software name="suprhuey">
 		<description>Super Huey</description>
+		<!-- Serial: CX7828 -->
 		<year>1989</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -1212,7 +1356,8 @@
 	</software>
 
 	<software name="suprhueu">
-		<description>Super Huey (Euro)</description>
+		<description>Super Huey (PAL)</description>
+		<!-- Serial: CX7828 -->
 		<year>1989</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -1224,6 +1369,7 @@
 
 	<software name="sprskate">
 		<description>Super Skateboardin'</description>
+		<!-- Serial: AV-047-04 -->
 		<year>1988</year>
 		<publisher>Absolute Entertainment, Inc.</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -1234,7 +1380,8 @@
 	</software>
 
 	<software name="sprskaeu">
-		<description>Super Skateboardin' (Euro)</description>
+		<description>Super Skateboardin' (PAL)</description>
+		<!-- Serial: AV-047-04 -->
 		<year>1988</year>
 		<publisher>Absolute Entertainment, Inc.</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -1246,6 +1393,7 @@
 
 	<software name="tankcmnd">
 		<description>Tank Command</description>
+		<!-- Serial: FG2003 -->
 		<year>1988</year>
 		<publisher>Froggo</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -1257,6 +1405,7 @@
 
 	<software name="titlemat">
 		<description>Title Match Pro Wrestling</description>
+		<!-- Serial: AV-041-04 -->
 		<year>1989</year>
 		<publisher>Absolute Entertainment, Inc.</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -1267,7 +1416,8 @@
 	</software>
 
 	<software name="titlemeu">
-		<description>Title Match Pro Wrestling (Euro)</description>
+		<description>Title Match Pro Wrestling (PAL)</description>
+		<!-- Serial: AV-041-04 -->
 		<year>1989</year>
 		<publisher>Absolute Entertainment, Inc.</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -1279,6 +1429,7 @@
 
 	<software name="tomcat">
 		<description>Tomcat - The F-14 Fighter Simulator</description>
+		<!-- Serial: AV-046-04 -->
 		<year>1989</year>
 		<publisher>Absolute Entertainment, Inc.</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -1289,7 +1440,8 @@
 	</software>
 
 	<software name="tomcateu">
-		<description>Tomcat - The F-14 Fighter Simulator (Euro)</description>
+		<description>Tomcat - The F-14 Fighter Simulator (PAL)</description>
+		<!-- Serial: AV-046-04 -->
 		<year>1989</year>
 		<publisher>Absolute Entertainment, Inc.</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -1300,7 +1452,8 @@
 	</software>
 
 	<software name="tchdown">
-		<description>Touchdown Football (Proto)</description>
+		<description>Touchdown Football (Prototype)</description>
+		<!-- Serial: CX7823 -->
 		<year>1988</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -1312,6 +1465,7 @@
 
 	<software name="twrtpllr">
 		<description>Tower Toppler</description>
+		<!-- Serial: CX7856 -->
 		<year>1988</year>
 		<publisher>Atari / U.S. Gold</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -1322,7 +1476,8 @@
 	</software>
 
 	<software name="twrtpleu">
-		<description>Tower Toppler (Euro)</description>
+		<description>Tower Toppler (PAL)</description>
+		<!-- Serial: CX7856 -->
 		<year>1988</year>
 		<publisher>Atari / U.S. Gold</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -1334,6 +1489,7 @@
 
 	<software name="waterski">
 		<description>Water Ski</description>
+		<!-- Serial: FG2002 -->
 		<year>1988</year>
 		<publisher>Froggo</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -1345,6 +1501,7 @@
 
 	<software name="wntrgame">
 		<description>Winter Games</description>
+		<!-- Serial: CX7831 -->
 		<year>1987</year>
 		<publisher>Atari / Epyx</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -1356,6 +1513,7 @@
 
 	<software name="xnophobe">
 		<description>Xenophobe</description>
+		<!-- Serial: CX7858 -->
 		<year>1987</year>
 		<publisher>Atari / Bally Midway Mfg. Co.</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -1366,7 +1524,8 @@
 	</software>
 
 	<software name="xnophoeu">
-		<description>Xenophobe (Euro)</description>
+		<description>Xenophobe (PAL)</description>
+		<!-- Serial: CX7858 -->
 		<year>1987</year>
 		<publisher>Atari / Bally Midway Mfg. Co.</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -1377,7 +1536,8 @@
 	</software>
 
 	<software name="xevious">
-		<description>Xevious (Proto)</description>
+		<description>Xevious (Prototype)</description>
+		<!-- Serial: CX7810 -->
 		<year>1984</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -1388,7 +1548,8 @@
 	</software>
 
 	<software name="xevioeu">
-		<description>Xevious (Proto) (Euro)</description>
+		<description>Xevious (PAL, Prototype)</description>
+		<!-- Serial: CX7810 -->
 		<year>1984</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a7800_cart">

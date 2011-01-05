@@ -36,6 +36,7 @@ Known undumped prototypes:
 <softwarelist name="lynx" description="Atari Lynx cartridges">
 	<software name="apb">
 		<description>A.P.B. (Euro, USA)</description>
+		<!-- Serial: PA2042 -->
 		<year>1991</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
@@ -47,6 +48,7 @@ Known undumped prototypes:
 
 	<software name="avsp">
 		<description>Alien vs Predator (USA, Prototype)</description>
+		<!-- Serial: N/A -->
 		<year>199?</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
@@ -58,6 +60,7 @@ Known undumped prototypes:
 
 	<software name="awesomeg">
 		<description>Awesome Golf (Euro, USA)</description>
+		<!-- Serial: PA2049 -->
 		<year>1991</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
@@ -67,31 +70,33 @@ Known undumped prototypes:
 		</part>
 	</software>
 
-	<!-- // Bad dump -->
 	<software name="bbheroes">
 		<description>Baseball Heroes (Euro, USA)</description>
+		<!-- Serial: PA2050 -->
 		<year>1992</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
 			<dataarea name="rom" size="262208">
-				<rom name="baseball heroes (Euro, USA) [b].lnx" size="262208" crc="400989ea" sha1="5e116d56e1642f107e15bb943416655917fbd607" offset="000000" status="baddump" />
+				<rom name="baseball heroes (Euro, USA).lnx" size="262208" crc="bb5de237" sha1="167ff323c8ea65416c9e34589bd1b4fd08f3bfda" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="basketbr">
 		<description>Basketbrawl (Euro, USA)</description>
+		<!-- Serial: PA2034 -->
 		<year>1992</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
-			<dataarea name="rom" size="262208">
-				<rom name="basketbrawl (Euro, USA).lnx" size="262208" crc="a41b3d47" sha1="cfe4708a881564b1ad75cdbe6da526c06d19a9c1" offset="000000" />
+			<dataarea name="rom" size="131136">
+				<rom name="basketbrawl (Euro, USA).lnx" size="131136" crc="207fd124" sha1="54a8dc7a41af244fc835dd46fac98c21c3b97823" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="batmanrn">
 		<description>Batman Returns (Euro, USA)</description>
+		<!-- Serial: PA2101 -->
 		<year>1992</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
@@ -103,6 +108,7 @@ Known undumped prototypes:
 
 	<software name="bwheels">
 		<description>Battle Wheels (Euro, USA)</description>
+		<!-- Serial: PT5006 -->
 		<year>1993</year>
 		<publisher>Beyond Games</publisher>
 		<part name="cart" interface="lynx_cart">
@@ -114,6 +120,7 @@ Known undumped prototypes:
 
 	<software name="bzone2k">
 		<description>Battlezone 2000 (Euro, USA)</description>
+		<!-- Serial: PA2088 -->
 		<year>1995</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
@@ -125,6 +132,7 @@ Known undumped prototypes:
 
 	<software name="billted">
 		<description>Bill &amp; Ted's Excellent Adventure (Euro, USA)</description>
+		<!-- Serial: PA2068 -->
 		<year>1991</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
@@ -136,6 +144,7 @@ Known undumped prototypes:
 
 	<software name="blockout">
 		<description>Block Out (Euro, USA)</description>
+		<!-- Serial: PA2056 -->
 		<year>1991</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
@@ -147,6 +156,7 @@ Known undumped prototypes:
 
 	<software name="bluelghtd" cloneof="bluelght">
 		<description>Blue Lightning (USA, Demo)</description>
+		<!-- Serial: PA2054 -->
 		<year>1989</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
@@ -158,6 +168,7 @@ Known undumped prototypes:
 
 	<software name="bluelght">
 		<description>Blue Lightning (Euro, USA)</description>
+		<!-- Serial: PA2020 -->
 		<year>1989</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
@@ -169,6 +180,7 @@ Known undumped prototypes:
 
 	<software name="bubtroub">
 		<description>Bubble Trouble (Euro, USA)</description>
+		<!-- Serial: LX216 -->
 		<year>1994</year>
 		<publisher>Telegames</publisher>
 		<part name="cart" interface="lynx_cart">
@@ -180,6 +192,7 @@ Known undumped prototypes:
 
 	<software name="calgames">
 		<description>California Games (Euro, USA)</description>
+		<!-- Serial: PA2025 -->
 		<year>1989</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
@@ -191,6 +204,7 @@ Known undumped prototypes:
 
 	<software name="centiped">
 		<description>Centipede (USA, Prototype)</description>
+		<!-- Serial: N/A -->
 		<year>199?</year>
 		<publisher>Shadowsoft</publisher>
 		<part name="cart" interface="lynx_cart">
@@ -202,6 +216,7 @@ Known undumped prototypes:
 
 	<software name="chekflag">
 		<description>Checkered Flag (Euro, USA)</description>
+		<!-- Serial: PA2053 -->
 		<year>1991</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
@@ -213,6 +228,7 @@ Known undumped prototypes:
 
 	<software name="chipchal">
 		<description>Chip's Challenge (Euro, USA)</description>
+		<!-- Serial: PA2028 -->
 		<year>1989</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
@@ -224,17 +240,19 @@ Known undumped prototypes:
 
 	<software name="crystalm">
 		<description>Crystal Mines II (Euro, USA)</description>
+		<!-- Serial: PA2105 -->
 		<year>1992</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
-			<dataarea name="rom" size="262208">
-				<rom name="crystal mines ii (Euro, USA).lnx" size="262208" crc="58ff6db3" sha1="e8d6a939a202060a76e0417315c7693631116d57" offset="000000" />
+			<dataarea name="rom" size="131136">
+				<rom name="crystal mines ii (Euro, USA).lnx" size="131136" crc="ecf9e1f7" sha1="4131dad8bf6056539c6002f5dfcd2e16fb831973" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="daemongt">
 		<description>Daemonsgate (USA, Prototype)</description>
+		<!-- Serial: N/A -->
 		<year>199?</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
@@ -246,6 +264,7 @@ Known undumped prototypes:
 
 	<software name="dstrike">
 		<description>Desert Strike - Return to the Gulf (Euro, USA)</description>
+		<!-- Serial: L071 -->
 		<year>1993</year>
 		<publisher>Telegames</publisher>
 		<part name="cart" interface="lynx_cart">
@@ -257,6 +276,7 @@ Known undumped prototypes:
 
 	<software name="dinolymp">
 		<description>Dinolympics (Euro, USA)</description>
+		<!-- Serial: PA2089 -->
 		<year>1992</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
@@ -268,6 +288,7 @@ Known undumped prototypes:
 
 	<software name="dirtylar">
 		<description>Dirty Larry - Renegade Cop (Euro, USA)</description>
+		<!-- Serial: PA2077 -->
 		<year>1992</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
@@ -279,6 +300,7 @@ Known undumped prototypes:
 
 	<software name="ddragon">
 		<description>Double Dragon (Euro, USA)</description>
+		<!-- Serial: L070 -->
 		<year>1993</year>
 		<publisher>Telegames</publisher>
 		<part name="cart" interface="lynx_cart">
@@ -290,6 +312,7 @@ Known undumped prototypes:
 
 	<software name="dracula">
 		<description>Dracula the Undead (Euro, USA)</description>
+		<!-- Serial: PA2087 -->
 		<year>1992</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
@@ -301,6 +324,7 @@ Known undumped prototypes:
 
 	<software name="electroc">
 		<description>Electrocop (Euro, USA)</description>
+		<!-- Serial: PA2021 -->
 		<year>1989</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
@@ -312,6 +336,7 @@ Known undumped prototypes:
 
 	<software name="eurosocc">
 		<description>European Soccer Challenge (Euro, USA)</description>
+		<!-- Serial: LX106 -->
 		<year>1993</year>
 		<publisher>Telegames</publisher>
 		<part name="cart" interface="lynx_cart">
@@ -323,6 +348,7 @@ Known undumped prototypes:
 
 	<software name="eyebehol">
 		<description>Eye of the Beholder (USA, Prototype)</description>
+		<!-- Serial: N/A -->
 		<year>199?</year>
 		<publisher>NuFX</publisher>
 		<part name="cart" interface="lynx_cart">
@@ -334,6 +360,7 @@ Known undumped prototypes:
 
 	<software name="fatbobby">
 		<description>Fat Bobby (Euro, USA)</description>
+		<!-- Serial: N/A -->
 		<year>199?</year>
 		<publisher>Telegames</publisher>
 		<part name="cart" interface="lynx_cart">
@@ -345,6 +372,7 @@ Known undumped prototypes:
 
 	<software name="fidelity">
 		<description>The Fidelity Ultimate Chess Challenge (Euro, USA)</description>
+		<!-- Serial: LX101 -->
 		<year>1991</year>
 		<publisher>Telegames</publisher>
 		<part name="cart" interface="lynx_cart">
@@ -356,6 +384,7 @@ Known undumped prototypes:
 
 	<software name="gatezend">
 		<description>Gates of Zendocon (Euro, USA)</description>
+		<!-- Serial: PA2023 -->
 		<year>1989</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
@@ -367,6 +396,7 @@ Known undumped prototypes:
 
 	<software name="gauntlet">
 		<description>Gauntlet - The Third Encounter (Euro, USA)</description>
+		<!-- Serial: PA2024 -->
 		<year>1990</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
@@ -378,6 +408,7 @@ Known undumped prototypes:
 
 	<software name="gordo106">
 		<description>Gordo 106 - The Mutated Lab Monkey (Euro, USA)</description>
+		<!-- Serial: PA2106 -->
 		<year>1993</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
@@ -389,6 +420,7 @@ Known undumped prototypes:
 
 	<software name="harddriv">
 		<description>Hard Drivin' (Euro, USA)</description>
+		<!-- Serial: PA2044 -->
 		<year>1991</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
@@ -400,6 +432,7 @@ Known undumped prototypes:
 
 	<software name="hockey">
 		<description>Hockey (Euro, USA)</description>
+		<!-- Serial: PA2052 -->
 		<year>1992</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
@@ -411,6 +444,7 @@ Known undumped prototypes:
 
 	<software name="hydra">
 		<description>Hydra (Euro, USA)</description>
+		<!-- Serial: PA2073 -->
 		<year>1992</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
@@ -422,17 +456,19 @@ Known undumped prototypes:
 
 	<software name="ishido">
 		<description>Ishido - The Way of Stones (Euro, USA)</description>
+		<!-- Serial: PA2065 -->
 		<year>1991</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
-			<dataarea name="rom" size="262208">
-				<rom name="ishido - the way of stones (Euro, USA).lnx" size="262208" crc="7c58aea4" sha1="f7f2fb564c589fc8499f0aafd21ef13a38135947" offset="000000" />
+			<dataarea name="rom" size="131136">
+				<rom name="ishido - the way of stones (Euro, USA).lnx" size="131136" crc="59c0c5f3" sha1="e43cbd787dc8291c954ebf41a5a5c5a389d9980c" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="jimmycon">
 		<description>Jimmy Connors' Tennis (Euro, USA)</description>
+		<!-- Serial: PA2085 -->
 		<year>1993</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
@@ -444,17 +480,19 @@ Known undumped prototypes:
 
 	<software name="joust">
 		<description>Joust (Euro, USA)</description>
+		<!-- Serial: PT5005 -->
 		<year>1992</year>
 		<publisher>Williams Entertainment</publisher>
 		<part name="cart" interface="lynx_cart">
-			<dataarea name="rom" size="262208">
-				<rom name="joust (Euro, USA).lnx" size="262208" crc="9f7662c2" sha1="9a72b390ce25ffe8400b7abdedd2ca61d3957cc3" offset="000000" />
+			<dataarea name="rom" size="131136">
+				<rom name="joust (Euro, USA).lnx" size="131136" crc="66b1eb4a" sha1="4279730d1c80284acb410e7d95a05dec8f08902a" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="klax">
 		<description>Klax (Euro, USA)</description>
+		<!-- Serial: PA2031 -->
 		<year>1990</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
@@ -466,6 +504,7 @@ Known undumped prototypes:
 
 	<software name="krazyace">
 		<description>Krazy Ace - Miniature Golf (Euro, USA)</description>
+		<!-- Serial: L204 -->
 		<year>1993</year>
 		<publisher>Telegames</publisher>
 		<part name="cart" interface="lynx_cart">
@@ -477,6 +516,7 @@ Known undumped prototypes:
 
 	<software name="kungfood">
 		<description>Kung Food (Euro, USA)</description>
+		<!-- Serial: PA2076 -->
 		<year>1992</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
@@ -488,6 +528,7 @@ Known undumped prototypes:
 
 	<software name="lemmings">
 		<description>Lemmings (Euro, USA)</description>
+		<!-- Serial: PA2080 -->
 		<year>1993</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
@@ -499,6 +540,7 @@ Known undumped prototypes:
 
 	<software name="lexis">
 		<description>Lexis (Euro, USA)</description>
+		<!-- Serial: CF2003 -->
 		<year>1999</year>
 		<publisher>Songbird Productions</publisher>
 		<part name="cart" interface="lynx_cart">
@@ -510,6 +552,7 @@ Known undumped prototypes:
 
 	<software name="loopz">
 		<description>Loopz (USA, Prototype)</description>
+		<!-- Serial: CF2009 -->
 		<year>2004</year>
 		<publisher>Songbird Productions</publisher>
 		<part name="cart" interface="lynx_cart">
@@ -521,6 +564,7 @@ Known undumped prototypes:
 
 	<software name="lcasino">
 		<description>Lynx Casino (Euro, USA)</description>
+		<!-- Serial: PA2061 -->
 		<year>1992</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
@@ -532,6 +576,7 @@ Known undumped prototypes:
 
 	<software name="malibu">
 		<description>Malibu Bikini Volleyball (Euro, USA)</description>
+		<!-- Serial: PA2086 -->
 		<year>1993</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
@@ -543,6 +588,7 @@ Known undumped prototypes:
 
 	<software name="marlboro">
 		<description>Marlboro Go! (Euro, Prototype)</description>
+		<!-- Serial: N/A -->
 		<year>1993</year>
 		<publisher>Digital Image</publisher>
 		<part name="cart" interface="lynx_cart">
@@ -554,6 +600,7 @@ Known undumped prototypes:
 
 	<software name="mspacman">
 		<description>Ms. Pac-Man (Euro, USA)</description>
+		<!-- Serial: PA2057 -->
 		<year>1990</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
@@ -565,6 +612,7 @@ Known undumped prototypes:
 
 	<software name="nflfoot">
 		<description>NFL Football (Euro, USA)</description>
+		<!-- Serial: PA2045 -->
 		<year>1992</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
@@ -576,6 +624,7 @@ Known undumped prototypes:
 
 	<software name="ninjag">
 		<description>Ninja Gaiden (Euro, USA)</description>
+		<!-- Serial: PA2039 -->
 		<year>1991</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
@@ -587,6 +636,7 @@ Known undumped prototypes:
 
 	<software name="ninjag3">
 		<description>Ninja Gaiden III - The Ancient Ship of Doom (Euro, USA)</description>
+		<!-- Serial: PA2092 -->
 		<year>1993</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
@@ -598,6 +648,7 @@ Known undumped prototypes:
 
 	<software name="pacland">
 		<description>Pac-Land (Euro, USA)</description>
+		<!-- Serial: PA2059 -->
 		<year>1991</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
@@ -609,6 +660,7 @@ Known undumped prototypes:
 
 	<software name="paperboy">
 		<description>Paperboy (Euro, USA)</description>
+		<!-- Serial: PA2041 -->
 		<year>1990</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
@@ -620,6 +672,7 @@ Known undumped prototypes:
 
 	<software name="pinballj">
 		<description>Pinball Jam (Euro, USA)</description>
+		<!-- Serial: PA2055 -->
 		<year>1992</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
@@ -631,6 +684,7 @@ Known undumped prototypes:
 
 	<software name="pitfight">
 		<description>Pit Fighter - The Ultimate Competition (Euro, USA)</description>
+		<!-- Serial: PA2070 -->
 		<year>1992</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
@@ -642,6 +696,7 @@ Known undumped prototypes:
 
 	<software name="powfactr">
 		<description>Power Factor (Euro, USA)</description>
+		<!-- Serial: PA2109 -->
 		<year>1992</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
@@ -653,6 +708,7 @@ Known undumped prototypes:
 
 	<software name="qix">
 		<description>Qix (Euro, USA)</description>
+		<!-- Serial: LX102 -->
 		<year>1991</year>
 		<publisher>Telegames</publisher>
 		<part name="cart" interface="lynx_cart">
@@ -664,6 +720,7 @@ Known undumped prototypes:
 
 	<software name="raiden">
 		<description>Raiden (USA, v3.0)</description>
+		<!-- Serial: N/A -->
 		<year>1997</year>
 		<publisher>Telegames</publisher>
 		<part name="cart" interface="lynx_cart">
@@ -675,6 +732,7 @@ Known undumped prototypes:
 
 	<software name="rampage">
 		<description>Rampage (Euro, USA)</description>
+		<!-- Serial: PA2022 -->
 		<year>1990</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
@@ -686,6 +744,7 @@ Known undumped prototypes:
 
 	<software name="rampart">
 		<description>Rampart (Euro, USA)</description>
+		<!-- Serial: PA2102 -->
 		<year>1992</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
@@ -697,6 +756,7 @@ Known undumped prototypes:
 
 	<software name="roadriot">
 		<description>Road Riot 4WD (USA, Prototype)</description>
+		<!-- Serial: N/A -->
 		<year>199?</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
@@ -708,6 +768,7 @@ Known undumped prototypes:
 
 	<software name="roadblas">
 		<description>RoadBlasters (Euro, USA)</description>
+		<!-- Serial: PA2036 -->
 		<year>1990</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
@@ -719,6 +780,7 @@ Known undumped prototypes:
 
 	<software name="robosqua">
 		<description>Robo-Squash (Euro, USA)</description>
+		<!-- Serial: PA2035 -->
 		<year>1990</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
@@ -730,6 +792,7 @@ Known undumped prototypes:
 
 	<software name="robotron">
 		<description>Robotron 2084 (Euro, USA)</description>
+		<!-- Serial: PT5003 -->
 		<year>1991</year>
 		<publisher>Williams Entertainment</publisher>
 		<part name="cart" interface="lynx_cart">
@@ -741,6 +804,7 @@ Known undumped prototypes:
 
 	<software name="rygar">
 		<description>Rygar - Legendary Warrior (Euro, USA)</description>
+		<!-- Serial: PA2043 -->
 		<year>1990</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
@@ -752,6 +816,7 @@ Known undumped prototypes:
 
 	<software name="stunrun">
 		<description>S.T.U.N. Runner (Euro, USA)</description>
+		<!-- Serial: PA2060 -->
 		<year>1991</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
@@ -763,6 +828,7 @@ Known undumped prototypes:
 
 	<software name="scrapdog">
 		<description>Scrapyard Dog (Euro, USA)</description>
+		<!-- Serial: PA2048 -->
 		<year>1991</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
@@ -774,6 +840,7 @@ Known undumped prototypes:
 
 	<software name="beast">
 		<description>Shadow of the Beast (Euro, USA)</description>
+		<!-- Serial: PA2081 -->
 		<year>1992</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
@@ -785,6 +852,7 @@ Known undumped prototypes:
 
 	<software name="shanghai">
 		<description>Shanghai (Euro, USA)</description>
+		<!-- Serial: PA2063 -->
 		<year>1990</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
@@ -796,6 +864,7 @@ Known undumped prototypes:
 
 	<software name="steeltal">
 		<description>Steel Talons (Euro, USA)</description>
+		<!-- Serial: PA2104 -->
 		<year>1992</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
@@ -807,6 +876,7 @@ Known undumped prototypes:
 
 	<software name="supaster">
 		<description>Super Asteroids - Missile Command (Euro, USA)</description>
+		<!-- Serial: PA2093 -->
 		<year>1995</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
@@ -818,6 +888,7 @@ Known undumped prototypes:
 
 	<software name="superoff">
 		<description>Super Off-Road (Euro, USA)</description>
+		<!-- Serial: LX105 -->
 		<year>1993</year>
 		<publisher>Telegames</publisher>
 		<part name="cart" interface="lynx_cart">
@@ -829,6 +900,7 @@ Known undumped prototypes:
 
 	<software name="supskwek">
 		<description>Super Skweek (Euro, USA)</description>
+		<!-- Serial: PA2100 -->
 		<year>1991</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
@@ -840,6 +912,7 @@ Known undumped prototypes:
 
 	<software name="switchb2">
 		<description>Switchblade II (Euro, USA)</description>
+		<!-- Serial: PA2094 -->
 		<year>1992</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
@@ -851,6 +924,7 @@ Known undumped prototypes:
 
 	<software name="toddsadv">
 		<description>Todd's Adventures in Slime World (Euro, USA)</description>
+		<!-- Serial: PA2029 -->
 		<year>1990</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
@@ -862,6 +936,7 @@ Known undumped prototypes:
 
 	<software name="toki">
 		<description>Toki (Euro, USA)</description>
+		<!-- Serial: PA2066 -->
 		<year>1992</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
@@ -873,6 +948,7 @@ Known undumped prototypes:
 
 	<software name="tcyberbl">
 		<description>Tournament Cyberball 2072 (Euro, USA)</description>
+		<!-- Serial: PA2038 -->
 		<year>1991</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
@@ -884,6 +960,7 @@ Known undumped prototypes:
 
 	<software name="turbosub">
 		<description>Turbo Sub (Euro, USA)</description>
+		<!-- Serial: PA2047 -->
 		<year>1991</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
@@ -895,6 +972,7 @@ Known undumped prototypes:
 
 	<software name="viking">
 		<description>Viking Child (Euro, USA)</description>
+		<!-- Serial: PA2064 -->
 		<year>1991</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
@@ -906,6 +984,7 @@ Known undumped prototypes:
 
 	<software name="warbirds">
 		<description>Warbirds (Euro, USA)</description>
+		<!-- Serial: PA2032 -->
 		<year>1991</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
@@ -917,6 +996,7 @@ Known undumped prototypes:
 
 	<software name="wcsoccer">
 		<description>World Class Soccer (Euro, USA)</description>
+		<!-- Serial: PA2037 -->
 		<year>1992</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
@@ -928,6 +1008,7 @@ Known undumped prototypes:
 
 	<software name="xenophob">
 		<description>Xenophobe (Euro, USA)</description>
+		<!-- Serial: PA2026 -->
 		<year>1990</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
@@ -939,6 +1020,7 @@ Known undumped prototypes:
 
 	<software name="xybots">
 		<description>Xybots (Euro, USA)</description>
+		<!-- Serial: PA2062 -->
 		<year>1991</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
@@ -950,6 +1032,7 @@ Known undumped prototypes:
 
 	<software name="zarlor">
 		<description>Zarlor Mercenary (Euro, USA)</description>
+		<!-- Serial: PA2030 -->
 		<year>1990</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
@@ -961,6 +1044,7 @@ Known undumped prototypes:
 
 	<software name="dragnet">
 		<description>Dragnet</description>
+		<!-- Serial: N/A -->
 		<year>1995</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="lynx_cart">
@@ -972,6 +1056,7 @@ Known undumped prototypes:
 
 	<software name="conquest">
 		<description>Conquest of Zow</description>
+		<!-- Serial: N/A -->
 		<year>1996</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="lynx_cart">
@@ -983,6 +1068,7 @@ Known undumped prototypes:
 
 	<software name="tres">
 		<description>T-RES (title unknown) (199x) [b1]</description>
+		<!-- Serial: N/A -->
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="lynx_cart">
@@ -994,6 +1080,7 @@ Known undumped prototypes:
 
 	<software name="tetris1">
 		<description>Tetris (1996) [b1]</description>
+		<!-- Serial: N/A -->
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="lynx_cart">
@@ -1005,6 +1092,7 @@ Known undumped prototypes:
 
 	<software name="tetris2">
 		<description>Tetris (1996) [b2]</description>
+		<!-- Serial: N/A -->
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="lynx_cart">
@@ -1016,6 +1104,7 @@ Known undumped prototypes:
 
 	<software name="tetris3">
 		<description>Tetris (1996) [b3]</description>
+		<!-- Serial: N/A -->
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="lynx_cart">
@@ -1027,6 +1116,7 @@ Known undumped prototypes:
 
 	<software name="lynx2tst">
 		<description>Lynx II Production Test Program V0.02 (USA, Prototype)</description>
+		<!-- Serial: N/A -->
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="lynx_cart">

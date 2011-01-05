@@ -7,18 +7,20 @@ Compiled by K1W1
 
 <!--
   Re-released games for XEGS not shown here but available on a800.xml:
-
-  - Caverns of Mars - Atari (RX8021)
   - Donkey Kong - Atari (RX8031)
   - Eastern Front (1941) - Atari (RX8039)
 
-  Missing Cartridge":
+  Missing Cartridges:
+     - Xenophobe (Prototype)
 
-  - XE Demo Cartridge (CA400201)
+  XE Demo Cartridge (CA400201) contained 4 Games:
+  - One on One (Same as the retail cartridge)
+  - Ms. PacMan (Same as the retail cartridge, see a800 list)
+  - Joust (Same as the retail cartridge, see a800 list)
+  - Flight Simulator 2 (Proper demo version, included on this list)
 
-  Cartridges to use with the XEGS Light Gun
-
-  - Barnyard Blaster
+  Cartridges to use with the XEGS Light Gun:
+  - Barnyard Blasterokook
   - Bug Hunt
   - Crime Buster
   - Crossbow
@@ -27,7 +29,7 @@ Compiled by K1W1
 <softwarelist name="xegs" description="Atari XE Game System cartridges">
 	<software name="aceaces">
 		<description>Ace of Aces</description>
-		<!-- <cart number>RX8099</cart number> -->
+		<!-- Serial: RX8099 -->
 		<year>1988</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="xegs_cart">
@@ -39,7 +41,7 @@ Compiled by K1W1
 
 	<software name="airball">
 		<description>Airball</description>
-		<!-- <cart number>RX8109</cart number> -->
+		<!-- Serial: RX8109 -->
 		<year>1988</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="xegs_cart">
@@ -51,7 +53,7 @@ Compiled by K1W1
 
 	<software name="archon">
 		<description>Archon: The Light and the Dark</description>
-		<!-- <cart number>RX8092</cart number> -->
+		<!-- Serial: RX8092 -->
 		<year>1987</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="xegs_cart">
@@ -63,7 +65,7 @@ Compiled by K1W1
 
 	<software name="ballblzr">
 		<description>Ballblazer</description>
-		<!-- <cart number>RX8064</cart number> -->
+		<!-- Serial: RX8064 -->
 		<year>1987</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="xegs_cart">
@@ -75,7 +77,7 @@ Compiled by K1W1
 
 	<software name="brnblstr">
 		<description>Barnyard Blaster</description>
-		<!-- <cart number>RX8086</cart number> -->
+		<!-- Serial: RX8086 -->
 		<year>1987</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="xegs_cart">
@@ -87,7 +89,7 @@ Compiled by K1W1
 
 	<software name="bzone">
 		<description>BattleZone</description>
-		<!-- <cart number>RX8077</cart number> -->
+		<!-- Serial: RX8077 -->
 		<year>1987</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="xegs_cart">
@@ -99,7 +101,7 @@ Compiled by K1W1
 
 	<software name="bluemax">
 		<description>Blue Max</description>
-		<!-- <cart number>RX8081</cart number> -->
+		<!-- Serial: RX8081 -->
 		<year>1987</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="xegs_cart">
@@ -111,7 +113,7 @@ Compiled by K1W1
 
 	<software name="bughunt">
 		<description>Bug Hunt</description>
-		<!-- <cart number>RX8087</cart number> -->
+		<!-- Serial: RX8087 -->
 		<year>1987</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="xegs_cart">
@@ -123,7 +125,7 @@ Compiled by K1W1
 
 	<software name="choplift" supported="partial">
 		<description>Choplifter!</description>
-		<!-- <cart number>RX8096</cart number> -->
+		<!-- Serial: RX8096 -->
 		<year>1987</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="xegs_cart">
@@ -135,7 +137,7 @@ Compiled by K1W1
 
 	<software name="commando">
 		<description>Commando (Prototype)</description>
-		<!-- <cart number></cart number> -->
+		<!-- Serial: N/A -->
 		<year>1988</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="xegs_cart">
@@ -147,7 +149,7 @@ Compiled by K1W1
 
 	<software name="crimbstr">
 		<description>Crime Buster</description>
-		<!-- <cart number>RX8104</cart number> -->
+		<!-- Serial: RX8104 -->
 		<year>1988</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="xegs_cart">
@@ -159,7 +161,7 @@ Compiled by K1W1
 
 	<software name="crossbow" supported="partial">
 		<description>Crossbow</description>
-		<!-- <cart number>RX8088</cart number> -->
+		<!-- Serial: RX8088 -->
 		<year>1988</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="xegs_cart">
@@ -171,7 +173,7 @@ Compiled by K1W1
 
 	<software name="crossbowa" cloneof="crossbow" supported="partial">
 		<description>Crossbow (Alt)</description>
-		<!-- <cart number>RX8088</cart number> -->
+		<!-- Serial: RX8088 -->
 		<year>1988</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="xegs_cart">
@@ -183,7 +185,7 @@ Compiled by K1W1
 
 	<software name="ccastles">
 		<description>Crystal Castles</description>
-		<!-- <cart number>RX8102</cart number> -->
+		<!-- Serial: RX8102 -->
 		<year>1988</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="xegs_cart">
@@ -195,7 +197,7 @@ Compiled by K1W1
 
 	<software name="drkchmbr">
 		<description>Dark Chambers</description>
-		<!-- <cart number>RX8101</cart number> -->
+		<!-- Serial: RX8101 -->
 		<year>1988</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="xegs_cart">
@@ -207,7 +209,7 @@ Compiled by K1W1
 
 	<software name="midntmgc">
 		<description>David's Midnight Magic</description>
-		<!-- <cart number>RX8083</cart number> -->
+		<!-- Serial: RX8083 -->
 		<year>1987</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="xegs_cart">
@@ -219,7 +221,7 @@ Compiled by K1W1
 
 	<software name="deflktor">
 		<description>Deflektor (Prototype)</description>
-		<!-- <cart number></cart number> -->
+		<!-- Serial: N/A -->
 		<year>1988</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="xegs_cart">
@@ -231,7 +233,7 @@ Compiled by K1W1
 
 	<software name="dsrtflcn">
 		<description>Desert Falcon</description>
-		<!-- <cart number>RX8089</cart number> -->
+		<!-- Serial: RX8089 -->
 		<year>1988</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="xegs_cart">
@@ -243,7 +245,7 @@ Compiled by K1W1
 
 	<software name="fightnit">
 		<description>Fight Night</description>
-		<!-- <cart number>RX8085</cart number> -->
+		<!-- Serial: RX8085 -->
 		<year>1987</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="xegs_cart">
@@ -255,7 +257,7 @@ Compiled by K1W1
 
 	<software name="flgtsim2" supported="partial">
 		<description>Flight Simulator 2</description>
-		<!-- <cart number>RX8091</cart number> -->
+		<!-- Serial: RX8091 -->
 		<year>1987</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="xegs_cart">
@@ -267,19 +269,19 @@ Compiled by K1W1
 
 	<software name="fltsim2d" cloneof="flgtsim2">
 		<description>Flight Simulator 2 (Demo Cartridge)</description>
-		<!-- <cart number></cart number> -->
+		<!-- Serial: CA400201 -->
 		<year>1987</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="xegs_cart">
 			<dataarea name="rom" size="65536">
-				<rom name="flight simulator 2 (demo).bin" size="65536" crc="5133a213" sha1="d1087e8d47a106555670d0aa40d97e90d0cd407a" offset="0" />
+				<rom name="flight simulator 2 (demo).rom" size="65536" crc="5133a213" sha1="d1087e8d47a106555670d0aa40d97e90d0cd407a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="foodf">
 		<description>Food Fight</description>
-		<!-- <cart number>RX8079</cart number> -->
+		<!-- Serial: RX8079 -->
 		<year>1987</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="xegs_cart">
@@ -291,7 +293,7 @@ Compiled by K1W1
 
 	<software name="gato">
 		<description>GATO Submarine Simulation</description>
-		<!-- <cart number>RX8090</cart number> -->
+		<!-- Serial: RX8090 -->
 		<year>1987</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="xegs_cart">
@@ -303,7 +305,7 @@ Compiled by K1W1
 
 	<software name="hardball">
 		<description>Hardball!</description>
-		<!-- <cart number>RX8084</cart number> -->
+		<!-- Serial: RX8084 -->
 		<year>1987</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="xegs_cart">
@@ -315,7 +317,7 @@ Compiled by K1W1
 
 	<software name="eaglnest">
 		<description>Into the Eagle's Nest</description>
-		<!-- <cart number>RX8114</cart number> -->
+		<!-- Serial: RX8114 -->
 		<year>1988</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="xegs_cart">
@@ -327,7 +329,7 @@ Compiled by K1W1
 
 	<software name="karateka">
 		<description>Karateka</description>
-		<!-- <cart number>RX8095</cart number> -->
+		<!-- Serial: RX8095 -->
 		<year>1988</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="xegs_cart">
@@ -339,7 +341,7 @@ Compiled by K1W1
 
 	<software name="ldrun">
 		<description>Lode Runner</description>
-		<!-- <cart number>RX8082</cart number> -->
+		<!-- Serial: RX8082 -->
 		<year>1987</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="xegs_cart">
@@ -351,7 +353,7 @@ Compiled by K1W1
 
 	<software name="mariobro">
 		<description>Mario Bros.</description>
-		<!-- <cart number>RX8103</cart number> -->
+		<!-- Serial: RX8103 -->
 		<year>1988</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="xegs_cart">
@@ -363,7 +365,7 @@ Compiled by K1W1
 
 	<software name="mean18">
 		<description>Mean 18 (Prototype)</description>
-		<!-- <cart number></cart number> -->
+		<!-- Serial: N/A -->
 		<year>1988</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="xegs_cart">
@@ -375,7 +377,7 @@ Compiled by K1W1
 
 	<software name="midimaze" supported="partial">
 		<description>MIDI Maze (Prototype)</description>
-		<!-- <cart number></cart number> -->
+		<!-- Serial: N/A -->
 		<year>1988</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="xegs_cart">
@@ -387,7 +389,7 @@ Compiled by K1W1
 
 	<software name="necroman">
 		<description>Necromancer</description>
-		<!-- <cart number>RX8108</cart number> -->
+		<!-- Serial: RX8108 -->
 		<year>1988</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="xegs_cart">
@@ -399,7 +401,7 @@ Compiled by K1W1
 
 	<software name="1on1">
 		<description>One-on-One</description>
-		<!-- <cart number>RX8093</cart number> -->
+		<!-- Serial: RX8093 -->
 		<year>1987</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="xegs_cart">
@@ -411,7 +413,7 @@ Compiled by K1W1
 
 	<software name="fractlus">
 		<description>Rescue on Fractalus!</description>
-		<!-- <cart number>RX8063</cart number> -->
+		<!-- Serial: RX8063 -->
 		<year>1987</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="xegs_cart">
@@ -423,7 +425,7 @@ Compiled by K1W1
 
 	<software name="raiders2">
 		<description>Star Raiders II</description>
-		<!-- <cart number>RX8078</cart number> -->
+		<!-- Serial: RX8078 -->
 		<year>1987</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="xegs_cart">
@@ -435,7 +437,7 @@ Compiled by K1W1
 
 	<software name="sumrgams">
 		<description>Summer Games</description>
-		<!-- <cart number>RX8098</cart number> -->
+		<!-- Serial: RX8098 -->
 		<year>1987</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="xegs_cart">
@@ -447,7 +449,7 @@ Compiled by K1W1
 
 	<software name="thundfox">
 		<description>Thunderfox</description>
-		<!-- <cart number>RX8113</cart number> -->
+		<!-- Serial: RX8113 -->
 		<year>1988</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="xegs_cart">
@@ -459,7 +461,7 @@ Compiled by K1W1
 
 	<software name="ttoppler">
 		<description>Tower Toppler (Prototype)</description>
-		<!-- <cart number></cart number> -->
+		<!-- Serial: N/A -->
 		<year>1988</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="xegs_cart">

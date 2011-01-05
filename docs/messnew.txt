@@ -188,7 +188,7 @@ Source Changes:
 - Added rudimentary 8N1 serial I/O to the generic terminal device. [Curt Coder]
 
 - softlists: Added new lists, new dumps and info [anondumper, Barry Rodewald, 
-  Curt Coder, MESSfan, Fabio Priuli]
+  Curt Coder, k1w1, MESSfan, Fabio Priuli]
 
 - Refactored the MSM8251 device to use devcb. [Curt Coder]
 

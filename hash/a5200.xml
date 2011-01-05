@@ -1,14 +1,107 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-<softwarelist name="a5200" description="Atari 5200 cartridges">
-<!-- Undumped protos:
 
-  - Muppets Go-Round (CX5234)
+<!-- 
+
+Known Undumped protos: -
+
+  - Behind Jaggi Lines 			Atari 				 CX5254  (Released as "Rescue on Fractalus")
+  - Fail Safe                   Atari                CX5210  (Released as "Countermeasure")
+  - Jungle River Cruise         Atari                        (Created to work with the unreleased "Puffer" Exercise Bicycle)
+  - Muppets Go-Round            Atari                CX5234  (Released on the Atari 8bit as "Sesame Street Letter Go Round")
+  - Tumbleweeds                 Atari                        (Created to work with the unreleased "Puffer" Exercise Bicycle)
+
+Possible Undumped protos: -
+
+  - Adventure                   Atari
+  - Arabian                     Atari
+  - Asteroids Deluxe            Atari
+  - Astro Grover                Atari                 CX5233
+  - Big Bird Hide 'N Seek       Atari                 CX5235
+  - Black Widow                 Atari
+  - Bristles                    First Star Soft.
+  - Bump 'N Jump                Sega
+  - Campaign '84                Sunrise Software
+  - Chess                       Parker Brothers
+  - Cloak and Dagger            Atari
+  - Crystal Castles             Atari                 CX5223  (For Trackball)
+  - Domino Man                  CBS Electronics       80133
+  - Donald Duck                 Atari                 CX5244
+  - Dragonstomper               Starpath
+  - Dukes Of Hazzard            Atari
+  - Elevator Action             Atari                 CX5250
+  - Escape From The Mindmaster  Starpath
+  - Espial                      Tigervision
+  - Fall Guy, The               20th Century Fox
+  - Fathom                      Imagic
+  - Flip & Flop                 First Star Soft.
+  - Food Fight                  Atari                 CX5245
+  - Galaga                      Atari                 CX5228
+  - Gravitar                    Atari                 CX5224
+  - Highway                     Atari                 CX5227
+  - Indiana Jones And The       Atari
+    Temple Of Doom
+  - Jawbreaker                  Sierra On-Line
+  - Krull                       Atari
+  - Laser Gates                 Imagic
+  - Legacy, The                 Atari                          (Released as "Final Legacy")
+  - Loco-Motion                 Atari                 CX5226
+  - Lode Runner                 Broderbund
+  - Madden Football             CBS Electronics       80123
+  - Mad Planets                 Parker Brothers
+  - Major Havoc                 Atari
+  - Martial Arts                Atari                 CX5231
+  - Moonsweeper                 Imagic
+  - Ms. Pac-Man                 Atari                           (Created to work with the unreleased "Puffer" Exercise Bicycle)
+  - Omega Race                  CBS                   80093
+  - Orbiter                     Atari                 CX5250    (Possibly released as "Last Starfighter") 
+  - Party Mix                   Starpath
+  - Polaris                     Tigervision           700752
+  - Pole Position               Atari                           (Created to work with the unreleased "Puffer" Exercise Bicycle)
+  - Pursuit Of The Pink         Probe 2000 (Odyssey)
+    Panther
+  - Quantum                     Atari                           (For Trackball)
+  - Quick Step                  Imagic
+  - Rabbit Transit              Starpath
+  - Risk                        Parker Brothers
+  - River Patrol                Tigervision           700452
+  - Satan's Hollow              CBS                   80143
+  - Scraper Caper               Big Five Soft.
+  - Serpentine                  Broderbund
+  - Sinistar                    Atari                 CX5249
+  - Skiing                      Atari
+  - Solar Fox                   CBS Electronics
+  - Space Duel                  Atari
+  - Springer                    Tigervision           700652
+  - Spy Hunter                  Sega
+  - Star Trek III: Search       Sega
+    For Spock
+  - Star Trek: The Motion       Milton Bradley
+    Picture
+  - Star Wars: The Empire       Parker Brothers
+    Strikes Back
+  - Subterfuge                  Atari                 CX5238
+  - Superman III                Atari                 CX5222
+  - Survival Island             Starpath
+  - Sweat: The Decathlon Game   Starpath
+  - Tac-Scan                    Sega
+  - Tank                        Atari                 CX5210
+  - Tank Battle                 Atari
+  - Tapper                      Sega
+  - Toy Bizarre                 Activision
+  - Tunnel Runner               CBS Electronics
+  - Tutankham                   Parker Brothers       9540
+  - Up 'N Down                  Sega
+  - Warp Wars                   Activision
+  - Wings                       CBS Electronics
+  - Wing War                    Imagic
+  - Wrath of Quintana Roo       Sunrise Software
 
 -->
-
+<softwarelist name="a5200" description="Atari 5200 cartridges">
 	<software name="5200menu">
 		<description>5200 Menu (Prototype)</description>
+		<!-- Serial: N/A -->
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -20,6 +113,7 @@
 
 	<software name="aep">
 		<description>A.E. (Prototype)</description>
+		<!-- Serial: N/A -->
 		<year>1982</year>
 		<publisher>Broderbund Software Inc</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -31,6 +125,7 @@
 
 	<software name="decathln">
 		<description>The Activision Decathlon</description>
+		<!-- Serial: FC-008 -->
 		<year>1983</year>
 		<publisher>Activision</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -42,6 +137,7 @@
 
 	<software name="asteroid">
 		<description>Asteroids (Prototype)</description>
+		<!-- Serial: CX5201 -->
 		<year>1982</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -53,6 +149,7 @@
 
 	<software name="astrchse">
 		<description>Astro Chase</description>
+		<!-- Serial: 9560 -->
 		<year>1984</year>
 		<publisher>Parker Brothers</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -64,6 +161,7 @@
 
 	<software name="ballblze">
 		<description>Ballblazer</description>
+		<!-- Serial: CX5255 -->
 		<year>1986</year>
 		<publisher>Atari / Lucasfilm</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -75,6 +173,7 @@
 
 	<software name="barbball">
 		<description>Barroom Baseball (Prototype)</description>
+		<!-- Serial: N/A -->
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -86,6 +185,7 @@
 
 	<software name="bzone">
 		<description>Battlezone (Prototype)</description>
+		<!-- Serial: CX5239 -->
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -97,6 +197,7 @@
 
 	<software name="beamrid">
 		<description>Beamrider</description>
+		<!-- Serial: FZ-009 -->
 		<year>1983</year>
 		<publisher>Activision</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -108,6 +209,7 @@
 
 	<software name="berzerk">
 		<description>Berzerk</description>
+		<!-- Serial: CX5221 -->
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -119,6 +221,7 @@
 
 	<software name="blckbelt">
 		<description>Black Belt (Prototype)</description>
+		<!-- Serial: CX5231 -->
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -130,6 +233,7 @@
 
 	<software name="blaster">
 		<description>Blaster (Prototype)</description>
+		<!-- Serial: N/A -->
 		<year>1984</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -141,6 +245,7 @@
 
 	<software name="blueprnt">
 		<description>Blue-Print</description>
+		<!-- Serial: 80033 -->
 		<year>1982</year>
 		<publisher>CBS Electronics / Bally Midway MFG. Co.</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -152,6 +257,7 @@
 
 	<software name="bbstrksb">
 		<description>Bounty Bob Strikes Back!</description>
+		<!-- Serial: N/A -->
 		<year>1984</year>
 		<publisher>Big Five Software</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -162,7 +268,8 @@
 	</software>
 
 	<software name="buckrog">
-		<description>Buck Rogers</description>
+		<description>Buck Rogers : Planet of Zoom</description>
+		<!-- Serial: 005-02 -->
 		<year>1983</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -174,6 +281,8 @@
 
 	<software name="centiped">
 		<description>Centipede</description>
+		<!-- Serial: CX5212 -->
+		<!-- Works with Trackball controller -->
 		<year>1982</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -185,6 +294,7 @@
 
 	<software name="choplift">
 		<description>Choplifter!</description>
+		<!-- Serial: CX5253 -->
 		<year>1984</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -196,6 +306,7 @@
 
 	<software name="congo">
 		<description>Congo Bongo</description>
+		<!-- Serial: 006-02 -->
 		<year>1983</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -207,6 +318,8 @@
 
 	<software name="cntrmsre">
 		<description>Countermeasure</description>
+		<!-- Serial: CX5210 -->
+		<!-- Prototype called "Fail Safe" -->
 		<year>1982</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -218,6 +331,7 @@
 
 	<software name="pitfall2">
 		<description>David Crane's Pitfall II - Lost Caverns</description>
+		<!-- Serial: FZ-011 -->
 		<year>1983</year>
 		<publisher>Activision</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -229,6 +343,7 @@
 
 	<software name="defender">
 		<description>Defender</description>
+		<!-- Serial: CX5218 -->
 		<year>1982</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -240,6 +355,7 @@
 
 	<software name="digdug">
 		<description>Dig Dug</description>
+		<!-- Serial: CX5211 -->
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -251,6 +367,7 @@
 
 	<software name="dredfctr">
 		<description>The Dreadnaught Factor</description>
+		<!-- Serial: FZ-005 -->
 		<year>1983</year>
 		<publisher>Activision</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -262,6 +379,7 @@
 
 	<software name="finalleg">
 		<description>Final Legacy (Prototype)</description>
+		<!-- Serial: CX5256 -->
 		<year>1984</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -273,6 +391,7 @@
 
 	<software name="friskyt">
 		<description>Frisky Tom (Prototype)</description>
+		<!-- Serial: N/A -->
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -284,6 +403,7 @@
 
 	<software name="frogger">
 		<description>Frogger</description>
+		<!-- Serial: 9530 -->
 		<year>1983</year>
 		<publisher>Parker Brothers</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -295,6 +415,7 @@
 
 	<software name="frogger2">
 		<description>Frogger II: Threeedeep!</description>
+		<!-- Serial: 9090 -->
 		<year>1983</year>
 		<publisher>Parker Brothers</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -306,6 +427,8 @@
 
 	<software name="galaxian">
 		<description>Galaxian</description>
+		<!-- Serial: CX5206 -->
+		<!-- Works with Trackball controller -->
 		<year>1982</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -317,6 +440,7 @@
 
 	<software name="gorf">
 		<description>Gorf</description>
+		<!-- Serial: 80013 -->
 		<year>1982</year>
 		<publisher>CBS Electronics / Bally Midway MFG. Co.</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -328,6 +452,7 @@
 
 	<software name="gremlins">
 		<description>Gremlins</description>
+		<!-- Serial: CX5257 -->
 		<year>1984</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -339,6 +464,7 @@
 
 	<software name="gyruss">
 		<description>Gyruss</description>
+		<!-- Serial: 9080 -->
 		<year>1984</year>
 		<publisher>Parker Brothers</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -350,6 +476,7 @@
 
 	<software name="hero">
 		<description>H.E.R.O.</description>
+		<!-- Serial: FZ-007 -->
 		<year>1984</year>
 		<publisher>Activision</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -361,6 +488,7 @@
 
 	<software name="jamesbnd">
 		<description>James Bond</description>
+		<!-- Serial: 9100 -->
 		<year>1984</year>
 		<publisher>Parker Brothers</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -372,6 +500,7 @@
 
 	<software name="joust">
 		<description>Joust</description>
+		<!-- Serial: CX5240 -->
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -383,6 +512,7 @@
 
 	<software name="jrpacman">
 		<description>Jr Pacman (Prototype)</description>
+		<!-- Serial: CX5251 -->
 		<year>1984</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -394,6 +524,7 @@
 
 	<software name="jungleh">
 		<description>Jungle Hunt</description>
+		<!-- Serial: CX5222 -->
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -405,6 +536,7 @@
 
 	<software name="krazysht">
 		<description>K-Razy Shootout</description>
+		<!-- Serial: 80503 -->
 		<year>1982</year>
 		<publisher>CBS Electronics / Kay Enterprizes Co.</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -416,6 +548,8 @@
 
 	<software name="kaboom">
 		<description>Kaboom!</description>
+		<!-- Serial: FZ-001 -->
+		<!-- Works with Trackball controller -->
 		<year>1983</year>
 		<publisher>Activision</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -427,6 +561,7 @@
 
 	<software name="kangaroo">
 		<description>Kangaroo</description>
+		<!-- Serial: CX5229 -->
 		<year>1982</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -438,6 +573,7 @@
 
 	<software name="keystone">
 		<description>Keystone Kapers</description>
+		<!-- Serial: FZ-006 -->
 		<year>1983</year>
 		<publisher>Activision</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -449,6 +585,7 @@
 
 	<software name="laststar">
 		<description>The Last Starfighter (Prototype)</description>
+		<!-- Serial: CX5260 -->
 		<year>1984</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -460,6 +597,7 @@
 
 	<software name="loontoon">
 		<description>Looney Tunes Hotel (Prototype)</description>
+		<!-- Serial: N/A -->
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -471,6 +609,7 @@
 
 	<software name="mario">
 		<description>Mario Bros.</description>
+		<!-- Serial: CX5247 -->
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -482,6 +621,7 @@
 
 	<software name="meebzork">
 		<description>Meebzork (Prototype)</description>
+		<!-- Serial: N/A -->
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -493,6 +633,7 @@
 
 	<software name="megamnia">
 		<description>MegaMania</description>
+		<!-- Serial: FZ-003 -->
 		<year>1984</year>
 		<publisher>Activision</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -504,6 +645,7 @@
 
 	<software name="meteorit">
 		<description>Meteorites</description>
+		<!-- Serial: N/A -->
 		<year>1983</year>
 		<publisher>Electra Concepts</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -515,6 +657,7 @@
 
 	<software name="microgam">
 		<description>Microgammon SB (Prototype)</description>
+		<!-- Serial: N/A -->
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -526,6 +669,8 @@
 
 	<software name="milliped">
 		<description>Millipede (Prototype)</description>
+		<!-- Serial: CX5248 -->
+		<!-- Works with Trackball controller -->
 		<year>1984</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -537,6 +682,7 @@
 
 	<software name="mine2049">
 		<description>Miner 2049er</description>
+		<!-- Serial: BF1912 -->
 		<year>1983</year>
 		<publisher>Big Five Software</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -548,6 +694,7 @@
 
 	<software name="minigolf">
 		<description>Miniature Golf (Prototype)</description>
+		<!-- Serial: CX5230 -->
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -559,6 +706,8 @@
 
 	<software name="missile">
 		<description>Missile Command</description>
+		<!-- Serial: CX5202 -->
+		<!-- Works with Trackball controller -->
 		<year>1982</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -570,6 +719,7 @@
 
 	<software name="montezum">
 		<description>Montezuma's Revenge</description>
+		<!-- Serial: 9460 -->
 		<year>1984</year>
 		<publisher>Parker Brothers</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -581,6 +731,7 @@
 
 	<software name="mpatrol">
 		<description>Moon Patrol</description>
+		<!-- Serial: CX5241 -->
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -592,6 +743,7 @@
 
 	<software name="mntnking">
 		<description>Mountain King</description>
+		<!-- Serial: 80083 -->
 		<year>1983</year>
 		<publisher>CBS Electronics</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -603,6 +755,7 @@
 
 	<software name="docastle">
 		<description>Mr. Do!'s Castle</description>
+		<!-- Serial: 9420 -->
 		<year>1984</year>
 		<publisher>Parker Brothers</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -614,6 +767,7 @@
 
 	<software name="mspacman">
 		<description>Ms. Pac-Man</description>
+		<!-- Serial: CX5243 -->
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -625,6 +779,7 @@
 
 	<software name="pacman">
 		<description>Pac-Man</description>
+		<!-- Serial: CX5208 -->
 		<year>1982</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -636,6 +791,7 @@
 
 	<software name="pengo">
 		<description>Pengo</description>
+		<!-- Serial: CX5236 -->
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -647,6 +803,7 @@
 
 	<software name="pitfall">
 		<description>Pitfall!</description>
+		<!-- Serial: FZ-004 -->
 		<year>1984</year>
 		<publisher>Activision</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -658,6 +815,8 @@
 
 	<software name="polepos">
 		<description>Pole Position</description>
+		<!-- Serial: CX5217 -->
+		<!-- Works with Trackball controller -->
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -669,6 +828,7 @@
 
 	<software name="popeye">
 		<description>Popeye</description>
+		<!-- Serial: 9510 -->
 		<year>1983</year>
 		<publisher>Parker Brothers</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -680,6 +840,7 @@
 
 	<software name="qbert">
 		<description>Q*bert</description>
+		<!-- Serial: 9500 -->
 		<year>1983</year>
 		<publisher>Parker Brothers</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -691,6 +852,7 @@
 
 	<software name="qix">
 		<description>Qix</description>
+		<!-- Serial: CX5221 -->
 		<year>1982</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -702,6 +864,7 @@
 
 	<software name="questroo">
 		<description>Quest for Quintana Roo</description>
+		<!-- Serial: 1603 -->
 		<year>1984</year>
 		<publisher>Sunrise</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -713,6 +876,8 @@
 
 	<software name="rsbsebll">
 		<description>RealSports Baseball</description>
+		<!-- Serial: CX5209 -->
+		<!-- Works with Trackball controller -->
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -724,6 +889,7 @@
 
 	<software name="rsbktbll">
 		<description>RealSports Basketball (19831216)</description>
+		<!-- Serial: CX5219 -->
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -735,6 +901,7 @@
 
 	<software name="rsbktbll1" cloneof="rsbktbll">
 		<description>RealSports Basketball (Prototype, 19831031)</description>
+		<!-- Serial: CX5219 -->
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -746,6 +913,7 @@
 
 	<software name="rsbktbll2" cloneof="rsbktbll">
 		<description>RealSports Basketball (Prototype, 19821105)</description>
+		<!-- Serial: CX5219 -->
 		<year>1982</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -757,6 +925,9 @@
 
 	<software name="rsftball">
 		<description>RealSports Football</description>
+		<!-- Serial: CX5207 -->
+		<!-- Originally released as "Football" -->
+		<!-- Works with Trackball controller -->
 		<year>1982</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -768,6 +939,9 @@
 
 	<software name="rssoccer">
 		<description>RealSports Soccer</description>
+		<!-- Serial: CX5213 -->
+		<!-- Originally released as "Soccer" -->
+		<!-- Works with Trackball controller -->
 		<year>1982</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -779,6 +953,7 @@
 
 	<software name="rstennis">
 		<description>RealSports Tennis</description>
+		<!-- Serial: CX5214 -->
 		<year>1982</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -790,6 +965,8 @@
 
 	<software name="fractlus">
 		<description>Rescue on Fractalus!</description>
+		<!-- Serial: CX5254 -->
+		<!-- Prototype called "Behind Jaggi Lines" -->
 		<year>1986</year>
 		<publisher>Atari / Lucasfilm</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -801,6 +978,7 @@
 
 	<software name="rverraid">
 		<description>River Raid</description>
+		<!-- Serial: FZ-002 -->
 		<year>1983</year>
 		<publisher>Activision</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -812,6 +990,7 @@
 
 	<software name="roadrunn">
 		<description>Road Runner (Prototype)</description>
+		<!-- Serial: CX5242 -->
 		<year>1982</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -823,6 +1002,7 @@
 
 	<software name="robotron">
 		<description>Robotron: 2084</description>
+		<!-- Serial: CX5225 -->
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -834,6 +1014,7 @@
 
 	<software name="spcedngn">
 		<description>Space Dungeon</description>
+		<!-- Serial: CX5232 -->
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -845,6 +1026,8 @@
 
 	<software name="spaceinv">
 		<description>Space Invaders</description>
+		<!-- Serial: CX5204 -->
+		<!-- Works with Trackball controller -->
 		<year>1982</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -856,6 +1039,7 @@
 
 	<software name="spceshut">
 		<description>Space Shuttle - A Journey Into Space</description>
+		<!-- Serial: FZ-012 -->
 		<year>1983</year>
 		<publisher>Activision</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -867,6 +1051,7 @@
 
 	<software name="spitfire">
 		<description>Spitfire (Prototype)</description>
+		<!-- Serial: N/A -->
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -878,6 +1063,7 @@
 
 	<software name="sprtgoof">
 		<description>Sport Goofy (Prototype)</description>
+		<!-- Serial: CX5237 -->
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -889,6 +1075,7 @@
 
 	<software name="starraid">
 		<description>Star Raiders</description>
+		<!-- Serial: CX5202 -->
 		<year>1982</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -900,6 +1087,7 @@
 
 	<software name="startrek">
 		<description>Star Trek</description>
+		<!-- Serial: 004-02 -->
 		<year>1982</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -911,6 +1099,7 @@
 
 	<software name="starwars">
 		<description>Star Wars - Return of the Jedi - Death Star Battle</description>
+		<!-- Serial: 9060 -->
 		<year>1983</year>
 		<publisher>Parker Brothers</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -922,6 +1111,7 @@
 
 	<software name="swa">
 		<description>Star Wars - The Arcade Game</description>
+		<!-- Serial: 9040 -->
 		<year>1983</year>
 		<publisher>Parker Brothers</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -933,6 +1123,7 @@
 
 	<software name="stargate">
 		<description>Stargate (Prototype)</description>
+		<!-- Serial: CX5252 -->
 		<year>1984</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -944,6 +1135,8 @@
 
 	<software name="sprbreak">
 		<description>Super Breakout</description>
+		<!-- Serial: CX5203 -->
+		<!-- Works with Trackball controller -->
 		<year>1982</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -955,6 +1148,7 @@
 
 	<software name="scobra">
 		<description>Super Cobra</description>
+		<!-- Serial: 9550 -->
 		<year>1983</year>
 		<publisher>Parker Brothers</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -966,6 +1160,7 @@
 
 	<software name="spacman">
 		<description>Super Pacman (Prototype)</description>
+		<!-- Serial: N/A -->
 		<year>1984</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -977,6 +1172,7 @@
 
 	<software name="tempest">
 		<description>Tempest (Prototype)</description>
+		<!-- Serial: CX5220 -->
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -988,6 +1184,7 @@
 
 	<software name="trackfld">
 		<description>Track and Field (Prototype)</description>
+		<!-- Serial: CX5258 -->
 		<year>1984</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -999,6 +1196,7 @@
 
 	<software name="vanguard">
 		<description>Vanguard</description>
+		<!-- Serial: CX5216 -->
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -1010,6 +1208,7 @@
 
 	<software name="wow">
 		<description>Wizard of Wor</description>
+		<!-- Serial: 80003 -->
 		<year>1983</year>
 		<publisher>CBS Electronics</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -1021,6 +1220,7 @@
 
 	<software name="xariarna">
 		<description>Xari Arena (Prototype)</description>
+		<!-- Serial: N/A -->
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -1032,6 +1232,7 @@
 
 	<software name="xevious">
 		<description>Xevious (Prototype)</description>
+		<!-- Serial: CX5246 -->
 		<year>1984</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -1043,6 +1244,7 @@
 
 	<software name="yllowsub">
 		<description>Yellow Sub Demo</description>
+		<!-- Serial: N/A -->
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -1054,6 +1256,7 @@
 
 	<software name="zaxxon">
 		<description>Zaxxon</description>
+		<!-- Serial: 008-02 -->
 		<year>1984</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -1065,6 +1268,7 @@
 
 	<software name="zenji">
 		<description>Zenji</description>
+		<!-- Serial: FZ-010 -->
 		<year>1984</year>
 		<publisher>Activision</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -1076,6 +1280,7 @@
 
 	<software name="znerangr">
 		<description>Zone Ranger</description>
+		<!-- Serial: FZ-101 -->
 		<year>1984</year>
 		<publisher>Activision</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -1087,6 +1292,7 @@
 
 	<software name="petetest">
 		<description>PAM: Pete's Test (USA)</description>
+		<!-- Serial: N/A -->
 		<year>1982</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -1098,6 +1304,7 @@
 
 	<software name="pamdiag2">
 		<description>PAM Diag 2.0</description>
+		<!-- Serial: N/A -->
 		<year>1982</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -1109,6 +1316,7 @@
 
 	<software name="pamdg23">
 		<description>Atari PAM Diagnostics (Rev 2.3)</description>
+		<!-- Serial: N/A -->
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -1120,6 +1328,7 @@
 
 	<software name="finaltst">
 		<description>Atari PAM Final System Test (Rev 1.0)</description>
+		<!-- Serial: N/A -->
 		<year>1982</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -1131,6 +1340,7 @@
 
 	<software name="boogie">
 		<description>Boogie (Demo)</description>
+		<!-- Serial: N/A -->
 		<year>1982</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -1142,6 +1352,7 @@
 
 	<software name="cblast">
 		<description>Castle Blast</description>
+		<!-- Serial: N/A -->
 		<year>2002</year>
         <!-- by Ronen Habot -->
 		<publisher>&lt;unlicensed&gt;</publisher>
@@ -1154,6 +1365,7 @@
 
 	<software name="ccrisis">
 		<description>Castle Crisis</description>
+		<!-- Serial: N/A -->
 		<year>2004</year>
         <!-- by Bryan Edewaard -->
 		<publisher>&lt;unlicensed&gt;</publisher>
@@ -1166,6 +1378,7 @@
 
 	<software name="koffiyk">
 		<description>Koffi: Yellow Kopter</description>
+		<!-- Serial: N/A -->
 		<year>2002</year>
         <!-- by Ron Lloyd -->
 		<publisher>&lt;unlicensed&gt;</publisher>
