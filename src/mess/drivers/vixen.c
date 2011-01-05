@@ -229,8 +229,8 @@ static ADDRESS_MAP_START( vixen_io, ADDRESS_SPACE_IO, 8, vixen_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE_LEGACY(FDC1797_TAG, wd17xx_r, wd17xx_w)
-	AM_RANGE(0x04, 0x04) AM_MIRROR(0x03) AM_WRITE(ctl_w)
-	AM_RANGE(0x08, 0x08) AM_DEVREADWRITE(P8155H_TAG, i8155_device, read, write)
+	AM_RANGE(0x04, 0x04) AM_MIRROR(0x03) AM_READWRITE(status_r, cmd_w)
+	AM_RANGE(0x08, 0x08) AM_MIRROR(0x01) AM_DEVREADWRITE(P8155H_TAG, i8155_device, read, write)
 	AM_RANGE(0x0c, 0x0d) AM_DEVWRITE(P8155H_TAG, i8155_device, ale_w)
 	AM_RANGE(0x10, 0x10) AM_MIRROR(0x07) AM_DEVREAD_LEGACY(IEEE488_TAG, ieee488_dio_r)
 	AM_RANGE(0x18, 0x18) AM_MIRROR(0x07) AM_READ_PORT("IEEE488")
@@ -239,7 +239,7 @@ static ADDRESS_MAP_START( vixen_io, ADDRESS_SPACE_IO, 8, vixen_state )
 	AM_RANGE(0x30, 0x30) AM_MIRROR(0x06) AM_DEVREADWRITE_LEGACY(P8251A_TAG, msm8251_data_r, msm8251_data_w)
 	AM_RANGE(0x31, 0x31) AM_MIRROR(0x06) AM_DEVREADWRITE_LEGACY(P8251A_TAG, msm8251_status_r, msm8251_control_w)
 	AM_RANGE(0x38, 0x38) AM_MIRROR(0x07) AM_READ(port3_r)
-	AM_RANGE(0xf0, 0xf0) AM_MIRROR(0x0f) AM_READWRITE(status_r, cmd_w)
+//	AM_RANGE(0xf0, 0xff) Hard Disk?
 ADDRESS_MAP_END
 
 
@@ -433,7 +433,7 @@ bool vixen_state::video_update(screen_device &screen, bitmap_t &bitmap, const re
 				{
 					int color = (BIT(char_data, 7 - x) ^ reverse) & !blank;
 					
-					*BITMAP_ADDR16(&bitmap, (txadr * 10) + scan, chadr * 8 + x) = color;
+					*BITMAP_ADDR16(&bitmap, (txadr * 10) + scan, (chadr * 8) + x) = color;
 				}
 			}
 		}
