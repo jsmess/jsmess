@@ -10,6 +10,42 @@
     Perhaps this needs merging into the 80186 core.....
 */
 
+/* 
+
+	SCSI/SASI drives supported by RM Nimbus machines 
+	
+Native SCSI - format with HDFORM.EXE
+	
+Drive			Capacity	Tracks	Heads	Sec/Track		Blocks
+RO652-20		20MB		306		4		34				41616
+ST225N			20MB		615		4		17				41721
+ST125N			20MB		407		4		26				41921
+8425S-30		20MB										41004
+CP3020			20MB		623		2		33				41118
+ST225NP			20MB		615		4		17				41720
+CP3040			40MB		1026	2		40				82080	
+
+Via Xibec S1410 SASI to MFM bridge board - format with WINFORM.EXE
+NP05-10S		 8MB		160		6		17				16320
+NP04-20T		16MB		320		6		17				32640
+NP03-20			15MB		306		6		17				31212
+R352-10			10MB		306		4		17				20808
+NP04-50			40MB		699		7		17				83181
+NP04-55			44MB		754		7		17				89726	
+
+Via Adaptec ACB4070 SCSI to RLL bridge board - format with ADAPT.EXE
+NEC D5147		60MB		615		8		26				127920
+ST227R			60MB		820		6		26				127920	
+
+After formating, the drives need to have a partition table put on them with 
+STAMP.EXE and then formatted in the normal way for a dos system drive with 
+Format /s.
+
+The tracks, heads and sectors/track can be used with chdman -createblank
+to create a blank hard disk which can then be formatted with the RM tools.
+
+*/
+
 
 #include "emu.h"
 #include "memory.h"
@@ -1410,7 +1446,8 @@ static void decode_subbios(device_t *device,offs_t pc)
                 case 8  : set_func("f_recalibrate"); break;
                 case 9  : set_func("f_motors_off"); break;
             }
-
+			dump_dssi=&decode_dssi_f_rw_sectors;
+			
         }; break;
 
         case 3   :

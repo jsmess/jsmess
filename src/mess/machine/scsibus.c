@@ -10,10 +10,20 @@
 #include "emu.h"
 #include "machine/scsi.h"
 #include "machine/scsibus.h"
+#include "debugger.h"
+#include "debug/debugcpu.h"
+#include "debug/debugcon.h"
 
-/* LOGLEVEL 0=no logging, 1=just commands and data, 2=everything ! */
+/* 
+	LOGLEVEL 
+		0	no logging, 
+		1	just commands
+		2	1 + data 
+		3	2 + line changes
+*/
 
 #define LOGLEVEL			1
+#define ENABLE_DATA_DUMP	1
 
 #define LOG(level,...)      if(LOGLEVEL>=level) logerror(__VA_ARGS__)
 
@@ -30,8 +40,11 @@ struct _scsibus_t
     UINT8       command[CMD_BUF_SIZE];
     UINT8       cmd_idx;
     UINT8       is_linked;
+	
+	UINT8		status;
+	UINT8		sense;
 
-	UINT8       data[DATA_BUF_SIZE+RW_BUFFER_HEAD_BYTES];
+	UINT8       data[ADAPTEC_BUF_SIZE];
     UINT16      data_idx;
     int         xfer_count;
     int         bytes_left;
@@ -39,8 +52,10 @@ struct _scsibus_t
 
     emu_timer   *req_timer;
     emu_timer   *ack_timer;
-
-    UINT8       initialised;
+	emu_timer   *sel_timer;
+	emu_timer   *dataout_timer;
+    
+	UINT8       initialised;
 };
 
 static void set_scsi_line_now(device_t *device, UINT8 line, UINT8 state);
@@ -51,6 +66,9 @@ static void scsi_out_line_change_now(device_t *device, UINT8 line, UINT8 state);
 static void scsi_out_line_req(device_t *device, UINT8 state);
 static TIMER_CALLBACK(req_timer_callback);
 static TIMER_CALLBACK(ack_timer_callback);
+static TIMER_CALLBACK(sel_timer_callback);
+static TIMER_CALLBACK(dataout_timer_callback);
+
 static void scsi_change_phase(device_t *device, UINT8 newphase);
 
 static const char *const linenames[] =
@@ -69,9 +87,37 @@ INLINE scsibus_t *get_token(device_t *device)
 	return (scsibus_t *) downcast<legacy_device_base *>(device)->token();
 }
 
+static void dump_bytes(UINT8 *buff, int count)
+{
+    int byteno;
+
+    for(byteno=0; byteno<count; byteno++)
+    {
+        logerror("%02X ",buff[byteno]);
+    }
+}
+
+static void dump_command_bytes(scsibus_t   *bus)
+{
+
+    logerror("sending command 0x%02X to ScsiID %d\n",bus->command[0],bus->last_id);
+	dump_bytes(bus->command,bus->cmd_idx);
+    logerror("\n\n");
+}
+
+#if ENABLE_DATA_DUMP
+static void dump_data_bytes(scsibus_t   *bus, int count)
+{
+
+    logerror("Data buffer[0..%d]\n",count);
+	dump_bytes(bus->data,count);
+    logerror("\n\n");
+}
+#endif
+
 static void scsibus_read_data(scsibus_t   *bus)
 {
-    bus->data_last = (bus->bytes_left >= DATA_BUF_SIZE) ? DATA_BUF_SIZE : bus->bytes_left;
+    bus->data_last = (bus->bytes_left >= DATA_BLOCK_SIZE) ? DATA_BLOCK_SIZE : bus->bytes_left;
 
     LOG(2,"SCSIBUS:scsibus_read_data bus->bytes_left=%04X, bus->data_last=%04X, bus->xfer_count=%04X\n",bus->bytes_left,bus->data_last,bus->xfer_count);
 
@@ -85,11 +131,11 @@ static void scsibus_read_data(scsibus_t   *bus)
 
 static void scsibus_write_data(scsibus_t   *bus)
 {
-    if(bus->bytes_left >= DATA_BUF_SIZE)
+    if(bus->bytes_left >= DATA_BLOCK_SIZE)
     {
-        SCSIWriteData(bus->devices[bus->last_id], bus->data, DATA_BUF_SIZE);
+        SCSIWriteData(bus->devices[bus->last_id], bus->data, DATA_BLOCK_SIZE);
 
-        bus->bytes_left-=DATA_BUF_SIZE;
+        bus->bytes_left-=DATA_BLOCK_SIZE;
         bus->data_idx=0;
     }
 }
@@ -108,14 +154,14 @@ UINT8 scsi_data_r(device_t *device)
 
             // check to see if we have reached the end of the block buffer
             // and that there is more data to read from the scsi disk
-            if((bus->data_idx==DATA_BUF_SIZE) && (bus->bytes_left>0) && IS_READ_COMMAND())
+            if((bus->data_idx==DATA_BLOCK_SIZE) && (bus->bytes_left>0) && IS_READ_COMMAND())
             {
                 scsibus_read_data(bus);
             }
             break;
 
         case SCSI_PHASE_STATUS :
-            result=0;              // no errors for the time being !
+            result=bus->status;		// return command status
             bus->cmd_idx++;
             break;
 
@@ -148,18 +194,19 @@ void scsi_data_w(device_t *device, UINT8 data)
         case SCSI_PHASE_DATAOUT :
 
             //LOG(1,"SCSIBUS:xfer_count=%02X, bytes_left=%02X data_idx=%02X\n",bus->xfer_count,bus->bytes_left,bus->data_idx);
-
-            // Write (blocks) and write buffer, just buffer it
-            if(IS_WRITE_COMMAND() || IS_COMMAND(SCSI_CMD_BUFFER_WRITE) || IS_COMMAND(SCSI_CMD_MODE_SELECT))
-                bus->data[bus->data_idx++]=data;
-
+                
             if(IS_COMMAND(SCSI_CMD_FORMAT_UNIT))
             {
                 // Only store the first 4 bytes of the bad block list (the header)
-                if(bus->data_idx<4)
+                //if(bus->data_idx<4)
                     bus->data[bus->data_idx++]=data;
-                else
-                    bus->data_idx++;
+					dump_data_bytes(bus,4);
+                //else
+                //   bus->data_idx++;
+				
+				// If we have the first byte, then cancel the dataout timout
+				if(bus->data_idx==1)
+					timer_adjust_oneshot(bus->dataout_timer,attotime_never,0);
 
                 // When we have the first 3 bytes, calculate how many more are in the
                 // bad block list.
@@ -167,11 +214,17 @@ void scsi_data_w(device_t *device, UINT8 data)
                 {
                     bus->xfer_count+=((bus->data[2]<<8)+bus->data[3]);
                     bus->data_last=bus->xfer_count;
+					LOG(1,"format_unit reading an extra %d bytes\n",bus->xfer_count-4);
+					dump_data_bytes(bus,4);
                 }
             }
+			else
+			{
+				bus->data[bus->data_idx++]=data;
+			}
 
             // If the data buffer is full, and we are writing blocks flush it to the SCSI disk
-            if((bus->data_idx == DATA_BUF_SIZE) && IS_WRITE_COMMAND())
+            if((bus->data_idx == DATA_BLOCK_SIZE) && IS_WRITE_COMMAND())
                 scsibus_write_data(bus);
             break;
     }
@@ -203,7 +256,7 @@ UINT8 get_scsi_line(device_t *device, UINT8 lineno)
         case SCSI_LINE_RESET    : result=(bus->linestate & (1<<SCSI_LINE_RESET)) >> SCSI_LINE_RESET; break;
     }
 
-    LOG(2,"get_scsi_line(%s)=%d\n",linenames[lineno],result);
+    LOG(3,"get_scsi_line(%s)=%d\n",linenames[lineno],result);
 
     return result;
 }
@@ -215,7 +268,7 @@ void set_scsi_line(device_t *device, UINT8 line, UINT8 state)
 
     changed = ((bus->linestate & (1<<line)) != (state << line));
 
-    LOG(2,"set_scsi_line(%s,%d), changed=%d, linestate=%02X\n",linenames[line],state,changed,bus->linestate);
+    LOG(3,"set_scsi_line(%s,%d), changed=%d, linestate=%02X\n",linenames[line],state,changed,bus->linestate);
 
     if(changed)
     {
@@ -245,19 +298,6 @@ void set_scsi_line_ack(device_t *device, UINT8 state)
     timer_adjust_oneshot(bus->ack_timer,ATTOTIME_IN_NSEC(ACK_DELAY_NS),state);
 }
 
-static void dump_command_bytes(scsibus_t   *bus)
-{
-    int byteno;
-
-    logerror("sending command 0x%02X to ScsiID %d\n",bus->command[0],bus->last_id);
-
-    for(byteno=0; byteno<bus->cmd_idx; byteno++)
-    {
-        logerror("%02X ",bus->command[byteno]);
-    }
-    logerror("\n\n");
-}
-
 static void scsibus_exec_command(device_t *device)
 {
     scsibus_t   *bus = get_token(device);
@@ -267,11 +307,51 @@ static void scsibus_exec_command(device_t *device)
     if(LOGLEVEL)
         dump_command_bytes(bus);
 
-    bus->is_linked=bus->command[bus->cmd_idx-1] & 0x01;
-
+    //bus->is_linked=bus->command[bus->cmd_idx-1] & 0x01;
+	bus->is_linked=0;
+	
+	// Assume command will succeed, if not set sytatus below.
+	if (bus->command[0]!=SCSI_CMD_REQUEST_SENSE)
+		SET_STATUS_SENSE(SCSI_STATUS_OK,SCSI_SENSE_NO_SENSE);
+	
     // Check for locally executed commands, and if found execute them
     switch (bus->command[0])
     {
+		// Test ready
+		case SCSI_CMD_TEST_READY :
+			LOG(1,"SCSIBUS: test_ready\n");
+            command_local=1;
+			bus->xfer_count=0;
+            bus->data_last=bus->xfer_count;
+            bus->bytes_left=0;
+			SCSISetPhase(bus->devices[bus->last_id],SCSI_PHASE_STATUS);
+			break;
+		
+		// Recalibrate drive
+		case SCSI_CMD_RECALIBRATE :
+			LOG(1,"SCSIBUS: Recalibrate drive\n");
+            command_local=1;
+			bus->xfer_count=0;
+            bus->data_last=bus->xfer_count;
+            bus->bytes_left=0;
+			SCSISetPhase(bus->devices[bus->last_id],SCSI_PHASE_STATUS);
+			break;
+			
+		// Request sense, return previous error codes
+		case SCSI_CMD_REQUEST_SENSE :
+			LOG(1,"SCSIBUS: request_sense\n");
+            command_local=1;
+			bus->xfer_count=SCSI_SENSE_SIZE;
+            bus->data_last=bus->xfer_count;
+            bus->bytes_left=0;
+			bus->data[0]=bus->sense;
+			bus->data[1]=0x00;
+			bus->data[2]=0x00;
+			bus->data[3]=0x00;
+			SET_STATUS_SENSE(SCSI_STATUS_OK,SCSI_SENSE_NO_SENSE);
+			SCSISetPhase(bus->devices[bus->last_id],SCSI_PHASE_DATAOUT);
+			break;
+		
         // Format unit
         case SCSI_CMD_FORMAT_UNIT :
             LOG(1,"SCSIBUS: format unit bus->command[1]=%02X & 0x10\n",(bus->command[1] & 0x10));
@@ -284,8 +364,98 @@ static void scsibus_exec_command(device_t *device)
             bus->xfer_count=4;
             bus->data_last=bus->xfer_count;
             bus->bytes_left=0;
+			timer_adjust_oneshot(bus->dataout_timer,ATTOTIME_IN_SEC(FORMAT_UNIT_TIMEOUT),0);
             break;
 
+		// Check track format Xebec
+		case SCSI_CMD_CHECK_TRACK_FORMAT :
+			LOG(1,"SCSIBUS: check track format\n");
+            command_local=1;
+			bus->xfer_count=0;
+            bus->data_last=bus->xfer_count;
+            bus->bytes_left=0;
+			SCSISetPhase(bus->devices[bus->last_id],SCSI_PHASE_STATUS);
+			break;
+		
+		// Setup drive parameters Xebec
+		case SCSI_CMD_INIT_DRIVE_PARAMS :
+			LOG(1,"SCSIBUS: init_drive_params: Xebec S1410\n");
+            command_local=1;
+			bus->xfer_count=XEBEC_PARAMS_SIZE;
+            bus->data_last=bus->xfer_count;
+            bus->bytes_left=0;
+			SCSISetPhase(bus->devices[bus->last_id],SCSI_PHASE_DATAOUT);
+            break;
+		
+		// Format bad track Xebec
+		case SCSI_CMD_FORMAT_ALT_TRACK :
+			LOG(1,"SCSIBUS: format_alt_track: Xebec S1410\n");
+            command_local=1;
+			bus->xfer_count=XEBEC_ALT_TRACK_SIZE;
+            bus->data_last=bus->xfer_count;
+            bus->bytes_left=0;
+			SCSISetPhase(bus->devices[bus->last_id],SCSI_PHASE_DATAOUT);
+            break;
+
+		// Write buffer Xebec S1410 specific
+		case SCSI_CMD_WRITE_SEC_BUFFER : 
+			LOG(1,"SCSIBUS: write_sector_buffer: Xebec S1410\n");
+            command_local=1;
+			bus->xfer_count=XEBEC_SECTOR_BUFFER_SIZE;
+            bus->data_last=bus->xfer_count;
+            bus->bytes_left=0;
+			SCSISetPhase(bus->devices[bus->last_id],SCSI_PHASE_DATAOUT);
+            break;
+
+		// Read buffer Xebec S1410 specific
+		case SCSI_CMD_READ_SEC_BUFFER :
+            LOG(1,"SCSIBUS: read_sector_buffer: Xebec S1410\n");
+            command_local=1;
+			bus->xfer_count=XEBEC_SECTOR_BUFFER_SIZE;
+            bus->data_last=bus->xfer_count;
+            bus->bytes_left=0;
+            SCSISetPhase(bus->devices[bus->last_id],SCSI_PHASE_DATAIN);
+            break;
+
+		// Write buffer, Adaptec ACB40x0 specific
+		case SCSI_CMD_WRITE_DATA_BUFFER :
+			LOG(1,"SCSIBUS: write_buffer: Adaptec ACB40x0\n");
+            command_local=1;
+			bus->xfer_count=ADAPTEC_DATA_BUFFER_SIZE;
+            bus->data_last=bus->xfer_count;
+            bus->bytes_left=0;
+			SCSISetPhase(bus->devices[bus->last_id],SCSI_PHASE_DATAOUT);
+            break;
+
+		// Read buffer, Adaptec ACB40x0 specific
+		case SCSI_CMD_READ_DATA_BUFFER :
+            LOG(1,"SCSIBUS: read_data_buffer: Adaptec ACB40x0\n");
+            command_local=1;
+			bus->xfer_count=ADAPTEC_DATA_BUFFER_SIZE;
+            bus->data_last=bus->xfer_count;
+            bus->bytes_left=0;
+            SCSISetPhase(bus->devices[bus->last_id],SCSI_PHASE_DATAIN);
+            break;
+			
+		// Send diagnostic info
+		case SCSI_CMD_SEND_DIAGNOSTIC :
+            LOG(1,"SCSIBUS: send_diagnostic\n");
+            command_local=1;
+			bus->xfer_count=(bus->command[3]<<8)+bus->command[4];
+            bus->data_last=bus->xfer_count;
+            bus->bytes_left=0;
+			SCSISetPhase(bus->devices[bus->last_id],SCSI_PHASE_DATAOUT);
+            break;
+		
+		case SCSI_CMD_SEARCH_DATA_EQUAL :
+            LOG(1,"SCSIBUS: Search_data_equal ACB40x0\n");
+            command_local=1;
+			bus->xfer_count=0;
+            bus->data_last=bus->xfer_count;
+            bus->bytes_left=0;
+			SCSISetPhase(bus->devices[bus->last_id],SCSI_PHASE_STATUS);
+			break;
+		
         case SCSI_CMD_READ_DEFECT :
             LOG(1,"SCSIBUS: read defect list\n");
             command_local=1;
@@ -305,23 +475,35 @@ static void scsibus_exec_command(device_t *device)
         case SCSI_CMD_BUFFER_WRITE :
             LOG(1,"SCSIBUS: write_buffer\n");
             command_local=1;
-            bus->xfer_count=(bus->command[7]<<8)+bus->command[8];
+			bus->xfer_count=(bus->command[7]<<8)+bus->command[8];
             bus->data_last=bus->xfer_count;
             bus->bytes_left=0;
-            SCSISetPhase(bus->devices[bus->last_id],SCSI_PHASE_DATAOUT);
+			SCSISetPhase(bus->devices[bus->last_id],SCSI_PHASE_DATAOUT);
             break;
 
         // read buffer
         case SCSI_CMD_BUFFER_READ   :
             LOG(1,"SCSIBUS: read_buffer\n");
             command_local=1;
-            bus->xfer_count=(bus->command[7]<<8)+bus->command[8];
+			bus->xfer_count=(bus->command[7]<<8)+bus->command[8];
             bus->data_last=bus->xfer_count;
             bus->bytes_left=0;
             SCSISetPhase(bus->devices[bus->last_id],SCSI_PHASE_DATAIN);
             break;
-    }
-
+		
+		// Xebec S1410
+		case SCSI_CMD_RAM_DIAGS :
+		case SCSI_CMD_DRIVE_DIAGS :
+		case SCSI_CMD_CONTROLER_DIAGS :
+			LOG(1,"SCSIBUS: Xebec RAM, disk or Controler diags [%02X]\n",bus->command[0]);
+            command_local=1;
+			bus->xfer_count=0;
+            bus->data_last=bus->xfer_count;
+            bus->bytes_left=0;
+			SCSISetPhase(bus->devices[bus->last_id],SCSI_PHASE_STATUS);
+			break;
+	}
+	
 
     // Check for locally executed command, if not then pass it on
     // to the disk driver
@@ -371,9 +553,42 @@ static int dataout_done(scsibus_t   *bus)
     return result;
 }
 
+static void check_process_dataout(device_t *device)
+{
+	scsibus_t   	*bus = get_token(device);
+    int				capacity=0;
+	int				tracks;
+	adaptec_sense_t	*sense;
+	
+	LOG(1,"SCSIBUS:check_process_dataout cmd=%02X\n",bus->command[0]);
+	
+	switch (bus->command[0])
+	{
+		case SCSI_CMD_INIT_DRIVE_PARAMS :
+			tracks=((bus->data[0]<<8)+bus->data[1]);
+			capacity=(tracks * bus->data[2]) * 17;
+			LOG(1,"Tracks=%d, Heads=%d\n",tracks,bus->data[2]);
+			LOG(1,"Setting disk capacity to %d blocks\n",capacity);
+			//debugger_break(device->machine);
+			break;
+			
+		case SCSI_CMD_MODE_SELECT :
+			sense=(adaptec_sense_t *)bus->data;
+			tracks=(sense->cylinder_count[0]<<8)+sense->cylinder_count[1];
+			capacity=(tracks * sense->head_count * 17);
+			LOG(1,"Tracks=%d, Heads=%d sec/track=%d\n",tracks,sense->head_count,sense->sectors_per_track);
+			LOG(1,"Setting disk capacity to %d blocks\n",capacity);
+			dump_data_bytes(bus,0x16);
+			//debugger_break(device->machine);
+			break;		
+	}
+}
+                        
+
 static void scsi_in_line_changed(device_t *device, UINT8 line, UINT8 state)
 {
     scsibus_t   *bus = get_token(device);
+	void		*hdfile;
 
     // Reset aborts and returns to bus free
     if((line==SCSI_LINE_RESET) && (state==0))
@@ -391,10 +606,16 @@ static void scsi_in_line_changed(device_t *device, UINT8 line, UINT8 state)
         case SCSI_PHASE_BUS_FREE :
             if((line==SCSI_LINE_SEL) && (bus->devices[bus->last_id]!=NULL))
             {
-                if(state==0)
-                    scsi_out_line_change(device,SCSI_LINE_BSY,0);
-                else
-                    scsi_change_phase(device,SCSI_PHASE_COMMAND);
+				// Check to see if device had image file mounted, if not, do not set busy,
+				// and stay busfree.
+				SCSIGetDevice(bus->devices[bus->last_id],&hdfile);
+				if(hdfile!=(void *)NULL)
+				{
+					if(state==0)
+						timer_adjust_oneshot(bus->sel_timer,ATTOTIME_IN_NSEC(BSY_DELAY_NS),0);
+					else
+						scsi_change_phase(device,SCSI_PHASE_COMMAND);
+				}
             }
             break;
 
@@ -437,7 +658,10 @@ static void scsi_in_line_changed(device_t *device, UINT8 line, UINT8 state)
                 if(state)
                 {
                     if(dataout_done(bus))
+					{
+						check_process_dataout(device);
                         scsi_change_phase(device,SCSI_PHASE_STATUS);
+					}
                     else
                         scsi_out_line_change(device,SCSI_LINE_REQ,0);
                 }
@@ -502,7 +726,7 @@ static void scsi_out_line_change_now(device_t *device, UINT8 line, UINT8 state)
     else
         bus->linestate &= ~(1<<line);
 
-    LOG(2,"scsi_out_line_change(%s,%d)\n",linenames[line],state);
+    LOG(3,"scsi_out_line_change(%s,%d)\n",linenames[line],state);
 
     if(bus->interface->line_change_cb!=NULL)
         bus->interface->line_change_cb(device,line,state);
@@ -526,6 +750,22 @@ static TIMER_CALLBACK(ack_timer_callback)
     set_scsi_line_now((device_t *)ptr, SCSI_LINE_ACK, param);
 }
 
+static TIMER_CALLBACK(sel_timer_callback)
+{
+    scsi_out_line_change_now((device_t *)ptr, SCSI_LINE_BSY, param);
+}
+
+static TIMER_CALLBACK(dataout_timer_callback)
+{
+    scsibus_t   *bus = get_token((device_t *)ptr);
+
+	// Some drives, notably the ST225N and ST125N, accept fromat unit commands
+	// with flags set indicating that bad block data should be transfered but
+	// don't then implemnt a data in phase, this timeout it to catch these !
+	if(IS_COMMAND(SCSI_CMD_FORMAT_UNIT) && (bus->data_idx==0))
+		scsi_change_phase((device_t *)ptr,SCSI_PHASE_STATUS);
+		
+}
 
 UINT8 get_scsi_phase(device_t *device)
 {
@@ -539,7 +779,7 @@ static void scsi_change_phase(device_t *device, UINT8 newphase)
 {
     scsibus_t   *bus = get_token(device);
 
-    LOG(2,"scsi_change_phase() from=%s, to=%s\n",phasenames[bus->phase],phasenames[newphase]);
+    LOG(1,"scsi_change_phase() from=%s, to=%s\n",phasenames[bus->phase],phasenames[newphase]);
 
     bus->phase=newphase;
     bus->cmd_idx=0;
@@ -553,6 +793,9 @@ static void scsi_change_phase(device_t *device, UINT8 newphase)
             scsi_out_line_change(device,SCSI_LINE_MSG,1);
             scsi_out_line_change(device,SCSI_LINE_REQ,1);
             scsi_out_line_change(device,SCSI_LINE_BSY,1);
+			LOG(1,"SCSIBUS: done\n\n");
+			//if (IS_COMMAND(SCSI_CMD_READ_CAPACITY))
+			//	debugger_break(device->machine);
             break;
 
         case SCSI_PHASE_COMMAND :
@@ -560,6 +803,7 @@ static void scsi_change_phase(device_t *device, UINT8 newphase)
             scsi_out_line_change(device,SCSI_LINE_IO,1);
             scsi_out_line_change(device,SCSI_LINE_MSG,1);
             scsi_out_line_change(device,SCSI_LINE_REQ,0);
+			LOG(1,"\nSCSIBUS: Command begin\n");
             break;
 
         case SCSI_PHASE_DATAOUT :
@@ -622,11 +866,11 @@ int get_scsi_cmd_len(int cbyte)
 
 	group = (cbyte>>5) & 7;
 
-	if (group == 0) return 6;
+	if (group == 0 || group == 7 || group == 3) return 6;
 	if (group == 1 || group == 2) return 10;
 	if (group == 5) return 12;
 
-	fatalerror("scsibus: Unknown SCSI command group %d", group);
+	fatalerror("scsibus: Unknown SCSI command group %d, command byte=%02X", group,cbyte);
 
 	return 6;
 }
@@ -642,7 +886,7 @@ void init_scsibus(device_t *device)
         // try to open the devices
         for (devno = 0; devno < scsidevs->devs_present; devno++)
         {
-            LOG(1,"init_scsibus devno=%d \n",devno);
+            LOG(1,"SCSIBUS:init devno=%d \n",devno);
             SCSIAllocInstance( device->machine, scsidevs->devices[devno].scsiClass, &bus->devices[scsidevs->devices[devno].scsiID], scsidevs->devices[devno].diskregion );
         }
 
@@ -668,9 +912,12 @@ static DEVICE_START( scsibus )
     // Start with bus free
     bus->phase=SCSI_PHASE_BUS_FREE;
 
-    // Setup req/ack timers
+    // Setup req/ack/sel timers
     bus->req_timer=timer_alloc(device->machine, req_timer_callback, (void *)device);
     bus->ack_timer=timer_alloc(device->machine, ack_timer_callback, (void *)device);
+	bus->sel_timer=timer_alloc(device->machine, sel_timer_callback, (void *)device);
+	bus->dataout_timer=timer_alloc(device->machine, dataout_timer_callback, (void *)device);
+	
 }
 
 static DEVICE_STOP( scsibus )
