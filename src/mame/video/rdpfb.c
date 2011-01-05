@@ -37,7 +37,7 @@ void Framebuffer::Write16Bit(UINT32 curpixel, UINT32 r, UINT32 g, UINT32 b)
 #endif
 
 	UINT32 fb = (m_misc_state->m_fb_address >> 1) + curpixel;
-	UINT32 hb = fb;
+	UINT32 hb = m_misc_state->m_fb_address;
 
 #if 0
 	if (m_misc_state->m_curpixel_cvg > 8 && m_other_modes->z_mode != 1)
@@ -164,7 +164,7 @@ void Framebuffer::Read(UINT32 curpixel)
 void Framebuffer::Read16Bit(UINT32 curpixel)
 {
 	UINT16 fword = RREADIDX16((m_misc_state->m_fb_address >> 1) + curpixel);
-	UINT8 hbyte = HREADADDR8((m_misc_state->m_fb_address >> 1) + curpixel);
+	UINT8 hbyte = HREADADDR8(m_misc_state->m_fb_address + curpixel);
 	m_rdp->GetMemoryColor()->i.r = GETHICOL(fword);
 	m_rdp->GetMemoryColor()->i.g = GETMEDCOL(fword);
 	m_rdp->GetMemoryColor()->i.b = GETLOWCOL(fword);
@@ -220,7 +220,7 @@ void Framebuffer::Copy16Bit(UINT32 curpixel, UINT32 r, UINT32 g, UINT32 b)
 {
 	UINT16 val = ((r >> 3) << 11) | ((g >> 3) << 6) | ((b >> 3) << 1) | ((m_misc_state->m_curpixel_cvg >> 2) & 1);
 	RWRITEIDX16((m_misc_state->m_fb_address >> 1) + curpixel, val);
-	HWRITEADDR8((m_misc_state->m_fb_address >> 1) + curpixel, m_misc_state->m_curpixel_cvg & 3);
+	HWRITEADDR8(m_misc_state->m_fb_address + curpixel, m_misc_state->m_curpixel_cvg & 3);
 }
 
 void Framebuffer::Copy32Bit(UINT32 curpixel, UINT32 r, UINT32 g, UINT32 b)
@@ -259,15 +259,15 @@ void Framebuffer::Fill16Bit(UINT32 curpixel)
 		val = (m_rdp->GetFillColor32() >> 16) & 0xffff;
 	}
 	RWRITEIDX16((m_misc_state->m_fb_address >> 1) + curpixel, val);
-	HWRITEADDR8((m_misc_state->m_fb_address >> 1) + curpixel, ((val & 1) << 1) | (val & 1));
+	HWRITEADDR8(m_misc_state->m_fb_address + curpixel, ((val & 1) << 1) | (val & 1));
 }
 
 void Framebuffer::Fill32Bit(UINT32 curpixel)
 {
 	UINT32 fill_color = m_rdp->GetFillColor32();
 	RWRITEIDX32((m_misc_state->m_fb_address >> 2) + curpixel, fill_color);
-	HWRITEADDR8((m_misc_state->m_fb_address >> 1) + (curpixel << 1), (fill_color & 0x10000) ? 3 : 0);
-	HWRITEADDR8((m_misc_state->m_fb_address >> 1) + (curpixel << 1) + 1, (fill_color & 0x1) ? 3 : 0);
+	HWRITEADDR8(m_misc_state->m_fb_address + (curpixel << 1), (fill_color & 0x10000) ? 3 : 0);
+	HWRITEADDR8(m_misc_state->m_fb_address + (curpixel << 1) + 1, (fill_color & 0x1) ? 3 : 0);
 }
 
 } // namespace RDP
