@@ -134,6 +134,7 @@ CPUS += UNSP
 CPUS += HCD62121
 CPUS += PPS4
 CPUS += UPD7725
+CPUS += HD61700
 
 #-------------------------------------------------
 # specify available sound cores; some of these are
@@ -721,6 +722,8 @@ $(MESSOBJ)/capcom.a:			\
 $(MESSOBJ)/casio.a:				\
 	$(MESS_DRIVERS)/pv1000.o	\
 	$(MESS_DRIVERS)/pv2000.o	\
+	$(MESS_DRIVERS)/pb1000.o	\
+	$(MESS_VIDEO)/hd44352.o		\
 
 $(MESSOBJ)/cbm.a:				\
 	$(MESS_VIDEO)/pet.o			\

@@ -175,6 +175,9 @@ const game_driver * const drivers[] =
 	/* Casio */
 	DRIVER( pv1000 )	/* Casio PV-1000 */
 	DRIVER( pv2000 )	/* Casio PV-2000 */
+	DRIVER( pb1000 )	/* Casio PP-1000 */
+	DRIVER( pb2000c )	/* Casio PB-2000C */
+	DRIVER( ai1000 )	/* Casio AI-1000 */
 
 	/* Coleco */
 	DRIVER( coleco )	/* ColecoVision (Original BIOS)  */
