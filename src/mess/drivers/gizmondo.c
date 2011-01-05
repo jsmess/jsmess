@@ -32,6 +32,7 @@ SYSINTR_GPS      = INT_EINT3, INT_EINT8_23 (EINT18)
 #include "machine/docg3.h"
 #include "machine/s3c2440.h"
 #include "video/gf4500.h"
+#include "rendlay.h"
 
 #define VERBOSE_LEVEL ( 0 )
 

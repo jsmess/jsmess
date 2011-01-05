@@ -19,7 +19,7 @@ Todo:
 #include "includes/gamecom.h"
 #include "cpu/sm8500/sm8500.h"
 #include "imagedev/cartslot.h"
-
+#include "rendlay.h"
 
 static ADDRESS_MAP_START(gamecom_mem_map, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE( 0x0000, 0x0013 )  AM_RAM

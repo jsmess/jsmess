@@ -26,6 +26,7 @@
 #include "imagedev/cartslot.h"
 #include "video/hd44780.h"
 #include "includes/psion.h"
+#include "rendlay.h"
 
 /***********************************************
 

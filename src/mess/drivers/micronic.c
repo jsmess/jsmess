@@ -121,6 +121,7 @@
 #include "machine/mc146818.h"
 #include "machine/ram.h"
 #include "sound/beep.h"
+#include "rendlay.h"
 
 static UINT8 keypad_r (running_machine *machine)
 {

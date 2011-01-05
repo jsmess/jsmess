@@ -29,6 +29,7 @@
 #include "sound/beep.h"
 #include "includes/x07.h"
 #include "imagedev/printer.h"
+#include "rendlay.h"
 
 static void t6834_cmd (running_machine *machine, UINT8 cmd);
 static void receive_from_t6834 (running_machine *machine);

@@ -78,6 +78,7 @@ Notes:
 #include "cpu/z80/z80.h"
 #include "machine/ram.h"
 #include "imagedev/cartslot.h"
+#include "rendlay.h"
 
 
 class prestige_state : public driver_device

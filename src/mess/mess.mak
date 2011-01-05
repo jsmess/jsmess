@@ -1809,9 +1809,6 @@ $(MESS_DRIVERS)/mac.o:		$(MESSSRC)/drivers/mac.c \
 # layout dependencies
 #-------------------------------------------------
 
-$(MESSOBJ)/mess.o:		$(MESS_LAYOUT)/lcd.lh
-$(MESSOBJ)/mess.o:		$(MESS_LAYOUT)/lcd_rot.lh
-
 $(MESS_DRIVERS)/4004clk.o:	$(MESS_LAYOUT)/4004clk.lh
 $(MESS_DRIVERS)/acrnsys1.o:	$(MESS_LAYOUT)/acrnsys1.lh
 $(MESS_DRIVERS)/aim65.o:	$(MESS_LAYOUT)/aim65.lh

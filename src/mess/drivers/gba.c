@@ -24,6 +24,7 @@
 #include "machine/intelfsh.h"
 #include "audio/gb.h"
 #include "includes/gba.h"
+#include "rendlay.h"
 
 #define VERBOSE_LEVEL	(0)
 

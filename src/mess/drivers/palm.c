@@ -15,7 +15,7 @@
 #include "sound/dac.h"
 #include "debugger.h"
 #include "machine/ram.h"
-
+#include "rendlay.h"
 
 class palm_state : public driver_device
 {

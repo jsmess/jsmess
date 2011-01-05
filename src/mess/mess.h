@@ -10,17 +10,8 @@
 #define __MESS_H__
 
 /***************************************************************************
-    CONSTANTS
-***************************************************************************/
-#define LCD_FRAMES_PER_SECOND	30
-
-
-/***************************************************************************
     GLOBALS
 ***************************************************************************/
-
-extern const char layout_lcd[];	/* generic 1:1 lcd screen layout */
-extern const char layout_lcd_rot[];	/* same, for use with ROT90 or ROT270 */
 
 extern const char mess_disclaimer[];
 

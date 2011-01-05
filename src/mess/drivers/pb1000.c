@@ -18,6 +18,7 @@
 #include "imagedev/cartslot.h"
 #include "machine/nvram.h"
 #include "sound/beep.h"
+#include "rendlay.h"
 
 class pb1000_state : public driver_device
 {

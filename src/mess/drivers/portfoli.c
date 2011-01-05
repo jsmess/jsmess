@@ -89,6 +89,7 @@
 #include "machine/nvram.h"
 #include "sound/speaker.h"
 #include "video/hd61830.h"
+#include "rendlay.h"
 
 //**************************************************************************
 //	MACROS / CONSTANTS

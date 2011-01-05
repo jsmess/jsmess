@@ -37,8 +37,8 @@ IMGTOOL_LIB_OBJS =					\
 	$(EMUOBJ)/emuopts.o 				\
 	$(EMUOBJ)/memory.o				\
 	$(EMUOBJ)/ioprocs.o			\
-	$(MESS_FORMATS)/flopimg.o			\
-	$(MESS_FORMATS)/cassimg.o			\
+	$(EMUOBJ)/imagedev/flopimg.o			\
+	$(EMUOBJ)/imagedev/cassimg.o			\
 	$(MESS_FORMATS)/basicdsk.o			\
 	$(MESS_FORMATS)/coco_dsk.o			\
 	$(MESS_FORMATS)/coco_cas.o			\
@@ -50,7 +50,7 @@ IMGTOOL_LIB_OBJS =					\
 	$(MESS_FORMATS)/pc_dsk.o			\
 	$(MESS_FORMATS)/ap2_dsk.o			\
 	$(MESS_FORMATS)/ap_dsk35.o			\
-	$(MESS_FORMATS)/wavfile.o			\
+	$(EMUOBJ)/imagedev/wavfile.o			\
 	$(MESS_FORMATS)/vt_dsk.o			\
 	$(MESS_FORMATS)/fdi_dsk.o			\
 	$(IMGTOOLOBJ)/stream.o				\

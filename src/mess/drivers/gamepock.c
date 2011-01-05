@@ -4,7 +4,7 @@
 #include "sound/speaker.h"
 #include "imagedev/cartslot.h"
 #include "includes/gamepock.h"
-
+#include "rendlay.h"
 
 static ADDRESS_MAP_START(gamepock_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH

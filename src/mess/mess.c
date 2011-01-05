@@ -7,12 +7,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "emuopts.h"
-
-#include "lcd.lh"
-#include "lcd_rot.lh"
-
-#include "machine/ram.h"
 
 /* Globals */
 const char mess_disclaimer[] =

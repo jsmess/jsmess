@@ -4,6 +4,7 @@
 #include "includes/kyocera.h"
 #include "video/hd44102.h"
 #include "video/hd61830.h"
+#include "rendlay.h"
 
 static PALETTE_INIT( kc85 )
 {

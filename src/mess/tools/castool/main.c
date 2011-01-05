@@ -30,7 +30,7 @@
 #include "formats/fmsx_cas.h"
 #include "formats/gtp_cas.h"
 #include "formats/hect_tap.h"
-#include "formats/jupi_tap.h"
+#include "formats/ace_tap.h"
 #include "formats/kim1_cas.h"
 #include "formats/lviv_lvt.h"
 #include "formats/mz_cas.h"
@@ -66,7 +66,7 @@ const struct SupportedCassetteFormats formats[] = {
 	{"fmxs", fmsx_cassette_formats             ,"MSX"},
 	{"gtp", gtp_cassette_formats               ,"Galaksija"},
 	{"hector", hector_cassette_formats         ,"Hector - k7 : classical, FOR : forth cassette "},
-	{"jupiter", jupiter_cassette_formats       ,"Jupiter"},
+	{"jupiter", ace_cassette_formats           ,"Jupiter"},
 	{"kim1", kim1_cassette_formats             ,"KIM-1"},
 	{"lviv", lviv_lvt_format                   ,"Lviv"},
 	{"mz", mz700_cassette_formats              ,"Sharp MZ"},

@@ -42,6 +42,7 @@
 #include "machine/pit8253.h"
 #include "video/msm6255.h"
 #include "includes/bw2.h"
+#include "rendlay.h"
 
 int bw2_state::get_ramdisk_size()
 {

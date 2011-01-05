@@ -43,7 +43,7 @@ CASTOOL_LIB_OBJS =						\
 	$(MESS_FORMATS)/csw_cas.o           \
 	$(MESS_FORMATS)/fmsx_cas.o          \
 	$(MESS_FORMATS)/gtp_cas.o           \
-	$(MESS_FORMATS)/jupi_tap.o          \
+	$(MESS_FORMATS)/ace_tap.o          \
 	$(MESS_FORMATS)/hect_tap.o          \
 	$(MESS_FORMATS)/kim1_cas.o          \
 	$(MESS_FORMATS)/lviv_lvt.o          \
@@ -61,8 +61,8 @@ CASTOOL_LIB_OBJS =						\
 	$(MESS_FORMATS)/vg5k_cas.o          \
 	$(MESS_FORMATS)/vt_cas.o            \
 	$(MESS_FORMATS)/zx81_p.o		    \
-	$(MESS_FORMATS)/cassimg.o			\
-	$(MESS_FORMATS)/wavfile.o			\
+	$(EMUOBJ)/imagedev/cassimg.o			\
+	$(EMUOBJ)/imagedev/wavfile.o			\
 
 
 $(LIBCASTOOL): $(CASTOOL_LIB_OBJS)

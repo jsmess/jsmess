@@ -22,6 +22,7 @@
 #include "includes/gp32.h"
 #include "sound/dac.h"
 #include "video/generic.h"
+#include "rendlay.h"
 
 #define VERBOSE_LEVEL ( 0 )
 

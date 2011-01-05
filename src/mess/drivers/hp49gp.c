@@ -7,6 +7,7 @@
 #include "emu.h"
 #include "cpu/arm7/arm7.h"
 #include "machine/s3c2410.h"
+#include "rendlay.h"
 
 #define VERBOSE_LEVEL ( 0 )
 

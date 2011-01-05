@@ -42,6 +42,7 @@ Bit 7  LED A-H
 // #include "rendlay.h"
 // #include "uiinput.h"
 #include "machine/mboard.h"
+#include "rendlay.h"
 
 //static UINT8 lcd_shift_counter;
 static UINT8 led_status;

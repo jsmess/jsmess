@@ -22,6 +22,7 @@
 #include "machine/at45dbxx.h"
 #include "machine/sst39vfx.h"
 #include "machine/ram.h"
+#include "rendlay.h"
 
 /* Until support for the H8Sxxxx variants used by cybiko is added, we use H8_3002 (even if opcodes differ) */
 #define H8S2241   H83002

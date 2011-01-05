@@ -22,7 +22,7 @@
 #include "includes/ti89.h"
 #include "machine/nvram.h"
 #include "machine/intelfsh.h"
-
+#include "rendlay.h"
 
 UINT8 ti68k_state::keypad_r (running_machine *machine)
 {

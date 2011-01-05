@@ -5,7 +5,7 @@
 #include "emu.h"
 #include "cpu/upd7810/upd7810.h"
 #include "imagedev/cartslot.h"
-
+#include "rendlay.h"
 #include "includes/gmaster.h"
 
 
