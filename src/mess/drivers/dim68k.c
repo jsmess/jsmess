@@ -4,6 +4,31 @@
 
         28/12/2011 Skeleton driver.
 
+        This computer had the facility for plug-in cards to emulate popular
+        computers of the time such as apple, trs80, kaypro, etc. The floppy
+        disk parameters could be set to be able to read the disks of the
+        various systems, or you create any other format you wished.
+
+        There is no schematic available, and no native software exists (afaik).
+        So, without a boot disk, cannot proceed very far.
+
+        ToDo:
+
+        - Floppy controller
+        - Floppy formats (not sure if MESS supports user-defined formats)
+        - Banking
+        - Graphics display (including colour and video_control options)
+        - DUART
+        - RTC
+        - RS232 interface
+        - Keyboard
+        - Centronics printer
+        - Video-high
+        - Video-reset
+        - Game switches, paddles and timers
+        - The plug-in boards
+        - Emulator trap function
+
 ****************************************************************************/
 #define ADDRESS_MAP_MODERN
 
@@ -91,15 +116,28 @@ WRITE16_MEMBER( dim68k_state::dim68k_video_high_w )
 
 WRITE16_MEMBER( dim68k_state::dim68k_video_control_w )
 {
-/* D7 0 = Hires/Graphics; 1= Lores/Text
-   D6 0 = 8 dots per character; 1 = 7 dots
-   D5 0 = CRTC and CPU run Asynchronously; 1 = Synchronously
-   D4,D3 Dot clock 00=14MHz; 01=3.58MHz; 10=7MHz; 11=1.79MHz
-   D2 0 = Screen On; 1 = Off
-   D1 0 = Standard Chars & LoRes; 1 = Alternate Chars & HiRes
-   D0 0 = Non-Mixed (all text or all Graphics); 1 = Mixed (Colour Graphics and Monochrome Text)
+/* D7 0 = Hires/Graphics; 1= Lores/Text [not emulated yet]
+   D6 0 = 8 dots per character; 1 = 7 dots [emulated]
+   D5 0 = CRTC and CPU run Asynchronously; 1 = Synchronously [won't be emulated]
+   D4,D3  Dot clock: 00=14MHz; 01=3.58MHz; 10=7MHz; 11=1.79MHz [emulated]
+   D2 0 = Screen On; 1 = Off [emulated]
+   D1 0 = Standard Chars & LoRes; 1 = Alternate Chars & HiRes [not emulated yet]
+   D0 0 = Non-Mixed (all text or all Graphics); 1 = Mixed (Colour Graphics and Monochrome Text) [not emulated yet]
  */
+	mc6845_set_hpixels_per_column(m_crtc, (data & 0x40) ? 7 : 8);
 	m_video_control = data;
+
+	switch (data & 0x18)
+	{
+		case 0x00: mc6845_set_clock(m_crtc, XTAL_14MHz);
+		           break;
+		case 0x08: mc6845_set_clock(m_crtc, XTAL_3_579545MHz);
+		           break;
+		case 0x10: mc6845_set_clock(m_crtc, XTAL_14MHz / 2);
+		           break;
+		case 0x18: mc6845_set_clock(m_crtc, XTAL_3_579545MHz / 2);
+		           break;
+	}
 }
 
 WRITE16_MEMBER( dim68k_state::dim68k_video_reset_w )
@@ -127,8 +165,8 @@ WRITE16_MEMBER( dim68k_state::dim68k_banksw_w )
 
 static ADDRESS_MAP_START(dim68k_mem, ADDRESS_SPACE_PROGRAM, 16, dim68k_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000000, 0x00feffff) AM_RAM AM_BASE(ram) // 16MB RAM / ROM at boot	
-	AM_RANGE(0x00ff0000, 0x00ff1fff) AM_ROM AM_REGION("user1",0)
+	AM_RANGE(0x00000000, 0x00feffff) AM_RAM AM_BASE(ram) // 16MB RAM / ROM at boot
+	AM_RANGE(0x00ff0000, 0x00ff1fff) AM_ROM AM_REGION("bootrom", 0)
 	AM_RANGE(0x00ff2000, 0x00ff7fff) AM_RAM // Graphics Video RAM
 	AM_RANGE(0x00ff8000, 0x00ff8001) AM_DEVREADWRITE8_LEGACY("crtc", mc6845_status_r, mc6845_address_w, 0xff)
 	AM_RANGE(0x00ff8002, 0x00ff8003) AM_DEVREADWRITE8_LEGACY("crtc", mc6845_register_r, mc6845_register_w, 0xff)
@@ -160,9 +198,9 @@ INPUT_PORTS_END
 static MACHINE_RESET(dim68k) 
 {
 	dim68k_state *state = machine->driver_data<dim68k_state>();
-	UINT8* user1 = machine->region("user1")->base();
+	UINT8* ROM = machine->region("bootrom")->base();
 
-	memcpy((UINT8*)state->ram,user1,0x20000);
+	memcpy((UINT8*)state->ram, ROM, 0x2000);
 
 	machine->device("maincpu")->reset();	
 }
@@ -180,29 +218,34 @@ static VIDEO_UPDATE( dim68k )
 	return 0;
 }
 
-// Text-only; graphics isn't emulated yet
+// Text-only; graphics isn't emulated yet. Need to find out if hardware cursor is used.
 MC6845_UPDATE_ROW( dim68k_update_row )
 {
 	dim68k_state *state = device->machine->driver_data<dim68k_state>();
 	UINT8 chr,gfx,x,xx,inv;
-	UINT16 dchr;
-
+	UINT16 chr16=0x2020; // set to spaces if screen is off
 	UINT16 *p = BITMAP_ADDR16(bitmap, y, 0);
+	UINT8 screen_on = ~state->m_video_control & 4;
+	UINT8 dot8 = ~state->m_video_control & 40;
 
 	// need to divide everything in half to cater for 16-bit reads
 	x_count /= 2;
 	ma /= 2;
 	xx = 0;
 
+	if (!screen_on)
+		cursor_x = 0xff; // disable cursor if screen is off
+
 	for (x = 0; x < x_count; x++)
 	{
-		dchr = state->ram[ma+x]; // reads 2 characters
+		if (screen_on)
+			chr16 = state->ram[ma+x]; // reads 2 characters
 
 		inv=0;
 		if (xx == cursor_x) inv=0xff;
 		xx++;
 
-		chr = dchr>>8;
+		chr = chr16>>8;
 		gfx = state->FNT[(chr<<4) | ra] ^ inv ^ ((chr & 0x80) ? 0xff : 0);
 		*p++ = ( gfx & 0x80 ) ? 1 : 0;
 		*p++ = ( gfx & 0x40 ) ? 1 : 0;
@@ -211,13 +254,13 @@ MC6845_UPDATE_ROW( dim68k_update_row )
 		*p++ = ( gfx & 0x08 ) ? 1 : 0;
 		*p++ = ( gfx & 0x04 ) ? 1 : 0;
 		*p++ = ( gfx & 0x02 ) ? 1 : 0;
-		*p++ = ( gfx & 0x01 ) ? 1 : 0;
+		if (dot8) *p++ = ( gfx & 0x01 ) ? 1 : 0;
 
 		inv = 0;
 		if (xx == cursor_x) inv=0xff;
 		xx++;
 
-		chr = dchr;
+		chr = chr16;
 		gfx = state->FNT[(chr<<4) | ra] ^ inv ^ ((chr & 0x80) ? 0xff : 0);
 		*p++ = ( gfx & 0x80 ) ? 1 : 0;
 		*p++ = ( gfx & 0x40 ) ? 1 : 0;
@@ -226,7 +269,7 @@ MC6845_UPDATE_ROW( dim68k_update_row )
 		*p++ = ( gfx & 0x08 ) ? 1 : 0;
 		*p++ = ( gfx & 0x04 ) ? 1 : 0;
 		*p++ = ( gfx & 0x02 ) ? 1 : 0;
-		*p++ = ( gfx & 0x01 ) ? 1 : 0;
+		if (dot8) *p++ = ( gfx & 0x01 ) ? 1 : 0;
 	}
 }
 
@@ -317,7 +360,7 @@ MC113	82S153	U16
 */
 /* ROM definition */
 ROM_START( dim68k )
-	ROM_REGION( 0x10000, "user1", ROMREGION_ERASEFF )
+	ROM_REGION( 0x2000, "bootrom", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "mc103e.bin", 0x0000, 0x1000, CRC(4730c902) SHA1(5c4bb79ad22def721a22eb63dd05e0391c8082be))
 	ROM_LOAD16_BYTE( "mc104.bin",  0x0001, 0x1000, CRC(14b04575) SHA1(43e15d9ebe1c9c1bf1bcfc1be3899a49e6748200))
 
