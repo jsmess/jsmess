@@ -8,11 +8,7 @@
 
     Various additions by Robbbert.
 
-    Thanks to The Bee Board (http://microbee.no-ip.com/beeboard), who
-    through a very dedicated community, have provided us with rom dumps,
-    software, technical documents and general information.
-
-    Also thanks to the author of the "ubee512" emulator for his help.
+    Thanks to the author of the "ubee512" emulator for his help.
 
     TeleTerm roms dumped by ejwords. The correct slots found by ubee512 author.
     Swedish roms dumped by nama. The correct slots found by ubee512 author.
