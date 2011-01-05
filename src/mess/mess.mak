@@ -410,6 +410,7 @@ DRVLIBS = \
 	$(MESSOBJ)/visual.a \
 	$(MESSOBJ)/votrax.a \
 	$(MESSOBJ)/vtech.a \
+	$(MESSOBJ)/wavemate.a \
 	$(MESSOBJ)/xerox.a \
 	$(MESSOBJ)/zvt.a \
 	$(MESSOBJ)/shared.a \
@@ -1034,9 +1035,9 @@ $(MESSOBJ)/intv.a:				\
 	$(MESS_DRIVERS)/intv.o		\
 
 $(MESSOBJ)/jupiter.a:			\
-	$(MESS_DRIVERS)/jupiter.o	\
-	$(MESS_MACHINE)/jupiter.o	\
-	$(MESS_FORMATS)/jupi_tap.o	\
+	$(MESS_DRIVERS)/ace.o		\
+	$(MESS_MACHINE)/ace.o		\
+	$(MESS_FORMATS)/ace_tap.o	\
 
 $(MESSOBJ)/kaypro.a:			\
 	$(MESS_DRIVERS)/kaypro.o	\
@@ -1400,8 +1401,7 @@ $(MESSOBJ)/sharp.a:				\
 	$(MESS_FORMATS)/x1_tap.o	\
 	$(MESS_DRIVERS)/mz2500.o	\
 	$(MESS_DRIVERS)/pce220.o	\
-
-
+	
 $(MESSOBJ)/sinclair.a:			\
 	$(MESS_VIDEO)/spectrum.o	\
 	$(MESS_VIDEO)/timex.o		\
@@ -1674,6 +1674,10 @@ $(MESSOBJ)/vtech.a:				\
 	$(MESS_DRIVERS)/pc2000.o	\
 	$(MESS_DRIVERS)/prestige.o	\
 
+$(MESSOBJ)/wavemate.a:			\
+	$(MESS_DRIVERS)/bullet.o	\
+	$(MESS_DRIVERS)/jupiter.o	\
+
 $(MESSOBJ)/xerox.a:				\
 	$(MESS_DRIVERS)/xerox820.o	\
 
@@ -1687,7 +1691,6 @@ $(MESSOBJ)/skeleton.a:			\
 	$(MESS_DRIVERS)/amico2k.o	\
 	$(MESS_DRIVERS)/beehive.o	\
 	$(MESS_DRIVERS)/bob85.o		\
-	$(MESS_DRIVERS)/bullet.o	\
 	$(MESS_DRIVERS)/busicom.o	\
 	$(MESS_VIDEO)/busicom.o		\
 	$(MESS_DRIVERS)/c10.o		\

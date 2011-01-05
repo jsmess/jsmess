@@ -861,7 +861,7 @@ const game_driver * const drivers[] =
 	DRIVER( pc9821a )
 
 	/* Cantab */
-	DRIVER( jupiter )   /* Jupiter Ace    */
+	DRIVER( ace )   /* Jupiter Ace    */
 
 	/* Sord */
 	DRIVER( sordm5 )
@@ -1837,5 +1837,7 @@ const game_driver * const drivers[] =
 	DRIVER( okean240 )
 	DRIVER( vixen )
 	DRIVER( pt68k4 )
+	DRIVER( jupiter2 )
+	DRIVER( jupiter3 )
 	
 #endif /* DRIVER_RECURSIVE */

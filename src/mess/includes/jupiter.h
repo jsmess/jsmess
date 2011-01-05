@@ -1,46 +1,41 @@
-/*****************************************************************************
- *
- * includes/jupiter.h
- *
- ****************************************************************************/
+#pragma once
 
-#ifndef JUPITER_H_
-#define JUPITER_H_
+#ifndef __JUPITER__
+#define __JUPITER__
 
-typedef struct
-{
-	UINT8 hdr_type;
-	UINT8 hdr_name[10];
-	UINT16 hdr_len;
-	UINT16 hdr_addr;
-	UINT8 hdr_vars[8];
-	UINT8 hdr_3c4c;
-	UINT8 hdr_3c4d;
-	UINT16 dat_len;
-} jupiter_tape_t;
+#define MCM6571AP_TAG	"vid125_6c"
+#define S6820_TAG		"vid125_4a"
+#define Z80_TAG			"cpu126_4c"
+#define INS1771N1_TAG	"fdi027_4c"
+#define MC6820P_TAG		"fdi027_4b"
+#define MC6850P_TAG		"rsi068_6a"
+#define MC6821P_TAG		"sdm058_4b"
+#define TERMINAL_TAG	"terminal"
 
-
-class jupiter_state : public driver_device
+class jupiter2_state : public driver_device
 {
 public:
-	jupiter_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	jupiter2_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config),
+		  m_maincpu(*this, MCM6571AP_TAG)
+	{ }
 
-	UINT8 *videoram;
-	emu_timer *set_irq_timer;
-	emu_timer *clear_irq_timer;
-	UINT8 *charram;
-	UINT8 *expram;
-	jupiter_tape_t tape;
+	required_device<cpu_device> m_maincpu;
+
+	virtual void machine_start();
 };
 
+class jupiter3_state : public driver_device
+{
+public:
+	jupiter3_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config),
+		  m_maincpu(*this, Z80_TAG)
+	{ }
 
-/*----------- defined in machine/jupiter.c -----------*/
+	required_device<cpu_device> m_maincpu;
 
+	virtual void machine_start();
+};
 
-SNAPSHOT_LOAD(jupiter);
-
-
-/*----------- defined in video/jupiter.c -----------*/
-
-#endif /* JUPITER_H_ */
+#endif

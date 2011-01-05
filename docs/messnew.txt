@@ -41,6 +41,8 @@ Skeleton drivers:
 - NEC PC-8300 [Incog]
 - Peripheral Technology PT68K4
 - Osborne 4 Vixen [Curt Coder]
+- Wave Mate Jupiter II [Curt Coder]
+- Wave Mate Jupiter III [Curt Coder]
 
 
 
@@ -58,6 +60,10 @@ System Driver Changes:
 - [ABC800C] Added Color version ROMs. [Ola Andersson]
 
 - [ABC1600] Added ROM dumps. [Ola Andersson]
+
+- [ACE] Renamed jupiter to ace to avoid naming conflict with Wave Mate.
+  Added support for BoldField Joystick interface AC5 and EME Soundbox AC4.
+  Cleaned up and modernized driver. [Curt Coder]
 
 - [AMU880] Fixed keyboard. [Curt Coder]
 
