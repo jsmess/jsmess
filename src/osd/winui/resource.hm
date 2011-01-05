@@ -36,6 +36,7 @@
 #define HIDC_FILTER_VECTOR              0x80a90451    // IDD_FILTERS [English (U.S.)]
 #define HIDC_FILTER_VERTICAL            0x80a90460    // IDD_FILTERS [English (U.S.)]
 #define HIDC_FILTER_WORKING             0x80a9045c    // IDD_FILTERS [English (U.S.)]
+#define HIDC_FILTER_MECHANICAL          0x80a90461    // IDD_FILTERS [English (U.S.)]
 #define HIDC_FLICKER                    0x809f0407    // IDD_PROP_VECTOR [English (U.S.)]
 #define HIDC_FLIPX                      0x809a0408    // IDD_PROP_DISPLAY [English (U.S.)]
 #define HIDC_FLIPY                      0x809a0409    // IDD_PROP_DISPLAY [English (U.S.)]

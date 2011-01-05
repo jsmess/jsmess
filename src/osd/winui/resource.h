@@ -316,6 +316,7 @@
 #define IDC_SNAPSIZEHEIGHT              1251
 #define IDC_SNAPSIZETEXT                1252
 #define IDC_SNAPSIZEX                   1253
+#define IDC_FILTER_MECHANICAL           1254
 #define ID_CONTEXT_SHOW_FOLDER_START    39000
 #define ID_CONTEXT_SHOW_FOLDER_END      39200
 #define ID_FILE_EXIT                    40001
@@ -417,7 +418,7 @@
 #define _APS_3D_CONTROLS                     1
 #define _APS_NEXT_RESOURCE_VALUE        192
 #define _APS_NEXT_COMMAND_VALUE         40102
-#define _APS_NEXT_CONTROL_VALUE         1254
+#define _APS_NEXT_CONTROL_VALUE         1255
 #define _APS_NEXT_SYMED_VALUE           93
 #endif
 #endif

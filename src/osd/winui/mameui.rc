@@ -1075,7 +1075,9 @@ BEGIN
     CONTROL         "&Working",IDC_FILTER_WORKING,"Button",BS_AUTOCHECKBOX | 
                     WS_TABSTOP,100,44,47,10,0,HIDC_FILTER_WORKING
     CONTROL         "&Vertical",IDC_FILTER_VERTICAL,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,100,58,47,10,0,HIDC_FILTER_VERTICAL
+                    WS_TABSTOP,100,58,47,10,0,HIDC_FILTER_VERTICAL					
+    CONTROL         "&Mechanical",IDC_FILTER_MECHANICAL,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,100,72,47,10,0,HIDC_FILTER_MECHANICAL
     LTEXT           "(*) = inherited from parent folder",IDC_INHERITED,14,72,
                     99,10
 #ifdef MESS
