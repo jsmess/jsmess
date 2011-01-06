@@ -198,6 +198,16 @@ static ADDRESS_MAP_START( pc8_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( zenith_map, ADDRESS_SPACE_PROGRAM, 8 )
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x00000, 0x9ffff) AM_RAMBANK("bank10")
+	AM_RANGE(0xa0000, 0xbffff) AM_NOP
+	AM_RANGE(0xc0000, 0xc7fff) AM_ROM
+	AM_RANGE(0xc8000, 0xcffff) AM_ROM
+	AM_RANGE(0xd0000, 0xeffff) AM_NOP
+	AM_RANGE(0xf0000, 0xf7fff) AM_RAM
+	AM_RANGE(0xf8000, 0xfffff) AM_ROM
+ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( pc16_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -2605,6 +2615,67 @@ static MACHINE_CONFIG_START( poisk2, pc_state )
 	MCFG_RAM_DEFAULT_SIZE("640K")
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_START( zenith, pc_state )
+	/* basic machine hardware */
+	MCFG_CPU_PC(zenith, pc8, I8088, XTAL_14_31818MHz/3, pc_frame_interrupt)	/* 4,77 MHz */
+
+	MCFG_QUANTUM_TIME(HZ(60))
+
+	MCFG_MACHINE_START(pc)
+	MCFG_MACHINE_RESET(pc)
+
+	MCFG_PIT8253_ADD( "pit8253", ibm5150_pit8253_config )
+
+	MCFG_I8237_ADD( "dma8237", XTAL_14_31818MHz/3, ibm5150_dma8237_config )
+
+	MCFG_PIC8259_ADD( "pic8259", ibm5150_pic8259_config )
+
+	MCFG_I8255A_ADD( "ppi8255", ibm5160_ppi8255_interface )
+
+	MCFG_INS8250_ADD( "ins8250_0", ibm5150_com_interface[0] )			/* TODO: Verify model */
+	MCFG_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1] )			/* TODO: Verify model */
+	MCFG_INS8250_ADD( "ins8250_2", ibm5150_com_interface[2] )			/* TODO: Verify model */
+	MCFG_INS8250_ADD( "ins8250_3", ibm5150_com_interface[3] )			/* TODO: Verify model */
+
+	/* video hardware */
+	MCFG_FRAGMENT_ADD( pcvideo_cga )
+	MCFG_GFXDECODE(ibm5150)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+#ifdef ADLIB
+	MCFG_SOUND_ADD("ym3812", YM3812, ym3812_StdClock)
+	MCFG_SOUND_CONFIG(pc_ym3812_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+#endif
+#ifdef GAMEBLASTER
+	MCFG_SOUND_ADD("saa1099.1", SAA1099, 4772720)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("saa1099.2", SAA1099, 4772720)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+#endif
+
+	/* keyboard */
+	MCFG_KB_KEYTRONIC_ADD("keyboard", pc_keytronic_intf)
+
+	/* printer */
+	MCFG_PC_LPT_ADD("lpt_0", pc_lpt_config)
+	MCFG_PC_LPT_ADD("lpt_1", pc_lpt_config)
+	MCFG_PC_LPT_ADD("lpt_2", pc_lpt_config)
+
+	/* harddisk */
+	MCFG_FRAGMENT_ADD( pc_hdc )
+
+	MCFG_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
+
+	MCFG_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_config)
+
+	/* internal ram */
+	MCFG_RAM_ADD(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("640K")
+MACHINE_CONFIG_END
 
 #if 0
 	//pcjr roms? (incomplete dump, most likely 64 kbyte)
@@ -2770,6 +2841,14 @@ ROM_START( pc )
 	ROM_LOAD("5788005.u33", 0x00000, 0x2000, CRC(0bf56d70) SHA1(c2a8b10808bf51a3c123ba3eb1e9dd608231916f)) /* "AMI 8412PI // 5788005 // (C) IBM CORP. 1981 // KOREA" */
 ROM_END
 
+
+ROM_START( zdsupers )
+    ROM_REGION(0x100000,"maincpu", 0)
+	ROM_LOAD( "z184m v3.1d.10d", 0xf8000, 0x8000, CRC(44012c3b) SHA1(f2f28979798874386ca8ba3dd3ead24ae7c2aeb4))
+	/* IBM 1501981(CGA) and 1501985(MDA) Character rom */
+	ROM_REGION(0x2000,"gfx1", 0)
+	ROM_LOAD("5788005.u33", 0x00000, 0x2000, CRC(0bf56d70) SHA1(c2a8b10808bf51a3c123ba3eb1e9dd608231916f)) /* "AMI 8412PI // 5788005 // (C) IBM CORP. 1981 // KOREA" */
+ROM_END
 
 ROM_START( europc )
 	ROM_REGION(0x100000,"maincpu", 0)
@@ -3368,3 +3447,5 @@ COMP ( 1990,	poisk1,     ibm5150,	0,	iskr1031,	pccga,	pccga,	"<unknown>",  "Pois
 COMP ( 1991,	poisk2,     ibm5150,	0,	poisk2,	pccga,	pccga,	"<unknown>",  "Poisk-2" , GAME_NOT_WORKING)
 COMP ( 1990,	mc1702,     ibm5150,	0,	pccga,	pccga,	pccga,	"<unknown>",  "Elektronika MC-1702" , GAME_NOT_WORKING)
 COMP ( 19??,	mc1502,     ibm5150,	0,	pccga,	pccga,	pccga,	"<unknown>",  "Elektronika MC-1502" , GAME_NOT_WORKING)
+
+COMP(  1987,	zdsupers,   ibm5150,	0,	zenith,	pccga,	pccga,	"Zenith Data Systems",  "SuperSport" , 0)

@@ -10,7 +10,7 @@ New System Drivers Supported:
 - Tiger Telematics Gizmondo (not working) [Tim Schuerewegen]
 - Hewlett Packard 49G+ Graphing Calculator (not working) [Tim Schuerewegen]
 - Victor Wondermega M2 (not working) [Justin Kerk]
-
+- Zenith Data Systems SuperSport [incog]
 
 
 Systems Promoted from GAME_NOT_WORKING:
