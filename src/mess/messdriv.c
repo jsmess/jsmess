@@ -1757,7 +1757,7 @@ const game_driver * const drivers[] =
 	DRIVER( scv )
 	DRIVER( scv_pal )
 	DRIVER( vii ) // Chintendo / KenSingTon / Jungle Soft / Siatronics Vii
-	DRIVER( vsmile )
+	//DRIVER( vsmile )
 	DRIVER( zsbc3 )
 	DRIVER( dms5000 )
 	DRIVER( dms86 )
