@@ -1530,7 +1530,7 @@ $(MESSOBJ)/thomson.a:			\
 	$(MESS_DRIVERS)/thomson.o	\
 	$(MESS_MACHINE)/thomson.o	\
 	$(MESS_VIDEO)/thomson.o		\
-	$(MESS_DEVICES)/thomflop.o	\
+	$(MESS_MACHINE)/thomflop.o	\
 	$(MESS_FORMATS)/thom_dsk.o	\
 	$(MESS_FORMATS)/thom_cas.o	\
 
@@ -1572,6 +1572,7 @@ $(MESSOBJ)/ti.a:				\
 	$(MESS_MACHINE)/ti99/sgcpu.o  \
 	$(MESS_MACHINE)/ti99/genboard.o  \
 	$(MESS_MACHINE)/ti99/tiboard.o  \
+	$(MESS_MACHINE)/ti99/ti99_hd.o	\
 	$(MESS_MACHINE)/strata.o	\
 	$(MESS_MACHINE)/990_dk.o	\
 	$(MESS_DRIVERS)/ti990_4.o	\
@@ -1580,7 +1581,6 @@ $(MESSOBJ)/ti.a:				\
 	$(MESS_DRIVERS)/geneve.o	\
 	$(MESS_DRIVERS)/tm990189.o	\
 	$(MESS_DRIVERS)/ti99_8.o	\
-	$(MESS_DEVICES)/ti99_hd.o	\
 	$(MESS_VIDEO)/911_vdt.o		\
 	$(MESS_VIDEO)/733_asr.o		\
 	$(MESS_DRIVERS)/ti990_10.o	\

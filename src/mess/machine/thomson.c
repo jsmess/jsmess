@@ -7,7 +7,7 @@
 **********************************************************************/
 
 #include "emu.h"
-#include "devices/thomflop.h"
+#include "machine/thomflop.h"
 #include "formats/thom_dsk.h"
 #include "includes/thomson.h"
 #include "machine/6821pia.h"

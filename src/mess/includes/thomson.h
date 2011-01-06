@@ -26,7 +26,7 @@
 #include "machine/mc6854.h"
 #include "formats/thom_cas.h"
 #include "formats/thom_dsk.h"
-#include "devices/thomflop.h"
+#include "machine/thomflop.h"
 
 
 /*----------- defined in machine/thomson.c -----------*/

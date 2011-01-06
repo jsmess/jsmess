@@ -134,7 +134,7 @@ do not depend on the card being active at that time.
 #include "imagedev/flopdrv.h"
 #include "imagedev/harddriv.h"
 #include "formats/ti99_dsk.h"
-#include "devices/ti99_hd.h"
+#include "ti99_hd.h"
 
 static const floppy_config ti99_4_floppy_config =
 {
