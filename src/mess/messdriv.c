@@ -666,6 +666,7 @@ const game_driver * const drivers[] =
 	DRIVER( megapc )
 	DRIVER( megapcpl )
 	DRIVER( ec1849 )
+	DRIVER( t2000sx )
 
 	/* 3Com / Palm / USRobotics */
 	DRIVER( pilot1k )   /* Pilot 1000 */
