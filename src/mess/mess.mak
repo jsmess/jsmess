@@ -277,6 +277,7 @@ DRVLIBS = \
 	$(MESSOBJ)/booth.a \
 	$(MESSOBJ)/camputers.a \
 	$(MESSOBJ)/canon.a \
+	$(MESSOBJ)/cantab.a \
 	$(MESSOBJ)/capcom.a \
 	$(MESSOBJ)/casio.a \
 	$(MESSOBJ)/cbm.a \
@@ -326,7 +327,6 @@ DRVLIBS = \
 	$(MESSOBJ)/interact.a \
 	$(MESSOBJ)/interton.a \
 	$(MESSOBJ)/intv.a \
-	$(MESSOBJ)/jupiter.a \
 	$(MESSOBJ)/kaypro.a \
 	$(MESSOBJ)/koei.a \
 	$(MESSOBJ)/kyocera.a \
@@ -480,7 +480,7 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_MACHINE)/rp5c01a.o	\
 	$(MESS_MACHINE)/rp5c15.o	\
 	$(MESS_MACHINE)/rs232.o		\
-	$(MESS_MACHINE)/scsibus.o   \
+	$(MESS_MACHINE)/scsibus.o	\
 	$(MESS_MACHINE)/serial.o	\
 	$(MESS_MACHINE)/smartmed.o	\
 	$(MESS_MACHINE)/smc92x4.o	\
@@ -701,6 +701,11 @@ $(MESSOBJ)/camputers.a:			\
 $(MESSOBJ)/canon.a:				\
 	$(MESS_DRIVERS)/cat.o		\
 	$(MESS_DRIVERS)/x07.o		\
+
+$(MESSOBJ)/cantab.a:			\
+	$(MESS_DRIVERS)/ace.o		\
+	$(MESS_MACHINE)/ace.o		\
+	$(MESS_FORMATS)/ace_tap.o	\
 
 $(MESSOBJ)/capcom.a:			\
 	$(MESS_DRIVERS)/cpschngr.o	\
@@ -1033,11 +1038,6 @@ $(MESSOBJ)/intv.a:				\
 	$(MESS_MACHINE)/intv.o		\
 	$(MESS_AUDIO)/intv.o		\
 	$(MESS_DRIVERS)/intv.o		\
-
-$(MESSOBJ)/jupiter.a:			\
-	$(MESS_DRIVERS)/ace.o		\
-	$(MESS_MACHINE)/ace.o		\
-	$(MESS_FORMATS)/ace_tap.o	\
 
 $(MESSOBJ)/kaypro.a:			\
 	$(MESS_DRIVERS)/kaypro.o	\

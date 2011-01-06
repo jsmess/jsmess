@@ -7,6 +7,7 @@
 #ifndef ACE_H_
 #define ACE_H_
 
+#include "machine/ram.h"
 #define Z80_TAG			"z0"
 #define AY8910_TAG		"ay8910"
 #define SPEAKER_TAG		"speaker"
@@ -21,7 +22,7 @@ public:
 		  m_maincpu(*this, Z80_TAG),
 		  m_speaker(*this, SPEAKER_TAG),
 		  m_cassette(*this, CASSETTE_TAG),
-		  m_ram(*this, "ram")
+		  m_ram(*this, RAM_TAG)
 	 { }
 
 	required_device<cpu_device> m_maincpu;

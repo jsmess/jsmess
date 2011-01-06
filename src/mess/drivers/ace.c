@@ -45,7 +45,6 @@ Ports:
 #include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"
-#include "machine/ram.h"
 #include "sound/ay8910.h"
 #include "sound/speaker.h"
 #include "sound/wave.h"
@@ -410,7 +409,7 @@ static MACHINE_CONFIG_START( ace, ace_state )
 	MCFG_SNAPSHOT_ADD("snapshot", ace, "ace", 1)
 
 	/* internal ram */
-	MCFG_RAM_ADD("ram")
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("1K")
 	MCFG_RAM_EXTRA_OPTIONS("16K,48K")
 MACHINE_CONFIG_END
