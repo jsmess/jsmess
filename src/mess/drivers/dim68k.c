@@ -9,8 +9,8 @@
         disk parameters could be set to be able to read the disks of the
         various systems, or you create any other format you wished.
 
-        There is no schematic available, and no native software exists (afaik).
-        So, without a boot disk, cannot proceed very far.
+        There is no schematic available, so not fully able to emulate at
+        this time.
 
         ToDo:
 
