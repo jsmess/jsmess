@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="vixen" description="Osborne 4 Vixen Disk Images">
+	<software name="system12">
+		<description>OSBORNE 4 System Disk</description>
+		<year>1985</year>
+		<publisher>Maxis</publisher>
+		
+		<part name="disk1" interface="vixen_flop">
+		<!-- Included on the disk: Wordstar, SuperCalc2, CP/M Utilities, MailMerge -->
+		<!-- P/N: 3D49005-01 REV 1.2 03/20/85 -->
+			<dataarea name="flop" size="380287">
+				<rom name="disk1.imd" size="380287" crc="8fe4129b" sha1="3cbc937bd0b0c44dac98af0427ab4430f25a24f3" offset="0" />
+			</dataarea>
+		</part>
+		
+		<part name="disk2" interface="vixen_flop">
+		<!-- Included on the disk: MEDIA MASTER, MBASIC, OSBOARD -->
+		<!-- P/N: 3D490005-02 REV 1.2 03/20/85 -->
+			<dataarea name="flop" size="360899">
+				<rom name="disk2.imd" size="360899" crc="ccadbac9" sha1="4987b41ced5dd23145f6e3f63c8c30e16c79c400" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="disk3" interface="vixen_flop">
+		<!-- Included on the disk: SUPERCALC2 Templates -->
+		<!-- P/N: 3D490005-03 REV 1.2 03/20/85 -->
+			<dataarea name="flop" size="195152">
+				<rom name="disk3.imd" size="195152" crc="64141c47" sha1="79aedfc6f2bd8f6bc78a2a7cb69b393aca2339ad" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+</softwarelist>
