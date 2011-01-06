@@ -1229,7 +1229,7 @@ static UINT8 towns_cd_get_track(running_machine* machine)
 
 	for(track=1;track<99;track++)
 	{
-		if(cdrom_get_track_start(mess_cd_get_cdrom_file(cdrom),track) > lba)
+		if(cdrom_get_track_start(cd_get_cdrom_file(cdrom),track) > lba)
 			break;
 	}
 	return track;
@@ -1278,7 +1278,7 @@ static TIMER_CALLBACK( towns_cdrom_read_byte )
 				state->towns_cd.extra_status = 0;
 				towns_cd_set_status(device->machine,0x22,0x00,0x00,0x00);
 				towns_cdrom_set_irq(device->machine,TOWNS_CD_IRQ_DMA,1);
-				cdrom_read_data(mess_cd_get_cdrom_file(state->cdrom),++state->towns_cd.lba_current,state->towns_cd.buffer,CD_TRACK_MODE1);
+				cdrom_read_data(cd_get_cdrom_file(state->cdrom),++state->towns_cd.lba_current,state->towns_cd.buffer,CD_TRACK_MODE1);
 				timer_adjust_oneshot(state->towns_cd.read_timer,ATTOTIME_IN_HZ(300000),1);
 				state->towns_cd.buffer_ptr = -1;
 			}
@@ -1308,7 +1308,7 @@ static void towns_cdrom_read(device_t* device)
 	state->towns_cd.lba_last = msf_to_lba(lba2);
 
 	// first track starts at 00:02:00 - this is hardcoded in the boot procedure
-	track = cdrom_get_track(mess_cd_get_cdrom_file(device),state->towns_cd.lba_current);
+	track = cdrom_get_track(cd_get_cdrom_file(device),state->towns_cd.lba_current);
 	if(track < 2)
 	{  // recalculate LBA
 		state->towns_cd.lba_current -= 150;
@@ -1328,7 +1328,7 @@ static void towns_cdrom_read(device_t* device)
 	}
 	else
 	{
-		cdrom_read_data(mess_cd_get_cdrom_file(device),state->towns_cd.lba_current,state->towns_cd.buffer,CD_TRACK_MODE1);
+		cdrom_read_data(cd_get_cdrom_file(device),state->towns_cd.lba_current,state->towns_cd.buffer,CD_TRACK_MODE1);
 		state->towns_cd.status |= 0x10;  // DMA transfer begin
 		state->towns_cd.status &= ~0x20;  // not a software transfer
 //      state->towns_cd.buffer_ptr = 0;
@@ -1366,7 +1366,7 @@ static void towns_cdrom_play_cdda(device_t* device)
 	state->towns_cd.cdda_current = msf_to_lba(lba1);
 	state->towns_cd.cdda_length = msf_to_lba(lba2) - state->towns_cd.cdda_current;
 
-	cdda_set_cdrom(cdda,mess_cd_get_cdrom_file(device));
+	cdda_set_cdrom(cdda,cd_get_cdrom_file(device));
 	cdda_start_audio(cdda,state->towns_cd.cdda_current,state->towns_cd.cdda_length);
 	logerror("CD: CD-DA start from LBA:%i length:%i\n",state->towns_cd.cdda_current,state->towns_cd.cdda_length);
 	if(state->towns_cd.command & 0x20)
@@ -1385,7 +1385,7 @@ static void towns_cdrom_execute_command(device_t* device)
 {
 	towns_state* state = device->machine->driver_data<towns_state>();
 
-	if(mess_cd_get_cdrom_file(device) == NULL)
+	if(cd_get_cdrom_file(device) == NULL)
 	{  // No CD in drive
 		if(state->towns_cd.command & 0x20)
 		{
@@ -1544,18 +1544,18 @@ static READ8_HANDLER(towns_cdrom_r)
 									break;
 								case 4: // st1 = last track number (BCD)
 									towns_cd_set_status(space->machine,0x17,
-										byte_to_bcd(cdrom_get_last_track(mess_cd_get_cdrom_file(state->cdrom))),
+										byte_to_bcd(cdrom_get_last_track(cd_get_cdrom_file(state->cdrom))),
 										0x00,0x00);
 									state->towns_cd.extra_status++;
 									break;
 								case 5:  // st1 = control/adr of track 0xaa?
 									towns_cd_set_status(space->machine,0x16,
-										cdrom_get_adr_control(mess_cd_get_cdrom_file(state->cdrom),0xaa),
+										cdrom_get_adr_control(cd_get_cdrom_file(state->cdrom),0xaa),
 										0xaa,0x00);
 									state->towns_cd.extra_status++;
 									break;
 								case 6:  // st1/2/3 = address of track 0xaa? (BCD)
-									addr = cdrom_get_track_start(mess_cd_get_cdrom_file(state->cdrom),0xaa);
+									addr = cdrom_get_track_start(cd_get_cdrom_file(state->cdrom),0xaa);
 									addr = lba_to_msf(addr);
 									towns_cd_set_status(space->machine,0x17,
 										(addr & 0xff0000) >> 16,(addr & 0x00ff00) >> 8,addr & 0x0000ff);
@@ -1565,18 +1565,18 @@ static READ8_HANDLER(towns_cdrom_r)
 									if(state->towns_cd.extra_status & 0x01)
 									{
 										towns_cd_set_status(space->machine,0x16,
-											((cdrom_get_adr_control(mess_cd_get_cdrom_file(state->cdrom),(state->towns_cd.extra_status/2)-3) & 0x0f) << 4)
-											| ((cdrom_get_adr_control(mess_cd_get_cdrom_file(state->cdrom),(state->towns_cd.extra_status/2)-3) & 0xf0) >> 4),
+											((cdrom_get_adr_control(cd_get_cdrom_file(state->cdrom),(state->towns_cd.extra_status/2)-3) & 0x0f) << 4)
+											| ((cdrom_get_adr_control(cd_get_cdrom_file(state->cdrom),(state->towns_cd.extra_status/2)-3) & 0xf0) >> 4),
 											(state->towns_cd.extra_status/2)-3,0x00);
 										state->towns_cd.extra_status++;
 									}
 									else
 									{
-										addr = cdrom_get_track_start(mess_cd_get_cdrom_file(state->cdrom),(state->towns_cd.extra_status/2)-4);
+										addr = cdrom_get_track_start(cd_get_cdrom_file(state->cdrom),(state->towns_cd.extra_status/2)-4);
 										addr = lba_to_msf(addr);
 										towns_cd_set_status(space->machine,0x17,
 											(addr & 0xff0000) >> 16,(addr & 0x00ff00) >> 8,addr & 0x0000ff);
-										if(((state->towns_cd.extra_status/2)-3) >= cdrom_get_last_track(mess_cd_get_cdrom_file(state->cdrom)))
+										if(((state->towns_cd.extra_status/2)-3) >= cdrom_get_last_track(cd_get_cdrom_file(state->cdrom)))
 										{
 											state->towns_cd.extra_status = 0;
 										}

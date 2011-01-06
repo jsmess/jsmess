@@ -1034,7 +1034,7 @@ static MACHINE_RESET( psx )
 	device_t *cdrom_dev = machine->device("cdrom");
 	if( cdrom_dev )
 	{
-		state->cdrom = mess_cd_get_cdrom_file(cdrom_dev);
+		state->cdrom = cd_get_cdrom_file(cdrom_dev);
 	}
 
 	psx_machine_init(machine);

@@ -212,7 +212,7 @@ static DEVICE_IMAGE_LOAD( ti990_hd )
 	d = &hdc.d[id];
 	d->img = &image;
 
-	hd_file = mess_hd_get_hard_disk_file( image );
+	hd_file = hd_get_hard_disk_file( image );
 
 	if ( hd_file )
 	{

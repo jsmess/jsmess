@@ -72,7 +72,7 @@ void ti99_mfm_harddisk_read_sector(device_t *harddisk, int cylinder, int head, i
 	UINT32 lba;
 	mfmhd_state *hd = (mfmhd_state *)downcast<legacy_device_base *>(harddisk)->token();
 	device_t *drive = harddisk->subdevice("drive");
-	hard_disk_file *file = mess_hd_get_hard_disk_file(drive);
+	hard_disk_file *file = hd_get_hard_disk_file(drive);
 
 	*sector_length = 256;
 	*buf = (UINT8 *)malloc(*sector_length);
@@ -108,7 +108,7 @@ void ti99_mfm_harddisk_write_sector(device_t *harddisk, int cylinder, int head, 
 	UINT32 lba;
 	mfmhd_state *hd = (mfmhd_state *)downcast<legacy_device_base *>(harddisk)->token();
 	device_t *drive = harddisk->subdevice("drive");
-	hard_disk_file *file = mess_hd_get_hard_disk_file(drive);
+	hard_disk_file *file = hd_get_hard_disk_file(drive);
 
 	if (file==NULL)
 	{
@@ -191,7 +191,7 @@ void ti99_mfm_harddisk_read_track(device_t *harddisk, int head, UINT8 **pbuffer,
 	int crc;
 
 	const hard_disk_info *info;
-	hard_disk_file *file = mess_hd_get_hard_disk_file(drive);
+	hard_disk_file *file = hd_get_hard_disk_file(drive);
 
 	if (file==NULL)
 	{
@@ -308,7 +308,7 @@ void ti99_mfm_harddisk_write_track(device_t *harddisk, int head, UINT8 *track_im
 	UINT32 lba;
 	mfmhd_state *hd = (mfmhd_state *)downcast<legacy_device_base *>(harddisk)->token();
 	device_t *drive = harddisk->subdevice("drive");
-	hard_disk_file *file = mess_hd_get_hard_disk_file(drive);
+	hard_disk_file *file = hd_get_hard_disk_file(drive);
 
 	/* printf("ti99_hd write track c=%d h=%d\n", hd->current_cylinder, head); */
 
@@ -411,7 +411,7 @@ UINT8 ti99_mfm_harddisk_status(device_t *harddisk)
 	device_t *drive;
 	mfmhd_state *hd = (mfmhd_state *)downcast<legacy_device_base *>(harddisk)->token();
 	drive = harddisk->subdevice("drive");
-	hard_disk_file *file = mess_hd_get_hard_disk_file(drive);
+	hard_disk_file *file = hd_get_hard_disk_file(drive);
 
 	if (file!=NULL)
 		status |= MFMHD_READY;
@@ -434,7 +434,7 @@ void ti99_mfm_harddisk_seek(device_t *harddisk, int direction)
 	device_t *drive = harddisk->subdevice("drive");
 	mfmhd_state *hd = (mfmhd_state *)downcast<legacy_device_base *>(harddisk)->token();
 	const hard_disk_info *info;
-	hard_disk_file *file = mess_hd_get_hard_disk_file(drive);
+	hard_disk_file *file = hd_get_hard_disk_file(drive);
 
 	if (file==NULL)	return;
 
@@ -464,7 +464,7 @@ void ti99_mfm_harddisk_get_next_id(device_t *harddisk, int head, chrn_id_hd *id)
 	hard_disk_file *file;
 	int interleave = 3;
 
-	file = mess_hd_get_hard_disk_file(drive);
+	file = hd_get_hard_disk_file(drive);
 	if (file==NULL)
 	{
 		hd->status &= ~MFMHD_READY;

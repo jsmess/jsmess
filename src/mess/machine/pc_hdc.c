@@ -250,7 +250,7 @@ static hard_disk_file *pc_hdc_file(running_machine *machine, int id)
 	if (!img->exists())
 		return NULL;
 
-	return mess_hd_get_hard_disk_file(&img->device());
+	return hd_get_hard_disk_file(&img->device());
 }
 
 static void pc_hdc_result(running_machine *machine,int n, int set_error_info)

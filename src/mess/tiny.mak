@@ -52,15 +52,6 @@ DRVLIBS = \
 	$(EMU_VIDEO)/tms9928a.o \
 
 
-
-#-------------------------------------------------
-# layout dependencies
-#-------------------------------------------------
-
-$(MESSOBJ)/mess.o:	$(MESS_LAYOUT)/lcd.lh
-$(MESSOBJ)/mess.o:	$(MESS_LAYOUT)/lcd_rot.lh
-
-
 #-------------------------------------------------
 # MESS special OSD rules
 #-------------------------------------------------

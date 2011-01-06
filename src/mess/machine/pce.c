@@ -1251,7 +1251,7 @@ static void pce_cd_init( running_machine *machine )
 	device = machine->device("cdrom");
 	if ( device )
 	{
-		pce_cd.cd = mess_cd_get_cdrom_file(device);
+		pce_cd.cd = cd_get_cdrom_file(device);
 		if ( pce_cd.cd )
 		{
 			pce_cd.toc = cdrom_get_toc( pce_cd.cd );

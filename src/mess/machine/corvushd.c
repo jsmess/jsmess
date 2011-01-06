@@ -1190,7 +1190,7 @@ static hard_disk_file *corvus_hdc_file(running_machine *machine, int id) {
 	if (!img->exists())
 		return NULL;
 
-	return mess_hd_get_hard_disk_file(&img->device());
+	return hd_get_hard_disk_file(&img->device());
 }
 
 
