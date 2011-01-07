@@ -20,6 +20,12 @@
 */
 
 /***************************************************************************
+    CONSTANTS / MACROS
+***************************************************************************/
+
+#define LOG 0
+
+/***************************************************************************
     IMPLEMENTATION
 ***************************************************************************/
 
@@ -58,6 +64,8 @@ static FLOPPY_CONSTRUCT( atarist_st_construct )
 	geometry.sector_length = 512;
 	geometry.tracks = tracks;
 	geometry.sectors = sectors;
+
+	if (LOG) logerror("ST Heads %u Tracks %u Sectors %u\n", heads, tracks, sectors);
 
 	return basicdsk_construct(floppy, &geometry);
 }

@@ -137,6 +137,8 @@ System Driver Changes:
   selecting the Segascope views from the Video Options menu). The option 
   is turned off by default, being inaccurate [Enik Land, Fabio Priuli]
 
+- [ST] Fixed floppy reading. At least "Buggy Boy" and "First Age" demo load.
+
 - [SUPER80] Added a bios found in a scrapped machine. [Robbbert]
 
 - [SUPER80] Added printer support for the 'super80e' [Robbbert]

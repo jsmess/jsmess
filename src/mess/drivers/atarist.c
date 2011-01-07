@@ -37,46 +37,141 @@
 
 */
 
+#define LOG 0
+
 /* Floppy Disk Controller */
 
-static void atarist_fdc_dma_transfer(running_machine *machine)
+static void toggle_dma_fifo(running_machine *machine)
+{
+	atarist_state *state = machine->driver_data<atarist_state>();
+
+	if (LOG) logerror("Toggling DMA FIFO\n");
+
+	state->fdc_fifo_sel = !state->fdc_fifo_sel;
+	state->fdc_fifo_index = 0;
+}
+
+static void flush_dma_fifo(running_machine *machine)
 {
 	address_space *program = cputag_get_address_space(machine, M68000_TAG, ADDRESS_SPACE_PROGRAM);
 	atarist_state *state = machine->driver_data<atarist_state>();
 
-	if ((state->fdc_mode & ATARIST_FLOPPY_MODE_DMA_DISABLE) == 0)
+	if (state->fdc_fifo_empty[state->fdc_fifo_sel]) return;
+
+	for (int i = 0; i < 8; i++)
 	{
-		while (state->fdc_sectors > 0)
+		UINT16 data = state->fdc_fifo[state->fdc_fifo_sel][i];
+		
+		if (LOG) logerror("Flushing DMA FIFO %u data %04x to address %06x\n", state->fdc_fifo_sel, data, state->fdc_dmabase);
+
+		program->write_word(state->fdc_dmabase, data);
+		state->fdc_dmabase += 2;
+	}
+
+	state->fdc_fifo_empty[state->fdc_fifo_sel] = 1;
+}
+
+static void fill_dma_fifo(running_machine *machine)
+{
+	address_space *program = cputag_get_address_space(machine, M68000_TAG, ADDRESS_SPACE_PROGRAM);
+	atarist_state *state = machine->driver_data<atarist_state>();
+
+	for (int i = 0; i < 8; i++)
+	{
+		UINT16 data = program->read_word(state->fdc_dmabase);
+
+		if (LOG) logerror("Filling DMA FIFO %u with data %04x from memory address %06x\n", state->fdc_fifo_sel, data, state->fdc_dmabase);
+
+		state->fdc_fifo[state->fdc_fifo_sel][i] = data;
+		state->fdc_dmabase += 2;
+	}
+
+	state->fdc_fifo_empty[state->fdc_fifo_sel] = 0;
+}
+
+static void atarist_fdc_dma_transfer(running_machine *machine)
+{
+	atarist_state *state = machine->driver_data<atarist_state>();
+
+	if (!state->fdc_dmabytes) return;
+
+	if (state->fdc_mode & DMA_MODE_READ_WRITE)
+	{
+		UINT16 data = state->fdc_fifo[state->fdc_fifo_sel][state->fdc_fifo_index];
+
+		if (state->fdc_fifo_msb)
 		{
-			if (state->fdc_mode & ATARIST_FLOPPY_MODE_WRITE)
+			// write LSB to disk
+			wd17xx_data_w(state->wd1772, 0, data & 0xff);
+			
+			if (LOG) logerror("DMA Write to FDC %02x\n", data & 0xff);
+
+			state->fdc_fifo_index++;
+		}
+		else
+		{
+			// write MSB to disk
+			wd17xx_data_w(state->wd1772, 0, data >> 8);
+
+			if (LOG) logerror("DMA Write to FDC %02x\n", data >> 8);
+		}
+
+		// toggle MSB/LSB
+		state->fdc_fifo_msb = !state->fdc_fifo_msb;
+
+		if (state->fdc_fifo_index == 8)
+		{
+			state->fdc_fifo_index--;
+			state->fdc_fifo_empty[state->fdc_fifo_sel] = 1;
+
+			toggle_dma_fifo(machine);
+
+			if (state->fdc_fifo_empty[state->fdc_fifo_sel])
 			{
-				UINT8 data = program->read_byte(state->fdc_dmabase);
-
-				wd17xx_data_w(state->wd1772, 0, data);
+				fill_dma_fifo(machine);
 			}
-			else
-			{
-				UINT8 data = wd17xx_data_r(state->wd1772, 0);
+		}
+	}
+	else
+	{
+		// read from controller to FIFO
+		UINT8 data = wd17xx_data_r(state->wd1772, 0);
 
-				program->write_byte(state->fdc_dmabase, data);
-			}
+		state->fdc_fifo_empty[state->fdc_fifo_sel] = 0;
+			
+		if (LOG) logerror("DMA Read from FDC %02x\n", data);
 
-			state->fdc_dmabase++;
-			state->fdc_dmabytes--;
+		if (state->fdc_fifo_msb)
+		{
+			// write MSB to FIFO
+			state->fdc_fifo[state->fdc_fifo_sel][state->fdc_fifo_index] |= data;
+			state->fdc_fifo_index++;
+		}
+		else
+		{
+			// write LSB to FIFO
+			state->fdc_fifo[state->fdc_fifo_sel][state->fdc_fifo_index] = data << 8;
+		}
 
-			if (state->fdc_dmabytes == 0)
-			{
-				state->fdc_sectors--;
+		// toggle MSB/LSB
+		state->fdc_fifo_msb = !state->fdc_fifo_msb;
 
-				if (state->fdc_sectors == 0)
-				{
-					state->fdc_status &= ~ATARIST_FLOPPY_STATUS_SECTOR_COUNT_ZERO;
-				}
-				else
-				{
-					state->fdc_dmabytes = ATARIST_FLOPPY_BYTES_PER_SECTOR;
-				}
-			}
+		if (state->fdc_fifo_index == 8)
+		{
+			flush_dma_fifo(machine);
+			toggle_dma_fifo(machine);
+		}
+	}
+
+	state->fdc_dmabytes--;
+
+	if (state->fdc_dmabytes == 0)
+	{
+		state->fdc_sectors--;
+
+		if (state->fdc_sectors)
+		{
+			state->fdc_dmabytes = DMA_SECTOR_SIZE;
 		}
 	}
 }
@@ -84,22 +179,17 @@ static void atarist_fdc_dma_transfer(running_machine *machine)
 static WRITE_LINE_DEVICE_HANDLER( atarist_fdc_intrq_w )
 {
 	atarist_state *driver_state = device->machine->driver_data<atarist_state>();
-
-	driver_state->fdc_irq = state;
+	
+	driver_state->fdc_irq = !state;
 }
 
 static WRITE_LINE_DEVICE_HANDLER( atarist_fdc_drq_w )
 {
 	atarist_state *driver_state = device->machine->driver_data<atarist_state>();
 
-	if (state)
+	if (state && (!(driver_state->fdc_mode & DMA_MODE_ENABLED)) && (driver_state->fdc_mode & DMA_MODE_FDC_HDC_ACK))
 	{
-		driver_state->fdc_status |= ATARIST_FLOPPY_STATUS_FDC_DATA_REQUEST;
 		atarist_fdc_dma_transfer(device->machine);
-	}
-	else
-	{
-		driver_state->fdc_status &= ~ATARIST_FLOPPY_STATUS_FDC_DATA_REQUEST;
 	}
 }
 
@@ -123,53 +213,66 @@ static READ16_HANDLER( atarist_fdc_data_r )
 {
 	atarist_state *state = space->machine->driver_data<atarist_state>();
 
-	if (state->fdc_mode & ATARIST_FLOPPY_MODE_SECTOR_COUNT)
+	UINT8 data = 0;
+
+	if (state->fdc_mode & DMA_MODE_SECTOR_COUNT)
 	{
-		return state->fdc_sectors;
+		if (LOG) logerror("Indeterminate DMA Sector Count Read!\n");
+
+		// sector count register is write only, reading it returns unpredictable values
+		data = space->machine->rand() & 0xff;
 	}
 	else
 	{
-		if (state->fdc_mode & ATARIST_FLOPPY_MODE_HDC)
+		if (!(state->fdc_mode & DMA_MODE_FDC_HDC_CS))
 		{
-			// HDC not implemented
-			state->fdc_status &= ~ATARIST_FLOPPY_STATUS_DMA_ERROR;
+			// floppy controller
+			int offset = (state->fdc_mode & DMA_MODE_ADDRESS_MASK) >> 1;
 
-			return 0;
-		}
-		else
-		{
-			return wd17xx_r(state->wd1772, (state->fdc_mode & ATARIST_FLOPPY_MODE_ADDRESS_MASK) >> 1);
+			data = wd17xx_r(state->wd1772, offset);
+
+			if (LOG) logerror("FDC Register %u Read %02x\n", offset, data);
 		}
 	}
+
+	return data;
 }
 
 static WRITE16_HANDLER( atarist_fdc_data_w )
 {
 	atarist_state *state = space->machine->driver_data<atarist_state>();
 
-	if (state->fdc_mode & ATARIST_FLOPPY_MODE_SECTOR_COUNT)
+	if (state->fdc_mode & DMA_MODE_SECTOR_COUNT)
 	{
-		if (data == 0)
+		if (LOG) logerror("DMA Sector Count %u\n", data);
+
+		// sector count register
+		state->fdc_sectors = data;
+	
+		if (state->fdc_sectors)
 		{
-			state->fdc_status &= ~ATARIST_FLOPPY_STATUS_SECTOR_COUNT_ZERO;
-		}
-		else
-		{
-			state->fdc_status |= ATARIST_FLOPPY_STATUS_SECTOR_COUNT_ZERO;
+			state->fdc_dmabytes = DMA_SECTOR_SIZE;
 		}
 
-		state->fdc_sectors = data;
+		if (state->fdc_mode & DMA_MODE_READ_WRITE)
+		{
+			// fill both FIFOs with data
+			fill_dma_fifo(space->machine);
+			toggle_dma_fifo(space->machine);
+			fill_dma_fifo(space->machine);
+			toggle_dma_fifo(space->machine);
+		}
 	}
 	else
 	{
-		if (state->fdc_mode & ATARIST_FLOPPY_MODE_HDC)
+		if (!(state->fdc_mode & DMA_MODE_FDC_HDC_CS))
 		{
-			// HDC not implemented
-			state->fdc_status &= ~ATARIST_FLOPPY_STATUS_DMA_ERROR;
-		}
-		else
-		{
-			wd17xx_w(state->wd1772, (state->fdc_mode & ATARIST_FLOPPY_MODE_ADDRESS_MASK) >> 1, data);
+			// floppy controller
+			int offset = (state->fdc_mode & DMA_MODE_ADDRESS_MASK) >> 1;
+
+			if (LOG) logerror("FDC Register %u Write %02x\n", offset, data);
+
+			wd17xx_w(state->wd1772, offset, data);
 		}
 	}
 }
@@ -178,57 +281,83 @@ static READ16_HANDLER( atarist_fdc_dma_status_r )
 {
 	atarist_state *state = space->machine->driver_data<atarist_state>();
 
-	return state->fdc_status;
+	UINT16 data = 0;
+
+	// DMA error
+	data |= 1;
+
+	// sector count null
+	data |= !(state->fdc_sectors == 0) << 1;
+
+	// DRQ state
+	data |= wd17xx_drq_r(state->wd1772) << 2;
+
+	return data;
 }
 
 static WRITE16_HANDLER( atarist_fdc_dma_mode_w )
 {
 	atarist_state *state = space->machine->driver_data<atarist_state>();
 
-	if ((data & ATARIST_FLOPPY_MODE_WRITE) != (state->fdc_mode & ATARIST_FLOPPY_MODE_WRITE))
+	if (LOG) logerror("DMA Mode %04x\n", data);
+
+	if ((data & DMA_MODE_READ_WRITE) != (state->fdc_mode & DMA_MODE_READ_WRITE))
 	{
+		if (LOG) logerror("DMA reset\n");
+
+		flush_dma_fifo(space->machine);
+
 		state->fdc_status = 0;
 		state->fdc_sectors = 0;
+		state->fdc_fifo_sel = 0;
+		state->fdc_fifo_msb = 0;
 	}
 
 	state->fdc_mode = data;
 }
 
-static READ16_HANDLER( atarist_fdc_dma_base_r )
+static READ8_HANDLER( atarist_fdc_dma_base_r )
 {
 	atarist_state *state = space->machine->driver_data<atarist_state>();
+
+	UINT8 data = 0;
 
 	switch (offset)
 	{
 	case 0:
-		return (state->fdc_dmabase >> 16) & 0xff;
+		data = (state->fdc_dmabase >> 16) & 0xff;
+
 	case 1:
-		return (state->fdc_dmabase >> 8) & 0xff;
+		data = (state->fdc_dmabase >> 8) & 0xff;
+
 	case 2:
-		return state->fdc_dmabase & 0xff;
+		data = state->fdc_dmabase & 0xff;
 	}
 
-	return 0;
+	return data;
 }
 
-static WRITE16_HANDLER( atarist_fdc_dma_base_w )
+static WRITE8_HANDLER( atarist_fdc_dma_base_w )
 {
 	atarist_state *state = space->machine->driver_data<atarist_state>();
 
 	switch (offset)
 	{
 	case 0:
-		state->fdc_dmabase = (state->fdc_dmabase & 0x00ffff) | ((data & 0xff) << 16);
+		state->fdc_dmabase = (state->fdc_dmabase & 0x00ffff) | (data << 16);
+		if (LOG) logerror("DMA Address High %02x (%06x)\n", data & 0xff, state->fdc_dmabase);
 		break;
+
 	case 1:
-		state->fdc_dmabase = (state->fdc_dmabase & 0x0000ff) | ((data & 0xff) << 8);
+		state->fdc_dmabase = (state->fdc_dmabase & 0x0000ff) | (data << 8);
+		if (LOG) logerror("DMA Address Mid %02x (%06x)\n", data & 0xff, state->fdc_dmabase);
 		break;
+
 	case 2:
 		state->fdc_dmabase = data & 0xff;
+		if (LOG) logerror("DMA Address Low %02x (%06x)\n", data & 0xff, state->fdc_dmabase);
 		break;
 	}
-
-	state->fdc_dmabytes = ATARIST_FLOPPY_BYTES_PER_SECTOR;
 }
 
 /* MMU */
@@ -501,15 +630,15 @@ static TIMER_CALLBACK( atariste_dmasound_tick )
 
 	if (state->dmasnd_ctrl & 0x80)
 	{
-//      logerror("DMA sound left  %i\n", state->dmasnd_fifo[7 - state->dmasnd_samples]);
+//      if (LOG) logerror("DMA sound left  %i\n", state->dmasnd_fifo[7 - state->dmasnd_samples]);
 		state->dmasnd_samples--;
 
-//      logerror("DMA sound right %i\n", state->dmasnd_fifo[7 - state->dmasnd_samples]);
+//      if (LOG) logerror("DMA sound right %i\n", state->dmasnd_fifo[7 - state->dmasnd_samples]);
 		state->dmasnd_samples--;
 	}
 	else
 	{
-//      logerror("DMA sound mono %i\n", state->dmasnd_fifo[7 - state->dmasnd_samples]);
+//      if (LOG) logerror("DMA sound mono %i\n", state->dmasnd_fifo[7 - state->dmasnd_samples]);
 		state->dmasnd_samples--;
 	}
 
@@ -826,7 +955,7 @@ static ADDRESS_MAP_START( ikbd_io_map, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( st_map, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x000007) AM_ROM AM_REGION(M68000_TAG, 0)
+	AM_RANGE(0x000000, 0x000007) AM_RAM
 	AM_RANGE(0x000008, 0x1fffff) AM_RAM
 	AM_RANGE(0x200000, 0x3fffff) AM_RAM
 //	AM_RANGE(0xfa0000, 0xfbffff) AM_ROM // cartridge
@@ -839,7 +968,7 @@ static ADDRESS_MAP_START( st_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xff8260, 0xff8261) AM_READWRITE8(atarist_shifter_mode_r, atarist_shifter_mode_w, 0xff00)
 	AM_RANGE(0xff8604, 0xff8605) AM_READWRITE(atarist_fdc_data_r, atarist_fdc_data_w)
 	AM_RANGE(0xff8606, 0xff8607) AM_READWRITE(atarist_fdc_dma_status_r, atarist_fdc_dma_mode_w)
-	AM_RANGE(0xff8608, 0xff860d) AM_READWRITE(atarist_fdc_dma_base_r, atarist_fdc_dma_base_w)
+	AM_RANGE(0xff8608, 0xff860d) AM_READWRITE8(atarist_fdc_dma_base_r, atarist_fdc_dma_base_w, 0x00ff)
 	AM_RANGE(0xff8800, 0xff8801) AM_DEVREADWRITE8(YM2149_TAG, ay8910_r, ay8910_data_w, 0xff00)
 	AM_RANGE(0xff8802, 0xff8803) AM_DEVWRITE8(YM2149_TAG, ay8910_data_w, 0xff00)
 	AM_RANGE(0xfffa00, 0xfffa2f) AM_DEVREADWRITE8(MC68901_TAG, mc68901_register_r, mc68901_register_w, 0xff)
@@ -864,7 +993,7 @@ static ADDRESS_MAP_START( megast_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xff8260, 0xff8261) AM_READWRITE8(atarist_shifter_mode_r, atarist_shifter_mode_w, 0xff00)
 	AM_RANGE(0xff8604, 0xff8605) AM_READWRITE(atarist_fdc_data_r, atarist_fdc_data_w)
 	AM_RANGE(0xff8606, 0xff8607) AM_READWRITE(atarist_fdc_dma_status_r, atarist_fdc_dma_mode_w)
-	AM_RANGE(0xff8608, 0xff860d) AM_READWRITE(atarist_fdc_dma_base_r, atarist_fdc_dma_base_w)
+	AM_RANGE(0xff8608, 0xff860d) AM_READWRITE8(atarist_fdc_dma_base_r, atarist_fdc_dma_base_w, 0x00ff)
 	AM_RANGE(0xff8800, 0xff8801) AM_DEVREADWRITE8(YM2149_TAG, ay8910_r, ay8910_data_w, 0xff00)
 	AM_RANGE(0xff8802, 0xff8803) AM_DEVWRITE8(YM2149_TAG, ay8910_data_w, 0xff00)
 	AM_RANGE(0xff8a00, 0xff8a1f) AM_READWRITE(atarist_blitter_halftone_r, atarist_blitter_halftone_w)
@@ -906,7 +1035,7 @@ static ADDRESS_MAP_START( ste_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xff8264, 0xff8265) AM_READWRITE(atariste_shifter_pixelofs_r, atariste_shifter_pixelofs_w)
 	AM_RANGE(0xff8604, 0xff8605) AM_READWRITE(atarist_fdc_data_r, atarist_fdc_data_w)
 	AM_RANGE(0xff8606, 0xff8607) AM_READWRITE(atarist_fdc_dma_status_r, atarist_fdc_dma_mode_w)
-	AM_RANGE(0xff8608, 0xff860d) AM_READWRITE(atarist_fdc_dma_base_r, atarist_fdc_dma_base_w)
+	AM_RANGE(0xff8608, 0xff860d) AM_READWRITE8(atarist_fdc_dma_base_r, atarist_fdc_dma_base_w, 0x00ff)
 	AM_RANGE(0xff8800, 0xff8801) AM_DEVREADWRITE8(YM2149_TAG, ay8910_r, ay8910_data_w, 0xff00)
 	AM_RANGE(0xff8802, 0xff8803) AM_DEVWRITE8(YM2149_TAG, ay8910_data_w, 0xff00)
 	AM_RANGE(0xff8900, 0xff8901) AM_READWRITE(atariste_sound_dma_control_r, atariste_sound_dma_control_w)
@@ -961,7 +1090,7 @@ static ADDRESS_MAP_START( megaste_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xff8264, 0xff8265) AM_READWRITE(atariste_shifter_pixelofs_r, atariste_shifter_pixelofs_w)
 	AM_RANGE(0xff8604, 0xff8605) AM_READWRITE(atarist_fdc_data_r, atarist_fdc_data_w)
 	AM_RANGE(0xff8606, 0xff8607) AM_READWRITE(atarist_fdc_dma_status_r, atarist_fdc_dma_mode_w)
-	AM_RANGE(0xff8608, 0xff860d) AM_READWRITE(atarist_fdc_dma_base_r, atarist_fdc_dma_base_w)
+	AM_RANGE(0xff8608, 0xff860d) AM_READWRITE8(atarist_fdc_dma_base_r, atarist_fdc_dma_base_w, 0x00ff)
 	AM_RANGE(0xff8800, 0xff8801) AM_DEVREADWRITE8(YM2149_TAG, ay8910_r, ay8910_data_w, 0xff00)
 	AM_RANGE(0xff8802, 0xff8803) AM_DEVWRITE8(YM2149_TAG, ay8910_data_w, 0xff00)
 	AM_RANGE(0xff8900, 0xff8901) AM_READWRITE(atariste_sound_dma_control_r, atariste_sound_dma_control_w)
@@ -1016,7 +1145,7 @@ static ADDRESS_MAP_START( stbook_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xff827e, 0xff827f) AM_WRITE(stbook_lcd_control_w)
 	AM_RANGE(0xff8604, 0xff8605) AM_READWRITE(atarist_fdc_data_r, atarist_fdc_data_w)
 	AM_RANGE(0xff8606, 0xff8607) AM_READWRITE(atarist_fdc_dma_status_r, atarist_fdc_dma_mode_w)
-	AM_RANGE(0xff8608, 0xff860d) AM_READWRITE(atarist_fdc_dma_base_r, atarist_fdc_dma_base_w)
+	AM_RANGE(0xff8608, 0xff860d) AM_READWRITE8(atarist_fdc_dma_base_r, atarist_fdc_dma_base_w, 0x00ff)
 	AM_RANGE(0xff8800, 0xff8801) AM_DEVREADWRITE8(YM3439_TAG, ay8910_r, ay8910_data_w, 0xff00)
 	AM_RANGE(0xff8802, 0xff8803) AM_DEVWRITE8(YM3439_TAG, ay8910_data_w, 0xff00)
 	AM_RANGE(0xff8900, 0xff8901) AM_READWRITE(atariste_sound_dma_control_r, atariste_sound_dma_control_w)
@@ -1497,7 +1626,7 @@ static void atarist_state_save(running_machine *machine)
 {
 	atarist_state *state = machine->driver_data<atarist_state>();
 
-	state->fdc_status |= ATARIST_FLOPPY_STATUS_DMA_ERROR;
+	state->fdc_status |= DMA_STATUS_ERROR;
 
 	state_save_register_global(machine, state->mmu);
 	state_save_register_global(machine, state->fdc_dmabase);
@@ -1537,6 +1666,12 @@ static MACHINE_START( atarist )
 
 	/* register for state saving */
 	atarist_state_save(machine);
+
+	address_space *program = cputag_get_address_space(machine, M68000_TAG, ADDRESS_SPACE_PROGRAM);
+	program->write_word(0, 0x60ae);
+	program->write_word(2, 0x0104);
+	program->write_word(4, 0x00fc);
+	program->write_word(6, 0x0030);
 }
 
 static const struct rp5c15_interface rtc_intf =

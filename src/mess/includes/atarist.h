@@ -28,18 +28,20 @@
 #define Y200	XTAL_2_4576MHz
 #define Y700	XTAL_10MHz
 
-#define ATARIST_FLOPPY_STATUS_FDC_DATA_REQUEST	0x04
-#define ATARIST_FLOPPY_STATUS_SECTOR_COUNT_ZERO	0x02
-#define ATARIST_FLOPPY_STATUS_DMA_ERROR			0x01
+#define DMA_STATUS_DRQ				0x04
+#define DMA_STATUS_SECTOR_COUNT		0x02
+#define DMA_STATUS_ERROR			0x01
 
-#define ATARIST_FLOPPY_MODE_WRITE				0x0100
-#define ATARIST_FLOPPY_MODE_FDC_ACCESS			0x0080
-#define ATARIST_FLOPPY_MODE_DMA_DISABLE			0x0040
-#define ATARIST_FLOPPY_MODE_SECTOR_COUNT		0x0010
-#define ATARIST_FLOPPY_MODE_HDC					0x0008
-#define ATARIST_FLOPPY_MODE_ADDRESS_MASK		0x0006
+#define DMA_MODE_READ_WRITE			0x100
+#define DMA_MODE_FDC_HDC_ACK		0x080
+#define DMA_MODE_ENABLED			0x040
+#define DMA_MODE_SECTOR_COUNT		0x010
+#define DMA_MODE_FDC_HDC_CS			0x008
+#define DMA_MODE_A1					0x004
+#define DMA_MODE_A0					0x002
+#define DMA_MODE_ADDRESS_MASK		0x006
 
-#define ATARIST_FLOPPY_BYTES_PER_SECTOR			512
+#define DMA_SECTOR_SIZE				512
 
 enum
 {
@@ -76,6 +78,11 @@ public:
 	UINT16 fdc_status;
 	UINT16 fdc_mode;
 	UINT8 fdc_sectors;
+	UINT16 fdc_fifo[2][8];
+	int fdc_fifo_sel;
+	int fdc_fifo_index;
+	int fdc_fifo_msb;
+	int fdc_fifo_empty[2];
 	int fdc_dmabytes;
 	int fdc_irq;
 
