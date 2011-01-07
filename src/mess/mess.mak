@@ -742,6 +742,7 @@ $(MESSOBJ)/canon.a:				\
 $(MESSOBJ)/cantab.a:			\
 	$(MESS_DRIVERS)/ace.o		\
 	$(MESS_MACHINE)/ace.o		\
+	$(MESS_FORMATS)/ace_ace.o	\
 	$(MESS_FORMATS)/ace_tap.o	\
 
 $(MESSOBJ)/capcom.a:			\

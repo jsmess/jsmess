@@ -63,8 +63,9 @@ System Driver Changes:
 - [ABC1600] Added ROM dumps. [Ola Andersson]
 
 - [ACE] Renamed jupiter to ace to avoid naming conflict with Wave Mate.
-  Added support for BoldField Joystick interface AC5 and EME Soundbox AC4.
-  Cleaned up and modernized driver. [Curt Coder]
+  Cleaned up and modernized driver. Implemented the following expansions:
+  BoldField Joystick interface AC5, EME Soundbox AC4, EME Printer Board,
+  Big Mouth speech board. [Curt Coder]
 
 - [AMU880] Fixed keyboard. [Curt Coder]
 

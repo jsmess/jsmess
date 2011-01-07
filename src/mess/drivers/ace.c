@@ -33,8 +33,8 @@ Ports:
 
 	TODO:
 
-	- printer
-	- Big Mouth speech unit (SP0256-AL1)
+	- Ace Colour Board
+	- 96K ram expansion
 	- Deep Thought disc interface (6850, 6821)
 
 */
@@ -43,12 +43,18 @@ Ports:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "formats/ace_ace.h"
+#include "formats/ace_tap.h"
 #include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"
+#include "machine/ctronics.h"
+#include "machine/i8255a.h"
+#include "machine/ram.h"
+#include "machine/z80pio.h"
 #include "sound/ay8910.h"
+#include "sound/sp0256.h"
 #include "sound/speaker.h"
 #include "sound/wave.h"
-#include "formats/ace_tap.h"
 #include "includes/ace.h"
 
 
@@ -101,6 +107,106 @@ WRITE8_MEMBER( ace_state::io_w )
 }
 
 
+//-------------------------------------------------
+//   ppi_r - 
+//-------------------------------------------------
+
+static READ8_DEVICE_HANDLER( ppi_pa_r )
+{
+	return i8255a_r(device, 0);
+}
+
+static READ8_DEVICE_HANDLER( ppi_pb_r )
+{
+	return i8255a_r(device, 1);
+}
+
+static READ8_DEVICE_HANDLER( ppi_pc_r )
+{
+	return i8255a_r(device, 2);
+}
+
+static READ8_DEVICE_HANDLER( ppi_control_r )
+{
+	return i8255a_r(device, 3);
+}
+
+
+//-------------------------------------------------
+//   ppi_w - 
+//-------------------------------------------------
+
+static WRITE8_DEVICE_HANDLER( ppi_pa_w )
+{
+	i8255a_w(device, 0, data);
+}
+
+static WRITE8_DEVICE_HANDLER( ppi_pb_w )
+{
+	i8255a_w(device, 1, data);
+}
+
+static WRITE8_DEVICE_HANDLER( ppi_pc_w )
+{
+	i8255a_w(device, 2, data);
+}
+
+static WRITE8_DEVICE_HANDLER( ppi_control_w )
+{
+	i8255a_w(device, 3, data);
+}
+
+
+//-------------------------------------------------
+//   pio_r - 
+//-------------------------------------------------
+
+static READ8_DEVICE_HANDLER( pio_ad_r )
+{
+	return z80pio_d_r(device, 0);
+}
+
+static READ8_DEVICE_HANDLER( pio_bd_r )
+{
+	return z80pio_d_r(device, 1);
+}
+
+static READ8_DEVICE_HANDLER( pio_ac_r )
+{
+	return z80pio_c_r(device, 0);
+}
+
+static READ8_DEVICE_HANDLER( pio_bc_r )
+{
+	return z80pio_c_r(device, 1);
+}
+
+
+//-------------------------------------------------
+//   pio_w - 
+//-------------------------------------------------
+
+static WRITE8_DEVICE_HANDLER( pio_ad_w )
+{
+	z80pio_d_w(device, 0, data);
+}
+
+static WRITE8_DEVICE_HANDLER( pio_bd_w )
+{
+	z80pio_d_w(device, 1, data);
+}
+
+static WRITE8_DEVICE_HANDLER( pio_ac_w )
+{
+	z80pio_c_w(device, 0, data);
+}
+
+static WRITE8_DEVICE_HANDLER( pio_bc_w )
+{
+	z80pio_c_w(device, 1, data);
+}
+
+
 
 //**************************************************************************
 //	ADDRESS MAPS
@@ -112,9 +218,9 @@ WRITE8_MEMBER( ace_state::io_w )
 
 static ADDRESS_MAP_START( ace_mem, ADDRESS_SPACE_PROGRAM, 8, ace_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2400, 0x27ff) AM_MIRROR(0x0400) AM_RAM AM_BASE(m_video_ram)
-	AM_RANGE(0x2c00, 0x2fff) AM_MIRROR(0x0400) AM_RAM AM_BASE(m_char_ram) AM_REGION(Z80_TAG, 0xfc00)
-	AM_RANGE(0x3c00, 0x3fff) AM_MIRROR(0x0c00) AM_RAM
+	AM_RANGE(0x2000, 0x23ff) AM_MIRROR(0x0400) AM_RAM AM_BASE(m_video_ram)
+	AM_RANGE(0x2800, 0x2bff) AM_MIRROR(0x0400) AM_RAM AM_BASE(m_char_ram) AM_REGION(Z80_TAG, 0xfc00)
+	AM_RANGE(0x3000, 0x33ff) AM_MIRROR(0x0c00) AM_RAM
 	AM_RANGE(0x4000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -126,6 +232,14 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( ace_io, ADDRESS_SPACE_IO, 8, ace_state )
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0xfffe) AM_MASK(0xff00) AM_READWRITE(io_r, io_w)
 	AM_RANGE(0x01, 0x01) AM_MIRROR(0xff00) AM_READ_PORT("JOY")
+	AM_RANGE(0x41, 0x41) AM_MIRROR(0xff80) AM_DEVREADWRITE_LEGACY(I8255_TAG, ppi_pa_r, ppi_pa_w)
+	AM_RANGE(0x43, 0x43) AM_MIRROR(0xff80) AM_DEVREADWRITE_LEGACY(I8255_TAG, ppi_pb_r, ppi_pb_w)
+	AM_RANGE(0x45, 0x45) AM_MIRROR(0xff80) AM_DEVREADWRITE_LEGACY(I8255_TAG, ppi_pc_r, ppi_pc_w)
+	AM_RANGE(0x47, 0x47) AM_MIRROR(0xff80) AM_DEVREADWRITE_LEGACY(I8255_TAG, ppi_control_r, ppi_control_w)
+	AM_RANGE(0x81, 0x81) AM_MIRROR(0xff38) AM_DEVREADWRITE_LEGACY(Z80PIO_TAG, pio_ad_r, pio_ad_w)
+	AM_RANGE(0x83, 0x83) AM_MIRROR(0xff38) AM_DEVREADWRITE_LEGACY(Z80PIO_TAG, pio_bd_r, pio_bd_w)
+	AM_RANGE(0x85, 0x85) AM_MIRROR(0xff38) AM_DEVREADWRITE_LEGACY(Z80PIO_TAG, pio_ac_r, pio_ac_w)
+	AM_RANGE(0x87, 0x87) AM_MIRROR(0xff38) AM_DEVREADWRITE_LEGACY(Z80PIO_TAG, pio_bc_r, pio_bc_w)
 	AM_RANGE(0xfd, 0xfd) AM_MIRROR(0xff00) AM_DEVWRITE_LEGACY(AY8910_TAG, ay8910_address_w)
 	AM_RANGE(0xff, 0xff) AM_MIRROR(0xff00) AM_DEVREADWRITE_LEGACY(AY8910_TAG, ay8910_r, ay8910_data_w)
 ADDRESS_MAP_END
@@ -137,10 +251,10 @@ ADDRESS_MAP_END
 //**************************************************************************
 
 //-------------------------------------------------
-//  INPUT_PORTS( bullet )
+//  INPUT_PORTS( ace )
 //-------------------------------------------------
 
-static INPUT_PORTS_START (ace)
+static INPUT_PORTS_START( ace )
 	PORT_START("A8")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_RSHIFT)		PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Symbol Shift") PORT_CODE(KEYCODE_LSHIFT) PORT_CHAR(UCHAR_SHIFT_2)
@@ -228,13 +342,13 @@ INPUT_PORTS_END
 
 static const gfx_layout ace_charlayout =
 {
-	8, 8,	/* 8x8 characters */
-	128,	/* 128 characters */
-	1,		/* 1 bits per pixel */
-	{0},	/* no bitplanes; 1 bit per pixel */
-	{0, 1, 2, 3, 4, 5, 6, 7},
-	{0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8},
-	8*8 	/* each character takes 8 consecutive bytes */
+	8,8,
+	128,
+	1,
+	{ RGN_FRAC(0,1) },
+	{ STEP8(0,1) },
+	{ STEP8(0,8) },
+	8*8
 };
 
 
@@ -274,13 +388,13 @@ static TIMER_DEVICE_CALLBACK( clear_irq )
 bool ace_state::video_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	UINT8 y,ra,chr,gfx;
-	UINT16 sy=0,ma=0,x;
+	UINT16 sy=56,ma=0,x;
 
 	for (y = 0; y < 24; y++)
 	{
 		for (ra = 0; ra < 8; ra++)
 		{
-			UINT16 *p = BITMAP_ADDR16(&bitmap, sy++, 0);
+			UINT16 *p = BITMAP_ADDR16(&bitmap, sy++, 40);
 
 			for (x = ma; x < ma+32; x++)
 			{
@@ -335,7 +449,133 @@ static const ay8910_interface psg_intf =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
+	DEVCB_NULL
+};
+
+
+//-------------------------------------------------
+//  sp0256_interface sp0256_intf
+//-------------------------------------------------
+
+static const sp0256_interface sp0256_intf =
+{
 	DEVCB_NULL,
+	DEVCB_NULL
+};
+
+
+//-------------------------------------------------
+//  I8255A_INTERFACE( ppi_intf )
+//-------------------------------------------------
+
+static READ8_DEVICE_HANDLER( sby_r )
+{
+	/*
+
+		bit		description
+
+		PC0		SP0256 SBY
+		PC1		
+		PC2		
+		PC3		
+		PC4		
+		PC5		
+		PC6		
+		PC7		
+
+	*/
+
+	return sp0256_sby_r(device);
+}
+
+static WRITE8_DEVICE_HANDLER( ald_w )
+{
+	/*
+
+		bit		description
+
+		PA0		SP0256 A1
+		PA1		SP0256 A2
+		PA2		SP0256 A3
+		PA3		SP0256 A4
+		PA4		SP0256 A5
+		PA5		SP0256 A6
+		PA6		SP0256 _ALD
+		PA7		
+
+	*/
+
+	if (!BIT(data, 6))
+	{
+		sp0256_ALD_w(device, 0, data & 0x3f);
+	}
+}
+
+static I8255A_INTERFACE( ppi_intf )
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_DEVICE_HANDLER(SP0256AL2_TAG, sby_r),
+	DEVCB_DEVICE_HANDLER(SP0256AL2_TAG, ald_w),
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
+
+//-------------------------------------------------
+//  Z80PIO_INTERFACE( pio_intf )
+//-------------------------------------------------
+
+READ8_MEMBER( ace_state::pio_pa_r )
+{
+	/*
+
+        bit     description
+
+        PA0		
+        PA1		RxD
+        PA2		
+        PA3		
+        PA4		
+        PA5		
+        PA6		
+        PA7	
+
+    */
+
+	return 0;
+};
+
+WRITE8_MEMBER( ace_state::pio_pa_w )
+{
+	/*
+
+        bit     description
+
+        PA0		RTS
+        PA1		
+        PA2		CTS
+        PA3		TxD
+        PA4		
+        PA5		
+        PA6		STB
+        PA7	
+
+    */
+
+	// centronics strobe
+	centronics_strobe_w(m_centronics, !BIT(data, 6));
+};
+
+static Z80PIO_INTERFACE( pio_intf )
+{
+	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),
+	DEVCB_DRIVER_MEMBER(ace_state, pio_pa_r),
+	DEVCB_DRIVER_MEMBER(ace_state, pio_pa_w),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_DEVICE_HANDLER(CENTRONICS_TAG, centronics_data_w),
+	DEVCB_NULL
 };
 
 
@@ -362,6 +602,10 @@ void ace_state::machine_start()
 	case 16*1024:
 		memory_unmap_readwrite(program, 0x8000, 0xffff, 0, 0);
 		break;
+
+	case 32*1024:
+		memory_unmap_readwrite(program, 0xc000, 0xffff, 0, 0);
+		break;
 	}
 }
 
@@ -376,24 +620,25 @@ void ace_state::machine_start()
 //-------------------------------------------------
 
 static MACHINE_CONFIG_START( ace, ace_state )
-	/* basic machine hardware */
+	// basic machine hardware
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_6_5MHz/2)
 	MCFG_CPU_PROGRAM_MAP(ace_mem)
 	MCFG_CPU_IO_MAP(ace_io)
 	MCFG_QUANTUM_TIME(HZ(60))
 
-	/* video hardware */
+	// video hardware
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_6_5MHz, 416, 0, 256, 264, 0, 192)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_6_5MHz, 416, 0, 336, 312, 0, 304)
 	MCFG_TIMER_ADD_SCANLINE("set_irq", set_irq, SCREEN_TAG, 31*8, 264)
 	MCFG_TIMER_ADD_SCANLINE("clear_irq", clear_irq, SCREEN_TAG, 32*8, 264)
 
-	MCFG_GFXDECODE( ace )
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
 
-	/* sound hardware */
+	MCFG_GFXDECODE(ace)
+
+	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_WAVE_ADD("wave", CASSETTE_TAG)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
@@ -404,14 +649,21 @@ static MACHINE_CONFIG_START( ace, ace_state )
 	MCFG_SOUND_CONFIG(psg_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	/* Devices */
+	MCFG_SOUND_ADD(SP0256AL2_TAG, SP0256, XTAL_3MHz)
+	MCFG_SOUND_CONFIG(sp0256_intf)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+
+	// devices
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, ace_cassette_config)
 	MCFG_SNAPSHOT_ADD("snapshot", ace, "ace", 1)
+	MCFG_I8255A_ADD(I8255_TAG, ppi_intf)
+	MCFG_Z80PIO_ADD(Z80PIO_TAG, XTAL_6_5MHz/2, pio_intf)
+	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
 
-	/* internal ram */
+	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("1K")
-	MCFG_RAM_EXTRA_OPTIONS("16K,48K")
+	MCFG_RAM_EXTRA_OPTIONS("16K,32K,48K")
 MACHINE_CONFIG_END
 
 
@@ -425,12 +677,15 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 
 ROM_START( ace )
-	ROM_REGION( 0x10000, Z80_TAG,0 )
+	ROM_REGION( 0x10000, Z80_TAG, 0 )
 	ROM_LOAD( "rom-a.z1", 0x0000, 0x1000, CRC(dc8438a5) SHA1(8fa97eb71e5dd17c7d190c6587ee3840f839347c) )
 	ROM_LOAD( "rom-b.z2", 0x1000, 0x1000, CRC(4009f636) SHA1(98c5d4bcd74bcf014268cf4c00b2007ea5cc21f3) )
 
 	ROM_REGION( 0x1000, "fdc", 0 ) // Deep Thought disc interface
 	ROM_LOAD( "dos 4.bin", 0x0000, 0x1000, CRC(04c70448) SHA1(53ddcced6ae2feafd687a3b55864726656b71412) )
+
+	ROM_REGION( 0x10000, SP0256AL2_TAG, 0 )
+	ROM_LOAD( "sp0256-al2.ic1", 0x000, 0x800, CRC(df8de0b0) SHA1(86fb6d9fef955ac0bc76e0c45c66585946d278a1) )
 ROM_END
 
 

@@ -1,18 +1,15 @@
-/***************************************************************************
+/*********************************************************************
 
-  machine.c
+    ace_ace.c
 
-  Functions to emulate general aspects of the machine (RAM, ROM, interrupts,
-  I/O ports)
+    Format code for Jupiter Ace snapshot files
 
-***************************************************************************/
+*********************************************************************/
 
 #include "emu.h"
+#include "ace_ace.h"
 #include "cpu/z80/z80.h"
-#include "imagedev/snapquik.h"
-#include "includes/ace.h"
-
-
+#include "machine/ram.h"
 
 /* Load in .ace files. These are memory images of 0x2000 to 0x7fff
    and compressed as follows:
@@ -22,16 +19,15 @@
    <byt>        : <byt>
 */
 
-
 /******************************************************************************
  Snapshot Handling
 ******************************************************************************/
 
-SNAPSHOT_LOAD(ace)
+SNAPSHOT_LOAD( ace )
 {
-	UINT8 *RAM = image.device().machine->region(Z80_TAG)->base();
-	device_t *cpu = image.device().machine->device(Z80_TAG);
-	address_space *space = cputag_get_address_space(image.device().machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
+	cpu_device *cpu = image.device().machine->firstcpu;
+	UINT8 *RAM = image.device().machine->region(cpu->tag())->base();
+	address_space *space = cpu_get_address_space(cpu, ADDRESS_SPACE_PROGRAM);
 	unsigned char ace_repeat, ace_byte, loop;
 	int done=0, ace_index=0x2000;
 
