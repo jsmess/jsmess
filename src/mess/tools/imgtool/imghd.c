@@ -254,7 +254,7 @@ OPTION_GUIDE_END
 #define mess_hd_create_optionspecs "B[1]-2048;C1-[32]-65536;D1-[8]-64;E1-[128]-4096;F128/256/[512]/1024/2048/4096/8192/16384/32768/65536"
 
 
-void mess_hd_get_info(const imgtool_class *imgclass, UINT32 state, union imgtoolinfo *info)
+void hd_get_info(const imgtool_class *imgclass, UINT32 state, union imgtoolinfo *info)
 {
 	switch(state)
 	{
