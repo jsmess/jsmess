@@ -53,7 +53,7 @@ MESS adaptation by R. Belmont
 #include "includes/megadriv.h"
 
 /* cart device, custom mappers & sram init */
-#include "includes/genesis.h"
+#include "../includes/genesis.h"
 
 
 static int megadrive_region_export = 0;

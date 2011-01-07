@@ -1064,7 +1064,7 @@ ROM_START( vii )
 	ROM_LOAD( "vii.bin", 0x0000, 0x2000000, CRC(04627639) SHA1(f883a92d31b53c9a5b0cdb112d07cd793c95fc43))
 ROM_END
 
-ROM_START( batman )
+ROM_START( batmantv )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )      /* dummy region for u'nSP */
 	ROM_LOAD16_WORD_SWAP( "batman.bin", 0x000000, 0x400000, CRC(46f848e5) SHA1(5875d57bb3fe0cac5d20e626e4f82a0e5f9bb94c) )
 ROM_END
@@ -1076,6 +1076,6 @@ ROM_START( vsmile )
 ROM_END
 
 /*    YEAR  NAME     PARENT    COMPAT    MACHINE   INPUT     INIT      COMPANY                                              FULLNAME      FLAGS */
-CONS( 2004, batman,  0,        0,        batman,   batman,   batman,   "JAKKS Pacific Inc / HotGen Ltd",                "The Batman", GAME_NO_SOUND )
+CONS( 2004, batmantv, 0,        0,        batman,   batman,   batman,   "JAKKS Pacific Inc / HotGen Ltd",                "The Batman", GAME_NO_SOUND )
 CONS( 2005, vsmile,  0,        0,        vsmile,   vsmile,   vsmile,   "V-Tech",                                            "V-Smile",    GAME_NO_SOUND | GAME_NOT_WORKING )
 CONS( 2007, vii,     0,        0,        vii,      vii,      vii,      "Jungle Soft / KenSingTon / Chintendo / Siatronics", "Vii",        GAME_NO_SOUND )

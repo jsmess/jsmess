@@ -336,11 +336,9 @@ int AY3600_init(running_machine *machine)
 	keystilldown = 0;
 	keymodreg = A2_KEYMOD_CAPSLOCK;	// caps lock on
 
-#ifdef MESS
 	inputx_setup_natural_keyboard(AY3600_keyboard_queue_chars,
 		AY3600_keyboard_accept_char,
 		NULL);
-#endif
 
 	return 0;
 }

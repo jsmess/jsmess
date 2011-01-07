@@ -49,7 +49,7 @@
 #include "cpu/m68000/m68000.h"
 
 #include "imagedev/cartslot.h"
-#include "includes/genesis.h"
+#include "../includes/genesis.h"
 #include "gen_pcb.h"
 
 

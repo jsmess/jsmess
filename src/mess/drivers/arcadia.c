@@ -694,7 +694,7 @@ ROM_START(telefevr)
 	ROM_REGION(0x100,"gfx1", ROMREGION_ERASEFF)
 ROM_END
 
-ROM_START(tempest3)
+ROM_START(tempestm)
 	ROM_REGION(0x8000,"maincpu", ROMREGION_ERASEFF)
 	ROM_REGION(0x100,"gfx1", ROMREGION_ERASEFF)
 ROM_END
@@ -897,7 +897,7 @@ CONS(1982, tvg2000,   arcadia,   0,        arcadia,      arcadia,  arcadia,     
 CONS(198?, sheenhvc,  ormatu,    0,        arcadia,      arcadia,  arcadia,      "Sheen",              "Sheen Home Video Centre 2001", GAME_IMPERFECT_SOUND )     /* Australia */
 CONS(198?, soundic,   intmpt03,  0,        arcadia,      arcadia,  arcadia,      "Soundic",            "Soundic MPT-03", GAME_IMPERFECT_SOUND )             /* Finland */
 CONS(198?, telefevr,  arcadia,   0,        arcadia,      arcadia,  arcadia,      "Tchibo",             "Tele-Fever", GAME_IMPERFECT_SOUND )                 /* Germany */
-CONS(198?, tempest3,  intmpt03,  0,        arcadia,      arcadia,  arcadia,      "Tempest",            "Tempest MPT-03", GAME_IMPERFECT_SOUND )             /* Australia */
+CONS(198?, tempestm,  intmpt03,  0,        arcadia,      arcadia,  arcadia,      "Tempest",            "Tempest MPT-03", GAME_IMPERFECT_SOUND )             /* Australia */
 CONS(198?, tbbympt3,  intmpt03,  0,        arcadia,      arcadia,  arcadia,      "Tobby",              "Tobby MPT-03", GAME_IMPERFECT_SOUND )               /* ? */
 CONS(198?, trakcvg,   plldium,   0,        arcadia,      arcadia,  arcadia,      "Trakton",            "Trakton Computer Video Game", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )      /* Australia */
 CONS(1982, tunixha,   arcadia,   0,        arcadia,      arcadia,  arcadia,      "Monaco Leisure",     "Tunix Home Arcade", GAME_IMPERFECT_SOUND )          /* New Zealand */

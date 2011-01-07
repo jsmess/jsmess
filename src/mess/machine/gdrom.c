@@ -8,9 +8,7 @@
 #include "machine/scsidev.h"
 #include "cdrom.h"
 #include "sound/cdda.h"
-#ifdef MESS
 #include "imagedev/chd_cd.h"
-#endif
 #include "gdrom.h"
 
 typedef struct
@@ -791,17 +789,16 @@ static void scsicd_alloc_instance( SCSIInstance *scsiInstance, const char *diskr
 	state_save_register_item( machine, "scsicd", diskregion, 0, our_this->cur_subblock );
 	state_save_register_item( machine, "scsicd", diskregion, 0, our_this->play_err_flag );
 
-#ifdef MESS
 	/* TODO: get rid of this ifdef MESS section */
 	our_this->cdrom = cd_get_cdrom_file( machine->device( diskregion ) );
-#else
+/*
 	our_this->cdrom = cdrom_open(get_disk_handle( diskregion ));
 
 	if (!our_this->cdrom)
 	{
 		logerror("GDROM: no CD found!\n");
 	}
-#endif
+*/
 }
 
 static void scsicd_delete_instance( SCSIInstance *scsiInstance )

@@ -419,7 +419,7 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 
-ROM_START(scorpion)
+ROM_START(scorpio)
 	ROM_REGION(0x90000, "maincpu", 0)
 	ROM_SYSTEM_BIOS(0, "v1", "V.2.92")
 	ROMX_LOAD("scorp0.rom", 0x010000, 0x4000, CRC(0eb40a09) SHA1(477114ff0fe1388e0979df1423602b21248164e5), ROM_BIOS(1))
@@ -494,7 +494,7 @@ ROM_START( kay1024 )
 ROM_END
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE     INPUT       INIT    COMPANY     FULLNAME */
-COMP( 1994, scorpion, spec128,	 0,	scorpion,	spec_plus,	0,		"Zonov and Co.",		"Scorpion ZS-256", GAME_NOT_WORKING )
+COMP( 1994, scorpio,  spec128,	 0,	scorpion,	spec_plus,	0,		"Zonov and Co.",		"Scorpion ZS-256", GAME_NOT_WORKING )
 COMP( 1991, profi,    spec128,	 0,	profi,  	spec_plus,	0,		"Kondor and Kramis",		"Profi", GAME_NOT_WORKING )
 COMP( 1998, kay1024,  spec128,	 0,	scorpion,	spec_plus,	0,		"NEMO",		"Kay 1024", GAME_NOT_WORKING )
 COMP( 19??, quorum,   spec128,	 0,	quorum, 	spec_plus,	0,		"<unknown>",		"Quorum", GAME_NOT_WORKING )

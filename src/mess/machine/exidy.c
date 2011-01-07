@@ -13,7 +13,7 @@
 #include "imagedev/snapquik.h"
 #include "imagedev/cartslot.h"
 #include "machine/ay31015.h"
-#include "includes/exidy.h"
+#include "../includes/exidy.h"
 #include "imagedev/flopdrv.h"
 
 

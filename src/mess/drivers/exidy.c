@@ -152,7 +152,7 @@ standard one; a custom implementation will need to be written.
 #include "machine/ay31015.h"
 #include "imagedev/flopdrv.h"
 #include "formats/exidydsk.h"
-#include "includes/exidy.h"
+#include "../includes/exidy.h"
 
 
 static READ8_HANDLER( exidy_read_ff ) { return 0xff; }

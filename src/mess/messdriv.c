@@ -220,7 +220,7 @@ const game_driver * const drivers[] =
 	DRIVER( sheenhvc )		/* Sheen Home Video Centre 2001  */
 	DRIVER( soundic )		/* Soundic MPT-03    */
 	DRIVER( telefevr )		/* Tchibo Tele-Fever     */
-	DRIVER( tempest3 )		/* Tempest MPT-03    */
+	DRIVER( tempestm )		/* Tempest MPT-03    */
 	DRIVER( tbbympt3 )		/* Tobby MPT-03  */
 	DRIVER( trakcvg )		/* Trakton Computer Video Game   */
 	DRIVER( tunixha )		/* Tunix Home Arcade     */
@@ -481,7 +481,7 @@ const game_driver * const drivers[] =
 	DRIVER( tt030_fr )
 	DRIVER( tt030_pl )
 //  DRIVER( fx1 )      /* Atari FX-1 (prototype)       */
-	DRIVER( falcon )    /* Atari Falcon030    */
+	DRIVER( falcon30 )    /* Atari Falcon030    */
 	DRIVER( falcon40 )  /* Atari Falcon040 (prototype)    */
 
 	/* AT&T */
@@ -723,7 +723,7 @@ const game_driver * const drivers[] =
 	DRIVER( sp3e8bit )  /* 2002 ZX Spectrum +3e 8bit IDE    */
 	DRIVER( sp3ezcf )   /* 2002 ZX Spectrum +3e ZXCF    */
 	DRIVER( sp3eata )   /* 2002 ZX Spectrum +3e ZXATASP  */
-	DRIVER( scorpion )
+	DRIVER( scorpio )
 	DRIVER( profi )
 	DRIVER( kay1024 )
 	DRIVER( quorum )
@@ -1441,7 +1441,7 @@ const game_driver * const drivers[] =
 	DRIVER( hc128 )   /* 1991 HC-128      */
 	DRIVER( hc2000 )  /* 1992 HC-2000    */
 
-	DRIVER( cobra )
+	DRIVER( cobrasp )
 	DRIVER( cobra80 )
 
 	DRIVER( cip01 )   /* 1987 CIP-01      */
@@ -1460,7 +1460,7 @@ const game_driver * const drivers[] =
 	DRIVER( mistrum ) /* 1988 Mistrum      */
 
 	/* Russian clones */
-	DRIVER( blitz )	 /* 1990 Blic    */
+	DRIVER( blitzs )	 /* 1990 Blic    */
 	DRIVER( byte )	  /* 1990 Byte   */
 	DRIVER( orizon )	/* 199? Orizon-Micro     */
 	DRIVER( quorum48 )  /* 1993 Kvorum 48K     */
@@ -1596,7 +1596,7 @@ const game_driver * const drivers[] =
         DRIVER( polgar )      /* Polgar    */
 
 	/* JAKKS Pacific, Inc. / HotGen, Ltd. */
-	DRIVER( batman )	/* The Batman, 2004 */
+	DRIVER( batmantv )	/* The Batman, 2004 */
 
 /*********** Misc ***********************************************************/
 
@@ -1731,7 +1731,7 @@ const game_driver * const drivers[] =
 	DRIVER( pimps )
 	DRIVER( sage2 )
 	DRIVER( zexall ) /* zexall z80 test suite with kevtris' preloader/serial interface at 0000-00ff */
-	DRIVER( horizon )
+	DRIVER( horizdd )
 	DRIVER( horizsd )
 	DRIVER( vector1 )
 	DRIVER( tricep )

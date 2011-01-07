@@ -881,7 +881,7 @@ ROM_START(jet)
 	ROM_CART_LOAD("cart", 0x0000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
-ROM_START( cobra )
+ROM_START( cobrasp )
     ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS(0, "v1", "V1")
 	ROMX_LOAD( "boot64k_v1.bin", 0x0000, 0x0800, CRC(a54aae6d) SHA1(8f5134ce24aea59065ed166ad79e864e17ce812f), ROM_BIOS(1))
@@ -962,7 +962,7 @@ ROM_END
 
 /* Russian clones */
 
-ROM_START(blitz)
+ROM_START(blitzs)
 	ROM_REGION(0x10000,"maincpu",0)
 	ROM_LOAD("blitz.rom",0x0000,0x4000, CRC(91e535a8) SHA1(14f09d45dc3803cbdb05c33adb28eb12dbad9dd0))
 	ROM_CART_LOAD("cart", 0x0000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
@@ -1022,7 +1022,7 @@ COMP( 1985, hc85,     spectrum, 0,		spectrum,		spectrum,	spectrum,	"ICE-Felix",	
 COMP( 1988, hc88,     spectrum, 0,		spectrum,		spectrum,	spectrum,	"ICE-Felix",	"HC-88" , GAME_NOT_WORKING)
 COMP( 1990, hc90,     spectrum, 0,		spectrum,		spectrum,	spectrum,	"ICE-Felix",	"HC-90" , 0)
 COMP( 1991, hc91,     spectrum, 0,		spectrum,		spec_plus,	spectrum,	"ICE-Felix",	"HC-91" , 0)
-COMP( 1988, cobra,    spectrum, 0,		spectrum,		spectrum,	spectrum,	"ITCI",	"Cobra" , GAME_NOT_WORKING)
+COMP( 1988, cobrasp,   spectrum, 0,		spectrum,		spectrum,	spectrum,	"ITCI",	"Cobra" , GAME_NOT_WORKING)
 COMP( 1988, cobra80,  spectrum, 0,		spectrum,		spectrum,	spectrum,	"ITCI",	"Cobra 80K" , GAME_NOT_WORKING)
 COMP( 1987, cip01,    spectrum, 0,		spectrum,		spectrum,	spectrum,	"Electronica",	"CIP-01" , 0)	// keyboard should be spectrum, but image was not clear
 COMP( 1988, cip03,    spectrum, 0,		spectrum,		spectrum,	spectrum,	"Electronica",	"CIP-03" , 0)	// keyboard should be spectrum, but image was not clear
@@ -1035,7 +1035,7 @@ COMP( 1991, didakm91, spectrum, 0,		spectrum,		spec_plus,	spectrum,	"Didaktik Sk
 COMP( 1992, didaktk,  spectrum, 0,		spectrum,		spec_plus,	spectrum,	"Didaktik Skalica",	"Didaktik Kompakt" , 0)
 COMP( 1993, didakm93, spectrum, 0,		spectrum,		spec_plus,	spectrum,	"Didaktik Skalica",	"Didaktik M 93" , 0)
 COMP( 1988, mistrum,  spectrum, 0,		spectrum,		spectrum,	spectrum,	"Amaterske RADIO",	"Mistrum" , 0)	// keyboard could be spectrum in some models (since it was a build-yourself design)
-COMP( 1990, blitz,    spectrum, 0,		spectrum,		spectrum,	spectrum,	"<unknown>",	"Blic" , 0)		// no keyboard images found
+COMP( 1990, blitzs,   spectrum, 0,		spectrum,		spectrum,	spectrum,	"<unknown>",	"Blic" , 0)		// no keyboard images found
 COMP( 1990, byte,     spectrum, 0,		spectrum,		spectrum,	spectrum,	"<unknown>",	"Byte" , 0)		// no keyboard images found
 COMP( 199?, orizon,   spectrum, 0,		spectrum,		spectrum,	spectrum,	"<unknown>",	"Orizon-Micro" , 0)		// no keyboard images found
 COMP( 1993, quorum48, spectrum, 0,		spectrum,		spectrum,	spectrum,	"<unknown>",	"Kvorum 48K" , GAME_NOT_WORKING)
