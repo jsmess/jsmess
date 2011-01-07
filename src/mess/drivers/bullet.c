@@ -88,15 +88,6 @@ enum {
 };
 
 
-// DMA memory transfer
-enum {
-	MAIN_TO_MAIN = 0,
-	BUFFER_TO_BUFFER,
-	MAIN_TO_BUFFER,
-	BUFFER_TO_MAIN
-};
-
-
 //**************************************************************************
 //	READ/WRITE HANDLERS
 //**************************************************************************
@@ -182,7 +173,7 @@ READ8_MEMBER( bullet_state::info_r )
 
 	*/
 
-	UINT8 data = 0;
+	UINT8 data = 0x10;
 
 	// DIP switches
 	data |= input_port_read(machine, "SW1") & 0x0f;
@@ -298,18 +289,7 @@ WRITE8_MEMBER( bullet_state::exdma_w )
 
 	m_exdma = data;
 
-	switch (data >> 3)
-	{
-	case MAIN_TO_MAIN:
-	case MAIN_TO_BUFFER:
-		m_buf = 0;
-		break;
-
-	case BUFFER_TO_BUFFER:
-	case BUFFER_TO_MAIN:
-		m_buf = 1;
-		break;
-	}
+	m_buf = BIT(data, 3);
 
 	update_dma_rdy();
 }
@@ -516,12 +496,9 @@ READ8_MEMBER( bullet_state::dma_mreq_r )
 	UINT8 *ram = ram_get_ptr(m_ram);
 	UINT8 data = ram[offset];
 
-	switch (m_exdma >> 3)
+	if (BIT(m_exdma, 4))
 	{
-	case MAIN_TO_BUFFER:
-	case BUFFER_TO_MAIN:
 		m_buf = !m_buf;
-		break;
 	}
 
 	return data;
@@ -537,12 +514,9 @@ WRITE8_MEMBER( bullet_state::dma_mreq_w )
 	UINT8 *ram = ram_get_ptr(m_ram);
 	ram[offset] = data;
 
-	switch (m_exdma >> 3)
+	if (BIT(m_exdma, 4))
 	{
-	case MAIN_TO_BUFFER:
-	case BUFFER_TO_MAIN:
 		m_buf = !m_buf;
-		break;
 	}
 }
 
