@@ -293,20 +293,20 @@ ADDRESS_MAP_END
     ADDRESS_MAP( keyboard_mem )
 -------------------------------------------------*/
 
-//static ADDRESS_MAP_START( keyboard_mem, ADDRESS_SPACE_PROGRAM, 8 )
-//  AM_RANGE(0x000, 0x7ff) AM_ROM
-//ADDRESS_MAP_END
+static ADDRESS_MAP_START( keyboard_mem, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x000, 0x7ff) AM_ROM
+ADDRESS_MAP_END
 
 /*-------------------------------------------------
     ADDRESS_MAP( keyboard_io )
 -------------------------------------------------*/
 
-//static ADDRESS_MAP_START( keyboard_io, ADDRESS_SPACE_IO, 8 )
-/*  AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1)
+static ADDRESS_MAP_START( keyboard_io, ADDRESS_SPACE_IO, 8 )
+/*	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1)
     AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2)
     AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1)
     AM_RANGE(MCS48_PORT_BUS, MCS48_PORT_BUS)*/
-//ADDRESS_MAP_END
+ADDRESS_MAP_END
 
 /***************************************************************************
     INPUT PORTS
@@ -423,6 +423,8 @@ static MACHINE_RESET(cgc7900)
 	memcpy((UINT8*)state->chrom_ram,user1,8);
 
 	machine->device(M68000_TAG)->reset();
+
+	memset((UINT8*)state->chrom_ram,0,8);
 }
 
 /***************************************************************************
@@ -439,9 +441,10 @@ static MACHINE_CONFIG_START( cgc7900, cgc7900_state )
     MCFG_CPU_ADD(M68000_TAG, M68000, XTAL_28_48MHz/4)
     MCFG_CPU_PROGRAM_MAP(cgc7900_mem)
 
-/*  MCFG_CPU_ADD(I8035_TAG, I8035, 1000000)
+	MCFG_CPU_ADD(I8035_TAG, I8035, 1000000)
     MCFG_CPU_PROGRAM_MAP(keyboard_mem)
-    MCFG_CPU_IO_MAP(keyboard_io)*/
+    MCFG_CPU_IO_MAP(keyboard_io)
+	MCFG_DEVICE_DISABLE()
 
 /*  MCFG_CPU_ADD(AM2910_TAG, AM2910, XTAL_17_36MHz)
     MCFG_CPU_PROGRAM_MAP(omti10_mem)*/
@@ -468,7 +471,7 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 ROM_START( cgc7900 )
-    ROM_REGION( 0x10000, M68000_TAG, 0 )
+    ROM_REGION16_BE( 0x10000, M68000_TAG, 0 )
 	ROM_LOAD16_BYTE( "210274 800k even a3ee term 1.4.ue24",						0x0000, 0x1000, CRC(5fa8f368) SHA1(120dbcfedce0badd38bf5b23e1fbc99667eb286c) )
 	ROM_LOAD16_BYTE( "210275 800k odd bbb3 term 1.4.uf24",						0x0001, 0x1000, CRC(4d479457) SHA1(5fa96a1eadfd9ba493d28691286e2e001a489a19) )
 	ROM_LOAD16_BYTE( "210276 802k even 0c22 term 1.4.ue22",						0x2000, 0x1000, CRC(c88c44ec) SHA1(f39d8a3cf7aaefd815b4426348965b076c1f2265) )
