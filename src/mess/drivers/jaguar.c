@@ -93,13 +93,21 @@ static DEVICE_IMAGE_LOAD( jaguar );
  *  Global variables
  *
  *************************************/
-
+#ifdef MESS
 UINT32 *jaguar_shared_ram;
 UINT32 *jaguar_gpu_ram;
 UINT32 *jaguar_gpu_clut;
 UINT32 *jaguar_dsp_ram;
 UINT32 *jaguar_wave_rom;
 UINT8 cojag_is_r3000 = FALSE;
+#else
+extern UINT32 *jaguar_shared_ram;
+extern UINT32 *jaguar_gpu_ram;
+extern UINT32 *jaguar_gpu_clut;
+extern UINT32 *jaguar_dsp_ram;
+extern UINT32 *jaguar_wave_rom;
+extern UINT8 cojag_is_r3000;
+#endif
 
 
 

@@ -190,12 +190,23 @@ cpu #0 (PC=0601023A): unmapped program memory dword write to 02000000 = 00000000
 
 /**************************************************************************************/
 /*to be added into a stv Header file,remember to remove all the static...*/
+#ifdef MESS
+UINT32* stv_workram_l;
+UINT32* stv_workram_h;
+int stv_enable_slave_sh2;
+int minit_boost,sinit_boost;
+attotime minit_boost_timeslice, sinit_boost_timeslice;
+#else
+extern UINT32* stv_workram_l;
+extern UINT32* stv_workram_h;
+extern int stv_enable_slave_sh2;
+extern int minit_boost,sinit_boost;
+extern attotime minit_boost_timeslice, sinit_boost_timeslice;
+#endif
 
 static UINT8 *smpc_ram;
 //static void stv_dump_ram(void);
 
-UINT32* stv_workram_l;
-UINT32* stv_workram_h;
 //UINT32* stv_backupram;
 static UINT16* scsp_regs;
 static UINT16* sound_ram;
@@ -203,7 +214,6 @@ static UINT16* sound_ram;
 static int saturn_region;
 
 extern int stv_vblank,stv_hblank;
-int stv_enable_slave_sh2;
 /*SMPC stuff*/
 static UINT8 NMI_reset;
 static void system_reset(void);
@@ -251,10 +261,6 @@ static void dma_direct_lv2(address_space *space);   /*DMA level 2 direct transfe
 static void dma_indirect_lv0(address_space *space); /*DMA level 0 indirect transfer function*/
 static void dma_indirect_lv1(address_space *space); /*DMA level 1 indirect transfer function*/
 static void dma_indirect_lv2(address_space *space); /*DMA level 2 indirect transfer function*/
-
-
-int minit_boost,sinit_boost;
-attotime minit_boost_timeslice, sinit_boost_timeslice;
 
 //static int scanline;
 

@@ -29,6 +29,14 @@
 
 #define CPU_CLOCK (200000000)
 
+#ifdef MESS
+UINT16 actel_id;
+int jvsboard_type;
+#else
+extern UINT16 actel_id;
+extern int jvsboard_type;
+#endif
+
 // things from mess/machine/dc.c
 void dreamcast_atapi_init(running_machine *machine);
 void dreamcast_atapi_reset(running_machine *machine);
@@ -39,8 +47,6 @@ extern WRITE64_HANDLER( dc_mess_g1_ctrl_w );
 
 static UINT32 *dc_sound_ram;
 static UINT64 *dc_ram;
-UINT16 actel_id;
-int jvsboard_type;
 
 static READ64_HANDLER( dcus_idle_skip_r )
 {
