@@ -254,8 +254,12 @@ SOUNDS += TMS5200
 # the list of drivers
 #-------------------------------------------------
 
-DRVLIBS = \
-	$(MESSOBJ)/messdriv.o \
+ifeq ($(TARGET),mess)
+DRVLIBS += \
+	$(MESSOBJ)/messdriv.o
+endif
+
+DRVLIBS += \
 	$(MESSOBJ)/3do.a \
 	$(MESSOBJ)/acorn.a \
 	$(MESSOBJ)/act.a \
@@ -414,7 +418,11 @@ DRVLIBS = \
 	$(MESSOBJ)/xerox.a \
 	$(MESSOBJ)/zvt.a \
 	$(MESSOBJ)/shared.a \
-	$(MESSOBJ)/mame.a \
+
+ifeq ($(TARGET),mess)
+DRVLIBS += \
+	$(MESSOBJ)/mame.a
+endif
 
 #-------------------------------------------------
 # the following files are MAME components and
