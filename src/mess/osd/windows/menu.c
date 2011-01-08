@@ -29,11 +29,6 @@
 #include "windows/window.h"
 #include "winutf8.h"
 
-#ifdef UNDER_CE
-#include "invokegx.h"
-#else
-#endif
-
 //============================================================
 //  IMPORTS
 //============================================================
@@ -72,20 +67,6 @@ enum
 #define HAS_PROFILER	1
 #else
 #define HAS_PROFILER	0
-#endif
-
-#ifdef UNDER_CE
-#define HAS_TOGGLEMENUBAR		0
-#define HAS_TOGGLEFULLSCREEN	0
-#else
-#define HAS_TOGGLEMENUBAR		1
-#define HAS_TOGGLEFULLSCREEN	1
-#endif
-
-#ifdef UNDER_CE
-#define WM_INITMENU		WM_INITMENUPOPUP
-#define MFS_GRAYED		MF_GRAYED
-#define WMSZ_BOTTOM		6
 #endif
 
 //============================================================
@@ -1101,11 +1082,6 @@ static void set_command_state(HMENU menu_bar, UINT command, UINT state)
 {
 	BOOL result;
 
-#ifdef UNDER_CE
-	result = EnableMenuItem(menu_bar, command, (state & MFS_GRAYED ? MF_GRAYED : MF_ENABLED) | MF_BYCOMMAND);
-	if (result)
-		result = CheckMenuItem(menu_bar, command, (state & MFS_CHECKED ? MF_CHECKED : MF_UNCHECKED) | MF_BYCOMMAND) != 0xffffffff;
-#else
 	MENUITEMINFO mii;
 
 	memset(&mii, 0, sizeof(mii));
@@ -1113,7 +1089,6 @@ static void set_command_state(HMENU menu_bar, UINT command, UINT state)
 	mii.fMask = MIIM_STATE;
 	mii.fState = state;
 	result = SetMenuItemInfo(menu_bar, command, FALSE, &mii);
-#endif
 }
 
 
@@ -1198,9 +1173,7 @@ static void setup_joystick_menu(running_machine *machine, HMENU menu_bar)
 	else
 	{
 		// set up joystick menu
-#ifndef UNDER_CE
 		joystick_count = input_count_players(machine);
-#endif
 		if (joystick_count > 0)
 		{
 			for (i = 0; i < joystick_count; i++)
@@ -1324,9 +1297,7 @@ static void prepare_menus(HWND wnd)
 	set_command_state(menu_bar, ID_OPTIONS_DIPSWITCHES,		has_dipswitch								? MFS_ENABLED : MFS_GRAYED);
 	set_command_state(menu_bar, ID_OPTIONS_MISCINPUT,		has_misc									? MFS_ENABLED : MFS_GRAYED);
 	set_command_state(menu_bar, ID_OPTIONS_ANALOGCONTROLS,	has_analog									? MFS_ENABLED : MFS_GRAYED);
-#if HAS_TOGGLEFULLSCREEN
 	set_command_state(menu_bar, ID_OPTIONS_FULLSCREEN,		!is_windowed()								? MFS_CHECKED : MFS_ENABLED);
-#endif // HAS_TOGGLEFULLSCREEN
 	set_command_state(menu_bar, ID_OPTIONS_TOGGLEFPS,		ui_get_show_fps()							? MFS_CHECKED : MFS_ENABLED);
 #if HAS_PROFILER
 	set_command_state(menu_bar, ID_OPTIONS_PROFILER,		ui_get_show_profiler()						? MFS_CHECKED : MFS_ENABLED);
@@ -1798,11 +1769,9 @@ static int invoke_command(HWND wnd, UINT command)
 			customize_analogcontrols(window->machine, wnd);
 			break;
 
-#if HAS_TOGGLEFULLSCREEN
 		case ID_OPTIONS_FULLSCREEN:
 			winwindow_toggle_full_screen();
 			break;
-#endif
 
 		case ID_OPTIONS_TOGGLEFPS:
 			ui_set_show_fps(!ui_get_show_fps());
@@ -1816,11 +1785,9 @@ static int invoke_command(HWND wnd, UINT command)
 			}
 			break;
 
-#if HAS_TOGGLEMENUBAR
 		case ID_OPTIONS_TOGGLEMENUBAR:
 			win_toggle_menubar();
 			break;
-#endif
 
 		case ID_FRAMESKIP_AUTO:
 			window->machine->video().set_frameskip(-1);
@@ -1981,14 +1948,6 @@ int win_setup_menus(running_machine *machine, HMODULE module, HMENU menu_bar)
 
 	if ((machine->debug_flags & DEBUG_FLAG_ENABLED) == 0)
 		DeleteMenu(menu_bar, ID_OPTIONS_DEBUGGER, MF_BYCOMMAND);
-
-#if !HAS_TOGGLEFULLSCREEN
-	DeleteMenu(menu_bar, ID_OPTIONS_FULLSCREEN, MF_BYCOMMAND);
-#endif
-
-#if !HAS_TOGGLEMENUBAR
-	DeleteMenu(menu_bar, ID_OPTIONS_TOGGLEMENUBAR, MF_BYCOMMAND);
-#endif
 
 	// set up frameskip menu
 	frameskip_menu = find_sub_menu(menu_bar, "&Options\0&Frameskip\0", FALSE);

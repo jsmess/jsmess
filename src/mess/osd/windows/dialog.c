@@ -20,11 +20,6 @@
 #include "windows/window.h"
 #include "winutf8.h"
 
-
-#ifdef UNDER_CE
-#include "invokegx.h"
-#endif
-
 //============================================================
 
 #define SEQWM_SETFOCUS	(WM_APP + 0)
@@ -1603,12 +1598,6 @@ WCHAR *win_dialog_wcsdup(dialog_box *dialog, const WCHAR *s)
 static void before_display_dialog(running_machine *machine)
 {
 	Machine = machine;
-
-#ifdef UNDER_CE
-	// on WinCE, suspend GAPI
-	gx_suspend();
-#endif
-
 	winwindow_ui_pause_from_window_thread(machine, TRUE);
 }
 
@@ -1620,13 +1609,7 @@ static void before_display_dialog(running_machine *machine)
 
 static void after_display_dialog(running_machine *machine)
 {
-#ifdef UNDER_CE
-	// on WinCE, resume GAPI
-	gx_resume();
-#endif
-
 	winwindow_ui_pause_from_window_thread(machine, FALSE);
-
 	Machine = NULL;
 }
 
