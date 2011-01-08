@@ -9,19 +9,20 @@
 #include "machine/z80sio.h"
 #include "machine/wd17xx.h"
 #include "machine/scsibus.h"
+#include "machine/6522via.h"
 
 #define MAINCPU_TAG "maincpu"
 #define IOCPU_TAG   "iocpu"
 
-#define num_ioports 0x80
-#define NIMBUS_KEYROWS      11
-#define KEYBOARD_QUEUE_SIZE 32
+#define num_ioports 			0x80
+#define NIMBUS_KEYROWS      	11
+#define KEYBOARD_QUEUE_SIZE 	32
 
 #define SCREEN_WIDTH_PIXELS     640
 #define SCREEN_HEIGHT_LINES     250
 #define SCREEN_NO_COLOURS       16
 
-#define NO_VIDREGS      (0x30/2)
+#define NO_VIDREGS      		(0x30/2)
 
 /* Nimbus sub-bios structures for debugging */
 
@@ -416,6 +417,17 @@ READ8_HANDLER( nimbus_mouse_js_r );
 WRITE8_HANDLER( nimbus_mouse_js_w );
 
 #define MOUSE_INT_ENABLED(state)     (((state)->iou_reg092 & MOUSE_INT_ENABLE) ? 1 : 0)
+
+/* Paralell / User port BBC compatible ! */
+
+#define VIA_TAG					"via6522"
+#define CENTRONICS_TAG			"centronics"
+
+#define	VIA_INT					0x03
+
+extern const via6522_interface nimbus_via;
+
+WRITE_LINE_DEVICE_HANDLER(nimbus_ack_w);
 
 
 /*----------- defined in video/rmnimbus.c -----------*/

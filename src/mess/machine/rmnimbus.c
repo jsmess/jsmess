@@ -43,7 +43,9 @@ Format /s.
 
 The tracks, heads and sectors/track can be used with chdman -createblank
 to create a blank hard disk which can then be formatted with the RM tools.
-
+The important thing when doing this is to make sure that if using the Native
+SCSI tools, that the disk has the  same number of blocks as specified above,
+even if you have to use unusual geometry to do so !
 */
 
 
@@ -59,6 +61,8 @@ to create a blank hard disk which can then be formatted with the RM tools.
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
 #include "machine/msm8251.h"
+#include "machine/ctronics.h"
+#include "machine/6522via.h"
 #include "machine/scsi.h"
 #include "sound/ay8910.h"
 #include "sound/msm5205.h"
@@ -102,6 +106,7 @@ static int sio_serial_receive( device_t *device, int channel );
 
 #define DMA_BREAK           0x0000001
 #define DECODE_BIOS         0x0000002
+#define DECODE_DOS21		0x0000004
 
 /* Z80 SIO */
 
@@ -153,6 +158,7 @@ static void nimbus_debug(running_machine *machine, int ref, int params, const ch
 
 static int instruction_hook(device_t &device, offs_t curpc);
 static void decode_subbios(device_t *device,offs_t pc);
+static void decode_dos21(device_t *device,offs_t pc);
 static void decode_dssi_f_fill_area(device_t *device,UINT16  ds, UINT16 si);
 static void decode_dssi_f_plot_character_string(device_t *device,UINT16  ds, UINT16 si);
 static void decode_dssi_f_set_new_clt(device_t *device,UINT16  ds, UINT16 si);
@@ -1026,7 +1032,7 @@ WRITE16_HANDLER( nimbus_i186_internal_port_w )
 {
 	rmnimbus_state *state = space->machine->driver_data<rmnimbus_state>();
 	int temp, which, data16 = data;
-
+		
 	switch (offset)
 	{
 		case 0x11:
@@ -1346,9 +1352,14 @@ static int instruction_hook(device_t &device, offs_t curpc)
 
     addr_ptr = (UINT8*)space->get_read_ptr(curpc);
 
-    if(DEBUG_SET(DECODE_BIOS))
-        if ((addr_ptr !=NULL) && (addr_ptr[0]==0xCD) && (addr_ptr[1]==0xF0))
-            decode_subbios(&device,curpc);
+	if ((addr_ptr !=NULL) && (addr_ptr[0]==0xCD))
+	{
+		if(DEBUG_SET(DECODE_BIOS) && (addr_ptr[1]==0xF0))
+			decode_subbios(&device,curpc);
+
+		if(DEBUG_SET(DECODE_DOS21) && (addr_ptr[1]==0x21))
+            decode_dos21(&device,curpc);
+	}
 
     return 0;
 }
@@ -1787,6 +1798,35 @@ static void decode_dssi_f_rw_sectors(device_t *device,UINT16  ds, UINT16 si)
 
     logerror("\n");
 }
+
+static void decode_dos21(device_t *device,offs_t pc)
+{
+    device_t *cpu = device->machine->device(MAINCPU_TAG);
+
+    UINT16  ax = cpu_get_reg(cpu,I8086_AX);
+    UINT16  bx = cpu_get_reg(cpu,I8086_BX);
+    UINT16  cx = cpu_get_reg(cpu,I8086_CX);
+	UINT16  dx = cpu_get_reg(cpu,I8086_DX);
+    UINT16  cs = cpu_get_reg(cpu,I8086_CS);
+	UINT16  ds = cpu_get_reg(cpu,I8086_DS);
+	UINT16  es = cpu_get_reg(cpu,I8086_ES);
+	UINT16  ss = cpu_get_reg(cpu,I8086_SS);
+	
+    UINT16  si = cpu_get_reg(cpu,I8086_SI);
+    UINT16  di = cpu_get_reg(cpu,I8086_DI);
+	UINT16  bp = cpu_get_reg(cpu,I8086_BP);
+
+    logerror("=======================================================================\n");
+    logerror("DOS Int 0x21 call at %05X\n",pc); 
+	logerror("AX=%04X, BX=%04X, CX=%04X, DX=%04X\n",ax,bx,cx,dx);
+	logerror("CS=%04X, DS=%04X, ES=%04X, SS=%04X\n",cs,ds,es,ss);
+	logerror("SI=%04X, DI=%04X, BP=%04X\n",si,di,bp);
+    logerror("=======================================================================\n");
+	
+	if((ax & 0xff00)==0x0900)
+		debugger_break(device->machine);
+}
+
 
 /*
     The Nimbus has 3 banks of memory each of which can be either 16x4164 or 16x41256 giving
@@ -2901,5 +2941,56 @@ READ8_HANDLER( nimbus_mouse_js_r )
 
 WRITE8_HANDLER( nimbus_mouse_js_w )
 {
+}
+
+/**********************************************************************
+Paralell printer / User port.
+The Nimbus paralell printer port card is almost identical to the circuit 
+in the BBC micro, so I have borrowed the driver code from the BBC :)
+
+Port A output is buffered before being connected to the printer connector.
+This means that they can only be operated as output lines.
+CA1 is pulled high by a 4K7 resistor. CA1 normally acts as an acknowledge
+line when a printer is used. CA2 is buffered so that it has become an open
+collector output only. It usially acts as the printer strobe line.
+***********************************************************************/
+
+/* USER VIA 6522 port B is connected to the BBC user port */
+static READ8_DEVICE_HANDLER( nimbus_via_read_portb )
+{
+	return 0xff;
+}
+
+static WRITE8_DEVICE_HANDLER( nimbus_via_write_portb )
+{
+}
+
+static WRITE_LINE_DEVICE_HANDLER( nimbus_via_irq_w )
+{
+	if(state)
+		external_int(device->machine,VIA_INT,0x00);
+}
+
+const via6522_interface nimbus_via =
+{
+	DEVCB_NULL,	//via_user_read_porta,
+	DEVCB_HANDLER(nimbus_via_read_portb),
+	DEVCB_NULL,	//via_user_read_ca1,
+	DEVCB_NULL,	//via_user_read_cb1,
+	DEVCB_NULL,	//via_user_read_ca2,
+	DEVCB_NULL,	//via_user_read_cb2,
+	DEVCB_DEVICE_HANDLER(CENTRONICS_TAG, centronics_data_w),
+	DEVCB_HANDLER(nimbus_via_write_portb),
+	DEVCB_NULL, //via_user_write_ca1
+	DEVCB_NULL, //via_user_write_cb1
+	DEVCB_DEVICE_LINE(CENTRONICS_TAG, centronics_strobe_w),
+	DEVCB_NULL,	//via_user_write_cb2,
+	DEVCB_LINE(nimbus_via_irq_w)
+};
+
+WRITE_LINE_DEVICE_HANDLER(nimbus_ack_w)
+{
+	via6522_device *via_1 = device->machine->device<via6522_device>(VIA_TAG);
+	via_1->write_ca1(!state); /* ack seems to be inverted? */
 }
 

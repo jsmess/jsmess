@@ -22,7 +22,7 @@
 		3	2 + line changes
 */
 
-#define LOGLEVEL			1
+#define LOGLEVEL			0
 #define ENABLE_DATA_DUMP	1
 
 #define LOG(level,...)      if(LOGLEVEL>=level) logerror(__VA_ARGS__)
