@@ -30,7 +30,11 @@ TODO:
 #include "machine/timekpr.h"
 #include "sound/cdda.h"
 #include "includes/cdi.h"
+#ifdef MESS
 #include "cdi.lh"
+#else
+extern const char layout_cdi[];
+#endif
 
 #if ENABLE_VERBOSE_LOG
 INLINE void verboselog(running_machine *machine, int n_level, const char *s_fmt, ...)

@@ -36,8 +36,11 @@
 #include "sound/2610intf.h"
 #include "devices/aescart.h"
 #include "imagedev/cartslot.h"
-
+#ifdef MESS
 #include "neogeo.lh"
+#else
+extern const char layout_neogeo[];
+#endif
 
 
 // CD-ROM / DMA control registers
