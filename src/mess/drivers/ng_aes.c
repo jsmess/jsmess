@@ -121,7 +121,7 @@ static void adjust_display_position_interrupt_timer( running_machine *machine )
 	}
 }
 
-
+#ifdef MESS
 void neogeo_set_display_position_interrupt_control( running_machine *machine, UINT16 data )
 {
 	neogeo_state *state = machine->driver_data<neogeo_state>();
@@ -153,7 +153,7 @@ void neogeo_set_display_counter_lsb( address_space *space, UINT16 data )
 		adjust_display_position_interrupt_timer(space->machine);
 	}
 }
-
+#endif
 
 static void update_interrupts( running_machine *machine )
 {
@@ -173,7 +173,7 @@ static void update_interrupts( running_machine *machine )
 	}
 }
 
-
+#ifdef MESS
 void neogeo_acknowledge_interrupt( running_machine *machine, UINT16 data )
 {
 	neogeo_state *state = machine->driver_data<neogeo_state>();
@@ -187,7 +187,7 @@ void neogeo_acknowledge_interrupt( running_machine *machine, UINT16 data )
 
 	update_interrupts(machine);
 }
-
+#endif
 
 static TIMER_CALLBACK( display_position_interrupt_callback )
 {
@@ -370,7 +370,7 @@ static WRITE16_HANDLER( io_control_w )
  *  Unmapped memory access
  *
  *************************************/
-
+#ifdef MESS
 READ16_HANDLER( neogeo_unmapped_r )
 {
 	neogeo_state *state = space->machine->driver_data<neogeo_state>();
@@ -391,7 +391,7 @@ READ16_HANDLER( neogeo_unmapped_r )
 
 	return ret;
 }
-
+#endif
 
 
 
@@ -640,7 +640,7 @@ static void _set_main_cpu_bank_address( running_machine *machine )
 	memory_set_bankptr(machine, NEOGEO_BANK_CARTRIDGE, &machine->region("maincpu")->base()[state->main_cpu_bank_address]);
 }
 
-
+#ifdef MESS
 void neogeo_set_main_cpu_bank_address( address_space *space, UINT32 bank_address )
 {
 	neogeo_state *state = space->machine->driver_data<neogeo_state>();
@@ -651,7 +651,7 @@ void neogeo_set_main_cpu_bank_address( address_space *space, UINT32 bank_address
 
 	_set_main_cpu_bank_address(space->machine);
 }
-
+#endif
 
 static WRITE16_HANDLER( main_cpu_bank_select_w )
 {

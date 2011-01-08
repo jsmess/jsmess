@@ -322,12 +322,12 @@ static ADDRESS_MAP_START(a5200_mem, ADDRESS_SPACE_PROGRAM, 8)
 ADDRESS_MAP_END
 
 
-
+#ifdef MESS
 int atari_input_disabled(void)
 {
 	return 0;
 }
-
+#endif
 
 /**************************************************************
  *
