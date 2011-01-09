@@ -73,6 +73,94 @@ The software list will be divided in four categories:
 
 <!-- List of perfect dumps -->
 	
+	<software name="bahamut">
+		<!-- Serial: SHVC-AXBJ-JPN - Release Date: 1996-02-09 - Alt. Title: バハムート ラグーン -->
+		<description>Bahamut Lagoon (Jpn)</description>
+		<year>1996</year>
+		<publisher>Square</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1J3M-20" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 64K SRAM" />
+			<feature name="u3" value="U3 MAD-1" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="battery" value="CR2032" />
+			<feature name="cart_revision" value="none" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="G741812 SHVC-JPN-1" />
+			<dataarea name="rom" size="3145728">
+				<rom name="shvc-axbj-0.u1" size="3145728" crc="1b83c440" sha1="c8bca249ebd481dfd7bb851c7846844ab70d3003" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="bahamuta" cloneof="bahamut">
+		<!-- Serial: SHVC-AXBJ-JPN - Release Date: 1996-02-09 - Alt. Title: バハムート ラグーン -->
+		<description>Bahamut Lagoon (Jpn, Alt)</description>
+		<year>1996</year>
+		<publisher>Square</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-BJ3M-20" />
+			<feature name="u1" value="U1 P0" />
+			<feature name="u1" value="U2 P1" />
+			<feature name="u3" value="U3 64K SRAM" />
+			<feature name="u4" value="U4 MAD-1" />
+			<feature name="u5" value="U5 CIC" />
+			<feature name="battery" value="CR2032" />
+			<feature name="cart_revision" value="none" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="G741812 SHVC-JPN-1" />
+			<dataarea name="rom" size="3145728">
+				<rom name="shvc-axbj-0.p0.u1" size="2097152" crc="196e9a8d" sha1="e25fcd539b2a2996a29eb8bed3bcb37e79cdf067" offset="000000" />
+				<rom name="shvc-axbj-0.p3.u2" size="1048576" crc="50fc1757" sha1="16acdc879d9e37e7e49239e8cf11c7aead9e9094" offset="200000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="ctriggerj" cloneof="ctrigger">
+		<!-- Serial: SHVC-ACTJ-JPN  - Release Date: 1995-03-11 - Alt. Title: クロノ・トリガー -->
+		<description>Chrono Trigger (Jpn)</description>
+		<year>1995</year>
+		<publisher>Square</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1J3M-20" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 64K SRAM" />
+			<feature name="u3" value="U3 MAD-1" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="battery" value="CR2032" />
+			<feature name="cart_revision" value="none" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="920214" />
+			<dataarea name="rom" size="4194304">
+				<rom name="shvc-actj-0.u1" size="4194304" crc="4d014c20" sha1="a82f0fba9bb111ffd0a878853a4563917d9b67bb" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="ctriggerja" cloneof="ctrigger">
+		<!-- Serial: SHVC-ACTJ-JPN  - Release Date: 1995-03-11 - Alt. Title: クロノ・トリガー -->
+		<description>Chrono Trigger (Jpn, Alt)</description>
+		<year>1995</year>
+		<publisher>Square</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-BJ3M-20" />
+			<feature name="u1" value="U1 P0" />
+			<feature name="u1" value="U2 P1" />
+			<feature name="u3" value="U3 64K SRAM" />
+			<feature name="u4" value="U4 MAD-1" />
+			<feature name="u5" value="U5 CIC" />
+			<feature name="battery" value="CR2032" />
+			<feature name="cart_revision" value="none" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="920214" />
+			<dataarea name="rom" size="4194304">
+				<rom name="shvc-actj-0.p0.u1" size="2097152" crc="ea81762f" sha1="ed96918a5b7b43bd6c817ced3a567768cc26fca1" offset="000000" />
+				<rom name="shvc-actj-0.p3.u2" size="2097152" crc="a7e0cf31" sha1="62564bb1ba9a4789c08cdb2738f3c37df94e4dc3" offset="200000" />
+			</dataarea>
+		</part>
+	</software>
+	
 	<software name="ff4j" cloneof="ff2">
 		<!-- Serial: SHVC-F4 - Release Date: 1991-07-19 - Alt. Title: ファイナルファンタジーIV -->
 		<description>Final Fantasy IV (Jpn, Rev. A)</description>
@@ -106,7 +194,7 @@ The software list will be divided in four categories:
 			<feature name="u3" value="U3 [note:74LS139]" />
 			<feature name="u4" value="U4 CIC" />
 			<feature name="battery" value="CR2032" />
-			<feature name="cart_revision" value="N/A" />
+			<feature name="cart_revision" value="none" />
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="901121" />
 			<dataarea name="rom" size="1048576">
@@ -127,7 +215,7 @@ The software list will be divided in four categories:
 			<feature name="u3" value="U3 [note:74LS139]" />
 			<feature name="u4" value="U4 CIC" />
 			<feature name="battery" value="CR2032" />
-			<feature name="cart_revision" value="N/A" />
+			<feature name="cart_revision" value="none" />
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="920214" />
 			<dataarea name="rom" size="1048576">
@@ -148,7 +236,7 @@ The software list will be divided in four categories:
 			<feature name="u3" value="U3 74LS139" />
 			<feature name="u4" value="U4 CIC" />
 			<feature name="battery" value="CR2032" />
-			<feature name="cart_revision" value="N/A" />
+			<feature name="cart_revision" value="none" />
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="920214" />
 			<dataarea name="rom" size="2097152">
@@ -171,7 +259,7 @@ The software list will be divided in four categories:
 			<feature name="u5" value="U5 74LS00" />
 			<feature name="u6" value="U6 CIC" />
 			<feature name="battery" value="CR2032" />
-			<feature name="cart_revision" value="N/A" />
+			<feature name="cart_revision" value="none" />
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="920214" />
 			<dataarea name="rom" size="2097152">
@@ -194,7 +282,7 @@ The software list will be divided in four categories:
 			<feature name="u4" value="U4 MAD-1" />
 			<feature name="u5" value="U5 CIC" />
 			<feature name="battery" value="CR2032" />
-			<feature name="cart_revision" value="N/A" />
+			<feature name="cart_revision" value="none" />
 			<feature name="cart_model" value="SHVC-006" />
 			<dataarea name="rom" size="3145728">
 				<rom name="shvc-f6-0.p0.u1" size="2097152" crc="bafa8ed6" sha1="3a1e1b38c3bac784f2941a07ce15cee744c5a245" offset="000000" />
@@ -218,7 +306,7 @@ The software list will be divided in four categories:
 			<feature name="u6" value="U6 MAD-1" />
 			<feature name="u7" value="U7 CIC" />
 			<feature name="battery" value="CR2032" />
-			<feature name="cart_revision" value="N/A" />
+			<feature name="cart_revision" value="none" />
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="920214" />
 			<dataarea name="rom" size="3145728 ">		
@@ -238,7 +326,7 @@ The software list will be divided in four categories:
 			<feature name="pcb" value="SHVC-1A0N-20" />
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 CIC" />
-			<feature name="cart_revision" value="N/A" />
+			<feature name="cart_revision" value="none" />
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="920214" />
 			<dataarea name="rom" size="524288">
@@ -280,7 +368,7 @@ The software list will be divided in four categories:
 			<feature name="u3" value="U3 [note:74LS139]" />
 			<feature name="u4" value="U4 CIC" />
 			<feature name="battery" value="CR2032" />
-			<feature name="cart_revision" value="N/A" />
+			<feature name="cart_revision" value="none" />
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="901121" />
 			<dataarea name="rom" size="1048576">
@@ -301,7 +389,7 @@ The software list will be divided in four categories:
 			<feature name="u3" value="U3 MAD-1" />
 			<feature name="u4" value="U4 CIC" />
 			<feature name="battery" value="CR2032" />
-			<feature name="cart_revision" value="N/A" />
+			<feature name="cart_revision" value="none" />
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="920214" />
 			<dataarea name="rom" size="2097152">
@@ -323,7 +411,7 @@ The software list will be divided in four categories:
 			<feature name="u4" value="U4 MAD-1/R" />
 			<feature name="u5" value="U5 CIC" />
 			<feature name="battery" value="CR2032" />
-			<feature name="cart_revision" value="N/A" />
+			<feature name="cart_revision" value="none" />
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="920214" />
 			<dataarea name="rom" size="2097152">
@@ -334,7 +422,7 @@ The software list will be divided in four categories:
 	</software>
 
 	<software name="romsaga3">
-		<!-- Serial: SHVC-AL3J-JPN - Release Date: 1995-11-11 - Alt. Title:  -->
+		<!-- Serial: SHVC-AL3J-JPN - Release Date: 1995-11-11 - Alt. Title: ロマンシング サ・ガ3 -->
 		<description>Romancing Sa-Ga 3 (Jpn, Rev. A)</description>
 		<year>1995</year>
 		<publisher>Square</publisher>
@@ -355,7 +443,7 @@ The software list will be divided in four categories:
 	</software>
 
 	<software name="romsaga3a" cloneof="romsaga3">
-		<!-- Serial: SHVC-AL3J-JPN - Release Date: 1995-11-11 - Alt. Title:  -->
+		<!-- Serial: SHVC-AL3J-JPN - Release Date: 1995-11-11 - Alt. Title: ロマンシング サ・ガ3 -->
 		<description>Romancing Sa-Ga 3 (Jpn)</description>
 		<year>1995</year>
 		<publisher>Square</publisher>
@@ -366,7 +454,7 @@ The software list will be divided in four categories:
 			<feature name="u3" value="U3 MAD-1" />
 			<feature name="u4" value="U4 CIC" />
 			<feature name="battery" value="CR2032" />
-			<feature name="cart_revision" value="N/A" />
+			<feature name="cart_revision" value="none" />
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="G741812 SHVC-JPN-1" />
 			<dataarea name="rom" size="4194304">
@@ -375,8 +463,31 @@ The software list will be divided in four categories:
 		</part>
 	</software>
 
+<!-- Revision A has the same ROM as the initial release, but different hardware.  -->
+<!-- TODO: verify how the new Rev. A component (u4 vs. u4-u5) affects the SNES unit and decide if the sets have to be separately supported. -->
 	<software name="smkart">
-		<description>Super Mario Kart (Euro)</description> <!-- Revision A has the same ROM as the initial release -->
+		<description>Super Mario Kart (Euro, Rev. A)</description>
+		<year>1992</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1K1X-10" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 16K SRAM" />
+			<feature name="u3" value="U3 uPD77C25" />
+			<feature name="u4" value="U4 MAD-2" />
+			<feature name="u5" value="U5 CIC" />
+			<feature name="battery" value="CR2032" />
+			<feature name="cart_revision" value="A" />
+			<feature name="cart_model" value="SNSP-006" />
+			<feature name="cart_back_label" value="SNSP-EUR" />
+			<dataarea name="rom" size="524288">
+				<rom name="spal-mk-0.u1" size="524288" crc="56410e5e" sha1="27d9b4f30d39af75075691344b7bdeedbd32ac19" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="smkarta" cloneof="smkart">
+		<description>Super Mario Kart (Euro)</description>
 		<year>1992</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="snes_cart">
@@ -388,21 +499,9 @@ The software list will be divided in four categories:
 			<feature name="u5" value="U5 74HCU04" />
 			<feature name="u6" value="U6 CIC" />
 			<feature name="battery" value="CR2032" />
-			<feature name="cart_revision" value="N/A" />
+			<feature name="cart_revision" value="none" />
 			<feature name="cart_model" value="SNSP-006" />
 			<feature name="cart_back_label" value="unknown" />
-<!-- Revision A features:
-			<feature name="pcb" value="SHVC-1K1X-10" />
-			<feature name="u1" value="U1 MASK ROM" />
-			<feature name="u2" value="U2 16K SRAM" />
-			<feature name="u3" value="U3 uPD77C25" />
-			<feature name="u4" value="U4 MAD-2" />
-			<feature name="u5" value="U5 CIC" />
-			<feature name="battery" value="CR2032" />
-			<feature name="cart_revision" value="A" />
-			<feature name="cart_model" value="SNSP-006" />
-			<feature name="cart_back_label" value="SNSP-EUR" />
--->
 			<dataarea name="rom" size="524288">
 				<rom name="spal-mk-0.u1" size="524288" crc="56410e5e" sha1="27d9b4f30d39af75075691344b7bdeedbd32ac19" offset="000000" />
 			</dataarea>
@@ -422,7 +521,7 @@ The software list will be divided in four categories:
 			<feature name="u4" value="U4 MAD-1" />
 			<feature name="u5" value="U5 CIC" />
 			<feature name="battery" value="CR2032" />
-			<feature name="cart_revision" value="N/A" />
+			<feature name="cart_revision" value="none" />
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="920214" />
 			<dataarea name="rom" size="1310720">
@@ -2587,18 +2686,6 @@ The software list will be divided in four categories:
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="b.o.b. (usa).sfc" size="1048576" crc="4f593c46" sha1="8b9efe5107285c776b24241a0a93f54f23a46e09" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="bahamut">
-		<!-- Serial:  - Release Date: 1996-02-09 -->
-		<description>Bahamut Lagoon (Jpn)</description>
-		<year>1996</year>
-		<publisher>Square</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="3145728">
-				<rom name="bahamut lagoon (japan).sfc" size="3145728" crc="1b83c440" sha1="c8bca249ebd481dfd7bb851c7846844ab70d3003" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -5937,18 +6024,6 @@ The software list will be divided in four categories:
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="chrono trigger (japan) (sample).sfc" size="4194304" crc="17c9f363" sha1="6dea64bcbbe2e6f396270a8c992850f82ec12e38" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ctriggerj" cloneof="ctrigger">
-		<!-- Serial:  - Release Date: 1995-03-11 -->
-		<description>Chrono Trigger (Jpn)</description>
-		<year>1995</year>
-		<publisher>Square</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="4194304">
-				<rom name="chrono trigger (japan).sfc" size="4194304" crc="4d014c20" sha1="a82f0fba9bb111ffd0a878853a4563917d9b67bb" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
