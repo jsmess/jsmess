@@ -13,7 +13,6 @@ The following games existed according to VGRebirth
   - Scratch Golf (USA) by Vic Tokai
   - Sonic Drift (Euro) by Sega
   - Super Golf (USA) by Sage's Creations
-  - T2 (Jpn) by Acclaim
   - Terminator 2 - Judgement Day (Jpn) by Acclaim
   - Zool (Euro) by Gremlin Interactive
 
@@ -6103,6 +6102,18 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
+	<!-- Alt. Title: ソニック＆テイルス 実演用 サンプル -->
+	<software name="sonictlss" cloneof="sonicc">
+		<description>Sonic &amp; Tails (Jpn, Jitsuenyou Sample)</description>
+		<year>1993</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="gamegear_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="sonic &amp; tails [demo] (jp).bin" size="524288" crc="e0e3fb6a" sha1="cb09f304f3da4bb23fe70abec4b94b4826c41111" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- Id:  - Developers:  - Releases:  (Jpn) -->
 	<software name="sonictl2" cloneof="sonictri">
 		<description>Sonic &amp; Tails 2 (Jpn)</description>
@@ -7440,6 +7451,17 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="t2 - the arcade game (usa, europe).bin" size="524288" crc="9479c83a" sha1="12b6f5542b6cebfe872096eab2a885d297eefa2f" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="t2agj" cloneof="t2ag">
+		<description>T2 - The Arcade Game (Jpn)</description>
+		<year>1993</year>
+		<publisher>Acclaim</publisher>
+		<part name="cart" interface="gamegear_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="t2 - the arcade game (jp).bin" size="524288" crc="0b1ba87f" sha1="a56fc1154709cae443efeed6e6310cc059396605" offset="000000" />
 			</dataarea>
 		</part>
 	</software>

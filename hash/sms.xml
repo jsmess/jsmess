@@ -13,6 +13,19 @@
   4 in 1 carts)
 
 -->
+<!--
+  Taiwanese releases for the Aaronix Mark III
+  - White Gold Cartridges
+  GB1301 - Fantasy Zone / Kuàilè xiǎo fēidié (快樂小飛碟)  [dumped]
+  GB1303 - Hokuto no Ken / Běidǒu shén quán (北斗神拳)  [dumped]
+  GB1310 - Space Harrier / ???  [verified to be the same as the Jpn release]
+  GB1314 - Double Target / Shí miàn máifú (十面埋伏)  [verified to be the same as the Jpn release]
+  - Yellow Gold Cartridges
+  K307 - Great Soccer / Shìjiè bēi zúqiú sài (世界杯足球賽)  [dumped]
+  K313 - F-16 Fighting Falcon / F-16  [dumped]
+  K317 - Comical Machine Gun Joe / Dàzhàn hēishǒu dǎng (大戰黑手黨)  [dumped]
+  K321 - Spy Vs. Spy / Dié duì dié (諜對諜)  [dumped]
+-->
 
 <softwarelist name="sms" description="Sega Master System cartridges">
 	<!-- Id: 0002 -->
@@ -50,8 +63,9 @@
 		</part>
 	</software>
 
+	<!-- Id: G-1305, 5055, 41008 - Releases: 1986-08-17 (JPN) - Alt Title: アクションファイター -->
 	<software name="actionfg">
-		<description>Action Fighter (Euro, USA, v1.2)</description>
+		<description>Action Fighter (Euro, USA, Bra, v2)</description>
 		<year>1986</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -61,9 +75,8 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1305, 5055 - Releases: 1986-08-17 (JPN) - Alt Title: アクションファイター -->
 	<software name="actionfg1" cloneof="actionfg">
-		<description>Action Fighter (Euro, Jpn, v1.1)</description>
+		<description>Action Fighter (Euro, Jpn, v1)</description>
 		<year>1986</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -87,7 +100,7 @@
 
 	<!-- Id: 7041 -->
 	<software name="aerialas">
-		<description>Aerial Assault (Euro)</description>
+		<description>Aerial Assault (Euro, Bra)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -122,6 +135,7 @@
 
 	<software name="agidooly" cloneof="dinodool">
 		<description>Agigongnyong Dooly (Kor)</description>
+        <!-- Korean version of dinodool (which is also a Korean cart, but in English) -->
 		<year>1991</year>
 		<publisher>Daou Infosys</publisher>
 		<part name="cart" interface="sms_cart">
@@ -131,9 +145,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 7102 -->
+	<!-- Id: 7102, GB2018JG -->
 	<software name="airresc">
-		<description>Air Rescue (Euro)</description>
+		<description>Air Rescue (Euro, Bra, Kor)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -143,9 +157,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 9027 -->
+	<!-- Id: 9027, 028420, GB94001JG -->
 	<software name="aladdin">
-		<description>Aladdin (Euro)</description>
+		<description>Aladdin (Euro, Bra, Kor)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -1154,6 +1168,18 @@
 		</part>
 	</software>
 
+    <!-- Alt. Title: Dàzhàn hēishǒu dǎng ~ 大戰黑手黨 -->
+	<software name="comicaltw" cloneof="comical">
+		<description>Comical Machine Gun Joe (Tw)</description>
+		<year>1986?</year>
+		<publisher>Aaronix</publisher>
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="comical machine gun joe (tw).bin" size="32768" crc="84ad5ae4" sha1="b39b09f86b275612f6444247ff253f2620a36ef3" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- Id: 27068-50 -->
 	<software name="coolspot">
 		<description>Cool Spot (Euro)</description>
@@ -1622,6 +1648,18 @@
 		</part>
 	</software>
 
+    <!-- Alt Title: F-16 -->
+	<software name="f16falctw" cloneof="f16fight">
+		<description>F-16 Fighting Falcon (Tw)</description>
+		<year>1985?</year>
+		<publisher>Aaronix</publisher>
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="f-16 fighting falcon (tw).bin" size="32768" crc="c4c53226" sha1="9a6c70c1cb18d34e39f4037a555759ce97c6eeef" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- Id: 4581 (Euro Cart re-release?) -->
 	<software name="f16fight">
 		<description>F-16 Fighter (Euro, USA)</description>
@@ -1724,6 +1762,18 @@
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="fantasy zone (japan).bin" size="131072" crc="0ffbcaa3" sha1="b486d8be0cf669117e134f9e53a452bf71097479" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+    <!-- Alt Title: Kuàilè xiǎo fēidié ~ 快樂小飛碟 -->
+	<software name="fantzonetw" cloneof="fantzone">
+		<description>Fantasy Zone (Tw)</description>
+		<year>1986?</year>
+		<publisher>Aaronix</publisher>
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="fantasy zone (tw).bin" size="131072" crc="5fd48352" sha1="5162cd4923cdcad66fee0aa18d5e63fcf5259c00" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -2333,13 +2383,14 @@
 		</part>
 	</software>
 
-	<software name="greatscrj1" cloneof="greatscr">
-		<description>Great Soccer (Jpn, Pirate)</description>
-		<year>1985</year>
-		<publisher>&lt;pirate&gt;</publisher>
+    <!-- Alt Title: Shìjiè bēi zúqiú sài ~ 世界杯足球賽 -->
+	<software name="greatscrtw" cloneof="greatscr">
+		<description>Great Soccer (Tw)</description>
+		<year>1985?</year>
+		<publisher>Aaronix</publisher>
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="great soccer (j) [p1][!].bin" size="32768" crc="84665648" sha1="88611c50fcaa307bfd70b2bd5effeb39c2c4f3ae" offset="000000" />
+				<rom name="great soccer (tw).bin" size="32768" crc="84665648" sha1="88611c50fcaa307bfd70b2bd5effeb39c2c4f3ae" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -2482,6 +2533,18 @@
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="hokuto no ken (japan).bin" size="131072" crc="24f5fe8c" sha1="26c5da3ee48bc0f8fd3d20f9408e584242edcd9d" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+    <!-- Alt Title: Běidǒu shén quán ~ 北斗神拳 -->
+	<software name="hokutotw" cloneof="blackblt">
+		<description>Hokuto no Ken (Tw)</description>
+		<year>1986?</year>
+		<publisher>Aaronix</publisher>
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="hokuto no ken (tw).bin" size="131072" crc="c4ab363d" sha1="a66f9373f75355855aac52fdc11d9ad887fd5556" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -4755,6 +4818,18 @@
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="spy vs spy (japan).bin" size="32768" crc="d41b9a08" sha1="c5e004b34d6569e6e1d99bff6be940f308e2c39f" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+    <!-- Alt Title: Dié duì dié ~ 諜對諜 -->
+	<software name="spyvsspytw" cloneof="spyvsspy">
+		<description>Spy vs Spy (Tw)</description>
+		<year>1986?</year>
+		<publisher>Aaronix</publisher>
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="spy vs spy (tw).bin" size="32768" crc="689f58a2" sha1="9f715b67ffddc432299c9bbae6b7e088ddbd4679" offset="000000" />
 			</dataarea>
 		</part>
 	</software>

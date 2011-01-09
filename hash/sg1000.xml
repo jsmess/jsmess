@@ -1,10 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!-- Othello Multivision carts are marked with OMV.
-Known undumped OMV games
-  OM-G007   Space Armor ~ スペースアーマー	
 
-Other Canceled titles (possibly exist in prototype form)
+Canceled titles (possibly exist in prototype form)
   C-62    Champion Ski (by Sega)
   OM-G009 Challenge Soccer (by Tsukuda)
   OM-G010 Great Escape 2 (by Tsukuda)
@@ -23,35 +21,81 @@ C-43 - Zippy Race
  -->
 <!--
 Many SG-1000 games were also sold in Taiwan by Aaronix
-These are mostly undumped (except a few, thanks to Bock and SMS Power)
-and probably many more exist
+These are now mostly dumped (thanks to Bock and SMS Power)
 
 codes: "color of the cart"-"game number". colors: White, Blue and Red.
 
-W-011 世界棒球賽 -> G-1011 Champion Baseball [dumped]
-W-012 辛巴達 -> G-1012 Sindbad Mystery
-W-020 迷魂車 -> G-1020 Pacar
-W-022 蜜蜂二代 -> G-1022 Sega Galaga
-B-026 摩托車遊美國 -> G-1026 Zippy Race
-B-028 火鳳凰 -> G-1028 Exerion
-B-031 尋寶記(敲金塊) -> G-1031 Lode Runner
-B-035 貓抓老鼠 -> G-1035 Hustle Chumy
-B-036 餓貓抓小雞 -> G-1036 Flicky
-B-042 奧運大賽 -> G-1042 Hyper Sports
-B-043 星際大戰 -> G-1043 Star Force [dumped]
-
-R-046 精武門 -> C-46 Dragon Wang [dumped]
-R-048 飛狼 -> C-48 Choplifter
-R-049 法櫃奇兵 -> C-49 Pitfall II
-R-050 企鵝 -> C-50 Doki Doki Penguin Land [dumped]
-R-051 救難小英雄 -> C-51 Drol
-R-052 打漁 -> C-52 Chack'n Pop
-R-054 摩天大樓 -> C-54 Rock n' Bolt	
-R-055 諜對諜 -> C-55 Elevator Action	
+W-001 偷渡邊境 / Tōudù biānjìng -> G-1001 Borderline [WANTED]
+W-002 叢林歷險 / Cónglín lìxiǎn -> G-1002 Safari Hunting [dumped]
+W-003 潛水大戰 / Qiánshuǐ dàzhàn -> G-1003 N-Sub [dumped]
+B-004 雙人麻雀 / Shuāngrén máquè -> G-1004 Mahjong [dumped]
+B-005 高爾夫賽 / Gāoěrfū sài -> G-1005 Champion Golf [WANTED]
+W-006 水精靈 / Shuǐ jīnglíng -> OM-G002 Guzzler [dumped]
+B-007 金鋼三代 / Jīn gāng sāndài -> G-1007 Congo Bongo [WANTED]
+W-008 太和艦 / Tài hé jiàn -> G-1008 Yamato [dumped]
+W-009 007 -> OM-G008 007 James Bond [dumped]
+B-010 太空城 / Tàikōng chéng -> G-1010 Star Jacker [dumped]
+W-011 世界棒球賽 / Shìjiè bàngqiú sài -> G-1011 Champion Baseball [dumped]
+B-012 天方夜譚 / Tiānfāng yè tán -> G-1012 Sindbad Mystery [dumped]
+W-013 三人麻雀 / Sān rén máquè -> OM-G004 San-nin Mahjong [dumped]
+B-014 哥爾哥13 / Gē ěr gē 13 -> G-1014 Golgo 13 [WANTED]
+B-015 太空怪獸 / Tàikōng guàishòu -> G-1015 Orguss [WANTED, a Tw cart with no product number has been dumped and matched the Jpn cart, but a B-015 cart might exist!]
+W-016 帝國大反擊 / Dìguó dà fǎnjí -> OM-G007 Space Armor [dumped, same as Jpn v0 dump). 
+B-017 摩納哥賽車 / Mónàgē sàichē -> G-1017 Monaco GP [dumped]
+W-018 霹靂彈 / Pīlì dàn -> G-1018 Sega Flipper [dumped?]
+W-019 精靈鼠 / Jīnglíng shǔ -> G-1019 Pop Flamer [dumped]
+W-020 迷魂車 / Mí hún chē -> G-1020 Pacar [dumped]
+B-021 女子高爾夫 / Nǚzǐ gāoěrfū -> OM-G006 Okamoto Ayako no Match Play Golf [dumped]
+W-022 蜜蜂二代 / Mìfēng èr dài -> G-1022 Sega-Galaga [dumped]
+B-026 摩托車遊美國 / Mótuō chē yóu měiguó -> G-1026 Zippy Race [dumped]
+W-028 地球保衛戰 / Dìqiú bǎowèi zhàn -> G-1028 Exerion [dumped]
+W-029 賓果遊戲 / Bīn guǒ yóuxì -> G-1029 Pachinko II [dumped]
+R-030 四人麻雀 / Sì rén máquè -> G-1030 Home Mahjong [dumped]
+B-031 尋寶記 / Xún bǎo jì -> G-1031 Lode Runner [dumped]
+B-032 非洲大賽車 / Fēizhōu dà sàichē -> G-1032 Safari Race [dumped]
+B-033 拳王爭霸戰 / Quán wáng zhēng bà zhàn -> G-1033 Champion Boxing [dumped]
+W-034 足球王 / Zúqiú wáng -> G-1034 Champion Soccer [dumped]
+W-035 頑皮鼠 / Wánpí shǔ -> G-1035 Hustle Chumy [WANTED]
+B-036 餓貓抓小雞 / È māo zhuā xiǎo jī -> G-1036 Flicky [dumped]
+B-037 美人會英雄 / Měirén huì yīngxióng -> G-1037 Girl's Garden [dumped]
+B-038 突擊大本營 / Tújí dàběnyíng -> G-1038 Zaxxon [dumped]
+B-039 摔角大賽 / Shuāi jiǎo dàsài -> G-1039 Champion Pro Wrestling [WANTED]
+B-040 瘋狂大賽車 / Fēngkuáng dà sàichē -> G-1040 GP World [dumped]
+B-041 妙伙計 / Miào huǒjì -> G-1041 Konami no Shinnyuushain Tooru-Kun [WANTED]
+B-042 奧運大賽 / Àoyùn dàsài -> G-1042 Hyper Sports [dumped]
+B-043 星際大戰 / Xīngjì dàzhàn -> G-1043 Star Force [2 taiwanese ROM variations dumped]
+R-044 黑白棋 / Hēibái qí -> G-1044 Othello [dumped]
+W-045 太空侵略戰 / Tàikōng qīnlüè zhàn -> G-1045 Space Invaders [dumped]
+R-046 精武門 / Jīng wǔmén -> C-46 Dragon Wang [2 taiwanese ROM variations dumped]
+R-047 火狐狸 / Huǒ húlí -> C-47 Zoom 909 [dumped]
+R-048 飛狼 / Fēi láng -> C-48 Choplifter [2 taiwanese ROM variations dumped]
+R-049 法櫃奇兵 / Fǎ guì qíbīng -> C-49 Pitfall II [2 taiwanese ROM variations dumped]
+R-050 企鵝 / Qì'é -> C-50 Doki Doki Penguin Land [dumped]
+R-051 救難小英雄 / Jiùnàn xiǎo yīngxióng -> C-51 Drol [dumped]
+R-052 ?? maybe 賽馬 / Sàimǎ -> OM-G005 Challenge Derby [WANTED]
+R-052 ?? maybe 打漁 -> C-52 Chack'n Pop
+R-053 比利大盜 / Bǐ lì dà dào -> C-53 Bank Panic [dumped]
+R-054 摩天大樓 / Mótiān dàlóu -> C-54 Rock n' Bolt [dumped]	
+R-055 諜對諜 / Dié duì dié -> C-55 Elevator Action [dumped]	
 R-056 倉庫番 -> C-56 Sokoban	
 R-062 摩托飛車 -> ?? maybe is the same as B-026 (i.e. Zippy Race)
 R-065 忍者公主 -> C-65 Ninja Princess
 R-066 超級坦克 -> C-66 Super Tank
+
+R-103 功夫 -> Gōngfu (Yie Ar Kung-Fu conversion from MSX1)
+R-108 乒乓球 -> Pīngpāng qiú (Konami Ping Pong conversion from MSX1)
+
+
+Some alternate Aaronix taiwanese carts with generic label contain a regular JP build
+
+Also other Taiwanese carts have been dumped by Bock (unknown manufacturer, so it's hard to tell if they are licensed or pirate)
+
+A103 : 大金鋼 / Dà jīn gāng -> Congo Bongo
+A116 : 世界賽車 / Shìjiè sàichē -> Monaco GP (same dump as B-017 by Aaronix)
+A121 : 新國四傅 / Xīn guó sì fu -> Konami no Shinnyuushain Tooru-Kun
+A127 : 西部槍戰 / Xībù qiāngzhàn -> Bank Panic (same as R-053 by Aaronix)
+A129 : 飛鷹Ｆ１６ / Fēi yīng F16 -> Choplifter [WANTED]
+A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by Aaronix)
 
 -->
 
@@ -69,6 +113,18 @@ R-066 超級坦克 -> C-66 Super Tank
 		</part>
 	</software>
 
+	<software name="3ninmjt" cloneof="3ninmj">
+		<!-- Serial: W-013 - Alt Title: Sān rén máquè ~ 三人麻雀 -->
+		<description>San-nin Mahjong (Tw)</description>
+		<year>1984?</year>
+		<publisher>Aaronix</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="san-nin mahjong (tw).bin" size="16384" crc="6fd17655" sha1="245e9adf0fdb33849f1e6ef872c1b204cbed5754" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="bankpani">
 		<!-- Serial: C-53 - Alt Title: バンク パニック -->
 		<description>Bank Panic (Jpn)</description>
@@ -77,6 +133,18 @@ R-066 超級坦克 -> C-66 Super Tank
 		<part name="cart" interface="sg1000_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="bank panic (japan).bin" size="32768" crc="d8a87095" sha1="8e1dc4d79c5bc45fc6112969ea9a2c68b3c86666" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bilidada" cloneof="bankpani">
+		<!-- Serial: R-053 - Alt Title: Bǐ lì dà dào ~ 比利大盜 -->
+		<description>Bi Li Da Dao (Tw)</description>
+		<year>1985?</year>
+		<publisher>Aaronix</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="bank panic (tw).bin" size="32768" crc="bd43fde4" sha1="18f7ab9fe95aeacceab36297cdf9374dc7e3233f" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -228,6 +296,18 @@ R-066 超級坦克 -> C-66 Super Tank
 		</part>
 	</software>
 
+	<software name="champboxt" cloneof="champbox">
+		<!-- Serial: B-033 - Alt Title: Quán wáng zhēng bà zhàn ~ 拳王爭霸戰 -->
+		<description>Champion Boxing (Tw)</description>
+		<year>1984?</year>
+		<publisher>Aaronix</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="champion boxing (tw).bin" size="32768" crc="15d2ce33" sha1="e55396be42c6cfbf47ff43d3e8faee1dc8fad807" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="champbox1" cloneof="champbox">
 		<!-- Serial: C-33 - Alt Title: チャンピオン ボクシング -->
 		<description>Champion Boxing (MyCard) (Jpn)</description>
@@ -312,6 +392,18 @@ R-066 超級坦克 -> C-66 Super Tank
 		</part>
 	</software>
 
+	<software name="champscrt" cloneof="champscr">
+		<!-- Serial: W-034 - Alt Title: Zúqiú wáng ~ 足球王 -->
+		<description>Champion Soccer (Tw)</description>
+		<year>1984?</year>
+		<publisher>Aaronix</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="champion soccer (tw).bin" size="16384" crc="269c1aee" sha1="ad2a72dff1959e3e148c48962ab382897bc06627" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="champtns">
 		<!-- Serial: G-1009 - Alt Title: チャンピオン テニス -->
 		<description>Champion Tennis (Jpn)</description>
@@ -347,6 +439,32 @@ R-066 超級坦克 -> C-66 Super Tank
 		</part>
 	</software>
 
+	<software name="feilang" cloneof="choplift">
+		<!-- Serial: R-048 - Alt Title: Fēi láng ~ 飛狼 -->
+		<description>Fei Lang (Tw)</description>
+        <!-- This version has the Chinese title screen after the Chinese title -->
+		<year>1985?</year>
+		<publisher>Aaronix</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="choplifter [chinese logo] (tw).bin" size="32768" crc="746a8d86" sha1="af6c40febe02fe2b424ea99e666cf3f451eb5a1f" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="feilanga" cloneof="choplift">
+		<!-- Serial: R-048 - Alt Title: Fēi láng ~ 飛狼 -->
+		<description>Fei Lang (Tw, Alt)</description>
+        <!-- This version has the English title screen after the Chinese title -->
+		<year>1985?</year>
+		<publisher>Aaronix</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="choplifter [english logo] (tw).bin" size="32768" crc="7c603987" sha1="61d1afe62b2be0da26d8a185828387063dd4b06e" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="cloderun">
 		<!-- Serial: C-57 - Alt Title: チャンピオンシップ ロードランナー -->
 		<description>Championship Lode Runner (Jpn)</description>
@@ -361,13 +479,36 @@ R-066 超級坦克 -> C-66 Super Tank
 
 	<software name="congo">
 		<!-- Serial: G-1007 - Alt Title: コンゴ・ボンゴ -->
-		<description>Congo Bongo (Euro, Jpn)</description>
+		<description>Congo Bongo (Jpn, v1)</description>
         <!-- other 32k dumps floating around are overdumps, as verified by Bock! -->
 		<year>1983</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sg1000_cart">
-			<dataarea name="rom" size="32768">
+			<dataarea name="rom" size="24576">
+				<rom name="congo bongo [v1].bin" size="24576" crc="5eb48a20" sha1="9e153c7822a36230e85e9ac0ddc53d6fee810089" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="congo1" cloneof="congo">
+		<description>Congo Bongo (Euro, Jpn, v0)</description>
+ 		<year>1983</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="24576">
 				<rom name="congo bongo.bin" size="24576" crc="5a24c7cf" sha1="47aba6a295e5695db4c3aaa1dea8ad8ac961b5f9" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="congot" cloneof="congo"> <!-- based on Jpn v0 release -->
+		<!-- Serial: A103 - Alt Title: Dà jīn gāng ~ 大金鋼 -->
+		<description>Congo Bongo (Tw)</description>
+ 		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="24576">
+				<rom name="congo bongo (tw).bin" size="24576" crc="f7eb94c5" sha1="3fe3272374135e8b5e849bdcd12812a90bb9901c" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -396,9 +537,9 @@ R-066 超級坦克 -> C-66 Super Tank
 		</part>
 	</software>
 
-	<software name="dokidokit" cloneof="dokidoki">
-		<!-- Serial: R-050 - Alt Title: 企鵝 -->
-		<description>Penguin Land (Tw)</description>
+	<software name="qie" cloneof="dokidoki">
+		<!-- Serial: R-050 - Alt Title: Qì'é ~ 企鵝 -->
+		<description>Qi E (Tw)</description>
 		<year>1985?</year>
 		<publisher>Aaronix</publisher>
 		<part name="cart" interface="sg1000_cart">
@@ -410,7 +551,7 @@ R-066 超級坦克 -> C-66 Super Tank
 
 	<software name="dragwang">
 		<!-- Serial: C-46 - Alt Title: ドラゴン-ワン -->
-		<description>Dragon Wang (Jpn)</description>
+		<description>Dragon Wang (Jpn, v1)</description>
 		<year>1985</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sg1000_cart">
@@ -420,9 +561,10 @@ R-066 超級坦克 -> C-66 Super Tank
 		</part>
 	</software>
 
-	<software name="jingwumn" cloneof="dragwang">
+	<software name="jingwumn" cloneof="dragwang"> <!-- based on Jpn v0 release -->
         <!-- Serial: R-046 - Alt Title: 精武門 -->
 		<description>Jing Wu Men (Tw)</description>
+        <!-- This version has Chinese title screen after the Chinese title -->
 		<year>1985?</year>
 		<publisher>Aaronix</publisher>
 		<part name="cart" interface="sg1000_cart">
@@ -432,8 +574,21 @@ R-066 超級坦克 -> C-66 Super Tank
 		</part>
 	</software>
 
+	<software name="jingwumna" cloneof="dragwang"> <!-- based on Jpn v0 release -->
+        <!-- Serial: R-046 - Alt Title: 精武門 -->
+		<description>Jing Wu Men (Tw, Alt)</description>
+        <!-- This version has English title screen after the Chinese title -->
+		<year>1985?</year>
+		<publisher>Aaronix</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="dragon wang [v0] [english logo] (tw).bin" size="32768" crc="6f94e5c0" sha1="b2a3c886677ba3926cb56a1a781e7926852499c7" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="dragwang1" cloneof="dragwang">
-		<description>Dragon Wang (Jpn, Alt)</description>
+		<description>Dragon Wang (Jpn, v0)</description>
 		<year>1985</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sg1000_cart">
@@ -455,6 +610,18 @@ R-066 超級坦克 -> C-66 Super Tank
 		</part>
 	</software>
 
+	<software name="drolt" cloneof="drol">
+		<!-- Serial: R-051 - Alt Title: Jiùnàn xiǎo yīngxióng ~ 救難小英雄 -->
+		<description>Drol (Tw)</description>
+		<year>1985?</year>
+		<publisher>Aaronix</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="drol (tw).bin" size="32768" crc="b7fc033d" sha1="8bb117df0a86508cf3fc139bd070c0aa8c6487dd" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="elevator">
 		<!-- Serial: C-55 - Alt Title: エレベーター アクション -->
 		<description>Elevator Action (Jpn)</description>
@@ -467,6 +634,18 @@ R-066 超級坦克 -> C-66 Super Tank
 		</part>
 	</software>
 
+	<software name="elevatort" cloneof="elevator">
+		<!-- Serial: R-055 - Alt Title: Dié duì dié ~ 諜對諜 -->
+		<description>Die Dui Die (Tw)</description>
+		<year>1985?</year>
+		<publisher>Aaronix</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="elevator action (tw).bin" size="32768" crc="6846e36d" sha1="0c419fdd769371f97c66030c51b21c786b89a105" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="exerion">
 		<!-- Serial: G-1028 - Alt Title: エクセリオン -->
 		<description>Exerion (Euro, Jpn)</description>
@@ -475,6 +654,18 @@ R-066 超級坦克 -> C-66 Super Tank
 		<part name="cart" interface="sg1000_cart">
 			<dataarea name="rom" size="16384">
 				<rom name="exerion (japan, europe).bin" size="16384" crc="a2c45b61" sha1="839e19487b96d02222ff397b047cbc6a0fbc08ff" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="exeriont" cloneof="exerion">
+		<!-- Serial: W-028 - Alt Title: Dìqiú bǎowèi zhàn ~ 地球保衛戰 -->
+		<description>Exerion (Tw)</description>
+		<year>1983?</year>
+		<publisher>Aaronix</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="exerion (tw).bin" size="16384" crc="b5c84a32" sha1="75555c1a05a14401e4136bffb9fb52f88a17ecfc" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -493,12 +684,24 @@ R-066 超級坦克 -> C-66 Super Tank
 
 	<software name="flickya" cloneof="flicky">
 		<!-- Serial: G-1036 - Alt Title: フリッキー -->
-		<description>Flicky (Jpn)</description>
+		<description>Flicky (Jpn, v0)</description>
 		<year>1984</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sg1000_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="flicky (japan).bin" size="32768" crc="bd24d27b" sha1="39a91b5ad6b139ca5d8ac60b78520210e84944bd" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="flickyt" cloneof="flicky"> <!-- Based on Jpn v1 release -->
+		<!-- Serial: B-036 - Alt Title: È māo zhuā xiǎo jī ~ 餓貓抓小雞 -->
+		<description>Flicky (Tw)</description>
+		<year>1984?</year>
+		<publisher>Aaronix</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="flicky (tw).bin" size="32768" crc="cd0666a7" sha1="a04ce8c70eddfac0adbf9489c0abbaaae613037c" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -511,6 +714,18 @@ R-066 超級坦克 -> C-66 Super Tank
 		<part name="cart" interface="sg1000_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="girl's garden (japan).bin" size="32768" crc="1898f274" sha1="0e08786587fb76909b3f9806ba1f5d57ea17728c" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="girlgardt" cloneof="girlgard">
+		<!-- Serial: B-037 - Alt Title: Měirén huì yīngxióng ~ 美人會英雄 -->
+		<description>Girl's Garden (Tw)</description>
+		<year>1984?</year>
+		<publisher>Aaronix</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="girl's garden (tw).bin" size="32768" crc="b9635ac4" sha1="94089be091af476c5628225e0262396faa5394f1" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -551,6 +766,18 @@ R-066 超級坦克 -> C-66 Super Tank
 		</part>
 	</software>
 
+	<software name="gpworldt" cloneof="gpworld"> <!-- based on Jpn v0 release -->
+		<!-- Serial: B-040 - Alt Title: Fēngkuáng dà sàichē ~ 瘋狂大賽車 -->
+		<description>GP World (Tw)</description>
+		<year>1985?</year>
+		<publisher>Aaronix</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="gp world (tw).bin" size="32768" crc="f19f7548" sha1="11773e7eb2dca727ea293b5aa50ed8094df29f41" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="gulkave">
 		<!-- Serial: C-63 - Alt Title: ガルケーブ -->
 		<description>Gulkave (Jpn)</description>
@@ -571,6 +798,18 @@ R-066 超級坦克 -> C-66 Super Tank
 		<part name="cart" interface="sg1000_cart">
 			<dataarea name="rom" size="8192">
 				<rom name="guzzler (japan) (om).bin" size="8192" crc="61fa9ea0" sha1="d42b2c5f1da4e0fbd29fcea91bfc092ae46da4b8" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="guzzlert" cloneof="guzzler">
+		<!-- Serial: W-006 - Alt Title: Shuǐ jīnglíng ~ 水精靈 -->
+		<description>Guzzler (Tw)</description>
+		<year>1983?</year>
+		<publisher>Aaronix</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="guzzler (tw).bin" size="8192" crc="eb808158" sha1="5c51f9846fb8220ab7dd6db5d6911cf4e985bfe9" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -601,7 +840,7 @@ R-066 超級坦克 -> C-66 Super Tank
 
 	<software name="homemj">
 		<!-- Serial: G-1030 - Alt Title: ホーム麻雀 -->
-		<description>Home Mahjong (Jpn, v1.1)</description>
+		<description>Home Mahjong (Jpn, v1)</description>
 		<year>1984</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sg1000_cart">
@@ -612,12 +851,24 @@ R-066 超級坦克 -> C-66 Super Tank
 	</software>
 
 	<software name="homemj1" cloneof="homemj">
-		<description>Home Mahjong (Jpn, v1.0)</description>
+		<description>Home Mahjong (Jpn, v0)</description>
 		<year>1984</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sg1000_cart">
 			<dataarea name="rom" size="49152">
 				<rom name="home mahjong (japan) (v1.0).bin" size="49152" crc="c9d1ae7d" sha1="0202c0d86c4b793c58af021edfb3c077ae3169a5" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="homemjt" cloneof="homemj"> <!-- based on Jpn v1 release -->
+		<!-- Serial: R-030 - Alt Title: Sì rén máquè ~ 四人麻雀 -->
+		<description>Yon-nin Mahjong (Tw)</description>
+		<year>1984?</year>
+		<publisher>Aaronix</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="49152">
+				<rom name="home mahjong (tw).bin" size="49152" crc="0583a9fa" sha1="db98d7461e88cef8160089c44fcd432388e3c9df" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -647,6 +898,18 @@ R-066 超級坦克 -> C-66 Super Tank
 		</part>
 	</software>
 
+	<software name="hyperspt" cloneof="hypersp">
+		<!-- Serial: B-042 - Alt Title: Àoyùn dàsài ~ 奧運大賽 -->
+		<description>Hyper Sports (Tw)</description>
+		<year>1985?</year>
+		<publisher>Aaronix</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="hyper sports (tw).bin" size="32768" crc="87619ac2" sha1="bf4218aebc07aa7179cc52853a55436db985b81e" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="jb007">
 		<!-- Serial: OM-G008 - Alt Title: ダブルオーセブン ジェームス・ボンド -->
 		<description>James Bond 007 (Jpn, v2.7, OMV)</description>
@@ -659,6 +922,18 @@ R-066 超級坦克 -> C-66 Super Tank
 		</part>
 	</software>
 
+	<software name="jb007t" cloneof="jb007">
+		<!-- Serial: W-009 - Alt Title: 007 -->
+		<description>James Bond 007 (Tw)</description>
+		<year>1984?</year>
+		<publisher>Aaronix</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="james bond 007 (tw).bin" size="16384" crc="76d6c64d" sha1="f0b594fa0d371b31bc517afec8e28d4917193f0e" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="loderun">
 		<!-- Serial: G-1031 - Alt Title: ロードランナー -->
 		<description>Lode Runner (Euro, Jpn)</description>
@@ -667,6 +942,18 @@ R-066 超級坦克 -> C-66 Super Tank
 		<part name="cart" interface="sg1000_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="lode runner (japan, europe).bin" size="32768" crc="00ed3970" sha1="f14f216edfda7dfd113f5cb32375a27be8a6409d" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="loderunt" cloneof="loderun">
+		<!-- Serial: B-031 - Alt Title: Xún bǎo jì ~ 尋寶記 -->
+		<description>Lode Runner (Tw)</description>
+		<year>1984?</year>
+		<publisher>Aaronix</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="lode runner (tw).bin" size="32768" crc="d953bdb7" sha1="fb226a489e5a47eb0182a067fa1031ec944ab455" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -692,6 +979,18 @@ R-066 超級坦克 -> C-66 Super Tank
 		<part name="cart" interface="sg1000_cart">
 			<dataarea name="rom" size="24576">
 				<rom name="mahjong [big 1983].bin" size="24576" crc="1c137cab" sha1="81015cea7e5ff08bd7d20953a702d47efdb8c11c" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mahjongt" cloneof="mahjong">
+		<!-- Serial: B-004 - Alt Title: Shuāngrén máquè ~ 雙人麻雀) -->
+		<description>Mahjong (Tw)</description>
+		<year>1983?</year>
+		<publisher>Aaronix</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="24576">
+				<rom name="mahjong (tw).bin" size="24576" crc="bc823a89" sha1="bd5130d36fc0ad008abfc524bb0c37290e7d0189" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -733,6 +1032,18 @@ R-066 超級坦克 -> C-66 Super Tank
 		</part>
 	</software>
 
+	<software name="monacogpt" cloneof="monacogp"> <!-- based on v1 Jpn release -->
+		<!-- Serial: W-017 - Alt Title: Mónàgē sàichē ~ 摩納哥賽車 -->
+		<description>Monaco GP (Tw)</description>
+		<year>1983?</year>
+		<publisher>Aaronix</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="monaco gp (tw).bin" size="32768" crc="01cda679" sha1="464ec3c9acfefd0ad244a43033985e88798905f9" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ninjap">
 		<!-- Serial: C-65 - Alt Title: 忍者プリンセス -->
 		<description>Ninja Princess (Jpn)</description>
@@ -757,7 +1068,7 @@ R-066 超級坦克 -> C-66 Super Tank
 		</part>
 	</software>
 
-	<software name="nsuba">
+	<software name="nsuba" cloneof="nsub">
 		<description>N-Sub (Jpn)</description>
 		<year>1983</year>
 		<publisher>Sega</publisher>
@@ -768,7 +1079,7 @@ R-066 超級坦克 -> C-66 Super Tank
 		</part>
 	</software>
 
-	<software name="nsubb">
+	<software name="nsubb" cloneof="nsub">
 		<description>N-Sub (Jpn, Alt)</description>
         <!-- only 16k out of 40k are the game data, also one between nsuba and nsubb has a gameover glitch (bg color is not reset properly in certain cases), the other is fixed -->
 		<year>1983</year>
@@ -780,26 +1091,49 @@ R-066 超級坦克 -> C-66 Super Tank
 		</part>
 	</software>
 
-	<software name="matchpga">
-		<!-- Serial: OM-G006 - Alt Title: 岡本綾子のマッチプレイゴルフ -->
-		<description>Okamoto Ayako no Match Play Golf (Jpn, Rev. A?, OMV)</description>
-		<year>1984?</year>
-		<publisher>Tsukuda Original</publisher>
+	<software name="nsubt" cloneof="nsub">
+		<!-- Serial: W-003 - Alt Title: Qiánshuǐ dàzhàn ~ 潛水大戰 -->
+		<description>N-Sub (Tw)</description>
+		<year>1983?</year>
+		<publisher>Aaronix</publisher>
 		<part name="cart" interface="sg1000_cart">
-			<dataarea name="rom" size="32768">
-				<rom name="Okamoto Ayako no Match Play Golf [A] (JP).bin" size="32768" crc="547dd7fd" sha1="2fe5e6811aa340f10b67f78ee9ed566a94326bad" offset="000000" />
+			<dataarea name="rom" size="16384">
+				<rom name="n-sub (tw).bin" size="16384" crc="3e371769" sha1="55a36c77cbdf87530611feccf2f1807bdd2ac0ec" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="matchpgb">
-		<!-- Serial:  - Alt Title:  -->
-		<description>Okamoto Ayako no Match Play Golf (Jpn, Rev. B?, OMV)</description>
+	<software name="matchpg">
+		<!-- Serial: OM-G006 - Alt Title: 岡本綾子のマッチプレイゴルフ -->
+		<description>Okamoto Ayako no Match Play Golf (Jpn, OMV)</description>
 		<year>1984?</year>
 		<publisher>Tsukuda Original</publisher>
 		<part name="cart" interface="sg1000_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="Okamoto Ayako no Match Play Golf [B] (JP).bin" size="32768" crc="49d3db2c" sha1="bcb03afd3bbd5dadf00474eac44bb66a5df419cf" offset="000000" />
+				<rom name="okamoto ayako no match play golf [b] (jp).bin" size="32768" crc="49d3db2c" sha1="bcb03afd3bbd5dadf00474eac44bb66a5df419cf" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="matchpga" cloneof="matchpg">
+		<description>Okamoto Ayako no Match Play Golf (Jpn, Alt, OMV)</description>
+		<year>1984?</year>
+		<publisher>Tsukuda Original</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="okamoto ayako no match play golf [a] (jp).bin" size="32768" crc="547dd7fd" sha1="2fe5e6811aa340f10b67f78ee9ed566a94326bad" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="matchpgt" cloneof="matchpg"> <!-- based on Jpn Rev. B? -->
+		<!-- Serial: B-021 - Alt Title: Nǚzǐ gāoěrfū ~ 女子高爾夫 -->
+		<description>Okamoto Ayako no Match Play Golf (Tw)</description>
+		<year>1984?</year>
+		<publisher>Aaronix</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="okamoto ayako no match play golf (tw).bin" size="32768" crc="b60492d5" sha1="543046650e07b10dbd2dca6f20bcafb9dd6dda77" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -828,6 +1162,18 @@ R-066 超級坦克 -> C-66 Super Tank
 		</part>
 	</software>
 
+	<software name="heibaiqi" cloneof="othello">
+		<!-- Serial: R-044 - Alt Title: Hēibái qí ~ 黑白棋 -->
+		<description>Hei Bai Qi (Tw)</description>
+		<year>1985?</year>
+		<publisher>Aaronix</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="othello (tw).bin" size="32768" crc="1d1a0ca3" sha1="242c29989149b94ff27d59a94f067d0f1c84b4a7" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="pacar">
 		<!-- Serial: G-1020 - Alt Title: パッカー -->
 		<description>Pacar (Euro, Jpn)</description>
@@ -840,14 +1186,38 @@ R-066 超級坦克 -> C-66 Super Tank
 		</part>
 	</software>
 
+	<software name="pacart" cloneof="pacar">
+		<!-- Serial: W-020 - Alt Title: Mí hún chē ~ 迷魂車 -->
+		<description>Pacar (Tw)</description>
+		<year>1983?</year>
+		<publisher>Aaronix</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="pacar (tw).bin" size="16384" crc="dd6817a0" sha1="0833be2743608983012cab6e3bdd6fd56453114e" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="pachink2">
-		<!-- Serial: G-1027 - Alt Title: パチンコ -->
+		<!-- Serial: G-1029 - Alt Title: パチンコ2 -->
 		<description>Pachinko II (Jpn)</description>
 		<year>1984</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sg1000_cart">
 			<dataarea name="rom" size="16384">
 				<rom name="pachinko ii (japan).bin" size="16384" crc="fd7cb50a" sha1="1dbc4babbbb377a1ff59a11e550a9b1b5e742b02" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pachink2t" cloneof="pachink2">
+		<!-- Serial: W-029 - Alt Title: Bīn guǒ yóuxì ~ 賓果遊戲 -->
+		<description>Pachinko II (Tw)</description>
+		<year>1984?</year>
+		<publisher>Aaronix</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="pachinko ii (tw).bin" size="16384" crc="6ebe81bf" sha1="ca0c66b4d48d6ade38e7f9093eea74ad090ecdb7" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -860,6 +1230,18 @@ R-066 超級坦克 -> C-66 Super Tank
 		<part name="cart" interface="sg1000_cart">
 			<dataarea name="rom" size="40960">
 				<rom name="pachinko (japan).bin" size="40960" crc="326587e1" sha1="aeaa15155e7d4275880c35c866c45626daa4dab9" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pingpong">
+		<!-- Serial: R-108 - Alt Title: Pīngpāng qiú ~ 乒乓球 -->
+		<description>Ping Pong (Tw)</description>
+		<year>1985?</year>
+		<publisher>Aaronix</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="ping pong (konami's) (tw).bin" size="32768" crc="4d972a9e" sha1="cba791acd9e0f46bfa6132645bf44027e100c68a" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -887,6 +1269,32 @@ R-066 超級坦克 -> C-66 Super Tank
 		</part>
 	</software>
 
+	<software name="faguiqib" cloneof="pitfall2">
+		<!-- Serial: R-049 - Alt Title: Fǎ guì qíbīng ~ 法櫃奇兵 -->
+		<description>Fa Gui Qibing (Tw)</description>
+        <!-- This version has the Chinese title screen -->
+		<year>1985?</year>
+		<publisher>Aaronix</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="pitfall ii [v0] [chinese logo] (tw).bin" size="32768" crc="476a079b" sha1="38c25d7730863877fdae5491724a3aed9c6b04d5" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="faguiqiba" cloneof="pitfall2">
+		<!-- Serial: R-049 - Alt Title: Fǎ guì qíbīng ~ 法櫃奇兵 -->
+		<description>Fa Gui Qibing (Tw, Alt)</description>
+        <!-- This version has the English title screen -->
+		<year>1985?</year>
+		<publisher>Aaronix</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="pitfall ii [v0] [english logo] (tw).bin" size="32768" crc="4e93bc8e" sha1="c98a5bdb2f97e2e85d0a131d58e311544adb416e" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="popflame">
 		<!-- Serial: G-1019 - Alt Title: ポップ フレーマー -->
 		<description>Pop Flamer (Euro, Jpn)</description>
@@ -899,8 +1307,20 @@ R-066 超級坦克 -> C-66 Super Tank
 		</part>
 	</software>
 
+	<software name="popflamet" cloneof="popflame">
+		<!-- Serial: W-019 - Alt Title: Jīnglíng shǔ ~ 精靈鼠 -->
+		<description>Pop Flamer (Tw)</description>
+		<year>1983?</year>
+		<publisher>Aaronix</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="pop flamer (tw).bin" size="16384" crc="ab1da8a6" sha1="25d5cdc7fdd5cba97abbd9d32f61a39aacceb2c0" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="qbert">
-		<!-- Serial: OM-G001 - Release Date: 1983-11-30 - Alt Title: キューバート	 -->
+		<!-- Serial: OM-G001 - Release Date: 1983-11-30 - Alt Title: キューバート -->
 		<description>Q*bert (Jpn, OMV)</description>
 		<year>1983</year>
 		<publisher>Tsukuda Original / Parker Brothers</publisher>
@@ -923,6 +1343,18 @@ R-066 超級坦克 -> C-66 Super Tank
 		</part>
 	</software>
 
+	<software name="motianda" cloneof="rocknbol">
+		<!-- Serial: R-054 - Alt Title: Mótiān dàlóu ~ 摩天大樓 -->
+		<description>Mo Tian Da Lou (Tw)</description>
+		<year>1985?</year>
+		<publisher>Aaronix</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="rock n' bolt (tw).bin" size="32768" crc="4eacb981" sha1="18a6b34d071feaad416704d5e6fd7680374dd669" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="safarihu">
 		<!-- Serial: G-1002 - Alt Title: サファリハンティング -->
 		<description>Safari Hunting (Jpn)</description>
@@ -935,14 +1367,38 @@ R-066 超級坦克 -> C-66 Super Tank
 		</part>
 	</software>
 
+	<software name="safarihut" cloneof="safarihu">
+		<!-- Serial: W-002 - Alt Title: Cónglín lìxiǎn ~ 叢林歷險 -->
+		<description>Safari Hunting (Tw)</description>
+		<year>1983?</year>
+		<publisher>Aaronix</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="safari hunting (tw).bin" size="16384" crc="6dc51c01" sha1="e3aa37f4c9f213a673e369f62561f3f80513e4f3" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="safarirc">
 		<!-- Serial: G-1032 - Alt Title: サファリレース -->
 		<description>Safari Race (Jpn)</description>
-		<year>1988</year>
+		<year>1984</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sg1000_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="safari race (japan).bin" size="32768" crc="619dd066" sha1="1d2ca62c894fc8aab97605e65078e834bbbe3d8b" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="safarirct" cloneof="safarirc">
+		<!-- Serial: B-032 - Alt Title: Fēizhōu dà sàichē ~ 非洲大賽車 -->
+		<description>Safari Race (Tw)</description>
+		<year>1984?</year>
+		<publisher>Aaronix</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="safari race (tw).bin" size="32768" crc="b2724428" sha1="06fe09074bef542b590761ba585911d0998af646" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -982,6 +1438,18 @@ R-066 超級坦克 -> C-66 Super Tank
 		</part>
 	</software>
 
+	<software name="galaga" cloneof="segagala">
+		<!-- Serial: W-022 - Alt Title: Mìfēng èr dài ~ 蜜蜂二代 -->
+		<description>Galaga (Tw)</description>
+		<year>1983?</year>
+		<publisher>Aaronix</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="galaga (tw).bin" size="16384" crc="845bbb22" sha1="6c049daa08af7b1f08b98d6998ba52d7cf3cc4de" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="serizawa">
 		<!-- Serial: G-1006 - Alt Title: 芹沢八段の詰将棋 -->
 		<description>Serizawa Hachidan no Tsumeshogi (Jpn)</description>
@@ -1006,6 +1474,18 @@ R-066 超級坦克 -> C-66 Super Tank
 		</part>
 	</software>
 
+	<software name="shinnyust" cloneof="shinnyus">
+		<!-- Serial: A121 - Alt Title: Xīn guó sì fu ~ 新國四傅 -->
+		<description>Shinnyushain Tooru Kun (Tw)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="shinnyushain tooru kun (tw).bin" size="32768" crc="33fc5cf6" sha1="e47e56be455d46c6cc5334895e54069a85da6c3b" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="sindbadm">
 		<!-- Serial: G-1012 - Alt Title: シンドバッドミステリー -->
 		<description>Sindbad Mystery (Euro, Jpn)</description>
@@ -1014,6 +1494,18 @@ R-066 超級坦克 -> C-66 Super Tank
 		<part name="cart" interface="sg1000_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="sindbad mystery (japan, europe).bin" size="32768" crc="01932df9" sha1="90bb8b8337866339f32b3fd48b4d25d78d682b55" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sindbadmt" cloneof="sindbadm">
+		<!-- Serial: B-012 - Alt Title: Tiānfāng yè tán ~ 天方夜譚 -->
+		<description>Sindbad Mystery (Tw)</description>
+		<year>1983?</year>
+		<publisher>Aaronix</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="sindbad mystery (tw).bin" size="32768" crc="945f7847" sha1="9a4e44ccd3cabd092aae59fcabda8f047609a675" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1030,6 +1522,30 @@ R-066 超級坦克 -> C-66 Super Tank
 		</part>
 	</software>
 
+	<software name="spacearm">
+		<!-- Serial: OM-G007 - Alt Title: スペースアーマー -->
+		<description>Space Armor (Jpn, OMV, v1)</description>
+		<year>1984</year>
+		<publisher>Tsukuda Original</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="space armor [v1].bin" size="16384" crc="ac4f0a5c" sha1="a968b1debb39909cd83203244cc60da1e0003f71" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spacearma" cloneof="spacearm">
+		<!-- Serial: OM-G007, also W-016 (Tw, by Aaronix) - Alt Title: スペースアーマー, Dìguó dà fǎnjí ~ 帝國大反擊 -->
+		<description>Space Armor (Jpn, OMV, v0)</description>
+		<year>1984</year>
+		<publisher>Tsukuda Original</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="space armor [v0].bin" size="16384" crc="d5fdb4a3" sha1="3c3b59321321061642f8cf609ae3e2cab56eb83b" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="spaceinv">
 		<!-- Serial: G-1045 - Alt Title: スペースインベーダー -->
 		<description>Space Invaders (Jpn)</description>
@@ -1038,6 +1554,18 @@ R-066 超級坦克 -> C-66 Super Tank
 		<part name="cart" interface="sg1000_cart">
 			<dataarea name="rom" size="16384">
 				<rom name="space invaders (japan).bin" size="16384" crc="6ad5cb3d" sha1="a4e4b0c2967e39c4931fba8bc87428f296e461c5" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spaceinvt" cloneof="spaceinv">
+		<!-- Serial: W-045 - Alt Title: Tàikōng qīnlüè zhàn ~ 太空侵略戰 -->
+		<description>Space Invaders (Tw)</description>
+		<year>1985?</year>
+		<publisher>Aaronix</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="space invaders (tw).bin" size="16384" crc="0760ea93" sha1="5a7904697ea8a360066ea8403793227021735969" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1079,13 +1607,25 @@ R-066 超級坦克 -> C-66 Super Tank
 	</software>
 
 	<software name="starforct" cloneof="starforc">
-        <!-- Serial: B-043 - Alt Title: Star Wars ~ 星際大戰 -->
+         <!-- Serial: B-043 - Alt Title: Star Wars ~ Xīngjì dàzhàn ~ 星際大戰 -->
 		<description>Star Force (Tw)</description>
 		<year>1985?</year>
 		<publisher>Aaronix</publisher>
 		<part name="cart" interface="sg1000_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="star force (tw).bin" size="32768" crc="1f736931" sha1="f3ddf97ddf0e40289e38d9105300f15ec7eab78c" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="starforcta" cloneof="starforc">
+        <!-- Serial: B-043 - Alt Title: Star Wars ~ Xīngjì dàzhàn ~ 星際大戰 -->
+		<description>Star Force (Tw, Alt)</description>
+		<year>1985?</year>
+		<publisher>Aaronix</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="star force [b] (tw).bin" size="32768" crc="6f9b1ccd" sha1="ff6e3bdb830e6f74f9997b4d36604fd07d7e6019" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1120,6 +1660,18 @@ R-066 超級坦克 -> C-66 Super Tank
 		<part name="cart" interface="sg1000_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="star jacker (japan) (v1.0).bin" size="32768" crc="1ae94122" sha1="5d074708edf6c40dc6d80032cd91ff6197aa79c7" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="starjackt" cloneof="starjack">
+		<!-- Serial: B-010 - Alt Title: Tàikōng chéng ~ 太空城 -->
+		<description>Star Jacker (Tw)</description>
+		<year>1983?</year>
+		<publisher>Aaronix</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="star jacker [v1] (tw).bin" size="32768" crc="df162201" sha1="2bc990615a6ea7f005e8458c9791f0098c4d4a85" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1184,6 +1736,30 @@ R-066 超級坦克 -> C-66 Super Tank
 		</part>
 	</software>
 
+	<software name="yamatot" cloneof="yamato">
+		<!-- Serial: W-008 - Alt Title: Tài hé jiàn ~ 太和艦 -->
+		<description>Yamato (Tw)</description>
+		<year>1983?</year>
+		<publisher>Aaronix</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="yamato (tw).bin" size="16384" crc="b65a093f" sha1="6fbdc967f5c7c39eb1fdea08d2dcabfd64b8e7ee" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="yiear">
+		<!-- Serial: R-103 - Alt Title: Gōngfu ~ 功夫 -->
+		<description>Yie Ar Kung-Fu (Tw)</description>
+		<year>1985?</year>
+		<publisher>Aaronix</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="yie ar kung-fu (tw).bin" size="32768" crc="bb0f1930" sha1="0a6157837af2e5dec2e9b30d475b48fa7c14cc3e" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="zaxxon">
 		<!-- Serial: G-1038 - Alt Title: ザクソン -->
 		<description>Zaxxon (Jpn)</description>
@@ -1192,6 +1768,18 @@ R-066 超級坦克 -> C-66 Super Tank
 		<part name="cart" interface="sg1000_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="zaxxon (japan).bin" size="32768" crc="905467e4" sha1="e32f536c3576d41ab485e07809c4404e6b462443" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zaxxont" cloneof="zaxxon">
+		<!-- Serial: B-038 - Alt Title: Tújí dàběnyíng ~ 突擊大本營 -->
+		<description>Zaxxon (Tw)</description>
+		<year>1985?</year>
+		<publisher>Aaronix</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="zaxxon (tw).bin" size="32768" crc="49cae925" sha1="172a8ff1a574d7920906c5cf60e1d39f31b9b639" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1208,6 +1796,18 @@ R-066 超級坦克 -> C-66 Super Tank
 		</part>
 	</software>
 
+	<software name="zippyract" cloneof="zippyrac">
+		<!-- Serial: B-026 - Alt Title: Mótuō chē yóu měiguó ~ 摩托車遊美國 -->
+		<description>Zippy Race (Tw)</description>
+		<year>1983?</year>
+		<publisher>Aaronix</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="zippy race (tw).bin" size="32768" crc="bcf441a5" sha1="f6926d0c3c654a038cd5eec9aaa6876bce86fdaa" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="zoom909">
 		<!-- Serial: C-47 - Alt Title: ズーム909 -->
 		<description>Zoom 909 (Jpn)</description>
@@ -1216,6 +1816,18 @@ R-066 超級坦克 -> C-66 Super Tank
 		<part name="cart" interface="sg1000_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="zoom 909 (japan).bin" size="32768" crc="093830d8" sha1="09552aaa7140f9fc780b5f7d541478b534320075" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="huohuli" cloneof="zoom909">
+		<!-- Serial: R-47 - Alt Title: Huǒ húlí ~ 火狐狸 -->
+		<description>Huo Hu Li (Tw)</description>
+		<year>1985?</year>
+		<publisher>Aaronix</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="zoom 909 (tw).bin" size="32768" crc="9943fc2b" sha1="7a998a0da19471f7e3e5bd82a9fbaf82a966ee40" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
