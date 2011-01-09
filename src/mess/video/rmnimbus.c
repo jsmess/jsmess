@@ -92,8 +92,10 @@ static void write_reg_006(rmnimbus_state *state);
 static void write_reg_010(rmnimbus_state *state);
 static void write_reg_012(rmnimbus_state *state);
 static void write_reg_014(rmnimbus_state *state);
+static void write_reg_016(rmnimbus_state *state);
 static void write_reg_01A(rmnimbus_state *state);
 static void write_reg_01C(rmnimbus_state *state);
+static void write_reg_01E(rmnimbus_state *state);
 static void write_reg_026(rmnimbus_state *state);
 static void change_palette(running_machine *machine, UINT8 bank, UINT16 colours, UINT8 regno);
 
@@ -294,11 +296,11 @@ WRITE16_HANDLER (nimbus_video_io_w)
         case    reg010  : state->vidregs[reg010]=data; write_reg_010(state); break;
         case    reg012  : state->vidregs[reg012]=data; write_reg_012(state); break;
         case    reg014  : state->vidregs[reg014]=data; write_reg_014(state); break;
-        case    reg016  : state->vidregs[reg016]=data; break;
+        case    reg016  : state->vidregs[reg016]=data; write_reg_016(state); break;
         case    reg018  : state->vidregs[reg018]=data; break;
         case    reg01A  : state->vidregs[reg01A]=data; write_reg_01A(state); break;
         case    reg01C  : state->vidregs[reg01C]=data; write_reg_01C(state);break;
-        case    reg01E  : state->vidregs[reg01E]=data; break;
+        case    reg01E  : state->vidregs[reg01E]=data; write_reg_01E(state);break;
 
         case    reg020  : state->vidregs[reg020]=data; break;
         case    reg022  : state->vidregs[reg022]=data; break;
@@ -521,6 +523,14 @@ static void write_reg_014(rmnimbus_state *state)
     write_pixel_data(state, state->vidregs[reg002],state->vidregs[reg00C]++,state->vidregs[reg014]);
 }
 
+static void write_reg_016(rmnimbus_state *state)
+{
+	state->vidregs[reg002]=state->vidregs[reg016];
+	
+    write_pixel_data(state, state->vidregs[reg002],state->vidregs[reg00C]++,FG_COLOUR);
+}
+
+
 static void write_reg_01A(rmnimbus_state *state)
 {
     write_pixel_data(state, ++state->vidregs[reg002],state->vidregs[reg00C],state->vidregs[reg01A]);
@@ -534,6 +544,13 @@ static void write_reg_01C(rmnimbus_state *state)
     state->vidregs[reg00C]=state->vidregs[reg01C];
 
     write_pixel_data(state, state->vidregs[reg002],state->vidregs[reg01C],FG_COLOUR);
+}
+
+static void write_reg_01E(rmnimbus_state *state)
+{
+	state->vidregs[reg00C]=state->vidregs[reg01E];
+
+    write_pixel_data(state, ++state->vidregs[reg002],state->vidregs[reg00C],FG_COLOUR);
 }
 
 /*

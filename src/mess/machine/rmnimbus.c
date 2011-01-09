@@ -104,9 +104,12 @@ static int sio_serial_receive( device_t *device, int channel );
 
 #define DEBUG_SET(flags)    ((state->debug_machine & (flags))==(flags))
 
+#define DEBUG_NONE			0x0000000
 #define DMA_BREAK           0x0000001
 #define DECODE_BIOS         0x0000002
-#define DECODE_DOS21		0x0000004
+#define DECODE_BIOS_RAW     0x0000004
+#define DECODE_DOS21		0x0000008
+
 
 /* Z80 SIO */
 
@@ -157,13 +160,14 @@ static void execute_debug_intmasks(running_machine *machine, int ref, int params
 static void nimbus_debug(running_machine *machine, int ref, int params, const char *param[]);
 
 static int instruction_hook(device_t &device, offs_t curpc);
-static void decode_subbios(device_t *device,offs_t pc);
+static void decode_subbios(device_t *device,offs_t pc, UINT8 raw_flag);
 static void decode_dos21(device_t *device,offs_t pc);
-static void decode_dssi_f_fill_area(device_t *device,UINT16  ds, UINT16 si);
-static void decode_dssi_f_plot_character_string(device_t *device,UINT16  ds, UINT16 si);
-static void decode_dssi_f_set_new_clt(device_t *device,UINT16  ds, UINT16 si);
-static void decode_dssi_f_plonk_char(device_t *device,UINT16  ds, UINT16 si);
-static void decode_dssi_f_rw_sectors(device_t *device,UINT16  ds, UINT16 si);
+static void decode_dssi_generic(device_t *device,UINT16  ds, UINT16 si, UINT8 raw_flag);
+static void decode_dssi_f_fill_area(device_t *device,UINT16  ds, UINT16 si, UINT8 raw_flag);
+static void decode_dssi_f_plot_character_string(device_t *device,UINT16  ds, UINT16 si, UINT8 raw_flag);
+static void decode_dssi_f_set_new_clt(device_t *device,UINT16  ds, UINT16 si, UINT8 raw_flag);
+static void decode_dssi_f_plonk_char(device_t *device,UINT16  ds, UINT16 si, UINT8 raw_flag);
+static void decode_dssi_f_rw_sectors(device_t *device,UINT16  ds, UINT16 si, UINT8 raw_flag);
 
 static void nimbus_bank_memory(running_machine *machine);
 static void memory_reset(running_machine *machine);
@@ -1287,7 +1291,7 @@ MACHINE_START( nimbus )
 		machine->device(MAINCPU_TAG)->debug()->set_instruction_hook(instruction_hook);
 	}
 
-	state->debug_machine=DECODE_BIOS;
+	state->debug_machine=DEBUG_NONE;
 }
 
 static void execute_debug_irq(running_machine *machine, int ref, int params, const char *param[])
@@ -1346,17 +1350,22 @@ static void nimbus_debug(running_machine *machine, int ref, int params, const ch
 
 static int instruction_hook(device_t &device, offs_t curpc)
 {
-	rmnimbus_state *state = device.machine->driver_data<rmnimbus_state>();
-    address_space *space = cpu_get_address_space(&device, ADDRESS_SPACE_PROGRAM);
-    UINT8               *addr_ptr;
+	rmnimbus_state 	*state = device.machine->driver_data<rmnimbus_state>();
+    address_space 	*space = cpu_get_address_space(&device, ADDRESS_SPACE_PROGRAM);
+    UINT8           *addr_ptr;
 
     addr_ptr = (UINT8*)space->get_read_ptr(curpc);
 
 	if ((addr_ptr !=NULL) && (addr_ptr[0]==0xCD))
 	{
 		if(DEBUG_SET(DECODE_BIOS) && (addr_ptr[1]==0xF0))
-			decode_subbios(&device,curpc);
-
+		{
+			if(DEBUG_SET(DECODE_BIOS_RAW))
+				decode_subbios(&device,curpc,1);
+			else
+				decode_subbios(&device,curpc,0);			
+		}
+		
 		if(DEBUG_SET(DECODE_DOS21) && (addr_ptr[1]==0x21))
             decode_dos21(&device,curpc);
 	}
@@ -1368,13 +1377,13 @@ static int instruction_hook(device_t &device, offs_t curpc)
 #define set_drv(drv_name)       sprintf(drv_str,drv_name)
 #define set_func(func_name)     sprintf(func_str,func_name)
 
-static void decode_subbios(device_t *device,offs_t pc)
+static void decode_subbios(device_t *device,offs_t pc, UINT8 raw_flag)
 {
     char    type_str[80];
     char    drv_str[80];
     char    func_str[80];
 
-    void (*dump_dssi)(device_t *,UINT16, UINT16) = NULL;
+    void (*dump_dssi)(device_t *,UINT16, UINT16 ,UINT8) = NULL;
 
     device_t *cpu = device->machine->device(MAINCPU_TAG);
 
@@ -1384,13 +1393,20 @@ static void decode_subbios(device_t *device,offs_t pc)
     UINT16  ds = cpu_get_reg(cpu,I8086_DS);
     UINT16  si = cpu_get_reg(cpu,I8086_SI);
 
-    logerror("=======================================================================\n");
-    logerror("Sub-bios call at %08X, AX=%04X, BX=%04X, CX=%04X, DS:SI=%04X:%04X\n",pc,ax,bx,cx,ds,si);
+	// *** TEMP Don't show f_enquire_display_line calls !
+	if((cx==6) && (ax==43))
+		return;
+	// *** END TEMP
 
+	if(!raw_flag)
+	{
+		logerror("=======================================================================\n");
+		logerror("Sub-bios call at %08X, AX=%04X, BX=%04X, CX=%04X, DS:SI=%04X:%04X\n",pc,ax,bx,cx,ds,si);
+	}
+	
     set_type("invalid");
     set_drv("invalid");
     set_func("invalid");
-
 
     switch (cx)
     {
@@ -1618,7 +1634,7 @@ static void decode_subbios(device_t *device,offs_t pc)
                         case 2  : set_func("f_plonk_cursor"); break;
                         case 3  : set_func("f_kill_cursor"); break;
                         case 4  : set_func("f_scroll"); break;
-                        case 5  : set_func("f_width"); break;
+                        case 5  : set_func("f_width"); dump_dssi=decode_dssi_generic;break;
                         case 6  : set_func("f_get_char_set"); break;
                         case 7  : set_func("f_set_char_set"); break;
                         case 8  : set_func("f_reset_char_set"); break;
@@ -1687,11 +1703,19 @@ static void decode_subbios(device_t *device,offs_t pc)
         }; break;
     }
 
-    logerror("Type=%s, Driver=%s, Function=%s\n",type_str,drv_str,func_str);
+	if(raw_flag)
+	{
+		if(dump_dssi!=NULL)
+			dump_dssi(device,ds,si,raw_flag);
+	}
+	else
+	{
+		logerror("Type=%s, Driver=%s, Function=%s\n",type_str,drv_str,func_str);
 
-    if(dump_dssi!=NULL)
-        dump_dssi(device,ds,si);
-    logerror("=======================================================================\n");
+		if(dump_dssi!=NULL)
+			dump_dssi(device,ds,si,raw_flag);
+		logerror("=======================================================================\n");
+	}
 }
 
 static void *get_dssi_ptr(address_space *space, UINT16   ds, UINT16 si)
@@ -1699,12 +1723,30 @@ static void *get_dssi_ptr(address_space *space, UINT16   ds, UINT16 si)
     int             addr;
 
     addr=((ds<<4)+si);
-    OUTPUT_SEGOFS("DS:SI",ds,si);
+//    OUTPUT_SEGOFS("DS:SI",ds,si);
 
     return space->get_read_ptr(addr);
 }
 
-static void decode_dssi_f_fill_area(device_t *device,UINT16  ds, UINT16 si)
+static void decode_dssi_generic(device_t *device,UINT16  ds, UINT16 si, UINT8 raw_flag)
+{
+	address_space *space = cputag_get_address_space(device->machine,MAINCPU_TAG, ADDRESS_SPACE_PROGRAM);
+    UINT16  *params;
+	int		count;
+
+    if(raw_flag)
+		return;
+	
+    params=(UINT16  *)get_dssi_ptr(space,ds,si);
+
+	for(count=0; count<10; count++)
+		logerror("%04X ",params[count]);
+
+	logerror("\n");
+}
+
+
+static void decode_dssi_f_fill_area(device_t *device,UINT16  ds, UINT16 si, UINT8 raw_flag)
 {
     address_space *space = cputag_get_address_space(device->machine,MAINCPU_TAG, ADDRESS_SPACE_PROGRAM);
 
@@ -1715,32 +1757,58 @@ static void decode_dssi_f_fill_area(device_t *device,UINT16  ds, UINT16 si)
 
     area_params = (t_area_params   *)get_dssi_ptr(space,ds,si);
 
-    OUTPUT_SEGOFS("SegBrush:OfsBrush",area_params->seg_brush,area_params->ofs_brush);
-    brush=(t_nimbus_brush  *)space->get_read_ptr(LINEAR_ADDR(area_params->seg_brush,area_params->ofs_brush));
+    if (!raw_flag)
+		OUTPUT_SEGOFS("SegBrush:OfsBrush",area_params->seg_brush,area_params->ofs_brush);
+    
+	brush=(t_nimbus_brush  *)space->get_read_ptr(LINEAR_ADDR(area_params->seg_brush,area_params->ofs_brush));
 
-    logerror("Brush params\n");
-    logerror("Style=%04X,          StyleIndex=%04X\n",brush->style,brush->style_index);
-    logerror("Colour1=%04X,        Colour2=%04X\n",brush->colour1,brush->colour2);
-    logerror("transparency=%04X,   boundry_spec=%04X\n",brush->transparency,brush->boundary_spec);
-    logerror("boundry colour=%04X, save colour=%04X\n",brush->boundary_colour,brush->save_colour);
+    if(raw_flag)
+	{
+		logerror("\tdw\t%04X, %04X, %04X, %04X, %04X, %04X, %04X, %04X, %04X, ",
+				 brush->style,brush->style_index,brush->colour1,brush->colour2,
+				 brush->transparency,brush->boundary_spec,brush->boundary_colour,brush->save_colour,
+				 area_params->count);
+	}	
+	else
+	{
+		logerror("Brush params\n");
+		logerror("Style=%04X,          StyleIndex=%04X\n",brush->style,brush->style_index);
+		logerror("Colour1=%04X,        Colour2=%04X\n",brush->colour1,brush->colour2);
+		logerror("transparency=%04X,   boundry_spec=%04X\n",brush->transparency,brush->boundary_spec);
+		logerror("boundry colour=%04X, save colour=%04X\n",brush->boundary_colour,brush->save_colour);
 
 
-    OUTPUT_SEGOFS("SegData:OfsData",area_params->seg_data,area_params->ofs_data);
-
+		OUTPUT_SEGOFS("SegData:OfsData",area_params->seg_data,area_params->ofs_data);
+	}
+	
     addr_ptr = (UINT16 *)space->get_read_ptr(LINEAR_ADDR(area_params->seg_data,area_params->ofs_data));
     for(cocount=0; cocount < area_params->count; cocount++)
     {
-        logerror("x=%d y=%d\n",addr_ptr[cocount*2],addr_ptr[(cocount*2)+1]);
+		if(raw_flag)
+		{
+			if(cocount!=(area_params->count-1))
+				logerror("%04X, %04X, ",addr_ptr[cocount*2],addr_ptr[(cocount*2)+1]);
+			else
+				logerror("%04X, %04X ",addr_ptr[cocount*2],addr_ptr[(cocount*2)+1]);		
+		}
+		else
+			logerror("x=%d y=%d\n",addr_ptr[cocount*2],addr_ptr[(cocount*2)+1]);
     }
+	
+	if(raw_flag)
+		logerror("\n");
 }
 
-static void decode_dssi_f_plot_character_string(device_t *device,UINT16  ds, UINT16 si)
+static void decode_dssi_f_plot_character_string(device_t *device,UINT16  ds, UINT16 si, UINT8 raw_flag)
 {
     address_space *space = cputag_get_address_space(device->machine,MAINCPU_TAG, ADDRESS_SPACE_PROGRAM);
 
-    UINT8          *char_ptr;
-    t_plot_string_params   *plot_string_params;
-    int             charno;
+    UINT8          			*char_ptr;
+    t_plot_string_params   	*plot_string_params;
+    int             		charno;
+
+    if(raw_flag)
+		return;
 
     plot_string_params=(t_plot_string_params   *)get_dssi_ptr(space,ds,si);
 
@@ -1760,12 +1828,15 @@ static void decode_dssi_f_plot_character_string(device_t *device,UINT16  ds, UIN
     logerror("\n");
 }
 
-static void decode_dssi_f_set_new_clt(device_t *device,UINT16  ds, UINT16 si)
+static void decode_dssi_f_set_new_clt(device_t *device,UINT16  ds, UINT16 si, UINT8 raw_flag)
 {
     address_space *space = cputag_get_address_space(device->machine,MAINCPU_TAG, ADDRESS_SPACE_PROGRAM);
     UINT16  *new_colours;
     int     colour;
     new_colours=(UINT16  *)get_dssi_ptr(space,ds,si);
+
+    if(raw_flag)
+		return;
 
     OUTPUT_SEGOFS("SegColours:OfsColours",ds,si);
 
@@ -1774,22 +1845,28 @@ static void decode_dssi_f_set_new_clt(device_t *device,UINT16  ds, UINT16 si)
 
 }
 
-static void decode_dssi_f_plonk_char(device_t *device,UINT16  ds, UINT16 si)
+static void decode_dssi_f_plonk_char(device_t *device,UINT16  ds, UINT16 si, UINT8 raw_flag)
 {
     address_space *space = cputag_get_address_space(device->machine,MAINCPU_TAG, ADDRESS_SPACE_PROGRAM);
     UINT16  *params;
     params=(UINT16  *)get_dssi_ptr(space,ds,si);
+
+    if(raw_flag)
+		return;
 
     OUTPUT_SEGOFS("SegParams:OfsParams",ds,si);
 
     logerror("plonked_char=%c\n",params[0]);
 }
 
-static void decode_dssi_f_rw_sectors(device_t *device,UINT16  ds, UINT16 si)
+static void decode_dssi_f_rw_sectors(device_t *device,UINT16  ds, UINT16 si, UINT8 raw_flag)
 {
     address_space *space = cputag_get_address_space(device->machine,MAINCPU_TAG, ADDRESS_SPACE_PROGRAM);
     UINT16  *params;
     int     param_no;
+
+    if(raw_flag)
+		return;
 
     params=(UINT16  *)get_dssi_ptr(space,ds,si);
 

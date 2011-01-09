@@ -2061,7 +2061,7 @@ static IRQ_CALLBACK( atarist_int_ack )
 void st_state::configure_memory()
 {
 	address_space *program = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);
-	UINT8 *ram = ram_get_ptr(m_ram);
+//	UINT8 *ram = ram_get_ptr(m_ram);
 
 	switch (ram_get_size(m_ram))
 	{
@@ -2200,7 +2200,7 @@ void stbook_state::machine_start()
 {
 	/* configure RAM banking */
 	address_space *program = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);
-	UINT8 *ram = ram_get_ptr(m_ram);
+//	UINT8 *ram = ram_get_ptr(m_ram);
 
 	switch (ram_get_size(m_ram))
 	{
