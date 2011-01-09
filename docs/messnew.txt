@@ -1,4 +1,44 @@
-﻿0.141
+﻿0.141.1
+
+New System Drivers Supported:
+-----------------------------
+- Victor Wondermega M2 (not working) [Justin Kerk]
+
+
+
+Systems Promoted from GAME_NOT_WORKING:
+---------------------------------------
+(none)
+
+
+
+Skeleton drivers:
+-----------------
+(none)
+
+
+System Driver Changes:
+----------------------
+- [PIPPIN] Added pre release rom
+
+- [PV1000] 4 new cartridge dumps for the software list.  [anondumper]
+
+
+
+Imgtool Changes:
+----------------
+(none)
+
+
+
+Source Changes:
+----------------
+- softlists: Added new lists, new dumps and info [anondumper, Barry Rodewald, 
+  Curt Coder, MESSfan, Fabio Priuli]
+
+
+
+0.141
 
 New System Drivers Supported:
 -----------------------------
@@ -9,7 +49,6 @@ New System Drivers Supported:
 - Elektronika MC-1502 (not working) [Miodrag Milanovic]
 - Tiger Telematics Gizmondo (not working) [Tim Schuerewegen]
 - Hewlett Packard 49G+ Graphing Calculator (not working) [Tim Schuerewegen]
-- Victor Wondermega M2 (not working) [Justin Kerk]
 - Zenith Data Systems SuperSport [incog]
 - Toshiba T2000SX
 
@@ -120,8 +159,6 @@ System Driver Changes:
 
 - [PCW] Added very preliminary printer emulation, output to a separate screen.  [Barry Rodewald]
 
-- [PIPPIN] Added pre release rom
-
 - [QL] Added a software list for cartridges. [Curt Coder]
 
 - [SMS] Improved Light Phaser emulation and converted it to use timers 
@@ -199,11 +236,8 @@ Source Changes:
 
 - Added rudimentary 8N1 serial I/O to the generic terminal device. [Curt Coder]
 
-- softlists: Added new lists, new dumps and info [anondumper, Barry Rodewald, 
-  Curt Coder, k1w1, MESSfan, Fabio Priuli]
 
 - Refactored the MSM8251 device to use devcb. [Curt Coder]
-
 
 
 0.140
