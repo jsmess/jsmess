@@ -4,10 +4,11 @@
 #define __ATARI_ST__
 
 #define M68000_TAG		"m68000"
-#define HD6301_TAG		"hd6301"
+#define HD6301V1_TAG	"hd6301"
 #define YM2149_TAG		"ym2149"
 #define MC6850_0_TAG	"mc6850_0"
 #define MC6850_1_TAG	"mc6850_1"
+#define Z8530_TAG		"z8530"
 #define COP888_TAG		"u703"
 #define RP5C15_TAG		"rp5c15"
 #define YM3439_TAG		"ym3439"
@@ -50,113 +51,301 @@ enum
 	IKBD_MOUSE_PHASE_NEGATIVE
 };
 
-class atarist_state : public driver_device
+class st_state : public driver_device
 {
 public:
-	atarist_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	st_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config),
+		  m_maincpu(*this, M68000_TAG),
+		  m_fdc(*this, WD1772_TAG),
+		  m_mfp(*this, MC68901_TAG),
+		  m_centronics(*this, CENTRONICS_TAG),
+		  m_rs232(*this, RS232_TAG),
+		  m_ram(*this, RAM_TAG)
+	{ }
+
+	required_device<cpu_device> m_maincpu;
+	required_device<device_t> m_fdc;
+	required_device<mc68901_device> m_mfp;
+	required_device<device_t> m_centronics;
+	required_device<device_t> m_rs232;
+	required_device<device_t> m_ram;
+	
+	void machine_start();
+
+	void video_start();
+
+	// video
+	DECLARE_READ8_MEMBER( shifter_base_r );
+	DECLARE_READ8_MEMBER( shifter_counter_r );
+	DECLARE_READ8_MEMBER( shifter_sync_r );
+	DECLARE_READ16_MEMBER( shifter_palette_r );
+	DECLARE_READ8_MEMBER( shifter_mode_r );
+
+	DECLARE_WRITE8_MEMBER( shifter_base_w );
+	DECLARE_WRITE8_MEMBER( shifter_sync_w );
+	DECLARE_WRITE16_MEMBER( shifter_palette_w );
+	DECLARE_WRITE8_MEMBER( shifter_mode_w );
+	
+	DECLARE_READ16_MEMBER( blitter_halftone_r );
+	DECLARE_READ16_MEMBER( blitter_src_inc_x_r );
+	DECLARE_READ16_MEMBER( blitter_src_inc_y_r );
+	DECLARE_READ16_MEMBER( blitter_src_r );
+	DECLARE_READ16_MEMBER( blitter_end_mask_r );
+	DECLARE_READ16_MEMBER( blitter_dst_inc_x_r );
+	DECLARE_READ16_MEMBER( blitter_dst_inc_y_r );
+	DECLARE_READ16_MEMBER( blitter_dst_r );
+	DECLARE_READ16_MEMBER( blitter_count_x_r );
+	DECLARE_READ16_MEMBER( blitter_count_y_r );
+	DECLARE_READ16_MEMBER( blitter_op_r );
+	DECLARE_READ16_MEMBER( blitter_ctrl_r );
+
+	DECLARE_WRITE16_MEMBER( blitter_halftone_w );
+	DECLARE_WRITE16_MEMBER( blitter_src_inc_x_w );
+	DECLARE_WRITE16_MEMBER( blitter_src_inc_y_w );
+	DECLARE_WRITE16_MEMBER( blitter_src_w );
+	DECLARE_WRITE16_MEMBER( blitter_end_mask_w );
+	DECLARE_WRITE16_MEMBER( blitter_dst_inc_x_w );
+	DECLARE_WRITE16_MEMBER( blitter_dst_inc_y_w );
+	DECLARE_WRITE16_MEMBER( blitter_dst_w );
+	DECLARE_WRITE16_MEMBER( blitter_count_x_w );
+	DECLARE_WRITE16_MEMBER( blitter_count_y_w );
+	DECLARE_WRITE16_MEMBER( blitter_op_w );
+	DECLARE_WRITE16_MEMBER( blitter_ctrl_w );
+
+	inline pen_t shift_mode_0();
+	inline pen_t shift_mode_1();
+	inline pen_t shift_mode_2();
+	void shifter_tick();
+	inline void shifter_load();
+	void glue_tick();
+	void set_screen_parameters();
+	void blitter_source();
+	UINT16 blitter_hop();
+	void blitter_op(UINT16 s, UINT32 dstaddr, UINT16 mask);
+	void blitter_tick();
+
+	// driver
+	DECLARE_READ16_MEMBER( fdc_data_r );
+	DECLARE_WRITE16_MEMBER( fdc_data_w );
+	DECLARE_READ16_MEMBER( dma_status_r );
+	DECLARE_WRITE16_MEMBER( dma_mode_w );
+	DECLARE_READ8_MEMBER( dma_counter_r );
+	DECLARE_WRITE8_MEMBER( dma_base_w );
+	DECLARE_READ8_MEMBER( mmu_r );
+	DECLARE_WRITE8_MEMBER( mmu_w );
+	DECLARE_READ8_MEMBER( ikbd_port1_r );
+	DECLARE_READ8_MEMBER( ikbd_port2_r );
+	DECLARE_WRITE8_MEMBER( ikbd_port2_w );
+	DECLARE_WRITE8_MEMBER( ikbd_port3_w );
+	DECLARE_READ8_MEMBER( ikbd_port4_r );
+	DECLARE_WRITE8_MEMBER( ikbd_port4_w );
+
+	DECLARE_WRITE_LINE_MEMBER( fdc_intrq_w );
+	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
+
+	DECLARE_WRITE8_MEMBER( psg_pa_w );
+
+	DECLARE_READ_LINE_MEMBER( ikbd_rx_r );
+	DECLARE_WRITE_LINE_MEMBER( ikbd_tx_w );
+	DECLARE_WRITE_LINE_MEMBER( acia_irq_w );
+
+	DECLARE_READ8_MEMBER( mfp_gpio_r );
+	DECLARE_WRITE_LINE_MEMBER( mfp_tdo_w );
+	DECLARE_WRITE_LINE_MEMBER( mfp_so_w );
+	
+	void toggle_dma_fifo();
+	void flush_dma_fifo();
+	void fill_dma_fifo();
+	void fdc_dma_transfer();
+
+	void configure_memory();
+	void state_save();
 
 	/* memory state */
-	UINT8 mmu;
-	UINT16 megaste_cache;
+	UINT8 m_mmu;
+	UINT16 m_megaste_cache;
 
 	/* keyboard state */
-	UINT8 ikbd_keylatch;
-	UINT8 ikbd_mouse_x;
-	UINT8 ikbd_mouse_y;
-	UINT8 ikbd_mouse_px;
-	UINT8 ikbd_mouse_py;
-	UINT8 ikbd_mouse_pc;
-	int ikbd_rx;
-	int ikbd_tx;
-	int midi_rx;
-	int midi_tx;
-	int acia_irq;
+	UINT8 m_ikbd_keylatch;
+	UINT8 m_ikbd_mouse_x;
+	UINT8 m_ikbd_mouse_y;
+	UINT8 m_ikbd_mouse_px;
+	UINT8 m_ikbd_mouse_py;
+	UINT8 m_ikbd_mouse_pc;
+	int m_ikbd_rx;
+	int m_ikbd_tx;
+	int m_midi_rx;
+	int m_midi_tx;
+	int m_acia_irq;
 
 	/* floppy state */
-	UINT32 fdc_dmabase;
-	UINT16 fdc_status;
-	UINT16 fdc_mode;
-	UINT8 fdc_sectors;
-	UINT16 fdc_fifo[2][8];
-	int fdc_fifo_sel;
-	int fdc_fifo_index;
-	int fdc_fifo_msb;
-	int fdc_fifo_empty[2];
-	int fdc_dmabytes;
-	int fdc_irq;
+	UINT32 m_dma_base;
+	UINT16 m_dma_error;
+	UINT16 m_fdc_mode;
+	UINT8 m_fdc_sectors;
+	UINT16 m_fdc_fifo[2][8];
+	int m_fdc_fifo_sel;
+	int m_fdc_fifo_index;
+	int m_fdc_fifo_msb;
+	int m_fdc_fifo_empty[2];
+	int m_fdc_dmabytes;
 
 	/* shifter state */
-	UINT32 shifter_base;
-	UINT32 shifter_ofs;
-	UINT8 shifter_sync;
-	UINT8 shifter_mode;
-	UINT16 shifter_palette[16];
-	UINT8 shifter_lineofs;  // STe
-	UINT8 shifter_pixelofs; // STe
-	UINT16 shifter_rr[4];
-	UINT16 shifter_ir[4];
-	int shifter_bitplane;
-	int shifter_shift;
-	int shifter_h;
-	int shifter_v;
-	int shifter_de;
-	int shifter_x_start;
-	int shifter_x_end;
-	int shifter_y_start;
-	int shifter_y_end;
-	int shifter_hblank_start;
-	int shifter_vblank_start;
+	UINT32 m_shifter_base;
+	UINT32 m_shifter_ofs;
+	UINT8 m_shifter_sync;
+	UINT8 m_shifter_mode;
+	UINT16 m_shifter_palette[16];
+	UINT16 m_shifter_rr[4];
+	UINT16 m_shifter_ir[4];
+	int m_shifter_bitplane;
+	int m_shifter_shift;
+	int m_shifter_h;
+	int m_shifter_v;
+	int m_shifter_de;
+	int m_shifter_x_start;
+	int m_shifter_x_end;
+	int m_shifter_y_start;
+	int m_shifter_y_end;
+	int m_shifter_hblank_start;
+	int m_shifter_vblank_start;
 
 	/* blitter state */
-	UINT16 blitter_halftone[16];
-	INT16 blitter_src_inc_x;
-	INT16 blitter_src_inc_y;
-	INT16 blitter_dst_inc_x;
-	INT16 blitter_dst_inc_y;
-	UINT32 blitter_src;
-	UINT32 blitter_dst;
-	UINT16 blitter_endmask1;
-	UINT16 blitter_endmask2;
-	UINT16 blitter_endmask3;
-	UINT16 blitter_xcount;
-	UINT16 blitter_ycount;
-	UINT16 blitter_xcountl;
-	UINT8 blitter_hop;
-	UINT8 blitter_op;
-	UINT8 blitter_ctrl;
-	UINT8 blitter_skew;
-	UINT32 blitter_srcbuf;
+	int m_blitter_done;
+	UINT16 m_blitter_halftone[16];
+	INT16 m_blitter_src_inc_x;
+	INT16 m_blitter_src_inc_y;
+	INT16 m_blitter_dst_inc_x;
+	INT16 m_blitter_dst_inc_y;
+	UINT32 m_blitter_src;
+	UINT32 m_blitter_dst;
+	UINT16 m_blitter_endmask1;
+	UINT16 m_blitter_endmask2;
+	UINT16 m_blitter_endmask3;
+	UINT16 m_blitter_xcount;
+	UINT16 m_blitter_ycount;
+	UINT16 m_blitter_xcountl;
+	UINT8 m_blitter_hop;
+	UINT8 m_blitter_op;
+	UINT8 m_blitter_ctrl;
+	UINT8 m_blitter_skew;
+	UINT32 m_blitter_srcbuf;
+	
+	/* timers */
+	emu_timer *m_glue_timer;
+	emu_timer *m_shifter_timer;
+};
+
+class megast_state : public st_state
+{
+public:
+	megast_state(running_machine &machine, const driver_device_config_base &config)
+		: st_state(machine, config)
+	{ }
+
+	void machine_start();
+};
+
+class ste_state : public st_state
+{
+public:
+	ste_state(running_machine &machine, const driver_device_config_base &config)
+		: st_state(machine, config),
+		  m_lmc1992(*this, LMC1992_TAG)
+	{ }
+
+	required_device<device_t> m_lmc1992;
+
+	void machine_start();
+
+	void video_start();
+
+	READ16_MEMBER( shifter_base_low_r );
+	WRITE16_MEMBER( shifter_base_low_w );
+	READ16_MEMBER( shifter_counter_r );
+	WRITE16_MEMBER( shifter_counter_w );
+	WRITE16_MEMBER( shifter_palette_w );
+	READ16_MEMBER( shifter_lineofs_r );
+	WRITE16_MEMBER( shifter_lineofs_w );
+	READ16_MEMBER( shifter_pixelofs_r );
+	WRITE16_MEMBER( shifter_pixelofs_w );
+
+	DECLARE_READ16_MEMBER( sound_dma_control_r );
+	DECLARE_READ16_MEMBER( sound_dma_base_r );
+	DECLARE_READ16_MEMBER( sound_dma_counter_r );
+	DECLARE_READ16_MEMBER( sound_dma_end_r );
+	DECLARE_READ16_MEMBER( sound_mode_r );
+	DECLARE_WRITE16_MEMBER( sound_dma_control_w );
+	DECLARE_WRITE16_MEMBER( sound_dma_base_w );
+	DECLARE_WRITE16_MEMBER( sound_dma_end_w );
+	DECLARE_WRITE16_MEMBER( sound_mode_w );
+	DECLARE_READ16_MEMBER( microwire_data_r );
+	DECLARE_WRITE16_MEMBER( microwire_data_w );
+	DECLARE_READ16_MEMBER( microwire_mask_r );
+	DECLARE_WRITE16_MEMBER( microwire_mask_w );
+
+	DECLARE_READ8_MEMBER( mfp_gpio_r );
+
+	void dmasound_set_state(int level);
+	void dmasound_tick();
+	void microwire_shift();
+	void microwire_tick();
+	void state_save();
+
+	// shifter state
+	UINT8 m_shifter_lineofs;
+	UINT8 m_shifter_pixelofs;
 
 	/* microwire state */
-	UINT16 mw_data;
-	UINT16 mw_mask;
-	int mw_shift;
+	UINT16 m_mw_data;
+	UINT16 m_mw_mask;
+	int m_mw_shift;
 
 	/* DMA sound state */
-	UINT32 dmasnd_base;
-	UINT32 dmasnd_end;
-	UINT32 dmasnd_cntr;
-	UINT32 dmasnd_baselatch;
-	UINT32 dmasnd_endlatch;
-	UINT16 dmasnd_ctrl;
-	UINT16 dmasnd_mode;
-	UINT8 dmasnd_fifo[8];
-	UINT8 dmasnd_samples;
-	int dmasnd_active;
+	UINT32 m_dmasnd_base;
+	UINT32 m_dmasnd_end;
+	UINT32 m_dmasnd_cntr;
+	UINT32 m_dmasnd_baselatch;
+	UINT32 m_dmasnd_endlatch;
+	UINT16 m_dmasnd_ctrl;
+	UINT16 m_dmasnd_mode;
+	UINT8 m_dmasnd_fifo[8];
+	UINT8 m_dmasnd_samples;
+	int m_dmasnd_active;
 
-	/* devices */
-	device_t *mc68901;
-	device_t *lmc1992;
-	device_t *wd1772;
-	device_t *centronics;
-	device_t *rs232;
+	// timers
+	emu_timer *m_microwire_timer;
+	emu_timer *m_dmasound_timer;
+};
 
-	/* timers */
-	emu_timer *glue_timer;
-	emu_timer *shifter_timer;
-	emu_timer *microwire_timer;
-	emu_timer *dmasound_timer;
+class megaste_state : public ste_state
+{
+public:
+	megaste_state(running_machine &machine, const driver_device_config_base &config)
+		: ste_state(machine, config)
+	{ }
+
+	void machine_start();
+
+	DECLARE_READ16_MEMBER( cache_r );
+	DECLARE_WRITE16_MEMBER( cache_w );
+};
+
+class stbook_state : public ste_state
+{
+public:
+	stbook_state(running_machine &machine, const driver_device_config_base &config)
+		: ste_state(machine, config)
+	{ }
+
+	void machine_start();
+
+	DECLARE_READ16_MEMBER( config_r );
+	DECLARE_WRITE16_MEMBER( lcd_control_w );
+
+	DECLARE_WRITE8_MEMBER( psg_pa_w );
+	DECLARE_READ8_MEMBER( mfp_gpio_r );
 };
 
 #endif

@@ -329,7 +329,7 @@ INLINE mc68901_t *get_safe_token(device_t *device)
 INLINE const mc68901_interface *get_interface(device_t *device)
 {
 	assert(device != NULL);
-	assert(device->type() == MC68901);
+	assert(device->type() == MK68901);
 	return (const mc68901_interface *) device->baseconfig().static_config();
 }
 
@@ -1687,5 +1687,5 @@ DEVICE_GET_INFO( mk68901 )
 	}
 }
 
-DEFINE_LEGACY_DEVICE(MC68901, mc68901);
+//DEFINE_LEGACY_DEVICE(MC68901, mc68901);
 DEFINE_LEGACY_DEVICE(MK68901, mk68901);

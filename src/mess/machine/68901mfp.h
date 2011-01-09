@@ -44,7 +44,7 @@
     MACROS / CONSTANTS
 ***************************************************************************/
 
-DECLARE_LEGACY_DEVICE(MC68901, mc68901);
+//DECLARE_LEGACY_DEVICE(MC68901, mc68901);
 DECLARE_LEGACY_DEVICE(MK68901, mk68901);
 
 #define MCFG_MC68901_ADD(_tag, _clock, _config) \

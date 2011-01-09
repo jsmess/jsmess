@@ -2650,7 +2650,7 @@ static MACHINE_CONFIG_START( x68000, x68k_state )
 	MCFG_MACHINE_RESET( x68000 )
 
 	/* device hardware */
-	MCFG_MC68901_ADD(MC68901_TAG, 4000000, mfp_interface)
+	MCFG_MK68901_ADD(MC68901_TAG, 4000000, mfp_interface)
 
 	MCFG_I8255A_ADD( "ppi8255",  ppi_interface )
 
