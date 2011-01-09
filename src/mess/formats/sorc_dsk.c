@@ -8,7 +8,7 @@
 
 #include <string.h>
 
-#include "formats/exidydsk.h"
+#include "formats/sorc_dsk.h"
 #include "formats/basicdsk.h"
 #include "emu.h"
 

@@ -966,9 +966,9 @@ $(MESSOBJ)/exeltel.a:			\
 	$(MESS_DRIVERS)/exelv.o		\
 
 $(MESSOBJ)/exidy.a:				\
-	$(MESS_MACHINE)/exidy.o		\
-	$(MESS_FORMATS)/exidydsk.o	\
-	$(MESS_DRIVERS)/exidy.o		\
+	$(MESS_MACHINE)/sorcerer.o	\
+	$(MESS_FORMATS)/sorc_dsk.o	\
+	$(MESS_DRIVERS)/sorcerer.o	\
 
 $(MESSOBJ)/fairch.a:			\
 	$(MESS_VIDEO)/channelf.o	\

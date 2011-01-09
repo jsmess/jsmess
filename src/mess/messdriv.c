@@ -1189,8 +1189,7 @@ const game_driver * const drivers[] =
 //  DRIVER( aquariu2 )  /* 1984 Aquarius II  */
 
 	/* Exidy, Inc. */
-	DRIVER( exidy )	 /* Sorcerer     */
-	DRIVER( exidyd )	/* Sorcerer (cassette only)  */
+	DRIVER( sorcerer )	 /* Sorcerer     */
 
 	/* Galaksija */
 	DRIVER( galaxy )

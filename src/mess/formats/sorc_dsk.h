@@ -1,6 +1,6 @@
 /*********************************************************************
 
-    formats/exi_dsk.h
+    formats/sorc_dsk.h
 
     Exidy Sorcerer disk images
 

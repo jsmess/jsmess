@@ -99,19 +99,9 @@
     The Sorcerer has a bus connection for S100 equipment. This allows the connection
     of disk drives, provided that suitable driver/boot software is loaded.
 
-    The driver "exidy" emulates a Sorcerer with 4 floppy disk drives fitted, and 44k of ram.
-
-    The driver "exidyd" emulates the most common form, a cassette-based system with 48k of ram.
-
 *******************************************************************************
 
-
-Emulation status:
-
-exidy: 32k disk-based system. Disks not tested. Optional S-100 interface not implemented.
-exidyd: 48k cassette-based system. Disks and S-100 are not options on this system.
-
-Real machines had optional RAM sizes of 4k, 16k, 32k, 48k (officially).
+Real machines had optional RAM sizes of 8k, 16k, 32k, 48k (officially).
 Unofficially, the cart could hold another 8k of static RAM (4x 6116), giving 56k total.
 
 On the back of the machine is a 50-pin expansion port, which could be hooked to the
@@ -132,65 +122,62 @@ for cassette unit 1 are duplicated on a set of phono plugs.
 We emulate the use of two cassette units. An option allows you to hear the sound
 of the tape during playback.
 
-The sorcerer has a UART device used by the serial interface and the cassette system.
-
 An examination of the disk controller boot rom shows the controller is not a
 standard one; a custom implementation will need to be written.
 
+********************************************************************************
+
+NOTES (2011-01-09)
+1. Converted to MODERN driver as much as possible.
+2. Added 2 defines for work that needs doing at some time:
+- SORCERER_USING_RS232 - this is for when we can connect a serial interface.
+- SORCERER_USING_DISKS - the disk controller I believe most likely to be a
+                         'Micropolis Floppy Disk System' at 143KB on 13cm disks.
+                         There was a hard-sector system (top of ram = BBFF),
+                         and a soft-sector system (top of RAM = BDFF). You could
+                         use alternate systems (since you could attach a S-100
+                         unit), so not sure how this could be developed. The
+                         Micropolis seems completely undocumented in the technical
+                         sense. When using the hard-sector system, in the monitor
+                         enter GO BC00 to boot the disk. No idea how in other
+                         disk systems.
+
+                         Note that the code within the defines has NOT been
+                         compiled or tested. You are on your own!
 
 ********************************************************************************/
+#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "sound/dac.h"
-#include "sound/wave.h"
-#include "machine/ctronics.h"
-#include "machine/wd17xx.h"
-#include "imagedev/cassette.h"
-#include "imagedev/snapquik.h"
-#include "imagedev/cartslot.h"
-#include "machine/ay31015.h"
-#include "imagedev/flopdrv.h"
-#include "formats/exidydsk.h"
-#include "../includes/exidy.h"
+#include "includes/sorcerer.h"
 
 
-static READ8_HANDLER( exidy_read_ff ) { return 0xff; }
-
-static ADDRESS_MAP_START( exidy_mem, ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START( sorcerer_mem, ADDRESS_SPACE_PROGRAM, 8, sorcerer_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x07ff) AM_RAMBANK("boot")
-	AM_RANGE(0x0800, 0xbbff) AM_RAM AM_REGION("maincpu", 0x0800)
-	AM_RANGE(0xbc00, 0xbcff) AM_ROM						/* disk bios */
-	AM_RANGE(0xbd00, 0xbdff) AM_READ(exidy_read_ff) AM_WRITENOP
-	AM_RANGE(0xbe00, 0xbe03) AM_DEVREADWRITE("wd179x", wd17xx_r, wd17xx_w)
-	AM_RANGE(0xbe04, 0xbfff) AM_READ(exidy_read_ff) AM_WRITENOP
+#if SORCERER_USING_DISKS
+	AM_RANGE(0x0800, 0xbbff) AM_RAM
+	AM_RANGE(0xbc00, 0xbcff) AM_ROM //micropolis boot code
+	AM_RANGE(0xbe00, 0xbe03) //micropolis memory-mapped disk controller
+#else
+	AM_RANGE(0x0800, 0xbfff) AM_RAM
+#endif
 	AM_RANGE(0xc000, 0xefff) AM_ROM						/* rom pac and bios */
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_REGION("maincpu", 0xf000)		/* screen ram */
 	AM_RANGE(0xf800, 0xfbff) AM_ROM						/* char rom */
 	AM_RANGE(0xfc00, 0xffff) AM_RAM	AM_REGION("maincpu", 0xfc00)		/* programmable chars */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( exidyd_mem, ADDRESS_SPACE_PROGRAM, 8)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x07ff) AM_RAMBANK("boot")
-	AM_RANGE(0x0800, 0xbfff) AM_RAM AM_REGION("maincpu", 0x0800)
-	AM_RANGE(0xc000, 0xefff) AM_ROM						/* rom pac and bios */
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_REGION("maincpu", 0xf000)		/* screen ram */
-	AM_RANGE(0xf800, 0xfbff) AM_ROM						/* char rom */
-	AM_RANGE(0xfc00, 0xffff) AM_RAM	AM_REGION("maincpu", 0xfc00)		/* programmable chars */
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( exidy_io, ADDRESS_SPACE_IO, 8)
+static ADDRESS_MAP_START( sorcerer_io, ADDRESS_SPACE_IO, 8, sorcerer_state)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0xfc, 0xfc) AM_READWRITE( exidy_fc_r, exidy_fc_w )
-	AM_RANGE(0xfd, 0xfd) AM_READWRITE( exidy_fd_r, exidy_fd_w )
-	AM_RANGE(0xfe, 0xfe) AM_READWRITE( exidy_fe_r, exidy_fe_w )
-	AM_RANGE(0xff, 0xff) AM_READWRITE( exidy_ff_r, exidy_ff_w )
+	AM_RANGE(0xfc, 0xfc) AM_READWRITE( sorcerer_fc_r, sorcerer_fc_w )
+	AM_RANGE(0xfd, 0xfd) AM_READWRITE( sorcerer_fd_r, sorcerer_fd_w )
+	AM_RANGE(0xfe, 0xfe) AM_READWRITE( sorcerer_fe_r, sorcerer_fe_w )
+	AM_RANGE(0xff, 0xff) AM_READWRITE( sorcerer_ff_r, sorcerer_ff_w )
 ADDRESS_MAP_END
 
-static INPUT_PORTS_START(exidy)
+static INPUT_PORTS_START(sorcerer)
 	PORT_START("VS")
 	/* vblank */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_VBLANK)
@@ -325,7 +312,7 @@ INPUT_PORTS_END
 
 /**************************** F4 CHARACTER DISPLAYER ******************************************************/
 
-static const gfx_layout exidy_charlayout =
+static const gfx_layout sorcerer_charlayout =
 {
 	8, 8,					/* 8 x 8 characters */
 	256,					/* 256 characters */
@@ -339,11 +326,11 @@ static const gfx_layout exidy_charlayout =
 };
 
 /* This will show the 128 characters in the ROM + whatever happens to be in the PCG */
-static GFXDECODE_START( exidy )
-	GFXDECODE_ENTRY( "maincpu", 0xf800, exidy_charlayout, 0, 1 )
+static GFXDECODE_START( sorcerer )
+	GFXDECODE_ENTRY( "maincpu", 0xf800, sorcerer_charlayout, 0, 1 )
 GFXDECODE_END
 
-static VIDEO_UPDATE( exidy )
+static VIDEO_UPDATE( sorcerer )
 {
 	UINT8 y,ra,chr,gfx;
 	UINT16 sy=0,ma=0xf080,x;
@@ -353,7 +340,7 @@ static VIDEO_UPDATE( exidy )
 	{
 		for (ra = 0; ra < 8; ra++)
 		{
-			UINT16  *p = BITMAP_ADDR16(bitmap, sy++, 0);
+			UINT16 *p = BITMAP_ADDR16(bitmap, sy++, 0);
 
 			for (x = ma; x < ma+64; x++)
 			{
@@ -381,7 +368,7 @@ static VIDEO_UPDATE( exidy )
 
 /**********************************************************************************************************/
 
-static const ay31015_config exidy_ay31015_config =
+static const ay31015_config sorcerer_ay31015_config =
 {
 	AY_3_1015,
 	4800.0,
@@ -392,7 +379,7 @@ static const ay31015_config exidy_ay31015_config =
 };
 
 
-static const cassette_config exidy_cassette_config =
+static const cassette_config sorcerer_cassette_config =
 {
 	cassette_default_formats,
 	NULL,
@@ -400,7 +387,8 @@ static const cassette_config exidy_cassette_config =
 	NULL
 };
 
-static const floppy_config exidy_floppy_config =
+#if SORCERER_USING_DISKS
+static const floppy_config sorcerer_floppy_config =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -408,18 +396,19 @@ static const floppy_config exidy_floppy_config =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
-	FLOPPY_OPTIONS_NAME(exidy),
+	FLOPPY_OPTIONS_NAME(sorcerer),
 	NULL
 };
+#endif
 
-static MACHINE_CONFIG_START( exidy, exidy_state )
+static MACHINE_CONFIG_START( sorcerer, sorcerer_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 12638000/6)
-	MCFG_CPU_PROGRAM_MAP(exidy_mem)
-	MCFG_CPU_IO_MAP(exidy_io)
+	MCFG_CPU_PROGRAM_MAP(sorcerer_mem)
+	MCFG_CPU_IO_MAP(sorcerer_io)
 
-	MCFG_MACHINE_START( exidy )
-	MCFG_MACHINE_RESET( exidy )
+	MCFG_MACHINE_START( sorcerer )
+	MCFG_MACHINE_RESET( sorcerer )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -429,11 +418,11 @@ static MACHINE_CONFIG_START( exidy, exidy_state )
 	MCFG_SCREEN_SIZE(64*8, 30*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 64*8-1, 0, 30*8-1)
 
-	MCFG_GFXDECODE(exidy)
+	MCFG_GFXDECODE(sorcerer)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
 
-	MCFG_VIDEO_UPDATE( exidy )
+	MCFG_VIDEO_UPDATE( sorcerer )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -444,37 +433,34 @@ static MACHINE_CONFIG_START( exidy, exidy_state )
 	MCFG_SOUND_ADD("dac", DAC, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)	// speaker or music card on parallel port
 
-	MCFG_AY31015_ADD( "ay_3_1015", exidy_ay31015_config )
+	MCFG_AY31015_ADD( "uart", sorcerer_ay31015_config )
 
 	/* printer */
 	MCFG_CENTRONICS_ADD("centronics", standard_centronics)
 
 	/* quickload */
-	MCFG_SNAPSHOT_ADD("snapshot", exidy, "snp", 2)
-	MCFG_Z80BIN_QUICKLOAD_ADD("quickload", exidy, 2)
+	MCFG_SNAPSHOT_ADD("snapshot", sorcerer, "snp", 2)
+	MCFG_Z80BIN_QUICKLOAD_ADD("quickload", sorcerer, 2)
 
-	MCFG_CASSETTE_ADD( "cassette1", exidy_cassette_config )
-	MCFG_CASSETTE_ADD( "cassette2", exidy_cassette_config )
-
-	MCFG_WD179X_ADD("wd179x", default_wd17xx_interface )
+	MCFG_CASSETTE_ADD( "cassette1", sorcerer_cassette_config )
+	MCFG_CASSETTE_ADD( "cassette2", sorcerer_cassette_config )
 
 	/* cartridge */
 	MCFG_CARTSLOT_ADD("cart")
 	MCFG_CARTSLOT_EXTENSION_LIST("rom")
-	MCFG_CARTSLOT_NOT_MANDATORY
 
-	MCFG_FLOPPY_4_DRIVES_ADD(exidy_floppy_config)
+	// internal ram
+	MCFG_RAM_ADD(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("48K")
+	MCFG_RAM_EXTRA_OPTIONS("8K,16K,32K")
+
+#if SORCERER_USING_DISKS
+	MCFG_xx_ADD("micropolis", default_micropolis_interface ) // custom micropolis controller
+	MCFG_FLOPPY_4_DRIVES_ADD(sorcerer_floppy_config)
+#endif
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( exidyd, exidy )
-
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(exidyd_mem)
-
-	MCFG_FLOPPY_4_DRIVES_REMOVE()
-MACHINE_CONFIG_END
-
-static DRIVER_INIT( exidy )
+static DRIVER_INIT( sorcerer )
 {
 	UINT8 *RAM = machine->region("maincpu")->base();
 	memory_configure_bank(machine, "boot", 0, 2, &RAM[0x0000], 0xe000);
@@ -485,30 +471,21 @@ static DRIVER_INIT( exidy )
   Game driver(s)
 
 ***************************************************************************/
-ROM_START(exidy)
+ROM_START(sorcerer)
 	ROM_REGION( 0x10000, "maincpu", 0 )
+#if SORCERER_USING_DISKS
+	ROM_LOAD("diskboot.dat",0xbc00, 0x0100, BAD_DUMP CRC(d82a40d6) SHA1(cd1ef5fb0312cd1640e0853d2442d7d858bc3e3b))
+#endif
 	ROM_LOAD("exmo1-1.dat", 0xe000, 0x0800, CRC(ac924f67) SHA1(72fcad6dd1ed5ec0527f967604401284d0e4b6a1) ) /* monitor roms */
 	ROM_LOAD("exmo1-2.dat", 0xe800, 0x0800, CRC(ead1d0f6) SHA1(c68bed7344091bca135e427b4793cc7d49ca01be) )
 	ROM_LOAD("exchr-1.dat", 0xf800, 0x0400, CRC(4a7e1cdd) SHA1(2bf07a59c506b6e0c01ec721fb7b747b20f5dced) ) /* char rom */
+	ROM_CART_LOAD("cart", 0xc000, 0x2000, ROM_FILL_FF | ROM_OPTIONAL)
+
+	ROM_REGION( 0x10000, "proms", 0 )
+	ROM_LOAD_OPTIONAL("bruce.dat",   0x0000, 0x0020, CRC(fae922cb) SHA1(470a86844cfeab0d9282242e03ff1d8a1b2238d1)) /* video prom */
 	ROM_LOAD_OPTIONAL("diskboot.dat",0xbc00, 0x0100, BAD_DUMP CRC(d82a40d6) SHA1(cd1ef5fb0312cd1640e0853d2442d7d858bc3e3b))
-	ROM_CART_LOAD("cart", 0xc000, 0x2000, ROM_FILL_FF | ROM_OPTIONAL)
-
-	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD_OPTIONAL("bruce.dat",   0x0000, 0x0020, CRC(fae922cb) SHA1(470a86844cfeab0d9282242e03ff1d8a1b2238d1)) /* video prom */
-ROM_END
-
-ROM_START(exidyd)
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("exmo1-1.dat", 0xe000, 0x0800, CRC(ac924f67) SHA1(72fcad6dd1ed5ec0527f967604401284d0e4b6a1) ) /* monitor roms */
-	ROM_LOAD("exmo1-2.dat", 0xe800, 0x0800, CRC(ead1d0f6) SHA1(c68bed7344091bca135e427b4793cc7d49ca01be) )
-	ROM_LOAD("exchr-1.dat", 0xf800, 0x0400, CRC(4a7e1cdd) SHA1(2bf07a59c506b6e0c01ec721fb7b747b20f5dced) ) /* char rom */
-	ROM_CART_LOAD("cart", 0xc000, 0x2000, ROM_FILL_FF | ROM_OPTIONAL)
-
-	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD_OPTIONAL("bruce.dat",   0x0000, 0x0020, CRC(fae922cb) SHA1(470a86844cfeab0d9282242e03ff1d8a1b2238d1)) /* video prom */
 ROM_END
 
 /*    YEAR  NAME    PARENT  COMPAT      MACHINE INPUT   INIT    COMPANY        FULLNAME */
-COMP(1979, exidy,   0,		0,	exidy,	exidy,	exidy,		"Exidy Inc", "Sorcerer", 0 )
-COMP(1979, exidyd,  exidy,	0,	exidyd,	exidy,	exidy,		"Exidy Inc", "Sorcerer (Cassette only)", 0 )
+COMP(1979, sorcerer, 0,		0,	sorcerer, sorcerer, sorcerer, "Exidy Inc", "Sorcerer", 0 )
 
