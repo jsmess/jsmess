@@ -224,9 +224,21 @@ Battlefighter (Original) (Unreleased - Prototype Stage)
 		</part>
 	</software>
 
+	<software name="saurus">
+	<!-- (Japanese 003E)-->
+		<description>Saurusland</description>
+		<year>1983</year>
+		<publisher>Tomy</publisher>
+		<part name="cart" interface="tutor_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="saurus.bin" size="8192" crc="87085401" sha1="bb4dd5b39a9a3992f4a67bf479be4ec0693c5845" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="scramble">
 	<!-- Stock No: 8201, (Japanese 006E)-->
-		<description>Scramble</description>
+		<description>Scramble (USA)</description>
 		<year>1981</year>
 		<publisher>Tomy</publisher>
 		<part name="cart" interface="tutor_cart">
@@ -236,14 +248,14 @@ Battlefighter (Original) (Unreleased - Prototype Stage)
 		</part>
 	</software>
 
-	<software name="scrambla">
+	<software name="scramblej" cloneof="scramble">
 	<!-- Stock No: 8201, (Japanese 006E)-->
-		<description>Scramble (Alt)</description>
+		<description>Scramble (Jpn)</description>
 		<year>1981</year>
 		<publisher>Tomy</publisher>
 		<part name="cart" interface="tutor_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="scrambla.bin" size="8192" crc="3c23d24f" sha1="cf025d180cec5bafbbae9623cd5b6177481478a9" offset="0" />
+				<rom name="scramblej.bin" size="8192" crc="bd708ab4" sha1="9029d16c123e6d35a5f3ed4fbc9eefae8948215f" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -255,7 +267,7 @@ Battlefighter (Original) (Unreleased - Prototype Stage)
 		<publisher>Tomy</publisher>
 		<part name="cart" interface="tutor_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="tterror.bin" size="8192" crc="95577ceb" sha1="4b75c4bdd2285eff5ed0df3a951d8527270e6b96" offset="0" />
+				<rom name="torpedo.bin" size="8192" crc="95577ceb" sha1="4b75c4bdd2285eff5ed0df3a951d8527270e6b96" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -272,9 +284,9 @@ Battlefighter (Original) (Unreleased - Prototype Stage)
 		</part>
 	</software>
 
-	<software name="trafjama">
+	<software name="trafjama" cloneof="trafjam">
 	<!-- Stock No: 8103, (Japanese 010E)-->
-		<description>Trafic Jam (alt)</description>
+		<description>Trafic Jam (Alt)</description>
 		<year>1982</year>
 		<publisher>Tomy</publisher>
 		<part name="cart" interface="tutor_cart">
