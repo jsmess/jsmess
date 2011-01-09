@@ -284,6 +284,7 @@ The software list will be divided in four categories:
 			<feature name="battery" value="CR2032" />
 			<feature name="cart_revision" value="none" />
 			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="920214" />
 			<dataarea name="rom" size="3145728">
 				<rom name="shvc-f6-0.p0.u1" size="2097152" crc="bafa8ed6" sha1="3a1e1b38c3bac784f2941a07ce15cee744c5a245" offset="000000" />
 				<rom name="shvc-f6-0.p3.u2" size="1048576" crc="38a398a2" sha1="b28c6b17b2b027831b70a3dcc0156e84209da2d0" offset="0x200000" />
@@ -313,6 +314,50 @@ The software list will be divided in four categories:
 				<rom name="shvc-f6-0.p1.u1" size="1048576" crc="bfc35e36" sha1="579cca6fd6c0b4f8d3489ba115d6bd51a745a16a" offset="000000" />
 				<rom name="shvc-f6-0.p2.u2" size="1048576" crc="82736bb1" sha1="1931269554c4aebbd4d250c881cd15906347062d" offset="0x100000" />
 				<rom name="shvc-f6-0.p3.u3" size="1048576" crc="38a398a2" sha1="b28c6b17b2b027831b70a3dcc0156e84209da2d0" offset="0x200000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="frontmsa" cloneof="frontms">
+		<!-- Serial: SHVC-AGCJ-JPN - Release Date: 1995-02-24 - Alt. Title: フロントミッション -->
+		<description>Front Mission (Jpn)</description>
+		<year>1995</year>
+		<publisher>Square</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-BJ3M-20" />
+			<feature name="u1" value="U1 P0" />
+			<feature name="u2" value="U2 P1" />
+			<feature name="u3" value="U3 64K SRAM" />
+			<feature name="u4" value="U4 MAD-1" />
+			<feature name="u5" value="U5 CIC" />
+			<feature name="battery" value="CR2032" />
+			<feature name="cart_revision" value="none" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="920214" />
+			<dataarea name="rom" size="3145728">
+				<rom name="shvc-agcj-0.p0.u1" size="2097152" crc="6c48e2fa" sha1="eac970657f29126fc93c550080427a88427e34c5" offset="000000" />
+				<rom name="shvc-agcj-0.p3.u2" size="1048576" crc="e53074a7" sha1="2436b6f393dda9177f45ad1eb5b86652e9ddc2da" offset="200000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="frontmss">
+		<!-- Serial: SHVC-AZGJ-JPN - Release Date: 1996-02-23 - Alt. Title: フロントミッションシリーズ ガンハザード -->
+		<description>Front Mission Series - Gun Hazard (Jpn)</description>
+		<year>1996</year>
+		<publisher>Square</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1J3M-20" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 64K SRAM" />
+			<feature name="u3" value="U3 MAD-1" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="battery" value="CR2032" />
+			<feature name="cart_revision" value="none" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="G741812 SHVC-JPN-1" />
+			<dataarea name="rom" size="3145728">
+				<rom name="shvc-azgj-0.u1" size="3145728" crc="fd3fdbac" sha1="65da5aea2b08ef8a540a86710d9f97a590184848" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -600,6 +645,19 @@ The software list will be divided in four categories:
 
 
 <!-- List of unconfirmed dumps -->
+
+	<software name="frontms">
+		<!-- Serial: SHVC-AGCJ-JPN - Release Date: 1995-02-24 - Alt. Title: フロントミッション -->
+		<description>Front Mission (Jpn, Rev. A)</description>
+		<year>1995</year>
+		<publisher>Square</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="3145728">
+				<rom name="front mission (japan) (rev 1).sfc" size="3145728" crc="50278b21" sha1="a1c2ba17e44b8e69b6118f1e12dcefc32eb93387" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 <!-- End of unconfirmed dumps -->
 
 
@@ -2408,7 +2466,7 @@ The software list will be divided in four categories:
 	</software>
 
 	<software name="aretha2p2" cloneof="aretha2">
-		<description>Aretha II - Ariel no Fushigi na Tabi (Jpn, Earlier Prototype)</description>
+		<description>Aretha II - Ariel no Fushigi na Tabi (Jpn, Prototype Earlier)</description>
 		<year>1994</year>
 		<publisher>Yanoman Games</publisher>
 		<part name="cart" interface="snes_cart">
@@ -10589,6 +10647,17 @@ The software list will be divided in four categories:
 		</part>
 	</software>
 
+	<software name="firearm">
+		<description>Firearm (USA, Prototype 19931217)</description>
+		<year>1993</year>
+		<publisher>Malibu Interactive</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="firearm (beta).sfc" size="524288" crc="9aa13682" sha1="22d140eafbad07c8ce71a89ce586cdbcc82d30e8" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="firemen">
 		<description>The Firemen (Euro)</description>
 		<year>1994</year>
@@ -11140,42 +11209,6 @@ The software list will be divided in four categories:
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="3145728">
 				<rom name="from tv animation slam dunk 2 - ih yosen kanzen ban!! (japan).sfc" size="3145728" crc="aa2b7692" sha1="1efecc88aad38a084aea8e4d5d4c21633c37669c" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="frontms">
-		<!-- Serial:  - Release Date: 1995-02-24 -->
-		<description>Front Mission (Jpn, Rev. A)</description>
-		<year>1995</year>
-		<publisher>Square</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="3145728">
-				<rom name="front mission (japan) (rev 1).sfc" size="3145728" crc="50278b21" sha1="a1c2ba17e44b8e69b6118f1e12dcefc32eb93387" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="frontmsa" cloneof="frontms">
-		<!-- Serial:  - Release Date: 1995-02-24 -->
-		<description>Front Mission (Jpn)</description>
-		<year>1995</year>
-		<publisher>Square</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="3145728">
-				<rom name="front mission (japan).sfc" size="3145728" crc="fe27e061" sha1="415a01c011a8294630315a2af29f8da5a4645ef4" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="frontmss">
-		<!-- Serial:  - Release Date: 1996-02-23 -->
-		<description>Front Mission Series - Gun Hazard (Jpn)</description>
-		<year>1996</year>
-		<publisher>Square</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="3145728">
-				<rom name="front mission series - gun hazard (japan).sfc" size="3145728" crc="fd3fdbac" sha1="65da5aea2b08ef8a540a86710d9f97a590184848" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -23398,6 +23431,28 @@ The software list will be divided in four categories:
 		</part>
 	</software>
 
+	<software name="pagemstrup1" cloneof="pagemstr">
+		<description>The Pagemaster (USA, Prototype Alt)</description>
+		<year>1994</year>
+		<publisher>Fox Interactive</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="pagemaster, the (usa) (nesworld beta).sfc" size="2097152" crc="a251b8bf" sha1="70337cd6ef8a303d7552934d93fb30a2e3a6c9b1" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pagemstrup2" cloneof="pagemstr">
+		<description>The Pagemaster (USA, Prototype Earlier)</description>
+		<year>1994</year>
+		<publisher>Fox Interactive</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="pagemaster, the (usa) (bbs alpha).sfc" size="2097152" crc="0df6088b" sha1="4ce822cb637645f0222854cf11ff67e1ba581e2a" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="pagemstru" cloneof="pagemstr">
 		<!-- Serial:  - Release Date: 1994-11 -->
 		<description>The Pagemaster (USA)</description>
@@ -31281,6 +31336,17 @@ The software list will be divided in four categories:
 		</part>
 	</software>
 
+	<software name="schinwl2p" cloneof="schinwl2">
+		<description>Super Chinese World 2 - Uchuu Ichibutou Taikai (Jpn, Prototype)</description>
+		<year>1993</year>
+		<publisher>Culture Brain</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="super chinese world 2 - uchuu ichibutou taikai (japan) (beta).sfc" size="2097152" crc="404638d0" sha1="69dfba8fad75e25c281e80a9466ad549e14b5799" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="schinwl2s" cloneof="schinwl2">
 		<description>Super Chinese World 2 - Uchuu Ichibutou Taikai (Jpn, Sample)</description>
 		<year>1993</year>
@@ -31559,6 +31625,17 @@ The software list will be divided in four categories:
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="super drift out - world rally championships (japan).sfc" size="2097152" crc="ec8c1cca" sha1="0e97fe3fdeff2cd2d806713282726c147e7f3312" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sdriftop" cloneof="sdrifto">
+		<description>Super Drift Out - World Rally Championships (USA, Prototype 19950518)</description>
+		<year>1995</year>
+		<publisher>Accolade ~ Visco</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="super drift out - world rally championships (us proto).sfc" size="2097152" crc="ea2b03f9" sha1="cc96864f513cb4d86e94bc84577a80b70565983a" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
