@@ -37,6 +37,7 @@
 					<!ATTLIST disk md5 CDATA #IMPLIED>
 					<!ATTLIST disk sha1 CDATA #IMPLIED>
 					<!ATTLIST disk status (baddump|nodump|good) "good">
+					<!ATTLIST disk writeable (yes|no) "no">
 			<!ELEMENT dipswitch (dipvalue*)>
 				<!ATTLIST dipswitch name CDATA #REQUIRED>
 				<!ATTLIST dipswitch tag CDATA #REQUIRED>
