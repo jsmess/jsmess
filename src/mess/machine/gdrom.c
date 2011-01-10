@@ -23,6 +23,7 @@ typedef struct
 	UINT32 read_type;	// for command 0x30 only
 	UINT32 data_select;	// for command 0x30 only
 	cdrom_file *cdrom;
+	bool is_file;
 } SCSIGd;
 
 static const UINT8 GDROM_Cmd11_Reply[32] =
@@ -789,27 +790,29 @@ static void scsicd_alloc_instance( SCSIInstance *scsiInstance, const char *diskr
 	state_save_register_item( machine, "scsicd", diskregion, 0, our_this->cur_subblock );
 	state_save_register_item( machine, "scsicd", diskregion, 0, our_this->play_err_flag );
 
-	/* TODO: get rid of this ifdef MESS section */
-	our_this->cdrom = cd_get_cdrom_file( machine->device( diskregion ) );
-/*
-	our_this->cdrom = cdrom_open(get_disk_handle( diskregion ));
+	if (machine->device( diskregion )) {
+		our_this->is_file = TRUE;
+		our_this->cdrom = cd_get_cdrom_file( machine->device( diskregion ) );
+	} else {
+		our_this->is_file = FALSE;
+		our_this->cdrom = cdrom_open(get_disk_handle( machine, diskregion ));
+	}
 
 	if (!our_this->cdrom)
 	{
 		logerror("GDROM: no CD found!\n");
 	}
-*/
 }
 
 static void scsicd_delete_instance( SCSIInstance *scsiInstance )
 {
-#ifndef MESS
 	SCSIGd *our_this = (SCSIGd *)SCSIThis( &SCSIClassGDROM, scsiInstance );
-	if( our_this->cdrom )
-	{
-		cdrom_close( our_this->cdrom );
+	if (!our_this->is_file) {
+		if( our_this->cdrom )
+		{
+			cdrom_close( our_this->cdrom );
+		}
 	}
-#endif
 }
 
 static void scsicd_get_device( SCSIInstance *scsiInstance, cdrom_file **cdrom )
