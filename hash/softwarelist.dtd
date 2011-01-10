@@ -8,7 +8,7 @@
 		<!ELEMENT description (#PCDATA)>
 		<!ELEMENT year (#PCDATA)>
 		<!ELEMENT publisher (#PCDATA)>
-		<!ELEMENT part (feature*, dataarea*, dipswitch*)>
+		<!ELEMENT part (feature*, dataarea*, diskarea*, dipswitch*)>
 			<!ATTLIST part name CDATA #REQUIRED>
 			<!ATTLIST part interface CDATA #REQUIRED>
 			<!-- feature is used to store things like pcb-type, mapper type, etc. Specific values depend on the system. -->
@@ -30,6 +30,13 @@
 					<!ATTLIST rom value CDATA #IMPLIED>
 					<!ATTLIST rom status (baddump|nodump|good) "good">
 					<!ATTLIST rom loadflag (load16_byte|load16_word|load16_word_swap|load32_byte|load32_word|load32_word_swap|load32_dword|load64_word|load64_word_swap|reload|fill|continue) #IMPLIED>
+			<!ELEMENT diskarea (disk*)>
+				<!ATTLIST diskarea name CDATA #REQUIRED>
+				<!ELEMENT disk EMPTY>
+					<!ATTLIST disk name CDATA #IMPLIED>
+					<!ATTLIST disk md5 CDATA #IMPLIED>
+					<!ATTLIST disk sha1 CDATA #IMPLIED>
+					<!ATTLIST disk status (baddump|nodump|good) "good">
 			<!ELEMENT dipswitch (dipvalue*)>
 				<!ATTLIST dipswitch name CDATA #REQUIRED>
 				<!ATTLIST dipswitch tag CDATA #REQUIRED>
