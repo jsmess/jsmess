@@ -61,7 +61,9 @@ public:
 		  m_mfp(*this, MC68901_TAG),
 		  m_centronics(*this, CENTRONICS_TAG),
 		  m_rs232(*this, RS232_TAG),
-		  m_ram(*this, RAM_TAG)
+		  m_ram(*this, RAM_TAG),
+		  m_acia_ikbd_irq(1),
+		  m_acia_midi_irq(1)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -148,7 +150,8 @@ public:
 
 	DECLARE_READ_LINE_MEMBER( ikbd_rx_r );
 	DECLARE_WRITE_LINE_MEMBER( ikbd_tx_w );
-	DECLARE_WRITE_LINE_MEMBER( acia_irq_w );
+	DECLARE_WRITE_LINE_MEMBER( acia_ikbd_irq_w );
+	DECLARE_WRITE_LINE_MEMBER( acia_midi_irq_w );
 
 	DECLARE_READ8_MEMBER( mfp_gpio_r );
 	DECLARE_WRITE_LINE_MEMBER( mfp_tdo_w );
@@ -164,9 +167,10 @@ public:
 
 	/* memory state */
 	UINT8 m_mmu;
-	UINT16 m_megaste_cache;
 
 	/* keyboard state */
+	int m_acia_ikbd_irq;
+	int m_acia_midi_irq;
 	UINT8 m_ikbd_keylatch;
 	UINT8 m_ikbd_mouse_x;
 	UINT8 m_ikbd_mouse_y;
@@ -177,7 +181,6 @@ public:
 	int m_ikbd_tx;
 	int m_midi_rx;
 	int m_midi_tx;
-	int m_acia_irq;
 
 	/* floppy state */
 	UINT32 m_dma_base;
@@ -261,25 +264,25 @@ public:
 
 	void video_start();
 
-	READ16_MEMBER( shifter_base_low_r );
-	WRITE16_MEMBER( shifter_base_low_w );
-	READ16_MEMBER( shifter_counter_r );
-	WRITE16_MEMBER( shifter_counter_w );
+	READ8_MEMBER( shifter_base_low_r );
+	WRITE8_MEMBER( shifter_base_low_w );
+	READ8_MEMBER( shifter_counter_r );
+	WRITE8_MEMBER( shifter_counter_w );
 	WRITE16_MEMBER( shifter_palette_w );
-	READ16_MEMBER( shifter_lineofs_r );
-	WRITE16_MEMBER( shifter_lineofs_w );
-	READ16_MEMBER( shifter_pixelofs_r );
-	WRITE16_MEMBER( shifter_pixelofs_w );
+	READ8_MEMBER( shifter_lineofs_r );
+	WRITE8_MEMBER( shifter_lineofs_w );
+	READ8_MEMBER( shifter_pixelofs_r );
+	WRITE8_MEMBER( shifter_pixelofs_w );
 
-	DECLARE_READ16_MEMBER( sound_dma_control_r );
-	DECLARE_READ16_MEMBER( sound_dma_base_r );
-	DECLARE_READ16_MEMBER( sound_dma_counter_r );
-	DECLARE_READ16_MEMBER( sound_dma_end_r );
-	DECLARE_READ16_MEMBER( sound_mode_r );
-	DECLARE_WRITE16_MEMBER( sound_dma_control_w );
-	DECLARE_WRITE16_MEMBER( sound_dma_base_w );
-	DECLARE_WRITE16_MEMBER( sound_dma_end_w );
-	DECLARE_WRITE16_MEMBER( sound_mode_w );
+	DECLARE_READ8_MEMBER( sound_dma_control_r );
+	DECLARE_READ8_MEMBER( sound_dma_base_r );
+	DECLARE_READ8_MEMBER( sound_dma_counter_r );
+	DECLARE_READ8_MEMBER( sound_dma_end_r );
+	DECLARE_READ8_MEMBER( sound_mode_r );
+	DECLARE_WRITE8_MEMBER( sound_dma_control_w );
+	DECLARE_WRITE8_MEMBER( sound_dma_base_w );
+	DECLARE_WRITE8_MEMBER( sound_dma_end_w );
+	DECLARE_WRITE8_MEMBER( sound_mode_w );
 	DECLARE_READ16_MEMBER( microwire_data_r );
 	DECLARE_WRITE16_MEMBER( microwire_data_w );
 	DECLARE_READ16_MEMBER( microwire_mask_r );
@@ -308,8 +311,8 @@ public:
 	UINT32 m_dmasnd_cntr;
 	UINT32 m_dmasnd_baselatch;
 	UINT32 m_dmasnd_endlatch;
-	UINT16 m_dmasnd_ctrl;
-	UINT16 m_dmasnd_mode;
+	UINT8 m_dmasnd_ctrl;
+	UINT8 m_dmasnd_mode;
 	UINT8 m_dmasnd_fifo[8];
 	UINT8 m_dmasnd_samples;
 	int m_dmasnd_active;
@@ -330,6 +333,8 @@ public:
 
 	DECLARE_READ16_MEMBER( cache_r );
 	DECLARE_WRITE16_MEMBER( cache_w );
+
+	UINT16 m_cache;
 };
 
 class stbook_state : public ste_state

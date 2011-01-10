@@ -423,7 +423,7 @@ WRITE16_MEMBER( st_state::shifter_palette_w )
 //  shifter_base_low_r -
 //-------------------------------------------------
 
-READ16_MEMBER( ste_state::shifter_base_low_r )
+READ8_MEMBER( ste_state::shifter_base_low_r )
 {
 	return m_shifter_base & 0xfe;
 }
@@ -433,7 +433,7 @@ READ16_MEMBER( ste_state::shifter_base_low_r )
 //  shifter_base_low_w -
 //-------------------------------------------------
 
-WRITE16_MEMBER( ste_state::shifter_base_low_w )
+WRITE8_MEMBER( ste_state::shifter_base_low_w )
 {
 	m_shifter_base = (m_shifter_base & 0x3fff00) | (data & 0xfe);
 	logerror("SHIFTER Video Base Address %06x\n", m_shifter_base);
@@ -444,9 +444,9 @@ WRITE16_MEMBER( ste_state::shifter_base_low_w )
 //  shifter_counter_r -
 //-------------------------------------------------
 
-READ16_MEMBER( ste_state::shifter_counter_r )
+READ8_MEMBER( ste_state::shifter_counter_r )
 {
-	UINT16 data = 0;
+	UINT8 data = 0;
 
 	switch (offset)
 	{
@@ -471,7 +471,7 @@ READ16_MEMBER( ste_state::shifter_counter_r )
 //  shifter_counter_w -
 //-------------------------------------------------
 
-WRITE16_MEMBER( ste_state::shifter_counter_w )
+WRITE8_MEMBER( ste_state::shifter_counter_w )
 {
 	switch (offset)
 	{
@@ -481,7 +481,7 @@ WRITE16_MEMBER( ste_state::shifter_counter_w )
 		break;
 
 	case 0x01:
-		m_shifter_ofs = (m_shifter_ofs & 0x3f00fe) | (data & 0xff) << 8;
+		m_shifter_ofs = (m_shifter_ofs & 0x3f00fe) | (data << 8);
 		logerror("SHIFTER Video Address Counter %06x\n", m_shifter_ofs);
 		break;
 
@@ -514,7 +514,7 @@ WRITE16_MEMBER( ste_state::shifter_palette_w )
 //  shifter_lineofs_r -
 //-------------------------------------------------
 
-READ16_MEMBER( ste_state::shifter_lineofs_r )
+READ8_MEMBER( ste_state::shifter_lineofs_r )
 {
 	return m_shifter_lineofs;
 }
@@ -524,9 +524,9 @@ READ16_MEMBER( ste_state::shifter_lineofs_r )
 //  shifter_lineofs_w -
 //-------------------------------------------------
 
-WRITE16_MEMBER( ste_state::shifter_lineofs_w )
+WRITE8_MEMBER( ste_state::shifter_lineofs_w )
 {
-	m_shifter_lineofs = data & 0xff;
+	m_shifter_lineofs = data;
 	logerror("SHIFTER Line Offset %x\n", m_shifter_lineofs);
 }
 
@@ -535,7 +535,7 @@ WRITE16_MEMBER( ste_state::shifter_lineofs_w )
 //  shifter_pixelofs_r -
 //-------------------------------------------------
 
-READ16_MEMBER( ste_state::shifter_pixelofs_r )
+READ8_MEMBER( ste_state::shifter_pixelofs_r )
 {
 	return m_shifter_pixelofs;
 }
@@ -545,7 +545,7 @@ READ16_MEMBER( ste_state::shifter_pixelofs_r )
 //  shifter_pixelofs_w -
 //-------------------------------------------------
 
-WRITE16_MEMBER( ste_state::shifter_pixelofs_w )
+WRITE8_MEMBER( ste_state::shifter_pixelofs_w )
 {
 	m_shifter_pixelofs = data & 0x0f;
 	logerror("SHIFTER Pixel Offset %x\n", m_shifter_pixelofs);
