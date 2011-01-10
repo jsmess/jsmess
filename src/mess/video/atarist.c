@@ -2,7 +2,7 @@
 
     TODO:
 
-    - double screen width to allow for medium resolution
+	- rewrite shifter
     - STe pixelofs
     - blitter hog
     - high resolution
@@ -234,6 +234,34 @@ void st_state::glue_tick()
 	{
 		cpu_set_input_line(m_maincpu, M68K_IRQ_2, HOLD_LINE);
 //		m_shifter_ofs += (m_shifter_lineofs * 2); // STe
+	}
+
+	pen_t pen;
+
+	switch (m_shifter_mode)
+	{
+	case 0:
+		pen = shift_mode_0();
+		*BITMAP_ADDR32(machine->generic.tmpbitmap, y, x) = pen;
+		pen = shift_mode_0();
+		*BITMAP_ADDR32(machine->generic.tmpbitmap, y, x+1) = pen;
+		pen = shift_mode_0();
+		*BITMAP_ADDR32(machine->generic.tmpbitmap, y, x+2) = pen;
+		pen = shift_mode_0();
+		*BITMAP_ADDR32(machine->generic.tmpbitmap, y, x+3) = pen;
+		break;
+
+	case 1:
+		pen = shift_mode_1();
+		break;
+
+	case 2:
+		pen = shift_mode_2();
+		break;
+		
+	default:
+		pen = get_black_pen(machine);
+		break;
 	}
 }
 
@@ -904,8 +932,11 @@ WRITE16_MEMBER( st_state::blitter_src_w )
 	{
 	case 0:
 		m_blitter_src = (data & 0xff) | (m_blitter_src & 0xfffe);
+		break;
+
 	case 1:
 		m_blitter_src = (m_blitter_src & 0xff0000) | (data & 0xfffe);
+		break;
 	}
 }
 
@@ -920,10 +951,15 @@ WRITE16_MEMBER( st_state::blitter_end_mask_w )
 	{
 	case 0:
 		m_blitter_endmask1 = data;
+		break;
+
 	case 1:
 		m_blitter_endmask2 = data;
+		break;
+
 	case 2:
 		m_blitter_endmask3 = data;
+		break;
 	}
 }
 
@@ -958,8 +994,11 @@ WRITE16_MEMBER( st_state::blitter_dst_w )
 	{
 	case 0:
 		m_blitter_dst = (data & 0xff) | (m_blitter_dst & 0xfffe);
+		break;
+
 	case 1:
 		m_blitter_dst = (m_blitter_dst & 0xff0000) | (data & 0xfffe);
+		break;
 	}
 }
 
@@ -1044,7 +1083,7 @@ void st_state::video_start()
 	m_shifter_timer = timer_alloc(machine, atarist_shifter_tick, NULL);
 	m_glue_timer = timer_alloc(machine, atarist_glue_tick, NULL);
 
-	timer_adjust_periodic(m_shifter_timer, machine->primary_screen->time_until_pos(0,0), 0, ATTOTIME_IN_HZ(Y2/4)); // 125 ns
+//	timer_adjust_periodic(m_shifter_timer, machine->primary_screen->time_until_pos(0,0), 0, ATTOTIME_IN_HZ(Y2/4)); // 125 ns
 	timer_adjust_periodic(m_glue_timer, machine->primary_screen->time_until_pos(0,0), 0, ATTOTIME_IN_HZ(Y2/16)); // 500 ns
 
 	/* register for state saving */
