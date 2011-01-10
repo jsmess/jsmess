@@ -15357,7 +15357,7 @@
 		</part>
 	</software>
 
-	<software name="tombrleg">
+	<software name="traidleg">
 		<description>Lara Croft Tomb Raider - Legend (Euro)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -15368,7 +15368,7 @@
 		</part>
 	</software>
 
-	<software name="tombrlegu" cloneof="tombrleg">
+	<software name="traidlegu" cloneof="traidleg">
 		<description>Lara Croft Tomb Raider - Legend (USA)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -15379,7 +15379,7 @@
 		</part>
 	</software>
 
-	<software name="tombrpro">
+	<software name="traidpr">
 		<description>Lara Croft Tomb Raider - The Prophecy (Euro)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -15390,7 +15390,7 @@
 		</part>
 	</software>
 
-	<software name="tombrproj" cloneof="tombrpro">
+	<software name="traidprj" cloneof="traidpr">
 		<description>Lara Croft Tomb Raider - The Prophecy (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -15401,7 +15401,7 @@
 		</part>
 	</software>
 
-	<software name="tombrprou" cloneof="tombrpro">
+	<software name="traidpru" cloneof="traidpr">
 		<description>Lara Croft Tomb Raider - The Prophecy (USA)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -31703,6 +31703,28 @@
 		<part name="cart" interface="gba_cart">
 			<dataarea name="rom" size="2391740">
 				<rom name="tintoy (gba engine demo 2).bin" size="2391740" crc="7bda5802" sha1="dea31690917e27850922f5aa40c1c43ea785e438" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spyroflmup" cloneof="spyroflm">
+		<description>Spyro 2 - Season of Flame (USA, Prototype)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="gba_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="spyro 2 - season of flame (beta).bin" size="8388608" crc="d05c86bb" sha1="64608522b649f54c1e7678fb54ffeb8246f0342f" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="traidlegup" cloneof="traidleg">
+		<description>Lara Croft Tomb Raider - Legend (USA, Prototype)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="gba_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="lara croft tomb raider - legend (beta).bin" size="8388608" crc="03708dcd" sha1="6efd82b911f0db968743133739d3895abf8d2ec4" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
