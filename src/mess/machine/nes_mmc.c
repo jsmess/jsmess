@@ -278,6 +278,10 @@ static void prg32( running_machine *machine, int bank )
 {
 	nes_state *state = machine->driver_data<nes_state>();
 
+	/* if there is only 16k PRG, return */
+	if (!(state->prg_chunks >> 1))
+		return;
+
 	/* assumes that bank references a 32k chunk */
 	bank &= ((state->prg_chunks >> 1) - 1);
 

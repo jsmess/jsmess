@@ -521,6 +521,7 @@ static const nes_pcb pcb_list[] =
 	{ "UNL-KOF97",        UNL_KOF97 },
 	{ "UNL-T-230",        UNL_T230 },
 	{ "UNL-STUDYNGAME",   UNL_STUDYNGAME },	// mapper 39
+	{ "UNL-OneBus",       UNSUPPORTED_BOARD },
 //
 	{ "BTL-SMB2A",         BTL_SMB2A },
 	{ "BTL-MARIOBABY",     BTL_MARIOBABY },
