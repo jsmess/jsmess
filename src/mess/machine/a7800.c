@@ -202,6 +202,9 @@ DEVICE_START( a7800_cart )
 	/* save the BIOS so we can switch it in and out */
 	memcpy( state->bios_bkup, memory + 0xC000, 0x4000 );
 
+	/* Initialize cart area to "no data" */
+	memset( state->cart_bkup, 0xFF, 0x4000 );
+
 	/* defaults for PAL bios without cart */
 	state->cart_type = 0;
 	state->stick_type = 1;
