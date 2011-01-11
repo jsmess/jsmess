@@ -13,12 +13,15 @@
 	- What exact kind of garbage happens if you try to enable both direct and palette color
 	  modes to a graphic layer?
 	- What is exactly supposed to be a "bus slot"?
+	- fdc "intelligent mode" has 0x7f as irq vector ... 0x7f is ld a,a and it IS NOT correctly
+	  hooked up by the current z80 core
 
 ********************************************************************************************/
 
 #include "emu.h"
 #include "cpu/nec/nec.h"
 #include "cpu/z80/z80.h"
+#include "debug/debugcpu.h"
 #include "machine/i8255a.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
@@ -61,7 +64,13 @@ public:
 	UINT8 buf_index;
 	UINT8 buf_ram[16];
 	UINT8 portc_test;
+
+	/* floppy state */
+	UINT8 i8255_0_pc;
+	UINT8 i8255_1_pc;
 };
+
+static UINT8 fdc_mode,fdc_irq_opcode;
 
 
 static VIDEO_START( pc88va )
@@ -905,6 +914,30 @@ static READ8_HANDLER( hdd_status_r )
 	return 0x20;
 }
 
+static WRITE8_HANDLER( upd765_mc_w )
+{
+	floppy_mon_w(floppy_get_device(space->machine, 0), (data & 1) ? CLEAR_LINE : ASSERT_LINE);
+	floppy_mon_w(floppy_get_device(space->machine, 1), (data & 2) ? CLEAR_LINE : ASSERT_LINE);
+	floppy_drive_set_ready_state(floppy_get_device(space->machine, 0), (data & 1), 0);
+	floppy_drive_set_ready_state(floppy_get_device(space->machine, 1), (data & 2), 0);
+}
+
+static TIMER_CALLBACK( pc8801fd_upd765_tc_to_zero )
+{
+//	pc88va_state *state = machine->driver_data<pc88va_state>();
+
+	upd765_tc_w(machine->device("upd765"), 0);
+}
+
+READ8_HANDLER( upd765_tc_r )
+{
+	//pc88va_state *state = space->machine->driver_data<pc88va_state>();
+
+	upd765_tc_w(space->machine->device("upd765"), 1);
+	timer_set(space->machine,  ATTOTIME_IN_USEC(500), NULL, 0, pc8801fd_upd765_tc_to_zero );
+	return 0;
+}
+
 static READ8_HANDLER( pc88va_fdc_r )
 {
 	switch(offset*2)
@@ -930,6 +963,8 @@ static WRITE8_HANDLER( pc88va_fdc_w )
 		---- ---x MODE: FDC op mode (0) Intelligent (1) DMA
 		*/
 		case 0x00: // FDC mode register
+			fdc_mode = data & 1;
+			cputag_set_input_line(space->machine, "fdccpu", INPUT_LINE_HALT, (fdc_mode) ? ASSERT_LINE : CLEAR_LINE);
 			break;
 		/*
 		--x- ---- CLK: FDC clock selection (0) 4.8MHz (1) 8 MHz
@@ -943,8 +978,7 @@ static WRITE8_HANDLER( pc88va_fdc_w )
 		---- x--- PCM: ?
 		---- --xx M1/M0: Drive 1/0 motor control (0) Motor OFF (1) Motor ON
 		*/
-		case 0x04: // FDC control port 1
-			break;
+		case 0x04: upd765_mc_w(space,0,data); break;
 		/*
 		x--- ---- FDCRST: FDC Reset
 		-xx- ---- FDCFRY FRYCEN: FDC force ready control
@@ -1108,18 +1142,19 @@ static ADDRESS_MAP_START( pc88va_z80_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0x7fff) AM_RAM
 ADDRESS_MAP_END
 
+static WRITE8_HANDLER( fdc_irq_vector_w )
+{
+	fdc_irq_opcode = data;
+}
+
 static ADDRESS_MAP_START( pc88va_z80_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-//	AM_RANGE(0xf0, 0xf0) // Interrupt Opcode Port
+	AM_RANGE(0xf0, 0xf0) AM_WRITE(fdc_irq_vector_w) // Interrupt Opcode Port
 //	AM_RANGE(0xf4, 0xf4) // Drive Control Port
-//	AM_RANGE(0xf8, 0xf8) // (R) Terminal Count Port (W) Motor Control Port
-//	AM_RANGE(0xfa, 0xfa) // FDC Status Register
-//	AM_RANGE(0xfb, 0xfb) // FDC Data Register
-	// 0xfc - 0xff there's a i8255 mapped, bidiretional handshake port
-//	AM_RANGE(0xfc, 0xfc) // (R) Data input port from main CPU
-//	AM_RANGE(0xfd, 0xfd) // (W) Data input port to main CPU
-	AM_RANGE(0xfe, 0xfe) AM_NOP // Handshake Control Port
-//	AM_RANGE(0xff, 0xff) // Mode Set / Bit Control
+	AM_RANGE(0xf8, 0xf8) AM_READWRITE(upd765_tc_r,upd765_mc_w) // (R) Terminal Count Port (W) Motor Control Port
+	AM_RANGE(0xfa, 0xfa) AM_DEVREAD("upd765", upd765_status_r )
+	AM_RANGE(0xfb, 0xfb) AM_DEVREADWRITE("upd765", upd765_data_r, upd765_data_w )
+	AM_RANGE(0xfc, 0xff) AM_DEVREADWRITE("d8255_2s", i8255a_r,i8255a_w)
 ADDRESS_MAP_END
 
 
@@ -1340,47 +1375,52 @@ static GFXDECODE_START( pc88va )
 	GFXDECODE_ENTRY( "kanji",   0x00000, pc88va_chars_16x16,  0, 1 )
 GFXDECODE_END
 
-static READ8_DEVICE_HANDLER( fdd_porta_r )
-{
-	return 0xff;
-}
-
-static READ8_DEVICE_HANDLER( fdd_portb_r )
-{
-	return 0xff;
-}
-
-static READ8_DEVICE_HANDLER( fdd_portc_r )
+static READ8_DEVICE_HANDLER( cpu_8255_c_r )
 {
 	pc88va_state *state = device->machine->driver_data<pc88va_state>();
-	state->portc_test^=5;
 
-	return 0xff ^ state->portc_test;
+	return state->i8255_1_pc >> 4;
 }
 
-static WRITE8_DEVICE_HANDLER( fdd_porta_w )
+static WRITE8_DEVICE_HANDLER( cpu_8255_c_w )
 {
-	// ...
+	pc88va_state *state = device->machine->driver_data<pc88va_state>();
+
+	state->i8255_0_pc = data;
 }
 
-static WRITE8_DEVICE_HANDLER( fdd_portb_w )
+static I8255A_INTERFACE( master_fdd_intf )
 {
-	// ...
+	DEVCB_DEVICE_HANDLER("d8255_2s", i8255a_pb_r),	// Port A read
+	DEVCB_NULL,							// Port B read
+	DEVCB_HANDLER(cpu_8255_c_r),		// Port C read
+	DEVCB_NULL,							// Port A write
+	DEVCB_NULL,							// Port B write
+	DEVCB_HANDLER(cpu_8255_c_w)			// Port C write
+};
+
+static READ8_DEVICE_HANDLER( fdc_8255_c_r )
+{
+	pc88va_state *state = device->machine->driver_data<pc88va_state>();
+
+	return state->i8255_0_pc >> 4;
 }
 
-static WRITE8_DEVICE_HANDLER( fdd_portc_w )
+static WRITE8_DEVICE_HANDLER( fdc_8255_c_w )
 {
-	// ...
+	pc88va_state *state = device->machine->driver_data<pc88va_state>();
+
+	state->i8255_1_pc = data;
 }
 
-static I8255A_INTERFACE( fdd_intf )
+static I8255A_INTERFACE( slave_fdd_intf )
 {
-	DEVCB_HANDLER(fdd_porta_r),						/* Port A read */
-	DEVCB_HANDLER(fdd_portb_r),						/* Port B read */
-	DEVCB_HANDLER(fdd_portc_r),						/* Port C read */
-	DEVCB_HANDLER(fdd_porta_w),						/* Port A write */
-	DEVCB_HANDLER(fdd_portb_w),						/* Port B write */
-	DEVCB_HANDLER(fdd_portc_w)						/* Port C write */
+	DEVCB_DEVICE_HANDLER("d8255_2", i8255a_pb_r),	// Port A read
+	DEVCB_NULL,							// Port B read
+	DEVCB_HANDLER(fdc_8255_c_r),		// Port C read
+	DEVCB_NULL,							// Port A write
+	DEVCB_NULL,							// Port B write
+	DEVCB_HANDLER(fdc_8255_c_w)			// Port C write
 };
 
 static READ8_DEVICE_HANDLER( r232_ctrl_porta_r )
@@ -1491,6 +1531,9 @@ static MACHINE_RESET( pc88va )
 	}
 
 	state->tsp.tvram_vreg_offset = 0;
+
+	fdc_mode = 0;
+	fdc_irq_opcode = 0x7f; // ld a,a !
 }
 
 static INTERRUPT_GEN( pc88va_vrtc_irq )
@@ -1544,9 +1587,11 @@ static const struct pit8253_config pc88va_pit8253_config =
 
 static WRITE_LINE_DEVICE_HANDLER(pc88va_upd765_interrupt)
 {
-	pic8259_ir3_w(device->machine->device( "pic8259_slave"), state);
+	if(fdc_mode)
+		pic8259_ir3_w(device->machine->device( "pic8259_slave"), state);
+	else
+		cputag_set_input_line_and_vector(device->machine, "fdccpu", 0, HOLD_LINE, fdc_irq_opcode);
 };
-
 
 static const struct upd765_interface pc88va_upd765_interface =
 {
@@ -1554,7 +1599,7 @@ static const struct upd765_interface pc88va_upd765_interface =
 	DEVCB_NULL, //DRQ, TODO
 	NULL,
 	UPD765_RDY_PIN_CONNECTED,
-	{FLOPPY_0,NULL, NULL, NULL}
+	{FLOPPY_0, FLOPPY_1, NULL, NULL}
 };
 
 static const ym2203_interface pc88va_ym2203_intf =
@@ -1596,8 +1641,10 @@ static MACHINE_CONFIG_START( pc88va, pc88va_state )
 	MCFG_MACHINE_START( pc88va )
 	MCFG_MACHINE_RESET( pc88va )
 
-	MCFG_I8255A_ADD( "d8255_2", fdd_intf )
+	MCFG_I8255A_ADD( "d8255_2", master_fdd_intf )
 	MCFG_I8255A_ADD( "d8255_3", r232c_ctrl_intf )
+
+	MCFG_I8255A_ADD( "d8255_2s", slave_fdd_intf )
 
 	MCFG_PIC8259_ADD( "pic8259_master", pc88va_pic8259_master_config )
 	MCFG_PIC8259_ADD( "pic8259_slave", pc88va_pic8259_slave_config )
