@@ -987,6 +987,7 @@ static WRITE8_HANDLER( pc88va_fdc_w )
 		---- ---x TTRG: FDC timer trigger (0) FDC timer clearing (1) FDC timer start
 		*/
 		case 0x06:
+			printf("%02x\n",data);
 			break; // FDC control port 2
 		case 0x08: break; // UPD765 status
 		case 0x0a: upd765_data_w(space->machine->device("upd765"), 0,data); break;
@@ -1533,7 +1534,7 @@ static MACHINE_RESET( pc88va )
 	state->tsp.tvram_vreg_offset = 0;
 
 	fdc_mode = 0;
-	fdc_irq_opcode = 0x7f; // ld a,a !
+	fdc_irq_opcode = 0x00; //0x7f ld a,a !
 }
 
 static INTERRUPT_GEN( pc88va_vrtc_irq )
