@@ -617,8 +617,8 @@ VIDEO_UPDATE( pc8801 )
 								cg = (((state->gVRAM[0x0000 + x + y * 2 * 80 + gy * 80] << gx) & 0x80) >> 7) |
 									(((state->gVRAM[0x4000 + x + y * 2 * 80 + gy * 80] << gx) & 0x80) >> 6) |
 									(((state->gVRAM[0x8000 + x + y * 2 * 80 + gy * 80] << gx) & 0x80) >> 5);
-								pc8801_plot_pixel(state->wbm1, x * 8 + gx, y * 4 + gy * 2, cg);
-								pc8801_plot_pixel(state->wbm1, x * 8 + gx, y * 4 + gy * 2 + 1, 17);
+								pc8801_plot_pixel(state->wbm1, x * 8 + gx, y * 4 + gy * 2, (cg & 0xf) + 0x20);
+								pc8801_plot_pixel(state->wbm1, x * 8 + gx, y * 4 + gy * 2 + 1, (cg & 0xf) + 0x20);
 							}
 						}
 						break;
@@ -1061,4 +1061,5 @@ WRITE8_HANDLER(pc88_palette_w)
 		state->pal[offset].g = (data & 4) ? 0xff : 0x00;
 	}
 	colortable_palette_set_color(space->machine->colortable, palno, MAKE_RGB(state->pal[offset].r, state->pal[offset].g, state->pal[offset].b));
+	palette_set_color(space->machine, palno + 0x20, MAKE_RGB(state->pal[offset].r, state->pal[offset].g, state->pal[offset].b));
 }
