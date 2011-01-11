@@ -4,8 +4,34 @@
 
         11/01/2010 Skeleton driver.
         28/11/2010 Connected to a terminal
+        11/01/2011 Converted to Modern.
+
+****************************************************************************
+
+        Monitor commands: [] indicates optional
+
+        Bx = Boot from device x (0 to 7)
+        Dx [y] = Dump memory (hex and ascii) in range x [to y]
+        Fx y z = Fill memory x to y with z
+        Gx = Execute program at address x
+        Ix = Display IN of port x
+        Ox y = Output y to port x
+        Sx = Enter memory editing mode, press enter for next address
+        Mx y = unknown (affects memory)
+        Tx = unknown (does strange things)
+        enter = dump memory from 9000 to 907F (why?)
+
+****************************************************************************
+
+        TODO:
+        Everything really...
+
+        Devices of all kinds;
+        Use the other rom for something..
 
 ****************************************************************************/
+
+#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
@@ -16,41 +42,46 @@ class zsbc3_state : public driver_device
 {
 public:
 	zsbc3_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+		: driver_device(machine, config),
+		  m_maincpu(*this, "maincpu"),
+		  m_terminal(*this, "terminal")
+	{ }
 
-	UINT8 term_data;
+	required_device<cpu_device> m_maincpu;
+	required_device<device_t> m_terminal;
+	DECLARE_READ8_MEMBER(zsbc3_28_r);
+	DECLARE_READ8_MEMBER(zsbc3_2a_r);
+	DECLARE_WRITE8_MEMBER(zsbc3_28_w);
+	DECLARE_WRITE8_MEMBER(zsbc3_kbd_put);
+	UINT8 m_term_data;
 };
 
 
 
-static WRITE8_HANDLER( zsbc3_28_w )
+WRITE8_MEMBER( zsbc3_state::zsbc3_28_w )
 {
-	device_t *terminal = space->machine->device("terminal");
-
-	terminal_write(terminal, 0, data);
+	terminal_write(m_terminal, 0, data);
 }
 
-static READ8_HANDLER( zsbc3_28_r )
+READ8_MEMBER( zsbc3_state::zsbc3_28_r )
 {
-	zsbc3_state *state = space->machine->driver_data<zsbc3_state>();
-	UINT8 ret = state->term_data;
-	state->term_data = 0;
+	UINT8 ret = m_term_data;
+	m_term_data = 0;
 	return ret;
 }
 
-static READ8_HANDLER( zsbc3_2a_r )
+READ8_MEMBER( zsbc3_state::zsbc3_2a_r )
 {
-	zsbc3_state *state = space->machine->driver_data<zsbc3_state>();
-	return 4 | ((state->term_data) ? 1 : 0);
+	return 4 | ((m_term_data) ? 1 : 0);
 }
 
-static ADDRESS_MAP_START(zsbc3_mem, ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START(zsbc3_mem, ADDRESS_SPACE_PROGRAM, 8, zsbc3_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x07ff ) AM_ROM
 	AM_RANGE( 0x0800, 0xffff ) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( zsbc3_io , ADDRESS_SPACE_IO, 8)
+static ADDRESS_MAP_START( zsbc3_io , ADDRESS_SPACE_IO, 8, zsbc3_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x28, 0x28) AM_READWRITE(zsbc3_28_r,zsbc3_28_w)
@@ -67,15 +98,14 @@ static MACHINE_RESET(zsbc3)
 {
 }
 
-static WRITE8_DEVICE_HANDLER( zsbc3_kbd_put )
+WRITE8_MEMBER( zsbc3_state::zsbc3_kbd_put )
 {
-	zsbc3_state *state = device->machine->driver_data<zsbc3_state>();
-	state->term_data = data;
+	m_term_data = data;
 }
 
 static GENERIC_TERMINAL_INTERFACE( zsbc3_terminal_intf )
 {
-	DEVCB_HANDLER(zsbc3_kbd_put)
+	DEVCB_DRIVER_MEMBER(zsbc3_state, zsbc3_kbd_put)
 };
 
 
@@ -97,6 +127,7 @@ MACHINE_CONFIG_END
 ROM_START( zsbc3 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "54-3002_zsbc_monitor_1.09.bin", 0x0000, 0x0800, CRC(628588e9) SHA1(8f0d489147ec8382ca007236e0a95a83b6ebcd86))
+
 	ROM_REGION( 0x10000, "hdc", ROMREGION_ERASEFF )
 	ROM_LOAD( "54-8622_hdc13.bin", 0x0000, 0x0400, CRC(02c7cd6d) SHA1(494281ba081a0f7fbadfc30a7d2ea18c59e55101))
 ROM_END
@@ -104,5 +135,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY               FULLNAME       FLAGS */
-COMP( 1980, zsbc3,  0,       0, 		zsbc3,	zsbc3,	 0, 	  "Digital Microsystems",   "ZSBC-3",		GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1980, zsbc3,  0,       0, 		zsbc3,	zsbc3,	 0, 	  "Digital Microsystems",   "ZSBC-3",		GAME_NOT_WORKING | GAME_NO_SOUND_HW)
 
