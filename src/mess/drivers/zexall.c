@@ -17,6 +17,7 @@ One i/o port is used:
 0001 - bit 0 controls whether interrupt timer is enabled (1) or not (0), this is a holdover from a project of kevtris' and can be ignored.
 
 ******************************************************************************/
+#define ADDRESS_MAP_MODERN
 
 /* Core includes */
 #include "emu.h"
@@ -28,103 +29,98 @@ class zexall_state : public driver_device
 {
 public:
 	zexall_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+		: driver_device(machine, config),
+		  m_maincpu(*this, "maincpu"),
+		  m_terminal(*this, "terminal")
+	{ }
 
+	required_device<cpu_device> m_maincpu;
+	required_device<device_t> m_terminal;
+	DECLARE_READ8_MEMBER( zexall_output_ack_r );
+	DECLARE_READ8_MEMBER( zexall_output_req_r );
+	DECLARE_READ8_MEMBER( zexall_output_data_r );
+	DECLARE_WRITE8_MEMBER( zexall_output_ack_w );
+	DECLARE_WRITE8_MEMBER( zexall_output_req_w );
+	DECLARE_WRITE8_MEMBER( zexall_output_data_w );
 	UINT8 *main_ram;
 	UINT8 data[8]; // unused; to suppress the scalar initializer warning
-	UINT8 out_data; // byte written to 0xFFFF
-	UINT8 out_req; // byte written to 0xFFFE
-	UINT8 out_req_last; // old value at 0xFFFE before the most recent write
-	UINT8 out_ack; // byte written to 0xFFFC
+	UINT8 m_out_data; // byte written to 0xFFFF
+	UINT8 m_out_req; // byte written to 0xFFFE
+	UINT8 m_out_req_last; // old value at 0xFFFE before the most recent write
+	UINT8 m_out_ack; // byte written to 0xFFFC
 };
-
-
-/* Defines */
-
-/* Components */
-
-/* Devices */
 
 static DRIVER_INIT( zexall )
 {
 	zexall_state *state = machine->driver_data<zexall_state>();
-	state->out_ack = 0;
-	state->out_req = 0;
-	state->out_req_last = 0;
-	state->out_data = 0;
+	state->m_out_ack = 0;
+	state->m_out_req = 0;
+	state->m_out_req_last = 0;
+	state->m_out_data = 0;
 }
 
 static MACHINE_RESET( zexall )
 {
+// rom is self-modifying, so need to refresh it on each run
 	zexall_state *state = machine->driver_data<zexall_state>();
 	UINT8 *rom = machine->region("romcode")->base();
 	UINT8 *ram = state->main_ram;
-	int i;
 	/* fill main ram with zexall code */
-	for (i = 0; i < 0x228a; i++)
-		ram[i] = rom[i];
-	//fprintf(stderr,"MACHINE_RESET: copied romcode to maincpu\n");
+	memcpy(ram, rom, 0x228a);
 }
 
-static READ8_HANDLER( zexall_output_ack_r )
+READ8_MEMBER( zexall_state::zexall_output_ack_r )
 {
-	zexall_state *state = space->machine->driver_data<zexall_state>();
-	device_t *devconf = space->machine->device("terminal");
 // spit out the byte in out_byte if out_req is not equal to out_req_last
-	if (state->out_req != state->out_req_last)
+	if (m_out_req != m_out_req_last)
 	{
-	terminal_write(devconf,0,state->out_data);
-	fprintf(stderr,"%c",state->out_data);
-	state->out_req_last = state->out_req;
-	state->out_ack++;
+		terminal_write(m_terminal,0,m_out_data);
+		fprintf(stderr,"%c",m_out_data);
+		m_out_req_last = m_out_req;
+		m_out_ack++;
 	}
-	return state->out_ack;
+	return m_out_ack;
 }
 
-static WRITE8_HANDLER( zexall_output_ack_w )
+WRITE8_MEMBER( zexall_state::zexall_output_ack_w )
 {
-	zexall_state *state = space->machine->driver_data<zexall_state>();
-	state->out_ack = data;
+	m_out_ack = data;
 }
 
-static READ8_HANDLER( zexall_output_req_r )
+READ8_MEMBER( zexall_state::zexall_output_req_r )
 {
-	zexall_state *state = space->machine->driver_data<zexall_state>();
-	return state->out_req;
+	return m_out_req;
 }
 
-static WRITE8_HANDLER( zexall_output_req_w )
+WRITE8_MEMBER( zexall_state::zexall_output_req_w )
 {
-	zexall_state *state = space->machine->driver_data<zexall_state>();
-	state->out_req_last = state->out_req;
-	state->out_req = data;
+	m_out_req_last = m_out_req;
+	m_out_req = data;
 }
 
-static READ8_HANDLER( zexall_output_data_r )
+READ8_MEMBER( zexall_state::zexall_output_data_r )
 {
-	zexall_state *state = space->machine->driver_data<zexall_state>();
-	return state->out_data;
+	return m_out_data;
 }
 
-static WRITE8_HANDLER( zexall_output_data_w )
+WRITE8_MEMBER( zexall_state::zexall_output_data_w )
 {
-	zexall_state *state = space->machine->driver_data<zexall_state>();
-	state->out_data = data;
+	m_out_data = data;
 }
 
 /******************************************************************************
  Address Maps
 ******************************************************************************/
 
-static ADDRESS_MAP_START(z80_mem, ADDRESS_SPACE_PROGRAM, 8)
-    ADDRESS_MAP_UNMAP_HIGH
-    AM_RANGE(0x0000, 0xfffc) AM_RAM AM_BASE_MEMBER(zexall_state, main_ram)
+static ADDRESS_MAP_START(z80_mem, ADDRESS_SPACE_PROGRAM, 8, zexall_state)
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000, 0xfffc) AM_RAM AM_BASE(main_ram)
 	AM_RANGE(0xfffd, 0xfffd) AM_READWRITE(zexall_output_ack_r,zexall_output_ack_w)
 	AM_RANGE(0xfffe, 0xfffe) AM_READWRITE(zexall_output_req_r,zexall_output_req_w)
 	AM_RANGE(0xffff, 0xffff) AM_READWRITE(zexall_output_data_r,zexall_output_data_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(z80_io, ADDRESS_SPACE_IO, 8)
+static ADDRESS_MAP_START(z80_io, ADDRESS_SPACE_IO, 8, zexall_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0001, 0x0001) AM_NOP // really a disable/enable for some sort of interrupt timer on kev's hardware, which is completely irrelevant for the zexall test
 ADDRESS_MAP_END
@@ -140,27 +136,23 @@ INPUT_PORTS_END
 /******************************************************************************
  Machine Drivers
 ******************************************************************************/
-static WRITE8_DEVICE_HANDLER( null_kbd_put )
-{
-}
 
-static GENERIC_TERMINAL_INTERFACE( dectalk_terminal_intf )
+static GENERIC_TERMINAL_INTERFACE( zexall_terminal_intf )
 {
-	DEVCB_HANDLER(null_kbd_put)
+	DEVCB_NULL
 };
 
 static MACHINE_CONFIG_START( zexall, zexall_state )
-    /* basic machine hardware */
-    MCFG_CPU_ADD("maincpu", Z80, XTAL_3_579545MHz*10)
-    MCFG_CPU_PROGRAM_MAP(z80_mem)
-    MCFG_CPU_IO_MAP(z80_io)
-    MCFG_QUANTUM_TIME(HZ(60))
-    MCFG_MACHINE_RESET(zexall)
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_3_579545MHz*10)
+	MCFG_CPU_PROGRAM_MAP(z80_mem)
+	MCFG_CPU_IO_MAP(z80_io)
+	MCFG_QUANTUM_TIME(HZ(60))
+	MCFG_MACHINE_RESET(zexall)
 
-    /* video hardware */
+	/* video hardware */
 	MCFG_FRAGMENT_ADD( generic_terminal )
-	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG,dectalk_terminal_intf)
-
+	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, zexall_terminal_intf)
 MACHINE_CONFIG_END
 
 
@@ -170,9 +162,8 @@ MACHINE_CONFIG_END
 ******************************************************************************/
 
 ROM_START(zexall)
-
-    ROM_REGION(0x10000, "romcode", 0)
-    ROM_LOAD("zex.bin", 0x00000, 0x2289, CRC(77E0A1DF) SHA1(CC8F84724E3837783816D92A6DFB8E5975232C66))
+	ROM_REGION(0x22ff, "romcode", 0)
+	ROM_LOAD("zex.bin", 0x0000, 0x2289, CRC(77E0A1DF) SHA1(CC8F84724E3837783816D92A6DFB8E5975232C66))
 ROM_END
 
 
