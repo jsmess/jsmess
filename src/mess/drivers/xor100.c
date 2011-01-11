@@ -2,6 +2,21 @@
 
         XOR S-100-12
 
+*****************************************************************************************************
+
+        Summary of Monitor commands:
+
+        D xxxx yyyy = dump memory to screen
+        F xxxx yyyy zz = fill memory from xxxx to yyyy-1 with zz
+        G xxxx         = execute program at xxxx
+        H xxxx yyyy aa bb...  = unknown
+        L xxxx         = edit memory (. to exit)
+        M xxxx yyyy zzzz = Move (copy) memory
+        V xxxx           = unknown
+	X n     = Select a bank (0 works, others freeze)
+
+        Note some of the commands are a bit buggy, eg F doesn't fill the last byte
+
 *****************************************************************************************************/
 
 /*
@@ -559,12 +574,12 @@ static const floppy_config xor100_floppy_config =
 };
 
 static MACHINE_CONFIG_START( xor100, xor100_state )
-    /* basic machine hardware */
-    MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_8MHz/2)
-    MCFG_CPU_PROGRAM_MAP(xor100_mem)
-    MCFG_CPU_IO_MAP(xor100_io)
+	/* basic machine hardware */
+	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_8MHz/2)
+	MCFG_CPU_PROGRAM_MAP(xor100_mem)
+	MCFG_CPU_IO_MAP(xor100_io)
 
-    /* video hardware */
+	/* video hardware */
 	MCFG_FRAGMENT_ADD( generic_terminal )
 
 	/* devices */
