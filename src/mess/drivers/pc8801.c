@@ -142,7 +142,7 @@ static ADDRESS_MAP_START( pc88sr_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x32, 0x32) AM_READWRITE(pc88sr_inport_32, pc88sr_outport_32)
 	AM_RANGE(0x34, 0x35) AM_WRITE(pc88sr_alu)
 	AM_RANGE(0x40, 0x40) AM_READWRITE(pc88sr_inport_40, pc88sr_outport_40)
-	AM_RANGE(0x44, 0x45) AM_DEVREAD(YM2203_TAG, ym2203_r)
+	AM_RANGE(0x44, 0x45) AM_DEVREADWRITE(YM2203_TAG, ym2203_r,ym2203_w)
 //  AM_RANGE(0x46, 0x47) AM_NOP                                     /* OPNA extra port (not yet) */
 	AM_RANGE(0x50, 0x51) AM_READWRITE(pc88_crtc_r, pc88_crtc_w)
 	AM_RANGE(0x52, 0x5b) AM_WRITE(pc88_palette_w)
@@ -181,9 +181,17 @@ static ADDRESS_MAP_START( pc8801fd_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0x7fff) AM_RAM
 ADDRESS_MAP_END
 
+static WRITE8_HANDLER( pc8801fd_upd765_mc )
+{
+	floppy_mon_w(floppy_get_device(space->machine, 0), (data & 1) ? CLEAR_LINE : ASSERT_LINE);
+	floppy_mon_w(floppy_get_device(space->machine, 1), (data & 2) ? CLEAR_LINE : ASSERT_LINE);
+	floppy_drive_set_ready_state(floppy_get_device(space->machine, 0), (data & 1), 0);
+	floppy_drive_set_ready_state(floppy_get_device(space->machine, 1), (data & 2), 0);
+}
+
 static ADDRESS_MAP_START( pc8801fd_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xf8, 0xf8) AM_READ(pc8801fd_upd765_tc)
+	AM_RANGE(0xf8, 0xf8) AM_READWRITE(pc8801fd_upd765_tc,pc8801fd_upd765_mc)
 	AM_RANGE(0xfa, 0xfa) AM_DEVREAD(UPD765_TAG, upd765_status_r )
 	AM_RANGE(0xfb, 0xfb) AM_DEVREADWRITE(UPD765_TAG, upd765_data_r, upd765_data_w )
 	AM_RANGE(0xfc, 0xff) AM_DEVREADWRITE(FDC_I8255A_TAG, i8255a_r, i8255a_w )
