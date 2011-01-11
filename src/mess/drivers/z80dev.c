@@ -17,13 +17,13 @@ class z80dev_state : public driver_device
 {
 public:
 	z80dev_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config)
+		: driver_device(machine, config),
+	m_maincpu(*this, "maincpu")
 	{ }
 
-	void machine_reset();
-
-	WRITE8_MEMBER( display_w );
-	READ8_MEMBER( test_r );
+	required_device<cpu_device> m_maincpu;
+	DECLARE_WRITE8_MEMBER( display_w );
+	DECLARE_READ8_MEMBER( test_r );
 };
 
 WRITE8_MEMBER( z80dev_state::display_w )
@@ -93,23 +93,19 @@ INPUT_PORTS_START( z80dev )
 		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("LD") PORT_CODE(KEYCODE_L)
 INPUT_PORTS_END
 
-void z80dev_state::machine_reset()
-{
-}
-
 static MACHINE_CONFIG_START( z80dev, z80dev_state )
-    /* basic machine hardware */
-    MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
-    MCFG_CPU_PROGRAM_MAP(z80dev_mem)
-    MCFG_CPU_IO_MAP(z80dev_io)
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
+	MCFG_CPU_PROGRAM_MAP(z80dev_mem)
+	MCFG_CPU_IO_MAP(z80dev_io)
 
-    /* video hardware */
-    MCFG_DEFAULT_LAYOUT(layout_z80dev)
+	/* video hardware */
+	MCFG_DEFAULT_LAYOUT(layout_z80dev)
 MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( z80dev )
-    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "z80dev.bin", 0x0000, 0x0800, CRC(dd5b9cd9) SHA1(97c176fcb63674f0592851b7858cb706886b5857))
 ROM_END
 
