@@ -143,7 +143,7 @@
 Space Destroyers has a 2K ROM, a 4K ROM, and 1K RAM.  Here's the memory address:
 
 Memory map of the chips inside Space Destroyers:
------------- --------- --------- --------- ---------
+
 
 $8000 to $87FF 2k ROM (32768 to 34815)
 
