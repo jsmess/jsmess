@@ -21,8 +21,8 @@
 				<!ATTLIST dataarea databits (8|16|32|64) "8">
 				<!ATTLIST dataarea endian (big|little) "little">
 				<!ELEMENT rom EMPTY>
-					<!ATTLIST rom name CDATA #IMPLIED>
-					<!ATTLIST rom size CDATA #IMPLIED>
+					<!ATTLIST rom name CDATA #REQUIRED>
+					<!ATTLIST rom size CDATA #REQUIRED>
 					<!ATTLIST rom crc CDATA #IMPLIED>
 					<!ATTLIST rom md5 CDATA #IMPLIED>
 					<!ATTLIST rom sha1 CDATA #IMPLIED>
@@ -33,7 +33,7 @@
 			<!ELEMENT diskarea (disk*)>
 				<!ATTLIST diskarea name CDATA #REQUIRED>
 				<!ELEMENT disk EMPTY>
-					<!ATTLIST disk name CDATA #IMPLIED>
+					<!ATTLIST disk name CDATA #REQUIRED>
 					<!ATTLIST disk md5 CDATA #IMPLIED>
 					<!ATTLIST disk sha1 CDATA #IMPLIED>
 					<!ATTLIST disk status (baddump|nodump|good) "good">
