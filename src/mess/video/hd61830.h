@@ -109,8 +109,6 @@ protected:
     virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
-	static TIMER_CALLBACK( busy_tick );
-
 	inline UINT8 readbyte(offs_t address);
 	inline void writebyte(offs_t address, UINT8 data);
 

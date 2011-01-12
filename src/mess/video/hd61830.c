@@ -207,6 +207,8 @@ void hd61830_device::device_start()
 	// resolve callbacks
     devcb_resolve_read8(&m_in_rd_func, &m_config.m_in_rd_func, this);
 
+	m_screen = machine->device<screen_device>(m_config.screen_tag);
+
 	// register for state saving
 	state_save_register_device_item(this, 0, m_bf);
 	state_save_register_device_item(this, 0, m_ir);
@@ -539,7 +541,8 @@ void hd61830_device::draw_char(bitmap_t *bitmap, const rectangle *cliprect, UINT
 					pixel = m_cursor ? 1 : 0;
 			}
 
-			*BITMAP_ADDR16(bitmap, sy, sx) = pixel;
+			if (sy < m_screen->height() && sx < m_screen->width())
+				*BITMAP_ADDR16(bitmap, sy, sx) = pixel;
 		}
 	}
 }
