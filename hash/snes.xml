@@ -102,7 +102,7 @@ The software list will be divided in four categories:
 		<part name="cart" interface="snes_cart">
 			<feature name="pcb" value="SHVC-BJ3M-20" />
 			<feature name="u1" value="U1 P0" />
-			<feature name="u1" value="U2 P1" />
+			<feature name="u2" value="U2 P1" />
 			<feature name="u3" value="U3 64K SRAM" />
 			<feature name="u4" value="U4 MAD-1" />
 			<feature name="u5" value="U5 CIC" />
@@ -112,7 +112,7 @@ The software list will be divided in four categories:
 			<feature name="cart_back_label" value="G741812 SHVC-JPN-1" />
 			<dataarea name="rom" size="3145728">
 				<rom name="shvc-axbj-0.p0.u1" size="2097152" crc="196e9a8d" sha1="e25fcd539b2a2996a29eb8bed3bcb37e79cdf067" offset="000000" />
-				<rom name="shvc-axbj-0.p3.u2" size="1048576" crc="50fc1757" sha1="16acdc879d9e37e7e49239e8cf11c7aead9e9094" offset="200000" />
+				<rom name="shvc-axbj-0.p3.u2" size="1048576" crc="50fc1757" sha1="16acdc879d9e37e7e49239e8cf11c7aead9e9094" offset="0x200000" />
 			</dataarea>
 		</part>
 	</software>
@@ -146,7 +146,7 @@ The software list will be divided in four categories:
 		<part name="cart" interface="snes_cart">
 			<feature name="pcb" value="SHVC-BJ3M-20" />
 			<feature name="u1" value="U1 P0" />
-			<feature name="u1" value="U2 P1" />
+			<feature name="u2" value="U2 P1" />
 			<feature name="u3" value="U3 64K SRAM" />
 			<feature name="u4" value="U4 MAD-1" />
 			<feature name="u5" value="U5 CIC" />
@@ -156,7 +156,7 @@ The software list will be divided in four categories:
 			<feature name="cart_back_label" value="920214" />
 			<dataarea name="rom" size="4194304">
 				<rom name="shvc-actj-0.p0.u1" size="2097152" crc="ea81762f" sha1="ed96918a5b7b43bd6c817ced3a567768cc26fca1" offset="000000" />
-				<rom name="shvc-actj-0.p3.u2" size="2097152" crc="a7e0cf31" sha1="62564bb1ba9a4789c08cdb2738f3c37df94e4dc3" offset="200000" />
+				<rom name="shvc-actj-0.p3.u2" size="2097152" crc="a7e0cf31" sha1="62564bb1ba9a4789c08cdb2738f3c37df94e4dc3" offset="0x200000" />
 			</dataarea>
 		</part>
 	</software>
@@ -336,7 +336,7 @@ The software list will be divided in four categories:
 			<feature name="cart_back_label" value="920214" />
 			<dataarea name="rom" size="3145728">
 				<rom name="shvc-agcj-0.p0.u1" size="2097152" crc="6c48e2fa" sha1="eac970657f29126fc93c550080427a88427e34c5" offset="000000" />
-				<rom name="shvc-agcj-0.p3.u2" size="1048576" crc="e53074a7" sha1="2436b6f393dda9177f45ad1eb5b86652e9ddc2da" offset="200000" />
+				<rom name="shvc-agcj-0.p3.u2" size="1048576" crc="e53074a7" sha1="2436b6f393dda9177f45ad1eb5b86652e9ddc2da" offset="0x200000" />
 			</dataarea>
 		</part>
 	</software>
@@ -461,7 +461,7 @@ The software list will be divided in four categories:
 			<feature name="cart_back_label" value="920214" />
 			<dataarea name="rom" size="2097152">
 				<rom name="shvc-2l-0.p0.u1" size="1048576" crc="98453e17" sha1="01d54630d7caa1710cc4af7b68db262fe92b8305" offset="000000" />
-				<rom name="shvc-2l-0.p1.u2" size="1048576" crc="aad14245" sha1="9dde7ac6352ba1b57fc7241ac883aecb661b85ab" offset="100000" />
+				<rom name="shvc-2l-0.p1.u2" size="1048576" crc="aad14245" sha1="9dde7ac6352ba1b57fc7241ac883aecb661b85ab" offset="0x100000" />
 			</dataarea>
 		</part>
 	</software>
@@ -504,6 +504,117 @@ The software list will be divided in four categories:
 			<feature name="cart_back_label" value="G741812 SHVC-JPN-1" />
 			<dataarea name="rom" size="4194304">
 				<rom name="shvc-al3j-0.u1" size="4194304" crc="5399bddb" sha1="71b404b4f775c86b924f26203dc00d7deb72ce58" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="seikndn2" cloneof="mana">
+		<!-- Serial: SHVC-K2 - Release Date: 1993-08-06 - Alt. Title: 聖剣伝説2 -->
+		<description>Seiken Densetsu 2 (Jpn)</description>
+		<year>1993</year>
+		<publisher>Square</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1J3B-01" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 64K SRAM" />
+			<feature name="u3" value="U3 74LS139" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="battery" value="CR2032" />
+			<feature name="cart_revision" value="none" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="920214" />
+			<dataarea name="rom" size="2097152">
+				<rom name="shvc-k2-0.u1" size="2097152" crc="b8049e3c" sha1="b78a9a844d165345631cea1b5246c8fcbcdbc162" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="seikndn2a" cloneof="mana">
+		<!-- Serial: SHVC-K2 - Release Date: 1993-08-06 - Alt. Title: 聖剣伝説2 -->
+		<description>Seiken Densetsu 2 (Jpn, Alt)</description>
+		<year>1993</year>
+		<publisher>Square</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-2J3M-01" />
+			<feature name="u1" value="U1 P0" />
+			<feature name="u2" value="U2 P1" />
+			<feature name="u3" value="U3 64K SRAM" />
+			<feature name="u4" value="U4 MAD-1/R" />
+			<feature name="u5" value="U5 CIC" />
+			<feature name="battery" value="CR2032" />
+			<feature name="cart_revision" value="none" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="920214" />
+			<dataarea name="rom" size="2097152">
+				<rom name="shvc-k2-0.p0.u1" size="1048576" crc="259cfd2a" sha1="5bee3bf7159aca59fd4d2b77e97b096fe72f8044" offset="000000" />
+				<rom name="shvc-k2-0.p1.u2" size="1048576" crc="4e99646e" sha1="5861118bc3d4041313f94dfc6d1aaaae900dd796" offset="0x100000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="seikndn3">
+		<!-- Serial: SHVC-A3DJ-JPN - Release Date: 1995-09-30 - Alt. Title: 聖剣伝説3 -->
+		<description>Seiken Densetsu 3 (Jpn)</description>
+		<year>1995</year>
+		<publisher>Square</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1J3M-20" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 64K SRAM" />
+			<feature name="u3" value="U3 MAD-1" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="battery" value="CR2032" />
+			<feature name="cart_revision" value="none" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="920214" />
+			<dataarea name="rom" size="4194304">
+				<rom name="shvc-a3dj-0.u1" size="4194304" crc="863ed0b8" sha1="209c55fd2a8d7963905e3048b7d40094d6bea965" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="seikndn3a" cloneof="seikndn3">
+		<!-- Serial: SHVC-A3DJ-JPN - Release Date: 1995-09-30 - Alt. Title: 聖剣伝説3 -->
+		<description>Seiken Densetsu 3 (Jpn, Alt)</description>
+		<year>1995</year>
+		<publisher>Square</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-BJ3M-20" />
+			<feature name="u1" value="U1 P0" />
+			<feature name="u2" value="U2 P1" />
+			<feature name="u3" value="U3 64K SRAM" />
+			<feature name="u4" value="U4 MAD-1" />
+			<feature name="u5" value="U5 CIC" />
+			<feature name="battery" value="CR2032" />
+			<feature name="cart_revision" value="none" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="920214" />
+			<dataarea name="rom" size="4194304">
+				<rom name="shvc-a3dj-0.p0.u1" size="2097152" crc="58216f82" sha1="6c379dc16246122ee48ce7acb90bc5a313abaa80" offset="000000" />
+				<rom name="shvc-a3dj-0.p3.u2" size="2097152" crc="77da06fa" sha1="daf71888ec9181632bff7f7ea575dc26a3daf957" offset="0x200000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sjinsei2a" cloneof="sjinsei2">
+		<!-- Serial: SHVC-AL2J-JPN - Release Date: 1995-09-08 - Alt. Title: スーパー人生ゲーム２ -->
+		<description>Super Jinsei Game 2 (Jpn)</description>
+		<year>1995</year>
+		<publisher>Takara</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-2A1M-10" />
+			<feature name="u1" value="U1 P0" />
+			<feature name="u2" value="U2 P1" />
+			<feature name="u3" value="U3 16K SRAM" />
+			<feature name="u4" value="U4 MAD-1" />
+			<feature name="u5" value="U5 CIC" />
+			<feature name="battery" value="CR2032" />
+			<feature name="cart_revision" value="none" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="920214" />
+			<dataarea name="rom" size="1310720">
+				<rom name="shvc-al2j-0.p0.u1" size="1048576" crc="d060dc70" sha1="cc9b02314ab8164d33cb858ca8dbe9718fd0624a" offset="000000" />
+				<rom name="shvc-al2j-0.p1.u2" size="262144" crc="018cbd87" sha1="e29f59ac56b49c16e9dc6f18cd957b552041187f" offset="0x100000" />
 			</dataarea>
 		</part>
 	</software>
@@ -553,29 +664,6 @@ The software list will be divided in four categories:
 		</part>
 	</software>
 
-	<software name="sjinsei2a" cloneof="sjinsei2">
-		<!-- Serial: SHVC-AL2J-JPN - Release Date: 1995-09-08 -->
-		<description>Super Jinsei Game 2 (Jpn)</description>
-		<year>1995</year>
-		<publisher>Takara</publisher>
-		<part name="cart" interface="snes_cart">
-			<feature name="pcb" value="SHVC-2A1M-10" />
-			<feature name="u1" value="U1 P0" />
-			<feature name="u2" value="U2 P1" />
-			<feature name="u3" value="U3 16K SRAM" />
-			<feature name="u4" value="U4 MAD-1" />
-			<feature name="u5" value="U5 CIC" />
-			<feature name="battery" value="CR2032" />
-			<feature name="cart_revision" value="none" />
-			<feature name="cart_model" value="SHVC-006" />
-			<feature name="cart_back_label" value="920214" />
-			<dataarea name="rom" size="1310720">
-				<rom name="shvc-al2j-0.p0.u1" size="1048576" crc="d060dc70" sha1="cc9b02314ab8164d33cb858ca8dbe9718fd0624a" offset="000000" />
-				<rom name="shvc-al2j-0.p1.u2" size="262144" crc="018cbd87" sha1="e29f59ac56b49c16e9dc6f18cd957b552041187f" offset="100000" />
-			</dataarea>
-		</part>
-	</software>
-
 <!-- End of perfect dumps -->
 
 
@@ -600,7 +688,7 @@ The software list will be divided in four categories:
 	</software>
 
 	<software name="sjinsei2">
-		<!-- Serial: SHVC-AL2J-JPN - Release Date: 1995-09-08 -->
+		<!-- Serial: SHVC-AL2J-JPN - Release Date: 1995-09-08 - Alt. Title: スーパー人生ゲーム２ -->
 		<description>Super Jinsei Game 2 (Jpn, Rev. B)</description>
 		<year>1995</year>
 		<publisher>Takara</publisher>
@@ -654,6 +742,17 @@ The software list will be divided in four categories:
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="3145728">
 				<rom name="front mission (japan) (rev 1).sfc" size="3145728" crc="50278b21" sha1="a1c2ba17e44b8e69b6118f1e12dcefc32eb93387" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="seikndn3s" cloneof="seikndn3">
+		<description>Seiken Densetsu 3 (Jpn, Sample)</description>
+		<year>1995</year>
+		<publisher>Square</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="4194304">
+				<rom name="seiken densetsu 3 (japan) (sample).sfc" size="4194304" crc="4801e76a" sha1="7078dbcf0b2941af59c8187eeb3b8dd392407b46" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -27431,41 +27530,6 @@ The software list will be divided in four categories:
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="2621440">
 				<rom name="seijuu maden beasts &amp; blades (japan).sfc" size="2621440" crc="d0aea27c" sha1="e0067694f59e5190bcf02c92ddf016ec3c55fb7a" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="seikndn2" cloneof="mana">
-		<!-- Serial: SHVC-K2 - Release Date: 1993-08-06 - Alt. Title: 聖剣伝説2 -->
-		<description>Seiken Densetsu 2 (Jpn)</description>
-		<year>1993</year>
-		<publisher>Square</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="2097152">
-				<rom name="seiken densetsu 2 (japan).sfc" size="2097152" crc="b8049e3c" sha1="b78a9a844d165345631cea1b5246c8fcbcdbc162" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="seikndn3s" cloneof="seikndn3">
-		<description>Seiken Densetsu 3 (Jpn, Sample)</description>
-		<year>1995</year>
-		<publisher>Square</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="4194304">
-				<rom name="seiken densetsu 3 (japan) (sample).sfc" size="4194304" crc="4801e76a" sha1="7078dbcf0b2941af59c8187eeb3b8dd392407b46" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="seikndn3">
-		<!-- Serial:  - Release Date: 1995-09-30 -->
-		<description>Seiken Densetsu 3 (Jpn)</description>
-		<year>1995</year>
-		<publisher>Square</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="4194304">
-				<rom name="seiken densetsu 3 (japan).sfc" size="4194304" crc="863ed0b8" sha1="209c55fd2a8d7963905e3048b7d40094d6bea965" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
