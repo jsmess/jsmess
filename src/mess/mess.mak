@@ -1854,6 +1854,7 @@ $(MESS_DRIVERS)/junior.o:	$(MESS_LAYOUT)/junior.lh
 $(MESS_DRIVERS)/lc80.o:		$(MESS_LAYOUT)/lc80.lh
 $(MESS_DRIVERS)/lx800.o:	$(MESS_LAYOUT)/lx800.lh
 $(MESS_DRIVERS)/mephisto.o:	$(MESS_LAYOUT)/mephisto.lh
+$(MESS_DRIVERS)/mikrolab.o:	$(MESS_LAYOUT)/mikrolab.lh
 $(MESS_DRIVERS)/mk1.o:		$(MESS_LAYOUT)/mk1.lh
 $(MESS_DRIVERS)/mk14.o:		$(MESS_LAYOUT)/mk14.lh
 $(MESS_DRIVERS)/mk2.o:		$(MESS_LAYOUT)/mk2.lh
