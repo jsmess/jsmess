@@ -1,4 +1,4 @@
-﻿0.141.1
+0.141.1
 
 New System Drivers Supported:
 -----------------------------
@@ -33,6 +33,18 @@ Imgtool Changes:
 
 Source Changes:
 ----------------
+- Added support for a new template to -snapname to use software names for 
+  snapshots. It is now possible to use %d_XXXX to name snaps after the name
+  of the file mounted in the device XXXX, being XXXX the brief name of any
+  device. E.g. you can use "-snapname %d_cart" to use the name of the game 
+  mounted in the cartslot, or "-snapname %d_flop2" to use the name of the game 
+  mounted in the second floppy drive, etc. If you are loading software through 
+  software lists, its shortname will be used; if you are using the fullpath of 
+  the software, its filename is used. Any combination of the new template with 
+  the old "/", "%g" and "%i" templates is supported as well. Notice that if you 
+  specify an invalid device, or if you have no software mounted in the chosen 
+  device, MESS will revert to the default template "%g/%i". [Fabio Priuli]
+
 - softlists: Added new lists, new dumps and info [anondumper, Barry Rodewald, 
   Curt Coder, MESSfan, Fabio Priuli]
 
