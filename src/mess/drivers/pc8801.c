@@ -7,6 +7,16 @@
     TODO:
 	- used to do more, currently under rewriting stage.
 
+	Bankswitch Notes:
+	- 0x31 - graphic banking
+	- 0x32 - misc banking
+	- 0x5c / 0x5f - VRAM banking
+	- 0x70 - window offset (banking)
+	- 0x71 - extra ROM banking
+	- 0x78 - window offset (banking) + 0x100
+	- 0xe2 / 0xe3 - extra RAM banking
+	- 0xf0 / 0xf1 = kanji banking
+
 ======================================================================================================================================
 
     PC-88xx Models (and similar machines like PC-80xx and PC-98DO)
@@ -86,6 +96,9 @@
 #include "sound/2203intf.h"
 #include "sound/beep.h"
 
+static UINT32 bank[4];
+static UINT8 bank_wp[4];
+
 static VIDEO_START( pc8801 )
 {
 
@@ -93,11 +106,98 @@ static VIDEO_START( pc8801 )
 
 static VIDEO_UPDATE( pc8801 )
 {
+	int x,y;
+	int xi,yi;
+	UINT8 *vram = screen->machine->region("maincpu")->base();
+
+	for(y=0;y<25;y++)
+	{
+		for(x=0;x<80;x++)
+		{
+			for(yi=0;yi<8;yi++)
+			{
+				for(xi=0;xi<8;xi++)
+				{
+					int res_x,res_y;
+					int tile;
+					UINT8 color;
+					UINT8 *gfx_data = screen->machine->region("gfx1")->base();
+
+					tile = vram[x+(y*80)+0xf3c8]; //TODO: vram base, connected to DMAC address 2
+
+					res_x = x*8+xi;
+					res_y = y*8+yi;
+
+					color = ((gfx_data[tile*8+yi] >> (7-xi)) & 1) ? 7 : 0;
+
+					if((res_x)<=screen->machine->primary_screen->visible_area().max_x && (res_y)<=screen->machine->primary_screen->visible_area().max_y)
+						*BITMAP_ADDR16(bitmap, res_y, res_x) = screen->machine->pens[color];
+				}
+			}
+		}
+	}
+
 	return 0;
 }
 
+static READ8_HANDLER( pc8801_mem_0_r )
+{
+	UINT8 *ram = space->machine->region("maincpu")->base();
+
+	return ram[offset + bank[0]];
+}
+
+static WRITE8_HANDLER( pc8801_mem_0_w )
+{
+	UINT8 *ram = space->machine->region("maincpu")->base();
+
+	if(bank_wp[0])
+		return;
+
+	ram[offset + bank[0]] = data;
+}
+
+static READ8_HANDLER( pc8801_mem_1_r )
+{
+	UINT8 *ram = space->machine->region("maincpu")->base();
+
+	return ram[offset + bank[1]];
+}
+
+static WRITE8_HANDLER( pc8801_mem_1_w )
+{
+	UINT8 *ram = space->machine->region("maincpu")->base();
+
+	if(bank_wp[1])
+		return;
+
+	ram[offset + bank[1]] = data;
+}
+
+static READ8_HANDLER( pc8801_ctrl_r )
+{
+	static UINT8 vrtc;
+
+	/*
+	--x- ---- vrtc
+	---x ---- calendar CDO
+	---- x--- (fdc related)
+	---- -x-- (RS-232C related)
+	---- --x- monitor refresh rate DIP-SW
+	---- ---x (pbsy?)
+	*/
+
+	vrtc = (space->machine->primary_screen->vpos() < 200) ? 1 : 0; // vblank
+
+	return (vrtc << 5) | 0xc0;
+}
+
 static ADDRESS_MAP_START( pc8801_mem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x0000, 0x5fff) AM_READWRITE(pc8801_mem_0_r,pc8801_mem_0_w)
+	AM_RANGE(0x6000, 0x7fff) AM_READWRITE(pc8801_mem_1_r,pc8801_mem_1_w)
+	AM_RANGE(0x8000, 0x83ff) AM_RAM
+	AM_RANGE(0x8400, 0xbfff) AM_RAM //no bankswitch?
+	AM_RANGE(0xc000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pc8801_io, ADDRESS_SPACE_IO, 8 )
@@ -121,11 +221,11 @@ static ADDRESS_MAP_START( pc8801_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x0f, 0x0f) AM_READ_PORT("KEY15")
 //	AM_RANGE(0x10, 0x10) AM_WRITE(pc88_rtc_w)
 //  AM_RANGE(0x20, 0x21) AM_NOP                                     /* RS-232C and cassette */
-//	AM_RANGE(0x30, 0x30) AM_READ_PORT("DSW1") AM_WRITE(pc88sr_outport_30)
-//	AM_RANGE(0x31, 0x31) AM_READWRITE(pc88sr_inport_31, pc88sr_outport_31)	/* DIP-SW2 */
+	AM_RANGE(0x30, 0x30) AM_READ_PORT("DSW1") //AM_WRITE(pc88sr_outport_30)
+	AM_RANGE(0x31, 0x31) AM_READ_PORT("DSW2") //AM_WRITE(pc88sr_outport_31)
 //	AM_RANGE(0x32, 0x32) AM_READWRITE(pc88sr_inport_32, pc88sr_outport_32)
 //	AM_RANGE(0x34, 0x35) AM_WRITE(pc88sr_alu)
-//	AM_RANGE(0x40, 0x40) AM_READWRITE(pc88sr_inport_40, pc88sr_outport_40)
+	AM_RANGE(0x40, 0x40) AM_READ(pc8801_ctrl_r) //, pc88sr_outport_40)
 	AM_RANGE(0x44, 0x45) AM_DEVREADWRITE("ym2203", ym2203_r,ym2203_w)
 //  AM_RANGE(0x46, 0x47) AM_NOP                                     /* OPNA extra port */
 //	AM_RANGE(0x50, 0x51) AM_READWRITE(pc88_crtc_r, pc88_crtc_w)
@@ -504,7 +604,26 @@ static const cassette_config pc88_cassette_config =
 	NULL
 };
 
-/* Machine Drivers */
+static MACHINE_START( pc8801 )
+{
+
+}
+
+static MACHINE_RESET( pc8801 )
+{
+	bank[0] = 0x10000;
+	bank[1] = 0x16000;
+	bank_wp[0] = 1;
+	bank_wp[1] = 1;
+}
+
+static PALETTE_INIT( pc8801 )
+{
+	int i;
+
+	for(i=0;i<8;i++)
+		palette_set_color_rgb(machine, i, pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
+}
 
 static MACHINE_CONFIG_START( pc8801, driver_device )
 	/* main CPU */
@@ -522,8 +641,8 @@ static MACHINE_CONFIG_START( pc8801, driver_device )
 
 	//MCFG_QUANTUM_TIME(HZ(300000))
 
-	//MCFG_MACHINE_START( pc88srl )
-	//MCFG_MACHINE_RESET( pc88srl )
+	MCFG_MACHINE_START( pc8801 )
+	MCFG_MACHINE_RESET( pc8801 )
 
 	//MCFG_I8255A_ADD( "d8255_master", pc8801_8255_config_0 )
 	//MCFG_I8255A_ADD( "d8255_slave"), pc8801_8255_config_1 )
@@ -541,17 +660,17 @@ static MACHINE_CONFIG_START( pc8801, driver_device )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(640, 440)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 400-1)
+	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
 	MCFG_GFXDECODE( pc8801 )
-	MCFG_PALETTE_LENGTH(32+16)
-	//MCFG_PALETTE_INIT( pc8801 )
+	MCFG_PALETTE_LENGTH(0x10)
+	MCFG_PALETTE_INIT( pc8801 )
 
 	MCFG_VIDEO_START(pc8801)
 	MCFG_VIDEO_UPDATE(pc8801)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ym2203", YM2203, 3993600)
+	MCFG_SOUND_ADD("ym2203", YM2203, 4000000) //unknown clock
 	MCFG_SOUND_CONFIG(pc88_ym2203_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
@@ -562,10 +681,10 @@ MACHINE_CONFIG_END
 /* ROMs */
 
 ROM_START( pc8801 )
-	ROM_REGION( 0x18000, "maincpu", 0 )
-	ROM_LOAD( "n80.rom",   0x00000, 0x8000, CRC(5cb8b584) SHA1(063609dd518c124a4fc9ba35d1bae35771666a34) )
-	ROM_LOAD( "n88.rom",   0x08000, 0x8000, CRC(ffd68be0) SHA1(3518193b8207bdebf22c1380c2db8c554baff329) )
-	ROM_LOAD( "n88_0.rom", 0x10000, 0x2000, CRC(61984bab) SHA1(d1ae642aed4f0584eeb81ff50180db694e5101d4) )
+	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "n88.rom",   0x10000, 0x8000, CRC(ffd68be0) SHA1(3518193b8207bdebf22c1380c2db8c554baff329) )
+	ROM_LOAD( "n80.rom",   0x18000, 0x8000, CRC(5cb8b584) SHA1(063609dd518c124a4fc9ba35d1bae35771666a34) )
+	ROM_LOAD( "n88_0.rom", 0x1a000, 0x2000, CRC(61984bab) SHA1(d1ae642aed4f0584eeb81ff50180db694e5101d4) )
 
 	ROM_REGION( 0x40000, "gfx1", 0)
 	ROM_LOAD( "font.rom", 0x0000, 0x0800, CRC(56653188) SHA1(84b90f69671d4b72e8f219e1fe7cd667e976cf7f) )
@@ -574,10 +693,10 @@ ROM_END
 /* The dump only included "maincpu". Other roms arbitrariely taken from PC-8801 & PC-8801 MkIISR (there should be
 at least 1 Kanji ROM). */
 ROM_START( pc8801mk2 )
-	ROM_REGION( 0x18000, "maincpu", 0 )
-	ROM_LOAD( "m2_n80.rom",   0x00000, 0x8000, CRC(91d84b1a) SHA1(d8a1abb0df75936b3fc9d226ccdb664a9070ffb1) )
-	ROM_LOAD( "m2_n88.rom",   0x08000, 0x8000, CRC(f35169eb) SHA1(ef1f067f819781d9fb2713836d195866f0f81501) )
-	ROM_LOAD( "m2_n88_0.rom", 0x10000, 0x2000, CRC(5eb7a8d0) SHA1(95a70af83b0637a5a0f05e31fb0452bb2cb68055) )
+	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "m2_n88.rom",   0x10000, 0x8000, CRC(f35169eb) SHA1(ef1f067f819781d9fb2713836d195866f0f81501) )
+	ROM_LOAD( "m2_n80.rom",   0x18000, 0x8000, CRC(91d84b1a) SHA1(d8a1abb0df75936b3fc9d226ccdb664a9070ffb1) )
+	ROM_LOAD( "m2_n88_0.rom", 0x1a000, 0x2000, CRC(5eb7a8d0) SHA1(95a70af83b0637a5a0f05e31fb0452bb2cb68055) )
 
 	/* should this be here? */
 	ROM_REGION( 0x40000, "gfx1", 0)
@@ -585,13 +704,13 @@ ROM_START( pc8801mk2 )
 ROM_END
 
 ROM_START( pc8001mk2sr )
-	ROM_REGION( 0x18000, "maincpu", 0 )
-	ROM_LOAD( "mk2sr_n80.rom",   0x00000, 0x8000, CRC(27e1857d) SHA1(5b922ed9de07d2a729bdf1da7b57c50ddf08809a) )
-	ROM_LOAD( "mk2sr_n88.rom",   0x08000, 0x8000, CRC(a0fc0473) SHA1(3b31fc68fa7f47b21c1a1cb027b86b9e87afbfff) )
-	ROM_LOAD( "mk2sr_n88_0.rom", 0x10000, 0x2000, CRC(710a63ec) SHA1(d239c26ad7ac5efac6e947b0e9549b1534aa970d) )
-	ROM_LOAD( "n88_1.rom", 0x12000, 0x2000, CRC(c0bd2aa6) SHA1(8528eef7946edf6501a6ccb1f416b60c64efac7c) )
-	ROM_LOAD( "n88_2.rom", 0x14000, 0x2000, CRC(af2b6efa) SHA1(b7c8bcea219b77d9cc3ee0efafe343cc307425d1) )
-	ROM_LOAD( "n88_3.rom", 0x16000, 0x2000, CRC(7713c519) SHA1(efce0b51cab9f0da6cf68507757f1245a2867a72) )
+	ROM_REGION( 0x30000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "mk2sr_n80.rom",   0x18000, 0x8000, CRC(27e1857d) SHA1(5b922ed9de07d2a729bdf1da7b57c50ddf08809a) )
+	ROM_LOAD( "mk2sr_n88.rom",   0x10000, 0x8000, CRC(a0fc0473) SHA1(3b31fc68fa7f47b21c1a1cb027b86b9e87afbfff) )
+	ROM_LOAD( "mk2sr_n88_0.rom", 0x20000, 0x2000, CRC(710a63ec) SHA1(d239c26ad7ac5efac6e947b0e9549b1534aa970d) )
+	ROM_LOAD( "n88_1.rom", 0x22000, 0x2000, CRC(c0bd2aa6) SHA1(8528eef7946edf6501a6ccb1f416b60c64efac7c) )
+	ROM_LOAD( "n88_2.rom", 0x24000, 0x2000, CRC(af2b6efa) SHA1(b7c8bcea219b77d9cc3ee0efafe343cc307425d1) )
+	ROM_LOAD( "n88_3.rom", 0x26000, 0x2000, CRC(7713c519) SHA1(efce0b51cab9f0da6cf68507757f1245a2867a72) )
 
 	ROM_REGION( 0x10000, "fdccpu", 0)
 	ROM_LOAD( "disk.rom", 0x0000, 0x0800, CRC(2158d307) SHA1(bb7103a0818850a039c67ff666a31ce49a8d516f) )
@@ -606,13 +725,13 @@ ROM_START( pc8001mk2sr )
 ROM_END
 
 ROM_START( pc8801mk2fr )
-	ROM_REGION( 0x18000, "maincpu", 0 )
-	ROM_LOAD( "m2fr_n80.rom",   0x00000, 0x8000, CRC(27e1857d) SHA1(5b922ed9de07d2a729bdf1da7b57c50ddf08809a) )
-	ROM_LOAD( "m2fr_n88.rom",   0x08000, 0x8000, CRC(b9daf1aa) SHA1(696a480232bcf8c827c7aeea8329db5c44420d2a) )
-	ROM_LOAD( "m2fr_n88_0.rom", 0x10000, 0x2000, CRC(710a63ec) SHA1(d239c26ad7ac5efac6e947b0e9549b1534aa970d) )
-	ROM_LOAD( "m2fr_n88_1.rom", 0x12000, 0x2000, CRC(e3e78a37) SHA1(85ecd287fe72b56e54c8b01ea7492ca4a69a7470) )
-	ROM_LOAD( "m2fr_n88_2.rom", 0x14000, 0x2000, CRC(98c3a7b2) SHA1(fc4980762d3caa56964d0ae583424756f511d186) )
-	ROM_LOAD( "m2fr_n88_3.rom", 0x16000, 0x2000, CRC(0ca08abd) SHA1(a5a42d0b7caa84c3bc6e337c9f37874d82f9c14b) )
+	ROM_REGION( 0x30000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "m2fr_n80.rom",   0x18000, 0x8000, CRC(27e1857d) SHA1(5b922ed9de07d2a729bdf1da7b57c50ddf08809a) )
+	ROM_LOAD( "m2fr_n88.rom",   0x10000, 0x8000, CRC(b9daf1aa) SHA1(696a480232bcf8c827c7aeea8329db5c44420d2a) )
+	ROM_LOAD( "m2fr_n88_0.rom", 0x20000, 0x2000, CRC(710a63ec) SHA1(d239c26ad7ac5efac6e947b0e9549b1534aa970d) )
+	ROM_LOAD( "m2fr_n88_1.rom", 0x22000, 0x2000, CRC(e3e78a37) SHA1(85ecd287fe72b56e54c8b01ea7492ca4a69a7470) )
+	ROM_LOAD( "m2fr_n88_2.rom", 0x24000, 0x2000, CRC(98c3a7b2) SHA1(fc4980762d3caa56964d0ae583424756f511d186) )
+	ROM_LOAD( "m2fr_n88_3.rom", 0x26000, 0x2000, CRC(0ca08abd) SHA1(a5a42d0b7caa84c3bc6e337c9f37874d82f9c14b) )
 
 	ROM_REGION( 0x10000, "fdccpu", 0)
 	ROM_LOAD( "m2fr_disk.rom", 0x0000, 0x0800, CRC(2163b304) SHA1(80da2dee49d4307f00895a129a5cfeff00cf5321) )
@@ -626,13 +745,13 @@ ROM_START( pc8801mk2fr )
 ROM_END
 
 ROM_START( pc8801mk2mr )
-	ROM_REGION( 0x18000, "maincpu", 0 )
-	ROM_LOAD( "m2mr_n80.rom",   0x00000, 0x8000, CRC(f074b515) SHA1(ebe9cf4cf57f1602c887f609a728267f8d953dce) )
-	ROM_LOAD( "m2mr_n88.rom",   0x08000, 0x8000, CRC(69caa38e) SHA1(3c64090237152ee77c76e04d6f36bad7297bea93) )
-	ROM_LOAD( "m2mr_n88_0.rom", 0x10000, 0x2000, CRC(710a63ec) SHA1(d239c26ad7ac5efac6e947b0e9549b1534aa970d) )
-	ROM_LOAD( "m2mr_n88_1.rom", 0x12000, 0x2000, CRC(e3e78a37) SHA1(85ecd287fe72b56e54c8b01ea7492ca4a69a7470) )
-	ROM_LOAD( "m2mr_n88_2.rom", 0x14000, 0x2000, CRC(11176e0b) SHA1(f13f14f3d62df61498a23f7eb624e1a646caea45) )
-	ROM_LOAD( "m2mr_n88_3.rom", 0x16000, 0x2000, CRC(0ca08abd) SHA1(a5a42d0b7caa84c3bc6e337c9f37874d82f9c14b) )
+	ROM_REGION( 0x30000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "m2mr_n80.rom",   0x18000, 0x8000, CRC(f074b515) SHA1(ebe9cf4cf57f1602c887f609a728267f8d953dce) )
+	ROM_LOAD( "m2mr_n88.rom",   0x10000, 0x8000, CRC(69caa38e) SHA1(3c64090237152ee77c76e04d6f36bad7297bea93) )
+	ROM_LOAD( "m2mr_n88_0.rom", 0x20000, 0x2000, CRC(710a63ec) SHA1(d239c26ad7ac5efac6e947b0e9549b1534aa970d) )
+	ROM_LOAD( "m2mr_n88_1.rom", 0x22000, 0x2000, CRC(e3e78a37) SHA1(85ecd287fe72b56e54c8b01ea7492ca4a69a7470) )
+	ROM_LOAD( "m2mr_n88_2.rom", 0x24000, 0x2000, CRC(11176e0b) SHA1(f13f14f3d62df61498a23f7eb624e1a646caea45) )
+	ROM_LOAD( "m2mr_n88_3.rom", 0x26000, 0x2000, CRC(0ca08abd) SHA1(a5a42d0b7caa84c3bc6e337c9f37874d82f9c14b) )
 
 	ROM_REGION( 0x10000, "fdccpu", 0)
 	ROM_LOAD( "m2mr_disk.rom", 0x0000, 0x2000, CRC(2447516b) SHA1(1492116f15c426f9796dc2bb6fcccf2656c0ca75) )
@@ -649,13 +768,13 @@ ROM_START( pc8801mk2mr )
 ROM_END
 
 ROM_START( pc8801mh )
-	ROM_REGION( 0x18000, "maincpu", 0 )
-	ROM_LOAD( "mh_n80.rom",   0x00000, 0x8000, CRC(8a2a1e17) SHA1(06dae1db384aa29d81c5b6ed587877e7128fcb35) )
-	ROM_LOAD( "mh_n88.rom",   0x08000, 0x8000, CRC(64c5d162) SHA1(3e0aac76fb5d7edc99df26fa9f365fd991742a5d) )
-	ROM_LOAD( "mh_n88_0.rom", 0x10000, 0x2000, CRC(deb384fb) SHA1(5f38cafa8aab16338038c82267800446fd082e79) )
-	ROM_LOAD( "mh_n88_1.rom", 0x12000, 0x2000, CRC(7ad5d943) SHA1(4ae4d37409ff99411a623da9f6a44192170a854e) )
-	ROM_LOAD( "mh_n88_2.rom", 0x14000, 0x2000, CRC(6aa6b6d8) SHA1(2a077ab444a4fd1470cafb06fd3a0f45420c39cc) )
-	ROM_LOAD( "mh_n88_3.rom", 0x16000, 0x2000, CRC(692cbcd8) SHA1(af452aed79b072c4d17985830b7c5dca64d4b412) )
+	ROM_REGION( 0x30000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "mh_n80.rom",   0x18000, 0x8000, CRC(8a2a1e17) SHA1(06dae1db384aa29d81c5b6ed587877e7128fcb35) )
+	ROM_LOAD( "mh_n88.rom",   0x10000, 0x8000, CRC(64c5d162) SHA1(3e0aac76fb5d7edc99df26fa9f365fd991742a5d) )
+	ROM_LOAD( "mh_n88_0.rom", 0x20000, 0x2000, CRC(deb384fb) SHA1(5f38cafa8aab16338038c82267800446fd082e79) )
+	ROM_LOAD( "mh_n88_1.rom", 0x22000, 0x2000, CRC(7ad5d943) SHA1(4ae4d37409ff99411a623da9f6a44192170a854e) )
+	ROM_LOAD( "mh_n88_2.rom", 0x24000, 0x2000, CRC(6aa6b6d8) SHA1(2a077ab444a4fd1470cafb06fd3a0f45420c39cc) )
+	ROM_LOAD( "mh_n88_3.rom", 0x26000, 0x2000, CRC(692cbcd8) SHA1(af452aed79b072c4d17985830b7c5dca64d4b412) )
 
 	ROM_REGION( 0x10000, "fdccpu", 0)
 	ROM_LOAD( "mh_disk.rom", 0x0000, 0x2000, CRC(a222ecf0) SHA1(79e9c0786a14142f7a83690bf41fb4f60c5c1004) )
@@ -672,13 +791,13 @@ ROM_START( pc8801mh )
 ROM_END
 
 ROM_START( pc8801fa )
-	ROM_REGION( 0x18000, "maincpu", 0 )
-	ROM_LOAD( "fa_n80.rom",   0x00000, 0x8000, CRC(8a2a1e17) SHA1(06dae1db384aa29d81c5b6ed587877e7128fcb35) )
-	ROM_LOAD( "fa_n88.rom",   0x08000, 0x8000, CRC(73573432) SHA1(9b1346d44044eeea921c4cce69b5dc49dbc0b7e9) )
-	ROM_LOAD( "fa_n88_0.rom", 0x10000, 0x2000, CRC(a72697d7) SHA1(5aedbc5916d67ef28767a2b942864765eea81bb8) )
-	ROM_LOAD( "fa_n88_1.rom", 0x12000, 0x2000, CRC(7ad5d943) SHA1(4ae4d37409ff99411a623da9f6a44192170a854e) )
-	ROM_LOAD( "fa_n88_2.rom", 0x14000, 0x2000, CRC(6aee9a4e) SHA1(e94278682ef9e9bbb82201f72c50382748dcea2a) )
-	ROM_LOAD( "fa_n88_3.rom", 0x16000, 0x2000, CRC(692cbcd8) SHA1(af452aed79b072c4d17985830b7c5dca64d4b412) )
+	ROM_REGION( 0x30000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "fa_n80.rom",   0x18000, 0x8000, CRC(8a2a1e17) SHA1(06dae1db384aa29d81c5b6ed587877e7128fcb35) )
+	ROM_LOAD( "fa_n88.rom",   0x10000, 0x8000, CRC(73573432) SHA1(9b1346d44044eeea921c4cce69b5dc49dbc0b7e9) )
+	ROM_LOAD( "fa_n88_0.rom", 0x20000, 0x2000, CRC(a72697d7) SHA1(5aedbc5916d67ef28767a2b942864765eea81bb8) )
+	ROM_LOAD( "fa_n88_1.rom", 0x22000, 0x2000, CRC(7ad5d943) SHA1(4ae4d37409ff99411a623da9f6a44192170a854e) )
+	ROM_LOAD( "fa_n88_2.rom", 0x24000, 0x2000, CRC(6aee9a4e) SHA1(e94278682ef9e9bbb82201f72c50382748dcea2a) )
+	ROM_LOAD( "fa_n88_3.rom", 0x26000, 0x2000, CRC(692cbcd8) SHA1(af452aed79b072c4d17985830b7c5dca64d4b412) )
 
 	ROM_REGION( 0x10000, "fdccpu", 0)
 	ROM_LOAD( "fa_disk.rom", 0x0000, 0x0800, CRC(2163b304) SHA1(80da2dee49d4307f00895a129a5cfeff00cf5321) )
@@ -695,13 +814,13 @@ ROM_START( pc8801fa )
 ROM_END
 
 ROM_START( pc8801ma )
-	ROM_REGION( 0x18000, "maincpu", 0 )
-	ROM_LOAD( "ma_n80.rom",   0x00000, 0x8000, CRC(8a2a1e17) SHA1(06dae1db384aa29d81c5b6ed587877e7128fcb35) )
-	ROM_LOAD( "ma_n88.rom",   0x08000, 0x8000, CRC(73573432) SHA1(9b1346d44044eeea921c4cce69b5dc49dbc0b7e9) )
-	ROM_LOAD( "ma_n88_0.rom", 0x10000, 0x2000, CRC(a72697d7) SHA1(5aedbc5916d67ef28767a2b942864765eea81bb8) )
-	ROM_LOAD( "ma_n88_1.rom", 0x12000, 0x2000, CRC(7ad5d943) SHA1(4ae4d37409ff99411a623da9f6a44192170a854e) )
-	ROM_LOAD( "ma_n88_2.rom", 0x14000, 0x2000, CRC(6aee9a4e) SHA1(e94278682ef9e9bbb82201f72c50382748dcea2a) )
-	ROM_LOAD( "ma_n88_3.rom", 0x16000, 0x2000, CRC(692cbcd8) SHA1(af452aed79b072c4d17985830b7c5dca64d4b412) )
+	ROM_REGION( 0x30000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "ma_n80.rom",   0x18000, 0x8000, CRC(8a2a1e17) SHA1(06dae1db384aa29d81c5b6ed587877e7128fcb35) )
+	ROM_LOAD( "ma_n88.rom",   0x10000, 0x8000, CRC(73573432) SHA1(9b1346d44044eeea921c4cce69b5dc49dbc0b7e9) )
+	ROM_LOAD( "ma_n88_0.rom", 0x20000, 0x2000, CRC(a72697d7) SHA1(5aedbc5916d67ef28767a2b942864765eea81bb8) )
+	ROM_LOAD( "ma_n88_1.rom", 0x22000, 0x2000, CRC(7ad5d943) SHA1(4ae4d37409ff99411a623da9f6a44192170a854e) )
+	ROM_LOAD( "ma_n88_2.rom", 0x24000, 0x2000, CRC(6aee9a4e) SHA1(e94278682ef9e9bbb82201f72c50382748dcea2a) )
+	ROM_LOAD( "ma_n88_3.rom", 0x26000, 0x2000, CRC(692cbcd8) SHA1(af452aed79b072c4d17985830b7c5dca64d4b412) )
 
 	ROM_REGION( 0x10000, "fdccpu", 0)
 	ROM_LOAD( "ma_disk.rom", 0x0000, 0x2000, CRC(a222ecf0) SHA1(79e9c0786a14142f7a83690bf41fb4f60c5c1004) )
@@ -722,13 +841,13 @@ ROM_START( pc8801ma )
 ROM_END
 
 ROM_START( pc8801ma2 )
-	ROM_REGION( 0x18000, "maincpu", 0 )
-	ROM_LOAD( "ma2_n80.rom",   0x00000, 0x8000, CRC(8a2a1e17) SHA1(06dae1db384aa29d81c5b6ed587877e7128fcb35) )
-	ROM_LOAD( "ma2_n88.rom",   0x08000, 0x8000, CRC(ae1a6ebc) SHA1(e53d628638f663099234e07837ffb1b0f86d480d) )
-	ROM_LOAD( "ma2_n88_0.rom", 0x10000, 0x2000, CRC(a72697d7) SHA1(5aedbc5916d67ef28767a2b942864765eea81bb8) )
-	ROM_LOAD( "ma2_n88_1.rom", 0x12000, 0x2000, CRC(7ad5d943) SHA1(4ae4d37409ff99411a623da9f6a44192170a854e) )
-	ROM_LOAD( "ma2_n88_2.rom", 0x14000, 0x2000, CRC(1d6277b6) SHA1(dd9c3e50169b75bb707ef648f20d352e6a8bcfe4) )
-	ROM_LOAD( "ma2_n88_3.rom", 0x16000, 0x2000, CRC(692cbcd8) SHA1(af452aed79b072c4d17985830b7c5dca64d4b412) )
+	ROM_REGION( 0x30000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "ma2_n80.rom",   0x18000, 0x8000, CRC(8a2a1e17) SHA1(06dae1db384aa29d81c5b6ed587877e7128fcb35) )
+	ROM_LOAD( "ma2_n88.rom",   0x10000, 0x8000, CRC(ae1a6ebc) SHA1(e53d628638f663099234e07837ffb1b0f86d480d) )
+	ROM_LOAD( "ma2_n88_0.rom", 0x20000, 0x2000, CRC(a72697d7) SHA1(5aedbc5916d67ef28767a2b942864765eea81bb8) )
+	ROM_LOAD( "ma2_n88_1.rom", 0x22000, 0x2000, CRC(7ad5d943) SHA1(4ae4d37409ff99411a623da9f6a44192170a854e) )
+	ROM_LOAD( "ma2_n88_2.rom", 0x24000, 0x2000, CRC(1d6277b6) SHA1(dd9c3e50169b75bb707ef648f20d352e6a8bcfe4) )
+	ROM_LOAD( "ma2_n88_3.rom", 0x26000, 0x2000, CRC(692cbcd8) SHA1(af452aed79b072c4d17985830b7c5dca64d4b412) )
 
 	ROM_REGION( 0x10000, "fdccpu", 0)
 	ROM_LOAD( "ma2_disk.rom", 0x0000, 0x2000, CRC(a222ecf0) SHA1(79e9c0786a14142f7a83690bf41fb4f60c5c1004) )
@@ -749,13 +868,13 @@ ROM_START( pc8801ma2 )
 ROM_END
 
 ROM_START( pc8801mc )
-	ROM_REGION( 0x18000, "maincpu", 0 )
-	ROM_LOAD( "mc_n80.rom",   0x00000, 0x8000, CRC(8a2a1e17) SHA1(06dae1db384aa29d81c5b6ed587877e7128fcb35) )
-	ROM_LOAD( "mc_n88.rom",   0x08000, 0x8000, CRC(356d5719) SHA1(5d9ba80d593a5119f52aae1ccd61a1457b4a89a1) )
-	ROM_LOAD( "mc_n88_0.rom", 0x10000, 0x2000, CRC(a72697d7) SHA1(5aedbc5916d67ef28767a2b942864765eea81bb8) )
-	ROM_LOAD( "mc_n88_1.rom", 0x12000, 0x2000, CRC(7ad5d943) SHA1(4ae4d37409ff99411a623da9f6a44192170a854e) )
-	ROM_LOAD( "mc_n88_2.rom", 0x14000, 0x2000, CRC(1d6277b6) SHA1(dd9c3e50169b75bb707ef648f20d352e6a8bcfe4) )
-	ROM_LOAD( "mc_n88_3.rom", 0x16000, 0x2000, CRC(692cbcd8) SHA1(af452aed79b072c4d17985830b7c5dca64d4b412) )
+	ROM_REGION( 0x30000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "mc_n80.rom",   0x18000, 0x8000, CRC(8a2a1e17) SHA1(06dae1db384aa29d81c5b6ed587877e7128fcb35) )
+	ROM_LOAD( "mc_n88.rom",   0x10000, 0x8000, CRC(356d5719) SHA1(5d9ba80d593a5119f52aae1ccd61a1457b4a89a1) )
+	ROM_LOAD( "mc_n88_0.rom", 0x20000, 0x2000, CRC(a72697d7) SHA1(5aedbc5916d67ef28767a2b942864765eea81bb8) )
+	ROM_LOAD( "mc_n88_1.rom", 0x22000, 0x2000, CRC(7ad5d943) SHA1(4ae4d37409ff99411a623da9f6a44192170a854e) )
+	ROM_LOAD( "mc_n88_2.rom", 0x24000, 0x2000, CRC(1d6277b6) SHA1(dd9c3e50169b75bb707ef648f20d352e6a8bcfe4) )
+	ROM_LOAD( "mc_n88_3.rom", 0x26000, 0x2000, CRC(692cbcd8) SHA1(af452aed79b072c4d17985830b7c5dca64d4b412) )
 
 	ROM_REGION( 0x10000, "fdccpu", 0)
 	ROM_LOAD( "mc_disk.rom", 0x0000, 0x2000, CRC(a222ecf0) SHA1(79e9c0786a14142f7a83690bf41fb4f60c5c1004) )
