@@ -4,7 +4,7 @@
 	<software name="frogfeas">
 		<description>Frog Feast</description>
 		<year>2000</year>
-		<publisher>????</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
 				<disk name="Frog Feast" sha1="1ab1eb988458c39e171c8704176617df5730f56e"/>
