@@ -1,4 +1,13 @@
 <?xml version="1.0"?>
+
+<!--
+
+undumped GBC protos
+
+  - Jet Force Gemini
+
+-->
+
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <softwarelist name="gbcolor" description="Nintendo Game Boy Color cartridges">
 	<software name="007twine">
