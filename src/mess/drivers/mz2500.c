@@ -20,13 +20,11 @@
     - Moon Child: needs mixed 3+3bpp tvram supported, kludged for now (not a real test case);
     - Moon Child: window masking doesn't mask bottom part of the screen?
     - Moon Child: appears to be a network / system link game, obviously doesn't work with current MAME / MESS framework;
-   	- Marchen Veil I: doesn't load if you try to run it, it does if you load another game first (for example Mappy);
-   	- Mugen no Shinzou: returns an HW error if you attempt to do a new game, it seems to be a fdc writing issue;
+   	- Marchen Veil I: doesn't load if you try to run it directly, it does if you load another game first (for example Mappy) then do a soft reset;
     - Mugen no Shinzou II - The Prince of Darkness: dies on IPLPRO loading, presumably a wd17xx core bug;
     - Multiplan: random hangs/crashes after you set the RTC, sometimes it loads properly;
-    - Murder Club: has lots of CG artifacts;
+    - Murder Club: has lots of CG artifacts, FDC issue?
     - Penguin Kun Wars: has a bug with window effects ("Push space or trigger" msg on the bottom"), needs investigation;
-    - Relics: doesn't boot, attempts to read at track 1 sector 17 that obviously doesn't exist.
     - Sound Gal Music Editor: wants a "master disk", that apparently isn't available;
     - Yukar K2 (normal version): moans about something, DFJustin: "please put the system disk back to normal", disk write-protected?
 
