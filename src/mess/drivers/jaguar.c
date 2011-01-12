@@ -86,6 +86,7 @@ The start address of a cart may be found at 800404. It is normally 802000.
 #define JAGUAR_CLOCK		26.6e6
 
 static QUICKLOAD_LOAD( jaguar );
+static DEVICE_START( jaguar_cart );
 static DEVICE_IMAGE_LOAD( jaguar );
 
 /*************************************
@@ -661,6 +662,7 @@ static MACHINE_CONFIG_START( jaguar, driver_device )
 	MCFG_CARTSLOT_ADD("cart")
 	MCFG_CARTSLOT_EXTENSION_LIST("j64,rom")
 	MCFG_CARTSLOT_INTERFACE("jaguar_cart")
+	MCFG_CARTSLOT_START(jaguar_cart)
 	MCFG_CARTSLOT_LOAD(jaguar)
 
 	/* software lists */
@@ -790,6 +792,13 @@ static QUICKLOAD_LOAD( jaguar )
 	cpu_set_reg(image.device().machine->device("maincpu"), STATE_GENPC, quickload_begin);
 	jaguar_shared_ram[1]=quickload_begin;
 	return IMAGE_INIT_PASS;
+}
+
+static DEVICE_START( jaguar_cart )
+{
+	/* Initialize for no cartridge present */
+	using_cart = 0;
+	memset( cart_base, 0, cart_size );
 }
 
 static DEVICE_IMAGE_LOAD( jaguar )
