@@ -46,7 +46,6 @@ Notes:
 	TODO:
 
 	- video line buffer
-	- vsync
 	- floppy
 	- keyboard
 	- RS232 RI interrupt
@@ -154,7 +153,7 @@ WRITE8_MEMBER( vixen_state::cmd_w )
 
 	*/
 
-	logerror("CMD %u\n", data);
+//	logerror("CMD %u\n", data);
 
 	// vertical sync interrupt enable
 	m_cmd_d0 = BIT(data, 0);
@@ -360,7 +359,7 @@ static TIMER_DEVICE_CALLBACK( vsync_tick )
 
 	if (state->m_cmd_d0)
 	{
-//		state->m_vsync = 1;
+		state->m_vsync = 1;
 		state->update_interrupt();
 	}
 }
@@ -720,11 +719,25 @@ static const wd17xx_interface fdc_intf =
 //**************************************************************************
 
 //-------------------------------------------------
+//  IRQ_CALLBACK( vixen )
+//-------------------------------------------------
+
+static IRQ_CALLBACK( vixen_int_ack )
+{
+	// D0 is pulled low
+	return 0xfe;
+}
+
+
+//-------------------------------------------------
 //  MACHINE_START( vixen )
 //-------------------------------------------------
 
 void vixen_state::machine_start()
 {
+	// interrupt callback
+	cpu_set_irq_callback(m_maincpu, vixen_int_ack);
+
 	// configure memory banking
 	UINT8 *ram = ram_get_ptr(m_ram);
 
@@ -765,6 +778,7 @@ void vixen_state::machine_reset()
 
 	m_reset = 1;
 	
+	m_vsync = 0;
 	m_cmd_d0 = 0;
 	m_cmd_d1 = 0;
 	update_interrupt();
