@@ -9,6 +9,7 @@
 	  later models at some point.
 	- macros for the various rom / ram areas, it might require various attempts in order to finally get a reasonable arrangement ...
 	- dipswitches are WRONG
+	- currently it's too slow ... why?
 	- below notes states that plain PC-8801 doesn't have a disk CPU, but the BIOS clearly checks the floppy ports. Wrong info?
 
 	Notes:
@@ -111,6 +112,7 @@ static UINT8 i8255_0_pc,i8255_1_pc;
 static UINT8 fdc_irq_opcode;
 static UINT8 ext_rom_bank,gfx_ctrl,vram_sel;
 static UINT8 vrtc_irq_mask;
+static UINT8 window_offset_bank;
 
 #define NBASIC_BASE 0x20000
 #define N88BASIC_BASE 0x28000
@@ -276,23 +278,28 @@ static UINT32 pc8801_bankswitch_1_r(running_machine *machine)
 
 static UINT32 pc8801_bankswitch_0_w(running_machine *machine)
 {
-	return 0x80000;
+	return WRAM_BASE;
 }
 
 static UINT32 pc8801_bankswitch_1_w(running_machine *machine)
 {
-	return 0x80000 + 0x6000;
+	return WRAM_BASE + 0x6000;
 }
 
-/* TODO: window offset */
 static UINT32 pc8801_bankswitch_2_r(running_machine *machine)
 {
-	return 0x88000;
+	if(gfx_ctrl & 6) //wram read select or n basic select banks this as normal wram
+		return WRAM_BASE + 0x8000;
+
+	return WRAM_BASE + (window_offset_bank << 8);
 }
 
 static UINT32 pc8801_bankswitch_2_w(running_machine *machine)
 {
-	return 0x88000;
+	if(gfx_ctrl & 6) //wram read select or n basic select banks this as normal wram
+		return WRAM_BASE + 0x8000;
+
+	return WRAM_BASE + (window_offset_bank << 8);
 }
 
 /* TODO: this isn't correct */
@@ -326,7 +333,8 @@ static UINT32 pc8801_bankswitch_4_w(running_machine *machine)
 static ADDRESS_MAP_START( pc8801_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_READWRITE(pc8801_mem_0_r,pc8801_mem_0_w)
 	AM_RANGE(0x6000, 0x7fff) AM_READWRITE(pc8801_mem_1_r,pc8801_mem_1_w)
-	AM_RANGE(0x8000, 0xbfff) AM_READWRITE(pc8801_mem_2_r,pc8801_mem_2_w)
+	AM_RANGE(0x8000, 0x83ff) AM_READWRITE(pc8801_mem_2_r,pc8801_mem_2_w)
+	AM_RANGE(0x8400, 0xbfff) AM_RAM
 	AM_RANGE(0xc000, 0xefff) AM_READWRITE(pc8801_mem_3_r,pc8801_mem_3_w)
 	AM_RANGE(0xf000, 0xffff) AM_READWRITE(pc8801_mem_4_r,pc8801_mem_4_w)
 ADDRESS_MAP_END
@@ -395,6 +403,25 @@ static WRITE8_HANDLER( pc8801_irq_mask_w )
 	vrtc_irq_mask = data & 2;
 }
 
+static READ8_HANDLER( pc8801_window_bank_r )
+{
+	return window_offset_bank;
+}
+
+static WRITE8_HANDLER( pc8801_window_bank_w )
+{
+	window_offset_bank = data;
+	bankr[2] = pc8801_bankswitch_2_r(space->machine);
+	bankw[2] = pc8801_bankswitch_2_w(space->machine);
+}
+
+static WRITE8_HANDLER( pc8801_window_bank_inc_w )
+{
+	window_offset_bank++;
+	bankr[2] = pc8801_bankswitch_2_r(space->machine);
+	bankw[2] = pc8801_bankswitch_2_w(space->machine);
+}
+
 static ADDRESS_MAP_START( pc8801_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
@@ -430,9 +457,9 @@ static ADDRESS_MAP_START( pc8801_io, ADDRESS_SPACE_IO, 8 )
 //	AM_RANGE(0x60, 0x68) AM_READWRITE(pc88_dmac_r, pc88_dmac_w)
 //  AM_RANGE(0x6e, 0x6e) AM_NOP                                     /* CPU clock info */
 //  AM_RANGE(0x6f, 0x6f) AM_NOP                                     /* RS-232C speed ctrl */
-//	AM_RANGE(0x70, 0x70) AM_READWRITE(pc8801_inport_70, pc8801_outport_70)
+	AM_RANGE(0x70, 0x70) AM_READWRITE(pc8801_window_bank_r, pc8801_window_bank_w)
 	AM_RANGE(0x71, 0x71) AM_READWRITE(pc8801_ext_rom_bank_r, pc8801_ext_rom_bank_w)
-//	AM_RANGE(0x78, 0x78) AM_WRITE(pc8801_outport_78)				/* text window increment */
+	AM_RANGE(0x78, 0x78) AM_WRITE(pc8801_window_bank_inc_w)
 //  AM_RANGE(0x90, 0x9f) AM_NOP                                     /* CD-ROM */
 //  AM_RANGE(0xa0, 0xa3) AM_NOP                                     /* music & network */
 //  AM_RANGE(0xa8, 0xad) AM_NOP                                     /* second sound board */
@@ -869,6 +896,7 @@ static MACHINE_RESET( pc8801 )
 {
 	ext_rom_bank = 0xff;
 	gfx_ctrl = 0x31;
+	window_offset_bank = 0x00;
 	bankr[0] = pc8801_bankswitch_0_r(machine);
 	bankr[1] = pc8801_bankswitch_1_r(machine);
 	bankw[0] = pc8801_bankswitch_0_w(machine);
@@ -889,7 +917,7 @@ static MACHINE_RESET( pc8801 )
 	bank_wp[3] = 0;
 	bank_wp[4] = 0;
 
-	fdc_irq_opcode = 0x00; //TODO: should be 0x7f ld a,a
+	fdc_irq_opcode = 0; //TODO: copied from PC-88VA, could be wrong here ... should be 0x7f ld a,a in the latter case
 }
 
 static PALETTE_INIT( pc8801 )
@@ -953,7 +981,7 @@ static MACHINE_CONFIG_START( pc8801, driver_device )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MCFG_SCREEN_SIZE(640, 440)
+	MCFG_SCREEN_SIZE(640, 240)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
 	MCFG_GFXDECODE( pc8801 )
 	MCFG_PALETTE_LENGTH(0x10)
