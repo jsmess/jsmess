@@ -929,7 +929,7 @@ static TIMER_CALLBACK( pc8801fd_upd765_tc_to_zero )
 	upd765_tc_w(machine->device("upd765"), 0);
 }
 
-READ8_HANDLER( upd765_tc_r )
+static READ8_HANDLER( upd765_tc_r )
 {
 	//pc88va_state *state = space->machine->driver_data<pc88va_state>();
 
