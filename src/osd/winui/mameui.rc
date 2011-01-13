@@ -3,7 +3,7 @@
 #include "resource.h"
 
 #ifdef MESS
-#include "resourcems.h"
+#include "../../mess/osd/winui/resourcems.h "
 #endif
 
 // Generated Help ID header file
@@ -942,10 +942,6 @@ BEGIN
     PUSHBUTTON      "Reset",IDC_PROP_RESET,4,222,97,14,0,0,HIDC_PROP_RESET
     PUSHBUTTON      "Restore Default Settings",IDC_USE_DEFAULT,118,222,97,14,
                     0,0,HIDC_USE_DEFAULT
-#ifdef MESS
-    CONTROL         "Use New UI",IDC_USE_NEW_UI,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,119,134,86,10,0
-#endif
 END
 
 IDD_PROP_VECTOR DIALOGEX 0, 0, 220, 240

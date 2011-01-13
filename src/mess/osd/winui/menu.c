@@ -2008,14 +2008,13 @@ static HMODULE win_resource_module(void)
 //  win_create_menu
 //============================================================
 
-#ifdef HAS_WINDOW_MENU
 int win_create_menu(running_machine *machine, HMENU *menus)
 {
 	HMENU menu_bar = NULL;
 	HMODULE module;
 
-	if (options_get_bool(mame_options(), "newui"))
-	{
+//	if (options_get_bool(mame_options(), "newui"))
+//	{
 		module = win_resource_module();
 		menu_bar = LoadMenu(module, MAKEINTRESOURCE(IDR_RUNTIME_MENU));
 		if (!menu_bar)
@@ -2023,7 +2022,7 @@ int win_create_menu(running_machine *machine, HMENU *menus)
 
 		if (win_setup_menus(machine, module, menu_bar))
 			goto error;
-	}
+//	}
 
 	*menus = menu_bar;
 	return 0;
@@ -2033,15 +2032,14 @@ error:
 		DestroyMenu(menu_bar);
 	return 1;
 }
-#endif /* HAS_WINDOW_MENU */
 
 
 
 //============================================================
-//  win_mess_window_proc
+//  winwindow_video_window_proc_ui
 //============================================================
 
-LRESULT CALLBACK win_mess_window_proc(HWND wnd, UINT message, WPARAM wparam, LPARAM lparam)
+LRESULT CALLBACK winwindow_video_window_proc_ui(HWND wnd, UINT message, WPARAM wparam, LPARAM lparam)
 {
 	switch(message)
 	{

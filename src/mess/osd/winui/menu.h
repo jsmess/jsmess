@@ -16,11 +16,9 @@
 //============================================================
 
 int win_setup_menus(running_machine *machine, HMODULE module, HMENU menu_bar);
-LRESULT CALLBACK win_mess_window_proc(HWND wnd, UINT message, WPARAM wparam, LPARAM lparam);
+LRESULT CALLBACK winwindow_video_window_proc_ui(HWND wnd, UINT message, WPARAM wparam, LPARAM lparam);
 void win_toggle_menubar(void);
-#ifdef HAS_WINDOW_MENU
 int win_create_menu(running_machine *machine, HMENU *menus);
-#endif
 
 
 #endif /* MENU_H */
