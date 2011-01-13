@@ -275,7 +275,6 @@ OSDOBJS = \
 	$(WINOBJ)/sound.o \
 	$(WINOBJ)/video.o \
 	$(WINOBJ)/window.o \
-	$(WINOBJ)/winmain.o \
 
 
 ifeq ($(DIRECT3D),8)
@@ -287,6 +286,7 @@ endif
 
 # add UI objs
 OSDOBJS += \
+	$(WINOBJ)/winmainui.o \
 	$(UIOBJ)/mui_util.o \
 	$(UIOBJ)/directinput.o \
 	$(UIOBJ)/dijoystick.o \
@@ -327,7 +327,7 @@ $(WINOBJ)/drawgdi.o :	$(SRC)/emu/rendersw.c
 OSDOBJS += \
 	$(WINOBJ)/debugwin.o
 
-$(WINOBJ)/winmain.o : $(WINSRC)/winmain.c
+$(WINOBJ)/winmainui.o : $(WINSRC)/winmain.c
 	@echo Compiling $<...
 	$(CC) $(CDEFS) -Dmain=utf8_main $(CFLAGS) -c $< -o $@
 
