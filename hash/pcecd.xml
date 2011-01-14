@@ -1,0 +1,4967 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="pcecd" description="PCE CD-ROM list">
+  
+  <!-- These CHDs have all been converted from the 
+       'PD PC-Engine V2' collection, dated 2007 
+       
+       Apparently many of these have extra data tracks
+       appended on the end, so shouldn't be considered
+       perfect 1:1 dumps.  Therefore, assuming better
+       reads are made (maybe some already exist) are
+       considered replacable.
+       
+   -->
+
+  <!-- JPN releases -->
+  <software name="1552tenk">
+    <description>1552 Tenka Tairan (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="1552 Tenka Tairan (SCD)(JPN)" sha1="687533a22553ddf94e10244cb92bc2f82c257f0b"/>
+      </diskarea>
+    </part>
+  </software>
+
+  <software name="3x3eyes">
+    <description>3 x 3 Eyes - Sanjiyan Hensei (ACD, SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="3 x 3 Eyes - Sanjiyan Hensei (ACD, SCD)(JPN)" sha1="f31323d30474ba046ba9944c3ac3c1470bc0c126"/>
+      </diskarea>
+    </part>
+  </software>
+
+  <software name="aiii">
+    <description>A. III (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="A. III (SCD)(JPN)" sha1="85e706d4baf6078605f5c3d6a9e1098c34611c41"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="avgeo">
+    <description>Advanced Variable Geo (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Advanced Variable Geo (SCD)(JPN)" sha1="1bd2b1a0e60970c1dc69e968109b03b402957078"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="advquiz">
+    <description>Adventure Quiz - Capcom World Hatena no Daibouken (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Adventure Quiz - Capcom World Hatena no Daibouken (SCD)(JPN)" sha1="651ca2ae55a79f72f2927fa0f043d39d83c74de7"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="aichou">
+    <description>Ai Chou Aniki (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Ai Chou Aniki (SCD)(JPN)" sha1="bb0a3c910ffe4ab6a37540194ba3557a856d8691"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="draculax">
+    <description>Akumajou Dracula X - Chi no Rondo (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Akumajou Dracula X - Chi no Rondo (SCD)(JPN)" sha1="bff01c949ae66b51797ec891befd91009591fbc1"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="alshark">
+    <description>Alshark [Imperfect] (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Alshark [Imperfect] (SCD)(JPN)" sha1="0272c7c946451bcc5136af32a0911044b6a8c468"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="anesan">
+    <description>Ane-San (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Ane-San (SCD)(JPN)" sha1="b1d9ea7d1e3ec6566bf7c899f6eafc87face7fd4"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="angelsii">
+    <description>Angels II - Holy Night [Prototype][Backup] (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Angels II - Holy Night [Prototype][Backup] (SCD)(JPN)" sha1="24feef69cf752d2229b5791cc62bddc75554e0eb"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="arunamun">
+    <description>Arunamu no Kiba - Juuzoku Juuni Shinto Densetsu (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Arunamu no Kiba - Juuzoku Juuni Shinto Densetsu (SCD)(JPN)" sha1="9933a4670f2077845ec1a0ea81a0c00c68e4072e"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="asuka120">
+    <description>Asuka 120% Maxima Burning Fest (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Asuka 120% Maxima Burning Fest (SCD)(JPN)" sha1="27bb73a3372a0189ad9597fc8d9fb546cc466eef"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="auroraq">
+    <description>Aurora Quest - Otaku no Seiza (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Aurora Quest - Otaku no Seiza (SCD)(JPN)" sha1="453eef887f04ad9830f34cde40baa3faeb42b4d4"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="avenger">
+    <description>Avenger (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Avenger (CD)(JPN)" sha1="a92d736e832b4e880109a44b9cc09e81851c5c14"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="babel">
+    <description>Babel (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Babel (SCD)(JPN)" sha1="665f10c01a170e1de0f7db9b3fe6295e5bca8648"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="babyjo">
+    <description>Baby Jo (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Baby Jo (SCD)(JPN)" sha1="a21666ff45b6732043da468de7acbe1dbca1d5ab"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="bakuden">
+    <description>Bakuden Unbalance Zone (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Bakuden Unbalance Zone (SCD)(JPN)" sha1="d83a6b2218bfb95837b9fa8e43963cffbc20dc17"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="bakurets">
+    <description>Bakuretsu Hunter (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Bakuretsu Hunter (SCD)(JPN)" sha1="0c82e3473082c45ad7500df27cb75e68a997a8d7"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="bakushou">
+    <description>Bakushou Yoshimoto no Shinkigeki (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Bakushou Yoshimoto no Shinkigeki (SCD)(JPN)" sha1="35c01f0f2b63e7fb72e089676372580a314e85d8"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="basted">
+    <description>Basted (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Basted (SCD)(JPN)" sha1="67102dddf64ec7b1b5bb77612738a3f2c91c66ff"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="battle94">
+    <description>Battlefield '94 in Tokyo Dome (ACD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Battlefield '94 in Tokyo Dome (ACD)(JPN)" sha1="866e90f08cee3c5820b148f6c2c0791f5972ff51"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="bazaru">
+    <description>Bazaru Degozaru no Game Degozaru (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Bazaru Degozaru no Game Degozaru (SCD)(JPN)" sha1="7d73eea01e3720e8df5bef20d439856d220f0a0e"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="bikkurim">
+    <description>Bikkuriman Daijikai (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Bikkuriman Daijikai (CD)(JPN)" sha1="c50269a7706483552b03cac07c06d1dd2b21a86b"/>
+      </diskarea>
+    </part>
+  </software>
+
+  <software name="bishssm">
+    <description>Bishoujo Senshi Sailor Moon (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Bishoujo Senshi Sailor Moon (SCD)(JPN)" sha1="f801623ed6a639e2e31a254790209fa1c8dfc74f"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="bishssmc">
+    <description>Bishoujo Senshi Sailor Moon Collection (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Bishoujo Senshi Sailor Moon Collection (SCD)(JPN)" sha1="45c557d03947a939495c001d100a2d3a325befed"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="bhass">
+    <description>Black Hole Assault (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Black Hole Assault (SCD)(JPN)" sha1="1a43b268c51fa5ceaa1a328872a7a5ef106df0fe"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="bldgear">
+    <description>Blood Gear (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Blood Gear (SCD)(JPN)" sha1="bb8281103f608f798d0346dec746f1165b835ba3"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="bombmn94">
+    <description>Bomberman '94 Taikenban (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Bomberman '94 Taikenban (SCD)(JPN)" sha1="485bd561f0725f852dfe762bed01f70c93b9e3d9"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="panicbom">
+    <description>Bomberman Panic Bomber (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Bomberman Panic Bomber (SCD)(JPN)" sha1="a51e348693400a51443b45e2632accaeb561abd8"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="bonanzab">
+    <description>Bonanza Bros. (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Bonanza Bros. (SCD)(JPN)" sha1="e19218e6cdc48cccb4f60bdcdd92350e7abdb529"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="brandish">
+    <description>Brandish (ACD, SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Brandish (ACD, SCD)(JPN)" sha1="e0c0c55ca145c2e0f1a1efa7a4d5f2f59d34c913"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="browning">
+    <description>Browning (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Browning (SCD)(JPN)" sha1="262ad128891dd97aaa59baf2f805ee9115a1277d"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="builderl">
+    <description>Builderland (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Builderland (SCD)(JPN)" sha1="e3aa7b1950f70c70b02864ad31d78e7c3b389964"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="bunillas">
+    <description>Bunilla Syndrome Mahjong (CD, SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Bunilla Syndrome Mahjong (CD, SCD)(JPN)" sha1="fe373cbdcab0cd8e4f63b03c6c52b6d653a58f7a"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="buraihac">
+    <description>Burai - Hachigyoku no Yuushi Densetsu (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Burai - Hachigyoku no Yuushi Densetsu (CD)(JPN)" sha1="d09251bbcc78e2a196cfd1234fe7a9e84e53e394"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="buraiiiy">
+    <description>Burai II - Yami Koutei no Gyakushuu (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Burai II - Yami Koutei no Gyakushuu (SCD)(JPN)" sha1="871f5d9ce05f25024a16700ab4881b6575874ea4"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="cal2">
+    <description>Cal II (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Cal II (SCD)(JPN)" sha1="d352b7afa1b0d76330504b3ebd812ea6d76b1626"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="cal3">
+    <description>Cal III (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Cal III (SCD)(JPN)" sha1="72fb9951a0efefdca2b636073f47b2275129de72"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="cardange">
+    <description>Cardangels (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Cardangels (SCD)(JPN)" sha1="2454db7da7b96bf140b49aa9e7f3b5d8f60b0039"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="cdbattle">
+    <description>CD Battle Hikari no Yuushatachi (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="CD Battle Hikari no Yuushatachi (SCD)(JPN)" sha1="da0734ab6d82dd0ad936be8ba1bce9322d1bda6a"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="cddenjin">
+    <description>CD Denjin Rockabilly Tengoku (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="CD Denjin Rockabilly Tengoku (SCD)(JPN)" sha1="926e941198db68ee864905d1a367a81693673d4a"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="chrally">
+    <description>Championship Rally (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Championship Rally (SCD)(JPN)" sha1="3726e6cf1e0303cd3f0c196838a904dab578fd23"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="chikichi">
+    <description>Chiki Chiki Boys (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Chiki Chiki Boys (SCD)(JPN)" sha1="f853288741be1e749b19897861b0f558a337dac9"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="chouanik">
+    <description>Chou Aniki (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Chou Aniki (SCD)(JPN)" sha1="e636fdf83393a31b2c3f6400d559f4a7671c3e97"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="choueiyu">
+    <description>Chou Eiyuu Densetsu - Dynastic Hero (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Chou Eiyuu Densetsu - Dynastic Hero (SCD)(JPN)" sha1="f77c0c275cf6f56484e97f1b33f2827fed888044"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="cobrakok">
+    <description>Cobra - Kokuryuuou no Densetsu (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Cobra - Kokuryuuou no Densetsu (CD)(JPN)" sha1="4574c15766858512e03c1610a67d3f48d504aa1e"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="cobraiid">
+    <description>Cobra II - Densetsu no Otoko (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Cobra II - Densetsu no Otoko (CD)(JPN)" sha1="e41670fc6c481286d0856abf76a32d4aca654b7d"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="colorwar">
+    <description>Color Wars (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Color Wars (CD)(JPN)" sha1="fecc69fcae81092c5216014187ab84cedd3659fb"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="cosmicfa">
+    <description>Cosmic Fantasy - Bouken Shounen Yuu (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Cosmic Fantasy - Bouken Shounen Yuu (CD)(JPN)" sha1="e33c000b4aef2a9889bb6fa24bc762c6f5c5c5c6"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="cosmic2">
+    <description>Cosmic Fantasy II - Bouken Shounen Ban (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Cosmic Fantasy II - Bouken Shounen Ban (CD)(JPN)" sha1="fa5d543bb09c6ba85aa7e349492c6599e59882b5"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="cosmic3">
+    <description>Cosmic Fantasy III - Bouken Shounen Rei (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Cosmic Fantasy III - Bouken Shounen Rei (SCD)(JPN)" sha1="bfe28bfa082b20759157a5042282e3216df6b543"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="cosmic4g">
+    <description>Cosmic Fantasy IV - Ginga Shounen Densetsu Gekitou Hen (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Cosmic Fantasy IV - Ginga Shounen Densetsu Gekitou Hen (SCD)(JPN)" sha1="e2eb894314c1f5310490a7c016ca7e65d4d05735"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="cosmic4t">
+    <description>Cosmic Fantasy IV - Ginga Shounen Densetsu Totsunyuu Hen (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Cosmic Fantasy IV - Ginga Shounen Densetsu Totsunyuu Hen (SCD)(JPN)" sha1="7138eac0999eba52f00f91dde940006d87ab0323"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="cotton">
+    <description>Cotton - Fantastic Night Dreams (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Cotton - Fantastic Night Dreams (SCD)(JPN)" sha1="e052deea6d41594b45420c9dc1e467b66d3e0605"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="crazyhos">
+    <description>Crazy Hospital - Fushigi no Kuni no Tenshi (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Crazy Hospital - Fushigi no Kuni no Tenshi (SCD)(JPN)" sha1="29758242bdf0fa0b1e0193ee8ac7781efa8ec30b"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="crestofw">
+    <description>Crest of Wolf (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Crest of Wolf (SCD)(JPN)" sha1="df1372872221b409f1f40fe3ecaa2c6f3673b87f"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="cybercit">
+    <description>Cyber City OEDO 808 (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Cyber City OEDO 808 (CD)(JPN)" sha1="7f27e985acf4ea34a2f36206a896d6007d7d9d83"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="daisenpu">
+    <description>Daisenpuu Custom (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Daisenpuu Custom (CD)(JPN)" sha1="97c676ac0bd0dd60b05aa020c48c2fb1e2b18c05"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="daisenry">
+    <description>Daisenryaku II - Campaign Version (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Daisenryaku II - Campaign Version (SCD)(JPN)" sha1="ad51f848d8d7b0f3ad62a74db54df4083e25a1f8"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="deja">
+    <description>De Ja (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="De Ja (SCD)(JPN)" sha1="b5c9048c60df6b53ae451abe185bc299b390666c"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="dedbrain">
+    <description>Dead of the Brain I II (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Dead of the Brain I II (SCD)(JPN)" sha1="c3392b4238b7d5f4a40e4b3d24d6ed0d5fd038df"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="deathbrn">
+    <description>Death Bringer - The Knight of Darkness (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Death Bringer - The Knight of Darkness (CD)(JPN)" sha1="39b524dbd01d1a4a61f0598b686757e6d34c2176"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="dedennod">
+    <description>Deden no Den (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Deden no Den (SCD)(JPN)" sha1="7540ddae6b0fd239fd52fac260ade8fb1c57f4cc"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="dekoboko">
+    <description>Dekoboko Densetsu - Hashire Wagamanma (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Dekoboko Densetsu - Hashire Wagamanma (CD)(JPN)" sha1="4e742f76968b20d1842ea4cba9cd9e0231598e17"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="dennoute">
+    <description>Dennou Tenshi - Digital Angel (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Dennou Tenshi - Digital Angel (SCD)(JPN)" sha1="58944fc7c2f2a1da6528e95b46d73adead355e71"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="devmag1">
+    <description>Develo Magazine Volume I (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Develo Magazine Volume I (SCD)(JPN)" sha1="0bd212fae90cec9aa64ae2298da33dbc63cf2adc"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="devstart">
+    <description>Develo Starter Kit - Assembler (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Develo Starter Kit - Assembler (SCD)(JPN)" sha1="1870ecb7b20baa511275809217fb9f29dd626666"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="devbasic">
+    <description>Develo Starter Kit - Basic (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Develo Starter Kit - Basic (SCD)(JPN)" sha1="138a599e7ddfef3125cff74239d19ca09e703b23"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="doraemon">
+    <description>Doraemon Nobita no Dorabian Night (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Doraemon Nobita no Dorabian Night (SCD)(JPN)" sha1="b2c36f377d0fefa798e3f5da5995c769da8441fa"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="ddragon2">
+    <description>Double Dragon II - The Revenge (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Double Dragon II - The Revenge (SCD)(JPN)" sha1="fa9d611edd6db7a45e71d0d84428f90ed5540a19"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="doukyuus">
+    <description>Doukyuusei (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Doukyuusei (SCD)(JPN)" sha1="b48137f4eb68acfd4e0004f7aabba4dd17c6a69e"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="downld2">
+    <description>Download II (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Download II (CD)(JPN)" sha1="25a9fb58997f6069fababe46c4e09decb790e629"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="downtown">
+    <description>Downtown Nekketsu Monogatari (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Downtown Nekketsu Monogatari (SCD)(JPN)" sha1="1f13c7ac132d7fc669c1382bd99ca1bb5a257904"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="dragonha">
+    <description>Dragon Half (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Dragon Half (SCD)(JPN)" sha1="f3cbad9621bb8f6ff753a2b3fe0bb03082556727"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="dragonkn">
+    <description>Dragon Knight Grafitti (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Dragon Knight Grafitti (SCD)(JPN)" sha1="263326661ed77d88ec170ddbb2b4dc7afb25d35d"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="dragonk2">
+    <description>Dragon Knight II (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Dragon Knight II (SCD)(JPN)" sha1="4036165a03b9ebf9a150afff437b5e92996fcb78"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="dragonk3">
+    <description>Dragon Knight III (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Dragon Knight III (SCD)(JPN)" sha1="a19c5fa505098ce6a11b778f10b90d5821f6f0ae"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="dslay">
+    <description>Dragon Slayer - Eiyuu Densetsu (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Dragon Slayer - Eiyuu Densetsu (SCD)(JPN)" sha1="c02b28288a0612bf52d5d5793e193d926a901b56"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="dslay2">
+    <description>Dragon Slayer - Eiyuu Densetsu II (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Dragon Slayer - Eiyuu Densetsu II (SCD)(JPN)" sha1="00ae7badc241f92a7a362fd4c75195f81d58bfa7"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="dbzisgd">
+    <description>Dragonball Z - Idainaru Son Gokuu Densetsu (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Dragonball Z - Idainaru Son Gokuu Densetsu (SCD)(JPN)" sha1="1305806c0adaa701e1bc296be722618b59fe0222"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="dungex2">
+    <description>Dungeon Explorer II (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Dungeon Explorer II (SCD)(JPN)" sha1="1a9eddc532b91b6860b8338c6371757b558079fb"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="dungmst">
+    <description>Dungeon Master - Theron's Quest (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Dungeon Master - Theron's Quest (SCD)(JPN)" sha1="3fc6bff66d6b93b6f41f74d26b38a8ddc3a52bba"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="eferajil">
+    <description>Efera Jiliora - The Emblem from Darkness (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Efera Jiliora - The Emblem from Darkness (CD)(JPN)" sha1="757ae688d5d2e5e46ce4a3293ec8d13ae03f772a"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="eikanhak">
+    <description>Eikan ha Kimini - Koukou Yakyuu Zenkoku Taikai (ACD, SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Eikan ha Kimini - Koukou Yakyuu Zenkoku Taikai (ACD, SCD)(JPN)" sha1="4920b87a8ee81abafcdf568ffa3a6761d7c97ac8"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="eiyuusan">
+    <description>Eiyuu Sangokushi (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Eiyuu Sangokushi (SCD)(JPN)" sha1="2753e9a6415b1ab5c070290d448c491529451c1f"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="emdrag">
+    <description>Emerald Dragon (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Emerald Dragon (SCD)(JPN)" sha1="b1e59c9ea6a53eb64035ef5c562017e96c95b46f"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="emdragt">
+    <description>Emerald Dragon Taikenban (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Emerald Dragon Taikenban (SCD)(JPN)" sha1="501a113ee8ecb5580dce1a9149e7d71a8bf46391"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="exilej">
+    <description>Exile - Toki no Hasama he (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Exile - Toki no Hasama he (CD)(JPN)" sha1="8c4dea9ee6b080bd3751dcfada64355b5d480c75"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="exile2j">
+    <description>Exile II - Janen no Jishou (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Exile II - Janen no Jishou (SCD)(JPN)" sha1="dfa9d99f51a5c1488eeb4489b12c78935661d737"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="f1circus">
+    <description>F1 Circus Special - Pole to Win (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="F1 Circus Special - Pole to Win (SCD)(JPN)" sha1="d7cc23686476b7e02a322ea3bcd76182f831dd1e"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="f1teamsi">
+    <description>F1 Team Simulation Project F (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="F1 Team Simulation Project F (SCD)(JPN)" sha1="63436eae82536a460f763432317044de10cc3bb5"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="faceball">
+    <description>Faceball (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Faceball (SCD)(JPN)" sha1="ad0e36fcaceceb0d153ff27283961d757a533433"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="facebalt">
+    <description>Faceball Taikenban (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Faceball Taikenban (SCD)(JPN)" sha1="a027c41b2e3e35cdaee7fd3c7ea2d09b5ecf7f9f"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="faeriedu">
+    <description>Faerie Dust Story - Meikyuu no Elfeene (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Faerie Dust Story - Meikyuu no Elfeene (CD)(JPN)" sha1="b0358742fc7893b1f0949c81da919d109b5defe8"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="farjiusn">
+    <description>Farjius no Jakoutei - Neo Metal Fantasy (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Farjius no Jakoutei - Neo Metal Fantasy (SCD)(JPN)" sha1="8e5b83da2584ab8e0a4e004758ca7b7936e7056d"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="faussete">
+    <description>Faussete Amour (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Faussete Amour (SCD)(JPN)" sha1="46cd07cd5f07a3a2645613d2c5b0ac3667df3892"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="fiendhun">
+    <description>Fiend Hunter (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Fiend Hunter (SCD)(JPN)" sha1="dedffa3d7b3e279e4a498a9ec42786eed939316c"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="fstreetj">
+    <description>Fighting Street (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Fighting Street (CD)(JPN)" sha1="5cba0b94b697dc9f9f457a1feb098fd1ecbeb0de"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="fzone2j">
+    <description>Final Zone II (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Final Zone II (CD)(JPN)" sha1="7721a3c2347f847bf53a61b07bb5b0aa3d039ab0"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="fireproj">
+    <description>Fire Pro Jyoshi - Dome Chojyo Taisen (ACD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Fire Pro Jyoshi - Dome Chojyo Taisen (ACD)(JPN)" sha1="a2a2e4108eed453e95f080b746b0797117b886e9"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="flashhd">
+    <description>Flash Hiders (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Flash Hiders (SCD)(JPN)" sha1="04b12812db5650e40b056e72420a6eb211e285f0"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="flashhdt">
+    <description>Flash Hiders Taikenban (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Flash Hiders Taikenban (SCD)(JPN)" sha1="d0b857baa888b01add7591596e2093fa8d3d598e"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="forgotnj">
+    <description>Forgotten Worlds (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Forgotten Worlds (SCD)(JPN)" sha1="14c5c294c5a3fba22092a01e5ec4c8512f4583ce"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="forsoc95">
+    <description>Formation Soccer '95 - Della Serie A (ACD, SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Formation Soccer '95 - Della Serie A (ACD, SCD)(JPN)" sha1="e907f2f637eed0a1f0ea52371f51f9dcb6042a6f"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="fraycdxa">
+    <description>Fray CD Xak Gaiden (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Fray CD Xak Gaiden (SCD)(JPN)" sha1="e57c40587a7e5e5f53c25bfa543c0ec299fe05b3"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="fushigin">
+    <description>Fushigi no Umi no Nadia (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Fushigi no Umi no Nadia (SCD)(JPN)" sha1="de8d36d88cff758d9433390c2e6ffc12c9ae78ae"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="gground">
+    <description>Gain Ground SX (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Gain Ground SX (SCD)(JPN)" sha1="1a0d1dbe9b7f565dfd5bfb09cba0f6dcad54b7cc"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="galaxyde">
+    <description>Galaxy Deka Gayvan (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Galaxy Deka Gayvan (SCD)(JPN)" sha1="7e94d3cccfbd0f4393d3f21b486ca3fb8650acbb"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="galfr">
+    <description>Galaxy Fraulein Yuna {HRH310827-3FAAT} (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Galaxy Fraulein Yuna {HRH310827-3FAAT} (SCD)(JPN)" sha1="3fc1ccec5a313773bc884486cdf9a54c29abb1c1"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="galfra">
+    <description>Galaxy Fraulein Yuna {HRH310827-3FAFT} (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Galaxy Fraulein Yuna {HRH310827-3FAFT} (SCD)(JPN)" sha1="544792f0d609f20ca9e7b4d3f5f0bc295c2e9ca9"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="galfrhuv">
+    <description>Galaxy Fraulien Yuna HuVideo CD (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Galaxy Fraulien Yuna HuVideo CD (SCD)(JPN)" sha1="1bab1a0e1bb836bae62ff1d800b89a75aa9a237d"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="galfr2">
+    <description>Galaxy Fraulien Yuna II - Eternal Princess (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Galaxy Fraulien Yuna II - Eternal Princess (SCD)(JPN)" sha1="d1199d242b67c4010201b6c364f22f55ec67bba0"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="gamblerj">
+    <description>Gambler Jikochuushinha (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Gambler Jikochuushinha (CD)(JPN)" sha1="ccd56b03b21dc3dad156e82851e7357a7b66dc48"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="gamblerm">
+    <description>Gambler Jikochuushinha - Mahjong Puzzle Collection (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Gambler Jikochuushinha - Mahjong Puzzle Collection (CD)(JPN)" sha1="53473d2eb13fb91bcd966f1253c7748563e7bc92"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="ganchouh">
+    <description>Ganchouhishi - Aoki Ookami to Shiroki Mejika (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Ganchouhishi - Aoki Ookami to Shiroki Mejika (SCD)(JPN)" sha1="9fab62a6d313851a8ba1dcc24ff4d53466364464"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="garoud2s">
+    <description>Garou Densetsu II - Aratanaru Tatakai - Sample Disc (ACD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Garou Densetsu II - Aratanaru Tatakai - Sample Disc (ACD)(JPN)" sha1="978720b488736828bff3d7ecf2f738aec4aa3f36"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="garoud2">
+    <description>Garou Densetsu II - Aratanaru Tatakai [Imperfect] (ACD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Garou Densetsu II - Aratanaru Tatakai [Imperfect] (ACD)(JPN)" sha1="b5d2dedf90a5b90c4d2b588e5f6985b8f38e18b5"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="garoud">
+    <description>Garou Densetsu Special (ACD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Garou Densetsu Special (ACD)(JPN)" sha1="3d43a9d59e3a894580a4bbabc85ee0757b09d84a"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="gateofth">
+    <description>Gate of Thunder (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Gate of Thunder (SCD)(JPN)" sha1="f35599f3b40db2f4df9bafbbd597700a28d8fc1e"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="genocide">
+    <description>Genocide (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Genocide (SCD)(JPN)" sha1="a080429af821cd37ffb7a5c016dc63dfc5a51191"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="gensouta">
+    <description>Gensou Tairiku Auleria (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Gensou Tairiku Auleria (CD)(JPN)" sha1="a0483fee2bf65b49600d15b3945fb665589bbf3e"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="gingafuk">
+    <description>Ginga Fukei Densetsu Sapphire (ACD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Ginga Fukei Densetsu Sapphire (ACD)(JPN)" sha1="5fe3b477286a60e47c367f8dd4d662557a62588b"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="gogobird">
+    <description>Go! Go! Birdie Chance (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Go! Go! Birdie Chance (SCD)(JPN)" sha1="7ae94f6dc48a3e63683eb765f8c23819ab9f301b"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="godpanic">
+    <description>God Panic - Shijyou Saikyo Gundan (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="God Panic - Shijyou Saikyo Gundan (SCD)(JPN)" sha1="84deacbf6283b2bd96b151cd341550a2881cecbe"/>
+      </diskarea>
+    </part>
+  </software>
+
+  <software name="godzillb">
+    <description>Godzilla - Bakutou Retsuden (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Godzilla - Bakutou Retsuden (SCD)(JPN)" sha1="532ae0b02fddef060cc4500f5af26cd9308b733b"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="goldnaxe">
+    <description>Golden Axe (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Golden Axe (CD)(JPN)" sha1="b74317481ef2015274bc091e2cf23fed08a7121e"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="gotzendi">
+    <description>Gotzendiener (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Gotzendiener (SCD)(JPN)" sha1="3ff3e7d67885b094d14954ff0784695a5df4cb11"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="gradius2">
+    <description>Gradius II - Gofer no Yabou (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Gradius II - Gofer no Yabou (SCD)(JPN)" sha1="5555f1eb3b213b710e19a62c66c95bded17468ec"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="gsmikami">
+    <description>GS Mikami (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="GS Mikami (SCD)(JPN)" sha1="3a988e3ffeae467693796d2f9cf7d58817bbc031"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="gulcligh">
+    <description>Gulclight TDF 2 (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Gulclight TDF 2 (CD)(JPN)" sha1="29048f590dfa9c2965a69a3a9bc3d6c999cbc29f"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="hatsukoi">
+    <description>Hatsukoi Monogatari (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Hatsukoi Monogatari (SCD)(JPN)" sha1="a44c2e480924202eae9df3b19a01620d7bc0ef2c"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="hawkf123">
+    <description>Hawk F-123 (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Hawk F-123 (SCD)(JPN)" sha1="31bd94f7576f7f38d850536035aa29ef0aff716f"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="hellfire">
+    <description>Hellfire S - The Another Story (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Hellfire S - The Another Story (CD)(JPN)" sha1="2993cef0cfb997c34633fe9131bca08935d3dfa1"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="highgren">
+    <description>High Grenadier (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="High Grenadier (CD)(JPN)" sha1="118f9840454af1722d7904d4d24bca092ffd2309"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="hihouden">
+    <description>Hihou Densetsu Chris no Bouken (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Hihou Densetsu Chris no Bouken (CD)(JPN)" sha1="91713af668ed7e5d912788140d8e3808cf9a049f"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="himitsun">
+    <description>Himitsu no Hanazono (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Himitsu no Hanazono (SCD)(JPN)" sha1="7b3d813b62239346dd35182c88136962c45f02a2"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="horrorst">
+    <description>Horror Story (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Horror Story (SCD)(JPN)" sha1="00e5617bb50d9d27d1ef5c14c6fa5fc2be579d76"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="hupga2">
+    <description>Hu PGA Tour Power Golf 2 - Golfer (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Hu PGA Tour Power Golf 2 - Golfer (SCD)(JPN)" sha1="e28fe78e387b4d04b0d9bfffc0f7a3147a6767cb"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="humanspo">
+    <description>Human Sports Festival (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Human Sports Festival (SCD)(JPN)" sha1="a3feaf6a44cea55e8c3458ae19eb3a6deb12b0b8"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="hyakumon">
+    <description>Hyaku Monogatari - Hontou ni Atta Kowai Hanashi (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Hyaku Monogatari - Hontou ni Atta Kowai Hanashi (SCD)(JPN)" sha1="5acdd741b06c4044694dfeb1b7d84abdb691494d"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="hyperdyn">
+    <description>Hyper Dyne SideArms Special (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Hyper Dyne SideArms Special (CD)(JPN)" sha1="569e9375faa58696b7eb759328cd64cb9119e1dc"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="hyperwar">
+    <description>Hyper Wars (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Hyper Wars (SCD)(JPN)" sha1="966ac0799493da8e4871ffa3461b9e71ef24cac2"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="iganinde">
+    <description>Iga Ninden Gaiou (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Iga Ninden Gaiou (SCD)(JPN)" sha1="b2a975b5d609009bec8a89c5c91e42e2049c982f"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="imagef2">
+    <description>Image Fight II (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Image Fight II (SCD)(JPN)" sha1="4e6812ae030eb1b09ef515baa65dcee2613ee8ed"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="inouemam">
+    <description>Inoue Mami - Kono Hoshi ni Tatta Hitori no Kimi (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Inoue Mami - Kono Hoshi ni Tatta Hitori no Kimi (SCD)(JPN)" sha1="162bbd4b2092aa9f0dac4dae9edd7d386a28553a"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="iqpanic">
+    <description>IQ Panic (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="IQ Panic (CD)(JPN)" sha1="f8c7557fc94e6ae0b10a1a4a61a441e629f83045"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="jthunder">
+    <description>J Thunder (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="J Thunder (SCD)(JPN)" sha1="eaf25ab90d3a28d8cc742dff607c1e974c079c78"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="jbharj">
+    <description>J. B. Harold Murder Club (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="J. B. Harold Murder Club (CD)(JPN)" sha1="6c7c522e8ed8dc039a0c9d18512a885426afc1c5"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="jleaguet">
+    <description>J. League Tremendous Soccer '94 (ACD, SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="J. League Tremendous Soccer '94 (ACD, SCD)(JPN)" sha1="a5ed925bc880ab8a9546973b88e8cb32bfac50de"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="jacknicj">
+    <description>Jack Nicklaus World Tour Golf (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Jack Nicklaus World Tour Golf (CD)(JPN)" sha1="d0b837b04cca8ab3dde72eeae3c2cc5e10db8e73"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="janshind">
+    <description>Janshin Densetsu - Quest of Jongmaster (ACD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Janshin Densetsu - Quest of Jongmaster (ACD)(JPN)" sha1="afade5dd161d71ae646f3d2361aef56100362160"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="janteimo">
+    <description>Jantei Monogatari (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Jantei Monogatari (CD)(JPN)" sha1="1d403b3e77cacff6208943ea160a5065fb9f352a"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="jantei2k">
+    <description>Jantei Monogatari II - Uchuu Tantei Divan Kanketsu Hen (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Jantei Monogatari II - Uchuu Tantei Divan Kanketsu Hen (CD)(JPN)" sha1="8161117db53ae149936918b63280652195070ba2"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="jantei2s">
+    <description>Jantei Monogatari II - Uchuu Tantei Divan Shutsudou Hen (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Jantei Monogatari II - Uchuu Tantei Divan Shutsudou Hen (CD)(JPN)" sha1="dc0d06c1b353330e0ede74ba6a5dcb8a0d125480"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="jantei3">
+    <description>Jantei Monogatari III - Saver Angels (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Jantei Monogatari III - Saver Angels (SCD)(JPN)" sha1="f7e309dd40486ad2d8db6e42dec0e5448e9e91de"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="jimpower">
+    <description>Jim Power - In Mutant Planet (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Jim Power - In Mutant Planet (SCD)(JPN)" sha1="ed89ec85eef9944064aae9738aad51b4cc6d84a6"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="juuoukic">
+    <description>Juuouki (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Juuouki (CD)(JPN)" sha1="0a21900decba9770c966db0358c1b16de139c722"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="kagamain">
+    <description>Kagamai no Kuni no Legend (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Kagamai no Kuni no Legend (CD)(JPN)" sha1="365b60a0ec27dbe1f332d0ac80e8cb71cc78f8fc"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="kaizouch">
+    <description>Kaizou Choujin Shubibinman III - Ikai no Princess (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Kaizou Choujin Shubibinman III - Ikai no Princess (CD)(JPN)" sha1="be121f1b4268589926a8251c0346b64c05f38592"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="kakutouh">
+    <description>Kakutou Haou Densetsu Algunos (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Kakutou Haou Densetsu Algunos (SCD)(JPN)" sha1="5f088952d162ebc3e72c72846fe272b103add905"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="kawanonu">
+    <description>Kawa no Nushizuri - Shizenha (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Kawa no Nushizuri - Shizenha (CD)(JPN)" sha1="1cb2400fb25ed6c09f864fb90f297c844e66f766"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="kazekiri">
+    <description>Kaze Kiri - Ninja Action (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Kaze Kiri - Ninja Action (SCD)(JPN)" sha1="f262008939d5c1e1761cc8285622ebb0ad856d5d"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="kazenode">
+    <description>Kaze no Densetsu Xanadu (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Kaze no Densetsu Xanadu (SCD)(JPN)" sha1="9a53a3d1458f1532ea508e43318e9c2b4aa110ad"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="kazenods">
+    <description>Kaze no Densetsu Xanadu - Sample Disc (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Kaze no Densetsu Xanadu - Sample Disc (SCD)(JPN)" sha1="9a53a3d1458f1532ea508e43318e9c2b4aa110ad"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="kazenod2">
+    <description>Kaze no Densetsu Xanadu II (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Kaze no Densetsu Xanadu II (SCD)(JPN)" sha1="5747236d037d3e7d931e6c6829b0faf98edc9f47"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="kiaidan">
+    <description>Kiaidan 00 (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Kiaidan 00 (SCD)(JPN)" sha1="cbbfde36857eb3a78f918a3ea8b8109be358d151"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="kidoukei">
+    <description>Kidou Keisatsu Patlabor - Griffon Hen (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Kidou Keisatsu Patlabor - Griffon Hen (SCD)(JPN)" sha1="a1f6c20a72947c380cbd52199e4e500d519f12a8"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="kisoulou">
+    <description>Kisou Louga (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Kisou Louga (SCD)(JPN)" sha1="fdf14da41bad6c4fc4294d58c324ab96c9605e3a"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="kisoulo2">
+    <description>Kisou Louga II - The Ends of Shangrila (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Kisou Louga II - The Ends of Shangrila (SCD)(JPN)" sha1="7f6a4ff5022e811486534150b3d5a102a368edc7"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="koseikib">
+    <description>KO Seiki Beast - Gaia Fukkatsu Kanketsu Hen (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="KO Seiki Beast - Gaia Fukkatsu Kanketsu Hen (SCD)(JPN)" sha1="2b3cc82c637894d9096bc6a5c9f5ad580985252b"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="kuusouka">
+    <description>Kuusou Kagaku Sekai Gulliver Boy (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Kuusou Kagaku Sekai Gulliver Boy (SCD)(JPN)" sha1="aaae3bd225a43dc6f73001a656e46e9c5af2e6c3"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="ldis">
+    <description>L-Dis (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="L-Dis (CD)(JPN)" sha1="b7475b261732fe57fa4fa2b39fc53720e2d82a48"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="ladyphan">
+    <description>Lady Phantom (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Lady Phantom (SCD)(JPN)" sha1="c89f4ecb166fc346d4489f056c7d9d11f856813e"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="langriss">
+    <description>Langrisser - Hikari no Matsuei (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Langrisser - Hikari no Matsuei (SCD)(JPN)" sha1="35e44e731c70695c9ded9a94c39e2478b3c81ee4"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="laplace">
+    <description>Laplace no Ma (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Laplace no Ma (SCD)(JPN)" sha1="ff12d9f1f46263dccd49dd8adb6a5555ba7f8556"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="laplacep">
+    <description>Laplace no Ma - Preview Disk (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Laplace no Ma - Preview Disk (SCD)(JPN)" sha1="6e315d5777fb5d43675aa12762827addfad78f76"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="lsoft1">
+    <description>Laser Soft Visual Collection Volume I - Cosmic Fantasy Visual Shuu (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Laser Soft Visual Collection Volume I - Cosmic Fantasy Visual Shuu (CD)(JPN)" sha1="13c023480fffb9bac3a882343ffd61276eb55aef"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="lsoft2">
+    <description>Laser Soft Visual Collection Volume II - Valis Visual Shuu (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Laser Soft Visual Collection Volume II - Valis Visual Shuu (CD)(JPN)" sha1="d875fedd27e1eea4696f686187303745110c5af3"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="lastarma">
+    <description>Last Armageddon {BRCD0001-6-0625-R1F} (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Last Armageddon {BRCD0001-6-0625-R1F} (CD)(JPN)" sha1="e9070ea3fcc0f2d9574e4051f6ce6c82b14634c6"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="lastarm1">
+    <description>Last Armageddon {BRCD0001-6-0625-R3D} (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Last Armageddon {BRCD0001-6-0625-R3D} (CD)(JPN)" sha1="e9070ea3fcc0f2d9574e4051f6ce6c82b14634c6"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="lastarm2">
+    <description>Last Armageddon {BRCD0001-7-0904-R1D} (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Last Armageddon {BRCD0001-7-0904-R1D} (CD)(JPN)" sha1="58bc6af8ae5bca7bd2726afe04c8f1ec19e8d24b"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="legion">
+    <description>Legion (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Legion (CD)(JPN)" sha1="09dbf4e7eaaee5262949625917b73ae112478a38"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="lemmings">
+    <description>Lemmings (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Lemmings (SCD)(JPN)" sha1="6de5534c9c3afb599b77d1d7a972f7479be2f8f5"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="linda">
+    <description>Linda (ACD, SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Linda (ACD, SCD)(JPN)" sha1="dc0ae10710aa7ba4f49a3e2606d939230891a340"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="lodossto">
+    <description>Lodoss Tousenki - Record of Lodoss War (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Lodoss Tousenki - Record of Lodoss War (CD)(JPN)" sha1="145e81409cecbaff6f1030b99a260d6de4107742"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="lodosstt">
+    <description>Lodoss Tousenki - Record of Lodoss War Taikenban (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Lodoss Tousenki - Record of Lodoss War Taikenban (CD)(JPN)" sha1="145e81409cecbaff6f1030b99a260d6de4107742"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="lodosst2">
+    <description>Lodoss Tousenki II - Record of Lodoss War II (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Lodoss Tousenki II - Record of Lodoss War II (SCD)(JPN)" sha1="43fb5b216db3d8ac387b07ec50541694a7a54037"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="loomj">
+    <description>Loom (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Loom (SCD)(JPN)" sha1="2798bb114fcb3b2f1e6336066391a1ba5a0cc69a"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="lordwars">
+    <description>Lord of Wars (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Lord of Wars (CD)(JPN)" sha1="32094d6b4250106898829c5eee01de5d4a4bf78a"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="mac2036">
+    <description>Macross 2036 (CD, SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Macross 2036 (CD, SCD)(JPN)" sha1="ac033b09b9585563d7300ea6b7cc53494f0633b5"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="macrosse">
+    <description>Macross Eien no Love Song (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Macross Eien no Love Song (SCD)(JPN)" sha1="8dc4f4c91603220530d3f283e788646694889682"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="madstlk">
+    <description>Mad Stalker - Full Metal Force (ACD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Mad Stalker - Full Metal Force (ACD)(JPN)" sha1="c2c1fdb935068405154eca2ab6a4ed68985353dd"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="madstlks">
+    <description>Mad Stalker - Full Metal Force - Sample Disc (ACD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Mad Stalker - Full Metal Force - Sample Disc (ACD)(JPN)" sha1="3ee9dd98aa62dac638dc20f22f67029120a1d6d6"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="madoumon">
+    <description>Madou Monogatari I - Honou no Sotsuenji [Imperfect] (ACD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Madou Monogatari I - Honou no Sotsuenji [Imperfect] (ACD)(JPN)" sha1="b0af74f366ca5284fb9447df1a456e7f624250f0"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="magicalf">
+    <description>Magical Fantasy Adventure - Popful Mail (ACD, SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Magical Fantasy Adventure - Popful Mail (ACD, SCD)(JPN)" sha1="fce1f8fc9fd82e7b918178450846e1fc7e6d432e"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="magicals">
+    <description>Magical Saurus Tour (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Magical Saurus Tour (CD)(JPN)" sha1="36ec3d800532172a6ca78972112bd6a687a320cc"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="magicoal">
+    <description>Magicoal (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Magicoal (SCD)(JPN)" sha1="076408524fd1b9cec86714418865bfa954df7632"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="mclinics">
+    <description>Mahjong Clinic Special (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Mahjong Clinic Special (SCD)(JPN)" sha1="0274ac68ec082ebd34ab66cb12ac29bd94cebbfc"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="mlemang">
+    <description>Mahjong Lemon Angel (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Mahjong Lemon Angel (SCD)(JPN)" sha1="dabcd3b19c751a23a6804e79e466c0e2dccc4394"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="mbeach">
+    <description>Mahjong on the Beach (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Mahjong on the Beach (SCD)(JPN)" sha1="08dd0f25d900acbbbbf337bc734cb3e396a5fc48"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="mahswrd">
+    <description>Mahjong Sword - Princess Quest Gaiden (ACD, SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Mahjong Sword - Princess Quest Gaiden (ACD, SCD)(JPN)" sha1="6ce6561a7f6bf2c2508e1c1c442fc3810ad7db71"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="mahslk31">
+    <description>Mahou no Shoujo Silky Lip [Ver 3.1 Prototype][Backup] (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Mahou no Shoujo Silky Lip [Ver 3.1 Prototype][Backup] (SCD)(JPN)" sha1="a98a920742f2f2399c588c702a14fd83c7f03d46"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="mahslk50">
+    <description>Mahou no Shoujo Silky Lip [Ver 5.0 Prototype][Backup][alt] (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Mahou no Shoujo Silky Lip [Ver 5.0 Prototype][Backup][alt] (SCD)(JPN)" sha1="143f84c18d43add0c7b64aa1b6087eb1f58384e1"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="mamonoht">
+    <description>Mamono Hunter Youko - Makai Kara no Tenkousei (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Mamono Hunter Youko - Makai Kara no Tenkousei (CD)(JPN)" sha1="2635956c512ec08f44b6dda8a6dc019e868e10e2"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="mamonohu">
+    <description>Mamono Hunter Youko - Tooki Yobigoe (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Mamono Hunter Youko - Tooki Yobigoe (SCD)(JPN)" sha1="5c225a59b49a08f8eb7dd51937900d1884f44640"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="martialc">
+    <description>Martial Champion (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Martial Champion (SCD)(JPN)" sha1="f0cd99e26f8813589ce09da74c26f4900e751128"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="mashoude">
+    <description>Mashou Denki La Valeur (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Mashou Denki La Valeur (CD)(JPN)" sha1="36dea131d1721da1d816e40c824778698e354289"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="masterof">
+    <description>Master of Monsters (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Master of Monsters (CD)(JPN)" sha1="53b2dab8072c23416871be716135a0cdcfa95f16"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="matekide">
+    <description>Mateki Densetsu Astralius (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Mateki Densetsu Astralius (CD)(JPN)" sha1="1821cc3feeb3f304dbd102855b4aac6f1741ad78"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="megamipa">
+    <description>Megami Paradise (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Megami Paradise (SCD)(JPN)" sha1="9fd02dbf78a1ffa4af67ac2ef2ea3cd29e41373c"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="metalang">
+    <description>Metal Angel (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Metal Angel (SCD)(JPN)" sha1="15f82c44ceaee816a12826f68094e5fd4c120d10"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="metalan2">
+    <description>Metal Angel II (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Metal Angel II (SCD)(JPN)" sha1="d3a071fce1f50d5baf67d3210a00c5bd0ee03c1a"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="metamorj">
+    <description>Metamor Jupiter (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Metamor Jupiter (SCD)(JPN)" sha1="39e7fea1e184b89171f92b2ced2ff153422914c6"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="mmagic">
+    <description>Might and Magic (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Might and Magic (CD)(JPN)" sha1="6bb91509c48ebcefe70257c1fbb3182fb407f299"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="mmagic3j">
+    <description>Might and Magic III - Isles of Terra (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Might and Magic III - Isles of Terra (SCD)(JPN)" sha1="8dc9dd1f5d2c63984d44529bc6b5a8a6044d8235"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="mineswee">
+    <description>Mine Sweeper (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Mine Sweeper (CD)(JPN)" sha1="1b0ec31a67f0ce25dc117d8b691d3f19b8c8f683"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="miraisho">
+    <description>Mirai Shonen Conan (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Mirai Shonen Conan (SCD)(JPN)" sha1="e795b4b6c1cb40f7a65b6eabaf70b34375526104"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="mitsubac">
+    <description>Mitsubachi Gakuen (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Mitsubachi Gakuen (CD)(JPN)" sha1="2d30578a99e667aca82b2022b1b46227a9d871ce"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="mlairj">
+    <description>Monster Lair - Wonderboy III (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Monster Lair - Wonderboy III (CD)(JPN)" sha1="8d817dd85d8ed827ce49c1a161befef786cff962"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="monsterm">
+    <description>Monster Maker - Yami no Ryuukishi (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Monster Maker - Yami no Ryuukishi (SCD)(JPN)" sha1="3b9468230cb15841070744396b4f3d63aa1cac07"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="moonligh">
+    <description>Moonlight Lady (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Moonlight Lady (SCD)(JPN)" sha1="8b3f9a23d20771844f0cf9d1c39031145ff65d2b"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="motoroad">
+    <description>Motoroader MC (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Motoroader MC (SCD)(JPN)" sha1="344fe31a83463d106fc8ca1b274e6ff07649f08b"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="motteket">
+    <description>Motteke Tamago [Imperfect] (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Motteke Tamago [Imperfect] (SCD)(JPN)" sha1="f9feaca7fe0e2f36926b5f2e288d423f63bc09ee"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="mugensen">
+    <description>Mugen Senshi Valis - Legend of a Fantasm Soldier (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Mugen Senshi Valis - Legend of a Fantasm Soldier (SCD)(JPN)" sha1="ff2cf17dc87419b051a6db09a4f592007a13b58b"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="mysticfo">
+    <description>Mystic Formula (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Mystic Formula (SCD)(JPN)" sha1="07c8850fe1efa4775a5f5f9d6b811a2794578c09"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="nekketsh">
+    <description>Nekketsu Koukou Dodgeballbu Soccer Hen (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Nekketsu Koukou Dodgeballbu Soccer Hen (SCD)(JPN)" sha1="938ae6f85fa3f881eabdc1e01b5f3f109345a7fe"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="nekketsd">
+    <description>Nekketsu Koushinkyoku - Soreyuke Daiundoukai (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Nekketsu Koushinkyoku - Soreyuke Daiundoukai (SCD)(JPN)" sha1="5aa2ce24e93b0250069a43d99f1b9be9306b7c25"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="nekketlb">
+    <description>Nekketsu Legend Baseball (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Nekketsu Legend Baseball (SCD)(JPN)" sha1="15a0c03eceeb780a73448b8652d0622ca0c4c1c2"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="nemurenu">
+    <description>Nemurenumori no Chiisana Ohanashi (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Nemurenumori no Chiisana Ohanashi (SCD)(JPN)" sha1="88d8b6a084b4de972b4c510263723328ca93b1bf"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="neonecta">
+    <description>Neo Nectaris (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Neo Nectaris (SCD)(JPN)" sha1="c076f47ea06f689e8f77d6607c21f4e5b4b4f368"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="nexzr">
+    <description>Nexzr (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Nexzr (SCD)(JPN)" sha1="8380542f6a4908a44ae527c589aeeb052bc593bf"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="nishimur">
+    <description>Nishimura Kyoutarou Mystery - Hokutosei no Onna (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Nishimura Kyoutarou Mystery - Hokutosei no Onna (CD)(JPN)" sha1="322079d1c931e35d85c3234791d04e22091e5aa0"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="noriko">
+    <description>No.Ri.Ko (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="No.Ri.Ko (CD)(JPN)" sha1="620c24f751ecff52e3363e30d4dba8b1c37557eb"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="nobunbf">
+    <description>Nobunaga no Yabou - Bushou Fuuunroku (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Nobunaga no Yabou - Bushou Fuuunroku (SCD)(JPN)" sha1="80846ff82b584c923e49c0d41a2a7887ab41c660"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="nobunnyz">
+    <description>Nobunaga no Yabou Zenkokuban (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Nobunaga no Yabou Zenkokuban (SCD)(JPN)" sha1="1b819a6635c7d96ed2bedc43c46c13e4aa01c77f"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="pachiok3">
+    <description>Pachiokun III - Pachisuro Pachinko (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Pachiokun III - Pachisuro Pachinko (SCD)(JPN)" sha1="c1e66f4322725bda15e1d65941be63f7828a2464"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="pachioku">
+    <description>Pachiokun Maboroshi no Densetsu (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Pachiokun Maboroshi no Densetsu (CD)(JPN)" sha1="315372ab100ec14634b223b9ce23cedfcbfa8461"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="pachiowu">
+    <description>Pachiokun Warau Uchuu (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Pachiokun Warau Uchuu (SCD)(JPN)" sha1="3a9ffa553b241047ae5dbb2ff8f2491d8a0f1ab6"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="paradion">
+    <description>Paradion - Auto Crusher Palladium (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Paradion - Auto Crusher Palladium (SCD)(JPN)" sha1="6e82b782bf38241eda0c26b83c905c823d66e9cf"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="pastelli">
+    <description>Pastel Lime (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Pastel Lime (SCD)(JPN)" sha1="72ffbf7c4118f7baf18316284f94c95335e4bac0"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="fanspc1">
+    <description>PCEngine Fan Special CD-Rom Volume I (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="PCEngine Fan Special CD-Rom Volume I (SCD)(JPN)" sha1="99d080127024b2dbc08516a22cfef3efdc58612d"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="hyprcat">
+    <description>PCEngine Hyper Catalog (CD-Rom Capsule) (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="PCEngine Hyper Catalog (CD-Rom Capsule) (SCD)(JPN)" sha1="b9fe479e56f5de00719dd1d745ea9a93afe59027"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="hyprcata">
+    <description>PCEngine Hyper Catalog Duo-RX - Disc A (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="PCEngine Hyper Catalog Duo-RX - Disc A (SCD)(JPN)" sha1="03a0fd6859535e80ad70d494ef9d9f1dc322ad59"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="hyprcatb">
+    <description>PCEngine Hyper Catalog Duo-RX - Disc B (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="PCEngine Hyper Catalog Duo-RX - Disc B (SCD)(JPN)" sha1="bc816cf3a6ba32e8aae20e769f8475832c669931"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="hyprcat2">
+    <description>PCEngine Hyper Catalog II (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="PCEngine Hyper Catalog II (SCD)(JPN)" sha1="b160d9bb9d9389fa7850b08e236be4d1ecdaf885"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="hyprcat3">
+    <description>PCEngine Hyper Catalog III (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="PCEngine Hyper Catalog III (SCD)(JPN)" sha1="cb1c3987ec85f55a21533b5ead581692bd06a3a9"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="hyprcat4">
+    <description>PCEngine Hyper Catalog IV (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="PCEngine Hyper Catalog IV (SCD)(JPN)" sha1="f1bd5efb7a033ea60d6952038db8cc7d4988938d"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="hyprcat5">
+    <description>PCEngine Hyper Catalog V (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="PCEngine Hyper Catalog V (SCD)(JPN)" sha1="fd59eed69f0521544617c36b5fee1b717a06e9f4"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="hyprct6a">
+    <description>PCEngine Hyper Catalog VI - Disc A (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="PCEngine Hyper Catalog VI - Disc A (SCD)(JPN)" sha1="66ca2433b56ee4f38c81baa7a750382ce54b1342"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="hyprct6b">
+    <description>PCEngine Hyper Catalog VI - Disc B (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="PCEngine Hyper Catalog VI - Disc B (SCD)(JPN)" sha1="cd9623eb7424352134ec751453054d44cb499f5b"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="policeco">
+    <description>Police Connection (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Police Connection (SCD)(JPN)" sha1="14fb3b1ed009bcbe4893578f224cfdb0cfc50bc9"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="pompingw">
+    <description>Pomping World (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Pomping World (CD)(JPN)" sha1="6194343134fe1dd74d8403817082c0e87c03b6d1"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="popnmagi">
+    <description>Pop'n Magic (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Pop'n Magic (SCD)(JPN)" sha1="74aaf15841f8024394495f37fdaee036fd3d223c"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="populous">
+    <description>Populous - The Promised Lands (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Populous - The Promised Lands (SCD)(JPN)" sha1="c033d92835f04f3bafb62bb3798c5eb6fc54690b"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="princej">
+    <description>Prince of Persia (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Prince of Persia (SCD)(JPN)" sha1="52db76823ea57c4ef6cd1e9b1cd1a3c4704698f7"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="prmaker">
+    <description>Princess Maker I (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Princess Maker I (SCD)(JPN)" sha1="ee6ebbb0ea52725bcddf97244d6718e567489e32"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="prmakera">
+    <description>Princess Maker I - Drama CD Audio (Audio CD)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Princess Maker I - Drama CD Audio (Audio CD)" sha1="12182e87a057ee337ae3d955f182f24f48189d1b"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="prmaker2">
+    <description>Princess Maker II (ACD, SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Princess Maker II (ACD, SCD)(JPN)" sha1="6aa2c991496a68302daf297f23b96819d63ebefa"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="princesm">
+    <description>Princess Minerva (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Princess Minerva (SCD)(JPN)" sha1="c1ce05b16ef1c449cac7e5716ba845a11d1ee6b9"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="peyedol">
+    <description>Private Eyedol (ACD, SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Private Eyedol (ACD, SCD)(JPN)" sha1="a80b9c9178b60efd84a9ec5de4dddc59e8f621e3"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="pdet3">
+    <description>Psychic Detective Series Vol. III - Aya (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Psychic Detective Series Vol. III - Aya (SCD)(JPN)" sha1="21e16d8a267ae209ba56816528cfad821c26c587"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="pdet3d">
+    <description>Psychic Detective Series Vol. III - Aya - Auto Demo (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Psychic Detective Series Vol. III - Aya - Auto Demo (SCD)(JPN)" sha1="4f5932d13d5c178cfbc066e25f5cf53558ce8023"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="pdet4">
+    <description>Psychic Detective Series Vol. IV - Orgel (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Psychic Detective Series Vol. IV - Orgel (SCD)(JPN)" sha1="52587664e6c16c5bb82787ea0440695ee6397a8e"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="psychics">
+    <description>Psychic Storm (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Psychic Storm (SCD)(JPN)" sha1="5843c7ad36e6484683408f0a51e879d7eacae3e1"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="puyopuyo">
+    <description>Puyo Puyo CD (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Puyo Puyo CD (SCD)(JPN)" sha1="210cbc711f820dbe1a7e1bb053e8d11a94ded1e0"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="puyopuy2">
+    <description>Puyo Puyo CD Tsuu (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Puyo Puyo CD Tsuu (SCD)(JPN)" sha1="4cc57065bd833a46b5c5d4b3c38faf8a32abc655"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="quizaven">
+    <description>Quiz Avenue (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Quiz Avenue (CD)(JPN)" sha1="e9c2f7f72e13c6edb2c068a6e8dfe0e8406cf4af"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="quizave2">
+    <description>Quiz Avenue II (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Quiz Avenue II (CD)(JPN)" sha1="662b2755a41217cade5d8cb1ea5467400688fe09"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="quizave3">
+    <description>Quiz Avenue III (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Quiz Avenue III (SCD)(JPN)" sha1="682dc0c18232acb5a599813037ff21cb0bfe4815"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="quizcara">
+    <description>Quiz Caravan Cult Q (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Quiz Caravan Cult Q (CD)(JPN)" sha1="56c14e1a17d1c455d5ca5fb707262e7970e8efa5"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="quizdega">
+    <description>Quiz de Gakuensai (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Quiz de Gakuensai (SCD)(JPN)" sha1="f85b3eb149005616d01fd3c7274cfa7d76be95dd"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="quizmaru">
+    <description>Quiz Marugoto the World (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Quiz Marugoto the World (CD)(JPN)" sha1="b78f8bd106302aa1705e7c14d69252b5201bd306"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="quizmar2">
+    <description>Quiz Marugoto The World II - Time Machine ni Onegai! (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Quiz Marugoto The World II - Time Machine ni Onegai! (CD)(JPN)" sha1="1c2a663efd7214d274f8cdd33c36789bb03c996e"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="quiznoho">
+    <description>Quiz no Hoshi (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Quiz no Hoshi (SCD)(JPN)" sha1="41070395f80d59601884019dc080d76a1100ba08"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="quiztono">
+    <description>Quiz Tonosama no Yabou (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Quiz Tonosama no Yabou (CD)(JPN)" sha1="c3ca89cfa1d11a649ce1f2565a1aa2fb3dda9a07"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="rtypecom">
+    <description>R-Type Complete CD (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="R-Type Complete CD (SCD)(JPN)" sha1="8dd0ae2caa84ac702214545d6fbe191c66b3d77f"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="rainbowi">
+    <description>Rainbow Islands (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Rainbow Islands (CD)(JPN)" sha1="462a43d0925b4422adf84b127151a17bc37b2a0a"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="ranma">
+    <description>Ranma (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Ranma (CD)(JPN)" sha1="dab9e6867e392bf0fdedd8347348678a324e1986"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="ranmadat">
+    <description>Ranma Datou, Ganso Musabetsu Kakutou-Ryuu! (CD, SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Ranma Datou, Ganso Musabetsu Kakutou-Ryuu! (CD, SCD)(JPN)" sha1="d37addaf2cc3a37c8430842570e1846ea6afe02a"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="ranmator">
+    <description>Ranma Toraware no Hanayome (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Ranma Toraware no Hanayome (CD)(JPN)" sha1="99e2c73ab7dc6930d3379ee43fa3342b26e9b4ad"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="rayx2">
+    <description>Rayxanber II (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Rayxanber II (CD)(JPN)" sha1="dbe51de4cd9cfc1bbd7236c5137889220fe2a46a"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="rayx3">
+    <description>Rayxanber III (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Rayxanber III (SCD)(JPN)" sha1="922ac08824a1bff69f476a66c433d1da38d132c3"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="redalert">
+    <description>Red Alert (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Red Alert (CD)(JPN)" sha1="a2bdfd8ed605a57302eec523ca9b23c23881bc66"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="rennybla">
+    <description>Renny Blaster (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Renny Blaster (SCD)(JPN)" sha1="0edc8e948144635d4bb2d1a9cf077554ed537334"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="risingsu">
+    <description>Rising Sun (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Rising Sun (CD)(JPN)" sha1="26fba2cb2c37e78e987b8a03c9140a5140dea9dd"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="roadspir">
+    <description>Road Spirits (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Road Spirits (CD)(JPN)" sha1="dfa6b121fb38c2b26a96bc53f86ce09f447fbdb5"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="karok1">
+    <description>Rom Karaoke - Volume I (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Rom Karaoke - Volume I (CD)(JPN)" sha1="eee18b415dd6bf4b6cbf2815b6c688a382b9483a"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="karok1ss">
+    <description>Rom Karaoke - Volume I - Suteki ni Standard (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Rom Karaoke - Volume I - Suteki ni Standard (CD)(JPN)" sha1="ef62f79a75b83137f6010f2ecc2928a976b85d50"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="karok2">
+    <description>Rom Karaoke - Volume II (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Rom Karaoke - Volume II (CD)(JPN)" sha1="4ce68cc3b8651741dfb2f300a48d8babb81a6742"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="karok2ni">
+    <description>Rom Karaoke - Volume II - Nattoku Idol (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Rom Karaoke - Volume II - Nattoku Idol (CD)(JPN)" sha1="f7e7e36f21a580b9cfdafdba72cdc802c4a19f3f"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="karok3">
+    <description>Rom Karaoke - Volume III (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Rom Karaoke - Volume III (CD)(JPN)" sha1="b31ef682534f8bfee64f6b907234b2ad3b6e09e5"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="karok3yb">
+    <description>Rom Karaoke - Volume III - Yappashi Band (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Rom Karaoke - Volume III - Yappashi Band (CD)(JPN)" sha1="681b704b79870a6fdf6918718a2f4640079e6fc1"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="karok4">
+    <description>Rom Karaoke - Volume IV (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Rom Karaoke - Volume IV (CD)(JPN)" sha1="f1a07619a4c25e2650f6d2841a3df5ea1aa63d38"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="karok4co">
+    <description>Rom Karaoke - Volume IV - Choito Otona! (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Rom Karaoke - Volume IV - Choito Otona! (CD)(JPN)" sha1="266eb12d8d47c82ad67e85b8076453020eedcc9a"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="karok5">
+    <description>Rom Karaoke - Volume V (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Rom Karaoke - Volume V (CD)(JPN)" sha1="18b3f9bfd20c9347292939735e44f1b963f9ebf5"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="karok5mu">
+    <description>Rom Karaoke - Volume V - Maku no Uchi (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Rom Karaoke - Volume V - Maku no Uchi (CD)(JPN)" sha1="87630a36c35b466ffe42e232a308c961662f1580"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="romromst">
+    <description>Rom Rom Stadium (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Rom Rom Stadium (CD)(JPN)" sha1="37a982cb7dc8736084d251e3ddb66b9e4aeae8e3"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="ruinkami">
+    <description>Ruin - Kami no Isan (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Ruin - Kami no Isan (SCD)(JPN)" sha1="524096542bf3dd251787fcc7818b62a53ad8be3b"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="ryuukono">
+    <description>Ryuuko no Ken (ACD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Ryuuko no Ken (ACD)(JPN)" sha1="50c2a68d3b1ab99802ec865af901e8454df62fc4"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="ryuukons">
+    <description>Ryuuko no Ken - Sample Disc (ACD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Ryuuko no Ken - Sample Disc (ACD)(JPN)" sha1="d1c5f36592565e3284bdc970b673fd7b577ad784"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="sangokus">
+    <description>Sangokushi Eiketsu - Tenka ni Nozomu (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Sangokushi Eiketsu - Tenka ni Nozomu (CD)(JPN)" sha1="f7648c494b025af23612adec90c1478ea73f79a7"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="sangoku3">
+    <description>Sangokushi III (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Sangokushi III (SCD)(JPN)" sha1="6c862555545f266ac288836aab7f9da1bdd4e6f5"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="seireise">
+    <description>Seirei Senshi Spriggan (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Seirei Senshi Spriggan (CD)(JPN)" sha1="d859aa50d9e184734cd523e23d0f1ec71d4b56cc"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="seiryuud">
+    <description>Seiryuu Densetsu Monbit (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Seiryuu Densetsu Monbit (CD)(JPN)" sha1="1e4880e01859c63ffc2020bb2f4299d9c8ca7dbf"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="seisensh">
+    <description>Seisenshi Denshou - Jantaku no Kishi (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Seisenshi Denshou - Jantaku no Kishi (SCD)(JPN)" sha1="17908378b7772f9d7544ad2b9756fa5f1651c612"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="seiyamon">
+    <description>Seiya Monogatari - Anearth Fantasy Stories (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Seiya Monogatari - Anearth Fantasy Stories (SCD)(JPN)" sha1="9607ccf63de1202d1c79a86af6d608b5893735c5"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="seiyamot">
+    <description>Seiya Monogatari - Anearth Fantasy Stories Taikenban (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Seiya Monogatari - Anearth Fantasy Stories Taikenban (SCD)(JPN)" sha1="0c8d8c95b95cc4f36ae71f7b68e6591c2255c0d7"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="seiyamop">
+    <description>Seiya Monogatari - Anearth Fantasy Stories [Debug Version Prototype] (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Seiya Monogatari - Anearth Fantasy Stories [Debug Version Prototype] (SCD)(JPN)" sha1="c1f21bc471f2279210c60d1c03f0159106131e96"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="sengokuk">
+    <description>Sengoku Kantou Sankokushi (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Sengoku Kantou Sankokushi (CD)(JPN)" sha1="391ce8de33dad93688b5439a8af7fd0195dc9bcc"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="sexyidol">
+    <description>Sexy Idol Mahjong (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Sexy Idol Mahjong (SCD)(JPN)" sha1="f776d7b7f802d0f3141f54708de73dc801231537"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="sexyidof">
+    <description>Sexy Idol Mahjong Fashion Monogatari (ACD, SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Sexy Idol Mahjong Fashion Monogatari (ACD, SCD)(JPN)" sha1="a640c7241a0c041eb25f73656545b32da310d020"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="sexyidoy">
+    <description>Sexy Idol Mahjong Yakyuuken no Uta [Imperfect] (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Sexy Idol Mahjong Yakyuuken no Uta [Imperfect] (SCD)(JPN)" sha1="b7de22a420df3b943aa5d329786683d0b9a6dd66"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="shbeastj">
+    <description>Shadow of the Beast (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Shadow of the Beast (SCD)(JPN)" sha1="a67be43f8e0d453b178c087a7dcf77d209dcefef"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="shangha2">
+    <description>Shanghai II (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Shanghai II (CD)(JPN)" sha1="0987aadb3dad464d8ac1bb222b9af6b4e768b628"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="shangha3">
+    <description>Shanghai III - Dragon's Eye (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Shanghai III - Dragon's Eye (CD)(JPN)" sha1="bbb661e3025f6702470f55b9cb03312d197a2307"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="shapeshj">
+    <description>Shapeshifter - Makai Eiyuu Den (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Shapeshifter - Makai Eiyuu Den (SCD)(JPN)" sha1="eb74ffb4beb592d5f64355e8948376e85f3823f3"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="sherlocj">
+    <description>Sherlock Holmes no Tantei Kouza (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Sherlock Holmes no Tantei Kouza (CD)(JPN)" sha1="f6ca113b18bf035d243885d23342c8b0673d118c"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="sherlo2j">
+    <description>Sherlock Holmes no Tantei Kouza II (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Sherlock Holmes no Tantei Kouza II (CD)(JPN)" sha1="b3d3ebea20e37eac9c76a0b8aa97d769f1188ce4"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="shiawase">
+    <description>Shiawase Usagi - Nureta Bishoujo Ichi Hajimete na no ni [Imperfect] (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Shiawase Usagi - Nureta Bishoujo Ichi Hajimete na no ni [Imperfect] (SCD)(JPN)" sha1="7af0f2d13b0ec94e818c2ecf1adc95c8cba505e6"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="shiawas2">
+    <description>Shiawase Usagi II - Toraware Usagi Sailor Z (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Shiawase Usagi II - Toraware Usagi Sailor Z (SCD)(JPN)" sha1="6ee7856cc9cc857386491aef1dcbca4cd5f28f55"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="shinmega">
+    <description>Shin Megami Tensei (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Shin Megami Tensei (SCD)(JPN)" sha1="640841e7da66d6f7328d58aacecaebcf135ac21b"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="shinonry">
+    <description>Shin Onryou Senki (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Shin Onryou Senki (SCD)(JPN)" sha1="725641091bcc1381298f20126e22fd2d89ee4101"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="shinsang">
+    <description>Shin Sangokushi - Tenka ha Ware ni (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Shin Sangokushi - Tenka ha Ware ni (CD)(JPN)" sha1="a41e89c303721904298a369b6aea5c42bc5aeac3"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="shinsets">
+    <description>Shinsetsu Shiawase Usagi (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Shinsetsu Shiawase Usagi (SCD)(JPN)" sha1="abfc4f06d492f53cf73eeb5c36db2361f6e889a5"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="shinsetf">
+    <description>Shinsetsu Shiawase Usagi F - Yuujiyou Yorimo Aiyoku (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Shinsetsu Shiawase Usagi F - Yuujiyou Yorimo Aiyoku (SCD)(JPN)" sha1="776c1708b359214a12974694c027343b1fefd524"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="shinset2">
+    <description>Shinsetsu Shiawase Usagi II (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Shinsetsu Shiawase Usagi II (SCD)(JPN)" sha1="2ece49b1291333a7460faa03fc6959c301f2d238"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="shougida">
+    <description>Shougi Database Kiyuu (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Shougi Database Kiyuu (SCD)(JPN)" sha1="120d775393aa1435a03942ab5507827a94e4aec8"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="simeartj">
+    <description>Sim Earth - The Living Planet (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Sim Earth - The Living Planet (SCD)(JPN)" sha1="2451d9a725c3c6c502d1ad0f469e99fcd270daae"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="slimewor">
+    <description>Slime World (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Slime World (SCD)(JPN)" sha1="2f702cfb4408ef5bccc643e59374f0550253a45b"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="slotgamb">
+    <description>Slot Gambler (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Slot Gambler (SCD)(JPN)" sha1="c1ae368ca02033f565571cdcacb40c1e5f5105b4"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="snatcher">
+    <description>Snatcher (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Snatcher (SCD)(JPN)" sha1="8cdbf988155861408e3fbb8945300bc20dd44519"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="snatchpd">
+    <description>Snatcher - Pilot Disk (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Snatcher - Pilot Disk (SCD)(JPN)" sha1="f42063d7dc0ded7bf8d2b411260671007aaedbb0"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="solbianc">
+    <description>Sol Bianca (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Sol Bianca (CD)(JPN)" sha1="b45fa35403c7d536a110caa536a059dfdb0f8af3"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="solmoona">
+    <description>Sol Moonarge (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Sol Moonarge (SCD)(JPN)" sha1="4fae2690241f819830facb30fa7c4735fdc7113f"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="solidfor">
+    <description>Solid Force (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Solid Force (SCD)(JPN)" sha1="d7664286c3f22d5bbd01b338bc4b972927f634f3"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="sorceria">
+    <description>Sorcerian (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Sorcerian (SCD)(JPN)" sha1="8de9dcb88502f298a6711286f06c2533bd163b27"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="sotsugyo">
+    <description>Sotsugyou - Graduation (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Sotsugyou - Graduation (SCD)(JPN)" sha1="345a8339b2c8adfbcd055513a62c3a4e8ae8e75a"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="sotsugy2">
+    <description>Sotsugyou II - Neo Generation (ACD, SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Sotsugyou II - Neo Generation (ACD, SCD)(JPN)" sha1="df09e386502dc040c1fea86025a3f7da4f38f682"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="sotsugym">
+    <description>Sotsugyou Shashin - Miki (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Sotsugyou Shashin - Miki (SCD)(JPN)" sha1="e7839336fadeb7fd6a7e9348608ec4d2e7931df1"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="spacefan">
+    <description>Space Fantasy Zone [Prototype][Backup] (CD, SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Space Fantasy Zone [Prototype][Backup] (CD, SCD)(JPN)" sha1="5d81cf1aba411801b3765510bf846dab74fc74c3"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="spaceinv">
+    <description>Space Invaders - The Original Game (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Space Invaders - The Original Game (SCD)(JPN)" sha1="804b8e05ba2220e01a1d28e0eac4f3dd00c436b9"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="splashlj">
+    <description>Splash Lake (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Splash Lake (CD)(JPN)" sha1="baa6d02d435dec6d2119628a1820f351a2464258"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="spriggan">
+    <description>Spriggan Mark II - Re Terraform Project [Imperfect] (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Spriggan Mark II - Re Terraform Project [Imperfect] (SCD)(JPN)" sha1="1adfc831b858b6e923087e92aa49499398195743"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="starbrea">
+    <description>Star Breaker (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Star Breaker (SCD)(JPN)" sha1="93a7c1a4c85e86d66ae9c552d5f706b2e122f3bc"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="starmobi">
+    <description>Star Mobile (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Star Mobile (CD)(JPN)" sha1="4860459229e31dbb66cffb1fe27051c5be356c0a"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="starparo">
+    <description>Star Parodia (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Star Parodia (SCD)(JPN)" sha1="afcc8269fd2aba58084453249f747fd368307ce6"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="startlin">
+    <description>Startling Odyssey (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Startling Odyssey (SCD)(JPN)" sha1="698b7d5b4ab037e927a5c6b769b0ab618df73e00"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="startli2">
+    <description>Startling Odyssey II (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Startling Odyssey II (SCD)(JPN)" sha1="dffb91ae82ff96a6282a9f4d9f86010c241a42a4"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="steamhea">
+    <description>Steam Heart's [Imperfect] (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Steam Heart's [Imperfect] (SCD)(JPN)" sha1="cdb1ec8d3a032fb4ef3d63e2f85af15d2179b4bb"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="strider">
+    <description>Strider Hiryuu (ACD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Strider Hiryuu (ACD)(JPN)" sha1="55730fca43667b79ca69a22092ddeb9e47f8eac4"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="sugoroku">
+    <description>Sugoroku '92 Nari Tore Nariagari Trendy (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Sugoroku '92 Nari Tore Nariagari Trendy (CD)(JPN)" sha1="50878c5d63b25b96ab73f9774913db156b1ae139"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="summer92">
+    <description>Summer Carnival '92 - Alzadick (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Summer Carnival '92 - Alzadick (CD)(JPN)" sha1="069b402fa1d9db6eb0c36237181f4cfc2ca5f2e2"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="summer93">
+    <description>Summer Carnival '93 - Nexzr Special (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Summer Carnival '93 - Nexzr Special (SCD)(JPN)" sha1="d7702330355053c31669d3dcff65b42eae4b07b7"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="superalb">
+    <description>Super Albatross (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Super Albatross (CD)(JPN)" sha1="d16bab64455f206f9b71a274c4a2f7cb43c98a18"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="scdrpgs">
+    <description>Super Cd-Rom RPG Sampler (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Super Cd-Rom RPG Sampler (SCD)(JPN)" sha1="5f264e9cb01c63dc34fd72634ad3d8fb8c0ec060"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="superdai">
+    <description>Super Daisenryaku (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Super Daisenryaku (CD)(JPN)" sha1="a9df7ea93b268b7226ca9f3851049c82aa115f90"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="superdar">
+    <description>Super Darius (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Super Darius (CD)(JPN)" sha1="2008a739c9994309e7cb5b60a80ef9249f439fd4"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="superda2">
+    <description>Super Darius II (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Super Darius II (SCD)(JPN)" sha1="7ab7a901616286ad5e6700e3b0426d256092606a"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="supermah">
+    <description>Super Mahjong Taikai (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Super Mahjong Taikai (SCD)(JPN)" sha1="41da84139e471a0f5c74ecf027a728bcc74d2ae6"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="sraiden">
+    <description>Super Raiden (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Super Raiden (SCD)(JPN)" sha1="a8dc137dd0dd80259dcaacc132cc56e6d731d44e"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="srmp23">
+    <description>Super Real Mahjong P II III Custom (ACD, SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Super Real Mahjong P II III Custom (ACD, SCD)(JPN)" sha1="3f3b4e7c5c2ae0faabf139eb95e5e6002162928b"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="srmp4">
+    <description>Super Real Mahjong P IV Custom (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Super Real Mahjong P IV Custom (SCD)(JPN)" sha1="eee57a8abe44393ce85d5594bcb753cccf798bfd"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="srmp5">
+    <description>Super Real Mahjong P V Custom (ACD, SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Super Real Mahjong P V Custom (ACD, SCD)(JPN)" sha1="248e967c4069bf047b1a114a7768bb2110f430a4"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="srmspec">
+    <description>Super Real Mahjong Special (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Super Real Mahjong Special (SCD)(JPN)" sha1="313c0bf7945d0f90b210ad8303f8b51a89e856da"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="supersch">
+    <description>Super Schwartzschild (CD, SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Super Schwartzschild (CD, SCD)(JPN)" sha1="05064b599ccfe5e86f3d25a46eabc01226c416ba"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="supersc2">
+    <description>Super Schwartzschild II (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Super Schwartzschild II (SCD)(JPN)" sha1="4dd726cfd7dc6a4e1d2b05e0d42d89e31f2e6aa2"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="swordmas">
+    <description>Sword Master (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Sword Master (SCD)(JPN)" sha1="33963709f2fa43c05c7a7196e2060c9f5336fc83"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="sylphias">
+    <description>Sylphia (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Sylphia (SCD)(JPN)" sha1="cd99ce7f8bf517177e0dbfd2431a7267cd3d59df"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="tadaimay">
+    <description>Tadaima Yuusha Boshuuchuu (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Tadaima Yuusha Boshuuchuu (SCD)(JPN)" sha1="72d83615d43019cd7dd413afa457d525893afe2f"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="tadaimas">
+    <description>Tadaima Yuusha Boshuuchuu - Sample Disc (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Tadaima Yuusha Boshuuchuu - Sample Disc (SCD)(JPN)" sha1="3b8de4f1d459da9801a8c30fd5f671ade7fd2f87"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="taiheiki">
+    <description>Taiheiki (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Taiheiki (CD)(JPN)" sha1="a0f73f146bfa6455ef916cbe6c76b93b7df7f999"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="tanjoude">
+    <description>Tanjou Debut (ACD, SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Tanjou Debut (ACD, SCD)(JPN)" sha1="859060b5ada85083f5e262309f5f1b7ec7e3998c"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="tecmowor">
+    <description>Tecmo World Cup Super Soccer (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Tecmo World Cup Super Soccer (SCD)(JPN)" sha1="52702f076c143d1d3e8d630319ada5388405c7e1"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="tekiwork">
+    <description>Tekipaki Working Love (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Tekipaki Working Love (SCD)(JPN)" sha1="4caa8fdfbb839c168982f5eb5f35f7b4bfa73ced"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="tenchimu">
+    <description>Tenchi Muyou! Ryououki (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Tenchi Muyou! Ryououki (SCD)(JPN)" sha1="bccd9bbe173ae17c0485a2a75375ab0126be82fb"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="tenchiwo">
+    <description>Tenchi wo Kurau (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Tenchi wo Kurau (SCD)(JPN)" sha1="1cf20024173f0af21b8a37c496eab38f838b7739"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="tengaims">
+    <description>Tengai Makyo - Fuun Kabuki Den Shutsugeki no Sho (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Tengai Makyo - Fuun Kabuki Den Shutsugeki no Sho (SCD)(JPN)" sha1="0512da6b6cf4773bd8fada01fee1de4492f3709a"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="tengaima">
+    <description>Tengai Makyo - Kabuki Itouryodan (ACD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Tengai Makyo - Kabuki Itouryodan (ACD)(JPN)" sha1="0ebc331c4d7d963f4a6553e6f2020fa5a1031753"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="tengaimz">
+    <description>Tengai Makyo - Ziria (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Tengai Makyo - Ziria (CD)(JPN)" sha1="6d4e3cb113dacf158d9392a18daa413c0f5a0360"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="tengaizh">
+    <description>Tengai Makyo - Ziria [Hibaihin] (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Tengai Makyo - Ziria [Hibaihin] (SCD)(JPN)" sha1="0f7569be19837774a8b49c86230555ffad4cd637"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="tengaim2">
+    <description>Tengai Makyo II - Manji Maru (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Tengai Makyo II - Manji Maru (SCD)(JPN)" sha1="c43ca00cb46a5300da6dbb8533ff52caa92bdcbc"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="tenshino">
+    <description>Tenshi no Uta (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Tenshi no Uta (SCD)(JPN)" sha1="7024f70d857e11a11a53ac76335bf46671811a90"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="tenshin2">
+    <description>Tenshi no Uta II - Datenshi no Uta (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Tenshi no Uta II - Datenshi no Uta (SCD)(JPN)" sha1="b38d6331fd00748d65ae1d1fac3ddf31c290eb9e"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="terrafor">
+    <description>Terraforming (CD, SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Terraforming (CD, SCD)(JPN)" sha1="a17977b33a87e37eb1e858d7785497fc4ad34d66"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="atlasrv">
+    <description>The Atlas - Renaissance Voyager (ACD, SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="The Atlas - Renaissance Voyager (ACD, SCD)(JPN)" sha1="a3b7b45550eef37f2f85fe2d98334341ccd67840"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="dcupten">
+    <description>The Davis Cup Tennis (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="The Davis Cup Tennis (SCD)(JPN)" sha1="8d3b7d1a8117b03a72d3270314e0ff0833f6dff0"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="kickboxj">
+    <description>The Kick Boxing (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="The Kick Boxing (SCD)(JPN)" sha1="b49ff223c930653bb8f8c1beecaeddfd36e454a2"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="manhole">
+    <description>The Manhole (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="The Manhole (CD)(JPN)" sha1="287a0f989a59b4486023d84494b862e149ed9902"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="theproya">
+    <description>The Pro Yakyuu (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="The Pro Yakyuu (CD)(JPN)" sha1="7bab377c7bc3a202e966750b218a1253d25d8923"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="thepro94">
+    <description>The Pro Yakyuu Super '94 (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="The Pro Yakyuu Super '94 (SCD)(JPN)" sha1="dabb3f3e9d04b5ddaaf210ccd4c766ae6d19d198"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="theprosu">
+    <description>The Pro Yakyuu Super (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="The Pro Yakyuu Super (SCD)(JPN)" sha1="e71f527409a1606993c0decbe31f3e3405c691d3"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="thetvsho">
+    <description>The TV Show (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="The TV Show (SCD)(JPN)" sha1="10cfd9c5841da3c5bcab8073d2982a3fe0bfde9e"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="tokimek">
+    <description>Tokimeki Memorial {HRKM70414-1FAAT} [Imperfect] (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Tokimeki Memorial {HRKM70414-1FAAT} [Imperfect] (SCD)(JPN)" sha1="dd72050d2ca53c213305338e24bd6ccbce7e20f5"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="tokimeka">
+    <description>Tokimeki Memorial {HRKM70414-1FABT} [Imperfect] (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Tokimeki Memorial {HRKM70414-1FABT} [Imperfect] (SCD)(JPN)" sha1="dd72050d2ca53c213305338e24bd6ccbce7e20f5"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="tokimekb">
+    <description>Tokimeki Memorial {HRKM70701-2FAAT} (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Tokimeki Memorial {HRKM70701-2FAAT} (SCD)(JPN)" sha1="a11603aec313ebb169e03b594ca41a0dedcdbf40"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="tokimekc">
+    <description>Tokimeki Memorial {HRKM71014-3FAAT} (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Tokimeki Memorial {HRKM71014-3FAAT} (SCD)(JPN)" sha1="3c6c9cf7134a20c36c19dfcb6b10c32d4a0595f7"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="tokimekd">
+    <description>Tokimeki Memorial {HRKM71014-3FABT} (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Tokimeki Memorial {HRKM71014-3FABT} (SCD)(JPN)" sha1="3c6c9cf7134a20c36c19dfcb6b10c32d4a0595f7"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="toponera">
+    <description>Top O Nerae! GunBuster Volume I (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Top O Nerae! GunBuster Volume I (SCD)(JPN)" sha1="82034516ba041a3634b0edbed642518308c10309"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="toponer2">
+    <description>Top O Nerae! GunBuster Volume II (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Top O Nerae! GunBuster Volume II (SCD)(JPN)" sha1="9eea2a1d0236a12cfa356e6cde3e64e3cf334f1a"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="travelep">
+    <description>Travel Epuru (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Travel Epuru (SCD)(JPN)" sha1="86435bb5329ddda91e7629aae829f65ed8cd418c"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="traveler">
+    <description>Travelers! Densetsu wo ButtobaSe [Imperfect] (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Travelers! Densetsu wo ButtobaSe [Imperfect] (SCD)(JPN)" sha1="406c222c6b16af097e088128e03c065f227a1500"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="uchuusen">
+    <description>Uchuu Senkan Yamato (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Uchuu Senkan Yamato (SCD)(JPN)" sha1="a2c69bbe0cab5ca9c6f88f61ef46e47d6a546572"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="ultra2">
+    <description>Ultrabox II Go (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Ultrabox II Go (CD)(JPN)" sha1="5d80e4b3b4002dacd06edbbddce55d4ae20b8e16"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="ultra3">
+    <description>Ultrabox III Go (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Ultrabox III Go (CD)(JPN)" sha1="78bd5964241f33db1326716bb3465863230a635d"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="ultra4">
+    <description>Ultrabox IV Go (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Ultrabox IV Go (CD)(JPN)" sha1="1f2483c94812980831a62fdf6fd3da60ceffd61f"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="ultra">
+    <description>Ultrabox Sohkan Go (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Ultrabox Sohkan Go (CD)(JPN)" sha1="42f490a1eec3d7200d89b0063e40b9e49a7d5a7c"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="ultra5">
+    <description>Ultrabox V Go (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Ultrabox V Go (CD)(JPN)" sha1="c899628cad207b4333ca1419f0aa355274e4831d"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="ultra6">
+    <description>Ultrabox VI Go (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Ultrabox VI Go (CD)(JPN)" sha1="019918bfa9fbb50ec386846f42a13d94a81dc2bb"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="uruseiya">
+    <description>Urusei Yatsura - Stay With You (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Urusei Yatsura - Stay With You (CD)(JPN)" sha1="5ca6ce8fd1ea7a7669e3e1a0a08154976f2f9d6f"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="uruseiyb">
+    <description>Urusei Yatsura - Stay with You - Bonus CD Audio (Audio CD)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Urusei Yatsura - Stay with You - Bonus CD Audio (Audio CD)" sha1="3aed614f6ce906070a35a454c14e59e98ab7729a"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="valis2j">
+    <description>Valis II - The Fantasm Soldier (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Valis II - The Fantasm Soldier (CD)(JPN)" sha1="2e6e3dee640753c4758e2b27b6322faf517288f8"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="valis3j">
+    <description>Valis III - The Fantasm Soldier (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Valis III - The Fantasm Soldier (CD)(JPN)" sha1="770eff89a4b2de3a7f6201326d3c384613e7d150"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="valis4">
+    <description>Valis IV - The Fantasm Soldier (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Valis IV - The Fantasm Soldier (CD)(JPN)" sha1="9bb8160955fff2a40368a82a3b387908837964b4"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="vasteelj">
+    <description>Vasteel (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Vasteel (CD)(JPN)" sha1="8fd03b0b8cc7962d6bb889b75868abb7aa1ff70d"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="vasteel2">
+    <description>Vasteel II (ACD, SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Vasteel II (ACD, SCD)(JPN)" sha1="fa01d9a03416d35a313740728a797f8792ddfda1"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="virgindr">
+    <description>Virgin Dream (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Virgin Dream (SCD)(JPN)" sha1="9b11e93e42ea5b72767638bf6682d559850fba72"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="whereint">
+    <description>Where in the World is Carmen Sandiego (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Where in the World is Carmen Sandiego (CD)(JPN)" sha1="f49d23979b1c2625e18ab31c742f873d58fe0bc7"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="windsoft">
+    <description>Winds of Thunder (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Winds of Thunder (SCD)(JPN)" sha1="6a2b0633935f421c16fb771925ca597db4b85091"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="wizard12">
+    <description>Wizardry I II (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Wizardry I II (SCD)(JPN)" sha1="b1e42a5f72e46428b81e6d1d43ab966e6d51110a"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="wizard34">
+    <description>Wizardry III IV (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Wizardry III IV (SCD)(JPN)" sha1="1dfd3ef21d765d4b4430dd52f58eb92d962dfc85"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="wizard5">
+    <description>Wizardry V - Heart of the Maelstrom (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Wizardry V - Heart of the Maelstrom (SCD)(JPN)" sha1="3d55943b6a2241bccc49d43a3d1a044ed1b7437f"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="wh2">
+    <description>World Heroes II (ACD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="World Heroes II (ACD)(JPN)" sha1="67e7c559c1be2034502cb63efea6881fcc6b8e5a"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="wh2sam">
+    <description>World Heroes II - Sample Disc (ACD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="World Heroes II - Sample Disc (ACD)(JPN)" sha1="b3b8bcd66f58ee57f0e7473df1549f51e9096ade"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="wrestlin">
+    <description>Wrestling Angels - Double Impact (ACD, SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Wrestling Angels - Double Impact (ACD, SCD)(JPN)" sha1="d79ce768849f21a9010c221d8dd7817a4a1b94f9"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="xak12">
+    <description>Xak I II (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Xak I II (SCD)(JPN)" sha1="aa372a729bb91d73086e845efb307da06121dc72"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="xak3">
+    <description>Xak III - The Eternal Recurrence (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Xak III - The Eternal Recurrence (SCD)(JPN)" sha1="dc68312ff5a45ff66afe23163bbdd51d9c186b18"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="yamamura">
+    <description>Yamamura Misa Suspense - Kinsen Ka Kyo E Zara Satsu Jin Ji Ken (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Yamamura Misa Suspense - Kinsen Ka Kyo E Zara Satsu Jin Ji Ken (SCD)(JPN)" sha1="e05f900c7135de67b4523fcd425ec75cac5f1cf8"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="yaminoke">
+    <description>Yami no Ketsuzoku Harukanaru Kioku (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Yami no Ketsuzoku Harukanaru Kioku (SCD)(JPN)" sha1="fd6a1ab3707386d603a46b0769a82fd7740ab393"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="yawarasc">
+    <description>Yawara! (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Yawara! (SCD)(JPN)" sha1="2da1ea9a6a83f7c8c830836779ab006838759fb9"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="yawara2">
+    <description>Yawara! II (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Yawara! II (SCD)(JPN)" sha1="9c46a0ccdc9cbaeb8d856c801e67fdbb26280af6"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="ysbk12j">
+    <description>Ys Book I II (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Ys Book I II (CD)(JPN)" sha1="885144de107d9b65c10e3737322634a5a32c2f9c"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="ys3>
+    <description>Ys III - Wanderers from Ys (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Ys III - Wanderers from Ys (CD)(JPN)" sha1="12fdadc85fc12e2a362638edbdd87f1929e9d58d"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="ys4">
+    <description>Ys IV - The Dawn of Ys {HCD3051-4-1108-R1F} (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Ys IV - The Dawn of Ys {HCD3051-4-1108-R1F} (SCD)(JPN)" sha1="ec1c0c2f73ecff186661ead31348d2f3df7a70e9"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="ys4a">
+    <description>Ys IV - The Dawn of Ys {HCD3051-5-1116-R1P} (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Ys IV - The Dawn of Ys {HCD3051-5-1116-R1P} (SCD)(JPN)" sha1="f1c340189f560183c406d2bf7ac585afa604c5e0"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="yuyuhaku">
+    <description>Yu Yu Hakusho (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Yu Yu Hakusho (SCD)(JPN)" sha1="fe84e8c9438fafd6a499cb107bab73c5714f24aa"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="zankager">
+    <description>Zan - Kagerou no Toki (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Zan - Kagerou no Toki (CD)(JPN)" sha1="63471284c5da061e2a67d8d547225513265c2597"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="zero4cha">
+    <description>Zero 4 Champ II (SCD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Zero 4 Champ II (SCD)(JPN)" sha1="cddecd2914b421dcb4569b13bd1274361f721298"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="zerowing">
+    <description>Zero Wing (CD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Zero Wing (CD)(JPN)" sha1="0f5c540f56fb164c23867acbf136c23a39347876"/>
+      </diskarea>
+    </part>
+  </software>
+
+  <!-- USA releases -->
+  <software name="tg3in1">
+    <description>3 in 1 DUO Demo CD (SCD)(USA)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="3 in 1 DUO Demo CD (SCD)(USA)" sha1="bf80b222ca8ece1ae8bab660fae4c70577c933a2"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="tg4in1">
+    <description>4 in 1 Super CD (SCD)(USA)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="4 in 1 Super CD (SCD)(USA)" sha1="e2bb4420c7cb12188c8205b6692d51dfafef1437"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="beyondsg">
+    <description>Beyond Shadowgate (SCD)(USA)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Beyond Shadowgate (SCD)(USA)" sha1="b1f61aab839d53cc197906de1e8a1e861b5c6f8f"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="bikini">
+    <description>Bikini Girls (CD)(USA)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Bikini Girls (CD)(USA)" sha1="d35b9097e6d4a8aaf89d94fe3d9bb57331d7452e"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="bonk3cd">
+    <description>Bonk III - Bonk's Big Adventure (SCD)(USA)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Bonk III - Bonk's Big Adventure (SCD)(USA)" sha1="411bc9afd5abd07cd189a4afac9b62cf216480cb"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="busterbr">
+    <description>Buster Bros. (CD)(USA)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Buster Bros. (CD)(USA)" sha1="696ba4356d1d754eeb3e9dde37ba52cd0da8c655"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="campcali">
+    <description>Camp California (SCD)(USA)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Camp California (SCD)(USA)" sha1="b33ba2e5ccf7e6974eae890f77e431de359f8a10"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="cosmic2u">
+    <description>Cosmic Fantasy II (CD)(USA)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Cosmic Fantasy II (CD)(USA)" sha1="17dc61ac510530322777c936bdc7fdfe838fe67d"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="cottonu">
+    <description>Cotton - Fantastic Night Dreams (SCD)(USA)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Cotton - Fantastic Night Dreams (SCD)(USA)" sha1="e09c4f202b3e4a8fbcaa0a0010f044c679203021"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="dslayu">
+    <description>Dragon Slayer - The Legend of Heroes (SCD)(USA)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Dragon Slayer - The Legend of Heroes (SCD)(USA)" sha1="43904f0149b50663e67ebd7d0dccf2cb75adcc5b"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="dungex2u">
+    <description>Dungeon Explorer II (SCD)(USA)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Dungeon Explorer II (SCD)(USA)" sha1="07ea9c0455e77b6dbea37938432eb73fb3b383bd"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="dungmstu">
+    <description>Dungeon Master - Theron's Quest (SCD)(USA)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Dungeon Master - Theron's Quest (SCD)(USA)" sha1="d64ebdc9a4e5082a9a238d2f47ef0c41aa5c6345"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="exileu">
+    <description>Exile (CD)(USA)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Exile (CD)(USA)" sha1="8753da89e56382aecbb7ccc1dcf19e3e16355702"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="exile2u">
+    <description>Exile II - Wicked Phenomenon (SCD)(USA)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Exile II - Wicked Phenomenon (SCD)(USA)" sha1="685bc20981a8e2c61eb8c88ff2fe44617ae178fd"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="fantss">
+    <description>Fantasy Star Soldier [Prototype] (SCD)(USA)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Fantasy Star Soldier [Prototype] (SCD)(USA)" sha1="a7d17d5b41f34b46e10feaf55244fad24adec25b"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="fstreetu">
+    <description>Fighting Street (CD)(USA)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Fighting Street (CD)(USA)" sha1="3cb4ea04ef7a3bfa1f85db83fa81b7b646d11640"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="fzone2u">
+    <description>Final Zone II (CD)(USA)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Final Zone II (CD)(USA)" sha1="f9466d04fe261ea2c7326f9662848c86b788a5f2"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="forgotnu">
+    <description>Forgotten Worlds (SCD)(USA)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Forgotten Worlds (SCD)(USA)" sha1="8a13fd4f1afc493018d84c36b1031baae614a14d"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="godzilla">
+    <description>Godzilla (SCD)(USA)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Godzilla (SCD)(USA)" sha1="059c03358249b1d84ba5fe2a8804e2279a0d5726"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="hawiian">
+    <description>Hawiian Island Girls (CD)(USA)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Hawiian Island Girls (CD)(USA)" sha1="f976fb229efbdfebd2abf023c44ecab8b5b1f1f9"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="jbharu">
+    <description>J. B. Harold Murder Club [Imperfect] (CD)(USA)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="J. B. Harold Murder Club [Imperfect] (CD)(USA)" sha1="a908f96cf5e21e7575c73b6e07cbae3c6781e2fe"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="itcamefr">
+    <description>It Came from the Desert (CD)(USA)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="It Came from the Desert (CD)(USA)" sha1="16fc102f78471dcf144fc60a2dd6c4a6f357c383"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="jacknicu">
+    <description>Jack Nicklaus Turbo Golf (CD)(USA)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Jack Nicklaus Turbo Golf (CD)(USA)" sha1="a3675a97048018448b99b00949c500a05e207b89"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="johnmadd">
+    <description>John Madden Duo CD Football (SCD)(USA)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="John Madden Duo CD Football (SCD)(USA)" sha1="faf8416829f4d5430c326f0797b0a6a9ae5b7a6c"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="lastaler">
+    <description>Last Alert (CD)(USA)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Last Alert (CD)(USA)" sha1="a45465b4cdf70946e1f7c1a488e999a44a5df147"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="loomu">
+    <description>Loom (SCD)(USA)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Loom (SCD)(USA)" sha1="588c56b5569d2bf8ddec547c97ee77ed207a7480"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="lordrise">
+    <description>Lords of the Rising Sun (CD)(USA)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Lords of the Rising Sun (CD)(USA)" sha1="8eda39779434bf5cea405049d1c6373a86018b3b"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="lordthun">
+    <description>Lords of Thunder (SCD)(USA)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Lords of Thunder (SCD)(USA)" sha1="8f5c9531c3fe8298150e20712cfc84f6c2b614f3"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="magicald">
+    <description>Magical Dinosaur Tour (CD)(USA)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Magical Dinosaur Tour (CD)(USA)" sha1="126820b4dbe989c0e9d9e39c89983d016864be89"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="mmagic3u">
+    <description>Might and Magic III - Isles of Terra (SCD)(USA)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Might and Magic III - Isles of Terra (SCD)(USA)" sha1="f6d7da8d852794df96c9f0b2161f1701a5a7deba"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="mlairu">
+    <description>Monster Lair (CD)(USA)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Monster Lair (CD)(USA)" sha1="1f9b98e82d29fef6897bb43fc84814e5dc513a0d"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="princeu">
+    <description>Prince of Persia (SCD)(USA)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Prince of Persia (SCD)(USA)" sha1="7405fb7162a17ca98de6d3e782358d75956db817"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="riotzone">
+    <description>Riot Zone (SCD)(USA)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Riot Zone (SCD)(USA)" sha1="bce0714632417cc272558a502411287490b5e585"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="shbeastu">
+    <description>Shadow of the Beast (SCD)(USA)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Shadow of the Beast (SCD)(USA)" sha1="420f127f0205d9b83ad7b6dfc959627b9239243a"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="shapeshu">
+    <description>Shape Shifter (SCD)(USA)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Shape Shifter (SCD)(USA)" sha1="538aaa83c2a454778cf7e99d13dab60c73120fb0"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="sherloc">
+    <description>Sherlock Holmes Consulting Detective (CD)(USA)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Sherlock Holmes Consulting Detective (CD)(USA)" sha1="9271e6ca1462359aaa7c7cf2feddf37b499e4333"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="sherlo2">
+    <description>Sherlock Holmes Consulting Detective Volume II (CD, SCD)(USA)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Sherlock Holmes Consulting Detective Volume II (CD, SCD)(USA)" sha1="38630ee371016af030440bef129541f7a6d14183"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="simeartu">
+    <description>Sim Earth - The Living Planet (SCD)(USA)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Sim Earth - The Living Planet (SCD)(USA)" sha1="1019e7bd44d3c0b8bb3c6c80b586e484d4f10700"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="splashlu">
+    <description>Splash Lake (CD)(USA)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Splash Lake (CD)(USA)" sha1="7dd7901e9afe21d1b5079f620663b43ae9e52767"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="superair">
+    <description>Super Air Zonk (SCD)(USA)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Super Air Zonk (SCD)(USA)" sha1="507cf143590cac9cc3f1d53302ca12d3c1001a6c"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="sydmeads">
+    <description>Syd Mead's Terra Forming [Imperfect] (CD, SCD)(USA)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Syd Mead's Terra Forming [Imperfect] (CD, SCD)(USA)" sha1="6a3a74163777b4b23f350cd9476578a357dba007"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="addams">
+    <description>The Addams Family (CD)(USA)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="The Addams Family (CD)(USA)" sha1="ea7507833bc79b0a2eb887302932b156fc438e58"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="dynashr">
+    <description>The Dynastic Hero (SCD)(USA)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="The Dynastic Hero (SCD)(USA)" sha1="93cc5daa5eec3ff814d719a5d75df9f28eb0384c"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="hawaiiu">
+    <description>The Local Girls of Hawaii (CD)(USA)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="The Local Girls of Hawaii (CD)(USA)" sha1="e87a413d0b9da4b5bdaa7c92cc9b0366ccd9dec6"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="valis2u">
+    <description>Valis II (CD)(USA)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Valis II (CD)(USA)" sha1="9f1f8c50e2c941dacbabe91d004ffa185840ee06"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="valis3u">
+    <description>Valis III (CD)(USA)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Valis III (CD)(USA)" sha1="a3a46675521327be979615d1d953b4c01381980a"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="vasteelu">
+    <description>Vasteel (CD)(USA)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Vasteel (CD)(USA)" sha1="67eeb07e9e7d1d84e08f5fcdceae9a5d16b97ef3"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="ysbk12u">
+    <description>Ys Book I II (CD)(USA)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Ys Book I II (CD)(USA)" sha1="5f9ad72f3f9824a1d1940b0bd5a249474c23d151"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="ys3u">
+    <description>Ys III - Wanderers from Ys (CD)(USA)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Ys III - Wanderers from Ys (CD)(USA)" sha1="12ea7ad74a9bae7001f097b9d31d80088a3d174e"/>
+      </diskarea>
+    </part>
+  </software>
+
+
+  <!-- Game Express Titles - use different System Card -->
+  <software name="hilegfan">
+    <description>Hi-Leg Fantasy (GECD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Hi-Leg Fantasy (GECD)(JPN)" sha1="a3740084259f3bad73669ed663f57bbf5a608951"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="avtanjou">
+    <description>AV Tanjou (GECD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="AV Tanjou (GECD)(JPN)" sha1="fc40acf0745a627e54b8a2514975d72459b1ea0b"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="bishjip">
+    <description>Bishoujo Jyanshi Idol Pai (GECD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="Bishoujo Jyanshi Idol Pai (GECD)(JPN)" sha1="65344719bb02fe8dfc5b1f72034a011a5414c412"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="cdbishou">
+    <description>CD Bishoujo Pachinko Kyuuma Yon Shimai [Imperfect] (GECD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="CD Bishoujo Pachinko Kyuuma Yon Shimai [Imperfect] (GECD)(JPN)" sha1="90795ac81cf0d85547a84b7c01c689e0350090a0"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="cdhanafu">
+    <description>CD Hanafuda Bishoujo Fan Club (GECD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="CD Hanafuda Bishoujo Fan Club (GECD)(JPN)" sha1="6b0c5925f89a2c5413e4cb36ae81bf8a5ee54a07"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="cdmahjon">
+    <description>CD Mahjong Bishoujo Chuushinha (GECD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="CD Mahjong Bishoujo Chuushinha (GECD)(JPN)" sha1="da6a4826296bed48834adedad28783ca848da8c8"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="cdpachis">
+    <description>CD Pachisuro Bishoujo Gambler (GECD)(JPN)</description>
+    <year>????</year>
+    <publisher>NEC</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="CD Pachisuro Bishoujo Gambler (GECD)(JPN)" sha1="355da6d27f23a2a81d2964412299310db3ed8689"/>
+      </diskarea>
+    </part>
+  </software>
+
+</softwarelist>

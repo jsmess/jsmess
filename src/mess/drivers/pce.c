@@ -301,7 +301,12 @@ static const c6280_interface c6280_config =
 {
 	"maincpu"
 };
+static MACHINE_CONFIG_FRAGMENT( pce_cdslot )
+	MCFG_CDROM_ADD( "cdrom" )	
+	MCFG_CDROM_INTERFACE("pce_cdrom")
 
+	MCFG_SOFTWARE_LIST_ADD("cd_list","pcecd")	
+MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_FRAGMENT( pce_cartslot )
 	MCFG_CARTSLOT_ADD("cart")
@@ -372,16 +377,16 @@ static MACHINE_CONFIG_START( pce_common, driver_device )
 	MCFG_SOUND_ADD( "cdda", CDDA, 0 )
 	MCFG_SOUND_ROUTE( 0, "lspeaker", 1.00 )
 	MCFG_SOUND_ROUTE( 1, "rspeaker", 1.00 )
-
-	MCFG_CDROM_ADD( "cdrom" )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( pce, pce_common )
 	MCFG_FRAGMENT_ADD( pce_cartslot )
+	MCFG_FRAGMENT_ADD( pce_cdslot )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( tg16, pce_common )
 	MCFG_FRAGMENT_ADD( tg16_cartslot )
+	MCFG_FRAGMENT_ADD( pce_cdslot )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( sgx, driver_device )
@@ -424,6 +429,7 @@ static MACHINE_CONFIG_START( sgx, driver_device )
 	MCFG_SOUND_ROUTE( 1, "rspeaker", 1.00 )
 
 	MCFG_FRAGMENT_ADD( sgx_cartslot )
+	MCFG_FRAGMENT_ADD( pce_cdslot )
 MACHINE_CONFIG_END
 
 /***************************************************************************
