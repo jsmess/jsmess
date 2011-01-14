@@ -49,8 +49,8 @@
 #include "cpu/m68000/m68000.h"
 
 #include "imagedev/cartslot.h"
-#include "../includes/genesis.h"
-#include "gen_pcb.h"
+#include "../includes/megadriv.h"
+#include "md_pcb.h"
 
 
 #define MAX_MD_CART_SIZE 0x500000
@@ -107,7 +107,7 @@ static UINT16 g_l3alt_pcmd;
 
 static int genesis_last_loaded_image_length;
 
-static UINT16 *genesis_sram, *megadriv_backupram;
+UINT16 *genesis_sram;
 static int genesis_sram_start, genesis_sram_end;
 static int genesis_sram_active, genesis_sram_readonly;
 static int sram_handlers_installed;

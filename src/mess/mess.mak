@@ -466,6 +466,8 @@ $(MESSOBJ)/mame.a: \
 	$(MAME_VIDEO)/stvvdp2.o		\
 	$(MAME_DRIVERS)/megadriv.o  \
 	$(MAME_DRIVERS)/megadrvb.o  \
+	$(MAME_MACHINE)/megadriv.o	\
+	$(MAME_MACHINE)/md_pcb.o	\
 	$(MAME_MACHINE)/dc.o		\
 	$(MAME_MACHINE)/naomibd.o	\
 	$(MAME_MACHINE)/gdcrypt.o	\
@@ -1374,9 +1376,6 @@ $(MESSOBJ)/sanyo.a:				\
 	$(MESS_DRIVERS)/phc25.o		\
 
 $(MESSOBJ)/sega.a:				\
-	$(MESS_DRIVERS)/genesis.o	\
-	$(MESS_MACHINE)/genesis.o	\
-	$(MESS_MACHINE)/gen_pcb.o	\
 	$(MESS_DRIVERS)/saturn.o	\
 	$(MESS_VIDEO)/smsvdp.o		\
 	$(MESS_MACHINE)/sms.o		\
