@@ -1535,6 +1535,8 @@ static MACHINE_RESET( pc88va )
 
 	fdc_mode = 0;
 	fdc_irq_opcode = 0x00; //0x7f ld a,a !
+
+	cpu_set_input_line_vector(machine->device("fdccpu"), 0, 0);
 }
 
 static INTERRUPT_GEN( pc88va_vrtc_irq )
@@ -1591,7 +1593,7 @@ static WRITE_LINE_DEVICE_HANDLER(pc88va_upd765_interrupt)
 	if(fdc_mode)
 		pic8259_ir3_w(device->machine->device( "pic8259_slave"), state);
 	else
-		cputag_set_input_line_and_vector(device->machine, "fdccpu", 0, HOLD_LINE, fdc_irq_opcode);
+		cputag_set_input_line(device->machine, "fdccpu", 0, HOLD_LINE);
 };
 
 static const struct upd765_interface pc88va_upd765_interface =

@@ -130,6 +130,29 @@ static VIDEO_UPDATE( pc8801 )
 	int x,y;
 	int xi,yi;
 	UINT8 *vram = screen->machine->region("maincpu")->base() + WRAM_BASE;
+	UINT8 *gvram = screen->machine->region("maincpu")->base() + GRAM_BASE;
+	UINT32 count;
+
+	count = 0;
+
+	for(y=0;y<200;y++)
+	{
+		for(x=0;x<640;x+=8)
+		{
+			for(xi=0;xi<8;xi++)
+			{
+				int pen;
+
+				pen = ((gvram[count+0x0000] >> (7-xi)) & 1) << 0;
+				pen|= ((gvram[count+0x4000] >> (7-xi)) & 1) << 1;
+				pen|= ((gvram[count+0x8000] >> (7-xi)) & 1) << 2;
+
+				*BITMAP_ADDR16(bitmap, y, x+xi) = screen->machine->pens[pen & 7];
+			}
+
+			count++;
+		}
+	}
 
 	for(y=0;y<25;y++)
 	{
@@ -141,7 +164,7 @@ static VIDEO_UPDATE( pc8801 )
 				{
 					int res_x,res_y;
 					int tile;
-					UINT8 color;
+					int color;
 					UINT8 *gfx_data = screen->machine->region("gfx1")->base();
 
 					tile = vram[x+(y*120)+0xf3c8]; //TODO: vram base, connected to DMAC address 2
@@ -149,10 +172,11 @@ static VIDEO_UPDATE( pc8801 )
 					res_x = x*8+xi;
 					res_y = y*8+yi;
 
-					color = ((gfx_data[tile*8+yi] >> (7-xi)) & 1) ? 7 : 0;
+					color = ((gfx_data[tile*8+yi] >> (7-xi)) & 1) ? 7 : -1;
 
 					if((res_x)<=screen->machine->primary_screen->visible_area().max_x && (res_y)<=screen->machine->primary_screen->visible_area().max_y)
-						*BITMAP_ADDR16(bitmap, res_y, res_x) = screen->machine->pens[color];
+						if(color != -1)
+							*BITMAP_ADDR16(bitmap, res_y, res_x) = screen->machine->pens[color];
 				}
 			}
 		}
@@ -425,6 +449,13 @@ static WRITE8_HANDLER( pc8801_misc_ctrl_w )
 		sound_irq_mask = ((data & 0x80) == 0);
 }
 
+static WRITE8_HANDLER( pc8801_palram_w )
+{
+	/* TODO: analog hook-up */
+
+	if(offset)
+		palette_set_color_rgb(space->machine, offset, pal1bit(data >> 1), pal1bit(data >> 2), pal1bit(data >> 0));
+}
 
 static ADDRESS_MAP_START( pc8801_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
@@ -455,7 +486,9 @@ static ADDRESS_MAP_START( pc8801_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x44, 0x45) AM_DEVREADWRITE("ym2203", ym2203_r,ym2203_w)
 //  AM_RANGE(0x46, 0x47) AM_NOP                                     /* OPNA extra port */
 //	AM_RANGE(0x50, 0x51) AM_READWRITE(pc88_crtc_r, pc88_crtc_w)
-//	AM_RANGE(0x52, 0x5b) AM_WRITE(pc88_palette_w)
+//	AM_RANGE(0x52, 0x52) //background palette
+//	AM_RANGE(0x53, 0x53) //video related
+	AM_RANGE(0x54, 0x5b) AM_WRITE(pc8801_palram_w)
 	AM_RANGE(0x5c, 0x5c) AM_READ(pc8801_vram_select_r)
 	AM_RANGE(0x5c, 0x5f) AM_WRITE(pc8801_vram_select_w)
 //	AM_RANGE(0x60, 0x68) AM_READWRITE(pc88_dmac_r, pc88_dmac_w)
@@ -861,6 +894,8 @@ static UPD1990A_INTERFACE( pc88_upd1990a_intf )
 /* YM2203 Interface */
 static void pc8801_sound_irq( device_t *device, int irq )
 {
+	printf("%02x\n",sound_irq_mask);
+
 	if(sound_irq_mask)
 		cputag_set_input_line_and_vector(device->machine, "maincpu", 0, HOLD_LINE, 4*2);
 }
@@ -936,6 +971,14 @@ static MACHINE_RESET( pc8801 )
 	sound_irq_mask = 0;
 
 	cpu_set_input_line_vector(machine->device("fdccpu"), 0, 0);
+
+	{
+		UINT8 *gvram = machine->region("maincpu")->base() + GRAM_BASE;
+		int i;
+
+		for(i=0;i<0x10000;i++)
+			gvram[i] = 0x00;
+	}
 }
 
 static PALETTE_INIT( pc8801 )
