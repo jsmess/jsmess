@@ -573,7 +573,7 @@ static int snes_find_addon_chip( running_machine *machine )
 			{
 				state->has_addon_chip = HAS_SA1;
 				supported_type = 0;
-				printf("This is a SA-1 type game, currently unsupported by the driver");
+				mame_printf_error("This is a SA-1 type game, currently unsupported by the driver\n");
 			}
 			break;
 
@@ -765,7 +765,7 @@ static DEVICE_IMAGE_LOAD( snes_cart )
 	else
 		memcpy(ROM, image.get_software_region("rom") + offset, state->cart_size - offset);
 
-	if (SNES_CART_DEBUG) printf("size %08X\n", state->cart_size - offset);
+	if (SNES_CART_DEBUG) mame_printf_error("size %08X\n", state->cart_size - offset);
 
 	/* First, look if the cart is HiROM or LoROM (and set snes_cart accordingly) */
 	int_header_offs = snes_find_hilo_mode(image, ROM, offset, 0);
@@ -824,7 +824,7 @@ static DEVICE_IMAGE_LOAD( snes_cart )
 			st_bios = 1;
 	}
 
-	if (SNES_CART_DEBUG) printf("mode %d\n", state->cart[0].mode);
+	if (SNES_CART_DEBUG) mame_printf_error("mode %d\n", state->cart[0].mode);
 
 	/* FIXME: Insert crc check here? */
 
@@ -832,7 +832,7 @@ static DEVICE_IMAGE_LOAD( snes_cart )
 	total_blocks = ((state->cart_size - offset) / (state->cart[0].mode & 0xa5 ? 0x8000 : 0x10000));
 	read_blocks = 0;
 
-	if (SNES_CART_DEBUG) printf("blocks %d\n", total_blocks);
+	if (SNES_CART_DEBUG) mame_printf_error("blocks %d\n", total_blocks);
 
 	/* Loading all the data blocks from cart, we only partially cover banks 0x00 to 0x7f. Therefore, we
      * have to mirror the blocks until we reach the end. E.g. for a 11Mbits image (44 blocks), we proceed
@@ -978,8 +978,8 @@ static DEVICE_IMAGE_LOAD( snes_cart )
 		case SNES_MODE_ST:
 			if (!st_bios)
 			{
-				printf("This is a Sufami Turbo data cart and cannot be loaded for snes/snespal in MESS.\n");
-				printf("Please use snesst driver to load it, instead.\n");
+				mame_printf_error("This is a Sufami Turbo data cart and cannot be loaded for snes/snespal in MESS.\n");
+				mame_printf_error("Please use snesst driver to load it, instead.\n");
 				return IMAGE_INIT_FAIL;
 			}
 			else
@@ -1007,13 +1007,13 @@ static DEVICE_IMAGE_LOAD( snes_cart )
 		case SNES_MODE_BSLO:
 		case SNES_MODE_BSHI:
 			/* not handled yet */
-			printf("This is a BS-X Satellaview image: MESS does not support these yet, sorry.\n");
+			mame_printf_error("This is a BS-X Satellaview image: MESS does not support these yet, sorry.\n");
 #if 0
 			// shall we force incompatibility of flash carts without a base unit?
 			if (!has_bsx_slot)
 			{
-				printf("This is a BS-X flash cart and cannot be loaded in snes/snespal.\n");
-//              printf("Please use snesbsx driver to load it, instead.\n");
+				mame_printf_error("This is a BS-X flash cart and cannot be loaded in snes/snespal.\n");
+//              mame_printf_error("Please use snesbsx driver to load it, instead.\n");
 				return IMAGE_INIT_FAIL;
 			}
 #endif
@@ -1144,7 +1144,7 @@ static DEVICE_IMAGE_LOAD( sufami_cart )
 	else
 		memcpy(ROM, image.get_software_region("rom") + offset, state->cart_size - offset);
 
-	if (SNES_CART_DEBUG) printf("size %08X\n", state->cart_size - offset);
+	if (SNES_CART_DEBUG) mame_printf_error("size %08X\n", state->cart_size - offset);
 
 	/* Detect Sufami Turbo carts */
 	if (!memcmp(ROM, "BANDAI SFC-ADX", 14))
@@ -1155,15 +1155,15 @@ static DEVICE_IMAGE_LOAD( sufami_cart )
 	}
 	else
 	{
-		printf("This is not a Sufami Turbo data pack.\n");
-		printf("This image cannot be loaded in snesst (Use snes or snespal drivers, instead).\n");
+		mame_printf_error("This is not a Sufami Turbo data pack.\n");
+		mame_printf_error("This image cannot be loaded in snesst (Use snes or snespal drivers, instead).\n");
 		return IMAGE_INIT_FAIL;
 	}
 
 	if (st_bios == 1)
 	{
-		printf("This is the Sufami Turbo BIOS and not a Sufami Turbo data pack.\n");
-		printf("This image cannot be loaded in snesst.\n");
+		mame_printf_error("This is the Sufami Turbo BIOS and not a Sufami Turbo data pack.\n");
+		mame_printf_error("This image cannot be loaded in snesst.\n");
 		return IMAGE_INIT_FAIL;
 	}
 
@@ -1174,7 +1174,7 @@ static DEVICE_IMAGE_LOAD( sufami_cart )
 	read_blocks = 0;
 
 	if (SNES_CART_DEBUG)
-		printf("blocks %d\n", total_blocks);
+		mame_printf_error("blocks %d\n", total_blocks);
 
 	// actually load the cart
 	while (read_blocks < 32 && read_blocks < total_blocks)
@@ -1235,7 +1235,7 @@ static DEVICE_IMAGE_LOAD( bsx_cart )
 	else
 		memcpy(ROM, image.get_software_region("rom") + offset, state->cart_size - offset);
 
-	if (SNES_CART_DEBUG) printf("size %08X\n", state->cart_size - offset);
+	if (SNES_CART_DEBUG) mame_printf_error("size %08X\n", state->cart_size - offset);
 
 	/* First, look if the cart is HiROM or LoROM (and set snes_cart accordingly) */
 	int_header_offs = snes_find_hilo_mode(image, ROM, offset, 0);
@@ -1271,8 +1271,8 @@ static DEVICE_IMAGE_LOAD( bsx_cart )
 	}
 	else
 	{
-		printf("This is not a BS-X compatible cart.\n");
-		printf("This image cannot be loaded in the first cartslot of snesbsx.\n");
+		mame_printf_error("This is not a BS-X compatible cart.\n");
+		mame_printf_error("This image cannot be loaded in the first cartslot of snesbsx.\n");
 		return IMAGE_INIT_FAIL;
 	}
 
@@ -1283,7 +1283,7 @@ static DEVICE_IMAGE_LOAD( bsx_cart )
 	total_blocks = (state->cart_size - offset) / 0x8000;
 	read_blocks = 0;
 
-	if (SNES_CART_DEBUG) printf("blocks %d\n", total_blocks);
+	if (SNES_CART_DEBUG) mame_printf_error("blocks %d\n", total_blocks);
 
 	// actually load the cart
 	while (read_blocks < 64 && read_blocks < total_blocks)
@@ -1335,7 +1335,7 @@ static DEVICE_IMAGE_LOAD( bsx2slot_cart )
 	else
 		memcpy(ROM, image.get_software_region("rom") + offset, state->cart_size - offset);
 
-	if (SNES_CART_DEBUG) printf("size %08X\n", state->cart_size - offset);
+	if (SNES_CART_DEBUG) mame_printf_error("size %08X\n", state->cart_size - offset);
 
 	/* First, look if the cart is HiROM or LoROM (and set snes_cart accordingly) */
 	int_header_offs = snes_find_hilo_mode(image, ROM, offset, 1);
@@ -1357,8 +1357,8 @@ static DEVICE_IMAGE_LOAD( bsx2slot_cart )
 
 	if (state->cart[1].mode != SNES_MODE_BSX)
 	{
-		printf("This is not a BS-X flash cart.\n");
-		printf("This image cannot be loaded in the second cartslot of snesbsx.\n");
+		mame_printf_error("This is not a BS-X flash cart.\n");
+		mame_printf_error("This image cannot be loaded in the second cartslot of snesbsx.\n");
 		return IMAGE_INIT_FAIL;
 	}
 
