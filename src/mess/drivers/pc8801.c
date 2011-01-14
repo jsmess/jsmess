@@ -10,6 +10,7 @@
 	- macros for the various rom / ram areas, it might require various attempts in order to finally get a reasonable arrangement ...
 	- dipswitches are WRONG
 	- currently it's too slow ... why?
+	- implement proper i8214 routing, also add irq latch mechanism.
 	- below notes states that plain PC-8801 doesn't have a disk CPU, but the BIOS clearly checks the floppy ports. Wrong info?
 
 	Notes:
@@ -103,15 +104,15 @@
 #include "machine/i8255a.h"
 #include "machine/upd1990a.h"
 #include "machine/upd765.h"
+#include "machine/i8214.h"
 #include "sound/2203intf.h"
 #include "sound/beep.h"
 
 static UINT32 bankr[5],bankw[5];
-static UINT8 bank_wp[5];
 static UINT8 i8255_0_pc,i8255_1_pc;
 static UINT8 fdc_irq_opcode;
-static UINT8 ext_rom_bank,gfx_ctrl,vram_sel;
-static UINT8 vrtc_irq_mask;
+static UINT8 ext_rom_bank,gfx_ctrl,vram_sel,misc_ctrl;
+static UINT8 vrtc_irq_mask,sound_irq_mask;
 static UINT8 window_offset_bank;
 
 #define NBASIC_BASE 0x20000
@@ -171,9 +172,6 @@ static WRITE8_HANDLER( pc8801_mem_0_w )
 {
 	UINT8 *ram = space->machine->region("maincpu")->base();
 
-	if(bank_wp[0])
-		return;
-
 	ram[offset + bankw[0]] = data;
 }
 
@@ -187,9 +185,6 @@ static READ8_HANDLER( pc8801_mem_1_r )
 static WRITE8_HANDLER( pc8801_mem_1_w )
 {
 	UINT8 *ram = space->machine->region("maincpu")->base();
-
-	if(bank_wp[1])
-		return;
 
 	ram[offset + bankw[1]] = data;
 }
@@ -207,9 +202,6 @@ static WRITE8_HANDLER( pc8801_mem_2_w )
 {
 	UINT8 *ram = space->machine->region("maincpu")->base();
 
-	if(bank_wp[2])
-		return;
-
 	offset &= 0x3ff;
 
 	ram[offset + bankw[2]] = data;
@@ -226,9 +218,6 @@ static WRITE8_HANDLER( pc8801_mem_3_w )
 {
 	UINT8 *ram = space->machine->region("maincpu")->base();
 
-	if(bank_wp[3])
-		return;
-
 	ram[offset + bankw[3]] = data;
 }
 
@@ -242,9 +231,6 @@ static READ8_HANDLER( pc8801_mem_4_r )
 static WRITE8_HANDLER( pc8801_mem_4_w )
 {
 	UINT8 *ram = space->machine->region("maincpu")->base();
-
-	if(bank_wp[4])
-		return;
 
 	ram[offset + bankw[4]] = data;
 }
@@ -266,9 +252,7 @@ static UINT32 pc8801_bankswitch_1_r(running_machine *machine)
 		return WRAM_BASE + 0x6000;
 
 	if(gfx_ctrl & 0x4) //n basic select
-	{
 		return NBASIC_BASE + 0x6000;
-	}
 
 	if(ext_rom_bank & 1) // NOT ext ROM bank
 		return N88BASIC_BASE + 0x6000;
@@ -326,7 +310,7 @@ static UINT32 pc8801_bankswitch_4_w(running_machine *machine)
 	if(vram_sel == 3)
 		return WRAM_BASE + 0xf000;
 
-	return GRAM_BASE + 0x3000 + 0x4000 * vram_sel;
+	return GRAM_BASE + 0x3000 + (0x4000 * vram_sel);
 }
 
 
@@ -389,6 +373,11 @@ static WRITE8_HANDLER( pc8801_gfx_ctrl_w )
 	bankw[1] = pc8801_bankswitch_1_w(space->machine);
 }
 
+static READ8_HANDLER( pc8801_vram_select_r )
+{
+	return (0xf8) | (vram_sel << 1);
+}
+
 static WRITE8_HANDLER( pc8801_vram_select_w )
 {
 	vram_sel = offset & 3;
@@ -418,9 +407,24 @@ static WRITE8_HANDLER( pc8801_window_bank_w )
 static WRITE8_HANDLER( pc8801_window_bank_inc_w )
 {
 	window_offset_bank++;
+	window_offset_bank&=0xff;
 	bankr[2] = pc8801_bankswitch_2_r(space->machine);
 	bankw[2] = pc8801_bankswitch_2_w(space->machine);
 }
+
+static READ8_HANDLER( pc8801_misc_ctrl_r )
+{
+	return misc_ctrl;
+}
+
+static WRITE8_HANDLER( pc8801_misc_ctrl_w )
+{
+	misc_ctrl = data;
+
+	if(!(data & 0x80))
+		sound_irq_mask = ((data & 0x80) == 0);
+}
+
 
 static ADDRESS_MAP_START( pc8801_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
@@ -445,14 +449,14 @@ static ADDRESS_MAP_START( pc8801_io, ADDRESS_SPACE_IO, 8 )
 //  AM_RANGE(0x20, 0x21) AM_NOP                                     /* RS-232C and cassette */
 	AM_RANGE(0x30, 0x30) AM_READ_PORT("DSW1") //AM_WRITE(pc88sr_outport_30)
 	AM_RANGE(0x31, 0x31) AM_READ_PORT("DSW2") AM_WRITE(pc8801_gfx_ctrl_w)
-//	AM_RANGE(0x32, 0x32) AM_READWRITE(pc88sr_inport_32, pc88sr_outport_32)
+	AM_RANGE(0x32, 0x32) AM_READWRITE(pc8801_misc_ctrl_r, pc8801_misc_ctrl_w)
 //	AM_RANGE(0x34, 0x35) AM_WRITE(pc88sr_alu)
 	AM_RANGE(0x40, 0x40) AM_READ(pc8801_ctrl_r) //, pc88sr_outport_40)
 	AM_RANGE(0x44, 0x45) AM_DEVREADWRITE("ym2203", ym2203_r,ym2203_w)
 //  AM_RANGE(0x46, 0x47) AM_NOP                                     /* OPNA extra port */
 //	AM_RANGE(0x50, 0x51) AM_READWRITE(pc88_crtc_r, pc88_crtc_w)
 //	AM_RANGE(0x52, 0x5b) AM_WRITE(pc88_palette_w)
-//	AM_RANGE(0x5c, 0x5c) AM_READ(pc88_vramtest_r)
+	AM_RANGE(0x5c, 0x5c) AM_READ(pc8801_vram_select_r)
 	AM_RANGE(0x5c, 0x5f) AM_WRITE(pc8801_vram_select_w)
 //	AM_RANGE(0x60, 0x68) AM_READWRITE(pc88_dmac_r, pc88_dmac_w)
 //  AM_RANGE(0x6e, 0x6e) AM_NOP                                     /* CPU clock info */
@@ -470,7 +474,7 @@ static ADDRESS_MAP_START( pc8801_io, ADDRESS_SPACE_IO, 8 )
 //  AM_RANGE(0xd8, 0xd8) AM_NOP                                     /* GP-IB */
 //  AM_RANGE(0xdc, 0xdf) AM_NOP                                     /* MODEM */
 //	AM_RANGE(0xe2, 0xe3) AM_READWRITE(pc88_extmem_r, pc88_extmem_w) /* expand RAM select */
-//	AM_RANGE(0xe4, 0xe4) AM_WRITE(pc8801_write_interrupt_level)
+	AM_RANGE(0xe4, 0xe4) AM_WRITENOP //AM_WRITE(pc8801_write_interrupt_level)
 	AM_RANGE(0xe6, 0xe6) AM_WRITE(pc8801_irq_mask_w)
 //  AM_RANGE(0xe7, 0xe7) AM_NOP                                     /* (unknown) */
 //	AM_RANGE(0xe8, 0xeb) AM_READWRITE(pc88_kanji_r, pc88_kanji_w)
@@ -484,11 +488,15 @@ ADDRESS_MAP_END
 
 static READ8_DEVICE_HANDLER( cpu_8255_c_r )
 {
+	timer_call_after_resynch(device->machine, NULL, 0, 0); // force resync
+
 	return i8255_1_pc >> 4;
 }
 
 static WRITE8_DEVICE_HANDLER( cpu_8255_c_w )
 {
+	timer_call_after_resynch(device->machine, NULL, 0, 0); // force resync
+
 	i8255_0_pc = data;
 }
 
@@ -504,11 +512,15 @@ static I8255A_INTERFACE( master_fdd_intf )
 
 static READ8_DEVICE_HANDLER( fdc_8255_c_r )
 {
+	timer_call_after_resynch(device->machine, NULL, 0, 0); // force resync
+
 	return i8255_0_pc >> 4;
 }
 
 static WRITE8_DEVICE_HANDLER( fdc_8255_c_w )
 {
+	timer_call_after_resynch(device->machine, NULL, 0, 0); // force resync
+
 	i8255_1_pc = data;
 }
 
@@ -847,6 +859,12 @@ static UPD1990A_INTERFACE( pc88_upd1990a_intf )
 };
 
 /* YM2203 Interface */
+static void pc8801_sound_irq( device_t *device, int irq )
+{
+	if(sound_irq_mask)
+		cputag_set_input_line_and_vector(device->machine, "maincpu", 0, HOLD_LINE, 4*2);
+}
+
 
 static READ8_DEVICE_HANDLER( opn_dummy_input ) { return 0xff; }
 
@@ -860,7 +878,7 @@ static const ym2203_interface pc88_ym2203_intf =
 		DEVCB_NULL,
 		DEVCB_NULL
 	},
-	NULL//pc88sr_sound_interupt
+	pc8801_sound_irq
 };
 
 /* Floppy Configuration */
@@ -897,6 +915,7 @@ static MACHINE_RESET( pc8801 )
 	ext_rom_bank = 0xff;
 	gfx_ctrl = 0x31;
 	window_offset_bank = 0x00;
+	misc_ctrl = 0x90;
 	bankr[0] = pc8801_bankswitch_0_r(machine);
 	bankr[1] = pc8801_bankswitch_1_r(machine);
 	bankw[0] = pc8801_bankswitch_0_w(machine);
@@ -911,13 +930,12 @@ static MACHINE_RESET( pc8801 )
 	bankw[3] = pc8801_bankswitch_3_w(machine);
 	bankw[4] = pc8801_bankswitch_4_w(machine);
 
-	bank_wp[0] = 0;
-	bank_wp[1] = 0;
-	bank_wp[2] = 0;
-	bank_wp[3] = 0;
-	bank_wp[4] = 0;
-
 	fdc_irq_opcode = 0; //TODO: copied from PC-88VA, could be wrong here ... should be 0x7f ld a,a in the latter case
+
+	vrtc_irq_mask = 0;
+	sound_irq_mask = 0;
+
+	cpu_set_input_line_vector(machine->device("fdccpu"), 0, 0);
 }
 
 static PALETTE_INIT( pc8801 )
@@ -928,14 +946,9 @@ static PALETTE_INIT( pc8801 )
 		palette_set_color_rgb(machine, i, pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
 }
 
-static WRITE_LINE_DEVICE_HANDLER(pc8801_upd765_interrupt)
-{
-	cputag_set_input_line_and_vector(device->machine, "fdccpu", 0, HOLD_LINE, fdc_irq_opcode);
-};
-
 static const struct upd765_interface pc8801_upd765_interface =
 {
-	DEVCB_LINE(pc8801_upd765_interrupt),
+	DEVCB_CPU_INPUT_LINE("fdccpu", INPUT_LINE_IRQ0),
 	DEVCB_NULL, //DRQ, TODO
 	NULL,
 	UPD765_RDY_PIN_CONNECTED,
