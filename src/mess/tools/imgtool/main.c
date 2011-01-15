@@ -908,11 +908,7 @@ static const struct command cmds[] =
 	{ "listdriveroptions",	cmd_listdriveroptions, "<format>", 1, 1, 0 }
 };
 
-#ifdef WIN32
-int CLIB_DECL utf8_main(int argc, char *argv[])
-#else
 int CLIB_DECL main(int argc, char *argv[])
-#endif
 {
 	int i;
 	int result;
