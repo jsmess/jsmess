@@ -282,7 +282,8 @@ OSDOBJS = \
 	$(SDLOBJ)/video.o \
 	$(SDLOBJ)/drawsdl.o \
 	$(SDLOBJ)/window.o \
-	$(SDLOBJ)/output.o
+	$(SDLOBJ)/output.o \
+	$(SDLOBJ)/watchdog.o
 
 # Add SDL1.3 support
 ifdef SDL_INSTALL_ROOT
@@ -347,7 +348,8 @@ endif
 endif
 
 ifndef SDL_INSTALL_ROOT
-INCPATH += `sdl-config --cflags  | sed 's:/SDL::'`
+INCPATH += `sdl-config --cflags  | sed -e 's:/SDL::' -e 's:\(-D[^ ]*\)::g'`
+CCOMFLAGS += `sdl-config --cflags  | sed -e 's:/SDL::' -e 's:\(-I[^ ]*\)::g'`
 LIBS += -lm `sdl-config --libs`
 
 else
@@ -565,19 +567,5 @@ EXCLUDES = -x "*/.svn/*"
 
 zip:
 	zip -rq ../mame_$(BUILD_VERSION).zip $(DISTFILES) $(EXCLUDES)
-
-DEPENDFILE = .depend_$(EMULATOR)
-
-makedepend:
-	@echo Generating $(DEPENDFILE)
-	rm -f $(DEPENDFILE)
-	@for i in `find src -name "*.c"` ; do \
-		echo processing $$i; \
-		mt=`echo $$i | sed -e "s/\\.c/\\.o/" -e "s!^src/!$(OBJ)/!"` ; \
-		g++ -MM -MT $$mt $(CDEFS) $(CCOMFLAGS) $$i 2>/dev/null \
-		| sed -e "s!$$i!!g" >> $(DEPENDFILE) ; \
-	done
-
--include $(DEPENDFILE)
 
 endif

@@ -53,6 +53,8 @@
 #include <X11/Xutil.h>
 #endif
 
+#include "watchdog.h"
+
 //============================================================
 //  OPTIONS
 //============================================================
@@ -85,12 +87,14 @@ static const options_entry mame_sdl_options[] =
 	// debugging options
 	{ NULL,                                   NULL,       OPTION_HEADER,     "DEBUGGING OPTIONS" },
 	{ SDLOPTION_OSLOG,                        "0",        OPTION_BOOLEAN,    "output error.log data to the system debugger" },
+	{ SDLOPTION_WATCHDOG ";wdog",             "0",        0,                 "force the program to terminate if no updates within specified number of seconds" },
 
 	// performance options
 	{ NULL,                                   NULL,       OPTION_HEADER,     "PERFORMANCE OPTIONS" },
 	{ SDLOPTION_MULTITHREADING ";mt",         "0",        OPTION_BOOLEAN,    "enable multithreading; this enables rendering and blitting on a separate thread" },
 	{ SDLOPTION_NUMPROCESSORS ";np",         "auto",      0,				 "number of processors; this overrides the number the system reports" },
 	{ SDLOPTION_SDLVIDEOFPS,                  "0",        OPTION_BOOLEAN,    "show sdl video performance" },
+	{ SDLOPTION_BENCH,                        "0",        0,                 "benchmark for the given number of emulated seconds; implies -video none -nosound -nothrottle" },
 	// video options
 	{ NULL,                                   NULL,       OPTION_HEADER,     "VIDEO OPTIONS" },
 // OS X can be trusted to have working hardware OpenGL, so default to it on for the best user experience
@@ -369,6 +373,7 @@ static void output_oslog(running_machine &machine, const char *buffer)
 
 sdl_osd_interface::sdl_osd_interface()
 {
+	m_watchdog = NULL;
 }
 
 
@@ -520,6 +525,16 @@ void sdl_osd_interface::init(running_machine &machine)
 
 	const char *stemp;
 
+	// determine if we are benchmarking, and adjust options appropriately
+	int bench = options_get_int(machine.options(), SDLOPTION_BENCH);
+	if (bench > 0)
+	{
+		options_set_bool(machine.options(), OPTION_THROTTLE, false, OPTION_PRIORITY_MAXIMUM);
+		options_set_bool(machine.options(), OPTION_SOUND, false, OPTION_PRIORITY_MAXIMUM);
+		options_set_string(machine.options(), SDLOPTION_VIDEO, "none", OPTION_PRIORITY_MAXIMUM);
+		options_set_int(machine.options(), OPTION_SECONDS_TO_RUN, bench, OPTION_PRIORITY_MAXIMUM);
+	}
+
 	// Some driver options - must be before audio init!
 	stemp = options_get_string(machine.options(), SDLOPTION_AUDIODRIVER);
 	if (stemp != NULL && strcmp(stemp, SDLOPTVAL_AUTO) != 0)
@@ -616,6 +631,18 @@ void sdl_osd_interface::init(running_machine &machine)
 
 	if (options_get_bool(machine.options(), SDLOPTION_OSLOG))
 		machine.add_logerror_callback(output_oslog);
+
+	/* now setup watchdog */
+
+	int watchdog_timeout = options_get_int(machine.options(), SDLOPTION_WATCHDOG);
+	int str = options_get_int(machine.options(), OPTION_SECONDS_TO_RUN);
+
+	/* only enable watchdog if seconds_to_run is enabled *and* relatively short (time taken from ui.c) */
+	if ((watchdog_timeout != 0) && (str > 0) && (str < 60*5 ))
+	{
+		m_watchdog = auto_alloc(&machine, watchdog);
+		m_watchdog->setTimeout(watchdog_timeout);
+	}
 
 #if (SDL_VERSION_ATLEAST(1,3,0))
 	SDL_EventState(SDL_TEXTINPUT, SDL_TRUE);

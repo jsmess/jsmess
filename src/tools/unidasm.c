@@ -97,6 +97,7 @@ CPU_DISASSEMBLE( ccpu );
 CPU_DISASSEMBLE( cop410 );
 CPU_DISASSEMBLE( cop420 );
 CPU_DISASSEMBLE( cop444 );
+CPU_DISASSEMBLE( cosmac );
 CPU_DISASSEMBLE( cp1610 );
 CPU_DISASSEMBLE( cquestsnd );
 CPU_DISASSEMBLE( cquestrot );
@@ -104,6 +105,7 @@ CPU_DISASSEMBLE( cquestlin );
 CPU_DISASSEMBLE( dsp32c );
 CPU_DISASSEMBLE( dsp56k );
 CPU_DISASSEMBLE( hyperstone_generic );
+CPU_DISASSEMBLE( hd61700 );
 CPU_DISASSEMBLE( esrip );
 CPU_DISASSEMBLE( f8 );
 CPU_DISASSEMBLE( g65816_generic );
@@ -220,6 +222,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "cop410",		_8bit,  0, CPU_DISASSEMBLE_NAME(cop410) },
 	{ "cop420",		_8bit,  0, CPU_DISASSEMBLE_NAME(cop420) },
 	{ "cop444",		_8bit,  0, CPU_DISASSEMBLE_NAME(cop444) },
+	{ "cosmac",		_8bit,  0, CPU_DISASSEMBLE_NAME(cosmac) },
 	{ "cp1610",		_16be, -1, CPU_DISASSEMBLE_NAME(cp1610) },
 	{ "cquestsnd",	_64be, -3, CPU_DISASSEMBLE_NAME(cquestsnd) },
 	{ "cquestrot",	_64be, -3, CPU_DISASSEMBLE_NAME(cquestrot) },
@@ -227,6 +230,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "dsp32c",		_32le,  0, CPU_DISASSEMBLE_NAME(dsp32c) },
 	{ "dsp56k",		_16le, -1, CPU_DISASSEMBLE_NAME(dsp56k) },
 	{ "hyperstone",	_16be,  0, CPU_DISASSEMBLE_NAME(hyperstone_generic) },
+	{ "hd61700",	_8bit,  0, CPU_DISASSEMBLE_NAME(hd61700) },
 	{ "esrip",		_64be,  0, CPU_DISASSEMBLE_NAME(esrip) },
 	{ "f8",			_8bit,  0, CPU_DISASSEMBLE_NAME(f8) },
 	{ "g65816",		_8bit,  0, CPU_DISASSEMBLE_NAME(g65816_generic) },

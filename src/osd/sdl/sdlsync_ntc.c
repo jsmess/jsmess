@@ -17,6 +17,7 @@
 
 #ifdef SDLMAME_MACOSX
 #include <mach/mach.h>
+#include <signal.h>
 #endif
 
 // standard C headers
@@ -511,4 +512,13 @@ void osd_thread_wait_free(osd_thread *thread)
 {
 	pthread_join(thread->thread, NULL);
 	free(thread);
+}
+
+//============================================================
+//  osd_process_kill
+//============================================================
+
+void osd_process_kill(void)
+{
+	kill(getpid(), SIGKILL);
 }
