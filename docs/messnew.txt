@@ -1,4 +1,4 @@
-0.141.1
+﻿0.141.1
 
 New System Drivers Supported:
 -----------------------------
@@ -19,6 +19,8 @@ Skeleton drivers:
 
 System Driver Changes:
 ----------------------
+- [ADAM] Added dumps of the internal M6801 ROMs. [KevinP]
+
 - [PIPPIN] Added pre release rom
 
 - [PV1000] 4 new cartridge dumps for the software list.  [anondumper]

@@ -707,8 +707,20 @@ ROM_START (adam)
 
 	ROM_CART_LOAD("cart", 0x28000, 0x8000, ROM_NOMIRROR | ROM_OPTIONAL)
 
-	//ROM_REGION( 0x10000, "cpu1", 0)
-	//ROM_LOAD ("master68.rom", 0x0100, 0x0E4, CRC(619a47b8)) /* Replacement 6801 Master ROM */
+	ROM_REGION( 0x800, "cpu1", 0 )
+	ROM_LOAD( "master.bin", 0x000, 0x800, CRC(035a7a3d) SHA1(0426e6eaf18c2be9fe08066570c214ab5951ee14) )
+
+	ROM_REGION( 0x800, "cpu2", 0 )
+	ROM_LOAD( "keyboard.bin", 0x000, 0x800, CRC(ef204746) SHA1(83162ffc75847328a05429135b728a63efb05b93) )
+
+	ROM_REGION( 0x800, "cpu3", 0 )
+	ROM_LOAD( "ddp.bin", 0x000, 0x800, CRC(6b9ea1cf) SHA1(b970f11e8f443fa130fba02ad1f60da51bf89673) )
+
+	ROM_REGION( 0x800, "cpu4", 0 )
+	ROM_LOAD( "spi.bin", 0x000, 0x800, CRC(4ba30352) SHA1(99fe5aebd505a208bea6beec5d7322b15426e9c1) )
+
+	ROM_REGION( 0x800, "cpu5", 0 )
+	ROM_LOAD( "printer.bin", 0x000, 0x800, CRC(e8db783b) SHA1(32b40679749ad0317c2c9ee9ca619fad6d850ce7) )
 ROM_END
 
 
