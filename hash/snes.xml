@@ -7650,7 +7650,7 @@ The software list will be divided in four categories:
 		<publisher>ASCII Entertainment</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="3145728">
-				<rom name="derby stallion iii (japan) (rev 1).sfc" size="3145728" crc="7e97ae6a " sha1="b279db5d9631069ab72b2dabf48824f9462568c8" offset="000000" />
+				<rom name="derby stallion iii (japan) (rev 1).sfc" size="3145728" crc="7e97ae6a" sha1="b279db5d9631069ab72b2dabf48824f9462568c8" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -26980,7 +26980,7 @@ The software list will be divided in four categories:
 		<publisher>Koei</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="3145728">
-				<rom name="sangokushi iv (japan) (rev 1).sfc" size="3145728" crc="57674647 " sha1="f1fdd94d71fbacc794a8a7ad82c217926fc94c6f" offset="000000" />
+				<rom name="sangokushi iv (japan) (rev 1).sfc" size="3145728" crc="57674647" sha1="f1fdd94d71fbacc794a8a7ad82c217926fc94c6f" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -35522,7 +35522,7 @@ The software list will be divided in four categories:
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="Taiwan 16 Mahjong II - Horoscope Girls Edition (Unl).sfc" size="524288" crc="561bbd96" sha1="7d22466ebf2d3a33e4567d6f23756a286ddcf9c7" offset="000000" />
+				<rom name="taiwan 16 mahjong ii - horoscope girls edition (unl).sfc" size="524288" crc="561bbd96" sha1="7d22466ebf2d3a33e4567d6f23756a286ddcf9c7" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -41265,7 +41265,7 @@ The software list will be divided in four categories:
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="2162688">
-				<rom name="Super Big 2 (China) (Unlicensed).sfc" size="2162688" crc="f33c710d" sha1="a789c63ca0f4723c2224e890f7d367f23cebc0ff" offset="000000" />
+				<rom name="super big 2 (china) (unlicensed).sfc" size="2162688" crc="f33c710d" sha1="a789c63ca0f4723c2224e890f7d367f23cebc0ff" offset="000000" />
 			</dataarea>
 		</part>
 	</software>

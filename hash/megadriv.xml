@@ -578,7 +578,7 @@ Known undumped pirates
 		<part name="cart" interface="megadriv_cart">
 		  <!-- PCB serial isn't present -->
 			<dataarea name="rom" size="1048576">
-				<rom name="LROG452-MML.bin" size="1048576" crc="5d162d21" sha1="2f7ef2f956d62373dcd5f3808e7501e3660c0658" offset="000000" loadflag="load16_word_swap" />
+				<rom name="lrog452-mml.bin" size="1048576" crc="5d162d21" sha1="2f7ef2f956d62373dcd5f3808e7501e3660c0658" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -840,7 +840,7 @@ Known undumped pirates
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="16 zhang ma jiang (Chi) (unl).bin" size="1048576" crc="36407c82" sha1="7857c797245b52641a3d1d4512089bccb0ed5359" offset="000000" loadflag="load16_word_swap" />
+				<rom name="16 zhang ma jiang (chi) (unl).bin" size="1048576" crc="36407c82" sha1="7857c797245b52641a3d1d4512089bccb0ed5359" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -1192,7 +1192,7 @@ Known undumped pirates
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="adventurous boy - mao xian xiao zi (Chi) (unl).bin" size="524288" crc="d4403913" sha1="f6e5bba7254f7f73a007f234f1001ddcb0b62484" offset="000000" loadflag="load16_word_swap" />
+				<rom name="adventurous boy - mao xian xiao zi (chi) (unl).bin" size="524288" crc="d4403913" sha1="f6e5bba7254f7f73a007f234f1001ddcb0b62484" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -1665,7 +1665,7 @@ Known undumped pirates
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="aq renkan awa (Chi) (unl).bin" size="1048576" crc="2c6cbd77" sha1="fcd1c7fcfb9027ae7baad9c67847ef5f1090991a" offset="000000" loadflag="load16_word_swap" />
+				<rom name="aq renkan awa (chi) (unl).bin" size="1048576" crc="2c6cbd77" sha1="fcd1c7fcfb9027ae7baad9c67847ef5f1090991a" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -2315,7 +2315,7 @@ Known undumped pirates
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="2097152">
-				<rom name="barver battle saga - tai kong zhan shi (Chi) (unl).bin" size="2097152" crc="d37a37c6" sha1="6d49a0db7687ccad3441f47fbc483c87cd6eab53" offset="000000" loadflag="load16_word_swap" />
+				<rom name="barver battle saga - tai kong zhan shi (chi) (unl).bin" size="2097152" crc="d37a37c6" sha1="6d49a0db7687ccad3441f47fbc483c87cd6eab53" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -3813,7 +3813,7 @@ Known undumped pirates
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="chao ji da fu weng (Chi) (unl).bin" size="1048576" crc="2e2ea687" sha1="be1a66bd1f75f5b1b37b8ae18e6334c36291e63d" offset="000000" loadflag="load16_word_swap" />
+				<rom name="chao ji da fu weng (chi) (unl).bin" size="1048576" crc="2e2ea687" sha1="be1a66bd1f75f5b1b37b8ae18e6334c36291e63d" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -4651,7 +4651,7 @@ Known undumped pirates
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="2097152">
-				<rom name="comix zone (Kor) (prototype - jun 09, 1995).bin" size="2097152" crc="e45a15f4" sha1="2427e7e3932da731eb172ae22ad779c0abfced13" offset="000000" loadflag="load16_word_swap" />
+				<rom name="comix zone (kor) (prototype - jun 09, 1995).bin" size="2097152" crc="e45a15f4" sha1="2427e7e3932da731eb172ae22ad779c0abfced13" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -6501,7 +6501,7 @@ Known undumped pirates
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="elf wor (Chi) (unl).bin" size="1048576" crc="e24ac6b2" sha1="5fc4591fbb1acc64e184466c7b6287c7f64e0b7a" offset="000000" loadflag="load16_word_swap" />
+				<rom name="elf wor (chi) (unl).bin" size="1048576" crc="e24ac6b2" sha1="5fc4591fbb1acc64e184466c7b6287c7f64e0b7a" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -7304,7 +7304,7 @@ Known undumped pirates
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="feng kuang tao hua yuan (Chi) (unl).bin" size="1048576" crc="8d40d64f" sha1="0330611a5fcb1f3ca173fcb3387fd35b865f1131" offset="000000" loadflag="load16_word_swap" />
+				<rom name="feng kuang tao hua yuan (chi) (unl).bin" size="1048576" crc="8d40d64f" sha1="0330611a5fcb1f3ca173fcb3387fd35b865f1131" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -7315,7 +7315,7 @@ Known undumped pirates
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="2097152">
-				<rom name="feng shen ying jie chuan (Chi) (unl).bin" size="2097152" crc="6a382b60" sha1="7a6e06846a94df2df2417d6509e398c29354dc68" offset="000000" loadflag="load16_word_swap" />
+				<rom name="feng shen ying jie chuan (chi) (unl).bin" size="2097152" crc="6a382b60" sha1="7a6e06846a94df2df2417d6509e398c29354dc68" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -8626,7 +8626,7 @@ Known undumped pirates
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="hei tao 2 - super big 2 (Chi) (unl).bin" size="1048576" crc="31449113" sha1="e1e4c439c5c22fa5cfcecaab421c55bf1746b5de" offset="000000" loadflag="load16_word_swap" />
+				<rom name="hei tao 2 - super big 2 (chi) (unl).bin" size="1048576" crc="31449113" sha1="e1e4c439c5c22fa5cfcecaab421c55bf1746b5de" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -8759,7 +8759,7 @@ Known undumped pirates
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="2097152">
-				<rom name="hua mu lan - mulan (Chi) (unl).bin" size="2097152" crc="796882b8" sha1="d8936c1023db646e1e20f9208b68271afbd6dbf4" offset="000000" loadflag="load16_word_swap" />
+				<rom name="hua mu lan - mulan (chi) (unl).bin" size="2097152" crc="796882b8" sha1="d8936c1023db646e1e20f9208b68271afbd6dbf4" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -8770,7 +8770,7 @@ Known undumped pirates
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="huan le tao qi shu - smart mouse (Chi) (unl).bin" size="524288" crc="decdf740" sha1="df7a2527875317406b466175f0614d343dd32117" offset="000000" loadflag="load16_word_swap" />
+				<rom name="huan le tao qi shu - smart mouse (chi) (unl).bin" size="524288" crc="decdf740" sha1="df7a2527875317406b466175f0614d343dd32117" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -9387,7 +9387,7 @@ Known undumped pirates
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="jiu ji ma jiang ii - ye yan bian (Chi) (unl).bin" size="1048576" crc="e9829b22" sha1="c112602c58f9867377bb6a1204d1d7e49a50aa10" offset="000000" loadflag="load16_word_swap" />
+				<rom name="jiu ji ma jiang ii - ye yan bian (chi) (unl).bin" size="1048576" crc="e9829b22" sha1="c112602c58f9867377bb6a1204d1d7e49a50aa10" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -10457,7 +10457,7 @@ Known undumped pirates
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="2097152">
-				<rom name="shi zi wang ii - the lion king ii, the (Chi) (unl).bin" size="2097152" crc="aff46765" sha1="5649fa1fbfb28d58b0608e8ebc5dc7bd5c4c9678" offset="000000" loadflag="load16_word_swap" />
+				<rom name="shi zi wang ii - the lion king ii, the (chi) (unl).bin" size="2097152" crc="aff46765" sha1="5649fa1fbfb28d58b0608e8ebc5dc7bd5c4c9678" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -10468,7 +10468,7 @@ Known undumped pirates
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="2097152">
-				<rom name="shi zi wang ii - the lion king ii, the (Chi) (unl) (pirate).bin" size="2097152" crc="721b4981" sha1="70eb5b423948e5a124de4d5d24c14b2c64bfb282" offset="000000" loadflag="load16_word_swap" />
+				<rom name="shi zi wang ii - the lion king ii, the (chi) (unl) (pirate).bin" size="2097152" crc="721b4981" sha1="70eb5b423948e5a124de4d5d24c14b2c64bfb282" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -10479,7 +10479,7 @@ Known undumped pirates
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="20971520">
-				<rom name="shi zi wang 3 - the lion king 3 (Chi) (unl).bin" size="2097152" crc="c004219d" sha1="54ffd355b0805741f58329fa38ed3d9f8f7c80ca" offset="0x400000" loadflag="load16_word_swap" />
+				<rom name="shi zi wang 3 - the lion king 3 (chi) (unl).bin" size="2097152" crc="c004219d" sha1="54ffd355b0805741f58329fa38ed3d9f8f7c80ca" offset="0x400000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -10512,7 +10512,7 @@ Known undumped pirates
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="long (Chi) (unl).bin" size="262144" crc="1b86e623" sha1="09e4b59da3344f16ce6173c432c88ee9a12a3561" offset="000000" loadflag="load16_word_swap" />
+				<rom name="long (chi) (unl).bin" size="262144" crc="1b86e623" sha1="09e4b59da3344f16ce6173c432c88ee9a12a3561" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -10611,7 +10611,7 @@ Known undumped pirates
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="ma jiang qing ren - ji ma jiang zhi (Chi) (unl).bin" size="1048576" crc="ddd02ba4" sha1="fe9ec21bd206ad1a178c54a2fee80b553c478fc4" offset="000000" loadflag="load16_word_swap" />
+				<rom name="ma jiang qing ren - ji ma jiang zhi (chi) (unl).bin" size="1048576" crc="ddd02ba4" sha1="fe9ec21bd206ad1a178c54a2fee80b553c478fc4" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -10622,7 +10622,7 @@ Known undumped pirates
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="ma qiao e mo ta - devilish mahjong tower (Chi) (unl).bin" size="1048576" crc="12e35994" sha1="84e8bf546283c73396e40c4cfa05986ebeb123bb" offset="000000" loadflag="load16_word_swap" />
+				<rom name="ma qiao e mo ta - devilish mahjong tower (chi) (unl).bin" size="1048576" crc="12e35994" sha1="84e8bf546283c73396e40c4cfa05986ebeb123bb" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -11403,7 +11403,7 @@ Known undumped pirates
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="meng huan shui guo pan - 777 casino (Chi) (unl).bin" size="1048576" crc="42dc03e4" sha1="df20a28d03a2cd481af134ef7602062636c3cc79" offset="000000" loadflag="load16_word_swap" />
+				<rom name="meng huan shui guo pan - 777 casino (chi) (unl).bin" size="1048576" crc="42dc03e4" sha1="df20a28d03a2cd481af134ef7602062636c3cc79" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -16380,7 +16380,7 @@ Known undumped pirates
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="san guo zhi lie zhuan - luan shi qun ying (Chi).bin" size="1048576" crc="3b5cc398" sha1="7aaa0cc1dafaa14e6d62d6c1dbd462e69617bf7e" offset="000000" loadflag="load16_word_swap" />
+				<rom name="san guo zhi lie zhuan - luan shi qun ying (chi).bin" size="1048576" crc="3b5cc398" sha1="7aaa0cc1dafaa14e6d62d6c1dbd462e69617bf7e" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -16391,7 +16391,7 @@ Known undumped pirates
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="2097152">
-				<rom name="san guo zhi v (Chi) (unl).bin" size="2097152" crc="cd7e53d0" sha1="1a3333983f40dd242ad86187e50d1abed68d5ae9" offset="000000" loadflag="load16_word_swap" />
+				<rom name="san guo zhi v (chi) (unl).bin" size="2097152" crc="cd7e53d0" sha1="1a3333983f40dd242ad86187e50d1abed68d5ae9" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -16710,7 +16710,7 @@ Known undumped pirates
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="2097152">
-				<rom name="shi jie zhi bang zheng ba zhan - world pro baseball 94 (Chi) (unl).bin" size="2097152" crc="72dd884f" sha1="d05c770312feec38c45b910ad09204b87961c01a" offset="000000" loadflag="load16_word_swap" />
+				<rom name="shi jie zhi bang zheng ba zhan - world pro baseball 94 (chi) (unl).bin" size="2097152" crc="72dd884f" sha1="d05c770312feec38c45b910ad09204b87961c01a" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -16974,7 +16974,7 @@ Known undumped pirates
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="2097152">
-				<rom name="shui hu - feng yun zhuan (Chi) (unl).bin" size="2097152" crc="3e9e010c" sha1="7ac1b7a9e36dde9a03b3d0861b473ac9e1324175" offset="000000" loadflag="load16_word_swap" />
+				<rom name="shui hu - feng yun zhuan (chi) (unl).bin" size="2097152" crc="3e9e010c" sha1="7ac1b7a9e36dde9a03b3d0861b473ac9e1324175" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -16985,7 +16985,7 @@ Known undumped pirates
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="2097152">
-				<rom name="shui hu zhuan (Chi) (unl).bin" size="2097152" crc="61e458c3" sha1="f58c522bd0629833d3943ef4091c3c349c134879" offset="000000" loadflag="load16_word_swap" />
+				<rom name="shui hu zhuan (chi) (unl).bin" size="2097152" crc="61e458c3" sha1="f58c522bd0629833d3943ef4091c3c349c134879" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -18228,7 +18228,7 @@ Known undumped pirates
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="squirrel king (Chi) (unl).bin" size="1048576" crc="b8261ff5" sha1="2a561b6e47c93272fe5947084837d9f6f514ed38" offset="000000" loadflag="load16_word_swap" />
+				<rom name="squirrel king (chi) (unl).bin" size="1048576" crc="b8261ff5" sha1="2a561b6e47c93272fe5947084837d9f6f514ed38" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -19154,7 +19154,7 @@ Known undumped pirates
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="super bubble bobble (Chi) (unl).bin" size="1048576" crc="4820a161" sha1="03f40c14624f1522d6e3105997d14e8eaba12257" offset="000000" loadflag="load16_word_swap" />
+				<rom name="super bubble bobble (chi) (unl).bin" size="1048576" crc="4820a161" sha1="03f40c14624f1522d6e3105997d14e8eaba12257" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -19742,7 +19742,7 @@ Known undumped pirates
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="taiwan daheng (Chi) (unl).bin" size="1048576" crc="baf20f81" sha1="88726c11e5ed7927830bf5ae0b83d85dfff4a2a4" offset="000000" loadflag="load16_word_swap" />
+				<rom name="taiwan daheng (chi) (unl).bin" size="1048576" crc="baf20f81" sha1="88726c11e5ed7927830bf5ae0b83d85dfff4a2a4" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -20867,7 +20867,7 @@ Known undumped pirates
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="2097152">
-				<rom name="tun shi tian di iii (Chi) (simple chinese) (unl).bin" size="2097152" crc="ea57b668" sha1="7040e96c053f29c75cf0524ddb168a83d0fb526f" offset="000000" loadflag="load16_word_swap" />
+				<rom name="tun shi tian di iii (chi) (simple chinese) (unl).bin" size="2097152" crc="ea57b668" sha1="7040e96c053f29c75cf0524ddb168a83d0fb526f" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -20878,7 +20878,7 @@ Known undumped pirates
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="2097152">
-				<rom name="tun shi tian di iii (Chi) (unl).bin" size="2097152" crc="b23c4166" sha1="534bf8f951ee30d47df18202246245b998c0eced" offset="000000" loadflag="load16_word_swap" />
+				<rom name="tun shi tian di iii (chi) (unl).bin" size="2097152" crc="b23c4166" sha1="534bf8f951ee30d47df18202246245b998c0eced" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -23135,7 +23135,7 @@ Known undumped pirates
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="2097152">
-				<rom name="wu kong wai zhuan (Chi) (unl).bin" size="2097152" crc="880a916e" sha1="dd4d7f7433ab82680d7d36124beca0bacebcd6e4" offset="000000" loadflag="load16_word_swap" />
+				<rom name="wu kong wai zhuan (chi) (unl).bin" size="2097152" crc="880a916e" sha1="dd4d7f7433ab82680d7d36124beca0bacebcd6e4" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -23487,7 +23487,7 @@ Known undumped pirates
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="xiao monv - magic girl (Chi) (unl).bin" size="524288" crc="8e49a92e" sha1="22a48404e77cab473ee65e5d5167d17c28884a7a" offset="000000" loadflag="load16_word_swap" />
+				<rom name="xiao monv - magic girl (chi) (unl).bin" size="524288" crc="8e49a92e" sha1="22a48404e77cab473ee65e5d5167d17c28884a7a" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -23498,7 +23498,7 @@ Known undumped pirates
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="4194304">
-				<rom name="xin qi gai wang zi (Chi) (alt) (unl).bin" size="4194304" crc="da5a4bfe" sha1="75f8003a6388814c1880347882b244549da62158" offset="000000" loadflag="load16_word_swap" />
+				<rom name="xin qi gai wang zi (chi) (alt) (unl).bin" size="4194304" crc="da5a4bfe" sha1="75f8003a6388814c1880347882b244549da62158" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -23509,7 +23509,7 @@ Known undumped pirates
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="4194304">
-				<rom name="xin qi gai wang zi (Chi) (unl).bin" size="4194304" crc="dd2f38b5" sha1="4a7494d8601149f43ba7e3595a0b2340cde2e9ba" offset="000000" loadflag="load16_word_swap" />
+				<rom name="xin qi gai wang zi (chi) (unl).bin" size="4194304" crc="dd2f38b5" sha1="4a7494d8601149f43ba7e3595a0b2340cde2e9ba" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -23520,7 +23520,7 @@ Known undumped pirates
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="2097152">
-				<rom name="ya se chuan shuo (Chi) (unl).bin" size="2097152" crc="095b9a15" sha1="8fe0806427e123717ba20478ab1410c25fa942e6" offset="000000" loadflag="load16_word_swap" />
+				<rom name="ya se chuan shuo (chi) (unl).bin" size="2097152" crc="095b9a15" sha1="8fe0806427e123717ba20478ab1410c25fa942e6" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -23531,7 +23531,7 @@ Known undumped pirates
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="2097152">
-				<rom name="yang jia jiang - yang warrior family (Chi) (unl).bin" size="2097152" crc="6604a79e" sha1="6fcc3102fc22b42049e6eae9a1c30c8a7f022d14" offset="000000" loadflag="load16_word_swap" />
+				<rom name="yang jia jiang - yang warrior family (chi) (unl).bin" size="2097152" crc="6604a79e" sha1="6fcc3102fc22b42049e6eae9a1c30c8a7f022d14" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -23784,7 +23784,7 @@ Known undumped pirates
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="zhuo gui da shi - ghost hunter (Chi) (unl).bin" size="524288" crc="76c62a8b" sha1="3424892e913c20754d2e340c6e79476a9eb6761b" offset="000000" loadflag="load16_word_swap" />
+				<rom name="zhuo gui da shi - ghost hunter (chi) (unl).bin" size="524288" crc="76c62a8b" sha1="3424892e913c20754d2e340c6e79476a9eb6761b" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -23974,7 +23974,7 @@ Known undumped pirates
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="2097152">
-				<rom name="unknown chinese game 1 (Chi).bin" size="2097152" crc="dfacb9ff" sha1="4283bb9aec05098b9f6b1739e1b02c1bb1f8242f" offset="000000" loadflag="load16_word_swap" />
+				<rom name="unknown chinese game 1 (chi).bin" size="2097152" crc="dfacb9ff" sha1="4283bb9aec05098b9f6b1739e1b02c1bb1f8242f" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -24024,7 +24024,7 @@ Known undumped pirates
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="World Soccer (Prototype).bin" size="1048576" crc="9d451f72" sha1="892747034876a7f587bbf0e3f21c9f35237bb1ea" offset="000000" loadflag="load16_word_swap" />
+				<rom name="world soccer (prototype).bin" size="1048576" crc="9d451f72" sha1="892747034876a7f587bbf0e3f21c9f35237bb1ea" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>

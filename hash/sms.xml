@@ -5039,7 +5039,7 @@
 		<publisher>Zemina</publisher>
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="65536">
-				<rom name="super boy II (kor).bin" size="49152" crc="67c2f0ff" sha1="f0c239e4cf90cd4c699889792f811717670ac85c" offset="000000" />
+				<rom name="super boy ii (kor).bin" size="49152" crc="67c2f0ff" sha1="f0c239e4cf90cd4c699889792f811717670ac85c" offset="000000" />
 			</dataarea>
 		</part>
 	</software>

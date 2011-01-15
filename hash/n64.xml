@@ -9995,7 +9995,7 @@ There appear to exist some undumped N64 protos
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="33554432" layout="region32_be">
-				<rom name="Legend of Zelda, The - Ocarina of Time (2003)(Nintendo)(PAL)[Gamecube version].v64" size="33554432" crc="6e658036" sha1="580dd0bd1b6d2c51cc20a764eece84dba558964c" offset="000000" />
+				<rom name="legend of zelda, the - ocarina of time (2003)(nintendo)(pal)[gamecube version].v64" size="33554432" crc="6e658036" sha1="580dd0bd1b6d2c51cc20a764eece84dba558964c" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -10006,7 +10006,7 @@ There appear to exist some undumped N64 protos
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="33554432" layout="region32_be">
-				<rom name="Legend of Zelda, The - Majora's Mask (2003)(Nintendo)(US)[Gamecube version].v64" size="33554432" crc="52245acb" sha1="8c378b87c83b3f4de20b14accf91e7590399f5dc" offset="000000" />
+				<rom name="legend of zelda, the - majora's mask (2003)(nintendo)(us)[gamecube version].v64" size="33554432" crc="52245acb" sha1="8c378b87c83b3f4de20b14accf91e7590399f5dc" offset="000000" />
 			</dataarea>
 		</part>
 	</software>

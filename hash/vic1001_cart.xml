@@ -36,10 +36,10 @@
 		<publisher>Brøderbund</publisher>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="6000" size="8192">
-				<rom name="a.e. (brøderbund)(1982)(viccart-224)(jue).60" size="8192" crc="5b8f0411" sha1="06db59f9c2def1d9a12dad588ab9ccec9fd9f33b" offset="0x0000" />
+				<rom name="a.e. (broderbund)(1982)(viccart-224)(jue).60" size="8192" crc="5b8f0411" sha1="06db59f9c2def1d9a12dad588ab9ccec9fd9f33b" offset="0x0000" />
 			</dataarea>
 			<dataarea name="a000" size="8192">
-				<rom name="a.e. (brøderbund)(1982)(viccart-224)(jue).a0" size="8192" crc="05ae8278" sha1="3309bb5fe0c4fddfacfe99acbac9e8922297e7a4" offset="0x0000" />
+				<rom name="a.e. (broderbund)(1982)(viccart-224)(jue).a0" size="8192" crc="05ae8278" sha1="3309bb5fe0c4fddfacfe99acbac9e8922297e7a4" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -51,10 +51,10 @@
 		<publisher>Brøderbund</publisher>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="6000" size="8192">
-				<rom name="a.e. (brøderbund)(1982)(viccart-224)(jue) [a].60" size="8192" crc="7f942bcd" sha1="770762ccff81231ef703af35d86850391fa7dd94" offset="0x0000" />
+				<rom name="a.e. (broderbund)(1982)(viccart-224)(jue) [a].60" size="8192" crc="7f942bcd" sha1="770762ccff81231ef703af35d86850391fa7dd94" offset="0x0000" />
 			</dataarea>
 			<dataarea name="a000" size="8192">
-				<rom name="a.e. (brøderbund)(1982)(viccart-224)(jue) [a].a0" size="8192" crc="2cfe98cb" sha1="d4b7b055ec31ad302e8c12fbc3b1ddfe457dee73" offset="0x0000" />
+				<rom name="a.e. (broderbund)(1982)(viccart-224)(jue) [a].a0" size="8192" crc="2cfe98cb" sha1="d4b7b055ec31ad302e8c12fbc3b1ddfe457dee73" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>

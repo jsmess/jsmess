@@ -3030,7 +3030,7 @@ undumped GBC protos
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="doraemon no quiz boy (japan) (rev. a).bin" size="1048576" crc="915356e3 " sha1="ae48f07e608d76143a4a51f18f9454cd990d766a" offset="000000" />
+				<rom name="doraemon no quiz boy (japan) (rev. a).bin" size="1048576" crc="915356e3" sha1="ae48f07e608d76143a4a51f18f9454cd990d766a" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -4108,7 +4108,7 @@ undumped GBC protos
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="4194304">
-				<rom name="from tv animation one piece - yume no luffy kaizokudan tanjou! (japan) (rev. a).bin" size="4194304" crc="a4dde805 " sha1="53da28b16a4bf0efab1f65c21f7931ce4948865b" offset="000000" />
+				<rom name="from tv animation one piece - yume no luffy kaizokudan tanjou! (japan) (rev. a).bin" size="4194304" crc="a4dde805" sha1="53da28b16a4bf0efab1f65c21f7931ce4948865b" offset="000000" />
 			</dataarea>
 		</part>
 	</software>

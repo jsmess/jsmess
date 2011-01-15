@@ -1529,7 +1529,7 @@
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304" layout="region16_be">
-				<rom name="Soulstar-X.bin" size="2097152" crc="5ea52f22" sha1="4726988f28c5e49971e1f38e335fecc3f9dd6c1f" offset="000000" />
+				<rom name="soulstar-x.bin" size="2097152" crc="5ea52f22" sha1="4726988f28c5e49971e1f38e335fecc3f9dd6c1f" offset="000000" />
 			</dataarea>
 		</part>
 	</software>

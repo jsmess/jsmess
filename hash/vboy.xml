@@ -35,7 +35,7 @@ According to Planet Virtual Boy, the following undumped protos exist
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="vboy_cart">
 			<dataarea name="rom" size="2097152">
-				<rom name="Bound High! (JU).bin" size="2097152" crc="e81a3703" sha1="1196ef8b9a96a0ff2f3634f8eb1c4865c0fb6b01" offset="000000" />
+				<rom name="bound high! (ju).bin" size="2097152" crc="e81a3703" sha1="1196ef8b9a96a0ff2f3634f8eb1c4865c0fb6b01" offset="000000" />
 			</dataarea>
 		</part>
 	</software>

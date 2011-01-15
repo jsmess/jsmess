@@ -123,7 +123,7 @@
 		<publisher>Unknown</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="16">
-				<rom name="azusa.T77" size="16" crc="24B4D6C4" sha1="0F397F343CC74993777E10DEFFE6F9579713FB8E" offset="000000" />
+				<rom name="azusa.t77" size="16" crc="24B4D6C4" sha1="0F397F343CC74993777E10DEFFE6F9579713FB8E" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="cass2" interface="fm7_cass">
@@ -138,7 +138,7 @@
 		</part>
 		<part name="cass4" interface="fm7_cass">
 			<dataarea name="cass" size="42000">
-				<rom name="test.T77" size="42000" crc="9A99D305" sha1="E02813D6880C301A55A096AA7515044DE88C7894" offset="000000" />
+				<rom name="test.t77" size="42000" crc="9A99D305" sha1="E02813D6880C301A55A096AA7515044DE88C7894" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="cass5" interface="fm7_cass">
@@ -163,52 +163,52 @@
 		</part>
 		<part name="cass9" interface="fm7_cass">
 			<dataarea name="cass" size="42132">
-				<rom name="azusa.T77" size="42132" crc="E4459A46" sha1="53903CD0F6C8BB578B12A2A4F4B0A5D57AF11C46" offset="000000" />
+				<rom name="azusa.t77" size="42132" crc="E4459A46" sha1="53903CD0F6C8BB578B12A2A4F4B0A5D57AF11C46" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="cassa" interface="fm7_cass">
 			<dataarea name="cass" size="84292">
-				<rom name="chiduru.T77" size="84292" crc="9235862C" sha1="AF0EBC5A44E5CA8C8B7DD3F35A74F678B629BF7F" offset="000000" />
+				<rom name="chiduru.t77" size="84292" crc="9235862C" sha1="AF0EBC5A44E5CA8C8B7DD3F35A74F678B629BF7F" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="cassb" interface="fm7_cass">
 			<dataarea name="cass" size="42132">
-				<rom name="hatune.T77" size="42132" crc="30C18AF2" sha1="0189582D161CB1AE0B242FCA54E9D3F3F6A4A444" offset="000000" />
+				<rom name="hatune.t77" size="42132" crc="30C18AF2" sha1="0189582D161CB1AE0B242FCA54E9D3F3F6A4A444" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="cassc" interface="fm7_cass">
 			<dataarea name="cass" size="42132">
-				<rom name="kaede.T77" size="42132" crc="766C4CED" sha1="71BB858FFD65D162FB4FBF24BB61DEE6DA483F96" offset="000000" />
+				<rom name="kaede.t77" size="42132" crc="766C4CED" sha1="71BB858FFD65D162FB4FBF24BB61DEE6DA483F96" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="cassd" interface="fm7_cass">
 			<dataarea name="cass" size="42176">
-				<rom name="koichi.T77" size="42176" crc="B2687127" sha1="835BDB552646D24C401BF9AAC5E6685F22D6A8E3" offset="000000" />
+				<rom name="koichi.t77" size="42176" crc="B2687127" sha1="835BDB552646D24C401BF9AAC5E6685F22D6A8E3" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="casse" interface="fm7_cass">
 			<dataarea name="cass" size="42090">
-				<rom name="unk1.T77" size="42090" crc="9375F5BD" sha1="A29C84D111B6CE4D200BC6ABB839FFA5A7C4F0DB" offset="000000" />
+				<rom name="unk1.t77" size="42090" crc="9375F5BD" sha1="A29C84D111B6CE4D200BC6ABB839FFA5A7C4F0DB" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="cassf" interface="fm7_cass">
 			<dataarea name="cass" size="42000">
-				<rom name="unk2.T77" size="42000" crc="01AFC0C0" sha1="0D7565FAE3EB2AA4C763FAE3F48735B08CF20E03" offset="000000" />
+				<rom name="unk2.t77" size="42000" crc="01AFC0C0" sha1="0D7565FAE3EB2AA4C763FAE3F48735B08CF20E03" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="cassg" interface="fm7_cass">
 			<dataarea name="cass" size="42044">
-				<rom name="unk3.T77" size="42044" crc="7DCF38D2" sha1="09AF331550E003C18FFE185DF1C07C95B26C3DF7" offset="000000" />
+				<rom name="unk3.t77" size="42044" crc="7DCF38D2" sha1="09AF331550E003C18FFE185DF1C07C95B26C3DF7" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="cassh" interface="fm7_cass">
 			<dataarea name="cass" size="42088">
-				<rom name="unk4.T77" size="42088" crc="C49401F3" sha1="70536AAB0B0117789AA99E20A0871C08D9689668" offset="000000" />
+				<rom name="unk4.t77" size="42088" crc="C49401F3" sha1="70536AAB0B0117789AA99E20A0871C08D9689668" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="cassi" interface="fm7_cass">
 			<dataarea name="cass" size="42044">
-				<rom name="unk5.T77" size="42044" crc="9B9B239A" sha1="B7CEA888BF66F9EF2DC5129CAE1A7D0CD2215A3D" offset="000000" />
+				<rom name="unk5.t77" size="42044" crc="9B9B239A" sha1="B7CEA888BF66F9EF2DC5129CAE1A7D0CD2215A3D" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -232,7 +232,7 @@
 		<publisher>Unknown</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="1642830">
-				<rom name="BUSHMAN.T77" size="1642830" crc="728062AB" sha1="8B0CD10F01585F12CE33179AC6F7D8FC999F2D91" offset="000000" />
+				<rom name="bushman.t77" size="1642830" crc="728062AB" sha1="8B0CD10F01585F12CE33179AC6F7D8FC999F2D91" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -279,7 +279,7 @@
 		<publisher>Nidecom / Carry Soft</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="2770776">
-				<rom name="CHACKN.T77" size="2770776" crc="F5EC39F2" sha1="80A795EEA0CF18F30C80F926A82560EEA6E332B4" offset="000000" />
+				<rom name="chackn.t77" size="2770776" crc="F5EC39F2" sha1="80A795EEA0CF18F30C80F926A82560EEA6E332B4" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -378,7 +378,7 @@
 		</part>
 		<part name="cass4" interface="fm7_cass">
 			<dataarea name="cass" size="68044">
-				<rom name="savedisk.T77" size="68044" crc="9BC582F5" sha1="3E83BF18ADA35E17CB8B45673D879B55EF32066F" offset="000000" />
+				<rom name="savedisk.t77" size="68044" crc="9BC582F5" sha1="3E83BF18ADA35E17CB8B45673D879B55EF32066F" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="cass5" interface="fm7_cass">
@@ -408,7 +408,7 @@
 		</part>
 		<part name="cassa" interface="fm7_cass">
 			<dataarea name="cass" size="34030">
-				<rom name="savedisk.T77" size="34030" crc="5901992E" sha1="8BC20F85750E9FC2C322EE313398F741A62D9A32" offset="000000" />
+				<rom name="savedisk.t77" size="34030" crc="5901992E" sha1="8BC20F85750E9FC2C322EE313398F741A62D9A32" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="cassb" interface="fm7_cass">
@@ -473,7 +473,7 @@
 		<publisher>XTAL Soft</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="4055314">
-				<rom name="EARTHBOU.T77" size="4055314" crc="840C5F73" sha1="B225E8FD97EED419380E03E21DBD259A057C5DBF" offset="000000" />
+				<rom name="earthbou.t77" size="4055314" crc="840C5F73" sha1="B225E8FD97EED419380E03E21DBD259A057C5DBF" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -645,7 +645,7 @@
 		<publisher>Oh!FM</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="2345284">
-				<rom name="GBANK.T77" size="2345284" crc="03AEAF4B" sha1="DF1D1772F27235DBC526218658CA9766A6A7B8A6" offset="000000" />
+				<rom name="gbank.t77" size="2345284" crc="03AEAF4B" sha1="DF1D1772F27235DBC526218658CA9766A6A7B8A6" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -710,7 +710,7 @@
 		<publisher>Hudson Soft</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="1256418">
-				<rom name="GUNMAN.t77" size="1256418" crc="43A1C580" sha1="551F6D24C6AB4EF3E86C4056C3A266AE439B8E30" offset="000000" />
+				<rom name="gunman.t77" size="1256418" crc="43A1C580" sha1="551F6D24C6AB4EF3E86C4056C3A266AE439B8E30" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -768,7 +768,7 @@
 		<publisher>T&amp;E Soft</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="3282720">
-				<rom name="HYDLIDE.T77" size="3282720" crc="0DB66952" sha1="D21FC6D686AAE43C98CC7285144E5C0444907550" offset="000000" />
+				<rom name="hydlide.t77" size="3282720" crc="0DB66952" sha1="D21FC6D686AAE43C98CC7285144E5C0444907550" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -847,7 +847,7 @@
 		<publisher>Pony Canyon</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="2274254">
-				<rom name="ooikagu.T77" size="2274254" crc="9F0057FF" sha1="DA5947960734EF53CD3B5332E971AD14BE680F62" offset="000000" />
+				<rom name="ooikagu.t77" size="2274254" crc="9F0057FF" sha1="DA5947960734EF53CD3B5332E971AD14BE680F62" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -972,7 +972,7 @@
 		<publisher>Unknown</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="1425834">
-				<rom name="LITTLEG.T77" size="1425834" crc="3B9E282E" sha1="0DC0B0AAA87397C40D72B1C59DC4435F1A3946EA" offset="000000" />
+				<rom name="littleg.t77" size="1425834" crc="3B9E282E" sha1="0DC0B0AAA87397C40D72B1C59DC4435F1A3946EA" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1058,7 +1058,7 @@
 		<publisher>Hudson Soft</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="2453598">
-				<rom name="MARIOBRS.T77" size="2453598" crc="6DA2355E" sha1="E1AF54A873DCE91A4BCA2F75C1C628AF74891424" offset="000000" />
+				<rom name="mariobrs.t77" size="2453598" crc="6DA2355E" sha1="E1AF54A873DCE91A4BCA2F75C1C628AF74891424" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1118,7 +1118,7 @@
 		<publisher>Magicalzoo</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="2637670">
-				<rom name="Mu.t77" size="2637670" crc="FB9FEA6F" sha1="E0E0CD9061B970D46F275973DFEF38ECF9DB1F14" offset="000000" />
+				<rom name="mu.t77" size="2637670" crc="FB9FEA6F" sha1="E0E0CD9061B970D46F275973DFEF38ECF9DB1F14" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1323,7 +1323,7 @@
 		<publisher>Unknown</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="222184">
-				<rom name="data.T77" size="222184" crc="4FE8CA64" sha1="9353A973BEC6774DAA92273486F65883B9346F11" offset="000000" />
+				<rom name="data.t77" size="222184" crc="4FE8CA64" sha1="9353A973BEC6774DAA92273486F65883B9346F11" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="cass2" interface="fm7_cass">
@@ -1344,7 +1344,7 @@
 		<publisher>Kiku / Hudson Soft</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="1857252">
-				<rom name="PUNCHBAL.T77" size="1857252" crc="D2355B5B" sha1="C60D5403BD4691802D9F264871EAFC40E24F5427" offset="000000" />
+				<rom name="punchbal.t77" size="1857252" crc="D2355B5B" sha1="C60D5403BD4691802D9F264871EAFC40E24F5427" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1458,7 +1458,7 @@
 		<publisher>Unknown</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="34030">
-				<rom name="salada3.T77" size="34030" crc="BB3AD189" sha1="1A959989704B3616E9E9EA8112595A86E6E2936C" offset="000000" />
+				<rom name="salada3.t77" size="34030" crc="BB3AD189" sha1="1A959989704B3616E9E9EA8112595A86E6E2936C" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="cass2" interface="fm7_cass">
@@ -1557,12 +1557,12 @@
 		<publisher>Unknown</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="26822">
-				<rom name="1-sou.T77" size="26822" crc="35003F53" sha1="144FCF3A183CCB789637ABDA933D100B0171C2E9" offset="000000" />
+				<rom name="1-sou.t77" size="26822" crc="35003F53" sha1="144FCF3A183CCB789637ABDA933D100B0171C2E9" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="cass2" interface="fm7_cass">
 			<dataarea name="cass" size="26822">
-				<rom name="2-sou.T77" size="26822" crc="4BF5C41B" sha1="28201FC26B5EB575E28037F7C3D820DFABE5FC2C" offset="000000" />
+				<rom name="2-sou.t77" size="26822" crc="4BF5C41B" sha1="28201FC26B5EB575E28037F7C3D820DFABE5FC2C" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="cass3" interface="fm7_cass">
@@ -1732,7 +1732,7 @@
 		<publisher>Tecno Soft</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="2329036">
-				<rom name="TFORCE.T77" size="2329036" crc="4297C768" sha1="7C534329D6550F0B00AD8F7D9CDB8EE861A16B60" offset="000000" />
+				<rom name="tforce.t77" size="2329036" crc="4297C768" sha1="7C534329D6550F0B00AD8F7D9CDB8EE861A16B60" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1796,12 +1796,12 @@
 		<publisher>Unknown</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="1882972">
-				<rom name="UOOTOY.T77" size="1882972" crc="3BF4D54C" sha1="73E072DAADBAC3FE36325BEC0489A42323CB8AFE" offset="000000" />
+				<rom name="uootoy.t77" size="1882972" crc="3BF4D54C" sha1="73E072DAADBAC3FE36325BEC0489A42323CB8AFE" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="cass2" interface="fm7_cass">
 			<dataarea name="cass" size="1139276">
-				<rom name="UOOTOY_CNST.T77" size="1139276" crc="E9FBD7A3" sha1="30A34E5577BEEAE0CD4D20F4D3882695C624A410" offset="000000" />
+				<rom name="uootoy_cnst.t77" size="1139276" crc="E9FBD7A3" sha1="30A34E5577BEEAE0CD4D20F4D3882695C624A410" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1866,7 +1866,7 @@
 		</part>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="45960">
-				<rom name="chara.T77" size="45960" crc="90A10946" sha1="D2E9F50EE9ABB04A707C286999ADD53D52FA3BB8" offset="000000" />
+				<rom name="chara.t77" size="45960" crc="90A10946" sha1="D2E9F50EE9ABB04A707C286999ADD53D52FA3BB8" offset="000000" />
 			</dataarea>
 		</part>
 	</software>

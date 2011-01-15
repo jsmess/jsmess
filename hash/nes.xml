@@ -41714,10 +41714,10 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-CNROM" />
 			<dataarea name="prg" size="32768">
-				<rom name="super pitfall II (u) (prototype) [!].prg" size="32768" crc="82bd6a77" sha1="9f661ece65ee7859cd70ac9e364a2f249a433e0d" offset="00000" status="baddump" />
+				<rom name="super pitfall ii (u) (prototype) [!].prg" size="32768" crc="82bd6a77" sha1="9f661ece65ee7859cd70ac9e364a2f249a433e0d" offset="00000" status="baddump" />
 			</dataarea>
 			<dataarea name="chr" size="32768">
-				<rom name="super pitfall II (u) (prototype) [!].chr" size="32768" crc="d968c953" sha1="d85754af4328f2d49c2f28ba506376e7654b7756" offset="00000" status="baddump" />
+				<rom name="super pitfall ii (u) (prototype) [!].chr" size="32768" crc="d968c953" sha1="d85754af4328f2d49c2f28ba506376e7654b7756" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -62931,7 +62931,7 @@ that the real dumps might surface -->
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="UNL-OneBus" />
 			<dataarea name="prg" size="4194304">
-				<rom name="100-in-1 arcade action II (at-103)(unl)[!].prg" size="4194304" crc="33923995" sha1="a206e8c0ee6e86adb800cf66697defabcbd01902" offset="00000" status="baddump" />
+				<rom name="100-in-1 arcade action ii (at-103)(unl)[!].prg" size="4194304" crc="33923995" sha1="a206e8c0ee6e86adb800cf66697defabcbd01902" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
