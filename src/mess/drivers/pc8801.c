@@ -481,6 +481,51 @@ static WRITE8_HANDLER( pc8801_layer_masking_w )
 	layer_mask = data;
 }
 
+static READ8_HANDLER( pc8801_crtc_param_r )
+{
+	return 0xff;
+}
+
+static WRITE8_HANDLER( pc88_crtc_param_w )
+{
+}
+
+static READ8_HANDLER( pc8801_crtc_status_r )
+{
+	return 0xff;
+}
+
+/*
+  CRTC_RESET		= 0,
+  CRTC_STOP_DISPLAY	= 0,
+  CRTC_START_DISPLAY,
+  CRTC_SET_INTERRUPT_MASK,
+  CRTC_READ_LIGHT_PEN,
+  CRTC_LOAD_CURSOR_POSITION,
+  CRTC_RESET_INTERRUPT,
+  CRTC_RESET_COUNTERS,
+  CRTC_READ_STATUS,
+*/
+
+static const char *const crtc_command[] =
+{
+	"Reset / Stop Display",				// 0
+	"Start Display", 					// 1
+	"Set IRQ MASK",						// 2
+	"Read Light Pen",					// 3
+	"Load Cursor Position",				// 4
+	"Reset IRQ",						// 5
+	"Reset Counters",					// 6
+	"Read Status"						// 7
+};
+
+static WRITE8_HANDLER( pc88_crtc_cmd_w )
+{
+	if((data >> 5) != 4)
+		printf("CRTC cmd %s polled\n",crtc_command[data >> 5]);
+
+}
+
 static ADDRESS_MAP_START( pc8801_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
@@ -509,7 +554,8 @@ static ADDRESS_MAP_START( pc8801_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x40, 0x40) AM_READ(pc8801_ctrl_r) //, pc88sr_outport_40)
 	AM_RANGE(0x44, 0x45) AM_DEVREADWRITE("ym2203", ym2203_r,ym2203_w)
 //  AM_RANGE(0x46, 0x47) AM_NOP                                     /* OPNA extra port */
-//	AM_RANGE(0x50, 0x51) AM_READWRITE(pc88_crtc_r, pc88_crtc_w)
+	AM_RANGE(0x50, 0x50) AM_READWRITE(pc8801_crtc_param_r, pc88_crtc_param_w)
+	AM_RANGE(0x51, 0x51) AM_READWRITE(pc8801_crtc_status_r, pc88_crtc_cmd_w)
 //	AM_RANGE(0x52, 0x52) //background palette
 	AM_RANGE(0x53, 0x53) AM_WRITE(pc8801_layer_masking_w)
 	AM_RANGE(0x54, 0x5b) AM_WRITE(pc8801_palram_w)
