@@ -313,7 +313,10 @@ static UINT32 pc8801_bankswitch_2_w(running_machine *machine)
 /* TODO: this isn't correct */
 static UINT32 pc8801_bankswitch_3_r(running_machine *machine)
 {
-	return WRAM_BASE + 0xc000;
+	if(vram_sel == 3)
+		return WRAM_BASE + 0xc000;
+
+	return GRAM_BASE + 0x4000 * vram_sel;
 }
 
 static UINT32 pc8801_bankswitch_3_w(running_machine *machine)
@@ -326,7 +329,10 @@ static UINT32 pc8801_bankswitch_3_w(running_machine *machine)
 
 static UINT32 pc8801_bankswitch_4_r(running_machine *machine)
 {
-	return WRAM_BASE + 0xf000;
+	if(vram_sel == 3)
+		return WRAM_BASE + 0xf000;
+
+	return GRAM_BASE + 0x3000 + (0x4000 * vram_sel);
 }
 
 static UINT32 pc8801_bankswitch_4_w(running_machine *machine)
