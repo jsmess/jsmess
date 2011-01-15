@@ -35650,6 +35650,26 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
+	<software name="birdweekp" cloneof="birdweek">
+		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<description>Bird Week (Jpn, Prototype)</description>
+		<year>1986</year>
+		<publisher>Toemiland</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="HVC-CNROM" />
+ 			<feature name="mirroring" value="vertical" />
+			<feature name="chr-pin26" value="CE" />
+			<feature name="chr-pin27" value="CE" />
+			<dataarea name="prg" size="32768">
+				<rom name="bird week (j) (prototype).prg" size="32768" crc="dd06cade" sha1="0749c7559cf567828b22a5a22d000ce229c92213" offset="00000" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
+			</dataarea>
+			<dataarea name="chr" size="16384">
+				<rom name="bird week (j) (prototype).chr" size="16384" crc="877c7d71" sha1="8fd04168e1e73f166d56e52c337d5096e878946a" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="blackbs2" cloneof="blackbas">
 		<!-- Serial:  - Release Date: 1988-10-01 - Alternative Title:  -->
 		<description>The Black Bass II (Jpn)</description>
@@ -36329,6 +36349,27 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="crisisfp" cloneof="crisisf">
+		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<description>Crisis Force (Jpn, Prototype)</description>
+		<year>1991</year>
+		<publisher>Konami</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="KONAMI-VRC-4" />
+			<feature name="vrc4-pin3" value="PRG A1" />
+			<feature name="vrc4-pin4" value="PRG A0" />
+			<dataarea name="prg" size="131072">
+				<rom name="crisis force (j) (prototype).prg" size="131072" crc="90bd41bf" sha1="a6ce08c1f7dd4425c87b3615ea90041bf1437eb3" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="crisis force (j) (prototype).chr" size="131072" crc="5551d951" sha1="1d20a1f547f0d269b8fb345bf37e7a9ed0eed347" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 2k WRAM on cartridge -->
+			<dataarea name="wram" size="2048">
 			</dataarea>
 		</part>
 	</software>
@@ -44863,6 +44904,23 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			</dataarea>
 			<dataarea name="prg" size="32768">
 				<rom name="balloon monster (unknown) (ntdec, gluk video) (unl).prg" size="32768" crc="99d1f385" sha1="23025edb8ef70787d147f6930d39dd9fce568105" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wargulf">
+		<!-- Serial: CN-07 - Release Date:  - Alternative Title:  -->
+		<description>War in the Gulf (Spa, Bra)</description>
+		<year>1991</year>
+		<publisher>Gluk Video / CCE</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NTDEC-TC-112" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="chr" size="131072">
+				<rom name="nd961-c" size="131072" crc="3ac3bddd" sha1="5c14c79826f9a40f3d1b0d8fc288e5c6fbc7cc9b" offset="00000" />
+			</dataarea>
+			<dataarea name="prg" size="131072">
+				<rom name="nd961-p" size="131072" crc="a586ad54" sha1="14dec2e13d3c8bad626bcdbfc12cef93a80dd5f9" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
