@@ -114,6 +114,7 @@ static UINT8 fdc_irq_opcode;
 static UINT8 ext_rom_bank,gfx_ctrl,vram_sel,misc_ctrl;
 static UINT8 vrtc_irq_mask,sound_irq_mask;
 static UINT8 window_offset_bank;
+static UINT8 layer_mask;
 
 #define NBASIC_BASE 0x20000
 #define N88BASIC_BASE 0x28000
@@ -143,9 +144,11 @@ static VIDEO_UPDATE( pc8801 )
 			{
 				int pen;
 
-				pen = ((gvram[count+0x0000] >> (7-xi)) & 1) << 0;
-				pen|= ((gvram[count+0x4000] >> (7-xi)) & 1) << 1;
-				pen|= ((gvram[count+0x8000] >> (7-xi)) & 1) << 2;
+				pen = 0;
+
+				if(!(layer_mask & 2)) { pen |= ((gvram[count+0x0000] >> (7-xi)) & 1) << 0; }
+				if(!(layer_mask & 4)) { pen |= ((gvram[count+0x4000] >> (7-xi)) & 1) << 1; }
+				if(!(layer_mask & 8)) { pen |= ((gvram[count+0x8000] >> (7-xi)) & 1) << 2; }
 
 				*BITMAP_ADDR16(bitmap, y, x+xi) = screen->machine->pens[pen & 7];
 			}
@@ -154,29 +157,32 @@ static VIDEO_UPDATE( pc8801 )
 		}
 	}
 
-	for(y=0;y<25;y++)
+	if(!(layer_mask & 1))
 	{
-		for(x=0;x<80;x++)
+		for(y=0;y<25;y++)
 		{
-			for(yi=0;yi<8;yi++)
+			for(x=0;x<80;x++)
 			{
-				for(xi=0;xi<8;xi++)
+				for(yi=0;yi<8;yi++)
 				{
-					int res_x,res_y;
-					int tile;
-					int color;
-					UINT8 *gfx_data = screen->machine->region("gfx1")->base();
+					for(xi=0;xi<8;xi++)
+					{
+						int res_x,res_y;
+						int tile;
+						int color;
+						UINT8 *gfx_data = screen->machine->region("gfx1")->base();
 
-					tile = vram[x+(y*120)+0xf3c8]; //TODO: vram base, connected to DMAC address 2
+						tile = vram[x+(y*120)+0xf3c8]; //TODO: vram base, connected to DMAC address 2
 
-					res_x = x*8+xi;
-					res_y = y*8+yi;
+						res_x = x*8+xi;
+						res_y = y*8+yi;
 
-					color = ((gfx_data[tile*8+yi] >> (7-xi)) & 1) ? 7 : -1;
+						color = ((gfx_data[tile*8+yi] >> (7-xi)) & 1) ? 7 : -1;
 
-					if((res_x)<=screen->machine->primary_screen->visible_area().max_x && (res_y)<=screen->machine->primary_screen->visible_area().max_y)
-						if(color != -1)
-							*BITMAP_ADDR16(bitmap, res_y, res_x) = screen->machine->pens[color];
+						if((res_x)<=screen->machine->primary_screen->visible_area().max_x && (res_y)<=screen->machine->primary_screen->visible_area().max_y)
+							if(color != -1)
+								*BITMAP_ADDR16(bitmap, res_y, res_x) = screen->machine->pens[color];
+					}
 				}
 			}
 		}
@@ -463,6 +469,18 @@ static WRITE8_HANDLER( pc8801_palram_w )
 		palette_set_color_rgb(space->machine, offset, pal1bit(data >> 1), pal1bit(data >> 2), pal1bit(data >> 0));
 }
 
+static WRITE8_HANDLER( pc8801_layer_masking_w )
+{
+	/*
+	---- x--- green gvram masked flag
+	---- -x-- red gvram masked flag
+	---- --x- blue gvram masked flag
+	---- ---x text vram masked
+	*/
+
+	layer_mask = data;
+}
+
 static ADDRESS_MAP_START( pc8801_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
@@ -493,7 +511,7 @@ static ADDRESS_MAP_START( pc8801_io, ADDRESS_SPACE_IO, 8 )
 //  AM_RANGE(0x46, 0x47) AM_NOP                                     /* OPNA extra port */
 //	AM_RANGE(0x50, 0x51) AM_READWRITE(pc88_crtc_r, pc88_crtc_w)
 //	AM_RANGE(0x52, 0x52) //background palette
-//	AM_RANGE(0x53, 0x53) //video related
+	AM_RANGE(0x53, 0x53) AM_WRITE(pc8801_layer_masking_w)
 	AM_RANGE(0x54, 0x5b) AM_WRITE(pc8801_palram_w)
 	AM_RANGE(0x5c, 0x5c) AM_READ(pc8801_vram_select_r)
 	AM_RANGE(0x5c, 0x5f) AM_WRITE(pc8801_vram_select_w)
@@ -957,6 +975,7 @@ static MACHINE_RESET( pc8801 )
 	gfx_ctrl = 0x31;
 	window_offset_bank = 0x00;
 	misc_ctrl = 0x90;
+	layer_mask = 0x00;
 	bankr[0] = pc8801_bankswitch_0_r(machine);
 	bankr[1] = pc8801_bankswitch_1_r(machine);
 	bankw[0] = pc8801_bankswitch_0_w(machine);
