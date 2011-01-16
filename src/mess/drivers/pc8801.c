@@ -2,7 +2,7 @@
 
     PC-8801 (c) 1981 NEC
 
-    preliminary driver by Angelo Salese
+    preliminary driver by Angelo Salese, original MESS PC-88SR by ???
 
     TODO:
 	- used to do more, currently under rewriting stage. We are currently using plain PC-8801 as the base, will add differences for the
@@ -116,6 +116,28 @@ static UINT8 ext_rom_bank,gfx_ctrl,vram_sel,misc_ctrl,device_ctrl_data;
 static UINT8 vrtc_irq_mask,sound_irq_mask;
 static UINT8 window_offset_bank;
 static UINT8 layer_mask;
+static UINT8 i8214_irq_level,i8214_irq_state;
+
+static void pc8801_update_irq(running_machine *machine)
+{
+	int level, i;
+
+	level = -1;
+	for (i = 0; i < 8; i++)
+	{
+		if ((i8214_irq_state & (1<<i)) != 0)
+			level = i;
+	}
+
+	if (level >= 0 && level < i8214_irq_level)
+		cputag_set_input_line(machine, "maincpu", 0, HOLD_LINE);
+}
+
+static void pc8801_raise_irq(running_machine *machine, int level)
+{
+	i8214_irq_state |= (1<<level);
+	pc8801_update_irq(machine);
+}
 
 /*
 CRTC command params:
@@ -503,6 +525,15 @@ static WRITE8_HANDLER( pc8801_vram_select_w )
 	bankw[4] = pc8801_bankswitch_4_w(space->machine);
 }
 
+static WRITE8_HANDLER( pc8801_irq_level_w )
+{
+	if(data & 8)
+		i8214_irq_level = 7;
+	else
+		i8214_irq_level = data & 7;
+}
+
+
 static WRITE8_HANDLER( pc8801_irq_mask_w )
 {
 	vrtc_irq_mask = data & 2;
@@ -537,8 +568,7 @@ static WRITE8_HANDLER( pc8801_misc_ctrl_w )
 {
 	misc_ctrl = data;
 
-	if(!(data & 0x80))
-		sound_irq_mask = ((data & 0x80) == 0);
+	sound_irq_mask = ((data & 0x80) == 0);
 }
 
 static WRITE8_HANDLER( pc8801_palram_w )
@@ -655,7 +685,7 @@ static ADDRESS_MAP_START( pc8801_io, ADDRESS_SPACE_IO, 8 )
 //  AM_RANGE(0xd8, 0xd8) AM_NOP                                     /* GP-IB */
 //  AM_RANGE(0xdc, 0xdf) AM_NOP                                     /* MODEM */
 //	AM_RANGE(0xe2, 0xe3) AM_READWRITE(pc88_extmem_r, pc88_extmem_w) /* expand RAM select */
-	AM_RANGE(0xe4, 0xe4) AM_WRITENOP //AM_WRITE(pc8801_write_interrupt_level)
+	AM_RANGE(0xe4, 0xe4) AM_WRITE(pc8801_irq_level_w)
 	AM_RANGE(0xe6, 0xe6) AM_WRITE(pc8801_irq_mask_w)
 //  AM_RANGE(0xe7, 0xe7) AM_NOP                                     /* (unknown) */
 //	AM_RANGE(0xe8, 0xeb) AM_READWRITE(pc88_kanji_r, pc88_kanji_w)
@@ -1045,7 +1075,7 @@ static void pc8801_sound_irq( device_t *device, int irq )
 	printf("%02x\n",sound_irq_mask);
 
 	if(sound_irq_mask)
-		cputag_set_input_line_and_vector(device->machine, "maincpu", 0, HOLD_LINE, 4*2);
+		pc8801_raise_irq(device->machine,4);
 }
 
 
@@ -1088,9 +1118,24 @@ static const cassette_config pc88_cassette_config =
 	NULL
 };
 
+static IRQ_CALLBACK( pc8801_irq_callback )
+{
+	int level, i;
+
+	level = 0;
+	for (i = 0; i < 8; i++)
+	{
+		if ((i8214_irq_state & (1<<i))!=0)
+			level = i;
+	}
+
+	i8214_irq_state &= ~(1<<level);
+	return level*2;
+}
+
 static MACHINE_START( pc8801 )
 {
-
+	cpu_set_irq_callback(machine->device("maincpu"), pc8801_irq_callback);
 }
 
 static MACHINE_RESET( pc8801 )
@@ -1116,9 +1161,6 @@ static MACHINE_RESET( pc8801 )
 
 	fdc_irq_opcode = 0; //TODO: copied from PC-88VA, could be wrong here ... should be 0x7f ld a,a in the latter case
 
-	vrtc_irq_mask = 0;
-	sound_irq_mask = 0;
-
 	cpu_set_input_line_vector(machine->device("fdccpu"), 0, 0);
 
 	{
@@ -1136,6 +1178,14 @@ static MACHINE_RESET( pc8801 )
 
 	beep_set_frequency(machine->device("beeper"),2400);
 	beep_set_state(machine->device("beeper"),0);
+
+	{
+		vrtc_irq_mask = 0;
+		sound_irq_mask = 0;
+
+		i8214_irq_level = 0;
+		i8214_irq_state = 0;
+	}
 }
 
 static PALETTE_INIT( pc8801 )
@@ -1159,7 +1209,7 @@ static const struct upd765_interface pc8801_upd765_interface =
 static INTERRUPT_GEN( pc8801_vrtc_irq )
 {
 	if(vrtc_irq_mask)
-		cputag_set_input_line_and_vector(device->machine, "maincpu", 0, HOLD_LINE, 2);
+		pc8801_raise_irq(device->machine,1);
 }
 
 static MACHINE_CONFIG_START( pc8801, driver_device )
