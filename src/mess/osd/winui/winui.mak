@@ -82,4 +82,4 @@ endif
 
 $(EMU_EXE): $(VERSIONOBJ) $(DRVLIBS) $(WINOSDOBJS) $(LIBCPU) $(LIBEMU) $(LIBDASM) $(LIBSOUND) $(LIBUTIL) $(EXPAT) $(ZLIB) $(SOFTFLOAT) $(LIBOCORE) $(RESFILE)
 	@echo Linking $@...
-	$(LD) $(LDFLAGS) -mwindows $^ $(LIBS) -lcomdlg32 -o $@
+	$(LD) $(LDFLAGS) $^ $(LIBS) -lcomdlg32 -o $@
