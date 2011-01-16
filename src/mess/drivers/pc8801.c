@@ -11,6 +11,7 @@
 	- dipswitches are WRONG
 	- implement proper i8214 routing, also add irq latch mechanism.
 	- below notes states that plain PC-8801 doesn't have a disk CPU, but the BIOS clearly checks the floppy ports. Wrong info?
+	- joystick / mouse support;
 	- cursor is 8 x 10, not 8 x 8 as current implementation.
 
 	Notes:
@@ -111,7 +112,7 @@
 static UINT32 bankr[5],bankw[5];
 static UINT8 i8255_0_pc,i8255_1_pc;
 static UINT8 fdc_irq_opcode;
-static UINT8 ext_rom_bank,gfx_ctrl,vram_sel,misc_ctrl;
+static UINT8 ext_rom_bank,gfx_ctrl,vram_sel,misc_ctrl,device_ctrl_data;
 static UINT8 vrtc_irq_mask,sound_irq_mask;
 static UINT8 window_offset_bank;
 static UINT8 layer_mask;
@@ -431,6 +432,31 @@ static READ8_HANDLER( pc8801_ctrl_r )
 	return (vrtc << 5) | 0xc0;
 }
 
+static WRITE8_HANDLER( pc8801_ctrl_w )
+{
+	/*
+	x--- ---- beeper (mirror?)
+	-x-- ---- mouse latch (JOP1, routes on OPN sound port A)
+	--x- ---- beeper
+	---
+	*/
+
+	/* TODO: this might actually be two beepers */
+	if(((device_ctrl_data & 0x20) == 0x00) && ((data & 0x20) == 0x20))
+		beep_set_state(space->machine->device("beeper"),1);
+
+	if(((device_ctrl_data & 0x80) == 0x00) && ((data & 0x80) == 0x80))
+		beep_set_state(space->machine->device("beeper"),1);
+
+	if(((device_ctrl_data & 0x20) == 0x20) && ((data & 0x20) == 0x00))
+		beep_set_state(space->machine->device("beeper"),0);
+
+	if(((device_ctrl_data & 0x80) == 0x80) && ((data & 0x80) == 0x00))
+		beep_set_state(space->machine->device("beeper"),0);
+
+	device_ctrl_data = data;
+}
+
 static READ8_HANDLER( pc8801_ext_rom_bank_r )
 {
 	return ext_rom_bank;
@@ -603,7 +629,7 @@ static ADDRESS_MAP_START( pc8801_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x31, 0x31) AM_READ_PORT("DSW2") AM_WRITE(pc8801_gfx_ctrl_w)
 	AM_RANGE(0x32, 0x32) AM_READWRITE(pc8801_misc_ctrl_r, pc8801_misc_ctrl_w)
 //	AM_RANGE(0x34, 0x35) AM_WRITE(pc88sr_alu)
-	AM_RANGE(0x40, 0x40) AM_READ(pc8801_ctrl_r) //, pc88sr_outport_40)
+	AM_RANGE(0x40, 0x40) AM_READWRITE(pc8801_ctrl_r, pc8801_ctrl_w)
 	AM_RANGE(0x44, 0x45) AM_DEVREADWRITE("ym2203", ym2203_r,ym2203_w)
 //  AM_RANGE(0x46, 0x47) AM_NOP                                     /* OPNA extra port */
 	AM_RANGE(0x50, 0x50) AM_READWRITE(pc8801_crtc_param_r, pc88_crtc_param_w)
@@ -1107,6 +1133,9 @@ static MACHINE_RESET( pc8801 )
 		crtc.param_count = 0;
 		crtc.cmd = 0;
 	}
+
+	beep_set_frequency(machine->device("beeper"),2400);
+	beep_set_state(machine->device("beeper"),0);
 }
 
 static PALETTE_INIT( pc8801 )
@@ -1180,7 +1209,7 @@ static MACHINE_CONFIG_START( pc8801, driver_device )
 	MCFG_SOUND_CONFIG(pc88_ym2203_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("beep", BEEP, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 MACHINE_CONFIG_END
 
