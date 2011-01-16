@@ -13,6 +13,7 @@
 	- below notes states that plain PC-8801 doesn't have a disk CPU, but the BIOS clearly checks the floppy ports. Wrong info?
 	- joystick / mouse support;
 	- cursor is 8 x 10, not 8 x 8 as current implementation.
+	- text DMAC stuff isn't well documented;
 
 	per-game specific TODO:
 	- 100 Yen disk(s): reads kanji ports;
@@ -20,7 +21,6 @@
 	- Adrenalin Connection: seems to have an unemulated screen mode;
 	- Again: hangs waiting for something;
 	- Agress: crashes after that it shows the title screen;
-	- Tokyo Nampa Street: text garbage during gameplay;
 	- Xevious: game is too fast
 
 	Notes:
@@ -127,6 +127,7 @@ static UINT8 window_offset_bank;
 static UINT8 layer_mask;
 static UINT8 i8214_irq_level,i8214_irq_state;
 static UINT16 dma_counter[4],dma_address[4];
+static UINT8 dmac_mode;
 
 static void pc8801_update_irq(running_machine *machine)
 {
@@ -240,7 +241,7 @@ static VIDEO_UPDATE( pc8801 )
 		}
 	}
 
-	if(!(layer_mask & 1))
+	if(!(layer_mask & 1) && dmac_mode & 4)
 	{
 		for(y=0;y<25;y++)
 		{
@@ -661,6 +662,11 @@ static WRITE8_HANDLER( pc8801_dmac_w )
 	dmac_ff ^= 1;
 }
 
+static WRITE8_HANDLER( pc8801_dmac_mode_w )
+{
+	dmac_mode = data;
+}
+
 static ADDRESS_MAP_START( pc8801_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
@@ -697,6 +703,7 @@ static ADDRESS_MAP_START( pc8801_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x5c, 0x5c) AM_READ(pc8801_vram_select_r)
 	AM_RANGE(0x5c, 0x5f) AM_WRITE(pc8801_vram_select_w)
 	AM_RANGE(0x60, 0x67) AM_WRITE(pc8801_dmac_w)
+	AM_RANGE(0x68, 0x68) AM_WRITE(pc8801_dmac_mode_w)
 //  AM_RANGE(0x6e, 0x6e) AM_NOP                                     /* CPU clock info */
 //  AM_RANGE(0x6f, 0x6f) AM_NOP                                     /* RS-232C speed ctrl */
 	AM_RANGE(0x70, 0x70) AM_READWRITE(pc8801_window_bank_r, pc8801_window_bank_w)
