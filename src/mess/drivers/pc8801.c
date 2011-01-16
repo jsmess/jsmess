@@ -14,6 +14,15 @@
 	- joystick / mouse support;
 	- cursor is 8 x 10, not 8 x 8 as current implementation.
 
+	per-game specific TODO:
+	- 100 Yen disk(s): reads kanji ports;
+	- Acro Jet: hangs waiting for an irq;
+	- Adrenalin Connection: seems to have an unemulated screen mode;
+	- Again: hangs waiting for something;
+	- Agress: crashes after that it shows the title screen;
+	- Tokyo Nampa Street: text garbage during gameplay;
+	- Xevious: game is too fast
+
 	Notes:
 	- BIOS disk ROM defines what kind of floppies you could load:
 	  * with 0x0800 ROM size you can load 2d floppies only;
@@ -25,7 +34,7 @@
 	- 0x5c / 0x5f - VRAM banking
 	- 0x70 - window offset (banking)
 	- 0x71 - extra ROM banking
-	- 0x78 - window offset (banking) + 0x100
+	- 0x78 - window offset (banking) increment (+ 0x100)
 	- 0xe2 / 0xe3 - extra RAM banking
 	- 0xf0 / 0xf1 = kanji banking
 
@@ -113,10 +122,11 @@ static UINT32 bankr[5],bankw[5];
 static UINT8 i8255_0_pc,i8255_1_pc;
 static UINT8 fdc_irq_opcode;
 static UINT8 ext_rom_bank,gfx_ctrl,vram_sel,misc_ctrl,device_ctrl_data;
-static UINT8 vrtc_irq_mask,sound_irq_mask;
+static UINT8 vrtc_irq_mask,rtc_irq_mask,sound_irq_mask;
 static UINT8 window_offset_bank;
 static UINT8 layer_mask;
 static UINT8 i8214_irq_level,i8214_irq_state;
+static UINT16 dma_counter[4],dma_address[4];
 
 static void pc8801_update_irq(running_machine *machine)
 {
@@ -135,7 +145,8 @@ static void pc8801_update_irq(running_machine *machine)
 
 static void pc8801_raise_irq(running_machine *machine, int level)
 {
-	i8214_irq_state |= (1<<level);
+	/* TODO ... */
+	i8214_irq_state = (1<<level);
 	pc8801_update_irq(machine);
 }
 
@@ -244,7 +255,7 @@ static VIDEO_UPDATE( pc8801 )
 						int color;
 						UINT8 *gfx_data = screen->machine->region("gfx1")->base();
 
-						tile = vram[x+(y*120)+0xf3c8]; //TODO: vram base, connected to DMAC address 2
+						tile = vram[x+(y*120)+dma_address[2]];
 
 						res_x = x*8+xi;
 						res_y = y*8+yi;
@@ -536,7 +547,11 @@ static WRITE8_HANDLER( pc8801_irq_level_w )
 
 static WRITE8_HANDLER( pc8801_irq_mask_w )
 {
+	rtc_irq_mask = data & 1;
 	vrtc_irq_mask = data & 2;
+
+	if(data & 4)
+		printf("IRQ mask %02x\n",data);
 }
 
 static READ8_HANDLER( pc8801_window_bank_r )
@@ -634,6 +649,18 @@ static WRITE8_HANDLER( pc88_crtc_cmd_w )
 		printf("CRTC cmd %s polled\n",crtc_command[data >> 5]);
 }
 
+static WRITE8_HANDLER( pc8801_dmac_w )
+{
+	static UINT8 dmac_ff;
+
+	if(offset & 1)
+		dma_counter[offset >> 1] = (dmac_ff) ? (dma_counter[offset >> 1]&0xff)|(data<<8) : (dma_counter[offset >> 1]&0xff00)|(data&0xff);
+	else
+		dma_address[offset >> 1] = (dmac_ff) ? (dma_address[offset >> 1]&0xff)|(data<<8) : (dma_address[offset >> 1]&0xff00)|(data&0xff);
+
+	dmac_ff ^= 1;
+}
+
 static ADDRESS_MAP_START( pc8801_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
@@ -669,7 +696,7 @@ static ADDRESS_MAP_START( pc8801_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x54, 0x5b) AM_WRITE(pc8801_palram_w)
 	AM_RANGE(0x5c, 0x5c) AM_READ(pc8801_vram_select_r)
 	AM_RANGE(0x5c, 0x5f) AM_WRITE(pc8801_vram_select_w)
-//	AM_RANGE(0x60, 0x68) AM_READWRITE(pc88_dmac_r, pc88_dmac_w)
+	AM_RANGE(0x60, 0x67) AM_WRITE(pc8801_dmac_w)
 //  AM_RANGE(0x6e, 0x6e) AM_NOP                                     /* CPU clock info */
 //  AM_RANGE(0x6f, 0x6f) AM_NOP                                     /* RS-232C speed ctrl */
 	AM_RANGE(0x70, 0x70) AM_READWRITE(pc8801_window_bank_r, pc8801_window_bank_w)
@@ -1133,9 +1160,17 @@ static IRQ_CALLBACK( pc8801_irq_callback )
 	return level*2;
 }
 
+static TIMER_CALLBACK( pc8801_rtc_irq )
+{
+	if(rtc_irq_mask)
+		pc8801_raise_irq(machine,2);
+}
+
 static MACHINE_START( pc8801 )
 {
 	cpu_set_irq_callback(machine->device("maincpu"), pc8801_irq_callback);
+
+	timer_pulse(machine, ATTOTIME_IN_HZ(600), NULL, 0, pc8801_rtc_irq);
 }
 
 static MACHINE_RESET( pc8801 )
@@ -1186,6 +1221,10 @@ static MACHINE_RESET( pc8801 )
 		i8214_irq_level = 0;
 		i8214_irq_state = 0;
 	}
+
+	{
+		dma_address[2] = 0xf300;
+	}
 }
 
 static PALETTE_INIT( pc8801 )
@@ -1205,7 +1244,6 @@ static const struct upd765_interface pc8801_upd765_interface =
 	{FLOPPY_0, FLOPPY_1, NULL, NULL}
 };
 
-/* TODO: it needs daisy chain */
 static INTERRUPT_GEN( pc8801_vrtc_irq )
 {
 	if(vrtc_irq_mask)
