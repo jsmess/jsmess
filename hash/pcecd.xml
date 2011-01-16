@@ -4930,7 +4930,7 @@
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
       <diskarea name="cdrom">
-        <disk name="cd bishoujo pachinko kyuuma yon Shimai [imperfect] (gecd)(jpn)" sha1="90795ac81cf0d85547a84b7c01c689e0350090a0"/>
+        <disk name="cd bishoujo pachinko kyuuma yon shimai [imperfect] (gecd)(jpn)" sha1="90795ac81cf0d85547a84b7c01c689e0350090a0"/>
       </diskarea>
     </part>
   </software>
