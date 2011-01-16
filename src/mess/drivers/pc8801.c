@@ -9,9 +9,9 @@
 	  later models at some point.
 	- macros for the various rom / ram areas, it might require various attempts in order to finally get a reasonable arrangement ...
 	- dipswitches are WRONG
-	- currently it's too slow ... why?
 	- implement proper i8214 routing, also add irq latch mechanism.
 	- below notes states that plain PC-8801 doesn't have a disk CPU, but the BIOS clearly checks the floppy ports. Wrong info?
+	- cursor is 8 x 10, not 8 x 8 as current implementation.
 
 	Notes:
 	- BIOS disk ROM defines what kind of floppies you could load:
@@ -116,6 +116,30 @@ static UINT8 vrtc_irq_mask,sound_irq_mask;
 static UINT8 window_offset_bank;
 static UINT8 layer_mask;
 
+/*
+CRTC command params:
+0. CRTC reset
+
+[0] -xxx xxxx screen columns (+2)
+[1] xx-- ---- blink speed (in frame unit) (+1, << 3)
+[1] --xx xxxx screen lines (+1)
+[2] x--- ---- "skip line"
+[2] -x-- ---- cursor style (reverse on / underscore off)
+[2] --x- ---- cursor blink on/off
+
+[4] x--- ---- attribute not separate flag
+[4] -x-- ---- attribute color flag
+[4] --x- ---- attribute not special flag
+*/
+
+#define blink_speed ((((crtc.param[0][1] & 0xc0) >> 6) + 1) << 3)
+
+static struct
+{
+	UINT8 cmd,param_count,cursor_on;
+	UINT8 param[8][5];
+}crtc;
+
 #define NBASIC_BASE 0x20000
 #define N88BASIC_BASE 0x28000
 #define WRAM_BASE 0x00000
@@ -126,6 +150,30 @@ static VIDEO_START( pc8801 )
 
 }
 
+static UINT8 calc_cursor_pos(running_machine *machine,int x,int y,int yi)
+{
+	if(!(crtc.cursor_on)) // don't bother if cursor is off
+		return 0;
+
+	if(x == crtc.param[4][0] && y == crtc.param[4][1]) /* check if position matches */
+	{
+		/* don't pass through if we are using underscore */
+		if((!(crtc.param[0][2] & 0x40)) && yi != 7)
+			return 0;
+
+		/* finally check if blinking is currently active high */
+		if(!(crtc.param[0][2] & 0x20))
+			return 1;
+
+		if(((machine->primary_screen->frame_number() / blink_speed) & 1) == 0)
+			return 1;
+
+		return 0;
+	}
+
+	return 0;
+}
+
 static VIDEO_UPDATE( pc8801 )
 {
 	int x,y;
@@ -133,6 +181,7 @@ static VIDEO_UPDATE( pc8801 )
 	UINT8 *vram = screen->machine->region("maincpu")->base() + WRAM_BASE;
 	UINT8 *gvram = screen->machine->region("maincpu")->base() + GRAM_BASE;
 	UINT32 count;
+	UINT8 is_cursor;
 
 	count = 0;
 
@@ -177,7 +226,12 @@ static VIDEO_UPDATE( pc8801 )
 						res_x = x*8+xi;
 						res_y = y*8+yi;
 
-						color = ((gfx_data[tile*8+yi] >> (7-xi)) & 1) ? 7 : -1;
+						is_cursor = calc_cursor_pos(screen->machine,x,y,yi);
+
+						if(is_cursor)
+							color = ((gfx_data[tile*8+yi] >> (7-xi)) & 1) ? -1 : 7;
+						else
+							color = ((gfx_data[tile*8+yi] >> (7-xi)) & 1) ? 7 : -1;
 
 						if((res_x)<=screen->machine->primary_screen->visible_area().max_x && (res_y)<=screen->machine->primary_screen->visible_area().max_y)
 							if(color != -1)
@@ -488,24 +542,17 @@ static READ8_HANDLER( pc8801_crtc_param_r )
 
 static WRITE8_HANDLER( pc88_crtc_param_w )
 {
+	if(crtc.param_count < 5)
+	{
+		crtc.param[crtc.cmd][crtc.param_count] = data;
+		crtc.param_count++;
+	}
 }
 
 static READ8_HANDLER( pc8801_crtc_status_r )
 {
 	return 0xff;
 }
-
-/*
-  CRTC_RESET		= 0,
-  CRTC_STOP_DISPLAY	= 0,
-  CRTC_START_DISPLAY,
-  CRTC_SET_INTERRUPT_MASK,
-  CRTC_READ_LIGHT_PEN,
-  CRTC_LOAD_CURSOR_POSITION,
-  CRTC_RESET_INTERRUPT,
-  CRTC_RESET_COUNTERS,
-  CRTC_READ_STATUS,
-*/
 
 static const char *const crtc_command[] =
 {
@@ -521,9 +568,14 @@ static const char *const crtc_command[] =
 
 static WRITE8_HANDLER( pc88_crtc_cmd_w )
 {
+	crtc.cmd = (data & 0xe0) >> 5;
+	crtc.param_count = 0;
+
+	if(crtc.cmd == 4) // load cursor position ON/OFF
+		crtc.cursor_on = data & 1;
+
 	if((data >> 5) != 4)
 		printf("CRTC cmd %s polled\n",crtc_command[data >> 5]);
-
 }
 
 static ADDRESS_MAP_START( pc8801_io, ADDRESS_SPACE_IO, 8 )
@@ -1049,6 +1101,11 @@ static MACHINE_RESET( pc8801 )
 
 		for(i=0;i<0x10000;i++)
 			gvram[i] = 0x00;
+	}
+
+	{
+		crtc.param_count = 0;
+		crtc.cmd = 0;
 	}
 }
 
