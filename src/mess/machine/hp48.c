@@ -85,9 +85,6 @@ static const UINT8 hp48_module_addr_id[6] = { 0x19, 0xf4, 0xf6, 0xf8, 0xf2, 0x00
  */
 
 
-/* I/O memory (each UINT8 stores one nibble) */
-UINT8 hp48_io[64]; /* 64 nibbles */
-
 /* CRC state */
 
 /* timers state */

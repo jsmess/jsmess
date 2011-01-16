@@ -332,7 +332,7 @@ static MC6845_UPDATE_ROW( h19_update_row )
 	}
 }
 
-INS8250_INTERRUPT(h19_ace_irq)
+static INS8250_INTERRUPT(h19_ace_irq)
 {
 	cputag_set_input_line(device->machine, "maincpu", 0, (state ? HOLD_LINE : CLEAR_LINE));
 }

@@ -35,7 +35,7 @@ static INPUT_PORTS_START( ipds )
 INPUT_PORTS_END
 
 
-I8275_DISPLAY_PIXELS(ipds_display_pixels)
+static I8275_DISPLAY_PIXELS(ipds_display_pixels)
 {
 	int i;
 	bitmap_t *bitmap = device->machine->generic.tmpbitmap;

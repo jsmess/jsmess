@@ -50,6 +50,8 @@ Source Changes:
 - softlists: Added new lists, new dumps and info [anondumper, Barry Rodewald, 
   Curt Coder, MESSfan, Fabio Priuli]
 
+- Cleanups; static qualifiers.  [Atari Ace]
+
 
 
 0.141

@@ -13,8 +13,6 @@
 #include "emu.h"
 #include "includes/pegasus.h"
 
-UINT8* pegasus_video_ram;
-
 static const UINT8 mcm6571a[] =
 {
 	0x00,0x00,0x00,0x00,0x31,0x4A,0x44,0x4A,0x31,// 0

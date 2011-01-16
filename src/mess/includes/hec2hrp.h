@@ -110,7 +110,7 @@ extern UINT8 hector_videoram[0x04000];
 extern UINT8 hector_color[4];
 
 /* Sound function*/
-extern sn76477_interface hector_sn76477_interface;
+extern const sn76477_interface hector_sn76477_interface;
 
 // state disc2 port 
 extern UINT8 hector_disc2_data_r_ready; /* =ff when PC2 = true and data in read buffer (hector_disc2_data_read) */

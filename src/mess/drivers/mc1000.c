@@ -299,7 +299,7 @@ static VIDEO_UPDATE( mc1000 )
 	return mc6847_update(state->mc6847, bitmap, cliprect);
 }
 
-UINT8 mc1000_get_char_rom(running_machine *machine, UINT8 ch,int line)
+static UINT8 mc1000_get_char_rom(running_machine *machine, UINT8 ch, int line)
 {
 	return ch;
 }

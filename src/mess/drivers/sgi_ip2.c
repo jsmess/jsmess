@@ -222,7 +222,7 @@ static WRITE16_HANDLER(sgi_ip2_status_w)
 #define PAR_MBR		0x40	/* Check parity on multibus reads */
 #define PAR_MBW		0x80	/* Check parity on multibus writes */
 
-UINT8 sgi_ip2_parctl;
+static UINT8 sgi_ip2_parctl;
 
 static READ8_HANDLER(sgi_ip2_parctl_r)
 {
@@ -245,7 +245,7 @@ static WRITE8_HANDLER(sgi_ip2_parctl_w)
 #define MBP_LMACC	0x40	/* Allow lower memory access (0x0nnnnn - 0x7nnnnn) */
 #define MBP_HMACC	0x80	/* Allow upper memory access (0x8nnnnn - 0xfnnnnn) */
 
-UINT8 sgi_ip2_mbp;
+static UINT8 sgi_ip2_mbp;
 
 static READ8_HANDLER(sgi_ip2_mbp_r)
 {

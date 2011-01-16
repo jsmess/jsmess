@@ -67,7 +67,7 @@
 // CA2: SCSI interrupt = 0x01
 // CB1: ASC interrupt = 0x10
 
-INTERRUPT_GEN( mac_rbv_vbl )
+static INTERRUPT_GEN( mac_rbv_vbl )
 {
 	mac_state *mac = device->machine->driver_data<mac_state>();
 

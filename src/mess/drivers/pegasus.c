@@ -36,8 +36,6 @@
 #include "imagedev/cassette.h"
 #include "includes/pegasus.h"
 
-UINT8 pegasus_control_bits = 0;
-
 static TIMER_DEVICE_CALLBACK( pegasus_firq )
 {
 	device_t *cpu = timer.machine->device( "maincpu" );

@@ -64,9 +64,6 @@ const via6522_interface vectrex_via6522_interface =
 };
 
 
-typedef void (*vector_add_point_fn)(running_machine *, int, int, rgb_t, int);
-vector_add_point_fn vector_add_point_function;
-
 
 /*********************************************************************
 
@@ -233,7 +230,7 @@ static TIMER_CALLBACK(vectrex_zero_integrators)
 	vectrex_state *state = machine->driver_data<vectrex_state>();
 	state->x_int = state->x_center + (state->analog[A_ZR] * INT_PER_CLOCK);
 	state->y_int = state->y_center + (state->analog[A_ZR] * INT_PER_CLOCK);
-	vector_add_point_function(machine, state->x_int, state->y_int, state->beam_color, 0);
+	(*state->vector_add_point_function)(machine, state->x_int, state->y_int, state->beam_color, 0);
 }
 
 
@@ -260,12 +257,12 @@ static TIMER_CALLBACK(update_signal)
 		state->x_int += length * (state->analog[A_X] + state->analog[A_ZR]);
 		state->y_int += length * (state->analog[A_Y] + state->analog[A_ZR]);
 
-		vector_add_point_function(machine, state->x_int, state->y_int, state->beam_color, 2 * state->analog[A_Z] * state->blank);
+		(*state->vector_add_point_function)(machine, state->x_int, state->y_int, state->beam_color, 2 * state->analog[A_Z] * state->blank);
 	}
 	else
 	{
 		if (state->blank)
-			vector_add_point_function(machine, state->x_int, state->y_int, state->beam_color, 2 * state->analog[A_Z]);
+			(*state->vector_add_point_function)(machine, state->x_int, state->y_int, state->beam_color, 2 * state->analog[A_Z]);
 	}
 
 	state->vector_start_time = timer_get_time(machine);
@@ -294,7 +291,7 @@ VIDEO_START(vectrex)
 
 	state->imager_freq = 1;
 
-	vector_add_point_function = vectrex_add_point;
+	state->vector_add_point_function = vectrex_add_point;
 	state->imager_timer = timer_alloc(machine, vectrex_imager_eye, NULL);
 	timer_adjust_periodic(state->imager_timer,
 						  ATTOTIME_IN_HZ(state->imager_freq),
@@ -492,7 +489,7 @@ VIDEO_START(raaspec)
 	state->x_max = visarea.max_x << 16;
 	state->y_max = visarea.max_y << 16;
 
-	vector_add_point_function = vectrex_add_point;
+	state->vector_add_point_function = vectrex_add_point;
 	state->refresh = timer_alloc(machine, vectrex_refresh, NULL);
 
 	VIDEO_START_CALL(vector);

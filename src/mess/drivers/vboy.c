@@ -706,7 +706,7 @@ static DEVICE_IMAGE_LOAD( vboy_cart )
 	return IMAGE_INIT_PASS;
 }
 
-INTERRUPT_GEN( vboy_interrupt )
+static INTERRUPT_GEN( vboy_interrupt )
 {
 	vboy_state *state = device->machine->driver_data<vboy_state>();
 

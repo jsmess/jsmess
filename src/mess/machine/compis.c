@@ -373,7 +373,7 @@ WRITE16_DEVICE_HANDLER ( compis_osp_pit_w )
 /*-------------------------------------------------------------------------*/
 /*  USART 8251                                                             */
 /*-------------------------------------------------------------------------*/
-WRITE_LINE_DEVICE_HANDLER( compis_usart_rxready )
+static WRITE_LINE_DEVICE_HANDLER( compis_usart_rxready )
 {
 #if 0
 	if (state)

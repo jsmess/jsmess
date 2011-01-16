@@ -268,11 +268,6 @@ void nc_set_card_present_state(running_machine *machine, int state)
 	drvstate->card_status = state;
 }
 
-/* card ram */
-unsigned char *nc_card_ram = NULL;
-
-
-
 
 /* latched interrupts are interrupts that cannot be cleared by writing to the irq
 mask. latched interrupts can only be cleared by accessing the interrupting

@@ -217,7 +217,7 @@ WRITE8_DEVICE_HANDLER ( teleprinter_write )
 /***************************************************************************
     VIDEO HARDWARE
 ***************************************************************************/
-void generic_teleprinter_update(device_t *device, bitmap_t *bitmap, const rectangle *cliprect)
+static void generic_teleprinter_update(device_t *device, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	UINT8 code;
 	int y, c, x, b;

@@ -16,8 +16,6 @@
 #include "includes/microtan.h"
 
 
-UINT8 microtan_chunky_graphics = 0;
-UINT8 *microtan_chunky_buffer = NULL;
 
 
 WRITE8_HANDLER( microtan_videoram_w )

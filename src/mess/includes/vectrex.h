@@ -60,6 +60,7 @@ public:
 	UINT16 via_timer2;
 	attotime vector_start_time;
 	UINT8 cb2;
+	void (*vector_add_point_function) (running_machine *, int, int, rgb_t, int);
 };
 
 
@@ -98,6 +99,5 @@ WRITE8_HANDLER ( vectrex_via_w );
 
 void vectrex_add_point_stereo (running_machine *machine, int x, int y, rgb_t color, int intensity);
 void vectrex_add_point (running_machine *machine, int x, int y, rgb_t color, int intensity);
-extern void (*vector_add_point_function) (running_machine *, int, int, rgb_t, int);
 
 #endif /* VECTREX_H_ */

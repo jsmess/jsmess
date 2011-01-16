@@ -1,10 +1,6 @@
 #include "emu.h"
 #include "includes/channelf.h"
 
-UINT8 channelf_val_reg = 0;
-UINT8 channelf_row_reg = 0;
-UINT8 channelf_col_reg = 0;
-
 static const rgb_t channelf_palette[] =
 {
 	MAKE_RGB(0x10, 0x10, 0x10),	/* black */

@@ -269,8 +269,6 @@ void nes_partialhash(char *dest, const unsigned char *data, unsigned long length
 
 /*----------- defined in video/nes.c -----------*/
 
-extern int nes_vram_sprite[8];
-
 PALETTE_INIT( nes );
 VIDEO_START( nes );
 VIDEO_UPDATE( nes );

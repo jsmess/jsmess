@@ -694,7 +694,7 @@ void Update_Sound(address_space *space, UINT8 data)
 	/* VCO oscillateur*/
 	if (AU[12]==1)
 		sn76477_vco_res_w(		sn76477, Pin_Value[18][AU[10]]/12.0); /* en non AU11*/
-    else
+	else
 		sn76477_vco_res_w(		sn76477, Pin_Value[18][AU[10]]); /* en non AU11*/
 
 	sn76477_vco_cap_w(		sn76477, Pin_Value[17][AU[2 ]]);
@@ -734,7 +734,7 @@ void Update_Sound(address_space *space, UINT8 data)
 	sn76477_enable_w(sn76477, Pin_Value[9][AU[14]]);
 }
 
-sn76477_interface hector_sn76477_interface =
+const sn76477_interface hector_sn76477_interface =
 {
 	RES_K(47),		/*  4  noise_res*/
 	RES_K(330),		/*  5  filter_res*/

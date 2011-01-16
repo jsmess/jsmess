@@ -24,6 +24,8 @@ class sm1800_state : public driver_device
 public:
 	sm1800_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
+
+	UINT8 irq_state;
 };
 
 static ADDRESS_MAP_START(sm1800_mem, ADDRESS_SPACE_PROGRAM, 8)
@@ -65,15 +67,14 @@ static VIDEO_UPDATE( sm1800 )
 	return 0;
 }
 
-UINT8 state = 0;
-
-INTERRUPT_GEN( sm1800_vblank_interrupt )
+static INTERRUPT_GEN( sm1800_vblank_interrupt )
 {
-	cputag_set_input_line(device->machine, "maincpu", 0, state ?  HOLD_LINE : CLEAR_LINE);
-	state ^= 1;
+	sm1800_state *state = device->machine->driver_data<sm1800_state>();
+	cputag_set_input_line(device->machine, "maincpu", 0, state->irq_state ?  HOLD_LINE : CLEAR_LINE);
+	state->irq_state ^= 1;
 }
 
-I8275_DISPLAY_PIXELS(sm1800_display_pixels)
+static I8275_DISPLAY_PIXELS(sm1800_display_pixels)
 {
 	int i;
 	bitmap_t *bitmap = device->machine->generic.tmpbitmap;
@@ -119,6 +120,7 @@ static READ8_DEVICE_HANDLER (sm1800_8255_portc_r )
 {
 	return 0;
 }
+
 I8255A_INTERFACE( sm1800_ppi8255_interface )
 {
 	DEVCB_HANDLER(sm1800_8255_porta_r),

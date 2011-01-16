@@ -330,7 +330,7 @@ bool pb1000_state::video_update(screen_device &screen, bitmap_t &bitmap, const r
 	return m_hd44352->video_update(bitmap, cliprect);
 }
 
-void lcd_control(hd61700_cpu_device &device, UINT8 data)
+static void lcd_control(hd61700_cpu_device &device, UINT8 data)
 {
 	pb1000_state *state = device.machine->driver_data<pb1000_state>();
 
@@ -338,7 +338,7 @@ void lcd_control(hd61700_cpu_device &device, UINT8 data)
 }
 
 
-UINT8 lcd_data_r(hd61700_cpu_device &device)
+static UINT8 lcd_data_r(hd61700_cpu_device &device)
 {
 	pb1000_state *state = device.machine->driver_data<pb1000_state>();
 
@@ -346,7 +346,7 @@ UINT8 lcd_data_r(hd61700_cpu_device &device)
 }
 
 
-void lcd_data_w(hd61700_cpu_device &device, UINT8 data)
+static void lcd_data_w(hd61700_cpu_device &device, UINT8 data)
 {
 	pb1000_state *state = device.machine->driver_data<pb1000_state>();
 
@@ -440,39 +440,39 @@ void pb1000_state::kb_matrix_w(running_machine *machine, UINT8 matrix)
 //  HD61700 interface
 //-------------------------------------------------
 
-void kb_matrix_w_call(hd61700_cpu_device &device, UINT8 matrix)
+static void kb_matrix_w_call(hd61700_cpu_device &device, UINT8 matrix)
 {
 	pb1000_state *state = device.machine->driver_data<pb1000_state>();
 
 	state->kb_matrix_w(device.machine, matrix);
 }
 
-UINT8 pb1000_port_r(hd61700_cpu_device &device)
+static UINT8 pb1000_port_r(hd61700_cpu_device &device)
 {
 	//TODO
 	return 0x00;
 }
 
-UINT8 pb2000c_port_r(hd61700_cpu_device &device)
+static UINT8 pb2000c_port_r(hd61700_cpu_device &device)
 {
 	//TODO
 	return 0xfc;
 }
 
-void port_w(hd61700_cpu_device &device, UINT8 data)
+static void port_w(hd61700_cpu_device &device, UINT8 data)
 {
 	beep_set_state(device.machine->device("beep"), (BIT(data,7) ^ BIT(data,6)));
 	//printf("%x\n", data);
 }
 
-UINT16 pb1000_kb_r_call(hd61700_cpu_device &device)
+static UINT16 pb1000_kb_r_call(hd61700_cpu_device &device)
 {
 	pb1000_state *state = device.machine->driver_data<pb1000_state>();
 
 	return state->pb1000_kb_r(device.machine);
 }
 
-UINT16 pb2000c_kb_r_call(hd61700_cpu_device &device)
+static UINT16 pb2000c_kb_r_call(hd61700_cpu_device &device)
 {
 	pb1000_state *state = device.machine->driver_data<pb1000_state>();
 
@@ -521,20 +521,20 @@ static const hd44352_interface hd44352_pb1000_conf =
 };
 
 static MACHINE_CONFIG_START( pb1000, pb1000_state )
-    /* basic machine hardware */
-    MCFG_CPU_ADD("maincpu", HD61700, 910000)
-    MCFG_CPU_PROGRAM_MAP(pb1000_mem)
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", HD61700, 910000)
+	MCFG_CPU_PROGRAM_MAP(pb1000_mem)
 	MCFG_HD61700_CONFIG(pb1000_config)
 
-    /* video hardware */
-    MCFG_SCREEN_ADD("screen", RASTER)
-    MCFG_SCREEN_REFRESH_RATE(50)
-    MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-    MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(192, 32)
 	MCFG_SCREEN_VISIBLE_AREA(0, 192-1, 0, 32-1)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
-    MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT( pb1000 )
 	MCFG_GFXDECODE( pb1000 )
 
@@ -550,20 +550,20 @@ static MACHINE_CONFIG_START( pb1000, pb1000_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( pb2000c, pb1000_state )
-    /* basic machine hardware */
-    MCFG_CPU_ADD("maincpu",HD61700, 910000)
-    MCFG_CPU_PROGRAM_MAP(pb2000c_mem)
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu",HD61700, 910000)
+	MCFG_CPU_PROGRAM_MAP(pb2000c_mem)
 	MCFG_HD61700_CONFIG(pb2000c_config)
 
-    /* video hardware */
-    MCFG_SCREEN_ADD("screen", RASTER)
-    MCFG_SCREEN_REFRESH_RATE(50)
-    MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-    MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(192, 32)
 	MCFG_SCREEN_VISIBLE_AREA(0, 192-1, 0, 32-1)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
-    MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT( pb1000 )
 	MCFG_GFXDECODE( pb1000 )
 

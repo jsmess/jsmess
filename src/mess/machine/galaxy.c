@@ -32,8 +32,6 @@ READ8_HANDLER( galaxy_keyboard_r )
 	}
 }
 
-UINT8 galaxy_latch_value = 0;
-
 WRITE8_HANDLER( galaxy_latch_w )
 {
 	galaxy_state *state = space->machine->driver_data<galaxy_state>();
@@ -47,7 +45,6 @@ WRITE8_HANDLER( galaxy_latch_w )
 /***************************************************************************
   Interrupts
 ***************************************************************************/
-int galaxy_interrupts_enabled = TRUE;
 
 INTERRUPT_GEN( galaxy_interrupt )
 {

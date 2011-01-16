@@ -136,7 +136,7 @@ void vectrex_configuration(running_machine *machine)
 		if (state->imager_status == 0)
 			state->imager_status = cport & 0x01;
 
-		vector_add_point_function = cport & 0x02 ? vectrex_add_point_stereo: vectrex_add_point;
+		state->vector_add_point_function = cport & 0x02 ? vectrex_add_point_stereo: vectrex_add_point;
 
 		switch ((cport >> 2) & 0x07)
 		{
@@ -199,7 +199,7 @@ void vectrex_configuration(running_machine *machine)
 	}
 	else
 	{
-		vector_add_point_function = vectrex_add_point;
+		state->vector_add_point_function = vectrex_add_point;
 		state->beam_color = RGB_WHITE;
 		state->imager_colors[0] = state->imager_colors[1] = state->imager_colors[2] = state->imager_colors[3] = state->imager_colors[4] = state->imager_colors[5] = RGB_WHITE;
 	}

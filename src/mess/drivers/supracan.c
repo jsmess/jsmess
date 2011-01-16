@@ -105,9 +105,9 @@ typedef struct _acan_sprdma_regs_t acan_sprdma_regs_t;
 struct _acan_sprdma_regs_t
 {
 	UINT32 src;
-    UINT16 src_inc;
+	UINT16 src_inc;
 	UINT32 dst;
-    UINT16 dst_inc;
+	UINT16 dst_inc;
 	UINT16 count;
 	UINT16 control;
 };
@@ -116,70 +116,67 @@ class supracan_state : public driver_device
 {
 public:
 	supracan_state(running_machine &machine, const driver_device_config_base &config) : driver_device(machine, config)
-    {
-        m6502_reset = 0;
-    }
+	{
+		m6502_reset = 0;
+	}
 
 	acan_dma_regs_t acan_dma_regs;
 	acan_sprdma_regs_t acan_sprdma_regs;
 
 	UINT16 m6502_reset;
 	UINT8 *soundram;
-    UINT8 soundlatch;
-    UINT8 soundcpu_irq_src;
-    UINT8 sound_irq_enable_reg;
-    UINT8 sound_irq_source_reg;
-    UINT8 sound_cpu_68k_irq_reg;
+	UINT8 soundlatch;
+	UINT8 soundcpu_irq_src;
+	UINT8 sound_irq_enable_reg;
+	UINT8 sound_irq_source_reg;
+	UINT8 sound_cpu_68k_irq_reg;
 
 	emu_timer *video_timer;
-    emu_timer *hbl_timer;
-    emu_timer *line_on_timer;
-    emu_timer *line_off_timer;
+	emu_timer *hbl_timer;
+	emu_timer *line_on_timer;
+	emu_timer *line_off_timer;
 	UINT16 *vram;
 	UINT16 *vram_swapped;
 	UINT8 *vram_addr_swapped;
 
-    UINT16 *pram;
+	UINT16 *pram;
 
-    UINT16 sprite_count;
+	UINT16 sprite_count;
 	UINT32 sprite_base_addr;
-    UINT8 sprite_flags;
+	UINT8 sprite_flags;
 
  	UINT32 tilemap_base_addr[3];
 	int tilemap_scrollx[3];
-    int tilemap_scrolly[3];
+	int tilemap_scrolly[3];
 	UINT16 video_flags;
 	UINT16 tilemap_flags[3];
-    UINT16 tilemap_mode[3];
+	UINT16 tilemap_mode[3];
 	UINT16 irq_mask;
-    UINT16 hbl_mask;
+	UINT16 hbl_mask;
 
 	UINT32 roz_base_addr;
 	UINT16 roz_mode;
 	UINT32 roz_scrollx;
-    UINT32 roz_scrolly;
+	UINT32 roz_scrolly;
 	UINT16 roz_tile_bank;
-    UINT32 roz_unk_base0;
-    UINT32 roz_unk_base1;
-    UINT32 roz_unk_base2;
-    UINT16 roz_coeffa;
-    UINT16 roz_coeffb;
-    UINT16 roz_coeffc;
-    UINT16 roz_coeffd;
-    INT32 roz_changed;
-    INT32 roz_cx;
-    INT32 roz_cy;
-    UINT16 unk_1d0;
+	UINT32 roz_unk_base0;
+	UINT32 roz_unk_base1;
+	UINT32 roz_unk_base2;
+	UINT16 roz_coeffa;
+	UINT16 roz_coeffb;
+	UINT16 roz_coeffc;
+	UINT16 roz_coeffd;
+	INT32 roz_changed;
+	INT32 roz_cx;
+	INT32 roz_cy;
+	UINT16 unk_1d0;
 
 	UINT16 video_regs[256];
 
-    bool hack_68k_to_6502_access;
+	bool hack_68k_to_6502_access;
 
-	tilemap_t    *tilemap_sizes[4][4];
+	tilemap_t *tilemap_sizes[4][4];
 	bitmap_t	 *sprite_final_bitmap;
-
-
-
 };
 
 static READ16_HANDLER( supracan_68k_soundram_r );
@@ -207,9 +204,9 @@ INLINE void verboselog(const char *tag, running_machine *machine, int n_level, c
 #define verboselog(w,x,y,z,...)
 #endif
 
-int supracan_tilemap_get_region(running_machine* machine, int layer)
+static int supracan_tilemap_get_region(running_machine* machine, int layer)
 {
-    supracan_state *state = machine->driver_data<supracan_state>();
+	supracan_state *state = machine->driver_data<supracan_state>();
 
 	// HACK!!!
 	if (layer==2)
@@ -253,7 +250,7 @@ int supracan_tilemap_get_region(running_machine* machine, int layer)
 
 static void supracan_tilemap_get_info_common(running_machine* machine, int layer, tile_data *tileinfo, int count)
 {
-    supracan_state *state = machine->driver_data<supracan_state>();
+	supracan_state *state = machine->driver_data<supracan_state>();
 
 	UINT16* supracan_vram = state->vram;
 
@@ -263,8 +260,8 @@ static void supracan_tilemap_get_info_common(running_machine* machine, int layer
 
 	count += base;
 
-    UINT16 tile_bank = 0;
-    UINT16 palette_bank = 0;
+	UINT16 tile_bank = 0;
+	UINT16 palette_bank = 0;
 	switch(gfx_mode)
 	{
 		case 7:
@@ -293,10 +290,10 @@ static void supracan_tilemap_get_info_common(running_machine* machine, int layer
 	}
 
 
-    if(layer == 2)
-    {
-        tile_bank = 0x1000;
-    }
+	if(layer == 2)
+	{
+		tile_bank = 0x1000;
+	}
 
 	int tile = (supracan_vram[count] & 0x03ff) + tile_bank;
 	int flipxy = (supracan_vram[count] & 0x0c00)>>10;
@@ -308,16 +305,16 @@ static void supracan_tilemap_get_info_common(running_machine* machine, int layer
 // I wonder how different this really is.. my guess, not at all.
 static void supracan_tilemap_get_info_roz(running_machine* machine, int layer, tile_data *tileinfo, int count)
 {
-    supracan_state *state = machine->driver_data<supracan_state>();
+	supracan_state *state = machine->driver_data<supracan_state>();
 
 	UINT16* supracan_vram = state->vram;
 
 	UINT32 base = state->roz_base_addr;
 
 
-    int region = 1;
-    UINT16 tile_bank = 0;
-    UINT16 palette_bank = 0;
+	int region = 1;
+	UINT16 tile_bank = 0;
+	UINT16 palette_bank = 0;
 
 	region = supracan_tilemap_get_region(machine, layer);
 
@@ -388,8 +385,8 @@ static TILE_GET_INFO( get_supracan_roz_tile_info )
 
 static VIDEO_START( supracan )
 {
-    supracan_state *state = machine->driver_data<supracan_state>();
-    state->sprite_final_bitmap = auto_bitmap_alloc(machine, 1024, 1024, BITMAP_FORMAT_INDEXED16);
+	supracan_state *state = machine->driver_data<supracan_state>();
+	state->sprite_final_bitmap = auto_bitmap_alloc(machine, 1024, 1024, BITMAP_FORMAT_INDEXED16);
 
 	state->vram = (UINT16*)machine->region("ram_gfx")->base();
 	state->vram_swapped = (UINT16*)machine->region("ram_gfx2")->base();
@@ -418,7 +415,7 @@ static VIDEO_START( supracan )
 
 static int get_tilemap_dimensions(running_machine* machine, int &xsize, int &ysize, int layer)
 {
-    supracan_state *state = (supracan_state *)machine->driver_data<supracan_state>();
+	supracan_state *state = (supracan_state *)machine->driver_data<supracan_state>();
 	int select;
 
 	xsize = 32;
@@ -455,7 +452,7 @@ static int get_tilemap_dimensions(running_machine* machine, int &xsize, int &ysi
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-    supracan_state *state = machine->driver_data<supracan_state>();
+	supracan_state *state = machine->driver_data<supracan_state>();
 	UINT16 *supracan_vram = state->vram;
 
 //      [0]
@@ -608,9 +605,9 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 
 
-void mark_active_tilemap_all_dirty(running_machine* machine, int layer)
+static void mark_active_tilemap_all_dirty(running_machine* machine, int layer)
 {
-    supracan_state *state = (supracan_state *)machine->driver_data<supracan_state>();
+	supracan_state *state = (supracan_state *)machine->driver_data<supracan_state>();
 	int xsize = 0;
 	int ysize = 0;
 
@@ -751,7 +748,7 @@ static void supracan_suprnova_draw_roz(running_machine* machine, bitmap_t* bitma
 
 static VIDEO_UPDATE( supracan )
 {
-    supracan_state *state = (supracan_state *)screen->machine->driver_data<supracan_state>();
+	supracan_state *state = (supracan_state *)screen->machine->driver_data<supracan_state>();
 
 
 
@@ -848,7 +845,7 @@ static VIDEO_UPDATE( supracan )
 						if (scrolly&0x8000) scrolly-= 0x10000;
 
 					  	int mosaic_count = (state->tilemap_flags[layer] & 0x001c) >> 2;
-    					int mosaic_mask = 0xffffffff << mosaic_count;
+						int mosaic_mask = 0xffffffff << mosaic_count;
 
 						int y,x;
 						// yes, it will draw a single line if you specify a cliprect as such (partial updates...)
@@ -984,9 +981,9 @@ static VIDEO_UPDATE( supracan )
 
 static WRITE16_HANDLER( supracan_dma_w )
 {
-    supracan_state *state = (supracan_state *)space->machine->driver_data<supracan_state>();
+	supracan_state *state = (supracan_state *)space->machine->driver_data<supracan_state>();
 	acan_dma_regs_t *acan_dma_regs = &state->acan_dma_regs;
-    int ch = (offset < 0x10/2) ? 0 : 1;
+	int ch = (offset < 0x10/2) ? 0 : 1;
 
 	switch(offset)
 	{
@@ -1059,19 +1056,19 @@ static WRITE16_HANDLER( supracan_dma_w )
 	}
 }
 
-/*
+#if 0
 static WRITE16_HANDLER( supracan_pram_w )
 {
-    supracan_state *state = (supracan_state *)space->machine->driver_data<supracan_state>();
-    state->pram[offset] &= ~mem_mask;
-    state->pram[offset] |= data & mem_mask;
+	supracan_state *state = (supracan_state *)space->machine->driver_data<supracan_state>();
+	state->pram[offset] &= ~mem_mask;
+	state->pram[offset] |= data & mem_mask;
 }
-*/
+#endif
 
 // swap address around so that 64x64 tile can be decoded as 8x8 tiles..
-void write_swapped_byte(running_machine* machine, int offset, UINT8 byte )
+static void write_swapped_byte(running_machine* machine, int offset, UINT8 byte )
 {
-    supracan_state *state = (supracan_state *)machine->driver_data<supracan_state>();
+	supracan_state *state = (supracan_state *)machine->driver_data<supracan_state>();
 	int swapped_offset = BITSWAP32(offset, 31,30,29,28,27,26,25,24,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8,7,2,1,0,6,5,4,3);
 
 	state->vram_addr_swapped[swapped_offset] = byte;
@@ -1080,14 +1077,14 @@ void write_swapped_byte(running_machine* machine, int offset, UINT8 byte )
 
 static READ16_HANDLER( supracan_vram_r )
 {
-    supracan_state *state = (supracan_state *)space->machine->driver_data<supracan_state>();
+	supracan_state *state = (supracan_state *)space->machine->driver_data<supracan_state>();
 	return state->vram[offset];
 }
 
 
 static WRITE16_HANDLER( supracan_vram_w )
 {
-    supracan_state *state = (supracan_state *)space->machine->driver_data<supracan_state>();
+	supracan_state *state = (supracan_state *)space->machine->driver_data<supracan_state>();
 	COMBINE_DATA(&state->vram[offset]);
 
 	// store a byteswapped vesrion for easier gfx-decode
@@ -1115,11 +1112,11 @@ static ADDRESS_MAP_START( supracan_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0xe80202, 0xe80203 ) AM_READ_PORT("P2")
 	AM_RANGE( 0xe80208, 0xe80209 ) AM_READ_PORT("P3")
 	AM_RANGE( 0xe8020c, 0xe8020d ) AM_READ_PORT("P4")
-    AM_RANGE( 0xe80000, 0xe8ffff ) AM_READWRITE( supracan_68k_soundram_r, supracan_68k_soundram_w )
+	AM_RANGE( 0xe80000, 0xe8ffff ) AM_READWRITE( supracan_68k_soundram_r, supracan_68k_soundram_w )
 	AM_RANGE( 0xe90000, 0xe9001f ) AM_READWRITE( supracan_sound_r, supracan_sound_w )
 	AM_RANGE( 0xe90020, 0xe9003f ) AM_WRITE( supracan_dma_w )
 	AM_RANGE( 0xf00000, 0xf001ff ) AM_READWRITE( supracan_video_r, supracan_video_w )
-    AM_RANGE( 0xf00200, 0xf003ff ) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE( 0xf00200, 0xf003ff ) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE( 0xf40000, 0xf5ffff ) AM_READWRITE(supracan_vram_r, supracan_vram_w)
 	AM_RANGE( 0xfc0000, 0xfdffff ) AM_MIRROR(0x30000) AM_RAM /* System work ram */
 ADDRESS_MAP_END
@@ -1520,10 +1517,10 @@ static TIMER_CALLBACK( supracan_line_off_callback )
 
 static TIMER_CALLBACK( supracan_video_callback )
 {
-    supracan_state *state = machine->driver_data<supracan_state>();
+	supracan_state *state = machine->driver_data<supracan_state>();
 	int vpos = machine->primary_screen->vpos();
 
-    state->video_regs[0] &= ~0x0002;
+	state->video_regs[0] &= ~0x0002;
 
 	switch( vpos )
 	{
@@ -1730,12 +1727,12 @@ static WRITE16_HANDLER( supracan_video_w )
 
 		case 0x1f0/2: //FIXME: this register is mostly not understood
 			state->irq_mask = data;//(data & 8) ? 0 : 1;
-            /*
+#if 0
             if(!state->irq_mask && !state->hbl_mask)
             {
                 cpu_set_input_line(devtag_get_device(space->machine, "maincpu"), 7, CLEAR_LINE);
             }
-            */
+#endif
             verboselog("maincpu", space->machine, 3, "irq_mask = %04x\n", data);
 			break;
 		default:
@@ -1882,14 +1879,14 @@ GFXDECODE_END
 
 static INTERRUPT_GEN( supracan_irq )
 {
-    /*
+#if 0
     supracan_state *state = (supracan_state *)device->machine->driver_data<supracan_state>();
 
     if(state->irq_mask)
     {
         cpu_set_input_line(device, 7, HOLD_LINE);
     }
-    */
+#endif
 }
 
 static INTERRUPT_GEN( supracan_sound_irq )
@@ -1916,11 +1913,11 @@ static MACHINE_CONFIG_START( supracan, supracan_state )
 
 	MCFG_CPU_ADD( "soundcpu", M6502, XTAL_3_579545MHz )		/* TODO: Verfiy actual clock */
 	MCFG_CPU_PROGRAM_MAP( supracan_sound_mem )
-    MCFG_CPU_VBLANK_INT("screen", supracan_sound_irq)
+	MCFG_CPU_VBLANK_INT("screen", supracan_sound_irq)
 
 #if !(SOUNDCPU_BOOT_HACK)
-    MCFG_QUANTUM_PERFECT_CPU("maincpu")
-    MCFG_QUANTUM_PERFECT_CPU("soundcpu")
+	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+	MCFG_QUANTUM_PERFECT_CPU("soundcpu")
 #endif
 
 	MCFG_MACHINE_START( supracan )
@@ -1928,7 +1925,7 @@ static MACHINE_CONFIG_START( supracan, supracan_state )
 
 	MCFG_SCREEN_ADD( "screen", RASTER )
 	MCFG_SCREEN_FORMAT( BITMAP_FORMAT_INDEXED16 )
-    //MCFG_SCREEN_FORMAT( BITMAP_FORMAT_RGB32 )
+	//MCFG_SCREEN_FORMAT( BITMAP_FORMAT_RGB32 )
 	MCFG_SCREEN_RAW_PARAMS(XTAL_10_738635MHz/2, 348, 0, 256, 256, 0, 240 )	/* No idea if this is correct */
 
 	MCFG_PALETTE_LENGTH( 32768 )

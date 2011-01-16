@@ -177,7 +177,7 @@ WRITE8_MEMBER( portfolio_state::sivr_w )
 //  IRQ_CALLBACK( portfolio_int_ack )
 //-------------------------------------------------
 
-IRQ_CALLBACK( portfolio_int_ack )
+static IRQ_CALLBACK( portfolio_int_ack )
 {
 	portfolio_state *state = device->machine->driver_data<portfolio_state>();
 
@@ -383,7 +383,7 @@ WRITE8_MEMBER( portfolio_state::unknown_w )
 //  TIMER_DEVICE_CALLBACK( system_tick )
 //-------------------------------------------------
 
-TIMER_DEVICE_CALLBACK( system_tick )
+static TIMER_DEVICE_CALLBACK( system_tick )
 {
 	portfolio_state *state = timer.machine->driver_data<portfolio_state>();
 
@@ -394,7 +394,7 @@ TIMER_DEVICE_CALLBACK( system_tick )
 //  TIMER_DEVICE_CALLBACK( counter_tick )
 //-------------------------------------------------
 
-TIMER_DEVICE_CALLBACK( counter_tick )
+static TIMER_DEVICE_CALLBACK( counter_tick )
 {
 	portfolio_state *state = timer.machine->driver_data<portfolio_state>();
 
@@ -668,7 +668,7 @@ static PALETTE_INIT( portfolio )
 //  HD61830_INTERFACE( lcdc_intf )
 //-------------------------------------------------
 
-READ8_DEVICE_HANDLER( hd61830_rd_r )
+static READ8_DEVICE_HANDLER( hd61830_rd_r )
 {
 	UINT16 address = ((offset & 0xff) << 3) | ((offset >> 12) & 0x07);
 	UINT8 data = device->machine->region(HD61830_TAG)->base()[address];

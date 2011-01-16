@@ -449,24 +449,24 @@ static INPUT_PORTS_START(geneve)
 
 INPUT_PORTS_END
 
-DRIVER_INIT( genmod )
+static DRIVER_INIT( genmod )
 {
 	/*has_genmod = TRUE;*/
 }
 
-DRIVER_INIT( geneve )
+static DRIVER_INIT( geneve )
 {
 	/*has_genmod = FALSE;*/
 }
 
-MACHINE_START( geneve )
+static MACHINE_START( geneve )
 {
 }
 
 /*
     Reset the machine.
 */
-MACHINE_RESET( geneve )
+static MACHINE_RESET( geneve )
 {
 }
 
