@@ -383,7 +383,7 @@ static UINT32 pc8801_bankswitch_1_r(running_machine *machine)
 	if(ext_rom_bank & 1) // NOT ext ROM bank
 		return N88BASIC_BASE + 0x6000;
 
-	return N88BASIC_BASE + 0x6000 + 0x2000; // ext ROM bank
+	return N88BASIC_BASE + 0x6000 + (0x2000 * ((misc_ctrl & 3)+1)); // ext ROM bank
 }
 
 static UINT32 pc8801_bankswitch_0_w(running_machine *machine)
@@ -1424,7 +1424,7 @@ MACHINE_CONFIG_END
 
 /* ROMs */
 
-ROM_START( pc8801 )
+ROM_START( pc8801 ) /* Basic version 1.0 */
 	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "n80.rom",   0x20000, 0x8000, CRC(5cb8b584) SHA1(063609dd518c124a4fc9ba35d1bae35771666a34) )
 	ROM_LOAD( "n88.rom",   0x28000, 0x8000, CRC(ffd68be0) SHA1(3518193b8207bdebf22c1380c2db8c554baff329) )
@@ -1433,14 +1433,13 @@ ROM_START( pc8801 )
 	ROM_REGION( 0x10000, "fdccpu", 0)
 	ROM_LOAD( "disk.rom", 0x0000, 0x0800, CRC(2158d307) SHA1(bb7103a0818850a039c67ff666a31ce49a8d516f) )
 
-
 	ROM_REGION( 0x40000, "gfx1", 0)
 	ROM_LOAD( "font.rom", 0x0000, 0x0800, CRC(56653188) SHA1(84b90f69671d4b72e8f219e1fe7cd667e976cf7f) )
 ROM_END
 
 /* The dump only included "maincpu". Other roms arbitrariely taken from PC-8801 & PC-8801 MkIISR (there should be
 at least 1 Kanji ROM). */
-ROM_START( pc8801mk2 )
+ROM_START( pc8801mk2 ) /* Basic version 1.3 */
 	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "m2_n80.rom",   0x20000, 0x8000, CRC(91d84b1a) SHA1(d8a1abb0df75936b3fc9d226ccdb664a9070ffb1) )
 	ROM_LOAD( "m2_n88.rom",   0x28000, 0x8000, CRC(f35169eb) SHA1(ef1f067f819781d9fb2713836d195866f0f81501) )
@@ -1454,7 +1453,7 @@ ROM_START( pc8801mk2 )
 	ROM_LOAD( "kanji1.rom", 0x00000, 0x20000, CRC(6178bd43) SHA1(82e11a177af6a5091dd67f50a2f4bafda84d6556) )
 ROM_END
 
-ROM_START( pc8001mk2sr )
+ROM_START( pc8801mk2sr )
 	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "mk2sr_n80.rom",   0x20000, 0x8000, CRC(27e1857d) SHA1(5b922ed9de07d2a729bdf1da7b57c50ddf08809a) )
 	ROM_LOAD( "mk2sr_n88.rom",   0x28000, 0x8000, CRC(a0fc0473) SHA1(3b31fc68fa7f47b21c1a1cb027b86b9e87afbfff) )
@@ -1654,7 +1653,7 @@ ROM_END
 
 COMP( 1981, pc8801,         0,		0,     pc8801,  pc88sr,  0,    "Nippon Electronic Company",  "PC-8801", GAME_NOT_WORKING )
 COMP( 1983, pc8801mk2,      pc8801, 0,     pc8801,  pc88sr,  0,    "Nippon Electronic Company",  "PC-8801mkII", GAME_NOT_WORKING )
-//COMP( 1985, pc8801mk2sr,    pc8801,	0,     pc8801,  pc88sr,  0,    "Nippon Electronic Company",  "PC-8801mkIISR", GAME_NOT_WORKING )
+COMP( 1985, pc8801mk2sr,    pc8801,	0,     pc8801,  pc88sr,  0,    "Nippon Electronic Company",  "PC-8801mkIISR", GAME_NOT_WORKING )
 //COMP( 1985, pc8801mk2tr,  pc8801, 0,     pc8801,  pc88sr,  0,    "Nippon Electronic Company",  "PC-8801mkIITR", GAME_NOT_WORKING )
 COMP( 1985, pc8801mk2fr,    pc8801,	0,     pc8801,  pc88sr,  0,    "Nippon Electronic Company",  "PC-8801mkIIFR", GAME_NOT_WORKING )
 COMP( 1985, pc8801mk2mr,    pc8801,	0,     pc8801,  pc88sr,  0,    "Nippon Electronic Company",  "PC-8801mkIIMR", GAME_NOT_WORKING )

@@ -847,6 +847,7 @@ const game_driver * const drivers[] =
 
 	DRIVER( pc8801 )
 	DRIVER( pc8801mk2 )
+	DRIVER( pc8801mk2sr )
 	DRIVER( pc8801mk2fr )
 	DRIVER( pc8801mk2mr )
 	DRIVER( pc8801mh )
