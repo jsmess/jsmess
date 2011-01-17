@@ -24,7 +24,7 @@
 #-------------------------------------------------
 
 ifndef TARGET
-TARGET = mess
+TARGET = mame
 endif
 
 ifndef SUBTARGET
