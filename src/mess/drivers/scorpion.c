@@ -313,8 +313,8 @@ static MACHINE_RESET( scorpion )
 
 	betadisk_disable(beta);
 	betadisk_clear_status(beta);
-
-	space->set_direct_update_handler(direct_update_delegate_create_static(scorpion_direct, *machine));
+	// This causes severe slowdown (5fps vs 750fps) removed until rewritten
+	//space->set_direct_update_handler(direct_update_delegate_create_static(scorpion_direct, *machine));
 
 	memset(messram,0,256*1024);
 

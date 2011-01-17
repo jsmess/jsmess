@@ -122,8 +122,8 @@ static MACHINE_RESET( atm )
 		betadisk_enable(beta);
 		betadisk_clear_status(beta);
 	}
-
-	space->set_direct_update_handler(direct_update_delegate_create_static(atm_direct, *machine));
+	// This causes severe slowdown (5fps vs 750fps) removed until rewritten
+	//space->set_direct_update_handler(direct_update_delegate_create_static(atm_direct, *machine));
 
 	memset(messram,0,128*1024);
 
