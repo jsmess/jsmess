@@ -818,7 +818,7 @@ static ADDRESS_MAP_START( pc8801_io, ADDRESS_SPACE_IO, 8 )
 //  AM_RANGE(0xd0, 0xd7) AM_NOP                                     /* music & GP-IB */
 //  AM_RANGE(0xd8, 0xd8) AM_NOP                                     /* GP-IB */
 //  AM_RANGE(0xdc, 0xdf) AM_NOP                                     /* MODEM */
-	AM_RANGE(0xe2, 0xe2) AM_WRITE(pc8801_extram_sel_w) 					/* expand RAM select */
+	AM_RANGE(0xe2, 0xe2) AM_WRITE(pc8801_extram_sel_w) 				/* expand RAM select */
 	AM_RANGE(0xe4, 0xe4) AM_WRITE(pc8801_irq_level_w)
 	AM_RANGE(0xe6, 0xe6) AM_WRITE(pc8801_irq_mask_w)
 //  AM_RANGE(0xe7, 0xe7) AM_NOP                                     /* (unknown) */
@@ -1218,8 +1218,6 @@ static UPD1990A_INTERFACE( pc88_upd1990a_intf )
 /* YM2203 Interface */
 static void pc8801_sound_irq( device_t *device, int irq )
 {
-	printf("%02x\n",sound_irq_mask);
-
 	if(sound_irq_mask)
 		pc8801_raise_irq(device->machine,4);
 }
@@ -1297,7 +1295,7 @@ static MACHINE_RESET( pc8801 )
 {
 	ext_rom_bank = 0xff;
 	gfx_ctrl = 0x31;
-	window_offset_bank = 0x00;
+	window_offset_bank = 0x80;
 	misc_ctrl = 0x90;
 	layer_mask = 0x00;
 	bankr[0] = pc8801_bankswitch_0_r(machine);
