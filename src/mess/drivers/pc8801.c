@@ -1149,6 +1149,18 @@ static INPUT_PORTS_START( pc8001 )
 	PORT_DIPSETTING(    0x80, "9600bps" )
 	PORT_DIPSETTING(    0x90, "19200bps" )
 
+	PORT_START("OPNA")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("OPNB")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
+
 	PORT_START("MEM")
 	PORT_CONFNAME( 0x1f, 0x00, "Extension memory" )
 	PORT_CONFSETTING(    0x00, DEF_STR( None ) )
@@ -1212,16 +1224,17 @@ static void pc8801_sound_irq( device_t *device, int irq )
 		pc8801_raise_irq(device->machine,4);
 }
 
-
-static READ8_DEVICE_HANDLER( opn_dummy_input ) { return 0xff; }
+/* TODO: mouse routing (that's why I don't use DEVCB_INPUT_PORT here) */
+static READ8_DEVICE_HANDLER( opn_porta_r ) { return input_port_read(device->machine, "OPNA"); }
+static READ8_DEVICE_HANDLER( opn_portb_r ) { return input_port_read(device->machine, "OPNB"); }
 
 static const ym2203_interface pc88_ym2203_intf =
 {
 	{
 		AY8910_LEGACY_OUTPUT,
 		AY8910_DEFAULT_LOADS,
-		DEVCB_HANDLER(opn_dummy_input),
-		DEVCB_HANDLER(opn_dummy_input),
+		DEVCB_HANDLER(opn_porta_r),
+		DEVCB_HANDLER(opn_portb_r),
 		DEVCB_NULL,
 		DEVCB_NULL
 	},
