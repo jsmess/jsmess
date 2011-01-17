@@ -20,6 +20,7 @@
 
 	per-game specific TODO:
 	- 100 Yen disk(s): reads kanji ports;
+	- 177: gameplay is too fast;
 	- Acro Jet: hangs waiting for an irq;
 	- Adrenalin Connection: seems to have an unemulated screen mode;
 	- Aggress: crashes after that it shows the title screen;
@@ -460,7 +461,7 @@ static UINT32 pc8801_bankswitch_4_r(running_machine *machine)
 {
 	if(vram_sel == 3)
 	{
-		if(misc_ctrl & 0x10) // high VRAM
+		if((misc_ctrl & 0x10) == 0) // high VRAM
 			return WRAM_BASE + 0xf000;
 
 		return WRAM_BASE + 0xf000 + 0x10000;
@@ -480,7 +481,7 @@ static UINT32 pc8801_bankswitch_4_w(running_machine *machine)
 {
 	if(vram_sel == 3)
 	{
-		if(misc_ctrl & 0x10) // high VRAM
+		if((misc_ctrl & 0x10) == 0) // high VRAM
 			return WRAM_BASE + 0xf000;
 
 		return WRAM_BASE + 0xf000 + 0x10000;
@@ -519,7 +520,7 @@ static READ8_HANDLER( pc8801_ctrl_r )
 	---- ---x (pbsy?)
 	*/
 
-	vrtc = (space->machine->primary_screen->vpos() < 200) ? 1 : 0; // vblank
+	vrtc = (space->machine->primary_screen->vpos() < 200) ? 0 : 1; // vblank
 
 	return (vrtc << 5) | 0xc0;
 }
@@ -641,6 +642,12 @@ static READ8_HANDLER( pc8801_misc_ctrl_r )
 static WRITE8_HANDLER( pc8801_misc_ctrl_w )
 {
 	misc_ctrl = data;
+
+	bankr[1] = pc8801_bankswitch_1_r(space->machine);
+	bankr[3] = pc8801_bankswitch_3_r(space->machine);
+	bankr[4] = pc8801_bankswitch_4_r(space->machine);
+	bankw[3] = pc8801_bankswitch_3_w(space->machine);
+	bankw[4] = pc8801_bankswitch_4_w(space->machine);
 
 	sound_irq_mask = ((data & 0x80) == 0);
 
@@ -1338,7 +1345,7 @@ static MACHINE_RESET( pc8801 )
 	ext_rom_bank = 0xff;
 	gfx_ctrl = 0x31;
 	window_offset_bank = 0x80;
-	misc_ctrl = 0x90;
+	misc_ctrl = 0x80;
 	layer_mask = 0x00;
 	bankr[0] = pc8801_bankswitch_0_r(machine);
 	bankr[1] = pc8801_bankswitch_1_r(machine);
@@ -1449,7 +1456,7 @@ static MACHINE_CONFIG_START( pc8801, driver_device )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MCFG_SCREEN_SIZE(640, 240)
+	MCFG_SCREEN_SIZE(640, 220)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
 	MCFG_GFXDECODE( pc8801 )
 	MCFG_PALETTE_LENGTH(0x10)
