@@ -22,13 +22,13 @@
 	- 100 Yen disk(s): reads kanji ports;
 	- 177: gameplay is too fast;
 	- Acro Jet: hangs waiting for an irq;
-	- Adrenalin Connection: seems to have an unemulated screen mode;
 	- Aggress: crashes after that it shows the title screen;
 	- American Success: uses some ALU characteristics, might be a good test case;
 	- American Success: reads the light pen?
 	- Alphos: test case for text VRAM attributes;
 	- Alphos: text VRAM garbage during gameplay;
 	- Alphos: background is supposed to be blue?
+	- Bokosuka Wars: doesn't boot, floppy issue;
 	- Xevious: game is too fast
 
 	Notes:
@@ -219,14 +219,11 @@ static UINT8 calc_cursor_pos(running_machine *machine,int x,int y,int yi)
 	return 0;
 }
 
-static VIDEO_UPDATE( pc8801 )
+static void draw_bitmap_3bpp_h200(running_machine *machine, bitmap_t *bitmap)
 {
-	int x,y;
-	int xi,yi;
-	UINT8 *vram = screen->machine->region("maincpu")->base() + WRAM_BASE;
-	UINT8 *gvram = screen->machine->region("maincpu")->base() + GRAM_BASE;
+	int x,y,xi;
 	UINT32 count;
-	UINT8 is_cursor;
+	UINT8 *gvram = machine->region("maincpu")->base() + GRAM_BASE;
 
 	count = 0;
 
@@ -244,11 +241,35 @@ static VIDEO_UPDATE( pc8801 )
 				if(!(layer_mask & 4)) { pen |= ((gvram[count+0x4000] >> (7-xi)) & 1) << 1; }
 				if(!(layer_mask & 8)) { pen |= ((gvram[count+0x8000] >> (7-xi)) & 1) << 2; }
 
-				*BITMAP_ADDR16(bitmap, y, x+xi) = screen->machine->pens[pen & 7];
+				*BITMAP_ADDR16(bitmap, y, x+xi) = machine->pens[pen & 7];
 			}
 
 			count++;
 		}
+	}
+}
+
+static void draw_bitmap_1bpp_h400(running_machine *machine, bitmap_t *bitmap)
+{
+	popmessage("%02x VIDEO MODE",gfx_ctrl);
+
+	// ...
+}
+
+static VIDEO_UPDATE( pc8801 )
+{
+	int x,y;
+	int xi,yi;
+	UINT8 *vram = screen->machine->region("maincpu")->base() + WRAM_BASE;
+	UINT8 is_cursor;
+	bitmap_fill(bitmap, cliprect, screen->machine->pens[0]);
+
+	if(gfx_ctrl & 8)
+	{
+		if(gfx_ctrl & 0x10)
+			draw_bitmap_3bpp_h200(screen->machine,bitmap);
+		else
+			draw_bitmap_1bpp_h400(screen->machine,bitmap);
 	}
 
 	if(!(layer_mask & 1) && dmac_mode & 4 && crtc.status & 0x10 && crtc.irq_mask == 3)
@@ -429,49 +450,49 @@ static UINT32 pc8801_bankswitch_2_w(running_machine *machine)
 
 static UINT32 pc8801_bankswitch_3_r(running_machine *machine)
 {
-	if(vram_sel == 3)
-		return WRAM_BASE + 0xc000;
-
 	if(misc_ctrl & 0x40)
 	{
 		vram_sel = 3;
 		if(alu_ctrl2 & 0x80)
 			return 0xa0000; // TODO: ALU hook-up
 	}
+
+	if(vram_sel == 3)
+		return WRAM_BASE + 0xc000;
 
 	return GRAM_BASE + 0x4000 * vram_sel;
 }
 
 static UINT32 pc8801_bankswitch_3_w(running_machine *machine)
 {
-	if(vram_sel == 3)
-		return WRAM_BASE + 0xc000;
-
 	if(misc_ctrl & 0x40)
 	{
 		vram_sel = 3;
 		if(alu_ctrl2 & 0x80)
 			return 0xa0000; // TODO: ALU hook-up
 	}
+
+	if(vram_sel == 3)
+		return WRAM_BASE + 0xc000;
 
 	return GRAM_BASE + 0x4000 * vram_sel;
 }
 
 static UINT32 pc8801_bankswitch_4_r(running_machine *machine)
 {
+	if(misc_ctrl & 0x40)
+	{
+		vram_sel = 3;
+		if(alu_ctrl2 & 0x80)
+			return 0xa0000; // TODO: ALU hook-up
+	}
+
 	if(vram_sel == 3)
 	{
 		if((misc_ctrl & 0x10) == 0) // high VRAM
 			return WRAM_BASE + 0xf000;
 
 		return WRAM_BASE + 0xf000 + 0x10000;
-	}
-
-	if(misc_ctrl & 0x40)
-	{
-		vram_sel = 3;
-		if(alu_ctrl2 & 0x80)
-			return 0xa0000; // TODO: ALU hook-up
 	}
 
 	return GRAM_BASE + 0x3000 + (0x4000 * vram_sel);
@@ -479,19 +500,19 @@ static UINT32 pc8801_bankswitch_4_r(running_machine *machine)
 
 static UINT32 pc8801_bankswitch_4_w(running_machine *machine)
 {
+	if(misc_ctrl & 0x40)
+	{
+		vram_sel = 3;
+		if(alu_ctrl2 & 0x80)
+			return 0xa0000; // TODO: ALU hook-up
+	}
+
 	if(vram_sel == 3)
 	{
 		if((misc_ctrl & 0x10) == 0) // high VRAM
 			return WRAM_BASE + 0xf000;
 
 		return WRAM_BASE + 0xf000 + 0x10000;
-	}
-
-	if(misc_ctrl & 0x40)
-	{
-		vram_sel = 3;
-		if(alu_ctrl2 & 0x80)
-			return 0xa0000; // TODO: ALU hook-up
 	}
 
 	return GRAM_BASE + 0x3000 + (0x4000 * vram_sel);
@@ -568,11 +589,11 @@ static WRITE8_HANDLER( pc8801_gfx_ctrl_w )
 {
 	/*
 	--x- ---- VRAM y 25 (1) / 20 (0)
-	---x ---- color yes (1) / no (0)
-	---- x--- vram display yes (1) / no (0)
+	---x ---- graphic color yes (1) / no (0)
+	---- x--- graphic display yes (1) / no (0)
 	---- -x-- Basic N (1) / N88 (0)
 	---- --x- RAM select yes (1) / no (0)
-	---- ---x VRAM 200 lines (1) / 400 linese (0)
+	---- ---x VRAM 200 lines (1) / 400 lines (0)
 	*/
 
 	gfx_ctrl = data;
@@ -650,9 +671,6 @@ static WRITE8_HANDLER( pc8801_misc_ctrl_w )
 	bankw[4] = pc8801_bankswitch_4_w(space->machine);
 
 	sound_irq_mask = ((data & 0x80) == 0);
-
-	if(data & 0x40)
-		printf("Extra VRAM triggered\n");
 }
 
 static WRITE8_HANDLER( pc8801_palram_w )
@@ -814,6 +832,11 @@ static WRITE8_HANDLER( pc8801_alu_ctrl2_w )
 	bankw[4] = pc8801_bankswitch_4_w(space->machine);
 }
 
+static WRITE8_HANDLER( pc8801_pcg8100_w )
+{
+	printf("Write to PCG-8100 %02x %02x\n",offset,data);
+}
+
 static ADDRESS_MAP_START( pc8801_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
@@ -833,6 +856,7 @@ static ADDRESS_MAP_START( pc8801_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x0d, 0x0d) AM_READ_PORT("KEY13")
 	AM_RANGE(0x0e, 0x0e) AM_READ_PORT("KEY14")
 	AM_RANGE(0x0f, 0x0f) AM_READ_PORT("KEY15")
+	AM_RANGE(0x00, 0x02) AM_WRITE(pc8801_pcg8100_w)
 //	AM_RANGE(0x10, 0x10) AM_WRITE(pc88_rtc_w)
 //  AM_RANGE(0x20, 0x21) AM_NOP                                     /* RS-232C and cassette */
 	AM_RANGE(0x30, 0x30) AM_READ_PORT("DSW1") //AM_WRITE(pc88sr_outport_30)
@@ -1522,9 +1546,12 @@ ROM_START( pc8801mk2sr )
 	ROM_REGION( 0x2000, "audiocpu", 0)
 	ROM_LOAD( "soundbios.rom", 0x0000, 0x2000, NO_DUMP )
 
-	ROM_REGION( 0x40000, "gfx1", 0)
+	ROM_REGION( 0x40000, "kanji", 0)
 	ROM_LOAD( "kanji1.rom", 0x00000, 0x20000, CRC(6178bd43) SHA1(82e11a177af6a5091dd67f50a2f4bafda84d6556) )
 	ROM_LOAD( "kanji2.rom", 0x20000, 0x20000, CRC(154803cc) SHA1(7e6591cd465cbb35d6d3446c5a83b46d30fafe95) )	// it should not be here
+
+	ROM_REGION( 0x40000, "gfx1", 0)
+	ROM_COPY( "kanji", 0x1000, 0x0000, 0x800 )
 ROM_END
 
 ROM_START( pc8801mk2fr )
