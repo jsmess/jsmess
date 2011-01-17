@@ -166,26 +166,16 @@ static UINT8 get_mcm6571a_line(UINT8 code, UINT8 line, UINT8 pcg_mode, UINT8 *FN
 	else
 	if (!mcm6571a_shift[code])
 	{
-		if (line < 1)
-			return 0;
-		else
-		if (line < 10)
+		if ((line) && (line < 10))
 			return mcm6571a[code*9 + line - 1];
-		else
-			return 0;
 	}
 	else
 	{
-		if (line < 4)
-			return 0;
-		else
-		if (line <13)
+		if ((line > 3) && (line < 13))
 			return mcm6571a[code*9 + line - 4];
-		else
-			return 0;
 	}
-	return 0;
 
+	return 0;
 }
 
 VIDEO_UPDATE( pegasus )
@@ -193,8 +183,7 @@ VIDEO_UPDATE( pegasus )
 	pegasus_state *state = screen->machine->driver_data<pegasus_state>();
 	UINT16 addr,xpos,x,y;
 	UINT8 b,j,l,code,inv;
-	UINT8 *FNT = screen->machine->region("pcg")->base();
-	UINT8 pcg_mode = state->control_bits & 2;
+	UINT8 pcg_mode = state->m_control_bits & 2;
 
 	for(y = 0; y < 16; y++ )
 	{
@@ -202,11 +191,11 @@ VIDEO_UPDATE( pegasus )
 		xpos = 0;
 		for(x = 0; x < 32; x++ )
 		{
-			code = state->video_ram[addr|x];
+			code = state->m_videoram[addr|x];
 			inv = (code >> 7) ^ 1;
 			for(j = 0; j < 16; j++ )
 			{
-				l = get_mcm6571a_line(code &0x7f, j, pcg_mode, FNT);
+				l = get_mcm6571a_line(code &0x7f, j, pcg_mode, state->m_pcgram);
 				for(b = 0; b < 8; b++ )
 					*BITMAP_ADDR16(bitmap, (y<<4)|j, xpos+b ) =  inv ^ ((l >> (7-b)) & 1);
 			}

@@ -28,12 +28,9 @@
     - Work on the other non-working programs
 
 ****************************************************************************/
+#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
-#include "cpu/m6809/m6809.h"
-#include "machine/6821pia.h"
-#include "imagedev/cartslot.h"
-#include "imagedev/cassette.h"
 #include "includes/pegasus.h"
 
 static TIMER_DEVICE_CALLBACK( pegasus_firq )
@@ -42,33 +39,30 @@ static TIMER_DEVICE_CALLBACK( pegasus_firq )
 	cpu_set_input_line(cpu, M6809_FIRQ_LINE, HOLD_LINE);
 }
 
-static WRITE_LINE_DEVICE_HANDLER( pegasus_firq_clr )
+WRITE_LINE_MEMBER( pegasus_state::pegasus_firq_clr )
 {
-	cputag_set_input_line(device->machine, "maincpu", M6809_FIRQ_LINE, CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", M6809_FIRQ_LINE, CLEAR_LINE);
 }
 
-static READ8_DEVICE_HANDLER( pegasus_keyboard_r )
+READ8_MEMBER( pegasus_state::pegasus_keyboard_r )
 {
-	pegasus_state *state = device->machine->driver_data<pegasus_state>();
 	static const char *const keynames[] = { "X0", "X1", "X2", "X3", "X4", "X5", "X6", "X7" };
 	UINT8 bit,data = 0xff;
 	for (bit = 0; bit < 8; bit++)
-		if (!BIT(state->kbd_row, bit)) data &= input_port_read(device->machine, keynames[bit]);
+		if (!BIT(m_kbd_row, bit)) data &= input_port_read(machine, keynames[bit]);
 
-	state->kbd_irq = (data == 0xff) ? 1 : 0;
-	if (state->control_bits & 8) data<<=4;
+	m_kbd_irq = (data == 0xff) ? 1 : 0;
+	if (m_control_bits & 8) data<<=4;
 	return data;
 }
 
-static WRITE8_DEVICE_HANDLER( pegasus_keyboard_w )
+WRITE8_MEMBER( pegasus_state::pegasus_keyboard_w )
 {
-	pegasus_state *state = device->machine->driver_data<pegasus_state>();
-	state->kbd_row = data;
+	m_kbd_row = data;
 }
 
-static WRITE8_DEVICE_HANDLER( pegasus_controls )
+WRITE8_MEMBER( pegasus_state::pegasus_controls_w )
 {
-	pegasus_state *state = device->machine->driver_data<pegasus_state>();
 /*  d0,d2 - not emulated
     d0 - Blank - Video blanking
     d1 - Char - select character rom or ram
@@ -76,75 +70,70 @@ static WRITE8_DEVICE_HANDLER( pegasus_controls )
     d3 - Asc - Select which half of the keyboard to read
 */
 
-	state->control_bits = data;
+	m_control_bits = data;
 }
 
-static READ_LINE_DEVICE_HANDLER( pegasus_keyboard_irq )
+READ_LINE_MEMBER( pegasus_state::pegasus_keyboard_irq )
 {
-	pegasus_state *state = device->machine->driver_data<pegasus_state>();
-	return state->kbd_irq;
+	return m_kbd_irq;
 }
 
-static READ_LINE_DEVICE_HANDLER( pegasus_cassette_r )
+READ_LINE_MEMBER( pegasus_state::pegasus_cassette_r )
 {
-	pegasus_state *state = device->machine->driver_data<pegasus_state>();
-	return cassette_input(state->cass);
+	return cassette_input(m_cass);
 }
 
-static WRITE_LINE_DEVICE_HANDLER( pegasus_cassette_w )
+WRITE_LINE_MEMBER( pegasus_state::pegasus_cassette_w )
 {
-	pegasus_state *drvstate = device->machine->driver_data<pegasus_state>();
-	cassette_output(drvstate->cass, state ? 1 : -1);
+	cassette_output(m_cass, state ? 1 : -1);
 }
 
-static READ8_HANDLER( pegasus_pcg_r )
+READ8_MEMBER( pegasus_state::pegasus_pcg_r )
 {
-	pegasus_state *state = space->machine->driver_data<pegasus_state>();
-	UINT8 code = state->video_ram[offset] & 0x7f;
-	return state->FNT[(code << 4) | (~state->kbd_row & 15)];
+	UINT8 code = m_videoram[offset] & 0x7f;
+	return m_pcgram[(code << 4) | (~m_kbd_row & 15)];
 }
 
-static WRITE8_HANDLER( pegasus_pcg_w )
+WRITE8_MEMBER( pegasus_state::pegasus_pcg_w )
 {
-	pegasus_state *state = space->machine->driver_data<pegasus_state>();
-//  if (state->control_bits & 2)
+//  if (state->m_control_bits & 2)
 	{
-		UINT8 code = state->video_ram[offset] & 0x7f;
-		state->FNT[(code << 4) | (~state->kbd_row & 15)] = data;
+		UINT8 code = m_videoram[offset] & 0x7f;
+		m_pcgram[(code << 4) | (~m_kbd_row & 15)] = data;
 	}
 }
 
 /* Must return the A register except when it is doing a rom search */
-static READ8_HANDLER( pegasus_protection_r )
+READ8_MEMBER( pegasus_state::pegasus_protection_r )
 {
-	UINT8 data = cpu_get_reg(space->machine->device("maincpu"), M6809_A);
+	UINT8 data = cpu_get_reg(m_maincpu, M6809_A);
 	if (data == 0x20) data = 0xff;
 	return data;
 }
 
-static ADDRESS_MAP_START(pegasus_mem, ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START(pegasus_mem, ADDRESS_SPACE_PROGRAM, 8, pegasus_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0xb000, 0xbdff) AM_RAM
-	AM_RANGE(0xbe00, 0xbfff) AM_RAM AM_BASE_MEMBER(pegasus_state, video_ram)
+	AM_RANGE(0xbe00, 0xbfff) AM_RAM AM_BASE(m_videoram)
 	AM_RANGE(0xc000, 0xdfff) AM_ROM AM_WRITENOP
 	AM_RANGE(0xe000, 0xe1ff) AM_READ(pegasus_protection_r)
 	AM_RANGE(0xe200, 0xe3ff) AM_READWRITE(pegasus_pcg_r,pegasus_pcg_w)
-	AM_RANGE(0xe400, 0xe403) AM_MIRROR(0x1fc) AM_DEVREADWRITE("pegasus_pia_u", pia6821_r, pia6821_w)
-	AM_RANGE(0xe600, 0xe603) AM_MIRROR(0x1fc) AM_DEVREADWRITE("pegasus_pia_s", pia6821_r, pia6821_w)
+	AM_RANGE(0xe400, 0xe403) AM_MIRROR(0x1fc) AM_DEVREADWRITE_LEGACY("pia_u", pia6821_r, pia6821_w)
+	AM_RANGE(0xe600, 0xe603) AM_MIRROR(0x1fc) AM_DEVREADWRITE_LEGACY("pia_s", pia6821_r, pia6821_w)
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(pegasusm_mem, ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START(pegasusm_mem, ADDRESS_SPACE_PROGRAM, 8, pegasus_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x5000, 0xbdff) AM_RAM
-	AM_RANGE(0xbe00, 0xbfff) AM_RAM AM_BASE_MEMBER(pegasus_state, video_ram)
+	AM_RANGE(0xbe00, 0xbfff) AM_RAM AM_BASE(m_videoram)
 	AM_RANGE(0xc000, 0xdfff) AM_ROM AM_WRITENOP
 	AM_RANGE(0xe000, 0xe1ff) AM_READ(pegasus_protection_r)
 	AM_RANGE(0xe200, 0xe3ff) AM_READWRITE(pegasus_pcg_r,pegasus_pcg_w)
-	AM_RANGE(0xe400, 0xe403) AM_MIRROR(0x1fc) AM_DEVREADWRITE("pegasus_pia_u", pia6821_r, pia6821_w)
-	AM_RANGE(0xe600, 0xe603) AM_MIRROR(0x1fc) AM_DEVREADWRITE("pegasus_pia_s", pia6821_r, pia6821_w)
+	AM_RANGE(0xe400, 0xe403) AM_MIRROR(0x1fc) AM_DEVREADWRITE_LEGACY("pia_u", pia6821_r, pia6821_w)
+	AM_RANGE(0xe600, 0xe603) AM_MIRROR(0x1fc) AM_DEVREADWRITE_LEGACY("pia_s", pia6821_r, pia6821_w)
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -235,15 +224,15 @@ INPUT_PORTS_END
 static const pia6821_interface pegasus_pia_s_intf=
 {
 	DEVCB_NULL,						/* port A input */
-	DEVCB_HANDLER(pegasus_keyboard_r),			/* port B input */
-	DEVCB_LINE(pegasus_cassette_r),				/* CA1 input */
-	DEVCB_LINE(pegasus_keyboard_irq),			/* CB1 input */
+	DEVCB_DRIVER_MEMBER(pegasus_state, pegasus_keyboard_r),	/* port B input */
+	DEVCB_DRIVER_LINE_MEMBER(pegasus_state, pegasus_cassette_r), /* CA1 input */
+	DEVCB_DRIVER_LINE_MEMBER(pegasus_state, pegasus_keyboard_irq), /* CB1 input */
 	DEVCB_NULL,						/* CA2 input */
 	DEVCB_NULL,						/* CB2 input */
-	DEVCB_HANDLER(pegasus_keyboard_w),			/* port A output */
-	DEVCB_HANDLER(pegasus_controls),			/* port B output */
-	DEVCB_LINE(pegasus_cassette_w),				/* CA2 output */
-	DEVCB_DEVICE_LINE("maincpu", pegasus_firq_clr),		/* CB2 output */
+	DEVCB_DRIVER_MEMBER(pegasus_state, pegasus_keyboard_w),	/* port A output */
+	DEVCB_DRIVER_MEMBER(pegasus_state, pegasus_controls_w),	/* port B output */
+	DEVCB_DRIVER_LINE_MEMBER(pegasus_state, pegasus_cassette_w), /* CA2 output */
+	DEVCB_DRIVER_LINE_MEMBER(pegasus_state, pegasus_firq_clr), /* CB2 output */
 	DEVCB_CPU_INPUT_LINE("maincpu", M6809_IRQ_LINE),	/* IRQA output */
 	DEVCB_CPU_INPUT_LINE("maincpu", M6809_IRQ_LINE)		/* IRQB output */
 };
@@ -337,16 +326,15 @@ static DEVICE_IMAGE_LOAD( pegasus_cart_5 )
 static MACHINE_START( pegasus )
 {
 	pegasus_state *state = machine->driver_data<pegasus_state>();
-	state->cass = machine->device("cassette");
-	state->FNT = machine->region("pcg")->base();
+	state->m_pcgram = machine->region("pcg")->base();
 }
 
 static MACHINE_RESET( pegasus )
 {
 	pegasus_state *state = machine->driver_data<pegasus_state>();
-	state->kbd_row = 0;
-	state->kbd_irq = 1;
-	state->control_bits = 0;
+	state->m_kbd_row = 0;
+	state->m_kbd_irq = 1;
+	state->m_control_bits = 0;
 }
 
 static DRIVER_INIT( pegasus )
@@ -374,8 +362,8 @@ static MACHINE_CONFIG_START( pegasus, pegasus_state )
 	MCFG_VIDEO_UPDATE(pegasus)
 
 	/* devices */
-	MCFG_PIA6821_ADD( "pegasus_pia_s", pegasus_pia_s_intf )
-	MCFG_PIA6821_ADD( "pegasus_pia_u", pegasus_pia_u_intf )
+	MCFG_PIA6821_ADD( "pia_s", pegasus_pia_s_intf )
+	MCFG_PIA6821_ADD( "pia_u", pegasus_pia_u_intf )
 	MCFG_CARTSLOT_ADD("cart1")
 	MCFG_CARTSLOT_EXTENSION_LIST("bin")
 	MCFG_CARTSLOT_LOAD(pegasus_cart_1)
