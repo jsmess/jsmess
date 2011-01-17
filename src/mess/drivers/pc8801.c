@@ -14,13 +14,19 @@
 	- joystick / mouse support;
 	- cursor is 8 x 10, not 8 x 8 as current implementation.
 	- text DMAC stuff isn't well documented;
+	- CRTC really looks like to be a MCU;
+	- needs to support V1 / V2 properly;
 
 	per-game specific TODO:
 	- 100 Yen disk(s): reads kanji ports;
 	- Acro Jet: hangs waiting for an irq;
 	- Adrenalin Connection: seems to have an unemulated screen mode;
-	- Again: hangs waiting for something;
-	- Agress: crashes after that it shows the title screen;
+	- Aggress: crashes after that it shows the title screen;
+	- American Success: uses some ALU characteristics, might be a good test case;
+	- American Success: reads the light pen?
+	- Alphos: test case for text VRAM attributes;
+	- Alphos: text VRAM garbage during gameplay;
+	- Alphos: background is supposed to be blue?
 	- Xevious: game is too fast
 
 	Notes:
@@ -128,6 +134,7 @@ static UINT8 layer_mask;
 static UINT8 i8214_irq_level,i8214_irq_state;
 static UINT16 dma_counter[4],dma_address[4];
 static UINT8 dmac_mode;
+static UINT8 alu_ctrl1,alu_ctrl2;
 
 static void pc8801_update_irq(running_machine *machine)
 {
@@ -171,7 +178,7 @@ CRTC command params:
 
 static struct
 {
-	UINT8 cmd,param_count,cursor_on;
+	UINT8 cmd,param_count,cursor_on,status,irq_mask;
 	UINT8 param[8][5];
 }crtc;
 
@@ -241,7 +248,7 @@ static VIDEO_UPDATE( pc8801 )
 		}
 	}
 
-	if(!(layer_mask & 1) && dmac_mode & 4)
+	if(!(layer_mask & 1) && dmac_mode & 4 && crtc.status & 0x10 && crtc.irq_mask == 3)
 	{
 		for(y=0;y<25;y++)
 		{
@@ -405,11 +412,17 @@ static UINT32 pc8801_bankswitch_2_w(running_machine *machine)
 	return WRAM_BASE + (window_offset_bank << 8);
 }
 
-/* TODO: this isn't correct */
 static UINT32 pc8801_bankswitch_3_r(running_machine *machine)
 {
 	if(vram_sel == 3)
 		return WRAM_BASE + 0xc000;
+
+	if(misc_ctrl & 0x40)
+	{
+		vram_sel = 3;
+		if(alu_ctrl2 & 0x80)
+			return 0xc0000; // TODO: ALU hook-up
+	}
 
 	return GRAM_BASE + 0x4000 * vram_sel;
 }
@@ -419,13 +432,32 @@ static UINT32 pc8801_bankswitch_3_w(running_machine *machine)
 	if(vram_sel == 3)
 		return WRAM_BASE + 0xc000;
 
+	if(misc_ctrl & 0x40)
+	{
+		vram_sel = 3;
+		if(alu_ctrl2 & 0x80)
+			return 0xc0000; // TODO: ALU hook-up
+	}
+
 	return GRAM_BASE + 0x4000 * vram_sel;
 }
 
 static UINT32 pc8801_bankswitch_4_r(running_machine *machine)
 {
 	if(vram_sel == 3)
-		return WRAM_BASE + 0xf000;
+	{
+		if(misc_ctrl & 0x10) // high VRAM
+			return WRAM_BASE + 0xf000;
+
+		return WRAM_BASE + 0xf000 + 0x10000;
+	}
+
+	if(misc_ctrl & 0x40)
+	{
+		vram_sel = 3;
+		if(alu_ctrl2 & 0x80)
+			return 0xc0000; // TODO: ALU hook-up
+	}
 
 	return GRAM_BASE + 0x3000 + (0x4000 * vram_sel);
 }
@@ -433,7 +465,19 @@ static UINT32 pc8801_bankswitch_4_r(running_machine *machine)
 static UINT32 pc8801_bankswitch_4_w(running_machine *machine)
 {
 	if(vram_sel == 3)
-		return WRAM_BASE + 0xf000;
+	{
+		if(misc_ctrl & 0x10) // high VRAM
+			return WRAM_BASE + 0xf000;
+
+		return WRAM_BASE + 0xf000 + 0x10000;
+	}
+
+	if(misc_ctrl & 0x40)
+	{
+		vram_sel = 3;
+		if(alu_ctrl2 & 0x80)
+			return 0xc0000; // TODO: ALU hook-up
+	}
 
 	return GRAM_BASE + 0x3000 + (0x4000 * vram_sel);
 }
@@ -585,6 +629,9 @@ static WRITE8_HANDLER( pc8801_misc_ctrl_w )
 	misc_ctrl = data;
 
 	sound_irq_mask = ((data & 0x80) == 0);
+
+	if(data & 0x40)
+		printf("Extra VRAM triggered\n");
 }
 
 static WRITE8_HANDLER( pc8801_palram_w )
@@ -623,7 +670,15 @@ static WRITE8_HANDLER( pc88_crtc_param_w )
 
 static READ8_HANDLER( pc8801_crtc_status_r )
 {
-	return 0xff;
+	/*
+	---x ---- video enable
+	---- x--- DMA is running
+	---- -x-- special control character IRQ
+	---- --x- indication end IRQ
+	---- ---x light pen input
+	*/
+
+	return crtc.status;
 }
 
 static const char *const crtc_command[] =
@@ -643,11 +698,35 @@ static WRITE8_HANDLER( pc88_crtc_cmd_w )
 	crtc.cmd = (data & 0xe0) >> 5;
 	crtc.param_count = 0;
 
-	if(crtc.cmd == 4) // load cursor position ON/OFF
-		crtc.cursor_on = data & 1;
+	switch(crtc.cmd)
+	{
+		case 0:  // reset CRTC
+			crtc.status &= (~0x10 | ~0x04 | ~0x02);
+			break;
+		case 1:  // start display
+			crtc.status |= 0x10;
+			crtc.status &= (~0x08);
+			if(data & 1)
+				printf("CRTC reverse display ON\n");
 
-	if((data >> 5) != 4)
-		printf("CRTC cmd %s polled\n",crtc_command[data >> 5]);
+			break;
+		case 2:  // set irq mask
+			crtc.irq_mask = data & 3;
+			break;
+		case 3:  // read light pen
+			crtc.status &= (~0x01);
+			break;
+		case 4:  // load cursor position ON/OFF
+			crtc.cursor_on = data & 1;
+			break;
+		case 5:  // reset IRQ
+		case 6:  // reset counters
+			crtc.status &= (~0x04 | ~0x02);
+			break;
+	}
+
+	//if((data >> 5) != 4)
+	//	printf("CRTC cmd %s polled\n",crtc_command[data >> 5]);
 }
 
 static WRITE8_HANDLER( pc8801_dmac_w )
@@ -665,6 +744,26 @@ static WRITE8_HANDLER( pc8801_dmac_w )
 static WRITE8_HANDLER( pc8801_dmac_mode_w )
 {
 	dmac_mode = data;
+}
+
+static WRITE8_HANDLER( pc8801_extram_sel_w )
+{
+	if(data & 0x11)
+		printf("Extra RAM select %02x\n",data & 0x11);
+}
+
+static WRITE8_HANDLER( pc8801_alu_ctrl1_w )
+{
+	alu_ctrl1 = data;
+}
+
+static WRITE8_HANDLER( pc8801_alu_ctrl2_w )
+{
+	alu_ctrl2 = data;
+	bankr[3] = pc8801_bankswitch_3_r(space->machine);
+	bankr[4] = pc8801_bankswitch_4_r(space->machine);
+	bankw[3] = pc8801_bankswitch_3_w(space->machine);
+	bankw[4] = pc8801_bankswitch_4_w(space->machine);
 }
 
 static ADDRESS_MAP_START( pc8801_io, ADDRESS_SPACE_IO, 8 )
@@ -691,7 +790,8 @@ static ADDRESS_MAP_START( pc8801_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x30, 0x30) AM_READ_PORT("DSW1") //AM_WRITE(pc88sr_outport_30)
 	AM_RANGE(0x31, 0x31) AM_READ_PORT("DSW2") AM_WRITE(pc8801_gfx_ctrl_w)
 	AM_RANGE(0x32, 0x32) AM_READWRITE(pc8801_misc_ctrl_r, pc8801_misc_ctrl_w)
-//	AM_RANGE(0x34, 0x35) AM_WRITE(pc88sr_alu)
+	AM_RANGE(0x34, 0x34) AM_WRITE(pc8801_alu_ctrl1_w)
+	AM_RANGE(0x35, 0x35) AM_WRITE(pc8801_alu_ctrl2_w)
 	AM_RANGE(0x40, 0x40) AM_READWRITE(pc8801_ctrl_r, pc8801_ctrl_w)
 	AM_RANGE(0x44, 0x45) AM_DEVREADWRITE("ym2203", ym2203_r,ym2203_w)
 //  AM_RANGE(0x46, 0x47) AM_NOP                                     /* OPNA extra port */
@@ -718,7 +818,7 @@ static ADDRESS_MAP_START( pc8801_io, ADDRESS_SPACE_IO, 8 )
 //  AM_RANGE(0xd0, 0xd7) AM_NOP                                     /* music & GP-IB */
 //  AM_RANGE(0xd8, 0xd8) AM_NOP                                     /* GP-IB */
 //  AM_RANGE(0xdc, 0xdf) AM_NOP                                     /* MODEM */
-//	AM_RANGE(0xe2, 0xe3) AM_READWRITE(pc88_extmem_r, pc88_extmem_w) /* expand RAM select */
+	AM_RANGE(0xe2, 0xe2) AM_WRITE(pc8801_extram_sel_w) 					/* expand RAM select */
 	AM_RANGE(0xe4, 0xe4) AM_WRITE(pc8801_irq_level_w)
 	AM_RANGE(0xe6, 0xe6) AM_WRITE(pc8801_irq_mask_w)
 //  AM_RANGE(0xe7, 0xe7) AM_NOP                                     /* (unknown) */
@@ -1020,18 +1120,18 @@ static INPUT_PORTS_START( pc8001 )
 	PORT_DIPNAME( 0x20, 0x20, "Duplex" )
 	PORT_DIPSETTING(    0x20, "Half" )
 	PORT_DIPSETTING(    0x00, "Full" )
-	PORT_DIPNAME( 0x40, 0x00, "Boot from floppy" )
+/*	PORT_DIPNAME( 0x40, 0x00, "Boot from floppy" )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x80, 0x80, "Disable floppy" )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )*/
+	PORT_DIPNAME( 0xc0, 0x40, "Basic mode" )
+	PORT_DIPSETTING(    0x80, "N-BASIC" )
+	PORT_DIPSETTING(    0xc0, "N88-BASIC (V1)" )
+	PORT_DIPSETTING(    0x40, "N88-BASIC (V2)" )
 
 	PORT_START("CFG")		/* EXSWITCH */
-	PORT_DIPNAME( 0x03, 0x01, "Basic mode" )
-	PORT_DIPSETTING(    0x02, "N-BASIC" )
-	PORT_DIPSETTING(    0x03, "N88-BASIC (V1)" )
-	PORT_DIPSETTING(    0x01, "N88-BASIC (V2)" )
 	PORT_DIPNAME( 0x04, 0x04, "Speed mode" )
 	PORT_DIPSETTING(    0x00, "Slow" )
 	PORT_DIPSETTING(    0x04, DEF_STR( High ) )
@@ -1216,6 +1316,7 @@ static MACHINE_RESET( pc8801 )
 	{
 		crtc.param_count = 0;
 		crtc.cmd = 0;
+		crtc.status = 0;
 	}
 
 	beep_set_frequency(machine->device("beeper"),2400);
