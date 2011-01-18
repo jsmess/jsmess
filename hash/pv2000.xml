@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-<softwarelist name="pv2000" description="CASIO PV-2000 cartridges">
+<softwarelist name="pv2000" description="Casio PV-2000 cartridges">
 	<software name="excitem2">
 		<description>Excite Mahjong 2</description>
 		<year>1983</year>
