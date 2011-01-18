@@ -17,6 +17,7 @@
 	- CRTC really looks like to be a MCU;
 	- needs to support V1 / V2 properly;
 	- Add limits for extend work RAM;
+	- What happens to the palette contents when the analog/digital palette mode changes?
 
 	per-game specific TODO:
 	- 100 Yen disk(s): reads kanji ports;
@@ -26,10 +27,13 @@
 	- American Success: reads the light pen?
 	- Alphos: test case for text VRAM attributes;
 	- Alphos: text VRAM garbage during gameplay;
-	- Alphos: background is supposed to be blue?
 	- Balance of Power: attempt to use the SIO port for mouse polling, worked around for now;
+	- Battle Entry: moans with a kanji msg then dies if you try to press either numpad 1 or 2 (what it basically asks by looking at the DASM)
+	- Bersekers Front Gaiden 3: checks CPU speed port and polls the PCG stuff too;
+	- Bishoujo Baseball Gakuen: checks ym2608 after intro screen;
 	- Bokosuka Wars: doesn't boot, floppy issue;
 	- Grobda: palette is ugly;
+	- Wanderers from Ys: floppy / irq issues?
 	- Xevious: game is too fast
 
 	Notes:
@@ -139,6 +143,7 @@ static UINT16 dma_counter[4],dma_address[4];
 static UINT8 dmac_mode;
 static UINT8 alu_ctrl1,alu_ctrl2;
 static UINT8 extram_mode,extram_bank;
+static int vblank_pos;
 
 static void pc8801_update_irq(running_machine *machine)
 {
@@ -663,7 +668,7 @@ static READ8_HANDLER( pc8801_ctrl_r )
 	---- ---x (pbsy?)
 	*/
 
-	vrtc = (space->machine->primary_screen->vpos() < 200) ? 0 : 1; // vblank
+	vrtc = (space->machine->primary_screen->vpos() < vblank_pos) ? 0 : 1; // vblank
 
 	return (vrtc << 5) | 0xc0;
 }
@@ -719,6 +724,12 @@ static void pc8801_dynamic_res_change(running_machine *machine)
 	/* low screen res if graphic screen is disabled */
 	if((gfx_ctrl & 0x8) == 0)
 		visarea.max_y = 200 - 1;
+
+	/* low screen res if graphic screen is color */
+	if(gfx_ctrl & 0x10)
+		visarea.max_y = 200 - 1;
+
+	vblank_pos = visarea.max_y + 1;
 
 	machine->primary_screen->configure(640, 480, visarea, machine->primary_screen->frame_period().attoseconds);
 }
@@ -815,10 +826,27 @@ static WRITE8_HANDLER( pc8801_misc_ctrl_w )
 
 static WRITE8_HANDLER( pc8801_palram_w )
 {
-	/* TODO: analog hook-up */
+	static UINT8 b[8],r[8],g[8];
 
-	if(offset)
-		palette_set_color_rgb(space->machine, offset, pal1bit(data >> 1), pal1bit(data >> 2), pal1bit(data >> 0));
+	if(misc_ctrl & 0x20) //analog palette
+	{
+		if((data & 0x40) == 0)
+		{
+			b[offset] = data & 0x7;
+			r[offset] = (data & 0x38) >> 3;
+		}
+		else
+			g[offset] = data & 0x7;
+
+	}
+	else //digital palette
+	{
+		b[offset] = data & 1 ? 7 : 0;
+		r[offset] = data & 2 ? 7 : 0;
+		g[offset] = data & 4 ? 7 : 0;
+	}
+
+	palette_set_color_rgb(space->machine, offset, pal3bit(r[offset]), pal3bit(g[offset]), pal3bit(b[offset]));
 }
 
 static WRITE8_HANDLER( pc8801_layer_masking_w )
