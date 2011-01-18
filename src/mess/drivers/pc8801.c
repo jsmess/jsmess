@@ -270,7 +270,7 @@ static void draw_bitmap_1bpp(running_machine *machine, bitmap_t *bitmap)
 		{
 			for(xi=0;xi<8;xi++)
 			{
-				int pen;
+				int pen = 0;
 
 				/* TODO: dunno if layer_mask is correct here */
 				if(!(layer_mask & 2)) { pen = ((gvram[count+0x0000] >> (7-xi)) & 1) << 0; }
@@ -292,7 +292,7 @@ static void draw_bitmap_1bpp(running_machine *machine, bitmap_t *bitmap)
 			{
 				for(xi=0;xi<8;xi++)
 				{
-					int pen;
+					int pen = 0;
 
 					/* TODO: dunno if layer_mask is correct here */
 					if(!(layer_mask & 4)) { pen = ((gvram[count+0x4000] >> (7-xi)) & 1) << 0; }
