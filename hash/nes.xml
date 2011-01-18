@@ -35534,6 +35534,21 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
+	<software name="batmanrnp" cloneof="batmanrn">
+		<description>Batman Returns (Euro, Prototype)</description>
+		<year>1993</year>
+		<publisher>Konami</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-TLROM" />
+			<dataarea name="chr" size="262144">
+				<rom name="batman returns - prototype.chr" size="262144" crc="25ad186c" sha1="ab82b2ecce66350e6a482f834f4c20b24e80dbd4" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="131072">
+				<rom name="batman returns - prototype.prg" size="131072" crc="0d349500" sha1="b2f116a5ad9f89e227c09d2eef896bff004b1409" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="batbaseb">
 		<!-- Serial:  - Release Date: 1993-02-19 - Alternative Title:  -->
 		<description>Battle Baseball (Jpn)</description>
@@ -40311,6 +40326,24 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
+	<software name="parodiusp" cloneof="parodius">
+		<description>Parodius (Euro, Prototype)</description>
+		<year>1992</year>
+		<publisher>Palcom</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-TLROM" />
+			<dataarea name="prg" size="131072">
+				<rom name="parodius - prototype.prg" size="131072" crc="24d98a3e" sha1="61499513bac01597c9af65717a350de332f5ad12" offset="00000" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="parodius - prototype.chr" size="131072" crc="71fee257" sha1="647df3af0c304e681586c5ce1f0e2ceb506be7b3" offset="00000" />
+			</dataarea>
+			<!-- 8k WRAM on cartridge -->
+			<dataarea name="wram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="peepart">
 		<!-- Serial:  - Release Date: 1990-08-10 - Alternative Title:  -->
 		<description>Peepar Time (Jpn)</description>
@@ -41968,6 +42001,21 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			</dataarea>
 			<dataarea name="prg" size="131072">
 				<rom name="teenage mutant ninja turtles (italy).prg" size="131072" crc="f1db1ca5" sha1="91bfef1695ac06783332f2530082ec12f718b184" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tmnt2up" cloneof="tmnt2">
+		<description>Teenage Mutant Ninja Turtles II: The Arcade Game (USA, Prototype)</description>
+		<year>1990</year>
+		<publisher>Ultra Games</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-TLROM" />
+			<dataarea name="chr" size="262144">
+				<rom name="teenage mutant ninja turtles ii - prototype.chr" size="262144" crc="0dbc575f" sha1="8094278cf3267757953ab761dbccf38589142376" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="262144">
+				<rom name="teenage mutant ninja turtles ii - prototype.prg" size="262144" crc="eba3cd94" sha1="a6a8ccfefe9f51fd1469fcb47e61f45809dd7785" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -49754,6 +49802,22 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			</dataarea>
 			<dataarea name="prg" size="262144">
 				<rom name="panda prince, the (shin-shin) (unl) [!].prg" size="262144" crc="3149438f" sha1="cc25b46893793a6b13e32024f0bec7f108efa8b9" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pandaprna" cloneof="pandaprn">
+		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<description>The Panda Prince (Alt)</description>
+		<year>19??</year>
+		<publisher>Shin-Shin</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="UNL-PANDAPRINCE" />
+			<dataarea name="chr" size="262144">
+				<rom name="panda prince, the (shin-shin) (unl) [!].chr" size="262144" crc="ddebd01d" sha1="b1c3243717f056fd0ca1cdd434c4dd1c3f557714" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="262144">
+				<rom name="panda prince, the (shin-shin) (chi).prg" size="262144" crc="a9ce7a7e" sha1="31307082a9a8d9b69a9f0f25cfdf900f9c9cadab" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>

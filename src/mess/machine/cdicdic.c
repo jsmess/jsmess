@@ -860,8 +860,9 @@ void cdicdic_device::process_delayed_command()
             m_ram[(m_data_buffer & 5) * (0xa00/2) + 0x93a/2] = 0x0000;                      //  CRC2
 
             m_time = next_msf << 8;
-
-            timer_adjust_oneshot(m_interrupt_timer, ATTOTIME_IN_HZ(75), 0);
+		
+			// the following line BREAKS 'The Apprentice', hangs when you attempt to start the game
+            //timer_adjust_oneshot(m_interrupt_timer, ATTOTIME_IN_HZ(75), 0);
 
             m_x_buffer |= 0x8000;
             //m_data_buffer |= 0x4000;

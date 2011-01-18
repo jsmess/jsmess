@@ -10822,6 +10822,17 @@ The software list will be divided in four categories:
 		<publisher>Accolade</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="2097152">
+				<rom name="fireteam rogue (later beta).sfc" size="2097152" crc="4f659fd5" sha1="7692442f132a67e44b6842c0c97362a624453bf8" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fireteama" cloneof="fireteam">
+		<description>Fireteam Rogue (USA, Prototype Earlier)</description>
+		<year>1995</year>
+		<publisher>Accolade</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="2097152">
 				<rom name="fireteam rogue (usa) (proto).sfc" size="2097152" crc="00f67ba2" sha1="9a1b37955e5a8b01a40b0dc35454d4fb9f99f34f" offset="000000" />
 			</dataarea>
 		</part>
@@ -41647,6 +41658,324 @@ The software list will be divided in four categories:
 			</dataarea>
 		</part>
 	</software>
+
+	<software name="bssbm">
+		<!-- Serial:  - Release Date:  -->
+		<description>Sonic Blast Man (Jpn, BS)</description>
+		<!-- BS -->
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="sonic blastman (bs).sfc" size="1048576" crc="86bb53e5" sha1="e8411f5e0ea2b2922416710c9b463023fe1e5f39" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tablgmbs">
+		<!-- Serial:  - Release Date:  -->
+		<description>Table Game Daishuugou!! (Jpn, BS)</description>
+		<!-- BS -->
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="table game daisyugo (bs).sfc" size="1048576" crc="47e3047e" sha1="00ddbd9471f9b22b927a2361c672d7e4081fb69d" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsshangha" cloneof="bsshangh" supported="no">
+		<!-- Serial:  - Release Date:  -->
+		<description>Shanghai - Banri no Choujou (Jpn, BS, Alt)</description>
+		<!-- BS -->
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="shanghai - banri no choujou (bs).bs" size="1048576" crc="5c95f21c" sha1="82a238519f92dc3174dd3226a1243c69d7f03528" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shubibina" cloneof="shubibin" supported="no">
+		<!-- Serial:  - Release Date:  -->
+		<description>Kaizou Choujin Shubibinman Zero (Jpn, Locked)</description>
+		<!-- BS -->
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="kaizou choujin shubibinman zero (l).bs" size="1048576" crc="26a4f6c3" sha1="dd084021a7e2afd939fee3b6426778f6e5c2f333" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+    
+
+    <!-- BS Unknow packs, to be sorted out once we emulate this properly! -->
+
+    <!-- This pack returns a 'Error 41' message on a real unit, and it does not work further -->
+	<software name="bsunk01" supported="no">
+		<!-- Serial:  - Release Date:  -->
+		<description>BS Unknown Memory Pack 01 (Jpn)</description>
+		<!-- BS -->
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="asdf.bs" size="1048576" crc="ff0bab5d" sha1="98106965b02c41f1be7289acb408581de3d82a52" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+    <!-- These packs were released as an "Assorted set of data packs, which seem to be RPG Tsukuru and Sound Novel Tsukuru data" -->
+	<software name="bsunk02" supported="no">
+		<!-- Serial:  - Release Date:  -->
+		<description>BS Unknown Memory Pack 02 (Jpn, ASCII MUSIC TOOL1995.11.02 V1.0)</description>
+		<!-- BS -->
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="65536">
+				<rom name="ascii music tool1995.11.02 v1.0.bs" size="65536" crc="ee250acb" sha1="9cabc99c9c5bbbe192d401127ddb69dc14fcf35a" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsunk03" supported="no">
+		<!-- Serial:  - Release Date:  -->
+		<description>BS Unknown Memory Pack 03 (Jpn, KANADERU CONVERT 1)</description>
+		<!-- BS -->
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="kanaderu convert 1.bs" size="262144" crc="0fe1b6a4" sha1="ae04f366ffa9bc5409b9231023f3049c50255a0b" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsunk04" supported="no">
+		<!-- Serial:  - Release Date:  -->
+		<description>BS Unknown Memory Pack 04 (Jpn, KANADERU CONVERT 2)</description>
+		<!-- BS -->
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="kanaderu convert 2.bs" size="131072" crc="4a5ffa76" sha1="5a0e2b4f6dd5ccb2c4bcfa51bfacf905da0d6bd4" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsunk05" supported="no">
+		<!-- Serial:  - Release Date:  -->
+		<description>BS Unknown Memory Pack 05 (Jpn, KANADERU CONVERT 5)</description>
+		<!-- BS -->
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="kanaderu convert 5.bs" size="262144" crc="a502aa9d" sha1="39b41cac1bd60f276cafb719939917129260a82d" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsunk06" supported="no">
+		<!-- Serial:  - Release Date:  -->
+		<description>BS Unknown Memory Pack 06 (Jpn, RPG DATA 01)</description>
+		<!-- BS -->
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="rpg data 01.bs" size="131072" crc="7c9a8066" sha1="e40b2712aae8e9a7bd5f99873ef9f3a0821e79cd" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsunk07" supported="no">
+		<!-- Serial:  - Release Date:  -->
+		<description>BS Unknown Memory Pack 07 (Jpn, RPG DATA 01 a)</description>
+		<!-- BS -->
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="rpg data 01 a.bs" size="131072" crc="dcfeef74" sha1="d9ec72de332e90fe794d9d53f5c7ece7e55ff281" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsunk08" supported="no">
+		<!-- Serial:  - Release Date:  -->
+		<description>BS Unknown Memory Pack 08 (Jpn, RPG DATA 02)</description>
+		<!-- BS -->
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="rpg data 02.bs" size="262144" crc="0cdc896b" sha1="9242f1cd7d2b08457ad2a434180bc54ce113f4d2" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsunk09" supported="no">
+		<!-- Serial:  - Release Date:  -->
+		<description>BS Unknown Memory Pack 09 (Jpn, RPG DATA 02 b)</description>
+		<!-- BS -->
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="rpg data 02 b.bs" size="131072" crc="b5abf7d5" sha1="ba7f004a07fed15521cacb980bcdd36dae9ae21a" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsunk10" supported="no">
+		<!-- Serial:  - Release Date:  -->
+		<description>BS Unknown Memory Pack 10 (Jpn, RPG DATA 03 Judas Priest)</description>
+		<!-- BS -->
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="rpg data 03 judas priest.bs" size="131072" crc="a00a6450" sha1="5c1dc43900c76042db10d49a1e3ae6a8dc8f7672" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsunk11" supported="no">
+		<!-- Serial:  - Release Date:  -->
+		<description>BS Unknown Memory Pack 11 (Jpn, SOUND NOVEL 1)</description>
+		<!-- BS -->
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="sound novel 1.bs" size="131072" crc="cab837e0" sha1="2254ac8d4c919ade22eadae630b1b82c228a2c82" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsunk12" supported="no">
+		<!-- Serial:  - Release Date:  -->
+		<description>BS Unknown Memory Pack 12 (Jpn, SOUND NOVEL 1 a)</description>
+		<!-- BS -->
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="sound novel 1 a.bs" size="131072" crc="c7657cd1" sha1="106843f2528869b75918156f5079353236e5278d" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsunk13" supported="no">
+		<!-- Serial:  - Release Date:  -->
+		<description>BS Unknown Memory Pack 13 (Jpn, SOUND NOVEL 2)</description>
+		<!-- BS -->
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="sound novel 2.bs" size="131072" crc="05f3faef" sha1="6162f262c25f3a45f07297db6eb3f08dd11ed8e1" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsunk14" supported="no">
+		<!-- Serial:  - Release Date:  -->
+		<description>BS Unknown Memory Pack 14 (Jpn, SOUND NOVEL 3)</description>
+		<!-- BS -->
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="sound novel 3.bs" size="131072" crc="c1bc6475" sha1="cb675b6f9df9917cce34ce59d2d645d48d50c188" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsunk15" supported="no">
+		<!-- Serial:  - Release Date:  -->
+		<description>BS Unknown Memory Pack 15 (Jpn, SOUND NOVEL 3 a)</description>
+		<!-- BS -->
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="sound novel 3 a.bs" size="131072" crc="93516da4" sha1="3ba52325c030b629cd9773a707b83f515600add9" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsunk16" supported="no">
+		<!-- Serial:  - Release Date:  -->
+		<description>BS Unknown Memory Pack 16 (Jpn, SOUND NOVEL 4)</description>
+		<!-- BS -->
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="sound novel 4.bs" size="131072" crc="4f823052" sha1="5478c8f3e84b5ee0680a99435288f1e4311982a4" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsunk17" supported="no">
+		<!-- Serial:  - Release Date:  -->
+		<description>BS Unknown Memory Pack 17 (Jpn, SOUND NOVEL 4 a)</description>
+		<!-- BS -->
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="sound novel 4 a.bs" size="131072" crc="7426f308" sha1="1254626439c10cf474a74b02d9f501a3aefb2c84" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsunk18" supported="no">
+		<!-- Serial:  - Release Date:  -->
+		<description>BS Unknown Memory Pack 18 (Jpn, SOUND NOVEL 5)</description>
+		<!-- BS -->
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="sound novel 5.bs" size="131072" crc="3955eb83" sha1="6d785d32410ec1acc2efeffe4717e26c1221d2ed" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsunk19" supported="no">
+		<!-- Serial:  - Release Date:  -->
+		<description>BS Unknown Memory Pack 19 (Jpn, SOUND NOVEL 6)</description>
+		<!-- BS -->
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="sound novel 6.bs" size="131072" crc="d9ee913a" sha1="ab6e28dd1e2542f974160e571abb9181e4767edc" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsunk20" supported="no">
+		<!-- Serial:  - Release Date:  -->
+		<description>BS Unknown Memory Pack 20 (Jpn, SOUND NOVEL 7)</description>
+		<!-- BS -->
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="sound novel 7.bs" size="131072" crc="c7d0b4df" sha1="d426c22704f2ea96ec9ec95af72f8959e7df27ca" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 
 <!-- Non game cartridges -->
 
