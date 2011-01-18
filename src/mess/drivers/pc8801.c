@@ -9,7 +9,8 @@
 	  later models at some point.
 	- macros for the various rom / ram areas, it might require various attempts in order to finally get a reasonable arrangement ...
 	- dipswitches are WRONG
-	- implement proper i8214 routing, also add irq latch mechanism.
+	- implement proper i8214 routing, also add irq latch mechanism;
+	- implement proper upd3301 / i8257 support;
 	- below notes states that plain PC-8801 doesn't have a disk CPU, but the BIOS clearly checks the floppy ports. Wrong info?
 	- joystick / mouse support;
 	- cursor is 8 x 10, not 8 x 8 as current implementation.
@@ -143,6 +144,7 @@ static UINT16 dma_counter[4],dma_address[4];
 static UINT8 dmac_mode;
 static UINT8 alu_ctrl1,alu_ctrl2;
 static UINT8 extram_mode,extram_bank;
+static UINT8 txt_width, txt_color;
 static int vblank_pos;
 
 static void pc8801_update_irq(running_machine *machine)
@@ -202,30 +204,6 @@ static VIDEO_START( pc8801 )
 
 }
 
-static UINT8 calc_cursor_pos(running_machine *machine,int x,int y,int yi)
-{
-	if(!(crtc.cursor_on)) // don't bother if cursor is off
-		return 0;
-
-	if(x == crtc.param[4][0] && y == crtc.param[4][1]) /* check if position matches */
-	{
-		/* don't pass through if we are using underscore */
-		if((!(crtc.param[0][2] & 0x40)) && yi != 7)
-			return 0;
-
-		/* finally check if blinking is currently active high */
-		if(!(crtc.param[0][2] & 0x20))
-			return 1;
-
-		if(((machine->primary_screen->frame_number() / blink_speed) & 1) == 0)
-			return 1;
-
-		return 0;
-	}
-
-	return 0;
-}
-
 static void draw_bitmap_3bpp(running_machine *machine, bitmap_t *bitmap)
 {
 	int x,y,xi;
@@ -270,8 +248,9 @@ static void draw_bitmap_1bpp(running_machine *machine, bitmap_t *bitmap)
 		{
 			for(xi=0;xi<8;xi++)
 			{
-				int pen = 0;
+				int pen;
 
+				pen = 0;
 				/* TODO: dunno if layer_mask is correct here */
 				if(!(layer_mask & 2)) { pen = ((gvram[count+0x0000] >> (7-xi)) & 1) << 0; }
 
@@ -292,8 +271,9 @@ static void draw_bitmap_1bpp(running_machine *machine, bitmap_t *bitmap)
 			{
 				for(xi=0;xi<8;xi++)
 				{
-					int pen = 0;
+					int pen;
 
+					pen = 0;
 					/* TODO: dunno if layer_mask is correct here */
 					if(!(layer_mask & 4)) { pen = ((gvram[count+0x4000] >> (7-xi)) & 1) << 0; }
 
@@ -306,12 +286,126 @@ static void draw_bitmap_1bpp(running_machine *machine, bitmap_t *bitmap)
 	}
 }
 
-static VIDEO_UPDATE( pc8801 )
+static UINT8 calc_cursor_pos(running_machine *machine,int x,int y,int yi)
+{
+	if(!(crtc.cursor_on)) // don't bother if cursor is off
+		return 0;
+
+	if(x == crtc.param[4][0] && y == crtc.param[4][1]) /* check if position matches */
+	{
+		/* don't pass through if we are using underscore */
+		if((!(crtc.param[0][2] & 0x40)) && yi != 7)
+			return 0;
+
+		/* finally check if blinking is currently active high */
+		if(!(crtc.param[0][2] & 0x20))
+			return 1;
+
+		if(((machine->primary_screen->frame_number() / blink_speed) & 1) == 0)
+			return 1;
+
+		return 0;
+	}
+
+	return 0;
+}
+
+static void draw_text_80(running_machine *machine, bitmap_t *bitmap,int y_size)
 {
 	int x,y;
 	int xi,yi;
-	UINT8 *vram = screen->machine->region("maincpu")->base() + WRAM_BASE;
+	UINT8 *vram = machine->region("maincpu")->base() + WRAM_BASE;
 	UINT8 is_cursor;
+	UINT8 y_height;
+
+	y_height = y_size == 20 ? 10 : 8;
+
+	for(y=0;y<y_size;y++)
+	{
+		for(x=0;x<80;x++)
+		{
+			for(yi=0;yi<8;yi++)
+			{
+				is_cursor = calc_cursor_pos(machine,x,y,yi);
+
+				for(xi=0;xi<8;xi++)
+				{
+					int res_x,res_y;
+					int tile;
+					int color;
+					UINT8 *gfx_data = machine->region("gfx1")->base();
+
+					tile = vram[x+(y*120)+dma_address[2]];
+
+					res_x = x*8+xi;
+					res_y = y*y_height+yi;
+
+					if(is_cursor)
+						color = ((gfx_data[tile*8+yi] >> (7-xi)) & 1) ? -1 : 7;
+					else
+						color = ((gfx_data[tile*8+yi] >> (7-xi)) & 1) ? 7 : -1;
+
+					if((res_x)<=machine->primary_screen->visible_area().max_x && (res_y)<=machine->primary_screen->visible_area().max_y)
+						if(color != -1)
+							*BITMAP_ADDR16(bitmap, res_y, res_x) = machine->pens[color];
+				}
+			}
+		}
+	}
+}
+
+static void draw_text_40(running_machine *machine, bitmap_t *bitmap, int y_size)
+{
+	int x,y;
+	int xi,yi;
+	UINT8 *vram = machine->region("maincpu")->base() + WRAM_BASE;
+	UINT8 is_cursor;
+	UINT8 y_height;
+
+	y_height = y_size == 20 ? 10 : 8;
+
+	for(y=0;y<y_size;y++)
+	{
+		for(x=0;x<80;x++)
+		{
+			if(x & 1)
+				continue;
+
+			for(yi=0;yi<8;yi++)
+			{
+				is_cursor = calc_cursor_pos(machine,x,y,yi);
+
+				for(xi=0;xi<8;xi++)
+				{
+					int res_x,res_y;
+					int tile;
+					int color;
+					UINT8 *gfx_data = machine->region("gfx1")->base();
+
+					tile = vram[x+(y*120)+dma_address[2]];
+
+					res_x = (x*8)+xi*2;
+					res_y = (y*y_height)+yi;
+
+					if(is_cursor)
+						color = ((gfx_data[tile*8+yi] >> (7-xi)) & 1) ? -1 : 7;
+					else
+						color = ((gfx_data[tile*8+yi] >> (7-xi)) & 1) ? 7 : -1;
+
+					if((res_x)<=machine->primary_screen->visible_area().max_x && (res_y)<=machine->primary_screen->visible_area().max_y)
+						if(color != -1)
+							*BITMAP_ADDR16(bitmap, res_y, res_x) = machine->pens[color];
+					if((res_x+1)<=machine->primary_screen->visible_area().max_x && (res_y)<=machine->primary_screen->visible_area().max_y)
+						if(color != -1)
+							*BITMAP_ADDR16(bitmap, res_y, res_x+1) = machine->pens[color];
+				}
+			}
+		}
+	}
+}
+
+static VIDEO_UPDATE( pc8801 )
+{
 	bitmap_fill(bitmap, cliprect, screen->machine->pens[0]);
 
 	if(gfx_ctrl & 8)
@@ -324,38 +418,17 @@ static VIDEO_UPDATE( pc8801 )
 
 	if(!(layer_mask & 1) && dmac_mode & 4 && crtc.status & 0x10 && crtc.irq_mask == 3)
 	{
-		for(y=0;y<25;y++)
-		{
-			for(x=0;x<80;x++)
-			{
-				for(yi=0;yi<8;yi++)
-				{
-					for(xi=0;xi<8;xi++)
-					{
-						int res_x,res_y;
-						int tile;
-						int color;
-						UINT8 *gfx_data = screen->machine->region("gfx1")->base();
+		static int y_size;
 
-						tile = vram[x+(y*120)+dma_address[2]];
+		y_size = (crtc.param[0][1] & 0x3f) + 1;
 
-						res_x = x*8+xi;
-						res_y = y*8+yi;
+		if(y_size < 20) y_size = 20;
+		if(y_size > 25) y_size = 25;
 
-						is_cursor = calc_cursor_pos(screen->machine,x,y,yi);
-
-						if(is_cursor)
-							color = ((gfx_data[tile*8+yi] >> (7-xi)) & 1) ? -1 : 7;
-						else
-							color = ((gfx_data[tile*8+yi] >> (7-xi)) & 1) ? 7 : -1;
-
-						if((res_x)<=screen->machine->primary_screen->visible_area().max_x && (res_y)<=screen->machine->primary_screen->visible_area().max_y)
-							if(color != -1)
-								*BITMAP_ADDR16(bitmap, res_y, res_x) = screen->machine->pens[color];
-					}
-				}
-			}
-		}
+		if(txt_width)
+			draw_text_80(screen->machine,bitmap,y_size);
+		else
+			draw_text_40(screen->machine,bitmap,y_size);
 	}
 
 	return 0;
@@ -782,8 +855,8 @@ static WRITE8_HANDLER( pc8801_irq_mask_w )
 	rtc_irq_mask = data & 1;
 	vrtc_irq_mask = data & 2;
 
-	if(data & 4)
-		printf("IRQ mask %02x\n",data);
+	//if(data & 4)
+	//	printf("IRQ mask %02x\n",data);
 }
 
 static READ8_HANDLER( pc8801_window_bank_r )
@@ -1015,6 +1088,14 @@ static READ8_HANDLER( sio_status_r )
 	return 0;
 }
 
+static WRITE8_HANDLER( pc8801_txt_cmt_ctrl_w )
+{
+	/* bits 2 to 5 are cmt related */
+
+	txt_width = data & 1;
+	txt_color = data & 2;
+}
+
 static ADDRESS_MAP_START( pc8801_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
@@ -1037,7 +1118,7 @@ static ADDRESS_MAP_START( pc8801_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x02) AM_WRITE(pc8801_pcg8100_w)
 //	AM_RANGE(0x10, 0x10) AM_WRITE(pc88_rtc_w)
 	AM_RANGE(0x21, 0x21) AM_READ(sio_status_r)                                /* RS-232C and cassette */
-	AM_RANGE(0x30, 0x30) AM_READ_PORT("DSW1") //AM_WRITE(pc88sr_outport_30)
+	AM_RANGE(0x30, 0x30) AM_READ_PORT("DSW1") AM_WRITE(pc8801_txt_cmt_ctrl_w)
 	AM_RANGE(0x31, 0x31) AM_READ_PORT("DSW2") AM_WRITE(pc8801_gfx_ctrl_w)
 	AM_RANGE(0x32, 0x32) AM_READWRITE(pc8801_misc_ctrl_r, pc8801_misc_ctrl_w)
 	AM_RANGE(0x34, 0x34) AM_WRITE(pc8801_alu_ctrl1_w)
