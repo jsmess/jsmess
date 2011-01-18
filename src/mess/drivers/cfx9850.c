@@ -2,6 +2,14 @@
 
     Driver for Casio CFX-9850
 
+To operate:
+The unit is switched off by default, you have to switch it on by pressing 'Q'.
+
+Debugging information:
+First make sure system is initialized (g 10b3).
+At cs=23, ip=d1a4,d1af,d1ba,d1c5,d1d0,d1db,d1ea,d1f9,d208,d217,d226,d235,d244
+are routines which fill display ram with patterns.
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -28,7 +36,7 @@ static ADDRESS_MAP_START( cfx9850, ADDRESS_SPACE_PROGRAM, 8 )
 //  AM_RANGE( 0x110000, 0x11ffff ) /* some memory mapped i/o? */
 	AM_RANGE( 0x200000, 0x27ffff ) AM_ROM AM_REGION( "bios", 0 )
 	AM_RANGE( 0x400000, 0x40ffff ) AM_RAM
-	AM_RANGE( 0x600000, 0x601fff ) AM_MIRROR(0xe000) AM_RAM AM_BASE_MEMBER( cfx9850_state, display_ram )
+	AM_RANGE( 0x600000, 0x601fff ) AM_MIRROR(0xf800) AM_RAM AM_BASE_MEMBER( cfx9850_state, display_ram )
 //  AM_RANGE( 0xe10000, 0xe1ffff ) /* some memory mapped i/o? */
 ADDRESS_MAP_END
 
@@ -175,6 +183,44 @@ static INPUT_PORTS_START( cfx9850 )
 INPUT_PORTS_END
 
 
+static PALETTE_INIT( cfx9850 )
+{
+	palette_set_color_rgb( machine, 0, 0xff, 0xff, 0xff );
+	palette_set_color_rgb( machine, 1, 0x00, 0x00, 0xff );
+	palette_set_color_rgb( machine, 2, 0x00, 0xff, 0x00 );
+	palette_set_color_rgb( machine, 3, 0xff, 0x00, 0x00 );
+}
+
+
+static VIDEO_UPDATE( cfx9850 )
+{
+	cfx9850_state *state = screen->machine->driver_data<cfx9850_state>();
+	UINT16 offset = 0;
+
+	for ( int i = 0; i < 16; i++ )
+	{
+		int x = 120 - i * 8;
+
+		for ( int j = 0; j < 64; j++ )
+		{
+			UINT8 data1 = state->display_ram[ offset ];
+			UINT8 data2 = state->display_ram[ offset + 0x400 ];
+
+			for ( int b = 0; b < 8; b++ )
+			{
+				*BITMAP_ADDR16(bitmap, 63-j, x+b) = ( data1 & 0x80 ) ? ( data2 & 0x80 ? 3 : 2 ) : ( data2 & 0x80 ? 1 : 0 );
+				data1 <<= 1;
+				data2 <<= 1;
+			}
+
+			offset++;
+		}
+	}
+
+	return 0;
+}
+
+
 static MACHINE_CONFIG_START( cfx9850, cfx9850_state )
 
 	MCFG_CPU_ADD( "maincpu", HCD62121, 4300000 )	/* 4.3 MHz */
@@ -188,9 +234,11 @@ static MACHINE_CONFIG_START( cfx9850, cfx9850_state )
 	MCFG_SCREEN_VISIBLE_AREA( 0, 127, 0, 63 )
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
+	MCFG_VIDEO_UPDATE( cfx9850 )
+
 	/* TODO: It uses a color display, but I'm being lazy here. 3 colour lcd */
-	MCFG_PALETTE_LENGTH( 2 )
-	MCFG_PALETTE_INIT(black_and_white)
+	MCFG_PALETTE_LENGTH( 4 )
+	MCFG_PALETTE_INIT( cfx9850 )
 
 MACHINE_CONFIG_END
 
