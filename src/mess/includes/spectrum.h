@@ -96,6 +96,9 @@ public:
 	char *pEventListBuffer;
 	int LastFrameStartTime;
 	int CyclesPerFrame;
+	
+	UINT8 *ram_0000;
+	UINT8 ram_disabled_by_beta;
 };
 
 

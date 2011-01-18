@@ -183,9 +183,6 @@ D6-D7 - not used. ( yet ? )
 
 /* rom 0=zx128, 1=zx48, 2 = service monitor, 3=tr-dos */
 
-static UINT8 *ram_0000;
-static UINT8 ram_disabled_by_beta;
-
 static void scorpion_update_memory(running_machine *machine)
 {
 	spectrum_state *state = machine->driver_data<spectrum_state>();
@@ -197,7 +194,7 @@ static void scorpion_update_memory(running_machine *machine)
 
 	if ((state->port_1ffd_data & 0x01)==0x01)
 	{
-		ram_0000 = messram+(8<<14);
+		state->ram_0000 = messram+(8<<14);
 		memory_set_bankptr(machine, "bank1", messram+(8<<14));
 		logerror("RAM\n");
 	}
@@ -221,13 +218,13 @@ static WRITE8_HANDLER( scorpion_0000_w )
 {
 	spectrum_state *state = space->machine->driver_data<spectrum_state>();
 
-	if ( ! ram_0000 )
+	if ( ! state->ram_0000 )
 		return;
 
 	if ((state->port_1ffd_data & 0x01)==0x01)
 	{
-		if ( ! ram_disabled_by_beta )
-			ram_0000[offset] = data;
+		if ( ! state->ram_disabled_by_beta )
+			state->ram_0000[offset] = data;
 	}
 }
 
@@ -239,14 +236,14 @@ DIRECT_UPDATE_HANDLER( scorpion_direct )
 	UINT16 pc = cpu_get_reg(machine->device("maincpu"), STATE_GENPCBASE);
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
-	ram_disabled_by_beta = 0;
+	state->ram_disabled_by_beta = 0;
 	if (betadisk_is_active(beta))
 	{
 		if (pc >= 0x4000)
 		{
 			state->ROMSelection = ((state->port_7ffd_data>>4) & 0x01) ? 1 : 0;
 			betadisk_disable(beta);
-			ram_disabled_by_beta = 1;
+			state->ram_disabled_by_beta = 1;
 			memory_set_bankptr(machine, "bank1", machine->region("maincpu")->base() + 0x010000 + (state->ROMSelection<<14));
 		}
 	}
@@ -257,7 +254,7 @@ DIRECT_UPDATE_HANDLER( scorpion_direct )
 	}
 	if((address>=0x0000) && (address<=0x3fff))
 	{
-		ram_disabled_by_beta = 1;
+		state->ram_disabled_by_beta = 1;
 		direct.explicit_configure(0x0000, 0x3fff, 0x3fff, space->machine->region("maincpu")->base() + 0x010000 + (state->ROMSelection<<14));
 		memory_set_bankptr(machine, "bank1", space->machine->region("maincpu")->base() + 0x010000 + (state->ROMSelection<<14));
 		return ~0;
@@ -326,7 +323,7 @@ static MACHINE_RESET( scorpion )
 	device_t *beta = machine->device(BETA_DISK_TAG);
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
-	ram_0000 = NULL;
+	state->ram_0000 = NULL;
 	memory_install_read_bank(space, 0x0000, 0x3fff, 0, 0, "bank1");
 	memory_install_write8_handler(space, 0x0000, 0x3fff, 0, 0, scorpion_0000_w);
 

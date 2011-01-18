@@ -24,7 +24,6 @@ DIRECT_UPDATE_HANDLER( atm_direct )
 	spectrum_state *state = machine->driver_data<spectrum_state>();
 	device_t *beta = machine->device(BETA_DISK_TAG);
 	UINT16 pc = cpu_get_reg(machine->device("maincpu"), STATE_GENPCBASE);
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	if (beta->started() && betadisk_is_active(beta))
 	{
@@ -32,7 +31,6 @@ DIRECT_UPDATE_HANDLER( atm_direct )
 		{
 			state->ROMSelection = ((state->port_7ffd_data>>4) & 0x01) ? 1 : 0;
 			betadisk_disable(beta);
-			memory_unmap_write(space, 0x0000, 0x3fff, 0, 0);
 			memory_set_bankptr(machine, "bank1", machine->region("maincpu")->base() + 0x010000 + (state->ROMSelection<<14));
 		}
 	}
@@ -45,7 +43,6 @@ DIRECT_UPDATE_HANDLER( atm_direct )
 	}
 	if((address>=0x0000) && (address<=0x3fff))
 	{
-		memory_unmap_write(space, 0x0000, 0x3fff, 0, 0);
 		if (state->ROMSelection == 3) {
 			direct.explicit_configure(0x0000, 0x3fff, 0x3fff, machine->region("maincpu")->base() + 0x018000);
 			memory_set_bankptr(machine, "bank1", machine->region("maincpu")->base() + 0x018000);
@@ -122,8 +119,7 @@ static MACHINE_RESET( atm )
 		betadisk_enable(beta);
 		betadisk_clear_status(beta);
 	}
-	// This causes severe slowdown (5fps vs 750fps) removed until rewritten
-	//space->set_direct_update_handler(direct_update_delegate_create_static(atm_direct, *machine));
+	space->set_direct_update_handler(direct_update_delegate_create_static(atm_direct, *machine));
 
 	memset(messram,0,128*1024);
 
