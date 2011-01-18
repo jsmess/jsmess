@@ -680,12 +680,12 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="x1_flop">
 			<dataarea name="flop" size="415840">
-				<rom name="flop1.d88" size="415840" crc="57353bdb" sha1="567ed54b51b7e97465fa3f419bc1910c9ad7a219" offset="0" />
+				<rom name="disk1.d88" size="415840" crc="57353bdb" sha1="567ed54b51b7e97465fa3f419bc1910c9ad7a219" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="x1_flop">
 			<dataarea name="flop" size="415840">
-				<rom name="flop2.d88" size="415840" crc="f92dcbae" sha1="acd01e2c8e93806d506e8abe9bb4b053e3558e2d" offset="0" />
+				<rom name="disk2.d88" size="415840" crc="f92dcbae" sha1="acd01e2c8e93806d506e8abe9bb4b053e3558e2d" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="x1_flop">
@@ -701,12 +701,12 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="x1_flop">
 			<dataarea name="flop" size="327680">
-				<rom name="flop_a.2d" size="327680" crc="e59a8698" sha1="837808bf5f987fa7f0f53ce76190d7b1e3849df0" offset="0" />
+				<rom name="disk_a.2d" size="327680" crc="e59a8698" sha1="837808bf5f987fa7f0f53ce76190d7b1e3849df0" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="x1_flop">
 			<dataarea name="flop" size="327680">
-				<rom name="flop_b.2d" size="327680" crc="8467dc7b" sha1="150e1aa389a32f8c58ea9b34b5dad971ef94f159" offset="0" />
+				<rom name="disk_b.2d" size="327680" crc="8467dc7b" sha1="150e1aa389a32f8c58ea9b34b5dad971ef94f159" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -850,22 +850,22 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="x1_flop">
 			<dataarea name="flop" size="377936">
-				<rom name="flop1.d88" size="377936" crc="12db7383" sha1="09c928b69b78b90ada339af66482eebc15c2cf1c" offset="0" />
+				<rom name="disk1.d88" size="377936" crc="12db7383" sha1="09c928b69b78b90ada339af66482eebc15c2cf1c" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="x1_flop">
 			<dataarea name="flop" size="380848">
-				<rom name="flop2.d88" size="380848" crc="e95732d9" sha1="415c90e8ed61188992db0b4ce0a932b4d70e58d7" offset="0" />
+				<rom name="disk2.d88" size="380848" crc="e95732d9" sha1="415c90e8ed61188992db0b4ce0a932b4d70e58d7" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="x1_flop">
 			<dataarea name="flop" size="380848">
-				<rom name="flop3.d88" size="380848" crc="de116245" sha1="c5489340c3fa6d294770087234420fc21952bb53" offset="0" />
+				<rom name="disk3.d88" size="380848" crc="de116245" sha1="c5489340c3fa6d294770087234420fc21952bb53" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="x1_flop">
 			<dataarea name="flop" size="380848">
-				<rom name="flop4.d88" size="380848" crc="dee3af09" sha1="7f0704af4162dc7f8a381c56e62fcce6ce246d96" offset="0" />
+				<rom name="disk4.d88" size="380848" crc="dee3af09" sha1="7f0704af4162dc7f8a381c56e62fcce6ce246d96" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -876,17 +876,17 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="x1_flop">
 			<dataarea name="flop" size="378448">
-				<rom name="flop1.d88" size="378448" crc="450703c5" sha1="90e4594be5c22823f64fbb96b03d84fc0a771b5f" offset="0" />
+				<rom name="disk1.d88" size="378448" crc="450703c5" sha1="90e4594be5c22823f64fbb96b03d84fc0a771b5f" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="x1_flop">
 			<dataarea name="flop" size="380848">
-				<rom name="flop2.d88" size="380848" crc="d0858a0c" sha1="2066a6d352dfd60157ed656f0b371e0e9d7c482a" offset="0" />
+				<rom name="disk2.d88" size="380848" crc="d0858a0c" sha1="2066a6d352dfd60157ed656f0b371e0e9d7c482a" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="x1_flop">
 			<dataarea name="flop" size="380848">
-				<rom name="flop3.d88" size="350448" crc="27d0f232" sha1="43a6ee9e445b4112dce1079a747ef09eea12815c" offset="0" />
+				<rom name="disk3.d88" size="350448" crc="27d0f232" sha1="43a6ee9e445b4112dce1079a747ef09eea12815c" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1682,17 +1682,17 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="x1_flop">
 			<dataarea name="flop" size="421040">
-				<rom name="flop1.d88" size="421040" crc="1bd1fcee" sha1="79d71844a34aed3e88f8fed8e2ea87b7c2a37e8c" offset="0" />
+				<rom name="disk1.d88" size="421040" crc="1bd1fcee" sha1="79d71844a34aed3e88f8fed8e2ea87b7c2a37e8c" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="x1_flop">
 			<dataarea name="flop" size="415840">
-				<rom name="flop2.d88" size="415840" crc="42670edc" sha1="98ec24213a6c170b79136150006c2b93db0b3fe8" offset="0" />
+				<rom name="disk2.d88" size="415840" crc="42670edc" sha1="98ec24213a6c170b79136150006c2b93db0b3fe8" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="x1_flop">
 			<dataarea name="flop" size="416688">
-				<rom name="flop3.d88" size="416688" crc="7aa2c5b4" sha1="e7263df70443790965e70b8df38b8119e9442944" offset="0" />
+				<rom name="disk3.d88" size="416688" crc="7aa2c5b4" sha1="e7263df70443790965e70b8df38b8119e9442944" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1703,37 +1703,37 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="x1_flop">
 			<dataarea name="flop" size="425392">
-				<rom name="flopa.d88" size="425392" crc="6c238b5c" sha1="932b71419f859553a28ad2dd0f924bb97349dd49" offset="0" />
+				<rom name="diska.d88" size="425392" crc="6c238b5c" sha1="932b71419f859553a28ad2dd0f924bb97349dd49" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="x1_flop">
 			<dataarea name="flop" size="425392">
-				<rom name="flopb.d88" size="425392" crc="ff80f144" sha1="fbd0ebbcc5447124b889ab0076340c69c79e510f" offset="0" />
+				<rom name="diskb.d88" size="425392" crc="ff80f144" sha1="fbd0ebbcc5447124b889ab0076340c69c79e510f" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="x1_flop">
 			<dataarea name="flop" size="425392">
-				<rom name="flopc.d88" size="425392" crc="f784b936" sha1="72a2fe351c5df26e67e6aaa99293123f07c65afb" offset="0" />
+				<rom name="diskc.d88" size="425392" crc="f784b936" sha1="72a2fe351c5df26e67e6aaa99293123f07c65afb" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="x1_flop">
 			<dataarea name="flop" size="425392">
-				<rom name="flopd.d88" size="425392" crc="0b6b0a54" sha1="cd3974c218d52344d982c1bf134810a6276bc468" offset="0" />
+				<rom name="diskd.d88" size="425392" crc="0b6b0a54" sha1="cd3974c218d52344d982c1bf134810a6276bc468" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop5" interface="x1_flop">
 			<dataarea name="flop" size="425392">
-				<rom name="flope.d88" size="425392" crc="a2231d69" sha1="562d6d2fd64af5fe7b7ee22b51108fbe413fb625" offset="0" />
+				<rom name="diske.d88" size="425392" crc="a2231d69" sha1="562d6d2fd64af5fe7b7ee22b51108fbe413fb625" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop6" interface="x1_flop">
 			<dataarea name="flop" size="425392">
-				<rom name="flopf.d88" size="425392" crc="82cb86f5" sha1="f53c570465972232033d4e335f2a4562fc634f04" offset="0" />
+				<rom name="diskf.d88" size="425392" crc="82cb86f5" sha1="f53c570465972232033d4e335f2a4562fc634f04" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop7" interface="x1_flop">
 			<dataarea name="flop" size="425392">
-				<rom name="flopg.d88" size="425392" crc="68ae46aa" sha1="67278343a1c78f46b0f49d566897eb5ad419afdd" offset="0" />
+				<rom name="diskg.d88" size="425392" crc="68ae46aa" sha1="67278343a1c78f46b0f49d566897eb5ad419afdd" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1755,12 +1755,12 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="x1_flop">
 			<dataarea name="flop" size="327680">
-				<rom name="flop_a.2d" size="327680" crc="f3e360fb" sha1="598be1cf51d967d73f921d46f9c89734b87936b3" offset="0" />
+				<rom name="disk_a.2d" size="327680" crc="f3e360fb" sha1="598be1cf51d967d73f921d46f9c89734b87936b3" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="x1_flop">
 			<dataarea name="flop" size="327680">
-				<rom name="flop_b.2d" size="327680" crc="763b9e52" sha1="c971b99c95455f90c3d7d3005847ed0391dfa96a" offset="0" />
+				<rom name="disk_b.2d" size="327680" crc="763b9e52" sha1="c971b99c95455f90c3d7d3005847ed0391dfa96a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3244,12 +3244,12 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="x1_flop">
 			<dataarea name="flop" size="327680">
-                <rom name="flop1.d88" size="348848" crc="3c17cce4" sha1="defff082c7ba49ac0f5e807c3cd1e9a9f4c7f1ab" offset="0" />
+                <rom name="disk1.d88" size="348848" crc="3c17cce4" sha1="defff082c7ba49ac0f5e807c3cd1e9a9f4c7f1ab" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="x1_flop">
 			<dataarea name="flop" size="327680">
-                <rom name="flop2.d88" size="348848" crc="50f1b9c7" sha1="1b1bfbe1cd1b1891be78c78dba6f44b735a78b48" offset="0" />
+                <rom name="disk2.d88" size="348848" crc="50f1b9c7" sha1="1b1bfbe1cd1b1891be78c78dba6f44b735a78b48" offset="0" />
 			</dataarea>
 		</part>
 	</software>

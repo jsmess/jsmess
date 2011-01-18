@@ -520,7 +520,7 @@ Xtal Systems (Xtal Research)
 		<publisher>Emsoft</publisher>
 		<part name="flop1" interface="einstein_flop">
 			<dataarea name="flop" size="215296">
-				<rom name="flop.dsk" size="215296" crc="2a18d569" sha1="45950a6d63d661c4819a53e156da8027055eff42" offset="000000" />
+				<rom name="disk.dsk" size="215296" crc="2a18d569" sha1="45950a6d63d661c4819a53e156da8027055eff42" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
