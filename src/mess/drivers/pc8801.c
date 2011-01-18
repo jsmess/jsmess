@@ -756,7 +756,7 @@ static WRITE8_HANDLER( pc8801_gfx_ctrl_w )
 
 static READ8_HANDLER( pc8801_vram_select_r )
 {
-	return (0xf8) | (vram_sel << 1);
+	return 0xf8 | ((vram_sel == 3) ? 0 : (1 << vram_sel));
 }
 
 static WRITE8_HANDLER( pc8801_vram_select_w )
