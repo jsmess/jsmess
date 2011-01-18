@@ -27,6 +27,7 @@
 	- Alphos: test case for text VRAM attributes;
 	- Alphos: text VRAM garbage during gameplay;
 	- Alphos: background is supposed to be blue?
+	- Balance of Power: attempt to use the SIO port for mouse polling, worked around for now;
 	- Bokosuka Wars: doesn't boot, floppy issue;
 	- Grobda: palette is ugly;
 	- Xevious: game is too fast
@@ -220,7 +221,7 @@ static UINT8 calc_cursor_pos(running_machine *machine,int x,int y,int yi)
 	return 0;
 }
 
-static void draw_bitmap_3bpp_h200(running_machine *machine, bitmap_t *bitmap)
+static void draw_bitmap_3bpp(running_machine *machine, bitmap_t *bitmap)
 {
 	int x,y,xi;
 	UINT32 count;
@@ -250,11 +251,54 @@ static void draw_bitmap_3bpp_h200(running_machine *machine, bitmap_t *bitmap)
 	}
 }
 
-static void draw_bitmap_1bpp_h400(running_machine *machine, bitmap_t *bitmap)
+static void draw_bitmap_1bpp(running_machine *machine, bitmap_t *bitmap)
 {
-	popmessage("%02x VIDEO MODE",gfx_ctrl);
+	int x,y,xi;
+	UINT32 count;
+	UINT8 *gvram = machine->region("maincpu")->base() + GRAM_BASE;
 
-	// ...
+	count = 0;
+
+	for(y=0;y<200;y++)
+	{
+		for(x=0;x<640;x+=8)
+		{
+			for(xi=0;xi<8;xi++)
+			{
+				int pen;
+
+				/* TODO: dunno if layer_mask is correct here */
+				if(!(layer_mask & 2)) { pen = ((gvram[count+0x0000] >> (7-xi)) & 1) << 0; }
+
+				*BITMAP_ADDR16(bitmap, y, x+xi) = machine->pens[pen ? 7 : 0];
+			}
+
+			count++;
+		}
+	}
+
+	count = 0;
+
+	if(!(gfx_ctrl & 1)) // 400 lines
+	{
+		for(y=200;y<400;y++)
+		{
+			for(x=0;x<640;x+=8)
+			{
+				for(xi=0;xi<8;xi++)
+				{
+					int pen;
+
+					/* TODO: dunno if layer_mask is correct here */
+					if(!(layer_mask & 4)) { pen = ((gvram[count+0x4000] >> (7-xi)) & 1) << 0; }
+
+					*BITMAP_ADDR16(bitmap, y, x+xi) = machine->pens[pen ? 7 : 0];
+				}
+
+				count++;
+			}
+		}
+	}
 }
 
 static VIDEO_UPDATE( pc8801 )
@@ -268,9 +312,9 @@ static VIDEO_UPDATE( pc8801 )
 	if(gfx_ctrl & 8)
 	{
 		if(gfx_ctrl & 0x10)
-			draw_bitmap_3bpp_h200(screen->machine,bitmap);
+			draw_bitmap_3bpp(screen->machine,bitmap);
 		else
-			draw_bitmap_1bpp_h400(screen->machine,bitmap);
+			draw_bitmap_1bpp(screen->machine,bitmap);
 	}
 
 	if(!(layer_mask & 1) && dmac_mode & 4 && crtc.status & 0x10 && crtc.irq_mask == 3)
@@ -663,6 +707,22 @@ static WRITE8_HANDLER( pc8801_ext_rom_bank_w )
 	bankw[1] = pc8801_bankswitch_1_w(space->machine);
 }
 
+static void pc8801_dynamic_res_change(running_machine *machine)
+{
+	rectangle visarea;
+
+	visarea.min_x = 0;
+	visarea.min_y = 0;
+	visarea.max_x = 640 - 1;
+	visarea.max_y = ((gfx_ctrl & 1) ? 200 : 400) - 1;
+
+	/* low screen res if graphic screen is disabled */
+	if((gfx_ctrl & 0x8) == 0)
+		visarea.max_y = 200 - 1;
+
+	machine->primary_screen->configure(640, 480, visarea, machine->primary_screen->frame_period().attoseconds);
+}
+
 static WRITE8_HANDLER( pc8801_gfx_ctrl_w )
 {
 	/*
@@ -679,6 +739,8 @@ static WRITE8_HANDLER( pc8801_gfx_ctrl_w )
 	bankr[1] = pc8801_bankswitch_1_r(space->machine);
 	bankw[0] = pc8801_bankswitch_0_w(space->machine);
 	bankw[1] = pc8801_bankswitch_1_w(space->machine);
+
+	pc8801_dynamic_res_change(space->machine);
 }
 
 static READ8_HANDLER( pc8801_vram_select_r )
@@ -919,6 +981,12 @@ static WRITE8_HANDLER( pc8801_pcg8100_w )
 	printf("Write to PCG-8100 %02x %02x\n",offset,data);
 }
 
+/* Balance of Power temp work-around */
+static READ8_HANDLER( sio_status_r )
+{
+	return 0;
+}
+
 static ADDRESS_MAP_START( pc8801_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
@@ -940,7 +1008,7 @@ static ADDRESS_MAP_START( pc8801_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x0f, 0x0f) AM_READ_PORT("KEY15")
 	AM_RANGE(0x00, 0x02) AM_WRITE(pc8801_pcg8100_w)
 //	AM_RANGE(0x10, 0x10) AM_WRITE(pc88_rtc_w)
-//  AM_RANGE(0x20, 0x21) AM_NOP                                     /* RS-232C and cassette */
+	AM_RANGE(0x21, 0x21) AM_READ(sio_status_r)                                /* RS-232C and cassette */
 	AM_RANGE(0x30, 0x30) AM_READ_PORT("DSW1") //AM_WRITE(pc88sr_outport_30)
 	AM_RANGE(0x31, 0x31) AM_READ_PORT("DSW2") AM_WRITE(pc8801_gfx_ctrl_w)
 	AM_RANGE(0x32, 0x32) AM_READWRITE(pc8801_misc_ctrl_r, pc8801_misc_ctrl_w)
@@ -1467,6 +1535,8 @@ static MACHINE_RESET( pc8801 )
 	bankw[3] = pc8801_bankswitch_3_w(machine);
 	bankw[4] = pc8801_bankswitch_4_w(machine);
 
+	pc8801_dynamic_res_change(machine);
+
 	fdc_irq_opcode = 0; //TODO: copied from PC-88VA, could be wrong here ... should be 0x7f ld a,a in the latter case
 
 	cpu_set_input_line_vector(machine->device("fdccpu"), 0, 0);
@@ -1565,7 +1635,7 @@ static MACHINE_CONFIG_START( pc8801, driver_device )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MCFG_SCREEN_SIZE(640, 220)
+	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
 	MCFG_GFXDECODE( pc8801 )
 	MCFG_PALETTE_LENGTH(0x10)
