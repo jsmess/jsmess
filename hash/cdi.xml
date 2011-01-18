@@ -1,20 +1,20 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-<softwarelist name="cdi" description="CDI CD-ROM list">
+<softwarelist name="cdi" description="CD-i CD-ROM list">
 
-	<software name="frogfeas">
-		<description>Frog Feast (Demo)</description>
-		<year>2000</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cdrom" interface="cdi_cdrom">
-			<diskarea name="cdrom">
-				<disk name="frog feast" sha1="1ab1eb988458c39e171c8704176617df5730f56e"/>
-			</diskarea>
-		</part>
-	</software>
+<software name="frogfeas">
+	<description>Frog Feast (Demo)</description>
+	<year>2000</year>
+	<publisher>&lt;unknown&gt;</publisher>
+	<part name="cdrom" interface="cdi_cdrom">
+	<diskarea name="cdrom">
+		<disk name="frog feast" sha1="1ab1eb988458c39e171c8704176617df5730f56e"/>
+	</diskarea>
+	</part>
+</software>
 
 
- <software name="3rddegre">
+<software name="3rddegre">
 	<description>3rd Degree (USA)</description>
 	<year>1993</year>
 	<publisher>Philips</publisher>
@@ -25,16 +25,18 @@
 	</part>
 </software>
  
- <software name="7th1a">
+<software name="7th1a">
 	<description>The 7th Guest (Euro)[DVC][8111033V113 50404169 01]</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
 	<part name="cdrom1" interface="cdi_cdrom">
+		<feature name="part_id" value="The Game" />
 		<diskarea name="cdrom">
 			<disk name="7th guest, the (1994)(philips)(eu)(disc 1 of 2)[!][the game][dvc][8111033v113 50404169 01]" sha1="f08256a2719f0f4f3010cb95d3f8e2c3ff63d0fe"/>
 		</diskarea>
 	</part>
  	<part name="cdrom2" interface="cdi_cdrom">
+		<feature name="part_id" value="The Music" />
 		<diskarea name="cdrom">
 			<disk name="7th guest, the (1994)(philips)(eu)(disc 2 of 2)[!][the music, die musik][cd-audio]" sha1="baa165adf76678353cd9d97bd8e7d09d80af1914"/>
 		</diskarea>
@@ -46,11 +48,13 @@
 	<year>1994</year>
 	<publisher>Philips</publisher>
 	<part name="cdrom1" interface="cdi_cdrom">
+		<feature name="part_id" value="The Game" />
 		<diskarea name="cdrom">
 			<disk name="7th guest, the (1994)(philips)(eu)(disc 1 of 2)[!][the game][dvc][8110033v113 50404169 02]" sha1="d1ef3e8c9f05f6d928cb459c116e422b391d6758"/>
 		</diskarea>
 	</part>
 	<part name="cdrom2" interface="cdi_cdrom">
+		<feature name="part_id" value="The Music" />
 		<diskarea name="cdrom">
 			<disk name="7th guest, the (1994)(philips)(eu)(disc 2 of 2)[!][the music, die musik][cd-audio]" sha1="baa165adf76678353cd9d97bd8e7d09d80af1914"/>
 		</diskarea>
@@ -62,11 +66,13 @@
 	<year>1994</year>
 	<publisher>Philips</publisher>
 	<part name="cdrom1" interface="cdi_cdrom">
+		<feature name="part_id" value="Das Spiel" />
 		<diskarea name="cdrom">
 			<disk name="7th guest, the (1994)(philips)(de)(disc 1 of 2)[!][das spiel][dvc]" sha1="d73d783fc580e927653077afa4867d3316f77674"/>
 		</diskarea>
 	</part>
 	<part name="cdrom2" interface="cdi_cdrom">
+		<feature name="part_id" value="Die Musik" />
 		<diskarea name="cdrom">
 			<disk name="7th guest, the (1994)(philips)(eu)(disc 2 of 2)[!][the music, die musik][cd-audio]" sha1="baa165adf76678353cd9d97bd8e7d09d80af1914"/>
 		</diskarea>
@@ -78,11 +84,13 @@
 	<year>1994</year>
 	<publisher>Philips</publisher>
 	<part name="cdrom1" interface="cdi_cdrom">
+		<feature name="part_id" value="Le Jeu" />
 		<diskarea name="cdrom">
 			<disk name="7th guest, the (1994)(philips)(fr)(disc 1 of 2)[le jeu][dvc]" sha1="5fee7d8eac3e6fa3c94e8e753622d115c27bc3d4"/>
 		</diskarea>
 	</part>
 	<part name="cdrom2" interface="cdi_cdrom">
+		<feature name="part_id" value="The Music (?)" />
 		<diskarea name="cdrom">
 			<disk name="7th guest, the (1994)(philips)(eu)(disc 2 of 2)[!][the music, die musik][cd-audio]" sha1="baa165adf76678353cd9d97bd8e7d09d80af1914"/>
 		</diskarea>
@@ -1398,11 +1406,13 @@
 	<year>1995</year>
 	<publisher>Philips</publisher>
 	<part name="cdrom1" interface="cdi_cdrom">
+		<feature name="part_id" value="The Game" />
 		<diskarea name="cdrom">
 			<disk name="marco polo (1995)(philips)(eu)(disc 1 of 2)[!][the game]" sha1="f785d70e556a38b0e2ab6d9bb300d8df63011e97"/>
 		</diskarea>
 	</part>
 	<part name="cdrom2" interface="cdi_cdrom">
+		<feature name="part_id" value="The Documentation" />
 		<diskarea name="cdrom">
 			<disk name="marco polo (1995)(philips)(eu)(disc 2 of 2)[!][the documentation]" sha1="6c31873f8f3898ab8e44d03bf0a1485000f9018a"/>
 		</diskarea>
@@ -1414,11 +1424,13 @@
 	<year>1995</year>
 	<publisher>Philips</publisher>
 	<part name="cdrom1" interface="cdi_cdrom">
+		<feature name="part_id" value="Le Jeu" />
 		<diskarea name="cdrom">
 			<disk name="marco polo (1995)(philips)(fr)(disc 1 of 2)[le jeu]" sha1="63549bc7398028e80c83aa3f2c03d60ab582ec38"/>
 		</diskarea>
 	</part>
 	<part name="cdrom2" interface="cdi_cdrom">
+		<feature name="part_id" value="La Documentation" />
 		<diskarea name="cdrom">
 			<disk name="marco polo (1995)(philips)(fr)(disc 2 of 2)[la documentation]" sha1="d3e7164f28869198076792ad9ea2019b9ba7a1f1"/>
 		</diskarea>
@@ -1969,11 +1981,13 @@
 	<year>1995</year>
 	<publisher>Philips</publisher>
 	<part name="cdrom1" interface="cdi_cdrom">
+		<feature name="part_id" value="The Game" />
 		<diskarea name="cdrom">
 			<disk name="thunder in paradise (1995)(philips)(eu)(disc 1 of 2)[!][the game][dvc]" sha1="8e4844ff6f3aabfb4520110475811875009e3808"/>
 		</diskarea>
 	</part>
 	<part name="cdrom2" interface="cdi_cdrom">
+		<feature name="part_id" value="The Episode" />
 		<diskarea name="cdrom">
 			<disk name="thunder in paradise (1995)(philips)(eu)(disc 2 of 2)[!][the episode][dvc]" sha1="39b0a2825d6254095a3a97649b0bcc52cabd8f1b"/>
 		</diskarea>
@@ -1985,11 +1999,13 @@
 	<year>1995</year>
 	<publisher>Philips</publisher>
 	<part name="cdrom1" interface="cdi_cdrom">
+		<feature name="part_id" value="The Game" />
 		<diskarea name="cdrom">
 			<disk name="thunder in paradise (1995)(philips)(us)(disc 1 of 2)[!][the game][dvc]" sha1="c3915a61ad43c43a9105ac0c271ac431b8d3d4b2"/>
 		</diskarea>
 	</part>
 	<part name="cdrom2" interface="cdi_cdrom">
+		<feature name="part_id" value="The Episode" />
 		<diskarea name="cdrom">
 			<disk name="thunder in paradise (1995)(philips)(us)(disc 2 of 2)[!][the episode][dvc]" sha1="27c8cf91919c286a0e98e7d63ca0e70e26e56edd"/>
 		</diskarea>
@@ -2001,12 +2017,14 @@
 	<year>1995</year>
 	<publisher>Philips</publisher>
 	<part name="cdrom1" interface="cdi_cdrom">
+		<feature name="part_id" value="Das Spiel" />
 		<diskarea name="cdrom">
 			<disk name="thunder in paradise (1996)(philips)(de)(disc 1 of 2)[das spiel][dvc]" sha1="f90a4dc07c7571c2680426228de4706aab9c204c"/>
 		</diskarea>
 	</part>
 	<!-- Is this correct as disc 2? -->
 	<part name="cdrom2" interface="cdi_cdrom">
+		<feature name="part_id" value="The Episode (?)" />
 		<diskarea name="cdrom">
 			<disk name="thunder in paradise (1995)(philips)(eu)(disc 2 of 2)[!][the episode][dvc]" sha1="39b0a2825d6254095a3a97649b0bcc52cabd8f1b"/>
 		</diskarea>
@@ -4198,21 +4216,25 @@
 	</part>
 </software>
 
+<!-- TODO: check if the part_id used are 'names' for the disk, or anything else... -->
 <software name="help1">
 	<description>Help! Opleiding Bedrijfshulpverlener voor de Supermarkt (Ned)</description>
 	<year>1996</year>
 	<publisher>&lt;unknown&gt;</publisher>
 	<part name="cdrom1" interface="cdi_cdrom">
+		<feature name="part_id" value="Inleiding Ehbo2 Toets" />
 		<diskarea name="cdrom">
 			<disk name="help! opleiding bedrijfshulpverlener voor de supermarkt (1996)(-)(nl)(disc 1 of 3)[inleiding ehbo2 toets]" sha1="2371b2fda7d55d30f92e040d1420dd21cd8a4fd5"/>
 		</diskarea>
 	</part>
 	<part name="cdrom2" interface="cdi_cdrom">
+		<feature name="part_id" value="Ehbo1" />
 		<diskarea name="cdrom">
 			<disk name="help! opleiding bedrijfshulpverlener voor de supermarkt (1996)(-)(nl)(disc 2 of 3)[ehbo1]" sha1="9de2182d95a4447e3060737a3044b7da6d9a5813"/>
 		</diskarea>
 	</part>
 	<part name="cdrom3" interface="cdi_cdrom">
+		<feature name="part_id" value="Brand Ontruiming" />
 		<diskarea name="cdrom">
 			<disk name="help! opleiding bedrijfshulpverlener voor de supermarkt (1996)(-)(nl)(disc 3 of 3)[brand ontruiming]" sha1="6db47cfd5fc307bbd64543b45e01b8c915e55aea"/>
 		</diskarea>
@@ -4514,11 +4536,13 @@
 	<year>1995</year>
 	<publisher>Philips</publisher>
 	<part name="cdrom1" interface="cdi_cdrom">
+		<feature name="part_id" value="Journal Interactif" />
 		<diskarea name="cdrom">
 			<disk name="journal interactif '94 et le jeu des stars de l'info, le (1995)(philips)(fr)(disc 1 of 2)[journal interactif][dvc]" sha1="e8135f48058dcb4be1aa8c9287b391ad500e4f3d"/>
 		</diskarea>
 	</part>
 	<part name="cdrom2" interface="cdi_cdrom">
+		<feature name="part_id" value="Jeu des Stars de l'Info" />
 		<diskarea name="cdrom">
 			<disk name="journal interactif '94 et le jeu des stars de l'info, le (1995)(philips)(fr)(disc 2 of 2)[jeu des stars de l'info][dvc]" sha1="00c64bda26559c4acb08c3abc108e3eeaa078deb"/>
 		</diskarea>
@@ -4530,11 +4554,13 @@
 	<year>1995</year>
 	<publisher>Philips</publisher>
 	<part name="cdrom1" interface="cdi_cdrom">
+		<feature name="part_id" value="Journal Interactif" />
 		<diskarea name="cdrom">
 			<disk name="journal interactif 1995 et le jeu des stars de l'info, le (1995)(philips)(fr)(disc 1 of 2)[journal interactif][dvc]" sha1="8063d3cbf65f1709e24befe8cd8d16537ace0c20"/>
 		</diskarea>
 	</part>
 	<part name="cdrom2" interface="cdi_cdrom">
+		<feature name="part_id" value="Jeu des Stars de l'Info" />
 		<diskarea name="cdrom">
 			<disk name="journal interactif 1995 et le jeu des stars de l'info, le (1995)(philips)(fr)(disc 2 of 2)[jeu des stars de l'info][dvc]" sha1="64e65e371a29e245b4c7a2a2c9a0747d27441669"/>
 		</diskarea>
@@ -4759,6 +4785,7 @@
 		</diskarea>
 	</part>
 	<part name="cdrom3" interface="cdi_cdrom">
+		<feature name="part_id" value="Guided Tour" />
 		<diskarea name="cdrom">
 			<disk name="language director - deutsch level 1 (1993)(philips)(eu)(disc 3 of 3)[guided tour]" sha1="19464492c78417d1201b55aaaba6ed83eff06708"/>
 		</diskarea>
@@ -4780,6 +4807,7 @@
 		</diskarea>
 	</part>
 	<part name="cdrom3" interface="cdi_cdrom">
+		<feature name="part_id" value="Guided Tour" />
 		<diskarea name="cdrom">
 			<disk name="language director - deutsch level 2 (1993)(philips)(eu)(disc 3 of 3)[guided tour]" sha1="1d91d00c29b47a71fbc56bd55ce24875affcc8de"/>
 		</diskarea>
@@ -4801,6 +4829,7 @@
 		</diskarea>
 	</part>
 	<part name="cdrom3" interface="cdi_cdrom">
+		<feature name="part_id" value="Guided Tour" />
 		<diskarea name="cdrom">
 			<disk name="language director - deutsch level 3 (1994)(philips)(eu)(disc 3 of 3)[guided tour]" sha1="9fd222a532b93e0efc7b17c0567f808ff0854e7e"/>
 		</diskarea>
@@ -4822,6 +4851,7 @@
 		</diskarea>
 	</part>
 	<part name="cdrom3" interface="cdi_cdrom">
+		<feature name="part_id" value="Guided Tour" />
 		<diskarea name="cdrom">
 			<disk name="language director - english level 1 (1993)(philips)(eu)(disc 3 of 3)[!][guided tour]" sha1="2a7e30728368606b5112595e892fc0710ac9523d"/>
 		</diskarea>
@@ -4843,6 +4873,7 @@
 		</diskarea>
 	</part>
 	<part name="cdrom3" interface="cdi_cdrom">
+		<feature name="part_id" value="Guided Tour" />
 		<diskarea name="cdrom">
 			<disk name="language director - english level 2 (1993)(philips)(eu)(disc 3 of 3)[guided tour]" sha1="f49f517856c3518572f3dc4e04bc39d867a6d999"/>
 		</diskarea>
@@ -4864,6 +4895,7 @@
 		</diskarea>
 	</part>
 	<part name="cdrom3" interface="cdi_cdrom">
+		<feature name="part_id" value="Guided Tour" />
 		<diskarea name="cdrom">
 			<disk name="language director - espanol level 1 (1994)(philips)(eu)(disc 3 of 3)[guided tour]" sha1="5d121adc6ab5ba127fd5019b76028e734127c101"/>
 		</diskarea>
@@ -4885,6 +4917,7 @@
 		</diskarea>
 	</part>
 	<part name="cdrom3" interface="cdi_cdrom">
+		<feature name="part_id" value="Guided Tour" />
 		<diskarea name="cdrom">
 			<disk name="language director - francais level 1 (1993)(philips)(eu)(disc 3 of 3)[guided tour]" sha1="c41243f2a2232b2844d7e85168d9d33410f16df4"/>
 		</diskarea>
@@ -4906,6 +4939,7 @@
 		</diskarea>
 	</part>
 	<part name="cdrom3" interface="cdi_cdrom">
+		<feature name="part_id" value="Guided Tour" />
 		<diskarea name="cdrom">
 			<disk name="language director - francais level 2 (1993)(philips)(eu)(disc 3 of 3)[guided tour]" sha1="e1f50f6beda8adc53f885f46496caf169ef2ed3e"/>
 		</diskarea>
@@ -4927,6 +4961,7 @@
 		</diskarea>
 	</part>
 	<part name="cdrom3" interface="cdi_cdrom">
+		<feature name="part_id" value="Guided Tour" />
 		<diskarea name="cdrom">
 			<disk name="language director - francais level 3 (1994)(philips)(eu)(disc 3 of 3)[guided tour]" sha1="7e3a7b1b204c3b2134681c5f2530336ce0cb73e3"/>
 		</diskarea>
