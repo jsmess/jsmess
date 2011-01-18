@@ -23,12 +23,12 @@
 	- 177: gameplay is too fast;
 	- Acro Jet: hangs waiting for an irq;
 	- Aggress: crashes after that it shows the title screen;
-	- American Success: uses some ALU characteristics, might be a good test case;
 	- American Success: reads the light pen?
 	- Alphos: test case for text VRAM attributes;
 	- Alphos: text VRAM garbage during gameplay;
 	- Alphos: background is supposed to be blue?
 	- Bokosuka Wars: doesn't boot, floppy issue;
+	- Grobda: palette is ugly;
 	- Xevious: game is too fast
 
 	Notes:
@@ -189,6 +189,7 @@ static struct
 #define N88BASIC_BASE 0x88000
 #define WRAM_BASE 0x00000
 #define GRAM_BASE 0xc0000
+#define ALU_BASE 0xa0000
 
 static VIDEO_START( pc8801 )
 {
@@ -357,9 +358,77 @@ static WRITE8_HANDLER( pc8801_mem_2_w )
 	ram[offset + bankw[2]] = data;
 }
 
+static UINT8 alu_r(running_machine *machine, UINT16 ram_addr)
+{
+	int i;
+	UINT8 *gvram = machine->region("maincpu")->base();
+	UINT8 b,r,g;
+
+	/* store data to ALU regs */
+	for(i=0;i<3;i++)
+	{
+		gvram[ALU_BASE + i] = gvram[GRAM_BASE + i*0x4000 + ram_addr];
+	}
+
+	b = gvram[GRAM_BASE + ram_addr + 0x0000];
+	r = gvram[GRAM_BASE + ram_addr + 0x4000];
+	g = gvram[GRAM_BASE + ram_addr + 0x8000];
+	if(!(alu_ctrl2 & 1)) { b^=0xff; }
+	if(!(alu_ctrl2 & 2)) { r^=0xff; }
+	if(!(alu_ctrl2 & 4)) { g^=0xff; }
+
+	return b & r & g;
+}
+
+static void alu_w(running_machine *machine, UINT16 ram_addr,UINT8 data)
+{
+	int i;
+	UINT8 *gvram = machine->region("maincpu")->base();
+
+	switch(alu_ctrl2 & 0x30) // alu write mode
+	{
+		case 0x00: //logic operation
+		{
+			UINT8 logic_op;
+
+			for(i=0;i<3;i++)
+			{
+				logic_op = (alu_ctrl1 & (0x11 << i)) >> i;
+
+				switch(logic_op)
+				{
+					case 0x00: { gvram[GRAM_BASE + i*0x4000 + ram_addr] &= ~data; } break;
+					case 0x01: { gvram[GRAM_BASE + i*0x4000 + ram_addr] |= data; } break;
+					case 0x10: { gvram[GRAM_BASE + i*0x4000 + ram_addr] ^= data; } break;
+					case 0x11: break; // NOP
+				}
+			}
+		}
+		break;
+
+		case 0x10: // restore data from ALU regs
+		{
+			for(i=0;i<3;i++)
+				gvram[GRAM_BASE + i*0x4000 + ram_addr] = gvram[ALU_BASE + i];
+		}
+		break;
+
+		case 0x20: // swap ALU reg 1 into R GVRAM
+			gvram[GRAM_BASE + 0x0000 + ram_addr] = gvram[ALU_BASE + 1];
+			break;
+
+		case 0x30: // swap ALU reg 0 into B GVRAM
+			gvram[GRAM_BASE + 0x4000 + ram_addr] = gvram[ALU_BASE + 0];
+			break;
+	}
+}
+
 static READ8_HANDLER( pc8801_mem_3_r )
 {
 	UINT8 *ram = space->machine->region("maincpu")->base();
+
+	if(bankr[3] == 0xa0000)
+		return alu_r(space->machine,(offset + bankr[3]) & 0x3fff);
 
 	return ram[offset + bankr[3]];
 }
@@ -368,12 +437,18 @@ static WRITE8_HANDLER( pc8801_mem_3_w )
 {
 	UINT8 *ram = space->machine->region("maincpu")->base();
 
-	ram[offset + bankw[3]] = data;
+	if(bankw[3] == 0xa0000)
+		alu_w(space->machine,(offset + bankw[3]) & 0x3fff,data);
+	else
+		ram[offset + bankw[3]] = data;
 }
 
 static READ8_HANDLER( pc8801_mem_4_r )
 {
 	UINT8 *ram = space->machine->region("maincpu")->base();
+
+	if(bankr[4] == 0xa3000)
+		return alu_r(space->machine,(offset + bankr[4]) & 0x3fff);
 
 	return ram[offset + bankr[4]];
 }
@@ -382,7 +457,10 @@ static WRITE8_HANDLER( pc8801_mem_4_w )
 {
 	UINT8 *ram = space->machine->region("maincpu")->base();
 
-	ram[offset + bankw[4]] = data;
+	if(bankw[4] == 0xa3000)
+		alu_w(space->machine,(offset + bankw[4]) & 0x3fff,data);
+	else
+		ram[offset + bankw[4]] = data;
 }
 
 static UINT32 pc8801_bankswitch_0_r(running_machine *machine)
@@ -454,7 +532,7 @@ static UINT32 pc8801_bankswitch_3_r(running_machine *machine)
 	{
 		vram_sel = 3;
 		if(alu_ctrl2 & 0x80)
-			return 0xa0000; // TODO: ALU hook-up
+			return ALU_BASE;
 	}
 
 	if(vram_sel == 3)
@@ -469,7 +547,7 @@ static UINT32 pc8801_bankswitch_3_w(running_machine *machine)
 	{
 		vram_sel = 3;
 		if(alu_ctrl2 & 0x80)
-			return 0xa0000; // TODO: ALU hook-up
+			return ALU_BASE;
 	}
 
 	if(vram_sel == 3)
@@ -484,7 +562,7 @@ static UINT32 pc8801_bankswitch_4_r(running_machine *machine)
 	{
 		vram_sel = 3;
 		if(alu_ctrl2 & 0x80)
-			return 0xa0000; // TODO: ALU hook-up
+			return ALU_BASE + 0x3000;
 	}
 
 	if(vram_sel == 3)
@@ -504,7 +582,7 @@ static UINT32 pc8801_bankswitch_4_w(running_machine *machine)
 	{
 		vram_sel = 3;
 		if(alu_ctrl2 & 0x80)
-			return 0xa0000; // TODO: ALU hook-up
+			return ALU_BASE + 0x3000;
 	}
 
 	if(vram_sel == 3)
@@ -821,6 +899,10 @@ static WRITE8_HANDLER( pc8801_extram_bank_w )
 static WRITE8_HANDLER( pc8801_alu_ctrl1_w )
 {
 	alu_ctrl1 = data;
+	bankr[3] = pc8801_bankswitch_3_r(space->machine);
+	bankr[4] = pc8801_bankswitch_4_r(space->machine);
+	bankw[3] = pc8801_bankswitch_3_w(space->machine);
+	bankw[4] = pc8801_bankswitch_4_w(space->machine);
 }
 
 static WRITE8_HANDLER( pc8801_alu_ctrl2_w )
@@ -1390,11 +1472,14 @@ static MACHINE_RESET( pc8801 )
 	cpu_set_input_line_vector(machine->device("fdccpu"), 0, 0);
 
 	{
-		UINT8 *gvram = machine->region("maincpu")->base() + GRAM_BASE;
+		UINT8 *gvram = machine->region("maincpu")->base();
 		int i;
 
 		for(i=0;i<0x10000;i++)
-			gvram[i] = 0x00;
+			gvram[GRAM_BASE + i] = 0x00;
+
+		for(i=0;i<3;i++)
+			gvram[ALU_BASE + i] = 0x00;
 	}
 
 	{
