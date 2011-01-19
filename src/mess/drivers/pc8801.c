@@ -25,6 +25,7 @@
 	- Bouken Roman
 	- Bruce Lee
 	- Castle Excellent
+	- Tobira wo Akete (in parent pc8801 only)
 
 	per-game specific TODO:
 	- 100 Yen disk(s): reads kanji ports;
@@ -668,10 +669,20 @@ static READ8_HANDLER( pc8801_mem_r )
 	}
 	else if(offset >= 0x8000 && offset <= 0x83ff) // work RAM window
 	{
+		static UINT32 window_offset;
+
 		if(gfx_ctrl & 6) //wram read select or n basic select banks this as normal wram
 			return pc8801_wram_r(space,offset);
 
-		return pc8801_wram_r(space,(offset & 0x3ff) + (window_offset_bank << 8));
+		window_offset = (offset & 0x3ff) + (window_offset_bank << 8);
+
+		if((window_offset & 0xf000) == 0xf000)
+			printf("Read from 0xf000 - 0xffff window offset\n");
+
+		if(((window_offset & 0xf000) == 0xf000) && (misc_ctrl & 0x10))
+			return pc8801_high_wram_r(space,window_offset & 0xfff);
+
+		return pc8801_wram_r(space,window_offset);
 	}
 	else if(offset >= 0x8400 && offset <= 0xbfff)
 	{
@@ -716,7 +727,19 @@ static WRITE8_HANDLER( pc8801_mem_w )
 		if(gfx_ctrl & 6) //wram read select or n basic select banks this as normal wram
 			pc8801_wram_w(space,offset,data);
 		else
-			pc8801_wram_w(space,(offset & 0x3ff) + (window_offset_bank << 8),data);
+		{
+			static UINT32 window_offset;
+
+			window_offset = (offset & 0x3ff) + (window_offset_bank << 8);
+
+			if((window_offset & 0xf000) == 0xf000)
+				printf("Read from 0xf000 - 0xffff window offset\n");
+
+			if(((window_offset & 0xf000) == 0xf000) && (misc_ctrl & 0x10))
+				pc8801_high_wram_w(space,window_offset & 0xfff,data);
+			else
+				pc8801_wram_w(space,window_offset,data);
+		}
 
 		return;
 	}
@@ -1089,6 +1112,38 @@ static WRITE8_HANDLER( pc8801_txt_cmt_ctrl_w )
 	txt_color = data & 2;
 }
 
+static UINT32 knj_addr[2];
+
+static READ8_HANDLER( pc8801_kanji_r )
+{
+	UINT8 *knj_rom = space->machine->region("kanji")->base();
+	if((offset & 2) == 0)
+		return knj_rom[knj_addr[0]*2+((offset & 1) ^ 1)];
+
+	return 0xff;
+}
+
+static WRITE8_HANDLER( pc8801_kanji_w )
+{
+	if((offset & 2) == 0)
+		knj_addr[0] = ((offset & 1) == 0) ? ((knj_addr[0]&0xff00)|(data&0xff)) : ((knj_addr[0]&0x00ff)|(data<<8));
+}
+
+static READ8_HANDLER( pc8801_kanji_lv2_r )
+{
+	UINT8 *knj_rom = space->machine->region("kanji")->base() + 0x20000;
+	if((offset & 2) == 0)
+		return knj_rom[knj_addr[1]*2+((offset & 1) ^ 1)];
+
+	return 0xff;
+}
+
+static WRITE8_HANDLER( pc8801_kanji_lv2_w )
+{
+	if((offset & 2) == 0)
+		knj_addr[1] = ((offset & 1) == 0) ? ((knj_addr[1]&0xff00)|(data&0xff)) : ((knj_addr[1]&0x00ff)|(data<<8));
+}
+
 static ADDRESS_MAP_START( pc8801_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
@@ -1147,8 +1202,8 @@ static ADDRESS_MAP_START( pc8801_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xe4, 0xe4) AM_WRITE(pc8801_irq_level_w)
 	AM_RANGE(0xe6, 0xe6) AM_WRITE(pc8801_irq_mask_w)
 //  AM_RANGE(0xe7, 0xe7) AM_NOP                                     /* (unknown) */
-//	AM_RANGE(0xe8, 0xeb) AM_READWRITE(pc88_kanji_r, pc88_kanji_w)
-//	AM_RANGE(0xec, 0xed) AM_READWRITE(pc88_kanji2_r, pc88_kanji2_w) /* JIS level2 Kanji ROM */
+	AM_RANGE(0xe8, 0xeb) AM_READWRITE(pc8801_kanji_r, pc8801_kanji_w)
+	AM_RANGE(0xec, 0xef) AM_READWRITE(pc8801_kanji_lv2_r, pc8801_kanji_lv2_w)
 //  AM_RANGE(0xf0, 0xf1) AM_NOP                                     /* Kana to Kanji dictionary ROM select (not yet) */
 //  AM_RANGE(0xf3, 0xf3) AM_NOP                                     /* DMA floppy (unknown) */
 //  AM_RANGE(0xf4, 0xf7) AM_NOP                                     /* DMA 5'floppy (may be not released) */
