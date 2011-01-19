@@ -20,11 +20,16 @@
 	- Add limits for extend work RAM;
 	- What happens to the palette contents when the analog/digital palette mode changes?
 
+	list of games that crashes due of floppy issues:
+	- Bokosuka Wars
+	- Bouken Roman
+	- Bruce Lee
+	- Castle Excellent
+
 	per-game specific TODO:
 	- 100 Yen disk(s): reads kanji ports;
 	- 177: gameplay is too fast;
 	- Acro Jet: hangs waiting for an irq;
-	- Aggress: crashes after that it shows the title screen;
 	- American Success: reads the light pen?
 	- Alpha (demo): crashes with "illegal function" msg;
 	- Alphos: text VRAM garbage during gameplay;
@@ -33,9 +38,6 @@
 	- Bersekers Front Gaiden 3: checks CPU speed port and polls the PCG stuff too;
 	- Bishoujo Baseball Gakuen: checks ym2608 after intro screen;
 	- Blue Moon Story: moans with a kanji msg;.
-	- Bokosuka Wars: doesn't boot, floppy issue;
-	- Bouken Roman: doesn't boot, floppy issue;
-	- Bruce Lee: doesn't boot, floppy issue;
 	- Bu U Ma: sets gfx compatibility mode on title screen (attr bit 4,N-BASIC), dunno how to draw with it ...;
 	- Grobda: palette is ugly;
 	- Wanderers from Ys: user data looks screwed? It loads with everything as maximum as per now ...
@@ -1519,15 +1521,26 @@ static const gfx_layout char_layout =
 	RGN_FRAC(1,1),
 	1,
 	{ 0 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8 * 8
+	{ STEP8(0,1) },
+	{ STEP8(0,8) },
+	8*8
 };
 
+static const gfx_layout kanji_layout =
+{
+	16, 16,
+	RGN_FRAC(1,1),
+	1,
+	{ 0 },
+	{ STEP16(0,1) },
+	{ STEP16(0,16) },
+	16*16
+};
 
-
+/* debugging only */
 static GFXDECODE_START( pc8801 )
-	GFXDECODE_ENTRY( "gfx1", 0, char_layout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx1",  0, char_layout,  0, 8 )
+	GFXDECODE_ENTRY( "kanji", 0, kanji_layout, 0, 8 )
 GFXDECODE_END
 
 /* uPD1990A Interface */
@@ -1767,7 +1780,10 @@ ROM_START( pc8801 ) /* Basic version 1.0 */
 	ROM_REGION( 0x10000, "fdccpu", 0)
 	ROM_LOAD( "disk.rom", 0x0000, 0x0800, CRC(2158d307) SHA1(bb7103a0818850a039c67ff666a31ce49a8d516f) )
 
-	ROM_REGION( 0x40000, "gfx1", 0)
+	ROM_REGION( 0x40000, "kanji", ROMREGION_ERASEFF)
+	ROM_LOAD_OPTIONAL( "kanji1.rom", 0x00000, 0x20000, CRC(6178bd43) SHA1(82e11a177af6a5091dd67f50a2f4bafda84d6556) )
+
+	ROM_REGION( 0x800, "gfx1", 0)
 	ROM_LOAD( "font.rom", 0x0000, 0x0800, CRC(56653188) SHA1(84b90f69671d4b72e8f219e1fe7cd667e976cf7f) )
 ROM_END
 
@@ -1786,9 +1802,11 @@ ROM_START( pc8801mk2 ) /* Basic version 1.3 */
 	ROM_REGION( 0x10000, "fdccpu", 0)
 	ROM_LOAD( "disk.rom", 0x0000, 0x0800, CRC(2158d307) SHA1(bb7103a0818850a039c67ff666a31ce49a8d516f) )
 
-	/* should this be here? */
-	ROM_REGION( 0x40000, "gfx1", 0)
-	ROM_LOAD( "kanji1.rom", 0x00000, 0x20000, CRC(6178bd43) SHA1(82e11a177af6a5091dd67f50a2f4bafda84d6556) )
+	ROM_REGION( 0x40000, "kanji", ROMREGION_ERASEFF)
+	ROM_LOAD_OPTIONAL( "kanji1.rom", 0x00000, 0x20000, CRC(6178bd43) SHA1(82e11a177af6a5091dd67f50a2f4bafda84d6556) )
+
+	ROM_REGION( 0x800, "gfx1", 0)
+	ROM_COPY( "kanji", 0x1000, 0x0000, 0x800 )
 ROM_END
 
 ROM_START( pc8801mk2sr )
@@ -1815,8 +1833,8 @@ ROM_START( pc8801mk2sr )
 	ROM_LOAD( "kanji1.rom", 0x00000, 0x20000, CRC(6178bd43) SHA1(82e11a177af6a5091dd67f50a2f4bafda84d6556) )
 	ROM_LOAD( "kanji2.rom", 0x20000, 0x20000, CRC(154803cc) SHA1(7e6591cd465cbb35d6d3446c5a83b46d30fafe95) )	// it should not be here
 
-	ROM_REGION( 0x40000, "gfx1", 0)
-	ROM_COPY( "kanji", 0x1000, 0x0000, 0x1000 )
+	ROM_REGION( 0x800, "gfx1", 0)
+	ROM_COPY( "kanji", 0x1000, 0x0000, 0x800 )
 ROM_END
 
 ROM_START( pc8801mk2fr )
@@ -1839,8 +1857,11 @@ ROM_START( pc8801mk2fr )
 	ROM_REGION( 0x2000, "audiocpu", 0)
 	ROM_LOAD( "soundbios.rom", 0x0000, 0x2000, NO_DUMP )
 
-	ROM_REGION( 0x40000, "gfx1", 0)
+	ROM_REGION( 0x40000, "kanji", 0)
 	ROM_LOAD( "kanji1.rom", 0x00000, 0x20000, CRC(6178bd43) SHA1(82e11a177af6a5091dd67f50a2f4bafda84d6556) )
+
+	ROM_REGION( 0x800, "gfx1", 0)
+	ROM_COPY( "kanji", 0x1000, 0x0000, 0x800 )
 ROM_END
 
 ROM_START( pc8801mk2mr )
@@ -1863,11 +1884,12 @@ ROM_START( pc8801mk2mr )
 	ROM_REGION( 0x2000, "audiocpu", 0)
 	ROM_LOAD( "soundbios.rom", 0x0000, 0x2000, NO_DUMP )
 
-	ROM_REGION( 0x40000, "gfx1", 0)
-	ROM_LOAD( "kanji1.rom", 0x00000, 0x20000, CRC(6178bd43) SHA1(82e11a177af6a5091dd67f50a2f4bafda84d6556) )
+	ROM_REGION( 0x40000, "kanji", 0)
+	ROM_LOAD( "kanji1.rom",      0x00000, 0x20000, CRC(6178bd43) SHA1(82e11a177af6a5091dd67f50a2f4bafda84d6556) )
+	ROM_LOAD( "m2mr_kanji2.rom", 0x20000, 0x20000, CRC(376eb677) SHA1(bcf96584e2ba362218b813be51ea21573d1a2a78) )
 
-	ROM_REGION( 0x20000, "kanji2", 0)
-	ROM_LOAD( "m2mr_kanji2.rom", 0x00000, 0x20000, CRC(376eb677) SHA1(bcf96584e2ba362218b813be51ea21573d1a2a78) )
+	ROM_REGION( 0x800, "gfx1", 0)
+	ROM_COPY( "kanji", 0x1000, 0x0000, 0x800 )
 ROM_END
 
 ROM_START( pc8801mh )
@@ -1890,11 +1912,12 @@ ROM_START( pc8801mh )
 	ROM_REGION( 0x2000, "audiocpu", 0)
 	ROM_LOAD( "soundbios.rom", 0x0000, 0x2000, NO_DUMP )
 
-	ROM_REGION( 0x40000, "gfx1", 0)
-	ROM_LOAD( "kanji1.rom", 0x00000, 0x20000, CRC(6178bd43) SHA1(82e11a177af6a5091dd67f50a2f4bafda84d6556) )
+	ROM_REGION( 0x40000, "kanji", 0)
+	ROM_LOAD( "kanji1.rom",    0x00000, 0x20000, CRC(6178bd43) SHA1(82e11a177af6a5091dd67f50a2f4bafda84d6556) )
+	ROM_LOAD( "mh_kanji2.rom", 0x20000, 0x20000, CRC(376eb677) SHA1(bcf96584e2ba362218b813be51ea21573d1a2a78) )
 
-	ROM_REGION( 0x20000, "kanji2", 0)
-	ROM_LOAD( "mh_kanji2.rom", 0x00000, 0x20000, CRC(376eb677) SHA1(bcf96584e2ba362218b813be51ea21573d1a2a78) )
+	ROM_REGION( 0x800, "gfx1", 0)
+	ROM_COPY( "kanji", 0x1000, 0x0000, 0x0800 )
 ROM_END
 
 ROM_START( pc8801fa )
@@ -1917,11 +1940,12 @@ ROM_START( pc8801fa )
 	ROM_REGION( 0x2000, "audiocpu", 0)
 	ROM_LOAD( "soundbios.rom", 0x0000, 0x2000, NO_DUMP )
 
-	ROM_REGION( 0x40000, "gfx1", 0 )
-	ROM_LOAD( "kanji1.rom", 0x00000, 0x20000, CRC(6178bd43) SHA1(82e11a177af6a5091dd67f50a2f4bafda84d6556) )
+	ROM_REGION( 0x40000, "kanji", 0 )
+	ROM_LOAD( "kanji1.rom",    0x00000, 0x20000, CRC(6178bd43) SHA1(82e11a177af6a5091dd67f50a2f4bafda84d6556) )
+	ROM_LOAD( "fa_kanji2.rom", 0x20000, 0x20000, CRC(376eb677) SHA1(bcf96584e2ba362218b813be51ea21573d1a2a78) )
 
-	ROM_REGION( 0x20000, "kanji2", 0)
-	ROM_LOAD( "fa_kanji2.rom", 0x00000, 0x20000, CRC(376eb677) SHA1(bcf96584e2ba362218b813be51ea21573d1a2a78) )
+	ROM_REGION( 0x800, "gfx1", 0)
+	ROM_COPY( "kanji", 0x1000, 0x0000, 0x0800 )
 ROM_END
 
 ROM_START( pc8801ma )
@@ -1944,11 +1968,12 @@ ROM_START( pc8801ma )
 	ROM_REGION( 0x2000, "audiocpu", 0)
 	ROM_LOAD( "soundbios.rom", 0x0000, 0x2000, NO_DUMP )
 
-	ROM_REGION( 0x40000, "gfx1", 0 )
-	ROM_LOAD( "kanji1.rom", 0x00000, 0x20000, CRC(6178bd43) SHA1(82e11a177af6a5091dd67f50a2f4bafda84d6556) )
+	ROM_REGION( 0x40000, "kanji", 0 )
+	ROM_LOAD( "kanji1.rom",    0x00000, 0x20000, CRC(6178bd43) SHA1(82e11a177af6a5091dd67f50a2f4bafda84d6556) )
+	ROM_LOAD( "ma_kanji2.rom", 0x20000, 0x20000, CRC(376eb677) SHA1(bcf96584e2ba362218b813be51ea21573d1a2a78) )
 
-	ROM_REGION( 0x20000, "kanji2", 0)
-	ROM_LOAD( "ma_kanji2.rom", 0x00000, 0x20000, CRC(376eb677) SHA1(bcf96584e2ba362218b813be51ea21573d1a2a78) )
+	ROM_REGION( 0x800, "gfx1", 0)
+	ROM_COPY( "kanji", 0x1000, 0x0000, 0x0800 )
 
 	/* 32 banks, to be loaded at 0xc000 - 0xffff */
 	ROM_REGION( 0x80000, "dictionary", 0 )
@@ -1975,11 +2000,12 @@ ROM_START( pc8801ma2 )
 	ROM_REGION( 0x2000, "audiocpu", 0)
 	ROM_LOAD( "soundbios.rom", 0x0000, 0x2000, NO_DUMP )
 
-	ROM_REGION( 0x40000, "gfx1", 0 )
-	ROM_LOAD( "kanji1.rom", 0x00000, 0x20000, CRC(6178bd43) SHA1(82e11a177af6a5091dd67f50a2f4bafda84d6556) )
+	ROM_REGION( 0x40000, "kanji", 0)
+	ROM_LOAD( "kanji1.rom",     0x00000, 0x20000, CRC(6178bd43) SHA1(82e11a177af6a5091dd67f50a2f4bafda84d6556) )
+	ROM_LOAD( "ma2_kanji2.rom", 0x20000, 0x20000, CRC(376eb677) SHA1(bcf96584e2ba362218b813be51ea21573d1a2a78) )
 
-	ROM_REGION( 0x20000, "kanji2", 0)
-	ROM_LOAD( "ma2_kanji2.rom", 0x00000, 0x20000, CRC(376eb677) SHA1(bcf96584e2ba362218b813be51ea21573d1a2a78) )
+	ROM_REGION( 0x800, "gfx1", 0)
+	ROM_COPY( "kanji", 0x1000, 0x0000, 0x0800 )
 
 	/* 32 banks, to be loaded at 0xc000 - 0xffff */
 	ROM_REGION( 0x80000, "dictionary", 0 )
@@ -2009,11 +2035,12 @@ ROM_START( pc8801mc )
 	ROM_REGION( 0x2000, "audiocpu", 0)
 	ROM_LOAD( "soundbios.rom", 0x0000, 0x2000, NO_DUMP )
 
-	ROM_REGION( 0x40000, "gfx1", 0 )
-	ROM_LOAD( "kanji1.rom", 0x00000, 0x20000, CRC(6178bd43) SHA1(82e11a177af6a5091dd67f50a2f4bafda84d6556) )
+	ROM_REGION( 0x40000, "kanji", 0 )
+	ROM_LOAD( "kanji1.rom",    0x00000, 0x20000, CRC(6178bd43) SHA1(82e11a177af6a5091dd67f50a2f4bafda84d6556) )
+	ROM_LOAD( "mc_kanji2.rom", 0x20000, 0x20000, CRC(376eb677) SHA1(bcf96584e2ba362218b813be51ea21573d1a2a78) )
 
-	ROM_REGION( 0x20000, "kanji2", 0)
-	ROM_LOAD( "mc_kanji2.rom", 0x00000, 0x20000, CRC(376eb677) SHA1(bcf96584e2ba362218b813be51ea21573d1a2a78) )
+	ROM_REGION( 0x800, "gfx1", 0)
+	ROM_COPY( "kanji", 0x1000, 0x0000, 0x0800 )
 
 	/* 32 banks, to be loaded at 0xc000 - 0xffff */
 	ROM_REGION( 0x80000, "dictionary", 0 )
