@@ -36,9 +36,9 @@
 	- Bokosuka Wars: doesn't boot, floppy issue;
 	- Bouken Roman: doesn't boot, floppy issue;
 	- Bruce Lee: doesn't boot, floppy issue;
-	- Bu U Ma: sets gfx compatibility mode (attr bit 4,N-BASIC), dunno how to draw with it ...;
+	- Bu U Ma: sets gfx compatibility mode on title screen (attr bit 4,N-BASIC), dunno how to draw with it ...;
 	- Grobda: palette is ugly;
-	- Wanderers from Ys: floppy / irq issues?
+	- Wanderers from Ys: user data looks screwed? It loads with everything as maximum as per now ...
 	- Xevious: game is too fast
 
 	Notes:
@@ -136,7 +136,6 @@
 #include "sound/beep.h"
 //#include "includes/pc8801.h"
 
-static UINT32 bankr[5],bankw[5];
 static UINT8 i8255_0_pc,i8255_1_pc;
 static UINT8 fdc_irq_opcode;
 static UINT8 ext_rom_bank,gfx_ctrl,vram_sel,misc_ctrl,device_ctrl_data;
@@ -145,6 +144,7 @@ static UINT8 window_offset_bank;
 static UINT8 layer_mask;
 static UINT8 i8214_irq_level,i8214_irq_state;
 static UINT16 dma_counter[4],dma_address[4];
+static UINT8 alu_reg[3];
 static UINT8 dmac_mode;
 static UINT8 alu_ctrl1,alu_ctrl2;
 static UINT8 extram_mode,extram_bank;
@@ -199,12 +199,6 @@ static struct
 	UINT8 param[8][5];
 }crtc;
 
-#define NBASIC_BASE 0x80000
-#define N88BASIC_BASE 0x88000
-#define WRAM_BASE 0x00000
-#define GRAM_BASE 0xc0000
-#define ALU_BASE 0xa0000
-
 static VIDEO_START( pc8801 )
 {
 
@@ -214,7 +208,7 @@ static void draw_bitmap_3bpp(running_machine *machine, bitmap_t *bitmap)
 {
 	int x,y,xi;
 	UINT32 count;
-	UINT8 *gvram = machine->region("maincpu")->base() + GRAM_BASE;
+	UINT8 *gvram = machine->region("gvram")->base();
 
 	count = 0;
 
@@ -244,7 +238,7 @@ static void draw_bitmap_1bpp(running_machine *machine, bitmap_t *bitmap)
 {
 	int x,y,xi;
 	UINT32 count;
-	UINT8 *gvram = machine->region("maincpu")->base() + GRAM_BASE;
+	UINT8 *gvram = machine->region("gvram")->base();
 
 	count = 0;
 
@@ -320,7 +314,7 @@ static UINT8 calc_cursor_pos(running_machine *machine,int x,int y,int yi)
 
 static UINT8 extract_text_attribute(running_machine *machine,UINT32 address,int x)
 {
-	UINT8 *vram = machine->region("maincpu")->base() + WRAM_BASE;
+	UINT8 *vram = machine->region("wram")->base();
 	int i;
 	int fifo_size;
 
@@ -350,11 +344,11 @@ static void draw_text_80(running_machine *machine, bitmap_t *bitmap,int y_size)
 {
 	int x,y;
 	int xi,yi;
-	UINT8 *vram = machine->region("maincpu")->base() + WRAM_BASE;
+	UINT8 *vram = machine->region("wram")->base();
 	UINT8 is_cursor;
 	UINT8 y_height;
 	UINT8 attr;
-	UINT8 reverse = 0;
+	UINT8 reverse;
 	UINT8 pal;
 	UINT8 gfx_mode;
 
@@ -370,6 +364,7 @@ static void draw_text_80(running_machine *machine, bitmap_t *bitmap,int y_size)
 			{
 				pal = (attr & 0xe0) >> 5;
 				gfx_mode = (attr & 0x10) >> 4;
+				reverse = 0;
 			}
 			else
 			{
@@ -416,7 +411,7 @@ static void draw_text_40(running_machine *machine, bitmap_t *bitmap, int y_size)
 {
 	int x,y;
 	int xi,yi;
-	UINT8 *vram = machine->region("maincpu")->base() + WRAM_BASE;
+	UINT8 *vram = machine->region("wram")->base();
 	UINT8 is_cursor;
 	UINT8 y_height;
 	UINT8 attr;
@@ -435,13 +430,18 @@ static void draw_text_40(running_machine *machine, bitmap_t *bitmap, int y_size)
 			attr = extract_text_attribute(machine,(((y*120)+80+dma_address[2]) & 0xffff),(x));
 
 			if(text_color_flag)
+			{
 				pal = (attr & 0xe0) >> 5;
+				reverse = 0;
+			}
 			else
+			{
 				pal = 7;
+				reverse = attr & 4;
+			}
 
 			pal|=8; //text pal bank
 
-			reverse = attr & 4;
 
 			for(yi=0;yi<8;yi++)
 			{
@@ -508,67 +508,19 @@ static VIDEO_UPDATE( pc8801 )
 	return 0;
 }
 
-static READ8_HANDLER( pc8801_mem_0_r )
-{
-	UINT8 *ram = space->machine->region("maincpu")->base();
-
-	return ram[offset + bankr[0]];
-}
-
-static WRITE8_HANDLER( pc8801_mem_0_w )
-{
-	UINT8 *ram = space->machine->region("maincpu")->base();
-
-	ram[offset + bankw[0]] = data;
-}
-
-static READ8_HANDLER( pc8801_mem_1_r )
-{
-	UINT8 *ram = space->machine->region("maincpu")->base();
-
-	return ram[offset + bankr[1]];
-}
-
-static WRITE8_HANDLER( pc8801_mem_1_w )
-{
-	UINT8 *ram = space->machine->region("maincpu")->base();
-
-	ram[offset + bankw[1]] = data;
-}
-
-static READ8_HANDLER( pc8801_mem_2_r )
-{
-	UINT8 *ram = space->machine->region("maincpu")->base();
-
-	offset &= 0x3ff;
-
-	return ram[offset + bankr[2]];
-}
-
-static WRITE8_HANDLER( pc8801_mem_2_w )
-{
-	UINT8 *ram = space->machine->region("maincpu")->base();
-
-	offset &= 0x3ff;
-
-	ram[offset + bankw[2]] = data;
-}
-
-static UINT8 alu_r(running_machine *machine, UINT16 ram_addr)
+static READ8_HANDLER( pc8801_alu_r )
 {
 	int i;
-	UINT8 *gvram = machine->region("maincpu")->base();
+	UINT8 *gvram = space->machine->region("gvram")->base();
 	UINT8 b,r,g;
 
 	/* store data to ALU regs */
 	for(i=0;i<3;i++)
-	{
-		gvram[ALU_BASE + i] = gvram[GRAM_BASE + i*0x4000 + ram_addr];
-	}
+		alu_reg[i] = gvram[i*0x4000 + offset];
 
-	b = gvram[GRAM_BASE + ram_addr + 0x0000];
-	r = gvram[GRAM_BASE + ram_addr + 0x4000];
-	g = gvram[GRAM_BASE + ram_addr + 0x8000];
+	b = gvram[offset + 0x0000];
+	r = gvram[offset + 0x4000];
+	g = gvram[offset + 0x8000];
 	if(!(alu_ctrl2 & 1)) { b^=0xff; }
 	if(!(alu_ctrl2 & 2)) { r^=0xff; }
 	if(!(alu_ctrl2 & 4)) { g^=0xff; }
@@ -576,10 +528,10 @@ static UINT8 alu_r(running_machine *machine, UINT16 ram_addr)
 	return b & r & g;
 }
 
-static void alu_w(running_machine *machine, UINT16 ram_addr,UINT8 data)
+static WRITE8_HANDLER( pc8801_alu_w )
 {
 	int i;
-	UINT8 *gvram = machine->region("maincpu")->base();
+	UINT8 *gvram = space->machine->region("gvram")->base();
 
 	switch(alu_ctrl2 & 0x30) // alu write mode
 	{
@@ -593,9 +545,9 @@ static void alu_w(running_machine *machine, UINT16 ram_addr,UINT8 data)
 
 				switch(logic_op)
 				{
-					case 0x00: { gvram[GRAM_BASE + i*0x4000 + ram_addr] &= ~data; } break;
-					case 0x01: { gvram[GRAM_BASE + i*0x4000 + ram_addr] |= data; } break;
-					case 0x10: { gvram[GRAM_BASE + i*0x4000 + ram_addr] ^= data; } break;
+					case 0x00: { gvram[i*0x4000 + offset] &= ~data; } break;
+					case 0x01: { gvram[i*0x4000 + offset] |= data; } break;
+					case 0x10: { gvram[i*0x4000 + offset] ^= data; } break;
 					case 0x11: break; // NOP
 				}
 			}
@@ -605,201 +557,203 @@ static void alu_w(running_machine *machine, UINT16 ram_addr,UINT8 data)
 		case 0x10: // restore data from ALU regs
 		{
 			for(i=0;i<3;i++)
-				gvram[GRAM_BASE + i*0x4000 + ram_addr] = gvram[ALU_BASE + i];
+				gvram[i*0x4000 + offset] = alu_reg[i];
 		}
 		break;
 
 		case 0x20: // swap ALU reg 1 into R GVRAM
-			gvram[GRAM_BASE + 0x0000 + ram_addr] = gvram[ALU_BASE + 1];
+			gvram[0x0000 + offset] = alu_reg[1];
 			break;
 
 		case 0x30: // swap ALU reg 0 into B GVRAM
-			gvram[GRAM_BASE + 0x4000 + ram_addr] = gvram[ALU_BASE + 0];
+			gvram[0x4000 + offset] = alu_reg[0];
 			break;
 	}
 }
 
-static READ8_HANDLER( pc8801_mem_3_r )
+
+static READ8_HANDLER( pc8801_wram_r )
 {
-	UINT8 *ram = space->machine->region("maincpu")->base();
+	UINT8 *work_ram = space->machine->region("wram")->base();
 
-	if(bankr[3] == 0xa0000)
-		return alu_r(space->machine,(offset + bankr[3]) & 0x3fff);
-
-	return ram[offset + bankr[3]];
+	return work_ram[offset];
 }
 
-static WRITE8_HANDLER( pc8801_mem_3_w )
+static WRITE8_HANDLER( pc8801_wram_w )
 {
-	UINT8 *ram = space->machine->region("maincpu")->base();
+	UINT8 *work_ram = space->machine->region("wram")->base();
 
-	if(bankw[3] == 0xa0000)
-		alu_w(space->machine,(offset + bankw[3]) & 0x3fff,data);
-	else
-		ram[offset + bankw[3]] = data;
+	work_ram[offset] = data;
 }
 
-static READ8_HANDLER( pc8801_mem_4_r )
+static READ8_HANDLER( pc8801_ext_wram_r )
 {
-	UINT8 *ram = space->machine->region("maincpu")->base();
+	UINT8 *ext_work_ram = space->machine->region("ewram")->base();
 
-	if(bankr[4] == 0xa3000)
-		return alu_r(space->machine,(offset + bankr[4]) & 0x3fff);
+	/* TODO: check max range here */
 
-	return ram[offset + bankr[4]];
+	return ext_work_ram[offset];
 }
 
-static WRITE8_HANDLER( pc8801_mem_4_w )
+static WRITE8_HANDLER( pc8801_ext_wram_w )
 {
-	UINT8 *ram = space->machine->region("maincpu")->base();
+	UINT8 *ext_work_ram = space->machine->region("ewram")->base();
 
-	if(bankw[4] == 0xa3000)
-		alu_w(space->machine,(offset + bankw[4]) & 0x3fff,data);
-	else
-		ram[offset + bankw[4]] = data;
+	/* TODO: check max range here */
+
+	ext_work_ram[offset] = data;
 }
 
-static UINT32 pc8801_bankswitch_0_r(running_machine *machine)
+static READ8_HANDLER( pc8801_nbasic_rom_r )
 {
-	if(extram_mode & 1) // access R EXT RAM
-		return WRAM_BASE + 0x20000 + extram_bank * 0x8000;
+	UINT8 *n80_rom = space->machine->region("n80rom")->base();
 
-	if(gfx_ctrl & 0x2) //wram read select
-		return WRAM_BASE;
-
-	if(gfx_ctrl & 0x4) //n basic select
-		return NBASIC_BASE;
-
-	return N88BASIC_BASE;
+	return n80_rom[offset];
 }
 
-static UINT32 pc8801_bankswitch_1_r(running_machine *machine)
+static READ8_HANDLER( pc8801_n88basic_rom_r )
 {
-	if(extram_mode & 1) // access R EXT RAM
-		return WRAM_BASE + 0x20000 + 0x6000 + (extram_bank * 0x8000);
+	UINT8 *n88_rom = space->machine->region("n88rom")->base();
 
-	if(gfx_ctrl & 0x2) //wram read select
-		return WRAM_BASE + 0x6000;
-
-	if(gfx_ctrl & 0x4) //n basic select
-		return NBASIC_BASE + 0x6000;
-
-	if(ext_rom_bank & 1) // NOT ext ROM bank
-		return N88BASIC_BASE + 0x6000;
-
-	return N88BASIC_BASE + 0x6000 + (0x2000 * ((misc_ctrl & 3)+1)); // ext ROM bank
+	return n88_rom[offset];
 }
 
-static UINT32 pc8801_bankswitch_0_w(running_machine *machine)
+static READ8_HANDLER( pc8801_gvram_r )
 {
-	if(extram_mode & 0x10) // access W EXT RAM
-		return WRAM_BASE + 0x20000 + (extram_bank * 0x8000);
+	UINT8 *gvram = space->machine->region("gvram")->base();
 
-	return WRAM_BASE;
+	return gvram[offset];
 }
 
-static UINT32 pc8801_bankswitch_1_w(running_machine *machine)
+static WRITE8_HANDLER( pc8801_gvram_w )
 {
-	if(extram_mode & 0x10) // access W EXT RAM
-		return WRAM_BASE + 0x20000 + 0x6000 + (extram_bank * 0x8000);
+	UINT8 *gvram = space->machine->region("gvram")->base();
 
-	return WRAM_BASE + 0x6000;
+	gvram[offset] = data;
 }
 
-static UINT32 pc8801_bankswitch_2_r(running_machine *machine)
+static READ8_HANDLER( pc8801_high_wram_r )
 {
-	if(gfx_ctrl & 6) //wram read select or n basic select banks this as normal wram
-		return WRAM_BASE + 0x8000;
+	UINT8 *hi_work_ram = space->machine->region("hiwram")->base();
 
-	return WRAM_BASE + (window_offset_bank << 8);
+	return hi_work_ram[offset];
 }
 
-static UINT32 pc8801_bankswitch_2_w(running_machine *machine)
+static WRITE8_HANDLER( pc8801_high_wram_w )
 {
-	if(gfx_ctrl & 6) //wram read select or n basic select banks this as normal wram
-		return WRAM_BASE + 0x8000;
+	UINT8 *hi_work_ram = space->machine->region("hiwram")->base();
 
-	return WRAM_BASE + (window_offset_bank << 8);
+	hi_work_ram[offset] = data;
 }
 
-static UINT32 pc8801_bankswitch_3_r(running_machine *machine)
+static READ8_HANDLER( pc8801_mem_r )
 {
-	if(misc_ctrl & 0x40)
+	if(offset >= 0x0000 && offset <= 0x7fff)
 	{
-		vram_sel = 3;
-		if(alu_ctrl2 & 0x80)
-			return ALU_BASE;
+		if(extram_mode & 1)
+			return pc8801_ext_wram_r(space,offset | (extram_bank * 0x8000));
+
+		if(gfx_ctrl & 2)
+			return pc8801_wram_r(space,offset);
+
+		if(gfx_ctrl & 4)
+			return pc8801_nbasic_rom_r(space,offset);
+
+		if(offset >= 0x6000 && offset <= 0x7fff && ((ext_rom_bank & 1) == 0))
+			return pc8801_n88basic_rom_r(space,0x8000 + (offset & 0x1fff) + (0x2000 * (misc_ctrl & 3)));
+
+		return pc8801_n88basic_rom_r(space,offset);
+	}
+	else if(offset >= 0x8000 && offset <= 0x83ff) // work RAM window
+	{
+		if(gfx_ctrl & 6) //wram read select or n basic select banks this as normal wram
+			return pc8801_wram_r(space,offset);
+
+		return pc8801_wram_r(space,(offset & 0x3ff) + (window_offset_bank << 8));
+	}
+	else if(offset >= 0x8400 && offset <= 0xbfff)
+	{
+		return pc8801_wram_r(space,offset);
+	}
+	else if(offset >= 0xc000 && offset <= 0xffff)
+	{
+		if(misc_ctrl & 0x40)
+		{
+			vram_sel = 3;
+			if(alu_ctrl2 & 0x80)
+				return pc8801_alu_r(space,offset & 0x3fff);
+		}
+
+		if(vram_sel == 3)
+		{
+			if(offset >= 0xf000 && offset <= 0xffff && (misc_ctrl & 0x10))
+				return pc8801_high_wram_r(space,offset & 0xfff);
+
+			return pc8801_wram_r(space,offset);
+		}
+
+		return pc8801_gvram_r(space,(offset & 0x3fff) + (0x4000 * vram_sel));
 	}
 
-	if(vram_sel == 3)
-		return WRAM_BASE + 0xc000;
-
-	return GRAM_BASE + 0x4000 * vram_sel;
+	return 0xff;
 }
 
-static UINT32 pc8801_bankswitch_3_w(running_machine *machine)
+static WRITE8_HANDLER( pc8801_mem_w )
 {
-	if(misc_ctrl & 0x40)
+	if(offset >= 0x0000 && offset <= 0x7fff)
 	{
-		vram_sel = 3;
-		if(alu_ctrl2 & 0x80)
-			return ALU_BASE;
+		if(extram_mode & 0x10)
+			pc8801_ext_wram_w(space,offset | (extram_bank * 0x8000),data);
+		else
+			pc8801_wram_w(space,offset,data);
+
+		return;
 	}
+	else if(offset >= 0x8000 && offset <= 0x83ff)
+	{
+		if(gfx_ctrl & 6) //wram read select or n basic select banks this as normal wram
+			pc8801_wram_w(space,offset,data);
+		else
+			pc8801_wram_w(space,(offset & 0x3ff) + (window_offset_bank << 8),data);
 
-	if(vram_sel == 3)
-		return WRAM_BASE + 0xc000;
+		return;
+	}
+	else if(offset >= 0x8400 && offset <= 0xbfff)
+	{
+		pc8801_wram_w(space,offset,data);
+		return;
+	}
+	else if(offset >= 0xc000 && offset <= 0xffff)
+	{
+		if(misc_ctrl & 0x40)
+		{
+			vram_sel = 3;
+			if(alu_ctrl2 & 0x80)
+			{
+				pc8801_alu_w(space,offset & 0x3fff,data);
+				return;
+			}
+		}
 
-	return GRAM_BASE + 0x4000 * vram_sel;
+		if(vram_sel == 3)
+		{
+			if(offset >= 0xf000 && offset <= 0xffff && (misc_ctrl & 0x10))
+			{
+				pc8801_high_wram_w(space,offset & 0xfff,data);
+				return;
+			}
+
+			pc8801_wram_w(space,offset,data);
+			return;
+		}
+
+		pc8801_gvram_w(space,(offset & 0x3fff) + (0x4000 * vram_sel),data);
+		return;
+	}
 }
-
-static UINT32 pc8801_bankswitch_4_r(running_machine *machine)
-{
-	if(misc_ctrl & 0x40)
-	{
-		vram_sel = 3;
-		if(alu_ctrl2 & 0x80)
-			return ALU_BASE + 0x3000;
-	}
-
-	if(vram_sel == 3)
-	{
-		if((misc_ctrl & 0x10) == 0) // high VRAM
-			return WRAM_BASE + 0xf000;
-
-		return WRAM_BASE + 0xf000 + 0x10000;
-	}
-
-	return GRAM_BASE + 0x3000 + (0x4000 * vram_sel);
-}
-
-static UINT32 pc8801_bankswitch_4_w(running_machine *machine)
-{
-	if(misc_ctrl & 0x40)
-	{
-		vram_sel = 3;
-		if(alu_ctrl2 & 0x80)
-			return ALU_BASE + 0x3000;
-	}
-
-	if(vram_sel == 3)
-	{
-		if((misc_ctrl & 0x10) == 0) // high VRAM
-			return WRAM_BASE + 0xf000;
-
-		return WRAM_BASE + 0xf000 + 0x10000;
-	}
-
-	return GRAM_BASE + 0x3000 + (0x4000 * vram_sel);
-}
-
 
 static ADDRESS_MAP_START( pc8801_mem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x5fff) AM_READWRITE(pc8801_mem_0_r,pc8801_mem_0_w)
-	AM_RANGE(0x6000, 0x7fff) AM_READWRITE(pc8801_mem_1_r,pc8801_mem_1_w)
-	AM_RANGE(0x8000, 0x83ff) AM_READWRITE(pc8801_mem_2_r,pc8801_mem_2_w)
-	AM_RANGE(0x8400, 0xbfff) AM_RAM
-	AM_RANGE(0xc000, 0xefff) AM_READWRITE(pc8801_mem_3_r,pc8801_mem_3_w)
-	AM_RANGE(0xf000, 0xffff) AM_READWRITE(pc8801_mem_4_r,pc8801_mem_4_w)
+	AM_RANGE(0x0000, 0xffff) AM_READWRITE(pc8801_mem_r,pc8801_mem_w)
 ADDRESS_MAP_END
 
 static READ8_HANDLER( pc8801_ctrl_r )
@@ -853,10 +807,6 @@ static READ8_HANDLER( pc8801_ext_rom_bank_r )
 static WRITE8_HANDLER( pc8801_ext_rom_bank_w )
 {
 	ext_rom_bank = data;
-	bankr[0] = pc8801_bankswitch_0_r(space->machine);
-	bankr[1] = pc8801_bankswitch_1_r(space->machine);
-	bankw[0] = pc8801_bankswitch_0_w(space->machine);
-	bankw[1] = pc8801_bankswitch_1_w(space->machine);
 }
 
 static void pc8801_dynamic_res_change(running_machine *machine)
@@ -893,10 +843,6 @@ static WRITE8_HANDLER( pc8801_gfx_ctrl_w )
 	*/
 
 	gfx_ctrl = data;
-	bankr[0] = pc8801_bankswitch_0_r(space->machine);
-	bankr[1] = pc8801_bankswitch_1_r(space->machine);
-	bankw[0] = pc8801_bankswitch_0_w(space->machine);
-	bankw[1] = pc8801_bankswitch_1_w(space->machine);
 
 	pc8801_dynamic_res_change(space->machine);
 }
@@ -909,10 +855,6 @@ static READ8_HANDLER( pc8801_vram_select_r )
 static WRITE8_HANDLER( pc8801_vram_select_w )
 {
 	vram_sel = offset & 3;
-	bankr[3] = pc8801_bankswitch_3_r(space->machine);
-	bankr[4] = pc8801_bankswitch_4_r(space->machine);
-	bankw[3] = pc8801_bankswitch_3_w(space->machine);
-	bankw[4] = pc8801_bankswitch_4_w(space->machine);
 }
 
 static WRITE8_HANDLER( pc8801_irq_level_w )
@@ -941,16 +883,12 @@ static READ8_HANDLER( pc8801_window_bank_r )
 static WRITE8_HANDLER( pc8801_window_bank_w )
 {
 	window_offset_bank = data;
-	bankr[2] = pc8801_bankswitch_2_r(space->machine);
-	bankw[2] = pc8801_bankswitch_2_w(space->machine);
 }
 
 static WRITE8_HANDLER( pc8801_window_bank_inc_w )
 {
 	window_offset_bank++;
 	window_offset_bank&=0xff;
-	bankr[2] = pc8801_bankswitch_2_r(space->machine);
-	bankw[2] = pc8801_bankswitch_2_w(space->machine);
 }
 
 static READ8_HANDLER( pc8801_misc_ctrl_r )
@@ -961,12 +899,6 @@ static READ8_HANDLER( pc8801_misc_ctrl_r )
 static WRITE8_HANDLER( pc8801_misc_ctrl_w )
 {
 	misc_ctrl = data;
-
-	bankr[1] = pc8801_bankswitch_1_r(space->machine);
-	bankr[3] = pc8801_bankswitch_3_r(space->machine);
-	bankr[4] = pc8801_bankswitch_4_r(space->machine);
-	bankw[3] = pc8801_bankswitch_3_w(space->machine);
-	bankw[4] = pc8801_bankswitch_4_w(space->machine);
 
 	sound_irq_mask = ((data & 0x80) == 0);
 }
@@ -1113,10 +1045,6 @@ static WRITE8_HANDLER( pc8801_extram_mode_w )
 	*/
 
 	extram_mode = data & 0x11;
-	bankr[0] = pc8801_bankswitch_0_r(space->machine);
-	bankr[1] = pc8801_bankswitch_1_r(space->machine);
-	bankw[0] = pc8801_bankswitch_0_w(space->machine);
-	bankw[1] = pc8801_bankswitch_1_w(space->machine);
 }
 
 static READ8_HANDLER( pc8801_extram_bank_r )
@@ -1127,28 +1055,16 @@ static READ8_HANDLER( pc8801_extram_bank_r )
 static WRITE8_HANDLER( pc8801_extram_bank_w )
 {
 	extram_bank = data;
-	bankr[0] = pc8801_bankswitch_0_r(space->machine);
-	bankr[1] = pc8801_bankswitch_1_r(space->machine);
-	bankw[0] = pc8801_bankswitch_0_w(space->machine);
-	bankw[1] = pc8801_bankswitch_1_w(space->machine);
 }
 
 static WRITE8_HANDLER( pc8801_alu_ctrl1_w )
 {
 	alu_ctrl1 = data;
-	bankr[3] = pc8801_bankswitch_3_r(space->machine);
-	bankr[4] = pc8801_bankswitch_4_r(space->machine);
-	bankw[3] = pc8801_bankswitch_3_w(space->machine);
-	bankw[4] = pc8801_bankswitch_4_w(space->machine);
 }
 
 static WRITE8_HANDLER( pc8801_alu_ctrl2_w )
 {
 	alu_ctrl2 = data;
-	bankr[3] = pc8801_bankswitch_3_r(space->machine);
-	bankr[4] = pc8801_bankswitch_4_r(space->machine);
-	bankw[3] = pc8801_bankswitch_3_w(space->machine);
-	bankw[4] = pc8801_bankswitch_4_w(space->machine);
 }
 
 static WRITE8_HANDLER( pc8801_pcg8100_w )
@@ -1705,19 +1621,7 @@ static MACHINE_RESET( pc8801 )
 	window_offset_bank = 0x80;
 	misc_ctrl = 0x80;
 	layer_mask = 0x00;
-	bankr[0] = pc8801_bankswitch_0_r(machine);
-	bankr[1] = pc8801_bankswitch_1_r(machine);
-	bankw[0] = pc8801_bankswitch_0_w(machine);
-	bankw[1] = pc8801_bankswitch_1_w(machine);
-
-	bankr[2] = pc8801_bankswitch_2_r(machine);
-	bankw[2] = pc8801_bankswitch_2_w(machine);
-
 	vram_sel = 3;
-	bankr[3] = pc8801_bankswitch_3_r(machine);
-	bankr[4] = pc8801_bankswitch_4_r(machine);
-	bankw[3] = pc8801_bankswitch_3_w(machine);
-	bankw[4] = pc8801_bankswitch_4_w(machine);
 
 	pc8801_dynamic_res_change(machine);
 
@@ -1726,14 +1630,10 @@ static MACHINE_RESET( pc8801 )
 	cpu_set_input_line_vector(machine->device("fdccpu"), 0, 0);
 
 	{
-		UINT8 *gvram = machine->region("maincpu")->base();
 		int i;
 
-		for(i=0;i<0x10000;i++)
-			gvram[GRAM_BASE + i] = 0x00;
-
 		for(i=0;i<3;i++)
-			gvram[ALU_BASE + i] = 0x00;
+			alu_reg[i] = 0x00;
 	}
 
 	{
@@ -1846,12 +1746,23 @@ static MACHINE_CONFIG_START( pc8801, driver_device )
 MACHINE_CONFIG_END
 
 /* ROMs */
+#define PC8801_MEM_LOAD \
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF ) \
+	ROM_REGION( 0x10000, "wram", ROMREGION_ERASEFF ) \
+	ROM_REGION( 0x1000, "hiwram", ROMREGION_ERASEFF ) \
+	ROM_REGION( 0x40000, "ewram", ROMREGION_ERASEFF ) \
+	ROM_REGION( 0xc000, "gvram", ROMREGION_ERASE00 )
+
 
 ROM_START( pc8801 ) /* Basic version 1.0 */
-	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASE00 )
-	ROM_LOAD( "n80.rom",   0x80000, 0x8000, CRC(5cb8b584) SHA1(063609dd518c124a4fc9ba35d1bae35771666a34) )
-	ROM_LOAD( "n88.rom",   0x88000, 0x8000, CRC(ffd68be0) SHA1(3518193b8207bdebf22c1380c2db8c554baff329) )
-	ROM_LOAD( "n88_0.rom", 0x90000, 0x2000, CRC(61984bab) SHA1(d1ae642aed4f0584eeb81ff50180db694e5101d4) )
+	PC8801_MEM_LOAD
+
+	ROM_REGION( 0x8000, "n80rom", ROMREGION_ERASEFF )
+	ROM_LOAD( "n80.rom",   0x0000, 0x8000, CRC(5cb8b584) SHA1(063609dd518c124a4fc9ba35d1bae35771666a34) )
+
+	ROM_REGION( 0x10000, "n88rom", ROMREGION_ERASEFF )
+	ROM_LOAD( "n88.rom",   0x0000, 0x8000, CRC(ffd68be0) SHA1(3518193b8207bdebf22c1380c2db8c554baff329) )
+	ROM_LOAD( "n88_0.rom", 0x8000, 0x2000, CRC(61984bab) SHA1(d1ae642aed4f0584eeb81ff50180db694e5101d4) )
 
 	ROM_REGION( 0x10000, "fdccpu", 0)
 	ROM_LOAD( "disk.rom", 0x0000, 0x0800, CRC(2158d307) SHA1(bb7103a0818850a039c67ff666a31ce49a8d516f) )
@@ -1863,10 +1774,14 @@ ROM_END
 /* The dump only included "maincpu". Other roms arbitrariely taken from PC-8801 & PC-8801 MkIISR (there should be
 at least 1 Kanji ROM). */
 ROM_START( pc8801mk2 ) /* Basic version 1.3 */
-	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "m2_n80.rom",   0x80000, 0x8000, CRC(91d84b1a) SHA1(d8a1abb0df75936b3fc9d226ccdb664a9070ffb1) )
-	ROM_LOAD( "m2_n88.rom",   0x88000, 0x8000, CRC(f35169eb) SHA1(ef1f067f819781d9fb2713836d195866f0f81501) )
-	ROM_LOAD( "m2_n88_0.rom", 0x90000, 0x2000, CRC(5eb7a8d0) SHA1(95a70af83b0637a5a0f05e31fb0452bb2cb68055) )
+	PC8801_MEM_LOAD
+
+	ROM_REGION( 0x8000, "n80rom", ROMREGION_ERASEFF )
+	ROM_LOAD( "m2_n80.rom",   0x0000, 0x8000, CRC(91d84b1a) SHA1(d8a1abb0df75936b3fc9d226ccdb664a9070ffb1) )
+
+	ROM_REGION( 0x10000, "n88rom", ROMREGION_ERASEFF )
+	ROM_LOAD( "m2_n88.rom",   0x0000, 0x8000, CRC(f35169eb) SHA1(ef1f067f819781d9fb2713836d195866f0f81501) )
+	ROM_LOAD( "m2_n88_0.rom", 0x8000, 0x2000, CRC(5eb7a8d0) SHA1(95a70af83b0637a5a0f05e31fb0452bb2cb68055) )
 
 	ROM_REGION( 0x10000, "fdccpu", 0)
 	ROM_LOAD( "disk.rom", 0x0000, 0x0800, CRC(2158d307) SHA1(bb7103a0818850a039c67ff666a31ce49a8d516f) )
@@ -1877,13 +1792,17 @@ ROM_START( pc8801mk2 ) /* Basic version 1.3 */
 ROM_END
 
 ROM_START( pc8801mk2sr )
-	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "mk2sr_n80.rom",   0x80000, 0x8000, CRC(27e1857d) SHA1(5b922ed9de07d2a729bdf1da7b57c50ddf08809a) )
-	ROM_LOAD( "mk2sr_n88.rom",   0x88000, 0x8000, CRC(a0fc0473) SHA1(3b31fc68fa7f47b21c1a1cb027b86b9e87afbfff) )
-	ROM_LOAD( "mk2sr_n88_0.rom", 0x90000, 0x2000, CRC(710a63ec) SHA1(d239c26ad7ac5efac6e947b0e9549b1534aa970d) )
-	ROM_LOAD( "n88_1.rom", 0x92000, 0x2000, CRC(c0bd2aa6) SHA1(8528eef7946edf6501a6ccb1f416b60c64efac7c) )
-	ROM_LOAD( "n88_2.rom", 0x94000, 0x2000, CRC(af2b6efa) SHA1(b7c8bcea219b77d9cc3ee0efafe343cc307425d1) )
-	ROM_LOAD( "n88_3.rom", 0x96000, 0x2000, CRC(7713c519) SHA1(efce0b51cab9f0da6cf68507757f1245a2867a72) )
+	PC8801_MEM_LOAD
+
+	ROM_REGION( 0x8000, "n80rom", ROMREGION_ERASEFF )
+	ROM_LOAD( "mk2sr_n80.rom",   0x0000, 0x8000, CRC(27e1857d) SHA1(5b922ed9de07d2a729bdf1da7b57c50ddf08809a) )
+
+	ROM_REGION( 0x10000, "n88rom", ROMREGION_ERASEFF )
+	ROM_LOAD( "mk2sr_n88.rom",   0x0000, 0x8000, CRC(a0fc0473) SHA1(3b31fc68fa7f47b21c1a1cb027b86b9e87afbfff) )
+	ROM_LOAD( "mk2sr_n88_0.rom", 0x8000, 0x2000, CRC(710a63ec) SHA1(d239c26ad7ac5efac6e947b0e9549b1534aa970d) )
+	ROM_LOAD( "n88_1.rom", 		 0xa000, 0x2000, CRC(c0bd2aa6) SHA1(8528eef7946edf6501a6ccb1f416b60c64efac7c) )
+	ROM_LOAD( "n88_2.rom", 		 0xc000, 0x2000, CRC(af2b6efa) SHA1(b7c8bcea219b77d9cc3ee0efafe343cc307425d1) )
+	ROM_LOAD( "n88_3.rom", 		 0xe000, 0x2000, CRC(7713c519) SHA1(efce0b51cab9f0da6cf68507757f1245a2867a72) )
 
 	ROM_REGION( 0x10000, "fdccpu", 0)
 	ROM_LOAD( "disk.rom", 0x0000, 0x0800, CRC(2158d307) SHA1(bb7103a0818850a039c67ff666a31ce49a8d516f) )
@@ -1901,13 +1820,17 @@ ROM_START( pc8801mk2sr )
 ROM_END
 
 ROM_START( pc8801mk2fr )
-	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "m2fr_n80.rom",   0x80000, 0x8000, CRC(27e1857d) SHA1(5b922ed9de07d2a729bdf1da7b57c50ddf08809a) )
-	ROM_LOAD( "m2fr_n88.rom",   0x88000, 0x8000, CRC(b9daf1aa) SHA1(696a480232bcf8c827c7aeea8329db5c44420d2a) )
-	ROM_LOAD( "m2fr_n88_0.rom", 0x90000, 0x2000, CRC(710a63ec) SHA1(d239c26ad7ac5efac6e947b0e9549b1534aa970d) )
-	ROM_LOAD( "m2fr_n88_1.rom", 0x92000, 0x2000, CRC(e3e78a37) SHA1(85ecd287fe72b56e54c8b01ea7492ca4a69a7470) )
-	ROM_LOAD( "m2fr_n88_2.rom", 0x94000, 0x2000, CRC(98c3a7b2) SHA1(fc4980762d3caa56964d0ae583424756f511d186) )
-	ROM_LOAD( "m2fr_n88_3.rom", 0x96000, 0x2000, CRC(0ca08abd) SHA1(a5a42d0b7caa84c3bc6e337c9f37874d82f9c14b) )
+	PC8801_MEM_LOAD
+
+	ROM_REGION( 0x8000, "n80rom", ROMREGION_ERASEFF )
+	ROM_LOAD( "m2fr_n80.rom",   0x0000, 0x8000, CRC(27e1857d) SHA1(5b922ed9de07d2a729bdf1da7b57c50ddf08809a) )
+
+	ROM_REGION( 0x10000, "n88rom", ROMREGION_ERASEFF )
+	ROM_LOAD( "m2fr_n88.rom",   0x0000, 0x8000, CRC(b9daf1aa) SHA1(696a480232bcf8c827c7aeea8329db5c44420d2a) )
+	ROM_LOAD( "m2fr_n88_0.rom", 0x8000, 0x2000, CRC(710a63ec) SHA1(d239c26ad7ac5efac6e947b0e9549b1534aa970d) )
+	ROM_LOAD( "m2fr_n88_1.rom", 0xa000, 0x2000, CRC(e3e78a37) SHA1(85ecd287fe72b56e54c8b01ea7492ca4a69a7470) )
+	ROM_LOAD( "m2fr_n88_2.rom", 0xc000, 0x2000, CRC(98c3a7b2) SHA1(fc4980762d3caa56964d0ae583424756f511d186) )
+	ROM_LOAD( "m2fr_n88_3.rom", 0xe000, 0x2000, CRC(0ca08abd) SHA1(a5a42d0b7caa84c3bc6e337c9f37874d82f9c14b) )
 
 	ROM_REGION( 0x10000, "fdccpu", 0)
 	ROM_LOAD( "m2fr_disk.rom", 0x0000, 0x0800, CRC(2163b304) SHA1(80da2dee49d4307f00895a129a5cfeff00cf5321) )
@@ -1921,13 +1844,17 @@ ROM_START( pc8801mk2fr )
 ROM_END
 
 ROM_START( pc8801mk2mr )
-	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "m2mr_n80.rom",   0x80000, 0x8000, CRC(f074b515) SHA1(ebe9cf4cf57f1602c887f609a728267f8d953dce) )
-	ROM_LOAD( "m2mr_n88.rom",   0x88000, 0x8000, CRC(69caa38e) SHA1(3c64090237152ee77c76e04d6f36bad7297bea93) )
-	ROM_LOAD( "m2mr_n88_0.rom", 0x90000, 0x2000, CRC(710a63ec) SHA1(d239c26ad7ac5efac6e947b0e9549b1534aa970d) )
-	ROM_LOAD( "m2mr_n88_1.rom", 0x92000, 0x2000, CRC(e3e78a37) SHA1(85ecd287fe72b56e54c8b01ea7492ca4a69a7470) )
-	ROM_LOAD( "m2mr_n88_2.rom", 0x94000, 0x2000, CRC(11176e0b) SHA1(f13f14f3d62df61498a23f7eb624e1a646caea45) )
-	ROM_LOAD( "m2mr_n88_3.rom", 0x96000, 0x2000, CRC(0ca08abd) SHA1(a5a42d0b7caa84c3bc6e337c9f37874d82f9c14b) )
+	PC8801_MEM_LOAD
+
+	ROM_REGION( 0x8000, "n80rom", ROMREGION_ERASEFF )
+	ROM_LOAD( "m2mr_n80.rom",   0x0000, 0x8000, CRC(f074b515) SHA1(ebe9cf4cf57f1602c887f609a728267f8d953dce) )
+
+	ROM_REGION( 0x10000, "n88rom", ROMREGION_ERASEFF )
+	ROM_LOAD( "m2mr_n88.rom",   0x0000, 0x8000, CRC(69caa38e) SHA1(3c64090237152ee77c76e04d6f36bad7297bea93) )
+	ROM_LOAD( "m2mr_n88_0.rom", 0x8000, 0x2000, CRC(710a63ec) SHA1(d239c26ad7ac5efac6e947b0e9549b1534aa970d) )
+	ROM_LOAD( "m2mr_n88_1.rom", 0xa000, 0x2000, CRC(e3e78a37) SHA1(85ecd287fe72b56e54c8b01ea7492ca4a69a7470) )
+	ROM_LOAD( "m2mr_n88_2.rom", 0xc000, 0x2000, CRC(11176e0b) SHA1(f13f14f3d62df61498a23f7eb624e1a646caea45) )
+	ROM_LOAD( "m2mr_n88_3.rom", 0xe000, 0x2000, CRC(0ca08abd) SHA1(a5a42d0b7caa84c3bc6e337c9f37874d82f9c14b) )
 
 	ROM_REGION( 0x10000, "fdccpu", 0)
 	ROM_LOAD( "m2mr_disk.rom", 0x0000, 0x2000, CRC(2447516b) SHA1(1492116f15c426f9796dc2bb6fcccf2656c0ca75) )
@@ -1944,13 +1871,17 @@ ROM_START( pc8801mk2mr )
 ROM_END
 
 ROM_START( pc8801mh )
-	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "mh_n80.rom",   0x80000, 0x8000, CRC(8a2a1e17) SHA1(06dae1db384aa29d81c5b6ed587877e7128fcb35) )
-	ROM_LOAD( "mh_n88.rom",   0x88000, 0x8000, CRC(64c5d162) SHA1(3e0aac76fb5d7edc99df26fa9f365fd991742a5d) )
-	ROM_LOAD( "mh_n88_0.rom", 0x90000, 0x2000, CRC(deb384fb) SHA1(5f38cafa8aab16338038c82267800446fd082e79) )
-	ROM_LOAD( "mh_n88_1.rom", 0x92000, 0x2000, CRC(7ad5d943) SHA1(4ae4d37409ff99411a623da9f6a44192170a854e) )
-	ROM_LOAD( "mh_n88_2.rom", 0x94000, 0x2000, CRC(6aa6b6d8) SHA1(2a077ab444a4fd1470cafb06fd3a0f45420c39cc) )
-	ROM_LOAD( "mh_n88_3.rom", 0x96000, 0x2000, CRC(692cbcd8) SHA1(af452aed79b072c4d17985830b7c5dca64d4b412) )
+	PC8801_MEM_LOAD
+
+	ROM_REGION( 0x8000, "n80rom", ROMREGION_ERASEFF )
+	ROM_LOAD( "mh_n80.rom",   0x0000, 0x8000, CRC(8a2a1e17) SHA1(06dae1db384aa29d81c5b6ed587877e7128fcb35) )
+
+	ROM_REGION( 0x10000, "n88rom", ROMREGION_ERASEFF )
+	ROM_LOAD( "mh_n88.rom",   0x0000, 0x8000, CRC(64c5d162) SHA1(3e0aac76fb5d7edc99df26fa9f365fd991742a5d) )
+	ROM_LOAD( "mh_n88_0.rom", 0x8000, 0x2000, CRC(deb384fb) SHA1(5f38cafa8aab16338038c82267800446fd082e79) )
+	ROM_LOAD( "mh_n88_1.rom", 0xa000, 0x2000, CRC(7ad5d943) SHA1(4ae4d37409ff99411a623da9f6a44192170a854e) )
+	ROM_LOAD( "mh_n88_2.rom", 0xc000, 0x2000, CRC(6aa6b6d8) SHA1(2a077ab444a4fd1470cafb06fd3a0f45420c39cc) )
+	ROM_LOAD( "mh_n88_3.rom", 0xe000, 0x2000, CRC(692cbcd8) SHA1(af452aed79b072c4d17985830b7c5dca64d4b412) )
 
 	ROM_REGION( 0x10000, "fdccpu", 0)
 	ROM_LOAD( "mh_disk.rom", 0x0000, 0x2000, CRC(a222ecf0) SHA1(79e9c0786a14142f7a83690bf41fb4f60c5c1004) )
@@ -1967,13 +1898,17 @@ ROM_START( pc8801mh )
 ROM_END
 
 ROM_START( pc8801fa )
-	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "fa_n80.rom",   0x80000, 0x8000, CRC(8a2a1e17) SHA1(06dae1db384aa29d81c5b6ed587877e7128fcb35) )
-	ROM_LOAD( "fa_n88.rom",   0x88000, 0x8000, CRC(73573432) SHA1(9b1346d44044eeea921c4cce69b5dc49dbc0b7e9) )
-	ROM_LOAD( "fa_n88_0.rom", 0x90000, 0x2000, CRC(a72697d7) SHA1(5aedbc5916d67ef28767a2b942864765eea81bb8) )
-	ROM_LOAD( "fa_n88_1.rom", 0x92000, 0x2000, CRC(7ad5d943) SHA1(4ae4d37409ff99411a623da9f6a44192170a854e) )
-	ROM_LOAD( "fa_n88_2.rom", 0x94000, 0x2000, CRC(6aee9a4e) SHA1(e94278682ef9e9bbb82201f72c50382748dcea2a) )
-	ROM_LOAD( "fa_n88_3.rom", 0x96000, 0x2000, CRC(692cbcd8) SHA1(af452aed79b072c4d17985830b7c5dca64d4b412) )
+	PC8801_MEM_LOAD
+
+	ROM_REGION( 0x8000, "n80rom", ROMREGION_ERASEFF )
+	ROM_LOAD( "fa_n80.rom",   0x0000, 0x8000, CRC(8a2a1e17) SHA1(06dae1db384aa29d81c5b6ed587877e7128fcb35) )
+
+	ROM_REGION( 0x10000, "n88rom", ROMREGION_ERASEFF )
+	ROM_LOAD( "fa_n88.rom",   0x0000, 0x8000, CRC(73573432) SHA1(9b1346d44044eeea921c4cce69b5dc49dbc0b7e9) )
+	ROM_LOAD( "fa_n88_0.rom", 0x8000, 0x2000, CRC(a72697d7) SHA1(5aedbc5916d67ef28767a2b942864765eea81bb8) )
+	ROM_LOAD( "fa_n88_1.rom", 0xa000, 0x2000, CRC(7ad5d943) SHA1(4ae4d37409ff99411a623da9f6a44192170a854e) )
+	ROM_LOAD( "fa_n88_2.rom", 0xc000, 0x2000, CRC(6aee9a4e) SHA1(e94278682ef9e9bbb82201f72c50382748dcea2a) )
+	ROM_LOAD( "fa_n88_3.rom", 0xe000, 0x2000, CRC(692cbcd8) SHA1(af452aed79b072c4d17985830b7c5dca64d4b412) )
 
 	ROM_REGION( 0x10000, "fdccpu", 0)
 	ROM_LOAD( "fa_disk.rom", 0x0000, 0x0800, CRC(2163b304) SHA1(80da2dee49d4307f00895a129a5cfeff00cf5321) )
@@ -1990,13 +1925,17 @@ ROM_START( pc8801fa )
 ROM_END
 
 ROM_START( pc8801ma )
-	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "ma_n80.rom",   0x80000, 0x8000, CRC(8a2a1e17) SHA1(06dae1db384aa29d81c5b6ed587877e7128fcb35) )
-	ROM_LOAD( "ma_n88.rom",   0x88000, 0x8000, CRC(73573432) SHA1(9b1346d44044eeea921c4cce69b5dc49dbc0b7e9) )
-	ROM_LOAD( "ma_n88_0.rom", 0x90000, 0x2000, CRC(a72697d7) SHA1(5aedbc5916d67ef28767a2b942864765eea81bb8) )
-	ROM_LOAD( "ma_n88_1.rom", 0x92000, 0x2000, CRC(7ad5d943) SHA1(4ae4d37409ff99411a623da9f6a44192170a854e) )
-	ROM_LOAD( "ma_n88_2.rom", 0x94000, 0x2000, CRC(6aee9a4e) SHA1(e94278682ef9e9bbb82201f72c50382748dcea2a) )
-	ROM_LOAD( "ma_n88_3.rom", 0x96000, 0x2000, CRC(692cbcd8) SHA1(af452aed79b072c4d17985830b7c5dca64d4b412) )
+	PC8801_MEM_LOAD
+
+	ROM_REGION( 0x8000, "n80rom", ROMREGION_ERASEFF )
+	ROM_LOAD( "ma_n80.rom",   0x0000, 0x8000, CRC(8a2a1e17) SHA1(06dae1db384aa29d81c5b6ed587877e7128fcb35) )
+
+	ROM_REGION( 0x10000, "n88rom", ROMREGION_ERASEFF )
+	ROM_LOAD( "ma_n88.rom",   0x0000, 0x8000, CRC(73573432) SHA1(9b1346d44044eeea921c4cce69b5dc49dbc0b7e9) )
+	ROM_LOAD( "ma_n88_0.rom", 0x8000, 0x2000, CRC(a72697d7) SHA1(5aedbc5916d67ef28767a2b942864765eea81bb8) )
+	ROM_LOAD( "ma_n88_1.rom", 0xa000, 0x2000, CRC(7ad5d943) SHA1(4ae4d37409ff99411a623da9f6a44192170a854e) )
+	ROM_LOAD( "ma_n88_2.rom", 0xc000, 0x2000, CRC(6aee9a4e) SHA1(e94278682ef9e9bbb82201f72c50382748dcea2a) )
+	ROM_LOAD( "ma_n88_3.rom", 0xe000, 0x2000, CRC(692cbcd8) SHA1(af452aed79b072c4d17985830b7c5dca64d4b412) )
 
 	ROM_REGION( 0x10000, "fdccpu", 0)
 	ROM_LOAD( "ma_disk.rom", 0x0000, 0x2000, CRC(a222ecf0) SHA1(79e9c0786a14142f7a83690bf41fb4f60c5c1004) )
@@ -2017,13 +1956,17 @@ ROM_START( pc8801ma )
 ROM_END
 
 ROM_START( pc8801ma2 )
-	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "ma2_n80.rom",   0x80000, 0x8000, CRC(8a2a1e17) SHA1(06dae1db384aa29d81c5b6ed587877e7128fcb35) )
-	ROM_LOAD( "ma2_n88.rom",   0x88000, 0x8000, CRC(ae1a6ebc) SHA1(e53d628638f663099234e07837ffb1b0f86d480d) )
-	ROM_LOAD( "ma2_n88_0.rom", 0x90000, 0x2000, CRC(a72697d7) SHA1(5aedbc5916d67ef28767a2b942864765eea81bb8) )
-	ROM_LOAD( "ma2_n88_1.rom", 0x92000, 0x2000, CRC(7ad5d943) SHA1(4ae4d37409ff99411a623da9f6a44192170a854e) )
-	ROM_LOAD( "ma2_n88_2.rom", 0x94000, 0x2000, CRC(1d6277b6) SHA1(dd9c3e50169b75bb707ef648f20d352e6a8bcfe4) )
-	ROM_LOAD( "ma2_n88_3.rom", 0x96000, 0x2000, CRC(692cbcd8) SHA1(af452aed79b072c4d17985830b7c5dca64d4b412) )
+	PC8801_MEM_LOAD
+
+	ROM_REGION( 0x8000, "n80rom", ROMREGION_ERASEFF )
+	ROM_LOAD( "ma2_n80.rom",   0x0000, 0x8000, CRC(8a2a1e17) SHA1(06dae1db384aa29d81c5b6ed587877e7128fcb35) )
+
+	ROM_REGION( 0x10000, "n88rom", ROMREGION_ERASEFF )
+	ROM_LOAD( "ma2_n88.rom",   0x0000, 0x8000, CRC(ae1a6ebc) SHA1(e53d628638f663099234e07837ffb1b0f86d480d) )
+	ROM_LOAD( "ma2_n88_0.rom", 0x8000, 0x2000, CRC(a72697d7) SHA1(5aedbc5916d67ef28767a2b942864765eea81bb8) )
+	ROM_LOAD( "ma2_n88_1.rom", 0xa000, 0x2000, CRC(7ad5d943) SHA1(4ae4d37409ff99411a623da9f6a44192170a854e) )
+	ROM_LOAD( "ma2_n88_2.rom", 0xc000, 0x2000, CRC(1d6277b6) SHA1(dd9c3e50169b75bb707ef648f20d352e6a8bcfe4) )
+	ROM_LOAD( "ma2_n88_3.rom", 0xe000, 0x2000, CRC(692cbcd8) SHA1(af452aed79b072c4d17985830b7c5dca64d4b412) )
 
 	ROM_REGION( 0x10000, "fdccpu", 0)
 	ROM_LOAD( "ma2_disk.rom", 0x0000, 0x2000, CRC(a222ecf0) SHA1(79e9c0786a14142f7a83690bf41fb4f60c5c1004) )
@@ -2044,13 +1987,17 @@ ROM_START( pc8801ma2 )
 ROM_END
 
 ROM_START( pc8801mc )
-	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "mc_n80.rom",   0x80000, 0x8000, CRC(8a2a1e17) SHA1(06dae1db384aa29d81c5b6ed587877e7128fcb35) )
-	ROM_LOAD( "mc_n88.rom",   0x88000, 0x8000, CRC(356d5719) SHA1(5d9ba80d593a5119f52aae1ccd61a1457b4a89a1) )
-	ROM_LOAD( "mc_n88_0.rom", 0x90000, 0x2000, CRC(a72697d7) SHA1(5aedbc5916d67ef28767a2b942864765eea81bb8) )
-	ROM_LOAD( "mc_n88_1.rom", 0x92000, 0x2000, CRC(7ad5d943) SHA1(4ae4d37409ff99411a623da9f6a44192170a854e) )
-	ROM_LOAD( "mc_n88_2.rom", 0x94000, 0x2000, CRC(1d6277b6) SHA1(dd9c3e50169b75bb707ef648f20d352e6a8bcfe4) )
-	ROM_LOAD( "mc_n88_3.rom", 0x96000, 0x2000, CRC(692cbcd8) SHA1(af452aed79b072c4d17985830b7c5dca64d4b412) )
+	PC8801_MEM_LOAD
+
+	ROM_REGION( 0x8000, "n80rom", ROMREGION_ERASEFF )
+	ROM_LOAD( "mc_n80.rom",   0x0000, 0x8000, CRC(8a2a1e17) SHA1(06dae1db384aa29d81c5b6ed587877e7128fcb35) )
+
+	ROM_REGION( 0x10000, "n88rom", ROMREGION_ERASEFF )
+	ROM_LOAD( "mc_n88.rom",   0x0000, 0x8000, CRC(356d5719) SHA1(5d9ba80d593a5119f52aae1ccd61a1457b4a89a1) )
+	ROM_LOAD( "mc_n88_0.rom", 0x8000, 0x2000, CRC(a72697d7) SHA1(5aedbc5916d67ef28767a2b942864765eea81bb8) )
+	ROM_LOAD( "mc_n88_1.rom", 0xa000, 0x2000, CRC(7ad5d943) SHA1(4ae4d37409ff99411a623da9f6a44192170a854e) )
+	ROM_LOAD( "mc_n88_2.rom", 0xc000, 0x2000, CRC(1d6277b6) SHA1(dd9c3e50169b75bb707ef648f20d352e6a8bcfe4) )
+	ROM_LOAD( "mc_n88_3.rom", 0xe000, 0x2000, CRC(692cbcd8) SHA1(af452aed79b072c4d17985830b7c5dca64d4b412) )
 
 	ROM_REGION( 0x10000, "fdccpu", 0)
 	ROM_LOAD( "mc_disk.rom", 0x0000, 0x2000, CRC(a222ecf0) SHA1(79e9c0786a14142f7a83690bf41fb4f60c5c1004) )
