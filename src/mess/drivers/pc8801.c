@@ -182,10 +182,12 @@ CRTC command params:
 
 [4] x--- ---- attribute not separate flag
 [4] -x-- ---- attribute color flag
-[4] --x- ---- attribute not special flag
+[4] --x- ---- attribute not special flag (invalidates next register)
+[4] ---x xxxx attribute size (+1)
 */
 
 #define blink_speed ((((crtc.param[0][1] & 0xc0) >> 6) + 1) << 3)
+#define text_color_flag (crtc.param[0][4] & 0x40)
 
 static struct
 {
@@ -310,6 +312,36 @@ static UINT8 calc_cursor_pos(running_machine *machine,int x,int y,int yi)
 	return 0;
 }
 
+
+
+static UINT8 extract_text_attribute(running_machine *machine,UINT32 address,int x,int swap)
+{
+	UINT8 *vram = machine->region("maincpu")->base() + WRAM_BASE;
+	int i;
+	int fifo_size;
+
+	if(crtc.param[0][4] & 0x80)
+	{
+		popmessage("Using non-separate mode for text tilemap, contact MESSdev");
+		return 0;
+	}
+
+	fifo_size = (crtc.param[0][4] & 0x20) ? 0 : ((crtc.param[0][4] & 0x1f) + 1);
+
+	for(i=0;i<fifo_size;i++)
+	{
+		/* TODO: do we have a bug lying to somewhere else? N-BASIC attributes doesn't work without this +2 ... */
+		if(x < vram[address+swap])
+		{
+			return vram[address+1];
+		}
+		else
+			address+=2;
+	}
+
+	return 0;
+}
+
 static void draw_text_80(running_machine *machine, bitmap_t *bitmap,int y_size)
 {
 	int x,y;
@@ -317,6 +349,9 @@ static void draw_text_80(running_machine *machine, bitmap_t *bitmap,int y_size)
 	UINT8 *vram = machine->region("maincpu")->base() + WRAM_BASE;
 	UINT8 is_cursor;
 	UINT8 y_height;
+	UINT8 attr;
+	UINT8 reverse;
+	UINT8 pal;
 
 	y_height = y_size == 20 ? 10 : 8;
 
@@ -324,6 +359,15 @@ static void draw_text_80(running_machine *machine, bitmap_t *bitmap,int y_size)
 	{
 		for(x=0;x<80;x++)
 		{
+			attr = extract_text_attribute(machine,(((y*120)+80+dma_address[2]) & 0xffff),(x),0);
+
+			if(text_color_flag)
+				pal = (attr & 0xe0) >> 5;
+			else
+				pal = 7;
+
+			reverse = attr & 4;
+
 			for(yi=0;yi<8;yi++)
 			{
 				is_cursor = calc_cursor_pos(machine,x,y,yi);
@@ -340,10 +384,10 @@ static void draw_text_80(running_machine *machine, bitmap_t *bitmap,int y_size)
 					res_x = x*8+xi;
 					res_y = y*y_height+yi;
 
-					if(is_cursor)
-						color = ((gfx_data[tile*8+yi] >> (7-xi)) & 1) ? -1 : 7;
+					if(is_cursor || reverse)
+						color = ((gfx_data[tile*8+yi] >> (7-xi)) & 1) ? -1 : pal;
 					else
-						color = ((gfx_data[tile*8+yi] >> (7-xi)) & 1) ? 7 : -1;
+						color = ((gfx_data[tile*8+yi] >> (7-xi)) & 1) ? pal : -1;
 
 					if((res_x)<=machine->primary_screen->visible_area().max_x && (res_y)<=machine->primary_screen->visible_area().max_y)
 						if(color != -1)
@@ -361,6 +405,8 @@ static void draw_text_40(running_machine *machine, bitmap_t *bitmap, int y_size)
 	UINT8 *vram = machine->region("maincpu")->base() + WRAM_BASE;
 	UINT8 is_cursor;
 	UINT8 y_height;
+	UINT8 attr;
+	UINT8 reverse;
 
 	y_height = y_size == 20 ? 10 : 8;
 
@@ -370,6 +416,10 @@ static void draw_text_40(running_machine *machine, bitmap_t *bitmap, int y_size)
 		{
 			if(x & 1)
 				continue;
+
+			attr = extract_text_attribute(machine,(((y*120)+80+dma_address[2]) & 0xffff),(x),2);
+
+			reverse = attr & 4;
 
 			for(yi=0;yi<8;yi++)
 			{
@@ -387,7 +437,7 @@ static void draw_text_40(running_machine *machine, bitmap_t *bitmap, int y_size)
 					res_x = (x*8)+xi*2;
 					res_y = (y*y_height)+yi;
 
-					if(is_cursor)
+					if(is_cursor || reverse)
 						color = ((gfx_data[tile*8+yi] >> (7-xi)) & 1) ? -1 : 7;
 					else
 						color = ((gfx_data[tile*8+yi] >> (7-xi)) & 1) ? 7 : -1;
@@ -419,6 +469,8 @@ static VIDEO_UPDATE( pc8801 )
 	if(!(layer_mask & 1) && dmac_mode & 4 && crtc.status & 0x10 && crtc.irq_mask == 3)
 	{
 		static int y_size;
+
+		//popmessage("%02x %02x",crtc.param[0][0],crtc.param[0][4]);
 
 		y_size = (crtc.param[0][1] & 0x3f) + 1;
 
