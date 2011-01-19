@@ -2,47 +2,49 @@
 
     PC-8801 (c) 1981 NEC
 
-    preliminary driver by Angelo Salese, original MESS PC-88SR by ???
+    preliminary driver by Angelo Salese, original MESS PC-88SR driver by ???
 
     TODO:
-	- used to do more, currently under rewriting stage. We are currently using plain PC-8801 as the base, will add differences for the
-	  later models at some point.
-	- macros for the various rom / ram areas, it might require various attempts in order to finally get a reasonable arrangement ...
-	- dipswitches are WRONG
+	- add differences between various models;
 	- implement proper i8214 routing, also add irq latch mechanism;
 	- implement proper upd3301 / i8257 support;
 	- below notes states that plain PC-8801 doesn't have a disk CPU, but the BIOS clearly checks the floppy ports. Wrong info?
-	- joystick / mouse support;
+	- mouse support;
 	- cursor is 8 x 10, not 8 x 8 as current implementation.
-	- text DMAC stuff isn't well documented;
-	- CRTC really looks like to be a MCU;
 	- needs to support V1 / V2 properly;
 	- Add limits for extend work RAM;
+	- Later models have palette bugs with some games (Alphos, Tokyo Nampa Street), check out why;
 	- What happens to the palette contents when the analog/digital palette mode changes?
+	- dipswitches needs to be controlled;
+
+	per-game specific TODO:
+	- 100 Yen disk(s): reads kanji ports;
+	- 177: gameplay is too fast (parent pc8801 only);
+	- Acro Jet: hangs waiting for an irq;
+	- American Success: reads the light pen?
+	- Alpha (demo): crashes with "illegal function" msg;
+	- Balance of Power: attempt to use the SIO port for mouse polling, worked around for now;
+	- Balance of Power: moans with a JP msg;
+	- Battle Entry: moans with a JP msg then dies if you try to press either numpad 1 or 2 (asks if the user wants to use the sound board (yes 1 / no 2)
+	- Bishoujo Baseball Gakuen: checks ym2608 after intro screen;
+	- Blue Moon Story: moans with a kanji msg;.
+	- Bu U Ma: sets gfx compatibility mode on title screen (attr bit 4,N-BASIC), dunno how to draw with it ...;
+	- Grobda: palette is ugly (parent pc8801 only);
+	- Wanderers from Ys: user data disk looks screwed? It loads with everything as maximum as per now ...
+	- Wanderers from Ys: sound crashes at some point, presumably irq issue;
+	- Xevious: game is too fast (parent pc8801 only)
 
 	list of games that crashes due of floppy issues:
+	- Bersekers Front Gaiden 3
 	- Bokosuka Wars
 	- Bouken Roman
 	- Bruce Lee
 	- Castle Excellent
-	- Tobira wo Akete (in parent pc8801 only)
+	- Tobira wo Akete (random crashes in parent pc8801 only)
 
-	per-game specific TODO:
-	- 100 Yen disk(s): reads kanji ports;
-	- 177: gameplay is too fast;
-	- Acro Jet: hangs waiting for an irq;
-	- American Success: reads the light pen?
-	- Alpha (demo): crashes with "illegal function" msg;
-	- Alphos: text VRAM garbage during gameplay;
-	- Balance of Power: attempt to use the SIO port for mouse polling, worked around for now;
-	- Battle Entry: moans with a kanji msg then dies if you try to press either numpad 1 or 2 (what it basically asks by looking at the DASM)
-	- Bersekers Front Gaiden 3: checks CPU speed port and polls the PCG stuff too;
-	- Bishoujo Baseball Gakuen: checks ym2608 after intro screen;
-	- Blue Moon Story: moans with a kanji msg;.
-	- Bu U Ma: sets gfx compatibility mode on title screen (attr bit 4,N-BASIC), dunno how to draw with it ...;
-	- Grobda: palette is ugly;
-	- Wanderers from Ys: user data looks screwed? It loads with everything as maximum as per now ...
-	- Xevious: game is too fast
+	games that needs to NOT have write-protect floppies (BTANBs):
+	- Tobira wo Akete (hangs at title screen)
+
 
 	Notes:
 	- BIOS disk ROM defines what kind of floppies you could load:
@@ -352,8 +354,8 @@ static void draw_text_80(running_machine *machine, bitmap_t *bitmap,int y_size)
 	UINT8 y_height;
 	UINT8 attr;
 	UINT8 reverse;
-	UINT8 pal;
-	UINT8 gfx_mode;
+	int pal;
+	//UINT8 gfx_mode;
 
 	y_height = y_size == 20 ? 10 : 8;
 
@@ -366,16 +368,16 @@ static void draw_text_80(running_machine *machine, bitmap_t *bitmap,int y_size)
 			if(text_color_flag)
 			{
 				pal = (attr & 0xe0) >> 5;
-				gfx_mode = (attr & 0x10) >> 4;
+				//gfx_mode = (attr & 0x10) >> 4;
 				reverse = 0;
+				pal|=8; //text pal bank
 			}
 			else
 			{
-				pal = 7;
+				pal = (txt_color) ? 7 : 0;
 				reverse = attr & 4;
+				pal|=8; //text pal bank
 			}
-
-			pal|=8; //text pal bank
 
 			for(yi=0;yi<8;yi++)
 			{
@@ -419,7 +421,7 @@ static void draw_text_40(running_machine *machine, bitmap_t *bitmap, int y_size)
 	UINT8 y_height;
 	UINT8 attr;
 	UINT8 reverse;
-	UINT8 pal;
+	int pal;
 
 	y_height = y_size == 20 ? 10 : 8;
 
@@ -435,16 +437,16 @@ static void draw_text_40(running_machine *machine, bitmap_t *bitmap, int y_size)
 			if(text_color_flag)
 			{
 				pal = (attr & 0xe0) >> 5;
+				//gfx_mode = (attr & 0x10) >> 4;
 				reverse = 0;
+				pal|=8; //text pal bank
 			}
 			else
 			{
-				pal = 7;
+				pal = (txt_color) ? 7 : 0;
 				reverse = attr & 4;
+				pal|=8; //text pal bank
 			}
-
-			pal|=8; //text pal bank
-
 
 			for(yi=0;yi<8;yi++)
 			{
@@ -490,6 +492,8 @@ static VIDEO_UPDATE( pc8801 )
 		else
 			draw_bitmap_1bpp(screen->machine,bitmap);
 	}
+
+	//popmessage("%02x %02x %02x %02x",layer_mask,dmac_mode,crtc.status,crtc.irq_mask);
 
 	if(!(layer_mask & 1) && dmac_mode & 4 && crtc.status & 0x10 && crtc.irq_mask == 3)
 	{
@@ -802,7 +806,7 @@ static READ8_HANDLER( pc8801_ctrl_r )
 static WRITE8_HANDLER( pc8801_ctrl_w )
 {
 	/*
-	x--- ---- beeper (mirror?)
+	x--- ---- SING (buzzer mirror?)
 	-x-- ---- mouse latch (JOP1, routes on OPN sound port A)
 	--x- ---- beeper
 	---
@@ -1012,14 +1016,13 @@ static WRITE8_HANDLER( pc88_crtc_cmd_w )
 	switch(crtc.cmd)
 	{
 		case 0:  // reset CRTC
-			crtc.status &= (~0x10 | ~0x04 | ~0x02);
+			crtc.status &= (~0x16);
 			break;
 		case 1:  // start display
 			crtc.status |= 0x10;
 			crtc.status &= (~0x08);
 			if(data & 1)
 				printf("CRTC reverse display ON\n");
-
 			break;
 		case 2:  // set irq mask
 			crtc.irq_mask = data & 3;
@@ -1032,7 +1035,7 @@ static WRITE8_HANDLER( pc88_crtc_cmd_w )
 			break;
 		case 5:  // reset IRQ
 		case 6:  // reset counters
-			crtc.status &= (~0x04 | ~0x02);
+			crtc.status &= (~0x06);
 			break;
 	}
 
@@ -1110,6 +1113,8 @@ static WRITE8_HANDLER( pc8801_txt_cmt_ctrl_w )
 
 	txt_width = data & 1;
 	txt_color = data & 2;
+	if((data & 2) == 0)
+	printf("TEXT COLOR is black\n");
 }
 
 static UINT32 knj_addr[2];
@@ -1172,7 +1177,7 @@ static ADDRESS_MAP_START( pc8801_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x34, 0x34) AM_WRITE(pc8801_alu_ctrl1_w)
 	AM_RANGE(0x35, 0x35) AM_WRITE(pc8801_alu_ctrl2_w)
 	AM_RANGE(0x40, 0x40) AM_READWRITE(pc8801_ctrl_r, pc8801_ctrl_w)
-	AM_RANGE(0x44, 0x45) AM_DEVREADWRITE("ym2203", ym2203_r,ym2203_w)
+	AM_RANGE(0x44, 0x45) AM_DEVREADWRITE("opn", ym2203_r,ym2203_w)
 //  AM_RANGE(0x46, 0x47) AM_NOP                                     /* OPNA extra port */
 	AM_RANGE(0x50, 0x50) AM_READWRITE(pc8801_crtc_param_r, pc88_crtc_param_w)
 	AM_RANGE(0x51, 0x51) AM_READWRITE(pc8801_crtc_status_r, pc88_crtc_cmd_w)
@@ -1529,14 +1534,14 @@ static INPUT_PORTS_START( pc8001 )
 	PORT_DIPSETTING(    0x80, "9600bps" )
 	PORT_DIPSETTING(    0x90, "19200bps" )
 
-	PORT_START("OPNA")
+	PORT_START("OPN_PA")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("OPNB")
+	PORT_START("OPN_PB")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1614,8 +1619,8 @@ static void pc8801_sound_irq( device_t *device, int irq )
 }
 
 /* TODO: mouse routing (that's why I don't use DEVCB_INPUT_PORT here) */
-static READ8_DEVICE_HANDLER( opn_porta_r ) { return input_port_read(device->machine, "OPNA"); }
-static READ8_DEVICE_HANDLER( opn_portb_r ) { return input_port_read(device->machine, "OPNB"); }
+static READ8_DEVICE_HANDLER( opn_porta_r ) { return input_port_read(device->machine, "OPN_PA"); }
+static READ8_DEVICE_HANDLER( opn_portb_r ) { return input_port_read(device->machine, "OPN_PB"); }
 
 static const ym2203_interface pc88_ym2203_intf =
 {
@@ -1696,6 +1701,10 @@ static MACHINE_RESET( pc8801 )
 	fdc_irq_opcode = 0; //TODO: copied from PC-88VA, could be wrong here ... should be 0x7f ld a,a in the latter case
 
 	cpu_set_input_line_vector(machine->device("fdccpu"), 0, 0);
+
+	{
+		txt_color = 2;
+	}
 
 	{
 		int i;
@@ -1805,7 +1814,7 @@ static MACHINE_CONFIG_START( pc8801, driver_device )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ym2203", YM2203, 4000000) //unknown clock
+	MCFG_SOUND_ADD("opn", YM2203, 4000000) //unknown clock
 	MCFG_SOUND_CONFIG(pc88_ym2203_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
