@@ -14,7 +14,7 @@
 </software>
 
 
-<software name="3rddegre">
+<software name="3degree">
 	<description>3rd Degree (USA)</description>
 	<year>1993</year>
 	<publisher>Philips</publisher>
@@ -25,25 +25,7 @@
 	</part>
 </software>
  
-<software name="7th1a">
-	<description>The 7th Guest (Euro)[DVC][8111033V113 50404169 01]</description>
-	<year>1994</year>
-	<publisher>Philips</publisher>
-	<part name="cdrom1" interface="cdi_cdrom">
-		<feature name="part_id" value="The Game" />
-		<diskarea name="cdrom">
-			<disk name="7th guest, the (1994)(philips)(eu)(disc 1 of 2)[!][the game][dvc][8111033v113 50404169 01]" sha1="f08256a2719f0f4f3010cb95d3f8e2c3ff63d0fe"/>
-		</diskarea>
-	</part>
- 	<part name="cdrom2" interface="cdi_cdrom">
-		<feature name="part_id" value="The Music" />
-		<diskarea name="cdrom">
-			<disk name="7th guest, the (1994)(philips)(eu)(disc 2 of 2)[!][the music, die musik][cd-audio]" sha1="baa165adf76678353cd9d97bd8e7d09d80af1914"/>
-		</diskarea>
-	</part>
-</software>
-
-<software name="7th1">
+<software name="7thguest" supported="no">
 	<description>The 7th Guest (Euro)[DVC][8110033V113 50404169 02]</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
@@ -61,7 +43,25 @@
 	</part>
 </software>
 
-<software name="7thg1">
+<software name="7thguesta" cloneof="7thguest" supported="no">
+	<description>The 7th Guest (Euro)[DVC][8111033V113 50404169 01]</description>
+	<year>1994</year>
+	<publisher>Philips</publisher>
+	<part name="cdrom1" interface="cdi_cdrom">
+		<feature name="part_id" value="The Game" />
+		<diskarea name="cdrom">
+			<disk name="7th guest, the (1994)(philips)(eu)(disc 1 of 2)[!][the game][dvc][8111033v113 50404169 01]" sha1="f08256a2719f0f4f3010cb95d3f8e2c3ff63d0fe"/>
+		</diskarea>
+	</part>
+ 	<part name="cdrom2" interface="cdi_cdrom">
+		<feature name="part_id" value="The Music" />
+		<diskarea name="cdrom">
+			<disk name="7th guest, the (1994)(philips)(eu)(disc 2 of 2)[!][the music, die musik][cd-audio]" sha1="baa165adf76678353cd9d97bd8e7d09d80af1914"/>
+		</diskarea>
+	</part>
+</software>
+
+<software name="7thguestg" cloneof="7thguest" supported="no">
 	<description>The 7th Guest (Ger)[DVC]</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
@@ -79,7 +79,7 @@
 	</part>
 </software>
 
-<software name="7thf1">
+<software name="7thguestf" cloneof="7thguest" supported="no">
 	<description>The 7th Guest (Fra)[DVC]</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
@@ -97,7 +97,7 @@
 	</part>
 </software>
 
-<software name="agreatd">
+<software name="dayrace">
 	<description>A Great Day at the Races (Euro)</description>
 	<year>1993</year>
 	<publisher>Philips</publisher>
@@ -108,7 +108,7 @@
 	</part>
 </software>
 
-<software name="agreatdu">
+<software name="dayraceu" cloneof="dayrace">
 	<description>A Great Day at the Races (USA)</description>
 	<year>1993</year>
 	<publisher>Philips</publisher>
@@ -119,7 +119,7 @@
 	</part>
 </software>
 
-<software name="affairem">
+<software name="morlov">
 	<!-- Alt. Title: The Morlov Affair -->
 	<description>L'Affaire Morlov (Euro)[CD-i-PC]</description>
 	<year>1996</year>
@@ -131,18 +131,7 @@
 	</part>
 </software>
 
-<software name="aliceaup">
-	<description>Alice au Pays des Merveilles (Fra)</description>
-	<year>1992</year>
-	<publisher>Philips</publisher>
-	<part name="cdrom" interface="cdi_cdrom">
-		<diskarea name="cdrom">
-			<disk name="alice au pays des merveilles (1992)(philips)(fr)" sha1="a97388c17f9655d201aad85de657bddd369d8e0a"/>
-		</diskarea>
-	</part>
-</software>
-
-<software name="alicein">
+<software name="alice">
 	<description>Alice in Wonderland (USA)</description>
 	<year>1992</year>
 	<publisher>Philips</publisher>
@@ -153,13 +142,24 @@
 	</part>
 </software>
 
-<software name="aliceinn">
+<software name="aliced" cloneof="alice">
 	<description>Alice in Wonderland (Ned)</description>
 	<year>1993</year>
 	<publisher>Philips</publisher>
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="alice in wonderland (1993)(philips)(nl)" sha1="3e9b0a04b219f1ed579003fd096b4a38ef80cfa8"/>
+		</diskarea>
+	</part>
+</software>
+
+<software name="alicef" cloneof="alice">
+	<description>Alice au Pays des Merveilles (Fra)</description>
+	<year>1992</year>
+	<publisher>Philips</publisher>
+	<part name="cdrom" interface="cdi_cdrom">
+		<diskarea name="cdrom">
+			<disk name="alice au pays des merveilles (1992)(philips)(fr)" sha1="a97388c17f9655d201aad85de657bddd369d8e0a"/>
 		</diskarea>
 	</part>
 </software>
@@ -175,7 +175,7 @@
 	</part>
 </software>
 
-<software name="archeonc">
+<software name="archeon">
 	<description>Archeon CD-i Quiz (Ned)</description>
 	<year>1994</year>
 	<publisher>Dutch Electronic Publishers</publisher>
@@ -186,7 +186,7 @@
 	</part>
 </software>
 
-<software name="asterixc">
+<software name="asterix">
 	<description>Asterix - Caesar's Challenge v3.9 (Euro)</description>
 	<year>1995</year>
 	<publisher>Pathe ~ Philips</publisher>
@@ -197,7 +197,7 @@
 	</part>
 </software>
 
-<software name="asterixn">
+<software name="asterixd" cloneof="asterix">
 	<description>Asterix - De Uitdaging Van Caesar v3.9 (Ned)</description>
 	<year>1995</year>
 	<publisher>Pathe ~ Philips</publisher>
@@ -208,7 +208,7 @@
 	</part>
 </software>
 
-<software name="asterixd">
+<software name="asterixg" cloneof="asterix">
 	<description>Asterix - Die Grosse Reise v3.9 (Ger)</description>
 	<year>1995</year>
 	<publisher>Pathe ~ Philips</publisher>
@@ -219,7 +219,7 @@
 	</part>
 </software>
 
-<software name="asterixe">
+<software name="asterixs" cloneof="asterix">
 	<description>Asterix - El Desafio de Cesar v3.9 (Spa)</description>
 	<year>1995</year>
 	<publisher>Pathe ~ Philips</publisher>
@@ -230,7 +230,7 @@
 	</part>
 </software>
 
-<software name="asterixi">
+<software name="asterixi" cloneof="asterix">
 	<description>Asterix - La Sfida di Cesare v3.9 (Ita)</description>
 	<year>1995</year>
 	<publisher>Pathe ~ Philips</publisher>
@@ -241,7 +241,7 @@
 	</part>
 </software>
 
-<software name="asterixl">
+<software name="asterixf" cloneof="asterix">
 	<description>Asterix - Le Defi de Cesar v3.9 (Fra)</description>
 	<year>1995</year>
 	<publisher>Pathe ~ Philips</publisher>
@@ -252,7 +252,7 @@
 	</part>
 </software>
 
-<software name="atlantis">
+<software name="atlantis" supported="no">
 	<description>Atlantis - The Last Resort v1.11 (Euro)[DVC]</description>
 	<year>1996</year>
 	<publisher>Philips</publisher>
@@ -263,7 +263,7 @@
 	</part>
 </software>
 
-<software name="axisanda">
+<software name="axisall">
 	<description>Axis and Allies (USA)</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
@@ -285,7 +285,7 @@
 	</part>
 </software>
 
-<software name="battlesh">
+<software name="bship">
 	<description>Battleship (Euro, USA)</description>
 	<year>1991</year>
 	<publisher>Philips</publisher>
@@ -296,7 +296,7 @@
 	</part>
 </software>
 
-<software name="braindea">
+<software name="bdead13" supported="no">
 	<description>Brain Dead 13 v1.07 (Euro)[DVC]</description>
 	<year>1997</year>
 	<publisher>Philips</publisher>
@@ -307,7 +307,7 @@
 	</part>
 </software>
 
-<software name="burncy">
+<software name="burncycl">
 	<description>BURN-CYCLE (Euro)</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
@@ -318,7 +318,7 @@
 	</part>
 </software>
 
-<software name="burncye">
+<software name="burncycls" cloneof="burncycl">
 	<description>BURN-CYCLE (Spa)</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
@@ -329,7 +329,7 @@
 	</part>
 </software>
 
-<software name="burncyg">
+<software name="burncyclg" cloneof="burncycl">
 	<description>BURN-CYCLE (Ger)</description>
 	<year>1995</year>
 	<publisher>Philips</publisher>
@@ -340,7 +340,7 @@
 	</part>
 </software>
 
-<software name="burncyi">
+<software name="burncycli" cloneof="burncycl">
 	<description>BURN-CYCLE (Ita)</description>
 	<year>1995</year>
 	<publisher>Philips</publisher>
@@ -351,7 +351,7 @@
 	</part>
 </software>
 
-<software name="burndemo">
+<software name="burncycld" cloneof="burncycl">
 	<description>BURN-CYCLE (Fra, Demo)</description>
 	<year>1995</year>
 	<publisher>Philips</publisher>
@@ -362,7 +362,7 @@
 	</part>
 </software>
 
-<software name="caebox">
+<software name="cboxing" supported="no">
 	<description>Caesars World of Boxing (Euro)[DVC]</description>
 	<year>1993</year>
 	<publisher>Philips</publisher>
@@ -373,7 +373,7 @@
 	</part>
 </software>
 
-<software name="caeboxu">
+<software name="cboxingu" cloneof="cboxing">
 	<description>Caesars World of Boxing (USA)[18621209 01]</description>
 	<year>1993</year>
 	<publisher>Philips</publisher>
@@ -384,7 +384,7 @@
 	</part>
 </software>
 
-<software name="caeboxua">
+<software name="cboxingua" cloneof="cboxing">
 	<description>Caesars World of Boxing (USA)[18621217 03]</description>
 	<year>1993</year>
 	<publisher>Philips</publisher>
@@ -395,7 +395,7 @@
 	</part>
 </software>
 
-<software name="caeboxue">
+<software name="cgambl">
 	<description>Caesars World of Gambling (Euro, USA)</description>
 	<year>1992</year>
 	<publisher>Philips</publisher>
@@ -417,7 +417,7 @@
 	</part>
 </software>
 
-<software name="cdshootu">
+<software name="cdshootu" cloneof="cdshoot">
 	<description>CD Shoot (USA)</description>
 	<year>1992</year>
 	<publisher>Philips</publisher>
@@ -428,7 +428,7 @@
 	</part>
 </software>
 
-<software name="centurio">
+<software name="centrion" supported="no">
 	<description>Centurion (Ned)[DVC]</description>
 	<year>1995</year>
 	<publisher>Philips</publisher>
@@ -439,18 +439,7 @@
 	</part>
 </software>
 
-<software name="chaoscg">
-	<description>Chaos Control v1.15 (Ger)[DVC]</description>
-	<year>1995</year>
-	<publisher>Philips</publisher>
-	<part name="cdrom" interface="cdi_cdrom">
-		<diskarea name="cdrom">
-			<disk name="chaos control v1.15 (1995)(philips)(de)[!][dvc]" sha1="a7d73fc368276e88efff52fbd4f2237b4fc92c00"/>
-		</diskarea>
-	</part>
-</software>
-
-<software name="chaosc">
+<software name="chaosc" supported="no">
 	<description>Chaos Control v1.15 (Euro)[DVC]</description>
 	<year>1995</year>
 	<publisher>Philips</publisher>
@@ -461,7 +450,7 @@
 	</part>
 </software>
 
-<software name="chaoscf">
+<software name="chaoscf" cloneof="chaosc" supported="no">
 	<description>Chaos Control v1.15 (Fra)[DVC]</description>
 	<year>1995</year>
 	<publisher>Philips</publisher>
@@ -472,7 +461,18 @@
 	</part>
 </software>
 
-<software name="chaoscu">
+<software name="chaoscg" cloneof="chaosc" supported="no">
+	<description>Chaos Control v1.15 (Ger)[DVC]</description>
+	<year>1995</year>
+	<publisher>Philips</publisher>
+	<part name="cdrom" interface="cdi_cdrom">
+		<diskarea name="cdrom">
+			<disk name="chaos control v1.15 (1995)(philips)(de)[!][dvc]" sha1="a7d73fc368276e88efff52fbd4f2237b4fc92c00"/>
+		</diskarea>
+	</part>
+</software>
+
+<software name="chaoscu" cloneof="chaosc" supported="no">
 	<description>Chaos Control v1.15 (USA)[DVC]</description>
 	<year>1995</year>
 	<publisher>Philips</publisher>
@@ -483,7 +483,7 @@
 	</part>
 </software>
 
-<software name="christma">
+<software name="xmasctry" supported="no">
 	<description>Christmas Country (Euro)[DVC]</description>
 	<year>1996</year>
 	<publisher>Creative Media</publisher>
@@ -494,7 +494,7 @@
 	</part>
 </software>
 
-<software name="christmo">
+<software name="xmascris" supported="no">
 	<description>Christmas Crisis (Euro)[DVC]</description>
 	<year>1995</year>
 	<publisher>DIMA ~ Philips</publisher>
@@ -505,18 +505,7 @@
 	</part>
 </software>
 
-<software name="clue1994">
-	<description>Clue (USA)[DVC]</description>
-	<year>1994</year>
-	<publisher>Philips</publisher>
-	<part name="cdrom" interface="cdi_cdrom">
-		<diskarea name="cdrom">
-			<disk name="clue (1994)(philips)(us)[dvc]" sha1="119a042e7dcd52e367fdc0ff6dec3952bfa6d61d"/>
-		</diskarea>
-	</part>
-</software>
-
-<software name="cluedo19">
+<software name="cluedo" supported="no">
 	<description>Cluedo (Euro)[DVC]</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
@@ -527,7 +516,18 @@
 	</part>
 </software>
 
-<software name="cluedoth">
+<software name="clue" cloneof="cluedo" supported="no">
+	<description>Clue (USA)[DVC]</description>
+	<year>1994</year>
+	<publisher>Philips</publisher>
+	<part name="cdrom" interface="cdi_cdrom">
+		<diskarea name="cdrom">
+			<disk name="clue (1994)(philips)(us)[dvc]" sha1="119a042e7dcd52e367fdc0ff6dec3952bfa6d61d"/>
+		</diskarea>
+	</part>
+</software>
+
+<software name="cluedo2" supported="no">
 	<description>Cluedo - The Mysteries Continue (Euro)[DVC]</description>
 	<year>1995</year>
 	<publisher>Philips</publisher>
@@ -538,7 +538,7 @@
 	</part>
 </software>
 
-<software name="connectf">
+<software name="connect4">
 	<description>Connect Four v1 (Euro, USA)</description>
 	<year>1991</year>
 	<publisher>Philips</publisher>
@@ -549,7 +549,7 @@
 	</part>
 </software>
 
-<software name="creatur1">
+<software name="crtshock" supported="no">
 	<description>Creature Shock (Euro)[DVC]</description>
 	<year>1996</year>
 	<publisher>Philips ~ Virgin</publisher>
@@ -565,7 +565,7 @@
 	</part>
 </software>
 
-<software name="darkcast">
+<software name="darkcstl">
 	<description>Dark Castle (Euro, USA)</description>
 	<year>1992</year>
 	<publisher>Philips</publisher>
@@ -598,7 +598,7 @@
 	</part>
 </software>
 
-<software name="dominohe">
+<software name="domino">
 	<description>Domino - Het Oudste Spel, Het Nieuwste Medium (Ned)</description>
 	<year>1997</year>
 	<publisher>Haarlems Uitgeef Bedrijf</publisher>
@@ -609,7 +609,7 @@
 	</part>
 </software>
 
-<software name="dlair">
+<software name="dlair" supported="no">
 	<description>Dragon's Lair (Euro)[DVC]</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
@@ -620,7 +620,7 @@
 	</part>
 </software>
 
-<software name="dlairu">
+<software name="dlairu" cloneof="dlair" supported="no">
 	<description>Dragon's Lair (USA)[DVC]</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
@@ -642,7 +642,7 @@
 	</part>
 </software>
 
-<software name="dlair2u">
+<software name="dlair2u" cloneof="dlair2" supported="no">
 	<description>Dragon's Lair II - Time Warp (USA)[DVC][13920805 02]</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
@@ -653,7 +653,7 @@
 	</part>
 </software>
 
-<software name="dlair2uo">
+<software name="dlair2ua" cloneof="dlair2" supported="no">
 	<description>Dragon's Lair II - Time Warp (USA)[DVC][13920805 01]</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
@@ -664,35 +664,13 @@
 	</part>
 </software>
 
-<software name="drugwars">
+<software name="drugwars" supported="no">
 	<description>Drug Wars (Euro)[DVC]</description>
 	<year>1996</year>
 	<publisher>Philips</publisher>
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="drug wars (1996)(philips)(eu)[dvc]" sha1="e54420063121466529348630145dbb75f524a92b"/>
-		</diskarea>
-	</part>
-</software>
-
-<software name="earthcn">
-	<description>Earth Command - De Toekomst van de Wereld Ligt in Jouw Handen v1.05 (Ned)</description>
-	<year>1994</year>
-	<publisher>Philips</publisher>
-	<part name="cdrom" interface="cdi_cdrom">
-		<diskarea name="cdrom">
-			<disk name="earth command - de toekomst van de wereld ligt in jouw handen v1.05 (1994)(philips)(nl)[!]" sha1="cfd569efec5c5962269a748e3c76221583fd96ad"/>
-		</diskarea>
-	</part>
-</software>
-
-<software name="earthcd">
-	<description>Earth Command - Die Zukunft Unserer welt Liegt in Ihrer Hand v1.05 (Ger)</description>
-	<year>1994</year>
-	<publisher>Philips</publisher>
-	<part name="cdrom" interface="cdi_cdrom">
-		<diskarea name="cdrom">
-			<disk name="earth command - die zukunft unserer welt liegt in ihrer hand v1.05 (1994)(philips)(de)[!]" sha1="8f4b8205bf95c55dee468099eeb0170f99c3cf80"/>
 		</diskarea>
 	</part>
 </software>
@@ -708,7 +686,29 @@
 	</part>
 </software>
 
-<software name="earthcu">
+<software name="earthcd" cloneof="earthc">
+	<description>Earth Command - De Toekomst van de Wereld Ligt in Jouw Handen v1.05 (Ned)</description>
+	<year>1994</year>
+	<publisher>Philips</publisher>
+	<part name="cdrom" interface="cdi_cdrom">
+		<diskarea name="cdrom">
+			<disk name="earth command - de toekomst van de wereld ligt in jouw handen v1.05 (1994)(philips)(nl)[!]" sha1="cfd569efec5c5962269a748e3c76221583fd96ad"/>
+		</diskarea>
+	</part>
+</software>
+
+<software name="earthcg" cloneof="earthc">
+	<description>Earth Command - Die Zukunft Unserer welt Liegt in Ihrer Hand v1.05 (Ger)</description>
+	<year>1994</year>
+	<publisher>Philips</publisher>
+	<part name="cdrom" interface="cdi_cdrom">
+		<diskarea name="cdrom">
+			<disk name="earth command - die zukunft unserer welt liegt in ihrer hand v1.05 (1994)(philips)(de)[!]" sha1="8f4b8205bf95c55dee468099eeb0170f99c3cf80"/>
+		</diskarea>
+	</part>
+</software>
+
+<software name="earthcu" cloneof="earthc">
 	<description>Earth Command - The Future of Our World is in Your Hands v1.05 (USA)</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
@@ -719,7 +719,7 @@
 	</part>
 </software>
 
-<software name="earthcf">
+<software name="earthcf" cloneof="earthc">
 	<description>Earth Command v1.05 (Fra)</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
@@ -730,7 +730,7 @@
 	</part>
 </software>
 
-<software name="effacerh">
+<software name="effacer">
 	<description>Effacer - Hangman of the 25th Century (USA)</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
@@ -741,7 +741,7 @@
 	</part>
 </software>
 
-<software name="escapefr">
+<software name="cybrcity">
 	<description>Escape from CyberCity (Euro, USA)</description>
 	<year>1992</year>
 	<publisher>Philips</publisher>
@@ -752,7 +752,7 @@
 	</part>
 </software>
 
-<software name="family">
+<software name="familyg1">
 	<description>Family Games I (Euro)</description>
 	<year>1995</year>
 	<publisher>Philips</publisher>
@@ -763,7 +763,7 @@
 	</part>
 </software>
 
-<software name="family2">
+<software name="familyg2">
 	<description>Family Games II - Junk Food Jive (Euro)</description>
 	<year>1995</year>
 	<publisher>Philips</publisher>
@@ -774,7 +774,7 @@
 	</part>
 </software>
 
-<software name="flashbac">
+<software name="flashb">
 	<description>Flashback (Euro)</description>
 	<year>1995</year>
 	<publisher>Philips</publisher>
@@ -785,7 +785,7 @@
 	</part>
 </software>
 
-<software name="girlsclu">
+<software name="girlclub">
 	<description>Girl's Club - The Fantasy Dating Game (USA)</description>
 	<year>1993</year>
 	<publisher>Philips</publisher>
@@ -796,7 +796,7 @@
 	</part>
 </software>
 
-<software name="golden">
+<software name="golden1">
 	<description>Golden Oldies I (Euro)</description>
 	<year>1997</year>
 	<publisher>SPC Vision</publisher>
@@ -818,7 +818,7 @@
 	</part>
 </software>
 
-<software name="guignols">
+<software name="guignols" supported="no">
 	<description>Les Guignols de l'Info - Le Jeu! (Fra)[DVC]</description>
 	<year>1996</year>
 	<publisher>CANAL+ ~ Philips</publisher>
@@ -829,7 +829,7 @@
 	</part>
 </software>
 
-<software name="hierogly">
+<software name="hierog">
 	<description>Hieroglyph (Ger)</description>
 	<year>1994</year>
 	<publisher>ZYX-Music</publisher>
@@ -840,7 +840,7 @@
 	</part>
 </software>
 
-<software name="hotelm">
+<software name="hotmario">
 	<description>Hotel Mario (Euro)</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
@@ -851,7 +851,7 @@
 	</part>
 </software>
 
-<software name="hotelmu">
+<software name="hotmariou" cloneof="hotmario">
 	<description>Hotel Mario (USA)</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
@@ -873,7 +873,7 @@
 	</part>
 </software>
 
-<software name="incaa">
+<software name="incaa" cloneof="inca">
 	<description>Inca (Euro)[FPD Testing - Phase 1]</description>
 	<year>1993</year>
 	<publisher>Coktel Vision ~ Philips</publisher>
@@ -884,7 +884,7 @@
 	</part>
 </software>
 
-<software name="incab">
+<software name="incab" cloneof="inca">
 	<description>Inca (Euro)[8100126V206 50399445 01]</description>
 	<year>1994</year>
 	<publisher>Coktel Vision ~ Philips</publisher>
@@ -895,7 +895,7 @@
 	</part>
 </software>
 
-<software name="incac">
+<software name="incac" cloneof="inca">
 	<description>Inca (Euro)</description>
 	<year>1994</year>
 	<publisher>Coktel Vision ~ Philips</publisher>
@@ -906,7 +906,7 @@
 	</part>
 </software>
 
-<software name="intenn">
+<software name="tennisop">
 	<description>International Tennis Open (Euro, USA)</description>
 	<year>1993</year>
 	<publisher>Pathe ~ Philips</publisher>
@@ -917,7 +917,7 @@
 	</part>
 </software>
 
-<software name="intenns">
+<software name="tennisops" cloneof="tennisop">
 	<description>International Tennis Open v2.01 (Spa)</description>
 	<year>1993</year>
 	<publisher>Pathe ~ Philips</publisher>
@@ -928,7 +928,7 @@
 	</part>
 </software>
 
-<software name="intenng">
+<software name="tennisopg" cloneof="tennisop">
 	<description>International Tennis Open v3.01 (Ger)</description>
 	<year>1993</year>
 	<publisher>Pathe ~ Philips</publisher>
@@ -939,7 +939,7 @@
 	</part>
 </software>
 
-<software name="intenng2">
+<software name="tennisopg2" cloneof="tennisop">
 	<description>International Tennis Open v3.01 (Ger)[2 players]</description>
 	<year>1994</year>
 	<publisher>Pathe ~ Philips</publisher>
@@ -950,7 +950,7 @@
 	</part>
 </software>
 
-<software name="intenni2">
+<software name="tennisopi2" cloneof="tennisop">
 	<description>International Tennis Open v1.01 (Ita)[2 players]</description>
 	<year>1994</year>
 	<publisher>Pathe ~ Philips</publisher>
@@ -961,7 +961,7 @@
 	</part>
 </software>
 
-<software name="intennf">
+<software name="tennisop2" cloneof="tennisop">
 	<description>International Tennis Open v3.03 (Euro)[2 players]</description>
 	<year>1994</year>
 	<publisher>Pathe ~ Philips</publisher>
@@ -972,7 +972,7 @@
 	</part>
 </software>
 
-<software name="intennu">
+<software name="tennisopu" cloneof="tennisop">
 	<description>International Tennis Open v3.03 (USA)[2 players]</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
@@ -994,7 +994,7 @@
 	</part>
 </software>
 
-<software name="jigsawth">
+<software name="jigsaw">
 	<description>Jigsaw - The Ultimate Electronic Challenge (USA)</description>
 	<year>1992</year>
 	<publisher>Philips</publisher>
@@ -1016,35 +1016,13 @@
 	</part>
 </software>
 
-<software name="jokerswi">
+<software name="jokers">
 	<description>The Joker's Wild! (USA)</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="joker's wild!, the (1994)(philips)(us)[!]" sha1="a5609953241b49d64bfdfd671edfdffc93b4b3dd"/>
-		</diskarea>
-	</part>
-</software>
-
-<software name="ketherdo">
-	<description>Kether v3.08 (Ger)</description>
-	<year>1993</year>
-	<publisher>Philips</publisher>
-	<part name="cdrom" interface="cdi_cdrom">
-		<diskarea name="cdrom">
-			<disk name="kether v3.08 (1993)(philips)(de)(en-de)" sha1="c49f476b2dd23449937b56f93c19663364017ea3"/>
-		</diskarea>
-	</part>
-</software>
-
-<software name="ketherd">
-	<description>Kether v3.11 (Ger)</description>
-	<year>1994</year>
-	<publisher>Philips</publisher>
-	<part name="cdrom" interface="cdi_cdrom">
-		<diskarea name="cdrom">
-			<disk name="kether v3.11 (1994)(philips)(de)(en-de)[!]" sha1="4c3eb8713f7cfcca271d711ec493f822170b06d3"/>
 		</diskarea>
 	</part>
 </software>
@@ -1060,7 +1038,7 @@
 	</part>
 </software>
 
-<software name="kethero">
+<software name="kethero" cloneof="kether">
 	<description>Kether v3.09 (Euro)</description>
 	<year>1993</year>
 	<publisher>Philips</publisher>
@@ -1071,7 +1049,7 @@
 	</part>
 </software>
 
-<software name="ketheroa">
+<software name="ketheroa" cloneof="kether">
 	<description>Kether v3.09 (Euro, Alt)</description>
 	<year>1993</year>
 	<publisher>Philips</publisher>
@@ -1082,18 +1060,7 @@
 	</part>
 </software>
 
-<software name="ketheru">
-	<description>Kether v3.11 (USA)</description>
-	<year>1994</year>
-	<publisher>Philips</publisher>
-	<part name="cdrom" interface="cdi_cdrom">
-		<diskarea name="cdrom">
-			<disk name="kether v3.11 (1994)(philips)(us)(en-fr)" sha1="96bb5d15f5fef4e63a649c31c026b085f4d01f3f"/>
-		</diskarea>
-	</part>
-</software>
-
-<software name="kethern">
+<software name="ketherd" cloneof="kether">
 	<description>Kether v3.12 (Ned)</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
@@ -1104,7 +1071,40 @@
 	</part>
 </software>
 
-<software name="kingdoms">
+<software name="kethergo" cloneof="kether">
+	<description>Kether v3.08 (Ger)</description>
+	<year>1993</year>
+	<publisher>Philips</publisher>
+	<part name="cdrom" interface="cdi_cdrom">
+		<diskarea name="cdrom">
+			<disk name="kether v3.08 (1993)(philips)(de)(en-de)" sha1="c49f476b2dd23449937b56f93c19663364017ea3"/>
+		</diskarea>
+	</part>
+</software>
+
+<software name="ketherg" cloneof="kether">
+	<description>Kether v3.11 (Ger)</description>
+	<year>1994</year>
+	<publisher>Philips</publisher>
+	<part name="cdrom" interface="cdi_cdrom">
+		<diskarea name="cdrom">
+			<disk name="kether v3.11 (1994)(philips)(de)(en-de)[!]" sha1="4c3eb8713f7cfcca271d711ec493f822170b06d3"/>
+		</diskarea>
+	</part>
+</software>
+
+<software name="ketheru" cloneof="kether">
+	<description>Kether v3.11 (USA)</description>
+	<year>1994</year>
+	<publisher>Philips</publisher>
+	<part name="cdrom" interface="cdi_cdrom">
+		<diskarea name="cdrom">
+			<disk name="kether v3.11 (1994)(philips)(us)(en-fr)" sha1="96bb5d15f5fef4e63a649c31c026b085f4d01f3f"/>
+		</diskarea>
+	</part>
+</software>
+
+<software name="kingdom" supported="no">
 	<description>Kingdom - Shadoan (Euro)[DVC]</description>
 	<year>1996</year>
 	<publisher>Philips</publisher>
@@ -1115,7 +1115,7 @@
 	</part>
 </software>
 
-<software name="kingdomt">
+<software name="kingdomu" cloneof="kingdom" supported="no">
 	<description>Kingdom - The Far Reaches (USA)[DVC]</description>
 	<year>1995</year>
 	<publisher>Philips</publisher>
@@ -1126,7 +1126,7 @@
 	</part>
 </software>
 
-<software name="langeetl">
+<software name="angedemn">
 	<description>L'Ange et le Demon (Fra)</description>
 	<year>1993</year>
 	<publisher>Philips</publisher>
@@ -1137,7 +1137,7 @@
 	</part>
 </software>
 
-<software name="labyrint">
+<software name="labyrint" supported="no">
 	<description>Labyrinth of Crete (Euro)[DVC]</description>
 	<year>1995</year>
 	<publisher>Philips</publisher>
@@ -1148,7 +1148,7 @@
 	</part>
 </software>
 
-<software name="laserlor">
+<software name="lasrlord">
 	<description>Laser Lords (USA)[07420911 01]</description>
 	<year>1992</year>
 	<publisher>Philips</publisher>
@@ -1159,7 +1159,7 @@
 	</part>
 </software>
 
-<software name="laserloa">
+<software name="lasrlorda" cloneof="lasrlord">
 	<description>Laser Lords (USA)[3106900742 50273 097 01]</description>
 	<year>1992</year>
 	<publisher>Philips</publisher>
@@ -1192,7 +1192,7 @@
 	</part>
 </software>
 
-<software name="lingov10">
+<software name="lingo">
 	<description>Lingo v1.07 (Ned)</description>
 	<year>1995</year>
 	<publisher>Philips</publisher>
@@ -1203,29 +1203,7 @@
 	</part>
 </software>
 
-<software name="linkfcen">
-	<description>Link - De Gezichten Van Het Kwaad (Ned)</description>
-	<year>1993</year>
-	<publisher>Philips</publisher>
-	<part name="cdrom" interface="cdi_cdrom">
-		<diskarea name="cdrom">
-			<disk name="link - de gezichten van het kwaad (1993)(philips)(nl)[!]" sha1="ecd2a331b4cd33972a924b43f696774756aad378"/>
-		</diskarea>
-	</part>
-</software>
-
-<software name="linkfceg">
-	<description>Link - Die Fratzen des Boesen (Ger)</description>
-	<year>1993</year>
-	<publisher>Philips</publisher>
-	<part name="cdrom" interface="cdi_cdrom">
-		<diskarea name="cdrom">
-			<disk name="link - die fratzen des boesen (1993)(philips)(de)[!]" sha1="3ad711cd1f5a7768a74dc608b5e4381115053d57"/>
-		</diskarea>
-	</part>
-</software>
-
-<software name="linkfce">
+<software name="linkfoe">
 	<description>Link - The Faces of Evil (Euro)</description>
 	<year>1993</year>
 	<publisher>Philips</publisher>
@@ -1236,7 +1214,7 @@
 	</part>
 </software>
 
-<software name="linkfcef">
+<software name="linkfoef" cloneof="linkfoe">
 	<description>Link - The Faces of Evil (Fra)</description>
 	<year>1993</year>
 	<publisher>Philips</publisher>
@@ -1247,7 +1225,29 @@
 	</part>
 </software>
 
-<software name="litildv">
+<software name="linkfoed" cloneof="linkfoe">
+	<description>Link - De Gezichten Van Het Kwaad (Ned)</description>
+	<year>1993</year>
+	<publisher>Philips</publisher>
+	<part name="cdrom" interface="cdi_cdrom">
+		<diskarea name="cdrom">
+			<disk name="link - de gezichten van het kwaad (1993)(philips)(nl)[!]" sha1="ecd2a331b4cd33972a924b43f696774756aad378"/>
+		</diskarea>
+	</part>
+</software>
+
+<software name="linkfoeg" cloneof="linkfoe">
+	<description>Link - Die Fratzen des Boesen (Ger)</description>
+	<year>1993</year>
+	<publisher>Philips</publisher>
+	<part name="cdrom" interface="cdi_cdrom">
+		<diskarea name="cdrom">
+			<disk name="link - die fratzen des boesen (1993)(philips)(de)[!]" sha1="3ad711cd1f5a7768a74dc608b5e4381115053d57"/>
+		</diskarea>
+	</part>
+</software>
+
+<software name="litildvl" supported="no">
 	<description>Litil Divil (Euro)[DVC]</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
@@ -1258,7 +1258,7 @@
 	</part>
 </software>
 
-<software name="litildvu">
+<software name="litildvlu" cloneof="litildvl" supported="no">
 	<description>Litil Divil (USA)[DVC]</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
@@ -1269,7 +1269,7 @@
 	</part>
 </software>
 
-<software name="lordsoft">
+<software name="lordrsun">
 	<description>Lords of the Rising Sun (USA)</description>
 	<year>1992</year>
 	<publisher>Philips</publisher>
@@ -1280,18 +1280,7 @@
 	</part>
 </software>
 
-<software name="lostedng">
-	<description>Lost Eden (Ger)[DVC]</description>
-	<year>1995</year>
-	<publisher>Philips</publisher>
-	<part name="cdrom" interface="cdi_cdrom">
-		<diskarea name="cdrom">
-			<disk name="lost eden (1995)(philips)(de)[!][dvc]" sha1="099652b449a96190dd54c5b990bc467c4dc8b73d"/>
-		</diskarea>
-	</part>
-</software>
-
-<software name="losteden">
+<software name="losteden" supported="no">
 	<description>Lost Eden (Euro)[DVC]</description>
 	<year>1995</year>
 	<publisher>Philips</publisher>
@@ -1302,7 +1291,18 @@
 	</part>
 </software>
 
-<software name="lostednn">
+<software name="lostedeng" cloneof="losteden" supported="no">
+	<description>Lost Eden (Ger)[DVC]</description>
+	<year>1995</year>
+	<publisher>Philips</publisher>
+	<part name="cdrom" interface="cdi_cdrom">
+		<diskarea name="cdrom">
+			<disk name="lost eden (1995)(philips)(de)[!][dvc]" sha1="099652b449a96190dd54c5b990bc467c4dc8b73d"/>
+		</diskarea>
+	</part>
+</software>
+
+<software name="lostedend" cloneof="losteden" supported="no">
 	<description>Lost Eden (Ned)[DVC]</description>
 	<year>1995</year>
 	<publisher>Philips</publisher>
@@ -1313,7 +1313,7 @@
 	</part>
 </software>
 
-<software name="lostride">
+<software name="lostride" supported="no">
 	<description>The Lost Ride (Euro)[DVC]</description>
 	<year>1998</year>
 	<publisher>Philips</publisher>
@@ -1324,18 +1324,7 @@
 	</part>
 </software>
 
-<software name="maddog2l">
-	<description>Mad Dog 2 - Le Tresor Perdu (Fra)[DVC]</description>
-	<year>1996</year>
-	<publisher>Philips</publisher>
-	<part name="cdrom" interface="cdi_cdrom">
-		<diskarea name="cdrom">
-			<disk name="mad dog 2 - le tresor perdu (1996)(philips)(fr)[dvc]" sha1="1b5596d3da6da191614fafca36b4f9d7ce116904"/>
-		</diskarea>
-	</part>
-</software>
-
-<software name="maddogii">
+<software name="maddog2" supported="no">
 	<description>Mad Dog II - The Lost Gold (Euro)[DVC]</description>
 	<year>1995</year>
 	<publisher>Philips</publisher>
@@ -1346,7 +1335,18 @@
 	</part>
 </software>
 
-<software name="maddog">
+<software name="maddog2f" cloneof="maddog2" supported="no">
+	<description>Mad Dog 2 - Le Tresor Perdu (Fra)[DVC]</description>
+	<year>1996</year>
+	<publisher>Philips</publisher>
+	<part name="cdrom" interface="cdi_cdrom">
+		<diskarea name="cdrom">
+			<disk name="mad dog 2 - le tresor perdu (1996)(philips)(fr)[dvc]" sha1="1b5596d3da6da191614fafca36b4f9d7ce116904"/>
+		</diskarea>
+	</part>
+</software>
+
+<software name="maddog" supported="no">
 	<description>Mad Dog McCree (Euro)[DVC]</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
@@ -1357,7 +1357,7 @@
 	</part>
 </software>
 
-<software name="maddogu">
+<software name="maddogu" cloneof="maddog" supported="no">
 	<description>Mad Dog McCree (USA)[DVC][05820818 N01]</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
@@ -1368,7 +1368,7 @@
 	</part>
 </software>
 
-<software name="maddogua">
+<software name="maddogua" cloneof="maddog" supported="no">
 	<description>Mad Dog McCree (USA)[DVC][05820826 01]</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
@@ -1390,7 +1390,7 @@
 	</part>
 </software>
 
-<software name="makingth">
+<software name="makingrd" supported="no">
 	<description>Making the Grade v0.90 (Euro, Pre-Release)[DVC]</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
@@ -1401,7 +1401,7 @@
 	</part>
 </software>
 
-<software name="marcop1">
+<software name="marcpolo">
 	<description>Marco Polo (Euro)</description>
 	<year>1995</year>
 	<publisher>Philips</publisher>
@@ -1419,7 +1419,7 @@
 	</part>
 </software>
 
-<software name="marcopf1">
+<software name="marcpolof" cloneof="marcpolo">
 	<description>Marco Polo (Fra)</description>
 	<year>1995</year>
 	<publisher>Philips</publisher>
@@ -1437,7 +1437,7 @@
 	</part>
 </software>
 
-<software name="masterla">
+<software name="mlabyrnt" supported="no">
 	<description>Master Labyrinth v1.06 (Euro)[DVC]</description>
 	<year>1995</year>
 	<publisher>Pack-In Video</publisher>
@@ -1459,7 +1459,7 @@
 	</part>
 </software>
 
-<software name="megamazu">
+<software name="megamazeu" cloneof="megamaze">
 	<description>Mega Maze v1.06 (USA)</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
@@ -1470,7 +1470,7 @@
 	</part>
 </software>
 
-<software name="merlinso">
+<software name="merlinapo" cloneof="merlinap">
 	<description>Merlin's Apprentice v1.1 (Euro)</description>
 	<year>1995</year>
 	<publisher>Philips</publisher>
@@ -1481,7 +1481,7 @@
 	</part>
 </software>
 
-<software name="merlins">
+<software name="merlinap">
 	<description>Merlin's Apprentice v1.2 (USA)</description>
 	<year>1995</year>
 	<publisher>Philips</publisher>
@@ -1503,7 +1503,7 @@
 	</part>
 </software>
 
-<software name="micromad">
+<software name="micromacd" cloneof="micromac">
 	<description>Micro Machines (Euro, Demo)</description>
 	<year>1995</year>
 	<publisher>Philips</publisher>
@@ -1514,7 +1514,7 @@
 	</part>
 </software>
 
-<software name="mutantra">
+<software name="mutntrap" supported="no">
 	<description>Mutant Rampage - Bodyslam (Euro)[DVC]</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
@@ -1525,7 +1525,7 @@
 	</part>
 </software>
 
-<software name="mutantru">
+<software name="mutntrapu" cloneof="mutntrap" supported="no">
 	<description>Mutant Rampage - Bodyslam (USA)[DVC]</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
@@ -1547,7 +1547,7 @@
 	</part>
 </software>
 
-<software name="mmpe">
+<software name="mystmidw">
 	<description>Mystic Midway - Phantom Express (Euro)</description>
 	<year>1993</year>
 	<publisher>Philips</publisher>
@@ -1558,7 +1558,7 @@
 	</part>
 </software>
 
-<software name="mmrip">
+<software name="mystmidwu" cloneof="mystmidw">
 	<description>Mystic Midway - Rest in Pieces (Euro, USA)</description>
 	<year>1992</year>
 	<publisher>Philips</publisher>
@@ -1569,7 +1569,7 @@
 	</part>
 </software>
 
-<software name="mmripj">
+<software name="mystmidwj" cloneof="mystmidw">
 	<description>Mystic Midway - Rest in Pieces (JP)</description>
 	<year>1992</year>
 	<publisher>Philips</publisher>
@@ -1591,7 +1591,7 @@
 	</part>
 </software>
 
-<software name="nflfootb">
+<software name="nfltriv">
 	<description>NFL Football Trivia Challenge (USA)</description>
 	<year>1993</year>
 	<publisher>Philips</publisher>
@@ -1602,7 +1602,7 @@
 	</part>
 </software>
 
-<software name="nflhallo">
+<software name="nflhoff" supported="no">
 	<description>NFL Hall of Fame Football (Euro)[DVC]</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
@@ -1635,7 +1635,7 @@
 	</part>
 </software>
 
-<software name="palm">
+<software name="palmsprg">
 	<description>The Palm Springs Open (Euro, USA)</description>
 	<year>1991</year>
 	<publisher>Philips</publisher>
@@ -1646,7 +1646,7 @@
 	</part>
 </software>
 
-<software name="palmg">
+<software name="palmsprgg" cloneof="palmsprg">
 	<description>Die Palm Springs Open (Ger)</description>
 	<year>1992</year>
 	<publisher>Philips</publisher>
@@ -1657,7 +1657,7 @@
 	</part>
 </software>
 
-<software name="lopendep">
+<software name="palmsprgf" cloneof="palmsprg">
 	<description>L'Open de Palm Springs (Fra)</description>
 	<year>1992</year>
 	<publisher>Philips</publisher>
@@ -1668,24 +1668,24 @@
 	</part>
 </software>
 
-<software name="palmu">
-	<description>The Palm Springs Open (USA)</description>
-	<year>1991</year>
-	<publisher>Philips</publisher>
-	<part name="cdrom" interface="cdi_cdrom">
-		<diskarea name="cdrom">
-			<disk name="palm springs open, the (1991)(philips)(us)[!]" sha1="6d43807b55ad663c4db44aca2dd527be2b63d374"/>
-		</diskarea>
-	</part>
-</software>
-
-<software name="palmi">
+<software name="palmsprgi" cloneof="palmsprg">
 	<description>The Palm Springs Open (Ita)</description>
 	<year>1992</year>
 	<publisher>Philips</publisher>
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="palm springs open, the (1992)(philips)(it)" sha1="95bad384f658714cb64e23b53bb1a52c10711a12"/>
+		</diskarea>
+	</part>
+</software>
+
+<software name="palmsprgu" cloneof="palmsprg">
+	<description>The Palm Springs Open (USA)</description>
+	<year>1991</year>
+	<publisher>Philips</publisher>
+	<part name="cdrom" interface="cdi_cdrom">
+		<diskarea name="cdrom">
+			<disk name="palm springs open, the (1991)(philips)(us)[!]" sha1="6d43807b55ad663c4db44aca2dd527be2b63d374"/>
 		</diskarea>
 	</part>
 </software>
@@ -1701,7 +1701,7 @@
 	</part>
 </software>
 
-<software name="pinballa">
+<software name="pinballa" cloneof="pinball">
 	<description>Pinball (USA)[3106900342 50238 037 04]</description>
 	<year>1992</year>
 	<publisher>Philips</publisher>
@@ -1712,7 +1712,7 @@
 	</part>
 </software>
 
-<software name="powerh">
+<software name="powerhit">
 	<description>Power Hitter (Euro)</description>
 	<year>1992</year>
 	<publisher>Philips</publisher>
@@ -1723,7 +1723,7 @@
 	</part>
 </software>
 
-<software name="powerhu">
+<software name="powerhitu" cloneof="powerhit">
 	<description>Power Hitter (USA)[08120804 01]</description>
 	<year>1993</year>
 	<publisher>Philips</publisher>
@@ -1734,7 +1734,7 @@
 	</part>
 </software>
 
-<software name="powerhua">
+<software name="powerhitua" cloneof="powerhit">
 	<description>Power Hitter (USA)[08120908 01]</description>
 	<year>1993</year>
 	<publisher>Philips</publisher>
@@ -1745,7 +1745,7 @@
 	</part>
 </software>
 
-<software name="riseofth">
+<software name="riserobo" supported="no">
 	<description>Rise of the Robots (Euro)[DVC]</description>
 	<year>1995</year>
 	<publisher>Philips</publisher>
@@ -1767,24 +1767,13 @@
 	</part>
 </software>
 
-<software name="sargona">
+<software name="sargona" cloneof="sargon">
 	<description>Sargon Chess (USA)[03020320 01]</description>
 	<year>1992</year>
 	<publisher>Philips</publisher>
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="sargon chess (1992)(philips)(us)[03020320 01]" sha1="5b5eb50c1df41bece49225663476db67a8954c50"/>
-		</diskarea>
-	</part>
-</software>
-
-<software name="scotlanf">
-	<description>Scotland Yard - Interactif v1.04 (Fra)</description>
-	<year>1994</year>
-	<publisher>Philips</publisher>
-	<part name="cdrom" interface="cdi_cdrom">
-		<diskarea name="cdrom">
-			<disk name="scotland yard - interactif v1.04 (1994)(philips)(fr)" sha1="5ea998ca2917f88b1a1a40ea7cc5d7e133d51745"/>
 		</diskarea>
 	</part>
 </software>
@@ -1800,24 +1789,24 @@
 	</part>
 </software>
 
-<software name="scotlang">
+<software name="scotlandf" cloneof="scotland">
+	<description>Scotland Yard - Interactif v1.04 (Fra)</description>
+	<year>1994</year>
+	<publisher>Philips</publisher>
+	<part name="cdrom" interface="cdi_cdrom">
+		<diskarea name="cdrom">
+			<disk name="scotland yard - interactif v1.04 (1994)(philips)(fr)" sha1="5ea998ca2917f88b1a1a40ea7cc5d7e133d51745"/>
+		</diskarea>
+	</part>
+</software>
+
+<software name="scotlang" cloneof="scotland">
 	<description>Scotland Yard - Interactive v1.09 (Ger)</description>
 	<year>1993</year>
 	<publisher>Philips</publisher>
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="scotland yard - interactive v1.09 (1993)(philips)(de)[!]" sha1="b2d75c0cfa6e352638efa7a7e296dfc7d0780a67"/>
-		</diskarea>
-	</part>
-</software>
-
-<software name="secretmg">
-	<description>Secret Mission v1.03 (Ger)</description>
-	<year>1996</year>
-	<publisher>Philips</publisher>
-	<part name="cdrom" interface="cdi_cdrom">
-		<diskarea name="cdrom">
-			<disk name="secret mission v1.03 (1996)(philips)(de)" sha1="e8824c6263f5efc9ea14a4b15a33d459192b8333"/>
 		</diskarea>
 	</part>
 </software>
@@ -1833,7 +1822,18 @@
 	</part>
 </software>
 
-<software name="secretmn">
+<software name="secretmg" cloneof="secretm">
+	<description>Secret Mission v1.03 (Ger)</description>
+	<year>1996</year>
+	<publisher>Philips</publisher>
+	<part name="cdrom" interface="cdi_cdrom">
+		<diskarea name="cdrom">
+			<disk name="secret mission v1.03 (1996)(philips)(de)" sha1="e8824c6263f5efc9ea14a4b15a33d459192b8333"/>
+		</diskarea>
+	</part>
+</software>
+
+<software name="secretmd" cloneof="secretm">
 	<description>Secret Mission v1.03 (Ned)</description>
 	<year>1996</year>
 	<publisher>Philips</publisher>
@@ -1844,7 +1844,7 @@
 	</part>
 </software>
 
-<software name="shaolins">
+<software name="shaolin">
 	<description>Shaolin's Road (Euro)</description>
 	<year>1995</year>
 	<publisher>Philips</publisher>
@@ -1855,7 +1855,7 @@
 	</part>
 </software>
 
-<software name="spaceace">
+<software name="spaceace" supported="no">
 	<description>Space Ace (Euro)[DVC]</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
@@ -1866,7 +1866,7 @@
 	</part>
 </software>
 
-<software name="spaceacu">
+<software name="spaceaceu" cloneof="spaceace" supported="no">
 	<description>Space Ace (USA)[DVC]</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
@@ -1877,7 +1877,7 @@
 	</part>
 </software>
 
-<software name="sportfre">
+<software name="sportfrk">
 	<description>Sport Freaks (Ned)</description>
 	<year>1996</year>
 	<publisher>Philips</publisher>
@@ -1899,7 +1899,7 @@
 	</part>
 </software>
 
-<software name="strikeru">
+<software name="strikeru" cloneof="striker">
 	<description>Striker Pro (USA)</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
@@ -1910,7 +1910,7 @@
 	</part>
 </software>
 
-<software name="striplv">
+<software name="stripliv">
 	<description>Strip Poker Live (Euro)</description>
 	<year>1995</year>
 	<publisher>Green Pig Production</publisher>
@@ -1932,7 +1932,7 @@
 	</part>
 </software>
 
-<software name="tangramt">
+<software name="tangram">
 	<description>Tangram - The Ultimate Chinese Game (Euro)</description>
 	<year>1992</year>
 	<publisher>Philips</publisher>
@@ -1943,7 +1943,7 @@
 	</part>
 </software>
 
-<software name="tetris19">
+<software name="tetris">
 	<description>Tetris (Euro, USA)</description>
 	<year>1992</year>
 	<publisher>Philips</publisher>
@@ -1954,7 +1954,7 @@
 	</part>
 </software>
 
-<software name="tetsuoga">
+<software name="tetsuo" supported="no">
 	<description>Tetsuo Gaiden (Euro)[DVC]</description>
 	<year>1997</year>
 	<publisher>New Frontier</publisher>
@@ -1976,7 +1976,7 @@
 	</part>
 </software>
 
-<software name="tpara1">
+<software name="tparad" supported="no">
 	<description>Thunder in Paradise (Euro)[DVC]</description>
 	<year>1995</year>
 	<publisher>Philips</publisher>
@@ -1994,7 +1994,7 @@
 	</part>
 </software>
 
-<software name="tparau1">
+<software name="tparadu" cloneof="tparad" supported="no">
 	<description>Thunder in Paradise (USA)[DVC]</description>
 	<year>1995</year>
 	<publisher>Philips</publisher>
@@ -2012,7 +2012,7 @@
 	</part>
 </software>
 
-<software name="tparag">
+<software name="tparadg" cloneof="tparad" supported="no">
 	<description>Thunder in Paradise (Ger)[DVC]</description>
 	<year>1995</year>
 	<publisher>Philips</publisher>
@@ -2042,7 +2042,7 @@
 	</part>
 </software>
 
-<software name="noaharku">
+<software name="noaharku" cloneof="noahark">
 	<description>The Ultimate Noah's Ark (USA)</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
@@ -2053,7 +2053,7 @@
 	</part>
 </software>
 
-<software name="ultracdi">
+<software name="ultracdi" supported="no">
 	<description>Ultra CD-i Soccer (Euro)[DVC]</description>
 	<year>1997</year>
 	<publisher>Philips</publisher>
@@ -2064,7 +2064,7 @@
 	</part>
 </software>
 
-<software name="vegasgir">
+<software name="vegasgrl">
 	<description>Vegas Girls (Euro)[access code 1234]</description>
 	<year>1995</year>
 	<publisher>Status</publisher>
@@ -2075,7 +2075,7 @@
 	</part>
 </software>
 
-<software name="videogra">
+<software name="videogp">
 	<description>Video Grand Prix Speedway (Fra)</description>
 	<year>1993</year>
 	<publisher>Philips</publisher>
@@ -2086,7 +2086,7 @@
 	</part>
 </software>
 
-<software name="videospe">
+<software name="videospd">
 	<description>Video Speedway - The Ultimate Racing Experience (Euro)</description>
 	<year>1993</year>
 	<publisher>Philips</publisher>
@@ -2097,7 +2097,7 @@
 	</part>
 </software>
 
-<software name="videospu">
+<software name="videospdu" cloneof="videospd">
 	<description>Video Speedway - The Ultimate Racing Experience (USA)</description>
 	<year>1993</year>
 	<publisher>Philips</publisher>
@@ -2108,7 +2108,7 @@
 	</part>
 </software>
 
-<software name="voetbalv">
+<software name="voetbal" supported="no">
 	<description>Voetbal v1.04 (Ned)[DVC]</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
@@ -2130,7 +2130,7 @@
 	</part>
 </software>
 
-<software name="voyeuru">
+<software name="voyeuru" cloneof="voyeur">
 	<description>Voyeur ...Don't Get Caught (USA)[access code 3333][11220909 01]</description>
 	<year>1993</year>
 	<publisher>Philips</publisher>
@@ -2141,7 +2141,7 @@
 	</part>
 </software>
 
-<software name="voyeurua">
+<software name="voyeurua" cloneof="voyeur">
 	<description>Voyeur ...Don't Get Caught (USA)[access code 3333][11220928 03]</description>
 	<year>1993</year>
 	<publisher>Philips</publisher>
@@ -2152,7 +2152,7 @@
 	</part>
 </software>
 
-<software name="voyeurg">
+<software name="voyeurg" cloneof="voyeur">
 	<description>Voyeur ...Lass Dich Nicht Erwischen! (Ger)[access code 3333]</description>
 	<year>1995</year>
 	<publisher>Philips</publisher>
@@ -2163,7 +2163,7 @@
 	</part>
 </software>
 
-<software name="voyeurf">
+<software name="voyeurf" cloneof="voyeur">
 	<description>Voyeur ...Soyez Prudent (Fra)[access code 3333]</description>
 	<year>1995</year>
 	<publisher>Philips</publisher>
@@ -2174,7 +2174,7 @@
 	</part>
 </software>
 
-<software name="wackywor">
+<software name="wackyglf">
 	<description>The Wacky World of Minature Golf - With Eugene Levy (Euro)</description>
 	<year>1993</year>
 	<publisher>Philips</publisher>
@@ -2185,7 +2185,7 @@
 	</part>
 </software>
 
-<software name="wackywou">
+<software name="wackyglfu" cloneof="wackyglf">
 	<description>The Wacky World of Minature Golf - With Eugene Levy (USA)</description>
 	<year>1993</year>
 	<publisher>Philips</publisher>
@@ -2196,7 +2196,7 @@
 	</part>
 </software>
 
-<software name="whackabu">
+<software name="whackbub">
 	<description>Whack a Bubble (Euro)</description>
 	<year>1997</year>
 	<publisher>New Frontier</publisher>
@@ -2207,7 +2207,7 @@
 	</part>
 </software>
 
-<software name="whoshot">
+<software name="whoshot" supported="no">
 	<description>Who Shot Johnny Rock (Euro)[DVC]</description>
 	<year>1995</year>
 	<publisher>Philips</publisher>
@@ -2218,7 +2218,7 @@
 	</part>
 </software>
 
-<software name="whoshotu">
+<software name="whoshotu" cloneof="whoshot" supported="no">
 	<description>Who Shot Johnny Rock (USA)[DVC]</description>
 	<year>1995</year>
 	<publisher>Philips</publisher>
@@ -2229,7 +2229,7 @@
 	</part>
 </software>
 
-<software name="wimbledo">
+<software name="wimbledn">
 	<description>Wimbledon Challenge - The Official Wimbledon Quiz Game (Euro)</description>
 	<year>1993</year>
 	<publisher>Philips</publisher>
@@ -2251,7 +2251,7 @@
 	</part>
 </software>
 
-<software name="worldcup">
+<software name="worldglf" supported="no">
 	<description>World Cup Golf (Euro)[DVC]</description>
 	<year>1995</year>
 	<publisher>Philips</publisher>
@@ -2262,7 +2262,7 @@
 	</part>
 </software>
 
-<software name="zaakvans">
+<software name="intdetec" supported="no">
 	<description>De Zaak van Sam - Interactieve Detective (Ned)[DVC]</description>
 	<year>1997</year>
 	<publisher>NOB-Interactive</publisher>
@@ -2284,7 +2284,7 @@
 	</part>
 </software>
 
-<software name="zeldgamn">
+<software name="zeldgamd" cloneof="zeldgam">
 	<description>Zelda - De toverstaf van Gamelon (Ned)</description>
 	<year>1993</year>
 	<publisher>Philips</publisher>
@@ -2295,7 +2295,7 @@
 	</part>
 </software>
 
-<software name="zeldgamg">
+<software name="zeldgamg" cloneof="zeldgam">
 	<description>Zelda - Der Zauberstab von Gamelon (Ger)</description>
 	<year>1993</year>
 	<publisher>Philips</publisher>
@@ -2306,7 +2306,7 @@
 	</part>
 </software>
 
-<software name="zeldgamf">
+<software name="zeldgamf" cloneof="zeldgam">
 	<description>Zelda - The Wand of Gamelon (Fra)</description>
 	<year>1993</year>
 	<publisher>Philips</publisher>
@@ -2317,7 +2317,7 @@
 	</part>
 </software>
 
-<software name="zeldgamu">
+<software name="zeldgamu" cloneof="zeldgam">
 	<description>Zelda - The Wand of Gamelon (USA)</description>
 	<year>1993</year>
 	<publisher>Philips</publisher>
@@ -2328,7 +2328,7 @@
 	</part>
 </software>
 
-<software name="zeldasad">
+<software name="zeldaadv">
 	<description>Zelda's Adventure (Euro)</description>
 	<year>1995</year>
 	<publisher>Philips</publisher>
@@ -2350,7 +2350,7 @@
 	</part>
 </software>
 
-<software name="zombd">
+<software name="zombie">
 	<description>Zombie Dinos from Planet Zeltoid (Euro)</description>
 	<year>1992</year>
 	<publisher>Philips</publisher>
@@ -2361,7 +2361,7 @@
 	</part>
 </software>
 
-<software name="zombdf">
+<software name="zombief" cloneof="zombie">
 	<description>Zombie Dinos de la Planete Zeltoide (Fra)</description>
 	<year>1993</year>
 	<publisher>Philips</publisher>
@@ -2372,7 +2372,7 @@
 	</part>
 </software>
 
-<software name="zombdu">
+<software name="zombieu" cloneof="zombie">
 	<description>Zombie Dinos from Planet Zeltoid (USA)</description>
 	<year>1992</year>
 	<publisher>Philips</publisher>
@@ -2383,7 +2383,7 @@
 	</part>
 </software>
 
-<software name="zombdn">
+<software name="zombied" cloneof="zombie">
 	<description>Zombie Dinos van de Planeet Zeltoid (Ned)</description>
 	<year>1993</year>
 	<publisher>Philips</publisher>
@@ -2394,7 +2394,7 @@
 	</part>
 </software>
 
-<software name="zombdg">
+<software name="zombieg" cloneof="zombie">
 	<description>Zombie Dinos vom Planeten Zeltoid (Ger)</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
@@ -2408,7 +2408,7 @@
  
   <!-- Non-games (multimedia, educational etc.) -->
 
- <software name="1995allt">
+ <software name="1995anv" supported="no">
 	<description>1995 - All the News and Views (Euro)[DVC]</description>
 	<year>1995</year>
 	<publisher>Philips</publisher>
@@ -2419,7 +2419,7 @@
 	</part>
 </software>
 
-<software name="achildo">
+<software name="achildo" cloneof="achild">
 	<description>A Child is Born v1.0 (Euro)</description>
 	<year>1993</year>
 	<publisher>Philips</publisher>
@@ -2441,7 +2441,7 @@
 	</part>
 </software>
 
-<software name="anationa">
+<software name="parktour">
 	<description>A National Parks Tour (USA)</description>
 	<year>1992</year>
 	<publisher>Philips</publisher>
@@ -2452,7 +2452,7 @@
 	</part>
 </software>
 
-<software name="anightin">
+<software name="nightnyl" supported="no">
 	<description>A Night in Nylon City (Euro)[DVC]</description>
 	<year>1995</year>
 	<publisher>ICDI ~ Sofidoc</publisher>
@@ -2463,7 +2463,7 @@
 	</part>
 </software>
 
-<software name="seasme">
+<software name="sesamel">
 	<description>A Visit To Sesame Street - Letters (Euro, USA)</description>
 	<year>1992</year>
 	<publisher>Philips</publisher>
@@ -2474,7 +2474,7 @@
 	</part>
 </software>
 
-<software name="seasmen">
+<software name="sesamen">
 	<description>A Visit To Sesame Street - Numbers (USA)[3106900632 01]</description>
 	<year>1991</year>
 	<publisher>Philips</publisher>
@@ -2485,7 +2485,7 @@
 	</part>
 </software>
 
-<software name="seasmena">
+<software name="sesamena">
 	<description>A Visit To Sesame Street - Numbers (USA)[3106900192 50239 141 01]</description>
 	<year>1992</year>
 	<publisher>Philips</publisher>
@@ -2496,7 +2496,7 @@
 	</part>
 </software>
 
-<software name="avisitto">
+<software name="valpuebl">
 	<description>A Visit to the Valley of Puebla and the Amparo Museum (USA)</description>
 	<year>1992</year>
 	<publisher>Philips</publisher>
@@ -2507,7 +2507,7 @@
 	</part>
 </software>
 
-<software name="accenta">
+<software name="ach0104g" supported="no">
 	<description>Accent Health - Information for Healthy Living - January 2004 - General CDi 1-04 (USA)[DVC]</description>
 	<year>2004</year>
 	<publisher>CNN</publisher>
@@ -2518,7 +2518,7 @@
 	</part>
 </software>
 
-<software name="accentb">
+<software name="ach1104s" supported="no">
 	<description>Accent Health - Information for Healthy Living - November 2004 - 50 + Silver CDi 1104 (USA)[DVC]</description>
 	<year>2004</year>
 	<publisher>CNN</publisher>
@@ -2529,7 +2529,7 @@
 	</part>
 </software>
 
-<software name="accentc">
+<software name="ach1104g" supported="no">
 	<description>Accent Health - Information for Healthy Living - November 2004 - General CDi 11-04 (USA)[DVC]</description>
 	<year>2004</year>
 	<publisher>CNN</publisher>
@@ -2540,7 +2540,7 @@
 	</part>
 </software>
 
-<software name="accentd">
+<software name="ach1004g" supported="no">
 	<description>Accent Health - Information for Healthy Living - October 2004 - General CDi 10-04 (USA)[DVC]</description>
 	<year>2004</year>
 	<publisher>CNN</publisher>
@@ -2551,7 +2551,7 @@
 	</part>
 </software>
 
-<software name="actcolle">
+<software name="actcollg">
 	<description>ACT College Search (USA)</description>
 	<year>1992</year>
 	<publisher>Philips</publisher>
@@ -2562,7 +2562,7 @@
 	</part>
 </software>
 
-<software name="adiacce1">
+<software name="adiasce1">
 	<description>ADI Accompagnement Scolaire - Français-Maths CE1 (Fra)</description>
 	<year>1994</year>
 	<publisher>Coktel Vision</publisher>
@@ -2573,7 +2573,7 @@
 	</part>
 </software>
 
-<software name="adiacce2">
+<software name="adiasce2">
 	<description>ADI Accompagnement Scolaire - Français-Maths CE2 (Fra)</description>
 	<year>1994</year>
 	<publisher>Coktel Vision</publisher>
@@ -2584,7 +2584,7 @@
 	</part>
 </software>
 
-<software name="adiaccm1">
+<software name="adiascm1">
 	<description>ADI Accompagnement Scolaire - Français-Maths CM1 (Fra)</description>
 	<year>1994</year>
 	<publisher>Coktel Vision</publisher>
@@ -2595,7 +2595,7 @@
 	</part>
 </software>
 
-<software name="adiaccm2">
+<software name="adiascm2">
 	<description>ADI Accompagnement Scolaire - Français-Maths CM2 (Fra)</description>
 	<year>1994</year>
 	<publisher>Coktel Vision</publisher>
@@ -2617,7 +2617,7 @@
 	</part>
 </software>
 
-<software name="aimsbird">
+<software name="aimsbird" supported="no">
 	<description>AIMS - A First Look at Birds [DVC]</description>
 	<year>1995</year>
 	<publisher>AIMS Multimedia</publisher>
@@ -2628,7 +2628,7 @@
 	</part>
 </software>
 
-<software name="aimsmaml">
+<software name="aimsmaml" supported="no">
 	<description>AIMS - A First Look at Mammals (USA)[DVC]</description>
 	<year>1995</year>
 	<publisher>AIMS Multimedia</publisher>
@@ -2639,7 +2639,7 @@
 	</part>
 </software>
 
-<software name="aimstree">
+<software name="aimstree" supported="no">
 	<description>AIMS - A First Look at Trees (USA)[DVC]</description>
 	<year>1995</year>
 	<publisher>AIMS Multimedia</publisher>
@@ -2650,7 +2650,7 @@
 	</part>
 </software>
 
-<software name="aimsanim">
+<software name="aimsanim" supported="no">
 	<description>AIMS - Animal Communities (USA)[DVC]</description>
 	<year>1995</year>
 	<publisher>AIMS Multimedia</publisher>
@@ -2661,7 +2661,7 @@
 	</part>
 </software>
 
-<software name="aimstad">
+<software name="aimstide" supported="no">
 	<description>AIMS - Animal Life in a Tidepool (USA)[DVC]</description>
 	<year>1995</year>
 	<publisher>AIMS Multimedia</publisher>
@@ -2672,7 +2672,7 @@
 	</part>
 </software>
 
-<software name="aimsbeav">
+<software name="aimsbeav" supported="no">
 	<description>AIMS - Beavers and How they Live (USA)[DVC]</description>
 	<year>1995</year>
 	<publisher>AIMS Multimedia</publisher>
@@ -2683,7 +2683,7 @@
 	</part>
 </software>
 
-<software name="aimsbees">
+<software name="aimsbees" supported="no">
 	<description>AIMS - Bees and How they Live (USA)[DVC]</description>
 	<year>1995</year>
 	<publisher>AIMS Multimedia</publisher>
@@ -2694,7 +2694,7 @@
 	</part>
 </software>
 
-<software name="aimsecos">
+<software name="aimsecos" supported="no">
 	<description>AIMS - Ecosystems - Nature in Balance (USA)[DVC]</description>
 	<year>1995</year>
 	<publisher>AIMS Multimedia</publisher>
@@ -2705,7 +2705,7 @@
 	</part>
 </software>
 
-<software name="aimsevol">
+<software name="aimsevol" supported="no">
 	<description>AIMS - Evolution - Change Through Natural Selection (USA)[DVC]</description>
 	<year>1995</year>
 	<publisher>AIMS Multimedia</publisher>
@@ -2716,7 +2716,7 @@
 	</part>
 </software>
 
-<software name="aimsexpl">
+<software name="aimsexpl" supported="no">
 	<description>AIMS - Exploring our Solar System (USA)[DVC]</description>
 	<year>1995</year>
 	<publisher>AIMS Multimedia</publisher>
@@ -2727,7 +2727,7 @@
 	</part>
 </software>
 
-<software name="aimsfrog">
+<software name="aimsfrog" supported="no">
 	<description>AIMS - Frogs and How they Live (USA)[DVC]</description>
 	<year>1995</year>
 	<publisher>AIMS Multimedia</publisher>
@@ -2738,7 +2738,7 @@
 	</part>
 </software>
 
-<software name="aimshowa">
+<software name="aimssurv" supported="no">
 	<description>AIMS - How Animals Survive (USA)[DVC]</description>
 	<year>1995</year>
 	<publisher>AIMS Multimedia</publisher>
@@ -2749,7 +2749,7 @@
 	</part>
 </software>
 
-<software name="aimshoww">
+<software name="aimsclas" supported="no">
 	<description>AIMS - How we Classify Animals (USA)[DVC]</description>
 	<year>1995</year>
 	<publisher>AIMS Multimedia</publisher>
@@ -2760,7 +2760,7 @@
 	</part>
 </software>
 
-<software name="aimsinse">
+<software name="aimsinse" supported="no">
 	<description>AIMS - Insects Reproduction and Metamorphosis (USA)[DVC]</description>
 	<year>1995</year>
 	<publisher>AIMS Multimedia</publisher>
@@ -2771,7 +2771,7 @@
 	</part>
 </software>
 
-<software name="aimslear">
+<software name="aimsecol" supported="no">
 	<description>AIMS - Learning About Ecology (USA)[DVC]</description>
 	<year>1995</year>
 	<publisher>AIMS Multimedia</publisher>
@@ -2782,7 +2782,7 @@
 	</part>
 </software>
 
-<software name="aimstemp">
+<software name="aimstemp" supported="no">
 	<description>AIMS - Temperature, Pressure and Humidity (USA)[DVC]</description>
 	<year>1995</year>
 	<publisher>AIMS Multimedia</publisher>
@@ -2793,7 +2793,7 @@
 	</part>
 </software>
 
-<software name="aimsfour">
+<software name="aims4yw" supported="no">
 	<description>AIMS - The Civil War - Four Years of War and its Aftermath (USA)[DVC]</description>
 	<year>1995</year>
 	<publisher>AIMS Multimedia</publisher>
@@ -2804,7 +2804,7 @@
 	</part>
 </software>
 
-<software name="aimsthec">
+<software name="aimswarb" supported="no">
 	<description>AIMS - The Civil War - The South Secedes and War Begins (USA)[DVC]</description>
 	<year>1995</year>
 	<publisher>AIMS Multimedia</publisher>
@@ -2815,7 +2815,7 @@
 	</part>
 </software>
 
-<software name="aimswind">
+<software name="aimswind" supported="no">
 	<description>AIMS - Winds, Fronts and Storms (USA)[DVC]</description>
 	<year>1995</year>
 	<publisher>AIMS Multimedia</publisher>
@@ -2826,7 +2826,7 @@
 	</part>
 </software>
 
-<software name="allthefu">
+<software name="funfair">
 	<description>All the Fun of the Fair - Engels voor kinderen (Ned)</description>
 	<year>1993</year>
 	<publisher>Philips</publisher>
@@ -2837,7 +2837,7 @@
 	</part>
 </software>
 
-<software name="allesove">
+<software name="allesovr">
 	<description>Alles over CD-i - Apr-Mei 1995 (Ned)</description>
 	<year>1995</year>
 	<publisher>Philips</publisher>
@@ -2848,7 +2848,7 @@
 	</part>
 </software>
 
-<software name="allesovo">
+<software name="allesovro" cloneof="allesovr">
 	<description>Alles over CD-i - Aug-Sep 1994 (Ned)</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
@@ -2859,7 +2859,7 @@
 	</part>
 </software>
 
-<software name="amsterda">
+<software name="amstrdam">
 	<description>De Amsterdamse Effectenbeurs Interactief (Ned)</description>
 	<year>1996</year>
 	<publisher>Philips</publisher>
@@ -2870,7 +2870,7 @@
 	</part>
 </software>
 
-<software name="andrewll">
+<software name="andrewll" supported="no">
 	<description>Andrew Lloyd Webber - The Premiere Collection Encore (Euro)[DVC]</description>
 	<year>1993</year>
 	<publisher>Philips ~ PolyGram</publisher>
@@ -2881,7 +2881,7 @@
 	</part>
 </software>
 
-<software name="andrewlu">
+<software name="andrewllu" cloneof="andrewll" supported="no">
 	<description>Andrew Lloyd Webber - The Premiere Collection Encore (USA)[DVC]</description>
 	<year>1993</year>
 	<publisher>Philips ~ PolyGram</publisher>
@@ -2903,7 +2903,7 @@
 	</part>
 </software>
 
-<software name="annewilu">
+<software name="annewillu" cloneof="annewill">
 	<description>Anne Willan presents The Food of France (USA)</description>
 	<year>1992</year>
 	<publisher>Philips</publisher>
@@ -2914,7 +2914,7 @@
 	</part>
 </software>
 
-<software name="aroundat">
+<software name="aroundat" supported="no">
 	<description>Around Atlanta - The Olympic City (Euro)[DVC]</description>
 	<year>1996</year>
 	<publisher>Philips</publisher>
@@ -2936,7 +2936,7 @@
 	</part>
 </software>
 
-<software name="artofthe">
+<software name="artczars">
 	<description>The Art of the Czars - St. Petersburg and the Treasures of the Hermitage (Euro, USA)</description>
 	<year>1992</year>
 	<publisher>Philips</publisher>
@@ -2980,7 +2980,7 @@
 	</part>
 </software>
 
-<software name="barrioma">
+<software name="barriors">
 	<description>El Barrio Mas Divertido de Richard Scarry (Spa)</description>
 	<year>1992</year>
 	<publisher>Philips</publisher>
@@ -2991,7 +2991,7 @@
 	</part>
 </software>
 
-<software name="beautyth">
+<software name="beauty">
 	<description>Beauty and the Beast (USA)</description>
 	<year>1992</year>
 	<publisher>Philips</publisher>
@@ -3002,24 +3002,13 @@
 	</part>
 </software>
 
-<software name="schoneun">
+<software name="beautyg" cloneof="beauty">
 	<description>Die Schöne und das Tier (Ger)</description>
 	<year>1993</year>
 	<publisher>Philips</publisher>
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="schone und das tier, die (1993)(philips)(de)[!]" sha1="581fb486d418c4373f5927ad631e709e8f042ef0"/>
-		</diskarea>
-	</part>
-</software>
-
-<software name="berenstf">
-	<description>The Berenstain Bears - Les Ours Berenstain Comme des Grands (Fra)</description>
-	<year>1994</year>
-	<publisher>Philips</publisher>
-	<part name="cdrom" interface="cdi_cdrom">
-		<diskarea name="cdrom">
-			<disk name="berenstain bears, the - les ours berenstain comme des grands (1994)(philips)(fr)" sha1="752a34a6478774a6b9a9c09b3b2483e6b20b8bb2"/>
 		</diskarea>
 	</part>
 </software>
@@ -3035,7 +3024,18 @@
 	</part>
 </software>
 
-<software name="berenstg">
+<software name="berenstf" cloneof="berenst">
+	<description>The Berenstain Bears - Les Ours Berenstain Comme des Grands (Fra)</description>
+	<year>1994</year>
+	<publisher>Philips</publisher>
+	<part name="cdrom" interface="cdi_cdrom">
+		<diskarea name="cdrom">
+			<disk name="berenstain bears, the - les ours berenstain comme des grands (1994)(philips)(fr)" sha1="752a34a6478774a6b9a9c09b3b2483e6b20b8bb2"/>
+		</diskarea>
+	</part>
+</software>
+
+<software name="berenstg" cloneof="berenst">
 	<description>Die Berenstain-Baren - Selbst ist der bar - mach mit - ist gar nicht schwer! (Ger)</description>
 	<year>1993</year>
 	<publisher>Philips</publisher>
@@ -3046,7 +3046,7 @@
 	</part>
 </software>
 
-<software name="bijdeber">
+<software name="berenstd" cloneof="berenst">
 	<description>Thuis Bij de Berenstain Beren - Thuis en bij jou (Ned)</description>
 	<year>1993</year>
 	<publisher>Philips</publisher>
@@ -3068,7 +3068,7 @@
 	</part>
 </software>
 
-<software name="bertelgd">
+<software name="bertelsgdvc" cloneof="bertelsg" supported="no">
 	<description>Bertelsmann Universal Lexikon (Ger)[DVC]</description>
 	<year>1995</year>
 	<publisher>Pathe ~ Philips</publisher>
@@ -3079,7 +3079,7 @@
 	</part>
 </software>
 
-<software name="berteldd">
+<software name="bertelsgd" cloneof="bertelsg">
 	<description>Bertelsmann Universal Lexikon - Demo-Disk (Ger)</description>
 	<year>1994</year>
 	<publisher>Pathe ~ Philips</publisher>
@@ -3090,7 +3090,7 @@
 	</part>
 </software>
 
-<software name="bestofba">
+<software name="bestbabs" supported="no">
 	<description>The Best of Baby Songs - Featuring the Songs of Hop Palmer (USA)[DVC]</description>
 	<year>1993</year>
 	<publisher>Philips</publisher>
@@ -3101,7 +3101,7 @@
 	</part>
 </software>
 
-<software name="bestofdr">
+<software name="bestdraw">
 	<description>The Best of Draw-50 with Lee Ames (USA)</description>
 	<year>1993</year>
 	<publisher>Philips</publisher>
@@ -3112,7 +3112,7 @@
 	</part>
 </software>
 
-<software name="bestofma">
+<software name="bestmanf" supported="no">
 	<description>The Best Of Manfred Deix Vol. 1 (Aut)[DVC]</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
@@ -3123,7 +3123,7 @@
 	</part>
 </software>
 
-<software name="breastse">
+<software name="breastsa">
 	<description>Breast Self-Examination - Auto-examen Del Seno (USA)</description>
 	<year>1994</year>
 	<publisher>Media Inc</publisher>
@@ -3156,7 +3156,7 @@
 	</part>
 </software>
 
-<software name="burncycl">
+<software name="burncycm">
 	<description>BURN-CYCLE - The Music (Euro)[BURN-CYCLE, 810 0114, 813 0118, 815 0102, 816 0056][CD-Audio]</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
@@ -3167,7 +3167,7 @@
 	</part>
 </software>
 
-<software name="caminode">
+<software name="camnsntg">
 	<description>El Camino de Santiago - La milenaria ruta de las estrellas (Spa)</description>
 	<year>1995</year>
 	<publisher>ANAYAtouring - Philips</publisher>
@@ -3178,7 +3178,7 @@
 	</part>
 </software>
 
-<software name="caminocc">
+<software name="camnsntgcc" cloneof="camnsntg">
 	<description>El Camino de Santiago - La milenaria ruta de las estrellas (Compilation Cultura) (Spa)</description>
 	<year>1995</year>
 	<publisher>ANAYAtouring - Philips</publisher>
@@ -3189,7 +3189,7 @@
 	</part>
 </software>
 
-<software name="cartoonc">
+<software name="cartoonc" supported="no">
 	<description>Cartoon Carnival (Euro, USA)[DVC enhanced]</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
@@ -3211,7 +3211,7 @@
 	</part>
 </software>
 
-<software name="cartonja">
+<software name="cartoonja" cloneof="cartoonj">
 	<description>Cartoon Jukebox (USA)[3106900012 01!]</description>
 	<year>1991</year>
 	<publisher>Philips</publisher>
@@ -3222,7 +3222,7 @@
 	</part>
 </software>
 
-<software name="cartonjg">
+<software name="cartoonjg" cloneof="cartoonj">
 	<description>Cartoon Jukebox (Ger)</description>
 	<year>1992</year>
 	<publisher>Philips</publisher>
@@ -3233,7 +3233,7 @@
 	</part>
 </software>
 
-<software name="cdidemon">
+<software name="cdidemon" supported="no">
 	<description>CD-i Demonstratie Disc - Fall 1996 - Spring 1997 (Ned)[DVC]</description>
 	<year>1996</year>
 	<publisher>Philips</publisher>
@@ -3266,7 +3266,7 @@
 	</part>
 </software>
 
-<software name="cdimitde">
+<software name="cdimaus">
 	<description>Die CD-i mit der Maus - Auf dem Bauernhof (Ger)</description>
 	<year>1995</year>
 	<publisher>Philips</publisher>
@@ -3321,7 +3321,7 @@
 	</part>
 </software>
 
-<software name="cdonlin1">
+<software name="cdonlin1" supported="no">
 	<description>CD-Online - Issue 01 - Internet on TV (Euro)[DVC]</description>
 	<year>1995</year>
 	<publisher>CD-Online</publisher>
@@ -3332,7 +3332,7 @@
 	</part>
 </software>
 
-<software name="cdonlin2">
+<software name="cdonlin2" supported="no">
 	<description>CD-Online - Issue 02 - The Internet Game Issue (Euro)[DVC]</description>
 	<year>1996</year>
 	<publisher>CD-Online</publisher>
@@ -3343,7 +3343,7 @@
 	</part>
 </software>
 
-<software name="cdonli97">
+<software name="cdonli97" supported="no">
 	<description>CD-Online Disc 97-10 (Euro)[DVC]</description>
 	<year>1997</year>
 	<publisher>CD-Online</publisher>
@@ -3387,7 +3387,7 @@
 	</part>
 </software>
 
-<software name="cmta">
+<software name="cmta" cloneof="cmt">
 	<description>Children's Musical Theatre (USA)[0082914 01]</description>
 	<year>1992</year>
 	<publisher>Philips</publisher>
@@ -3420,7 +3420,7 @@
 	</part>
 </software>
 
-<software name="classica">
+<software name="classicj">
 	<description>Classical Jukebox (Euro, USA)</description>
 	<year>1991</year>
 	<publisher>Philips</publisher>
@@ -3442,7 +3442,7 @@
 	</part>
 </software>
 
-<software name="comptons">
+<software name="comptondvc" cloneof="compton" supported="no">
 	<description>Compton's Interactive Encyclopedia (Euro)[DVC enhanced]</description>
 	<year>1995</year>
 	<publisher>Compton's NewMedia</publisher>
@@ -3453,7 +3453,7 @@
 	</part>
 </software>
 
-<software name="comptcdi">
+<software name="compton">
 	<description>Compton's Interactive Encyclopedia - CD-Interactive (Euro)</description>
 	<year>1992</year>
 	<publisher>Compton's NewMedia</publisher>
@@ -3464,7 +3464,7 @@
 	</part>
 </software>
 
-<software name="comptcdu">
+<software name="comptonu" cloneof="compton">
 	<description>Compton's Interactive Encyclopedia - CD-Interactive (USA)</description>
 	<year>1992</year>
 	<publisher>Compton's NewMedia</publisher>
@@ -3475,7 +3475,7 @@
 	</part>
 </software>
 
-<software name="conciseo">
+<software name="coxford">
 	<description>The Concise Oxford Dictionary &amp; Oxford Thesaurus (Euro)</description>
 	<year>1995</year>
 	<publisher>Oxford University Press ~ Philips</publisher>
@@ -3486,7 +3486,7 @@
 	</part>
 </software>
 
-<software name="coololdi">
+<software name="coololdj">
 	<description>Cool Oldies Jukebox (USA)</description>
 	<year>1991</year>
 	<publisher>Mercury ~ Philips</publisher>
@@ -3497,24 +3497,13 @@
 	</part>
 </software>
 
-<software name="cosmopol">
+<software name="cosmopol" supported="no">
 	<description>Cosmopolitan Interactive - Tonetics (USA)[DVC]</description>
 	<year>1995</year>
 	<publisher>Philips</publisher>
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="cosmopolitan interactive - tonetics (1995)(philips)(us)[dvc]" sha1="5668157f9b54788ec9ada74fc58f98f1f7cc5ae9"/>
-		</diskarea>
-	</part>
-</software>
-
-<software name="crayonfu">
-	<description>The Crayon Factory (USA)</description>
-	<year>1994</year>
-	<publisher>Philips</publisher>
-	<part name="cdrom" interface="cdi_cdrom">
-		<diskarea name="cdrom">
-			<disk name="crayon factory, the (1994)(philips)(us)" sha1="14c752e3ca62b36065a62468fb2756116d73a089"/>
 		</diskarea>
 	</part>
 </software>
@@ -3530,7 +3519,18 @@
 	</part>
 </software>
 
-<software name="createyo">
+<software name="crayonfu" cloneof="crayonf">
+	<description>The Crayon Factory (USA)</description>
+	<year>1994</year>
+	<publisher>Philips</publisher>
+	<part name="cdrom" interface="cdi_cdrom">
+		<diskarea name="cdrom">
+			<disk name="crayon factory, the (1994)(philips)(us)" sha1="14c752e3ca62b36065a62468fb2756116d73a089"/>
+		</diskarea>
+	</part>
+</software>
+
+<software name="creatcar">
 	<description>Create your own Caricature with Spitting Image (Euro)[8110001 50274 188 01]</description>
 	<year>1992</year>
 	<publisher>Philips</publisher>
@@ -3541,7 +3541,7 @@
 	</part>
 </software>
 
-<software name="createya">
+<software name="creatcara" cloneof="creatcar">
 	<description>Create your own Caricature with Spitting Image (Euro)[8110001 50274 188 02]</description>
 	<year>1992</year>
 	<publisher>Philips</publisher>
@@ -3552,8 +3552,8 @@
 	</part>
 </software>
 
-<software name="cruisedi">
-	<description>Cruise Directory (GB)</description>
+<software name="cruised">
+	<description>Cruise Directory (UK)</description>
 	<year>1994</year>
 	<publisher>Barclays ~ Philips</publisher>
 	<part name="cdrom" interface="cdi_cdrom">
@@ -3563,7 +3563,7 @@
 	</part>
 </software>
 
-<software name="dansen19">
+<software name="dansen" supported="no">
 	<description>Dansen! (Ned)[DVC]</description>
 	<year>1996</year>
 	<publisher>Philips</publisher>
@@ -3585,7 +3585,7 @@
 	</part>
 </software>
 
-<software name="dgbcne">
+<software name="dgbcne" supported="no">
 	<description>Destination Great Britain - Central and Northern England (USA)[DVC]</description>
 	<year>1994</year>
 	<publisher>World of Wonders</publisher>
@@ -3596,7 +3596,7 @@
 	</part>
 </software>
 
-<software name="dgbewc">
+<software name="dgbewc" supported="no">
 	<description>Destination Great Britain - England's West Country (USA)[DVC]</description>
 	<year>1994</year>
 	<publisher>World of Wonders</publisher>
@@ -3607,7 +3607,7 @@
 	</part>
 </software>
 
-<software name="dgblse">
+<software name="dgblse" supported="no">
 	<description>Destination Great Britain - London &amp; Southern England (USA)[DVC]</description>
 	<year>1995</year>
 	<publisher>World of Wonders</publisher>
@@ -3618,7 +3618,7 @@
 	</part>
 </software>
 
-<software name="dgbw">
+<software name="dgbw" supported="no">
 	<description>Destination Great Britain - Wales (USA)[DVC]</description>
 	<year>1994</year>
 	<publisher>World of Wonders</publisher>
@@ -3651,7 +3651,7 @@
 	</part>
 </software>
 
-<software name="ditwas94">
+<software name="ditwas94" supported="no">
 	<description>Dit Was 1994 - Wereldnieuws Overzicht (Ned)[DVC]</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
@@ -3662,7 +3662,7 @@
 	</part>
 </software>
 
-<software name="ditwas95">
+<software name="ditwas95" supported="no">
 	<description>Dit Was 1995 - Wereldnieuws Overzicht (Ned)[DVC]</description>
 	<year>1996</year>
 	<publisher>Philips</publisher>
@@ -3673,7 +3673,7 @@
 	</part>
 </software>
 
-<software name="domzusts">
+<software name="domststp">
 	<description>Der Dom zu St. Stephan in Wien (Aut)</description>
 	<year>1995</year>
 	<publisher>Philips</publisher>
@@ -3695,7 +3695,7 @@
 	</part>
 </software>
 
-<software name="dutchm">
+<software name="dutch17">
 	<description>Dutch Masters of the Seventeenth Century (Euro)</description>
 	<year>1992</year>
 	<publisher>Philips</publisher>
@@ -3706,7 +3706,7 @@
 	</part>
 </software>
 
-<software name="dutchmu">
+<software name="dutch17u" cloneof="dutch17">
 	<description>Dutch Masters of the Seventeenth Century (USA)</description>
 	<year>1992</year>
 	<publisher>Philips</publisher>
@@ -3717,7 +3717,7 @@
 	</part>
 </software>
 
-<software name="ezplayto">
+<software name="ezplay">
 	<description>E-Z Play Today Keyboard - Now Anyone Can Learn To Play Keyboard! (Euro)</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
@@ -3728,7 +3728,7 @@
 	</part>
 </software>
 
-<software name="earththe">
+<software name="earth">
 	<description>Earth - The Changing Environment (USA)</description>
 	<year>1995</year>
 	<publisher>World of Wonders</publisher>
@@ -3739,7 +3739,7 @@
 	</part>
 </software>
 
-<software name="einkinde">
+<software name="kindenst">
 	<description>Ein Kind Entsteht (Ger)</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
@@ -3750,7 +3750,7 @@
 	</part>
 </software>
 
-<software name="emperors">
+<software name="emperor">
 	<description>The Emperor's New Clothes (USA)</description>
 	<year>1992</year>
 	<publisher>Philips</publisher>
@@ -3784,7 +3784,7 @@
 	</part>
 </software>
 
-<software name="clap1">
+<software name="clapton" supported="no">
 	<description>Eric Clapton - The Cream Of Eric Clapton (Euro)[DVC]</description>
 	<year>1994</year>
 	<publisher>Philips ~ PolyGram</publisher>
@@ -3801,7 +3801,7 @@
 </software>
 
 <software name="essentia">
-	<description>Essentials - The New Shape of Home Shopping by Freemans (GB)</description>
+	<description>Essentials - The New Shape of Home Shopping by Freemans (UK)</description>
 	<year>1994</year>
 	<publisher>Barclays ~ Philips</publisher>
 	<part name="cdrom" interface="cdi_cdrom">
@@ -3811,7 +3811,7 @@
 	</part>
 </software>
 
-<software name="european">
+<software name="europrty">
 	<description>European Party (Euro)</description>
 	<year>1994</year>
 	<publisher>Giunti Multimedia ~ Philips</publisher>
@@ -3866,7 +3866,7 @@
 	</part>
 </software>
 
-<software name="filmmaaa">
+<software name="filmmaana" cloneof="filmmaan" supported="no">
 	<description>De Filmmaand - Highlights-Previews-Filmclips (Ned, Alt)[DVC]</description>
 	<year>1995</year>
 	<publisher>Philips</publisher>
@@ -3877,7 +3877,7 @@
 	</part>
 </software>
 
-<software name="filmmaan">
+<software name="filmmaan" supported="no">
 	<description>De Filmmaand - Highlights-Previews-Filmclips (Ned)[DVC]</description>
 	<year>1995</year>
 	<publisher>Philips</publisher>
@@ -3888,7 +3888,7 @@
 	</part>
 </software>
 
-<software name="fishtvli">
+<software name="fishtv">
 	<description>Fish TV - Living Screens (Euro)</description>
 	<year>1997</year>
 	<publisher>Daedalus</publisher>
@@ -3899,7 +3899,7 @@
 	</part>
 </software>
 
-<software name="flntjet">
+<software name="flintjet">
 	<description>Flintstones &amp; Jetsons - Timewarp (Euro)</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
@@ -3910,7 +3910,7 @@
 	</part>
 </software>
 
-<software name="flntjetu">
+<software name="flintjetu" cloneof="flintjet">
 	<description>Flintstones &amp; Jetsons - Timewarp (USA)</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
@@ -3921,7 +3921,7 @@
 	</part>
 </software>
 
-<software name="flowerso">
+<software name="flowers">
 	<description>The Flowers of Robert Mapplethorpe (USA)[Photo CD]</description>
 	<year>1992</year>
 	<publisher>Philips</publisher>
@@ -3932,7 +3932,7 @@
 	</part>
 </software>
 
-<software name="football">
+<software name="football" supported="no">
 	<description>Football - L'histoire, les regles, les vedettes, le jeu de penalties v1.04 (Fra)[DVC]</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
@@ -3954,13 +3954,24 @@
 	</part>
 </software>
 
-<software name="franseim">
+<software name="frenchimd" cloneof="frenchim">
 	<description>De Franse Impressionisten (Ned)</description>
 	<year>1991</year>
 	<publisher>Philips</publisher>
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="franse impressionisten, de (1991)(philips)(nl)[!]" sha1="dd429e0edb2b8941da9e1131bf118cbc46e67bee"/>
+		</diskarea>
+	</part>
+</software>
+
+<software name="frenchimf" cloneof="frenchim">
+	<description>Les Impressionnistes Français (Fra)</description>
+	<year>1992</year>
+	<publisher>Philips</publisher>
+	<part name="cdrom" interface="cdi_cdrom">
+		<diskarea name="cdrom">
+			<disk name="impressionnistes francais, les (1992)(philips)(fr)" sha1="084ae8bfdde803970c9f32ca81aeabebf3fcd18f"/>
 		</diskarea>
 	</part>
 </software>
@@ -4009,7 +4020,7 @@
 	</part>
 </software>
 
-<software name="gnomesv2">
+<software name="gnomes">
 	<description>Gnomes v2.10 (USA)</description>
 	<year>1995</year>
 	<publisher>Philips</publisher>
@@ -4020,7 +4031,7 @@
 	</part>
 </software>
 
-<software name="goldeno">
+<software name="goldoldj">
 	<description>Golden Oldies Jukebox (USA)[310690006-2 50240 109 01]</description>
 	<year>1991</year>
 	<publisher>Philips</publisher>
@@ -4031,7 +4042,7 @@
 	</part>
 </software>
 
-<software name="goldenoa">
+<software name="goldoldja" cloneof="goldoldj">
 	<description>Golden Oldies Jukebox (USA)[0062919 01]</description>
 	<year>1991</year>
 	<publisher>Philips</publisher>
@@ -4042,7 +4053,7 @@
 	</part>
 </software>
 
-<software name="golfmyw1">
+<software name="glfmyway">
 	<description>Golf My Way (USA)</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
@@ -4085,7 +4096,7 @@
 </software>
 
 <software name="goyagrab">
-	<description>Goya Grabador - Luces Y Sombras (Spa)</description>
+	<description>Goya Grabador - Luces y Sombras (Spa)</description>
 	<year>1995</year>
 	<publisher>Philips</publisher>
 	<part name="cdrom" interface="cdi_cdrom">
@@ -4095,7 +4106,7 @@
 	</part>
 </software>
 
-<software name="grandpri">
+<software name="granprix">
 	<description>Grand Prix Special (Euro)</description>
 	<year>1994</year>
 	<publisher>Xdra</publisher>
@@ -4106,7 +4117,7 @@
 	</part>
 </software>
 
-<software name="greatame">
+<software name="greatag" supported="no">
 	<description>Great American Golf 2 (Euro)[DVC]</description>
 	<year>1994</year>
 	<publisher>Xdra</publisher>
@@ -4117,7 +4128,7 @@
 	</part>
 </software>
 
-<software name="greatbri">
+<software name="greatbg">
 	<description>Great British Golf - Middle Ages - 1940 (Euro)</description>
 	<year>1992</year>
 	<publisher>Philips</publisher>
@@ -4128,7 +4139,7 @@
 	</part>
 </software>
 
-<software name="harvesta">
+<software name="vangogh">
 	<description>Harvest of the Sun - Vincent Van Gogh Revisited (USA)[028294 01]</description>
 	<year>1991</year>
 	<publisher>Philips</publisher>
@@ -4139,7 +4150,7 @@
 	</part>
 </software>
 
-<software name="harvestb">
+<software name="vangogha" cloneof="vangogh">
 	<description>Harvest of the Sun - Vincent Van Gogh Revisited (USA)[310690028-2 50239 148 01]</description>
 	<year>1992</year>
 	<publisher>Philips</publisher>
@@ -4150,7 +4161,7 @@
 	</part>
 </software>
 
-<software name="harvestc">
+<software name="vangoghb" cloneof="vangogh">
 	<description>Harvest of the Sun - Vincent Van Gogh Revisited (USA)[310690028-2 50239 148 02]</description>
 	<year>1992</year>
 	<publisher>Philips</publisher>
@@ -4161,7 +4172,7 @@
 	</part>
 </software>
 
-<software name="harvesto">
+<software name="vangoghf" cloneof="vangogh">
 	<description>Harvest of the Sun - Van Gogh - Une Moisson de soleils (Fra)</description>
 	<year>1992</year>
 	<publisher>Philips</publisher>
@@ -4172,7 +4183,7 @@
 	</part>
 </software>
 
-<software name="oogstvan">
+<software name="vangoghd" cloneof="vangogh">
 	<description>Oogst van de Zon - leven en kunst van Vincent van Gogh (Ned)</description>
 	<year>1992</year>
 	<publisher>Philips</publisher>
@@ -4183,7 +4194,7 @@
 	</part>
 </software>
 
-<software name="ernteder">
+<software name="vangoghg" cloneof="vangogh">
 	<description>Ernte der Sonne - Vincent Van Gogh (Ger)</description>
 	<year>1992</year>
 	<publisher>Philips</publisher>
@@ -4194,7 +4205,7 @@
 	</part>
 </software>
 
-<software name="cosechad">
+<software name="vangoghs" cloneof="vangogh">
 	<description>La Cosecha del Sol - Vincent Van Gogh Revivido (Spa)</description>
 	<year>1992</year>
 	<publisher>Philips</publisher>
@@ -4217,7 +4228,7 @@
 </software>
 
 <!-- TODO: check if the part_id used are 'names' for the disk, or anything else... -->
-<software name="help1">
+<software name="help">
 	<description>Help! Opleiding Bedrijfshulpverlener voor de Supermarkt (Ned)</description>
 	<year>1996</year>
 	<publisher>&lt;unknown&gt;</publisher>
@@ -4241,7 +4252,7 @@
 	</part>
 </software>
 
-<software name="henrides">
+<software name="henrides" supported="no">
 	<description>Henri Des - Les Betises (Fra)[DVC]</description>
 	<year>1993</year>
 	<publisher>Philips</publisher>
@@ -4274,7 +4285,7 @@
 	</part>
 </software>
 
-<software name="histori1">
+<software name="histarte">
 	<description>Historia Universal del ARTE - La aventura de la expresion humana (Spa)</description>
 	<year>1996</year>
 	<publisher>Salvat Multimedia</publisher>
@@ -4355,7 +4366,7 @@
 	</part>
 </software>
 
-<software name="hondenli">
+<software name="hondenli" supported="no">
 	<description>Hondenliefde (Ned)[DVC]</description>
 	<year>1995</year>
 	<publisher>AVRO</publisher>
@@ -4388,7 +4399,7 @@
 	</part>
 </software>
 
-<software name="wiedasrh">
+<software name="rhinog" cloneof="rhino">
 	<description>Wie das Rhinozeros zu seiner Haut kam (Ger)</description>
 	<year>1993</year>
 	<publisher>Philips</publisher>
@@ -4399,7 +4410,7 @@
 	</part>
 </software>
 
-<software name="rhinoa">
+<software name="rhinoa" cloneof="rhino">
 	<description>How the Rhinoceros got his Skin (USA)[3106900232 50237 962 01]</description>
 	<year>1992</year>
 	<publisher>Philips</publisher>
@@ -4410,7 +4421,7 @@
 	</part>
 </software>
 
-<software name="howtopho">
+<software name="howphoto">
 	<description>How to Photograph Nature (USA)[CD-i-Photo CD]</description>
 	<year>1993</year>
 	<publisher>Philips</publisher>
@@ -4421,7 +4432,7 @@
 	</part>
 </software>
 
-<software name="ikmiklet">
+<software name="ikmiklet" supported="no">
 	<description>Ik, Mik, Letterland - een leesavontuur met maan roos vis (Ned)[DVC]</description>
 	<year>1996</year>
 	<publisher>Philips</publisher>
@@ -4432,7 +4443,7 @@
 	</part>
 </software>
 
-<software name="imaginat">
+<software name="imaginat" supported="no">
 	<description>Imagination in Motion - A New Era in 3D Chill Out Video (Euro)[DVC]</description>
 	<year>1996</year>
 	<publisher>AIMS Multimedia</publisher>
@@ -4443,18 +4454,7 @@
 	</part>
 </software>
 
-<software name="impressi">
-	<description>Les Impressionnistes Français (Fra)</description>
-	<year>1992</year>
-	<publisher>Philips</publisher>
-	<part name="cdrom" interface="cdi_cdrom">
-		<diskarea name="cdrom">
-			<disk name="impressionnistes francais, les (1992)(philips)(fr)" sha1="084ae8bfdde803970c9f32ca81aeabebf3fcd18f"/>
-		</diskarea>
-	</part>
-</software>
-
-<software name="interdec">
+<software name="interdec" supported="no">
 	<description>Interactive Math - Decimals v1.0 (USA)[DVC]</description>
 	<year>1994</year>
 	<publisher>Gulliver Ritchie Associates</publisher>
@@ -4476,7 +4476,7 @@
 	</part>
 </software>
 
-<software name="internet">
+<software name="internet" supported="no">
 	<description>Internetten op je TV! - Demo Disc (Ned)[DVC][8140154]</description>
 	<year>1996</year>
 	<publisher>Philips</publisher>
@@ -4487,7 +4487,7 @@
 	</part>
 </software>
 
-<software name="internta">
+<software name="interneta" cloneof="internet" supported="no">
 	<description>Internetten op je TV! - Demo Disc (Ned)[DVC][8100330]</description>
 	<year>1996</year>
 	<publisher>Philips</publisher>
@@ -4520,7 +4520,7 @@
 	</part>
 </software>
 
-<software name="jazzlesg">
+<software name="jazzgianf" cloneof="jazzgian">
 	<description>Jazz - Les Geants de Big Band à la Bossa Nova (Fra)</description>
 	<year>1993</year>
 	<publisher>Philips</publisher>
@@ -4531,7 +4531,7 @@
 	</part>
 </software>
 
-<software name="journal1">
+<software name="jour94" supported="no">
 	<description>Le Journal Interactif '94 et Le Jeu des Stars de l'info (Fra)[DVC]</description>
 	<year>1995</year>
 	<publisher>Philips</publisher>
@@ -4549,7 +4549,7 @@
 	</part>
 </software>
 
-<software name="jour951">
+<software name="jour95" supported="no">
 	<description>Le Journal interactif 1995 et Le Jeu des Stars de l'info (Fra)[DVC]</description>
 	<year>1995</year>
 	<publisher>Philips</publisher>
@@ -4567,7 +4567,7 @@
 	</part>
 </software>
 
-<software name="joyofsxo">
+<software name="joysexu" cloneof="joysex" supported="no">
 	<description>The Joy of Sex v3.01 (USA)[DVC]</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
@@ -4578,7 +4578,7 @@
 	</part>
 </software>
 
-<software name="joyofsex">
+<software name="joysex" supported="no">
 	<description>The Joy of Sex v3.03 (Euro)[DVC]</description>
 	<year>1993</year>
 	<publisher>Philips</publisher>
@@ -4655,7 +4655,7 @@
 	</part>
 </software>
 
-<software name="kathy">
+<software name="kathy" supported="no">
 	<description>Kathy Smith - Personal Trainer (Euro)[DVC]</description>
 	<year>1995</year>
 	<publisher>Philips</publisher>
@@ -4666,7 +4666,7 @@
 	</part>
 </software>
 
-<software name="kathyu">
+<software name="kathyu" cloneof="kathy" supported="no">
 	<description>Kathy Smith - Personal Trainer (USA)[DVC]</description>
 	<year>1995</year>
 	<publisher>Philips</publisher>
@@ -4677,7 +4677,7 @@
 	</part>
 </software>
 
-<software name="keepf1">
+<software name="bonjovi" supported="no">
 	<description>Keep The Faith - An Evening with Bon Jovi (Euro)[DVC]</description>
 	<year>1993</year>
 	<publisher>Philips ~ PolyGram</publisher>
@@ -4693,18 +4693,7 @@
 	</part>
 </software>
 
-<software name="kinderda">
-	<description>De Kinderdisc met het complete verhaal ijsbeer in de tropen (Ned, Alt)[DVC]</description>
-	<year>1995</year>
-	<publisher>Philips</publisher>
-	<part name="cdrom" interface="cdi_cdrom">
-		<diskarea name="cdrom">
-			<disk name="kinderdisc met het complete verhaal ijsbeer in de tropen, de (1995)(philips)(nl)[a][dvc]" sha1="9e4471ca4013e45f07bfe041427c4cb986d2edb5"/>
-		</diskarea>
-	</part>
-</software>
-
-<software name="kinderd">
+<software name="kinderd" supported="no">
 	<description>De Kinderdisc met het complete verhaal ijsbeer in de tropen (Ned)[DVC]</description>
 	<year>1995</year>
 	<publisher>Philips</publisher>
@@ -4715,7 +4704,18 @@
 	</part>
 </software>
 
-<software name="kissv107">
+<software name="kinderda" cloneof="kinderd" supported="no">
+	<description>De Kinderdisc met het complete verhaal ijsbeer in de tropen (Ned, Alt)[DVC]</description>
+	<year>1995</year>
+	<publisher>Philips</publisher>
+	<part name="cdrom" interface="cdi_cdrom">
+		<diskarea name="cdrom">
+			<disk name="kinderdisc met het complete verhaal ijsbeer in de tropen, de (1995)(philips)(nl)[a][dvc]" sha1="9e4471ca4013e45f07bfe041427c4cb986d2edb5"/>
+		</diskarea>
+	</part>
+</software>
+
+<software name="kiss">
 	<description>Kiss v1.07 (Euro)</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
@@ -4726,7 +4726,7 @@
 	</part>
 </software>
 
-<software name="kulturbe">
+<software name="kultur">
 	<description>Kulturberg Naturtal - Eine Tirolreise auf cd-i (Aut)</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
@@ -4748,7 +4748,7 @@
 	</part>
 </software>
 
-<software name="kunstscn">
+<software name="kunstscd">
 	<description>De Kunstschatten Van Rusluand - St. Petersburg en de Collectie van de Hermitage (Ned)</description>
 	<year>1993</year>
 	<publisher>Philips</publisher>
@@ -4770,7 +4770,7 @@
 	</part>
 </software>
 
-<software name="langg11">
+<software name="langg1">
 	<description>Language Director - Deutsch Level 1 (Euro)</description>
 	<year>1993</year>
 	<publisher>Philips</publisher>
@@ -4792,7 +4792,7 @@
 	</part>
 </software>
 
-<software name="langg21">
+<software name="langg2">
 	<description>Language Director - Deutsch Level 2 (Euro)</description>
 	<year>1993</year>
 	<publisher>Philips</publisher>
@@ -4814,7 +4814,7 @@
 	</part>
 </software>
 
-<software name="langg31">
+<software name="langg3">
 	<description>Language Director - Deutsch Level 3 (Euro)</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
@@ -4836,7 +4836,7 @@
 	</part>
 </software>
 
-<software name="lange11">
+<software name="lange1">
 	<description>Language Director - English Level 1 (Euro)</description>
 	<year>1993</year>
 	<publisher>Philips</publisher>
@@ -4858,7 +4858,7 @@
 	</part>
 </software>
 
-<software name="lange21">
+<software name="lange2">
 	<description>Language Director - English Level 2 (Euro)</description>
 	<year>1993</year>
 	<publisher>Philips</publisher>
@@ -4880,7 +4880,7 @@
 	</part>
 </software>
 
-<software name="langs11">
+<software name="langs1">
 	<description>Language Director - Espanol Level 1 (Euro)</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
@@ -4902,7 +4902,7 @@
 	</part>
 </software>
 
-<software name="langf11">
+<software name="langf1">
 	<description>Language Director - Français Level 1 (Euro)</description>
 	<year>1993</year>
 	<publisher>Philips</publisher>
@@ -4924,7 +4924,7 @@
 	</part>
 </software>
 
-<software name="langf21">
+<software name="langf2">
 	<description>Language Director - Français Level 2 (Euro)</description>
 	<year>1993</year>
 	<publisher>Philips</publisher>
@@ -4946,7 +4946,7 @@
 	</part>
 </software>
 
-<software name="langf31">
+<software name="langf3">
 	<description>Language Director - Français Level 3 (Euro)</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
@@ -4968,7 +4968,7 @@
 	</part>
 </software>
 
-<software name="mpyth">
+<software name="mpython" supported="no">
 	<description>Live Without Monty Python (Euro)[DVC]</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
@@ -4979,7 +4979,7 @@
 	</part>
 </software>
 
-<software name="mpythu">
+<software name="mpythonu" cloneof="mpython" supported="no">
 	<description>Live Without Monty Python (USA)[DVC]</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
@@ -4990,7 +4990,7 @@
 	</part>
 </software>
 
-<software name="loving1">
+<software name="loving" supported="no">
 	<description>Loving for a Lifetime (Euro)[DVC]</description>
 	<year>1994</year>
 	<publisher>Extraware ~ Interlance ~ Meteor Film</publisher>
@@ -5006,7 +5006,7 @@
 	</part>
 </software>
 
-<software name="lovingg1">
+<software name="lovingg" cloneof="loving">
 	<description>Loving for a Lifetime - Sex, Lust und Leben (Ger)</description>
 	<year>1994</year>
 	<publisher>Extraware ~ Interlance ~ Meteor Film</publisher>
@@ -5022,7 +5022,7 @@
 	</part>
 </software>
 
-<software name="machinea">
+<software name="timemach">
 	<description>La Machine à Remonter le Temps (Fra)</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
@@ -5033,7 +5033,7 @@
 	</part>
 </software>
 
-<software name="maestrio">
+<software name="maest600">
 	<description>I Maestri Olandesi del Seicento (Ita)</description>
 	<year>1995</year>
 	<publisher>Philips</publisher>
@@ -5044,7 +5044,7 @@
 	</part>
 </software>
 
-<software name="malschul">
+<software name="malschu1">
 	<description>Malschule 1 (Ger) ~ Escuela de Pintura I (Spa) ~ Schilderschool I (Ned)</description>
 	<year>1992</year>
 	<publisher>Philips</publisher>
@@ -5066,7 +5066,7 @@
 	</part>
 </software>
 
-<software name="mathtr1">
+<software name="mathtr1" supported="no">
 	<description>Mathtrak K1 (USA)[DVC]</description>
 	<year>1994</year>
 	<publisher> InterROM </publisher>
@@ -5077,7 +5077,7 @@
 	</part>
 </software>
 
-<software name="mathtr2">
+<software name="mathtr2" supported="no">
 	<description>Mathtrak K2 (USA)[DVC]</description>
 	<year>1994</year>
 	<publisher> InterROM </publisher>
@@ -5099,7 +5099,7 @@
 	</part>
 </software>
 
-<software name="maxmagia">
+<software name="maxmagica" cloneof="maxmagic">
 	<description>Max Magic (Euro, Alt)</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
@@ -5110,7 +5110,7 @@
 	</part>
 </software>
 
-<software name="maxmagiu">
+<software name="maxmagicu" cloneof="maxmagic">
 	<description>Max Magic (USA)</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
@@ -5132,7 +5132,7 @@
 	</part>
 </software>
 
-<software name="mmlmons">
+<software name="lilmonst">
 	<description>Mercer Mayer's Little Monster at School (Euro)</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
@@ -5143,7 +5143,7 @@
 	</part>
 </software>
 
-<software name="mmlmonsu">
+<software name="lilmonstu" cloneof="lilmonst">
 	<description>Mercer Mayer's Little Monster at School (USA)</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
@@ -5154,7 +5154,7 @@
 	</part>
 </software>
 
-<software name="methoded">
+<software name="methlang">
 	<description>La Methode de Langues Multimedia - Je parle l'Allemand (Fra)</description>
 	<year>1996</year>
 	<publisher>Infogrames</publisher>
@@ -5165,7 +5165,7 @@
 	</part>
 </software>
 
-<software name="mondriaa">
+<software name="mondrian">
 	<description>Mondriaan (Ned)[CD-i-PC]</description>
 	<year>1995</year>
 	<publisher>Zoutewelle Multimedia</publisher>
@@ -5176,7 +5176,7 @@
 	</part>
 </software>
 
-<software name="mpysky">
+<software name="mpysthky" supported="no">
 	<description>Monty Python's Invasion from the Planet Skyron (Euro)[DVC]</description>
 	<year>1995</year>
 	<publisher>Philips</publisher>
@@ -5187,7 +5187,7 @@
 	</part>
 </software>
 
-<software name="mpybits">
+<software name="mpythbit" supported="no">
 	<description>Monty Python's More Naughty Bits (Euro)[DVC]</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
@@ -5198,7 +5198,7 @@
 	</part>
 </software>
 
-<software name="mpybitsa">
+<software name="mpythbitu" cloneof="mpythbit" supported="no">
 	<description>Monty Python's More Naughty Bits (USA)[DVC]</description>
 	<year>1995</year>
 	<publisher>Philips</publisher>
@@ -5209,7 +5209,7 @@
 	</part>
 </software>
 
-<software name="mosesthe">
+<software name="moses">
 	<description>Moses - The Exodus (USA)</description>
 	<year>1992</year>
 	<publisher>Philips</publisher>
@@ -5220,7 +5220,7 @@
 	</part>
 </software>
 
-<software name="mothergo">
+<software name="mgoosehp">
 	<description>Mother Goose - Hidden Pictures (USA)[0152911 01]</description>
 	<year>1991</year>
 	<publisher>Philips</publisher>
@@ -5231,7 +5231,7 @@
 	</part>
 </software>
 
-<software name="motherga">
+<software name="mgoosehpa" cloneof="mgoosehp">
 	<description>Mother Goose - Hidden Pictures (USA)[3106900152 50228 843 03]</description>
 	<year>1991</year>
 	<publisher>Philips</publisher>
@@ -5242,7 +5242,7 @@
 	</part>
 </software>
 
-<software name="mothergb">
+<software name="mgooserc">
 	<description>Mother Goose - Rhymes to Color (USA)[3106900162 50228 839 01]</description>
 	<year>1991</year>
 	<publisher>Philips</publisher>
@@ -5253,7 +5253,7 @@
 	</part>
 </software>
 
-<software name="mothergc">
+<software name="mgooserca" cloneof="mgooserc">
 	<description>Mother Goose - Rhymes to Color (USA)[MGRTC392 03!]</description>
 	<year>1991</year>
 	<publisher>Philips</publisher>
@@ -5264,7 +5264,7 @@
 	</part>
 </software>
 
-<software name="muzzylea">
+<software name="muzzyfr" supported="no">
 	<description>Muzzy - Learn French the Fun Way (Euro)[DVC]</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
@@ -5275,7 +5275,7 @@
 	</part>
 </software>
 
-<software name="muzzyleb">
+<software name="muzzyfru" cloneof="muzzyfr" supported="no">
 	<description>Muzzy - Learn French the Fun Way (USA)[DVC]</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
@@ -5297,7 +5297,7 @@
 	</part>
 </software>
 
-<software name="nederlan">
+<software name="nederlnd" supported="no">
 	<description>Nederlands Elftal Compleet - Alles over de Europese Kampioenschappen (Ned)[DVC]</description>
 	<year>1996</year>
 	<publisher>Philips</publisher>
@@ -5308,7 +5308,7 @@
 	</part>
 </software>
 
-<software name="nederl95">
+<software name="nederl95" supported="no">
 	<description>Nederlands Film Festival '95 - 15 Jaar Gouden Kalf (Ned)[DVC]</description>
 	<year>1995</year>
 	<publisher>Philips</publisher>
@@ -5319,7 +5319,7 @@
 	</part>
 </software>
 
-<software name="nfl100gr">
+<software name="nfl100gt">
 	<description>NFL 100 Greatest Touchdowns (Euro)</description>
 	<year>1996</year>
 	<publisher>Philips</publisher>
@@ -5330,7 +5330,7 @@
 	</part>
 </software>
 
-<software name="nfl100gu">
+<software name="nfl100gtu" cloneof="nfl100gt">
 	<description>NFL 100 Greatest Touchdowns (USA)</description>
 	<year>1996</year>
 	<publisher>Philips</publisher>
@@ -5374,7 +5374,7 @@
 	</part>
 </software>
 
-<software name="odysseyt">
+<software name="odyssey">
 	<description>Odyssey - The Journey to Your Future (USA)</description>
 	<year>1997</year>
 	<publisher>Educational Management Group</publisher>
@@ -5385,7 +5385,7 @@
 	</part>
 </software>
 
-<software name="ontdekhe">
+<software name="ontdekhe" supported="no">
 	<description>Ontdek het onbekende Nederland - Nederland-Waterland v1.0 (Ned)[DVC]</description>
 	<year>1995</year>
 	<publisher>Philips</publisher>
@@ -5396,7 +5396,7 @@
 	</part>
 </software>
 
-<software name="operaima">
+<software name="operaimg">
 	<description>Opera Imaginaire (Euro)</description>
 	<year>1995</year>
 	<publisher> Pascavision </publisher>
@@ -5407,7 +5407,7 @@
 	</part>
 </software>
 
-<software name="origami1">
+<software name="origami">
 	<description>Origami (Euro)</description>
 	<year>1993</year>
 	<publisher>Philips</publisher>
@@ -5418,7 +5418,7 @@
 	</part>
 </software>
 
-<software name="pawspers">
+<software name="paws">
 	<description>P.A.W.S. - Personal Automated Wagging System (Euro)</description>
 	<year>1998</year>
 	<publisher>Philips</publisher>
@@ -5429,7 +5429,7 @@
 	</part>
 </software>
 
-<software name="paintsch">
+<software name="paintsc">
 	<description>Paint School I v1.0 (USA)</description>
 	<year>1991</year>
 	<publisher>Philips</publisher>
@@ -5473,7 +5473,7 @@
 	</part>
 </software>
 
-<software name="pegasus1">
+<software name="pegasus">
 	<description>Pegasus (Euro, USA)</description>
 	<year>1992</year>
 	<publisher>Philips</publisher>
@@ -5484,7 +5484,7 @@
 	</part>
 </software>
 
-<software name="philipsd">
+<software name="philipsd" supported="no">
 	<description>Philips Demo CD (Ned)[DVC]</description>
 	<year>1995</year>
 	<publisher>Philips</publisher>
@@ -5506,7 +5506,7 @@
 	</part>
 </software>
 
-<software name="philipsm">
+<software name="philipme" supported="no">
 	<!-- Alt. Title: Standaard Interactieve Encyclopedie -->
 	<description>Philips Media Interactieve Encyclopedie (Ned)[DVC]</description>
 	<year>1995</year>
@@ -5518,7 +5518,7 @@
 	</part>
 </software>
 
-<software name="philipex">
+<software name="philipex" supported="no">
 	<description>Philips Media Interactieve Encyclopedie - Demonstratie - Exemplaar (Ned)[DVC]</description>
 	<year>1995</year>
 	<publisher>Philips</publisher>
@@ -5529,7 +5529,7 @@
 	</part>
 </software>
 
-<software name="philipnl">
+<software name="philipmm" supported="no">
 	<description>Philips Media Medische Encyclopedie (Ned)[DVC]</description>
 	<year>1996</year>
 	<publisher>Philips</publisher>
@@ -5540,7 +5540,7 @@
 	</part>
 </software>
 
-<software name="photocdo">
+<software name="photocddo" cloneof="photocdd">
 	<description>Photo CD Demo Disc v3.0 (Euro)[1993-03]</description>
 	<year>1993</year>
 	<publisher>Philips</publisher>
@@ -5562,7 +5562,7 @@
 	</part>
 </software>
 
-<software name="playboyi">
+<software name="playboyi" cloneof="playboy" supported="no">
 	<description>Playboy - I Segreti Del Massaggio (Ita)[DVC]</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
@@ -5573,7 +5573,7 @@
 	</part>
 </software>
 
-<software name="playboys">
+<software name="playboy" supported="no">
 	<description>Playboy's Complete Massage (USA)[DVC]</description>
 	<year>1993</year>
 	<publisher>Philips</publisher>
@@ -5595,7 +5595,7 @@
 	</part>
 </software>
 
-<software name="portrait">
+<software name="venice">
 	<description>Portrait of a City - Venice (Euro)</description>
 	<year>1992</year>
 	<publisher>Philips</publisher>
@@ -5606,7 +5606,7 @@
 	</part>
 </software>
 
-<software name="ritratto">
+<software name="venicei" cloneof="venice">
 	<description>Ritratto di Città - Venezia (Ita)</description>
 	<year>1993</year>
 	<publisher>Philips</publisher>
@@ -5650,7 +5650,7 @@
 	</part>
 </software>
 
-<software name="privroku">
+<software name="privrocku" cloneof="privrock">
 	<description>Private Lesson Series - Rock Guitar - A Beginner's Guide (USA)</description>
 	<year>1992</year>
 	<publisher>Philips</publisher>
@@ -5661,7 +5661,7 @@
 	</part>
 </software>
 
-<software name="pyramida">
+<software name="pyramid" supported="no">
 	<description>Pyramid Adventures - Episode 1 - Treasures of the Lost Pyramid (USA)[DVC]</description>
 	<year>1995</year>
 	<publisher>Compact Disc Incorporated</publisher>
@@ -5672,7 +5672,7 @@
 	</part>
 </software>
 
-<software name="queengr1">
+<software name="queen" supported="no">
 	<description>Queen - Greatest Flix I &amp; II (Euro)[DVC]</description>
 	<year>1994</year>
 	<publisher>Queen Films</publisher>
@@ -5699,7 +5699,7 @@
 	</part>
 </software>
 
-<software name="randmc">
+<software name="usatlas">
 	<description>Rand McNally's America - United States Atlas (USA)[01420320 03]</description>
 	<year>1991</year>
 	<publisher>Philips</publisher>
@@ -5710,7 +5710,7 @@
 	</part>
 </software>
 
-<software name="randmca">
+<software name="usatlasa" cloneof="usatlas">
 	<description>Rand McNally's America - United States Atlas (USA)[3106900142 50239 896 01]</description>
 	<year>1991</year>
 	<publisher>Philips</publisher>
@@ -5721,7 +5721,7 @@
 	</part>
 </software>
 
-<software name="reihepri">
+<software name="privclsg">
 	<description>Reihe Privatunterricht - Die Klassische Gitarre (Ger)</description>
 	<year>1992</year>
 	<publisher>Philips</publisher>
@@ -5732,7 +5732,7 @@
 	</part>
 </software>
 
-<software name="reiherck">
+<software name="privrckg">
 	<description>Reihe Privatunterricht - Rockgitarre (Ger)</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
@@ -5743,7 +5743,7 @@
 	</part>
 </software>
 
-<software name="renaisu">
+<software name="rengal">
 	<description>The Renaissance Gallery (USA)[0362911 01]</description>
 	<year>1991</year>
 	<publisher>Philips</publisher>
@@ -5754,7 +5754,7 @@
 	</part>
 </software>
 
-<software name="renaisua">
+<software name="rengala" cloneof="rengal">
 	<description>The Renaissance Gallery (USA)[310690 0442 50260 353 01]</description>
 	<year>1992</year>
 	<publisher>Philips</publisher>
@@ -5765,7 +5765,7 @@
 	</part>
 </software>
 
-<software name="renfu">
+<software name="renflor">
 	<description>The Renaissance of Florence (USA)[0442397 01, 0442397 02]</description>
 	<year>1991</year>
 	<publisher>Philips</publisher>
@@ -5776,7 +5776,7 @@
 	</part>
 </software>
 
-<software name="renfua">
+<software name="renflora" cloneof="renflor">
 	<description>The Renaissance of Florence (USA)[310690036-2 50239 145 01]</description>
 	<year>1992</year>
 	<publisher>Philips</publisher>
@@ -5787,7 +5787,7 @@
 	</part>
 </software>
 
-<software name="renacimi">
+<software name="renflors" cloneof="renflor">
 	<description>El Renacimiento de Florencia (Spa)</description>
 	<year>1992</year>
 	<publisher>Philips</publisher>
@@ -5798,51 +5798,7 @@
 	</part>
 </software>
 
-<software name="renaisf">
-	<description>Le Renaissance à Florence (Fra)</description>
-	<year>1992</year>
-	<publisher>Philips</publisher>
-	<part name="cdrom" interface="cdi_cdrom">
-		<diskarea name="cdrom">
-			<disk name="renaissance a florence, la (1992)(philips)(fr)" sha1="c7a20aae2456a97a0274bdc74cecc181f4dd5bae"/>
-		</diskarea>
-	</part>
-</software>
-
-<software name="renaisg">
-	<description>Die Renaissance in Florenz (Ger)</description>
-	<year>1992</year>
-	<publisher>Philips</publisher>
-	<part name="cdrom" interface="cdi_cdrom">
-		<diskarea name="cdrom">
-			<disk name="renaissance in florenz, die (1992)(philips)(de)" sha1="766bd740a442ad7ac9d9d1e5658d2abddadecce3"/>
-		</diskarea>
-	</part>
-</software>
-
-<software name="rinascim">
-	<description>Il Rinascimento a Firenze (Ita)</description>
-	<year>1992</year>
-	<publisher>Philips</publisher>
-	<part name="cdrom" interface="cdi_cdrom">
-		<diskarea name="cdrom">
-			<disk name="rinascimento a firenze, il (1992)(philips)(it)" sha1="72704aeb13fd9398b4f29012da2c617c7df892fb"/>
-		</diskarea>
-	</part>
-</software>
-
-<software name="renfun">
-	<description>De Renaissance van Florence (Ned)</description>
-	<year>1991</year>
-	<publisher>Philips</publisher>
-	<part name="cdrom" interface="cdi_cdrom">
-		<diskarea name="cdrom">
-			<disk name="renaissance van florence, de (1991)(philips)(nl)" sha1="2f6008ceac1df9a7a751b7f4b7cbe6ba5b826822"/>
-		</diskarea>
-	</part>
-</software>
-
-<software name="renacicc">
+<software name="renflorscc" cloneof="renflor">
 	<description>El Renacimiento de Florencia (Compilation Cultura) (Spa)</description>
 	<year>1992</year>
 	<publisher>Philips</publisher>
@@ -5853,7 +5809,51 @@
 	</part>
 </software>
 
-<software name="rhythmu">
+<software name="renflorf" cloneof="renflor">
+	<description>Le Renaissance à Florence (Fra)</description>
+	<year>1992</year>
+	<publisher>Philips</publisher>
+	<part name="cdrom" interface="cdi_cdrom">
+		<diskarea name="cdrom">
+			<disk name="renaissance a florence, la (1992)(philips)(fr)" sha1="c7a20aae2456a97a0274bdc74cecc181f4dd5bae"/>
+		</diskarea>
+	</part>
+</software>
+
+<software name="renflorg" cloneof="renflor">
+	<description>Die Renaissance in Florenz (Ger)</description>
+	<year>1992</year>
+	<publisher>Philips</publisher>
+	<part name="cdrom" interface="cdi_cdrom">
+		<diskarea name="cdrom">
+			<disk name="renaissance in florenz, die (1992)(philips)(de)" sha1="766bd740a442ad7ac9d9d1e5658d2abddadecce3"/>
+		</diskarea>
+	</part>
+</software>
+
+<software name="renflori" cloneof="renflor">
+	<description>Il Rinascimento a Firenze (Ita)</description>
+	<year>1992</year>
+	<publisher>Philips</publisher>
+	<part name="cdrom" interface="cdi_cdrom">
+		<diskarea name="cdrom">
+			<disk name="rinascimento a firenze, il (1992)(philips)(it)" sha1="72704aeb13fd9398b4f29012da2c617c7df892fb"/>
+		</diskarea>
+	</part>
+</software>
+
+<software name="renflord" cloneof="renflor">
+	<description>De Renaissance van Florence (Ned)</description>
+	<year>1991</year>
+	<publisher>Philips</publisher>
+	<part name="cdrom" interface="cdi_cdrom">
+		<diskarea name="cdrom">
+			<disk name="renaissance van florence, de (1991)(philips)(nl)" sha1="2f6008ceac1df9a7a751b7f4b7cbe6ba5b826822"/>
+		</diskarea>
+	</part>
+</software>
+
+<software name="rhythm">
 	<description>Rhythm Maker (USA)[17220326 01]</description>
 	<year>1993</year>
 	<publisher>Philips</publisher>
@@ -5864,7 +5864,7 @@
 	</part>
 </software>
 
-<software name="rhythmua">
+<software name="rhythma" cloneof="rhythm">
 	<description>Rhythm Maker (USA)[17220409 02]</description>
 	<year>1993</year>
 	<publisher>Philips</publisher>
@@ -5875,7 +5875,7 @@
 	</part>
 </software>
 
-<software name="richard1">
+<software name="scarryab">
 	<description>Richard Scarry's Allerbeste Buurt Disc! (Ned)</description>
 	<year>1992</year>
 	<publisher>Philips</publisher>
@@ -5886,7 +5886,7 @@
 	</part>
 </software>
 
-<software name="richard2">
+<software name="scarryad">
 	<description>Richard Scarry's Allerdrukste Buurt Disc! (Ned)</description>
 	<year>1992</year>
 	<publisher>Philips</publisher>
@@ -5897,7 +5897,7 @@
 	</part>
 </software>
 
-<software name="richard3">
+<software name="scarryag">
 	<description>Richard Scarry's Allerwitzigste Geschichten aus Schaffenau (Ger)</description>
 	<year>1992</year>
 	<publisher>Philips</publisher>
@@ -5908,7 +5908,7 @@
 	</part>
 </software>
 
-<software name="richard4">
+<software name="scarrybe">
 	<description>Richard Scarry's Best Neighborhood Disc Ever! (USA)</description>
 	<year>1992</year>
 	<publisher>Philips</publisher>
@@ -5919,7 +5919,7 @@
 	</part>
 </software>
 
-<software name="richard5">
+<software name="scarrybu">
 	<description>Richard Scarry's Busiest Neighborhood Disc Ever! (USA)[0382911 01]</description>
 	<year>1991</year>
 	<publisher>Philips</publisher>
@@ -5930,7 +5930,7 @@
 	</part>
 </software>
 
-<software name="richard6">
+<software name="scarrybua" cloneof="scarrybu">
 	<description>Richard Scarry's Busiest Neighborhood Disc Ever! (USA)[03820201 01]</description>
 	<year>1992</year>
 	<publisher>Philips</publisher>
@@ -5941,7 +5941,7 @@
 	</part>
 </software>
 
-<software name="richard7">
+<software name="scarrybub" cloneof="scarrybu">
 	<description>Richard Scarry's Busiest Neighborhood Disc Ever! (USA)[3106900382 50257 831 01]</description>
 	<year>1992</year>
 	<publisher>Philips</publisher>
@@ -5952,7 +5952,7 @@
 	</part>
 </software>
 
-<software name="richard8">
+<software name="scarrywg">
 	<description>Richard Scarry's Wunderbarste Geschichten aus Schaffenau (Ger)</description>
 	<year>1992</year>
 	<publisher>Philips</publisher>
@@ -5963,7 +5963,7 @@
 	</part>
 </software>
 
-<software name="richesof">
+<software name="riches">
 	<description>The Riches of Coins (USA)</description>
 	<year>1992</year>
 	<publisher>Philips</publisher>
@@ -5974,7 +5974,7 @@
 	</part>
 </software>
 
-<software name="tina1">
+<software name="tina88" supported="no">
 	<description>Rio '88 - Tina Turner (Euro)[DVC]</description>
 	<year>19??</year>
 	<publisher>Philips ~ PolyGram</publisher>
@@ -5990,7 +5990,7 @@
 	</part>
 </software>
 
-<software name="rockmeto">
+<software name="rockmet">
 	<description>Rock - Metoode de Guitare avec Paul Personne (Fra)</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
@@ -6012,7 +6012,7 @@
 	</part>
 </software>
 
-<software name="rulesofg">
+<software name="rulesglf">
 	<description>The Rules of Golf (Ned)</description>
 	<year>1991</year>
 	<publisher>Telecity CD-I</publisher>
@@ -6023,7 +6023,7 @@
 	</part>
 </software>
 
-<software name="sailing1">
+<software name="sailing">
 	<description>Sailing (USA)</description>
 	<year>1993</year>
 	<publisher>Philips</publisher>
@@ -6045,7 +6045,7 @@
 	</part>
 </software>
 
-<software name="sandysci">
+<software name="sandyadv">
 	<description>Sandy's Circus Adventure (USA)</description>
 	<year>1991</year>
 	<publisher>Philips</publisher>
@@ -6056,7 +6056,7 @@
 	</part>
 </software>
 
-<software name="aventure">
+<software name="sandyadvf" cloneof="sandyadv">
 	<description>Les Aventures de Sandy au Cirque (Fra)</description>
 	<year>1993</year>
 	<publisher>Philips</publisher>
@@ -6067,7 +6067,7 @@
 	</part>
 </software>
 
-<software name="sandyscn">
+<software name="sandyadvd" cloneof="sandyadv">
 	<description>Sandy's Circus Avontuur (Ned)[814 0008 50260 053 01]</description>
 	<year>1992</year>
 	<publisher>Philips</publisher>
@@ -6078,7 +6078,7 @@
 	</part>
 </software>
 
-<software name="sandysna">
+<software name="sandyadvda" cloneof="sandyadv">
 	<description>Sandy's Circus Avontuur (Ned)[8140008 50260 053 02]</description>
 	<year>1992</year>
 	<publisher>Philips</publisher>
@@ -6089,7 +6089,7 @@
 	</part>
 </software>
 
-<software name="sandyszi">
+<software name="sandyadvg" cloneof="sandyadv">
 	<description>Sandy's Zirkus Abenteuer (Ger)</description>
 	<year>1992</year>
 	<publisher>Philips</publisher>
@@ -6100,7 +6100,7 @@
 	</part>
 </software>
 
-<software name="santacla">
+<software name="santamic">
 	<!-- Alt. Title: Les souris du Pere Noel -->
 	<description>Santa Claus' Mice (Euro)</description>
 	<year>1992</year>
@@ -6123,7 +6123,7 @@
 	</part>
 </software>
 
-<software name="sciamo">
+<software name="tombaski" supported="no">
 	<description>Sciamo con Alberto Tomba - Let's Go Skiing With Alberto Tomba (Euro)[DVC][8100236V103 50461390 01]</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
@@ -6134,7 +6134,7 @@
 	</part>
 </software>
 
-<software name="sciamoa">
+<software name="tombaskia" cloneof="tombaski" supported="no">
 	<description>Sciamo con Alberto Tomba - Let's Go Skiing With Alberto Tomba (Euro)[DVC][991953100049 1445-A]</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
@@ -6145,7 +6145,7 @@
 	</part>
 </software>
 
-<software name="sharilew">
+<software name="sharilew" supported="no">
 	<description>Shari Lewis - Lamb Chop's Play-Along! - Action Songs (USA)[DVC]</description>
 	<year>1993</year>
 	<publisher>Philips</publisher>
@@ -6167,7 +6167,7 @@
 	</part>
 </software>
 
-<software name="shipwrec">
+<software name="shipwrck">
 	<description>Shipwreck v3.03 (Euro)</description>
 	<year>1993</year>
 	<publisher>Philips</publisher>
@@ -6189,7 +6189,7 @@
 	</part>
 </software>
 
-<software name="siteseei">
+<software name="eindhov">
 	<description>Site Seeing in Digitaal Eindhoven (Ned)</description>
 	<year>1997</year>
 	<publisher>TV-Tokyo</publisher>
@@ -6211,7 +6211,7 @@
 	</part>
 </software>
 
-<software name="soundtra">
+<software name="soundtrp">
 	<description>Soundtrap v3.04 (Euro)</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
@@ -6233,7 +6233,7 @@
 	</part>
 </software>
 
-<software name="stampswi">
+<software name="stamps">
 	<description>Stamps - Windows on the World (USA)</description>
 	<year>1991</year>
 	<publisher>Philips</publisher>
@@ -6255,24 +6255,13 @@
 	</part>
 </software>
 
-<software name="stickybu">
+<software name="stickybu" cloneof="stickyb">
 	<description>Stickybear Family Fun Games (USA)</description>
 	<year>1995</year>
 	<publisher>Philips</publisher>
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="stickybear family fun games (1995)(philips)(us)[!]" sha1="bed6ec58e876dea844711166d2ff57ab006bb7fd"/>
-		</diskarea>
-	</part>
-</software>
-
-<software name="stickybs">
-	<description>Stickybear Leyendo (Spa)</description>
-	<year>1994</year>
-	<publisher>Philips</publisher>
-	<part name="cdrom" interface="cdi_cdrom">
-		<diskarea name="cdrom">
-			<disk name="stickybear leyendo (1994)(philips)(es)(en-es)" sha1="67cad4a1dce46c88456a9dc6bf37d6fb72225e42"/>
 		</diskarea>
 	</part>
 </software>
@@ -6299,7 +6288,7 @@
 	</part>
 </software>
 
-<software name="stickyru">
+<software name="stickyr">
 	<description>Stickybear Reading (USA)</description>
 	<year>1993</year>
 	<publisher>Philips</publisher>
@@ -6310,7 +6299,18 @@
 	</part>
 </software>
 
-<software name="stingten">
+<software name="stickyrs" cloneof="stickyr">
+	<description>Stickybear Leyendo (Spa)</description>
+	<year>1994</year>
+	<publisher>Philips</publisher>
+	<part name="cdrom" interface="cdi_cdrom">
+		<diskarea name="cdrom">
+			<disk name="stickybear leyendo (1994)(philips)(es)(en-es)" sha1="67cad4a1dce46c88456a9dc6bf37d6fb72225e42"/>
+		</diskarea>
+	</part>
+</software>
+
+<software name="sting" supported="no">
 	<description>Sting - Ten Summoner's Tales (Euro)[DVC]</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
@@ -6332,7 +6332,7 @@
 	</part>
 </software>
 
-<software name="storymg">
+<software name="storymcg" cloneof="storymc">
 	<description>Story Machine - Marchenzauber v1.0 (Ger)</description>
 	<year>1992</year>
 	<publisher>Philips</publisher>
@@ -6343,7 +6343,7 @@
 	</part>
 </software>
 
-<software name="storymu">
+<software name="storyms">
 	<description>Story Machine - Star Dreams v1.0 (USA)</description>
 	<year>1992</year>
 	<publisher>Philips</publisher>
@@ -6354,7 +6354,7 @@
 	</part>
 </software>
 
-<software name="storymas">
+<software name="storymsg" cloneof="storyms">
 	<description>Story Maschine - Galaxis v1.0 (Ger)</description>
 	<year>1992</year>
 	<publisher>Philips</publisher>
@@ -6365,7 +6365,7 @@
 	</part>
 </software>
 
-<software name="supertes">
+<software name="supertst">
 	<description>SuperTEST (Ita)</description>
 	<year>1995</year>
 	<publisher>Philips</publisher>
@@ -6376,7 +6376,7 @@
 	</part>
 </software>
 
-<software name="surfcty">
+<software name="surfcity">
 	<description>Surf City (Euro)</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
@@ -6387,7 +6387,7 @@
 	</part>
 </software>
 
-<software name="surfctyu">
+<software name="surfcityu" cloneof="surfcity">
 	<description>Surf City (USA)</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
@@ -6398,7 +6398,7 @@
 	</part>
 </software>
 
-<software name="tellmey">
+<software name="tellmeu1">
 	<description>Tell Me Why One (USA)</description>
 	<year>1991</year>
 	<publisher>Philips</publisher>
@@ -6409,7 +6409,7 @@
 	</part>
 </software>
 
-<software name="tellmeya">
+<software name="tellmey2">
 	<description>Tell Me Why Two (USA)</description>
 	<year>1991</year>
 	<publisher>Philips</publisher>
@@ -6420,7 +6420,7 @@
 	</part>
 </software>
 
-<software name="tenniso1">
+<software name="tennisow" supported="no">
 	<description>Tennis Our Way (USA)[DVC]</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
@@ -6441,7 +6441,7 @@
 	</part>
 </software>
 
-<software name="thumbeli">
+<software name="thumblin" supported="no">
 	<description>Thumbelina (Euro)[DVC]</description>
 	<year>1995</year>
 	<publisher>Philips</publisher>
@@ -6562,7 +6562,7 @@
 	</part>
 </software>
 
-<software name="tlphotua">
+<software name="tlphotoa" cloneof="tlphoto">
 	<description>Time-Life - 35mm Photography (USA)[310690017-2 50240 104 01]</description>
 	<year>1991</year>
 	<publisher>Philips</publisher>
@@ -6573,7 +6573,7 @@
 	</part>
 </software>
 
-<software name="tlphotou">
+<software name="tlphoto">
 	<description>Time-Life - 35mm Photography (USA)[3106900642 01]</description>
 	<year>1991</year>
 	<publisher>Philips</publisher>
@@ -6595,7 +6595,7 @@
 	</part>
 </software>
 
-<software name="tlphoton">
+<software name="tlphotod" cloneof="tlphoto">
 	<description>Time-Life - Kleinbeeld Fotografie (Ned)</description>
 	<year>1992</year>
 	<publisher>Philips</publisher>
@@ -6606,7 +6606,7 @@
 	</part>
 </software>
 
-<software name="tlphotog">
+<software name="tlphotog" cloneof="tlphoto">
 	<description>Time-Life - Kleinbildfotografie (Ger)</description>
 	<year>1992</year>
 	<publisher>Philips</publisher>
@@ -6617,7 +6617,7 @@
 	</part>
 </software>
 
-<software name="tlphotoi">
+<software name="tlphotoi" cloneof="tlphoto">
 	<description>Time-Life - La Fotografia In 35 mm (Ita)</description>
 	<year>1992</year>
 	<publisher>Philips</publisher>
@@ -6628,7 +6628,7 @@
 	</part>
 </software>
 
-<software name="tlphotof">
+<software name="tlphotof" cloneof="tlphoto">
 	<description>Time-Life - La Photographie - 24 x 36 mm (Fra)</description>
 	<year>1992</year>
 	<publisher>Philips</publisher>
@@ -6639,7 +6639,7 @@
 	</part>
 </software>
 
-<software name="titanica">
+<software name="titanic" supported="no">
 	<description>Titanic - An interactive exploration (USA)[DVC enhanced]</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
@@ -6650,7 +6650,7 @@
 	</part>
 </software>
 
-<software name="tomderma">
+<software name="tommaxmg">
 	<description>Tom der Maximagier (Ger)</description>
 	<year>1993</year>
 	<publisher>Philips</publisher>
@@ -6661,7 +6661,7 @@
 	</part>
 </software>
 
-<software name="tomlemax">
+<software name="tommaxmf">
 	<description>Tom le Maximagier v1.0 (Fra)[8120021 50262 231 03]</description>
 	<year>1992</year>
 	<publisher>Philips</publisher>
@@ -6672,7 +6672,7 @@
 	</part>
 </software>
 
-<software name="tomlemaa">
+<software name="tommaxmfa" cloneof="tommaxmf">
 	<description>Tom le Maximagier v1.0 (Fra)[8120021V203 50262231 05]</description>
 	<year>1992</year>
 	<publisher>Philips</publisher>
@@ -6683,7 +6683,7 @@
 	</part>
 </software>
 
-<software name="totaleur">
+<software name="totaleur" supported="no">
 	<description>Total Euro 96 (Euro)[DVC]</description>
 	<year>1996</year>
 	<publisher>Philips</publisher>
@@ -6705,7 +6705,7 @@
 	</part>
 </software>
 
-<software name="tria">
+<software name="tria" cloneof="tri">
 	<description>TR-I - No World Order (USA)[6902672 50378963 01]</description>
 	<year>1993</year>
 	<publisher>Philips</publisher>
@@ -6716,7 +6716,7 @@
 	</part>
 </software>
 
-<software name="treasure">
+<software name="smithson">
 	<description>Treasures of the Smithsonian (USA)</description>
 	<year>1991</year>
 	<publisher>Philips</publisher>
@@ -6727,8 +6727,8 @@
 	</part>
 </software>
 
-<software name="tresorde">
-	<description>Le Tresor de l'Ile aux jeux (Fra)</description>
+<software name="tresilej">
+	<description>Le Tresor de l'Ile aux Jeux (Fra)</description>
 	<year>1993</year>
 	<publisher>Philips</publisher>
 	<part name="cdrom" interface="cdi_cdrom">
@@ -6738,7 +6738,7 @@
 	</part>
 </software>
 
-<software name="uefachag">
+<software name="uefaclg" supported="no">
 	<description>UEFA Champions League (Ger)[DVC]</description>
 	<year>1995</year>
 	<publisher>Philips</publisher>
@@ -6749,7 +6749,7 @@
 	</part>
 </software>
 
-<software name="uefachan">
+<software name="uefacld" supported="no">
 	<description>UEFA Champions League (Ned)[DVC]</description>
 	<year>1995</year>
 	<publisher>Philips</publisher>
@@ -6771,7 +6771,7 @@
 	</part>
 </software>
 
-<software name="usa94gfn">
+<software name="usa94gfd" supported="no">
 	<description>USA '94 - World Cup (Euro, German / French / Dutch)[DVC enhanced][8100101V104 50404061 01]</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
@@ -6782,7 +6782,7 @@
 	</part>
 </software>
 
-<software name="usa94esi">
+<software name="usa94esia" cloneof="usa94esi" supported="no">
 	<description>USA '94 - World Cup (Euro, English / Spanish / Italian, Alt)[DVC enhanced][8100103V105 50404055 01]</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
@@ -6793,7 +6793,7 @@
 	</part>
 </software>
 
-<software name="us94esia">
+<software name="usa94esi" supported="no">
 	<description>USA '94 - World Cup (Euro, English / Spanish / Italian)[DVC enhanced][8100103V105 50404055 01]</description>
 	<year>1994</year>
 	<publisher>Philips</publisher>
@@ -6837,24 +6837,13 @@
 	</part>
 </software>
 
-<software name="videocdm">
+<software name="videocdm" supported="no">
 	<description>Video CD - Music Sampler (Euro)[DVC]</description>
 	<year>1995</year>
 	<publisher>Philips ~ PolyGram</publisher>
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="video cd - music sampler (1995)(philips - polygram)(eu)[dvc]" sha1="307eac171685ec019ea1ad802dee7c18b5f3f68a"/>
-		</diskarea>
-	</part>
-</software>
-
-<software name="vinsdefr">
-	<description>Les Vins de France (Fra)</description>
-	<year>1994</year>
-	<publisher>Philips</publisher>
-	<part name="cdrom" interface="cdi_cdrom">
-		<diskarea name="cdrom">
-			<disk name="vins de france, les (1994)(philips)(fr)" sha1="21a142ee35a4b8781d20ec599c86b2b5f8a10f36"/>
 		</diskarea>
 	</part>
 </software>
@@ -6881,7 +6870,7 @@
 	</part>
 </software>
 
-<software name="webi1996">
+<software name="webi">
 	<description>WEB-i (USA)</description>
 	<year>1996</year>
 	<publisher>Philips</publisher>
@@ -6892,7 +6881,7 @@
 	</part>
 </software>
 
-<software name="whatstha">
+<software name="whatbird">
 	<description>What's that Bird (Euro)</description>
 	<year>1992</year>
 	<publisher>Philips</publisher>
@@ -6903,7 +6892,7 @@
 	</part>
 </software>
 
-<software name="whycdi19">
+<software name="whycdi">
 	<description>Why CD-I</description>
 	<year>1991</year>
 	<publisher>Philips</publisher>
@@ -6914,7 +6903,7 @@
 	</part>
 </software>
 
-<software name="windowso">
+<software name="windchin">
 	<description>Windows on Chinese Civilization - The Forbidden City (Euro)</description>
 	<year>1995</year>
 	<publisher>Philips</publisher>
@@ -6925,13 +6914,24 @@
 	</part>
 </software>
 
-<software name="winesoff">
+<software name="winefran">
 	<description>Wines of France (Euro)</description>
 	<year>1995</year>
 	<publisher>Philips</publisher>
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="wines of france (1995)(philips)(eu)" sha1="8da7d564465bd9afba0f2ff2abcfa674515e7ec7"/>
+		</diskarea>
+	</part>
+</software>
+
+<software name="vinsfran" cloneof="winefran">
+	<description>Les Vins de France (Fra)</description>
+	<year>1994</year>
+	<publisher>Philips</publisher>
+	<part name="cdrom" interface="cdi_cdrom">
+		<diskarea name="cdrom">
+			<disk name="vins de france, les (1994)(philips)(fr)" sha1="21a142ee35a4b8781d20ec599c86b2b5f8a10f36"/>
 		</diskarea>
 	</part>
 </software>
@@ -6947,18 +6947,7 @@
 	</part>
 </software>
 
-<software name="worldofu">
-	<description>The World of Impressionism (USA)</description>
-	<year>1991</year>
-	<publisher>Philips</publisher>
-	<part name="cdrom" interface="cdi_cdrom">
-		<diskarea name="cdrom">
-			<disk name="world of impressionism, the (1991)(philips)(us)" sha1="5e862fece15122168233fe51751748dbac28c6da"/>
-		</diskarea>
-	</part>
-</software>
-
-<software name="worldofi">
+<software name="worldimp">
 	<description>The World of Impressionism (Euro, USA)</description>
 	<year>1992</year>
 	<publisher>Philips</publisher>
@@ -6969,7 +6958,18 @@
 	</part>
 </software>
 
-<software name="wtegypt">
+<software name="worldimpu" cloneof="worldimp">
+	<description>The World of Impressionism (USA)</description>
+	<year>1991</year>
+	<publisher>Philips</publisher>
+	<part name="cdrom" interface="cdi_cdrom">
+		<diskarea name="cdrom">
+			<disk name="world of impressionism, the (1991)(philips)(us)" sha1="5e862fece15122168233fe51751748dbac28c6da"/>
+		</diskarea>
+	</part>
+</software>
+
+<software name="wtegypt" supported="no">
 	<description>World Tours - Egypt (USA)[DVC]</description>
 	<year>1996</year>
 	<publisher>Educational Management Group</publisher>
@@ -6980,7 +6980,7 @@
 	</part>
 </software>
 
-<software name="wthk">
+<software name="wthk" supported="no">
 	<description>World Tours - Hong Kong (USA)[DVC]</description>
 	<year>1995</year>
 	<publisher>Educational Management Group</publisher>
@@ -6991,7 +6991,7 @@
 	</part>
 </software>
 
-<software name="wtnz">
+<software name="wtnz" supported="no">
 	<description>World Tours - New Zealand (USA)[DVC]</description>
 	<year>1995</year>
 	<publisher>Educational Management Group</publisher>
@@ -7002,7 +7002,7 @@
 	</part>
 </software>
 
-<software name="wtpi">
+<software name="wtpi" supported="no">
 	<description>World Tours - Pacific Islands (USA)[DVC]</description>
 	<year>1996</year>
 	<publisher>Educational Management Group</publisher>
@@ -7013,7 +7013,7 @@
 	</part>
 </software>
 
-<software name="wtrain">
+<software name="wtrain" supported="no">
 	<description>World Tours - The Amazon Rainforest (USA)[DVC]</description>
 	<year>1995</year>
 	<publisher>Educational Management Group</publisher>
@@ -7024,7 +7024,7 @@
 	</part>
 </software>
 
-<software name="wtwaf">
+<software name="wtwaf" supported="no">
 	<description>World Tours - West Africa (USA)[DVC]</description>
 	<year>1994</year>
 	<publisher>Educational Management Group</publisher>
@@ -7035,7 +7035,7 @@
 	</part>
 </software>
 
-<software name="xplora1p">
+<software name="xplora1p" supported="no">
 	<description>Xplora 1 - Peter Gabriel's Secret World (Euro)[DVC]</description>
 	<year>1995</year>
 	<publisher>Philips</publisher>
@@ -7108,7 +7108,7 @@
 	</part>
 </software>
 
-<software name="aliengt">
+<software name="aliengat">
 	<description>Alien Gate [CDi Ready]</description>
 	<year>????</year>
 	<publisher>The Vision Factory</publisher>
