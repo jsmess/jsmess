@@ -354,7 +354,7 @@ static void draw_text_80(running_machine *machine, bitmap_t *bitmap,int y_size)
 	UINT8 is_cursor;
 	UINT8 y_height;
 	UINT8 attr;
-	UINT8 reverse;
+	UINT8 reverse = 0;
 	UINT8 pal;
 	UINT8 gfx_mode;
 
