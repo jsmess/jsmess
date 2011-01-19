@@ -23,57 +23,75 @@
         SOL-20 board only
 
 ****************************************************************************/
+#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
 #include "machine/terminal.h"
-#include "machine/ram.h"
+#include "sound/wave.h"
+#include "imagedev/cassette.h"
+#include "machine/ay31015.h"
 
 
-class ptcsol_state : public driver_device
+class sol20_state : public driver_device
 {
 public:
-	ptcsol_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	sol20_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config),
+	m_maincpu(*this, "maincpu"),
+	m_cass_1(*this, "cassette1"),
+	m_cass_2(*this, "cassette2"),
+	m_uart_c(*this, "uart_c"),
+	m_uart_s(*this, "uart_s"),
+	m_terminal(*this, TERMINAL_TAG)
+	{ }
 
-	UINT8 sol20_fa;
-	UINT8 sol20_fc;
-	UINT8 sol20_fe;
+	required_device<cpu_device> m_maincpu;
+	required_device<device_t> m_cass_1;
+	required_device<device_t> m_cass_2;
+	required_device<device_t> m_uart_c;
+	required_device<device_t> m_uart_s;
+	required_device<device_t> m_terminal;
+	DECLARE_READ8_MEMBER( sol20_fa_r );
+	DECLARE_READ8_MEMBER( sol20_fc_r );
+	DECLARE_WRITE8_MEMBER( sol20_fe_w );
+	DECLARE_WRITE8_MEMBER( sol20_kbd_put );
+	UINT8 m_sol20_fa;
+	UINT8 m_sol20_fc;
+	UINT8 m_sol20_fe;
 	const UINT8 *FNT;
-	const UINT8 *videoram;
-	UINT8 framecnt;
+	const UINT8 *m_videoram;
+	UINT8 m_framecnt;
 };
 
 
 
-static READ8_HANDLER( sol20_fa_r )
+READ8_MEMBER( sol20_state::sol20_fa_r )
 {
-	ptcsol_state *state = space->machine->driver_data<ptcsol_state>();
-	return state->sol20_fa;
+	return m_sol20_fa;
 }
 
-static READ8_HANDLER( sol20_fc_r )
+READ8_MEMBER( sol20_state::sol20_fc_r )
 {
-	ptcsol_state *state = space->machine->driver_data<ptcsol_state>();
-	state->sol20_fa = 0xff;
-	return state->sol20_fc;
+	m_sol20_fa = 0xff;
+	return m_sol20_fc;
 }
 
-static WRITE8_HANDLER( sol20_fe_w )
+WRITE8_MEMBER( sol20_state::sol20_fe_w )
 {
-	ptcsol_state *state = space->machine->driver_data<ptcsol_state>();
-	state->sol20_fe = data;
+	m_sol20_fe = data;
 }
 
-static ADDRESS_MAP_START( sol20_mem, ADDRESS_SPACE_PROGRAM, 8)
-	AM_RANGE(0X0000, 0Xbfff) AM_RAM	// optional s100 ram
+static ADDRESS_MAP_START( sol20_mem, ADDRESS_SPACE_PROGRAM, 8, sol20_state)
+	AM_RANGE(0x0000, 0x07ff) AM_RAMBANK("boot")
+	AM_RANGE(0X0800, 0Xbfff) AM_RAM	// optional s100 ram
 	AM_RANGE(0xc000, 0xc7ff) AM_ROM
 	AM_RANGE(0Xc800, 0Xcbff) AM_RAM	// system ram
-	AM_RANGE(0Xcc00, 0Xcfff) AM_RAM	AM_REGION("maincpu", 0xcc00)// video ram
+	AM_RANGE(0Xcc00, 0Xcfff) AM_RAM	AM_BASE(m_videoram)
 	AM_RANGE(0Xd000, 0Xffff) AM_RAM	// optional s100 ram
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sol20_io , ADDRESS_SPACE_IO, 8)
+static ADDRESS_MAP_START( sol20_io , ADDRESS_SPACE_IO, 8, sol20_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xfa, 0xfa) AM_READ(sol20_fa_r)
@@ -94,31 +112,62 @@ static INPUT_PORTS_START( sol20 )
 	PORT_INCLUDE(generic_terminal)
 INPUT_PORTS_END
 
+static const ay31015_config sol20_ay31015_config =
+{
+	AY_3_1015,
+	4800.0,
+	4800.0,
+	NULL,
+	NULL,
+	NULL
+};
+
+
+static const cassette_config sol20_cassette_config =
+{
+	cassette_default_formats,
+	NULL,
+	(cassette_state)(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED),
+	NULL
+};
+
+/* after the first 4 bytes have been read from ROM, switch the ram back in */
+static TIMER_CALLBACK( sol20_boot )
+{
+	memory_set_bank(machine, "boot", 0);
+}
 
 static MACHINE_RESET( sol20 )
 {
-	ptcsol_state *state = machine->driver_data<ptcsol_state>();
-	state->sol20_fa=0xff;
-	state->sol20_fe=0;
+	sol20_state *state = machine->driver_data<sol20_state>();
+	state->m_sol20_fa=0xff;
+	state->m_sol20_fe=0;
+	memory_set_bank(machine, "boot", 1);
+	timer_set(machine, ATTOTIME_IN_USEC(10), NULL, 0, sol20_boot);
+}
+
+static DRIVER_INIT( sol20 )
+{
+	UINT8 *RAM = machine->region("maincpu")->base();
+	memory_configure_bank(machine, "boot", 0, 2, &RAM[0x0000], 0xc000);
 }
 
 static VIDEO_START( sol20 )
 {
-	ptcsol_state *state = machine->driver_data<ptcsol_state>();
+	sol20_state *state = machine->driver_data<sol20_state>();
 	state->FNT = machine->region("chargen")->base();
-	state->videoram = machine->region("maincpu")->base()+0xcc00;
 }
 
 static VIDEO_UPDATE( sol20 )
 {
-	ptcsol_state *state = screen->machine->driver_data<ptcsol_state>();
+	sol20_state *state = screen->machine->driver_data<sol20_state>();
 /* visible screen is 64 x 16, with start position controlled by scroll register */
 	UINT8 y,ra,chr,gfx;
 	UINT16 sy=0,ma,x,inv;
 
-	state->framecnt++;
+	state->m_framecnt++;
 
-	ma = state->sol20_fe << 6; // scroll register
+	ma = state->m_sol20_fe << 6; // scroll register
 
 	for (y = 0; y < 16; y++)
 	{
@@ -128,11 +177,11 @@ static VIDEO_UPDATE( sol20 )
 
 			for (x = ma; x < ma + 64; x++)
 			{
-				chr = state->videoram[x & 0x3ff];
+				chr = state->m_videoram[x & 0x3ff];
 				inv = 0;
 
 				/* Take care of flashing characters */
-				if ((chr & 0x80) && (state->framecnt & 0x08))
+				if ((chr & 0x80) && (state->m_framecnt & 0x08))
 					inv ^= 0xff;
 
 				chr &= 0x7f;
@@ -162,19 +211,18 @@ static VIDEO_UPDATE( sol20 )
 	return 0;
 }
 
-static WRITE8_DEVICE_HANDLER( sol20_kbd_put )
+WRITE8_MEMBER( sol20_state::sol20_kbd_put )
 {
-	ptcsol_state *state = device->machine->driver_data<ptcsol_state>();
-	state->sol20_fa &= 0xfe;
-	state->sol20_fc = data;
+	m_sol20_fa &= 0xfe;
+	m_sol20_fc = data;
 }
 
 static GENERIC_TERMINAL_INTERFACE( sol20_terminal_intf )
 {
-	DEVCB_HANDLER(sol20_kbd_put)
+	DEVCB_DRIVER_MEMBER(sol20_state, sol20_kbd_put)
 };
 
-static MACHINE_CONFIG_START( sol20, ptcsol_state )
+static MACHINE_CONFIG_START( sol20, sol20_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8080, XTAL_14_31818MHz/7)
 	MCFG_CPU_PROGRAM_MAP(sol20_mem)
@@ -195,11 +243,19 @@ static MACHINE_CONFIG_START( sol20, ptcsol_state )
 	MCFG_VIDEO_START(sol20)
 	MCFG_VIDEO_UPDATE(sol20)
 
-	/* internal ram */
-//  MCFG_RAM_ADD(RAM_TAG)
-//  MCFG_RAM_DEFAULT_SIZE("8K")
-//  MCFG_RAM_EXTRA_OPTIONS("16K,32K")
-	MCFG_GENERIC_TERMINAL_ADD("terminal", sol20_terminal_intf)
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_WAVE_ADD("wave.1", "cassette1")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)	// cass1 speaker
+	MCFG_SOUND_WAVE_ADD("wave.2", "cassette2")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)	// cass2 speaker
+
+	// devices
+	MCFG_CASSETTE_ADD( "cassette1", sol20_cassette_config )
+	MCFG_CASSETTE_ADD( "cassette2", sol20_cassette_config )
+	MCFG_AY31015_ADD( "uart_c", sol20_ay31015_config )
+	MCFG_AY31015_ADD( "uart_s", sol20_ay31015_config )
+	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, sol20_terminal_intf)
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -211,8 +267,9 @@ ROM_START( sol20 )
 	/* character generator not dumped, using the one from 'c10' for now */
 	ROM_REGION( 0x2000, "chargen", 0 )
 	ROM_LOAD( "c10_char.bin", 0x0000, 0x2000, BAD_DUMP CRC(cb530b6f) SHA1(95590bbb433db9c4317f535723b29516b9b9fcbf))
+	/* There are actually 2 character generators available - the 6574 and the 6575 */
 ROM_END
 
 /* Driver */
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  INIT   COMPANY     FULLNAME   FLAGS */
-COMP( 1976, sol20,  0,      0,      sol20,   sol20, 0,     "Processor Technology Corporation",  "SOL-20", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1976, sol20,  0,      0,      sol20,   sol20, sol20, "Processor Technology Corporation",  "SOL-20", GAME_NOT_WORKING )
