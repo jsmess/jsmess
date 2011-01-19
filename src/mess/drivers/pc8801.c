@@ -26,13 +26,17 @@
 	- Acro Jet: hangs waiting for an irq;
 	- Aggress: crashes after that it shows the title screen;
 	- American Success: reads the light pen?
-	- Alphos: test case for text VRAM attributes;
+	- Alpha (demo): crashes with "illegal function" msg;
 	- Alphos: text VRAM garbage during gameplay;
 	- Balance of Power: attempt to use the SIO port for mouse polling, worked around for now;
 	- Battle Entry: moans with a kanji msg then dies if you try to press either numpad 1 or 2 (what it basically asks by looking at the DASM)
 	- Bersekers Front Gaiden 3: checks CPU speed port and polls the PCG stuff too;
 	- Bishoujo Baseball Gakuen: checks ym2608 after intro screen;
+	- Blue Moon Story: moans with a kanji msg;.
 	- Bokosuka Wars: doesn't boot, floppy issue;
+	- Bouken Roman: doesn't boot, floppy issue;
+	- Bruce Lee: doesn't boot, floppy issue;
+	- Bu U Ma: sets gfx compatibility mode (attr bit 4,N-BASIC), dunno how to draw with it ...;
 	- Grobda: palette is ugly;
 	- Wanderers from Ys: floppy / irq issues?
 	- Xevious: game is too fast
@@ -314,7 +318,7 @@ static UINT8 calc_cursor_pos(running_machine *machine,int x,int y,int yi)
 
 
 
-static UINT8 extract_text_attribute(running_machine *machine,UINT32 address,int x,int swap)
+static UINT8 extract_text_attribute(running_machine *machine,UINT32 address,int x)
 {
 	UINT8 *vram = machine->region("maincpu")->base() + WRAM_BASE;
 	int i;
@@ -330,8 +334,8 @@ static UINT8 extract_text_attribute(running_machine *machine,UINT32 address,int 
 
 	for(i=0;i<fifo_size;i++)
 	{
-		/* TODO: do we have a bug lying to somewhere else? N-BASIC attributes doesn't work without this +2 ... */
-		if(x < vram[address+swap])
+		/* TODO: DMA timing bug? N-BASIC attributes doesn't work here without +2 here ... */
+		if(x < vram[address])
 		{
 			return vram[address+1];
 		}
@@ -352,6 +356,7 @@ static void draw_text_80(running_machine *machine, bitmap_t *bitmap,int y_size)
 	UINT8 attr;
 	UINT8 reverse;
 	UINT8 pal;
+	UINT8 gfx_mode;
 
 	y_height = y_size == 20 ? 10 : 8;
 
@@ -359,14 +364,20 @@ static void draw_text_80(running_machine *machine, bitmap_t *bitmap,int y_size)
 	{
 		for(x=0;x<80;x++)
 		{
-			attr = extract_text_attribute(machine,(((y*120)+80+dma_address[2]) & 0xffff),(x),0);
+			attr = extract_text_attribute(machine,(((y*120)+80+dma_address[2]) & 0xffff),(x));
 
 			if(text_color_flag)
+			{
 				pal = (attr & 0xe0) >> 5;
+				gfx_mode = (attr & 0x10) >> 4;
+			}
 			else
+			{
 				pal = 7;
+				reverse = attr & 4;
+			}
 
-			reverse = attr & 4;
+			pal|=8; //text pal bank
 
 			for(yi=0;yi<8;yi++)
 			{
@@ -377,21 +388,24 @@ static void draw_text_80(running_machine *machine, bitmap_t *bitmap,int y_size)
 					int res_x,res_y;
 					int tile;
 					int color;
-					UINT8 *gfx_data = machine->region("gfx1")->base();
 
-					tile = vram[x+(y*120)+dma_address[2]];
+					{
+						UINT8 *gfx_data = machine->region("gfx1")->base();
 
-					res_x = x*8+xi;
-					res_y = y*y_height+yi;
+						tile = vram[x+(y*120)+dma_address[2]];
 
-					if(is_cursor || reverse)
-						color = ((gfx_data[tile*8+yi] >> (7-xi)) & 1) ? -1 : pal;
-					else
-						color = ((gfx_data[tile*8+yi] >> (7-xi)) & 1) ? pal : -1;
+						res_x = x*8+xi;
+						res_y = y*y_height+yi;
 
-					if((res_x)<=machine->primary_screen->visible_area().max_x && (res_y)<=machine->primary_screen->visible_area().max_y)
-						if(color != -1)
-							*BITMAP_ADDR16(bitmap, res_y, res_x) = machine->pens[color];
+						if(is_cursor || reverse)
+							color = ((gfx_data[tile*8+yi] >> (7-xi)) & 1) ? -1 : pal;
+						else
+							color = ((gfx_data[tile*8+yi] >> (7-xi)) & 1) ? pal : -1;
+
+						if((res_x)<=machine->primary_screen->visible_area().max_x && (res_y)<=machine->primary_screen->visible_area().max_y)
+							if(color != -1)
+								*BITMAP_ADDR16(bitmap, res_y, res_x) = machine->pens[color];
+					}
 				}
 			}
 		}
@@ -407,6 +421,7 @@ static void draw_text_40(running_machine *machine, bitmap_t *bitmap, int y_size)
 	UINT8 y_height;
 	UINT8 attr;
 	UINT8 reverse;
+	UINT8 pal;
 
 	y_height = y_size == 20 ? 10 : 8;
 
@@ -417,7 +432,14 @@ static void draw_text_40(running_machine *machine, bitmap_t *bitmap, int y_size)
 			if(x & 1)
 				continue;
 
-			attr = extract_text_attribute(machine,(((y*120)+80+dma_address[2]) & 0xffff),(x),2);
+			attr = extract_text_attribute(machine,(((y*120)+80+dma_address[2]) & 0xffff),(x));
+
+			if(text_color_flag)
+				pal = (attr & 0xe0) >> 5;
+			else
+				pal = 7;
+
+			pal|=8; //text pal bank
 
 			reverse = attr & 4;
 
@@ -438,9 +460,9 @@ static void draw_text_40(running_machine *machine, bitmap_t *bitmap, int y_size)
 					res_y = (y*y_height)+yi;
 
 					if(is_cursor || reverse)
-						color = ((gfx_data[tile*8+yi] >> (7-xi)) & 1) ? -1 : 7;
+						color = ((gfx_data[tile*8+yi] >> (7-xi)) & 1) ? -1 : pal;
 					else
-						color = ((gfx_data[tile*8+yi] >> (7-xi)) & 1) ? 7 : -1;
+						color = ((gfx_data[tile*8+yi] >> (7-xi)) & 1) ? pal : -1;
 
 					if((res_x)<=machine->primary_screen->visible_area().max_x && (res_y)<=machine->primary_screen->visible_area().max_y)
 						if(color != -1)
@@ -1131,6 +1153,7 @@ static WRITE8_HANDLER( pc8801_alu_ctrl2_w )
 
 static WRITE8_HANDLER( pc8801_pcg8100_w )
 {
+	if(data)
 	printf("Write to PCG-8100 %02x %02x\n",offset,data);
 }
 
@@ -1739,13 +1762,20 @@ static MACHINE_RESET( pc8801 )
 		extram_bank = 0;
 		extram_mode = 0;
 	}
+
+	{
+		int i;
+
+		for(i=0;i<0x10;i++) //text + bitmap
+			palette_set_color_rgb(machine, i, pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
+	}
 }
 
 static PALETTE_INIT( pc8801 )
 {
 	int i;
 
-	for(i=0;i<8;i++)
+	for(i=0;i<0x10;i++) //text + bitmap
 		palette_set_color_rgb(machine, i, pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
 }
 
@@ -1867,7 +1897,7 @@ ROM_START( pc8801mk2sr )
 	ROM_LOAD( "kanji2.rom", 0x20000, 0x20000, CRC(154803cc) SHA1(7e6591cd465cbb35d6d3446c5a83b46d30fafe95) )	// it should not be here
 
 	ROM_REGION( 0x40000, "gfx1", 0)
-	ROM_COPY( "kanji", 0x1000, 0x0000, 0x800 )
+	ROM_COPY( "kanji", 0x1000, 0x0000, 0x1000 )
 ROM_END
 
 ROM_START( pc8801mk2fr )
