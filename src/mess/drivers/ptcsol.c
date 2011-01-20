@@ -16,12 +16,34 @@
       - BOOTLOAD
       - DPMON (3rd party)
 
+    Other roms needed:
+      - Dump of the 2 character generators (motorola 6574 and 6575)
+      - Dump of U18 in the keyboard
+
     Hardware variants (ever shipped?):
       - SOL-10, i.e. a stripped down version without expansion backplane and
         numeric keypad
       - SOL-PC, i.e. the single board version, basically it consisted of the
         SOL-20 board only
 
+    Similarity to Exidy Sorcerer:
+      - Some hardware is the same design (parallel ports, serial ports, 2
+        tape players, the cassette circuits)
+      - The cassette format is totally identical, in fact tapes from one
+        machine can be loaded on the other natively. They won't run of course.
+      - Sorcerer monitor commands are almost identical to the SOLOS ones.
+        To illustrate some differences:
+        Run a program in memory  GO (sorcerer) EX (SOLOS)
+        Load a file from tape    LO (Sorcerer) GE (SOLOS)
+        Set tape operation to 300 baud  SE T=1 (sorcerer)  SE TA 1 (SOLOS)
+        Most other commands are identical. The EN command (enter bytes into
+        memory) is rather primitive in SOLOS, better on Sorcerer.
+      - Sol20 has "personality modules" where you could plug a new OS into
+        a special socket on the motherboard. Sorcerer improved upon this by
+        being the first computer to use cartridges.
+      - Some circuits are completely different... the video and keyboard are
+        notable examples, while the address of ram on the basic machines is
+        another major difference.
 ****************************************************************************/
 #define ADDRESS_MAP_MODERN
 
@@ -53,7 +75,7 @@ public:
 	m_maincpu(*this, "maincpu"),
 	m_cass1(*this, "cassette1"),
 	m_cass2(*this, "cassette2"),
-	m_uart_c(*this, "uart_c"),
+	m_uart(*this, "uart"),
 	m_uart_s(*this, "uart_s"),
 	m_terminal(*this, TERMINAL_TAG)
 	{ }
@@ -61,7 +83,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<device_t> m_cass1;
 	required_device<device_t> m_cass2;
-	required_device<device_t> m_uart_c;
+	required_device<device_t> m_uart;
 	required_device<device_t> m_uart_s;
 	required_device<device_t> m_terminal;
 	DECLARE_READ8_MEMBER( sol20_fa_r );
@@ -116,7 +138,7 @@ static TIMER_CALLBACK(sol20_cassette_tc)
 				state->m_cass_data.input.level = cass_ws;
 				state->m_cass_data.input.bit = ((state->m_cass_data.input.length < 0x6) || (state->m_cass_data.input.length > 0x20)) ? 1 : 0;
 				state->m_cass_data.input.length = 0;
-				ay31015_set_input_pin( state->m_uart_c, AY31015_SI, state->m_cass_data.input.bit );
+				ay31015_set_input_pin( state->m_uart, AY31015_SI, state->m_cass_data.input.bit );
 			}
 
 			/* saving a tape - convert the serial stream from the uart, into 1200 and 2400 Hz frequencies.
@@ -125,7 +147,7 @@ static TIMER_CALLBACK(sol20_cassette_tc)
 			state->m_cass_data.output.length++;
 			if (!(state->m_cass_data.output.length & 0x1f))
 			{
-				cass_ws = ay31015_get_output_pin( state->m_uart_c, AY31015_SO );
+				cass_ws = ay31015_get_output_pin( state->m_uart, AY31015_SO );
 				if (cass_ws != state->m_cass_data.output.bit)
 				{
 					state->m_cass_data.output.bit = cass_ws;
@@ -157,7 +179,7 @@ static TIMER_CALLBACK(sol20_cassette_tc)
 					state->m_cass_data.input.length = 0;
 					state->m_cass_data.input.level = cass_ws;
 				}
-				ay31015_set_input_pin( state->m_uart_c, AY31015_SI, state->m_cass_data.input.bit );
+				ay31015_set_input_pin( state->m_uart, AY31015_SI, state->m_cass_data.input.bit );
 			}
 
 			/* saving a tape - convert the serial stream from the uart, into 600 and 1200 Hz frequencies. */
@@ -165,7 +187,7 @@ static TIMER_CALLBACK(sol20_cassette_tc)
 			state->m_cass_data.output.length++;
 			if (!(state->m_cass_data.output.length & 7))
 			{
-				cass_ws = ay31015_get_output_pin( state->m_uart_c, AY31015_SO );
+				cass_ws = ay31015_get_output_pin( state->m_uart, AY31015_SO );
 				if (cass_ws != state->m_cass_data.output.bit)
 				{
 					state->m_cass_data.output.bit = cass_ws;
@@ -191,21 +213,21 @@ READ8_MEMBER( sol20_state::sol20_fa_r )
 	/* set unused bits high */
 	UINT8 data = 0x26;
 
-	ay31015_set_input_pin( m_uart_c, AY31015_SWE, 0 );
-	data |= ay31015_get_output_pin( m_uart_c, AY31015_TBMT ) ? 0x80 : 0;
-	data |= ay31015_get_output_pin( m_uart_c, AY31015_DAV  ) ? 0x40 : 0;
-	data |= ay31015_get_output_pin( m_uart_c, AY31015_OR   ) ? 0x10 : 0;
-	data |= ay31015_get_output_pin( m_uart_c, AY31015_FE   ) ? 0x08 : 0;
-	ay31015_set_input_pin( m_uart_c, AY31015_SWE, 1 );
+	ay31015_set_input_pin( m_uart, AY31015_SWE, 0 );
+	data |= ay31015_get_output_pin( m_uart, AY31015_TBMT ) ? 0x80 : 0;
+	data |= ay31015_get_output_pin( m_uart, AY31015_DAV  ) ? 0x40 : 0;
+	data |= ay31015_get_output_pin( m_uart, AY31015_OR   ) ? 0x10 : 0;
+	data |= ay31015_get_output_pin( m_uart, AY31015_FE   ) ? 0x08 : 0;
+	ay31015_set_input_pin( m_uart, AY31015_SWE, 1 );
 
 	return data | (m_sol20_fa & 1);
 }
 
 READ8_MEMBER( sol20_state::sol20_fb_r)
 {
-	UINT8 data = ay31015_get_received_data( m_uart_c );
-	ay31015_set_input_pin( m_uart_c, AY31015_RDAV, 0 );
-	ay31015_set_input_pin( m_uart_c, AY31015_RDAV, 1 );
+	UINT8 data = ay31015_get_received_data( m_uart );
+	ay31015_set_input_pin( m_uart, AY31015_RDAV, 0 );
+	ay31015_set_input_pin( m_uart, AY31015_RDAV, 1 );
 	return data;
 }
 
@@ -234,13 +256,13 @@ WRITE8_MEMBER( sol20_state::sol20_fa_w )
 		timer_adjust_oneshot(m_cassette_timer, attotime_zero, 0);
 
 	// bit 5 baud rate */
-	ay31015_set_receiver_clock( m_uart_c, (BIT(data, 5)) ? 4800.0 : 19200.0);
-	ay31015_set_transmitter_clock( m_uart_c, (BIT(data, 5)) ? 4800.0 : 19200.0);
+	ay31015_set_receiver_clock( m_uart, (BIT(data, 5)) ? 4800.0 : 19200.0);
+	ay31015_set_transmitter_clock( m_uart, (BIT(data, 5)) ? 4800.0 : 19200.0);
 }
 
 WRITE8_MEMBER( sol20_state::sol20_fb_w )
 {
-	ay31015_set_transmit_data( m_uart_c, data );
+	ay31015_set_transmit_data( m_uart, data );
 }
 
 WRITE8_MEMBER( sol20_state::sol20_fe_w )
@@ -316,13 +338,13 @@ static MACHINE_RESET( sol20 )
 	state->m_sol20_fe=0;
 	state->m_sol20_fa=1;
 	// set hard-wired uart pins
-	ay31015_set_input_pin( state->m_uart_c, AY31015_CS, 0 );
-	ay31015_set_input_pin( state->m_uart_c, AY31015_NB1, 1);
-	ay31015_set_input_pin( state->m_uart_c, AY31015_NB2, 1);
-	ay31015_set_input_pin( state->m_uart_c, AY31015_TSB, 1);
-	ay31015_set_input_pin( state->m_uart_c, AY31015_EPS, 1);
-	ay31015_set_input_pin( state->m_uart_c, AY31015_NP,  1);
-	ay31015_set_input_pin( state->m_uart_c, AY31015_CS, 1 );
+	ay31015_set_input_pin( state->m_uart, AY31015_CS, 0 );
+	ay31015_set_input_pin( state->m_uart, AY31015_NB1, 1);
+	ay31015_set_input_pin( state->m_uart, AY31015_NB2, 1);
+	ay31015_set_input_pin( state->m_uart, AY31015_TSB, 1);
+	ay31015_set_input_pin( state->m_uart, AY31015_EPS, 1);
+	ay31015_set_input_pin( state->m_uart, AY31015_NP,  1);
+	ay31015_set_input_pin( state->m_uart, AY31015_CS, 1 );
 	// boot-bank
 	memory_set_bank(machine, "boot", 1);
 	timer_set(machine, ATTOTIME_IN_USEC(9), NULL, 0, sol20_boot);
@@ -436,7 +458,7 @@ static MACHINE_CONFIG_START( sol20, sol20_state )
 	// devices
 	MCFG_CASSETTE_ADD( "cassette1", sol20_cassette_config )
 	MCFG_CASSETTE_ADD( "cassette2", sol20_cassette_config )
-	MCFG_AY31015_ADD( "uart_c", sol20_ay31015_config )
+	MCFG_AY31015_ADD( "uart", sol20_ay31015_config )
 	MCFG_AY31015_ADD( "uart_s", sol20_ay31015_config )
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, sol20_terminal_intf)
 MACHINE_CONFIG_END
