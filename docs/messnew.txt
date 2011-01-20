@@ -17,6 +17,7 @@ Skeleton drivers:
 (none)
 
 
+
 System Driver Changes:
 ----------------------
 - [ADAM] Added dumps of the internal M6801 ROMs. [KevinP]
@@ -24,6 +25,8 @@ System Driver Changes:
 - [PIPPIN] Added pre release rom
 
 - [PV1000] 4 new cartridge dumps for the software list.  [anondumper]
+
+- [STE] Added a proper dump of some French TOS ROM. [ElBarto]
 
 
 
