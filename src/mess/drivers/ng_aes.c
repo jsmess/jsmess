@@ -86,6 +86,8 @@ public:
 
 //static UINT16 *save_ram;
 
+UINT16* neocd_work_ram;
+
 /*************************************
  *
  *  Forward declarations
@@ -1390,7 +1392,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( neocd_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x00007f) AM_RAMBANK(NEOGEO_BANK_VECTORS)
 	AM_RANGE(0x000080, 0x0fffff) AM_RAM
-	AM_RANGE(0x100000, 0x10ffff) AM_MIRROR(0x0f0000) AM_RAM
+	AM_RANGE(0x100000, 0x10ffff) AM_MIRROR(0x0f0000) AM_RAM AM_BASE(&neocd_work_ram)
 	/* some games have protection devices in the 0x200000 region, it appears to map to cart space, not surprising, the ROM is read here too */
 	AM_RANGE(0x200000, 0x2fffff) AM_ROMBANK(NEOGEO_BANK_CARTRIDGE)
 	AM_RANGE(0x2ffff0, 0x2fffff) AM_WRITE(main_cpu_bank_select_w)
@@ -1810,7 +1812,7 @@ ROM_START( aes )
 ROM_END
 
 ROM_START( neocd )
-	ROM_REGION16_BE( 0x80000, "mainbios", 0 )
+	ROM_REGION16_BE( 0x100000, "mainbios", 0 )
 	ROM_LOAD16_WORD_SWAP( "top-sp1.bin",    0x00000, 0x80000, CRC(19f0ad1a) SHA1(b3e2f8467e9a642c122428d075024a9bd1fe0679) )
 
 	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
@@ -1834,7 +1836,7 @@ ROM_START( neocd )
 ROM_END
 
 ROM_START( neocdz )
-	ROM_REGION16_BE( 0x80000, "mainbios", 0 )
+	ROM_REGION16_BE( 0x100000, "mainbios", 0 )
 	ROM_LOAD16_WORD_SWAP( "neocd.bin",    0x00000, 0x80000, CRC(df9de490) SHA1(7bb26d1e5d1e930515219cb18bcde5b7b23e2eda) )
 
 	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
