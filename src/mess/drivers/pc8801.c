@@ -13,7 +13,6 @@
 	- cursor is 8 x 10, not 8 x 8 as current implementation.
 	- needs to support V1 / V2 properly;
 	- Add limits for extend work RAM;
-	- Later models have palette bugs with some games (Alphos, Tokyo Nampa Street), check out why;
 	- What happens to the palette contents when the analog/digital palette mode changes?
 	- dipswitches needs to be controlled;
 
@@ -45,11 +44,12 @@
 	games that needs to NOT have write-protect floppies (BTANBs):
 	- Tobira wo Akete (hangs at title screen)
 
-
 	Notes:
 	- BIOS disk ROM defines what kind of floppies you could load:
 	  * with 0x0800 ROM size you can load 2d floppies only;
 	  * with 0x2000 ROM size you can load 2d and 2hd floppies;
+	- Later models have palette bugs with some games (Alphos, Tokyo Nampa Street).
+	  This is because you have to set up the V1 / V2 DIP-SW to V1 for those games (it's the BIOS that sets up to analog and never changes back otherwise).
 
 	Bankswitch Notes:
 	- 0x31 - graphic banking
@@ -1831,13 +1831,13 @@ MACHINE_CONFIG_END
 	ROM_REGION( 0xc000, "gvram", ROMREGION_ERASE00 )
 
 
-ROM_START( pc8801 ) /* Basic version 1.0 */
+ROM_START( pc8801 )
 	PC8801_MEM_LOAD
 
-	ROM_REGION( 0x8000, "n80rom", ROMREGION_ERASEFF )
+	ROM_REGION( 0x8000, "n80rom", ROMREGION_ERASEFF ) // 1.2
 	ROM_LOAD( "n80.rom",   0x0000, 0x8000, CRC(5cb8b584) SHA1(063609dd518c124a4fc9ba35d1bae35771666a34) )
 
-	ROM_REGION( 0x10000, "n88rom", ROMREGION_ERASEFF )
+	ROM_REGION( 0x10000, "n88rom", ROMREGION_ERASEFF ) // 1.0
 	ROM_LOAD( "n88.rom",   0x0000, 0x8000, CRC(ffd68be0) SHA1(3518193b8207bdebf22c1380c2db8c554baff329) )
 	ROM_LOAD( "n88_0.rom", 0x8000, 0x2000, CRC(61984bab) SHA1(d1ae642aed4f0584eeb81ff50180db694e5101d4) )
 
@@ -1853,13 +1853,13 @@ ROM_END
 
 /* The dump only included "maincpu". Other roms arbitrariely taken from PC-8801 & PC-8801 MkIISR (there should be
 at least 1 Kanji ROM). */
-ROM_START( pc8801mk2 ) /* Basic version 1.3 */
+ROM_START( pc8801mk2 )
 	PC8801_MEM_LOAD
 
-	ROM_REGION( 0x8000, "n80rom", ROMREGION_ERASEFF )
+	ROM_REGION( 0x8000, "n80rom", ROMREGION_ERASEFF ) // 1.4
 	ROM_LOAD( "m2_n80.rom",   0x0000, 0x8000, CRC(91d84b1a) SHA1(d8a1abb0df75936b3fc9d226ccdb664a9070ffb1) )
 
-	ROM_REGION( 0x10000, "n88rom", ROMREGION_ERASEFF )
+	ROM_REGION( 0x10000, "n88rom", ROMREGION_ERASEFF ) //1.3
 	ROM_LOAD( "m2_n88.rom",   0x0000, 0x8000, CRC(f35169eb) SHA1(ef1f067f819781d9fb2713836d195866f0f81501) )
 	ROM_LOAD( "m2_n88_0.rom", 0x8000, 0x2000, CRC(5eb7a8d0) SHA1(95a70af83b0637a5a0f05e31fb0452bb2cb68055) )
 
@@ -1876,10 +1876,10 @@ ROM_END
 ROM_START( pc8801mk2sr )
 	PC8801_MEM_LOAD
 
-	ROM_REGION( 0x8000, "n80rom", ROMREGION_ERASEFF )
+	ROM_REGION( 0x8000, "n80rom", ROMREGION_ERASEFF ) // 1.5
 	ROM_LOAD( "mk2sr_n80.rom",   0x0000, 0x8000, CRC(27e1857d) SHA1(5b922ed9de07d2a729bdf1da7b57c50ddf08809a) )
 
-	ROM_REGION( 0x10000, "n88rom", ROMREGION_ERASEFF )
+	ROM_REGION( 0x10000, "n88rom", ROMREGION_ERASEFF ) // 2.0
 	ROM_LOAD( "mk2sr_n88.rom",   0x0000, 0x8000, CRC(a0fc0473) SHA1(3b31fc68fa7f47b21c1a1cb027b86b9e87afbfff) )
 	ROM_LOAD( "mk2sr_n88_0.rom", 0x8000, 0x2000, CRC(710a63ec) SHA1(d239c26ad7ac5efac6e947b0e9549b1534aa970d) )
 	ROM_LOAD( "n88_1.rom", 		 0xa000, 0x2000, CRC(c0bd2aa6) SHA1(8528eef7946edf6501a6ccb1f416b60c64efac7c) )
@@ -1904,10 +1904,10 @@ ROM_END
 ROM_START( pc8801mk2fr )
 	PC8801_MEM_LOAD
 
-	ROM_REGION( 0x8000, "n80rom", ROMREGION_ERASEFF )
+	ROM_REGION( 0x8000, "n80rom", ROMREGION_ERASEFF ) // 1.5
 	ROM_LOAD( "m2fr_n80.rom",   0x0000, 0x8000, CRC(27e1857d) SHA1(5b922ed9de07d2a729bdf1da7b57c50ddf08809a) )
 
-	ROM_REGION( 0x10000, "n88rom", ROMREGION_ERASEFF )
+	ROM_REGION( 0x10000, "n88rom", ROMREGION_ERASEFF ) // 2.1
 	ROM_LOAD( "m2fr_n88.rom",   0x0000, 0x8000, CRC(b9daf1aa) SHA1(696a480232bcf8c827c7aeea8329db5c44420d2a) )
 	ROM_LOAD( "m2fr_n88_0.rom", 0x8000, 0x2000, CRC(710a63ec) SHA1(d239c26ad7ac5efac6e947b0e9549b1534aa970d) )
 	ROM_LOAD( "m2fr_n88_1.rom", 0xa000, 0x2000, CRC(e3e78a37) SHA1(85ecd287fe72b56e54c8b01ea7492ca4a69a7470) )
@@ -1931,10 +1931,10 @@ ROM_END
 ROM_START( pc8801mk2mr )
 	PC8801_MEM_LOAD
 
-	ROM_REGION( 0x8000, "n80rom", ROMREGION_ERASEFF )
+	ROM_REGION( 0x8000, "n80rom", ROMREGION_ERASEFF ) // 1.8
 	ROM_LOAD( "m2mr_n80.rom",   0x0000, 0x8000, CRC(f074b515) SHA1(ebe9cf4cf57f1602c887f609a728267f8d953dce) )
 
-	ROM_REGION( 0x10000, "n88rom", ROMREGION_ERASEFF )
+	ROM_REGION( 0x10000, "n88rom", ROMREGION_ERASEFF ) // 2.2
 	ROM_LOAD( "m2mr_n88.rom",   0x0000, 0x8000, CRC(69caa38e) SHA1(3c64090237152ee77c76e04d6f36bad7297bea93) )
 	ROM_LOAD( "m2mr_n88_0.rom", 0x8000, 0x2000, CRC(710a63ec) SHA1(d239c26ad7ac5efac6e947b0e9549b1534aa970d) )
 	ROM_LOAD( "m2mr_n88_1.rom", 0xa000, 0x2000, CRC(e3e78a37) SHA1(85ecd287fe72b56e54c8b01ea7492ca4a69a7470) )
@@ -1959,10 +1959,10 @@ ROM_END
 ROM_START( pc8801mh )
 	PC8801_MEM_LOAD
 
-	ROM_REGION( 0x8000, "n80rom", ROMREGION_ERASEFF )
+	ROM_REGION( 0x8000, "n80rom", ROMREGION_ERASEFF ) // 1.8, but different BIOS code?
 	ROM_LOAD( "mh_n80.rom",   0x0000, 0x8000, CRC(8a2a1e17) SHA1(06dae1db384aa29d81c5b6ed587877e7128fcb35) )
 
-	ROM_REGION( 0x10000, "n88rom", ROMREGION_ERASEFF )
+	ROM_REGION( 0x10000, "n88rom", ROMREGION_ERASEFF ) // 2.3
 	ROM_LOAD( "mh_n88.rom",   0x0000, 0x8000, CRC(64c5d162) SHA1(3e0aac76fb5d7edc99df26fa9f365fd991742a5d) )
 	ROM_LOAD( "mh_n88_0.rom", 0x8000, 0x2000, CRC(deb384fb) SHA1(5f38cafa8aab16338038c82267800446fd082e79) )
 	ROM_LOAD( "mh_n88_1.rom", 0xa000, 0x2000, CRC(7ad5d943) SHA1(4ae4d37409ff99411a623da9f6a44192170a854e) )
@@ -1987,10 +1987,10 @@ ROM_END
 ROM_START( pc8801fa )
 	PC8801_MEM_LOAD
 
-	ROM_REGION( 0x8000, "n80rom", ROMREGION_ERASEFF )
+	ROM_REGION( 0x8000, "n80rom", ROMREGION_ERASEFF ) // 1.8, but different BIOS code?
 	ROM_LOAD( "fa_n80.rom",   0x0000, 0x8000, CRC(8a2a1e17) SHA1(06dae1db384aa29d81c5b6ed587877e7128fcb35) )
 
-	ROM_REGION( 0x10000, "n88rom", ROMREGION_ERASEFF )
+	ROM_REGION( 0x10000, "n88rom", ROMREGION_ERASEFF ) // 2.3 but different BIOS code?
 	ROM_LOAD( "fa_n88.rom",   0x0000, 0x8000, CRC(73573432) SHA1(9b1346d44044eeea921c4cce69b5dc49dbc0b7e9) )
 	ROM_LOAD( "fa_n88_0.rom", 0x8000, 0x2000, CRC(a72697d7) SHA1(5aedbc5916d67ef28767a2b942864765eea81bb8) )
 	ROM_LOAD( "fa_n88_1.rom", 0xa000, 0x2000, CRC(7ad5d943) SHA1(4ae4d37409ff99411a623da9f6a44192170a854e) )
@@ -2012,13 +2012,13 @@ ROM_START( pc8801fa )
 	ROM_COPY( "kanji", 0x1000, 0x0000, 0x0800 )
 ROM_END
 
-ROM_START( pc8801ma )
+ROM_START( pc8801ma ) // newer floppy BIOS and Jisyo (dictionary) ROM
 	PC8801_MEM_LOAD
 
-	ROM_REGION( 0x8000, "n80rom", ROMREGION_ERASEFF )
+	ROM_REGION( 0x8000, "n80rom", ROMREGION_ERASEFF ) // 1.8, but different BIOS code?
 	ROM_LOAD( "ma_n80.rom",   0x0000, 0x8000, CRC(8a2a1e17) SHA1(06dae1db384aa29d81c5b6ed587877e7128fcb35) )
 
-	ROM_REGION( 0x10000, "n88rom", ROMREGION_ERASEFF )
+	ROM_REGION( 0x10000, "n88rom", ROMREGION_ERASEFF ) // 2.3 but different BIOS code?
 	ROM_LOAD( "ma_n88.rom",   0x0000, 0x8000, CRC(73573432) SHA1(9b1346d44044eeea921c4cce69b5dc49dbc0b7e9) )
 	ROM_LOAD( "ma_n88_0.rom", 0x8000, 0x2000, CRC(a72697d7) SHA1(5aedbc5916d67ef28767a2b942864765eea81bb8) )
 	ROM_LOAD( "ma_n88_1.rom", 0xa000, 0x2000, CRC(7ad5d943) SHA1(4ae4d37409ff99411a623da9f6a44192170a854e) )
@@ -2047,10 +2047,10 @@ ROM_END
 ROM_START( pc8801ma2 )
 	PC8801_MEM_LOAD
 
-	ROM_REGION( 0x8000, "n80rom", ROMREGION_ERASEFF )
+	ROM_REGION( 0x8000, "n80rom", ROMREGION_ERASEFF ) // 1.8
 	ROM_LOAD( "ma2_n80.rom",   0x0000, 0x8000, CRC(8a2a1e17) SHA1(06dae1db384aa29d81c5b6ed587877e7128fcb35) )
 
-	ROM_REGION( 0x10000, "n88rom", ROMREGION_ERASEFF )
+	ROM_REGION( 0x10000, "n88rom", ROMREGION_ERASEFF ) // BASIC doesn't boot, 1.91 in ROM (2.31?)
 	ROM_LOAD( "ma2_n88.rom",   0x0000, 0x8000, CRC(ae1a6ebc) SHA1(e53d628638f663099234e07837ffb1b0f86d480d) )
 	ROM_LOAD( "ma2_n88_0.rom", 0x8000, 0x2000, CRC(a72697d7) SHA1(5aedbc5916d67ef28767a2b942864765eea81bb8) )
 	ROM_LOAD( "ma2_n88_1.rom", 0xa000, 0x2000, CRC(7ad5d943) SHA1(4ae4d37409ff99411a623da9f6a44192170a854e) )
@@ -2079,10 +2079,10 @@ ROM_END
 ROM_START( pc8801mc )
 	PC8801_MEM_LOAD
 
-	ROM_REGION( 0x8000, "n80rom", ROMREGION_ERASEFF )
+	ROM_REGION( 0x8000, "n80rom", ROMREGION_ERASEFF ) // 1.8
 	ROM_LOAD( "mc_n80.rom",   0x0000, 0x8000, CRC(8a2a1e17) SHA1(06dae1db384aa29d81c5b6ed587877e7128fcb35) )
 
-	ROM_REGION( 0x10000, "n88rom", ROMREGION_ERASEFF )
+	ROM_REGION( 0x10000, "n88rom", ROMREGION_ERASEFF ) // BASIC doesn't boot, 1.93 in ROM (2.33?)
 	ROM_LOAD( "mc_n88.rom",   0x0000, 0x8000, CRC(356d5719) SHA1(5d9ba80d593a5119f52aae1ccd61a1457b4a89a1) )
 	ROM_LOAD( "mc_n88_0.rom", 0x8000, 0x2000, CRC(a72697d7) SHA1(5aedbc5916d67ef28767a2b942864765eea81bb8) )
 	ROM_LOAD( "mc_n88_1.rom", 0xa000, 0x2000, CRC(7ad5d943) SHA1(4ae4d37409ff99411a623da9f6a44192170a854e) )
