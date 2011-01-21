@@ -24,7 +24,6 @@
 	- American Success: reads the light pen?
 	- Alpha (demo): crashes with "illegal function" msg;
 	- Balance of Power: attempt to use the SIO port for mouse polling, worked around for now;
-	- Balance of Power: moans with a JP msg;
 	- Battle Entry: moans with a JP msg then dies if you try to press either numpad 1 or 2 (asks if the user wants to use the sound board (yes 1 / no 2)
 	- Bishoujo Baseball Gakuen: checks ym2608 after intro screen;
 	- Blue Moon Story: moans with a kanji msg;.
@@ -48,6 +47,7 @@
 	- Tobira wo Akete (random crashes in parent pc8801 only)
 
 	games that needs to NOT have write-protect floppies (BTANBs):
+	- Balance of Power
 	- Tobira wo Akete (hangs at title screen)
 
 	Notes:
@@ -151,6 +151,7 @@ static UINT8 i8255_0_pc,i8255_1_pc;
 static UINT8 fdc_irq_opcode;
 static UINT8 ext_rom_bank,gfx_ctrl,vram_sel,misc_ctrl,device_ctrl_data;
 static UINT8 vrtc_irq_mask,rtc_irq_mask,sound_irq_mask;
+static UINT8 vrtc_irq_latch,rtc_irq_latch,sound_irq_latch;
 static UINT8 window_offset_bank;
 static UINT8 layer_mask;
 static UINT8 i8214_irq_level,i8214_irq_state;
@@ -909,6 +910,17 @@ static WRITE8_HANDLER( pc8801_irq_mask_w )
 	rtc_irq_mask = data & 1;
 	vrtc_irq_mask = data & 2;
 
+	if(rtc_irq_mask && rtc_irq_latch)
+	{
+		rtc_irq_latch = 0;
+		pc8801_raise_irq(space->machine,2);
+	}
+	else if(vrtc_irq_mask && vrtc_irq_latch)
+	{
+		vrtc_irq_latch = 0;
+		pc8801_raise_irq(space->machine,1);
+	}
+
 	//if(data & 4)
 	//	printf("IRQ mask %02x\n",data);
 }
@@ -939,6 +951,12 @@ static WRITE8_HANDLER( pc8801_misc_ctrl_w )
 	misc_ctrl = data;
 
 	sound_irq_mask = ((data & 0x80) == 0);
+
+	if(sound_irq_mask && sound_irq_latch)
+	{
+		sound_irq_latch = 0;
+		pc8801_raise_irq(space->machine,4);
+	}
 }
 
 static WRITE8_HANDLER( pc8801_palram_w )
@@ -1626,6 +1644,8 @@ static void pc8801_sound_irq( device_t *device, int irq )
 {
 	if(sound_irq_mask)
 		pc8801_raise_irq(device->machine,4);
+	else
+		sound_irq_latch = 1;
 }
 
 /* TODO: mouse routing (that's why I don't use DEVCB_INPUT_PORT here) */
@@ -1674,13 +1694,16 @@ static IRQ_CALLBACK( pc8801_irq_callback )
 	int level, i;
 
 	level = 0;
-	for (i = 0; i < 8; i++)
+	for (i = 8; i > 0; i--)
 	{
 		if ((i8214_irq_state & (1<<i))!=0)
+		{
 			level = i;
+		}
 	}
 
 	i8214_irq_state &= ~(1<<level);
+
 	return level*2;
 }
 
@@ -1688,6 +1711,8 @@ static TIMER_CALLBACK( pc8801_rtc_irq )
 {
 	if(rtc_irq_mask)
 		pc8801_raise_irq(machine,2);
+	else
+		rtc_irq_latch = 1;
 }
 
 static MACHINE_START( pc8801 )
@@ -1737,6 +1762,10 @@ static MACHINE_RESET( pc8801 )
 		rtc_irq_mask = 0;
 		sound_irq_mask = 0;
 
+		rtc_irq_latch = 0;
+		vrtc_irq_latch = 0;
+		sound_irq_latch = 0;
+
 		i8214_irq_level = 0;
 		i8214_irq_state = 0;
 	}
@@ -1779,6 +1808,8 @@ static INTERRUPT_GEN( pc8801_vrtc_irq )
 {
 	if(vrtc_irq_mask)
 		pc8801_raise_irq(device->machine,1);
+	else
+		vrtc_irq_latch = 1;
 }
 
 static MACHINE_CONFIG_START( pc8801, driver_device )
