@@ -937,10 +937,8 @@ ROM_END
 ROM_START( bigboard )
     ROM_REGION( 0x1000, "monitor", 0 )
 	ROM_LOAD( "bigboard.u67", 0x0000, 0x0800, CRC(5a85a228) SHA1(d51a2cbd0aae80315bda9530275aabfe8305364e))
-	
-	// Using Xerox till real one is dumped
 	ROM_REGION( 0x800, "chargen", 0 )
-	ROM_LOAD( "x820.u92", 0x0000, 0x0800, CRC(b823fa98) SHA1(ad0ea346aa257a53ad5701f4201896a2b3a0f928) )	
+	ROM_LOAD( "bigboard.u73", 0x0000, 0x0800, CRC(10bf0d81) SHA1(7ec73670a4d9d6421a5d6a4c4edc8b7c87923f6c) )	
 ROM_END
 
 /* System Drivers */
