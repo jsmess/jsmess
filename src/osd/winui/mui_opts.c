@@ -2273,7 +2273,7 @@ static file_error LoadSettingsFile(core_options *opts, const char *filename)
 	filerr = core_fopen(filename, OPEN_FLAG_READ, &file);
 	if (filerr == FILERR_NONE)
 	{
-		options_parse_ini_file(opts, file, OPTION_PRIORITY_CMDLINE);
+		options_parse_ini_file(opts, file, OPTION_PRIORITY_CMDLINE, OPTION_PRIORITY_CMDLINE);
 		core_fclose(file);
 	}
 	return filerr;
