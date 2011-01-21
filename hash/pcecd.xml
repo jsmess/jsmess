@@ -2,7 +2,7 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <softwarelist name="pcecd" description="PCE CD-ROM list">
   
-  <!-- These CHDs have all been converted from the 
+  <!-- The JPN CHDs have all been converted from the 
        'PD PC-Engine V2' collection, dated 2007 
        
        Apparently many of these have extra data tracks
@@ -11,11 +11,15 @@
        reads are made (maybe some already exist) are
        considered replacable.
        
+       The USA CHDs are converted from a set that is 
+       known to be 1:1 copies.
+       
    -->
 
   <!-- JPN releases -->
   <software name="1552tenk">
     <description>1552 Tenka Tairan (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -27,6 +31,7 @@
 
   <software name="3x3eyes">
     <description>3 x 3 Eyes - Sanjiyan Hensei (ACD, SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -38,6 +43,7 @@
 
   <software name="aiii">
     <description>A. III (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -48,6 +54,7 @@
   </software>
   <software name="avgeo">
     <description>Advanced Variable Geo (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -58,6 +65,7 @@
   </software>
   <software name="advquiz">
     <description>Adventure Quiz - Capcom World Hatena no Daibouken (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -68,6 +76,7 @@
   </software>
   <software name="aichou">
     <description>Ai Chou Aniki (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -78,6 +87,7 @@
   </software>
   <software name="draculax">
     <description>Akumajou Dracula X - Chi no Rondo (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -88,6 +98,7 @@
   </software>
   <software name="alshark">
     <description>Alshark [Imperfect] (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -98,6 +109,7 @@
   </software>
   <software name="anesan">
     <description>Ane-San (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -108,6 +120,7 @@
   </software>
   <software name="angelsii">
     <description>Angels II - Holy Night [Prototype][Backup] (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -118,6 +131,7 @@
   </software>
   <software name="arunamun">
     <description>Arunamu no Kiba - Juuzoku Juuni Shinto Densetsu (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -128,6 +142,7 @@
   </software>
   <software name="asuka120">
     <description>Asuka 120% Maxima Burning Fest (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -138,6 +153,7 @@
   </software>
   <software name="auroraq">
     <description>Aurora Quest - Otaku no Seiza (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -148,6 +164,7 @@
   </software>
   <software name="avenger">
     <description>Avenger (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -158,6 +175,7 @@
   </software>
   <software name="babel">
     <description>Babel (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -168,6 +186,7 @@
   </software>
   <software name="babyjo">
     <description>Baby Jo (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -178,6 +197,7 @@
   </software>
   <software name="bakuden">
     <description>Bakuden Unbalance Zone (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -188,6 +208,7 @@
   </software>
   <software name="bakurets">
     <description>Bakuretsu Hunter (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -198,6 +219,7 @@
   </software>
   <software name="bakushou">
     <description>Bakushou Yoshimoto no Shinkigeki (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -208,6 +230,7 @@
   </software>
   <software name="basted">
     <description>Basted (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -218,6 +241,7 @@
   </software>
   <software name="battle94">
     <description>Battlefield '94 in Tokyo Dome (ACD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -228,6 +252,7 @@
   </software>
   <software name="bazaru">
     <description>Bazaru Degozaru no Game Degozaru (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -238,6 +263,7 @@
   </software>
   <software name="bikkurim">
     <description>Bikkuriman Daijikai (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -249,6 +275,7 @@
 
   <software name="bishssm">
     <description>Bishoujo Senshi Sailor Moon (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -259,6 +286,7 @@
   </software>
   <software name="bishssmc">
     <description>Bishoujo Senshi Sailor Moon Collection (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -269,6 +297,7 @@
   </software>
   <software name="bhass">
     <description>Black Hole Assault (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -279,6 +308,7 @@
   </software>
   <software name="bldgear">
     <description>Blood Gear (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -289,6 +319,7 @@
   </software>
   <software name="bombmn94">
     <description>Bomberman '94 Taikenban (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -299,6 +330,7 @@
   </software>
   <software name="panicbom">
     <description>Bomberman Panic Bomber (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -309,6 +341,7 @@
   </software>
   <software name="bonanzab">
     <description>Bonanza Bros. (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -319,6 +352,7 @@
   </software>
   <software name="brandish">
     <description>Brandish (ACD, SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -329,6 +363,7 @@
   </software>
   <software name="browning">
     <description>Browning (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -339,6 +374,7 @@
   </software>
   <software name="builderl">
     <description>Builderland (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -349,6 +385,7 @@
   </software>
   <software name="bunillas">
     <description>Bunilla Syndrome Mahjong (CD, SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -359,6 +396,7 @@
   </software>
   <software name="buraihac">
     <description>Burai - Hachigyoku no Yuushi Densetsu (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -369,6 +407,7 @@
   </software>
   <software name="buraiiiy">
     <description>Burai II - Yami Koutei no Gyakushuu (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -379,6 +418,7 @@
   </software>
   <software name="cal2">
     <description>Cal II (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -389,6 +429,7 @@
   </software>
   <software name="cal3">
     <description>Cal III (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -399,6 +440,7 @@
   </software>
   <software name="cardange">
     <description>Cardangels (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -409,6 +451,7 @@
   </software>
   <software name="cdbattle">
     <description>CD Battle Hikari no Yuushatachi (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -419,6 +462,7 @@
   </software>
   <software name="cddenjin">
     <description>CD Denjin Rockabilly Tengoku (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -429,6 +473,7 @@
   </software>
   <software name="chrally">
     <description>Championship Rally (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -439,6 +484,7 @@
   </software>
   <software name="chikichi">
     <description>Chiki Chiki Boys (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -449,6 +495,7 @@
   </software>
   <software name="chouanik">
     <description>Chou Aniki (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -459,6 +506,7 @@
   </software>
   <software name="choueiyu">
     <description>Chou Eiyuu Densetsu - Dynastic Hero (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -469,6 +517,7 @@
   </software>
   <software name="cobrakok">
     <description>Cobra - Kokuryuuou no Densetsu (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -479,6 +528,7 @@
   </software>
   <software name="cobraiid">
     <description>Cobra II - Densetsu no Otoko (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -489,6 +539,7 @@
   </software>
   <software name="colorwar">
     <description>Color Wars (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -499,6 +550,7 @@
   </software>
   <software name="cosmicfa">
     <description>Cosmic Fantasy - Bouken Shounen Yuu (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -509,6 +561,7 @@
   </software>
   <software name="cosmic2">
     <description>Cosmic Fantasy II - Bouken Shounen Ban (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -519,6 +572,7 @@
   </software>
   <software name="cosmic3">
     <description>Cosmic Fantasy III - Bouken Shounen Rei (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -529,6 +583,7 @@
   </software>
   <software name="cosmic4g">
     <description>Cosmic Fantasy IV - Ginga Shounen Densetsu Gekitou Hen (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -539,6 +594,7 @@
   </software>
   <software name="cosmic4t">
     <description>Cosmic Fantasy IV - Ginga Shounen Densetsu Totsunyuu Hen (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -549,6 +605,7 @@
   </software>
   <software name="cotton">
     <description>Cotton - Fantastic Night Dreams (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -559,6 +616,7 @@
   </software>
   <software name="crazyhos">
     <description>Crazy Hospital - Fushigi no Kuni no Tenshi (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -569,6 +627,7 @@
   </software>
   <software name="crestofw">
     <description>Crest of Wolf (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -579,6 +638,7 @@
   </software>
   <software name="cybercit">
     <description>Cyber City OEDO 808 (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -589,6 +649,7 @@
   </software>
   <software name="daisenpu">
     <description>Daisenpuu Custom (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -599,6 +660,7 @@
   </software>
   <software name="daisenry">
     <description>Daisenryaku II - Campaign Version (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -609,6 +671,7 @@
   </software>
   <software name="deja">
     <description>De Ja (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -619,6 +682,7 @@
   </software>
   <software name="dedbrain">
     <description>Dead of the Brain I II (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -629,6 +693,7 @@
   </software>
   <software name="deathbrn">
     <description>Death Bringer - The Knight of Darkness (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -639,6 +704,7 @@
   </software>
   <software name="dedennod">
     <description>Deden no Den (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -649,6 +715,7 @@
   </software>
   <software name="dekoboko">
     <description>Dekoboko Densetsu - Hashire Wagamanma (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -659,6 +726,7 @@
   </software>
   <software name="dennoute">
     <description>Dennou Tenshi - Digital Angel (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -669,6 +737,7 @@
   </software>
   <software name="devmag1">
     <description>Develo Magazine Volume I (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -679,6 +748,7 @@
   </software>
   <software name="devstart">
     <description>Develo Starter Kit - Assembler (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -689,6 +759,7 @@
   </software>
   <software name="devbasic">
     <description>Develo Starter Kit - Basic (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -699,6 +770,7 @@
   </software>
   <software name="doraemon">
     <description>Doraemon Nobita no Dorabian Night (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -709,6 +781,7 @@
   </software>
   <software name="ddragon2">
     <description>Double Dragon II - The Revenge (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -719,6 +792,7 @@
   </software>
   <software name="doukyuus">
     <description>Doukyuusei (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -729,6 +803,7 @@
   </software>
   <software name="downld2">
     <description>Download II (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -739,6 +814,7 @@
   </software>
   <software name="downtown">
     <description>Downtown Nekketsu Monogatari (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -749,6 +825,7 @@
   </software>
   <software name="dragonha">
     <description>Dragon Half (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -759,6 +836,7 @@
   </software>
   <software name="dragonkn">
     <description>Dragon Knight Grafitti (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -769,6 +847,7 @@
   </software>
   <software name="dragonk2">
     <description>Dragon Knight II (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -779,6 +858,7 @@
   </software>
   <software name="dragonk3">
     <description>Dragon Knight III (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -789,6 +869,7 @@
   </software>
   <software name="dslay">
     <description>Dragon Slayer - Eiyuu Densetsu (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -799,6 +880,7 @@
   </software>
   <software name="dslay2">
     <description>Dragon Slayer - Eiyuu Densetsu II (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -809,6 +891,7 @@
   </software>
   <software name="dbzisgd">
     <description>Dragonball Z - Idainaru Son Gokuu Densetsu (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -819,6 +902,7 @@
   </software>
   <software name="dungex2">
     <description>Dungeon Explorer II (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -829,6 +913,7 @@
   </software>
   <software name="dungmst">
     <description>Dungeon Master - Theron's Quest (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -839,6 +924,7 @@
   </software>
   <software name="eferajil">
     <description>Efera Jiliora - The Emblem from Darkness (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -849,6 +935,7 @@
   </software>
   <software name="eikanhak">
     <description>Eikan ha Kimini - Koukou Yakyuu Zenkoku Taikai (ACD, SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -859,6 +946,7 @@
   </software>
   <software name="eiyuusan">
     <description>Eiyuu Sangokushi (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -869,6 +957,7 @@
   </software>
   <software name="emdrag">
     <description>Emerald Dragon (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -879,6 +968,7 @@
   </software>
   <software name="emdragt">
     <description>Emerald Dragon Taikenban (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -889,6 +979,7 @@
   </software>
   <software name="exilej">
     <description>Exile - Toki no Hasama he (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -899,6 +990,7 @@
   </software>
   <software name="exile2j">
     <description>Exile II - Janen no Jishou (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -909,6 +1001,7 @@
   </software>
   <software name="f1circus">
     <description>F1 Circus Special - Pole to Win (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -919,6 +1012,7 @@
   </software>
   <software name="f1teamsi">
     <description>F1 Team Simulation Project F (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -929,6 +1023,7 @@
   </software>
   <software name="faceball">
     <description>Faceball (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -939,6 +1034,7 @@
   </software>
   <software name="facebalt">
     <description>Faceball Taikenban (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -949,6 +1045,7 @@
   </software>
   <software name="faeriedu">
     <description>Faerie Dust Story - Meikyuu no Elfeene (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -959,6 +1056,7 @@
   </software>
   <software name="farjiusn">
     <description>Farjius no Jakoutei - Neo Metal Fantasy (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -969,6 +1067,7 @@
   </software>
   <software name="faussete">
     <description>Faussete Amour (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -979,6 +1078,7 @@
   </software>
   <software name="fiendhun">
     <description>Fiend Hunter (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -989,6 +1089,7 @@
   </software>
   <software name="fstreetj">
     <description>Fighting Street (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -999,6 +1100,7 @@
   </software>
   <software name="fzone2j">
     <description>Final Zone II (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -1009,6 +1111,7 @@
   </software>
   <software name="fireproj">
     <description>Fire Pro Jyoshi - Dome Chojyo Taisen (ACD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -1019,6 +1122,7 @@
   </software>
   <software name="flashhd">
     <description>Flash Hiders (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -1029,6 +1133,7 @@
   </software>
   <software name="flashhdt">
     <description>Flash Hiders Taikenban (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -1039,6 +1144,7 @@
   </software>
   <software name="forgotnj">
     <description>Forgotten Worlds (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -1049,6 +1155,7 @@
   </software>
   <software name="forsoc95">
     <description>Formation Soccer '95 - Della Serie A (ACD, SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -1059,6 +1166,7 @@
   </software>
   <software name="fraycdxa">
     <description>Fray CD Xak Gaiden (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -1069,6 +1177,7 @@
   </software>
   <software name="fushigin">
     <description>Fushigi no Umi no Nadia (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -1079,6 +1188,7 @@
   </software>
   <software name="gground">
     <description>Gain Ground SX (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -1089,6 +1199,7 @@
   </software>
   <software name="galaxyde">
     <description>Galaxy Deka Gayvan (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -1099,6 +1210,7 @@
   </software>
   <software name="galfr">
     <description>Galaxy Fraulein Yuna {HRH310827-3FAAT} (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -1109,6 +1221,7 @@
   </software>
   <software name="galfra">
     <description>Galaxy Fraulein Yuna {HRH310827-3FAFT} (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -1119,6 +1232,7 @@
   </software>
   <software name="galfrhuv">
     <description>Galaxy Fraulien Yuna HuVideo CD (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -1129,6 +1243,7 @@
   </software>
   <software name="galfr2">
     <description>Galaxy Fraulien Yuna II - Eternal Princess (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -1139,6 +1254,7 @@
   </software>
   <software name="gamblerj">
     <description>Gambler Jikochuushinha (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -1149,6 +1265,7 @@
   </software>
   <software name="gamblerm">
     <description>Gambler Jikochuushinha - Mahjong Puzzle Collection (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -1159,6 +1276,7 @@
   </software>
   <software name="ganchouh">
     <description>Ganchouhishi - Aoki Ookami to Shiroki Mejika (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -1169,6 +1287,7 @@
   </software>
   <software name="garoud2s">
     <description>Garou Densetsu II - Aratanaru Tatakai - Sample Disc (ACD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -1179,6 +1298,7 @@
   </software>
   <software name="garoud2">
     <description>Garou Densetsu II - Aratanaru Tatakai [Imperfect] (ACD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -1189,6 +1309,7 @@
   </software>
   <software name="garoud">
     <description>Garou Densetsu Special (ACD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -1199,6 +1320,7 @@
   </software>
   <software name="gateofth">
     <description>Gate of Thunder (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -1209,6 +1331,7 @@
   </software>
   <software name="genocide">
     <description>Genocide (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -1219,6 +1342,7 @@
   </software>
   <software name="gensouta">
     <description>Gensou Tairiku Auleria (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -1229,6 +1353,7 @@
   </software>
   <software name="gingafuk">
     <description>Ginga Fukei Densetsu Sapphire (ACD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -1239,6 +1364,7 @@
   </software>
   <software name="gogobird">
     <description>Go! Go! Birdie Chance (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -1249,6 +1375,7 @@
   </software>
   <software name="godpanic">
     <description>God Panic - Shijyou Saikyo Gundan (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -1260,6 +1387,7 @@
 
   <software name="godzillb">
     <description>Godzilla - Bakutou Retsuden (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -1270,6 +1398,7 @@
   </software>
   <software name="goldnaxe">
     <description>Golden Axe (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -1280,6 +1409,7 @@
   </software>
   <software name="gotzendi">
     <description>Gotzendiener (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -1290,6 +1420,7 @@
   </software>
   <software name="gradius2">
     <description>Gradius II - Gofer no Yabou (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -1300,6 +1431,7 @@
   </software>
   <software name="gsmikami">
     <description>GS Mikami (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -1310,6 +1442,7 @@
   </software>
   <software name="gulcligh">
     <description>Gulclight TDF 2 (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -1320,6 +1453,7 @@
   </software>
   <software name="hatsukoi">
     <description>Hatsukoi Monogatari (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -1330,6 +1464,7 @@
   </software>
   <software name="hawkf123">
     <description>Hawk F-123 (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -1340,6 +1475,7 @@
   </software>
   <software name="hellfire">
     <description>Hellfire S - The Another Story (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -1350,6 +1486,7 @@
   </software>
   <software name="highgren">
     <description>High Grenadier (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -1360,6 +1497,7 @@
   </software>
   <software name="hihouden">
     <description>Hihou Densetsu Chris no Bouken (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -1370,6 +1508,7 @@
   </software>
   <software name="himitsun">
     <description>Himitsu no Hanazono (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -1380,6 +1519,7 @@
   </software>
   <software name="horrorst">
     <description>Horror Story (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -1390,6 +1530,7 @@
   </software>
   <software name="hupga2">
     <description>Hu PGA Tour Power Golf 2 - Golfer (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -1400,6 +1541,7 @@
   </software>
   <software name="humanspo">
     <description>Human Sports Festival (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -1410,6 +1552,7 @@
   </software>
   <software name="hyakumon">
     <description>Hyaku Monogatari - Hontou ni Atta Kowai Hanashi (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -1420,6 +1563,7 @@
   </software>
   <software name="hyperdyn">
     <description>Hyper Dyne SideArms Special (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -1430,6 +1574,7 @@
   </software>
   <software name="hyperwar">
     <description>Hyper Wars (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -1440,6 +1585,7 @@
   </software>
   <software name="iganinde">
     <description>Iga Ninden Gaiou (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -1450,6 +1596,7 @@
   </software>
   <software name="imagef2">
     <description>Image Fight II (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -1460,6 +1607,7 @@
   </software>
   <software name="inouemam">
     <description>Inoue Mami - Kono Hoshi ni Tatta Hitori no Kimi (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -1470,6 +1618,7 @@
   </software>
   <software name="iqpanic">
     <description>IQ Panic (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -1480,6 +1629,7 @@
   </software>
   <software name="jthunder">
     <description>J Thunder (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -1490,6 +1640,7 @@
   </software>
   <software name="jbharj">
     <description>J. B. Harold Murder Club (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -1500,6 +1651,7 @@
   </software>
   <software name="jleaguet">
     <description>J. League Tremendous Soccer '94 (ACD, SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -1510,6 +1662,7 @@
   </software>
   <software name="jacknicj">
     <description>Jack Nicklaus World Tour Golf (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -1521,6 +1674,7 @@
   XXXXX
   <software name="janshind">
     <description>Janshin Densetsu - Quest of Jongmaster (ACD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -1531,6 +1685,7 @@
   </software>
   <software name="janteimo">
     <description>Jantei Monogatari (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -1541,6 +1696,7 @@
   </software>
   <software name="jantei2k">
     <description>Jantei Monogatari II - Uchuu Tantei Divan Kanketsu Hen (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -1551,6 +1707,7 @@
   </software>
   <software name="jantei2s">
     <description>Jantei Monogatari II - Uchuu Tantei Divan Shutsudou Hen (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -1561,6 +1718,7 @@
   </software>
   <software name="jantei3">
     <description>Jantei Monogatari III - Saver Angels (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -1571,6 +1729,7 @@
   </software>
   <software name="jimpower">
     <description>Jim Power - In Mutant Planet (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -1581,6 +1740,7 @@
   </software>
   <software name="juuoukic">
     <description>Juuouki (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -1591,6 +1751,7 @@
   </software>
   <software name="kagamain">
     <description>Kagamai no Kuni no Legend (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -1601,6 +1762,7 @@
   </software>
   <software name="kaizouch">
     <description>Kaizou Choujin Shubibinman III - Ikai no Princess (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -1611,6 +1773,7 @@
   </software>
   <software name="kakutouh">
     <description>Kakutou Haou Densetsu Algunos (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -1621,6 +1784,7 @@
   </software>
   <software name="kawanonu">
     <description>Kawa no Nushizuri - Shizenha (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -1631,6 +1795,7 @@
   </software>
   <software name="kazekiri">
     <description>Kaze Kiri - Ninja Action (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -1641,6 +1806,7 @@
   </software>
   <software name="kazenode">
     <description>Kaze no Densetsu Xanadu (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -1651,6 +1817,7 @@
   </software>
   <software name="kazenods">
     <description>Kaze no Densetsu Xanadu - Sample Disc (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -1661,6 +1828,7 @@
   </software>
   <software name="kazenod2">
     <description>Kaze no Densetsu Xanadu II (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -1671,6 +1839,7 @@
   </software>
   <software name="kiaidan">
     <description>Kiaidan 00 (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -1681,6 +1850,7 @@
   </software>
   <software name="kidoukei">
     <description>Kidou Keisatsu Patlabor - Griffon Hen (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -1691,6 +1861,7 @@
   </software>
   <software name="kisoulou">
     <description>Kisou Louga (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -1701,6 +1872,7 @@
   </software>
   <software name="kisoulo2">
     <description>Kisou Louga II - The Ends of Shangrila (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -1711,6 +1883,7 @@
   </software>
   <software name="koseikib">
     <description>KO Seiki Beast - Gaia Fukkatsu Kanketsu Hen (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -1721,6 +1894,7 @@
   </software>
   <software name="kuusouka">
     <description>Kuusou Kagaku Sekai Gulliver Boy (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -1731,6 +1905,7 @@
   </software>
   <software name="ldis">
     <description>L-Dis (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -1741,6 +1916,7 @@
   </software>
   <software name="ladyphan">
     <description>Lady Phantom (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -1751,6 +1927,7 @@
   </software>
   <software name="langriss">
     <description>Langrisser - Hikari no Matsuei (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -1761,6 +1938,7 @@
   </software>
   <software name="laplace">
     <description>Laplace no Ma (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -1771,6 +1949,7 @@
   </software>
   <software name="laplacep">
     <description>Laplace no Ma - Preview Disk (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -1781,6 +1960,7 @@
   </software>
   <software name="lsoft1">
     <description>Laser Soft Visual Collection Volume I - Cosmic Fantasy Visual Shuu (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -1791,6 +1971,7 @@
   </software>
   <software name="lsoft2">
     <description>Laser Soft Visual Collection Volume II - Valis Visual Shuu (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -1801,6 +1982,7 @@
   </software>
   <software name="lastarma">
     <description>Last Armageddon {BRCD0001-6-0625-R1F} (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -1811,6 +1993,7 @@
   </software>
   <software name="lastarm1">
     <description>Last Armageddon {BRCD0001-6-0625-R3D} (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -1821,6 +2004,7 @@
   </software>
   <software name="lastarm2">
     <description>Last Armageddon {BRCD0001-7-0904-R1D} (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -1831,6 +2015,7 @@
   </software>
   <software name="legion">
     <description>Legion (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -1841,6 +2026,7 @@
   </software>
   <software name="lemmings">
     <description>Lemmings (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -1851,6 +2037,7 @@
   </software>
   <software name="linda">
     <description>Linda (ACD, SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -1861,6 +2048,7 @@
   </software>
   <software name="lodossto">
     <description>Lodoss Tousenki - Record of Lodoss War (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -1871,6 +2059,7 @@
   </software>
   <software name="lodosstt">
     <description>Lodoss Tousenki - Record of Lodoss War Taikenban (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -1881,6 +2070,7 @@
   </software>
   <software name="lodosst2">
     <description>Lodoss Tousenki II - Record of Lodoss War II (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -1891,6 +2081,7 @@
   </software>
   <software name="loomj">
     <description>Loom (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -1901,6 +2092,7 @@
   </software>
   <software name="lordwars">
     <description>Lord of Wars (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -1911,6 +2103,7 @@
   </software>
   <software name="mac2036">
     <description>Macross 2036 (CD, SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -1921,6 +2114,7 @@
   </software>
   <software name="macrosse">
     <description>Macross Eien no Love Song (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -1931,6 +2125,7 @@
   </software>
   <software name="madstlk">
     <description>Mad Stalker - Full Metal Force (ACD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -1941,6 +2136,7 @@
   </software>
   <software name="madstlks">
     <description>Mad Stalker - Full Metal Force - Sample Disc (ACD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -1951,6 +2147,7 @@
   </software>
   <software name="madoumon">
     <description>Madou Monogatari I - Honou no Sotsuenji [Imperfect] (ACD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -1961,6 +2158,7 @@
   </software>
   <software name="magicalf">
     <description>Magical Fantasy Adventure - Popful Mail (ACD, SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -1971,6 +2169,7 @@
   </software>
   <software name="magicals">
     <description>Magical Saurus Tour (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -1981,6 +2180,7 @@
   </software>
   <software name="magicoal">
     <description>Magicoal (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -1991,6 +2191,7 @@
   </software>
   <software name="mclinics">
     <description>Mahjong Clinic Special (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -2001,6 +2202,7 @@
   </software>
   <software name="mlemang">
     <description>Mahjong Lemon Angel (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -2011,6 +2213,7 @@
   </software>
   <software name="mbeach">
     <description>Mahjong on the Beach (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -2021,6 +2224,7 @@
   </software>
   <software name="mahswrd">
     <description>Mahjong Sword - Princess Quest Gaiden (ACD, SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -2031,6 +2235,7 @@
   </software>
   <software name="mahslk31">
     <description>Mahou no Shoujo Silky Lip [Ver 3.1 Prototype][Backup] (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -2041,6 +2246,7 @@
   </software>
   <software name="mahslk50">
     <description>Mahou no Shoujo Silky Lip [Ver 5.0 Prototype][Backup][alt] (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -2051,6 +2257,7 @@
   </software>
   <software name="mamonoht">
     <description>Mamono Hunter Youko - Makai Kara no Tenkousei (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -2061,6 +2268,7 @@
   </software>
   <software name="mamonohu">
     <description>Mamono Hunter Youko - Tooki Yobigoe (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -2071,6 +2279,7 @@
   </software>
   <software name="martialc">
     <description>Martial Champion (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -2081,6 +2290,7 @@
   </software>
   <software name="mashoude">
     <description>Mashou Denki La Valeur (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -2091,6 +2301,7 @@
   </software>
   <software name="masterof">
     <description>Master of Monsters (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -2101,6 +2312,7 @@
   </software>
   <software name="matekide">
     <description>Mateki Densetsu Astralius (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -2111,6 +2323,7 @@
   </software>
   <software name="megamipa">
     <description>Megami Paradise (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -2121,6 +2334,7 @@
   </software>
   <software name="metalang">
     <description>Metal Angel (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -2131,6 +2345,7 @@
   </software>
   <software name="metalan2">
     <description>Metal Angel II (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -2141,6 +2356,7 @@
   </software>
   <software name="metamorj">
     <description>Metamor Jupiter (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -2151,6 +2367,7 @@
   </software>
   <software name="mmagic">
     <description>Might and Magic (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -2161,6 +2378,7 @@
   </software>
   <software name="mmagic3j">
     <description>Might and Magic III - Isles of Terra (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -2171,6 +2389,7 @@
   </software>
   <software name="mineswee">
     <description>Mine Sweeper (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -2181,6 +2400,7 @@
   </software>
   <software name="miraisho">
     <description>Mirai Shonen Conan (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -2191,6 +2411,7 @@
   </software>
   <software name="mitsubac">
     <description>Mitsubachi Gakuen (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -2201,6 +2422,7 @@
   </software>
   <software name="mlairj">
     <description>Monster Lair - Wonderboy III (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -2211,6 +2433,7 @@
   </software>
   <software name="monsterm">
     <description>Monster Maker - Yami no Ryuukishi (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -2221,6 +2444,7 @@
   </software>
   <software name="moonligh">
     <description>Moonlight Lady (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -2231,6 +2455,7 @@
   </software>
   <software name="motoroad">
     <description>Motoroader MC (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -2241,6 +2466,7 @@
   </software>
   <software name="motteket">
     <description>Motteke Tamago [Imperfect] (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -2251,6 +2477,7 @@
   </software>
   <software name="mugensen">
     <description>Mugen Senshi Valis - Legend of a Fantasm Soldier (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -2261,6 +2488,7 @@
   </software>
   <software name="mysticfo">
     <description>Mystic Formula (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -2271,6 +2499,7 @@
   </software>
   <software name="nekketsh">
     <description>Nekketsu Koukou Dodgeballbu Soccer Hen (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -2281,6 +2510,7 @@
   </software>
   <software name="nekketsd">
     <description>Nekketsu Koushinkyoku - Soreyuke Daiundoukai (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -2291,6 +2521,7 @@
   </software>
   <software name="nekketlb">
     <description>Nekketsu Legend Baseball (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -2301,6 +2532,7 @@
   </software>
   <software name="nemurenu">
     <description>Nemurenumori no Chiisana Ohanashi (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -2311,6 +2543,7 @@
   </software>
   <software name="neonecta">
     <description>Neo Nectaris (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -2321,6 +2554,7 @@
   </software>
   <software name="nexzr">
     <description>Nexzr (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -2331,6 +2565,7 @@
   </software>
   <software name="nishimur">
     <description>Nishimura Kyoutarou Mystery - Hokutosei no Onna (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -2341,6 +2576,7 @@
   </software>
   <software name="noriko">
     <description>No.Ri.Ko (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -2351,6 +2587,7 @@
   </software>
   <software name="nobunbf">
     <description>Nobunaga no Yabou - Bushou Fuuunroku (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -2361,6 +2598,7 @@
   </software>
   <software name="nobunnyz">
     <description>Nobunaga no Yabou Zenkokuban (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -2371,6 +2609,7 @@
   </software>
   <software name="pachiok3">
     <description>Pachiokun III - Pachisuro Pachinko (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -2381,6 +2620,7 @@
   </software>
   <software name="pachioku">
     <description>Pachiokun Maboroshi no Densetsu (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -2391,6 +2631,7 @@
   </software>
   <software name="pachiowu">
     <description>Pachiokun Warau Uchuu (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -2401,6 +2642,7 @@
   </software>
   <software name="paradion">
     <description>Paradion - Auto Crusher Palladium (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -2411,6 +2653,7 @@
   </software>
   <software name="pastelli">
     <description>Pastel Lime (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -2421,6 +2664,7 @@
   </software>
   <software name="fanspc1">
     <description>PCEngine Fan Special CD-Rom Volume I (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -2431,6 +2675,7 @@
   </software>
   <software name="hyprcat">
     <description>PCEngine Hyper Catalog (CD-Rom Capsule) (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -2441,6 +2686,7 @@
   </software>
   <software name="hyprcata">
     <description>PCEngine Hyper Catalog Duo-RX - Disc A (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -2451,6 +2697,7 @@
   </software>
   <software name="hyprcatb">
     <description>PCEngine Hyper Catalog Duo-RX - Disc B (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -2461,6 +2708,7 @@
   </software>
   <software name="hyprcat2">
     <description>PCEngine Hyper Catalog II (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -2471,6 +2719,7 @@
   </software>
   <software name="hyprcat3">
     <description>PCEngine Hyper Catalog III (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -2481,6 +2730,7 @@
   </software>
   <software name="hyprcat4">
     <description>PCEngine Hyper Catalog IV (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -2491,6 +2741,7 @@
   </software>
   <software name="hyprcat5">
     <description>PCEngine Hyper Catalog V (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -2501,6 +2752,7 @@
   </software>
   <software name="hyprct6a">
     <description>PCEngine Hyper Catalog VI - Disc A (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -2511,6 +2763,7 @@
   </software>
   <software name="hyprct6b">
     <description>PCEngine Hyper Catalog VI - Disc B (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -2521,6 +2774,7 @@
   </software>
   <software name="policeco">
     <description>Police Connection (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -2531,6 +2785,7 @@
   </software>
   <software name="pompingw">
     <description>Pomping World (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -2541,6 +2796,7 @@
   </software>
   <software name="popnmagi">
     <description>Pop'n Magic (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -2551,6 +2807,7 @@
   </software>
   <software name="populous">
     <description>Populous - The Promised Lands (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -2561,6 +2818,7 @@
   </software>
   <software name="princej">
     <description>Prince of Persia (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -2571,6 +2829,7 @@
   </software>
   <software name="prmaker">
     <description>Princess Maker I (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -2581,6 +2840,7 @@
   </software>
   <software name="prmakera">
     <description>Princess Maker I - Drama CD Audio (Audio CD)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -2591,6 +2851,7 @@
   </software>
   <software name="prmaker2">
     <description>Princess Maker II (ACD, SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -2601,6 +2862,7 @@
   </software>
   <software name="princesm">
     <description>Princess Minerva (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -2611,6 +2873,7 @@
   </software>
   <software name="peyedol">
     <description>Private Eyedol (ACD, SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -2621,6 +2884,7 @@
   </software>
   <software name="pdet3">
     <description>Psychic Detective Series Vol. III - Aya (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -2631,6 +2895,7 @@
   </software>
   <software name="pdet3d">
     <description>Psychic Detective Series Vol. III - Aya - Auto Demo (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -2641,6 +2906,7 @@
   </software>
   <software name="pdet4">
     <description>Psychic Detective Series Vol. IV - Orgel (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -2651,6 +2917,7 @@
   </software>
   <software name="psychics">
     <description>Psychic Storm (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -2661,6 +2928,7 @@
   </software>
   <software name="puyopuyo">
     <description>Puyo Puyo CD (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -2671,6 +2939,7 @@
   </software>
   <software name="puyopuy2">
     <description>Puyo Puyo CD Tsuu (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -2681,6 +2950,7 @@
   </software>
   <software name="quizaven">
     <description>Quiz Avenue (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -2691,6 +2961,7 @@
   </software>
   <software name="quizave2">
     <description>Quiz Avenue II (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -2701,6 +2972,7 @@
   </software>
   <software name="quizave3">
     <description>Quiz Avenue III (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -2711,6 +2983,7 @@
   </software>
   <software name="quizcara">
     <description>Quiz Caravan Cult Q (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -2721,6 +2994,7 @@
   </software>
   <software name="quizdega">
     <description>Quiz de Gakuensai (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -2731,6 +3005,7 @@
   </software>
   <software name="quizmaru">
     <description>Quiz Marugoto the World (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -2741,6 +3016,7 @@
   </software>
   <software name="quizmar2">
     <description>Quiz Marugoto The World II - Time Machine ni Onegai! (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -2751,6 +3027,7 @@
   </software>
   <software name="quiznoho">
     <description>Quiz no Hoshi (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -2761,6 +3038,7 @@
   </software>
   <software name="quiztono">
     <description>Quiz Tonosama no Yabou (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -2771,6 +3049,7 @@
   </software>
   <software name="rtypecom">
     <description>R-Type Complete CD (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -2781,6 +3060,7 @@
   </software>
   <software name="rainbowi">
     <description>Rainbow Islands (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -2791,6 +3071,7 @@
   </software>
   <software name="ranma">
     <description>Ranma (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -2801,6 +3082,7 @@
   </software>
   <software name="ranmadat">
     <description>Ranma Datou, Ganso Musabetsu Kakutou-Ryuu! (CD, SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -2811,6 +3093,7 @@
   </software>
   <software name="ranmator">
     <description>Ranma Toraware no Hanayome (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -2821,6 +3104,7 @@
   </software>
   <software name="rayx2">
     <description>Rayxanber II (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -2831,6 +3115,7 @@
   </software>
   <software name="rayx3">
     <description>Rayxanber III (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -2841,6 +3126,7 @@
   </software>
   <software name="redalert">
     <description>Red Alert (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -2851,6 +3137,7 @@
   </software>
   <software name="rennybla">
     <description>Renny Blaster (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -2861,6 +3148,7 @@
   </software>
   <software name="risingsu">
     <description>Rising Sun (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -2871,6 +3159,7 @@
   </software>
   <software name="roadspir">
     <description>Road Spirits (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -2881,6 +3170,7 @@
   </software>
   <software name="karok1">
     <description>Rom Karaoke - Volume I (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -2891,6 +3181,7 @@
   </software>
   <software name="karok1ss">
     <description>Rom Karaoke - Volume I - Suteki ni Standard (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -2901,6 +3192,7 @@
   </software>
   <software name="karok2">
     <description>Rom Karaoke - Volume II (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -2911,6 +3203,7 @@
   </software>
   <software name="karok2ni">
     <description>Rom Karaoke - Volume II - Nattoku Idol (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -2921,6 +3214,7 @@
   </software>
   <software name="karok3">
     <description>Rom Karaoke - Volume III (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -2931,6 +3225,7 @@
   </software>
   <software name="karok3yb">
     <description>Rom Karaoke - Volume III - Yappashi Band (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -2941,6 +3236,7 @@
   </software>
   <software name="karok4">
     <description>Rom Karaoke - Volume IV (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -2951,6 +3247,7 @@
   </software>
   <software name="karok4co">
     <description>Rom Karaoke - Volume IV - Choito Otona! (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -2961,6 +3258,7 @@
   </software>
   <software name="karok5">
     <description>Rom Karaoke - Volume V (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -2971,6 +3269,7 @@
   </software>
   <software name="karok5mu">
     <description>Rom Karaoke - Volume V - Maku no Uchi (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -2981,6 +3280,7 @@
   </software>
   <software name="romromst">
     <description>Rom Rom Stadium (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -2991,6 +3291,7 @@
   </software>
   <software name="ruinkami">
     <description>Ruin - Kami no Isan (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -3001,6 +3302,7 @@
   </software>
   <software name="ryuukono">
     <description>Ryuuko no Ken (ACD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -3011,6 +3313,7 @@
   </software>
   <software name="ryuukons">
     <description>Ryuuko no Ken - Sample Disc (ACD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -3021,6 +3324,7 @@
   </software>
   <software name="sangokus">
     <description>Sangokushi Eiketsu - Tenka ni Nozomu (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -3031,6 +3335,7 @@
   </software>
   <software name="sangoku3">
     <description>Sangokushi III (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -3041,6 +3346,7 @@
   </software>
   <software name="seireise">
     <description>Seirei Senshi Spriggan (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -3051,6 +3357,7 @@
   </software>
   <software name="seiryuud">
     <description>Seiryuu Densetsu Monbit (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -3061,6 +3368,7 @@
   </software>
   <software name="seisensh">
     <description>Seisenshi Denshou - Jantaku no Kishi (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -3071,6 +3379,7 @@
   </software>
   <software name="seiyamon">
     <description>Seiya Monogatari - Anearth Fantasy Stories (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -3081,6 +3390,7 @@
   </software>
   <software name="seiyamot">
     <description>Seiya Monogatari - Anearth Fantasy Stories Taikenban (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -3091,6 +3401,7 @@
   </software>
   <software name="seiyamop">
     <description>Seiya Monogatari - Anearth Fantasy Stories [Debug Version Prototype] (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -3101,6 +3412,7 @@
   </software>
   <software name="sengokuk">
     <description>Sengoku Kantou Sankokushi (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -3111,6 +3423,7 @@
   </software>
   <software name="sexyidol">
     <description>Sexy Idol Mahjong (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -3121,6 +3434,7 @@
   </software>
   <software name="sexyidof">
     <description>Sexy Idol Mahjong Fashion Monogatari (ACD, SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -3131,6 +3445,7 @@
   </software>
   <software name="sexyidoy">
     <description>Sexy Idol Mahjong Yakyuuken no Uta [Imperfect] (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -3141,6 +3456,7 @@
   </software>
   <software name="shbeastj">
     <description>Shadow of the Beast (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -3151,6 +3467,7 @@
   </software>
   <software name="shangha2">
     <description>Shanghai II (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -3161,6 +3478,7 @@
   </software>
   <software name="shangha3">
     <description>Shanghai III - Dragon's Eye (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -3171,6 +3489,7 @@
   </software>
   <software name="shapeshj">
     <description>Shapeshifter - Makai Eiyuu Den (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -3181,6 +3500,7 @@
   </software>
   <software name="sherlocj">
     <description>Sherlock Holmes no Tantei Kouza (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -3191,6 +3511,7 @@
   </software>
   <software name="sherlo2j">
     <description>Sherlock Holmes no Tantei Kouza II (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -3201,6 +3522,7 @@
   </software>
   <software name="shiawase">
     <description>Shiawase Usagi - Nureta Bishoujo Ichi Hajimete na no ni [Imperfect] (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -3211,6 +3533,7 @@
   </software>
   <software name="shiawas2">
     <description>Shiawase Usagi II - Toraware Usagi Sailor Z (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -3221,6 +3544,7 @@
   </software>
   <software name="shinmega">
     <description>Shin Megami Tensei (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -3231,6 +3555,7 @@
   </software>
   <software name="shinonry">
     <description>Shin Onryou Senki (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -3241,6 +3566,7 @@
   </software>
   <software name="shinsang">
     <description>Shin Sangokushi - Tenka ha Ware ni (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -3251,6 +3577,7 @@
   </software>
   <software name="shinsets">
     <description>Shinsetsu Shiawase Usagi (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -3261,6 +3588,7 @@
   </software>
   <software name="shinsetf">
     <description>Shinsetsu Shiawase Usagi F - Yuujiyou Yorimo Aiyoku (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -3271,6 +3599,7 @@
   </software>
   <software name="shinset2">
     <description>Shinsetsu Shiawase Usagi II (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -3281,6 +3610,7 @@
   </software>
   <software name="shougida">
     <description>Shougi Database Kiyuu (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -3291,6 +3621,7 @@
   </software>
   <software name="simeartj">
     <description>Sim Earth - The Living Planet (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -3301,6 +3632,7 @@
   </software>
   <software name="slimewor">
     <description>Slime World (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -3311,6 +3643,7 @@
   </software>
   <software name="slotgamb">
     <description>Slot Gambler (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -3321,6 +3654,7 @@
   </software>
   <software name="snatcher">
     <description>Snatcher (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -3331,6 +3665,7 @@
   </software>
   <software name="snatchpd">
     <description>Snatcher - Pilot Disk (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -3341,6 +3676,7 @@
   </software>
   <software name="solbianc">
     <description>Sol Bianca (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -3351,6 +3687,7 @@
   </software>
   <software name="solmoona">
     <description>Sol Moonarge (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -3361,6 +3698,7 @@
   </software>
   <software name="solidfor">
     <description>Solid Force (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -3371,6 +3709,7 @@
   </software>
   <software name="sorceria">
     <description>Sorcerian (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -3381,6 +3720,7 @@
   </software>
   <software name="sotsugyo">
     <description>Sotsugyou - Graduation (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -3391,6 +3731,7 @@
   </software>
   <software name="sotsugy2">
     <description>Sotsugyou II - Neo Generation (ACD, SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -3401,6 +3742,7 @@
   </software>
   <software name="sotsugym">
     <description>Sotsugyou Shashin - Miki (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -3411,6 +3753,7 @@
   </software>
   <software name="spacefan">
     <description>Space Fantasy Zone [Prototype][Backup] (CD, SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -3421,6 +3764,7 @@
   </software>
   <software name="spaceinv">
     <description>Space Invaders - The Original Game (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -3431,6 +3775,7 @@
   </software>
   <software name="splashlj">
     <description>Splash Lake (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -3441,6 +3786,7 @@
   </software>
   <software name="spriggan">
     <description>Spriggan Mark II - Re Terraform Project [Imperfect] (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -3451,6 +3797,7 @@
   </software>
   <software name="starbrea">
     <description>Star Breaker (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -3461,6 +3808,7 @@
   </software>
   <software name="starmobi">
     <description>Star Mobile (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -3471,6 +3819,7 @@
   </software>
   <software name="starparo">
     <description>Star Parodia (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -3481,6 +3830,7 @@
   </software>
   <software name="startlin">
     <description>Startling Odyssey (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -3491,6 +3841,7 @@
   </software>
   <software name="startli2">
     <description>Startling Odyssey II (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -3501,6 +3852,7 @@
   </software>
   <software name="steamhea">
     <description>Steam Heart's [Imperfect] (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -3511,6 +3863,7 @@
   </software>
   <software name="strider">
     <description>Strider Hiryuu (ACD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -3521,6 +3874,7 @@
   </software>
   <software name="sugoroku">
     <description>Sugoroku '92 Nari Tore Nariagari Trendy (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -3531,6 +3885,7 @@
   </software>
   <software name="summer92">
     <description>Summer Carnival '92 - Alzadick (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -3541,6 +3896,7 @@
   </software>
   <software name="summer93">
     <description>Summer Carnival '93 - Nexzr Special (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -3551,6 +3907,7 @@
   </software>
   <software name="superalb">
     <description>Super Albatross (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -3561,6 +3918,7 @@
   </software>
   <software name="scdrpgs">
     <description>Super cd-Rom RPG Sampler (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -3571,6 +3929,7 @@
   </software>
   <software name="superdai">
     <description>Super Daisenryaku (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -3581,6 +3940,7 @@
   </software>
   <software name="superdar">
     <description>Super Darius (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -3591,6 +3951,7 @@
   </software>
   <software name="superda2">
     <description>Super Darius II (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -3601,6 +3962,7 @@
   </software>
   <software name="supermah">
     <description>Super Mahjong Taikai (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -3611,6 +3973,7 @@
   </software>
   <software name="sraiden">
     <description>Super Raiden (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -3621,6 +3984,7 @@
   </software>
   <software name="srmp23">
     <description>Super Real Mahjong P II III Custom (ACD, SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -3631,6 +3995,7 @@
   </software>
   <software name="srmp4">
     <description>Super Real Mahjong P IV Custom (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -3641,6 +4006,7 @@
   </software>
   <software name="srmp5">
     <description>Super Real Mahjong P V Custom (ACD, SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -3651,6 +4017,7 @@
   </software>
   <software name="srmspec">
     <description>Super Real Mahjong Special (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -3661,6 +4028,7 @@
   </software>
   <software name="supersch">
     <description>Super Schwartzschild (CD, SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -3671,6 +4039,7 @@
   </software>
   <software name="supersc2">
     <description>Super Schwartzschild II (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -3681,6 +4050,7 @@
   </software>
   <software name="swordmas">
     <description>Sword Master (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -3691,6 +4061,7 @@
   </software>
   <software name="sylphias">
     <description>Sylphia (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -3701,6 +4072,7 @@
   </software>
   <software name="tadaimay">
     <description>Tadaima Yuusha Boshuuchuu (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -3711,6 +4083,7 @@
   </software>
   <software name="tadaimas">
     <description>Tadaima Yuusha Boshuuchuu - Sample Disc (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -3721,6 +4094,7 @@
   </software>
   <software name="taiheiki">
     <description>Taiheiki (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -3731,6 +4105,7 @@
   </software>
   <software name="tanjoude">
     <description>Tanjou Debut (ACD, SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -3741,6 +4116,7 @@
   </software>
   <software name="tecmowor">
     <description>Tecmo World Cup Super Soccer (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -3751,6 +4127,7 @@
   </software>
   <software name="tekiwork">
     <description>Tekipaki Working Love (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -3761,6 +4138,7 @@
   </software>
   <software name="tenchimu">
     <description>Tenchi Muyou! Ryououki (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -3771,6 +4149,7 @@
   </software>
   <software name="tenchiwo">
     <description>Tenchi wo Kurau (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -3781,6 +4160,7 @@
   </software>
   <software name="tengaims">
     <description>Tengai Makyo - Fuun Kabuki Den Shutsugeki no Sho (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -3791,6 +4171,7 @@
   </software>
   <software name="tengaima">
     <description>Tengai Makyo - Kabuki Itouryodan (ACD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -3801,6 +4182,7 @@
   </software>
   <software name="tengaimz">
     <description>Tengai Makyo - Ziria (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -3811,6 +4193,7 @@
   </software>
   <software name="tengaizh">
     <description>Tengai Makyo - Ziria [Hibaihin] (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -3821,6 +4204,7 @@
   </software>
   <software name="tengaim2">
     <description>Tengai Makyo II - Manji Maru (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -3831,6 +4215,7 @@
   </software>
   <software name="tenshino">
     <description>Tenshi no Uta (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -3841,6 +4226,7 @@
   </software>
   <software name="tenshin2">
     <description>Tenshi no Uta II - Datenshi no Uta (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -3851,6 +4237,7 @@
   </software>
   <software name="terrafor">
     <description>Terraforming (CD, SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -3861,6 +4248,7 @@
   </software>
   <software name="atlasrv">
     <description>The Atlas - Renaissance Voyager (ACD, SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -3871,6 +4259,7 @@
   </software>
   <software name="dcupten">
     <description>The Davis Cup Tennis (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -3881,6 +4270,7 @@
   </software>
   <software name="kickboxj">
     <description>The Kick Boxing (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -3891,6 +4281,7 @@
   </software>
   <software name="manhole">
     <description>The Manhole (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -3901,6 +4292,7 @@
   </software>
   <software name="theproya">
     <description>The Pro Yakyuu (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -3911,6 +4303,7 @@
   </software>
   <software name="thepro94">
     <description>The Pro Yakyuu Super '94 (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -3921,6 +4314,7 @@
   </software>
   <software name="theprosu">
     <description>The Pro Yakyuu Super (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -3931,6 +4325,7 @@
   </software>
   <software name="thetvsho">
     <description>The TV Show (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -3941,6 +4336,7 @@
   </software>
   <software name="tokimek">
     <description>Tokimeki Memorial {HRKM70414-1FAAT} [Imperfect] (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -3951,6 +4347,7 @@
   </software>
   <software name="tokimeka">
     <description>Tokimeki Memorial {HRKM70414-1FABT} [Imperfect] (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -3961,6 +4358,7 @@
   </software>
   <software name="tokimekb">
     <description>Tokimeki Memorial {HRKM70701-2FAAT} (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -3971,6 +4369,7 @@
   </software>
   <software name="tokimekc">
     <description>Tokimeki Memorial {HRKM71014-3FAAT} (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -3981,6 +4380,7 @@
   </software>
   <software name="tokimekd">
     <description>Tokimeki Memorial {HRKM71014-3FABT} (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -3991,6 +4391,7 @@
   </software>
   <software name="toponera">
     <description>Top O Nerae! GunBuster Volume I (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -4001,6 +4402,7 @@
   </software>
   <software name="toponer2">
     <description>Top O Nerae! GunBuster Volume II (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -4011,6 +4413,7 @@
   </software>
   <software name="travelep">
     <description>Travel Epuru (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -4021,6 +4424,7 @@
   </software>
   <software name="traveler">
     <description>Travelers! Densetsu wo ButtobaSe [Imperfect] (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -4031,6 +4435,7 @@
   </software>
   <software name="uchuusen">
     <description>Uchuu Senkan Yamato (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -4041,6 +4446,7 @@
   </software>
   <software name="ultra2">
     <description>Ultrabox II Go (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -4051,6 +4457,7 @@
   </software>
   <software name="ultra3">
     <description>Ultrabox III Go (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -4061,6 +4468,7 @@
   </software>
   <software name="ultra4">
     <description>Ultrabox IV Go (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -4071,6 +4479,7 @@
   </software>
   <software name="ultra">
     <description>Ultrabox Sohkan Go (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -4081,6 +4490,7 @@
   </software>
   <software name="ultra5">
     <description>Ultrabox V Go (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -4091,6 +4501,7 @@
   </software>
   <software name="ultra6">
     <description>Ultrabox VI Go (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -4101,6 +4512,7 @@
   </software>
   <software name="uruseiya">
     <description>Urusei Yatsura - Stay With You (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -4111,6 +4523,7 @@
   </software>
   <software name="uruseiyb">
     <description>Urusei Yatsura - Stay with You - Bonus CD Audio (Audio CD)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -4121,6 +4534,7 @@
   </software>
   <software name="valis2j">
     <description>Valis II - The Fantasm Soldier (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -4131,6 +4545,7 @@
   </software>
   <software name="valis3j">
     <description>Valis III - The Fantasm Soldier (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -4141,6 +4556,7 @@
   </software>
   <software name="valis4">
     <description>Valis IV - The Fantasm Soldier (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -4151,6 +4567,7 @@
   </software>
   <software name="vasteelj">
     <description>Vasteel (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -4161,6 +4578,7 @@
   </software>
   <software name="vasteel2">
     <description>Vasteel II (ACD, SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -4171,6 +4589,7 @@
   </software>
   <software name="virgindr">
     <description>Virgin Dream (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -4181,6 +4600,7 @@
   </software>
   <software name="whereint">
     <description>Where in the world is Carmen Sandiego (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -4191,6 +4611,7 @@
   </software>
   <software name="windsoft">
     <description>Winds of Thunder (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -4201,6 +4622,7 @@
   </software>
   <software name="wizard12">
     <description>Wizardry I II (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -4211,6 +4633,7 @@
   </software>
   <software name="wizard34">
     <description>Wizardry III IV (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -4221,6 +4644,7 @@
   </software>
   <software name="wizard5">
     <description>Wizardry V - Heart of the Maelstrom (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -4231,6 +4655,7 @@
   </software>
   <software name="wh2">
     <description>World Heroes II (ACD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -4241,6 +4666,7 @@
   </software>
   <software name="wh2sam">
     <description>World Heroes II - Sample Disc (ACD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -4251,6 +4677,7 @@
   </software>
   <software name="wrestlin">
     <description>Wrestling Angels - Double Impact (ACD, SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -4261,6 +4688,7 @@
   </software>
   <software name="xak12">
     <description>Xak I II (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -4271,6 +4699,7 @@
   </software>
   <software name="xak3">
     <description>Xak III - The Eternal Recurrence (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -4281,6 +4710,7 @@
   </software>
   <software name="yamamura">
     <description>Yamamura Misa Suspense - Kinsen Ka Kyo E Zara Satsu Jin Ji Ken (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -4291,6 +4721,7 @@
   </software>
   <software name="yaminoke">
     <description>Yami no Ketsuzoku Harukanaru Kioku (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -4301,6 +4732,7 @@
   </software>
   <software name="yawarasc">
     <description>Yawara! (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -4311,6 +4743,7 @@
   </software>
   <software name="yawara2">
     <description>Yawara! II (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -4321,6 +4754,7 @@
   </software>
   <software name="ysbk12j">
     <description>Ys Book I II (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -4331,6 +4765,7 @@
   </software>
   <software name="ys3">
     <description>Ys III - Wanderers from Ys (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -4341,6 +4776,7 @@
   </software>
   <software name="ys4">
     <description>Ys IV - The Dawn of Ys {HCD3051-4-1108-R1F} (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -4351,6 +4787,7 @@
   </software>
   <software name="ys4a">
     <description>Ys IV - The Dawn of Ys {HCD3051-5-1116-R1P} (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -4361,6 +4798,7 @@
   </software>
   <software name="yuyuhaku">
     <description>Yu Yu Hakusho (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -4371,6 +4809,7 @@
   </software>
   <software name="zankager">
     <description>Zan - Kagerou no Toki (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -4381,6 +4820,7 @@
   </software>
   <software name="zero4cha">
     <description>Zero 4 Champ II (SCD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -4391,6 +4831,7 @@
   </software>
   <software name="zerowing">
     <description>Zero Wing (CD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -4403,491 +4844,565 @@
   <!-- USA releases -->
   <software name="tg3in1">
     <description>3 in 1 DUO Demo CD (SCD)(USA)</description>
-    <year>????</year>
-    <publisher>NEC</publisher>
+    <!-- Serial: DUO DEMO 01 -->
+    <year>199?</year>
+    <publisher>Hudson Soft / Red</publisher>
     <part name="cdrom" interface="pce_cdrom">
       <diskarea name="cdrom">
-        <disk name="3 in 1 duo demo cd (scd)(usa)" sha1="bf80b222ca8ece1ae8bab660fae4c70577c933a2"/>
+        <disk name="3 in 1 duo demo cd (scd)(usa)" sha1="8de8a67b7e4a7e6eb5a0cae5f0fda8e3c6d5414e"/>
       </diskarea>
     </part>
   </software>
   <software name="tg4in1">
     <description>4 in 1 Super CD (SCD)(USA)</description>
-    <year>????</year>
-    <publisher>NEC</publisher>
+    <!-- Serial: TGXCD1026 -->
+    <!-- Press U R D L II at menu to access Bomberman -->
+    <year>1992</year>
+    <publisher>Hudson Soft / Red</publisher>
     <part name="cdrom" interface="pce_cdrom">
       <diskarea name="cdrom">
-        <disk name="4 in 1 super cd (scd)(usa)" sha1="e2bb4420c7cb12188c8205b6692d51dfafef1437"/>
+        <disk name="4 in 1 super cd (scd)(usa)" sha1="5100db1abb77459508cfbeb43a86920c0e913acf"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="addams">
+    <description>Addams Family, The (CD)(USA)</description>
+    <!-- Serial: TGXCD1019 -->
+    <year>1991</year>
+    <publisher>ICOM Simulations</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="the addams family (cd)(usa)" sha1="80f53ba344b1a681748f8e3fac66c8c30a88baeb"/>
       </diskarea>
     </part>
   </software>
   <software name="beyondsg">
     <description>Beyond Shadowgate (SCD)(USA)</description>
-    <year>????</year>
-    <publisher>NEC</publisher>
+    <!-- Serial: TGXCD1048 -->
+    <year>1993</year>
+    <publisher>ICOM Simulations</publisher>
     <part name="cdrom" interface="pce_cdrom">
       <diskarea name="cdrom">
-        <disk name="beyond shadowgate (scd)(usa)" sha1="b1f61aab839d53cc197906de1e8a1e861b5c6f8f"/>
+        <disk name="beyond shadowgate (scd)(usa)" sha1="2ef1abf597ff3123722e8d3fe384756b1b014e96"/>
       </diskarea>
     </part>
   </software>
   <software name="bikini">
     <description>Bikini Girls (CD)(USA)</description>
-    <year>????</year>
-    <publisher>NEC</publisher>
+    <!-- Serial: AK BIKINI SRCR 01 -->
+    <year>199?</year>
+    <publisher>Excite Software</publisher>
     <part name="cdrom" interface="pce_cdrom">
       <diskarea name="cdrom">
-        <disk name="bikini girls (cd)(usa)" sha1="d35b9097e6d4a8aaf89d94fe3d9bb57331d7452e"/>
+        <disk name="bikini girls (cd)(usa)" sha1="c5bf0e98159e57295aad655b340accc5d5ffdfc2"/>
       </diskarea>
     </part>
   </software>
   <software name="bonk3cd">
     <description>Bonk III - Bonk's Big Adventure (SCD)(USA)</description>
-    <year>????</year>
-    <publisher>NEC</publisher>
+    <!-- Serial: TGXCD1052 -->
+    <year>1993</year>
+    <publisher>Hudson Soft / Red</publisher>
     <part name="cdrom" interface="pce_cdrom">
       <diskarea name="cdrom">
-        <disk name="bonk iii - bonk's big adventure (scd)(usa)" sha1="411bc9afd5abd07cd189a4afac9b62cf216480cb"/>
+        <disk name="bonk iii - bonk's big adventure (scd)(usa)" sha1="fd95ce97a9fa8b249ffb419110a1c18171772c36"/>
       </diskarea>
     </part>
   </software>
   <software name="busterbr">
     <description>Buster Bros. (CD)(USA)</description>
-    <year>????</year>
-    <publisher>NEC</publisher>
+    <!-- Serial: TGXCD1031 -->
+    <year>1993</year>
+    <publisher>Capcom</publisher>
     <part name="cdrom" interface="pce_cdrom">
       <diskarea name="cdrom">
-        <disk name="buster bros. (cd)(usa)" sha1="696ba4356d1d754eeb3e9dde37ba52cd0da8c655"/>
+        <disk name="buster bros. (cd)(usa)" sha1="0b1eacf830c22e8519ce7c8c7c821a16743e44ed"/>
       </diskarea>
     </part>
   </software>
   <software name="campcali">
     <description>Camp California (SCD)(USA)</description>
-    <year>????</year>
-    <publisher>NEC</publisher>
+    <!-- Serial: TGXCD1013 -->
+    <year>1993</year>
+    <publisher>ICOM Simulations</publisher>
     <part name="cdrom" interface="pce_cdrom">
       <diskarea name="cdrom">
-        <disk name="camp california (scd)(usa)" sha1="b33ba2e5ccf7e6974eae890f77e431de359f8a10"/>
+        <disk name="camp california (scd)(usa)" sha1="0083f15f77630273a397783af0344074c1716f35"/>
       </diskarea>
     </part>
   </software>
   <software name="cosmic2u">
     <description>Cosmic Fantasy II (CD)(USA)</description>
-    <year>????</year>
-    <publisher>NEC</publisher>
+    <!-- Serial: WTG990301 -->
+    <year>1992</year>
+    <publisher>Telenet Japan</publisher>
     <part name="cdrom" interface="pce_cdrom">
       <diskarea name="cdrom">
-        <disk name="cosmic fantasy ii (cd)(usa)" sha1="17dc61ac510530322777c936bdc7fdfe838fe67d"/>
+        <disk name="cosmic fantasy ii (cd)(usa)" sha1="fa4ef8341782c35f52fbc0e1f7af28d581629f53"/>
       </diskarea>
     </part>
   </software>
   <software name="cottonu">
     <description>Cotton - Fantastic Night Dreams (SCD)(USA)</description>
-    <year>????</year>
-    <publisher>NEC</publisher>
+    <!-- Serial: TGXCD1038 -->
+    <year>1993</year>
+    <publisher>Success</publisher>
     <part name="cdrom" interface="pce_cdrom">
       <diskarea name="cdrom">
-        <disk name="cotton - fantastic night dreams (scd)(usa)" sha1="e09c4f202b3e4a8fbcaa0a0010f044c679203021"/>
+        <disk name="cotton - fantastic night dreams (scd)(usa)" sha1="bb3be2103245d0452cdf93ee4f44357e74daf765"/>
       </diskarea>
     </part>
   </software>
   <software name="dslayu">
     <description>Dragon Slayer - The Legend of Heroes (SCD)(USA)</description>
-    <year>????</year>
-    <publisher>NEC</publisher>
+    <!-- Serial: TGXCD1029 -->
+    <year>1992</year>
+    <publisher>Falcom</publisher>
     <part name="cdrom" interface="pce_cdrom">
       <diskarea name="cdrom">
-        <disk name="dragon slayer - the legend of heroes (scd)(usa)" sha1="43904f0149b50663e67ebd7d0dccf2cb75adcc5b"/>
+        <disk name="dragon slayer - the legend of heroes (scd)(usa)" sha1="4fda5ad3613d05694d7d2c0c1d30a8ec3e654a0f"/>
       </diskarea>
     </part>
   </software>
   <software name="dungex2u">
     <description>Dungeon Explorer II (SCD)(USA)</description>
-    <year>????</year>
-    <publisher>NEC</publisher>
+    <!-- Serial: TGXCD1034 -->
+    <year>1993</year>
+    <publisher>Hudson Soft</publisher>
     <part name="cdrom" interface="pce_cdrom">
       <diskarea name="cdrom">
-        <disk name="dungeon explorer ii (scd)(usa)" sha1="07ea9c0455e77b6dbea37938432eb73fb3b383bd"/>
+        <disk name="dungeon explorer ii (scd)(usa)" sha1="dd6693f7db94b831f3921de01456f72e4323365e"/>
       </diskarea>
     </part>
   </software>
   <software name="dungmstu">
     <description>Dungeon Master - Theron's Quest (SCD)(USA)</description>
-    <year>????</year>
-    <publisher>NEC</publisher>
+    <!-- Serial: TGXCD1041 -->
+    <year>1993</year>
+    <publisher>FTL Games</publisher>
     <part name="cdrom" interface="pce_cdrom">
       <diskarea name="cdrom">
-        <disk name="dungeon master - theron's quest (scd)(usa)" sha1="d64ebdc9a4e5082a9a238d2f47ef0c41aa5c6345"/>
+        <disk name="dungeon master - theron's quest (scd)(usa)" sha1="d0bdaf93ccea98899334cdfcccaeb6c59d789980"/>
       </diskarea>
     </part>
   </software>
   <software name="exileu">
     <description>Exile (CD)(USA)</description>
-    <year>????</year>
-    <publisher>NEC</publisher>
+    <!-- Serial: WTG990101 -->
+    <year>1992</year>
+    <publisher>Telnet Japan</publisher>
     <part name="cdrom" interface="pce_cdrom">
       <diskarea name="cdrom">
-        <disk name="exile (cd)(usa)" sha1="8753da89e56382aecbb7ccc1dcf19e3e16355702"/>
+        <disk name="exile (cd)(usa)" sha1="e46deece4fd5032446cb8db4a2aed8b79c86a718"/>
       </diskarea>
     </part>
   </software>
   <software name="exile2u">
     <description>Exile II - Wicked Phenomenon (SCD)(USA)</description>
-    <year>????</year>
-    <publisher>NEC</publisher>
+    <!-- Serial: WTG990102 -->
+    <year>1993</year>
+    <publisher>Telnet Japan</publisher>
     <part name="cdrom" interface="pce_cdrom">
       <diskarea name="cdrom">
-        <disk name="exile ii - wicked phenomenon (scd)(usa)" sha1="685bc20981a8e2c61eb8c88ff2fe44617ae178fd"/>
+        <disk name="exile ii - wicked phenomenon (scd)(usa)" sha1="7605c62073d210708f1e847047b277630603908f"/>
       </diskarea>
     </part>
   </software>
   <software name="fantss">
     <description>Fantasy Star Soldier [Prototype] (SCD)(USA)</description>
-    <year>????</year>
-    <publisher>NEC</publisher>
+    <!-- Serial: N/A -->
+    <year>199?</year>
+    <publisher>Inter State</publisher>
     <part name="cdrom" interface="pce_cdrom">
       <diskarea name="cdrom">
-        <disk name="fantasy star soldier [prototype] (scd)(usa)" sha1="a7d17d5b41f34b46e10feaf55244fad24adec25b"/>
+        <disk name="fantasy star soldier [prototype] (scd)(usa)" sha1="b35d11e0de73fd19138864beb70414bc5f3bbac3"/>
       </diskarea>
     </part>
   </software>
   <software name="fstreetu">
     <description>Fighting Street (CD)(USA)</description>
-    <year>????</year>
-    <publisher>NEC</publisher>
+    <!-- Serial: TGXCD1001 -->
+    <year>1989</year>
+    <publisher>Capcom</publisher>
     <part name="cdrom" interface="pce_cdrom">
       <diskarea name="cdrom">
-        <disk name="fighting street (cd)(usa)" sha1="3cb4ea04ef7a3bfa1f85db83fa81b7b646d11640"/>
+        <disk name="fighting street (cd)(usa)" sha1="0858c0d792053a24ed2df9ccf34c6fb1fbe9e9f2"/>
       </diskarea>
     </part>
   </software>
   <software name="fzone2u">
     <description>Final Zone II (CD)(USA)</description>
-    <year>????</year>
-    <publisher>NEC</publisher>
+    <!-- Serial: TGXCD1008 -->
+    <year>1990</year>
+    <publisher>Telnet Japan</publisher>
     <part name="cdrom" interface="pce_cdrom">
       <diskarea name="cdrom">
-        <disk name="final zone ii (cd)(usa)" sha1="f9466d04fe261ea2c7326f9662848c86b788a5f2"/>
+        <disk name="final zone ii (cd)(usa)" sha1="a8846a72f5eb819c6e9b6947eaa21597446f2e85"/>
       </diskarea>
     </part>
   </software>
   <software name="forgotnu">
     <description>Forgotten Worlds (SCD)(USA)</description>
-    <year>????</year>
-    <publisher>NEC</publisher>
+    <!-- Serial: TGXCD1030 -->
+    <year>1992</year>
+    <publisher>Capcom</publisher>
     <part name="cdrom" interface="pce_cdrom">
       <diskarea name="cdrom">
-        <disk name="forgotten worlds (scd)(usa)" sha1="8a13fd4f1afc493018d84c36b1031baae614a14d"/>
+        <disk name="forgotten worlds (scd)(usa)" sha1="a02459fca418805d9658447cd86757f3eba22158"/>
       </diskarea>
     </part>
   </software>
   <software name="godzilla">
     <description>Godzilla (SCD)(USA)</description>
-    <year>????</year>
-    <publisher>NEC</publisher>
+    <!-- Serial: TGXCD1051 -->
+    <year>1993</year>
+    <publisher>Toho</publisher>
     <part name="cdrom" interface="pce_cdrom">
       <diskarea name="cdrom">
-        <disk name="godzilla (scd)(usa)" sha1="059c03358249b1d84ba5fe2a8804e2279a0d5726"/>
+        <disk name="godzilla (scd)(usa)" sha1="cedb892d8412a335480af0775eb76b679f77d063"/>
       </diskarea>
     </part>
   </software>
   <software name="hawiian">
     <description>Hawiian Island Girls (CD)(USA)</description>
-    <year>????</year>
-    <publisher>NEC</publisher>
+    <!-- Serial: AK ISLAND SRCR 02 -->
+    <year>199?</year>
+    <publisher>Excite Software</publisher>
     <part name="cdrom" interface="pce_cdrom">
       <diskarea name="cdrom">
-        <disk name="hawiian island girls (cd)(usa)" sha1="f976fb229efbdfebd2abf023c44ecab8b5b1f1f9"/>
+        <disk name="hawiian island girls (cd)(usa)" sha1="48d2330705fc7596f5960095c994ca7dea1ab0b0"/>
       </diskarea>
     </part>
   </software>
   <software name="jbharu">
-    <description>J. B. Harold Murder Club [Imperfect] (CD)(USA)</description>
-    <year>????</year>
-    <publisher>NEC</publisher>
+    <description>J. B. Harold Murder Club (CD)(USA)</description>
+    <!-- Serial: TGXCD1012 -->
+    <year>1991</year>
+    <publisher>Riverhill Soft</publisher>
     <part name="cdrom" interface="pce_cdrom">
       <diskarea name="cdrom">
-        <disk name="j. b. harold murder club [imperfect] (cd)(usa)" sha1="a908f96cf5e21e7575c73b6e07cbae3c6781e2fe"/>
+        <disk name="j. b. harold murder club (cd)(usa)" sha1="6e045dee47bae87663c6094c6f2bb6ff3c4d76b8"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="implode">
+    <description>Implode (SCD)(USA)[bad toc]</description>
+    <!-- Serial: BTCD0201 -->
+    <!-- This disc has a copy protection scheme -->
+    <year>2002</year>
+    <publisher>MindRec</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="implode (scd)(usa)[bad toc]" sha1="e408fad0a69bb6c7329e218ef6bb26165de616b6"/>
       </diskarea>
     </part>
   </software>
   <software name="itcamefr">
     <description>It Came from the Desert (CD)(USA)</description>
-    <year>????</year>
-    <publisher>NEC</publisher>
+    <!-- Serial: TGXCD1010 -->
+    <year>1992</year>
+    <publisher>Cinemaware</publisher>
     <part name="cdrom" interface="pce_cdrom">
       <diskarea name="cdrom">
-        <disk name="it came from the desert (cd)(usa)" sha1="16fc102f78471dcf144fc60a2dd6c4a6f357c383"/>
+        <disk name="it came from the desert (cd)(usa)" sha1="a891134263f27de77d2ba2dd512c5295e7148b69"/>
       </diskarea>
     </part>
   </software>
   <software name="jacknicu">
     <description>Jack Nicklaus Turbo Golf (CD)(USA)</description>
-    <year>????</year>
-    <publisher>NEC</publisher>
+    <!-- Serial: ATGXCDJTTC -->
+    <year>1990</year>
+    <publisher>Accolade</publisher>
     <part name="cdrom" interface="pce_cdrom">
       <diskarea name="cdrom">
-        <disk name="jack nicklaus turbo golf (cd)(usa)" sha1="a3675a97048018448b99b00949c500a05e207b89"/>
+        <disk name="jack nicklaus turbo golf (cd)(usa)" sha1="66ee7612d6e817a277778e77b5da2ec4c3c7f506"/>
       </diskarea>
     </part>
   </software>
   <software name="johnmadd">
     <description>John Madden Duo CD Football (SCD)(USA)</description>
-    <year>????</year>
-    <publisher>NEC</publisher>
+    <!-- Serial: TGXCD1045 -->
+    <year>1993</year>
+    <publisher>Electronic Arts</publisher>
     <part name="cdrom" interface="pce_cdrom">
       <diskarea name="cdrom">
-        <disk name="john madden duo cd football (scd)(usa)" sha1="faf8416829f4d5430c326f0797b0a6a9ae5b7a6c"/>
+        <disk name="john madden duo cd football (scd)(usa)" sha1="68695cf121e93de1f41594f14bebb80f8d953cf9"/>
       </diskarea>
     </part>
   </software>
   <software name="lastaler">
     <description>Last Alert (CD)(USA)</description>
-    <year>????</year>
-    <publisher>NEC</publisher>
+    <!-- Serial: TGXCD1007 -->
+    <year>1990</year>
+    <publisher>Telnet Japan</publisher>
     <part name="cdrom" interface="pce_cdrom">
       <diskarea name="cdrom">
-        <disk name="last alert (cd)(usa)" sha1="a45465b4cdf70946e1f7c1a488e999a44a5df147"/>
+        <disk name="last alert (cd)(usa)" sha1="085ecab0e16b7e1f74843d14a4f8ffe36a63567d"/>
       </diskarea>
     </part>
   </software>
   <software name="loomu">
     <description>Loom (SCD)(USA)</description>
-    <year>????</year>
-    <publisher>NEC</publisher>
+    <!-- Serial: TGXCD1017 -->
+    <year>1992</year>
+    <publisher>Lucas Arts</publisher>
     <part name="cdrom" interface="pce_cdrom">
       <diskarea name="cdrom">
-        <disk name="loom (scd)(usa)" sha1="588c56b5569d2bf8ddec547c97ee77ed207a7480"/>
+        <disk name="loom (scd)(usa)" sha1="443483a7599284c7d4ce228464c792dbc22bada0"/>
       </diskarea>
     </part>
   </software>
   <software name="lordrise">
     <description>Lords of the Rising Sun (CD)(USA)</description>
-    <year>????</year>
-    <publisher>NEC</publisher>
+    <!-- Serial: TGXCD1014 -->
+    <year>1992</year>
+    <publisher>Cinemaware</publisher>
     <part name="cdrom" interface="pce_cdrom">
       <diskarea name="cdrom">
-        <disk name="lords of the rising sun (cd)(usa)" sha1="8eda39779434bf5cea405049d1c6373a86018b3b"/>
+        <disk name="lords of the rising sun (cd)(usa)" sha1="b6dd435d437889e9f4df6f0694149d5233c7a65e"/>
       </diskarea>
     </part>
   </software>
   <software name="lordthun">
     <description>Lords of Thunder (SCD)(USA)</description>
-    <year>????</year>
-    <publisher>NEC</publisher>
+    <!-- Serial: TGXCD1033 -->
+    <year>1993</year>
+    <publisher>Hudson Soft / Red</publisher>
     <part name="cdrom" interface="pce_cdrom">
       <diskarea name="cdrom">
-        <disk name="lords of thunder (scd)(usa)" sha1="8f5c9531c3fe8298150e20712cfc84f6c2b614f3"/>
+        <disk name="lords of thunder (scd)(usa)" sha1="ef889edba301b26f7b33294be79f63b60503b978"/>
       </diskarea>
     </part>
   </software>
   <software name="magicald">
     <description>Magical Dinosaur Tour (CD)(USA)</description>
-    <year>????</year>
-    <publisher>NEC</publisher>
+    <!-- Serial: TGXCD1005 -->
+    <year>1990</year>
+    <publisher>Yazawa Science Office</publisher>
     <part name="cdrom" interface="pce_cdrom">
       <diskarea name="cdrom">
-        <disk name="magical dinosaur tour (cd)(usa)" sha1="126820b4dbe989c0e9d9e39c89983d016864be89"/>
+        <disk name="magical dinosaur tour (cd)(usa)" sha1="87ec132c7c23363f7c411f9ab097d660bc7db5f7"/>
+      </diskarea>
+    </part>
+  </software>
+  <software name="meteorbl">
+    <description>Meteor Blster DX (SCD)(USA)[bad toc]</description>
+    <!-- Serial: BTCD0402 -->
+    <!-- This disc has a copy protection scheme -->
+    <year>2004</year>
+    <publisher>MindRec</publisher>
+    <part name="cdrom" interface="pce_cdrom">
+      <diskarea name="cdrom">
+        <disk name="meteor blaster dx (scd)(usa)[bad toc]" sha1="d6a3d3a6c6305b7a7137ac330388fa327d9da066"/>
       </diskarea>
     </part>
   </software>
   <software name="mmagic3u">
     <description>Might and Magic III - Isles of Terra (SCD)(USA)</description>
-    <year>????</year>
-    <publisher>NEC</publisher>
+    <!-- Serial: TGXCD1047 -->
+    <year>1993</year>
+    <publisher>New World Computing</publisher>
     <part name="cdrom" interface="pce_cdrom">
       <diskarea name="cdrom">
-        <disk name="might and magic iii - isles of terra (scd)(usa)" sha1="f6d7da8d852794df96c9f0b2161f1701a5a7deba"/>
+        <disk name="might and magic iii - isles of terra (scd)(usa)" sha1="56ef1ecdb4c13aae230286d148c4388e87be216b"/>
       </diskarea>
     </part>
   </software>
   <software name="mlairu">
     <description>Monster Lair (CD)(USA)</description>
-    <year>????</year>
-    <publisher>NEC</publisher>
+    <!-- Serial: TGXCD1003 -->
+    <year>1989</year>
+    <publisher>Westone</publisher>
     <part name="cdrom" interface="pce_cdrom">
       <diskarea name="cdrom">
-        <disk name="monster lair (cd)(usa)" sha1="1f9b98e82d29fef6897bb43fc84814e5dc513a0d"/>
+        <disk name="monster lair (cd)(usa)" sha1="a5068feb9b697d7f6ae788514af0a1812f293f7b"/>
       </diskarea>
     </part>
   </software>
   <software name="princeu">
     <description>Prince of Persia (SCD)(USA)</description>
-    <year>????</year>
-    <publisher>NEC</publisher>
+    <!-- Serial: TGXCD1027 -->
+    <year>1992</year>
+    <publisher>Brøderbund</publisher>
     <part name="cdrom" interface="pce_cdrom">
       <diskarea name="cdrom">
-        <disk name="prince of persia (scd)(usa)" sha1="7405fb7162a17ca98de6d3e782358d75956db817"/>
+        <disk name="prince of persia (scd)(usa)" sha1="9c80a48a5c3ef7190289f46b5023550dfe8fbbd4"/>
       </diskarea>
     </part>
   </software>
   <software name="riotzone">
     <description>Riot Zone (SCD)(USA)</description>
-    <year>????</year>
-    <publisher>NEC</publisher>
+    <!-- Serial: TGXCD1035 -->
+    <year>1993</year>
+    <publisher>Westone</publisher>
     <part name="cdrom" interface="pce_cdrom">
       <diskarea name="cdrom">
-        <disk name="riot zone (scd)(usa)" sha1="bce0714632417cc272558a502411287490b5e585"/>
+        <disk name="riot zone (scd)(usa)" sha1="8a28af48bbda28fa782c22753eb504406fe65314"/>
       </diskarea>
     </part>
   </software>
   <software name="shbeastu">
     <description>Shadow of the Beast (SCD)(USA)</description>
-    <year>????</year>
-    <publisher>NEC</publisher>
+    <!-- Serial: TGXCD1018 -->
+    <year>1992</year>
+    <publisher>Psygnosis</publisher>
     <part name="cdrom" interface="pce_cdrom">
       <diskarea name="cdrom">
-        <disk name="shadow of the beast (scd)(usa)" sha1="420f127f0205d9b83ad7b6dfc959627b9239243a"/>
+        <disk name="shadow of the beast (scd)(usa)" sha1="bb80363487d087be66f43333cc9c7de5dc065415"/>
       </diskarea>
     </part>
   </software>
   <software name="shapeshu">
     <description>Shape Shifter (SCD)(USA)</description>
-    <year>????</year>
-    <publisher>NEC</publisher>
+    <!-- Serial: TGXCD1021 -->
+    <year>1992</year>
+    <publisher>ICOM Simulations</publisher>
     <part name="cdrom" interface="pce_cdrom">
       <diskarea name="cdrom">
-        <disk name="shape shifter (scd)(usa)" sha1="538aaa83c2a454778cf7e99d13dab60c73120fb0"/>
+        <disk name="shape shifter (scd)(usa)" sha1="cc6a2d0a4826eb98b5fde999eda525c4b122e349"/>
       </diskarea>
     </part>
   </software>
   <software name="sherloc">
     <description>Sherlock Holmes Consulting Detective (CD)(USA)</description>
-    <year>????</year>
-    <publisher>NEC</publisher>
+    <!-- Serial: TGXCD1011 -->
+    <year>1991</year>
+    <publisher>Sleuth Publications</publisher>
     <part name="cdrom" interface="pce_cdrom">
       <diskarea name="cdrom">
-        <disk name="sherlock holmes consulting detective (cd)(usa)" sha1="9271e6ca1462359aaa7c7cf2feddf37b499e4333"/>
+        <disk name="sherlock holmes consulting detective (cd)(usa)" sha1="b84b97763cb1734267efb31f3701c853d0e852bf"/>
       </diskarea>
     </part>
   </software>
   <software name="sherlo2">
     <description>Sherlock Holmes Consulting Detective Volume II (CD, SCD)(USA)</description>
-    <year>????</year>
-    <publisher>NEC</publisher>
+    <!-- Serial: TGXCD1039 -->
+    <year>1993</year>
+    <publisher>Sleuth Publications</publisher>
     <part name="cdrom" interface="pce_cdrom">
       <diskarea name="cdrom">
-        <disk name="sherlock holmes consulting detective volume ii (cd, scd)(usa)" sha1="38630ee371016af030440bef129541f7a6d14183"/>
+        <disk name="sherlock holmes consulting detective volume ii (cd, scd)(usa)" sha1="0c0206282e52ce25319abf2f71dea61d42f1366e"/>
       </diskarea>
     </part>
   </software>
   <software name="simeartu">
     <description>Sim Earth - The Living Planet (SCD)(USA)</description>
-    <year>????</year>
-    <publisher>NEC</publisher>
+    <!-- Serial: TGXCD1036 -->
+    <year>1993</year>
+    <publisher>Maxis</publisher>
     <part name="cdrom" interface="pce_cdrom">
       <diskarea name="cdrom">
-        <disk name="sim earth - the living planet (scd)(usa)" sha1="1019e7bd44d3c0b8bb3c6c80b586e484d4f10700"/>
+        <disk name="sim earth - the living planet (scd)(usa)" sha1="cc1bb9c2262abee90adae806b54fc2aa85de4f9a"/>
       </diskarea>
     </part>
   </software>
   <software name="splashlu">
     <description>Splash Lake (CD)(USA)</description>
-    <year>????</year>
-    <publisher>NEC</publisher>
+    <!-- Serial: TGXCD1025 -->
+    <year>1992</year>
+    <publisher>NEC Avenue</publisher>
     <part name="cdrom" interface="pce_cdrom">
       <diskarea name="cdrom">
-        <disk name="splash lake (cd)(usa)" sha1="7dd7901e9afe21d1b5079f620663b43ae9e52767"/>
+        <disk name="splash lake (cd)(usa)" sha1="cd16c4d9c4eaf69ff8ef05496a98b4c8ebd558fb"/>
       </diskarea>
     </part>
   </software>
   <software name="superair">
     <description>Super Air Zonk (SCD)(USA)</description>
-    <year>????</year>
-    <publisher>NEC</publisher>
+    <!-- Serial: TGXCD1042 -->
+    <year>1993</year>
+    <publisher>Hudson Soft / Red</publisher>
     <part name="cdrom" interface="pce_cdrom">
       <diskarea name="cdrom">
-        <disk name="super air zonk (scd)(usa)" sha1="507cf143590cac9cc3f1d53302ca12d3c1001a6c"/>
+        <disk name="super air zonk (scd)(usa)" sha1="8d25bbfbc5681872e996e2a66ddd36f0e0b35d16"/>
       </diskarea>
     </part>
   </software>
   <software name="sydmeads">
-    <description>Syd Mead's Terra Forming [Imperfect] (CD, SCD)(USA)</description>
-    <year>????</year>
-    <publisher>NEC</publisher>
+    <description>Syd Mead's Terra Forming (CD, SCD)(USA)</description>
+    <!-- Serial: TGXCD1040 -->
+    <year>1993</year>
+    <publisher>Syd Mead</publisher>
     <part name="cdrom" interface="pce_cdrom">
       <diskarea name="cdrom">
-        <disk name="syd mead's terra forming [imperfect] (cd, scd)(usa)" sha1="6a3a74163777b4b23f350cd9476578a357dba007"/>
-      </diskarea>
-    </part>
-  </software>
-  <software name="addams">
-    <description>The Addams Family (CD)(USA)</description>
-    <year>????</year>
-    <publisher>NEC</publisher>
-    <part name="cdrom" interface="pce_cdrom">
-      <diskarea name="cdrom">
-        <disk name="the addams family (cd)(usa)" sha1="ea7507833bc79b0a2eb887302932b156fc438e58"/>
+        <disk name="syd mead's terra forming [imperfect] (cd, scd)(usa)" sha1="86d8a356538f44f891ae985a6f5274025033bef5"/>
       </diskarea>
     </part>
   </software>
   <software name="dynashr">
     <description>The Dynastic Hero (SCD)(USA)</description>
-    <year>????</year>
-    <publisher>NEC</publisher>
+    <!-- Serial: TGXCD1053 -->
+    <year>1993</year>
+    <publisher>Westone</publisher>
     <part name="cdrom" interface="pce_cdrom">
       <diskarea name="cdrom">
-        <disk name="the dynastic hero (scd)(usa)" sha1="93cc5daa5eec3ff814d719a5d75df9f28eb0384c"/>
+        <disk name="the dynastic hero (scd)(usa)" sha1="503965f689e012a1283a1337ff059c4af4a94310"/>
       </diskarea>
     </part>
   </software>
   <software name="hawaiiu">
     <description>The Local Girls of Hawaii (CD)(USA)</description>
-    <year>????</year>
-    <publisher>NEC</publisher>
+    <!-- Serial: AK LOCAL SRCR 01 -->
+    <year>199?</year>
+    <publisher>Excite Software</publisher>
     <part name="cdrom" interface="pce_cdrom">
       <diskarea name="cdrom">
-        <disk name="the local girls of hawaii (cd)(usa)" sha1="e87a413d0b9da4b5bdaa7c92cc9b0366ccd9dec6"/>
+        <disk name="the local girls of hawaii (cd)(usa)" sha1="c8cfad5293dcf2d2087ca03649012a20d0f6897a"/>
       </diskarea>
     </part>
   </software>
   <software name="valis2u">
     <description>Valis II (CD)(USA)</description>
-    <year>????</year>
-    <publisher>NEC</publisher>
+    <!-- Serial: TGXCD1006 -->
+    <year>1990</year>
+    <publisher>Telnet Japan</publisher>
     <part name="cdrom" interface="pce_cdrom">
       <diskarea name="cdrom">
-        <disk name="valis ii (cd)(usa)" sha1="9f1f8c50e2c941dacbabe91d004ffa185840ee06"/>
+        <disk name="valis ii (cd)(usa)" sha1="480221e874d2e3689554d6e8017565343e10f69e"/>
       </diskarea>
     </part>
   </software>
   <software name="valis3u">
     <description>Valis III (CD)(USA)</description>
-    <year>????</year>
-    <publisher>NEC</publisher>
+    <!-- Serial: TGXCD1024 -->
+    <year>1992</year>
+    <publisher>Telnet Japan</publisher>
     <part name="cdrom" interface="pce_cdrom">
       <diskarea name="cdrom">
-        <disk name="valis iii (cd)(usa)" sha1="a3a46675521327be979615d1d953b4c01381980a"/>
+        <disk name="valis iii (cd)(usa)" sha1="b8f696e60f5adb3ed968884574f218f416b344ee"/>
       </diskarea>
     </part>
   </software>
   <software name="vasteelu">
     <description>Vasteel (CD)(USA)</description>
-    <year>????</year>
-    <publisher>NEC</publisher>
+    <!-- Serial: WTG990801 -->
+    <year>1993</year>
+    <publisher>Human</publisher>
     <part name="cdrom" interface="pce_cdrom">
       <diskarea name="cdrom">
-        <disk name="vasteel (cd)(usa)" sha1="67eeb07e9e7d1d84e08f5fcdceae9a5d16b97ef3"/>
+        <disk name="vasteel (cd)(usa)" sha1="110a81e2e42c1fba9564c0d684418ad95041b8e0"/>
       </diskarea>
     </part>
   </software>
   <software name="ysbk12u">
     <description>Ys Book I II (CD)(USA)</description>
-    <year>????</year>
-    <publisher>NEC</publisher>
+    <!-- Serial: TGXCD1002 -->
+    <year>1990</year>
+    <publisher>Falcom</publisher>
     <part name="cdrom" interface="pce_cdrom">
       <diskarea name="cdrom">
-        <disk name="ys book i ii (cd)(usa)" sha1="5f9ad72f3f9824a1d1940b0bd5a249474c23d151"/>
+        <disk name="ys book i ii (cd)(usa)" sha1="745b55b433e8dc7c6c5830087db8e8133519ecd0"/>
       </diskarea>
     </part>
   </software>
   <software name="ys3u">
     <description>Ys III - Wanderers from Ys (CD)(USA)</description>
-    <year>????</year>
-    <publisher>NEC</publisher>
+    <!-- Serial: TGXCD1015 -->
+    <year>1991</year>
+    <publisher>Falcom</publisher>
     <part name="cdrom" interface="pce_cdrom">
       <diskarea name="cdrom">
-        <disk name="ys iii - wanderers from ys (cd)(usa)" sha1="12ea7ad74a9bae7001f097b9d31d80088a3d174e"/>
+        <disk name="ys iii - wanderers from ys (cd)(usa)" sha1="2c9be3926d7cb5e5d46e5418be8fd0c01deb309f"/>
       </diskarea>
     </part>
   </software>
@@ -4896,6 +5411,7 @@
   <!-- Game Express Titles - use different System Card -->
   <software name="hilegfan">
     <description>Hi-Leg Fantasy (GECD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -4906,6 +5422,7 @@
   </software>
   <software name="avtanjou">
     <description>AV Tanjou (GECD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -4916,6 +5433,7 @@
   </software>
   <software name="bishjip">
     <description>Bishoujo Jyanshi Idol Pai (GECD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -4926,6 +5444,7 @@
   </software>
   <software name="cdbishou">
     <description>CD Bishoujo Pachinko Kyuuma Yon Shimai [Imperfect] (GECD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -4936,6 +5455,7 @@
   </software>
   <software name="cdhanafu">
     <description>CD Hanafuda Bishoujo Fan Club (GECD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -4946,6 +5466,7 @@
   </software>
   <software name="cdmahjon">
     <description>CD Mahjong Bishoujo Chuushinha (GECD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">
@@ -4956,6 +5477,7 @@
   </software>
   <software name="cdpachis">
     <description>CD Pachisuro Bishoujo Gambler (GECD)(JPN)</description>
+    <!-- Serial:  -->
     <year>????</year>
     <publisher>NEC</publisher>
     <part name="cdrom" interface="pce_cdrom">

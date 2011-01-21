@@ -174,6 +174,12 @@ static MACHINE_CONFIG_DERIVED( wscolor, wswan )
 	MCFG_MACHINE_START( wscolor )
 	MCFG_PALETTE_LENGTH(4096)
 	MCFG_PALETTE_INIT( wscolor )
+
+
+	/* software lists */
+	MCFG_DEVICE_REMOVE("cart_list")
+	MCFG_SOFTWARE_LIST_ADD("cart_list","wscolor")
+	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("wswan","wswan")
 MACHINE_CONFIG_END
 
 /***************************************************************************
