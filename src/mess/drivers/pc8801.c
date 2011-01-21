@@ -38,6 +38,7 @@
 	- Bokosuka Wars
 	- Bouken Roman
 	- Bruce Lee
+	- Bubblegum Crisis (after the logo)
 	- Castle Excellent
 	- Tobira wo Akete (random crashes in parent pc8801 only)
 
@@ -227,9 +228,10 @@ static void draw_bitmap_3bpp(running_machine *machine, bitmap_t *bitmap)
 
 				pen = 0;
 
-				if(!(layer_mask & 2)) { pen |= ((gvram[count+0x0000] >> (7-xi)) & 1) << 0; }
-				if(!(layer_mask & 4)) { pen |= ((gvram[count+0x4000] >> (7-xi)) & 1) << 1; }
-				if(!(layer_mask & 8)) { pen |= ((gvram[count+0x8000] >> (7-xi)) & 1) << 2; }
+				/* note: layer masking doesn't occur in 3bpp mode, Bug Attack relies on this */
+				pen |= ((gvram[count+0x0000] >> (7-xi)) & 1) << 0;
+				pen |= ((gvram[count+0x4000] >> (7-xi)) & 1) << 1;
+				pen |= ((gvram[count+0x8000] >> (7-xi)) & 1) << 2;
 
 				*BITMAP_ADDR16(bitmap, y, x+xi) = machine->pens[pen & 7];
 			}
@@ -289,6 +291,8 @@ static void draw_bitmap_1bpp(running_machine *machine, bitmap_t *bitmap)
 			}
 		}
 	}
+	else
+		popmessage("200 lines B/W mode selected, check me");
 }
 
 static UINT8 calc_cursor_pos(running_machine *machine,int x,int y,int yi)
@@ -493,7 +497,7 @@ static VIDEO_UPDATE( pc8801 )
 			draw_bitmap_1bpp(screen->machine,bitmap);
 	}
 
-	//popmessage("%02x %02x %02x %02x",layer_mask,dmac_mode,crtc.status,crtc.irq_mask);
+	popmessage("%02x %02x %02x %02x %02x",layer_mask,dmac_mode,crtc.status,crtc.irq_mask,gfx_ctrl);
 
 	if(!(layer_mask & 1) && dmac_mode & 4 && crtc.status & 0x10 && crtc.irq_mask == 3)
 	{
