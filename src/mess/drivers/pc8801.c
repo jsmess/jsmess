@@ -20,6 +20,7 @@
 	- 100 Yen disk(s): reads kanji ports;
 	- 177: gameplay is too fast (parent pc8801 only);
 	- Acro Jet: hangs waiting for an irq;
+	- Advanced Fantasian: wants an irq that can't happen (I is equal to 0x3f)
 	- American Success: reads the light pen?
 	- Alpha (demo): crashes with "illegal function" msg;
 	- Balance of Power: attempt to use the SIO port for mouse polling, worked around for now;
@@ -34,12 +35,16 @@
 	- Xevious: game is too fast (parent pc8801 only)
 
 	list of games that crashes due of floppy issues:
+	- Agni no Ishi
+	- American Truck / American Truck SR (polls read deleted data command)
 	- Bersekers Front Gaiden 3
-	- Bokosuka Wars
+	- Bokosuka Wars (polls read ID command)
 	- Bouken Roman
 	- Bruce Lee
 	- Bubblegum Crisis (after the logo)
-	- Castle Excellent
+	- Burning Point
+	- Burunet
+	- Castle Excellent (sets sector 0xf4?)
 	- Tobira wo Akete (random crashes in parent pc8801 only)
 
 	games that needs to NOT have write-protect floppies (BTANBs):
@@ -497,7 +502,7 @@ static VIDEO_UPDATE( pc8801 )
 			draw_bitmap_1bpp(screen->machine,bitmap);
 	}
 
-	popmessage("%02x %02x %02x %02x %02x",layer_mask,dmac_mode,crtc.status,crtc.irq_mask,gfx_ctrl);
+	//popmessage("%02x %02x %02x %02x %02x",layer_mask,dmac_mode,crtc.status,crtc.irq_mask,gfx_ctrl);
 
 	if(!(layer_mask & 1) && dmac_mode & 4 && crtc.status & 0x10 && crtc.irq_mask == 3)
 	{
@@ -1293,7 +1298,8 @@ static READ8_HANDLER( upd765_tc_r )
 	//pc88va_state *state = space->machine->driver_data<pc88va_state>();
 
 	upd765_tc_w(space->machine->device("upd765"), 1);
-	timer_set(space->machine,  ATTOTIME_IN_USEC(500), NULL, 0, pc8801fd_upd765_tc_to_zero ); //TODO: timing of this
+	 //TODO: I'm not convinced that this works correctly with current hook-up ... 1000 usec is needed by Aploon, a bigger value breaks Alpha.
+	timer_set(space->machine,  ATTOTIME_IN_USEC(1000), NULL, 0, pc8801fd_upd765_tc_to_zero );
 	return 0xff; // value is meaningless
 }
 
