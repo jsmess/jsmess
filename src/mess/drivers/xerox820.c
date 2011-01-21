@@ -935,11 +935,20 @@ ROM_START( xerox168 )
 	ROM_LOAD( "x820ii.u58", 0x0800, 0x0800, CRC(aca4b9b3) SHA1(77f41470b0151945b8d3c3a935fc66409e9157b3) )
 ROM_END
 
+ROM_START( bigboard )
+    ROM_REGION( 0x1000, "monitor", 0 )
+	ROM_LOAD( "bigboard.u67", 0x0000, 0x0800, CRC(5a85a228) SHA1(d51a2cbd0aae80315bda9530275aabfe8305364e))
+	
+	// Using Xerox till real one is dumped
+	ROM_REGION( 0x800, "chargen", 0 )
+	ROM_LOAD( "x820.u92", 0x0000, 0x0800, CRC(b823fa98) SHA1(ad0ea346aa257a53ad5701f4201896a2b3a0f928) )	
+ROM_END
+
 /* System Drivers */
 
 /*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       INIT    COMPANY                         FULLNAME        FLAGS */
 COMP( 1981, xerox820,	0,			0,		xerox820,	xerox820,	0,		"Xerox",						"Xerox 820",	GAME_NO_SOUND)
 COMP( 1983, xerox820ii, xerox820,   0,      xerox820ii, xerox820,   0,      "Xerox",                        "Xerox 820-II", GAME_NOT_WORKING | GAME_NO_SOUND)
 COMP( 1983, xerox168,   xerox820,   0,      xerox168,   xerox820,   0,      "Xerox",                        "Xerox 16/8",   GAME_NOT_WORKING | GAME_NO_SOUND)
-//COMP( 1980, bigboard,   0,          0,      bigboard,   bigboard,   0,      "Digital Research Computers",   "Big Board",    GAME_NOT_WORKING)
+COMP( 1980, bigboard,   0,          0,      xerox820,   xerox820,   0,      "Digital Research Computers",   "Big Board",    GAME_NOT_WORKING | GAME_NO_SOUND)
 //COMP( 1983, bigbord2,   0,          0,      bigbord2,   bigboard,   0,      "Digital Research Computers",   "Big Board II", GAME_NOT_WORKING)

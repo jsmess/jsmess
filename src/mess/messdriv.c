@@ -1840,5 +1840,6 @@ const game_driver * const drivers[] =
 	DRIVER( pt68k4 )
 	DRIVER( jupiter2 )
 	DRIVER( jupiter3 )
+	DRIVER( bigboard )
 
 #endif /* DRIVER_RECURSIVE */
