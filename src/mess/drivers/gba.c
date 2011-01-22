@@ -2328,6 +2328,7 @@ static DEVICE_IMAGE_LOAD( gba_cart )
 	int i;
 	UINT32 cart_size;
 	UINT8 game_code[4] = { 0 };
+	int game_noflash, game_eeprom_large;
 	gba_state *state = image.device().machine->driver_data<gba_state>();
 
 	state->nvsize = 0;
@@ -2350,6 +2351,14 @@ static DEVICE_IMAGE_LOAD( gba_cart )
 		memcpy(game_code, ROM + 0xAC, 4);
 	}
 
+ 	// "Backyard Hockey" and "Banjo-Kazooie" false positive for "FLASH"
+	game_noflash = (!memcmp(game_code, "BYHE", 4)) || (!memcmp(game_code, "BKZE", 4)) || (!memcmp(game_code, "BKZX", 4));
+
+	// "Bomberman Max 2", "Broken Sword" and "Custom Robo GX" require 14 bit EEPROM addressing
+	game_eeprom_large = ((!memcmp(game_code, "AMHE", 4)) || (!memcmp(game_code, "AMYJ", 4)) || (!memcmp(game_code, "AMYE", 4))
+		|| (!memcmp(game_code, "AMHP", 4)) || (!memcmp(game_code, "AMHJ", 4)) || (!memcmp(game_code, "AMYP", 4))
+		|| (!memcmp(game_code, "ABJE", 4)) || (!memcmp(game_code, "ABJP", 4)) || (!memcmp(game_code, "ARJJ", 4)));
+
 	for (i = 0; i < cart_size; i++)
 	{
 		if (!memcmp(&ROM[i], "EEPROM_", 7))
@@ -2357,10 +2366,7 @@ static DEVICE_IMAGE_LOAD( gba_cart )
 			state->nvptr = (UINT8 *)&state->gba_eeprom;
 			state->nvsize = 0x2000;
 
-			// "Bomberman Max 2" and "Broken Sword" use 14 bit addressing
-			if ((!memcmp(game_code, "AMHE", 4)) || (!memcmp(game_code, "AMYJ", 4)) || (!memcmp(game_code, "AMYE", 4)) ||
-				(!memcmp(game_code, "AMHP", 4)) || (!memcmp(game_code, "AMHJ", 4)) || (!memcmp(game_code, "AMYP", 4)) ||
-				(!memcmp(game_code, "ABJE", 4)) || (!memcmp(game_code, "ABJP", 4)))
+			if (game_eeprom_large)
 			{
 				state->eeprom_addr_bits = 14;
 			}
@@ -2401,7 +2407,7 @@ static DEVICE_IMAGE_LOAD( gba_cart )
 			memory_install_write32_handler(cpu_get_address_space(image.device().machine->device("maincpu"), ADDRESS_SPACE_PROGRAM), 0xe000000, 0xe01ffff, 0, 0, flash_w);
 			break;
 		}
-		else if ((!memcmp(&ROM[i], "FLASH", 5)) && (memcmp(game_code, "BYHE", 4))) // "Backyard Hockey" false positive
+		else if ((!memcmp(&ROM[i], "FLASH", 5)) && (!game_noflash))
 		{
 			state->nvptr = NULL;
 			state->nvsize = 0;

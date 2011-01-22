@@ -23,6 +23,9 @@ System Driver Changes:
 ----------------------
 - [ADAM] Added dumps of the internal M6801 ROMs. [KevinP]
 
+- [GBA] Fixed EEPROM detection for "Banjo-Kazooie" and "Custom Robo GX".
+  [Tim Schuerewegen]
+
 - [PIPPIN] Added pre release rom
 
 - [PV1000] 4 new cartridge dumps for the software list.  [anondumper]
