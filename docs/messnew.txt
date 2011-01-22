@@ -26,6 +26,9 @@ System Driver Changes:
 - [GBA] Fixed EEPROM detection for "Banjo-Kazooie" and "Custom Robo GX".
   [Tim Schuerewegen]
 
+- [GBA] Fixed an ARM7 carry flag bug. This fixes the palette corruption
+  in "Banjo-Kazooie". [Tim Schuerewegen]
+
 - [PIPPIN] Added pre release rom
 
 - [PV1000] 4 new cartridge dumps for the software list.  [anondumper]
