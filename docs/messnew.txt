@@ -36,6 +36,9 @@ System Driver Changes:
 - [GBA] Implemented an undefined ARM7 THUMB instruction used by "Moto GP".
   [Tim Schuerewegen]
 
+- [GBA] Allow reading of the BLDALPHA register. This fixes the lockup in
+  "Donkey Kong Country". [Tim Schuerewegen]
+
 - [PIPPIN] Added pre release rom
 
 - [PV1000] 4 new cartridge dumps for the software list.  [anondumper]

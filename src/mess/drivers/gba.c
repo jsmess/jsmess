@@ -716,7 +716,8 @@ static READ32_HANDLER( gba_io_r )
 			}
 			if( (mem_mask) & 0xffff0000 )
 			{
-				verboselog(machine, 2, "GBA IO Register Read: BLDALPHA (%08x) = %04x\n", 0x04000000 + ( offset << 2 ) + 2, 0 );
+				verboselog(machine, 2, "GBA IO Register Read: BLDALPHA (%08x) = %04x\n", 0x04000000 + ( offset << 2 ) + 2, state->BLDALPHA );
+				retval |= state->BLDALPHA << 16;
 			}
 			break;
 		case 0x0054/4:
