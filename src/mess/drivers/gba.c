@@ -850,6 +850,13 @@ static READ32_HANDLER( gba_io_r )
 				// update times for
 				if (state->timer_regs[timer] & 0x800000)
 				{
+					if (state->timer_regs[timer] & 0x00040000)
+					{
+						elapsed = state->timer_regs[timer] & 0xffff;
+					}
+					else
+					{
+
 					time = attotime_to_double(timer_timeelapsed(state->tmr_timer[timer]));
 
 					ticks = (double)(0x10000 - (state->timer_regs[timer] & 0xffff));
@@ -860,6 +867,8 @@ static READ32_HANDLER( gba_io_r )
 					time /= (1.0 / state->timer_hz[timer]);
 
 					elapsed = (UINT32)time;
+					
+					}
 
 //                  printf("elapsed = %x\n", elapsed);
 				}

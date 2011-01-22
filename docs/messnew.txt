@@ -29,8 +29,9 @@ System Driver Changes:
 - [GBA] Fixed an ARM7 carry flag bug. This fixes the palette corruption
   in "Banjo-Kazooie". [Tim Schuerewegen]
 
-- [GBA] Fixed timer overflow/reload bug. This fixes the lockup in
-  "2 in 1 - Dragon Ball Z 1 and 2". [Tim Schuerewegen]
+- [GBA] Fixed timer overflow/reload bugs. This fixes the lockups in
+  "2 in 1 - Dragon Ball Z 1 and 2", "Aggressive Inline", "Bibi und Tina"
+  and probably other games too. [Tim Schuerewegen]
 
 - [PIPPIN] Added pre release rom
 
