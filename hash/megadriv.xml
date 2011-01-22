@@ -95,6 +95,9 @@ Known undumped pirates
 
 -->
 
+<!-- TODO: currently we are using arbitrary names for the pcb_type feature (used to install the necessary handlers). It would be
+better to use names related to the actual pcb, possibly even reverting to use the pcb feature (used to document pcb serial) -->
+
 <softwarelist name="megadriv" description="Sega MegaDrive/Genesis cartridges">
 
 	<!-- Proper dumps -->
@@ -425,7 +428,7 @@ Known undumped pirates
 	</software>
 
 	<software name="sor">
-		<description>Streets of Rage / Bare Knuckle - Ikari no Tetsuken (World, Rev. A)</description>
+		<description>Streets of Rage ~ Bare Knuckle - Ikari no Tetsuken (World, Rev. A)</description>
 		<year>199?</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -437,7 +440,7 @@ Known undumped pirates
 	</software>
 
 	<software name="sora" cloneof="sor">
-		<description>Streets of Rage / Bare Knuckle - Ikari no Tetsuken (World)</description>
+		<description>Streets of Rage ~ Bare Knuckle - Ikari no Tetsuken (World)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -478,6 +481,7 @@ Known undumped pirates
 		<year>1990</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-EEPROM" />
 			<feature name="pcb" value="171-5878" />
 			<dataarea name="rom" size="131072">
 				<rom name="mpr-12750a.ic1" size="131072" crc="c185c819" sha1="9673b519c16883c146924c347ec6764281fa3a57" offset="000000" loadflag="load16_word_swap" />
@@ -516,6 +520,7 @@ Known undumped pirates
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="WBOY5" />
 			<feature name="pcb" value="171-6584A" />
 			<dataarea name="rom" size="2097152">
 				<rom name="mpr-16211.ic1" size="2097152" crc="9778c181" sha1="db28d70f9b744004cadd06eb77d6223534f59215" offset="000000" loadflag="load16_word_swap" />
@@ -560,6 +565,7 @@ Known undumped pirates
 	</software>
 
 	<software name="talmit">
+    <!-- Namcot PCB (blob epoxy chip) -->
 		<description>Talmit's Adventure (Euro)</description>
 		<year>1991</year>
 		<publisher>Namco</publisher>
@@ -612,6 +618,7 @@ Known undumped pirates
 		<year>1994</year>
 		<publisher>Codemasters</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="CM-JCART-SEPROM" />
 			<feature name="pcb" value="SRJCV2-1" />
 			<dataarea name="rom" size="1048576">
 				<rom name="mdm_2bead.bin" size="1048576" crc="42bfb7eb" sha1="ab29077a6a5c2ccc777b0bf22f4d5908401f4d47" offset="000000" loadflag="load16_word_swap" />
@@ -624,6 +631,7 @@ Known undumped pirates
 		<year>1995</year>
 		<publisher>Codemasters</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="CM-JCART-SEPROM" />
 			<feature name="pcb" value="SRJCV2-2" />
 			<dataarea name="rom" size="1048576">
 				<rom name="mm96mdeddb.bin" size="1048576" crc="23319d0d" sha1="e8ff759679a0df2b3f9ece37ef686f248d3cf37b" offset="000000" loadflag="load16_word_swap" />
@@ -636,6 +644,7 @@ Known undumped pirates
 		<year>1994</year>
 		<publisher>Codemasters</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="CM-JCART" />
 			<feature name="pcb" value="SRJCV1-2" />
 			<dataarea name="rom" size="1048576">
 				<rom name="mdst6636.bin" size="1048576" crc="94e505b2" sha1="4c830ace4590294bb374b4cab71ebebf44d9a07a" offset="000000" loadflag="load16_word_swap" />
@@ -648,6 +657,7 @@ Known undumped pirates
 		<year>1990</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<feature name="pcb" value="171-5921" />
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-12851a.ic1" size="524288" crc="74714110" sha1="99038db23ab38c5eaabd3b27dea96059324fee6a" offset="000000" />
@@ -661,6 +671,7 @@ Known undumped pirates
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<feature name="pcb" value="171-6278A" />
 			<dataarea name="rom" size="2097152">
 				<rom name="mpr-16933.ic1" size="2097152" crc="83cb46d1" sha1="a2ba86f4d756f98886f8f9a56f20cbf8c3b2945e" offset="000000" loadflag="load16_word_swap" />
@@ -721,6 +732,7 @@ Known undumped pirates
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-FRAM" />
 			<feature name="pcb" value="171-6658A" />
 			<dataarea name="rom" size="2097152">
 				<rom name="mpr-16342.ic1" size="2097152" crc="6a632503" sha1="2ff45bb056ede0f745e52f8d02c54b4ca724ca4c" offset="000000" loadflag="load16_word_swap" />
@@ -733,7 +745,8 @@ Known undumped pirates
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
-		<feature name="pcb" value="171-6658A" />
+			<feature name="pcb_type" value="SEGA-FRAM" />
+            <feature name="pcb" value="171-6658A" />
 			<dataarea name="rom" size="2097152">
 				<rom name="mpr-16343.ic1" size="2097152" crc="f4951d1f" sha1="7b98b21b7274233e962132bc22a7ccdf548c0ddb" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -813,16 +826,6 @@ Known undumped pirates
 	</software>
 
 	<!-- Old scrambled/interleaved dumps -->
-	<software name="12in1">
-		<description>12-in-1</description>
-		<year>199?</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="20971520">
-				<rom name="12-in-1 (unl).bin" size="2097152" crc="a98bf454" sha1="7313c20071de0ab1cd84ac1352cb0ed1c4a4afa8" offset="0x400000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
 
 	<software name="16ton">
 		<description>16 Ton (Jpn, SegaNet)</description>
@@ -869,7 +872,7 @@ Known undumped pirates
 	</software>
 
 	<software name="3in1fl">
-		<description>3-in-1 Flashback - World Champ. Soccer - Tecmo World Cup 92 (Pirate)</description>
+		<description>3 in 1 Flashback - World Champ. Soccer - Tecmo World Cup 92 (Pirate)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -880,23 +883,12 @@ Known undumped pirates
 	</software>
 
 	<software name="3in1ro">
-		<description>3-in-1 Road Rash - Ms. Pac-Man - Block Out (Pirate)</description>
+		<description>3in 1 Road Rash - Ms. Pac-Man - Block Out (Pirate)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="3-in-1 road rash - ms. pac-man - block out (pirate).bin" size="1048576" crc="13c96154" sha1="fd7255c2abdf90698f779a039ea1e560ca19639a" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="4in1pb">
-		<description>4-in-1 (Pirate)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="20971520">
-				<rom name="4-in-1 (pirate).bin" size="2097152" crc="be72857b" sha1="2aceca16f13d6a7a6a1bff8543d31bded179df3b" offset="0x400000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -3004,7 +2996,7 @@ Known undumped pirates
 	</software>
 
 	<software name="bloods">
-		<description>Bloodshot / Battle Frenzy (Euro)</description>
+		<description>Bloodshot ~ Battle Frenzy (Euro)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -3329,6 +3321,7 @@ Known undumped pirates
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="CM-SEPROM" />
 			<dataarea name="rom" size="1048576">
 				<rom name="brian lara cricket 96 (euro) (april 1996).bin" size="1048576" crc="fe52f7e1" sha1="3e1ef39e9008a4a55fd57b25948668c8c52ba9e3" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -3340,6 +3333,7 @@ Known undumped pirates
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="CM-SEPROM" />
 			<dataarea name="rom" size="1048576">
 				<rom name="mdbl_9844.bin" size="1048576" crc="fa3024af" sha1="0b08788a0f8214c5d07b8e2293f0b954dd05bef5" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -3474,17 +3468,6 @@ Known undumped pirates
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="budokan - the martial spirit (usa).bin" size="524288" crc="acd9f5fc" sha1="93bc8242106bc9b2e0a8a974a3f65b559dd2941d" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="bugslife">
-		<description>A Bug's Life</description>
-		<year>199?</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="bug's life, a (unl).bin" size="1048576" crc="10458e09" sha1="b620c2bebd5bab39bc9258a925169b4c93614599" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -3985,28 +3968,6 @@ Known undumped pirates
 		</part>
 	</software>
 
-	<software name="chinf3">
-		<description>Chinese Fighter III (Chi)</description>
-		<year>199?</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="20971520">
-				<rom name="chinese fighter iii (unl).bin" size="2097152" crc="e833bc6e" sha1="ecca9d2d21c8e27fc7584d53f557fdd8b4cbffa7" offset="0x400000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="chinf3a" cloneof="chinf3">
-		<description>Chinese Fighter III (Chi, Alt)</description>
-		<year>199?</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="2097152">
-				<rom name="chinese fighter iii (unl, alt).bin" size="2097152" crc="6f98247d" sha1="cc212b1564dc7c73ffdc55f9fde3269a83fee399" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="chuckrck">
 		<description>Chuck Rock (Euro)</description>
 		<year>199?</year>
@@ -4430,6 +4391,7 @@ Known undumped pirates
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="CSLAM" />
 			<dataarea name="rom" size="4194304">
 				<rom name="college slam (usa).bin" size="4194304" crc="96a42431" sha1="0dbbe740b14077fe8648955f7e17965ea25f382a" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -6287,17 +6249,6 @@ Known undumped pirates
 		</part>
 	</software>
 
-	<software name="earthdef">
-		<description>Earth Defense (USA)</description>
-		<year>199?</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="20971520">
-				<rom name="earth defense (usa) (unl).bin" size="524288" crc="3519c422" sha1="9bf4cda850495d7811df578592289018862df575" offset="0x400000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="ejim">
 		<description>Earthworm Jim (Euro)</description>
 		<year>199?</year>
@@ -6503,17 +6454,6 @@ Known undumped pirates
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="elemental master (jpn).bin" size="524288" crc="5f553e29" sha1="6cbe2cd607aa9850306970a8a61cb9fa82445293" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="elfwor">
-		<description>Elf Wor (Chi)</description>
-		<year>199?</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="elf wor (chi) (unl).bin" size="1048576" crc="e24ac6b2" sha1="5fc4591fbb1acc64e184466c7b6287c7f64e0b7a" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -6897,6 +6837,7 @@ Known undumped pirates
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="WBOY5" />
 			<dataarea name="rom" size="524288">
 				<rom name="mpr-14860.bin" size="524288" crc="4fef37c8" sha1="eb4aca22f8b5837a0a0b10491c46714948b09844" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -7509,7 +7450,7 @@ Known undumped pirates
 	</software>
 
 	<software name="finalz">
-		<description>Final Zone / FZ Senki Axis (USA, Jpn)</description>
+		<description>Final Zone (USA) ~ FZ Senki Axis (Jpn)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -7733,6 +7674,7 @@ Known undumped pirates
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="CSLAM" />
 			<dataarea name="rom" size="4194304">
 				<rom name="frank thomas big hurt baseball (euro, usa).bin" size="4194304" crc="863e0950" sha1="9c978aaab10e16be59558561b07a0c610c74b43e" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -7779,17 +7721,6 @@ Known undumped pirates
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="fun car rally (usa) (prototype).bin" size="1048576" crc="42e27845" sha1="779aba11bf77ca59e6ae981854805bf3fabe4b0e" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="funnywld">
-		<description>Funny World &amp; Balloon Boy (USA)</description>
-		<year>199?</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="20971520">
-				<rom name="funny world &amp; balloon boy (usa) (unl).bin" size="524288" crc="a82f05f0" sha1="17481c8327433bfce8f7bae493fc044194e400a4" offset="0x400000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -8168,18 +8099,6 @@ Known undumped pirates
 		</part>
 	</software>
 
-	<!-- // this contains only the first bank, so most of the games are missing -->
-	<software name="golden10">
-		<description>Golden 10-in-1</description>
-		<year>199?</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="20971520">
-				<rom name="golden 10-in-1 (bad dump).bin" size="1048576" crc="4fa3f82b" sha1="04edbd35fe4916f61b516016b492352d96a8de7f" offset="0x400000" status="baddump" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="gaxe">
 		<description>Golden Axe (World, v1.1)</description>
 		<year>199?</year>
@@ -8362,6 +8281,7 @@ Known undumped pirates
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="WBOY5" />
 			<dataarea name="rom" size="2097152">
 				<rom name="greatest heavyweights (jpn).bin" size="2097152" crc="7ef8b162" sha1="1d5fe812df75e0dc1ff379c563058e078b839a09" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -8373,6 +8293,7 @@ Known undumped pirates
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="WBOY5" />
 			<dataarea name="rom" size="2097152">
 				<rom name="greatest heavyweights (usa).bin" size="2097152" crc="6e3621d5" sha1="4ef7aec80003aab0e1d2260b7fc0d22d63d90038" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -8761,28 +8682,6 @@ Known undumped pirates
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="hook (usa).bin" size="1048576" crc="2c48e712" sha1="67031af6ec4b771bd8d69a44c9945562a063593e" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="huamul">
-		<description>Hua Mu Lan - Mulan (Chi)</description>
-		<year>199?</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="2097152">
-				<rom name="hua mu lan - mulan (chi) (unl).bin" size="2097152" crc="796882b8" sha1="d8936c1023db646e1e20f9208b68271afbd6dbf4" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="huanle">
-		<description>Huan Le Tao Qi Shu - Smart Mouse (Chi)</description>
-		<year>199?</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="524288">
-				<rom name="huan le tao qi shu - smart mouse (chi) (unl).bin" size="524288" crc="decdf740" sha1="df7a2527875317406b466175f0614d343dd32117" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -9285,7 +9184,7 @@ Known undumped pirates
 	<software name="jantei">
 		<description>Jantei Monogatari (Jpn)</description>
 		<year>199?</year>
-		<publisher>Telnet Japan / Atlus</publisher>
+		<publisher>Telnet Japan ~ Atlus</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="jantei monogatari (jpn).bin" size="1048576" crc="8a1b19ad" sha1="8e109961a89e1366c83808fb0bb33333f88a82b7" offset="000000" loadflag="load16_word_swap" />
@@ -9899,29 +9798,6 @@ Known undumped pirates
 		</part>
 	</software>
 
-	<!-- // [!] -->
-	<software name="kof98">
-		<description>The King of Fighters '98</description>
-		<year>199?</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="2097152">
-				<rom name="king of fighters '98, the (unl).bin" size="2097152" crc="cbc38eea" sha1="aeee33bfc2c440b6b861ac0d1b9bc9bface24861" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="kof98a" cloneof="kof98">
-		<description>The King of Fighters '98 (Pirate)</description>
-		<year>199?</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="2097152">
-				<rom name="king of fighters '98, the (unl) (pirate).bin" size="2097152" crc="c79e1074" sha1="6eb3a12e082ce4074e88ad3cb2b3c51f9a72225c" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="kotm">
 		<description>King of the Monsters (Euro)</description>
 		<year>199?</year>
@@ -10462,40 +10338,6 @@ Known undumped pirates
 		</part>
 	</software>
 
-	<!-- // [!] -->
-	<software name="lionkin2">
-		<description>Shi Zi Wang II - The Lion King II</description>
-		<year>199?</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="2097152">
-				<rom name="shi zi wang ii - the lion king ii, the (chi) (unl).bin" size="2097152" crc="aff46765" sha1="5649fa1fbfb28d58b0608e8ebc5dc7bd5c4c9678" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="lionkin2a" cloneof="lionkin2">
-		<description>Shi Zi Wang II - The Lion King II (Pirate)</description>
-		<year>199?</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="2097152">
-				<rom name="shi zi wang ii - the lion king ii, the (chi) (unl) (pirate).bin" size="2097152" crc="721b4981" sha1="70eb5b423948e5a124de4d5d24c14b2c64bfb282" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="lionkin3">
-		<description>Shi Zi Wang 3 - The Lion King 3</description>
-		<year>199?</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="20971520">
-				<rom name="shi zi wang 3 - the lion king 3 (chi) (unl).bin" size="2097152" crc="c004219d" sha1="54ffd355b0805741f58329fa38ed3d9f8f7c80ca" offset="0x400000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="lionking">
 		<description>The Lion King (World)</description>
 		<year>199?</year>
@@ -10613,17 +10455,6 @@ Known undumped pirates
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="m-1 abrams battle tank (euro, usa).bin" size="524288" crc="1e2f74cf" sha1="65248727b0b52106007ec1193832f16545db5378" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="majian">
-		<description>Ma Jiang Qing Ren - Ji Ma Jiang Zhi (Chi)</description>
-		<year>199?</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="ma jiang qing ren - ji ma jiang zhi (chi) (unl).bin" size="1048576" crc="ddd02ba4" sha1="fe9ec21bd206ad1a178c54a2fee80b553c478fc4" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -11249,6 +11080,7 @@ Known undumped pirates
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="WBOY5" />
 			<dataarea name="rom" size="2097152">
 				<rom name="mega man - the wily wars (euro).bin" size="2097152" crc="dcf6e8b2" sha1="ea9ae2043c97db716a8d31ee90e581c3d75f4e3e" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -11421,7 +11253,7 @@ Known undumped pirates
 	</software>
 
 	<software name="mercs">
-		<description>Mercs / Senjou no Ookami II (World)</description>
+		<description>Mercs ~ Senjou no Ookami II (World)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -11568,6 +11400,7 @@ Known undumped pirates
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="CM-JCART-SEPROM" />
 			<dataarea name="rom" size="1048576">
 				<rom name="mm96md7cc3.bin" size="1048576" crc="7492b1de" sha1="9f47fcc7bb2f5921cb1c3beb06b668ffb292cb08" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -11579,6 +11412,7 @@ Known undumped pirates
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="CM-JCART-SEPROM" />
 			<dataarea name="rom" size="1048576">
 				<rom name="micro machines 2 - turbo tournament (euro) (j-cart) (alt).bin" size="1048576" crc="01c22a5d" sha1="cb5fb33212592809639b37c2babd72a7953fa102" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -11590,6 +11424,7 @@ Known undumped pirates
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="CM-JCART-SEPROM" />
 			<dataarea name="rom" size="1048576">
 				<rom name="micro machines military (euro) (j-cart).bin" size="1048576" crc="b3abb15e" sha1="6d3df64ab8bb0b559f216adca62d1cdd74704a26" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -12037,7 +11872,7 @@ Known undumped pirates
 	</software>
 
 	<software name="mspacman1" cloneof="mspacman">
-		<description>Ms. Pac-Man (Pirate, Ripped from Golden 10-in-1)</description>
+		<description>Ms. Pac-Man (Pirate, Ripped from Golden 10 in 1)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -12615,6 +12450,7 @@ Known undumped pirates
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="NBAJAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="nba jam (euro, usa) (v1.1).bin" size="2097152" crc="eb8360e6" sha1="55f2b26a932c69b2c7cb4f24f56b43f24f113a7c" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -12626,6 +12462,7 @@ Known undumped pirates
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="NBAJAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="s285_ver_1.00.bin" size="2097152" crc="10fa248f" sha1="99c5bc57fdea7f9df0cd8dec54160b162342344d" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -12637,6 +12474,7 @@ Known undumped pirates
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="NBAJAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="nba jam (jpn).bin" size="2097152" crc="a6c6305a" sha1="2a88b2e1ecf115fa6246397d829448b755a5385e" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -12648,6 +12486,7 @@ Known undumped pirates
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="NBAJAMTE" />
 			<dataarea name="rom" size="3145728">
 				<rom name="nba jam tournament edition (world).bin" size="3145728" crc="e9ffcb37" sha1="ddbf09c5e6ed5d528ef5ec816129a332c685f103" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -12659,6 +12498,7 @@ Known undumped pirates
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="NBAJAMTE" />
 			<dataarea name="rom" size="3145728">
 				<rom name="nba jam tournament edition (world) (fixed).bin" size="3145728" crc="6e25ebf0" sha1="0f5bb5d5352fe2ebe4b4051a1dd9b9fde4b505ab" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -13132,6 +12972,7 @@ Known undumped pirates
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="NBAJAMTE" />
 			<dataarea name="rom" size="3145728">
 				<rom name="nfl quarterback club (world).bin" size="3145728" crc="94542eaf" sha1="60744af955df83278f119df3478baeebd735a26c" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -13143,6 +12984,7 @@ Known undumped pirates
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="NFLQB96" />
 			<dataarea name="rom" size="4194304">
 				<rom name="nfl quarterback club 96 (euro, usa).bin" size="4194304" crc="d5a37cab" sha1="2948419532a6079404f05348bc4bbf2dd989622d" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -13418,6 +13260,7 @@ Known undumped pirates
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="NHLPA" />
 			<dataarea name="rom" size="524288">
 				<rom name="h9306.bin" size="524288" crc="f361d0bf" sha1="2ab048fc7209df28b00ef47f2f686f5b7208466e" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -13429,6 +13272,7 @@ Known undumped pirates
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="NHLPA" />
 			<dataarea name="rom" size="524288">
 				<rom name="nhlpa hockey 93 (euro, usa).bin" size="524288" crc="cbbf4262" sha1="8efc1cacb079ea223966dda065c16c49e584cac2" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -14722,39 +14566,6 @@ Known undumped pirates
 		</part>
 	</software>
 
-	<software name="pokemon">
-		<description>Pocket Monsters</description>
-		<year>199?</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="2097152">
-				<rom name="pocket monsters (unl).bin" size="2097152" crc="f68f6367" sha1="d10de935e099c520384c986b1f00fd5e72d64e03" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="pokemona" cloneof="pokemon">
-		<description>Pocket Monsters (Alt)</description>
-		<year>199?</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="2097152">
-				<rom name="pocket monsters (unl) (alt).bin" size="2097152" crc="fb176667" sha1="3d667aea1b6fa980dddcc10e65845a6831491792" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="pokemon2">
-		<description>Pocket Monsters 2</description>
-		<year>199?</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="2097152">
-				<rom name="pocket monsters 2 (unl).bin" size="2097152" crc="30f7031f" sha1="dae100dfaee1b5b7816731cb2f43bcda3da273b7" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="pokecd">
 		<description>Pokemon Crazy Drummer</description>
 		<year>199?</year>
@@ -14762,17 +14573,6 @@ Known undumped pirates
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="pokemon crazy drummer (unl).bin" size="2097152" crc="8838a25d" sha1="780a81fe6dd2fb9575ccdc506e7dbee13213d01d" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="pokestad">
-		<description>Pokemon Stadium</description>
-		<year>199?</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="20971520">
-				<rom name="pokemon stadium (unl).bin" size="2097152" crc="fe187c5d" sha1="f65af5d86aba33bd3f4f91a0cd7428778bcceedf" offset="0x400000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -15275,7 +15075,7 @@ Known undumped pirates
 	second half of the data at 0x100000. The latter will be removed as soon as we properly implement the mirroring. -->
 
 	<software name="quacksht" supported="no">
-		<description>QuackShot Starring Donald Duck / QuackShot - Guruzia Ou no Hihou (World)</description>
+		<description>QuackShot Starring Donald Duck ~ QuackShot - Guruzia Ou no Hihou (World)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -15286,7 +15086,7 @@ Known undumped pirates
 	</software>
 
 	<software name="quackshth" cloneof="quacksht">
-		<description>QuackShot Starring Donald Duck / QuackShot - Guruzia Ou no Hihou (World, Hacked)</description>
+		<description>QuackShot Starring Donald Duck ~ QuackShot - Guruzia Ou no Hihou (World, Hacked)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -15297,7 +15097,7 @@ Known undumped pirates
 	</software>
 
 	<software name="quacksht1" cloneof="quacksht">
-		<description>QuackShot Starring Donald Duck / QuackShot - Guruzia Ou no Hihou (World, Alt)</description>
+		<description>QuackShot Starring Donald Duck ~ QuackShot - Guruzia Ou no Hihou (World, Alt)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -15429,7 +15229,7 @@ Known undumped pirates
 	</software>
 
 	<software name="raiden">
-		<description>Raiden Trad / Raiden Densetsu (USA, Jpn)</description>
+		<description>Raiden Trad (USA) ~ Raiden Densetsu (Jpn)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -15796,6 +15596,7 @@ Known undumped pirates
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="NHLPA" />
 			<dataarea name="rom" size="1048576">
 				<rom name="rin09.bin" size="1048576" crc="41fcc497" sha1="84851ce4527761b8d74ce581c19e15d0dd17f368" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -16140,17 +15941,6 @@ Known undumped pirates
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="rocket knight adventures (usa).bin" size="1048576" crc="a6efec47" sha1="49634bb09c38fa03549577f977e6afb6cebaac48" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="rockmnx3">
-		<description>Rockman X3</description>
-		<year>199?</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="2097152">
-				<rom name="rockman x3 (unl).bin" size="2097152" crc="3ee639f0" sha1="37024d0088fab1d76c082014663c58921cdf33df" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -17498,7 +17288,7 @@ Known undumped pirates
 	</software>
 
 	<software name="s3d">
-		<description>Sonic 3D - Flickies' Island / Sonic 3D Blast (Euro, USA, Kor)</description>
+		<description>Sonic 3D - Flickies' Island ~ Sonic 3D Blast (Euro, USA, Kor)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -17597,7 +17387,7 @@ Known undumped pirates
 	</software>
 
 	<software name="soniccmp">
-		<description>Sonic Compilation / Sonic Classics (Euro, USA, Kor)</description>
+		<description>Sonic Compilation ~ Sonic Classics (Euro, USA, Kor)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -17718,7 +17508,7 @@ Known undumped pirates
 	</software>
 
 	<software name="sonicpir" cloneof="sonic">
-		<description>Sonic the Hedgehog (Pirate, Ripped from Golden 10-in-1)</description>
+		<description>Sonic the Hedgehog (Pirate, Ripped from Golden 10 in 1)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -17922,17 +17712,6 @@ Known undumped pirates
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="mpr-12906.bin" size="524288" crc="a143a8c5" sha1="cbd7f0693a0d127138977da7cdf5a7f9440dfd43" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="soulblad">
-		<description>Soul Blade</description>
-		<year>199?</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="4194304">
-				<rom name="soul blade (unl).bin" size="4194304" crc="f26f88d1" sha1="7714e01819ab4a0f424d7e306e9f891031d053a8" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -18195,6 +17974,7 @@ Known undumped pirates
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="WBOY5" />
 			<dataarea name="rom" size="1048576">
 				<rom name="sports talk baseball (usa).bin" size="1048576" crc="0deb79c2" sha1="e223513d9bcecb49a6798720f3195dbd1c34681c" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -18219,17 +17999,6 @@ Known undumped pirates
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="3145728">
 				<rom name="spot goes to hollywood (usa).bin" size="3145728" crc="bdad1cbc" sha1="064a384f745eeffee3621d55a0278c133abdbc11" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="squirrel">
-		<description>Squirrel King (Chi)</description>
-		<year>199?</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="squirrel king (chi) (unl).bin" size="1048576" crc="b8261ff5" sha1="2a561b6e47c93272fe5947084837d9f6f514ed38" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -18666,7 +18435,7 @@ Known undumped pirates
 	</software>
 
 	<software name="sor2">
-		<description>Streets of Rage II / Bare Knuckle II - Shitou e no Chingonka (Euro, Jpn)</description>
+		<description>Streets of Rage II (Euro) ~ Bare Knuckle II - Shitou e no Chingonka (Jpn)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -19083,28 +18852,6 @@ Known undumped pirates
 		</part>
 	</software>
 
-	<software name="s15in1">
-		<description>Super 15-in-1 (Pirate)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="20971520">
-				<rom name="super 15-in-1 (pirate).bin" size="2097152" crc="6d17dfff" sha1="6b2a6de2622735f6d56c6c9c01f74daa90e355cb" offset="0x400000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="s19in1">
-		<description>Super 19-in-1 (Pirate)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="20971520">
-				<rom name="super 19-in-1 (pirate).bin" size="4194304" crc="0ad2b342" sha1="e1c041ba69da087c428dcda16850159f3caebd4b" offset="0x400000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="sb2020">
 		<description>Super Baseball 2020 (Euro, USA)</description>
 		<year>199?</year>
@@ -19149,17 +18896,6 @@ Known undumped pirates
 		</part>
 	</software>
 
-	<software name="supbub">
-		<description>Super Bubble Bobble (Chi)</description>
-		<year>199?</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="super bubble bobble (chi) (unl).bin" size="1048576" crc="4820a161" sha1="03f40c14624f1522d6e3105997d14e8eaba12257" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="superd">
 		<description>Super Daisenryaku (Jpn)</description>
 		<year>199?</year>
@@ -19167,41 +18903,6 @@ Known undumped pirates
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="mpr-12477.bin" size="524288" crc="d50a166f" sha1="56d9366b50cea65b16ed621b9a5bf355ef89e6b5" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="sdkong99">
-		<description>Super Donkey Kong 99 (Protected)</description>
-		<year>199?</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="20971520">
-				<rom name="super donkey kong 99 (unl) (protected).bin" size="3145728" crc="43be4dd5" sha1="5d3c84bd18f821b20212941a6f7a1a272eb0d7e3" offset="0x400000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- // [!] -->
-	<software name="sdkong99a" cloneof="sdkong99">
-		<description>Super Donkey Kong 99 (Unprotected)</description>
-		<year>199?</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="2097152">
-				<rom name="super donkey kong 99 (unl).bin" size="2097152" crc="8e7d9177" sha1="91f6b10ada917e6dfdafdd5ad9d476723498a7a4" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- // [!] -->
-	<software name="skkong99" cloneof="sdkong99">
-		<description>Super King Kong 99</description>
-		<year>199?</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="20971520">
-				<rom name="super king kong 99 (unl).bin" size="2097152" crc="413dfee2" sha1="6973598d77a755beafff31ce85595f9610f8afa5" offset="0x400000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -19328,30 +19029,6 @@ Known undumped pirates
 	</software>
 
 	<!-- // [!] -->
-	<software name="smario2">
-		<description>Super Mario 2 1998</description>
-		<year>199?</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="2097152">
-				<rom name="super mario 2 1998 (unl).bin" size="2097152" crc="f7e1b3e1" sha1="de10115ce6a7eb416de9cd167df9cf24e34687b1" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- // [!] -->
-	<software name="smb">
-		<description>Super Mario Bros.</description>
-		<year>199?</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="2097152">
-				<rom name="super mario bros. (unl).bin" size="2097152" crc="9cfa2bd8" sha1="5011e16f0ab3a6487a1406b85c6090ad2d1fe345" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- // [!] -->
 	<software name="smw" cloneof="smb">
 		<description>Super Mario World</description>
 		<year>199?</year>
@@ -19467,8 +19144,9 @@ Known undumped pirates
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SSF2" />
 			<dataarea name="rom" size="20971520">
-				<rom name="super street fighter ii - the new challengers (euro).bin" size="5242880" crc="682c192f" sha1="56768a0524fa13fcd76474c8bb89b995bb471847" offset="0x400000" loadflag="load16_word_swap" />
+				<rom name="super street fighter ii - the new challengers (euro).bin" size="5242880" crc="682c192f" sha1="56768a0524fa13fcd76474c8bb89b995bb471847" offset="00000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -19478,8 +19156,9 @@ Known undumped pirates
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SSF2" />
 			<dataarea name="rom" size="20971520">
-				<rom name="super street fighter ii - the new challengers (jpn).bin" size="5242880" crc="d8eeb2bd" sha1="24c8634f59a481118f8350125fa6e00d33e04c95" offset="0x400000" loadflag="load16_word_swap" />
+				<rom name="super street fighter ii - the new challengers (jpn).bin" size="5242880" crc="d8eeb2bd" sha1="24c8634f59a481118f8350125fa6e00d33e04c95" offset="00000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -19489,8 +19168,9 @@ Known undumped pirates
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SSF2" />
 			<dataarea name="rom" size="20971520">
-				<rom name="super street fighter ii - the new challengers (usa).bin" size="5242880" crc="165defbf" sha1="9ce6e69db9d28386f7542dacd3e3ead28eacf2a4" offset="0x400000" loadflag="load16_word_swap" />
+				<rom name="super street fighter ii - the new challengers (usa).bin" size="5242880" crc="165defbf" sha1="9ce6e69db9d28386f7542dacd3e3ead28eacf2a4" offset="00000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -19815,7 +19495,7 @@ Known undumped pirates
 	</software>
 
 	<software name="truxton">
-		<description>Truxton / Tatsujin (World)</description>
+		<description>Truxton ~ Tatsujin (World)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -20201,28 +19881,6 @@ Known undumped pirates
 		</part>
 	</software>
 
-	<software name="redcliff">
-		<description>The Battle of Red Cliffs - Romance of the Three Kingdoms</description>
-		<year>199?</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="20971520">
-				<rom name="the battle of red cliffs - romance of the three kingdoms (unl).bin" size="2097157" crc="44463492" sha1="244334583fde808a56059c0b0eef77742c18274d" offset="0x400000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="kof99">
-		<description>The King of Fighters 99</description>
-		<year>199?</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="3145728">
-				<rom name="the king of fighters 99 (unl).bin" size="3145728" crc="54638c11" sha1="cdef3008dec2ce1a214af8b9cb000053671a3c36" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="themeprk">
 		<description>Theme Park (Euro, USA)</description>
 		<year>199?</year>
@@ -20576,7 +20234,7 @@ Known undumped pirates
 	</software>
 
 	<software name="toki">
-		<description>Toki - Going Ape Spit / JuJu Densetsu (World, Rev. A)</description>
+		<description>Toki - Going Ape Spit ~ JuJu Densetsu (World, Rev. A)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -20587,7 +20245,7 @@ Known undumped pirates
 	</software>
 
 	<software name="toki1" cloneof="toki">
-		<description>Toki - Going Ape Spit / JuJu Densetsu (World)</description>
+		<description>Toki - Going Ape Spit ~ JuJu Densetsu (World)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -20637,18 +20295,6 @@ Known undumped pirates
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="tony la russa baseball (usa, aus).bin" size="1048576" crc="24629c78" sha1="0e3f7ebf8661cac9bd7a0c5af64f260e7b5f0a0b" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- //[!] -->
-	<software name="topfight">
-		<description>Top Fighter 2000 MK VIII</description>
-		<year>199?</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="20971520">
-				<rom name="top fighter 2000 mk viii (unl).bin" size="2097152" crc="f75519dc" sha1="617be8de1444ae0c6610d73967f3f0e67541b05a" offset="0x400000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -20940,7 +20586,7 @@ Known undumped pirates
 	</software>
 
 	<software name="twinhawk">
-		<description>Twin Hawk / Daisenpuu (Euro, Jpn)</description>
+		<description>Twin Hawk (Euro) ~ Daisenpuu (Jpn)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -21753,17 +21399,6 @@ Known undumped pirates
 		</part>
 	</software>
 
-	<software name="whacacri">
-		<description>Whac-a-Critter (USA)</description>
-		<year>199?</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="20971520">
-				<rom name="whac-a-critter (usa) (unl).bin" size="524288" crc="1bdd02b8" sha1="4b45801b112a641fee936e41a31728ee7aa2f834" offset="0x400000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="wheelfor">
 		<description>Wheel of Fortune (USA)</description>
 		<year>199?</year>
@@ -22033,6 +21668,7 @@ Known undumped pirates
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="WBOY5" />
 			<dataarea name="rom" size="786432">
 				<rom name="mpr-14556.bin" size="786432" crc="1592f5b0" sha1="87a968f773c7e807e647c0737132457b06b78276" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -22044,6 +21680,7 @@ Known undumped pirates
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="WBOY5" />
 			<dataarea name="rom" size="655360">
 				<rom name="wonder boy v - monster world iii (jpn, kor).bin" size="655360" crc="45a50f96" sha1="1582f159e1969ff0541319a9bd7e6f7a53505d01" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -22055,6 +21692,7 @@ Known undumped pirates
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="WBOY5" />
 			<dataarea name="rom" size="1048576">
 				<rom name="turma da monica na terra dos monstros (bra).bin" size="1048576" crc="f8288de1" sha1="80fc2a6a6b8b943f781598094f3b5a5fe4f05ede" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -22338,7 +21976,7 @@ Known undumped pirates
 	</software>
 
 	<software name="wcs">
-		<description>World Championship Soccer / World Cup Soccer (USA, Jpn, Rev. B)</description>
+		<description>World Championship Soccer ~ World Cup Soccer (USA, Jpn, Rev. B)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -22349,7 +21987,7 @@ Known undumped pirates
 	</software>
 
 	<software name="wcsa" cloneof="wcs">
-		<description>World Championship Soccer / World Cup Soccer (USA, Jpn, v1.2)</description>
+		<description>World Championship Soccer ~ World Cup Soccer (USA, Jpn, v1.2)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -22360,7 +21998,7 @@ Known undumped pirates
 	</software>
 
 	<software name="wcsb" cloneof="wcs">
-		<description>World Championship Soccer / World Cup Soccer (USA, Jpn)</description>
+		<description>World Championship Soccer ~ World Cup Soccer (USA, Jpn)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -23946,7 +23584,440 @@ Known undumped pirates
 		</part>
 	</software>
 
-	<software name="truc96">
+	
+    
+<!-- dumps which need ad hoc handlers to be installed in the emulator -->
+
+	<software name="12in1">
+		<description>12 in 1</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="12IN1" />
+			<dataarea name="rom" size="20971520">
+				<rom name="12-in-1 (unl).bin" size="2097152" crc="a98bf454" sha1="7313c20071de0ab1cd84ac1352cb0ed1c4a4afa8" offset="00000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="4in1pb">
+		<description>4 in 1 (Pirate)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="12IN1" />
+			<dataarea name="rom" size="20971520">
+				<rom name="4-in-1 (pirate).bin" size="2097152" crc="be72857b" sha1="2aceca16f13d6a7a6a1bff8543d31bded179df3b" offset="00000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bugslife">
+		<description>A Bug's Life</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="BUGSLIFE" />
+			<dataarea name="rom" size="1048576">
+				<rom name="bug's life, a (unl).bin" size="1048576" crc="10458e09" sha1="b620c2bebd5bab39bc9258a925169b4c93614599" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chinf3">
+		<description>Chinese Fighter III (Chi)</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="CHINFIGHT3" />
+			<dataarea name="rom" size="20971520">
+				<rom name="chinese fighter iii (unl).bin" size="2097152" crc="e833bc6e" sha1="ecca9d2d21c8e27fc7584d53f557fdd8b4cbffa7" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="earthdef">
+		<description>Earth Defense (USA)</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="REALTEC" />
+			<dataarea name="rom" size="20971520">
+				<rom name="earth defense (usa) (unl).bin" size="524288" crc="3519c422" sha1="9bf4cda850495d7811df578592289018862df575" offset="00000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="funnywld">
+		<description>Funny World &amp; Balloon Boy (USA)</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="REALTEC" />
+			<dataarea name="rom" size="20971520">
+				<rom name="funny world &amp; balloon boy (usa) (unl).bin" size="524288" crc="a82f05f0" sha1="17481c8327433bfce8f7bae493fc044194e400a4" offset="00000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- // this contains only the first bank, so most of the games are missing -->
+	<software name="golden10">
+		<description>Golden 10 in 1</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="12IN1" />
+			<dataarea name="rom" size="20971520">
+				<rom name="golden 10-in-1 (bad dump).bin" size="1048576" crc="4fa3f82b" sha1="04edbd35fe4916f61b516016b492352d96a8de7f" offset="00000" status="baddump" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="huamul">
+		<description>Hua Mu Lan - Mulan (Chi)</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="MULAN" />
+			<dataarea name="rom" size="2097152">
+				<rom name="hua mu lan - mulan (chi) (unl).bin" size="2097152" crc="796882b8" sha1="d8936c1023db646e1e20f9208b68271afbd6dbf4" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="huanle">
+		<description>Huan Le Tao Qi Shu - Smart Mouse (Chi)</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SMOUSE" />
+			<dataarea name="rom" size="524288">
+				<rom name="huan le tao qi shu - smart mouse (chi) (unl).bin" size="524288" crc="decdf740" sha1="df7a2527875317406b466175f0614d343dd32117" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- // [!] -->
+	<software name="kof98">
+		<description>The King of Fighters '98</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="KOF98" />
+			<dataarea name="rom" size="2097152">
+				<rom name="king of fighters '98, the (unl).bin" size="2097152" crc="cbc38eea" sha1="aeee33bfc2c440b6b861ac0d1b9bc9bface24861" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="supmagic">
+		<description>Linghuan Daoshi Super Magician (Chi)</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="ELFWOR" />
+			<dataarea name="rom" size="1048576">
+				<rom name="elf wor (chi) (unl).bin" size="1048576" crc="e24ac6b2" sha1="5fc4591fbb1acc64e184466c7b6287c7f64e0b7a" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- // [!] -->
+	<software name="lionkin2">
+		<description>Shi Zi Wang II - The Lion King II</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="LIONK2" />
+			<dataarea name="rom" size="2097152">
+				<rom name="shi zi wang ii - the lion king ii, the (chi) (unl).bin" size="2097152" crc="aff46765" sha1="5649fa1fbfb28d58b0608e8ebc5dc7bd5c4c9678" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lionkin3">
+		<description>Shi Zi Wang 3 - The Lion King 3</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="LIONK3" />
+			<dataarea name="rom" size="20971520">
+				<rom name="shi zi wang 3 - the lion king 3 (chi) (unl).bin" size="2097152" crc="c004219d" sha1="54ffd355b0805741f58329fa38ed3d9f8f7c80ca" offset="00000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="majian">
+		<description>Ma Jiang Qing Ren - Ji Ma Jiang Zhi (Chi)</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="MJLOVER" />
+			<dataarea name="rom" size="1048576">
+				<rom name="ma jiang qing ren - ji ma jiang zhi (chi) (unl).bin" size="1048576" crc="ddd02ba4" sha1="fe9ec21bd206ad1a178c54a2fee80b553c478fc4" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pokestad">
+		<description>Pokemon Stadium</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="KAIJU" />
+			<dataarea name="rom" size="20971520">
+				<rom name="pokemon stadium (unl).bin" size="2097152" crc="fe187c5d" sha1="f65af5d86aba33bd3f4f91a0cd7428778bcceedf" offset="00000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rockmnx3">
+		<description>Rockman X3</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="ROCKMANX3" />
+			<dataarea name="rom" size="2097152">
+				<rom name="rockman x3 (unl).bin" size="2097152" crc="3ee639f0" sha1="37024d0088fab1d76c082014663c58921cdf33df" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="soulblad">
+		<description>Soul Blade</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SOULBLAD" />
+			<dataarea name="rom" size="4194304">
+				<rom name="soul blade (unl).bin" size="4194304" crc="f26f88d1" sha1="7714e01819ab4a0f424d7e306e9f891031d053a8" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="squirrel">
+		<description>Squirrel King (Chi)</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SQUIRRELK" />
+			<dataarea name="rom" size="1048576">
+				<rom name="squirrel king (chi) (unl).bin" size="1048576" crc="b8261ff5" sha1="2a561b6e47c93272fe5947084837d9f6f514ed38" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="s15in1">
+		<description>Super 15 in 1 (Pirate)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="MC_SUP15IN1" />
+			<dataarea name="rom" size="20971520">
+				<rom name="super 15-in-1 (pirate).bin" size="2097152" crc="6d17dfff" sha1="6b2a6de2622735f6d56c6c9c01f74daa90e355cb" offset="00000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="s19in1">
+		<description>Super 19 in 1 (Pirate)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="MC_SUP19IN1" />
+			<dataarea name="rom" size="20971520">
+				<rom name="super 19-in-1 (pirate).bin" size="4194304" crc="0ad2b342" sha1="e1c041ba69da087c428dcda16850159f3caebd4b" offset="00000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="supbub">
+		<description>Super Bubble Bobble (Chi)</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SBUBBOB" />
+			<dataarea name="rom" size="1048576">
+				<rom name="super bubble bobble (chi) (unl).bin" size="1048576" crc="4820a161" sha1="03f40c14624f1522d6e3105997d14e8eaba12257" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sdkong99">
+		<description>Super Donkey Kong 99 (Protected)</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SDK99" />
+			<dataarea name="rom" size="20971520">
+				<rom name="super donkey kong 99 (unl) (protected).bin" size="3145728" crc="43be4dd5" sha1="5d3c84bd18f821b20212941a6f7a1a272eb0d7e3" offset="00000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- // [!] -->
+	<software name="skkong99" cloneof="sdkong99">
+		<description>Super King Kong 99</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SKINGKONG" />
+			<dataarea name="rom" size="20971520">
+				<rom name="super king kong 99 (unl).bin" size="2097152" crc="413dfee2" sha1="6973598d77a755beafff31ce85595f9610f8afa5" offset="00000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- // [!] -->
+	<software name="smario2">
+		<description>Super Mario 2 1998</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SMB2" />
+			<dataarea name="rom" size="2097152">
+				<rom name="super mario 2 1998 (unl).bin" size="2097152" crc="f7e1b3e1" sha1="de10115ce6a7eb416de9cd167df9cf24e34687b1" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- // [!] -->
+	<software name="smb">
+		<description>Super Mario Bros.</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SMB" />
+			<dataarea name="rom" size="2097152">
+				<rom name="super mario bros. (unl).bin" size="2097152" crc="9cfa2bd8" sha1="5011e16f0ab3a6487a1406b85c6090ad2d1fe345" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="redcliff">
+		<description>The Battle of Red Cliffs - Romance of the Three Kingdoms</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="REDCLIFF" />
+			<dataarea name="rom" size="20971520">
+				<rom name="the battle of red cliffs - romance of the three kingdoms (unl).bin" size="2097157" crc="44463492" sha1="244334583fde808a56059c0b0eef77742c18274d" offset="00000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kof99">
+		<description>The King of Fighters 99</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="KOF99" />
+			<dataarea name="rom" size="3145728">
+				<rom name="the king of fighters 99 (unl).bin" size="3145728" crc="54638c11" sha1="cdef3008dec2ce1a214af8b9cb000053671a3c36" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- //[!] -->
+	<software name="topfight">
+		<description>Top Fighter 2000 MK VIII</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="TOPFIGHTER" />
+			<dataarea name="rom" size="20971520">
+				<rom name="top fighter 2000 mk viii (unl).bin" size="2097152" crc="f75519dc" sha1="617be8de1444ae0c6610d73967f3f0e67541b05a" offset="00000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="whacacri">
+		<description>Whac-a-Critter (USA)</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="REALTEC" />
+			<dataarea name="rom" size="20971520">
+				<rom name="whac-a-critter (usa) (unl).bin" size="524288" crc="1bdd02b8" sha1="4b45801b112a641fee936e41a31728ee7aa2f834" offset="00000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="radicav1">
+		<description>Radica: Volume 1 (USA)</description>
+		<year>2004</year>
+		<publisher>Radica Games ~ Sega</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="RADICA" />
+			<dataarea name="rom" size="4194304">
+				<rom name="radicav1.bin" size="4194304" crc="3b4c8438" sha1="5ed9c053f9ebc8d4bf571d57e562cf347585d158" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="radicasf">
+		<description>Radica: Street Fighter Pack (Euro)</description>
+		<year>2004</year>
+		<publisher>Radica Games ~ Capcom</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="RADICA" />
+			<dataarea name="rom" size="4194304">
+				<rom name="radicasf.bin" size="4194304" crc="868afb44" sha1="f4339e36272c18b1d49aa4095127ed18e0961df6" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Are these unprotected versions legit? or were they hacked to work with emus? -->
+
+	<software name="chinf3a" cloneof="chinf3">
+		<description>Chinese Fighter III (Chi, Alt)</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="chinese fighter iii (unl, alt).bin" size="2097152" crc="6f98247d" sha1="cc212b1564dc7c73ffdc55f9fde3269a83fee399" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kof98a" cloneof="kof98">
+		<description>The King of Fighters '98 (Pirate)</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="king of fighters '98, the (unl) (pirate).bin" size="2097152" crc="c79e1074" sha1="6eb3a12e082ce4074e88ad3cb2b3c51f9a72225c" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lionkin2a" cloneof="lionkin2">
+		<description>Shi Zi Wang II - The Lion King II (Pirate)</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="shi zi wang ii - the lion king ii, the (chi) (unl) (pirate).bin" size="2097152" crc="721b4981" sha1="70eb5b423948e5a124de4d5d24c14b2c64bfb282" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- // [!] -->
+	<software name="sdkong99a" cloneof="sdkong99">
+		<description>Super Donkey Kong 99 (Unprotected)</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="super donkey kong 99 (unl).bin" size="2097152" crc="8e7d9177" sha1="91f6b10ada917e6dfdafdd5ad9d476723498a7a4" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+
+<!-- Pirate dumps to be sorted out (a few from HazeMD, others recently dumped by drx) -->
+
+	<software name="truco96">
 		<description>Truco '96 (Arg)</description>
 		<year>1996</year>
 		<publisher>Miky</publisher>
@@ -23979,34 +24050,6 @@ Known undumped pirates
 			</dataarea>
 		</part>
 	</software>
-
-	<software name="radicav1">
-		<description>Radica: Volume 1 (USA)</description>
-		<year>2004</year>
-		<publisher>Radica Games / Sega</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="12582912">
-				<rom name="radicav1.bin" size="4194304" crc="3b4c8438" sha1="5ed9c053f9ebc8d4bf571d57e562cf347585d158" offset="000000" loadflag="load16_word_swap" />
-				<rom size="4194304" offset="0x400000" loadflag="reload" />
-				<rom size="4194304" offset="0x800000" loadflag="reload" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="radicasf">
-		<description>Radica: Street Fighter Pack (Euro)</description>
-		<year>2004</year>
-		<publisher>Radica Games / Capcom</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="12582912">
-				<rom name="radicasf.bin" size="4194304" crc="868afb44" sha1="f4339e36272c18b1d49aa4095127ed18e0961df6" offset="000000" loadflag="load16_word_swap" />
-				<rom size="4194304" offset="0x400000" loadflag="reload" />
-				<rom size="4194304" offset="0x800000" loadflag="reload" />
-			</dataarea>
-		</part>
-	</software>
-	
-<!-- pirate dumps to be sorted out (recently dumped by drx) -->
 
 	<software name="unknown2">
 		<description>Unknown Game 2 (Rockman-related?)</description>
@@ -24046,6 +24089,7 @@ Known undumped pirates
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="LIONK3" />
 			<dataarea name="rom" size="20971520">
 				<rom name="lion_king_3.bin" size="2097152" crc="87e86943" sha1="0ef55dc45536963c8748192a4cb4864a87b03102" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -24106,6 +24150,7 @@ Known undumped pirates
 			</dataarea>
 		</part>
 	</software>
+
 
 <!-- Other Dumps to be sorted -->
 
