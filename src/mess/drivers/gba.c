@@ -405,7 +405,7 @@ static TIMER_CALLBACK(timer_expire)
 	case 0:
 	        if (state->timer_regs[1] & 0x40000)
 	        {
-		        state->timer_regs[1] = ( ( state->timer_regs[1] & 0x0000ffff ) + 1 ) & 0x0000ffff;
+		        state->timer_regs[1] = (( ( state->timer_regs[1] & 0x0000ffff ) + 1 ) & 0x0000ffff) | (state->timer_regs[1] & 0xffff0000);
 		        if( ( state->timer_regs[1] & 0x0000ffff ) == 0 )
 		        {
 		                state->timer_regs[1] |= state->timer_reload[1];
@@ -415,7 +415,7 @@ static TIMER_CALLBACK(timer_expire)
 		                }
 		                if( ( state->timer_regs[2] & 0x40000 ) )
 		                {
-			                state->timer_regs[2] = ( ( state->timer_regs[2] & 0x0000ffff ) + 1 ) & 0x0000ffff;
+			                state->timer_regs[2] = (( ( state->timer_regs[2] & 0x0000ffff ) + 1 ) & 0x0000ffff) | (state->timer_regs[2] & 0xffff0000);
 			                if( ( state->timer_regs[2] & 0x0000ffff ) == 0 )
 			                {
 			                        state->timer_regs[2] |= state->timer_reload[2];
@@ -425,7 +425,7 @@ static TIMER_CALLBACK(timer_expire)
 			                        }
 			                        if( ( state->timer_regs[3] & 0x40000 ) )
 			                        {
-				                        state->timer_regs[3] = ( ( state->timer_regs[3] & 0x0000ffff ) + 1 ) & 0x0000ffff;
+				                        state->timer_regs[3] = (( ( state->timer_regs[3] & 0x0000ffff ) + 1 ) & 0x0000ffff) | (state->timer_regs[3] & 0xffff0000);
 				                        if( ( state->timer_regs[3] & 0x0000ffff ) == 0 )
 				                        {
 				                                state->timer_regs[3] |= state->timer_reload[3];
@@ -443,7 +443,7 @@ static TIMER_CALLBACK(timer_expire)
 	case 1:
 	        if (state->timer_regs[2] & 0x40000)
 	        {
-		        state->timer_regs[2] = ( ( state->timer_regs[2] & 0x0000ffff ) + 1 ) & 0x0000ffff;
+		        state->timer_regs[2] = (( ( state->timer_regs[2] & 0x0000ffff ) + 1 ) & 0x0000ffff) | (state->timer_regs[2] & 0xffff0000);
 		        if( ( state->timer_regs[2] & 0x0000ffff ) == 0 )
 		        {
 		                state->timer_regs[2] |= state->timer_reload[2];
@@ -453,10 +453,10 @@ static TIMER_CALLBACK(timer_expire)
 		                }
 		                if( ( state->timer_regs[3] & 0x40000 ) )
 		                {
-		        	        state->timer_regs[3] = ( ( state->timer_regs[3] & 0x0000ffff ) + 1 ) & 0x0000ffff;
+		        	        state->timer_regs[3] = (( ( state->timer_regs[3] & 0x0000ffff ) + 1 ) & 0x0000ffff) | (state->timer_regs[3] & 0xffff0000);
 			                if( ( state->timer_regs[3] & 0x0000ffff ) == 0 )
 			                {
-			                        state->timer_regs[2] |= state->timer_reload[2];
+			                        state->timer_regs[3] |= state->timer_reload[3];
 			                        if( ( state->timer_regs[3] & 0x400000 ) && ( state->IME != 0 ) )
 			                        {
 				                        gba_request_irq( machine, tmr_ints[3] );
@@ -469,7 +469,7 @@ static TIMER_CALLBACK(timer_expire)
 	case 2:
 	        if (state->timer_regs[3] & 0x40000)
 	        {
-		        state->timer_regs[3] = ( ( state->timer_regs[3] & 0x0000ffff ) + 1 ) & 0x0000ffff;
+		        state->timer_regs[3] = (( ( state->timer_regs[3] & 0x0000ffff ) + 1 ) & 0x0000ffff) | (state->timer_regs[3] & 0xffff0000);
 		        if( ( state->timer_regs[3] & 0x0000ffff ) == 0 )
 		        {
 		                state->timer_regs[3] |= state->timer_reload[3];
