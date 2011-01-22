@@ -55,7 +55,7 @@ typedef struct
 	UINT8 pcg_mode;
 	UINT8 v400_mode;
 
-	UINT8 ply;
+	UINT8 pri;
 	UINT8 blackclip; // x1 turbo specific
 } scrn_reg_t;
 
@@ -116,10 +116,9 @@ public:
 	UINT8 x_g;
 	UINT8 x_r;
 	int addr_latch;
-	UINT8 kanji_addr_l;
-	UINT8 kanji_addr_h;
-	UINT8 kanji_count;
+	UINT16 kanji_addr_latch;
 	UINT32 kanji_addr;
+	UINT8 kanji_eksel;
 	UINT8 pcg_reset_occurred;
 	UINT32 old_key1;
 	UINT32 old_key2;
