@@ -941,6 +941,11 @@ ROM_START( bigboard )
 	ROM_LOAD( "bigboard.u73", 0x0000, 0x0800, CRC(10bf0d81) SHA1(7ec73670a4d9d6421a5d6a4c4edc8b7c87923f6c) )	
 ROM_END
 
+ROM_START( bigbord2 )
+    ROM_REGION( 0x1000, "monitor", 0 )
+	ROM_LOAD( "bigbrdii.bin", 0x0000, 0x1000, CRC(c588189e) SHA1(4133903171ee8b9fcf12cc72de843af782b4a645))
+	ROM_REGION( 0x800, "chargen", 0 )
+ROM_END
 /* System Drivers */
 
 /*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       INIT    COMPANY                         FULLNAME        FLAGS */
@@ -948,4 +953,4 @@ COMP( 1981, xerox820,	0,			0,		xerox820,	xerox820,	0,		"Xerox",						"Xerox 820"
 COMP( 1983, xerox820ii, xerox820,   0,      xerox820ii, xerox820,   0,      "Xerox",                        "Xerox 820-II", GAME_NOT_WORKING | GAME_NO_SOUND)
 COMP( 1983, xerox168,   xerox820,   0,      xerox168,   xerox820,   0,      "Xerox",                        "Xerox 16/8",   GAME_NOT_WORKING | GAME_NO_SOUND)
 COMP( 1980, bigboard,   0,          0,      xerox820,   xerox820,   0,      "Digital Research Computers",   "Big Board",    GAME_NOT_WORKING | GAME_NO_SOUND)
-//COMP( 1983, bigbord2,   0,          0,      bigbord2,   bigboard,   0,      "Digital Research Computers",   "Big Board II", GAME_NOT_WORKING)
+COMP( 1983, bigbord2,   0,          0,      xerox820,   xerox820,   0,      "Digital Research Computers",   "Big Board II", GAME_NOT_WORKING | GAME_NO_SOUND)

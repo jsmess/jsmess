@@ -3,7 +3,7 @@
 New System Drivers Supported:
 -----------------------------
 - Victor Wondermega M2 (not working) [Justin Kerk]
-- Digital Research Computers Big Board [Miodrag Milanovic]
+- Ferguson Big Board [Miodrag Milanovic]
 
 
 
@@ -15,7 +15,7 @@ Systems Promoted from GAME_NOT_WORKING:
 
 Skeleton drivers:
 -----------------
-(none)
+- Ferguson Big Board II [Miodrag Milanovic]
 
 
 
