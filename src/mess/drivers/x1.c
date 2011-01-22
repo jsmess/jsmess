@@ -5,18 +5,21 @@
     driver by Angelo Salese & Barry Rodewald
 
     TODO:
-    - Understand how keyboard works and decap/dump the keyboard MCU if possible;
+    - Rewrite keyboard input hook-up and decap/dump the keyboard MCU if possible;
+    - x1turbo keyboard inputs are currently broken;
+	- Fix palette stuff, make it a lot cleaner;
+	- Implement proper PCG index hooks by beam positions;
     - Hook-up remaining .tap image formats;
     - Implement .rom format support (needs an image for it);
     - Implement tape commands;
     - Sort out / redump the BIOS gfx roms;
     - X1Turbo: Implement SIO.
     - X1Twin: Hook-up the PC Engine part (actually needs his own driver?);
+    - Implement SASI HDD interface;
     - clean-ups!
     - There are various unclear video things, these are:
-        - Understand why some games still doesn't upload the proper PCG index;
         - Implement the remaining scrn regs;
-        - Interlace mode?
+        - Interlace mode
         - Implement the new features of the x1turbo, namely the 4096 color feature amongst other
           things
         - (anything else?)
@@ -230,6 +233,14 @@ static VIDEO_START( x1 )
 	state->gfx_bitmap_ram = auto_alloc_array(machine, UINT8, 0xc000*2);
 }
 
+static void x1_draw_pixel(running_machine *machine, bitmap_t *bitmap,int y,int x,UINT16	pen)
+{
+	if((x)>machine->primary_screen->visible_area().max_x || (y)>machine->primary_screen->visible_area().max_y)
+		return;
+
+	*BITMAP_ADDR16(bitmap, y, x) = machine->pens[pen];
+}
+
 static void draw_fgtilemap(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int w)
 {
 	x1_state *state = machine->driver_data<x1_state>();
@@ -286,38 +297,35 @@ static void draw_fgtilemap(running_machine *machine, bitmap_t *bitmap,const rect
 						if((state->scrn_reg.blackclip & 8) && (color == (state->scrn_reg.blackclip & 7)))
 							pcg_pen = 0; // clip the pen to black
 
-						if((res_x+xi)>machine->primary_screen->visible_area().max_x && (res_y+yi)>machine->primary_screen->visible_area().max_y)
-							continue;
-
 						if(state->scrn_reg.v400_mode)
 						{
-							*BITMAP_ADDR16(bitmap, (res_y+yi)*2+0, res_x+xi) = machine->pens[pcg_pen];
-							*BITMAP_ADDR16(bitmap, (res_y+yi)*2+1, res_x+xi) = machine->pens[pcg_pen];
+							x1_draw_pixel(machine,bitmap,(res_y+yi)*2+0,res_x+xi,pcg_pen);
+							x1_draw_pixel(machine,bitmap,(res_y+yi)*2+1,res_x+xi,pcg_pen);
 							if(width)
 							{
-								*BITMAP_ADDR16(bitmap, (res_y+yi)*2+0, res_x+xi+1) = machine->pens[pcg_pen];
-								*BITMAP_ADDR16(bitmap, (res_y+yi)*2+1, res_x+xi+1) = machine->pens[pcg_pen];
+								x1_draw_pixel(machine,bitmap,(res_y+yi)*2+0,res_x+xi+1,pcg_pen);
+								x1_draw_pixel(machine,bitmap,(res_y+yi)*2+1,res_x+xi+1,pcg_pen);
 							}
 							if(height)
 							{
-								*BITMAP_ADDR16(bitmap, (res_y+yi+1)*2+0, res_x+xi) = machine->pens[pcg_pen];
-								*BITMAP_ADDR16(bitmap, (res_y+yi+1)*2+1, res_x+xi) = machine->pens[pcg_pen];
+								x1_draw_pixel(machine,bitmap,(res_y+yi+1)*2+0,res_x+xi,pcg_pen);
+								x1_draw_pixel(machine,bitmap,(res_y+yi+1)*2+1,res_x+xi,pcg_pen);
 							}
 							if(width && height)
 							{
-								*BITMAP_ADDR16(bitmap, (res_y+yi+1)*2+0, res_x+xi+1) = machine->pens[pcg_pen];
-								*BITMAP_ADDR16(bitmap, (res_y+yi+1)*2+1, res_x+xi+1) = machine->pens[pcg_pen];
+								x1_draw_pixel(machine,bitmap,(res_y+yi+1)*2+0,res_x+xi+1,pcg_pen);
+								x1_draw_pixel(machine,bitmap,(res_y+yi+1)*2+1,res_x+xi+1,pcg_pen);
 							}
 						}
 						else
 						{
-							*BITMAP_ADDR16(bitmap, res_y+yi, res_x+xi) = machine->pens[pcg_pen];
+							x1_draw_pixel(machine,bitmap,res_y+yi,res_x+xi,pcg_pen);
 							if(width)
-								*BITMAP_ADDR16(bitmap, res_y+yi, res_x+xi+1) = machine->pens[pcg_pen];
+								x1_draw_pixel(machine,bitmap,res_y+yi,res_x+xi+1,pcg_pen);
 							if(height)
-								*BITMAP_ADDR16(bitmap, res_y+yi+1, res_x+xi) = machine->pens[pcg_pen];
+								x1_draw_pixel(machine,bitmap,res_y+yi+1,res_x+xi,pcg_pen);
 							if(width && height)
-								*BITMAP_ADDR16(bitmap, res_y+yi+1, res_x+xi+1) = machine->pens[pcg_pen];
+								x1_draw_pixel(machine,bitmap,res_y+yi+1,res_x+xi+1,pcg_pen);
 						}
 					}
 				}
@@ -327,15 +335,15 @@ static void draw_fgtilemap(running_machine *machine, bitmap_t *bitmap,const rect
 }
 
 /*
- * Priority Mixer Calculation (PLY)
+ * Priority Mixer Calculation (pri)
  *
- * If ply is 0xff then the bitmap entirely covers the tilemap, if it's 0x00 then
+ * If pri is 0xff then the bitmap entirely covers the tilemap, if it's 0x00 then
  * the tilemap priority is entirely above the bitmap. Any other value mixes the
  * bitmap and the tilemap priorities based on the pen value, bit 0 = entry 0 <-> bit 7 = entry 7
  * of the bitmap.
  *
  */
-static int priority_mixer_ply(running_machine *machine,int color)
+static int priority_mixer_pri(running_machine *machine,int color)
 {
 	int pri_i,pri_mask_calc;
 
@@ -375,100 +383,22 @@ static void draw_gfxbitmap(running_machine *machine, bitmap_t *bitmap,const rect
 
 					color =  pen_g<<2 | pen_r<<1 | pen_b<<0;
 
-					pri_mask_val = priority_mixer_ply(machine,color);
+					pri_mask_val = priority_mixer_pri(machine,color);
 					if(pri_mask_val & pri) continue;
 
 					if(state->scrn_reg.v400_mode)
 					{
-						if((x*8+xi)<=machine->primary_screen->visible_area().max_x && (( y*(state->tile_height+1)+yi)*2+0)<=machine->primary_screen->visible_area().max_y)
-							*BITMAP_ADDR16(bitmap, ( y*(state->tile_height+1)+yi)*2+0, x*8+xi) = machine->pens[color+0x100];
-						if((x*8+xi)<=machine->primary_screen->visible_area().max_x && (( y*(state->tile_height+1)+yi)*2+1)<=machine->primary_screen->visible_area().max_y)
-							*BITMAP_ADDR16(bitmap, ( y*(state->tile_height+1)+yi)*2+1, x*8+xi) = machine->pens[color+0x100];
+						x1_draw_pixel(machine,bitmap,(y*(state->tile_height+1)+yi)*2+0,x*8+xi,color);
+						x1_draw_pixel(machine,bitmap,(y*(state->tile_height+1)+yi)*2+1,x*8+xi,color);
 					}
 					else
-					{
-						if((x*8+xi)<=machine->primary_screen->visible_area().max_x && (y*(state->tile_height+1)+yi)<=machine->primary_screen->visible_area().max_y)
-							*BITMAP_ADDR16(bitmap, y*(state->tile_height+1)+yi, x*8+xi) = machine->pens[color+0x100];
-					}
+						x1_draw_pixel(machine,bitmap,y*(state->tile_height+1)+yi,x*8+xi,color);
+
 				}
 			}
 		}
 	}
 }
-
-#if 0
-/* Old code for reference, to be removed soon */
-static void draw_gfxbitmap(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int w,int plane,int pri)
-{
-	x1_state *state = machine->driver_data<x1_state>();
-	int count,xi,yi,x,y;
-	int pen_r,pen_g,pen_b,color;
-	int yi_size;
-	int pri_mask_val;
-
-	count = state->crtc_start_addr;
-
-	yi_size = (w == 1) ? 16 : 8;
-
-	for(yi=0;yi<yi_size;yi++)
-	{
-		for(y=0;y<200;y+=8)
-		{
-			for(x=0;x<(320*w);x+=8)
-			{
-				for(xi=0;xi<8;xi++)
-				{
-					pen_b = (state->gfx_bitmap_ram[count+0x0000+plane*0xc000]>>(7-xi)) & 1;
-					pen_r = (state->gfx_bitmap_ram[count+0x4000+plane*0xc000]>>(7-xi)) & 1;
-					pen_g = (state->gfx_bitmap_ram[count+0x8000+plane*0xc000]>>(7-xi)) & 1;
-
-					color =  pen_g<<2 | pen_r<<1 | pen_b<<0;
-
-					pri_mask_val = priority_mixer_ply(machine,color);
-					if(pri_mask_val & pri) continue;
-
-					if(w == 1)
-					{
-						if(yi & 1)
-							continue;
-
-						if(state->scrn_reg.v400_mode)
-						{
-							if((x+xi)<=machine->primary_screen->visible_area().max_x && (y+(yi >> 1)*2+0)<=machine->primary_screen->visible_area().max_y)
-								*BITMAP_ADDR16(bitmap, (y+(yi >> 1))*2+0, x+xi) = machine->pens[color+0x100];
-							if((x+xi)<=machine->primary_screen->visible_area().max_x && (y+(yi >> 1)*2+1)<=machine->primary_screen->visible_area().max_y)
-								*BITMAP_ADDR16(bitmap, (y+(yi >> 1))*2+1, x+xi) = machine->pens[color+0x100];
-						}
-						else
-						{
-							if((x+xi)<=machine->primary_screen->visible_area().max_x && (y+(yi >> 1))<=machine->primary_screen->visible_area().max_y)
-								*BITMAP_ADDR16(bitmap, y+(yi >> 1), x+xi) = machine->pens[color+0x100];
-						}
-					}
-					else
-					{
-						if(state->scrn_reg.v400_mode)
-						{
-							if((x+xi)<=machine->primary_screen->visible_area().max_x && ((y+yi)*2+0)<=machine->primary_screen->visible_area().max_y)
-								*BITMAP_ADDR16(bitmap, (y+yi)*2+0, x+xi) = machine->pens[color+0x100];
-							if((x+xi)<=machine->primary_screen->visible_area().max_x && ((y+yi)*2+1)<=machine->primary_screen->visible_area().max_y)
-								*BITMAP_ADDR16(bitmap, (y+yi)*2+1, x+xi) = machine->pens[color+0x100];
-						}
-						else
-						{
-							if((x+xi)<=machine->primary_screen->visible_area().max_x && (y+yi)<=machine->primary_screen->visible_area().max_y)
-								*BITMAP_ADDR16(bitmap, y+yi, x+xi) = machine->pens[color+0x100];
-						}
-					}
-				}
-				count++;
-			}
-		}
-		count+= (w == 2) ? 48 : 24;
-		count&=0x3fff;
-	}
-}
-#endif
 
 static VIDEO_UPDATE( x1 )
 {
@@ -479,9 +409,9 @@ static VIDEO_UPDATE( x1 )
 
 	bitmap_fill(bitmap, cliprect, MAKE_ARGB(0xff,0x00,0x00,0x00));
 
-	draw_gfxbitmap(screen->machine,bitmap,cliprect,w,state->scrn_reg.disp_bank,state->scrn_reg.ply);
+	draw_gfxbitmap(screen->machine,bitmap,cliprect,w,state->scrn_reg.disp_bank,state->scrn_reg.pri);
 	draw_fgtilemap(screen->machine,bitmap,cliprect,w);
-	draw_gfxbitmap(screen->machine,bitmap,cliprect,w,state->scrn_reg.disp_bank,state->scrn_reg.ply^0xff);
+	draw_gfxbitmap(screen->machine,bitmap,cliprect,w,state->scrn_reg.disp_bank,state->scrn_reg.pri^0xff);
 	/* Y's uses the following as a normal buffer/work ram without anything reasonable to draw */
 //  draw_gfxbitmap(screen->machine,bitmap,cliprect,w,1);
 
@@ -563,6 +493,18 @@ static UINT8 check_keyboard_press(running_machine *machine)
 static UINT8 check_keyboard_shift(running_machine *machine)
 {
 	UINT8 val = 0xe0;
+	/*
+	all of those are active low
+	x--- ---- TEN: Numpad, Function key, special input key
+	-x-- ---- KIN: Valid key
+	--x- ---- REP: Key repeat
+	---x ---- GRAPH key ON
+	---- x--- CAPS lock ON
+	---- -x-- KANA lock ON
+	---- --x- SHIFT ON
+	---- ---x CTRL ON
+	*/
+
 	val |= input_port_read(machine,"key_modifiers") & 0x1f;
 
 	if(check_keyboard_press(machine) != 0)
@@ -742,12 +684,12 @@ static TIMER_CALLBACK( cmt_wind_timer )
 static WRITE8_HANDLER( sub_io_w )
 {
 	x1_state *state = space->machine->driver_data<x1_state>();
-	/* TODO: check sub-routine at $10e */
-	/* $17a -> floppy? */
-	/* $094 -> ROM */
-	/* $0c0 -> timer*/
-	/* $052 -> cmt */
-	/* $0f5 -> reload sub-routine? */
+	/* sub-routine at $10e sends to these sub-routines when a keyboard input is triggered:
+	 $17a -> floppy
+	 $094 -> ROM
+	 $0c0 -> timer
+	 $052 -> cmt
+	 $0f5 -> reload sub-routine? */
 
 	if(state->sub_cmd == 0xe4)
 	{
@@ -758,33 +700,65 @@ static WRITE8_HANDLER( sub_io_w )
 	if(state->sub_cmd == 0xe9)
 		cmt_command(space->machine,data);
 
-	if((data & 0xf0) == 0xd0) //reads here tv recording timer data.
+	if((data & 0xf0) == 0xd0) //reads here tv recording timer data. (Timer set (0xd0) / Timer readout (0xd8))
 	{
+		/*
+			xx-- ---- mode
+			--xx xxxx interval
+		*/
 		state->sub_val[0] = 0;
+		/*
+			xxxx xxxx command code:
+			00 timer disabled
+			01 TV command
+			10 interrupt
+			11 Cassette deck
+		*/
 		state->sub_val[1] = 0;
+		/*
+			---x xxxx minute
+		*/
 		state->sub_val[2] = 0;
+		/*
+			---- xxxx hour
+		*/
 		state->sub_val[3] = 0;
+		/*
+			xxxx ---- month
+			---- -xxx day of the week
+		*/
 		state->sub_val[4] = 0;
+		/*
+			--xx xxxx day
+		*/
 		state->sub_val[5] = 0;
 		state->sub_cmd_length = 6;
 	}
 
 	switch(data)
 	{
-		case 0xe3:
+		case 0xe3: //game key obtaining
 			state->sub_cmd_length = 3;
 			state->sub_val[0] = get_game_key(space->machine,0);
 			state->sub_val[1] = get_game_key(space->machine,1);
 			state->sub_val[2] = get_game_key(space->machine,2);
 			break;
-		case 0xe6:
+		case 0xe4: //irq vector setting
+			break;
+		//case 0xe5: //timer irq clear
+		//	break;
+		case 0xe6: //key data readout
 			state->sub_val[0] = check_keyboard_shift(space->machine);
 			state->sub_val[1] = check_keyboard_press(space->machine);
 			state->sub_cmd_length = 2;
 			break;
-		case 0xe8:
+//		case 0xe7: // TV Control
+//			break;
+		case 0xe8: // TV Control read-out
 			state->sub_val[0] = state->sub_cmd;
 			state->sub_cmd_length = 1;
+			break;
+		case 0xe9: // CMT Control
 			break;
 		case 0xea:  // CMT Control status
 			state->sub_val[0] = state->cmt_current_cmd;
@@ -794,38 +768,37 @@ static WRITE8_HANDLER( sub_io_w )
 		case 0xeb:  // CMT Tape status
 		            // bit 0 = tape end (0=end of tape)
 					// bit 1 = tape inserted
-					// bit 2 = record status (1=OK, 0=write protect?)
+					// bit 2 = record status (1=OK, 0=write protect)
 			state->sub_val[0] = 0x05;
 			if(cassette_get_image(space->machine->device("cass")) != NULL)
 				state->sub_val[0] |= 0x02;
 			state->sub_cmd_length = 1;
 			logerror("CMT: Command 0xEB received, returning 0x%02x.\n",state->sub_val[0]);
 			break;
+//		case 0xec: //set date
+//			break;
 		case 0xed: //get date
 			state->sub_val[0] = state->rtc.day;
 			state->sub_val[1] = (state->rtc.month<<4) | (state->rtc.wday & 0xf);
 			state->sub_val[2] = state->rtc.year;
 			state->sub_cmd_length = 3;
 			break;
+//		case 0xee: //set time
+//			break;
 		case 0xef: //get time
 			state->sub_val[0] = state->rtc.hour;
 			state->sub_val[1] = state->rtc.min;
 			state->sub_val[2] = state->rtc.sec;
 			state->sub_cmd_length = 3;
 			break;
-		#if 0
-		default:
-		{
-			if(data > 0xe3 && data <= 0xef)
-				printf("%02x CMD\n",data);
-		}
-		#endif
 	}
 
 	state->sub_cmd = data;
 
 	state->sub_obf = (state->sub_cmd_length) ? 0x00 : 0x20;
-	logerror("SUB: Command byte 0x%02x\n",data);
+
+	if(data != 0xe6)
+		logerror("SUB: Command byte 0x%02x\n",data);
 }
 
 /*************************************
@@ -900,10 +873,16 @@ static READ8_HANDLER( x1_fdc_r )
 		case 0x0ffb:
 			return wd17xx_data_r(dev,offset);
 		case 0x0ffc:
+			printf("FDC: read FM type\n");
+			return 0xff;
 		case 0x0ffd:
+			printf("FDC: read MFM typex\n");
+			return 0xff;
 		case 0x0ffe:
+			printf("FDC: read 1.6M type\n");
+			return 0xff;
 		case 0x0fff:
-			logerror("FDC: read from %04x\n",offset+0xff8);
+			printf("FDC: switching between 500k/1M\n");
 			return 0xff;
 	}
 
@@ -937,7 +916,7 @@ static WRITE8_HANDLER( x1_fdc_w )
 		case 0x0ffd:
 		case 0x0ffe:
 		case 0x0fff:
-			logerror("FDC: write to %04x = %02x\n",offset+0xff8,data);
+			logerror("FDC: invalid write to %04x = %02x\n",offset+0xff8,data);
 			break;
 	}
 }
@@ -1109,7 +1088,6 @@ static WRITE8_HANDLER( x1_pcg_w )
  *************************************/
 
 /* for bitmap mode */
-
 static void set_current_palette(running_machine *machine)
 {
 	x1_state *state = machine->driver_data<x1_state>();
@@ -1125,11 +1103,15 @@ static void set_current_palette(running_machine *machine)
 	}
 }
 
+/* Note: docs claims that reading the palette ports makes the value to change somehow in X1 mode ...
+         In 4096 color mode, it's used for reading the value back. */
 static WRITE8_HANDLER( x1_pal_r_w )
 {
 	x1_state *state = space->machine->driver_data<x1_state>();
 	state->x_r = data;
 	set_current_palette(space->machine);
+
+	/* TODO: 4096 mode for x1turboz */
 }
 
 static WRITE8_HANDLER( x1_pal_g_w )
@@ -1137,6 +1119,8 @@ static WRITE8_HANDLER( x1_pal_g_w )
 	x1_state *state = space->machine->driver_data<x1_state>();
 	state->x_g = data;
 	set_current_palette(space->machine);
+
+	/* TODO: 4096 mode for x1turboz */
 }
 
 static WRITE8_HANDLER( x1_pal_b_w )
@@ -1144,6 +1128,8 @@ static WRITE8_HANDLER( x1_pal_b_w )
 	x1_state *state = space->machine->driver_data<x1_state>();
 	state->x_b = data;
 	set_current_palette(space->machine);
+
+	/* TODO: 4096 mode for x1turboz */
 }
 
 static WRITE8_HANDLER( x1_ex_gfxram_w )
@@ -1164,17 +1150,14 @@ static WRITE8_HANDLER( x1_ex_gfxram_w )
 /*
     SCRN flags
 
-    d0(01) = 0:low res            1:high res
-    d1(02) = 0:1 raster           1:2 raster  <- 0=400-line mode, legal when 'd0=1'
-    d2(04) = 0:25(20) lines       1:12(10) lines
-    d3(08) = 0:bank 0             0:bank 1    <- display
-    d4(10) = 0:bank 0             0:bank 1    <- access
-    d5(20) = 0:compatibility      1:high speed  <- define PCG mode
-    d6(40) = 0:8-raster graphics  1:16-raster graphics
-    d7(80) = 0:don't display      1:display  <- underline (when 1, graphics are not displayed)
-
-    The value output by the X1turbo's IOCS at 0x1fd*
-    is stored in memory at 0xf8d6
+    d0(01) = 0:low resolution (15KHz) 1: high resolution (24KHz)
+    d1(02) = 0:1 raster / pixel       1:2 raster / pixel
+    d2(04) = 0:8 rasters / CHR        1:16 rasters / CHR
+    d3(08) = 0:bank 0                 0:bank 1    <- display
+    d4(10) = 0:bank 0                 0:bank 1    <- access
+    d5(20) = 0:compatibility          1:high speed  <- define PCG mode
+    d6(40) = 0:8-raster graphics      1:16-raster graphics
+    d7(80) = 0:don't display          1:display  <- underline (when 1, graphics are not displayed)
 */
 static WRITE8_HANDLER( x1_scrn_w )
 {
@@ -1185,13 +1168,15 @@ static WRITE8_HANDLER( x1_scrn_w )
 	state->scrn_reg.v400_mode = ((data & 0x03) == 3) ? 1 : 0;
 	if(data & 0xc4)
 		printf("SCRN = %02x\n",data & 0xc4);
+	if((data & 0x03) == 1)
+		printf("SCRN sets true 400 lines mode\n");
 }
 
-static WRITE8_HANDLER( x1_ply_w )
+static WRITE8_HANDLER( x1_pri_w )
 {
 	x1_state *state = space->machine->driver_data<x1_state>();
-	state->scrn_reg.ply = data;
-//  printf("PLY = %02x\n",data);
+	state->scrn_reg.pri = data;
+//  printf("PRI = %02x\n",data);
 }
 
 static WRITE8_HANDLER( x1_6845_w )
@@ -1222,6 +1207,7 @@ static WRITE8_HANDLER( x1_6845_w )
 static READ8_HANDLER( x1_blackclip_r )
 {
 	x1_state *state = space->machine->driver_data<x1_state>();
+	/*  TODO: this returns only on x1turboz */
 	return state->scrn_reg.blackclip;
 }
 
@@ -1229,6 +1215,8 @@ static WRITE8_HANDLER( x1_blackclip_w )
 {
 	x1_state *state = space->machine->driver_data<x1_state>();
 	state->scrn_reg.blackclip = data;
+	if(data & 0xf0)
+		printf("Blackclip data access %02x\n",data);
 }
 
 static READ8_HANDLER( x1turbo_pal_r )
@@ -1296,7 +1284,7 @@ static WRITE8_HANDLER( x1turbo_gfxpal_w )
 
 
 /*
- *  FIXME: this makes no sense atm, the only game that uses this function so far is Hyper Olympics '84 disk version
+ *  FIXME: this is still wrong, the only game that uses this function so far is Hyper Olympics '84 disk version. Perhaps it's the source ROM that isn't correct ...
  */
 static READ8_HANDLER( x1_kanji_r )
 {
@@ -1305,14 +1293,10 @@ static READ8_HANDLER( x1_kanji_r )
 	UINT8 res;
 
 	//res = 0;
+	res = kanji_rom[state->kanji_addr*2+offset];
 
-	printf("%08x\n",state->kanji_addr*0x20+state->kanji_count);
-
-	res = kanji_rom[(state->kanji_addr*0x20)+(state->kanji_count)];
-	state->kanji_count++;
-	state->kanji_count&=0x1f;
-
-	//printf("%04x R\n",offset);
+	if(offset == 1)
+		state->kanji_addr_latch++;
 
 	return res;
 }
@@ -1321,21 +1305,27 @@ static WRITE8_HANDLER( x1_kanji_w )
 {
 	x1_state *state = space->machine->driver_data<x1_state>();
 //  if(offset < 2)
-		printf("%04x %02x W\n",offset,data);
 
 	switch(offset)
 	{
-		case 0: state->kanji_addr_l = (data & 0xff); break;
-		case 1: state->kanji_addr_h = (data & 0xff); state->kanji_count = 0; break;
+		case 0: state->kanji_addr_latch = (data & 0xff)|(state->kanji_addr_latch&0xff00); break;
+		case 1: state->kanji_addr_latch = (data<<8)|(state->kanji_addr_latch&0x00ff); break;
 		case 2:
-			if(data)
+		{
+			/* 0 -> selects Expanded EEPROM */
+			/* 1 -> selects Kanji ROM */
+			/* 0 -> 1 -> latches Kanji ROM data */
+
+			if(((state->kanji_eksel & 1) == 0) && ((data & 1) == 1))
 			{
-				state->kanji_addr = (state->kanji_addr_h<<8) | (state->kanji_addr_l);
+				state->kanji_addr = (state->kanji_addr_latch);
 				//state->kanji_addr &= 0x3fff; //<- temp kludge until the rom is redumped.
 				//printf("%08x\n",state->kanji_addr);
 				//state->kanji_addr+= state->kanji_count;
 			}
-			break;
+			state->kanji_eksel = data & 1;
+		}
+		break;
 	}
 }
 
@@ -1351,8 +1341,10 @@ static READ8_HANDLER( x1_io_r )
 	UINT8 *videoram = state->videoram;
 	state->io_bank_mode = 0; //any read disables the extended mode.
 
-	//if(offset >= 0x0704 && offset <= 0x0707)      { return z80ctc_r(space->machine->device("ctc"), offset-0x0704); }
 	if(offset == 0x0e03)                    		{ return x1_rom_r(space, 0); }
+	// TODO: user could install ym2151 on plain X1 too
+	//0x700, 0x701
+	//if(offset >= 0x0704 && offset <= 0x0707)      { return z80ctc_r(space->machine->device("ctc"), offset-0x0704); }
 	else if(offset >= 0x0ff8 && offset <= 0x0fff)	{ return x1_fdc_r(space, offset-0xff8); }
 	else if(offset >= 0x1400 && offset <= 0x17ff)	{ return x1_pcg_r(space, offset-0x1400); }
 	else if(offset >= 0x1900 && offset <= 0x19ff)	{ return sub_io_r(space, 0); }
@@ -1380,6 +1372,8 @@ static WRITE8_HANDLER( x1_io_w )
 	x1_state *state = space->machine->driver_data<x1_state>();
 	UINT8 *videoram = state->videoram;
 	if(state->io_bank_mode == 1)                       	{ x1_ex_gfxram_w(space, offset, data); }
+	// TODO: user could install ym2151 on plain X1 too
+	//0x700, 0x701
 //  else if(offset >= 0x0704 && offset <= 0x0707)   { z80ctc_w(space->machine->device("ctc"), offset-0x0704,data); }
 //  else if(offset >= 0x0c00 && offset <= 0x0cff)   { x1_rs232c_w(space->machine, 0, data); }
 	else if(offset >= 0x0e00 && offset <= 0x0e02)	{ x1_rom_w(space, offset-0xe00,data); }
@@ -1388,7 +1382,7 @@ static WRITE8_HANDLER( x1_io_w )
 	else if(offset >= 0x1000 && offset <= 0x10ff)	{ x1_pal_b_w(space, 0,data); }
 	else if(offset >= 0x1100 && offset <= 0x11ff)	{ x1_pal_r_w(space, 0,data); }
 	else if(offset >= 0x1200 && offset <= 0x12ff)	{ x1_pal_g_w(space, 0,data); }
-	else if(offset >= 0x1300 && offset <= 0x13ff)	{ x1_ply_w(space, 0,data); }
+	else if(offset >= 0x1300 && offset <= 0x13ff)	{ x1_pri_w(space, 0,data); }
 	else if(offset >= 0x1400 && offset <= 0x17ff)	{ x1_pcg_w(space, offset-0x1400,data); }
 	else if(offset == 0x1800 || offset == 0x1801)	{ x1_6845_w(space, offset-0x1800, data); }
 	else if(offset >= 0x1900 && offset <= 0x19ff)	{ sub_io_w(space, 0,data); }
@@ -1406,7 +1400,7 @@ static WRITE8_HANDLER( x1_io_w )
 //  else if(offset >= 0x1fb9 && offset <= 0x1fbf)   { x1turbo_txpal_w(space,offset-0x1fb9,data); }
 //  else if(offset == 0x1fc0)                       { x1turbo_txdisp_w(space,0,data); }
 //  else if(offset == 0x1fc5)                       { x1turbo_gfxpal_w(space,0,data); }
-	else if(offset >= 0x1fd0 && offset <= 0x1fdf)	{ x1_scrn_w(space,0,data); }
+//	else if(offset >= 0x1fd0 && offset <= 0x1fdf)	{ x1_scrn_w(space,0,data); }
 //  else if(offset == 0x1fe0)                       { x1_blackclip_w(space,0,data); }
 	else if(offset >= 0x2000 && offset <= 0x2fff)	{ state->colorram[offset-0x2000] = data; }
 	else if(offset >= 0x3000 && offset <= 0x3fff)	{ videoram[offset-0x3000] = state->pcg_write_addr = data; }
@@ -1417,6 +1411,8 @@ static WRITE8_HANDLER( x1_io_w )
 	}
 }
 
+/* TODO: I should actually simplify this, by just overwriting X1 Turbo specifics here, and call plain X1 functions otherwise */
+// * at the end states devices used on plain X1 too
 static READ8_HANDLER( x1turbo_io_r )
 {
 	x1_state *state = space->machine->driver_data<x1_state>();
@@ -1425,9 +1421,18 @@ static READ8_HANDLER( x1turbo_io_r )
 
 	if(offset == 0x0700)							{ return (ym2151_r(space->machine->device("ym"), offset-0x0700) & 0x7f) | (input_port_read(space->machine, "SOUND_SW") & 0x80); }
 	else if(offset == 0x0701)		                { return ym2151_r(space->machine->device("ym"), offset-0x0700); }
+	//0x704 is FM sound detection port on X1 turboZ
 	else if(offset >= 0x0704 && offset <= 0x0707)   { return z80ctc_r(space->machine->device("ctc"), offset-0x0704); }
+	else if(offset == 0x0801)						{ printf("Color image board read\n"); return 0xff; } // *
+	else if(offset == 0x0803)						{ printf("Color image board 2 read\n"); return 0xff; } // *
+	else if(offset >= 0x0a00 && offset <= 0x0a07)	{ printf("Stereoscopic board read %04x\n",offset); return 0xff; } // *
+	else if(offset == 0x0b00)						{ printf("Bank memory switch read\n"); return 0xff; }
+	else if(offset >= 0x0c00 && offset <= 0x0cff)   { printf("RS-232C read %04x\n",offset); return 0xff; } // *
+	else if(offset >= 0x0d00 && offset <= 0x0dff)	{ printf("EMM read %04x\n",offset); return 0xff; } // *
 	else if(offset == 0x0e03)                   	{ return x1_rom_r(space, 0); }
-	else if(offset >= 0x0e80 && offset <= 0x0e83)	{ return x1_kanji_r(space, offset-0xe80); }
+	else if(offset >= 0x0e80 && offset <= 0x0e81)	{ return x1_kanji_r(space, offset-0xe80); }
+	else if(offset >= 0x0fd0 && offset <= 0x0fd3)	{ /* printf("SASI HDD read %04x\n",offset); */ return 0xff; } // *
+	else if(offset >= 0x0fe8 && offset <= 0x0fef)	{ printf("8-inch FD read %04x\n",offset); return 0xff; } // *
 	else if(offset >= 0x0ff8 && offset <= 0x0fff)	{ return x1_fdc_r(space, offset-0xff8); }
 	else if(offset >= 0x1400 && offset <= 0x17ff)	{ return x1_pcg_r(space, offset-0x1400); }
 	else if(offset >= 0x1900 && offset <= 0x19ff)	{ return sub_io_r(space, 0); }
@@ -1436,21 +1441,21 @@ static READ8_HANDLER( x1turbo_io_r )
 	else if(offset >= 0x1f80 && offset <= 0x1f8f)	{ return z80dma_r(space->machine->device("dma"), 0); }
 	else if(offset >= 0x1f90 && offset <= 0x1f91)	{ return z80sio_c_r(space->machine->device("sio"), (offset-0x1f90) & 1); }
 	else if(offset >= 0x1f92 && offset <= 0x1f93)	{ return z80sio_d_r(space->machine->device("sio"), (offset-0x1f92) & 1); }
+	else if(offset >= 0x1f98 && offset <= 0x1f9f)	{ printf("Extended SIO/CTC read %04x\n",offset); return 0xff; }
 	else if(offset >= 0x1fa0 && offset <= 0x1fa3)	{ return z80ctc_r(space->machine->device("ctc"), offset-0x1fa0); }
 	else if(offset >= 0x1fa8 && offset <= 0x1fab)	{ return z80ctc_r(space->machine->device("ctc"), offset-0x1fa8); }
-	else if(offset == 0x1fb0)						{ return x1turbo_pal_r(space,0); }
-	else if(offset >= 0x1fb8 && offset <= 0x1fbf)	{ return x1turbo_txpal_r(space,offset-0x1fb8); }
-	else if(offset == 0x1fc0)						{ return x1turbo_txdisp_r(space,0); }
-	else if(offset == 0x1fc5)						{ return x1turbo_gfxpal_r(space,0); }
-//  else if(offset >= 0x1fd0 && offset <= 0x1fdf)   { return x1_scrn_r(space,offset-0x1fd0); }
+	else if(offset == 0x1fb0)						{ return x1turbo_pal_r(space,0); } // Z only!
+	else if(offset >= 0x1fb8 && offset <= 0x1fbf)	{ return x1turbo_txpal_r(space,offset-0x1fb8); } //Z only!
+	else if(offset == 0x1fc0)						{ return x1turbo_txdisp_r(space,0); } // Z only!
+	else if(offset == 0x1fc5)						{ return x1turbo_gfxpal_r(space,0); } // Z only!
+//  else if(offset >= 0x1fd0 && offset <= 0x1fdf)   { return x1_scrn_r(space,offset-0x1fd0); } //Z only
 	else if(offset == 0x1fe0)						{ return x1_blackclip_r(space,0); }
+	else if(offset == 0x1ff0) 						{ return input_port_read(space->machine, "X1TURBO_DSW"); }
 	else if(offset >= 0x2000 && offset <= 0x2fff)	{ return state->colorram[offset-0x2000]; }
 	else if(offset >= 0x3000 && offset <= 0x3fff)	{ return videoram[offset-0x3000]; }
 	else if(offset >= 0x4000 && offset <= 0xffff)	{ return state->gfx_bitmap_ram[offset-0x4000+(state->scrn_reg.gfx_bank*0xc000)]; }
 	else
 	{
-		//0xfd0-0xfd7: FDC extended area?
-		//0x1ff0: if 0, game screen is interlaced
 		logerror("(PC=%06x) Read i/o address %04x\n",cpu_get_pc(space->cpu),offset);
 	}
 	return 0xff;
@@ -1460,17 +1465,25 @@ static WRITE8_HANDLER( x1turbo_io_w )
 {
 	x1_state *state = space->machine->driver_data<x1_state>();
 	UINT8 *videoram = state->videoram;
-	if(state->io_bank_mode == 1)                       	{ x1_ex_gfxram_w(space, offset, data); }
+	if(state->io_bank_mode == 1)                    { x1_ex_gfxram_w(space, offset, data); }
 	else if(offset == 0x0700 || offset == 0x0701)	{ ym2151_w(space->machine->device("ym"), offset-0x0700,data); }
+	//0x704 is FM sound detection port on X1 turboZ
 	else if(offset >= 0x0704 && offset <= 0x0707)	{ z80ctc_w(space->machine->device("ctc"), offset-0x0704,data); }
-//  else if(offset >= 0x0c00 && offset <= 0x0cff)   { x1_rs232c_w(space->machine, 0, data); }
+	else if(offset == 0x0800)						{ printf("Color image board write %02x\n",data); } // *
+	else if(offset == 0x0802)						{ printf("Color image board 2 write %02x\n",data); } // *
+	else if(offset >= 0x0a00 && offset <= 0x0a07)	{ printf("Stereoscopic board write %04x %02x\n",offset,data); } // *
+	else if(offset == 0x0b00)						{ printf("Bank memory switch write %02x\n",data); }
+	else if(offset >= 0x0c00 && offset <= 0x0cff)   { printf("RS-232C write %04x %02x\n",offset,data); } // *
+	else if(offset >= 0x0d00 && offset <= 0x0dff)	{ printf("EMM write %04x %02x\n",offset,data); } // *
 	else if(offset >= 0x0e00 && offset <= 0x0e02)	{ x1_rom_w(space, offset-0xe00,data); }
 	else if(offset >= 0x0e80 && offset <= 0x0e83)	{ x1_kanji_w(space, offset-0xe80,data); }
+	else if(offset >= 0x0fd0 && offset <= 0x0fd3)	{ printf("SASI HDD write %04x %02x\n",offset,data); } // *
+	else if(offset >= 0x0fe8 && offset <= 0x0fef)	{ printf("8-inch FD write %04x %02x\n",offset,data); } // *
 	else if(offset >= 0x0ff8 && offset <= 0x0fff)	{ x1_fdc_w(space, offset-0xff8,data); }
 	else if(offset >= 0x1000 && offset <= 0x10ff)	{ x1_pal_b_w(space, 0,data); }
 	else if(offset >= 0x1100 && offset <= 0x11ff)	{ x1_pal_r_w(space, 0,data); }
 	else if(offset >= 0x1200 && offset <= 0x12ff)	{ x1_pal_g_w(space, 0,data); }
-	else if(offset >= 0x1300 && offset <= 0x13ff)	{ x1_ply_w(space, 0,data); }
+	else if(offset >= 0x1300 && offset <= 0x13ff)	{ x1_pri_w(space, 0,data); }
 	else if(offset >= 0x1400 && offset <= 0x17ff)	{ x1_pcg_w(space, offset-0x1400,data); }
 	else if(offset == 0x1800 || offset == 0x1801)	{ x1_6845_w(space, offset-0x1800, data); }
 	else if(offset >= 0x1900 && offset <= 0x19ff)	{ sub_io_w(space, 0,data); }
@@ -1482,12 +1495,17 @@ static WRITE8_HANDLER( x1turbo_io_w )
 	else if(offset >= 0x1f80 && offset <= 0x1f8f)	{ z80dma_w(space->machine->device("dma"), 0,data); }
 	else if(offset >= 0x1f90 && offset <= 0x1f91)	{ z80sio_c_w(space->machine->device("sio"), (offset-0x1f90) & 1,data); }
 	else if(offset >= 0x1f92 && offset <= 0x1f93)	{ z80sio_d_w(space->machine->device("sio"), (offset-0x1f92) & 1,data); }
+	else if(offset >= 0x1f98 && offset <= 0x1f9f)	{ printf("Extended SIO/CTC write %04x %02x\n",offset,data); }
 	else if(offset >= 0x1fa0 && offset <= 0x1fa3)	{ z80ctc_w(space->machine->device("ctc"), offset-0x1fa0,data); }
 	else if(offset >= 0x1fa8 && offset <= 0x1fab)	{ z80ctc_w(space->machine->device("ctc"), offset-0x1fa8,data); }
-	else if(offset == 0x1fb0)						{ x1turbo_pal_w(space,0,data); }
-	else if(offset >= 0x1fb8 && offset <= 0x1fbf)	{ x1turbo_txpal_w(space,offset-0x1fb8,data); }
-	else if(offset == 0x1fc0)						{ x1turbo_txdisp_w(space,0,data); }
-	else if(offset == 0x1fc5)						{ x1turbo_gfxpal_w(space,0,data); }
+	else if(offset == 0x1fb0)						{ x1turbo_pal_w(space,0,data); } // Z only!
+	else if(offset >= 0x1fb8 && offset <= 0x1fbf)	{ x1turbo_txpal_w(space,offset-0x1fb8,data); } //Z only!
+	else if(offset == 0x1fc0)						{ x1turbo_txdisp_w(space,0,data); } //Z only!
+	else if(offset == 0x1fc1)						{ printf("Z image capturing access %02x\n",data); } // Z only!
+	else if(offset == 0x1fc2)						{ printf("Z mosaic effect access %02x\n",data); } // Z only!
+	else if(offset == 0x1fc3)						{ printf("Z Chroma key access %02x\n",data); } // Z only!
+	else if(offset == 0x1fc4)						{ printf("Z Extra scroll config access %02x\n",data); } // Z only!
+	else if(offset == 0x1fc5)						{ x1turbo_gfxpal_w(space,0,data); } // Z only!
 	else if(offset >= 0x1fd0 && offset <= 0x1fdf)	{ x1_scrn_w(space,0,data); }
 	else if(offset == 0x1fe0)						{ x1_blackclip_w(space,0,data); }
 	else if(offset >= 0x2000 && offset <= 0x2fff)	{ state->colorram[offset-0x2000] = data; }
@@ -1538,10 +1556,10 @@ static READ8_DEVICE_HANDLER( x1_portb_r )
     -x-- ---- "sub cpu ibf"
     --x- ---- "sub cpu obf"
     ---x ---- ROM/RAM flag (0=ROM, 1=RAM)
-    ---- x--- "busy"
+    ---- x--- "busy" <- allow printer data output
     ---- -x-- "v sync"
     ---- --x- "cmt read"
-    ---- ---x "cmt test" (active low)
+    ---- ---x "cmt test" (active low) <- actually this is "Sub CPU detected BREAK"
     */
 	UINT8 dat = 0;
 	state->vdisp = (device->machine->primary_screen->vpos() < 200) ? 0x80 : 0x00;
@@ -1571,9 +1589,11 @@ static READ8_DEVICE_HANDLER( x1_portc_r )
 	x1_state *state = device->machine->driver_data<x1_state>();
 	//printf("PPI Port C read\n");
 	/*
-    x--x xxxx <unknown>
+    x--- ---- Printer port output
     -x-- ---- 320 mode (r/w)
     --x- ---- i/o mode (r/w)
+    ---x ---- smooth scroll enabled (?)
+	---- ---x cassette output data
     */
 	return (state->io_sys & 0x9f) | state->hres_320 | ~state->io_switch;
 }
@@ -1910,6 +1930,36 @@ static INPUT_PORTS_START( x1 )
 	PORT_BIT(0x10000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("PF10") PORT_CODE(KEYCODE_F10)
 
 	#endif
+INPUT_PORTS_END
+
+INPUT_PORTS_START( x1turbo )
+	PORT_INCLUDE( x1 )
+
+	PORT_START("X1TURBO_DSW")
+	PORT_DIPNAME( 0x01, 0x01, "Interlace mode" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0e, 0x00, "Default Boot Device" ) // this selects what kind of device is loaded at start-up
+	PORT_DIPSETTING(    0x00, "5/3-inch 2D" )
+	PORT_DIPSETTING(    0x02, "5/3-inch 2DD" )
+	PORT_DIPSETTING(    0x04, "5/3-inch 2HD" )
+	PORT_DIPSETTING(    0x06, "5/3-inch 2DD (IBM)" )
+	PORT_DIPSETTING(    0x08, "8-inch 2D256" )
+	PORT_DIPSETTING(    0x0a, "8-inch 2D256 (IBM)" )
+	PORT_DIPSETTING(    0x0c, "8-inch 1S128 (IBM)" )
+	PORT_DIPSETTING(    0x0e, "SASI HDD" )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) ) //this is a port conditional of some sort ...
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 /*************************************
@@ -2462,9 +2512,9 @@ static DRIVER_INIT( kanji )
 }
 
 
-/*    YEAR  NAME       PARENT  COMPAT   MACHINE  INPUT  INIT  COMPANY   FULLNAME      FLAGS */
-COMP( 1982, x1,        0,      0,       x1,      x1,    0,    "Sharp",  "X1 (CZ-800C)",         0)
-COMP( 1986, x1twin,    x1,     0,       x1, 	 x1,    kanji,"Sharp",  "X1 Twin (CZ-830C)",    GAME_NOT_WORKING)
-COMP( 1984, x1turbo,   x1,     0,       x1turbo, x1,    kanji,"Sharp",  "X1 Turbo (CZ-850C)",   GAME_NOT_WORKING) //model 10
-COMP( 1985, x1turbo40, x1,     0,       x1turbo, x1,    kanji,"Sharp",  "X1 Turbo (CZ-862C)",   GAME_NOT_WORKING) //model 40
+/*    YEAR  NAME       PARENT  COMPAT   MACHINE  INPUT       INIT   COMPANY   FULLNAME      FLAGS */
+COMP( 1982, x1,        0,      0,       x1,      x1,         0,    "Sharp",  "X1 (CZ-800C)",         0)
+COMP( 1986, x1twin,    x1,     0,       x1, 	 x1,         kanji,"Sharp",  "X1 Twin (CZ-830C)",    GAME_NOT_WORKING)
+COMP( 1984, x1turbo,   x1,     0,       x1turbo, x1turbo,    kanji,"Sharp",  "X1 Turbo (CZ-850C)",   GAME_NOT_WORKING) //model 10
+COMP( 1985, x1turbo40, x1,     0,       x1turbo, x1turbo,    kanji,"Sharp",  "X1 Turbo (CZ-862C)",   GAME_NOT_WORKING) //model 40
 // x1turboz  /* 1986 Sharp X1 TurboZ  */
