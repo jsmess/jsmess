@@ -367,7 +367,7 @@ static CPU_RESET( arm7500 )
 	arm7_core_reset(device);
 
 	cpustate->archRev = 3;	// ARMv3
-	cpustate->archFlags = 0;
+	cpustate->archFlags = eARM_ARCHFLAGS_MODE26;
 }
 
 static CPU_RESET( arm9 )
