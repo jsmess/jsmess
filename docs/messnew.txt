@@ -33,6 +33,9 @@ System Driver Changes:
   "2 in 1 - Dragon Ball Z 1 and 2", "Aggressive Inline", "Bibi und Tina"
   and probably other games too. [Tim Schuerewegen]
 
+- [GBA] Implemented an undefined ARM7 THUMB instruction used by "Moto GP".
+  [Tim Schuerewegen]
+
 - [PIPPIN] Added pre release rom
 
 - [PV1000] 4 new cartridge dumps for the software list.  [anondumper]
