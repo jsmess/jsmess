@@ -685,8 +685,8 @@ static READ32_HANDLER(towns_sys5e8_r)
 		case 0x00:
 			if(ACCESSING_BITS_0_7)
 			{
-				logerror("SYS: read RAM size port\n");
-				return 0x06;  // 6MB is standard for the Marty
+				logerror("SYS: read RAM size port (%i)\n",ram_get_size(state->ram));
+				return ram_get_size(state->ram)/1048576;
 			}
 			break;
 		case 0x01:
@@ -1958,7 +1958,7 @@ static ADDRESS_MAP_START(towns_mem, ADDRESS_SPACE_PROGRAM, 32)
   AM_RANGE(0x000da000, 0x000effff) AM_RAM //READWRITE(SMH_BANK(11),SMH_BANK(11))
   AM_RANGE(0x000f0000, 0x000f7fff) AM_RAM //READWRITE(SMH_BANK(12),SMH_BANK(12))
   AM_RANGE(0x000f8000, 0x000fffff) AM_READ_BANK("bank11") AM_WRITE_BANK("bank12")
-  AM_RANGE(0x00100000, 0x005fffff) AM_RAM  // some extra RAM
+//  AM_RANGE(0x00100000, 0x005fffff) AM_RAM  // some extra RAM
   AM_RANGE(0x80000000, 0x8007ffff) AM_READWRITE8(towns_gfx_high_r,towns_gfx_high_w,0xffffffff) AM_MIRROR(0x180000) // VRAM
   AM_RANGE(0x81000000, 0x8101ffff) AM_READWRITE8(towns_spriteram_r,towns_spriteram_w,0xffffffff) // Sprite RAM
   AM_RANGE(0xc2000000, 0xc207ffff) AM_ROM AM_REGION("user",0x000000)  // OS ROM
@@ -1982,7 +1982,7 @@ static ADDRESS_MAP_START(marty_mem, ADDRESS_SPACE_PROGRAM, 32)
   AM_RANGE(0x000da000, 0x000effff) AM_RAM //READWRITE(SMH_BANK(11),SMH_BANK(11))
   AM_RANGE(0x000f0000, 0x000f7fff) AM_RAM //READWRITE(SMH_BANK(12),SMH_BANK(12))
   AM_RANGE(0x000f8000, 0x000fffff) AM_READ_BANK("bank11") AM_WRITE_BANK("bank12")
-  AM_RANGE(0x00100000, 0x005fffff) AM_RAM  // some extra RAM - the Marty has 6MB RAM (not upgradable)
+//  AM_RANGE(0x00100000, 0x005fffff) AM_RAM  // some extra RAM - the Marty has 6MB RAM (not upgradable)
   AM_RANGE(0x00600000, 0x0067ffff) AM_ROM AM_REGION("user",0x000000)  // OS
   AM_RANGE(0x00680000, 0x0087ffff) AM_ROM AM_REGION("user",0x280000)  // EX ROM
   AM_RANGE(0x00a00000, 0x00a7ffff) AM_READWRITE8(towns_gfx_high_r,towns_gfx_high_w,0xffffffff) AM_MIRROR(0x180000) // VRAM
@@ -2279,6 +2279,8 @@ static DRIVER_INIT( towns )
 	state->towns_cd.read_timer = timer_alloc(machine,towns_cdrom_read_byte,(void*)machine->device("dma_1"));
 
 	cpu_set_irq_callback(machine->device("maincpu"), towns_irq_callback);
+	memory_install_ram(cputag_get_address_space(machine,"maincpu",ADDRESS_SPACE_PROGRAM),0x100000,ram_get_size(machine->device(RAM_TAG))-1,0xffffffff,0,NULL);
+
 }
 
 static DRIVER_INIT( marty )
@@ -2307,6 +2309,7 @@ static MACHINE_RESET( towns )
 	state->hd2 = machine->device("harddisk2");
 	state->hd3 = machine->device("harddisk3");
 	state->hd4 = machine->device("harddisk4");
+	state->ram = machine->device(RAM_TAG);
 	state->ftimer = 0x00;
 	state->nmi_mask = 0x00;
 	state->compat_mode = 0x00;
@@ -2511,6 +2514,7 @@ static MACHINE_CONFIG_START( towns, towns_state )
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("6M")
+	MCFG_RAM_EXTRA_OPTIONS("2M,4M,8M,16M,32M,64M,96M")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( marty, towns )
@@ -2519,6 +2523,9 @@ static MACHINE_CONFIG_DERIVED( marty, towns )
 	MCFG_CPU_PROGRAM_MAP(marty_mem)
 	MCFG_CPU_IO_MAP(towns_io)
 	MCFG_CPU_VBLANK_INT("screen", towns_vsync_irq)
+
+	MCFG_RAM_MODIFY(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("6M")
 MACHINE_CONFIG_END
 
 /* ROM definitions */

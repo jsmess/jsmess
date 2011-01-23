@@ -145,6 +145,7 @@ class towns_state : public driver_device
 	device_t* hd2;
 	device_t* hd3;
 	device_t* hd4;
+	device_t* ram;
 	UINT32 kb_prev[4];
 	UINT8 prev_pad_mask;
 	UINT8 prev_x;
