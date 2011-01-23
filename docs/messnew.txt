@@ -23,6 +23,9 @@ System Driver Changes:
 ----------------------
 - [ADAM] Added dumps of the internal M6801 ROMs. [KevinP]
 
+- [ADAM] Rewrote driver to use the M6801 CPUs. Currently the only working
+  peripheral is the keyboard. [Curt Coder]
+
 - [BBC] Made the SAA505x implementation a device.  [Atari Ace]
 
 - [GBA] Fixed EEPROM detection for "Banjo-Kazooie" and "Custom Robo GX".

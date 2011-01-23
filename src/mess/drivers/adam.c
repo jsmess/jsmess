@@ -1,589 +1,1313 @@
 /***************************************************************************
 
-Full schematics of anything Adam at http://drushel.cwru.edu/schematics/
+    Coleco Adam
 
-  adam.c
+	The Coleco ADAM is a Z80-based micro with all peripheral devices
+	attached to an internal serial serial bus (ADAMnet) managed by 6801
+	microcontrollers (processor, internal RAM, internal ROM, serial port).Each
+	device had its own 6801, and the ADAMnet was managed by a "master" 6801 on
+	the ADAM motherboard.  Each device was allotted a block of 21 bytes in Z80
+	address space; device control was accomplished by poking function codes into
+	the first byte of each device control block (hereafter DCB) after setup of
+	other DCB locations with such things as:  buffer address in Z80 space, # of
+	bytes to transfer, block # to access if it was a block device like a tape
+	or disk drive, etc.  The master 6801 would interpret this data, and pass
+	along internal ADAMnet requests to the desired peripheral, which would then
+	send/receive its data and return the status of the operation.  The status
+	codes were left in the same byte of the DCB as the function request, and
+	certain bits of the status byte would reflect done/working on it/error/
+	not present, and error codes were left in another DCB byte for things like
+	CRC error, write protected disk, missing block, etc.
 
-  Driver file to handle emulation of the ColecoAdam.
+	ADAM's ROM operating system, EOS (Elementary OS), was constructed
+	similar to CP/M in that it provided both a filesystem (like BDOS) and raw
+	device interface (BIOS).  At the file level, sequential files could be
+	created, opened, read, written, appended, closed, and deleted.  Forward-
+	only random access was implemented (you could not move the R/W pointer
+	backward, except clear to the beginning!), and all files had to be
+	contiguous on disk/tape.  Directories could be initialized or searched
+	for a matching filename (no wildcards allowed).  At the device level,
+	individual devices could be read/written by block (for disks/tapes) or
+	character-by-character (for printer, keyboard, and a prototype serial
+	board which was never released).  Devices could be checked for their
+	ADAMnet status, and reset if necessary.  There was no function provided
+	to do low-level formatting of disks/tapes.
 
-  Marat Fayzullin (ColEm source)
-  Marcel de Kogel (AdamEm source)
-  Mike Balfour
-  Ben Bruscella
-  Sean Young
-  Jose Moya
+	 At system startup, the EOS was loaded from ROM into the highest
+	8K of RAM, a function call made to initialize the ADAMnet, and then
+	any disks or tapes were checked for a boot medium; if found, block 0 of
+	the medium was loaded in, and a jump made to the start of the boot code.
+	The boot block would take over loading in the rest of the program.  If no
+	boot media were found, a jump would be made to a ROM word processor (called
+	SmartWriter).
 
+	 Coleco designed the ADAMnet to have up to 15 devices attached.
+	Before they went bankrupt, Coleco had released a 64K memory expander and
+	a 300-baud internal modem, but surprisingly neither of these was an
+	ADAMnet device.  Disassembly of the RAMdisk drivers in ADAM CP/M 2.2, and
+	of the ADAMlink terminal program revealed that these were simple port I/O
+	devices, banks of XRAM being accessed by a special memory switch port not
+	documented as part of the EOS.  The modem did not even use the interrupt
+	capabilities of the Z80--it was simply polled.  A combination serial/
+	parallel interface, each port of which *was* an ADAMnet device, reached the
+	prototype stage, as did a 5MB hard disk, but neither was ever released to
+	the public.  (One prototype serial/parallel board is still in existence,
+	but the microcontroller ROMs have not yet been succcessfully read.)  So
+	when Coleco finally bailed out of the computer business, a maximum ADAM
+	system consisted of a daisy wheel printer, a keyboard, 2 tape drives, and
+	2 disk drives (all ADAMnet devices), a 64K expander and a 300-baud modem
+	(which were not ADAMnet devices).
 
-The Coleco ADAM is a Z80-based micro with all peripheral devices
-attached to an internal serial serial bus (ADAMnet) managed by 6801
-microcontrollers (processor, internal RAM, internal ROM, serial port).Each
-device had its own 6801, and the ADAMnet was managed by a "master" 6801 on
-the ADAM motherboard.  Each device was allotted a block of 21 bytes in Z80
-address space; device control was accomplished by poking function codes into
-the first byte of each device control block (hereafter DCB) after setup of
-other DCB locations with such things as:  buffer address in Z80 space, # of
-bytes to transfer, block # to access if it was a block device like a tape
-or disk drive, etc.  The master 6801 would interpret this data, and pass
-along internal ADAMnet requests to the desired peripheral, which would then
-send/receive its data and return the status of the operation.  The status
-codes were left in the same byte of the DCB as the function request, and
-certain bits of the status byte would reflect done/working on it/error/
-not present, and error codes were left in another DCB byte for things like
-CRC error, write protected disk, missing block, etc.
+	 Third-party vendors reverse-engineered the modem (which had a
+	2651 UART at its heart) and made a popular serial interface board.  It was
+	not an ADAMnet device, however, because nobody knew how to make a new ADAMnet
+	device (no design specs were ever released), and the 6801 microcontrollers
+	had unreadable mask ROMs.  Disk drives, however, were easily upgraded from
+	160K to as high as 1MB because, for some unknown reason, the disk controller
+	boards used a separate microprocessor and *socketed* EPROM (which was
+	promptly disassembled and reworked).  Hard drives were cobbled together from
+	a Kaypro-designed board and accessed as standard I/O port devices.  A parallel
+	interface card was similarly set up at its own I/O port.
 
-ADAM's ROM operating system, EOS (Elementary OS), was constructed
-similar to CP/M in that it provided both a filesystem (like BDOS) and raw
-device interface (BIOS).  At the file level, sequential files could be
-created, opened, read, written, appended, closed, and deleted.  Forward-
-only random access was implemented (you could not move the R/W pointer
-backward, except clear to the beginning!), and all files had to be
-contiguous on disk/tape.  Directories could be initialized or searched
-for a matching filename (no wildcards allowed).  At the device level,
-individual devices could be read/written by block (for disks/tapes) or
-character-by-character (for printer, keyboard, and a prototype serial
-board which was never released).  Devices could be checked for their
-ADAMnet status, and reset if necessary.  There was no function provided
-to do low-level formatting of disks/tapes.
+	  Devices (15 max):
+		Device 0 = Master 6801 ADAMnet controller (uses the adam_pcb as DCB)
+		Device 1 = Keyboard
+		Device 2 = ADAM printer
+		Device 3 = Copywriter (projected)
+		Device 4 = Disk drive 1
+		Device 5 = Disk drive 2
+		Device 6 = Disk drive 3 (third party)
+		Device 7 = Disk drive 4 (third party)
+		Device 8 = Tape drive 1
+		Device 9 = Tape drive 3 (projected)
+		Device 10 = Unused
+		Device 11 = Non-ADAMlink modem
+		Device 12 = Hi-resolution monitor
+		Device 13 = ADAM parallel interface (never released)
+		Device 14 = ADAM serial interface (never released)
+		Device 15 = Gateway
+		Device 24 = Tape drive 2 (share DCB with Tape1)
+		Device 25 = Tape drive 4 (projected, may have share DCB with Tape3)
+		Device 26 = Expansion RAM disk drive (third party ID, not used by Coleco)
 
- At system startup, the EOS was loaded from ROM into the highest
-8K of RAM, a function call made to initialize the ADAMnet, and then
-any disks or tapes were checked for a boot medium; if found, block 0 of
-the medium was loaded in, and a jump made to the start of the boot code.
-The boot block would take over loading in the rest of the program.  If no
-boot media were found, a jump would be made to a ROM word processor (called
-SmartWriter).
+	  Terminology:
+		EOS = Elementary Operating System
+		DCB = Device Control Block Table (21bytes each DCB, DCB+16=dev#, DCB+0=Status Byte) (0xFD7C)
 
- Coleco designed the ADAMnet to have up to 15 devices attached.
-Before they went bankrupt, Coleco had released a 64K memory expander and
-a 300-baud internal modem, but surprisingly neither of these was an
-ADAMnet device.  Disassembly of the RAMdisk drivers in ADAM CP/M 2.2, and
-of the ADAMlink terminal program revealed that these were simple port I/O
-devices, banks of XRAM being accessed by a special memory switch port not
-documented as part of the EOS.  The modem did not even use the interrupt
-capabilities of the Z80--it was simply polled.  A combination serial/
-parallel interface, each port of which *was* an ADAMnet device, reached the
-prototype stage, as did a 5MB hard disk, but neither was ever released to
-the public.  (One prototype serial/parallel board is still in existence,
-but the microcontroller ROMs have not yet been succcessfully read.)  So
-when Coleco finally bailed out of the computer business, a maximum ADAM
-system consisted of a daisy wheel printer, a keyboard, 2 tape drives, and
-2 disk drives (all ADAMnet devices), a 64K expander and a 300-baud modem
-(which were not ADAMnet devices).
+			   0     Status byte
+			 1-2     Buffer start address (lobyte, hibyte)
+			 3-4     Buffer length (lobyte, hibyte)
+			 5-8     Block number accessed (loword, hiword in lobyte, hibyte format)
+			   9     High nibble of device number
+			10-15    Always zero (unknown purpose)
+			  16     Low nibble of device number
+			17-18    Maximum block length (lobyte, hibyte)
+			  19     Device type (0 for block device, 1 for character device)
+			  20     Node type
 
- Third-party vendors reverse-engineered the modem (which had a
-2651 UART at its heart) and made a popular serial interface board.  It was
-not an ADAMnet device, however, because nobody knew how to make a new ADAMnet
-device (no design specs were ever released), and the 6801 microcontrollers
-had unreadable mask ROMs.  Disk drives, however, were easily upgraded from
-160K to as high as 1MB because, for some unknown reason, the disk controller
-boards used a separate microprocessor and *socketed* EPROM (which was
-promptly disassembled and reworked).  Hard drives were cobbled together from
-a Kaypro-designed board and accessed as standard I/O port devices.  A parallel
-interface card was similarly set up at its own I/O port.
-
-  Devices (15 max):
-    Device 0 = Master 6801 ADAMnet controller (uses the adam_pcb as DCB)
-    Device 1 = Keyboard
-    Device 2 = ADAM printer
-    Device 3 = Copywriter (projected)
-    Device 4 = Disk drive 1
-    Device 5 = Disk drive 2
-    Device 6 = Disk drive 3 (third party)
-    Device 7 = Disk drive 4 (third party)
-    Device 8 = Tape drive 1
-    Device 9 = Tape drive 3 (projected)
-    Device 10 = Unused
-    Device 11 = Non-ADAMlink modem
-    Device 12 = Hi-resolution monitor
-    Device 13 = ADAM parallel interface (never released)
-    Device 14 = ADAM serial interface (never released)
-    Device 15 = Gateway
-    Device 24 = Tape drive 2 (share DCB with Tape1)
-    Device 25 = Tape drive 4 (projected, may have share DCB with Tape3)
-    Device 26 = Expansion RAM disk drive (third party ID, not used by Coleco)
-
-  Terminology:
-    EOS = Elementary Operating System
-    DCB = Device Control Block Table (21bytes each DCB, DCB+16=dev#, DCB+0=Status Byte) (0xFD7C)
-
-           0     Status byte
-         1-2     Buffer start address (lobyte, hibyte)
-         3-4     Buffer length (lobyte, hibyte)
-         5-8     Block number accessed (loword, hiword in lobyte, hibyte format)
-           9     High nibble of device number
-        10-15    Always zero (unknown purpose)
-          16     Low nibble of device number
-        17-18    Maximum block length (lobyte, hibyte)
-          19     Device type (0 for block device, 1 for character device)
-          20     Node type
-
-        - Writing to byte0 requests the following operations:
-            1     Return current status
-            2     Soft reset
-            3     Write
-            4     Read
+			- Writing to byte0 requests the following operations:
+				1     Return current status
+				2     Soft reset
+				3     Write
+				4     Read
 
 
-    FCB = File Control Block Table (32bytes, 2 max each application) (0xFCB0)
-    OCB = Overlay Control Block Table
-    adam_pcb = Processor Control Block Table, 4bytes (adam_pcb+3 = Number of valid DCBs) (0xFEC0 relocatable), current adam_pcb=[0xFD70]
-            adam_pcb+0 = Status, 0=Request Status of Z80 -> must return 0x81..0x82 to sync Master 6801 clk with Z80 clk
-            adam_pcb+1,adam_pcb+2 = address of adam_pcb start
-            adam_pcb+3 = device #
+		FCB = File Control Block Table (32bytes, 2 max each application) (0xFCB0)
+		OCB = Overlay Control Block Table
+		adam_pcb = Processor Control Block Table, 4bytes (adam_pcb+3 = Number of valid DCBs) (0xFEC0 relocatable), current adam_pcb=[0xFD70]
+				adam_pcb+0 = Status, 0=Request Status of Z80 -> must return 0x81..0x82 to sync Master 6801 clk with Z80 clk
+				adam_pcb+1,adam_pcb+2 = address of adam_pcb start
+				adam_pcb+3 = device #
 
-            - Writing to byte0:
-                1   Synchronize the Z80 clock (should return 0x81)
-                2   Synchronize the Master 6801 clock (should return 0x82)
-                3   Relocate adam_pcb
+				- Writing to byte0:
+					1   Synchronize the Z80 clock (should return 0x81)
+					2   Synchronize the Master 6801 clock (should return 0x82)
+					3   Relocate adam_pcb
 
-            - Status values:
-                0x80 -> Success
-                0x81 -> Z80 clock in sync
-                0x82 -> Master 6801 clock in sync
-                0x83 -> adam_pcb relocated
-                0x9B -> Time Out
+				- Status values:
+					0x80 -> Success
+					0x81 -> Z80 clock in sync
+					0x82 -> Master 6801 clock in sync
+					0x83 -> adam_pcb relocated
+					0x9B -> Time Out
 
-    DEV_ID = Device id
+		DEV_ID = Device id
 
 
-    The ColecoAdam I/O map is contolled by the MIOC (Memory Input Output Controller):
+		The ColecoAdam I/O map is contolled by the MIOC (Memory Input Output Controller):
 
-            20-3F (W) = Adamnet Writes
-            20-3F (R) = Adamnet Reads
+				20-3F (W) = Adamnet Writes
+				20-3F (R) = Adamnet Reads
 
-            42-42 (W) = Expansion RAM page selection, only useful if expansion greater than 64k
+				42-42 (W) = Expansion RAM page selection, only useful if expansion greater than 64k
 
-            40-40 (W) = Printer Data Out
-            40-40 (R) = Printer (Returns 0x41)
+				40-40 (W) = Printer Data Out
+				40-40 (R) = Printer (Returns 0x41)
 
-            5E-5E (RW)= Modem Data I/O
-            5F-5F (RW)= Modem Data Control Status
+				5E-5E (RW)= Modem Data I/O
+				5F-5F (RW)= Modem Data Control Status
 
-            60-7F (W) = Set Memory configuration
-            60-7F (R) = Read Memory configuration
+				60-7F (W) = Set Memory configuration
+				60-7F (R) = Read Memory configuration
 
-            80-9F (W) = Set both controllers to keypad mode
-            80-9F (R) = Not Connected
+				80-9F (W) = Set both controllers to keypad mode
+				80-9F (R) = Not Connected
 
-            A0-BF (W) = Video Chip (TMS9928A), A0=0 -> Write Register 0 , A0=1 -> Write Register 1
-            A0-BF (R) = Video Chip (TMS9928A), A0=0 -> Read Register 0 , A0=1 -> Read Register 1
+				A0-BF (W) = Video Chip (TMS9928A), A0=0 -> Write Register 0 , A0=1 -> Write Register 1
+				A0-BF (R) = Video Chip (TMS9928A), A0=0 -> Read Register 0 , A0=1 -> Read Register 1
 
-            C0-DF (W) = Set both controllers to joystick mode
-            C0-DF (R) = Not Connected
+				C0-DF (W) = Set both controllers to joystick mode
+				C0-DF (R) = Not Connected
 
-            E0-FF (W) = Sound Chip (SN76489A)
-            E0-FF (R) = Read Controller data, A1=0 -> read controller 1, A1=1 -> read controller 2
+				E0-FF (W) = Sound Chip (SN76489A)
+				E0-FF (R) = Read Controller data, A1=0 -> read controller 1, A1=1 -> read controller 2
 
-TO DO:
-    - Improve Keyboard "Simulation" (No ROM dumps available for the keyboard MC6801 AdamNet MCU)
-    - Add Tape "Simulation" (No ROM dumps available for the Tape MC6801 AdamNet MCU)
-    - Add Disc "Simulation" (No ROM dumps available for the Disc MC6801 AdamNet MCU)
-    - Add Full ColecoAdam emulation (every MC6801) if ROM dumps become available.
-        Do you have the ROM dumps?... let us know.
+	http://drushel.cwru.edu/atm/atm.html
 
-***************************************************************************/
+	- fc75 GET_STATUS
+	- fbe7 MMR_MAC
+	- febe MMR_TR_REC
+	- ff0f MMR_TR_TCU
 
+****************************************************************************/
+
+/*
+
+    TODO:
+
+	- special keys
+	- sort out ROMs
+	- tape (DDP)
+	- floppy
+	- printer
+	- SPI
+
+*/
+
+#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "cpu/m6800/m6800.h"
+#include "imagedev/cartslot.h"
+#include "imagedev/cassette.h"
+#include "imagedev/flopdrv.h"
+#include "machine/coleco.h"
+#include "machine/ram.h"
+#include "machine/wd17xx.h"
 #include "sound/sn76496.h"
 #include "video/tms9928a.h"
 #include "includes/adam.h"
-#include "cpu/m6800/m6800.h"
-#include "imagedev/cartslot.h"
-#include "imagedev/flopdrv.h"
-#include "formats/adam_dsk.h"
 
-static ADDRESS_MAP_START( adam_mem, ADDRESS_SPACE_PROGRAM, 8)
-	AM_RANGE(0x00000, 0x01fff) AM_READ_BANK("bank1") AM_WRITE_BANK("bank6")
-	AM_RANGE(0x02000, 0x03fff) AM_READ_BANK("bank2") AM_WRITE_BANK("bank7")
-	AM_RANGE(0x04000, 0x05fff) AM_READ_BANK("bank3") AM_WRITE_BANK("bank8")
-	AM_RANGE(0x06000, 0x07fff) AM_READ_BANK("bank4") AM_WRITE_BANK("bank9")
-	AM_RANGE(0x08000, 0x0ffff) AM_READ_BANK("bank5") AM_WRITE( adam_common_writes_w )
+
+
+//**************************************************************************
+//	MACROS / CONSTANTS
+//**************************************************************************
+
+enum
+{
+	LO_SMARTWRITER = 0,
+	LO_INTERNAL_RAM,
+	LO_RAM_EXPANSION,
+	LO_OS7_ROM_INTERNAL_RAM
+};
+
+
+enum
+{
+	HI_INTERNAL_RAM = 0,
+	HI_ROM_EXPANSION,
+	HI_RAM_EXPANSION,
+	HI_CARTRIDGE_ROM
+};
+
+
+enum
+{
+	ADAMNET_MASTER = 0,
+	ADAMNET_KEYBOARD,
+	ADAMNET_DDP,
+	ADAMNET_PRINTER
+};
+
+
+
+//**************************************************************************
+//	MEMORY BANKING
+//**************************************************************************
+
+//-------------------------------------------------
+//  bankswitch - 
+//-------------------------------------------------
+
+void adam_state::bankswitch()
+{
+	address_space *program = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);
+	UINT8 *ram = ram_get_ptr(m_ram);
+
+	switch (m_mioc & 0x03)
+	{
+	case LO_SMARTWRITER:
+		if (BIT(m_adamnet, 1))
+		{
+			memory_unmap_readwrite(program, 0x0000, 0x5fff, 0, 0);
+			memory_install_rom(program, 0x6000, 0x7fff, 0, 0, machine->region("eos")->base());
+		}
+		else
+		{
+			memory_install_rom(program, 0x0000, 0x7fff, 0, 0, machine->region("wp")->base());
+		}
+		break;
+
+	case LO_INTERNAL_RAM:
+		memory_install_ram(program, 0x0000, 0x7fff, 0, 0, ram);
+		break;
+
+	case LO_RAM_EXPANSION:
+		if (ram_get_size(m_ram) > 64 * 1024)
+			memory_install_ram(program, 0x0000, 0x7fff, 0, 0, ram + 0x10000);
+		else
+			memory_unmap_readwrite(program, 0x0000, 0x7fff, 0, 0);
+		break;
+
+	case LO_OS7_ROM_INTERNAL_RAM:
+		memory_install_rom(program, 0x0000, 0x1fff, 0, 0, machine->region("os7")->base());
+		memory_install_ram(program, 0x2000, 0x7fff, 0, 0, ram + 0x2000);
+		break;
+	}
+
+	switch ((m_mioc >> 2) & 0x03)
+	{
+	case HI_INTERNAL_RAM:
+		memory_install_ram(program, 0x8000, 0xffff, 0, 0, ram + 0x8000);
+		break;
+
+	case HI_ROM_EXPANSION:
+		memory_install_rom(program, 0x8000, 0xffff, 0, 0, machine->region("xrom")->base());
+		break;
+
+	case HI_RAM_EXPANSION:
+		if (ram_get_size(m_ram) > 64 * 1024)
+			memory_install_ram(program, 0x8000, 0xffff, 0, 0, ram + 0x18000);
+		else
+			memory_unmap_readwrite(program, 0x8000, 0xffff, 0, 0);
+		break;
+
+	case HI_CARTRIDGE_ROM:
+		memory_install_rom(program, 0x8000, 0xffff, 0, 0, machine->region("cart")->base());
+		break;
+	}
+}
+
+
+//-------------------------------------------------
+//  mioc_r - 
+//-------------------------------------------------
+
+READ8_MEMBER( adam_state::mioc_r )
+{
+	return m_mioc & 0x0f;
+}
+
+
+//-------------------------------------------------
+//  mioc_w - 
+//-------------------------------------------------
+
+WRITE8_MEMBER( adam_state::mioc_w )
+{
+	/*
+
+		bit		description
+		
+		0		Lower memory option 0
+		1		Lower memory option 1
+		2		Upper memory option 0
+		3		Upper memory option 1
+		4		
+		5		
+		6		
+		7		
+
+	*/
+
+	m_mioc = data;
+
+	bankswitch();
+}
+
+
+
+//**************************************************************************
+//	ADAMNET
+//**************************************************************************
+
+//-------------------------------------------------
+//  adamnet_txd_w - 
+//-------------------------------------------------
+
+void adam_state::adamnet_txd_w(int device, int state)
+{
+	m_txd[device] = state;
+
+	m_rxd = 1;
+
+	for (int i = 0; i < 4; i++)
+	{
+		if (!m_txd[i]) m_rxd = 0;
+	}
+}
+
+
+//-------------------------------------------------
+//  adamnet_r - 
+//-------------------------------------------------
+
+READ8_MEMBER( adam_state::adamnet_r )
+{
+	return m_adamnet & 0x0f;
+}
+
+
+//-------------------------------------------------
+//  adamnet_w - 
+//-------------------------------------------------
+
+WRITE8_MEMBER( adam_state::adamnet_w )
+{
+	/*
+
+		bit		description
+		
+		0		Network reset
+		1		EOS enable
+		2		
+		3		
+		4		
+		5		
+		6		
+		7		
+
+	*/
+
+	// network reset
+	if (BIT(m_adamnet, 0) && !BIT(data, 0))
+	{
+		machine->device(M6801_KB_TAG)->reset();
+		machine->device(M6801_DDP_TAG)->reset();
+		machine->device(M6801_PRN_TAG)->reset();
+		//machine->device(M6801_SPI_TAG)->reset();
+	}
+
+	m_adamnet = data;
+
+	bankswitch();
+}
+
+
+//-------------------------------------------------
+//  kb6801_p1_r - 
+//-------------------------------------------------
+
+WRITE8_MEMBER( adam_state::master6801_p1_w )
+{
+	/*
+
+		bit		description
+
+		0		BA8
+		1		BA9
+		2		BA10
+		3		BA11
+		4		BA12
+		5		BA13
+		6		BA14
+		7		BA15
+		
+	*/
+
+	m_ba = (data << 8) | (m_ba & 0xff);
+}
+
+
+//-------------------------------------------------
+//  master6801_p2_r - 
+//-------------------------------------------------
+
+READ8_MEMBER( adam_state::master6801_p2_r )
+{
+	/*
+
+		bit		description
+
+		0		M6801 mode bit 0
+		1		M6801 mode bit 1
+		2		M6801 mode bit 2
+		3		NET RXD
+		4		
+
+	*/
+
+	UINT8 data = M6801_MODE_7;
+
+	// NET RXD
+	data |= m_rxd << 3;
+
+	return data;
+}
+
+
+//-------------------------------------------------
+//  master6801_p2_w - 
+//-------------------------------------------------
+
+WRITE8_MEMBER( adam_state::master6801_p2_w )
+{
+	/*
+
+		bit		description
+
+		0		_DMA
+		1		
+		2		_BWR
+		3		
+		4		NET TXD
+
+	*/
+
+	// DMA
+	m_dma = BIT(data, 0);
+
+	// write
+	m_bwr = BIT(data, 2);
+
+	// NET TXD
+	adamnet_txd_w(ADAMNET_MASTER, BIT(data, 4));
+}
+
+
+//-------------------------------------------------
+//  master6801_p3_r - 
+//-------------------------------------------------
+
+READ8_MEMBER( adam_state::master6801_p3_r )
+{
+	/*
+
+		bit		description
+
+		0		BD0
+		1		BD1
+		2		BD2
+		3		BD3
+		4		BD4
+		5		BD5
+		6		BD6
+		7		BD7
+		
+	*/
+
+	return m_data_out;
+}
+
+
+//-------------------------------------------------
+//  master6801_p3_w - 
+//-------------------------------------------------
+
+WRITE8_MEMBER( adam_state::master6801_p3_w )
+{
+	/*
+
+		bit		description
+
+		0		BD0
+		1		BD1
+		2		BD2
+		3		BD3
+		4		BD4
+		5		BD5
+		6		BD6
+		7		BD7
+		
+	*/
+
+	m_data_in = data;
+}
+
+
+//-------------------------------------------------
+//  master6801_p4_w - 
+//-------------------------------------------------
+
+WRITE8_MEMBER( adam_state::master6801_p4_w )
+{
+	/*
+
+		bit		description
+
+		0		BA0
+		1		BA1
+		2		BA2
+		3		BA3
+		4		BA4
+		5		BA5
+		6		BA6
+		7		BA7
+		
+	*/
+
+	m_ba = (m_ba & 0xff00) | data;
+}
+
+
+//-------------------------------------------------
+//  kb6801_p1_r - 
+//-------------------------------------------------
+
+READ8_MEMBER( adam_state::kb6801_p1_r )
+{
+	/*
+
+		bit		description
+
+		0		X0
+		1		X1
+		2		X2
+		3		X3
+		4		X4
+		5		X5
+		6		X6
+		7		X7
+		
+	*/
+
+	UINT8 data = 0xff;
+
+	if (!BIT(m_key_y, 0)) data &= input_port_read(machine, "Y0");
+	if (!BIT(m_key_y, 1)) data &= input_port_read(machine, "Y1");
+	if (!BIT(m_key_y, 2)) data &= input_port_read(machine, "Y2");
+	if (!BIT(m_key_y, 3)) data &= input_port_read(machine, "Y3");
+	if (!BIT(m_key_y, 4)) data &= input_port_read(machine, "Y4");
+	if (!BIT(m_key_y, 5)) data &= input_port_read(machine, "Y5");
+	if (!BIT(m_key_y, 6)) data &= input_port_read(machine, "Y6");
+	if (!BIT(m_key_y, 7)) data &= input_port_read(machine, "Y7");
+	if (!BIT(m_key_y, 8)) data &= input_port_read(machine, "Y8");
+	if (!BIT(m_key_y, 9)) data &= input_port_read(machine, "Y9");
+	if (!BIT(m_key_y, 10)) data &= input_port_read(machine, "Y10");
+	if (!BIT(m_key_y, 11)) data &= input_port_read(machine, "Y11");
+	if (!BIT(m_key_y, 12)) data &= input_port_read(machine, "Y12");
+
+	return data;
+}
+
+
+//-------------------------------------------------
+//  kb6801_p2_r - 
+//-------------------------------------------------
+
+READ8_MEMBER( adam_state::kb6801_p2_r )
+{
+	/*
+
+		bit		description
+
+		0		mode bit 0
+		1		mode bit 1
+		2		mode bit 2
+		3		NET RXD
+		4		NET TXD
+
+	*/
+
+	UINT8 data = M6801_MODE_7;
+
+	// NET RXD
+	data |= m_rxd << 3;
+
+	return data;
+}
+
+
+//-------------------------------------------------
+//  kb6801_p2_w - 
+//-------------------------------------------------
+
+WRITE8_MEMBER( adam_state::kb6801_p2_w )
+{
+	/*
+
+		bit		description
+
+		0		mode bit 0
+		1		mode bit 1
+		2		mode bit 2
+		3		NET RXD
+		4		NET TXD
+
+	*/
+
+	adamnet_txd_w(ADAMNET_KEYBOARD, BIT(data, 4));
+}
+
+
+//-------------------------------------------------
+//  kb6801_p3_r - 
+//-------------------------------------------------
+
+READ8_MEMBER( adam_state::kb6801_p3_r )
+{
+	return 0xff;
+}
+
+
+//-------------------------------------------------
+//  kb6801_p3_w - 
+//-------------------------------------------------
+
+WRITE8_MEMBER( adam_state::kb6801_p3_w )
+{
+	/*
+
+		bit		description
+
+		0		Y0
+		1		Y1
+		2		Y2
+		3		Y3
+		4		Y4
+		5		Y5
+		6		Y6
+		7		Y7
+
+	*/
+
+	m_key_y = (m_key_y & 0x1f00) | data;
+}
+
+
+//-------------------------------------------------
+//  kb6801_p4_r - 
+//-------------------------------------------------
+
+READ8_MEMBER( adam_state::kb6801_p4_r )
+{
+	return 0xff;
+}
+
+
+//-------------------------------------------------
+//  kb6801_p4_w - 
+//-------------------------------------------------
+
+WRITE8_MEMBER( adam_state::kb6801_p4_w )
+{
+	/*
+
+		bit		description
+
+		0		Y8
+		1		Y9
+		2		Y10
+		3		Y11
+		4		Y12
+		5		
+		6		
+		7		
+
+	*/
+
+	m_key_y = ((data & 0x1f) << 8) | (m_key_y & 0xff);
+}
+
+
+//-------------------------------------------------
+//  ddp6801_p1_w - 
+//-------------------------------------------------
+
+WRITE8_MEMBER( adam_state::ddp6801_p1_w )
+{
+	/*
+
+		bit		description
+
+		0		SPD SEL (0=20 ips, 1=80ips)
+		1		STOP0
+		2		STOP1
+		3		_GO FWD
+		4		_GO REV
+		5		BRAKE
+		6		_WR0
+		7		_WR1
+		
+	*/
+}
+
+
+//-------------------------------------------------
+//  ddp6801_p2_r - 
+//-------------------------------------------------
+
+READ8_MEMBER( adam_state::ddp6801_p2_r )
+{
+	/*
+
+		bit		description
+
+		0		mode bit 0
+		1		mode bit 1 / CIP1
+		2		mode bit 2
+		3		NET RXD
+		4		
+
+	*/
+
+	UINT8 data = M6801_MODE_6; // ?
+
+	// NET RXD
+	data |= m_rxd << 3;
+
+	return data;
+}
+
+
+//-------------------------------------------------
+//  ddp6801_p2_w - 
+//-------------------------------------------------
+
+WRITE8_MEMBER( adam_state::ddp6801_p2_w )
+{
+	/*
+
+		bit		description
+
+		0		WRT DATA
+		1		
+		2		TRACK A/B (0=B, 1=A)
+		3		
+		4		NET TXD
+
+	*/
+
+	adamnet_txd_w(ADAMNET_DDP, BIT(data, 4));
+}
+
+
+//-------------------------------------------------
+//  ddp6801_p4_r - 
+//-------------------------------------------------
+
+READ8_MEMBER( adam_state::ddp6801_p4_r )
+{
+	/*
+
+		bit		description
+
+		0		A8
+		1		A9
+		2		A10 (2114 _S)
+		3		MSENSE 0
+		4		MSENSE 1
+		5		CIP0
+		6		RD DATA 0 (always 1)
+		7		RD DATA 1 (data from drives ORed together)
+
+	*/
+
+	return 0x40;
+}
+
+
+//-------------------------------------------------
+//  printer6801_p1_w - 
+//-------------------------------------------------
+
+WRITE8_MEMBER( adam_state::printer6801_p1_w )
+{
+	/*
+
+		bit		description
+
+		0		M2 phase D
+		1		M2 phase B
+		2		M2 phase C
+		3		M2 phase A
+		4		M3 phase B
+		5		M3 phase D
+		6		M3 phase A
+		7		M3 phase C
+
+	*/
+}
+
+
+//-------------------------------------------------
+//  printer6801_p2_r - 
+//-------------------------------------------------
+
+READ8_MEMBER( adam_state::printer6801_p2_r )
+{
+	/*
+
+		bit		description
+
+		0		mode bit 0
+		1		mode bit 1
+		2		mode bit 2
+		3		NET RXD
+		4		NET TXD
+
+	*/
+
+	UINT8 data = M6801_MODE_7;
+
+	// NET RXD
+	data |= m_rxd << 3;
+
+	return data;
+}
+
+
+//-------------------------------------------------
+//  printer6801_p2_w - 
+//-------------------------------------------------
+
+WRITE8_MEMBER( adam_state::printer6801_p2_w )
+{
+	/*
+
+		bit		description
+
+		0		mode bit 0
+		1		mode bit 1
+		2		mode bit 2
+		3		NET RXD
+		4		NET TXD
+
+	*/
+
+	adamnet_txd_w(ADAMNET_PRINTER, BIT(data, 4));
+}
+
+
+//-------------------------------------------------
+//  printer6801_p3_r - 
+//-------------------------------------------------
+
+READ8_MEMBER( adam_state::printer6801_p3_r )
+{
+	return 0xff;
+}
+
+
+//-------------------------------------------------
+//  printer6801_p4_r - 
+//-------------------------------------------------
+
+READ8_MEMBER( adam_state::printer6801_p4_r )
+{
+	/*
+
+		bit		description
+
+		0		
+		1		
+		2		
+		3		
+		4		left margin
+		5		platen detent
+		6		wheel home
+		7		self-test
+
+	*/
+
+	return 0x80;
+}
+
+
+//-------------------------------------------------
+//  printer6801_p4_w - 
+//-------------------------------------------------
+
+WRITE8_MEMBER( adam_state::printer6801_p4_w )
+{
+	/*
+
+		bit		description
+
+		0		print hammer solenoid
+		1		ribbon advance solenoid
+		2		platen motor advance
+		3		platen motor break
+		4		
+		5		
+		6		
+		7		
+
+	*/
+}
+
+
+
+//**************************************************************************
+//	PADDLES
+//**************************************************************************
+
+//-------------------------------------------------
+//  TIMER_DEVICE_CALLBACK( paddle_tick )
+//-------------------------------------------------
+
+static TIMER_DEVICE_CALLBACK( paddle_tick )
+{
+	adam_state *state = timer.machine->driver_data<adam_state>();
+
+	coleco_scan_paddles(timer.machine, &state->m_joy_status0, &state->m_joy_status1);
+
+    if (state->m_joy_status0 || state->m_joy_status1)
+	{
+		cpu_set_input_line(state->m_maincpu, INPUT_LINE_IRQ0, HOLD_LINE);
+	}
+}
+
+
+//-------------------------------------------------
+//  paddle_w - 
+//-------------------------------------------------
+
+WRITE8_MEMBER( adam_state::paddle_w )
+{
+	m_joy_mode = 0;
+}
+
+
+//-------------------------------------------------
+//  joystick_w - 
+//-------------------------------------------------
+
+WRITE8_MEMBER( adam_state::joystick_w )
+{
+	m_joy_mode = 1;
+}
+
+
+//-------------------------------------------------
+//  input1_r - 
+//-------------------------------------------------
+
+READ8_MEMBER( adam_state::input1_r )
+{
+	return coleco_paddle1_read(machine, m_joy_mode, m_joy_status0);
+}
+
+
+//-------------------------------------------------
+//  input2_r - 
+//-------------------------------------------------
+
+READ8_MEMBER( adam_state::input2_r )
+{
+	return coleco_paddle1_read(machine, m_joy_mode, m_joy_status1);
+}
+
+
+
+//**************************************************************************
+//	ADDRESS MAPS
+//**************************************************************************
+
+//-------------------------------------------------
+//  ADDRESS_MAP( adam_mem )
+//-------------------------------------------------
+
+static ADDRESS_MAP_START( adam_mem, ADDRESS_SPACE_PROGRAM, 8, adam_state )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START ( adam_io, ADDRESS_SPACE_IO, 8)
+
+//-------------------------------------------------
+//  ADDRESS_MAP( adam_io )
+//-------------------------------------------------
+
+static ADDRESS_MAP_START( adam_io, ADDRESS_SPACE_IO, 8, adam_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x20, 0x3F) AM_READWRITE( adamnet_r, adamnet_w )
-	AM_RANGE(0x60, 0x7F) AM_READWRITE( adam_memory_map_controller_r, adam_memory_map_controller_w )
-	AM_RANGE(0x80, 0x9F) AM_WRITE( adam_paddle_toggle_off )
-	AM_RANGE(0xA0, 0xBF) AM_READWRITE( adam_video_r, adam_video_w )
-	AM_RANGE(0xC0, 0xDF) AM_WRITE( adam_paddle_toggle_on )
-	AM_RANGE(0xE0, 0xFF) AM_READ( adam_paddle_r )
-	AM_RANGE(0xE0, 0xFF) AM_DEVWRITE( "sn76489a", sn76496_w )
+//	AM_RANGE(0x1e, 0x1e) Optional Auto Dialer
+	AM_RANGE(0x20, 0x20) AM_MIRROR(0x1f) AM_READWRITE(adamnet_r, adamnet_w)
+//	AM_RANGE(0x40, 0x40) Printer Data
+//	AM_RANGE(0x42, 0x42) Expansion RAM Page Select
+//	AM_RANGE(0x5e, 0x5e) Optional Modem Data I/O
+//	AM_RANGE(0x5f, 0x5f) Optional Modem Control Status
+	AM_RANGE(0x60, 0x60) AM_MIRROR(0x1f) AM_READWRITE(mioc_r, mioc_w)
+	AM_RANGE(0x80, 0x80) AM_MIRROR(0x1f) AM_WRITE(paddle_w)
+	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x1e) AM_READWRITE_LEGACY(TMS9928A_vram_r, TMS9928A_vram_w)
+	AM_RANGE(0xa1, 0xa1) AM_MIRROR(0x1e) AM_READWRITE_LEGACY(TMS9928A_register_r, TMS9928A_register_w)
+	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x1f) AM_WRITE(joystick_w)
+	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0x1f) AM_DEVWRITE_LEGACY(SN76489A_TAG, sn76496_w)
+	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0x1d) AM_READ(input1_r)
+	AM_RANGE(0xe2, 0xe2) AM_MIRROR(0x1d) AM_READ(input2_r)
 ADDRESS_MAP_END
 
-#ifdef UNUSED_FUNCTION
-/*
-I do now know the real memory map of the Master 6801...
-and the 6801 ASM code is a replacement coded for this driver.
-*/
-static ADDRESS_MAP_START( master6801_mem , ADDRESS_SPACE_PROGRAM, 8)
-	AM_RANGE( 0x0100, 0x3fff) AM_ROM /* Replacement Master ROM code */
-	AM_RANGE( 0x4000, 0xffff) AM_READWRITE( master6801_ram_r, master6801_ram_w ) /* RAM Memory shared with Z80 not banked*/
+
+//-------------------------------------------------
+//  ADDRESS_MAP( master6801_mem )
+//-------------------------------------------------
+
+static ADDRESS_MAP_START( master6801_mem, ADDRESS_SPACE_PROGRAM, 8, adam_state )
+	AM_RANGE(0x0000, 0x001f) AM_READWRITE_LEGACY(hd63701_internal_registers_r, hd63701_internal_registers_w)
+	AM_RANGE(0x0080, 0x00ff) AM_RAM
+	AM_RANGE(0xf800, 0xffff) AM_ROM AM_REGION(M6801_MAIN_TAG, 0)
 ADDRESS_MAP_END
-#endif
+
+
+//-------------------------------------------------
+//  ADDRESS_MAP( master6801_io )
+//-------------------------------------------------
+
+static ADDRESS_MAP_START( master6801_io, ADDRESS_SPACE_IO, 8, adam_state )
+	AM_RANGE(M6803_PORT1, M6803_PORT1) AM_WRITE(master6801_p1_w)
+	AM_RANGE(M6803_PORT2, M6803_PORT2) AM_READWRITE(master6801_p2_r, master6801_p2_w)
+	AM_RANGE(M6803_PORT3, M6803_PORT3) AM_READWRITE(master6801_p3_r, master6801_p3_w)
+	AM_RANGE(M6803_PORT4, M6803_PORT4) AM_WRITE(master6801_p4_w)
+ADDRESS_MAP_END
+
+
+//-------------------------------------------------
+//  ADDRESS_MAP( kb6801_mem )
+//-------------------------------------------------
+
+static ADDRESS_MAP_START( kb6801_mem, ADDRESS_SPACE_PROGRAM, 8, adam_state )
+	AM_RANGE(0x0000, 0x001f) AM_READWRITE_LEGACY(hd63701_internal_registers_r, hd63701_internal_registers_w)
+	AM_RANGE(0x0080, 0x00ff) AM_RAM
+	AM_RANGE(0xf800, 0xffff) AM_ROM AM_REGION(M6801_KB_TAG, 0)
+ADDRESS_MAP_END
+
+
+//-------------------------------------------------
+//  ADDRESS_MAP( kb6801_io )
+//-------------------------------------------------
+
+static ADDRESS_MAP_START( kb6801_io, ADDRESS_SPACE_IO, 8, adam_state )
+	AM_RANGE(M6803_PORT1, M6803_PORT1) AM_READ(kb6801_p1_r)
+	AM_RANGE(M6803_PORT2, M6803_PORT2) AM_READWRITE(kb6801_p2_r, kb6801_p2_w)
+	AM_RANGE(M6803_PORT3, M6803_PORT3) AM_READWRITE(kb6801_p3_r, kb6801_p3_w)
+	AM_RANGE(M6803_PORT4, M6803_PORT4) AM_READWRITE(kb6801_p4_r, kb6801_p4_w)
+ADDRESS_MAP_END
+
+
+//-------------------------------------------------
+//  ADDRESS_MAP( ddp6801_mem )
+//-------------------------------------------------
+
+static ADDRESS_MAP_START( ddp6801_mem, ADDRESS_SPACE_PROGRAM, 8, adam_state )
+	AM_RANGE(0x0000, 0x001f) AM_READWRITE_LEGACY(hd63701_internal_registers_r, hd63701_internal_registers_w)
+	AM_RANGE(0x0080, 0x00ff) AM_RAM
+	AM_RANGE(0x0400, 0x07ff) AM_RAM
+	AM_RANGE(0xf800, 0xffff) AM_ROM AM_REGION(M6801_DDP_TAG, 0)
+ADDRESS_MAP_END
+
+
+//-------------------------------------------------
+//  ADDRESS_MAP( ddp6801_io )
+//-------------------------------------------------
+
+static ADDRESS_MAP_START( ddp6801_io, ADDRESS_SPACE_IO, 8, adam_state )
+	AM_RANGE(M6803_PORT1, M6803_PORT1) AM_WRITE(ddp6801_p1_w)
+	AM_RANGE(M6803_PORT2, M6803_PORT2) AM_READWRITE(ddp6801_p2_r, ddp6801_p2_w)
+	AM_RANGE(M6803_PORT3, M6803_PORT3) AM_NOP // Multiplexed Address/Data
+	AM_RANGE(M6803_PORT4, M6803_PORT4) AM_READ(ddp6801_p4_r)
+ADDRESS_MAP_END
+
+
+//-------------------------------------------------
+//  ADDRESS_MAP( printer6801_mem )
+//-------------------------------------------------
+
+static ADDRESS_MAP_START( printer6801_mem, ADDRESS_SPACE_PROGRAM, 8, adam_state )
+	AM_RANGE(0x0000, 0x001f) AM_READWRITE_LEGACY(hd63701_internal_registers_r, hd63701_internal_registers_w)
+	AM_RANGE(0x0080, 0x00ff) AM_RAM
+	AM_RANGE(0xf800, 0xffff) AM_ROM AM_REGION(M6801_PRN_TAG, 0)
+ADDRESS_MAP_END
+
+
+//-------------------------------------------------
+//  ADDRESS_MAP( printer6801_io )
+//-------------------------------------------------
+
+static ADDRESS_MAP_START( printer6801_io, ADDRESS_SPACE_IO, 8, adam_state )
+	AM_RANGE(M6803_PORT1, M6803_PORT1) AM_WRITE(printer6801_p1_w)
+	AM_RANGE(M6803_PORT2, M6803_PORT2) AM_READWRITE(printer6801_p2_r, printer6801_p2_w)
+	AM_RANGE(M6803_PORT3, M6803_PORT3) AM_READ(printer6801_p3_r)
+	AM_RANGE(M6803_PORT4, M6803_PORT4) AM_READWRITE(printer6801_p4_r, printer6801_p4_w)
+ADDRESS_MAP_END
+
+
+
+//**************************************************************************
+//	INPUT PORTS
+//**************************************************************************
+
+//-------------------------------------------------
+//  INPUT_PORTS( adam )
+//-------------------------------------------------
 
 static INPUT_PORTS_START( adam )
-    PORT_START( "controller1_keypad1" )  /* IN0 */
-    PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("P1 Keypad 0") PORT_CODE(KEYCODE_0)         PORT_PLAYER(1)
-    PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("P1 Keypad 1") PORT_CODE(KEYCODE_1)         PORT_PLAYER(1)
-    PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("P1 Keypad 2") PORT_CODE(KEYCODE_2)         PORT_PLAYER(1)
-    PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("P1 Keypad 3") PORT_CODE(KEYCODE_3)         PORT_PLAYER(1)
-    PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_NAME("P1 Keypad 4") PORT_CODE(KEYCODE_4)         PORT_PLAYER(1)
-    PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON10) PORT_NAME("P1 Keypad 5") PORT_CODE(KEYCODE_5)         PORT_PLAYER(1)
-    PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON11) PORT_NAME("P1 Keypad 6") PORT_CODE(KEYCODE_6)         PORT_PLAYER(1)
-    PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON12) PORT_NAME("P1 Keypad 7") PORT_CODE(KEYCODE_7)         PORT_PLAYER(1)
+	PORT_START("Y0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("I") PORT_CODE(KEYCODE_F1)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("II") PORT_CODE(KEYCODE_F2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("III") PORT_CODE(KEYCODE_F3)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("IV") PORT_CODE(KEYCODE_F4)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("V") PORT_CODE(KEYCODE_F5)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("VI") PORT_CODE(KEYCODE_F6)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
 
-    PORT_START( "controller1_keypad2" )  /* IN1 */
-    PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON13) PORT_NAME("P1 Keypad 8") PORT_CODE(KEYCODE_8)         PORT_PLAYER(1)
-    PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON14) PORT_NAME("P1 Keypad 9") PORT_CODE(KEYCODE_9)         PORT_PLAYER(1)
-    PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON15) PORT_NAME("P1 Keypad #") PORT_CODE(KEYCODE_MINUS)     PORT_PLAYER(1)
-    PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON16) PORT_NAME("P1 Keypad *") PORT_CODE(KEYCODE_EQUALS)    PORT_PLAYER(1)
-    PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P1 Button 2 (SAC Red Button)")             PORT_PLAYER(1)
-    PORT_BIT( 0xB0, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_START("Y1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_CHAR('1') PORT_CHAR('!')
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_CHAR('@')
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_CHAR('3') PORT_CHAR('#')
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_CHAR('$')
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_CHAR('5') PORT_CHAR('%')
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CHAR('6') PORT_CHAR('_')
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR('&')
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_CHAR('8') PORT_CHAR('*')
 
-    PORT_START( "controller1_joystick" )  /* IN2 */
-    PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )                                                   PORT_PLAYER(1) PORT_8WAY
-    PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )                                                PORT_PLAYER(1) PORT_8WAY
-    PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )                                                 PORT_PLAYER(1) PORT_8WAY
-    PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )                                                 PORT_PLAYER(1) PORT_8WAY
-    PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 Button 1 (SAC Yellow Button)")          PORT_PLAYER(1)
-    PORT_BIT( 0xB0, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_START("Y2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("TAB") PORT_CODE(KEYCODE_TAB) PORT_CHAR('\t')
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Q) PORT_CHAR('q') PORT_CHAR('Q')
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_W) PORT_CHAR('w') PORT_CHAR('W')
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E) PORT_CHAR('e') PORT_CHAR('E')
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_R) PORT_CHAR('r') PORT_CHAR('R')
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_T) PORT_CHAR('t') PORT_CHAR('T')
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Y) PORT_CHAR('y') PORT_CHAR('Y')
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_U) PORT_CHAR('u') PORT_CHAR('U')
 
-    PORT_START( "controller2_keypad1" )  /* IN3 */
-    PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("P2 Keypad 0") PORT_CODE(KEYCODE_0_PAD)     PORT_PLAYER(2)
-    PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("P2 Keypad 1") PORT_CODE(KEYCODE_1_PAD)     PORT_PLAYER(2)
-    PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("P2 Keypad 2") PORT_CODE(KEYCODE_2_PAD)     PORT_PLAYER(2)
-    PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("P2 Keypad 3") PORT_CODE(KEYCODE_3_PAD)     PORT_PLAYER(2)
-    PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_NAME("P2 Keypad 4") PORT_CODE(KEYCODE_4_PAD)     PORT_PLAYER(2)
-    PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON10) PORT_NAME("P2 Keypad 5") PORT_CODE(KEYCODE_5_PAD)     PORT_PLAYER(2)
-    PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON11) PORT_NAME("P2 Keypad 6") PORT_CODE(KEYCODE_6_PAD)     PORT_PLAYER(2)
-    PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON12) PORT_NAME("P2 Keypad 7") PORT_CODE(KEYCODE_7_PAD)     PORT_PLAYER(2)
+	PORT_START("Y3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A) PORT_CHAR('a') PORT_CHAR('A')
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_S) PORT_CHAR('s') PORT_CHAR('S')
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_D) PORT_CHAR('d') PORT_CHAR('D')
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F) PORT_CHAR('f') PORT_CHAR('F')
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_G) PORT_CHAR('g') PORT_CHAR('G')
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_H) PORT_CHAR('h') PORT_CHAR('H')
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_J) PORT_CHAR('j') PORT_CHAR('J')
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_K) PORT_CHAR('k') PORT_CHAR('K')
 
-    PORT_START( "controller2_keypad2" )  /* IN4 */
-    PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON13) PORT_NAME("P2 Keypad 8") PORT_CODE(KEYCODE_8_PAD)     PORT_PLAYER(2)
-    PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON14) PORT_NAME("P2 Keypad 9") PORT_CODE(KEYCODE_9_PAD)     PORT_PLAYER(2)
-    PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON15) PORT_NAME("P2 Keypad #") PORT_CODE(KEYCODE_MINUS_PAD) PORT_PLAYER(2)
-    PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON16) PORT_NAME("P2 Keypad *") PORT_CODE(KEYCODE_PLUS_PAD)  PORT_PLAYER(2)
-    PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2)  PORT_NAME("P2 Button 2 (SAC Red Button)")             PORT_PLAYER(2)
-    PORT_BIT( 0xB0, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_START("Y4")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Z) PORT_CHAR('z') PORT_CHAR('Z')
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_X) PORT_CHAR('x') PORT_CHAR('X')
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_C) PORT_CHAR('c') PORT_CHAR('C')
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_V) PORT_CHAR('v') PORT_CHAR('V')
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_B) PORT_CHAR('b') PORT_CHAR('B')
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_N) PORT_CHAR('n') PORT_CHAR('N')
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_M) PORT_CHAR('m') PORT_CHAR('M')
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',') PORT_CHAR('<')
 
-    PORT_START( "controller2_joystick" )  /* IN5 */
-    PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)                                                    PORT_PLAYER(2) PORT_8WAY
-    PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT)                                                 PORT_PLAYER(2) PORT_8WAY
-    PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN)                                                  PORT_PLAYER(2) PORT_8WAY
-    PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)                                                  PORT_PLAYER(2) PORT_8WAY
-    PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("P2 Button 1 (SAC Yellow Button)")           PORT_PLAYER(2)
-    PORT_BIT( 0xB0, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_START("Y5")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CHAR('9') PORT_CHAR('(')
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0) PORT_CHAR('0') PORT_CHAR(')')
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-') PORT_CHAR('\'')
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('+') PORT_CHAR('=')
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_TILDE) PORT_CHAR('^') PORT_CHAR('~')
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_L) PORT_CHAR('l') PORT_CHAR('L')
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COLON) PORT_CHAR(';') PORT_CHAR(':')
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_QUOTE) PORT_CHAR('\'') PORT_CHAR('\"')
 
-    PORT_START( "controllers" ) /* IN6 */
-    PORT_CONFNAME(0x0F, 0x00, "Controllers")
-    PORT_CONFSETTING(0x00, DEF_STR( None ) )
-    PORT_CONFSETTING(0x01, "Driving Controller" )
-    PORT_CONFSETTING(0x02, "Roller Controller" )
-    PORT_CONFSETTING(0x04, "Super Action Controllers" )
-    PORT_CONFSETTING(0x08, "Standard Controllers" )
+	PORT_START("Y6")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_I) PORT_CHAR('i') PORT_CHAR('I')
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_O) PORT_CHAR('o') PORT_CHAR('O')
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_P) PORT_CHAR('p') PORT_CHAR('P')
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR('[') PORT_CHAR('{')
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(']') PORT_CHAR('}')
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_STOP) PORT_CHAR('.') PORT_CHAR('>')
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/') PORT_CHAR('?')
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("RETURN") PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13)
 
-    PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_NAME("P1 SAC Blue Button")   PORT_CODE(KEYCODE_Z) PORT_PLAYER(1)
-    PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON4) PORT_NAME("P1 SAC Purple Button") PORT_CODE(KEYCODE_X) PORT_PLAYER(1)
-    PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_NAME("P2 SAC Blue Button")   PORT_CODE(KEYCODE_Q) PORT_PLAYER(2)
-    PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4) PORT_NAME("P2 SAC Purple Button") PORT_CODE(KEYCODE_W) PORT_PLAYER(2)
+	PORT_START("Y7")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR('\\') PORT_CHAR('|')
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Space") PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ')
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
 
-    PORT_START( "controller1_analog" ) /* IN7, to emulate Extra Controls (Driving Controller, SAC P1 slider, Roller Controller X Axis) */
-    PORT_BIT( 0x0f, 0x00, IPT_TRACKBALL_X) \
-              PORT_SENSITIVITY(20) \
-              PORT_KEYDELTA(10) \
-              PORT_CODE_DEC(KEYCODE_J) \
-              PORT_CODE_INC(KEYCODE_L) \
-              PORT_PLAYER(1) \
-              PORT_RESET
+	PORT_START("Y8")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(UTF8_LEFT) PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT))
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
 
-    PORT_START( "controller2_analog" ) /* IN8, to emulate Extra Controls (SAC P2 slider, Roller Controller Y Axis) */
-    PORT_BIT( 0x0f, 0x00, IPT_TRACKBALL_X) \
-              PORT_SENSITIVITY(20) \
-              PORT_KEYDELTA(10) \
-              PORT_CODE_DEC(KEYCODE_I) \
-              PORT_CODE_INC(KEYCODE_K) \
-              PORT_PLAYER(2) \
-              PORT_RESET
+	PORT_START("Y9")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("CTRL") PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_MAMEKEY(LCONTROL))
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
 
-/* Keyboard with 75 Keys - TODO: Discover if the keys are actually organized this way on real hardware */
+	PORT_START("Y10")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("SHIFT") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
 
-	PORT_START("keyboard_1") /* IN9 0*/
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Escape/WP")    PORT_CODE(KEYCODE_ESC)        PORT_CHAR(27)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)                           PORT_CODE(KEYCODE_A)          PORT_CHAR('a') PORT_CHAR('A')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)                           PORT_CODE(KEYCODE_B)          PORT_CHAR('b') PORT_CHAR('B')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)                           PORT_CODE(KEYCODE_C)          PORT_CHAR('c') PORT_CHAR('C')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD)                           PORT_CODE(KEYCODE_D)          PORT_CHAR('d') PORT_CHAR('D')
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)                           PORT_CODE(KEYCODE_E)          PORT_CHAR('e') PORT_CHAR('E')
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)                           PORT_CODE(KEYCODE_F)          PORT_CHAR('f') PORT_CHAR('F')
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)                           PORT_CODE(KEYCODE_G)          PORT_CHAR('g') PORT_CHAR('G')
+	PORT_START("Y11")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("LOCK") PORT_CODE(KEYCODE_CAPSLOCK) PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK))
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
 
-	PORT_START("keyboard_2") /* IN10 1*/
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)                           PORT_CODE(KEYCODE_H)          PORT_CHAR('h') PORT_CHAR('H') PORT_CHAR(8)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)                           PORT_CODE(KEYCODE_I)          PORT_CHAR('i') PORT_CHAR('I') PORT_CHAR(9)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)                           PORT_CODE(KEYCODE_J)          PORT_CHAR('j') PORT_CHAR('J')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)                           PORT_CODE(KEYCODE_K)          PORT_CHAR('k') PORT_CHAR('K')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD)                           PORT_CODE(KEYCODE_L)          PORT_CHAR('l') PORT_CHAR('L')
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("m M Return")   PORT_CODE(KEYCODE_M)          PORT_CHAR('m') PORT_CHAR('M') PORT_CHAR(13)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)                           PORT_CODE(KEYCODE_N)          PORT_CHAR('n') PORT_CHAR('N')
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)                           PORT_CODE(KEYCODE_O)          PORT_CHAR('o') PORT_CHAR('O')
+	PORT_START("Y12")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
 
-	PORT_START("keyboard_3") /* IN11 2*/
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)                           PORT_CODE(KEYCODE_P)          PORT_CHAR('p') PORT_CHAR('P')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)                           PORT_CODE(KEYCODE_Q)          PORT_CHAR('q') PORT_CHAR('Q')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)                           PORT_CODE(KEYCODE_R)          PORT_CHAR('r') PORT_CHAR('R')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)                           PORT_CODE(KEYCODE_S)          PORT_CHAR('s') PORT_CHAR('S')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD)                           PORT_CODE(KEYCODE_T)          PORT_CHAR('t') PORT_CHAR('T')
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)                           PORT_CODE(KEYCODE_U)          PORT_CHAR('u') PORT_CHAR('U')
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)                           PORT_CODE(KEYCODE_V)          PORT_CHAR('v') PORT_CHAR('V')
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)                           PORT_CODE(KEYCODE_W)          PORT_CHAR('w') PORT_CHAR('W')
-
-	PORT_START("keyboard_4") /* IN12 3*/
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)                           PORT_CODE(KEYCODE_X)          PORT_CHAR('x') PORT_CHAR('X')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)                           PORT_CODE(KEYCODE_Y)          PORT_CHAR('y') PORT_CHAR('Y')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)                           PORT_CODE(KEYCODE_Z)          PORT_CHAR('z') PORT_CHAR('Z')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)                           PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(']') PORT_CHAR('}')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD)                           PORT_CODE(KEYCODE_TILDE)      PORT_CHAR('\\') PORT_CHAR('|')
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)                           PORT_CODE(KEYCODE_BACKSPACE)  PORT_CHAR('^') PORT_CHAR('~')
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)                           PORT_CODE(KEYCODE_MINUS)      PORT_CHAR('-') PORT_CHAR('`')
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)                           PORT_CODE(KEYCODE_COLON)      PORT_CHAR(';') PORT_CHAR(':')
-
-	PORT_START("keyboard_5") /* IN13 4*/
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)                           PORT_CODE(KEYCODE_0)          PORT_CHAR('0') PORT_CHAR(')')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)                           PORT_CODE(KEYCODE_1)          PORT_CHAR('1') PORT_CHAR('!')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)                           PORT_CODE(KEYCODE_2)          PORT_CHAR('2') PORT_CHAR('@')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)                           PORT_CODE(KEYCODE_3)          PORT_CHAR('3') PORT_CHAR('#')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD)                           PORT_CODE(KEYCODE_4)          PORT_CHAR('4') PORT_CHAR('$')
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)                           PORT_CODE(KEYCODE_5)          PORT_CHAR('5') PORT_CHAR('%')
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)                           PORT_CODE(KEYCODE_6)          PORT_CHAR('6') PORT_CHAR('_')
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)                           PORT_CODE(KEYCODE_7)          PORT_CHAR('7') PORT_CHAR('&')
-
-	PORT_START("keyboard_6") /* IN14 5*/
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)                           PORT_CODE(KEYCODE_8)          PORT_CHAR('8') PORT_CHAR('*')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)                           PORT_CODE(KEYCODE_9)          PORT_CHAR('9') PORT_CHAR('(')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)                           PORT_CODE(KEYCODE_QUOTE)      PORT_CHAR('\'') PORT_CHAR('\"')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)                           PORT_CODE(KEYCODE_EQUALS)     PORT_CHAR('+') PORT_CHAR('=')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD)                           PORT_CODE(KEYCODE_COMMA)      PORT_CHAR(',') PORT_CHAR('<')
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)                           PORT_CODE(KEYCODE_STOP)       PORT_CHAR('.') PORT_CHAR('>')
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)                           PORT_CODE(KEYCODE_SLASH)      PORT_CHAR('/') PORT_CHAR('?')
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)                           PORT_CODE(KEYCODE_OPENBRACE)  PORT_CHAR('[') PORT_CHAR('{')
-
-	PORT_START("keyboard_7") /* IN15 6*/
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\xE2\x85\xA0") PORT_CODE(KEYCODE_F3)         PORT_CHAR(UCHAR_MAMEKEY(F1))
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\xE2\x85\xA1") PORT_CODE(KEYCODE_F4)         PORT_CHAR(UCHAR_MAMEKEY(F2))
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\xE2\x85\xA2") PORT_CODE(KEYCODE_F5)         PORT_CHAR(UCHAR_MAMEKEY(F3))
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\xE2\x85\xA3") PORT_CODE(KEYCODE_F6)         PORT_CHAR(UCHAR_MAMEKEY(F4))
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\xE2\x85\xA4") PORT_CODE(KEYCODE_F7)         PORT_CHAR(UCHAR_MAMEKEY(F5))
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\xE2\x85\xA5") PORT_CODE(KEYCODE_F8)         PORT_CHAR(UCHAR_MAMEKEY(F6))
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Space")        PORT_CODE(KEYCODE_SPACE)      PORT_CHAR(32)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Return")       PORT_CODE(KEYCODE_ENTER)      PORT_CHAR(13)
-
-	PORT_START("keyboard_8") /* IN16 7*/
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Wild Card")    PORT_CODE(KEYCODE_F1)         PORT_CHAR(UCHAR_MAMEKEY(F7))
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Undo")         PORT_CODE(KEYCODE_F9)         PORT_CHAR(UCHAR_MAMEKEY(F8))
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Move/Copy")    PORT_CODE(KEYCODE_INSERT)     PORT_CHAR(UCHAR_MAMEKEY(PGUP))
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Store/Get")    PORT_CODE(KEYCODE_HOME)       PORT_CHAR(UCHAR_MAMEKEY(PGDN))
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Insert")       PORT_CODE(KEYCODE_DEL)        PORT_CHAR(UCHAR_MAMEKEY(INSERT))
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Print")        PORT_CODE(KEYCODE_END)        PORT_CHAR(UCHAR_MAMEKEY(PRTSCR))
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Clear")        PORT_CODE(KEYCODE_PGUP)       PORT_CHAR(UCHAR_MAMEKEY(DEL_PAD))
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Delete")       PORT_CODE(KEYCODE_PGDN)       PORT_CHAR(UCHAR_MAMEKEY(DEL))
-
-	PORT_START("keyboard_9") /* IN17 8*/
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Home")         PORT_CODE(KEYCODE_5_PAD)      PORT_CHAR(UCHAR_MAMEKEY(HOME))
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\xE2\x87\xA7") PORT_CODE(KEYCODE_8_PAD)      PORT_CHAR(UCHAR_MAMEKEY(UP))
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\xE2\x87\xA9") PORT_CODE(KEYCODE_2_PAD)      PORT_CHAR(UCHAR_MAMEKEY(DOWN))
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\xE2\x87\xA6") PORT_CODE(KEYCODE_4_PAD)      PORT_CHAR(UCHAR_MAMEKEY(LEFT))
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\xE2\x87\xA8") PORT_CODE(KEYCODE_6_PAD)      PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Tab")          PORT_CODE(KEYCODE_TAB)        PORT_CHAR(UCHAR_MAMEKEY(TAB))
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Left Shift")   PORT_CODE(KEYCODE_LSHIFT)     PORT_CHAR(UCHAR_SHIFT_1)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Right Shift")  PORT_CODE(KEYCODE_RSHIFT)     PORT_CHAR(UCHAR_SHIFT_1)
-
-	PORT_START("keyboard_10") /* IN18 9*/
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Control")      PORT_CODE(KEYCODE_CAPSLOCK)   PORT_CHAR(UCHAR_SHIFT_2)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Backspace")    PORT_CODE(KEYCODE_F10)        PORT_CHAR(8)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Lock")         PORT_CODE(KEYCODE_LCONTROL)   PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK)) PORT_TOGGLE
-	PORT_BIT(0xF8, IP_ACTIVE_LOW, IPT_UNUSED )
-
+	PORT_INCLUDE( coleco )
 INPUT_PORTS_END
 
-/***************************************************************************
 
-  The interrupts come from the vdp. The vdp (tms9928a) interrupt can go up
-  and down; the Coleco only uses nmi interrupts (which is just a pulse). They
-  are edge-triggered: as soon as the vdp interrupt line goes up, an interrupt
-  is generated. Nothing happens when the line stays up or goes down.
 
-  To emulate this correctly, we set a callback in the tms9928a (they
-  can occur mid-frame). At every frame we call the TMS9928A_interrupt
-  because the vdp needs to know when the end-of-frame occurs, but we don't
-  return an interrupt.
+//**************************************************************************
+//	DEVICE CONFIGURATION
+//**************************************************************************
 
-***************************************************************************/
+//-------------------------------------------------
+//  TMS9928a_interface tms9928a_interface
+//-------------------------------------------------
 
 static INTERRUPT_GEN( adam_interrupt )
 {
 	TMS9928A_interrupt(device->machine);
-	adam_explore_keyboard(device->machine);
 }
 
 static void adam_vdp_interrupt(running_machine *machine, int state)
 {
-	adam_state *drvstate = machine->driver_data<adam_state>();
-	/* only if it goes up */
-	if (state && !drvstate->last_state)
+	adam_state *driver_state = machine->driver_data<adam_state>();
+
+	if (state && !driver_state->m_vdp_nmi)
 	{
-		cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
-	}
-	drvstate->last_state = state;
-}
-
-static TIMER_CALLBACK(adam_paddle_callback)
-{
-	adam_state *state = machine->driver_data<adam_state>();
-	int port7 = input_port_read(machine, "controller1_analog");
-	int port8 = input_port_read(machine, "controller2_analog");
-
-	if (port7 == 0)
-		state->joy_stat[0] = 0;
-	else if (port7 & 0x08)
-		state->joy_stat[0] = -1;
-	else
-		state->joy_stat[0] = 1;
-
-	if (port8 == 0)
-		state->joy_stat[1] = 0;
-	else if (port8 & 0x08)
-		state->joy_stat[1] = -1;
-	else
-		state->joy_stat[1] = 1;
-
-	if (state->joy_stat[0] || state->joy_stat[1])
-		cputag_set_input_line(machine, "maincpu", 0, HOLD_LINE);
-}
-
-void adam_set_memory_banks(running_machine *machine)
-{
-	adam_state *state = machine->driver_data<adam_state>();
-/*
-Lineal virtual memory map:
-
-0x00000, 0x07fff -> Lower Internal RAM
-0x08000, 0x0ffff -> Upper Internal RAM
-0x10000, 0x17fff -> Lower Expansion RAM
-0x18000, 0x1ffff -> Upper Expansion RAM
-0x20000, 0x27fff -> SmartWriter ROM
-0x28000, 0x2ffff -> Cartridge
-0x30000, 0x31fff -> OS7 ROM (ColecoVision ROM)
-0x32000, 0x39fff -> EOS ROM
-0x3A000, 0x41fff -> Used to Write Protect ROMs
-*/
-	UINT8 *BankBase;
-	BankBase = &machine->region("maincpu")->base()[0x00000];
-
-	switch (state->lower_memory)
-	{
-		case 0: /* SmartWriter ROM */
-			if (state->net_data & 0x02)
-			{
-				/* Read */
-				memory_set_bankptr(machine, "bank1", BankBase+0x32000); /* No data here */
-				memory_set_bankptr(machine, "bank2", BankBase+0x34000); /* No data here */
-				memory_set_bankptr(machine, "bank3", BankBase+0x36000); /* No data here */
-				memory_set_bankptr(machine, "bank4", BankBase+0x38000); /* EOS ROM */
-
-				/* Write */
-				memory_set_bankptr(machine, "bank6", BankBase+0x3A000); /* Write protecting ROM */
-				memory_set_bankptr(machine, "bank7", BankBase+0x3A000); /* Write protecting ROM */
-				memory_set_bankptr(machine, "bank8", BankBase+0x3A000); /* Write protecting ROM */
-				memory_set_bankptr(machine, "bank9", BankBase+0x3A000); /* Write protecting ROM */
-			}
-			else
-			{
-				/* Read */
-				memory_set_bankptr(machine, "bank1", BankBase+0x20000); /* SmartWriter ROM */
-				memory_set_bankptr(machine, "bank2", BankBase+0x22000);
-				memory_set_bankptr(machine, "bank3", BankBase+0x24000);
-				memory_set_bankptr(machine, "bank4", BankBase+0x26000);
-
-				/* Write */
-				memory_set_bankptr(machine, "bank6", BankBase+0x3A000); /* Write protecting ROM */
-				memory_set_bankptr(machine, "bank7", BankBase+0x3A000); /* Write protecting ROM */
-				memory_set_bankptr(machine, "bank8", BankBase+0x3A000); /* Write protecting ROM */
-				memory_set_bankptr(machine, "bank9", BankBase+0x3A000); /* Write protecting ROM */
-			}
-			break;
-		case 1: /* Internal RAM */
-			/* Read */
-			memory_set_bankptr(machine, "bank1", BankBase);
-			memory_set_bankptr(machine, "bank2", BankBase+0x02000);
-			memory_set_bankptr(machine, "bank3", BankBase+0x04000);
-			memory_set_bankptr(machine, "bank4", BankBase+0x06000);
-
-			/* Write */
-			memory_set_bankptr(machine, "bank6", BankBase);
-			memory_set_bankptr(machine, "bank7", BankBase+0x02000);
-			memory_set_bankptr(machine, "bank8", BankBase+0x04000);
-			memory_set_bankptr(machine, "bank9", BankBase+0x06000);
-			break;
-		case 2: /* RAM Expansion */
-			/* Read */
-			memory_set_bankptr(machine, "bank1", BankBase+0x10000);
-			memory_set_bankptr(machine, "bank2", BankBase+0x12000);
-			memory_set_bankptr(machine, "bank3", BankBase+0x14000);
-			memory_set_bankptr(machine, "bank4", BankBase+0x16000);
-
-			/* Write */
-			memory_set_bankptr(machine, "bank6", BankBase+0x10000);
-			memory_set_bankptr(machine, "bank7", BankBase+0x12000);
-			memory_set_bankptr(machine, "bank8", BankBase+0x14000);
-			memory_set_bankptr(machine, "bank9", BankBase+0x16000);
-			break;
-		case 3: /* OS7 ROM (8k) + Internal RAM (24k) */
-			/* Read */
-			memory_set_bankptr(machine, "bank1", BankBase+0x30000);
-			memory_set_bankptr(machine, "bank2", BankBase+0x02000);
-			memory_set_bankptr(machine, "bank3", BankBase+0x04000);
-			memory_set_bankptr(machine, "bank4", BankBase+0x06000);
-
-			/* Write */
-			memory_set_bankptr(machine, "bank6", BankBase+0x3A000); /* Write protecting ROM */
-			memory_set_bankptr(machine, "bank7", BankBase+0x02000);
-			memory_set_bankptr(machine, "bank8", BankBase+0x04000);
-			memory_set_bankptr(machine, "bank9", BankBase+0x06000);
+		cputag_set_input_line(machine, Z80_TAG, INPUT_LINE_NMI, PULSE_LINE);
 	}
 
-	switch (state->upper_memory)
-	{
-		case 0: /* Internal RAM */
-			/* Read */
-			memory_set_bankptr(machine, "bank5", BankBase+0x08000);
-			/*memory_set_bankptr(machine, 10, BankBase+0x08000);*/
-			break;
-		case 1: /* ROM Expansion */
-			break;
-		case 2: /* RAM Expansion */
-			/* Read */
-			memory_set_bankptr(machine, "bank5", BankBase+0x18000);
-			/*memory_set_bankptr(machine, 10, BankBase+0x18000);*/
-			break;
-		case 3: /* Cartridge ROM */
-			/* Read */
-			memory_set_bankptr(machine, "bank5", BankBase+0x28000);
-			/*memory_set_bankptr(machine, 10, BankBase+0x3A000); *//* Write protecting ROM */
-			break;
-	}
-}
-
-void adam_reset_pcb(running_machine *machine)
-{
-	adam_state *state = machine->driver_data<adam_state>();
-	int i;
-	machine->region("maincpu")->base()[state->pcb] = 0x01;
-
-	for (i = 0; i < 15; i++)
-		machine->region("maincpu")->base()[(state->pcb+4+i*21)&0xFFFF]=i+1;
+	driver_state->m_vdp_nmi = state;
 }
 
 static const TMS9928a_interface tms9928a_interface =
@@ -594,37 +1318,33 @@ static const TMS9928a_interface tms9928a_interface =
 	adam_vdp_interrupt
 };
 
-static MACHINE_START( adam )
+
+//-------------------------------------------------
+//  cassette_config adam_cassette_config
+//-------------------------------------------------
+
+static const cassette_config adam_cassette_config =
 {
-	TMS9928A_configure(&tms9928a_interface);
-	timer_pulse(machine, ATTOTIME_IN_MSEC(20), NULL, 0, adam_paddle_callback);
-}
+	cassette_default_formats,
+	NULL,
+	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED),
+	NULL
+};
 
-static MACHINE_RESET( adam )
-{
-	adam_state *state = machine->driver_data<adam_state>();
-	device_image_interface *image = dynamic_cast<device_image_interface *>(machine->device("cart"));
 
-	if (image->exists())
-	{
-		/* ColecoVision Mode Reset (Cartridge Mounted) */
-		state->lower_memory = 3; /* OS7 + 24k RAM */
-		state->upper_memory = 3; /* Cartridge ROM */
-	}
-	else
-	{
-		/* Adam Mode Reset */
-		state->lower_memory = 0; /* SmartWriter ROM/EOS */
-		state->upper_memory = 0; /* Internal RAM */
-	}
+//-------------------------------------------------
+//  wd17xx_interface fdc_intf
+//-------------------------------------------------
 
-	state->net_data = 0;
-	adam_set_memory_banks(machine);
-	state->pcb=0xFEC0;
-	adam_clear_keyboard_buffer(machine);
-
-	memset(&machine->region("maincpu")->base()[0x0000], 0xFF, 0x20000); /* Initializing RAM */
-}
+#ifdef UNUSED_CODE
+static FLOPPY_OPTIONS_START( adam )
+	FLOPPY_OPTION( adam, "dsk", "Coleco Adam floppy disk image", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([1])
+		TRACKS([40])
+		SECTORS([8])
+		SECTOR_LENGTH([512])
+		FIRST_SECTOR_ID([0]))
+FLOPPY_OPTIONS_END
 
 static const floppy_config adam_floppy_config =
 {
@@ -633,103 +1353,219 @@ static const floppy_config adam_floppy_config =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	FLOPPY_STANDARD_5_25_DSHD,
+	FLOPPY_STANDARD_5_25_DSDD,
 	FLOPPY_OPTIONS_NAME(adam),
 	NULL
 };
 
+static const wd17xx_interface fdc_intf =
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	{ FLOPPY_0, NULL, NULL, NULL }
+};
+#endif
+
+
+//-------------------------------------------------
+//  M6801_INTERFACE( master6801_intf )
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER( adam_state::os3_w )
+{
+	if (state && !m_dma)
+	{
+		UINT8 *ram = ram_get_ptr(m_ram);
+
+		if (!m_bwr)
+		{
+			//logerror("Master 6801 write to %04x data %02x\n", m_ba, m_data_in);
+
+			ram[m_ba] = m_data_in;
+		}
+		else
+		{
+			m_data_out = ram[m_ba];
+
+			//logerror("Master 6801 read from %04x data %02x\n", m_ba, m_data_out);
+
+			cpu_set_input_line(m_netcpu, M6800_SC1_LINE, ASSERT_LINE);
+			cpu_set_input_line(m_netcpu, M6800_SC1_LINE, CLEAR_LINE);
+		}
+	}
+}
+
+static M6801_INTERFACE( master6801_intf )
+{
+	DEVCB_DRIVER_LINE_MEMBER(adam_state, os3_w)
+};
+
+
+
+//**************************************************************************
+//	MACHINE INITIALIZATION
+//**************************************************************************
+
+//-------------------------------------------------
+//  MACHINE_START( adam )
+//-------------------------------------------------
+
+void adam_state::machine_start()
+{
+	// configure VDP
+	TMS9928A_configure(&tms9928a_interface);
+
+	// register for state saving
+	state_save_register_global(machine, m_mioc);
+	state_save_register_global(machine, m_adamnet);
+	state_save_register_global_array(machine, m_txd);
+	state_save_register_global(machine, m_rxd);
+	state_save_register_global(machine, m_reset);
+	state_save_register_global(machine, m_ba);
+	state_save_register_global(machine, m_dma);
+	state_save_register_global(machine, m_bwr);
+	state_save_register_global(machine, m_data_in);
+	state_save_register_global(machine, m_data_out);
+	state_save_register_global(machine, m_key_y);
+	state_save_register_global(machine, m_joy_mode);
+	state_save_register_global(machine, m_joy_status0);
+	state_save_register_global(machine, m_joy_status1);
+	state_save_register_global(machine, m_vdp_nmi);
+}
+
+
+//-------------------------------------------------
+//  MACHINE_RESET( adam )
+//-------------------------------------------------
+
+void adam_state::machine_reset()
+{
+	m_mioc = 0;
+	m_adamnet = 0;
+
+	bankswitch();
+}
+
+
+
+//**************************************************************************
+//	MACHINE CONFIGURATION
+//**************************************************************************
+
+//-------------------------------------------------
+//  MACHINE_CONFIG( adam )
+//-------------------------------------------------
+
 static MACHINE_CONFIG_START( adam, adam_state )
-	/* Machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 3579545)       /* 3.579545 MHz */
+	// basic machine hardware
+	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_7_15909MHz/2)
 	MCFG_CPU_PROGRAM_MAP(adam_mem)
 	MCFG_CPU_IO_MAP(adam_io)
 
-	/* Master M6801 AdamNet controller */
-	//MCFG_CPU_ADD("adamnet", M6800, 4000000)       /* 4.0 MHz */
-	//MCFG_CPU_PROGRAM_MAP(master6801_mem, 0)
+	MCFG_CPU_ADD(M6801_MAIN_TAG, M6801, XTAL_4MHz)
+	MCFG_CPU_PROGRAM_MAP(master6801_mem)
+	MCFG_CPU_IO_MAP(master6801_io)
+	MCFG_CPU_CONFIG(master6801_intf)
+	
+	MCFG_CPU_ADD(M6801_KB_TAG, M6801, XTAL_4MHz)
+	MCFG_CPU_PROGRAM_MAP(kb6801_mem)
+	MCFG_CPU_IO_MAP(kb6801_io)
 
-	MCFG_CPU_VBLANK_INT("screen", adam_interrupt)
+	MCFG_CPU_ADD(M6801_DDP_TAG, M6801, XTAL_4MHz)
+	MCFG_CPU_PROGRAM_MAP(ddp6801_mem)
+	MCFG_CPU_IO_MAP(ddp6801_io)
+	MCFG_DEVICE_DISABLE()
 
-	MCFG_MACHINE_START( adam )
-	MCFG_MACHINE_RESET( adam )
+	MCFG_CPU_ADD(M6801_PRN_TAG, M6801, XTAL_4MHz)
+	MCFG_CPU_PROGRAM_MAP(printer6801_mem)
+	MCFG_CPU_IO_MAP(printer6801_io)
+	MCFG_DEVICE_DISABLE()
 
-	/* video hardware */
+	MCFG_CPU_ADD(M6801_FDC_TAG, M6801, XTAL_4MHz)
+	MCFG_DEVICE_DISABLE()
+
+	MCFG_CPU_ADD(M6801_SPI_TAG, M6801, XTAL_4MHz)
+	MCFG_DEVICE_DISABLE()
+
+	MCFG_CPU_VBLANK_INT(SCREEN_TAG, adam_interrupt)
+
+	// video hardware
 	MCFG_FRAGMENT_ADD(tms9928a)
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_MODIFY(SCREEN_TAG)
+	MCFG_SCREEN_REFRESH_RATE((float)XTAL_10_738635MHz/2/342/262)
 
-	/* sound hardware */
+	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("sn76489a", SN76489A, 3579545)	/* 3.579545 MHz */
+	MCFG_SOUND_ADD(SN76489A_TAG, SN76489A, XTAL_7_15909MHz/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	/* cartridge */
+	// devices
+	MCFG_TIMER_ADD_PERIODIC("paddles", paddle_tick, MSEC(20))
+//	MCFG_WD2793_ADD(WD2793_TAG, fdc_intf)
+//	MCFG_FLOPPY_DRIVE_ADD(FLOPPY_0, adam_floppy_config)
+	MCFG_CASSETTE_ADD(CASSETTE_TAG, adam_cassette_config)
+
+	// cartridge
 	MCFG_CARTSLOT_ADD("cart")
 	MCFG_CARTSLOT_EXTENSION_LIST("rom,col,bin")
 	MCFG_CARTSLOT_NOT_MANDATORY
 
-	MCFG_FLOPPY_4_DRIVES_ADD(adam_floppy_config)
+	// internal ram
+	MCFG_RAM_ADD(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("64K")
+	MCFG_RAM_EXTRA_OPTIONS("128K")
 MACHINE_CONFIG_END
 
 
-/***************************************************************************
 
-  Game driver(s)
+//**************************************************************************
+//	ROMS
+//**************************************************************************
 
-***************************************************************************/
+//-------------------------------------------------
+//  ROM( adam )
+//-------------------------------------------------
 
-/*
-os7.rom CRC(3AA93EF3)
-eos.rom CRC(05A37A34)
-wp.rom  CRC(58D86A2A)
-*/
-/*
-Total Memory Size: 64k Internal RAM, 64k Expansion RAM, 32k SmartWriter ROM, 8k OS7, 32k Cartridge, 32k Extra
+ROM_START( adam )
+	ROM_REGION( 0x8000, "wp", 0)
+	ROM_LOAD( "wp.rom", 0x0000, 0x8000, BAD_DUMP CRC(58d86a2a) SHA1(d4aec4efe1431e56fe52d83baf9118542c525255) ) // should be separate 8/16K ROMs
 
-Lineal virtual memory map:
+	ROM_REGION( 0x2000, "os7", 0)
+	ROM_LOAD( "os7.rom", 0x0000, 0x2000, CRC(3aa93ef3) SHA1(45bedc4cbdeac66c7df59e9e599195c778d86a92) )
 
-0x00000, 0x07fff -> Lower Internal RAM
-0x08000, 0x0ffff -> Upper Internal RAM
-0x10000, 0x17fff -> Lower Expansion RAM
-0x18000, 0x1ffff -> Upper Expansion RAM
-0x20000, 0x27fff -> SmartWriter ROM
-0x28000, 0x2ffff -> Cartridge
-0x30000, 0x31fff -> OS7 ROM (ColecoVision ROM)
-0x32000, 0x39fff -> EOS ROM
-0x3A000, 0x41fff -> Used to Write Protect ROMs
-0x42000, 0x47fff -> Low unused EOS ROM
-*/
-ROM_START (adam)
-	ROM_REGION( 0x42000, "maincpu", 0)
-	ROM_LOAD ("wp.rom", 0x20000, 0x8000, CRC(58d86a2a) SHA1(d4aec4efe1431e56fe52d83baf9118542c525255))
-	ROM_LOAD ("os7.rom", 0x30000, 0x2000, CRC(3aa93ef3) SHA1(45bedc4cbdeac66c7df59e9e599195c778d86a92))
-	ROM_LOAD ("eos.rom", 0x38000, 0x2000, CRC(05a37a34) SHA1(ad3c20ef444f10af7ae8eb75c81e500d9b1bba3d))
+	ROM_REGION( 0x2000, "eos", 0)
+	ROM_LOAD( "eos.rom", 0x0000, 0x2000, CRC(05a37a34) SHA1(ad3c20ef444f10af7ae8eb75c81e500d9b1bba3d) )
 
-	ROM_CART_LOAD("cart", 0x28000, 0x8000, ROM_NOMIRROR | ROM_OPTIONAL)
+	ROM_REGION( 0x8000, "xrom", ROMREGION_ERASE00 )
 
-	ROM_REGION( 0x800, "cpu1", 0 )
-	ROM_LOAD( "master.bin", 0x000, 0x800, CRC(035a7a3d) SHA1(0426e6eaf18c2be9fe08066570c214ab5951ee14) )
+	ROM_REGION( 0x8000, "cart", 0 )
+	ROM_CART_LOAD( "cart", 0x0000, 0x8000, ROM_NOMIRROR | ROM_OPTIONAL )
 
-	ROM_REGION( 0x800, "cpu2", 0 )
-	ROM_LOAD( "keyboard.bin", 0x000, 0x800, CRC(ef204746) SHA1(83162ffc75847328a05429135b728a63efb05b93) )
+	ROM_REGION( 0x800, M6801_MAIN_TAG, 0 )
+	ROM_LOAD( "master.u6", 0x000, 0x800, CRC(035a7a3d) SHA1(0426e6eaf18c2be9fe08066570c214ab5951ee14) )
 
-	ROM_REGION( 0x800, "cpu3", 0 )
-	ROM_LOAD( "ddp.bin", 0x000, 0x800, CRC(6b9ea1cf) SHA1(b970f11e8f443fa130fba02ad1f60da51bf89673) )
+	ROM_REGION( 0x800, M6801_KB_TAG, 0 )
+	ROM_LOAD( "keyboard.u2", 0x000, 0x800, CRC(ef204746) SHA1(83162ffc75847328a05429135b728a63efb05b93) )
 
-	ROM_REGION( 0x800, "cpu4", 0 )
+	ROM_REGION( 0x800, M6801_DDP_TAG, 0 )
+	ROM_LOAD( "ddp.u24", 0x000, 0x800, CRC(6b9ea1cf) SHA1(b970f11e8f443fa130fba02ad1f60da51bf89673) )
+
+	ROM_REGION( 0x800, M6801_PRN_TAG, 0 )
+	ROM_LOAD( "printer.u2", 0x000, 0x800, CRC(e8db783b) SHA1(32b40679749ad0317c2c9ee9ca619fad6d850ce7) )
+
+	ROM_REGION( 0x800, M6801_FDC_TAG, 0 )
+	ROM_LOAD( "floppy disk drive", 0x000, 0x800, NO_DUMP )
+
+	ROM_REGION( 0x800, M6801_SPI_TAG, 0 )
 	ROM_LOAD( "spi.bin", 0x000, 0x800, CRC(4ba30352) SHA1(99fe5aebd505a208bea6beec5d7322b15426e9c1) )
-
-	ROM_REGION( 0x800, "cpu5", 0 )
-	ROM_LOAD( "printer.bin", 0x000, 0x800, CRC(e8db783b) SHA1(32b40679749ad0317c2c9ee9ca619fad6d850ce7) )
 ROM_END
 
 
-/***************************************************************************
 
-  Game driver(s)
+//**************************************************************************
+//	SYSTEM DRIVERS
+//**************************************************************************
 
-***************************************************************************/
-
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    COMPANY FULLNAME */
-COMP( 1982, adam,   0,		coleco,	adam,   adam,   0,		"Coleco", "Adam" , 0)
-
+/*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       INIT    COMPANY         FULLNAME            FLAGS */
+COMP( 1982, adam,		0,			coleco,	adam,		adam,		0,		"Coleco",		"Adam",				GAME_NOT_WORKING )

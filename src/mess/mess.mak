@@ -839,10 +839,8 @@ $(MESSOBJ)/chromatics.a:		\
 
 $(MESSOBJ)/coleco.a:			\
 	$(MESS_DRIVERS)/coleco.o	\
-	$(MESS_MACHINE)/coleco.o		\
-	$(MESS_MACHINE)/adam.o		\
+	$(MESS_MACHINE)/coleco.o	\
 	$(MESS_DRIVERS)/adam.o		\
-	$(MESS_FORMATS)/adam_dsk.o	\
 
 $(MESSOBJ)/comx.a:				\
 	$(MESS_DRIVERS)/comx35.o	\

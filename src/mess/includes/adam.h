@@ -1,54 +1,112 @@
-/*****************************************************************************
- *
- * includes/adam.h
- *
- ****************************************************************************/
+#pragma once
 
 #ifndef ADAM_H_
 #define ADAM_H_
 
+#define Z80_TAG			"u1"
+#define SN76489A_TAG	"u20"
+#define TMS9928A_TAG	"tms9928a"
+#define WD2793_TAG		"u11"
+#define M6801_MAIN_TAG	"cpu1"
+#define M6801_KB_TAG	"cpu2"
+#define M6801_DDP_TAG	"cpu3"
+#define M6801_PRN_TAG	"cpu4"
+#define M6801_FDC_TAG	"cpu5"
+#define M6801_SPI_TAG	"cpu6"
+#define CASSETTE_TAG	"cassette"
+#define SCREEN_TAG		"screen"
 
 class adam_state : public driver_device
 {
 public:
 	adam_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+		: driver_device(machine, config),
+		  m_maincpu(*this, Z80_TAG),
+		  m_netcpu(*this, M6801_MAIN_TAG),
+		  m_ram(*this, RAM_TAG),
+		  m_rxd(1),
+		  m_reset(0),
+		  m_dma(1),
+		  m_bwr(1)
+	{
+		for (int i = 0; i < 6; i++)
+			m_txd[i] = 1;
+	}
 
-	int last_state;
-	int lower_memory;
-	int upper_memory;
-	int joy_stat[2];
-	int net_data;
-	int pcb;
-	int joy_mode;
-	int KeyboardBuffer[20];
-	UINT8 KbRepeatTable[256];
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_netcpu;
+	required_device<device_t> m_ram;
+
+	virtual void machine_start();
+	virtual void machine_reset();
+
+	void bankswitch();
+	void adamnet_txd_w(int device, int state);
+	
+	DECLARE_WRITE_LINE_MEMBER( os3_w );
+
+	DECLARE_READ8_MEMBER( adamnet_r );
+	DECLARE_WRITE8_MEMBER( adamnet_w );
+	DECLARE_READ8_MEMBER( mioc_r );
+	DECLARE_WRITE8_MEMBER( mioc_w );
+	DECLARE_WRITE8_MEMBER( paddle_w );
+	DECLARE_WRITE8_MEMBER( joystick_w );
+	DECLARE_READ8_MEMBER( input1_r );
+	DECLARE_READ8_MEMBER( input2_r );
+	
+	DECLARE_WRITE8_MEMBER( master6801_p1_w );
+	DECLARE_READ8_MEMBER( master6801_p2_r );
+	DECLARE_WRITE8_MEMBER( master6801_p2_w );
+	DECLARE_READ8_MEMBER( master6801_p3_r );
+	DECLARE_WRITE8_MEMBER( master6801_p3_w );
+	DECLARE_WRITE8_MEMBER( master6801_p4_w );
+
+	DECLARE_READ8_MEMBER( kb6801_p1_r );
+	DECLARE_READ8_MEMBER( kb6801_p2_r );
+	DECLARE_WRITE8_MEMBER( kb6801_p2_w );
+	DECLARE_READ8_MEMBER( kb6801_p3_r );
+	DECLARE_WRITE8_MEMBER( kb6801_p3_w );
+	DECLARE_READ8_MEMBER( kb6801_p4_r );
+	DECLARE_WRITE8_MEMBER( kb6801_p4_w );
+
+	DECLARE_WRITE8_MEMBER( ddp6801_p1_w );
+	DECLARE_READ8_MEMBER( ddp6801_p2_r );
+	DECLARE_WRITE8_MEMBER( ddp6801_p2_w );
+	DECLARE_READ8_MEMBER( ddp6801_p4_r );
+	
+	DECLARE_WRITE8_MEMBER( printer6801_p1_w );
+	DECLARE_READ8_MEMBER( printer6801_p2_r );
+	DECLARE_WRITE8_MEMBER( printer6801_p2_w );
+	DECLARE_READ8_MEMBER( printer6801_p3_r );
+	DECLARE_READ8_MEMBER( printer6801_p4_r );
+	DECLARE_WRITE8_MEMBER( printer6801_p4_w );
+
+	// memory state
+	UINT8 m_mioc;
+
+	// ADAMnet state
+	UINT8 m_adamnet;
+	int m_txd[6];
+	int m_rxd;
+	int m_reset;
+
+	// DMA state
+	UINT16 m_ba;
+	int m_dma;
+	int m_bwr;
+	UINT8 m_data_in;
+	UINT8 m_data_out;
+
+	// keyboard state
+	UINT16 m_key_y;
+
+	// paddle state
+	int m_joy_mode;
+	int m_joy_status0;
+	int m_joy_status1;
+
+	// video state
+	int m_vdp_nmi;
 };
 
-
-/*----------- defined in drivers/adam.c -----------*/
-
-void adam_set_memory_banks(running_machine *machine);
-void adam_reset_pcb(running_machine *machine);
-
-
-/*----------- defined in machine/adam.c -----------*/
-
-//int adam_cart_verify(const UINT8 *buf, size_t size);
-
-void adam_clear_keyboard_buffer(running_machine *machine);
-void adam_explore_keyboard(running_machine *machine);
-
-READ8_HANDLER  ( adamnet_r );
-WRITE8_HANDLER ( adamnet_w );
-READ8_HANDLER  ( adam_paddle_r );
-WRITE8_HANDLER ( adam_paddle_toggle_off );
-WRITE8_HANDLER ( adam_paddle_toggle_on );
-WRITE8_HANDLER ( adam_memory_map_controller_w );
-READ8_HANDLER ( adam_memory_map_controller_r );
-READ8_HANDLER ( adam_video_r );
-WRITE8_HANDLER ( adam_video_w );
-WRITE8_HANDLER ( adam_common_writes_w );
-
-
-#endif /* ADAM_H_ */
+#endif
