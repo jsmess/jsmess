@@ -338,6 +338,8 @@ READ8_MEMBER( mb89352_device::mb89352_r )
 			m_data = m_buffer[m_transfer_index % 512];
 			m_transfer_index++;
 			m_transfer_count--;
+			if(m_transfer_index % 512 == 0)
+				SCSIReadData(m_SCSIdevices[m_target],m_buffer,512);
 			if(m_transfer_count == 0)
 			{
 				// End of transfer
@@ -346,7 +348,9 @@ READ8_MEMBER( mb89352_device::mb89352_r )
 				m_ints |= INTS_COMMAND_COMPLETE;
 				set_phase(SCSI_PHASE_STATUS);
 			}
+			return m_data;
 		}
+
 		return 0x00;
 	case 0x0b:  // TEMP - Temporary
 		return m_temp;
