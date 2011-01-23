@@ -112,7 +112,7 @@ static READ8_HANDLER( apple3_c0xx_r )
 	{
 		case 0x00: case 0x01: case 0x02: case 0x03:
 		case 0x04: case 0x05: case 0x06: case 0x07:
-			result = AY3600_keydata_strobe_r();
+			result = AY3600_keydata_strobe_r(space->machine);
 			break;
 
 		case 0x08: case 0x09: case 0x0A: case 0x0B:
@@ -125,7 +125,7 @@ static READ8_HANDLER( apple3_c0xx_r )
 		case 0x14: case 0x15: case 0x16: case 0x17:
 		case 0x18: case 0x19: case 0x1A: case 0x1B:
 		case 0x1C: case 0x1D: case 0x1E: case 0x1F:
-			AY3600_anykey_clearstrobe_r();
+			AY3600_anykey_clearstrobe_r(space->machine);
 			break;
 
 		case 0x50: case 0x51: case 0x52: case 0x53:
@@ -198,7 +198,7 @@ static WRITE8_HANDLER( apple3_c0xx_w )
 		case 0x14: case 0x15: case 0x16: case 0x17:
 		case 0x18: case 0x19: case 0x1A: case 0x1B:
 		case 0x1C: case 0x1D: case 0x1E: case 0x1F:
-			AY3600_anykey_clearstrobe_r();
+			AY3600_anykey_clearstrobe_r(space->machine);
 			break;
 
 		case 0x50: case 0x51: case 0x52: case 0x53:
@@ -252,7 +252,7 @@ INTERRUPT_GEN( apple3_interrupt )
 {
 	via6522_device *via_1 = device->machine->device<via6522_device>("via6522_1");
 
-	via_1->write_ca2((AY3600_keydata_strobe_r() & 0x80) ? 1 : 0);
+	via_1->write_ca2((AY3600_keydata_strobe_r(device->machine) & 0x80) ? 1 : 0);
 	via_1->write_cb1(device->machine->primary_screen->vblank());
 	via_1->write_cb2(device->machine->primary_screen->vblank());
 }

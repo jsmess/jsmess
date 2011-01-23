@@ -44,49 +44,60 @@ Bit 7  LED A-H
 #include "machine/mboard.h"
 #include "rendlay.h"
 
+
+class polgar_state : public driver_device
+{
+public:
+	polgar_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 led_status;
+	UINT8 lcd_char;
+	UINT8 led7;
+	UINT8 latch_data;
+};
+
+
 //static UINT8 lcd_shift_counter;
-static UINT8 led_status;
-static UINT8 lcd_char=0;
 // static UINT8 *milano_ram;
-static UINT8 led7;
 
 static const int value[4] = {0x80,0x81,0x00,0x01};
 
-static UINT8 latch_data;
 
 static const hd44780_interface polgar_display =
 {
-    2,                  // number of lines
-    16,                 // chars for line
-    NULL                // custom display layout
+	2,	// number of lines
+	16,	// chars for line
+	NULL	// custom display layout
 };
 
 
 static WRITE8_HANDLER ( write_io )
 {
-int i;
- hd44780_device * hd44780 = space->machine->device<hd44780_device>("hd44780");
- device_t *speaker = space->machine->device("beep");
+	polgar_state *state = space->machine->driver_data<polgar_state>();
+	int i;
+	hd44780_device * hd44780 = space->machine->device<hd44780_device>("hd44780");
+	device_t *speaker = space->machine->device("beep");
 
-if (BIT(data,1)) {
-	if (BIT(data,0)) {
-		hd44780->data_write(128, lcd_char);
-	} else {
-		hd44780->control_write(128, lcd_char);
+	if (BIT(data,1)) {
+		if (BIT(data,0)) {
+			hd44780->data_write(128, state->lcd_char);
+		} else {
+			hd44780->control_write(128, state->lcd_char);
+		}
 	}
-}
 
-if (BIT(data,2) || BIT(data,3)) beep_set_state(speaker,1); else beep_set_state(speaker,0);
+	if (BIT(data,2) || BIT(data,3)) beep_set_state(speaker,1); else beep_set_state(speaker,0);
 
-if (BIT(data,7) && BIT(data, 4))
+	if (BIT(data,7) && BIT(data, 4))
 	{
 		for (i=0;i<8;i++)
-		output_set_led_value(i,!BIT(latch_data,i));
+		output_set_led_value(i,!BIT(state->latch_data,i));
 	}
-if (BIT(data,6) && BIT(data,5))
+	if (BIT(data,6) && BIT(data,5))
 	{
 		for (i=0;i<8;i++)
-		output_set_led_value(10+i,!BIT(latch_data,7-i));
+		output_set_led_value(10+i,!BIT(state->latch_data,7-i));
 	}
 
 	//logerror("LCD Status  Data = %d\n",data);
@@ -96,24 +107,27 @@ if (BIT(data,6) && BIT(data,5))
 
 static WRITE8_HANDLER ( write_lcd )
 {
+	polgar_state *state = space->machine->driver_data<polgar_state>();
 
-  lcd_char=data;
+	state->lcd_char=data;
 
- //logerror("LCD Data = %d [%c]\n",data,(data&0xff));
+	//logerror("LCD Data = %d [%c]\n",data,(data&0xff));
 
 }
 
 
 static WRITE8_HANDLER ( write_board )
 {
-  latch_data=data;
+	polgar_state *state = space->machine->driver_data<polgar_state>();
+	state->latch_data=data;
 }
 
 
 static WRITE8_HANDLER ( milano_write_led )
 {
 	UINT8 LED_offset=100;
-if (data==0xff) output_set_led_value(LED_offset+offset,1);
+	if (data==0xff)
+		output_set_led_value(LED_offset+offset,1);
 	else
 		output_set_led_value(LED_offset+offset,0);
 
@@ -122,39 +136,45 @@ if (data==0xff) output_set_led_value(LED_offset+offset,1);
 
 static WRITE8_HANDLER ( write_led )
 {
+	polgar_state *state = space->machine->driver_data<polgar_state>();
 	UINT8 LED_offset=100;
 	data &= 0x80;
 
-	if (data==0)led_status &= 255-(1<<offset) ; else led_status|=1<<offset;
-	if (offset<6)output_set_led_value(LED_offset+offset, led_status&1<<offset?1:0);
-	if (offset==7) led7=data& 0x80 ? 0x00 :0xff;
+	if (data==0)state->led_status &= 255-(1<<offset) ; else state->led_status|=1<<offset;
+	if (offset<6)output_set_led_value(LED_offset+offset, state->led_status&1<<offset?1:0);
+	if (offset==7) state->led7=data& 0x80 ? 0x00 :0xff;
 	logerror("LEDs  Offset = %d Data = %d\n",offset,data);
 }
 
-/*static WRITE8_HANDLER ( write_led )
+#if 0
+static WRITE8_HANDLER ( write_led )
 {
+	polgar_state *state = space->machine->driver_data<polgar_state>();
 	UINT8 LED_offset=100;
-if (data==0xff) output_set_led_value(LED_offset+offset,1);
+	if (data==0xff)
+		output_set_led_value(LED_offset+offset,1);
 	else
 		output_set_led_value(LED_offset+offset,0);
-	if (data==0)led_status &= 255-(1<<offset) ; else led_status|=1<<offset;
-	if (offset<6)output_set_led_value(LED_offset+offset, led_status&1<<offset?1:0);
-	 if (offset==7) led7=data& 0x80 ? 0x00 :0xff;
+	if (data==0)state->led_status &= 255-(1<<offset) ; else state->led_status|=1<<offset;
+	if (offset<6)output_set_led_value(LED_offset+offset, state->led_status&1<<offset?1:0);
+	if (offset==7) state->led7=data& 0x80 ? 0x00 :0xff;
 
 
 	logerror("LEDs  Offset = %d Data = %d\n",offset,data);
 }
-*/
+#endif
+
 static READ8_HANDLER(read_board)
 {
 	UINT8 data;
-  data=input_port_read(space->machine, "KEY1_8");
-  logerror("Keydata  Data = %d\n  ",data);
-return data;
+	data=input_port_read(space->machine, "KEY1_8");
+	logerror("Keydata  Data = %d\n  ",data);
+	return data;
 }
 
 static READ8_HANDLER(read_keys)
 {
+	//polgar_state *state = space->machine->driver_data<polgar_state>();
 	UINT8 data;
 	static const char *const keynames[2][8] =
 			{
@@ -163,14 +183,14 @@ static READ8_HANDLER(read_keys)
 			};
 
 	data = 0xff;
-/*
-	if (((led_status & 0x80) == 0x00))
+#if 0
+	if (((state->led_status & 0x80) == 0x00))
 		data=input_port_read(space->machine, keynames[0][offset]);
 	else
 		data=input_port_read(space->machine, keynames[1][offset]);
-*/
-  data=input_port_read(space->machine, keynames[0][offset]);
-	// logerror("Keyboard Port = %s Data = %d\n  ", ((led_status & 0x80) == 0x00) ? keynames[0][offset] : keynames[1][offset], data);
+#endif
+	data=input_port_read(space->machine, keynames[0][offset]);
+	// logerror("Keyboard Port = %s Data = %d\n  ", ((state->led_status & 0x80) == 0x00) ? keynames[0][offset] : keynames[1][offset], data);
 	return data | 0x7f;
 }
 
@@ -183,31 +203,31 @@ static VIDEO_START( polgar )
 
 static VIDEO_UPDATE( polgar )
 {
-    hd44780_device * hd44780 = screen->machine->device<hd44780_device>("hd44780");
-    return hd44780->video_update( bitmap, cliprect );
+	hd44780_device * hd44780 = screen->machine->device<hd44780_device>("hd44780");
+	return hd44780->video_update( bitmap, cliprect );
 }
 
 static PALETTE_INIT( polgar )
 {
-//    palette_set_color(machine, 0, MAKE_RGB(138, 146, 148));
+	//palette_set_color(machine, 0, MAKE_RGB(138, 146, 148));
 	palette_set_color(machine, 0, MAKE_RGB(195, 201, 200));
-  palette_set_color(machine, 1, MAKE_RGB(40, 30, 30));
+	palette_set_color(machine, 1, MAKE_RGB(40, 30, 30));
 }
 
 
 static const gfx_layout polgar_charlayout =
 {
-    5, 8,                   /* 5 x 8 characters */
-    256,                    /* 256 characters */
-    1,                      /* 1 bits per pixel */
-    { 0 },                  /* no bitplanes */
-    { 3, 4, 5, 6, 7},
-    { 0, 8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8},
-    8*8                     /* 8 bytes */
+	5, 8,	/* 5 x 8 characters */
+	256,	/* 256 characters */
+	1,	/* 1 bits per pixel */
+	{ 0 },	/* no bitplanes */
+	{ 3, 4, 5, 6, 7},
+	{ 0, 8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8},
+	8*8	/* 8 bytes */
 };
 
 static GFXDECODE_START( polgar )
-    GFXDECODE_ENTRY( "hd44780", 0x0000, polgar_charlayout, 0, 1 )
+	GFXDECODE_ENTRY( "hd44780", 0x0000, polgar_charlayout, 0, 1 )
 GFXDECODE_END
 
 
@@ -219,7 +239,7 @@ static ADDRESS_MAP_START(polgar_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE( 0x3400, 0x3405) AM_WRITE( write_led)	// Function LEDs 3400 TRN 3401
 	AM_RANGE( 0x2c00, 0x2c07) AM_READ( read_keys)	// CL Key
 	AM_RANGE( 0x2004, 0x2004) AM_WRITE( write_io)	// LCD Instr. Reg + Beeper
-	AM_RANGE( 0x2000, 0x2000) AM_WRITE( write_lcd)	        // LCD Char Reg.
+	AM_RANGE( 0x2000, 0x2000) AM_WRITE( write_lcd)	// LCD Char Reg.
  	AM_RANGE( 0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -360,11 +380,12 @@ INPUT_PORTS_END
 
 static TIMER_CALLBACK( update_nmi )
 {
-	// device_t *speaker = machine->device("beep");
+	//polgar_state *state = machine->driver_data<polgar_state>();
+	// running_device *speaker = machine->device("beep");
 	cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI,PULSE_LINE);
 	// cputag_set_input_line(machine, "maincpu", M6502_IRQ_LINE, CLEAR_LINE);
-	// dac_data_w(0,led_status&64?128:0);
-	// beep_set_state(speaker,led_status&64?1:0);
+	// dac_data_w(0,state->led_status&64?128:0);
+	// beep_set_state(speaker,state->led_status&64?1:0);
 }
 
 
@@ -385,17 +406,17 @@ static MACHINE_RESET( polgar )
 }
 
 
-static MACHINE_CONFIG_START( polgar, driver_device )
+static MACHINE_CONFIG_START( polgar, polgar_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M65C02,4915200)        /* 65C02 */
+	MCFG_CPU_ADD("maincpu",M65C02,4915200)	/* 65C02 */
 	MCFG_CPU_PROGRAM_MAP(polgar_mem)
 	MCFG_QUANTUM_TIME(HZ(60))
 	MCFG_MACHINE_START( polgar )
 	MCFG_MACHINE_RESET( polgar )
 
 	/* video hardware */
-  // MCFG_DEFAULT_LAYOUT(layout_milano)
-  MCFG_SCREEN_ADD("screen", LCD)
+	// MCFG_DEFAULT_LAYOUT(layout_milano)
+	MCFG_SCREEN_ADD("screen", LCD)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(100, 20)
@@ -407,12 +428,12 @@ static MACHINE_CONFIG_START( polgar, driver_device )
 
 	MCFG_HD44780_ADD("hd44780", polgar_display)
 
-    MCFG_VIDEO_START(polgar)
-    MCFG_VIDEO_UPDATE(polgar)
+	MCFG_VIDEO_START(polgar)
+	MCFG_VIDEO_UPDATE(polgar)
 
 
-//	MCFG_DEFAULT_LAYOUT(layout_van16)
-	 MCFG_DEFAULT_LAYOUT(layout_lcd)
+	//MCFG_DEFAULT_LAYOUT(layout_van16)
+	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
 
 	/* sound hardware */
@@ -423,7 +444,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( milano, polgar )
 	/* basic machine hardware */
-  // MCFG_IMPORT_FROM( polgar )
+	// MCFG_IMPORT_FROM( polgar )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(milano_mem)
 	//beep_set_frequency(0, 4000);
@@ -433,7 +454,7 @@ ROM_START(milano)
 	ROM_REGION(0x10000,"maincpu",0)
 	ROM_LOAD("milano.bin", 0x0000, 0x10000, CRC(0e9c8fe1) SHA1(e9176f42d86fe57e382185c703c7eff7e63ca711))
 	ROM_REGION( 0x0860, "hd44780", ROMREGION_ERASE )
-	ROM_LOAD( "44780a00.bin",    0x0000, 0x0860,  BAD_DUMP CRC(3a89024c) SHA1(5a87b68422a916d1b37b5be1f7ad0b3fb3af5a8d))
+	ROM_LOAD( "44780a00.bin", 0x0000, 0x0860,  BAD_DUMP CRC(3a89024c) SHA1(5a87b68422a916d1b37b5be1f7ad0b3fb3af5a8d))
 ROM_END
 
 
@@ -442,13 +463,14 @@ ROM_START(polgar) //polgar
 	ROM_REGION(0x10000,"maincpu",0)
 	ROM_LOAD("polgar.bin", 0x0000, 0x10000, CRC(88d55c0f) SHA1(e86d088ec3ac68deaf90f6b3b97e3e31b1515913))
 	ROM_REGION( 0x0860, "hd44780", ROMREGION_ERASE )
-	ROM_LOAD( "44780a00.bin",    0x0000, 0x0860,  BAD_DUMP CRC(3a89024c) SHA1(5a87b68422a916d1b37b5be1f7ad0b3fb3af5a8d))
+	ROM_LOAD( "44780a00.bin", 0x0000, 0x0860,  BAD_DUMP CRC(3a89024c) SHA1(5a87b68422a916d1b37b5be1f7ad0b3fb3af5a8d))
 ROM_END
 
 
 static DRIVER_INIT( polgar )
 {
-led_status=0;
+	polgar_state *state = machine->driver_data<polgar_state>();
+	state->led_status=0;
 }
 
 /***************************************************************************

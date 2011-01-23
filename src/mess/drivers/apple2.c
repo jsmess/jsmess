@@ -603,7 +603,7 @@ static const cassette_config apple2_cassette_config =
 	NULL
 };
 
-static MACHINE_CONFIG_START( apple2_common, driver_device )
+static MACHINE_CONFIG_START( apple2_common, apple2_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 1021800)		/* close to actual CPU frequency of 1.020484 MHz */
 	MCFG_CPU_PROGRAM_MAP(apple2_map)

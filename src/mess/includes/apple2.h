@@ -102,6 +102,46 @@ struct _apple2_memmap_config
 };
 
 
+class apple2_state : public driver_device
+{
+public:
+	apple2_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT32 flags;
+	INT32 a2_cnxx_slot;
+	UINT32 a2_mask;
+	UINT32 a2_set;
+	int a2_speaker_state;
+	double joystick_x1_time;
+	double joystick_y1_time;
+	double joystick_x2_time;
+	double joystick_y2_time;
+	apple2_memmap_config mem_config;
+	apple2_meminfo *current_meminfo;
+	int fdc_diskreg;
+	unsigned int *ay3600_keys;
+	//UINT8 keycode;
+	UINT8 keycode_unmodified;
+	//UINT8 keywaiting;
+	UINT8 keystilldown;
+	UINT8 keymodreg;
+	int reset_flag;
+	int last_key;
+	int last_key_unmodified;
+	unsigned int time_until_repeat;
+	const UINT8 *a2_videoram;
+	UINT32 a2_videomask;
+	UINT32 old_a2;
+	int fgcolor;
+	int bgcolor;
+	int flash;
+	int alt_charset_value;
+	UINT16 *hires_artifact_map;
+	UINT16 *dhires_artifact_map;
+};
+
+
 /*----------- defined in drivers/apple2.c -----------*/
 
 INPUT_PORTS_EXTERN( apple2ep );
@@ -110,13 +150,10 @@ PALETTE_INIT( apple2 );
 
 /*----------- defined in machine/apple2.c -----------*/
 
-extern UINT32 apple2_flags;
-extern INT32 a2_cnxx_slot;
-
 extern const applefdc_interface apple2_fdc_interface;
 
 void apple2_iwm_setdiskreg(running_machine *machine, UINT8 data);
-UINT8 apple2_iwm_getdiskreg(void);
+UINT8 apple2_iwm_getdiskreg(running_machine *machine);
 
 void apple2_init_common(running_machine *machine);
 MACHINE_START( apple2 );
@@ -144,9 +181,5 @@ VIDEO_START( apple2 );
 VIDEO_START( apple2p );
 VIDEO_START( apple2e );
 VIDEO_UPDATE( apple2 );
-void apple2_set_fgcolor(int color);
-void apple2_set_bgcolor(int color);
-int apple2_get_fgcolor(void);
-int apple2_get_bgcolor(void);
 
 #endif /* APPLE2_H_ */

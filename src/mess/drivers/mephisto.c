@@ -61,22 +61,34 @@ $8000-$FFF ROM
 
 #include "machine/mboard.h"
 
-static UINT8 lcd_shift_counter;
-static UINT8 led_status;
-static UINT8 *mephisto_ram;
-static UINT8 led7;
+
+class mephisto_state : public driver_device
+{
+public:
+	mephisto_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 lcd_shift_counter;
+	UINT8 led_status;
+	UINT8 *ram;
+	UINT8 led7;
+};
+
+
 
 static WRITE8_HANDLER ( write_lcd )
 {
-	if (led7==0)output_set_digit_value(lcd_shift_counter,data);    // 0x109 MM IV // 0x040 MM V
+	mephisto_state *state = space->machine->driver_data<mephisto_state>();
+	if (state->led7==0)output_set_digit_value(state->lcd_shift_counter,data);	// 0x109 MM IV // 0x040 MM V
 
-	//output_set_digit_value(lcd_shift_counter,data ^ mephisto_ram[0x165]);    // 0x109 MM IV // 0x040 MM V
-	lcd_shift_counter--;
-	lcd_shift_counter&=3;
+	//output_set_digit_value(state->lcd_shift_counter,data ^ state->ram[0x165]);	// 0x109 MM IV // 0x040 MM V
+	state->lcd_shift_counter--;
+	state->lcd_shift_counter&=3;
 }
 
 static READ8_HANDLER(read_keys)
 {
+	mephisto_state *state = space->machine->driver_data<mephisto_state>();
 	UINT8 data;
 	static const char *const keynames[2][8] =
 			{
@@ -85,47 +97,49 @@ static READ8_HANDLER(read_keys)
 			};
 
 	data = 0xff;
-	if (((led_status & 0x80) == 0x00))
+	if (((state->led_status & 0x80) == 0x00))
 		data=input_port_read(space->machine, keynames[0][offset]);
 	else
 		data=input_port_read(space->machine, keynames[1][offset]);
 
-	logerror("Keyboard Port = %s Data = %d\n  ", ((led_status & 0x80) == 0x00) ? keynames[0][offset] : keynames[1][offset], data);
+	logerror("Keyboard Port = %s Data = %d\n  ", ((state->led_status & 0x80) == 0x00) ? keynames[0][offset] : keynames[1][offset], data);
 	return data | 0x7f;
 }
 
 static WRITE8_HANDLER ( write_led )
 {
+	mephisto_state *state = space->machine->driver_data<mephisto_state>();
 	UINT8 LED_offset=100;
 	data &= 0x80;
 
-	if (data==0)led_status &= 255-(1<<offset) ; else led_status|=1<<offset;
-	if (offset<6)output_set_led_value(LED_offset+offset, led_status&1<<offset?1:0);
-	if (offset==7) led7=data& 0x80 ? 0x00 :0xff;
+	if (data==0)state->led_status &= 255-(1<<offset) ; else state->led_status|=1<<offset;
+	if (offset<6)output_set_led_value(LED_offset+offset, state->led_status&1<<offset?1:0);
+	if (offset==7) state->led7=data& 0x80 ? 0x00 :0xff;
 	logerror("LEDs  Offset = %d Data = %d\n",offset,data);
 }
 
 static WRITE8_HANDLER ( write_led_mm2 )
 {
+	mephisto_state *state = space->machine->driver_data<mephisto_state>();
 
 	UINT8 LED_offset=100;
 	data &= 0x80;
 
 	if (data==0)
-		led_status &= 255-(1<<offset);
+		state->led_status &= 255-(1<<offset);
 	else
-		led_status|=1<<offset;
+		state->led_status|=1<<offset;
 
 	if (offset<6)
-		output_set_led_value(LED_offset+offset, led_status&1<<offset?1:0);
+		output_set_led_value(LED_offset+offset, state->led_status&1<<offset?1:0);
 
 	if (offset==7)
-	    led7= data & 0x80 ? 0xff :0x00;	//MM2
+		state->led7= data & 0x80 ? 0xff :0x00;	//MM2
 
 }
 
 static ADDRESS_MAP_START(rebel5_mem , ADDRESS_SPACE_PROGRAM, 8)
-	AM_RANGE( 0x0000, 0x1fff) AM_RAM						// AM_BASE(&mephisto_ram)//
+	AM_RANGE( 0x0000, 0x1fff) AM_RAM						// AM_BASE_MEMBER(mephisto_state, ram)//
 	AM_RANGE( 0x5000, 0x5000) AM_WRITE( write_lcd )
 	AM_RANGE( 0x3000, 0x3007) AM_READ( read_keys )			// Rebel 5.0
 	AM_RANGE( 0x2000, 0x2007) AM_WRITE( write_led )			// Status LEDs+ buzzer
@@ -137,7 +151,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START(mephisto_mem , ADDRESS_SPACE_PROGRAM, 8)
-	AM_RANGE( 0x0000, 0x1fff) AM_RAM AM_BASE(&mephisto_ram )//
+	AM_RANGE( 0x0000, 0x1fff) AM_RAM AM_BASE_MEMBER(mephisto_state, ram )//
 	AM_RANGE( 0x2000, 0x2000) AM_WRITE( write_lcd )
 	AM_RANGE( 0x2c00, 0x2c07) AM_READ( read_keys )
 	AM_RANGE( 0x3400, 0x3407) AM_WRITE( write_led )			// Status LEDs+ buzzer
@@ -150,7 +164,7 @@ static ADDRESS_MAP_START(mephisto_mem , ADDRESS_SPACE_PROGRAM, 8)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(mm2_mem , ADDRESS_SPACE_PROGRAM, 8)
-	AM_RANGE( 0x0000, 0x0fff) AM_RAM AM_BASE(&mephisto_ram )
+	AM_RANGE( 0x0000, 0x0fff) AM_RAM AM_BASE_MEMBER(mephisto_state, ram )
 	AM_RANGE( 0x2800, 0x2800) AM_WRITE( write_lcd )
 	AM_RANGE( 0x1800, 0x1807) AM_READ( read_keys )
 	AM_RANGE( 0x1000, 0x1007) AM_WRITE( write_led_mm2 )		//Status LEDs
@@ -304,24 +318,27 @@ INPUT_PORTS_END
 
 static TIMER_CALLBACK( update_nmi )
 {
+	mephisto_state *state = machine->driver_data<mephisto_state>();
 	device_t *speaker = machine->device("beep");
 	cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI,PULSE_LINE);
-	// dac_data_w(0,led_status&64?128:0);
-	beep_set_state(speaker,led_status&64?1:0);
+	// dac_data_w(0,state->led_status&64?128:0);
+	beep_set_state(speaker,state->led_status&64?1:0);
 }
 
 static TIMER_CALLBACK( update_irq )		//only mm2
 {
+	mephisto_state *state = machine->driver_data<mephisto_state>();
 	device_t *speaker = machine->device("beep");
 
 	cputag_set_input_line(machine, "maincpu", M6502_IRQ_LINE, ASSERT_LINE);
 	cputag_set_input_line(machine, "maincpu", M6502_IRQ_LINE, CLEAR_LINE);
 
-	beep_set_state(speaker,led_status&64?1:0);
+	beep_set_state(speaker,state->led_status&64?1:0);
 }
 static MACHINE_START( mephisto )
 {
-	lcd_shift_counter=3;
+	mephisto_state *state = machine->driver_data<mephisto_state>();
+	state->lcd_shift_counter=3;
 
 	timer_pulse(machine, ATTOTIME_IN_HZ(600), NULL, 0, update_nmi);
 	timer_pulse(machine, ATTOTIME_IN_HZ(100), NULL, 0, mboard_update_artwork);
@@ -331,8 +348,9 @@ static MACHINE_START( mephisto )
 
 static MACHINE_START( mm2 )
 {
-	lcd_shift_counter=3;
-	led7=0xff;
+	mephisto_state *state = machine->driver_data<mephisto_state>();
+	state->lcd_shift_counter=3;
+	state->led7=0xff;
 
 	timer_pulse(machine, ATTOTIME_IN_HZ(450), NULL, 0, update_irq);
 	timer_pulse(machine, ATTOTIME_IN_HZ(100), NULL, 0, mboard_update_artwork);
@@ -343,7 +361,8 @@ static MACHINE_START( mm2 )
 
 static MACHINE_RESET( mephisto )
 {
-	lcd_shift_counter = 3;
+	mephisto_state *state = machine->driver_data<mephisto_state>();
+	state->lcd_shift_counter = 3;
 
 	mboard_set_border_pieces();
 	mboard_set_board();
@@ -363,9 +382,9 @@ static MACHINE_RESET( mephisto )
 }
 
 
-static MACHINE_CONFIG_START( mephisto, driver_device )
+static MACHINE_CONFIG_START( mephisto, mephisto_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M65C02,4915200)        /* 65C02 */
+	MCFG_CPU_ADD("maincpu",M65C02,4915200)	/* 65C02 */
 	MCFG_CPU_PROGRAM_MAP(mephisto_mem)
 	MCFG_QUANTUM_TIME(HZ(60))
 	MCFG_MACHINE_START( mephisto )
@@ -434,7 +453,8 @@ ROM_END
 
 static DRIVER_INIT( mephisto )
 {
-	lcd_shift_counter = 3;
+	mephisto_state *state = machine->driver_data<mephisto_state>();
+	state->lcd_shift_counter = 3;
 }
 
 /***************************************************************************

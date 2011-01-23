@@ -9,6 +9,7 @@
 #ifndef APPLE2GS_H_
 #define APPLE2GS_H_
 
+#include "includes/apple2.h"
 
 // IIgs clocks as marked on the schematics
 #define APPLE2GS_28M  (XTAL_28_63636MHz) // IIGS master clock
@@ -39,11 +40,11 @@ typedef enum
 } adbstate_t;
 
 
-class apple2gs_state : public driver_device
+class apple2gs_state : public apple2_state
 {
 public:
 	apple2gs_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+		: apple2_state(machine, config) { }
 
 	UINT8 *slowmem;
 	UINT8 newvideo;

@@ -9,6 +9,7 @@
 #ifndef APPLE3_H_
 #define APPLE3_H_
 
+#include "includes/apple2.h"
 #include "machine/applefdc.h"
 #include "machine/6522via.h"
 
@@ -22,11 +23,11 @@
 #define VAR_EXTSIDE		0x0080
 
 
-class apple3_state : public driver_device
+class apple3_state : public apple2_state
 {
 public:
 	apple3_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+		: apple2_state(machine, config) { }
 
 	UINT32 flags;
 	UINT8 via_0_a;

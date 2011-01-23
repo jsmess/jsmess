@@ -68,9 +68,10 @@ public:
 	/* floppy state */
 	UINT8 i8255_0_pc;
 	UINT8 i8255_1_pc;
+	UINT8 fdc_mode;
+	UINT8 fdc_irq_opcode;
 };
 
-static UINT8 fdc_mode,fdc_irq_opcode;
 
 
 static VIDEO_START( pc88va )
@@ -957,14 +958,15 @@ static READ8_HANDLER( pc88va_fdc_r )
 
 static WRITE8_HANDLER( pc88va_fdc_w )
 {
+	pc88va_state *state = space->machine->driver_data<pc88va_state>();
 	switch(offset*2)
 	{
 		/*
 		---- ---x MODE: FDC op mode (0) Intelligent (1) DMA
 		*/
 		case 0x00: // FDC mode register
-			fdc_mode = data & 1;
-			cputag_set_input_line(space->machine, "fdccpu", INPUT_LINE_HALT, (fdc_mode) ? ASSERT_LINE : CLEAR_LINE);
+			state->fdc_mode = data & 1;
+			cputag_set_input_line(space->machine, "fdccpu", INPUT_LINE_HALT, (state->fdc_mode) ? ASSERT_LINE : CLEAR_LINE);
 			break;
 		/*
 		--x- ---- CLK: FDC clock selection (0) 4.8MHz (1) 8 MHz
@@ -1145,7 +1147,8 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( fdc_irq_vector_w )
 {
-	fdc_irq_opcode = data;
+	pc88va_state *state = space->machine->driver_data<pc88va_state>();
+	state->fdc_irq_opcode = data;
 }
 
 static ADDRESS_MAP_START( pc88va_z80_io_map, ADDRESS_SPACE_IO, 8 )
@@ -1533,8 +1536,8 @@ static MACHINE_RESET( pc88va )
 
 	state->tsp.tvram_vreg_offset = 0;
 
-	fdc_mode = 0;
-	fdc_irq_opcode = 0x00; //0x7f ld a,a !
+	state->fdc_mode = 0;
+	state->fdc_irq_opcode = 0x00; //0x7f ld a,a !
 
 	cpu_set_input_line_vector(machine->device("fdccpu"), 0, 0);
 }
@@ -1590,7 +1593,8 @@ static const struct pit8253_config pc88va_pit8253_config =
 
 static WRITE_LINE_DEVICE_HANDLER(pc88va_upd765_interrupt)
 {
-	if(fdc_mode)
+	pc88va_state *drvstate = device->machine->driver_data<pc88va_state>();
+	if(drvstate->fdc_mode)
 		pic8259_ir3_w(device->machine->device( "pic8259_slave"), state);
 	else
 		cputag_set_input_line(device->machine, "fdccpu", 0, HOLD_LINE);
