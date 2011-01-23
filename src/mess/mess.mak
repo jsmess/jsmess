@@ -465,9 +465,8 @@ $(MESSOBJ)/mame.a: \
 	$(MAME_VIDEO)/stvvdp1.o		\
 	$(MAME_VIDEO)/stvvdp2.o		\
 	$(MAME_DRIVERS)/megadriv.o  \
-	$(MAME_DRIVERS)/megadrvb.o  \
-	$(MAME_MACHINE)/megadriv.o	\
-	$(MAME_MACHINE)/md_pcb.o	\
+	$(MAME_MACHINE)/megadriv.o  \
+	$(MAME_MACHINE)/md_cart.o	\
 	$(MAME_MACHINE)/dc.o		\
 	$(MAME_MACHINE)/naomibd.o	\
 	$(MAME_MACHINE)/gdcrypt.o	\
