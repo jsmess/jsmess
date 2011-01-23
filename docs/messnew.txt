@@ -23,6 +23,8 @@ System Driver Changes:
 ----------------------
 - [ADAM] Added dumps of the internal M6801 ROMs. [KevinP]
 
+- [BBC] Made the SAA505x implementation a device.  [Atari Ace]
+
 - [GBA] Fixed EEPROM detection for "Banjo-Kazooie" and "Custom Robo GX".
   [Tim Schuerewegen]
 
@@ -38,6 +40,8 @@ System Driver Changes:
 
 - [GBA] Allow reading of the BLDALPHA register. This fixes the lockup in
   "Donkey Kong Country". [Tim Schuerewegen]
+
+- [PDP1] Made the CRT implementation a device.  [Atari Ace]
 
 - [PIPPIN] Added pre release rom
 

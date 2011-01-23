@@ -316,6 +316,12 @@ static const tx0_reset_param_t tx0_reset_param =
 	tx0_io_reset_callback
 };
 
+static const crt_interface tx0_crt_interface = 
+{
+	pen_crt_num_levels,
+	crt_window_offset_x, crt_window_offset_y,
+	crt_window_width, crt_window_height
+};
 
 static MACHINE_CONFIG_START( tx0_64kw, tx0_state )
 	/* basic machine hardware */
@@ -336,13 +342,14 @@ static MACHINE_CONFIG_START( tx0_64kw, tx0_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(virtual_width, virtual_height)
 	MCFG_SCREEN_VISIBLE_AREA(0, virtual_width-1, 0, virtual_height-1)
+	MCFG_CRT_ADD( "crt", tx0_crt_interface )
 
 	MCFG_GFXDECODE(tx0)
 	MCFG_PALETTE_LENGTH(pen_crt_num_levels + sizeof(tx0_colors) / 3 + sizeof(tx0_palette))
 
 	MCFG_PALETTE_INIT(tx0)
 	MCFG_VIDEO_START(tx0)
-	MCFG_VIDEO_EOF(crt)
+	MCFG_VIDEO_EOF(tx0)
 	MCFG_VIDEO_UPDATE(tx0)
 MACHINE_CONFIG_END
 

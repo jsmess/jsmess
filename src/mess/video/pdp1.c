@@ -65,20 +65,27 @@ VIDEO_START( pdp1 )
 
 	bitmap_fill(state->typewriter_bitmap, &typewriter_bitmap_bounds, pen_typewriter_bg);
 
-	/* initialize CRT */
-	video_start_crt(machine, pen_crt_num_levels, crt_window_offset_x, crt_window_offset_y, crt_window_width, crt_window_height);
+	state->crt = machine->device("crt");
 }
 
+
+VIDEO_EOF( pdp1 )
+{
+	pdp1_state *state = machine->driver_data<pdp1_state>();
+
+	crt_eof(state->crt);
+}
 
 /*
     schedule a pixel to be plotted
 */
-void pdp1_plot(int x, int y)
+void pdp1_plot(running_machine *machine, int x, int y)
 {
+	pdp1_state *state = machine->driver_data<pdp1_state>();
 	/* compute pixel coordinates and plot */
 	x = x*crt_window_width/01777;
 	y = y*crt_window_height/01777;
-	crt_plot(x, y);
+	crt_plot(state->crt, x, y);
 }
 
 
@@ -89,7 +96,7 @@ VIDEO_UPDATE( pdp1 )
 {
 	pdp1_state *state = screen->machine->driver_data<pdp1_state>();
 	pdp1_erase_lightpen(state, bitmap);
-	VIDEO_UPDATE_CALL(crt);
+	crt_update(state->crt, bitmap);
 	pdp1_draw_lightpen(state, bitmap);
 
 	pdp1_draw_panel(screen->machine, state->panel_bitmap);

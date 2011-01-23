@@ -3365,87 +3365,121 @@ static const char teletext_separated_graphics[96*60]={
 };
 
 
-static int teletext_data;
-static int teletext_LOSE;
-
-static const char *tt_lookup;
-static const char *tt_graphics;
-static int tt_colour;
-static int tt_rcolour;
-static int tt_bgcolour=0;
-static int tt_start_line=0;
-static int tt_double_height=0;
-static int tt_double_height_set=0;
-static int tt_double_height_offset=0;
-static int tt_linecount=0;
-static int tt_flash=0;
-static int tt_holdgraphics=0;
-static int tt_lastcode=0;
-
-static int tt_frame_count=0;
-
-// local copy of the 6845 external procedure calls
-static struct saa505x_interface saa505x_calls;
-
-
-void saa505x_config(const struct saa505x_interface *intf)
+typedef struct
 {
-	tt_lookup=teletext_saa5050_characters;
-	tt_graphics=teletext_graphics;
-	tt_colour=7;
-	saa505x_calls.out_Pixel_func=*intf->out_Pixel_func;
+	int data;
+	int lose;
+
+	const char *lookup;
+	const char *graphics;
+	int colour;
+	int rcolour;
+	int bgcolour;
+	int start_line;
+	int double_height;
+	int double_height_set;
+	int double_height_offset;
+	int linecount;
+	int flash;
+	int holdgraphics;
+	int lastcode;
+
+	int frame_count;
+	const saa505x_interface *intf;
+} teletext_t;
+
+
+INLINE teletext_t *get_safe_token( device_t *device )
+{
+	assert(device != NULL);
+	assert(device->type() == SAA505X);
+
+	return (teletext_t *)downcast<legacy_device_base *>(device)->token();
 }
 
-
-
-void teletext_data_w(int offset, int data)
+static DEVICE_START( saa505x )
 {
-	teletext_data=data & 0x7f;
+	teletext_t *tt = get_safe_token(device);
+	tt->lookup=teletext_saa5050_characters;
+	tt->graphics=teletext_graphics;
+	tt->colour=7;
+	tt->intf = (const saa505x_interface *)device->baseconfig().static_config();
 }
 
-void teletext_DEW(void)
+DEVICE_GET_INFO( saa505x )
 {
-	tt_linecount=9;
-	tt_double_height=0;
-	tt_double_height_set=0;
-	tt_double_height_offset=0;
-	tt_frame_count=(tt_frame_count+1)%50;
+	switch (state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(teletext_t);					break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(saa505x);		break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							strcpy(info->s, "SAA505x Video");					break;
+		case DEVINFO_STR_FAMILY:						strcpy(info->s, "SAA505x Video");					break;
+		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");							break;
+		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);						break;
+		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright MESS Team");			break;
+	}
 }
 
-void teletext_LOSE_w(int offset, int data)
+DEFINE_LEGACY_DEVICE(SAA505X, saa505x);
+
+void teletext_data_w(device_t *device, int offset, int data)
 {
-	if ((data)&&(!teletext_LOSE))
+	teletext_t *tt = get_safe_token(device);
+	tt->data=data & 0x7f;
+}
+
+void teletext_DEW(device_t *device)
+{
+	teletext_t *tt = get_safe_token(device);
+	tt->linecount=9;
+	tt->double_height=0;
+	tt->double_height_set=0;
+	tt->double_height_offset=0;
+	tt->frame_count=(tt->frame_count+1)%50;
+}
+
+void teletext_LOSE_w(device_t *device, int offset, int data)
+{
+	teletext_t *tt = get_safe_token(device);
+
+	if ((data)&&(!tt->lose))
 	{
 
-		tt_lookup=teletext_saa5050_characters;
-		tt_colour=7;
-		tt_bgcolour=0;
-		tt_graphics=teletext_graphics;
-		tt_linecount=(tt_linecount+1)%10;
-		tt_start_line=0;
-		tt_double_height=0;
-		tt_flash=0;
-		tt_holdgraphics=0;
-		tt_lastcode=0x20;
+		tt->lookup=teletext_saa5050_characters;
+		tt->colour=7;
+		tt->bgcolour=0;
+		tt->graphics=teletext_graphics;
+		tt->linecount=(tt->linecount+1)%10;
+		tt->start_line=0;
+		tt->double_height=0;
+		tt->flash=0;
+		tt->holdgraphics=0;
+		tt->lastcode=0x20;
 
 		// only check the double height stuff if at the first row of a new line
-		if (!tt_linecount)
+		if (!tt->linecount)
 		{
-			tt_double_height_offset=((!tt_double_height_set)||tt_double_height_offset)?0:10;
-			tt_double_height_set=0;
+			tt->double_height_offset=((!tt->double_height_set)||tt->double_height_offset)?0:10;
+			tt->double_height_set=0;
 		}
 
 	}
 
-	teletext_LOSE=data;
+	tt->lose=data;
 }
 
 
-void teletext_F1(running_machine *machine)
+void teletext_F1(device_t *device)
 {
+	teletext_t *tt = get_safe_token(device);
 	int sc1;
 	int code;
-	code=teletext_data;
+	code=tt->data;
 
 	switch (code)
 	{
@@ -3453,29 +3487,29 @@ void teletext_F1(running_machine *machine)
 
 		case 0x01: case 0x02: case 0x03: case 0x04:
 		case 0x05: case 0x06: case 0x07:
-			tt_lookup=teletext_saa5050_characters;
-			tt_colour=code;
+			tt->lookup=teletext_saa5050_characters;
+			tt->colour=code;
 			break;
 
 
 		case 0x08:  // Flash
-			tt_flash=tt_frame_count<20?1:0;
+			tt->flash=tt->frame_count<20?1:0;
 			break;
 		case 0x09:  // Steady
-			tt_flash=0;
+			tt->flash=0;
 			break;
 
 		// 0x0a     End Box    NOT USED
 		// 0x0b     Start Box  NOT USED
 
 		case 0x0c:	// Normal Height
-			tt_double_height=0;
-			tt_start_line=0;
+			tt->double_height=0;
+			tt->start_line=0;
 			break;
 		case 0x0d:	// Double Height
-			tt_double_height=1;
-			tt_double_height_set=1;
-			tt_start_line=tt_double_height_offset;
+			tt->double_height=1;
+			tt->double_height_set=1;
+			tt->start_line=tt->double_height_offset;
 			break;
 
 		// 0x0e     S0         NOT USED
@@ -3484,64 +3518,64 @@ void teletext_F1(running_machine *machine)
 
 		case 0x11: case 0x12: case 0x13: case 0x14:
 		case 0x15: case 0x16: case 0x17:
-			tt_lookup=tt_graphics;
-			tt_colour=code&0x07;
+			tt->lookup=tt->graphics;
+			tt->colour=code&0x07;
 			break;
 
 		// 0x18     Conceal Display
 
 		case 0x19:	//  Contiguois Graphics
-			tt_graphics=teletext_graphics;
-			if (tt_lookup!=teletext_saa5050_characters)
-				tt_lookup=tt_graphics;
+			tt->graphics=teletext_graphics;
+			if (tt->lookup!=teletext_saa5050_characters)
+				tt->lookup=tt->graphics;
 			break;
 		case 0x1a:	//  Separated Graphics
-			tt_graphics=teletext_separated_graphics;
-			if (tt_lookup!=teletext_saa5050_characters)
-				tt_lookup=tt_graphics;
+			tt->graphics=teletext_separated_graphics;
+			if (tt->lookup!=teletext_saa5050_characters)
+				tt->lookup=tt->graphics;
 			break;
 
 		// 0x1b     ESC        NOT USED
 
 		case 0x1c:  //  Black Background
-			tt_bgcolour=0;
+			tt->bgcolour=0;
 			break;
 		case 0x1d:  //  New Background
-			tt_bgcolour=tt_colour;
+			tt->bgcolour=tt->colour;
 			break;
 
 		case 0x1e:
-			tt_holdgraphics=1;
+			tt->holdgraphics=1;
 			break;
 
 		case 0x1f:
-			tt_holdgraphics=0;
+			tt->holdgraphics=0;
 			break;
 	}
 
-	if (teletext_LOSE)
+	if (tt->lose)
 	{
-		tt_rcolour=tt_flash?tt_bgcolour:tt_colour;
+		tt->rcolour=tt->flash?tt->bgcolour:tt->colour;
 		if (code<0x20) {
-			if (tt_holdgraphics) {
-				code=tt_lastcode;
+			if (tt->holdgraphics) {
+				code=tt->lastcode;
 			} else {
 				code=0x20;
 			}
 		}
-		tt_lastcode=code;
-		code=(code-0x20)*60+(6*((tt_linecount+tt_start_line)>>tt_double_height));
+		tt->lastcode=code;
+		code=(code-0x20)*60+(6*((tt->linecount+tt->start_line)>>tt->double_height));
 		for(sc1=0;sc1<6;sc1++)
 		{
-			(saa505x_calls.out_Pixel_func)(machine,0,tt_lookup[code++]?tt_rcolour:tt_bgcolour);
+			(tt->intf->out_Pixel_func)(device,0,tt->lookup[code++]?tt->rcolour:tt->bgcolour);
 		}
 	} else {
 
-		(saa505x_calls.out_Pixel_func)(machine,0,0);
-		(saa505x_calls.out_Pixel_func)(machine,0,0);
-		(saa505x_calls.out_Pixel_func)(machine,0,0);
-		(saa505x_calls.out_Pixel_func)(machine,0,0);
-		(saa505x_calls.out_Pixel_func)(machine,0,0);
-		(saa505x_calls.out_Pixel_func)(machine,0,0);
+		(tt->intf->out_Pixel_func)(device,0,0);
+		(tt->intf->out_Pixel_func)(device,0,0);
+		(tt->intf->out_Pixel_func)(device,0,0);
+		(tt->intf->out_Pixel_func)(device,0,0);
+		(tt->intf->out_Pixel_func)(device,0,0);
+		(tt->intf->out_Pixel_func)(device,0,0);
 	}
 }

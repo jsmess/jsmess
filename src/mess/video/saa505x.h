@@ -1,4 +1,3 @@
-
 /************************************************************************
     saa505x
 
@@ -10,17 +9,19 @@
  ************************************************************************/
 
 
-struct saa505x_interface
+typedef struct _saa505x_interface saa505x_interface;
+struct _saa505x_interface
 {
-	void (*out_Pixel_func)(running_machine *machine, int offset, int data);
+	void (*out_Pixel_func)(device_t *device, int offset, int data);
 };
 
-void saa505x_config(const struct saa505x_interface *intf);
+void teletext_DEW(device_t *device);
+void teletext_LOSE_w(device_t *device, int offset, int data);
+void teletext_data_w(device_t *device, int offset, int data);
+void teletext_F1(device_t *device);
 
+DECLARE_LEGACY_DEVICE(SAA505X, saa505x);
 
-void teletext_DEW(void);
-void teletext_LOSE_w(int offset, int data);
-
-void teletext_data_w(int offset, int data);
-void teletext_F1(running_machine *machine);
-
+#define MCFG_SAA505X_VIDEO_ADD(_tag, _intf) \
+	MCFG_DEVICE_ADD(_tag, SAA505X, 0) \
+	MCFG_DEVICE_CONFIG(_intf)

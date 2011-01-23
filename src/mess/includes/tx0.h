@@ -144,6 +144,7 @@ public:
 	bitmap_t *typewriter_bitmap;
 	int pos;
 	int case_shift;
+	device_t *crt;
 };
 
 
@@ -176,8 +177,10 @@ INTERRUPT_GEN( tx0_interrupt );
 /*----------- defined in video/tx0.c -----------*/
 
 VIDEO_START( tx0 );
-void tx0_plot(int x, int y);
+VIDEO_EOF( tx0 );
 VIDEO_UPDATE( tx0 );
+
+void tx0_plot(running_machine *machine, int x, int y);
 void tx0_typewriter_drawchar(running_machine *machine, int character);
 
 /* defines for each bit and mask in input port "CSW" */

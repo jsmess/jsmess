@@ -52,20 +52,29 @@ VIDEO_START( tx0 )
 
 	bitmap_fill(state->typewriter_bitmap, &typewriter_bitmap_bounds, pen_typewriter_bg);
 
-	/* initialize CRT */
-	video_start_crt(machine, pen_crt_num_levels, crt_window_offset_x, crt_window_offset_y, crt_window_width, crt_window_height);
+	state->crt = machine->device("crt");
+}
+
+
+VIDEO_EOF( tx0 )
+{
+	tx0_state *state = machine->driver_data<tx0_state>();
+
+	crt_eof(state->crt);
 }
 
 
 /*
     schedule a pixel to be plotted
 */
-void tx0_plot(int x, int y)
+void tx0_plot(running_machine *machine, int x, int y)
 {
+	tx0_state *state = machine->driver_data<tx0_state>();
+
 	/* compute pixel coordinates and plot */
 	x = x*crt_window_width/0777;
 	y = y*crt_window_height/0777;
-	crt_plot(x, y);
+	crt_plot(state->crt, x, y);
 }
 
 
@@ -75,7 +84,7 @@ void tx0_plot(int x, int y)
 VIDEO_UPDATE( tx0 )
 {
 	tx0_state *state = screen->machine->driver_data<tx0_state>();
-	VIDEO_UPDATE_CALL(crt);
+	crt_update(state->crt, bitmap);
 
 	tx0_draw_panel(screen->machine, state->panel_bitmap);
 	copybitmap(bitmap, state->panel_bitmap, 0, 0, panel_window_offset_x, panel_window_offset_y, cliprect);

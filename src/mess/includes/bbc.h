@@ -89,6 +89,7 @@ public:
 	int BBC_VSync;
 	int BBC_Character_Row;
 	int BBC_DE;
+	device_t *saa505x;
 	int Teletext_Latch_Input_D7;
 	int Teletext_Latch;
 	int VideoULA_DE;
@@ -202,6 +203,7 @@ VIDEO_START( bbcbp );
 VIDEO_START( bbcm );
 VIDEO_UPDATE( bbc );
 
+void bbc_draw_RGB_in(device_t *device, int offset, int data);
 void bbc_set_video_memory_lookups(running_machine *machine, int ramsize);
 void bbc_frameclock(running_machine *machine);
 void bbc_setscreenstart(running_machine *machine, int b4, int b5);

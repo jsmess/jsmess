@@ -970,7 +970,7 @@ static void iot_dpy(device_t *device, int op2, int nac, int mb, int *io, int ac)
 
 	x = ((ac+0400000) & 0777777) >> 8;
 	y = (((*io)+0400000) & 0777777) >> 8;
-	pdp1_plot(x, y);
+	pdp1_plot(device->machine, x, y);
 
 	/* light pen 32 support */
 	state->io_status &= ~io_st_pen;

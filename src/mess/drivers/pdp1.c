@@ -346,6 +346,13 @@ static PALETTE_INIT( pdp1 )
 }
 
 
+static const crt_interface pdp1_crt_interface =
+{
+	pen_crt_num_levels,
+	crt_window_offset_x, crt_window_offset_y,
+	crt_window_width, crt_window_height
+};
+
 static MACHINE_CONFIG_START( pdp1, pdp1_state )
 
 	/* basic machine hardware */
@@ -365,13 +372,14 @@ static MACHINE_CONFIG_START( pdp1, pdp1_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(virtual_width, virtual_height)
 	MCFG_SCREEN_VISIBLE_AREA(0, virtual_width-1, 0, virtual_height-1)
+	MCFG_CRT_ADD( "crt", pdp1_crt_interface )
 
 	MCFG_GFXDECODE(pdp1)
 	MCFG_PALETTE_LENGTH(pen_crt_num_levels + sizeof(pdp1_colors) / 3 + sizeof(pdp1_palette))
 
 	MCFG_PALETTE_INIT(pdp1)
 	MCFG_VIDEO_START(pdp1)
-	MCFG_VIDEO_EOF(crt)
+	MCFG_VIDEO_EOF(pdp1)
 	MCFG_VIDEO_UPDATE(pdp1)
 MACHINE_CONFIG_END
 

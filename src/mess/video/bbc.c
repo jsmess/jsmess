@@ -17,8 +17,6 @@
 static void BBC_draw_hi_res(running_machine* machine);
 static void BBC_draw_teletext(running_machine *machine);
 
-static void BBC_draw_RGB_in(running_machine *machine, int offset,int data);
-
 /************************************************************************
  * video_refresh flag is used in optimising the screen redrawing
  * it is set whenever a 6845 or VideoULA registers are change.
@@ -178,11 +176,6 @@ static void set_pixel_lookup(bbc_state *state)
 
 
 
-static const struct saa505x_interface BBCsaa5050 =
-{
-	BBC_draw_RGB_in,
-};
-
 static void BBC_draw_teletext(running_machine *machine)
 {
 	bbc_state *state = machine->driver_data<bbc_state>();
@@ -191,13 +184,13 @@ static void BBC_draw_teletext(running_machine *machine)
 	//Teletext Latch bit 6 is only passed onto bits 6 on the Teletext chip if DE is true
 	//Teletext Latch bit 7 goes to LOSE on the Teletext chip
 
-    int meml;
+	int meml;
 
-	teletext_LOSE_w(0,(state->Teletext_Latch>>7)&1);
+	teletext_LOSE_w(state->saa505x, 0, (state->Teletext_Latch>>7)&1);
 
-	teletext_F1(machine);
+	teletext_F1(state->saa505x);
 
-	teletext_data_w(0,(state->Teletext_Latch&0x3f)|((state->Teletext_Latch&0x40)|(state->BBC_DE?0:0x40)));
+	teletext_data_w(state->saa505x, 0, (state->Teletext_Latch&0x3f)|((state->Teletext_Latch&0x40)|(state->BBC_DE?0:0x40)));
 
 	meml=m6845_memory_address_r(0);
 
@@ -389,9 +382,9 @@ static void BBC_draw_hi_res(running_machine *machine)
 
 // RGB input to the Video ULA from the Teletext IC
 // Just pass on the output at the correct pixel size.
-static void BBC_draw_RGB_in(running_machine *machine, int offset,int data)
+void bbc_draw_RGB_in(device_t *device, int offset,int data)
 {
-	bbc_state *state = machine->driver_data<bbc_state>();
+	bbc_state *state = device->machine->driver_data<bbc_state>();
 	BBC_ula_drawpixel(state, data, state->emulation_pixels_per_real_pixel);
 }
 
@@ -469,7 +462,7 @@ static void BBC_Set_VSync(running_machine *machine, int offset, int data)
 
 		state->BBC_display = state->BBC_display_left + state->x_screen_offset;
 
-		teletext_DEW();
+		teletext_DEW(state->saa505x);
 	}
 	state->BBC_VSync=data;
 
@@ -654,7 +647,7 @@ static void common_init(running_machine *machine)
 
 	set_pixel_lookup(state);
 	m6845_config(&BBC6845);
-	saa505x_config(&BBCsaa5050);
+	state->saa505x = machine->device("saa505x");
 
 	state->BBC_Video_RAM = machine->region("maincpu")->base();
 	state->vidmem_RAM = state->vidmem;

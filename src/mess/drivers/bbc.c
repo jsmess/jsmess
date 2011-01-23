@@ -14,7 +14,6 @@
 #include "cpu/m6502/m6502.h"
 #include "machine/6522via.h"
 #include "machine/mc146818.h"
-#include "includes/bbc.h"
 #include "machine/upd7002.h"
 #include "machine/ctronics.h"
 #include "imagedev/flopdrv.h"
@@ -24,6 +23,8 @@
 #include "formats/uef_cas.h"
 #include "formats/csw_cas.h"
 #include "sound/sn76496.h"
+#include "video/saa505x.h"
+#include "includes/bbc.h"
 
 
 /******************************************************************************
@@ -781,6 +782,11 @@ static const floppy_config bbc_floppy_config =
 	NULL
 };
 
+static const saa505x_interface bbc_saa505x_intf =
+{
+	bbc_draw_RGB_in,
+};
+
 static MACHINE_CONFIG_FRAGMENT( bbc_cartslot )
 	MCFG_CARTSLOT_ADD("cart1")
 	MCFG_CARTSLOT_EXTENSION_LIST("rom")
@@ -823,6 +829,7 @@ static MACHINE_CONFIG_START( bbca, bbc_state )
 	MCFG_SCREEN_VISIBLE_AREA(0,800-1,0,300-1)
 	MCFG_PALETTE_LENGTH(16)
 	MCFG_PALETTE_INIT(bbc)
+	MCFG_SAA505X_VIDEO_ADD("saa505x", bbc_saa505x_intf)
 
 	MCFG_VIDEO_START(bbca)
 	MCFG_VIDEO_UPDATE(bbc)
@@ -914,6 +921,7 @@ static MACHINE_CONFIG_START( bbcm, bbc_state )
 	MCFG_SCREEN_VISIBLE_AREA(0,800-1,0,300-1)
 	MCFG_PALETTE_LENGTH(16)
 	MCFG_PALETTE_INIT(bbc)
+	MCFG_SAA505X_VIDEO_ADD("saa505x", bbc_saa505x_intf)
 
 	MCFG_VIDEO_START(bbcm)
 	MCFG_VIDEO_UPDATE(bbc)

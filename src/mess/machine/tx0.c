@@ -394,7 +394,7 @@ void tx0_io_dis(device_t *device)
 	ac = cpu_get_reg(device, TX0_AC);
 	x = ac >> 9;
 	y = ac & 0777;
-	tx0_plot(x, y);
+	tx0_plot(device->machine, x, y);
 
 	timer_adjust_oneshot(state->dis_timer, ATTOTIME_IN_USEC(50), 0);
 }
