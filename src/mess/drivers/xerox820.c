@@ -944,7 +944,7 @@ ROM_END
 ROM_START( bigbord2 )
     ROM_REGION( 0x1000, "monitor", 0 )
 	ROM_LOAD( "bigbrdii.bin", 0x0000, 0x1000, CRC(c588189e) SHA1(4133903171ee8b9fcf12cc72de843af782b4a645))
-	ROM_REGION( 0x800, "chargen", 0 )
+	ROM_REGION( 0x800, "chargen", ROMREGION_ERASE00 )
 ROM_END
 /* System Drivers */
 
