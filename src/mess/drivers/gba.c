@@ -2332,13 +2332,54 @@ static WRITE32_HANDLER( eeprom_w )
 	}
 }
 
+#define	GBA_CHIP_EEPROM    (1 << 0)
+#define	GBA_CHIP_SRAM      (1 << 1)
+#define	GBA_CHIP_FLASH     (1 << 2)
+#define	GBA_CHIP_FLASH_1M  (1 << 3)
+#define	GBA_CHIP_RTC       (1 << 4)
+#define	GBA_CHIP_FLASH_512 (1 << 5)
+#define	GBA_CHIP_EEPROM_8K (1 << 6)
+
+static UINT32 gba_detect_chip( UINT8 *data, int size)
+{
+	int i;
+	UINT32 chip = 0;
+	for (i = 0; i < size; i++)
+	{
+		if (!memcmp(&data[i], "EEPROM_", 7))
+		{
+			chip |= GBA_CHIP_EEPROM;
+		}
+		else if ((!memcmp(&data[i], "SRAM_", 5))) // || (!memcmp(&data[i], "ADVANCEWARS", 11))) //advance wars 1 & 2 has SRAM, but no "SRAM_" string can be found inside the ROM space
+		{
+			chip |= GBA_CHIP_SRAM;
+		}
+		else if (!memcmp(&data[i], "FLASH1M_", 8))
+		{
+			chip |= GBA_CHIP_FLASH_1M;
+		}
+		else if (!memcmp(&data[i], "FLASH512_", 9))
+		{
+			chip |= GBA_CHIP_FLASH_512;
+		}
+		else if (!memcmp(&data[i], "FLASH_", 6))
+		{
+			chip |= GBA_CHIP_FLASH;
+		}
+		else if (!memcmp(&data[i], "SIIRTC_V", 8))
+		{
+			chip |= GBA_CHIP_RTC;
+		}
+	}
+	return chip;
+}
+
 static DEVICE_IMAGE_LOAD( gba_cart )
 {
 	UINT8 *ROM = image.device().machine->region("cartridge")->base();
-	int i;
 	UINT32 cart_size;
 	UINT8 game_code[4] = { 0 };
-	int game_noflash, game_eeprom_large;
+	UINT32 chip;
 	gba_state *state = image.device().machine->driver_data<gba_state>();
 
 	state->nvsize = 0;
@@ -2361,78 +2402,117 @@ static DEVICE_IMAGE_LOAD( gba_cart )
 		memcpy(game_code, ROM + 0xAC, 4);
 	}
 
- 	// "Backyard Hockey" and "Banjo-Kazooie" false positive for "FLASH"
-	game_noflash = (!memcmp(game_code, "BYHE", 4)) || (!memcmp(game_code, "BKZE", 4)) || (!memcmp(game_code, "BKZX", 4));
+	chip = gba_detect_chip( ROM, cart_size);
 
-	// "Bomberman Max 2", "Broken Sword" and "Custom Robo GX" require 14 bit EEPROM addressing
-	game_eeprom_large = ((!memcmp(game_code, "AMHE", 4)) || (!memcmp(game_code, "AMYJ", 4)) || (!memcmp(game_code, "AMYE", 4))
-		|| (!memcmp(game_code, "AMHP", 4)) || (!memcmp(game_code, "AMHJ", 4)) || (!memcmp(game_code, "AMYP", 4))
-		|| (!memcmp(game_code, "ABJE", 4)) || (!memcmp(game_code, "ABJP", 4)) || (!memcmp(game_code, "ARJJ", 4)));
-
-	for (i = 0; i < cart_size; i++)
 	{
-		if (!memcmp(&ROM[i], "EEPROM_", 7))
-		{
-			state->nvptr = (UINT8 *)&state->gba_eeprom;
-			state->nvsize = 0x2000;
+		char s[256], *p = s;
+		if (chip == 0) p += sprintf( p, " NONE");
+		if (chip & GBA_CHIP_EEPROM) p += sprintf( p, " EEPROM");
+		if (chip & GBA_CHIP_EEPROM_8K) p += sprintf( p, " EEPROM_8K");
+		if (chip & GBA_CHIP_FLASH) p += sprintf( p, " FLASH");
+		if (chip & GBA_CHIP_FLASH_1M) p += sprintf( p, " FLASH_1M");
+		if (chip & GBA_CHIP_FLASH_512) p += sprintf( p, " FLASH_512");
+		if (chip & GBA_CHIP_SRAM) p += sprintf( p, " SRAM");
+		if (chip & GBA_CHIP_RTC) p += sprintf( p, " RTC");
+		mame_printf_info( "GBA: Detected%s\n", s);
+	}
 
-			if (game_eeprom_large)
-			{
-				state->eeprom_addr_bits = 14;
-			}
+	{
+		int count = 0;
+		if (chip & GBA_CHIP_EEPROM) count++;
+		if (chip & GBA_CHIP_EEPROM_8K) count++;
+		if (chip & GBA_CHIP_FLASH) count++;
+		if (chip & GBA_CHIP_FLASH_1M) count++;
+		if (chip & GBA_CHIP_FLASH_512) count++;
+		if (chip & GBA_CHIP_SRAM) count++;
+		if (count > 1)
+		{
+			chip &= ~(GBA_CHIP_EEPROM | GBA_CHIP_EEPROM_8K | GBA_CHIP_FLASH | GBA_CHIP_FLASH_1M | GBA_CHIP_FLASH_512 | GBA_CHIP_SRAM);
+			if      (!memcmp(game_code, "ABFJ", 4)) chip |= GBA_CHIP_SRAM;   // 0059 - Breath of Fire - Ryuu no Senshi (JPN)
+			else if (!memcmp(game_code, "AHMJ", 4)) chip |= GBA_CHIP_EEPROM; // 0364 - Dai-Mahjong (JPN)
+			else if (!memcmp(game_code, "A2GJ", 4)) chip |= GBA_CHIP_EEPROM; // 0399 - Advance GT2 (JPN)
+			else if (!memcmp(game_code, "AK9E", 4)) chip |= GBA_CHIP_EEPROM; // 0479 - Medabots AX - Rokusho Version (USA)
+			else if (!memcmp(game_code, "AK8E", 4)) chip |= GBA_CHIP_EEPROM; // 0480 - Medabots AX - Metabee Version (USA)
+			else if (!memcmp(game_code, "AK9P", 4)) chip |= GBA_CHIP_EEPROM; // 0515 - Medabots AX - Rokusho Version (EUR)
+			else if (!memcmp(game_code, "AGIJ", 4)) chip |= GBA_CHIP_EEPROM; // 0548 - Medarot G - Kuwagata Version (JPN)
+			else if (!memcmp(game_code, "A3DJ", 4)) chip |= GBA_CHIP_EEPROM; // 0567 - Disney Sports - American Football (JPN)
+			else if (!memcmp(game_code, "AF7J", 4)) chip |= GBA_CHIP_EEPROM; // 0605 - Tokimeki Yume Series 1 - Ohanaya-san ni Narou! (JPN)
+			else if (!memcmp(game_code, "AH7J", 4)) chip |= GBA_CHIP_EEPROM; // 0617 - Nakayoshi Pet Advance Series 1 - Kawaii Hamster (JPN)
+			else if (!memcmp(game_code, "AGHJ", 4)) chip |= GBA_CHIP_EEPROM; // 0620 - Medarot G - Kabuto Version (JPN)
+			else if (!memcmp(game_code, "AR8E", 4)) chip |= GBA_CHIP_SRAM;   // 0727 - Rocky (USA)
+			else if (!memcmp(game_code, "ALUE", 4)) chip |= GBA_CHIP_EEPROM; // 0751 - Super Monkey Ball Jr. (USA)
 			else
 			{
-				state->eeprom_addr_bits = 6;
+				mame_printf_warning( "GBA: NVRAM is disabled because multiple NVRAM chips were detected!\n");
 			}
+		}
+	}
 
-			if (cart_size <= (16 * 1024 * 1024))
-			{
-				memory_install_read32_handler(cpu_get_address_space(image.device().machine->device("maincpu"), ADDRESS_SPACE_PROGRAM), 0xd000000, 0xdffffff, 0, 0, eeprom_r);
-				memory_install_write32_handler(cpu_get_address_space(image.device().machine->device("maincpu"), ADDRESS_SPACE_PROGRAM), 0xd000000, 0xdffffff, 0, 0, eeprom_w);
-			}
-			else
-			{
-				memory_install_read32_handler(cpu_get_address_space(image.device().machine->device("maincpu"), ADDRESS_SPACE_PROGRAM), 0xdffff00, 0xdffffff, 0, 0, eeprom_r);
-				memory_install_write32_handler(cpu_get_address_space(image.device().machine->device("maincpu"), ADDRESS_SPACE_PROGRAM), 0xdffff00, 0xdffffff, 0, 0, eeprom_w);
-			}
-			break;
-		}
-		else if ((!memcmp(&ROM[i], "SRAM_", 5)) || (!memcmp(&ROM[i], "ADVANCEWARS", 11))) //advance wars 1 & 2 has SRAM, but no "SRAM_" string can be found inside the ROM space
+	// "Bomberman Max 2", "Broken Sword", "Custom Robo GX" and "Classic NES Series - Excitebike" require 14 bit EEPROM addressing
+	if (chip & GBA_CHIP_EEPROM)
+	{
+		if ((!memcmp(game_code, "AMHE", 4)) || (!memcmp(game_code, "AMYJ", 4)) || (!memcmp(game_code, "AMYE", 4))
+			|| (!memcmp(game_code, "AMHP", 4)) || (!memcmp(game_code, "AMHJ", 4)) || (!memcmp(game_code, "AMYP", 4))
+			|| (!memcmp(game_code, "ABJE", 4)) || (!memcmp(game_code, "ABJP", 4)) || (!memcmp(game_code, "ARJJ", 4))
+			|| (!memcmp(game_code, "FEBE", 4)))
 		{
-			state->nvptr = (UINT8 *)&state->gba_sram;
-			state->nvsize = 0x10000;
+			chip = (chip & ~GBA_CHIP_EEPROM) | GBA_CHIP_EEPROM_8K;
+		}
+	}
 
-			memory_install_read32_handler(cpu_get_address_space(image.device().machine->device("maincpu"), ADDRESS_SPACE_PROGRAM), 0xe000000, 0xe00ffff, 0, 0, sram_r);
-			memory_install_write32_handler(cpu_get_address_space(image.device().machine->device("maincpu"), ADDRESS_SPACE_PROGRAM), 0xe000000, 0xe00ffff, 0, 0, sram_w);
-			break;
-		}
-		else if (!memcmp(&ROM[i], "FLASH1M_", 8))
-		{
-			state->nvptr = NULL;
-			state->nvsize = 0;
-			state->flash_size = 0x20000;
-			state->flash_mask = 0x1ffff/4;
+	if ((chip & GBA_CHIP_EEPROM) || (chip & GBA_CHIP_EEPROM_8K))
+	{
+		state->nvptr = (UINT8 *)&state->gba_eeprom;
+		state->nvsize = 0x2000;
 
-			memory_install_read32_handler(cpu_get_address_space(image.device().machine->device("maincpu"), ADDRESS_SPACE_PROGRAM), 0xe000000, 0xe01ffff, 0, 0, flash_r);
-			memory_install_write32_handler(cpu_get_address_space(image.device().machine->device("maincpu"), ADDRESS_SPACE_PROGRAM), 0xe000000, 0xe01ffff, 0, 0, flash_w);
-			break;
-		}
-		else if ((!memcmp(&ROM[i], "FLASH", 5)) && (!game_noflash))
-		{
-			state->nvptr = NULL;
-			state->nvsize = 0;
-			state->flash_size = 0x10000;
-			state->flash_mask = 0xffff/4;
+		state->eeprom_addr_bits = (chip & GBA_CHIP_EEPROM_8K) ? 14 : 6;
 
-			memory_install_read32_handler(cpu_get_address_space(image.device().machine->device("maincpu"), ADDRESS_SPACE_PROGRAM), 0xe000000, 0xe00ffff, 0, 0, flash_r);
-			memory_install_write32_handler(cpu_get_address_space(image.device().machine->device("maincpu"), ADDRESS_SPACE_PROGRAM), 0xe000000, 0xe00ffff, 0, 0, flash_w);
-			break;
-		}
-		else if (!memcmp(&ROM[i], "SIIRTC_V", 8))
+		if (cart_size <= (16 * 1024 * 1024))
 		{
-			mame_printf_verbose("game has RTC\n");
-			break;
+			memory_install_read32_handler(cpu_get_address_space(image.device().machine->device("maincpu"), ADDRESS_SPACE_PROGRAM), 0xd000000, 0xdffffff, 0, 0, eeprom_r);
+			memory_install_write32_handler(cpu_get_address_space(image.device().machine->device("maincpu"), ADDRESS_SPACE_PROGRAM), 0xd000000, 0xdffffff, 0, 0, eeprom_w);
 		}
+		else
+		{
+			memory_install_read32_handler(cpu_get_address_space(image.device().machine->device("maincpu"), ADDRESS_SPACE_PROGRAM), 0xdffff00, 0xdffffff, 0, 0, eeprom_r);
+			memory_install_write32_handler(cpu_get_address_space(image.device().machine->device("maincpu"), ADDRESS_SPACE_PROGRAM), 0xdffff00, 0xdffffff, 0, 0, eeprom_w);
+		}
+	}
+
+	if (chip & GBA_CHIP_SRAM)
+	{
+		state->nvptr = (UINT8 *)&state->gba_sram;
+		state->nvsize = 0x10000;
+
+		memory_install_read32_handler(cpu_get_address_space(image.device().machine->device("maincpu"), ADDRESS_SPACE_PROGRAM), 0xe000000, 0xe00ffff, 0, 0, sram_r);
+		memory_install_write32_handler(cpu_get_address_space(image.device().machine->device("maincpu"), ADDRESS_SPACE_PROGRAM), 0xe000000, 0xe00ffff, 0, 0, sram_w);
+	}
+
+	if (chip & GBA_CHIP_FLASH_1M)
+	{
+		state->nvptr = NULL;
+		state->nvsize = 0;
+		state->flash_size = 0x20000;
+		state->flash_mask = 0x1ffff/4;
+
+		memory_install_read32_handler(cpu_get_address_space(image.device().machine->device("maincpu"), ADDRESS_SPACE_PROGRAM), 0xe000000, 0xe01ffff, 0, 0, flash_r);
+		memory_install_write32_handler(cpu_get_address_space(image.device().machine->device("maincpu"), ADDRESS_SPACE_PROGRAM), 0xe000000, 0xe01ffff, 0, 0, flash_w);
+	}
+
+	if ((chip & GBA_CHIP_FLASH) || (chip & GBA_CHIP_FLASH_512))
+	{
+		state->nvptr = NULL;
+		state->nvsize = 0;
+		state->flash_size = 0x10000;
+		state->flash_mask = 0xffff/4;
+
+		memory_install_read32_handler(cpu_get_address_space(image.device().machine->device("maincpu"), ADDRESS_SPACE_PROGRAM), 0xe000000, 0xe00ffff, 0, 0, flash_r);
+		memory_install_write32_handler(cpu_get_address_space(image.device().machine->device("maincpu"), ADDRESS_SPACE_PROGRAM), 0xe000000, 0xe00ffff, 0, 0, flash_w);
+	}
+
+	if (chip & GBA_CHIP_RTC)
+	{
+		mame_printf_verbose("game has RTC\n");
 	}
 
 	// if save media was found, reload it
