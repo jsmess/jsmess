@@ -476,7 +476,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 	</software>
 
 	<!-- Id: G-4503 -->
-	<software name="gameto">
+	<software name="gameto" supported="no"> <!-- It needs full EEPROM support -->
 		<description>Game Toshokan (Jpn, Rev. A)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
@@ -520,7 +520,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
-			<feature name="pcb_type" value="WBOY5" />
+			<feature name="pcb_type" value="SEGA-EEPROM" />
 			<feature name="pcb" value="171-6584A" />
 			<dataarea name="rom" size="2097152">
 				<rom name="mpr-16211.ic1" size="2097152" crc="9778c181" sha1="db28d70f9b744004cadd06eb77d6223534f59215" offset="000000" loadflag="load16_word_swap" />
@@ -6837,7 +6837,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
-			<feature name="pcb_type" value="WBOY5" />
+			<feature name="pcb_type" value="SEGA-EEPROM" />
 			<dataarea name="rom" size="524288">
 				<rom name="mpr-14860.bin" size="524288" crc="4fef37c8" sha1="eb4aca22f8b5837a0a0b10491c46714948b09844" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -7829,6 +7829,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="GAMEKANDUME" />
 			<dataarea name="rom" size="3145728">
 				<rom name="game no kandume otokuyou (jpn).bin" size="3145728" crc="cdad7e6b" sha1="31c66bd13abf4ae8271c09ec5286a0ee0289dbbc" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -8281,7 +8282,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
-			<feature name="pcb_type" value="WBOY5" />
+			<feature name="pcb_type" value="SEGA-EEPROM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="greatest heavyweights (jpn).bin" size="2097152" crc="7ef8b162" sha1="1d5fe812df75e0dc1ff379c563058e078b839a09" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -8293,7 +8294,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
-			<feature name="pcb_type" value="WBOY5" />
+			<feature name="pcb_type" value="SEGA-EEPROM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="greatest heavyweights (usa).bin" size="2097152" crc="6e3621d5" sha1="4ef7aec80003aab0e1d2260b7fc0d22d63d90038" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -11080,7 +11081,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
-			<feature name="pcb_type" value="WBOY5" />
+			<feature name="pcb_type" value="SEGA-EEPROM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="mega man - the wily wars (euro).bin" size="2097152" crc="dcf6e8b2" sha1="ea9ae2043c97db716a8d31ee90e581c3d75f4e3e" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -17974,7 +17975,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
-			<feature name="pcb_type" value="WBOY5" />
+			<feature name="pcb_type" value="SEGA-EEPROM" />
 			<dataarea name="rom" size="1048576">
 				<rom name="sports talk baseball (usa).bin" size="1048576" crc="0deb79c2" sha1="e223513d9bcecb49a6798720f3195dbd1c34681c" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -21668,7 +21669,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
-			<feature name="pcb_type" value="WBOY5" />
+			<feature name="pcb_type" value="SEGA-EEPROM" />
 			<dataarea name="rom" size="786432">
 				<rom name="mpr-14556.bin" size="786432" crc="1592f5b0" sha1="87a968f773c7e807e647c0737132457b06b78276" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -21680,7 +21681,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
-			<feature name="pcb_type" value="WBOY5" />
+			<feature name="pcb_type" value="SEGA-EEPROM" />
 			<dataarea name="rom" size="655360">
 				<rom name="wonder boy v - monster world iii (jpn, kor).bin" size="655360" crc="45a50f96" sha1="1582f159e1969ff0541319a9bd7e6f7a53505d01" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -21692,7 +21693,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
-			<feature name="pcb_type" value="WBOY5" />
+			<feature name="pcb_type" value="SEGA-EEPROM" />
 			<dataarea name="rom" size="1048576">
 				<rom name="turma da monica na terra dos monstros (bra).bin" size="1048576" crc="f8288de1" sha1="80fc2a6a6b8b943f781598094f3b5a5fe4f05ede" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -23136,6 +23137,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="BEGGAR" />
 			<dataarea name="rom" size="4194304">
 				<rom name="xin qi gai wang zi (chi) (alt) (unl).bin" size="4194304" crc="da5a4bfe" sha1="75f8003a6388814c1880347882b244549da62158" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -23147,6 +23149,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="BEGGAR" />
 			<dataarea name="rom" size="4194304">
 				<rom name="xin qi gai wang zi (chi) (unl).bin" size="4194304" crc="dd2f38b5" sha1="4a7494d8601149f43ba7e3595a0b2340cde2e9ba" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
