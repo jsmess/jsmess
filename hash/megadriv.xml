@@ -789,6 +789,24 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
+	<software name="storythof" cloneof="storytho">
+        <!-- Alt. Title: La Légende de Thor (Box and cart) -->
+		<description>The Story of Thor - A Successor of The Light (Fra)</description>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
+			<feature name="pcb" value="171-6583B" />
+			<feature name="ic1" value="MPR-17720-SM" />
+			<feature name="ic2" value="MPR-17720-SM" />
+			<feature name="ic3" value="GH76C8BALK-15" />
+			<dataarea name="rom" size="3145728">
+				<rom name="mpr-17720.ic1" size="2097152" crc="5385f970" sha1="30d80bfdbfa4758d1ad5aaad12899cf3e6dd1b63" offset="000000" />
+				<rom name="mpr-17721.ic2" size="1048576" crc="158fa2aa" sha1="f9c7aaf77e5cfe5b8bcce4e0021b7f413636b9ee" offset="0x200000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="smgp">
 		<description>Super Monaco GP (Euro, Jpn, Rev. A)</description>
 		<year>1990</year>
