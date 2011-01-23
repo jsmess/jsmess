@@ -683,7 +683,7 @@ PORT_START("duart_in") // IP4, IP5, IP6 bits on duart are dipswitches (really un
 	PORT_DIPNAME( 0x40, 0x40, "Unknown (IP6)" )
 	PORT_DIPSETTING(    0x40, "Open (VCC)" )
 	PORT_DIPSETTING(    0x00, "Short to GND" )
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // this pin (IP7) doesn't actually exist as a pin at all, reads as 1
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) // this pin (IP7) doesn't actually exist as a pin at all, reads as 1
 
 PORT_START("hacks")
 	PORT_CONFNAME( 0x01, 0x01, "Hack to prevent hang when skip self test is shorted" )
