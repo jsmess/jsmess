@@ -8,7 +8,16 @@
 
     Note that the SOLOS dump comes from the Solace emu. Not being sure if
     it has been verified with a real SOL-20 (even if I think it has been), I
-    marked it as a BAD_DUMP
+    marked it as a BAD_DUMP.
+
+    The roms DPMON and CONSOL are widely available on the net as ENT files,
+    which can be loaded into memory with the Paste option, then exported to
+    binary files with the debugger. They are working, however the ENT files
+    do not indicate the values of unused rom space. Therefore they are marked
+    as BAD_DUMP.
+
+    Note that the CONSOL rom is basically a dumb terminal program and doesn't
+    do anything useful unless the MODE key (whatever that is) is pressed.
 
     Other OS ROMs to be dumped:
       - CONSOL
@@ -385,7 +394,8 @@ static VIDEO_UPDATE( sol20 )
 				inv = 0;
 
 				/* Take care of flashing characters */
-				if ((chr & 0x80) && (state->m_framecnt & 0x08))
+				//if ((chr & 0x80) && (state->m_framecnt & 0x08))
+				if (chr & 0x80)
 					inv ^= 0xff;
 
 				chr &= 0x7f;
@@ -394,7 +404,6 @@ static VIDEO_UPDATE( sol20 )
 					gfx = 0;
 				else
 				if (ra < 10)
-
 					gfx = state->FNT[(chr<<4) | (ra-1) ] ^ inv;
 				else
 					gfx = inv;
@@ -418,7 +427,7 @@ static VIDEO_UPDATE( sol20 )
 WRITE8_MEMBER( sol20_state::sol20_kbd_put )
 {
 	m_sol20_fa &= 0xfe;
-	m_sol20_fc = data;
+	m_sol20_fc = data | 0x80; // CONSOL requires bit 7 to be high, others don't care
 }
 
 static GENERIC_TERMINAL_INTERFACE( sol20_terminal_intf )
@@ -466,7 +475,12 @@ MACHINE_CONFIG_END
 /* ROM definition */
 ROM_START( sol20 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "solos.rom", 0xc000, 0x0800, BAD_DUMP CRC(4d0af383) SHA1(ac4510c3380ed4a31ccf4f538af3cb66b76701ef) )	// from solace emu
+	ROM_SYSTEM_BIOS(0, "SOLOS", "SOLOS")
+	ROMX_LOAD( "solos.bin", 0xc000, 0x0800, BAD_DUMP CRC(4d0af383) SHA1(ac4510c3380ed4a31ccf4f538af3cb66b76701ef), ROM_BIOS(1) )	// from solace emu
+	ROM_SYSTEM_BIOS(1, "DPMON", "DPMON")
+	ROMX_LOAD( "dpmon.bin", 0xc000, 0x0800, BAD_DUMP CRC(2a84f099) SHA1(60ff6e38082c50afcf0f40707ef65668a411008b), ROM_BIOS(2) )
+	ROM_SYSTEM_BIOS(2, "CONSOL", "CONSOL")
+	ROMX_LOAD( "consol.bin", 0xc000, 0x0400, BAD_DUMP CRC(80bf6d85) SHA1(84b81c60bb08a3a5435ec1be56a67aa695bce099), ROM_BIOS(3) )
 	/* Character generator rom is missing */
 
 	/* character generator not dumped, using the one from 'c10' for now */
