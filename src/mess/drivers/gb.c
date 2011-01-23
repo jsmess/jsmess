@@ -595,6 +595,7 @@ static MACHINE_CONFIG_DERIVED( gameboy, gb_common )
 	MCFG_CARTSLOT_START(gb_cart)
 	MCFG_CARTSLOT_LOAD(gb_cart)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","gameboy")
+	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("gbc_list","gbcolor")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( supergb, gameboy )
@@ -614,8 +615,6 @@ static MACHINE_CONFIG_DERIVED( supergb, gameboy )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
 	MCFG_PALETTE_LENGTH(32768)
 	MCFG_PALETTE_INIT(sgb)
-
-	MCFG_CARTSLOT_MODIFY("cart")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( gbpocket, gameboy )
@@ -650,7 +649,7 @@ static MACHINE_CONFIG_DERIVED( gbcolor, gb_common )
 	MCFG_CARTSLOT_START(gb_cart)
 	MCFG_CARTSLOT_LOAD(gb_cart)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","gbcolor")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("gameboy","gameboy")
+	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("gb_list","gameboy")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( megaduck, gb_state )

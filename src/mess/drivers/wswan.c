@@ -166,6 +166,7 @@ static MACHINE_CONFIG_START( wswan, wswan_state )
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","wswan")
+	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("wsc_list","wscolor")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( wscolor, wswan )
@@ -178,8 +179,9 @@ static MACHINE_CONFIG_DERIVED( wscolor, wswan )
 
 	/* software lists */
 	MCFG_DEVICE_REMOVE("cart_list")
+	MCFG_DEVICE_REMOVE("wsc_list")
 	MCFG_SOFTWARE_LIST_ADD("cart_list","wscolor")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("wswan","wswan")
+	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("ws_list","wswan")
 MACHINE_CONFIG_END
 
 /***************************************************************************
