@@ -35,11 +35,11 @@ void mess_display_help(void)
 		build_version);
 	mame_printf_info("%s\n", mess_disclaimer);
 	mame_printf_info(
-		"Usage:  MESS <system> <device> <software> <options>\n"
+		"Usage:  MESS <system> <media> <software> <options>\n"
 		"\n"
 		"        MESS -showusage    for a brief list of options\n"
 		"        MESS -showconfig   for a list of configuration options\n"
-		"        MESS -listdevices  for a full list of supported devices\n"
+		"        MESS -listmedia    for a full list of supported media\n"
 		"        MESS -createconfig to create a mess.ini\n"
 		"\n"
 		"See config.txt and windows.txt for usage instructions.\n");
