@@ -150,11 +150,8 @@
 static UINT8 i8255_0_pc,i8255_1_pc;
 static UINT8 fdc_irq_opcode;
 static UINT8 ext_rom_bank,gfx_ctrl,vram_sel,misc_ctrl,device_ctrl_data;
-static UINT8 vrtc_irq_mask,rtc_irq_mask,sound_irq_mask;
-static UINT8 vrtc_irq_latch,rtc_irq_latch,sound_irq_latch;
 static UINT8 window_offset_bank;
 static UINT8 layer_mask;
-static UINT8 i8214_irq_level,i8214_irq_state;
 static UINT16 dma_counter[4],dma_address[4];
 static UINT8 alu_reg[3];
 static UINT8 dmac_mode;
@@ -162,28 +159,11 @@ static UINT8 alu_ctrl1,alu_ctrl2;
 static UINT8 extram_mode,extram_bank;
 static UINT8 txt_width, txt_color;
 static int vblank_pos;
+static UINT8 i8214_irq_level;
+static UINT8 vrtc_irq_mask,vrtc_irq_latch;
+static UINT8 timer_irq_mask,timer_irq_latch;
+static UINT8 sound_irq_mask,sound_irq_latch;
 
-static void pc8801_update_irq(running_machine *machine)
-{
-	int level, i;
-
-	level = -1;
-	for (i = 0; i < 8; i++)
-	{
-		if ((i8214_irq_state & (1<<i)) != 0)
-			level = i;
-	}
-
-	if (level >= 0 && level < i8214_irq_level)
-		cputag_set_input_line(machine, "maincpu", 0, HOLD_LINE);
-}
-
-static void pc8801_raise_irq(running_machine *machine, int level)
-{
-	/* TODO ... */
-	i8214_irq_state = (1<<level);
-	pc8801_update_irq(machine);
-}
 
 /*
 CRTC command params:
@@ -907,19 +887,14 @@ static WRITE8_HANDLER( pc8801_irq_level_w )
 
 static WRITE8_HANDLER( pc8801_irq_mask_w )
 {
-	rtc_irq_mask = data & 1;
+	timer_irq_mask = data & 1;
 	vrtc_irq_mask = data & 2;
 
-	if(rtc_irq_mask && rtc_irq_latch)
-	{
-		rtc_irq_latch = 0;
-		pc8801_raise_irq(space->machine,2);
-	}
-	else if(vrtc_irq_mask && vrtc_irq_latch)
-	{
+	if(timer_irq_mask == 0)
+		timer_irq_latch = 0;
+
+	if(vrtc_irq_mask == 0)
 		vrtc_irq_latch = 0;
-		pc8801_raise_irq(space->machine,1);
-	}
 
 	//if(data & 4)
 	//	printf("IRQ mask %02x\n",data);
@@ -952,11 +927,8 @@ static WRITE8_HANDLER( pc8801_misc_ctrl_w )
 
 	sound_irq_mask = ((data & 0x80) == 0);
 
-	if(sound_irq_mask && sound_irq_latch)
-	{
+	if(sound_irq_mask == 0)
 		sound_irq_latch = 0;
-		pc8801_raise_irq(space->machine,4);
-	}
 }
 
 static WRITE8_HANDLER( pc8801_palram_w )
@@ -1317,7 +1289,7 @@ static READ8_HANDLER( upd765_tc_r )
 
 	upd765_tc_w(space->machine->device("upd765"), 1);
 	 //TODO: I'm not convinced that this works correctly with current hook-up ... 1000 usec is needed by Aploon, a bigger value breaks Alpha.
-	timer_set(space->machine,  ATTOTIME_IN_USEC(1000), NULL, 0, pc8801fd_upd765_tc_to_zero );
+	timer_set(space->machine,  ATTOTIME_IN_USEC(750), NULL, 0, pc8801fd_upd765_tc_to_zero );
 	return 0xff; // value is meaningless
 }
 
@@ -1643,9 +1615,10 @@ static UPD1990A_INTERFACE( pc88_upd1990a_intf )
 static void pc8801_sound_irq( device_t *device, int irq )
 {
 	if(sound_irq_mask)
-		pc8801_raise_irq(device->machine,4);
-	else
+	{
 		sound_irq_latch = 1;
+		cputag_set_input_line(device->machine,"maincpu",0,HOLD_LINE);
+	}
 }
 
 /* TODO: mouse routing (that's why I don't use DEVCB_INPUT_PORT here) */
@@ -1691,28 +1664,33 @@ static const cassette_config pc88_cassette_config =
 
 static IRQ_CALLBACK( pc8801_irq_callback )
 {
-	int level, i;
-
-	level = 0;
-	for (i = 8; i > 0; i--)
+	if(i8214_irq_level >= 5 && sound_irq_latch)
 	{
-		if ((i8214_irq_state & (1<<i))!=0)
-		{
-			level = i;
-		}
+		sound_irq_latch = 0;
+		return 4*2;
+	}
+	else if(i8214_irq_level >= 2 && vrtc_irq_latch)
+	{
+		vrtc_irq_latch = 0;
+		return 1*2;
+	}
+	else if(i8214_irq_level >= 3 && timer_irq_latch)
+	{
+		timer_irq_latch = 0;
+		return 2*2;
 	}
 
-	i8214_irq_state &= ~(1<<level);
-
-	return level*2;
+	printf("IRQ triggered but no vector on the bus! %02x %02x %02x %02x\n",i8214_irq_level,sound_irq_latch,vrtc_irq_latch,timer_irq_latch);
+	return 2*2; //TODO: mustn't happen, it does if you press shift on N88-BASIC
 }
 
 static TIMER_CALLBACK( pc8801_rtc_irq )
 {
-	if(rtc_irq_mask)
-		pc8801_raise_irq(machine,2);
-	else
-		rtc_irq_latch = 1;
+	if(timer_irq_mask)
+	{
+		timer_irq_latch = 1;
+		cputag_set_input_line(machine,"maincpu",0,HOLD_LINE);
+	}
 }
 
 static MACHINE_START( pc8801 )
@@ -1759,15 +1737,12 @@ static MACHINE_RESET( pc8801 )
 
 	{
 		vrtc_irq_mask = 0;
-		rtc_irq_mask = 0;
-		sound_irq_mask = 0;
-
-		rtc_irq_latch = 0;
 		vrtc_irq_latch = 0;
+		timer_irq_mask = 0;
+		timer_irq_latch = 0;
+		sound_irq_mask = 0;
 		sound_irq_latch = 0;
-
 		i8214_irq_level = 0;
-		i8214_irq_state = 0;
 	}
 
 	{
@@ -1807,9 +1782,10 @@ static const struct upd765_interface pc8801_upd765_interface =
 static INTERRUPT_GEN( pc8801_vrtc_irq )
 {
 	if(vrtc_irq_mask)
-		pc8801_raise_irq(device->machine,1);
-	else
+	{
 		vrtc_irq_latch = 1;
+		cpu_set_input_line(device,0,HOLD_LINE);
+	}
 }
 
 static MACHINE_CONFIG_START( pc8801, driver_device )
