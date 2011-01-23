@@ -128,6 +128,8 @@
 #include "machine/8530scc.h"
 #include "machine/hd63450.h"
 #include "machine/rp5c15.h"
+#include "machine/mb89352.h"
+#include "imagedev/chd_cd.h"
 #include "imagedev/flopdrv.h"
 #include "formats/basicdsk.h"
 #include "formats/dim_dsk.h"
@@ -1945,6 +1947,16 @@ static IRQ_CALLBACK(x68k_int_ack)
 	return state->current_vector[irqline];
 }
 
+static WRITE_LINE_DEVICE_HANDLER( x68k_scsi_irq )
+{
+	// TODO : Internal SCSI IRQ vector 0x6c, External SCSI IRQ vector 0xf6
+}
+
+static WRITE_LINE_DEVICE_HANDLER( x68k_scsi_drq )
+{
+	// TODO
+}
+
 static ADDRESS_MAP_START(x68k_map, ADDRESS_SPACE_PROGRAM, 16)
 //  AM_RANGE(0x000000, 0xbfffff) AM_RAMBANK(1)
 	AM_RANGE(0xbffffc, 0xbfffff) AM_READWRITE(x68k_rom0_r, x68k_rom0_w)
@@ -1964,10 +1976,11 @@ static ADDRESS_MAP_START(x68k_map, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0xe92000, 0xe92001) AM_DEVREADWRITE8("okim6258", okim6258_status_r, okim6258_ctrl_w, 0x00ff)
 	AM_RANGE(0xe92002, 0xe92003) AM_DEVREADWRITE8("okim6258", okim6258_status_r, okim6258_data_w, 0x00ff)
 	AM_RANGE(0xe94000, 0xe95fff) AM_READWRITE(x68k_fdc_r, x68k_fdc_w)
-	AM_RANGE(0xe96000, 0xe97fff) AM_DEVREADWRITE("x68k_hdc",x68k_hdc_r, x68k_hdc_w)
+	AM_RANGE(0xe96000, 0xe9601f) AM_DEVREADWRITE("x68k_hdc",x68k_hdc_r, x68k_hdc_w)
 	AM_RANGE(0xe98000, 0xe99fff) AM_READWRITE(x68k_scc_r, x68k_scc_w)
 	AM_RANGE(0xe9a000, 0xe9bfff) AM_DEVREADWRITE("ppi8255", x68k_ppi_r, x68k_ppi_w)
 	AM_RANGE(0xe9c000, 0xe9dfff) AM_READWRITE(x68k_ioc_r, x68k_ioc_w)
+	AM_RANGE(0xea0000, 0xea1fff) AM_READWRITE(x68k_exp_r, x68k_exp_w)  // external SCSI ROM and controller
 	AM_RANGE(0xeafa00, 0xeafa1f) AM_READWRITE(x68k_exp_r, x68k_exp_w)
 	AM_RANGE(0xeafa80, 0xeafa89) AM_READWRITE(x68k_areaset_r, x68k_enh_areaset_w)
 	AM_RANGE(0xeb0000, 0xeb7fff) AM_READWRITE(x68k_spritereg_r, x68k_spritereg_w)
@@ -1977,7 +1990,45 @@ static ADDRESS_MAP_START(x68k_map, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0xed0000, 0xed3fff) AM_RAMBANK("bank4") AM_SHARE("nvram")
 	AM_RANGE(0xed4000, 0xefffff) AM_NOP
 	AM_RANGE(0xf00000, 0xfbffff) AM_ROM
-//  AM_RANGE(0xfc0000, 0xfdffff) AM_READWRITE(x68k_rom0_r, x68k_rom0_w)
+	AM_RANGE(0xfc0000, 0xfdffff) AM_READWRITE(x68k_exp_r, x68k_exp_w)  // internal SCSI ROM
+	AM_RANGE(0xfe0000, 0xffffff) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START(x68kxvi_map, ADDRESS_SPACE_PROGRAM, 16)
+//  AM_RANGE(0x000000, 0xbfffff) AM_RAMBANK(1)
+	AM_RANGE(0xbffffc, 0xbfffff) AM_READWRITE(x68k_rom0_r, x68k_rom0_w)
+//  AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE(x68k_gvram_r, x68k_gvram_w) AM_BASE_MEMBER(x68k_state, gvram)
+//  AM_RANGE(0xe00000, 0xe7ffff) AM_READWRITE(x68k_tvram_r, x68k_tvram_w) AM_BASE_MEMBER(x68k_state, tvram)
+	AM_RANGE(0xc00000, 0xdfffff) AM_RAMBANK("bank2")
+	AM_RANGE(0xe00000, 0xe7ffff) AM_RAMBANK("bank3")
+	AM_RANGE(0xe80000, 0xe81fff) AM_READWRITE(x68k_crtc_r, x68k_crtc_w)
+	AM_RANGE(0xe82000, 0xe83fff) AM_READWRITE(x68k_vid_r, x68k_vid_w)
+	AM_RANGE(0xe84000, 0xe85fff) AM_READWRITE(x68k_dmac_r, x68k_dmac_w)
+	AM_RANGE(0xe86000, 0xe87fff) AM_READWRITE(x68k_areaset_r, x68k_areaset_w)
+	AM_RANGE(0xe88000, 0xe89fff) AM_READWRITE(x68k_mfp_r, x68k_mfp_w)
+	AM_RANGE(0xe8a000, 0xe8bfff) AM_DEVREADWRITE("rp5c15", x68k_rtc_r, x68k_rtc_w)
+//  AM_RANGE(0xe8c000, 0xe8dfff) AM_READWRITE(x68k_printer_r, x68k_printer_w)
+	AM_RANGE(0xe8e000, 0xe8ffff) AM_READWRITE(x68k_sysport_r, x68k_sysport_w)
+	AM_RANGE(0xe90000, 0xe91fff) AM_READWRITE(x68k_fm_r, x68k_fm_w)
+	AM_RANGE(0xe92000, 0xe92001) AM_DEVREADWRITE8("okim6258", okim6258_status_r, okim6258_ctrl_w, 0x00ff)
+	AM_RANGE(0xe92002, 0xe92003) AM_DEVREADWRITE8("okim6258", okim6258_status_r, okim6258_data_w, 0x00ff)
+	AM_RANGE(0xe94000, 0xe95fff) AM_READWRITE(x68k_fdc_r, x68k_fdc_w)
+	AM_RANGE(0xe96000, 0xe9601f) AM_DEVREADWRITE("x68k_hdc",x68k_hdc_r, x68k_hdc_w)
+	AM_RANGE(0xe96020, 0xe9603f) AM_DEVREADWRITE8_MODERN("mb89352_int",mb89352_device,mb89352_r,mb89352_w,0x00ff)
+	AM_RANGE(0xe98000, 0xe99fff) AM_READWRITE(x68k_scc_r, x68k_scc_w)
+	AM_RANGE(0xe9a000, 0xe9bfff) AM_DEVREADWRITE("ppi8255", x68k_ppi_r, x68k_ppi_w)
+	AM_RANGE(0xe9c000, 0xe9dfff) AM_READWRITE(x68k_ioc_r, x68k_ioc_w)
+	AM_RANGE(0xea0000, 0xea1fff) AM_READWRITE(x68k_exp_r, x68k_exp_w)  // external SCSI ROM and controller
+	AM_RANGE(0xeafa00, 0xeafa1f) AM_READWRITE(x68k_exp_r, x68k_exp_w)
+	AM_RANGE(0xeafa80, 0xeafa89) AM_READWRITE(x68k_areaset_r, x68k_enh_areaset_w)
+	AM_RANGE(0xeb0000, 0xeb7fff) AM_READWRITE(x68k_spritereg_r, x68k_spritereg_w)
+	AM_RANGE(0xeb8000, 0xebffff) AM_READWRITE(x68k_spriteram_r, x68k_spriteram_w)
+	AM_RANGE(0xec0000, 0xecffff) AM_NOP  // User I/O
+//  AM_RANGE(0xed0000, 0xed3fff) AM_READWRITE(sram_r, sram_w) AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0xed0000, 0xed3fff) AM_RAMBANK("bank4") AM_SHARE("nvram")
+	AM_RANGE(0xed4000, 0xefffff) AM_NOP
+	AM_RANGE(0xf00000, 0xfbffff) AM_ROM
+	AM_RANGE(0xfc0000, 0xfdffff) AM_ROM  // internal SCSI ROM
 	AM_RANGE(0xfe0000, 0xffffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -1999,10 +2050,12 @@ static ADDRESS_MAP_START(x68030_map, ADDRESS_SPACE_PROGRAM, 32)
 	AM_RANGE(0xe90000, 0xe91fff) AM_READWRITE16(x68k_fm_r, x68k_fm_w,0xffffffff)
 	AM_RANGE(0xe92000, 0xe92003) AM_DEVREADWRITE8("okim6258", okim6258_status_r, x68030_adpcm_w, 0x00ff00ff)
 	AM_RANGE(0xe94000, 0xe95fff) AM_READWRITE16(x68k_fdc_r, x68k_fdc_w,0xffffffff)
-	AM_RANGE(0xe96000, 0xe97fff) AM_DEVREADWRITE16("x68k_hdc",x68k_hdc_r, x68k_hdc_w,0xffffffff)
+	AM_RANGE(0xe96000, 0xe9601f) AM_DEVREADWRITE16("x68k_hdc",x68k_hdc_r, x68k_hdc_w,0xffffffff)
+	AM_RANGE(0xe96020, 0xe9603f) AM_DEVREADWRITE8_MODERN("mb89352_int",mb89352_device,mb89352_r,mb89352_w,0x00ff00ff)
 	AM_RANGE(0xe98000, 0xe99fff) AM_READWRITE16(x68k_scc_r, x68k_scc_w,0xffffffff)
 	AM_RANGE(0xe9a000, 0xe9bfff) AM_DEVREADWRITE16("ppi8255", x68k_ppi_r, x68k_ppi_w,0xffffffff)
 	AM_RANGE(0xe9c000, 0xe9dfff) AM_READWRITE16(x68k_ioc_r, x68k_ioc_w,0xffffffff)
+	AM_RANGE(0xea0000, 0xea1fff) AM_READWRITE16(x68k_exp_r, x68k_exp_w,0xffffffff)  // external SCSI ROM and controller
 	AM_RANGE(0xeafa00, 0xeafa1f) AM_READWRITE16(x68k_exp_r, x68k_exp_w,0xffffffff)
 	AM_RANGE(0xeafa80, 0xeafa8b) AM_READWRITE16(x68k_areaset_r, x68k_enh_areaset_w,0xffffffff)
 	AM_RANGE(0xeb0000, 0xeb7fff) AM_READWRITE16(x68k_spritereg_r, x68k_spritereg_w,0xffffffff)
@@ -2012,7 +2065,7 @@ static ADDRESS_MAP_START(x68030_map, ADDRESS_SPACE_PROGRAM, 32)
 	AM_RANGE(0xed0000, 0xed3fff) AM_RAMBANK("bank4") AM_SHARE("nvram")
 	AM_RANGE(0xed4000, 0xefffff) AM_NOP
 	AM_RANGE(0xf00000, 0xfbffff) AM_ROM
-//  AM_RANGE(0xfc0000, 0xfdffff) AM_READWRITE16(x68k_rom0_r, x68k_rom0_w,0xffffffff)
+	AM_RANGE(0xfc0000, 0xfdffff) AM_ROM  // internal SCSI ROM
 	AM_RANGE(0xfe0000, 0xffffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -2445,6 +2498,27 @@ static const floppy_config x68k_floppy_config =
 	NULL
 };
 
+static const SCSIConfigTable x68k_scsi_devtable =
+{
+	7,                                      /* 7 SCSI devices */
+	{
+		{ SCSI_ID_0, "harddisk0", SCSI_DEVICE_HARDDISK },
+		{ SCSI_ID_1, "harddisk1", SCSI_DEVICE_HARDDISK },
+		{ SCSI_ID_2, "harddisk2", SCSI_DEVICE_HARDDISK },
+		{ SCSI_ID_3, "harddisk3", SCSI_DEVICE_HARDDISK },
+		{ SCSI_ID_4, "harddisk4", SCSI_DEVICE_HARDDISK },
+		{ SCSI_ID_5, "mo_disk",   SCSI_DEVICE_HARDDISK },  // Magneto-Optical disk
+		{ SCSI_ID_6, "cdrom",     SCSI_DEVICE_CDROM    },  // CD-ROM/RW
+	}
+};
+
+static const mb89352_interface x68k_scsi_intf =
+{
+	&x68k_scsi_devtable,
+	DEVCB_LINE(x68k_scsi_irq),
+	DEVCB_LINE(x68k_scsi_drq)
+};
+
 static MACHINE_RESET( x68000 )
 {
 	x68k_state *state = machine->driver_data<x68k_state>();
@@ -2704,6 +2778,16 @@ static MACHINE_CONFIG_DERIVED( x68kxvi, x68000 )
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(16000000)  /* 16 MHz */
+	MCFG_CPU_PROGRAM_MAP(x68kxvi_map)
+
+	MCFG_MB89352A_ADD("mb89352_int",x68k_scsi_intf)
+	MCFG_HARDDISK_ADD("harddisk0")
+	MCFG_HARDDISK_ADD("harddisk1")
+	MCFG_HARDDISK_ADD("harddisk2")
+	MCFG_HARDDISK_ADD("harddisk3")
+	MCFG_HARDDISK_ADD("harddisk4")
+	MCFG_HARDDISK_ADD("mo_disk")  // magneto-optical disk, we'll treat it as an HD for now
+	MCFG_CDROM_ADD("cdrom")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( x68030, x68000 )
@@ -2713,6 +2797,15 @@ static MACHINE_CONFIG_DERIVED( x68030, x68000 )
 
 	MCFG_MACHINE_START( x68030 )
 	MCFG_MACHINE_RESET( x68000 )
+
+	MCFG_MB89352A_ADD("mb89352_int",x68k_scsi_intf)
+	MCFG_HARDDISK_ADD("harddisk0")
+	MCFG_HARDDISK_ADD("harddisk1")
+	MCFG_HARDDISK_ADD("harddisk2")
+	MCFG_HARDDISK_ADD("harddisk3")
+	MCFG_HARDDISK_ADD("harddisk4")
+	MCFG_HARDDISK_ADD("mo_disk")  // magneto-optical disk, we'll treat it as an HD for now
+	MCFG_CDROM_ADD("cdrom")
 MACHINE_CONFIG_END
 
 ROM_START( x68000 )
@@ -2745,12 +2838,12 @@ ROM_START( x68kxvi )
 	ROMX_LOAD( "iplromco.dat", 0xfe0000, 0x020000, CRC(6c7ef608) SHA1(77511fc58798404701f66b6bbc9cbde06596eba7), ROM_BIOS(3) )
 	ROM_SYSTEM_BIOS(3, "ipl13",  "IPL-ROM V1.3 (92/11/27)")
 	ROMX_LOAD( "iplrom30.dat", 0xfe0000, 0x020000, CRC(e8f8fdad) SHA1(239e9124568c862c31d9ec0605e32373ea74b86a), ROM_BIOS(4) )
+	ROM_LOAD("scsiinrom.dat",0xfc0000, 0x002000, CRC(1c6c889e) SHA1(3f063d4231cdf53da6adc4db96533725e260076a) BAD_DUMP )
+//	ROM_LOAD("scsiexrom.dat",0xea0000, 0x002000, NO_DUMP )
 	ROM_REGION(0x8000, "user1",0)  // For Background/Sprite decoding
 	ROM_FILL(0x0000,0x8000,0x00)
 	ROM_REGION(0x20000, "user2", 0)
 	ROM_FILL(0x000,0x20000,0x00)
-	ROM_REGION(0x8000, "scsi", 0)
-	ROM_LOAD("scsiinrom.dat",0x000000, 0x008000, NO_DUMP )
 ROM_END
 
 ROM_START( x68030 )
@@ -2765,12 +2858,12 @@ ROM_START( x68030 )
 	ROMX_LOAD( "iplromco.dat", 0xfe0000, 0x020000, CRC(6c7ef608) SHA1(77511fc58798404701f66b6bbc9cbde06596eba7), ROM_BIOS(3) )
 	ROM_SYSTEM_BIOS(3, "ipl13",  "IPL-ROM V1.3 (92/11/27)")
 	ROMX_LOAD( "iplrom30.dat", 0xfe0000, 0x020000, CRC(e8f8fdad) SHA1(239e9124568c862c31d9ec0605e32373ea74b86a), ROM_BIOS(4) )
+	ROM_LOAD("scsiinrom.dat",0xfc0000, 0x002000, CRC(1c6c889e) SHA1(3f063d4231cdf53da6adc4db96533725e260076a) BAD_DUMP )
+//	ROM_LOAD("scsiexrom.dat",0xea0000, 0x002000, NO_DUMP )
 	ROM_REGION(0x8000, "user1",0)  // For Background/Sprite decoding
 	ROM_FILL(0x0000,0x8000,0x00)
 	ROM_REGION(0x20000, "user2", 0)
 	ROM_FILL(0x000,0x20000,0x00)
-	ROM_REGION(0x8000, "scsi", 0)
-	ROM_LOAD("scsiinrom.dat",0x000000, 0x008000, NO_DUMP )
 ROM_END
 
 
