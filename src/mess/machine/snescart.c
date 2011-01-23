@@ -619,7 +619,6 @@ static int snes_find_addon_chip( running_machine *machine )
 			if (snes_r_bank1(space, 0x00ffd7) < 0x0a)
 			{
 				state->has_addon_chip = HAS_ST011;
-				supported_type = 0;
 			}
 			else
 			{
@@ -658,6 +657,26 @@ static int snes_find_addon_chip( running_machine *machine )
 		for (int i = 0; i < 0x800; i+= 2)
 		{
 			*dspdata++ = dspsrc[dsp_prg_offset+0x2000+i]<<8 | dspsrc[dsp_prg_offset+0x2001+i];
+		}
+	}
+
+	if ((state->has_addon_chip == HAS_ST010) || (state->has_addon_chip == HAS_ST011))
+	{
+		UINT8 *dspsrc = (UINT8 *)machine->region("addons")->base();
+		UINT32 *dspprg = (UINT32 *)machine->region("dspprg")->base(); 
+		UINT16 *dspdata = (UINT16 *)machine->region("dspdata")->base(); 
+
+		// copy DSP program
+		for (int i = 0; i < 0x10000; i+= 4)
+		{
+			*dspprg = dspsrc[0+i]<<24 | dspsrc[1+i]<<16 | dspsrc[2+i]<<8;
+			dspprg++;
+		}
+
+		// copy DSP data
+		for (int i = 0; i < 0x1000; i+= 2)
+		{
+			*dspdata++ = dspsrc[0x10000+i]<<8 | dspsrc[0x10001+i];
 		}
 	}
 
