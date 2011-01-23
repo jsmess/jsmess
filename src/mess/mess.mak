@@ -1795,7 +1795,6 @@ $(MAME_MACHINE)/snes.o: $(MAMESRC)/machine/snesobc1.c \
 				$(MAMESRC)/machine/cx4data.c \
 				$(MAMESRC)/machine/snesrtc.c \
 				$(MAMESRC)/machine/snessdd1.c \
-				$(MAMESRC)/machine/snesst10.c \
 				$(MAMESRC)/machine/snes7110.c \
 				$(MAMESRC)/machine/snesbsx.c
 
