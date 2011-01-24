@@ -15,6 +15,7 @@
 	- Add limits for extend work RAM;
 	- What happens to the palette contents when the analog/digital palette mode changes?
 	- dipswitches needs to be controlled;
+	- Several games (most notably Ys series of games) have issues with the YM2203 music tempo (too fast) ... why?
 
 	per-game specific TODO:
 	- 100 Yen disk(s): reads kanji ports;
@@ -23,14 +24,14 @@
 	- Advanced Fantasian: wants an irq that can't happen (I is equal to 0x3f)
 	- American Success: reads the light pen?
 	- Alpha (demo): crashes with "illegal function" msg;
+	- Aploon: crashes because it doesn't clear irqs when it's supposed to do so;
 	- Balance of Power: attempt to use the SIO port for mouse polling, worked around for now;
 	- Battle Entry: moans with a JP msg then dies if you try to press either numpad 1 or 2 (asks if the user wants to use the sound board (yes 1 / no 2)
 	- Bishoujo Baseball Gakuen: checks ym2608 after intro screen;
 	- Blue Moon Story: moans with a kanji msg;.
-	- Bu U Ma: sets gfx compatibility mode on title screen (attr bit 4,N-BASIC), dunno how to draw with it ...;
+	- Bubblegum Crisis: needs default work RAM (it boots if you soft reset it after that it surpasses the logo)
 	- Grobda: palette is ugly (parent pc8801 only);
 	- Wanderers from Ys: user data disk looks screwed? It loads with everything as maximum as per now ...
-	- Wanderers from Ys: sound crashes at some point, presumably irq issue;
 	- Xevious: game is too fast (parent pc8801 only)
 
 	list of games that crashes due of floppy issues:
@@ -40,7 +41,6 @@
 	- Bokosuka Wars (polls read ID command)
 	- Bouken Roman
 	- Bruce Lee
-	- Bubblegum Crisis (after the logo)
 	- Burning Point
 	- Burunet
 	- Castle Excellent (sets sector 0xf4?)
@@ -349,8 +349,8 @@ static void draw_text_80(running_machine *machine, bitmap_t *bitmap,int y_size)
 	UINT8 y_height;
 	UINT8 attr;
 	UINT8 reverse;
+	UINT8 gfx_mode;
 	int pal;
-	//UINT8 gfx_mode;
 
 	y_height = y_size == 20 ? 10 : 8;
 
@@ -363,13 +363,14 @@ static void draw_text_80(running_machine *machine, bitmap_t *bitmap,int y_size)
 			if(text_color_flag)
 			{
 				pal = (attr & 0xe0) >> 5;
-				//gfx_mode = (attr & 0x10) >> 4;
+				gfx_mode = (attr & 0x10) >> 4;
 				reverse = 0;
 				pal|=8; //text pal bank
 			}
 			else
 			{
 				pal = (txt_color) ? 7 : 0;
+				gfx_mode = 0;
 				reverse = attr & 4;
 				pal|=8; //text pal bank
 			}
@@ -392,10 +393,21 @@ static void draw_text_80(running_machine *machine, bitmap_t *bitmap,int y_size)
 						res_x = x*8+xi;
 						res_y = y*y_height+yi;
 
-						if(is_cursor || reverse)
-							color = ((gfx_data[tile*8+yi] >> (7-xi)) & 1) ? -1 : pal;
+						if(gfx_mode)
+						{
+							UINT8 mask;
+
+							mask = (xi & 4) ? 0x10 : 0x01;
+							mask <<= ((yi & 6) >> 1);
+							color = (tile & mask) ? pal : -1;
+						}
 						else
-							color = ((gfx_data[tile*8+yi] >> (7-xi)) & 1) ? pal : -1;
+						{
+							if(is_cursor || reverse)
+								color = ((gfx_data[tile*8+yi] >> (7-xi)) & 1) ? -1 : pal;
+							else
+								color = ((gfx_data[tile*8+yi] >> (7-xi)) & 1) ? pal : -1;
+						}
 
 						if((res_x)<=machine->primary_screen->visible_area().max_x && (res_y)<=machine->primary_screen->visible_area().max_y)
 							if(color != -1)
@@ -416,6 +428,7 @@ static void draw_text_40(running_machine *machine, bitmap_t *bitmap, int y_size)
 	UINT8 y_height;
 	UINT8 attr;
 	UINT8 reverse;
+	UINT8 gfx_mode;
 	int pal;
 
 	y_height = y_size == 20 ? 10 : 8;
@@ -432,13 +445,14 @@ static void draw_text_40(running_machine *machine, bitmap_t *bitmap, int y_size)
 			if(text_color_flag)
 			{
 				pal = (attr & 0xe0) >> 5;
-				//gfx_mode = (attr & 0x10) >> 4;
+				gfx_mode = (attr & 0x10) >> 4;
 				reverse = 0;
 				pal|=8; //text pal bank
 			}
 			else
 			{
 				pal = (txt_color) ? 7 : 0;
+				gfx_mode = 0;
 				reverse = attr & 4;
 				pal|=8; //text pal bank
 			}
@@ -459,10 +473,21 @@ static void draw_text_40(running_machine *machine, bitmap_t *bitmap, int y_size)
 					res_x = (x*8)+xi*2;
 					res_y = (y*y_height)+yi;
 
-					if(is_cursor || reverse)
-						color = ((gfx_data[tile*8+yi] >> (7-xi)) & 1) ? -1 : pal;
+					if(gfx_mode)
+					{
+						UINT8 mask;
+
+						mask = (xi & 4) ? 0x10 : 0x01;
+						mask <<= ((yi & 6) >> 1);
+						color = (tile & mask) ? pal : -1;
+					}
 					else
-						color = ((gfx_data[tile*8+yi] >> (7-xi)) & 1) ? pal : -1;
+					{
+						if(is_cursor || reverse)
+							color = ((gfx_data[tile*8+yi] >> (7-xi)) & 1) ? -1 : pal;
+						else
+							color = ((gfx_data[tile*8+yi] >> (7-xi)) & 1) ? pal : -1;
+					}
 
 					if((res_x)<=machine->primary_screen->visible_area().max_x && (res_y)<=machine->primary_screen->visible_area().max_y)
 						if(color != -1)
@@ -1944,9 +1969,9 @@ MACHINE_CONFIG_END
 /* ROMs */
 #define PC8801_MEM_LOAD \
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF ) \
-	ROM_REGION( 0x10000, "wram", ROMREGION_ERASEFF ) \
-	ROM_REGION( 0x1000, "hiwram", ROMREGION_ERASEFF ) \
-	ROM_REGION( 0x40000, "ewram", ROMREGION_ERASEFF ) \
+	ROM_REGION( 0x10000, "wram", ROMREGION_ERASE00 ) \
+	ROM_REGION( 0x1000, "hiwram", ROMREGION_ERASE00 ) \
+	ROM_REGION( 0x40000, "ewram", ROMREGION_ERASE00 ) \
 	ROM_REGION( 0xc000, "gvram", ROMREGION_ERASE00 )
 
 
