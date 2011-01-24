@@ -105,6 +105,7 @@ public:
 	UINT8 m_sol20_fa;
 	UINT8 m_sol20_fc;
 	UINT8 m_sol20_fe;
+	UINT8 m_s4;
 	const UINT8 *FNT;
 	const UINT8 *m_videoram;
 	UINT8 m_framecnt;
@@ -321,35 +322,35 @@ static INPUT_PORTS_START( sol20 )
 	PORT_DIPSETTING(    0x30, DEF_STR(None))
 
 	PORT_START("S2") // Sense Switches
-	PORT_DIPNAME( 0x01, 0x00, "FF bit 0")
+	PORT_DIPNAME( 0x01, 0x01, "FF bit 0")
 	PORT_DIPSETTING(    0x01, DEF_STR(Off))
 	PORT_DIPSETTING(    0x00, DEF_STR(On))
-	PORT_DIPNAME( 0x02, 0x00, "FF bit 1")
+	PORT_DIPNAME( 0x02, 0x02, "FF bit 1")
 	PORT_DIPSETTING(    0x02, DEF_STR(Off))
 	PORT_DIPSETTING(    0x00, DEF_STR(On))
-	PORT_DIPNAME( 0x04, 0x00, "FF bit 2")
+	PORT_DIPNAME( 0x04, 0x04, "FF bit 2")
 	PORT_DIPSETTING(    0x04, DEF_STR(Off))
 	PORT_DIPSETTING(    0x00, DEF_STR(On))
-	PORT_DIPNAME( 0x08, 0x00, "FF bit 3")
+	PORT_DIPNAME( 0x08, 0x08, "FF bit 3")
 	PORT_DIPSETTING(    0x08, DEF_STR(Off))
 	PORT_DIPSETTING(    0x00, DEF_STR(On))
-	PORT_DIPNAME( 0x10, 0x00, "FF bit 4")
+	PORT_DIPNAME( 0x10, 0x10, "FF bit 4")
 	PORT_DIPSETTING(    0x10, DEF_STR(Off))
 	PORT_DIPSETTING(    0x00, DEF_STR(On))
-	PORT_DIPNAME( 0x20, 0x00, "FF bit 5")
+	PORT_DIPNAME( 0x20, 0x20, "FF bit 5")
 	PORT_DIPSETTING(    0x20, DEF_STR(Off))
 	PORT_DIPSETTING(    0x00, DEF_STR(On))
-	PORT_DIPNAME( 0x40, 0x00, "FF bit 6")
+	PORT_DIPNAME( 0x40, 0x40, "FF bit 6")
 	PORT_DIPSETTING(    0x40, DEF_STR(Off))
 	PORT_DIPSETTING(    0x00, DEF_STR(On))
-	PORT_DIPNAME( 0x80, 0x00, "FF bit 7")
+	PORT_DIPNAME( 0x80, 0x80, "FF bit 7")
 	PORT_DIPSETTING(    0x80, DEF_STR(Off))
 	PORT_DIPSETTING(    0x00, DEF_STR(On))
 
 	PORT_START("S3")
 	PORT_DIPNAME( 0xff, 0x08, "Baud Rate")
-	PORT_DIPSETTING(    0x01, "110")
-	PORT_DIPSETTING(    0x02, "150")
+	PORT_DIPSETTING(    0x01, "75")
+	PORT_DIPSETTING(    0x02, "110")
 	PORT_DIPSETTING(    0x04, "180")
 	PORT_DIPSETTING(    0x08, "300")
 	PORT_DIPSETTING(    0x10, "600")
@@ -362,12 +363,12 @@ static INPUT_PORTS_START( sol20 )
 	PORT_DIPSETTING(    0x00, DEF_STR(None))
 	PORT_DIPSETTING(    0x10, "Odd")
 	PORT_DIPSETTING(    0x11, "Even")
-	PORT_DIPNAME( 0x06, 0x00, "Data Bits")
+	PORT_DIPNAME( 0x06, 0x06, "Data Bits")
 	PORT_DIPSETTING(    0x00, "5")
 	PORT_DIPSETTING(    0x02, "6")
 	PORT_DIPSETTING(    0x04, "7")
 	PORT_DIPSETTING(    0x06, "8")
-	PORT_DIPNAME( 0x08, 0x00, "Stop Bits")
+	PORT_DIPNAME( 0x08, 0x08, "Stop Bits")
 	PORT_DIPSETTING(    0x00, "1")
 	PORT_DIPSETTING(    0x08, "2")
 	PORT_DIPNAME( 0x20, 0x00, "Duplex")
@@ -416,8 +417,12 @@ static MACHINE_START( sol20 )
 static MACHINE_RESET( sol20 )
 {
 	sol20_state *state = machine->driver_data<sol20_state>();
+	UINT8 data = 0, s_count = 0;
+	int s_clock;
+	const UINT16 s_bauds[8]={ 75, 110, 180, 300, 600, 1200, 2400, 4800 };
 	state->m_sol20_fe=0;
 	state->m_sol20_fa=1;
+
 	// set hard-wired uart pins
 	ay31015_set_input_pin( state->m_uart, AY31015_CS, 0 );
 	ay31015_set_input_pin( state->m_uart, AY31015_NB1, 1);
@@ -426,6 +431,40 @@ static MACHINE_RESET( sol20 )
 	ay31015_set_input_pin( state->m_uart, AY31015_EPS, 1);
 	ay31015_set_input_pin( state->m_uart, AY31015_NP,  1);
 	ay31015_set_input_pin( state->m_uart, AY31015_CS, 1 );
+
+	// set switched uart pins
+	data = input_port_read(machine, "S4");
+	ay31015_set_input_pin( state->m_uart_s, AY31015_CS, 0 );
+	ay31015_set_input_pin( state->m_uart_s, AY31015_NB1, BIT(data, 1) ? 1 : 0);
+	ay31015_set_input_pin( state->m_uart_s, AY31015_NB2, BIT(data, 2) ? 1 : 0);
+	ay31015_set_input_pin( state->m_uart_s, AY31015_TSB, BIT(data, 3) ? 1 : 0);
+	ay31015_set_input_pin( state->m_uart_s, AY31015_EPS, BIT(data, 0) ? 1 : 0);
+	ay31015_set_input_pin( state->m_uart_s, AY31015_NP, BIT(data, 4) ? 1 : 0);
+	ay31015_set_input_pin( state->m_uart_s, AY31015_CS, 1 );
+
+	// set rs232 baud rate
+	data = input_port_read(machine, "S3");
+
+	if (data > 1)
+		do
+		{
+			s_count++;
+			data >>= 1;
+		}
+		while (!(data & 1) && (s_count < 7)); // find which switch is used
+
+	if ((s_count == 7) && (input_port_read(machine, "CONFIG"))) // if highest, look at jumper
+		s_clock = 9600 << 4;
+	else
+		s_clock = s_bauds[s_count] << 4;
+
+	// these lines could be commented out for now if you want better performance
+	ay31015_set_receiver_clock( state->m_uart_s, s_clock);
+	ay31015_set_transmitter_clock( state->m_uart_s, s_clock);
+
+	// video dips
+	state->m_s4 = input_port_read(machine, "S1");
+
 	// boot-bank
 	memory_set_bank(machine, "boot", 1);
 	timer_set(machine, ATTOTIME_IN_USEC(9), NULL, 0, sol20_boot);
@@ -449,6 +488,8 @@ static VIDEO_UPDATE( sol20 )
 /* visible screen is 64 x 16, with start position controlled by scroll register */
 	UINT8 y,ra,chr,gfx;
 	UINT16 sy=0,ma,x,inv;
+	UINT8 ctrl_off = state->m_s4 & 4;
+	UINT8 polarity = (state->m_s4 & 8) ? 0xff : 0;
 
 	state->m_framecnt++;
 
@@ -462,8 +503,8 @@ static VIDEO_UPDATE( sol20 )
 
 			for (x = ma; x < ma + 64; x++)
 			{
+				inv = polarity;
 				chr = state->m_videoram[x & 0x3ff];
-				inv = 0;
 
 				/* Take care of flashing characters */
 				//if ((chr & 0x80) && (state->m_framecnt & 0x08))
@@ -472,8 +513,8 @@ static VIDEO_UPDATE( sol20 )
 
 				chr &= 0x7f;
 
-				if (ra == 0)
-					gfx = 0;
+				if ((ra == 0) || ((ctrl_off) && (chr < 0x20)))
+					gfx = inv;
 				else
 				if (ra < 10)
 					gfx = state->FNT[(chr<<4) | (ra-1) ] ^ inv;
