@@ -180,7 +180,7 @@ const game_driver * const drivers[] =
 	DRIVER( pb1000 )	/* Casio PP-1000 */
 	DRIVER( pb2000c )	/* Casio PB-2000C */
 	DRIVER( ai1000 )	/* Casio AI-1000 */
-	DRIVER( cfx9850 )	/* Casio CFX-9850 */
+	//DRIVER( cfx9850 )	/* Casio CFX-9850 */
 
 	/* Coleco */
 	DRIVER( coleco )	/* ColecoVision (Original BIOS)  */
