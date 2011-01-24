@@ -19,11 +19,10 @@
     Note that the CONSOL rom is basically a dumb terminal program and doesn't
     do anything useful unless the MODE key (whatever that is) is pressed.
 
-    Other OS ROMs to be dumped:
-      - CONSOL
-      - CUTER
-      - BOOTLOAD
-      - DPMON (3rd party)
+    CUTER is a relocatable cassette-based alternative to SOLOS.
+
+    Need a dump of BOOTLOAD. Need a tape of CUTER. Need orginal dumps of
+    SOLOS, DPMON and CONSOL.
 
     Other roms needed:
       - Dump of the 2 character generators (motorola 6574 and 6575)
@@ -41,18 +40,16 @@
       - The cassette format is totally identical, in fact tapes from one
         machine can be loaded on the other natively. They won't run of course.
       - Sorcerer monitor commands are almost identical to the SOLOS ones.
-        To illustrate some differences:
-        Run a program in memory  GO (sorcerer) EX (SOLOS)
-        Load a file from tape    LO (Sorcerer) GE (SOLOS)
-        Set tape operation to 300 baud  SE T=1 (sorcerer)  SE TA 1 (SOLOS)
+        example: to change tape speed to 300 baud:
+        SE T=1 (sorcerer)  SE TA 1 (SOLOS)
         Most other commands are identical. The EN command (enter bytes into
         memory) is rather primitive in SOLOS, better on Sorcerer.
       - Sol20 has "personality modules" where you could plug a new OS into
         a special socket on the motherboard. Sorcerer improved upon this by
         being the first computer to use cartridges.
       - Some circuits are completely different... the video and keyboard are
-        notable examples, while the address of ram on the basic machines is
-        another major difference.
+        notable examples, while the addresses of ram and bios on the basic
+        machines is another major difference.
 ****************************************************************************/
 #define ADDRESS_MAP_MODERN
 
@@ -95,9 +92,11 @@ public:
 	required_device<device_t> m_uart;
 	required_device<device_t> m_uart_s;
 	required_device<device_t> m_terminal;
+	DECLARE_READ8_MEMBER( sol20_f9_r );
 	DECLARE_READ8_MEMBER( sol20_fa_r );
 	DECLARE_READ8_MEMBER( sol20_fb_r );
 	DECLARE_READ8_MEMBER( sol20_fc_r );
+	DECLARE_WRITE8_MEMBER( sol20_f9_w );
 	DECLARE_WRITE8_MEMBER( sol20_fa_w );
 	DECLARE_WRITE8_MEMBER( sol20_fb_w );
 	DECLARE_WRITE8_MEMBER( sol20_fe_w );
@@ -105,7 +104,6 @@ public:
 	UINT8 m_sol20_fa;
 	UINT8 m_sol20_fc;
 	UINT8 m_sol20_fe;
-	UINT8 m_s4;
 	const UINT8 *FNT;
 	const UINT8 *m_videoram;
 	UINT8 m_framecnt;
@@ -217,6 +215,13 @@ static TIMER_CALLBACK(sol20_cassette_tc)
 	}
 }
 
+READ8_MEMBER( sol20_state::sol20_f9_r)
+{
+	UINT8 data = ay31015_get_received_data( m_uart_s );
+	ay31015_set_input_pin( m_uart_s, AY31015_RDAV, 0 );
+	ay31015_set_input_pin( m_uart_s, AY31015_RDAV, 1 );
+	return data;
+}
 
 READ8_MEMBER( sol20_state::sol20_fa_r )
 {
@@ -245,6 +250,11 @@ READ8_MEMBER( sol20_state::sol20_fc_r )
 {
 	m_sol20_fa |= 1;
 	return m_sol20_fc;
+}
+
+WRITE8_MEMBER( sol20_state::sol20_f9_w )
+{
+	ay31015_set_transmit_data( m_uart_s, data );
 }
 
 WRITE8_MEMBER( sol20_state::sol20_fa_w )
@@ -292,6 +302,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sol20_io , ADDRESS_SPACE_IO, 8, sol20_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0xf9, 0xf9) AM_READWRITE(sol20_f9_r,sol20_f9_w)
 	AM_RANGE(0xfa, 0xfa) AM_READWRITE(sol20_fa_r,sol20_fa_w)
 	AM_RANGE(0xfb, 0xfb) AM_READWRITE(sol20_fb_r,sol20_fb_w)
 	AM_RANGE(0xfc, 0xfc) AM_READ(sol20_fc_r)
@@ -359,10 +370,10 @@ static INPUT_PORTS_START( sol20 )
 	PORT_DIPSETTING(    0x80, "4800/9600")
 
 	PORT_START("S4") // these switches need to be checked for correct polarity
-	PORT_DIPNAME( 0x11, 0x00, "Parity")
-	PORT_DIPSETTING(    0x00, DEF_STR(None))
-	PORT_DIPSETTING(    0x10, "Odd")
-	PORT_DIPSETTING(    0x11, "Even")
+	PORT_DIPNAME( 0x11, 0x10, "Parity")
+	PORT_DIPSETTING(    0x00, "Even")
+	PORT_DIPSETTING(    0x01, "Odd")
+	PORT_DIPSETTING(    0x10, DEF_STR(None))
 	PORT_DIPNAME( 0x06, 0x06, "Data Bits")
 	PORT_DIPSETTING(    0x00, "5")
 	PORT_DIPSETTING(    0x02, "6")
@@ -462,9 +473,6 @@ static MACHINE_RESET( sol20 )
 	ay31015_set_receiver_clock( state->m_uart_s, s_clock);
 	ay31015_set_transmitter_clock( state->m_uart_s, s_clock);
 
-	// video dips
-	state->m_s4 = input_port_read(machine, "S1");
-
 	// boot-bank
 	memory_set_bank(machine, "boot", 1);
 	timer_set(machine, ATTOTIME_IN_USEC(9), NULL, 0, sol20_boot);
@@ -484,12 +492,18 @@ static VIDEO_START( sol20 )
 
 static VIDEO_UPDATE( sol20 )
 {
+// Visible screen is 64 x 16, with start position controlled by scroll register.
+// Note on blinking characters:
+// any character with bit 7 set will blink. With DPMON, do DA C000 C2FF to see what happens
+	UINT8 s1 = input_port_read(machine, "S1");
 	sol20_state *state = screen->machine->driver_data<sol20_state>();
-/* visible screen is 64 x 16, with start position controlled by scroll register */
 	UINT8 y,ra,chr,gfx;
 	UINT16 sy=0,ma,x,inv;
-	UINT8 ctrl_off = state->m_s4 & 4;
-	UINT8 polarity = (state->m_s4 & 8) ? 0xff : 0;
+	UINT8 polarity = (s1 & 8) ? 0xff : 0;
+
+	UINT8 cursor_inv = FALSE;
+	if ((s1 == 0x20) || ((s1 == 0x10) && (state->m_framecnt & 0x08)))
+		cursor_inv = TRUE;
 
 	state->m_framecnt++;
 
@@ -506,14 +520,13 @@ static VIDEO_UPDATE( sol20 )
 				inv = polarity;
 				chr = state->m_videoram[x & 0x3ff];
 
-				/* Take care of flashing characters */
-				//if ((chr & 0x80) && (state->m_framecnt & 0x08))
-				if (chr & 0x80)
+				// cursor
+				if (BIT(chr, 7) && cursor_inv)
 					inv ^= 0xff;
 
 				chr &= 0x7f;
 
-				if ((ra == 0) || ((ctrl_off) && (chr < 0x20)))
+				if ((ra == 0) || ((s1 & 4) && (chr < 0x20)))
 					gfx = inv;
 				else
 				if (ra < 10)
