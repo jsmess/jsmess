@@ -97,6 +97,14 @@ static ADDRESS_MAP_START( dsp_data_map, ADDRESS_SPACE_DATA, 16 )
 	AM_RANGE(0x0000, 0x03ff) AM_ROM AM_REGION("dspdata", 0)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( setadsp_prg_map, ADDRESS_SPACE_PROGRAM, 32 )
+	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_REGION("dspprg", 0)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( setadsp_data_map, ADDRESS_SPACE_DATA, 16 )
+	AM_RANGE(0x0000, 0x07ff) AM_ROM AM_REGION("dspdata", 0)
+ADDRESS_MAP_END
+
 /*************************************
  *
  *  Input ports
@@ -752,15 +760,15 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( snesst10, snes )
 
 	MCFG_CPU_ADD("setadsp", UPD96050, 10000000)
-	MCFG_CPU_PROGRAM_MAP(dsp_prg_map)
-	MCFG_CPU_DATA_MAP(dsp_data_map)
+	MCFG_CPU_PROGRAM_MAP(setadsp_prg_map)
+	MCFG_CPU_DATA_MAP(setadsp_data_map)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( snesst11, snes )
 
 	MCFG_CPU_ADD("setadsp", UPD96050, 15000000)
-	MCFG_CPU_PROGRAM_MAP(dsp_prg_map)
-	MCFG_CPU_DATA_MAP(dsp_data_map)
+	MCFG_CPU_PROGRAM_MAP(setadsp_prg_map)
+	MCFG_CPU_DATA_MAP(setadsp_data_map)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( snespal, snes )
