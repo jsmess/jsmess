@@ -348,10 +348,8 @@ READ8_MEMBER( mb89352_device::mb89352_r )
 				m_ints |= INTS_COMMAND_COMPLETE;
 				set_phase(SCSI_PHASE_STATUS);
 			}
-			return m_data;
 		}
-
-		return 0x00;
+		return m_data;
 	case 0x0b:  // TEMP - Temporary
 		return m_temp;
 	case 0x0c:  // TCH - Transfer Counter High
@@ -466,8 +464,11 @@ WRITE8_MEMBER( mb89352_device::mb89352_w )
 		case 0x04:   // Transfer
 			m_transfer_index = 0;
 			m_spc_status |= SSTS_XFER_IN_PROGRESS;
-			m_spc_status &= ~SSTS_DREG_EMPTY;  // DREG is no longer empty, but apparently it's not full either.
-			SCSIReadData(m_SCSIdevices[m_target],m_buffer,512);
+			if(m_phase == SCSI_PHASE_DATAIN)  // if we are reading data...
+			{
+				m_spc_status &= ~SSTS_DREG_EMPTY;  // DREG is no longer empty, but apparently it's not full either.
+				SCSIReadData(m_SCSIdevices[m_target],m_buffer,512);
+			}
 			logerror("mb89352: SCMD: Start Transfer\n");
 			break;
 		case 0x05:  // Transfer pause
@@ -552,6 +553,25 @@ WRITE8_MEMBER( mb89352_device::mb89352_w )
 		m_phase = data & 0x07;
 		m_line_status |= (data & 0x07);
 		logerror("mb89352: PCTL write %02x\n",data);
+		break;
+	case 0x0a:  // DREG - Data register
+		if(m_spc_status | SSTS_XFER_IN_PROGRESS)
+		{
+			m_buffer[m_transfer_index % 512] = data;
+			m_spc_status |= SSTS_DREG_EMPTY;  // DREG is empty once sent
+			m_transfer_index++;
+			m_transfer_count--;
+			if(m_transfer_index % 512 == 0)
+				SCSIWriteData(m_SCSIdevices[m_target],m_buffer,512);
+			if(m_transfer_count == 0)
+			{
+				// End of transfer
+				m_spc_status &= ~SSTS_XFER_IN_PROGRESS;
+				m_spc_status |= SSTS_DREG_EMPTY;
+				m_ints |= INTS_COMMAND_COMPLETE;
+				set_phase(SCSI_PHASE_STATUS);
+			}
+		}
 		break;
 	case 0x0b:  // TEMP - Temporary
 		m_temp = data;
