@@ -2388,36 +2388,16 @@ static UINT32 gba_detect_chip( UINT8 *data, int size)
 	return chip;
 }
 
-static DEVICE_IMAGE_LOAD( gba_cart )
+static UINT32 gba_fix_wrong_chip(running_machine *machine, UINT32 cart_size, UINT32 chip)
 {
-	UINT8 *ROM = image.device().machine->region("cartridge")->base();
-	UINT32 cart_size;
 	UINT8 game_code[4] = { 0 };
-	UINT32 chip;
-	gba_state *state = image.device().machine->driver_data<gba_state>();
-
-	state->nvsize = 0;
-	state->flash_size = 0;
-	state->nvptr = (UINT8 *)NULL;
-
-	if (image.software_entry() == NULL)
-	{
-		cart_size = image.length();
-		image.fread( ROM, cart_size);
-	}
-	else
-	{
-		cart_size = image.get_software_region_length("rom");
-		memcpy(ROM, image.get_software_region("rom"), cart_size);
-	}
+	UINT8 *ROM = machine->region("cartridge")->base();
 
 	if (cart_size >= 0xAC + 4)
 	{
 		memcpy(game_code, ROM + 0xAC, 4);
 	}
-
-	chip = gba_detect_chip( ROM, cart_size);
-
+	
 	{
 		char s[256], *p = s;
 		if (chip == 0) p += sprintf( p, " NONE");
@@ -2430,7 +2410,7 @@ static DEVICE_IMAGE_LOAD( gba_cart )
 		if (chip & GBA_CHIP_RTC) p += sprintf( p, " RTC");
 		mame_printf_info( "GBA: Detected%s\n", s);
 	}
-
+	
 	{
 		int count = 0;
 		if (chip & GBA_CHIP_EEPROM) count++;
@@ -2439,6 +2419,8 @@ static DEVICE_IMAGE_LOAD( gba_cart )
 		if (chip & GBA_CHIP_FLASH_1M) count++;
 		if (chip & GBA_CHIP_FLASH_512) count++;
 		if (chip & GBA_CHIP_SRAM) count++;
+
+		// fix for games which return more than one kind of chip: either it is one of the known titles, or we default to no battery
 		if (count > 1)
 		{
 			chip &= ~(GBA_CHIP_EEPROM | GBA_CHIP_EEPROM_8K | GBA_CHIP_FLASH | GBA_CHIP_FLASH_1M | GBA_CHIP_FLASH_512 | GBA_CHIP_SRAM);
@@ -2468,6 +2450,8 @@ static DEVICE_IMAGE_LOAD( gba_cart )
 			}
 		}
 	}
+	
+	// fix for a few games detected with the wrong nvram
 
 	// "Bomberman Max 2", "Broken Sword", "Custom Robo GX" and "Classic NES Series - Excitebike" require 14 bit EEPROM addressing
 	if (chip & GBA_CHIP_EEPROM)
@@ -2480,7 +2464,81 @@ static DEVICE_IMAGE_LOAD( gba_cart )
 			chip = (chip & ~GBA_CHIP_EEPROM) | GBA_CHIP_EEPROM_8K;
 		}
 	}
+	
+	return chip;
+}
 
+typedef struct _gba_pcb  gba_pcb;
+struct _gba_pcb
+{
+	const char              *pcb_name;
+	int                     pcb_id;
+};
+
+// Here, we take the feature attribute from .xml (i.e. the PCB name) and we assign a unique ID to it
+static const gba_pcb pcb_list[] =
+{
+	{"GBA-EEPROM",    GBA_CHIP_EEPROM},
+	{"GBA-SRAM",      GBA_CHIP_SRAM},
+	{"GBA-FLASH",     GBA_CHIP_FLASH},
+	{"GBA-FLASH-1M",  GBA_CHIP_FLASH_1M},
+	{"GBA-RTC",       GBA_CHIP_RTC},
+	{"GBA-FLASH-512", GBA_CHIP_FLASH_512},
+	{"GBA-EEPROM-8K", GBA_CHIP_EEPROM_8K}
+};
+
+static int gba_get_pcb_id(const char *pcb)
+{
+	int	i;
+	
+	for (i = 0; i < ARRAY_LENGTH(pcb_list); i++)
+	{
+		if (!mame_stricmp(pcb_list[i].pcb_name, pcb))
+			return pcb_list[i].pcb_id;
+	}
+	
+	return 0;
+}
+
+static DEVICE_IMAGE_LOAD( gba_cart )
+{
+	UINT8 *ROM = image.device().machine->region("cartridge")->base();
+	UINT32 cart_size;
+	UINT32 chip = 0;
+	gba_state *state = image.device().machine->driver_data<gba_state>();
+
+	state->nvsize = 0;
+	state->flash_size = 0;
+	state->nvptr = (UINT8 *)NULL;
+
+	if (image.software_entry() == NULL)
+	{
+		cart_size = image.length();
+		image.fread(ROM, cart_size);
+	}
+	else
+	{
+		const char *pcb_name = "";
+		cart_size = image.get_software_region_length("rom");
+		memcpy(ROM, image.get_software_region("rom"), cart_size);
+		
+		if ((pcb_name = image.get_feature("pcb_type")) == NULL)
+			chip = 0;
+		else
+			chip = gba_get_pcb_id(pcb_name);
+		
+		mame_printf_info("Type from xml: %s\n", pcb_name);
+	}
+
+	if (!chip)
+	{
+		// detect nvram based on strings inside the file
+		chip = gba_detect_chip(ROM, cart_size);
+	
+		// fix the previous value when possible
+		chip = gba_fix_wrong_chip(image.device().machine, cart_size, chip);
+	}
+	
 	if ((chip & GBA_CHIP_EEPROM) || (chip & GBA_CHIP_EEPROM_8K))
 	{
 		state->nvptr = (UINT8 *)&state->gba_eeprom;
@@ -2552,13 +2610,9 @@ static DEVICE_IMAGE_LOAD( gba_cart )
 	if (state->flash_size > 0)
 	{
 		if (state->flash_size == 0x10000)
-		{
 			state->mFlashDev = image.device().machine->device<intelfsh8_device>("pflash");
-		}
 		else
-		{
 			state->mFlashDev = image.device().machine->device<intelfsh8_device>("sflash");
-		}
 	}
 
 	// mirror the ROM

@@ -1603,6 +1603,7 @@
 		<year>2002</year>
 		<publisher>MTO</publisher>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb_type" value="GBA-EEPROM-8K" />
 			<dataarea name="rom" size="8388608">
 				<rom name="advance gt2 (japan).bin" size="8388608" crc="edcb7d46" sha1="c3988cda910f181ad989d3e157f4ebdc405ecda3" offset="000000" />
 			</dataarea>
@@ -3946,6 +3947,7 @@
 		<year>2002</year>
 		<publisher>Vivendi Universal</publisher>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb_type" value="GBA-EEPROM-8K" />
 			<dataarea name="rom" size="16777216">
 				<rom name="bomberman max 2 - blue advance (europe) (en,fr,de).bin" size="16777216" crc="09fc4d53" sha1="eb25e28ae1047145fd2cbcc3ecbb63330fbc8fe0" offset="000000" />
 			</dataarea>
@@ -3957,6 +3959,7 @@
 		<year>2002</year>
 		<publisher>Majesco</publisher>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb_type" value="GBA-EEPROM-8K" />
 			<dataarea name="rom" size="8388608">
 				<rom name="bomberman max 2 - blue advance (usa).bin" size="8388608" crc="94c620f3" sha1="b2c64452fe8c879c1abd5cf709e3e26971eeb166" offset="000000" />
 			</dataarea>
@@ -3968,6 +3971,7 @@
 		<year>2002</year>
 		<publisher>Hudson Soft</publisher>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb_type" value="GBA-EEPROM-8K" />
 			<dataarea name="rom" size="8388608">
 				<rom name="bomberman max 2 - bomberman version (japan).bin" size="8388608" crc="656cf22e" sha1="625e4c19f045202de4d95262b5cd30f15c4469fe" offset="000000" />
 			</dataarea>
@@ -3979,6 +3983,7 @@
 		<year>2002</year>
 		<publisher>Hudson Soft</publisher>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb_type" value="GBA-EEPROM-8K" />
 			<dataarea name="rom" size="8388608">
 				<rom name="bomberman max 2 - max version (japan).bin" size="8388608" crc="290d8810" sha1="7277ea99c0015df9ae1a29a9b45909f168624901" offset="000000" />
 			</dataarea>
@@ -3990,6 +3995,7 @@
 		<year>2002</year>
 		<publisher>Vivendi Universal</publisher>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb_type" value="GBA-EEPROM-8K" />
 			<dataarea name="rom" size="16777216">
 				<rom name="bomberman max 2 - red advance (europe) (en,fr,de).bin" size="16777216" crc="67d2e5b8" sha1="4d514fe19b59d42be9a118c99e2008efee2aedcb" offset="000000" />
 			</dataarea>
@@ -4001,6 +4007,7 @@
 		<year>2002</year>
 		<publisher>Majesco</publisher>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb_type" value="GBA-EEPROM-8K" />
 			<dataarea name="rom" size="8388608">
 				<rom name="bomberman max 2 - red advance (usa).bin" size="8388608" crc="4db517c1" sha1="1428bb0a78aebb112a2702ed8561bdfe9bcedcf1" offset="000000" />
 			</dataarea>
@@ -4309,6 +4316,7 @@
 		<year>2001</year>
 		<publisher>Ubi Soft</publisher>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb_type" value="GBA-SRAM" />
 			<dataarea name="rom" size="4194304">
 				<rom name="breath of fire (europe) (en,fr,de).bin" size="4194304" crc="d3660549" sha1="fdc7e7b6ab680229dcd159eb4dd7d1967b9e88ee" offset="000000" />
 			</dataarea>
@@ -4320,6 +4328,7 @@
 		<year>2001</year>
 		<publisher>Ubi Soft</publisher>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb_type" value="GBA-SRAM" />
 			<dataarea name="rom" size="4194304">
 				<rom name="breath of fire (europe).bin" size="4194304" crc="a1c3165d" sha1="f47870d25665588d19b75e90d0bd32a759e64918" offset="000000" />
 			</dataarea>
@@ -4331,6 +4340,7 @@
 		<year>2001</year>
 		<publisher>Capcom</publisher>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb_type" value="GBA-SRAM" />
 			<dataarea name="rom" size="4194304">
 				<rom name="breath of fire (usa).bin" size="4194304" crc="f06422a8" sha1="b30533f68037b47d5439bab0182169e4a643a38d" offset="000000" />
 			</dataarea>
@@ -4342,6 +4352,7 @@
 		<year>2001</year>
 		<publisher>Capcom</publisher>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb_type" value="GBA-SRAM" />
 			<dataarea name="rom" size="4194304">
 				<rom name="breath of fire - ryuu no senshi (japan).bin" size="4194304" crc="66e96b35" sha1="b09dc97ab42f5e32dc6254d09b0b195295b24932" offset="000000" />
 			</dataarea>
@@ -4441,6 +4452,7 @@
 		<year>2002</year>
 		<publisher>BAM! Entertainment</publisher>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb_type" value="GBA-EEPROM-8K" />
 			<dataarea name="rom" size="8388608">
 				<rom name="broken sword - the shadow of the templars (europe) (en,fr,de,es,it).bin" size="8388608" crc="3a23efd7" sha1="25c6cf94b1b54a1ac5058460faad00cf93d272f5" offset="000000" />
 			</dataarea>
@@ -4452,6 +4464,7 @@
 		<year>2002</year>
 		<publisher>BAM! Entertainment</publisher>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb_type" value="GBA-EEPROM-8K" />
 			<dataarea name="rom" size="8388608">
 				<rom name="broken sword - the shadow of the templars (usa) (en,fr,de,es,it).bin" size="8388608" crc="3278ce51" sha1="314eced054604866153883ee20e0966e1443e0d9" offset="000000" />
 			</dataarea>
@@ -6250,6 +6263,7 @@
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb_type" value="GBA-EEPROM-8K" />
 			<dataarea name="rom" size="8388608">
 				<rom name="custom robo gx (japan).bin" size="8388608" crc="f533dc13" sha1="0b5ce051aa1fd83ab0ec79122b07b02bb41096a5" offset="000000" />
 			</dataarea>
@@ -6272,6 +6286,7 @@
 		<year>2001</year>
 		<publisher>Hori</publisher>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb_type" value="GBA-EEPROM" />
 			<dataarea name="rom" size="4194304">
 				<rom name="dai-mahjong. (japan).bin" size="4194304" crc="c6ccca05" sha1="35e4c69a6a30362d873e3383942f86932a216ecf" offset="000000" />
 			</dataarea>
@@ -7044,6 +7059,7 @@
 		<year>2002</year>
 		<publisher>Disney Interactive</publisher>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb_type" value="GBA-EEPROM" />
 			<dataarea name="rom" size="16777216">
 				<rom name="disney sports - football (usa).bin" size="16777216" crc="01413db1" sha1="c806b83f73defce9fcf269b9023fc1cc6dbf356c" offset="000000" />
 			</dataarea>
@@ -7055,6 +7071,7 @@
 		<year>2002</year>
 		<publisher>Disney Interactive</publisher>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb_type" value="GBA-EEPROM" />
 			<dataarea name="rom" size="16777216">
 				<rom name="disney sports - american football (japan).bin" size="16777216" crc="b92e9057" sha1="6ff7aba52a2728d19059a2b496928649f33bd73b" offset="000000" />
 			</dataarea>
@@ -7385,6 +7402,7 @@
 		<year>2002</year>
 		<publisher>MTO</publisher>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb_type" value="GBA-EEPROM" />
 			<dataarea name="rom" size="8388608">
 				<rom name="dokidoki cooking series 1 - komugi-chan no happy cake (japan).bin" size="8388608" crc="fe198026" sha1="5633769b002ed9ae00b090eed1ff4d2af80246a0" offset="000000" />
 			</dataarea>
@@ -7396,6 +7414,7 @@
 		<year>2003</year>
 		<publisher>MTO</publisher>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb_type" value="GBA-EEPROM" />
 			<dataarea name="rom" size="8388608">
 				<rom name="dokidoki cooking series 2 - gourmet kitchen - suteki na obentou (japan).bin" size="8388608" crc="08dfc956" sha1="11da3a8e99457787f1263ff3396cb85b083583f0" offset="000000" />
 			</dataarea>
@@ -10517,6 +10536,7 @@
 		<year>2003</year>
 		<publisher>Banpresto</publisher>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb_type" value="GBA-FLASH" />
 			<dataarea name="rom" size="8388608">
 				<rom name="from tv animation one piece - mezase! king of belly (japan).bin" size="8388608" crc="e6f5bdd5" sha1="9b4e610a2f342f06de3704f7f0b35e6e562da928" offset="000000" />
 			</dataarea>
@@ -11315,7 +11335,7 @@
 		</part>
 	</software>
 
-	<software name="carbatlr">
+	<software name="carbatlr" cloneof="carbatlj">
 		<description>Gekitou! Car Battler Go!! (Jpn)</description>
 		<year>2001</year>
 		<publisher>Victor Interactive Software</publisher>
@@ -11821,7 +11841,7 @@
 		</part>
 	</software>
 
-	<software name="rave2">
+	<software name="rave2" cloneof="ravemstr">
 		<description>Groove Adventure Rave - Hikari to Yami no Daikessen 2 (Jpn)</description>
 		<year>2002</year>
 		<publisher>Konami</publisher>
@@ -12847,7 +12867,7 @@
 		</part>
 	</software>
 
-	<software name="hitsuji">
+	<software name="hitsuji" cloneof="sheep">
 		<description>Hitsuji no Kimochi. (Jpn)</description>
 		<year>2002</year>
 		<publisher>Capcom</publisher>
@@ -17289,6 +17309,7 @@
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb_type" value="GBA-EEPROM" />
 			<dataarea name="rom" size="8388608">
 				<rom name="medabots ax - metabee version (europe) (en,fr,de,es,it) [b].bin" size="8388608" crc="5f1e5a48" sha1="130c908d24ba3e422fd8db84e683bacc87235e78" offset="000000" status="baddump" />
 			</dataarea>
@@ -17300,6 +17321,7 @@
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb_type" value="GBA-EEPROM" />
 			<dataarea name="rom" size="8388608">
 				<rom name="medabots ax - metabee version (usa).bin" size="8388608" crc="03294511" sha1="80c024df6d40e499776665d7f0c494a252973048" offset="000000" />
 			</dataarea>
@@ -17311,6 +17333,7 @@
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb_type" value="GBA-EEPROM" />
 			<dataarea name="rom" size="8388608">
 				<rom name="medabots ax - rokusho version (europe) (en,fr,de,es,it).bin" size="8388608" crc="f5801bd8" sha1="35e35139e4d8d91ca52983097f3ce8fe090e3598" offset="000000" />
 			</dataarea>
@@ -17322,6 +17345,7 @@
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb_type" value="GBA-EEPROM" />
 			<dataarea name="rom" size="8388608">
 				<rom name="medabots ax - rokusho version (usa).bin" size="8388608" crc="92fdb8d6" sha1="ef47f8c675f1f541a0fe4bd37c8882efc539b1c7" offset="000000" />
 			</dataarea>
@@ -17388,6 +17412,7 @@
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb_type" value="GBA-EEPROM" />
 			<dataarea name="rom" size="8388608">
 				<rom name="medarot g - kabuto version (japan).bin" size="8388608" crc="b107c73d" sha1="cf0ab638d344ea74db39018163b12256583d556f" offset="000000" />
 			</dataarea>
@@ -17399,6 +17424,7 @@
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb_type" value="GBA-EEPROM" />
 			<dataarea name="rom" size="8388608">
 				<rom name="medarot g - kuwagata version (japan).bin" size="8388608" crc="14e3ebcc" sha1="4f54d7bd915aa90496725ea3928b8a0d93bc5e49" offset="000000" />
 			</dataarea>
@@ -19280,6 +19306,7 @@
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb_type" value="GBA-EEPROM-8" />
 			<dataarea name="rom" size="4194304">
 				<rom name="nakayoshi pet advance series 1 - kawaii hamster (japan).bin" size="4194304" crc="74930b16" sha1="1fb49bb2293dbbd061a5d72d65d413b22360cced" offset="000000" />
 			</dataarea>
@@ -19731,6 +19758,7 @@
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb_type" value="GBA-SRAM" />
 			<dataarea name="rom" size="4194304">
 				<rom name="nihon pro mahjong renmei kounin tetsuman advance - menkyo kaiden series (japan).bin" size="4194304" crc="085c1184" sha1="fc6c75af338224759757ae4b884d516dbfc973ac" offset="000000" />
 			</dataarea>
@@ -19929,6 +19957,7 @@
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb_type" value="GBA-EEPROM" />
 			<dataarea name="rom" size="8388608">
 				<rom name="ohanaya-san monogatari gba - iyashikei ohanaya-san ikusei game (japan).bin" size="8388608" crc="d5059733" sha1="36ef5248f9873c7812d93572242d01512d67f41c" offset="000000" />
 			</dataarea>
@@ -22751,7 +22780,7 @@
 		</part>
 	</software>
 
-	<software name="razorfs">
+	<software name="razorfs" cloneof="freestyl">
 		<description>Razor Freestyle Scooter (USA)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -22982,7 +23011,7 @@
 		</part>
 	</software>
 
-	<software name="roadtrip">
+	<software name="roadtrip" cloneof="gadgetrc">
 		<description>Road Trip - Shifting Gears (USA)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -23372,6 +23401,7 @@
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb_type" value="GBA-SRAM" />
 			<dataarea name="rom" size="8388608">
 				<rom name="rocky (europe) (en,fr,de,es,it).bin" size="8388608" crc="d2e55fb5" sha1="ae6a9b231cd155e1f1ec0eb3f02a5c2c9cb08636" offset="000000" />
 			</dataarea>
@@ -23383,6 +23413,7 @@
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb_type" value="GBA-SRAM" />
 			<dataarea name="rom" size="8388608">
 				<rom name="rocky (usa) (en,fr,de,es,it).bin" size="8388608" crc="c8f4ff1b" sha1="50a2b4d10542274d5a37c6cd5c8541a3ba8d5681" offset="000000" />
 			</dataarea>
@@ -27156,6 +27187,7 @@
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb_type" value="GBA-EEPROM" />
 			<dataarea name="rom" size="8388608">
 				<rom name="super monkey ball jr. (europe) (en,fr,de,es,it).bin" size="8388608" crc="d75da09d" sha1="9c87fcf42a27644ae5bec273ac3afc3f672b4f94" offset="000000" />
 			</dataarea>
@@ -27167,6 +27199,7 @@
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb_type" value="GBA-EEPROM" />
 			<dataarea name="rom" size="4194304">
 				<rom name="super monkey ball jr. (usa).bin" size="4194304" crc="0a8031f0" sha1="0d994a58b7acdfe9357e5405acebe232128b80fe" offset="000000" />
 			</dataarea>
@@ -28388,6 +28421,7 @@
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb_type" value="GBA-EEPROM" />
 			<dataarea name="rom" size="4194304">
 				<rom name="tokimeki yume series 1 - ohanaya-san ni narou! (japan).bin" size="4194304" crc="6eea16bd" sha1="76ad4d03b90ed8e2c1e657bc43954942c1fed18b" offset="000000" />
 			</dataarea>
@@ -29963,6 +29997,7 @@
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb_type" value="GBA-SRAM" />
 			<dataarea name="rom" size="8388608">
 				<rom name="warioware, inc. - mega microgame$! (usa) (beta).bin" size="8388608" crc="ec0c0c58" sha1="6a9dc96967e46c4c4ff138e73b45c031593c2a45" offset="000000" />
 			</dataarea>
@@ -29974,6 +30009,7 @@
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb_type" value="GBA-SRAM" />
 			<dataarea name="rom" size="8388608">
 				<rom name="warioware, inc. - mega microgame$! (usa).bin" size="8388608" crc="785d8b8c" sha1="3f556448d290fa5406d6ed367fee16cc02387ad3" offset="000000" />
 			</dataarea>
@@ -29985,6 +30021,7 @@
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb_type" value="GBA-SRAM" />
 			<dataarea name="rom" size="8388608">
 				<rom name="warioware, inc. - minigame mania (europe) (en,fr,de,es,it).bin" size="8388608" crc="500ca178" sha1="aad81e722aa88f98913c0354e559f845c4689cce" offset="000000" />
 			</dataarea>
