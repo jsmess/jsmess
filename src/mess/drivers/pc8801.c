@@ -147,6 +147,8 @@
 #include "sound/beep.h"
 //#include "includes/pc8801.h"
 
+//#define USE_PROPER_I8214
+
 static UINT8 i8255_0_pc,i8255_1_pc;
 static UINT8 fdc_irq_opcode;
 static UINT8 ext_rom_bank,gfx_ctrl,vram_sel,misc_ctrl,device_ctrl_data;
@@ -159,11 +161,14 @@ static UINT8 alu_ctrl1,alu_ctrl2;
 static UINT8 extram_mode,extram_bank;
 static UINT8 txt_width, txt_color;
 static int vblank_pos;
+#ifdef USE_PROPER_I8214
+static UINT8 m_int_mask,m_int_state;
+#else
 static UINT8 i8214_irq_level;
 static UINT8 vrtc_irq_mask,vrtc_irq_latch;
 static UINT8 timer_irq_mask,timer_irq_latch;
 static UINT8 sound_irq_mask,sound_irq_latch;
-
+#endif
 
 /*
 CRTC command params:
@@ -876,6 +881,20 @@ static WRITE8_HANDLER( pc8801_vram_select_w )
 	vram_sel = offset & 3;
 }
 
+#ifdef USE_PROPER_I8214
+
+static WRITE8_HANDLER( i8214_irq_level_w )
+{
+	i8214_b_w(space->machine->device("i8214"), 0, (data & 0x0f));
+}
+
+static WRITE8_HANDLER( i8214_irq_mask_w )
+{
+	m_int_mask = BITSWAP8((data & 0x07) | (m_int_mask & 0xf8),7,6,5,4,3,0,1,2);
+}
+
+
+#else
 static WRITE8_HANDLER( pc8801_irq_level_w )
 {
 	if(data & 8)
@@ -899,6 +918,7 @@ static WRITE8_HANDLER( pc8801_irq_mask_w )
 	//if(data & 4)
 	//	printf("IRQ mask %02x\n",data);
 }
+#endif
 
 static READ8_HANDLER( pc8801_window_bank_r )
 {
@@ -925,10 +945,14 @@ static WRITE8_HANDLER( pc8801_misc_ctrl_w )
 {
 	misc_ctrl = data;
 
+	#ifdef USE_PROPER_I8214
+	m_int_mask = (m_int_mask & 0xef) | ((data & 0x80) ? 0x00 : 0x10);
+	#else
 	sound_irq_mask = ((data & 0x80) == 0);
 
 	if(sound_irq_mask == 0)
 		sound_irq_latch = 0;
+	#endif
 }
 
 static WRITE8_HANDLER( pc8801_palram_w )
@@ -1203,9 +1227,14 @@ static ADDRESS_MAP_START( pc8801_io, ADDRESS_SPACE_IO, 8 )
 //  AM_RANGE(0xdc, 0xdf) AM_NOP                                     /* MODEM */
 	AM_RANGE(0xe2, 0xe2) AM_READWRITE(pc8801_extram_mode_r,pc8801_extram_mode_w) 			/* expand RAM mode */
 	AM_RANGE(0xe3, 0xe3) AM_READWRITE(pc8801_extram_bank_r,pc8801_extram_bank_w) 			/* expand RAM bank */
+#ifdef USE_PROPER_I8214
+	AM_RANGE(0xe4, 0xe4) AM_WRITE(i8214_irq_level_w)
+	AM_RANGE(0xe6, 0xe6) AM_WRITE(i8214_irq_mask_w)
+#else
 	AM_RANGE(0xe4, 0xe4) AM_WRITE(pc8801_irq_level_w)
 	AM_RANGE(0xe6, 0xe6) AM_WRITE(pc8801_irq_mask_w)
-//  AM_RANGE(0xe7, 0xe7) AM_NOP                                     /* (unknown) */
+#endif
+//  AM_RANGE(0xe7, 0xe7) AM_NOP                                     /* Arcus writes here, almost likely to be a mirror of above */
 	AM_RANGE(0xe8, 0xeb) AM_READWRITE(pc8801_kanji_r, pc8801_kanji_w)
 	AM_RANGE(0xec, 0xef) AM_READWRITE(pc8801_kanji_lv2_r, pc8801_kanji_lv2_w)
 //  AM_RANGE(0xf0, 0xf1) AM_NOP                                     /* Kana to Kanji dictionary ROM select (not yet) */
@@ -1611,33 +1640,6 @@ static UPD1990A_INTERFACE( pc88_upd1990a_intf )
 	DEVCB_NULL
 };
 
-/* YM2203 Interface */
-static void pc8801_sound_irq( device_t *device, int irq )
-{
-	if(sound_irq_mask)
-	{
-		sound_irq_latch = 1;
-		cputag_set_input_line(device->machine,"maincpu",0,HOLD_LINE);
-	}
-}
-
-/* TODO: mouse routing (that's why I don't use DEVCB_INPUT_PORT here) */
-static READ8_DEVICE_HANDLER( opn_porta_r ) { return input_port_read(device->machine, "OPN_PA"); }
-static READ8_DEVICE_HANDLER( opn_portb_r ) { return input_port_read(device->machine, "OPN_PB"); }
-
-static const ym2203_interface pc88_ym2203_intf =
-{
-	{
-		AY8910_LEGACY_OUTPUT,
-		AY8910_DEFAULT_LOADS,
-		DEVCB_HANDLER(opn_porta_r),
-		DEVCB_HANDLER(opn_portb_r),
-		DEVCB_NULL,
-		DEVCB_NULL
-	},
-	pc8801_sound_irq
-};
-
 /* Floppy Configuration */
 
 static const floppy_config pc88_floppy_config =
@@ -1662,6 +1664,61 @@ static const cassette_config pc88_cassette_config =
 	NULL
 };
 
+#ifdef USE_PROPER_I8214
+void pc8801_raise_irq(running_machine *machine,UINT8 mask)
+{
+	m_int_state |= mask;
+
+	i8214_r_w(machine->device("i8214"), 0, ~(m_int_state & m_int_mask));
+}
+
+static WRITE_LINE_DEVICE_HANDLER( pic_int_w )
+{
+	if (state == ASSERT_LINE)
+	{
+		cpu_set_input_line(device, INPUT_LINE_IRQ0, ASSERT_LINE);
+	}
+}
+
+static I8214_INTERFACE( pic_intf )
+{
+	DEVCB_DEVICE_LINE("maincpu", pic_int_w),
+	DEVCB_NULL
+};
+
+static IRQ_CALLBACK( pc8801_irq_callback )
+{
+	UINT8 vector = (i8214_a_r(device->machine->device("i8214"), 0)); //
+
+	printf("Interrupt Acknowledge Vector: %02x\n", vector);
+	m_int_state &= ~vector;
+
+	cputag_set_input_line(device->machine,"maincpu", INPUT_LINE_IRQ0, CLEAR_LINE);
+	i8214_r_w(device->machine->device("i8214"), 0, ~(m_int_state & m_int_mask));
+
+	return 1*2;
+}
+
+static void pc8801_sound_irq( device_t *device, int irq )
+{
+
+}
+
+static TIMER_CALLBACK( pc8801_rtc_irq )
+{
+	//pc8801_raise_irq(machine,2);
+	//if(m_int_mask & 4)
+	//	cputag_set_input_line(machine, "maincpu", INPUT_LINE_IRQ0, ASSERT_LINE);
+}
+
+static INTERRUPT_GEN( pc8801_vrtc_irq )
+{
+	pc8801_raise_irq(device->machine,1);
+	//if(m_int_mask & 2)
+	//	cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_IRQ0, ASSERT_LINE);
+}
+
+#else
 static IRQ_CALLBACK( pc8801_irq_callback )
 {
 	if(i8214_irq_level >= 5 && sound_irq_latch)
@@ -1681,7 +1738,19 @@ static IRQ_CALLBACK( pc8801_irq_callback )
 	}
 
 	printf("IRQ triggered but no vector on the bus! %02x %02x %02x %02x\n",i8214_irq_level,sound_irq_latch,vrtc_irq_latch,timer_irq_latch);
+	if(sound_irq_latch)
+		return 4*2;
+
 	return 2*2; //TODO: mustn't happen, it does if you press shift on N88-BASIC
+}
+
+static void pc8801_sound_irq( device_t *device, int irq )
+{
+	if(sound_irq_mask)
+	{
+		sound_irq_latch = 1;
+		cputag_set_input_line(device->machine,"maincpu",0,HOLD_LINE);
+	}
 }
 
 static TIMER_CALLBACK( pc8801_rtc_irq )
@@ -1692,6 +1761,16 @@ static TIMER_CALLBACK( pc8801_rtc_irq )
 		cputag_set_input_line(machine,"maincpu",0,HOLD_LINE);
 	}
 }
+
+static INTERRUPT_GEN( pc8801_vrtc_irq )
+{
+	if(vrtc_irq_mask)
+	{
+		vrtc_irq_latch = 1;
+		cpu_set_input_line(device,0,HOLD_LINE);
+	}
+}
+#endif
 
 static MACHINE_START( pc8801 )
 {
@@ -1735,6 +1814,13 @@ static MACHINE_RESET( pc8801 )
 	beep_set_frequency(machine->device("beeper"),2400);
 	beep_set_state(machine->device("beeper"),0);
 
+	#ifdef USE_PROPER_I8214
+	{
+		/* initialize I8214 */
+		i8214_etlg_w(machine->device("i8214"), 1);
+		i8214_inte_w(machine->device("i8214"), 1);
+	}
+	#else
 	{
 		vrtc_irq_mask = 0;
 		vrtc_irq_latch = 0;
@@ -1744,6 +1830,7 @@ static MACHINE_RESET( pc8801 )
 		sound_irq_latch = 0;
 		i8214_irq_level = 0;
 	}
+	#endif
 
 	{
 		dma_address[2] = 0xf300;
@@ -1779,24 +1866,36 @@ static const struct upd765_interface pc8801_upd765_interface =
 	{FLOPPY_0, FLOPPY_1, NULL, NULL}
 };
 
-static INTERRUPT_GEN( pc8801_vrtc_irq )
+/* YM2203 Interface */
+
+/* TODO: mouse routing (that's why I don't use DEVCB_INPUT_PORT here) */
+static READ8_DEVICE_HANDLER( opn_porta_r ) { return input_port_read(device->machine, "OPN_PA"); }
+static READ8_DEVICE_HANDLER( opn_portb_r ) { return input_port_read(device->machine, "OPN_PB"); }
+
+static const ym2203_interface pc88_ym2203_intf =
 {
-	if(vrtc_irq_mask)
 	{
-		vrtc_irq_latch = 1;
-		cpu_set_input_line(device,0,HOLD_LINE);
-	}
-}
+		AY8910_LEGACY_OUTPUT,
+		AY8910_DEFAULT_LOADS,
+		DEVCB_HANDLER(opn_porta_r),
+		DEVCB_HANDLER(opn_portb_r),
+		DEVCB_NULL,
+		DEVCB_NULL
+	},
+	pc8801_sound_irq
+};
+
+#define MASTER_CLOCK XTAL_4MHz
 
 static MACHINE_CONFIG_START( pc8801, driver_device )
 	/* main CPU */
-	MCFG_CPU_ADD("maincpu", Z80, 4000000)        /* 4 MHz */
+	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK)        /* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(pc8801_mem)
 	MCFG_CPU_IO_MAP(pc8801_io)
 	MCFG_CPU_VBLANK_INT("screen", pc8801_vrtc_irq)
 
 	/* sub CPU(5 inch floppy drive) */
-	MCFG_CPU_ADD("fdccpu", Z80, 4000000)		/* 4 MHz */
+	MCFG_CPU_ADD("fdccpu", Z80, MASTER_CLOCK)		/* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(pc8801fdc_mem)
 	MCFG_CPU_IO_MAP(pc8801fdc_io)
 
@@ -1809,6 +1908,9 @@ static MACHINE_CONFIG_START( pc8801, driver_device )
 	MCFG_I8255A_ADD( "d8255_slave", slave_fdd_intf )
 
 	MCFG_UPD765A_ADD("upd765", pc8801_upd765_interface)
+	#ifdef USE_PROPER_I8214
+	MCFG_I8214_ADD("i8214", MASTER_CLOCK, pic_intf)
+	#endif
 	//MCFG_UPD1990A_ADD("upd1990a", XTAL_32_768kHz, pc88_upd1990a_intf)
 	//MCFG_CENTRONICS_ADD("centronics", standard_centronics)
 	//MCFG_CASSETTE_ADD("cassette", pc88_cassette_config)
@@ -1831,7 +1933,7 @@ static MACHINE_CONFIG_START( pc8801, driver_device )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("opn", YM2203, 4000000) //unknown clock
+	MCFG_SOUND_ADD("opn", YM2203, MASTER_CLOCK)
 	MCFG_SOUND_CONFIG(pc88_ym2203_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
