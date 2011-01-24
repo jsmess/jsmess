@@ -44,6 +44,9 @@ System Driver Changes:
 - [GBA] Allow reading of the BLDALPHA register. This fixes the lockup in
   "Donkey Kong Country". [Tim Schuerewegen]
 
+- [GBA] Implemented FLASH bank select command. This fixes the NVRAM issue in
+  "Super Mario Advance 4". [Tim Schuerewegen]
+
 - [PDP1] Made the CRT implementation a device.  [Atari Ace]
 
 - [PIPPIN] Added pre release rom
