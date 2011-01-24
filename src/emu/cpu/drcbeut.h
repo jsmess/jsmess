@@ -57,7 +57,7 @@ class drc_hash_table
 public:
 	// construction/destruction
 	drc_hash_table(drc_cache &cache, UINT32 modes, UINT8 addrbits, UINT8 ignorebits);
-	
+
 	// getters
 	drccodeptr ***base() const { return m_base; }
 	UINT8 l1bits() const { return m_l1bits; }
@@ -67,13 +67,13 @@ public:
 	offs_t l1mask() const { return m_l1mask; }
 	offs_t l2mask() const { return m_l2mask; }
 	bool is_mode_populated(UINT32 mode) const { return m_base[mode] != m_emptyl1; }
-	
+
 	// set up and configuration
 	bool reset();
 	void set_default_codeptr(drccodeptr code);
 
 	// block begin/end
-	void block_begin(drcuml_block &block, const drcuml_instruction *instlist, UINT32 numinst);
+	void block_begin(drcuml_block &block, const uml::instruction *instlist, UINT32 numinst);
 	void block_end(drcuml_block &block);
 
 	// code pointer access
@@ -127,7 +127,7 @@ private:
 	// internal state
 	drc_cache &			m_cache;			// pointer to the cache
 	UINT64				m_uniquevalue;		// unique value used to find the table
-	UINT32				m_mapvalue[DRCUML_MAPVAR_END - DRCUML_MAPVAR_M0]; // array of current values
+	UINT32				m_mapvalue[uml::MAPVAR_END - uml::MAPVAR_M0]; // array of current values
 
 	// list of entries
 	struct map_entry
@@ -160,21 +160,21 @@ public:
 	void block_end(drcuml_block &block);
 
 	// get/set values
-	drccodeptr get_codeptr(drcuml_codelabel label, fixup_func fixup, void *param);
-	void set_codeptr(drcuml_codelabel label, drccodeptr codeptr);
+	drccodeptr get_codeptr(uml::code_label label, fixup_func fixup, void *param);
+	void set_codeptr(uml::code_label label, drccodeptr codeptr);
 
 private:
 	struct label_entry
 	{
 		label_entry *next() const { return m_next; }
 		label_entry *		m_next;			// pointer to next label
-		drcuml_codelabel	m_label;		// the label specified
+		uml::code_label		m_label;		// the label specified
 		drccodeptr			m_codeptr;		// pointer to the relevant code
 	};
 
 	// internal helpers
 	void reset(bool fatal_on_leftovers);
-	label_entry *find_or_allocate(drcuml_codelabel label);
+	label_entry *find_or_allocate(uml::code_label label);
 	static void oob_callback(drccodeptr *codeptr, void *param1, void *param2, void *param3);
 
 	// internal state

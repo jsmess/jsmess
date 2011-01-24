@@ -49,8 +49,8 @@
 //**************************************************************************
 
 // ensure that a given pointer is within the cache boundaries
-#define assert_in_cache(c,p)		assert((c)->contains_pointer(p))
-#define assert_in_near_cache(c,p)	assert((c)->contains_near_pointer(p))
+#define assert_in_cache(c,p)		assert((c).contains_pointer(p))
+#define assert_in_near_cache(c,p)	assert((c).contains_near_pointer(p))
 
 
 
@@ -60,6 +60,16 @@
 
 // generic code pointer
 typedef UINT8 *drccodeptr;
+
+
+// helper template for oob codegen
+template<class T, void (T::*func)(drccodeptr *codeptr, void *param1, void *param2)>
+void oob_func_stub(drccodeptr *codeptr, void *param1, void *param2, void *param3)
+{
+	T *target = reinterpret_cast<T *>(param3);
+	(target->*func)(codeptr, param1, param2);
+}
+
 
 // drc_cache
 class drc_cache
@@ -71,12 +81,12 @@ public:
 	// construction/destruction
 	drc_cache(size_t bytes);
 	~drc_cache();
-	
+
 	// getters
 	drccodeptr near() const { return m_near; }
 	drccodeptr base() const { return m_base; }
 	drccodeptr top() const { return m_top; }
-	
+
 	// pointer checking
 	bool contains_pointer(const void *ptr) const { return ((const drccodeptr)ptr >= m_near && (const drccodeptr)ptr < m_near + m_size); }
 	bool contains_near_pointer(const void *ptr) const { return ((const drccodeptr)ptr >= m_near && (const drccodeptr)ptr < m_neartop); }
@@ -119,7 +129,7 @@ private:
 	struct oob_handler
 	{
 		oob_handler *next() const { return m_next; }
-		
+
 		oob_handler *	m_next;				// next handler
 		oob_func		m_callback;			// callback function
 		void *			m_param1;			// 1st pointer parameter

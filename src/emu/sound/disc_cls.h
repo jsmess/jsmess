@@ -15,100 +15,89 @@
  *
  *  Additions/bugfix February 2003 - D.Renaud, F.Palazzolo, K.Wilkins
  *  Discrete parallel tasks 2009 - Couriersud
+ *  Discrete classes 2010        - Couriersud
  *
  ***********************************************************************/
 
 #define DISCRETE_CLASS_NAME(_name) discrete_ ## _name ## _node
 
-#if 0
-#define DISCRETE_CLASS_CONSTRUCTOR(_name, _base, _ctxsize)				\
-		DISCRETE_CLASS_NAME(_name)(discrete_device * pdev, const discrete_sound_block *block) \
-		 : DISCRETE_CLASS_NAME(_base)(pdev, block) { m_context_size = _ctxsize; }
-#else
-#define DISCRETE_CLASS_CONSTRUCTOR(_name, _base)				\
-		DISCRETE_CLASS_NAME(_name)() \
+#define DISCRETE_CLASS_INPUT(_name, _num)	inline double _name (void) { return *(m_input[_num]); }
+
+#define DISCRETE_CLASS_CONSTRUCTOR(_name, _base)						\
+	public:																\
+		DISCRETE_CLASS_NAME(_name)()									\
 		 : DISCRETE_CLASS_NAME(_base)() { }
-#endif
-#if 1
+
 #define DISCRETE_CLASS_DESTRUCTOR(_name)								\
 	public:																\
 		virtual ~ DISCRETE_CLASS_NAME(_name)(void) { }
-#else
-#define DISCRETE_CLASS_DESTRUCTOR(_name)
-#endif
 
-#define  DISCRETE_CLASS_STEP_RESETA(_name, _maxout, _priv)				\
+#define  DISCRETE_CLASS_STEP_RESET(_name, _maxout, _priv)				\
 class DISCRETE_CLASS_NAME(_name): public discrete_base_node, public discrete_step_interface			\
 {																		\
-public:																	\
 	DISCRETE_CLASS_CONSTRUCTOR(_name, base)								\
+	DISCRETE_CLASS_DESTRUCTOR(_name)									\
+public:																	\
 	void step(void);													\
 	void reset(void);													\
-	int max_output(void) { return _maxout; }							\
-	DISCRETE_CLASS_DESTRUCTOR(_name)									\
+	int max_output(void) { return _maxout; }					\
 private:																\
 	_priv																\
 }
 
-#define DISCRETE_CLASS_STEPA(_name, _maxout, _priv)	 				\
+#define DISCRETE_CLASS_STEP(_name, _maxout, _priv)						\
 class DISCRETE_CLASS_NAME(_name): public discrete_base_node, public discrete_step_interface				\
 {																		\
-public:																	\
 	DISCRETE_CLASS_CONSTRUCTOR(_name, base)								\
+	DISCRETE_CLASS_DESTRUCTOR(_name)									\
+public:																	\
 	void step(void);													\
 	void reset(void)			{ this->step(); }						\
-	int max_output(void) { return _maxout; }							\
-	DISCRETE_CLASS_DESTRUCTOR(_name)									\
+	int max_output(void) { return _maxout; }					\
 private:																\
 	_priv																\
 }
 
-#define  DISCRETE_CLASS_RESET(_name, _maxout) 				\
+#define  DISCRETE_CLASS_RESET(_name, _maxout)							\
 class DISCRETE_CLASS_NAME(_name): public discrete_base_node				\
 {																		\
-public:																	\
 	DISCRETE_CLASS_CONSTRUCTOR(_name, base)								\
-	void reset(void);													\
-	int max_output(void) { return _maxout; }							\
 	DISCRETE_CLASS_DESTRUCTOR(_name)									\
+public:																	\
+	void reset(void);													\
+	int max_output(void) { return _maxout; }					\
 }
 
-#define  DISCRETE_CLASSA(_name, _maxout, _priv) 						\
+#define  DISCRETE_CLASS(_name, _maxout, _priv)						\
 class DISCRETE_CLASS_NAME(_name): public discrete_base_node, public discrete_step_interface				\
 {																		\
-public:																	\
+	DISCRETE_CLASS_DESTRUCTOR(_name)									\
 	DISCRETE_CLASS_CONSTRUCTOR(_name, base)								\
+public:																	\
 	void step(void);													\
 	void reset(void);													\
 	void start(void);													\
 	void stop(void);													\
-	int max_output(void) { return _maxout; }							\
-	DISCRETE_CLASS_DESTRUCTOR(_name)									\
+	int max_output(void) { return _maxout; }					\
 private:																\
 	_priv																\
 }
 
 class DISCRETE_CLASS_NAME(special): public discrete_base_node
 {
-public:
 	DISCRETE_CLASS_CONSTRUCTOR(special, base)
-	int max_output(void) { return 0; }
 	DISCRETE_CLASS_DESTRUCTOR(special)
+public:
+	int max_output(void) { return 0; }
 };
 
 class DISCRETE_CLASS_NAME(unimplemented): public discrete_base_node
 {
-public:
 	DISCRETE_CLASS_CONSTRUCTOR(unimplemented, base)
-	int max_output(void) { return 0; }
 	DISCRETE_CLASS_DESTRUCTOR(unimplemented)
+public:
+	int max_output(void) { return 0; }
 };
-
-struct dst_size_context
-{
-//	int size;
-};
-
 
 /*************************************
  *
@@ -116,10 +105,13 @@ struct dst_size_context
  *
  *************************************/
 
-class DISCRETE_CLASS_NAME(dso_output): public discrete_base_node, public discrete_output_interface, public discrete_step_interface
+class DISCRETE_CLASS_NAME(dso_output):	public discrete_base_node,
+										public discrete_sound_output_interface,
+										public discrete_step_interface
 {
-public:
 	DISCRETE_CLASS_CONSTRUCTOR(dso_output, base)
+	DISCRETE_CLASS_DESTRUCTOR(dso_output)
+public:
 	void step(void) {
 		/* Add gain to the output and put into the buffers */
 		/* Clipping will be handled by the main sound system */
@@ -127,19 +119,18 @@ public:
 		*m_ptr++ = val;
 	}
 	int max_output(void) { return 0; }
-	void set_output(stream_sample_t *ptr) { m_ptr = ptr; }
-	DISCRETE_CLASS_DESTRUCTOR(dso_output)
+	void set_output_ptr(stream_sample_t *ptr) { m_ptr = ptr; }
 private:
 	stream_sample_t		*m_ptr;
 };
 
-DISCRETE_CLASSA(dso_csvlog, 0,
+DISCRETE_CLASS(dso_csvlog, 0,
 	FILE *m_csv_file;
 	INT64 m_sample_num;
 	char  m_name[32];
 );
 
-DISCRETE_CLASSA(dso_wavlog, 0,
+DISCRETE_CLASS(dso_wavlog, 0,
 	wav_file *m_wavfile;
 	char      m_name[32];
 );
@@ -152,8 +143,9 @@ DISCRETE_CLASSA(dso_wavlog, 0,
 
 class DISCRETE_CLASS_NAME(dss_adjustment): public discrete_base_node, public discrete_step_interface
 {
-public:
 	DISCRETE_CLASS_CONSTRUCTOR(dss_adjustment, base)
+	DISCRETE_CLASS_DESTRUCTOR(dss_adjustment)
+public:
 	void step(void);
 	void reset(void);
 private:
@@ -163,18 +155,17 @@ private:
 	double					m_pscale;
 	double					m_min;
 	double					m_scale;
-	DISCRETE_CLASS_DESTRUCTOR(dss_adjustment)
 };
 
 DISCRETE_CLASS_RESET(dss_constant, 1);
 
 class DISCRETE_CLASS_NAME(dss_input_data): public discrete_base_node, public discrete_input_interface
 {
-public:
+	DISCRETE_CLASS_DESTRUCTOR(dss_input_data)
 	DISCRETE_CLASS_CONSTRUCTOR(dss_input_data, base)
+public:
 	void reset(void);
 	void input_write(int sub_node, UINT8 data );
-	DISCRETE_CLASS_DESTRUCTOR(dss_input_data)
 private:
 	double		m_gain;				/* node gain */
 	double		m_offset;			/* node offset */
@@ -183,11 +174,11 @@ private:
 
 class DISCRETE_CLASS_NAME(dss_input_logic): public discrete_base_node, public discrete_input_interface
 {
-public:
 	DISCRETE_CLASS_CONSTRUCTOR(dss_input_logic, base)
+	DISCRETE_CLASS_DESTRUCTOR(dss_input_logic)
+public:
 	void reset(void);
 	void input_write(int sub_node, UINT8 data );
-	DISCRETE_CLASS_DESTRUCTOR(dss_input_logic)
 private:
 	double		m_gain;				/* node gain */
 	double		m_offset;			/* node offset */
@@ -196,11 +187,11 @@ private:
 
 class DISCRETE_CLASS_NAME(dss_input_not): public discrete_base_node, public discrete_input_interface
 {
-public:
 	DISCRETE_CLASS_CONSTRUCTOR(dss_input_not, base)
+	DISCRETE_CLASS_DESTRUCTOR(dss_input_not)
+public:
 	void reset(void);
 	void input_write(int sub_node, UINT8 data );
-	DISCRETE_CLASS_DESTRUCTOR(dss_input_not)
 private:
 	double		m_gain;				/* node gain */
 	double		m_offset;			/* node offset */
@@ -209,12 +200,12 @@ private:
 
 class DISCRETE_CLASS_NAME(dss_input_pulse): public discrete_base_node, public discrete_input_interface, public discrete_step_interface
 {
-public:
 	DISCRETE_CLASS_CONSTRUCTOR(dss_input_pulse, base)
+	DISCRETE_CLASS_DESTRUCTOR(dss_input_pulse)
+public:
 	void step(void);
 	void reset(void);
 	void input_write(int sub_node, UINT8 data );
-	DISCRETE_CLASS_DESTRUCTOR(dss_input_pulse)
 private:
 	double		m_gain;				/* node gain */
 	double		m_offset;			/* node offset */
@@ -223,17 +214,21 @@ private:
 
 class DISCRETE_CLASS_NAME(dss_input_stream): public discrete_base_node, public discrete_input_interface, public discrete_step_interface
 {
-public:
 	DISCRETE_CLASS_CONSTRUCTOR(dss_input_stream, base)
+	DISCRETE_CLASS_DESTRUCTOR(dss_input_stream)
+public:
 	void step(void);
 	void reset(void);
 	void start(void);
 	void input_write(int sub_node, UINT8 data );
 	virtual bool is_buffered(void) { return false; }
+
+	/* This is called by discrete_sound_device */
+	void stream_start(void);
+
 //protected:
 	UINT32				m_stream_in_number;
 	stream_sample_t		*m_ptr;			/* current in ptr for stream */
-	DISCRETE_CLASS_DESTRUCTOR(dss_input_stream)
 private:
 	static STREAM_UPDATE( static_stream_generate );
 	void stream_generate(stream_sample_t **inputs, stream_sample_t **outputs, int samples);
@@ -243,15 +238,15 @@ private:
 	UINT8		m_data;				/* data written */
 	UINT8				m_is_buffered;
 	/* the buffer stream */
-	sound_stream 		*m_buffer_stream;
+	sound_stream		*m_buffer_stream;
 };
 
 class DISCRETE_CLASS_NAME(dss_input_buffer): public DISCRETE_CLASS_NAME(dss_input_stream)
 {
-public:
 	DISCRETE_CLASS_CONSTRUCTOR(dss_input_buffer, dss_input_stream)
-	bool is_buffered(void) { return true; }
 	DISCRETE_CLASS_DESTRUCTOR(dss_input_buffer)
+public:
+	bool is_buffered(void) { return true; }
 };
 
 #include "disc_wav.h"

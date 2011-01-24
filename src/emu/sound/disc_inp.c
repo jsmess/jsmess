@@ -23,7 +23,7 @@
 READ8_DEVICE_HANDLER(discrete_sound_r)
 {
 	discrete_device *disc_device = downcast<discrete_device *>(device);
-	return 	disc_device->read( *disc_device->machine->firstcpu->space(), offset, 0xff);
+	return	disc_device->read( *disc_device->machine->firstcpu->space(), offset, 0xff);
 }
 
 
@@ -65,9 +65,9 @@ DISCRETE_STEP(dss_adjustment)
 
 		m_lastpval = rawportval;
 		if (DSS_ADJUSTMENT__LOG == 0)
-			this->output[0] = scaledval;
+			set_output(0,  scaledval);
 		else
-			this->output[0] = pow(10, scaledval);
+			set_output(0,  pow(10, scaledval));
 	}
 }
 
@@ -75,7 +75,7 @@ DISCRETE_RESET(dss_adjustment)
 {
 	double min, max;
 
-	m_port = device->machine->m_portlist.find((const char *)this->custom_data());
+	m_port = m_device->machine->m_portlist.find((const char *)this->custom_data());
 	if (m_port == NULL)
 		fatalerror("DISCRETE_ADJUSTMENT - NODE_%d has invalid tag", this->index());
 
@@ -115,7 +115,7 @@ DISCRETE_RESET(dss_adjustment)
 
 DISCRETE_RESET(dss_constant)
 {
-	this->output[0]= DSS_CONSTANT__INIT;
+	set_output(0, DSS_CONSTANT__INIT);
 }
 
 
@@ -136,7 +136,7 @@ DISCRETE_RESET(dss_input_data)
 	m_offset = DSS_INPUT__OFFSET;
 
 	m_data = DSS_INPUT__INIT;
-	this->output[0] = m_data * m_gain + m_offset;
+	set_output(0,  m_data * m_gain + m_offset);
 }
 
 void DISCRETE_CLASS_FUNC(dss_input_data, input_write)(int sub_node, UINT8 data )
@@ -148,12 +148,12 @@ void DISCRETE_CLASS_FUNC(dss_input_data, input_write)(int sub_node, UINT8 data )
 	if (m_data != new_data)
 	{
 		/* Bring the system up to now */
-		device->update();
+		m_device->update_to_current_time();
 
 		m_data = new_data;
 
 		/* Update the node output here so we don't have to do it each step */
-		this->output[0] = m_data * m_gain + m_offset;
+		set_output(0,  m_data * m_gain + m_offset);
 	}
 }
 
@@ -163,7 +163,7 @@ DISCRETE_RESET(dss_input_logic)
 	m_offset = DSS_INPUT__OFFSET;
 
 	m_data = (DSS_INPUT__INIT == 0) ? 0 : 1;
-	this->output[0] = m_data * m_gain + m_offset;
+	set_output(0,  m_data * m_gain + m_offset);
 }
 
 void DISCRETE_CLASS_FUNC(dss_input_logic, input_write)(int sub_node, UINT8 data )
@@ -175,12 +175,12 @@ void DISCRETE_CLASS_FUNC(dss_input_logic, input_write)(int sub_node, UINT8 data 
 	if (m_data != new_data)
 	{
 		/* Bring the system up to now */
-		device->update();
+		m_device->update_to_current_time();
 
 		m_data = new_data;
 
 		/* Update the node output here so we don't have to do it each step */
-		this->output[0] = m_data * m_gain + m_offset;
+		set_output(0,  m_data * m_gain + m_offset);
 	}
 }
 
@@ -190,7 +190,7 @@ DISCRETE_RESET(dss_input_not)
 	m_offset = DSS_INPUT__OFFSET;
 
 	m_data = (DSS_INPUT__INIT == 0) ? 1 : 0;
-	this->output[0] = m_data * m_gain + m_offset;
+	set_output(0,  m_data * m_gain + m_offset);
 }
 
 void DISCRETE_CLASS_FUNC(dss_input_not, input_write)(int sub_node, UINT8 data )
@@ -202,19 +202,19 @@ void DISCRETE_CLASS_FUNC(dss_input_not, input_write)(int sub_node, UINT8 data )
 	if (m_data != new_data)
 	{
 		/* Bring the system up to now */
-		device->update();
+		m_device->update_to_current_time();
 
 		m_data = new_data;
 
 		/* Update the node output here so we don't have to do it each step */
-		this->output[0] = m_data * m_gain + m_offset;
+		set_output(0,  m_data * m_gain + m_offset);
 	}
 }
 
 DISCRETE_STEP(dss_input_pulse)
 {
 	/* Set a valid output */
-	this->output[0] = m_data;
+	set_output(0,  m_data);
 	/* Reset the input to default for the next cycle */
 	/* node order is now important */
 	m_data = DSS_INPUT__INIT;
@@ -223,7 +223,7 @@ DISCRETE_STEP(dss_input_pulse)
 DISCRETE_RESET(dss_input_pulse)
 {
 	m_data = (DSS_INPUT__INIT == 0) ? 0 : 1;
-	this->output[0] = m_data;
+	set_output(0,  m_data);
 }
 
 void DISCRETE_CLASS_FUNC(dss_input_pulse, input_write)(int sub_node, UINT8 data )
@@ -235,7 +235,7 @@ void DISCRETE_CLASS_FUNC(dss_input_pulse, input_write)(int sub_node, UINT8 data 
 	if (m_data != new_data)
 	{
 		/* Bring the system up to now */
-		device->update();
+		m_device->update_to_current_time();
 		m_data = new_data;
 	}
 }
@@ -271,11 +271,11 @@ DISCRETE_STEP(dss_input_stream)
 	/* the context pointer is set to point to the current input stream data in discrete_stream_update */
 	if (EXPECTED(m_ptr))
 	{
-		this->output[0] = (*m_ptr) * m_gain + m_offset;
+		set_output(0,  (*m_ptr) * m_gain + m_offset);
 		m_ptr++;
 	}
 	else
-		this->output[0] = 0;
+		set_output(0,  0);
 }
 
 DISCRETE_RESET(dss_input_stream)
@@ -302,12 +302,12 @@ void DISCRETE_CLASS_FUNC(dss_input_stream, input_write)(int sub_node, UINT8 data
 		else
 		{
 			/* Bring the system up to now */
-			device->update();
+			m_device->update_to_current_time();
 
 			m_data = new_data;
 
 			/* Update the node output here so we don't have to do it each step */
-			this->output[0] = new_data * m_gain + m_offset;
+			set_output(0,  new_data * m_gain + m_offset);
 		}
 	}
 }
@@ -316,8 +316,6 @@ DISCRETE_START(dss_input_stream)
 {
 	discrete_base_node::start();
 
-	assert(DSS_INPUT_STREAM__STREAM < this->device->m_input_stream_list.count());
-
 	/* Stream out number is set during start */
 	m_stream_in_number = DSS_INPUT_STREAM__STREAM;
 	m_gain = DSS_INPUT_STREAM__GAIN;
@@ -325,16 +323,20 @@ DISCRETE_START(dss_input_stream)
 	m_ptr = NULL;
 
 	m_is_buffered = is_buffered();
-	if (m_is_buffered)
-	{
-		m_buffer_stream = stream_create(this->device, 0, 1, this->sample_rate(), this, static_stream_generate);
-
-		stream_set_input(device->m_stream, m_stream_in_number,
-			m_buffer_stream, 0, 1.0);
-	}
-	else
-	{
-		m_buffer_stream = NULL;
-	}
+	m_buffer_stream = NULL;
 }
 
+void DISCRETE_CLASS_NAME(dss_input_stream)::stream_start(void)
+{
+	if (m_is_buffered)
+	{
+		/* stream_buffered input only supported for sound devices */
+		discrete_sound_device *snd_device = downcast<discrete_sound_device *>(m_device);
+		//assert(DSS_INPUT_STREAM__STREAM < snd_device->m_input_stream_list.count());
+
+		m_buffer_stream = stream_create(snd_device, 0, 1, this->sample_rate(), this, static_stream_generate);
+
+		stream_set_input(snd_device->get_stream(), m_stream_in_number,
+			m_buffer_stream, 0, 1.0);
+	}
+}

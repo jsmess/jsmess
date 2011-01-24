@@ -128,37 +128,17 @@ Notes:
 
 To Do:
 
-- all games :   CRT controller (resolution+visible area+flip screen?)
-
-- dynagear  :   visible area may be incorrect
-
 - hypreac2  :   communication with other units
-                tilemap sprites use the yoffset specified in the sprites-list?
-                (see the 8 pixel gap between the backgrounds and the black rows)
 
 - janjans2  :   Coin inputs don't register in the input test
 
 - jsk       :   Coin inputs don't register in the input test
 
-- keithlcy  :   Backgrounds are offset by $20 pixels, so they're kludged to work; there is a
-                x&y offsets in the sprite list but in a same frame there are sprite with yoffset = 0
-                and sprite with a yoffset = $7c but for all sprite the offset must be the same ($20)
-
 - mslider   :   Coin inputs don't register in the input test
 
-- srmp4     :   Backgrounds are offset by $60 pixels, so they're kludged to work
-                Coin inputs don't register in the input test
+- srmp4     :   Coin inputs don't register in the input test
 
 - srmp7     :   Needs interrupts by the sound chip (not properly hooked up yet). Kludged to work.
-
-- stmblade  :   There is a rogue "tilemap" sprite that pops up at level 2 and stays
-                there till the end of the game (a piece of sky to the left of the screen).
-                It seems that the x&y offsets in the sprite list should be apllied
-                to it (-$200,-$200) to move it off screen. But currently those offsets
-                are ignored for "tilemap" sprites. This may be related to the kludge for srmp4
-                and to the kludge for keithlcy;
-
-- ultrax    :   Backgrounds are offset by $10 pixels, so they're kludged to work
 
 Notes:
 
@@ -1923,7 +1903,7 @@ static INPUT_PORTS_START( meosism )
 	PORT_DIPUNKNOWN_DIPLOC( 0x0008, 0x0008, "DSW2:4" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x0010, 0x0010, "DSW2:5" )
 	PORT_DIPNAME( 0x0020, 0x0000, DEF_STR( Controls ) )		PORT_DIPLOCATION( "DSW2:6" )
-//  PORT_DIPSETTING(      0x0020, "Simple") )
+	PORT_DIPSETTING(      0x0020, "Simple" )
 	PORT_DIPSETTING(      0x0000, "Complex" )
 	PORT_DIPNAME( 0x0040, 0x0000, "Coin Sensor" )			PORT_DIPLOCATION( "DSW2:7" )
 	PORT_DIPSETTING(      0x0040, "Active High" )
@@ -1946,7 +1926,7 @@ static INPUT_PORTS_START( meosism )
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN  )	//-
 	PORT_SERVICE_NO_TOGGLE( 0x0002, IP_ACTIVE_LOW )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN  )	//-
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_SERVICE3 )	//payout
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_SERVICE3 )	PORT_NAME("Payout") //payout
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN  )	//-
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_TILT     )	//reset
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN  )	//-
@@ -1954,11 +1934,11 @@ static INPUT_PORTS_START( meosism )
 
 	PORT_START("SYSTEM")	// IN4 - $21000c
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(10)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(10)
+//  PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(10)  // Should work but doesn't
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )	//service coin
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_SERVICE2 )	//analyzer
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_SERVICE2 )	PORT_NAME("Analyzer") //analyzer
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON5  )	//max bet
-	PORT_BIT( 0x00e0, IP_ACTIVE_LOW, IPT_UNKNOWN  )
+	PORT_BIT( 0x00e2, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 INPUT_PORTS_END
 
 
@@ -2352,11 +2332,13 @@ static INPUT_PORTS_START( twineag2 )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_SERVICE_DIPLOC( 0x0080, IP_ACTIVE_LOW, "DSW2:8" )
 
-	PORT_MODIFY("SYSTEM")	// IN4 - $21000c
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_SERVICE2 )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SERVICE4 )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_START3 )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START4 )
+// Not shown in service mode I/O or show any function in game.  Valid?
+//  PORT_MODIFY("SYSTEM")   // IN4 - $21000c
+//  PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_SERVICE2 )
+//  PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SERVICE4 )
+//  PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_START3 )
+//  PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START4 )
+
 INPUT_PORTS_END
 
 
@@ -2396,7 +2378,7 @@ static INPUT_PORTS_START( ultrax )
 	PORT_DIPNAME( 0x0014, 0x0004, "Country" )				PORT_DIPLOCATION("DSW2:3,5")
 	PORT_DIPSETTING(      0x0000, "China" )
 	PORT_DIPSETTING(      0x0014, DEF_STR( Japan ) )
-//  PORT_DIPSETTING(      0x0010, DEF_STR( Japan ) )
+//PORT_DIPSETTING(      0x0010, DEF_STR( Japan ) )
 	PORT_DIPSETTING(      0x0004, DEF_STR( World ) )
 	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Free_Play ) )	PORT_DIPLOCATION("DSW2:4")
 	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
@@ -2418,6 +2400,10 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( vasara )
 	PORT_INCLUDE(ssv_joystick)
+
+	PORT_MODIFY("SYSTEM")	// IN4 - $21000c
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_MODIFY("DSW1")	// IN0 - $210002
 	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Free_Play )  )	PORT_DIPLOCATION("DSW1:1")
@@ -2463,6 +2449,10 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( vasara2 )
 	PORT_INCLUDE(ssv_joystick)
+
+	PORT_MODIFY("SYSTEM")	// IN4 - $21000c
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_MODIFY("DSW1")	// IN0 - $210002
 	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Free_Play )  )	PORT_DIPLOCATION("DSW1:1")

@@ -57,7 +57,6 @@ READ32_HANDLER( n64_mi_reg_r )
 
 WRITE32_HANDLER( n64_mi_reg_w )
 {
-	//printf("MI %08x %08x\n", offset, data);
 	switch (offset)
 	{
 		case 0x00/4:		// MI_INIT_MODE_REG
@@ -278,8 +277,6 @@ READ32_HANDLER( n64_rdram_reg_r )
 
 WRITE32_HANDLER( n64_rdram_reg_w )
 {
-	//printf("RD %08x %08x\n", offset, data);
-
     switch (offset)
     {
         case 0x00/4:            // RDRAM_CONFIG_REG / RDRAM_DEVICE_TYPE_REG
@@ -512,8 +509,6 @@ READ32_DEVICE_HANDLER( n64_sp_reg_r )
 
 WRITE32_DEVICE_HANDLER( n64_sp_reg_w )
 {
-	//printf("SP %08x %08x\n", offset, data);
-
 	if ((offset & 0x10000) == 0)
 	{
 		switch (offset & 0xffff)
@@ -765,8 +760,6 @@ READ32_DEVICE_HANDLER( n64_dp_reg_r )
 
 WRITE32_DEVICE_HANDLER( n64_dp_reg_w )
 {
-	//printf("DP %08x %08x\n", offset, data);
-
 	_n64_state *state = device->machine->driver_data<_n64_state>();
 
 	//printf("%08x: %08x\n", offset, data);
@@ -930,7 +923,6 @@ WRITE32_HANDLER( n64_vi_reg_w )
 {
 	_n64_state *state = space->machine->driver_data<_n64_state>();
 
-	//printf("VI %08x %08x\n", offset, data);
 	switch (offset)
 	{
 		case 0x00/4:		// VI_CONTROL_REG
@@ -1187,17 +1179,16 @@ WRITE32_HANDLER( n64_ai_reg_w )
 {
 //  UINT16 *ram = (UINT16*)rdram;
 
-	//printf("AI %08x %08x\n", offset, data);
     switch (offset)
     {
         case 0x00/4:        // AI_DRAM_ADDR_REG
 //          mame_printf_debug("ai_dram_addr = %08X at %08X\n", data, cpu_get_pc(space->cpu));
-            ai_dram_addr = data & 0xfffff8;
+            ai_dram_addr = data & 0xffffff;
             break;
 
         case 0x04/4:        // AI_LEN_REG
 //          mame_printf_debug("ai_len = %08X at %08X\n", data, cpu_get_pc(space->cpu));
-            ai_len = data & 0x3fff8;        // Hardware v2.0 has 18 bits, v1.0 has 15 bits
+            ai_len = data & 0x3ffff;        // Hardware v2.0 has 18 bits, v1.0 has 15 bits
             audio_fifo_push(space->machine, ai_dram_addr, ai_len);
             break;
 
@@ -1291,8 +1282,6 @@ READ32_HANDLER( n64_pi_reg_r )
 
 WRITE32_HANDLER( n64_pi_reg_w )
 {
-	//printf("PI %08x %08x\n", offset, data);
-
 	switch (offset)
 	{
 		case 0x00/4:		// PI_DRAM_ADDR_REG
@@ -1473,7 +1462,6 @@ READ32_HANDLER( n64_ri_reg_r )
 WRITE32_HANDLER( n64_ri_reg_w )
 {
     //printf( "n64_ri_reg_w: 0x%02x/4 = %08x (%08x)\n", offset << 2, data, mem_mask );
-	//printf("RI %08x %08x\n", offset, data);
 	switch (offset)
 	{
         case 0x00/4: // RI_MODE_REG
@@ -1950,8 +1938,6 @@ READ32_HANDLER( n64_si_reg_r )
 
 WRITE32_HANDLER( n64_si_reg_w )
 {
-	//printf("SI %08x %08x\n", offset, data);
-
 	switch (offset)
 	{
 		case 0x00/4:		// SI_DRAM_ADDR_REG
@@ -2030,7 +2016,7 @@ WRITE32_HANDLER( n64_pif_ram_w )
 
 MACHINE_START( n64 )
 {
-	mips3drc_set_options(machine->device("maincpu"), MIPS3DRC_COMPATIBLE_OPTIONS);
+	mips3drc_set_options(machine->device("maincpu"), MIPS3DRC_FASTEST_OPTIONS + MIPS3DRC_STRICT_VERIFY);
 
 	/* configure fast RAM regions for DRC */
 	mips3drc_add_fastram(machine->device("maincpu"), 0x00000000, 0x007fffff, FALSE, rdram);

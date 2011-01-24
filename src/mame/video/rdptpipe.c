@@ -815,6 +815,20 @@ UINT32 TexturePipe::Fetch(INT32 s, INT32 t, INT32 tilenum)
 	tbase += tile[tilenum].tmem;
 	UINT32 tpal	= tile[tilenum].palette;
 
+	if (tformat == FORMAT_I && tsize > PIXEL_SIZE_8BIT)
+	{
+		tformat = FORMAT_RGBA; // Used by Supercross 2000 (in-game)
+	}
+	if (tformat == FORMAT_CI && tsize > PIXEL_SIZE_8BIT)
+	{
+		tformat = FORMAT_RGBA; // Used by Clay Fighter - Sculptor's Cut
+	}
+
+	if (tformat == FORMAT_RGBA && tsize < PIXEL_SIZE_16BIT)
+	{
+		tformat = FORMAT_CI; // Used by Exterem-G2, Madden Football 64, and Rat Attack
+	}
+
 	UINT16 *tc16 = m_rdp->GetTMEM16();
 
 	switch (tformat)
@@ -823,77 +837,10 @@ UINT32 TexturePipe::Fetch(INT32 s, INT32 t, INT32 tilenum)
 		{
 			switch (tsize)
 			{
-				case PIXEL_SIZE_4BIT: // Treated the same as 4-bit CI
-				{
-					UINT8 *tc = m_rdp->GetTMEM();
-					int taddr = ((tbase << 4) + s) >> 1;
-					taddr ^= ((t & 1) ? BYTE_XOR_DWORD_SWAP : BYTE_ADDR_XOR);
-					taddr &= 0xfff;
-
-					if (m_other_modes->en_tlut)
-					{
-						taddr &= 0x7ff;
-						UINT8 p = (s & 1) ? (tc[taddr] & 0xf) : (tc[taddr] >> 4);
-						UINT16 c = m_rdp->GetTLUT()[((tpal << 4) | p) << 2];
-
-						if (m_other_modes->tlut_type == 0)
-						{
-							color.i.r = GET_HI_RGBA16_TMEM(c);
-							color.i.g = GET_MED_RGBA16_TMEM(c);
-							color.i.b = GET_LOW_RGBA16_TMEM(c);
-							color.i.a = (c & 1) ? 0xff : 0;
-						}
-						else
-						{
-							color.i.r = color.i.g = color.i.b = (c >> 8) & 0xff;
-							color.i.a = c & 0xff;
-						}
-					}
-					else
-					{
-						UINT8 p = (s & 1) ? (tc[taddr] & 0xf) : (tc[taddr] >> 4);
-						p = (tpal << 4) | p;
-						color.i.r = color.i.g = color.i.b = color.i.a = p;
-					}
-
+				case PIXEL_SIZE_4BIT:
 					break;
-				}
-				case PIXEL_SIZE_8BIT: // Treated the same as 8-bit CI
-				{
-					UINT8 *tc = m_rdp->GetTMEM();
-					int taddr = (tbase << 3) + s;
-					taddr ^= ((t & 1) ? BYTE_XOR_DWORD_SWAP : BYTE_ADDR_XOR);
-					taddr &= 0xfff;
-
-					if (m_other_modes->en_tlut)
-					{
-						taddr &= 0x7ff;
-						UINT8 p = tc[taddr];
-						UINT16 c = m_rdp->GetTLUT()[p << 2];
-
-						if (m_other_modes->tlut_type == 0)
-						{
-							color.i.r = GET_HI_RGBA16_TMEM(c);
-							color.i.g = GET_MED_RGBA16_TMEM(c);
-							color.i.b = GET_LOW_RGBA16_TMEM(c);
-							color.i.a = (c & 1) ? 0xff : 0;
-						}
-						else
-						{
-							color.i.r = color.i.g = color.i.b = (c >> 8) & 0xff;
-							color.i.a = c & 0xff;
-						}
-					}
-					else
-					{
-						UINT8 p = tc[taddr];
-						color.i.r = p;
-						color.i.g = p;
-						color.i.b = p;
-						color.i.a = p;
-					}
+				case PIXEL_SIZE_8BIT:
 					break;
-				}
 				case PIXEL_SIZE_16BIT:
 				{
 					int taddr = (tbase << 2) + s;
@@ -1088,76 +1035,6 @@ UINT32 TexturePipe::Fetch(INT32 s, INT32 t, INT32 tilenum)
 						color.i.b = p;
 						color.i.a = p;
 					}
-					break;
-				}
-				case PIXEL_SIZE_16BIT: // Treated the same as 16-bit RGBA
-				{
-					int taddr = (tbase << 2) + s;
-					taddr ^= ((t & 1) ? WORD_XOR_DWORD_SWAP : WORD_ADDR_XOR);
-					taddr &= 0x7ff;
-
-					if (!m_other_modes->en_tlut)
-					{
-						UINT16 c = tc16[taddr];
-						color.i.r = GET_HI_RGBA16_TMEM(c);
-						color.i.g = GET_MED_RGBA16_TMEM(c);
-						color.i.b = GET_LOW_RGBA16_TMEM(c);
-						color.i.a = (c & 1) ? 0xff : 0;
-					}
-					else
-					{
-						UINT16 c = tc16[taddr];
-						c = m_rdp->GetTLUT()[(c >> 8) << 2];
-						if (m_other_modes->tlut_type == 0) // Used by Goldeneye 007 (ocean in Frigate)
-						{
-							color.i.r = GET_HI_RGBA16_TMEM(c);
-							color.i.g = GET_MED_RGBA16_TMEM(c);
-							color.i.b = GET_LOW_RGBA16_TMEM(c);
-							color.i.a = (c & 1) ? 0xff : 0;
-						}
-						else // Used by Beetle Adventure Racing (Mount Mayhem level)
-						{
-							color.i.r = color.i.g = color.i.b = (c >> 8) & 0xff;
-							color.i.a = c & 0xff;
-						}
-					}
-					break;
-				}
-				case PIXEL_SIZE_32BIT:  // Treated the same as 32-bit RGBA
-				{
-					UINT32 *tc = m_rdp->GetTMEM32();
-					int taddr = (tbase << 2) + s;
-					taddr ^= ((t & 1) ? WORD_XOR_DWORD_SWAP : WORD_ADDR_XOR);
-
-					if (!m_other_modes->en_tlut)
-					{
-						taddr &= 0x3ff;
-						UINT32 c = tc16[taddr];
-						color.i.r = (c >> 8) & 0xff;
-						color.i.g = c & 0xff;
-						c = tc16[taddr | 0x400];
-						color.i.b = (c >>  8) & 0xff;
-						color.i.a = c & 0xff;
-					}
-					else // Used by California Speed, attract mode
-					{
-						taddr &= 0x3ff;
-						UINT32 c = tc[taddr];
-						c = m_rdp->GetTLUT()[(c >> 24) << 2];
-						if (m_other_modes->tlut_type == 0)
-						{
-							color.i.r = GET_HI_RGBA16_TMEM(c);
-							color.i.g = GET_MED_RGBA16_TMEM(c);
-							color.i.b = GET_LOW_RGBA16_TMEM(c);
-							color.i.a = (c & 1) ? 0xff : 0;
-						}
-						else
-						{
-							color.i.r = color.i.g = color.i.b = (c >> 8) & 0xff;
-							color.i.a = c & 0xff;
-						}
-					}
-
 					break;
 				}
 				default:
@@ -1357,76 +1234,6 @@ UINT32 TexturePipe::Fetch(INT32 s, INT32 t, INT32 tilenum)
 						{
 							color.i.r = color.i.g = color.i.b = (k >> 8) & 0xff;
 							color.i.a = k & 0xff;
-						}
-					}
-
-					break;
-				}
-				case PIXEL_SIZE_16BIT: // Treated the same as 16-bit RGBA
-				{
-					int taddr = (tbase << 2) + s;
-					taddr ^= ((t & 1) ? WORD_XOR_DWORD_SWAP : WORD_ADDR_XOR);
-					taddr &= 0x7ff;
-
-					if (!m_other_modes->en_tlut)
-					{
-						UINT16 c = tc16[taddr];
-						color.i.r = GET_HI_RGBA16_TMEM(c);
-						color.i.g = GET_MED_RGBA16_TMEM(c);
-						color.i.b = GET_LOW_RGBA16_TMEM(c);
-						color.i.a = (c & 1) ? 0xff : 0;
-					}
-					else
-					{
-						UINT16 c = tc16[taddr];
-						c = m_rdp->GetTLUT()[(c >> 8) << 2];
-						if (m_other_modes->tlut_type == 0) // Used by Goldeneye 007 (ocean in Frigate)
-						{
-							color.i.r = GET_HI_RGBA16_TMEM(c);
-							color.i.g = GET_MED_RGBA16_TMEM(c);
-							color.i.b = GET_LOW_RGBA16_TMEM(c);
-							color.i.a = (c & 1) ? 0xff : 0;
-						}
-						else // Used by Beetle Adventure Racing (Mount Mayhem level)
-						{
-							color.i.r = color.i.g = color.i.b = (c >> 8) & 0xff;
-							color.i.a = c & 0xff;
-						}
-					}
-					break;
-				}
-				case PIXEL_SIZE_32BIT:  // Treated the same as 32-bit RGBA
-				{
-					UINT32 *tc = m_rdp->GetTMEM32();
-					int taddr = (tbase << 2) + s;
-					taddr ^= ((t & 1) ? WORD_XOR_DWORD_SWAP : WORD_ADDR_XOR);
-
-					if (!m_other_modes->en_tlut)
-					{
-						taddr &= 0x3ff;
-						UINT32 c = tc16[taddr];
-						color.i.r = (c >> 8) & 0xff;
-						color.i.g = c & 0xff;
-						c = tc16[taddr | 0x400];
-						color.i.b = (c >>  8) & 0xff;
-						color.i.a = c & 0xff;
-					}
-					else // Used by California Speed, attract mode
-					{
-						taddr &= 0x3ff;
-						UINT32 c = tc[taddr];
-						c = m_rdp->GetTLUT()[(c >> 24) << 2];
-						if (m_other_modes->tlut_type == 0)
-						{
-							color.i.r = GET_HI_RGBA16_TMEM(c);
-							color.i.g = GET_MED_RGBA16_TMEM(c);
-							color.i.b = GET_LOW_RGBA16_TMEM(c);
-							color.i.a = (c & 1) ? 0xff : 0;
-						}
-						else
-						{
-							color.i.r = color.i.g = color.i.b = (c >> 8) & 0xff;
-							color.i.a = c & 0xff;
 						}
 					}
 

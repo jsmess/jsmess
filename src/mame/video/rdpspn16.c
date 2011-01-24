@@ -143,7 +143,7 @@ void Span::Draw1Cycle(int index, int tilenum, bool flip)
 	SpanParam w = m_w;
 
 	UINT32 zb = m_misc_state->m_zb_address >> 1;
-	UINT32 zhb = m_misc_state->m_zb_address;
+	UINT32 zhb = zb;
 	UINT8 offx = 0, offy = 0;
 
 	INT32 tile1 = tilenum;
@@ -283,7 +283,7 @@ void Span::Draw2Cycle(int index, int tilenum, bool flip)
 	SpanParam w = m_w;
 
 	UINT32 zb = m_misc_state->m_zb_address >> 1;
-	UINT32 zhb = m_misc_state->m_zb_address;
+	UINT32 zhb = zb;
 	UINT8 offx = 0, offy = 0;
 
 	INT32 tile2 = (tilenum + 1) & 7;

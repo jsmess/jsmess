@@ -178,7 +178,7 @@ void okim6295_device::device_start()
 
 	// create the stream
 	int divisor = m_config.m_pin7 ? 132 : 165;
-	m_stream = stream_create(this, 0, 1, clock() / divisor, this, static_stream_generate);
+	m_stream = stream_create(*this, 0, 1, clock() / divisor);
 
 	state_save_register_device_item(this, 0, m_command);
 	state_save_register_device_item(this, 0, m_bank_offs);
@@ -234,12 +234,7 @@ void okim6295_device::device_clock_changed()
 //  our sound stream
 //-------------------------------------------------
 
-STREAM_UPDATE( okim6295_device::static_stream_generate )
-{
-	reinterpret_cast<okim6295_device *>(param)->stream_generate(inputs, outputs, samples);
-}
-
-void okim6295_device::stream_generate(stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void okim6295_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
 	// reset the output stream
 	memset(outputs[0], 0, samples * sizeof(*outputs[0]));
@@ -328,8 +323,8 @@ void okim6295_device::write_command(UINT8 command)
 	{
 		// the manual explicitly says that it's not possible to start multiple voices at the same time
 		int voicemask = command >> 4;
-		if (voicemask != 0 && voicemask != 1 && voicemask != 2 && voicemask != 4 && voicemask != 8)
-			popmessage("OKI6295 start %x contact MAMEDEV", voicemask);
+		//if (voicemask != 0 && voicemask != 1 && voicemask != 2 && voicemask != 4 && voicemask != 8)
+		//  popmessage("OKI6295 start %x contact MAMEDEV", voicemask);
 
 		// update the stream
 		stream_update(m_stream);

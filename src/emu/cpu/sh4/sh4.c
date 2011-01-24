@@ -28,14 +28,11 @@
 #include "sh4regs.h"
 #include "sh4comn.h"
 
-CPU_DISASSEMBLE( sh4 );
+//#define SHOW_AARON_BUG
 
-INLINE sh4_state *get_safe_token(device_t *device)
-{
-	assert(device != NULL);
-	assert(device->type() == SH4);
-	return (sh4_state *)downcast<legacy_cpu_device *>(device)->token();
-}
+#ifndef USE_SH4DRC
+
+CPU_DISASSEMBLE( sh4 );
 
 /* Called for unimplemented opcodes */
 static void TODO(sh4_state *sh4)
@@ -155,12 +152,13 @@ INLINE UINT32 RL(sh4_state *sh4, offs_t A)
 
 INLINE void WB(sh4_state *sh4, offs_t A, UINT8 V)
 {
-
+	#ifndef SHOW_AARON_BUG
 	if (A >= 0xfe000000)
 	{
 		sh4_internal_w(sh4->internal, ((A & 0x0fc) >> 2) | ((A & 0x1fe0000) >> 11), V << ((A & 3)*8), 0xff << ((A & 3)*8));
 		return;
 	}
+	#endif
 
 	if (A >= 0xe0000000)
 	{
@@ -173,11 +171,13 @@ INLINE void WB(sh4_state *sh4, offs_t A, UINT8 V)
 
 INLINE void WW(sh4_state *sh4, offs_t A, UINT16 V)
 {
+	#ifndef SHOW_AARON_BUG
 	if (A >= 0xfe000000)
 	{
 		sh4_internal_w(sh4->internal, ((A & 0x0fc) >> 2) | ((A & 0x1fe0000) >> 11), V << ((A & 2)*8), 0xffff << ((A & 2)*8));
 		return;
 	}
+	#endif
 
 	if (A >= 0xe0000000)
 	{
@@ -190,11 +190,13 @@ INLINE void WW(sh4_state *sh4, offs_t A, UINT16 V)
 
 INLINE void WL(sh4_state *sh4, offs_t A, UINT32 V)
 {
+	#ifndef SHOW_AARON_BUG
 	if (A >= 0xfe000000)
 	{
 		sh4_internal_w(sh4->internal, ((A & 0x0fc) >> 2) | ((A & 0x1fe0000) >> 11), V, 0xffffffff);
 		return;
 	}
+	#endif
 
 	if (A >= 0xe0000000)
 	{
@@ -2079,27 +2081,6 @@ INLINE void LDCSPC(sh4_state *sh4, UINT32 m)
 	sh4->spc = sh4->r[m];
 }
 
-static UINT32 sh4_getsqremap(sh4_state *sh4, UINT32 address)
-{
-	if (!sh4->sh4_mmu_enabled)
-		return address;
-	else
-	{
-		int i;
-		UINT32 topaddr = address&0xfff00000;
-
-		for (i=0;i<64;i++)
-		{
-			UINT32 topcmp = sh4->sh4_tlb_address[i]&0xfff00000;
-			if (topcmp==topaddr)
-				return (address&0x000fffff) | ((sh4->sh4_tlb_data[i])&0xfff00000);
-		}
-
-	}
-
-	return address;
-}
-
 /*  PREF     @Rn */
 INLINE void PREFM(sh4_state *sh4, UINT32 n)
 {
@@ -3322,6 +3303,19 @@ static CPU_RESET( sh4 )
 	sh4->sleep_mode = 0;
 
 	sh4->sh4_mmu_enabled = 0;
+
+	sh4->cpu_type = CPU_TYPE_SH4;
+}
+
+/*-------------------------------------------------
+    sh3_reset - reset the processor
+-------------------------------------------------*/
+
+static CPU_RESET( sh3 )
+{
+	sh4_state *sh4 = get_safe_token(device);
+	CPU_RESET_CALL(sh4);
+	sh4->cpu_type = CPU_TYPE_SH3;
 }
 
 /* Execute cycles - returns number of cycles actually run */
@@ -3622,42 +3616,12 @@ static ADDRESS_MAP_START( sh4_internal_map, ADDRESS_SPACE_PROGRAM, 64 )
 ADDRESS_MAP_END
 #endif
 
-
-static READ64_HANDLER( sh4_tlb_r )
+#ifdef SHOW_AARON_BUG
+static WRITE32_HANDLER(sh4_test_w)
 {
-	sh4_state *sh4 = get_safe_token(space->cpu);
-
-	int offs = offset*8;
-
-	if (offs >= 0x01000000)
-	{
-		UINT8 i = (offs>>8)&63;
-		return sh4->sh4_tlb_data[i];
-	}
-	else
-	{
-		UINT8 i = (offs>>8)&63;
-		return sh4->sh4_tlb_address[i];
-	}
+	printf("offset = %08x, data = %08x, mask = %08x\n", offset, data, mem_mask);
 }
-
-static WRITE64_HANDLER( sh4_tlb_w )
-{
-	sh4_state *sh4 = get_safe_token(space->cpu);
-
-	int offs = offset*8;
-
-	if (offs >= 0x01000000)
-	{
-		UINT8 i = (offs>>8)&63;
-		sh4->sh4_tlb_data[i]  = data&0xffffffff;
-	}
-	else
-	{
-		UINT8 i = (offs>>8)&63;
-		sh4->sh4_tlb_address[i] = data&0xffffffff;
-	}
-}
+#endif
 
 /*When OC index mode is on (CCR.OIX = 1)*/
 static ADDRESS_MAP_START( sh4_internal_map, ADDRESS_SPACE_PROGRAM, 64 )
@@ -3665,6 +3629,9 @@ static ADDRESS_MAP_START( sh4_internal_map, ADDRESS_SPACE_PROGRAM, 64 )
 	AM_RANGE(0x1E000000, 0x1E000FFF) AM_RAM AM_MIRROR(0x01FFF000)
 	AM_RANGE(0xE0000000, 0xE000003F) AM_RAM AM_MIRROR(0x03FFFFC0) // todo: store queues should be write only on DC's SH4, executing PREFM shouldn't cause an actual memory read access!
 	AM_RANGE(0xF6000000, 0xF7FFFFFF) AM_READWRITE(sh4_tlb_r,sh4_tlb_w)
+#ifdef SHOW_AARON_BUG
+	AM_RANGE(0xFE000000, 0xFFFFFFFF) AM_WRITE32(sh4_test_w, U64(0xffffffffffffffff))
+#endif
 ADDRESS_MAP_END
 
 
@@ -3883,4 +3850,22 @@ CPU_GET_INFO( sh4 )
 	}
 }
 
+CPU_GET_INFO( sh3 )
+{
+	switch (state)
+	{
+	/* --- the following bits of info are returned as pointers to data or functions --- */
+	case CPUINFO_FCT_RESET:						info->reset = CPU_RESET_NAME(sh3);				break;
+
+	/* --- the following bits of info are returned as NULL-terminated strings --- */
+	case DEVINFO_STR_NAME:						strcpy(info->s, "SH-3");				break;
+	case DEVINFO_STR_FAMILY:					strcpy(info->s, "Hitachi SH7700");		break;
+
+	default:									CPU_GET_INFO_CALL(sh4);					break;
+	}
+}
+
+DEFINE_LEGACY_CPU_DEVICE(SH3, sh3);
 DEFINE_LEGACY_CPU_DEVICE(SH4, sh4);
+
+#endif	// USE_SH4DRC

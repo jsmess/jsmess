@@ -29,9 +29,9 @@
 
 class sound_stream;
 
-typedef void (*stream_update_func)(device_t *device, void *param, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+typedef void (*stream_update_func)(device_t *device, sound_stream *stream, void *param, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 
-#define STREAM_UPDATE(name) void name(device_t *device, void *param, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+#define STREAM_UPDATE(name) void name(device_t *device, sound_stream *stream, void *param, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 
 
 
@@ -51,6 +51,9 @@ void streams_update(running_machine *machine);
 
 
 /* ----- stream configuration and setup ----- */
+
+/* create a new stream */
+sound_stream *stream_create(device_t &device, int inputs, int outputs, int sample_rate);
 
 /* create a new stream */
 sound_stream *stream_create(device_t *device, int inputs, int outputs, int sample_rate, void *param, stream_update_func callback);

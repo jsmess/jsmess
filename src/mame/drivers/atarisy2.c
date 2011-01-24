@@ -431,19 +431,21 @@ static READ8_HANDLER( leta_r )
 	static const char *const letanames[] = { "LETA0", "LETA1", "LETA2", "LETA3" };
 	atarisy2_state *state = space->machine->driver_data<atarisy2_state>();
 
-    if (state->pedal_count == -1)   /* 720 */
+    if (offset <= 1 && state->pedal_count == -1)   /* 720 */
 	{
-		/* special thanks to MAME Analog+ for the mapping code */
-		switch (offset & 3)
+		switch (input_port_read(space->machine, "SELECT"))
 		{
-			case 0:
-			case 1:
+			case 0:	/* Real */
+				break;
+
+			case 1:	/* Fake Joystick */
+			/* special thanks to MAME Analog+ for the mapping code */
 			{
 				static double last_angle;
 				static int rotations;
 
-				int analogx = input_port_read(space->machine, "LETA0") - 128;
-				int analogy = input_port_read(space->machine, "LETA1") - 128;
+				int analogx = input_port_read(space->machine, "FAKE_JOY_X") - 128;
+				int analogy = input_port_read(space->machine, "FAKE_JOY_Y") - 128;
 				double angle;
 
 				/* if the joystick is centered, leave the rest of this alone */
@@ -458,12 +460,16 @@ static READ8_HANDLER( leta_r )
 					rotations++;
 				last_angle = angle;
 
-				/* offset 0 returns 0xff when the controller blocks one of two gaps */
-				if ((offset & 3) == 0)
+				/* make offset 0 return 0xff when the controller blocks one of two gaps */
+				/* this is not accurate, as a counter should count up/down 2 counts as it passes through each gap */
+				/* this is close enough to pass the service mode controller test the first couple of trys. */
+				if (offset == 0)
 				{
 					/* original controller had two gaps 10 degrees apart, each 2.5 degrees wide */
 					/* we fake it a little to make it possible to hit the zeroed state with a digital controller */
 					return (angle >= -5.0 && angle <= 5.0) ? 0xff : 0x00;
+					/* proper angles */
+					// return ((angle >= -12.5 && angle <= -7.5) || (angle >= 7.5 && angle <= 12.5)) ? 0xff : 0x00;
 				}
 
 				/* offset 1 returns dial value; 144 units = 1 full rotation */
@@ -472,14 +478,94 @@ static READ8_HANDLER( leta_r )
 					/* take the rotations * 144 plus the current angle */
 					return (rotations * 144 + (int)(angle * 144.0 / 360.0)) & 0xff;
 				}
-				break;
 			}
-			case 2: return 0xff;
-			case 3: return 0xff;
+
+			case 2:	/* Fake Spinner */
+			{
+				static UINT32 last_rotate_count;
+				static INT32  pos;					/* track fake position of spinner */
+				static UINT32 center_count;
+				INT32  diff;
+				UINT32 temp;
+				UINT32 rotate_count = input_port_read(space->machine, "FAKE_SPINNER") & 0xffff;
+				/* rotate_count behaves the same as the real LEAT1 Rotate encoder
+                 * we use it to generate the LETA0 Center encoder count
+                 */
+
+				if (rotate_count != last_rotate_count)
+				{
+					/* see if count rolled between 0xffff and 0x0000 */
+					if ((last_rotate_count > 0xc000) && (rotate_count < 0x03ff))
+					{
+						temp = 0xffff - last_rotate_count;
+						diff = rotate_count + temp + 1;
+					}
+					else if ((rotate_count > 0xc000) && (last_rotate_count < 0x03ff))
+					{
+						temp = 0xffff - rotate_count;
+						diff = last_rotate_count - temp - 1;
+					}
+					else
+					{
+						temp = rotate_count - last_rotate_count;
+						diff = temp;
+					}
+
+					last_rotate_count = rotate_count;
+
+					/* you may not like this, but it is the easiest way to accurately fake the center count */
+					/* diff is never a big number anyways */
+					if (diff < 0)
+					{
+						for (int i = 0; i > diff; i--)
+						{
+							pos--;
+							if (pos < 0)
+								pos = 143;
+							else
+								switch (pos)
+								{
+									case 2:
+									case 3:
+									case 141:
+									case 142:
+										center_count--;
+								}
+						}
+					}
+					else
+					{
+						for (int i = 0; i < diff; i++)
+						{
+							pos++;
+							if (pos > 143)
+								pos = 0;
+							else
+								switch (pos)
+								{
+									case 2:
+									case 3:
+									case 141:
+									case 142:
+										center_count++;
+								}
+						}
+					}
+				}
+
+				if (offset == 0)
+					return center_count & 0xff;
+				else
+					/* offset == 1 */
+					return rotate_count & 0xff;
+			}
+
+			default:
+				logerror("Unknown controller passed to leta_r");
+				return 0xff;
 		}
 	}
-
-	return input_port_read(space->machine, letanames[offset & 3]);
+	return input_port_read(space->machine, letanames[offset]);
 }
 
 
@@ -881,11 +967,47 @@ static INPUT_PORTS_START( 720 )
 	PORT_MODIFY("ADC1")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_MODIFY("LETA0")	/* not direct mapped */
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10)
+	/* 720 uses a special controller to control the player rotation.
+     * It uses 1 disc with 72 teeth for the rotation and another disc
+     * with 2 teeth for the alignment of the joystick to the top position.
+     * The following graph shows how the Center and Rotate disc align.
+     * The numbers show how the optical count varies from center.
+     *
+     *   _____2  1________1  2_____
+     *        |__|        |__|          Center disc - 2 teeth.  Shown lined up with Rotate disc
+     *      __    __    __    __
+     *   __|  |__|  |__|  |__|  |__     Rotate disc - 72 teeth (144 positions)
+     *     4  3  2  1  1  2  3  4
+     */
 
+	/* Center disc */
+	/* X1, X2 LETA inputs */
+	PORT_MODIFY("LETA0")	/* not direct mapped */
+	PORT_BIT( 0xff, 0x00, IPT_DIAL_V ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_NAME("Center") PORT_CONDITION("SELECT",0x03,PORTCOND_EQUALS,0x00)
+
+	/* Rotate disc */
+	/* Y1, Y2 LETA inputs */
+	/* The disc has 72 teeth which are read by the hardware at 2x */
+	/* Computer hardware reads at 4x, so we set the sensitivity to 50% */
 	PORT_MODIFY("LETA1")	/* not direct mapped */
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_REVERSE
+	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_FULL_TURN_COUNT(144) PORT_NAME("Rotate") PORT_CONDITION("SELECT",0x03,PORTCOND_EQUALS,0x00)
+
+	PORT_START("FAKE_JOY_X")	/* not direct mapped */
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_CONDITION("SELECT",0x03,PORTCOND_EQUALS,0x01)
+
+	PORT_START("FAKE_JOY_Y")	/* not direct mapped */
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_REVERSE PORT_CONDITION("SELECT",0x03,PORTCOND_EQUALS,0x01)
+
+	/* Let's assume we are using a 1200 count spinner.  We scale to get a 144 count.
+     * 144/1200 = 0.12 = 12% */
+	PORT_START("FAKE_SPINNER")	/* not direct mapped */
+	PORT_BIT( 0xffff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(12) PORT_KEYDELTA(10) PORT_CONDITION("SELECT",0x03,PORTCOND_EQUALS,0x02)
+
+	PORT_START("SELECT")		/* IN6 - fake port, used to set the game select dial */
+    PORT_CONFNAME( 0x03, 0x02, "Controller Type" )
+    PORT_CONFSETTING(    0x00, "Real" )
+    PORT_CONFSETTING(    0x01, "Joystick" )
+    PORT_CONFSETTING(    0x02, "Spinner" )
 
 	PORT_MODIFY("DSW1")
 	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Bonus_Life ) )		PORT_DIPLOCATION("5/6A:!8,!7")

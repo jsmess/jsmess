@@ -187,6 +187,12 @@ int main(int argc, char *argv[])
 			}
 		}
 
+		/* ignore -include which is used by sdlmame to include sdlprefix.h before all other includes */
+		else if (strcmp(arg,"-include") == 0)
+		{
+			argnum++;
+		}
+
 		/* other parameter */
 		else if (arg[0] != '-' && unadorned == 0)
 		{
@@ -429,12 +435,16 @@ static file_entry *compute_dependencies(int srcrootlen, const astring *srcfile)
 			int scan = index;
 			dependency *dep;
 			int start;
+			int just_continue = 0;
 
 			/* first make sure we're not commented or quoted */
 			for (scan = index; scan > 2 && filedata[scan] != 13 && filedata[scan] != 10; scan--)
 				if ((filedata[scan] == '/' && filedata[scan - 1] == '/') || filedata[scan] == '"')
+				{
+					just_continue = 1;
 					break;
-			if (filedata[scan] != 13 && filedata[scan] != 10)
+				}
+			if (just_continue)
 				continue;
 
 			/* scan forward to find the quotes or bracket */

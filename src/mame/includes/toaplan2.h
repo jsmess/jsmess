@@ -1,6 +1,6 @@
 /**************** Machine stuff ******************/
 //#define USE_HD64x180          /* Define if CPU support is available */
-//#define USE_ENCRYPTED_V25S    /* Define to enable V25 even on games where it is encrypted */
+#define USE_ENCRYPTED_V25S    /* Define to enable V25 even on games where it is encrypted */
 
 /* sub cpu */
 #define CPU_2_NONE		0x00
@@ -8,10 +8,10 @@
 #define CPU_2_HD647180	0xa5
 #define CPU_2_V25		0xff
 
-/* vdp related */
+// we encode priority with colour in the tilemaps, so need a larger palette
+#define T2PALETTE_LENGTH 0x10000
 
-// mixing debug, render each VDP to it's own screen - be sure to recompile both driver and video after changing
-//#define DUAL_SCREEN_VDPS
+/* vdp related */
 
 #include "video/gp9001.h"
 
@@ -36,9 +36,7 @@ public:
 	UINT16 *V25_shared_ram;			/* Really 8bit RAM connected to Z180 */
 #endif
 	UINT8* batsugun_share;
-#ifdef USE_ENCRYPTED_V25S
-	UINT8* batsugun_share2;
-#endif
+
 
 	int sub_cpu_type;
 	device_t *sub_cpu;
@@ -47,8 +45,8 @@ public:
 	UINT16 video_status;
 	INT8 old_p1_paddle_h;		/* For Ghox */
 	INT8 old_p2_paddle_h;
+	UINT8 v25_reset_line;		/* 0x20 for dogyuun/batsugun, 0x10 for vfive, 0x08 for fixeight */
 	INT8 current_bank;			/* Z80 bank used in Battle Garegga and Batrider */
-
 	int sndirq_line;		/* IRQ4 for batrider, IRQ2 for bbakraid */
 	UINT16 z80_busreq;
 	int unlimited_ver;
@@ -75,11 +73,7 @@ public:
 
 /*----------- defined in audio/toaplan2.c -----------*/
 
-void dogyuun_okisnd_w(device_t *device, int data);
-void kbash_okisnd_w(device_t *device, int data);
 void fixeight_okisnd_w(device_t *device, int data);
-void batsugun_okisnd_w(device_t *device, int data);
-
 
 /*----------- defined in video/toaplan2.c -----------*/
 
@@ -110,8 +104,4 @@ WRITE16_HANDLER( raizing_tx_gfxram16_w );
 
 WRITE16_HANDLER( batrider_objectbank_w );
 WRITE16_HANDLER( batrider_textdata_decode );
-
-
-
-
 

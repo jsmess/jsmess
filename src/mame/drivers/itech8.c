@@ -2601,7 +2601,7 @@ ROM_START( gpgolf )
 
 	ROM_REGION( 0xc0000, "grom", 0 )
 	ROM_LOAD( "grom00.bin", 0x00000, 0x40000, CRC(c3a7b54b) SHA1(414d693bc5337d578d2630817dd647cf7e5cbcf7) )
-	ROM_LOAD( "grom01.bin", 0x40000, 0x40000, BAD_DUMP CRC(2c834cf9) SHA1(49eb070ca4439d4fcd2d8a2db62d3c99b824bf99) ) /* Self test checksum reports BAD */
+	ROM_LOAD( "grom01.bin", 0x40000, 0x40000, CRC(b7fe172d) SHA1(1ad0f3ce0f240ac1a23c0c5bdd9f99ec81bc14f1) )
 	ROM_LOAD( "grom02.bin", 0x80000, 0x40000, CRC(aebe6c45) SHA1(15e64fcb36cb1064988ee5cd45699d501a6e7f01) )
 
 	ROM_REGION( 0x40000, "oki", 0 )
@@ -2733,11 +2733,11 @@ GAME( 1989, gtg2t,    gtg2,     stratab_hi,        gtg2t,    0,        ROT0,   "
 GAME( 1991, gtg2j,    gtg2,     stratab_lo,        gtg,      0,        ROT0,   "Strata/Incredible Technologies", "Golden Tee Golf II (Joystick, V1.0)", 0 )
 
 /* Slick Shot-style PCB */
-GAME( 1990, slikshot,  0,        slikshot_hi,       slikshot, slikshot, ROT90,  "Grand Products/Incredible Technologies", "Slick Shot (V2.2)", 0 )
-GAME( 1990, slikshot17,slikshot, slikshot_hi,       slikshot, slikshot, ROT90,  "Grand Products/Incredible Technologies", "Slick Shot (V1.7)", 0 )
-GAME( 1990, slikshot16,slikshot, slikshot_hi,       slikshot, slikshot, ROT90,  "Grand Products/Incredible Technologies", "Slick Shot (V1.6)", 0 )
-GAME( 1990, dynobop,   0,        slikshot_hi,       dynobop,  slikshot, ROT90,  "Grand Products/Incredible Technologies", "Dyno Bop", 0 )
-GAME( 1990, sstrike,   0,        sstrike,           sstrike,  sstrike,  ROT270, "Strata/Incredible Technologies", "Super Strike Bowling", 0 )
+GAME( 1990, slikshot,  0,        slikshot_hi,       slikshot, slikshot, ROT90,  "Grand Products/Incredible Technologies", "Slick Shot (V2.2)", GAME_MECHANICAL )
+GAME( 1990, slikshot17,slikshot, slikshot_hi,       slikshot, slikshot, ROT90,  "Grand Products/Incredible Technologies", "Slick Shot (V1.7)", GAME_MECHANICAL )
+GAME( 1990, slikshot16,slikshot, slikshot_hi,       slikshot, slikshot, ROT90,  "Grand Products/Incredible Technologies", "Slick Shot (V1.6)", GAME_MECHANICAL )
+GAME( 1990, dynobop,   0,        slikshot_hi,       dynobop,  slikshot, ROT90,  "Grand Products/Incredible Technologies", "Dyno Bop", GAME_MECHANICAL )
+GAME( 1990, sstrike,   0,        sstrike,           sstrike,  sstrike,  ROT270, "Strata/Incredible Technologies", "Super Strike Bowling", GAME_MECHANICAL )
 GAME( 1991, pokrdice,  0,        slikshot_lo_noz80, pokrdice, 0,        ROT90,  "Strata/Incredible Technologies", "Poker Dice", 0 )
 
 /* Hot Shots Tennis-style PCB */

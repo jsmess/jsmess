@@ -189,7 +189,6 @@ static int sc2gui_update_mmtr;	// bit pattern which mechanical meter needs updat
 
 // local vars /////////////////////////////////////////////////////////////
 
-static UINT8 *nvram;		// pointer to NVRAM
 static UINT8 key[16];		// security device on gamecard (video games only)
 
 static UINT8 e2ram[1024];	// x24C08 e2ram
@@ -462,20 +461,6 @@ static NVRAM_HANDLER( bfm_sc2 )
 
 ///////////////////////////////////////////////////////////////////////////
 
-static READ8_HANDLER( ram_r )
-{
-	return nvram[offset];	// read from RAM
-}
-
-///////////////////////////////////////////////////////////////////////////
-
-static WRITE8_HANDLER( ram_w )
-{
-	nvram[offset] = data;	// write to RAM
-}
-
-///////////////////////////////////////////////////////////////////////////
-
 static WRITE8_HANDLER( watchdog_w )
 {
 	watchdog_kicked = 1;
@@ -729,23 +714,6 @@ static WRITE8_DEVICE_HANDLER( nec_latch_w )
 	upd7759_start_w(device, 0);
 	upd7759_start_w(device, 1);
 }
-
-///////////////////////////////////////////////////////////////////////////
-
-#ifdef UNUSED_FUNCTION
-static READ8_HANDLER( vfd_status_r )
-{
-	// b7 = NEC busy
-	// b6 = alpha busy (also matrix board)
-	// b5 - b0 = reel optics
-
-	int result = optic_pattern;
-
-	if ( !upd7759_busy_r(0) ) result |= 0x80;
-
-	return result;
-}
-#endif
 
 ///////////////////////////////////////////////////////////////////////////
 
@@ -1506,7 +1474,7 @@ static VIDEO_UPDATE( addersc2 )
 
 static ADDRESS_MAP_START( memmap_vid, ADDRESS_SPACE_PROGRAM, 8 )
 
-	AM_RANGE(0x0000, 0x1fff) AM_READWRITE(ram_r, ram_w) AM_BASE(&nvram) AM_SHARE("nvram") // 8k RAM
+	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("nvram") //8k RAM
 	AM_RANGE(0x2000, 0x2000) AM_READ(vfd_status_hop_r)		// vfd status register
 	AM_RANGE(0x2000, 0x20FF) AM_WRITE(reel12_vid_w)
 	AM_RANGE(0x2100, 0x21FF) AM_WRITE(reel34_w)
@@ -2747,7 +2715,7 @@ static MACHINE_RESET( dm01_init )
 
 
 static ADDRESS_MAP_START( sc2_memmap, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1FFF) AM_READWRITE(ram_r, ram_w) AM_BASE(&nvram) AM_SHARE("nvram")
+	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("nvram") //8k
 	AM_RANGE(0x2000, 0x2000) AM_READ(vfd_status_r)
 	AM_RANGE(0x2000, 0x20FF) AM_WRITE(reel12_w)
 	AM_RANGE(0x2100, 0x21FF) AM_WRITE(reel34_w)
@@ -2796,7 +2764,7 @@ ADDRESS_MAP_END
 
 /* memory map for scorpion3 board */
 static ADDRESS_MAP_START( sc3_memmap, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1FFF) AM_READWRITE(ram_r, ram_w) AM_BASE(&nvram) AM_SHARE("nvram")
+	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("nvram")//8k
 	AM_RANGE(0x2000, 0x2000) AM_READ(vfd_status_r)
 	AM_RANGE(0x2000, 0x20FF) AM_WRITE(reel12_w)
 	AM_RANGE(0x2100, 0x21FF) AM_WRITE(reel34_w)
@@ -2845,7 +2813,7 @@ ADDRESS_MAP_END
 
 /* memory map for scorpion2 board + dm01 dot matrix board */
 static ADDRESS_MAP_START( memmap_sc2_dm01, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1FFF) AM_READWRITE(ram_r, ram_w) AM_BASE(&nvram) AM_SHARE("nvram")
+	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("nvram")//8k
 	AM_RANGE(0x2000, 0x2000) AM_READ(vfd_status_dm01_r)
 	AM_RANGE(0x2000, 0x20FF) AM_WRITE(reel12_w)
 	AM_RANGE(0x2100, 0x21FF) AM_WRITE(reel34_w)
@@ -4440,33 +4408,33 @@ ROM_START( m_cpeno1 )
 	ROM_LOAD("cpe1_snd.bin",  0x00000, 0x80000, CRC(ca8a56bb) SHA1(36434dae4369f004fa5b4dd00eb6b1a965be60f9))
 ROM_END
 
-GAMEL( 1994, m_bdrwho, 0,         scorpion2,	 drwho,		drwho,		0,		 "BFM",      "Dr.Who The Timelord (set 1, UK, Game Card 95-750-288)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK,layout_drwho)
-GAMEL( 1994, m_bdrwh1, m_bdrwho,  scorpion2,	 drwho,		drwho,		0,		 "BFM",      "Dr.Who The Timelord (set 2, UK, Game Card 95-750-661)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK,layout_drwho)
-GAMEL( 1994, m_bdrwh2, m_bdrwho,  scorpion2,	 drwho,		drwho,		0,		 "BFM",      "Dr.Who The Timelord (set 3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK,layout_drwho)
-GAMEL( 1994, m_bdrwh3, m_bdrwho,  scorpion2,	 drwho,		drwho,		0,		 "BFM",      "Dr.Who The Timelord (set 4)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK,layout_drwho)
-GAMEL( 1994, m_bdrwh4, m_bdrwho,  scorpion2,	 drwho,		drwho,		0,		 "BFM",      "Dr.Who The Timelord (set 5)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK,layout_drwho)
-GAMEL( 1994, m_bdrwh5, m_bdrwho,  scorpion2,	 drwho,		drwho,		0,		 "BFM",      "Dr.Who The Timelord (set 6)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK,layout_drwho)
-GAMEL( 1994, m_bdrwh6, m_bdrwho,  scorpion2,	 drwho,		drwho,		0,		 "BFM",      "Dr.Who The Timelord (set 7)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK,layout_drwho)
-GAMEL( 1994, m_bdrwh7, m_bdrwho,  scorpion2,	 drwho,		drwho,		0,		 "BFM",      "Dr.Who The Timelord (set 8)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK,layout_drwho)
-GAMEL( 1994, m_bdrwh8, m_bdrwho,  scorpion2,	 drwho,		drwho,		0,		 "BFM",      "Dr.Who The Timelord (set 9)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK,layout_drwho)
-GAMEL( 1994, m_bdrwh9, m_bdrwho,  scorpion2,	 drwho,		drwho,		0,		 "BFM",      "Dr.Who The Timelord (set 10)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK,layout_drwho)
-GAMEL( 1994, m_bdrw10, m_bdrwho,  scorpion2,	 drwho,		drwho,		0,		 "BFM",      "Dr.Who The Timelord (set 11)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK,layout_drwho)
-GAMEL( 1994, m_bdrw11, m_bdrwho,  scorpion2,	 drwho,		drwho,		0,		 "BFM",      "Dr.Who The Timelord (set 12)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK,layout_drwho)
-GAMEL( 1994, m_bdrw12, m_bdrwho,  scorpion2,	 drwho,		drwho,		0,		 "BFM",      "Dr.Who The Timelord (set 13)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK,layout_drwho)
-GAMEL( 1994, m_bdrw13, m_bdrwho,  scorpion2,	 drwho,		drwho,		0,		 "BFM",      "Dr.Who The Timelord (set 14)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK,layout_drwho)
-GAMEL( 1994, m_bdrw14, m_bdrwho,  scorpion2,	 drwho,		drwho,		0,		 "BFM",      "Dr.Who The Timelord (set 15)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK,layout_drwho)
-GAMEL( 1994, m_bdrw15, m_bdrwho,  scorpion2,	 drwho,		drwho,		0,		 "BFM",      "Dr.Who The Timelord (set 16)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK,layout_drwho)
-GAMEL( 1994, m_bdrw16, m_bdrwho,  scorpion2,	 drwho,		drwho,		0,		 "BFM",      "Dr.Who The Timelord (set 17)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK,layout_drwho)
-GAMEL( 1994, m_bdrw17, m_bdrwho,  scorpion2,	 drwho,		drwhon,		0,		 "BFM",      "Dr.Who The Timelord (set 18, not encrypted)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK,layout_drwho)
+GAMEL( 1994, m_bdrwho, 0,         scorpion2,	 drwho,		drwho,		0,		 "BFM",      "Dr.Who The Timelord (set 1, UK, Game Card 95-750-288)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL,layout_drwho)
+GAMEL( 1994, m_bdrwh1, m_bdrwho,  scorpion2,	 drwho,		drwho,		0,		 "BFM",      "Dr.Who The Timelord (set 2, UK, Game Card 95-750-661)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL,layout_drwho)
+GAMEL( 1994, m_bdrwh2, m_bdrwho,  scorpion2,	 drwho,		drwho,		0,		 "BFM",      "Dr.Who The Timelord (set 3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL,layout_drwho)
+GAMEL( 1994, m_bdrwh3, m_bdrwho,  scorpion2,	 drwho,		drwho,		0,		 "BFM",      "Dr.Who The Timelord (set 4)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL,layout_drwho)
+GAMEL( 1994, m_bdrwh4, m_bdrwho,  scorpion2,	 drwho,		drwho,		0,		 "BFM",      "Dr.Who The Timelord (set 5)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL,layout_drwho)
+GAMEL( 1994, m_bdrwh5, m_bdrwho,  scorpion2,	 drwho,		drwho,		0,		 "BFM",      "Dr.Who The Timelord (set 6)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL,layout_drwho)
+GAMEL( 1994, m_bdrwh6, m_bdrwho,  scorpion2,	 drwho,		drwho,		0,		 "BFM",      "Dr.Who The Timelord (set 7)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL,layout_drwho)
+GAMEL( 1994, m_bdrwh7, m_bdrwho,  scorpion2,	 drwho,		drwho,		0,		 "BFM",      "Dr.Who The Timelord (set 8)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL,layout_drwho)
+GAMEL( 1994, m_bdrwh8, m_bdrwho,  scorpion2,	 drwho,		drwho,		0,		 "BFM",      "Dr.Who The Timelord (set 9)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL,layout_drwho)
+GAMEL( 1994, m_bdrwh9, m_bdrwho,  scorpion2,	 drwho,		drwho,		0,		 "BFM",      "Dr.Who The Timelord (set 10)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL,layout_drwho)
+GAMEL( 1994, m_bdrw10, m_bdrwho,  scorpion2,	 drwho,		drwho,		0,		 "BFM",      "Dr.Who The Timelord (set 11)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL,layout_drwho)
+GAMEL( 1994, m_bdrw11, m_bdrwho,  scorpion2,	 drwho,		drwho,		0,		 "BFM",      "Dr.Who The Timelord (set 12)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL,layout_drwho)
+GAMEL( 1994, m_bdrw12, m_bdrwho,  scorpion2,	 drwho,		drwho,		0,		 "BFM",      "Dr.Who The Timelord (set 13)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL,layout_drwho)
+GAMEL( 1994, m_bdrw13, m_bdrwho,  scorpion2,	 drwho,		drwho,		0,		 "BFM",      "Dr.Who The Timelord (set 14)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL,layout_drwho)
+GAMEL( 1994, m_bdrw14, m_bdrwho,  scorpion2,	 drwho,		drwho,		0,		 "BFM",      "Dr.Who The Timelord (set 15)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL,layout_drwho)
+GAMEL( 1994, m_bdrw15, m_bdrwho,  scorpion2,	 drwho,		drwho,		0,		 "BFM",      "Dr.Who The Timelord (set 16)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL,layout_drwho)
+GAMEL( 1994, m_bdrw16, m_bdrwho,  scorpion2,	 drwho,		drwho,		0,		 "BFM",      "Dr.Who The Timelord (set 17)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL,layout_drwho)
+GAMEL( 1994, m_bdrw17, m_bdrwho,  scorpion2,	 drwho,		drwhon,		0,		 "BFM",      "Dr.Who The Timelord (set 18, not encrypted)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL,layout_drwho)
 
-GAME( 1994, m_brkfst, 0,          scorpion2,	 bbrkfst,	bbrkfst,	0,		 "BFM",      "The Big Breakfast (Set 1 UK, Game Card 95-750-524)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING)
-GAME( 1994, m_brkfs1, m_brkfst,	  scorpion2,	 bbrkfst,	bbrkfst,	0,		 "BFM",      "The Big Breakfast (Set 2)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING)
-GAME( 1994, m_brkfs2, m_brkfst,	  scorpion2,	 bbrkfst,	bbrkfst,	0,		 "BFM",      "The Big Breakfast (Set 3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING)
-GAME( 1994, m_brkfs3, m_brkfst,	  scorpion2,	 bbrkfst,	bbrkfst,	0,		 "BFM",      "The Big Breakfast (Set 4)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING)
-GAME( 1994, m_brkfs4, m_brkfst,	  scorpion2,	 bbrkfst,	bbrkfst,	0,		 "BFM",      "The Big Breakfast (Set 5)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING)
-GAME( 1994, m_brkfs5, m_brkfst,	  scorpion2,	 bbrkfst,	bbrkfst,	0,		 "BFM",      "The Big Breakfast (Set 6)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING)
+GAME( 1994, m_brkfst, 0,          scorpion2,	 bbrkfst,	bbrkfst,	0,		 "BFM",      "The Big Breakfast (Set 1 UK, Game Card 95-750-524)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 1994, m_brkfs1, m_brkfst,	  scorpion2,	 bbrkfst,	bbrkfst,	0,		 "BFM",      "The Big Breakfast (Set 2)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 1994, m_brkfs2, m_brkfst,	  scorpion2,	 bbrkfst,	bbrkfst,	0,		 "BFM",      "The Big Breakfast (Set 3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 1994, m_brkfs3, m_brkfst,	  scorpion2,	 bbrkfst,	bbrkfst,	0,		 "BFM",      "The Big Breakfast (Set 4)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 1994, m_brkfs4, m_brkfst,	  scorpion2,	 bbrkfst,	bbrkfst,	0,		 "BFM",      "The Big Breakfast (Set 5)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 1994, m_brkfs5, m_brkfst,	  scorpion2,	 bbrkfst,	bbrkfst,	0,		 "BFM",      "The Big Breakfast (Set 6)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 
-GAME( 1995, m_bfocus, 0,          scorpion3,	 scorpion3,	focus,		0,		 "BFM/ELAM", "Focus (Dutch, Game Card 95-750-347)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK)
-GAME( 1996, m_bcgslm, 0,          scorpion2,	 bfmcgslm,	bfmcgslm,	0,		 "BFM",      "Club Grandslam (UK, Game Card 95-750-843)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK)
-GAME( 1996, m_luvjub, 0,          scorpion2_dm01,luvjub,	luvjub,		0,		 "BFM",      "Luvvly Jubbly (UK Multisite 10/25p, Game Card 95-750-808)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK)
-GAME( 1996, m_cpeno1, 0,	  scorpion2_dm01,cpeno1,        cpeno1,         0,               "BFM",      "Club Public Enemy No.1 (UK, Game Card 95-750-846)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK)
+GAME( 1995, m_bfocus, 0,          scorpion3,	 scorpion3,	focus,		0,		 "BFM/ELAM", "Focus (Dutch, Game Card 95-750-347)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL)
+GAME( 1996, m_bcgslm, 0,          scorpion2,	 bfmcgslm,	bfmcgslm,	0,		 "BFM",      "Club Grandslam (UK, Game Card 95-750-843)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL)
+GAME( 1996, m_luvjub, 0,          scorpion2_dm01,luvjub,	luvjub,		0,		 "BFM",      "Luvvly Jubbly (UK Multisite 10/25p, Game Card 95-750-808)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL)
+GAME( 1996, m_cpeno1, 0,          scorpion2_dm01,cpeno1,	cpeno1,		0,		 "BFM",      "Club Public Enemy No.1 (UK, Game Card 95-750-846)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL)

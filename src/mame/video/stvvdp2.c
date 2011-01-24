@@ -521,7 +521,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_BMPNB ((stv_vdp2_regs[0x02c/4] >> 16)&0x0000ffff)
+	#define STV_VDP2_BMPNB ((stv_vdp2_regs[0x02c/4] >> 0)&0x0000ffff)
 
 	#define STV_VDP2_R0BMP ((STV_VDP2_BMPNB & 0x0007) >> 0)
 
@@ -2262,7 +2262,9 @@ static UINT8 stv_vdp2_is_rotation_applied(void)
 		 RP.dxst == _FIXED_0 &&
 		 RP.dyst == _FIXED_1 &&
 		 RP.dx == _FIXED_1 &&
-		 RP.dy == _FIXED_0 )
+		 RP.dy == _FIXED_0 &&
+		 RP.kx == _FIXED_1 &&
+		 RP.ky == _FIXED_1 )
 	{
 		return 0;
 	}
@@ -5413,6 +5415,19 @@ static STATE_POSTLOAD( stv_vdp2_state_save_postload )
 		stv_vdp2_vram_decode[offset*4+1] = (data & 0x00ff0000) >> 16;
 		stv_vdp2_vram_decode[offset*4+2] = (data & 0x0000ff00) >> 8;
 		stv_vdp2_vram_decode[offset*4+3] = (data & 0x000000ff) >> 0;
+
+		gfx_element_mark_dirty(machine->gfx[0], offset/8);
+		gfx_element_mark_dirty(machine->gfx[1], offset/8);
+		gfx_element_mark_dirty(machine->gfx[2], offset/8);
+		gfx_element_mark_dirty(machine->gfx[3], offset/8);
+
+		/* 8-bit tiles overlap, so this affects the previous one as well */
+		if (offset/8 != 0)
+		{
+			gfx_element_mark_dirty(machine->gfx[2], offset/8 - 1);
+			gfx_element_mark_dirty(machine->gfx[3], offset/8 - 1);
+		}
+
 	}
 
 	memset( &stv_rbg_cache_data, 0, sizeof(stv_rbg_cache_data));
@@ -5827,11 +5842,13 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	static const UINT16 priority_mask_table[]  = {  3,  7,  1,  3,  3,  7,  7,  7, 1, 1, 3, 0, 1, 1, 3, 0 };
 	static const UINT16 ccrr_shift_table[] =	 { 11, 11, 11, 11, 10, 11, 10,  9, 0, 6, 0, 6, 0, 6, 0, 6 };
 	static const UINT16 ccrr_mask_table[] =	     {  7,  3,  7,  3,  7,  1,  3,  7, 0, 1, 0, 3, 0, 1, 0, 3 };
+	static const UINT16 shadow_mask_table[] = { 0, 0, 0x8000, 0x8000, 0x8000, 0x8000, 0x8000, 0x8000, 0, 0, 0, 0, 0, 0, 0, 0 };
 	UINT16 alpha_enabled;
 
 	int sprite_type;
 	int sprite_colormask;
 	int color_offset_pal;
+	int sprite_shadow;
 	UINT16 sprite_priority_shift, sprite_priority_mask, sprite_ccrr_shift, sprite_ccrr_mask;
 	UINT8	priority;
 	UINT8	ccr = 0;
@@ -5867,6 +5884,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	sprite_priority_mask = priority_mask_table[sprite_type];
 	sprite_ccrr_shift = ccrr_shift_table[sprite_type];
 	sprite_ccrr_mask = ccrr_mask_table[sprite_type];
+	sprite_shadow = shadow_mask_table[sprite_type];
 
 	for ( i = 0; i < (sprite_priority_mask+1); i++ ) if ( sprite_priorities[i] == pri ) break;
 	if ( i == (sprite_priority_mask+1) ) return;
@@ -5890,7 +5908,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			case 0x0: if ( pri <= STV_VDP2_SPCCN ) alpha_enabled = 1; break;
 			case 0x1: if ( pri == STV_VDP2_SPCCN ) alpha_enabled = 1; break;
 			case 0x2: if ( pri >= STV_VDP2_SPCCN ) alpha_enabled = 1; break;
-			case 0x3: /* MSBON */ break;
+			case 0x3: alpha_enabled = 2; sprite_shadow = 0; break;
 		}
 	}
 	else
@@ -5968,22 +5986,32 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 							continue;
 						};
 
-						pix &= sprite_colormask;
-						if ( pix == (sprite_colormask - 1) )
+						if ( pix & sprite_shadow )
 						{
-							/*shadow - in reality, we should check from what layer pixel beneath comes...*/
-							if ( STV_VDP2_SDCTL & 0x3f )
+							if ( pix & ~sprite_shadow )
 							{
 								bitmap_line[x] = (bitmap_line[x] & ~0x421) >> 1;
 							}
-							/* note that when shadows are disabled, "shadow" palette entries are not drawn */
 						}
-						else if ( pix )
+						else
 						{
-							pix += (STV_VDP2_SPCAOS << 8);
-							pix &= 0x7ff;
-							pix += color_offset_pal;
-							bitmap_line[x] = machine->pens[ pix ];
+							pix &= sprite_colormask;
+							if ( pix == (sprite_colormask - 1) )
+							{
+								/*shadow - in reality, we should check from what layer pixel beneath comes...*/
+								if ( STV_VDP2_SDCTL & 0x3f )
+								{
+									bitmap_line[x] = (bitmap_line[x] & ~0x421) >> 1;
+								}
+								/* note that when shadows are disabled, "shadow" palette entries are not drawn */
+							}
+							else if ( pix )
+							{
+								pix += (STV_VDP2_SPCAOS << 8);
+								pix &= 0x7ff;
+								pix += color_offset_pal;
+								bitmap_line[x] = machine->pens[ pix ];
+							}
 						}
 					}
 				}
@@ -6040,34 +6068,51 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 						};
 
 						ccr = sprite_ccr[ (pix >> sprite_ccrr_shift) & sprite_ccrr_mask ];
-
-						pix &= sprite_colormask;
-						if ( pix == (sprite_colormask - 1) )
+						if ( alpha_enabled == 2 )
 						{
-							/*shadow - in reality, we should check from what layer pixel beneath comes...*/
-							if ( STV_VDP2_SDCTL & 0x3f )
+							if ( ( pix & 0x8000 ) == 0 )
+							{
+								ccr = 0;
+							}
+						}
+
+						if ( pix & sprite_shadow )
+						{
+							if ( pix & ~sprite_shadow )
 							{
 								bitmap_line[x] = (bitmap_line[x] & ~0x421) >> 1;
 							}
-							/* note that when shadows are disabled, "shadow" palette entries are not drawn */
-						} else if ( pix )
+						}
+						else
 						{
-							pix += (STV_VDP2_SPCAOS << 8);
-							pix &= 0x7ff;
-							pix += color_offset_pal;
-							if ( ccr > 0 )
+							pix &= sprite_colormask;
+							if ( pix == (sprite_colormask - 1) )
 							{
-								if ( STV_VDP2_CCMD )
+								/*shadow - in reality, we should check from what layer pixel beneath comes...*/
+								if ( STV_VDP2_SDCTL & 0x3f )
 								{
-									bitmap_line[x] = stv_add_blend( bitmap_line[x], machine->pens[pix] );
+									bitmap_line[x] = (bitmap_line[x] & ~0x421) >> 1;
+								}
+								/* note that when shadows are disabled, "shadow" palette entries are not drawn */
+							} else if ( pix )
+							{
+								pix += (STV_VDP2_SPCAOS << 8);
+								pix &= 0x7ff;
+								pix += color_offset_pal;
+								if ( ccr > 0 )
+								{
+									if ( STV_VDP2_CCMD )
+									{
+										bitmap_line[x] = stv_add_blend( bitmap_line[x], machine->pens[pix] );
+									}
+									else
+									{
+										bitmap_line[x] = alpha_blend_r16( bitmap_line[x], machine->pens[pix], ((UINT16)(0x1f-ccr)*0xff)/0x1f );
+									}
 								}
 								else
-								{
-									bitmap_line[x] = alpha_blend_r16( bitmap_line[x], machine->pens[pix], ((UINT16)(0x1f-ccr)*0xff)/0x1f );
-								}
+									bitmap_line[x] = machine->pens[pix];
 							}
-							else
-								bitmap_line[x] = machine->pens[pix];
 						}
 					}
 				}
@@ -6175,65 +6220,83 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 					if ( alpha_enabled )
 						ccr = sprite_ccr[ (pix >> sprite_ccrr_shift) & sprite_ccrr_mask ];
 
-					pix &= sprite_colormask;
-					if ( pix == (sprite_colormask - 1) )
+					if ( alpha_enabled == 2 )
 					{
-						/*shadow - in reality, we should check from what layer pixel beneath comes...*/
-						if ( STV_VDP2_SDCTL & 0x3f )
+						if ( ( pix & 0x8000 ) == 0 )
+						{
+							ccr = 0;
+						}
+					}
+
+					if ( pix & sprite_shadow )
+					{
+						if ( pix & ~sprite_shadow )
 						{
 							bitmap_line[x] = (bitmap_line[x] & ~0x421) >> 1;
 						}
-						/* note that when shadows are disabled, "shadow" palette entries are not drawn */
-					} else if ( pix )
+					}
+					else
 					{
-						pix += (STV_VDP2_SPCAOS << 8);
-						pix &= 0x7ff;
-						pix += color_offset_pal;
-						if ( alpha_enabled == 0 )
+						pix &= sprite_colormask;
+						if ( pix == (sprite_colormask - 1) )
 						{
-							if(double_x)
+							/*shadow - in reality, we should check from what layer pixel beneath comes...*/
+							if ( STV_VDP2_SDCTL & 0x3f )
 							{
-								bitmap_line[x*2] = machine->pens[ pix ];
-								if ( interlace_framebuffer == 1 ) bitmap_line2[x*2] = machine->pens[ pix ];
-								bitmap_line[x*2+1] = machine->pens[ pix ];
-								if ( interlace_framebuffer == 1 ) bitmap_line2[x*2+1] = machine->pens[ pix ];
+								bitmap_line[x] = (bitmap_line[x] & ~0x421) >> 1;
 							}
-							else
-							{
-								bitmap_line[x] = machine->pens[ pix ];
-								if ( interlace_framebuffer == 1 ) bitmap_line2[x] = machine->pens[ pix ];
-							}
-						}
-						else // alpha_blend == 1
+							/* note that when shadows are disabled, "shadow" palette entries are not drawn */
+						} else if ( pix )
 						{
-							if ( STV_VDP2_CCMD )
+							pix += (STV_VDP2_SPCAOS << 8);
+							pix &= 0x7ff;
+							pix += color_offset_pal;
+							if ( alpha_enabled == 0 )
 							{
 								if(double_x)
 								{
-									bitmap_line[x*2] = stv_add_blend( bitmap_line[x*2], machine->pens[pix] );
-									if ( interlace_framebuffer == 1 ) bitmap_line2[x*2] = stv_add_blend( bitmap_line2[x], machine->pens[pix] );
-									bitmap_line[x*2+1] = stv_add_blend( bitmap_line[x*2+1], machine->pens[pix] );
-									if ( interlace_framebuffer == 1 ) bitmap_line2[x*2+1] = stv_add_blend( bitmap_line2[x], machine->pens[pix] );
+									bitmap_line[x*2] = machine->pens[ pix ];
+									if ( interlace_framebuffer == 1 ) bitmap_line2[x*2] = machine->pens[ pix ];
+									bitmap_line[x*2+1] = machine->pens[ pix ];
+									if ( interlace_framebuffer == 1 ) bitmap_line2[x*2+1] = machine->pens[ pix ];
 								}
 								else
 								{
-									bitmap_line[x] = stv_add_blend( bitmap_line[x], machine->pens[pix] );
-									if ( interlace_framebuffer == 1 ) bitmap_line2[x] = stv_add_blend( bitmap_line2[x], machine->pens[pix] );
+									bitmap_line[x] = machine->pens[ pix ];
+									if ( interlace_framebuffer == 1 ) bitmap_line2[x] = machine->pens[ pix ];
 								}
 							}
-							else
+							else // alpha_blend == 1
 							{
-								if(double_x)
+								if ( STV_VDP2_CCMD )
 								{
-									bitmap_line[x*2] = alpha_blend_r16( bitmap_line[x*2], machine->pens[pix], ((UINT16)(0x1f-ccr)*0xff)/0x1f );
-									if ( interlace_framebuffer == 1 ) bitmap_line2[x*2] = alpha_blend_r16( bitmap_line2[x], machine->pens[pix], ((UINT16)(0x1f-ccr)*0xff)/0x1f );
-									bitmap_line[x*2+1] = alpha_blend_r16( bitmap_line[x*2+1], machine->pens[pix], ((UINT16)(0x1f-ccr)*0xff)/0x1f );
-									if ( interlace_framebuffer == 1 ) bitmap_line2[x*2+1] = alpha_blend_r16( bitmap_line2[x], machine->pens[pix], ((UINT16)(0x1f-ccr)*0xff)/0x1f );
+									if(double_x)
+									{
+										bitmap_line[x*2] = stv_add_blend( bitmap_line[x*2], machine->pens[pix] );
+										if ( interlace_framebuffer == 1 ) bitmap_line2[x*2] = stv_add_blend( bitmap_line2[x], machine->pens[pix] );
+										bitmap_line[x*2+1] = stv_add_blend( bitmap_line[x*2+1], machine->pens[pix] );
+										if ( interlace_framebuffer == 1 ) bitmap_line2[x*2+1] = stv_add_blend( bitmap_line2[x], machine->pens[pix] );
+									}
+									else
+									{
+										bitmap_line[x] = stv_add_blend( bitmap_line[x], machine->pens[pix] );
+										if ( interlace_framebuffer == 1 ) bitmap_line2[x] = stv_add_blend( bitmap_line2[x], machine->pens[pix] );
+									}
 								}
 								else
 								{
-									bitmap_line[x] = alpha_blend_r16( bitmap_line[x], machine->pens[pix], ((UINT16)(0x1f-ccr)*0xff)/0x1f );
-									if ( interlace_framebuffer == 1 ) bitmap_line2[x] = alpha_blend_r16( bitmap_line2[x], machine->pens[pix], ((UINT16)(0x1f-ccr)*0xff)/0x1f );
+									if(double_x)
+									{
+										bitmap_line[x*2] = alpha_blend_r16( bitmap_line[x*2], machine->pens[pix], ((UINT16)(0x1f-ccr)*0xff)/0x1f );
+										if ( interlace_framebuffer == 1 ) bitmap_line2[x*2] = alpha_blend_r16( bitmap_line2[x], machine->pens[pix], ((UINT16)(0x1f-ccr)*0xff)/0x1f );
+										bitmap_line[x*2+1] = alpha_blend_r16( bitmap_line[x*2+1], machine->pens[pix], ((UINT16)(0x1f-ccr)*0xff)/0x1f );
+										if ( interlace_framebuffer == 1 ) bitmap_line2[x*2+1] = alpha_blend_r16( bitmap_line2[x], machine->pens[pix], ((UINT16)(0x1f-ccr)*0xff)/0x1f );
+									}
+									else
+									{
+										bitmap_line[x] = alpha_blend_r16( bitmap_line[x], machine->pens[pix], ((UINT16)(0x1f-ccr)*0xff)/0x1f );
+										if ( interlace_framebuffer == 1 ) bitmap_line2[x] = alpha_blend_r16( bitmap_line2[x], machine->pens[pix], ((UINT16)(0x1f-ccr)*0xff)/0x1f );
+									}
 								}
 							}
 						}

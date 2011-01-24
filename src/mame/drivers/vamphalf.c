@@ -20,27 +20,15 @@
     Mr. Dig                    (c) 2000 Sun
     Final Godori               (c) 2001 SemiCom            (version 2.20.5915)
     Wyvern Wings               (c) 2001 SemiCom
-    Mr. Kicker                 (c) 2001 SemiCom
+    Mr. Kicker                 (c) 2001 SemiCom [1]
     Age Of Heroes - Silkroad 2 (c) 2001 Unico              (v0.63 - 2001/02/07)
 
  Real games bugs:
  - dquizgo2: bugged video test
 
  Notes:
-  Mr Kicker appears to be broken due to problems with the Hyperstone CPU Core
-  It ends up trashing the registers containing the return value for a function
-
-    000018D6: MASK L51, L45, $1e00000
-    000018DC: CMPI L51, $c00000
-    000018E2: BE $18e6
-    000018E4: RET PC, L0
-    0003FA66: RET PC, L1  <-- no valid return value
-    00000000: CHK PC, PC     causes jump to 0
-
- It executes this code several times earlier before the crash, so I don't know
- if it's some kind of nested call problem, or simply beacuse it's using a
- different set of registers for the frame / call this time. (or if another
- Hyperstone bug is trashing some of the code in RAM)
+ [1]    Mr. Kicker game code crashes if the eeprom values are empty, because it replaces the SP register with a bogus value at PC = $18D0 before crashing.
+        It could be an original game bug or a hyperstone core bug
 
  Mr Kicker is also known to exist (not dumped) on the F-E1-16-010 PCB
  that Semicom also used for Date Quiz Go Go Episode 2 game.
@@ -216,6 +204,7 @@ static WRITE32_DEVICE_HANDLER( aoh_oki_bank_w )
 	downcast<okim6295_device *>(device)->set_bank_base(0x40000 * (data & 0x3));
 }
 
+
 static ADDRESS_MAP_START( common_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_BASE(&wram)
 	AM_RANGE(0x40000000, 0x4003ffff) AM_RAM AM_BASE(&tiles)
@@ -231,6 +220,7 @@ static ADDRESS_MAP_START( common_32bit_map, ADDRESS_SPACE_PROGRAM, 32 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( vamphalf_io, ADDRESS_SPACE_IO, 16 )
+	AM_RANGE(0x0c0, 0x0c1) AM_NOP // return 0, when oki chip is read / written
 	AM_RANGE(0x0c2, 0x0c3) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x140, 0x143) AM_DEVWRITE8("ymsnd", ym2151_register_port_w, 0x00ff)
 	AM_RANGE(0x146, 0x147) AM_DEVREADWRITE8("ymsnd", ym2151_status_port_r, ym2151_data_port_w, 0x00ff)
@@ -254,6 +244,7 @@ static ADDRESS_MAP_START( coolmini_io, ADDRESS_SPACE_IO, 16 )
 	AM_RANGE(0x300, 0x303) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x304, 0x307) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x308, 0x30b) AM_DEVWRITE("eeprom", eeprom_w)
+	AM_RANGE(0x4c0, 0x4c1) AM_NOP // return 0, when oki chip is read / written
 	AM_RANGE(0x4c2, 0x4c3) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x540, 0x543) AM_DEVWRITE8("ymsnd", ym2151_register_port_w, 0x00ff)
 	AM_RANGE(0x546, 0x547) AM_DEVREADWRITE8("ymsnd", ym2151_status_port_r, ym2151_data_port_w, 0x00ff)
@@ -264,6 +255,7 @@ static ADDRESS_MAP_START( suplup_io, ADDRESS_SPACE_IO, 16 )
 	AM_RANGE(0x020, 0x023) AM_DEVWRITE("eeprom", eeprom_w)
 	AM_RANGE(0x040, 0x043) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x060, 0x063) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0x080, 0x081) AM_NOP // return 0, when oki chip is read / written
 	AM_RANGE(0x082, 0x083) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x0c0, 0x0c3) AM_DEVWRITE8("ymsnd", ym2151_register_port_w, 0x00ff)
 	AM_RANGE(0x0c4, 0x0c7) AM_DEVREADWRITE8("ymsnd", ym2151_status_port_r, ym2151_data_port_w, 0x00ff)
@@ -299,20 +291,16 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mrkicker_io, ADDRESS_SPACE_IO, 32 )
 	AM_RANGE(0x2400, 0x2403) AM_DEVREAD("eeprom", eeprom32_r)
+	AM_RANGE(0x4000, 0x4003) AM_READNOP //?
 	AM_RANGE(0x4000, 0x4003) AM_DEVWRITE("eeprom", finalgdr_eeprom_w)
 	AM_RANGE(0x4040, 0x4043) AM_WRITE(finalgdr_prot_w)
+	AM_RANGE(0x4084, 0x4087) AM_WRITENOP //?
+	AM_RANGE(0x40a0, 0x40a3) AM_DEVWRITE("oki", finalgdr_oki_bank_w)
 	AM_RANGE(0x6400, 0x6403) AM_READ(finalgdr_prot_r)
 	AM_RANGE(0x7000, 0x7007) AM_DEVREADWRITE8("ymsnd", ym2151_r, ym2151_w, 0x0000ff00)
-//  AM_RANGE(0x7400, 0x7403) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x0000ff00)
-
-//  AM_RANGE(0xxxxx, 0xxxxx) AM_WRITE(finalgdr_backupram_bank_w)
-//  AM_RANGE(0xxxxx, 0xxxxx) AM_READWRITE(finalgdr_backupram_r, finalgdr_backupram_w)
-//  AM_RANGE(0xxxxx, 0xxxxx) AM_READ_PORT("P1_P2")
-//  AM_RANGE(0xxxxx, 0xxxxx) AM_READ_PORT("SYSTEM")
-//  AM_RANGE(0xxxxx, 0xxxxx) AM_READNOP //?
-//  AM_RANGE(0xxxxx, 0xxxxx) AM_WRITE(flipscreen32_w) //?
-//  AM_RANGE(0xxxxx, 0xxxxx) AM_WRITE(finalgdr_prize_w)
-//  AM_RANGE(0xxxxx, 0xxxxx) AM_DEVWRITE("oki", finalgdr_oki_bank_w)
+	AM_RANGE(0x7400, 0x7403) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x0000ff00)
+	AM_RANGE(0x7800, 0x7803) AM_READ_PORT("P1_P2")
+	AM_RANGE(0x7c00, 0x7c03) AM_READ_PORT("SYSTEM")
 ADDRESS_MAP_END
 
 
@@ -322,6 +310,7 @@ static ADDRESS_MAP_START( jmpbreak_io, ADDRESS_SPACE_IO, 16 )
 	AM_RANGE(0x240, 0x243) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x280, 0x283) AM_DEVWRITE("eeprom", eeprom_w)
 	AM_RANGE(0x2c0, 0x2c3) AM_DEVREAD("eeprom", eeprom_r)
+	AM_RANGE(0x440, 0x441) AM_NOP // return 0, when oki chip is read / written
 	AM_RANGE(0x442, 0x443) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x540, 0x543) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x680, 0x683) AM_DEVWRITE8("ymsnd", ym2151_register_port_w, 0x00ff)
@@ -329,10 +318,10 @@ static ADDRESS_MAP_START( jmpbreak_io, ADDRESS_SPACE_IO, 16 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mrdig_io, ADDRESS_SPACE_IO, 16 )
-
 	AM_RANGE(0x500, 0x503) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x3c0, 0x3c3) AM_DEVWRITE("eeprom", eeprom_w)
 	AM_RANGE(0x180, 0x183) AM_DEVREAD("eeprom", eeprom_r)
+	AM_RANGE(0x080, 0x081) AM_NOP // return 0, when oki chip is read / written
 	AM_RANGE(0x082, 0x083) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x280, 0x283) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x0c0, 0x0c3) AM_DEVWRITE8("ymsnd", ym2151_register_port_w, 0x00ff)
@@ -735,7 +724,6 @@ static MACHINE_CONFIG_DERIVED( jmpbreak, common )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mrdig, common )
-
 	MCFG_CPU_REPLACE("maincpu", GMS30C2116, 50000000)	/* 50 MHz */
 	MCFG_CPU_PROGRAM_MAP(common_map)
 	MCFG_CPU_MODIFY("maincpu")
@@ -769,6 +757,7 @@ static MACHINE_CONFIG_DERIVED( mrkicker, common )
 	MCFG_CPU_REPLACE("maincpu", E132T, 50000000)	/* 50 MHz */
 	MCFG_CPU_PROGRAM_MAP(common_32bit_map)
 	MCFG_CPU_IO_MAP(mrkicker_io)
+	MCFG_CPU_VBLANK_INT("screen", irq1_line_hold)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -1504,6 +1493,9 @@ ROM_START( mrkicker )
 	ROM_COPY( "user2", 0x040000, 0x0a0000, 0x020000)
 	ROM_COPY( "user2", 0x000000, 0x0c0000, 0x020000)
 	ROM_COPY( "user2", 0x060000, 0x0e0000, 0x020000)
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 ) /* Default EEPROM (it doesn't boot without and the game code crashes) */
+	ROM_LOAD( "eeprom-mrkicker.bin", 0x0000, 0x0080, CRC(87afb8f7) SHA1(444203b793c1d7929fc5916f18b510198719cd38) )
 ROM_END
 
 /*
@@ -1712,7 +1704,7 @@ static READ32_HANDLER( wyvernwg_speedup_r )
 
 static READ32_HANDLER( finalgdr_speedup_r )
 {
-	if(cpu_get_pc(space->cpu) == 0x1c212 )
+	if(cpu_get_pc(space->cpu) == 0x1c212)
 	{
 		if(irq_active(space))
 			cpu_spinuntil_int(space->cpu);
@@ -1722,6 +1714,21 @@ static READ32_HANDLER( finalgdr_speedup_r )
 
 	return wram32[0x005e874/4];
 }
+
+static READ32_HANDLER( mrkicker_speedup_r )
+{
+	UINT32 pc = cpu_get_pc(space->cpu);
+	if(pc == 0x469de || pc == 0x46a36)
+	{
+//      if(irq_active(space))
+//          cpu_spinuntil_int(space->cpu);
+//      else
+			cpu_eat_cycles(space->cpu, 50);
+	}
+
+	return wram32[0x00701a4/4];
+}
+
 
 static READ16_HANDLER( dquizgo2_speedup_r )
 {
@@ -1870,9 +1877,10 @@ static DRIVER_INIT( finalgdr )
 
 static DRIVER_INIT( mrkicker )
 {
+	// backup ram isn't used
 	finalgdr_backupram_bank = 1;
 	finalgdr_backupram = auto_alloc_array(machine, UINT8, 0x80*0x100);
-//  memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x005e874, 0x005e877, 0, 0, mrkicker_speedup_r );
+	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x00701a4, 0x00701a7, 0, 0, mrkicker_speedup_r );
 	machine->device<nvram_device>("nvram")->set_base(finalgdr_backupram, 0x80*0x100);
 
 	palshift = 0;
@@ -1910,7 +1918,7 @@ static DRIVER_INIT( jmpbreak )
 static DRIVER_INIT( mrdig )
 {
 	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x00a99c, 0x00a99f, 0, 0, mrdig_speedup_r );
-	//memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xe0000000, 0xe0000003, 0, 0, jmpbreak_flipscreen_w );
+	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xe0000000, 0xe0000003, 0, 0, jmpbreak_flipscreen_w );
 
 	palshift = 0;
 }
@@ -1927,6 +1935,6 @@ GAME( 2000, dquizgo2, 0,        coolmini, common,   dquizgo2, ROT0,   "SemiCom",
 GAME( 2000, misncrft, 0,        misncrft, common,   misncrft, ROT90,  "Sun",               "Mission Craft (version 2.4)", GAME_NO_SOUND )
 GAME( 2000, mrdig,    0,        mrdig,    common,   mrdig,    ROT0,   "Sun",               "Mr. Dig", 0 )
 GAME( 2001, finalgdr, 0,        finalgdr, finalgdr, finalgdr, ROT0,   "SemiCom",           "Final Godori (Korea, version 2.20.5915)", 0 )
-GAME( 2001, mrkicker, 0,        mrkicker, finalgdr, mrkicker, ROT0,   "SemiCom",           "Mr. Kicker", GAME_NOT_WORKING )
+GAME( 2001, mrkicker, 0,        mrkicker, finalgdr, mrkicker, ROT0,   "SemiCom",           "Mr. Kicker", 0 )
 GAME( 2001, wyvernwg, 0,        wyvernwg, common,   wyvernwg, ROT270, "SemiCom (Game Vision license)", "Wyvern Wings", GAME_NO_SOUND )
 GAME( 2001, aoh,      0,        aoh,      aoh,      aoh,      ROT0,   "Unico",             "Age Of Heroes - Silkroad 2 (v0.63 - 2001/02/07)", 0 )

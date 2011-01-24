@@ -382,7 +382,7 @@ static ADDRESS_MAP_START( lucky8_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static WRITE8_HANDLER( magical_outb850_w )
+static WRITE8_HANDLER( magodds_outb850_w )
 {
 	// guess, could be wrong, this might just be lights
 
@@ -393,18 +393,18 @@ static WRITE8_HANDLER( magical_outb850_w )
 	else
 		state->tile_bank = 0;
 
-	//popmessage("magical_outb850_w %02x\n", data);
+	//popmessage("magodds_outb850_w %02x\n", data);
 
 	tilemap_mark_all_tiles_dirty (state->fg_tilemap);
 
 }
 
-static WRITE8_HANDLER( magical_outb860_w )
+static WRITE8_HANDLER( magodds_outb860_w )
 {
-//  popmessage("magical_outb860_w %02x\n", data);
+//  popmessage("magodds_outb860_w %02x\n", data);
 }
 
-static ADDRESS_MAP_START(magical_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START(magodds_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	// where does the extra rom data map?? it seems like it should come straight after the existing rom, but it can't if this is a plain z80?
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("share1") AM_SHARE("nvram")
@@ -422,8 +422,8 @@ static ADDRESS_MAP_START(magical_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xb820, 0xb823) AM_DEVREADWRITE("ppi8255_2", ppi8255_r, ppi8255_w)	/* Input/Output Ports */
 	AM_RANGE(0xb830, 0xb830) AM_DEVREADWRITE("aysnd", ay8910_r, ay8910_data_w)
 	AM_RANGE(0xb840, 0xb840) AM_DEVWRITE("aysnd", ay8910_address_w)	/* no sound... only use both ports for DSWs */
-	AM_RANGE(0xb850, 0xb850) AM_WRITE(magical_outb850_w) //lamps
-	AM_RANGE(0xb860, 0xb860) AM_WRITE(magical_outb860_w) //watchdog
+	AM_RANGE(0xb850, 0xb850) AM_WRITE(magodds_outb850_w) //lamps
+	AM_RANGE(0xb860, 0xb860) AM_WRITE(magodds_outb860_w) //watchdog
 	AM_RANGE(0xb870, 0xb870) AM_DEVWRITE("snsnd", sn76496_w)	/* sound */
 	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION("maincpu",0xc000)
 ADDRESS_MAP_END
@@ -3009,6 +3009,162 @@ static INPUT_PORTS_START( ns8linew )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( luckylad )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN4")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSW3")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSW4")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( ladylinr )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -3151,7 +3307,7 @@ static INPUT_PORTS_START( kkojnoli )
 INPUT_PORTS_END
 
 /* not verified */
-static INPUT_PORTS_START( magical )
+static INPUT_PORTS_START( magodds )
 	PORT_START("IN0")	/* d800 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -4674,7 +4830,7 @@ static INPUT_PORTS_START( unkch )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( mtonic )
+static INPUT_PORTS_START( magoddsc )
 	PORT_START("IN0")
 	PORT_DIPNAME( 0x01, 0x01, "IN0")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
@@ -5139,7 +5295,7 @@ static GFXDECODE_START( ncb3 )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles8x32x4_layout, 128, 4 )
 GFXDECODE_END
 
-static GFXDECODE_START( magical )
+static GFXDECODE_START( magodds )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8x3_layout, 0, 32 )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles8x32x4_layout, 0, 16 )
 GFXDECODE_END
@@ -5946,7 +6102,7 @@ static MACHINE_CONFIG_START( lucky8, goldstar_state )
 
 MACHINE_CONFIG_END
 
-static PALETTE_INIT(magical)
+static PALETTE_INIT(magodds)
 {
 	int i;
 	for (i = 0; i < 0x100; i++)
@@ -5963,11 +6119,11 @@ static PALETTE_INIT(magical)
 	}
 }
 
-static MACHINE_CONFIG_START( magical, goldstar_state )
+static MACHINE_CONFIG_START( magodds, goldstar_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(magical_map)
+	MCFG_CPU_PROGRAM_MAP(magodds_map)
 	//MCFG_CPU_IO_MAP(goldstar_readport)
 	MCFG_CPU_VBLANK_INT("screen", lucky8_irq)
 
@@ -5983,9 +6139,9 @@ static MACHINE_CONFIG_START( magical, goldstar_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
-	MCFG_PALETTE_INIT(magical)
+	MCFG_PALETTE_INIT(magodds)
 
-	MCFG_GFXDECODE(magical)
+	MCFG_GFXDECODE(magodds)
 	MCFG_PALETTE_LENGTH(256)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
@@ -6643,6 +6799,29 @@ ROM_START( cb3c )
 	ROM_LOAD( "82s147.u2",      0x00000, 0x0200, CRC(5c8f2b8f) SHA1(67d2121e75813dd85d83858c5fc5ec6ad9cc2a7d) )
 ROM_END
 
+// set marked 'pignapoke'
+ROM_START( cb3d )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "0.14b", 0x00000, 0x10000, CRC(4f8be0f9) SHA1(0201bf0c1dca1570d2ccc862f10a19e0e261f7ab) )
+
+	ROM_REGION( 0x30000, "gfx1", 0 )
+	ROM_LOAD( "5.7h", 0x00000, 0x10000, CRC(50701ce1) SHA1(3af3f124e28fda2bb3ba4f2c78fcd21c725d7ebc) )
+	ROM_LOAD( "6.9h", 0x10000, 0x10000, CRC(baf1c9a2) SHA1(f75a64fa64d102a0e75919c76db638f6c34ecc9e) )
+	ROM_LOAD( "7.10h",0x20000, 0x10000, CRC(87c944c4) SHA1(754b410dbcef07967f7cfdc3923df20394909e49) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "1.1h", 0x00000, 0x02000, CRC(7cc6d26b) SHA1(de33e8985affce7bd3ead89463117c9aaa93d5e4) )
+	ROM_LOAD( "2.3h", 0x02000, 0x02000, CRC(e73ea4e3) SHA1(c9fd56461f6986d6bc170403d298fcc408a524e9) )
+	ROM_LOAD( "3.4h", 0x04000, 0x02000, CRC(91162010) SHA1(3acc21e7074602b247f2f392eb181802092d2f21) )
+	ROM_LOAD( "4.5h", 0x06000, 0x02000, CRC(cbcc6bfb) SHA1(5bafc934fef1f50d8c182c39d3a7ce795c89d175) )
+
+	ROM_REGION( 0x0200, "proms2", 0 )
+	ROM_LOAD( "dm74s288.13d",   0x00000, 0x0020, CRC(77a85e21) SHA1(3b41e0ab7cc55c5d78914d23e8289383f5bd5654) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD16_BYTE( "n82s129.13g",    0x001, 0x0100, CRC(59ac98e4) SHA1(5fc0f1a48c49c956cdb8826e20663dc57a9175e4) )
+	ROM_LOAD16_BYTE( "n82s129.14g",    0x000, 0x0100, CRC(0d8f35bd) SHA1(0c2a0145cdaaf9beabdce241731a36b0c65f18a2) )
+ROM_END
 
 ROM_START( cmv801 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -7229,7 +7408,31 @@ ROM_START( cmasterf )
 	ROM_LOAD( "82s129.u46", 0x0000, 0x0100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) )
 ROM_END
 
+ROM_START( chryangl )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "8.u6",  0x0000, 0x10000, CRC(331961e4) SHA1(50c7e0e983aed1f199f238442bb8fafce1849f84) )
 
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "7.e1",  0x00000,  0x10000, CRC(f8e523ba) SHA1(bfbe1803f0f3c3426a4cc252257c8a4dd83a70ac) )
+	ROM_LOAD( "6.e2",  0x08000,  0x10000, CRC(0d3b322a) SHA1(64b6bd387a78f51f83002c67d857b157a4651279) )
+	ROM_LOAD( "5.e3",  0x10000,  0x10000, CRC(da87dbeb) SHA1(3656b569d08540171003820ec86944d2a7a55b3b) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "1.f3",  0x0000,  0x2000, CRC(7cc6d26b) SHA1(de33e8985affce7bd3ead89463117c9aaa93d5e4) )
+	ROM_LOAD( "2.f2",  0x2000,  0x2000, CRC(e73ea4e3) SHA1(c9fd56461f6986d6bc170403d298fcc408a524e9) )
+	ROM_LOAD( "3.h3",  0x4000,  0x2000, CRC(91162010) SHA1(3acc21e7074602b247f2f392eb181802092d2f21) )
+	ROM_LOAD( "4.h2",  0x6000,  0x2000, CRC(cbcc6bfb) SHA1(5bafc934fef1f50d8c182c39d3a7ce795c89d175) )
+
+	ROM_REGION( 0x10000, "user1", ROMREGION_ERASEFF )
+	// nothing
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "82s129a.c15", 0x0000, 0x0100, CRC(6144d7fc) SHA1(4563ea31864d8732e3a4b0270449a0a79db334a2) )
+	ROM_LOAD( "82s129a.c16", 0x0100, 0x0100, CRC(0893e05d) SHA1(fabd58d498f5efdddae4c7142915cb7b092d6804) )
+
+	ROM_REGION( 0x100, "proms2", 0 )
+	ROM_LOAD( "82s129a.e9", 0x0000, 0x0100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) )
+ROM_END
 
 ROM_START( tonypok )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -7265,19 +7468,24 @@ ROM_START( tonypok )
 	ROM_LOAD( "82s129.u46", 0x0000, 0x0100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) )
 ROM_END
 
-// the program roms on these seem scrambled somehow, and there are no gfx roms dumped
+// the program roms on these seem scrambled somehow
 ROM_START( jkrmast )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "jokermaster.rom",  0x0000, 0x10000, CRC(73caf824) SHA1(b7a7bb6190465f7c3b40f2ef97f4f6beeb89ec41) )
+	ROM_LOAD( "pid-515.u5",  0x0000, 0x10000, CRC(73caf824) SHA1(b7a7bb6190465f7c3b40f2ef97f4f6beeb89ec41) )
 
-	// unknown # of roms / sizes
 	ROM_REGION( 0x20000, "gfx1", 0 )
-	ROM_LOAD( "gfx_roms", 0x00000,  0x8000, NO_DUMP )
-	ROM_REGION( 0x20000, "gfx2", ROMREGION_ERASE00 )
+	ROM_LOAD( "2000a.u41", 0x00000,  0x20000, CRC(cb8b1563) SHA1(c8c3ae646a9f3a7482d83566e4b3e18441c5d67f) )
+
+	ROM_REGION( 0x20000, "gfx2", 0 )
+	ROM_LOAD( "2000b.u48", 0x00000,  0x20000, CRC(e7b406ec) SHA1(c0a10cf8bf5467ecfe3c90e6897db3ab9aae0127) )
 
 	ROM_REGION( 0x10000, "user1", ROMREGION_ERASE00 )
-	ROM_REGION( 0x200, "proms", 0 )
-	ROM_LOAD( "proms", 0x00000,  0x200, NO_DUMP )
+	ROM_LOAD( "n82s129.u28",  0x0000, 0x0100, CRC(cfb152cf) SHA1(3166b9b21be4ce1d3b6fc8974c149b4ead03abac) )
+	ROM_LOAD( "n82s147a.u13", 0x0100, 0x0200, CRC(da92f0ae) SHA1(1269a2029e689a5f111c57e80825b3756b50521e) )
+
+	ROM_REGION( 0x200, "proms", ROMREGION_ERASE00 )
+
+
 	ROM_REGION( 0x100, "proms2", ROMREGION_ERASE00 )
 ROM_END
 
@@ -7464,128 +7672,6 @@ ROM_START( lucky8 )
 
 	ROM_REGION( 0x20, "unkprom2", 0 )
 	ROM_LOAD( "g13", 0x0000, 0x0020, CRC(6df3f972) SHA1(0096a7f7452b70cac6c0752cb62e24b643015b5c) )
-ROM_END
-
-
-/*
-
-Magical Tonic
-
-unknown, 40 pin cpu (plastic box, with "Tonic" sticker on it)
-8255 x3
-YM2203
-12 MHz
-
-4x DSW
-
-*/
-
-/* is this the original magical odds? */
-static DRIVER_INIT(mtonic)
-{
-	int A;
-	UINT8 *ROM = machine->region("maincpu")->base();
-
-	for (A = 0;A < 0x8000;A++)
-	{
-		if ((A & 4) == 4)
-			ROM[A] ^= 0x01;
-
-		ROM[A] = BITSWAP8(ROM[A], 3,6,5,4,7,2,1,0);
-	}
-}
-
-
-ROM_START( mtonic )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "8.e6",	0x0000, 0x8000, CRC(01daf2af) SHA1(cb9b12c79dce3c9123510a49dffc9f3cee056cf6) )
-	ROM_LOAD( "9.e6",	0x8000, 0x8000, CRC(1770ac79) SHA1(cadfd00ae75b90b1d202d741828e0afbd5ba0bec) )
-
-	ROM_REGION( 0x30000, "gfx1", 0 )
-	ROM_LOAD( "5.j10",	0x00000, 0x10000, CRC(b8032ea3) SHA1(15e5335a583d8e7a5422cd4d1d7342874a4962ab) )
-	ROM_LOAD( "6.j11",	0x10000, 0x10000, CRC(ff38ff30) SHA1(8fef6e1fe7c307c69c9dcafa69ecf66467b9cb41) )
-	ROM_LOAD( "7.j12",	0x20000, 0x10000, CRC(8f1d2db9) SHA1(200de01334905079dca542541e442d4194ecd913) )
-
-	ROM_REGION( 0x10000, "gfx2", 0 )
-	ROM_LOAD( "1.l10",	0x0000, 0x4000, CRC(746588db) SHA1(2a0af552011246d4cc0cd0b670907cf8685ce8ef) )
-	ROM_LOAD( "2.l11",	0x4000, 0x4000, CRC(8b7dd248) SHA1(a3ebde9fd0b6b1e42aa9b6d8e30c225abf2f80ce) )
-	ROM_LOAD( "3.l12",	0x8000, 0x4000, CRC(de05e678) SHA1(8b9fcb9f912075a20a9ae38100006b57d508e0e7) )
-	ROM_LOAD( "4.l13",	0xc000, 0x4000, CRC(8c542eee) SHA1(cb424e2a67c6d39302beca7cd5244bcad4a91189) )
-
-	ROM_REGION( 0x200, "proms", 0 )
-	ROM_LOAD( "prom1",	0x0000, 0x0100, NO_DUMP )
-	ROM_LOAD( "prom2",	0x0100, 0x0100, NO_DUMP )
-
-	ROM_REGION( 0x40, "proms2", 0 )
-	ROM_LOAD( "prom3",	0x0000, 0x0020, NO_DUMP )
-ROM_END
-
-
-// is this a bootleg board?
-ROM_START( magical )
-	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "8_p6_d12.512", 0x00000, 0x08000, CRC(6978c662) SHA1(cfdbcdcd4085c264e1d0ad4f18160b40d2d4e406) )
-	ROM_IGNORE(0x8000) // 1ST AND 2ND HALF IDENTICAL
-	ROM_LOAD( "9_p7_d14.512", 0x0c000, 0x04000, CRC(095230ba) SHA1(e60f5497c2cd5f1c0fc33b1e21303dd569654e6d) )
-	ROM_IGNORE(0xc000) // BADADDR        --xxxxxxxxxxxxxx
-
-	ROM_REGION( 0x30000, "gfx1", 0 )
-	ROM_LOAD( "5_l5_g2.512", 0x20000, 0x10000, CRC(f0ffb199) SHA1(383406e6ab74e8cecaf5574a879bf24aa606ac37) )
-	ROM_LOAD( "6_l6_g3.512", 0x10000, 0x10000, CRC(3e44d92b) SHA1(4e00e26a4dbf326c0c919c40382505189e82c85b) )
-	ROM_LOAD( "7_l7_g5.512", 0x00000, 0x10000, CRC(654bb754) SHA1(346bfbf85fc38797cf422da47d474e2ef2ef459c) )
-
-	ROM_REGION( 0x8000, "gfx2", 0 )
-	ROM_LOAD( "1_m1_h2.764", 0x06000, 0x2000, CRC(d7d657e4) SHA1(53e2717edb4cdeac83cd519b08225784600afa61) )
-	ROM_LOAD( "2_m2_h3.764", 0x02000, 0x2000, CRC(fb7541d5) SHA1(62a36c186b32bd98dff5c3f0fa5f2ad13992835c) )
-	ROM_LOAD( "3_m3_h5.764", 0x04000, 0x2000, CRC(49572d8b) SHA1(ceaaf911f58cceec82f429ca9114bffa1a67ec12) )
-	ROM_LOAD( "4_m4_h6.764", 0x00000, 0x2000, CRC(cccfaa5d) SHA1(69d9b8a26c769fd69093610e92918c9a086a2077) )
-
-	ROM_REGION( 0x300, "proms", 0 )
-	ROM_LOAD( "82s129a.3c", 0x000, 0x100, CRC(8c4c0dc8) SHA1(1b3ddbd253555efd1f48d469b42b272b9d96bacf) )
-	ROM_LOAD( "82s129a.1c", 0x100, 0x100, CRC(55e3c65f) SHA1(f51d08e0b2e4d97d2eacb1f6d52777065bbe1ae5) )
-	ROM_LOAD( "82s129a.2c", 0x200, 0x100, CRC(4d46f40a) SHA1(c141e94ae5705773605b7a094e65625b4a21db73) )
-
-	ROM_REGION( 0x100, "proms2", 0 )
-	ROM_LOAD( "82s129a.6j", 0x000, 0x100, CRC(1200815e) SHA1(8c9a856274246644af25961a2e731dbcb73f12b9) )
-
-	ROM_REGION( 0x100, "proms3", 0 )
-	ROM_LOAD( "dm74s288.1a", 0x00, 0x20, CRC(6a13320b) SHA1(6d7c663477f3fbc22fb716e15bfdd9c452eb686a) )
-	ROM_LOAD( "dm74s288.1b", 0x20, 0x20, CRC(e04abac8) SHA1(4f2adf9f1482470b6de6d0e547623f62e95eaf24) )
-	ROM_LOAD( "dm74s288.12k",0x40, 0x20, CRC(03231e84) SHA1(92abdf6f8ef705b260378e90e6d591da056c2cee) )
-ROM_END
-
-// is this a bootleg board?
-// program is the same as above set (but without the oversized rom 9), only gfx1 differs
-// the proms came from this board
-ROM_START( magicala )
-	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "8.12e", 0x00000, 0x08000, CRC(6978c662) SHA1(cfdbcdcd4085c264e1d0ad4f18160b40d2d4e406) )
-	ROM_IGNORE(0x8000) // 1ST AND 2ND HALF IDENTICAL
-	ROM_LOAD( "9.14e", 0x0c000, 0x04000, CRC(b3661c55) SHA1(f576d434ccec6f342455c18ada156d29634627cb) )
-
-	ROM_REGION( 0x30000, "gfx1", 0 )
-	ROM_LOAD( "5.2f", 0x20000, 0x10000, CRC(39e6ad6f) SHA1(0075015b3e794d82fb62984a41be48d17833c9f0) )
-	ROM_LOAD( "6.3f", 0x10000, 0x10000, CRC(42e03002) SHA1(5c4f2a1aa91d3c0906665bec7423f8579f434dc1) )
-	ROM_LOAD( "7.5f", 0x00000, 0x10000, CRC(5301a9a4) SHA1(f592bfc5f0d835cab6029aed7d6dcdd9d2ee1a2c) )
-
-	ROM_REGION( 0x8000, "gfx2", 0 )
-	ROM_LOAD( "1_m1_h2.764", 0x06000, 0x2000, CRC(d7d657e4) SHA1(53e2717edb4cdeac83cd519b08225784600afa61) )
-	ROM_LOAD( "2_m2_h3.764", 0x02000, 0x2000, CRC(fb7541d5) SHA1(62a36c186b32bd98dff5c3f0fa5f2ad13992835c) )
-	ROM_LOAD( "3_m3_h5.764", 0x04000, 0x2000, CRC(49572d8b) SHA1(ceaaf911f58cceec82f429ca9114bffa1a67ec12) )
-	ROM_LOAD( "4_m4_h6.764", 0x00000, 0x2000, CRC(cccfaa5d) SHA1(69d9b8a26c769fd69093610e92918c9a086a2077) )
-
-	ROM_REGION( 0x300, "proms", 0 )
-	ROM_LOAD( "82s129a.3c", 0x000, 0x100, CRC(8c4c0dc8) SHA1(1b3ddbd253555efd1f48d469b42b272b9d96bacf) )
-	ROM_LOAD( "82s129a.1c", 0x100, 0x100, CRC(55e3c65f) SHA1(f51d08e0b2e4d97d2eacb1f6d52777065bbe1ae5) )
-	ROM_LOAD( "82s129a.2c", 0x200, 0x100, CRC(4d46f40a) SHA1(c141e94ae5705773605b7a094e65625b4a21db73) )
-
-	ROM_REGION( 0x100, "proms2", 0 )
-	ROM_LOAD( "82s129a.6j", 0x000, 0x100, CRC(1200815e) SHA1(8c9a856274246644af25961a2e731dbcb73f12b9) )
-
-	ROM_REGION( 0x100, "proms3", 0 )
-	ROM_LOAD( "dm74s288.1a", 0x00, 0x20, CRC(6a13320b) SHA1(6d7c663477f3fbc22fb716e15bfdd9c452eb686a) )
-	ROM_LOAD( "dm74s288.1b", 0x20, 0x20, CRC(e04abac8) SHA1(4f2adf9f1482470b6de6d0e547623f62e95eaf24) )
-	ROM_LOAD( "dm74s288.12k",0x40, 0x20, CRC(03231e84) SHA1(92abdf6f8ef705b260378e90e6d591da056c2cee) )
 ROM_END
 
 /*
@@ -7907,6 +7993,268 @@ ROM_START( ns8linew )
 
 	ROM_REGION( 0x20, "unkprom2", 0 )
 	ROM_LOAD( "dm74s288.d12", 0x0000, 0x0020, CRC(6df3f972) SHA1(0096a7f7452b70cac6c0752cb62e24b643015b5c) )
+ROM_END
+
+/******************************************************************************
+
+  Lucky Lady (1985, Wing)
+  -----------------------
+
+  Wing original PCB
+
+  Silkscreened: WING 8504-B - MADE IN JAPAN.
+
+  1x 40-pin unknown encrypted CPU (numbered 03155096 and Falcon logo) (C11).
+  1x AY-3-8910 (C5).
+  3x NEC D8255AC-5 (C7-C8-C10).
+
+  2x M5L27128K Program ROMs labeled 18 & 19 (B12-B13).
+  7x GFX ROMs in a row labeled 11 to 17 (H1-H3-H4-H6-H7-H8-H10).
+
+  1x Xtal @ 12MHz. (J6).
+  4x 8 DIP switches banks: SW1(D8)-SW2(D7)-SW4(D6)-SW3(D5).
+  1x 3.6 V. Lithium battery.
+  1x 2x 10 pins edge connector.
+  1x 2x 36 pins edge connector.
+  1x simple 3-contacts switch.
+
+
+  The following PROMs weren't dumped:
+
+  1x TBP18S030 @ D12 (32 bytes)
+  1x TBP18S030 @ D13 (32 bytes)
+  1x TBP24S10N @ F3 (256 bytes)
+  1x TBP24S10N @ G13 (256 bytes)
+  1x TBP24S10N @ G14 (256 bytes)
+
+
+  RESNET: 2x resnet:
+
+  @ D14:  1K - 470 - 220 - 1K - 470 - 220 - 470 - 220.
+  @ F14:  1K - 470 - 220 - 1K - 1K - 470 - 220 - 1K - 470 - 220 - 1K.
+
+******************************************************************************/
+
+ROM_START( luckylad )
+	ROM_REGION( 0x8000, "maincpu", 0 )	/* encrypted CPU */
+	ROM_LOAD( "18.b12",  0x0000, 0x4000, CRC(2d178126) SHA1(5fc490e115e5c9073a7e3f56894fe19be6adb2b5) )
+	ROM_LOAD( "19.b13",  0x4000, 0x4000, CRC(ad02b9fd) SHA1(1a85da2d418350e5cebdb889fa146565a72f37c4) )
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "15.h7",  0x00000, 0x8000, CRC(42f221eb) SHA1(24f764b176339b5ff49dc1836913724805f970d7) )
+	ROM_LOAD( "16.h8",  0x08000, 0x8000, CRC(5af43f1e) SHA1(0f76071f1b43eab819bd892183730e9f7eed6c9b) )
+	ROM_LOAD( "17.h10", 0x10000, 0x8000, CRC(096522e3) SHA1(900e448dd657088ecb1e6c72c3b0859efb2ec23f) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "11.h1",  0x0000, 0x2000, CRC(abe67459) SHA1(71223b99b79284b71ad6d2a1c8061ddd61e24e36) )
+	ROM_LOAD( "12.h3",  0x2000, 0x2000, CRC(15d4bdae) SHA1(b2e4638bca29ec3ac662bc45f889a68c04cbd145) )
+	ROM_LOAD( "13.h4",  0x4000, 0x2000, CRC(167303b4) SHA1(a0d4804d46854d832ac7047647e5f452bd0d87a2) )
+	ROM_LOAD( "14.h5",  0x6000, 0x2000, CRC(708d5b2d) SHA1(a619b84bc67d579345db636d33e7e4f27e37a18c) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "tbp24s10n.g13", 0x0000, 0x0100, NO_DUMP )	/* undumped */
+	ROM_LOAD( "tbp24s10n.g14", 0x0100, 0x0100, NO_DUMP )	/* undumped */
+
+	ROM_REGION( 0x20, "proms2", 0 )
+	ROM_LOAD( "tbp18s030.d13", 0x0000, 0x0020, NO_DUMP )	/* undumped */
+
+	ROM_REGION( 0x100, "unkprom", 0 )
+	ROM_LOAD( "tbp24s10n.f3", 0x0000, 0x0100, NO_DUMP )	/* undumped */
+
+	ROM_REGION( 0x20, "unkprom2", 0 )
+	ROM_LOAD( "tbp18s030.d12", 0x0000, 0x0020, NO_DUMP )	/* undumped */
+ROM_END
+
+/*
+
+Magical Tonic
+
+unknown, 40 pin cpu (plastic box, with "Tonic" sticker on it)
+8255 x3
+YM2203
+12 MHz
+
+4x DSW
+
+*/
+
+/* is this the original Magical Odds? */
+static DRIVER_INIT(magoddsc)
+{
+	int A;
+	UINT8 *ROM = machine->region("maincpu")->base();
+
+	for (A = 0;A < 0x8000;A++)
+	{
+		if ((A & 4) == 4)
+			ROM[A] ^= 0x01;
+
+		ROM[A] = BITSWAP8(ROM[A], 3,6,5,4,7,2,1,0);
+	}
+}
+
+
+// is this a bootleg board?
+ROM_START( magodds )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "8_p6_d12.512", 0x00000, 0x08000, CRC(6978c662) SHA1(cfdbcdcd4085c264e1d0ad4f18160b40d2d4e406) )
+	ROM_IGNORE(0x8000) // 1ST AND 2ND HALF IDENTICAL
+	ROM_LOAD( "9_p7_d14.512", 0x0c000, 0x04000, CRC(095230ba) SHA1(e60f5497c2cd5f1c0fc33b1e21303dd569654e6d) )
+	ROM_IGNORE(0xc000) // BADADDR        --magoddscxxxxxx
+
+	ROM_REGION( 0x30000, "gfx1", 0 )
+	ROM_LOAD( "5_l5_g2.512", 0x20000, 0x10000, CRC(f0ffb199) SHA1(383406e6ab74e8cecaf5574a879bf24aa606ac37) )
+	ROM_LOAD( "6_l6_g3.512", 0x10000, 0x10000, CRC(3e44d92b) SHA1(4e00e26a4dbf326c0c919c40382505189e82c85b) )
+	ROM_LOAD( "7_l7_g5.512", 0x00000, 0x10000, CRC(654bb754) SHA1(346bfbf85fc38797cf422da47d474e2ef2ef459c) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "1_m1_h2.764", 0x06000, 0x2000, CRC(d7d657e4) SHA1(53e2717edb4cdeac83cd519b08225784600afa61) )
+	ROM_LOAD( "2_m2_h3.764", 0x02000, 0x2000, CRC(fb7541d5) SHA1(62a36c186b32bd98dff5c3f0fa5f2ad13992835c) )
+	ROM_LOAD( "3_m3_h5.764", 0x04000, 0x2000, CRC(49572d8b) SHA1(ceaaf911f58cceec82f429ca9114bffa1a67ec12) )
+	ROM_LOAD( "4_m4_h6.764", 0x00000, 0x2000, CRC(cccfaa5d) SHA1(69d9b8a26c769fd69093610e92918c9a086a2077) )
+
+	ROM_REGION( 0x300, "proms", 0 )
+	ROM_LOAD( "82s129a.3c", 0x000, 0x100, CRC(8c4c0dc8) SHA1(1b3ddbd253555efd1f48d469b42b272b9d96bacf) )
+	ROM_LOAD( "82s129a.1c", 0x100, 0x100, CRC(55e3c65f) SHA1(f51d08e0b2e4d97d2eacb1f6d52777065bbe1ae5) )
+	ROM_LOAD( "82s129a.2c", 0x200, 0x100, CRC(4d46f40a) SHA1(c141e94ae5705773605b7a094e65625b4a21db73) )
+
+	ROM_REGION( 0x100, "proms2", 0 )
+	ROM_LOAD( "82s129a.6j", 0x000, 0x100, CRC(1200815e) SHA1(8c9a856274246644af25961a2e731dbcb73f12b9) )
+
+	ROM_REGION( 0x100, "proms3", 0 )
+	ROM_LOAD( "dm74s288.1a", 0x00, 0x20, CRC(6a13320b) SHA1(6d7c663477f3fbc22fb716e15bfdd9c452eb686a) )
+	ROM_LOAD( "dm74s288.1b", 0x20, 0x20, CRC(e04abac8) SHA1(4f2adf9f1482470b6de6d0e547623f62e95eaf24) )
+	ROM_LOAD( "dm74s288.12k",0x40, 0x20, CRC(03231e84) SHA1(92abdf6f8ef705b260378e90e6d591da056c2cee) )
+ROM_END
+
+// is this a bootleg board?
+// program is the same as above set (but without the oversized rom 9), only gfx1 differs
+// the proms came from this board
+ROM_START( magoddsa )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "8.12e", 0x00000, 0x08000, CRC(6978c662) SHA1(cfdbcdcd4085c264e1d0ad4f18160b40d2d4e406) )
+	ROM_IGNORE(0x8000) // 1ST AND 2ND HALF IDENTICAL
+	ROM_LOAD( "9.14e", 0x0c000, 0x04000, CRC(b3661c55) SHA1(f576d434ccec6f342455c18ada156d29634627cb) )
+
+	ROM_REGION( 0x30000, "gfx1", 0 )
+	ROM_LOAD( "5.2f", 0x20000, 0x10000, CRC(39e6ad6f) SHA1(0075015b3e794d82fb62984a41be48d17833c9f0) )
+	ROM_LOAD( "6.3f", 0x10000, 0x10000, CRC(42e03002) SHA1(5c4f2a1aa91d3c0906665bec7423f8579f434dc1) )
+	ROM_LOAD( "7.5f", 0x00000, 0x10000, CRC(5301a9a4) SHA1(f592bfc5f0d835cab6029aed7d6dcdd9d2ee1a2c) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "1_m1_h2.764", 0x06000, 0x2000, CRC(d7d657e4) SHA1(53e2717edb4cdeac83cd519b08225784600afa61) )
+	ROM_LOAD( "2_m2_h3.764", 0x02000, 0x2000, CRC(fb7541d5) SHA1(62a36c186b32bd98dff5c3f0fa5f2ad13992835c) )
+	ROM_LOAD( "3_m3_h5.764", 0x04000, 0x2000, CRC(49572d8b) SHA1(ceaaf911f58cceec82f429ca9114bffa1a67ec12) )
+	ROM_LOAD( "4_m4_h6.764", 0x00000, 0x2000, CRC(cccfaa5d) SHA1(69d9b8a26c769fd69093610e92918c9a086a2077) )
+
+	ROM_REGION( 0x300, "proms", 0 )
+	ROM_LOAD( "82s129a.3c", 0x000, 0x100, CRC(8c4c0dc8) SHA1(1b3ddbd253555efd1f48d469b42b272b9d96bacf) )
+	ROM_LOAD( "82s129a.1c", 0x100, 0x100, CRC(55e3c65f) SHA1(f51d08e0b2e4d97d2eacb1f6d52777065bbe1ae5) )
+	ROM_LOAD( "82s129a.2c", 0x200, 0x100, CRC(4d46f40a) SHA1(c141e94ae5705773605b7a094e65625b4a21db73) )
+
+	ROM_REGION( 0x100, "proms2", 0 )
+	ROM_LOAD( "82s129a.6j", 0x000, 0x100, CRC(1200815e) SHA1(8c9a856274246644af25961a2e731dbcb73f12b9) )
+
+	ROM_REGION( 0x100, "proms3", 0 )
+	ROM_LOAD( "dm74s288.1a", 0x00, 0x20, CRC(6a13320b) SHA1(6d7c663477f3fbc22fb716e15bfdd9c452eb686a) )
+	ROM_LOAD( "dm74s288.1b", 0x20, 0x20, CRC(e04abac8) SHA1(4f2adf9f1482470b6de6d0e547623f62e95eaf24) )
+	ROM_LOAD( "dm74s288.12k",0x40, 0x20, CRC(03231e84) SHA1(92abdf6f8ef705b260378e90e6d591da056c2cee) )
+ROM_END
+
+// gfx same as above set, program rom differs
+ROM_START( magoddsb )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "mo-137-8.p6", 0x00000, 0x08000, CRC(abe5d6d1) SHA1(45161c580e6852aae5d9dbc06bb9743e86f9c279) )
+	ROM_LOAD( "mo-137-9.p7", 0x0c000, 0x04000, CRC(b3661c55) SHA1(f576d434ccec6f342455c18ada156d29634627cb) )
+
+	ROM_REGION( 0x30000, "gfx1", 0 )
+	ROM_LOAD( "mo-137-5.l5", 0x20000, 0x10000, CRC(39e6ad6f) SHA1(0075015b3e794d82fb62984a41be48d17833c9f0) )
+	ROM_LOAD( "mo-137-6.l6", 0x10000, 0x10000, CRC(42e03002) SHA1(5c4f2a1aa91d3c0906665bec7423f8579f434dc1) )
+	ROM_LOAD( "mo-137-7.l7", 0x00000, 0x10000, CRC(5301a9a4) SHA1(f592bfc5f0d835cab6029aed7d6dcdd9d2ee1a2c) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "mo-137-1.m1", 0x06000, 0x2000, CRC(d7d657e4) SHA1(53e2717edb4cdeac83cd519b08225784600afa61) )
+	ROM_LOAD( "mo-137-2.m2", 0x02000, 0x2000, CRC(fb7541d5) SHA1(62a36c186b32bd98dff5c3f0fa5f2ad13992835c) )
+	ROM_LOAD( "mo-137-3.m3", 0x04000, 0x2000, CRC(49572d8b) SHA1(ceaaf911f58cceec82f429ca9114bffa1a67ec12) )
+	ROM_LOAD( "mo-137-4.m4", 0x00000, 0x2000, CRC(cccfaa5d) SHA1(69d9b8a26c769fd69093610e92918c9a086a2077) )
+
+	ROM_REGION( 0x300, "proms", 0 )
+	ROM_LOAD( "n5.bin", 0x000, 0x100, CRC(8c4c0dc8) SHA1(1b3ddbd253555efd1f48d469b42b272b9d96bacf) )
+	ROM_LOAD( "n7.bin", 0x100, 0x100, CRC(55e3c65f) SHA1(f51d08e0b2e4d97d2eacb1f6d52777065bbe1ae5) )
+	ROM_LOAD( "n6.bin", 0x200, 0x100, CRC(4d46f40a) SHA1(c141e94ae5705773605b7a094e65625b4a21db73) )
+
+	ROM_REGION( 0x100, "proms2", 0 )
+	ROM_LOAD( "n4.bin", 0x000, 0x100, CRC(1200815e) SHA1(8c9a856274246644af25961a2e731dbcb73f12b9) )
+
+	ROM_REGION( 0x100, "proms3", 0 )
+	ROM_LOAD( "n9.bin", 0x00, 0x20, CRC(6a13320b) SHA1(6d7c663477f3fbc22fb716e15bfdd9c452eb686a) )
+	ROM_LOAD( "n8.bin", 0x20, 0x20, CRC(e04abac8) SHA1(4f2adf9f1482470b6de6d0e547623f62e95eaf24) )
+	ROM_LOAD( "p1.bin", 0x40, 0x20, CRC(1aa176f3) SHA1(fe777cba829046f850ab612b927bde4fe0d37811) ) // different! to magoddsa
+ROM_END
+
+
+// custom CPU block
+ROM_START( magoddsc )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "8.e6",	0x0000, 0x8000, CRC(01daf2af) SHA1(cb9b12c79dce3c9123510a49dffc9f3cee056cf6) )
+	ROM_LOAD( "9.e6",	0x8000, 0x8000, CRC(1770ac79) SHA1(cadfd00ae75b90b1d202d741828e0afbd5ba0bec) )
+
+	ROM_REGION( 0x30000, "gfx1", 0 )
+	ROM_LOAD( "5.j10",	0x00000, 0x10000, CRC(b8032ea3) SHA1(15e5335a583d8e7a5422cd4d1d7342874a4962ab) )
+	ROM_LOAD( "6.j11",	0x10000, 0x10000, CRC(ff38ff30) SHA1(8fef6e1fe7c307c69c9dcafa69ecf66467b9cb41) )
+	ROM_LOAD( "7.j12",	0x20000, 0x10000, CRC(8f1d2db9) SHA1(200de01334905079dca542541e442d4194ecd913) )
+
+	ROM_REGION( 0x10000, "gfx2", 0 )
+	ROM_LOAD( "1.l10",	0x0000, 0x4000, CRC(746588db) SHA1(2a0af552011246d4cc0cd0b670907cf8685ce8ef) )
+	ROM_LOAD( "2.l11",	0x4000, 0x4000, CRC(8b7dd248) SHA1(a3ebde9fd0b6b1e42aa9b6d8e30c225abf2f80ce) )
+	ROM_LOAD( "3.l12",	0x8000, 0x4000, CRC(de05e678) SHA1(8b9fcb9f912075a20a9ae38100006b57d508e0e7) )
+	ROM_LOAD( "4.l13",	0xc000, 0x4000, CRC(8c542eee) SHA1(cb424e2a67c6d39302beca7cd5244bcad4a91189) )
+
+	// proms not verified on this set, taken from magoddsa
+	ROM_REGION( 0x300, "proms", 0 )
+	ROM_LOAD( "82s129a.3c", 0x000, 0x100, CRC(8c4c0dc8) SHA1(1b3ddbd253555efd1f48d469b42b272b9d96bacf) )
+	ROM_LOAD( "82s129a.1c", 0x100, 0x100, CRC(55e3c65f) SHA1(f51d08e0b2e4d97d2eacb1f6d52777065bbe1ae5) )
+	ROM_LOAD( "82s129a.2c", 0x200, 0x100, CRC(4d46f40a) SHA1(c141e94ae5705773605b7a094e65625b4a21db73) )
+
+	ROM_REGION( 0x100, "proms2", 0 )
+	ROM_LOAD( "82s129a.6j", 0x000, 0x100, CRC(1200815e) SHA1(8c9a856274246644af25961a2e731dbcb73f12b9) )
+
+	ROM_REGION( 0x100, "proms3", 0 )
+	ROM_LOAD( "dm74s288.1a", 0x00, 0x20, CRC(6a13320b) SHA1(6d7c663477f3fbc22fb716e15bfdd9c452eb686a) )
+	ROM_LOAD( "dm74s288.1b", 0x20, 0x20, CRC(e04abac8) SHA1(4f2adf9f1482470b6de6d0e547623f62e95eaf24) )
+	ROM_LOAD( "dm74s288.12k",0x40, 0x20, CRC(03231e84) SHA1(92abdf6f8ef705b260378e90e6d591da056c2cee) )
+ROM_END
+
+// custom CPU block
+ROM_START( magoddsd )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "8.p7",	0x0000, 0x8000, CRC(da0f1ae5) SHA1(5790c8ec6fbcd13088079c1fbd035ef816b423e6) )
+	ROM_LOAD( "9.p6", 0x0c000, 0x04000, CRC(b3661c55) SHA1(f576d434ccec6f342455c18ada156d29634627cb) )
+
+	ROM_REGION( 0x30000, "gfx1", 0 )
+	ROM_LOAD( "5.m2", 0x20000, 0x10000, CRC(39e6ad6f) SHA1(0075015b3e794d82fb62984a41be48d17833c9f0) )
+	ROM_LOAD( "6.m3", 0x10000, 0x10000, CRC(42e03002) SHA1(5c4f2a1aa91d3c0906665bec7423f8579f434dc1) )
+	ROM_LOAD( "7.m4", 0x00000, 0x10000, CRC(5301a9a4) SHA1(f592bfc5f0d835cab6029aed7d6dcdd9d2ee1a2c) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "1.m1", 0x06000, 0x2000, CRC(d7d657e4) SHA1(53e2717edb4cdeac83cd519b08225784600afa61) )
+	ROM_LOAD( "2.m2", 0x02000, 0x2000, CRC(fb7541d5) SHA1(62a36c186b32bd98dff5c3f0fa5f2ad13992835c) )
+	ROM_LOAD( "3.m3", 0x04000, 0x2000, CRC(49572d8b) SHA1(ceaaf911f58cceec82f429ca9114bffa1a67ec12) )
+	ROM_LOAD( "4.m4", 0x00000, 0x2000, CRC(cccfaa5d) SHA1(69d9b8a26c769fd69093610e92918c9a086a2077) )
+
+	// proms not verified on this set, taken from magoddsa
+	ROM_REGION( 0x300, "proms", 0 )
+	ROM_LOAD( "82s129a.3c", 0x000, 0x100, CRC(8c4c0dc8) SHA1(1b3ddbd253555efd1f48d469b42b272b9d96bacf) )
+	ROM_LOAD( "82s129a.1c", 0x100, 0x100, CRC(55e3c65f) SHA1(f51d08e0b2e4d97d2eacb1f6d52777065bbe1ae5) )
+	ROM_LOAD( "82s129a.2c", 0x200, 0x100, CRC(4d46f40a) SHA1(c141e94ae5705773605b7a094e65625b4a21db73) )
+
+	ROM_REGION( 0x100, "proms2", 0 )
+	ROM_LOAD( "82s129a.6j", 0x000, 0x100, CRC(1200815e) SHA1(8c9a856274246644af25961a2e731dbcb73f12b9) )
+
+	ROM_REGION( 0x100, "proms3", 0 )
+	ROM_LOAD( "dm74s288.1a", 0x00, 0x20, CRC(6a13320b) SHA1(6d7c663477f3fbc22fb716e15bfdd9c452eb686a) )
+	ROM_LOAD( "dm74s288.1b", 0x20, 0x20, CRC(e04abac8) SHA1(4f2adf9f1482470b6de6d0e547623f62e95eaf24) )
+	ROM_LOAD( "dm74s288.12k",0x40, 0x20, CRC(03231e84) SHA1(92abdf6f8ef705b260378e90e6d591da056c2cee) )
 ROM_END
 
 /*
@@ -9929,9 +10277,16 @@ GAME(  199?, cb3a,      ncb3,     ncb3,     cb3a,     0,         ROT0, "Dyna",  
 GAME(  199?, cb3,       ncb3,     ncb3,     ncb3,     cb3,       ROT0, "Dyna",              "Cherry Bonus III (ver.1.40, encrypted)",      0 )
 GAME(  199?, cb3b,      ncb3,     cherrys,  ncb3,     cherrys,   ROT0, "Dyna",              "Cherry Bonus III (alt)",           0 )
 GAME(  199?, cb3c,      ncb3,     cb3c,     chrygld,  cb3,       ROT0, "bootleg",           "Cherry Bonus III (alt, set 2)", GAME_NOT_WORKING)
+GAME(  199?, cb3d,      ncb3,     ncb3,     ncb3,     0,         ROT0, "bootleg",           "Cherry Bonus III (set 3)", GAME_NOT_WORKING) // fix prom decode
+
+// looks like a hack of Cherry Bonus 3
+GAME(  199?, chryangl,  ncb3,     cm,       cmasterb, cmv4,      ROT0, "<unknown>",              "Cherry Angel",         GAME_NOT_WORKING )
+
 
 // cherry master hardware has a rather different mem map, but is basically the same
 GAME(  198?, cmv801,    0,        cm,       cmv801,   cm,        ROT0, "Corsica",           "Cherry Master (Corsica, ver.8.01)",           0 ) /* says ED-96 where the manufacturer is on some games.. */
+
+
 
 // most of these are almost certainly bootlegs, with added features, hacked payouts etc. identifying which are
 // the original, unmodified dyna versions is almost impossible due to lack of documentation from back in the day,
@@ -9951,7 +10306,7 @@ GAME(  1991, cmasterf,  cmaster,  cm,       cmasterb, cmv4,      ROT0, "Dyna",  
 
 
 GAME(  1991, tonypok,   0,        cm,       cmv801,   tonypok,   ROT0, "Corsica",           "Poker Master (Tony-Poker V3.A, hack?)",   0 )
-GAME(  199?, jkrmast,   0,        pkrmast,  cmasterb, cmv4,      ROT0, "<unknown>",         "Joker Master",                                GAME_NOT_WORKING ) // incomplete dump + encrypted?
+GAME(  199?, jkrmast,   0,        pkrmast,  cmasterb, cmv4,      ROT0, "<unknown>",         "Joker Master",                                GAME_NOT_WORKING ) // encrypted?
 GAME(  199?, pkrmast,   jkrmast,  pkrmast,  cmasterb, cmv4,      ROT0, "<unknown>",         "Poker Master (set 1)",                        GAME_NOT_WORKING ) // incomplete dump + encrypted?
 GAME(  199?, pkrmasta,  jkrmast,  pkrmast,  cmasterb, cmv4,      ROT0, "<unknown>",         "Poker Master (set 2)",                        GAME_NOT_WORKING ) // incomplete dump + encrypted?
 
@@ -9969,9 +10324,13 @@ GAMEL( 198?, kkojnoli,  0,        kkojnoli, kkojnoli, 0,         ROT0, "hack",  
 GAME(  198?, ladylinr,  0,        ladylinr, ladylinr, 0,         ROT0, "TAB Austria",          "Lady Liner",                                               0 )
 GAME(  198?, wcat3,     0,        wcat3,    lucky8,   0,         ROT0, "E.A.I.",               "Wild Cat 3",                                               GAME_NOT_WORKING )
 
-GAME(  1992, magical,   0,        magical,  magical,  0,         ROT0, "Pal Company / Micro Manufacturing Inc.", "Magical Odds (set 1)",               GAME_WRONG_COLORS | GAME_IMPERFECT_GRAPHICS )
-GAME(  1992, magicala,  magical,  magical,  magical,  0,         ROT0, "Pal Company / Micro Manufacturing Inc.", "Magical Odds (set 2)",               GAME_WRONG_COLORS | GAME_IMPERFECT_GRAPHICS )
-GAME(  1991, mtonic,    magical,  magical,  mtonic,   mtonic,    ROT0, "Pal Company",                            "Magical Odds (set 3, alt hardware)", GAME_WRONG_COLORS | GAME_NOT_WORKING |GAME_NO_SOUND) // Magical Odds logo / company in GFX
+GAME( 1985, luckylad,   0,        lucky8,   luckylad, 0,         ROT0, "Wing Co., Ltd.",       "Lucky Lady (Wing, encrypted)",                             GAME_NOT_WORKING ) // encrypted...
+
+GAME(  1992, magodds,   0,         magodds,  magodds,   0,         ROT0, "Pal Company / Micro Manufacturing Inc.", "Magical Odds (set 1)",               GAME_WRONG_COLORS | GAME_IMPERFECT_GRAPHICS )
+GAME(  1992, magoddsa,   magodds,  magodds,  magodds,   0,         ROT0, "Pal Company / Micro Manufacturing Inc.", "Magical Odds (set 2)",               GAME_WRONG_COLORS | GAME_IMPERFECT_GRAPHICS )
+GAME(  1992, magoddsb,   magodds,  magodds,  magodds,   0,         ROT0, "Pal Company / Micro Manufacturing Inc.", "Magical Odds (set 3)",               GAME_WRONG_COLORS | GAME_IMPERFECT_GRAPHICS )
+GAME(  1991, magoddsc,   magodds,  magodds,  magoddsc,  magoddsc,  ROT0, "Pal Company",                            "Magical Odds (set 4, custom encrypted CPU block)", GAME_WRONG_COLORS | GAME_NOT_WORKING |GAME_NO_SOUND)
+GAME(  1991, magoddsd,   magodds,  magodds,  magoddsc,  magoddsc,  ROT0, "Pal Company",                            "Magical Odds (set 5, custom encrypted CPU block)", GAME_WRONG_COLORS | GAME_NOT_WORKING |GAME_NO_SOUND)
 
 
 /* --- Amcoe games --- */

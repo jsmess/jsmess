@@ -237,16 +237,16 @@ static const discrete_555_desc dkong_555_vco_desc =
 	DK_SUP_V - 0.5
 };
 
-static const discrete_inverter_osc_desc dkong_inverter_osc_desc_jump =
+static const discrete_dss_inverter_osc_node::description dkong_inverter_osc_desc_jump =
 {
 	DEFAULT_CD40XX_VALUES(DK_SUP_V),
-	DISC_OSC_INVERTER_IS_TYPE1
+	discrete_dss_inverter_osc_node::IS_TYPE1
 };
 
-static const discrete_inverter_osc_desc dkong_inverter_osc_desc_walk =
+static const discrete_dss_inverter_osc_node::description dkong_inverter_osc_desc_walk =
 {
 	DEFAULT_CD40XX_VALUES(DK_SUP_V),
-	DISC_OSC_INVERTER_IS_TYPE2
+	discrete_dss_inverter_osc_node::IS_TYPE2
 };
 
 static const discrete_op_amp_filt_info dkong_sallen_key_info =
@@ -294,59 +294,51 @@ static const discrete_op_amp_filt_info dkong_sallen_key_info =
 #define DKONG_CUSTOM_C			DISCRETE_INPUT(6)
 #define DKONG_CUSTOM_V			DISCRETE_INPUT(7)
 
-struct dkong_custom_mixer_context
-{
-	double i_in1[2];
-	double r_in[2];
-	double r_total[2];
-	double exp[2];
-};
+DISCRETE_CLASS_STEP_RESET(dkong_custom_mixer, 1,
+	double m_i_in1[2];
+	double m_r_in[2];
+	double m_r_total[2];
+	double m_exp[2];
+	double m_out_v;
+);
 
 DISCRETE_STEP( dkong_custom_mixer )
 {
-	DISCRETE_DECLARE_CONTEXT(dkong_custom_mixer)
-
 	int		in_1    = (int)DKONG_CUSTOM_IN1;
 
 	/* start of with 555 current */
 	double	i_total = DKONG_CUSTOM_V / RES_K(5);
 	/* add in current from In1 */
-	i_total += context->i_in1[in_1];
+	i_total += m_i_in1[in_1];
 	/* add in current from In2 */
 	i_total += DKONG_CUSTOM_IN2 / DKONG_CUSTOM_R3;
 	/* charge cap */
-	/* node->output is cap voltage, (i_total * context->r_total[in_1]) is current charge voltage */
-	node->output[0] += (i_total * context->r_total[in_1] - node->output[0]) * context->exp[in_1];
+	/* node->output is cap voltage, (i_total * m_r_total[in_1]) is current charge voltage */
+	m_out_v += (i_total * m_r_total[in_1] - m_out_v) * m_exp[in_1];
+	set_output(0, m_out_v);
 }
 
 #define	NE555_CV_R		RES_2_PARALLEL(RES_K(5), RES_K(10))
 
 DISCRETE_RESET( dkong_custom_mixer )
 {
-	DISCRETE_DECLARE_CONTEXT(dkong_custom_mixer)
-
 	/* everything is based on the input to the O.C. inverter */
 	/* precalculate current from In1 */
-	context->i_in1[0] = DKONG_CUSTOM_V / (DKONG_CUSTOM_R1 + DKONG_CUSTOM_R2);
-	context->i_in1[1] = 0;
+	m_i_in1[0] = DKONG_CUSTOM_V / (DKONG_CUSTOM_R1 + DKONG_CUSTOM_R2);
+	m_i_in1[1] = 0;
 	/* precalculate total resistance for input circuit */
-	context->r_in[0] = RES_2_PARALLEL((DKONG_CUSTOM_R1 + DKONG_CUSTOM_R2), DKONG_CUSTOM_R3);
-	context->r_in[1] = RES_2_PARALLEL(DKONG_CUSTOM_R2, DKONG_CUSTOM_R3);
+	m_r_in[0] = RES_2_PARALLEL((DKONG_CUSTOM_R1 + DKONG_CUSTOM_R2), DKONG_CUSTOM_R3);
+	m_r_in[1] = RES_2_PARALLEL(DKONG_CUSTOM_R2, DKONG_CUSTOM_R3);
 	/* precalculate total charging resistance */
-	context->r_total[0] = RES_2_PARALLEL(context->r_in[0] + DKONG_CUSTOM_R4, NE555_CV_R);
-	context->r_total[1] = RES_2_PARALLEL((context->r_in[1] + DKONG_CUSTOM_R4), NE555_CV_R);
+	m_r_total[0] = RES_2_PARALLEL(m_r_in[0] + DKONG_CUSTOM_R4, NE555_CV_R);
+	m_r_total[1] = RES_2_PARALLEL((m_r_in[1] + DKONG_CUSTOM_R4), NE555_CV_R);
 	/* precalculate charging exponents */
-	context->exp[0] = RC_CHARGE_EXP(context->r_total[0] * DKONG_CUSTOM_C);
-	context->exp[1] = RC_CHARGE_EXP(context->r_total[1] * DKONG_CUSTOM_C);
+	m_exp[0] = RC_CHARGE_EXP(m_r_total[0] * DKONG_CUSTOM_C);
+	m_exp[1] = RC_CHARGE_EXP(m_r_total[1] * DKONG_CUSTOM_C);
 
-	node->output[0] = 0;
+	m_out_v = 0;
 }
 
-static const discrete_custom_info dkong_custom_mixer_info =
-{
-	DISCRETE_CUSTOM_MODULE( dkong_custom_mixer, struct dkong_custom_mixer_context),
-	NULL
-};
 #endif
 
 static DISCRETE_SOUND_START(dkong2b)
@@ -394,11 +386,11 @@ static DISCRETE_SOUND_START(dkong2b)
 
 #if DK_USE_CUSTOM
 	/* custom mixer for 555 CV voltage */
-	DISCRETE_CUSTOM8(NODE_28, DS_SOUND1_INV, NODE_25,
-				DK_R32, DK_R50, DK_R51, DK_R49, DK_C24, DK_SUP_V, &dkong_custom_mixer_info)
+	DISCRETE_CUSTOM8(NODE_28, dkong_custom_mixer, DS_SOUND1_INV, NODE_25,
+				DK_R32, DK_R50, DK_R51, DK_R49, DK_C24, DK_SUP_V, NULL)
 #else
-	DISCRETE_LOGIC_INVERT(DS_SOUND1,1,DS_SOUND1_INV)
-	DISCRETE_MULTIPLY(NODE_24,1,DS_SOUND1,DK_SUP_V)
+	DISCRETE_LOGIC_INVERT(DS_SOUND1,DS_SOUND1_INV)
+	DISCRETE_MULTIPLY(NODE_24,DS_SOUND1,DK_SUP_V)
 	DISCRETE_TRANSFORM3(NODE_26,DS_SOUND1,DK_R32,DK_R49+DK_R50,"01*2+")
 	DISCRETE_MIXER4(NODE_28, 1, NODE_24, NODE_25, DK_SUP_V, 0,&dkong_rc_jump_desc)
 #endif
@@ -426,11 +418,11 @@ static DISCRETE_SOUND_START(dkong2b)
 
 #if DK_USE_CUSTOM
 	/* custom mixer for 555 CV voltage */
-	DISCRETE_CUSTOM8(NODE_54, DS_SOUND0_INV, NODE_51,
-				DK_R36, DK_R45, DK_R46, DK_R44, DK_C29, DK_SUP_V, &dkong_custom_mixer_info)
+	DISCRETE_CUSTOM8(NODE_54, dkong_custom_mixer, DS_SOUND0_INV, NODE_51,
+				DK_R36, DK_R45, DK_R46, DK_R44, DK_C29, DK_SUP_V, NULL)
 #else
-	DISCRETE_LOGIC_INVERT(DS_SOUND0,1,DS_SOUND0_INV)
-	DISCRETE_MULTIPLY(NODE_50,1,DS_SOUND0,DK_SUP_V)
+	DISCRETE_LOGIC_INVERT(DS_SOUND0,DS_SOUND0_INV)
+	DISCRETE_MULTIPLY(NODE_50,DS_SOUND0,DK_SUP_V)
 	DISCRETE_TRANSFORM3(NODE_52,DS_SOUND0,DK_R46,R_SERIES(DK_R44,DK_R45),"01*2+")
 	DISCRETE_MIXER4(NODE_54, 1, NODE_50, NODE_51, DK_SUP_V, 0,&dkong_rc_walk_desc)
 #endif
@@ -617,14 +609,14 @@ static const discrete_mixer_desc radarscp_mixer_desc_7 =
 
 #define radarscp_555_vco_desc  dkong_555_vco_desc
 
-static const discrete_inverter_osc_desc radarscp_inverter_osc_desc_0 =
+static const discrete_dss_inverter_osc_node::description radarscp_inverter_osc_desc_0 =
 	{DEFAULT_CD40XX_VALUES(DK_SUP_V),
-	DISC_OSC_INVERTER_IS_TYPE2
+	discrete_dss_inverter_osc_node::IS_TYPE2
 	};
 
-static const discrete_inverter_osc_desc radarscp_inverter_osc_desc_7 =
+static const discrete_dss_inverter_osc_node::description radarscp_inverter_osc_desc_7 =
 	{DEFAULT_CD40XX_VALUES(DK_SUP_V),
-	DISC_OSC_INVERTER_IS_TYPE3
+	discrete_dss_inverter_osc_node::IS_TYPE3
 	};
 
 static DISCRETE_SOUND_START(radarscp)
@@ -1402,15 +1394,13 @@ MACHINE_CONFIG_FRAGMENT( dkong2b_audio )
 	MCFG_CPU_IO_MAP(dkong_sound_io_map)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
-	MCFG_SOUND_CONFIG_DISCRETE(dkong2b)
+	MCFG_DISCRETE_ADD("discrete", 0, dkong2b)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED( radarscp_audio, dkong2b_audio )
-	MCFG_SOUND_MODIFY("discrete")
-	MCFG_SOUND_CONFIG_DISCRETE(radarscp)
+	MCFG_DISCRETE_REPLACE("discrete", 0, radarscp)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.7)
 
 MACHINE_CONFIG_END
@@ -1466,8 +1456,7 @@ MACHINE_CONFIG_FRAGMENT( dkongjr_audio )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
-	MCFG_SOUND_CONFIG_DISCRETE(dkongjr)
+	MCFG_DISCRETE_ADD("discrete", 0, dkongjr)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 MACHINE_CONFIG_END

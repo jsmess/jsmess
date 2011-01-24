@@ -2229,7 +2229,7 @@ ROM_START( daiskiss )
 	ROM_LOAD( "535a22.9g", 0x000000, 2*1024*1024, CRC(7ee59acb) SHA1(782bf15f205e9fe7bd069f6445eb8187837dee32) )
 ROM_END
 
-/* Sexy Parodius */
+/* Sexy Parodius version JAA (Japan) */
 ROM_START( sexyparo )
 	/* main program */
 	ROM_REGION( 0x800000, "maincpu", 0 )
@@ -2245,7 +2245,37 @@ ROM_START( sexyparo )
 	/* tiles */
 	ROM_REGION( 0x500000, "gfx1", ROMREGION_ERASE00 )
 	TILE_WORD_ROM_LOAD( "533a19.17h", 0x000000, 2*1024*1024, CRC(3ec1843e) SHA1(5d2c37f1eb299c846daa63f35ccd5334a516a1f5) )
-	TILE_BYTE_ROM_LOAD( "533-ja.13g", 0x000004, 512*1024,    CRC(d3e0d058) SHA1(c50bdb3493501bfbbe092d01f5d4c38bfa3412f8) )
+	TILE_BYTE_ROM_LOAD( "533a18.13g", 0x000004, 512*1024,    CRC(d3e0d058) SHA1(c50bdb3493501bfbbe092d01f5d4c38bfa3412f8) )
+
+	/* sprites */
+	ROM_REGION( 0x600000, "gfx2", ROMREGION_ERASE00 )
+	ROM_LOAD32_WORD( "533a17.25g", 0x000000, 2*1024*1024, CRC(9947af57) SHA1(a8f67cb49cf55e8402de352bb530c7c90c643144) )
+	ROM_LOAD32_WORD( "533a13.28g", 0x000002, 2*1024*1024, CRC(58f1fc38) SHA1(9662b4fb036ffe90f294ee36fa52a0c1e1dbd116) )
+	ROM_LOAD( "533a11.30g", 0x400000, 2*1024*1024, CRC(983105e1) SHA1(c688f6f73fab16107f01523081558a2e02a5311c) )
+
+	/* sound data */
+	ROM_REGION( 0x400000, "shared", 0 )
+	ROM_LOAD( "533a22.9g", 0x000000, 2*1024*1024, CRC(97233814) SHA1(dba20a81517796b7baf7c82551bd7f1c1a8ecd7e) )
+	ROM_LOAD( "533a23.7g", 0x200000, 2*1024*1024, CRC(1bb7552b) SHA1(3c6f96b4ab97737c3634c08b94dd304d5517d88d) )
+ROM_END
+
+/* Sexy Parodius version AAA (Asia) */
+ROM_START( sexyparoa )
+	/* main program */
+	ROM_REGION( 0x800000, "maincpu", 0 )
+	GX_BIOS
+	ROM_LOAD32_WORD_SWAP( "533aaa02.31b", 0x200002, 512*1024, CRC(4fdc4298) SHA1(6aa0d6d00dada9d1bfe2b29cd342b11e2d42bf5a) )
+	ROM_LOAD32_WORD_SWAP( "533aaa03.27b", 0x200000, 512*1024, CRC(9c5e07cb) SHA1(4d7dbd9b0e47d501ab3f22c48942bb9e54450d87) )
+
+	/* sound program */
+	ROM_REGION( 0x40000, "soundcpu", 0 )
+	ROM_LOAD16_BYTE("533aaa08.9c", 0x000000, 128*1024, CRC(f2e2c963) SHA1(5b4ac1df208467cfac2927ce0b340090d631f190) )
+	ROM_LOAD16_BYTE("533aaa09.7c", 0x000001, 128*1024, CRC(49086451) SHA1(8fdbeb5889e476dfd3f31619d5b5280a0494de69) )
+
+	/* tiles */
+	ROM_REGION( 0x500000, "gfx1", ROMREGION_ERASE00 )
+	TILE_WORD_ROM_LOAD( "533a19.17h", 0x000000, 2*1024*1024, CRC(3ec1843e) SHA1(5d2c37f1eb299c846daa63f35ccd5334a516a1f5) )
+	TILE_BYTE_ROM_LOAD( "533a18.13g", 0x000004, 512*1024,    CRC(d3e0d058) SHA1(c50bdb3493501bfbbe092d01f5d4c38bfa3412f8) )
 
 	/* sprites */
 	ROM_REGION( 0x600000, "gfx2", ROMREGION_ERASE00 )
@@ -2380,8 +2410,8 @@ ROM_START( rushhero )
 	_48_WORD_ROM_LOAD( "605a19.14r", 0x0000000, 4*1024*1024, CRC(293427d0) SHA1(c31f93797bda09ea7e990100a5556eb0fde64968) )
 	_48_WORD_ROM_LOAD( "605a15.18r", 0x0000002, 4*1024*1024, CRC(19e6e356) SHA1(b2568e14d6fb9a9792f95aafcf694dbf00c0d2c8) )
 	_48_WORD_ROM_LOAD( "605a11.23r", 0x0000004, 4*1024*1024, CRC(bc61339c) SHA1(77a5737501bf8ffd7ae4192a6e5924c479eb6655) )
-	_48_WORD_ROM_LOAD( "605a17.16r", 0x0c00000, 4*1024*1024, BAD_DUMP CRC(42e6dc6f) SHA1(8035b7160267a988a1aa2690423c68b6f1975f1a) ) // - these two looks suspicious...
-	_48_WORD_ROM_LOAD( "605a13.21r", 0x0c00002, 4*1024*1024, BAD_DUMP CRC(08137923) SHA1(c1af6b55c1c08e16384d2660b2210ccf3b955be9) ) // /
+	_48_WORD_ROM_LOAD( "605a17.16r", 0x0c00000, 4*1024*1024, CRC(7a8f1cf9) SHA1(4c07f846915bded61c40876a10f5457e8895ad58) )
+	_48_WORD_ROM_LOAD( "605a13.21r", 0x0c00002, 4*1024*1024, CRC(9a6dff6d) SHA1(cbc200bde5933098e768db8d3021f77bdfe454b8) )
 	_48_WORD_ROM_LOAD( "605a09.25r", 0x0c00004, 4*1024*1024, CRC(624fd486) SHA1(edd81d5487f8239ffa89b931430cf41f06a17cf6) )
 	_48_WORD_ROM_LOAD( "605a14.14m", 0x1800000, 4*1024*1024, CRC(4d4dbecb) SHA1(7c3cb2739d6b729d855d652b1991c7af6cd79d1c) )
 	_48_WORD_ROM_LOAD( "605a18.18m", 0x1800002, 4*1024*1024, CRC(b5115d76) SHA1(48c3119afb649c58d4df36806fe5530ddd379782) )
@@ -2392,8 +2422,7 @@ ROM_START( rushhero )
 
 	/* PSAC2 tiles */
 	ROM_REGION( 0x200000, "gfx3", 0 )
-	ROM_LOAD("605a24.22h", 0x000000, 1024*1024, BAD_DUMP CRC(e5ba1bb7) SHA1(d677e03b418a8bde7a4e4932fd452924768e7d72)) //half size, missing title screen gfxs
-	ROM_RELOAD(0x100000,0x100000)
+	ROM_LOAD("605a24.22h", 0x000000, 2*1024*1024, CRC(73f06065) SHA1(8ca6747204a4c2cf59f19bcc9fce280e796e4a6e))
 
 	/* sound data */
 	ROM_REGION( 0x400000, "shared", 0 )
@@ -3691,6 +3720,7 @@ static const GXGameInfoT gameDefs[] =
 	{ "dragoonj",  7, 16, 3, BPP4 },
 	{ "dragoona",  7, 16, 3, BPP4 },
 	{ "sexyparo",  7, 0, 4, BPP5 },
+	{ "sexyparoa", 7, 0, 4, BPP5 },
 	{ "daiskiss",  7, 0, 5, BPP5 },
 	{ "tokkae",    7, 0, 0, BPP5 },
 	{ "salmndr2",  7, 0, 6, BPP66 },
@@ -3856,6 +3886,7 @@ GAME( 1995, dragoona, konamigx, dragoonj, dragoonj, konamigx, ROT0, "Konami", "D
 GAME( 1995, dragoonj, dragoona, dragoonj, dragoonj, konamigx, ROT0, "Konami", "Dragoon Might (ver JAA)", GAME_IMPERFECT_GRAPHICS )
 
 GAME( 1996, sexyparo, konamigx, konamigx, gokuparo, konamigx, ROT0, "Konami", "Sexy Parodius (ver JAA)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1996, sexyparoa,sexyparo, konamigx, gokuparo, konamigx, ROT0, "Konami", "Sexy Parodius (ver AAA)", GAME_IMPERFECT_GRAPHICS )
 
 GAME( 1996, daiskiss, konamigx, konamigx, gokuparo, konamigx, ROT0, "Konami", "Daisu-Kiss (ver JAA)", GAME_IMPERFECT_GRAPHICS )
 

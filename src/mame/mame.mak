@@ -122,8 +122,9 @@ CPUS += I8008
 CPUS += SCMP
 CPUS += MN10200
 CPUS += COSMAC
-
-
+CPUS += PPS4
+CPUS += UPD7725
+CPUS += HD61700
 
 #-------------------------------------------------
 # specify available sound cores; some of these are
@@ -235,8 +236,12 @@ SOUNDS += S2636
 # the list of drivers
 #-------------------------------------------------
 
-DRVLIBS = \
-	$(MAMEOBJ)/mamedriv.o \
+ifeq ($(TARGET),mame)
+DRVLIBS += \
+	$(MAMEOBJ)/mamedriv.o
+endif
+
+DRVLIBS += \
 	$(MAMEOBJ)/alba.a \
 	$(MAMEOBJ)/alliedl.a \
 	$(MAMEOBJ)/alpha.a \
@@ -326,6 +331,7 @@ DRVLIBS = \
 	$(MAMEOBJ)/yunsung.a \
 	$(MAMEOBJ)/zaccaria.a \
 	$(MAMEOBJ)/misc.a \
+	$(MAMEOBJ)/pinball.a \
 	$(MAMEOBJ)/shared.a \
 
 
@@ -658,9 +664,10 @@ $(MAMEOBJ)/fuuki.a: \
 	$(DRIVERS)/fuukifg3.o $(VIDEO)/fuukifg3.o \
 
 $(MAMEOBJ)/gaelco.a: \
+	$(DRIVERS)/atvtrack.o \
 	$(DRIVERS)/gaelco.o $(VIDEO)/gaelco.o $(MACHINE)/gaelcrpt.o \
 	$(DRIVERS)/gaelco2.o $(MACHINE)/gaelco2.o $(VIDEO)/gaelco2.o \
-	$(DRIVERS)/gaelco3d.o $(VIDEO)/gaelco3d.o \
+	$(DRIVERS)/gaelco3d.o $(VIDEO)/gaelco3d.o $(MACHINE)/gaelco3d.o\
 	$(DRIVERS)/glass.o $(VIDEO)/glass.o \
 	$(DRIVERS)/mastboy.o \
 	$(DRIVERS)/splash.o $(VIDEO)/splash.o \
@@ -962,6 +969,7 @@ $(MAMEOBJ)/namco.a: \
 	$(MACHINE)/namco50.o \
 	$(MACHINE)/namco51.o \
 	$(MACHINE)/namco53.o \
+	$(MACHINE)/namco62.o \
 	$(AUDIO)/namco52.o \
 	$(AUDIO)/namco54.o \
 	$(AUDIO)/namcoc7x.o \
@@ -1126,7 +1134,9 @@ $(MAMEOBJ)/sega.a: \
 	$(DRIVERS)/hikaru.o \
 	$(DRIVERS)/hshavoc.o \
 	$(DRIVERS)/kopunch.o $(VIDEO)/kopunch.o \
+	$(MACHINE)/megadriv.o \
 	$(DRIVERS)/megadriv.o \
+	$(MACHINE)/md_cart.o \
 	$(DRIVERS)/megadrvb.o \
 	$(DRIVERS)/megaplay.o \
 	$(DRIVERS)/megatech.o \
@@ -1147,7 +1157,7 @@ $(MAMEOBJ)/sega.a: \
 	$(DRIVERS)/segas18.o $(VIDEO)/segas18.o \
 	$(DRIVERS)/segas24.o $(MACHINE)/segas24.o $(VIDEO)/segas24.o \
 	$(DRIVERS)/segas32.o $(MACHINE)/segas32.o $(VIDEO)/segas32.o \
-	$(DRIVERS)/segamsys.o $(DRIVERS)/segae.o \
+	$(MACHINE)/segamsys.o $(DRIVERS)/segae.o \
 	$(DRIVERS)/segaxbd.o $(VIDEO)/segaxbd.o \
 	$(DRIVERS)/segaybd.o $(VIDEO)/segaybd.o \
 	$(DRIVERS)/sg1000a.o \
@@ -1418,6 +1428,7 @@ $(MAMEOBJ)/toaplan.a: \
 
 $(MAMEOBJ)/tong.a: \
 	$(DRIVERS)/beezer.o $(MACHINE)/beezer.o $(VIDEO)/beezer.o \
+	$(AUDIO)/beezer.o \
 
 $(MAMEOBJ)/unico.a: \
 	$(DRIVERS)/drgnmst.o $(VIDEO)/drgnmst.o \
@@ -1480,6 +1491,84 @@ $(MAMEOBJ)/zaccaria.a: \
 	$(DRIVERS)/zac2650.o $(VIDEO)/zac2650.o \
 	$(DRIVERS)/zaccaria.o $(VIDEO)/zaccaria.o \
 
+
+#-------------------------------------------------
+# pinball drivers
+#-------------------------------------------------
+$(MAMEOBJ)/pinball.a: \
+	$(DRIVERS)/allied.o  \
+	$(DRIVERS)/alvg.o  \
+	$(DRIVERS)/atari_s1.o  \
+	$(DRIVERS)/atari_s2.o  \
+	$(DRIVERS)/atari_s3.o  \
+	$(DRIVERS)/bingo.o  \
+	$(DRIVERS)/by17.o  \
+	$(DRIVERS)/by35.o  \
+	$(DRIVERS)/by6803.o  \
+	$(DRIVERS)/by68701.o  \
+	$(DRIVERS)/byvid.o  \
+	$(DRIVERS)/capcom.o  \
+	$(DRIVERS)/de_1.o  \
+	$(DRIVERS)/de_2.o  \
+	$(DRIVERS)/de_3.o  \
+	$(DRIVERS)/de_3b.o  \
+	$(DRIVERS)/flicker.o  \
+	$(DRIVERS)/g627.o  \
+	$(DRIVERS)/gp_1.o  \
+	$(DRIVERS)/gp_2.o  \
+	$(DRIVERS)/gts1.o  \
+	$(DRIVERS)/gts3.o  \
+	$(DRIVERS)/gts80.o  \
+	$(DRIVERS)/gts80a.o  \
+	$(DRIVERS)/gts80b.o  \
+	$(DRIVERS)/hankin.o  \
+	$(DRIVERS)/icecold.o  \
+	$(DRIVERS)/inder.o  \
+	$(DRIVERS)/jp.o  \
+	$(DRIVERS)/jvh.o  \
+	$(DRIVERS)/kissproto.o  \
+	$(DRIVERS)/ltd.o  \
+	$(DRIVERS)/micropin.o  \
+	$(DRIVERS)/mephisto.o  \
+	$(DRIVERS)/mrgame.o  \
+	$(DRIVERS)/nsm.o  \
+	$(DRIVERS)/peyper.o  \
+	$(DRIVERS)/play_1.o  \
+	$(DRIVERS)/play_2.o  \
+	$(DRIVERS)/play_3.o  \
+	$(DRIVERS)/play_5.o  \
+	$(DRIVERS)/rowamet.o  \
+	$(DRIVERS)/s11.o  \
+	$(DRIVERS)/s11a.o  \
+	$(DRIVERS)/s11b.o  \
+	$(DRIVERS)/s11c.o  \
+	$(DRIVERS)/s3.o  \
+	$(DRIVERS)/s4.o  \
+	$(DRIVERS)/s6.o  \
+	$(DRIVERS)/s6a.o  \
+	$(DRIVERS)/s7.o  \
+	$(DRIVERS)/s8.o  \
+	$(DRIVERS)/s9.o  \
+	$(DRIVERS)/sleic.o  \
+	$(DRIVERS)/spinb.o  \
+	$(DRIVERS)/st_mp100.o  \
+	$(DRIVERS)/st_mp200.o  \
+	$(DRIVERS)/taito.o  \
+	$(DRIVERS)/techno.o  \
+	$(DRIVERS)/vd.o  \
+	$(DRIVERS)/whitestar.o  \
+	$(DRIVERS)/white_mod.o  \
+	$(DRIVERS)/wico.o  \
+	$(DRIVERS)/wpc_95.o  \
+	$(DRIVERS)/wpc_an.o  \
+	$(DRIVERS)/wpc_dcs.o  \
+	$(DRIVERS)/wpc_dot.o  \
+	$(DRIVERS)/wpc_flip1.o  \
+	$(DRIVERS)/wpc_flip2.o  \
+	$(DRIVERS)/wpc_s.o  \
+	$(DRIVERS)/zac_1.o  \
+	$(DRIVERS)/zac_2.o  \
+	$(DRIVERS)/zac_proto.o  \
 
 #-------------------------------------------------
 # remaining drivers
@@ -1909,7 +1998,7 @@ $(DRIVERS)/wecleman.o:	$(LAYOUT)/wecleman.lh
 
 $(DRIVERS)/zac2650.o:	$(LAYOUT)/tinv2650.lh
 
-
+$(MAMEOBJ)/mamedriv.o:	$(LAYOUT)/pinball.lh
 
 #-------------------------------------------------
 # misc dependencies
@@ -1918,11 +2007,7 @@ $(DRIVERS)/zac2650.o:	$(LAYOUT)/tinv2650.lh
 $(DRIVERS)/galaxian.o:	$(MAMESRC)/drivers/galdrvr.c
 $(DRIVERS)/mpu4.o:		$(MAMESRC)/drivers/mpu4drvr.c
 $(DRIVERS)/neogeo.o:	$(MAMESRC)/drivers/neodrvr.c
-$(MACHINE)/snes.o:		$(MAMESRC)/machine/snesdsp1.c \
-				$(MAMESRC)/machine/snesdsp2.c \
-				$(MAMESRC)/machine/snesdsp3.c \
-				$(MAMESRC)/machine/snesdsp4.c \
-				$(MAMESRC)/machine/snesobc1.c \
+$(MACHINE)/snes.o:  	$(MAMESRC)/machine/snesobc1.c \
 				$(MAMESRC)/machine/snescx4.c \
 				$(MAMESRC)/machine/cx4ops.c \
 				$(MAMESRC)/machine/cx4oam.c \
@@ -1930,7 +2015,6 @@ $(MACHINE)/snes.o:		$(MAMESRC)/machine/snesdsp1.c \
 				$(MAMESRC)/machine/cx4data.c \
 				$(MAMESRC)/machine/snesrtc.c \
 				$(MAMESRC)/machine/snessdd1.c \
-				$(MAMESRC)/machine/snesst10.c \
 				$(MAMESRC)/machine/snes7110.c \
 				$(MAMESRC)/machine/snesbsx.c
 $(VIDEO)/jaguar.o:		$(MAMESRC)/video/jagobj.c \

@@ -68,6 +68,7 @@ DISCRETE_STEP(dsd_555_astbl)
 	double	v_charge, exponent = 0;
 	UINT8	flip_flop = m_flip_flop;
 	UINT8	update_exponent = 0;
+	double	v_out = 0.0;
 
 	/* put commonly used stuff in local variables for speed */
 	double	threshold = m_threshold;
@@ -76,7 +77,7 @@ DISCRETE_STEP(dsd_555_astbl)
 	if(DSD_555_ASTBL__RESET)
 	{
 		/* We are in RESET */
-		this->output[0]      = 0;
+		set_output(0, 0);
 		m_flip_flop   = 1;
 		m_cap_voltage = 0;
 		return;
@@ -154,9 +155,9 @@ DISCRETE_STEP(dsd_555_astbl)
 			m_t_rc_bleed  = DSD_555_ASTBL_T_RC_BLEED;
 			m_t_rc_charge = DSD_555_ASTBL_T_RC_CHARGE;
 			m_t_rc_discharge = DSD_555_ASTBL_T_RC_DISCHARGE;
-			m_exp_bleed  = RC_CHARGE_EXP_CLASS(m_t_rc_bleed);
-			m_exp_charge = RC_CHARGE_EXP_CLASS(m_t_rc_charge);
-			m_exp_discharge = RC_CHARGE_EXP_CLASS(m_t_rc_discharge);
+			m_exp_bleed  = RC_CHARGE_EXP(m_t_rc_bleed);
+			m_exp_charge = RC_CHARGE_EXP(m_t_rc_charge);
+			m_exp_discharge = RC_CHARGE_EXP(m_t_rc_discharge);
 			m_last_r1 = DSD_555_ASTBL__R1;
 			m_last_r2 = DSD_555_ASTBL__R2;
 			m_last_c  = DSD_555_ASTBL__C;
@@ -245,46 +246,45 @@ DISCRETE_STEP(dsd_555_astbl)
 		case DISC_555_OUT_SQW:
 			if (count_f + count_r >= 2)
 				/* force at least 1 toggle */
-				this->output[0] = m_flip_flop ? 0 : m_v_out_high;
+				v_out =  m_flip_flop ? 0 : m_v_out_high;
 			else
-				this->output[0] = flip_flop * m_v_out_high;
-			this->output[0] += m_ac_shift;
+				v_out =  flip_flop * m_v_out_high;
+			v_out += m_ac_shift;
 			break;
 		case DISC_555_OUT_CAP:
-			this->output[0] = v_cap;
+			v_out =  v_cap;
 			/* Fake it to AC if needed */
 			if (m_output_is_ac)
-				this->output[0] -= threshold * 3.0 /4.0;
+				v_out -= threshold * 3.0 /4.0;
 			break;
 		case DISC_555_OUT_ENERGY:
 			if (x_time == 0) x_time = 1.0;
-			this->output[0]  = m_v_out_high * (flip_flop ? x_time : (1.0 - x_time));
-			this->output[0] += m_ac_shift;
+			v_out = m_v_out_high * (flip_flop ? x_time : (1.0 - x_time));
+			v_out += m_ac_shift;
 			break;
 		case DISC_555_OUT_LOGIC_X:
-			this->output[0] = flip_flop + x_time;
+			v_out =  flip_flop + x_time;
 			break;
 		case DISC_555_OUT_COUNT_F_X:
-			this->output[0] = count_f ? count_f + x_time : count_f;
+			v_out = count_f ? count_f + x_time : count_f;
 			break;
 		case DISC_555_OUT_COUNT_R_X:
-			this->output[0] =  count_r ? count_r + x_time : count_r;
+			v_out =  count_r ? count_r + x_time : count_r;
 			break;
 		case DISC_555_OUT_COUNT_F:
-			this->output[0] = count_f;
+			v_out =  count_f;
 			break;
 		case DISC_555_OUT_COUNT_R:
-			this->output[0] = count_r;
+			v_out =  count_r;
 			break;
 	}
+	set_output(0, v_out);
 	m_flip_flop = flip_flop;
 }
 
 DISCRETE_RESET(dsd_555_astbl)
 {
 	DISCRETE_DECLARE_INFO(discrete_555_desc)
-
-	discrete_base_node *v_charge_node;
 
 	m_use_ctrlv   = (this->input_is_node() >> 4) & 1;
 	m_output_type = info->options & DISC_555_OUT_MASK;
@@ -293,13 +293,10 @@ DISCRETE_RESET(dsd_555_astbl)
 	m_v_out_high = (info->v_out_high == DEFAULT_555_HIGH) ? info->v_pos - 1.2 : info->v_out_high;
 
 	/* setup v_charge or node */
-	v_charge_node = this->device->discrete_find_node(info->v_charge);
-	if (v_charge_node)
-		m_v_charge_node = &(v_charge_node->output[NODE_CHILD_NODE_NUM(info->v_charge)]);
-	else
+	m_v_charge_node = m_device->node_output_ptr(info->v_charge);
+	if (m_v_charge_node == NULL)
 	{
 		m_v_charge   = (info->v_charge == DEFAULT_555_CHARGE) ? info->v_pos : info->v_charge;
-		m_v_charge_node = NULL;
 
 		if (info->options & DISC_555_ASTABLE_HAS_FAST_CHARGE_DIODE) m_v_charge -= 0.5;
 	}
@@ -324,11 +321,11 @@ DISCRETE_RESET(dsd_555_astbl)
 	else
 	{
 		m_t_rc_bleed  = DSD_555_ASTBL_T_RC_BLEED;
-		m_exp_bleed   = RC_CHARGE_EXP_CLASS(m_t_rc_bleed);
+		m_exp_bleed   = RC_CHARGE_EXP(m_t_rc_bleed);
 		m_t_rc_charge = DSD_555_ASTBL_T_RC_CHARGE;
-		m_exp_charge  = RC_CHARGE_EXP_CLASS(m_t_rc_charge);
+		m_exp_charge  = RC_CHARGE_EXP(m_t_rc_charge);
 		m_t_rc_discharge = DSD_555_ASTBL_T_RC_DISCHARGE;
-		m_exp_discharge  = RC_CHARGE_EXP_CLASS(m_t_rc_discharge);
+		m_exp_discharge  = RC_CHARGE_EXP(m_t_rc_discharge);
 	}
 
 	m_output_is_ac = info->options & DISC_555_OUT_AC;
@@ -380,7 +377,7 @@ DISCRETE_STEP(dsd_555_mstbl)
 	if(UNEXPECTED(DSD_555_MSTBL__RESET))
 	{
 		/* We are in RESET */
-		this->output[0]     = 0;
+		set_output(0, 0);
 		m_flip_flop  = 0;
 		m_cap_voltage = 0;
 		return;
@@ -494,7 +491,7 @@ DISCRETE_STEP(dsd_555_mstbl)
 			out -= m_ac_shift;
 			break;
 	}
-	this->output[0] = out;
+	set_output(0,  out);
 }
 
 DISCRETE_RESET(dsd_555_mstbl)
@@ -504,7 +501,7 @@ DISCRETE_RESET(dsd_555_mstbl)
 	m_output_type = info->options & DISC_555_OUT_MASK;
 	if ((m_output_type == DISC_555_OUT_COUNT_F) || (m_output_type == DISC_555_OUT_COUNT_R))
 	{
-		this->device->discrete_log("Invalid Output type in NODE_%d.\n", this->index());
+		m_device->discrete_log("Invalid Output type in NODE_%d.\n", this->index());
 		m_output_type = DISC_555_OUT_SQW;
 	}
 
@@ -538,9 +535,9 @@ DISCRETE_RESET(dsd_555_mstbl)
 	if (this->input_is_node() & DSD_555_MSTBL_RC_MASK)
 		m_has_rc_nodes = 1;
 	else
-		m_exp_charge = RC_CHARGE_EXP_CLASS(DSD_555_MSTBL__R * DSD_555_MSTBL__C);
+		m_exp_charge = RC_CHARGE_EXP(DSD_555_MSTBL__R * DSD_555_MSTBL__C);
 
-	this->output[0] = 0;
+	set_output(0,  0);
 }
 
 
@@ -602,11 +599,13 @@ DISCRETE_STEP(dsd_555_cc)
 	UINT8	update_exponent, update_t_rc;
 	UINT8	flip_flop = m_flip_flop;
 
+	double v_out = 0;
+
 
 	if (UNEXPECTED(DSD_555_CC__RESET))
 	{
 		/* We are in RESET */
-		this->output[0]      = 0;
+		set_output(0, 0);
 		m_flip_flop   = 1;
 		m_cap_voltage = 0;
 		return;
@@ -866,36 +865,37 @@ DISCRETE_STEP(dsd_555_cc)
 		case DISC_555_OUT_SQW:
 			if (count_f + count_r >= 2)
 				/* force at least 1 toggle */
-				this->output[0] = m_flip_flop ? 0 : m_v_out_high;
+				v_out =  m_flip_flop ? 0 : m_v_out_high;
 			else
-				this->output[0] = flip_flop * m_v_out_high;
+				v_out = flip_flop * m_v_out_high;
 			/* Fake it to AC if needed */
-			this->output[0] += m_ac_shift;
+			v_out += m_ac_shift;
 			break;
 		case DISC_555_OUT_CAP:
-			this->output[0] = v_cap + m_ac_shift;
+			v_out = v_cap + m_ac_shift;
 			break;
 		case DISC_555_OUT_ENERGY:
 			if (x_time == 0) x_time = 1.0;
-			this->output[0]  = m_v_out_high * (flip_flop ? x_time : (1.0 - x_time));
-			this->output[0] += m_ac_shift;
+			v_out = m_v_out_high * (flip_flop ? x_time : (1.0 - x_time));
+			v_out += m_ac_shift;
 			break;
 		case DISC_555_OUT_LOGIC_X:
-			this->output[0] = flip_flop + x_time;
+			v_out = flip_flop + x_time;
 			break;
 		case DISC_555_OUT_COUNT_F_X:
-			this->output[0] = count_f ? count_f + x_time : count_f;
+			v_out = count_f ? count_f + x_time : count_f;
 			break;
 		case DISC_555_OUT_COUNT_R_X:
-			this->output[0] =  count_r ? count_r + x_time : count_r;
+			v_out = count_r ? count_r + x_time : count_r;
 			break;
 		case DISC_555_OUT_COUNT_F:
-			this->output[0] = count_f;
+			v_out = count_f;
 			break;
 		case DISC_555_OUT_COUNT_R:
-			this->output[0] = count_r;
+			v_out = count_r;
 			break;
 	}
+	set_output(0, v_out);
 	m_flip_flop = flip_flop;
 }
 
@@ -963,15 +963,15 @@ DISCRETE_RESET(dsd_555_cc)
 				break;
 		}
 
-		m_exp_bleed  = RC_CHARGE_EXP_CLASS(DSD_555_CC_T_RC_BLEED);
+		m_exp_bleed  = RC_CHARGE_EXP(DSD_555_CC_T_RC_BLEED);
 		m_t_rc_discharge_01 = DSD_555_CC_T_RC_DISCHARGE_01;
-		m_exp_discharge_01  = RC_CHARGE_EXP_CLASS(m_t_rc_discharge_01);
+		m_exp_discharge_01  = RC_CHARGE_EXP(m_t_rc_discharge_01);
 		m_t_rc_discharge_no_i = DSD_555_CC_T_RC_DISCHARGE_NO_I;
-		m_exp_discharge_no_i  = RC_CHARGE_EXP_CLASS(m_t_rc_discharge_no_i);
+		m_exp_discharge_no_i  = RC_CHARGE_EXP(m_t_rc_discharge_no_i);
 		m_t_rc_charge = DSD_555_CC_T_RC_CHARGE;
-		m_exp_charge  = RC_CHARGE_EXP_CLASS(m_t_rc_charge);
+		m_exp_charge  = RC_CHARGE_EXP(m_t_rc_charge);
 		m_t_rc_discharge = DSD_555_CC_T_RC_DISCHARGE;
-		m_exp_discharge  = RC_CHARGE_EXP_CLASS(m_t_rc_discharge);
+		m_exp_discharge  = RC_CHARGE_EXP(m_t_rc_discharge);
 	}
 
 	/* Step to set the output */
@@ -1139,6 +1139,8 @@ DISCRETE_STEP(dsd_555_vco1)
 	double	v_cap;			/* Current voltage on capacitor, before dt */
 	double	v_cap_next = 0;	/* Voltage on capacitor, after dt */
 
+	double	v_out = 0;
+
 	dt    = this->sample_time();	/* Change in time */
 	v_cap = m_cap_voltage;
 
@@ -1249,35 +1251,36 @@ DISCRETE_STEP(dsd_555_vco1)
 	switch (m_output_type)
 	{
 		case DISC_555_OUT_SQW:
-			this->output[0] = m_flip_flop * m_v_out_high + m_ac_shift;
+			v_out = m_flip_flop * m_v_out_high + m_ac_shift;
 			break;
 		case DISC_555_OUT_CAP:
-			this->output[0] = v_cap_next;
+			v_out = v_cap_next;
 			/* Fake it to AC if needed */
 			if (m_output_is_ac)
-				this->output[0] -= m_threshold * 3.0 /4.0;
+				v_out -= m_threshold * 3.0 /4.0;
 			break;
 		case DISC_555_OUT_ENERGY:
 			if (x_time == 0) x_time = 1.0;
-			this->output[0]  = m_v_out_high * (m_flip_flop ? x_time : (1.0 - x_time));
-			this->output[0] += m_ac_shift;
+			v_out =  m_v_out_high * (m_flip_flop ? x_time : (1.0 - x_time));
+			v_out += m_ac_shift;
 			break;
 		case DISC_555_OUT_LOGIC_X:
-			this->output[0] = m_flip_flop + x_time;
+			v_out = m_flip_flop + x_time;
 			break;
 		case DISC_555_OUT_COUNT_F_X:
-			this->output[0] = count_f ? count_f + x_time : count_f;
+			v_out = count_f ? count_f + x_time : count_f;
 			break;
 		case DISC_555_OUT_COUNT_R_X:
-			this->output[0] =  count_r ? count_r + x_time : count_r;
+			v_out = count_r ? count_r + x_time : count_r;
 			break;
 		case DISC_555_OUT_COUNT_F:
-			this->output[0] = count_f;
+			v_out = count_f;
 			break;
 		case DISC_555_OUT_COUNT_R:
-			this->output[0] = count_r;
+			v_out = count_r;
 			break;
 	}
+	set_output(0, v_out);
 }
 
 DISCRETE_RESET(dsd_555_vco1)
@@ -1426,6 +1429,8 @@ DISCRETE_STEP(dsd_566)
 	double	v_cap;			/* Current voltage on capacitor, before dt */
 	int		count_f = 0, count_r = 0;
 
+	double	v_out = 0.0;
+
 	dt    = this->sample_time();	/* Change in time */
 	v_cap = m_cap_voltage;	/* Set to voltage before change */
 
@@ -1504,37 +1509,38 @@ DISCRETE_STEP(dsd_566)
 	switch (m_out_type)
 	{
 		case DISC_566_OUT_SQUARE:
-			this->output[0] = m_flip_flop ? m_v_sqr_high : m_v_sqr_low;
+			v_out = m_flip_flop ? m_v_sqr_high : m_v_sqr_low;
 			if (m_fake_ac)
-				this->output[0] += m_ac_shift;
+				v_out += m_ac_shift;
 			break;
 		case DISC_566_OUT_ENERGY:
 			if (x_time == 0) x_time = 1.0;
-			this->output[0]  = m_v_sqr_low + m_v_sqr_diff * (m_flip_flop ? x_time : (1.0 - x_time));
+			v_out = m_v_sqr_low + m_v_sqr_diff * (m_flip_flop ? x_time : (1.0 - x_time));
 			if (m_fake_ac)
-				this->output[0] += m_ac_shift;
+				v_out += m_ac_shift;
 			break;
 		case DISC_566_OUT_LOGIC:
-				this->output[0] = m_flip_flop;
+			v_out = m_flip_flop;
 			break;
 		case DISC_566_OUT_TRIANGLE:
-			this->output[0] = v_cap;
+			v_out = v_cap;
 			if (m_fake_ac)
-				this->output[0] += m_ac_shift;
+				v_out += m_ac_shift;
 			break;
 		case DISC_566_OUT_COUNT_F_X:
-			this->output[0] = count_f ? count_f + x_time : count_f;
+			v_out = count_f ? count_f + x_time : count_f;
 			break;
 		case DISC_566_OUT_COUNT_R_X:
-			this->output[0] =  count_r ? count_r + x_time : count_r;
+			v_out = count_r ? count_r + x_time : count_r;
 			break;
 		case DISC_566_OUT_COUNT_F:
-			this->output[0] = count_f;
+			v_out = count_f;
 			break;
 		case DISC_566_OUT_COUNT_R:
-			this->output[0] = count_r;
+			v_out = count_r;
 			break;
 	}
+	set_output(0, v_out);
 }
 
 DISCRETE_RESET(dsd_566)
@@ -1720,29 +1726,29 @@ DISCRETE_STEP(dsd_ls624)
 	switch (m_out_type)
 	{
 		case DISC_LS624_OUT_LOGIC_X:
-				this->output[0] = m_flip_flop  + x_time;
+			set_output(0,  m_flip_flop  + x_time);
 			break;
 		case DISC_LS624_OUT_COUNT_F_X:
-			this->output[0] = count_f ? count_f + x_time : count_f;
+			set_output(0,  count_f ? count_f + x_time : count_f);
 			break;
 		case DISC_LS624_OUT_COUNT_R_X:
-			this->output[0] =  count_r ? count_r + x_time : count_r;
+			set_output(0,   count_r ? count_r + x_time : count_r);
 			break;
 		case DISC_LS624_OUT_COUNT_F:
-			this->output[0] = count_f;
+			set_output(0,  count_f);
 			break;
 		case DISC_LS624_OUT_COUNT_R:
-			this->output[0] = count_r;
+			set_output(0,  count_r);
 			break;
 		case DISC_LS624_OUT_ENERGY:
 			if (x_time == 0) x_time = 1.0;
-			this->output[0] = LS624_OUT_HIGH * (m_flip_flop ? x_time : (1.0 - x_time));
+			set_output(0,  LS624_OUT_HIGH * (m_flip_flop ? x_time : (1.0 - x_time)));
 			break;
 		case DISC_LS624_OUT_LOGIC:
-				this->output[0] = m_flip_flop;
+				set_output(0,  m_flip_flop);
 			break;
 		case DISC_LS624_OUT_SQUARE:
-			this->output[0] = m_flip_flop ? LS624_OUT_HIGH : 0;
+			set_output(0,  m_flip_flop ? LS624_OUT_HIGH : 0);
 			break;
 	}
 }
@@ -1758,11 +1764,11 @@ DISCRETE_RESET(dsd_ls624)
 	if (DSD_LS624__C_FREQ_IN > 0)
 	{
 		m_has_freq_in_cap = 1;
-		m_exponent = RC_CHARGE_EXP_CLASS(RES_2_PARALLEL(DSD_LS624__R_FREQ_IN, LS624_IN_R) * DSD_LS624__C_FREQ_IN);
+		m_exponent = RC_CHARGE_EXP(RES_2_PARALLEL(DSD_LS624__R_FREQ_IN, LS624_IN_R) * DSD_LS624__C_FREQ_IN);
 		m_v_cap_freq_in = 0;
 	}
 	else
 		m_has_freq_in_cap = 0;
 
-	this->output[0] = 0;
+	set_output(0,  0);
 }
