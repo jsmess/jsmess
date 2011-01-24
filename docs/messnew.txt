@@ -47,6 +47,9 @@ System Driver Changes:
 - [GBA] Implemented FLASH bank select command. This fixes the NVRAM issue in
   "Super Mario Advance 4". [Tim Schuerewegen]
 
+- [GBA] Generate SIO data transfer completion interrupt. This fixes the lockup
+  in "Digimon Racing". [Tim Schuerewegen]
+
 - [PDP1] Made the CRT implementation a device.  [Atari Ace]
 
 - [PIPPIN] Added pre release rom

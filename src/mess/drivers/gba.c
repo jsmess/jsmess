@@ -1703,6 +1703,20 @@ static WRITE32_HANDLER( gba_io_w )
 			if( (mem_mask) & 0x0000ffff )
 			{
 				verboselog(machine, 2, "GBA IO Register Write: SIOCNT (%08x) = %04x (%08x)\n", 0x04000000 + ( offset << 2 ), data & mem_mask, ~mem_mask );
+				// normal mode ?
+				if (((state->RCNT & 0x8000) == 0) && ((data & 0x2000) == 0))
+				{
+					// start ?
+					if (((state->SIOCNT & 0x0080) == 0) && ((data & 0x0080) != 0))
+					{
+						data &= ~0x0080;
+						// request interrupt ?
+						if (data & 0x4000)
+						{
+							gba_request_irq( machine, INT_SIO);
+						}
+					}
+				}
 				state->SIOCNT = ( state->SIOCNT & ~mem_mask ) | ( data & mem_mask );
 			}
 			if( (mem_mask) & 0xffff0000 )
