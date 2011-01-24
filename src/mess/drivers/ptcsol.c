@@ -50,6 +50,31 @@
       - Some circuits are completely different... the video and keyboard are
         notable examples, while the addresses of ram and bios on the basic
         machines is another major difference.
+
+    ToDo:
+      - connect up half/full duplex dipswitch function
+      - connect up the remaining functions of port FE
+      - keyboard (using terminal keyboard for now)
+      - optional floppy disk support and CP/M
+      - parallel i/o and handshake lines
+      - connect serial i/o to something
+      - support for loading the various file formats
+
+    File Formats:
+      - Most files are simple ascii which can be loaded via the Paste handler.
+        These are ASC, ENT, BAS, ROM, BS5 and ECB. Most files require that the
+        correct version of BASIC be loaded first. Paste works, but it is very
+        very slow, and has a noticeable buffer limitation. Perhaps we need
+        something faster such as what Solace has.
+      - SVT (Solace Virtual Tape) files are a representation of a cassette,
+        usually holding about 4 games, just like a multifile tape. It will
+        need a 'format' program to be written to convert it to be loadable
+        via the cassette device.
+      - HEX files appear to be the standard Intel format, and can be loaded
+        by Solace.
+      - The remaining formats (OPN, PL, PRN, SMU, SOL, ASM and LIB) appear
+        at first glance to be more specialised, and probably not worth being
+        supported.
 ****************************************************************************/
 #define ADDRESS_MAP_MODERN
 
@@ -92,13 +117,17 @@ public:
 	required_device<device_t> m_uart;
 	required_device<device_t> m_uart_s;
 	required_device<device_t> m_terminal;
+	DECLARE_READ8_MEMBER( sol20_f8_r );
 	DECLARE_READ8_MEMBER( sol20_f9_r );
 	DECLARE_READ8_MEMBER( sol20_fa_r );
 	DECLARE_READ8_MEMBER( sol20_fb_r );
 	DECLARE_READ8_MEMBER( sol20_fc_r );
+	DECLARE_READ8_MEMBER( sol20_fd_r );
+	DECLARE_WRITE8_MEMBER( sol20_f8_w );
 	DECLARE_WRITE8_MEMBER( sol20_f9_w );
 	DECLARE_WRITE8_MEMBER( sol20_fa_w );
 	DECLARE_WRITE8_MEMBER( sol20_fb_w );
+	DECLARE_WRITE8_MEMBER( sol20_fd_w );
 	DECLARE_WRITE8_MEMBER( sol20_fe_w );
 	DECLARE_WRITE8_MEMBER( sol20_kbd_put );
 	UINT8 m_sol20_fa;
@@ -215,6 +244,23 @@ static TIMER_CALLBACK(sol20_cassette_tc)
 	}
 }
 
+READ8_MEMBER( sol20_state::sol20_f8_r )
+{
+// d7 - TMBT; d6 - DAV; d5 - CTS; d4 - OE; d3 - PE; d2 - FE; d1 - DSR; d0 - CD
+	/* set unemulated bits (CTS/DSR/CD) high */
+	UINT8 data = 0x23;
+
+	ay31015_set_input_pin( m_uart_s, AY31015_SWE, 0 );
+	data |= ay31015_get_output_pin( m_uart_s, AY31015_TBMT ) ? 0x80 : 0;
+	data |= ay31015_get_output_pin( m_uart_s, AY31015_DAV  ) ? 0x40 : 0;
+	data |= ay31015_get_output_pin( m_uart_s, AY31015_OR   ) ? 0x10 : 0;
+	data |= ay31015_get_output_pin( m_uart_s, AY31015_PE   ) ? 0x08 : 0;
+	data |= ay31015_get_output_pin( m_uart_s, AY31015_FE   ) ? 0x04 : 0;
+	ay31015_set_input_pin( m_uart_s, AY31015_SWE, 1 );
+
+	return data;
+}
+
 READ8_MEMBER( sol20_state::sol20_f9_r)
 {
 	UINT8 data = ay31015_get_received_data( m_uart_s );
@@ -252,6 +298,17 @@ READ8_MEMBER( sol20_state::sol20_fc_r )
 	return m_sol20_fc;
 }
 
+READ8_MEMBER( sol20_state::sol20_fd_r )
+{
+// Return a byte from parallel interface
+	return 0;
+}
+
+WRITE8_MEMBER( sol20_state::sol20_f8_w )
+{
+// The only function seems to be to send RTS from bit 4
+}
+
 WRITE8_MEMBER( sol20_state::sol20_f9_w )
 {
 	ay31015_set_transmit_data( m_uart_s, data );
@@ -285,6 +342,11 @@ WRITE8_MEMBER( sol20_state::sol20_fb_w )
 	ay31015_set_transmit_data( m_uart, data );
 }
 
+WRITE8_MEMBER( sol20_state::sol20_fd_w )
+{
+// Output a byte to parallel interface
+}
+
 WRITE8_MEMBER( sol20_state::sol20_fe_w )
 {
 	m_sol20_fe = data;
@@ -302,10 +364,12 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sol20_io , ADDRESS_SPACE_IO, 8, sol20_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0xf8, 0xf8) AM_READWRITE(sol20_f8_r,sol20_f8_w)
 	AM_RANGE(0xf9, 0xf9) AM_READWRITE(sol20_f9_r,sol20_f9_w)
 	AM_RANGE(0xfa, 0xfa) AM_READWRITE(sol20_fa_r,sol20_fa_w)
 	AM_RANGE(0xfb, 0xfb) AM_READWRITE(sol20_fb_r,sol20_fb_w)
 	AM_RANGE(0xfc, 0xfc) AM_READ(sol20_fc_r)
+	AM_RANGE(0xfd, 0xfd) AM_READWRITE(sol20_fd_r,sol20_fd_w)
 	AM_RANGE(0xfe, 0xfe) AM_WRITE(sol20_fe_w)
 	AM_RANGE(0xff, 0xff) AM_READ_PORT("S2")
 /*  AM_RANGE(0xf8, 0xf8) serial status in (bit 6=data av, bit 7=tmbe)
@@ -320,7 +384,7 @@ ADDRESS_MAP_END
 
 /* Input ports */
 static INPUT_PORTS_START( sol20 )
-	PORT_START("S1") // these switches need to be checked for correct polarity
+	PORT_START("S1")
 	PORT_DIPNAME( 0x04, 0x00, "Ctrl Chars")
 	PORT_DIPSETTING(    0x04, DEF_STR(Off))
 	PORT_DIPSETTING(    0x00, DEF_STR(On))
@@ -369,7 +433,7 @@ static INPUT_PORTS_START( sol20 )
 	PORT_DIPSETTING(    0x40, "2400")
 	PORT_DIPSETTING(    0x80, "4800/9600")
 
-	PORT_START("S4") // these switches need to be checked for correct polarity
+	PORT_START("S4")
 	PORT_DIPNAME( 0x11, 0x10, "Parity")
 	PORT_DIPSETTING(    0x00, "Even")
 	PORT_DIPSETTING(    0x01, "Odd")
@@ -493,16 +557,17 @@ static VIDEO_START( sol20 )
 static VIDEO_UPDATE( sol20 )
 {
 // Visible screen is 64 x 16, with start position controlled by scroll register.
+// Each character is 9 pixels wide (blank ones at the right) and 13 lines deep.
 // Note on blinking characters:
 // any character with bit 7 set will blink. With DPMON, do DA C000 C2FF to see what happens
-	UINT8 s1 = input_port_read(machine, "S1");
+	UINT8 s1 = input_port_read(screen->machine, "S1");
 	sol20_state *state = screen->machine->driver_data<sol20_state>();
 	UINT8 y,ra,chr,gfx;
 	UINT16 sy=0,ma,x,inv;
 	UINT8 polarity = (s1 & 8) ? 0xff : 0;
 
 	UINT8 cursor_inv = FALSE;
-	if ((s1 == 0x20) || ((s1 == 0x10) && (state->m_framecnt & 0x08)))
+	if (((s1 & 0x30) == 0x20) || (((s1 & 0x30) == 0x10) && (state->m_framecnt & 0x08)))
 		cursor_inv = TRUE;
 
 	state->m_framecnt++;
@@ -543,6 +608,7 @@ static VIDEO_UPDATE( sol20 )
 				*p++ = ( gfx & 0x04 ) ? 1 : 0;
 				*p++ = ( gfx & 0x02 ) ? 1 : 0;
 				*p++ = ( gfx & 0x01 ) ? 1 : 0;
+				*p++ = (inv) ? 1 : 0;
 			}
 		}
 		ma+=64;
@@ -575,8 +641,8 @@ static MACHINE_CONFIG_START( sol20, sol20_state )
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MCFG_SCREEN_SIZE(512, 208)
-	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 207)
+	MCFG_SCREEN_SIZE(576, 208)
+	MCFG_SCREEN_VISIBLE_AREA(0, 575, 0, 207)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
 
