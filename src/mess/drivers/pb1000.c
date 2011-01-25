@@ -8,6 +8,12 @@
         - improve the pb2000c gate array emulation
         - i/o port
 
+        Known issues:
+        - the second memory card is not recognized by the HW
+
+        More info:
+            http://www.itkp.uni-bonn.de/~wichmann/pb1000-wrobel.html
+
 ****************************************************************************/
 
 #define ADDRESS_MAP_MODERN
@@ -578,6 +584,12 @@ static MACHINE_CONFIG_START( pb2000c, pb1000_state )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 
 	MCFG_CARTSLOT_ADD("card1")
+	MCFG_CARTSLOT_EXTENSION_LIST("bin")
+	MCFG_CARTSLOT_NOT_MANDATORY
+	MCFG_CARTSLOT_LOAD(pb2000c_card)
+	MCFG_CARTSLOT_INTERFACE("pb2000c_card")
+
+	MCFG_CARTSLOT_ADD("card2")
 	MCFG_CARTSLOT_EXTENSION_LIST("bin")
 	MCFG_CARTSLOT_NOT_MANDATORY
 	MCFG_CARTSLOT_LOAD(pb2000c_card)

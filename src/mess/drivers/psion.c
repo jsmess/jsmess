@@ -702,9 +702,6 @@ void psion_state::machine_reset()
 	m_rom_bank=0;
 	m_pulse=0;
 
-	m_pack1.reset();
-	m_pack2.reset();
-
 	if (m_rom_bank_count || m_ram_bank_count)
 		update_banks(machine);
 }
@@ -712,6 +709,14 @@ void psion_state::machine_reset()
 bool psion_state::video_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	return m_lcdc->video_update( &bitmap, &cliprect );
+}
+
+static DRIVER_INIT( psion )
+{
+	psion_state *state = machine->driver_data<psion_state>();
+
+	state->m_pack1.reset();
+	state->m_pack2.reset();
 }
 
 static PALETTE_INIT( psion )
@@ -940,11 +945,11 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT COMPANY   FULLNAME       FLAGS */
-COMP( 1986, psioncm,	0,       0, 	psioncm,		psion,	 0,   "Psion",   "Organiser II CM",		GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS)
-COMP( 1986, psionla,	psioncm, 0, 	psionla,	    psion,	 0,   "Psion",   "Organiser II LA",		GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS)
-COMP( 1986, psionp350,	psioncm, 0, 	psionp350,	    psion,	 0,   "Psion",   "Organiser II P350",	GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS)
-COMP( 1986, psionlam,	psioncm, 0, 	psionlam,	    psion,	 0,   "Psion",   "Organiser II LAM",	GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS)
-COMP( 1989, psionlz,	0,		 0, 	psionlz,	    psion,	 0,   "Psion",   "Organiser II LZ",		GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS)
-COMP( 1989, psionlz64,  psionlz, 0, 	psionlz,	    psion,	 0,   "Psion",   "Organiser II LZ64",	GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS)
-COMP( 1989, psionlz64s,	psionlz, 0, 	psionlz,	    psion,	 0,   "Psion",   "Organiser II LZ64S",	GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS)
-COMP( 1989, psionp464,	psionlz, 0, 	psionlz,	    psion,	 0,   "Psion",   "Organiser II P464",	GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS)
+COMP( 1986, psioncm,	0,       0, 	psioncm,		psion,	 psion,   "Psion",   "Organiser II CM",		GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS)
+COMP( 1986, psionla,	psioncm, 0, 	psionla,	    psion,	 psion,   "Psion",   "Organiser II LA",		GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS)
+COMP( 1986, psionp350,	psioncm, 0, 	psionp350,	    psion,	 psion,   "Psion",   "Organiser II P350",	GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS)
+COMP( 1986, psionlam,	psioncm, 0, 	psionlam,	    psion,	 psion,   "Psion",   "Organiser II LAM",	GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS)
+COMP( 1989, psionlz,	0,		 0, 	psionlz,	    psion,	 psion,   "Psion",   "Organiser II LZ",		GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS)
+COMP( 1989, psionlz64,  psionlz, 0, 	psionlz,	    psion,	 psion,   "Psion",   "Organiser II LZ64",	GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS)
+COMP( 1989, psionlz64s,	psionlz, 0, 	psionlz,	    psion,	 psion,   "Psion",   "Organiser II LZ64S",	GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS)
+COMP( 1989, psionp464,	psionlz, 0, 	psionlz,	    psion,	 psion,   "Psion",   "Organiser II P464",	GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS)
