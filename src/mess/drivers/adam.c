@@ -163,6 +163,8 @@
 				E0-FF (R) = Read Controller data, A1=0 -> read controller 1, A1=1 -> read controller 2
 
 	http://drushel.cwru.edu/atm/atm.html
+	http://rich.dirocco.org/Coleco/adam/ADAM.htm
+	http://users.stargate.net/~drushel/pub/coleco/twwmca/index.html
 
 	- fc75 GET_STATUS
 	- fbe7 MMR_MAC
@@ -175,9 +177,11 @@
 
     TODO:
 
-	- special keys
-	- sort out ROMs
-	- tape (DDP)
+	- sound (PSG RDY -> Z80 WAIT)
+	- tape
+		- add track selection to cassette input/output
+		- add motor speed/direction controls
+		- DDP format converter
 	- floppy
 	- printer
 	- SPI
@@ -189,6 +193,7 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m6800/m6800.h"
+#include "formats/basicdsk.h"
 #include "imagedev/cartslot.h"
 #include "imagedev/cassette.h"
 #include "imagedev/flopdrv.h"
@@ -228,7 +233,8 @@ enum
 	ADAMNET_MASTER = 0,
 	ADAMNET_KEYBOARD,
 	ADAMNET_DDP,
-	ADAMNET_PRINTER
+	ADAMNET_PRINTER,
+	ADAMNET_FDC
 };
 
 
@@ -252,7 +258,7 @@ void adam_state::bankswitch()
 		if (BIT(m_adamnet, 1))
 		{
 			memory_unmap_readwrite(program, 0x0000, 0x5fff, 0, 0);
-			memory_install_rom(program, 0x6000, 0x7fff, 0, 0, machine->region("eos")->base());
+			memory_install_rom(program, 0x6000, 0x7fff, 0, 0, machine->region("wp")->base() + 0x8000);
 		}
 		else
 		{
@@ -288,10 +294,17 @@ void adam_state::bankswitch()
 		break;
 
 	case HI_RAM_EXPANSION:
-		if (ram_get_size(m_ram) > 64 * 1024)
-			memory_install_ram(program, 0x8000, 0xffff, 0, 0, ram + 0x18000);
+		if (m_game)
+		{
+			memory_install_rom(program, 0x8000, 0xffff, 0, 0, machine->region("cart")->base());
+		}
 		else
-			memory_unmap_readwrite(program, 0x8000, 0xffff, 0, 0);
+		{
+			if (ram_get_size(m_ram) > 64 * 1024)
+				memory_install_ram(program, 0x8000, 0xffff, 0, 0, ram + 0x18000);
+			else
+				memory_unmap_readwrite(program, 0x8000, 0xffff, 0, 0);
+		}
 		break;
 
 	case HI_CARTRIDGE_ROM:
@@ -394,10 +407,17 @@ WRITE8_MEMBER( adam_state::adamnet_w )
 	// network reset
 	if (BIT(m_adamnet, 0) && !BIT(data, 0))
 	{
+		m_reset = 1;
+		
 		machine->device(M6801_KB_TAG)->reset();
 		machine->device(M6801_DDP_TAG)->reset();
 		machine->device(M6801_PRN_TAG)->reset();
+		machine->device(M6801_FDC_TAG)->reset();
+		wd17xx_mr_w(m_fdc, 0);
+		wd17xx_mr_w(m_fdc, 1);
 		//machine->device(M6801_SPI_TAG)->reset();
+		
+		m_reset = 0;
 	}
 
 	m_adamnet = data;
@@ -742,6 +762,22 @@ WRITE8_MEMBER( adam_state::ddp6801_p1_w )
 		7		_WR1
 		
 	*/
+	
+	// speed select
+//	cassette_set_speed(m_ddp0, BIT(data, 0) ? 80 : 20);
+//	cassette_set_speed(m_ddp1, BIT(data, 0) ? 80 : 20);
+
+	// motor stop 0
+	cassette_set_state(m_ddp0, BIT(data, 1) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED);
+	
+	// motor stop 1
+	cassette_set_state(m_ddp1, BIT(data, 2) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED);
+		
+	// data write 0
+	m_wr0 = BIT(data, 6);
+	
+	// data write 1
+	m_wr1 = BIT(data, 7);
 }
 
 
@@ -763,8 +799,15 @@ READ8_MEMBER( adam_state::ddp6801_p2_r )
 
 	*/
 
-	UINT8 data = M6801_MODE_6; // ?
-
+	UINT8 data = M6801_MODE_6;
+	
+	if (!m_reset)
+	{
+		// cassette in place 1
+		data &= ~0x01;
+		//data |= dynamic_cast<device_image_interface *>(&m_ddp1)->exists() << 1;	
+	}
+	
 	// NET RXD
 	data |= m_rxd << 3;
 
@@ -790,6 +833,14 @@ WRITE8_MEMBER( adam_state::ddp6801_p2_w )
 
 	*/
 
+	// track
+	m_track = !BIT(data, 2);
+	
+	// write data
+	if (!m_wr0) cassette_output(m_ddp0, BIT(data, 0) ? 1.0 : -1.0);
+	if (!m_wr1) cassette_output(m_ddp0, BIT(data, 0) ? 1.0 : -1.0);
+	
+	// NET TXD
 	adamnet_txd_w(ADAMNET_DDP, BIT(data, 4));
 }
 
@@ -814,8 +865,25 @@ READ8_MEMBER( adam_state::ddp6801_p4_r )
 		7		RD DATA 1 (data from drives ORed together)
 
 	*/
+	
+	UINT8 data = 0;
 
-	return 0x40;
+	// motion sense 0
+	data |= ((cassette_get_state(m_ddp0) & CASSETTE_MASK_UISTATE) != CASSETTE_STOPPED) << 3;
+	
+	// motion sense 1
+	data |= ((cassette_get_state(m_ddp1) & CASSETTE_MASK_UISTATE) != CASSETTE_STOPPED) << 4;
+	
+	// cassette in place 0
+//	data |= dynamic_cast<device_image_interface *>(&m_ddp0)->exists() << 5;
+	
+	// read data 0
+	data |= 0x40;
+	
+	// read data 1
+	data |= ((cassette_input(m_ddp0) < 0) || (cassette_input(m_ddp1) < 0)) << 7;
+	
+	return data;
 }
 
 
@@ -949,6 +1017,138 @@ WRITE8_MEMBER( adam_state::printer6801_p4_w )
 }
 
 
+//-------------------------------------------------
+//  fdc6801_p1_r - 
+//-------------------------------------------------
+
+READ8_MEMBER( adam_state::fdc6801_p1_r )
+{
+	/*
+
+		bit		description
+
+		0		some kind of optic sensor
+		1		
+		2		FDC DRQ
+		3		
+		4		
+		5		
+		6		
+		7		SW3 (0=DS1, 1=DS2)
+
+	*/
+	
+	UINT8 data = 0;
+	
+	// floppy data request
+	data |= wd17xx_drq_r(m_fdc) << 2;
+	
+	return data;
+}
+
+
+//-------------------------------------------------
+//  fdc6801_p1_w - 
+//-------------------------------------------------
+
+WRITE8_MEMBER( adam_state::fdc6801_p1_w )
+{
+	/*
+
+		bit		description
+
+		0		
+		1		FDC ENP
+		2		
+		3		FDC _DDEN
+		4		
+		5		DRIVE SELECT
+		6		MOTOR ON
+		7		
+
+	*/
+	
+	// density select
+	wd17xx_dden_w(m_fdc, BIT(data, 3));
+	
+	// motor enable
+	floppy_mon_w(m_floppy0, !BIT(data, 6));
+	floppy_drive_set_ready_state(m_floppy0, 1, 1);
+}
+
+
+//-------------------------------------------------
+//  fdc6801_p2_r - 
+//-------------------------------------------------
+
+READ8_MEMBER( adam_state::fdc6801_p2_r )
+{
+	/*
+
+		bit		description
+
+		0		mode bit 0
+		1		mode bit 1
+		2		mode bit 2
+		3		NET RXD
+		4		
+
+	*/
+
+	UINT8 data = M6801_MODE_2;
+
+	// NET RXD
+	data |= m_rxd << 3;
+
+	return data;
+}
+
+
+//-------------------------------------------------
+//  fdc6801_p2_w - 
+//-------------------------------------------------
+
+WRITE8_MEMBER( adam_state::fdc6801_p2_w )
+{
+	/*
+
+		bit		description
+
+		0		
+		1		
+		2		
+		3		
+		4		NET TXD
+
+	*/
+
+	adamnet_txd_w(ADAMNET_FDC, BIT(data, 4));
+}
+
+
+//-------------------------------------------------
+//  fdc6801_p4_w - 
+//-------------------------------------------------
+
+WRITE8_MEMBER( adam_state::fdc6801_p4_w )
+{
+	/*
+
+		bit		description
+
+		0		A8
+		1		A9
+		2		A10
+		3		A11
+		4		_WE
+		5		FDC CA0
+		6		FDC CA1
+		7		chip select logic?
+
+	*/
+}
+
+
 
 //**************************************************************************
 //	PADDLES
@@ -1034,6 +1234,9 @@ static ADDRESS_MAP_START( adam_io, ADDRESS_SPACE_IO, 8, adam_state )
 	AM_RANGE(0x20, 0x20) AM_MIRROR(0x1f) AM_READWRITE(adamnet_r, adamnet_w)
 //	AM_RANGE(0x40, 0x40) Printer Data
 //	AM_RANGE(0x42, 0x42) Expansion RAM Page Select
+//	AM_RANGE(0x52, 0x52) Adam Resident Debugger ?
+//	AM_RANGE(0x54, 0x54) Adam Resident Debugger ?
+//	AM_RANGE(0x55, 0x55) Adam Resident Debugger ?
 //	AM_RANGE(0x5e, 0x5e) Optional Modem Data I/O
 //	AM_RANGE(0x5f, 0x5f) Optional Modem Control Status
 	AM_RANGE(0x60, 0x60) AM_MIRROR(0x1f) AM_READWRITE(mioc_r, mioc_w)
@@ -1140,6 +1343,29 @@ static ADDRESS_MAP_START( printer6801_io, ADDRESS_SPACE_IO, 8, adam_state )
 ADDRESS_MAP_END
 
 
+//-------------------------------------------------
+//  ADDRESS_MAP( fdc6801_mem )
+//-------------------------------------------------
+
+static ADDRESS_MAP_START( fdc6801_mem, ADDRESS_SPACE_PROGRAM, 8, adam_state )
+	AM_RANGE(0x0000, 0x001f) AM_READWRITE_LEGACY(hd63701_internal_registers_r, hd63701_internal_registers_w)
+	AM_RANGE(0x0080, 0x00ff) AM_RAM
+	AM_RANGE(0xf800, 0xffff) AM_ROM AM_REGION(M6801_FDC_TAG, 0)
+ADDRESS_MAP_END
+
+
+//-------------------------------------------------
+//  ADDRESS_MAP( fdc6801_io )
+//-------------------------------------------------
+
+static ADDRESS_MAP_START( fdc6801_io, ADDRESS_SPACE_IO, 8, adam_state )
+	AM_RANGE(M6803_PORT1, M6803_PORT1) AM_READWRITE(fdc6801_p1_r, fdc6801_p1_w)
+	AM_RANGE(M6803_PORT2, M6803_PORT2) AM_READWRITE(fdc6801_p2_r, fdc6801_p2_w)
+	AM_RANGE(M6803_PORT3, M6803_PORT3) 
+	AM_RANGE(M6803_PORT4, M6803_PORT4) AM_WRITE(fdc6801_p4_w)
+ADDRESS_MAP_END
+
+
 
 //**************************************************************************
 //	INPUT PORTS
@@ -1151,14 +1377,14 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( adam )
 	PORT_START("Y0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("WILD CARD") PORT_CODE(KEYCODE_F7)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("I") PORT_CODE(KEYCODE_F1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("II") PORT_CODE(KEYCODE_F2)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("III") PORT_CODE(KEYCODE_F3)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("IV") PORT_CODE(KEYCODE_F4)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("V") PORT_CODE(KEYCODE_F5)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("VI") PORT_CODE(KEYCODE_F6)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("UNDO") PORT_CODE(KEYCODE_F8)
 
 	PORT_START("Y1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_CHAR('1') PORT_CHAR('!')
@@ -1222,63 +1448,39 @@ static INPUT_PORTS_START( adam )
 
 	PORT_START("Y7")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR('\\') PORT_CHAR('|')
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("ESCAPE/WP") PORT_CODE(KEYCODE_ESC) PORT_CHAR(UCHAR_MAMEKEY(ESC))
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Space") PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ')
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("MOVE/COPY") PORT_CODE(KEYCODE_INSERT) PORT_CHAR(UCHAR_MAMEKEY(INSERT))
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("STORE/GET") PORT_CODE(KEYCODE_HOME) PORT_CHAR(UCHAR_MAMEKEY(HOME))
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("CLEAR") PORT_CODE(KEYCODE_PGUP) PORT_CHAR(UCHAR_MAMEKEY(PGUP))
 
 	PORT_START("Y8")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(UTF8_LEFT) PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT))
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(UTF8_UP) PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP))
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(UTF8_RIGHT) PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(UTF8_DOWN) PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN))
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(UTF8_LEFT) PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT))
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("BACKSPACE") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("INSERT") PORT_CODE(KEYCODE_DEL) PORT_CHAR(UCHAR_MAMEKEY(DEL))
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("PRINT") PORT_CODE(KEYCODE_END) PORT_CHAR(UCHAR_MAMEKEY(END))
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("DELETE") PORT_CODE(KEYCODE_PGDN) PORT_CHAR(UCHAR_MAMEKEY(PGDN))
 
 	PORT_START("Y9")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("CTRL") PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_MAMEKEY(LCONTROL))
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("CONTROL") PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_MAMEKEY(LCONTROL))
+	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNUSED ) 
 
 	PORT_START("Y10")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("SHIFT") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNUSED ) 
 
 	PORT_START("Y11")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("LOCK") PORT_CODE(KEYCODE_CAPSLOCK) PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK))
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNUSED ) 
 
 	PORT_START("Y12")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("HOME") PORT_CODE(KEYCODE_F9)
+	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNUSED ) 
 
 	PORT_INCLUDE( coleco )
 INPUT_PORTS_END
@@ -1336,7 +1538,6 @@ static const cassette_config adam_cassette_config =
 //  wd17xx_interface fdc_intf
 //-------------------------------------------------
 
-#ifdef UNUSED_CODE
 static FLOPPY_OPTIONS_START( adam )
 	FLOPPY_OPTION( adam, "dsk", "Coleco Adam floppy disk image", basicdsk_identify_default, basicdsk_construct_default,
 		HEADS([1])
@@ -1353,7 +1554,7 @@ static const floppy_config adam_floppy_config =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	FLOPPY_STANDARD_5_25_DSDD,
+	FLOPPY_STANDARD_5_25_SSDD,
 	FLOPPY_OPTIONS_NAME(adam),
 	NULL
 };
@@ -1361,11 +1562,10 @@ static const floppy_config adam_floppy_config =
 static const wd17xx_interface fdc_intf =
 {
 	DEVCB_NULL,
-	DEVCB_NULL,
+	DEVCB_CPU_INPUT_LINE(M6801_FDC_TAG, INPUT_LINE_NMI),
 	DEVCB_NULL,
 	{ FLOPPY_0, NULL, NULL, NULL }
 };
-#endif
 
 
 //-------------------------------------------------
@@ -1418,6 +1618,7 @@ void adam_state::machine_start()
 
 	// register for state saving
 	state_save_register_global(machine, m_mioc);
+	state_save_register_global(machine, m_game);
 	state_save_register_global(machine, m_adamnet);
 	state_save_register_global_array(machine, m_txd);
 	state_save_register_global(machine, m_rxd);
@@ -1432,6 +1633,9 @@ void adam_state::machine_start()
 	state_save_register_global(machine, m_joy_status0);
 	state_save_register_global(machine, m_joy_status1);
 	state_save_register_global(machine, m_vdp_nmi);
+	state_save_register_global(machine, m_wr0);
+	state_save_register_global(machine, m_wr1);
+	state_save_register_global(machine, m_track);
 }
 
 
@@ -1441,7 +1645,21 @@ void adam_state::machine_start()
 
 void adam_state::machine_reset()
 {
-	m_mioc = 0;
+	device_image_interface *image = dynamic_cast<device_image_interface *>(machine->device("cart"));
+
+    if (image->exists())
+	{
+		// game reset
+		m_game = 1;
+		m_mioc = (HI_CARTRIDGE_ROM << 2) | LO_OS7_ROM_INTERNAL_RAM;
+	}
+	else
+	{	
+		// computer reset
+		m_game = 0;
+		m_mioc = 0;
+	}
+		
 	m_adamnet = 0;
 
 	bankswitch();
@@ -1483,6 +1701,8 @@ static MACHINE_CONFIG_START( adam, adam_state )
 	MCFG_DEVICE_DISABLE()
 
 	MCFG_CPU_ADD(M6801_FDC_TAG, M6801, XTAL_4MHz)
+	MCFG_CPU_PROGRAM_MAP(fdc6801_mem)
+	MCFG_CPU_IO_MAP(fdc6801_io)
 	MCFG_DEVICE_DISABLE()
 
 	MCFG_CPU_ADD(M6801_SPI_TAG, M6801, XTAL_4MHz)
@@ -1502,13 +1722,19 @@ static MACHINE_CONFIG_START( adam, adam_state )
 
 	// devices
 	MCFG_TIMER_ADD_PERIODIC("paddles", paddle_tick, MSEC(20))
-//	MCFG_WD2793_ADD(WD2793_TAG, fdc_intf)
-//	MCFG_FLOPPY_DRIVE_ADD(FLOPPY_0, adam_floppy_config)
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, adam_cassette_config)
+	MCFG_WD2793_ADD(WD2793_TAG, fdc_intf)
+	MCFG_FLOPPY_DRIVE_ADD(FLOPPY_0, adam_floppy_config)
+	MCFG_CASSETTE_ADD(CASSETTE1_TAG, adam_cassette_config)
+	MCFG_CASSETTE_ADD(CASSETTE2_TAG, adam_cassette_config)
 
 	// cartridge
 	MCFG_CARTSLOT_ADD("cart")
 	MCFG_CARTSLOT_EXTENSION_LIST("rom,col,bin")
+	MCFG_CARTSLOT_NOT_MANDATORY
+
+	// ROM expansion
+	MCFG_CARTSLOT_ADD("xrom")
+	MCFG_CARTSLOT_EXTENSION_LIST("rom,bin")
 	MCFG_CARTSLOT_NOT_MANDATORY
 
 	// internal ram
@@ -1528,28 +1754,31 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 
 ROM_START( adam )
-	ROM_REGION( 0x8000, "wp", 0)
-	ROM_LOAD( "wp.rom", 0x0000, 0x8000, BAD_DUMP CRC(58d86a2a) SHA1(d4aec4efe1431e56fe52d83baf9118542c525255) ) // should be separate 8/16K ROMs
-
 	ROM_REGION( 0x2000, "os7", 0)
-	ROM_LOAD( "os7.rom", 0x0000, 0x2000, CRC(3aa93ef3) SHA1(45bedc4cbdeac66c7df59e9e599195c778d86a92) )
+	ROM_LOAD( "os7.u2", 0x0000, 0x2000, CRC(3aa93ef3) SHA1(45bedc4cbdeac66c7df59e9e599195c778d86a92) )
 
-	ROM_REGION( 0x2000, "eos", 0)
-	ROM_LOAD( "eos.rom", 0x0000, 0x2000, CRC(05a37a34) SHA1(ad3c20ef444f10af7ae8eb75c81e500d9b1bba3d) )
+	ROM_REGION( 0xa000, "wp", 0)
+	ROM_LOAD( "alf #1 rev 57 e3d5.u8",  0x0000, 0x2000, CRC(565b364a) SHA1(ebdafad6e268e7ed1674c1fb89607622748a5b36) )
+	ROM_LOAD( "alf #2 rev 57 ae6a.u20", 0x2000, 0x2000, CRC(44a1cff4) SHA1(661cdf36d9699d6c21c5f9e205ebc41c707359dd) )
+	ROM_LOAD( "alf #3 rev 57 8534.u21", 0x4000, 0x2000, CRC(77657b90) SHA1(d25d32ab6c8fafbc21b4b925b3e644fa26d111f7) )
+	ROM_LOAD( "eos 6 rev 57 08dd.u22",  0x8000, 0x2000, CRC(ef6403c5) SHA1(28c7616cd02e4286f9b4c1c4a8b8850832b49fcb) )
+	ROM_CONTINUE(                       0x6000, 0x2000 )
+	ROM_LOAD( "wp_r80.rom", 			0x0000, 0x8000, BAD_DUMP CRC(58d86a2a) SHA1(d4aec4efe1431e56fe52d83baf9118542c525255) ) // should be separate 8/16K ROMs
 
 	ROM_REGION( 0x8000, "xrom", ROMREGION_ERASE00 )
+	ROM_CART_LOAD( "xrom", 0x0000, 0x8000, ROM_NOMIRROR | ROM_OPTIONAL )
 
 	ROM_REGION( 0x8000, "cart", 0 )
 	ROM_CART_LOAD( "cart", 0x0000, 0x8000, ROM_NOMIRROR | ROM_OPTIONAL )
 
 	ROM_REGION( 0x800, M6801_MAIN_TAG, 0 )
-	ROM_LOAD( "master.u6", 0x000, 0x800, CRC(035a7a3d) SHA1(0426e6eaf18c2be9fe08066570c214ab5951ee14) )
+	ROM_LOAD( "master rev a 174b.u6", 0x000, 0x800, CRC(035a7a3d) SHA1(0426e6eaf18c2be9fe08066570c214ab5951ee14) )
 
 	ROM_REGION( 0x800, M6801_KB_TAG, 0 )
 	ROM_LOAD( "keyboard.u2", 0x000, 0x800, CRC(ef204746) SHA1(83162ffc75847328a05429135b728a63efb05b93) )
 
 	ROM_REGION( 0x800, M6801_DDP_TAG, 0 )
-	ROM_LOAD( "ddp.u24", 0x000, 0x800, CRC(6b9ea1cf) SHA1(b970f11e8f443fa130fba02ad1f60da51bf89673) )
+	ROM_LOAD( "tape rev a 8865.u24", 0x000, 0x800, CRC(6b9ea1cf) SHA1(b970f11e8f443fa130fba02ad1f60da51bf89673) )
 
 	ROM_REGION( 0x800, M6801_PRN_TAG, 0 )
 	ROM_LOAD( "printer.u2", 0x000, 0x800, CRC(e8db783b) SHA1(32b40679749ad0317c2c9ee9ca619fad6d850ce7) )

@@ -13,7 +13,8 @@
 #define M6801_PRN_TAG	"cpu4"
 #define M6801_FDC_TAG	"cpu5"
 #define M6801_SPI_TAG	"cpu6"
-#define CASSETTE_TAG	"cassette"
+#define CASSETTE1_TAG	"cassette1"
+#define CASSETTE2_TAG	"cassette2"
 #define SCREEN_TAG		"screen"
 
 class adam_state : public driver_device
@@ -23,7 +24,11 @@ public:
 		: driver_device(machine, config),
 		  m_maincpu(*this, Z80_TAG),
 		  m_netcpu(*this, M6801_MAIN_TAG),
+		  m_fdc(*this, WD2793_TAG),
 		  m_ram(*this, RAM_TAG),
+		  m_ddp0(*this, CASSETTE1_TAG),
+		  m_ddp1(*this, CASSETTE2_TAG),
+		  m_floppy0(*this, FLOPPY_0),
 		  m_rxd(1),
 		  m_reset(0),
 		  m_dma(1),
@@ -35,7 +40,11 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_netcpu;
+	required_device<device_t> m_fdc;
 	required_device<device_t> m_ram;
+	required_device<device_t> m_ddp0;
+	required_device<device_t> m_ddp1;
+	required_device<device_t> m_floppy0;
 
 	virtual void machine_start();
 	virtual void machine_reset();
@@ -81,8 +90,15 @@ public:
 	DECLARE_READ8_MEMBER( printer6801_p4_r );
 	DECLARE_WRITE8_MEMBER( printer6801_p4_w );
 
+	DECLARE_READ8_MEMBER( fdc6801_p1_r );
+	DECLARE_WRITE8_MEMBER( fdc6801_p1_w );
+	DECLARE_READ8_MEMBER( fdc6801_p2_r );
+	DECLARE_WRITE8_MEMBER( fdc6801_p2_w );
+	DECLARE_WRITE8_MEMBER( fdc6801_p4_w );
+	
 	// memory state
 	UINT8 m_mioc;
+	int m_game;
 
 	// ADAMnet state
 	UINT8 m_adamnet;
@@ -107,6 +123,11 @@ public:
 
 	// video state
 	int m_vdp_nmi;
+	
+	// cassette state
+	int m_wr0;
+	int m_wr1;
+	int m_track;
 };
 
 #endif
