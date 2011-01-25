@@ -50,6 +50,9 @@ System Driver Changes:
 - [GBA] Generate SIO data transfer completion interrupt. This fixes the lockup
   in "Digimon Racing". [Tim Schuerewegen]
 
+- [GBA] Removed "Metroid Fusion" DMA hack. This fixes the lockup in
+  "Caesar's Palace Advance". [Tim Schuerewegen]
+
 - [PDP1] Made the CRT implementation a device.  [Atari Ace]
 
 - [PIPPIN] Added pre release rom

@@ -1607,10 +1607,14 @@ static WRITE32_HANDLER( gba_io_w )
 				{
 					int ctrl = data>>16;
 
+					// Note: Metroid Fusion fails if we enforce the "rising edge" requirement... (who wrote this note?)
+
+					// Note: Caesar's Palace Advance fails if we DO NOT enforce the "rising edge" requirement
+					// (value @ 0x3003F9C is accidentally incremented because DMA completion interrupt is accidentally triggered @ 08002F2A)
+
 					// retrigger/restart on a rising edge.
 					// also reload internal regs
-					// (note: Metroid Fusion fails if we enforce the "rising edge" requirement...)
-					if (ctrl & 0x8000) //&& !(state->dma_regs[offset] & 0x80000000))
+					if ((ctrl & 0x8000) && !(state->dma_regs[offset] & 0x80000000))
 					{
 						state->dma_src[ch] = state->dma_regs[(ch*3)+0];
 						state->dma_dst[ch] = state->dma_regs[(ch*3)+1];
