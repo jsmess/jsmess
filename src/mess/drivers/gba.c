@@ -55,6 +55,18 @@ static void gba_machine_stop(running_machine &machine)
 		device_image_interface *image = dynamic_cast<device_image_interface *>(state->nvimage);
 		image->battery_save(state->nvptr, state->nvsize);
 	}
+
+	if (state->flash_size > 0)
+	{
+		device_image_interface *image = dynamic_cast<device_image_interface *>(state->nvimage);
+		UINT8 *nvram = auto_alloc_array( &machine, UINT8, state->flash_size);
+		for (int i = 0; i < state->flash_size; i++)
+		{
+			nvram[i] = state->mFlashDev->read_raw( i);
+		}
+		image->battery_save( nvram, state->flash_size);
+		auto_free( &machine, nvram);
+	}
 }
 
 static PALETTE_INIT( gba )
@@ -2095,6 +2107,19 @@ static MACHINE_RESET( gba )
         dac_signed_data_w(gb_a_r, 0x80);
         dac_signed_data_w(gb_b_l, 0x80);
         dac_signed_data_w(gb_b_r, 0x80);
+
+	if (state->flash_battery_load != 0)
+	{
+		device_image_interface *image = dynamic_cast<device_image_interface *>(state->nvimage);
+		UINT8 *nvram = auto_alloc_array( machine, UINT8, state->flash_size);
+		image->battery_load( nvram, state->flash_size, 0xff);
+		for (int i = 0; i < state->flash_size; i++)
+		{
+			state->mFlashDev->write_raw( i, nvram[i]);
+		}
+		auto_free( machine, nvram);
+		state->flash_battery_load = 0;
+	}
 }
 
 static MACHINE_START( gba )
@@ -2514,6 +2539,7 @@ static DEVICE_IMAGE_LOAD( gba_cart )
 	state->nvsize = 0;
 	state->flash_size = 0;
 	state->nvptr = (UINT8 *)NULL;
+    state->flash_battery_load = 0;
 
 	if (image.software_entry() == NULL)
 	{
@@ -2617,6 +2643,8 @@ static DEVICE_IMAGE_LOAD( gba_cart )
 			state->mFlashDev = image.device().machine->device<intelfsh8_device>("pflash");
 		else
 			state->mFlashDev = image.device().machine->device<intelfsh8_device>("sflash");
+		state->flash_battery_load = 1;
+		state->nvimage = image;
 	}
 
 	// mirror the ROM
