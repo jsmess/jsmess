@@ -426,7 +426,7 @@ static messtest_result_t run_test(int flags, messtest_results *results)
 	/* ugh... hideous ugly fake arguments */
 	fake_argv[0] = "MESSTEST";
 	fake_argv[1] = driver->name;
-	options_parse_command_line(opts, ARRAY_LENGTH(fake_argv), (char **) fake_argv, OPTION_PRIORITY_CMDLINE);
+	options_parse_command_line(opts, ARRAY_LENGTH(fake_argv), (char **) fake_argv, OPTION_PRIORITY_CMDLINE,TRUE);
 
 	/* preload any needed images */
 	while(current_command->command_type == MESSTEST_COMMAND_IMAGE_PRELOAD)
