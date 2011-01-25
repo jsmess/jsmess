@@ -319,7 +319,7 @@ WRITE8_MEMBER( psion_state::hd63701_int_reg_w )
 		break;
 	}
 
-	hd63701_internal_registers_w(&space, offset, data);
+	m6801_io_w(&space, offset, data);
 }
 
 READ8_MEMBER( psion_state::hd63701_int_reg_r )
@@ -342,7 +342,7 @@ READ8_MEMBER( psion_state::hd63701_int_reg_r )
 		else
 			return 0;
 	case 0x14:
-		return (hd63701_internal_registers_r(&space, offset)&0x7f) | (m_stby_pwr<<7);
+		return (m6801_io_r(&space, offset)&0x7f) | (m_stby_pwr<<7);
 	case 0x15:
 		/*
         x--- ---- ON key active high
@@ -362,9 +362,9 @@ READ8_MEMBER( psion_state::hd63701_int_reg_r )
 				return m_port6;
 		}
 	case 0x08:
-		hd63701_internal_registers_w(&space, offset, m_tcsr_value);
+		m6801_io_w(&space, offset, m_tcsr_value);
 	default:
-		return hd63701_internal_registers_r(&space, offset);
+		return m6801_io_r(&space, offset);
 	}
 }
 

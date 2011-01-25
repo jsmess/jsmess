@@ -1117,7 +1117,7 @@ WRITE16_MEMBER( stbook_state::lcd_control_w )
 //-------------------------------------------------
 
 static ADDRESS_MAP_START( ikbd_map, ADDRESS_SPACE_PROGRAM, 8, st_state )
-	AM_RANGE(0x0000, 0x001f) AM_READWRITE_LEGACY(hd63701_internal_registers_r, hd63701_internal_registers_w)
+	AM_RANGE(0x0000, 0x001f) AM_READWRITE_LEGACY(m6801_io_r, m6801_io_w)
 	AM_RANGE(0x0080, 0x00ff) AM_RAM
 	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION(HD6301V1_TAG, 0)
 ADDRESS_MAP_END
@@ -1128,10 +1128,10 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 static ADDRESS_MAP_START( ikbd_io_map, ADDRESS_SPACE_IO, 8, st_state )
-	AM_RANGE(HD63701_PORT1, HD63701_PORT1) AM_READ(ikbd_port1_r)
-	AM_RANGE(HD63701_PORT2, HD63701_PORT2) AM_READWRITE(ikbd_port2_r, ikbd_port2_w)
-	AM_RANGE(HD63701_PORT3, HD63701_PORT3) AM_WRITE(ikbd_port3_w)
-	AM_RANGE(HD63701_PORT4, HD63701_PORT4) AM_READWRITE(ikbd_port4_r, ikbd_port4_w)
+	AM_RANGE(M6801_PORT1, M6801_PORT1) AM_READ(ikbd_port1_r)
+	AM_RANGE(M6801_PORT2, M6801_PORT2) AM_READWRITE(ikbd_port2_r, ikbd_port2_w)
+	AM_RANGE(M6801_PORT3, M6801_PORT3) AM_WRITE(ikbd_port3_w)
+	AM_RANGE(M6801_PORT4, M6801_PORT4) AM_READWRITE(ikbd_port4_r, ikbd_port4_w)
 ADDRESS_MAP_END
 
 
