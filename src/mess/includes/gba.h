@@ -207,6 +207,8 @@ public:
 	
 	UINT32 bios_last_address;
 	int bios_protected;
+
+	int flash_battery_load;
 };
 
 /*----------- defined in video/gba.c -----------*/
