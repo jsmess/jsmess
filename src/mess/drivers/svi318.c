@@ -270,7 +270,7 @@ static const cassette_config svi318_cassette_config =
 	svi_cassette_formats,
 	NULL,
 	(cassette_state)(CASSETTE_PLAY),
-	NULL
+	"svi318_cass"
 };
 
 static const floppy_config svi318_floppy_config =
@@ -282,7 +282,7 @@ static const floppy_config svi318_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
 	FLOPPY_OPTIONS_NAME(svi318),
-	NULL
+	"svi318_flop"
 };
 
 static MACHINE_CONFIG_FRAGMENT( svi318_cartslot )
@@ -338,6 +338,10 @@ static MACHINE_CONFIG_START( svi318, svi318_state )
 	MCFG_WD179X_ADD("wd179x", svi_wd17xx_interface )
 
 	MCFG_FLOPPY_2_DRIVES_ADD(svi318_floppy_config)
+
+	/* Software lists */
+	MCFG_SOFTWARE_LIST_ADD("cass_list","svi318_flop")
+	MCFG_SOFTWARE_LIST_ADD("disk_list","svi318_cass")
 
 	MCFG_FRAGMENT_ADD( svi318_cartslot )
 

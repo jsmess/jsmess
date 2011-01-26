@@ -189,14 +189,13 @@ static int a7800_verify_cart(char header[128])
 DEVICE_START( a7800_cart )
 {
 	a7800_state *state = device->machine->driver_data<a7800_state>();
-	UINT8	*memory;
+	UINT8 *memory = device->machine->region("maincpu")->base();
 
-	memory = device->machine->region("maincpu")->base();
 	state->bios_bkup = NULL;
 	state->cart_bkup = NULL;
 
 	/* Allocate memory for BIOS bank switching */
-	state->bios_bkup = auto_alloc_array(device->machine, UINT8, 0x4000);
+	state->bios_bkup = auto_alloc_array_clear(device->machine, UINT8, 0x4000);
 	state->cart_bkup = auto_alloc_array(device->machine, UINT8, 0x4000);
 
 	/* save the BIOS so we can switch it in and out */
@@ -210,61 +209,117 @@ DEVICE_START( a7800_cart )
 	state->stick_type = 1;
 }
 
+struct a7800_pcb
+{
+	const char *pcb_name;
+	UINT16     type;
+};
+
+// sketchy support for a7800 cart types
+// TODO: proper emulation of the banking based on xml
+// (and on the real cart layout!)
+static const a7800_pcb pcb_list[] =
+{
+	{ "ABSOLUTE", MBANK_TYPE_ABSOLUTE },
+	{ "ACTIVISION", MBANK_TYPE_ACTIVISION },
+	{ "TYPE-0", 0x0 },
+	{ "TYPE-1", 0x1 },
+	{ "TYPE-2", 0x2 },
+	{ "TYPE-3", 0x3 },
+	{ "TYPE-6", 0x6 },
+	{ "TYPE-A", 0xa },
+	{ 0 }
+};
+
+static UINT16 a7800_get_pcb_id(const char *pcb)
+{
+	int	i;
+	
+	for (i = 0; i < ARRAY_LENGTH(pcb_list); i++)
+	{
+		if (!mame_stricmp(pcb_list[i].pcb_name, pcb))
+			return pcb_list[i].type;
+	}
+	
+	return 0;
+}
 
 DEVICE_IMAGE_LOAD( a7800_cart )
 {
 	a7800_state *state = image.device().machine->driver_data<a7800_state>();
-	long len,start;
+	UINT32 len = 0, start = 0;
 	unsigned char header[128];
-	UINT8 *memory;
+	UINT8 *memory = image.device().machine->region("maincpu")->base();
+	const char	*pcb_name;
 
-	memory = image.device().machine->region("maincpu")->base();
-
-	/* Load and decode the header */
-	image.fread(header, 128 );
-
-	/* Check the cart */
-	if( a7800_verify_cart((char *)header) == IMAGE_VERIFY_FAIL)
-		return IMAGE_INIT_FAIL;
-
-	len =(header[49] << 24) |(header[50] << 16) |(header[51] << 8) | header[52];
-	state->cart_size = len;
-
-	state->cart_type =(header[53] << 8) | header[54];
-	state->stick_type = header[55];
-	logerror( "Cart type: %x\n", state->cart_type );
-
-	/* For now, if game support stick and gun, set it to stick */
-	if( state->stick_type == 3 )
+	// detect cart type either from xml or from header
+	if (image.software_entry() == NULL)
+	{
+		/* Load and decode the header */
+		image.fread(header, 128);
+		
+		/* Check the cart */
+		if( a7800_verify_cart((char *)header) == IMAGE_VERIFY_FAIL)
+			return IMAGE_INIT_FAIL;
+		
+		len =(header[49] << 24) |(header[50] << 16) |(header[51] << 8) | header[52];
+		state->cart_size = len;
+		
+		state->cart_type =(header[53] << 8) | header[54];
+		state->stick_type = header[55];
+		logerror("Cart type: %x\n", state->cart_type);
+		
+		/* For now, if game support stick and gun, set it to stick */
+		if (state->stick_type == 3)
+			state->stick_type = 1;
+	}
+	else
+	{
+		len = image.get_software_region_length("rom");
+		state->cart_size = len;
+		// TODO: add stick/gun support to xml!
 		state->stick_type = 1;
+		if ((pcb_name = image.get_feature("pcb_type")) == NULL)
+			state->cart_type = 0;
+		else
+			state->cart_type = a7800_get_pcb_id(pcb_name);
+	}
 
-	if( state->cart_type == 0 || state->cart_type == 1 )
+	if (state->cart_type == 0 || state->cart_type == 1)
 	{
 		/* Normal Cart */
-
 		start = 0x10000 - len;
 		state->cartridge_rom = memory + start;
-		image.fread(state->cartridge_rom, len);
+		if (image.software_entry() == NULL)
+			image.fread(state->cartridge_rom, len);
+		else
+			memcpy(state->cartridge_rom, image.get_software_region("rom"), len);
 	}
-	else if( state->cart_type & 0x02 )
+	else if (state->cart_type & 0x02)
 	{
 		/* Super Cart */
-
 		/* Extra ROM at $4000 */
-		if( state->cart_type & 0x08 )
+		if (state->cart_type & 0x08)
 		{
-			image.fread(memory + 0x4000, 0x4000 );
+			if (image.software_entry() == NULL)
+				image.fread(memory + 0x4000, 0x4000);
+			else
+				memcpy(memory + 0x4000, image.get_software_region("rom"), 0x4000);
 			len -= 0x4000;
+			start = 0x4000;
 		}
 
 		state->cartridge_rom = memory + 0x10000;
-		image.fread(state->cartridge_rom, len);
+		if (image.software_entry() == NULL)
+			image.fread(state->cartridge_rom, len);
+		else
+			memcpy(state->cartridge_rom, image.get_software_region("rom") + start, len);
 
 		/* bank 0 */
-		memcpy( memory + 0x8000, memory + 0x10000, 0x4000);
+		memcpy(memory + 0x8000, memory + 0x10000, 0x4000);
 
 		/* last bank */
-		memcpy( memory + 0xC000, memory + 0x10000 + len - 0x4000, 0x4000);
+		memcpy(memory + 0xC000, memory + 0x10000 + len - 0x4000, 0x4000);
 
 		/* fixed 2002/05/13 kubecj
             there was 0x08, I added also two other cases.
@@ -272,54 +327,60 @@ DEVICE_IMAGE_LOAD( a7800_cart )
         */
 
 		/* bank n-2 */
-		if( ! ( state->cart_type & 0x0D ) )
+		if (!(state->cart_type & 0x0d))
 		{
-			memcpy( memory + 0x4000, memory + 0x10000 + len - 0x8000, 0x4000);
+			memcpy(memory + 0x4000, memory + 0x10000 + len - 0x8000, 0x4000);
 		}
 	}
-	else if( state->cart_type == MBANK_TYPE_ABSOLUTE )
+	else if (state->cart_type == MBANK_TYPE_ABSOLUTE)
 	{
 		/* F18 Hornet */
 
-		logerror( "Cart type: %x Absolute\n",state->cart_type );
+		logerror("Cart type: %x Absolute\n",state->cart_type);
 
 		state->cartridge_rom = memory + 0x10000;
-		image.fread(state->cartridge_rom, len );
+		if (image.software_entry() == NULL)
+			image.fread(state->cartridge_rom, len);
+		else
+			memcpy(state->cartridge_rom, image.get_software_region("rom") + start, len);
 
 		/* bank 0 */
-		memcpy( memory + 0x4000, memory + 0x10000, 0x4000 );
+		memcpy(memory + 0x4000, memory + 0x10000, 0x4000);
 
 		/* last bank */
-		memcpy( memory + 0x8000, memory + 0x18000, 0x8000);
+		memcpy(memory + 0x8000, memory + 0x18000, 0x8000);
 	}
-	else if( state->cart_type == MBANK_TYPE_ACTIVISION )
+	else if (state->cart_type == MBANK_TYPE_ACTIVISION)
 	{
 		/* Activision */
 
-		logerror( "Cart type: %x Activision\n",state->cart_type );
+		logerror("Cart type: %x Activision\n",state->cart_type);
 
 		state->cartridge_rom = memory + 0x10000;
-		image.fread(state->cartridge_rom, len );
-
+		if (image.software_entry() == NULL)
+			image.fread(state->cartridge_rom, len);
+		else
+			memcpy(state->cartridge_rom, image.get_software_region("rom") + start, len);
+		
 		/* bank 0 */
-		memcpy( memory + 0xA000, memory + 0x10000, 0x4000 );
+		memcpy(memory + 0xa000, memory + 0x10000, 0x4000);
 
 		/* bank6 hi */
-		memcpy( memory + 0x4000, memory + 0x2A000, 0x2000 );
+		memcpy(memory + 0x4000, memory + 0x2a000, 0x2000);
 
 		/* bank6 lo */
-		memcpy( memory + 0x6000, memory + 0x28000, 0x2000 );
+		memcpy(memory + 0x6000, memory + 0x28000, 0x2000);
 
 		/* bank7 hi */
-		memcpy( memory + 0x8000, memory + 0x2E000, 0x2000 );
+		memcpy(memory + 0x8000, memory + 0x2e000, 0x2000);
 
 		/* bank7 lo */
-		memcpy( memory + 0xE000, memory + 0x2C000, 0x2000 );
+		memcpy(memory + 0xe000, memory + 0x2c000, 0x2000);
 
 	}
 
-	memcpy( state->cart_bkup, memory + 0xC000, 0x4000 );
-	memcpy( memory + 0xC000, state->bios_bkup, 0x4000 );
+	memcpy(state->cart_bkup, memory + 0xc000, 0x4000);
+	memcpy(memory + 0xc000, state->bios_bkup, 0x4000);
 	return IMAGE_INIT_PASS;
 }
 

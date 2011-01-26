@@ -23,8 +23,8 @@ public:
 	int ctrl_reg;
 	int maria_flag;
 	unsigned char *cartridge_rom;
-	unsigned int cart_type;
-	unsigned long cart_size;
+	UINT16 cart_type;
+	UINT32 cart_size;
 	unsigned char stick_type;
 	UINT8 *ROM;
 	int maria_palette[8][4];
