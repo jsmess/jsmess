@@ -209,35 +209,6 @@ static VIDEO_UPDATE( gmaster )
     return 0;
 }
 
-static DEVICE_IMAGE_LOAD( gmaster_cart )
-{
-	UINT32 size;
-
-	if (image.software_entry() == NULL)
-	{
-		size = image.length();
-
-		if (size > (image.device().machine->region("maincpu")->bytes() - 0x8000))
-		{
-			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
-			return IMAGE_INIT_FAIL;
-		}
-
-		if (image.fread( image.device().machine->region("maincpu")->base() + 0x8000, size) != size)
-		{
-			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unable to fully read from file");
-			return IMAGE_INIT_FAIL;
-		}
-
-	}
-	else
-	{
-		size = image.get_software_region_length("rom");
-		memcpy(image.device().machine->region("maincpu")->base() + 0x8000, image.get_software_region("rom"), size);
-	}
-
-	return IMAGE_INIT_PASS;
-}
 
 static INTERRUPT_GEN( gmaster_interrupt )
 {
@@ -275,7 +246,6 @@ static MACHINE_CONFIG_START( gmaster, gmaster_state )
 	MCFG_CARTSLOT_EXTENSION_LIST("bin")
 	MCFG_CARTSLOT_MANDATORY
 	MCFG_CARTSLOT_INTERFACE("gmaster_cart")
-	MCFG_CARTSLOT_LOAD(gmaster_cart)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","gmaster")
 MACHINE_CONFIG_END
 
@@ -283,7 +253,7 @@ MACHINE_CONFIG_END
 ROM_START(gmaster)
 	ROM_REGION(0x10000,"maincpu", 0)
 	ROM_LOAD("gmaster.bin", 0x0000, 0x1000, CRC(05cc45e5) SHA1(05d73638dea9657ccc2791c0202d9074a4782c1e) )
-//  ROM_CART_LOAD(0, "bin", 0x8000, 0x7f00, 0)
+	ROM_CART_LOAD("cart", 0x8000, 0x8000, 0)
 ROM_END
 
 static DRIVER_INIT( gmaster )

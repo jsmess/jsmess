@@ -675,37 +675,6 @@ static PALETTE_INIT( vboy )
 	palette_set_colors(machine, 0, vboy_palette, ARRAY_LENGTH(vboy_palette));
 }
 
-static DEVICE_IMAGE_LOAD( vboy_cart )
-{
-	UINT32 size;
-	UINT8 *ptr = image.device().machine->region("user1")->base();
-
-	if (image.software_entry() == NULL)
-	{
-		size = image.length();
-
-		if (image.fread(ptr, size) != size)
-			return IMAGE_INIT_FAIL;
-
-		int pos = size;
-		int read_length = size;
-		// if size < 0x200000, then mirror the image up to 0x200000
-		while(pos < 0x200000)
-		{
-			int len = MIN(read_length, 0x200000 - pos);
-			memcpy(ptr + pos, ptr, len);
-			pos += len;
-		}
-	}
-	else
-	{
-		size = image.get_software_region_length("rom");
-		memcpy(ptr, image.get_software_region("rom"), size);
-	}
-
-	return IMAGE_INIT_PASS;
-}
-
 static INTERRUPT_GEN( vboy_interrupt )
 {
 	vboy_state *state = device->machine->driver_data<vboy_state>();
@@ -759,7 +728,6 @@ static MACHINE_CONFIG_START( vboy, vboy_state )
 	MCFG_CARTSLOT_EXTENSION_LIST("vb,bin")
 	MCFG_CARTSLOT_MANDATORY
 	MCFG_CARTSLOT_INTERFACE("vboy_cart")
-	MCFG_CARTSLOT_LOAD(vboy_cart)
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","vboy")
@@ -767,7 +735,8 @@ MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( vboy )
-	ROM_REGION( 0x200000, "user1", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "user1", 0 )
+	ROM_CART_LOAD("cart", 0x0000, 0x200000, ROM_MIRROR)
 ROM_END
 
 /* Driver */

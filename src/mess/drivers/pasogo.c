@@ -502,29 +502,6 @@ static const struct pic8259_interface pasogo_pic8259_config =
 	DEVCB_LINE(pasogo_pic8259_set_int_line)
 };
 
-static DEVICE_IMAGE_LOAD( pasogo_cart )
-{
-	UINT8 *user = image.device().machine->region("user1")->base();
-	UINT32 size;
-
-	if (image.software_entry() == NULL)
-	{
-		size = image.length();
-
-		if (image.fread( user, size) != size)
-		{
-			logerror("%s load error\n", image.filename());
-			return IMAGE_INIT_FAIL;
-		}
-	}
-	else
-	{
-		size = image.get_software_region_length("rom");
-		memcpy(user, image.get_software_region("rom"), size);
-	}
-
-	return IMAGE_INIT_PASS;
-}
 
 static MACHINE_CONFIG_START( pasogo, pasogo_state )
 
@@ -558,7 +535,6 @@ static MACHINE_CONFIG_START( pasogo, pasogo_state )
 	MCFG_CARTSLOT_EXTENSION_LIST("bin")
 	MCFG_CARTSLOT_MANDATORY
 	MCFG_CARTSLOT_INTERFACE("pasogo_cart")
-	MCFG_CARTSLOT_LOAD(pasogo_cart)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","pasogo")
 MACHINE_CONFIG_END
 
@@ -566,6 +542,7 @@ MACHINE_CONFIG_END
 ROM_START(pasogo)
 	ROM_REGION(0x100000,"maincpu", ROMREGION_ERASEFF) // 1 megabyte dram?
 	ROM_REGION(0x100000,"user1", ROMREGION_ERASEFF)
+	ROM_CART_LOAD("cart", 0, 0x100000, ROM_NOMIRROR)
 ROM_END
 
 

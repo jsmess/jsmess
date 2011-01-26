@@ -277,26 +277,6 @@ static INPUT_PORTS_START( pb2000c )
 		PORT_BIT(0xffff, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
-static DEVICE_IMAGE_LOAD( pb2000c_card )
-{
-	running_machine *machine = image.device().machine;
-	UINT8 *card = (UINT8*)machine->region(image.device().tag())->base();
-
-	if (card == NULL)
-		return IMAGE_INIT_FAIL;
-
-	if (image.software_entry() == NULL)
-	{
-		image.fread(card, image.length());
-	}
-	else
-	{
-		memcpy(card, image.get_software_region("rom"), image.get_software_region_length("rom"));
-	}
-
-	return IMAGE_INIT_PASS;
-}
-
 static PALETTE_INIT( pb1000 )
 {
 	palette_set_color(machine, 0, MAKE_RGB(138, 146, 148));
@@ -586,13 +566,11 @@ static MACHINE_CONFIG_START( pb2000c, pb1000_state )
 	MCFG_CARTSLOT_ADD("card1")
 	MCFG_CARTSLOT_EXTENSION_LIST("bin")
 	MCFG_CARTSLOT_NOT_MANDATORY
-	MCFG_CARTSLOT_LOAD(pb2000c_card)
 	MCFG_CARTSLOT_INTERFACE("pb2000c_card")
 
 	MCFG_CARTSLOT_ADD("card2")
 	MCFG_CARTSLOT_EXTENSION_LIST("bin")
 	MCFG_CARTSLOT_NOT_MANDATORY
-	MCFG_CARTSLOT_LOAD(pb2000c_card)
 	MCFG_CARTSLOT_INTERFACE("pb2000c_card")
 
 	/* Software lists */
@@ -627,8 +605,10 @@ ROM_START( pb2000c )
 	ROM_LOAD( "charset.bin", 0x0000, 0x0800, CRC(7f144716) SHA1(a02f1ecc6dc0ac55b94f00931d8f5cb6b9ffb7b4))
 
 	ROM_REGION( 0x20000, "card1", ROMREGION_ERASEFF )
+	ROM_CART_LOAD( "card1", 0, 0x20000, 0 )
 
 	ROM_REGION( 0x20000, "card2", ROMREGION_ERASEFF )
+	ROM_CART_LOAD( "card2", 0, 0x20000, 0 )
 ROM_END
 
 ROM_START( ai1000 )
@@ -642,8 +622,10 @@ ROM_START( ai1000 )
 	ROM_LOAD( "charset.bin", 0x0000, 0x0800, CRC(7f144716) SHA1(a02f1ecc6dc0ac55b94f00931d8f5cb6b9ffb7b4))
 
 	ROM_REGION( 0x20000, "card1", ROMREGION_ERASEFF )
+	ROM_CART_LOAD( "card1", 0, 0x20000, 0 )
 
 	ROM_REGION( 0x20000, "card2", ROMREGION_ERASEFF )
+	ROM_CART_LOAD( "card2", 0, 0x20000, 0 )
 ROM_END
 
 /* Driver */

@@ -390,32 +390,6 @@ static const cassette_config vidbrain_cassette_config =
 };
 
 
-//-------------------------------------------------
-//  DEVICE_IMAGE_LOAD( vidbrain_cart )
-//-------------------------------------------------
-
-static DEVICE_IMAGE_LOAD( vidbrain_cart )
-{
-	UINT32 size;
-	UINT8 *ptr = image.device().machine->region(F3850_TAG)->base() + 0x1000;
-
-	if (image.software_entry() == NULL)
-	{
-		size = image.length();
-		if (image.fread(ptr, size) != size)
-			return IMAGE_INIT_FAIL;
-	}
-	else
-	{
-		size = image.get_software_region_length("rom");
-		memcpy(ptr, image.get_software_region("rom"), size);
-	}
-
-	return IMAGE_INIT_PASS;
-}
-
-
-
 //**************************************************************************
 //	MACHINE INITIALIZATION
 //**************************************************************************
@@ -498,7 +472,6 @@ static MACHINE_CONFIG_START( vidbrain, vidbrain_state )
 	MCFG_CARTSLOT_ADD("cart")
 	MCFG_CARTSLOT_EXTENSION_LIST("bin")
 	MCFG_CARTSLOT_INTERFACE("vidbrain_cart")
-	MCFG_CARTSLOT_LOAD(vidbrain_cart)
 
 	// software lists
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "vidbrain")
@@ -521,6 +494,7 @@ MACHINE_CONFIG_END
 ROM_START( vidbrain )
     ROM_REGION( 0x3000, F3850_TAG, 0 )
 	ROM_LOAD( "uvres 1n.d67", 0x0000, 0x0800, CRC(065fe7c2) SHA1(9776f9b18cd4d7142e58eff45ac5ee4bc1fa5a2a) )
+	ROM_CART_LOAD( "cart", 0x1000, 0x1000, 0 )
 	ROM_LOAD( "resn2.e5",     0x2000, 0x0800, CRC(1d85d7be) SHA1(26c5a25d1289dedf107fa43aa8dfc14692fd9ee6) )
 ROM_END
 

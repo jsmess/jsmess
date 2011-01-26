@@ -61,38 +61,6 @@ static INPUT_PORTS_START( advision )
     PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_PLAYER(1) PORT_8WAY
 INPUT_PORTS_END
 
-/* Cartridge (+ Software List) */
-
-static DEVICE_IMAGE_LOAD( advision_cart )
-{
-	UINT32 size;
-
-	if (image.software_entry() == NULL)
-	{
-		size = image.length();
-
-		if (size > image.device().machine->region(I8048_TAG)->bytes())
-		{
-			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
-			return IMAGE_INIT_FAIL;
-		}
-
-		if (image.fread( image.device().machine->region(I8048_TAG)->base(), size) != size)
-		{
-			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unable to fully read from file");
-			return IMAGE_INIT_FAIL;
-		}
-
-	}
-	else
-	{
-		size = image.get_software_region_length("rom");
-		memcpy(image.device().machine->region(I8048_TAG)->base(), image.get_software_region("rom"), size);
-	}
-
-	return IMAGE_INIT_PASS;
-}
-
 /* Machine Driver */
 
 static COP400_INTERFACE( advision_cop411_interface )
@@ -133,7 +101,6 @@ static MACHINE_CONFIG_START( advision, advision_state )
 	MCFG_CARTSLOT_EXTENSION_LIST("bin")
 	MCFG_CARTSLOT_MANDATORY
 	MCFG_CARTSLOT_INTERFACE("advision_cart")
-	MCFG_CARTSLOT_LOAD(advision_cart)
 
 	/* Software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","advision")
@@ -142,7 +109,8 @@ MACHINE_CONFIG_END
 /* ROMs */
 
 ROM_START( advision )
-	ROM_REGION( 0x1000, I8048_TAG, ROMREGION_ERASE00 )
+	ROM_REGION( 0x1000, I8048_TAG, 0 )
+	ROM_CART_LOAD( "cart", 0x0000, 0x1000, ROM_NOMIRROR | ROM_FULLSIZE )
 
 	ROM_REGION( 0x400, "bios", 0 )
     ROM_LOAD( "avbios.u5", 0x000, 0x400, CRC(279e33d1) SHA1(bf7b0663e9125c9bfb950232eab627d9dbda8460) )
