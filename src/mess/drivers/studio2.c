@@ -465,13 +465,33 @@ void studio2_state::machine_reset()
 	if (m_cti) m_cti->reset();
 }
 
+
+DEVICE_IMAGE_LOAD( studio2_cart_load )
+{
+	if (image.software_entry() == NULL)
+		return device_load_st2_cartslot_load(image);
+	else
+	{
+		// WARNING: list code currently assume that cart mapping starts at 0x400.
+		// the five dumps currently available work like this, but the .st2 format
+		// allows for more freedom... how was the content of a real cart mapped?
+		UINT8 *ptr = ((UINT8 *) image.device().machine->region(CDP1802_TAG)->base()) + 0x400;
+		memcpy(ptr, image.get_software_region("rom"), image.get_software_region_length("rom"));	
+		return IMAGE_INIT_PASS;
+	}
+}
+
 /* Machine Drivers */
 
 static MACHINE_CONFIG_FRAGMENT( studio2_cartslot )
 	MCFG_CARTSLOT_ADD("cart")
-	MCFG_CARTSLOT_EXTENSION_LIST("st2")
+	MCFG_CARTSLOT_EXTENSION_LIST("st2,bin")
 	MCFG_CARTSLOT_NOT_MANDATORY
-	MCFG_CARTSLOT_LOAD(st2_cartslot_load)
+	MCFG_CARTSLOT_LOAD(studio2_cart_load)
+	MCFG_CARTSLOT_INTERFACE("studio2_cart")
+
+	/* software lists */
+	MCFG_SOFTWARE_LIST_ADD("cart_list","studio2")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( studio2, studio2_state )

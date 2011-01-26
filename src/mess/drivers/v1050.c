@@ -1091,7 +1091,7 @@ static const floppy_config v1050_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
 	FLOPPY_OPTIONS_NAME(v1050),
-	NULL
+	"v1050_flop"
 };
 
 /* Machine Initialization */
@@ -1210,6 +1210,9 @@ static MACHINE_CONFIG_START( v1050, v1050_state )
 	MCFG_FLOPPY_2_DRIVES_ADD(v1050_floppy_config)
 	MCFG_TIMER_ADD_PERIODIC(TIMER_KB_TAG, kb_8251_tick, HZ((double)XTAL_16MHz/4/13/8))
 	MCFG_TIMER_ADD(TIMER_SIO_TAG, sio_8251_tick)
+
+	/* software lists */
+	MCFG_SOFTWARE_LIST_ADD("disk_list","v1050")
 
 	/* printer */
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)

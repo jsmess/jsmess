@@ -583,7 +583,7 @@ Xtal Systems (Xtal Research)
 
 	<software name="elite" supported="no">
 		<description>Elite</description>
-		<year>198x</year>
+		<year>198?</year>
 		<publisher>Firebird</publisher>
 		<part name="flop1" interface="einstein_flop">
 			<dataarea name="flop" size="215296">
@@ -638,7 +638,7 @@ Xtal Systems (Xtal Research)
 
 	<software name="gronks">
 		<description>Gronks</description>
-		<year>198x</year>
+		<year>198?</year>
 		<publisher>unknown</publisher>
 		<part name="flop1" interface="einstein_flop">
 			<dataarea name="flop" size="215296">
@@ -658,7 +658,7 @@ Xtal Systems (Xtal Research)
 		</part>
 	</software>
 
-	<software name="hitchiker">
+	<software name="hitchikr">
 		<description>Hitchhikers Guide to the Galaxy</description>
 		<year>1984</year>
 		<publisher>Infocom</publisher>
@@ -792,7 +792,7 @@ Xtal Systems (Xtal Research)
 		</part>
 	</software>
 
-	<software name="mcomposer">
+	<software name="musicomp">
 		<description>Music Composer</description>
 		<year>1984</year>
 		<publisher>Kuma Software</publisher>
@@ -803,7 +803,7 @@ Xtal Systems (Xtal Research)
 		</part>
 	</software>
 
-	<software name="mworkshop">
+	<software name="mworkshp">
 		<description>Music Workshop</description>
 		<year>19??</year>
 		<publisher>Screensoft</publisher>
@@ -814,7 +814,7 @@ Xtal Systems (Xtal Research)
 		</part>
 	</software>
 
-	<software name="nightmare">
+	<software name="nightmar">
 		<description>Nightmare Park &amp; Commando Plain</description>
 		<year>19??</year>
 		<publisher>Solo Software</publisher>
@@ -946,7 +946,7 @@ Xtal Systems (Xtal Research)
 		</part>
 	</software>
 
-	<software name="spreadsht">
+	<software name="spreadsh">
 		<description>Spreadsheet</description>
 		<year>1984</year>
 		<publisher>Kuma Computers</publisher>
@@ -959,7 +959,7 @@ Xtal Systems (Xtal Research)
 
 	<software name="starx">
 		<description>Starcross</description>
-		<year>198x</year>
+		<year>198?</year>
 		<publisher>Infocom</publisher>
 		<part name="flop1" interface="einstein_flop">
 			<dataarea name="flop" size="215296">
@@ -1015,7 +1015,7 @@ Xtal Systems (Xtal Research)
 
 	<software name="super6">
 		<description>Super Six Game Pack</description>
-		<year>198x</year>
+		<year>198?</year>
 		<publisher>Tatung Einsoft</publisher>
 		<part name="flop1" interface="einstein_flop">
 			<dataarea name="flop" size="215296">
@@ -1103,7 +1103,7 @@ Xtal Systems (Xtal Research)
 
 	<software name="tycoon">
 		<description>Tycoon &amp; Pelmanism</description>
-		<year>198x</year>
+		<year>198?</year>
 		<publisher>Kuma Software</publisher>
 		<part name="flop1" interface="einstein_flop">
 			<dataarea name="flop" size="215296">
@@ -1125,7 +1125,7 @@ Xtal Systems (Xtal Research)
 
 	<software name="xtaldos">
 		<description>Xtaldos 1.31</description>
-		<year>198x</year>
+		<year>198?</year>
 		<publisher>Tatung</publisher>
 		<part name="flop1" interface="einstein_flop">
 			<dataarea name="flop" size="215296">
@@ -1191,7 +1191,7 @@ Xtal Systems (Xtal Research)
 
 	<software name="xmaster">
 		<description>X-master</description>
-		<year>198x</year>
+		<year>198?</year>
 		<publisher>unknown</publisher>
 		<part name="flop1" interface="einstein_flop">
 			<dataarea name="flop" size="215296">
@@ -1283,7 +1283,7 @@ Xtal Systems (Xtal Research)
 
 	<software name="sword">
 		<description>Sword Feud</description>
-		<year>198x</year>
+		<year>198?</year>
 		<publisher>A.C.E. Software</publisher>
 		<part name="flop1" interface="einstein_flop">
 			<dataarea name="flop" size="215296">

@@ -447,7 +447,11 @@ static MACHINE_CONFIG_START( sorcerer, sorcerer_state )
 
 	/* cartridge */
 	MCFG_CARTSLOT_ADD("cart")
-	MCFG_CARTSLOT_EXTENSION_LIST("rom")
+	MCFG_CARTSLOT_EXTENSION_LIST("rom,bin")
+	MCFG_CARTSLOT_INTERFACE("sorcerer_cart")
+
+	/* software lists */
+	MCFG_SOFTWARE_LIST_ADD("cart_list","sorcerer")
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)

@@ -745,8 +745,13 @@ static MACHINE_CONFIG_DERIVED( apf_m1000, apf_imagination )
 	MCFG_DEVICE_REMOVE( "pia_1" )
 
 	MCFG_DEVICE_REMOVE( "cassette" )
-	MCFG_CARTSLOT_ADD("cart")
 	MCFG_FLOPPY_2_DRIVES_REMOVE()
+
+	MCFG_CARTSLOT_ADD("cart")
+	MCFG_CARTSLOT_INTERFACE("apfm1000_cart")
+
+	/* software lists */
+	MCFG_SOFTWARE_LIST_ADD("cart_list","apfm1000")
 MACHINE_CONFIG_END
 
 

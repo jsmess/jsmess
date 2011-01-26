@@ -211,8 +211,12 @@ static MACHINE_CONFIG_START( casloopy, casloopy_state )
 	MCFG_VIDEO_UPDATE(casloopy)
 
 	MCFG_CARTSLOT_ADD("cart")
-	MCFG_CARTSLOT_EXTENSION_LIST("ic1")
+	MCFG_CARTSLOT_EXTENSION_LIST("ic1,bin")
 	MCFG_CARTSLOT_MANDATORY
+	MCFG_CARTSLOT_INTERFACE("loopy_cart")
+
+	/* software lists */
+	MCFG_SOFTWARE_LIST_ADD("cart_list","casloopy")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

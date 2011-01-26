@@ -17,7 +17,7 @@
 
 		<part name="cart" interface="studio2_cart">
 			<dataarea name="rom" size="512">
-				<rom name="spacewar.st2" size="512" crc="021551f2" sha1="4878ae6d313743d7e3bd45e05c6e5e0582d9febb" offset="000000" />
+				<rom name="spacewar.bin" size="512" crc="021551f2" sha1="4878ae6d313743d7e3bd45e05c6e5e0582d9febb" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -29,7 +29,7 @@
 
 		<part name="cart" interface="studio2_cart">
 			<dataarea name="rom" size="512">
-				<rom name="tennis-squash.st2" size="512" crc="a21590c8" sha1="c573e8cd7d1aa423d26e64a4da781a5989e4ed1d" offset="000000" />
+				<rom name="tennis-squash.bin" size="512" crc="a21590c8" sha1="c573e8cd7d1aa423d26e64a4da781a5989e4ed1d" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -41,7 +41,7 @@
 
 		<part name="cart" interface="studio2_cart">
 			<dataarea name="rom" size="1024">
-				<rom name="baseball.st2" size="1024" crc="d7fdedaa" sha1="fa1e3089d05503b7b1d5e98552318d5836c1798a" offset="000000" />
+				<rom name="baseball.bin" size="1024" crc="d7fdedaa" sha1="fa1e3089d05503b7b1d5e98552318d5836c1798a" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -53,7 +53,7 @@
 
 		<part name="cart" interface="studio2_cart">
 			<dataarea name="rom" size="512">
-				<rom name="tag.st2" size="512" crc="a80379e2" sha1="5bc93a1a7ea05411f607ed56241da88b1f8468c5" offset="000000" />
+				<rom name="tag.bin" size="512" crc="a80379e2" sha1="5bc93a1a7ea05411f607ed56241da88b1f8468c5" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -65,7 +65,7 @@
 		
 		<part name="cart" interface="studio2_cart">
 			<dataarea name="rom" size="1024">
-				<rom name="blackjack.st2" size="1024" crc="b30af7a9" sha1="e328791d6aa8292d1b68abe03c7ebfefa9282ced" offset="000000" />
+				<rom name="blackjack.bin" size="1024" crc="b30af7a9" sha1="e328791d6aa8292d1b68abe03c7ebfefa9282ced" offset="000000" />
 			</dataarea>
 		</part>
 	</software>

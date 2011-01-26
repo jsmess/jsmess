@@ -695,7 +695,7 @@ static const floppy_config vixen_floppy_config =
     DEVCB_NULL,
     FLOPPY_STANDARD_5_25_SSDD_40,
     FLOPPY_OPTIONS_NAME(default),
-    NULL
+    "vixen_flop"
 };
 
 WRITE_LINE_MEMBER( vixen_state::fdint_w )
@@ -822,7 +822,10 @@ static MACHINE_CONFIG_START( vixen, vixen_state )
 	MCFG_WD179X_ADD(FDC1797_TAG, fdc_intf)
 	MCFG_FLOPPY_2_DRIVES_ADD(vixen_floppy_config)
 	MCFG_IEEE488_ADD(IEEE488_TAG, ieee488_daisy)
-	
+
+	/* software lists */
+	MCFG_SOFTWARE_LIST_ADD("disk_list","vixen")
+
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")

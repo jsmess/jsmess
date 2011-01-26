@@ -723,7 +723,7 @@ static const floppy_config einstein_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_SSDD_40,
 	FLOPPY_OPTIONS_NAME(default),
-	NULL
+	"einstein_flop"
 };
 
 static MACHINE_CONFIG_START( einstein, einstein_state )
@@ -772,6 +772,9 @@ static MACHINE_CONFIG_START( einstein, einstein_state )
 	MCFG_WD1770_ADD(IC_I042, default_wd17xx_interface)
 
 	MCFG_FLOPPY_4_DRIVES_ADD(einstein_floppy_config)
+
+	/* software lists */
+	MCFG_SOFTWARE_LIST_ADD("disk_list","einstein")
 
 	/* RAM is provided by 8k DRAM ICs i009, i010, i011, i012, i013, i014, i015 and i016 */
 	/* internal ram */
