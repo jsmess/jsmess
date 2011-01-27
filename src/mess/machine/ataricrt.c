@@ -164,24 +164,145 @@ MACHINE_START( a800 )
 }
 
 
+/* PCB */
+enum
+{
+    A800_UNKNOWN = 0,
+	A800_4K, A800_8K, A800_12K, A800_16K,
+	A800_RIGHT_4K, A800_RIGHT_8K,
+	OSS_034M, OSS_M091, PHOENIX_8K, XEGS_32K,
+	BBSB, DIAMOND_64K, WILLIAMS_64K, EXPRESS_64,
+	SPARTADOS_X
+};
+
+typedef struct _a800_pcb  a800_pcb;
+struct _a800_pcb
+{
+	const char              *pcb_name;
+	int                     pcb_id;
+};
+
+// Here, we take the feature attribute from .xml (i.e. the PCB name) and we assign a unique ID to it
+// WARNING: most of these are still unsupported by the driver
+static const a800_pcb pcb_list[] =
+{
+	{"standard 4k", A800_4K},
+	{"standard 8k", A800_8K},
+	{"standard 12k", A800_12K},
+	{"standard 16k", A800_16K},
+	{"right slot 4k", A800_RIGHT_4K},
+	{"right slot 8k", A800_RIGHT_8K},
+	
+	{"oss 034m", OSS_034M},
+	{"oss m091", OSS_M091},
+	{"phoenix 8k", PHOENIX_8K},
+	{"xegs 32k", XEGS_32K},
+	{"bbsb", BBSB},	
+	{"diamond 64k", DIAMOND_64K},
+	{"williams 64k", WILLIAMS_64K},
+	{"express 64", EXPRESS_64},
+	{"spartados x", SPARTADOS_X},
+	{"N/A", A800_UNKNOWN}
+};
+
+static int a800_get_pcb_id(const char *pcb)
+{
+	int	i;
+	
+	for (i = 0; i < ARRAY_LENGTH(pcb_list); i++)
+	{
+		if (!mame_stricmp(pcb_list[i].pcb_name, pcb))
+			return pcb_list[i].pcb_id;
+	}
+	
+	return A800_UNKNOWN;
+}
+
+// currently this does nothing, but it will eventually install the memory handlers required by the mappers
+static void a800_setup_mappers(running_machine *machine, int type)
+{
+	switch (type)
+	{
+		case A800_4K:
+		case A800_8K:
+		case A800_12K:
+		case A800_16K:
+		case A800_RIGHT_4K:
+		case A800_RIGHT_8K:
+		case OSS_034M:
+		case OSS_M091:
+		case PHOENIX_8K:
+		case XEGS_32K:
+		case BBSB:
+		case DIAMOND_64K:
+		case WILLIAMS_64K:
+		case EXPRESS_64:
+		case SPARTADOS_X:
+		default:
+			break;
+	}
+}
+
 DEVICE_IMAGE_LOAD( a800_cart )
 {
 	UINT8 *mem = image.device().machine->region("maincpu")->base();
-	int size;
+	const char	*pcb_name;
+	int cart_type = 0;
+	UINT32 size;
+	
+	if (image.software_entry() == NULL)
+		size = image.length();
+	else
+	{
+		size = image.get_software_region_length("rom");
+		if ((pcb_name = image.get_feature("cart_type")) == NULL)
+			cart_type = A800_UNKNOWN;
+		else
+			cart_type = a800_get_pcb_id(pcb_name);
+		switch (cart_type)
+		{
+			case A800_4K:
+			case A800_8K:
+			case A800_12K:
+			case A800_16K:
+			case A800_RIGHT_4K:
+			case A800_RIGHT_8K:
+				break;
+			default:
+				mame_printf_info("Cart type \"%s\" currently unsupported.\n", pcb_name);
+				break;
+		}
+		a800_setup_mappers(image.device().machine, cart_type);
+	}
 
 	/* load an optional (dual) cartridge (e.g. basic.rom) */
 	if( strcmp(image.device().tag(),"cart2") == 0 )
 	{
-		size = image.fread(&mem[0x12000], 0x2000);
-		a800_cart_is_16k = (size == 0x2000);
+		a800_cart_is_16k = (size >= 0x2000) ? 1 : 0;
+
+		if (image.software_entry() == NULL)
+			image.fread(&mem[0x12000], 0x2000);
+		else
+			memcpy(&mem[0x12000], image.get_software_region("rom"), 0x2000);
+
 		logerror("%s loaded right cartridge '%s' size 16K\n", image.device().machine->gamedrv->name, image.filename() );
 	}
 	else
 	{
-		size = image.fread(&mem[0x10000], 0x2000);
-		a800_cart_loaded = size > 0x0000;
-		size = image.fread(&mem[0x12000], 0x2000);
-		a800_cart_is_16k = size > 0x2000;
+		a800_cart_loaded = (size > 0x0000) ? 1 : 0;
+		a800_cart_is_16k = (size > 0x2000) ? 1 : 0;
+		
+		if (image.software_entry() == NULL)
+		{
+			image.fread(&mem[0x10000], 0x2000);
+			image.fread(&mem[0x12000], 0x2000);
+		}
+		else
+		{
+			memcpy(&mem[0x10000], image.get_software_region("rom"), (size > 0x2000) ? 0x2000 : size);
+			if (a800_cart_is_16k)
+				memcpy(&mem[0x12000], image.get_software_region("rom") + 0x2000, (size > 0x4000) ? 0x2000 : size - 0x2000);
+		}
 		logerror("%s loaded left cartridge '%s' size %s\n", image.device().machine->gamedrv->name, image.filename() , (a800_cart_is_16k) ? "16K":"8K");
 	}
 	return IMAGE_INIT_PASS;

@@ -477,7 +477,7 @@ static const floppy_config ibmat_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
 	FLOPPY_OPTIONS_NAME(pc),
-	NULL
+	"ibmat_flop"
 };
 
 static const kb_keytronic_interface at_keytronic_intf =
@@ -547,6 +547,9 @@ static MACHINE_CONFIG_START( ibm5170, at_state )
 	MCFG_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
 
 	MCFG_FLOPPY_2_DRIVES_ADD(ibmat_floppy_config)
+
+	/* software lists */
+	MCFG_SOFTWARE_LIST_ADD("disk_list","ibm5170")
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -879,6 +882,9 @@ static MACHINE_CONFIG_DERIVED( megapc, at386 )
 	MCFG_CPU_REPLACE("maincpu", I386, XTAL_50MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(at386_map)
 	MCFG_CPU_IO_MAP(megapc_io)
+
+	/* software lists */
+	MCFG_SOFTWARE_LIST_ADD("disk_list","megapc")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( megapcpl, megapc )

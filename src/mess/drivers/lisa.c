@@ -106,7 +106,7 @@ static const floppy_config lisa_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
 	FLOPPY_OPTIONS_NAME(apple35_mac),
-	NULL
+	"lisa_flop"
 };
 
 /***************************************************************************
@@ -151,6 +151,9 @@ static MACHINE_CONFIG_START( lisa, lisa_state )
 	/* devices */
 	MCFG_IWM_ADD("fdc", lisa2_fdc_interface)
 	MCFG_FLOPPY_SONY_2_DRIVES_ADD(lisa_floppy_config)
+
+	/* software lists */
+	MCFG_SOFTWARE_LIST_ADD("disk_list","lisa")
 
 	/* via */
 	MCFG_VIA6522_ADD("via6522_0", 500000, lisa_via6522_0_intf)

@@ -639,7 +639,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="asteroids">
+	<software name="asteroid">
 		<description>Asteroids</description>
 		<!-- Serial: CXL4013 -->
 		<year>1981</year>
@@ -2116,7 +2116,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="batlnband">
+	<software name="batlband">
 		<description>Halftime Battlin' Bands</description>
 		<!-- Serial: 4L-9848 -->
 		<year>1984</year>
@@ -2220,7 +2220,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="jrnyplnts">
+	<software name="jrnyplnt">
 		<description>Journey to the Planets</description>
 		<!-- Serial: 09-01124 -->
 		<year>1983</year>
@@ -2595,7 +2595,7 @@ Compiled by K1W1
 		<year>1984</year>
 		<publisher>OSS</publisher>
 		<part name="cart" interface="a800_cart">
-			<feature name="cart_type" value="oss34m" />
+			<feature name="cart_type" value="oss 034m" />
 			<dataarea name="rom" size="16384">
 				<rom name="mac-65 macro assembler v1.0.rom" size="16384" crc="5e033719" sha1="13197d3c67efc7df429480bd0cd784bd62268b50" offset="0" />
 			</dataarea>
@@ -2654,7 +2654,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="encounter">
+	<software name="mathenct">
 		<description>Math Encounter</description>
 		<!-- Serial: N/A -->
 		<year>1984</year>
@@ -4267,7 +4267,7 @@ Compiled by K1W1
 		<year>1985</year>
 		<publisher>OSS</publisher>
 		<part name="cart" interface="a800_cart">
-			<feature name="cart_type" value="oss m034" />
+			<feature name="cart_type" value="oss 034m" />
 			<dataarea name="rom" size="16384">
 				<rom name="the writer&apos;s tool [fixed].rom" size="16384" crc="a1cb09bc" sha1="a2ce17cf15a7df539de45aed7b920aa374856905"  offset="0" />
 			</dataarea>

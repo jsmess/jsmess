@@ -455,13 +455,13 @@
 
 		<part name="flop1" interface="lisa_flop">
 			<dataarea name="flop" size="419284">
-				<rom name="Boot.image" size="419284" crc="fe6eb45b" sha1="c612c9edc6261e32d972719f0c53165591c52cf8" offset="000000" />
+				<rom name="boot.image" size="419284" crc="fe6eb45b" sha1="c612c9edc6261e32d972719f0c53165591c52cf8" offset="000000" />
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="lisa_flop">
 			<dataarea name="flop" size="419284">
-				<rom name="System.image" size="419284" crc="7430daed" sha1="2f0d865a0a1e4e746144965b5d4d73826ca8a88c" offset="000000" />
+				<rom name="system.image" size="419284" crc="7430daed" sha1="2f0d865a0a1e4e746144965b5d4d73826ca8a88c" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -474,13 +474,13 @@
 
 		<part name="flop1" interface="lisa_flop">
 			<dataarea name="flop" size="409684">
-				<rom name="Boot.image" size="409684" crc="a922d322" sha1="4d4952673b15a4d47f8ea8c2310107a9be84be1a" offset="000000" />
+				<rom name="boot.image" size="409684" crc="a922d322" sha1="4d4952673b15a4d47f8ea8c2310107a9be84be1a" offset="000000" />
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="lisa_flop">
 			<dataarea name="flop" size="409684">
-				<rom name="System.image" size="409684" crc="2473ff06" sha1="a7e065af2a913b508165604a25507be3280ce229" offset="000000" />
+				<rom name="system.image" size="409684" crc="2473ff06" sha1="a7e065af2a913b508165604a25507be3280ce229" offset="000000" />
 			</dataarea>
 		</part>
 	</software>

@@ -143,30 +143,6 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static DEVICE_IMAGE_LOAD( astrocde_cart )
-{
-	UINT32 size;
-
-	if (image.software_entry() == NULL)
-	{
-		size = image.length();
-
-		if (image.fread( image.device().machine->region("maincpu")->base() + 0x2000, size) != size)
-		{
-			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unable to fully read from file");
-			return IMAGE_INIT_FAIL;
-		}
-
-	}
-	else
-	{
-		size = image.get_software_region_length("rom");
-		memcpy(image.device().machine->region("maincpu")->base() + 0x2000, image.get_software_region("rom"), size);
-	}
-
-	return IMAGE_INIT_PASS;
-}
-
 static MACHINE_CONFIG_START( astrocde, astrocde_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, ASTROCADE_CLOCK/4)        /* 1.789 MHz */
@@ -193,7 +169,6 @@ static MACHINE_CONFIG_START( astrocde, astrocde_state )
 	MCFG_CARTSLOT_ADD("cart")
 	MCFG_CARTSLOT_EXTENSION_LIST("bin")
 	MCFG_CARTSLOT_INTERFACE("astrocde_cart")
-	MCFG_CARTSLOT_LOAD(astrocde_cart)
 
 	/* Software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","astrocde")
@@ -209,16 +184,19 @@ MACHINE_CONFIG_END
 ROM_START( astrocde )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "astro.bin",  0x0000, 0x2000, CRC(ebc77f3a) SHA1(b902c941997c9d150a560435bf517c6a28137ecc) )
+	ROM_CART_LOAD( "cart", 0x2000, 0x8000, 0 )
 ROM_END
 
 ROM_START( astrocdl )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ballyhlc.bin",  0x0000, 0x2000, CRC(d7c517ba) SHA1(6b2bef5d970e54ed204549f58ba6d197a8bfd3cc) )
+	ROM_CART_LOAD( "cart", 0x2000, 0x8000, 0 )
 ROM_END
 
 ROM_START( astrocdw )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "bioswhit.bin",  0x0000, 0x2000, CRC(6eb53e79) SHA1(d84341feec1a0a0e8aa6151b649bc3cf6ef69fbf) )
+	ROM_CART_LOAD( "cart", 0x2000, 0x8000, 0 )
 ROM_END
 
 /*************************************
