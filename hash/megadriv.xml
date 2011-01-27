@@ -231,8 +231,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="4194304">
 				<rom name="nhl94_hl9402" size="1048576" crc="acecd225" sha1="5a11c7e3c925a6e256d2000b292ad7aa530bda0f" offset="000000" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 <!--
@@ -251,8 +254,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="4194304">
 				<rom name="pga_tour_golf_pgt04" size="1048576" crc="8d980bb4" sha1="89b50dae5c88f633458a6faeb4ee288fcc94c1b1" offset="000000" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 <!--
@@ -703,6 +709,8 @@ better to use names related to the actual pcb, possibly even reverting to use th
 				<rom name="mpr-12851a.ic1" size="524288" crc="74714110" sha1="99038db23ab38c5eaabd3b27dea96059324fee6a" offset="000000" />
 				<rom name="mpr-12852a.ic2" size="524288" crc="e304231a" sha1="4ab8a0b63816f9bdc76ae36962f1e8c7228f5473" offset="0x080000" />
 			</dataarea>
+			<dataarea name="sram" size="16384">
+			</dataarea>
 		</part>
 	</software>
 
@@ -719,6 +727,8 @@ better to use names related to the actual pcb, possibly even reverting to use th
 			<feature name="ic4" value="BA6162" />
 			<dataarea name="rom" size="2097152">
 				<rom name="mpr-16933.ic1" size="2097152" crc="83cb46d1" sha1="a2ba86f4d756f98886f8f9a56f20cbf8c3b2945e" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -750,6 +760,8 @@ better to use names related to the actual pcb, possibly even reverting to use th
 			<dataarea name="rom" size="2097152">
 				<rom name="mpr-17512.ic1" size="2097152" crc="9ed4c323" sha1="95ae529cecb7dbca281df25c3c4e7cb8f48d936c" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
+			<dataarea name="sram" size="16384">
+			</dataarea>
 		</part>
 	</software>
 
@@ -763,6 +775,8 @@ better to use names related to the actual pcb, possibly even reverting to use th
 			<dataarea name="rom" size="2097152">
 				<rom name="mpr-17513.ic1" size="2097152" crc="08dc1ead" sha1="7890074018f165eeb1281d81039fb07ccde7d197" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
+			<dataarea name="sram" size="16384">
+			</dataarea>
 		</part>
 	</software>
 
@@ -775,6 +789,8 @@ better to use names related to the actual pcb, possibly even reverting to use th
 			<feature name="pcb" value="171-6278A" />
 			<dataarea name="rom" size="2097152">
 				<rom name="mpr-17514.ic1" size="2097152" crc="332b9ecd" sha1="65c8b7ab94b05812d009b4bebda3c49891a6bfbe" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -795,6 +811,8 @@ better to use names related to the actual pcb, possibly even reverting to use th
 			<dataarea name="rom" size="2097152">
 				<rom name="mpr-16342.ic1" size="2097152" crc="6a632503" sha1="2ff45bb056ede0f745e52f8d02c54b4ca724ca4c" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
+			<dataarea name="fram" size="1024">
+			</dataarea>
 		</part>
 	</software>
 
@@ -807,6 +825,8 @@ better to use names related to the actual pcb, possibly even reverting to use th
 			<feature name="pcb" value="171-6658A" />
 			<dataarea name="rom" size="2097152">
 				<rom name="mpr-16343.ic1" size="2097152" crc="f4951d1f" sha1="7b98b21b7274233e962132bc22a7ccdf548c0ddb" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="fram" size="1024">
 			</dataarea>
 		</part>
 	</software>
@@ -867,6 +887,8 @@ better to use names related to the actual pcb, possibly even reverting to use th
 				<rom name="mpr-17720.ic1" size="2097152" crc="5385f970" sha1="30d80bfdbfa4758d1ad5aaad12899cf3e6dd1b63" offset="000000" />
 				<rom name="mpr-17721.ic2" size="1048576" crc="158fa2aa" sha1="f9c7aaf77e5cfe5b8bcce4e0021b7f413636b9ee" offset="0x200000" />
 			</dataarea>
+			<dataarea name="sram" size="16384">
+			</dataarea>
 		</part>
 	</software>
 
@@ -918,6 +940,8 @@ better to use names related to the actual pcb, possibly even reverting to use th
 			<feature name="pcb" value="171-6278A" />
 			<dataarea name="rom" size="2097152">
 				<rom name="mpr-18090.ic1" size="2097152" crc="52c7252b" sha1="4352ae7ba1316e4384c4632be80f2fe277443f51" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -1017,8 +1041,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="524288">
 				<rom name="a ressha de ikou md (jpn).bin" size="524288" crc="3d45de4f" sha1="d0d0aaad68978fd15c5857773141ae639de1abc7" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
 			</dataarea>
 		</part>
 	</software>
@@ -1116,8 +1143,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-13842a.bin" size="1048576" crc="e0d5e18a" sha1="842430c0465d810576e75851023929fec873580d" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
 			</dataarea>
 		</part>
 	</software>
@@ -1358,8 +1388,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="1048576">
 				<rom name="aerobiz (usa).bin" size="1048576" crc="cfaa9bce" sha1="104ad3c6f5aaba08270faf427991d6a256c6e67c" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -1369,8 +1402,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="1048576">
 				<rom name="air management - oozora ni kakeru (jpn).bin" size="1048576" crc="b3db0c71" sha1="b4e5752453cb3e4b3f6cb4fd9ad6473b4b8addd4" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -1380,8 +1416,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="1048576">
 				<rom name="aerobiz supersonic (usa).bin" size="1048576" crc="9377f1b5" sha1="f29b148c052f50a89e3b877ce027a0d5aaa387d1" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -1391,8 +1430,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="1048576">
 				<rom name="air management ii - koukuuou o mezase (jpn).bin" size="1048576" crc="4582817b" sha1="6ed89fc3302023bc95c2bba0d45fe1d30e1c5d86" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -1754,8 +1796,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="1310720">
 				<rom name="aoki ookami to shiroki meshika - genchou hishi (jpn).bin" size="1310720" crc="10be1d93" sha1="0de0f798f636285da2b4d248f9894bf975b45304" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -2018,8 +2063,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="atp tour (euro).bin" size="2097152" crc="1a3da8c5" sha1="c5fe0fe967369e9d9e855fd3c7826c8f583c49e3" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -2118,8 +2166,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="atp tour championship tennis (usa).bin" size="2097152" crc="8c822884" sha1="1ccd027cac63ee56b24a54a84706646d22d0b610" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -2184,8 +2235,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-14861.bin" size="1048576" crc="60af0f76" sha1="373fb1744170a114ef99802db987bc9aae009032" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -2195,8 +2249,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="1048576">
 				<rom name="ayrton senna's super monaco gp ii (usa).bin" size="1048576" crc="eac8ded6" sha1="1ee87744d86c4bdd4958cc70d77538351aa206e6" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -2316,8 +2373,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="524288">
 				<rom name="mpr-13677.bin" size="524288" crc="b1e268da" sha1="cee49b613298e060d938de523dfcbb27e790b5af" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
 			</dataarea>
 		</part>
 	</software>
@@ -2382,8 +2442,12 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="barkley shut up and jam! 2 (usa).bin" size="2097152" crc="321bb6bd" sha1="b13f13ccc1a21dacd295f30c66695bf97bbeff8d" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+            <!-- Correct? size taken from the header -->
+			<dataarea name="sram" size="4096">
 			</dataarea>
 		</part>
 	</software>
@@ -2976,8 +3040,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="1048576">
 				<rom name="bwcf01.bin" size="1048576" crc="3ed83362" sha1="2bbb454900ac99172a2d72d1e6f96a96b8d6840b" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -2987,8 +3054,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="bill walsh college football 95 (usa).bin" size="2097152" crc="a582f45a" sha1="2ae000f45474b3cdedd08eeca7f5e195959ba689" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -3108,8 +3178,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="1048576">
 				<rom name="blue almanac (jpn).bin" size="1048576" crc="7222ebb3" sha1="0be0d4d3e192beb4106c0a95c1fb0aec952c3917" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -3385,8 +3458,12 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="brett hull hockey '95 (usa).bin" size="2097152" crc="f7775a09" sha1="bcc9d8a737b5b6ccc5ddcd5906202508e4307f79" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+            <!-- Correct? size taken from the header -->
+			<dataarea name="sram" size="2048">
 			</dataarea>
 		</part>
 	</software>
@@ -4224,8 +4301,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="coach k college basketball (usa).bin" size="2097152" crc="67c309c6" sha1="8ff5d7a7fcc47f030a3ea69f4534d9c892f58ce2" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -4246,8 +4326,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="college football usa 97 (usa).bin" size="2097152" crc="2ebb90a3" sha1="9b93035ecdc2b6f0815281764ef647f2de039e7b" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -4257,8 +4340,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="college football's national championship (usa).bin" size="2097152" crc="172c5dbb" sha1="a3db8661e160e07b09bca03ba0d20ba4e80a4c59" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -4268,8 +4354,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="college football's national championship (prototype - apr 13, 1994).bin" size="2097152" crc="d9772def" sha1="2eb0daad82caff6bcefb438297a2d701c99173c5" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -4279,8 +4368,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="college football's national championship (prototype - apr 18, 1994).bin" size="2097152" crc="e0a1705f" sha1="ea19e141c64cc4abc6e7d7eea7bbb6783569a05a" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -4290,8 +4382,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="college football's national championship (prototype - apr 19, 1994).bin" size="2097152" crc="d5fe66c3" sha1="9961db2c46f0189c419da2e335e6ca974eaa5379" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -4301,8 +4396,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="college football's national championship (prototype - apr 29, 1994).bin" size="2097152" crc="99da1973" sha1="11e333a326ea71f77b816add76defc8f2846710d" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -4312,8 +4410,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="college football's national championship (prototype - jun 01, 1994).bin" size="2097152" crc="994dbc8f" sha1="99e5ec2705fac1566e47fd813d6cf5b5e7f7daf4" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -4323,8 +4424,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="college football's national championship (prototype - jun 03, 1994).bin" size="2097152" crc="9ca29321" sha1="1e155744a1c089cd2332c27cdad48e7f243c2fc8" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -4334,8 +4438,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="college football's national championship (prototype - jun 07, 1994).bin" size="2097152" crc="b40b791e" sha1="334daa4f48dea4d85145fcd1bfb03f522532a9ae" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -4345,8 +4452,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="college football's national championship (prototype - jun 08, 1994).bin" size="2097152" crc="d008debc" sha1="1b69304213ef1732c0b9b2f059179a7cf18b2c75" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -4356,8 +4466,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="college football's national championship (prototype - jun 14, 1994).bin" size="2097152" crc="ecef7de7" sha1="923ce9034f37167b65aec97e160f6fe34ea2da33" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -4367,8 +4480,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="college football's national championship (prototype - jun 15, 1994).bin" size="2097152" crc="c7e5a998" sha1="c9d010a0ffccecc2c01412daf64bf1b0eaf5055e" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -4378,8 +4494,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="college football's national championship (prototype - jun 18, 1994).bin" size="2097152" crc="74988a9d" sha1="164e3fc32aa295b0d87e1508dd5fe75f9a7cadb9" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -4389,8 +4508,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="college football's national championship (prototype - jun 20, 1994).bin" size="2097152" crc="898c17fa" sha1="4b30eea2fb1187cf3c9150f9dee5b5b9571c76f5" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -4400,8 +4522,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="college football's national championship (prototype - may 03, 1994).bin" size="2097152" crc="db1a3f66" sha1="d9db6ecb032fd88443d0575b01e61cb4aeea5703" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -4411,8 +4536,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="college football's national championship (prototype - may 06, 1994).bin" size="2097152" crc="0a538e75" sha1="ee673500aef188ca7cf086fb1cf616b58896fdcb" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -4422,8 +4550,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="college football's national championship (prototype - may 11, 1994 - a).bin" size="2097152" crc="ce65b294" sha1="b16e953b695148b8284f87be566774379c4c2453" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -4433,8 +4564,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="college football's national championship (prototype - may 17, 1994 - a).bin" size="2097152" crc="8cfd4c86" sha1="01ed2026a930383d926d71192b2a8f9417dfb245" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -4444,8 +4578,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="college football's national championship (prototype - may 20, 1994).bin" size="2097152" crc="f285385e" sha1="0b26c5748e976a64c02864e1934f2b50f6953cba" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -4455,8 +4592,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="college football's national championship (prototype - may 25, 1994).bin" size="2097152" crc="482e334a" sha1="e2fb264a11e08d57acf2756688880cd6fc353aba" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -4466,8 +4606,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="college football's national championship (prototype - may 31, 1994).bin" size="2097152" crc="c6766745" sha1="157b65be9d946c46f77a90e4a5847fa41f2692b9" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -4477,8 +4620,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="college football's national championship ii (usa).bin" size="2097152" crc="65b64413" sha1="9609f9934a80dba183dab603ae07f445f02b919d" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -5679,8 +5825,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="1048576">
 				<rom name="dino dini's soccer (euro).bin" size="1048576" crc="4608f53a" sha1="49d4a654dd2f393e43a363ed171e73cd4c8ff4f4" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -5855,8 +6004,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="786432">
 				<rom name="dominus (usa) (prototype).bin" size="786432" crc="30006ebd" sha1="fde8160bf51575463e81cbd0b5d12fb5d49eb695" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -6053,8 +6205,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="dragon slayer - eiyuu densetsu (jpn).bin" size="2097152" crc="01bc1604" sha1="f67c9139bbc93f171e274a5cd3fba66480cd8244" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -6064,8 +6219,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="dragon slayer - eiyuu densetsu ii (jpn).bin" size="2097152" crc="46924dc3" sha1="79b6201301acb5d9e9c56dcf65a9bcf9d9a931ab" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -6119,8 +6277,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="4194304">
 				<rom name="duke nukem 3d (bra).bin" size="4194304" crc="6bd2accb" sha1="a4663f2b96787a92db604a92491fa27e2b5ced9e" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
 			</dataarea>
 		</part>
 	</software>
@@ -6163,8 +6324,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="1048576">
 				<rom name="dungeons &amp; dragons - warriors of the eternal sun (euro, usa).bin" size="1048576" crc="af4a9cd7" sha1="9135f7fda03ef7da92dfade9c0df75808214f693" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -6196,8 +6360,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2621440">
 				<rom name="dyna brothers 2 - sega channel special (jpn).bin" size="2621440" crc="ba3554bc" sha1="8e10298dfff521397f0e82d1787e701d6928750b" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -6571,8 +6738,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="swed9584.bin" size="2097152" crc="e10a25c0" sha1="5f2c8303099ce13fe1e5760b7ef598a2967bfa8d" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
 			</dataarea>
 		</part>
 	</software>
@@ -6582,8 +6752,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="elitserien 96 (sweden).bin" size="2097152" crc="9821d0a3" sha1="085fb8e6f0d2ff0f399de5c57eb13d9c9325dbae" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -6780,8 +6953,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="espn national hockey night (usa).bin" size="2097152" crc="1d08828c" sha1="cfd65e3ffb17e1718356ef8de7c527e2c9fd8940" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -6791,8 +6967,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="espn national hockey night (usa) (beta).bin" size="2097152" crc="a427814a" sha1="c890fc232ca46a9499bb4e3107a519ae2d8edb81" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -6802,8 +6981,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="espn speed world (usa).bin" size="2097152" crc="f50be478" sha1="9400a2ee865f11d68c766059318d6fe69987d89b" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -6813,8 +6995,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="espn speed world (usa) (beta).bin" size="2097152" crc="ab12849a" sha1="2d69701a22929a751483e6f3ccf126dcccdbd38a" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -6824,8 +7009,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="espn sunday night nfl (usa).bin" size="2097152" crc="61e9c309" sha1="03f8c8805ebd4313c8a7d76b34121339bad33f89" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -6835,8 +7023,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="espn sunday night nfl (usa) (beta).bin" size="2097152" crc="d13aecdc" sha1="8eeace9ef641d806afc1eaeafa244a076123b118" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -6957,8 +7148,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="1048576">
 				<rom name="exile (usa).bin" size="1048576" crc="1b569dc2" sha1="28377e9a68c2dcdfdb4133c2eb0b634aec552958" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -6968,8 +7162,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="1048576">
 				<rom name="exile - toki no hazama e (jpn).bin" size="1048576" crc="880bf311" sha1="14ef77cbf6c023365e168f54456d5486679292ef" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -7111,8 +7308,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-15834.bin" size="1048576" crc="fbdd4520" sha1="a8327157f6537f4cd5daaff648864e8e0bf945f1" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -7155,8 +7355,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="524288">
 				<rom name="f1 circus md (jpn).bin" size="524288" crc="5d30befb" sha1="2efb8d46163e785a57421e726991328024ecd2a7" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -7232,8 +7435,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="524288">
 				<rom name="fastest 1 (jpn).bin" size="524288" crc="bb43f0de" sha1="837a19b4b821076f1cd01d53d90b4553a0252340" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -7452,8 +7658,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>Electronic Arts</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="fifa95b1.bin" size="2097152" crc="b389d036" sha1="586f9d0f218cf6bb3388a8610b44b6ebb9538fb5" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -7474,8 +7683,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="futbol argentino 98 - pasion de multitudes (unl).bin" size="2097152" crc="5c015888" sha1="44adb1cf6c1ce6e53314dc336168c5cf3313a739" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -7485,8 +7697,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>Electronic Arts</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="fifa01.bin" size="2097152" crc="bad30ffa" sha1="a7fcfe478b368d7d33bcbca65245f5faed9a1e07" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -7496,8 +7711,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="fifa soccer 99 (pirate) (unl).bin" size="2097152" crc="c5c5a4b0" sha1="2c8c1dc0aaa711e3ab3fe0d74b79184f33127350" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -7518,8 +7736,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>Electronic Arts</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="fifa 98 - road to world cup (euro).bin" size="2097152" crc="96947f57" sha1="6613f13da5494aaaba3222ed5e730ec9ce3c09a7" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -7993,8 +8214,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>Koei</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="1048576">
 				<rom name="gemfire (usa).bin" size="1048576" crc="3d36135b" sha1="98da5fdec3147edb75210ccf662601e502e23c31" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -8048,8 +8272,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>Koei</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="1048576">
 				<rom name="genghis khan ii - clan of the gray wolf (usa).bin" size="1048576" crc="87a281ae" sha1="4c1151413a261ad271543eeb64f512053f261a35" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -8557,8 +8784,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="hardball '94 (euro, usa).bin" size="2097152" crc="ea9c4878" sha1="eceeecb3d520f9b350e41d0dd010abefbcfbbdab" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
 			</dataarea>
 		</part>
 	</software>
@@ -8811,8 +9041,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="hybrid front, the (jpn).bin" size="2097152" crc="a1f1cfe7" sha1="ed592c78ef60d91a6c5723d11cd553d3798524e1" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
 			</dataarea>
 		</part>
 	</software>
@@ -8822,8 +9055,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="3145728">
 				<rom name="hybrid front, the (jpn) (beta).bin" size="3145728" crc="04f02687" sha1="b6e72b69a22869f966c52e7d58d146bc48b5eb84" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
 			</dataarea>
 		</part>
 	</software>
@@ -8910,8 +9146,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="img international tour tennis (euro, usa).bin" size="2097152" crc="e04ffc2b" sha1="1f1b410d17b39851785dee3eee332fff489db395" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -9130,8 +9369,12 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="1048576">
 				<rom name="j. league pro striker (jpn) (v1.3).bin" size="1048576" crc="2d5b7a11" sha1="1e437182fab2980156b101a53623c3c2f27c3a6c" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+            <!-- Correct? size taken from the header -->
+			<dataarea name="sram" size="1024">
 			</dataarea>
 		</part>
 	</software>
@@ -9141,8 +9384,12 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="1048576">
 				<rom name="j. league pro striker (jpn) (v1.0).bin" size="1048576" crc="ec229156" sha1="d3dcc24e50373234988061d3ef56c16d28e580ad" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+            <!-- Correct? size taken from the header -->
+			<dataarea name="sram" size="1024">
 			</dataarea>
 		</part>
 	</software>
@@ -9152,8 +9399,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="mpr-16857.bin" size="2097152" crc="9fe71002" sha1="924f1ae3d90bec7326a5531cd1d598cdeba30d36" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -9163,8 +9413,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="j. league pro striker final stage (jpn).bin" size="2097152" crc="e35e25fb" sha1="74e4a3ac4b93e25ace6ec8c3818e0df2390cffa2" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -9174,8 +9427,12 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-16267.bin" size="1048576" crc="0abed379" sha1="7cfd8c9119d0565ee9a7708dc46bb34dd3258e37" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+            <!-- Correct? size taken from the header -->
+			<dataarea name="sram" size="1024">
 			</dataarea>
 		</part>
 	</software>
@@ -9185,8 +9442,12 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="1048576">
 				<rom name="jack nicklaus' power challenge golf (euro, usa).bin" size="1048576" crc="5545e909" sha1="8d7edfe87da732ecd9820a6afbb9c5700cce43b2" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+            <!-- Correct? size taken from the header -->
+			<dataarea name="sram" size="2048">
 			</dataarea>
 		</part>
 	</software>
@@ -9273,8 +9534,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="1048576">
 				<rom name="janou touryuumon (jpn).bin" size="1048576" crc="b5ef97c6" sha1="4f307e0146e944fbbd4537f5cdc5da136204fc9b" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -9879,8 +10143,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="524288">
 				<rom name="kidou keisatsu patlabor - 98-shiki kidou seyo! (jpn).bin" size="524288" crc="21a0e749" sha1="5595422530e6891042a4a005d11b79af7f09fe9b" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -9890,8 +10157,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-14929.bin" size="1048576" crc="ffe7b3c7" sha1="92bfb3548ebff18eedebe07751bf2170f95780d7" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -9979,8 +10249,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="1572864">
 				<rom name="kishi densetsu (jpn).bin" size="1572864" crc="22e1f04a" sha1="2884f79b8f717fc9e244dac0fb441bdc44c68203" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -10056,8 +10329,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="la russa baseball 95 (usa, aus).bin" size="2097152" crc="3f848a92" sha1="0e73742113aa3f0aa5b010bb847569589cd3a5b0" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
 			</dataarea>
 		</part>
 	</software>
@@ -10078,8 +10354,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="landstalker - the treasures of king nole (euro).bin" size="2097152" crc="e3c65277" sha1="9fbadc86319936855831ecd096d82d716b304215" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -10089,8 +10368,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="landstalker - le tresor du roi nole (france).bin" size="2097152" crc="5de7d917" sha1="86db4b22b54e8583e35717927ad66b7535bf33b4" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -10100,8 +10382,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="landstalker - die schatze von konig nolo (germany).bin" size="2097152" crc="10fedb8f" sha1="b0b447158cabb562e6bf4c0b829ed938b34afb52" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -10111,8 +10396,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="landstalker - koutei no zaihou (jpn).bin" size="2097152" crc="60d4cedb" sha1="cdbc7cd9ceb181cad9e49b641ff717072546f0d9" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -10122,8 +10410,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="landstalker (usa).bin" size="2097152" crc="fbbb5b97" sha1="24345e29427b000b90df778965dd8834300a9dde" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -10133,8 +10424,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="landstalker (usa) (beta).bin" size="2097152" crc="70483d03" sha1="dfca19397479852584d4ac6fcbe27412f9bc1af0" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -10144,10 +10438,13 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="524288">
 				<rom name="mpr-13845.bin" size="524288" crc="b6ea5016" sha1="cc67c5a3b91e706b495eb561a95a038fff72b5da" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
+			<dataarea name="sram" size="16384">
+			</dataarea>
 	</software>
 
 	<software name="langris2">
@@ -10155,8 +10452,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="langrisser ii (jpn) (v1.2).bin" size="2097152" crc="4967c9f9" sha1="167944091348c89ce43dfa4854f8a51ed7276dde" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -10166,8 +10466,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="langrisser ii (jpn) (v1.1).bin" size="2097152" crc="0caa0593" sha1="4ba6591dfd85aa75ffe8dc21137a9291aa7f5603" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -10177,8 +10480,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="langrisser ii (jpn).bin" size="2097152" crc="7f891dfc" sha1="4bbc2502784a61eedf45eca5303dc68062964ff4" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -10375,8 +10681,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>Koei</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="liberty or death (usa).bin" size="2097152" crc="2adb0364" sha1="c0ddfc2149cd84fbb0c5860b98c3a16f6000b85e" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -10386,8 +10695,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="light crusader (jpn).bin" size="2097152" crc="237076a4" sha1="2b8c0931c33c143d41ef7cff6a8dbb9b8351d613" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -10397,8 +10709,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="light crusader (kor).bin" size="2097152" crc="6d0cbcb2" sha1="0f018f95b4933bb5b3b3a91cee8b9a8ecb376942" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -10408,8 +10723,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="light crusader (prototype - jun 08, 1995).bin" size="2097152" crc="e350ccfa" sha1="0bf26dba5324471532db776da1ee4c0c06add1e5" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -10419,8 +10737,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="light crusader (usa).bin" size="2097152" crc="beb715dc" sha1="df58fbcbede4b9659740b5505641d4cc7dd1b7f8" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -10463,8 +10784,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="lord monarch - tokoton sentou densetsu (jpn).bin" size="2097152" crc="238bf5db" sha1="9b5c71d70de132c8ba6f2adfdeba43077f76ac3e" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -10562,8 +10886,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="madden nfl '94 (euro, usa).bin" size="2097152" crc="d14b811b" sha1="856d68d3e8589df3452096434feef823684d11eb" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -10573,8 +10900,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="madden nfl 95 (euro, usa).bin" size="2097152" crc="db0be0c2" sha1="41cde6211da87a8e61e2ffd42cef5de588f9b9fc" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -10584,8 +10914,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="madden nfl 96 (euro, usa).bin" size="2097152" crc="f126918b" sha1="35a4241eed51f10de2e63c843f162ce5d92c70a2" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -10595,8 +10928,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="madden nfl 97 (euro, usa).bin" size="2097152" crc="c4b4e112" sha1="63544d2a0230be102f2558c03a74855fc712b865" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
 			</dataarea>
 		</part>
 	</software>
@@ -10617,8 +10953,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="madou monogatari i (jpn).bin" size="2097152" crc="dd82c401" sha1="143456600e44f543796cf6ade77830115a8f2f99" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -10925,8 +11264,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="524288">
 				<rom name="master of monsters (usa).bin" size="524288" crc="91354820" sha1="28f38617911a99504542b30f70c0d9c81996ef65" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -10936,8 +11278,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="524288">
 				<rom name="mpr-14120.bin" size="524288" crc="d51ee8c2" sha1="ca62d376be5cc7b944bbe9b5f2610f8bb55a2fed" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -10958,8 +11303,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="1048576">
 				<rom name="maten no soumetsu (jpn).bin" size="1048576" crc="b804a105" sha1="31bc44b019310e18174eb5e1a6d8e7d351103e4e" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -11179,8 +11527,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="rockman mega world (jpn).bin" size="2097152" crc="4d87235e" sha1="4dfcf5c07106f6db4d8b7e73a053bb46a21686c3" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -11798,8 +12149,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="chou kyuukai miracle nine (jpn).bin" size="2097152" crc="6d8c2206" sha1="af2fd89dc7fb4ac0647c09edff462c7ae92dc771" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -11842,8 +12196,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="mlbpa baseball (usa).bin" size="2097152" crc="14a8064d" sha1="5a85c659db9dd7485ed1463a252f0941346aba24" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -11875,8 +12232,12 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="monster world iv (jpn).bin" size="2097152" crc="36a3aaa4" sha1="46ba5e8775a2223fe5056f54555d9caa7d04f4e1" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+            <!-- Correct? size taken from the header -->
+			<dataarea name="sram" size="1024">
 			</dataarea>
 		</part>
 	</software>
@@ -12139,8 +12500,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="1048576">
 				<rom name="nakajima satoru kanshuu f1 grand prix (jpn).bin" size="1048576" crc="93be47cf" sha1="e108342d53e1542d572d2e45524efbfe9d5dc964" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -12164,6 +12528,8 @@ better to use names related to the actual pcb, possibly even reverting to use th
 			<dataarea name="rom" size="1048576">
 				<rom name="nakajima satoru kanshuu f1 super license (jpn).bin" size="1048576" crc="8774bc79" sha1="ad5456259890bcb32098f82f14a1d5355af83f7e" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
+			<dataarea name="sram" size="16384">
+			</dataarea>
 		</part>
 	</software>
 
@@ -12172,8 +12538,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="nba action (usa).bin" size="2097152" crc="99c348ba" sha1="e2b5290d656219636e2422fcf93424ae602c4d29" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -12194,8 +12563,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="nba action (prototype - jan 16, 1994).bin" size="2097152" crc="fe43c79d" sha1="da6fcc1d7069e315797dd40a89e21963ab766b9e" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -12205,8 +12577,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="nba action (prototype - jan 27, 1994) (broken - c08 missing).bin" size="2097152" crc="176a4bc5" sha1="d5a6fbf8fe19bf70631a847e6b5e6a35878c7ae8" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -12216,8 +12591,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="nba action '95 starring david robinson (euro, usa).bin" size="2097152" crc="aa7006d6" sha1="34e2df219e09c24c95c588a37d2a2c5e15814d68" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
 			</dataarea>
 		</part>
 	</software>
@@ -12227,8 +12605,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="nba action '95 (prototype - dec 02, 1994 - b).bin" size="2097152" crc="04bf6f6e" sha1="42c55adad0249bb09350d1ac7c9bfb737ed091c8" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -12238,8 +12619,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="nba action '95 (prototype - dec 09, 1994).bin" size="2097152" crc="2b198487" sha1="2c34500bf06bbac610e8fca45db48382e32c8807" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -12249,8 +12633,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="nba action '95 (prototype - dec 15, 1994).bin" size="2097152" crc="10a3b46d" sha1="c3f88b334af683e8ac98cafafa9abf4dfe65a4b7" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -12260,8 +12647,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="nba action '95 (prototype - dec 22, 1994 - a).bin" size="2097152" crc="f92ba323" sha1="35f7436fa15591234edcb6fe72da24d091963d30" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
 			</dataarea>
 		</part>
 	</software>
@@ -12271,8 +12661,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="nba action '95 (prototype - dec 24, 1994 - a).bin" size="2097152" crc="ddb04550" sha1="248e67cad67118a1449de308bac0437641bda3ec" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
 			</dataarea>
 		</part>
 	</software>
@@ -12282,8 +12675,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="nba action '95 (prototype - dec 29, 1994).bin" size="2097152" crc="dcebe32a" sha1="2604a03c1dc59538a82e32bcc6f8a995bd8af609" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
 			</dataarea>
 		</part>
 	</software>
@@ -12293,8 +12689,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="nba action '95 (prototype - dec 30, 1994).bin" size="2097152" crc="d87956c9" sha1="4ddbe2f458915db0da45fa490d653f2d94ec1263" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -12304,8 +12703,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="nba action '95 (prototype - dec 31, 1994).bin" size="2097152" crc="582a378f" sha1="ba08a3f042f96b4b3bb889bbacb6a5e13b114f0c" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
 			</dataarea>
 		</part>
 	</software>
@@ -12315,8 +12717,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="nba action '95 (prototype - feb 01, 1995).bin" size="2097152" crc="2c02a79d" sha1="3dbc1a80005eb6783feeb4d3604d382d1cf688bc" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
 			</dataarea>
 		</part>
 	</software>
@@ -12327,8 +12732,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2094238">
 				<rom name="nba action '95 (prototype - feb 1, 1995).bin" size="2094238" crc="c4a0a624" sha1="58c88d26baffd0f68c2b5d95284323ba99db9b5a" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
 			</dataarea>
 		</part>
 	</software>
@@ -12339,8 +12747,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2089456">
 				<rom name="nba action '95 (prototype - feb 2, 1995).bin" size="2089456" crc="a9167903" sha1="3a5a95a79b1b2da0b35e8cde02d8645fe474fdde" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
 			</dataarea>
 		</part>
 	</software>
@@ -12350,8 +12761,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="nba action '95 (prototype - jan 03, 1995).bin" size="2097152" crc="374af160" sha1="b50be710436a3cb1f7644fdfac5d5098cd9dbb2b" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -12361,8 +12775,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="nba action '95 (prototype - jan 08, 1995).bin" size="2097152" crc="0a6b7b9e" sha1="3a60332ee684ff8accd96aef404346e66e267b6f" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -12372,8 +12789,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="nba action '95 (prototype - jan 12, 1995).bin" size="2097152" crc="b47ff025" sha1="9f6a2ea386d383aee3be06d6b74fda67b1ebd960" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -12383,8 +12803,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="nba action '95 (prototype - jan 15, 1995 - a).bin" size="2097152" crc="9c6a1f27" sha1="2fdb8879d50d963d984c280cab2e279b9479081f" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
 			</dataarea>
 		</part>
 	</software>
@@ -12394,8 +12817,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="nba action '95 (prototype - jan 21, 1995).bin" size="2097152" crc="e337bdfb" sha1="591288688956cec3d0aca3dd099b3e0985ca947a" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
 			</dataarea>
 		</part>
 	</software>
@@ -12405,8 +12831,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="nba action '95 (prototype - jan 22, 1995 - b).bin" size="2097152" crc="7bd7ca47" sha1="f219274a65c31d76a2d6633b7e7cf65462850f47" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
 			</dataarea>
 		</part>
 	</software>
@@ -12416,8 +12845,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="nba action '95 (prototype - jan 24, 1995 - b).bin" size="2097152" crc="15abcf41" sha1="eb99f0e1cac800f94743fde873448e56edb46333" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
 			</dataarea>
 		</part>
 	</software>
@@ -12427,8 +12859,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2089360">
 				<rom name="nba action '95 (prototype - jan 27, 1995 - a).bin" size="2089360" crc="79c7fb00" sha1="90c246dcb8ccea0f30ae5582b610721fc802f937" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
 			</dataarea>
 		</part>
 	</software>
@@ -12438,8 +12873,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2089360">
 				<rom name="nba action '95 (prototype - jan 27, 1995 - b).bin" size="2089360" crc="ef7f608b" sha1="32104d3585dcbf190904accdb9528f0b7105eb4b" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
 			</dataarea>
 		</part>
 	</software>
@@ -12449,8 +12887,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="nba action '95 (prototype - jan 28, 1995 - a).bin" size="2097152" crc="57c2c69c" sha1="f1affb6e01ca23b67aee9e1c1767f9ec13849823" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
 			</dataarea>
 		</part>
 	</software>
@@ -12460,8 +12901,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2089374">
 				<rom name="nba action '95 (prototype - jan 28, 1995).bin" size="2089374" crc="97d7075d" sha1="dd1256efa397a56d461e2bc7aec9f72aff9b04fb" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
 			</dataarea>
 		</part>
 	</software>
@@ -12471,8 +12915,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="nba action '95 (prototype - jan 30, 1995).bin" size="2097152" crc="2fac80b2" sha1="ab90daf9791fa7347fb8f040e27f91b6bae46e1e" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
 			</dataarea>
 		</part>
 	</software>
@@ -12482,8 +12929,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="nba action '95 (prototype - nov 18, 1994).bin" size="2097152" crc="2d411e4b" sha1="492776fc2659091d435a79588efcdd8e06d3cd0b" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -12493,8 +12943,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="nba action '95 (prototype - nov 23, 1994 - a).bin" size="2097152" crc="4650cfcc" sha1="0eee2e7296e3eed5dbf85954ce14a53622ae3d64" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -12597,8 +13050,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="nba live 95 (euro, usa).bin" size="2097152" crc="66018abc" sha1="f86bc9601751ac94119ab2f3ecce2029d5678f01" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -12619,8 +13075,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="nba live 96 (euro, usa).bin" size="2097152" crc="49de0062" sha1="5fca106c839d3dea11cbf6842d1d7650db06ca72" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -12630,8 +13089,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="nba live 97 (euro, usa).bin" size="2097152" crc="7024843a" sha1="1671451ab4ab6991e13db70671054c0f2c652a95" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -12685,8 +13147,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="nba pro basketball '94 (jpn).bin" size="2097152" crc="eea19bce" sha1="99c91fe3a5401e84e7b3fd2218dcb3aeaf10db74" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -12696,8 +13161,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="nba showdown '94 (euro, usa).bin" size="2097152" crc="160b7090" sha1="3134a3cb63115d2e16e63a76c2708cdaecab83e4" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -12707,8 +13175,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="nba showdown '94 (usa) (beta).bin" size="2097152" crc="6643a308" sha1="e804ca0f4da505056f0813f00df9b139248f59af" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -12718,8 +13189,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="1572864">
 				<rom name="ncaa final four basketball (usa).bin" size="1572864" crc="ed0c1303" sha1="29021b8c3bbcc62606c692a3de90d4e7a71b6361" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -12731,6 +13205,8 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="ncaa football (usa).bin" size="1048576" crc="081012f0" sha1="227e3c650d01c35a80de8a3ef9b18f96c07ecd38" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -12751,8 +13227,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="1572864">
 				<rom name="new 3d golf simulation devil's course (jpn).bin" size="1572864" crc="bd090c67" sha1="4509c10ab263175c605111c72c6c63c57321046a" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
 			</dataarea>
 		</part>
 	</software>
@@ -12762,8 +13241,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="1572864">
 				<rom name="mpr-16076.bin" size="1572864" crc="d2a9bf92" sha1="d023f9fc5d7c7f2873a5bf79f6035111b78cdd5d" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
 			</dataarea>
 		</part>
 	</software>
@@ -12773,8 +13255,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="1572864">
 				<rom name="new 3d golf simulation waialae no kiseki (jpn).bin" size="1572864" crc="cbe2c1f6" sha1="5d78c5cf3a514275a7df6d9fdbd708584b42e697" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
 			</dataarea>
 		</part>
 	</software>
@@ -12784,8 +13269,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="nfl '95 (euro, usa).bin" size="2097152" crc="b58e4a81" sha1="327249456f96ccb3e9758c0162c5f3e3f389072f" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
 			</dataarea>
 		</part>
 	</software>
@@ -12905,8 +13393,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="nfl '95 (prototype - sep 01, 1994).bin" size="2097152" crc="9240fcaa" sha1="ea1126f9cade3ec680dd029af10a5268cd5afa72" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -12916,8 +13407,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="nfl '95 (prototype - sep 02, 1994).bin" size="2097152" crc="ff049a49" sha1="83c70177164e418b988ed9144d9d12c0e7052c3b" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -12927,8 +13421,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="nfl '95 (prototype - sep 04, 1994).bin" size="2097152" crc="60604d40" sha1="c07558f34b7480e063eb60126fc33fba36ae3daa" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -12938,8 +13435,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="nfl '95 (prototype - sep 05, 1994 - b).bin" size="2097152" crc="123985a5" sha1="f25cbabd3f6284387e66eaa72fa4124f3768121e" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -12949,8 +13449,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="nfl '95 (prototype - sep 05, 1994).bin" size="2097152" crc="dbdf61ac" sha1="787f8093d8a5c55ee9dcaa49925752169527fa62" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -12960,8 +13463,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="nfl '95 (prototype - sep 06, 1994).bin" size="2097152" crc="624b8699" sha1="59c548514bee4be7a5e6e3483ac3122d410a7e4e" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -12971,8 +13477,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="nfl '95 (prototype - sep 07, 1994).bin" size="2097152" crc="ae8aa4be" sha1="ddf2b988bc035a0736ed3a1d7c8e6aa8cd2625f8" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -12982,8 +13491,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="nfl '95 (prototype - sep 08, 1994).bin" size="2097152" crc="22c5e289" sha1="f8689fd01dedced28ca417bf7ff8a9eea9973c3d" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -12993,8 +13505,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="nfl '95 (prototype - sep 09, 1994).bin" size="2097152" crc="55df1066" sha1="2ba79a9a638894abbcd0702ba380b68ccaebb50f" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -13004,8 +13519,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="nfl '95 (prototype - sep 11, 1994 - b).bin" size="2097152" crc="111ac6a0" sha1="2e3e044bd6061002444bdc4bbe5de1f8c8417ce6" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
 			</dataarea>
 		</part>
 	</software>
@@ -13015,8 +13533,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="nfl '95 (prototype - sep 11, 1994).bin" size="2097152" crc="21614c4f" sha1="91babf6f0d86e19e82c3f045d01e99ea9fe0253c" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
 			</dataarea>
 		</part>
 	</software>
@@ -13026,8 +13547,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="nfl 98 (usa).bin" size="2097152" crc="f73ec54c" sha1="27ea0133251e96c091b5a96024eb099cdca21e40" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
 			</dataarea>
 		</part>
 	</software>
@@ -13048,8 +13572,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="nfl football '94 (jpn).bin" size="2097152" crc="e490dc4a" sha1="a530a93d124ccecfbf54f0534b6d3269026e5988" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -13094,8 +13621,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="1048576">
 				<rom name="nhk taiga drama - taiheiki (jpn).bin" size="1048576" crc="09fbb30e" sha1="67358048fc9bc93d8835af852bc437124e015a61" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -13105,8 +13635,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="nhl 95 (euro, usa).bin" size="2097152" crc="e8ee917e" sha1="09e87b076aa4cd6f057a1d65bb50fd889b509b44" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
 			</dataarea>
 		</part>
 	</software>
@@ -13127,8 +13660,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="nhl 97 (euro, usa).bin" size="2097152" crc="f067c103" sha1="8a90d7921ab8380c0abb0b5515a6b9f96ca6023c" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
 			</dataarea>
 		</part>
 	</software>
@@ -13149,8 +13685,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="nhl all-star hockey '95 (usa).bin" size="2097152" crc="e6c0218b" sha1="f2069295f99b5d50444668cfa9d4216d988d5f46" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -13160,8 +13699,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097146">
 				<rom name="nhl all-star hockey '95 (prototype - dec 01, 1994 - b).bin" size="2097146" crc="c209d720" sha1="ff9e08e779ed07f0d055ba7ba34d602c5e6f892d" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -13171,8 +13713,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097146">
 				<rom name="nhl all-star hockey '95 (prototype - dec 01, 1994).bin" size="2097146" crc="112e4cb3" sha1="212449ee98b48e3aa8e7bee5791e6359f10f06de" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -13184,6 +13729,8 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="2097146">
 				<rom name="nhl all-star hockey '95 (prototype - dec 02, 1994).bin" size="2097146" crc="01d6a6c7" sha1="130f95bccd159234c117890b0412b415b43161a9" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -13248,8 +13795,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097146">
 				<rom name="nhl all-star hockey '95 (prototype - nov 23, 1994).bin" size="2097146" crc="88d4fc38" sha1="4550baf4f39ff20aacb52aade9d03598c47ce1b2" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -13259,8 +13809,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097146">
 				<rom name="nhl all-star hockey '95 (prototype - nov 27, 1994).bin" size="2097146" crc="658ffe52" sha1="c36c767bc1cfcc3301ca84fa37bc22bfb1e3678d" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -13270,8 +13823,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097146">
 				<rom name="nhl all-star hockey '95 (prototype - nov 28, 1994).bin" size="2097146" crc="51ad0056" sha1="5e54fe1f0a3dee5a9cec0722ab9eb5f17b6862db" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -13281,8 +13837,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097146">
 				<rom name="nhl all-star hockey '95 (prototype - nov 29, 1994).bin" size="2097146" crc="a060a60b" sha1="574bbf1b0890ca46fbee9e3f211060f15c02d037" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -13393,8 +13952,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="nightmare circus (bra).bin" size="2097152" crc="06da3217" sha1="3c80ff5ba54abe4702a3bb7d812571d3dc50c00f" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -13404,8 +13966,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="nightmare circus (bra) (alt).bin" size="2097152" crc="31de5a94" sha1="61b7d25e15011d379d07a8dad4f8c5bb5f75e29f" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -13426,8 +13991,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="524288">
 				<rom name="nikkan sports pro yakyuu van (jpn).bin" size="524288" crc="c3655a59" sha1="d29f7e70feae3b4f1b423026b7a124514ee48dcf" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
 			</dataarea>
 		</part>
 	</software>
@@ -13470,8 +14038,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-14456.bin" size="1048576" crc="30bf8637" sha1="1ed50cae48405ec8ad9257df3d445521e60636d8" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
 			</dataarea>
 		</part>
 	</software>
@@ -13481,8 +14052,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="nobunaga no yabou - haouden (jpn).bin" size="2097152" crc="96c01fc6" sha1="9246a29b25e276dc1f7edfae87229549cf87d92e" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
 			</dataarea>
 		</part>
 	</software>
@@ -13492,8 +14066,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>Koei</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="524288">
 				<rom name="nobunaga's ambition (usa).bin" size="524288" crc="b9bc07bc" sha1="394c6b46a9e9b9177a135fd8fd43392eb1099666" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -13503,8 +14080,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>Koei</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="524288">
 				<rom name="nobunaga no yabou - zenkoku ban (jpn).bin" size="524288" crc="1381b313" sha1="a1f64afbf3bcdc85b61bce96454105128ca6746a" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -13690,8 +14270,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>Koei</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="1048576">
 				<rom name="operation europe - path to victory 1939-45 (usa).bin" size="1048576" crc="e7cba1d8" sha1="e2e484c6db2bb058d04288b4dfea0ed199108d24" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
 			</dataarea>
 		</part>
 	</software>
@@ -13701,8 +14284,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>Koei</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="1048576">
 				<rom name="europa sensen (jpn).bin" size="1048576" crc="b0416c60" sha1="d382f977ea3071f133a947ceb3528904e72f9bc9" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
 			</dataarea>
 		</part>
 	</software>
@@ -13833,8 +14419,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="1048576">
 				<rom name="junker's high (jpn) (beta) (bad dump).bin" size="1048576" crc="23534949" sha1="81a9b6d29878b4e9313a887b5349c12846b9d77f" offset="000000" status="baddump" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -13910,8 +14499,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>Koei</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="1048576">
 				<rom name="pacific theater of operations (usa).bin" size="1048576" crc="d9d4c6e2" sha1="41d1d1956104133388b4ea69792fccca8013524a" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
 			</dataarea>
 		</part>
 	</software>
@@ -13921,8 +14513,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>Koei</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="1048576">
 				<rom name="teitoku no ketsudan (jpn).bin" size="1048576" crc="9b08e4e4" sha1="adc4c03636dbd8ca5449a8a66c6a7b7ef281893a" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
 			</dataarea>
 		</part>
 	</software>
@@ -14053,8 +14648,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="pebble beach golf links (euro).bin" size="2097152" crc="6cfc7297" sha1="53e8e8f11fb9950732409b770b7d9c8dabe85a19" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
 			</dataarea>
 		</part>
 	</software>
@@ -14064,8 +14662,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="pebble beach golf links (usa).bin" size="2097152" crc="95823c43" sha1="c9971710651056b8211b9bbd68eb5d1569e39e1f" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
 			</dataarea>
 		</part>
 	</software>
@@ -14075,8 +14676,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="1572864">
 				<rom name="new 3d golf simulation pebble beach no hatou (jpn).bin" size="1572864" crc="96ed2e5d" sha1="dee8430f4f15b4d04e1e3c0cc9d7d7f55ca1ad7b" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
 			</dataarea>
 		</part>
 	</software>
@@ -14086,8 +14690,12 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="pele ii - world tournament soccer (euro, usa).bin" size="2097152" crc="05a486e9" sha1="96498065545ed122aa29471d762a2ae1362b2dea" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+            <!-- Correct? size taken from the header -->
+			<dataarea name="sram" size="1024">
 			</dataarea>
 		</part>
 	</software>
@@ -14097,8 +14705,12 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="1048576">
 				<rom name="pele! (euro, usa).bin" size="1048576" crc="5a8abe51" sha1="c0a91e2d10b98174faa647fb732c335d7438abf7" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+            <!-- Correct? size taken from the header -->
+			<dataarea name="sram" size="4096">
 			</dataarea>
 		</part>
 	</software>
@@ -14141,8 +14753,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="1048576">
 				<rom name="euro03.bin" size="1048576" crc="8ca45acd" sha1="640615be6891a8457d94bb81b0e8e1fa7c5119a8" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -14154,6 +14769,8 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="pga9601.bin" size="2097152" crc="9698bbde" sha1="abc2a8d773724cd8fb1aeae483f5ca72f47e77fa" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
 			</dataarea>
 		</part>
 	</software>
@@ -14185,8 +14802,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="1048576">
 				<rom name="pga tour golf ii (euro, usa) (v1.1).bin" size="1048576" crc="e82b8606" sha1="12d5236a4ff23c5b1e4f452b3abd3d48e6e55314" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -14196,8 +14816,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="1048576">
 				<rom name="pga tour golf ii (jpn).bin" size="1048576" crc="c05b7a4a" sha1="a5896f2f019530929194a6d80828d18b859b9174" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -14210,6 +14833,8 @@ better to use names related to the actual pcb, possibly even reverting to use th
 			<dataarea name="rom" size="2097152">
 				<rom name="pga tour golf iii (euro, usa).bin" size="2097152" crc="aeb3f65f" sha1="702707efcbfe229f6e190f2b6c71b6f53ae9ec36" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
+			<dataarea name="sram" size="16384">
+			</dataarea>
 		</part>
 	</software>
 
@@ -14218,8 +14843,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="786432">
 				<rom name="phantasy star ii (euro, usa).bin" size="786432" crc="0d07d0ef" sha1="fcd032ded2235171f51db316ad1b7688fbbdafe4" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -14229,8 +14857,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="786432">
 				<rom name="phantasy star ii (bra).bin" size="786432" crc="e6688b66" sha1="ab62fac112cb4dd1f19cb973bd7952b161f6d100" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -14240,8 +14871,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="786432">
 				<rom name="mpr-12140+mpr-12181+mpr-12182.bin" size="786432" crc="bec8eb5a" sha1="fc186c681e110723b4be5590f242c73d5004c8a7" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -14339,8 +14973,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="786432">
 				<rom name="phantasy star iii - generations of doom (euro, usa, kor).bin" size="786432" crc="c6b42b0f" sha1="59d4914e652672fd1e453c76b8250d17e8ca154e" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -14350,8 +14987,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="786432">
 				<rom name="phantasy star iii - generations of doom (bra).bin" size="786432" crc="2e9b4c23" sha1="59ccfc6b85b95666d0e2c85e3e08c847c4a7ad34" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -14361,8 +15001,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="786432">
 				<rom name="phantasy star iii - toki no keishousha (jpn).bin" size="786432" crc="6c48c06f" sha1="68b0f8e73dea5dca1b6ac8c0e12bc1d9761edf32" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -14372,8 +15015,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="3145728">
 				<rom name="phantasy star iv (usa).bin" size="3145728" crc="fe236442" sha1="bc7ff6d6a8408f38562bc610f24645cad6c42629" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -14383,8 +15029,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="3145728">
 				<rom name="phantasy star - sennenki no owari ni (jpn).bin" size="3145728" crc="f0bfad42" sha1="9d330d5e395b7caae11fae92f71d259b8391904b" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -14394,8 +15043,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="3145728">
 				<rom name="phantasy star iv (prototype - aug 15, 1994).bin" size="3145728" crc="60137f25" sha1="81fe74c288bcf97b70758442c520ec47308cfcee" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -14405,8 +15057,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="3145728">
 				<rom name="phantasy star iv (prototype - jun 08, 1994).bin" size="3145728" crc="dc2e1c0a" sha1="d72b9d68cfb54b4221f3a2416eac30a94accd427" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -14416,8 +15071,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="3145728">
 				<rom name="phantasy star iv (prototype - may 30, 1994).bin" size="3145728" crc="b32b17e1" sha1="803877f317eeaaec57af07451a5ccf9309db513c" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -14427,8 +15085,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="3145728">
 				<rom name="phantasy star iv (prototype - nov 07, 1994).bin" size="3145728" crc="bda29cdf" sha1="e0c3de9991a03fd48dc85caae6415aaac016ab4a" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -14438,8 +15099,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="3145728">
 				<rom name="phantasy star iv (prototype - oct 27, 1994).bin" size="3145728" crc="12a2590a" sha1="6720d3afcd28cad06ac15749843d2a6995f403dc" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -14570,8 +15234,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="1048576">
 				<rom name="pirates! gold (usa).bin" size="1048576" crc="ed50e75c" sha1="ea597dbefc8f804524606af3c1c4fe6ba55e86e9" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -14724,8 +15391,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="1048576">
 				<rom name="power monger (jpn, kor).bin" size="1048576" crc="553289b3" sha1="f0a48f25d87f7a6d17ff76f5e29ea7be2d430ce4" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -14768,8 +15438,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-18473.bin" size="1048576" crc="303b889f" sha1="2916e5ef628e077cde87be873e0ea2507ef5c844" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
 			</dataarea>
 		</part>
 	</software>
@@ -14779,8 +15452,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="1048576">
 				<rom name="premier manager 97 (euro).bin" size="1048576" crc="fccbf69b" sha1="e2df3b48170e1a7bde46af2adbf939803e267e13" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
 			</dataarea>
 		</part>
 	</software>
@@ -14801,8 +15477,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="prime time nfl starring deion sanders (usa).bin" size="2097152" crc="5aa53cbc" sha1="7d7a5a920ac30831556b58caac66f4a8dde1632a" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
 			</dataarea>
 		</part>
 	</software>
@@ -15177,7 +15856,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="524288">
+			<dataarea name="rom" size="1310720">
 			<rom name="mpr-14371 (hacked).bin" size="1310720" crc="1801098b" sha1="7b1bd16fb817cc5e2af238cebe8521aaca8f6195" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
@@ -15430,8 +16109,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="1048576">
 				<rom name="ransei no hasha (jpn).bin" size="1048576" crc="a9a0083d" sha1="7c431e26226b99d09d61c4dc64131b2d81ae870e" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -15507,8 +16189,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-14187.bin" size="1048576" crc="2e515f82" sha1="a07e4d56c9842e1177df9016fb9478060dc4c1c6" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -16114,8 +16799,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="1048576">
 				<rom name="romance of the three kingdoms ii (usa).bin" size="1048576" crc="3d842478" sha1="89fc2203b0369565124184690a5a5037ac9c54d7" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
 			</dataarea>
 		</part>
 	</software>
@@ -16125,8 +16813,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-14455.bin" size="1048576" crc="437ba326" sha1="d9a912caacaa476a890564f62b6ce9cc8f60496e" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
 			</dataarea>
 		</part>
 	</software>
@@ -16136,8 +16827,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="1310720">
 				<rom name="romance of the three kingdoms iii - dragon of destiny (usa).bin" size="1310720" crc="7e41c8fe" sha1="a47b0ac13ef8229fbfc89216c8ecb66d72f6f73a" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
 			</dataarea>
 		</part>
 	</software>
@@ -16147,8 +16841,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="1572864">
 				<rom name="sangokushi iii (jpn).bin" size="1572864" crc="a8de6aea" sha1="c85d03a6bcfeccc66ea3fa3cbda006c83576815f" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
 			</dataarea>
 		</part>
 	</software>
@@ -16268,8 +16965,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="1048576">
 				<rom name="san guo zhi lie zhuan - luan shi qun ying (chi).bin" size="1048576" crc="3b5cc398" sha1="7aaa0cc1dafaa14e6d62d6c1dbd462e69617bf7e" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -16290,8 +16990,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="1048576">
 				<rom name="sangokushi retsuden - ransei no eiyuutachi (jpn).bin" size="1048576" crc="0f56785a" sha1="9b79f91060e68b9f6f48c8a5f38bc9873d03c4a9" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -16400,8 +17103,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="524288">
 				<rom name="mpr-16014.bin" size="524288" crc="f9b396b8" sha1="2ee1ad4aac354b6d227b16976f0875f4625ff604" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -16411,8 +17117,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="524288">
 				<rom name="sensible soccer (beta).bin" size="524288" crc="ef52664d" sha1="c12a644cf81886050a4ae108b17b3c742055f5c3" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -16477,8 +17186,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="shadowrun (usa).bin" size="2097152" crc="fbb92909" sha1="a06a281d39e845bff446a541b2ff48e1d93143c2" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -16488,8 +17200,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="shadowrun (jpn).bin" size="2097152" crc="d32199f7" sha1="e28bb51227abcc71aaf18d445d3651054247c662" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -16620,8 +17335,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="1572864">
 				<rom name="shining force (usa).bin" size="1572864" crc="e0594abe" sha1="7cbb3ed31c982750d70a273b9561a9e1b2c04eea" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -16631,8 +17349,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="1572864">
 				<rom name="shining force (usa) (beta).bin" size="1572864" crc="ce67143a" sha1="f026c9243431c9c2d4b0660e340158816a22b869" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -16642,8 +17363,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="1572864">
 				<rom name="shining force - kamigami no isan (jpn).bin" size="1572864" crc="9378fbcd" sha1="ef8afbdc9af931d9da34d72efc8a76f0d5f4379d" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -16653,8 +17377,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="shining force ii - koe no fuuin (jpn).bin" size="2097152" crc="0288f3e1" sha1="8e1f1a510af4d43716d9ee34d47becf907dec147" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -16664,8 +17391,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="shining force ii (prototype - apr 04, 1994).bin" size="2097152" crc="5843670c" sha1="cd98c45ec170ce72fabe2237cc55dc4f0b6aa884" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -16675,8 +17405,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="shining force ii (prototype - jun 07, 1994).bin" size="2097152" crc="03b68bba" sha1="caeb48ed31991614c21121bf7d7a899aea946a81" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -16686,8 +17419,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="shining force ii (usa).bin" size="2097152" crc="4815e075" sha1="22defc2e8e6c1dbb20421b906796538725b3d893" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -16697,8 +17433,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="1048576">
 				<rom name="shining in the darkness (euro, usa).bin" size="1048576" crc="4d2785bc" sha1="4e10c90199d6edd2030a4ba1c42c7c166bf309ec" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -16708,8 +17447,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="1048576">
 				<rom name="shining in the darkness (bra).bin" size="1048576" crc="3ee2bbc4" sha1="08c6e884d48329c45d9f090aeea03efd4c1918c0" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -16719,8 +17461,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-13807.bin" size="1048576" crc="496af51c" sha1="c09ff5bcee1a29a48c65be4ad584708b85ca549b" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -17115,8 +17860,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="mpr-17499.bin" size="2097152" crc="a30ebdb1" sha1="110a61671b83fe17fba768ab85b535ca1cc6d7ea" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -17126,8 +17874,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="crusader of centy (usa).bin" size="2097152" crc="41858f6f" sha1="bf2e8d122f4670865bedbc305ef991ee5f52d647" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -17357,8 +18108,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-FRAM" />
 			<dataarea name="rom" size="4194304">
 				<rom name="sonic 3c (prototype 0408 - apr 08, 1994, 17.29).bin" size="4194304" crc="59d23df5" sha1="5f96ddccff1e95d82201687b939973c642a05394" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="fram" size="1024">
 			</dataarea>
 		</part>
 	</software>
@@ -17368,8 +18122,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-FRAM" />
 			<dataarea name="rom" size="4194304">
 				<rom name="sonic 3c (prototype 0517 - may 17, 1994, 17.08).bin" size="4194304" crc="766c4b81" sha1="d6012af0f7856476892982e50b3d512d606dcb96" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="fram" size="1024">
 			</dataarea>
 		</part>
 	</software>
@@ -17742,8 +18499,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-FRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="sonic the hedgehog 3 (pirate).bin" size="2097152" crc="c818f6fd" sha1="bc2b67803bbba89a456a464e679cde4b4bb567fb" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="fram" size="1024">
 			</dataarea>
 		</part>
 	</software>
@@ -17753,8 +18513,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-FRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="sonic the hedgehog 3 (usa).bin" size="2097152" crc="9bc192ce" sha1="75e9c4705259d84112b3e697a6c00a0813d47d71" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="fram" size="1024">
 			</dataarea>
 		</part>
 	</software>
@@ -17764,8 +18527,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="1048576">
 				<rom name="sorcerer's kingdom (usa) (v1.1).bin" size="1048576" crc="bb1fc9ce" sha1="87759abb603f1f97c2e136682dc78eea545338ce" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -17775,8 +18541,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="1048576">
 				<rom name="sorcerer's kingdom (usa).bin" size="1048576" crc="cbe6c1ea" sha1="57322c1714fd4e42e1a10d56bfd795bcbc3380d7" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -17786,8 +18555,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="1048576">
 				<rom name="sorcer kingdom (jpn).bin" size="1048576" crc="944135ca" sha1="16394aebece9d03f43505eab0827889e1c61857f" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -17797,8 +18569,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="524288">
 				<rom name="mpr-12906.bin" size="524288" crc="a143a8c5" sha1="cbd7f0693a0d127138977da7cdf5a7f9440dfd43" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -18106,8 +18881,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="524288">
 				<rom name="star cruiser (jpn).bin" size="524288" crc="2b75b52f" sha1="cb099ecde141beffdfed6bb7f1d3dc6340da81d1" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -18139,8 +18917,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="star trek - the next generation - echoes from the past (usa) (v1.1).bin" size="2097152" crc="ef840ef2" sha1="fe72aff307182dc6970048e88eaa5f03348781f5" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -18150,8 +18931,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="star trek - the next generation - echoes from the past (usa).bin" size="2097152" crc="272153fb" sha1="ca0cf81784262fe6c00502cb495ede7daf3685c0" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -18337,8 +19121,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="3145728">
 				<rom name="mpr-17588+mpr-17606.bin" size="3145728" crc="1110b0db" sha1="178ef742dad227d4128fa81dddb116bad0cabe1d" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -18348,8 +19135,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="3145728">
 				<rom name="story of thor, the (germany).bin" size="3145728" crc="fa20d011" sha1="a82ffb7c4bf4b0f89f42a9cdc6600bc5bac1c854" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -18359,8 +19149,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="3145728">
 				<rom name="story of thor, the - hikari o tsugumono (jpn).bin" size="3145728" crc="4f39783c" sha1="54296f5cf1917c568bb29b0086641c282b8884bd" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -18382,8 +19175,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="3145728">
 				<rom name="story of thor, the (kor).bin" size="3145728" crc="ee1603c5" sha1="e0a43fb3d6da940b1fda449753bffae637a802cd" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -18393,8 +19189,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="3145728">
 				<rom name="story of thor, the (prototype - oct 04, 1994).bin" size="3145728" crc="9e486f91" sha1="499dd47c325874a231a8d8430aca0bb6feeb3dcd" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -18404,8 +19203,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="3145728">
 				<rom name="story of thor, the (prototype - oct 17, 1994).bin" size="3145728" crc="aa43d34a" sha1="e4b25941aefb58073784616acf7ca7458b213bee" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -18415,8 +19217,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="3145728">
 				<rom name="story of thor, the (prototype - nov 01, 1994).bin" size="3145728" crc="fa59f847" sha1="cb0606faeab0398244d4721d71cf7e1c5724a9ef" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -18426,8 +19231,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="3145728">
 				<rom name="story of thor, the (spain).bin" size="3145728" crc="4631f941" sha1="0fcc02355176e1c96043f4d827a3ff88d2d272df" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -18437,8 +19245,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="3145728">
 				<rom name="beyond oasis (usa).bin" size="3145728" crc="c4728225" sha1="2944910c07c02eace98c17d78d07bef7859d386a" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -18823,8 +19634,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="striker (euro).bin" size="2097152" crc="cc5d7ab2" sha1="9917c35a263cc9bd922d55bf59d01bc2733b4e24" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
 			</dataarea>
 		</part>
 	</software>
@@ -18834,8 +19648,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="striker (euro) (beta).bin" size="2097152" crc="c10b270e" sha1="128395e635e948005e89c7f4a6cd5b209be1ffbc" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
 			</dataarea>
 		</part>
 	</software>
@@ -18988,8 +19805,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="524288">
 				<rom name="mpr-12477.bin" size="524288" crc="d50a166f" sha1="56d9366b50cea65b16ed621b9a5bf355ef89e6b5" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -19054,8 +19874,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="524288">
 				<rom name="super hydlide (euro).bin" size="524288" crc="1fe2d90b" sha1="6c0a4b72b90ecfe8c324691bc6e54243746043c1" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -19076,8 +19899,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="524288">
 				<rom name="super hydlide (usa).bin" size="524288" crc="1335ddaa" sha1="5ff65139c7e10539dd5a12bdf56073504c998471" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -19087,8 +19913,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="524288">
 				<rom name="mpr-15420.bin" size="524288" crc="f43793ff" sha1="4e270b13a399d78d919157e50ab11f4645aa6d32" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -19355,8 +20184,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="surging aura (jpn).bin" size="2097152" crc="65ac1d2b" sha1="9f14cd11cfa499cdd58248de81db30f9308326e5" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
 			</dataarea>
 		</part>
 	</software>
@@ -19498,8 +20330,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>Koei</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="1310720">
 				<rom name="taikou risshiden (jpn).bin" size="1310720" crc="f96fe15b" sha1="a96d6492d4e89687d970bc010eb0b93ee2481a44" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
 			</dataarea>
 		</part>
 	</software>
@@ -19676,8 +20511,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="1048576">
 				<rom name="tecmo super baseball (usa).bin" size="1048576" crc="227a1178" sha1="f2ecc7b32cef29f22eb4a21a22be122bd4bad212" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -19687,8 +20525,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="1048576">
 				<rom name="tecmo super bowl (usa) (october 1993).bin" size="1048576" crc="21f27d34" sha1="8d34ffac312caeac853876415c74ab6fe63d8dc2" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -19698,8 +20539,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="1048576">
 				<rom name="tecmo super bowl (usa) (september 1993).bin" size="1048576" crc="bd5933ee" sha1="529b8e86b97c326592540f5e427198a205c127d0" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -19709,8 +20553,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="1048576">
 				<rom name="tecmo super bowl (jpn).bin" size="1048576" crc="90c6e20c" sha1="477880e7976ac0f7203fddabba4a6e8799aa604d" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -19720,8 +20567,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="tecmo super bowl ii - special edition (usa).bin" size="2097152" crc="0a0e67d8" sha1="5fadb2a0e780ec868671b0e888fad5d7c203f59f" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
 			</dataarea>
 		</part>
 	</software>
@@ -19731,8 +20581,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="tecmo super bowl ii - special edition (jpn).bin" size="2097152" crc="32fb633d" sha1="cb9e8cc1651b719054f05e1e1a9e0fbbc3876ebd" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
 			</dataarea>
 		</part>
 	</software>
@@ -19742,8 +20595,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="tecmo super bowl iii - final edition (usa).bin" size="2097152" crc="aae4089f" sha1="d5d1609cdf72d98f5e5daa47a9585ae7ca87a410" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
 			</dataarea>
 		</part>
 	</software>
@@ -19753,8 +20609,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="1048576">
 				<rom name="tecmo super hockey (usa).bin" size="1048576" crc="5f86ddc9" sha1="4d4fd22d2fafd7e56790029be9b02e61995df11c" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -19764,8 +20623,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="1048576">
 				<rom name="tecmo super nba basketball (usa).bin" size="1048576" crc="53913991" sha1="ac7aa724d6464fbd8e3144a49f3821ff6e42f67a" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -19775,8 +20637,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="1048576">
 				<rom name="tecmo super nba basketball (jpn).bin" size="1048576" crc="79f33eb6" sha1="07f160e6eb7e358f54e4fdabfc95bb5525c57fc9" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -19907,8 +20772,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="524288">
 				<rom name="md-tsd.bin" size="524288" crc="54cf8c29" sha1="2924ed0b4266edddbb981f97acb93bbdf90494e6" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -20215,8 +21083,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="1048576">
 				<rom name="tnn bass tournament of champions (usa).bin" size="1048576" crc="c83ffa1b" sha1="f76acb6d5da07377685d42daf1ce4ca53be5d6b9" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -20226,8 +21097,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="tnn outdoors bass tournament '96 (usa).bin" size="2097152" crc="5c523c0b" sha1="0ca72f28e88675066c466246977143599240b09f" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -20380,8 +21254,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="1048576">
 				<rom name="tony la russa baseball (usa, aus).bin" size="1048576" crc="24629c78" sha1="0e3f7ebf8661cac9bd7a0c5af64f260e7b5f0a0b" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -20501,8 +21378,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="1048576">
 				<rom name="traysia (usa).bin" size="1048576" crc="96184f4f" sha1="ff0efe6da308919f843a7593e8af7fae82160b0b" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -20512,8 +21392,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="1048576">
 				<rom name="minato no traysia (jpn).bin" size="1048576" crc="bd89fd09" sha1="dea227a41a5ba28f8c8ea75cba12965bbc5ff8da" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -20523,8 +21406,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="4194304">
 				<rom name="triple play '96 (usa).bin" size="4194304" crc="f1748e91" sha1="c0981b524d5e1c5368f9e74a4ce9c57d87fe323a" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
 			</dataarea>
 		</part>
 	</software>
@@ -20534,8 +21420,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="4194304">
 				<rom name="triple play gold (usa).bin" size="4194304" crc="bbe69017" sha1="007bee242384db1887c5831657470584ff77a163" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
 			</dataarea>
 		</part>
 	</software>
@@ -20545,8 +21434,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="4194304">
 				<rom name="triple play gold (usa) (alt).bin" size="4194304" crc="a89638a0" sha1="cb7f4b9b89fbf6162d7d4182229c8ac473f91cf4" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
 			</dataarea>
 		</part>
 	</software>
@@ -20578,8 +21470,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="troy aikman nfl football (usa).bin" size="2097152" crc="015f2713" sha1="820efb4a4d3d29036911d9077bb6c0a4ce7f36d4" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -20798,8 +21693,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>Koei</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="1048576">
 				<rom name="uncharted waters (usa).bin" size="1048576" crc="4edaec59" sha1="a76cf7dd06784cba15fa0c3be0ae92cba71ccade" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -20809,8 +21707,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>Koei</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="1048576">
 				<rom name="daikoukai jidai (jpn).bin" size="1048576" crc="5a652458" sha1="a4552b23079b161da9ad47ac7cb9c4ecb3731967" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -20820,8 +21721,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>Koei</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="uncharted waters - new horizons (usa).bin" size="2097152" crc="ead69824" sha1="9fd375cd212a132db24c40a8977c50d0f7b81524" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
 			</dataarea>
 		</part>
 	</software>
@@ -20831,8 +21735,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>Koei</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="daikoukai jidai ii (jpn).bin" size="2097152" crc="e040f0da" sha1="74f61092067d82127cae3306d5a66d3efe946bc3" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
 			</dataarea>
 		</part>
 	</software>
@@ -20864,8 +21771,12 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="unnecessary roughness 95 (usa).bin" size="2097152" crc="9920e7b7" sha1="7e100cb56c30498c1fee3867ff3612567287b656" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+            <!-- Correct? size taken from the header -->
+			<dataarea name="sram" size="2048">
 			</dataarea>
 		</part>
 	</software>
@@ -21084,8 +21995,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="655360">
 				<rom name="mpr-13430+mpr-13431.bin" size="655360" crc="ea1bc9ab" sha1="c18fc75e0c5fa0e98c8664903e978ec4f73ef5d2" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -21095,8 +22009,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="655360">
 				<rom name="vermilion (jpn).bin" size="655360" crc="e400dfc3" sha1="697fb165051179a2bbca77c8cfd0c929e334f8c1" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -21238,8 +22155,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="1048576">
 				<rom name="virtual pinball (euro, usa).bin" size="1048576" crc="d63473aa" sha1="cd066bb54e0a4c21821639728893462b0218597e" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -21249,8 +22169,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="1048576">
 				<rom name="vixen 357 (jpn).bin" size="1048576" crc="3afa2d7b" sha1="460037301df0d67947bd17eddb38a3011896cb43" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -21282,8 +22205,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="1048576">
 				<rom name="wacky worlds (usa).bin" size="1048576" crc="8af4552d" sha1="e331c57ce6a176ab9ff1461e9423514756c5558d" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
 			</dataarea>
 		</part>
 	</software>
@@ -21414,8 +22340,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="1048576">
 				<rom name="warrior of rome ii (usa).bin" size="1048576" crc="cd8c472a" sha1="fe4e3684212f1e695bdf4a4c41999fac773259f4" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -21425,8 +22354,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>Micronet</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="1048576">
 				<rom name="caesar no yabou ii (jpn).bin" size="1048576" crc="4f327b3a" sha1="cdb2f47bde3ff412c7b1f560637f2ccec023980f" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -21436,8 +22368,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="524288">
 				<rom name="warsong (usa).bin" size="524288" crc="4b680285" sha1="9b13a85f39b3f4cc31f54077df29bbe812405a08" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -21458,8 +22393,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="wayne gretzky and the nhlpa all-stars (euro, usa).bin" size="2097152" crc="c2c13b81" sha1="0b068f684e206139bcd592daba4613cbf634dd56" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -22111,8 +23049,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="1048576">
 				<rom name="world cup usa 94 (euro, usa, kor).bin" size="1048576" crc="0171b47f" sha1="af0e8fada3db7e746aef2c0070deb19602c6d32a" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -22398,8 +23339,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="3145728">
 				<rom name="world series baseball '95 (usa).bin" size="3145728" crc="25130077" sha1="878e9fdbbc0b20b27f25d56e4087efbde1e8979a" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
 			</dataarea>
 		</part>
 	</software>
@@ -22662,8 +23606,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="3145728">
 				<rom name="world series baseball '96 (usa).bin" size="3145728" crc="04ee8272" sha1="f91eeedbadd277904f821dfaae9e46f6078ff207" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
 			</dataarea>
 		</part>
 	</software>
@@ -22673,8 +23620,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="3145728">
 				<rom name="world series baseball '98 (usa).bin" size="3145728" crc="05b1ab53" sha1="0881077fd253d19d43ad45de6089d66e75d856b3" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
 			</dataarea>
 		</part>
 	</software>
@@ -22684,8 +23634,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="world series baseball (usa).bin" size="2097152" crc="57c1d5ec" sha1="e63cbd1f00eac2ccd2ee0290e7bf1bb47c1288e4" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -22849,8 +23802,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="524288">
 				<rom name="wrestle war (jpn) (beta).bin" size="524288" crc="1cdee87b" sha1="65c4815c6271bb7d526d84dac1bf177741e35364" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -22860,8 +23816,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="wu kong wai zhuan (chi) (unl).bin" size="2097152" crc="880a916e" sha1="dd4d7f7433ab82680d7d36124beca0bacebcd6e4" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -23379,8 +24338,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="1048576">
 				<rom name="ys iii (usa).bin" size="1048576" crc="ea27976e" sha1="b3331b41a9a5e2c3f4fb3b64c5b005037a3b6fdd" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -23390,8 +24352,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="1048576">
 				<rom name="ys - wanderers from ys (jpn).bin" size="1048576" crc="52da4e76" sha1="28dc01d5dde8d569bae3fafce2af55ee9b836454" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -23423,8 +24388,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="yuu yuu hakusho gaiden (jpn).bin" size="2097152" crc="7dc98176" sha1="274b86709b509852ca004ceaa244f3ae1d455c50" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -23434,8 +24402,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="524288">
 				<rom name="zan yasha enbukyoku (jpn).bin" size="524288" crc="637fe8f3" sha1="f1ea9a88233b76e3df32526be0b64fb653c13b7d" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -24134,8 +25105,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="unknown chinese game 1 (chi).bin" size="2097152" crc="dfacb9ff" sha1="4283bb9aec05098b9f6b1739e1b02c1bb1f8242f" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -24167,8 +25141,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="duke_nukem_3d.bin" size="2097152" crc="13e93c0d" sha1="14ce7438a379973c8d66b0cc365d05a04d94f7dd" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
 			</dataarea>
 		</part>
 	</software>
