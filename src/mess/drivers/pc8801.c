@@ -15,7 +15,6 @@
 	- Add limits for extend work RAM;
 	- What happens to the palette contents when the analog/digital palette mode changes?
 	- dipswitches needs to be controlled;
-	- Several games (most notably Ys series of games) have issues with the YM2203 music tempo (too fast) ... why?
 
 	per-game specific TODO:
 	- 100 Yen disk(s): reads kanji ports;
@@ -162,7 +161,7 @@ static UINT8 extram_mode,extram_bank;
 static UINT8 txt_width, txt_color;
 static int vblank_pos;
 #ifdef USE_PROPER_I8214
-static UINT8 m_int_mask,m_int_state;
+static UINT8 timer_irq_mask,vblank_irq_mask,sound_irq_mask,m_int_state;
 #else
 static UINT8 i8214_irq_level;
 static UINT8 vrtc_irq_mask,vrtc_irq_latch;
@@ -910,12 +909,16 @@ static WRITE8_HANDLER( pc8801_vram_select_w )
 
 static WRITE8_HANDLER( i8214_irq_level_w )
 {
-	i8214_b_w(space->machine->device("i8214"), 0, (data & 0x0f));
+	if(data & 8)
+		i8214_b_w(space->machine->device("i8214"), 0, (7));
+	else
+		i8214_b_w(space->machine->device("i8214"), 0, (data & 0x07));
 }
 
 static WRITE8_HANDLER( i8214_irq_mask_w )
 {
-	m_int_mask = BITSWAP8((data & 0x07) | (m_int_mask & 0xf8),7,6,5,4,3,0,1,2);
+	timer_irq_mask = data & 1;
+	vblank_irq_mask = data & 2;
 }
 
 
@@ -971,7 +974,7 @@ static WRITE8_HANDLER( pc8801_misc_ctrl_w )
 	misc_ctrl = data;
 
 	#ifdef USE_PROPER_I8214
-	m_int_mask = (m_int_mask & 0xef) | ((data & 0x80) ? 0x00 : 0x10);
+	sound_irq_mask = ((data & 0x80) == 0);
 	#else
 	sound_irq_mask = ((data & 0x80) == 0);
 
@@ -1690,57 +1693,59 @@ static const cassette_config pc88_cassette_config =
 };
 
 #ifdef USE_PROPER_I8214
-void pc8801_raise_irq(running_machine *machine,UINT8 mask)
+void pc8801_raise_irq(running_machine *machine,UINT8 irq,UINT8 mask)
 {
 	m_int_state |= mask;
 
-	i8214_r_w(machine->device("i8214"), 0, ~(m_int_state & m_int_mask));
+	i8214_r_w(machine->device("i8214"), 0, ~irq);
+
+	if(mask)
+		cputag_set_input_line(machine,"maincpu",0,ASSERT_LINE);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( pic_int_w )
 {
-	if (state == ASSERT_LINE)
-	{
-		cpu_set_input_line(device, INPUT_LINE_IRQ0, ASSERT_LINE);
-	}
+//	if (state == ASSERT_LINE)
+//	{
+//	}
+}
+
+static WRITE_LINE_DEVICE_HANDLER( pic_enlg_w )
+{
+	//if (state == CLEAR_LINE)
+	//{
+	//}
 }
 
 static I8214_INTERFACE( pic_intf )
 {
 	DEVCB_DEVICE_LINE("maincpu", pic_int_w),
-	DEVCB_NULL
+	DEVCB_DEVICE_LINE("maincpu", pic_enlg_w)
 };
 
 static IRQ_CALLBACK( pc8801_irq_callback )
 {
-	UINT8 vector = (i8214_a_r(device->machine->device("i8214"), 0)); //
+	UINT8 vector = (7 - i8214_a_r(device->machine->device("i8214"), 0));
 
-	printf("Interrupt Acknowledge Vector: %02x\n", vector);
-	m_int_state &= ~vector;
+	m_int_state &= ~(1<<vector);
+	cputag_set_input_line(device->machine,"maincpu",0,CLEAR_LINE);
 
-	cputag_set_input_line(device->machine,"maincpu", INPUT_LINE_IRQ0, CLEAR_LINE);
-	i8214_r_w(device->machine->device("i8214"), 0, ~(m_int_state & m_int_mask));
-
-	return 1*2;
+	return vector << 1;
 }
 
 static void pc8801_sound_irq( device_t *device, int irq )
 {
-
+	pc8801_raise_irq(device->machine,1<<(4),sound_irq_mask);
 }
 
 static TIMER_CALLBACK( pc8801_rtc_irq )
 {
-	//pc8801_raise_irq(machine,2);
-	//if(m_int_mask & 4)
-	//	cputag_set_input_line(machine, "maincpu", INPUT_LINE_IRQ0, ASSERT_LINE);
+	pc8801_raise_irq(machine,1<<(2),timer_irq_mask);
 }
 
 static INTERRUPT_GEN( pc8801_vrtc_irq )
 {
-	pc8801_raise_irq(device->machine,1);
-	//if(m_int_mask & 2)
-	//	cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_IRQ0, ASSERT_LINE);
+	pc8801_raise_irq(device->machine,1<<(1),vblank_irq_mask);
 }
 
 #else
@@ -1763,8 +1768,6 @@ static IRQ_CALLBACK( pc8801_irq_callback )
 	}
 
 	printf("IRQ triggered but no vector on the bus! %02x %02x %02x %02x\n",i8214_irq_level,sound_irq_latch,vrtc_irq_latch,timer_irq_latch);
-	if(sound_irq_latch)
-		return 4*2;
 
 	return 2*2; //TODO: mustn't happen, it does if you press shift on N88-BASIC
 }
@@ -1773,8 +1776,8 @@ static void pc8801_sound_irq( device_t *device, int irq )
 {
 	if(sound_irq_mask)
 	{
-		sound_irq_latch = 1;
-		cputag_set_input_line(device->machine,"maincpu",0,HOLD_LINE);
+		sound_irq_latch = irq;
+		cputag_set_input_line(device->machine,"maincpu",0,irq);
 	}
 }
 
