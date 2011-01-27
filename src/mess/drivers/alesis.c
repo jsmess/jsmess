@@ -154,6 +154,6 @@ static DRIVER_INIT( hr16 )
 
 /* Driver */
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY    FULLNAME       FLAGS */
-COMP( 1987, hr16,  0,       0,       hr16,      alesis,  hr16,   "Alesis",  "HR-16",       GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 1989, hr16b, hr16,    0,       hr16,      alesis,  hr16,   "Alesis",  "HR-16B",      GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 1990, sr16,  0,       0,       sr16,      alesis,  0,      "Alesis",  "SR-16",       GAME_NOT_WORKING | GAME_NO_SOUND)
+SYST( 1987, hr16,  0,       0,       hr16,      alesis,  hr16,   "Alesis",  "HR-16",       GAME_NOT_WORKING | GAME_NO_SOUND)
+SYST( 1989, hr16b, hr16,    0,       hr16,      alesis,  hr16,   "Alesis",  "HR-16B",      GAME_NOT_WORKING | GAME_NO_SOUND)
+SYST( 1990, sr16,  0,       0,       sr16,      alesis,  0,      "Alesis",  "SR-16",       GAME_NOT_WORKING | GAME_NO_SOUND)

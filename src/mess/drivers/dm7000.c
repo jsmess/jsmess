@@ -134,7 +134,7 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY   FULLNAME       FLAGS */
-COMP( 2003, dm7000,  0,       0,	dm7000, 	dm7000, 	 0,   "Dream Multimedia",   "Dreambox 7000",		GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 2004, dm5620,  dm7000,  0,	dm7000, 	dm7000, 	 0,   "Dream Multimedia",   "Dreambox 5620",		GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 2006, dm500,   dm7000,  0,	dm7000, 	dm7000, 	 0,   "Dream Multimedia",   "Dreambox 500",			GAME_NOT_WORKING | GAME_NO_SOUND)
+SYST( 2003, dm7000,  0,       0,	dm7000, 	dm7000, 	 0,   "Dream Multimedia",   "Dreambox 7000",		GAME_NOT_WORKING | GAME_NO_SOUND)
+SYST( 2004, dm5620,  dm7000,  0,	dm7000, 	dm7000, 	 0,   "Dream Multimedia",   "Dreambox 5620",		GAME_NOT_WORKING | GAME_NO_SOUND)
+SYST( 2006, dm500,   dm7000,  0,	dm7000, 	dm7000, 	 0,   "Dream Multimedia",   "Dreambox 500",			GAME_NOT_WORKING | GAME_NO_SOUND)
 

@@ -8,24 +8,12 @@
 
 BOOL DriverIsComputer(int driver_index)
 {
-	ioport_list portlist;
-	input_port_list_init(portlist, drivers[driver_index]->ipt, NULL, 0, FALSE);
+	return (drivers[driver_index]->flags & GAME_TYPE_COMPUTER) != 0;
+}
 
-	const input_field_config *field;
-	const input_port_config *port;
-	int has_keyboard = FALSE;
-	if (portlist.first()==NULL) has_keyboard = TRUE;
-	for (port = portlist.first(); port != NULL; port = port->next())
-	{
-		for (field = port->fieldlist; field != NULL; field = field->next)
-		{
-			if (field->type == IPT_KEYBOARD)
-				has_keyboard = TRUE;
-				break;
-		}
-	}
-
-	return has_keyboard;
+BOOL DriverIsConsole(int driver_index)
+{
+	return (drivers[driver_index]->flags & GAME_TYPE_CONSOLE) != 0;
 }
 
 BOOL DriverIsModified(int driver_index)
