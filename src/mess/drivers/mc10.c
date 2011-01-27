@@ -468,6 +468,14 @@ static const cassette_config mc10_cassette_config =
 	NULL
 };
 
+static const cassette_config alice32_cassette_config =
+{
+	coco_cassette_formats,
+	NULL,
+	(cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED),
+	"alice32_cass"
+};
+
 static const mc6847_interface mc10_mc6847_intf =
 {
 	DEVCB_HANDLER(mc10_mc6847_videoram_r),
@@ -544,12 +552,15 @@ static MACHINE_CONFIG_START( alice32, mc10_state )
 	MCFG_SOUND_ADD("dac", DAC, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MCFG_CASSETTE_ADD("cassette", mc10_cassette_config)
+	MCFG_CASSETTE_ADD("cassette", alice32_cassette_config)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("24K")
 	MCFG_RAM_EXTRA_OPTIONS("8K")
+	
+	/* Software lists */
+	MCFG_SOFTWARE_LIST_ADD("cass_list", "alice32")
 MACHINE_CONFIG_END
 
 /***************************************************************************

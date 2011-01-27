@@ -387,7 +387,7 @@ static const cassette_config vg5k_cassette_config =
 	vg5k_cassette_formats,
 	&vg5k_cassette_options,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MASK_SPEAKER),
-	NULL
+	"vg5k_cass"
 };
 
 
@@ -437,6 +437,9 @@ static MACHINE_CONFIG_START( vg5k, vg5k_state )
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("16K")
 	MCFG_RAM_EXTRA_OPTIONS("32K,48k")
+
+	/* Software lists */
+	MCFG_SOFTWARE_LIST_ADD("cass_list", "vg5k")
 MACHINE_CONFIG_END
 
 /* ROM definition */
