@@ -198,7 +198,7 @@
 	</software>
 
 	<!-- doesn't boot -->
-	<software name="robocop2" supported="no">>
+	<software name="robocop2" supported="no">
 		<description>Robocop 2</description>
 		<year>1990</year>
 		<publisher>Ocean Software</publisher>

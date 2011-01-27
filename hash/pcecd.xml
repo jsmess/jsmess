@@ -52,6 +52,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="avgeo">
     <description>Advanced Variable Geo (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -63,6 +64,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="advquiz">
     <description>Adventure Quiz - Capcom World Hatena no Daibouken (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -74,6 +76,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="aichou">
     <description>Ai Chou Aniki (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -85,6 +88,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="draculax">
     <description>Akumajou Dracula X - Chi no Rondo (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -96,6 +100,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="alshark">
     <description>Alshark [Imperfect] (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -107,6 +112,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="anesan">
     <description>Ane-San (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -118,6 +124,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="angelsii">
     <description>Angels II - Holy Night [Prototype][Backup] (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -129,6 +136,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="arunamun">
     <description>Arunamu no Kiba - Juuzoku Juuni Shinto Densetsu (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -140,6 +148,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="asuka120">
     <description>Asuka 120% Maxima Burning Fest (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -151,6 +160,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="auroraq">
     <description>Aurora Quest - Otaku no Seiza (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -162,6 +172,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="avenger">
     <description>Avenger (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -173,6 +184,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="babel">
     <description>Babel (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -184,6 +196,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="babyjo">
     <description>Baby Jo (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -195,6 +208,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="bakuden">
     <description>Bakuden Unbalance Zone (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -206,6 +220,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="bakurets">
     <description>Bakuretsu Hunter (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -217,6 +232,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="bakushou">
     <description>Bakushou Yoshimoto no Shinkigeki (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -228,6 +244,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="basted">
     <description>Basted (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -239,6 +256,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="battle94">
     <description>Battlefield '94 in Tokyo Dome (ACD)(JPN)</description>
     <!-- Serial:  -->
@@ -250,6 +268,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="bazaru">
     <description>Bazaru Degozaru no Game Degozaru (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -261,6 +280,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="bikkurim">
     <description>Bikkuriman Daijikai (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -284,6 +304,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="bishssmc">
     <description>Bishoujo Senshi Sailor Moon Collection (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -295,6 +316,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="bhass">
     <description>Black Hole Assault (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -306,6 +328,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="bldgear">
     <description>Blood Gear (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -317,6 +340,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="bombmn94">
     <description>Bomberman '94 Taikenban (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -328,6 +352,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="panicbom">
     <description>Bomberman Panic Bomber (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -339,6 +364,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="bonanzab">
     <description>Bonanza Bros. (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -350,6 +376,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="brandish">
     <description>Brandish (ACD, SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -361,6 +388,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="browning">
     <description>Browning (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -372,6 +400,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="builderl">
     <description>Builderland (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -383,6 +412,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="bunillas">
     <description>Bunilla Syndrome Mahjong (CD, SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -394,6 +424,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="buraihac">
     <description>Burai - Hachigyoku no Yuushi Densetsu (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -405,6 +436,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="buraiiiy">
     <description>Burai II - Yami Koutei no Gyakushuu (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -416,6 +448,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="cal2">
     <description>Cal II (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -427,6 +460,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="cal3">
     <description>Cal III (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -438,6 +472,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="cardange">
     <description>Cardangels (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -449,6 +484,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="cdbattle">
     <description>CD Battle Hikari no Yuushatachi (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -460,6 +496,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="cddenjin">
     <description>CD Denjin Rockabilly Tengoku (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -471,6 +508,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="chrally">
     <description>Championship Rally (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -482,6 +520,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="chikichi">
     <description>Chiki Chiki Boys (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -493,6 +532,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="chouanik">
     <description>Chou Aniki (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -504,6 +544,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="choueiyu">
     <description>Chou Eiyuu Densetsu - Dynastic Hero (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -515,6 +556,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="cobrakok">
     <description>Cobra - Kokuryuuou no Densetsu (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -526,6 +568,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="cobraiid">
     <description>Cobra II - Densetsu no Otoko (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -537,6 +580,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="colorwar">
     <description>Color Wars (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -548,6 +592,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="cosmicfa">
     <description>Cosmic Fantasy - Bouken Shounen Yuu (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -559,6 +604,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="cosmic2">
     <description>Cosmic Fantasy II - Bouken Shounen Ban (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -570,6 +616,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="cosmic3">
     <description>Cosmic Fantasy III - Bouken Shounen Rei (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -581,6 +628,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="cosmic4g">
     <description>Cosmic Fantasy IV - Ginga Shounen Densetsu Gekitou Hen (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -592,6 +640,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="cosmic4t">
     <description>Cosmic Fantasy IV - Ginga Shounen Densetsu Totsunyuu Hen (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -603,6 +652,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="cotton">
     <description>Cotton - Fantastic Night Dreams (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -614,6 +664,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="crazyhos">
     <description>Crazy Hospital - Fushigi no Kuni no Tenshi (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -625,6 +676,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="crestofw">
     <description>Crest of Wolf (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -636,6 +688,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="cybercit">
     <description>Cyber City OEDO 808 (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -647,6 +700,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="daisenpu">
     <description>Daisenpuu Custom (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -658,6 +712,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="daisenry">
     <description>Daisenryaku II - Campaign Version (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -669,6 +724,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="deja">
     <description>De Ja (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -680,6 +736,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="dedbrain">
     <description>Dead of the Brain I II (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -691,6 +748,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="deathbrn">
     <description>Death Bringer - The Knight of Darkness (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -702,6 +760,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="dedennod">
     <description>Deden no Den (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -713,6 +772,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="dekoboko">
     <description>Dekoboko Densetsu - Hashire Wagamanma (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -724,6 +784,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="dennoute">
     <description>Dennou Tenshi - Digital Angel (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -735,6 +796,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="devmag1">
     <description>Develo Magazine Volume I (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -746,6 +808,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="devstart">
     <description>Develo Starter Kit - Assembler (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -757,6 +820,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="devbasic">
     <description>Develo Starter Kit - Basic (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -768,6 +832,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="doraemon">
     <description>Doraemon Nobita no Dorabian Night (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -779,6 +844,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="ddragon2">
     <description>Double Dragon II - The Revenge (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -790,6 +856,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="doukyuus">
     <description>Doukyuusei (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -801,6 +868,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="downld2">
     <description>Download II (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -812,6 +880,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="downtown">
     <description>Downtown Nekketsu Monogatari (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -823,6 +892,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="dragonha">
     <description>Dragon Half (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -834,6 +904,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="dragonkn">
     <description>Dragon Knight Grafitti (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -845,6 +916,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="dragonk2">
     <description>Dragon Knight II (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -856,6 +928,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="dragonk3">
     <description>Dragon Knight III (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -867,6 +940,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="dslay">
     <description>Dragon Slayer - Eiyuu Densetsu (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -878,6 +952,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="dslay2">
     <description>Dragon Slayer - Eiyuu Densetsu II (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -889,6 +964,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="dbzisgd">
     <description>Dragonball Z - Idainaru Son Gokuu Densetsu (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -900,6 +976,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="dungex2">
     <description>Dungeon Explorer II (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -911,6 +988,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="dungmst">
     <description>Dungeon Master - Theron's Quest (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -922,6 +1000,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="eferajil">
     <description>Efera Jiliora - The Emblem from Darkness (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -933,6 +1012,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="eikanhak">
     <description>Eikan ha Kimini - Koukou Yakyuu Zenkoku Taikai (ACD, SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -944,6 +1024,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="eiyuusan">
     <description>Eiyuu Sangokushi (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -955,6 +1036,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="emdrag">
     <description>Emerald Dragon (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -966,6 +1048,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="emdragt">
     <description>Emerald Dragon Taikenban (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -977,6 +1060,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="exilej">
     <description>Exile - Toki no Hasama he (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -988,6 +1072,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="exile2j">
     <description>Exile II - Janen no Jishou (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -999,6 +1084,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="f1circus">
     <description>F1 Circus Special - Pole to Win (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -1010,6 +1096,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="f1teamsi">
     <description>F1 Team Simulation Project F (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -1021,6 +1108,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="faceball">
     <description>Faceball (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -1032,6 +1120,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="facebalt">
     <description>Faceball Taikenban (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -1043,6 +1132,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="faeriedu">
     <description>Faerie Dust Story - Meikyuu no Elfeene (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -1054,6 +1144,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="farjiusn">
     <description>Farjius no Jakoutei - Neo Metal Fantasy (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -1065,6 +1156,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="faussete">
     <description>Faussete Amour (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -1076,6 +1168,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="fiendhun">
     <description>Fiend Hunter (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -1087,6 +1180,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="fstreetj">
     <description>Fighting Street (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -1098,6 +1192,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="fzone2j">
     <description>Final Zone II (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -1109,6 +1204,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="fireproj">
     <description>Fire Pro Jyoshi - Dome Chojyo Taisen (ACD)(JPN)</description>
     <!-- Serial:  -->
@@ -1120,6 +1216,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="flashhd">
     <description>Flash Hiders (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -1131,6 +1228,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="flashhdt">
     <description>Flash Hiders Taikenban (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -1142,6 +1240,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="forgotnj">
     <description>Forgotten Worlds (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -1153,6 +1252,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="forsoc95">
     <description>Formation Soccer '95 - Della Serie A (ACD, SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -1164,6 +1264,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="fraycdxa">
     <description>Fray CD Xak Gaiden (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -1175,6 +1276,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="fushigin">
     <description>Fushigi no Umi no Nadia (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -1186,6 +1288,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="gground">
     <description>Gain Ground SX (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -1197,6 +1300,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="galaxyde">
     <description>Galaxy Deka Gayvan (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -1208,6 +1312,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="galfr">
     <description>Galaxy Fraulein Yuna {HRH310827-3FAAT} (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -1219,6 +1324,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="galfra">
     <description>Galaxy Fraulein Yuna {HRH310827-3FAFT} (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -1230,6 +1336,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="galfrhuv">
     <description>Galaxy Fraulien Yuna HuVideo CD (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -1241,6 +1348,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="galfr2">
     <description>Galaxy Fraulien Yuna II - Eternal Princess (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -1252,6 +1360,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="gamblerj">
     <description>Gambler Jikochuushinha (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -1263,6 +1372,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="gamblerm">
     <description>Gambler Jikochuushinha - Mahjong Puzzle Collection (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -1274,6 +1384,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="ganchouh">
     <description>Ganchouhishi - Aoki Ookami to Shiroki Mejika (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -1285,6 +1396,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="garoud2s">
     <description>Garou Densetsu II - Aratanaru Tatakai - Sample Disc (ACD)(JPN)</description>
     <!-- Serial:  -->
@@ -1296,6 +1408,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="garoud2">
     <description>Garou Densetsu II - Aratanaru Tatakai [Imperfect] (ACD)(JPN)</description>
     <!-- Serial:  -->
@@ -1307,6 +1420,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="garoud">
     <description>Garou Densetsu Special (ACD)(JPN)</description>
     <!-- Serial:  -->
@@ -1318,6 +1432,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="gateofth">
     <description>Gate of Thunder (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -1329,6 +1444,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="genocide">
     <description>Genocide (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -1340,6 +1456,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="gensouta">
     <description>Gensou Tairiku Auleria (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -1351,6 +1468,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="gingafuk">
     <description>Ginga Fukei Densetsu Sapphire (ACD)(JPN)</description>
     <!-- Serial:  -->
@@ -1362,6 +1480,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="gogobird">
     <description>Go! Go! Birdie Chance (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -1373,6 +1492,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="godpanic">
     <description>God Panic - Shijyou Saikyo Gundan (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -1396,6 +1516,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="goldnaxe">
     <description>Golden Axe (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -1407,6 +1528,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="gotzendi">
     <description>Gotzendiener (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -1418,6 +1540,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="gradius2">
     <description>Gradius II - Gofer no Yabou (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -1429,6 +1552,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="gsmikami">
     <description>GS Mikami (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -1440,6 +1564,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="gulcligh">
     <description>Gulclight TDF 2 (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -1451,6 +1576,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="hatsukoi">
     <description>Hatsukoi Monogatari (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -1462,6 +1588,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="hawkf123">
     <description>Hawk F-123 (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -1473,6 +1600,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="hellfire">
     <description>Hellfire S - The Another Story (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -1484,6 +1612,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="highgren">
     <description>High Grenadier (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -1495,6 +1624,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="hihouden">
     <description>Hihou Densetsu Chris no Bouken (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -1506,6 +1636,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="himitsun">
     <description>Himitsu no Hanazono (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -1517,6 +1648,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="horrorst">
     <description>Horror Story (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -1528,6 +1660,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="hupga2">
     <description>Hu PGA Tour Power Golf 2 - Golfer (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -1539,6 +1672,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="humanspo">
     <description>Human Sports Festival (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -1550,6 +1684,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="hyakumon">
     <description>Hyaku Monogatari - Hontou ni Atta Kowai Hanashi (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -1561,6 +1696,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="hyperdyn">
     <description>Hyper Dyne SideArms Special (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -1572,6 +1708,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="hyperwar">
     <description>Hyper Wars (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -1583,6 +1720,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="iganinde">
     <description>Iga Ninden Gaiou (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -1594,6 +1732,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="imagef2">
     <description>Image Fight II (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -1605,6 +1744,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="inouemam">
     <description>Inoue Mami - Kono Hoshi ni Tatta Hitori no Kimi (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -1616,6 +1756,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="iqpanic">
     <description>IQ Panic (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -1627,6 +1768,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="jthunder">
     <description>J Thunder (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -1638,6 +1780,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="jbharj">
     <description>J. B. Harold Murder Club (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -1649,6 +1792,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="jleaguet">
     <description>J. League Tremendous Soccer '94 (ACD, SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -1660,6 +1804,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="jacknicj">
     <description>Jack Nicklaus World Tour Golf (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -1671,7 +1816,7 @@
       </diskarea>
     </part>
   </software>
-  XXXXX
+
   <software name="janshind">
     <description>Janshin Densetsu - Quest of Jongmaster (ACD)(JPN)</description>
     <!-- Serial:  -->
@@ -1683,6 +1828,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="janteimo">
     <description>Jantei Monogatari (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -1694,6 +1840,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="jantei2k">
     <description>Jantei Monogatari II - Uchuu Tantei Divan Kanketsu Hen (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -1705,6 +1852,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="jantei2s">
     <description>Jantei Monogatari II - Uchuu Tantei Divan Shutsudou Hen (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -1716,6 +1864,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="jantei3">
     <description>Jantei Monogatari III - Saver Angels (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -1727,6 +1876,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="jimpower">
     <description>Jim Power - In Mutant Planet (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -1738,6 +1888,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="juuoukic">
     <description>Juuouki (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -1749,6 +1900,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="kagamain">
     <description>Kagamai no Kuni no Legend (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -1760,6 +1912,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="kaizouch">
     <description>Kaizou Choujin Shubibinman III - Ikai no Princess (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -1771,6 +1924,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="kakutouh">
     <description>Kakutou Haou Densetsu Algunos (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -1782,6 +1936,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="kawanonu">
     <description>Kawa no Nushizuri - Shizenha (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -1793,6 +1948,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="kazekiri">
     <description>Kaze Kiri - Ninja Action (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -1804,6 +1960,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="kazenode">
     <description>Kaze no Densetsu Xanadu (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -1815,6 +1972,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="kazenods">
     <description>Kaze no Densetsu Xanadu - Sample Disc (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -1826,6 +1984,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="kazenod2">
     <description>Kaze no Densetsu Xanadu II (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -1837,6 +1996,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="kiaidan">
     <description>Kiaidan 00 (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -1848,6 +2008,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="kidoukei">
     <description>Kidou Keisatsu Patlabor - Griffon Hen (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -1859,6 +2020,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="kisoulou">
     <description>Kisou Louga (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -1870,6 +2032,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="kisoulo2">
     <description>Kisou Louga II - The Ends of Shangrila (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -1881,6 +2044,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="koseikib">
     <description>KO Seiki Beast - Gaia Fukkatsu Kanketsu Hen (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -1892,6 +2056,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="kuusouka">
     <description>Kuusou Kagaku Sekai Gulliver Boy (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -1903,6 +2068,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="ldis">
     <description>L-Dis (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -1914,6 +2080,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="ladyphan">
     <description>Lady Phantom (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -1925,6 +2092,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="langriss">
     <description>Langrisser - Hikari no Matsuei (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -1936,6 +2104,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="laplace">
     <description>Laplace no Ma (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -1947,6 +2116,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="laplacep">
     <description>Laplace no Ma - Preview Disk (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -1958,6 +2128,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="lsoft1">
     <description>Laser Soft Visual Collection Volume I - Cosmic Fantasy Visual Shuu (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -1969,6 +2140,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="lsoft2">
     <description>Laser Soft Visual Collection Volume II - Valis Visual Shuu (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -1980,6 +2152,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="lastarma">
     <description>Last Armageddon {BRCD0001-6-0625-R1F} (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -1991,6 +2164,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="lastarm1">
     <description>Last Armageddon {BRCD0001-6-0625-R3D} (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -2002,6 +2176,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="lastarm2">
     <description>Last Armageddon {BRCD0001-7-0904-R1D} (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -2013,6 +2188,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="legion">
     <description>Legion (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -2024,6 +2200,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="lemmings">
     <description>Lemmings (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -2035,6 +2212,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="linda">
     <description>Linda (ACD, SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -2046,6 +2224,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="lodossto">
     <description>Lodoss Tousenki - Record of Lodoss War (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -2057,6 +2236,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="lodosstt">
     <description>Lodoss Tousenki - Record of Lodoss War Taikenban (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -2068,6 +2248,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="lodosst2">
     <description>Lodoss Tousenki II - Record of Lodoss War II (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -2079,6 +2260,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="loomj">
     <description>Loom (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -2090,6 +2272,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="lordwars">
     <description>Lord of Wars (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -2101,6 +2284,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="mac2036">
     <description>Macross 2036 (CD, SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -2112,6 +2296,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="macrosse">
     <description>Macross Eien no Love Song (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -2123,6 +2308,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="madstlk">
     <description>Mad Stalker - Full Metal Force (ACD)(JPN)</description>
     <!-- Serial:  -->
@@ -2134,6 +2320,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="madstlks">
     <description>Mad Stalker - Full Metal Force - Sample Disc (ACD)(JPN)</description>
     <!-- Serial:  -->
@@ -2145,6 +2332,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="madoumon">
     <description>Madou Monogatari I - Honou no Sotsuenji [Imperfect] (ACD)(JPN)</description>
     <!-- Serial:  -->
@@ -2156,6 +2344,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="magicalf">
     <description>Magical Fantasy Adventure - Popful Mail (ACD, SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -2167,6 +2356,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="magicals">
     <description>Magical Saurus Tour (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -2178,6 +2368,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="magicoal">
     <description>Magicoal (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -2189,6 +2380,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="mclinics">
     <description>Mahjong Clinic Special (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -2200,6 +2392,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="mlemang">
     <description>Mahjong Lemon Angel (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -2211,6 +2404,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="mbeach">
     <description>Mahjong on the Beach (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -2222,6 +2416,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="mahswrd">
     <description>Mahjong Sword - Princess Quest Gaiden (ACD, SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -2233,6 +2428,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="mahslk31">
     <description>Mahou no Shoujo Silky Lip [Ver 3.1 Prototype][Backup] (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -2244,6 +2440,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="mahslk50">
     <description>Mahou no Shoujo Silky Lip [Ver 5.0 Prototype][Backup][alt] (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -2255,6 +2452,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="mamonoht">
     <description>Mamono Hunter Youko - Makai Kara no Tenkousei (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -2266,6 +2464,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="mamonohu">
     <description>Mamono Hunter Youko - Tooki Yobigoe (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -2277,6 +2476,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="martialc">
     <description>Martial Champion (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -2288,6 +2488,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="mashoude">
     <description>Mashou Denki La Valeur (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -2299,6 +2500,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="masterof">
     <description>Master of Monsters (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -2310,6 +2512,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="matekide">
     <description>Mateki Densetsu Astralius (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -2321,6 +2524,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="megamipa">
     <description>Megami Paradise (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -2332,6 +2536,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="metalang">
     <description>Metal Angel (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -2343,6 +2548,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="metalan2">
     <description>Metal Angel II (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -2354,6 +2560,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="metamorj">
     <description>Metamor Jupiter (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -2365,6 +2572,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="mmagic">
     <description>Might and Magic (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -2376,6 +2584,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="mmagic3j">
     <description>Might and Magic III - Isles of Terra (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -2387,6 +2596,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="mineswee">
     <description>Mine Sweeper (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -2398,6 +2608,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="miraisho">
     <description>Mirai Shonen Conan (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -2409,6 +2620,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="mitsubac">
     <description>Mitsubachi Gakuen (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -2420,6 +2632,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="mlairj">
     <description>Monster Lair - Wonderboy III (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -2431,6 +2644,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="monsterm">
     <description>Monster Maker - Yami no Ryuukishi (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -2442,6 +2656,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="moonligh">
     <description>Moonlight Lady (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -2453,6 +2668,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="motoroad">
     <description>Motoroader MC (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -2464,6 +2680,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="motteket">
     <description>Motteke Tamago [Imperfect] (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -2475,6 +2692,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="mugensen">
     <description>Mugen Senshi Valis - Legend of a Fantasm Soldier (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -2486,6 +2704,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="mysticfo">
     <description>Mystic Formula (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -2497,6 +2716,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="nekketsh">
     <description>Nekketsu Koukou Dodgeballbu Soccer Hen (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -2508,6 +2728,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="nekketsd">
     <description>Nekketsu Koushinkyoku - Soreyuke Daiundoukai (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -2519,6 +2740,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="nekketlb">
     <description>Nekketsu Legend Baseball (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -2530,6 +2752,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="nemurenu">
     <description>Nemurenumori no Chiisana Ohanashi (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -2541,6 +2764,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="neonecta">
     <description>Neo Nectaris (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -2552,6 +2776,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="nexzr">
     <description>Nexzr (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -2563,6 +2788,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="nishimur">
     <description>Nishimura Kyoutarou Mystery - Hokutosei no Onna (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -2574,6 +2800,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="noriko">
     <description>No.Ri.Ko (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -2585,6 +2812,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="nobunbf">
     <description>Nobunaga no Yabou - Bushou Fuuunroku (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -2596,6 +2824,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="nobunnyz">
     <description>Nobunaga no Yabou Zenkokuban (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -2607,6 +2836,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="pachiok3">
     <description>Pachiokun III - Pachisuro Pachinko (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -2618,6 +2848,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="pachioku">
     <description>Pachiokun Maboroshi no Densetsu (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -2629,6 +2860,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="pachiowu">
     <description>Pachiokun Warau Uchuu (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -2640,6 +2872,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="paradion">
     <description>Paradion - Auto Crusher Palladium (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -2651,6 +2884,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="pastelli">
     <description>Pastel Lime (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -2662,6 +2896,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="fanspc1">
     <description>PCEngine Fan Special CD-Rom Volume I (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -2673,6 +2908,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="hyprcat">
     <description>PCEngine Hyper Catalog (CD-Rom Capsule) (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -2684,6 +2920,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="hyprcata">
     <description>PCEngine Hyper Catalog Duo-RX - Disc A (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -2695,6 +2932,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="hyprcatb">
     <description>PCEngine Hyper Catalog Duo-RX - Disc B (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -2706,6 +2944,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="hyprcat2">
     <description>PCEngine Hyper Catalog II (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -2717,6 +2956,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="hyprcat3">
     <description>PCEngine Hyper Catalog III (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -2728,6 +2968,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="hyprcat4">
     <description>PCEngine Hyper Catalog IV (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -2739,6 +2980,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="hyprcat5">
     <description>PCEngine Hyper Catalog V (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -2750,6 +2992,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="hyprct6a">
     <description>PCEngine Hyper Catalog VI - Disc A (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -2761,6 +3004,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="hyprct6b">
     <description>PCEngine Hyper Catalog VI - Disc B (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -2772,6 +3016,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="policeco">
     <description>Police Connection (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -2783,6 +3028,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="pompingw">
     <description>Pomping World (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -2794,6 +3040,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="popnmagi">
     <description>Pop'n Magic (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -2805,6 +3052,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="populous">
     <description>Populous - The Promised Lands (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -2816,6 +3064,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="princej">
     <description>Prince of Persia (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -2827,6 +3076,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="prmaker">
     <description>Princess Maker I (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -2838,6 +3088,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="prmakera">
     <description>Princess Maker I - Drama CD Audio (Audio CD)</description>
     <!-- Serial:  -->
@@ -2849,6 +3100,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="prmaker2">
     <description>Princess Maker II (ACD, SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -2860,6 +3112,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="princesm">
     <description>Princess Minerva (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -2871,6 +3124,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="peyedol">
     <description>Private Eyedol (ACD, SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -2882,6 +3136,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="pdet3">
     <description>Psychic Detective Series Vol. III - Aya (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -2893,6 +3148,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="pdet3d">
     <description>Psychic Detective Series Vol. III - Aya - Auto Demo (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -2904,6 +3160,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="pdet4">
     <description>Psychic Detective Series Vol. IV - Orgel (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -2915,6 +3172,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="psychics">
     <description>Psychic Storm (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -2926,6 +3184,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="puyopuyo">
     <description>Puyo Puyo CD (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -2937,6 +3196,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="puyopuy2">
     <description>Puyo Puyo CD Tsuu (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -2948,6 +3208,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="quizaven">
     <description>Quiz Avenue (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -2959,6 +3220,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="quizave2">
     <description>Quiz Avenue II (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -2970,6 +3232,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="quizave3">
     <description>Quiz Avenue III (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -2981,6 +3244,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="quizcara">
     <description>Quiz Caravan Cult Q (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -2992,6 +3256,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="quizdega">
     <description>Quiz de Gakuensai (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -3003,6 +3268,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="quizmaru">
     <description>Quiz Marugoto the World (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -3014,6 +3280,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="quizmar2">
     <description>Quiz Marugoto The World II - Time Machine ni Onegai! (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -3025,6 +3292,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="quiznoho">
     <description>Quiz no Hoshi (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -3036,6 +3304,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="quiztono">
     <description>Quiz Tonosama no Yabou (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -3047,6 +3316,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="rtypecom">
     <description>R-Type Complete CD (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -3058,6 +3328,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="rainbowi">
     <description>Rainbow Islands (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -3069,6 +3340,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="ranma">
     <description>Ranma (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -3080,6 +3352,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="ranmadat">
     <description>Ranma Datou, Ganso Musabetsu Kakutou-Ryuu! (CD, SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -3091,6 +3364,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="ranmator">
     <description>Ranma Toraware no Hanayome (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -3102,6 +3376,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="rayx2">
     <description>Rayxanber II (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -3113,6 +3388,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="rayx3">
     <description>Rayxanber III (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -3124,6 +3400,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="redalert">
     <description>Red Alert (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -3135,6 +3412,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="rennybla">
     <description>Renny Blaster (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -3146,6 +3424,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="risingsu">
     <description>Rising Sun (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -3157,6 +3436,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="roadspir">
     <description>Road Spirits (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -3168,6 +3448,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="karok1">
     <description>Rom Karaoke - Volume I (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -3179,6 +3460,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="karok1ss">
     <description>Rom Karaoke - Volume I - Suteki ni Standard (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -3190,6 +3472,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="karok2">
     <description>Rom Karaoke - Volume II (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -3201,6 +3484,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="karok2ni">
     <description>Rom Karaoke - Volume II - Nattoku Idol (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -3212,6 +3496,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="karok3">
     <description>Rom Karaoke - Volume III (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -3223,6 +3508,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="karok3yb">
     <description>Rom Karaoke - Volume III - Yappashi Band (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -3234,6 +3520,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="karok4">
     <description>Rom Karaoke - Volume IV (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -3245,6 +3532,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="karok4co">
     <description>Rom Karaoke - Volume IV - Choito Otona! (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -3256,6 +3544,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="karok5">
     <description>Rom Karaoke - Volume V (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -3267,6 +3556,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="karok5mu">
     <description>Rom Karaoke - Volume V - Maku no Uchi (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -3278,6 +3568,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="romromst">
     <description>Rom Rom Stadium (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -3289,6 +3580,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="ruinkami">
     <description>Ruin - Kami no Isan (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -3300,6 +3592,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="ryuukono">
     <description>Ryuuko no Ken (ACD)(JPN)</description>
     <!-- Serial:  -->
@@ -3311,6 +3604,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="ryuukons">
     <description>Ryuuko no Ken - Sample Disc (ACD)(JPN)</description>
     <!-- Serial:  -->
@@ -3322,6 +3616,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="sangokus">
     <description>Sangokushi Eiketsu - Tenka ni Nozomu (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -3333,6 +3628,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="sangoku3">
     <description>Sangokushi III (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -3344,6 +3640,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="seireise">
     <description>Seirei Senshi Spriggan (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -3355,6 +3652,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="seiryuud">
     <description>Seiryuu Densetsu Monbit (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -3366,6 +3664,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="seisensh">
     <description>Seisenshi Denshou - Jantaku no Kishi (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -3377,6 +3676,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="seiyamon">
     <description>Seiya Monogatari - Anearth Fantasy Stories (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -3388,6 +3688,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="seiyamot">
     <description>Seiya Monogatari - Anearth Fantasy Stories Taikenban (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -3399,6 +3700,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="seiyamop">
     <description>Seiya Monogatari - Anearth Fantasy Stories [Debug Version Prototype] (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -3410,6 +3712,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="sengokuk">
     <description>Sengoku Kantou Sankokushi (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -3421,6 +3724,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="sexyidol">
     <description>Sexy Idol Mahjong (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -3432,6 +3736,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="sexyidof">
     <description>Sexy Idol Mahjong Fashion Monogatari (ACD, SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -3443,6 +3748,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="sexyidoy">
     <description>Sexy Idol Mahjong Yakyuuken no Uta [Imperfect] (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -3454,6 +3760,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="shbeastj">
     <description>Shadow of the Beast (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -3465,6 +3772,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="shangha2">
     <description>Shanghai II (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -3476,6 +3784,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="shangha3">
     <description>Shanghai III - Dragon's Eye (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -3487,6 +3796,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="shapeshj">
     <description>Shapeshifter - Makai Eiyuu Den (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -3498,6 +3808,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="sherlocj">
     <description>Sherlock Holmes no Tantei Kouza (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -3509,6 +3820,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="sherlo2j">
     <description>Sherlock Holmes no Tantei Kouza II (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -3520,6 +3832,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="shiawase">
     <description>Shiawase Usagi - Nureta Bishoujo Ichi Hajimete na no ni [Imperfect] (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -3531,6 +3844,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="shiawas2">
     <description>Shiawase Usagi II - Toraware Usagi Sailor Z (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -3542,6 +3856,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="shinmega">
     <description>Shin Megami Tensei (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -3553,6 +3868,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="shinonry">
     <description>Shin Onryou Senki (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -3564,6 +3880,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="shinsang">
     <description>Shin Sangokushi - Tenka ha Ware ni (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -3575,6 +3892,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="shinsets">
     <description>Shinsetsu Shiawase Usagi (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -3586,6 +3904,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="shinsetf">
     <description>Shinsetsu Shiawase Usagi F - Yuujiyou Yorimo Aiyoku (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -3597,6 +3916,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="shinset2">
     <description>Shinsetsu Shiawase Usagi II (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -3608,6 +3928,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="shougida">
     <description>Shougi Database Kiyuu (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -3619,6 +3940,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="simeartj">
     <description>Sim Earth - The Living Planet (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -3630,6 +3952,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="slimewor">
     <description>Slime World (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -3641,6 +3964,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="slotgamb">
     <description>Slot Gambler (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -3652,6 +3976,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="snatcher">
     <description>Snatcher (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -3663,6 +3988,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="snatchpd">
     <description>Snatcher - Pilot Disk (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -3674,6 +4000,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="solbianc">
     <description>Sol Bianca (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -3685,6 +4012,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="solmoona">
     <description>Sol Moonarge (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -3696,6 +4024,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="solidfor">
     <description>Solid Force (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -3707,6 +4036,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="sorceria">
     <description>Sorcerian (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -3718,6 +4048,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="sotsugyo">
     <description>Sotsugyou - Graduation (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -3729,6 +4060,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="sotsugy2">
     <description>Sotsugyou II - Neo Generation (ACD, SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -3740,6 +4072,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="sotsugym">
     <description>Sotsugyou Shashin - Miki (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -3751,6 +4084,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="spacefan">
     <description>Space Fantasy Zone [Prototype][Backup] (CD, SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -3762,6 +4096,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="spaceinv">
     <description>Space Invaders - The Original Game (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -3773,6 +4108,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="splashlj">
     <description>Splash Lake (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -3784,6 +4120,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="spriggan">
     <description>Spriggan Mark II - Re Terraform Project [Imperfect] (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -3795,6 +4132,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="starbrea">
     <description>Star Breaker (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -3806,6 +4144,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="starmobi">
     <description>Star Mobile (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -3817,6 +4156,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="starparo">
     <description>Star Parodia (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -3828,6 +4168,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="startlin">
     <description>Startling Odyssey (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -3839,6 +4180,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="startli2">
     <description>Startling Odyssey II (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -3850,6 +4192,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="steamhea">
     <description>Steam Heart's [Imperfect] (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -3861,6 +4204,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="strider">
     <description>Strider Hiryuu (ACD)(JPN)</description>
     <!-- Serial:  -->
@@ -3872,6 +4216,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="sugoroku">
     <description>Sugoroku '92 Nari Tore Nariagari Trendy (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -3883,6 +4228,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="summer92">
     <description>Summer Carnival '92 - Alzadick (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -3894,6 +4240,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="summer93">
     <description>Summer Carnival '93 - Nexzr Special (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -3905,6 +4252,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="superalb">
     <description>Super Albatross (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -3916,6 +4264,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="scdrpgs">
     <description>Super cd-Rom RPG Sampler (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -3927,6 +4276,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="superdai">
     <description>Super Daisenryaku (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -3938,6 +4288,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="superdar">
     <description>Super Darius (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -3949,6 +4300,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="superda2">
     <description>Super Darius II (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -3960,6 +4312,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="supermah">
     <description>Super Mahjong Taikai (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -3971,6 +4324,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="sraiden">
     <description>Super Raiden (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -3982,6 +4336,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="srmp23">
     <description>Super Real Mahjong P II III Custom (ACD, SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -3993,6 +4348,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="srmp4">
     <description>Super Real Mahjong P IV Custom (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -4004,6 +4360,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="srmp5">
     <description>Super Real Mahjong P V Custom (ACD, SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -4015,6 +4372,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="srmspec">
     <description>Super Real Mahjong Special (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -4026,6 +4384,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="supersch">
     <description>Super Schwartzschild (CD, SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -4037,6 +4396,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="supersc2">
     <description>Super Schwartzschild II (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -4048,6 +4408,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="swordmas">
     <description>Sword Master (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -4059,6 +4420,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="sylphias">
     <description>Sylphia (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -4070,6 +4432,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="tadaimay">
     <description>Tadaima Yuusha Boshuuchuu (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -4081,6 +4444,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="tadaimas">
     <description>Tadaima Yuusha Boshuuchuu - Sample Disc (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -4092,6 +4456,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="taiheiki">
     <description>Taiheiki (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -4103,6 +4468,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="tanjoude">
     <description>Tanjou Debut (ACD, SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -4114,6 +4480,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="tecmowor">
     <description>Tecmo World Cup Super Soccer (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -4125,6 +4492,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="tekiwork">
     <description>Tekipaki Working Love (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -4136,6 +4504,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="tenchimu">
     <description>Tenchi Muyou! Ryououki (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -4147,6 +4516,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="tenchiwo">
     <description>Tenchi wo Kurau (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -4158,6 +4528,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="tengaims">
     <description>Tengai Makyo - Fuun Kabuki Den Shutsugeki no Sho (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -4169,6 +4540,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="tengaima">
     <description>Tengai Makyo - Kabuki Itouryodan (ACD)(JPN)</description>
     <!-- Serial:  -->
@@ -4180,6 +4552,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="tengaimz">
     <description>Tengai Makyo - Ziria (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -4191,6 +4564,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="tengaizh">
     <description>Tengai Makyo - Ziria [Hibaihin] (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -4202,6 +4576,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="tengaim2">
     <description>Tengai Makyo II - Manji Maru (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -4213,6 +4588,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="tenshino">
     <description>Tenshi no Uta (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -4224,6 +4600,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="tenshin2">
     <description>Tenshi no Uta II - Datenshi no Uta (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -4235,6 +4612,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="terrafor">
     <description>Terraforming (CD, SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -4246,6 +4624,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="atlasrv">
     <description>The Atlas - Renaissance Voyager (ACD, SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -4257,6 +4636,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="dcupten">
     <description>The Davis Cup Tennis (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -4268,6 +4648,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="kickboxj">
     <description>The Kick Boxing (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -4279,6 +4660,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="manhole">
     <description>The Manhole (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -4290,6 +4672,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="theproya">
     <description>The Pro Yakyuu (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -4301,6 +4684,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="thepro94">
     <description>The Pro Yakyuu Super '94 (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -4312,6 +4696,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="theprosu">
     <description>The Pro Yakyuu Super (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -4323,6 +4708,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="thetvsho">
     <description>The TV Show (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -4334,6 +4720,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="tokimek">
     <description>Tokimeki Memorial {HRKM70414-1FAAT} [Imperfect] (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -4345,6 +4732,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="tokimeka">
     <description>Tokimeki Memorial {HRKM70414-1FABT} [Imperfect] (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -4356,6 +4744,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="tokimekb">
     <description>Tokimeki Memorial {HRKM70701-2FAAT} (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -4367,6 +4756,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="tokimekc">
     <description>Tokimeki Memorial {HRKM71014-3FAAT} (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -4378,6 +4768,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="tokimekd">
     <description>Tokimeki Memorial {HRKM71014-3FABT} (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -4389,6 +4780,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="toponera">
     <description>Top O Nerae! GunBuster Volume I (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -4400,6 +4792,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="toponer2">
     <description>Top O Nerae! GunBuster Volume II (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -4411,6 +4804,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="travelep">
     <description>Travel Epuru (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -4422,6 +4816,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="traveler">
     <description>Travelers! Densetsu wo ButtobaSe [Imperfect] (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -4433,6 +4828,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="uchuusen">
     <description>Uchuu Senkan Yamato (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -4444,6 +4840,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="ultra2">
     <description>Ultrabox II Go (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -4455,6 +4852,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="ultra3">
     <description>Ultrabox III Go (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -4466,6 +4864,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="ultra4">
     <description>Ultrabox IV Go (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -4477,6 +4876,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="ultra">
     <description>Ultrabox Sohkan Go (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -4488,6 +4888,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="ultra5">
     <description>Ultrabox V Go (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -4499,6 +4900,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="ultra6">
     <description>Ultrabox VI Go (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -4510,6 +4912,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="uruseiya">
     <description>Urusei Yatsura - Stay With You (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -4521,6 +4924,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="uruseiyb">
     <description>Urusei Yatsura - Stay with You - Bonus CD Audio (Audio CD)</description>
     <!-- Serial:  -->
@@ -4532,6 +4936,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="valis2j">
     <description>Valis II - The Fantasm Soldier (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -4543,6 +4948,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="valis3j">
     <description>Valis III - The Fantasm Soldier (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -4554,6 +4960,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="valis4">
     <description>Valis IV - The Fantasm Soldier (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -4565,6 +4972,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="vasteelj">
     <description>Vasteel (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -4576,6 +4984,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="vasteel2">
     <description>Vasteel II (ACD, SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -4587,6 +4996,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="virgindr">
     <description>Virgin Dream (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -4598,6 +5008,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="whereint">
     <description>Where in the world is Carmen Sandiego (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -4609,6 +5020,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="windsoft">
     <description>Winds of Thunder (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -4620,6 +5032,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="wizard12">
     <description>Wizardry I II (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -4631,6 +5044,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="wizard34">
     <description>Wizardry III IV (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -4642,6 +5056,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="wizard5">
     <description>Wizardry V - Heart of the Maelstrom (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -4653,6 +5068,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="wh2">
     <description>World Heroes II (ACD)(JPN)</description>
     <!-- Serial:  -->
@@ -4664,6 +5080,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="wh2sam">
     <description>World Heroes II - Sample Disc (ACD)(JPN)</description>
     <!-- Serial:  -->
@@ -4675,6 +5092,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="wrestlin">
     <description>Wrestling Angels - Double Impact (ACD, SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -4686,6 +5104,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="xak12">
     <description>Xak I II (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -4697,6 +5116,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="xak3">
     <description>Xak III - The Eternal Recurrence (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -4708,6 +5128,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="yamamura">
     <description>Yamamura Misa Suspense - Kinsen Ka Kyo E Zara Satsu Jin Ji Ken (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -4719,6 +5140,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="yaminoke">
     <description>Yami no Ketsuzoku Harukanaru Kioku (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -4730,6 +5152,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="yawarasc">
     <description>Yawara! (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -4741,6 +5164,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="yawara2">
     <description>Yawara! II (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -4752,6 +5176,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="ysbk12j">
     <description>Ys Book I II (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -4763,6 +5188,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="ys3">
     <description>Ys III - Wanderers from Ys (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -4774,6 +5200,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="ys4">
     <description>Ys IV - The Dawn of Ys {HCD3051-4-1108-R1F} (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -4785,6 +5212,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="ys4a">
     <description>Ys IV - The Dawn of Ys {HCD3051-5-1116-R1P} (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -4796,6 +5224,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="yuyuhaku">
     <description>Yu Yu Hakusho (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -4807,6 +5236,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="zankager">
     <description>Zan - Kagerou no Toki (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -4818,6 +5248,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="zero4cha">
     <description>Zero 4 Champ II (SCD)(JPN)</description>
     <!-- Serial:  -->
@@ -4829,6 +5260,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="zerowing">
     <description>Zero Wing (CD)(JPN)</description>
     <!-- Serial:  -->
@@ -4853,6 +5285,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="tg4in1">
     <description>4 in 1 Super CD (SCD)(USA)</description>
     <!-- Serial: TGXCD1026 -->
@@ -4865,6 +5298,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="addams">
     <description>Addams Family, The (CD)(USA)</description>
     <!-- Serial: TGXCD1019 -->
@@ -4876,6 +5310,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="beyondsg">
     <description>Beyond Shadowgate (SCD)(USA)</description>
     <!-- Serial: TGXCD1048 -->
@@ -4887,6 +5322,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="bikini">
     <description>Bikini Girls (CD)(USA)</description>
     <!-- Serial: AK BIKINI SRCR 01 -->
@@ -4898,6 +5334,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="bonk3cd">
     <description>Bonk III - Bonk's Big Adventure (SCD)(USA)</description>
     <!-- Serial: TGXCD1052 -->
@@ -4909,6 +5346,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="busterbr">
     <description>Buster Bros. (CD)(USA)</description>
     <!-- Serial: TGXCD1031 -->
@@ -4920,6 +5358,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="campcali">
     <description>Camp California (SCD)(USA)</description>
     <!-- Serial: TGXCD1013 -->
@@ -4931,6 +5370,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="cosmic2u">
     <description>Cosmic Fantasy II (CD)(USA)</description>
     <!-- Serial: WTG990301 -->
@@ -4942,6 +5382,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="cottonu">
     <description>Cotton - Fantastic Night Dreams (SCD)(USA)</description>
     <!-- Serial: TGXCD1038 -->
@@ -4953,6 +5394,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="dslayu">
     <description>Dragon Slayer - The Legend of Heroes (SCD)(USA)</description>
     <!-- Serial: TGXCD1029 -->
@@ -4964,6 +5406,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="dungex2u">
     <description>Dungeon Explorer II (SCD)(USA)</description>
     <!-- Serial: TGXCD1034 -->
@@ -4975,6 +5418,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="dungmstu">
     <description>Dungeon Master - Theron's Quest (SCD)(USA)</description>
     <!-- Serial: TGXCD1041 -->
@@ -4986,6 +5430,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="exileu">
     <description>Exile (CD)(USA)</description>
     <!-- Serial: WTG990101 -->
@@ -4997,6 +5442,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="exile2u">
     <description>Exile II - Wicked Phenomenon (SCD)(USA)</description>
     <!-- Serial: WTG990102 -->
@@ -5008,6 +5454,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="fantss">
     <description>Fantasy Star Soldier [Prototype] (SCD)(USA)</description>
     <!-- Serial: N/A -->
@@ -5019,6 +5466,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="fstreetu">
     <description>Fighting Street (CD)(USA)</description>
     <!-- Serial: TGXCD1001 -->
@@ -5030,6 +5478,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="fzone2u">
     <description>Final Zone II (CD)(USA)</description>
     <!-- Serial: TGXCD1008 -->
@@ -5041,6 +5490,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="forgotnu">
     <description>Forgotten Worlds (SCD)(USA)</description>
     <!-- Serial: TGXCD1030 -->
@@ -5052,6 +5502,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="godzilla">
     <description>Godzilla (SCD)(USA)</description>
     <!-- Serial: TGXCD1051 -->
@@ -5063,6 +5514,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="hawiian">
     <description>Hawiian Island Girls (CD)(USA)</description>
     <!-- Serial: AK ISLAND SRCR 02 -->
@@ -5074,6 +5526,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="jbharu">
     <description>J. B. Harold Murder Club (CD)(USA)</description>
     <!-- Serial: TGXCD1012 -->
@@ -5085,6 +5538,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="implode">
     <description>Implode (SCD)(USA)[bad toc]</description>
     <!-- Serial: BTCD0201 -->
@@ -5097,6 +5551,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="itcamefr">
     <description>It Came from the Desert (CD)(USA)</description>
     <!-- Serial: TGXCD1010 -->
@@ -5108,6 +5563,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="jacknicu">
     <description>Jack Nicklaus Turbo Golf (CD)(USA)</description>
     <!-- Serial: ATGXCDJTTC -->
@@ -5119,6 +5575,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="johnmadd">
     <description>John Madden Duo CD Football (SCD)(USA)</description>
     <!-- Serial: TGXCD1045 -->
@@ -5130,6 +5587,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="lastaler">
     <description>Last Alert (CD)(USA)</description>
     <!-- Serial: TGXCD1007 -->
@@ -5141,6 +5599,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="loomu">
     <description>Loom (SCD)(USA)</description>
     <!-- Serial: TGXCD1017 -->
@@ -5152,6 +5611,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="lordrise">
     <description>Lords of the Rising Sun (CD)(USA)</description>
     <!-- Serial: TGXCD1014 -->
@@ -5163,6 +5623,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="lordthun">
     <description>Lords of Thunder (SCD)(USA)</description>
     <!-- Serial: TGXCD1033 -->
@@ -5174,6 +5635,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="magicald">
     <description>Magical Dinosaur Tour (CD)(USA)</description>
     <!-- Serial: TGXCD1005 -->
@@ -5185,6 +5647,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="meteorbl">
     <description>Meteor Blster DX (SCD)(USA)[bad toc]</description>
     <!-- Serial: BTCD0402 -->
@@ -5197,6 +5660,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="mmagic3u">
     <description>Might and Magic III - Isles of Terra (SCD)(USA)</description>
     <!-- Serial: TGXCD1047 -->
@@ -5208,6 +5672,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="mlairu">
     <description>Monster Lair (CD)(USA)</description>
     <!-- Serial: TGXCD1003 -->
@@ -5219,6 +5684,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="princeu">
     <description>Prince of Persia (SCD)(USA)</description>
     <!-- Serial: TGXCD1027 -->
@@ -5230,6 +5696,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="riotzone">
     <description>Riot Zone (SCD)(USA)</description>
     <!-- Serial: TGXCD1035 -->
@@ -5241,6 +5708,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="shbeastu">
     <description>Shadow of the Beast (SCD)(USA)</description>
     <!-- Serial: TGXCD1018 -->
@@ -5252,6 +5720,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="shapeshu">
     <description>Shape Shifter (SCD)(USA)</description>
     <!-- Serial: TGXCD1021 -->
@@ -5263,6 +5732,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="sherloc">
     <description>Sherlock Holmes Consulting Detective (CD)(USA)</description>
     <!-- Serial: TGXCD1011 -->
@@ -5274,6 +5744,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="sherlo2">
     <description>Sherlock Holmes Consulting Detective Volume II (CD, SCD)(USA)</description>
     <!-- Serial: TGXCD1039 -->
@@ -5285,6 +5756,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="simeartu">
     <description>Sim Earth - The Living Planet (SCD)(USA)</description>
     <!-- Serial: TGXCD1036 -->
@@ -5296,6 +5768,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="splashlu">
     <description>Splash Lake (CD)(USA)</description>
     <!-- Serial: TGXCD1025 -->
@@ -5307,6 +5780,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="superair">
     <description>Super Air Zonk (SCD)(USA)</description>
     <!-- Serial: TGXCD1042 -->
@@ -5318,6 +5792,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="sydmeads">
     <description>Syd Mead's Terra Forming (CD, SCD)(USA)</description>
     <!-- Serial: TGXCD1040 -->
@@ -5329,6 +5804,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="dynashr">
     <description>The Dynastic Hero (SCD)(USA)</description>
     <!-- Serial: TGXCD1053 -->
@@ -5340,6 +5816,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="hawaiiu">
     <description>The Local Girls of Hawaii (CD)(USA)</description>
     <!-- Serial: AK LOCAL SRCR 01 -->
@@ -5351,6 +5828,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="valis2u">
     <description>Valis II (CD)(USA)</description>
     <!-- Serial: TGXCD1006 -->
@@ -5362,6 +5840,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="valis3u">
     <description>Valis III (CD)(USA)</description>
     <!-- Serial: TGXCD1024 -->
@@ -5373,6 +5852,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="vasteelu">
     <description>Vasteel (CD)(USA)</description>
     <!-- Serial: WTG990801 -->
@@ -5384,6 +5864,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="ysbk12u">
     <description>Ys Book I II (CD)(USA)</description>
     <!-- Serial: TGXCD1002 -->
@@ -5395,6 +5876,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="ys3u">
     <description>Ys III - Wanderers from Ys (CD)(USA)</description>
     <!-- Serial: TGXCD1015 -->
@@ -5420,6 +5902,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="avtanjou">
     <description>AV Tanjou (GECD)(JPN)</description>
     <!-- Serial:  -->
@@ -5431,6 +5914,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="bishjip">
     <description>Bishoujo Jyanshi Idol Pai (GECD)(JPN)</description>
     <!-- Serial:  -->
@@ -5442,6 +5926,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="cdbishou">
     <description>CD Bishoujo Pachinko Kyuuma Yon Shimai [Imperfect] (GECD)(JPN)</description>
     <!-- Serial:  -->
@@ -5453,6 +5938,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="cdhanafu">
     <description>CD Hanafuda Bishoujo Fan Club (GECD)(JPN)</description>
     <!-- Serial:  -->
@@ -5464,6 +5950,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="cdmahjon">
     <description>CD Mahjong Bishoujo Chuushinha (GECD)(JPN)</description>
     <!-- Serial:  -->
@@ -5475,6 +5962,7 @@
       </diskarea>
     </part>
   </software>
+
   <software name="cdpachis">
     <description>CD Pachisuro Bishoujo Gambler (GECD)(JPN)</description>
     <!-- Serial:  -->

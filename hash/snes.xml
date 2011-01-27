@@ -924,7 +924,7 @@ The software list will be divided in four categories:
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="sm choukyoushi hitomi - bangai hen 2 - maki no love love panic (japan) (unl) [b].sfc" size="524288" crc="0504f733" sha1="02c5900462d9e320136445968ad116a33da932ca" offset="000000" state="baddump" />
+				<rom name="sm choukyoushi hitomi - bangai hen 2 - maki no love love panic (japan) (unl) [b].sfc" size="524288" crc="0504f733" sha1="02c5900462d9e320136445968ad116a33da932ca" offset="000000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -936,7 +936,7 @@ The software list will be divided in four categories:
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="sm choukyoushi hitomi - test version (japan) (unl) [b].sfc" size="524288" crc="1cfc5feb" sha1="e0e6f367ae7596557161d294550f851cc8d326d4" offset="000000" state="baddump" />
+				<rom name="sm choukyoushi hitomi - test version (japan) (unl) [b].sfc" size="524288" crc="1cfc5feb" sha1="e0e6f367ae7596557161d294550f851cc8d326d4" offset="000000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -948,7 +948,7 @@ The software list will be divided in four categories:
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="sm choukyoushi hitomi vol. 2 (japan) (unl) [b].sfc" size="1048576" crc="4a55cfb8" sha1="1515018c597f6966c4c6fb566a8dd61ab58049d7" offset="000000" state="baddump" />
+				<rom name="sm choukyoushi hitomi vol. 2 (japan) (unl) [b].sfc" size="1048576" crc="4a55cfb8" sha1="1515018c597f6966c4c6fb566a8dd61ab58049d7" offset="000000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -960,7 +960,7 @@ The software list will be divided in four categories:
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="sm choukyoushi hitomi vol. 2 - trial version (japan) (unl) [b].sfc" size="524288" crc="29e1efbf" sha1="8814268822a211f46a5db15a78cc9353a8de5068" offset="000000" state="baddump" />
+				<rom name="sm choukyoushi hitomi vol. 2 - trial version (japan) (unl) [b].sfc" size="524288" crc="29e1efbf" sha1="8814268822a211f46a5db15a78cc9353a8de5068" offset="000000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -972,7 +972,7 @@ The software list will be divided in four categories:
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="sm choukyoushi hitomi vol. 2 remix (japan) (unl) [b].sfc" size="524288" crc="4b280dfa" sha1="7b5534582954a94dd8d1d66e0ba382288aa48430" offset="000000" state="baddump" />
+				<rom name="sm choukyoushi hitomi vol. 2 remix (japan) (unl) [b].sfc" size="524288" crc="4b280dfa" sha1="7b5534582954a94dd8d1d66e0ba382288aa48430" offset="000000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -984,7 +984,7 @@ The software list will be divided in four categories:
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="sm choukyoushi hitomi vol. 3 (japan) (alt 1) (unl) [b].sfc" size="1048576" crc="92e6d22f" sha1="cfed5026f490dcd3a9848c5499d4f6f010bab880" offset="000000"  state="baddump"/>
+				<rom name="sm choukyoushi hitomi vol. 3 (japan) (alt 1) (unl) [b].sfc" size="1048576" crc="92e6d22f" sha1="cfed5026f490dcd3a9848c5499d4f6f010bab880" offset="000000"  status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -996,7 +996,7 @@ The software list will be divided in four categories:
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="sm choukyoushi hitomi vol. 3 (japan) (unl) [b].sfc" size="1048576" crc="1156cac6" sha1="37d404b0c213053d32b9d778a1c99f8477837b42" offset="000000" state="baddump" />
+				<rom name="sm choukyoushi hitomi vol. 3 (japan) (unl) [b].sfc" size="1048576" crc="1156cac6" sha1="37d404b0c213053d32b9d778a1c99f8477837b42" offset="000000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -1008,7 +1008,7 @@ The software list will be divided in four categories:
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="sm choukyoushi hitomi vol. 3 - test version (japan) (unl) [b].sfc" size="524288" crc="b3be5f84" sha1="a0ad63ab4a262b728e0faa0e5749423cd6aa3d9c" offset="000000" state="baddump" />
+				<rom name="sm choukyoushi hitomi vol. 3 - test version (japan) (unl) [b].sfc" size="524288" crc="b3be5f84" sha1="a0ad63ab4a262b728e0faa0e5749423cd6aa3d9c" offset="000000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -30414,7 +30414,7 @@ The software list will be divided in four categories:
 		</part>
 	</software>
 
-	<software name="striker"> Date:  -->
+	<software name="striker">
 		<description>Striker (Euro)</description>
 		<year>1992</year>
 		<publisher>Elite</publisher>

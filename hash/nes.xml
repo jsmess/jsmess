@@ -3207,7 +3207,7 @@
 		</part>
 	</software>
 
-	<software name="bestofu" clonoef="bestof">
+	<software name="bestofu" cloneof="bestof">
 		<!-- Serial: NES-BB-USA - Release Date: 1992-12 -->
 		<description>Best of the Best: Championship Karate (USA)</description>
 		<year>1992</year>
@@ -15438,7 +15438,7 @@
 		</part>
 	</software>
 
-	<software name="urashima" clone="xexyz">
+	<software name="urashima" cloneof="xexyz">
 		<!-- Serial: HFC-KO - Release Date: 1988-08-26 - Alternative Title: 亀の恩返し ウラシマ伝説 -->
 		<description>Kame no Ongaeshi: Urashima Densetsu (Jpn)</description>
 		<year>1988</year>
@@ -21205,7 +21205,7 @@
 		</part>
 	</software>
 
-	<software name="nryuken2" cloneof="shadwar2" supported="partial">>
+	<software name="nryuken2" cloneof="shadwar2" supported="partial">
 		<!-- Serial: TCF-NW - Release Date: 1990-04-06 - Alternative Title: 忍者龍剣伝Ⅱ　暗黒の邪神剣 -->
 		<description>Ninja Ryukenden II: Ankoku no Jashinken (Jpn)</description>
 		<year>1990</year>
@@ -26144,7 +26144,7 @@
 		</part>
 	</software>
 
-	<software name="shadwar2" supported="partial">>
+	<software name="shadwar2" supported="partial">
 		<!-- Serial: NES-67 (FRG/ESP) - Release Date: 1991 -->
 		<description>Shadow Warriors II: The Dark Sword of Chaos (Euro)</description>
 		<year>1991</year>
@@ -28307,9 +28307,9 @@
 		<description>Stealth ATF (USA)</description>
 		<year>1989</year>
 		<publisher>Activision</publisher>
-			<feature name="mmc1_type" value="MMC1B2" />
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-SLROM" />
+			<feature name="mmc1_type" value="MMC1B2" />
 			<dataarea name="prg" size="131072">
 				<rom name="nes-lh-0 prg" size="131072" crc="21d7517a" sha1="f1746813ab4f247e33448603908f2ebdfe2a693d" offset="00000" />
 			</dataarea>
@@ -36494,8 +36494,6 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		<description>Disney's Darkwing Duck (USA, Prototype)</description>
 		<year>1992</year>
 		<publisher>Capcom</publisher>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-SLROM" />
 			<dataarea name="chr" size="131072">
@@ -39961,7 +39959,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-	<software name="ngaiden2p" cloneof="shadwar2" supported="partial">>
+	<software name="ngaiden2p" cloneof="shadwar2" supported="partial">
 		<description>Ninja Gaiden II: The Dark Sword of Chaos (USA, Sample 36)</description>
 		<year>1990</year>
 		<publisher>Tecmo</publisher>
@@ -46987,7 +46985,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-	<software name="lzyx" clone="hanjukuh" supported="no">
+	<software name="lzyx" cloneof="hanjukuh" supported="no">
 		<!-- Serial:  - Release Date:  - Alternative Title:  -->
 		<description>Long Zhu Ying Xiong (Chi)</description>
 		<year>19??</year>

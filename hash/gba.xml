@@ -5438,7 +5438,6 @@
 		<description>Chicken Shoot (Euro)</description>
 		<year>2005</year>
 		<publisher>Zoo Digital Publishing</publisher>
-		<publisher>DSI Games</publisher>
 		<part name="cart" interface="gba_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="chicken shoot (europe) (en,fr,de,es,it).bin" size="4194304" crc="5749fdc9" sha1="d80ab8b60d82812dfbc7d7f1f7cbeb302bc85ec1" offset="000000" />
