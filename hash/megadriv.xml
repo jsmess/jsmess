@@ -15835,29 +15835,14 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		then again the last 256Kb of the game.
 		I think they did that for a crappy (really crappy) copy protection.
 	-->
-
-	<!-- quacksht is the proper dump of the 512KKb rom, which requires emulation of the different wiring to work.
-	since this is not yet implemented in MESS, we also temporarily include the "hacked" version quackshth with the
-	second half of the data at 0x100000. The latter will be removed as soon as we properly implement the mirroring. -->
-
 	<software name="quacksht" supported="no">
 		<description>QuackShot Starring Donald Duck ~ QuackShot - Guruzia Ou no Hihou (World)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="524288">
-				<rom name="mpr-14371.bin" size="524288" crc="5dd28dd7" sha1="ca02845fa49cd46ccb0a4023b91b10695573668e" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="quackshth" cloneof="quacksht">
-		<description>QuackShot Starring Donald Duck ~ QuackShot - Guruzia Ou no Hihou (World, Hacked)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="1310720">
-			<rom name="mpr-14371 (hacked).bin" size="1310720" crc="1801098b" sha1="7b1bd16fb817cc5e2af238cebe8521aaca8f6195" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-14371.bin" size="262144" crc="5dd28dd7" sha1="ca02845fa49cd46ccb0a4023b91b10695573668e" offset="000000" loadflag="load16_word_swap" />
+				<rom size="262144" offset="0x100000" loadflag="continue" />
 			</dataarea>
 		</part>
 	</software>
