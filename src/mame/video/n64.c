@@ -100,6 +100,7 @@ void Processor::VideoUpdate16(bitmap_t *bitmap)
 
 	INT32 hdiff = (n64_vi_hstart & 0x3ff) - ((n64_vi_hstart >> 16) & 0x3ff);
 	float hcoeff = ((float)(n64_vi_xscale & 0xfff) / (1 << 10));
+
 	UINT32 hres = ((float)hdiff * hcoeff);
 	INT32 invisiblewidth = n64_vi_width - hres;
 
@@ -108,6 +109,10 @@ void Processor::VideoUpdate16(bitmap_t *bitmap)
 	UINT32 vres = ((float)vdiff * vcoeff);
 
 	if (vdiff <= 0 || hdiff <= 0)
+	{
+		return;
+	}
+	if(vcoeff < 0.0f || hcoeff < 0.0f)
 	{
 		return;
 	}
@@ -122,11 +127,11 @@ void Processor::VideoUpdate16(bitmap_t *bitmap)
 
 	if (frame_buffer)
 	{
-		for(int j = 0; j < vres; j++)
+		for(int j = 0; j < vres && j < bitmap->height; j++)
 		{
 			UINT32 *d = BITMAP_ADDR32(bitmap, j, 0);
 
-			for(int i = 0; i < hres; i++)
+			for(int i = 0; i < hres && i < bitmap->width; i++)
 			{
 				Color c;
 				//int r, g, b;
