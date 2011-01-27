@@ -943,7 +943,7 @@
                         UINT32 ld_st_address;
 
                         rd = (insn & THUMB_MULTLS_BASE) >> THUMB_MULTLS_BASE_SHIFT;
-                        ld_st_address = GET_REGISTER(cpustate, rd) & 0xfffffffc;
+                        ld_st_address = GET_REGISTER(cpustate, rd); // & 0xfffffffc; // GBA "BB Ball" performs an unaligned read @ 0800B90A
 
                         if (insn & THUMB_MULTLS) /* Load */
                         {
