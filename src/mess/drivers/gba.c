@@ -234,9 +234,7 @@ static void dma_exec(running_machine *machine, FPTR ch)
 					break;
 				case 2:	// don't move
 					break;
-				case 3:	// not used
-					printf("DMA: Bad srcadd 3!\n");
-					src += 4;
+				case 3:	// not used ("Metal Max 2 Kai" expects no increment/decrement)
 					break;
 			}
 		}
@@ -271,8 +269,7 @@ static void dma_exec(running_machine *machine, FPTR ch)
 					break;
 				case 2:	// don't move
 					break;
-				case 3:	// not used
-					printf("DMA: Bad srcadd 3!\n");
+				case 3:	// not used (see note in 32-bit version above)
 					break;
 			}
 		}
