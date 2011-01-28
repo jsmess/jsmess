@@ -182,6 +182,7 @@ public:
 	UINT32 dma_src[4], dma_dst[4], dma_cnt[4], dma_srcadd[4], dma_dstadd[4];
 	UINT32 timer_regs[4];
 	UINT16 timer_reload[4];
+	int timer_recalc[4];
 
 	UINT32 gba_sram[0x10000/4];
 	UINT8 gba_eeprom[0x2000];
