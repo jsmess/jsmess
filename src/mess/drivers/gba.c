@@ -381,6 +381,23 @@ static TIMER_CALLBACK(timer_expire)
 
 //  printf("Timer %d expired, SOUNDCNT_H %04x\n", tmr, state->SOUNDCNT_H);
 
+	// "The reload value is copied into the counter only upon following two situations: Automatically upon timer overflows,"
+	// "or when the timer start bit becomes changed from 0 to 1."
+	if (state->timer_recalc[tmr] != 0)
+	{
+		double rate, clocksel, final;
+		attotime time;
+		state->timer_recalc[tmr] = 0;
+		state->timer_regs[tmr] = (state->timer_regs[tmr] & 0xFFFF0000) | (state->timer_reload[tmr] & 0x0000FFFF);
+		rate = 0x10000 - (state->timer_regs[tmr] & 0xffff);
+		clocksel = timer_clks[(state->timer_regs[tmr] >> 16) & 3];
+		final = clocksel / rate;
+		state->timer_hz[tmr] = final;
+		time = ATTOTIME_IN_HZ(final);
+		GBA_ATTOTIME_NORMALIZE(time);
+		timer_adjust_periodic(state->tmr_timer[tmr], time, tmr, time);
+	}
+
 	// check if timers 0 or 1 are feeding directsound
 	if (tmr == 0)
 	{
@@ -1651,22 +1668,31 @@ static WRITE32_HANDLER( gba_io_w )
 		case 0x010c/4:
 			{
 				double rate, clocksel;
+				UINT32 old_timer_regs;
 
 				offset -= (0x100/4);
 
-				COMBINE_DATA(&state->timer_regs[offset]);
+ 				old_timer_regs = state->timer_regs[offset];
+
+				state->timer_regs[offset] = ( state->timer_regs[offset] & ~mem_mask) | ( ( data & 0xffff0000 ) & mem_mask );
 
 //              printf("%x to timer %d (mask %x PC %x)\n", data, offset, ~mem_mask, cpu_get_pc(space->cpu));
 
 				if (ACCESSING_BITS_0_15)
 				{
-				        state->timer_reload[offset] = ( state->timer_reload[offset] & ~mem_mask ) | ( ( data & 0x0000ffff ) & mem_mask );
+					state->timer_reload[offset] = ( state->timer_reload[offset] & ~mem_mask ) | ( ( data & 0x0000ffff ) & mem_mask );
+					state->timer_recalc[offset] = 1;
 				}
 
 				// enabling this timer?
 				if ((ACCESSING_BITS_16_31) && (data & 0x800000))
 				{
 					double final;
+
+					if ((old_timer_regs & 0x00800000) == 0) // start bit 0 -> 1
+					{
+						state->timer_regs[offset] = (state->timer_regs[offset] & 0xFFFF0000) | (state->timer_reload[offset] & 0x0000FFFF);
+					}
 
 					rate = 0x10000 - (state->timer_regs[offset] & 0xffff);
 
@@ -1675,6 +1701,8 @@ static WRITE32_HANDLER( gba_io_w )
 					final = clocksel / rate;
 
 					state->timer_hz[offset] = final;
+
+					state->timer_recalc[offset] = 0;
 
 //                  printf("Enabling timer %d @ %f Hz\n", offset, final);
 
