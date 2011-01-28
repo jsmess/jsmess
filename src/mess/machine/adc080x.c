@@ -33,6 +33,7 @@ struct _adc080x_t
 INLINE adc080x_t *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
+	assert(device->type() == ADC0808 || device->type() == ADC0809);
 
 	return (adc080x_t *)downcast<legacy_device_base *>(device)->token();
 }

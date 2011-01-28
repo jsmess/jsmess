@@ -64,6 +64,8 @@ System Driver Changes:
 
 - [STE] Added a proper dump of some French TOS ROM. [ElBarto]
 
+- [TI] Converted strata/733_asr/911_vdt to devices.  [Atari Ace]
+
 
 
 Imgtool Changes:

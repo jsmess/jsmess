@@ -153,7 +153,8 @@ typedef struct _mapper8_state
 INLINE mapper8_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
-	assert(downcast<legacy_device_base *>(device)->token() != NULL);
+	assert(device->type() == MAPPER8);
+
 	return (mapper8_state *)downcast<legacy_device_base *>(device)->token();
 }
 

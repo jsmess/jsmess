@@ -33,6 +33,7 @@ struct _beta_disk_state
 INLINE beta_disk_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
+	assert(device->type() == BETA_DISK);
 
 	return (beta_disk_state *)downcast<legacy_device_base *>(device)->token();
 }

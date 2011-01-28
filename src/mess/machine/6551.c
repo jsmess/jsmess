@@ -63,7 +63,9 @@ static void acia_6551_refresh_ints(device_t *device);
 
 INLINE acia6551_t *get_token(device_t *device)
 {
+	assert(device != NULL);
 	assert(device->type() == ACIA6551);
+
 	return (acia6551_t *) downcast<legacy_device_base *>(device)->token();
 }
 

@@ -84,14 +84,18 @@ struct _scc8530_t
 
 INLINE scc8530_t *get_token(device_t *device)
 {
+	assert(device != NULL);
 	assert(device->type() == SCC8530);
+
 	return (scc8530_t *) downcast<legacy_device_base *>(device)->token();
 }
 
 
 INLINE const scc8530_interface *get_interface(device_t *device)
 {
+	assert(device != NULL);
 	assert(device->type() == SCC8530);
+
 	return (const scc8530_interface *) downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
 }
 

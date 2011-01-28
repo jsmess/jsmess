@@ -41,6 +41,7 @@ TODO:
 #include "machine/990_dk.h"
 #if VIDEO_911
 #include "video/911_vdt.h"
+#include "sound/beep.h"
 #else
 #include "video/733_asr.h"
 #endif
@@ -53,6 +54,7 @@ public:
 	ti990_4_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
+	device_t *terminal;
 };
 
 
@@ -62,20 +64,18 @@ static MACHINE_RESET(ti990_4)
 
 	ti990_reset_int();
 
-#if !VIDEO_911
-	asr733_reset(machine, 0);
-#endif
-
 	fd800_machine_init(machine, ti990_set_int7);
 }
 
 
 static INTERRUPT_GEN( ti990_4_line_interrupt )
 {
+	ti990_4_state *state = device->machine->driver_data<ti990_4_state>();
+
 #if VIDEO_911
-	vdt911_keyboard(device->machine, 0);
+	vdt911_keyboard(state->terminal);
 #else
-	asr733_keyboard(device->machine, 0);
+	asr733_keyboard(state->terminal);
 #endif
 
 	ti990_line_interrupt(device->machine);
@@ -91,9 +91,6 @@ static WRITE8_HANDLER ( rset_callback )
 {
 	ti990_cpuboard_reset();
 
-#if VIDEO_911
-	vdt911_reset();
-#endif
 	/* ... */
 
 	/* clear controller panel and smi fault LEDs */
@@ -119,34 +116,45 @@ static WRITE8_HANDLER ( lrex_callback )
     We emulate a single VDT911 CRT terminal.
 */
 
+static const vdt911_init_params_t vdt911_intf =
+{
+	char_1920,
+	vdt911_model_US,
+	ti990_set_int3
+};
+
 static VIDEO_START( ti990_4 )
 {
-	const vdt911_init_params_t params =
-	{
-		char_1920,
-		vdt911_model_US,
-		ti990_set_int3
-	};
+	ti990_4_state *state = machine->driver_data<ti990_4_state>();
 
-	vdt911_init_term(0, & params);
+	state->terminal = machine->device("vdt911");
 }
 
 static VIDEO_UPDATE( ti990_4 )
 {
-	vdt911_refresh(machine, bitmap, 0, 0, 0);
+	ti990_4_state *state = screen->machine->driver_data<ti990_4_state>();
+	vdt911_refresh(state->terminal, bitmap, 0, 0);
 	return 0;
 }
 
 #else
 
+static const asr733_init_params_t asr733_intf =
+{
+	ti990_set_int6
+};
+
 static VIDEO_START( ti990_4 )
 {
-	asr733_init_term(machine, 0, ti990_set_int6);
+	ti990_4_state *state = machine->driver_data<ti990_4_state>();
+
+	state->terminal = machine->device("asr733");
 }
 
 static VIDEO_UPDATE( ti990_4 )
 {
-	asr733_refresh(screen->machine, bitmap, 0, 0, 0);
+	ti990_4_state *state = screen->machine->driver_data<ti990_4_state>();
+	asr733_refresh(state->terminal, bitmap, 0, 0);
 	return 0;
 }
 
@@ -188,11 +196,11 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(ti990_4_cru_map, ADDRESS_SPACE_IO, 8)
 #if VIDEO_911
-	AM_RANGE(0x10, 0x11) AM_READ(vdt911_0_cru_r)
-	AM_RANGE(0x80, 0x8f) AM_WRITE(vdt911_0_cru_w)
+	AM_RANGE(0x10, 0x11) AM_DEVREAD("vdt911", vdt911_cru_r)
+	AM_RANGE(0x80, 0x8f) AM_DEVWRITE("vdt911", vdt911_cru_w)
 #else
-	AM_RANGE(0x00, 0x01) AM_READ(asr733_0_cru_r)
-	AM_RANGE(0x00, 0x0f) AM_WRITE(asr733_0_cru_w)
+	AM_RANGE(0x00, 0x01) AM_DEVREAD("asr733", asr733_cru_r)
+	AM_RANGE(0x00, 0x0f) AM_DEVWRITE("asr733", asr733_cru_w)
 #endif
 
 	AM_RANGE(0x08, 0x0b) AM_READ(fd800_cru_r)
@@ -261,8 +269,10 @@ static MACHINE_CONFIG_START( ti990_4, ti990_4_state )
 
 #if VIDEO_911
 	MCFG_PALETTE_INIT(vdt911)
+	MCFG_VDT911_VIDEO_ADD("vdt911", vdt911_intf)
 #else
 	MCFG_PALETTE_INIT(asr733)
+	MCFG_ASR733_VIDEO_ADD("asr733", asr733_intf)
 #endif
 	MCFG_VIDEO_START(ti990_4)
 	MCFG_VIDEO_UPDATE(ti990_4)

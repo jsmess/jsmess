@@ -83,14 +83,18 @@ static void msm8251_update_tx_ready(device_t *device);
 
 INLINE msm8251_t *get_token(device_t *device)
 {
+	assert(device != NULL);
 	assert(device->type() == MSM8251);
+
 	return (msm8251_t *) downcast<legacy_device_base *>(device)->token();
 }
 
 
 INLINE const msm8251_interface *get_interface(device_t *device)
 {
+	assert(device != NULL);
 	assert(device->type() == MSM8251);
+
 	return (const msm8251_interface *) device->baseconfig().static_config();
 }
 

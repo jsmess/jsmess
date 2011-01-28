@@ -66,6 +66,8 @@ struct _hd44102_t
 INLINE hd44102_t *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
+	assert(device->type() == HD44102);
+
 	return (hd44102_t *)downcast<legacy_device_base *>(device)->token();
 }
 
@@ -73,6 +75,7 @@ INLINE hd44102_config *get_safe_config(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == HD44102);
+
 	return (hd44102_config *)downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
 }
 

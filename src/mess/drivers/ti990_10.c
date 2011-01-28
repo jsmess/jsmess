@@ -83,6 +83,7 @@ public:
 	ti990_10_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
+	device_t *terminal;
 };
 
 
@@ -102,7 +103,8 @@ static MACHINE_RESET( ti990_10 )
 
 static INTERRUPT_GEN( ti990_10_line_interrupt )
 {
-	vdt911_keyboard(device->machine, 0);
+	ti990_10_state *state = device->machine->driver_data<ti990_10_state>();
+	vdt911_keyboard(state->terminal);
 
 	ti990_line_interrupt(device->machine);
 }
@@ -116,9 +118,6 @@ static void idle_callback(int state)
 static void rset_callback(device_t *device)
 {
 	ti990_cpuboard_reset();
-
-	vdt911_reset();
-	/* ... */
 
 	/* clear controller panel and smi fault LEDs */
 }
@@ -136,23 +135,25 @@ static void lrex_callback(device_t *device)
 */
 
 
+static const vdt911_init_params_t vdt911_intf =
+{
+	char_1920,
+	vdt911_model_US/*vdt911_model_UK*//*vdt911_model_French*//*vdt911_model_French*/
+	/*vdt911_model_German*//*vdt911_model_Swedish*//*vdt911_model_Norwegian*/
+	/*vdt911_model_Japanese*//*vdt911_model_Arabic*//*vdt911_model_FrenchWP*/,
+	ti990_set_int10
+};
+
 static VIDEO_START( ti990_10 )
 {
-	const vdt911_init_params_t params =
-	{
-		char_1920,
-		vdt911_model_US/*vdt911_model_UK*//*vdt911_model_French*//*vdt911_model_French*/
-		/*vdt911_model_German*//*vdt911_model_Swedish*//*vdt911_model_Norwegian*/
-		/*vdt911_model_Japanese*//*vdt911_model_Arabic*//*vdt911_model_FrenchWP*/,
-		ti990_set_int10
-	};
-
-	vdt911_init_term(machine, 0, & params);
+	ti990_10_state *state = machine->driver_data<ti990_10_state>();
+	state->terminal = machine->device("vdt911");
 }
 
 static VIDEO_UPDATE( ti990_10 )
 {
-	vdt911_refresh(screen->machine, bitmap, 0, 0, 0);
+	ti990_10_state *state = screen->machine->driver_data<ti990_10_state>();
+	vdt911_refresh(state->terminal, bitmap, 0, 0);
 	return 0;
 }
 
@@ -178,8 +179,8 @@ ADDRESS_MAP_END
 */
 
 static ADDRESS_MAP_START(ti990_10_io, ADDRESS_SPACE_IO, 8)
-	AM_RANGE(0x10, 0x11) AM_READ(vdt911_0_cru_r)
-	AM_RANGE(0x80, 0x8f) AM_WRITE(vdt911_0_cru_w)
+	AM_RANGE(0x10, 0x11) AM_DEVREAD("vdt911", vdt911_cru_r)
+	AM_RANGE(0x80, 0x8f) AM_DEVWRITE("vdt911", vdt911_cru_w)
 	AM_RANGE(0x1fa, 0x1fb) AM_READ(ti990_10_mapper_cru_r)
 	AM_RANGE(0x1fc, 0x1fd) AM_READ(ti990_10_eir_cru_r)
 	AM_RANGE(0x1fe, 0x1ff) AM_READ(ti990_panel_read)
@@ -228,6 +229,7 @@ static MACHINE_CONFIG_START( ti990_10, ti990_10_state )
 	MCFG_PALETTE_LENGTH(8)
 
 	MCFG_PALETTE_INIT(vdt911)
+	MCFG_VDT911_VIDEO_ADD("vdt911", vdt911_intf)
 	MCFG_VIDEO_START(ti990_10)
 	/*MCFG_VIDEO_EOF(name)*/
 	MCFG_VIDEO_UPDATE(ti990_10)

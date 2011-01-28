@@ -130,6 +130,7 @@ struct _i8275_t
 INLINE i8275_t *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
+	assert(device->type() == I8275);
 
 	return (i8275_t *)downcast<legacy_device_base *>(device)->token();
 }

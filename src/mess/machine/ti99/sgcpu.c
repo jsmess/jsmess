@@ -75,7 +75,8 @@ typedef struct _sgcpu_state
 INLINE sgcpu_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
-	assert(downcast<legacy_device_base *>(device)->token() != NULL);
+	assert(device->type() == SGCPU);
+
 	return (sgcpu_state *)downcast<legacy_device_base *>(device)->token();
 }
 

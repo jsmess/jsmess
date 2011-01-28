@@ -9,21 +9,28 @@ enum
 	asr733_chr_region_len	= 128*asr733_single_char_len
 };
 
+typedef struct asr733_init_params_t
+{
+	void (*int_callback)(running_machine *machine, int state);
+} asr733_init_params_t;
+
 GFXDECODE_EXTERN( asr733 );
 
 PALETTE_INIT( asr733 );
 
 void asr733_init(running_machine *machine);
-int asr733_init_term(running_machine *machine, int unit, void (*int_callback)(running_machine *machine, int state));
+DECLARE_LEGACY_DEVICE(ASR733, asr733);
 
-void asr733_reset(running_machine *machine, int unit);
+#define MCFG_ASR733_VIDEO_ADD(_tag, _intf) \
+	MCFG_DEVICE_ADD(_tag, ASR733, 0) \
+	MCFG_DEVICE_CONFIG(_intf)
 
-READ8_HANDLER(asr733_0_cru_r);
-WRITE8_HANDLER(asr733_0_cru_w);
+READ8_DEVICE_HANDLER(asr733_cru_r);
+WRITE8_DEVICE_HANDLER(asr733_cru_w);
 
-void asr733_refresh(running_machine *machine, bitmap_t *bitmap, int unit, int x, int y);
+void asr733_refresh(device_t *device, bitmap_t *bitmap, int x, int y);
 
-void asr733_keyboard(running_machine *machine, int unit);
+void asr733_keyboard(device_t *device);
 
 #define ASR733_KEY_PORTS																		\
 	PORT_START("KEY0")	/* keys 1-16 */																	\

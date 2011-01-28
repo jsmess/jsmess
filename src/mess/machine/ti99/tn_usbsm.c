@@ -45,6 +45,7 @@ typedef ti99_pebcard_config tn_usbsm_config;
 typedef struct _tn_usbsm_state
 {
 	device_t *smartmedia;
+	device_t *strata;
 
 	int 	selected;
 	int		feeprom_page;
@@ -73,6 +74,8 @@ enum
 INLINE tn_usbsm_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
+	assert(device->type() == USBSMART);
+
 	return (tn_usbsm_state *)downcast<legacy_device_base *>(device)->token();
 }
 
@@ -94,7 +97,7 @@ static UINT16 usbsm_mem_16_r(device_t *device, offs_t offset)
 		else
 		{	/* FEEPROM */
 			if (!(card->cru_register & cru_reg_feeprom_write_enable))
-				reply = strataflash_16_r(0, offset);
+				reply = strataflash_16_r(card->strata, offset);
 		}
 	}
 	else
@@ -140,7 +143,7 @@ static void usbsm_mem_16_w(device_t *device, offs_t offset, UINT16 data)
 		else
 		{	/* FEEPROM */
 			if (card->cru_register & cru_reg_feeprom_write_enable)
-				strataflash_16_w(0, offset, data);
+				strataflash_16_w(card->strata, offset, data);
 		}
 	}
 	else
@@ -307,10 +310,10 @@ static const ti99_peb_card tn_usbsm_card =
 
 static DEVICE_START( tn_usbsm )
 {
-	tn_usbsm_state *card = (tn_usbsm_state*)downcast<legacy_device_base *>(device)->token();
+	tn_usbsm_state *card = get_safe_token(device);
 	card->ram = auto_alloc_array(device->machine, UINT16, 0x100000/2);
 	card->smartmedia = device->subdevice("smartmedia");
-	strataflash_init(device->machine, 0);
+	card->strata = device->subdevice("strata");
 }
 
 static DEVICE_STOP( tn_usbsm )
@@ -319,7 +322,7 @@ static DEVICE_STOP( tn_usbsm )
 
 static DEVICE_RESET( tn_usbsm )
 {
-	tn_usbsm_state *card = (tn_usbsm_state*)downcast<legacy_device_base *>(device)->token();
+	tn_usbsm_state *card = get_safe_token(device);
 	/* Register the card */
 	device_t *peb = device->owner();
 
@@ -337,6 +340,7 @@ static DEVICE_RESET( tn_usbsm )
 
 MACHINE_CONFIG_FRAGMENT( tn_usbsm )
 	MCFG_SMARTMEDIA_ADD( "smartmedia" )
+	MCFG_STRATAFLASH_ADD( "strata" )
 MACHINE_CONFIG_END
 
 static const char DEVTEMPLATE_SOURCE[] = __FILE__;

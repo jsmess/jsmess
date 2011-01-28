@@ -58,6 +58,7 @@ struct _uPD7002_t
 INLINE uPD7002_t *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
+	assert(device->type() == UPD7002);
 
 	return (uPD7002_t *)downcast<legacy_device_base *>(device)->token();
 }

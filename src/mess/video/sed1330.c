@@ -131,6 +131,8 @@ struct _sed1330_t
 INLINE sed1330_t *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
+	assert((device->type() == SED1330));
+
 	return (sed1330_t *)downcast<legacy_device_base *>(device)->token();
 }
 
@@ -138,6 +140,7 @@ INLINE const sed1330_interface *get_interface(device_t *device)
 {
 	assert(device != NULL);
 	assert((device->type() == SED1330));
+
 	return (const sed1330_interface *) device->baseconfig().static_config();
 }
 

@@ -56,6 +56,7 @@ struct _vt_video_t
 INLINE vt_video_t *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
+	assert(device->type() == VT100_VIDEO);
 
 	return (vt_video_t *)downcast<legacy_device_base *>(device)->token();
 }
@@ -63,7 +64,8 @@ INLINE vt_video_t *get_safe_token(device_t *device)
 INLINE const vt_video_interface *get_interface(device_t *device)
 {
 	assert(device != NULL);
-//  assert((device->type() == dc012));
+	assert(device->type() == VT100_VIDEO);
+
 	return (const vt_video_interface *) device->baseconfig().static_config();
 }
 

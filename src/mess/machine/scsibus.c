@@ -33,25 +33,25 @@ struct _scsibus_t
 	SCSIInstance            *devices[8];
 	const SCSIBus_interface *interface;
 
-    UINT8       linestate;
+	UINT8       linestate;
 	UINT8       last_id;
 	UINT8       phase;
 
-    UINT8       command[CMD_BUF_SIZE];
-    UINT8       cmd_idx;
-    UINT8       is_linked;
+	UINT8       command[CMD_BUF_SIZE];
+	UINT8       cmd_idx;
+	UINT8       is_linked;
 	
 	UINT8		status;
 	UINT8		sense;
 
 	UINT8       data[ADAPTEC_BUF_SIZE];
-    UINT16      data_idx;
-    int         xfer_count;
-    int         bytes_left;
-    int         data_last;
+	UINT16      data_idx;
+	int         xfer_count;
+	int         bytes_left;
+	int         data_last;
 
-    emu_timer   *req_timer;
-    emu_timer   *ack_timer;
+	emu_timer   *req_timer;
+	emu_timer   *ack_timer;
 	emu_timer   *sel_timer;
 	emu_timer   *dataout_timer;
     
@@ -83,7 +83,9 @@ static const char *const phasenames[] =
 
 INLINE scsibus_t *get_token(device_t *device)
 {
+	assert(device != NULL);
 	assert(device->type() == SCSIBUS);
+
 	return (scsibus_t *) downcast<legacy_device_base *>(device)->token();
 }
 
@@ -938,7 +940,7 @@ static DEVICE_RESET( scsibus )
 DEVICE_GET_INFO( scsibus )
 {
 	switch ( state )
-    {
+	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(scsibus_t);				break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:	info->i = 0;				    		break;

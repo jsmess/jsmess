@@ -112,19 +112,17 @@ typedef struct vdt_t
 	char foreign_mode;
 } vdt_t;
 
-static vdt_t vdt[MAX_VDT];
-
 /*
     Macros for model features
 */
 /* TRUE for japanese and arabic terminals, which use 8-bit charcodes and keyboard shift modes */
-#define USES_8BIT_CHARCODES(unit) ((vdt[unit].model == vdt911_model_Japanese) /*|| (vdt[unit].model == vdt911_model_Arabic)*/)
+#define USES_8BIT_CHARCODES(vdt) ((vdt->model == vdt911_model_Japanese) /*|| (vdt->model == vdt911_model_Arabic)*/)
 /* TRUE for keyboards which have this extra key (on the left of TAB/SKIP)
     (Most localized keyboards have it) */
-#define HAS_EXTRA_KEY_67(unit) (! ((vdt[unit].model == vdt911_model_US) || (vdt[unit].model == vdt911_model_UK) || (vdt[unit].model == vdt911_model_French)))
+#define HAS_EXTRA_KEY_67(vdt) (! ((vdt->model == vdt911_model_US) || (vdt->model == vdt911_model_UK) || (vdt->model == vdt911_model_French)))
 /* TRUE for keyboards which have this extra key (on the right of space),
     AND do not use it as a modifier */
-#define HAS_EXTRA_KEY_91(unit) ((vdt[unit].model == vdt911_model_German) || (vdt[unit].model == vdt911_model_Swedish) || (vdt[unit].model == vdt911_model_Norwegian))
+#define HAS_EXTRA_KEY_91(vdt) ((vdt->model == vdt911_model_German) || (vdt->model == vdt911_model_Swedish) || (vdt->model == vdt911_model_Norwegian))
 
 static TIMER_CALLBACK(blink_callback);
 static TIMER_CALLBACK(beep_callback);
@@ -182,8 +180,6 @@ void vdt911_init(running_machine *machine)
 	UINT8 *base;
 	UINT8 *chr = machine->region(vdt911_chr_region)->base();
 
-	memset(vdt, 0, sizeof(vdt));
-
 	/* set up US character definitions */
 	base = chr+vdt911_US_chr_offset;
 	copy_character_matrix_array(char_defs+char_defs_US_base, base);
@@ -237,44 +233,69 @@ static TIMER_CALLBACK(setup_beep)
 	beep_set_frequency(machine->device("beep"), 2000);
 }
 
+
+INLINE vdt_t *get_safe_token(device_t *device)
+{
+	assert(device != NULL);
+	assert(device->type() == VDT911);
+
+	return (vdt_t *)downcast<legacy_device_base *>(device)->token();
+}
+
 /*
     Initialize one 911 vdt controller/terminal
 */
-void vdt911_init_term(running_machine *machine,int unit, const vdt911_init_params_t *params)
+static DEVICE_START( vdt911 )
 {
-	vdt[unit].last_key_pressed = 0x80;
-	vdt[unit].screen_size = params->screen_size;
-	vdt[unit].model = params->model;
-	vdt[unit].int_callback = params->int_callback;
+	vdt_t *vdt = get_safe_token(device);
+	const vdt911_init_params_t *params = (const vdt911_init_params_t *)device->baseconfig().static_config();
+	vdt->last_key_pressed = 0x80;
+	vdt->screen_size = params->screen_size;
+	vdt->model = params->model;
+	vdt->int_callback = params->int_callback;
 
-	if (vdt[unit].screen_size == char_960)
-		vdt[unit].cursor_address_mask = 0x3ff;	/* 1kb of RAM */
+	if (vdt->screen_size == char_960)
+		vdt->cursor_address_mask = 0x3ff;	/* 1kb of RAM */
 	else
-		vdt[unit].cursor_address_mask = 0x7ff;	/* 2 kb of RAM */
+		vdt->cursor_address_mask = 0x7ff;	/* 2 kb of RAM */
 
-	timer_set(machine, attotime_zero, NULL, unit, setup_beep);
+	timer_set(device->machine, attotime_zero, vdt, 0, setup_beep);
 
 	/* set up cursor blink clock.  2Hz frequency -> .25s half-period. */
-	/*vdt[unit].blink_clock =*/ timer_pulse(machine, ATTOTIME_IN_MSEC(250), NULL, unit, blink_callback);
+	/*vdt->blink_clock =*/ timer_pulse(device->machine, ATTOTIME_IN_MSEC(250), vdt, 0, blink_callback);
 
 	/* alloc beep timer */
-	vdt[unit].beep_timer = timer_alloc(machine, beep_callback, NULL);
+	vdt->beep_timer = timer_alloc(device->machine, beep_callback, NULL);
 }
 
-/*
-    Reset the controller board
-*/
-void vdt911_reset(void)
+DEVICE_GET_INFO( vdt911 )
 {
+	switch (state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(vdt_t);					break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(vdt911);		break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							strcpy(info->s, "911 VDT");					break;
+		case DEVINFO_STR_FAMILY:						strcpy(info->s, "911 VDT Video");					break;
+		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");							break;
+		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);						break;
+		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright MESS Team");			break;
+	}
 }
+
+DEFINE_LEGACY_DEVICE(VDT911, vdt911);
 
 /*
     timer callback to toggle blink state
 */
 static TIMER_CALLBACK(blink_callback)
 {
-	int unit = param;
-	vdt[unit].blink_state = ! vdt[unit].blink_state;
+	vdt_t *vdt = (vdt_t *)ptr;
+	vdt->blink_state = !vdt->blink_state;
 }
 
 /*
@@ -288,23 +309,24 @@ static TIMER_CALLBACK(beep_callback)
 /*
     CRU interface read
 */
-static int vdt911_cru_r(int offset, int unit)
+READ8_DEVICE_HANDLER( vdt911_cru_r )
 {
+	vdt_t *vdt = get_safe_token(device);
 	int reply=0;
 
 	offset &= 0x1;
 
-	if (! vdt[unit].word_select)
+	if (! vdt->word_select)
 	{	/* select word 0 */
 		switch (offset)
 		{
 		case 0:
-			reply = vdt[unit].display_RAM[vdt[unit].cursor_address];
+			reply = vdt->display_RAM[vdt->cursor_address];
 			break;
 
 		case 1:
-			reply = vdt[unit].keyboard_data & 0x7f;
-			if (vdt[unit].keyboard_data_ready)
+			reply = vdt->keyboard_data & 0x7f;
+			if (vdt->keyboard_data_ready)
 				reply |= 0x80;
 			break;
 		}
@@ -314,20 +336,20 @@ static int vdt911_cru_r(int offset, int unit)
 		switch (offset)
 		{
 		case 0:
-			reply = vdt[unit].cursor_address & 0xff;
+			reply = vdt->cursor_address & 0xff;
 			break;
 
 		case 1:
-			reply = (vdt[unit].cursor_address >> 8) & 0x07;
-			if (vdt[unit].keyboard_data & 0x80)
+			reply = (vdt->cursor_address >> 8) & 0x07;
+			if (vdt->keyboard_data & 0x80)
 				reply |= 0x08;
-			/*if (! vdt[unit].terminal_ready)
+			/*if (! vdt->terminal_ready)
                 reply |= 0x10;*/
-			if (vdt[unit].previous_word_select)
+			if (vdt->previous_word_select)
 				reply |= 0x20;
-			/*if (vdt[unit].keyboard_parity_error)
+			/*if (vdt->keyboard_parity_error)
                 reply |= 0x40;*/
-			if (vdt[unit].keyboard_data_ready)
+			if (vdt->keyboard_data_ready)
 				reply |= 0x80;
 			break;
 		}
@@ -339,11 +361,12 @@ static int vdt911_cru_r(int offset, int unit)
 /*
     CRU interface write
 */
-static void vdt911_cru_w(address_space *space, int offset, int data, int unit)
+WRITE8_DEVICE_HANDLER( vdt911_cru_w )
 {
+	vdt_t *vdt = get_safe_token(device);
 	offset &= 0xf;
 
-	if (! vdt[unit].word_select)
+	if (! vdt->word_select)
 	{	/* select word 0 */
 		switch (offset)
 		{
@@ -357,14 +380,14 @@ static void vdt911_cru_w(address_space *space, int offset, int data, int unit)
 		case 0x7:
 			/* display memory write data */
 			if (data)
-				vdt[unit].data_reg |= (1 << offset);
+				vdt->data_reg |= (1 << offset);
 			else
-				vdt[unit].data_reg &= ~ (1 << offset);
+				vdt->data_reg &= ~ (1 << offset);
 			break;
 
 		case 0x8:
 			/* write data strobe */
-			 vdt[unit].display_RAM[vdt[unit].cursor_address] = vdt[unit].data_reg;
+			 vdt->display_RAM[vdt->cursor_address] = vdt->data_reg;
 			break;
 
 		case 0x9:
@@ -375,37 +398,37 @@ static void vdt911_cru_w(address_space *space, int offset, int data, int unit)
 		case 0xa:
 			/* cursor move */
 			if (data)
-				vdt[unit].cursor_address--;
+				vdt->cursor_address--;
 			else
-				vdt[unit].cursor_address++;
-			vdt[unit].cursor_address &= vdt[unit].cursor_address_mask;
+				vdt->cursor_address++;
+			vdt->cursor_address &= vdt->cursor_address_mask;
 			break;
 
 		case 0xb:
 			/* blinking cursor enable */
-			vdt[unit].blinking_cursor_enable = data;
+			vdt->blinking_cursor_enable = data;
 			break;
 
 		case 0xc:
 			/* keyboard interrupt enable */
-			vdt[unit].keyboard_interrupt_enable = data;
-			(*vdt[unit].int_callback)(space->machine, vdt[unit].keyboard_interrupt_enable && vdt[unit].keyboard_data_ready);
+			vdt->keyboard_interrupt_enable = data;
+			(*vdt->int_callback)(device->machine, vdt->keyboard_interrupt_enable && vdt->keyboard_data_ready);
 			break;
 
 		case 0xd:
 			/* dual intensity enable */
-			vdt[unit].dual_intensity_enable = data;
+			vdt->dual_intensity_enable = data;
 			break;
 
 		case 0xe:
 			/* display enable */
-			vdt[unit].display_enable = data;
+			vdt->display_enable = data;
 			break;
 
 		case 0xf:
 			/* select word */
-			vdt[unit].previous_word_select = vdt[unit].word_select;
-			vdt[unit].word_select = data;
+			vdt->previous_word_select = vdt->word_select;
+			vdt->word_select = data;
 			break;
 		}
 	}
@@ -426,10 +449,10 @@ static void vdt911_cru_w(address_space *space, int offset, int data, int unit)
 		case 0xa:
 			/* cursor address */
 			if (data)
-				vdt[unit].cursor_address |= (1 << offset);
+				vdt->cursor_address |= (1 << offset);
 			else
-				vdt[unit].cursor_address &= ~ (1 << offset);
-			vdt[unit].cursor_address &= vdt[unit].cursor_address_mask;
+				vdt->cursor_address &= ~ (1 << offset);
+			vdt->cursor_address &= vdt->cursor_address_mask;
 			break;
 
 		case 0xb:
@@ -438,63 +461,54 @@ static void vdt911_cru_w(address_space *space, int offset, int data, int unit)
 
 		case 0xc:
 			/* display cursor */
-			vdt[unit].display_cursor = data;
+			vdt->display_cursor = data;
 			break;
 
 		case 0xd:
 			/* keyboard acknowledge */
-			if (vdt[unit].keyboard_data_ready)
+			if (vdt->keyboard_data_ready)
 			{
-				vdt[unit].keyboard_data_ready = 0;
-				if (vdt[unit].keyboard_interrupt_enable)
-					(*vdt[unit].int_callback)(space->machine, 0);
+				vdt->keyboard_data_ready = 0;
+				if (vdt->keyboard_interrupt_enable)
+					(*vdt->int_callback)(device->machine, 0);
 			}
-			/*vdt[unit].keyboard_parity_error = 0;*/
+			/*vdt->keyboard_parity_error = 0;*/
 			break;
 
 		case 0xe:
 			/* beep enable strobe - not tested */
-			beep_set_state(space->machine->device("beep"), 1);
+			beep_set_state(device->machine->device("beep"), 1);
 
-			timer_adjust_oneshot(vdt[unit].beep_timer, ATTOTIME_IN_USEC(300), unit);
+			timer_adjust_oneshot(vdt->beep_timer, ATTOTIME_IN_USEC(300), 0);
 			break;
 
 		case 0xf:
 			/* select word */
-			vdt[unit].previous_word_select = vdt[unit].word_select;
-			vdt[unit].word_select = data;
+			vdt->previous_word_select = vdt->word_select;
+			vdt->word_select = data;
 			break;
 		}
 	}
 }
 
- READ8_HANDLER(vdt911_0_cru_r)
-{
-	return vdt911_cru_r(offset, 0);
-}
-
-WRITE8_HANDLER(vdt911_0_cru_w)
-{
-	vdt911_cru_w(space, offset, data, 0);
-}
-
 /*
     Video refresh
 */
-void vdt911_refresh(running_machine *machine, bitmap_t *bitmap, int unit, int x, int y)
+void vdt911_refresh(device_t *device, bitmap_t *bitmap, int x, int y)
 {
-	const gfx_element *gfx = machine->gfx[vdt[unit].model];
-	int height = (vdt[unit].screen_size == char_960) ? 12 : /*25*/24;
-	int use_8bit_charcodes = USES_8BIT_CHARCODES(unit);
+	vdt_t *vdt = get_safe_token(device);
+	const gfx_element *gfx = device->machine->gfx[vdt->model];
+	int height = (vdt->screen_size == char_960) ? 12 : /*25*/24;
+	int use_8bit_charcodes = USES_8BIT_CHARCODES(vdt);
 	int address = 0;
 	int i, j;
 	int cur_char;
 	int color;
 
 	/*if (use_8bit_charcodes)
-        color = vdt[unit].dual_intensity_enable ? 1 : 0;*/
+        color = vdt->dual_intensity_enable ? 1 : 0;*/
 
-	if (! vdt[unit].display_enable)
+	if (! vdt->display_enable)
 	{
 		rectangle my_rect;
 
@@ -511,15 +525,15 @@ void vdt911_refresh(running_machine *machine, bitmap_t *bitmap, int unit, int x,
 		{
 			for (j=0; j<80; j++)
 			{
-				cur_char = vdt[unit].display_RAM[address];
+				cur_char = vdt->display_RAM[address];
 				/* does dual intensity work with 8-bit character set? */
-				color = (vdt[unit].dual_intensity_enable && (cur_char & 0x80)) ? 1 : 0;
+				color = (vdt->dual_intensity_enable && (cur_char & 0x80)) ? 1 : 0;
 				if (! use_8bit_charcodes)
 					cur_char &= 0x7f;
 
 				/* display cursor in reverse video */
-				if ((address == vdt[unit].cursor_address) && vdt[unit].display_cursor
-						&& ((! vdt[unit].blinking_cursor_enable) || vdt[unit].blink_state))
+				if ((address == vdt->cursor_address) && vdt->display_cursor
+						&& ((! vdt->blinking_cursor_enable) || vdt->blink_state))
 					color += 2;
 
 				address++;
@@ -556,8 +570,10 @@ static const unsigned char (*const key_translate[])[91] =
     keyboard handler: should be called regularly by machine code, for instance
     every Video Blank Interrupt.
 */
-void vdt911_keyboard(running_machine *machine, int unit)
+void vdt911_keyboard(device_t *device)
 {
+	vdt_t *vdt = get_safe_token(device);
+
 	typedef enum
 	{
 		/* states for western keyboards and katakana/arabic keyboards in romaji/latin mode */
@@ -581,14 +597,14 @@ void vdt911_keyboard(running_machine *machine, int unit)
 	/* read current key state */
 	for (i = 0; i < 6; i++)
 	{
-		key_buf[i] = input_port_read(machine, keynames[i]);
+		key_buf[i] = input_port_read(device->machine, keynames[i]);
 	}
 
 	/* parse modifier keys */
-	if ((USES_8BIT_CHARCODES(unit))
-		&& ((key_buf[5] & 0x0400) || ((!(key_buf[5] & 0x0100)) && vdt[unit].foreign_mode)))
+	if ((USES_8BIT_CHARCODES(vdt))
+		&& ((key_buf[5] & 0x0400) || ((!(key_buf[5] & 0x0100)) && vdt->foreign_mode)))
 	{	/* we are in katakana/arabic mode */
-		vdt[unit].foreign_mode = TRUE;
+		vdt->foreign_mode = TRUE;
 
 		if ((key_buf[4] & 0x0400) || (key_buf[5] & 0x0020))
 			modifier_state = foreign_shift;
@@ -598,7 +614,7 @@ void vdt911_keyboard(running_machine *machine, int unit)
 	else
 	{	/* we are using a western keyboard, or a katakana/arabic keyboard in
         romaji/latin mode */
-		vdt[unit].foreign_mode = FALSE;
+		vdt->foreign_mode = FALSE;
 
 		if (key_buf[3] & 0x0040)
 			modifier_state = control;
@@ -623,10 +639,10 @@ void vdt911_keyboard(running_machine *machine, int unit)
 	key_buf[5] &= ~0x0120;
 
 	/* remove unused keys */
-	if (! HAS_EXTRA_KEY_91(unit))
+	if (! HAS_EXTRA_KEY_91(vdt))
 		key_buf[5] &= ~0x0400;
 
-	if (! HAS_EXTRA_KEY_67(unit))
+	if (! HAS_EXTRA_KEY_67(vdt))
 		key_buf[4] &= ~0x0004;
 
 
@@ -634,21 +650,21 @@ void vdt911_keyboard(running_machine *machine, int unit)
 		/* reset REPEAT timer if the REPEAT key is not pressed */
 		repeat_timer = 0;
 
-	if (! (vdt[unit].last_key_pressed & 0x80) && (key_buf[vdt[unit].last_key_pressed >> 4] & (1 << (vdt[unit].last_key_pressed & 0xf))))
+	if (! (vdt->last_key_pressed & 0x80) && (key_buf[vdt->last_key_pressed >> 4] & (1 << (vdt->last_key_pressed & 0xf))))
 	{
 		/* last key has not been released */
-		if (modifier_state == vdt[unit].last_modifier_state)
+		if (modifier_state == vdt->last_modifier_state)
 		{
 			/* handle REPEAT mode if applicable */
 			if ((repeat_mode) && (++repeat_timer == repeat_delay))
 			{
-				if (vdt[unit].keyboard_data_ready)
+				if (vdt->keyboard_data_ready)
 				{	/* keyboard buffer full */
 					repeat_timer--;
 				}
 				else
 				{	/* repeat current key */
-					vdt[unit].keyboard_data_ready = 1;
+					vdt->keyboard_data_ready = 1;
 					repeat_timer = 0;
 				}
 			}
@@ -656,14 +672,14 @@ void vdt911_keyboard(running_machine *machine, int unit)
 		else
 		{
 			repeat_timer = 0;
-			vdt[unit].last_modifier_state = special_debounce;
+			vdt->last_modifier_state = special_debounce;
 		}
 	}
 	else
 	{
-		vdt[unit].last_key_pressed = 0x80;
+		vdt->last_key_pressed = 0x80;
 
-		if (vdt[unit].keyboard_data_ready)
+		if (vdt->keyboard_data_ready)
 		{	/* keyboard buffer full */
 			/* do nothing */
 		}
@@ -675,13 +691,13 @@ void vdt911_keyboard(running_machine *machine, int unit)
 				{
 					if (key_buf[i] & (1 << j))
 					{
-						vdt[unit].last_key_pressed = (i << 4) | j;
-						vdt[unit].last_modifier_state = modifier_state;
+						vdt->last_key_pressed = (i << 4) | j;
+						vdt->last_modifier_state = modifier_state;
 
-						vdt[unit].keyboard_data = (int)key_translate[vdt[unit].model][modifier_state][vdt[unit].last_key_pressed];
-						vdt[unit].keyboard_data_ready = 1;
-						if (vdt[unit].keyboard_interrupt_enable)
-							(*vdt[unit].int_callback)(machine, 1);
+						vdt->keyboard_data = (int)key_translate[vdt->model][modifier_state][vdt->last_key_pressed];
+						vdt->keyboard_data_ready = 1;
+						if (vdt->keyboard_interrupt_enable)
+							(*vdt->int_callback)(device->machine, 1);
 						return;
 					}
 				}

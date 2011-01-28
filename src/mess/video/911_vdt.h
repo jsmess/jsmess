@@ -43,16 +43,19 @@ typedef struct vdt911_init_params_t
 PALETTE_INIT( vdt911 );
 
 void vdt911_init(running_machine *machine);
-void vdt911_init_term(running_machine *machine,int unit, const vdt911_init_params_t *params);
+DECLARE_LEGACY_DEVICE(VDT911, vdt911);
 
-void vdt911_reset(void);
+#define MCFG_VDT911_VIDEO_ADD(_tag, _intf) \
+	MCFG_DEVICE_ADD(_tag, VDT911, 0) \
+	MCFG_DEVICE_CONFIG(_intf)
 
- READ8_HANDLER(vdt911_0_cru_r);
-WRITE8_HANDLER(vdt911_0_cru_w);
 
-void vdt911_refresh(running_machine *machine, bitmap_t *bitmap, int unit, int x, int y);
+ READ8_DEVICE_HANDLER(vdt911_cru_r);
+WRITE8_DEVICE_HANDLER(vdt911_cru_w);
 
-void vdt911_keyboard(running_machine *machine, int unit);
+void vdt911_refresh(device_t *device, bitmap_t *bitmap, int x, int y);
+
+void vdt911_keyboard(device_t *device);
 
 #define VDT911_KEY_PORTS																		\
 	PORT_START("KEY0")	/* keys 1-16 */																	\

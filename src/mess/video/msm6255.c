@@ -83,6 +83,8 @@ struct _msm6255_t
 INLINE msm6255_t *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
+	assert(device->type() == MSM6255);
+
 	return (msm6255_t *)downcast<legacy_device_base *>(device)->token();
 }
 

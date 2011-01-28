@@ -72,6 +72,7 @@ struct _atari_fdc_t
 INLINE atari_fdc_t *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
+	assert(device->type() == ATARI_FDC);
 
 	return (atari_fdc_t *)downcast<legacy_device_base *>(device)->token();
 }

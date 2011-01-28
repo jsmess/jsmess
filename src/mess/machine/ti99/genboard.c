@@ -121,7 +121,8 @@ static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", 
 INLINE genboard_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
-	assert(downcast<legacy_device_base *>(device)->token() != NULL);
+	assert(device->type() == GENBOARD);
+
 	return (genboard_state *)downcast<legacy_device_base *>(device)->token();
 }
 
