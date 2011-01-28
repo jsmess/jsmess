@@ -2182,7 +2182,9 @@ static WRITE32_HANDLER( sram_w )
 
 static READ32_HANDLER( no_sram_r )
 {
-	return 0xFFFFFFFF; // for "Classic NES Series"
+	UINT32 data = 0xFFFFFFFF; // for "Classic NES Series"
+	logerror( "%s: unmapped program memory read from %08X = %08X & %08X\n", cpuexec_describe_context( space->machine), 0x0E000000 + (offset << 2), data, mem_mask);
+	return data;
 }
 
 static READ32_HANDLER( flash_r )
