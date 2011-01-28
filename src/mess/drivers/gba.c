@@ -1674,13 +1674,13 @@ static WRITE32_HANDLER( gba_io_w )
 
  				old_timer_regs = state->timer_regs[offset];
 
-				state->timer_regs[offset] = ( state->timer_regs[offset] & ~mem_mask) | ( ( data & 0xffff0000 ) & mem_mask );
+				state->timer_regs[offset] = (state->timer_regs[offset] & ~(mem_mask & 0xFFFF0000)) | (data & (mem_mask & 0xFFFF0000));
 
 //              printf("%x to timer %d (mask %x PC %x)\n", data, offset, ~mem_mask, cpu_get_pc(space->cpu));
 
 				if (ACCESSING_BITS_0_15)
 				{
-					state->timer_reload[offset] = ( state->timer_reload[offset] & ~mem_mask ) | ( ( data & 0x0000ffff ) & mem_mask );
+					state->timer_reload[offset] = ((state->timer_reload[offset] & ~mem_mask) | (data & mem_mask)) & 0x0000FFFF;
 					state->timer_recalc[offset] = 1;
 				}
 
