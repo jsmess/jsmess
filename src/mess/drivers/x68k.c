@@ -129,7 +129,7 @@
 #include "machine/hd63450.h"
 #include "machine/rp5c15.h"
 #include "machine/mb89352.h"
-#include "imagedev/chd_cd.h"
+#include "machine/scsi.h"
 #include "imagedev/flopdrv.h"
 #include "formats/basicdsk.h"
 #include "formats/dim_dsk.h"
@@ -2507,8 +2507,8 @@ static const SCSIConfigTable x68k_scsi_devtable =
 		{ SCSI_ID_2, "harddisk2", SCSI_DEVICE_HARDDISK },
 		{ SCSI_ID_3, "harddisk3", SCSI_DEVICE_HARDDISK },
 		{ SCSI_ID_4, "harddisk4", SCSI_DEVICE_HARDDISK },
-		{ SCSI_ID_5, "mo_disk",   SCSI_DEVICE_HARDDISK },  // Magneto-Optical disk
-		{ SCSI_ID_6, "cdrom",     SCSI_DEVICE_CDROM    },  // CD-ROM/RW
+		{ SCSI_ID_5, "harddisk5", SCSI_DEVICE_HARDDISK },
+		{ SCSI_ID_6, "harddisk6", SCSI_DEVICE_HARDDISK },
 	}
 };
 
@@ -2786,8 +2786,8 @@ static MACHINE_CONFIG_DERIVED( x68kxvi, x68000 )
 	MCFG_HARDDISK_ADD("harddisk2")
 	MCFG_HARDDISK_ADD("harddisk3")
 	MCFG_HARDDISK_ADD("harddisk4")
-	MCFG_HARDDISK_ADD("mo_disk")  // magneto-optical disk, we'll treat it as an HD for now
-	MCFG_CDROM_ADD("cdrom")
+	MCFG_HARDDISK_ADD("harddisk5")
+	MCFG_HARDDISK_ADD("harddisk6")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( x68030, x68000 )
@@ -2804,8 +2804,8 @@ static MACHINE_CONFIG_DERIVED( x68030, x68000 )
 	MCFG_HARDDISK_ADD("harddisk2")
 	MCFG_HARDDISK_ADD("harddisk3")
 	MCFG_HARDDISK_ADD("harddisk4")
-	MCFG_HARDDISK_ADD("mo_disk")  // magneto-optical disk, we'll treat it as an HD for now
-	MCFG_CDROM_ADD("cdrom")
+	MCFG_HARDDISK_ADD("harddisk5")
+	MCFG_HARDDISK_ADD("harddisk6")
 MACHINE_CONFIG_END
 
 ROM_START( x68000 )
