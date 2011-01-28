@@ -2013,7 +2013,7 @@ static ADDRESS_MAP_START(x68kxvi_map, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0xe92000, 0xe92001) AM_DEVREADWRITE8("okim6258", okim6258_status_r, okim6258_ctrl_w, 0x00ff)
 	AM_RANGE(0xe92002, 0xe92003) AM_DEVREADWRITE8("okim6258", okim6258_status_r, okim6258_data_w, 0x00ff)
 	AM_RANGE(0xe94000, 0xe95fff) AM_READWRITE(x68k_fdc_r, x68k_fdc_w)
-	AM_RANGE(0xe96000, 0xe9601f) AM_DEVREADWRITE("x68k_hdc",x68k_hdc_r, x68k_hdc_w)
+//	AM_RANGE(0xe96000, 0xe9601f) AM_DEVREADWRITE("x68k_hdc",x68k_hdc_r, x68k_hdc_w)
 	AM_RANGE(0xe96020, 0xe9603f) AM_DEVREADWRITE8_MODERN("mb89352_int",mb89352_device,mb89352_r,mb89352_w,0x00ff)
 	AM_RANGE(0xe98000, 0xe99fff) AM_READWRITE(x68k_scc_r, x68k_scc_w)
 	AM_RANGE(0xe9a000, 0xe9bfff) AM_DEVREADWRITE("ppi8255", x68k_ppi_r, x68k_ppi_w)
@@ -2050,7 +2050,7 @@ static ADDRESS_MAP_START(x68030_map, ADDRESS_SPACE_PROGRAM, 32)
 	AM_RANGE(0xe90000, 0xe91fff) AM_READWRITE16(x68k_fm_r, x68k_fm_w,0xffffffff)
 	AM_RANGE(0xe92000, 0xe92003) AM_DEVREADWRITE8("okim6258", okim6258_status_r, x68030_adpcm_w, 0x00ff00ff)
 	AM_RANGE(0xe94000, 0xe95fff) AM_READWRITE16(x68k_fdc_r, x68k_fdc_w,0xffffffff)
-	AM_RANGE(0xe96000, 0xe9601f) AM_DEVREADWRITE16("x68k_hdc",x68k_hdc_r, x68k_hdc_w,0xffffffff)
+//	AM_RANGE(0xe96000, 0xe9601f) AM_DEVREADWRITE16("x68k_hdc",x68k_hdc_r, x68k_hdc_w,0xffffffff)
 	AM_RANGE(0xe96020, 0xe9603f) AM_DEVREADWRITE8_MODERN("mb89352_int",mb89352_device,mb89352_r,mb89352_w,0x00ff00ff)
 	AM_RANGE(0xe98000, 0xe99fff) AM_READWRITE16(x68k_scc_r, x68k_scc_w,0xffffffff)
 	AM_RANGE(0xe9a000, 0xe9bfff) AM_DEVREADWRITE16("ppi8255", x68k_ppi_r, x68k_ppi_w,0xffffffff)
@@ -2713,7 +2713,7 @@ static DRIVER_INIT( x68030 )
 	state->sysport.cputype = 0xdc; // 68030, 25MHz
 }
 
-static MACHINE_CONFIG_START( x68000, x68k_state )
+static MACHINE_CONFIG_START( x68000_base, x68k_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)  /* 10 MHz */
 	MCFG_CPU_PROGRAM_MAP(x68k_map)
@@ -2729,8 +2729,6 @@ static MACHINE_CONFIG_START( x68000, x68k_state )
 	MCFG_I8255A_ADD( "ppi8255",  ppi_interface )
 
 	MCFG_HD63450_ADD( "hd63450", dmac_interface )
-
-	MCFG_X68KHDC_ADD( "x68k_hdc" )
 
 	MCFG_SCC8530_ADD( "scc", 5000000 )
 
@@ -2774,7 +2772,13 @@ static MACHINE_CONFIG_START( x68000, x68k_state )
 	MCFG_RAM_EXTRA_OPTIONS("1M,2M,3M,5M,6M,7M,8M,9M,10M,11M,12M")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( x68kxvi, x68000 )
+static MACHINE_CONFIG_DERIVED( x68000, x68000_base )
+
+	MCFG_X68KHDC_ADD( "x68k_hdc" )
+
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( x68kxvi, x68000_base )
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(16000000)  /* 16 MHz */
@@ -2790,7 +2794,7 @@ static MACHINE_CONFIG_DERIVED( x68kxvi, x68000 )
 	MCFG_HARDDISK_ADD("harddisk6")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( x68030, x68000 )
+static MACHINE_CONFIG_DERIVED( x68030, x68000_base )
 
 	MCFG_CPU_REPLACE("maincpu", M68030, 25000000)  /* 25 MHz 68EC030 */
 	MCFG_CPU_PROGRAM_MAP(x68030_map)
