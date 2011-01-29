@@ -554,7 +554,7 @@ void intelfsh_device::write_full(UINT32 address, UINT32 data)
 		{
 			m_flash_mode = FM_NORMAL;
 		}
-		else if( ( address & 0xffff ) == 0x5555 && ( data & 0xff ) == 0xb0 && m_config.m_type == m_config.FLASH_SANYO_LE26FV10N1TS )
+		else if( ( address & 0xffff ) == 0x5555 && ( data & 0xff ) == 0xb0 && m_config.m_maker_id == 0x62 && m_config.m_device_id == 0x13 )
 		{
 			m_flash_mode = FM_BANKSELECT;
 		}

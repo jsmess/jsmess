@@ -3465,7 +3465,6 @@
  *
  ************************************************************************/
 
-#include "streams.h"
 #include "wavwrite.h"
 
 /*************************************
@@ -4169,7 +4168,7 @@ typedef enum
 
 	/* Debugging */
 	DSO_CSVLOG,			/* Dump nodes as csv file */
-	DSO_WAVELOG,		/* Dump nodes as wav file */
+	DSO_WAVLOG,		/* Dump nodes as wav file */
 
 	/* Parallel execution */
 	DSO_TASK_START,	/* start of parallel task */
@@ -4440,7 +4439,7 @@ public:
 
 	/* --------------------------------- */
 
-	virtual void update_to_current_time(void) const { stream_update(m_stream); }
+	virtual void update_to_current_time(void) const { m_stream->update(); }
 
 	sound_stream *get_stream(void) { return m_stream; }
 protected:
@@ -4766,8 +4765,8 @@ discrete_base_node * discrete_node_factory<C>::Create(discrete_device * pdev, co
 #define DISCRETE_CSVLOG3(NODE1,NODE2,NODE3)                             DSC_SND_ENTRY( NODE_SPECIAL, dso_csvlog  , DSO_CSVLOG  , 3, DSE( NODE1,NODE2,NODE3 ), DSE( NODE1,NODE2,NODE3 ), NULL, "DISCRETE_CSVLOG3" ),
 #define DISCRETE_CSVLOG4(NODE1,NODE2,NODE3,NODE4)                       DSC_SND_ENTRY( NODE_SPECIAL, dso_csvlog  , DSO_CSVLOG  , 4, DSE( NODE1,NODE2,NODE3,NODE4 ), DSE( NODE1,NODE2,NODE3,NODE4 ), NULL, "DISCRETE_CSVLOG4" ),
 #define DISCRETE_CSVLOG5(NODE1,NODE2,NODE3,NODE4,NODE5)                 DSC_SND_ENTRY( NODE_SPECIAL, dso_csvlog  , DSO_CSVLOG  , 5, DSE( NODE1,NODE2,NODE3,NODE4,NODE5 ), DSE( NODE1,NODE2,NODE3,NODE4,NODE5 ), NULL, "DISCRETE_CSVLOG5" ),
-#define DISCRETE_WAVLOG1(NODE1,GAIN1)                                   DSC_SND_ENTRY( NODE_SPECIAL, dso_wavelog , DSO_WAVELOG , 2, DSE( NODE1,NODE_NC ), DSE( NODE1,GAIN1 ), NULL, "DISCRETE_WAVLOG1" ),
-#define DISCRETE_WAVLOG2(NODE1,GAIN1,NODE2,GAIN2)                       DSC_SND_ENTRY( NODE_SPECIAL, dso_wavelog , DSO_WAVELOG , 4, DSE( NODE1,NODE_NC,NODE2,NODE_NC ), DSE( NODE1,GAIN1,NODE2,GAIN2 ), NULL, "DISCRETE_WAVLOG2" ),
+#define DISCRETE_WAVLOG1(NODE1,GAIN1)                                   DSC_SND_ENTRY( NODE_SPECIAL, dso_wavlog  , DSO_WAVLOG  , 2, DSE( NODE1,NODE_NC ), DSE( NODE1,GAIN1 ), NULL, "DISCRETE_WAVLOG1" ),
+#define DISCRETE_WAVLOG2(NODE1,GAIN1,NODE2,GAIN2)                       DSC_SND_ENTRY( NODE_SPECIAL, dso_wavlog  , DSO_WAVLOG  , 4, DSE( NODE1,NODE_NC,NODE2,NODE_NC ), DSE( NODE1,GAIN1,NODE2,GAIN2 ), NULL, "DISCRETE_WAVLOG2" ),
 
 /* import */
 #define DISCRETE_IMPORT(INFO)                                           DSC_SND_ENTRY( NODE_SPECIAL, special     , DSO_IMPORT  , 0, DSE( 0 ), DSE( 0 ), &(INFO##_discrete_interface), "DISCRETE_IMPORT" ),

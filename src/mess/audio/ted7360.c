@@ -359,7 +359,6 @@ Video part
    so i no exact column value reachable!
 */
 #include "emu.h"
-#include "streams.h"
 #include "audio/ted7360.h"
 
 
@@ -1235,7 +1234,7 @@ static void ted7360_soundport_w( device_t *device, int offset, int data )
 	ted7360_state *ted7360 = get_safe_token(device);
 
 	// int old = ted7360->reg[offset];
-	stream_update(ted7360->channel);
+	ted7360->channel->update();
 
 	switch (offset)
 	{
@@ -1347,7 +1346,7 @@ static void ted7360_sound_start( device_t *device )
 	ted7360_state *ted7360 = get_safe_token(device);
 	int i;
 
-	ted7360->channel = stream_create(device, 0, 1, device->machine->sample_rate, 0, ted7360_update);
+	ted7360->channel = device->machine->sound().stream_alloc(*device, 0, 1, device->machine->sample_rate, 0, ted7360_update);
 
 	/* buffer for fastest played sample for 5 second so we have enough data for min 5 second */
 	ted7360->noisesize = NOISE_FREQUENCY_MAX * NOISE_BUFFER_SIZE_SEC;

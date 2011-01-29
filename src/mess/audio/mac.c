@@ -11,7 +11,6 @@
 #include "emu.h"
 #include "sound/asc.h"
 #include "includes/mac.h"
-#include "streams.h"
 #include "machine/ram.h"
 
 /***************************************************************************
@@ -116,7 +115,7 @@ static DEVICE_START(mac_sound)
 	memset(token, 0, sizeof(*token));
 
 	token->snd_cache = auto_alloc_array(device->machine, UINT8, SND_CACHE_SIZE);
-	token->mac_stream = stream_create(device, 0, 1, MAC_SAMPLE_RATE, 0, mac_sound_update);
+	token->mac_stream = device->machine->sound().stream_alloc(*device, 0, 1, MAC_SAMPLE_RATE, 0, mac_sound_update);
 }
 
 
@@ -154,9 +153,9 @@ void mac_set_volume(device_t *device, int volume)
 {
 	mac_sound *token = get_token(device);
 
-	stream_update(token->mac_stream);
+	token->mac_stream->update();
 	volume = (100 / 7) * volume;
-	sound_set_output_gain(device, 0, volume / 100.0);
+	token->mac_stream->set_output_gain(0, volume / 100.0);
 }
 
 
@@ -175,7 +174,7 @@ void mac_sh_updatebuffer(device_t *device)
 	if (token->snd_cache_len >= SND_CACHE_SIZE)
 	{
 		/* clear buffer */
-		stream_update(token->mac_stream);
+		token->mac_stream->update();
 	}
 
 	if (token->snd_cache_len >= SND_CACHE_SIZE)

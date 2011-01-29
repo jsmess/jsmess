@@ -60,7 +60,6 @@
 **********************************************************************/
 
 #include "emu.h"
-#include "streams.h"
 #include "upd1771.h"
 
 
@@ -352,7 +351,7 @@ static DEVICE_START( upd1771c )
 
     state->timer = timer_alloc( device->machine, upd1771c_callback, (void *)device );
 
-    state->channel = stream_create( device, 0, 1, sample_rate, state, upd1771c_update );
+    state->channel = device->machine->sound().stream_alloc( *device, 0, 1, sample_rate, state, upd1771c_update );
 
     state_save_register_device_item_array( device, 0, state->packet );
     state_save_register_device_item(device, 0, state->index );

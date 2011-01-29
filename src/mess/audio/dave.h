@@ -7,7 +7,6 @@
 #ifndef __DAVE_H__
 #define __DAVE_H__
 
-#include "streams.h"
 #include "devcb.h"
 
 

@@ -40,7 +40,6 @@
 ***************************************************************************************/
 
 #include "emu.h"
-#include "streams.h"
 #include "gb.h"
 
 
@@ -423,7 +422,7 @@ WRITE8_DEVICE_HANDLER( gb_sound_w )
 	gb_sound_t *gb = get_token(device);
 
 	/* change in registers so update first */
-	stream_update(gb->channel);
+	gb->channel->update();
 
 	/* Only register NR52 is accessible if the sound controller is disabled */
 	if( !gb->snd_control.on && offset != NR52 )
@@ -699,7 +698,7 @@ static DEVICE_START( gameboy_sound )
 	memset(&gb->snd_3, 0, sizeof(gb->snd_3));
 	memset(&gb->snd_4, 0, sizeof(gb->snd_4));
 
-	gb->channel = stream_create(device, 0, 2, device->machine->sample_rate, 0, gameboy_update);
+	gb->channel = device->machine->sound().stream_alloc(*device, 0, 2, device->machine->sample_rate, 0, gameboy_update);
 	gb->rate = device->machine->sample_rate;
 
 	/* Calculate the envelope and sweep tables */

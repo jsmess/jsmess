@@ -6,7 +6,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "streams.h"
 #include "includes/vc4000.h"
 
 
@@ -32,7 +31,7 @@ void vc4000_soundport_w (device_t *device, int offset, int data)
 {
 	vc4000_sound *token = get_token(device);
 
-	stream_update(token->channel);
+	token->channel->update();
 	token->reg[offset] = data;
 	switch (offset)
 	{
@@ -81,7 +80,7 @@ static DEVICE_START(vc4000_sound)
 {
 	vc4000_sound *token = get_token(device);
 	memset(token, 0, sizeof(*token));
-    token->channel = stream_create(device, 0, 1, device->machine->sample_rate, 0, vc4000_update);
+    token->channel = device->machine->sound().stream_alloc(*device, 0, 1, device->machine->sample_rate, 0, vc4000_update);
 }
 
 

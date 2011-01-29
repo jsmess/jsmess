@@ -8,7 +8,6 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "streams.h"
 #include "socrates.h"
 
 typedef struct
@@ -98,28 +97,28 @@ static DEVICE_START( socrates_snd )
 	chip->DAC_output = 0x00; /* output */
 	chip->state[0] = chip->state[1] = chip->state[2] = 0;
 	chip->accum[0] = chip->accum[1] = chip->accum[2] = 0xFF;
-	chip->stream = stream_create(device, 0, 1, device->clock() ? device->clock() : device->machine->sample_rate, chip, socrates_snd_pcm_update);
+	chip->stream = device->machine->sound().stream_alloc(*device, 0, 1, device->clock() ? device->clock() : device->machine->sample_rate, chip, socrates_snd_pcm_update);
 }
 
 
 void socrates_snd_reg0_w(device_t *device, int data)
 {
 	SocratesASIC *chip = get_safe_token(device);
-	stream_update(chip->stream);
+	chip->stream->update();
 	chip->freq[0] = data;
 }
 
 void socrates_snd_reg1_w(device_t *device, int data)
 {
 	SocratesASIC *chip = get_safe_token(device);
-	stream_update(chip->stream);
+	chip->stream->update();
 	chip->freq[1] = data;
 }
 
 void socrates_snd_reg2_w(device_t *device, int data)
 {
 	SocratesASIC *chip = get_safe_token(device);
-	stream_update(chip->stream);
+	chip->stream->update();
 	chip->vol[0] = data&0xF;
 	chip->enable[0] = (data&0x10)>>4;
 }
@@ -127,7 +126,7 @@ void socrates_snd_reg2_w(device_t *device, int data)
 void socrates_snd_reg3_w(device_t *device, int data)
 {
 	SocratesASIC *chip = get_safe_token(device);
-	stream_update(chip->stream);
+	chip->stream->update();
 	chip->vol[1] = data&0xF;
 	chip->enable[1] = (data&0x10)>>4;
 }
@@ -135,7 +134,7 @@ void socrates_snd_reg3_w(device_t *device, int data)
 void socrates_snd_reg4_w(device_t *device, int data)
 {
 	SocratesASIC *chip = get_safe_token(device);
-	stream_update(chip->stream);
+	chip->stream->update();
 	chip->channel3 = data;
 }
 

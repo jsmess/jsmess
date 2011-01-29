@@ -3,7 +3,6 @@
 #include "emu.h"
 #include "cpu/mips/mips3.h"
 #include "cpu/mips/mips3com.h"
-#include "streams.h"
 #include "includes/n64.h"
 #include "sound/dmadac.h"
 #include "profiler.h"
@@ -33,7 +32,6 @@ static UINT32 mi_mode = 0;
 
 READ32_HANDLER( n64_mi_reg_r )
 {
-	//printf("mi_reg_r: %08x\n", offset << 2);
 	switch (offset)
 	{
         case 0x00/4:            // MI_MODE_REG
@@ -58,7 +56,6 @@ READ32_HANDLER( n64_mi_reg_r )
 
 WRITE32_HANDLER( n64_mi_reg_w )
 {
-	//printf("mi_reg_w: %08x = %08x & %08x\n", offset << 2, data, mem_mask);
 	switch (offset)
 	{
 		case 0x00/4:		// MI_INIT_MODE_REG
@@ -341,6 +338,11 @@ static void sp_dma(running_machine *machine, int direction)
 {
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	int i, c;
+
+	if (sp_dma_length == 0)
+	{
+		return;
+	}
 
 	sp_dma_length++;
 	if ((sp_dma_length & 7) != 0)
@@ -1354,7 +1356,7 @@ WRITE32_HANDLER( n64_pi_reg_w )
 			if (pi_first_dma)
 			{
 				// TODO: CIC-6105 has different address...
-				space->write_dword(0x00000318, 0x400000); // Switch to 0x800000 to let 6105 games see 8 megs... sometimes
+				space->write_dword(0x00000318, 0x400000);
 				space->write_dword(0x000003f0, 0x800000);
 				pi_first_dma = 0;
 			}
@@ -2013,7 +2015,7 @@ WRITE32_HANDLER( n64_pif_ram_w )
 
 MACHINE_START( n64 )
 {
-	mips3drc_set_options(machine->device("maincpu"), MIPS3DRC_COMPATIBLE_OPTIONS);
+	mips3drc_set_options(machine->device("maincpu"), MIPS3DRC_FASTEST_OPTIONS + MIPS3DRC_STRICT_VERIFY);
 
 	/* configure fast RAM regions for DRC */
 	mips3drc_add_fastram(machine->device("maincpu"), 0x00000000, 0x007fffff, FALSE, rdram);

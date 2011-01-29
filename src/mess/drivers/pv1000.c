@@ -7,7 +7,6 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "imagedev/cartslot.h"
-#include "streams.h"
 
 
 DECLARE_LEGACY_SOUND_DEVICE(PV1000,pv1000_sound);
@@ -284,7 +283,7 @@ static STREAM_UPDATE( pv1000_sound_update )
 static DEVICE_START( pv1000_sound )
 {
 	d65010_state *state = device->machine->driver_data<d65010_state>();
-	state->sh_channel = stream_create( device, 0, 1, device->clock()/1024, 0, pv1000_sound_update );
+	state->sh_channel = device->machine->sound().stream_alloc(*device, 0, 1, device->clock()/1024, 0, pv1000_sound_update );
 }
 
 

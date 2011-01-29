@@ -10,7 +10,6 @@
 
 #include "emu.h"
 #include "includes/wswan.h"
-#include "streams.h"
 
 
 struct CHAN {
@@ -66,7 +65,9 @@ static void wswan_ch_set_freq( running_machine *machine, struct CHAN *ch, UINT16
 WRITE8_DEVICE_HANDLER( wswan_sound_port_w )
 {
 	wswan_sound_state *state = get_safe_token(device);
-	stream_update( state->channel);
+	
+	state->channel->update();
+
 	switch( offset ) {
 	case 0x80:				/* Audio 1 freq (lo) */
 		wswan_ch_set_freq( device->machine, &state->audio1, ( state->audio1.freq & 0xFF00 ) | data );
@@ -232,7 +233,7 @@ static STREAM_UPDATE( wswan_sh_update )
 static DEVICE_START(wswan_sound)
 {
 	wswan_sound_state *state = get_safe_token(device);
-	state->channel = stream_create(device, 0, 2, device->machine->sample_rate, 0, wswan_sh_update);
+	state->channel = device->machine->sound().stream_alloc(*device, 0, 2, device->machine->sample_rate, 0, wswan_sh_update);
 
 	state->audio1.on = 0;
 	state->audio1.signal = 16;

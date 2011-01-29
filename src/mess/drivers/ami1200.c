@@ -109,7 +109,7 @@ static WRITE8_DEVICE_HANDLER( cd32_cia_0_porta_w )
 	device_t *cdda = device->machine->device("cdda");
 
 	if (cdda != NULL)
-		sound_set_output_gain(cdda, 0, BIT(data, 0) ? 0.0 : 1.0 );
+		device->machine->device<cdda_device>("cdda")->set_output_gain(0, BIT(data, 0) ? 0.0 : 1.0);
 
 	/* bit 2 = Power Led on Amiga */
 	set_led_status(device->machine, 0, !BIT(data, 1));

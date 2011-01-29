@@ -3367,7 +3367,7 @@ V-V                           TP-027
 	DRIVER( aquarush )	/* 2000.02 Aqua Rush (AQ1/VER.A1, Japan) */
 	DRIVER( golgo13 )	/* 2000.03 Golgo 13 (GLG1/VER.A, Japan) */
 	DRIVER( sws2000 )	/* 2000.03 Super World Stadium 2000 (SS01/VER.A, Japan) */
-//  DRIVER( truckk )        /* 2000.06 Truck Kyousoukyoku (Metro) */
+	DRIVER( truckk )    /* 2000.06 Truck Kyousoukyoku (Metro) */
 						/* 2000.07 Kart Duel */
 						/* 2000.08 Teknowerk */
 	DRIVER( g13knd )	/* 2000.10 Golgo 13 Kiseki no Dandou (GLS1/VER.A, Japan) */
@@ -4769,6 +4769,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( bdrdown )	/* 2003.04 Border Down */
 	DRIVER( usagui )	/* 2003.06 Usagi Yamashiro Mahjong Hen */
 						/* 2003.07 Yonin Uchi Mahjong MJ Network Taisen ver. NEW */
+	DRIVER( oinori )	/* 2003.08 Oinori-daimyoujin Matsuri */
 	DRIVER( psyvar2 )	/* 2003.11 Psyvariar 2 */
 	DRIVER( puyofev )	/* 2003.11 Puyopuyo Fever */
 	DRIVER( shootopl )	/* Shootout Pool */
@@ -4886,7 +4887,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( rangrmsn )	/* 2004.03 Ranger Mission */
 	DRIVER( salmankt )	/* 2004.06 Salary Man Kintarou Net Select */
 	DRIVER( kofnw )		/* 2004.07 The King of Fighters Neo Wave */
-	DRIVER( kofnwj )    	/* 2004.07 The King of Fighters Neo Wave (Japan) */
+	DRIVER( kofnwj )    /* 2004.07 The King of Fighters Neo Wave (Japan) */
 	DRIVER( xtrmhunt )	/* 2004.09 Extreme Hunting */
 	DRIVER( dirtypig )	/* 2004.09 Dirty Pig Skin Football */
 	DRIVER( ftspeed )	/* 2004.09 Faster than Speed */
@@ -4897,8 +4898,8 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 						/* 2005.09 Samurai Spirits Tenkaichi Kenkakuden */
 	DRIVER( kofxi )		/* 2005.10 The King of Fighters XI */
 	DRIVER( fotns )		/* 2005.12 Hokuto no Ken */
-						/* 2006.02 Metal Slug 6 */
-	DRIVER( xtrmhnt2 )			/* 2006.09 Extreme Hunting 2 Tournament Edition */
+	DRIVER( mslug6 )	/* 2006.02 Metal Slug 6 */
+	DRIVER( xtrmhnt2 )	/* 2006.09 Extreme Hunting 2 Tournament Edition */
 						/* 2008.?? Sega Clay Challenge */
 
 	/* Hikaru */
@@ -5919,6 +5920,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( btltryst )	/* GX636 (c)1998 */
 	DRIVER( heatof11 )	/* GX703 (c)1998 */
 	DRIVER( evilngt )	/* GX810 (c)1998 */
+	DRIVER( evilngte )	/* GX810 (c)1998 */
 	DRIVER( hellngt )	/* GX810 (c)1998 */
 
 	/* Exidy games */
@@ -7722,7 +7724,8 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( tengaij )	/* (c) 1996 */
 	DRIVER( s1945ii )	/* (c) 1997 */
 	DRIVER( soldivid )	/* (c) 1997 */
-	DRIVER( sbomberb )	/* (c) 1998 */
+	DRIVER( sbomber )	/* (c) 1998 */
+	DRIVER( sbombera )	/* (c) 1998 */
 	DRIVER( daraku )	/* (c) 1998 */
 	DRIVER( gunbird2 )	/* (c) 1998 */
 	DRIVER( s1945iii )	/* (c) 1999 */

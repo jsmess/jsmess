@@ -9,7 +9,6 @@
 
 #include "emu.h"
 #include "machine/pit8253.h"
-#include "streams.h"
 #include "includes/special.h"
 
 typedef struct _specimx_sound_state specimx_sound_state;
@@ -32,7 +31,7 @@ static DEVICE_START(specimx_sound)
 {
 	specimx_sound_state *state = get_safe_token(device);
 	state->specimx_input[0] = state->specimx_input[1] = state->specimx_input[2] = 0;
-	state->mixer_channel = stream_create(device, 0, 1, device->machine->sample_rate, 0, specimx_sh_update);
+	state->mixer_channel = device->machine->sound().stream_alloc(*device, 0, 1, device->machine->sample_rate, 0, specimx_sh_update);
 }
 
 static STREAM_UPDATE( specimx_sh_update )
@@ -69,7 +68,7 @@ void specimx_set_input(device_t *device, int index, int state)
 {
 	specimx_sound_state *sndstate = get_safe_token(device);
 	if (sndstate->mixer_channel!=NULL) {
-		stream_update( sndstate->mixer_channel );
+		sndstate->mixer_channel->update();
 	}
 	sndstate->specimx_input[index] = state;
 }

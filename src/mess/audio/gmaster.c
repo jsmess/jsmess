@@ -2,10 +2,8 @@
  PeT mess@utanet.at march 2002
 ***************************************************************************/
 
-#include <assert.h>
 #include <math.h>
 #include "emu.h"
-#include "streams.h"
 #include "emu.h"
 #include "timer.h"
 #include "cpu/upd7810/upd7810.h"
@@ -35,7 +33,7 @@ int gmaster_io_callback(device_t *device, int ioline, int state)
 	switch (ioline)
 	{
 		case UPD7810_TO:
-			stream_update(token->mixer_channel);
+			token->mixer_channel->update();
 			token->level = state;
 			break;
 		default:
@@ -68,7 +66,7 @@ static STREAM_UPDATE( gmaster_update )
 static DEVICE_START( gmaster_sound )
 {
 	gmaster_sound *token = get_token(device);
-	token->mixer_channel = stream_create(device, 0, 1, device->machine->sample_rate, 0, gmaster_update);
+	token->mixer_channel = device->machine->sound().stream_alloc(*device, 0, 1, device->machine->sample_rate, 0, gmaster_update);
 }
 
 

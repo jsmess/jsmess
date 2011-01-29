@@ -5,7 +5,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "streams.h"
 #include "includes/svision.h"
 
 typedef enum
@@ -143,7 +142,7 @@ void svision_soundport_w(device_t *device, int which, int offset, int data)
 	SVISION_CHANNEL *channel = &state->channel[which];
 	UINT16 size;
 
-	stream_update(state->mixer_channel);
+	state->mixer_channel->update();
 	channel->reg[offset] = data;
 
 	switch (offset)
@@ -296,7 +295,7 @@ static DEVICE_START( svision_sound )
 	memset(&state->noise, 0, sizeof(state->noise));
 	memset(state->channel, 0, sizeof(state->channel));
 
-	state->mixer_channel = stream_create(device, 0, 2, device->machine->sample_rate, 0, svision_update);
+	state->mixer_channel = device->machine->sound().stream_alloc(*device, 0, 2, device->machine->sample_rate, 0, svision_update);
 }
 
 

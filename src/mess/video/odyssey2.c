@@ -202,7 +202,7 @@ WRITE8_HANDLER( odyssey2_video_w )
 	odyssey2_state *state = space->machine->driver_data<odyssey2_state>();
 	/* Update the sound */
 	if( offset >= 0xa7 && offset <= 0xaa )
-		stream_update( state->sh_channel );
+		state->sh_channel->update();
 
     if (offset == 0xa0)
     {
@@ -616,7 +616,7 @@ VIDEO_UPDATE( odyssey2 )
 static DEVICE_START( odyssey2_sound )
 {
 	odyssey2_state *state = device->machine->driver_data<odyssey2_state>();
-	state->sh_channel = stream_create(device, 0, 1, device->clock()/(I824X_LINE_CLOCKS*4), 0, odyssey2_sh_update );
+	state->sh_channel = device->machine->sound().stream_alloc(*device, 0, 1, device->clock()/(I824X_LINE_CLOCKS*4), 0, odyssey2_sh_update );
 }
 
 

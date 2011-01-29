@@ -12,7 +12,6 @@
 #include "machine/pit8253.h"
 #include "machine/i8255a.h"
 #include "includes/dai.h"
-#include "streams.h"
 
 static STREAM_UPDATE( dai_sh_update );
 
@@ -66,7 +65,7 @@ void dai_set_volume(device_t *device, int offset, UINT8 data)
 void dai_set_input(device_t *device, int index, int state)
 {
 	dai_sound_state *sndstate = get_token(device);
-	stream_update( sndstate->mixer_channel );
+	sndstate->mixer_channel->update();
 
 	sndstate->dai_input[index] = state;
 }
@@ -76,7 +75,7 @@ static DEVICE_START(dai_sound)
 {
 	dai_sound_state *state = get_token(device);
 
-	state->mixer_channel = stream_create(device, 0, 2, device->machine->sample_rate, 0, dai_sh_update);
+	state->mixer_channel = device->machine->sound().stream_alloc(*device, 0, 2, device->machine->sample_rate, 0, dai_sh_update);
 
 	logerror ("sample rate: %d\n", device->machine->sample_rate);
 }

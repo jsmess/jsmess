@@ -10,7 +10,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "streams.h"
 #include "includes/arcadia.h"
 
 //known UVI audio clocks
@@ -65,7 +64,7 @@ void arcadia_soundport_w (device_t *device, int offset, int data)
 {
 	arcadia_sound *token = get_token(device);
 
-	stream_update(token->channel);
+	token->channel->update();
 	token->reg[offset] = data;
 
 	//logerror("arcadia_sound write:%x=%x\n",offset,data);
@@ -171,7 +170,7 @@ static STREAM_UPDATE( arcadia_update )
 static DEVICE_START(arcadia_sound)
 {
 	arcadia_sound *token = get_token(device);
-    token->channel = stream_create(device, 0, 1, UVI_PAL*OSAMP, 0, arcadia_update);
+    token->channel = device->machine->sound().stream_alloc(*device, 0, 1, UVI_PAL*OSAMP, 0, arcadia_update);
     token->lfsr    = LFSR_INIT;
     token->tval    = 1;
 	logerror("arcadia_sound start\n");

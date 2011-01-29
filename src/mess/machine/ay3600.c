@@ -38,8 +38,8 @@
 
 static TIMER_CALLBACK(AY3600_poll);
 
-static int AY3600_keyboard_queue_chars(const unicode_char *text, size_t text_len);
-static int AY3600_keyboard_accept_char(unicode_char ch);
+static int AY3600_keyboard_queue_chars(running_machine *machine, const unicode_char *text, size_t text_len);
+static int AY3600_keyboard_accept_char(running_machine *machine, unicode_char ch);
 
 static const unsigned char ay3600_key_remap_2[9*8][4] =
 {
@@ -336,7 +336,7 @@ int AY3600_init(running_machine *machine)
 	state->last_key_unmodified = 0xff;	/* necessary for special repeat key behaviour */
 	state->time_until_repeat = MAGIC_KEY_REPEAT_NUMBER;
 
-	inputx_setup_natural_keyboard(
+	inputx_setup_natural_keyboard(machine, 
 		AY3600_keyboard_queue_chars,
 		AY3600_keyboard_accept_char,
 		NULL);
@@ -604,7 +604,7 @@ static UINT8 AY3600_get_keycode(unicode_char ch)
 
 
 
-static int AY3600_keyboard_queue_chars(const unicode_char *text, size_t text_len)
+static int AY3600_keyboard_queue_chars(running_machine *machine, const unicode_char *text, size_t text_len)
 {
 	if (keywaiting)
 		return 0;
@@ -615,7 +615,7 @@ static int AY3600_keyboard_queue_chars(const unicode_char *text, size_t text_len
 
 
 
-static int AY3600_keyboard_accept_char(unicode_char ch)
+static int AY3600_keyboard_accept_char(running_machine *machine, unicode_char ch)
 {
 	return AY3600_get_keycode(ch) != 0;
 }

@@ -1,7 +1,6 @@
 #include <math.h>
 
 #include "emu.h"
-#include "streams.h"
 #include "includes/channelf.h"
 
 
@@ -33,7 +32,7 @@ void channelf_sound_w(device_t *device, int mode)
 	if (mode == state->sound_mode)
 		return;
 
-	stream_update(state->channel);
+	state->channel->update();
 	state->sound_mode = mode;
 
 	switch(mode)
@@ -100,7 +99,7 @@ static DEVICE_START(channelf_sound)
 	channelf_sound_state *state = get_safe_token(device);
 	int rate;
 
-	state->channel = stream_create(device, 0, 1, device->machine->sample_rate, 0, channelf_sh_update);
+	state->channel = device->machine->sound().stream_alloc(*device, 0, 1, device->machine->sample_rate, 0, channelf_sh_update);
 	rate = device->machine->sample_rate;
 
 	/*

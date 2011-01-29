@@ -168,7 +168,7 @@ static DEVICE_START( dave_sound )
     the volumes are mixed internally and output as left and right volume */
 
 	/* 3 tone channels + 1 noise channel */
-	dave->sound_stream_var = stream_create(device, 0, 2, device->machine->sample_rate, NULL, dave_update_sound);
+	dave->sound_stream_var = device->machine->sound().stream_alloc(*device, 0, 2, device->machine->sample_rate, NULL, dave_update_sound);
 }
 
 
@@ -411,7 +411,7 @@ static WRITE8_DEVICE_HANDLER(dave_sound_w)
 	dave_t *dave = get_token(device);
 
 	/* update stream */
-	stream_update(dave->sound_stream_var);
+	dave->sound_stream_var->update();
 
 	/* new write */
 	switch (offset)

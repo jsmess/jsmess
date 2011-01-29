@@ -7,9 +7,6 @@
 #ifndef ODYSSEY2_H_
 #define ODYSSEY2_H_
 
-#include "streams.h"
-
-
 #define P1_BANK_LO_BIT            (0x01)
 #define P1_BANK_HI_BIT            (0x02)
 #define P1_KEYBOARD_SCAN_ENABLE   (0x04)  /* active low */
