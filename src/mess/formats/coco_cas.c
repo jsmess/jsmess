@@ -38,6 +38,9 @@
 #define COCO_WAVESAMPLES_TRAILER	(1.0)
 #define COCO_LONGSILENCE			(5.0)
 
+//some games load with only 5s, but most games need 15s
+#define ALICE32_WAVESAMPLES_HEADER	(15.0)
+
 static int synccount;
 
 const struct CassetteModulation coco_cas_modulation =
@@ -145,7 +148,7 @@ static int get_cas_block(cassette_image *cassette, UINT64 *offset, UINT8 *block,
 
 
 
-static casserr_t coco_cas_load(cassette_image *cassette)
+static casserr_t cas_load(cassette_image *cassette, UINT8 silence)
 {
 	casserr_t err;
 	UINT64 offset;
@@ -207,10 +210,10 @@ static casserr_t coco_cas_load(cassette_image *cassette)
 		if ((last_blocktype == 0) || (last_blocktype == 0xFF) || (block[0] == 0))
 		{
 			/* silence */
-			err = cassette_put_sample(cassette, 0, time_index, COCO_WAVESAMPLES_HEADER, 0);
+			err = cassette_put_sample(cassette, 0, time_index, silence, 0);
 			if (err)
 				return err;
-			time_index += COCO_WAVESAMPLES_HEADER;
+			time_index += silence;
 
 			/* sync data */
 			err = cassette_put_modulated_filler(cassette, 0, time_index, 0x55, 128, &coco_cas_modulation, &time_displacement);
@@ -257,7 +260,15 @@ static casserr_t coco_cas_load(cassette_image *cassette)
 	return CASSETTE_ERROR_SUCCESS;
 }
 
+static casserr_t coco_cas_load(cassette_image *cassette)
+{
+	return cas_load(cassette, COCO_WAVESAMPLES_HEADER);
+}
 
+static casserr_t alice32_cas_load(cassette_image *cassette)
+{
+	return cas_load(cassette, ALICE32_WAVESAMPLES_HEADER);
+}
 
 const struct CassetteFormat coco_cas_format =
 {
@@ -267,8 +278,19 @@ const struct CassetteFormat coco_cas_format =
 	NULL
 };
 
+const struct CassetteFormat alice32_cas_format =
+{
+	"cas,c10,k7",
+	coco_cas_identify,
+	alice32_cas_load,
+	NULL
+};
 
 
 CASSETTE_FORMATLIST_START(coco_cassette_formats)
 	CASSETTE_FORMAT(coco_cas_format)
+CASSETTE_FORMATLIST_END
+
+CASSETTE_FORMATLIST_START(alice32_cassette_formats)
+	CASSETTE_FORMAT(alice32_cas_format)
 CASSETTE_FORMATLIST_END
