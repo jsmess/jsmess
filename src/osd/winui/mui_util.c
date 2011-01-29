@@ -346,8 +346,7 @@ int numberOfScreens(const machine_config *config)
 
 int numberOfSpeakers(const machine_config *config)
 {
-	int speakers = speaker_output_count(config);
-	return speakers;
+	return config->m_devicelist.count(SPEAKER);
 }
 
 static struct DriversInfo* GetDriversInfo(int driver_index)
