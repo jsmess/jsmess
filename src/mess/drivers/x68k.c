@@ -120,8 +120,8 @@
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "machine/68901mfp.h"
 #include "machine/i8255a.h"
+#include "machine/mc68901.h"
 #include "machine/upd765.h"
 #include "sound/2151intf.h"
 #include "sound/okim6258.h"
@@ -1289,8 +1289,8 @@ static READ16_HANDLER( x68k_mfp_r )
 static READ16_HANDLER( x68k_mfp_r )
 {
 	x68k_state *state = space->machine->driver_data<x68k_state>();
-	device_t *x68k_mfp = space->machine->device(MC68901_TAG);
-    // Initial settings indicate that IRQs are generated for FM (YM2151), Receive buffer error or full,
+
+	// Initial settings indicate that IRQs are generated for FM (YM2151), Receive buffer error or full,
     // MFP Timer C, and the power switch
 //  logerror("MFP: [%08x] Reading offset %i\n",cpu_get_pc(space->cpu),offset);
     switch(offset)
@@ -1346,7 +1346,7 @@ static READ16_HANDLER( x68k_mfp_r )
     case 23:
         return x68k_keyboard_pop_scancode(state);
     default:
-		if (ACCESSING_BITS_0_7) return mc68901_register_r(x68k_mfp, offset);
+		if (ACCESSING_BITS_0_7) return state->m_mfp->read(*space, offset);
     }
     return 0xffff;
 }
@@ -1354,7 +1354,6 @@ static READ16_HANDLER( x68k_mfp_r )
 static WRITE16_HANDLER( x68k_mfp_w )
 {
 	x68k_state *state = space->machine->driver_data<x68k_state>();
-	device_t *x68k_mfp = space->machine->device(MC68901_TAG);
 
 	/* For the Interrupt registers, the bits are set out as such:
        Reg A - bit 7: GPIP7 (HSync)
@@ -1478,7 +1477,7 @@ static WRITE16_HANDLER( x68k_mfp_w )
 		}
 		break;
 	default:
-		if (ACCESSING_BITS_0_7) mc68901_register_w(x68k_mfp, offset, data & 0xff);
+		if (ACCESSING_BITS_0_7) state->m_mfp->write(*space, offset, data & 0xff);
 		return;
 	}
 }
@@ -1510,14 +1509,20 @@ static void x68k_rtc_alarm_irq(running_machine *machine, int state)
 	if(drvstate->mfp.aer & 0x01)
 	{
 		if(state == 1)
+		{
 			drvstate->mfp.gpio |= 0x01;
+			drvstate->m_mfp->i0_w(1);
 			//mfp_trigger_irq(MFP_IRQ_GPIP0);  // RTC ALARM
+		}
 	}
 	else
 	{
 		if(state == 0)
+		{
 			drvstate->mfp.gpio &= ~0x01;
+			drvstate->m_mfp->i0_w(0);
 			//mfp_trigger_irq(MFP_IRQ_GPIP0);  // RTC ALARM
+		}
 	}
 }
 
@@ -1850,23 +1855,24 @@ static void x68k_fm_irq(device_t *device, int irq)
 	if(irq == CLEAR_LINE)
 	{
 		state->mfp.gpio |= 0x08;
+		state->m_mfp->i3_w(1);
 	}
 	else
 	{
 		state->mfp.gpio &= ~0x08;
+		state->m_mfp->i3_w(0);
 	}
 }
 
-static READ8_DEVICE_HANDLER( mfp_gpio_r )
+READ8_MEMBER( x68k_state::mfp_gpio_r )
 {
-	x68k_state *state = device->machine->driver_data<x68k_state>();
-	UINT8 data = state->mfp.gpio;
+	UINT8 data = mfp.gpio;
 
-	data &= ~(state->crtc.hblank << 7);
-	data &= ~(state->crtc.vblank << 4);
+	data &= ~(crtc.hblank << 7);
+	data &= ~(crtc.vblank << 4);
 	data |= 0x23;  // GPIP5 is unused, always 1
 
-//  mc68901_tai_w(mfp, state->crtc.vblank);
+//  m_mfp->tai_w(state->crtc.vblank);
 
 	return data;
 }
@@ -1920,13 +1926,12 @@ static INTERRUPT_GEN( x68k_vsync_irq )
 static IRQ_CALLBACK(x68k_int_ack)
 {
 	x68k_state *state = device->machine->driver_data<x68k_state>();
-	device_t *x68k_mfp = device->machine->device(MC68901_TAG);
 
 	if(irqline == 6)  // MFP
 	{
 		state->mfp.current_irq = -1;
 		if(state->current_vector[6] != 0x4b && state->current_vector[6] != 0x4c)
-			state->current_vector[6] = mc68901_get_vector(x68k_mfp);
+			state->current_vector[6] = state->m_mfp->get_vector();
 		else
 			cputag_set_input_line_and_vector(device->machine, "maincpu",irqline,CLEAR_LINE,state->current_vector[irqline]);
 		logerror("SYS: IRQ acknowledged (vector=0x%02x, line = %i)\n",state->current_vector[6],irqline);
@@ -2069,10 +2074,10 @@ static ADDRESS_MAP_START(x68030_map, ADDRESS_SPACE_PROGRAM, 32)
 	AM_RANGE(0xfe0000, 0xffffff) AM_ROM
 ADDRESS_MAP_END
 
-static WRITE8_DEVICE_HANDLER( mfp_tdo_w )
+WRITE_LINE_MEMBER( x68k_state::mfp_tdo_w )
 {
-	mc68901_rx_clock_w(device, data);
-	mc68901_tx_clock_w(device, data);
+	m_mfp->tc_w(state);
+	m_mfp->rc_w(state);
 }
 
 static MC68901_INTERFACE( mfp_interface )
@@ -2080,15 +2085,17 @@ static MC68901_INTERFACE( mfp_interface )
 	4000000,											/* timer clock */
 	0,													/* receive clock */
 	0,													/* transmit clock */
-	DEVCB_DEVICE_HANDLER(MC68901_TAG, mfp_gpio_r),	/* GPIO read */
+	DEVCB_LINE(mfp_irq_callback),						/* interrupt */
+	DEVCB_DRIVER_MEMBER(x68k_state, mfp_gpio_r),		/* GPIO read */
 	DEVCB_NULL,											/* GPIO write */
-	DEVCB_NULL,											/* serial input */
-	DEVCB_NULL,											/* serial output */
 	DEVCB_NULL,											/* TAO */
 	DEVCB_NULL,											/* TBO */
 	DEVCB_NULL,											/* TCO */
-	DEVCB_DEVICE_HANDLER(MC68901_TAG, mfp_tdo_w),	/* TDO */
-	DEVCB_LINE(mfp_irq_callback)						/* interrupt */
+	DEVCB_DRIVER_LINE_MEMBER(x68k_state, mfp_tdo_w),	/* TDO */
+	DEVCB_NULL,											/* serial input */
+	DEVCB_NULL,											/* serial output */
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 static I8255A_INTERFACE( ppi_interface )
@@ -2724,7 +2731,7 @@ static MACHINE_CONFIG_START( x68000_base, x68k_state )
 	MCFG_MACHINE_RESET( x68000 )
 
 	/* device hardware */
-	MCFG_MK68901_ADD(MC68901_TAG, 4000000, mfp_interface)
+	MCFG_MC68901_ADD(MC68901_TAG, 4000000, mfp_interface)
 
 	MCFG_I8255A_ADD( "ppi8255",  ppi_interface )
 

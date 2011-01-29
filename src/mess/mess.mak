@@ -501,7 +501,6 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_FORMATS)/pc_dsk.o	\
 	$(MESS_FORMATS)/rk_cas.o	\
 	$(MESS_MACHINE)/6551.o		\
-	$(MESS_MACHINE)/68901mfp.o	\
 	$(MESS_MACHINE)/74145.o		\
 	$(MESS_MACHINE)/8530scc.o	\
 	$(MESS_MACHINE)/adc080x.o	\
@@ -528,7 +527,6 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_MACHINE)/mc6846.o	\
 	$(MESS_MACHINE)/mc6852.o	\
 	$(MESS_MACHINE)/mc6854.o	\
-	$(MESS_MACHINE)/mc68901.o	\
 	$(MESS_MACHINE)/mm58274c.o	\
 	$(MESS_MACHINE)/mm74c922.o	\
 	$(MESS_MACHINE)/mpc105.o	\

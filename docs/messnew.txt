@@ -66,6 +66,8 @@ System Driver Changes:
 
 - [TI] Converted strata/733_asr/911_vdt to devices.  [Atari Ace]
 
+- [X68K] Refactored to use new MC68901 device. [Curt Coder]
+
 
 
 Imgtool Changes:

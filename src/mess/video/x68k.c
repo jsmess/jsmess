@@ -26,8 +26,8 @@
 */
 
 #include "emu.h"
+#include "machine/mc68901.h"
 #include "includes/x68k.h"
-#include "machine/68901mfp.h"
 #include "machine/ram.h"
 
 
@@ -267,6 +267,7 @@ static TIMER_CALLBACK(x68k_crtc_raster_end)
 {
 	x68k_state *state = machine->driver_data<x68k_state>();
 	state->mfp.gpio |= 0x40;
+	state->m_mfp->i6_w(1);
 }
 
 TIMER_CALLBACK(x68k_crtc_raster_irq)
@@ -279,6 +280,7 @@ TIMER_CALLBACK(x68k_crtc_raster_irq)
 	if(scan <= state->crtc.vtotal)
 	{
 		state->mfp.gpio &= ~0x40;  // GPIP6
+		state->m_mfp->i6_w(0);
 		machine->primary_screen->update_partial(scan);
 		irq_time = machine->primary_screen->time_until_pos(scan,state->crtc.hbegin);
 		// end of HBlank period clears GPIP6 also?
@@ -317,7 +319,7 @@ TIMER_CALLBACK(x68k_crtc_vblank_irq)
 	}
 
 	if (x68k_mfp != NULL)
-		mc68901_tai_w(x68k_mfp, !state->crtc.vblank);
+		state->m_mfp->tai_w(!state->crtc.vblank);
 }
 
 

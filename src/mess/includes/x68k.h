@@ -40,9 +40,15 @@ class x68k_state : public driver_device
 public:
 	x68k_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config),
+		  m_mfp(*this, MC68901_TAG),
 		  m_nvram(*this, "nvram") { }
 
+	required_device<mc68901_device> m_mfp;
 	required_shared_ptr<UINT32>	m_nvram;
+
+	DECLARE_WRITE_LINE_MEMBER( mfp_tdo_w );
+	DECLARE_READ8_MEMBER( mfp_gpio_r );
+
 	struct
 	{
 		int sram_writeprotect;
