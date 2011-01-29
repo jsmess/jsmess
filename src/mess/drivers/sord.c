@@ -7,8 +7,6 @@
     Thankyou to Roman Stec and Jan P. Naidr for the documentation and much
     help.
 
-    http://falabella.lf2.cuni.cz/~naidr/sord/
-
     PI-5 is the parallel interface using a 8255.
     FD-5 is the disc operating system and disc interface.
     FD-5 is connected to M5 via PI-5.
@@ -25,6 +23,11 @@
         - Floppy interface ROM isn't dumped
         - Interrupts are wrong
 
+	http://www.retropc.net/mm/m5/
+	http://www.museo8bits.es/wiki/index.php/Sord_M5
+	http://k5.web.klfree.net/content/view/10/11/
+	http://k5.web.klfree.net/images/stories/sord/m5heap.htm
+
  ******************************************************************************/
 
 #include "emu.h"
@@ -39,7 +42,7 @@
 #include "formats/sord_cas.h"
 
 /* FD-5 floppy support */
-#include "machine/8255ppi.h"
+#include "machine/i8255a.h"
 #include "imagedev/flopdrv.h"
 #include "formats/basicdsk.h"
 #include "machine/upd765.h"
@@ -111,9 +114,9 @@ static READ8_HANDLER(fd5_data_r)
 
 	LOG(("fd5 0x010 r: %02x %04x\n",state->fd5_databus,cpu_get_pc(space->cpu)));
 
-	ppi8255_set_port_c(space->machine->device("ppi8255"), 0x50);
-	ppi8255_set_port_c(space->machine->device("ppi8255"), 0x10);
-	ppi8255_set_port_c(space->machine->device("ppi8255"), 0x50);
+	i8255a_pc6_w(space->machine->device("ppi8255"), 1);
+	i8255a_pc6_w(space->machine->device("ppi8255"), 0);
+	i8255a_pc6_w(space->machine->device("ppi8255"), 1);
 
 	return state->fd5_databus;
 }
@@ -127,9 +130,9 @@ static WRITE8_HANDLER(fd5_data_w)
 	state->fd5_databus = data;
 
 	/* set stb on data write */
-	ppi8255_set_port_c(space->machine->device("ppi8255"), 0x50);
-	ppi8255_set_port_c(space->machine->device("ppi8255"), 0x40);
-	ppi8255_set_port_c(space->machine->device("ppi8255"), 0x50);
+	i8255a_pc4_w(space->machine->device("ppi8255"), 1);
+	i8255a_pc4_w(space->machine->device("ppi8255"), 0);
+	i8255a_pc4_w(space->machine->device("ppi8255"), 1);
 
 	cpu_yield(space->cpu);
 }
@@ -164,6 +167,7 @@ static WRITE8_HANDLER( fd5_tc_w )
 /* 0x040 */
 /* 0x050 */
 static ADDRESS_MAP_START(sord_fd5_io, ADDRESS_SPACE_IO, 8)
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x000, 0x000) AM_DEVREAD( "upd765", upd765_status_r)
 	AM_RANGE(0x001, 0x001) AM_DEVREADWRITE("upd765", upd765_data_r, upd765_data_w)
 	AM_RANGE(0x010, 0x010) AM_READWRITE(fd5_data_r, fd5_data_w)
@@ -191,7 +195,9 @@ static const struct upd765_interface sord_fd5_upd765_interface=
 static MACHINE_RESET( sord_m5_fd5 )
 {
 	MACHINE_RESET_CALL(sord_m5);
-	ppi8255_set_port_c(machine->device("ppi8255"), 0x50);
+
+	i8255a_pc4_w(machine->device("ppi8255"), 1);
+	i8255a_pc6_w(machine->device("ppi8255"), 1);
 }
 
 
@@ -292,7 +298,7 @@ static WRITE8_DEVICE_HANDLER(sord_ppi_portc_w)
 	LOG(("m5 write to pi5 port c: %02x %04x\n", data, cpu_get_pc(device->machine->device("maincpu"))));
 }
 
-static const ppi8255_interface sord_ppi8255_interface =
+static I8255A_INTERFACE( sord_ppi8255_interface )
 {
 	DEVCB_HANDLER(sord_ppi_porta_r),
 	DEVCB_HANDLER(sord_ppi_portb_r),
@@ -394,7 +400,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( srdm5fd5_io, ADDRESS_SPACE_IO, 8 )
 	AM_IMPORT_FROM(sord_m5_io)
-	AM_RANGE(0x70, 0x73) AM_MIRROR(0x0c) AM_DEVREADWRITE("ppi8255", ppi8255_r, ppi8255_w)
+	AM_RANGE(0x70, 0x73) AM_MIRROR(0x0c) AM_DEVREADWRITE("ppi8255", i8255a_r, i8255a_w)
 ADDRESS_MAP_END
 
 
@@ -561,7 +567,6 @@ static MACHINE_RESET( sord_m5 )
 
 
 static MACHINE_CONFIG_START( sord_m5, sord_state )
-
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_14_31818MHz/4)
 	MCFG_CPU_PROGRAM_MAP(sord_m5_mem)
@@ -625,8 +630,8 @@ static const floppy_config sordm5_floppy_config =
 };
 
 static MACHINE_CONFIG_DERIVED( sord_m5_fd5, sord_m5 )
-
 	MCFG_CPU_REPLACE("maincpu", Z80, XTAL_14_31818MHz/4)
+	MCFG_CPU_PROGRAM_MAP(sord_m5_mem)
 	MCFG_CPU_IO_MAP(srdm5fd5_io)
 
 	/* floppy */
@@ -634,7 +639,7 @@ static MACHINE_CONFIG_DERIVED( sord_m5_fd5, sord_m5 )
 	MCFG_CPU_PROGRAM_MAP(sord_fd5_mem)
 	MCFG_CPU_IO_MAP(sord_fd5_io)
 
-	MCFG_PPI8255_ADD("ppi8255", sord_ppi8255_interface)
+	MCFG_I8255A_ADD("ppi8255", sord_ppi8255_interface)
 	MCFG_UPD765A_ADD("upd765", sord_fd5_upd765_interface)
 
 	MCFG_QUANTUM_TIME(HZ(1200))
@@ -651,7 +656,7 @@ MACHINE_CONFIG_END
     ROM DEFINITIONS
 ***************************************************************************/
 
-ROM_START( sordm5 )
+ROM_START( m5 )
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_SYSTEM_BIOS(0, "int", "International")
 	ROMX_LOAD("sordint.rom", 0x0000, 0x2000, CRC(78848d39) SHA1(ac042c4ae8272ad6abe09ae83492ef9a0026d0b2),ROM_BIOS(1))
@@ -660,12 +665,12 @@ ROM_START( sordm5 )
 ROM_END
 
 
-ROM_START( sordm5fd5 )
+ROM_START( m5fd5 )
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("sordint.rom",0x0000, 0x2000, CRC(78848d39) SHA1(ac042c4ae8272ad6abe09ae83492ef9a0026d0b2))
 
 	ROM_REGION(0x4000, "floppy", 0)
-	ROM_LOAD("sordfd5.rom",0x0000, 0x4000, NO_DUMP)
+	ROM_LOAD("sordfd5.rom",0x0000, 0x4000, BAD_DUMP CRC(aa172b1b) SHA1(007cceb12528ca7f3e381578da88a8fcd5bc3a20)) // parsed from disassembly
 ROM_END
 
 
@@ -683,5 +688,5 @@ ROM_END
 ***************************************************************************/
 
 /*    YEAR  NAME       PARENT  COMPAT  MACHINE      INPUT    INIT  COMPANY  FULLNAME               FLAGS */
-COMP( 1983, sordm5,    0,      0,      sord_m5,	    sord_m5, 0,    "Sord",  "Sord M5",             0 )
-COMP( 1983, sordm5fd5, sordm5, 0,      sord_m5_fd5, sord_m5, 0,    "Sord",  "Sord M5 + PI5 + FD5", GAME_NOT_WORKING )
+COMP( 1983, m5,    0,      0,      sord_m5,	    sord_m5, 0,    "Sord",  "M5",             0 )
+COMP( 1983, m5fd5, m5,     0,      sord_m5_fd5, sord_m5, 0,    "Sord",  "M5 + PI5 + FD5", GAME_NOT_WORKING )

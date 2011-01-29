@@ -52,6 +52,8 @@ System Driver Changes:
 
 - [GBA] Removed "Metroid Fusion" DMA hack. This fixes the lockup in
   "Caesar's Palace Advance". [Tim Schuerewegen]
+  
+- [M5] Added FD-5 floppy interface ROM, renamed driver to m5. [Curt Coder]
 
 - [PDP1] Made the CRT implementation a device.  [Atari Ace]
 

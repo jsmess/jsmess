@@ -869,8 +869,8 @@ const game_driver * const drivers[] =
 	DRIVER( ace )   /* Jupiter Ace    */
 
 	/* Sord */
-	DRIVER( sordm5 )
-	DRIVER( sordm5fd5 )
+	DRIVER( m5 )
+	DRIVER( m5fd5 )
 
 	/* APF Electronics Inc. */
 	DRIVER( apfm1000 )
