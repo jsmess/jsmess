@@ -1582,15 +1582,15 @@ static void SoftwareTabView_OnMoveSize(void)
 	if (GetWindowLong(hwndSoftwareTabView, GWL_STYLE) & WS_VISIBLE)
 	{
 		res = TabCtrl_GetItemRect(hwndSoftwareTabView, 0, &rTab);
-		rClient.top += rTab.bottom - rTab.top + 4;
+		rClient.top += rTab.bottom - rTab.top + 2;
 	}
 
 	/* Now actually move the controls */
 	MoveWindow(hwndSoftwarePicker, rClient.left, rClient.top,
 		rClient.right - rClient.left, rClient.bottom - rClient.top,
 		TRUE);
-	MoveWindow(hwndSoftwareDevView, rClient.left, rClient.top,
-		rClient.right - rClient.left, rClient.bottom - rClient.top,
+	MoveWindow(hwndSoftwareDevView, rClient.left + 3, rClient.top + 2,
+		rClient.right - rClient.left - 6, rClient.bottom - rClient.top -4,
 		TRUE);
 	MoveWindow(hwndSoftwareList, rClient.left, rClient.top,
 		rClient.right - rClient.left, rClient.bottom - rClient.top,
