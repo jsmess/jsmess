@@ -445,10 +445,12 @@ MACHINE_CONFIG_END
 /* ROM definition */
 ROM_START( vg5k )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	ROM_SYSTEM_BIOS(0, "default", "VG 5000")
-	ROMX_LOAD( "vg5k.bin",  0x0000, 0x4000, CRC(a6998ff8) SHA1(881ba594be0a721a999378312aea0c3c1c7b2b58), ROM_BIOS(1) )			// dumped from a Radiola VG-5000
-	ROM_SYSTEM_BIOS(1, "alt", "VG 5000 (alt)")
-	ROMX_LOAD( "vg5k.rom", 0x0000, 0x4000, BAD_DUMP CRC(a6f4a0ea) SHA1(58eccce33cc21fc17bc83921018f531b8001eda3), ROM_BIOS(2) )	// from dcvg5k
+	ROM_SYSTEM_BIOS(0, "v11", "BASIC v1.1")
+	ROMX_LOAD( "vg5k11.bin",  0x0000, 0x4000, CRC(a6998ff8) SHA1(881ba594be0a721a999378312aea0c3c1c7b2b58), ROM_BIOS(1) )			// dumped from a Radiola VG-5000
+	ROM_SYSTEM_BIOS(1, "v11a", "BASIC v1.1 (alt)")
+	ROMX_LOAD( "vg5k11a.bin", 0x0000, 0x4000, BAD_DUMP CRC(a6f4a0ea) SHA1(58eccce33cc21fc17bc83921018f531b8001eda3), ROM_BIOS(2) )	// from dcvg5k
+	ROM_SYSTEM_BIOS(2, "v10", "BASIC v1.0")
+	ROMX_LOAD( "vg5k10.bin", 0x0000, 0x4000, BAD_DUMP CRC(57983260) SHA1(5ad1787a6a597b5c3eedb7c3704b649faa9be4ca), ROM_BIOS(3) )
 
 	ROM_REGION( 0x4000, "ef9345", 0 )
 	ROM_LOAD( "charset.rom", 0x0000, 0x2000, BAD_DUMP CRC(b2f49eb3) SHA1(d0ef530be33bfc296314e7152302d95fdf9520fc) )			// from dcvg5k
