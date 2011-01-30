@@ -1460,7 +1460,7 @@ $(MESSOBJ)/sony.a:				\
 	$(MESS_DRIVERS)/smc777.o	\
 
 $(MESSOBJ)/sord.a:				\
-	$(MESS_DRIVERS)/sord.o		\
+	$(MESS_DRIVERS)/m5.o		\
 	$(MESS_FORMATS)/sord_cas.o	\
 
 $(MESSOBJ)/special.a:			\

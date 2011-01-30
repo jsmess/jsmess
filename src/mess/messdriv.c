@@ -870,7 +870,7 @@ const game_driver * const drivers[] =
 
 	/* Sord */
 	DRIVER( m5 )
-	DRIVER( m5fd5 )
+	DRIVER( m5p )
 
 	/* APF Electronics Inc. */
 	DRIVER( apfm1000 )
