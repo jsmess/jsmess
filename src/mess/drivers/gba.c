@@ -1972,8 +1972,16 @@ static READ32_HANDLER(gba_bios_r)
 	return rom[offset&0x3fff];
 }
 
+static READ32_HANDLER(gba_4000_r)
+{
+	UINT32 data = 0xFFFFFFFF; // for "Fruit Mura no Doubutsu Tachi"
+	logerror( "%s: unmapped program memory read from %08X = %08X & %08X\n", cpuexec_describe_context( space->machine), 0x00004000 + (offset << 2), data, mem_mask);
+	return data;
+}
+
 static ADDRESS_MAP_START( gbadvance_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x00003fff) AM_ROM AM_READ(gba_bios_r)
+	AM_RANGE(0x00004000, 0x01ffffff) AM_READ(gba_4000_r)
 	AM_RANGE(0x02000000, 0x0203ffff) AM_RAM AM_MIRROR(0xfc0000)
 	AM_RANGE(0x03000000, 0x03007fff) AM_RAM AM_MIRROR(0xff8000)
 	AM_RANGE(0x04000000, 0x040003ff) AM_READWRITE( gba_io_r, gba_io_w )
