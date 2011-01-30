@@ -24,8 +24,12 @@
     Need a dump of BOOTLOAD. Need a tape of CUTER. Need orginal dumps of
     SOLOS, DPMON and CONSOL.
 
+    The character roms are built by a script from the Solace source, then the
+    characters moved back to the original 7x9 matrix positions, as shown in
+    the manual. Although they look exactly the same, I've marked them as
+    BAD_DUMP until properly verified.
+
     Other roms needed:
-      - Dump of the 2 character generators (motorola 6574 and 6575)
       - Dump of U18 in the keyboard
 
     Hardware variants (ever shipped?):
@@ -456,6 +460,9 @@ static INPUT_PORTS_START( sol20 )
 	PORT_CONFNAME( 0x01, 0x01, "High Baud Rate") // jumper on the board
 	PORT_CONFSETTING(    0x00, "4800")
 	PORT_CONFSETTING(    0x01, "9600")
+	PORT_CONFNAME( 0x02, 0x00, "Character Rom")
+	PORT_CONFSETTING(    0x00, "6574")
+	PORT_CONFSETTING(    0x02, "6575")
 INPUT_PORTS_END
 
 static const ay31015_config sol20_ay31015_config =
@@ -528,7 +535,7 @@ static MACHINE_RESET( sol20 )
 		}
 		while (!(data & 1) && (s_count < 7)); // find which switch is used
 
-	if ((s_count == 7) && (input_port_read(machine, "CONFIG"))) // if highest, look at jumper
+	if ((s_count == 7) && (input_port_read(machine, "CONFIG")&1)) // if highest, look at jumper
 		s_clock = 9600 << 4;
 	else
 		s_clock = s_bauds[s_count] << 4;
@@ -561,6 +568,7 @@ static VIDEO_UPDATE( sol20 )
 // Note on blinking characters:
 // any character with bit 7 set will blink. With DPMON, do DA C000 C2FF to see what happens
 	UINT8 s1 = input_port_read(screen->machine, "S1");
+	UINT16 which = (input_port_read(screen->machine, "CONFIG") & 2) << 10;
 	sol20_state *state = screen->machine->driver_data<sol20_state>();
 	UINT8 y,ra,chr,gfx;
 	UINT16 sy=0,ma,x,inv;
@@ -594,10 +602,20 @@ static VIDEO_UPDATE( sol20 )
 				if ((ra == 0) || ((s1 & 4) && (chr < 0x20)))
 					gfx = inv;
 				else
-				if (ra < 10)
-					gfx = state->FNT[(chr<<4) | (ra-1) ] ^ inv;
+				if ((chr==0x2C) || (chr==0x3B) || (chr==0x67) || (chr==0x6A) || (chr==0x70) || (chr==0x71) || (chr==0x79))
+				{
+					if (ra < 4)
+						gfx = inv;
+					else
+						gfx = state->FNT[which | (chr<<4) | (ra-4) ] ^ inv;
+				}
 				else
-					gfx = inv;
+				{
+					if (ra < 10)
+						gfx = state->FNT[which | (chr<<4) | (ra-1) ] ^ inv;
+					else
+						gfx = inv;
+				}
 
 				/* Display a scanline of a character */
 				*p++ = ( gfx & 0x80 ) ? 1 : 0;
@@ -616,10 +634,28 @@ static VIDEO_UPDATE( sol20 )
 	return 0;
 }
 
+/* F4 Character Displayer */
+static const gfx_layout sol20_charlayout =
+{
+	7, 9,					/* 7 x 9 characters */
+	128*2,					/* 128 characters per rom */
+	1,					/* 1 bits per pixel */
+	{ 0 },					/* no bitplanes */
+	/* x offsets */
+	{ 0, 1, 2, 3, 4, 5, 6 },
+	/* y offsets */
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8 },
+	8*16					/* every char takes 16 bytes */
+};
+
+static GFXDECODE_START( sol20 )
+	GFXDECODE_ENTRY( "chargen", 0x0000, sol20_charlayout, 0, 1 )
+GFXDECODE_END
+
 WRITE8_MEMBER( sol20_state::sol20_kbd_put )
 {
 	m_sol20_fa &= 0xfe;
-	m_sol20_fc = data | 0x80; // CONSOL requires bit 7 to be high, others don't care
+	m_sol20_fc = data;
 }
 
 static GENERIC_TERMINAL_INTERFACE( sol20_terminal_intf )
@@ -643,6 +679,7 @@ static MACHINE_CONFIG_START( sol20, sol20_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(576, 208)
 	MCFG_SCREEN_VISIBLE_AREA(0, 575, 0, 207)
+	MCFG_GFXDECODE(sol20)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
 
@@ -673,12 +710,10 @@ ROM_START( sol20 )
 	ROMX_LOAD( "dpmon.bin", 0xc000, 0x0800, BAD_DUMP CRC(2a84f099) SHA1(60ff6e38082c50afcf0f40707ef65668a411008b), ROM_BIOS(2) )
 	ROM_SYSTEM_BIOS(2, "CONSOL", "CONSOL")
 	ROMX_LOAD( "consol.bin", 0xc000, 0x0400, BAD_DUMP CRC(80bf6d85) SHA1(84b81c60bb08a3a5435ec1be56a67aa695bce099), ROM_BIOS(3) )
-	/* Character generator rom is missing */
 
-	/* character generator not dumped, using the one from 'c10' for now */
-	ROM_REGION( 0x2000, "chargen", 0 )
-	ROM_LOAD( "c10_char.bin", 0x0000, 0x2000, BAD_DUMP CRC(cb530b6f) SHA1(95590bbb433db9c4317f535723b29516b9b9fcbf))
-	/* There are actually 2 character generators available - the 6574 and the 6575 */
+	ROM_REGION( 0x1000, "chargen", 0 )
+	ROM_LOAD( "6574.bin", 0x0000, 0x0800, BAD_DUMP CRC(fd75df4f) SHA1(4d09aae2f933478532b7d3d1a2dee7123d9828ca) )
+	ROM_LOAD( "6575.bin", 0x0800, 0x0800, BAD_DUMP CRC(cfdb76c2) SHA1(ab00798161d13f07bee3cf0e0070a2f0a805591f) )
 ROM_END
 
 /* Driver */
