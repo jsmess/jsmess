@@ -79,6 +79,8 @@ typedef struct _at29c040a_state
 INLINE at29c040a_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
+	assert(device->type() == AT29C040A);
+
 	return (at29c040a_state *)downcast<legacy_device_base *>(device)->token();
 }
 
@@ -86,6 +88,7 @@ INLINE const at29c040a_config *get_config(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == AT29C040A);
+
 	return (const at29c040a_config *) downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
 }
 

@@ -78,6 +78,8 @@ typedef struct _tn_ide_state
 INLINE tn_ide_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
+	assert(device->type() == TNIDE);
+
 	return (tn_ide_state *)downcast<legacy_device_base *>(device)->token();
 }
 

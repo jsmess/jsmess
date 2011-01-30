@@ -43,9 +43,17 @@ static void SASIWriteByte(device_t* device, unsigned char val)
 	image->fwrite(&val,1);
 }
 
+INLINE sasi_ctrl_t *get_safe_token(device_t *device)
+{
+	assert(device != NULL);
+	assert(device->type() == X68KHDC);
+
+	return (sasi_ctrl_t *)downcast<legacy_device_base *>(device)->token();
+}
+
 DEVICE_START( x68k_hdc )
 {
-	sasi_ctrl_t* sasi = (sasi_ctrl_t*)downcast<legacy_device_base *>(device)->token();
+	sasi_ctrl_t* sasi = get_safe_token(device);
 
 	sasi->status = 0x00;
 	sasi->status_port = 0x00;
@@ -72,7 +80,7 @@ DEVICE_IMAGE_CREATE( sasihd )
 
 WRITE16_DEVICE_HANDLER( x68k_hdc_w )
 {
-	sasi_ctrl_t* sasi = (sasi_ctrl_t*)downcast<legacy_device_base *>(device)->token();
+	sasi_ctrl_t* sasi = get_safe_token(device);
 	unsigned int lba = 0;
 	char* blk;
 	device_image_interface *image = dynamic_cast<device_image_interface *>(device);
@@ -327,7 +335,7 @@ WRITE16_DEVICE_HANDLER( x68k_hdc_w )
 
 READ16_DEVICE_HANDLER( x68k_hdc_r )
 {
-	sasi_ctrl_t* sasi = (sasi_ctrl_t*)downcast<legacy_device_base *>(device)->token();
+	sasi_ctrl_t* sasi = get_safe_token(device);
 	device_image_interface *image = dynamic_cast<device_image_interface *>(device);
 	int retval = 0xff;
 

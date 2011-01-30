@@ -78,6 +78,7 @@ struct _msm58321_t
 INLINE msm58321_t *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
+	assert(device->type() == MSM58321RS);
 
 	return (msm58321_t *)downcast<legacy_device_base *>(device)->token();
 }
@@ -86,6 +87,7 @@ INLINE const msm58321_interface *get_interface(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == MSM58321RS);
+
 	return (const msm58321_interface *) device->baseconfig().static_config();
 }
 

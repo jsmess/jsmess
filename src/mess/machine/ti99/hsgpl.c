@@ -129,6 +129,8 @@ typedef struct _hsgpl_state
 INLINE hsgpl_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
+	assert(device->type() == HSGPL);
+
 	return (hsgpl_state *)downcast<legacy_device_base *>(device)->token();
 }
 

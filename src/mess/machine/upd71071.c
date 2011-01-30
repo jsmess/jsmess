@@ -111,11 +111,19 @@ struct _upd71071_t
 	const upd71071_intf* intf;
 };
 
+INLINE upd71071_t *get_safe_token(device_t *device)
+{
+	assert(device != NULL);
+	assert(device->type() == UPD71071);
+
+	return (upd71071_t*)downcast<legacy_device_base *>(device)->token();
+}
+
 static TIMER_CALLBACK(dma_transfer_timer)
 {
 	// single byte or word transfer
 	device_t* device = (device_t*)ptr;
-	upd71071_t* dmac = (upd71071_t*)downcast<legacy_device_base *>(device)->token();
+	upd71071_t* dmac = get_safe_token(device);
 	address_space* space = cputag_get_address_space(device->machine,dmac->intf->cputag,ADDRESS_SPACE_PROGRAM);
 	int channel = param;
 	UINT16 data = 0;  // data to transfer
@@ -171,7 +179,7 @@ static TIMER_CALLBACK(dma_transfer_timer)
 
 static void upd71071_soft_reset(device_t* device)
 {
-	upd71071_t* dmac = (upd71071_t*)downcast<legacy_device_base *>(device)->token();
+	upd71071_t* dmac = get_safe_token(device);
 	int x;
 
 	// Does not change base/current address, count, or buswidth
@@ -189,7 +197,7 @@ static void upd71071_soft_reset(device_t* device)
 
 int upd71071_dmarq(device_t* device, int state,int channel)
 {
-	upd71071_t* dmac = (upd71071_t*)downcast<legacy_device_base *>(device)->token();
+	upd71071_t* dmac = get_safe_token(device);
 
 	if(state != 0)
 	{
@@ -231,7 +239,7 @@ int upd71071_dmarq(device_t* device, int state,int channel)
 
 static DEVICE_START(upd71071)
 {
-	upd71071_t* dmac = (upd71071_t*)downcast<legacy_device_base *>(device)->token();
+	upd71071_t* dmac = get_safe_token(device);
 	int x;
 
 	dmac->intf = (const upd71071_intf*)device->baseconfig().static_config();
@@ -244,7 +252,7 @@ static DEVICE_START(upd71071)
 
 static READ8_DEVICE_HANDLER(upd71071_read)
 {
-	upd71071_t* dmac = (upd71071_t*)downcast<legacy_device_base *>(device)->token();
+	upd71071_t* dmac = get_safe_token(device);
 	UINT8 ret = 0;
 
 	logerror("DMA: read from register %02x\n",offset);
@@ -322,7 +330,7 @@ static READ8_DEVICE_HANDLER(upd71071_read)
 
 static WRITE8_DEVICE_HANDLER(upd71071_write)
 {
-	upd71071_t* dmac = (upd71071_t*)downcast<legacy_device_base *>(device)->token();
+	upd71071_t* dmac = get_safe_token(device);
 
 	switch(offset)
 	{

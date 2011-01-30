@@ -41,6 +41,8 @@ struct _e0516_t
 INLINE e0516_t *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
+	assert(device->type() == E0516);
+
 	return (e0516_t *)downcast<legacy_device_base *>(device)->token();
 }
 

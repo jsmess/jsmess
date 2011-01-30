@@ -76,6 +76,7 @@ enum
 INLINE mm58274c_t *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
+	assert(device->type() == MM58274C);
 
 	return (mm58274c_t *)downcast<legacy_device_base *>(device)->token();
 }

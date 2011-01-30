@@ -63,6 +63,8 @@ typedef struct _ti99_mecmouse_state
 INLINE ti99_mecmouse_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
+	assert(device->type() == MECMOUSE);
+
 	return (ti99_mecmouse_state *)downcast<legacy_device_base *>(device)->token();
 }
 

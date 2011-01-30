@@ -95,7 +95,8 @@ Source Changes:
 - softlists: Added new lists, new dumps and info [anondumper, Barry Rodewald, 
   Curt Coder, MESSfan, Fabio Priuli]
 
-- Cleanups; static qualifiers, added driver_states.  [Atari Ace]
+- Cleanups; static qualifiers, added driver_states, consistent get_safe_token
+  usage.  [Atari Ace]
 
 
 

@@ -45,6 +45,7 @@ struct _ay3600_t
 INLINE ay3600_t *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
+	assert(device->type() == AY3600PRO002);
 
 	return (ay3600_t *)downcast<legacy_device_base *>(device)->token();
 }

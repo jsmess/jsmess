@@ -333,7 +333,7 @@ READ_LINE_DEVICE_HANDLER( mc6852_tuf_r )
 
 static DEVICE_START( mc6852 )
 {
-	mc6852_t *mc6852 = (mc6852_t *)downcast<legacy_device_base *>(device)->token();
+	mc6852_t *mc6852 = get_safe_token(device);
 	const mc6852_interface *intf = get_interface(device);
 
 	/* resolve callbacks */
@@ -356,7 +356,7 @@ static DEVICE_START( mc6852 )
 
 static DEVICE_RESET( mc6852 )
 {
-	mc6852_t *mc6852 = (mc6852_t *)downcast<legacy_device_base *>(device)->token();
+	mc6852_t *mc6852 = get_safe_token(device);
 
 	/* set receiver shift register to all 1's */
 	mc6852->rsr = 0xff;

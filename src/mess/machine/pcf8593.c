@@ -69,7 +69,9 @@ static TIMER_CALLBACK( pcf8593_timer_callback );
 
 INLINE pcf8593_t *get_token(device_t *device)
 {
+	assert(device != NULL);
 	assert(device->type() == PCF8593);
+
 	return (pcf8593_t *) downcast<legacy_device_base *>(device)->token();
 }
 

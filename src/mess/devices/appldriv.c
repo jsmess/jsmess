@@ -24,6 +24,8 @@ struct apple525_disk
 INLINE const appledriv_config *get_config(device_t *device)
 {
 	assert(device != NULL);
+	assert(device->type() == FLOPPY_APPLE);
+
 	return (const appledriv_config *) downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
 }
 

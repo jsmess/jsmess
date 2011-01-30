@@ -79,6 +79,8 @@ struct _at45dbxx_t
 INLINE at45dbxx_t *get_token(device_t *device)
 {
 	assert(device != NULL);
+	assert(device->type() == AT45DB041 || device->type() == AT45DB081 || device->type() == AT45DB161);
+
 	return (at45dbxx_t *) downcast<legacy_device_base *>(device)->token();
 }
 

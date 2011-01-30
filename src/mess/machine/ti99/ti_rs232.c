@@ -67,6 +67,8 @@ typedef struct _ti_rs232_state
 INLINE ti_rs232_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
+	assert(device->type() == TIRS232);
+
 	return (ti_rs232_state *)downcast<legacy_device_base *>(device)->token();
 }
 
@@ -411,7 +413,7 @@ static TMS9902_XMIT_CALLBACK( xmit_callback_1 )
 static WRITE_LINE_DEVICE_HANDLER( senila )
 {
 	// put the value on the data bus. We store it in a state variable.
-	ti_rs232_state *card = (ti_rs232_state*)downcast<legacy_device_base *>(device)->token();
+	ti_rs232_state *card = get_safe_token(device);
 	card->senila = state;
 }
 
@@ -499,7 +501,7 @@ DEFINE_LEGACY_IMAGE_DEVICE(TI99_PIO, ti99_piodev);
 
 static DEVICE_START( ti_rs232 )
 {
-	ti_rs232_state *card = (ti_rs232_state*)downcast<legacy_device_base *>(device)->token();
+	ti_rs232_state *card = get_safe_token(device);
 	peb_callback_if *topeb = (peb_callback_if *)device->baseconfig().static_config();
 
 	astring *region = new astring();
@@ -520,7 +522,7 @@ static DEVICE_STOP( ti_rs232 )
 
 static DEVICE_RESET( ti_rs232 )
 {
-	ti_rs232_state *card = (ti_rs232_state*)downcast<legacy_device_base *>(device)->token();
+	ti_rs232_state *card = get_safe_token(device);
 	/* Register the card */
 	device_t *peb = device->owner();
 

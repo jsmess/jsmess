@@ -76,7 +76,13 @@ typedef struct {
 
 } xmodem;
 
+INLINE xmodem *get_safe_token(device_t *device)
+{
+	assert(device != NULL);
+	assert(device->type() == XMODEM);
 
+	return (xmodem*)downcast<legacy_device_base *>(device)->token();
+}
 
 /* compute checksum of the data part of the packet, i.e., sum modulo 256 */
 static UINT8 xmodem_chksum( xmodem* state )
@@ -162,7 +168,7 @@ static void xmodem_make_idle( xmodem* state )
 /* emulated machine has read the last byte we sent */
 void xmodem_byte_transmitted( device_t *device )
 {
-	xmodem* state = (xmodem*) downcast<legacy_device_base *>(device)->token();
+	xmodem* state = get_safe_token(device);
 	if ( (state->state == XMODEM_SENDING) && (state->pos < 132) )
 	{
 		/* send next byte */
@@ -173,7 +179,7 @@ void xmodem_byte_transmitted( device_t *device )
 /* emulated machine sends a byte to the outside (us) */
 void xmodem_receive_byte( device_t *device, UINT8 data )
 {
-	xmodem* state = (xmodem*) downcast<legacy_device_base *>(device)->token();
+	xmodem* state = get_safe_token(device);
 	switch ( state->state )
 	{
 
@@ -293,7 +299,7 @@ void xmodem_receive_byte( device_t *device, UINT8 data )
 
 static DEVICE_START( xmodem )
 {
-	xmodem* state = (xmodem*) downcast<legacy_device_base *>(device)->token();
+	xmodem* state = get_safe_token(device);
 	LOG(( "xmodem: start\n" ));
 	state->state = XMODEM_NOIMAGE;
 	state->image = NULL;
@@ -304,14 +310,14 @@ static DEVICE_START( xmodem )
 
 static DEVICE_RESET( xmodem )
 {
-	xmodem* state = (xmodem*) downcast<legacy_device_base *>(device)->token();
+	xmodem* state = get_safe_token(device);
 	LOG(( "xmodem: reset\n" ));
 	if ( state->state != XMODEM_NOIMAGE ) xmodem_make_idle( state );
 }
 
 static DEVICE_IMAGE_LOAD( xmodem )
 {
-	xmodem* state = (xmodem*) downcast<legacy_device_base *>(&image.device())->token();
+	xmodem* state = get_safe_token(&image.device());
 	LOG(( "xmodem: image load\n" ));
 	state->image = &image;
 	xmodem_make_idle( state );
@@ -320,7 +326,7 @@ static DEVICE_IMAGE_LOAD( xmodem )
 
 static DEVICE_IMAGE_CREATE( xmodem )
 {
-	xmodem* state = (xmodem*) downcast<legacy_device_base *>(&image.device())->token();
+	xmodem* state = get_safe_token(&image.device());
 	LOG(( "xmodem: image create\n" ));
 	state->image = &image;
 	xmodem_make_idle( state );
@@ -329,7 +335,7 @@ static DEVICE_IMAGE_CREATE( xmodem )
 
 static DEVICE_IMAGE_UNLOAD( xmodem )
 {
-	xmodem* state = (xmodem*) downcast<legacy_device_base *>(&image.device())->token();
+	xmodem* state = get_safe_token(&image.device());
 	LOG(( "xmodem: image unload\n" ));
 	state->state = XMODEM_NOIMAGE;
 	state->image = NULL;

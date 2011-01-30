@@ -181,6 +181,7 @@ static DEVICE_RESET( i8271 );
 INLINE i8271_t *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
+	assert(device->type() == I8271);
 
 	return (i8271_t *)downcast<legacy_device_base *>(device)->token();
 }

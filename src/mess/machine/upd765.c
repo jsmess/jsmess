@@ -161,6 +161,8 @@ static const INT8 upd765_cmd_size[32] =
 INLINE upd765_t *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
+	assert(device->type() == UPD765A || device->type() == UPD765B ||
+		device->type() == SMC37C78 || device->type() == UPD72065);
 
 	return (upd765_t *)downcast<legacy_device_base *>(device)->token();
 }

@@ -72,6 +72,30 @@ struct _aes_pcb_t
 };
 typedef struct _aes_pcb_t aes_pcb_t;
 
+INLINE aes_multicart_t *get_safe_token(device_t *device)
+{
+	assert(device != NULL);
+	assert(device->type() == AES_MULTICART);
+
+	return (aes_multicart_t *)downcast<legacy_device_base *>(device)->token();
+}
+
+INLINE aes_pcb_t *get_safe_pcb_token(device_t *device)
+{
+	assert(device != NULL);
+	assert(device->type() == AES_CARTRIDGE_PCB_NONE || device->type() == AES_CARTRIDGE_PCB_STD);
+
+	return (aes_pcb_t *)downcast<legacy_device_base *>(device)->token();
+}
+
+INLINE cartslot_t *get_safe_cartslot_token(device_t *device)
+{
+	assert(device != NULL);
+	assert(device->type() == CARTSLOT);
+
+	return (cartslot_t *)downcast<legacy_device_base *>(device)->token();
+}
+
 /*
     Find the index of the cartridge name. We assume the format
     <name><number>, i.e. the number is the longest string from the right
@@ -96,7 +120,7 @@ static aescartridge_t *assemble_common(running_machine *machine, device_t *carts
 	/* Pointer to the cartridge structure. */
 	aescartridge_t *cartridge;
 	device_t *cartsys = cartslot->owner();
-	aes_multicart_t *cartslots = (aes_multicart_t *)downcast<legacy_device_base *>(cartsys)->token();
+	aes_multicart_t *cartslots = get_safe_token(cartsys);
 	UINT8 *socketcont, *romrgn;
 	int reslength, i, blockofs;
 	char sprname1[16], sprname2[16];
@@ -217,8 +241,8 @@ static aescartridge_t *assemble_common(running_machine *machine, device_t *carts
 static void set_pointers(device_t *pcb, int index)
 {
 	device_t *cartsys = pcb->owner()->owner();
-	aes_multicart_t *cartslots = (aes_multicart_t *)downcast<legacy_device_base *>(cartsys)->token();
-	aes_pcb_t *pcb_def = (aes_pcb_t *)downcast<legacy_device_base *>(pcb)->token();
+	aes_multicart_t *cartslots = get_safe_token(cartsys);
+	aes_pcb_t *pcb_def = get_safe_pcb_token(pcb);
 
 	pcb_def->assemble = (assmfct *)downcast<const legacy_cart_slot_device_config_base *>(&pcb->baseconfig())->get_config_fct(AESCART_FCT_ASSM);
 	pcb_def->disassemble = (assmfct *)downcast<const legacy_cart_slot_device_config_base *>(&pcb->baseconfig())->get_config_fct(AESCART_FCT_DISASSM);
@@ -393,7 +417,7 @@ DEVICE_GET_INFO(aes_cartridge_pcb_std)
 */
 static DEVICE_START( aes_cartridge )
 {
-	cartslot_t *cart = (cartslot_t *)downcast<legacy_device_base *>(device)->token();
+	cartslot_t *cart = get_safe_cartslot_token(device);
 
 	/* find the PCB device */
 	cart->pcb_device = device->subdevice(TAG_PCB);
@@ -586,8 +610,8 @@ static DEVICE_IMAGE_LOAD( aes_cartridge )
 		fatalerror("Error loading multicart: no pcb found.");
 
 	/* If we are here, we have a multicart. */
-	pcb = (aes_pcb_t *)downcast<legacy_device_base *>(pcbdev)->token();
-	cart = (cartslot_t *)downcast<legacy_device_base *>(&image.device())->token();
+	pcb = get_safe_pcb_token(pcbdev);
+	cart = get_safe_cartslot_token(&image.device());
 
 	/* try opening this as a multicart */
 	/* This line requires that cartslot_t be included in cartslot.h,
@@ -625,8 +649,8 @@ static DEVICE_IMAGE_UNLOAD( aes_cartridge )
 
 	if (pcbdev != NULL)
 	{
-		aes_pcb_t *pcb = (aes_pcb_t *)downcast<legacy_device_base *>(pcbdev)->token();
-		cartslot_t *cart = (cartslot_t *)downcast<legacy_device_base *>(&image.device())->token();
+		aes_pcb_t *pcb = get_safe_pcb_token(pcbdev);
+		cartslot_t *cart = get_safe_cartslot_token(&image.device());
 
 		//  printf("unload\n");
 		if (cart->mc != NULL)
@@ -663,7 +687,7 @@ static DEVICE_START(aes_multicart)
 {
 	int i;
 //  printf("DEVICE_START(aes_multicart)\n");
-	aes_multicart_t *cartslots = (aes_multicart_t *)downcast<legacy_device_base *>(device)->token();
+	aes_multicart_t *cartslots = get_safe_token(device);
 
 	/* Save this in the shortcut; we don't want to look for it each time
        that we have a memory access. And currently we do not plan for

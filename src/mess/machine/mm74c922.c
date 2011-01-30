@@ -56,6 +56,8 @@ struct _mm74c922_t
 INLINE mm74c922_t *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
+	assert((device->type() == MM74C922) || (device->type() == MM74C923));
+
 	return (mm74c922_t *)downcast<legacy_device_base *>(device)->token();
 }
 
@@ -63,6 +65,7 @@ INLINE const mm74c922_interface *get_interface(device_t *device)
 {
 	assert(device != NULL);
 	assert((device->type() == MM74C922) || (device->type() == MM74C923));
+
 	return (const mm74c922_interface *) device->baseconfig().static_config();
 }
 

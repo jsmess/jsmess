@@ -73,6 +73,8 @@ the controller. */
 INLINE ti99_fdc_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
+	assert(device->type() == TIFDC);
+
 	return (ti99_fdc_state *)downcast<legacy_device_base *>(device)->token();
 }
 
@@ -336,7 +338,7 @@ static const ti99_peb_card fdc_card =
 
 static DEVICE_START( ti99_fdc )
 {
-	ti99_fdc_state *card = (ti99_fdc_state*)downcast<legacy_device_base *>(device)->token();
+	ti99_fdc_state *card = get_safe_token(device);
 
 	/* Resolve the callbacks to the PEB */
 	peb_callback_if *topeb = (peb_callback_if *)device->baseconfig().static_config();
@@ -357,7 +359,7 @@ static DEVICE_STOP( ti99_fdc )
 
 static DEVICE_RESET( ti99_fdc )
 {
-	ti99_fdc_state *card = (ti99_fdc_state*)downcast<legacy_device_base *>(device)->token();
+	ti99_fdc_state *card = get_safe_token(device);
 
 	/* If the card is selected in the menu, register the card */
 	if (input_port_read(device->machine, "DISKCTRL") == DISK_TIFDC)
@@ -384,7 +386,7 @@ static WRITE_LINE_DEVICE_HANDLER( ti99_fdc_ready )
 {
 	// Caution: The device pointer passed to this function is the calling
 	// device. That is, if we want *this* device, we need to take the owner.
-	ti99_fdc_state *card = (ti99_fdc_state*)downcast<legacy_device_base *>(device->owner())->token();
+	ti99_fdc_state *card = get_safe_token(device->owner());
 	devcb_call_write_line( &card->lines.ready, state );
 }
 #endif

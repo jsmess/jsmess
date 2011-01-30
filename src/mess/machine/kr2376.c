@@ -86,6 +86,7 @@ struct _kr2376_t
 INLINE kr2376_t *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
+	assert(device->type() == KR2376);
 
 	return (kr2376_t *)downcast<legacy_device_base *>(device)->token();
 }

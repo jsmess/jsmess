@@ -39,6 +39,8 @@ struct _abc77_t
 INLINE abc77_t *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
+	assert(device->type() == ABC77);
+
 	return (abc77_t *)downcast<legacy_device_base *>(device)->token();
 }
 
@@ -46,6 +48,7 @@ INLINE const abc77_interface *get_interface(device_t *device)
 {
 	assert(device != NULL);
 	assert((device->type() == ABC77));
+
 	return (const abc77_interface *) device->baseconfig().static_config();
 }
 
@@ -400,7 +403,7 @@ WRITE_LINE_DEVICE_HANDLER( abc77_reset_w )
 
 static DEVICE_START( abc77 )
 {
-	abc77_t *abc77 = (abc77_t *)downcast<legacy_device_base *>(device)->token();
+	abc77_t *abc77 = get_safe_token(device);
 	const abc77_interface *intf = get_interface(device);
 
 	/* resolve callbacks */

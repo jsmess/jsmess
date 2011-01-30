@@ -79,6 +79,7 @@ struct _amiga_fdc_t
 INLINE amiga_fdc_t *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
+	assert(device->type() == AMIGA_FDC);
 
 	return (amiga_fdc_t *)downcast<legacy_device_base *>(device)->token();
 }

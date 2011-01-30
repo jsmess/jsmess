@@ -20,6 +20,8 @@ typedef struct _ti99_myarcmem_state
 INLINE ti99_myarcmem_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
+	assert(device->type() == MYARCMEM);
+
 	return (ti99_myarcmem_state *)downcast<legacy_device_base *>(device)->token();
 }
 
@@ -95,19 +97,19 @@ static const ti99_peb_card myarcmem_card =
 
 static DEVICE_START( ti99_myarcmem )
 {
-	ti99_myarcmem_state *card = (ti99_myarcmem_state*)downcast<legacy_device_base *>(device)->token();
+	ti99_myarcmem_state *card = get_safe_token(device);
 	card->memory=NULL;
 }
 
 static DEVICE_STOP( ti99_myarcmem )
 {
-	ti99_myarcmem_state *card = (ti99_myarcmem_state*)downcast<legacy_device_base *>(device)->token();
+	ti99_myarcmem_state *card = get_safe_token(device);
 	if (card->memory) free(card->memory);
 }
 
 static DEVICE_RESET( ti99_myarcmem )
 {
-	ti99_myarcmem_state *card = (ti99_myarcmem_state*)downcast<legacy_device_base *>(device)->token();
+	ti99_myarcmem_state *card = get_safe_token(device);
 	/* Register the card */
 	device_t *peb = device->owner();
 

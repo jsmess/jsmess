@@ -65,7 +65,7 @@ INLINE diskonchip_g3_t *get_token( device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == DISKONCHIP_G3);
-	assert(downcast<legacy_device_base *>(device)->token() != NULL);
+
 	return (diskonchip_g3_t *)downcast<legacy_device_base *>(device)->token();
 }
 

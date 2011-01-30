@@ -126,6 +126,7 @@ static int tape_get_id(device_t *image)
 INLINE tap_990_t *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
+	assert(device->type() == TI990_TAPE_CTRL);
 
 	return (tap_990_t *)downcast<legacy_device_base *>(device)->token();
 }

@@ -42,6 +42,8 @@ struct _i8214_t
 INLINE i8214_t *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
+	assert(device->type() == I8214);
+
 	return (i8214_t *)downcast<legacy_device_base *>(device)->token();
 }
 
@@ -49,6 +51,7 @@ INLINE const i8214_interface *get_interface(device_t *device)
 {
 	assert(device != NULL);
 	assert((device->type() == I8214));
+
 	return (const i8214_interface *) device->baseconfig().static_config();
 }
 

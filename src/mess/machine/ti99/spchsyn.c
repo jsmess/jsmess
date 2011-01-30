@@ -37,6 +37,8 @@ typedef struct _ti99_speech_state
 INLINE ti99_speech_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
+	assert(device->type() == TISPEECH);
+
 	return (ti99_speech_state *)downcast<legacy_device_base *>(device)->token();
 }
 
@@ -178,7 +180,7 @@ static const ti99_peb_card speech_adapter_card =
 
 static DEVICE_START( ti99_speech )
 {
-	ti99_speech_state *adapter = (ti99_speech_state*)downcast<legacy_device_base *>(device)->token();
+	ti99_speech_state *adapter = get_safe_token(device);
 	/* Resolve the callbacks to the PEB */
 	peb_callback_if *topeb = (peb_callback_if *)device->baseconfig().static_config();
 	devcb_resolve_write_line(&adapter->lines.ready, &topeb->ready, device);
@@ -191,7 +193,7 @@ static DEVICE_STOP( ti99_speech )
 
 static DEVICE_RESET( ti99_speech )
 {
-	ti99_speech_state *adapter = (ti99_speech_state*)downcast<legacy_device_base *>(device)->token();
+	ti99_speech_state *adapter = get_safe_token(device);
 	/* Register the adapter */
 	device_t *peb = device->owner();
 
@@ -217,7 +219,7 @@ static DEVICE_RESET( ti99_speech )
 
 static WRITE_LINE_DEVICE_HANDLER( speech_ready )
 {
-	ti99_speech_state *adapter = (ti99_speech_state*)downcast<legacy_device_base *>(device->owner())->token();
+	ti99_speech_state *adapter = get_safe_token(device->owner());
 	logerror("speech: READY called by VSP\n");
 	devcb_call_write_line( &adapter->lines.ready, state );
 }

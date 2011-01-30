@@ -107,6 +107,8 @@ typedef struct _ti99_pcoden_state
 INLINE ti99_pcoden_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
+	assert(device->type() == PCODEN);
+
 	return (ti99_pcoden_state *)downcast<legacy_device_base *>(device)->token();
 }
 
@@ -198,7 +200,7 @@ static const ti99_peb_card pcode_ncard =
 
 static DEVICE_START( ti99_pcoden )
 {
-	ti99_pcoden_state *pcode = (ti99_pcoden_state*)downcast<legacy_device_base *>(device)->token();
+	ti99_pcoden_state *pcode = get_safe_token(device);
 
 	/* Resolve the callbacks to the PEB */
 	peb_callback_if *topeb = (peb_callback_if *)device->baseconfig().static_config();
@@ -213,7 +215,7 @@ static DEVICE_STOP( ti99_pcoden )
 static DEVICE_RESET( ti99_pcoden )
 {
 	logerror("ti99_pcode: reset\n");
-	ti99_pcoden_state *pcode = (ti99_pcoden_state*)downcast<legacy_device_base *>(device)->token();
+	ti99_pcoden_state *pcode = get_safe_token(device);
 
 	/* If the card is selected in the menu, register the card */
 	if (input_port_read(device->machine, "EXTCARD") & EXT_PCODE)
@@ -245,7 +247,7 @@ static WRITE_LINE_DEVICE_HANDLER( pcode_ready )
 {
 	// Caution: The device pointer passed to this function is the calling
 	// device. That is, if we want *this* device, we need to take the owner.
-	ti99_pcoden_state *pcode = (ti99_pcoden_state*)downcast<legacy_device_base *>(device->owner())->token();
+	ti99_pcoden_state *pcode = get_safe_token(device->owner());
 	devcb_call_write_line( &pcode->lines.ready, state );
 }
 
@@ -254,7 +256,7 @@ static WRITE_LINE_DEVICE_HANDLER( pcode_ready )
 */
 static UINT8 *get_grom_ptr(device_t *device)
 {
-	ti99_pcoden_state *pcode = (ti99_pcoden_state*)downcast<legacy_device_base *>(device)->token();
+	ti99_pcoden_state *pcode = get_safe_token(device);
 	return pcode->grom;
 }
 

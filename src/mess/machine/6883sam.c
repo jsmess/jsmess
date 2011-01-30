@@ -110,6 +110,7 @@ static const UINT8 sam_video_mode_row_pitches[] =
 INLINE sam6883_t *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
+	assert(device->type() == SAM6883 || device->type() == SAM6883_GIME);
 
 	return (sam6883_t *)downcast<legacy_device_base *>(device)->token();
 }

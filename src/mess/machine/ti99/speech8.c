@@ -28,6 +28,8 @@ typedef struct _ti99_speech8_state
 INLINE ti99_speech8_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
+	assert(device->type() == TISPEECH8);
+
 	return (ti99_speech8_state *)downcast<legacy_device_base *>(device)->token();
 }
 
@@ -161,7 +163,7 @@ WRITE8_DEVICE_HANDLER( ti998spch_w )
 
 static DEVICE_START( ti99_speech8 )
 {
-	ti99_speech8_state *spsys = (ti99_speech8_state*)downcast<legacy_device_base *>(device)->token();
+	ti99_speech8_state *spsys = get_safe_token(device);
 	/* Resolve the callbacks to the PEB */
 	spsys->vsp = device->subdevice("speechsyn");
 }
@@ -172,7 +174,7 @@ static DEVICE_STOP( ti99_speech8 )
 
 static DEVICE_RESET( ti99_speech8 )
 {
-	ti99_speech8_state *spsys = (ti99_speech8_state*)downcast<legacy_device_base *>(device)->token();
+	ti99_speech8_state *spsys = get_safe_token(device);
 
 	astring *region = new astring();
 	astring_assemble_3(region, device->tag(), ":", speech8_region);
@@ -186,7 +188,7 @@ static DEVICE_RESET( ti99_speech8 )
 
 static WRITE_LINE_DEVICE_HANDLER( speech8_ready )
 {
-//  ti99_speech8_state *spsys = (ti99_speech8_state*)downcast<legacy_device_base *>(device->owner())->token();
+	//ti99_speech8_state *spsys = get_safe_token(device->owner());
 	logerror("speech8: READY called by VSP\n");
 }
 

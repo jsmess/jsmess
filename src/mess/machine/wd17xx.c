@@ -350,8 +350,8 @@ struct _wd1770_state
 	/* pause time when writing/reading sector */
 	int pause_time;
 
-    /* complete command delay */
-    int complete_command_delay;
+	/* complete command delay */
+	int complete_command_delay;
 
 	/* Were we busy when we received a FORCE_INT command */
 	UINT8	was_busy;
@@ -394,6 +394,10 @@ static void wd17xx_timed_read_sector_request(device_t *device);
 INLINE wd1770_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
+	assert(device->type() == WD1770 || device->type() == WD1771 || device->type() == WD1772 ||
+		device->type() == WD1773 || device->type() == WD179X || device->type() == WD1793 ||
+		device->type() == WD2793 || device->type() == WD2797 || device->type() == WD177X ||
+		device->type() == MB8877);
 
 	return (wd1770_state *)downcast<legacy_device_base *>(device)->token();
 }

@@ -39,12 +39,16 @@ enum
 INLINE sst39vfx_t *get_token(device_t *device)
 {
 	assert(device != NULL);
+	assert(device->type() == SST39VF020 || device->type() == SST39VF400A);
+
 	return (sst39vfx_t *) downcast<legacy_device_base *>(device)->token();
 }
 
 INLINE const sst39vfx_config *get_config(device_t *device)
 {
 	assert(device != NULL);
+	assert(device->type() == SST39VF020 || device->type() == SST39VF400A);
+
 	return (const sst39vfx_config *) downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
 }
 

@@ -94,6 +94,8 @@ typedef struct _ti99_hfdc_state
 INLINE ti99_hfdc_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
+	assert(device->type() == HFDC);
+
 	return (ti99_hfdc_state *)downcast<legacy_device_base *>(device)->token();
 }
 
@@ -455,7 +457,7 @@ static int line_to_index(UINT8 line, int max)
 static device_t *current_floppy(device_t *controller)
 {
 	int disk_unit = -1;
-	ti99_hfdc_state *card = (ti99_hfdc_state*)downcast<legacy_device_base *>(controller->owner())->token();
+	ti99_hfdc_state *card = get_safe_token(controller->owner());
 
 	disk_unit = line_to_index(card->output1_latch & 0x0f, HFDC_MAX_FLOPPY);
 
@@ -481,7 +483,7 @@ static device_t *current_floppy(device_t *controller)
 
 static device_t *current_harddisk(device_t *controller)
 {
-	ti99_hfdc_state *card = (ti99_hfdc_state*)downcast<legacy_device_base *>(controller->owner())->token();
+	ti99_hfdc_state *card = get_safe_token(controller->owner());
 
 	int disk_unit = -1;
 	disk_unit = line_to_index((card->output1_latch>>4)&0x0f, HFDC_MAX_HARD);
@@ -645,7 +647,7 @@ static const ti99_peb_card hfdc_card =
 
 static DEVICE_START( ti99_hfdc )
 {
-	ti99_hfdc_state *card = (ti99_hfdc_state*)downcast<legacy_device_base *>(device)->token();
+	ti99_hfdc_state *card = get_safe_token(device);
 
 	/* Resolve the callbacks to the PEB */
 	peb_callback_if *topeb = (peb_callback_if *)device->baseconfig().static_config();
@@ -664,13 +666,13 @@ static DEVICE_START( ti99_hfdc )
 
 static DEVICE_STOP( ti99_hfdc )
 {
-	ti99_hfdc_state *card = (ti99_hfdc_state*)downcast<legacy_device_base *>(device)->token();
+	ti99_hfdc_state *card = get_safe_token(device);
 	if (card->ram) free(card->ram);
 }
 
 static DEVICE_RESET( ti99_hfdc )
 {
-	ti99_hfdc_state *card = (ti99_hfdc_state*)downcast<legacy_device_base *>(device)->token();
+	ti99_hfdc_state *card = get_safe_token(device);
 	static const char *const flopname[] = {FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3};
 	static const char *const hardname[] = {MFMHD_0, MFMHD_1, MFMHD_2};
 

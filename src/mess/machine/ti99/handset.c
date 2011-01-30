@@ -52,6 +52,8 @@ static const char *const keynames[] = { "KP0", "KP1", "KP2", "KP3", "KP4" };
 INLINE ti99_handset_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
+	assert(device->type() == HANDSET);
+
 	return (ti99_handset_state *)downcast<legacy_device_base *>(device)->token();
 }
 
@@ -59,6 +61,7 @@ INLINE const ti99_handset_config *get_config(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == HANDSET);
+
 	return (const ti99_handset_config *) downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
 }
 

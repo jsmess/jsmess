@@ -33,6 +33,8 @@ struct _mos6529_t
 INLINE mos6529_t *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
+	assert(device->type() == MOS6529);
+
 	return (mos6529_t *)downcast<legacy_device_base *>(device)->token();
 }
 
@@ -40,6 +42,7 @@ INLINE const mos6529_interface *get_interface(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == MOS6529);
+
 	return (const mos6529_interface *) device->baseconfig().static_config();
 }
 
@@ -75,7 +78,7 @@ WRITE8_DEVICE_HANDLER( mos6529_w )
 
 static DEVICE_START( mos6529 )
 {
-	mos6529_t *mos6529 = (mos6529_t *)downcast<legacy_device_base *>(device)->token();
+	mos6529_t *mos6529 = get_safe_token(device);
 	const mos6529_interface *intf = get_interface(device);
 
 	/* resolve callbacks */

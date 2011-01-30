@@ -32,7 +32,7 @@ struct _hd63450_regs
 typedef struct _hd63450_t hd63450_t;
 struct _hd63450_t
 {
-    hd63450_regs reg[4];
+	hd63450_regs reg[4];
 	emu_timer* timer[4];  // for timing data reading/writing each channel
 	attotime clock[4];
 	attotime burst_clock[4];
@@ -48,9 +48,17 @@ static void dma_transfer_halt(device_t* device, int channel);
 static void dma_transfer_continue(device_t* device, int channel);
 static void dma_transfer_start(device_t* device, int channel, int dir);
 
+INLINE hd63450_t *get_safe_token(device_t *device)
+{
+	assert(device != NULL);
+	assert(device->type() == HD63450);
+
+	return (hd63450_t *)downcast<legacy_device_base *>(device)->token();
+}
+
 static DEVICE_START(hd63450)
 {
-	hd63450_t* dmac = (hd63450_t*)downcast<legacy_device_base *>(device)->token();
+	hd63450_t* dmac = get_safe_token(device);
 	int x;
 
 	dmac->intf = (const hd63450_intf*)device->baseconfig().static_config();
@@ -69,7 +77,7 @@ static DEVICE_START(hd63450)
 int hd63450_read(device_t* device, int offset, UINT16 mem_mask)
 {
 	int channel,reg;
-	hd63450_t* dmac = (hd63450_t*)downcast<legacy_device_base *>(device)->token();
+	hd63450_t* dmac = get_safe_token(device);
 
 	channel = (offset & 0x60) >> 5;
 	reg = offset & 0x1f;
@@ -120,7 +128,7 @@ void hd63450_write(device_t* device, int offset, int data, UINT16 mem_mask)
 {
 	int channel,reg;
 
-	hd63450_t* dmac = (hd63450_t*)downcast<legacy_device_base *>(device)->token();
+	hd63450_t* dmac = get_safe_token(device);
 
 	channel = (offset & 0x60) >> 5;
 	reg = offset & 0x1f;
@@ -232,7 +240,7 @@ void hd63450_write(device_t* device, int offset, int data, UINT16 mem_mask)
 static void dma_transfer_start(device_t* device, int channel, int dir)
 {
 	address_space *space = cpu_get_address_space(device->machine->firstcpu, ADDRESS_SPACE_PROGRAM);
-	hd63450_t* dmac = (hd63450_t*)downcast<legacy_device_base *>(device)->token();
+	hd63450_t* dmac = get_safe_token(device);
 	dmac->in_progress[channel] = 1;
 	dmac->reg[channel].csr &= ~0xe0;
 	dmac->reg[channel].csr |= 0x08;  // Channel active
@@ -263,7 +271,7 @@ static void dma_transfer_start(device_t* device, int channel, int dir)
 
 void hd63450_set_timer(device_t* device, int channel, attotime tm)
 {
-	hd63450_t* dmac = (hd63450_t*)downcast<legacy_device_base *>(device)->token();
+	hd63450_t* dmac = get_safe_token(device);
 
 	dmac->clock[channel] = tm;
 	if(dmac->in_progress[channel] != 0)
@@ -277,7 +285,7 @@ static TIMER_CALLBACK(dma_transfer_timer)
 
 static void dma_transfer_abort(device_t* device, int channel)
 {
-	hd63450_t* dmac = (hd63450_t*)downcast<legacy_device_base *>(device)->token();
+	hd63450_t* dmac = get_safe_token(device);
 
 	logerror("DMA#%i: Transfer aborted\n",channel);
 	timer_adjust_oneshot(dmac->timer[channel], attotime_zero, 0);
@@ -289,7 +297,7 @@ static void dma_transfer_abort(device_t* device, int channel)
 
 static void dma_transfer_halt(device_t* device, int channel)
 {
-	hd63450_t* dmac = (hd63450_t*)downcast<legacy_device_base *>(device)->token();
+	hd63450_t* dmac = get_safe_token(device);
 
 	dmac->halted[channel] = 1;
 	timer_adjust_oneshot(dmac->timer[channel], attotime_zero, 0);
@@ -297,7 +305,7 @@ static void dma_transfer_halt(device_t* device, int channel)
 
 static void dma_transfer_continue(device_t* device, int channel)
 {
-	hd63450_t* dmac = (hd63450_t*)downcast<legacy_device_base *>(device)->token();
+	hd63450_t* dmac = get_safe_token(device);
 
 	if(dmac->halted[channel] != 0)
 	{
@@ -311,7 +319,7 @@ void hd63450_single_transfer(device_t* device, int x)
 	address_space *space = cpu_get_address_space(device->machine->firstcpu, ADDRESS_SPACE_PROGRAM);
 	int data;
 	int datasize = 1;
-	hd63450_t* dmac = (hd63450_t*)downcast<legacy_device_base *>(device)->token();
+	hd63450_t* dmac = get_safe_token(device);
 
 		if(dmac->in_progress[x] != 0)  // DMA in progress in channel x
 		{
@@ -443,13 +451,13 @@ void hd63450_single_transfer(device_t* device, int x)
 
 int hd63450_get_vector(device_t* device, int channel)
 {
-	hd63450_t* dmac = (hd63450_t*)downcast<legacy_device_base *>(device)->token();
+	hd63450_t* dmac = get_safe_token(device);
 	return dmac->reg[channel].niv;
 }
 
 int hd63450_get_error_vector(device_t* device, int channel)
 {
-	hd63450_t* dmac = (hd63450_t*)downcast<legacy_device_base *>(device)->token();
+	hd63450_t* dmac = get_safe_token(device);
 	return dmac->reg[channel].eiv;
 }
 

@@ -28,6 +28,14 @@ typedef struct _mfmhd
 	int id_index; /* position in track for seeking the sector; counts the sector number */
 } mfmhd_state, idehd_state;
 
+INLINE mfmhd_state *get_safe_token(device_t *device)
+{
+	assert(device != NULL);
+	assert(device->type() == MFMHD || device->type() == IDEHD);
+
+	return (mfmhd_state *)downcast<legacy_device_base *>(device)->token();
+}
+
 #if 0
 static void dump_contents(UINT8 *buffer, int length)
 {
@@ -70,7 +78,7 @@ static int harddisk_chs_to_lba(hard_disk_file *hdfile, int cylinder, int head, i
 void ti99_mfm_harddisk_read_sector(device_t *harddisk, int cylinder, int head, int sector, UINT8 **buf, int *sector_length)
 {
 	UINT32 lba;
-	mfmhd_state *hd = (mfmhd_state *)downcast<legacy_device_base *>(harddisk)->token();
+	mfmhd_state *hd = get_safe_token(harddisk);
 	device_t *drive = harddisk->subdevice("drive");
 	hard_disk_file *file = hd_get_hard_disk_file(drive);
 
@@ -106,7 +114,7 @@ void ti99_mfm_harddisk_read_sector(device_t *harddisk, int cylinder, int head, i
 void ti99_mfm_harddisk_write_sector(device_t *harddisk, int cylinder, int head, int sector, UINT8 *buf, int sector_length)
 {
 	UINT32 lba;
-	mfmhd_state *hd = (mfmhd_state *)downcast<legacy_device_base *>(harddisk)->token();
+	mfmhd_state *hd = get_safe_token(harddisk);
 	device_t *drive = harddisk->subdevice("drive");
 	hard_disk_file *file = hd_get_hard_disk_file(drive);
 
@@ -171,7 +179,7 @@ static int find_block(const UINT8 *buffer, int start, int stop, UINT8 byte, size
 */
 void ti99_mfm_harddisk_read_track(device_t *harddisk, int head, UINT8 **pbuffer, int *data_count)
 {
-	mfmhd_state *hd = (mfmhd_state *)downcast<legacy_device_base *>(harddisk)->token();
+	mfmhd_state *hd = get_safe_token(harddisk);
 	device_t *drive = harddisk->subdevice("drive");
 
 	/* We assume an interleave of 3 for 32 sectors. */
@@ -306,7 +314,7 @@ void ti99_mfm_harddisk_write_track(device_t *harddisk, int head, UINT8 *track_im
 	int sync = 13;
 
 	UINT32 lba;
-	mfmhd_state *hd = (mfmhd_state *)downcast<legacy_device_base *>(harddisk)->token();
+	mfmhd_state *hd = get_safe_token(harddisk);
 	device_t *drive = harddisk->subdevice("drive");
 	hard_disk_file *file = hd_get_hard_disk_file(drive);
 
@@ -409,7 +417,7 @@ UINT8 ti99_mfm_harddisk_status(device_t *harddisk)
 {
 	UINT8 status = 0;
 	device_t *drive;
-	mfmhd_state *hd = (mfmhd_state *)downcast<legacy_device_base *>(harddisk)->token();
+	mfmhd_state *hd = get_safe_token(harddisk);
 	drive = harddisk->subdevice("drive");
 	hard_disk_file *file = hd_get_hard_disk_file(drive);
 
@@ -432,7 +440,7 @@ UINT8 ti99_mfm_harddisk_status(device_t *harddisk)
 void ti99_mfm_harddisk_seek(device_t *harddisk, int direction)
 {
 	device_t *drive = harddisk->subdevice("drive");
-	mfmhd_state *hd = (mfmhd_state *)downcast<legacy_device_base *>(harddisk)->token();
+	mfmhd_state *hd = get_safe_token(harddisk);
 	const hard_disk_info *info;
 	hard_disk_file *file = hd_get_hard_disk_file(drive);
 
@@ -459,7 +467,7 @@ void ti99_mfm_harddisk_seek(device_t *harddisk, int direction)
 void ti99_mfm_harddisk_get_next_id(device_t *harddisk, int head, chrn_id_hd *id)
 {
 	device_t *drive = harddisk->subdevice("drive");
-	mfmhd_state *hd = (mfmhd_state *)downcast<legacy_device_base *>(harddisk)->token();
+	mfmhd_state *hd = get_safe_token(harddisk);
 	const hard_disk_info *info;
 	hard_disk_file *file;
 	int interleave = 3;

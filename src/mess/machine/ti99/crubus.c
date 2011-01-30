@@ -37,6 +37,8 @@ typedef struct _crubus_state
 INLINE crubus_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
+	assert(device->type() == CRUBUS);
+
 	return (crubus_state *)downcast<legacy_device_base *>(device)->token();
 }
 

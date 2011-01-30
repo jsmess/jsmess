@@ -174,6 +174,8 @@ typedef struct _ti99_peb_state
 INLINE ti99_peb_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
+	assert(device->type() == PBOX4 || device->type() == PBOX4A || device->type() == PBOX8 || device->type() == PBOXEV || device->type() == PBOXSG || device->type() == PBOXGEN);
+
 	return (ti99_peb_state *)downcast<legacy_device_base *>(device)->token();
 }
 
@@ -181,6 +183,7 @@ INLINE const ti99_peb_config *get_config(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == PBOX4 || device->type() == PBOX4A || device->type() == PBOX8 || device->type() == PBOXEV || device->type() == PBOXSG || device->type() == PBOXGEN);
+
 	return (const ti99_peb_config *) downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
 }
 
@@ -188,7 +191,7 @@ INLINE const ti99_peb_config *get_config(device_t *device)
 static WRITE_LINE_DEVICE_HANDLER( inta )
 {
 	int slot = get_pebcard_config(device)->slot;
-	ti99_peb_state *peb = (ti99_peb_state*)downcast<legacy_device_base *>(device->owner())->token();
+	ti99_peb_state *peb = get_safe_token(device->owner());
 	if (state==TRUE)
 	{
 		// The flags are stored as inverted (inta_state=0 if all lines are H)
@@ -207,7 +210,7 @@ static WRITE_LINE_DEVICE_HANDLER( inta )
 static WRITE_LINE_DEVICE_HANDLER( intb )
 {
 	int slot = get_pebcard_config(device)->slot;
-	ti99_peb_state *peb = (ti99_peb_state*)downcast<legacy_device_base *>(device->owner())->token();
+	ti99_peb_state *peb = get_safe_token(device->owner());
 	if (state==TRUE)
 		peb->intb_state &= ~(1 << slot);
 	else
@@ -218,7 +221,7 @@ static WRITE_LINE_DEVICE_HANDLER( intb )
 static WRITE_LINE_DEVICE_HANDLER( ready )
 {
 	int slot = get_pebcard_config(device)->slot;
-	ti99_peb_state *peb = (ti99_peb_state*)downcast<legacy_device_base *>(device->owner())->token();
+	ti99_peb_state *peb = get_safe_token(device->owner());
 	if (state==TRUE)
 		peb->ready_state &= ~(1 << slot);
 	else

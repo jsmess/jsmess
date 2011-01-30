@@ -24,6 +24,8 @@ typedef struct _ti99_video_state
 INLINE ti99_video_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
+	assert(device->type() == TIVIDEO);
+
 	return (ti99_video_state *)downcast<legacy_device_base *>(device)->token();
 }
 
@@ -31,6 +33,7 @@ INLINE const ti99_video_config *get_config(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == TIVIDEO);
+
 	return (const ti99_video_config *) downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
 }
 

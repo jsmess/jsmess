@@ -94,6 +94,8 @@ typedef struct _ti99_bwg_state
 INLINE ti99_bwg_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
+	assert(device->type() == BWG);
+
 	return (ti99_bwg_state *)downcast<legacy_device_base *>(device)->token();
 }
 
@@ -206,7 +208,7 @@ static WRITE_LINE_DEVICE_HANDLER( ti99_bwg_ready )
 {
 	// Caution: The device pointer passed to this function is the calling
 	// device. That is, if we want *this* device, we need to take the owner.
-	ti99_bwg_state *card = (ti99_bwg_state*)downcast<legacy_device_base *>(device->owner())->token();
+	ti99_bwg_state *card = get_safe_token(device->owner());
 	devcb_call_write_line( &card->lines.ready, state );
 }
 #endif
@@ -474,7 +476,7 @@ static WRITE8_DEVICE_HANDLER( data_w )
 
 static DEVICE_START( ti99_bwg )
 {
-	ti99_bwg_state *card = (ti99_bwg_state*)downcast<legacy_device_base *>(device)->token();
+	ti99_bwg_state *card = get_safe_token(device);
 
 	/* Resolve the callbacks to the PEB */
 	peb_callback_if *topeb = (peb_callback_if *)device->baseconfig().static_config();
@@ -491,8 +493,8 @@ static DEVICE_START( ti99_bwg )
 
 static DEVICE_STOP( ti99_bwg )
 {
+	ti99_bwg_state *card = get_safe_token(device);
 	logerror("ti99_bwg: stop\n");
-	ti99_bwg_state *card = (ti99_bwg_state*)downcast<legacy_device_base *>(device)->token();
 	if (card->ram) free(card->ram);
 }
 
@@ -507,7 +509,7 @@ static const ti99_peb_card bwg_card =
 
 static DEVICE_RESET( ti99_bwg )
 {
-	ti99_bwg_state *card = (ti99_bwg_state*)downcast<legacy_device_base *>(device)->token();
+	ti99_bwg_state *card = get_safe_token(device);
 
 	/* If the card is selected in the menu, register the card */
 	if (input_port_read(device->machine, "DISKCTRL") == DISK_BWG)
