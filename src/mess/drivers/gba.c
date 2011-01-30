@@ -2894,6 +2894,14 @@ static const gba_chip_fix_eeprom_item gba_chip_fix_eeprom_list[] =
 	{ "BPVY" }, // 2712 - Paard & Pony - Mijn Manege (EUR)
 	{ "BYPY" }, // 2713 - Paard & Pony - Paard in Galop (EUR)
 	{ "B54E" }, // 2757 - Crash & Spyro Superpack - The Huge Adventure + Season of Ice (USA)
+	// gba scan no. 9
+	{ "BKZX" }, // 1199 - Banjo-Kazooie - Grunty's Revenge (EUR)
+	{ "BKZI" }, // 1381 - Banjo Kazooie - La Vendetta di Grunty (ITA)
+	{ "BAZJ" }, // 1710 - Akachan Doubutsu Sono (JPN)
+	{ "BKZS" }, // 1883 - Banjo Kazooie - La Venganza de Grunty (ESP)
+	// gba scan no. 11
+	{ "A9BP" }, // 0925 - Medabots - Rokusho Version (EUR)
+	{ "A3IJ" }, // bokura no taiyou - taiyou action rpg - kabunushi go-yuutai ban (japan) (demo)
 };
 
 static int gba_chip_has_conflict( UINT32 chip)
@@ -2975,7 +2983,8 @@ static const gba_pcb pcb_list[] =
 	{"GBA-FLASH-1M",  GBA_CHIP_FLASH_1M},
 	{"GBA-RTC",       GBA_CHIP_RTC},
 	{"GBA-FLASH-512", GBA_CHIP_FLASH_512},
-	{"GBA-EEPROM-8K", GBA_CHIP_EEPROM_64K}
+	{"GBA-EEPROM-4K", GBA_CHIP_EEPROM_4K},
+	{"GBA-EEPROM-64K", GBA_CHIP_EEPROM_64K}
 };
 
 static int gba_get_pcb_id(const char *pcb)
