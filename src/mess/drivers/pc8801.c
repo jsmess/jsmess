@@ -339,7 +339,7 @@ static UINT8 extract_text_attribute(running_machine *machine,UINT32 address,int 
 	return 0;
 }
 
-static void pc8801_draw_char(running_machine *machine,bitmap_t *bitmap,int x,int y,int pal,UINT8 gfx_mode,UINT8 reverse,int y_size,int width)
+static void pc8801_draw_char(running_machine *machine,bitmap_t *bitmap,int x,int y,int pal,UINT8 gfx_mode,UINT8 reverse,UINT8 secret,UINT8 blink,UINT8 upper,UINT8 lower,int y_size,int width)
 {
 	int xi,yi;
 	UINT8 *vram = machine->region("wram")->base();
@@ -348,7 +348,7 @@ static void pc8801_draw_char(running_machine *machine,bitmap_t *bitmap,int x,int
 
 	y_height = y_size == 20 ? 10 : 8;
 
-	for(yi=0;yi<8;yi++)
+	for(yi=0;yi<y_height;yi++)
 	{
 		is_cursor = calc_cursor_pos(machine,x,y,yi);
 
@@ -359,8 +359,6 @@ static void pc8801_draw_char(running_machine *machine,bitmap_t *bitmap,int x,int
 			int color;
 
 			{
-				UINT8 *gfx_data = machine->region("gfx1")->base();
-
 				tile = vram[x+(y*120)+dma_address[2]];
 
 				res_x = x*8+xi*(width+1);
@@ -376,10 +374,24 @@ static void pc8801_draw_char(running_machine *machine,bitmap_t *bitmap,int x,int
 				}
 				else
 				{
-					if(is_cursor || reverse)
-						color = ((gfx_data[tile*8+yi] >> (7-xi)) & 1) ? -1 : pal;
+					UINT8 char_data;
+					UINT8 *gfx_rom = machine->region("gfx1")->base();
+
+					if(yi >= 8 || secret)
+						char_data = 0;
 					else
-						color = ((gfx_data[tile*8+yi] >> (7-xi)) & 1) ? pal : -1;
+						char_data = (gfx_rom[tile*8+yi] >> (7-xi)) & 1;
+
+					if(yi == 0 && upper)
+						char_data = 1;
+
+					if(yi == y_height && lower)
+						char_data = 1;
+
+					if(is_cursor || reverse)
+						color = char_data ? -1 : pal;
+					else
+						color = char_data ? pal : -1;
 				}
 
 				if((res_x)>machine->primary_screen->visible_area().max_x && (res_y)>machine->primary_screen->visible_area().max_y)
@@ -407,6 +419,10 @@ static void draw_text_80(running_machine *machine, bitmap_t *bitmap,int y_size)
 	UINT8 attr;
 	UINT8 reverse;
 	UINT8 gfx_mode;
+	UINT8 secret;
+	UINT8 upper;
+	UINT8 lower;
+	UINT8 blink;
 	int pal;
 
 	for(y=0;y<y_size;y++)
@@ -415,22 +431,36 @@ static void draw_text_80(running_machine *machine, bitmap_t *bitmap,int y_size)
 		{
 			attr = extract_text_attribute(machine,(((y*120)+80+dma_address[2]) & 0xffff),(x));
 
-			if(text_color_flag)
+			if(text_color_flag) // color mode
 			{
 				pal = (attr & 0xe0) >> 5;
 				gfx_mode = (attr & 0x10) >> 4;
 				reverse = 0;
+				secret = 0;
+				upper = 0;
+				lower = 0;
+				blink = 0;
 				pal|=8; //text pal bank
+
+				if(((attr & 8) == 8) && ((attr & 7) != 0))
+					popmessage("Warning: color switch enabled, contact MESSdev");
 			}
-			else
+			else // monochrome
 			{
 				pal = (txt_color) ? 7 : 0;
 				gfx_mode = 0;
-				reverse = attr & 4;
+				reverse = (attr & 4) >> 2;
+				secret = (attr & 1);
+				upper = (attr & 0x10) >> 4;
+				lower = (attr & 0x20) >> 5;
+				blink = (attr & 2) >> 1;
 				pal|=8; //text pal bank
+
+				if(attr & 0x80)
+					popmessage("Warning: mono gfx mode enabled, contact MESSdev");
 			}
 
-			pc8801_draw_char(machine,bitmap,x,y,pal,gfx_mode,reverse,y_size,0);
+			pc8801_draw_char(machine,bitmap,x,y,pal,gfx_mode,reverse,secret,upper,lower,blink,y_size,0);
 		}
 	}
 }
@@ -441,6 +471,10 @@ static void draw_text_40(running_machine *machine, bitmap_t *bitmap, int y_size)
 	UINT8 attr;
 	UINT8 reverse;
 	UINT8 gfx_mode;
+	UINT8 secret;
+	UINT8 upper;
+	UINT8 lower;
+	UINT8 blink;
 	int pal;
 
 	for(y=0;y<y_size;y++)
@@ -457,17 +491,31 @@ static void draw_text_40(running_machine *machine, bitmap_t *bitmap, int y_size)
 				pal = (attr & 0xe0) >> 5;
 				gfx_mode = (attr & 0x10) >> 4;
 				reverse = 0;
+				secret = 0;
+				upper = 0;
+				lower = 0;
+				blink = 0;
 				pal|=8; //text pal bank
+
+				if(attr & 0x08)
+					popmessage("Warning: color switch enabled, contact MESSdev");
 			}
 			else
 			{
 				pal = (txt_color) ? 7 : 0;
 				gfx_mode = 0;
-				reverse = attr & 4;
+				reverse = (attr & 4) >> 2;
+				secret = (attr & 1);
+				upper = (attr & 0x10) >> 4;
+				lower = (attr & 0x20) >> 5;
+				blink = (attr & 2) >> 1;
 				pal|=8; //text pal bank
+
+				if(attr & 0x80)
+					popmessage("Warning: mono gfx mode enabled, contact MESSdev");
 			}
 
-			pc8801_draw_char(machine,bitmap,x,y,pal,gfx_mode,reverse,y_size,1);
+			pc8801_draw_char(machine,bitmap,x,y,pal,gfx_mode,reverse,secret,upper,lower,blink,y_size,1);
 		}
 	}
 }
