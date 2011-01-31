@@ -1972,16 +1972,9 @@ static READ32_HANDLER(gba_bios_r)
 	return rom[offset&0x3fff];
 }
 
-static READ32_HANDLER(gba_4000_r)
-{
-	UINT32 data = 0xFFFFFFFF; // for "Fruit Mura no Doubutsu Tachi"
-	logerror( "%s: unmapped program memory read from %08X = %08X & %08X\n", cpuexec_describe_context( space->machine), 0x00004000 + (offset << 2), data, mem_mask);
-	return data;
-}
-
 static ADDRESS_MAP_START( gbadvance_map, ADDRESS_SPACE_PROGRAM, 32 )
+	ADDRESS_MAP_UNMAP_HIGH // for "Fruit Mura no Doubutsu Tachi" and "Classic NES Series"
 	AM_RANGE(0x00000000, 0x00003fff) AM_ROM AM_READ(gba_bios_r)
-	AM_RANGE(0x00004000, 0x01ffffff) AM_READ(gba_4000_r)
 	AM_RANGE(0x02000000, 0x0203ffff) AM_RAM AM_MIRROR(0xfc0000)
 	AM_RANGE(0x03000000, 0x03007fff) AM_RAM AM_MIRROR(0xff8000)
 	AM_RANGE(0x04000000, 0x040003ff) AM_READWRITE( gba_io_r, gba_io_w )
@@ -2214,13 +2207,6 @@ static WRITE32_HANDLER( sram_w )
 	gba_state *state = space->machine->driver_data<gba_state>();
 
 	COMBINE_DATA(&state->gba_sram[offset]);
-}
-
-static READ32_HANDLER( no_sram_r )
-{
-	UINT32 data = 0xFFFFFFFF; // for "Classic NES Series"
-	logerror( "%s: unmapped program memory read from %08X = %08X & %08X\n", cpuexec_describe_context( space->machine), 0x0E000000 + (offset << 2), data, mem_mask);
-	return data;
 }
 
 static READ32_HANDLER( flash_r )
@@ -3105,12 +3091,6 @@ static DEVICE_IMAGE_LOAD( gba_cart )
 	if (chip & GBA_CHIP_RTC)
 	{
 		mame_printf_verbose("game has RTC\n");
-	}
-
-	// install fake sram read handler to prevent sram detection if game contains copy protection checks
-	if ((chip & (GBA_CHIP_SRAM | GBA_CHIP_FLASH | GBA_CHIP_FLASH_512 | GBA_CHIP_FLASH_1M)) == 0)
-	{
-		memory_install_read32_handler(cpu_get_address_space(image.device().machine->device("maincpu"), ADDRESS_SPACE_PROGRAM), 0xe000000, 0xe00ffff, 0, 0, no_sram_r);
 	}
 
 	// if save media was found, reload it
