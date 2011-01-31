@@ -5,19 +5,20 @@
     preliminary driver by Angelo Salese, original MESS PC-88SR driver by ???
 
     TODO:
-	- add differences between various models;
 	- implement proper i8214 routing, also add irq latch mechanism;
+	- Fix up Floppy Terminal Count 0 / 1 writes properly, Castle Excellent (and presumably other games) is very picky about it.
+
+	- add differences between various models;
 	- implement proper upd3301 / i8257 support;
-	- below notes states that plain PC-8801 doesn't have a disk CPU, but the BIOS clearly checks the floppy ports. Wrong info?
 	- mouse support;
-	- cursor is 8 x 10, not 8 x 8 as current implementation.
 	- needs to support V1 / V2 properly;
 	- Add limits for extend work RAM;
 	- What happens to the palette contents when the analog/digital palette mode changes?
+	- waitstates;
 	- dipswitches needs to be controlled;
+	- below notes states that plain PC-8801 doesn't have a disk CPU, but the BIOS clearly checks the floppy ports. Wrong info?
 
 	per-game specific TODO:
-	- 100 Yen disk(s): reads kanji ports;
 	- 177: gameplay is too fast (parent pc8801 only);
 	- Acro Jet: hangs waiting for an irq;
 	- Advanced Fantasian: wants an irq that can't happen (I is equal to 0x3f)
@@ -168,6 +169,7 @@ static UINT8 vrtc_irq_mask,vrtc_irq_latch;
 static UINT8 timer_irq_mask,timer_irq_latch;
 static UINT8 sound_irq_mask,sound_irq_latch;
 #endif
+static UINT8 has_dictionary,dic_ctrl,dic_bank;
 
 /*
 CRTC command params:
@@ -692,6 +694,13 @@ static WRITE8_HANDLER( pc8801_high_wram_w )
 	hi_work_ram[offset] = data;
 }
 
+static READ8_HANDLER( pc8801ma_dic_r )
+{
+	UINT8 *dic_rom = space->machine->region("dictionary")->base();
+
+	return dic_rom[offset];
+}
+
 static READ8_HANDLER( pc8801_mem_r )
 {
 	if(offset >= 0x0000 && offset <= 0x7fff)
@@ -720,7 +729,7 @@ static READ8_HANDLER( pc8801_mem_r )
 		window_offset = (offset & 0x3ff) + (window_offset_bank << 8);
 
 		if((window_offset & 0xf000) == 0xf000)
-			printf("Read from 0xf000 - 0xffff window offset\n");
+			printf("Read from 0xf000 - 0xffff window offset\n"); //accessed by Castle Excellent, no noticeable quirk
 
 		if(((window_offset & 0xf000) == 0xf000) && (misc_ctrl & 0x10))
 			return pc8801_high_wram_r(space,window_offset & 0xfff);
@@ -733,6 +742,9 @@ static READ8_HANDLER( pc8801_mem_r )
 	}
 	else if(offset >= 0xc000 && offset <= 0xffff)
 	{
+		if(has_dictionary && dic_ctrl)
+			return pc8801ma_dic_r(space,(offset & 0x3fff) + ((dic_bank & 0x1f) * 0x4000));
+
 		if(misc_ctrl & 0x40)
 		{
 			vram_sel = 3;
@@ -776,7 +788,7 @@ static WRITE8_HANDLER( pc8801_mem_w )
 			window_offset = (offset & 0x3ff) + (window_offset_bank << 8);
 
 			if((window_offset & 0xf000) == 0xf000)
-				printf("Read from 0xf000 - 0xffff window offset\n");
+				printf("Write to 0xf000 - 0xffff window offset\n"); //accessed by Castle Excellent, no noticeable quirk
 
 			if(((window_offset & 0xf000) == 0xf000) && (misc_ctrl & 0x10))
 				pc8801_high_wram_w(space,window_offset & 0xfff,data);
@@ -1220,6 +1232,20 @@ static WRITE8_HANDLER( pc8801_kanji_lv2_w )
 		knj_addr[1] = ((offset & 1) == 0) ? ((knj_addr[1]&0xff00)|(data&0xff)) : ((knj_addr[1]&0x00ff)|(data<<8));
 }
 
+static WRITE8_HANDLER( pc8801_dic_bank_w )
+{
+	printf("JISHO BANK = %02x\n",data);
+	if(has_dictionary)
+		dic_bank = data  & 0x1f;
+}
+
+static WRITE8_HANDLER( pc8801_dic_ctrl_w )
+{
+	printf("JISHO CTRL = %02x\n",data);
+	if(has_dictionary)
+		dic_ctrl = (data ^ 1) & 1;
+}
+
 static ADDRESS_MAP_START( pc8801_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
@@ -1285,7 +1311,8 @@ static ADDRESS_MAP_START( pc8801_io, ADDRESS_SPACE_IO, 8 )
 //  AM_RANGE(0xe7, 0xe7) AM_NOP                                     /* Arcus writes here, almost likely to be a mirror of above */
 	AM_RANGE(0xe8, 0xeb) AM_READWRITE(pc8801_kanji_r, pc8801_kanji_w)
 	AM_RANGE(0xec, 0xef) AM_READWRITE(pc8801_kanji_lv2_r, pc8801_kanji_lv2_w)
-//  AM_RANGE(0xf0, 0xf1) AM_NOP                                     /* Kana to Kanji dictionary ROM select (not yet) */
+	AM_RANGE(0xf0, 0xf0) AM_WRITE(pc8801_dic_bank_w)
+	AM_RANGE(0xf1, 0xf1) AM_WRITE(pc8801_dic_ctrl_w)
 //  AM_RANGE(0xf3, 0xf3) AM_NOP                                     /* DMA floppy (unknown) */
 //  AM_RANGE(0xf4, 0xf7) AM_NOP                                     /* DMA 5'floppy (may be not released) */
 //  AM_RANGE(0xf8, 0xfb) AM_NOP                                     /* DMA 8'floppy (unknown) */
@@ -1895,6 +1922,22 @@ static MACHINE_RESET( pc8801 )
 		for(i=0;i<0x10;i++) //text + bitmap
 			palette_set_color_rgb(machine, i, pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
 	}
+
+	has_dictionary = 0;
+}
+
+static MACHINE_RESET( pc8801_dic )
+{
+	MACHINE_RESET_CALL( pc8801 );
+	has_dictionary = 1;
+	dic_bank = 0;
+	dic_ctrl = 0;
+}
+
+static MACHINE_RESET( pc8801_cdrom )
+{
+	MACHINE_RESET_CALL( pc8801_dic );
+	has_dictionary = 1;
 }
 
 static PALETTE_INIT( pc8801 )
@@ -1988,6 +2031,15 @@ static MACHINE_CONFIG_START( pc8801, driver_device )
 	MCFG_SOUND_ADD("beeper", BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( pc8801ma, pc8801 )
+	MCFG_MACHINE_RESET( pc8801_dic )
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( pc8801mc, pc8801 )
+	MCFG_MACHINE_RESET( pc8801_cdrom )
+MACHINE_CONFIG_END
+
 
 /* ROMs */
 #define PC8801_MEM_LOAD \
@@ -2282,21 +2334,21 @@ ROM_END
 
 /*    YEAR  NAME            PARENT  COMPAT  MACHINE   INPUT   INIT  COMPANY FULLNAME */
 
-COMP( 1981, pc8801,         0,		0,     pc8801,  pc88sr,  0,    "Nippon Electronic Company",  "PC-8801", GAME_NOT_WORKING )
-COMP( 1983, pc8801mk2,      pc8801, 0,     pc8801,  pc88sr,  0,    "Nippon Electronic Company",  "PC-8801mkII", GAME_NOT_WORKING )
-COMP( 1985, pc8801mk2sr,    pc8801,	0,     pc8801,  pc88sr,  0,    "Nippon Electronic Company",  "PC-8801mkIISR", GAME_NOT_WORKING )
-//COMP( 1985, pc8801mk2tr,  pc8801, 0,     pc8801,  pc88sr,  0,    "Nippon Electronic Company",  "PC-8801mkIITR", GAME_NOT_WORKING )
-COMP( 1985, pc8801mk2fr,    pc8801,	0,     pc8801,  pc88sr,  0,    "Nippon Electronic Company",  "PC-8801mkIIFR", GAME_NOT_WORKING )
-COMP( 1985, pc8801mk2mr,    pc8801,	0,     pc8801,  pc88sr,  0,    "Nippon Electronic Company",  "PC-8801mkIIMR", GAME_NOT_WORKING )
+COMP( 1981, pc8801,         0,		0,     pc8801,  	pc88sr,  0,    "Nippon Electronic Company",  "PC-8801", GAME_NOT_WORKING )
+COMP( 1983, pc8801mk2,      pc8801, 0,     pc8801,  	pc88sr,  0,    "Nippon Electronic Company",  "PC-8801mkII", GAME_NOT_WORKING )
+COMP( 1985, pc8801mk2sr,    pc8801,	0,     pc8801,  	pc88sr,  0,    "Nippon Electronic Company",  "PC-8801mkIISR", GAME_NOT_WORKING )
+//COMP( 1985, pc8801mk2tr,  pc8801, 0,     pc8801,  	pc88sr,  0,    "Nippon Electronic Company",  "PC-8801mkIITR", GAME_NOT_WORKING )
+COMP( 1985, pc8801mk2fr,    pc8801,	0,     pc8801,  	pc88sr,  0,    "Nippon Electronic Company",  "PC-8801mkIIFR", GAME_NOT_WORKING )
+COMP( 1985, pc8801mk2mr,    pc8801,	0,     pc8801,  	pc88sr,  0,    "Nippon Electronic Company",  "PC-8801mkIIMR", GAME_NOT_WORKING )
 
-//COMP( 1986, pc8801fh,     0,      0,     pc8801,  pc88sr,  0,    "Nippon Electronic Company",  "PC-8801FH", GAME_NOT_WORKING )
-COMP( 1986, pc8801mh,       pc8801,	0,     pc8801,  pc88sr,  0,    "Nippon Electronic Company",  "PC-8801MH", GAME_NOT_WORKING )
-COMP( 1987, pc8801fa,       pc8801,	0,     pc8801,  pc88sr,  0,    "Nippon Electronic Company",  "PC-8801FA", GAME_NOT_WORKING )
-COMP( 1987, pc8801ma,       pc8801,	0,     pc8801,  pc88sr,  0,    "Nippon Electronic Company",  "PC-8801MA", GAME_NOT_WORKING )
-//COMP( 1988, pc8801fe,     pc8801, 0,     pc8801,  pc88sr,  0,    "Nippon Electronic Company",  "PC-8801FE", GAME_NOT_WORKING )
-COMP( 1988, pc8801ma2,      pc8801,	0,     pc8801,  pc88sr,  0,    "Nippon Electronic Company",  "PC-8801MA2", GAME_NOT_WORKING )
-//COMP( 1989, pc8801fe2,    pc8801, 0,     pc8801,  pc88sr,  0,    "Nippon Electronic Company",  "PC-8801FE2", GAME_NOT_WORKING )
-COMP( 1989, pc8801mc,       pc8801,	0,     pc8801,  pc88sr,  0,    "Nippon Electronic Company",  "PC-8801MC", GAME_NOT_WORKING )
+//COMP( 1986, pc8801fh,     0,      0,     pc8801,  	pc88sr,  0,    "Nippon Electronic Company",  "PC-8801FH", GAME_NOT_WORKING )
+COMP( 1986, pc8801mh,       pc8801,	0,     pc8801,  	pc88sr,  0,    "Nippon Electronic Company",  "PC-8801MH", GAME_NOT_WORKING )
+COMP( 1987, pc8801fa,       pc8801,	0,     pc8801,  	pc88sr,  0,    "Nippon Electronic Company",  "PC-8801FA", GAME_NOT_WORKING )
+COMP( 1987, pc8801ma,       pc8801,	0,     pc8801ma,    pc88sr,  0,    "Nippon Electronic Company",  "PC-8801MA", GAME_NOT_WORKING )
+//COMP( 1988, pc8801fe,     pc8801, 0,     pc8801,  	pc88sr,  0,    "Nippon Electronic Company",  "PC-8801FE", GAME_NOT_WORKING )
+COMP( 1988, pc8801ma2,      pc8801,	0,     pc8801ma,    pc88sr,  0,    "Nippon Electronic Company",  "PC-8801MA2", GAME_NOT_WORKING )
+//COMP( 1989, pc8801fe2,    pc8801, 0,     pc8801,  	pc88sr,  0,    "Nippon Electronic Company",  "PC-8801FE2", GAME_NOT_WORKING )
+COMP( 1989, pc8801mc,       pc8801,	0,     pc8801mc,	pc88sr,  0,    "Nippon Electronic Company",  "PC-8801MC", GAME_NOT_WORKING )
 
 //COMP( 1989, pc98do,       0,      0,     pc88va,   pc88sr,  0,    "Nippon Electronic Company",  "PC-98DO", GAME_NOT_WORKING )
 //COMP( 1990, pc98dop,      0,      0,     pc88va,   pc88sr,  0,    "Nippon Electronic Company",  "PC-98DO+", GAME_NOT_WORKING )
