@@ -28,7 +28,7 @@
 	- Battle Entry: moans with a JP msg then dies if you try to press either numpad 1 or 2 (asks if the user wants to use the sound board (yes 1 / no 2)
 	- Bishoujo Baseball Gakuen: checks ym2608 after intro screen;
 	- Blue Moon Story: moans with a kanji msg;.
-	- Bubblegum Crisis: needs default work RAM (it boots if you soft reset it after that it surpasses the logo)
+	- Bubblegum Crisis: crashes due of a spurious irq (works if you soft reset the emulation when it triggers the halt opcode);
 	- Grobda: palette is ugly (parent pc8801 only);
 	- Wanderers from Ys: user data disk looks screwed? It loads with everything as maximum as per now ...
 	- Xevious: game is too fast (parent pc8801 only)
@@ -339,19 +339,75 @@ static UINT8 extract_text_attribute(running_machine *machine,UINT32 address,int 
 	return 0;
 }
 
-static void draw_text_80(running_machine *machine, bitmap_t *bitmap,int y_size)
+static void pc8801_draw_char(running_machine *machine,bitmap_t *bitmap,int x,int y,int pal,UINT8 gfx_mode,UINT8 reverse,int y_size,int width)
 {
-	int x,y;
 	int xi,yi;
 	UINT8 *vram = machine->region("wram")->base();
 	UINT8 is_cursor;
 	UINT8 y_height;
+
+	y_height = y_size == 20 ? 10 : 8;
+
+	for(yi=0;yi<8;yi++)
+	{
+		is_cursor = calc_cursor_pos(machine,x,y,yi);
+
+		for(xi=0;xi<8;xi++)
+		{
+			int res_x,res_y;
+			int tile;
+			int color;
+
+			{
+				UINT8 *gfx_data = machine->region("gfx1")->base();
+
+				tile = vram[x+(y*120)+dma_address[2]];
+
+				res_x = x*8+xi*(width+1);
+				res_y = y*y_height+yi;
+
+				if(gfx_mode)
+				{
+					UINT8 mask;
+
+					mask = (xi & 4) ? 0x10 : 0x01;
+					mask <<= ((yi & 6) >> 1);
+					color = (tile & mask) ? pal : -1;
+				}
+				else
+				{
+					if(is_cursor || reverse)
+						color = ((gfx_data[tile*8+yi] >> (7-xi)) & 1) ? -1 : pal;
+					else
+						color = ((gfx_data[tile*8+yi] >> (7-xi)) & 1) ? pal : -1;
+				}
+
+				if((res_x)>machine->primary_screen->visible_area().max_x && (res_y)>machine->primary_screen->visible_area().max_y)
+					continue;
+
+				if(color != -1)
+					*BITMAP_ADDR16(bitmap, res_y, res_x) = machine->pens[color];
+
+				if(width)
+				{
+					if((res_x+1)>machine->primary_screen->visible_area().max_x && (res_y)>machine->primary_screen->visible_area().max_y)
+						continue;
+
+					if(color != -1)
+						*BITMAP_ADDR16(bitmap, res_y, res_x+1) = machine->pens[color];
+				}
+			}
+		}
+	}
+}
+
+static void draw_text_80(running_machine *machine, bitmap_t *bitmap,int y_size)
+{
+	int x,y;
 	UINT8 attr;
 	UINT8 reverse;
 	UINT8 gfx_mode;
 	int pal;
-
-	y_height = y_size == 20 ? 10 : 8;
 
 	for(y=0;y<y_size;y++)
 	{
@@ -374,46 +430,7 @@ static void draw_text_80(running_machine *machine, bitmap_t *bitmap,int y_size)
 				pal|=8; //text pal bank
 			}
 
-			for(yi=0;yi<8;yi++)
-			{
-				is_cursor = calc_cursor_pos(machine,x,y,yi);
-
-				for(xi=0;xi<8;xi++)
-				{
-					int res_x,res_y;
-					int tile;
-					int color;
-
-					{
-						UINT8 *gfx_data = machine->region("gfx1")->base();
-
-						tile = vram[x+(y*120)+dma_address[2]];
-
-						res_x = x*8+xi;
-						res_y = y*y_height+yi;
-
-						if(gfx_mode)
-						{
-							UINT8 mask;
-
-							mask = (xi & 4) ? 0x10 : 0x01;
-							mask <<= ((yi & 6) >> 1);
-							color = (tile & mask) ? pal : -1;
-						}
-						else
-						{
-							if(is_cursor || reverse)
-								color = ((gfx_data[tile*8+yi] >> (7-xi)) & 1) ? -1 : pal;
-							else
-								color = ((gfx_data[tile*8+yi] >> (7-xi)) & 1) ? pal : -1;
-						}
-
-						if((res_x)<=machine->primary_screen->visible_area().max_x && (res_y)<=machine->primary_screen->visible_area().max_y)
-							if(color != -1)
-								*BITMAP_ADDR16(bitmap, res_y, res_x) = machine->pens[color];
-					}
-				}
-			}
+			pc8801_draw_char(machine,bitmap,x,y,pal,gfx_mode,reverse,y_size,0);
 		}
 	}
 }
@@ -421,16 +438,10 @@ static void draw_text_80(running_machine *machine, bitmap_t *bitmap,int y_size)
 static void draw_text_40(running_machine *machine, bitmap_t *bitmap, int y_size)
 {
 	int x,y;
-	int xi,yi;
-	UINT8 *vram = machine->region("wram")->base();
-	UINT8 is_cursor;
-	UINT8 y_height;
 	UINT8 attr;
 	UINT8 reverse;
 	UINT8 gfx_mode;
 	int pal;
-
-	y_height = y_size == 20 ? 10 : 8;
 
 	for(y=0;y<y_size;y++)
 	{
@@ -456,46 +467,7 @@ static void draw_text_40(running_machine *machine, bitmap_t *bitmap, int y_size)
 				pal|=8; //text pal bank
 			}
 
-			for(yi=0;yi<8;yi++)
-			{
-				is_cursor = calc_cursor_pos(machine,x,y,yi);
-
-				for(xi=0;xi<8;xi++)
-				{
-					int res_x,res_y;
-					int tile;
-					int color;
-					UINT8 *gfx_data = machine->region("gfx1")->base();
-
-					tile = vram[x+(y*120)+dma_address[2]];
-
-					res_x = (x*8)+xi*2;
-					res_y = (y*y_height)+yi;
-
-					if(gfx_mode)
-					{
-						UINT8 mask;
-
-						mask = (xi & 4) ? 0x10 : 0x01;
-						mask <<= ((yi & 6) >> 1);
-						color = (tile & mask) ? pal : -1;
-					}
-					else
-					{
-						if(is_cursor || reverse)
-							color = ((gfx_data[tile*8+yi] >> (7-xi)) & 1) ? -1 : pal;
-						else
-							color = ((gfx_data[tile*8+yi] >> (7-xi)) & 1) ? pal : -1;
-					}
-
-					if((res_x)<=machine->primary_screen->visible_area().max_x && (res_y)<=machine->primary_screen->visible_area().max_y)
-						if(color != -1)
-							*BITMAP_ADDR16(bitmap, res_y, res_x) = machine->pens[color];
-					if((res_x+1)<=machine->primary_screen->visible_area().max_x && (res_y)<=machine->primary_screen->visible_area().max_y)
-						if(color != -1)
-							*BITMAP_ADDR16(bitmap, res_y, res_x+1) = machine->pens[color];
-				}
-			}
+			pc8801_draw_char(machine,bitmap,x,y,pal,gfx_mode,reverse,y_size,1);
 		}
 	}
 }
