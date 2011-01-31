@@ -697,6 +697,9 @@ const game_driver * const drivers[] =
 	/* Research Machines */
 	DRIVER( nimbus )	/* RM Nimbus 186 */
 
+	/* Sanyo */
+	DRIVER( mbc55x )	/* Sanyo MBC-550, MBC-555 */
+
 	/* Sinclair Research */
 	DRIVER( zx80 )	  /* 1980 Sinclair ZX-80      */
 	DRIVER( zx81 )	  /* 1981 Sinclair ZX-81      */

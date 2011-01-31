@@ -1371,6 +1371,9 @@ $(MESSOBJ)/samsung.a:			\
 
 $(MESSOBJ)/sanyo.a:				\
 	$(MESS_DRIVERS)/phc25.o		\
+	$(MESS_DRIVERS)/mbc55x.o	\
+	$(MESS_MACHINE)/mbc55x.o  	\
+	$(MESS_VIDEO)/mbc55x.o    	\
 
 $(MESSOBJ)/sega.a:				\
 	$(MESS_DRIVERS)/saturn.o	\
