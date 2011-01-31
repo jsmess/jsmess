@@ -16,7 +16,6 @@
 	- floppy
 	- SI-5 serial interface (8251, ROM)
 	- 64KB RAM expansions
-	- PAL mode
 
 */
 
@@ -124,6 +123,8 @@ WRITE8_MEMBER( m5_state::com_w )
 
 READ8_MEMBER( m5_state::fd5_data_r )
 {
+	i8255a_pc6_w(m_ppi, 0);
+
 	return m_fd5_data;
 }
 
@@ -135,6 +136,8 @@ READ8_MEMBER( m5_state::fd5_data_r )
 WRITE8_MEMBER( m5_state::fd5_data_w )
 {
 	m_fd5_data = data;
+
+	i8255a_pc4_w(m_ppi, 0);
 }
 
 
@@ -148,10 +151,10 @@ READ8_MEMBER( m5_state::fd5_com_r )
 
 		bit		description
 		
-		0		
-		1		
-		2		
-		3		
+		0		?
+		1		1?
+		2		IBFA?
+		3		OBFA?
 		4		
 		5		
 		6		
@@ -159,7 +162,7 @@ READ8_MEMBER( m5_state::fd5_com_r )
 
 	*/
 
-	return 0;
+	return m_obfa << 3 | m_ibfa << 2 | 0x02;
 }
 
 
@@ -173,9 +176,9 @@ WRITE8_MEMBER( m5_state::fd5_com_w )
 
 		bit		description
 		
-		0		
-		1		
-		2		
+		0		PPI PC2
+		1		PPI PC0
+		2		PPI PC1
 		3		
 		4		
 		5		
@@ -183,6 +186,8 @@ WRITE8_MEMBER( m5_state::fd5_com_w )
 		7		
 
 	*/
+
+	m_fd5_com = data;
 }
 
 
@@ -206,6 +211,9 @@ WRITE8_MEMBER( m5_state::fd5_ctrl_w )
 		7		
 
 	*/
+
+	floppy_mon_w(m_floppy0, !BIT(data, 0));
+	floppy_drive_set_ready_state(m_floppy0, 1, 1);
 }
 
 
@@ -441,7 +449,15 @@ static INTERRUPT_GEN( sord_interrupt )
 	TMS9928A_interrupt(device->machine);
 }
 
-static const TMS9928a_interface vdp_intf =
+static const TMS9928a_interface ntsc_vdp_intf =
+{
+	TMS99x8A,
+	0x4000,
+	0, 0,
+	sordm5_video_interrupt_callback
+};
+
+static const TMS9928a_interface pal_vdp_intf =
 {
 	TMS9929A,
 	0x4000,
@@ -449,19 +465,101 @@ static const TMS9928a_interface vdp_intf =
 	sordm5_video_interrupt_callback
 };
 
-
 //-------------------------------------------------
 //  I8255A_INTERFACE( ppi_intf )
 //-------------------------------------------------
 
+READ8_MEMBER( m5_state::ppi_pa_r )
+{
+	return m_fd5_data;
+}
+
+READ8_MEMBER( m5_state::ppi_pc_r )
+{
+	/*
+
+		bit		description
+		
+		0		?
+		1		?
+		2		?
+		3		
+		4		STBA
+		5		
+		6		ACKA
+		7		
+
+	*/
+
+	return (
+			/* FD5 bit 0-> M5 bit 2 */
+			((m_fd5_com & 0x01)<<2) |
+			/* FD5 bit 2-> M5 bit 1 */
+			((m_fd5_com & 0x04)>>1) |
+			/* FD5 bit 1-> M5 bit 0 */
+			((m_fd5_com & 0x02)>>1)
+	);
+}
+
+WRITE8_MEMBER( m5_state::ppi_pa_w )
+{
+	m_fd5_data = data;
+}
+
+WRITE8_MEMBER( m5_state::ppi_pb_w )
+{
+	/*
+
+		bit		description
+		
+		0		
+		1		
+		2		
+		3		
+		4		
+		5		
+		6		
+		7		
+
+	*/
+
+	if (data == 0xf0)
+	{
+		cpu_set_input_line(m_fd5cpu, INPUT_LINE_RESET, ASSERT_LINE);
+		cpu_set_input_line(m_fd5cpu, INPUT_LINE_RESET, CLEAR_LINE);
+	}
+}
+
+WRITE8_MEMBER( m5_state::ppi_pc_w )
+{
+	/*
+
+		bit		description
+		
+		0		
+		1		
+		2		
+		3		INTRA
+		4		
+		5		IBFA
+		6		
+		7		OBFA
+
+	*/
+
+	m_intra = BIT(data, 3);
+	m_ibfa = BIT(data, 5);
+	m_obfa = BIT(data, 7);
+}
+
 static I8255A_INTERFACE( ppi_intf )
 {
-	DEVCB_DRIVER_MEMBER(m5_state, fd5_data_r),
+	DEVCB_DRIVER_MEMBER(m5_state, ppi_pa_r),
 	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(m5_state, fd5_data_w),
-	DEVCB_NULL,
-	DEVCB_NULL
+	DEVCB_DRIVER_MEMBER(m5_state, ppi_pc_r),
+	DEVCB_DRIVER_MEMBER(m5_state, ppi_pa_w),
+	DEVCB_DRIVER_MEMBER(m5_state, ppi_pb_w),
+	DEVCB_DRIVER_MEMBER(m5_state, ppi_pc_w)
 };
 
 
@@ -525,7 +623,7 @@ void m5_state::machine_start()
 	address_space *program = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);
 
 	// configure VDP
-	TMS9928A_configure(&vdp_intf);
+	TMS9928A_configure(m_vdp_intf);
 
 	// configure RAM
 	switch (ram_get_size(m_ram))
@@ -543,6 +641,10 @@ void m5_state::machine_start()
 
 	// register for state saving
 	state_save_register_global(machine, m_fd5_data);
+	state_save_register_global(machine, m_fd5_com);
+	state_save_register_global(machine, m_intra);
+	state_save_register_global(machine, m_ibfa);
+	state_save_register_global(machine, m_obfa);
 }
 
 
@@ -577,12 +679,6 @@ static MACHINE_CONFIG_START( m5, m5_state )
 	MCFG_CPU_PROGRAM_MAP(fd5_mem)
 	MCFG_CPU_IO_MAP(fd5_io)
 
-	// video hardware
-	MCFG_FRAGMENT_ADD(tms9928a)
-	MCFG_SCREEN_MODIFY(SCREEN_TAG)
-	MCFG_SCREEN_REFRESH_RATE((float)XTAL_10_738635MHz/2/342/262)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // not accurate
-
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD(SN76489AN_TAG, SN76489A, XTAL_14_31818MHz/4)
@@ -603,12 +699,38 @@ static MACHINE_CONFIG_START( m5, m5_state )
 	MCFG_CARTSLOT_INTERFACE("m5_cart")
 
 	// software lists
-	MCFG_SOFTWARE_LIST_ADD("cart_list","sordm5")
+	MCFG_SOFTWARE_LIST_ADD("cart_list", "m5")
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("4K")
 	MCFG_RAM_EXTRA_OPTIONS("36K,68K")
+MACHINE_CONFIG_END
+
+
+//-------------------------------------------------
+//  MACHINE_CONFIG_DERIVED( ntsc )
+//-------------------------------------------------
+
+static MACHINE_CONFIG_DERIVED( ntsc, m5 )
+	// video hardware
+	MCFG_FRAGMENT_ADD(tms9928a)
+	MCFG_SCREEN_MODIFY(SCREEN_TAG)
+	MCFG_SCREEN_REFRESH_RATE((float)XTAL_10_738635MHz/2/342/262)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // not accurate
+MACHINE_CONFIG_END
+
+
+//-------------------------------------------------
+//  MACHINE_CONFIG_DERIVED( pal )
+//-------------------------------------------------
+
+static MACHINE_CONFIG_DERIVED( pal, m5 )
+	// video hardware
+	MCFG_FRAGMENT_ADD(tms9928a)
+	MCFG_SCREEN_MODIFY(SCREEN_TAG)
+	MCFG_SCREEN_REFRESH_RATE((float)XTAL_10_738635MHz/2/342/313)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // not accurate
 MACHINE_CONFIG_END
 
 
@@ -647,9 +769,38 @@ ROM_END
 
 
 //**************************************************************************
+//	DRIVER INITIALIZATION
+//**************************************************************************
+
+//-------------------------------------------------
+//  ROM( ntsc )
+//-------------------------------------------------
+
+static DRIVER_INIT( ntsc )
+{
+	m5_state *state = machine->driver_data<m5_state>();
+
+	state->m_vdp_intf = &ntsc_vdp_intf;
+}
+	
+
+//-------------------------------------------------
+//  ROM( pal )
+//-------------------------------------------------
+
+static DRIVER_INIT( pal )
+{
+	m5_state *state = machine->driver_data<m5_state>();
+
+	state->m_vdp_intf = &pal_vdp_intf;
+}
+
+
+
+//**************************************************************************
 //	SYSTEM DRIVERS
 //**************************************************************************
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    COMPANY     FULLNAME            FLAGS
-COMP( 1983, m5,		0,		0,		m5,		m5,		0,		"Sord",		"m.5 (Japan)",		0 )
-COMP( 1983, m5p,	m5,		0,		m5,		m5,		0,		"Sord",		"m.5 (Europe)",		0 )
+COMP( 1983, m5,		0,		0,		ntsc,	m5,		ntsc,	"Sord",		"m.5 (Japan)",		0 )
+COMP( 1983, m5p,	m5,		0,		pal,	m5,		pal,	"Sord",		"m.5 (Europe)",		0 )
