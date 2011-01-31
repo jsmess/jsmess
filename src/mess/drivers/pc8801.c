@@ -169,7 +169,8 @@ static UINT8 vrtc_irq_mask,vrtc_irq_latch;
 static UINT8 timer_irq_mask,timer_irq_latch;
 static UINT8 sound_irq_mask,sound_irq_latch;
 #endif
-static UINT8 has_dictionary,dic_ctrl,dic_bank;
+static UINT8 has_dictionary,has_cdrom,dic_ctrl,dic_bank;
+static UINT8 cdrom_reg[0x10];
 
 /*
 CRTC command params:
@@ -701,6 +702,13 @@ static READ8_HANDLER( pc8801ma_dic_r )
 	return dic_rom[offset];
 }
 
+static READ8_HANDLER( pc8801_cdbios_rom_r )
+{
+	UINT8 *cdrom_bios = space->machine->region("cdrom")->base();
+
+	return cdrom_bios[offset];
+}
+
 static READ8_HANDLER( pc8801_mem_r )
 {
 	if(offset >= 0x0000 && offset <= 0x7fff)
@@ -710,6 +718,9 @@ static READ8_HANDLER( pc8801_mem_r )
 
 		if(gfx_ctrl & 2)
 			return pc8801_wram_r(space,offset);
+
+		if(has_cdrom && cdrom_reg[9] & 0x10)
+			return pc8801_cdbios_rom_r(space,(offset & 0x7fff) | ((gfx_ctrl & 4) ? 0x8000 : 0x0000));
 
 		if(gfx_ctrl & 4)
 			return pc8801_nbasic_rom_r(space,offset);
@@ -1195,9 +1206,7 @@ static WRITE8_HANDLER( pc8801_txt_cmt_ctrl_w )
 	/* bits 2 to 5 are cmt related */
 
 	txt_width = data & 1;
-	txt_color = data & 2;
-	if((data & 2) == 0)
-	printf("TEXT COLOR is black\n");
+	txt_color = data & 2; //TODO: Alpha enables this, but don't want black as the text?
 }
 
 static UINT32 knj_addr[2];
@@ -1246,6 +1255,28 @@ static WRITE8_HANDLER( pc8801_dic_ctrl_w )
 		dic_ctrl = (data ^ 1) & 1;
 }
 
+static READ8_HANDLER( pc8801_cdrom_r )
+{
+	//printf("CD-ROM read [%02x]\n",offset);
+
+	//if(has_cdrom)
+	//	return cdrom_reg[offset];
+
+	return 0xff;
+}
+
+static WRITE8_HANDLER( pc8801_cdrom_w )
+{
+	/*
+	[9] ---x ---- CD-ROM BIOS bank
+	    ---- ---x CD-ROM E-ROM bank (?)
+	*/
+	//printf("CD-ROM write %02x -> [%02x]\n",data,offset);
+
+	if(has_cdrom)
+		cdrom_reg[offset] = data;
+}
+
 static ADDRESS_MAP_START( pc8801_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
@@ -1271,6 +1302,7 @@ static ADDRESS_MAP_START( pc8801_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x30, 0x30) AM_READ_PORT("DSW1") AM_WRITE(pc8801_txt_cmt_ctrl_w)
 	AM_RANGE(0x31, 0x31) AM_READ_PORT("DSW2") AM_WRITE(pc8801_gfx_ctrl_w)
 	AM_RANGE(0x32, 0x32) AM_READWRITE(pc8801_misc_ctrl_r, pc8801_misc_ctrl_w)
+	//0x33, 0x33 sets something kanji related
 	AM_RANGE(0x34, 0x34) AM_WRITE(pc8801_alu_ctrl1_w)
 	AM_RANGE(0x35, 0x35) AM_WRITE(pc8801_alu_ctrl2_w)
 	AM_RANGE(0x40, 0x40) AM_READWRITE(pc8801_ctrl_r, pc8801_ctrl_w)
@@ -1290,7 +1322,7 @@ static ADDRESS_MAP_START( pc8801_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x70, 0x70) AM_READWRITE(pc8801_window_bank_r, pc8801_window_bank_w)
 	AM_RANGE(0x71, 0x71) AM_READWRITE(pc8801_ext_rom_bank_r, pc8801_ext_rom_bank_w)
 	AM_RANGE(0x78, 0x78) AM_WRITE(pc8801_window_bank_inc_w)
-//  AM_RANGE(0x90, 0x9f) AM_NOP                                     /* CD-ROM */
+	AM_RANGE(0x90, 0x9f) AM_READWRITE(pc8801_cdrom_r,pc8801_cdrom_w)
 //  AM_RANGE(0xa0, 0xa3) AM_NOP                                     /* music & network */
 //  AM_RANGE(0xa8, 0xad) AM_NOP                                     /* second sound board */
 //  AM_RANGE(0xb4, 0xb5) AM_NOP                                     /* Video art board */
@@ -1924,6 +1956,8 @@ static MACHINE_RESET( pc8801 )
 	}
 
 	has_dictionary = 0;
+	has_cdrom = 0;
+
 }
 
 static MACHINE_RESET( pc8801_dic )
@@ -1937,7 +1971,14 @@ static MACHINE_RESET( pc8801_dic )
 static MACHINE_RESET( pc8801_cdrom )
 {
 	MACHINE_RESET_CALL( pc8801_dic );
-	has_dictionary = 1;
+	has_cdrom = 1;
+
+	{
+		int i;
+
+		for(i=0;i<0x10;i++)
+			cdrom_reg[i] = 0;
+	}
 }
 
 static PALETTE_INIT( pc8801 )
