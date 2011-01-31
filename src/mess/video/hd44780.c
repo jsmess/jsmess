@@ -265,6 +265,12 @@ int hd44780_device::video_update(bitmap_t *bitmap, const rectangle *cliprect)
 
 void hd44780_device::control_write(offs_t offset, UINT8 data)
 {
+	if (busy_flag)
+	{
+		logerror("HD44780 '%s' Instruction %02x refused due of busy flag\n", tag(), data);
+		return;
+	}
+
 	if (BIT(data, 7)) // Set DDRAM Address
 	{
 		ac_mode = 0;
@@ -362,6 +368,12 @@ if (ac_mode == 0) {
 
 void hd44780_device::data_write(offs_t offset, UINT8 data)
 {
+	if (busy_flag)
+	{
+		logerror("HD44780 '%s' Ignoring data write %02x due of busy flag\n", tag(), data);
+		return;
+	}
+
 	if (ac_mode == 0) ddram[ac] = data;
 	else cgram[ac] = data;
 	data_bus_flag = 1;
