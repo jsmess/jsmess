@@ -17,6 +17,8 @@
 	- waitstates;
 	- dipswitches needs to be controlled;
 	- below notes states that plain PC-8801 doesn't have a disk CPU, but the BIOS clearly checks the floppy ports. Wrong info?
+	- PC-8801MC disk shows that bitmap and text colors mixes with additive blending (basically if the tv charset has white then the bitmap draws
+	  with inverted color output).
 
 	per-game specific TODO:
 	- 177: gameplay is too fast (parent pc8801 only);
@@ -342,7 +344,7 @@ static UINT8 extract_text_attribute(running_machine *machine,UINT32 address,int 
 	return 0;
 }
 
-static void pc8801_draw_char(running_machine *machine,bitmap_t *bitmap,int x,int y,int pal,UINT8 gfx_mode,UINT8 reverse,UINT8 secret,UINT8 blink,UINT8 upper,UINT8 lower,int y_size,int width)
+static void pc8801_draw_char(running_machine *machine,bitmap_t *bitmap,int x,int y,int pal,UINT8 gfx_mode,UINT8 reverse,UINT8 secret,UINT8 blink,UINT8 upper,UINT8 lower,int y_size,int height,int width)
 {
 	int xi,yi;
 	UINT8 *vram = machine->region("wram")->base();
@@ -365,7 +367,7 @@ static void pc8801_draw_char(running_machine *machine,bitmap_t *bitmap,int x,int
 				tile = vram[x+(y*120)+dma_address[2]];
 
 				res_x = x*8+xi*(width+1);
-				res_y = y*y_height+yi;
+				res_y = y*y_height*(height+1)+yi*(height+1);
 
 				if(gfx_mode)
 				{
@@ -410,6 +412,20 @@ static void pc8801_draw_char(running_machine *machine,bitmap_t *bitmap,int x,int
 
 					if(color != -1)
 						*BITMAP_ADDR16(bitmap, res_y, res_x+1) = machine->pens[color];
+				}
+				if(height)
+				{
+					if((res_x)>machine->primary_screen->visible_area().max_x && (res_y+1)>machine->primary_screen->visible_area().max_y)
+						continue;
+
+					if(color != -1)
+						*BITMAP_ADDR16(bitmap, res_y+1, res_x) = machine->pens[color];
+
+					if((res_x+1)>machine->primary_screen->visible_area().max_x && (res_y+1)>machine->primary_screen->visible_area().max_y)
+						continue;
+
+					if(color != -1)
+						*BITMAP_ADDR16(bitmap, res_y+1, res_x+1) = machine->pens[color];
 				}
 			}
 		}
@@ -463,7 +479,7 @@ static void draw_text_80(running_machine *machine, bitmap_t *bitmap,int y_size)
 					popmessage("Warning: mono gfx mode enabled, contact MESSdev");
 			}
 
-			pc8801_draw_char(machine,bitmap,x,y,pal,gfx_mode,reverse,secret,upper,lower,blink,y_size,0);
+			pc8801_draw_char(machine,bitmap,x,y,pal,gfx_mode,reverse,secret,upper,lower,blink,y_size,!(gfx_ctrl & 1),0);
 		}
 	}
 }
@@ -518,7 +534,7 @@ static void draw_text_40(running_machine *machine, bitmap_t *bitmap, int y_size)
 					popmessage("Warning: mono gfx mode enabled, contact MESSdev");
 			}
 
-			pc8801_draw_char(machine,bitmap,x,y,pal,gfx_mode,reverse,secret,upper,lower,blink,y_size,1);
+			pc8801_draw_char(machine,bitmap,x,y,pal,gfx_mode,reverse,secret,upper,lower,blink,y_size,!(gfx_ctrl & 1),1);
 		}
 	}
 }
@@ -930,7 +946,7 @@ static WRITE8_HANDLER( pc8801_gfx_ctrl_w )
 	---- x--- graphic display yes (1) / no (0)
 	---- -x-- Basic N (1) / N88 (0)
 	---- --x- RAM select yes (1) / no (0)
-	---- ---x VRAM 200 lines (1) / 400 lines (0)
+	---- ---x VRAM 200 lines (1) / 400 lines (0), 15 KHz / 24 KHz
 	*/
 
 	gfx_ctrl = data;
@@ -1434,10 +1450,18 @@ static WRITE8_HANDLER( fdc_irq_vector_w )
 	fdc_irq_opcode = data;
 }
 
+static WRITE8_HANDLER( fdc_drive_mode_w )
+{
+	if(data & 5)
+		printf("drive 0 sets up %s floppy format\n",data & 1 ? "2hd" : "2dd");
+	if(data & 0xa)
+		printf("drive 1 sets up %s floppy format\n",data & 2 ? "2hd" : "2dd");
+}
+
 static ADDRESS_MAP_START( pc8801fdc_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xf0, 0xf0) AM_WRITE(fdc_irq_vector_w) // Interrupt Opcode Port
-//	AM_RANGE(0xf4, 0xf4) // Drive mode, 2d, 2dd, 2hd
+	AM_RANGE(0xf4, 0xf4) AM_WRITE(fdc_drive_mode_w) // Drive mode, 2d, 2dd, 2hd
 //	AM_RANGE(0xf7, 0xf7) AM_WRITENOP // printer port output
 	AM_RANGE(0xf8, 0xf8) AM_READWRITE(upd765_tc_r,upd765_mc_w) // (R) Terminal Count Port (W) Motor Control Port
 	AM_RANGE(0xfa, 0xfa) AM_DEVREAD("upd765", upd765_status_r )
