@@ -26,9 +26,9 @@ public:
 
 	void machine_reset();
 
-	WRITE8_MEMBER( digit_w );
-	WRITE8_MEMBER( segment_w );
-	READ8_MEMBER( kp_r );
+	DECLARE_WRITE8_MEMBER( digit_w );
+	DECLARE_WRITE8_MEMBER( segment_w );
+	DECLARE_READ8_MEMBER( kp_r );
 
 	UINT8 digit_sel;
 };

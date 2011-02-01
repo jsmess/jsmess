@@ -80,7 +80,7 @@ protected:
     virtual void device_start();
     virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-	
+
 	// inline helper
 	inline UINT16 indexram(UINT8 r);
 	inline UINT16 indexrom(UINT8 r);
@@ -113,28 +113,28 @@ private:
 	static const device_timer_id BUSY_TIMER = 0;
 	static const device_timer_id BLINKING_TIMER = 1;
 
-	const memory_region *charset;
-	address_space *videoram;
+	const memory_region *m_charset;
+	address_space *m_videoram;
 
-	screen_device *screen;			//screen we are acting on
+	screen_device *m_screen;				//screen we are acting on
 
-	UINT8 bf;						//busy flag
-	UINT8 char_mode;				//40 or 80 chars for line
-	UINT8 acc_char[0x2000];			//accented chars
-	UINT8 registers[8];				//registers R0-R7
-	UINT8 state;					//status register
-	UINT8 TGS,MAT,PAT,DOR,ROR;		//indirect registers
-	UINT8 border[80];				//border color
-	UINT16 block;					//current memory block
-	UINT16 ram_base[4];				//index of ram charset
-	UINT8 blink;					//cursor status
-	UINT8 last_dial[40];			//last chars dial (for determinate the zoom position)
-	UINT8 latchc0;					//background color latch
-	UINT8 latchm;					//hided atribute latch
-	UINT8 latchi;					//insert atribute latch
-	UINT8 latchu;					//underline atribute latch
+	UINT8 m_bf;								//busy flag
+	UINT8 m_char_mode;						//40 or 80 chars for line
+	UINT8 m_acc_char[0x2000];				//accented chars
+	UINT8 m_registers[8];					//registers R0-R7
+	UINT8 m_state;							//status register
+	UINT8 m_tgs,m_mat,m_pat,m_dor,m_ror;	//indirect registers
+	UINT8 m_border[80];						//border color
+	UINT16 m_block;							//current memory block
+	UINT16 m_ram_base[4];					//index of ram charset
+	UINT8 m_blink;							//cursor status
+	UINT8 m_last_dial[40];					//last chars dial (for determinate the zoom position)
+	UINT8 m_latchc0;						//background color latch
+	UINT8 m_latchm;							//hided atribute latch
+	UINT8 m_latchi;							//insert atribute latch
+	UINT8 m_latchu;							//underline atribute latch
 
-	bitmap_t *screen_out;
+	bitmap_t *m_screen_out;
 
 	// timers
 	emu_timer *m_busy_timer;

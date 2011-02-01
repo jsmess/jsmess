@@ -757,7 +757,7 @@ static MACHINE_CONFIG_FRAGMENT( psion_slot )
 	MCFG_CARTSLOT_LOAD(psion_pack2)
 	MCFG_CARTSLOT_UNLOAD(psion_pack2)
 	MCFG_CARTSLOT_INTERFACE("psion_pack")
-	
+
 	/* Software lists */
 	MCFG_SOFTWARE_LIST_ADD("pack_list", "psion")
 MACHINE_CONFIG_END

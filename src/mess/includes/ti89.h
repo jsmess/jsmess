@@ -54,12 +54,12 @@ public:
 	bool video_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 
 	UINT8 keypad_r (running_machine *machine);
-	WRITE16_MEMBER ( ti68k_io_w );
-	READ16_MEMBER ( ti68k_io_r );
-	WRITE16_MEMBER ( ti68k_io2_w );
-	READ16_MEMBER ( ti68k_io2_r );
-	WRITE16_MEMBER ( flash_w );
-	READ16_MEMBER ( flash_r );
+	DECLARE_WRITE16_MEMBER ( ti68k_io_w );
+	DECLARE_READ16_MEMBER ( ti68k_io_r );
+	DECLARE_WRITE16_MEMBER ( ti68k_io2_w );
+	DECLARE_READ16_MEMBER ( ti68k_io2_r );
+	DECLARE_WRITE16_MEMBER ( flash_w );
+	DECLARE_READ16_MEMBER ( flash_r );
 	UINT64 timer;
 };
 

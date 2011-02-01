@@ -81,25 +81,25 @@ private:
 	static const device_timer_id ON_TIMER = 1;
 	emu_timer *m_on_timer;
 
-	UINT8 video_ram[2][0x180];
-	UINT8 control_lines;
-	UINT8 data_bus;
-	UINT8 par[3];
-	UINT8 state;
-	UINT16 bank;
-	UINT16 offset;
-	UINT8 char_width;
-	UINT8 lcd_on;
-	UINT8 scroll;
-	UINT32 contrast;
+	UINT8 m_video_ram[2][0x180];
+	UINT8 m_control_lines;
+	UINT8 m_data_bus;
+	UINT8 m_par[3];
+	UINT8 m_state;
+	UINT16 m_bank;
+	UINT16 m_offset;
+	UINT8 m_char_width;
+	UINT8 m_lcd_on;
+	UINT8 m_scroll;
+	UINT32 m_contrast;
 
-	UINT8 custom_char[4][8];		// 4 chars * 8 bytes
-	UINT8 byte_count;
-	UINT8 cursor_status;
-	UINT8 cursor[8];
-	UINT8 cursor_x;
-	UINT8 cursor_y;
-	UINT8 cursor_lcd;
+	UINT8 m_custom_char[4][8];		// 4 chars * 8 bytes
+	UINT8 m_byte_count;
+	UINT8 m_cursor_status;
+	UINT8 m_cursor[8];
+	UINT8 m_cursor_x;
+	UINT8 m_cursor_y;
+	UINT8 m_cursor_lcd;
 
 	devcb_resolved_write_line m_on;			// ON line callback
 	const hd44352_device_config &m_config;

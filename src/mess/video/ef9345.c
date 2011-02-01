@@ -109,8 +109,8 @@ void ef9345_device_config::device_config_complete()
 // calculate the internal RAM offset
 inline UINT16 ef9345_device::indexram(UINT8 r)
 {
-	UINT8 x = registers[r];
-	UINT8 y = registers[r - 1];
+	UINT8 x = m_registers[r];
+	UINT8 y = m_registers[r - 1];
 	if (y < 8)
 		y &= 1;
 	return ((x&0x3f) | ((x & 0x40) << 6) | ((x & 0x80) << 4) | ((y & 0x1f) << 6) | ((y & 0x20) << 8));
@@ -119,8 +119,8 @@ inline UINT16 ef9345_device::indexram(UINT8 r)
 // calculate the internal ROM offset
 inline UINT16 ef9345_device::indexrom(UINT8 r)
 {
-	UINT8 x = registers[r];
-	UINT8 y = registers[r - 1];
+	UINT8 x = m_registers[r];
+	UINT8 y = m_registers[r - 1];
 	if (y < 8)
 		y &= 1;
 	return((x&0x3f)|((x&0x40)<<6)|((x&0x80)<<4)|((y&0x1f)<<6));
@@ -129,22 +129,22 @@ inline UINT16 ef9345_device::indexrom(UINT8 r)
 // increment x
 inline void ef9345_device::inc_x(UINT8 r)
 {
-	UINT8 i = (registers[r] & 0x3f) + 1;
+	UINT8 i = (m_registers[r] & 0x3f) + 1;
 	if (i > 39)
 	{
 		i -= 40;
-		state |= 0x40;
+		m_state |= 0x40;
 	}
-	registers[r] = (registers[r] & 0xc0) | i;
+	m_registers[r] = (m_registers[r] & 0xc0) | i;
 }
 
 // increment y
 inline void ef9345_device::inc_y(UINT8 r)
 {
-	UINT8 i = (registers[r] & 0x1f) + 1;
+	UINT8 i = (m_registers[r] & 0x1f) + 1;
 	if (i > 31)
 		i -= 24;
-	registers[r] = (registers[r] & 0xe0) | i;
+	m_registers[r] = (m_registers[r] & 0xe0) | i;
 }
 
 
@@ -169,42 +169,42 @@ ef9345_device::ef9345_device( running_machine &_machine, const ef9345_device_con
 
 void ef9345_device::device_start()
 {
-	screen = machine->device<screen_device>(m_config.screen_tag);
+	m_screen = machine->device<screen_device>(m_config.screen_tag);
 
-	assert(screen != NULL);
+	assert(m_screen != NULL);
 
 	m_busy_timer = device_timer_alloc(*this, BUSY_TIMER);
 	m_blink_timer = device_timer_alloc(*this, BLINKING_TIMER);
 
-	videoram = space(0);
-	charset = region();
+	m_videoram = space(0);
+	m_charset = region();
 
-	screen_out = auto_bitmap_alloc(machine, 496, screen->height() , BITMAP_FORMAT_INDEXED16);
+	m_screen_out = auto_bitmap_alloc(machine, 496, m_screen->height() , BITMAP_FORMAT_INDEXED16);
 
 	timer_adjust_periodic(m_blink_timer, ATTOTIME_IN_MSEC(500), 0, ATTOTIME_IN_MSEC(500));
 
 	init_accented_chars();
 
-	state_save_register_device_item_array(this, 0, border);
-	state_save_register_device_item_array(this, 0, registers);
-	state_save_register_device_item_array(this, 0, last_dial);
-	state_save_register_device_item_array(this, 0, ram_base);
-	state_save_register_device_item(this, 0, bf);
-	state_save_register_device_item(this, 0, char_mode);
-	state_save_register_device_item(this, 0, state);
-	state_save_register_device_item(this, 0, TGS);
-	state_save_register_device_item(this, 0, MAT);
-	state_save_register_device_item(this, 0, PAT);
-	state_save_register_device_item(this, 0, DOR);
-	state_save_register_device_item(this, 0, ROR);
-	state_save_register_device_item(this, 0, block);
-	state_save_register_device_item(this, 0, blink);
-	state_save_register_device_item(this, 0, latchc0);
-	state_save_register_device_item(this, 0, latchm);
-	state_save_register_device_item(this, 0, latchi);
-	state_save_register_device_item(this, 0, latchu);
+	state_save_register_device_item_array(this, 0, m_border);
+	state_save_register_device_item_array(this, 0, m_registers);
+	state_save_register_device_item_array(this, 0, m_last_dial);
+	state_save_register_device_item_array(this, 0, m_ram_base);
+	state_save_register_device_item(this, 0, m_bf);
+	state_save_register_device_item(this, 0, m_char_mode);
+	state_save_register_device_item(this, 0, m_state);
+	state_save_register_device_item(this, 0, m_tgs);
+	state_save_register_device_item(this, 0, m_mat);
+	state_save_register_device_item(this, 0, m_pat);
+	state_save_register_device_item(this, 0, m_dor);
+	state_save_register_device_item(this, 0, m_ror);
+	state_save_register_device_item(this, 0, m_block);
+	state_save_register_device_item(this, 0, m_blink);
+	state_save_register_device_item(this, 0, m_latchc0);
+	state_save_register_device_item(this, 0, m_latchm);
+	state_save_register_device_item(this, 0, m_latchi);
+	state_save_register_device_item(this, 0, m_latchu);
 
-	state_save_register_device_item_bitmap(this, 0, screen_out);
+	state_save_register_device_item_bitmap(this, 0, m_screen_out);
 }
 
 //-------------------------------------------------
@@ -212,23 +212,23 @@ void ef9345_device::device_start()
 //-------------------------------------------------
 void ef9345_device::device_reset()
 {
-	TGS = MAT = PAT = DOR = ROR = 0;
-	state = 0;
-	bf = 0;
-	block = 0;
-	blink = 0;
-	latchc0 = 0;
-	latchm = 0;
-	latchi = 0;
-	latchu = 0;
-	char_mode = 0;
+	m_tgs = m_mat = m_pat = m_dor = m_ror = 0;
+	m_state = 0;
+	m_bf = 0;
+	m_block = 0;
+	m_blink = 0;
+	m_latchc0 = 0;
+	m_latchm = 0;
+	m_latchi = 0;
+	m_latchu = 0;
+	m_char_mode = 0;
 
-	memset(last_dial, 0, ARRAY_LENGTH(last_dial) * sizeof(UINT8));
-	memset(registers, 0, ARRAY_LENGTH(registers) * sizeof(UINT8));
-	memset(border, 0, ARRAY_LENGTH(border) * sizeof(UINT8));
-	memset(border, 0, ARRAY_LENGTH(ram_base) * sizeof(UINT16));
+	memset(m_last_dial, 0, sizeof(m_last_dial));
+	memset(m_registers, 0, sizeof(m_registers));
+	memset(m_border, 0, sizeof(m_border));
+	memset(m_border, 0, sizeof(m_ram_base));
 
-	bitmap_fill(screen_out, NULL, 0);
+	bitmap_fill(m_screen_out, NULL, 0);
 
 	set_video_mode();
 }
@@ -241,11 +241,11 @@ void ef9345_device::device_timer(emu_timer &timer, device_timer_id id, int param
 	switch(id)
 	{
 		case BUSY_TIMER:
-			bf = 0;
+			m_bf = 0;
 			break;
 
 		case BLINKING_TIMER:
-			blink = !blink;
+			m_blink = !m_blink;
 			break;
 	}
 }
@@ -254,7 +254,7 @@ void ef9345_device::device_timer(emu_timer &timer, device_timer_id id, int param
 // set busy flag and timer to clear it
 void ef9345_device::set_busy_flag(int period)
 {
-	bf = 1;
+	m_bf = 1;
 	timer_adjust_oneshot(m_busy_timer, ATTOTIME_IN_USEC(period), 0);
 }
 
@@ -262,52 +262,52 @@ void ef9345_device::set_busy_flag(int period)
 void ef9345_device::draw_char_40(UINT8 *c, UINT16 x, UINT16 y)
 {
 	//verify size limit
-	if (y * 10 >= screen->height() || x * 8 >= screen->width())
+	if (y * 10 >= m_screen->height() || x * 8 >= m_screen->width())
 		return;
 
 	for(int i = 0; i < 10; i++)
 		for(int j = 0; j < 8; j++)
-				*BITMAP_ADDR16(screen_out, y * 10 + i, x * 8 + j)  = c[8 * i + j] & 0x07;
+				*BITMAP_ADDR16(m_screen_out, y * 10 + i, x * 8 + j)  = c[8 * i + j] & 0x07;
 }
 
 // draw a char in 80 char line mode
 void ef9345_device::draw_char_80(UINT8 *c, UINT16 x, UINT16 y)
 {
 	// verify size limit
-	if (y * 10 >= screen->height() || x * 6 >= screen->width())
+	if (y * 10 >= m_screen->height() || x * 6 >= m_screen->width())
 		return;
 
 	for(int i = 0; i < 10; i++)
 		for(int j = 0; j < 6; j++)
-				*BITMAP_ADDR16(screen_out, y * 10 + i, x * 6 + j)  = c[6 * i + j] & 0x07;
+				*BITMAP_ADDR16(m_screen_out, y * 10 + i, x * 6 + j)  = c[6 * i + j] & 0x07;
 }
 
 
 // set then ef9345 mode
 void ef9345_device::set_video_mode(void)
 {
-	char_mode = ((PAT & 0x80) >> 5) | ((TGS & 0xc0) >> 6);
-	UINT16 new_width = (char_mode == MODE12x80 || char_mode == MODE8x80) ? 492 : 336;
+	m_char_mode = ((m_pat & 0x80) >> 5) | ((m_tgs & 0xc0) >> 6);
+	UINT16 new_width = (m_char_mode == MODE12x80 || m_char_mode == MODE8x80) ? 492 : 336;
 
-	if (screen->width() != new_width)
+	if (m_screen->width() != new_width)
 	{
-		rectangle visarea = screen->visible_area();
+		rectangle visarea = m_screen->visible_area();
 		visarea.max_x = new_width - 1;
 
-		screen->configure(new_width, screen->height(), visarea, screen->frame_period().attoseconds);
+		m_screen->configure(new_width, m_screen->height(), visarea, m_screen->frame_period().attoseconds);
 	}
 
 	//border color
-	memset(border, MAT & 0x07, ARRAY_LENGTH(border));
+	memset(m_border, m_mat & 0x07, sizeof(m_border));
 
-	//set the base for the videoram charset
-	ram_base[0] = ((DOR & 0x07) << 11);
-	ram_base[1] = ram_base[0];
-	ram_base[2] = ((DOR & 0x30) << 8);
-	ram_base[3] = ram_base[2] + 0x0800;
+	//set the base for the m_videoram charset
+	m_ram_base[0] = ((m_dor & 0x07) << 11);
+	m_ram_base[1] = m_ram_base[0];
+	m_ram_base[2] = ((m_dor & 0x30) << 8);
+	m_ram_base[3] = m_ram_base[2] + 0x0800;
 
 	//address of the current memory block
-	block = 0x0800 * ((((ROR & 0xf0) >> 4) | ((ROR & 0x40) >> 5) | ((ROR & 0x20) >> 3)) & 0x0c);
+	m_block = 0x0800 * ((((m_ror & 0xf0) >> 4) | ((m_ror & 0x40) >> 5) | ((m_ror & 0x20) >> 3)) & 0x0c);
 }
 
 // initialize the ef9345 accented chars
@@ -316,71 +316,71 @@ void ef9345_device::init_accented_chars(void)
 	UINT16 i, j;
 	for(j = 0; j < 0x10; j++)
 		for(i = 0; i < 0x200; i++)
-			acc_char[(j << 9) + i] = charset->u8(0x0600 + i);
+			m_acc_char[(j << 9) + i] = m_charset->u8(0x0600 + i);
 
 	for(j = 0; j < 0x200; j += 0x40)
 		for(i = 0; i < 4; i++)
 		{
-			acc_char[0x0200 + j + i +  4] |= 0x1c; //tilde
-			acc_char[0x0400 + j + i +  4] |= 0x10; //acute
-			acc_char[0x0400 + j + i +  8] |= 0x08; //acute
-			acc_char[0x0600 + j + i +  4] |= 0x04; //grave
-			acc_char[0x0600 + j + i +  8] |= 0x08; //grave
+			m_acc_char[0x0200 + j + i +  4] |= 0x1c; //tilde
+			m_acc_char[0x0400 + j + i +  4] |= 0x10; //acute
+			m_acc_char[0x0400 + j + i +  8] |= 0x08; //acute
+			m_acc_char[0x0600 + j + i +  4] |= 0x04; //grave
+			m_acc_char[0x0600 + j + i +  8] |= 0x08; //grave
 
-			acc_char[0x0a00 + j + i +  4] |= 0x1c; //tilde
-			acc_char[0x0c00 + j + i +  4] |= 0x10; //acute
-			acc_char[0x0c00 + j + i +  8] |= 0x08; //acute
-			acc_char[0x0e00 + j + i +  4] |= 0x04; //grave
-			acc_char[0x0e00 + j + i +  8] |= 0x08; //grave
+			m_acc_char[0x0a00 + j + i +  4] |= 0x1c; //tilde
+			m_acc_char[0x0c00 + j + i +  4] |= 0x10; //acute
+			m_acc_char[0x0c00 + j + i +  8] |= 0x08; //acute
+			m_acc_char[0x0e00 + j + i +  4] |= 0x04; //grave
+			m_acc_char[0x0e00 + j + i +  8] |= 0x08; //grave
 
-			acc_char[0x1200 + j + i +  4] |= 0x08; //point
-			acc_char[0x1400 + j + i +  4] |= 0x14; //trema
-			acc_char[0x1600 + j + i + 32] |= 0x08; //cedilla
-			acc_char[0x1600 + j + i + 36] |= 0x04; //cedilla
+			m_acc_char[0x1200 + j + i +  4] |= 0x08; //point
+			m_acc_char[0x1400 + j + i +  4] |= 0x14; //trema
+			m_acc_char[0x1600 + j + i + 32] |= 0x08; //cedilla
+			m_acc_char[0x1600 + j + i + 36] |= 0x04; //cedilla
 
-			acc_char[0x1a00 + j + i +  4] |= 0x08; //point
-			acc_char[0x1c00 + j + i +  4] |= 0x14; //trema
-			acc_char[0x1e00 + j + i + 32] |= 0x08; //cedilla
-			acc_char[0x1e00 + j + i + 36] |= 0x04; //cedilla
+			m_acc_char[0x1a00 + j + i +  4] |= 0x08; //point
+			m_acc_char[0x1c00 + j + i +  4] |= 0x14; //trema
+			m_acc_char[0x1e00 + j + i + 32] |= 0x08; //cedilla
+			m_acc_char[0x1e00 + j + i + 36] |= 0x04; //cedilla
 		}
 }
 
-// read a char in charset or in videoram
+// read a char in charset or in m_videoram
 UINT8 ef9345_device::read_char(UINT8 index, UINT16 addr)
 {
 	if (index < 0x04)
-		return charset->u8(0x0800*index + addr);
+		return m_charset->u8(0x0800*index + addr);
 	else if (index < 0x08)
-		return acc_char[0x0800*(index&3) + addr];
+		return m_acc_char[0x0800*(index&3) + addr];
 	else if (index < 0x0c)
-		return videoram->read_byte(ram_base[index-8] + addr);
+		return m_videoram->read_byte(m_ram_base[index-8] + addr);
 	else
-		return videoram->read_byte(addr);
+		return m_videoram->read_byte(addr);
 }
 
 // calculate the dial position of the char
 UINT8 ef9345_device::get_dial(UINT8 x, UINT8 attrib)
 {
-	if (x > 0 && last_dial[x-1] == 1) 		//top right
-		last_dial[x] = 2;
-	else if (x > 0 && last_dial[x-1] == 5)	//half right
-		last_dial[x] = 10;
-	else if (last_dial[x] == 1)				//bottom left
-		last_dial[x] = 4;
-	else if (last_dial[x] == 2)				//bottom right
-		last_dial[x] = 8;
-	else if (last_dial[x] == 3)				//lower half
-		last_dial[x] = 12;
-	else if (attrib == 1)					//Left half
-		last_dial[x] = 5;
-	else if (attrib == 2)					//half high
-		last_dial[x] = 3;
-	else if (attrib == 3)					//top left
-		last_dial[x] = 1;
-	else					 				//none
-		last_dial[x] = 0;
+	if (x > 0 && m_last_dial[x-1] == 1) 		//top right
+		m_last_dial[x] = 2;
+	else if (x > 0 && m_last_dial[x-1] == 5)	//half right
+		m_last_dial[x] = 10;
+	else if (m_last_dial[x] == 1)				//bottom left
+		m_last_dial[x] = 4;
+	else if (m_last_dial[x] == 2)				//bottom right
+		m_last_dial[x] = 8;
+	else if (m_last_dial[x] == 3)				//lower half
+		m_last_dial[x] = 12;
+	else if (attrib == 1)						//Left half
+		m_last_dial[x] = 5;
+	else if (attrib == 2)						//half high
+		m_last_dial[x] = 3;
+	else if (attrib == 3)						//top left
+		m_last_dial[x] = 1;
+	else										//none
+		m_last_dial[x] = 0;
 
-	return last_dial[x];
+	return m_last_dial[x];
 }
 
 // zoom the char
@@ -413,14 +413,14 @@ void ef9345_device::zoom(UINT8 *pix, UINT16 n)
 UINT16 ef9345_device::indexblock(UINT16 x, UINT16 y)
 {
 	UINT16 i = x, j;
-	j = (y == 0) ? ((TGS & 0x20) >> 5) : ((ROR & 0x1f) + y - 1);
+	j = (y == 0) ? ((m_tgs & 0x20) >> 5) : ((m_ror & 0x1f) + y - 1);
 
 	//right side of a double width character
-	if ((TGS & 0x80) == 0 && x > 0)
+	if ((m_tgs & 0x80) == 0 && x > 0)
 	{
-		if (last_dial[x - 1] == 1) i--;
-		if (last_dial[x - 1] == 4) i--;
-		if (last_dial[x - 1] == 5) i--;
+		if (m_last_dial[x - 1] == 1) i--;
+		if (m_last_dial[x - 1] == 4) i--;
+		if (m_last_dial[x - 1] == 5) i--;
 	}
 
 	return 0x40 * j + i;
@@ -432,9 +432,9 @@ void ef9345_device::bichrome40(UINT8 type, UINT16 address, UINT8 dial, UINT16 ib
 	UINT16 i;
 	UINT8 pix[80];
 
-	if (flash && PAT & 0x40 && blink)
+	if (flash && m_pat & 0x40 && m_blink)
 		c1 = c0;					//flash
-	if (hided && PAT & 0x08)
+	if (hided && m_pat & 0x08)
 		c1 = c0;        			//hided
 	if (negative)					//negative
 	{
@@ -443,23 +443,23 @@ void ef9345_device::bichrome40(UINT8 type, UINT16 address, UINT8 dial, UINT16 ib
 		c0 = i;
 	}
 
-	if ((PAT & 0x30) == 0x30)
+	if ((m_pat & 0x30) == 0x30)
 		insert = 0;         		//active area mark
 	if (insert == 0)
-		c1 += 8;                   	//foreground color
-	if ((PAT & 0x30) == 0x00)
+		c1 += 8;                	//foreground color
+	if ((m_pat & 0x30) == 0x00)
 		insert = 1;         		//insert mode
 	if (insert == 0)
-		c0 += 8;                   	//background color
+		c0 += 8;                	//background color
 
 	//draw the cursor
-	i = (registers[6] & 0x1f);
+	i = (m_registers[6] & 0x1f);
 	if (i < 8)
 		i &= 1;
 
-	if (iblock == 0x40 * i + (registers[7] & 0x3f))	//cursor position
+	if (iblock == 0x40 * i + (m_registers[7] & 0x3f))	//cursor position
 	{
-		switch(MAT & 0x70)
+		switch(m_mat & 0x70)
 		{
 		case 0x40:					//00 = fixed complemented
 			c0 = (23 - c0) & 15;
@@ -469,14 +469,14 @@ void ef9345_device::bichrome40(UINT8 type, UINT16 address, UINT8 dial, UINT16 ib
 			underline = 1;
 			break;
 		case 0x60:					//10 = flash complemented
-			if (blink)
+			if (m_blink)
 			{
 				c0 = (23 - c0) & 15;
 				c1 = (23 - c1) & 15;
 			}
 			break;
 		case 0x70:					//11 = flash underlined
-			if (blink)
+			if (m_blink)
 				underline = 1;
 				break;
 		}
@@ -499,7 +499,7 @@ void ef9345_device::bichrome40(UINT8 type, UINT16 address, UINT8 dial, UINT16 ib
 		zoom(pix, dial);
 
 	//doubles the height of the char
-	if (MAT & 0x80)
+	if (m_mat & 0x80)
 		zoom(pix, (y & 0x01) ? 0x0c : 0x03);
 
 	draw_char_40(pix, x + 1 , y + 1);
@@ -520,7 +520,7 @@ void ef9345_device::quadrichrome40(UINT8 c, UINT8 b, UINT8 a, UINT16 x, UINT16 y
 	UINT16 ramindex;
 
 	//quadrichrome don't suppor double size
-	last_dial[x] = 0;
+	m_last_dial[x] = 0;
 
 	//initialize the color table
 	for(j = 1, n = 0, i = 0; i < 8; i++)
@@ -559,9 +559,9 @@ void ef9345_device::bichrome80(UINT8 c, UINT8 a, UINT16 x, UINT16 y)
 {
 	UINT8 c0, c1, pix[60];
 	UINT16 i, j, d;
-	
-	c1 = (a & 1) ? (DOR >> 4) & 7 : DOR & 7; //foreground color = DOR
-	c0 =  MAT & 7;                           //background color = MAT
+
+	c1 = (a & 1) ? (m_dor >> 4) & 7 : m_dor & 7;	//foreground color = DOR
+	c0 =  m_mat & 7;                        		//background color = MAT
 
 	switch(c & 0x80)
 	{
@@ -572,8 +572,8 @@ void ef9345_device::bichrome80(UINT8 c, UINT8 a, UINT16 x, UINT16 y)
 		//A3: N = negative
 		//C0-6: character code
 
-		if ((a & 4) && (PAT & 0x40) && (blink))
-			c1 = c0; 	//flash
+		if ((a & 4) && (m_pat & 0x40) && (m_blink))
+			c1 = c0;	//flash
 		if (a & 8)		//negative
 		{
 			i = c1;
@@ -631,9 +631,9 @@ void ef9345_device::makechar_16x40(UINT16 x, UINT16 y)
 	UINT8 a, b, c0, c1, i, f, m, n, u, type, dial;
 	UINT16 address, iblock;
 
-	iblock = (MAT & 0x80 && y > 1) ? indexblock(x, y / 2) : indexblock(x, y);
-	a = videoram->read_byte(block + iblock);
-	b = videoram->read_byte(block + iblock + 0x0800);
+	iblock = (m_mat & 0x80 && y > 1) ? indexblock(x, y / 2) : indexblock(x, y);
+	a = m_videoram->read_byte(m_block + iblock);
+	b = m_videoram->read_byte(m_block + iblock + 0x0800);
 
 	dial = get_dial(x, (a & 0x80) ? 0 : (((a & 0x20) >> 5) | ((a & 0x10) >> 3)));
 
@@ -650,26 +650,26 @@ void ef9345_device::makechar_16x40(UINT16 x, UINT16 y)
 
 	//reset attributes latch
 	if (x == 0)
-		latchm = latchi = latchu = latchc0 = 0;
+		m_latchm = m_latchi = m_latchu = m_latchc0 = 0;
 
 	if (type == 4)
 	{
-		latchm = b & 1;
-		latchi = (b & 2) >> 1;
-		latchu = (b & 4) >> 2;
+		m_latchm = b & 1;
+		m_latchi = (b & 2) >> 1;
+		m_latchu = (b & 4) >> 2;
 	}
 
 	if (a & 0x80)
-		latchc0 = (a & 0x70) >> 4;
+		m_latchc0 = (a & 0x70) >> 4;
 
 	//char attributes
-	c0 = latchc0;							//background
+	c0 = m_latchc0;							//background
 	c1 = a & 0x07;							//foreground
-	i = latchi;								//insert mode
+	i = m_latchi;								//insert mode
 	f  = (a & 0x08) >> 3;					//flash
-	m = latchm;								//hided
+	m = m_latchm;								//hided
 	n  = (a & 0x80) ? 0: ((a & 0x40) >> 6);	//negative
-	u = latchu;								//underline
+	u = m_latchu;								//underline
 
 	bichrome40(type, address, dial, iblock, x, y, c0, c1, i, f, m, n, u);
 }
@@ -680,10 +680,10 @@ void ef9345_device::makechar_24x40(UINT16 x, UINT16 y)
 	UINT8 a, b, c, c0, c1, i, f, m, n, u, type, dial;
 	UINT16 address, iblock;
 
-	iblock = (MAT & 0x80 && y > 1) ? indexblock(x, y / 2) : indexblock(x, y);
-	c = videoram->read_byte(block + iblock);
-	b = videoram->read_byte(block + iblock + 0x0800);
-	a = videoram->read_byte(block + iblock + 0x1000);
+	iblock = (m_mat & 0x80 && y > 1) ? indexblock(x, y / 2) : indexblock(x, y);
+	c = m_videoram->read_byte(m_block + iblock);
+	b = m_videoram->read_byte(m_block + iblock + 0x0800);
+	a = m_videoram->read_byte(m_block + iblock + 0x1000);
 
 	if ((b & 0xc0) == 0xc0)
 	{
@@ -713,30 +713,30 @@ void ef9345_device::makechar_24x40(UINT16 x, UINT16 y)
 void ef9345_device::makechar_12x80(UINT16 x, UINT16 y)
 {
 	UINT16 iblock = indexblock(x, y);
-	bichrome80(videoram->read_byte(block + iblock), (videoram->read_byte(block + iblock + 0x1000) >> 4) & 0x0f, 2 * x + 1, y + 1);
-	bichrome80(videoram->read_byte(block + iblock + 0x0800), videoram->read_byte(block + iblock + 0x1000) & 0x0f, 2 * x + 2, y + 1);
+	bichrome80(m_videoram->read_byte(m_block + iblock), (m_videoram->read_byte(m_block + iblock + 0x1000) >> 4) & 0x0f, 2 * x + 1, y + 1);
+	bichrome80(m_videoram->read_byte(m_block + iblock + 0x0800), m_videoram->read_byte(m_block + iblock + 0x1000) & 0x0f, 2 * x + 2, y + 1);
 }
 
 void ef9345_device::draw_border(UINT16 line)
 {
-	if (char_mode == MODE12x80 || char_mode == MODE8x80)
+	if (m_char_mode == MODE12x80 || m_char_mode == MODE8x80)
 		for(int i = 0; i < 82; i++)
-			draw_char_80(border, i, line);
+			draw_char_80(m_border, i, line);
 	else
 		for(int i = 0; i < 42; i++)
-			draw_char_40(border, i, line);
+			draw_char_40(m_border, i, line);
 }
 
 void ef9345_device::makechar(UINT16 x, UINT16 y)
 {
-	switch (char_mode)
+	switch (m_char_mode)
 	{
 		case MODE24x40:
 			makechar_24x40(x, y);
 			break;
 		case MODEVAR40:
 		case MODE8x80:
-			logerror("Unemulated EF9345 mode: %02x\n", char_mode);
+			logerror("Unemulated EF9345 mode: %02x\n", m_char_mode);
 			break;
 		case MODE12x80:
 			makechar_12x80(x, y);
@@ -745,7 +745,7 @@ void ef9345_device::makechar(UINT16 x, UINT16 y)
 			makechar_16x40(x, y);
 			break;
 		default:
-			logerror("Unknown EF9345 mode: %02x\n", char_mode);
+			logerror("Unknown EF9345 mode: %02x\n", m_char_mode);
 			break;
 	}
 }
@@ -753,9 +753,9 @@ void ef9345_device::makechar(UINT16 x, UINT16 y)
 // Execute EF9345 command
 void ef9345_device::ef9345_exec(UINT8 cmd)
 {
-	state = 0;
-	if ((registers[5] & 0x3f) == 39) state |= 0x10; //S4(LXa) set
-	if ((registers[7] & 0x3f) == 39) state |= 0x20; //S5(LXm) set
+	m_state = 0;
+	if ((m_registers[5] & 0x3f) == 39) m_state |= 0x10; //S4(LXa) set
+	if ((m_registers[7] & 0x3f) == 39) m_state |= 0x20; //S5(LXm) set
 
 	UINT16 a = indexram(7);
 
@@ -764,49 +764,49 @@ void ef9345_device::ef9345_exec(UINT8 cmd)
 		case 0x00:	//KRF: R1,R2,R3->ram
 		case 0x01:	//KRF: R1,R2,R3->ram + increment
 			set_busy_flag(4);
-			videoram->write_byte(a, registers[1]);
-			videoram->write_byte(a + 0x0800, registers[2]);
-			videoram->write_byte(a + 0x1000, registers[3]);
+			m_videoram->write_byte(a, m_registers[1]);
+			m_videoram->write_byte(a + 0x0800, m_registers[2]);
+			m_videoram->write_byte(a + 0x1000, m_registers[3]);
 			if (cmd&1) inc_x(7);
 			break;
 		case 0x02:	//KRG: R1,R2->ram
 		case 0x03:	//KRG: R1,R2->ram + increment
 			set_busy_flag(5.5);
-			videoram->write_byte(a, registers[1]);
-			videoram->write_byte(a + 0x0800, registers[2]);
+			m_videoram->write_byte(a, m_registers[1]);
+			m_videoram->write_byte(a + 0x0800, m_registers[2]);
 			if (cmd&1) inc_x(7);
 			break;
 		case 0x08:	//KRF: ram->R1,R2,R3
 		case 0x09:	//KRF: ram->R1,R2,R3 + increment
 			set_busy_flag(7.5);
-			registers[1] = videoram->read_byte(a);
-			registers[2] = videoram->read_byte(a + 0x0800);
-			registers[3] = videoram->read_byte(a + 0x1000);
+			m_registers[1] = m_videoram->read_byte(a);
+			m_registers[2] = m_videoram->read_byte(a + 0x0800);
+			m_registers[3] = m_videoram->read_byte(a + 0x1000);
 			if (cmd&1) inc_x(7);
 			break;
 		case 0x0a:	//KRG: ram->R1,R2
 		case 0x0b:	//KRG: ram->R1,R2 + increment
 			set_busy_flag(7.5);
-			registers[1] = videoram->read_byte(a);
-			registers[2] = videoram->read_byte(a + 0x0800);
+			m_registers[1] = m_videoram->read_byte(a);
+			m_registers[2] = m_videoram->read_byte(a + 0x0800);
 			if (cmd&1) inc_x(7);
 			break;
 		case 0x30:	//OCT: R1->RAM, main pointer
 		case 0x31:	//OCT: R1->RAM, main pointer + inc
 			set_busy_flag(4);
-			videoram->write_byte(indexram(7), registers[1]);
+			m_videoram->write_byte(indexram(7), m_registers[1]);
 
 			if (cmd&1)
 			{
 				inc_x(7);
-				if ((registers[7] & 0x3f) == 0)
+				if ((m_registers[7] & 0x3f) == 0)
 					inc_y(6);
 			}
 			break;
 		case 0x34:	//OCT: R1->RAM, aux pointer
 		case 0x35:	//OCT: R1->RAM, aux pointer + inc
 			set_busy_flag(4);
-			videoram->write_byte(indexram(5), registers[1]);
+			m_videoram->write_byte(indexram(5), m_registers[1]);
 
 			if (cmd&1)
 				inc_x(5);
@@ -814,20 +814,20 @@ void ef9345_device::ef9345_exec(UINT8 cmd)
 		case 0x38:	//OCT: RAM->R1, main pointer
 		case 0x39:	//OCT: RAM->R1, main pointer + inc
 			set_busy_flag(4.5);
-			registers[1] = videoram->read_byte(indexram(7));
+			m_registers[1] = m_videoram->read_byte(indexram(7));
 
 			if (cmd&1)
 			{
 				inc_x(7);
 
-				if ((registers[7] & 0x3f) == 0)
+				if ((m_registers[7] & 0x3f) == 0)
 					inc_y(6);
 			}
 			break;
 		case 0x3c:	//OCT: RAM->R1, aux pointer
 		case 0x3d:	//OCT: RAM->R1, aux pointer + inc
 			set_busy_flag(4.5);
-			registers[1] = videoram->read_byte(indexram(5));
+			m_registers[1] = m_videoram->read_byte(indexram(5));
 
 			if (cmd&1)
 				inc_x(5);
@@ -835,50 +835,50 @@ void ef9345_device::ef9345_exec(UINT8 cmd)
 		case 0x50:	//KRL: 80 UINT8 - 12 bits write
 		case 0x51:	//KRL: 80 UINT8 - 12 bits write + inc
 			set_busy_flag(12.5);
-			videoram->write_byte(a, registers[1]);
+			m_videoram->write_byte(a, m_registers[1]);
 			switch((a / 0x0800) & 1)
 			{
 				case 0:
 				{
-					UINT8 tmp_data = videoram->read_byte(a + 0x1000);
-					videoram->write_byte(a + 0x1000, (tmp_data & 0x0f) | (registers[3] & 0xf0));
+					UINT8 tmp_data = m_videoram->read_byte(a + 0x1000);
+					m_videoram->write_byte(a + 0x1000, (tmp_data & 0x0f) | (m_registers[3] & 0xf0));
 					break;
 				}
 				case 1:
 				{
-					UINT8 tmp_data = videoram->read_byte(a + 0x0800);
-					videoram->write_byte(a + 0x0800, (tmp_data & 0xf0) | (registers[3] & 0x0f));
+					UINT8 tmp_data = m_videoram->read_byte(a + 0x0800);
+					m_videoram->write_byte(a + 0x0800, (tmp_data & 0xf0) | (m_registers[3] & 0x0f));
 					break;
 				}
 			}
 			if (cmd&1)
 			{
-				if ((registers[7] & 0x80) == 0x00) { registers[7] |= 0x80; return; }
-				registers[7] &= 0x80;
+				if ((m_registers[7] & 0x80) == 0x00) { m_registers[7] |= 0x80; return; }
+				m_registers[7] &= 0x80;
 				inc_x(7);
 			}
 			break;
 		case 0x58:	//KRL: 80 UINT8 - 12 bits read
 		case 0x59:	//KRL: 80 UINT8 - 12 bits read + inc
 			set_busy_flag(11.5);
-			registers[1] = videoram->read_byte(a);
+			m_registers[1] = m_videoram->read_byte(a);
 			switch((a / 0x0800) & 1)
 			{
 				case 0:
-					registers[3] = videoram->read_byte(a + 0x1000);
+					m_registers[3] = m_videoram->read_byte(a + 0x1000);
 					break;
 				case 1:
-					registers[3] = videoram->read_byte(a + 0x0800);
+					m_registers[3] = m_videoram->read_byte(a + 0x0800);
 					break;
 			}
 			if (cmd&1)
 			{
-				if ((registers[7] & 0x80) == 0x00)
+				if ((m_registers[7] & 0x80) == 0x00)
 				{
-					registers[7] |= 0x80;
+					m_registers[7] |= 0x80;
 					break;;
 				}
-				registers[7] &= 0x80;
+				m_registers[7] &= 0x80;
 				inc_x(7);
 			}
 			break;
@@ -892,14 +892,14 @@ void ef9345_device::ef9345_exec(UINT8 cmd)
 			set_busy_flag(2);
 			switch(cmd&7)
 			{
-				case 1: 	TGS = registers[1]; break;
-				case 2: 	MAT = registers[1]; break;
-				case 3: 	PAT = registers[1]; break;
-				case 4: 	DOR = registers[1]; break;
-				case 7: 	ROR = registers[1]; break;
+				case 1: 	m_tgs = m_registers[1]; break;
+				case 2: 	m_mat = m_registers[1]; break;
+				case 3: 	m_pat = m_registers[1]; break;
+				case 4: 	m_dor = m_registers[1]; break;
+				case 7: 	m_ror = m_registers[1]; break;
 			}
 			set_video_mode();
-			state &= 0x8f;  //reset S4(LXa), S5(LXm), S6(Al)
+			m_state &= 0x8f;  //reset S4(LXa), S5(LXm), S6(Al)
 			break;
 		case 0x88:	//IND: ROM->R1
 		case 0x89:	//IND: TGS->R1
@@ -910,14 +910,14 @@ void ef9345_device::ef9345_exec(UINT8 cmd)
 			set_busy_flag(3.5);
 			switch(cmd&7)
 			{
-				case 0: 	registers[1] = charset->u8(indexrom(7) & 0x1fff);
-				case 1: 	registers[1] = TGS; break;
-				case 2: 	registers[1] = MAT; break;
-				case 3: 	registers[1] = PAT; break;
-				case 4: 	registers[1] = DOR; break;
-				case 7: 	registers[1] = ROR; break;
+				case 0: 	m_registers[1] = m_charset->u8(indexrom(7) & 0x1fff);
+				case 1: 	m_registers[1] = m_tgs; break;
+				case 2: 	m_registers[1] = m_mat; break;
+				case 3: 	m_registers[1] = m_pat; break;
+				case 4: 	m_registers[1] = m_dor; break;
+				case 7: 	m_registers[1] = m_ror; break;
 			}
-			state &= 0x8f;  //reset S4(LXa), S5(LXm), S6(Al)
+			m_state &= 0x8f;  //reset S4(LXa), S5(LXm), S6(Al)
 			break;
 		case 0x90:	//NOP: no operation
 		case 0x91:	//NOP: no operation
@@ -927,7 +927,7 @@ void ef9345_device::ef9345_exec(UINT8 cmd)
 		case 0xb0:	//INY: increment Y
 			set_busy_flag(2);
 			inc_y(6);
-			state &= 0x8f;  //reset S4(LXa), S5(LXm), S6(Al)
+			m_state &= 0x8f;  //reset S4(LXa), S5(LXm), S6(Al)
 			break;
 		case 0xd5:	//MVB: move buffer MP->AP stop
 		case 0xd6:	//MVB: move buffer MP->AP nostop
@@ -951,17 +951,17 @@ void ef9345_device::ef9345_exec(UINT8 cmd)
 			for(i = 0; i < 1280; i++)
 			{
 				a1 = indexram(r1); a2 = indexram(r2);
-				videoram->write_byte(a2, videoram->read_byte(a1));
+				m_videoram->write_byte(a2, m_videoram->read_byte(a1));
 
-				if (n > 1) videoram->write_byte(a2 + 0x0800, videoram->read_byte(a1 + 0x0800));
-				if (n > 2) videoram->write_byte(a2 + 0x1000, videoram->read_byte(a1 + 0x1000));
+				if (n > 1) m_videoram->write_byte(a2 + 0x0800, m_videoram->read_byte(a1 + 0x0800));
+				if (n > 2) m_videoram->write_byte(a2 + 0x1000, m_videoram->read_byte(a1 + 0x1000));
 
 				inc_x(r1);
 				inc_x(r2);
-				if ((registers[5] & 0x3f) == 0 && (cmd&1))
+				if ((m_registers[5] & 0x3f) == 0 && (cmd&1))
 					break;
 
-				if ((registers[7] & 0x3f) == 0)
+				if ((m_registers[7] & 0x3f) == 0)
 				{
 					if (cmd&1)
 						break;
@@ -971,7 +971,7 @@ void ef9345_device::ef9345_exec(UINT8 cmd)
 
 				busy += 4 * n;
 			}
-			state &= 0x8f;  //reset S4(LXa), S5(LXm), S6(Al)
+			m_state &= 0x8f;  //reset S4(LXa), S5(LXm), S6(Al)
 			set_busy_flag(busy);
 		}
 		break;
@@ -993,7 +993,7 @@ void ef9345_device::ef9345_exec(UINT8 cmd)
 
 void ef9345_device::video_update(bitmap_t *bitmap, const rectangle *cliprect)
 {
-	copybitmap(bitmap, screen_out, 0, 0, 0, 0, cliprect);
+	copybitmap(bitmap, m_screen_out, 0, 0, 0, 0, cliprect);
 }
 
 void ef9345_device::update_scanline(UINT16 scanline)
@@ -1001,35 +1001,35 @@ void ef9345_device::update_scanline(UINT16 scanline)
 	UINT16 i;
 
 	if (scanline == 250)
-		state &= 0xfb;
+		m_state &= 0xfb;
 
 	set_busy_flag(104);
 
-	if (char_mode == MODE12x80 || char_mode == MODE8x80)
+	if (m_char_mode == MODE12x80 || m_char_mode == MODE8x80)
 	{
-		draw_char_80(border, 0, (scanline / 10) + 1);
-		draw_char_80(border, 81, (scanline / 10) + 1);
+		draw_char_80(m_border, 0, (scanline / 10) + 1);
+		draw_char_80(m_border, 81, (scanline / 10) + 1);
 	}
 	else
 	{
-		draw_char_40(border, 0, (scanline / 10) + 1);
-		draw_char_40(border, 41, (scanline / 10) + 1);
+		draw_char_40(m_border, 0, (scanline / 10) + 1);
+		draw_char_40(m_border, 41, (scanline / 10) + 1);
 	}
 
 	if (scanline == 0)
 	{
-		state |= 0x04;
+		m_state |= 0x04;
 		draw_border(0);
-		if (PAT & 1)
+		if (m_pat & 1)
 			for(i = 0; i < 40; i++)
 				makechar(i, (scanline / 10));
 		else
 			for(i = 0; i < 42; i++)
-				draw_char_40(border, i, 1);
+				draw_char_40(m_border, i, 1);
 	}
 	else if (scanline < 120)
 	{
-		if (PAT & 2)
+		if (m_pat & 2)
 			for(i = 0; i < 40; i++)
 				makechar(i, (scanline / 10));
 		else
@@ -1037,7 +1037,7 @@ void ef9345_device::update_scanline(UINT16 scanline)
 	}
 	else if (scanline < 250)
 	{
-		if (PAT & 4)
+		if (m_pat & 4)
 			for(i = 0; i < 40; i++)
 				makechar(i, (scanline / 10));
 		else
@@ -1051,20 +1051,20 @@ void ef9345_device::update_scanline(UINT16 scanline)
 READ8_MEMBER( ef9345_device::data_r )
 {
 	if (offset & 7)
-		return registers[offset & 7];
+		return m_registers[offset & 7];
 
-	if (bf)
-		state |= 0x80;
+	if (m_bf)
+		m_state |= 0x80;
 	else
-		state &= 0x7f;
+		m_state &= 0x7f;
 
-	return state;
+	return m_state;
 }
 
 WRITE8_MEMBER( ef9345_device::data_w )
 {
-	registers[offset & 7] = data;
+	m_registers[offset & 7] = data;
 
 	if (offset & 8)
-		ef9345_exec(registers[0] & 0xff);
+		ef9345_exec(m_registers[0] & 0xff);
 }

@@ -76,11 +76,11 @@ public:
 	UINT8 kb_read(running_machine *machine);
 	void update_banks(running_machine *machine);
 	datapack *get_active_slot(UINT8 data);
-	WRITE8_MEMBER( hd63701_int_reg_w );
-	READ8_MEMBER( hd63701_int_reg_r );
+	DECLARE_WRITE8_MEMBER( hd63701_int_reg_w );
+	DECLARE_READ8_MEMBER( hd63701_int_reg_r );
 	void io_rw(address_space &space, UINT16 offset);
-	WRITE8_MEMBER( io_w );
-	READ8_MEMBER( io_r );
+	DECLARE_WRITE8_MEMBER( io_w );
+	DECLARE_READ8_MEMBER( io_r );
 };
 
 #endif	// _PSION_H_

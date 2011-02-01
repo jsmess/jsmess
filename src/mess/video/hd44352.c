@@ -112,28 +112,28 @@ void hd44352_device::device_start()
 	m_on_timer = device_timer_alloc(*this, ON_TIMER);
 	timer_adjust_periodic(m_on_timer, ATTOTIME_IN_HZ(m_clock/16384), 0, ATTOTIME_IN_HZ(m_clock/16384));
 
-	state_save_register_device_item( this, 0, control_lines);
-	state_save_register_device_item( this, 0, data_bus);
-	state_save_register_device_item( this, 0, state);
-	state_save_register_device_item( this, 0, offset);
-	state_save_register_device_item( this, 0, char_width);
-	state_save_register_device_item( this, 0, bank);
-	state_save_register_device_item( this, 0, lcd_on);
-	state_save_register_device_item( this, 0, scroll);
-	state_save_register_device_item( this, 0, contrast);
-	state_save_register_device_item( this, 0, byte_count);
-	state_save_register_device_item( this, 0, cursor_status);
-	state_save_register_device_item( this, 0, cursor_x);
-	state_save_register_device_item( this, 0, cursor_y);
-	state_save_register_device_item( this, 0, cursor_lcd);
-	state_save_register_device_item_array( this, 0, video_ram[0]);
-	state_save_register_device_item_array( this, 0, video_ram[1]);
-	state_save_register_device_item_array( this, 0, par);
-	state_save_register_device_item_array( this, 0, cursor);
-	state_save_register_device_item_array( this, 0, custom_char[0]);
-	state_save_register_device_item_array( this, 0, custom_char[1]);
-	state_save_register_device_item_array( this, 0, custom_char[2]);
-	state_save_register_device_item_array( this, 0, custom_char[3]);
+	state_save_register_device_item( this, 0, m_control_lines);
+	state_save_register_device_item( this, 0, m_data_bus);
+	state_save_register_device_item( this, 0, m_state);
+	state_save_register_device_item( this, 0, m_offset);
+	state_save_register_device_item( this, 0, m_char_width);
+	state_save_register_device_item( this, 0, m_bank);
+	state_save_register_device_item( this, 0, m_lcd_on);
+	state_save_register_device_item( this, 0, m_scroll);
+	state_save_register_device_item( this, 0, m_contrast);
+	state_save_register_device_item( this, 0, m_byte_count);
+	state_save_register_device_item( this, 0, m_cursor_status);
+	state_save_register_device_item( this, 0, m_cursor_x);
+	state_save_register_device_item( this, 0, m_cursor_y);
+	state_save_register_device_item( this, 0, m_cursor_lcd);
+	state_save_register_device_item_array( this, 0, m_video_ram[0]);
+	state_save_register_device_item_array( this, 0, m_video_ram[1]);
+	state_save_register_device_item_array( this, 0, m_par);
+	state_save_register_device_item_array( this, 0, m_cursor);
+	state_save_register_device_item_array( this, 0, m_custom_char[0]);
+	state_save_register_device_item_array( this, 0, m_custom_char[1]);
+	state_save_register_device_item_array( this, 0, m_custom_char[2]);
+	state_save_register_device_item_array( this, 0, m_custom_char[3]);
 }
 
 
@@ -143,24 +143,24 @@ void hd44352_device::device_start()
 
 void hd44352_device::device_reset()
 {
-	memset(video_ram, 0x00, 0x300);
-	memset(par, 0x00, 3);
-	memset(custom_char, 0x00, 4*8);
-	memset(cursor, 0x00, 8);
-	control_lines = 0;
-	data_bus = 0xff;
-	state = 0;
-	bank = 0;
-	offset = 0;
-	char_width = 6;
-	lcd_on = 0;
-	scroll = 0;
-	byte_count = 0;
-	cursor_status = 0;
-	cursor_x = 0;
-	cursor_y = 0;
-	cursor_lcd = 0;
-	contrast = 0;
+	memset(m_video_ram, 0x00, sizeof(m_video_ram));
+	memset(m_par, 0x00, sizeof(m_par));
+	memset(m_custom_char, 0x00, sizeof(m_custom_char));
+	memset(m_cursor, 0x00, sizeof(m_cursor));
+	m_control_lines = 0;
+	m_data_bus = 0xff;
+	m_state = 0;
+	m_bank = 0;
+	m_offset = 0;
+	m_char_width = 6;
+	m_lcd_on = 0;
+	m_scroll = 0;
+	m_byte_count = 0;
+	m_cursor_status = 0;
+	m_cursor_x = 0;
+	m_cursor_y = 0;
+	m_cursor_lcd = 0;
+	m_contrast = 0;
 }
 
 
@@ -172,7 +172,7 @@ void hd44352_device::device_timer(emu_timer &timer, device_timer_id id, int para
 	switch(id)
 	{
 		case ON_TIMER:
-			if (control_lines & 0x40)
+			if (m_control_lines & 0x40)
 			{
 				devcb_call_write_line(&m_on, ASSERT_LINE);
 				devcb_call_write_line(&m_on, CLEAR_LINE);
@@ -187,21 +187,21 @@ void hd44352_device::device_timer(emu_timer &timer, device_timer_id id, int para
 
 int hd44352_device::video_update(bitmap_t &bitmap, const rectangle &cliprect)
 {
-	UINT8 cw = char_width;
+	UINT8 cw = m_char_width;
 
 	bitmap_fill(&bitmap, &cliprect, 0);
 
-	if (control_lines&0x80 && lcd_on)
+	if (m_control_lines&0x80 && m_lcd_on)
 	{
 		for (int a=0; a<2; a++)
 			for (int py=0; py<4; py++)
 				for (int px=0; px<16; px++)
-					if (BIT(cursor_status, 4) && px == cursor_x && py == cursor_y && a == cursor_lcd)
+					if (BIT(m_cursor_status, 4) && px == m_cursor_x && py == m_cursor_y && a == m_cursor_lcd)
 					{
 						//draw the cursor
 						for (int c=0; c<cw; c++)
 						{
-							UINT8 d = compute_newval((cursor_status>>5) & 0x07, video_ram[a][py*16*cw + px*cw + c + scroll * 48], cursor[c]);
+							UINT8 d = compute_newval((m_cursor_status>>5) & 0x07, m_video_ram[a][py*16*cw + px*cw + c + m_scroll * 48], m_cursor[c]);
 							for (int b=0; b<8; b++)
 							{
 								*BITMAP_ADDR16(&bitmap, py*8 + b, a*cw*16 + px*cw + c) = BIT(d, 7-b);
@@ -212,7 +212,7 @@ int hd44352_device::video_update(bitmap_t &bitmap, const rectangle &cliprect)
 					{
 						for (int c=0; c<cw; c++)
 						{
-							UINT8 d = video_ram[a][py*16*cw + px*cw + c + scroll * 48];
+							UINT8 d = m_video_ram[a][py*16*cw + px*cw + c + m_scroll * 48];
 							for (int b=0; b<8; b++)
 							{
 								*BITMAP_ADDR16(&bitmap, py*8 + b, a*cw*16 + px*cw + c) = BIT(d, 7-b);
@@ -227,10 +227,10 @@ int hd44352_device::video_update(bitmap_t &bitmap, const rectangle &cliprect)
 
 void hd44352_device::control_write(UINT8 data)
 {
-	if(control_lines == data)
-		state = 0;
+	if(m_control_lines == data)
+		m_state = 0;
 
-	control_lines = data;
+	m_control_lines = data;
 }
 
 UINT8 hd44352_device::compute_newval(UINT8 type, UINT8 oldval, UINT8 newval)
@@ -261,13 +261,13 @@ UINT8 hd44352_device::get_char(UINT16 pos)
 	switch ((UINT8)pos/8)
 	{
 		case 0xcf:
-			return custom_char[0][pos%8];
+			return m_custom_char[0][pos%8];
 		case 0xdf:
-			return custom_char[1][pos%8];
+			return m_custom_char[1][pos%8];
 		case 0xef:
-			return custom_char[2][pos%8];
+			return m_custom_char[2][pos%8];
 		case 0xff:
-			return custom_char[3][pos%8];
+			return m_custom_char[3][pos%8];
 		default:
 			return region()->u8(pos);
 	}
@@ -276,96 +276,96 @@ UINT8 hd44352_device::get_char(UINT16 pos)
 void hd44352_device::data_write(UINT8 data)
 {
 	// verify that controller is active
-	if (!(control_lines&0x80))
+	if (!(m_control_lines&0x80))
 		return;
 
-	if (control_lines & 0x01)
+	if (m_control_lines & 0x01)
 	{
-		if (!(control_lines&0x02) && !(control_lines&0x04))
+		if (!(m_control_lines&0x02) && !(m_control_lines&0x04))
 			return;
 
-		switch (state)
+		switch (m_state)
 		{
 			case 0:		//parameter 0
-				par[state++] = data;
+				m_par[m_state++] = data;
 				break;
 			case 1:		//parameter 1
-				par[state++] = data;
+				m_par[m_state++] = data;
 				break;
 			case 2:		//parameter 2
-				par[state++] = data;
+				m_par[m_state++] = data;
 				break;
 		}
 
-		switch (par[0] & 0x0f)
+		switch (m_par[0] & 0x0f)
 		{
 			case LCD_BYTE_INPUT:
 			case LCD_CHAR_OUTPUT:
 				{
-					if (state == 1)
-						bank = BIT(data, 4);
-					else if (state == 2)
-						offset = ((data>>1)&0x3f) % 48 + (BIT(data,7) * 48);
-					else if (state == 3)
-						offset += ((data & 0x03) * 96);
+					if (m_state == 1)
+						m_bank = BIT(data, 4);
+					else if (m_state == 2)
+						m_offset = ((data>>1)&0x3f) % 48 + (BIT(data,7) * 48);
+					else if (m_state == 3)
+						m_offset += ((data & 0x03) * 96);
 				}
 				break;
 			case LCD_BYTE_OUTPUT:
 				{
-					if (state == 1)
-						bank = BIT(data, 4);
-					else if (state == 2)
-						offset = ((data>>1)&0x3f) % 48 + (BIT(data,7) * 48);
-					else if (state == 3)
-						offset += ((data & 0x03) * 96);
+					if (m_state == 1)
+						m_bank = BIT(data, 4);
+					else if (m_state == 2)
+						m_offset = ((data>>1)&0x3f) % 48 + (BIT(data,7) * 48);
+					else if (m_state == 3)
+						m_offset += ((data & 0x03) * 96);
 				}
 				break;
 			case LCD_ON_OFF:
 				{
-					if (state == 1)
-						lcd_on = BIT(data, 4);
-					data_bus = 0xff;
-					state = 0;
+					if (m_state == 1)
+						m_lcd_on = BIT(data, 4);
+					m_data_bus = 0xff;
+					m_state = 0;
 				}
 				break;
 			case LCD_SCROLL_CHAR_WIDTH:
 				{
-					if (state == 1)
+					if (m_state == 1)
 					{
-						char_width = 8-((data>>4)&3);
-						scroll = ((data>>6)&3);
+						m_char_width = 8-((data>>4)&3);
+						m_scroll = ((data>>6)&3);
 					}
 
-					data_bus = 0xff;
-					state = 0;
+					m_data_bus = 0xff;
+					m_state = 0;
 				}
 				break;
 			case LCD_CURSOR_STATUS:
 				{
-					if (state == 1)
-						cursor_status = data;
-					data_bus = 0xff;
-					state = 0;
+					if (m_state == 1)
+						m_cursor_status = data;
+					m_data_bus = 0xff;
+					m_state = 0;
 				}
 				break;
 			case LCD_CONTRAST:
 				{
-					if (state == 1)
-						contrast = (contrast & 0x00ffff) | (data<<16);
-					else if (state == 2)
-						contrast = (contrast & 0xff00ff) | (data<<8);
-					else if (state == 3)
+					if (m_state == 1)
+						m_contrast = (m_contrast & 0x00ffff) | (data<<16);
+					else if (m_state == 2)
+						m_contrast = (m_contrast & 0xff00ff) | (data<<8);
+					else if (m_state == 3)
 					{
-						contrast = (contrast & 0xffff00) | (data<<0);
-						state = 0;
+						m_contrast = (m_contrast & 0xffff00) | (data<<0);
+						m_state = 0;
 					}
 
-					data_bus = 0xff;
+					m_data_bus = 0xff;
 				}
 				break;
 			case LCD_IRQ_FREQUENCY:
 				{
-					if (state == 1)
+					if (m_state == 1)
 					{
 						UINT32 on_timer_rate;
 
@@ -388,109 +388,108 @@ void hd44352_device::data_write(UINT8 data)
 
 						timer_adjust_periodic(m_on_timer, ATTOTIME_IN_HZ(m_clock/on_timer_rate), 0, ATTOTIME_IN_HZ(m_clock/on_timer_rate));
 					}
-					data_bus = 0xff;
-					state = 0;
+					m_data_bus = 0xff;
+					m_state = 0;
 				}
 				break;
 			case LCD_CURSOR_POSITION:
 				{
-					if (state == 1)
-						cursor_lcd = BIT(data, 4);	//0:left lcd 1:right lcd;
-					else if (state == 2)
-						cursor_x = ((data>>1)&0x3f) % 48 + (BIT(data,7) * 48);
-					else if (state == 3)
+					if (m_state == 1)
+						m_cursor_lcd = BIT(data, 4);	//0:left lcd 1:right lcd;
+					else if (m_state == 2)
+						m_cursor_x = ((data>>1)&0x3f) % 48 + (BIT(data,7) * 48);
+					else if (m_state == 3)
 					{
-						cursor_y = data & 0x03;
-						state = 0;
+						m_cursor_y = data & 0x03;
+						m_state = 0;
 					}
 
-					data_bus = 0xff;
+					m_data_bus = 0xff;
 				}
 				break;
 		}
 
-		byte_count = 0;
-		data_bus = 0xff;
+		m_byte_count = 0;
+		m_data_bus = 0xff;
 	}
 	else
 	{
-		switch (par[0] & 0x0f)
+		switch (m_par[0] & 0x0f)
 		{
 			case LCD_BYTE_INPUT:
 				{
-					if (((par[0]>>5) & 0x07) != 0x03)
+					if (((m_par[0]>>5) & 0x07) != 0x03)
 						break;
 
-					offset %= 0x180;
-					data_bus = ((video_ram[bank][offset]<<4)&0xf0) | ((video_ram[bank][offset]>>4)&0x0f);
-					offset++; byte_count++;
+					m_offset %= 0x180;
+					m_data_bus = ((m_video_ram[m_bank][m_offset]<<4)&0xf0) | ((m_video_ram[m_bank][m_offset]>>4)&0x0f);
+					m_offset++; m_byte_count++;
 				}
 				break;
 			case LCD_BYTE_OUTPUT:
 				{
-					offset %= 0x180;
-					video_ram[bank][offset] = compute_newval((par[0]>>5) & 0x07, video_ram[bank][offset], data);
-					offset++; byte_count++;
+					m_offset %= 0x180;
+					m_video_ram[m_bank][m_offset] = compute_newval((m_par[0]>>5) & 0x07, m_video_ram[m_bank][m_offset], data);
+					m_offset++; m_byte_count++;
 
-					data_bus = 0xff;
+					m_data_bus = 0xff;
 				}
 				break;
 			case LCD_CHAR_OUTPUT:
 				{
 					int char_pos = data*8;
 
-					for (int i=0; i<char_width; i++)
+					for (int i=0; i<m_char_width; i++)
 					{
-						offset %= 0x180;
-						video_ram[bank][offset] = compute_newval((par[0]>>5) & 0x07, video_ram[bank][offset], get_char(char_pos));
-						offset++; char_pos++;
+						m_offset %= 0x180;
+						m_video_ram[m_bank][m_offset] = compute_newval((m_par[0]>>5) & 0x07, m_video_ram[m_bank][m_offset], get_char(char_pos));
+						m_offset++; char_pos++;
 					}
 
-					byte_count++;
-					data_bus = 0xff;
+					m_byte_count++;
+					m_data_bus = 0xff;
 				}
 				break;
 			case LCD_CURSOR_GRAPHIC:
-				if (byte_count<8)
+				if (m_byte_count<8)
 				{
-					cursor[byte_count] = data;
-					byte_count++;
-					data_bus = 0xff;
+					m_cursor[m_byte_count] = data;
+					m_byte_count++;
+					m_data_bus = 0xff;
 				}
 				break;
 			case LCD_CURSOR_CHAR:
-				if (byte_count<1)
+				if (m_byte_count<1)
 				{
 					UINT8 char_code = ((data<<4)&0xf0) | ((data>>4)&0x0f);
 
 					for (int i=0; i<8; i++)
-						cursor[i] = get_char(char_code*8 + i);
+						m_cursor[i] = get_char(char_code*8 + i);
 
-					byte_count++;
-					data_bus = 0xff;
+					m_byte_count++;
+					m_data_bus = 0xff;
 				}
 				break;
 			case LCD_USER_CHARACTER:
-				if (byte_count<8)
+				if (m_byte_count<8)
 				{
-					custom_char[(par[0]&0x03)][byte_count] = data;
-					byte_count++;
-					data_bus = 0xff;
+					m_custom_char[(m_par[1]&0x03)][m_byte_count] = data;
+					m_byte_count++;
+					m_data_bus = 0xff;
 				}
 				break;
 			default:
-				data_bus = 0xff;
+				m_data_bus = 0xff;
 		}
 
-		state=0;
+		m_state=0;
 	}
 }
 
 UINT8 hd44352_device::data_read()
 {
-	return data_bus;
+	return m_data_bus;
 }
 
 // devices
 const device_type HD44352 = hd44352_device_config::static_alloc_device_config;
-
