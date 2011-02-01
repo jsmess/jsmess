@@ -11,7 +11,7 @@
 	- add differences between various models;
 	- implement proper upd3301 / i8257 support;
 	- mouse support;
-	- needs to support V1 / V2 properly;
+	- RTC support;
 	- Add limits for extend work RAM;
 	- What happens to the palette contents when the analog/digital palette mode changes?
 	- waitstates;
@@ -46,6 +46,7 @@
 	- Burning Point
 	- Burunet
 	- Castle Excellent (sets sector 0xf4?)
+	- Jark (needs PC-8801MC)
 	- Tobira wo Akete (random crashes in parent pc8801 only)
 
 	games that needs to NOT have write-protect floppies (BTANBs):
@@ -162,7 +163,6 @@ static UINT8 dmac_mode;
 static UINT8 alu_ctrl1,alu_ctrl2;
 static UINT8 extram_mode,extram_bank;
 static UINT8 txt_width, txt_color;
-static int vblank_pos;
 #ifdef USE_PROPER_I8214
 static UINT8 timer_irq_mask,vblank_irq_mask,sound_irq_mask,m_int_state;
 #else
@@ -454,7 +454,7 @@ static void draw_text_80(running_machine *machine, bitmap_t *bitmap,int y_size)
 
 			if(text_color_flag) // color mode
 			{
-				pal = (attr & 0xe0) >> 5;
+				pal = (attr & 8) ? ((attr & 0xe0) >> 5) : 7;  // Alpha behaves on this
 				gfx_mode = (attr & 0x10) >> 4;
 				reverse = 0;
 				secret = 0;
@@ -462,9 +462,6 @@ static void draw_text_80(running_machine *machine, bitmap_t *bitmap,int y_size)
 				lower = 0;
 				blink = 0;
 				pal|=8; //text pal bank
-
-				if(((attr & 8) == 8) && ((attr & 7) != 0))
-					popmessage("Warning: color switch enabled, contact MESSdev");
 			}
 			else // monochrome
 			{
@@ -509,7 +506,7 @@ static void draw_text_40(running_machine *machine, bitmap_t *bitmap, int y_size)
 
 			if(text_color_flag)
 			{
-				pal = (attr & 0xe0) >> 5;
+				pal = (attr & 8) ? ((attr & 0xe0) >> 5) : 7;  // Alpha behaves on this
 				gfx_mode = (attr & 0x10) >> 4;
 				reverse = 0;
 				secret = 0;
@@ -517,9 +514,6 @@ static void draw_text_40(running_machine *machine, bitmap_t *bitmap, int y_size)
 				lower = 0;
 				blink = 0;
 				pal|=8; //text pal bank
-
-				if(attr & 0x08)
-					popmessage("Warning: color switch enabled, contact MESSdev");
 			}
 			else
 			{
@@ -867,20 +861,17 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER( pc8801_ctrl_r )
 {
-	static UINT8 vrtc;
-
 	/*
+	11-- ----
 	--x- ---- vrtc
 	---x ---- calendar CDO
-	---- x--- (fdc related)
+	---- x--- fdc auto-boot DIP-SW
 	---- -x-- (RS-232C related)
 	---- --x- monitor refresh rate DIP-SW
 	---- ---x (pbsy?)
 	*/
 
-	vrtc = (space->machine->primary_screen->vpos() < vblank_pos) ? 0 : 1; // vblank
-
-	return (vrtc << 5) | 0xc0;
+	return input_port_read(space->machine, "CTRL");
 }
 
 static WRITE8_HANDLER( pc8801_ctrl_w )
@@ -926,8 +917,6 @@ static void pc8801_dynamic_res_change(running_machine *machine)
 	visarea.min_y = 0;
 	visarea.max_x = 640 - 1;
 	visarea.max_y = ((monitor_24KHz) ? 400 : 200) - 1;
-
-	vblank_pos = visarea.max_y + 1;
 
 	machine->primary_screen->configure(640, 480, visarea, machine->primary_screen->frame_period().attoseconds);
 }
@@ -1034,6 +1023,12 @@ static WRITE8_HANDLER( pc8801_misc_ctrl_w )
 	if(sound_irq_mask == 0)
 		sound_irq_latch = 0;
 	#endif
+}
+
+static WRITE8_HANDLER( pc8801_bgpal_w )
+{
+	if(data)
+		printf("BG Pal %02x\n",data);
 }
 
 static WRITE8_HANDLER( pc8801_palram_w )
@@ -1216,7 +1211,7 @@ static WRITE8_HANDLER( pc8801_txt_cmt_ctrl_w )
 	/* bits 2 to 5 are cmt related */
 
 	txt_width = data & 1;
-	txt_color = data & 2; //TODO: Alpha enables this, but don't want black as the text?
+	txt_color = data & 2;
 }
 
 static UINT32 knj_addr[2];
@@ -1309,6 +1304,11 @@ static WRITE8_HANDLER( pc8801_baudrate_w )
 		baudrate_val = data & 0xf;
 }
 
+static WRITE8_HANDLER( pc8801_rtc_w )
+{
+	printf("RTC write %02x\n",data);
+}
+
 static ADDRESS_MAP_START( pc8801_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
@@ -1329,7 +1329,7 @@ static ADDRESS_MAP_START( pc8801_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x0e, 0x0e) AM_READ_PORT("KEY14")
 	AM_RANGE(0x0f, 0x0f) AM_READ_PORT("KEY15")
 	AM_RANGE(0x00, 0x02) AM_WRITE(pc8801_pcg8100_w)
-//	AM_RANGE(0x10, 0x10) AM_WRITE(pc88_rtc_w)
+	AM_RANGE(0x10, 0x10) AM_WRITE(pc8801_rtc_w)
 	AM_RANGE(0x21, 0x21) AM_READ(sio_status_r)                                /* RS-232C and cassette */
 	AM_RANGE(0x30, 0x30) AM_READ_PORT("DSW1") AM_WRITE(pc8801_txt_cmt_ctrl_w)
 	AM_RANGE(0x31, 0x31) AM_READ_PORT("DSW2") AM_WRITE(pc8801_gfx_ctrl_w)
@@ -1342,7 +1342,7 @@ static ADDRESS_MAP_START( pc8801_io, ADDRESS_SPACE_IO, 8 )
 //  AM_RANGE(0x46, 0x47) AM_NOP                                     /* OPNA extra port */
 	AM_RANGE(0x50, 0x50) AM_READWRITE(pc8801_crtc_param_r, pc88_crtc_param_w)
 	AM_RANGE(0x51, 0x51) AM_READWRITE(pc8801_crtc_status_r, pc88_crtc_cmd_w)
-//	AM_RANGE(0x52, 0x52) //background palette
+	AM_RANGE(0x52, 0x52) AM_WRITE(pc8801_bgpal_w)
 	AM_RANGE(0x53, 0x53) AM_WRITE(pc8801_layer_masking_w)
 	AM_RANGE(0x54, 0x5b) AM_WRITE(pc8801_palram_w)
 	AM_RANGE(0x5c, 0x5c) AM_READ(pc8801_vram_select_r)
@@ -1681,10 +1681,7 @@ static INPUT_PORTS_START( pc8001 )
 	PORT_DIPNAME( 0x20, 0x20, "Duplex" )
 	PORT_DIPSETTING(    0x20, "Half" )
 	PORT_DIPSETTING(    0x00, "Full" )
-/*	PORT_DIPNAME( 0x40, 0x00, "Boot from floppy" )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Disable floppy" )
+/*	PORT_DIPNAME( 0x80, 0x80, "Disable floppy" )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )*/
 	PORT_DIPNAME( 0xc0, 0x40, "Basic mode" )
@@ -1692,7 +1689,18 @@ static INPUT_PORTS_START( pc8001 )
 	PORT_DIPSETTING(    0xc0, "N88-BASIC (V1)" )
 	PORT_DIPSETTING(    0x40, "N88-BASIC (V2)" )
 
+	PORT_START("CTRL")
+	PORT_DIPNAME( 0x02, 0x02, "Monitor Type" )
+	PORT_DIPSETTING(    0x02, "15 KHz" )
+	PORT_DIPSETTING(    0x00, "24 KHz" )
+	PORT_DIPNAME( 0x08, 0x08, "Auto-boot floppy at start-up" )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
+
 	PORT_START("CFG")		/* EXSWITCH */
+	#if 0 // reference only, afaik there isn't a thing like this ...
 	PORT_DIPNAME( 0x0f, 0x08, "Serial speed" )
 	PORT_DIPSETTING(    0x01, "75bps" )
 	PORT_DIPSETTING(    0x02, "150bps" )
@@ -1703,6 +1711,7 @@ static INPUT_PORTS_START( pc8001 )
 	PORT_DIPSETTING(    0x07, "4800bps" )
 	PORT_DIPSETTING(    0x08, "9600bps" )
 	PORT_DIPSETTING(    0x09, "19200bps" )
+	#endif
 	PORT_DIPNAME( 0x40, 0x40, "Speed mode" )
 	PORT_DIPSETTING(    0x00, "Slow" )
 	PORT_DIPSETTING(    0x40, DEF_STR( High ) )
