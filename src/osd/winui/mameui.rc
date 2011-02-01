@@ -1,10 +1,8 @@
 // Microsoft Visual C++ generated resource script.
 //
+#include "messres.h"
 #include "resource.h"
-
-#ifdef MESS
-#include "../../mess/osd/winui/resourcems.h "
-#endif
+#include "resourcems.h "
 
 // Generated Help ID header file
 #define APSTUDIO_HIDDEN_SYMBOLS
@@ -262,6 +260,85 @@ BEGIN
     END
 END
 
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDR_RUNTIME_MENU MENU
+BEGIN
+    POPUP "&File"
+    BEGIN
+        MENUITEM "&Load State...",              ID_FILE_LOADSTATE_NEWUI
+        MENUITEM "&Save State",                 ID_FILE_SAVESTATE
+        MENUITEM "S&ave State As...",           ID_FILE_SAVESTATE_AS
+        MENUITEM SEPARATOR
+        MENUITEM "Save Sc&reenshot",            ID_FILE_SAVESCREENSHOT
+        MENUITEM SEPARATOR
+        MENUITEM "&Exit",                       ID_FILE_EXIT_NEWUI
+    END
+    POPUP "&Edit"
+    BEGIN
+        MENUITEM "Paste",                       ID_EDIT_PASTE
+    END
+    POPUP "&Options"
+    BEGIN
+        MENUITEM "&Pause",                      ID_OPTIONS_PAUSE, GRAYED
+        MENUITEM "Soft &Reset",                 ID_OPTIONS_SOFTRESET
+        MENUITEM "Ha&rd Reset",                 ID_OPTIONS_HARDRESET
+        MENUITEM SEPARATOR
+        POPUP "&Keyboard"
+        BEGIN
+            MENUITEM "Emulated",                    ID_KEYBOARD_EMULATED
+            MENUITEM "Natural",                     ID_KEYBOARD_NATURAL
+            MENUITEM SEPARATOR
+            MENUITEM "Customize Emulated Keyboard...",     ID_KEYBOARD_CUSTOMIZE
+        END
+        MENUITEM "&Joysticks",                  ID_OPTIONS_JOYSTICKS, GRAYED
+        POPUP "&Video"
+        BEGIN
+		    MENUITEM SEPARATOR
+		    MENUITEM "Rotate 0 degrees",        ID_VIDEO_ROTATE_0
+		    MENUITEM "Rotate 90 degrees",       ID_VIDEO_ROTATE_90
+		    MENUITEM "Rotate 180 degrees",      ID_VIDEO_ROTATE_180
+		    MENUITEM "Rotate 270 degrees",      ID_VIDEO_ROTATE_270
+        END
+        MENUITEM "&Configuration...",           ID_OPTIONS_CONFIGURATION
+        MENUITEM "&DIP Switches...",            ID_OPTIONS_DIPSWITCHES
+        MENUITEM "&Miscellaneous Inputs...",    ID_OPTIONS_MISCINPUT
+        MENUITEM "&Analog Controls...",         ID_OPTIONS_ANALOGCONTROLS
+        MENUITEM SEPARATOR
+        POPUP "&Frameskip"
+        BEGIN
+            MENUITEM "Auto",                        ID_FRAMESKIP_AUTO
+        END
+        POPUP "Maximum &Speed"
+        BEGIN
+            MENUITEM "50%",                         ID_THROTTLE_50
+            MENUITEM "100%",                        ID_THROTTLE_100
+            MENUITEM "200%",                        ID_THROTTLE_200
+            MENUITEM "500%",                        ID_THROTTLE_500
+            MENUITEM "1000%",                       ID_THROTTLE_1000
+            MENUITEM "Unlimited",                   ID_THROTTLE_UNTHROTTLED
+        END
+        MENUITEM "Show &FPS",                   ID_OPTIONS_TOGGLEFPS
+        MENUITEM SEPARATOR
+        MENUITEM "&Hide Menubar\tScrLk",        ID_OPTIONS_TOGGLEMENUBAR
+        MENUITEM "&Full Screen\tAlt+Enter",     ID_OPTIONS_FULLSCREEN
+        MENUITEM "Show P&rofiler",              ID_OPTIONS_PROFILER, GRAYED
+        MENUITEM "&Debugger...",                ID_OPTIONS_DEBUGGER
+    END
+    POPUP "&Devices"
+    BEGIN
+        MENUITEM SEPARATOR
+    END
+    POPUP "&Help"
+    BEGIN
+        MENUITEM "About This System...",        ID_HELP_ABOUTSYSTEM
+        MENUITEM "&About MESS...",              ID_HELP_ABOUT_NEWUI
+    END
+END
+
 
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
@@ -271,7 +348,8 @@ END
 
 1 TEXTINCLUDE MOVEABLE PURE 
 BEGIN
-    "resource.h\0"
+    "resource.h\\r\n"
+	"messres.h\0"
 END
 
 2 TEXTINCLUDE MOVEABLE PURE  
@@ -300,7 +378,7 @@ END
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
 #ifdef MESS
-IDI_MAMEUI_ICON         ICON                    "res/mess.ico"
+IDI_MAMEUI_ICON         ICON                    "res\\mess.ico"
 #else
 IDI_MAMEUI_ICON         ICON                    "res\\mameui.ico"
 #endif
@@ -335,17 +413,24 @@ IDI_HEADER_UP           ICON                    "res\\header_up.ico"
 IDI_HEADER_DOWN         ICON                    "res\\header_down.ico"
 
 #ifdef MESS
-IDI_WIN_NOROMSNEEDED    ICON                    "res/win_nrnd.ico"
-IDI_WIN_MISSINGOPTROM	ICON	         		"res/win_noor.ico"
-IDI_WIN_FLOP            ICON        			"res/win_flop.ico"
-IDI_WIN_CASS            ICON        			"res/win_cass.ico"
-IDI_WIN_SERL            ICON       				"res/win_serl.ico"
-IDI_WIN_SNAP            ICON        			"res/win_snap.ico"
-IDI_WIN_PRIN            ICON        			"res/win_prin.ico"
-IDI_WIN_HARD            ICON        			"res/win_hard.ico"
-IDI_WIN_CYLN            ICON        			"res/win_cyln.ico"
-IDI_WIN_PTAP            ICON        			"res/win_ptap.ico"
-IDI_WIN_PCRD            ICON        			"res/win_pcrd.ico"
+IDI_WIN_NOROMSNEEDED    ICON                    "res\\win_nrnd.ico"
+IDI_WIN_MISSINGOPTROM	ICON	         		"res\\win_noor.ico"
+IDI_WIN_FLOP            ICON        			"res\\win_flop.ico"
+IDI_WIN_CASS            ICON        			"res\\win_cass.ico"
+IDI_WIN_SERL            ICON       				"res\\win_serl.ico"
+IDI_WIN_SNAP            ICON        			"res\\win_snap.ico"
+IDI_WIN_PRIN            ICON        			"res\\win_prin.ico"
+IDI_WIN_HARD            ICON        			"res\\win_hard.ico"
+IDI_WIN_CYLN            ICON        			"res\\win_cyln.ico"
+IDI_WIN_PTAP            ICON        			"res\\win_ptap.ico"
+IDI_WIN_PCRD            ICON        			"res\\win_pcrd.ico"
+IDI_ICON_CART           ICON    DISCARDABLE     "res\\cpu.ico"
+IDI_ICON_HARD           ICON    DISCARDABLE     "res\\harddisk.ico"
+IDI_ICON_CASS           ICON    DISCARDABLE     "res\\win_cass.ico"
+IDI_ICON_FLOP           ICON    DISCARDABLE     "res\\win_flop.ico"
+IDI_ICON_PRIN           ICON    DISCARDABLE     "res\\win_prin.ico"
+IDI_ICON_SERL           ICON    DISCARDABLE     "res\\win_serl.ico"
+IDI_ICON_SNAP           ICON    DISCARDABLE     "res\\win_snap.ico"
 #endif
 
 /////////////////////////////////////////////////////////////////////////////
@@ -1219,6 +1304,40 @@ BEGIN
                     TVS_FULLROWSELECT | WS_BORDER | WS_TABSTOP,6,18,178,90
     DEFPUSHBUTTON   "OK",IDOK,42,114,50,14
     PUSHBUTTON      "Cancel",IDCANCEL,98,114,50,14
+END
+
+IDD_PROP_SOFTWARE DIALOGEX 0, 0, 220, 220
+STYLE WS_CHILD | WS_CAPTION
+CAPTION "Software"
+FONT 8, "MS Sans Serif"
+BEGIN
+    ICON            IDI_WIN_FLOP,IDC_STATIC,20,10,20,20
+    LTEXT           "Title\nDirectory\nExtra",IDC_PROP_TITLE,52,9,161,25,
+                    SS_NOPREFIX
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,20,38,178,1
+    LTEXT           "Additional directories:",IDC_STATIC,7,40,157,8
+    CONTROL         "List1",IDC_DIR_LIST,"SysListView32",LVS_REPORT |
+                    LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_EDITLABELS |
+                    LVS_ALIGNLEFT | LVS_NOCOLUMNHEADER | WS_BORDER |
+                    WS_TABSTOP,7,50,206,120
+    PUSHBUTTON      "Browse...",IDC_DIR_BROWSE,7,180,50,14
+    PUSHBUTTON      "Insert",IDC_DIR_INSERT,85,180,50,14
+    PUSHBUTTON      "Delete",IDC_DIR_DELETE,163,180,50,14
+END
+
+
+IDD_PROP_CONFIGURATION DIALOGEX 0, 0, 220, 220
+STYLE WS_CHILD | WS_CAPTION
+CAPTION "Configuration"
+FONT 8, "MS Sans Serif"
+BEGIN
+    ICON            IDI_MAMEUI_ICON,IDC_STATIC,20,10,20,20
+    LTEXT           "Title\nDirectory\nExtra",IDC_PROP_TITLE,52,9,161,25,
+                    SS_NOPREFIX
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,20,38,178,1
+    LTEXT           "RAM size",IDC_RAM_CAPTION,20,50,50,10
+    COMBOBOX        IDC_RAM_COMBOBOX,70,50,100,76,CBS_DROPDOWNLIST | WS_VSCROLL |
+                    WS_TABSTOP
 END
 
 

@@ -27,24 +27,8 @@ OBJDIRS += \
 	$(MESSOBJ)/osd \
 	$(MESSOBJ)/osd/winui
 
-OSDCOREOBJS +=	\
-	$(MESS_WINUIOBJ)/dialog.o	\
-	$(MESS_WINUIOBJ)/menu.o	\
-	$(MESS_WINUIOBJ)/opcntrl.o	\
-	$(MESS_WINUIOBJ)/winutils.o
 
-OSDOBJS += \
-	$(MESS_WINUIOBJ)/messui.o \
-	$(MESS_WINUIOBJ)/optionsms.o \
-	$(MESS_WINUIOBJ)/layoutms.o \
-	$(MESS_WINUIOBJ)/msuiutil.o \
-	$(MESS_WINUIOBJ)/propertiesms.o \
-	$(MESS_WINUIOBJ)/swconfig.o \
-	$(MESS_WINUIOBJ)/softwarepicker.o \
-	$(MESS_WINUIOBJ)/softwarelist.o \
-	$(MESS_WINUIOBJ)/devview.o
-
-$(MESS_WINUIOBJ)/messui.res:	$(WINUISRC)/mameui.rc $(MESS_WINUISRC)/messui.rc $(WINUISRC)/resource.h $(MESS_WINUISRC)/resourcems.h $(WINUIOBJ)/mamevers.rc
+$(MESS_WINUIOBJ)/messui.res:	$(WINUISRC)/mameui.rc $(MESS_WINUISRC)/messui.rc $(WINUISRC)/resource.h $(WINUISRC)/resourcems.h $(WINUIOBJ)/mamevers.rc
 	@echo Compiling resources $<...
 	$(RC) $(RCDEFS) $(RCFLAGS) --include-dir $(WINUISRC) --include-dir $(MESS_WINUISRC) --include-dir $(WINUIOBJ) -o $@ -i $(MESS_WINUISRC)/messui.rc
 
@@ -74,7 +58,11 @@ WINOSDOBJS = \
 	$(WINOBJ)/video.o \
 	$(WINOBJ)/window.o \
 	$(WINOBJ)/winmain.o	\
-	$(WINOBJ)/debugwin.o
+	$(WINOBJ)/debugwin.o \
+	$(UIOBJ)/dialog.o	\
+	$(UIOBJ)/menu.o	\
+	$(UIOBJ)/opcntrl.o	\
+	$(UIOBJ)/winutils.o
 
 ifeq ($(DIRECT3D),8)
 WINOSDOBJS += $(WINOBJ)/d3d8intf.o
@@ -82,4 +70,4 @@ endif
 
 $(EMU_EXE): $(VERSIONOBJ) $(DRVLIBS) $(WINOSDOBJS) $(LIBCPU) $(LIBEMU) $(LIBDASM) $(LIBSOUND) $(LIBUTIL) $(EXPAT) $(ZLIB) $(SOFTFLOAT) $(LIBOCORE) $(RESFILE)
 	@echo Linking $@...
-	$(LD) $(LDFLAGS) $^ $(LIBS) -lcomdlg32 -o $@
+	$(LD) $(LDFLAGS) $^ $(LIBS) -o $@

@@ -26,7 +26,7 @@
 #include "tabview.h"
 #include "mui_util.h"
 #include "columnedit.h"
-#include "mess.h"
+#include "optionsms.h"
 #include "softwarepicker.h"
 #include "softwarelist.h"
 #include "devview.h"

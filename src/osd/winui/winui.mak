@@ -215,7 +215,7 @@ LIBS += \
 	-ladvapi32 \
 	-lcomctl32 \
 	-lshlwapi \
-
+	-lcomdlg32 \
 
 ifeq ($(DIRECTINPUT),7)
 LIBS += -ldinput
@@ -275,7 +275,10 @@ OSDOBJS = \
 	$(WINOBJ)/sound.o \
 	$(WINOBJ)/video.o \
 	$(WINOBJ)/window.o \
-
+	$(UIOBJ)/dialog.o	\
+	$(UIOBJ)/menu.o	\
+	$(UIOBJ)/opcntrl.o	\
+	$(UIOBJ)/winutils.o
 
 ifeq ($(DIRECT3D),8)
 OSDOBJS += $(WINOBJ)/d3d8intf.o
@@ -311,11 +314,22 @@ OSDOBJS += \
 	$(UIOBJ)/dirwatch.o \
 	$(UIOBJ)/winui.o \
 	$(UIOBJ)/helpids.o \
-
+	$(UIOBJ)/messui.o \
+	$(UIOBJ)/optionsms.o \
+	$(UIOBJ)/msuiutil.o \
+	$(UIOBJ)/propertiesms.o \
+	$(UIOBJ)/swconfig.o \
+	$(UIOBJ)/softwarepicker.o \
+	$(UIOBJ)/softwarelist.o \
+	$(UIOBJ)/devview.o
 
 ifeq ($(TARGET),mame)
 OSDOBJS += \
 	$(UIOBJ)/layout.o
+endif
+ifeq ($(TARGET),mess)
+OSDOBJS += \
+	$(UIOBJ)/layoutms.o
 endif
 
 # extra dependencies
