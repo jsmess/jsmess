@@ -1821,14 +1821,22 @@ static const cassette_config pc88_cassette_config =
 };
 
 #ifdef USE_PROPER_I8214
-void pc8801_raise_irq(running_machine *machine,UINT8 irq,UINT8 mask)
+void pc8801_raise_irq(running_machine *machine,UINT8 irq,UINT8 state)
 {
-	m_int_state |= mask;
+	if(state)
+	{
+		m_int_state |= irq;
 
-	i8214_r_w(machine->device("i8214"), 0, ~irq);
+		i8214_r_w(machine->device("i8214"), 0, ~irq);
 
-	if(mask)
 		cputag_set_input_line(machine,"maincpu",0,ASSERT_LINE);
+	}
+	else
+	{
+		//m_int_state &= ~irq;
+
+		//cputag_set_input_line(machine,"maincpu",0,CLEAR_LINE);
+	}
 }
 
 static WRITE_LINE_DEVICE_HANDLER( pic_int_w )
@@ -1863,17 +1871,20 @@ static IRQ_CALLBACK( pc8801_irq_callback )
 
 static void pc8801_sound_irq( device_t *device, int irq )
 {
-	pc8801_raise_irq(device->machine,1<<(4),sound_irq_mask);
+	if(sound_irq_mask && irq)
+		pc8801_raise_irq(device->machine,1<<(4),1);
 }
 
 static TIMER_CALLBACK( pc8801_rtc_irq )
 {
-	pc8801_raise_irq(machine,1<<(2),timer_irq_mask);
+	if(timer_irq_mask)
+		pc8801_raise_irq(machine,1<<(2),1);
 }
 
 static INTERRUPT_GEN( pc8801_vrtc_irq )
 {
-	pc8801_raise_irq(device->machine,1<<(1),vblank_irq_mask);
+	if(vblank_irq_mask)
+		pc8801_raise_irq(device->machine,1<<(1),1);
 }
 
 #else
