@@ -171,8 +171,9 @@ static UINT8 vrtc_irq_mask,vrtc_irq_latch;
 static UINT8 timer_irq_mask,timer_irq_latch;
 static UINT8 sound_irq_mask,sound_irq_latch;
 #endif
-static UINT8 has_dictionary,has_cdrom,dic_ctrl,dic_bank;
-static UINT8 cdrom_reg[0x10];
+static UINT8 has_clock_speed,clock_setting,baudrate_val;
+static UINT8 has_dictionary,dic_ctrl,dic_bank;
+static UINT8 has_cdrom,cdrom_reg[0x10];
 
 /*
 CRTC command params:
@@ -1286,6 +1287,28 @@ static WRITE8_HANDLER( pc8801_cdrom_w )
 		cdrom_reg[offset] = data;
 }
 
+static READ8_HANDLER( pc8801_cpuclock_r )
+{
+	if(has_clock_speed)
+		return 0x10 | clock_setting;
+
+	return 0xff;
+}
+
+static READ8_HANDLER( pc8801_baudrate_r )
+{
+	if(has_clock_speed)
+		return 0xf0 | baudrate_val;
+
+	return 0xff;
+}
+
+static WRITE8_HANDLER( pc8801_baudrate_w )
+{
+	if(has_clock_speed)
+		baudrate_val = data & 0xf;
+}
+
 static ADDRESS_MAP_START( pc8801_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
@@ -1326,8 +1349,8 @@ static ADDRESS_MAP_START( pc8801_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x5c, 0x5f) AM_WRITE(pc8801_vram_select_w)
 	AM_RANGE(0x60, 0x67) AM_WRITE(pc8801_dmac_w)
 	AM_RANGE(0x68, 0x68) AM_WRITE(pc8801_dmac_mode_w)
-//  AM_RANGE(0x6e, 0x6e) AM_NOP                                     /* CPU clock info */
-//  AM_RANGE(0x6f, 0x6f) AM_NOP                                     /* RS-232C speed ctrl */
+	AM_RANGE(0x6e, 0x6e) AM_READ(pc8801_cpuclock_r)
+	AM_RANGE(0x6f, 0x6f) AM_READWRITE(pc8801_baudrate_r,pc8801_baudrate_w)
 	AM_RANGE(0x70, 0x70) AM_READWRITE(pc8801_window_bank_r, pc8801_window_bank_w)
 	AM_RANGE(0x71, 0x71) AM_READWRITE(pc8801_ext_rom_bank_r, pc8801_ext_rom_bank_w)
 	AM_RANGE(0x78, 0x78) AM_WRITE(pc8801_window_bank_inc_w)
@@ -1670,22 +1693,22 @@ static INPUT_PORTS_START( pc8001 )
 	PORT_DIPSETTING(    0x40, "N88-BASIC (V2)" )
 
 	PORT_START("CFG")		/* EXSWITCH */
-	PORT_DIPNAME( 0x04, 0x04, "Speed mode" )
+	PORT_DIPNAME( 0x0f, 0x08, "Serial speed" )
+	PORT_DIPSETTING(    0x01, "75bps" )
+	PORT_DIPSETTING(    0x02, "150bps" )
+	PORT_DIPSETTING(    0x03, "300bps" )
+	PORT_DIPSETTING(    0x04, "600bps" )
+	PORT_DIPSETTING(    0x05, "1200bps" )
+	PORT_DIPSETTING(    0x06, "2400bps" )
+	PORT_DIPSETTING(    0x07, "4800bps" )
+	PORT_DIPSETTING(    0x08, "9600bps" )
+	PORT_DIPSETTING(    0x09, "19200bps" )
+	PORT_DIPNAME( 0x40, 0x40, "Speed mode" )
 	PORT_DIPSETTING(    0x00, "Slow" )
-	PORT_DIPSETTING(    0x04, DEF_STR( High ) )
-	PORT_DIPNAME( 0x08, 0x00, "Main CPU clock" )
-	PORT_DIPSETTING(    0x00, "4MHz" )
-	PORT_DIPSETTING(    0x08, "8MHz" )
-	PORT_DIPNAME( 0xf0, 0x80, "Serial speed" )
-	PORT_DIPSETTING(    0x10, "75bps" )
-	PORT_DIPSETTING(    0x20, "150bps" )
-	PORT_DIPSETTING(    0x30, "300bps" )
-	PORT_DIPSETTING(    0x40, "600bps" )
-	PORT_DIPSETTING(    0x50, "1200bps" )
-	PORT_DIPSETTING(    0x60, "2400bps" )
-	PORT_DIPSETTING(    0x70, "4800bps" )
-	PORT_DIPSETTING(    0x80, "9600bps" )
-	PORT_DIPSETTING(    0x90, "19200bps" )
+	PORT_DIPSETTING(    0x40, DEF_STR( High ) )
+	PORT_DIPNAME( 0x80, 0x80, "Main CPU clock" )
+	PORT_DIPSETTING(    0x80, "4MHz" )
+	PORT_DIPSETTING(    0x00, "8MHz" )
 
 	PORT_START("OPN_PA")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
@@ -1972,14 +1995,26 @@ static MACHINE_RESET( pc8801 )
 			palette_set_color_rgb(machine, i, pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
 	}
 
+	has_clock_speed = 0;
 	has_dictionary = 0;
 	has_cdrom = 0;
 
 }
 
-static MACHINE_RESET( pc8801_dic )
+static MACHINE_RESET( pc8801_clock_speed )
 {
 	MACHINE_RESET_CALL( pc8801 );
+	has_clock_speed = 1;
+	clock_setting = input_port_read(machine, "CFG") & 0x80;
+
+	cputag_set_clock(machine, "maincpu", clock_setting ?  XTAL_4MHz : XTAL_8MHz);
+	cputag_set_clock(machine, "fdccpu", clock_setting ?  XTAL_4MHz : XTAL_8MHz); // correct?
+	baudrate_val = 0;
+}
+
+static MACHINE_RESET( pc8801_dic )
+{
+	MACHINE_RESET_CALL( pc8801_clock_speed );
 	has_dictionary = 1;
 	dic_bank = 0;
 	dic_ctrl = 0;
@@ -2088,6 +2123,10 @@ static MACHINE_CONFIG_START( pc8801, driver_device )
 
 	MCFG_SOUND_ADD("beeper", BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( pc8801fh, pc8801 )
+	MCFG_MACHINE_RESET( pc8801_clock_speed )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( pc8801ma, pc8801 )
@@ -2398,8 +2437,8 @@ COMP( 1985, pc8801mk2fr,    pc8801,	0,     pc8801,  	pc88sr,  0,    "Nippon Elec
 COMP( 1985, pc8801mk2mr,    pc8801,	0,     pc8801,  	pc88sr,  0,    "Nippon Electronic Company",  "PC-8801mkIIMR", GAME_NOT_WORKING )
 
 //COMP( 1986, pc8801fh,     0,      0,     pc8801,  	pc88sr,  0,    "Nippon Electronic Company",  "PC-8801FH", GAME_NOT_WORKING )
-COMP( 1986, pc8801mh,       pc8801,	0,     pc8801,  	pc88sr,  0,    "Nippon Electronic Company",  "PC-8801MH", GAME_NOT_WORKING )
-COMP( 1987, pc8801fa,       pc8801,	0,     pc8801,  	pc88sr,  0,    "Nippon Electronic Company",  "PC-8801FA", GAME_NOT_WORKING )
+COMP( 1986, pc8801mh,       pc8801,	0,     pc8801fh,  	pc88sr,  0,    "Nippon Electronic Company",  "PC-8801MH", GAME_NOT_WORKING )
+COMP( 1987, pc8801fa,       pc8801,	0,     pc8801fh,  	pc88sr,  0,    "Nippon Electronic Company",  "PC-8801FA", GAME_NOT_WORKING )
 COMP( 1987, pc8801ma,       pc8801,	0,     pc8801ma,    pc88sr,  0,    "Nippon Electronic Company",  "PC-8801MA", GAME_NOT_WORKING )
 //COMP( 1988, pc8801fe,     pc8801, 0,     pc8801,  	pc88sr,  0,    "Nippon Electronic Company",  "PC-8801FE", GAME_NOT_WORKING )
 COMP( 1988, pc8801ma2,      pc8801,	0,     pc8801ma,    pc88sr,  0,    "Nippon Electronic Company",  "PC-8801MA2", GAME_NOT_WORKING )
