@@ -243,15 +243,35 @@ static void a800_setup_mappers(running_machine *machine, int type)
 	}
 }
 
+static int a800_get_type(device_image_interface &image)
+{
+	UINT8 header[16];
+	image.fread(header, 0x10);
+
+	// add check of CART format
+	if (strncmp((const char *)header, "CART", 4))
+		fatalerror("Invalid header detected!\n");
+
+	int cart_type = (header[4] << 24) + (header[5] << 16) +  (header[6] << 8) + (header[7] << 0);
+	printf("cart type: %x\n", cart_type);
+	return cart_type;
+}
+
 DEVICE_IMAGE_LOAD( a800_cart )
 {
 	UINT8 *mem = image.device().machine->region("maincpu")->base();
 	const char	*pcb_name;
 	int cart_type = 0;
 	UINT32 size;
-	
+
 	if (image.software_entry() == NULL)
+	{
 		size = image.length();
+		// check if there is an header, if so extract cart_type from it (after a800_get_type, we point at the start of the data)
+		if ((size % 0x1000) == 0x10)
+			cart_type = a800_get_type(image);
+		//else check size to decide type (assuming base type of cart only!)
+	}
 	else
 	{
 		size = image.get_software_region_length("rom");
