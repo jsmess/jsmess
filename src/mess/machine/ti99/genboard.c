@@ -1,7 +1,29 @@
 /***************************************************************************
     Geneve 9640 system board
 
-    Michael Zapf, October 2010
+    Onboard SRAM configuration:
+    There is an adjustable SRAM configuration on board, representing the
+    various enhancements by users.
+
+    The standard memory configuration as reported by chkdsk (32 KiB):
+    557056 bytes of total memory
+
+    With 64 KiB SRAM:
+    589824 bytes of total memory
+
+    With 384 KiB SRAM:
+    917504 bytes of total memory
+
+    The original 32 KiB SRAM memory needs to be expanded to 64 KiB for
+    MDOS 2.50s and higher, or the system will lock up. Therefore the emulation
+    default is 64 KiB.
+
+    The ultimate expansion is a 512 KiB SRAM circuit wired to the gate array
+    to provide 48 pages of fast static RAM. This also requires to build an
+    adapter for a larger socket. From the 512 KiB, only 384 KiB will be
+    accessed, since the higher pages are hidden behind the EPROM pages.
+
+    Michael Zapf, February 2011
 ***************************************************************************/
 
 #include "emu.h"
@@ -17,7 +39,7 @@
 #define KEYAUTOREPEATDELAY 30
 #define KEYAUTOREPEATRATE 6
 
-#define SRAM_SIZE 64*1024
+#define SRAM_SIZE 384*1024   // maximum expansion on-board
 #define DRAM_SIZE 512*1024
 
 typedef struct _genboard_state
@@ -61,6 +83,7 @@ typedef struct _genboard_state
 	UINT8	*sram;
 	UINT8	*dram;
 	UINT8	*eprom;
+	int		sram_mask, sram_val;
 
 	/* Mapper */
 	int 	geneve_mode;
@@ -362,17 +385,24 @@ READ8_DEVICE_HANDLER( geneve_r )
 		ti99_peb_data_rz(board->peribox, physaddr, &value);
 		return value;
 	}
-	if ((physaddr & 0x1f0000)==0x1d0000)
-	{
-		// 1 1101 xxxx xxxx xxxx xxxx on-board sram (64K)
-		value = board->sram[physaddr & 0x00ffff];
-		return value;
-	}
+
 	if ((physaddr & 0x1e0000)==0x1e0000)
 	{
 		// 1 111. ..xx xxxx xxxx xxxx on-board eprom (16K)
 		// mirrored for f0, f2, f4, ...; f1, f3, f5, ...
 		value = board->eprom[physaddr & 0x003fff];
+		return value;
+	}
+
+	if ((physaddr & board->sram_mask)==board->sram_val)
+	{
+		//  1 100. .... .... .... .... on-board sram (128K) -+
+		//  1 101. .... .... .... .... on-board sram (128K) -+-- maximum SRAM expansion
+		//  1 1100 .... .... .... .... on-board sram (64K) --+
+		//  1 1101 0... .... .... .... on-board sram (32K) - additional 32 KiB required for MDOS 2.50s and higher
+		//  1 1101 1... .... .... .... on-board sram (32K) - standard setup
+		// NOTE: This must be tested after the EPROM test above
+		value = board->sram[physaddr & 0x00ffff];
 		return value;
 	}
 
@@ -542,13 +572,26 @@ WRITE8_DEVICE_HANDLER( geneve_w )
 		ti99_peb_data_w(board->peribox, physaddr, data);
 		return;
 	}
-	if ((physaddr & 0x1f0000)==0x1d0000)
+
+	if ((physaddr & 0x1e0000)==0x1e0000)
 	{
-		// SRAM write
+		// 1 111. ..xx xxxx xxxx xxxx on-board eprom (16K)
+		// mirrored for f0, f2, f4, ...; f1, f3, f5, ...
+		// Ignore EPROM write
+		return;
+	}
+
+	if ((physaddr & board->sram_mask)==board->sram_val)
+	{
+		//  1 100. .... .... .... .... on-board sram (128K) -+
+		//  1 101. .... .... .... .... on-board sram (128K) -+-- maximum SRAM expansion
+		//  1 1100 .... .... .... .... on-board sram (64K) --+
+		//  1 1101 0... .... .... .... on-board sram (32K) - additional 32 KiB required for MDOS 2.50s and higher
+		//  1 1101 1... .... .... .... on-board sram (32K) - standard setup
+		// NOTE: This must be tested after the EPROM test above
 		board->sram[physaddr & 0x00ffff] = data;
 		return;
 	}
-	// Ignore EPROM write
 }
 
 /*
@@ -584,7 +627,12 @@ b bbbb bbbc cccc cccc cccc
 1 0111 101. .... .... .... p-box address block axxx
 1 0111 11.. .... .... .... p-box address block cxxx, exxx
 
-1 1101 .... .... .... .... on-board sram (64K)
+1 100. .... .... .... .... on-board sram (128K) -+
+1 101. .... .... .... .... on-board sram (128K) -+-- maximum SRAM expansion
+1 1100 .... .... .... .... on-board sram (64K) --+
+1 1101 0... .... .... .... on-board sram (32K) - additional 32 KiB required for MDOS 2.50s and higher
+1 1101 1... .... .... .... on-board sram (32K) - standard setup
+
 1 111. ..0. .... .... .... on-board boot1
 1 111. ..1. .... .... .... on-board boot2
 
@@ -1249,6 +1297,28 @@ static DEVICE_RESET( genboard )
 	if (input_port_read(device->machine, "BOOTROM")==0)
 	{
 		board->eprom = device->machine->region("maincpu")->base() + 0x4000;
+	}
+
+	switch (input_port_read(device->machine, "SRAM"))
+	{
+/*  1 100. .... .... .... .... on-board sram (128K) -+
+    1 101. .... .... .... .... on-board sram (128K) -+-- maximum SRAM expansion
+    1 1100 .... .... .... .... on-board sram (64K) --+
+    1 1101 0... .... .... .... on-board sram (32K) - additional 32 KiB required for MDOS 2.50s and higher
+    1 1101 1... .... .... .... on-board sram (32K) - standard setup
+*/
+	case 0: // 32 KiB
+		board->sram_mask =	0x1f8000;
+		board->sram_val =	0x1d8000;
+		break;
+	case 1: // 64 KiB
+		board->sram_mask =	0x1f0000;
+		board->sram_val =	0x1d0000;
+		break;
+	case 2: // 384 KiB (actually 512 KiB, but the EPROM masks the upper 128 KiB)
+		board->sram_mask =	0x180000;
+		board->sram_val =   0x180000;
+		break;
 	}
 }
 
