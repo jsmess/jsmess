@@ -1096,16 +1096,34 @@ static DEVICE_IMAGE_LOAD( snes_cart )
 	supported_type = snes_find_addon_chip(machine);
 
 	/* Find the amount of cart ram (even if we call it sram...) */
-	if ((state->has_addon_chip != HAS_SUPERFX))
-		state->cart[0].sram = snes_r_bank1(space, 0x00ffd8);
+	if (image.software_entry() == NULL)
+	{	
+		if ((state->has_addon_chip != HAS_SUPERFX))
+			state->cart[0].sram = snes_r_bank1(space, 0x00ffd8);
+		else
+			state->cart[0].sram = (snes_r_bank1(space, 0x00ffbd) & 0x07);
+		
+		if (state->cart[0].sram > 0)
+		{
+			state->cart[0].sram = (1024 << state->cart[0].sram);
+			if (state->cart[0].sram > state->cart[0].sram_max)
+				state->cart[0].sram = state->cart[0].sram_max;
+		}
+		printf("size %x\n", state->cart[0].sram);
+	}
 	else
-		state->cart[0].sram = (snes_r_bank1(space, 0x00ffbd) & 0x07);
-
-	if (state->cart[0].sram > 0)
 	{
-		state->cart[0].sram = (1024 << state->cart[0].sram);
-		if (state->cart[0].sram > state->cart[0].sram_max)
-			state->cart[0].sram = state->cart[0].sram_max;
+		// if we are loading from softlist, take sram from the xml
+		state->cart[0].sram = image.get_software_region("sram") ? image.get_software_region_length("sram") : 0;
+		
+		if (state->cart[0].sram > 0)
+		{
+			if (state->cart[0].sram > state->cart[0].sram_max)
+				fatalerror("Found more SRAM than max allowed (found: %x, max: %x), check xml file!\n", state->cart[0].sram, state->cart[0].sram_max);
+		}
+		// TODO: Eventually sram handlers should point to the allocated cart:sram region! 
+		// For now, we only use the region as a placeholder to carry size info...
+		printf("size %x\n", state->cart[0].sram);
 	}
 
 	/* adjust size for very large carts */
