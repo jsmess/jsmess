@@ -193,6 +193,7 @@ CRTC command params:
 
 #define blink_speed ((((crtc.param[0][1] & 0xc0) >> 6) + 1) << 3)
 #define text_color_flag (crtc.param[0][4] & 0x40)
+#define monitor_24KHz ((gfx_ctrl & 0x19) == 0x08)
 
 static struct
 {
@@ -479,7 +480,7 @@ static void draw_text_80(running_machine *machine, bitmap_t *bitmap,int y_size)
 					popmessage("Warning: mono gfx mode enabled, contact MESSdev");
 			}
 
-			pc8801_draw_char(machine,bitmap,x,y,pal,gfx_mode,reverse,secret,upper,lower,blink,y_size,!(gfx_ctrl & 1),0);
+			pc8801_draw_char(machine,bitmap,x,y,pal,gfx_mode,reverse,secret,upper,lower,blink,y_size,monitor_24KHz,0);
 		}
 	}
 }
@@ -534,7 +535,7 @@ static void draw_text_40(running_machine *machine, bitmap_t *bitmap, int y_size)
 					popmessage("Warning: mono gfx mode enabled, contact MESSdev");
 			}
 
-			pc8801_draw_char(machine,bitmap,x,y,pal,gfx_mode,reverse,secret,upper,lower,blink,y_size,!(gfx_ctrl & 1),1);
+			pc8801_draw_char(machine,bitmap,x,y,pal,gfx_mode,reverse,secret,upper,lower,blink,y_size,monitor_24KHz,1);
 		}
 	}
 }
@@ -923,15 +924,7 @@ static void pc8801_dynamic_res_change(running_machine *machine)
 	visarea.min_x = 0;
 	visarea.min_y = 0;
 	visarea.max_x = 640 - 1;
-	visarea.max_y = ((gfx_ctrl & 1) ? 200 : 400) - 1;
-
-	/* low screen res if graphic screen is disabled */
-	if((gfx_ctrl & 0x8) == 0)
-		visarea.max_y = 200 - 1;
-
-	/* low screen res if graphic screen is color */
-	if(gfx_ctrl & 0x10)
-		visarea.max_y = 200 - 1;
+	visarea.max_y = ((monitor_24KHz) ? 400 : 200) - 1;
 
 	vblank_pos = visarea.max_y + 1;
 
@@ -2334,7 +2327,7 @@ ROM_START( pc8801ma2 )
 	ROM_REGION( 0x8000, "n80rom", ROMREGION_ERASEFF ) // 1.8
 	ROM_LOAD( "ma2_n80.rom",   0x0000, 0x8000, CRC(8a2a1e17) SHA1(06dae1db384aa29d81c5b6ed587877e7128fcb35) )
 
-	ROM_REGION( 0x10000, "n88rom", ROMREGION_ERASEFF ) // BASIC doesn't boot, 1.91 in ROM (2.31?)
+	ROM_REGION( 0x10000, "n88rom", ROMREGION_ERASEFF ) // 2.3 (2.31?)
 	ROM_LOAD( "ma2_n88.rom",   0x0000, 0x8000, CRC(ae1a6ebc) SHA1(e53d628638f663099234e07837ffb1b0f86d480d) )
 	ROM_LOAD( "ma2_n88_0.rom", 0x8000, 0x2000, CRC(a72697d7) SHA1(5aedbc5916d67ef28767a2b942864765eea81bb8) )
 	ROM_LOAD( "ma2_n88_1.rom", 0xa000, 0x2000, CRC(7ad5d943) SHA1(4ae4d37409ff99411a623da9f6a44192170a854e) )
@@ -2355,7 +2348,6 @@ ROM_START( pc8801ma2 )
 	ROM_REGION( 0x800, "gfx1", 0)
 	ROM_COPY( "kanji", 0x1000, 0x0000, 0x0800 )
 
-	/* 32 banks, to be loaded at 0xc000 - 0xffff */
 	ROM_REGION( 0x80000, "dictionary", 0 )
 	ROM_LOAD( "ma2_jisyo.rom", 0x00000, 0x80000, CRC(856459af) SHA1(06241085fc1d62d4b2968ad9cdbdadc1e7d7990a) )
 ROM_END
@@ -2363,10 +2355,10 @@ ROM_END
 ROM_START( pc8801mc )
 	PC8801_MEM_LOAD
 
-	ROM_REGION( 0x8000, "n80rom", ROMREGION_ERASEFF ) // 1.8
+	ROM_REGION( 0x08000, "n80rom", ROMREGION_ERASEFF ) // 1.8
 	ROM_LOAD( "mc_n80.rom",   0x0000, 0x8000, CRC(8a2a1e17) SHA1(06dae1db384aa29d81c5b6ed587877e7128fcb35) )
 
-	ROM_REGION( 0x10000, "n88rom", ROMREGION_ERASEFF ) // BASIC doesn't boot, 1.93 in ROM (2.33?)
+	ROM_REGION( 0x10000, "n88rom", ROMREGION_ERASEFF ) // 2.3 (2.33?)
 	ROM_LOAD( "mc_n88.rom",   0x0000, 0x8000, CRC(356d5719) SHA1(5d9ba80d593a5119f52aae1ccd61a1457b4a89a1) )
 	ROM_LOAD( "mc_n88_0.rom", 0x8000, 0x2000, CRC(a72697d7) SHA1(5aedbc5916d67ef28767a2b942864765eea81bb8) )
 	ROM_LOAD( "mc_n88_1.rom", 0xa000, 0x2000, CRC(7ad5d943) SHA1(4ae4d37409ff99411a623da9f6a44192170a854e) )
@@ -2390,7 +2382,6 @@ ROM_START( pc8801mc )
 	ROM_REGION( 0x800, "gfx1", 0)
 	ROM_COPY( "kanji", 0x1000, 0x0000, 0x0800 )
 
-	/* 32 banks, to be loaded at 0xc000 - 0xffff */
 	ROM_REGION( 0x80000, "dictionary", 0 )
 	ROM_LOAD( "mc_jisyo.rom", 0x00000, 0x80000, CRC(bd6eb062) SHA1(deef0cc2a9734ba891a6d6c022aa70ffc66f783e) )
 ROM_END
