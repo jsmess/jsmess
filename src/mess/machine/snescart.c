@@ -1109,7 +1109,7 @@ static DEVICE_IMAGE_LOAD( snes_cart )
 			if (state->cart[0].sram > state->cart[0].sram_max)
 				state->cart[0].sram = state->cart[0].sram_max;
 		}
-		printf("size %x\n", state->cart[0].sram);
+//		printf("size %x\n", state->cart[0].sram);
 	}
 	else
 	{
@@ -1123,7 +1123,7 @@ static DEVICE_IMAGE_LOAD( snes_cart )
 		}
 		// TODO: Eventually sram handlers should point to the allocated cart:sram region! 
 		// For now, we only use the region as a placeholder to carry size info...
-		printf("size %x\n", state->cart[0].sram);
+//		printf("size %x\n", state->cart[0].sram);
 	}
 
 	/* adjust size for very large carts */
