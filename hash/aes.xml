@@ -1,10 +1,11 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
-<!-- Based on MAME Neo Geo driver.  Last update: 27/12/2010 -->
+<!-- Based on MAME 0.140 Neo Geo driver -->
 
 <softwarelist name="aes" description="SNK Neo Geo AES cartridges">
 <!-- ID 001 -->
+<!-- Release Date - Japan: 01/07/1991 USA: 01/07/1991 -->
 	<software name="nam1975">
 		<description>NAM-1975</description>
 		<year>1990</year>
@@ -40,6 +41,7 @@
 	</software>
 
 <!-- ID 002 -->
+<!-- Release Date - Japan: 01/07/1991 USA: 01/07/1991 -->
 	<software name="bstars">
 		<description>Baseball Stars Professional</description>
 		<year>1990</year>
@@ -76,6 +78,7 @@
 	</software>
 
 <!-- ID 003 -->
+<!-- Release Date - Japan: 01/07/1991 USA: 01/07/1991 -->
 	<software name="tpgolf">
 		<description>Top Player's Golf</description>
 		<year>1990</year>
@@ -115,6 +118,7 @@
 	</software>
 
 <!-- ID 004 -->
+<!-- Release Date - Japan: 01/07/1991 -->
 	<software name="mahretsu">
 		<description>Mahjong Kyo Retsuden</description>
 		<year>1990</year>
@@ -149,6 +153,7 @@
 	</software>
 
 <!-- ID 005 -->
+<!-- Release Date - Japan: 01/07/1991 USA: 01/07/1991 -->
 	<software name="maglord">
 		<description>Magician Lord</description>
 		<year>1990</year>
@@ -183,6 +188,7 @@
 	</software>
 
 <!-- ID 007 -->
+<!-- Release Date - Japan: 01/07/1991 USA: 01/07/1991 -->
 	<software name="alpham2">
 		<description>Alpha Mission II / ASO II - Last Guardian</description>
 		<year>1991</year>
@@ -213,6 +219,7 @@
 	</software>
 
 <!-- ID 009 -->
+<!-- Release Date - Japan: 01/07/1991 USA: 01/07/1991 -->
 	<software name="ncombat">
 		<description>Ninja Combat</description>
 		<year>1990</year>
@@ -248,6 +255,7 @@
 	</software>
 
 <!-- ID 011 -->
+<!-- Release Date - Japan: 01/07/1991 USA: 01/07/1991 -->
 	<software name="superspy">
 		<description>The Super Spy</description>
 		<year>1990</year>
@@ -281,6 +289,7 @@
 	</software>
 
 <!-- ID 014 -->
+<!-- Release Date - Japan: 17/04/1992 USA: 17/04/1992 -->
 	<software name="mutnat">
 		<description>Mutation Nation</description>
 		<year>1990</year>
@@ -310,6 +319,7 @@
 	</software>
 	
 <!-- ID 016 -->
+<!-- Release Date - Japan: 01/07/1991 USA: 01/07/1991 -->
 	<software name="kotm">
 		<description>King of the Monsters</description>
 		<year>1991</year>
@@ -340,6 +350,7 @@
 	</software>
 
 <!-- ID 017 -->
+<!-- Release Date - Japan: 01/07/1991 USA: 01/07/1991 -->
 	<software name="sengoku">
 		<description>Sengoku / Sengoku Denshou</description>
 		<year>1991</year>
@@ -370,6 +381,7 @@
 	</software>
 
 <!-- ID 019 -->
+<!-- Release Date - Japan: 01/07/1991 USA: 01/07/1991 -->
 	<software name="lbowling">
 		<description>League Bowling</description>
 		<year>1990</year>
@@ -400,6 +412,7 @@
 	</software>
 
 <!-- ID 020 -->
+<!-- Release Date - Japan: 01/07/1991 USA: 01/07/1991 -->
 	<software name="gpilots">
 		<description>Ghost Pilots</description>
 		<year>1991</year>
@@ -433,6 +446,7 @@
 	</software>
 
 <!-- ID 021 -->
+<!-- Release Date - Japan: 01/07/1991 USA: 01/07/1991 -->
 	<software name="joyjoy">
 		<description>Joy Joy Kid / Puzzled</description>
 		<year>1990</year>
@@ -462,6 +476,7 @@
 	</software>
 
 <!-- ID 022 -->
+<!-- Release Date - Japan: 01/07/1991 USA: 01/07/1991 -->
 	<software name="bjourney">
 		<description>Blue's Journey / Raguy</description>
 		<year>1990</year>
@@ -491,6 +506,7 @@
 	</software>
 
 <!-- ID 023 -->
+<!-- Release Date - Japan: 30/08/1991 -->
 	<software name="quizdais">
 		<description>Quiz Daisousa Sen - The Last Count Down</description>
 		<year>1991</year>
@@ -515,8 +531,9 @@
 			</dataarea>
 		</part>
 	</software>
-
+	
 <!-- ID 025 -->
+<!-- Release Date - Japan: 11/10/1991 USA: 11/10/1991 -->
 	<software name="eightman">
 		<description>Eight Man</description>
 		<year>1991</year>
@@ -546,6 +563,7 @@
 	</software>
 
 <!-- ID 030 -->
+<!-- Release Date - Japan: 25/10/1991 USA: 25/10/1991 -->
 	<software name="2020bb">
 		<description>2020 Super Baseball</description>
 		<year>1991</year>
@@ -575,6 +593,7 @@
 	</software>
 
 <!-- ID 031 -->
+<!-- Release Date - Japan: 13/0731992 USA: 13/03/1992 -->
 	<software name="socbrawl">
 		<description>Soccer Brawl</description>
 		<year>1991</year>
@@ -604,6 +623,7 @@
 	</software>
 
 <!-- ID 034 -->
+<!-- Release Date - Japan: 21/02/1992 USA: 21/02/1992 -->
 	<software name="fbfrenzy">
 		<description>Football Frenzy</description>
 		<year>1992</year>
@@ -633,6 +653,7 @@
 	</software>
 
 <!-- ID 036 -->
+<!-- Release Date - Japan: 20/12/1991 -->
 	<software name="bakatono">
 		<description>Bakatonosama Mahjong Manyuuki</description>
 		<year>1991</year>
@@ -662,6 +683,7 @@
 	</software>
 
 <!-- ID 037 -->
+<!-- Release Date - Japan: 01/10/1991 USA: 01/10/1991 -->
 	<software name="crsword">
 		<description>Crossed Swords</description>
 		<year>1991</year>
@@ -690,6 +712,7 @@
 	</software>
 
 <!-- ID 038 -->
+<!-- Release Date - Japan: 20/12/1991 USA: 20/12/1991 -->
 	<software name="trally">
 		<description>Thrash Rally</description>
 		<year>1991</year>
@@ -720,6 +743,7 @@
 	</software>
 
 <!-- ID 039 -->
+<!-- Release Date - Japan: 01/07/1991 USA: 01/07/1991 -->
 	<software name="kotm2">
 		<description>King of the Monsters 2 - The Next Thing</description>
 		<year>1992</year>
@@ -752,6 +776,7 @@
 	</software>
 
 <!-- ID 043 -->
+<!-- Release Date - Japan: 23/04/1993 USA: 23/04/1993 -->
 	<software name="3countb">
 		<description>3 Count Bout / Fire Suplex</description>
 		<year>1993</year>
@@ -785,6 +810,7 @@
 	</software>
 
 <!-- ID 044 -->
+<!-- Release Date - Japan: 11/12/1992 USA: 11/12/1992 -->
 	<software name="aof">
 		<description>Art of Fighting / Ryuuko no Ken</description>
 		<year>1992</year>
@@ -818,6 +844,7 @@
 	</software>
 
 <!-- ID 045 -->
+<!-- Release Date - Japan: 11/08/1993 USA: 11/08/1993 -->
 	<software name="samsho">
 		<description>Samurai Shodown / Samurai Spirits</description>
 		<year>1993</year>
@@ -850,6 +877,7 @@
 	</software>
 
 <!-- ID 046 -->
+<!-- Release Date - Japan: 24/06/1994 USA: 24/06/1994 -->
 	<software name="tophuntr">
 		<description>Top Hunter - Roddy and Cathy</description>
 		<year>1993</year>
@@ -886,6 +914,7 @@
 	</software>
 
 <!-- ID 047 -->
+<!-- Release Date - Japan: 05/03/1993 USA: 05/03/1993 -->
 	<software name="fatfury2">
 		<description>Fatal Fury 2 / Garou Densetsu 2 - arata-naru tatakai</description>
 		<year>1992</year>
@@ -921,6 +950,7 @@
 	</software>
 
 <!-- ID 049 -->
+<!-- Release Date - Japan: 17/07/1992 USA: 17/07/1992 -->
 	<software name="androdun">
 		<description>Andro Dunos</description>
 		<year>1992</year>
@@ -948,6 +978,7 @@
 	</software>
 
 <!-- ID 053 -->
+<!-- Release Date - Japan: 11/09/1992 USA: 11/09/1992 -->
 	<software name="wh1">
 		<description>World Heroes</description>
 		<year>1992</year>
@@ -980,6 +1011,7 @@
 	</software>
 
 <!-- ID 055 -->
+<!-- Release Date - Japan: 01/10/1994 USA: 01/10/1994 -->
 	<software name="kof94">
 		<description>The King of Fighters '94</description>
 		<year>1994</year>
@@ -1015,6 +1047,7 @@
 	</software>
 
 <!-- ID 056 -->
+<!-- Release Date - Japan: 11/03/1994 USA: 11/03/1994 -->
 	<software name="aof2">
 		<description>Art of Fighting 2 / Ryuuko no Ken 2</description>
 		<year>1994</year>
@@ -1084,6 +1117,7 @@
 	</software>
 
 <!-- ID 057 -->
+<!-- Release Date - Japan: 04/06/1993 USA: 04/06/1993 -->
 	<software name="wh2">
 		<description>World Heroes 2</description>
 		<year>1993</year>
@@ -1116,6 +1150,7 @@
 	</software>
 
 <!-- ID 058 -->
+<!-- Release Date - Japan: 22/12/1993 USA: 22/12/1993 -->
 	<software name="fatfursp">
 		<description>Fatal Fury Special / Garou Densetsu Special</description>
 		<year>1993</year>
@@ -1183,6 +1218,7 @@
 	</software>
 
 <!-- ID 061 -->
+<!-- Release Date - Japan: 27/05/1994 USA: 27/05/1994 -->
 	<software name="ssideki2">
 		<description>Super Sidekicks 2 - The World Championship / Tokuten Ou 2 - real fight football</description>
 		<year>1994</year>
@@ -1212,6 +1248,7 @@
 	</software>
 
 <!-- ID 063 -->
+<!-- Release Date - Japan: 02/12/1994 USA: 02/12/1994 -->
 	<software name="samsho2">
 		<description>Samurai Shodown II / Shin Samurai Spirits - Haohmaru jigokuhen</description>
 		<year>1994</year>
@@ -1248,6 +1285,7 @@
 	</software>
 
 <!-- ID 064 -->
+<!-- Release Date - Japan: 04/06/1994 USA: 04/06/1994 -->
 	<software name="wh2j">
 		<description>World Heroes 2 Jet</description>
 		<year>1994</year>
@@ -1282,6 +1320,7 @@
 	</software>
 
 <!-- ID 069 -->
+<!-- Release Date - Japan: 21/04/1995 USA: 21/04/1995 -->
 	<software name="fatfury3">
 		<description>Fatal Fury 3 - Road to the Final Victory / Garou Densetsu 3 - haruka-naru tatakai</description>
 		<year>1995</year>
@@ -1315,6 +1354,7 @@
 	</software>
 
 <!-- ID 074 -->
+<!-- Release Date - Japan: 26/08/1994 USA: 26/08/1994 -->
 	<software name="aodk">
 		<description>Aggressors of Dark Kombat / Tsuukai GANGAN Koushinkyoku</description>
 		<year>1994</year>
@@ -1349,6 +1389,7 @@
 	</software>
 
 <!-- ID 084 -->
+<!-- Release Date - Japan: 01/09/1995 USA: 01/09/1995 -->
 	<software name="kof95">
 		<description>The King of Fighters '95</description>
 		<year>1995</year>
@@ -1386,6 +1427,7 @@
 	</software>
 
 <!-- ID 087 -->
+<!-- Release Date - Japan: 01/12/1995 USA: 01/12/1995 -->
 	<software name="samsho3">
 		<description>Samurai Showdown III / Samurai Spirits - Zankurou Musouken / Fighters Swords</description>
 		<year>1995</year>
@@ -1420,6 +1462,7 @@
 	</software>
 
 <!-- ID 095 -->
+<!-- Release Date - Japan: 26/01/1996 USA: 26/01/1996 -->
 	<software name="rbff1">
 		<description>Real Bout Fatal Fury / Real Bout Garou Densetsu</description>
 		<year>1995</year>
@@ -1455,6 +1498,7 @@
 	</software>
 
 <!-- ID 232 -->
+<!-- Release Date - Japan: 25/09/1997 USA: 25/09/1997 -->
 	<software name="kof97">
 		<description>The King of Fighters '97</description>
 		<year>1997</year>
@@ -1488,6 +1532,7 @@
 	</software>
 
 <!-- ID 234 -->
+<!-- Release Date - Japan: 29/01/1998 USA: 29/01/1998 -->
 	<software name="lastblad">
 		<description>The Last Blade / Bakumatsu Roman - Gekka no Kenshi</description>
 		<year>1997</year>
@@ -1522,6 +1567,7 @@
 	</software>
 
 <!-- ID 240 -->
+<!-- Release Date - Japan: 29/04/1998 USA: 29/04/1998 -->
 	<software name="rbff2">
 		<description>Real Bout Fatal Fury 2 - The Newcomers / Real Bout Garou Densetsu 2 - The Newcomers</description>
 		<year>1998</year>
@@ -1556,6 +1602,7 @@
 	</software>
 
 <!-- ID 242 -->
+<!-- Release Date - Japan: 23/09/1998 USA: 23/09/1998 -->
 	<software name="kof98">
 		<description>The King of Fighters '98</description>
 		<year>1998</year>
@@ -1592,6 +1639,7 @@
 	</software>
 
 <!-- ID 243 -->
+<!-- Release Date - Japan: 28/01/1999 USA: 28/01/1999 -->
 	<software name="lastbld2">
 		<description>The Last Blade 2 / Bakumatsu Roman - Dai Ni Maku Gekka no Kenshi</description>
 		<year>1998</year>
@@ -1626,6 +1674,7 @@
 	</software>
 
 <!-- ID 251 -->
+<!-- Release Date - Japan: 23/09/1999 USA: 23/09/1999 -->
 	<software name="kof99">
 		<description>The King of Fighters '99 - Millennium Battle</description>
 		<year>1999</year>
@@ -1664,6 +1713,7 @@
 	</software>
 
 <!-- ID 256 -->
+<!-- Release Date - Japan: 01/06/2000 USA: 17/09/2001 -->
 	<software name="mslug3">
 		<description>Metal Slug 3</description>
 		<year>2000</year>
@@ -1701,6 +1751,7 @@
 	</software>
 
 <!-- ID 257 -->
+<!-- Release Date - Japan: 21/12/2000 -->
 	<software name="kof2000">
 		<description>The King of Fighters 2000</description>
 		<year>2000</year>
@@ -1741,6 +1792,7 @@
 	</software>
 
 <!-- ID 262 -->
+<!-- Release Date - Japan: 14/03/2002 USA: 14/03/2002 -->
 	<software name="kof2001">
 		<description>The King of Fighters 2001</description>
 		<year>2001</year>
@@ -1780,6 +1832,7 @@
 	</software>
 
 <!-- ID 263 -->
+<!-- Release Date - Japan: 12/06/2002 USA: 12/06/2002 -->
 	<software name="mslug4">
 		<description>Metal Slug 4</description>
 		<year>2002</year>
@@ -1815,6 +1868,7 @@
 	</software>
 
 <!-- ID 265 -->
+<!-- Release Date - Japan: 18/12/2002 USA: 18/12/2002 -->
 	<software name="kof2002">
 		<description>The King of Fighters 2002</description>
 		<year>2002</year>
@@ -1853,6 +1907,7 @@
 
 
 <!-- ID 266 -->
+<!-- Release Date - Japan: 29/05/2003 USA: 29/05/2003 -->
 	<software name="matrim">
 		<description>Matrimelee / Shin Gouketsuji Ichizoku Toukon</description>
 		<year>2002</year>
@@ -1890,6 +1945,7 @@
 	</software>
 
 <!-- ID 268 -->
+<!-- Release Date - Japan: 17/02/2004 USA: 17/02/2004 -->
 	<software name="mslug5">
 		<description>Metal Slug 5</description>
 		<year>2003</year>
@@ -1927,6 +1983,7 @@
 	</software>
 
 <!-- ID 269 -->
+<!-- Release Date - Japan: 14/11/2003 USA: 14/11/2003 -->
 	<software name="svc">
 		<description>SNK vs CAPCOM SVC CHAOS</description>
 		<year>2003</year>
@@ -1964,6 +2021,7 @@
 	</software>
 <!-- ID 270 -->
 	<software name="samsho5">
+	<!-- Release Date - Japan: 11/12/2003 USA: 11/12/2003 -->
 		<description>Samurai Shodown V / Samurai Spirits Zero</description>
 		<year>2003</year>
 		<publisher>Yuki Enterprise / SNK Playmore</publisher>
@@ -2000,6 +2058,7 @@
 	</software>
 
 <!-- ID 271 -->
+<!-- Release Date - Japan: 18/03/2004 USA: 18/03/2004 -->
 	<software name="kof2003">
 		<description>The King of Fighters 2003</description>
 		<year>2003</year>
@@ -2038,6 +2097,7 @@
 	</software>
 
 <!-- ID 272 -->
+<!-- Release Date - Japan: 09/07/2004 USA: 09/07/2004 -->
 	<software name="samsh5sp">
 		<description>Samurai Shodown V Special / Samurai Spirits Zero Special</description>
 		<year>2003</year>
@@ -2109,5 +2169,5 @@
 			</dataarea>
 		</part>
 	</software>
-
+	
 </softwarelist>

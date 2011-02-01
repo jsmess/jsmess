@@ -1319,7 +1319,7 @@ Unlicensed Undumped Releases: -
 	</software>
 
 	<software name="rampart" supported="no">
-		<description>Rampart (Prototype)</description>
+		<description>Rampart (PAL, Prototype)</description>
 		<!-- Serial: CX7892 -->
 		<year>1991</year>
 		<publisher>Imagitec Design</publisher>

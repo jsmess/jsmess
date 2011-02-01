@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
-<softwarelist name="vg5k" description="VG-5000 cassette">
+<softwarelist name="vg5k" description="Philips VG-5000 cassette">
 	<software name="abeille">
 		<description>L'Abeille - Spina the Bee</description>
 		<year>1984</year>

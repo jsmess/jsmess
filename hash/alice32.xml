@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
-<softwarelist name="alice32" description="Alice 32/90 Cassette">
+<softwarelist name="alice32" description="Matra Alice 32/90 Cassette">
 	<software name="alberthe">
 		<description>Al*berthe</description>
 		<year>1985</year>
@@ -486,7 +486,7 @@
 	</software>
 
 	<software name="planvl90">
-		<description>Plan de vol (alice90)</description>
+		<description>Plan de Vol (Alice90)</description>
 		<year>1985</year>
 		<publisher>EH Services</publisher>
 		<part name="cass" interface="alice32_cass">
