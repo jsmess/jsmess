@@ -269,15 +269,21 @@ static MACHINE_RESET( coleco )
 
 static DEVICE_IMAGE_LOAD( czz50_cart )
 {
-	int size = image.length();
 	UINT8 *ptr = image.device().machine->region("maincpu")->base() + 0x8000;
+	UINT32 size;
 
-	if (image.fread( ptr, size ) != size)
+	if (image.software_entry() == NULL)
 	{
-		return IMAGE_INIT_FAIL;
+		size = image.length();
+		if (image.fread(ptr, size) != size)
+			return IMAGE_INIT_FAIL;
+		return IMAGE_INIT_PASS;
 	}
-
-	return IMAGE_INIT_PASS;
+	else
+	{
+		memcpy(ptr, image.get_software_region("rom"), image.get_software_region_length("rom"));
+		return IMAGE_INIT_PASS;
+	}
 }
 
 /* Machine Drivers */
@@ -292,7 +298,7 @@ static MACHINE_CONFIG_START( coleco, coleco_state )
 	MCFG_MACHINE_START(coleco)
 	MCFG_MACHINE_RESET(coleco)
 
-    // video hardware
+	// video hardware
 	MCFG_FRAGMENT_ADD(tms9928a)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_REFRESH_RATE((float)XTAL_10_738635MHz/2/342/262)
@@ -307,6 +313,10 @@ static MACHINE_CONFIG_START( coleco, coleco_state )
 	MCFG_CARTSLOT_ADD("cart")
 	MCFG_CARTSLOT_EXTENSION_LIST("rom,col,bin")
 	MCFG_CARTSLOT_NOT_MANDATORY
+	MCFG_CARTSLOT_INTERFACE("coleco_cart")
+
+	/* software lists */
+	MCFG_SOFTWARE_LIST_ADD("cart_list","coleco")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( czz50, coleco_state )
@@ -319,7 +329,7 @@ static MACHINE_CONFIG_START( czz50, coleco_state )
 	MCFG_MACHINE_START(coleco)
 	MCFG_MACHINE_RESET(coleco)
 
-    // video hardware
+	// video hardware
 	MCFG_FRAGMENT_ADD(tms9928a)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_REFRESH_RATE((float)XTAL_10_738635MHz/2/342/262)
@@ -335,6 +345,10 @@ static MACHINE_CONFIG_START( czz50, coleco_state )
 	MCFG_CARTSLOT_EXTENSION_LIST("rom,col,bin")
 	MCFG_CARTSLOT_NOT_MANDATORY
 	MCFG_CARTSLOT_LOAD(czz50_cart)
+	MCFG_CARTSLOT_INTERFACE("coleco_cart")
+
+	/* software lists */
+	MCFG_SOFTWARE_LIST_ADD("cart_list","coleco")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( dina, czz50 )
@@ -351,7 +365,7 @@ ROM_START (coleco)
 ROM_END
 
 ROM_START (colecoa)
-    // differences to 0x3aa93ef3 modified characters, added a pad 2 related fix
+	// differences to 0x3aa93ef3 modified characters, added a pad 2 related fix
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "colecoa.rom", 0x0000, 0x2000, CRC(39bb16fc) SHA1(99ba9be24ada3e86e5c17aeecb7a2d68c5edfe59) )
 	ROM_CART_LOAD("cart", 0x8000, 0x8000, ROM_NOMIRROR | ROM_OPTIONAL)
