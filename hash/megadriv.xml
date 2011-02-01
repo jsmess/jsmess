@@ -864,7 +864,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 	</software>
 
 	<software name="thorf" cloneof="thor">
-		<!-- Alt. Title: La Legende de Thor (Box and cart) -->
+		<!-- Alt. Title: La Légende de Thor (Box and cart) -->
 		<description>The Story of Thor - A Successor of The Light (Fra)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
@@ -24396,7 +24396,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 	<software name="xinqig1" cloneof="xinqig">
 		<description>Xin Qi Gai Wang Zi (Chi, Alt)</description>
 		<year>1996</year>
-		<publisher>C&ap;E Inc.</publisher>
+		<publisher>C&amp;E Inc.</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb_type" value="BEGGAR" />
 			<dataarea name="rom" size="4194304">
@@ -24408,7 +24408,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 	<software name="xinqig">
 		<description>Xin Qi Gai Wang Zi (Chi)</description>
 		<year>1996</year>
-		<publisher>C&ap;E Inc.</publisher>
+		<publisher>C&amp;E Inc.</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb_type" value="BEGGAR" />
 			<dataarea name="rom" size="4194304">
