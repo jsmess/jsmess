@@ -2294,7 +2294,7 @@ static const floppy_config x1_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSDD_40,
 	FLOPPY_OPTIONS_NAME(x1),
-	"x1_flop"
+	"floppy_5_25"
 };
 
 static MACHINE_CONFIG_START( x1, x1_state )

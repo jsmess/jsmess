@@ -477,7 +477,7 @@ static const floppy_config ibmat_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
 	FLOPPY_OPTIONS_NAME(pc),
-	"ibmat_flop"
+	"floppy_5_25"
 };
 
 static const kb_keytronic_interface at_keytronic_intf =

@@ -282,7 +282,7 @@ static const floppy_config svi318_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
 	FLOPPY_OPTIONS_NAME(svi318),
-	"svi318_flop"
+	"floppy_5_25"
 };
 
 static MACHINE_CONFIG_FRAGMENT( svi318_cartslot )

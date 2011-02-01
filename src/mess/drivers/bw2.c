@@ -682,7 +682,7 @@ static const floppy_config bw2_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
 	FLOPPY_OPTIONS_NAME(bw2),
-	"bw2_flop"
+	"floppy_5_25"
 };
 
 static const wd17xx_interface bw2_wd17xx_interface =

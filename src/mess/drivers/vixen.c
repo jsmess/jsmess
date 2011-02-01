@@ -695,7 +695,7 @@ static const floppy_config vixen_floppy_config =
     DEVCB_NULL,
     FLOPPY_STANDARD_5_25_SSDD_40,
     FLOPPY_OPTIONS_NAME(default),
-    "vixen_flop"
+    "floppy_5_25"
 };
 
 WRITE_LINE_MEMBER( vixen_state::fdint_w )

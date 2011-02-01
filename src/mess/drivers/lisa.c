@@ -106,7 +106,7 @@ static const floppy_config lisa_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
 	FLOPPY_OPTIONS_NAME(apple35_mac),
-	"lisa_flop"
+	"floppy_5_25"
 };
 
 /***************************************************************************

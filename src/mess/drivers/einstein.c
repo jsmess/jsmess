@@ -723,7 +723,7 @@ static const floppy_config einstein_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_SSDD_40,
 	FLOPPY_OPTIONS_NAME(default),
-	"einstein_flop"
+	"floppy_5_25"
 };
 
 static MACHINE_CONFIG_START( einstein, einstein_state )

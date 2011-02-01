@@ -1091,7 +1091,7 @@ static const floppy_config v1050_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
 	FLOPPY_OPTIONS_NAME(v1050),
-	"v1050_flop"
+	"floppy_5_25"
 };
 
 /* Machine Initialization */

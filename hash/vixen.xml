@@ -6,7 +6,7 @@
 		<year>1985</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
-		<part name="flop1" interface="vixen_flop">
+		<part name="flop1" interface="floppy_5_25">
 		<!-- Included on the disk: Wordstar, SuperCalc2, CP/M Utilities, MailMerge -->
 		<!-- P/N: 3D49005-01 REV 1.2 03/20/85 -->
 			<dataarea name="flop" size="380287">
@@ -14,7 +14,7 @@
 			</dataarea>
 		</part>
 
-		<part name="flop2" interface="vixen_flop">
+		<part name="flop2" interface="floppy_5_25">
 		<!-- Included on the disk: MEDIA MASTER, MBASIC, OSBOARD -->
 		<!-- P/N: 3D490005-02 REV 1.2 03/20/85 -->
 			<dataarea name="flop" size="360899">
@@ -22,7 +22,7 @@
 			</dataarea>
 		</part>
 
-		<part name="flop3" interface="vixen_flop">
+		<part name="flop3" interface="floppy_5_25">
 		<!-- Included on the disk: SUPERCALC2 Templates -->
 		<!-- P/N: 3D490005-03 REV 1.2 03/20/85 -->
 			<dataarea name="flop" size="195152">
@@ -36,13 +36,13 @@
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
-		<part name="flop1" interface="vixen_flop">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="69161">
 				<rom name="cpm_system.imd" size="69161" crc="54629cd6" sha1="670690338541246de37c19887ad8a7644d95abdd" offset="0" />
 			</dataarea>
 		</part>
 
-		<part name="flop2" interface="vixen_flop">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="50987">
 				<rom name="cpm_utilities.imd" size="50987" crc="4f3f644b" sha1="ba7ca8ade978cc2c17443cbb9018c6d0aeb4b330" offset="0" />
 			</dataarea>
@@ -54,7 +54,7 @@
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
-		<part name="flop1" interface="vixen_flop">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="189090">
 				<rom name="crosstalk.imd" size="189090" crc="0259c65d" sha1="e9dae67b4d75cbb22fe77f69f1a6ad3d5ccf32a2" offset="0" />
 			</dataarea>
@@ -66,7 +66,7 @@
 		<year>1985</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
-		<part name="flop1" interface="vixen_flop">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="14964">
 				<rom name="turnkey.imd" size="14964" crc="42be74d0" sha1="de6debd4ac79a93886ed742ca5d5ed03be697554" offset="0" />
 			</dataarea>
@@ -78,13 +78,13 @@
 		<year>19??</year>
 		<publisher>MicroPro International</publisher>
 
-		<part name="flop1" interface="vixen_flop">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="382201">
 				<rom name="ws disk1.imd" size="382201" crc="def979cd" sha1="9dd9d1d4c7e64933629e675b00069f738a2cdd49" offset="0" />
 			</dataarea>
 		</part>
 
-		<part name="flop2" interface="vixen_flop">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="177824">
 				<rom name="ws disk2.imd" size="177824" crc="3adc8b8e" sha1="5ffa2590b5a8f8e4a95fbb8d2663e254e04db759" offset="0" />
 			</dataarea>
@@ -96,7 +96,7 @@
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
-		<part name="flop1" interface="vixen_flop">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="213413">
 				<rom name="vixen fix program.imd" size="213413" crc="4a5ba489" sha1="1ba7ed2a63ef2e3ec971ccbf64ad542e14c183dd" offset="0" />
 			</dataarea>
@@ -108,7 +108,7 @@
 		<year>1985</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
-		<part name="flop1" interface="vixen_flop">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="389393">
 				<rom name="vixen demonstration program.imd" size="389393" crc="90323539" sha1="21536759f0828b82e574902d89c1de6d890f1353" offset="0" />
 			</dataarea>
@@ -120,7 +120,7 @@
 		<year>1982</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
-		<part name="flop1" interface="vixen_flop">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="99156">
 				<rom name="vixen demonstration program.imd" size="99156" crc="5d45f8e2" sha1="b6125d32eaceae4431bf5770b3ca6762738e6f90" offset="0" />
 			</dataarea>
@@ -133,7 +133,7 @@
 		<year>19??</year>
 		<publisher>Encore</publisher>
 
-		<part name="flop1" interface="vixen_flop">
+		<part name="flop1" interface="floppy_5_25">
 			<!-- x3.094 -->
 			<!-- Revision: Date: 4/4/83 -->
 			<dataarea name="flop" size="45868">
@@ -141,7 +141,7 @@
 			</dataarea>
 		</part>
 
-		<part name="flop2" interface="vixen_flop">
+		<part name="flop2" interface="floppy_5_25">
 			<!-- Revision: x3.098 -->
 			<!-- Date: 4/8/83 -->
 			<!-- Seems to be a upgrade disk for x3.094 -->
@@ -156,7 +156,7 @@
 		<year>19??</year>
 		<publisher>Encore</publisher>
 
-		<part name="flop1" interface="vixen_flop">
+		<part name="flop1" interface="floppy_5_25">
 			<!-- Revision: x3.094 -->
 			<!-- Date: 4/4/83 -->
 			<dataarea name="flop" size="91903">
@@ -164,7 +164,7 @@
 			</dataarea>
 		</part>
 
-		<part name="flop2" interface="vixen_flop">
+		<part name="flop2" interface="floppy_5_25">
 			<!-- Revision: x3.098 -->
 			<!-- Date: 4/8/83 -->
 			<!-- Seems to be a upgrade disk for x3.094 -->
@@ -179,7 +179,7 @@
 		<year>19??</year>
 		<publisher>Encore</publisher>
 
-		<part name="flop1" interface="vixen_flop">
+		<part name="flop1" interface="floppy_5_25">
 			<!-- Revision: x3.094 -->
 			<!-- Date: 4/5/83 -->
 			<dataarea name="flop" size="197270">
@@ -193,7 +193,7 @@
 		<year>19??</year>
 		<publisher>Encore</publisher>
 
-		<part name="flop1" interface="vixen_flop">
+		<part name="flop1" interface="floppy_5_25">
 			<!-- Revision: x3.094 -->
 			<!-- Date: 4/5/83 -->
 			<dataarea name="flop" size="69398">
@@ -207,7 +207,7 @@
 		<year>19??</year>
 		<publisher>Encore</publisher>
 
-		<part name="flop1" interface="vixen_flop">
+		<part name="flop1" interface="floppy_5_25">
 			<!-- Revision: x3.094 -->
 			<!-- Date: 4/4/83 -->
 			<dataarea name="flop" size="69396">
@@ -221,7 +221,7 @@
 		<year>19??</year>
 		<publisher>Encore</publisher>
 
-		<part name="flop1" interface="vixen_flop">
+		<part name="flop1" interface="floppy_5_25">
 			<!-- Revision: x3.094 -->
 			<!-- Date: 4/4/83 -->
 			<dataarea name="flop" size="62235">

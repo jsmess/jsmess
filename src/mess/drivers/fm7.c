@@ -1850,7 +1850,7 @@ static const floppy_config fm7_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
 	FLOPPY_OPTIONS_NAME(default),
-	"fm7_flop"
+	"floppy_5_25"
 };
 
 static MACHINE_CONFIG_START( fm7, fm7_state )
