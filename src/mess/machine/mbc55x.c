@@ -136,18 +136,9 @@ I8255A_INTERFACE( mbc55x_ppi8255_interface )
 
 /* PIC 8259 Configuration */
 
-static WRITE_LINE_DEVICE_HANDLER( mbc55x_pic8259_set_int_line )
-{
-	//if (state)
-	//	debugger_break(device->machine);
-		
-	cpu_set_input_line(device->machine->device(MAINCPU_TAG), INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
 const struct pic8259_interface mbc55x_pic8259_config =
 {
-	DEVCB_LINE(mbc55x_pic8259_set_int_line)
-	//DEVCB_CPU_INPUT_LINE(MAINCPU_TAG, INPUT_LINE_IRQ0)
+	DEVCB_CPU_INPUT_LINE(MAINCPU_TAG, INPUT_LINE_IRQ0)
 };
 
 READ8_HANDLER(pic8259_r)
@@ -425,7 +416,7 @@ static int instruction_hook(device_t &device, offs_t curpc)
 
 	if ((addr_ptr !=NULL) && (addr_ptr[0]==0xCD))
 	{
-		logerror("int %02X called\n",addr_ptr[1]);
+//		logerror("int %02X called\n",addr_ptr[1]);
 		
 		if(DEBUG_SET(DECODE_DOS21) && (addr_ptr[1]==0x21))
             decode_dos21(&device,curpc);

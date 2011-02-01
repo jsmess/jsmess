@@ -138,7 +138,7 @@ static MC6845_UPDATE_ROW( vid_update_row )
 	
 	switch(state->vram_page)
 	{
-		case 4	: green=&ram[0x0C000]; break;
+		case 4	: green=&ram[0x08000]; break;
 		case 5	: green=&ram[0x1C000]; break;
 		case 6	: green=&ram[0x2C000]; break;
 		case 7	: green=&ram[0x3C000]; break;

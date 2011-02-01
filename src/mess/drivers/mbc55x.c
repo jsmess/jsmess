@@ -27,10 +27,10 @@ const unsigned char mbc55x_palette[SCREEN_NO_COLOURS][3] =
 	/*normal brightness */
 	{ 0x00,0x00,0x00 },     /* black */
 	{ 0x00,0x00,0x80 },		 /* blue */
-    { 0x80,0x00,0x00 },		 /* red */
-    { 0x80,0x00,0x80 },		 /* magenta */
-	{ 0x00,0x80,0x00 }, 	 /* green */
+    { 0x00,0x80,0x00 }, 	 /* green */
     { 0x00,0x80,0x80 },		 /* cyan */
+	{ 0x80,0x00,0x00 },		 /* red */
+    { 0x80,0x00,0x80 },		 /* magenta */
 	{ 0x80,0x80,0x00 },		 /* yellow */
 	{ 0x80,0x80,0x80 },		 /* light grey */
 };
@@ -43,7 +43,7 @@ static const floppy_config mbc55x_floppy_config =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSSD_35,
-	FLOPPY_OPTIONS_NAME(mbc55x),
+	FLOPPY_OPTIONS_NAME(pc),
 	NULL
 };
 
@@ -66,7 +66,7 @@ static ADDRESS_MAP_START(mbc55x_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE( 0xF0000, 0xF3FFF ) AM_RAMBANK(RED_PLANE_TAG)
 	AM_RANGE( 0xF4000, 0xF7FFF ) AM_RAMBANK(BLUE_PLANE_TAG)
 	AM_RANGE( 0xF8000, 0xFBFFF ) AM_NOP
-    AM_RANGE( 0xFC000, 0xFFFFF ) AM_ROM AM_REGION(MAINCPU_TAG, 0x0000)
+    AM_RANGE( 0xFC000, 0xFFFFF ) AM_ROM AM_WRITENOP AM_REGION(MAINCPU_TAG, 0x0000) 
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(mbc55x_io, ADDRESS_SPACE_IO, 8)
@@ -251,7 +251,7 @@ static MACHINE_CONFIG_START( mbc55x, mbc55x_state )
 
     MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("128K")
-	MCFG_RAM_EXTRA_OPTIONS("128K,192K,256K,384K,512K,640K")
+	MCFG_RAM_EXTRA_OPTIONS("128K,192K,256K,320K,384K,448K,512K,576K,640K")
 
     /* Peripheral chips */
     
