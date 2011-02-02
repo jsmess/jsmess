@@ -11,11 +11,68 @@
 #include "includes/astrocde.h"
 #include "sound/astrocde.h"
 #include "imagedev/cartslot.h"
+#include "machine/ram.h"
 
+MACHINE_RESET( astrocde );
+void get_ram_expansion_settings(address_space *space, int &ram_expansion_installed, int &write_protect_on, int &expansion_ram_start, int &expansion_ram_end, int &shadow_ram_end);
 
 /*************************************
  *
  *  Memory maps
+ *
+ * $0000 to $1FFF:  8K on-board ROM (could be one of three available BIOS dumps)
+ * $2000 to $3FFF:  8K cartridge ROM
+ * $4000 to $4FFF:  4K screen RAM
+ * $5000 to $FFFF:  44K address space not available in standard machine.  With a
+ * sufficiently large RAM expansion, all of this RAM can be added, and accessed
+ * by an extended BASIC program.  Bally and Astrocade BASIC can access from 
+ * $5000 to $7FFF if available.
+ *
+ *  RAM Expansions
+ *
+ * Several third party RAM expansions have been made for the Astrocade.  These
+ * allow access to various ranges of the expansion memory ($5000 to $FFFF).
+ * A RAM expansion is required to use extended BASIC programs like Blue RAM BASIC
+ * and VIPERSoft BASIC.  All of the expansions also have a RAM protect switch, which
+ * can be flipped at any time to make the RAM act like ROM.  Extended BASIC
+ * programs need access to the RAM and won't work with RAM protect enabled, but
+ * this can be useful with Bally and Astrocade BASIC.  They also have a range switch
+ * (not implemented).  The default position is 6K, but it can be switched to
+ * 2K.  This means that the expanded memory starting at $6000 will instead be 
+ * mapped to the cartridge memory starting at $2000.  So it would be possible to 
+ * load a cartridge program from tape into the expansion memory, then flip the range
+ * switch and run it as a cartridge.  This is useful for cartridge development.
+ *
+ * NOTE:  If you have any trouble running cartridges with a RAM expansion installed, hit reset.
+ *
+ * Blue RAM -- available in 4K, 16K, and 32K.  These also use an INS8154 chip,
+ * (not yet implemented) which has an additional $80 bytes of RAM mapped
+ * immediately after the end of the expansion address space.  This memory
+ * can't be write protected.  The INS8154 has I/O features needed for loading
+ * tape programs into Blue RAM BASIC, as well as running the Blue RAM Utility cart.
+ * 4K:  $6000 to $6FFF (can't run VIPERSoft BASIC, because this program needs memory
+ * past this range)
+ * 16K:  $6000 to $9FFF
+ * 32K:  $6000 to $DFFF
+ *
+ * VIPER System 1 -- This is available in 16K only.  It also includes a keyboard (not implemented).
+ * 16K:  $6000 to $9FFF
+ * 
+ * Lil' WHITE RAM -- This is available in 32K only.  Attempts to read and write
+ * to memory outside of its address range ($D000 to $FFFF) are mapped to the expansion
+ * memory $5000 to $7FFF.  The current implementation won't allow the shadow RAM area
+ * to be accessed when RAM protect is on, but there is no known software that will
+ * access the upper range of the expansion RAM when RAM protect is enabled.
+ * 32K:  $5000 to $CFFF
+ * 
+ * R&L 64K RAM Board -- This is a highly configurable kit.  RAM can be installed in
+ * 2K increments.  So, the entire 44K expansion memory can be filled.  It is also
+ * possible to override the rest of the memory map with RAM (not implemented).
+ * There are 32 switches allowing users to activate and deactivate each 2K block (not implemented).
+ * RAM write protection can be implemented in three ranges through jumpers or by
+ * installing switches.  The ranges are $0000 to $0FFF (first 4K), $0000 to $3FFF (first 16K),
+ * and $0000 to $FFFF (all 64K).  The current implementation is for 44K expansion memory mapped from
+ * $5000 to $FFFF, with only a single write protect covering this entire range.
  *
  *************************************/
 
@@ -30,6 +87,28 @@ static ADDRESS_MAP_START( astrocade_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x1f) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE(astrocade_data_chip_register_r, astrocade_data_chip_register_w)
 ADDRESS_MAP_END
 
+static INPUT_CHANGED( set_write_protect )  // run when RAM expansion write protect switch is changed
+{
+	int ram_expansion_installed = 0, write_protect_on = 0, expansion_ram_start = 0, expansion_ram_end = 0, shadow_ram_end = 0;
+	address_space *space = cputag_get_address_space(field->port->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	UINT8 *expram = ram_get_ptr(field->port->machine->device("ram_tag"));
+	
+	get_ram_expansion_settings(space, ram_expansion_installed, write_protect_on, expansion_ram_start, expansion_ram_end, shadow_ram_end);  // passing by reference
+	
+    if (ram_expansion_installed == 1)
+    {
+        if (write_protect_on == 0)  // write protect off, so install memory normally
+        {
+            memory_install_ram(space, expansion_ram_start, expansion_ram_end, 0, 0, expram);
+            if (shadow_ram_end > expansion_ram_end)
+                memory_install_ram(space, expansion_ram_end + 1, shadow_ram_end, 0, 0, expram);
+        }
+        else  // write protect on, so make memory read only
+        {
+            memory_nop_write(space, expansion_ram_start, expansion_ram_end, 0, 0);
+        }
+     }
+}
 
 /*************************************
  *
@@ -134,6 +213,21 @@ static INPUT_PORTS_START( astrocde )
 
 	PORT_START("P4_KNOB")
 	PORT_BIT(0xff, 0x00, IPT_PADDLE) PORT_INVERT PORT_SENSITIVITY(85) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_MINMAX(0,255) PORT_CODE_DEC(KEYCODE_Y) PORT_CODE_INC(KEYCODE_U) PORT_PLAYER(4)
+
+    PORT_START("CFG")	/* machine config */
+	PORT_DIPNAME( 0x3f, 0x00, "RAM Expansion")
+	PORT_DIPSETTING(	0x00, "No RAM Expansion")
+	PORT_DIPSETTING(	0x01, "16KB Viper System 1 RAM Expansion")
+	PORT_DIPSETTING(	0x02, "32KB Lil' WHITE RAM Expansion")
+	PORT_DIPSETTING(	0x04, "R&L 64K RAM Board (44K installed)")
+	PORT_DIPSETTING(	0x08, "4KB Blue RAM Expansion")
+	PORT_DIPSETTING(	0x10, "16KB Blue RAM Expansion")
+	PORT_DIPSETTING(	0x20, "32KB Blue RAM Expansion")
+	
+	PORT_START("PROTECT")  /* Write protect RAM */
+	PORT_DIPNAME( 0x01, 0x00, "Write Protect RAM") PORT_CHANGED(set_write_protect, 0)
+	PORT_DIPSETTING( 0x00, "Write Protect Off")
+	PORT_DIPSETTING( 0x01, "Write Protect On")
 INPUT_PORTS_END
 
 
@@ -148,6 +242,8 @@ static MACHINE_CONFIG_START( astrocde, astrocde_state )
 	MCFG_CPU_ADD("maincpu", Z80, ASTROCADE_CLOCK/4)        /* 1.789 MHz */
 	MCFG_CPU_PROGRAM_MAP(astrocade_mem)
 	MCFG_CPU_IO_MAP(astrocade_io)
+	
+	MCFG_MACHINE_RESET( astrocde )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -164,6 +260,10 @@ static MACHINE_CONFIG_START( astrocde, astrocde_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("astrocade1", ASTROCADE, ASTROCADE_CLOCK/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	
+    /* optional expansion ram (installed in MACHINE_RESET)*/
+	MCFG_RAM_ADD("ram_tag")
+	MCFG_RAM_DEFAULT_SIZE("32k")
 
 	/* cartridge */
 	MCFG_CARTSLOT_ADD("cart")
@@ -208,6 +308,79 @@ ROM_END
 static DRIVER_INIT( astrocde )
 {
 	astrocade_video_config = AC_SOUND_PRESENT | AC_LIGHTPEN_INTS;
+}
+
+MACHINE_RESET( astrocde )
+{
+    int ram_expansion_installed = 0, write_protect_on = 0, expansion_ram_start = 0, expansion_ram_end = 0, shadow_ram_end = 0;
+    address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+    UINT8 *expram = ram_get_ptr(machine->device("ram_tag"));
+    memory_unmap_readwrite(space, 0x5000, 0xffff, 0, 0);  // unmap any previously installed expansion RAM 
+    
+    get_ram_expansion_settings(space, ram_expansion_installed, write_protect_on, expansion_ram_start, expansion_ram_end, shadow_ram_end);  // passing by reference
+    
+    if (ram_expansion_installed == 1)
+    {
+        if (write_protect_on == 0)  // write protect off, so install memory normally
+        {
+            memory_install_ram(space, expansion_ram_start, expansion_ram_end, 0, 0, expram);
+            if (shadow_ram_end > expansion_ram_end)
+                memory_install_ram(space, expansion_ram_end + 1, shadow_ram_end, 0, 0, expram);
+        }
+        else  // write protect on, so make memory read only
+        {
+            memory_nop_write(space, expansion_ram_start, expansion_ram_end, 0, 0);
+        }
+     }
+}
+
+void get_ram_expansion_settings(address_space *space, int &ram_expansion_installed, int &write_protect_on, int &expansion_ram_start, int &expansion_ram_end, int &shadow_ram_end)
+{    
+    if (input_port_read(space->machine, "PROTECT") == 0x01)
+        write_protect_on = 1;
+    else
+        write_protect_on = 0;
+        
+    ram_expansion_installed = 1;    
+        
+    switch(input_port_read(space->machine, "CFG"))  // check RAM expansion configuration and set address ranges
+    {
+        case 0x00:  // No RAM Expansion
+             ram_expansion_installed = 0;
+             break;
+        case 0x01:  // 16KB Viper System 1 RAM Expansion
+             expansion_ram_start = 0x6000;
+             expansion_ram_end = 0x9fff;
+             shadow_ram_end = 0;
+             break;
+        case 0x02:  // "32KB Lil' WHITE RAM Expansion
+             expansion_ram_start = 0x5000;
+             expansion_ram_end = 0xcfff;
+             shadow_ram_end = 0xffff;
+             break;
+        case 0x04:  // R&L 64K RAM Board (44KB installed)
+             expansion_ram_start = 0x5000;
+             expansion_ram_end = 0xffff;
+             shadow_ram_end = 0;
+             break;
+        case 0x08:  // 4KB Blue RAM Expansion
+             expansion_ram_start = 0x6000;
+             expansion_ram_end = 0x6fff;
+             shadow_ram_end = 0;
+             break;
+        case 0x10:  // 16KB Blue RAM Expansion
+             expansion_ram_start = 0x6000;
+             expansion_ram_end = 0x9fff;
+             shadow_ram_end = 0;
+             break;
+        case 0x20:  // 32KB Blue RAM Expansion
+             expansion_ram_start = 0x6000;
+             expansion_ram_end = 0xdfff;
+             shadow_ram_end = 0;
+             break;
+        default:
+            break;
+    }  
 }
 
 

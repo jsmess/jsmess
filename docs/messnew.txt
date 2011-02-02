@@ -27,6 +27,10 @@ System Driver Changes:
 - [ADAM] Rewrote driver to use the M6801 CPUs. Currently the only working
   peripheral is the keyboard. [Curt Coder]
 
+- [ASTROCDE] Add options for several RAM expansions.  Some features
+  are not implemented yet, as noted in comments.  Extended BASIC carts
+  are now playable.  [ranger_lennier]
+
 - [BBC] Made the SAA505x implementation a device.  [Atari Ace]
 
 - [GBA] Fixed EEPROM detection for "Banjo-Kazooie" and "Custom Robo GX".
