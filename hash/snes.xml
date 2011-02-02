@@ -73,6 +73,24 @@ The software list will be divided in four categories:
 
 <!-- List of perfect dumps -->
 	
+	<software name="alcahest">
+		<!-- Serial: SHVC-LX - Release Date: 1993-12-17 - Alt. Title: アルカエスト -->
+		<description>Alcahest (Jpn)</description>
+		<year>1993</year>
+		<publisher>Square</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A0N-20" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="cart_revision" value="none" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="920214" />
+			<dataarea name="rom" size="1048576">
+				<rom name="shvc-lx-0.u1" size="1048576" crc="870427d0" sha1="dac852ea9ff3141de5dc6377307b16811f607008" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+	
 	<software name="bahamut">
 		<!-- Serial: SHVC-AXBJ-JPN - Release Date: 1996-02-09 - Alt. Title: バハムート ラグーン -->
 		<description>Bahamut Lagoon (Jpn)</description>
@@ -340,6 +358,29 @@ The software list will be divided in four categories:
 		</part>
 	</software>
 
+	<software name="ffmqj" cloneof="mquest">
+		<!-- Serial: SHVC-MQ - Release Date: 1993-09-10 - Alt. Title: ファイナル ファンタジーUSA ミスティック クエスト -->
+		<description>Final Fantasy USA - Mystic Quest (Jpn)</description>
+		<year>1993</year>
+		<publisher>Square</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A3M-10" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 64K SRAM" />
+			<feature name="u3" value="U3 MAD-1" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="battery" value="CR2032" />
+			<feature name="cart_revision" value="none" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="920214" />
+			<dataarea name="rom" size="524288">
+				<rom name="shvc-mq-0.u1" size="524288" crc="1da17f0c" sha1="ffc05a65ef43fa5c56c9930af1af527509c1ae05" offset="000000" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="frontmsa" cloneof="frontms">
 		<!-- Serial: SHVC-AGCJ-JPN - Release Date: 1995-02-24 - Alt. Title: フロントミッション -->
 		<description>Front Mission (Jpn)</description>
@@ -384,6 +425,29 @@ The software list will be divided in four categories:
 				<rom name="shvc-azgj-0.u1" size="3145728" crc="fd3fdbac" sha1="65da5aea2b08ef8a540a86710d9f97a590184848" offset="000000" />
 			</dataarea>
 			<dataarea name="sram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="livealiv">
+		<!-- Serial: SHVC-5V - Release Date: 1994-09-20 - Alt Title: ライブ・ア・ライブ -->
+		<description>Live A Live (Jpn)</description>
+		<year>1994</year>
+		<publisher>Square</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1J3M-11" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 64K SRAM" />
+			<feature name="u3" value="U3 MAD-1" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="battery" value="CR2032" />
+			<feature name="cart_revision" value="none" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="920214" />
+			<dataarea name="rom" size="2097152">
+				<rom name="shvc-5v-0.u1" size="2097152" crc="6291ee08" sha1="f626b0b767d11c62c5cb3f8d1d0171fe5deb4245" offset="000000" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
 			</dataarea>
 		</part>
 	</software>
@@ -542,6 +606,29 @@ The software list will be divided in four categories:
 				<rom name="shvc-al3j-0.u1" size="4194304" crc="5399bddb" sha1="71b404b4f775c86b924f26203dc00d7deb72ce58" offset="000000" />
 			</dataarea>
 			<dataarea name="sram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rudra">
+		<!-- Serial: SHVC-A0RJ-JPN - Release Date: 1996-04-05 - Alt. Title ルドラの秘宝 -->
+		<description>Rudra no Hihou (Jpn)</description>
+		<year>1996</year>
+		<publisher>Square</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1J3M-20" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 64K SRAM" />
+			<feature name="u3" value="U3 MAD-1" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="battery" value="CR2032" />
+			<feature name="cart_revision" value="none" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="G741812 SHVC-JPN-1" />
+			<dataarea name="rom" size="4194304">
+				<rom name="shvc-a0rj-0" size="4194304" crc="5d8cb7ac" sha1="0db32658302252bc18a8c3ad61ddba6ffa115e7f" offset="000000" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
 			</dataarea>
 		</part>
 	</software>
@@ -712,6 +799,29 @@ The software list will be divided in four categories:
 				<rom name="spal-mk-0.u1" size="524288" crc="56410e5e" sha1="27d9b4f30d39af75075691344b7bdeedbd32ac19" offset="000000" />
 			</dataarea>
 			<dataarea name="sram" size="2048">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="thunterg">
+		<!-- Serial: SHVC-AEGJ-JPN - Release Date: 1996-05-24 - Alt. Title ﾄﾚｼﾞｬｰﾊﾝﾀｰG -->
+		<description>Treasure Hunter G (Jpn)</description>
+		<year>1996</year>
+		<publisher>Square</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A3M-30" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 64K SRAM" />
+			<feature name="u3" value="U3 MAD-1" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="battery" value="CR2032" />
+			<feature name="cart_revision" value="none" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="920214" />
+			<dataarea name="rom" size="3145728">
+				<rom name="shvc-aegj-0.u1" size="3145728" crc="3cceed49" sha1="2fd4acdf34424a85b9371ab9bf0438de1d8f72c5" offset="000000" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
 			</dataarea>
 		</part>
 	</software>
@@ -2045,18 +2155,6 @@ The software list will be divided in four categories:
 				<rom name="albert odyssey 2 - jashin no taidou (japan).sfc" size="2097152" crc="1b6add7b" sha1="b3b78710000d467dc0304efa0245d2cf7ae23d88" offset="000000" />
 			</dataarea>
 			<dataarea name="sram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="alcahest">
-		<!-- Serial: SHVC-LX - Release Date: 1993-12-17 - Alt. Title: アルカエスト -->
-		<description>Alcahest (Jpn)</description>
-		<year>1993</year>
-		<publisher>Square</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="alcahest (japan).sfc" size="1048576" crc="870427d0" sha1="dac852ea9ff3141de5dc6377307b16811f607008" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
