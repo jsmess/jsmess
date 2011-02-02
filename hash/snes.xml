@@ -5441,6 +5441,8 @@ The software list will be divided in four categories:
 			<dataarea name="rom" size="1048576">
 				<rom name="casper (japan).sfc" size="1048576" crc="696458b3" sha1="848e5e0f4d622b81dd34e166bb98011c9bb2ba46" offset="000000" />
 			</dataarea>
+			<dataarea name="sram" size="8192">
+			</dataarea>
 		</part>
 	</software>
 
@@ -8130,8 +8132,8 @@ The software list will be divided in four categories:
 		</part>
 	</software>
 
-	<software name="dbzsaiya">
-		<description>Dragon Ball Z - La Legende Saien (Fra)</description>
+	<software name="dbzbuto2">
+		<description>Dragon Ball Z - La Légende Saien (Fra)</description>
 		<year>1994</year>
 		<publisher>Bandai</publisher>
 		<part name="cart" interface="snes_cart">
@@ -8175,7 +8177,7 @@ The software list will be divided in four categories:
 		</part>
 	</software>
 
-	<software name="dbzbuto2" cloneof="dbzsaiya">
+	<software name="dbzbuto2j" cloneof="dbzbuto2">
 		<!-- Serial: SHVC-EF - Release Date: 1993-12-17 - Alt. Title: ドラゴンボールZ 超武闘伝2 -->
 		<description>Dragon Ball Z - Super Butouden 2 (Jpn, Rev. A)</description>
 		<year>1993</year>
@@ -8187,7 +8189,7 @@ The software list will be divided in four categories:
 		</part>
 	</software>
 
-	<software name="dbzbuto2a" cloneof="dbzsaiya">
+	<software name="dbzbuto2ja" cloneof="dbzbuto2">
 		<!-- Serial: SHVC-EF - Release Date: 1993-12-17 - Alt. Title: ドラゴンボールZ 超武闘伝2 -->
 		<description>Dragon Ball Z - Super Butouden 2 (Jpn)</description>
 		<year>1993</year>
@@ -8239,7 +8241,7 @@ The software list will be divided in four categories:
 		</part>
 	</software>
 
-	<software name="dbzsaiyaj" cloneof="dbzsaiya">
+	<software name="dbzsaiya">
 		<!-- Serial: SHVC-DB - Release Date: 1992-01-25 - Alt. Title: ドラゴンボールZ スーパー -->
 		<description>Dragon Ball Z - Super Saiya Densetsu (Jpn, Rev. A)</description>
 		<year>1992</year>
@@ -8248,10 +8250,12 @@ The software list will be divided in four categories:
 			<dataarea name="rom" size="1048576">
 				<rom name="dragon ball z - super saiya densetsu (japan) (rev 1).sfc" size="1048576" crc="ade7b968" sha1="6b5725765ddde078350ec61221ddb9bb252066a7" offset="000000" />
 			</dataarea>
+			<dataarea name="sram" size="8192">
+			</dataarea>
 		</part>
 	</software>
 
-	<software name="dbzsaiyaj1" cloneof="dbzsaiya">
+	<software name="dbzsaiya1" cloneof="dbzsaiya">
 		<!-- Serial: SHVC-DB - Release Date: 1992-01-25 - Alt. Title: ドラゴンボールZ スーパー -->
 		<description>Dragon Ball Z - Super Saiya Densetsu (Jpn)</description>
 		<year>1992</year>
@@ -8259,6 +8263,8 @@ The software list will be divided in four categories:
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="dragon ball z - super saiya densetsu (japan).sfc" size="1048576" crc="32b17409" sha1="e894ad7f0cd5e9836494f12a22552511c9c3bce6" offset="000000" />
+			</dataarea>
+			<dataarea name="sram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -22069,7 +22075,7 @@ The software list will be divided in four categories:
 			<dataarea name="rom" size="2097152">
 				<rom name="nhl '98 (usa).sfc" size="2097152" crc="03cad2d2" sha1="6ca7cefa28d701c0be8c2b987e1ce5893613f4c4" offset="000000" />
 			</dataarea>
-			<dataarea name="sram" size="8192">
+			<dataarea name="sram" size="32768">
 			</dataarea>
 		</part>
 	</software>
@@ -30019,7 +30025,7 @@ The software list will be divided in four categories:
 			<dataarea name="rom" size="1048576">
 				<rom name="star fox 2 (japan) (proto) (alt 1).sfc" size="1048576" crc="79f3433d" sha1="aea7a00c52c0f4e102b98cd5fa6710e6282e0dee" offset="000000" />
 			</dataarea>
-			<dataarea name="sram" size="131072">
+			<dataarea name="sram" size="65536">
 			</dataarea>
 		</part>
 	</software>
@@ -30380,18 +30386,6 @@ The software list will be divided in four categories:
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="street fighter alpha 2 (usa).sfc" size="4194304" crc="9c59ddff" sha1="f4ede150b5281f7f5d7e3188c6d9163c2bc66475" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="sfex">
-		<!-- Serial:  - Release Date:  -->
-		<description>Street Fighter EX (World)</description>
-		<year>19??</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="2097152">
-				<rom name="street fighter ex (world) (unl).sfc" size="2097152" crc="dad59b9f" sha1="22f864b4a8728f08513b979d2a960eb3083b2c83" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -44676,6 +44670,19 @@ The software list will be divided in four categories:
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="sonic the hedgehog (unl) [a1].sfc" size="1048576" crc="4543dd75" sha1="e7553ec4558fa96da1c8f5338aec547158776d8f" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Is there any emu which makes this work? Is it a bad dump? -->
+	<software name="sfex" supported="no">
+		<!-- Serial:  - Release Date:  -->
+		<description>Street Fighter EX (World)</description>
+		<year>19??</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="street fighter ex (world) (unl).sfc" size="2097152" crc="dad59b9f" sha1="22f864b4a8728f08513b979d2a960eb3083b2c83" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
