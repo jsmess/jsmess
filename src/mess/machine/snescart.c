@@ -617,13 +617,13 @@ static int snes_find_addon_chip( running_machine *machine )
 			/* These Seta ST-01X chips have both 0x30 at 0x00ffd5,
              they only differ for the 'size' at 0x00ffd7 */
 			if (snes_r_bank1(space, 0x00ffd7) < 0x0a)
-			{
 				state->has_addon_chip = HAS_ST011;
-			}
 			else
-			{
 				state->has_addon_chip = HAS_ST010;
-			}
+
+			// if we are loading the game in a driver without the ST01X DSP, revert to HAS_NONE to avoid crash
+			if (!state->upd96050)
+				state->has_addon_chip = HAS_NONE;
 			break;
 
 		case 0xf9:
