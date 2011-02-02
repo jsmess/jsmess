@@ -376,7 +376,7 @@ The software list will be divided in four categories:
 			<dataarea name="rom" size="524288">
 				<rom name="shvc-mq-0.u1" size="524288" crc="1da17f0c" sha1="ffc05a65ef43fa5c56c9930af1af527509c1ae05" offset="000000" />
 			</dataarea>
-			<dataarea name="sram" size="65536">
+			<dataarea name="sram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -430,7 +430,7 @@ The software list will be divided in four categories:
 	</software>
 
 	<software name="livealiv">
-		<!-- Serial: SHVC-5V - Release Date: 1994-09-20 - Alt Title: ライブ・ア・ライブ -->
+		<!-- Serial: SHVC-5V - Release Date: 1994-09-02 - Alt Title: ライブ・ア・ライブ -->
 		<description>Live A Live (Jpn)</description>
 		<year>1994</year>
 		<publisher>Square</publisher>
@@ -447,7 +447,7 @@ The software list will be divided in four categories:
 			<dataarea name="rom" size="2097152">
 				<rom name="shvc-5v-0.u1" size="2097152" crc="6291ee08" sha1="f626b0b767d11c62c5cb3f8d1d0171fe5deb4245" offset="000000" />
 			</dataarea>
-			<dataarea name="sram" size="65536">
+			<dataarea name="sram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -611,7 +611,7 @@ The software list will be divided in four categories:
 	</software>
 
 	<software name="rudra">
-		<!-- Serial: SHVC-A0RJ-JPN - Release Date: 1996-04-05 - Alt. Title ルドラの秘宝 -->
+		<!-- Serial: SHVC-AORJ-JPN - Release Date: 1996-04-05 - Alt. Title ルドラの秘宝 -->
 		<description>Rudra no Hihou (Jpn)</description>
 		<year>1996</year>
 		<publisher>Square</publisher>
@@ -628,7 +628,7 @@ The software list will be divided in four categories:
 			<dataarea name="rom" size="4194304">
 				<rom name="shvc-a0rj-0" size="4194304" crc="5d8cb7ac" sha1="0db32658302252bc18a8c3ad61ddba6ffa115e7f" offset="000000" />
 			</dataarea>
-			<dataarea name="sram" size="65536">
+			<dataarea name="sram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -804,7 +804,7 @@ The software list will be divided in four categories:
 	</software>
 
 	<software name="thunterg">
-		<!-- Serial: SHVC-AEGJ-JPN - Release Date: 1996-05-24 - Alt. Title ﾄﾚｼﾞｬｰﾊﾝﾀｰG -->
+		<!-- Serial: SHVC-AEGJ-JPN - Release Date: 1996-05-24 - Alt. Title: トレジャーハンターG -->
 		<description>Treasure Hunter G (Jpn)</description>
 		<year>1996</year>
 		<publisher>Square</publisher>
@@ -821,7 +821,7 @@ The software list will be divided in four categories:
 			<dataarea name="rom" size="3145728">
 				<rom name="shvc-aegj-0.u1" size="3145728" crc="3cceed49" sha1="2fd4acdf34424a85b9371ab9bf0438de1d8f72c5" offset="000000" />
 			</dataarea>
-			<dataarea name="sram" size="65536">
+			<dataarea name="sram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -5194,6 +5194,8 @@ The software list will be divided in four categories:
 			<dataarea name="rom" size="1572864">
 				<rom name="cannondale cup (usa).sfc" size="1572864" crc="b95fe0a0" sha1="f4d77083dc87467612eda2ae251c6a9bb9500911" offset="000000" />
 			</dataarea>
+			<dataarea name="sram" size="2048">
+			</dataarea>
 		</part>
 	</software>
 
@@ -5313,6 +5315,8 @@ The software list will be divided in four categories:
 			<dataarea name="rom" size="1048576">
 				<rom name="captain tsubasa iii - koutei no chousen (japan).sfc" size="1048576" crc="26b0cee3" sha1="ccc69906612478813b4eaca03f9662e28596d69e" offset="000000" />
 			</dataarea>
+			<dataarea name="sram" size="8192">
+			</dataarea>
 		</part>
 	</software>
 
@@ -5324,6 +5328,8 @@ The software list will be divided in four categories:
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1572864">
 				<rom name="captain tsubasa iv - pro no rival-tachi (japan).sfc" size="1572864" crc="3e04b246" sha1="7471d2d4ea7c3e9fe2349b624c4ae570b585475f" offset="000000" />
+			</dataarea>
+			<dataarea name="sram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -5348,6 +5354,8 @@ The software list will be divided in four categories:
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="captain tsubasa v - hasha no shougou campione (japan).sfc" size="2097152" crc="e2b26d99" sha1="ad8ae8944e492b8336427ac3cd8af0853ad8b00b" offset="000000" />
+			</dataarea>
+			<dataarea name="sram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -5721,6 +5729,8 @@ The software list will be divided in four categories:
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="chinhai (japan).sfc" size="524288" crc="d7452215" sha1="cce66cec0250573613c7a81a2465b0bc96e7f99e" offset="000000" />
+			</dataarea>
+			<dataarea name="sram" size="2048">
 			</dataarea>
 		</part>
 	</software>
@@ -6295,6 +6305,8 @@ The software list will be divided in four categories:
 			<dataarea name="rom" size="524288">
 				<rom name="conveni wars barcode battler senki - super senshi shutsugeki seyo! (japan).sfc" size="524288" crc="115233db" sha1="72ca858f50d67121b06868633b8588a79316c3e2" offset="000000" />
 			</dataarea>
+			<dataarea name="sram" size="8192">
+			</dataarea>
 		</part>
 	</software>
 
@@ -6485,6 +6497,8 @@ The software list will be divided in four categories:
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="cu-on-pa sfc (japan).sfc" size="1048576" crc="42d0c418" sha1="58469e1ea82fc7b2ecd5d696a561292fa2c5db8a" offset="000000" />
+			</dataarea>
+			<dataarea name="sram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -8220,6 +8234,8 @@ The software list will be divided in four categories:
 			<dataarea name="rom" size="2097152">
 				<rom name="dragon ball z - super gokuu den - totsugeki hen (japan).sfc" size="2097152" crc="d531289b" sha1="926b861734cdeef9e70cd436be62c73481e7392f" offset="000000" />
 			</dataarea>
+			<dataarea name="sram" size="8192">
+			</dataarea>
 		</part>
 	</software>
 
@@ -8517,6 +8533,8 @@ The software list will be divided in four categories:
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="dream maze - kigurumi daibouken (japan).sfc" size="1048576" crc="4b17a200" sha1="5a15a4d4ed812f814370209ac70c1ac933b66005" offset="000000" />
+			</dataarea>
+			<dataarea name="sram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -9518,6 +9536,8 @@ The software list will be divided in four categories:
 			<dataarea name="rom" size="1048576">
 				<rom name="f1 pole position (europe).sfc" size="1048576" crc="e935886a" sha1="3351f8ddf52e2aeb01affd7dd3a6a4623d96ff1d" offset="000000" />
 			</dataarea>
+			<dataarea name="sram" size="2048">
+			</dataarea>
 		</part>
 	</software>
 
@@ -10096,20 +10116,6 @@ The software list will be divided in four categories:
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="3145728">
 				<rom name="final fantasy iii (usa).sfc" size="3145728" crc="a27f1c7a" sha1="4f37e4274ac3b2ea1bedb08aa149d8fc5bb676e7" offset="000000" />
-			</dataarea>
-			<dataarea name="sram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ffmqj" cloneof="mquest">
-		<!-- Serial: SHVC-MQ - Release Date: 1993-09-10 - Alt. Title: ファイナル ファンタジーUSAミスティック クエスト -->
-		<description>Final Fantasy USA - Mystic Quest (Jpn)</description>
-		<year>1993</year>
-		<publisher>Square</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="524288">
-				<rom name="final fantasy usa - mystic quest (japan).sfc" size="524288" crc="1da17f0c" sha1="ffc05a65ef43fa5c56c9930af1af527509c1ae05" offset="000000" />
 			</dataarea>
 			<dataarea name="sram" size="8192">
 			</dataarea>
@@ -14315,6 +14321,8 @@ The software list will be divided in four categories:
 			<dataarea name="rom" size="1572864">
 				<rom name="itadaki street 2 - neon sign wa barairo ni (japan).sfc" size="1572864" crc="95310032" sha1="e0bdf8d4e9c9d3f344686fda1e20190e3b47800d" offset="000000" />
 			</dataarea>
+			<dataarea name="sram" size="8192">
+			</dataarea>
 		</part>
 	</software>
 
@@ -18101,20 +18109,6 @@ The software list will be divided in four categories:
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="little master - nijiiro no maseki (japan).sfc" size="2097152" crc="b916334c" sha1="75b76715d4a20371e0340dbeee3a51ff6a1dbad3" offset="000000" />
-			</dataarea>
-			<dataarea name="sram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="livealiv">
-		<!-- Serial: SHVC-5V - Release Date: 1994-09-02 - Alt. Title: ライブ・ア・ライフ -->
-		<description>Live A Live (Jpn)</description>
-		<year>1994</year>
-		<publisher>Square</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="2097152">
-				<rom name="live a live (japan).sfc" size="2097152" crc="6291ee08" sha1="f626b0b767d11c62c5cb3f8d1d0171fe5deb4245" offset="000000" />
 			</dataarea>
 			<dataarea name="sram" size="8192">
 			</dataarea>
@@ -26709,20 +26703,6 @@ The software list will be divided in four categories:
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="rpg tsukuru 2 (japan).sfc" size="2097152" crc="675b6382" sha1="95f31dfb31200e31e80007cc66a32e2c1a7b02be" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="rudra">
-		<!-- Serial: SHVC-AORJ - Release Date: 1996-04-05 - Alt. Title: ルドラの秘宝 -->
-		<description>Rudra no Hihou (Jpn)</description>
-		<year>1996</year>
-		<publisher>Square</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="4194304">
-				<rom name="rudra no hihou (japan).sfc" size="4194304" crc="5d8cb7ac" sha1="0db32658302252bc18a8c3ad61ddba6ffa115e7f" offset="000000" />
-			</dataarea>
-			<dataarea name="sram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -37880,20 +37860,6 @@ The software list will be divided in four categories:
 		</part>
 	</software>
 
-	<software name="thunterg">
-		<!-- Serial: SHVC-AEGJ - Release Date: 1996-05-24 - Alt. Title: トレジャーハンターG -->
-		<description>Treasure Hunter G (Jpn)</description>
-		<year>1996</year>
-		<publisher>Square</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="3145728">
-				<rom name="treasure hunter g (japan).sfc" size="3145728" crc="3cceed49" sha1="2fd4acdf34424a85b9371ab9bf0438de1d8f72c5" offset="000000" />
-			</dataarea>
-			<dataarea name="sram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="tristar">
 		<!-- Serial:  - Release Date:  -->
 		<description>Tri-Star (USA)</description>
@@ -40804,8 +40770,6 @@ The software list will be divided in four categories:
 			<dataarea name="rom" size="1048576">
 				<rom name="yadamon - wonderland dreams (japan) (sample).sfc" size="1048576" crc="9424bbfa" sha1="99024eafe49fde8f1fe26f0a5e927ccb3e0e548d" offset="000000" />
 			</dataarea>
-			<dataarea name="sram" size="8192">
-			</dataarea>
 		</part>
 	</software>
 
@@ -40817,6 +40781,8 @@ The software list will be divided in four categories:
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="yadamon - wonderland dreams (japan).sfc" size="1048576" crc="b5292147" sha1="f13365792c97c423c8689a143b62f85d5f6ad3d1" offset="000000" />
+			</dataarea>
+			<dataarea name="sram" size="8192">
 			</dataarea>
 		</part>
 	</software>
