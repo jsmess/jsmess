@@ -381,7 +381,7 @@ static void draw_gfxbitmap(running_machine *machine, bitmap_t *bitmap,const rect
 					pen_r = (state->gfx_bitmap_ram[(((x+(y*40*w)+yi*0x800)+state->crtc_start_addr) & 0x3fff)+0x4000+plane*0xc000]>>(7-xi)) & 1;
 					pen_g = (state->gfx_bitmap_ram[(((x+(y*40*w)+yi*0x800)+state->crtc_start_addr) & 0x3fff)+0x8000+plane*0xc000]>>(7-xi)) & 1;
 
-					color =  pen_g<<2 | pen_r<<1 | pen_b<<0;
+					color =  (pen_g<<2 | pen_r<<1 | pen_b<<0) | 8;
 
 					pri_mask_val = priority_mixer_pri(machine,color);
 					if(pri_mask_val & pri) continue;
@@ -1099,7 +1099,7 @@ static void set_current_palette(running_machine *machine)
 		g = ((state->x_g)>>(addr)) & 1;
 		b = ((state->x_b)>>(addr)) & 1;
 
-		palette_set_color_rgb(machine, addr+0x100, pal1bit(r), pal1bit(g), pal1bit(b));
+		palette_set_color_rgb(machine, addr|8, pal1bit(r), pal1bit(g), pal1bit(b));
 	}
 }
 
@@ -2014,10 +2014,10 @@ static const gfx_layout x1_chars_16x16 =
 
 /* decoded for debugging purpose, this will be nuked in the end... */
 static GFXDECODE_START( x1 )
-	GFXDECODE_ENTRY( "cgrom",   0x00000, x1_chars_8x8,    0x200, 0x20 )
-	GFXDECODE_ENTRY( "pcg",     0x00000, x1_pcg_8x8,      0x000, 1 )
-	GFXDECODE_ENTRY( "font",    0x00000, x1_chars_8x16,   0x200, 0x20 )
-	GFXDECODE_ENTRY( "kanji",   0x00000, x1_chars_16x16,  0x200, 0x20 )
+	GFXDECODE_ENTRY( "cgrom",   0x00000, x1_chars_8x8,    0, 1 )
+	GFXDECODE_ENTRY( "pcg",     0x00000, x1_pcg_8x8,      0, 1 )
+	GFXDECODE_ENTRY( "font",    0x00000, x1_chars_8x16,   0, 1 )
+	GFXDECODE_ENTRY( "kanji",   0x00000, x1_chars_16x16,  0, 1 )
 GFXDECODE_END
 
 /*************************************
@@ -2219,11 +2219,8 @@ static MACHINE_RESET( x1 )
 	state->key_irq_flag = state->ctc_irq_flag = 0;
 
 	/* Reinitialize palette here if there's a soft reset for the Turbo PAL stuff*/
-	for(i=0;i<8;i++)
-	{
-		palette_set_color_rgb(machine, i+0x000, pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
-		palette_set_color_rgb(machine, i+0x100, pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
-	}
+	for(i=0;i<0x10;i++)
+		palette_set_color_rgb(machine, i, pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
 
 	timer_adjust_periodic(state->rtc_timer, attotime_zero, 0, ATTOTIME_IN_SEC(1));
 }
@@ -2255,25 +2252,8 @@ static PALETTE_INIT(x1)
 {
 	int i;
 
-	for(i=0;i<0x300;i++)
+	for(i=0;i<0x10;i++)
 		palette_set_color(machine, i,MAKE_RGB(0x00,0x00,0x00));
-
-	for (i = 0x200; i < 0x220; i++)
-	{
-		UINT8 r,g,b;
-
-		if(i & 0x01)
-		{
-			r = ((i >> 3) & 1) ? 0xff : 0x00;
-			g = ((i >> 2) & 1) ? 0xff : 0x00;
-			b = ((i >> 1) & 1) ? 0xff : 0x00;
-		}
-		else { r = g = b = 0x00; }
-
-		if(i & 0x10) { r^=0xff; g^=0xff; b^=0xff; }
-
-		palette_set_color_rgb(machine, i, r,g,b);
-	}
 }
 
 static FLOPPY_OPTIONS_START( x1 )
@@ -2322,7 +2302,7 @@ static MACHINE_CONFIG_START( x1, x1_state )
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_MC6845_ADD("crtc", H46505, (VDP_CLOCK/48), mc6845_intf) //unknown divider
-	MCFG_PALETTE_LENGTH(0x300)
+	MCFG_PALETTE_LENGTH(0x10)
 	MCFG_PALETTE_INIT(x1)
 
 	MCFG_GFXDECODE(x1)
