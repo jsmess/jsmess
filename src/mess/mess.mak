@@ -1830,7 +1830,7 @@ $(MESS_DRIVERS)/aim65_40.o:	$(MESS_LAYOUT)/aim65_40.lh
 $(MESS_DRIVERS)/amico2k.o:	$(MESS_LAYOUT)/amico2k.lh
 $(MESS_DRIVERS)/beta.o:		$(MESS_LAYOUT)/beta.lh
 $(MESS_DRIVERS)/bob85.o:	$(MESS_LAYOUT)/bob85.lh
-$(MESS_DRIVERS)/cdi.o:		$(MESS_LAYOUT)/cdi.lh
+$(MAME_DRIVERS)/cdi.o:		$(MAME_LAYOUT)/cdi.lh
 $(MESS_DRIVERS)/coco.o:		$(MESS_LAYOUT)/coco3.lh
 $(MESS_DRIVERS)/cosmicos.o:	$(MESS_LAYOUT)/cosmicos.lh
 $(MESS_DRIVERS)/c80.o:		$(MESS_LAYOUT)/c80.lh
