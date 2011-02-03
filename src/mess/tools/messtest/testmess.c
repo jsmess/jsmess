@@ -82,11 +82,11 @@ struct _messtest_command
 	messtest_command_type_t command_type;
 	union
 	{
-		int wait_time;
+		double wait_time;
 		struct
 		{
 			const char *input_chars;
-			int rate;
+			double rate;
 		} input_args;
 		struct
 		{
@@ -609,7 +609,7 @@ static void command_wait(running_machine *machine)
 	if (state == STATE_READY)
 	{
 		/* beginning a wait command */
-		wait_target = current_time + current_command->u.wait_time;
+		wait_target = current_time + attotime::from_msec(current_command->u.wait_time);
 		state = STATE_INCOMMAND;
 	}
 	else
@@ -637,7 +637,7 @@ static void command_input(running_machine *machine)
 		if (current_command->u.input_args.input_chars)
 		{
 			inputx_post_utf8_rate(machine, current_command->u.input_args.input_chars,
-				current_command->u.input_args.rate);
+				attotime::from_hz(current_command->u.input_args.rate));
 		}
 	}
 	state = inputx_is_posting(machine) ? STATE_INCOMMAND : STATE_READY;
@@ -1219,7 +1219,7 @@ static void node_wait(xml_data_node *node)
 
 	memset(&new_command, 0, sizeof(new_command));
 	new_command.command_type = MESSTEST_COMMAND_WAIT;
-	new_command.u.wait_time = parse_time(attr_node->value);
+	new_command.u.wait_time = atof(attr_node->value);
 
 	if (!append_command())
 	{
@@ -1234,13 +1234,11 @@ static void node_input(xml_data_node *node)
 {
 	/* <input> - inputs natural keyboard data into a system */
 	xml_attribute_node *attr_node;
-	attotime rate;
 
 	memset(&new_command, 0, sizeof(new_command));
 	new_command.command_type = MESSTEST_COMMAND_INPUT;
 	attr_node = xml_get_attribute(node, "rate");
-	rate = attr_node ? parse_time(attr_node->value) : attotime(0, 0);
-	new_command.u.input_args.rate = rate;
+	new_command.u.input_args.rate = atof(attr_node->value);
 	new_command.u.input_args.input_chars = node->value;
 
 	if (!append_command())
