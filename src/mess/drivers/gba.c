@@ -1972,6 +1972,25 @@ static READ32_HANDLER(gba_bios_r)
 	return rom[offset&0x3fff];
 }
 
+static READ32_HANDLER(gba_10000000_r)
+{
+	UINT32 data, cpsr, pc;
+	cpu_device *cpu = downcast<cpu_device *>(space->machine->device( "maincpu"));
+	pc = cpu_get_reg( cpu, ARM7_PC);
+	cpsr = cpu_get_reg( cpu, ARM7_CPSR);
+	if (T_IS_SET( cpsr))
+	{
+		data = space->read_dword( pc + 8);
+	}
+	else
+	{
+		UINT16 insn = space->read_word( pc + 4);
+		data = (insn << 16) | (insn << 0);
+	}
+	logerror( "%s: unmapped program memory read from %08X = %08X & %08X\n", cpuexec_describe_context( space->machine), 0x10000000 + (offset << 2), data, mem_mask);
+	return data;
+}
+
 static ADDRESS_MAP_START( gbadvance_map, ADDRESS_SPACE_PROGRAM, 32 )
 	ADDRESS_MAP_UNMAP_HIGH // for "Fruit Mura no Doubutsu Tachi" and "Classic NES Series"
 	AM_RANGE(0x00000000, 0x00003fff) AM_ROM AM_READ(gba_bios_r)
@@ -1984,6 +2003,7 @@ static ADDRESS_MAP_START( gbadvance_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x08000000, 0x09ffffff) AM_ROM AM_REGION("cartridge", 0)	// cartridge ROM (mirror 0)
 	AM_RANGE(0x0a000000, 0x0bffffff) AM_ROM AM_REGION("cartridge", 0)	// cartridge ROM (mirror 1)
 	AM_RANGE(0x0c000000, 0x0cffffff) AM_ROM AM_REGION("cartridge", 0)	// final mirror
+	AM_RANGE(0x10000000, 0xffffffff) AM_READ(gba_10000000_r) // for "Justice League Chronicles" (game bug)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( gbadv )
