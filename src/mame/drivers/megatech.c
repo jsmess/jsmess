@@ -272,7 +272,7 @@ static TIMER_CALLBACK( megatech_z80_stop_state )
 	if (game_region)
 	{
 		{
-			timer_set( machine, attotime_zero, NULL, param, megatech_z80_run_state );
+			timer_set( machine, attotime::zero, NULL, param, megatech_z80_run_state );
 		}
 	}
 	else
@@ -287,7 +287,7 @@ static TIMER_CALLBACK( megatech_z80_stop_state )
 
 static void megatech_select_game(running_machine *machine, int gameno)
 {
-	timer_set( machine, attotime_zero, NULL, gameno, megatech_z80_stop_state );
+	timer_set( machine, attotime::zero, NULL, gameno, megatech_z80_stop_state );
 }
 
 static WRITE8_HANDLER( megatech_cart_select_w )
@@ -437,7 +437,7 @@ static VIDEO_START(mtnew)
 	init_for_megadrive(machine); // create an sms vdp too, for comptibility mode
 	VIDEO_START_CALL(megadriv);
 }
-//attotime_never
+//attotime::never
 static VIDEO_UPDATE(mtnew)
 {
 	device_t *megadriv_screen = screen->machine->device("megadriv");
@@ -1199,7 +1199,7 @@ ROM_END
 
 
 /* nn */ /* nn is part of the instruction rom name, should there be a game for each number? */
-/* -- */ CONS( 1989, megatech, 0, 0,     megatech_slot, megatech, mt_slot, "Sega",                  "Mega-Tech", GAME_IS_BIOS_ROOT )
+/* -- */ CONS( 1989, megatech, 0, 0,     megatech_slot, megatech, mt_slot, "Sega",                  "Mega-Tech", GAME_NOT_WORKING )
 /* 01 */ GAME( 1988, mt_beast, megatech, megatech, megatech, mt_crt, ROT0, "Sega",                  "Altered Beast (Mega-Tech)", GAME_NOT_WORKING )
 /* 02 */ GAME( 1988, mt_shar2, megatech, megatech, megatech, mt_crt, ROT0, "Sega",                  "Space Harrier II (Mega-Tech)", GAME_NOT_WORKING )
 /* 03 */ GAME( 1988, mt_stbld, megatech, megatech, megatech, mt_crt, ROT0, "Sega",                  "Super Thunder Blade (Mega-Tech)", GAME_NOT_WORKING )
@@ -1252,7 +1252,7 @@ ROM_END
 /* 50 */ // unknown
 /* 51 */ GAME( 1991, mt_srage, megatech, megatech, megatech, mt_crt, ROT0, "Sega",                  "Streets of Rage (Mega-Tech)", GAME_NOT_WORKING )
 /* 52 */ GAME( 1991, mt_sonic, megatech, megatech, megatech, mt_crt, ROT0, "Sega",                  "Sonic The Hedgehog (Mega-Tech, set 1)", GAME_NOT_WORKING )
-/*    */ GAME( 1991, mt_sonia, mt_sonic, megatech, megatech, mt_crt, ROT0, "Sega",                  "Sonic The Hedgehog (Mega-Tech, set 2)", GAME_NOT_WORKING )
+/*    */ GAME( 1991, mt_sonia, megatech, megatech, megatech, mt_crt, ROT0, "Sega",                  "Sonic The Hedgehog (Mega-Tech, set 2)", GAME_NOT_WORKING )
 /* 53 */ GAME( 1990, mt_fshrk, megatech, megatech, megatech, mt_crt, ROT0, "Toaplan / Sega",        "Fire Shark (Mega-Tech)", GAME_NOT_WORKING )
 /* 54 */ GAME( 1991, mt_spman, megatech, megatech, megatech, mt_crt, ROT0, "Marvel / Sega",         "Spider-Man vs The Kingpin (Mega-Tech)", GAME_NOT_WORKING )
 /* 55 */ // unknown

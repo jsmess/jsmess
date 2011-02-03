@@ -217,7 +217,7 @@ int upd71071_dmarq(device_t* device, int state,int channel)
 				// TODO
 				break;
 			case 0x40:  // Single
-				timer_adjust_oneshot(dmac->timer[channel],ATTOTIME_IN_HZ(dmac->intf->clock),channel);
+				timer_adjust_oneshot(dmac->timer[channel],attotime::from_hz(dmac->intf->clock),channel);
 				break;
 			case 0x80:  // Block
 				// TODO

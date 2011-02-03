@@ -80,7 +80,7 @@ static TIMER_CALLBACK( atapi_xfer_end )
 {
 	UINT8 sector_buffer[ 4096 ];
 
-	timer_adjust_oneshot(atapi_timer, attotime_never, 0);
+	timer_adjust_oneshot(atapi_timer, attotime::never, 0);
 
 	printf("atapi_xfer_end atapi_xferlen = %d, atapi_xfermod=%d\n", atapi_xfermod, atapi_xferlen );
 
@@ -546,7 +546,7 @@ void dreamcast_atapi_init(running_machine *machine)
 	atapi_cdata_wait = 0;
 
 	atapi_timer = timer_alloc(machine,  atapi_xfer_end , NULL);
-	timer_adjust_oneshot(atapi_timer, attotime_never, 0);
+	timer_adjust_oneshot(atapi_timer, attotime::never, 0);
 
 	gdrom_device = NULL;
 

@@ -68,9 +68,9 @@ static void tmp68301_update_timer( running_machine *machine, int i )
 	UINT16 MAX2	=	tmp68301_regs[(0x206 + i * 0x20)/2];
 
 	int max = 0;
-	attotime duration = attotime_zero;
+	attotime duration = attotime::zero;
 
-	timer_adjust_oneshot(tmp68301_timer[i],attotime_never,i);
+	timer_adjust_oneshot(tmp68301_timer[i],attotime::never,i);
 
 	// timers 1&2 only
 	switch( (TCR & 0x0030)>>4 )						// MR2..1
@@ -90,7 +90,7 @@ static void tmp68301_update_timer( running_machine *machine, int i )
 		{
 			int scale = (TCR & 0x3c00)>>10;			// P4..1
 			if (scale > 8) scale = 8;
-			duration = attotime_mul(ATTOTIME_IN_HZ(machine->firstcpu->unscaled_clock()), (1 << scale) * max);
+			duration = attotime::from_hz(machine->firstcpu->unscaled_clock()) * ((1 << scale) * max);
 		}
 		break;
 	}
@@ -99,7 +99,7 @@ static void tmp68301_update_timer( running_machine *machine, int i )
 
 	if (!(TCR & 0x0002))				// CS
 	{
-		if (attotime_compare(duration, attotime_zero))
+		if (duration != attotime::zero)
 			timer_adjust_oneshot(tmp68301_timer[i],duration,i);
 		else
 			logerror("%s: TMP68301 error, timer %d duration is 0\n",cpuexec_describe_context(machine),i);

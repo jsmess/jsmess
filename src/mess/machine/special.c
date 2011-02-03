@@ -126,7 +126,7 @@ static TIMER_CALLBACK( special_reset )
 
 MACHINE_RESET( special )
 {
-	timer_set(machine, ATTOTIME_IN_USEC(10), NULL, 0, special_reset);
+	timer_set(machine, attotime::from_usec(10), NULL, 0, special_reset);
 	memory_set_bank(machine, "bank1", 1);
 }
 
@@ -275,7 +275,7 @@ MACHINE_RESET( specimx )
 	special_state *state = machine->driver_data<special_state>();
 	specimx_set_bank(machine, 2,0x00); // Initiali load ROM disk
 	state->specimx_color = 0x70;
-	timer_set(machine,  attotime_zero, NULL, 0, setup_pit8253_gates );
+	timer_set(machine,  attotime::zero, NULL, 0, setup_pit8253_gates );
 	device_t *fdc = machine->device("wd1793");
 	wd17xx_set_pause_time(fdc,12);
 	wd17xx_dden_w(fdc, 0);

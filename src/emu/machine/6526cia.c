@@ -208,7 +208,7 @@ void mos6526_device::device_start()
 	/* setup TOD timer, if appropriate */
 	if (m_config.m_tod_clock != 0)
 	{
-		timer_pulse(&m_machine, ATTOTIME_IN_HZ(m_config.m_tod_clock), (void *)this, 0, clock_tod_callback);
+		timer_pulse(&m_machine, attotime::from_hz(m_config.m_tod_clock), (void *)this, 0, clock_tod_callback);
 	}
 
 	/* state save support */
@@ -857,7 +857,7 @@ void mos6526_device::reg_w(UINT8 offset, UINT8 data)
 static int is_timer_active(emu_timer *timer)
 {
 	attotime t = timer_firetime(timer);
-	return attotime_compare(t, attotime_never) != 0;
+	return (t != attotime::never);
 }
 
 /*-------------------------------------------------
@@ -873,7 +873,7 @@ void mos6526_device::cia_timer::update(int which, INT32 new_count)
 	/* update the timer count, if necessary */
 	if ((new_count == -1) && is_timer_active(m_timer))
 	{
-		UINT16 current_count = attotime_to_double(attotime_mul(timer_timeelapsed(m_timer), m_clock));
+		UINT16 current_count = (timer_timeelapsed(m_timer) * m_clock).as_double();
 		m_count = m_count - MIN(m_count, current_count);
 	}
 
@@ -887,13 +887,13 @@ void mos6526_device::cia_timer::update(int which, INT32 new_count)
 	if ((m_mode & 0x01) && ((m_mode & (which ? 0x60 : 0x20)) == 0x00))
 	{
 		/* timer is on and is connected to clock */
-		attotime period = attotime_mul(ATTOTIME_IN_HZ(m_clock), (m_count ? m_count : 0x10000));
+		attotime period = attotime::from_hz(m_clock) * (m_count ? m_count : 0x10000);
 		timer_adjust_oneshot(m_timer, period, which);
 	}
 	else
 	{
 		/* timer is off or not connected to clock */
-		timer_adjust_oneshot(m_timer, attotime_never, which);
+		timer_adjust_oneshot(m_timer, attotime::never, which);
 	}
 }
 
@@ -908,7 +908,7 @@ UINT16 mos6526_device::cia_timer::get_count()
 
 	if (is_timer_active(m_timer))
 	{
-		UINT16 current_count = attotime_to_double(attotime_mul(timer_timeelapsed(m_timer), m_clock));
+		UINT16 current_count = (timer_timeelapsed(m_timer) * m_clock).as_double();
 		count = m_count - MIN(m_count, current_count);
 	}
 	else

@@ -57,7 +57,7 @@ void watchdog_init(running_machine *machine)
 static void watchdog_internal_reset(running_machine &machine)
 {
 	/* set up the watchdog timer; only start off enabled if explicitly configured */
-	watchdog_enabled = (machine.m_config.m_watchdog_vblank_count != 0 || attotime_compare(machine.m_config.m_watchdog_time, attotime_zero) != 0);
+	watchdog_enabled = (machine.m_config.m_watchdog_vblank_count != 0 || machine.m_config.m_watchdog_time != attotime::zero);
 	watchdog_reset(&machine);
 	watchdog_enabled = TRUE;
 }
@@ -109,7 +109,7 @@ void watchdog_reset(running_machine *machine)
 {
 	/* if we're not enabled, skip it */
 	if (!watchdog_enabled)
-		timer_adjust_oneshot(watchdog_timer, attotime_never, 0);
+		timer_adjust_oneshot(watchdog_timer, attotime::never, 0);
 
 	/* VBLANK-based watchdog? */
 	else if (machine->config->m_watchdog_vblank_count != 0)
@@ -122,12 +122,12 @@ void watchdog_reset(running_machine *machine)
 	}
 
 	/* timer-based watchdog? */
-	else if (attotime_compare(machine->config->m_watchdog_time, attotime_zero) != 0)
+	else if (machine->config->m_watchdog_time != attotime::zero)
 		timer_adjust_oneshot(watchdog_timer, machine->config->m_watchdog_time, 0);
 
 	/* default to an obscene amount of time (3 seconds) */
 	else
-		timer_adjust_oneshot(watchdog_timer, ATTOTIME_IN_SEC(3), 0);
+		timer_adjust_oneshot(watchdog_timer, attotime::from_seconds(3), 0);
 }
 
 

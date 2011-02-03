@@ -77,16 +77,16 @@ static void ssystem3_playfield_write(running_machine *machine, int reset, int si
   }
   if (!signal && state->playfield.signal) {
     attotime t=timer_get_time(machine);
-    state->playfield.high_time=attotime_sub(t, state->playfield.time);
+    state->playfield.high_time=t - state->playfield.time;
     state->playfield.time=t;
 
     //    logerror("%.4x playfield %d lowtime %s hightime %s\n",(int)activecpu_get_pc(), state->playfield.count,
-    //       attotime_string(state->playfield.low_time, 7), attotime_string(state->playfield.high_time,7) );
+    //       state->playfield.low_time.as_string(7), state->playfield.high_time.as_string(7) );
 
     if (state->playfield.started) {
       // 0 twice as long low
       // 1 twice as long high
-      if (attotime_compare(state->playfield.low_time,state->playfield.high_time)>0) d=TRUE;
+      if (state->playfield.low_time > state->playfield.high_time) d=TRUE;
 
       state->playfield.data&=~(1<<(state->playfield.bit^7));
       if (d) state->playfield.data|=1<<(state->playfield.bit^7);
@@ -102,7 +102,7 @@ static void ssystem3_playfield_write(running_machine *machine, int reset, int si
 
   } else if (signal && !state->playfield.signal) {
     attotime t=timer_get_time(machine);
-    state->playfield.low_time=attotime_sub(t, state->playfield.time);
+    state->playfield.low_time= t - state->playfield.time;
     state->playfield.time=t;
     state->playfield.started=TRUE;
   }
@@ -306,7 +306,7 @@ static MACHINE_CONFIG_START( ssystem3, ssystem3_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 1000000)
 	MCFG_CPU_PROGRAM_MAP(ssystem3_map)
-	MCFG_QUANTUM_TIME(HZ(60))
+	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
     /* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)

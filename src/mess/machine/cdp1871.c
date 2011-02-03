@@ -175,7 +175,7 @@ void cdp1871_device::device_start()
 
 	// allocate timers
 	m_scan_timer = device_timer_alloc(*this);
-	timer_adjust_periodic(m_scan_timer, attotime_zero, 0, ATTOTIME_IN_HZ(clock()));
+	timer_adjust_periodic(m_scan_timer, attotime::zero, 0, attotime::from_hz(clock()));
 
 	// register for state saving
 	state_save_register_device_item(this, 0, m_inhibit);

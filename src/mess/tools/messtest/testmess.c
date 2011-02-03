@@ -82,11 +82,11 @@ struct _messtest_command
 	messtest_command_type_t command_type;
 	union
 	{
-		attotime wait_time;
+		int wait_time;
 		struct
 		{
 			const char *input_chars;
-			attotime rate;
+			int rate;
 		} input_args;
 		struct
 		{
@@ -472,13 +472,13 @@ static messtest_result_t run_test(int flags, messtest_results *results)
 			if (had_failure)
 			{
 				report_message(MSG_FAILURE, "Test failed (real time %.2f; emu time %.2f [%i%%])",
-					real_run_time, attotime_to_double(final_time), (int) ((attotime_to_double(final_time) / real_run_time) * 100));
+					real_run_time, final_time.as_double(), (int) ((final_time.as_double() / real_run_time) * 100));
 				rc = MESSTEST_RESULT_RUNTIMEFAILURE;
 			}
 			else
 			{
 				report_message(MSG_INFO, "Test succeeded (real time %.2f; emu time %.2f [%i%%])",
-					real_run_time, attotime_to_double(final_time), (int) ((attotime_to_double(final_time) / real_run_time) * 100));
+					real_run_time, final_time.as_double(), (int) ((final_time.as_double() / real_run_time) * 100));
 				rc = MESSTEST_RESULT_SUCCESS;
 			}
 			break;
@@ -609,13 +609,13 @@ static void command_wait(running_machine *machine)
 	if (state == STATE_READY)
 	{
 		/* beginning a wait command */
-		wait_target = attotime_add(current_time, current_command->u.wait_time);
+		wait_target = current_time + current_command->u.wait_time;
 		state = STATE_INCOMMAND;
 	}
 	else
 	{
 		/* during a wait command */
-		state = (attotime_compare(current_time, wait_target) >= 0) ? STATE_READY : STATE_INCOMMAND;
+		state = (current_time >= wait_target) ? STATE_READY : STATE_INCOMMAND;
 	}
 }
 
@@ -652,7 +652,7 @@ static void command_rawinput(running_machine *machine)
 	static const char *position;
 #if 0
 	int i;
-	double rate = ATTOTIME_IN_SEC(1);
+	double rate = attotime::from_seconds(1);
 	const char *s;
 	char buf[256];
 #endif
@@ -665,7 +665,7 @@ static void command_rawinput(running_machine *machine)
 		wait_target = current_time;
 		state = STATE_INCOMMAND;
 	}
-	else if (attotime_compare(current_time, wait_target) > 0)
+	else if (current_time > wait_target)
 	{
 #if 0
 		do
@@ -1143,12 +1143,12 @@ void osd_update(running_machine *machine, int skip_redraw)
 
 	/* have we hit the time limit? */
 	current_time = timer_get_time(machine);
-	time_limit = (attotime_compare(current_testcase.time_limit, attotime_zero) != 0) ? current_testcase.time_limit
-		: ATTOTIME_IN_SEC(600);
-	if (attotime_compare(current_time, time_limit) > 0)
+	time_limit = (current_testcase.time_limit != attotime::zero) ? current_testcase.time_limit
+		: attotime::from_seconds(600);
+	if (current_time > time_limit)
 	{
 		state = STATE_ABORTED;
-		report_message(MSG_FAILURE, "Time limit of %s attoseconds exceeded", attotime_string(time_limit, 9));
+		report_message(MSG_FAILURE, "Time limit of %s attoseconds exceeded", time_limit.as_string(9));
 		return;
 	}
 
@@ -1239,7 +1239,7 @@ static void node_input(xml_data_node *node)
 	memset(&new_command, 0, sizeof(new_command));
 	new_command.command_type = MESSTEST_COMMAND_INPUT;
 	attr_node = xml_get_attribute(node, "rate");
-	rate = attr_node ? parse_time(attr_node->value) : attotime_make(0, 0);
+	rate = attr_node ? parse_time(attr_node->value) : attotime(0, 0);
 	new_command.u.input_args.rate = rate;
 	new_command.u.input_args.input_chars = node->value;
 

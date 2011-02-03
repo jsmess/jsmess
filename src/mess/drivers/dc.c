@@ -51,7 +51,7 @@ static UINT64 *dc_ram;
 static READ64_HANDLER( dcus_idle_skip_r )
 {
 	if (cpu_get_pc(space->cpu)==0xc0ba52a)
-		cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(2500));
+		cpu_spinuntil_time(space->cpu, attotime::from_usec(2500));
 	//  cpu_spinuntil_int(space->cpu);
 
 	return dc_ram[0x2303b0/8];
@@ -60,7 +60,7 @@ static READ64_HANDLER( dcus_idle_skip_r )
 static READ64_HANDLER( dcjp_idle_skip_r )
 {
 	if (cpu_get_pc(space->cpu)==0xc0bac62)
-		cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(2500));
+		cpu_spinuntil_time(space->cpu, attotime::from_usec(2500));
 	//  cpu_spinuntil_int(space->cpu);
 
 	return dc_ram[0x2302f8/8];

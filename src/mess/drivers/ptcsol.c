@@ -332,9 +332,9 @@ WRITE8_MEMBER( sol20_state::sol20_fa_w )
 		(BIT(data, 6)) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 
 	if (data & 0xc0)
-		timer_adjust_periodic(m_cassette_timer, attotime_zero, 0, ATTOTIME_IN_HZ(19200));
+		timer_adjust_periodic(m_cassette_timer, attotime::zero, 0, attotime::from_hz(19200));
 	else
-		timer_adjust_oneshot(m_cassette_timer, attotime_zero, 0);
+		timer_adjust_oneshot(m_cassette_timer, attotime::zero, 0);
 
 	// bit 5 baud rate */
 	ay31015_set_receiver_clock( m_uart, (BIT(data, 5)) ? 4800.0 : 19200.0);
@@ -546,7 +546,7 @@ static MACHINE_RESET( sol20 )
 
 	// boot-bank
 	memory_set_bank(machine, "boot", 1);
-	timer_set(machine, ATTOTIME_IN_USEC(9), NULL, 0, sol20_boot);
+	timer_set(machine, attotime::from_usec(9), NULL, 0, sol20_boot);
 }
 
 static DRIVER_INIT( sol20 )

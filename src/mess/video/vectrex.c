@@ -128,13 +128,13 @@ WRITE8_HANDLER(vectrex_via_w)
 	case 9:
 		state->via_timer2 = (state->via_timer2 & 0x00ff) | (data << 8);
 
-		period = attotime_mul(ATTOTIME_IN_HZ(cputag_get_clock(space->machine, "maincpu")), state->via_timer2);
+		period = (attotime::from_hz(cputag_get_clock(space->machine, "maincpu")) * state->via_timer2);
 
 		if (state->reset_refresh)
 			timer_adjust_periodic(state->refresh, period, 0, period);
 		else
 			timer_adjust_periodic(state->refresh,
-								  attotime_min(period, timer_timeleft(state->refresh)),
+								  min(period, timer_timeleft(state->refresh)),
 								  0,
 								  period);
 		break;
@@ -252,7 +252,7 @@ static TIMER_CALLBACK(update_signal)
 	if (!state->ramp)
 	{
 		length = cputag_get_clock(machine, "maincpu") * INT_PER_CLOCK
-			* attotime_to_double(attotime_sub(timer_get_time(machine), state->vector_start_time));
+			* (timer_get_time(machine) - state->vector_start_time).as_double();
 
 		state->x_int += length * (state->analog[A_X] + state->analog[A_ZR]);
 		state->y_int += length * (state->analog[A_Y] + state->analog[A_ZR]);
@@ -294,9 +294,9 @@ VIDEO_START(vectrex)
 	state->vector_add_point_function = vectrex_add_point;
 	state->imager_timer = timer_alloc(machine, vectrex_imager_eye, NULL);
 	timer_adjust_periodic(state->imager_timer,
-						  ATTOTIME_IN_HZ(state->imager_freq),
+						  attotime::from_hz(state->imager_freq),
 						  2,
-						  ATTOTIME_IN_HZ(state->imager_freq));
+						  attotime::from_hz(state->imager_freq));
 
 	state->lp_t = timer_alloc(machine, lightpen_trigger, NULL);
 
@@ -317,7 +317,7 @@ static void vectrex_multiplexer(running_machine *machine, int mux)
 	vectrex_state *state = machine->driver_data<vectrex_state>();
 	device_t *dac_device = machine->device("dac");
 
-	timer_set(machine, ATTOTIME_IN_NSEC(ANALOG_DELAY), &state->analog[mux], state->via_out[PORTA], update_signal);
+	timer_set(machine, attotime::from_nsec(ANALOG_DELAY), &state->analog[mux], state->via_out[PORTA], update_signal);
 
 	if (mux == A_AUDIO)
 		dac_data_w(dac_device, state->via_out[PORTA]);
@@ -365,7 +365,7 @@ static WRITE8_DEVICE_HANDLER(v_via_pb_w)
 						+(double)(state->pen_y - state->y_int) * (state->pen_y - state->y_int);
 					d2 = b2 - ab * ab / a2;
 					if (d2 < 2e10 && state->analog[A_Z] * state->blank > 0)
-						timer_adjust_oneshot(state->lp_t, double_to_attotime(ab / a2 / (cputag_get_clock(device->machine, "maincpu") * INT_PER_CLOCK)), 0);
+						timer_adjust_oneshot(state->lp_t, attotime::from_double(ab / a2 / (cputag_get_clock(device->machine, "maincpu") * INT_PER_CLOCK)), 0);
 				}
 			}
 		}
@@ -373,7 +373,7 @@ static WRITE8_DEVICE_HANDLER(v_via_pb_w)
 		if (!(data & 0x1) && (state->via_out[PORTB] & 0x1))
 		{
 			/* MUX has been enabled */
-			timer_set(device->machine, ATTOTIME_IN_NSEC(ANALOG_DELAY), NULL, 0, update_signal);
+			timer_set(device->machine, attotime::from_nsec(ANALOG_DELAY), NULL, 0, update_signal);
 		}
 	}
 	else
@@ -383,7 +383,7 @@ static WRITE8_DEVICE_HANDLER(v_via_pb_w)
 		{
 			/* Cancel running timer, line already finished */
 			if (state->lightpen_down)
-				timer_adjust_oneshot(state->lp_t, attotime_never, 0);
+				timer_adjust_oneshot(state->lp_t, attotime::never, 0);
 		}
 	}
 
@@ -402,7 +402,7 @@ static WRITE8_DEVICE_HANDLER(v_via_pb_w)
 		vectrex_multiplexer (device->machine, (data >> 1) & 0x3);
 
 	state->via_out[PORTB] = data;
-	timer_set(device->machine, ATTOTIME_IN_NSEC(ANALOG_DELAY), &state->ramp, data & 0x80, update_signal);
+	timer_set(device->machine, attotime::from_nsec(ANALOG_DELAY), &state->ramp, data & 0x80, update_signal);
 }
 
 
@@ -411,7 +411,7 @@ static WRITE8_DEVICE_HANDLER(v_via_pa_w)
 	vectrex_state *state = device->machine->driver_data<vectrex_state>();
 	/* DAC output always goes to Y integrator */
 	state->via_out[PORTA] = data;
-	timer_set(device->machine, ATTOTIME_IN_NSEC(ANALOG_DELAY), &state->analog[A_Y], data, update_signal);
+	timer_set(device->machine, attotime::from_nsec(ANALOG_DELAY), &state->analog[A_Y], data, update_signal);
 
 	if (!(state->via_out[PORTB] & 0x1))
 		vectrex_multiplexer (device->machine, (state->via_out[PORTB] >> 1) & 0x3);
@@ -421,7 +421,7 @@ static WRITE8_DEVICE_HANDLER(v_via_pa_w)
 static WRITE8_DEVICE_HANDLER(v_via_ca2_w)
 {
 	if (data == 0)
-		timer_set(device->machine, ATTOTIME_IN_NSEC(ANALOG_DELAY), NULL, 0, vectrex_zero_integrators);
+		timer_set(device->machine, attotime::from_nsec(ANALOG_DELAY), NULL, 0, vectrex_zero_integrators);
 }
 
 
@@ -446,11 +446,11 @@ static WRITE8_DEVICE_HANDLER(v_via_cb2_w)
 				dx = abs(state->pen_x - state->x_int);
 				dy = abs(state->pen_y - state->y_int);
 				if (dx < 500000 && dy < 500000 && data > 0)
-					timer_set(device->machine, attotime_zero, NULL, 0, lightpen_trigger);
+					timer_set(device->machine, attotime::zero, NULL, 0, lightpen_trigger);
 			}
 		}
 
-		timer_set(device->machine, attotime_zero, &state->blank, data, update_signal);
+		timer_set(device->machine, attotime::zero, &state->blank, data, update_signal);
 		state->cb2 = data;
 	}
 }

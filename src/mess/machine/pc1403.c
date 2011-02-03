@@ -128,7 +128,7 @@ void pc1403_outc(device_t *device, int data)
 {
 	pc1403_state *state = device->machine->driver_data<pc1403_state>();
     state->portc = data;
-//    logerror("%g pc %.4x outc %.2x\n", attotime_to_double(timer_get_time(device->machine)), cpu_get_pc(device->machine->device("maincpu")), data);
+//    logerror("%g pc %.4x outc %.2x\n", timer_get_time(device->machine).as_double(), cpu_get_pc(device->machine->device("maincpu")), data);
 }
 
 
@@ -181,7 +181,7 @@ DRIVER_INIT( pc1403 )
 	for (i=0; i<128; i++) gfx[i]=i;
 
 	state->power = 1;
-	timer_set(machine, ATTOTIME_IN_SEC(1), NULL, 0, pc1403_power_up);
+	timer_set(machine, attotime::from_seconds(1), NULL, 0, pc1403_power_up);
 
 	memory_set_bankptr(machine, "bank1", machine->region("user1")->base());
 }

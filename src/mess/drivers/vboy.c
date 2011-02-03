@@ -696,7 +696,7 @@ static MACHINE_CONFIG_START( vboy, vboy_state )
 
 	MCFG_MACHINE_RESET(vboy)
 
-	MCFG_TIMER_ADD_PERIODIC("video", video_tick, HZ(100))
+	MCFG_TIMER_ADD_PERIODIC("video", video_tick, attotime::from_hz(100))
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_vboy)

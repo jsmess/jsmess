@@ -265,7 +265,7 @@ static TIMER_CALLBACK(i8271_data_timer_callback)
 	i8271_data_request(device);
 
 	/* stop it */
-	timer_reset(i8271->data_timer, attotime_never);
+	timer_reset(i8271->data_timer, attotime::never);
 }
 
 /* setup a timed data request - data request will be triggered in a few usecs time */
@@ -277,8 +277,8 @@ static void i8271_timed_data_request(device_t *device)
 	usecs = 64;
 
 	/* set timers */
-	timer_reset(i8271->command_complete_timer, attotime_never);
-	timer_adjust_oneshot(i8271->data_timer, ATTOTIME_IN_USEC(usecs), 0);
+	timer_reset(i8271->command_complete_timer, attotime::never);
+	timer_adjust_oneshot(i8271->data_timer, attotime::from_usec(usecs), 0);
 }
 
 
@@ -290,7 +290,7 @@ static TIMER_CALLBACK(i8271_timed_command_complete_callback)
 	i8271_command_complete(device,1,1);
 
 	/* stop it, but don't allow it to be free'd */
-	timer_reset(i8271->command_complete_timer, attotime_never);
+	timer_reset(i8271->command_complete_timer, attotime::never);
 }
 
 /* setup a irq to occur 128us later - in reality this would be much later, because the int would
@@ -305,8 +305,8 @@ static void i8271_timed_command_complete(device_t *device)
 	usecs = 64*2;
 
 	/* set timers */
-	timer_reset(i8271->data_timer, attotime_never);
-	timer_adjust_oneshot(i8271->command_complete_timer, ATTOTIME_IN_USEC(usecs), 0);
+	timer_reset(i8271->data_timer, attotime::never);
+	timer_adjust_oneshot(i8271->command_complete_timer, attotime::from_usec(usecs), 0);
 }
 
 static void i8271_set_irq_state(device_t *device,int state)
@@ -1565,8 +1565,8 @@ static DEVICE_RESET( i8271 )
 	i8271->ParameterCount = 0;
 
 	/* if timer is active remove */
-	timer_reset(i8271->command_complete_timer, attotime_never);
-	timer_reset(i8271->data_timer, attotime_never);
+	timer_reset(i8271->command_complete_timer, attotime::never);
+	timer_reset(i8271->data_timer, attotime::never);
 
 	/* clear irq */
 	i8271_set_irq_state(device,0);

@@ -24,7 +24,7 @@
 		if(VERBOSE_LEVEL >= N) \
 		{ \
 			if( M ) \
-				logerror("%11.6f: %-24s", attotime_to_double(timer_get_time(MACHINE)), (char*) M ); \
+				logerror("%11.6f: %-24s", timer_get_time(MACHINE).as_double(), (char*) M ); \
 			logerror A; \
 		} \
 	} while (0)
@@ -190,12 +190,12 @@ static WRITE8_DEVICE_HANDLER( cass1_motor_w )
 	if (!data)
 	{
 		cassette_change_state(device->machine->device("cassette1"),CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
-		timer_adjust_periodic(state->datasette1_timer, attotime_zero, 0, ATTOTIME_IN_HZ(48000));	// I put 48000 because I was given some .wav with this freq
+		timer_adjust_periodic(state->datasette1_timer, attotime::zero, 0, attotime::from_hz(48000));	// I put 48000 because I was given some .wav with this freq
 	}
 	else
 	{
 		cassette_change_state(device->machine->device("cassette1"),CASSETTE_MOTOR_DISABLED ,CASSETTE_MASK_MOTOR);
-		timer_reset(state->datasette1_timer, attotime_never);
+		timer_reset(state->datasette1_timer, attotime::never);
 	}
 }
 
@@ -403,12 +403,12 @@ static WRITE8_DEVICE_HANDLER( via_pb_w )
 	if (BIT(data, 4))
 	{
 		cassette_change_state(device->machine->device("cassette2"), CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
-		timer_adjust_periodic(state->datasette2_timer, attotime_zero, 0, ATTOTIME_IN_HZ(48000));	// I put 48000 because I was given some .wav with this freq
+		timer_adjust_periodic(state->datasette2_timer, attotime::zero, 0, attotime::from_hz(48000));	// I put 48000 because I was given some .wav with this freq
 	}
 	else
 	{
 		cassette_change_state(device->machine->device("cassette2"), CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
-		timer_reset(state->datasette2_timer, attotime_never);
+		timer_reset(state->datasette2_timer, attotime::never);
 	}
 }
 
@@ -716,7 +716,7 @@ static void pet_common_driver_init( running_machine *machine )
 	}
 
 	/* pet clock */
-	timer_pulse(machine, ATTOTIME_IN_MSEC(10), NULL, 0, pet_interrupt);
+	timer_pulse(machine, attotime::from_msec(10), NULL, 0, pet_interrupt);
 
 	/* datasette */
 	state->datasette1_timer = timer_alloc(machine, pet_tape1_timer, NULL);

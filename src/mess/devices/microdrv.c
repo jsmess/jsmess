@@ -201,7 +201,7 @@ static DEVICE_START( microdrive )
 
 	// allocate timers
 	mdv->bit_timer = timer_alloc(device->machine, bit_timer_tick, (void *) device);
-	timer_adjust_periodic(mdv->bit_timer, attotime_zero, 0, ATTOTIME_IN_HZ(MDV_BITRATE));
+	timer_adjust_periodic(mdv->bit_timer, attotime::zero, 0, attotime::from_hz(MDV_BITRATE));
 	timer_enable(mdv->bit_timer, 0);
 }
 

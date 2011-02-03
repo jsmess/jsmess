@@ -2239,14 +2239,14 @@ static MACHINE_RESET( x1 )
 	for(i=0;i<0x10;i++)
 		palette_set_color_rgb(machine, i, pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
 
-	timer_adjust_periodic(state->rtc_timer, attotime_zero, 0, ATTOTIME_IN_SEC(1));
+	timer_adjust_periodic(state->rtc_timer, attotime::zero, 0, attotime::from_seconds(1));
 }
 
 static MACHINE_START( x1 )
 {
 	x1_state *state = machine->driver_data<x1_state>();
-	timer_pulse(machine, ATTOTIME_IN_HZ(240), NULL, 0, keyboard_callback);
-	timer_pulse(machine, ATTOTIME_IN_HZ(16), NULL, 0, cmt_wind_timer);
+	timer_pulse(machine, attotime::from_hz(240), NULL, 0, keyboard_callback);
+	timer_pulse(machine, attotime::from_hz(16), NULL, 0, cmt_wind_timer);
 
 	/* set up RTC */
 	{

@@ -347,7 +347,7 @@ static MACHINE_CONFIG_START( pegasus, pegasus_state )
 	MCFG_CPU_ADD("maincpu", M6809E, XTAL_4MHz)	// actually a 6809C
 	MCFG_CPU_PROGRAM_MAP(pegasus_mem)
 
-	MCFG_TIMER_ADD_PERIODIC("pegasus_firq", pegasus_firq, HZ(400))	// controls accuracy of the clock (ctrl-P)
+	MCFG_TIMER_ADD_PERIODIC("pegasus_firq", pegasus_firq, attotime::from_hz(400))	// controls accuracy of the clock (ctrl-P)
 	MCFG_MACHINE_START(pegasus)
 	MCFG_MACHINE_RESET(pegasus)
 	/* video hardware */

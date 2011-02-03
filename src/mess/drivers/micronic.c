@@ -224,26 +224,26 @@ static void set_146818_periodic_irq(running_machine *machine, UINT8 data)
 {
 	micronic_state *state = machine->driver_data<micronic_state>();
 
-	attotime timer_per = ATTOTIME_IN_SEC(0);
+	attotime timer_per = attotime::from_seconds(0);
 
 	switch(data & 0xf)
 	{
-		case 0:		timer_per = ATTOTIME_IN_NSEC(0);				break;
-		case 1:		timer_per = ATTOTIME_IN_NSEC((data & 0x20) ? 30517 : 3906250);	break;
-		case 2:		timer_per = ATTOTIME_IN_NSEC((data & 0x20) ? 61035 : 7812500);	break;
-		case 3:		timer_per = ATTOTIME_IN_NSEC(122070);			break;
-		case 4:		timer_per = ATTOTIME_IN_NSEC(244141);			break;
-		case 5:		timer_per = ATTOTIME_IN_NSEC(488281);			break;
-		case 6:		timer_per = ATTOTIME_IN_NSEC(976562);			break;
-		case 7:		timer_per = ATTOTIME_IN_NSEC(1953125);			break;
-		case 8:		timer_per = ATTOTIME_IN_NSEC(3906250);			break;
-		case 9:		timer_per = ATTOTIME_IN_NSEC(7812500);			break;
-		case 10:	timer_per = ATTOTIME_IN_USEC(15625);			break;
-		case 11:	timer_per = ATTOTIME_IN_USEC(31250);			break;
-		case 12:	timer_per = ATTOTIME_IN_USEC(62500);			break;
-		case 13:	timer_per = ATTOTIME_IN_USEC(62500);			break;
-		case 14:	timer_per = ATTOTIME_IN_MSEC(250);				break;
-		case 15:	timer_per = ATTOTIME_IN_MSEC(500);				break;
+		case 0:		timer_per = attotime::from_nsec(0);				break;
+		case 1:		timer_per = attotime::from_nsec((data & 0x20) ? 30517 : 3906250);	break;
+		case 2:		timer_per = attotime::from_nsec((data & 0x20) ? 61035 : 7812500);	break;
+		case 3:		timer_per = attotime::from_nsec(122070);			break;
+		case 4:		timer_per = attotime::from_nsec(244141);			break;
+		case 5:		timer_per = attotime::from_nsec(488281);			break;
+		case 6:		timer_per = attotime::from_nsec(976562);			break;
+		case 7:		timer_per = attotime::from_nsec(1953125);			break;
+		case 8:		timer_per = attotime::from_nsec(3906250);			break;
+		case 9:		timer_per = attotime::from_nsec(7812500);			break;
+		case 10:	timer_per = attotime::from_usec(15625);			break;
+		case 11:	timer_per = attotime::from_usec(31250);			break;
+		case 12:	timer_per = attotime::from_usec(62500);			break;
+		case 13:	timer_per = attotime::from_usec(62500);			break;
+		case 14:	timer_per = attotime::from_msec(250);				break;
+		case 15:	timer_per = attotime::from_msec(500);				break;
 	}
 
 	timer_adjust_periodic(state->rtc_periodic_irq, timer_per, 0, timer_per);

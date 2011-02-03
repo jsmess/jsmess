@@ -113,7 +113,7 @@ DAC and bitbanger values written should be reflected in the read.
 
 /* this MUX delay was introduced to fix bug #655, but the delay was originally
  * 16us.  This was reduced to 8us to fix bug #1608 */
-#define JOYSTICK_MUX_DELAY				ATTOTIME_IN_USEC(8)
+#define JOYSTICK_MUX_DELAY				attotime::from_usec(8)
 
 
 
@@ -1103,7 +1103,7 @@ static attotime coco_hiresjoy_computetransitiontime( running_machine *machine, U
 		val = val * 4160.0 + 592.0;
 	}
 
-	return attotime_add(timer_get_time(machine), attotime_mul(COCO_CPU_SPEED, val));
+	return (timer_get_time(machine) + (COCO_CPU_SPEED * val));
 }
 
 static void coco_hiresjoy_w( running_machine *machine, int data, UINT8 port )
@@ -1118,8 +1118,8 @@ static void coco_hiresjoy_w( running_machine *machine, int data, UINT8 port )
 	else if (data && !state->hiresjoy_ca)
 	{
 		/* Lo to hi */
-		state->hiresjoy_xtransitiontime = attotime_zero;
-		state->hiresjoy_ytransitiontime = attotime_zero;
+		state->hiresjoy_xtransitiontime = attotime::zero;
+		state->hiresjoy_ytransitiontime = attotime::zero;
 	}
 	state->hiresjoy_ca = data;
 	(*state->update_keyboard)(machine);
@@ -1127,7 +1127,7 @@ static void coco_hiresjoy_w( running_machine *machine, int data, UINT8 port )
 
 static int coco_hiresjoy_readone( running_machine *machine, attotime transitiontime )
 {
-	return attotime_compare(timer_get_time(machine), transitiontime) >= 0;
+	return timer_get_time(machine) >= transitiontime;
 }
 
 static int coco_hiresjoy_rx( running_machine *machine )
@@ -1338,10 +1338,10 @@ static attotime get_relative_time( running_machine *machine, attotime absolute_t
 	attotime result;
 	attotime now = timer_get_time(machine);
 
-	if (attotime_compare(absolute_time, now) > 0)
-		result = attotime_sub(absolute_time, now);
+	if (absolute_time > now) 
+		result = absolute_time - now;
 	else
-		result = attotime_never;
+		result = attotime::never;
 	return result;
 }
 
@@ -1354,7 +1354,7 @@ static UINT8 coco_update_keyboard( running_machine *machine )
 	int joyval;
 	static const int joy_rat_table[] = {15, 24, 42, 33 };
 	static const int dclg_table[] = {0, 14, 30, 49 };
-	attotime dclg_time = attotime_zero;
+	attotime dclg_time = attotime::zero;
 	UINT8 pia0_pb;
 	UINT8 dac = pia6821_get_output_a(state->pia_1) & 0xfc;
 	UINT8 hires = input_port_read_safe(machine, "hires_intf", 0x00);
@@ -1445,7 +1445,7 @@ static UINT8 coco_update_keyboard( running_machine *machine )
 			break;
 	}
 
-	if (attotime_compare(dclg_time, attotime_zero))
+	if (dclg_time == attotime::zero)
 	{
 		/* schedule lightgun events */
 		timer_reset(state->update_keyboard_timer, dclg_time);
@@ -1457,7 +1457,7 @@ static UINT8 coco_update_keyboard( running_machine *machine )
 		attotime ytrans = get_relative_time(machine, state->hiresjoy_ytransitiontime);
 
 		timer_reset(state->update_keyboard_timer,
-			(attotime_compare(xtrans, ytrans) > 0) ? ytrans : xtrans);
+			(xtrans > ytrans) ? ytrans : xtrans);
 	}
 
 	/* sample joystick buttons */
@@ -2248,7 +2248,7 @@ static void coco3_timer_reset(running_machine *machine)
 		/* determine the delay time */
 		delay_time = coco6847_time_delay(machine, timing, timer_value);
 		if (LOG_TIMER)
-			logerror("coco3_reset_timer(): delay_time=%g\n", attotime_to_double(delay_time));
+			logerror("coco3_reset_timer(): delay_time=%g\n", delay_time.as_double());
 
 		/* and adjust the timer */
 		timer_adjust_oneshot(state->gime_timer, delay_time, 0);
@@ -2256,7 +2256,7 @@ static void coco3_timer_reset(running_machine *machine)
 	else
 	{
 		/* timer is shut off */
-		timer_reset(state->gime_timer, attotime_never);
+		timer_reset(state->gime_timer, attotime::never);
 		if (LOG_TIMER)
 			logerror("coco3_reset_timer(): timer is off\n");
 	}
@@ -2851,8 +2851,8 @@ static void generic_init_machine(running_machine *machine, const machine_init_in
 
 	/* clear static variables */
 	state->hiresjoy_ca = 1;
-	state->hiresjoy_xtransitiontime = attotime_zero;
-	state->hiresjoy_ytransitiontime = attotime_zero;
+	state->hiresjoy_xtransitiontime = attotime::zero;
+	state->hiresjoy_ytransitiontime = attotime::zero;
 
 	/* set up function pointers */
 	state->update_keyboard = coco_update_keyboard;
@@ -2935,7 +2935,7 @@ MACHINE_START( dragon32 )
 	generic_coco12_dragon_init(machine, &init);
 
 	/* need to specify lightgun crosshairs */
-	timer_set(machine, attotime_zero, NULL, 0, update_lightgun_timer_callback);
+	timer_set(machine, attotime::zero, NULL, 0, update_lightgun_timer_callback);
 }
 
 MACHINE_START( dragon64 )
@@ -2950,7 +2950,7 @@ MACHINE_START( dragon64 )
 	generic_coco12_dragon_init(machine, &init);
 
 	/* need to specify lightgun crosshairs */
-	timer_set(machine, attotime_zero, NULL, 0, update_lightgun_timer_callback);
+	timer_set(machine, attotime::zero, NULL, 0, update_lightgun_timer_callback);
 }
 
 MACHINE_START( tanodr64 )
@@ -2965,7 +2965,7 @@ MACHINE_START( tanodr64 )
 	generic_coco12_dragon_init(machine, &init);
 
 	/* need to specify lightgun crosshairs */
-	timer_set(machine, attotime_zero, NULL, 0, update_lightgun_timer_callback);
+	timer_set(machine, attotime::zero, NULL, 0, update_lightgun_timer_callback);
 }
 
 MACHINE_START( dgnalpha )
@@ -2980,7 +2980,7 @@ MACHINE_START( dgnalpha )
 	generic_coco12_dragon_init(machine, &init);
 
 	/* need to specify lightgun crosshairs */
-	timer_set(machine, attotime_zero, NULL, 0, update_lightgun_timer_callback);
+	timer_set(machine, attotime::zero, NULL, 0, update_lightgun_timer_callback);
 }
 
 MACHINE_RESET( dgnalpha )
@@ -2994,7 +2994,7 @@ MACHINE_RESET( dgnalpha )
 	state->dgnalpha_just_reset=1;
 
 	/* need to specify lightgun crosshairs */
-	timer_set(machine, attotime_zero, NULL, 0, update_lightgun_timer_callback);
+	timer_set(machine, attotime::zero, NULL, 0, update_lightgun_timer_callback);
 }
 
 const wd17xx_interface dgnalpha_wd17xx_interface =
@@ -3019,7 +3019,7 @@ MACHINE_START( coco )
 	generic_coco12_dragon_init(machine, &init);
 
 	/* need to specify lightgun crosshairs */
-	timer_set(machine, attotime_zero, NULL, 0, update_lightgun_timer_callback);
+	timer_set(machine, attotime::zero, NULL, 0, update_lightgun_timer_callback);
 }
 
 MACHINE_START( coco2 )
@@ -3034,7 +3034,7 @@ MACHINE_START( coco2 )
 	generic_coco12_dragon_init(machine, &init);
 
 	/* need to specify lightgun crosshairs */
-	timer_set(machine, attotime_zero, NULL, 0, update_lightgun_timer_callback);
+	timer_set(machine, attotime::zero, NULL, 0, update_lightgun_timer_callback);
 }
 
 MACHINE_RESET( coco3 )
@@ -3087,7 +3087,7 @@ MACHINE_START( coco3 )
 	state_save_register_postload(machine, coco3_state_postload, NULL);
 
 	/* need to specify lightgun crosshairs */
-	timer_set(machine, attotime_zero, NULL, 0, update_lightgun_timer_callback);
+	timer_set(machine, attotime::zero, NULL, 0, update_lightgun_timer_callback);
 }
 
 

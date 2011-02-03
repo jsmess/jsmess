@@ -81,7 +81,7 @@ static MACHINE_CONFIG_START( apple3, apple3_state )
 	MCFG_CPU_PROGRAM_MAP(apple3_map)
 	MCFG_CPU_CONFIG( apple3_m6502_interface )
 	MCFG_CPU_PERIODIC_INT(apple3_interrupt, 192)
-	MCFG_QUANTUM_TIME(HZ(60))
+	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_MACHINE_RESET( apple3 )
 

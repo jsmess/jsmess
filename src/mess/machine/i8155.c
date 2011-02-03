@@ -514,7 +514,7 @@ void i8155_device::register_w(int offset, UINT8 data)
 			{
 				// load mode and CNT length and start immediately after loading (if timer is not running)
 				m_counter = m_count_length;
-				timer_adjust_periodic(m_timer, attotime_zero, 0, ATTOTIME_IN_HZ(clock()));
+				timer_adjust_periodic(m_timer, attotime::zero, 0, attotime::from_hz(clock()));
 			}
 			break;
 		}

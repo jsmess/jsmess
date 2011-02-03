@@ -523,7 +523,7 @@ static MACHINE_CONFIG_START( cgenie_common, cgenie_state )
 	MCFG_CPU_IO_MAP(cgenie_io)
 	MCFG_CPU_VBLANK_INT("screen", cgenie_frame_interrupt)
 	MCFG_CPU_PERIODIC_INT(cgenie_timer_interrupt, 40)
-	MCFG_QUANTUM_TIME(HZ(240))
+	MCFG_QUANTUM_TIME(attotime::from_hz(240))
 
 	MCFG_MACHINE_START( cgenie )
 	MCFG_MACHINE_RESET( cgenie )

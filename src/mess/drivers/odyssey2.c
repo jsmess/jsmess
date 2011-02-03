@@ -177,7 +177,7 @@ static MACHINE_CONFIG_START( odyssey2, odyssey2_state )
 	MCFG_CPU_ADD("maincpu", I8048, ( ( XTAL_7_15909MHz * 3 ) / 4 ) )
 	MCFG_CPU_PROGRAM_MAP(odyssey2_mem)
 	MCFG_CPU_IO_MAP(odyssey2_io)
-	MCFG_QUANTUM_TIME(HZ(60))
+	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_MACHINE_RESET( odyssey2 )
 
@@ -211,7 +211,7 @@ static MACHINE_CONFIG_START( videopac, odyssey2_state )
 	MCFG_CPU_ADD("maincpu", I8048, ( XTAL_17_73447MHz / 3 ) )
 	MCFG_CPU_PROGRAM_MAP(odyssey2_mem)
 	MCFG_CPU_IO_MAP(odyssey2_io)
-	MCFG_QUANTUM_TIME(HZ(60))
+	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_MACHINE_RESET( odyssey2 )
 
@@ -244,7 +244,7 @@ static MACHINE_CONFIG_START( g7400, odyssey2_state )
 	MCFG_CPU_ADD("maincpu", I8048, 5911000 )
 	MCFG_CPU_PROGRAM_MAP(odyssey2_mem)
 	MCFG_CPU_IO_MAP(g7400_io)
-	MCFG_QUANTUM_TIME(HZ(60))
+	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_MACHINE_RESET( odyssey2 )
 

@@ -76,7 +76,7 @@
           The Kaypro doesn't care timewise, but the busy flag must turn off
           sometime or it hangs.
             -       w->status |= STA_2_BUSY;
-            +       wd17xx_set_busy(device, ATTOTIME_IN_USEC(400));
+            +       wd17xx_set_busy(device, attotime::from_usec(400));
 
     2009-June-4 Roberto Lavarone:
         - Initial support for wd1771
@@ -553,7 +553,7 @@ static TIMER_CALLBACK( wd17xx_data_callback )
 		else
 		{
 			/* requeue us for more data */
-			timer_adjust_oneshot(w->timer_data, ATTOTIME_IN_USEC(wd17xx_dden(device) ? 128 : 32), 0);
+			timer_adjust_oneshot(w->timer_data, attotime::from_usec(wd17xx_dden(device) ? 128 : 32), 0);
 		}
 	}
 	else
@@ -618,7 +618,7 @@ static void wd17xx_command_restore(device_t *device)
 	/* when command completes set irq */
 	wd17xx_set_intrq(device);
 #endif
-	wd17xx_set_busy(device, ATTOTIME_IN_USEC(100));
+	wd17xx_set_busy(device, attotime::from_usec(100));
 }
 
 /*
@@ -1036,11 +1036,11 @@ static void wd17xx_complete_command(device_t *device, int delay)
     usecs   = w->complete_command_delay;
 
 	/* set new timer */
-	timer_adjust_oneshot(w->timer_cmd, ATTOTIME_IN_USEC(usecs), 0);
+	timer_adjust_oneshot(w->timer_cmd, attotime::from_usec(usecs), 0);
 	
 	/* Kill onshot read/write sector timers */
-	timer_adjust_oneshot(w->timer_rs, attotime_never, 0);
-	timer_adjust_oneshot(w->timer_ws, attotime_never, 0);
+	timer_adjust_oneshot(w->timer_rs, attotime::never, 0);
+	timer_adjust_oneshot(w->timer_ws, attotime::never, 0);
 }
 
 
@@ -1189,7 +1189,7 @@ static void wd17xx_timed_data_request(device_t *device)
 	wd1770_state *w = get_safe_token(device);
 
 	/* set new timer */
-	timer_adjust_oneshot(w->timer_data, ATTOTIME_IN_USEC(wd17xx_dden(device) ? 128 : 32), 0);
+	timer_adjust_oneshot(w->timer_data, attotime::from_usec(wd17xx_dden(device) ? 128 : 32), 0);
 }
 
 
@@ -1200,7 +1200,7 @@ static void wd17xx_timed_read_sector_request(device_t *device)
 	wd1770_state *w = get_safe_token(device);
 
 	/* set new timer */
-	timer_adjust_oneshot(w->timer_rs, ATTOTIME_IN_USEC(w->pause_time), 0);
+	timer_adjust_oneshot(w->timer_rs, attotime::from_usec(w->pause_time), 0);
 }
 
 
@@ -1211,7 +1211,7 @@ static void wd17xx_timed_write_sector_request(device_t *device)
 	wd1770_state *w = get_safe_token(device);
 
 	/* set new timer */
-	timer_adjust_oneshot(w->timer_ws, ATTOTIME_IN_USEC(w->pause_time), 0);
+	timer_adjust_oneshot(w->timer_ws, attotime::from_usec(w->pause_time), 0);
 }
 
 
@@ -1708,7 +1708,7 @@ WRITE8_DEVICE_HANDLER( wd17xx_command_w )
 #if 0
 		wd17xx_set_intrq(device);
 #endif
-		wd17xx_set_busy(device, ATTOTIME_IN_USEC(100));
+		wd17xx_set_busy(device, attotime::from_usec(100));
 
 	}
 
@@ -1730,7 +1730,7 @@ WRITE8_DEVICE_HANDLER( wd17xx_command_w )
 #if 0
 		wd17xx_set_intrq(device);
 #endif
-		wd17xx_set_busy(device, ATTOTIME_IN_USEC(100));
+		wd17xx_set_busy(device, attotime::from_usec(100));
 
 
 	}
@@ -1752,7 +1752,7 @@ WRITE8_DEVICE_HANDLER( wd17xx_command_w )
 #if 0
 		wd17xx_set_intrq(device);
 #endif
-		wd17xx_set_busy(device, ATTOTIME_IN_USEC(100));
+		wd17xx_set_busy(device, attotime::from_usec(100));
 
 	}
 
@@ -1775,7 +1775,7 @@ WRITE8_DEVICE_HANDLER( wd17xx_command_w )
 #if 0
 		wd17xx_set_intrq(device);
 #endif
-		wd17xx_set_busy(device, ATTOTIME_IN_USEC(100));
+		wd17xx_set_busy(device, attotime::from_usec(100));
 	}
 
 	if (w->command_type == TYPE_I)

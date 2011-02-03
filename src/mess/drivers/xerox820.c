@@ -820,8 +820,8 @@ static MACHINE_CONFIG_START( xerox820, xerox820_state )
     MCFG_PALETTE_INIT(black_and_white)
 
 	/* keyboard */
-	MCFG_TIMER_ADD_PERIODIC("keyboard", xerox820_keyboard_tick, HZ(60))
-	MCFG_TIMER_ADD_PERIODIC("ctc", ctc_tick, HZ(XTAL_20MHz/8))
+	MCFG_TIMER_ADD_PERIODIC("keyboard", xerox820_keyboard_tick,attotime::from_hz(60))
+	MCFG_TIMER_ADD_PERIODIC("ctc", ctc_tick, attotime::from_hz(XTAL_20MHz/8))
 
 	/* devices */
 	MCFG_Z80SIO0_ADD(Z80SIO_TAG, XTAL_20MHz/8, sio_intf)
@@ -854,8 +854,8 @@ static MACHINE_CONFIG_START( xerox820ii, xerox820ii_state )
     MCFG_PALETTE_INIT(black_and_white)
 
 	/* keyboard */
-	MCFG_TIMER_ADD_PERIODIC("keyboard", xerox820_keyboard_tick, HZ(60))
-	MCFG_TIMER_ADD_PERIODIC("ctc", ctc_tick, HZ(XTAL_16MHz/4))
+	MCFG_TIMER_ADD_PERIODIC("keyboard", xerox820_keyboard_tick, attotime::from_hz(60))
+	MCFG_TIMER_ADD_PERIODIC("ctc", ctc_tick, attotime::from_hz(XTAL_16MHz/4))
 
 	/* devices */
 	MCFG_Z80SIO0_ADD(Z80SIO_TAG, XTAL_16MHz/4, sio_intf)

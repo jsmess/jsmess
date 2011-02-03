@@ -873,17 +873,17 @@ WRITE8_MEMBER( v1050_state::misc_ppi_pc_w )
 
 	if (baud_sel != m_baud_sel)
 	{
-		attotime period = attotime_never;
+		attotime period = attotime::never;
 
 		switch (baud_sel)
 		{
-		case 0:	period = ATTOTIME_IN_HZ((double)XTAL_16MHz/4/13/16); break;
-		case 1:	period = ATTOTIME_IN_HZ((double)XTAL_16MHz/4/13/8); break;
-		case 2:	period = ATTOTIME_IN_HZ((double)XTAL_16MHz/4/8); break;
-		case 3:	period = ATTOTIME_IN_HZ((double)XTAL_16MHz/4/13/2); break;
+		case 0:	period = attotime::from_hz((double)XTAL_16MHz/4/13/16); break;
+		case 1:	period = attotime::from_hz((double)XTAL_16MHz/4/13/8); break;
+		case 2:	period = attotime::from_hz((double)XTAL_16MHz/4/8); break;
+		case 3:	period = attotime::from_hz((double)XTAL_16MHz/4/13/2); break;
 		}
 
-		m_timer_sio->adjust(attotime_zero, 0, period);
+		m_timer_sio->adjust(attotime::zero, 0, period);
 
 		m_baud_sel = baud_sel;
 	}
@@ -1165,7 +1165,7 @@ void v1050_state::machine_reset()
 
 	bankswitch();
 
-	m_timer_sio->adjust(attotime_zero, 0, ATTOTIME_IN_HZ((double)XTAL_16MHz/4/13/16));
+	m_timer_sio->adjust(attotime::zero, 0, attotime::from_hz((double)XTAL_16MHz/4/13/16));
 }
 
 /* Machine Driver */
@@ -1186,7 +1186,7 @@ static MACHINE_CONFIG_START( v1050, v1050_state )
 	MCFG_DEVICE_DISABLE()
 
 	/* keyboard HACK */
-	MCFG_TIMER_ADD_PERIODIC("keyboard", v1050_keyboard_tick, HZ(60))
+	MCFG_TIMER_ADD_PERIODIC("keyboard", v1050_keyboard_tick, attotime::from_hz(60))
 
     /* video hardware */
 	MCFG_FRAGMENT_ADD(v1050_video)
@@ -1208,7 +1208,7 @@ static MACHINE_CONFIG_START( v1050, v1050_state )
 	MCFG_MSM8251_ADD(I8251A_SIO_TAG, /*XTAL_16MHz/8,*/ sio_8251_intf)
 	MCFG_WD1793_ADD(MB8877_TAG, /*XTAL_16MHz/16,*/ fdc_intf )
 	MCFG_FLOPPY_2_DRIVES_ADD(v1050_floppy_config)
-	MCFG_TIMER_ADD_PERIODIC(TIMER_KB_TAG, kb_8251_tick, HZ((double)XTAL_16MHz/4/13/8))
+	MCFG_TIMER_ADD_PERIODIC(TIMER_KB_TAG, kb_8251_tick, attotime::from_hz((double)XTAL_16MHz/4/13/8))
 	MCFG_TIMER_ADD(TIMER_SIO_TAG, sio_8251_tick)
 
 	/* software lists */

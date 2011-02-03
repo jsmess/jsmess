@@ -780,7 +780,7 @@ void hector_init(running_machine *machine)
 	
 	/* For Cassette synchro*/
 	Cassette_timer = timer_alloc(machine, Callback_CK, 0);
-	timer_adjust_periodic(Cassette_timer, ATTOTIME_IN_MSEC(100), 0, ATTOTIME_IN_USEC(64));/* => real synchro scan speed for 15,624Khz*/
+	timer_adjust_periodic(Cassette_timer, attotime::from_msec(100), 0, attotime::from_usec(64));/* => real synchro scan speed for 15,624Khz*/
 
 	/* Sound sn76477*/
 	Init_Value_SN76477_Hector();  /*init R/C value*/

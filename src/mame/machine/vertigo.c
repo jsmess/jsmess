@@ -95,7 +95,7 @@ static void update_irq_encoder(running_machine *machine, int line, int state)
 static WRITE_LINE_DEVICE_HANDLER( v_irq4_w )
 {
 	update_irq_encoder(device->machine, INPUT_LINE_IRQ4, state);
-	vertigo_vproc(device->machine->device<cpu_device>("maincpu")->attotime_to_cycles(attotime_sub(timer_get_time(device->machine), irq4_time)), state);
+	vertigo_vproc(device->machine->device<cpu_device>("maincpu")->attotime_to_cycles(timer_get_time(device->machine) - irq4_time), state);
 	irq4_time = timer_get_time(device->machine);
 }
 
@@ -179,7 +179,7 @@ static TIMER_CALLBACK( sound_command_w )
        quickly. Otherwise the main CPU gives up with sound. Boosting
        the interleave for a while helps. */
 
-	cpuexec_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(100));
+	cpuexec_boost_interleave(machine, attotime::zero, attotime::from_usec(100));
 }
 
 

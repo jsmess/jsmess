@@ -962,7 +962,7 @@ WRITE_LINE_MEMBER( crt9007_device::ack_w )
 	if (m_dmar && !m_ack && state)
 	{
 		// start DMA transfer
-		timer_adjust_oneshot(m_dma_timer, ATTOTIME_IN_HZ(clock()), 0);
+		timer_adjust_oneshot(m_dma_timer, attotime::from_hz(clock()), 0);
 	}
 
 	m_ack = state;

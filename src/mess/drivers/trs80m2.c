@@ -1037,14 +1037,14 @@ static MACHINE_CONFIG_START( trs80m2, trs80m2_state )
 	/* devices */
 	MCFG_WD179X_ADD(FD1791_TAG, fd1791_intf)
 	MCFG_Z80CTC_ADD(Z80CTC_TAG, XTAL_8MHz/2, ctc_intf)
-	MCFG_TIMER_ADD_PERIODIC("ctc", ctc_tick, HZ(XTAL_8MHz/2/2))
+	MCFG_TIMER_ADD_PERIODIC("ctc", ctc_tick, attotime::from_hz(XTAL_8MHz/2/2))
 	MCFG_Z80DMA_ADD(Z80DMA_TAG, XTAL_8MHz/2, dma_intf)
 	MCFG_Z80PIO_ADD(Z80PIO_TAG, XTAL_8MHz/2, pio_intf)
 	MCFG_Z80SIO0_ADD(Z80SIO_TAG, XTAL_8MHz/2, sio_intf)
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_intf)
 	MCFG_FLOPPY_DRIVE_ADD(FLOPPY_0, trs80m2_floppy_config)
 
-	MCFG_TIMER_ADD_PERIODIC("keyboard", trs80m2_keyboard_tick, HZ(60))
+	MCFG_TIMER_ADD_PERIODIC("keyboard", trs80m2_keyboard_tick,attotime::from_hz(60))
 
 	/* internal RAM */
 	MCFG_RAM_ADD(RAM_TAG)

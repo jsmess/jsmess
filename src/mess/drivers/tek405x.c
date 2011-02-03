@@ -1229,7 +1229,7 @@ static MACHINE_CONFIG_START( tek4051, tek4051_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	// devices
-	MCFG_TIMER_ADD_PERIODIC("keyboard", keyboard_tick, HZ(XTAL_12_5MHz/15/4))
+	MCFG_TIMER_ADD_PERIODIC("keyboard", keyboard_tick, attotime::from_hz(XTAL_12_5MHz/15/4))
 	MCFG_PIA6821_ADD(MC6820_X_TAG, x_pia_intf)
 	MCFG_PIA6821_ADD(MC6820_Y_TAG, y_pia_intf)
 	MCFG_PIA6821_ADD(MC6820_KB_TAG, kb_pia_intf)

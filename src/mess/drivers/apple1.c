@@ -232,7 +232,7 @@ static MACHINE_CONFIG_START( apple1, apple1_state )
        is 2 cycles of the fundamental 14.31818 MHz oscillator.  The
        total blanking time is about 4450 microseconds. */
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC((int) (70 * 65 * 7 * 2 / 14.31818)))
-	MCFG_QUANTUM_TIME(HZ(60))
+	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_MACHINE_RESET( apple1 )
 

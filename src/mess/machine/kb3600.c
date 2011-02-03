@@ -150,7 +150,7 @@ static DEVICE_START( ay3600 )
 
 	/* create the timers */
 	ay3600->scan_timer = timer_alloc(device->machine, ay3600_scan_tick, (void *)device);
-	timer_adjust_periodic(ay3600->scan_timer, attotime_zero, 0, ATTOTIME_IN_HZ(60));
+	timer_adjust_periodic(ay3600->scan_timer, attotime::zero, 0, attotime::from_hz(60));
 
 	/* register for state saving */
 	state_save_register_device_item(device, 0, ay3600->b);

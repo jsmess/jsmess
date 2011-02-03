@@ -1803,13 +1803,13 @@ MACHINE_START( apple2gs )
 	state_save_register_item(machine, "SNDGLUDUMMYRD", NULL,0, state->sndglu_dummy_read);
 
 	state->clock_timer = timer_alloc(machine, apple2gs_clock_tick, NULL);
-	timer_adjust_periodic(state->clock_timer, ATTOTIME_IN_SEC(1), 0, ATTOTIME_IN_SEC(1));
+	timer_adjust_periodic(state->clock_timer, attotime::from_seconds(1), 0, attotime::from_seconds(1));
 
 	state->qsecond_timer = timer_alloc(machine, apple2gs_qsecond_tick, NULL);
-	timer_adjust_periodic(state->qsecond_timer, ATTOTIME_IN_USEC(266700), 0, ATTOTIME_IN_USEC(266700));
+	timer_adjust_periodic(state->qsecond_timer, attotime::from_usec(266700), 0, attotime::from_usec(266700));
 
 	state->scanline_timer = timer_alloc(machine, apple2gs_scanline_tick, NULL);
-	timer_adjust_oneshot(state->scanline_timer, attotime_never, 0);
+	timer_adjust_oneshot(state->scanline_timer, attotime::never, 0);
 
 	// fire on scanline zero
 	timer_adjust_oneshot(state->scanline_timer, machine->primary_screen->time_until_pos(0, 0), 0);

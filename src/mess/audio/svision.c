@@ -83,7 +83,7 @@ void svision_sound_decrement(device_t *device)
 WRITE8_DEVICE_HANDLER( svision_sounddma_w )
 {
 	svision_sound_state *state = get_safe_token(device);
-	logerror("%.6f svision snddma write %04x %02x\n", attotime_to_double(timer_get_time(device->machine)),offset+0x18,data);
+	logerror("%.6f svision snddma write %04x %02x\n", timer_get_time(device->machine).as_double(),offset+0x18,data);
 	state->dma.reg[offset] = data;
 	switch (offset)
 	{

@@ -212,7 +212,7 @@ static DEVICE_START( mm74c922 )
 
 	/* create the timers */
 	mm74c922->scan_timer = timer_alloc(device->machine, mm74c922_scan_tick, (void *)device);
-	timer_adjust_periodic(mm74c922->scan_timer, attotime_zero, 0, ATTOTIME_IN_HZ(50));
+	timer_adjust_periodic(mm74c922->scan_timer, attotime::zero, 0, attotime::from_hz(50));
 
 	/* register for state saving */
 	state_save_register_device_item(device, 0, mm74c922->inhibit);

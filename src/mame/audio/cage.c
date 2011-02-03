@@ -164,8 +164,8 @@ void cage_init(running_machine *machine, offs_t speedup)
 	memory_set_bankptr(machine, "bank11", machine->region("cage")->base());
 
 	cage_cpu = machine->device<cpu_device>("cage");
-	cage_cpu_clock_period = ATTOTIME_IN_HZ(cage_cpu->clock());
-	cage_cpu_h1_clock_period = attotime_mul(cage_cpu_clock_period, 2);
+	cage_cpu_clock_period = attotime::from_hz(cage_cpu->clock());
+	cage_cpu_h1_clock_period = cage_cpu_clock_period * 2;
 
 	dma_timer = machine->device<timer_device>("cage_dma_timer");
 	timer[0] = machine->device<timer_device>("cage_timer0");
@@ -221,7 +221,7 @@ static TIMER_DEVICE_CALLBACK( dma_timer_callback )
 	{
 		if (dma_timer_enabled)
 		{
-			timer.adjust(attotime_never);
+			timer.adjust(attotime::never);
 			dma_timer_enabled = 0;
 		}
 		return;
@@ -232,7 +232,7 @@ static TIMER_DEVICE_CALLBACK( dma_timer_callback )
 	tms32031_io_regs[DMA_SOURCE_ADDR] = param;
 
 	/* set the interrupt */
-	cpu_set_input_line(cage_cpu, TMS32031_DINT, ASSERT_LINE);
+	cpu_set_input_line(cage_cpu, TMS3203X_DINT, ASSERT_LINE);
 	dma_enabled = 0;
 }
 
@@ -271,7 +271,7 @@ static void update_dma_state(address_space *space)
 		/* compute the time of the interrupt and set the timer */
 		if (!dma_timer_enabled)
 		{
-			attotime period = attotime_mul(serial_period_per_word, tms32031_io_regs[DMA_TRANSFER_COUNT]);
+			attotime period = serial_period_per_word * tms32031_io_regs[DMA_TRANSFER_COUNT];
 			dma_timer->adjust(period, addr, period);
 			dma_timer_enabled = 1;
 		}
@@ -301,7 +301,7 @@ static TIMER_DEVICE_CALLBACK( cage_timer_callback )
 	int which = param;
 
 	/* set the interrupt */
-	cpu_set_input_line(cage_cpu, TMS32031_TINT0 + which, ASSERT_LINE);
+	cpu_set_input_line(cage_cpu, TMS3203X_TINT0 + which, ASSERT_LINE);
 	cage_timer_enabled[which] = 0;
 	update_timer(which);
 }
@@ -316,7 +316,7 @@ static void update_timer(int which)
 	/* see if we turned on */
 	if (enabled && !cage_timer_enabled[which])
 	{
-		attotime period = attotime_mul(cage_cpu_h1_clock_period, 2 * tms32031_io_regs[base + TIMER0_PERIOD]);
+		attotime period = cage_cpu_h1_clock_period * (2 * tms32031_io_regs[base + TIMER0_PERIOD]);
 
 		/* make sure our assumptions are correct */
 		if (tms32031_io_regs[base + TIMER0_GLOBAL_CTL] != 0x2c1)
@@ -328,7 +328,7 @@ static void update_timer(int which)
 	/* see if we turned off */
 	else if (!enabled && cage_timer_enabled[which])
 	{
-		timer[which]->adjust(attotime_never, which);
+		timer[which]->adjust(attotime::never, which);
 	}
 
 	/* set the new state */
@@ -349,17 +349,17 @@ static void update_serial(running_machine *machine)
 	UINT32 freq;
 
 	/* we start out at half the H1 frequency (or 2x the H1 period) */
-	serial_clock_period = attotime_mul(cage_cpu_h1_clock_period, 2);
+	serial_clock_period = cage_cpu_h1_clock_period * 2;
 
 	/* if we're in clock mode, muliply by another factor of 2 */
 	if (tms32031_io_regs[SPORT_GLOBAL_CTL] & 4)
-		serial_clock_period = attotime_mul(serial_clock_period, 2);
+		serial_clock_period *= 2;
 
 	/* now multiply by the timer period */
-	bit_clock_period = attotime_mul(serial_clock_period, (tms32031_io_regs[SPORT_TIMER_PERIOD] & 0xffff));
+	bit_clock_period = serial_clock_period * (tms32031_io_regs[SPORT_TIMER_PERIOD] & 0xffff);
 
 	/* and times the number of bits per sample */
-	serial_period_per_word = attotime_mul(bit_clock_period, 8 * (((tms32031_io_regs[SPORT_GLOBAL_CTL] >> 18) & 3) + 1));
+	serial_period_per_word = bit_clock_period * (8 * (((tms32031_io_regs[SPORT_GLOBAL_CTL] >> 18) & 3) + 1));
 
 	/* compute the step value to stretch this to the sample_rate */
 	freq = ATTOSECONDS_TO_HZ(serial_period_per_word.attoseconds) / DAC_BUFFER_CHANNELS;
@@ -470,11 +470,11 @@ static void update_control_lines(running_machine *machine)
 	}
 
 	/* set the IOF input lines */
-	val = cpu_get_reg(cage_cpu, TMS32031_IOF);
+	val = cpu_get_reg(cage_cpu, TMS3203X_IOF);
 	val &= ~0x88;
 	if (cpu_to_cage_ready) val |= 0x08;
 	if (cage_to_cpu_ready) val |= 0x80;
-	cage_cpu->set_state(TMS32031_IOF, val);
+	cage_cpu->set_state(TMS3203X_IOF, val);
 }
 
 
@@ -484,7 +484,7 @@ static READ32_HANDLER( cage_from_main_r )
 		logerror("%06X:CAGE read command = %04X\n", cpu_get_pc(space->cpu), cage_from_main);
 	cpu_to_cage_ready = 0;
 	update_control_lines(space->machine);
-	cpu_set_input_line(cage_cpu, TMS32031_IRQ0, CLEAR_LINE);
+	cpu_set_input_line(cage_cpu, TMS3203X_IRQ0, CLEAR_LINE);
 	return cage_from_main;
 }
 
@@ -532,7 +532,7 @@ static TIMER_CALLBACK( deferred_cage_w )
 	cage_from_main = param;
 	cpu_to_cage_ready = 1;
 	update_control_lines(machine);
-	cpu_set_input_line(cage_cpu, TMS32031_IRQ0, ASSERT_LINE);
+	cpu_set_input_line(cage_cpu, TMS3203X_IRQ0, ASSERT_LINE);
 }
 
 
@@ -610,7 +610,7 @@ static WRITE32_HANDLER( speedup_w )
  *
  *************************************/
 
-static const tms32031_config cage_config =
+static const tms3203x_config cage_config =
 {
 	0x400000
 };
@@ -651,7 +651,7 @@ MACHINE_CONFIG_FRAGMENT( cage )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("cage", TMS32031, 33868800)
-	MCFG_CPU_CONFIG(cage_config)
+	MCFG_TMS3203X_CONFIG(cage_config)
 	MCFG_CPU_PROGRAM_MAP(cage_map)
 
 	MCFG_TIMER_ADD("cage_dma_timer", dma_timer_callback)

@@ -99,7 +99,7 @@ static READ8_DEVICE_HANDLER( tf20_upd765_tc_r )
 
 	/* toggle tc on read */
 	upd765_tc_w(device, ASSERT_LINE);
-	timer_set(device->machine, attotime_zero, device, 0, tf20_upd765_tc_reset);
+	timer_set(device->machine, attotime::zero, device, 0, tf20_upd765_tc_reset);
 
 	return 0xff;
 }
@@ -302,7 +302,7 @@ static MACHINE_CONFIG_FRAGMENT( tf20 )
 
 	/* upd7201 serial interface */
 	MCFG_UPD7201_ADD("3a", XTAL_CR1 / 2, tf20_upd7201_intf)
-	MCFG_TIMER_ADD_PERIODIC("serial_timer", serial_clock, HZ(XTAL_CR2 / 128))
+	MCFG_TIMER_ADD_PERIODIC("serial_timer", serial_clock, attotime::from_hz(XTAL_CR2 / 128))
 
 	/* 2 floppy drives */
 	MCFG_FLOPPY_2_DRIVES_ADD(tf20_floppy_config)

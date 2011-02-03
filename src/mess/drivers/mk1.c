@@ -171,7 +171,7 @@ static TIMER_CALLBACK( mk1_update_leds )
 
 static MACHINE_START( mk1 )
 {
-	timer_pulse(machine,  ATTOTIME_IN_HZ(30), NULL, 0, mk1_update_leds );
+	timer_pulse(machine,  attotime::from_hz(30), NULL, 0, mk1_update_leds );
 }
 
 
@@ -194,7 +194,7 @@ static MACHINE_CONFIG_START( mk1, mk1_state )
 	MCFG_CPU_ADD( "maincpu", F8, MAIN_CLOCK )        /* MK3850 */
 	MCFG_CPU_PROGRAM_MAP( mk1_mem)
 	MCFG_CPU_IO_MAP( mk1_io)
-	MCFG_QUANTUM_TIME(HZ(60))
+	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_MACHINE_START( mk1 )
 

@@ -284,7 +284,7 @@ static MACHINE_CONFIG_START( channelf, channelf_state )
 	MCFG_CPU_ADD("maincpu", F8, 3579545/2)        /* Colorburst/2 */
 	MCFG_CPU_PROGRAM_MAP(channelf_map)
 	MCFG_CPU_IO_MAP(channelf_io)
-	MCFG_QUANTUM_TIME(HZ(60))
+	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -312,7 +312,7 @@ static MACHINE_CONFIG_START( sabavdpl, channelf_state )
 	MCFG_CPU_ADD("maincpu", F8, MASTER_CLOCK_PAL)        /* PAL speed */
 	MCFG_CPU_PROGRAM_MAP(channelf_map)
 	MCFG_CPU_IO_MAP(channelf_io)
-	MCFG_QUANTUM_TIME(HZ(50))
+	MCFG_QUANTUM_TIME(attotime::from_hz(50))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -341,7 +341,7 @@ static MACHINE_CONFIG_START( channlf2, channelf_state )
 	MCFG_CPU_ADD("maincpu", F8, 3579545/2)        /* Colorburst / 2 */
 	MCFG_CPU_PROGRAM_MAP(channelf_map)
 	MCFG_CPU_IO_MAP(channelf_io)
-	MCFG_QUANTUM_TIME(HZ(60))
+	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -370,7 +370,7 @@ static MACHINE_CONFIG_START( sabavpl2, channelf_state )
 	MCFG_CPU_ADD("maincpu", F8, MASTER_CLOCK_PAL)        /* PAL speed */
 	MCFG_CPU_PROGRAM_MAP(channelf_map)
 	MCFG_CPU_IO_MAP(channelf_io)
-	MCFG_QUANTUM_TIME(HZ(50))
+	MCFG_QUANTUM_TIME(attotime::from_hz(50))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

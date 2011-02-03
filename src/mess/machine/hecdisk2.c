@@ -195,7 +195,7 @@ static void valid_interrupt( running_machine *machine)
 if ((hector_disc2_RNMI==1) &&  (NMI_current_state==1))  
 	{
 		cputag_set_input_line(machine, "disc2cpu", INPUT_LINE_NMI, CLEAR_LINE); // Clear NMI...
-		timer_adjust_oneshot(DMA_timer, ATTOTIME_IN_USEC(6), 0 );//a little time to let the Z80 terminate he's previous job !
+		timer_adjust_oneshot(DMA_timer, attotime::from_usec(6), 0 );//a little time to let the Z80 terminate he's previous job !
 		NMI_current_state=0;
 	}
 }
@@ -224,7 +224,7 @@ static WRITE_LINE_DEVICE_HANDLER( disc2_fdc_interrupt )
 {
 	cputag_set_input_line(device->machine, "disc2cpu", INPUT_LINE_IRQ0, CLEAR_LINE);
 	if (state)
-		timer_adjust_oneshot(INT_timer, ATTOTIME_IN_USEC(500), 0 );//a little time to let the Z80 terminate he's previous job !
+		timer_adjust_oneshot(INT_timer, attotime::from_usec(500), 0 );//a little time to let the Z80 terminate he's previous job !
 }
 
 static WRITE_LINE_DEVICE_HANDLER( hector_disc2_fdc_dma_irq )

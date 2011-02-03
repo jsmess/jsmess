@@ -1559,7 +1559,7 @@ static MACHINE_CONFIG_START( pcmda, pc_state )
 	MCFG_CPU_IO_MAP(pc8_io)
 	MCFG_CPU_VBLANK_INT_HACK(pc_frame_interrupt, 4)
 
-	MCFG_QUANTUM_TIME(HZ(60))
+	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_MACHINE_START(pc)
 	MCFG_MACHINE_RESET(pc)
@@ -1706,7 +1706,7 @@ static MACHINE_CONFIG_START( ibm5150, pc_state )
 	MCFG_CPU_IO_MAP(pc8_io)
 	MCFG_CPU_CONFIG(i86_address_mask)
 
-	MCFG_QUANTUM_TIME(HZ(60))
+	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_MACHINE_START(pc)
 	MCFG_MACHINE_RESET(pc)
@@ -1771,7 +1771,7 @@ static MACHINE_CONFIG_START( pccga, pc_state )
 	/* basic machine hardware */
 	MCFG_CPU_PC(pc8, pc8, I8088, 4772720, pc_frame_interrupt)	/* 4,77 MHz */
 
-	MCFG_QUANTUM_TIME(HZ(60))
+	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_MACHINE_START(pc)
 	MCFG_MACHINE_RESET(pc)
@@ -2494,7 +2494,7 @@ static MACHINE_CONFIG_START( iskr1031, pc_state )
 	/* basic machine hardware */
 	MCFG_CPU_PC(pc16, pc16, I8086, 4772720, pc_frame_interrupt)
 
-	MCFG_QUANTUM_TIME(HZ(60))
+	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_MACHINE_START(pc)
 	MCFG_MACHINE_RESET(pc)
@@ -2557,7 +2557,7 @@ static MACHINE_CONFIG_START( poisk2, pc_state )
 	/* basic machine hardware */
 	MCFG_CPU_PC(pc16, pc16, I8086, 4772720, pc_frame_interrupt)
 
-	MCFG_QUANTUM_TIME(HZ(60))
+	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_MACHINE_START(pc)
 	MCFG_MACHINE_RESET(pc)
@@ -2619,7 +2619,7 @@ static MACHINE_CONFIG_START( zenith, pc_state )
 	/* basic machine hardware */
 	MCFG_CPU_PC(zenith, pc8, I8088, XTAL_14_31818MHz/3, pc_frame_interrupt)	/* 4,77 MHz */
 
-	MCFG_QUANTUM_TIME(HZ(60))
+	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_MACHINE_START(pc)
 	MCFG_MACHINE_RESET(pc)

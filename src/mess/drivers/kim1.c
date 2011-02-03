@@ -287,8 +287,8 @@ static MACHINE_START( kim1 )
 	state_save_register_item(machine, "kim1", NULL, 0, state->u2_port_b );
 	state_save_register_item(machine, "kim1", NULL, 0, state->_311_output );
 	state_save_register_item(machine, "kim1", NULL, 0, state->cassette_high_count );
-	timer_pulse(machine,  ATTOTIME_IN_HZ(60), NULL, 0, kim1_update_leds );
-	timer_pulse(machine,  ATTOTIME_IN_HZ(44100), NULL, 0, kim1_cassette_input );
+	timer_pulse(machine,  attotime::from_hz(60), NULL, 0, kim1_update_leds );
+	timer_pulse(machine,  attotime::from_hz(44100), NULL, 0, kim1_cassette_input );
 }
 
 
@@ -321,7 +321,7 @@ static MACHINE_CONFIG_START( kim1, kim1_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 1000000)        /* 1 MHz */
 	MCFG_CPU_PROGRAM_MAP(kim1_map)
-	MCFG_QUANTUM_TIME(HZ(60))
+	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_MACHINE_START( kim1 )
 	MCFG_MACHINE_RESET( kim1 )

@@ -716,7 +716,7 @@ static const sc61860_cpu_core pc1401_config =
 };
 
 static MACHINE_CONFIG_FRAGMENT( pocketc )
-	MCFG_QUANTUM_TIME(HZ(60))
+	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_NVRAM_HANDLER( pc1401 )
 

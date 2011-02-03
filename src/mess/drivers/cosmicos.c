@@ -624,8 +624,8 @@ static MACHINE_CONFIG_START( cosmicos, cosmicos_state )
     /* video hardware */
 	MCFG_DEFAULT_LAYOUT( layout_cosmicos )
 	MCFG_DM9368_ADD(DM9368_TAG, 0, NULL)
-	MCFG_TIMER_ADD_PERIODIC("digit", digit_tick, HZ(100))
-	MCFG_TIMER_ADD_PERIODIC("interrupt", int_tick, HZ(1000))
+	MCFG_TIMER_ADD_PERIODIC("digit", digit_tick, attotime::from_hz(100))
+	MCFG_TIMER_ADD_PERIODIC("interrupt", int_tick, attotime::from_hz(1000))
 
 	MCFG_CDP1864_SCREEN_ADD(SCREEN_TAG, XTAL_1_75MHz)
 

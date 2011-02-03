@@ -120,7 +120,7 @@ static MACHINE_CONFIG_START( concept, concept_state )
 	MCFG_CPU_PROGRAM_MAP(concept_memmap)
 	MCFG_CPU_VBLANK_INT("screen", concept_interrupt)
 
-	MCFG_QUANTUM_TIME(HZ(60))
+	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 	MCFG_MACHINE_START(concept)
 
 	/* video hardware */

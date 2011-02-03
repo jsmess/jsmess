@@ -251,7 +251,7 @@ static WRITE32_HANDLER( a7000_vidc20_w )
 				if(state->vidc20_vert_reg[VDER] != 0)
 					timer_adjust_oneshot(state->flyback_timer, space->machine->primary_screen->time_until_pos(state->vidc20_vert_reg[VDER]),0);
 				else
-					timer_adjust_oneshot(state->flyback_timer, attotime_never,0);
+					timer_adjust_oneshot(state->flyback_timer, attotime::never,0);
 			}
 
 			// logerror("VIDC20: %s Register write = %08x (%d)\n",vidc20_vert_regnames[vert_reg],val,val);
@@ -577,9 +577,9 @@ static void fire_iomd_timer(a7000_state *state, int timer)
 	int val = timer_count / 2; // correct?
 
 	if(val==0)
-		timer_adjust_oneshot(state->IOMD_timer[timer], attotime_never, 0);
+		timer_adjust_oneshot(state->IOMD_timer[timer], attotime::never, 0);
 	else
-		timer_adjust_periodic(state->IOMD_timer[timer], ATTOTIME_IN_USEC(val), 0, ATTOTIME_IN_USEC(val));
+		timer_adjust_periodic(state->IOMD_timer[timer], attotime::from_usec(val), 0, attotime::from_usec(val));
 }
 
 static TIMER_CALLBACK( IOMD_timer0_callback )
@@ -799,9 +799,9 @@ static MACHINE_RESET(a7000)
 
 	state->IOMD_keyb_ctrl = 0x00;
 
-	timer_adjust_oneshot( state->IOMD_timer[0], attotime_never, 0);
-	timer_adjust_oneshot( state->IOMD_timer[1], attotime_never, 0);
-	timer_adjust_oneshot( state->flyback_timer, attotime_never, 0);
+	timer_adjust_oneshot( state->IOMD_timer[0], attotime::never, 0);
+	timer_adjust_oneshot( state->IOMD_timer[1], attotime::never, 0);
+	timer_adjust_oneshot( state->flyback_timer, attotime::never, 0);
 }
 
 static MACHINE_CONFIG_START( a7000, a7000_state )

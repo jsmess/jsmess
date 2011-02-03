@@ -9132,7 +9132,7 @@ static WRITE8_HANDLER( btl_mariobaby_w )
 				if (!(data & 0x02))
 				{
 					state->IRQ_enable = 0;
-					timer_adjust_oneshot(state->irq_timer, attotime_never, 0);
+					timer_adjust_oneshot(state->irq_timer, attotime::never, 0);
 				}
 				break;
 		}

@@ -105,7 +105,7 @@ static READ8_HANDLER(svision_r)
 			svision_irq( space->machine );
 			break;
 		default:
-			logerror("%.6f svision read %04x %02x\n", attotime_to_double(timer_get_time(space->machine)),offset,data);
+			logerror("%.6f svision read %04x %02x\n", timer_get_time(space->machine).as_double(),offset,data);
 			break;
 	}
 
@@ -126,7 +126,7 @@ static WRITE8_HANDLER(svision_w)
 		case 3:
 			break;
 		case 0x26: /* bits 5,6 memory management for a000? */
-			logerror("%.6f svision write %04x %02x\n", attotime_to_double(timer_get_time(space->machine)),offset,data);
+			logerror("%.6f svision write %04x %02x\n", timer_get_time(space->machine).as_double(),offset,data);
 			memory_set_bankptr(space->machine, "bank1", space->machine->region("user1")->base() + ((state->reg[0x26] & 0xe0) << 9));
 			svision_irq( space->machine );
 			break;
@@ -154,7 +154,7 @@ static WRITE8_HANDLER(svision_w)
 			svision_noise_w(state->sound, offset - 0x28, data);
 			break;
 		default:
-			logerror("%.6f svision write %04x %02x\n", attotime_to_double(timer_get_time(space->machine)), offset, data);
+			logerror("%.6f svision write %04x %02x\n", timer_get_time(space->machine).as_double(), offset, data);
 			break;
 	}
 }
@@ -442,7 +442,7 @@ static DRIVER_INIT( svisions )
 	state->svision.timer1 = timer_alloc(machine, svision_timer, NULL);
 	state->pet.on = TRUE;
 	state->pet.timer = timer_alloc(machine, svision_pet_timer, NULL);
-	timer_pulse(machine, attotime_mul(ATTOTIME_IN_SEC(8), 256/cputag_get_clock(machine, "maincpu")), NULL, 0, svision_pet_timer);
+	timer_pulse(machine, attotime::from_seconds(8) * 256/cputag_get_clock(machine, "maincpu"), NULL, 0, svision_pet_timer);
 }
 
 static DEVICE_IMAGE_LOAD( svision_cart )

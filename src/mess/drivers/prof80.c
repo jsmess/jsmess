@@ -244,7 +244,7 @@ static void ls259_w(running_machine *machine, int fa, int sa, int fb, int sb)
 			/* trigger floppy motor off NE555 timer */
 			int t = 110 * RES_M(10) * CAP_U(6.8); // t = 1.1 * R8 * C6
 
-			timer_adjust_oneshot(state->floppy_motor_off_timer, ATTOTIME_IN_MSEC(t), 0);
+			timer_adjust_oneshot(state->floppy_motor_off_timer, attotime::from_msec(t), 0);
 		}
 		else
 		{
@@ -284,7 +284,7 @@ static void ls259_w(running_machine *machine, int fa, int sa, int fb, int sb)
 		if (!fb)
 		{
 			/* immediately turn off floppy motor */
-			timer_adjust_oneshot(state->floppy_motor_off_timer, attotime_zero, 0);
+			timer_adjust_oneshot(state->floppy_motor_off_timer, attotime::zero, 0);
 		}
 		break;
 
@@ -1322,7 +1322,7 @@ static MACHINE_CONFIG_DERIVED( grip, prof80 )
 	MCFG_MACHINE_START(grip)
 
 	/* keyboard hack */
-	MCFG_TIMER_ADD_PERIODIC("keyboard", keyboard_tick, HZ(50))
+	MCFG_TIMER_ADD_PERIODIC("keyboard", keyboard_tick, attotime::from_hz(50))
 
 
     MCFG_VIDEO_START(grip)

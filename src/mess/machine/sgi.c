@@ -491,7 +491,7 @@ static TIMER_CALLBACK(mc_update_callback)
 void sgi_mc_timer_init(running_machine *machine)
 {
 	tMC_UpdateTimer = timer_alloc(machine,  mc_update_callback , NULL);
-	timer_adjust_periodic(tMC_UpdateTimer, ATTOTIME_IN_HZ(10000), 0, ATTOTIME_IN_HZ(10000));
+	timer_adjust_periodic(tMC_UpdateTimer, attotime::from_hz(10000), 0, attotime::from_hz(10000));
 }
 
 void sgi_mc_init(running_machine *machine)

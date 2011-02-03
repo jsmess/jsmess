@@ -406,7 +406,7 @@ MACHINE_START( z80ne )
 	state_save_register_item_array( machine, "z80ne", NULL, 0, state->lx383_key );
 	state_save_register_item( machine, "z80ne", NULL, 0, state->nmi_delay_counter );
 	state->cassette_timer = timer_alloc(machine, z80ne_cassette_tc, NULL);
-	timer_pulse( machine, ATTOTIME_IN_HZ(1000), NULL, 0, z80ne_kbd_scan );
+	timer_pulse( machine, attotime::from_hz(1000), NULL, 0, z80ne_kbd_scan );
 }
 
 MACHINE_START( z80net )
@@ -617,9 +617,9 @@ WRITE8_HANDLER(lx385_ctrl_w)
 			(motor_b) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 
 		if (motor_a || motor_b)
-			timer_adjust_periodic(state->cassette_timer, attotime_zero, 0, ATTOTIME_IN_HZ(LX385_TAPE_SAMPLE_FREQ));
+			timer_adjust_periodic(state->cassette_timer, attotime::zero, 0, attotime::from_hz(LX385_TAPE_SAMPLE_FREQ));
 		else
-			timer_adjust_oneshot(state->cassette_timer, attotime_zero, 0);
+			timer_adjust_oneshot(state->cassette_timer, attotime::zero, 0);
 	}
 }
 

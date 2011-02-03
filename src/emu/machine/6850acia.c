@@ -122,8 +122,8 @@ void acia6850_device::device_start()
 	m_status_read = 0;
 	m_brk = 0;
 
-	timer_reset(m_rx_timer, attotime_never);
-	timer_reset(m_tx_timer, attotime_never);
+	timer_reset(m_rx_timer, attotime::never);
+	timer_reset(m_tx_timer, attotime::never);
 
 	state_save_register_device_item(this, 0, m_ctrl);
 	state_save_register_device_item(this, 0, m_status);
@@ -291,13 +291,13 @@ WRITE8_DEVICE_HANDLER_TRAMPOLINE(acia6850, acia6850_ctrl_w )
 		{
 			if (m_rx_clock)
 			{
-				attotime rx_period = attotime_mul(ATTOTIME_IN_HZ(m_rx_clock), m_divide);
+				attotime rx_period = attotime::from_hz(m_rx_clock) *  m_divide;
 				timer_adjust_periodic(m_rx_timer, rx_period, 0, rx_period);
 			}
 
 			if (m_tx_clock)
 			{
-				attotime tx_period = attotime_mul(ATTOTIME_IN_HZ(m_tx_clock), m_divide);
+				attotime tx_period = attotime::from_hz(m_tx_clock) * m_divide;
 				timer_adjust_periodic(m_tx_timer, tx_period, 0, tx_period);
 			}
 		}
@@ -745,7 +745,7 @@ void acia6850_device::set_rx_clock(int clock)
 
 	if (m_rx_clock)
 	{
-		attotime rx_period = attotime_mul(ATTOTIME_IN_HZ(m_rx_clock), m_divide);
+		attotime rx_period = attotime::from_hz(m_rx_clock) * m_divide;
 		timer_adjust_periodic(m_rx_timer, rx_period, 0, rx_period);
 	}
 }
@@ -772,7 +772,7 @@ void acia6850_device::set_tx_clock(int clock)
 
 	if (m_tx_clock)
 	{
-		attotime tx_period = attotime_mul(ATTOTIME_IN_HZ(m_tx_clock), m_divide);
+		attotime tx_period = attotime::from_hz(m_tx_clock) * m_divide;
 		timer_adjust_periodic(m_tx_timer, tx_period, 0, tx_period);
 	}
 }

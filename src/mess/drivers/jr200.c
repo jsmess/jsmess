@@ -304,9 +304,9 @@ static WRITE8_HANDLER( mn1271_io_w )
 	{
 		case 0xc805: break; //LPT printer port W
 		case 0xc816: if (data!=0) {
-					timer_adjust_periodic(state->timer_d, attotime_zero, 0, attotime_mul(ATTOTIME_IN_HZ(XTAL_14_31818MHz), (state->mn1271_ram[0x17]*0x100 + state->mn1271_ram[0x18])));
+					timer_adjust_periodic(state->timer_d, attotime::zero, 0, attotime::from_hz(XTAL_14_31818MHz) * (state->mn1271_ram[0x17]*0x100 + state->mn1271_ram[0x18]));
 				} else {
-					timer_adjust_periodic(state->timer_d, attotime_zero, 0,  attotime_zero);
+					timer_adjust_periodic(state->timer_d, attotime::zero, 0,  attotime::zero);
 				}
 				break;
 		case 0xc819: jr200_beep_w(space,0,data); break;

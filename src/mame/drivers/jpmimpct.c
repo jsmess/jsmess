@@ -292,7 +292,7 @@ static READ16_HANDLER( duart_1_r )
 		}
 		case 0xe:
 		{
-			attotime rate = attotime_mul(ATTOTIME_IN_HZ(MC68681_1_CLOCK), 16 * duart_1.CT);
+			attotime rate = attotime::from_hz(MC68681_1_CLOCK) * (16 * duart_1.CT);
 			timer_device *duart_timer = space->machine->device<timer_device>("duart_1_timer");
 			duart_timer->adjust(rate, 0, rate);
 			break;
@@ -854,7 +854,7 @@ static MACHINE_CONFIG_START( jpmimpct, driver_device )
 	MCFG_CPU_CONFIG(tms_config)
 	MCFG_CPU_PROGRAM_MAP(tms_program_map)
 
-	MCFG_QUANTUM_TIME(HZ(30000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(30000))
 	MCFG_MACHINE_START(jpmimpct)
 	MCFG_MACHINE_RESET(jpmimpct)
 	MCFG_NVRAM_ADD_0FILL("nvram")
@@ -1326,7 +1326,7 @@ static MACHINE_CONFIG_START( impctawp, driver_device )
 	MCFG_CPU_ADD("maincpu",M68000, 8000000)
 	MCFG_CPU_PROGRAM_MAP(awp68k_program_map)
 
-	MCFG_QUANTUM_TIME(HZ(30000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(30000))
 
 	MCFG_MACHINE_START(impctawp)
 	MCFG_MACHINE_RESET(impctawp)

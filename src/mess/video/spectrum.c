@@ -80,7 +80,7 @@ VIDEO_EOF( spectrum )
 		pItem = spectrum_EventList_GetFirstItem(machine);
 		spectrum_border_set_last_color ( machine, pItem[NumItems-1].Event_Data );
 		spectrum_EventList_Reset(machine);
-		spectrum_EventList_SetOffsetStartTime ( machine, machine->firstcpu->attotime_to_cycles(attotime_mul(machine->primary_screen->scan_period(), machine->primary_screen->vpos())) );
+		spectrum_EventList_SetOffsetStartTime ( machine, machine->firstcpu->attotime_to_cycles(machine->primary_screen->scan_period() * machine->primary_screen->vpos()) );
 		logerror ("Event log reset in callback fn.\n");
 	}
 }
@@ -529,7 +529,7 @@ void spectrum_border_draw(running_machine *machine, bitmap_t *bitmap,
 
 	/* Assume all other routines have processed their data from the list */
 	spectrum_EventList_Reset(machine);
-	spectrum_EventList_SetOffsetStartTime ( machine, machine->firstcpu->attotime_to_cycles(attotime_mul(machine->primary_screen->scan_period(), machine->primary_screen->vpos())));
+	spectrum_EventList_SetOffsetStartTime ( machine, machine->firstcpu->attotime_to_cycles(machine->primary_screen->scan_period() * machine->primary_screen->vpos()));
 }
 
 

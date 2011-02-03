@@ -175,7 +175,7 @@ static WRITE8_DEVICE_HANDLER( cru_w )
 			{	/* on rising edge, set motor_running for 4.23s */
 				card->DVENA = TRUE;
 				fdc_handle_hold(device);
-				timer_adjust_oneshot(card->motor_on_timer, ATTOTIME_IN_MSEC(4230), 0);
+				timer_adjust_oneshot(card->motor_on_timer, attotime::from_msec(4230), 0);
 			}
 			card->strobe_motor = data;
 			break;

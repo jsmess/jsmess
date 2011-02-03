@@ -296,7 +296,7 @@ static MACHINE_CONFIG_START( mz80k, mz80_state )
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_TIMER_ADD_PERIODIC("tempo", ne555_tempo_callback, HZ(34)) // 33.5Hz - 34.3Hz
+	MCFG_TIMER_ADD_PERIODIC("tempo", ne555_tempo_callback, attotime::from_hz(34)) // 33.5Hz - 34.3Hz
 
 	MCFG_CASSETTE_ADD( "cassette", mz80k_cassette_config )
 MACHINE_CONFIG_END

@@ -60,7 +60,7 @@ static const int c128_mmu_helper[4] =
 		if(VERBOSE_LEVEL >= N) \
 		{ \
 			if( M ) \
-				logerror("%11.6f: %-24s", attotime_to_double(timer_get_time(MACHINE)), (char*) M ); \
+				logerror("%11.6f: %-24s", timer_get_time(MACHINE).as_double(), (char*) M ); \
 			logerror A; \
 		} \
 	} while (0)
@@ -1106,12 +1106,12 @@ void c128_m6510_port_write( device_t *device, UINT8 direction, UINT8 data )
 			if (!(data & 0x20))
 			{
 				cassette_change_state(device->machine->device("cassette"),CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
-				timer_adjust_periodic(state->datasette_timer, attotime_zero, 0, ATTOTIME_IN_HZ(44100));
+				timer_adjust_periodic(state->datasette_timer, attotime::zero, 0, attotime::from_hz(44100));
 			}
 			else
 			{
 				cassette_change_state(device->machine->device("cassette"),CASSETTE_MOTOR_DISABLED ,CASSETTE_MASK_MOTOR);
-				timer_reset(state->datasette_timer, attotime_never);
+				timer_reset(state->datasette_timer, attotime::never);
 			}
 		}
 	}

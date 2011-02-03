@@ -152,14 +152,14 @@ static attotime prescale(int val)
 {
     switch(val)
     {
-        case 0: return ATTOTIME_IN_NSEC(0);
-        case 1: return ATTOTIME_IN_NSEC(1000);
-        case 2: return ATTOTIME_IN_NSEC(2500);
-        case 3: return ATTOTIME_IN_NSEC(4000);
-        case 4: return ATTOTIME_IN_NSEC(12500);
-        case 5: return ATTOTIME_IN_NSEC(16000);
-        case 6: return ATTOTIME_IN_NSEC(25000);
-        case 7: return ATTOTIME_IN_NSEC(50000);
+        case 0: return attotime::from_nsec(0);
+        case 1: return attotime::from_nsec(1000);
+        case 2: return attotime::from_nsec(2500);
+        case 3: return attotime::from_nsec(4000);
+        case 4: return attotime::from_nsec(12500);
+        case 5: return attotime::from_nsec(16000);
+        case 6: return attotime::from_nsec(25000);
+        case 7: return attotime::from_nsec(50000);
         default:
             fatalerror("out of range");
     }
@@ -180,7 +180,7 @@ static void mfp_init(running_machine *machine)
     mfp_timer[2] = timer_alloc(machine, mfp_timer_c_callback, NULL);
     mfp_timer[3] = timer_alloc(machine, mfp_timer_d_callback, NULL);
     mfp_irq = timer_alloc(machine, mfp_update_irq, NULL);
-    timer_adjust_periodic(mfp_irq, attotime_zero, 0, ATTOTIME_IN_USEC(32));
+    timer_adjust_periodic(mfp_irq, attotime::zero, 0, attotime::from_usec(32));
 #endif
 }
 
@@ -308,13 +308,13 @@ void mfp_set_timer(int timer, unsigned char data)
 {
     if((data & 0x07) == 0x0000)
     {  // Timer stop
-        timer_adjust_oneshot(mfp_timer[timer], attotime_zero, 0);
+        timer_adjust_oneshot(mfp_timer[timer], attotime::zero, 0);
         logerror("MFP: Timer #%i stopped. \n",timer);
         return;
     }
 
-    timer_adjust_periodic(mfp_timer[timer], attotime_zero, 0, prescale(data & 0x07));
-    logerror("MFP: Timer #%i set to %2.1fus\n",timer, attotime_to_double(prescale(data & 0x07)) * 1000000);
+    timer_adjust_periodic(mfp_timer[timer], attotime::zero, 0, prescale(data & 0x07));
+    logerror("MFP: Timer #%i set to %2.1fus\n",timer, prescale(data & 0x07).as_double() * 1000000);
 
 }
 #endif
@@ -681,7 +681,7 @@ static void x68k_set_adpcm(running_machine* machine)
 	}
 	if(state->adpcm.clock != 0)
 		rate = rate/2;
-	hd63450_set_timer(dev,3,ATTOTIME_IN_HZ(rate));
+	hd63450_set_timer(dev,3,attotime::from_hz(rate));
 }
 
 // Megadrive 3 button gamepad
@@ -2111,8 +2111,8 @@ static I8255A_INTERFACE( ppi_interface )
 static const hd63450_intf dmac_interface =
 {
 	"maincpu",  // CPU - 68000
-	{STATIC_ATTOTIME_IN_USEC(32),STATIC_ATTOTIME_IN_NSEC(450),STATIC_ATTOTIME_IN_USEC(4),STATIC_ATTOTIME_IN_HZ(15625/2)},  // Cycle steal mode timing (guesstimate)
-	{STATIC_ATTOTIME_IN_USEC(32),STATIC_ATTOTIME_IN_NSEC(450),STATIC_ATTOTIME_IN_NSEC(50),STATIC_ATTOTIME_IN_NSEC(50)}, // Burst mode timing (guesstimate)
+	{attotime::from_usec(32),attotime::from_nsec(450),attotime::from_usec(4),attotime::from_hz(15625/2)},  // Cycle steal mode timing (guesstimate)
+	{attotime::from_usec(32),attotime::from_nsec(450),attotime::from_nsec(50),attotime::from_nsec(50)}, // Burst mode timing (guesstimate)
 	x68k_dma_end,
 	x68k_dma_error,
 	{ x68k_fdc_read_byte, 0, 0, 0 },
@@ -2621,14 +2621,14 @@ static MACHINE_START( x68000 )
 	memory_set_bankptr(machine, "bank4",state->m_nvram);  // so that code in SRAM is executable, there is an option for booting from SRAM
 
 	// start keyboard timer
-	timer_adjust_periodic(state->kb_timer, attotime_zero, 0, ATTOTIME_IN_MSEC(5));  // every 5ms
+	timer_adjust_periodic(state->kb_timer, attotime::zero, 0, attotime::from_msec(5));  // every 5ms
 
 	// start mouse timer
-	timer_adjust_periodic(state->mouse_timer, attotime_zero, 0, ATTOTIME_IN_MSEC(1));  // a guess for now
+	timer_adjust_periodic(state->mouse_timer, attotime::zero, 0, attotime::from_msec(1));  // a guess for now
 	state->mouse.inputtype = 0;
 
 	// start LED timer
-	timer_adjust_periodic(state->led_timer, attotime_zero, 0, ATTOTIME_IN_MSEC(400));
+	timer_adjust_periodic(state->led_timer, attotime::zero, 0, attotime::from_msec(400));
 }
 
 static MACHINE_START( x68030 )
@@ -2655,14 +2655,14 @@ static MACHINE_START( x68030 )
 	memory_set_bankptr(machine, "bank4",state->m_nvram);  // so that code in SRAM is executable, there is an option for booting from SRAM
 
 	// start keyboard timer
-	timer_adjust_periodic(state->kb_timer, attotime_zero, 0, ATTOTIME_IN_MSEC(5));  // every 5ms
+	timer_adjust_periodic(state->kb_timer, attotime::zero, 0, attotime::from_msec(5));  // every 5ms
 
 	// start mouse timer
-	timer_adjust_periodic(state->mouse_timer, attotime_zero, 0, ATTOTIME_IN_MSEC(1));  // a guess for now
+	timer_adjust_periodic(state->mouse_timer, attotime::zero, 0, attotime::from_msec(1));  // a guess for now
 	state->mouse.inputtype = 0;
 
 	// start LED timer
-	timer_adjust_periodic(state->led_timer, attotime_zero, 0, ATTOTIME_IN_MSEC(400));
+	timer_adjust_periodic(state->led_timer, attotime::zero, 0, attotime::from_msec(400));
 }
 
 static DRIVER_INIT( x68000 )
@@ -2725,7 +2725,7 @@ static MACHINE_CONFIG_START( x68000_base, x68k_state )
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)  /* 10 MHz */
 	MCFG_CPU_PROGRAM_MAP(x68k_map)
 	MCFG_CPU_VBLANK_INT("screen", x68k_vsync_irq)
-	MCFG_QUANTUM_TIME(HZ(60))
+	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_MACHINE_START( x68000 )
 	MCFG_MACHINE_RESET( x68000 )

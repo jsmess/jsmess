@@ -13,6 +13,8 @@ Mainboard + Cart combo
     Green      = Asia
     Red        = Korean
 
+ There is a USA version of Cyvern known to exist, but not dumped. The cart color is Black.
+
   Credits (in no particular order):
    Olivier Galibert for all the assistance and information he's provided
    R.Belmont for working on the SH2 timers so sound worked
@@ -839,11 +841,11 @@ static MACHINE_CONFIG_START( skns, driver_device )
 	MCFG_MACHINE_RESET(skns)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	MCFG_TIMER_ADD_PERIODIC("int15_timer", interrupt_callback, MSEC(2))
+	MCFG_TIMER_ADD_PERIODIC("int15_timer", interrupt_callback, attotime::from_msec(2))
 	MCFG_TIMER_PARAM(15)
-	MCFG_TIMER_ADD_PERIODIC("int11_timer", interrupt_callback, MSEC(8))
+	MCFG_TIMER_ADD_PERIODIC("int11_timer", interrupt_callback, attotime::from_msec(8))
 	MCFG_TIMER_PARAM(11)
-	MCFG_TIMER_ADD_PERIODIC("int9_timer", interrupt_callback, HZ(28638000/1824))
+	MCFG_TIMER_ADD_PERIODIC("int9_timer", interrupt_callback, attotime::from_hz(28638000/1824))
 	MCFG_TIMER_PARAM(9)
 
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
@@ -1455,8 +1457,6 @@ ROM_START( puzzloopu )
 	ROM_REGION( 0x400000, "ymz", 0 ) /* Samples */
 	ROM_LOAD( "pzl30000.u4", 0x000000, 0x400000, CRC(38604b8d) SHA1(1191cf48a6a7baa58e51509442b40ea67f5252d2) )
 ROM_END
-
-/* haven't even tried to run the ones below yet */
 
 ROM_START( jjparads )
 	ROM_REGION( 0x080000, "maincpu", 0 ) /* SH-2 Code */

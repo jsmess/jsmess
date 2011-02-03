@@ -208,7 +208,7 @@ void scsi_data_w(device_t *device, UINT8 data)
 				
 				// If we have the first byte, then cancel the dataout timout
 				if(bus->data_idx==1)
-					timer_adjust_oneshot(bus->dataout_timer,attotime_never,0);
+					timer_adjust_oneshot(bus->dataout_timer,attotime::never,0);
 
                 // When we have the first 3 bytes, calculate how many more are in the
                 // bad block list.
@@ -297,7 +297,7 @@ void set_scsi_line_ack(device_t *device, UINT8 state)
 {
     scsibus_t   *bus = get_token(device);
 
-    timer_adjust_oneshot(bus->ack_timer,ATTOTIME_IN_NSEC(ACK_DELAY_NS),state);
+    timer_adjust_oneshot(bus->ack_timer,attotime::from_nsec(ACK_DELAY_NS),state);
 }
 
 static void scsibus_exec_command(device_t *device)
@@ -366,7 +366,7 @@ static void scsibus_exec_command(device_t *device)
             bus->xfer_count=4;
             bus->data_last=bus->xfer_count;
             bus->bytes_left=0;
-			timer_adjust_oneshot(bus->dataout_timer,ATTOTIME_IN_SEC(FORMAT_UNIT_TIMEOUT),0);
+			timer_adjust_oneshot(bus->dataout_timer,attotime::from_seconds(FORMAT_UNIT_TIMEOUT),0);
             break;
 
 		// Check track format Xebec
@@ -614,7 +614,7 @@ static void scsi_in_line_changed(device_t *device, UINT8 line, UINT8 state)
 				if(hdfile!=(void *)NULL)
 				{
 					if(state==0)
-						timer_adjust_oneshot(bus->sel_timer,ATTOTIME_IN_NSEC(BSY_DELAY_NS),0);
+						timer_adjust_oneshot(bus->sel_timer,attotime::from_nsec(BSY_DELAY_NS),0);
 					else
 						scsi_change_phase(device,SCSI_PHASE_COMMAND);
 				}
@@ -738,7 +738,7 @@ static void scsi_out_line_req(device_t *device, UINT8 state)
 {
     scsibus_t   *bus = get_token(device);
 
-    timer_adjust_oneshot(bus->req_timer,ATTOTIME_IN_NSEC(REQ_DELAY_NS),state);
+    timer_adjust_oneshot(bus->req_timer,attotime::from_nsec(REQ_DELAY_NS),state);
 }
 
 

@@ -818,7 +818,7 @@ static MACHINE_CONFIG_START( bbca, bbc_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(128))
-	MCFG_QUANTUM_TIME(HZ(60))
+	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_MACHINE_START( bbca )
 	MCFG_MACHINE_RESET( bbca )
@@ -907,7 +907,7 @@ static MACHINE_CONFIG_START( bbcm, bbc_state )
 	MCFG_CPU_PROGRAM_MAP( bbcm_mem)
 	MCFG_CPU_VBLANK_INT("screen", bbcb_vsync)				/* screen refresh interrupts */
 	MCFG_CPU_PERIODIC_INT(bbcm_keyscan, 1000)		/* scan keyboard */
-	MCFG_QUANTUM_TIME(HZ(60))
+	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_MACHINE_START( bbcm )
 	MCFG_MACHINE_RESET( bbcm )

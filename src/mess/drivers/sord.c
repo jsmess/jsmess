@@ -642,7 +642,7 @@ static MACHINE_CONFIG_DERIVED( sord_m5_fd5, sord_m5 )
 	MCFG_I8255A_ADD("ppi8255", sord_ppi8255_interface)
 	MCFG_UPD765A_ADD("upd765", sord_fd5_upd765_interface)
 
-	MCFG_QUANTUM_TIME(HZ(1200))
+	MCFG_QUANTUM_TIME(attotime::from_hz(1200))
 	MCFG_MACHINE_RESET(sord_m5_fd5)
 
 	MCFG_FLOPPY_4_DRIVES_ADD(sordm5_floppy_config)

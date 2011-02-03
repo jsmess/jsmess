@@ -129,7 +129,7 @@ static MACHINE_START( cdi )
 	scc68070_register_globals(machine, &state->scc68070_regs);
 
 	state->scc68070_regs.timers.timer0_timer = timer_alloc(machine, scc68070_timer0_callback, 0);
-	timer_adjust_oneshot(state->scc68070_regs.timers.timer0_timer, attotime_never, 0);
+	timer_adjust_oneshot(state->scc68070_regs.timers.timer0_timer, attotime::never, 0);
 }
 
 static MACHINE_RESET( cdi )

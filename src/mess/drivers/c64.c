@@ -679,7 +679,7 @@ static MACHINE_CONFIG_START( c64, c64_state )
 	MCFG_CPU_CONFIG( c64_m6510_interface )
 	MCFG_CPU_VBLANK_INT("screen", c64_frame_interrupt)
 	//MCFG_CPU_PERIODIC_INT(vic2_raster_irq, VIC6567_HRETRACERATE)
-	MCFG_QUANTUM_TIME(HZ(60))
+	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_MACHINE_START( c64 )
 	MCFG_MACHINE_RESET( c64 )
@@ -730,7 +730,7 @@ static MACHINE_CONFIG_START( c64pal, c64_state )
 	MCFG_CPU_CONFIG( c64_m6510_interface )
 	MCFG_CPU_VBLANK_INT("screen", c64_frame_interrupt)
 	// MCFG_CPU_PERIODIC_INT(vic2_raster_irq, VIC6569_HRETRACERATE)
-	MCFG_QUANTUM_TIME(HZ(50))
+	MCFG_QUANTUM_TIME(attotime::from_hz(50))
 
 	MCFG_MACHINE_START( c64 )
 	MCFG_MACHINE_RESET( c64 )
@@ -817,9 +817,9 @@ static MACHINE_CONFIG_DERIVED( sx64, c64pal )
 	MCFG_DEVICE_REMOVE( "dac" )
 	MCFG_DEVICE_REMOVE( "cassette" )
 #ifdef CPU_SYNC
-	MCFG_QUANTUM_TIME(HZ(60))
+	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 #else
-	MCFG_QUANTUM_TIME(HZ(180000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(180000))
 #endif
 MACHINE_CONFIG_END
 

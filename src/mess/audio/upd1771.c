@@ -204,7 +204,7 @@ WRITE8_DEVICE_HANDLER( upd1771_w )
                 //logerror( "upd1771_w: ----------------noise state reset\n");
             }
             else
-                timer_adjust_oneshot( state->timer, ticks_to_attotime( 512, device->clock() ), 0 );
+                timer_adjust_oneshot( state->timer, attotime::from_ticks( 512, device->clock() ), 0 );
 		}break;
 
         case 2:
@@ -223,7 +223,7 @@ WRITE8_DEVICE_HANDLER( upd1771_w )
                 state->index = 0;
             }
             else
-                timer_adjust_oneshot( state->timer, ticks_to_attotime( 512, device->clock() ), 0 );
+                timer_adjust_oneshot( state->timer, attotime::from_ticks( 512, device->clock() ), 0 );
 
 		}break;
 
@@ -239,7 +239,7 @@ WRITE8_DEVICE_HANDLER( upd1771_w )
 				state->packet[0]=0;
 			}
 			else
-				timer_adjust_oneshot( state->timer, ticks_to_attotime( 512, device->clock() ), 0 );
+				timer_adjust_oneshot( state->timer, attotime::from_ticks( 512, device->clock() ), 0 );
 
 		}break;
 

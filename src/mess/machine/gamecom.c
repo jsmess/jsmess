@@ -244,12 +244,12 @@ WRITE8_HANDLER( gamecom_internal_w )
 			if ( data & 0x40 )
 			{
 				/* timer resolution 1 minute */
-				timer_adjust_periodic(state->clock_timer, ATTOTIME_IN_SEC(1), 0, ATTOTIME_IN_SEC(60));
+				timer_adjust_periodic(state->clock_timer, attotime::from_seconds(1), 0, attotime::from_seconds(60));
 			}
 			else
 			{
 				/* TImer resolution 1 second */
-				timer_adjust_periodic(state->clock_timer, ATTOTIME_IN_SEC(1), 0, ATTOTIME_IN_SEC(1));
+				timer_adjust_periodic(state->clock_timer, attotime::from_seconds(1), 0, attotime::from_seconds(1));
 			}
 		}
 		else

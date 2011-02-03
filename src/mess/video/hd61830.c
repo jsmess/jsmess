@@ -262,7 +262,7 @@ void hd61830_device::set_busy_flag()
 	m_bf = true;
 
 	// adjust busy timer
-	timer_adjust_oneshot(m_busy_timer, ATTOTIME_IN_USEC(CYCLES[m_ir]), 0);
+	timer_adjust_oneshot(m_busy_timer, attotime::from_usec(CYCLES[m_ir]), 0);
 }
 
 

@@ -49,7 +49,7 @@ static void scc68070_set_timer_callback(scc68070_regs_t *scc68070, int channel)
     {
         case 0:
             compare = 0x10000 - scc68070->timers.timer0;
-            period = attotime_mul(ATTOTIME_IN_HZ(CLOCK_A/192), compare);
+            period = attotime::from_hz(CLOCK_A/192) * compare;
             timer_adjust_oneshot(scc68070->timers.timer0_timer, period, 0);
             break;
         default:

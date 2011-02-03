@@ -396,7 +396,7 @@ static MACHINE_CONFIG_START( amu880, amu880_state )
 	MCFG_CPU_IO_MAP(amu880_io)
 	MCFG_CPU_CONFIG(amu880_daisy_chain)
 
-	MCFG_TIMER_ADD_PERIODIC("keyboard", keyboard_tick, HZ(1500))
+	MCFG_TIMER_ADD_PERIODIC("keyboard", keyboard_tick, attotime::from_hz(1500))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)

@@ -1271,7 +1271,7 @@ static void OPL_initalize(FM_OPL *OPL)
 	/*logerror("freqbase=%f\n", OPL->freqbase);*/
 
 	/* Timer base time */
-	OPL->TimerBase = attotime_mul(ATTOTIME_IN_HZ(OPL->clock), 72);
+	OPL->TimerBase = attotime::from_hz(OPL->clock) * 72;
 
 	/* make fnumber -> increment counter table */
 	for( i=0 ; i < 1024 ; i++ )
@@ -1498,14 +1498,14 @@ static void OPLWriteReg(FM_OPL *OPL, int r, int v)
 				/* timer 2 */
 				if(OPL->st[1] != st2)
 				{
-					attotime period = st2 ? attotime_mul(OPL->TimerBase, OPL->T[1]) : attotime_zero;
+					attotime period = st2 ? (OPL->TimerBase * OPL->T[1]) : attotime::zero;
 					OPL->st[1] = st2;
 					if (OPL->timer_handler) (OPL->timer_handler)(OPL->TimerParam,1,period);
 				}
 				/* timer 1 */
 				if(OPL->st[0] != st1)
 				{
-					attotime period = st1 ? attotime_mul(OPL->TimerBase, OPL->T[0]) : attotime_zero;
+					attotime period = st1 ? (OPL->TimerBase * OPL->T[0]) : attotime::zero;
 					OPL->st[0] = st1;
 					if (OPL->timer_handler) (OPL->timer_handler)(OPL->TimerParam,0,period);
 				}
@@ -1744,7 +1744,7 @@ static int OPL_LockTable(device_t *device)
 	{
 		cymfile = fopen("3812_.cym","wb");
 		if (cymfile)
-			timer_pulse ( device->machine, ATTOTIME_IN_HZ(110), NULL, 0, cymfile_callback); /*110 Hz pulse timer*/
+			timer_pulse ( device->machine, attotime::from_hz(110), NULL, 0, cymfile_callback); /*110 Hz pulse timer*/
 		else
 			logerror("Could not create file 3812_.cym\n");
 	}
@@ -2142,7 +2142,7 @@ static int OPLTimerOver(FM_OPL *OPL,int c)
 		}
 	}
 	/* reload timer */
-	if (OPL->timer_handler) (OPL->timer_handler)(OPL->TimerParam,c,attotime_mul(OPL->TimerBase, OPL->T[c]));
+	if (OPL->timer_handler) (OPL->timer_handler)(OPL->TimerParam,c,OPL->TimerBase * OPL->T[c]);
 	return OPL->status>>7;
 }
 

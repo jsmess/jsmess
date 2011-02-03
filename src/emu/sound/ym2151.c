@@ -690,21 +690,21 @@ static void init_chip_tables(YM2151 *chip)
 	for (i=0; i<1024; i++)
 	{
 		/* ASG 980324: changed to compute both tim_A_tab and timer_A_time */
-		pom= attotime_mul(ATTOTIME_IN_HZ(chip->clock), 64 * (1024 - i));
+		pom= attotime::from_hz(chip->clock) * (64 * (1024 - i));
 		#ifdef USE_MAME_TIMERS
 			chip->timer_A_time[i] = pom;
 		#else
-			chip->tim_A_tab[i] = attotime_to_double(pom) * (double)chip->sampfreq * mult;  /* number of samples that timer period takes (fixed point) */
+			chip->tim_A_tab[i] = pom.as_double() * (double)chip->sampfreq * mult;  /* number of samples that timer period takes (fixed point) */
 		#endif
 	}
 	for (i=0; i<256; i++)
 	{
 		/* ASG 980324: changed to compute both tim_B_tab and timer_B_time */
-		pom= attotime_mul(ATTOTIME_IN_HZ(chip->clock), 1024 * (256 - i));
+		pom= attotime::from_hz(chip->clock) * (1024 * (256 - i));
 		#ifdef USE_MAME_TIMERS
 			chip->timer_B_time[i] = pom;
 		#else
-			chip->tim_B_tab[i] = attotime_to_double(pom) * (double)chip->sampfreq * mult;  /* number of samples that timer period takes (fixed point) */
+			chip->tim_B_tab[i] = pom.as_double() * (double)chip->sampfreq * mult;  /* number of samples that timer period takes (fixed point) */
 		#endif
 	}
 
@@ -824,7 +824,7 @@ static TIMER_CALLBACK( timer_callback_a )
 	if (chip->irq_enable & 0x04)
 	{
 		chip->status |= 1;
-		timer_set(machine, attotime_zero,chip,0,irqAon_callback);
+		timer_set(machine, attotime::zero,chip,0,irqAon_callback);
 	}
 	if (chip->irq_enable & 0x80)
 		chip->csm_req = 2;		/* request KEY ON / KEY OFF sequence */
@@ -837,7 +837,7 @@ static TIMER_CALLBACK( timer_callback_b )
 	if (chip->irq_enable & 0x08)
 	{
 		chip->status |= 2;
-		timer_set(machine, attotime_zero,chip,0,irqBon_callback);
+		timer_set(machine, attotime::zero,chip,0,irqBon_callback);
 	}
 }
 #if 0
@@ -1049,7 +1049,7 @@ void ym2151_write_reg(void *_chip, int r, int v)
 #if 0
 	/* There is no info on what YM2151 really does when busy flag is set */
 	if ( chip->status & 0x80 ) return;
-	timer_set ( attotime_mul(ATTOTIME_IN_HZ(chip->clock), 64), chip, 0, timer_callback_chip_busy);
+	timer_set ( attotime::from_hz(chip->clock) * 64, chip, 0, timer_callback_chip_busy);
 	chip->status |= 0x80;	/* set busy flag for 64 chip clock cycles */
 #endif
 
@@ -1098,7 +1098,7 @@ void ym2151_write_reg(void *_chip, int r, int v)
 			{
 #ifdef USE_MAME_TIMERS
 				chip->status &= ~1;
-				timer_set(chip->device->machine, attotime_zero,chip,0,irqAoff_callback);
+				timer_set(chip->device->machine, attotime::zero,chip,0,irqAoff_callback);
 #else
 				int oldstate = chip->status & 3;
 				chip->status &= ~1;
@@ -1110,7 +1110,7 @@ void ym2151_write_reg(void *_chip, int r, int v)
 			{
 #ifdef USE_MAME_TIMERS
 				chip->status &= ~2;
-				timer_set(chip->device->machine, attotime_zero,chip,0,irqBoff_callback);
+				timer_set(chip->device->machine, attotime::zero,chip,0,irqBoff_callback);
 #else
 				int oldstate = chip->status & 3;
 				chip->status &= ~2;
@@ -1546,7 +1546,7 @@ void * ym2151_init(device_t *device, int clock, int rate)
 	{
 		cymfile = fopen("2151_.cym","wb");
 		if (cymfile)
-			timer_pulse ( device->machine, ATTOTIME_IN_HZ(110), NULL, 0, cymfile_callback); /*110 Hz pulse timer*/
+			timer_pulse ( device->machine, attotime::from_hz(110), NULL, 0, cymfile_callback); /*110 Hz pulse timer*/
 		else
 			logerror("Could not create file 2151_.cym\n");
 	}

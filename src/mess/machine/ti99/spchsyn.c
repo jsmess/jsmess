@@ -157,12 +157,12 @@ static WRITE8_DEVICE_HANDLER( speech_w )
 		/* which would be more complex. */
 		if (!tms5220_readyq_r(adapter->vsp))
 		{
-			attotime time_to_ready = double_to_attotime(tms5220_time_to_ready(adapter->vsp));
+			attotime time_to_ready = attotime::from_double(tms5220_time_to_ready(adapter->vsp));
 			int cycles_to_ready = device->machine->device<cpu_device>("maincpu")->attotime_to_cycles(time_to_ready);
-			logerror("time to ready: %f -> %d\n", attotime_to_double(time_to_ready), (int) cycles_to_ready);
+			logerror("time to ready: %f -> %d\n", time_to_ready.as_double(), (int) cycles_to_ready);
 
 			cpu_adjust_icount(device->machine->device("maincpu"),-cycles_to_ready);
-			timer_set(device->machine, attotime_zero, NULL, 0, NULL);
+			timer_set(device->machine, attotime::zero, NULL, 0, NULL);
 		}
 		tms5220_data_w(adapter->vsp, offset, data);
 	}

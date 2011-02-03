@@ -1647,12 +1647,12 @@ static MACHINE_CONFIG_START( abc800c, abc800c_state )
 
 	// peripheral hardware
 	MCFG_Z80CTC_ADD(Z80CTC_TAG, ABC800_X01/2/2, ctc_intf)
-	MCFG_TIMER_ADD_PERIODIC("ctc", ctc_tick, HZ(ABC800_X01/2/2/2))
+	MCFG_TIMER_ADD_PERIODIC("ctc", ctc_tick, attotime::from_hz(ABC800_X01/2/2/2))
 	MCFG_Z80SIO2_ADD(Z80SIO_TAG, ABC800_X01/2/2, sio_intf)
 	MCFG_Z80DART_ADD(Z80DART_TAG, ABC800_X01/2/2, abc800_dart_intf)
 	MCFG_PRINTER_ADD("printer")
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, abc800_cassette_config)
-	MCFG_TIMER_ADD_PERIODIC("keyboard_t1", keyboard_t1_tick, HZ(XTAL_5_9904MHz/(3*5)/20)) // TODO correct frequency?
+	MCFG_TIMER_ADD_PERIODIC("keyboard_t1", keyboard_t1_tick, attotime::from_hz(XTAL_5_9904MHz/(3*5)/20)) // TODO correct frequency?
 
 	// ABC bus
 	MCFG_ABCBUS_ADD(ABCBUS_TAG, abcbus_daisy, Z80_TAG)
@@ -1690,12 +1690,12 @@ static MACHINE_CONFIG_START( abc800m, abc800m_state )
 
 	// peripheral hardware
 	MCFG_Z80CTC_ADD(Z80CTC_TAG, ABC800_X01/2/2, ctc_intf)
-	MCFG_TIMER_ADD_PERIODIC("ctc", ctc_tick, HZ(ABC800_X01/2/2/2))
+	MCFG_TIMER_ADD_PERIODIC("ctc", ctc_tick, attotime::from_hz(ABC800_X01/2/2/2))
 	MCFG_Z80SIO2_ADD(Z80SIO_TAG, ABC800_X01/2/2, sio_intf)
 	MCFG_Z80DART_ADD(Z80DART_TAG, ABC800_X01/2/2, abc800_dart_intf)
 	MCFG_PRINTER_ADD("printer")
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, abc800_cassette_config)
-	MCFG_TIMER_ADD_PERIODIC("keyboard_t1", keyboard_t1_tick, HZ(XTAL_5_9904MHz/(3*5)/20)) // TODO correct frequency?
+	MCFG_TIMER_ADD_PERIODIC("keyboard_t1", keyboard_t1_tick, attotime::from_hz(XTAL_5_9904MHz/(3*5)/20)) // TODO correct frequency?
 
 	// ABC bus
 	MCFG_ABCBUS_ADD(ABCBUS_TAG, abcbus_daisy, Z80_TAG)
@@ -1730,7 +1730,7 @@ static MACHINE_CONFIG_START( abc802, abc802_state )
 
 	// peripheral hardware
 	MCFG_Z80CTC_ADD(Z80CTC_TAG, ABC800_X01/2/2, ctc_intf)
-	MCFG_TIMER_ADD_PERIODIC("ctc", ctc_tick, HZ(ABC800_X01/2/2/2))
+	MCFG_TIMER_ADD_PERIODIC("ctc", ctc_tick, attotime::from_hz(ABC800_X01/2/2/2))
 	MCFG_Z80SIO2_ADD(Z80SIO_TAG, ABC800_X01/2/2, sio_intf)
 	MCFG_Z80DART_ADD(Z80DART_TAG, ABC800_X01/2/2, abc802_dart_intf)
 	//MCFG_ABC77_ADD(abc800_abc77_intf)
@@ -1742,7 +1742,7 @@ static MACHINE_CONFIG_START( abc802, abc802_state )
 	MCFG_ABC834_ADD("luxor_55_21046", ABCBUS_TAG)
 
 	// fake keyboard
-	MCFG_TIMER_ADD_PERIODIC("keyboard", keyboard_tick, USEC(2500))
+	MCFG_TIMER_ADD_PERIODIC("keyboard", keyboard_tick, attotime::from_usec(2500))
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
@@ -1770,7 +1770,7 @@ static MACHINE_CONFIG_START( abc806, abc806_state )
 	// peripheral hardware
 	MCFG_E0516_ADD(E0516_TAG, ABC806_X02)
 	MCFG_Z80CTC_ADD(Z80CTC_TAG, ABC800_X01/2/2, ctc_intf)
-	MCFG_TIMER_ADD_PERIODIC("ctc", ctc_tick, HZ(ABC800_X01/2/2/2))
+	MCFG_TIMER_ADD_PERIODIC("ctc", ctc_tick, attotime::from_hz(ABC800_X01/2/2/2))
 	MCFG_Z80SIO2_ADD(Z80SIO_TAG, ABC800_X01/2/2, sio_intf)
 	MCFG_Z80DART_ADD(Z80DART_TAG, ABC800_X01/2/2, abc806_dart_intf)
 	//MCFG_ABC77_ADD(abc800_abc77_intf)
@@ -1782,7 +1782,7 @@ static MACHINE_CONFIG_START( abc806, abc806_state )
 	MCFG_ABC832_ADD("luxor_55_21046", ABCBUS_TAG, DRIVE_TEAC_FD55F)
 
 	// fake keyboard
-	MCFG_TIMER_ADD_PERIODIC("keyboard", keyboard_tick, USEC(2500))
+	MCFG_TIMER_ADD_PERIODIC("keyboard", keyboard_tick, attotime::from_usec(2500))
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)

@@ -605,7 +605,7 @@ static TIMER_CALLBACK( setup_beep )
 
 static DRIVER_INIT( studio2 )
 {
-	timer_set(machine, attotime_zero, NULL, 0, setup_beep);
+	timer_set(machine, attotime::zero, NULL, 0, setup_beep);
 }
 
 /* Game Drivers */

@@ -278,7 +278,7 @@ static MACHINE_RESET(cat)
 {
 	cat_state *state = machine->driver_data<cat_state>();
 	cpu_set_irq_callback(machine->device("maincpu"), cat_int_ack);
-	timer_adjust_periodic(state->keyboard_timer, attotime_zero, 0, ATTOTIME_IN_HZ(120));
+	timer_adjust_periodic(state->keyboard_timer, attotime::zero, 0, attotime::from_hz(120));
 }
 
 static VIDEO_START( cat )
@@ -324,7 +324,7 @@ static MACHINE_START(swyft)
 
 static MACHINE_RESET(swyft)
 {
-	timer_set(machine, ATTOTIME_IN_USEC(10), NULL, 0, swyft_reset);
+	timer_set(machine, attotime::from_usec(10), NULL, 0, swyft_reset);
 }
 
 static VIDEO_START( swyft )

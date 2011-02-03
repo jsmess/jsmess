@@ -363,7 +363,7 @@ static void update_de_changed_timer(crtc_ega_t *crtc_ega)
 		if (next_y != -1)
 			duration = crtc_ega->screen->time_until_pos(next_y, next_x);
 		else
-			duration = attotime_never;
+			duration = attotime::never;
 
 		timer_adjust_oneshot(crtc_ega->de_changed_timer, duration, 0);
 	}

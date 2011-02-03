@@ -376,7 +376,7 @@ static WRITE16_HANDLER( m68k_infifo_w ) // 68k write to the speech input fifo
 {
 	dectalk_state *state = space->machine->driver_data<dectalk_state>();
 #ifdef USE_LOOSE_TIMING
-	cpuexec_boost_interleave(space->machine, attotime_zero, ATTOTIME_IN_USEC(25));
+	cpuexec_boost_interleave(space->machine, attotime::zero, attotime::from_usec(25));
 #endif
 #ifdef SPC_LOG_68K
 	logerror("m68k: SPC infifo written with data = %04X, fifo head was: %02X; fifo tail: %02X\n",data, state->infifo_head_ptr, state->infifo_tail_ptr);
@@ -411,7 +411,7 @@ static WRITE16_HANDLER( m68k_spcflags_w ) // 68k write to the speech flags (only
 {
 	dectalk_state *state = space->machine->driver_data<dectalk_state>();
 #ifdef USE_LOOSE_TIMING
-	cpuexec_boost_interleave(space->machine, attotime_zero, ATTOTIME_IN_USEC(25));
+	cpuexec_boost_interleave(space->machine, attotime::zero, attotime::from_usec(25));
 #endif
 #ifdef SPC_LOG_68K
 	logerror("m68k: SPC flags written with %04X, only storing %04X\n",data, data&0x41);
@@ -560,7 +560,7 @@ static WRITE16_HANDLER( spc_latch_outfifo_error_stats ) // latch 74ls74 @ E64 up
 {
 	dectalk_state *state = space->machine->driver_data<dectalk_state>();
 #ifdef USE_LOOSE_TIMING
-	cpuexec_boost_interleave(space->machine, attotime_zero, ATTOTIME_IN_USEC(25));
+	cpuexec_boost_interleave(space->machine, attotime::zero, attotime::from_usec(25));
 #endif
 #ifdef SPC_LOG_DSP
 	logerror("dsp: set fifo semaphore and set error status = %01X\n",data&1);
@@ -704,7 +704,7 @@ static TIMER_CALLBACK( outfifo_read_cb )
 #ifdef VERBOSE
 	if (data!= 0x8000) logerror("sample output: %04X\n", data);
 #endif
-	timer_set(machine, ATTOTIME_IN_HZ(10000), NULL, 0, outfifo_read_cb);
+	timer_set(machine, attotime::from_hz(10000), NULL, 0, outfifo_read_cb);
 	dac_signed_data_16_w( speaker, data );
 }
 
@@ -714,7 +714,7 @@ static DRIVER_INIT( dectalk )
 	dectalk_state *state = machine->driver_data<dectalk_state>();
 	dectalk_clear_all_fifos(machine);
 	state->simulate_outfifo_error = 0;
-	timer_set(machine, ATTOTIME_IN_HZ(10000), NULL, 0,  outfifo_read_cb);
+	timer_set(machine, attotime::from_hz(10000), NULL, 0,  outfifo_read_cb);
 }
 
 static WRITE8_DEVICE_HANDLER( dectalk_kbd_put )
@@ -740,7 +740,7 @@ static MACHINE_CONFIG_START( dectalk, dectalk_state )
     MCFG_CPU_PROGRAM_MAP(tms32010_mem)
     MCFG_CPU_IO_MAP(tms32010_io)
 #ifdef USE_LOOSE_TIMING
-    MCFG_QUANTUM_TIME(HZ(100))
+    MCFG_QUANTUM_TIME(attotime::from_hz(100))
 #else
     MCFG_QUANTUM_PERFECT_CPU("dsp")
 #endif

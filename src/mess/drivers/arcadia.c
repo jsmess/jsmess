@@ -537,7 +537,7 @@ static MACHINE_CONFIG_START( arcadia, arcadia_state )
 	MCFG_CPU_PROGRAM_MAP(arcadia_mem)
 	MCFG_CPU_IO_MAP(arcadia_io)
 	MCFG_CPU_PERIODIC_INT(arcadia_video_line, 262*60)
-	MCFG_QUANTUM_TIME(HZ(60))
+	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
     /* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -15,7 +15,7 @@
 		if(LEVEL>=N) \
 		{ \
 			if( M ) \
-				logerror("%11.6f: %-24s",attotime_to_double(timer_get_time(machine)),(char*)M ); \
+				logerror("%11.6f: %-24s",timer_get_time(machine).as_double(),(char*)M ); \
 			logerror A; \
 		} \
 	} while (0)
@@ -113,7 +113,7 @@ void pc_rtc_init(running_machine *machine)
 {
 	memset(&pc_rtc,0,sizeof(pc_rtc));
 	pc_rtc.timer = timer_alloc(machine, pc_rtc_timer, NULL);
-	timer_adjust_periodic(pc_rtc.timer, attotime_zero, 0, attotime_make(1, 0));
+	timer_adjust_periodic(pc_rtc.timer, attotime::zero, 0, attotime(1, 0));
 }
 
 READ8_HANDLER( pc_rtc_r )

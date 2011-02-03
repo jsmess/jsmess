@@ -548,7 +548,7 @@ static MACHINE_CONFIG_START( pmd85, pmd85_state )
 	MCFG_CPU_ADD("maincpu", I8080, 2000000)		/* 2.048MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(pmd85_mem)
 	MCFG_CPU_IO_MAP(pmd85_io_map)
-	MCFG_QUANTUM_TIME(HZ(60))
+	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_MACHINE_RESET( pmd85 )
 

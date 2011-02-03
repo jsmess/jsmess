@@ -153,7 +153,7 @@ MACHINE_START( cgenie )
 	memory_install_write8_handler(space, 0x4000, 0x4000 + ram_get_size(machine->device(RAM_TAG)) - 1, 0, 0, cgenie_videoram_w);
 	state->videoram = ram_get_ptr(machine->device(RAM_TAG));
 	memory_set_bankptr(machine, "bank1", ram_get_ptr(machine->device(RAM_TAG)));
-	timer_pulse(machine,  ATTOTIME_IN_HZ(11025), NULL, 0, handle_cassette_input );
+	timer_pulse(machine,  attotime::from_hz(11025), NULL, 0, handle_cassette_input );
 }
 
 /*************************************

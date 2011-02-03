@@ -88,7 +88,7 @@ struct _t6721_state
 		if(VERBOSE_LEVEL >= N) \
 		{ \
 			if( M ) \
-				logerror("%11.6f: %-24s", attotime_to_double(timer_get_time(device->machine)), (char*) M ); \
+				logerror("%11.6f: %-24s", timer_get_time(device->machine).as_double(), (char*) M ); \
 			logerror A; \
 		} \
 	} while(0)
@@ -150,7 +150,7 @@ WRITE8_DEVICE_HANDLER( t6721_speech_w )
 					t6721->playing = 0;
 					break;
 				case 1: /* start */
-					timer_adjust_periodic(t6721->timer, attotime_zero, 0, ATTOTIME_IN_HZ(8000));
+					timer_adjust_periodic(t6721->timer, attotime::zero, 0, attotime::from_hz(8000));
 					t6721->playing = 1;
 					t6721->end_of_sample = 0;
 					t6721->sample_timeindex = 0;
@@ -158,7 +158,7 @@ WRITE8_DEVICE_HANDLER( t6721_speech_w )
 				case 2:
 					t6721->end_of_sample = 0;
 					/*t6721->busy = 0; */
-					timer_reset(t6721->timer, attotime_never);
+					timer_reset(t6721->timer, attotime::never);
 					t6721->playing = 0;
 					break;
 				case 5: /* set rate (in next nibble) */

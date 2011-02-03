@@ -272,7 +272,7 @@ logerror("Votrax: intonation %d, phoneme %02x %s\n",data >> 6,data & 0x3f,Phonem
 	}
 
 	/* generate a NMI after a while to make the CPU continue to send data */
-	timer_set(space->machine, ATTOTIME_IN_USEC(50), NULL, 0, gottlieb_nmi_generate);
+	timer_set(space->machine, attotime::from_usec(50), NULL, 0, gottlieb_nmi_generate);
 }
 
 static WRITE8_HANDLER( speech_clock_dac_w )
@@ -420,7 +420,7 @@ static WRITE8_HANDLER( signal_audio_nmi_w )
 INLINE void nmi_timer_adjust(void)
 {
 	/* adjust timer to go off in the future based on the current rate */
-	timer_adjust_oneshot(nmi_timer, attotime_mul(ATTOTIME_IN_HZ(SOUND2_CLOCK/16), 256 * (256 - nmi_rate)), 0);
+	timer_adjust_oneshot(nmi_timer, attotime::from_hz(SOUND2_CLOCK/16) * (256 * (256 - nmi_rate)), 0);
 }
 
 
@@ -446,7 +446,7 @@ static TIMER_CALLBACK( nmi_callback )
 	nmi_state_update(machine);
 
 	/* set a timer to turn it off again on hte next SOUND_CLOCK/16 */
-	timer_set(machine, ATTOTIME_IN_HZ(SOUND2_CLOCK/16), NULL, 0, nmi_clear);
+	timer_set(machine, attotime::from_hz(SOUND2_CLOCK/16), NULL, 0, nmi_clear);
 
 	/* adjust the NMI timer for the next time */
 	nmi_timer_adjust();

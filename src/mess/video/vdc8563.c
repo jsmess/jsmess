@@ -59,7 +59,7 @@ struct _vdc8563_state
 		if (VERBOSE_LEVEL >= N) \
 		{ \
 			if (M) \
-				logerror("%11.6f: %-24s",attotime_to_double(timer_get_time(device->machine)),(char*)M ); \
+				logerror("%11.6f: %-24s",timer_get_time(device->machine).as_double(),(char*)M ); \
 			logerror A; \
 		} \
 	} while (0)
@@ -364,7 +364,7 @@ static void vdc8563_time( device_t *device )
 {
 	vdc8563_state *vdc8563 = get_safe_token(device);
 	double newtime, ftime;
-	newtime = attotime_to_double(timer_get_time(device->machine));
+	newtime = timer_get_time(device->machine).as_double();
 
 	if (vdc8563_clocks_in_frame(device) == 0.0)
 		return;

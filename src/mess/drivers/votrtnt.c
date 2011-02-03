@@ -72,7 +72,7 @@ static MACHINE_CONFIG_START( votrtnt, votrtnt_state )
     /* basic machine hardware */
     MCFG_CPU_ADD("maincpu", M6802, XTAL_2_4576MHz)  /* 2.4576MHz XTAL, verified; divided by 4 inside the m6802*/
     MCFG_CPU_PROGRAM_MAP(6802_mem)
-    MCFG_QUANTUM_TIME(HZ(60))
+    MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
     /* video hardware */
     MCFG_DEFAULT_LAYOUT(layout_votrtnt)

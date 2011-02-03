@@ -62,7 +62,7 @@
 
 /* packet retry parameters */
 #define KERMIT_MAX_RETRIES  5
-#define KERMIT_RETRY_DELAY  ATTOTIME_IN_SEC( 10 )
+#define KERMIT_RETRY_DELAY  attotime::from_seconds( 10 )
 
 
 /* packet format is:
@@ -402,7 +402,7 @@ static void kermit_reset( kermit* state )
 		state->image->fseek( SEEK_SET, 0 );
 	}
 
-	timer_adjust_periodic( state->resend, attotime_never, 0, attotime_never );
+	timer_adjust_periodic( state->resend, attotime::never, 0, attotime::never );
 }
 
 

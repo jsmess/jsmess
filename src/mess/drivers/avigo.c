@@ -434,7 +434,7 @@ static MACHINE_START( avigo )
 {
 	/* a timer used to check status of pen */
 	/* an interrupt is generated when the pen is pressed to the screen */
-	timer_pulse(machine, ATTOTIME_IN_HZ(50), NULL, 0, avigo_dummy_timer_callback);
+	timer_pulse(machine, attotime::from_hz(50), NULL, 0, avigo_dummy_timer_callback);
 }
 
 
@@ -948,7 +948,7 @@ static MACHINE_CONFIG_START( avigo, avigo_state )
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(avigo_mem)
 	MCFG_CPU_IO_MAP(avigo_io)
-	MCFG_QUANTUM_TIME(HZ(60))
+	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_MACHINE_START( avigo )
 	MCFG_MACHINE_RESET( avigo )

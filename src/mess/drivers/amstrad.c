@@ -875,7 +875,7 @@ static MACHINE_CONFIG_START( amstrad, amstrad_state )
 	MCFG_CPU_PROGRAM_MAP(amstrad_mem)
 	MCFG_CPU_IO_MAP(amstrad_io)
 
-	MCFG_QUANTUM_TIME(HZ(60))
+	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_MACHINE_START( amstrad )
 	MCFG_MACHINE_RESET( amstrad )
@@ -937,7 +937,7 @@ static MACHINE_CONFIG_START( cpcplus, amstrad_state )
 	MCFG_CPU_PROGRAM_MAP(amstrad_mem)
 	MCFG_CPU_IO_MAP(amstrad_io)
 
-	MCFG_QUANTUM_TIME(HZ(60))
+	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_MACHINE_START( plus )
 	MCFG_MACHINE_RESET( plus )
@@ -993,7 +993,7 @@ static MACHINE_CONFIG_START( gx4000, amstrad_state )
 	MCFG_CPU_PROGRAM_MAP(amstrad_mem)
 	MCFG_CPU_IO_MAP(amstrad_io)
 
-	MCFG_QUANTUM_TIME(HZ(60))
+	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_MACHINE_START( gx4000 )
 	MCFG_MACHINE_RESET( gx4000 )

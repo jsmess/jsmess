@@ -150,7 +150,7 @@ static DEVICE_START( adc080x )
 
 	/* allocate cycle timer */
 	adc080x->cycle_timer = timer_alloc(device->machine, cycle_tick, (void *)device);
-	timer_adjust_periodic(adc080x->cycle_timer, attotime_zero, 0, ATTOTIME_IN_HZ(device->clock()));
+	timer_adjust_periodic(adc080x->cycle_timer, attotime::zero, 0, attotime::from_hz(device->clock()));
 
 	/* register for state saving */
 	state_save_register_item(device->machine, "adc080x", device->tag(), 0, adc080x->address);

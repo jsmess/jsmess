@@ -54,8 +54,8 @@
     CONSTANTS
 ***************************************************************************/
 
-#define SOUND_TIMER_RATE			ATTOTIME_IN_USEC(5)
-#define SOUND_TIMER_BOOST			ATTOTIME_IN_USEC(100)
+#define SOUND_TIMER_RATE			attotime::from_usec(5)
+#define SOUND_TIMER_BOOST			attotime::from_usec(100)
 
 
 
@@ -1376,15 +1376,13 @@ void atarigen_halt_until_hblank_0(screen_device &screen)
 	int hpos = screen.hpos();
 	int width = screen.width();
 	int hblank = width * 9 / 10;
-	double fraction;
 
 	/* if we're in hblank, set up for the next one */
 	if (hpos >= hblank)
 		hblank += width;
 
 	/* halt and set a timer to wake up */
-	fraction = (double)(hblank - hpos) / (double)width;
-	timer_set(screen.machine, double_to_attotime(attotime_to_double(screen.scan_period()) * fraction), (void *)cpu, 0, unhalt_cpu);
+	timer_set(screen.machine, screen.scan_period() * (hblank - hpos) / width, (void *)cpu, 0, unhalt_cpu);
 	cpu_set_input_line(cpu, INPUT_LINE_HALT, ASSERT_LINE);
 }
 

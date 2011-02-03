@@ -340,8 +340,8 @@ static MACHINE_START( mephisto )
 	mephisto_state *state = machine->driver_data<mephisto_state>();
 	state->lcd_shift_counter=3;
 
-	timer_pulse(machine, ATTOTIME_IN_HZ(600), NULL, 0, update_nmi);
-	timer_pulse(machine, ATTOTIME_IN_HZ(100), NULL, 0, mboard_update_artwork);
+	timer_pulse(machine, attotime::from_hz(600), NULL, 0, update_nmi);
+	timer_pulse(machine, attotime::from_hz(100), NULL, 0, mboard_update_artwork);
 
 	mboard_savestate_register(machine);
 }
@@ -352,8 +352,8 @@ static MACHINE_START( mm2 )
 	state->lcd_shift_counter=3;
 	state->led7=0xff;
 
-	timer_pulse(machine, ATTOTIME_IN_HZ(450), NULL, 0, update_irq);
-	timer_pulse(machine, ATTOTIME_IN_HZ(100), NULL, 0, mboard_update_artwork);
+	timer_pulse(machine, attotime::from_hz(450), NULL, 0, update_irq);
+	timer_pulse(machine, attotime::from_hz(100), NULL, 0, mboard_update_artwork);
 
 	mboard_savestate_register(machine);
 }
@@ -386,7 +386,7 @@ static MACHINE_CONFIG_START( mephisto, mephisto_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M65C02,4915200)	/* 65C02 */
 	MCFG_CPU_PROGRAM_MAP(mephisto_mem)
-	MCFG_QUANTUM_TIME(HZ(60))
+	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 	MCFG_MACHINE_START( mephisto )
 	MCFG_MACHINE_RESET( mephisto )
 

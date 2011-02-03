@@ -116,7 +116,7 @@ static void adjust_display_position_interrupt_timer( running_machine *machine )
 
 	if ((state->display_counter + 1) != 0)
 	{
-		attotime period = attotime_mul(ATTOTIME_IN_HZ(NEOGEO_PIXEL_CLOCK), state->display_counter + 1);
+		attotime period = (attotime::from_hz(NEOGEO_PIXEL_CLOCK) * (state->display_counter + 1));
 		if (LOG_VIDEO_SYSTEM) logerror("adjust_display_position_interrupt_timer  current y: %02x  current x: %02x   target y: %x  target x: %x\n", machine->primary_screen->vpos(), machine->primary_screen->hpos(), (state->display_counter + 1) / NEOGEO_HTOTAL, (state->display_counter + 1) % NEOGEO_HTOTAL);
 
 		timer_adjust_oneshot(state->display_position_interrupt_timer, period, 0);
@@ -572,7 +572,7 @@ static WRITE16_HANDLER( audio_command_w )
 		audio_cpu_assert_nmi(space->machine);
 
 		/* boost the interleave to let the audio CPU read the command */
-		cpuexec_boost_interleave(space->machine, attotime_zero, ATTOTIME_IN_USEC(50));
+		cpuexec_boost_interleave(space->machine, attotime::zero, attotime::from_usec(50));
 
 		if (LOG_CPU_COMM) logerror("MAIN CPU PC %06x: audio_command_w %04x - %04x\n", cpu_get_pc(space->cpu), data, mem_mask);
 	}

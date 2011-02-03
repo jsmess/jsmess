@@ -356,8 +356,8 @@ static MACHINE_CONFIG_START( mz700, mz_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* ne556 timers */
-	MCFG_TIMER_ADD_PERIODIC("cursor", ne556_cursor_callback, HZ(1.5))
-	MCFG_TIMER_ADD_PERIODIC("other", ne556_other_callback, HZ(34.5))
+	MCFG_TIMER_ADD_PERIODIC("cursor", ne556_cursor_callback, attotime::from_hz(1.5))
+	MCFG_TIMER_ADD_PERIODIC("other", ne556_other_callback, attotime::from_hz(34.5))
 
 	/* devices */
 	MCFG_PIT8253_ADD("pit8253", mz700_pit8253_config)

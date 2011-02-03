@@ -430,7 +430,7 @@ static INPUT_CHANGED( monitor_pressed )
 	{
 		// TODO: what are the correct values?
 		int t = RES_K(27) * CAP_U(1) * 1000; // t = R26 * C1
-		timer_adjust_oneshot(state->ef4_timer, ATTOTIME_IN_MSEC(t), 0);
+		timer_adjust_oneshot(state->ef4_timer, attotime::from_msec(t), 0);
 	}
 }
 
@@ -925,7 +925,7 @@ static TIMER_CALLBACK(setup_beep)
 
 static DRIVER_INIT( tmc1800 )
 {
-	timer_set(machine, attotime_zero, NULL, 0, setup_beep);
+	timer_set(machine, attotime::zero, NULL, 0, setup_beep);
 }
 
 /* System Drivers */

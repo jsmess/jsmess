@@ -24,7 +24,7 @@ WRITE8_HANDLER(poly88_baud_rate_w)
 	poly88_state *state = space->machine->driver_data<poly88_state>();
 	logerror("poly88_baud_rate_w %02x\n",data);
 	state->usart_timer = timer_alloc(space->machine, poly88_usart_timer_callback, NULL);
-	timer_adjust_periodic(state->usart_timer, attotime_zero, 0, ATTOTIME_IN_HZ(300));
+	timer_adjust_periodic(state->usart_timer, attotime::zero, 0, attotime::from_hz(300));
 
 }
 
@@ -210,12 +210,12 @@ DRIVER_INIT ( poly88 )
 	state->previous_level = 0;;
 	state->clk_level = state->clk_level_tape = 1;
 	state->cassette_timer = timer_alloc(machine, poly88_cassette_timer_callback, NULL);
-	timer_adjust_periodic(state->cassette_timer, attotime_zero, 0, ATTOTIME_IN_HZ(600));
+	timer_adjust_periodic(state->cassette_timer, attotime::zero, 0, attotime::from_hz(600));
 
 	serial_connection_init(machine, &state->cassette_serial_connection);
 	serial_connection_set_in_callback(machine, &state->cassette_serial_connection, poly88_cassette_write);
 
-	timer_pulse(machine, ATTOTIME_IN_HZ(24000), NULL, 0, keyboard_callback);
+	timer_pulse(machine, attotime::from_hz(24000), NULL, 0, keyboard_callback);
 }
 
 MACHINE_RESET(poly88)
@@ -225,7 +225,7 @@ MACHINE_RESET(poly88)
 	state->intr = 0;
 	state->last_code = 0;
 
-	timer_set(machine,  attotime_zero, NULL, 0, setup_machine_state );
+	timer_set(machine,  attotime::zero, NULL, 0, setup_machine_state );
 }
 
 INTERRUPT_GEN( poly88_interrupt )

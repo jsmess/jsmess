@@ -279,7 +279,7 @@ static MACHINE_CONFIG_START( compis, compis_state )
 	MCFG_CPU_ADD("i8749", I8749, 1000000)
 	MCFG_CPU_IO_MAP(keyboard_io)
 
-	MCFG_QUANTUM_TIME(HZ(60))
+	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_MACHINE_START(compis)
 	MCFG_MACHINE_RESET(compis)

@@ -343,8 +343,8 @@ static WRITE8_HANDLER( px4_ctrl1_w )
 
 	if (baud <= 12)
 	{
-		timer_adjust_periodic(px4->transmit_timer, attotime_zero, 0, ATTOTIME_IN_HZ(XTAL_7_3728MHz/2/transmit_rate[baud]));
-		timer_adjust_periodic(px4->receive_timer, attotime_zero, 0, ATTOTIME_IN_HZ(XTAL_7_3728MHz/2/receive_rate[baud]));
+		timer_adjust_periodic(px4->transmit_timer, attotime::zero, 0, attotime::from_hz(XTAL_7_3728MHz/2/transmit_rate[baud]));
+		timer_adjust_periodic(px4->receive_timer, attotime::zero, 0, attotime::from_hz(XTAL_7_3728MHz/2/receive_rate[baud]));
 	}
 
 	px4->ctrl1 = data;
@@ -403,12 +403,12 @@ static WRITE8_HANDLER( px4_ctrl2_w )
 	if (BIT(data, 1))
 	{
 		cassette_change_state(px4->ext_cas, CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
-		timer_adjust_periodic(px4->ext_cas_timer, attotime_zero, 0, ATTOTIME_IN_HZ(44100));
+		timer_adjust_periodic(px4->ext_cas_timer, attotime::zero, 0, attotime::from_hz(44100));
 	}
 	else
 	{
 		cassette_change_state(px4->ext_cas, CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
-		timer_adjust_oneshot(px4->ext_cas_timer, attotime_zero, 0);
+		timer_adjust_oneshot(px4->ext_cas_timer, attotime::zero, 0);
 	}
 }
 
@@ -1378,8 +1378,8 @@ static MACHINE_CONFIG_START( px4, px4_state )
 
 	MCFG_VIDEO_UPDATE(px4)
 
-	MCFG_TIMER_ADD_PERIODIC("one_sec", upd7508_1sec_callback, SEC(1))
-	MCFG_TIMER_ADD_PERIODIC("frc", frc_tick, HZ(XTAL_7_3728MHz / 2 / 6))
+	MCFG_TIMER_ADD_PERIODIC("one_sec", upd7508_1sec_callback, attotime::from_seconds(1))
+	MCFG_TIMER_ADD_PERIODIC("frc", frc_tick, attotime::from_hz(XTAL_7_3728MHz / 2 / 6))
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

@@ -563,7 +563,7 @@ static const ym2203_interface ym2203_config =
 
 static MACHINE_START(multi8)
 {
-	timer_pulse(machine, ATTOTIME_IN_HZ(240/32), NULL, 0, keyboard_callback);
+	timer_pulse(machine, attotime::from_hz(240/32), NULL, 0, keyboard_callback);
 }
 
 static MACHINE_RESET(multi8)

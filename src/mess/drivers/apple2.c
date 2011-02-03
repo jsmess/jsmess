@@ -608,7 +608,7 @@ static MACHINE_CONFIG_START( apple2_common, apple2_state )
 	MCFG_CPU_ADD("maincpu", M6502, 1021800)		/* close to actual CPU frequency of 1.020484 MHz */
 	MCFG_CPU_PROGRAM_MAP(apple2_map)
 	MCFG_CPU_VBLANK_INT_HACK(apple2_interrupt, 192/8)
-	MCFG_QUANTUM_TIME(HZ(60))
+	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_MACHINE_START( apple2 )
 

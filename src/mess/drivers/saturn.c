@@ -1398,7 +1398,7 @@ static void dma_direct_lv0(address_space *space)
 	if(LOG_SCU) logerror("DMA transfer END\n");
 
 	/*TODO: timing of this*/
-	timer_set(space->machine, ATTOTIME_IN_USEC(300), NULL, 0, dma_lv0_ended);
+	timer_set(space->machine, attotime::from_usec(300), NULL, 0, dma_lv0_ended);
 
 	if(scu_add_tmp & 0x80000000)
 	{
@@ -1499,7 +1499,7 @@ static void dma_direct_lv1(address_space *space)
 
 	if(LOG_SCU) logerror("DMA transfer END\n");
 
-	timer_set(space->machine, ATTOTIME_IN_USEC(300), NULL, 0, dma_lv1_ended);
+	timer_set(space->machine, attotime::from_usec(300), NULL, 0, dma_lv1_ended);
 
 	if(scu_add_tmp & 0x80000000)
 	{
@@ -1600,7 +1600,7 @@ static void dma_direct_lv2(address_space *space)
 
 	if(LOG_SCU) logerror("DMA transfer END\n");
 
-	timer_set(space->machine, ATTOTIME_IN_USEC(300), NULL, 0, dma_lv2_ended);
+	timer_set(space->machine, attotime::from_usec(300), NULL, 0, dma_lv2_ended);
 
 	if(scu_add_tmp & 0x80000000)
 	{
@@ -1675,7 +1675,7 @@ static void dma_indirect_lv0(address_space *space)
 
 	}while(job_done == 0);
 
-	timer_set(space->machine, ATTOTIME_IN_USEC(300), NULL, 0, dma_lv0_ended);
+	timer_set(space->machine, attotime::from_usec(300), NULL, 0, dma_lv0_ended);
 }
 
 static void dma_indirect_lv1(address_space *space)
@@ -1744,7 +1744,7 @@ static void dma_indirect_lv1(address_space *space)
 
 	}while(job_done == 0);
 
-	timer_set(space->machine, ATTOTIME_IN_USEC(300), NULL, 0, dma_lv1_ended);
+	timer_set(space->machine, attotime::from_usec(300), NULL, 0, dma_lv1_ended);
 }
 
 static void dma_indirect_lv2(address_space *space)
@@ -1812,7 +1812,7 @@ static void dma_indirect_lv2(address_space *space)
 
 	}while(job_done == 0);
 
-	timer_set(space->machine, ATTOTIME_IN_USEC(300), NULL, 0, dma_lv2_ended);
+	timer_set(space->machine, attotime::from_usec(300), NULL, 0, dma_lv2_ended);
 }
 
 
@@ -1853,7 +1853,7 @@ static WRITE32_HANDLER( stv_scsp_regs_w32 )
 static WRITE32_HANDLER( minit_w )
 {
 	logerror("cpu %s (PC=%08X) MINIT write = %08x\n", space->cpu->tag(), cpu_get_pc(space->cpu),data);
-	cpuexec_boost_interleave(space->machine, minit_boost_timeslice, ATTOTIME_IN_USEC(minit_boost));
+	cpuexec_boost_interleave(space->machine, minit_boost_timeslice, attotime::from_usec(minit_boost));
 	cpuexec_trigger(space->machine, 1000);
 	sh2_set_frt_input(space->machine->device("slave"), PULSE_LINE);
 }
@@ -1861,7 +1861,7 @@ static WRITE32_HANDLER( minit_w )
 static WRITE32_HANDLER( sinit_w )
 {
 	logerror("cpu %s (PC=%08X) SINIT write = %08x\n", space->cpu->tag(), cpu_get_pc(space->cpu),data);
-	cpuexec_boost_interleave(space->machine, sinit_boost_timeslice, ATTOTIME_IN_USEC(sinit_boost));
+	cpuexec_boost_interleave(space->machine, sinit_boost_timeslice, attotime::from_usec(sinit_boost));
 	sh2_set_frt_input(space->machine->device("maincpu"), PULSE_LINE);
 }
 
@@ -2187,8 +2187,8 @@ static void saturn_init_driver(running_machine *machine, int rgn)
 	/* amount of time to boost interleave for on MINIT / SINIT, needed for communication to work */
 	minit_boost = 400;
 	sinit_boost = 400;
-	minit_boost_timeslice = attotime_zero;
-	sinit_boost_timeslice = attotime_zero;
+	minit_boost_timeslice = attotime::zero;
+	sinit_boost_timeslice = attotime::zero;
 
 	smpc_ram = auto_alloc_array(machine, UINT8, 0x80);
 	stv_scu = auto_alloc_array(machine, UINT32, 0x100/4);

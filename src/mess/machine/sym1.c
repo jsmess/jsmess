@@ -20,7 +20,7 @@
 #include "sound/speaker.h"
 #include "machine/ram.h"
 
-#define LED_REFRESH_DELAY  ATTOTIME_IN_USEC(70)
+#define LED_REFRESH_DELAY  attotime::from_usec(70)
 
 
 

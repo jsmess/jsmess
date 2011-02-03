@@ -1356,7 +1356,7 @@ static void corvus_process_command_packet(running_machine *machine, UINT8 invali
 	//
 	// Set up timers for command completion and timeout from host
 	//
-	timer_set(machine, ATTOTIME_IN_USEC(c->delay), NULL, CALLBACK_CTH_MODE, corvus_hdc_callback);
+	timer_set(machine, attotime::from_usec(c->delay), NULL, CALLBACK_CTH_MODE, corvus_hdc_callback);
 	timer_enable(c->timeout_timer, 0);			// We've received enough data, disable the timeout timer
 
 	c->delay = 0;									// Reset delay for next function
@@ -1456,7 +1456,7 @@ UINT8 corvus_hdc_init(running_machine *machine) {
 	c->recv_bytes = 0;							// We aren't waiting on additional data from the host
 
 	c->timeout_timer = timer_alloc(machine, corvus_hdc_callback, NULL);	// Set up a timer to handle the four-second host-to-controller timeout
-	timer_adjust_oneshot(c->timeout_timer, ATTOTIME_IN_SEC(4), CALLBACK_TIMEOUT);
+	timer_adjust_oneshot(c->timeout_timer, attotime::from_seconds(4), CALLBACK_TIMEOUT);
 	timer_enable(c->timeout_timer, 0);		// Start this timer out disabled
 
 	LOG(("corvus_hdc_init: Attached to drive image: H:%d, C:%d, S:%d\n", info->heads, info->cylinders, info->sectors));
@@ -1623,14 +1623,14 @@ READ8_HANDLER ( corvus_hdc_data_r ) {
 		c->xmit_bytes = 0;		// We don't have anything more to say
 		c->recv_bytes = 0;		// No active commands
 
-		timer_set(space->machine, (ATTOTIME_IN_USEC(INTERBYTE_DELAY)), NULL, CALLBACK_HTC_MODE, corvus_hdc_callback);
+		timer_set(space->machine, (attotime::from_usec(INTERBYTE_DELAY)), NULL, CALLBACK_HTC_MODE, corvus_hdc_callback);
 
 //      c->status &= ~(CONTROLLER_DIRECTION | CONTROLLER_BUSY); // Put us in Idle, Host-to-Controller mode
 	} else {
 		//
 		// Not finished with this packet.  Insert an interbyte delay and then let the host continue
 		//
-		timer_set(space->machine, (ATTOTIME_IN_USEC(INTERBYTE_DELAY)), NULL, CALLBACK_SAME_MODE, corvus_hdc_callback);
+		timer_set(space->machine, (attotime::from_usec(INTERBYTE_DELAY)), NULL, CALLBACK_SAME_MODE, corvus_hdc_callback);
 	}
 
 	return result;
@@ -1674,7 +1674,7 @@ WRITE8_HANDLER ( corvus_hdc_data_w ) {
 	if(c->offset == 0)	{													// First byte of a packet
 		LOG(("corvus_hdc_data_w: Received a byte with c->offset == 0.  Processing as command: 0x%2.2x\n", data));
 		c->invalid_command_flag = parse_hdc_command(data);
-		timer_reset(c->timeout_timer, (ATTOTIME_IN_SEC(4)));
+		timer_reset(c->timeout_timer, (attotime::from_seconds(4)));
 		timer_enable(c->timeout_timer, 1);								// Start our four-second timer
 	} else if(c->offset == 1 && c->awaiting_modifier) {						// Second byte of a packet
 		LOG(("corvus_hdc_data_w: Received a byte while awaiting modifier with c->offset == 0.  Processing as modifier: 0x%2.2x\n", data));
@@ -1698,12 +1698,12 @@ WRITE8_HANDLER ( corvus_hdc_data_w ) {
 		//
 		// Reset the four-second timer since we received some data
 		//
-		timer_reset(c->timeout_timer, (ATTOTIME_IN_SEC(4)));
+		timer_reset(c->timeout_timer, (attotime::from_seconds(4)));
 
 		//
 		// Make the controller busy for a few microseconds while the command is processed
 		//
 		c->status |= CONTROLLER_BUSY;
-		timer_set(space->machine, (ATTOTIME_IN_USEC(INTERBYTE_DELAY)), NULL, CALLBACK_SAME_MODE, corvus_hdc_callback);
+		timer_set(space->machine, (attotime::from_usec(INTERBYTE_DELAY)), NULL, CALLBACK_SAME_MODE, corvus_hdc_callback);
 	}
 }

@@ -175,7 +175,7 @@ struct _vic2_state
 		if(VERBOSE_LEVEL >= N) \
 		{ \
 			if( M ) \
-				logerror("%11.6f: %-24s", attotime_to_double(timer_get_time(machine)), (char*) M ); \
+				logerror("%11.6f: %-24s", timer_get_time(machine).as_double(), (char*) M ); \
 			logerror A; \
 		} \
 	} while (0)
@@ -1046,7 +1046,7 @@ if (input_code_pressed_once(machine, KEYCODE_Z)) printf("b:%02x 1:%02x 2:%02x 3:
 //          if (LIGHTPEN_BUTTON)
 			{
 				/* lightpen timer start */
-				timer_set(machine, attotime_make(0, 0), vic2, 1, vic2_timer_timeout);
+				timer_set(machine, attotime(0, 0), vic2, 1, vic2_timer_timeout);
 			}
 		}
 		else
@@ -1637,7 +1637,7 @@ static TIMER_CALLBACK( ntsc_timer_callback )
 //          if (LIGHTPEN_BUTTON)
 			{
 				/* lightpen timer starten */
-				timer_set(machine, attotime_make(0, 0), vic2, 1, vic2_timer_timeout);
+				timer_set(machine, attotime(0, 0), vic2, 1, vic2_timer_timeout);
 			}
 		}
 		else

@@ -31,11 +31,11 @@
 
 #define VERBOSE_DBG 0       /* general debug messages */
 #define DBG_LOG(N,M,A) \
-	if(VERBOSE_DBG>=N){ if( M )logerror("%11.6f: %-24s",attotime_to_double(timer_get_time(pc_keyb.machine)),(char*)M ); logerror A; }
+	if(VERBOSE_DBG>=N){ if( M )logerror("%11.6f: %-24s",timer_get_time(pc_keyb.machine).as_double(),(char*)M ); logerror A; }
 
 #define VERBOSE_JOY 0		/* JOY (joystick port) */
 #define JOY_LOG(N,M,A) \
-	if(VERBOSE_JOY>=N){ if( M )logerror("%11.6f: %-24s",attotime_to_double(timer_get_time(pc_keyb.machine)),(char*)M ); logerror A; }
+	if(VERBOSE_JOY>=N){ if( M )logerror("%11.6f: %-24s",timer_get_time(pc_keyb.machine).as_double(),(char*)M ); logerror A; }
 
 
 static TIMER_CALLBACK( pc_keyb_timer );
@@ -99,14 +99,14 @@ void pc_keyb_set_clock(int on)
 	if (pc_keyb.on != on)
 	{
 		if (!on)
-			timer_adjust_oneshot(pc_keyb.timer, ATTOTIME_IN_MSEC(5), 0);
+			timer_adjust_oneshot(pc_keyb.timer, attotime::from_msec(5), 0);
 		else {
 			if ( pc_keyb.self_test ) {
 				/* The self test of the keyboard takes some time. 2 msec seems to work. */
 				/* This still needs to verified against a real keyboard. */
-				timer_adjust_oneshot(pc_keyb.timer, ATTOTIME_IN_MSEC( 2 ), 0);
+				timer_adjust_oneshot(pc_keyb.timer, attotime::from_msec( 2 ), 0);
 			} else {
-				timer_reset(pc_keyb.timer, attotime_never);
+				timer_reset(pc_keyb.timer, attotime::never);
 				pc_keyb.self_test = 0;
 			}
 		}

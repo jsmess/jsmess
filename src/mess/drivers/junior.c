@@ -189,7 +189,7 @@ static MACHINE_START( junior )
 	junior_state *state = machine->driver_data<junior_state>();
 	state_save_register_item(machine, "junior", NULL, 0, state->port_a );
 	state_save_register_item(machine, "junior", NULL, 0, state->port_b );
-	timer_pulse(machine,  ATTOTIME_IN_HZ(50), NULL, 0, junior_update_leds );
+	timer_pulse(machine,  attotime::from_hz(50), NULL, 0, junior_update_leds );
 }
 
 
@@ -209,7 +209,7 @@ static MACHINE_CONFIG_START( junior, junior_state )
     /* basic machine hardware */
     MCFG_CPU_ADD("maincpu",M6502, XTAL_1MHz)
     MCFG_CPU_PROGRAM_MAP(junior_mem)
-	MCFG_QUANTUM_TIME(HZ(50))
+	MCFG_QUANTUM_TIME(attotime::from_hz(50))
 
 	MCFG_MACHINE_START( junior )
     MCFG_MACHINE_RESET(junior)

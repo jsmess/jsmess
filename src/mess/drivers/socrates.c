@@ -371,7 +371,7 @@ end hd38880 info.*/
 			{
 				/* write me: start talking */
 				state->speech_running = 1;
-				timer_set(space->machine, ATTOTIME_IN_SEC(4), NULL, 0, clear_speech_cb); // hack
+				timer_set(space->machine, attotime::from_seconds(4), NULL, 0, clear_speech_cb); // hack
 			}
 			break;
 		case 0x90: // unknown
@@ -395,7 +395,7 @@ end hd38880 info.*/
 			if ((data&0xF) == 0) // speak
 			{
 				state->speech_running = 1;
-				timer_set(space->machine, ATTOTIME_IN_SEC(4), NULL, 0, clear_speech_cb); // hack
+				timer_set(space->machine, attotime::from_seconds(4), NULL, 0, clear_speech_cb); // hack
 			}
 			else if ((data&0xF) == 8) // reset
 			{
@@ -904,7 +904,7 @@ static MACHINE_CONFIG_START( socrates, socrates_state )
     MCFG_CPU_ADD("maincpu", Z80, XTAL_21_4772MHz/6)  /* Toshiba TMPZ84C00AP @ 3.579545 MHz, verified, xtal is divided by 6 */
     MCFG_CPU_PROGRAM_MAP(z80_mem)
     MCFG_CPU_IO_MAP(z80_io)
-    MCFG_QUANTUM_TIME(HZ(60))
+    MCFG_QUANTUM_TIME(attotime::from_hz(60))
     MCFG_CPU_VBLANK_INT("screen", assert_irq)
     //MCFG_MACHINE_START(socrates)
     MCFG_MACHINE_RESET(socrates)

@@ -26,13 +26,13 @@ READ8_HANDLER ( pc_JOY_r )
 		data = input_port_read_direct(joystick_port) ^ 0xf0;
 
 		/* timer overflow? */
-		if (attotime_compare(attotime_sub(new_time, JOY_time), ATTOTIME_IN_MSEC(10)) > 0)
+		if ((new_time - JOY_time) > attotime::from_msec(10))
 		{
 			/* do nothing */
 		}
 		else
 		{
-			delta = attotime_mul(attotime_sub(new_time, JOY_time), 256 * 1000).seconds;
+			delta = ((new_time - JOY_time) * 256 * 1000).seconds;
 			if (input_port_read(space->machine, "pc_joy_1") < delta) data &= ~0x01;
 			if (input_port_read(space->machine, "pc_joy_2") < delta) data &= ~0x02;
 			if (input_port_read(space->machine, "pc_joy_3") < delta) data &= ~0x04;

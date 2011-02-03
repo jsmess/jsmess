@@ -114,7 +114,7 @@ void hd44780_device::device_start()
 	m_busy_timer = device_timer_alloc(*this, BUSY_TIMER);
 	m_blink_timer = device_timer_alloc(*this, BLINKING_TIMER);
 
-	timer_adjust_periodic(m_blink_timer, ATTOTIME_IN_MSEC(409), 0, ATTOTIME_IN_MSEC(409));
+	timer_adjust_periodic(m_blink_timer, attotime::from_msec(409), 0, attotime::from_msec(409));
 
 	state_save_register_device_item( this, 0, m_ac);
 	state_save_register_device_item( this, 0, m_ac_mode);
@@ -186,7 +186,7 @@ void hd44780_device::set_busy_flag(UINT16 usec)
 {
 	m_busy_flag = 1;
 
-	timer_adjust_oneshot( m_busy_timer, ATTOTIME_IN_USEC( usec ), 0 );
+	timer_adjust_oneshot( m_busy_timer, attotime::from_usec( usec ), 0 );
 
 }
 

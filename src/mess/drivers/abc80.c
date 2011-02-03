@@ -379,7 +379,7 @@ static void abc80_keyboard_scan(running_machine *machine)
 	if (!state->m_key_strobe && state->m_key_data)
 	{
 		z80pio_pa_w(state->m_pio, 0, state->m_key_data);
-		timer_set(machine, ATTOTIME_IN_MSEC(50), NULL, 0, keyboard_data_clear);
+		timer_set(machine, attotime::from_msec(50), NULL, 0, keyboard_data_clear);
 	}
 }
 
@@ -714,7 +714,7 @@ static MACHINE_CONFIG_START( abc80, abc80_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* keyboard */
-	MCFG_TIMER_ADD_PERIODIC("keyboard", abc80_keyboard_tick, USEC(2500))
+	MCFG_TIMER_ADD_PERIODIC("keyboard", abc80_keyboard_tick, attotime::from_usec(2500))
 
 	/* Luxor Conkort 55-10828 */
 	MCFG_ABCBUS_ADD(ABCBUS_TAG, abcbus_daisy, Z80_TAG)

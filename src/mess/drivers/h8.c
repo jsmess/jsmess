@@ -221,7 +221,7 @@ static MACHINE_CONFIG_START( h8, h8_state )
 	MCFG_CPU_CONFIG(h8_cpu_config)
 
 	MCFG_MACHINE_RESET(h8)
-	MCFG_TIMER_ADD_PERIODIC("h8_timer", h8_irq_pulse, HZ(H8_IRQ_PULSE) )
+	MCFG_TIMER_ADD_PERIODIC("h8_timer", h8_irq_pulse, attotime::from_hz(H8_IRQ_PULSE) )
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_h8)

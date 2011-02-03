@@ -217,7 +217,7 @@ static MACHINE_CONFIG_START( vcs80, vcs80_state )
     MCFG_MACHINE_START(vcs80)
 
 	/* keyboard timer */
-	MCFG_TIMER_ADD_PERIODIC("keyboard", vcs80_keyboard_tick, HZ(1000))
+	MCFG_TIMER_ADD_PERIODIC("keyboard", vcs80_keyboard_tick, attotime::from_hz(1000))
 
     /* video hardware */
 	MCFG_DEFAULT_LAYOUT( layout_vcs80 )

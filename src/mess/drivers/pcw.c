@@ -177,7 +177,7 @@ static TIMER_CALLBACK(pcw_timer_interrupt)
 
 	state->timer_irq_flag = 1;
 	pcw_update_irqs(machine);
-	timer_set(machine,ATTOTIME_IN_USEC(100),NULL,0,pcw_timer_pulse);
+	timer_set(machine,attotime::from_usec(100),NULL,0,pcw_timer_pulse);
 }
 
 /* fdc interrupt callback. set/clear fdc int */
@@ -1118,9 +1118,9 @@ static DRIVER_INIT(pcw)
 	state->roller_ram_offset = 0;
 
 	/* timer interrupt */
-	timer_pulse(machine, ATTOTIME_IN_HZ(300), NULL, 0, pcw_timer_interrupt);
+	timer_pulse(machine, attotime::from_hz(300), NULL, 0, pcw_timer_interrupt);
 
-	timer_set(machine, attotime_zero, NULL, 0, setup_beep);
+	timer_set(machine, attotime::zero, NULL, 0, setup_beep);
 
 	state->prn_stepper = timer_alloc(machine,pcw_stepper_callback,NULL);
 	state->prn_pins = timer_alloc(machine,pcw_pins_callback,NULL);
@@ -1344,7 +1344,7 @@ static MACHINE_CONFIG_START( pcw, pcw_state )
 	MCFG_CPU_ADD("keyboard_mcu", I8048, 5000000) // 5MHz
 	MCFG_CPU_IO_MAP(pcw_keyboard_io)
 
-//	MCFG_QUANTUM_TIME(HZ(50))
+//	MCFG_QUANTUM_TIME(attotime::from_hz(50))
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
 	MCFG_MACHINE_START(pcw)

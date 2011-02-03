@@ -202,7 +202,7 @@ static IRQ_CALLBACK(int_callback)
     UINT16  oldreq;
 
 	if (LOG_INTERRUPTS)
-		logerror("(%f) **** Acknowledged interrupt vector %02X\n", attotime_to_double(timer_get_time(device->machine)), state->i186.intr.poll_status & 0x1f);
+		logerror("(%f) **** Acknowledged interrupt vector %02X\n", timer_get_time(device->machine).as_double(), state->i186.intr.poll_status & 0x1f);
 
 	/* clear the interrupt */
 	cpu_set_input_line(device, 0, CLEAR_LINE);
@@ -351,7 +351,7 @@ generate_int:
 	state->i186.intr.pending = 1;
 	cpuexec_trigger(machine, CPU_RESUME_TRIGGER);
 	if (LOG_OPTIMIZATION) logerror("  - trigger due to interrupt pending\n");
-	if (LOG_INTERRUPTS) logerror("(%f) **** Requesting interrupt vector %02X\n", attotime_to_double(timer_get_time(machine)), new_vector);
+	if (LOG_INTERRUPTS) logerror("(%f) **** Requesting interrupt vector %02X\n", timer_get_time(machine).as_double(), new_vector);
 }
 
 
@@ -379,7 +379,7 @@ static void handle_eoi(running_machine *machine,int data)
 			case 0x0f:	state->i186.intr.in_service &= ~0x80;	break;
 			default:	logerror("%05X:ERROR - 80186 EOI with unknown vector %02X\n", cpu_get_pc(machine->device(MAINCPU_TAG)), data & 0x1f);
 		}
-		if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for vector %02X\n", attotime_to_double(timer_get_time(machine)), data & 0x1f);
+		if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for vector %02X\n", timer_get_time(machine).as_double(), data & 0x1f);
 	}
 
 	/* non-specific case */
@@ -392,7 +392,7 @@ static void handle_eoi(running_machine *machine,int data)
 			if ((state->i186.intr.timer & 0x07) == Priority && (state->i186.intr.in_service & 0x01))
 			{
 				state->i186.intr.in_service &= ~0x01;
-				if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for timer\n", attotime_to_double(timer_get_time(machine)));
+				if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for timer\n", timer_get_time(machine).as_double());
 				handled=1;
 			}
 
@@ -401,7 +401,7 @@ static void handle_eoi(running_machine *machine,int data)
 				if ((state->i186.intr.dma[IntNo] & 0x07) == Priority && (state->i186.intr.in_service & (0x04 << IntNo)))
 				{
 					state->i186.intr.in_service &= ~(0x04 << IntNo);
-					if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for DMA%d\n", attotime_to_double(timer_get_time(machine)), IntNo);
+					if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for DMA%d\n", timer_get_time(machine).as_double(), IntNo);
 					handled=1;
 				}
 
@@ -410,7 +410,7 @@ static void handle_eoi(running_machine *machine,int data)
 				if ((state->i186.intr.ext[IntNo] & 0x07) == Priority && (state->i186.intr.in_service & (0x10 << IntNo)))
 				{
 					state->i186.intr.in_service &= ~(0x10 << IntNo);
-					if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for INT%d\n", attotime_to_double(timer_get_time(machine)), IntNo);
+					if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for INT%d\n", timer_get_time(machine).as_double(), IntNo);
 					handled=1;
 				}
 		}
@@ -483,11 +483,11 @@ static TIMER_CALLBACK(internal_timer_int)
 	if (t->control & 0x0001)
 	{
 		int count = t->maxA ? t->maxA : 0x10000;
-		timer_adjust_oneshot(t->int_timer, attotime_mul(ATTOTIME_IN_HZ(2000000), count), which);
+		timer_adjust_oneshot(t->int_timer, (attotime::from_hz(2000000) * count), which);
 		if (LOG_TIMER) logerror("  Repriming interrupt\n");
 	}
 	else
-		timer_adjust_oneshot(t->int_timer, attotime_never, which);
+		timer_adjust_oneshot(t->int_timer, attotime::never, which);
 }
 
 
@@ -500,7 +500,7 @@ static void internal_timer_sync(running_machine *machine, int which)
 	if (t->time_timer_active)
 	{
 		attotime current_time = timer_timeelapsed(t->time_timer);
-		int net_clocks = attotime_mul(attotime_sub(current_time, t->last_time),  2000000).seconds;
+		int net_clocks = ((current_time - t->last_time) * 2000000).seconds;
 		t->last_time = current_time;
 
 		/* set the max count bit if we passed the max */
@@ -604,7 +604,7 @@ static void internal_timer_update(running_machine *machine,
 				internal_timer_sync(machine, which);
 
 				/* nuke the timer and force the interrupt timer to be recomputed */
-				timer_adjust_oneshot(t->time_timer, attotime_never, which);
+				timer_adjust_oneshot(t->time_timer, attotime::never, which);
 				t->time_timer_active = 0;
 				update_int_timer = 1;
 			}
@@ -613,7 +613,7 @@ static void internal_timer_update(running_machine *machine,
 			else if ((diff & 0x8000) && (new_control & 0x8000))
 			{
 				/* start the timing */
-				timer_adjust_oneshot(t->time_timer, attotime_never, which);
+				timer_adjust_oneshot(t->time_timer, attotime::never, which);
 				t->time_timer_active = 1;
 				update_int_timer = 1;
 			}
@@ -638,12 +638,12 @@ static void internal_timer_update(running_machine *machine,
 			int diff = t->maxA - t->count;
 			if (diff <= 0)
 				diff += 0x10000;
-			timer_adjust_oneshot(t->int_timer, attotime_mul(ATTOTIME_IN_HZ(2000000), diff), which);
+			timer_adjust_oneshot(t->int_timer, attotime::from_hz(2000000) * diff, which);
 			if (LOG_TIMER) logerror("Set interrupt timer for %d\n", which);
 		}
 		else
 		{
-			timer_adjust_oneshot(t->int_timer, attotime_never, which);
+			timer_adjust_oneshot(t->int_timer, attotime::never, which);
 		}
 	}
 }
@@ -2125,7 +2125,7 @@ static void keyboard_reset(running_machine *machine)
     memset(state->keyboard.keyrows,0xFF,NIMBUS_KEYROWS);
 
     // Setup timer to scan state->keyboard.
-    timer_adjust_periodic(state->keyboard.keyscan_timer, attotime_zero, 0, ATTOTIME_IN_HZ(50));
+    timer_adjust_periodic(state->keyboard.keyscan_timer, attotime::zero, 0, attotime::from_hz(50));
 }
 
 static void queue_scancode(running_machine *machine, UINT8 scancode)
@@ -2844,7 +2844,7 @@ static void mouse_js_reset(running_machine *machine)
     state->reg0a4=0xC0;
 
     // Setup timer to poll the mouse
-    timer_adjust_periodic(state->mouse_timer, attotime_zero, 0, ATTOTIME_IN_HZ(1000));
+    timer_adjust_periodic(state->mouse_timer, attotime::zero, 0, attotime::from_hz(1000));
 }
 
 static TIMER_CALLBACK(mouse_callback)

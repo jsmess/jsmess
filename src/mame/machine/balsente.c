@@ -482,7 +482,7 @@ static TIMER_CALLBACK( m6850_w_callback )
 
 	/* set a timer for 500usec later to actually transmit the data */
 	/* (this is very important for several games, esp Snacks'n Jaxson) */
-	timer_set(machine, ATTOTIME_IN_USEC(500), NULL, param, m6850_data_ready_callback);
+	timer_set(machine, attotime::from_usec(500), NULL, param, m6850_data_ready_callback);
 }
 
 
@@ -628,7 +628,7 @@ WRITE8_HANDLER( balsente_adc_select_w )
 	/* set a timer to go off and read the value after 50us */
 	/* it's important that we do this for Mini Golf */
 logerror("adc_select %d\n", offset & 7);
-	timer_set(space->machine, ATTOTIME_IN_USEC(50), NULL, offset & 7, adc_finished);
+	timer_set(space->machine, attotime::from_usec(50), NULL, offset & 7, adc_finished);
 }
 
 
@@ -650,7 +650,7 @@ INLINE void counter_start(balsente_state *state, int which)
 		if (state->counter[which].gate && !state->counter[which].timer_active)
 		{
 			state->counter[which].timer_active = 1;
-			state->counter[which].timer->adjust(attotime_mul(ATTOTIME_IN_HZ(2000000), state->counter[which].count), which);
+			state->counter[which].timer->adjust(attotime::from_hz(2000000) * state->counter[which].count, which);
 		}
 	}
 }
@@ -671,7 +671,7 @@ INLINE void counter_update_count(balsente_state *state, int which)
 	if (state->counter[which].timer_active)
 	{
 		/* determine how many 2MHz cycles are remaining */
-		int count = attotime_to_double(attotime_mul(state->counter[which].timer->time_left(), 2000000));
+		int count = (state->counter[which].timer->time_left() * 2000000).as_double();
 		state->counter[which].count = (count < 0) ? 0 : count;
 	}
 }
@@ -935,7 +935,7 @@ static void update_counter_0_timer(balsente_state *state)
 	if (maxfreq > 0.0)
 	{
 		state->counter_0_timer_active = 1;
-		state->counter_0_timer->adjust(ATTOTIME_IN_HZ(maxfreq), 0, ATTOTIME_IN_HZ(maxfreq));
+		state->counter_0_timer->adjust(attotime::from_hz(maxfreq), 0, attotime::from_hz(maxfreq));
 	}
 }
 

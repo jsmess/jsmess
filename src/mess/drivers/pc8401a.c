@@ -651,7 +651,7 @@ static MACHINE_CONFIG_START( common, pc8401a_state )
 	MCFG_MACHINE_START(pc8401a)
 
 	/* fake keyboard */
-	MCFG_TIMER_ADD_PERIODIC("keyboard", pc8401a_keyboard_tick, HZ(64))
+	MCFG_TIMER_ADD_PERIODIC("keyboard", pc8401a_keyboard_tick, attotime::from_hz(64))
 
 	/* devices */
 	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, pc8401a_upd1990a_intf)

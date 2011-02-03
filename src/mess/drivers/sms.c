@@ -407,7 +407,7 @@ static MACHINE_CONFIG_START( sms_ntsc_base, sms_state )
 	MCFG_CPU_PROGRAM_MAP(sms_mem)
 	MCFG_CPU_IO_MAP(sms_io)
 
-	MCFG_QUANTUM_TIME(HZ(60))
+	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_MACHINE_START(sms)
 	MCFG_MACHINE_RESET(sms)
@@ -513,7 +513,7 @@ static MACHINE_CONFIG_START( sms_pal_base, sms_state )
 	MCFG_CPU_PROGRAM_MAP(sms_mem)
 	MCFG_CPU_IO_MAP(sms_io)
 
-	MCFG_QUANTUM_TIME(HZ(60))
+	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_MACHINE_START(sms)
 	MCFG_MACHINE_RESET(sms)
@@ -597,7 +597,7 @@ static MACHINE_CONFIG_START( gamegear, sms_state )
 	MCFG_CPU_PROGRAM_MAP(sms_mem)
 	MCFG_CPU_IO_MAP(gg_io)
 
-	MCFG_QUANTUM_TIME(HZ(60))
+	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_MACHINE_START(sms)
 	MCFG_MACHINE_RESET(sms)

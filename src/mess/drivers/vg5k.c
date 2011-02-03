@@ -284,7 +284,7 @@ static TIMER_CALLBACK( z80_irq )
 {
 	cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
 
-	timer_set(machine, ATTOTIME_IN_USEC(100), NULL, 0, z80_irq_clear);
+	timer_set(machine, attotime::from_usec(100), NULL, 0, z80_irq_clear);
 }
 
 static TIMER_DEVICE_CALLBACK( vg5k_scanline )
@@ -304,7 +304,7 @@ static MACHINE_START( vg5k )
 	vg5k->printer = machine->device("printer");
 	vg5k->cassette = machine->device("cassette");
 
-	timer_pulse(machine, ATTOTIME_IN_MSEC(20), NULL, 0, z80_irq);
+	timer_pulse(machine, attotime::from_msec(20), NULL, 0, z80_irq);
 
 	state_save_register_global(machine, vg5k->ef9345_offset);
 }

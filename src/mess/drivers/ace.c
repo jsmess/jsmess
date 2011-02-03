@@ -624,7 +624,7 @@ static MACHINE_CONFIG_START( ace, ace_state )
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_6_5MHz/2)
 	MCFG_CPU_PROGRAM_MAP(ace_mem)
 	MCFG_CPU_IO_MAP(ace_io)
-	MCFG_QUANTUM_TIME(HZ(60))
+	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	// video hardware
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)

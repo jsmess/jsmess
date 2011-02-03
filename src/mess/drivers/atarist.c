@@ -835,7 +835,7 @@ WRITE8_MEMBER( ste_state::sound_dma_control_w )
 		if (!m_dmasnd_active)
 		{
 			dmasound_set_state(1);
-			timer_adjust_periodic(m_dmasound_timer, attotime_zero, 0, ATTOTIME_IN_HZ(DMASOUND_RATE[m_dmasnd_mode & 0x03]));
+			timer_adjust_periodic(m_dmasound_timer, attotime::zero, 0, attotime::from_hz(DMASOUND_RATE[m_dmasnd_mode & 0x03]));
 		}
 	}
 	else
@@ -991,7 +991,7 @@ WRITE16_MEMBER( ste_state::microwire_data_w )
 	if (!timer_enabled(m_microwire_timer))
 	{
 		m_mw_data = data;
-		timer_adjust_periodic(m_microwire_timer, attotime_zero, 0, ATTOTIME_IN_USEC(2));
+		timer_adjust_periodic(m_microwire_timer, attotime::zero, 0, attotime::from_usec(2));
 	}
 }
 

@@ -646,26 +646,26 @@ static void avr8_update_timer1_clock_source(running_machine *machine)
 	switch(AVR8_TIMER2_CLOCK_SELECT)
 	{
 		case 0: // Counter stopped
-			period = attotime_never;
+			period = attotime::never;
 			break;
 		case 1: // Clk/1; no prescaling
-			period = ATTOTIME_IN_HZ(MASTER_CLOCK);
+			period = attotime::from_hz(MASTER_CLOCK);
 			break;
 		case 2: // Clk/8
-			period = ATTOTIME_IN_HZ(MASTER_CLOCK/8);
+			period = attotime::from_hz(MASTER_CLOCK/8);
 			break;
 		case 3: // Clk/32
-			period = ATTOTIME_IN_HZ(MASTER_CLOCK/32);
+			period = attotime::from_hz(MASTER_CLOCK/32);
 			break;
 		case 4: // Clk/64
-			period = ATTOTIME_IN_HZ(MASTER_CLOCK/64);
+			period = attotime::from_hz(MASTER_CLOCK/64);
 			break;
 		case 5: // Clk/128
-			period = ATTOTIME_IN_HZ(MASTER_CLOCK/128);
+			period = attotime::from_hz(MASTER_CLOCK/128);
 			break;
 		case 6: // T1 trigger, falling edge
 		case 7: // T1 trigger, rising edge
-			period = attotime_never;
+			period = attotime::never;
 			verboselog(machine, 0, "avr8_update_timer1_clock_source: T1 Trigger mode not implemented yet\n");
 			break;
 	}
@@ -750,28 +750,28 @@ static void avr8_update_timer2_clock_source(running_machine *machine)
 	switch(AVR8_TIMER2_CLOCK_SELECT)
 	{
 		case 0: // Counter stopped
-			period = attotime_never;
+			period = attotime::never;
 			break;
 		case 1: // Clk/1; no prescaling
-			period = ATTOTIME_IN_HZ(MASTER_CLOCK);
+			period = attotime::from_hz(MASTER_CLOCK);
 			break;
 		case 2: // Clk/8
-			period = ATTOTIME_IN_HZ(MASTER_CLOCK/8);
+			period = attotime::from_hz(MASTER_CLOCK/8);
 			break;
 		case 3: // Clk/32
-			period = ATTOTIME_IN_HZ(MASTER_CLOCK/32);
+			period = attotime::from_hz(MASTER_CLOCK/32);
 			break;
 		case 4: // Clk/64
-			period = ATTOTIME_IN_HZ(MASTER_CLOCK/64);
+			period = attotime::from_hz(MASTER_CLOCK/64);
 			break;
 		case 5: // Clk/128
-			period = ATTOTIME_IN_HZ(MASTER_CLOCK/128);
+			period = attotime::from_hz(MASTER_CLOCK/128);
 			break;
 		case 6: // Clk/256
-			period = ATTOTIME_IN_HZ(MASTER_CLOCK/256);
+			period = attotime::from_hz(MASTER_CLOCK/256);
 			break;
 		case 7: // Clk/1024
-			period = ATTOTIME_IN_HZ(MASTER_CLOCK/1024);
+			period = attotime::from_hz(MASTER_CLOCK/1024);
 			break;
 	}
 	timer_adjust_periodic(state->timer2_timer, period, 0, period);

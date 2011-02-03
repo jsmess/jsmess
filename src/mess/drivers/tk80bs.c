@@ -295,7 +295,7 @@ static TIMER_CALLBACK( keyboard_callback )
 
 static MACHINE_START(tk80bs)
 {
-	timer_pulse(machine, ATTOTIME_IN_HZ(240/32), NULL, 0, keyboard_callback);
+	timer_pulse(machine, attotime::from_hz(240/32), NULL, 0, keyboard_callback);
 }
 
 static MACHINE_RESET(tk80bs)

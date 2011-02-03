@@ -162,7 +162,7 @@ static void xmodem_make_idle( xmodem* state )
        The 2 sec start time is here so that the machine does not get NAK instead of
        ACK or EOT as the last byte of a transfer.
      */
-	timer_adjust_periodic( state->timer, ATTOTIME_IN_SEC( 2 ), 0, ATTOTIME_IN_SEC( 2 ) );
+	timer_adjust_periodic( state->timer, attotime::from_seconds( 2 ), 0, attotime::from_seconds( 2 ) );
 }
 
 /* emulated machine has read the last byte we sent */

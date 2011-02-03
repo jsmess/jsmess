@@ -190,7 +190,7 @@ WRITE16_HANDLER( micro3d_mc68901_w )
 					case 7: divisor = 200; break;
 				}
 
-				period = attotime_mul(ATTOTIME_IN_HZ(4000000 / divisor), data);
+				period = attotime::from_hz(4000000 / divisor) * data;
 
 				timer_adjust_periodic(state->mc68901.timer_a, period, 0, period);
 			}
@@ -594,7 +594,7 @@ WRITE32_HANDLER( micro3d_mac2_w )
 
 	/* TODO: Calculate a better estimate for timing */
 	if (state->mac_stat)
-		timer_set(space->machine, attotime_mul(ATTOTIME_IN_HZ(MAC_CLK), mac_cycles), NULL, 0, mac_done_callback);
+		timer_set(space->machine, attotime::from_hz(MAC_CLK) * mac_cycles, NULL, 0, mac_done_callback);
 
 	state->mrab11 = mrab11;
 	state->vtx_addr = vtx_addr;
@@ -658,7 +658,7 @@ WRITE16_HANDLER( micro3d_adc_w )
 		return;
 	}
 
-	timer_set(space->machine, ATTOTIME_IN_USEC(40), NULL, data & ~4, adc_done_callback);
+	timer_set(space->machine, attotime::from_usec(40), NULL, data & ~4, adc_done_callback);
 }
 
 CUSTOM_INPUT( botssa_hwchk_r )
@@ -701,7 +701,7 @@ WRITE16_HANDLER( micro3d_reset_w )
 WRITE16_HANDLER( host_drmath_int_w )
 {
 	cputag_set_input_line(space->machine, "drmath", AM29000_INTR2, ASSERT_LINE);
-	cpuexec_boost_interleave(space->machine, attotime_zero, ATTOTIME_IN_USEC(10));
+	cpuexec_boost_interleave(space->machine, attotime::zero, attotime::from_usec(10));
 }
 
 

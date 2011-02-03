@@ -289,19 +289,19 @@ TIMER_CALLBACK(vectrex_imager_eye)
 	{
 		state->imager_status = param;
 		coffset = param > 1? 3: 0;
-		timer_set (machine, double_to_attotime(rtime * state->imager_angles[0]), NULL, state->imager_colors[coffset+2], vectrex_imager_change_color);
-		timer_set (machine, double_to_attotime(rtime * state->imager_angles[1]), NULL, state->imager_colors[coffset+1], vectrex_imager_change_color);
-		timer_set (machine, double_to_attotime(rtime * state->imager_angles[2]), NULL, state->imager_colors[coffset], vectrex_imager_change_color);
+		timer_set (machine, attotime::from_double(rtime * state->imager_angles[0]), NULL, state->imager_colors[coffset+2], vectrex_imager_change_color);
+		timer_set (machine, attotime::from_double(rtime * state->imager_angles[1]), NULL, state->imager_colors[coffset+1], vectrex_imager_change_color);
+		timer_set (machine, attotime::from_double(rtime * state->imager_angles[2]), NULL, state->imager_colors[coffset], vectrex_imager_change_color);
 
 		if (param == 2)
 		{
-			timer_set (machine, double_to_attotime(rtime * 0.50), NULL, 1, vectrex_imager_eye);
+			timer_set (machine, attotime::from_double(rtime * 0.50), NULL, 1, vectrex_imager_eye);
 
 			/* Index hole sensor is connected to IO7 which triggers also CA1 of VIA */
 			via_0->write_ca1(1);
 			via_0->write_ca1(0);
 			state->imager_pinlevel |= 0x80;
-			timer_set (machine, double_to_attotime(rtime / 360.0), &state->imager_pinlevel, 0, update_level);
+			timer_set (machine, attotime::from_double(rtime / 360.0), &state->imager_pinlevel, 0, update_level);
 		}
 	}
 }
@@ -318,7 +318,7 @@ WRITE8_HANDLER(vectrex_psg_port_w)
 	if (!mcontrol && mcontrol ^ state->old_mcontrol)
 	{
 		state->old_mcontrol = mcontrol;
-		tmp = attotime_to_double(timer_get_time(space->machine));
+		tmp = timer_get_time(space->machine).as_double();
 		wavel = tmp - state->sl;
 		state->sl = tmp;
 
@@ -336,16 +336,16 @@ WRITE8_HANDLER(vectrex_psg_port_w)
 			if (state->imager_freq > 1)
 			{
 				timer_adjust_periodic(state->imager_timer,
-									  double_to_attotime(MIN(1.0 / state->imager_freq, attotime_to_double(timer_timeleft(state->imager_timer)))),
+									  attotime::from_double(MIN(1.0 / state->imager_freq, timer_timeleft(state->imager_timer).as_double())),
 									  2,
-									  double_to_attotime(1.0 / state->imager_freq));
+									  attotime::from_double(1.0 / state->imager_freq));
 			}
 		}
 	}
 	if (mcontrol && mcontrol ^ state->old_mcontrol)
 	{
 		state->old_mcontrol = mcontrol;
-		state->pwl = attotime_to_double(timer_get_time(space->machine)) - state->sl;
+		state->pwl = timer_get_time(space->machine).as_double() - state->sl;
 	}
 }
 

@@ -268,7 +268,7 @@ static void set_line_timer(device_t *device, coco_cartridge_line *line, cococart
 	/* calculate delay; delay dependant on cycles per second */
 	attotime delay = (line->delay != 0)
 		? device->machine->firstcpu->cycles_to_attotime(line->delay)
-		: attotime_zero;
+		: attotime::zero;
 
    timer_adjust_oneshot(line->timer[line->timer_index], delay, (int) value);
    line->timer_index = (line->timer_index + 1) % TIMER_POOL;

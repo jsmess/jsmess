@@ -547,7 +547,7 @@ static void snes_input_read( running_machine *machine )
 	UINT8 ctrl2 = (input_port_read(machine, "CTRLSEL") & 0xf0) >> 4;
 
 	/* Check if lightgun has been chosen as input: if so, enable crosshair */
-	timer_set(machine, attotime_zero, NULL, 0, lightgun_tick);
+	timer_set(machine, attotime::zero, NULL, 0, lightgun_tick);
 
 	switch (ctrl1)
 	{
@@ -711,7 +711,7 @@ static MACHINE_CONFIG_START( snes_base, snes_state )
 	MCFG_CPU_ADD("soundcpu", SPC700, 1024000)	/* 1.024 MHz */
 	MCFG_CPU_PROGRAM_MAP(spc_map)
 
-	//MCFG_QUANTUM_TIME(HZ(48000))
+	//MCFG_QUANTUM_TIME(attotime::from_hz(48000))
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
 	MCFG_MACHINE_START(snes_mess)

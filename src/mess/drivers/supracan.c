@@ -1494,7 +1494,7 @@ static TIMER_CALLBACK( supracan_hbl_callback )
 {
     supracan_state *state = machine->driver_data<supracan_state>();
 
-    timer_adjust_oneshot(state->hbl_timer, attotime_never, 0);
+    timer_adjust_oneshot(state->hbl_timer, attotime::never, 0);
 }
 
 static TIMER_CALLBACK( supracan_line_on_callback )
@@ -1503,7 +1503,7 @@ static TIMER_CALLBACK( supracan_line_on_callback )
 
     cpu_set_input_line(machine->device("maincpu"), 5, HOLD_LINE);
 
-    timer_adjust_oneshot(state->line_on_timer, attotime_never, 0);
+    timer_adjust_oneshot(state->line_on_timer, attotime::never, 0);
 }
 
 static TIMER_CALLBACK( supracan_line_off_callback )
@@ -1512,7 +1512,7 @@ static TIMER_CALLBACK( supracan_line_off_callback )
 
     cpu_set_input_line(machine->device("maincpu"), 5, CLEAR_LINE);
 
-    timer_adjust_oneshot(state->line_on_timer, attotime_never, 0);
+    timer_adjust_oneshot(state->line_on_timer, attotime::never, 0);
 }
 
 static TIMER_CALLBACK( supracan_video_callback )
@@ -1659,7 +1659,7 @@ static WRITE16_HANDLER( supracan_video_w )
                 }
                 else
                 {
-                    timer_adjust_oneshot(state->line_on_timer, attotime_never, 0);
+                    timer_adjust_oneshot(state->line_on_timer, attotime::never, 0);
                 }
             }
             break;
@@ -1673,7 +1673,7 @@ static WRITE16_HANDLER( supracan_video_w )
                 }
                 else
                 {
-                    timer_adjust_oneshot(state->line_off_timer, attotime_never, 0);
+                    timer_adjust_oneshot(state->line_off_timer, attotime::never, 0);
                 }
             }
             break;

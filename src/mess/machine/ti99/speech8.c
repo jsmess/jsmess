@@ -148,12 +148,12 @@ WRITE8_DEVICE_HANDLER( ti998spch_w )
 		/* which would be more complex. */
 		if (!tms5220_readyq_r(spsys->vsp))
 		{
-			attotime time_to_ready = double_to_attotime(tms5220_time_to_ready(spsys->vsp));
+			attotime time_to_ready = attotime::from_double(tms5220_time_to_ready(spsys->vsp));
 			int cycles_to_ready = device->machine->device<cpu_device>("maincpu")->attotime_to_cycles(time_to_ready);
-			logerror("time to ready: %f -> %d\n", attotime_to_double(time_to_ready), (int) cycles_to_ready);
+			logerror("time to ready: %f -> %d\n", time_to_ready.as_double(), (int) cycles_to_ready);
 
 			cpu_adjust_icount(device->machine->device("maincpu"),-cycles_to_ready);
-			timer_set(device->machine, attotime_zero, NULL, 0, NULL);
+			timer_set(device->machine, attotime::zero, NULL, 0, NULL);
 		}
 		tms5220_data_w(spsys->vsp, offset, data);
 	}

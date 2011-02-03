@@ -613,7 +613,7 @@ INLINE void ay31015_update_rx_timer( device_t *device )
 
 	if ( ay31015->rx_clock > 0.0 )
 	{
-		timer_adjust_periodic( ay31015->rx_timer, ATTOTIME_IN_HZ( ay31015->rx_clock ), 0, ATTOTIME_IN_HZ( ay31015->rx_clock ) );
+		timer_adjust_periodic( ay31015->rx_timer, attotime::from_hz( ay31015->rx_clock ), 0, attotime::from_hz( ay31015->rx_clock ) );
 	}
 	else
 	{
@@ -628,7 +628,7 @@ INLINE void ay31015_update_tx_timer( device_t *device )
 
 	if ( ay31015->tx_clock > 0.0 )
 	{
-		timer_adjust_periodic( ay31015->tx_timer, ATTOTIME_IN_HZ( ay31015->tx_clock ), 0, ATTOTIME_IN_HZ( ay31015->tx_clock ) );
+		timer_adjust_periodic( ay31015->tx_timer, attotime::from_hz( ay31015->tx_clock ), 0, attotime::from_hz( ay31015->tx_clock ) );
 	}
 	else
 	{

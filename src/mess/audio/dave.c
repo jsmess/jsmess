@@ -155,7 +155,7 @@ static DEVICE_START( dave_sound )
 	dave->one_khz_state = 0;
 	dave->fifty_hz_count = DAVE_FIFTY_HZ_COUNTER_RELOAD;
 	dave->one_hz_count = DAVE_ONE_HZ_COUNTER_RELOAD;
-	timer_pulse(device->machine, ATTOTIME_IN_HZ(1000), (void *) device, 0, dave_1khz_callback);
+	timer_pulse(device->machine, attotime::from_hz(1000), (void *) device, 0, dave_1khz_callback);
 
 	for (i=0; i<3; i++)
 	{

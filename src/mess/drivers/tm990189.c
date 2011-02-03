@@ -79,7 +79,7 @@ public:
 
 
 
-#define displayena_duration ATTOTIME_IN_USEC(4500)	/* Can anyone confirm this? 74LS123 connected to C=0.1uF and R=100kOhm */
+#define displayena_duration attotime::from_usec(4500)	/* Can anyone confirm this? 74LS123 connected to C=0.1uF and R=100kOhm */
 
 
 enum
@@ -279,7 +279,7 @@ static void hold_load(running_machine *machine)
 	tm990189_state *state = machine->driver_data<tm990189_state>();
 	state->load_state = TRUE;
 	field_interrupts(machine);
-	timer_set(machine, ATTOTIME_IN_MSEC(100), NULL, 0, clear_load);
+	timer_set(machine, attotime::from_msec(100), NULL, 0, clear_load);
 }
 
 /*
@@ -345,7 +345,7 @@ static WRITE8_DEVICE_HANDLER( sys9901_segment_w )
 	else
 	{
 		state->segment &= ~ (1 << (offset-4));
-		if ((attotime_compare(timer_timeleft(state->displayena_timer), attotime_zero) > 0) && (state->digitsel < 10))
+		if ((timer_timeleft(state->displayena_timer) > attotime::zero)  && (state->digitsel < 10))
 			draw_digit(state);
 	}
 }
@@ -404,7 +404,7 @@ static DEVICE_IMAGE_LOAD( tm990_189_rs232 )
 	tm990189_state *state = image.device().machine->driver_data<tm990189_state>();
 	tms9902_set_dsr(image.device().machine->device("tms9902"), 1);
 	state->rs232_input_timer = timer_alloc(image.device().machine, rs232_input_callback, (void*)image);
-	timer_adjust_periodic(state->rs232_input_timer, attotime_zero, 0, ATTOTIME_IN_MSEC(10));
+	timer_adjust_periodic(state->rs232_input_timer, attotime::zero, 0, attotime::from_msec(10));
 
 	return IMAGE_INIT_PASS;
 }
@@ -417,7 +417,7 @@ static DEVICE_IMAGE_UNLOAD( tm990_189_rs232 )
 	tm990189_state *state = image.device().machine->driver_data<tm990189_state>();
 	tms9902_set_dsr(image.device().machine->device("tms9902"), 0);
 
-	timer_reset(state->rs232_input_timer, attotime_never);	/* FIXME - timers should only be allocated once */
+	timer_reset(state->rs232_input_timer, attotime::never);	/* FIXME - timers should only be allocated once */
 }
 
 DEVICE_GET_INFO( tm990_189_rs232 )
@@ -562,16 +562,16 @@ static READ8_HANDLER(video_joy_r)
 	int reply = input_port_read(space->machine, "BUTTONS");
 
 
-	if (attotime_compare(timer_timeleft(state->joy1x_timer), attotime_zero) < 0)
+	if (timer_timeleft(state->joy1x_timer) < attotime::zero)
 		reply |= 0x01;
 
-	if (attotime_compare(timer_timeleft(state->joy1y_timer), attotime_zero) < 0)
+	if (timer_timeleft(state->joy1y_timer) < attotime::zero)
 		reply |= 0x02;
 
-	if (attotime_compare(timer_timeleft(state->joy2x_timer), attotime_zero) < 0)
+	if (timer_timeleft(state->joy2x_timer) < attotime::zero)
 		reply |= 0x08;
 
-	if (attotime_compare(timer_timeleft(state->joy2y_timer), attotime_zero) < 0)
+	if (timer_timeleft(state->joy2y_timer) < attotime::zero)
 		reply |= 0x10;
 
 	return reply;
@@ -580,10 +580,10 @@ static READ8_HANDLER(video_joy_r)
 static WRITE8_HANDLER(video_joy_w)
 {
 	tm990189_state *state = space->machine->driver_data<tm990189_state>();
-	timer_reset(state->joy1x_timer, ATTOTIME_IN_USEC(input_port_read(space->machine, "JOY1_X")*28+28));
-	timer_reset(state->joy1y_timer, ATTOTIME_IN_USEC(input_port_read(space->machine, "JOY1_Y")*28+28));
-	timer_reset(state->joy2x_timer, ATTOTIME_IN_USEC(input_port_read(space->machine, "JOY2_X")*28+28));
-	timer_reset(state->joy2y_timer, ATTOTIME_IN_USEC(input_port_read(space->machine, "JOY2_Y")*28+28));
+	timer_reset(state->joy1x_timer, attotime::from_usec(input_port_read(space->machine, "JOY1_X")*28+28));
+	timer_reset(state->joy1y_timer, attotime::from_usec(input_port_read(space->machine, "JOY1_Y")*28+28));
+	timer_reset(state->joy2x_timer, attotime::from_usec(input_port_read(space->machine, "JOY2_X")*28+28));
+	timer_reset(state->joy2y_timer, attotime::from_usec(input_port_read(space->machine, "JOY2_Y")*28+28));
 }
 
 /* user tms9901 setup */

@@ -935,7 +935,7 @@ static READ8_HANDLER( upd765_tc_r )
 	//pc88va_state *state = space->machine->driver_data<pc88va_state>();
 
 	upd765_tc_w(space->machine->device("upd765"), 1);
-	timer_set(space->machine,  ATTOTIME_IN_USEC(500), NULL, 0, pc8801fd_upd765_tc_to_zero );
+	timer_set(space->machine,  attotime::from_usec(500), NULL, 0, pc8801fd_upd765_tc_to_zero );
 	return 0;
 }
 
@@ -1024,7 +1024,7 @@ static TIMER_CALLBACK( t3_mouse_callback )
 	if(state->timer3_io_reg & 0x80)
 	{
 		pic8259_ir5_w(machine->device("pic8259_slave"), 1);
-		timer_adjust_oneshot(state->t3_mouse_timer, ATTOTIME_IN_HZ(120 >> (state->timer3_io_reg & 3)), 0);
+		timer_adjust_oneshot(state->t3_mouse_timer, attotime::from_hz(120 >> (state->timer3_io_reg & 3)), 0);
 	}
 }
 
@@ -1038,11 +1038,11 @@ static WRITE8_HANDLER( timer3_ctrl_reg_w )
 	state->timer3_io_reg = data;
 
 	if(data & 0x80)
-		timer_adjust_oneshot(state->t3_mouse_timer, ATTOTIME_IN_HZ(120 >> (state->timer3_io_reg & 3)), 0);
+		timer_adjust_oneshot(state->t3_mouse_timer, attotime::from_hz(120 >> (state->timer3_io_reg & 3)), 0);
 	else
 	{
 		pic8259_ir5_w(space->machine->device("pic8259_slave"), 0);
-		timer_adjust_oneshot(state->t3_mouse_timer, attotime_never, 0);
+		timer_adjust_oneshot(state->t3_mouse_timer, attotime::never, 0);
 	}
 }
 
@@ -1512,7 +1512,7 @@ static MACHINE_START( pc88va )
 	cpu_set_irq_callback(machine->device("maincpu"), pc88va_irq_callback);
 
 	state->t3_mouse_timer = timer_alloc(machine, t3_mouse_callback, 0);
-	timer_adjust_oneshot(state->t3_mouse_timer, attotime_never, 0);
+	timer_adjust_oneshot(state->t3_mouse_timer, attotime::never, 0);
 }
 
 static MACHINE_RESET( pc88va )

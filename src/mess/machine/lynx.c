@@ -956,12 +956,12 @@ static READ8_HANDLER( suzy_read )
 			value = 0x01; // must not be 0 for correct power up
 			break;
 		case 0x92:	/* Better check this with docs! */
-			if (!attotime_compare(state->blitter.time, attotime_zero))
+			if (state->blitter.time!=attotime::zero)
 			{
-				if (space->machine->device<cpu_device>("maincpu")->attotime_to_cycles(attotime_sub(timer_get_time(space->machine), state->blitter.time)) > state->blitter.memory_accesses * 20)
+				if (space->machine->device<cpu_device>("maincpu")->attotime_to_cycles(timer_get_time(space->machine) - state->blitter.time) > state->blitter.memory_accesses * 20)
 				{
 					state->suzy.data[offset] &= ~0x01; //state->blitter finished
-					state->blitter.time = attotime_zero;
+					state->blitter.time = attotime::zero;
 				}
 			}
 			value = state->suzy.data[offset];
@@ -1405,7 +1405,7 @@ static UINT8 lynx_timer_read(lynx_state *state, int which, int offset)
 			else
 			{
 				if ( state->timer[which].timer_active )
-					value = (UINT8) ( state->timer[which].bakup - attotime_mul(timer_timeleft(state->timer[which].timer), lynx_time_factor( state->timer[which].cntrl1 & 0x07 )).seconds);
+					value = (UINT8) ( state->timer[which].bakup - (timer_timeleft(state->timer[which].timer) * lynx_time_factor( state->timer[which].cntrl1 & 0x07 )).seconds);
 			}
 			break;
 
@@ -1442,15 +1442,15 @@ static void lynx_timer_write(lynx_state *state, int which, int offset, UINT8 dat
 	/* Update timers */
 	if ( offset < 3 )
 	{
-		timer_reset(state->timer[which].timer, attotime_never);
+		timer_reset(state->timer[which].timer, attotime::never);
 		state->timer[which].timer_active = 0;
 		if ((state->timer[which].cntrl1 & 0x08))		// 0x48?
 		{
 			if ((state->timer[which].cntrl1 & 0x07) != 0x07)
 			{
-				attotime t = attotime_mul(ATTOTIME_IN_HZ(lynx_time_factor(state->timer[which].cntrl1 & 0x07)), state->timer[which].bakup + 1);
+				attotime t = (attotime::from_hz(lynx_time_factor(state->timer[which].cntrl1 & 0x07)) * (state->timer[which].bakup + 1));
 				if (state->timer[which].cntrl1 & 0x10)
-					timer_adjust_periodic(state->timer[which].timer, attotime_zero, which, t);
+					timer_adjust_periodic(state->timer[which].timer, attotime::zero, which, t);
 				else
 					timer_adjust_oneshot(state->timer[which].timer, t, which);
 				state->timer[which].timer_active = 1;
@@ -1479,7 +1479,7 @@ static TIMER_CALLBACK(lynx_uart_timer)
 	{
 		state->uart.data_to_send = state->uart.buffer;
 		state->uart.buffer_loaded = FALSE;
-		timer_set(machine, ATTOTIME_IN_USEC(11), NULL, 0, lynx_uart_timer);
+		timer_set(machine, attotime::from_usec(11), NULL, 0, lynx_uart_timer);
 	}
 	else
 		state->uart.sending = FALSE;
@@ -1535,7 +1535,7 @@ static WRITE8_HANDLER(lynx_uart_w)
 			{
 				state->uart.sending = TRUE;
 				state->uart.data_to_send = data;
-				timer_set(space->machine, ATTOTIME_IN_USEC(11), NULL, 0, lynx_uart_timer);
+				timer_set(space->machine, attotime::from_usec(11), NULL, 0, lynx_uart_timer);
 			}
 			break;
 	}

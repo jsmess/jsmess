@@ -59,7 +59,7 @@ static WRITE_LINE_DEVICE_HANDLER( mekd2_nmi_w )
 	if (state)
 		cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
 	else
-		timer_set(device->machine, ATTOTIME_IN_USEC(18), NULL, 0, mekd2_trace);
+		timer_set(device->machine, attotime::from_usec(18), NULL, 0, mekd2_trace);
 }
 
 /***********************************************************
@@ -319,7 +319,7 @@ static MACHINE_CONFIG_START( mekd2, mekd2_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800, XTAL_MEKD2 / 2)        /* 614.4 kHz */
 	MCFG_CPU_PROGRAM_MAP(mekd2_mem)
-	MCFG_QUANTUM_TIME(HZ(60))
+	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

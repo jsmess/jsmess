@@ -611,7 +611,7 @@ static MACHINE_CONFIG_START( cc10, fidelz80_state )
     MCFG_CPU_ADD("maincpu", Z80, XTAL_4MHz)
     MCFG_CPU_PROGRAM_MAP(cc10_z80_mem)
     MCFG_CPU_IO_MAP(fidel_z80_io)
-    MCFG_QUANTUM_TIME(HZ(60))
+    MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
     /* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_fidelz80)
@@ -630,7 +630,7 @@ static MACHINE_CONFIG_START( vcc, fidelz80_state )
     MCFG_CPU_ADD("maincpu", Z80, XTAL_4MHz)
     MCFG_CPU_PROGRAM_MAP(vcc_z80_mem)
     MCFG_CPU_IO_MAP(fidel_z80_io)
-    MCFG_QUANTUM_TIME(HZ(60))
+    MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
     /* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_fidelz80)
@@ -649,7 +649,7 @@ static MACHINE_CONFIG_START( abc, fidelz80_state )
     MCFG_CPU_ADD("maincpu", Z80, XTAL_4MHz) // unknown clock/divider
     MCFG_CPU_PROGRAM_MAP(abc_z80_mem)
     MCFG_CPU_IO_MAP(abc_z80_io)
-    MCFG_QUANTUM_TIME(HZ(60))
+    MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
     /* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_abc)

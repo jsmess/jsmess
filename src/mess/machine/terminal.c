@@ -523,7 +523,7 @@ static DEVICE_START( terminal )
 	const terminal_interface *intf = get_interface(device);
 
 	devcb_resolve_write8(&term->terminal_keyboard_func, &intf->terminal_keyboard_func, device);
-	timer_pulse(device->machine, ATTOTIME_IN_HZ(2400), (void*)device, 0, keyboard_callback);
+	timer_pulse(device->machine, attotime::from_hz(2400), (void*)device, 0, keyboard_callback);
 }
 
 /*-------------------------------------------------

@@ -225,7 +225,7 @@ SOUNDS += ZSG2
 SOUNDS += MOS656X
 SOUNDS += S2636
 SOUNDS += ASC
-
+SOUNDS += MAS3507D
 
 
 #-------------------------------------------------
@@ -1256,9 +1256,9 @@ $(MAMEOBJ)/stern.a: \
 	$(DRIVERS)/supdrapo.o \
 
 $(MAMEOBJ)/subsino.a: \
-	$(DRIVERS)/bishjan.o \
 	$(DRIVERS)/lastfght.o \
 	$(DRIVERS)/subsino.o \
+	$(DRIVERS)/subsino2.o \
 
 $(MAMEOBJ)/sun.a: \
 	$(DRIVERS)/arabian.o $(VIDEO)/arabian.o \
@@ -1631,6 +1631,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/flower.o $(AUDIO)/flower.o $(VIDEO)/flower.o \
 	$(DRIVERS)/fortecar.o \
 	$(DRIVERS)/freekick.o $(VIDEO)/freekick.o \
+	$(DRIVERS)/funkball.o \
 	$(DRIVERS)/funworld.o $(VIDEO)/funworld.o \
 	$(DRIVERS)/galaxi.o \
 	$(DRIVERS)/gamecstl.o \
@@ -1863,7 +1864,8 @@ $(DRIVERS)/luckgrln.o:	$(LAYOUT)/luckgrln.lh
 
 $(DRIVERS)/lucky74.o:	$(LAYOUT)/lucky74.lh
 
-$(DRIVERS)/magic10.o:	$(LAYOUT)/sgsafari.lh
+$(DRIVERS)/magic10.o:	$(LAYOUT)/sgsafari.lh \
+						$(LAYOUT)/musicsrt.lh
 
 $(DRIVERS)/maxaflex.o:	$(LAYOUT)/maxaflex.lh
 

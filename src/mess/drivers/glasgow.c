@@ -276,8 +276,8 @@ static MACHINE_START( glasgow )
 	mboard_key_selector = 0;
 	state->irq_flag = 0;
 	state->lcd_shift_counter = 3;
-	timer_pulse(machine, ATTOTIME_IN_HZ(50), NULL, 0, update_nmi);
-	timer_pulse(machine, ATTOTIME_IN_HZ(100), NULL, 0, mboard_update_artwork);
+	timer_pulse(machine, attotime::from_hz(50), NULL, 0, update_nmi);
+	timer_pulse(machine, attotime::from_hz(100), NULL, 0, mboard_update_artwork);
 	beep_set_frequency(speaker, 44);
 
 	mboard_savestate_register(machine);
@@ -290,8 +290,8 @@ static MACHINE_START( dallas32 )
 	device_t *speaker = machine->device("beep");
 
 	state->lcd_shift_counter = 3;
-	timer_pulse(machine, ATTOTIME_IN_HZ(50), NULL, 0, update_nmi32);
-	timer_pulse(machine, ATTOTIME_IN_HZ(100), NULL, 0, mboard_update_artwork);
+	timer_pulse(machine, attotime::from_hz(50), NULL, 0, update_nmi32);
+	timer_pulse(machine, attotime::from_hz(100), NULL, 0, mboard_update_artwork);
 	beep_set_frequency(speaker, 44);
 
 	mboard_savestate_register(machine);

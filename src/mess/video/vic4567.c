@@ -106,7 +106,7 @@ struct _vic3_state
 		if(VERBOSE_LEVEL >= N) \
 		{ \
 			if( M ) \
-				logerror("%11.6f: %-24s", attotime_to_double(timer_get_time(device->machine)), (char*) M ); \
+				logerror("%11.6f: %-24s", timer_get_time(device->machine).as_double(), (char*) M ); \
 			logerror A; \
 		} \
 	} while (0)
@@ -1923,7 +1923,7 @@ void vic3_raster_interrupt_gen( device_t *device )
 		if (LIGHTPEN_BUTTON)
 		{
 			/* lightpen timer start */
-			timer_set(machine, attotime_make(0, 0), vic3, 1, vic3_timer_timeout);
+			timer_set(machine, attotime(0, 0), vic3, 1, vic3_timer_timeout);
 		}
 
 	}

@@ -216,7 +216,7 @@ static DEVICE_START( e0516 )
 
 	/* create the timers */
 	e0516->clock_timer = timer_alloc(device->machine, clock_tick, (void *)device);
-	timer_adjust_periodic(e0516->clock_timer, attotime_zero, 0, ATTOTIME_IN_HZ(device->clock() / 32768));
+	timer_adjust_periodic(e0516->clock_timer, attotime::zero, 0, attotime::from_hz(device->clock() / 32768));
 
 	/* register for state saving */
 	state_save_register_device_item(device, 0, e0516->cs);

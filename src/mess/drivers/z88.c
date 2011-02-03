@@ -299,7 +299,7 @@ static void z88_refresh_memory_bank(running_machine *machine, int bank)
 
 static MACHINE_START( z88 )
 {
-	timer_pulse(machine, ATTOTIME_IN_MSEC(5), NULL, 0, z88_rtc_timer_callback);
+	timer_pulse(machine, attotime::from_msec(5), NULL, 0, z88_rtc_timer_callback);
 }
 
 static MACHINE_RESET( z88 )
@@ -749,7 +749,7 @@ static MACHINE_CONFIG_START( z88, z88_state )
 	MCFG_CPU_ADD("maincpu", Z80, 3276800)
 	MCFG_CPU_PROGRAM_MAP(z88_mem)
 	MCFG_CPU_IO_MAP(z88_io)
-	MCFG_QUANTUM_TIME(HZ(60))
+	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_MACHINE_START( z88 )
 	MCFG_MACHINE_RESET( z88 )

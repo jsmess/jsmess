@@ -23,7 +23,7 @@
 		if(VERBOSE>=N) \
 		{ \
 			if( M ) \
-				logerror("%11.6f: %-24s",attotime_to_double(timer_get_time(machine)),(char*)M ); \
+				logerror("%11.6f: %-24s",timer_get_time(machine).as_double(),(char*)M ); \
 			logerror A; \
 		} \
 	} while (0)

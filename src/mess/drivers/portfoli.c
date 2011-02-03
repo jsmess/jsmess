@@ -875,11 +875,11 @@ static MACHINE_CONFIG_START( portfolio, portfolio_state )
 	MCFG_I8255A_ADD(M82C55A_TAG, ppi_intf)
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_intf)
 	MCFG_INS8250_ADD(M82C50A_TAG, i8250_intf) // should be MCFG_INS8250A_ADD
-	MCFG_TIMER_ADD_PERIODIC("counter", counter_tick, HZ(XTAL_32_768kHz/16384))
-	MCFG_TIMER_ADD_PERIODIC(TIMER_TICK_TAG, system_tick, HZ(XTAL_32_768kHz/32768))
+	MCFG_TIMER_ADD_PERIODIC("counter", counter_tick, attotime::from_hz(XTAL_32_768kHz/16384))
+	MCFG_TIMER_ADD_PERIODIC(TIMER_TICK_TAG, system_tick, attotime::from_hz(XTAL_32_768kHz/32768))
 
 	/* fake keyboard */
-	MCFG_TIMER_ADD_PERIODIC("keyboard", keyboard_tick, USEC(2500))
+	MCFG_TIMER_ADD_PERIODIC("keyboard", keyboard_tick, attotime::from_usec(2500))
 
 	/* cartridge */
 	MCFG_CARTSLOT_ADD("cart")

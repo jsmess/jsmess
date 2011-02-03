@@ -113,7 +113,7 @@ static TIMER_CALLBACK(dmac_dma_proc)
 	if ( dmac_data.wtc > 0 )
 	{
 		matsucd_read_next_block();
-		timer_adjust_oneshot(dmac_data.dma_timer, ATTOTIME_IN_MSEC( CD_SECTOR_TIME ), 0);
+		timer_adjust_oneshot(dmac_data.dma_timer, attotime::from_msec( CD_SECTOR_TIME ), 0);
 	}
 	else
 	{
@@ -223,14 +223,14 @@ static READ16_HANDLER( amiga_dmac_r )
 		case 0x70:	/* DMA start strobe */
 		{
 			LOG(( "DMAC: PC=%08x - DMA Start Strobe\n", cpu_get_pc(space->cpu) ));
-			timer_adjust_oneshot(dmac_data.dma_timer, ATTOTIME_IN_MSEC( CD_SECTOR_TIME ), 0);
+			timer_adjust_oneshot(dmac_data.dma_timer, attotime::from_msec( CD_SECTOR_TIME ), 0);
 		}
 		break;
 
 		case 0x71:	/* DMA stop strobe */
 		{
 			LOG(( "DMAC: PC=%08x - DMA Stop Strobe\n", cpu_get_pc(space->cpu) ));
-			timer_reset( dmac_data.dma_timer, attotime_never );
+			timer_reset( dmac_data.dma_timer, attotime::never );
 		}
 		break;
 
@@ -350,14 +350,14 @@ static WRITE16_HANDLER( amiga_dmac_w )
 		case 0x70:	/* DMA start strobe */
 		{
 			LOG(( "DMAC: PC=%08x - DMA Start Strobe\n", cpu_get_pc(space->cpu) ));
-			timer_adjust_oneshot(dmac_data.dma_timer, ATTOTIME_IN_MSEC( CD_SECTOR_TIME ), 0);
+			timer_adjust_oneshot(dmac_data.dma_timer, attotime::from_msec( CD_SECTOR_TIME ), 0);
 		}
 		break;
 
 		case 0x71:	/* DMA stop strobe */
 		{
 			LOG(( "DMAC: PC=%08x - DMA Stop Strobe\n", cpu_get_pc(space->cpu) ));
-			timer_reset( dmac_data.dma_timer, attotime_never );
+			timer_reset( dmac_data.dma_timer, attotime::never );
 		}
 		break;
 
@@ -461,7 +461,7 @@ static TIMER_CALLBACK(tp6525_delayed_irq)
 	}
 	else
 	{
-		timer_adjust_oneshot(tp6525_delayed_timer, ATTOTIME_IN_MSEC(1), 0);
+		timer_adjust_oneshot(tp6525_delayed_timer, attotime::from_msec(1), 0);
 	}
 }
 
@@ -479,7 +479,7 @@ void amigacd_tpi6525_irq(device_t *device, int level)
 		else
 		{
 			/* we *have to* deliver the irq, so if we can't, delay it and try again later */
-			timer_adjust_oneshot(tp6525_delayed_timer, ATTOTIME_IN_MSEC(1), 0);
+			timer_adjust_oneshot(tp6525_delayed_timer, attotime::from_msec(1), 0);
 		}
 	}
 }

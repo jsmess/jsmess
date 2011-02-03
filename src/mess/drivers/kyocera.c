@@ -1426,7 +1426,7 @@ static MACHINE_CONFIG_START( tandy200, tandy200_state )
 	MCFG_FRAGMENT_ADD(tandy200_video)
 
 	/* TP timer */
-	MCFG_TIMER_ADD_PERIODIC("tp", tandy200_tp_tick, HZ(XTAL_4_9152MHz/2/8192))
+	MCFG_TIMER_ADD_PERIODIC("tp", tandy200_tp_tick, attotime::from_hz(XTAL_4_9152MHz/2/8192))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

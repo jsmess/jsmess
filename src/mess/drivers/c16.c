@@ -470,7 +470,7 @@ static MACHINE_CONFIG_START( c16, c16_state )
 	MCFG_CPU_CONFIG( c16_m7501_interface )
 	MCFG_CPU_VBLANK_INT("screen", c16_frame_interrupt)
 	MCFG_CPU_PERIODIC_INT(c16_raster_interrupt, TED7360_HRETRACERATE)
-	MCFG_QUANTUM_TIME(HZ(60))
+	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_MACHINE_START( c16 )
 	MCFG_MACHINE_RESET( c16 )
@@ -515,9 +515,9 @@ static MACHINE_CONFIG_DERIVED( c16c, c16 )
 	MCFG_C1551_ADD("c1551", "maincpu", 8)
 
 #ifdef CPU_SYNC
-	MCFG_QUANTUM_TIME(HZ(60))
+	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 #else
-	MCFG_QUANTUM_TIME(HZ(6000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 #endif
 MACHINE_CONFIG_END
 
@@ -529,9 +529,9 @@ static MACHINE_CONFIG_DERIVED( c16v, c16 )
 	MCFG_CBM_IEC_ADD("iec", c16_iec_1541)
 	MCFG_C1541_ADD("c1541", "iec", 8)
 #ifdef CPU_SYNC
-	MCFG_QUANTUM_TIME(HZ(60))
+	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 #else
-	MCFG_QUANTUM_TIME(HZ(300000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(300000))
 #endif
 MACHINE_CONFIG_END
 
@@ -563,9 +563,9 @@ static MACHINE_CONFIG_DERIVED( plus4c, plus4 )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 #ifdef CPU_SYNC
-	MCFG_QUANTUM_TIME(HZ(60))
+	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 #else
-	MCFG_QUANTUM_TIME(HZ(60000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(60000))
 #endif
 MACHINE_CONFIG_END
 
@@ -580,9 +580,9 @@ static MACHINE_CONFIG_DERIVED( plus4v, plus4 )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 #ifdef CPU_SYNC
-	MCFG_QUANTUM_TIME(HZ(60))
+	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 #else
-	MCFG_QUANTUM_TIME(HZ(300000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(300000))
 #endif
 MACHINE_CONFIG_END
 

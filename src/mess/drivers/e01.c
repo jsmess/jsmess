@@ -442,7 +442,7 @@ static MACHINE_CONFIG_START( e01, e01_state )
 
 	MCFG_MC146818_ADD(HD146818_TAG, MC146818_STANDARD)
 
-	MCFG_TIMER_ADD_PERIODIC("rtc_hack", rtc_irq_hack, HZ(2)) // HACK!
+	MCFG_TIMER_ADD_PERIODIC("rtc_hack", rtc_irq_hack, attotime::from_hz(2)) // HACK!
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT( layout_e01 )

@@ -420,7 +420,7 @@ struct _ted7360_state
 		if(VERBOSE_LEVEL >= N) \
 		{ \
 			if( M ) \
-				logerror("%11.6f: %-24s", attotime_to_double(timer_get_time(device->machine)), (char*) M ); \
+				logerror("%11.6f: %-24s", timer_get_time(device->machine).as_double(), (char*) M ); \
 			logerror A; \
 		} \
 	} while(0)
@@ -482,12 +482,12 @@ struct _ted7360_state
 static attotime TEDTIME_IN_CYCLES(int pal, int cycles)
 {
 	double d = (double)(cycles) / (pal ? TED7360PAL_CLOCK : TED7360NTSC_CLOCK);
-	return double_to_attotime(d);
+	return attotime::from_double(d);
 }
 
 static int TEDTIME_TO_CYCLES(int pal, attotime t)
 {
-	double d = attotime_to_double(t);
+	double d = t.as_double();
 	return (int)((d) * (pal ? TED7360PAL_CLOCK : TED7360NTSC_CLOCK));
 }
 
@@ -549,7 +549,7 @@ static void ted7360_clear_interrupt( device_t *device, int mask )
 static int ted7360_rastercolumn( device_t *device )
 {
 	ted7360_state *ted7360 = get_safe_token(device);
-	return (int) ((attotime_to_double(timer_get_time(device->machine)) - ted7360->rastertime) * TED7360_VRETRACERATE * ted7360->lines * 57 * 8 + 0.5);
+	return (int) ((timer_get_time(device->machine).as_double() - ted7360->rastertime) * TED7360_VRETRACERATE * ted7360->lines * 57 * 8 + 0.5);
 }
 
 static TIMER_CALLBACK(ted7360_timer_timeout)
@@ -859,7 +859,7 @@ WRITE8_DEVICE_HANDLER( ted7360_port_w )
 		if (ted7360->timer1_active)
 		{
 			ted7360->reg[1] = TEDTIME_TO_CYCLES((ted7360->type == TED7360_PAL), timer_timeleft(ted7360->timer1)) >> 8;
-			timer_reset(ted7360->timer1, attotime_never);
+			timer_reset(ted7360->timer1, attotime::never);
 			ted7360->timer1_active = 0;
 		}
 		break;
@@ -873,7 +873,7 @@ WRITE8_DEVICE_HANDLER( ted7360_port_w )
 		if (ted7360->timer2_active)
 		{
 			ted7360->reg[3] = TEDTIME_TO_CYCLES((ted7360->type == TED7360_PAL), timer_timeleft(ted7360->timer2)) >> 8;
-			timer_reset(ted7360->timer2, attotime_never);
+			timer_reset(ted7360->timer2, attotime::never);
 			ted7360->timer2_active = 0;
 		}
 		break;
@@ -887,7 +887,7 @@ WRITE8_DEVICE_HANDLER( ted7360_port_w )
 		if (ted7360->timer3_active)
 		{
 			ted7360->reg[5] = TEDTIME_TO_CYCLES((ted7360->type == TED7360_PAL), timer_timeleft(ted7360->timer3)) >> 8;
-			timer_reset(ted7360->timer3, attotime_never);
+			timer_reset(ted7360->timer3, attotime::never);
 			ted7360->timer3_active = 0;
 		}
 		break;
@@ -1183,7 +1183,7 @@ void ted7360_raster_interrupt_gen( device_t *device )
 	ted7360_state *ted7360 = get_safe_token(device);
 
 	ted7360->rasterline++;
-	ted7360->rastertime = attotime_to_double(timer_get_time(device->machine));
+	ted7360->rastertime = timer_get_time(device->machine).as_double();
 	if (ted7360->rasterline >= ted7360->lines)
 	{
 		ted7360->rasterline = 0;

@@ -197,7 +197,7 @@ static UINT8 sms_vdp_hcount( running_machine *machine )
 	int max_hpos = screen->width() - 1;
 
 	if (hpos == max_hpos)
-		time_end = attotime_zero;
+		time_end = attotime::zero;
 	else
 		time_end = screen->time_until_pos(vpos, max_hpos);
 	calc_cycles = machine->device<cpu_device>("maincpu")->attotime_to_clocks(time_end);
@@ -356,7 +356,7 @@ static void sms_get_inputs( address_space *space )
 	}
 
 	/* Check if lightgun has been chosen as input: if so, enable crosshair */
-	timer_set(machine, attotime_zero, NULL, 0, lightgun_tick);
+	timer_set(machine, attotime::zero, NULL, 0, lightgun_tick);
 
 	/* Player 1 */
 	switch (input_port_read_safe(machine, "CTRLSEL", 0x00) & 0x0f)
@@ -1706,7 +1706,7 @@ MACHINE_START( sms )
 
 	machine->add_notifier(MACHINE_NOTIFY_EXIT, sms_machine_stop);
 	state->rapid_fire_timer = timer_alloc(machine, rapid_fire_callback , NULL);
-	timer_adjust_periodic(state->rapid_fire_timer, ATTOTIME_IN_HZ(10), 0, ATTOTIME_IN_HZ(10));
+	timer_adjust_periodic(state->rapid_fire_timer, attotime::from_hz(10), 0, attotime::from_hz(10));
 
 	state->lphaser_1_timer = timer_alloc(machine, lphaser_1_callback , NULL);
 	state->lphaser_2_timer = timer_alloc(machine, lphaser_2_callback , NULL);
@@ -1720,7 +1720,7 @@ MACHINE_START( sms )
 	state->right_lcd = machine->device("right_lcd");
 	
 	/* Check if lightgun has been chosen as input: if so, enable crosshair */
-	timer_set(machine, attotime_zero, NULL, 0, lightgun_tick);
+	timer_set(machine, attotime::zero, NULL, 0, lightgun_tick);
 }
 
 #ifdef MESS

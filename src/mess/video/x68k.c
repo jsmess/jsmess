@@ -392,7 +392,7 @@ WRITE16_HANDLER( x68k_crtc_w )
 			attotime irq_time;
 			irq_time = space->machine->primary_screen->time_until_pos((data) / state->crtc.vmultiple,2);
 
-			if(attotime_to_double(irq_time) > 0)
+			if(irq_time.as_double() > 0)
 				timer_adjust_oneshot(state->raster_irq, irq_time, (data) / state->crtc.vmultiple);
 		}
 		logerror("CRTC: Write to raster IRQ register - %i\n",data);
@@ -444,12 +444,12 @@ WRITE16_HANDLER( x68k_crtc_w )
 		if(data & 0x08)  // text screen raster copy
 		{
 			x68k_crtc_text_copy(state, (state->crtc.reg[22] & 0xff00) >> 8,(state->crtc.reg[22] & 0x00ff));
-			timer_set(space->machine, ATTOTIME_IN_MSEC(1), NULL, 0x02,x68k_crtc_operation_end);  // time taken to do operation is a complete guess.
+			timer_set(space->machine, attotime::from_msec(1), NULL, 0x02,x68k_crtc_operation_end);  // time taken to do operation is a complete guess.
 		}
 		if(data & 0x02)  // high-speed graphic screen clear
 		{
 			memset(state->gvram,0,0x40000);
-			timer_set(space->machine, ATTOTIME_IN_MSEC(10), NULL, 0x02,x68k_crtc_operation_end);  // time taken to do operation is a complete guess.
+			timer_set(space->machine, attotime::from_msec(10), NULL, 0x02,x68k_crtc_operation_end);  // time taken to do operation is a complete guess.
 		}
 		break;
 	}
@@ -1107,7 +1107,7 @@ VIDEO_START( x68000 )
 	tilemap_set_transparent_pen(state->bg0_16,0);
 	tilemap_set_transparent_pen(state->bg1_16,0);
 
-//  timer_adjust_periodic(state->scanline_timer, attotime_zero, 0, ATTOTIME_IN_HZ(55.45)/568);
+//  timer_adjust_periodic(state->scanline_timer, attotime::zero, 0, attotime::from_hz(55.45)/568);
 }
 
 VIDEO_UPDATE( x68000 )

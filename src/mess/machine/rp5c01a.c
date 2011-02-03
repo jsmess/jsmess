@@ -338,10 +338,10 @@ static DEVICE_START( rp5c01a )
 
 	/* create the timers */
 	rp5c01a->clock_timer = timer_alloc(device->machine, clock_tick, (void *)device);
-	timer_adjust_periodic(rp5c01a->clock_timer, attotime_zero, 0, ATTOTIME_IN_HZ(1));
+	timer_adjust_periodic(rp5c01a->clock_timer, attotime::zero, 0, attotime::from_hz(1));
 
 	rp5c01a->alarm_timer = timer_alloc(device->machine, alarm_tick, (void *)device);
-	timer_adjust_periodic(rp5c01a->alarm_timer, attotime_zero, 0, ATTOTIME_IN_HZ(16));
+	timer_adjust_periodic(rp5c01a->alarm_timer, attotime::zero, 0, attotime::from_hz(16));
 	timer_enable(rp5c01a->alarm_timer, 0);
 
 	/* register for state saving */

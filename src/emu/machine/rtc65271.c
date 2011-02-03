@@ -25,10 +25,10 @@ static TIMER_CALLBACK( rtc_end_update_callback );
 
 /* Delay between the beginning (UIP asserted) and the end (UIP cleared and
 update interrupt asserted) of the update cycle */
-#define UPDATE_CYCLE_TIME ATTOTIME_IN_USEC(1984)
+#define UPDATE_CYCLE_TIME attotime::from_usec(1984)
 /* Delay between the assertion of UIP and the effective start of the update
 cycle */
-/*#define UPDATE_CYCLE_DELAY ATTOTIME_IN_USEC(244)*/
+/*#define UPDATE_CYCLE_DELAY attotime::from_usec(244)*/
 
 typedef struct _rtc65271_state rtc65271_state;
 struct _rtc65271_state
@@ -408,12 +408,12 @@ void rtc65271_w(device_t *device, int xramsel, offs_t offset, UINT8 data)
 				{
 					if (data & reg_A_RS)
 					{
-						attotime period = ATTOTIME_IN_HZ(SQW_freq_table[data & reg_A_RS]);
-						attotime half_period = attotime_div(period, 2);
+						attotime period = attotime::from_hz(SQW_freq_table[data & reg_A_RS]);
+						attotime half_period = period / 2;
 						attotime elapsed = timer_timeelapsed(state->update_timer);
 
-						if (attotime_compare(half_period, elapsed) > 0)
-							timer_adjust_oneshot(state->SQW_timer, attotime_sub(half_period, elapsed), 0);
+						if (half_period > elapsed)
+							timer_adjust_oneshot(state->SQW_timer, half_period - elapsed, 0);
 						else
 							timer_adjust_oneshot(state->SQW_timer, half_period, 0);
 					}
@@ -422,7 +422,7 @@ void rtc65271_w(device_t *device, int xramsel, offs_t offset, UINT8 data)
 						state->SQW_internal_state = 0;	/* right??? */
 
 						/* Stop the divider used for SQW and periodic interrupts. */
-						timer_adjust_oneshot(state->SQW_timer, attotime_never, 0);
+						timer_adjust_oneshot(state->SQW_timer, attotime::never, 0);
 					}
 				}
 				/* The UIP bit is read-only */
@@ -505,7 +505,7 @@ static TIMER_CALLBACK( rtc_SQW_callback )
 		field_interrupts(device);
 	}
 
-	half_period = attotime_div(ATTOTIME_IN_HZ(SQW_freq_table[state->regs[reg_A] & reg_A_RS]), 2);
+	half_period = attotime::from_hz(SQW_freq_table[state->regs[reg_A] & reg_A_RS]) / 2;
 	timer_adjust_oneshot(state->SQW_timer, half_period, 0);
 }
 
@@ -689,7 +689,7 @@ static DEVICE_START( rtc65271 )
 	rtc65271_state *state = get_safe_token(device);
 
 	state->update_timer = timer_alloc(device->machine, rtc_begin_update_callback, (void *)device);
-	timer_adjust_periodic(state->update_timer, ATTOTIME_IN_SEC(1), 0, ATTOTIME_IN_SEC(1));
+	timer_adjust_periodic(state->update_timer, attotime::from_seconds(1), 0, attotime::from_seconds(1));
 	state->SQW_timer = timer_alloc(device->machine, rtc_SQW_callback, (void *)device);
 	state->interrupt_callback = config->interrupt_callback;
 

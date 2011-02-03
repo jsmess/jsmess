@@ -165,7 +165,7 @@ static MACHINE_CONFIG_START( n64, _n64_state )
 
 	MCFG_MACHINE_START( n64 )
 	MCFG_MACHINE_RESET( n64 )
-	MCFG_QUANTUM_TIME(HZ(600))
+	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

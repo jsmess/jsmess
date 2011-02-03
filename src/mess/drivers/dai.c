@@ -206,7 +206,7 @@ static MACHINE_CONFIG_START( dai, dai_state )
 	MCFG_CPU_ADD("maincpu", I8080, 2000000)
 	MCFG_CPU_PROGRAM_MAP(dai_mem)
 	MCFG_CPU_IO_MAP(dai_io)
-	MCFG_QUANTUM_TIME(HZ(60))
+	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_MACHINE_START( dai )
 	MCFG_MACHINE_RESET( dai )

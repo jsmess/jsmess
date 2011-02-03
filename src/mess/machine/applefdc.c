@@ -235,7 +235,7 @@ static DEVICE_RESET(applefdc)
 		}
 	}
 
-	timer_reset(fdc->motor_timer, attotime_never);
+	timer_reset(fdc->motor_timer, attotime::never);
 }
 
 
@@ -528,12 +528,12 @@ static void iwm_access(device_t *device, int offset)
 		case 0x08:
 			/* turn off motor */
 			timer_adjust_oneshot(fdc->motor_timer,
-				(fdc->mode & IWM_MODE_MOTOROFFDELAY) ? attotime_zero : ATTOTIME_IN_SEC(1), 0);
+				(fdc->mode & IWM_MODE_MOTOROFFDELAY) ? attotime::zero : attotime::from_seconds(1), 0);
 			break;
 
 		case 0x09:
 			/* turn on motor */
-			timer_adjust_oneshot(fdc->motor_timer, attotime_zero, 1);
+			timer_adjust_oneshot(fdc->motor_timer, attotime::zero, 1);
 			break;
 
 		case 0x0A:

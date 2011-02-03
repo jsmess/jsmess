@@ -49,7 +49,7 @@ static TIMER_CALLBACK( okean240_boot )
 
 static MACHINE_RESET(okean240) 
 {	
-	timer_set(machine, ATTOTIME_IN_USEC(10), NULL, 0, okean240_boot);
+	timer_set(machine, attotime::from_usec(10), NULL, 0, okean240_boot);
 	memory_set_bank(machine, "boot", 1);
 }
 

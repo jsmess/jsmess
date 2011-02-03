@@ -99,7 +99,7 @@ INLINE unsigned thom_video_elapsed ( running_machine *machine )
 {
 	unsigned u;
 	attotime elapsed = timer_timeelapsed( thom_video_timer );
-	u = attotime_mul( elapsed, 1000000 ).seconds;
+	u = (elapsed * 1000000 ).seconds;
 	if ( u >= 19968 )
 		u = 19968;
 	return u;
@@ -203,7 +203,7 @@ static void (*thom_lightpen_cb) ( running_machine *machine, int );
 
 void thom_set_lightpen_callback ( running_machine *machine, int nb, void (*cb) ( running_machine *machine, int step ) )
 {
-	LOG (( "%f thom_set_lightpen_callback called\n", attotime_to_double(timer_get_time(machine)) ));
+	LOG (( "%f thom_set_lightpen_callback called\n", timer_get_time(machine).as_double()));
 	thom_lightpen_nb = nb;
 	thom_lightpen_cb = cb;
 }
@@ -216,7 +216,7 @@ static TIMER_CALLBACK( thom_lightpen_step )
 		thom_lightpen_cb( machine, step );
 
 	if ( step < thom_lightpen_nb )
-		timer_adjust_oneshot(thom_lightpen_timer, ATTOTIME_IN_USEC( 64 ), step + 1);
+		timer_adjust_oneshot(thom_lightpen_timer, attotime::from_usec( 64 ), step + 1);
 }
 
 
@@ -822,7 +822,7 @@ static TIMER_CALLBACK( thom_scanline_start )
 
 	/* prepare for next scanline */
 	if ( y == 199 )
-		timer_adjust_oneshot(thom_scanline_timer, attotime_never, 0);
+		timer_adjust_oneshot(thom_scanline_timer, attotime::never, 0);
 	else
 	{
 
@@ -847,7 +847,7 @@ static TIMER_CALLBACK( thom_scanline_start )
 			thom_pal_changed = 0;
 		}
 
-		timer_adjust_oneshot(thom_scanline_timer, ATTOTIME_IN_USEC(64), y + 1);
+		timer_adjust_oneshot(thom_scanline_timer, attotime::from_usec(64), y + 1);
 	}
 }
 
@@ -913,7 +913,7 @@ VIDEO_UPDATE ( thom )
 	rectangle lrect = { 0, xbleft - 1, 0, 0 };
 	rectangle rrect = { xbright, xright - 1, 0, 0 };
 
-	//LOG (( "%f thom: video update called\n", attotime_to_double(timer_get_time(machine)) ));
+	//LOG (( "%f thom: video update called\n", timer_get_time(machine).as_double()));
 
 	/* upper border */
 	for ( y = 0; y < THOM_BORDER_HEIGHT - thom_bheight; y++ )
@@ -1025,12 +1025,12 @@ void thom_set_init_callback ( running_machine *machine, void (*cb) ( running_mac
 static TIMER_CALLBACK( thom_set_init )
 {
 	int init = param;
-	LOG (( "%f thom_set_init: %i, at line %i col %i\n", attotime_to_double(timer_get_time(machine)), init, thom_video_elapsed( machine ) / 64, thom_video_elapsed( machine ) % 64 ));
+	LOG (( "%f thom_set_init: %i, at line %i col %i\n", timer_get_time(machine).as_double(), init, thom_video_elapsed( machine ) / 64, thom_video_elapsed( machine ) % 64 ));
 
 	if ( thom_init_cb )
 		thom_init_cb( machine, init );
 	if ( ! init )
-		timer_adjust_oneshot(thom_init_timer, ATTOTIME_IN_USEC( 64 * THOM_ACTIVE_HEIGHT - 24 ), 1-init);
+		timer_adjust_oneshot(thom_init_timer, attotime::from_usec( 64 * THOM_ACTIVE_HEIGHT - 24 ), 1-init);
 }
 
 /* call this at the very begining of each new frame */
@@ -1041,7 +1041,7 @@ VIDEO_EOF ( thom )
 	UINT16 b = 0;
 	struct thom_vsignal l = thom_get_lightpen_vsignal( machine, 0, -1, 0 );
 
-	LOG (( "%f thom: video eof called\n", attotime_to_double(timer_get_time(machine)) ));
+	LOG (( "%f thom: video eof called\n", timer_get_time(machine).as_double() ));
 
 	/* floppy indicator count */
 	if ( thom_floppy_wcount )
@@ -1068,18 +1068,18 @@ VIDEO_EOF ( thom )
 	thom_vstate_dirty = 0;
 
 	/* schedule first init signal */
-	timer_adjust_oneshot(thom_init_timer, ATTOTIME_IN_USEC( 64 * THOM_BORDER_HEIGHT + 7 ), 0);
+	timer_adjust_oneshot(thom_init_timer, attotime::from_usec( 64 * THOM_BORDER_HEIGHT + 7 ), 0);
 
 	/* schedule first lightpen signal */
 	l.line &= ~1; /* hack (avoid lock in MO6 palette selection) */
 	timer_adjust_oneshot(thom_lightpen_timer,
-			   ATTOTIME_IN_USEC( 64 * ( THOM_BORDER_HEIGHT + l.line - 2 ) + 16 ), 0);
+			   attotime::from_usec( 64 * ( THOM_BORDER_HEIGHT + l.line - 2 ) + 16 ), 0);
 
 	/* schedule first active-area scanline call-back */
-	timer_adjust_oneshot(thom_scanline_timer, ATTOTIME_IN_USEC( 64 * THOM_BORDER_HEIGHT + 7), -1);
+	timer_adjust_oneshot(thom_scanline_timer, attotime::from_usec( 64 * THOM_BORDER_HEIGHT + 7), -1);
 
 	/* reset video frame time */
-	timer_adjust_oneshot(thom_video_timer, attotime_zero, 0);
+	timer_adjust_oneshot(thom_video_timer, attotime::zero, 0);
 
 	/* update screen size according to user options */
 	if ( thom_update_screen_size( machine ) )

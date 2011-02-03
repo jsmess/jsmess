@@ -494,7 +494,7 @@ static MACHINE_CONFIG_START( ibm5170, at_state )
 	MCFG_CPU_IO_MAP(at16_io)
 	MCFG_CPU_CONFIG(i286_address_mask)
 
-	MCFG_QUANTUM_TIME(HZ(60))
+	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_PIT8254_ADD( "pit8254", at_pit8254_config )
 
@@ -574,7 +574,7 @@ static MACHINE_CONFIG_START( ibm5162, at_state )
 	MCFG_CPU_IO_MAP(at16_io)
 	MCFG_CPU_CONFIG(i286_address_mask)
 
-	MCFG_QUANTUM_TIME(HZ(60))
+	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_PIT8254_ADD( "pit8254", at_pit8254_config )
 

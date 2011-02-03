@@ -230,7 +230,7 @@ bool abc80_state::video_update(screen_device &screen, bitmap_t &bitmap, const re
 //-------------------------------------------------
 
 MACHINE_CONFIG_FRAGMENT( abc80_video )
-	MCFG_TIMER_ADD_PERIODIC("blink", blink_tick, HZ(ABC80_XTAL/2/6/64/312/16))
+	MCFG_TIMER_ADD_PERIODIC("blink", blink_tick, attotime::from_hz(ABC80_XTAL/2/6/64/312/16))
 	MCFG_TIMER_ADD_SCANLINE("vsync_on", vsync_on_tick, SCREEN_TAG, 0, ABC80_VTOTAL)
 	MCFG_TIMER_ADD_SCANLINE("vsync_off", vsync_off_tick, SCREEN_TAG, 16, ABC80_VTOTAL)
 

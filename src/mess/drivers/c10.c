@@ -51,7 +51,7 @@ static TIMER_CALLBACK( c10_reset )
 static MACHINE_RESET(c10)
 {
 	memory_set_bank(machine, "boot", 1);
-	timer_set(machine, ATTOTIME_IN_USEC(4), NULL, 0, c10_reset);
+	timer_set(machine, attotime::from_usec(4), NULL, 0, c10_reset);
 }
 
 static VIDEO_START( c10 )

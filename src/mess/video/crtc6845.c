@@ -109,7 +109,7 @@ struct mscrtc6845 *mscrtc6845_init(running_machine *machine, const struct mscrtc
 	int idx;
 
 	crtc = auto_alloc_clear(machine, struct mscrtc6845);
-	crtc->cursor_time = attotime_to_double(timer_get_time(machine));
+	crtc->cursor_time = timer_get_time(machine).as_double();
 	crtc->config = *config;
 	mscrtc6845 = crtc;
 
@@ -152,7 +152,7 @@ void mscrtc6845_time(running_machine *machine, struct mscrtc6845 *crtc)
 	double neu, ftime;
 	struct mscrtc6845_cursor cursor;
 
-	neu = attotime_to_double(timer_get_time(machine));
+	neu = timer_get_time(machine).as_double();
 
 	if (mscrtc6845_clocks_in_frame(crtc) == 0.0)
 		return;

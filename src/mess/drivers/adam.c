@@ -1721,7 +1721,7 @@ static MACHINE_CONFIG_START( adam, adam_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	// devices
-	MCFG_TIMER_ADD_PERIODIC("paddles", paddle_tick, MSEC(20))
+	MCFG_TIMER_ADD_PERIODIC("paddles", paddle_tick, attotime::from_msec(20))
 	MCFG_WD2793_ADD(WD2793_TAG, fdc_intf)
 	MCFG_FLOPPY_DRIVE_ADD(FLOPPY_0, adam_floppy_config)
 	MCFG_CASSETTE_ADD(CASSETTE1_TAG, adam_cassette_config)

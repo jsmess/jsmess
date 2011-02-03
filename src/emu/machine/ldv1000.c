@@ -43,7 +43,7 @@
 #define SCAN_SPEED						(2000 / 30)			/* 2000 frames/second */
 #define SEEK_FAST_SPEED					(4000 / 30)			/* 4000 frames/second */
 
-#define MULTIJUMP_TRACK_TIME			ATTOTIME_IN_USEC(50)
+#define MULTIJUMP_TRACK_TIME			attotime::from_usec(50)
 
 
 
@@ -257,13 +257,13 @@ static void ldv1000_vsync(laserdisc_state *ld, const vbi_metadata *vbi, int fiel
 
 	/* signal VSYNC and set a timer to turn it off */
 	player->vsync = TRUE;
-	timer_set(ld->device->machine, attotime_mul(ld->screen->scan_period(), 4), ld, 0, vsync_off);
+	timer_set(ld->device->machine, ld->screen->scan_period() * 4, ld, 0, vsync_off);
 
 	/* also set a timer to fetch the VBI data when it is ready */
 	timer_set(ld->device->machine, ld->screen->time_until_pos(19*2), ld, 0, vbi_data_fetch);
 
 	/* boost interleave for the first 1ms to improve communications */
-	cpuexec_boost_interleave(ld->device->machine, attotime_zero, ATTOTIME_IN_MSEC(1));
+	cpuexec_boost_interleave(ld->device->machine, attotime::zero, attotime::from_msec(1));
 }
 
 

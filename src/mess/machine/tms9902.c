@@ -229,9 +229,9 @@ static void reload_interval_timer(device_t *device)
 	if (tms9902->TMR)
 	{	/* reset clock interval */
 		timer_adjust_periodic(tms9902->timer,
-						double_to_attotime((double) tms9902->TMR / (tms9902->clock_rate / ((tms9902->CLK4M) ? 4. : 3.) / 64.)),
+						attotime::from_double((double) tms9902->TMR / (tms9902->clock_rate / ((tms9902->CLK4M) ? 4. : 3.) / 64.)),
 						0,
-						double_to_attotime((double) tms9902->TMR / (tms9902->clock_rate / ((tms9902->CLK4M) ? 4. : 3.) / 64.)));
+						attotime::from_double((double) tms9902->TMR / (tms9902->clock_rate / ((tms9902->CLK4M) ? 4. : 3.) / 64.)));
 	}
 	else
 	{	/* clock interval == 0 -> no timer */
@@ -581,7 +581,7 @@ static DEVICE_STOP( tms9902 )
 
 	if (tms9902->timer)
 	{
-		timer_reset(tms9902->timer, attotime_never);	/* FIXME - timers should only be allocated once */
+		timer_reset(tms9902->timer, attotime::never);	/* FIXME - timers should only be allocated once */
 		tms9902->timer = NULL;
 	}
 }

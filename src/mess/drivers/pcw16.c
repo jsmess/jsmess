@@ -1361,11 +1361,11 @@ static MACHINE_START( pcw16 )
 	state->interrupt_counter = 0;
 
 	/* video ints */
-	timer_pulse(machine, ATTOTIME_IN_USEC(5830), NULL, 0,pcw16_timer_callback);
+	timer_pulse(machine, attotime::from_usec(5830), NULL, 0,pcw16_timer_callback);
 	/* rtc timer */
-	timer_pulse(machine, ATTOTIME_IN_HZ(256), NULL, 0, rtc_timer_callback);
+	timer_pulse(machine, attotime::from_hz(256), NULL, 0, rtc_timer_callback);
 	/* keyboard timer */
-	timer_pulse(machine, ATTOTIME_IN_HZ(50), NULL, 0, pcw16_keyboard_timer_callback);
+	timer_pulse(machine, attotime::from_hz(50), NULL, 0, pcw16_keyboard_timer_callback);
 
 
 	pc_fdc_init(machine, &pcw16_fdc_interface);
@@ -1421,7 +1421,7 @@ static MACHINE_CONFIG_START( pcw16, pcw16_state )
 	MCFG_CPU_ADD("maincpu", Z80, 16000000)
 	MCFG_CPU_PROGRAM_MAP(pcw16_map)
 	MCFG_CPU_IO_MAP(pcw16_io)
-	MCFG_QUANTUM_TIME(HZ(60))
+	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_MACHINE_START( pcw16 )
 

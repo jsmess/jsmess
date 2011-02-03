@@ -44,7 +44,7 @@ static struct
 /* but the interrupt test does some precise timing, and fails */
 /* if it's not 8 */
 #define VICTORY_MICRO_STATE_CLOCK	(XTAL_11_289MHz)
-#define MICRO_STATE_CLOCK_PERIOD	ATTOTIME_IN_HZ(VICTORY_MICRO_STATE_CLOCK / 8)
+#define MICRO_STATE_CLOCK_PERIOD	attotime::from_hz(VICTORY_MICRO_STATE_CLOCK / 8)
 
 
 /* debugging constants */
@@ -192,7 +192,7 @@ READ8_HANDLER( victory_video_control_r )
 			// D5 = 5VIRQ
 			// D4 = 5BCIRQ (3B1)
 			// D3 = SL256
-			if (micro.timer_active && attotime_compare(timer_timeelapsed(micro.timer), micro.endtime) < 0)
+			if (micro.timer_active && timer_timeelapsed(micro.timer) < micro.endtime)
 				result |= 0x80;
 			result |= (~fgcoll & 1) << 6;
 			result |= (~vblank_irq & 1) << 5;
@@ -526,22 +526,22 @@ Registers:
 
 INLINE void count_states(int states)
 {
-	attotime state_time = attotime_make(0, attotime_to_attoseconds(MICRO_STATE_CLOCK_PERIOD) * states);
+	attotime state_time = MICRO_STATE_CLOCK_PERIOD * states;
 
 	if (!micro.timer)
 	{
-		timer_adjust_oneshot(micro.timer, attotime_never, 0);
+		timer_adjust_oneshot(micro.timer, attotime::never, 0);
 		micro.timer_active = 1;
 		micro.endtime = state_time;
 	}
-	else if (attotime_compare(timer_timeelapsed(micro.timer), micro.endtime) > 0)
+	else if (timer_timeelapsed(micro.timer) > micro.endtime)
 	{
-		timer_adjust_oneshot(micro.timer, attotime_never, 0);
+		timer_adjust_oneshot(micro.timer, attotime::never, 0);
 		micro.timer_active = 1;
 		micro.endtime = state_time;
 	}
 	else
-		micro.endtime = attotime_add(micro.endtime, state_time);
+		micro.endtime += state_time;
 }
 
 

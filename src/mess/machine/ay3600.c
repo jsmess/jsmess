@@ -322,7 +322,7 @@ int AY3600_init(running_machine *machine)
 
 	/* We poll the keyboard periodically to scan the keys.  This is
     actually consistent with how the AY-3600 keyboard controller works. */
-	timer_pulse(machine, ATTOTIME_IN_HZ(60), NULL, 0, AY3600_poll);
+	timer_pulse(machine, attotime::from_hz(60), NULL, 0, AY3600_poll);
 
 	/* Set Caps Lock light to ON, since that's how we default it. */
 	set_led_status(machine,1,1);

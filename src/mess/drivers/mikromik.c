@@ -718,7 +718,7 @@ static MACHINE_CONFIG_START( mm1, mm1_state )
 	MCFG_CPU_PROGRAM_MAP(mm1_map)
 	MCFG_CPU_CONFIG(i8085_intf)
 
-	MCFG_TIMER_ADD_PERIODIC("kbclk", kbclk_tick, HZ(2500)) //HZ(XTAL_6_144MHz/2/8))
+	MCFG_TIMER_ADD_PERIODIC("kbclk", kbclk_tick, attotime::from_hz(2500)) //attotime::from_hz(XTAL_6_144MHz/2/8))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD( SCREEN_TAG, RASTER )

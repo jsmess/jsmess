@@ -351,7 +351,7 @@ static TIMER_CALLBACK( touch_cb )
 
 			if (++touch_data_count == 3)
 			{
-				timer_reset(touch_timer, attotime_never);
+				timer_reset(touch_timer, attotime::never);
 				touch_state = IDLE;
 			}
 			else
@@ -368,7 +368,7 @@ static INPUT_CHANGED( touchscreen_press )
 {
 	if (newval == 0)
 	{
-		attotime rx_period = attotime_mul(ATTOTIME_IN_HZ(10000), 16);
+		attotime rx_period = attotime::from_hz(10000) * 16;
 
 		/* Each touch screen packet is 3 bytes */
 		touch_data[0] = 0x2a;
@@ -582,7 +582,7 @@ static MACHINE_START( jpmsys5v )
 
 static MACHINE_RESET( jpmsys5v )
 {
-	timer_reset(touch_timer, attotime_never);
+	timer_reset(touch_timer, attotime::never);
 	touch_state = IDLE;
 	a2_data_in = 1;
 	a2_acia_dcd = 0;

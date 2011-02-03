@@ -391,9 +391,9 @@ static TIMER_CALLBACK( update_nmi )
 
 static MACHINE_START( polgar )
 {
-	// timer_pulse(machine, ATTOTIME_IN_HZ(60), NULL, 0, update_leds);
-	timer_pulse(machine, ATTOTIME_IN_HZ(600), NULL, 0, update_nmi);
-	timer_pulse(machine, ATTOTIME_IN_HZ(100), NULL, 0, mboard_update_artwork);
+	// timer_pulse(machine, attotime::from_hz(60), NULL, 0, update_leds);
+	timer_pulse(machine, attotime::from_hz(600), NULL, 0, update_nmi);
+	timer_pulse(machine, attotime::from_hz(100), NULL, 0, mboard_update_artwork);
 	mboard_savestate_register(machine);
 }
 
@@ -410,7 +410,7 @@ static MACHINE_CONFIG_START( polgar, polgar_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M65C02,4915200)	/* 65C02 */
 	MCFG_CPU_PROGRAM_MAP(polgar_mem)
-	MCFG_QUANTUM_TIME(HZ(60))
+	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 	MCFG_MACHINE_START( polgar )
 	MCFG_MACHINE_RESET( polgar )
 

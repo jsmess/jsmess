@@ -387,7 +387,7 @@ static DEVICE_START( tc8521 )
 {
 	tc8521_t *rtc = get_token(device);
 	memset(rtc, 0, sizeof(*rtc));
-	timer_pulse(device->machine, ATTOTIME_IN_HZ(32), (void *) device, 0, tc8521_timer_callback);
+	timer_pulse(device->machine, attotime::from_hz(32), (void *) device, 0, tc8521_timer_callback);
 }
 
 

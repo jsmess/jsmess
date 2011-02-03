@@ -94,5 +94,5 @@ MACHINE_RESET( ondra )
 
 MACHINE_START(ondra)
 {
-	timer_pulse(machine, ATTOTIME_IN_HZ(10), NULL, 0, nmi_check_callback);
+	timer_pulse(machine, attotime::from_hz(10), NULL, 0, nmi_check_callback);
 }

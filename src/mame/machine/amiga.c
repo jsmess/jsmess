@@ -400,7 +400,7 @@ static TIMER_CALLBACK( amiga_irq_proc )
 	amiga_state *state = machine->driver_data<amiga_state>();
 
 	update_irqs(machine);
-	timer_reset( state->irq_timer, attotime_never);
+	timer_reset( state->irq_timer, attotime::never);
 }
 
 
@@ -937,7 +937,7 @@ static TIMER_CALLBACK( amiga_blitter_proc )
 	amiga_custom_w(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), REG_INTREQ, 0x8000 | INTENA_BLIT, 0xffff);
 
 	/* reset the blitter timer */
-	timer_reset( state->blitter_timer, attotime_never);
+	timer_reset( state->blitter_timer, attotime::never);
 }
 
 
@@ -1515,7 +1515,7 @@ attotime amiga_get_serial_char_period(running_machine *machine)
 	UINT32 divisor = (CUSTOM_REG(REG_SERPER) & 0x7fff) + 1;
 	UINT32 baud = cputag_get_clock(machine, "maincpu") / 2 / divisor;
 	UINT32 numbits = 2 + ((CUSTOM_REG(REG_SERPER) & 0x8000) ? 9 : 8);
-	return attotime_mul(ATTOTIME_IN_HZ(baud), numbits);
+	return attotime::from_hz(baud) * numbits;
 }
 
 

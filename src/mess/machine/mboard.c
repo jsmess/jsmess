@@ -217,20 +217,20 @@ WRITE32_HANDLER( mboard_write_board_32 )
 WRITE8_HANDLER( mboard_write_LED_8 )
 {
 	write_LED(data);
-	cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(7));
+	cpu_spinuntil_time(space->cpu, attotime::from_usec(7));
 }
 
 WRITE16_HANDLER( mboard_write_LED_16 )
 {
 	 write_LED(data >> 8);
-	 cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(9));
+	 cpu_spinuntil_time(space->cpu, attotime::from_usec(9));
 }
 
 WRITE32_HANDLER( mboard_write_LED_32 )
 {
 	data = data | data << 24;
 	write_LED(data >> 24);
-	cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(20));
+	cpu_spinuntil_time(space->cpu, attotime::from_usec(20));
 }
 
 

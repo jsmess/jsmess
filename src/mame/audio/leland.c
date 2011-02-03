@@ -694,7 +694,7 @@ static DEVICE_RESET( leland_80186_sound )
 static IRQ_CALLBACK( int_callback )
 {
 	leland_sound_state *state = get_safe_token(device->machine->device("custom"));
-	if (LOG_INTERRUPTS) logerror("(%f) **** Acknowledged interrupt vector %02X\n", attotime_to_double(timer_get_time(device->machine)), state->i80186.intr.poll_status & 0x1f);
+	if (LOG_INTERRUPTS) logerror("(%f) **** Acknowledged interrupt vector %02X\n", timer_get_time(device->machine).as_double(), state->i80186.intr.poll_status & 0x1f);
 
 	/* clear the interrupt */
 	cpu_set_input_line(state->i80186.cpu, 0, CLEAR_LINE);
@@ -809,7 +809,7 @@ generate_int:
 	if (!state->i80186.intr.pending)
 		cputag_set_input_line(machine, "audiocpu", 0, ASSERT_LINE);
 	state->i80186.intr.pending = 1;
-	if (LOG_INTERRUPTS) logerror("(%f) **** Requesting interrupt vector %02X\n", attotime_to_double(timer_get_time(machine)), new_vector);
+	if (LOG_INTERRUPTS) logerror("(%f) **** Requesting interrupt vector %02X\n", timer_get_time(machine).as_double(), new_vector);
 }
 
 
@@ -836,7 +836,7 @@ static void handle_eoi(device_t *device, int data)
 			case 0x0f:	state->i80186.intr.in_service &= ~0x80;	break;
 			default:	logerror("%s:ERROR - 80186 EOI with unknown vector %02X\n", cpuexec_describe_context(machine), data & 0x1f);
 		}
-		if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for vector %02X\n", attotime_to_double(timer_get_time(machine)), data & 0x1f);
+		if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for vector %02X\n", timer_get_time(machine).as_double(), data & 0x1f);
 	}
 
 	/* non-specific case */
@@ -849,7 +849,7 @@ static void handle_eoi(device_t *device, int data)
 			if ((state->i80186.intr.timer & 7) == i && (state->i80186.intr.in_service & 0x01))
 			{
 				state->i80186.intr.in_service &= ~0x01;
-				if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for timer\n", attotime_to_double(timer_get_time(machine)));
+				if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for timer\n", timer_get_time(machine).as_double());
 				return;
 			}
 
@@ -858,7 +858,7 @@ static void handle_eoi(device_t *device, int data)
 				if ((state->i80186.intr.dma[j] & 7) == i && (state->i80186.intr.in_service & (0x04 << j)))
 				{
 					state->i80186.intr.in_service &= ~(0x04 << j);
-					if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for DMA%d\n", attotime_to_double(timer_get_time(machine)), j);
+					if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for DMA%d\n", timer_get_time(machine).as_double(), j);
 					return;
 				}
 
@@ -867,7 +867,7 @@ static void handle_eoi(device_t *device, int data)
 				if ((state->i80186.intr.ext[j] & 7) == i && (state->i80186.intr.in_service & (0x10 << j)))
 				{
 					state->i80186.intr.in_service &= ~(0x10 << j);
-					if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for INT%d\n", attotime_to_double(timer_get_time(machine)), j);
+					if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for INT%d\n", timer_get_time(machine).as_double(), j);
 					return;
 				}
 		}
@@ -906,11 +906,11 @@ static TIMER_CALLBACK( internal_timer_int )
 	if (t->control & 0x0001)
 	{
 		int count = t->maxA ? t->maxA : 0x10000;
-		timer_adjust_oneshot(t->int_timer, attotime_mul(ATTOTIME_IN_HZ(2000000), count), which);
+		timer_adjust_oneshot(t->int_timer, attotime::from_hz(2000000) * count, which);
 		if (LOG_TIMER) logerror("  Repriming interrupt\n");
 	}
 	else
-		timer_adjust_oneshot(t->int_timer, attotime_never, which);
+		timer_adjust_oneshot(t->int_timer, attotime::never, which);
 }
 
 
@@ -922,7 +922,7 @@ static void internal_timer_sync(leland_sound_state *state, int which)
 	if (t->time_timer_active)
 	{
 		attotime current_time = timer_timeelapsed(t->time_timer);
-		int net_clocks = attotime_to_double(attotime_mul(attotime_sub(current_time, t->last_time), 2000000));
+		int net_clocks = ((current_time - t->last_time) * 2000000).as_double();
 		t->last_time = current_time;
 
 		/* set the max count bit if we passed the max */
@@ -1024,7 +1024,7 @@ static void internal_timer_update(leland_sound_state *state, int which, int new_
 				internal_timer_sync(state, which);
 
 				/* nuke the timer and force the interrupt timer to be recomputed */
-				timer_adjust_oneshot(t->time_timer, attotime_never, which);
+				timer_adjust_oneshot(t->time_timer, attotime::never, which);
 				t->time_timer_active = 0;
 				update_int_timer = 1;
 			}
@@ -1033,7 +1033,7 @@ static void internal_timer_update(leland_sound_state *state, int which, int new_
 			else if ((diff & 0x8000) && (new_control & 0x8000))
 			{
 				/* start the timing */
-				timer_adjust_oneshot(t->time_timer, attotime_never, which);
+				timer_adjust_oneshot(t->time_timer, attotime::never, which);
 				t->time_timer_active = 1;
 				update_int_timer = 1;
 			}
@@ -1062,11 +1062,11 @@ static void internal_timer_update(leland_sound_state *state, int which, int new_
 			{
 				int diff = t->maxA - t->count;
 				if (diff <= 0) diff += 0x10000;
-				timer_adjust_oneshot(t->int_timer, attotime_mul(ATTOTIME_IN_HZ(2000000), diff), which);
+				timer_adjust_oneshot(t->int_timer, attotime::from_hz(2000000) * diff, which);
 				if (LOG_TIMER) logerror("Set interrupt timer for %d\n", which);
 			}
 			else
-				timer_adjust_oneshot(t->int_timer, attotime_never, which);
+				timer_adjust_oneshot(t->int_timer, attotime::never, which);
 		}
 }
 
@@ -1153,7 +1153,7 @@ static void update_dma_control(leland_sound_state *state, int which, int new_con
 			if (LOG_DMA) logerror("Initiated DMA %d - count = %04X, source = %04X, dest = %04X\n", which, d->count, d->source, d->dest);
 
 			d->finished = 0;
-			timer_adjust_oneshot(d->finish_timer, attotime_mul(ATTOTIME_IN_HZ(state->dac[dacnum].frequency), count), which);
+			timer_adjust_oneshot(d->finish_timer, attotime::from_hz(state->dac[dacnum].frequency) * count, which);
 		}
 	}
 
@@ -1612,7 +1612,7 @@ INLINE void counter_update_count(struct counter_state *ctr)
 	if (ctr->timer)
 	{
 		/* determine how many 2MHz cycles are remaining */
-		int count = attotime_to_double(attotime_mul(timer_timeleft(ctr->timer), 2000000));
+		int count = (timer_timeleft(ctr->timer) * 2000000).as_double();
 		ctr->count = (count < 0) ? 0 : count;
 	}
 }
@@ -1696,7 +1696,7 @@ static WRITE16_DEVICE_HANDLER( pit8254_w )
 				if (ctr->count == 0) ctr->count = 0x10000;
 
 				/* reset/start the timer */
-				timer_adjust_oneshot(ctr->timer, attotime_never, 0);
+				timer_adjust_oneshot(ctr->timer, attotime::never, 0);
 
 				if (LOG_PIT) logerror("PIT counter %d set to %d (%d Hz)\n", which, ctr->count, 4000000 / ctr->count);
 

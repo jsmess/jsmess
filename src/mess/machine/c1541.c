@@ -958,7 +958,7 @@ static WRITE8_DEVICE_HANDLER( via1_pb_w )
 
 	if (c1541->ds != ds)
 	{
-		timer_adjust_periodic(c1541->bit_timer, attotime_zero, 0, ATTOTIME_IN_HZ(C2040_BITRATE[ds]/4));
+		timer_adjust_periodic(c1541->bit_timer, attotime::zero, 0, attotime::from_hz(C2040_BITRATE[ds]/4));
 		c1541->ds = ds;
 	}
 }

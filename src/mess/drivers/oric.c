@@ -388,7 +388,7 @@ static MACHINE_CONFIG_START( oric, oric_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 1000000)
 	MCFG_CPU_PROGRAM_MAP(oric_mem)
-	MCFG_QUANTUM_TIME(HZ(60))
+	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_MACHINE_START( oric )
 	MCFG_MACHINE_RESET( oric )

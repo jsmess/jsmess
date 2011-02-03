@@ -151,7 +151,7 @@ READ8_HANDLER ( zx80_io_r )
 			if ((cassette_input(space->machine->device("cassette")) < -0.75) && state->tape_bit)
 			{
 				state->tape_bit = 0x00;
-				timer_set(space->machine, ATTOTIME_IN_USEC(362), NULL, 0, zx_tape_pulse);
+				timer_set(space->machine, attotime::from_usec(362), NULL, 0, zx_tape_pulse);
 			}
 
 			data &= ~state->tape_bit;
@@ -216,7 +216,7 @@ READ8_HANDLER ( zx81_io_r )
 			if ((cassette_input(space->machine->device("cassette")) < -0.75) && state->tape_bit)
 			{
 				state->tape_bit = 0x00;
-				timer_set(space->machine, ATTOTIME_IN_USEC(362), NULL, 0, zx_tape_pulse);
+				timer_set(space->machine, attotime::from_usec(362), NULL, 0, zx_tape_pulse);
 			}
 
 			data &= ~state->tape_bit;
@@ -288,7 +288,7 @@ READ8_HANDLER ( pc8300_io_r )
 			if ((cassette_input(space->machine->device("cassette")) < -0.75) && state->tape_bit)
 			{
 				state->tape_bit = 0x00;
-				timer_set(space->machine, ATTOTIME_IN_USEC(362), NULL, 0, zx_tape_pulse);
+				timer_set(space->machine, attotime::from_usec(362), NULL, 0, zx_tape_pulse);
 			}
 
 			data &= ~state->tape_bit;
@@ -364,7 +364,7 @@ READ8_HANDLER ( pow3000_io_r )
 			if ((cassette_input(space->machine->device("cassette")) < -0.75) && state->tape_bit)
 			{
 				state->tape_bit = 0x00;
-				timer_set(space->machine, ATTOTIME_IN_USEC(362), NULL, 0, zx_tape_pulse);
+				timer_set(space->machine, attotime::from_usec(362), NULL, 0, zx_tape_pulse);
 			}
 
 			data &= ~state->tape_bit;
@@ -411,14 +411,14 @@ WRITE8_HANDLER ( zx81_io_w )
 
 	if (offs == 0xfd)
 	{
-		timer_reset(state->ula_nmi, attotime_never);
+		timer_reset(state->ula_nmi, attotime::never);
 
 		LOG_ZX81_IOW("ULA NMIs off");
 	}
 	else
 	if (offs == 0xfe)
 	{
-		timer_adjust_periodic(state->ula_nmi, attotime_zero, 0, space->machine->device<cpu_device>("maincpu")->cycles_to_attotime(207));
+		timer_adjust_periodic(state->ula_nmi, attotime::zero, 0, space->machine->device<cpu_device>("maincpu")->cycles_to_attotime(207));
 
 		LOG_ZX81_IOW("ULA NMIs on");
 

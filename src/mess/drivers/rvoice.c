@@ -365,7 +365,7 @@ static MACHINE_CONFIG_START( rvoicepc, rvoice_state )
 	//MCFG_CPU_ADD("playercpu", HD63701, XTAL_7_3728MHz) // not dumped yet
 	//MCFG_CPU_PROGRAM_MAP(hd63701_slave_mem)
 	//MCFG_CPU_IO_MAP(hd63701_slave_io)
-	MCFG_QUANTUM_TIME(HZ(60))
+	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 	MCFG_MACHINE_RESET(rvoicepc)
 
 	MCFG_ACIA6551_ADD("acia65c51")

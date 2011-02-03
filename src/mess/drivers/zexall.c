@@ -147,7 +147,7 @@ static MACHINE_CONFIG_START( zexall, zexall_state )
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_3_579545MHz*10)
 	MCFG_CPU_PROGRAM_MAP(z80_mem)
 	MCFG_CPU_IO_MAP(z80_io)
-	MCFG_QUANTUM_TIME(HZ(60))
+	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 	MCFG_MACHINE_RESET(zexall)
 
 	/* video hardware */

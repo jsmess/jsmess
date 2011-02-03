@@ -626,7 +626,7 @@ static DEVICE_START( i8257 )
 
 	/* create the DMA timer */
 	i8257->dma_timer = timer_alloc(device->machine, dma_tick, (void *)device);
-	timer_adjust_periodic(i8257->dma_timer, attotime_zero, 0, ATTOTIME_IN_HZ(device->clock()));
+	timer_adjust_periodic(i8257->dma_timer, attotime::zero, 0, attotime::from_hz(device->clock()));
 
 	/* register for state saving */
 	state_save_register_device_item(device, 0, i8257->mr);

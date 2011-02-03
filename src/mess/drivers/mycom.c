@@ -513,7 +513,7 @@ static MACHINE_START(mycom)
 	state->cassette = machine->device("cassette");
 	state->fdc = machine->device("fdc");
 	state->RAM = machine->region("maincpu")->base();
-	timer_pulse(machine, ATTOTIME_IN_HZ(20), NULL, 0, mycom_kbd);
+	timer_pulse(machine, attotime::from_hz(20), NULL, 0, mycom_kbd);
 }
 
 static MACHINE_RESET(mycom)

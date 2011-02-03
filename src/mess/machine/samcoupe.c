@@ -187,7 +187,7 @@ UINT8 samcoupe_mouse_r(running_machine *machine)
 	UINT8 result;
 
 	/* on a read, reset the timer */
-	timer_adjust_oneshot(state->mouse_reset, ATTOTIME_IN_USEC(50), 0);
+	timer_adjust_oneshot(state->mouse_reset, attotime::from_usec(50), 0);
 
 	/* update when we are about to read the first real values */
 	if (state->mouse_index == 2)

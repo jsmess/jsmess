@@ -110,7 +110,7 @@ enum
 /* set new blink state - record blink state in event list */
 void kc85_video_set_blink_state(running_machine *machine, int data)
 {
-	//spectrum_EventList_AddItemOffset(machine, KC85_VIDEO_EVENT_SET_BLINK_STATE, ((data & 0x01)<<7), machine->firstcpu->attotime_to_cycles(attotime_mul(machine->primary_screen->scan_period(), machine->primary_screen->vpos())));
+	//spectrum_EventList_AddItemOffset(machine, KC85_VIDEO_EVENT_SET_BLINK_STATE, ((data & 0x01)<<7), machine->firstcpu->attotime_to_cycles(machine->primary_screen->scan_period() * machine->primary_screen->vpos()));
 }
 
 
@@ -547,7 +547,7 @@ static void kc85_common_process_frame(running_machine *machine, bitmap_t *bitmap
 	/* process remainder */
 	kc85_common_vh_process_lines(state, &video_update, cycles_remaining_in_frame);
 	//spectrum_EventList_Reset(machine);
-	//spectrum_EventList_SetOffsetStartTime ( machine, machine->firstcpu->attotime_to_cycles(attotime_mul(machine->primary_screen->scan_period(), machine->primary_screen->vpos())) );
+	//spectrum_EventList_SetOffsetStartTime ( machine, machine->firstcpu->attotime_to_cycles(machine->primary_screen->scan_period() * machine->primary_screen->vpos()) );
 }
 
 

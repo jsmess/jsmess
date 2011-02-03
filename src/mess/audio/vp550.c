@@ -207,7 +207,7 @@ static TIMER_DEVICE_CALLBACK( sync_tick )
 -------------------------------------------------*/
 
 static MACHINE_CONFIG_FRAGMENT( vp550 )
-	MCFG_TIMER_ADD_PERIODIC("sync", sync_tick, HZ(50))
+	MCFG_TIMER_ADD_PERIODIC("sync", sync_tick, attotime::from_hz(50))
 
 	MCFG_CDP1863_ADD(CDP1863_A_TAG, 0, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)

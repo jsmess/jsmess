@@ -465,7 +465,7 @@ static void cdic_decode_audio_sector(running_machine *machine, const unsigned ch
 	if(hdr[2] == 0xff && triggered == 1)
 	{
 		// Don't play
-        //timer_adjust_oneshot(m_audio_sample_timer, attotime_never, 0);
+        //timer_adjust_oneshot(m_audio_sample_timer, attotime::never, 0);
 		return;
 	}
 
@@ -583,7 +583,7 @@ TIMER_CALLBACK( audio_sample_trigger )
     if(m_decode_addr == 0xffff)
 	{
 		verboselog(machine, 0, "Decode stop requested, stopping playback\n" );
-        timer_adjust_oneshot(m_audio_sample_timer, attotime_never, 0);
+        timer_adjust_oneshot(m_audio_sample_timer, attotime::never, 0);
 		return;
 	}
 
@@ -617,7 +617,7 @@ TIMER_CALLBACK( audio_sample_trigger )
 
 		//// Delay for Frequency * (18*28*2*size in bytes) before requesting more data
 		verboselog(machine, 0, "Data is valid, setting up a new callback\n" );
-        m_decode_period = attotime_mul(ATTOTIME_IN_HZ(CDIC_SAMPLE_BUF_FREQ(m_ram, m_decode_addr & 0x3ffe)), 18*28*2*CDIC_SAMPLE_BUF_SIZE(m_ram, m_decode_addr & 0x3ffe));
+        m_decode_period = attotime::from_hz(CDIC_SAMPLE_BUF_FREQ(m_ram, m_decode_addr & 0x3ffe)) * 18*28*2*CDIC_SAMPLE_BUF_SIZE(m_ram, m_decode_addr & 0x3ffe);
         timer_adjust_oneshot(m_audio_sample_timer, m_decode_period, 0);
 		//dmadac_enable(&dmadac[0], 2, 0);
 	}
@@ -802,13 +802,13 @@ TIMER_CALLBACK( cdic_trigger_readback_int )
 
                 if((buffer[CDIC_SECTOR_SUBMODE2] & CDIC_SUBMODE_EOF) == 0 && m_command != 0x23)
 				{
-                    timer_adjust_oneshot(m_interrupt_timer, ATTOTIME_IN_HZ(75), 0); // 75Hz = 1x CD-ROM speed
+                    timer_adjust_oneshot(m_interrupt_timer, attotime::from_hz(75), 0); // 75Hz = 1x CD-ROM speed
 				}
 				else
 				{
                     if(m_command == 0x23) // Mode 1 Reset
 					{
-                        timer_adjust_oneshot(m_interrupt_timer, attotime_never, 0);
+                        timer_adjust_oneshot(m_interrupt_timer, attotime::never, 0);
 					}
 				}
 			}
@@ -817,7 +817,7 @@ TIMER_CALLBACK( cdic_trigger_readback_int )
 		}
 		//case 0x24: // Mode 2 Reset
 		case 0x2e: // Abort
-            timer_adjust_oneshot(m_interrupt_timer, attotime_never, 0);
+            timer_adjust_oneshot(m_interrupt_timer, attotime::never, 0);
             //m_data_buffer &= ~4;
 			break;
 		case 0x28: // Play CDDA audio
@@ -877,7 +877,7 @@ TIMER_CALLBACK( cdic_trigger_readback_int )
 
             m_time = next_msf << 8;
 
-            timer_adjust_oneshot(m_interrupt_timer, ATTOTIME_IN_HZ(75), 0);
+            timer_adjust_oneshot(m_interrupt_timer, attotime::from_hz(75), 0);
 
             m_x_buffer |= 0x8000;
             //m_data_buffer |= 0x4000;
@@ -910,7 +910,7 @@ TIMER_CALLBACK( cdic_trigger_readback_int )
 			};
 			lba = nybbles[0] + nybbles[1]*10 + ((nybbles[2] + nybbles[3]*10)*75) + ((nybbles[4] + nybbles[5]*10)*75*60);
 
-            timer_adjust_oneshot(m_interrupt_timer, ATTOTIME_IN_HZ(75), 0);
+            timer_adjust_oneshot(m_interrupt_timer, attotime::from_hz(75), 0);
 
             cdrom_read_data(m_cd, lba, buffer, CD_TRACK_RAW_DONTCARE);
 
@@ -1012,7 +1012,7 @@ READ16_HANDLER( cdimono1_cdic_r )
 
 		case 0x3ffa/2: // AUDCTL
 		{
-            if(attotime_is_never(timer_timeleft(m_audio_sample_timer)))
+            if(timer_timeleft(m_audio_sample_timer).is_never())
 			{
                 m_z_buffer ^= 0x0001;
 			}
@@ -1128,17 +1128,17 @@ WRITE16_HANDLER( cdimono1_cdic_w )
             if(m_z_buffer & 0x2000)
 			{
                 attotime period = timer_timeleft(m_audio_sample_timer);
-				if(attotime_is_never(period))
+				if(period.is_never())
 				{
                     m_decode_addr = m_z_buffer & 0x3a00;
                     m_decode_delay = 1;
-                    timer_adjust_oneshot(m_audio_sample_timer, ATTOTIME_IN_HZ(75), 0);
+                    timer_adjust_oneshot(m_audio_sample_timer, attotime::from_hz(75), 0);
 				}
 			}
 			else
 			{
                 m_decode_addr = 0xffff;
-                timer_adjust_oneshot(m_audio_sample_timer, attotime_never, 0);
+                timer_adjust_oneshot(m_audio_sample_timer, attotime::never, 0);
 			}
 			break;
 		}
@@ -1157,14 +1157,14 @@ WRITE16_HANDLER( cdimono1_cdic_w )
 					//case 0x24: // Reset Mode 2
 					case 0x2e: // Abort
 					{
-                        timer_adjust_oneshot(m_interrupt_timer, attotime_never, 0);
+                        timer_adjust_oneshot(m_interrupt_timer, attotime::never, 0);
 						dmadac_enable(&state->dmadac[0], 2, 0);
                         //m_data_buffer &= 0xbfff;
 						break;
 					}
 					case 0x2b: // Stop CDDA
 						cdda_stop_audio(space->machine->device("cdda"));
-                        timer_adjust_oneshot(m_interrupt_timer, attotime_never, 0);
+                        timer_adjust_oneshot(m_interrupt_timer, attotime::never, 0);
 						break;
 					case 0x23: // Reset Mode 1
 					case 0x29: // Read Mode 1
@@ -1173,7 +1173,7 @@ WRITE16_HANDLER( cdimono1_cdic_w )
 					case 0x2c: // Seek
 					{
                         attotime period = timer_timeleft(m_interrupt_timer);
-						if(!attotime_is_never(period))
+						if(!period.is_never())
 						{
                             timer_adjust_oneshot(m_interrupt_timer, period, 0);
 						}
@@ -1181,7 +1181,7 @@ WRITE16_HANDLER( cdimono1_cdic_w )
 						{
                             if(m_command != 0x23 && m_command != 0x24)
 							{
-                                timer_adjust_oneshot(m_interrupt_timer, ATTOTIME_IN_HZ(75), 0);
+                                timer_adjust_oneshot(m_interrupt_timer, attotime::from_hz(75), 0);
 							}
 						}
 						break;

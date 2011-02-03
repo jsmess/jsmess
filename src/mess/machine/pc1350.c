@@ -126,7 +126,7 @@ MACHINE_START( pc1350 )
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	state->power = 1;
-	timer_set(machine, ATTOTIME_IN_SEC(1), NULL, 0, pc1350_power_up);
+	timer_set(machine, attotime::from_seconds(1), NULL, 0, pc1350_power_up);
 
 	memory_install_readwrite_bank(space, 0x6000, 0x6fff, 0, 0, "bank1");
 	memory_set_bankptr(machine, "bank1", &ram_get_ptr(machine->device(RAM_TAG))[0x0000]);

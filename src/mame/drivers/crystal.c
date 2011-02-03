@@ -287,7 +287,7 @@ INLINE void Timer_w( address_space *space, int which, UINT32 data, UINT32 mem_ma
 	{
 		int PD = (data >> 8) & 0xff;
 		int TCV = space->read_dword(0x01801404 + which * 8);
-		attotime period = attotime_mul(ATTOTIME_IN_HZ(43000000), (PD + 1) * (TCV + 1));
+		attotime period = attotime::from_hz(43000000) * ((PD + 1) * (TCV + 1));
 
 		if (state->Timerctrl[which] & 2)
 			timer_adjust_periodic(state->Timer[which], period, 0, period);
@@ -609,7 +609,7 @@ static MACHINE_RESET( crystal )
 	for (i = 0; i < 4; i++)
 	{
 		state->Timerctrl[i] = 0;
-		timer_adjust_oneshot(state->Timer[i], attotime_never, 0);
+		timer_adjust_oneshot(state->Timer[i], attotime::never, 0);
 	}
 
 	vr0_snd_set_areas(machine->device("vrender"), state->textureram, state->frameram);

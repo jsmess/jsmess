@@ -330,7 +330,7 @@ attotime apple1_vh_dsp_time_to_ready (running_machine *machine)
 	apple1_state *state = machine->driver_data<apple1_state>();
 	int cursor_x, cursor_y;
 	int cursor_scanline;
-	double scanline_period = attotime_to_double(machine->primary_screen->scan_period());
+	double scanline_period = machine->primary_screen->scan_period().as_double();
 	double cursor_hfrac;
 
 	/* The video hardware refreshes the screen by reading the
@@ -358,11 +358,11 @@ attotime apple1_vh_dsp_time_to_ready (running_machine *machine)
 		double current_hfrac = machine->primary_screen->hpos() /
 							   machine->first_screen()->width();
 		if (current_hfrac < cursor_hfrac)
-			return double_to_attotime(scanline_period * (cursor_hfrac - current_hfrac));
+			return attotime::from_double(scanline_period * (cursor_hfrac - current_hfrac));
 	}
 
-	return double_to_attotime(
-		attotime_to_double(machine->primary_screen->time_until_pos(cursor_scanline, 0)) +
+	return attotime::from_double(
+		machine->primary_screen->time_until_pos(cursor_scanline, 0).as_double() +
 		scanline_period * cursor_hfrac);
 }
 
@@ -378,7 +378,7 @@ static void apple1_vh_cursor_blink (running_machine *machine)
        number of one-third-cycles elapsed, then checking the result
        modulo 3. */
 
-	if (((int) (attotime_to_double(timer_get_time(machine)) / CURSOR_OFF_LENGTH)) % 3 < 2)
+	if (((int) (timer_get_time(machine).as_double() / CURSOR_OFF_LENGTH)) % 3 < 2)
 		new_blink_on = 1;
 	else
 		new_blink_on = 0;

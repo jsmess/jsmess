@@ -738,13 +738,13 @@ static MACHINE_CONFIG_START( einstein, einstein_state )
 
 	/* this is actually clocked at the system clock 4 MHz, but this would be too fast for our
     driver. So we update at 50Hz and hope this is good enough. */
-	MCFG_TIMER_ADD_PERIODIC("keyboard", einstein_keyboard_timer_callback, HZ(50))
+	MCFG_TIMER_ADD_PERIODIC("keyboard", einstein_keyboard_timer_callback, attotime::from_hz(50))
 
 	MCFG_Z80PIO_ADD(IC_I063, XTAL_X002 / 2, einstein_pio_intf)
 
 	MCFG_Z80CTC_ADD(IC_I058, XTAL_X002 / 2, einstein_ctc_intf)
 	/* the input to channel 0 and 1 of the ctc is a 2 MHz clock */
-	MCFG_TIMER_ADD_PERIODIC("ctc", einstein_ctc_trigger_callback, HZ(XTAL_X002 /4))
+	MCFG_TIMER_ADD_PERIODIC("ctc", einstein_ctc_trigger_callback, attotime::from_hz(XTAL_X002 /4))
 
 	/* Einstein daisy chain support for non-Z80 devices */
 	MCFG_DEVICE_ADD("keyboard_daisy", EINSTEIN_KEYBOARD_DAISY, 0)

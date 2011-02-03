@@ -42,7 +42,7 @@ extern void h8_3002_InterruptRequest(h83xx_state *h8, UINT8 source, UINT8 state)
 
 static void h8itu_timer_expire(h83xx_state *h8, int which)
 {
-	timer_adjust_oneshot(h8->timer[which], attotime_never, 0);
+	timer_adjust_oneshot(h8->timer[which], attotime::never, 0);
 	h8->h8TCNT[which] = 0;
 	h8->per_regs[tsr[which]] |= 4;
 	// interrupt on overflow ?
@@ -96,7 +96,7 @@ static void h8_itu_refresh_timer(h83xx_state *h8, int tnum)
 	ourTCR = h8->per_regs[tcr[tnum]];
 	ourTVAL = h8->h8TCNT[tnum];
 
-	period = attotime_mul(ATTOTIME_IN_HZ(h8->device->unscaled_clock()), tscales[ourTCR & 3] * (65536 - ourTVAL));
+	period = attotime::from_hz(h8->device->unscaled_clock()) * tscales[ourTCR & 3] * (65536 - ourTVAL);
 
 	if (ourTCR & 4)
 	{
@@ -115,10 +115,10 @@ static void h8_itu_sync_timers(h83xx_state *h8, int tnum)
 	ourTCR = h8->per_regs[tcr[tnum]];
 
 	// get the time per unit
-	cycle_time = attotime_mul(ATTOTIME_IN_HZ(h8->device->unscaled_clock()), tscales[ourTCR & 3]);
+	cycle_time = attotime::from_hz(h8->device->unscaled_clock()) * tscales[ourTCR & 3];
 	cur = timer_timeelapsed(h8->timer[tnum]);
 
-	ratio = attotime_to_double(cur) / attotime_to_double(cycle_time);
+	ratio = cur.as_double() / cycle_time.as_double();
 
 	h8->h8TCNT[tnum] = ratio;
 }
@@ -457,7 +457,7 @@ static void h8_3007_itu_refresh_timer(h83xx_state *h8, int tnum)
 	attotime period;
 	int ourTCR = h8->per_regs[0x68+(tnum*8)];
 
-	period = attotime_mul(ATTOTIME_IN_HZ(h8->device->unscaled_clock()), tscales[ourTCR & 3]);
+	period = attotime::from_hz(h8->device->unscaled_clock()) * tscales[ourTCR & 3];
 
 	if (ourTCR & 4)
 	{
@@ -489,7 +489,7 @@ static void h8itu_3007_timer_expire(h83xx_state *h8, int tnum)
 		else
 		{
 			//logerror("h8/3007 timer %d GRA match, stopping\n",tnum);
-			timer_adjust_oneshot(h8->timer[tnum], attotime_never, 0);
+			timer_adjust_oneshot(h8->timer[tnum], attotime::never, 0);
 		}
 
 		h8->per_regs[0x64] |= 1<<tnum;
@@ -511,7 +511,7 @@ static void h8itu_3007_timer_expire(h83xx_state *h8, int tnum)
 		else
 		{
 			//logerror("h8/3007 timer %d GRB match, stopping\n",tnum);
-			timer_adjust_oneshot(h8->timer[tnum], attotime_never, 0);
+			timer_adjust_oneshot(h8->timer[tnum], attotime::never, 0);
 		}
 
 		h8->per_regs[0x65] |= 1<<tnum;
@@ -790,5 +790,5 @@ void h8_itu_reset(h83xx_state *h8)
 
 	// stop all the timers
 	for (i=0; i<5; i++)
-		timer_adjust_oneshot(h8->timer[i], attotime_never, 0);
+		timer_adjust_oneshot(h8->timer[i], attotime::never, 0);
 }

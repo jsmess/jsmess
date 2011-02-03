@@ -29,13 +29,13 @@ static void electron_tape_start( electron_state *state )
 	state->ula.high_tone_set = 0;
 	state->ula.bit_count = 0;
 	state->ula.tape_running = 1;
-	timer_adjust_periodic(state->tape_timer, attotime_zero, 0, ATTOTIME_IN_HZ(4800));
+	timer_adjust_periodic(state->tape_timer, attotime::zero, 0, attotime::from_hz(4800));
 }
 
 static void electron_tape_stop( electron_state *state )
 {
 	state->ula.tape_running = 0;
-	timer_reset( state->tape_timer, attotime_never );
+	timer_reset( state->tape_timer, attotime::never );
 }
 
 #define TAPE_LOW	0x00;
@@ -349,7 +349,7 @@ MACHINE_START( electron )
 
 	state->ula.interrupt_status = 0x82;
 	state->ula.interrupt_control = 0x00;
-	timer_set(machine, attotime_zero, NULL, 0, setup_beep );
+	timer_set(machine, attotime::zero, NULL, 0, setup_beep );
 	state->tape_timer = timer_alloc(machine,  electron_tape_timer_handler, NULL );
 	machine->add_notifier(MACHINE_NOTIFY_RESET, electron_reset);
 }

@@ -341,7 +341,7 @@ void samcoupe_irq(device_t *device, UINT8 src)
 
 	/* assert irq and a timer to set it off again */
 	cpu_set_input_line(device, 0, ASSERT_LINE);
-	timer_set(device->machine, ATTOTIME_IN_USEC(20), NULL, src, irq_off);
+	timer_set(device->machine, attotime::from_usec(20), NULL, src, irq_off);
 
 	/* adjust STATUS register */
 	state->status &= ~src;

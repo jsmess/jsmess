@@ -304,7 +304,7 @@ WRITE8_HANDLER(spectrum_port_fe_w)
 	if ((Changed & 0x07)!=0)
 	{
 		/* yes - send event */
-		spectrum_EventList_AddItemOffset(space->machine, 0x0fe, data & 0x07, space->machine->device<cpu_device>("maincpu")->attotime_to_cycles(attotime_mul(space->machine->primary_screen->scan_period(), space->machine->primary_screen->vpos())));
+		spectrum_EventList_AddItemOffset(space->machine, 0x0fe, data & 0x07, space->machine->device<cpu_device>("maincpu")->attotime_to_cycles(space->machine->primary_screen->scan_period() * space->machine->primary_screen->vpos()));
 	}
 
 	if ((Changed & (1<<4))!=0)
@@ -711,7 +711,7 @@ MACHINE_CONFIG_START( spectrum_common, spectrum_state )
 	MCFG_CPU_PROGRAM_MAP(spectrum_mem)
 	MCFG_CPU_IO_MAP(spectrum_io)
 	MCFG_CPU_VBLANK_INT("screen", spec_interrupt)
-	MCFG_QUANTUM_TIME(HZ(60))
+	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_MACHINE_RESET( spectrum )
 

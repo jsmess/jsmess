@@ -1068,7 +1068,7 @@ static WRITE8_DEVICE_HANDLER( miot_pb_w )
 
 	if (c2040->ds != ds)
 	{
-		timer_adjust_periodic(c2040->bit_timer, attotime_zero, 0, ATTOTIME_IN_HZ(C2040_BITRATE[ds]/4));
+		timer_adjust_periodic(c2040->bit_timer, attotime::zero, 0, attotime::from_hz(C2040_BITRATE[ds]/4));
 		c2040->ds = ds;
 	}
 
@@ -1158,7 +1158,7 @@ static WRITE8_DEVICE_HANDLER( c8050_miot_pb_w )
 
 	if (c2040->ds != ds)
 	{
-		timer_adjust_periodic(c2040->bit_timer, attotime_zero, 0, ATTOTIME_IN_HZ(C8050_BITRATE[ds]));
+		timer_adjust_periodic(c2040->bit_timer, attotime::zero, 0, attotime::from_hz(C8050_BITRATE[ds]));
 		c2040->ds = ds;
 	}
 

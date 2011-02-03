@@ -103,7 +103,7 @@ static int to7_get_cassette ( running_machine *machine )
 			if ( bitpos >= to7_k7_bitsize )
 				bitpos = to7_k7_bitsize -1;
 			VLOG (( "$%04x %f to7_get_cassette: state=$%X pos=%f samppos=%i bit=%i\n",
-				cpu_get_previouspc(machine->device("maincpu")), attotime_to_double(timer_get_time(machine)), state, pos, bitpos,
+				cpu_get_previouspc(machine->device("maincpu")), timer_get_time(machine).as_double(), state, pos, bitpos,
 				to7_k7_bits[ bitpos ] ));
 			return to7_k7_bits[ bitpos ];
 		}
@@ -124,7 +124,7 @@ static int to7_get_cassette ( running_machine *machine )
 			}
 			k = ( chg >= 13 ) ? 1 : 0;
 			VLOG (( "$%04x %f to7_get_cassette: state=$%X pos=%f samppos=%i bit=%i (%i)\n",
-				cpu_get_previouspc(machine->device("maincpu")), attotime_to_double(timer_get_time(machine)), state, pos, bitpos,
+				cpu_get_previouspc(machine->device("maincpu")), timer_get_time(machine).as_double(), state, pos, bitpos,
 				k, chg ));
 			return k;
 		}
@@ -152,7 +152,7 @@ static WRITE8_DEVICE_HANDLER ( to7_set_cassette_motor )
 	double pos = cassette_get_position(img);
 
 	LOG (( "$%04x %f to7_set_cassette_motor: cassette motor %s bitpos=%i\n",
-	       cpu_get_previouspc(device->machine->device("maincpu")), attotime_to_double(timer_get_time(img->machine)), data ? "off" : "on",
+	       cpu_get_previouspc(device->machine->device("maincpu")), timer_get_time(img->machine).as_double(), data ? "off" : "on",
 	       (int) (pos / TO7_BIT_LENGTH) ));
 
 	if ( (state & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_DISABLED && !data && pos > 0.3 )
@@ -203,7 +203,7 @@ static int mo5_get_cassette ( running_machine *machine )
 		hbit = hbit >= 0;
 
 		VLOG (( "$%04x %f mo5_get_cassette: state=$%X pos=%f hbitpos=%i hbit=%i\n",
-			cpu_get_previouspc(machine->device("maincpu")), attotime_to_double(timer_get_time(machine)), state, pos,
+			cpu_get_previouspc(machine->device("maincpu")), timer_get_time(machine).as_double(), state, pos,
 			(int) (pos / MO5_HBIT_LENGTH), hbit ));
 		return hbit;
 	}
@@ -228,7 +228,7 @@ static WRITE8_DEVICE_HANDLER ( mo5_set_cassette_motor )
 	double pos = cassette_get_position(img);
 
 	LOG (( "$%04x %f mo5_set_cassette_motor: cassette motor %s hbitpos=%i\n",
-	       cpu_get_previouspc(device->machine->device("maincpu")), attotime_to_double(timer_get_time(device->machine)), data ? "off" : "on",
+	       cpu_get_previouspc(device->machine->device("maincpu")), timer_get_time(device->machine).as_double(), data ? "off" : "on",
 	       (int) (pos / MO5_HBIT_LENGTH) ));
 
 	if ( (state & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_DISABLED &&  !data && pos > 0.3 )
@@ -268,9 +268,9 @@ static void thom_set_irq ( running_machine *machine, int line, int state )
 		thom_irq &= ~(1 << line);
 
 	if ( !old && thom_irq )
-		LOG_IRQ(( "%f thom_set_irq: irq line up %i\n", attotime_to_double(timer_get_time(machine)), line ));
+		LOG_IRQ(( "%f thom_set_irq: irq line up %i\n", timer_get_time(machine).as_double(), line ));
 	if ( old && !thom_irq )
-		LOG_IRQ(( "%f thom_set_irq: irq line down %i\n", attotime_to_double(timer_get_time(machine)), line ));
+		LOG_IRQ(( "%f thom_set_irq: irq line down %i\n", timer_get_time(machine).as_double(), line ));
 
 	cputag_set_input_line(machine, "maincpu", M6809_IRQ_LINE, thom_irq ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -287,9 +287,9 @@ static void thom_set_firq ( running_machine *machine, int line, int state )
 		thom_firq &= ~(1 << line);
 
 	if ( !old && thom_firq )
-		LOG_IRQ(( "%f thom_set_firq: firq line up %i\n", attotime_to_double(timer_get_time(machine)), line ));
+		LOG_IRQ(( "%f thom_set_firq: firq line up %i\n", timer_get_time(machine).as_double(), line ));
 	if ( old && !thom_firq )
-		LOG_IRQ(( "%f thom_set_firq: firq line down %i\n", attotime_to_double(timer_get_time(machine)), line ));
+		LOG_IRQ(( "%f thom_set_firq: firq line down %i\n", timer_get_time(machine).as_double(), line ));
 
 	cputag_set_input_line(machine, "maincpu", M6809_FIRQ_LINE, thom_firq ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -644,7 +644,7 @@ static void to7_lightpen_cb ( running_machine *machine, int step )
 	if ( ! to7_lightpen )
 		return;
 
-	LOG_VIDEO(( "%f to7_lightpen_cb: step=%i\n", attotime_to_double(timer_get_time(machine)), step ));
+	LOG_VIDEO(( "%f to7_lightpen_cb: step=%i\n", timer_get_time(machine).as_double(), step ));
 	pia6821_cb1_w( sys_pia, 1 );
 	pia6821_cb1_w( sys_pia, 0 );
 	to7_lightpen_step = step;
@@ -661,7 +661,7 @@ static void to7_set_init ( running_machine *machine, int init )
 	device_t *sys_pia = machine->device( THOM_PIA_SYS );
 	/* INIT signal wired to system PIA 6821 */
 
-	LOG_VIDEO(( "%f to7_set_init: init=%i\n", attotime_to_double(timer_get_time(machine)), init ));
+	LOG_VIDEO(( "%f to7_set_init: init=%i\n", timer_get_time(machine).as_double(), init ));
 	pia6821_ca1_w( sys_pia, init );
 }
 
@@ -787,7 +787,7 @@ static WRITE_LINE_DEVICE_HANDLER( to7_io_ack )
 	device_t *io_pia = device->machine->device( THOM_PIA_IO );
 
 	pia6821_cb1_w( io_pia, state);
-	//LOG_IO (( "%f to7_io_ack: CENTRONICS new state $%02X (ack=%i)\n", attotime_to_double(timer_get_time(machine)), data, ack ));
+	//LOG_IO (( "%f to7_io_ack: CENTRONICS new state $%02X (ack=%i)\n", timer_get_time(machine).as_double(), data, ack ));
 }
 
 
@@ -797,7 +797,7 @@ static WRITE8_DEVICE_HANDLER ( to7_io_porta_out )
 	int tx  = data & 1;
 	int dtr = ( data & 2 ) ? 1 : 0;
 
-	LOG_IO(( "$%04x %f to7_io_porta_out: tx=%i, dtr=%i\n",  cpu_get_previouspc(device->machine->device("maincpu")), attotime_to_double(timer_get_time(device->machine)), tx, dtr ));
+	LOG_IO(( "$%04x %f to7_io_porta_out: tx=%i, dtr=%i\n",  cpu_get_previouspc(device->machine->device("maincpu")), timer_get_time(device->machine).as_double(), tx, dtr ));
 	if ( dtr )
 		to7_io_line.State |=  SERIAL_STATE_DTR;
 	else
@@ -821,7 +821,7 @@ static READ8_DEVICE_HANDLER( to7_io_porta_in )
 	else
 		cts = !centronics_busy_r(printer);
 
-	LOG_IO(( "$%04x %f to7_io_porta_in: mode=%i cts=%i, dsr=%i, rd=%i\n", cpu_get_previouspc(device->machine->device("maincpu")), attotime_to_double(timer_get_time(device->machine)), to7_io_mode(device->machine), cts, dsr, rd ));
+	LOG_IO(( "$%04x %f to7_io_porta_in: mode=%i cts=%i, dsr=%i, rd=%i\n", cpu_get_previouspc(device->machine->device("maincpu")), timer_get_time(device->machine).as_double(), to7_io_mode(device->machine), cts, dsr, rd ));
 
 	return (dsr ? 0x20 : 0) | (cts ? 0x40 : 0) | (rd ? 0x80: 0);
 }
@@ -832,7 +832,7 @@ static WRITE8_DEVICE_HANDLER( to7_io_portb_out )
 {
 	device_t *printer = device->machine->device("centronics");
 
-	LOG_IO(( "$%04x %f to7_io_portb_out: CENTRONICS set data=$%02X\n", cpu_get_previouspc(device->machine->device("maincpu")), attotime_to_double(timer_get_time(device->machine)), data ));
+	LOG_IO(( "$%04x %f to7_io_portb_out: CENTRONICS set data=$%02X\n", cpu_get_previouspc(device->machine->device("maincpu")), timer_get_time(device->machine).as_double(), data ));
 
 	/* set 8-bit data */
 	centronics_data_w(printer, 0, data);
@@ -844,7 +844,7 @@ static WRITE8_DEVICE_HANDLER( to7_io_cb2_out )
 {
 	device_t *printer = device->machine->device("centronics");
 
-	LOG_IO(( "$%04x %f to7_io_cb2_out: CENTRONICS set strobe=%i\n", cpu_get_previouspc(device->machine->device("maincpu")), attotime_to_double(timer_get_time(device->machine)), data ));
+	LOG_IO(( "$%04x %f to7_io_cb2_out: CENTRONICS set strobe=%i\n", cpu_get_previouspc(device->machine->device("maincpu")), timer_get_time(device->machine).as_double(), data ));
 
 	/* send STROBE to printer */
 	centronics_strobe_w(printer, data);
@@ -857,7 +857,7 @@ static void to7_io_in_cb ( running_machine *machine, int id, unsigned long state
 	/* our peer's state has changed */
 	to7_io_line.input_state = state;
 
-	LOG_IO(( "%f to7_io_in_callback:  cts=%i dsr=%i rd=%i\n", attotime_to_double(timer_get_time(machine)), (state & SERIAL_STATE_CTS) ? 1 : 0, (state & SERIAL_STATE_DSR) ? 1 : 0, (int)get_in_data_bit( state ) ));
+	LOG_IO(( "%f to7_io_in_callback:  cts=%i dsr=%i rd=%i\n", timer_get_time(machine).as_double(), (state & SERIAL_STATE_CTS) ? 1 : 0, (state & SERIAL_STATE_DSR) ? 1 : 0, (int)get_in_data_bit( state ) ));
 }
 
 
@@ -1067,7 +1067,7 @@ WRITE8_HANDLER ( to7_modem_mea8000_w )
 
 
 
-#define TO7_GAME_POLL_PERIOD  ATTOTIME_IN_USEC( 500 )
+#define TO7_GAME_POLL_PERIOD  attotime::from_usec( 500 )
 
 
 
@@ -1355,7 +1355,7 @@ READ8_HANDLER ( to7_midi_r )
 		/* bit 6:     parity error (ignored) */
 		/* bit 7:     interrupt */
 		LOG_MIDI(( "$%04x %f to7_midi_r: status $%02X (rdrf=%i, tdre=%i, ovrn=%i, irq=%i)\n",
-			  cpu_get_previouspc(space->machine->device("maincpu")), attotime_to_double(timer_get_time(space->machine)), to7_midi_status,
+			  cpu_get_previouspc(space->machine->device("maincpu")), timer_get_time(space->machine).as_double(), to7_midi_status,
 			  (to7_midi_status & ACIA_6850_RDRF) ? 1 : 0,
 			  (to7_midi_status & ACIA_6850_TDRE) ? 1 : 0,
 			  (to7_midi_status & ACIA_6850_OVRN) ? 1 : 0,
@@ -1373,7 +1373,7 @@ READ8_HANDLER ( to7_midi_r )
 			to7_midi_status &= ~ACIA_6850_OVRN;
 		to7_midi_overrun = 0;
 		LOG_MIDI(( "$%04x %f to7_midi_r: read data $%02X\n",
-			  cpu_get_previouspc(space->machine->device("maincpu")), attotime_to_double(timer_get_time(space->machine)), data ));
+			  cpu_get_previouspc(space->machine->device("maincpu")), timer_get_time(space->machine).as_double(), data ));
 		to7_midi_update_irq( space->machine );
 		return data;
 	}
@@ -1400,7 +1400,7 @@ WRITE8_HANDLER ( to7_midi_w )
 		if ( (data & 3) == 3 )
 		{
 			/* reset */
-			LOG_MIDI(( "$%04x %f to7_midi_w: reset (data=$%02X)\n", cpu_get_previouspc(space->machine->device("maincpu")), attotime_to_double(timer_get_time(space->machine)), data ));
+			LOG_MIDI(( "$%04x %f to7_midi_w: reset (data=$%02X)\n", cpu_get_previouspc(space->machine->device("maincpu")), timer_get_time(space->machine).as_double(), data ));
 			to7_midi_overrun = 0;
 			to7_midi_status = 2;
 			to7_midi_intr = 0;
@@ -1417,7 +1417,7 @@ WRITE8_HANDLER ( to7_midi_w )
 				static const int stop[8] = { 2,2,1,1,2,1,1,1 };
 				static const char parity[8] = { 'e','o','e','o','-','-','e','o' };
 				LOG_MIDI(( "$%04x %f to7_midi_w: set control to $%02X (bits=%i, stop=%i, parity=%c, intr in=%i out=%i)\n",
-					  cpu_get_previouspc(space->machine->device("maincpu")), attotime_to_double(timer_get_time(space->machine)),
+					  cpu_get_previouspc(space->machine->device("maincpu")), timer_get_time(space->machine).as_double(),
 					  data,
 					  bits[ (data >> 2) & 7 ],
 					  stop[ (data >> 2) & 7 ],
@@ -1431,7 +1431,7 @@ WRITE8_HANDLER ( to7_midi_w )
 
 
 	case 1: /* output data */
-		LOG_MIDI(( "$%04x %f to7_midi_w: write data $%02X\n", cpu_get_previouspc(space->machine->device("maincpu")), attotime_to_double(timer_get_time(space->machine)), data ));
+		LOG_MIDI(( "$%04x %f to7_midi_w: write data $%02X\n", cpu_get_previouspc(space->machine->device("maincpu")), timer_get_time(space->machine).as_double(), data ));
 		if ( data == 0x55 )
 			/* cable-detect: shortcut */
 			chardev_fake_in( to7_midi_chardev, 0x55 );
@@ -1899,7 +1899,7 @@ static TIMER_CALLBACK(mo5_periodic_cb)
 static void mo5_init_timer(running_machine *machine)
 {
 	/* time is a little faster than 50 Hz to match video framerate */
-	timer_adjust_periodic(mo5_periodic_timer, attotime_zero, 0, ATTOTIME_IN_USEC( 19968 ));
+	timer_adjust_periodic(mo5_periodic_timer, attotime::zero, 0, attotime::from_usec( 19968 ));
 }
 
 
@@ -2239,14 +2239,14 @@ MACHINE_START ( mo5 )
 
 WRITE8_HANDLER ( to9_ieee_w )
 {
-	logerror( "$%04x %f to9_ieee_w: unhandled write $%02X to register %i\n", cpu_get_previouspc(space->machine->device("maincpu")), attotime_to_double(timer_get_time(space->machine)), data, offset );
+	logerror( "$%04x %f to9_ieee_w: unhandled write $%02X to register %i\n", cpu_get_previouspc(space->machine->device("maincpu")), timer_get_time(space->machine).as_double(), data, offset );
 }
 
 
 
 READ8_HANDLER  ( to9_ieee_r )
 {
-	logerror( "$%04x %f to9_ieee_r: unhandled read from register %i\n", cpu_get_previouspc(space->machine->device("maincpu")), attotime_to_double(timer_get_time(space->machine)), offset );
+	logerror( "$%04x %f to9_ieee_r: unhandled read from register %i\n", cpu_get_previouspc(space->machine->device("maincpu")), timer_get_time(space->machine).as_double(), offset );
 	return 0;
 }
 
@@ -2372,7 +2372,7 @@ READ8_HANDLER  ( to9_vreg_r )
 
 WRITE8_HANDLER ( to9_vreg_w )
 {
-	LOG_VIDEO(( "$%04x %f to9_vreg_w: off=%i ($%04X) data=$%02X\n", cpu_get_previouspc(space->machine->device("maincpu")), attotime_to_double(timer_get_time(space->machine)), offset, 0xe7da + offset, data ));
+	LOG_VIDEO(( "$%04x %f to9_vreg_w: off=%i ($%04X) data=$%02X\n", cpu_get_previouspc(space->machine->device("maincpu")), timer_get_time(space->machine).as_double(), offset, 0xe7da + offset, data ));
 
 	switch ( offset )
 	{
@@ -2576,11 +2576,11 @@ static STATE_POSTLOAD( to9_update_ram_bank_postload )
 
 
 /* normal mode: polling interval */
-#define TO9_KBD_POLL_PERIOD  ATTOTIME_IN_MSEC( 10 )
+#define TO9_KBD_POLL_PERIOD  attotime::from_msec( 10 )
 
 /* peripherial mode: time between two bytes, and after last byte */
-#define TO9_KBD_BYTE_SPACE   ATTOTIME_IN_USEC( 300 )
-#define TO9_KBD_END_SPACE    ATTOTIME_IN_USEC( 9100 )
+#define TO9_KBD_BYTE_SPACE   attotime::from_usec( 300 )
+#define TO9_KBD_END_SPACE    attotime::from_usec( 9100 )
 
 /* first and subsequent repeat periods, in TO9_KBD_POLL_PERIOD units */
 #define TO9_KBD_REPEAT_DELAY  80 /* 800 ms */
@@ -2670,7 +2670,7 @@ READ8_HANDLER ( to9_kbd_r )
 		/* bit 7:     interrupt */
 
 		LOG_KBD(( "$%04x %f to9_kbd_r: status $%02X (rdrf=%i, tdre=%i, ovrn=%i, pe=%i, irq=%i)\n",
-			  cpu_get_previouspc(space->machine->device("maincpu")), attotime_to_double(timer_get_time(space->machine)), to9_kbd_status,
+			  cpu_get_previouspc(space->machine->device("maincpu")), timer_get_time(space->machine).as_double(), to9_kbd_status,
 			  (to9_kbd_status & ACIA_6850_RDRF) ? 1 : 0,
 			  (to9_kbd_status & ACIA_6850_TDRE) ? 1 : 0,
 			  (to9_kbd_status & ACIA_6850_OVRN) ? 1 : 0,
@@ -2685,7 +2685,7 @@ READ8_HANDLER ( to9_kbd_r )
 		else
 			to9_kbd_status &= ~(ACIA_6850_OVRN | ACIA_6850_RDRF);
 		to9_kbd_overrun = 0;
-		LOG_KBD(( "$%04x %f to9_kbd_r: read data $%02X\n", cpu_get_previouspc(space->machine->device("maincpu")), attotime_to_double(timer_get_time(space->machine)), to9_kbd_in ));
+		LOG_KBD(( "$%04x %f to9_kbd_r: read data $%02X\n", cpu_get_previouspc(space->machine->device("maincpu")), timer_get_time(space->machine).as_double(), to9_kbd_in ));
 		to9_kbd_update_irq(space->machine);
 		return to9_kbd_in;
 
@@ -2712,7 +2712,7 @@ WRITE8_HANDLER ( to9_kbd_w )
 			to9_kbd_overrun = 0;
 			to9_kbd_status = ACIA_6850_TDRE;
 			to9_kbd_intr = 0;
-			LOG_KBD(( "$%04x %f to9_kbd_w: reset (data=$%02X)\n", cpu_get_previouspc(space->machine->device("maincpu")), attotime_to_double(timer_get_time(space->machine)), data ));
+			LOG_KBD(( "$%04x %f to9_kbd_w: reset (data=$%02X)\n", cpu_get_previouspc(space->machine->device("maincpu")), timer_get_time(space->machine).as_double(), data ));
 		}
 		else
 		{
@@ -2726,7 +2726,7 @@ WRITE8_HANDLER ( to9_kbd_w )
 			to9_kbd_intr = data >> 5;
 
 			LOG_KBD(( "$%04x %f to9_kbd_w: set control to $%02X (parity=%i, intr in=%i out=%i)\n",
-				  cpu_get_previouspc(space->machine->device("maincpu")), attotime_to_double(timer_get_time(space->machine)),
+				  cpu_get_previouspc(space->machine->device("maincpu")), timer_get_time(space->machine).as_double(),
 				  data, to9_kbd_parity, to9_kbd_intr >> 2,
 				  (to9_kbd_intr & 3) ? 1 : 0 ));
 		}
@@ -2757,13 +2757,13 @@ WRITE8_HANDLER ( to9_kbd_w )
 		case 0xFE: to9_kbd_periph = 0; break;
 
 		default:
-			logerror( "$%04x %f to9_kbd_w: unknown kbd command %02X\n", cpu_get_previouspc(space->machine->device("maincpu")), attotime_to_double(timer_get_time(space->machine)), data );
+			logerror( "$%04x %f to9_kbd_w: unknown kbd command %02X\n", cpu_get_previouspc(space->machine->device("maincpu")), timer_get_time(space->machine).as_double(), data );
 		}
 
 		thom_set_caps_led( space->machine, !to9_kbd_caps );
 
 		LOG(( "$%04x %f to9_kbd_w: kbd command %02X (caps=%i, pad=%i, periph=%i)\n",
-		      cpu_get_previouspc(space->machine->device("maincpu")), attotime_to_double(timer_get_time(space->machine)), data,
+		      cpu_get_previouspc(space->machine->device("maincpu")), timer_get_time(space->machine).as_double(), data,
 		      to9_kbd_caps, to9_kbd_pad, to9_kbd_periph ));
 
 		break;
@@ -2785,7 +2785,7 @@ static void to9_kbd_send ( running_machine *machine, UINT8 data, int parity )
 	{
 		/* overrun will be set when the current valid byte is read */
 		to9_kbd_overrun = 1;
-		LOG_KBD(( "%f to9_kbd_send: overrun => drop data=$%02X, parity=%i\n", attotime_to_double(timer_get_time(machine)), data, parity ));
+		LOG_KBD(( "%f to9_kbd_send: overrun => drop data=$%02X, parity=%i\n", timer_get_time(machine).as_double(), data, parity ));
 	}
 	else
 	{
@@ -2796,7 +2796,7 @@ static void to9_kbd_send ( running_machine *machine, UINT8 data, int parity )
 			to9_kbd_status &= ~ACIA_6850_PE; /* parity OK */
 		else
 			to9_kbd_status |= ACIA_6850_PE;  /* parity error */
-		LOG_KBD(( "%f to9_kbd_send: data=$%02X, parity=%i, status=$%02X\n", attotime_to_double(timer_get_time(machine)), data, parity, to9_kbd_status ));
+		LOG_KBD(( "%f to9_kbd_send: data=$%02X, parity=%i, status=$%02X\n", timer_get_time(machine).as_double(), data, parity, to9_kbd_status ));
 	}
 	to9_kbd_update_irq(machine);
 }
@@ -3221,14 +3221,14 @@ UINT8 to8_cart_vpage;
 
 
 /* polling interval */
-#define TO8_KBD_POLL_PERIOD  ATTOTIME_IN_MSEC( 1 )
+#define TO8_KBD_POLL_PERIOD  attotime::from_msec( 1 )
 
 /* first and subsequent repeat periods, in TO8_KBD_POLL_PERIOD units */
 #define TO8_KBD_REPEAT_DELAY  800 /* 800 ms */
 #define TO8_KBD_REPEAT_PERIOD  70 /*  70 ms */
 
 /* timeout waiting for CPU */
-#define TO8_KBD_TIMEOUT  ATTOTIME_IN_MSEC( 100 )
+#define TO8_KBD_TIMEOUT  attotime::from_msec( 100 )
 
 
 
@@ -3357,7 +3357,7 @@ static void to8_kbd_timer_func(running_machine *machine)
 {
 	attotime d;
 
-	LOG_KBD(( "%f to8_kbd_timer_cb: step=%i ack=%i data=$%03X\n", attotime_to_double(timer_get_time(machine)), to8_kbd_step, to8_kbd_ack, to8_kbd_data ));
+	LOG_KBD(( "%f to8_kbd_timer_cb: step=%i ack=%i data=$%03X\n", timer_get_time(machine).as_double(), to8_kbd_step, to8_kbd_ack, to8_kbd_data ));
 
 	if( ! to8_kbd_step )
 	{
@@ -3378,7 +3378,7 @@ static void to8_kbd_timer_func(running_machine *machine)
 			LOG_KBD(( "to8_kbd_timer_cb: got key $%03X\n", k ));
 			to8_kbd_data = k;
 			to8_kbd_step = 1;
-			d = ATTOTIME_IN_USEC( 100 );
+			d = attotime::from_usec( 100 );
 		}
 	}
 	else if ( to8_kbd_step == 255 )
@@ -3408,7 +3408,7 @@ static void to8_kbd_timer_func(running_machine *machine)
 	{
 		/* send silence between bits */
 		mc6846_set_input_cp1( machine->device("mc6846"), 0 );
-		d = ATTOTIME_IN_USEC( 100 );
+		d = attotime::from_usec( 100 );
 		to8_kbd_step++;
 	}
 	else
@@ -3417,7 +3417,7 @@ static void to8_kbd_timer_func(running_machine *machine)
 		int bpos = 8 - ( (to8_kbd_step - 100) / 2);
 		int bit = (to8_kbd_data >> bpos) & 1;
 		mc6846_set_input_cp1( machine->device("mc6846"), 1 );
-		d = ATTOTIME_IN_USEC( bit ? 56 : 38 );
+		d = attotime::from_usec( bit ? 56 : 38 );
 		to8_kbd_step++;
 	}
 	timer_adjust_oneshot(to8_kbd_timer, d, 0);
@@ -3441,21 +3441,21 @@ static void to8_kbd_set_ack ( running_machine *machine, int data )
 
 	if ( data )
 	{
-		double len = attotime_to_double(timer_timeelapsed( to8_kbd_signal )) * 1000. - 2.;
-		LOG_KBD(( "%f to8_kbd_set_ack: CPU end ack, len=%f\n", attotime_to_double(timer_get_time(machine)), len ));
+		double len = timer_timeelapsed( to8_kbd_signal).as_double() * 1000. - 2.;
+		LOG_KBD(( "%f to8_kbd_set_ack: CPU end ack, len=%f\n", timer_get_time(machine).as_double(), len ));
 		if ( to8_kbd_data == 0xfff )
 		{
 			/* end signal from CPU */
 			if ( len >= 0.6 && len <= 0.8 )
 			{
-				LOG (( "%f to8_kbd_set_ack: INIT signal\n", attotime_to_double(timer_get_time(machine)) ));
+				LOG (( "%f to8_kbd_set_ack: INIT signal\n", timer_get_time(machine).as_double() ));
 				to8_kbd_last_key = 0xff;
 				to8_kbd_key_count = 0;
 				to8_kbd_caps = 1;
 				/* send back signal: TODO returned codes ? */
 				to8_kbd_data = 0;
 				to8_kbd_step = 0;
-				timer_adjust_oneshot(to8_kbd_timer, ATTOTIME_IN_MSEC( 1 ), 0);
+				timer_adjust_oneshot(to8_kbd_timer, attotime::from_msec( 1 ), 0);
 			}
 			else
 			{
@@ -3463,12 +3463,12 @@ static void to8_kbd_set_ack ( running_machine *machine, int data )
 				timer_adjust_oneshot(to8_kbd_timer, TO8_KBD_POLL_PERIOD, 0);
 				if ( len >= 1.2 && len <= 1.4 )
 				{
-					LOG (( "%f to8_kbd_set_ack: CAPS on signal\n", attotime_to_double(timer_get_time(machine)) ));
+					LOG (( "%f to8_kbd_set_ack: CAPS on signal\n", timer_get_time(machine).as_double() ));
 					to8_kbd_caps = 1;
 				}
 				else if ( len >= 1.8 && len <= 2.0 )
 				{
-					LOG (( "%f to8_kbd_set_ack: CAPS off signal\n", attotime_to_double(timer_get_time(machine)) ));
+					LOG (( "%f to8_kbd_set_ack: CAPS off signal\n", timer_get_time(machine).as_double() ));
 					to8_kbd_caps = 0;
 				}
 			}
@@ -3488,17 +3488,17 @@ static void to8_kbd_set_ack ( running_machine *machine, int data )
 		{
 			/* CPU accepts key */
 			to8_kbd_step = 99;
-			timer_adjust_oneshot(to8_kbd_timer, ATTOTIME_IN_USEC( 400 ), 0);
+			timer_adjust_oneshot(to8_kbd_timer, attotime::from_usec( 400 ), 0);
 		}
 		else
 		{
 			/* start signal from CPU */
 			to8_kbd_data = 0xfff;
 			to8_kbd_step = 91;
-			timer_adjust_oneshot(to8_kbd_timer, ATTOTIME_IN_USEC( 400 ), 0);
-			timer_adjust_oneshot(to8_kbd_signal, attotime_never, 0);
+			timer_adjust_oneshot(to8_kbd_timer, attotime::from_usec( 400 ), 0);
+			timer_adjust_oneshot(to8_kbd_signal, attotime::never, 0);
 		}
-		LOG_KBD(( "%f to8_kbd_set_ack: CPU ack, data=$%03X\n", attotime_to_double(timer_get_time(machine)), to8_kbd_data ));
+		LOG_KBD(( "%f to8_kbd_set_ack: CPU ack, data=$%03X\n", timer_get_time(machine).as_double(), to8_kbd_data ));
 	}
 }
 
@@ -3839,7 +3839,7 @@ READ8_HANDLER ( to8_gatearray_r )
 	}
 
 	LOG_VIDEO(( "$%04x %f to8_gatearray_r: off=%i ($%04X) res=$%02X lightpen=%i\n",
-		  cpu_get_previouspc(space->machine->device("maincpu")), attotime_to_double(timer_get_time(space->machine)),
+		  cpu_get_previouspc(space->machine->device("maincpu")), timer_get_time(space->machine).as_double(),
 		  offset, 0xe7e4 + offset, res, to7_lightpen ));
 
 	return res;
@@ -3850,7 +3850,7 @@ READ8_HANDLER ( to8_gatearray_r )
 WRITE8_HANDLER ( to8_gatearray_w )
 {
 	LOG_VIDEO(( "$%04x %f to8_gatearray_w: off=%i ($%04X) data=$%02X\n",
-		  cpu_get_previouspc(space->machine->device("maincpu")), attotime_to_double(timer_get_time(space->machine)),
+		  cpu_get_previouspc(space->machine->device("maincpu")), timer_get_time(space->machine).as_double(),
 		  offset, 0xe7e4 + offset, data ));
 
 	switch ( offset )
@@ -3931,7 +3931,7 @@ READ8_HANDLER  ( to8_vreg_r )
 WRITE8_HANDLER ( to8_vreg_w )
 {
 	LOG_VIDEO(( "$%04x %f to8_vreg_w: off=%i ($%04X) data=$%02X\n",
-		  cpu_get_previouspc(space->machine->device("maincpu")), attotime_to_double(timer_get_time(space->machine)),
+		  cpu_get_previouspc(space->machine->device("maincpu")), timer_get_time(space->machine).as_double(),
 		  offset, 0xe7da + offset, data ));
 
 	switch ( offset )
@@ -3987,7 +3987,7 @@ static READ8_DEVICE_HANDLER ( to8_sys_porta_in )
 {
 	int ktest = to8_kbd_ktest (device->machine);
 
-	LOG_KBD(( "$%04x %f: to8_sys_porta_in ktest=%i\n", cpu_get_previouspc(device->machine->device("maincpu")), attotime_to_double(timer_get_time(device->machine)), ktest ));
+	LOG_KBD(( "$%04x %f: to8_sys_porta_in ktest=%i\n", cpu_get_previouspc(device->machine->device("maincpu")), timer_get_time(device->machine).as_double(), ktest ));
 
 	return ktest;
 }
@@ -4554,7 +4554,7 @@ static WRITE8_DEVICE_HANDLER ( mo6_game_porta_out )
 {
 	device_t *printer = device->machine->device("centronics");
 
-	LOG (( "$%04x %f mo6_game_porta_out: CENTRONICS set data=$%02X\n", cpu_get_previouspc(device->machine->device("maincpu")), attotime_to_double(timer_get_time(device->machine)), data ));
+	LOG (( "$%04x %f mo6_game_porta_out: CENTRONICS set data=$%02X\n", cpu_get_previouspc(device->machine->device("maincpu")), timer_get_time(device->machine).as_double(), data ));
 
 	/* centronics data */
 	centronics_data_w(printer, 0, data);
@@ -4566,7 +4566,7 @@ static WRITE8_DEVICE_HANDLER ( mo6_game_cb2_out )
 {
 	device_t *printer = device->machine->device("centronics");
 
-	LOG (( "$%04x %f mo6_game_cb2_out: CENTRONICS set strobe=%i\n", cpu_get_previouspc(device->machine->device("maincpu")), attotime_to_double(timer_get_time(device->machine)), data ));
+	LOG (( "$%04x %f mo6_game_cb2_out: CENTRONICS set strobe=%i\n", cpu_get_previouspc(device->machine->device("maincpu")), timer_get_time(device->machine).as_double(), data ));
 
 	/* centronics strobe */
 	centronics_strobe_w(printer, data);
@@ -4774,7 +4774,7 @@ READ8_HANDLER ( mo6_gatearray_r )
 	}
 
 	LOG_VIDEO(( "$%04x %f mo6_gatearray_r: off=%i ($%04X) res=$%02X lightpen=%i\n",
-		  cpu_get_previouspc(space->machine->device("maincpu")), attotime_to_double(timer_get_time(space->machine)),
+		  cpu_get_previouspc(space->machine->device("maincpu")), timer_get_time(space->machine).as_double(),
 		  offset, 0xa7e4 + offset, res, to7_lightpen ));
 
 	return res;
@@ -4785,7 +4785,7 @@ READ8_HANDLER ( mo6_gatearray_r )
 WRITE8_HANDLER ( mo6_gatearray_w )
 {
 	LOG_VIDEO(( "$%04x %f mo6_gatearray_w: off=%i ($%04X) data=$%02X\n",
-		  cpu_get_previouspc(space->machine->device("maincpu")), attotime_to_double(timer_get_time(space->machine)),
+		  cpu_get_previouspc(space->machine->device("maincpu")), timer_get_time(space->machine).as_double(),
 		  offset, 0xa7e4 + offset, data ));
 
 	switch ( offset )
@@ -4852,7 +4852,7 @@ READ8_HANDLER ( mo6_vreg_r )
 WRITE8_HANDLER ( mo6_vreg_w )
 {
 	LOG_VIDEO(( "$%04x %f mo6_vreg_w: off=%i ($%04X) data=$%02X\n",
-		  cpu_get_previouspc(space->machine->device("maincpu")), attotime_to_double(timer_get_time(space->machine)),
+		  cpu_get_previouspc(space->machine->device("maincpu")), timer_get_time(space->machine).as_double(),
 		  offset, 0xa7da + offset, data ));
 
 	switch ( offset )
@@ -5006,7 +5006,7 @@ READ8_HANDLER ( mo5nr_net_r )
 	if ( to7_controller_type )
 		return to7_floppy_r ( space, offset );
 
-	logerror( "$%04x %f mo5nr_net_r: read from reg %i\n", cpu_get_previouspc(space->machine->device("maincpu")), attotime_to_double(timer_get_time(space->machine)), offset );
+	logerror( "$%04x %f mo5nr_net_r: read from reg %i\n", cpu_get_previouspc(space->machine->device("maincpu")), timer_get_time(space->machine).as_double(), offset );
 
 	return 0;
 }
@@ -5019,7 +5019,7 @@ WRITE8_HANDLER ( mo5nr_net_w )
 		to7_floppy_w ( space, offset, data );
 	else
 		logerror( "$%04x %f mo5nr_net_w: write $%02X to reg %i\n",
-			  cpu_get_previouspc(space->machine->device("maincpu")), attotime_to_double(timer_get_time(space->machine)), data, offset );
+			  cpu_get_previouspc(space->machine->device("maincpu")), timer_get_time(space->machine).as_double(), data, offset );
 }
 
 

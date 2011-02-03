@@ -629,7 +629,7 @@ INLINE void amstrad_update_video( running_machine *machine )
 
 	if ( state->gate_array.draw_p )
 	{
-		UINT32 cycles_passed = attotime_to_ticks( attotime_sub( now, state->gate_array.last_draw_time ), XTAL_16MHz );
+		UINT32 cycles_passed = (now - state->gate_array.last_draw_time ).as_ticks(XTAL_16MHz);
 
 		while( cycles_passed )
 		{
@@ -702,7 +702,7 @@ INLINE void amstrad_plus_update_video( running_machine *machine )
 
 	if ( state->gate_array.draw_p )
 	{
-		UINT32 cycles_passed = attotime_to_ticks( attotime_sub( now, state->gate_array.last_draw_time ), XTAL_16MHz );
+		UINT32 cycles_passed = (now - state->gate_array.last_draw_time ).as_ticks(XTAL_16MHz);
 
 		while( cycles_passed )
 		{
@@ -957,7 +957,7 @@ static WRITE_LINE_DEVICE_HANDLER( amstrad_vsync_changed )
 	drvstate->gate_array.vsync = state ? 1 : 0;
 
 	/* Schedule a write to PC2 */
-	timer_set( device->machine, attotime_zero, NULL, 0, amstrad_pc2_low );
+	timer_set( device->machine, attotime::zero, NULL, 0, amstrad_pc2_low );
 }
 
 
@@ -980,7 +980,7 @@ static WRITE_LINE_DEVICE_HANDLER( amstrad_plus_vsync_changed )
 	drvstate->gate_array.vsync = state ? 1 : 0;
 
 	/* Schedule a write to PC2 */
-	timer_set( device->machine, attotime_zero, NULL, 0, amstrad_pc2_low );
+	timer_set( device->machine, attotime::zero, NULL, 0, amstrad_pc2_low );
 }
 
 
@@ -2767,7 +2767,7 @@ READ8_DEVICE_HANDLER (amstrad_ppi_portb_r)
 	}
 
 	/* Schedule a write to PC2 */
-	timer_set( device->machine, attotime_zero, NULL, 0, amstrad_pc2_low );
+	timer_set( device->machine, attotime::zero, NULL, 0, amstrad_pc2_low );
 
 	return data;
 }
@@ -3140,7 +3140,7 @@ MACHINE_RESET( amstrad )
 	state->gate_array.hsync = 0;
 	state->gate_array.vsync = 0;
 
-	timer_set( machine, attotime_zero, NULL, 0, cb_set_resolution );
+	timer_set( machine, attotime::zero, NULL, 0, cb_set_resolution );
 }
 
 
@@ -3188,7 +3188,7 @@ MACHINE_RESET( plus )
 	amstrad_GateArray_write(machine, 0x081); // Epyx World of Sports requires upper ROM to be enabled by default
 
 	//  multiface_init();
-	timer_set( machine, attotime_zero, NULL, 0, cb_set_resolution );
+	timer_set( machine, attotime::zero, NULL, 0, cb_set_resolution );
 }
 
 MACHINE_START( gx4000 )
@@ -3234,7 +3234,7 @@ MACHINE_RESET( gx4000 )
 	amstrad_GateArray_write(machine, 0x081); // Epyx World of Sports requires upper ROM to be enabled by default
 	//  multiface_init();
 
-	timer_set( machine, attotime_zero, NULL, 0, cb_set_resolution );
+	timer_set( machine, attotime::zero, NULL, 0, cb_set_resolution );
 }
 
 MACHINE_START( kccomp )
@@ -3292,7 +3292,7 @@ MACHINE_RESET( aleste )
 	amstrad_common_init(machine);
 	amstrad_reset_machine(machine);
 
-	timer_set( machine, attotime_zero, NULL, 0, cb_set_resolution );
+	timer_set( machine, attotime::zero, NULL, 0, cb_set_resolution );
 }
 
 

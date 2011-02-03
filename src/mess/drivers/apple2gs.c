@@ -242,7 +242,7 @@ static MACHINE_CONFIG_START( apple2gs, apple2gs_state )
 	MCFG_CPU_ADD("maincpu", G65816, APPLE2GS_14M/5)
 	MCFG_CPU_PROGRAM_MAP(apple2gs_map)
 	MCFG_CPU_VBLANK_INT_HACK(apple2_interrupt, 192/8)
-	MCFG_QUANTUM_TIME(HZ(60))
+	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

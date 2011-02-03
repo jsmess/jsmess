@@ -160,8 +160,8 @@ z80ctc_device::z80ctc_device(running_machine &_machine, const z80ctc_device_conf
 
 void z80ctc_device::device_start()
 {
-	m_period16 = attotime_mul(ATTOTIME_IN_HZ(m_clock), 16);
-	m_period256 = attotime_mul(ATTOTIME_IN_HZ(m_clock), 256);
+	m_period16 = attotime::from_hz(m_clock) * 16;
+	m_period256 = attotime::from_hz(m_clock) * 256;
 
 	// resolve callbacks
 	devcb_resolve_write_line(&m_intr, &m_config.m_intr, this);
@@ -355,7 +355,7 @@ void z80ctc_device::ctc_channel::reset()
 {
 	m_mode = RESET_ACTIVE;
 	m_tconst = 0x100;
-	timer_adjust_oneshot(m_timer, attotime_never, 0);
+	timer_adjust_oneshot(m_timer, attotime::never, 0);
 	m_int_state = 0;
 }
 
@@ -368,18 +368,18 @@ attotime z80ctc_device::ctc_channel::period() const
 {
 	// if reset active, no period
 	if ((m_mode & RESET) == RESET_ACTIVE)
-		return attotime_zero;
+		return attotime::zero;
 
 	// if counter mode, no real period
 	if ((m_mode & MODE) == MODE_COUNTER)
 	{
 		logerror("CTC %d is CounterMode : Can't calculate period\n", m_index);
-		return attotime_zero;
+		return attotime::zero;
 	}
 
 	// compute the period
 	attotime period = ((m_mode & PRESCALER) == PRESCALER_16) ? m_device->m_period16 : m_device->m_period256;
-	return attotime_mul(period, m_tconst);
+	return period * m_tconst;
 }
 
 
@@ -401,7 +401,7 @@ UINT8 z80ctc_device::ctc_channel::read()
 		VPRINTF(("CTC clock %f\n",ATTOSECONDS_TO_HZ(period.attoseconds)));
 
 		if (m_timer != NULL)
-			return ((int)(attotime_to_double(timer_timeleft(m_timer)) / attotime_to_double(period)) + 1) & 0xff;
+			return ((int)(timer_timeleft(m_timer).as_double() / period.as_double()) + 1) & 0xff;
 		else
 			return 0;
 	}
@@ -440,7 +440,7 @@ void z80ctc_device::ctc_channel::write(UINT8 data)
 					timer_adjust_periodic(m_timer, curperiod, m_index, curperiod);
 				}
 				else
-					timer_adjust_oneshot(m_timer, attotime_never, 0);
+					timer_adjust_oneshot(m_timer, attotime::never, 0);
 			}
 
 			// else set the bit indicating that we're waiting for the appropriate trigger
@@ -475,7 +475,7 @@ void z80ctc_device::ctc_channel::write(UINT8 data)
 		// if we're being reset, clear out any pending timers for this channel
 		if ((data & RESET) == RESET_ACTIVE)
 		{
-			timer_adjust_oneshot(m_timer, attotime_never, 0);
+			timer_adjust_oneshot(m_timer, attotime::never, 0);
 			// note that we don't clear the interrupt state here!
 		}
 	}
@@ -506,13 +506,13 @@ void z80ctc_device::ctc_channel::trigger(UINT8 data)
 				if (!m_notimer)
 				{
 					attotime curperiod = period();
-					VPRINTF(("CTC period %s\n", attotime_string(curperiod, 9)));
+					VPRINTF(("CTC period %s\n", curperiod.as_string()));
 					timer_adjust_periodic(m_timer, curperiod, m_index, curperiod);
 				}
 				else
 				{
 					VPRINTF(("CTC disabled\n"));
-					timer_adjust_oneshot(m_timer, attotime_never, 0);
+					timer_adjust_oneshot(m_timer, attotime::never, 0);
 				}
 			}
 

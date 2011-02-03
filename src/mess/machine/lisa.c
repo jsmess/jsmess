@@ -565,9 +565,9 @@ static TIMER_CALLBACK(read_COPS_command)
 
 		case 0x7:	/* send mouse command */
 			if (immediate & 0x8)
-				timer_adjust_periodic(state->mouse_timer, attotime_zero, 0, ATTOTIME_IN_MSEC((immediate & 0x7)*4)); /* enable mouse */
+				timer_adjust_periodic(state->mouse_timer, attotime::zero, 0, attotime::from_msec((immediate & 0x7)*4)); /* enable mouse */
 			else
-				timer_reset(state->mouse_timer, attotime_never);
+				timer_reset(state->mouse_timer, attotime::never);
 			break;
 		}
 	}
@@ -611,7 +611,7 @@ static TIMER_CALLBACK(set_COPS_ready)
 	state->COPS_Ready = 1;
 
 	/* impulsion width : +/- 20us */
-	timer_set(machine, ATTOTIME_IN_USEC(20), NULL, 0, read_COPS_command);
+	timer_set(machine, attotime::from_usec(20), NULL, 0, read_COPS_command);
 }
 
 static void reset_COPS(lisa_state *state)
@@ -626,7 +626,7 @@ static void reset_COPS(lisa_state *state)
 	for (i=0; i<8; i++)
 		state->key_matrix[i] = 0;
 
-	timer_reset(state->mouse_timer, attotime_never);
+	timer_reset(state->mouse_timer, attotime::never);
 }
 
 static void unplug_keyboard(running_machine *machine)
@@ -1047,7 +1047,7 @@ MACHINE_START( lisa )
 	state->mouse_timer = timer_alloc(machine, handle_mouse, NULL);
 
 	/* read command every ms (don't know the real value) */
-	timer_pulse(machine, ATTOTIME_IN_MSEC(1), NULL, 0, set_COPS_ready);
+	timer_pulse(machine, attotime::from_msec(1), NULL, 0, set_COPS_ready);
 }
 
 MACHINE_RESET( lisa )

@@ -678,7 +678,7 @@ void psion_state::machine_start()
 		memory_set_bank(machine, "rambank", 0);
 	}
 
-	timer_pulse(machine, ATTOTIME_IN_SEC(1), NULL, 0, nmi_timer);
+	timer_pulse(machine, attotime::from_seconds(1), NULL, 0, nmi_timer);
 
 	state_save_register_global(machine, m_kb_counter);
 	state_save_register_global(machine, m_enable_nmi);

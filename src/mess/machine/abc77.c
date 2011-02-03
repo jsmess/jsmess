@@ -330,10 +330,10 @@ static MACHINE_CONFIG_FRAGMENT( abc77 )
 	MCFG_CPU_IO_MAP(abc77_io_map)
 
 	/* watchdog */
-	MCFG_WATCHDOG_TIME_INIT(HZ(XTAL_4_608MHz/(3*5)))
+	MCFG_WATCHDOG_TIME_INIT(attotime::from_hz(XTAL_4_608MHz/(3*5)))
 
 	/* serial clock timer */
-	MCFG_TIMER_ADD_PERIODIC("serial", clock_tick, HZ(XTAL_4_608MHz/(3*5)/16))
+	MCFG_TIMER_ADD_PERIODIC("serial", clock_tick, attotime::from_hz(XTAL_4_608MHz/(3*5)/16))
 
 	/* discrete sound */
 	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
@@ -389,7 +389,7 @@ WRITE_LINE_DEVICE_HANDLER( abc77_reset_w )
 
 		/* trigger reset */
 		cpu_set_input_line(abc77->cpu, INPUT_LINE_RESET, ASSERT_LINE);
-		timer_adjust_oneshot(abc77->reset_timer, ATTOTIME_IN_MSEC(t), 0);
+		timer_adjust_oneshot(abc77->reset_timer, attotime::from_msec(t), 0);
 
 		cpu_set_input_line(abc77->cpu, MCS48_INPUT_EA, ea ? CLEAR_LINE : ASSERT_LINE);
 	}

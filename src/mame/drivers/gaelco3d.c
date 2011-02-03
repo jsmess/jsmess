@@ -484,11 +484,11 @@ static WRITE32_HANDLER( tms_m68k_ram_w )
 }
 
 
-static void iack_w(device_t *device, UINT8 state, offs_t addr)
+static void iack_w(tms3203x_device &device, UINT8 state, offs_t addr)
 {
 	if (LOG)
 		logerror("iack_w(%d) - %06X\n", state, addr);
-	cpu_set_input_line(device, 0, CLEAR_LINE);
+	device.set_input_line(0, CLEAR_LINE);
 }
 
 
@@ -694,16 +694,16 @@ static void adsp_tx_callback(adsp21xx_device &device, int port, INT32 data)
 			/* calculate how long until we generate an interrupt */
 
 			/* period per each bit sent */
-			sample_period = attotime_mul(ATTOTIME_IN_HZ(device.clock()), 2 * (adsp_control_regs[S1_SCLKDIV_REG] + 1));
+			sample_period = attotime::from_hz(device.clock()) * (2 * (adsp_control_regs[S1_SCLKDIV_REG] + 1));
 
 			/* now put it down to samples, so we know what the channel frequency has to be */
-			sample_period = attotime_mul(sample_period, 16 * SOUND_CHANNELS);
+			sample_period *= 16 * SOUND_CHANNELS;
 
 			dmadac_set_frequency(&dmadac[0], SOUND_CHANNELS, ATTOSECONDS_TO_HZ(sample_period.attoseconds));
 			dmadac_enable(&dmadac[0], SOUND_CHANNELS, 1);
 
 			/* fire off a timer wich will hit every half-buffer */
-			sample_period = attotime_div(attotime_mul(sample_period, adsp_size), SOUND_CHANNELS * adsp_incs);
+			sample_period = (sample_period * adsp_size) / (SOUND_CHANNELS * adsp_incs);
 
 			adsp_autobuffer_timer->adjust(sample_period, 0, sample_period);
 
@@ -978,7 +978,7 @@ static const adsp21xx_config adsp_config =
 	NULL					/* callback for timer fired */
 };
 
-static const tms32031_config tms_config =
+static const tms3203x_config tms_config =
 {
 	0x1000,
 	0,
@@ -995,7 +995,7 @@ static MACHINE_CONFIG_START( gaelco3d, driver_device )
 	MCFG_CPU_VBLANK_INT("screen", vblank_gen)
 
 	MCFG_CPU_ADD("tms", TMS32031, 60000000)
-	MCFG_CPU_CONFIG(tms_config)
+	MCFG_TMS3203X_CONFIG(tms_config)
 	MCFG_CPU_PROGRAM_MAP(tms_map)
 
 	MCFG_CPU_ADD("adsp", ADSP2115, 16000000)
@@ -1008,7 +1008,7 @@ static MACHINE_CONFIG_START( gaelco3d, driver_device )
 
 	MCFG_EEPROM_93C66B_ADD("eeprom")
 
-	MCFG_QUANTUM_TIME(HZ(6000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	MCFG_TIMER_ADD("adsp_timer", adsp_autobuffer_irq)
 	MCFG_GAELCO_SERIAL_ADD("serial", 0, serial_interface)

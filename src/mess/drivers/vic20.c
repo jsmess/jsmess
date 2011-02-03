@@ -682,7 +682,7 @@ static INTERRUPT_GEN( vic20_raster_interrupt )
 
 static MACHINE_CONFIG_START( vic20_common, vic20_state )
 
-	MCFG_TIMER_ADD_PERIODIC(TIMER_C1530_TAG, cassette_tick, HZ(44100))
+	MCFG_TIMER_ADD_PERIODIC(TIMER_C1530_TAG, cassette_tick, attotime::from_hz(44100))
 
 	/* devices */
 	MCFG_VIA6522_ADD(M6522_0_TAG, 0, vic20_via0_intf)

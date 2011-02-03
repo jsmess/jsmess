@@ -348,7 +348,7 @@ static MACHINE_RESET( pv1000 )
 	state->io_regs[5] = 0;
 	state->fd_data = 0;
 	timer_adjust_oneshot( state->irq_on_timer, state->screen->time_until_pos(195, 0 ), 0 );
-	timer_adjust_oneshot( state->irq_off_timer, attotime_never, 0 );
+	timer_adjust_oneshot( state->irq_off_timer, attotime::never, 0 );
 }
 
 

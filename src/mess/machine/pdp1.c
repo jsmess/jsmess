@@ -104,8 +104,8 @@ enum
 
 
 
-#define PARALLEL_DRUM_WORD_TIME ATTOTIME_IN_NSEC(8500)
-#define PARALLEL_DRUM_ROTATION_TIME ATTOTIME_IN_NSEC(8500*4096)
+#define PARALLEL_DRUM_WORD_TIME attotime::from_nsec(8500)
+#define PARALLEL_DRUM_ROTATION_TIME attotime::from_nsec(8500*4096)
 
 
 pdp1_reset_param_t pdp1_reset_param =
@@ -376,7 +376,7 @@ DEVICE_IMAGE_LOAD( pdp1_tape )
 			if (state->tape_reader.motor_on && state->tape_reader.rcl)
 			{
 				/* delay is approximately 1/400s */
-				timer_adjust_oneshot(state->tape_reader.timer, ATTOTIME_IN_USEC(2500), 0);
+				timer_adjust_oneshot(state->tape_reader.timer, attotime::from_usec(2500), 0);
 			}
 			else
 			{
@@ -459,7 +459,7 @@ static void begin_tape_read(pdp1_state *state, int binary, int nac)
 	if (state->tape_reader.motor_on && state->tape_reader.rcl)
 	{
 		/* delay is approximately 1/400s */
-		timer_adjust_oneshot(state->tape_reader.timer, ATTOTIME_IN_USEC(2500), 0);
+		timer_adjust_oneshot(state->tape_reader.timer, attotime::from_usec(2500), 0);
 	}
 	else
 	{
@@ -513,7 +513,7 @@ static TIMER_CALLBACK(reader_callback)
 
 	if (state->tape_reader.motor_on && state->tape_reader.rcl)
 		/* delay is approximately 1/400s */
-		timer_adjust_oneshot(state->tape_reader.timer, ATTOTIME_IN_USEC(2500), 0);
+		timer_adjust_oneshot(state->tape_reader.timer, attotime::from_usec(2500), 0);
 	else
 		timer_enable(state->tape_reader.timer, 0);
 }
@@ -657,7 +657,7 @@ static void iot_ppa(device_t *device, int op2, int nac, int mb, int *io, int ac)
 			logerror("Error: overlapped PPA/PPB instructions: mb=0%06o, (%s)\n", (unsigned) mb, cpuexec_describe_context(device->machine));
 	}
 
-	timer_adjust_oneshot(state->tape_puncher.timer, ATTOTIME_IN_USEC(15800), nac);
+	timer_adjust_oneshot(state->tape_puncher.timer, attotime::from_usec(15800), nac);
 }
 
 /*
@@ -685,7 +685,7 @@ static void iot_ppb(device_t *device, int op2, int nac, int mb, int *io, int ac)
 		if (timer_enable(state->tape_puncher.timer, 0))
 			logerror("Error: overlapped PPA/PPB instructions: mb=0%06o, (%s)\n", (unsigned) mb, cpuexec_describe_context(device->machine));
 	}
-	timer_adjust_oneshot(state->tape_puncher.timer, ATTOTIME_IN_USEC(15800), nac);
+	timer_adjust_oneshot(state->tape_puncher.timer, attotime::from_usec(15800), nac);
 }
 
 
@@ -878,7 +878,7 @@ static void iot_tyo(device_t *device, int op2, int nac, int mb, int *io, int ac)
 			logerror("Error: overlapped TYO instruction: mb=0%06o, (%s)\n", (unsigned) mb, cpuexec_describe_context(device->machine));
 	}
 
-	timer_adjust_oneshot(state->typewriter.tyo_timer, ATTOTIME_IN_MSEC(delay), nac);
+	timer_adjust_oneshot(state->typewriter.tyo_timer, attotime::from_msec(delay), nac);
 }
 
 /*
@@ -992,7 +992,7 @@ static void iot_dpy(device_t *device, int op2, int nac, int mb, int *io, int ac)
 			if (timer_enable(state->dpy_timer, 0))
 				logerror("Error: overlapped DPY instruction: mb=0%06o, (%s)\n", (unsigned) mb, cpuexec_describe_context(device->machine));
 		}
-		timer_adjust_oneshot(state->dpy_timer, ATTOTIME_IN_USEC(50), 0);
+		timer_adjust_oneshot(state->dpy_timer, attotime::from_usec(50), 0);
 	}
 }
 
@@ -1008,9 +1008,9 @@ static void parallel_drum_set_il(pdp1_state *state, int il)
 
 	state->parallel_drum.il = il;
 
-	il_phase = attotime_sub(attotime_mul(PARALLEL_DRUM_WORD_TIME, il), timer_timeelapsed(state->parallel_drum.rotation_timer));
-	if (attotime_compare(il_phase, attotime_zero) < 0)
-		il_phase = attotime_add(il_phase, PARALLEL_DRUM_ROTATION_TIME);
+	il_phase = ((PARALLEL_DRUM_WORD_TIME * il) - timer_timeelapsed(state->parallel_drum.rotation_timer));
+	if (il_phase < attotime::zero)
+		il_phase = il_phase + PARALLEL_DRUM_ROTATION_TIME;
 	timer_adjust_periodic(state->parallel_drum.il_timer, il_phase, 0, PARALLEL_DRUM_ROTATION_TIME);
 }
 
@@ -1137,7 +1137,7 @@ static void iot_dcc(device_t *device, int op2, int nac, int mb, int *io, int ac)
 		state->parallel_drum.wcl = (state->parallel_drum.wcl+1) & 0177777/*0007777???*/;
 		dc = (dc+1) & 07777;
 		if (state->parallel_drum.wc)
-			delay = attotime_add(delay, PARALLEL_DRUM_WORD_TIME);
+			delay = delay + PARALLEL_DRUM_WORD_TIME;
 	} while (state->parallel_drum.wc);
 	cpu_adjust_icount(device->machine->device("maincpu"),-device->machine->device<cpu_device>("maincpu")->attotime_to_cycles(delay));
 	/* if no error, skip */
@@ -1147,9 +1147,8 @@ static void iot_dcc(device_t *device, int op2, int nac, int mb, int *io, int ac)
 static void iot_dra(device_t *device, int op2, int nac, int mb, int *io, int ac)
 {
 	pdp1_state *state = device->machine->driver_data<pdp1_state>();
-	(*io) = attotime_mul(
-		timer_timeelapsed(state->parallel_drum.rotation_timer),
-		ATTOSECONDS_PER_SECOND / (attotime_to_attoseconds(PARALLEL_DRUM_WORD_TIME))).seconds & 0007777;
+	(*io) = (timer_timeelapsed(state->parallel_drum.rotation_timer) *
+		(ATTOSECONDS_PER_SECOND / (PARALLEL_DRUM_WORD_TIME.as_attoseconds()))).seconds & 0007777;
 
 	/* set parity error and timing error... */
 }

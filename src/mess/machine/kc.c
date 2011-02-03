@@ -230,7 +230,7 @@ static TIMER_CALLBACK(kc85_disk_reset_timer_callback)
 
 static void kc_disc_interface_init(running_machine *machine)
 {
-	timer_set(machine, attotime_zero, NULL, 0, kc85_disk_reset_timer_callback);
+	timer_set(machine, attotime::zero, NULL, 0, kc85_disk_reset_timer_callback);
 
 	/* hold cpu at reset */
 	cputag_set_input_line(machine, "disc", INPUT_LINE_RESET, ASSERT_LINE);
@@ -376,7 +376,7 @@ static void kc85_module_system_init(kc_state *state)
 */
 
 
-#define KC_CASSETTE_TIMER_FREQUENCY ATTOTIME_IN_HZ(4800)
+#define KC_CASSETTE_TIMER_FREQUENCY attotime::from_hz(4800)
 
 /* this timer is used to update the cassette */
 /* this is the current state of the cassette motor */
@@ -420,12 +420,12 @@ static void	kc_cassette_set_motor(running_machine *machine, int motor_state)
 		if (motor_state)
 		{
 			/* start timer */
-			timer_adjust_periodic(state->cassette_timer, attotime_zero, 0, KC_CASSETTE_TIMER_FREQUENCY);
+			timer_adjust_periodic(state->cassette_timer, attotime::zero, 0, KC_CASSETTE_TIMER_FREQUENCY);
 		}
 		else
 		{
 			/* stop timer */
-			timer_reset(state->cassette_timer, attotime_never);
+			timer_reset(state->cassette_timer, attotime::never);
 		}
 	}
 
@@ -1788,13 +1788,13 @@ MACHINE_START(kc85)
 
 	// from keyboard init
 	/* 50 Hz is just a arbitrary value - used to put scan-codes into the queue for transmitting */
-	timer_pulse(machine, ATTOTIME_IN_HZ(50), NULL, 0, kc_keyboard_update);
+	timer_pulse(machine, attotime::from_hz(50), NULL, 0, kc_keyboard_update);
 
 	/* timer to transmit pulses to kc base unit */
-	timer_pulse(machine, ATTOTIME_IN_USEC(1024), NULL, 0, kc_keyboard_transmit_timer_callback);
+	timer_pulse(machine, attotime::from_usec(1024), NULL, 0, kc_keyboard_transmit_timer_callback);
 
-	timer_pulse(machine, ATTOTIME_IN_HZ(15625), (void *)machine->device("z80ctc"), 0, kc85_15khz_timer_callback);
-	timer_set(machine, attotime_zero, NULL, 0, kc85_reset_timer_callback);
+	timer_pulse(machine, attotime::from_hz(15625), (void *)machine->device("z80ctc"), 0, kc85_15khz_timer_callback);
+	timer_set(machine, attotime::zero, NULL, 0, kc85_reset_timer_callback);
 }
 
 static void	kc85_common_init(running_machine *machine)

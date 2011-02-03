@@ -66,7 +66,7 @@ static MACHINE_CONFIG_START( lynx, lynx_state )
 	MCFG_CPU_ADD("maincpu", M65SC02, 4000000)        /* vti core, integrated in vlsi, stz, but not bbr bbs */
 	MCFG_CPU_PROGRAM_MAP(lynx_mem)
 	MCFG_CPU_VBLANK_INT("screen", lynx_frame_int)
-	MCFG_QUANTUM_TIME(HZ(60))
+	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_MACHINE_START( lynx )
 

@@ -474,7 +474,7 @@ DRIVER_INIT( osborne1 )
 	state->video_timer = timer_alloc(machine,  osborne1_video_callback , NULL);
 	timer_adjust_oneshot(state->video_timer, machine->primary_screen->time_until_pos(1, 0 ), 0);
 
-	timer_set(machine,  attotime_zero, NULL, 0, setup_osborne1 );
+	timer_set(machine,  attotime::zero, NULL, 0, setup_osborne1 );
 }
 
 

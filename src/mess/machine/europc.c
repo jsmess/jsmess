@@ -294,7 +294,7 @@ void europc_rtc_init(running_machine *machine)
 	europc_rtc.data[0xf]=1;
 
 	europc_rtc.timer = timer_alloc(machine, europc_rtc_timer, NULL);
-	timer_adjust_periodic(europc_rtc.timer, attotime_zero, 0, attotime_make(1, 0));
+	timer_adjust_periodic(europc_rtc.timer, attotime::zero, 0, attotime(1, 0));
 }
 
  READ8_HANDLER( europc_rtc_r )

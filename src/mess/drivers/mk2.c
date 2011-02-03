@@ -104,7 +104,7 @@ static TIMER_CALLBACK( update_leds )
 
 static MACHINE_START( mk2 )
 {
-	timer_pulse(machine, ATTOTIME_IN_HZ(60), NULL, 0, update_leds);
+	timer_pulse(machine, attotime::from_hz(60), NULL, 0, update_leds);
 }
 
 static READ8_DEVICE_HANDLER( mk2_read_a )
@@ -182,7 +182,7 @@ static MACHINE_CONFIG_START( mk2, mk2_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 1000000)        /* 6504 */
 	MCFG_CPU_PROGRAM_MAP(mk2_mem)
-	MCFG_QUANTUM_TIME(HZ(60))
+	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_MACHINE_START( mk2 )
 

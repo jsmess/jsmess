@@ -466,7 +466,7 @@ WRITE8_DEVICE_HANDLER( pokemini_hwreg_w )
 			int index = data & 0x07;
 			int cycles = ( state->pm_reg[0x19] & 0x01 ) ? timer_to_cycles_slow[index] : timer_to_cycles_fast[index];
 
-			timer_adjust_periodic(state->timers.timer1, attotime_zero, 0, device->machine->device<cpu_device>("maincpu")->cycles_to_attotime(cycles));
+			timer_adjust_periodic(state->timers.timer1, attotime::zero, 0, device->machine->device<cpu_device>("maincpu")->cycles_to_attotime(cycles));
 		}
 
 		/* Check for prescaler change for the high counter */
@@ -475,7 +475,7 @@ WRITE8_DEVICE_HANDLER( pokemini_hwreg_w )
 			int index = ( data >> 4 ) & 0x07;
 			int cycles = ( state->pm_reg[0x19] & 0x02 ) ? timer_to_cycles_slow[index] : timer_to_cycles_fast[index];
 
-			timer_adjust_periodic(state->timers.timer1_hi, attotime_zero, 0, device->machine->device<cpu_device>("maincpu")->cycles_to_attotime(cycles));
+			timer_adjust_periodic(state->timers.timer1_hi, attotime::zero, 0, device->machine->device<cpu_device>("maincpu")->cycles_to_attotime(cycles));
 		}
 
 		/* Check if timer1 low should be enabled */
@@ -516,7 +516,7 @@ WRITE8_DEVICE_HANDLER( pokemini_hwreg_w )
 			int index = state->pm_reg[0x18] & 0x07;
 			int cycles = ( data & 0x01 ) ? timer_to_cycles_slow[index] : timer_to_cycles_fast[index];
 
-			timer_adjust_periodic(state->timers.timer1, attotime_zero, 0, device->machine->device<cpu_device>("maincpu")->cycles_to_attotime(cycles));
+			timer_adjust_periodic(state->timers.timer1, attotime::zero, 0, device->machine->device<cpu_device>("maincpu")->cycles_to_attotime(cycles));
 		}
 
 		/* Check for prescaler change for the low counter */
@@ -525,7 +525,7 @@ WRITE8_DEVICE_HANDLER( pokemini_hwreg_w )
 			int index = ( state->pm_reg[0x18] >> 4 ) & 0x07;
 			int cycles = ( data & 0x02 ) ? timer_to_cycles_slow[index] : timer_to_cycles_fast[index];
 
-			timer_adjust_periodic(state->timers.timer1_hi, attotime_zero, 0, device->machine->device<cpu_device>("maincpu")->cycles_to_attotime(cycles));
+			timer_adjust_periodic(state->timers.timer1_hi, attotime::zero, 0, device->machine->device<cpu_device>("maincpu")->cycles_to_attotime(cycles));
 		}
 
 		{
@@ -595,7 +595,7 @@ WRITE8_DEVICE_HANDLER( pokemini_hwreg_w )
 			int index = data & 0x07;
 			int cycles = ( state->pm_reg[0x1B] & 0x01 ) ? timer_to_cycles_slow[index] : timer_to_cycles_fast[index];
 
-			timer_adjust_periodic(state->timers.timer2, attotime_zero, 0, device->machine->device<cpu_device>("maincpu")->cycles_to_attotime(cycles));
+			timer_adjust_periodic(state->timers.timer2, attotime::zero, 0, device->machine->device<cpu_device>("maincpu")->cycles_to_attotime(cycles));
 		}
 
 		/* Check for prescaler change for the high counter */
@@ -604,7 +604,7 @@ WRITE8_DEVICE_HANDLER( pokemini_hwreg_w )
 			int index = ( data >> 4 ) & 0x07;
 			int cycles = ( state->pm_reg[0x1B] & 0x02 ) ? timer_to_cycles_slow[index] : timer_to_cycles_fast[index];
 
-			timer_adjust_periodic(state->timers.timer2_hi, attotime_zero, 0, device->machine->device<cpu_device>("maincpu")->cycles_to_attotime(cycles));
+			timer_adjust_periodic(state->timers.timer2_hi, attotime::zero, 0, device->machine->device<cpu_device>("maincpu")->cycles_to_attotime(cycles));
 		}
 
 		/* Check if timer2 low should be enabled */
@@ -641,7 +641,7 @@ WRITE8_DEVICE_HANDLER( pokemini_hwreg_w )
 			int index = state->pm_reg[0x1A] & 0x07;
 			int cycles = ( data & 0x01 ) ? timer_to_cycles_slow[index] : timer_to_cycles_fast[index];
 
-			timer_adjust_periodic(state->timers.timer2, attotime_zero, 0, device->machine->device<cpu_device>("maincpu")->cycles_to_attotime(cycles));
+			timer_adjust_periodic(state->timers.timer2, attotime::zero, 0, device->machine->device<cpu_device>("maincpu")->cycles_to_attotime(cycles));
 
 			if ( ( state->pm_reg[0x1A] & 0x08 ) && ( state->pm_reg[0x38] & 0x04 ) &&
 			     ( ( ( state->pm_reg[0x19] & 0x10 ) && ( data & 0x01 ) ) ||
@@ -661,7 +661,7 @@ WRITE8_DEVICE_HANDLER( pokemini_hwreg_w )
 			int index = ( state->pm_reg[0x1A] >> 4 ) & 0x07;
 			int cycles = ( data & 0x02 ) ? timer_to_cycles_slow[index] : timer_to_cycles_fast[index];
 
-			timer_adjust_periodic(state->timers.timer2_hi, attotime_zero, 0, device->machine->device<cpu_device>("maincpu")->cycles_to_attotime(cycles));
+			timer_adjust_periodic(state->timers.timer2_hi, attotime::zero, 0, device->machine->device<cpu_device>("maincpu")->cycles_to_attotime(cycles));
 
 			if ( ( state->pm_reg[0x1A] & 0x80 ) && ( state->pm_reg[0x39] & 0x04 ) && ! ( state->pm_reg[0x38] & 0x80 ) &&
 			     ( ( ( state->pm_reg[0x19] & 0x10 ) && ( data & 0x02 ) ) ||
@@ -695,7 +695,7 @@ WRITE8_DEVICE_HANDLER( pokemini_hwreg_w )
 			int index = data & 0x07;
 			int cycles = ( state->pm_reg[0x1D] & 0x01 ) ? timer_to_cycles_slow[index] : timer_to_cycles_fast[index];
 
-			timer_adjust_periodic(state->timers.timer3, attotime_zero, 0, device->machine->device<cpu_device>("maincpu")->cycles_to_attotime(cycles));
+			timer_adjust_periodic(state->timers.timer3, attotime::zero, 0, device->machine->device<cpu_device>("maincpu")->cycles_to_attotime(cycles));
 		}
 
 		/* Check for prescaler change for the high counter */
@@ -704,7 +704,7 @@ WRITE8_DEVICE_HANDLER( pokemini_hwreg_w )
 			int index = ( data >> 4 ) & 0x07;
 			int cycles = ( state->pm_reg[0x1D] & 0x02 ) ? timer_to_cycles_slow[index] : timer_to_cycles_fast[index];
 
-			timer_adjust_periodic(state->timers.timer3_hi, attotime_zero, 0, device->machine->device<cpu_device>("maincpu")->cycles_to_attotime(cycles));
+			timer_adjust_periodic(state->timers.timer3_hi, attotime::zero, 0, device->machine->device<cpu_device>("maincpu")->cycles_to_attotime(cycles));
 		}
 
 		/* Check if timer2 low should be enabled */
@@ -741,7 +741,7 @@ WRITE8_DEVICE_HANDLER( pokemini_hwreg_w )
 			int index = state->pm_reg[0x1C] & 0x07;
 			int cycles = ( data & 0x01 ) ? timer_to_cycles_slow[index] : timer_to_cycles_fast[index];
 
-			timer_adjust_periodic(state->timers.timer3, attotime_zero, 0, device->machine->device<cpu_device>("maincpu")->cycles_to_attotime(cycles));
+			timer_adjust_periodic(state->timers.timer3, attotime::zero, 0, device->machine->device<cpu_device>("maincpu")->cycles_to_attotime(cycles));
 
 			if ( ( state->pm_reg[0x1C] & 0x08 ) && ( state->pm_reg[0x48] & 0x04 ) &&
 			     ( ( ( state->pm_reg[0x19] & 0x10 ) && ( data & 0x01 ) ) ||
@@ -761,7 +761,7 @@ WRITE8_DEVICE_HANDLER( pokemini_hwreg_w )
 			int index = ( state->pm_reg[0x1C] >> 4 ) & 0x07;
 			int cycles = ( data & 0x02 ) ? timer_to_cycles_slow[index] : timer_to_cycles_fast[index];
 
-			timer_adjust_periodic(state->timers.timer3_hi, attotime_zero, 0, device->machine->device<cpu_device>("maincpu")->cycles_to_attotime(cycles));
+			timer_adjust_periodic(state->timers.timer3_hi, attotime::zero, 0, device->machine->device<cpu_device>("maincpu")->cycles_to_attotime(cycles));
 
 			if ( ( state->pm_reg[0x1C] & 0x80 ) && ( state->pm_reg[0x49] & 0x04 ) && ! ( state->pm_reg[0x48] & 0x80 ) &&
 			     ( ( ( state->pm_reg[0x19] & 0x10 ) && ( data & 0x02 ) ) ||
@@ -1569,10 +1569,10 @@ MACHINE_START( pokemini )
 
 	/* Set up timers */
 	state->timers.seconds_timer = timer_alloc(machine,  pokemini_seconds_timer_callback , NULL );
-	timer_adjust_periodic( state->timers.seconds_timer, attotime_zero, 0, ATTOTIME_IN_SEC( 1 ) );
+	timer_adjust_periodic( state->timers.seconds_timer, attotime::zero, 0, attotime::from_seconds( 1 ) );
 
 	state->timers.hz256_timer = timer_alloc(machine,  pokemini_256hz_timer_callback , NULL );
-	timer_adjust_periodic( state->timers.hz256_timer, attotime_zero, 0, ATTOTIME_IN_HZ( 256 ) );
+	timer_adjust_periodic( state->timers.hz256_timer, attotime::zero, 0, attotime::from_hz( 256 ) );
 
 	state->timers.timer1 = timer_alloc(machine,  pokemini_timer1_callback , NULL );
 	state->timers.timer1_hi = timer_alloc(machine,  pokemini_timer1_hi_callback, NULL );
@@ -1584,6 +1584,6 @@ MACHINE_START( pokemini )
 	/* Set up the PRC */
 	state->prc.max_frame_count = 2;
 	state->prc.count_timer = timer_alloc(machine,  pokemini_prc_counter_callback, NULL );
-	timer_adjust_periodic( state->prc.count_timer, attotime_zero, 0, machine->device<cpu_device>("maincpu")->cycles_to_attotime(55640 / 65) );
+	timer_adjust_periodic( state->prc.count_timer, attotime::zero, 0, machine->device<cpu_device>("maincpu")->cycles_to_attotime(55640 / 65) );
 }
 

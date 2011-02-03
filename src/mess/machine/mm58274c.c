@@ -85,14 +85,14 @@ static attotime interrupt_period_table(int val)
 {
 	switch(val)
 	{
-		case 0:	return ATTOTIME_IN_MSEC(0);
-		case 1:	return ATTOTIME_IN_MSEC(100);
-		case 2:	return ATTOTIME_IN_MSEC(500);
-		case 3:	return ATTOTIME_IN_SEC(1);
-		case 4:	return ATTOTIME_IN_SEC(5);
-		case 5:	return ATTOTIME_IN_SEC(10);
-		case 6:	return ATTOTIME_IN_SEC(30);
-		case 7:	return ATTOTIME_IN_SEC(60);
+		case 0:	return attotime::from_msec(0);
+		case 1:	return attotime::from_msec(100);
+		case 2:	return attotime::from_msec(500);
+		case 3:	return attotime::from_seconds(1);
+		case 4:	return attotime::from_seconds(5);
+		case 5:	return attotime::from_seconds(10);
+		case 6:	return attotime::from_seconds(30);
+		case 7:	return attotime::from_seconds(60);
 		default: fatalerror("out of range");
 	}
 };
@@ -209,7 +209,7 @@ WRITE8_DEVICE_HANDLER (mm58274c_w)
 			/* interrupt run */
 			attotime period = interrupt_period_table(mm58274c->int_ctl & int_ctl_dly);
 
-			timer_adjust_periodic(mm58274c->interrupt_timer, period, 0, mm58274c->int_ctl & int_ctl_rpt ? period : attotime_zero);
+			timer_adjust_periodic(mm58274c->interrupt_timer, period, 0, mm58274c->int_ctl & int_ctl_rpt ? period : attotime::zero);
 		}
 		if (data & ctl_clkstop)
 			/* stopping the clock clears the tenth counter */
@@ -282,7 +282,7 @@ WRITE8_DEVICE_HANDLER (mm58274c_w)
 				/* interrupt run */
 				attotime period = interrupt_period_table(mm58274c->int_ctl & int_ctl_dly);
 
-				timer_adjust_periodic(mm58274c->interrupt_timer, period, 0, mm58274c->int_ctl & int_ctl_rpt ? period : attotime_zero);
+				timer_adjust_periodic(mm58274c->interrupt_timer, period, 0, mm58274c->int_ctl & int_ctl_rpt ? period : attotime::zero);
 			}
 		}
 		else
@@ -472,7 +472,7 @@ static DEVICE_START( mm58274c )
 	state_save_register_item(device->machine, "mm58274c", device->tag(), 0, mm58274c->tenths);
 
 	mm58274c->increment_rtc = timer_alloc(device->machine, increment_rtc, ((void*)device));
-	timer_adjust_periodic(mm58274c->increment_rtc, attotime_zero, 0, ATTOTIME_IN_MSEC(100));
+	timer_adjust_periodic(mm58274c->increment_rtc, attotime::zero, 0, attotime::from_msec(100));
 	mm58274c->interrupt_timer = timer_alloc(device->machine, rtc_interrupt_callback, ((void*)device));
 }
 

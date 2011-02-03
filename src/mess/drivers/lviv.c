@@ -430,7 +430,7 @@ static MACHINE_CONFIG_START( lviv, lviv_state )
 	MCFG_CPU_ADD("maincpu", I8080, 2500000)
 	MCFG_CPU_PROGRAM_MAP(lviv_mem)
 	MCFG_CPU_IO_MAP(io_map)
-	MCFG_QUANTUM_TIME(HZ(60))
+	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_MACHINE_RESET( lviv )
 

@@ -360,7 +360,7 @@ static DEVICE_START( kr2376 )
 
 	/* create the timers */
 	kr2376->scan_timer = timer_alloc(device->machine, kr2376_scan_tick, (void *)device);
-	timer_adjust_periodic(kr2376->scan_timer, attotime_zero, 0, ATTOTIME_IN_HZ(kr2376->intf->clock));
+	timer_adjust_periodic(kr2376->scan_timer, attotime::zero, 0, attotime::from_hz(kr2376->intf->clock));
 
 	/* register for state saving */
 	state_save_register_device_item(device, 0, kr2376->ring11);

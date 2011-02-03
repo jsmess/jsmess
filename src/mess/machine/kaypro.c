@@ -327,7 +327,7 @@ static TIMER_CALLBACK( kaypro_timer_callback )
 static WRITE_LINE_DEVICE_HANDLER( kaypro_fdc_intrq_w )
 {
 	if (state)
-		timer_set(device->machine, ATTOTIME_IN_USEC(25), NULL, 0, kaypro_timer_callback);
+		timer_set(device->machine, attotime::from_usec(25), NULL, 0, kaypro_timer_callback);
 	else
 		cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
 }
@@ -335,7 +335,7 @@ static WRITE_LINE_DEVICE_HANDLER( kaypro_fdc_intrq_w )
 static WRITE_LINE_DEVICE_HANDLER( kaypro_fdc_drq_w )
 {
 	if (state)
-		timer_set(device->machine, ATTOTIME_IN_USEC(25), NULL, 0, kaypro_timer_callback);
+		timer_set(device->machine, attotime::from_usec(25), NULL, 0, kaypro_timer_callback);
 	else
 		cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
 

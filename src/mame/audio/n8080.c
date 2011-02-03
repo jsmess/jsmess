@@ -153,7 +153,7 @@ static void stop_mono_flop( device_t *sn, int n )
 
 	update_SN76477_status(sn);
 
-	timer_adjust_oneshot(state->sound_timer[n], attotime_never, n);
+	timer_adjust_oneshot(state->sound_timer[n], attotime::never, n);
 }
 
 
@@ -179,15 +179,15 @@ static void spacefev_sound_pins_changed( running_machine *machine )
 	}
 	if (changes & (1 << 0x3))
 	{
-		start_mono_flop(sn, 0, ATTOTIME_IN_USEC(550 * 36 * 100));
+		start_mono_flop(sn, 0, attotime::from_usec(550 * 36 * 100));
 	}
 	if (changes & (1 << 0x6))
 	{
-		start_mono_flop(sn, 1, ATTOTIME_IN_USEC(550 * 22 * 33));
+		start_mono_flop(sn, 1, attotime::from_usec(550 * 22 * 33));
 	}
 	if (changes & (1 << 0x4))
 	{
-		start_mono_flop(sn, 2, ATTOTIME_IN_USEC(550 * 22 * 33));
+		start_mono_flop(sn, 2, attotime::from_usec(550 * 22 * 33));
 	}
 	if (changes & ((1 << 0x2) | (1 << 0x3) | (1 << 0x5)))
 	{
@@ -208,11 +208,11 @@ static void sheriff_sound_pins_changed( running_machine *machine )
 	}
 	if (changes & (1 << 0x6))
 	{
-		start_mono_flop(sn, 0, ATTOTIME_IN_USEC(550 * 33 * 33));
+		start_mono_flop(sn, 0, attotime::from_usec(550 * 33 * 33));
 	}
 	if (changes & (1 << 0x4))
 	{
-		start_mono_flop(sn, 1, ATTOTIME_IN_USEC(550 * 33 * 33));
+		start_mono_flop(sn, 1, attotime::from_usec(550 * 33 * 33));
 	}
 	if (changes & ((1 << 0x2) | (1 << 0x3) | (1 << 0x5)))
 	{
@@ -431,7 +431,7 @@ static WRITE8_HANDLER( helifire_sound_ctrl_w )
 		state->helifire_dac_timing = DECAY_RATE * log(state->helifire_dac_volume);
 	}
 
-	state->helifire_dac_timing += attotime_to_double(timer_get_time(space->machine));
+	state->helifire_dac_timing += timer_get_time(space->machine).as_double();
 }
 
 
@@ -443,7 +443,7 @@ static TIMER_DEVICE_CALLBACK( spacefev_vco_voltage_timer )
 
 	if (state->mono_flop[2])
 	{
-		voltage = 5 * (1 - exp(- attotime_to_double(timer_timeelapsed(state->sound_timer[2])) / 0.22));
+		voltage = 5 * (1 - exp(- timer_timeelapsed(state->sound_timer[2]).as_double() / 0.22));
 	}
 
 	sn76477_vco_voltage_w(sn, voltage);
@@ -453,7 +453,7 @@ static TIMER_DEVICE_CALLBACK( spacefev_vco_voltage_timer )
 static TIMER_DEVICE_CALLBACK( helifire_dac_volume_timer )
 {
 	n8080_state *state = timer.machine->driver_data<n8080_state>();
-	double t = state->helifire_dac_timing - attotime_to_double(timer_get_time(timer.machine));
+	double t = state->helifire_dac_timing - timer_get_time(timer.machine).as_double();
 
 	if (state->helifire_dac_phase)
 	{
@@ -592,7 +592,7 @@ MACHINE_CONFIG_FRAGMENT( spacefev_sound )
 	MCFG_CPU_PROGRAM_MAP(n8080_sound_cpu_map)
 	MCFG_CPU_IO_MAP(n8080_sound_io_map)
 
-	MCFG_TIMER_ADD_PERIODIC("vco_timer", spacefev_vco_voltage_timer, HZ(1000))
+	MCFG_TIMER_ADD_PERIODIC("vco_timer", spacefev_vco_voltage_timer, attotime::from_hz(1000))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -632,7 +632,7 @@ MACHINE_CONFIG_FRAGMENT( helifire_sound )
 	MCFG_CPU_PROGRAM_MAP(n8080_sound_cpu_map)
 	MCFG_CPU_IO_MAP(helifire_sound_io_map)
 
-	MCFG_TIMER_ADD_PERIODIC("helifire_dac", helifire_dac_volume_timer, HZ(1000) )
+	MCFG_TIMER_ADD_PERIODIC("helifire_dac", helifire_dac_volume_timer, attotime::from_hz(1000) )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

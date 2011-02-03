@@ -148,7 +148,7 @@ GFXDECODE_END
 MACHINE_CONFIG_FRAGMENT( tmc600_video )
 	// video hardware
 	MCFG_CDP1869_SCREEN_PAL_ADD(SCREEN_TAG, CDP1869_DOT_CLK_PAL)
-	MCFG_TIMER_ADD_PERIODIC("blink", blink_tick, HZ(2))
+	MCFG_TIMER_ADD_PERIODIC("blink", blink_tick, attotime::from_hz(2))
 	MCFG_GFXDECODE(tmc600)
 
 	// sound hardware

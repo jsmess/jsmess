@@ -345,7 +345,7 @@ static MACHINE_RESET( scorpion )
 }
 static MACHINE_START( scorpion )
 {
-	timer_pulse(machine, ATTOTIME_IN_HZ(50), NULL, 0, nmi_check_callback);
+	timer_pulse(machine, attotime::from_hz(50), NULL, 0, nmi_check_callback);
 }
 
 

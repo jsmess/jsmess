@@ -378,7 +378,7 @@ static MACHINE_CONFIG_START( intv, intv_state )
 	MCFG_CPU_ADD("maincpu", CP1610, XTAL_3_579545MHz/4)        /* Colorburst/4 */
 	MCFG_CPU_PROGRAM_MAP(intv_mem)
 	MCFG_CPU_VBLANK_INT("screen", intv_interrupt)
-	MCFG_QUANTUM_TIME(HZ(60))
+	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_MACHINE_RESET( intv )
 
@@ -417,7 +417,7 @@ static MACHINE_CONFIG_DERIVED( intvkbd, intv )
 	MCFG_CPU_PROGRAM_MAP(intv2_mem)
 	MCFG_CPU_VBLANK_INT("screen", intv_interrupt2)
 
-	MCFG_QUANTUM_TIME(HZ(6000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	/* video hardware */
 	MCFG_GFXDECODE(intvkbd)

@@ -317,7 +317,7 @@ static void c1551_port_w( device_t *device, UINT8 direction, UINT8 data )
 
 	if (c1551->ds != ds)
 	{
-		timer_adjust_periodic(c1551->bit_timer, attotime_zero, 0, ATTOTIME_IN_HZ(C2040_BITRATE[ds]/4));
+		timer_adjust_periodic(c1551->bit_timer, attotime::zero, 0, attotime::from_hz(C2040_BITRATE[ds]/4));
 		c1551->ds = ds;
 	}
 }
@@ -680,7 +680,7 @@ static MACHINE_CONFIG_FRAGMENT( c1551 )
 	MCFG_TPI6525_ADD(M6523_0_TAG, tpi0_intf) // 6523
 	MCFG_TPI6525_ADD(M6523_1_TAG, tpi1_intf) // 6523
 
-	MCFG_TIMER_ADD_PERIODIC("irq", irq_tick, HZ(120))
+	MCFG_TIMER_ADD_PERIODIC("irq", irq_tick, attotime::from_hz(120))
 
 	MCFG_FLOPPY_DRIVE_ADD(FLOPPY_0, c1551_floppy_config)
 MACHINE_CONFIG_END

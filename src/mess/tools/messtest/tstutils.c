@@ -22,7 +22,7 @@ const char *find_attribute(const char **attributes, const char *seek_attribute)
 attotime parse_time(const char *s)
 {
 	double d = atof(s);
-	return double_to_attotime(d);
+	return attotime::from_double(d);
 }
 
 

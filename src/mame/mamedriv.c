@@ -1027,6 +1027,7 @@ const game_driver * const drivers[] =
 	DRIVER( devzone2 )	/* 8022 (c) [1980] */
 	DRIVER( cheekyms )	/* 8004 (c) [1980?] */
 	DRIVER( zerohour )	/* 8011 (c) Universal */
+	DRIVER( zerohoura )	/* 8011 (c) Universal */
 	DRIVER( redclash )	/* (c) 1981 Tehkan */
 	DRIVER( redclasha )	/* (c) 1981 Tehkan */
 	DRIVER( redclashk )	/* (c) Kaneko (bootleg?) */
@@ -4396,26 +4397,26 @@ DokiDoki Penguin Land *not confirmed
 
 	/* Model 2B-CRX (SHARC, SCSP sound board) */
 	DRIVER( vstriker )	/* 1995.05 virtua Striker */
-	DRIVER( vstrikero )
+	DRIVER( vstrikero )	/* 1995.05 virtua Striker */
 	DRIVER( rchase2 )	/* 1995.06 Rail Chase 2 (Arcade TV Game List - P.104, Left, 12 from top) */
 	DRIVER( indy500 )	/* 1995.07 Indy 500 */
-	DRIVER( indy500d )
-	DRIVER( indy500to )
+	DRIVER( indy500d )	/* 1995.07 Indy 500 */
+	DRIVER( indy500to )	/* 1995.07 Indy 500 */
 	DRIVER( skytargt )	/* 1995.10 Sky Target */
 	DRIVER( fvipers )	/* 1995.11 Fighting Vipers */
-	DRIVER( von )		/* 1996.01 Dennou Senki Virtual-On */
-	DRIVER( vonj )
+	DRIVER( von )		/* 1996.01 Dennou Senki Virtual-On (USA) */
+	DRIVER( vonj )		/* 1996.01 Dennou Senki Virtual-On (Japan) */
 	DRIVER( gunblade )	/* 1996.04 Gunblade N.Y. */
 	DRIVER( schamp )	/* 1996.05 Sonic Championship */
 	DRIVER( sfight )	/* 1996.05 Sonic the Fighters */
 	DRIVER( lastbrnx )	/* 1996.06 Last Bronx */
-	DRIVER( lastbrnxj )
+	DRIVER( lastbrnxj )	/* 1996.06 Last Bronx (Japan) */
 	DRIVER( sgt24h )	/* 1996.07 Super GT 24h */
 	DRIVER( dynabb )	/* 1996.08 Dynamite Baseball */
 	DRIVER( doa )		/* 1996.11 Dead or Alive */
 						/* 1997.04 Dynamite Baseball '97 */
 	DRIVER( zerogun )	/* 1997.12 Zero Gunner */
-	DRIVER( zerogunj )
+	DRIVER( zerogunj )	/* 1997.12 Zero Gunner (Japan) */
 	DRIVER( dyndeka2b )	/* 1998.05 Dynamite Deka 2 */
 	DRIVER( dynamcopb )	/* 1998.09 Dynamite Cop */
 	DRIVER( pltkids )	/* 1999.03 Pilot Kids */
@@ -4428,7 +4429,8 @@ DokiDoki Penguin Land *not confirmed
 	DRIVER( waverunr )	/* 1996.10 Wave Runner */
 	DRIVER( hotd )		/* 1997.03 The House of the Dead */
 	DRIVER( topskatr )	/* 1997.05 Top Skater */
-	DRIVER( topskatru )
+	DRIVER( topskatru )	/* 1997.05 Top Skater (USA) */
+	DRIVER( topskatrj )	/* 1997.05 Top Skater (Japan) */
 	DRIVER( overrev )	/* 1997.09 Overrev */
 	DRIVER( segawski )	/* 1997.09 Sega Water Ski */
 	DRIVER( dynamcopc )	/* 1998.09 Dynamite Cop */
@@ -6544,6 +6546,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( streetsmj )	/* A8007 'S2' (c) 1989 */
 	DRIVER( prehisle )	/* A8003 'GT' (c) 1989 */
 	DRIVER( prehisleu )	/* A8003 'GT' (c) 1989 */
+	DRIVER( prehislek )	/* A8003 'GT' (c) 1989 */
 	DRIVER( gensitou )	/* A8003 'GT' (c) 1989 */
 	DRIVER( mechatt )	/* A8002 'MA' (c) 1989 */
 	DRIVER( mechattu )	/* A8002 'MA' (c) 1989 */
@@ -9244,6 +9247,7 @@ Other Sun games
 	DRIVER( crazywar )	/* (c) 2002 Eolith */
 	DRIVER( bballoon )	/* (c) 2003 Eolith */
 	DRIVER( hapytour )	/* (c) 2005 GAV Company (on Eolith's Ghost hardware) */
+	DRIVER( funkball )	/* (c) 1998 dgPIX Entertainment Inc */
 	DRIVER( xfiles )	/* (c) 1999 dgPIX Entertainment Inc */
 	DRIVER( kdynastg )	/* (c) 1999 EZ Graphics */
 	DRIVER( fmaniac3 )	/* (c) 2002 Saero Entertainment */
@@ -9511,6 +9515,7 @@ Other Sun games
 	DRIVER( hotslot )	/* (c) 1996 ABM Electronics */
 	DRIVER( mcolors )	/* 1999 unknown */
 	DRIVER( sgsafari )	/* (c) 1996 New Impeuropex Corp. */
+	DRIVER( musicsrt )	/* (c) 1995 ABM Games */
 	DRIVER( galaxi )	/* (c) 2000 BRL S.R.L. Bologna */
 	DRIVER( magjoker )	/* (c) 2000 BRL S.R.L. Bologna */
 	DRIVER( dwarfd )	/* (c) 198? Electro-Sports */
@@ -9538,17 +9543,19 @@ Other Sun games
 	DRIVER( tisub )		/* (c) 1992 Subsino */
 	DRIVER( tisuba )	/* (c) 1992 Subsino */
 	DRIVER( stisub )	/* (c) 1995 Subsino (Alpha license) */
-	DRIVER( sharkpy )	/* (c) 1996 Subsino */
-	DRIVER( sharkpya )	/* (c) 1996 Subsino */
-	DRIVER( sharkpye )	/* (c) 1996 Subsino (Alpha license) */
 	DRIVER( victor6 )	/* (c) 1995 Subsino (Alpha license) */
 	DRIVER( victor6a )	/* (c) 1995 Subsino (Alpha license) */
 	DRIVER( victor6b )	/* (c) 1995 Subsino (Alpha license) */
+	DRIVER( sharkpy )	/* (c) 1996 Subsino */
+	DRIVER( sharkpya )	/* (c) 1996 Subsino */
+	DRIVER( sharkpye )	/* (c) 1996 Subsino (Alpha license) */
 	DRIVER( smoto20 )	/* (c) 1996 Subsino */
 	DRIVER( smoto16 )	/* (c) 1996 Subsino */
-	DRIVER( mtrain )	/* (c) 1997 Subsino */
+	DRIVER( mtrain )	/* (c) 1996 Subsino */
+	DRIVER( expcard )	/* (c) 1998 American Alpha */
 	DRIVER( saklove )	/* (c) 1998 Subsino */
 	DRIVER( bishjan )	/* (c) 1999 Subsino */
+	DRIVER( xtrain )	/* (c) 1999 Subsino */
 	DRIVER( lastfght )	/* (c) 2000 Subsino */
 	DRIVER( xplan )		/* (c) 2006 Subsino */
 

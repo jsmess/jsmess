@@ -1457,7 +1457,7 @@ static READ8_HANDLER( upd765_tc_r )
 
 	upd765_tc_w(space->machine->device("upd765"), 1);
 	 //TODO: I'm not convinced that this works correctly with current hook-up ... 1000 usec is needed by Aploon, a bigger value breaks Alpha.
-	timer_set(space->machine,  ATTOTIME_IN_USEC(750), NULL, 0, pc8801fd_upd765_tc_to_zero );
+	timer_set(space->machine,  attotime::from_usec(750), NULL, 0, pc8801fd_upd765_tc_to_zero );
 	return 0xff; // value is meaningless
 }
 
@@ -1943,7 +1943,7 @@ static MACHINE_START( pc8801 )
 {
 	cpu_set_irq_callback(machine->device("maincpu"), pc8801_irq_callback);
 
-	timer_pulse(machine, ATTOTIME_IN_HZ(600), NULL, 0, pc8801_rtc_irq);
+	timer_pulse(machine, attotime::from_hz(600), NULL, 0, pc8801_rtc_irq);
 }
 
 static MACHINE_RESET( pc8801 )
@@ -2103,7 +2103,7 @@ static MACHINE_CONFIG_START( pc8801, driver_device )
 	MCFG_CPU_PROGRAM_MAP(pc8801fdc_mem)
 	MCFG_CPU_IO_MAP(pc8801fdc_io)
 
-	//MCFG_QUANTUM_TIME(HZ(300000))
+	//MCFG_QUANTUM_TIME(attotime::from_hz(300000))
 
 	MCFG_MACHINE_START( pc8801 )
 	MCFG_MACHINE_RESET( pc8801 )

@@ -181,7 +181,7 @@ void ef9345_device::device_start()
 
 	m_screen_out = auto_bitmap_alloc(machine, 496, m_screen->height() , BITMAP_FORMAT_INDEXED16);
 
-	timer_adjust_periodic(m_blink_timer, ATTOTIME_IN_MSEC(500), 0, ATTOTIME_IN_MSEC(500));
+	timer_adjust_periodic(m_blink_timer, attotime::from_msec(500), 0, attotime::from_msec(500));
 
 	init_accented_chars();
 
@@ -255,7 +255,7 @@ void ef9345_device::device_timer(emu_timer &timer, device_timer_id id, int param
 void ef9345_device::set_busy_flag(int period)
 {
 	m_bf = 1;
-	timer_adjust_oneshot(m_busy_timer, ATTOTIME_IN_USEC(period), 0);
+	timer_adjust_oneshot(m_busy_timer, attotime::from_usec(period), 0);
 }
 
 // draw a char in 40 char line mode

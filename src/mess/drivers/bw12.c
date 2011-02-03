@@ -116,7 +116,7 @@ void bw12_state::set_floppy_motor_off_timer()
 
         */
 		
-		m_floppy_timer->adjust(attotime_zero);
+		m_floppy_timer->adjust(attotime::zero);
 	}
 }
 

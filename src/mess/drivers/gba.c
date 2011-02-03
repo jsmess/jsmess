@@ -117,7 +117,7 @@ static TIMER_CALLBACK( dma_complete )
 
 //  printf("dma complete: ch %d\n", ch);
 
-	timer_adjust_oneshot(state->dma_timer[ch], attotime_never, 0);
+	timer_adjust_oneshot(state->dma_timer[ch], attotime::never, 0);
 
 	ctrl = state->dma_regs[(ch*3)+2] >> 16;
 
@@ -393,7 +393,7 @@ static TIMER_CALLBACK(timer_expire)
 		clocksel = timer_clks[(state->timer_regs[tmr] >> 16) & 3];
 		final = clocksel / rate;
 		state->timer_hz[tmr] = final;
-		time = ATTOTIME_IN_HZ(final);
+		time = attotime::from_hz(final);
 		GBA_ATTOTIME_NORMALIZE(time);
 		timer_adjust_periodic(state->tmr_timer[tmr], time, tmr, time);
 	}
@@ -521,7 +521,7 @@ static TIMER_CALLBACK(handle_irq)
 
 	gba_request_irq(machine, state->IF);
 
-	timer_adjust_oneshot(state->irq_timer, attotime_never, 0);
+	timer_adjust_oneshot(state->irq_timer, attotime::never, 0);
 }
 
 static READ32_HANDLER( gba_io_r )
@@ -884,7 +884,7 @@ static READ32_HANDLER( gba_io_r )
 					else
 					{
 
-					time = attotime_to_double(timer_timeelapsed(state->tmr_timer[timer]));
+					time = timer_timeelapsed(state->tmr_timer[timer]).as_double();
 
 					ticks = (double)(0x10000 - (state->timer_regs[timer] & 0xffff));
 
@@ -1709,7 +1709,7 @@ static WRITE32_HANDLER( gba_io_w )
 					// enable the timer
 					if( !(data & 0x40000) ) // if we're not in Count-Up mode
 					{
-						attotime time = ATTOTIME_IN_HZ(final);
+						attotime time = attotime::from_hz(final);
 						GBA_ATTOTIME_NORMALIZE(time);
 						timer_adjust_periodic(state->tmr_timer[offset], time, offset, time);
 					}
@@ -1874,7 +1874,7 @@ static WRITE32_HANDLER( gba_io_w )
 				state->IME = ( state->IME & ~mem_mask ) | ( data & mem_mask );
 				if (state->IF)
 				{
-					timer_adjust_oneshot(state->irq_timer, attotime_zero, 0);
+					timer_adjust_oneshot(state->irq_timer, attotime::zero, 0);
 				}
 			}
 			if( (mem_mask) & 0xffff0000 )
@@ -2029,7 +2029,7 @@ static TIMER_CALLBACK( perform_hbl )
 		}
 	}
 
-	timer_adjust_oneshot(state->hbl_timer, attotime_never, 0);
+	timer_adjust_oneshot(state->hbl_timer, attotime::never, 0);
 }
 
 static TIMER_CALLBACK( perform_scan )
@@ -2119,11 +2119,11 @@ static MACHINE_RESET( gba )
 	state->bios_protected = 0;
 
 	timer_adjust_oneshot(state->scan_timer, machine->primary_screen->time_until_pos(0, 0), 0);
-	timer_adjust_oneshot(state->hbl_timer, attotime_never, 0);
-	timer_adjust_oneshot(state->dma_timer[0], attotime_never, 0);
-	timer_adjust_oneshot(state->dma_timer[1], attotime_never, 1);
-	timer_adjust_oneshot(state->dma_timer[2], attotime_never, 2);
-	timer_adjust_oneshot(state->dma_timer[3], attotime_never, 3);
+	timer_adjust_oneshot(state->hbl_timer, attotime::never, 0);
+	timer_adjust_oneshot(state->dma_timer[0], attotime::never, 0);
+	timer_adjust_oneshot(state->dma_timer[1], attotime::never, 1);
+	timer_adjust_oneshot(state->dma_timer[2], attotime::never, 2);
+	timer_adjust_oneshot(state->dma_timer[3], attotime::never, 3);
 
 	state->fifo_a_ptr = state->fifo_b_ptr = 17;	// indicate empty
 	state->fifo_a_in = state->fifo_b_in = 17;
@@ -2165,24 +2165,24 @@ static MACHINE_START( gba )
 	state->dma_timer[1] = timer_alloc(machine, dma_complete, 0);
 	state->dma_timer[2] = timer_alloc(machine, dma_complete, 0);
 	state->dma_timer[3] = timer_alloc(machine, dma_complete, 0);
-	timer_adjust_oneshot(state->dma_timer[0], attotime_never, 0);
-	timer_adjust_oneshot(state->dma_timer[1], attotime_never, 1);
-	timer_adjust_oneshot(state->dma_timer[2], attotime_never, 2);
-	timer_adjust_oneshot(state->dma_timer[3], attotime_never, 3);
+	timer_adjust_oneshot(state->dma_timer[0], attotime::never, 0);
+	timer_adjust_oneshot(state->dma_timer[1], attotime::never, 1);
+	timer_adjust_oneshot(state->dma_timer[2], attotime::never, 2);
+	timer_adjust_oneshot(state->dma_timer[3], attotime::never, 3);
 
 	/* also one for each timer (heh) */
 	state->tmr_timer[0] = timer_alloc(machine, timer_expire, 0);
 	state->tmr_timer[1] = timer_alloc(machine, timer_expire, 0);
 	state->tmr_timer[2] = timer_alloc(machine, timer_expire, 0);
 	state->tmr_timer[3] = timer_alloc(machine, timer_expire, 0);
-	timer_adjust_oneshot(state->tmr_timer[0], attotime_never, 0);
-	timer_adjust_oneshot(state->tmr_timer[1], attotime_never, 1);
-	timer_adjust_oneshot(state->tmr_timer[2], attotime_never, 2);
-	timer_adjust_oneshot(state->tmr_timer[3], attotime_never, 3);
+	timer_adjust_oneshot(state->tmr_timer[0], attotime::never, 0);
+	timer_adjust_oneshot(state->tmr_timer[1], attotime::never, 1);
+	timer_adjust_oneshot(state->tmr_timer[2], attotime::never, 2);
+	timer_adjust_oneshot(state->tmr_timer[3], attotime::never, 3);
 
 	/* and an IRQ handling timer */
 	state->irq_timer = timer_alloc(machine, handle_irq, 0);
-	timer_adjust_oneshot(state->irq_timer, attotime_never, 0);
+	timer_adjust_oneshot(state->irq_timer, attotime::never, 0);
 
 	gba_video_start(machine);
 }

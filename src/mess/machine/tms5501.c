@@ -233,7 +233,7 @@ static void tms5501_timer_reload(device_t *device, int timer)
 
 	if (tms->timer_counter[timer])
 	{	/* reset clock interval */
-		timer_adjust_periodic(tms->timer[timer], double_to_attotime((double) tms->timer_counter[0] / (intf->clock_rate / 128.)), timer_name[timer], double_to_attotime((double) tms->timer_counter[timer] / (intf->clock_rate / 128.)));
+		timer_adjust_periodic(tms->timer[timer], attotime::from_double((double) tms->timer_counter[0] / (intf->clock_rate / 128.)), timer_name[timer], attotime::from_double((double) tms->timer_counter[timer] / (intf->clock_rate / 128.)));
 	}
 	else
 	{	/* clock interval == 0 -> no timer */

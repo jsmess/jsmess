@@ -1389,11 +1389,11 @@ static MACHINE_START( newbrain )
 
 	/* allocate reset timer */
 	state->reset_timer = timer_alloc(machine, reset_tick, NULL);
-	timer_adjust_oneshot(state->reset_timer, ATTOTIME_IN_USEC(get_reset_t()), 0);
+	timer_adjust_oneshot(state->reset_timer, attotime::from_usec(get_reset_t()), 0);
 
 	/* allocate power up timer */
 	state->pwrup_timer = timer_alloc(machine, pwrup_tick, NULL);
-	timer_adjust_oneshot(state->pwrup_timer, ATTOTIME_IN_USEC(get_pwrup_t()), 0);
+	timer_adjust_oneshot(state->pwrup_timer, attotime::from_usec(get_pwrup_t()), 0);
 
 	/* initialize variables */
 	state->pwrup = 1;
@@ -1462,7 +1462,7 @@ static MACHINE_RESET( newbrain )
 	cputag_set_input_line(machine, Z80_TAG, INPUT_LINE_RESET, HOLD_LINE);
 	cputag_set_input_line(machine, COP420_TAG, INPUT_LINE_RESET, HOLD_LINE);
 
-	timer_adjust_oneshot(state->reset_timer, ATTOTIME_IN_MSEC(get_reset_t()), 0);
+	timer_adjust_oneshot(state->reset_timer, attotime::from_msec(get_reset_t()), 0);
 }
 
 static INTERRUPT_GEN( newbrain_interrupt )
@@ -1561,7 +1561,7 @@ static MACHINE_CONFIG_START( newbrain_a, newbrain_state )
 
 	MCFG_GFXDECODE(newbrain)
 
-	MCFG_TIMER_ADD_PERIODIC("cop_regint", cop_regint_tick, USEC(12500)) // HACK
+	MCFG_TIMER_ADD_PERIODIC("cop_regint", cop_regint_tick, attotime::from_usec(12500)) // HACK
 
 	MCFG_MACHINE_START(newbrain)
 	MCFG_MACHINE_RESET(newbrain)
@@ -1611,7 +1611,7 @@ static MACHINE_CONFIG_DERIVED( newbrain_eim, newbrain_a )
 
 	/* Z80 CTC */
 	MCFG_Z80CTC_ADD(Z80CTC_TAG, XTAL_16MHz/8, newbrain_ctc_intf)
-	MCFG_TIMER_ADD_PERIODIC("z80ctc_c2", ctc_c2_tick, HZ(XTAL_16MHz/4/13))
+	MCFG_TIMER_ADD_PERIODIC("z80ctc_c2", ctc_c2_tick, attotime::from_hz(XTAL_16MHz/4/13))
 
 	/* AD-DA converters */
 	MCFG_ADC0809_ADD(ADC0809_TAG, 500000, newbrain_adc0809_intf)

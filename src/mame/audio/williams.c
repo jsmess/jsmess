@@ -554,7 +554,7 @@ static TIMER_CALLBACK( narc_sync_clear )
 
 static WRITE8_HANDLER( narc_master_sync_w )
 {
-	timer_set(space->machine, double_to_attotime(TIME_OF_74LS123(180000, 0.000001)), NULL, 0x01, narc_sync_clear);
+	timer_set(space->machine, attotime::from_double(TIME_OF_74LS123(180000, 0.000001)), NULL, 0x01, narc_sync_clear);
 	audio_sync |= 0x01;
 	logerror("Master sync = %02X\n", data);
 }
@@ -568,7 +568,7 @@ static WRITE8_HANDLER( narc_slave_talkback_w )
 
 static WRITE8_HANDLER( narc_slave_sync_w )
 {
-	timer_set(space->machine, double_to_attotime(TIME_OF_74LS123(180000, 0.000001)), NULL, 0x02, narc_sync_clear);
+	timer_set(space->machine, attotime::from_double(TIME_OF_74LS123(180000, 0.000001)), NULL, 0x02, narc_sync_clear);
 	audio_sync |= 0x02;
 	logerror("Slave sync = %02X\n", data);
 }
@@ -649,7 +649,7 @@ static READ8_HANDLER( adpcm_command_r )
 
 	/* don't clear the external IRQ state for a short while; this allows the
        self-tests to pass */
-	timer_set(space->machine, ATTOTIME_IN_USEC(10), NULL, 0, clear_irq_state);
+	timer_set(space->machine, attotime::from_usec(10), NULL, 0, clear_irq_state);
 	return soundlatch_r(space, 0);
 }
 
@@ -674,7 +674,7 @@ void williams_adpcm_data_w(int data)
 	{
 		cpu_set_input_line(sound_cpu, M6809_IRQ_LINE, ASSERT_LINE);
 		williams_sound_int_state = 1;
-		cpuexec_boost_interleave(space->machine, attotime_zero, ATTOTIME_IN_USEC(100));
+		cpuexec_boost_interleave(space->machine, attotime::zero, attotime::from_usec(100));
 	}
 }
 

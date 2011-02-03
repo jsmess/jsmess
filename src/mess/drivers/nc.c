@@ -309,7 +309,7 @@ static TIMER_CALLBACK(nc_keyboard_timer_callback)
         nc_update_interrupts(machine);
 
         /* don't trigger again, but don't free it */
-        timer_reset(state->keyboard_timer, attotime_never);
+        timer_reset(state->keyboard_timer, attotime::never);
 }
 
 
@@ -624,7 +624,7 @@ static WRITE8_HANDLER(nc_irq_status_w)
 		if ((data & (1<<3))!=0)
 		{
 			/* set timer to occur again */
-			timer_reset(state->keyboard_timer, ATTOTIME_IN_MSEC(10));
+			timer_reset(state->keyboard_timer, attotime::from_msec(10));
 
 			nc_update_interrupts(space->machine);
 		}
@@ -641,7 +641,7 @@ static WRITE8_HANDLER(nc_irq_status_w)
            )
         {
 			/* set timer to occur again */
-			timer_reset(state->keyboard_timer, ATTOTIME_IN_MSEC(10));
+			timer_reset(state->keyboard_timer, attotime::from_msec(10));
         }
 #endif
         state->irq_status &=~data;
@@ -670,7 +670,7 @@ static READ8_HANDLER(nc_key_data_in_r)
 		state->irq_status &= ~(1<<3);
 
 		/* set timer to occur again */
-		timer_reset(state->keyboard_timer, ATTOTIME_IN_MSEC(10));
+		timer_reset(state->keyboard_timer, attotime::from_msec(10));
 
 		nc_update_interrupts(space->machine);
 	}
@@ -797,7 +797,7 @@ static WRITE8_HANDLER(nc_uart_control_w)
 		}
 	}
 
-	timer_adjust_periodic(state->serial_timer, attotime_zero, 0, ATTOTIME_IN_HZ(baud_rate_table[(data & 0x07)]));
+	timer_adjust_periodic(state->serial_timer, attotime::zero, 0, attotime::from_hz(baud_rate_table[(data & 0x07)]));
 
 	state->uart_control = data;
 }
@@ -994,10 +994,10 @@ static MACHINE_START( nc100 )
 
 	/* keyboard timer */
 	state->keyboard_timer = timer_alloc(machine, nc_keyboard_timer_callback, NULL);
-	timer_adjust_oneshot(state->keyboard_timer, ATTOTIME_IN_MSEC(10), 0);
+	timer_adjust_oneshot(state->keyboard_timer, attotime::from_msec(10), 0);
 
 	/* dummy timer */
-	timer_pulse(machine, ATTOTIME_IN_HZ(50), NULL, 0, dummy_timer_callback);
+	timer_pulse(machine, attotime::from_hz(50), NULL, 0, dummy_timer_callback);
 
 	/* serial timer */
 	state->serial_timer = timer_alloc(machine, nc_serial_timer_callback, NULL);
@@ -1393,10 +1393,10 @@ static MACHINE_START( nc200 )
 
 	/* keyboard timer */
 	state->keyboard_timer = timer_alloc(machine, nc_keyboard_timer_callback, NULL);
-	timer_adjust_oneshot(state->keyboard_timer, ATTOTIME_IN_MSEC(10), 0);
+	timer_adjust_oneshot(state->keyboard_timer, attotime::from_msec(10), 0);
 
 	/* dummy timer */
-	timer_pulse(machine, ATTOTIME_IN_HZ(50), NULL, 0, dummy_timer_callback);
+	timer_pulse(machine, attotime::from_hz(50), NULL, 0, dummy_timer_callback);
 
 	/* serial timer */
 	state->serial_timer = timer_alloc(machine, nc_serial_timer_callback, NULL);
@@ -1697,7 +1697,7 @@ static MACHINE_CONFIG_START( nc100, nc_state )
 	MCFG_CPU_ADD("maincpu", Z80, /*6000000*/ 4606000)        /* Russell Marks says this is more accurate */
 	MCFG_CPU_PROGRAM_MAP(nc_map)
 	MCFG_CPU_IO_MAP(nc100_io)
-	MCFG_QUANTUM_TIME(HZ(60))
+	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_MACHINE_START( nc100 )
 	MCFG_MACHINE_RESET( nc100 )

@@ -265,7 +265,7 @@ static WRITE8_HANDLER( fm7_beeper_w )
 		{
 			beep_set_state(space->machine->device("beeper"),1);
 			logerror("timed beeper on\n");
-			timer_set(space->machine,ATTOTIME_IN_MSEC(205),NULL,0,fm7_beeper_off);
+			timer_set(space->machine,attotime::from_msec(205),NULL,0,fm7_beeper_off);
 		}
 	}
 	logerror("beeper state: %02x\n",data);
@@ -283,7 +283,7 @@ READ8_HANDLER( fm7_sub_beeper_r )
 	{
 		beep_set_state(space->machine->device("beeper"),1);
 		logerror("timed beeper on\n");
-		timer_set(space->machine,ATTOTIME_IN_MSEC(205),NULL,0,fm7_beeper_off);
+		timer_set(space->machine,attotime::from_msec(205),NULL,0,fm7_beeper_off);
 	}
 	return 0xff;
 }
@@ -730,7 +730,7 @@ WRITE8_HANDLER( fm77av_key_encoder_w )
 			fm77av_encoder_handle_command(state);
 
 		// wait 5us to set ACK flag
-		timer_set(space->machine,ATTOTIME_IN_USEC(5),NULL,0,fm77av_encoder_ack);
+		timer_set(space->machine,attotime::from_usec(5),NULL,0,fm77av_encoder_ack);
 
 		//logerror("ENC: write 0x%02x to data register, moved to pos %i\n",data,state->encoder.position);
 	}
@@ -1749,9 +1749,9 @@ static MACHINE_RESET(fm7)
 	UINT8* RAM = machine->region("maincpu")->base();
 	UINT8* ROM = machine->region("init")->base();
 
-	timer_adjust_periodic(state->timer,ATTOTIME_IN_NSEC(2034500),0,ATTOTIME_IN_NSEC(2034500));
-	timer_adjust_periodic(state->subtimer,ATTOTIME_IN_MSEC(20),0,ATTOTIME_IN_MSEC(20));
-	timer_adjust_periodic(state->keyboard_timer,attotime_zero,0,ATTOTIME_IN_MSEC(10));
+	timer_adjust_periodic(state->timer,attotime::from_nsec(2034500),0,attotime::from_nsec(2034500));
+	timer_adjust_periodic(state->subtimer,attotime::from_msec(20),0,attotime::from_msec(20));
+	timer_adjust_periodic(state->keyboard_timer,attotime::zero,0,attotime::from_msec(10));
 	if(state->type != SYS_FM7)
 		timer_adjust_oneshot(state->fm77av_vsync_timer,machine->primary_screen->time_until_vblank_end(),0);
 

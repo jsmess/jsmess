@@ -54,7 +54,7 @@
 		if(VERBOSE_PIO>=N) \
 		{ \
 			if( M ) \
-				logerror("%11.6f: %-24s",attotime_to_double(timer_get_time(machine)),(char*)M ); \
+				logerror("%11.6f: %-24s",timer_get_time(machine).as_double(),(char*)M ); \
 			logerror A; \
 		} \
 	} while (0)
@@ -479,7 +479,7 @@ static TIMER_CALLBACK( pcjr_keyb_signal_callback )
 
 	if ( pcjr_keyb.signal_count <= 0 )
 	{
-		timer_adjust_periodic( pcjr_keyb.keyb_signal_timer, attotime_never, 0, attotime_never );
+		timer_adjust_periodic( pcjr_keyb.keyb_signal_timer, attotime::never, 0, attotime::never );
 		pcjr_keyb.transferring = 0;
 	}
 }
@@ -517,7 +517,7 @@ static void pcjr_set_keyb_int(running_machine *machine, int state)
 		pcjr_keyb.transferring = 1;
 
 		/* Set timer */
-		timer_adjust_periodic( pcjr_keyb.keyb_signal_timer, ATTOTIME_IN_USEC(220), 0, ATTOTIME_IN_USEC(220) );
+		timer_adjust_periodic( pcjr_keyb.keyb_signal_timer, attotime::from_usec(220), 0, attotime::from_usec(220) );
 
 		/* Trigger NMI */
 		if ( ! pcjr_keyb.latch )

@@ -98,9 +98,9 @@ static void amiga_load_proc(device_image_interface &image)
 	fdc->fdc_status[id].cached = -1;
 	fdc->fdc_status[id].motor_on = 0;
 	fdc->fdc_status[id].rev_timer_started = 0;
-	timer_reset( fdc->fdc_status[id].rev_timer, attotime_never );
-	timer_reset( fdc->fdc_status[id].sync_timer, attotime_never );
-	timer_reset( fdc->fdc_status[id].dma_timer, attotime_never );
+	timer_reset( fdc->fdc_status[id].rev_timer, attotime::never );
+	timer_reset( fdc->fdc_status[id].sync_timer, attotime::never );
+	timer_reset( fdc->fdc_status[id].dma_timer, attotime::never );
 	fdc->fdc_rdy = 0;
 
 	check_extended_image( image.device().owner(), id );
@@ -115,9 +115,9 @@ static void amiga_unload_proc(device_image_interface &image)
 	fdc->fdc_status[id].cached = -1;
 	fdc->fdc_status[id].motor_on = 0;
 	fdc->fdc_status[id].rev_timer_started = 0;
-	timer_reset( fdc->fdc_status[id].rev_timer, attotime_never );
-	timer_reset( fdc->fdc_status[id].sync_timer, attotime_never );
-	timer_reset( fdc->fdc_status[id].dma_timer, attotime_never );
+	timer_reset( fdc->fdc_status[id].rev_timer, attotime::never );
+	timer_reset( fdc->fdc_status[id].sync_timer, attotime::never );
+	timer_reset( fdc->fdc_status[id].dma_timer, attotime::never );
 	fdc->fdc_rdy = 0;
 }
 
@@ -158,9 +158,9 @@ static DEVICE_START(amiga_fdc)
 		fdc->fdc_status[id].is_ext_image = 0;
 		fdc->fdc_status[id].tracklen = MAX_TRACK_BYTES;
 		fdc->fdc_status[id].disk_changed = DISK_DETECT_DELAY;
-		timer_reset( fdc->fdc_status[id].rev_timer, attotime_never );
-		timer_reset( fdc->fdc_status[id].sync_timer, attotime_never );
-		timer_reset( fdc->fdc_status[id].dma_timer, attotime_never );
+		timer_reset( fdc->fdc_status[id].rev_timer, attotime::never );
+		timer_reset( fdc->fdc_status[id].sync_timer, attotime::never );
+		timer_reset( fdc->fdc_status[id].dma_timer, attotime::never );
 		memset( fdc->fdc_status[id].mfm, 0xaa, MAX_MFM_TRACK_LEN );
 	}
 	fdc->fdc_sel = 0x0f;
@@ -237,10 +237,10 @@ static int fdc_get_curpos( device_t *device, int drive )
 		return 0;
 	}
 
-	elapsed = attotime_to_double(timer_timeelapsed( fdc->fdc_status[drive].rev_timer ));
+	elapsed = timer_timeelapsed( fdc->fdc_status[drive].rev_timer ).as_double();
 	speed = ( CUSTOM_REG(REG_ADKCON) & 0x100 ) ? 2 : 4;
 
-	bytes = elapsed / attotime_to_double( ATTOTIME_IN_USEC( speed * 8 ) );
+	bytes = elapsed /  attotime::from_usec( speed * 8 ).as_double();
 	pos = bytes % ( fdc->fdc_status[drive].tracklen );
 
 	return pos;
@@ -333,12 +333,12 @@ static TIMER_CALLBACK(fdc_sync_proc)
 		time = ONE_SECTOR_BYTES;
 		time *= ( CUSTOM_REG(REG_ADKCON) & 0x0100 ) ? 2 : 4;
 		time *= 8;
-		timer_adjust_oneshot(fdc->fdc_status[drive].sync_timer, ATTOTIME_IN_USEC( time ), drive);
+		timer_adjust_oneshot(fdc->fdc_status[drive].sync_timer, attotime::from_usec( time ), drive);
 		return;
 	}
 
 bail:
-	timer_reset( fdc->fdc_status[drive].sync_timer, attotime_never );
+	timer_reset( fdc->fdc_status[drive].sync_timer, attotime::never );
 }
 
 static TIMER_CALLBACK(fdc_dma_proc)
@@ -417,13 +417,13 @@ static TIMER_CALLBACK(fdc_dma_proc)
 			time = len_words * 2;
 			time *= ( CUSTOM_REG(REG_ADKCON) & 0x0100 ) ? 2 : 4;
 			time *= 8;
-			timer_adjust_oneshot(fdc->fdc_status[drive].dma_timer, ATTOTIME_IN_USEC( time ), drive);
+			timer_adjust_oneshot(fdc->fdc_status[drive].dma_timer, attotime::from_usec( time ), drive);
 			return;
 		}
 	}
 
 bail:
-	timer_reset( fdc->fdc_status[drive].dma_timer, attotime_never );
+	timer_reset( fdc->fdc_status[drive].dma_timer, attotime::never );
 }
 
 void amiga_fdc_setup_dma( device_t *device ) {
@@ -492,12 +492,12 @@ void amiga_fdc_setup_dma( device_t *device ) {
 	time += len_words * 2;
 	time *= ( CUSTOM_REG(REG_ADKCON) & 0x0100 ) ? 2 : 4;
 	time *= 8;
-	timer_adjust_oneshot(fdc->fdc_status[drive].dma_timer, ATTOTIME_IN_USEC( time ), drive);
+	timer_adjust_oneshot(fdc->fdc_status[drive].dma_timer, attotime::from_usec( time ), drive);
 
 	return;
 
 bail:
-	timer_reset( fdc->fdc_status[drive].dma_timer, attotime_never );
+	timer_reset( fdc->fdc_status[drive].dma_timer, attotime::never );
 }
 
 static void setup_fdc_buffer( device_t *device,int drive )
@@ -674,7 +674,7 @@ static TIMER_CALLBACK(fdc_rev_proc)
 	mos6526_flag_w(cia, 0);
 	mos6526_flag_w(cia, 1);
 
-	timer_adjust_oneshot(fdc->fdc_status[drive].rev_timer, ATTOTIME_IN_MSEC( ONE_REV_TIME ), drive);
+	timer_adjust_oneshot(fdc->fdc_status[drive].rev_timer, attotime::from_msec( ONE_REV_TIME ), drive);
 	fdc->fdc_status[drive].rev_timer_started = 1;
 
 	if ( fdc->fdc_status[drive].is_ext_image == 0 )
@@ -683,7 +683,7 @@ static TIMER_CALLBACK(fdc_rev_proc)
 		time = GAP_TRACK_BYTES + 6;
 		time *= ( CUSTOM_REG(REG_ADKCON) & 0x0100 ) ? 2 : 4;
 		time *= 8;
-		timer_adjust_oneshot(fdc->fdc_status[drive].sync_timer, ATTOTIME_IN_USEC( time ), drive);
+		timer_adjust_oneshot(fdc->fdc_status[drive].sync_timer, attotime::from_usec( time ), drive);
 	}
 }
 
@@ -696,7 +696,7 @@ static void start_rev_timer( device_t *device,int drive ) {
 		return;
 	}
 
-	timer_adjust_oneshot(fdc->fdc_status[drive].rev_timer, ATTOTIME_IN_MSEC( ONE_REV_TIME ), drive);
+	timer_adjust_oneshot(fdc->fdc_status[drive].rev_timer, attotime::from_msec( ONE_REV_TIME ), drive);
 	fdc->fdc_status[drive].rev_timer_started = 1;
 }
 
@@ -708,10 +708,10 @@ static void stop_rev_timer( device_t *device,int drive ) {
 		return;
 	}
 
-	timer_reset( fdc->fdc_status[drive].rev_timer, attotime_never );
+	timer_reset( fdc->fdc_status[drive].rev_timer, attotime::never );
 	fdc->fdc_status[drive].rev_timer_started = 0;
-	timer_reset( fdc->fdc_status[drive].dma_timer, attotime_never );
-	timer_reset( fdc->fdc_status[drive].sync_timer, attotime_never );
+	timer_reset( fdc->fdc_status[drive].dma_timer, attotime::never );
+	timer_reset( fdc->fdc_status[drive].sync_timer, attotime::never );
 }
 
 static void fdc_setup_leds(device_t *device, int drive ) {

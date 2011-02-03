@@ -149,8 +149,8 @@ MACHINE_START( dai )
 	state->tms5501 = machine->device("tms5501");
 
 	memory_configure_bank(machine, "bank2", 0, 4, machine->region("maincpu")->base() + 0x010000, 0x1000);
-	timer_set(machine, attotime_zero, NULL, 0, dai_bootstrap_callback);
-	timer_pulse(machine, ATTOTIME_IN_HZ(100),NULL,0,dai_timer);	/* timer for tms5501 */
+	timer_set(machine, attotime::zero, NULL, 0, dai_bootstrap_callback);
+	timer_pulse(machine, attotime::from_hz(100),NULL,0,dai_timer);	/* timer for tms5501 */
 }
 
 MACHINE_RESET( dai )

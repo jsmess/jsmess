@@ -420,10 +420,10 @@ static WRITE8_HANDLER(tutor_cassette_w)
 			{
 				state->tape_interrupt_enable = ! data;
 				if (state->tape_interrupt_enable)
-					timer_adjust_periodic(state->tape_interrupt_timer, /*ATTOTIME_IN_HZ(44100)*/attotime_zero, 0, ATTOTIME_IN_HZ(44100));
+					timer_adjust_periodic(state->tape_interrupt_timer, /*attotime::from_hz(44100)*/attotime::zero, 0, attotime::from_hz(44100));
 				else
 				{
-					timer_adjust_oneshot(state->tape_interrupt_timer, attotime_never, 0);
+					timer_adjust_oneshot(state->tape_interrupt_timer, attotime::never, 0);
 					cputag_set_input_line(space->machine, "maincpu", 1, CLEAR_LINE);
 				}
 			}

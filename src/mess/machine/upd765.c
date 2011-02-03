@@ -349,7 +349,7 @@ static TIMER_CALLBACK(upd765_seek_timer_callback)
 	/* seek complete */
 	upd765_seek_complete(device);
 
-	timer_reset(fdc->seek_timer, attotime_never);
+	timer_reset(fdc->seek_timer, attotime::never);
 }
 
 static void upd765_timer_func(device_t *device, int timer_type)
@@ -368,12 +368,12 @@ static void upd765_timer_func(device_t *device, int timer_type)
 			if (fdc->upd765_command_bytes[0] & UPD765_MF)
 			{
 				/* MFM */
-				timer_reset(fdc->timer, ATTOTIME_IN_USEC(13));
+				timer_reset(fdc->timer, attotime::from_usec(13));
 			}
 			else
 			{
 				/* FM */
-				timer_reset(fdc->timer, ATTOTIME_IN_USEC(27));
+				timer_reset(fdc->timer, attotime::from_usec(27));
 			}
 		}
 		else
@@ -406,7 +406,7 @@ static void upd765_timer_func(device_t *device, int timer_type)
 
 		upd765_set_data_request(device);
 
-		timer_reset(fdc->timer, attotime_never);
+		timer_reset(fdc->timer, attotime::never);
 	}
 	else if (fdc->timer_type == 4)
 	{
@@ -425,7 +425,7 @@ static void upd765_timer_func(device_t *device, int timer_type)
 			}
 		}
 
-		timer_reset(fdc->timer, attotime_never);
+		timer_reset(fdc->timer, attotime::never);
 	}
 }
 
@@ -454,7 +454,7 @@ static void upd765_setup_timed_generic(device_t *device, int timer_type, attotim
 	else
 	{
 		upd765_timer_func(device,fdc->timer_type);
-		timer_reset(fdc->timer, attotime_never);
+		timer_reset(fdc->timer, attotime::never);
 	}
 }
 
@@ -462,13 +462,13 @@ static void upd765_setup_timed_generic(device_t *device, int timer_type, attotim
 static void upd765_setup_timed_data_request(device_t *device, int bytes)
 {
 	/* setup timer to trigger in UPD765_DATA_RATE us */
-	upd765_setup_timed_generic(device, 0, ATTOTIME_IN_USEC(32-27)	/*UPD765_DATA_RATE)*bytes*/);
+	upd765_setup_timed_generic(device, 0, attotime::from_usec(32-27)	/*UPD765_DATA_RATE)*bytes*/);
 }
 
 /* setup result data request */
 static void upd765_setup_timed_result_data_request(device_t *device)
 {
-	upd765_setup_timed_generic(device, 2, ATTOTIME_IN_USEC(UPD765_DATA_RATE*2));
+	upd765_setup_timed_generic(device, 2, attotime::from_usec(UPD765_DATA_RATE*2));
 }
 
 
@@ -477,7 +477,7 @@ static void upd765_setup_timed_int(device_t *device,int signed_tracks)
 {
 	upd765_t *fdc = get_safe_token(device);
 	/* setup timer to signal after seek time is complete */
-	timer_adjust_oneshot(fdc->seek_timer, double_to_attotime(fdc->srt_in_ms*abs(signed_tracks)*0.001), 0);
+	timer_adjust_oneshot(fdc->seek_timer, attotime::from_double(fdc->srt_in_ms*abs(signed_tracks)*0.001), 0);
 }
 
 static void upd765_seek_setup(device_t *device, int is_recalibrate)
@@ -760,14 +760,14 @@ WRITE_LINE_DEVICE_HANDLER( upd765_tc_w )
 			{
 				if (fdc->timer_type==0)
 				{
-					timer_reset(fdc->timer, attotime_never);
+					timer_reset(fdc->timer, attotime::never);
 
 
 				}
 			}
 
 #ifdef NO_END_OF_CYLINDER
-			timer_adjust_oneshot(fdc->command_timer, attotime_zero, 0);
+			timer_adjust_oneshot(fdc->command_timer, attotime::zero, 0);
 #else
 			upd765_update_state(device);
 #endif
@@ -1671,7 +1671,7 @@ void upd765_update_state(device_t *device)
 
 		if ((fdc->upd765_transfer_bytes_remaining==0) || (fdc->upd765_flags & UPD765_TC))
 		{
-			timer_adjust_oneshot(fdc->command_timer, attotime_zero, 0);
+			timer_adjust_oneshot(fdc->command_timer, attotime::zero, 0);
 		}
 		else
 		{
@@ -1740,7 +1740,7 @@ void upd765_update_state(device_t *device)
 
 		if ((fdc->upd765_transfer_bytes_remaining == 0) || (fdc->upd765_flags & UPD765_TC))
 		{
-			timer_adjust_oneshot(fdc->command_timer, attotime_zero, 0);
+			timer_adjust_oneshot(fdc->command_timer, attotime::zero, 0);
 		}
 		else
 		{

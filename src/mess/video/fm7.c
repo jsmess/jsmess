@@ -635,7 +635,7 @@ static void fm77av_line_draw(running_machine* machine)
 
 	// set timer to disable busy flag
 	// 1/16 us for each byte changed
-	timer_set(machine,ATTOTIME_IN_USEC(byte_count/16),NULL,0,fm77av_alu_task_end);
+	timer_set(machine,attotime::from_usec(byte_count/16),NULL,0,fm77av_alu_task_end);
 }
 
 READ8_HANDLER( fm7_vram_r )
@@ -1394,7 +1394,7 @@ TIMER_CALLBACK( fm77av_vsync )
 	if(param == 0)  // start of vsync
 	{
 		state->video.vsync_flag = 1;
-		timer_adjust_oneshot(state->fm77av_vsync_timer,ATTOTIME_IN_USEC(510),1);  // VSync length for 200 line modes = 0.51ms
+		timer_adjust_oneshot(state->fm77av_vsync_timer,attotime::from_usec(510),1);  // VSync length for 200 line modes = 0.51ms
 	}
 	else
 	{

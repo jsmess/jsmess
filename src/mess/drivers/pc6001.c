@@ -1300,7 +1300,7 @@ static WRITE8_HANDLER( pc6001m2_timer_adj_w )
 {
 	pc6001_state *state = space->machine->driver_data<pc6001_state>();
 	state->timer_hz_div = data;
-	attotime period = ATTOTIME_IN_HZ((487.5*4)/(state->timer_hz_div+1));
+	attotime period = attotime::from_hz((487.5*4)/(state->timer_hz_div+1));
 	timer_adjust_periodic(state->timer_irq_timer, period,  0, period);
 }
 
@@ -2045,13 +2045,13 @@ static MACHINE_START(pc6001)
 {
 	pc6001_state *state = machine->driver_data<pc6001_state>();
 	/* TODO: accurate timing on this */
-	timer_pulse(machine, ATTOTIME_IN_HZ(250), NULL, 0, keyboard_callback);
+	timer_pulse(machine, attotime::from_hz(250), NULL, 0, keyboard_callback);
 
-	timer_pulse(machine, ATTOTIME_IN_HZ(1200/12), NULL, 0, cassette_callback); //1200 bauds / (1 start bit -> 8 data bits -> 3 stop bits)
+	timer_pulse(machine, attotime::from_hz(1200/12), NULL, 0, cassette_callback); //1200 bauds / (1 start bit -> 8 data bits -> 3 stop bits)
 
 	state->timer_hz_div = 3;
 	{
-		attotime period = ATTOTIME_IN_HZ((487.5*4)/(state->timer_hz_div+1));
+		attotime period = attotime::from_hz((487.5*4)/(state->timer_hz_div+1));
 		state->timer_irq_timer = timer_alloc(machine, audio_callback, NULL);
 		timer_adjust_periodic(state->timer_irq_timer, period,  0, period);
 	}

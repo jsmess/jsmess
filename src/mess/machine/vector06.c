@@ -175,7 +175,7 @@ WRITE8_HANDLER(vector06_disc_w)
 
 MACHINE_START( vector06 )
 {
-	timer_pulse(machine, ATTOTIME_IN_HZ(50), NULL, 0, reset_check_callback);
+	timer_pulse(machine, attotime::from_hz(50), NULL, 0, reset_check_callback);
 }
 
 MACHINE_RESET( vector06 )

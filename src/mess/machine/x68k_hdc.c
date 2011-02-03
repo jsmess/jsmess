@@ -127,7 +127,7 @@ WRITE16_DEVICE_HANDLER( x68k_hdc_w )
 
 			sasi->req = 0;
 			sasi->status_port &= ~0x01;
-			timer_set(device->machine,ATTOTIME_IN_NSEC(450),sasi,0,req_delay);
+			timer_set(device->machine,attotime::from_nsec(450),sasi,0,req_delay);
 			sasi->transfer_byte_count++;
 			if(sasi->transfer_byte_count >= sasi->transfer_byte_total)
 			{
@@ -165,7 +165,7 @@ WRITE16_DEVICE_HANDLER( x68k_hdc_w )
 			// reset REQ temporarily
 			sasi->req = 0;
 			sasi->status_port &= ~0x01;
-			timer_set(device->machine,ATTOTIME_IN_NSEC(450),sasi,0,req_delay);
+			timer_set(device->machine,attotime::from_nsec(450),sasi,0,req_delay);
 
 			sasi->command_byte_count++;
 			if(sasi->command_byte_count >= sasi->command_byte_total)
@@ -310,7 +310,7 @@ WRITE16_DEVICE_HANDLER( x68k_hdc_w )
 				sasi->status_port |= 0x08;
 				sasi->command_byte_count = 0;
 				sasi->command_byte_total = 0;
-				timer_set(device->machine,ATTOTIME_IN_NSEC(45),sasi,0,req_delay);
+				timer_set(device->machine,attotime::from_nsec(45),sasi,0,req_delay);
 			}
 		}
 		break;
@@ -362,7 +362,7 @@ READ16_DEVICE_HANDLER( x68k_hdc_r )
 			// reset REQ temporarily
 			sasi->req = 0;
 			sasi->status_port &= ~0x01;
-			timer_set(device->machine,ATTOTIME_IN_NSEC(450),sasi,0,req_delay);
+			timer_set(device->machine,attotime::from_nsec(450),sasi,0,req_delay);
 
 			return sasi->status;
 		}
@@ -418,7 +418,7 @@ READ16_DEVICE_HANDLER( x68k_hdc_r )
 
 			sasi->req = 0;
 			sasi->status_port &= ~0x01;
-			timer_set(device->machine,ATTOTIME_IN_NSEC(450),sasi,0,req_delay);
+			timer_set(device->machine,attotime::from_nsec(450),sasi,0,req_delay);
 			sasi->transfer_byte_count++;
 			if(sasi->transfer_byte_count >= sasi->transfer_byte_total)
 			{

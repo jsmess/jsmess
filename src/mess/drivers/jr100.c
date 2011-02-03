@@ -382,7 +382,7 @@ static MACHINE_CONFIG_START( jr100, jr100_state )
 
 	MCFG_CASSETTE_ADD( "cassette", jr100_cassette_config )
 
-	MCFG_TIMER_ADD_PERIODIC("sound_tick", sound_tick, HZ(XTAL_14_31818MHz / 16))
+	MCFG_TIMER_ADD_PERIODIC("sound_tick", sound_tick, attotime::from_hz(XTAL_14_31818MHz / 16))
 
 	/* quickload */
 	MCFG_QUICKLOAD_ADD("quickload", jr100, "prg", 2)

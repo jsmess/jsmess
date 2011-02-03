@@ -91,7 +91,7 @@ static DEVICE_START( pcf8593 )
 	_logerror( 0, ("pcf8593_init\n"));
 	memset( rtc, 0, sizeof(*rtc));
 	rtc->timer = timer_alloc(device->machine,  pcf8593_timer_callback , (void *) device);
-	timer_adjust_periodic(rtc->timer, ATTOTIME_IN_SEC(1), 0, ATTOTIME_IN_SEC(1));
+	timer_adjust_periodic(rtc->timer, attotime::from_seconds(1), 0, attotime::from_seconds(1));
 }
 
 

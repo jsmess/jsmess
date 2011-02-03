@@ -119,7 +119,7 @@ DEVICE_IMAGE_LOAD( tx0_tape )
 			if (state->tape_reader.motor_on && state->tape_reader.rcl)
 			{
 				/* delay is approximately 1/400s */
-				timer_adjust_oneshot(state->tape_reader.timer, ATTOTIME_IN_USEC(2500), 0);
+				timer_adjust_oneshot(state->tape_reader.timer, attotime::from_usec(2500), 0);
 			}
 			else
 			{
@@ -194,7 +194,7 @@ static void begin_tape_read(tx0_state *state, int binary)
 	if (state->tape_reader.motor_on && state->tape_reader.rcl)
 	{
 		/* delay is approximately 1/400s */
-		timer_adjust_oneshot(state->tape_reader.timer, ATTOTIME_IN_USEC(2500), 0);
+		timer_adjust_oneshot(state->tape_reader.timer, attotime::from_usec(2500), 0);
 	}
 	else
 	{
@@ -246,7 +246,7 @@ static TIMER_CALLBACK(reader_callback)
 
 	if (state->tape_reader.motor_on && state->tape_reader.rcl)
 		/* delay is approximately 1/400s */
-		timer_adjust_oneshot(state->tape_reader.timer, ATTOTIME_IN_USEC(2500), 0);
+		timer_adjust_oneshot(state->tape_reader.timer, attotime::from_usec(2500), 0);
 	else
 		timer_enable(state->tape_reader.timer, 0);
 }
@@ -290,7 +290,7 @@ void tx0_io_p6h(device_t *device)
 	/* shuffle and punch 6-bit word */
 	tape_write(state, ((ac & 0100000) >> 15) | ((ac & 0010000) >> 11) | ((ac & 0001000) >> 7) | ((ac & 0000100) >> 3) | ((ac & 0000010) << 1) | ((ac & 0000001) << 5));
 
-	timer_adjust_oneshot(state->tape_puncher.timer, ATTOTIME_IN_USEC(15800), 0);
+	timer_adjust_oneshot(state->tape_puncher.timer, attotime::from_usec(15800), 0);
 }
 
 /*
@@ -306,7 +306,7 @@ void tx0_io_p7h(device_t *device)
 	/* shuffle and punch 6-bit word */
 	tape_write(state, ((ac & 0100000) >> 15) | ((ac & 0010000) >> 11) | ((ac & 0001000) >> 7) | ((ac & 0000100) >> 3) | ((ac & 0000010) << 1) | ((ac & 0000001) << 5) | 0100);
 
-	timer_adjust_oneshot(state->tape_puncher.timer, ATTOTIME_IN_USEC(15800), 0);
+	timer_adjust_oneshot(state->tape_puncher.timer, attotime::from_usec(15800), 0);
 }
 
 
@@ -369,7 +369,7 @@ void tx0_io_prt(device_t *device)
 	ch = ((ac & 0100000) >> 15) | ((ac & 0010000) >> 11) | ((ac & 0001000) >> 7) | ((ac & 0000100) >> 3) | ((ac & 0000010) << 1) | ((ac & 0000001) << 5);
 	typewriter_out(device->machine, ch);
 
-	timer_adjust_oneshot(state->typewriter.prt_timer, ATTOTIME_IN_MSEC(100), 0);
+	timer_adjust_oneshot(state->typewriter.prt_timer, attotime::from_msec(100), 0);
 }
 
 
@@ -396,7 +396,7 @@ void tx0_io_dis(device_t *device)
 	y = ac & 0777;
 	tx0_plot(device->machine, x, y);
 
-	timer_adjust_oneshot(state->dis_timer, ATTOTIME_IN_USEC(50), 0);
+	timer_adjust_oneshot(state->dis_timer, attotime::from_usec(50), 0);
 }
 
 
@@ -412,21 +412,21 @@ void tx0_io_dis(device_t *device)
 
 static void schedule_select(tx0_state *state)
 {
-	attotime delay = attotime_zero;
+	attotime delay = attotime::zero;
 
 	switch (state->magtape.command)
 	{
 	case 0:	/* backspace */
-		delay = ATTOTIME_IN_USEC(4600);
+		delay = attotime::from_usec(4600);
 		break;
 	case 1:	/* read */
-		delay = ATTOTIME_IN_USEC(8600);
+		delay = attotime::from_usec(8600);
 		break;
 	case 2:	/* rewind */
-		delay = ATTOTIME_IN_USEC(12000);
+		delay = attotime::from_usec(12000);
 		break;
 	case 3:	/* write */
-		delay = ATTOTIME_IN_USEC(4600);
+		delay = attotime::from_usec(4600);
 		break;
 	}
 	timer_adjust_oneshot(state->magtape.timer, delay, 0);
@@ -434,21 +434,21 @@ static void schedule_select(tx0_state *state)
 
 static void schedule_unselect(tx0_state *state)
 {
-	attotime delay = attotime_zero;
+	attotime delay = attotime::zero;
 
 	switch (state->magtape.command)
 	{
 	case 0:	/* backspace */
-		delay = ATTOTIME_IN_USEC(5750);
+		delay = attotime::from_usec(5750);
 		break;
 	case 1:	/* read */
-		delay = ATTOTIME_IN_USEC(1750);
+		delay = attotime::from_usec(1750);
 		break;
 	case 2:	/* rewind */
-		delay = ATTOTIME_IN_USEC(0);
+		delay = attotime::from_usec(0);
 		break;
 	case 3:	/* write */
-		delay = ATTOTIME_IN_USEC(5750);
+		delay = attotime::from_usec(5750);
 		break;
 	}
 	timer_adjust_oneshot(state->magtape.timer, delay, 0);
@@ -681,7 +681,7 @@ static void magtape_callback(device_t *device)
 					break;
 				}
 				if (state->magtape.state != MTS_UNSELECTING)
-					timer_adjust_oneshot(state->magtape.timer, ATTOTIME_IN_USEC(66), 0);
+					timer_adjust_oneshot(state->magtape.timer, attotime::from_usec(66), 0);
 			}
 			break;
 
@@ -840,14 +840,14 @@ static void magtape_callback(device_t *device)
 					break;
 				}
 				if (state->magtape.state != MTS_UNSELECTING)
-					timer_adjust_oneshot(state->magtape.timer, ATTOTIME_IN_USEC(66), 0);
+					timer_adjust_oneshot(state->magtape.timer, attotime::from_usec(66), 0);
 			}
 			break;
 
 		case 2:	/* rewind */
 			state->magtape.state = MTS_UNSELECTING;
 			/* we rewind at 10*read speed (I don't know the real value) */
-			timer_adjust_oneshot(state->magtape.timer, attotime_mul(ATTOTIME_IN_NSEC(6600), state->magtape.img->ftell()), 0);
+			timer_adjust_oneshot(state->magtape.timer, (attotime::from_nsec(6600) * state->magtape.img->ftell()), 0);
 			//schedule_unselect(state);
 			state->magtape.img->fseek( 0, SEEK_END);
 			state->magtape.irg_pos = MTIRGP_END;
@@ -935,7 +935,7 @@ static void magtape_callback(device_t *device)
 					state->magtape.img->unload();
 				}
 				else
-					timer_adjust_oneshot(state->magtape.timer, ATTOTIME_IN_USEC(66), 0);
+					timer_adjust_oneshot(state->magtape.timer, attotime::from_usec(66), 0);
 			}
 			break;
 		}
@@ -952,7 +952,7 @@ void tx0_sel(device_t *device)
 	{
 		if (0)
 			magtape_callback(device);
-		timer_adjust_oneshot(state->magtape.timer, attotime_zero, 0);
+		timer_adjust_oneshot(state->magtape.timer, attotime::zero, 0);
 	}
 }
 
