@@ -7,7 +7,6 @@
     TODO:
     - Rewrite keyboard input hook-up and decap/dump the keyboard MCU if possible;
     - x1turbo keyboard inputs are currently broken;
-	- Fix palette stuff, make it a lot cleaner;
 	- Implement proper PCG index hooks by beam positions;
     - Hook-up remaining .tap image formats;
     - Implement .rom format support (needs an image for it);
@@ -19,9 +18,7 @@
     - clean-ups!
     - There are various unclear video things, these are:
         - Implement the remaining scrn regs;
-        - Interlace mode
-        - Implement the new features of the x1turbo, namely the 4096 color feature amongst other
-          things
+        - Implement the new features of the x1turbo, namely the 4096 color feature amongst other things
         - (anything else?)
 
     per-game/program specific TODO:
@@ -233,13 +230,42 @@ static VIDEO_START( x1 )
 	state->gfx_bitmap_ram = auto_alloc_array(machine, UINT8, 0xc000*2);
 }
 
-static void x1_draw_pixel(running_machine *machine, bitmap_t *bitmap,int y,int x,UINT16	pen)
+static void x1_draw_pixel(running_machine *machine, bitmap_t *bitmap,int y,int x,UINT16	pen,UINT8 width,UINT8 height)
 {
 	if((x)>machine->primary_screen->visible_area().max_x || (y)>machine->primary_screen->visible_area().max_y)
 		return;
 
-	*BITMAP_ADDR16(bitmap, y, x) = machine->pens[pen];
+	if(width && height)
+	{
+		*BITMAP_ADDR16(bitmap, y+0, x+0) = machine->pens[pen];
+		*BITMAP_ADDR16(bitmap, y+0, x+1) = machine->pens[pen];
+		*BITMAP_ADDR16(bitmap, y+1, x+0) = machine->pens[pen];
+		*BITMAP_ADDR16(bitmap, y+1, x+1) = machine->pens[pen];
+	}
+	else if(width)
+	{
+		*BITMAP_ADDR16(bitmap, y, x+0) = machine->pens[pen];
+		*BITMAP_ADDR16(bitmap, y, x+1) = machine->pens[pen];
+	}
+	else if(height)
+	{
+		*BITMAP_ADDR16(bitmap, y+0, x) = machine->pens[pen];
+		*BITMAP_ADDR16(bitmap, y+1, x) = machine->pens[pen];
+	}
+	else
+		*BITMAP_ADDR16(bitmap, y, x) = machine->pens[pen];
 }
+
+/*
+attribute:
+x--- ---- double width
+-x-- ---- double height
+--x- ---- PCG select
+---x ---- color blinking
+---- x--- reverse color
+---- -xxx color pen
+
+*/
 
 static void draw_fgtilemap(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int w)
 {
@@ -247,27 +273,26 @@ static void draw_fgtilemap(running_machine *machine, bitmap_t *bitmap,const rect
 	UINT8 *videoram = state->videoram;
 	int y,x,res_x,res_y;
 	int screen_mask;
+	UINT8 prev_width;
 
 	screen_mask = (w == 2) ? 0xfff : 0x7ff;
 
 	for (y=0;y<50;y++)
 	{
+		prev_width = 0;
+
 		for (x=0;x<40*w;x++)
 		{
 			int tile = videoram[(x+(y*40*w)+state->crtc_start_addr) & screen_mask];
 			int color = state->colorram[(x+(y*40*w)+state->crtc_start_addr) & screen_mask] & 0x1f;
 			int width = (state->colorram[(x+(y*40*w)+state->crtc_start_addr) & screen_mask] & 0x80)>>7;
-			int height = (state->colorram[(x+(y*40*w)+state->crtc_start_addr) & screen_mask] & 0x40)>>6;
+			//int height = (state->colorram[(x+(y*40*w)+state->crtc_start_addr) & screen_mask] & 0x40)>>6;
 			int pcg_bank = (state->colorram[(x+(y*40*w)+state->crtc_start_addr) & screen_mask] & 0x20)>>5;
 			UINT8 *gfx_data = pcg_bank ? machine->region("pcg")->base() : machine->region("cgrom")->base();
 
-			/* skip draw if the x/y values are odd and the width/height is active, */
-			/* behaviour confirmed by Black Onyx title screen and the X1Demo */
-			if((x & 1) == 1 && width) continue;
-			if((y & 1) == 1 && height) continue;
-
-			res_x = (x/(width+1))*8*(width+1);
-			res_y = (y/(height+1))*(state->tile_height+1)*(height+1);
+			if(prev_width && x) { prev_width = 0; continue; }
+			if(width)
+				prev_width = 1;
 
 			{
 				int pen[3],pen_mask,pcg_pen,xi,yi;
@@ -275,13 +300,13 @@ static void draw_fgtilemap(running_machine *machine, bitmap_t *bitmap,const rect
 				pen_mask = color & 7;
 
 				/* We use custom drawing code due of the bitplane disable and the color revert stuff. */
-				for(yi=0;yi<(state->tile_height+1)*(height+1);yi+=(height+1))
+				for(yi=0;yi<8;yi++)
 				{
-					for(xi=0;xi<8*(width+1);xi+=(width+1))
+					for(xi=0;xi<8;xi++)
 					{
-						pen[0] = gfx_data[((tile*8)+yi/(height+1))+0x0000]>>(7-xi/(width+1)) & (pen_mask & 1)>>0;
-						pen[1] = gfx_data[((tile*8)+yi/(height+1))+0x0800]>>(7-xi/(width+1)) & (pen_mask & 2)>>1;
-						pen[2] = gfx_data[((tile*8)+yi/(height+1))+0x1000]>>(7-xi/(width+1)) & (pen_mask & 4)>>2;
+						pen[0] = gfx_data[((tile*8)+yi)+0x0000]>>(7-xi) & (pen_mask & 1)>>0;
+						pen[1] = gfx_data[((tile*8)+yi)+0x0800]>>(7-xi) & (pen_mask & 2)>>1;
+						pen[2] = gfx_data[((tile*8)+yi)+0x1000]>>(7-xi) & (pen_mask & 4)>>2;
 
 						pcg_pen = pen[2]<<2|pen[1]<<1|pen[0]<<0;
 
@@ -297,35 +322,20 @@ static void draw_fgtilemap(running_machine *machine, bitmap_t *bitmap,const rect
 						if((state->scrn_reg.blackclip & 8) && (color == (state->scrn_reg.blackclip & 7)))
 							pcg_pen = 0; // clip the pen to black
 
+						res_x = x*8+xi*(width+1);
+						if(state->scrn_reg.v400_mode)
+							res_y = y*((state->tile_height+1)/2)+yi*(0+1);
+						else
+							res_y = y*(state->tile_height+1)+yi*(0+1);
+
 						if(state->scrn_reg.v400_mode)
 						{
-							x1_draw_pixel(machine,bitmap,(res_y+yi)*2+0,res_x+xi,pcg_pen);
-							x1_draw_pixel(machine,bitmap,(res_y+yi)*2+1,res_x+xi,pcg_pen);
-							if(width)
-							{
-								x1_draw_pixel(machine,bitmap,(res_y+yi)*2+0,res_x+xi+1,pcg_pen);
-								x1_draw_pixel(machine,bitmap,(res_y+yi)*2+1,res_x+xi+1,pcg_pen);
-							}
-							if(height)
-							{
-								x1_draw_pixel(machine,bitmap,(res_y+yi+1)*2+0,res_x+xi,pcg_pen);
-								x1_draw_pixel(machine,bitmap,(res_y+yi+1)*2+1,res_x+xi,pcg_pen);
-							}
-							if(width && height)
-							{
-								x1_draw_pixel(machine,bitmap,(res_y+yi+1)*2+0,res_x+xi+1,pcg_pen);
-								x1_draw_pixel(machine,bitmap,(res_y+yi+1)*2+1,res_x+xi+1,pcg_pen);
-							}
+							x1_draw_pixel(machine,bitmap,res_y*2+0,res_x,pcg_pen,width,0);
+							x1_draw_pixel(machine,bitmap,res_y*2+1,res_x,pcg_pen,width,0);
 						}
 						else
 						{
-							x1_draw_pixel(machine,bitmap,res_y+yi,res_x+xi,pcg_pen);
-							if(width)
-								x1_draw_pixel(machine,bitmap,res_y+yi,res_x+xi+1,pcg_pen);
-							if(height)
-								x1_draw_pixel(machine,bitmap,res_y+yi+1,res_x+xi,pcg_pen);
-							if(width && height)
-								x1_draw_pixel(machine,bitmap,res_y+yi+1,res_x+xi+1,pcg_pen);
+							x1_draw_pixel(machine,bitmap,res_y,res_x,pcg_pen,width,0);
 						}
 					}
 				}
@@ -388,11 +398,11 @@ static void draw_gfxbitmap(running_machine *machine, bitmap_t *bitmap,const rect
 
 					if(state->scrn_reg.v400_mode)
 					{
-						x1_draw_pixel(machine,bitmap,(y*(state->tile_height+1)+yi)*2+0,x*8+xi,color);
-						x1_draw_pixel(machine,bitmap,(y*(state->tile_height+1)+yi)*2+1,x*8+xi,color);
+						x1_draw_pixel(machine,bitmap,(y*(state->tile_height+1)+yi)*2+0,x*8+xi,color,0,0);
+						x1_draw_pixel(machine,bitmap,(y*(state->tile_height+1)+yi)*2+1,x*8+xi,color,0,0);
 					}
 					else
-						x1_draw_pixel(machine,bitmap,y*(state->tile_height+1)+yi,x*8+xi,color);
+						x1_draw_pixel(machine,bitmap,y*(state->tile_height+1)+yi,x*8+xi,color,0,0);
 
 				}
 			}
@@ -981,7 +991,8 @@ static READ8_HANDLER( x1_pcg_r )
 
 	addr = (offset & 0x300) >> 8;
 
-	if(state->pcg_reset)
+	//if(state->pcg_reset)
+	if(0) //TODO: temporary fix, the PCG needs a full rewrite anyway
 	{
 		state->pcg_index_r[0] = state->pcg_index_r[1] = state->pcg_index_r[2] = state->bios_offset = 0;
 		state->pcg_reset = 0;
@@ -1038,7 +1049,8 @@ static WRITE8_HANDLER( x1_pcg_w )
 
 	addr = (offset & 0x300) >> 8;
 
-	if(state->pcg_reset)
+	//if(state->pcg_reset)
+	if(0) //TODO: temporary fix, the PCG needs a full rewrite anyway
 	{
 		state->pcg_index[0] = state->pcg_index[1] = state->pcg_index[2] = 0;
 		state->pcg_reset = 0;
@@ -1412,13 +1424,13 @@ static WRITE8_HANDLER( x1_io_w )
 }
 
 /* TODO: I should actually simplify this, by just overwriting X1 Turbo specifics here, and call plain X1 functions otherwise */
-// * at the end states devices used on plain X1 too
 static READ8_HANDLER( x1turbo_io_r )
 {
 	x1_state *state = space->machine->driver_data<x1_state>();
 	UINT8 *videoram = state->videoram;
 	state->io_bank_mode = 0; //any read disables the extended mode.
 
+	// a * at the end states devices used on plain X1 too
 	if(offset == 0x0700)							{ return (ym2151_r(space->machine->device("ym"), offset-0x0700) & 0x7f) | (input_port_read(space->machine, "SOUND_SW") & 0x80); }
 	else if(offset == 0x0701)		                { return ym2151_r(space->machine->device("ym"), offset-0x0700); }
 	//0x704 is FM sound detection port on X1 turboZ
@@ -1465,6 +1477,8 @@ static WRITE8_HANDLER( x1turbo_io_w )
 {
 	x1_state *state = space->machine->driver_data<x1_state>();
 	UINT8 *videoram = state->videoram;
+
+	// a * at the end states devices used on plain X1 too
 	if(state->io_bank_mode == 1)                    { x1_ex_gfxram_w(space, offset, data); }
 	else if(offset == 0x0700 || offset == 0x0701)	{ ym2151_w(space->machine->device("ym"), offset-0x0700,data); }
 	//0x704 is FM sound detection port on X1 turboZ
@@ -1636,8 +1650,10 @@ static WRITE_LINE_DEVICE_HANDLER(vsync_changed)
 {
 	x1_state *drvstate = device->machine->driver_data<x1_state>();
 	drvstate->vsync = (state & 1) ? 0x04 : 0x00;
+
 	if(state & 1 && drvstate->pcg_reset_occurred == 0) { drvstate->pcg_reset = drvstate->pcg_reset_occurred = 1; }
-	if(!(state & 1))                         { drvstate->pcg_reset_occurred = 0; }
+	if(!(state & 1))                         		   { drvstate->pcg_reset_occurred = 0; }
+
 	//printf("%d %02x\n",device->machine->primary_screen->vpos(),drvstate->vsync);
 }
 
@@ -1939,7 +1955,7 @@ INPUT_PORTS_START( x1turbo )
 	PORT_DIPNAME( 0x01, 0x01, "Interlace mode" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0e, 0x00, "Default Boot Device" ) // this selects what kind of device is loaded at start-up
+	PORT_DIPNAME( 0x0e, 0x00, "Default Auto-boot Device" ) // this selects what kind of device is loaded at start-up
 	PORT_DIPSETTING(    0x00, "5/3-inch 2D" )
 	PORT_DIPSETTING(    0x02, "5/3-inch 2DD" )
 	PORT_DIPSETTING(    0x04, "5/3-inch 2HD" )
@@ -2209,6 +2225,7 @@ static MACHINE_RESET( x1 )
 
 	state->io_bank_mode = 0;
 	state->pcg_index[0] = state->pcg_index[1] = state->pcg_index[2] = 0;
+	state->pcg_index_r[0] = state->pcg_index_r[1] = state->pcg_index_r[2] = state->bios_offset = 0;
 
 	//cpu_set_irq_callback(machine->device("maincpu"), x1_irq_callback);
 
