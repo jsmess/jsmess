@@ -437,5 +437,3 @@ static void check_board_buttons ( running_machine *machine )
 	}
 
 }
-
-
