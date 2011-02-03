@@ -1199,7 +1199,7 @@ ROM_END
 
 
 /* nn */ /* nn is part of the instruction rom name, should there be a game for each number? */
-/* -- */ CONS( 1989, megatech, 0, 0,     megatech_slot, megatech, mt_slot, "Sega",                  "Mega-Tech", GAME_NOT_WORKING )
+/* -- */ CONS( 1989, megatech, 0, 0,     megatech_slot, megatech, mt_slot, "Sega",                  "Mega-Tech", GAME_IS_BIOS_ROOT )
 /* 01 */ GAME( 1988, mt_beast, megatech, megatech, megatech, mt_crt, ROT0, "Sega",                  "Altered Beast (Mega-Tech)", GAME_NOT_WORKING )
 /* 02 */ GAME( 1988, mt_shar2, megatech, megatech, megatech, mt_crt, ROT0, "Sega",                  "Space Harrier II (Mega-Tech)", GAME_NOT_WORKING )
 /* 03 */ GAME( 1988, mt_stbld, megatech, megatech, megatech, mt_crt, ROT0, "Sega",                  "Super Thunder Blade (Mega-Tech)", GAME_NOT_WORKING )
@@ -1252,7 +1252,7 @@ ROM_END
 /* 50 */ // unknown
 /* 51 */ GAME( 1991, mt_srage, megatech, megatech, megatech, mt_crt, ROT0, "Sega",                  "Streets of Rage (Mega-Tech)", GAME_NOT_WORKING )
 /* 52 */ GAME( 1991, mt_sonic, megatech, megatech, megatech, mt_crt, ROT0, "Sega",                  "Sonic The Hedgehog (Mega-Tech, set 1)", GAME_NOT_WORKING )
-/*    */ GAME( 1991, mt_sonia, megatech, megatech, megatech, mt_crt, ROT0, "Sega",                  "Sonic The Hedgehog (Mega-Tech, set 2)", GAME_NOT_WORKING )
+/*    */ GAME( 1991, mt_sonia, mt_sonic, megatech, megatech, mt_crt, ROT0, "Sega",                  "Sonic The Hedgehog (Mega-Tech, set 2)", GAME_NOT_WORKING )
 /* 53 */ GAME( 1990, mt_fshrk, megatech, megatech, megatech, mt_crt, ROT0, "Toaplan / Sega",        "Fire Shark (Mega-Tech)", GAME_NOT_WORKING )
 /* 54 */ GAME( 1991, mt_spman, megatech, megatech, megatech, mt_crt, ROT0, "Marvel / Sega",         "Spider-Man vs The Kingpin (Mega-Tech)", GAME_NOT_WORKING )
 /* 55 */ // unknown
