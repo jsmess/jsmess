@@ -477,6 +477,11 @@ $(MESSOBJ)/mame.a: \
 	$(MAME_MACHINE)/neocrypt.o	\
 	$(MAME_MACHINE)/psx.o		\
 	$(MAME_VIDEO)/psx.o			\
+	$(MAME_DRIVERS)/cdi.o		\
+	$(MAME_MACHINE)/cdi070.o	\
+	$(MAME_MACHINE)/cdicdic.o	\
+	$(MAME_MACHINE)/cdislave.o	\
+	$(MAME_VIDEO)/mcd212.o		\
 
 #-------------------------------------------------
 # the following files are general components and
@@ -1300,11 +1305,6 @@ $(MESSOBJ)/pel.a:				\
 	$(MESS_VIDEO)/orao.o		\
 
 $(MESSOBJ)/philips.a:			\
-	$(MESS_DRIVERS)/cdi.o		\
-	$(MESS_MACHINE)/cdi070.o	\
-	$(MESS_MACHINE)/cdicdic.o	\
-	$(MESS_MACHINE)/cdislave.o	\
-	$(MESS_VIDEO)/mcd212.o		\
 	$(MESS_VIDEO)/p2000m.o		\
 	$(MESS_DRIVERS)/p2000t.o	\
 	$(MESS_MACHINE)/p2000t.o	\
