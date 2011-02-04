@@ -495,7 +495,6 @@ void MessBuildDataMap(datamap *properties_datamap)
 	// MESS specific stuff
 	datamap_add(properties_datamap, IDC_DIR_LIST,				DM_STRING,	NULL);
 	datamap_add(properties_datamap, IDC_RAM_COMBOBOX,			DM_INT,		OPTION_RAMSIZE);
-//	datamap_add(properties_datamap, IDC_USE_NEW_UI,				DM_BOOL,	"newui");
 
 	// set up callbacks
 	datamap_set_callback(properties_datamap, IDC_DIR_LIST,		DCT_READ_CONTROL,		DirListReadControl);

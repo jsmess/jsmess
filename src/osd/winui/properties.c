@@ -129,6 +129,7 @@ b) Exit the dialog.
 #include "mui_audit.h"
 #include "mui_opts.h"
 #include "resource.h"
+#include "resourcems.h"
 #include "dijoystick.h"     /* For DIJoystick avalibility. */
 #include "mui_util.h"
 #include "directdraw.h"
@@ -2458,6 +2459,10 @@ static void BuildDataMap(void)
 
 	// input device options
 	datamap_add(properties_datamap, IDC_DUAL_LIGHTGUN,			DM_BOOL,	WINOPTION_DUAL_LIGHTGUN);
+	
+	// show menu
+	datamap_add(properties_datamap, IDC_SHOW_MENU,				DM_BOOL,	WINOPTION_MENU);
+
 
 	// set up callbacks
 	datamap_set_callback(properties_datamap, IDC_ROTATE,		DCT_READ_CONTROL,		RotateReadControl);

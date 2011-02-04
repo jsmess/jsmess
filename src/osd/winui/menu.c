@@ -2013,16 +2013,13 @@ int win_create_menu(running_machine *machine, HMENU *menus)
 	HMENU menu_bar = NULL;
 	HMODULE module;
 
-//	if (options_get_bool(mame_options(), "newui"))
-//	{
-		module = win_resource_module();
-		menu_bar = LoadMenu(module, MAKEINTRESOURCE(IDR_RUNTIME_MENU));
-		if (!menu_bar)
-			goto error;
+	module = win_resource_module();
+	menu_bar = LoadMenu(module, MAKEINTRESOURCE(IDR_RUNTIME_MENU));
+	if (!menu_bar)
+		goto error;
 
-		if (win_setup_menus(machine, module, menu_bar))
-			goto error;
-//	}
+	if (win_setup_menus(machine, module, menu_bar))
+		goto error;
 
 	*menus = menu_bar;
 	return 0;

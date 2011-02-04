@@ -1027,6 +1027,9 @@ BEGIN
     PUSHBUTTON      "Reset",IDC_PROP_RESET,4,222,97,14,0,0,HIDC_PROP_RESET
     PUSHBUTTON      "Restore Default Settings",IDC_USE_DEFAULT,118,222,97,14,
                     0,0,HIDC_USE_DEFAULT
+    CONTROL         "Show Menu",IDC_SHOW_MENU,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,119,134,86,10,0
+					
 END
 
 IDD_PROP_VECTOR DIALOGEX 0, 0, 220, 240
