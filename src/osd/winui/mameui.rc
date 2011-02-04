@@ -334,8 +334,13 @@ BEGIN
     END
     POPUP "&Help"
     BEGIN
+#ifdef MESS	
         MENUITEM "About This System...",        ID_HELP_ABOUTSYSTEM
         MENUITEM "&About MESS...",              ID_HELP_ABOUT_NEWUI
+#else
+        MENUITEM "About This Game...",        ID_HELP_ABOUTSYSTEM
+        MENUITEM "&About MAME...",              ID_HELP_ABOUT_NEWUI
+#endif	
     END
 END
 
@@ -412,7 +417,6 @@ IDI_CHECKMARK           ICON                    "res\\checkmark.ico"
 IDI_HEADER_UP           ICON                    "res\\header_up.ico"
 IDI_HEADER_DOWN         ICON                    "res\\header_down.ico"
 
-#ifdef MESS
 IDI_WIN_NOROMSNEEDED    ICON                    "res\\win_nrnd.ico"
 IDI_WIN_MISSINGOPTROM	ICON	         		"res\\win_noor.ico"
 IDI_WIN_FLOP            ICON        			"res\\win_flop.ico"
@@ -431,7 +435,6 @@ IDI_ICON_FLOP           ICON    DISCARDABLE     "res\\win_flop.ico"
 IDI_ICON_PRIN           ICON    DISCARDABLE     "res\\win_prin.ico"
 IDI_ICON_SERL           ICON    DISCARDABLE     "res\\win_serl.ico"
 IDI_ICON_SNAP           ICON    DISCARDABLE     "res\\win_snap.ico"
-#endif
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -1080,7 +1083,6 @@ BEGIN
 					LVS_OWNERDRAWFIXED | WS_BORDER | WS_TABSTOP,65,28,42,172
     GROUPBOX        "",IDC_SPLITTER,55,28,8,172,BS_NOTIFY | NOT WS_VISIBLE
     GROUPBOX        "",IDC_SPLITTER2,109,28,8,172,BS_NOTIFY | NOT WS_VISIBLE
-#ifdef MESS
     CONTROL         "",IDC_SWTAB,"SysTabControl32",TCS_HOTTRACK,119,0,200,100
     CONTROL         "List2",IDC_SWLIST,"SysListView32",LVS_REPORT | 
                     LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_AUTOARRANGE | 
@@ -1092,7 +1094,6 @@ BEGIN
                     LVS_SHAREIMAGELISTS |
 					LVS_OWNERDRAWFIXED | WS_BORDER | WS_TABSTOP,119,60,42,140	
     GROUPBOX        "",IDC_SPLITTER3,163,28,8,172,BS_NOTIFY | NOT WS_VISIBLE
-#endif
     CONTROL         "",IDC_SSFRAME,"Static",SS_ETCHEDFRAME | SS_NOTIFY,121,
                     11,181,194
     CONTROL         "",IDC_SSTAB,"SysTabControl32",TCS_HOTTRACK,121,0,181,18

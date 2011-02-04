@@ -64,11 +64,7 @@ typedef struct
  ***************************************************************************/
 
 static int CALLBACK BrowseCallbackProc(HWND hwnd, UINT uMsg, LPARAM lParam, LPARAM lpData);
-#ifdef MESS
 BOOL            BrowseForDirectory(HWND hwnd, LPCTSTR pStartDir, TCHAR* pResult);
-#else
-static BOOL     BrowseForDirectory(HWND hwnd, LPCTSTR pStartDir, TCHAR* pResult);
-#endif
 
 static void     DirInfo_SetDir(tDirInfo *pInfo, int nType, int nItem, LPCTSTR pText);
 static TCHAR*   DirInfo_Dir(tDirInfo *pInfo, int nType);

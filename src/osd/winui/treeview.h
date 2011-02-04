@@ -123,12 +123,10 @@ enum
 	FOLDER_SCREENS,
 	FOLDER_MECHANICAL,
 	FOLDER_NONMECHANICAL,
-#ifdef MESS
 	FOLDER_CONSOLE,
 	FOLDER_COMPUTER,
 	FOLDER_MODIFIED,
 	FOLDER_MOUSE,
-#endif
 	MAX_FOLDERS,
 };
 
@@ -145,11 +143,9 @@ typedef enum
 	F_HORIZONTAL    = 0x00001000,
 	F_VERTICAL      = 0x00002000,
 	F_MECHANICAL    = 0x00004000,
-#ifdef MESS
 	F_COMPUTER      = 0x00000200,
 	F_CONSOLE       = 0x00000400,
 	F_MODIFIED      = 0x00000800,
-#endif
 	F_MASK          = 0x0000FFFF,
 	F_INIEDIT       = 0x00010000, // There is an .ini that can be edited. MSH 20070811
 	F_CUSTOM        = 0x01000000  // for current .ini custom folders

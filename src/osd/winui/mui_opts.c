@@ -47,10 +47,7 @@
 #include "winmain.h"
 #include "winutf8.h"
 #include "strconv.h"
-
-#ifdef MESS
 #include "optionsms.h"
-#endif // MESS
 
 #ifdef _MSC_VER
 #define snprintf _snprintf
@@ -113,6 +110,7 @@ static void remove_all_source_options(void);
 #define MUIOPTION_RANDOM_BACKGROUND				"random_background"
 #define MUIOPTION_DEFAULT_FOLDER_ID				"default_folder_id"
 #define MUIOPTION_SHOW_IMAGE_SECTION			"show_image_section"
+#define MUIOPTION_SHOW_SOFTWARE_SECTION			"show_software_section"
 #define MUIOPTION_SHOW_FOLDER_SECTION			"show_folder_section"
 #define MUIOPTION_HIDE_FOLDERS					"hide_folders"
 #define MUIOPTION_SHOW_STATUS_BAR				"show_status_bar"
@@ -168,6 +166,7 @@ static void remove_all_source_options(void);
 #define MUIOPTION_UI_KEY_VIEW_FULLSCREEN		"ui_key_view_fullscreen"
 #define MUIOPTION_UI_KEY_VIEW_PAGETAB			"ui_key_view_pagetab"
 #define MUIOPTION_UI_KEY_VIEW_PICTURE_AREA		"ui_key_view_picture_area"
+#define MUIOPTION_UI_KEY_VIEW_SOFTWARE_AREA		"ui_key_view_software_area"
 #define MUIOPTION_UI_KEY_VIEW_STATUS			"ui_key_view_status"
 #define MUIOPTION_UI_KEY_VIEW_TOOLBARS			"ui_key_view_toolbars"
 #define MUIOPTION_UI_KEY_VIEW_TAB_CABINET		"ui_key_view_tab_cabinet"
@@ -262,11 +261,13 @@ static const options_entry regSettings[] =
 	{ MUIOPTION_SHOW_TABS,					"0",        OPTION_BOOLEAN,    NULL },
 	{ MUIOPTION_HIDE_TABS,					"flyer, cabinet, marquee, title, cpanel, pcb", 0, NULL },
 	{ MUIOPTION_HISTORY_TAB,				"1",        0,                 NULL },
+	{ MUIOPTION_SHOW_SOFTWARE_SECTION,		"1",        OPTION_BOOLEAN,    NULL },
 #else
 	{ MUIOPTION_SHOW_FOLDER_SECTION,		"1",        OPTION_BOOLEAN,    NULL },
 	{ MUIOPTION_SHOW_TABS,					"1",        OPTION_BOOLEAN,    NULL },
 	{ MUIOPTION_HIDE_TABS,					"marquee, title, cpanel, pcb, history", 0, NULL },
 	{ MUIOPTION_HISTORY_TAB,				"0",        0,                 NULL },
+	{ MUIOPTION_SHOW_SOFTWARE_SECTION,		"0",        OPTION_BOOLEAN,    NULL },
 #endif
 
 	{ MUIOPTION_SORT_COLUMN,				"0",        0,                 NULL },
@@ -345,6 +346,7 @@ static const options_entry regSettings[] =
 	{ MUIOPTION_UI_KEY_VIEW_FULLSCREEN,		"KEYCODE_F11",                0, NULL },
 	{ MUIOPTION_UI_KEY_VIEW_PAGETAB,		"KEYCODE_LALT KEYCODE_B",     0, NULL },
 	{ MUIOPTION_UI_KEY_VIEW_PICTURE_AREA,	"KEYCODE_LALT KEYCODE_P",     0, NULL },
+	{ MUIOPTION_UI_KEY_VIEW_SOFTWARE_AREA,	"KEYCODE_LALT KEYCODE_W",     0, NULL },
 	{ MUIOPTION_UI_KEY_VIEW_STATUS,			"KEYCODE_LALT KEYCODE_S",     0, NULL },
     { MUIOPTION_UI_KEY_VIEW_TOOLBARS,		"KEYCODE_LALT KEYCODE_T",     0, NULL },
 
@@ -372,10 +374,6 @@ static const options_entry regSettings[] =
 	{ MUIOPTION_UI_JOY_HISTORY_UP,			"2,0,4,0",  0,                 NULL },
 	{ MUIOPTION_UI_JOY_HISTORY_DOWN,		"2,0,1,0",  0,                 NULL },
 	{ MUIOPTION_UI_JOY_EXEC,				"0,0,0,0",  0,                 NULL },
-
-#ifndef MESS
-	{ NULL,									NULL,       OPTION_HEADER,     "GAME STATISTICS" },
-#endif
 	{ NULL }
 };
 
@@ -386,9 +384,7 @@ static const options_entry perGameOptions[] =
 	{ "_play_time",              "0",        0,                 NULL },
 	{ "_rom_audit",              "-1",       0,                 NULL },
 	{ "_samples_audit",          "-1",       0,                 NULL },
-#ifdef MESS
 	{ "_extra_software",         "",         0,                 NULL },
-#endif
 	{ NULL }
 };
 
@@ -512,10 +508,7 @@ core_options *CreateGameOptions(int driver_index)
 	if (is_global)
 		options_set_option_default_value(opts, OPTION_INIPATH, "ini");
 
-#ifdef MESS
 	MessSetupGameOptions(opts, driver_index);
-#endif // MESS
-
 	return opts;
 }
 
@@ -531,9 +524,7 @@ BOOL OptionsInit()
 	// set up the MAME32 settings (these get placed in MAME32ui.ini
 	settings = options_create(memory_error);
 	options_add_entries(settings, regSettings);
-#ifdef MESS
 	MessSetupSettings(settings);
-#endif
 
 	// set up per game options
 	{
@@ -857,6 +848,16 @@ void SetShowScreenShot(BOOL val)
 BOOL GetShowScreenShot(void)
 {
 	return options_get_bool(settings, MUIOPTION_SHOW_IMAGE_SECTION);
+}
+
+void SetShowSoftware(BOOL val)
+{
+	options_set_bool(settings, MUIOPTION_SHOW_SOFTWARE_SECTION, val, OPTION_PRIORITY_CMDLINE);
+}
+
+BOOL GetShowSoftware(void)
+{
+	return options_get_bool(settings, MUIOPTION_SHOW_SOFTWARE_SECTION);
 }
 
 void SetShowFolderList(BOOL val)
@@ -1785,6 +1786,10 @@ input_seq* Get_ui_key_view_picture_area(void)
 {
 	return options_get_input_seq(settings, MUIOPTION_UI_KEY_VIEW_PICTURE_AREA);
 }
+input_seq* Get_ui_key_view_software_area(void)
+{
+	return options_get_input_seq(settings, MUIOPTION_UI_KEY_VIEW_SOFTWARE_AREA);
+}
 input_seq* Get_ui_key_view_status(void)
 {
 	return options_get_input_seq(settings, MUIOPTION_UI_KEY_VIEW_STATUS);
@@ -2653,9 +2658,7 @@ BOOL IsGlobalOption(const char *option_name)
 	static const char *global_options[] =
 	{
 		OPTION_ROMPATH,
-#ifdef MESS
 		OPTION_HASHPATH,
-#endif // MESS
 		OPTION_SAMPLEPATH,
 		OPTION_ARTPATH,
 		OPTION_CTRLRPATH,

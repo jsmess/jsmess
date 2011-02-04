@@ -129,7 +129,6 @@ b) Exit the dialog.
 #include "mui_audit.h"
 #include "mui_opts.h"
 #include "resource.h"
-#include "resourcems.h"
 #include "dijoystick.h"     /* For DIJoystick avalibility. */
 #include "mui_util.h"
 #include "directdraw.h"
@@ -149,11 +148,8 @@ b) Exit the dialog.
 #define snprintf _snprintf
 #endif
 
-#ifdef MESS
-// done like this until I figure out a better idea
 #include "resourcems.h"
 #include "propertiesms.h"
-#endif
 
 #if defined(__GNUC__)
 /* fix warning: cast does not match function type */
@@ -1216,10 +1212,8 @@ INT_PTR CALLBACK GameOptionsProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lPar
 				}
 				break;
 			default:
-#ifdef MESS
 				if (MessPropertiesCommand(hDlg, wNotifyCode, wID, &changed))
 					break;
-#endif // MESS
 
 				// use default behavior; try to get the result out of the datamap if
 				// appropriate
@@ -2509,10 +2503,7 @@ static void BuildDataMap(void)
 	datamap_set_trackbar_range(properties_datamap, IDC_VOLUME,      -32,  0, 1);
 	datamap_set_trackbar_range(properties_datamap, IDC_SECONDSTORUN, 0,  60, 1);
 
-#ifdef MESS
-	// MESS specific stuff
 	MessBuildDataMap(properties_datamap);
-#endif // MESS
 }
 
 #if 0

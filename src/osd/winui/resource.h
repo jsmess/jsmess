@@ -408,6 +408,7 @@
 #define ID_OPTIONS_CHEAT                40099
 #define ID_OPTIONS_MAMEINFO             40100
 #define ID_OPTIONS_HISTORY              40101
+#define ID_VIEW_SOFTWARE_AREA           40102
 #define IDC_STATIC                      -1
 
 // Next default values for new objects
@@ -417,7 +418,7 @@
 #define _APS_NO_MFC                     1
 #define _APS_3D_CONTROLS                     1
 #define _APS_NEXT_RESOURCE_VALUE        192
-#define _APS_NEXT_COMMAND_VALUE         40102
+#define _APS_NEXT_COMMAND_VALUE         40103
 #define _APS_NEXT_CONTROL_VALUE         1255
 #define _APS_NEXT_SYMED_VALUE           93
 #endif

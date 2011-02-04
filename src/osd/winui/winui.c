@@ -78,10 +78,7 @@
 #include "directdraw.h"
 #include "directinput.h"
 #include "dijoystick.h"     /* For DIJoystick avalibility. */
-
-#ifdef MESS
 #include "messui.h"
-#endif // MESS
 
 #ifdef _MSC_VER
 #define snprintf _snprintf
@@ -312,6 +309,7 @@ static BOOL             GameCheck(void);
 static BOOL             FolderCheck(void);
 
 static void             ToggleScreenShot(void);
+static void             ToggleSoftware(void);
 static void             AdjustMetrics(void);
 //static void             EnablePlayOptions(int nIndex, core_options *o);
 
@@ -663,6 +661,7 @@ static const GUISequence GUISequenceControl[]=
 	{"gui_key_view_fullscreen",    SEQ_DEF_0,    ID_VIEW_FULLSCREEN,       Get_ui_key_view_fullscreen },
 	{"gui_key_view_pagetab",       SEQ_DEF_0,    ID_VIEW_PAGETAB,          Get_ui_key_view_pagetab },
 	{"gui_key_view_picture_area",  SEQ_DEF_0,    ID_VIEW_PICTURE_AREA,     Get_ui_key_view_picture_area },
+	{"gui_key_view_software_area", SEQ_DEF_0,    ID_VIEW_SOFTWARE_AREA,    Get_ui_key_view_software_area },
 	{"gui_key_view_status",        SEQ_DEF_0,    ID_VIEW_STATUS,           Get_ui_key_view_status },
 	{"gui_key_view_toolbars",      SEQ_DEF_0,    ID_VIEW_TOOLBARS,         Get_ui_key_view_toolbars },
 
@@ -714,6 +713,7 @@ static int          *icon_index = NULL; /* for custom per-game icons */
 static const TBBUTTON tbb[] =
 {
 	{0, ID_VIEW_FOLDERS,    TBSTATE_ENABLED, TBSTYLE_CHECK,      {0, 0}, 0, 0},
+	{1, ID_VIEW_SOFTWARE_AREA,TBSTATE_ENABLED, TBSTYLE_CHECK,      {0, 0}, 0, 1},
 	{1, ID_VIEW_PICTURE_AREA,TBSTATE_ENABLED, TBSTYLE_CHECK,      {0, 0}, 0, 1},
 	{0, 0,                  TBSTATE_ENABLED, TBSTYLE_SEP,        {0, 0}, 0, 0},
 	{2, ID_VIEW_LARGE_ICON, TBSTATE_ENABLED, TBSTYLE_CHECKGROUP, {0, 0}, 0, 2},
@@ -728,11 +728,12 @@ static const TBBUTTON tbb[] =
 
 #define NUM_TOOLBUTTONS (sizeof(tbb) / sizeof(tbb[0]))
 
-#define NUM_TOOLTIPS 8
+#define NUM_TOOLTIPS 9
 
 static const TCHAR szTbStrings[NUM_TOOLTIPS + 1][30] =
 {
 	TEXT("Toggle Folder List"),
+	TEXT("Toggle Software List"),
 	TEXT("Toggle Screen Shot"),
 	TEXT("Large Icons"),
 	TEXT("Small Icons"),
@@ -746,6 +747,7 @@ static const TCHAR szTbStrings[NUM_TOOLTIPS + 1][30] =
 static const int CommandToString[] =
 {
 	ID_VIEW_FOLDERS,
+	ID_VIEW_SOFTWARE_AREA,
 	ID_VIEW_PICTURE_AREA,
 	ID_VIEW_LARGE_ICON,
 	ID_VIEW_SMALL_ICON,
@@ -760,10 +762,8 @@ static const int CommandToString[] =
 static const int s_nPickers[] =
 {
 	IDC_LIST
-#ifdef MESS
 	,IDC_SWLIST
 	,IDC_SOFTLIST
-#endif
 };
 
 
@@ -790,11 +790,9 @@ static ResizeItem main_resize_items[] =
 	{ RA_ID,   { IDC_SSPICTURE },FALSE,	RA_RIGHT | RA_BOTTOM | RA_TOP,     NULL },
 	{ RA_ID,   { IDC_HISTORY },  TRUE,	RA_RIGHT | RA_BOTTOM | RA_TOP,     NULL },
 	{ RA_ID,   { IDC_SSTAB },    FALSE,	RA_RIGHT | RA_TOP,                 NULL },
-#ifdef MESS
 	{ RA_ID,   { IDC_SWLIST },    TRUE,	RA_RIGHT | RA_BOTTOM | RA_TOP,     NULL },
 	{ RA_ID,   { IDC_SOFTLIST },  TRUE,	RA_RIGHT | RA_BOTTOM | RA_TOP,     NULL },
 	{ RA_ID,   { IDC_SPLITTER3 },FALSE,	RA_RIGHT | RA_BOTTOM | RA_TOP,     NULL },
-#endif /* MESS */
 	{ RA_END,  { 0 },            FALSE, 0,                                 NULL }
 };
 
@@ -1319,6 +1317,55 @@ static void ResizeTreeAndListViews(BOOL bResizeHidden)
 	}
 }
 
+void UpdateSoftware(void)
+{
+	RECT rect;
+	//int  nWidth;
+
+	/* first time through can't do this stuff */
+	if (hwndList == NULL)
+		return;
+
+	/* Size the List Control in the Picker */
+	GetClientRect(hMain, &rect);
+
+	if (bShowStatusBar)
+		rect.bottom -= bottomMargin;
+	if (bShowToolBar)
+		rect.top += topMargin;
+
+	if (GetShowSoftware())
+	{
+		//nWidth = nSplitterOffset[GetSplitterCount() - 1];
+		CheckMenuItem(GetMenu(hMain),ID_VIEW_SOFTWARE_AREA, MF_CHECKED);
+		ToolBar_CheckButton(s_hToolBar, ID_VIEW_SOFTWARE_AREA, MF_CHECKED);
+	}
+	else
+	{
+		//nWidth = rect.right;
+		CheckMenuItem(GetMenu(hMain),ID_VIEW_SOFTWARE_AREA, MF_UNCHECKED);
+		ToolBar_CheckButton(s_hToolBar, ID_VIEW_SOFTWARE_AREA, MF_UNCHECKED);
+	}
+
+	ResizeTreeAndListViews(FALSE);
+
+	if (GetShowSoftware())
+	{
+		ShowWindow(GetDlgItem(hMain,IDC_SWLIST),SW_SHOW);
+		ShowWindow(GetDlgItem(hMain,IDC_SWDEVVIEW),SW_SHOW);
+		ShowWindow(GetDlgItem(hMain,IDC_SOFTLIST),SW_SHOW);
+		ShowWindow(GetDlgItem(hMain,IDC_SWTAB),SW_SHOW);
+	}
+	else
+	{
+		ShowWindow(GetDlgItem(hMain,IDC_SWLIST),SW_HIDE);
+		ShowWindow(GetDlgItem(hMain,IDC_SWDEVVIEW),SW_HIDE);
+		ShowWindow(GetDlgItem(hMain,IDC_SOFTLIST),SW_HIDE);
+		ShowWindow(GetDlgItem(hMain,IDC_SWTAB),SW_HIDE);
+	}
+
+}
+
 /* Adjust the list view and screenshot button based on GetShowScreenShot() */
 void UpdateScreenShot(void)
 {
@@ -1504,6 +1551,7 @@ void ResizePickerControls(HWND hWnd)
 	/* the other screen shot controls will be properly placed in UpdateScreenshot() */
 
 }
+
 
 char *ModifyThe(const char *str)
 {
@@ -1776,9 +1824,7 @@ static BOOL Win32UI_init(HINSTANCE hInstance, LPWSTR lpCmdLine, int nCmdShow)
 
 	RegisterClass(&wndclass);
 
-#ifdef MESS
 	DevView_RegisterClass();
-#endif //MESS
 
 	InitCommonControls();
 
@@ -1965,9 +2011,7 @@ static BOOL Win32UI_init(HINSTANCE hInstance, LPWSTR lpCmdLine, int nCmdShow)
 	dprintf("did init tree\n");
 
 	/* Initialize listview columns */
-#ifdef MESS
 	InitMessPicker();
-#endif
 	InitListView();
 	SetFocus(hwndList);
 
@@ -1993,6 +2037,7 @@ static BOOL Win32UI_init(HINSTANCE hInstance, LPWSTR lpCmdLine, int nCmdShow)
 	}
 
 	AdjustMetrics();
+	UpdateSoftware();
 	UpdateScreenShot();
 
 	hAccel = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDA_TAB_KEYS));
@@ -2100,9 +2145,7 @@ static BOOL Win32UI_init(HINSTANCE hInstance, LPWSTR lpCmdLine, int nCmdShow)
 
 static void Win32UI_exit()
 {
-	#ifdef MESS
 	MySoftwareListClose();
-	#endif
 	
     if (g_bDoBroadcast == TRUE)
     {
@@ -3238,9 +3281,7 @@ static void EnableSelection(int nGame)
 	HMENU			hMenu = GetMenu(hMain);
 	TCHAR*          t_description;
 
-#ifdef MESS
 	MyFillSoftwareList(nGame, FALSE);
-#endif
 
 	t_description = tstring_from_utf8(ConvertAmpersandString(ModifyThe(drivers[nGame]->description)));
 	if( !t_description )
@@ -4407,7 +4448,6 @@ static BOOL MameCommand(HWND hwnd,int id, HWND hwndCtl, UINT codeNotify)
 		{
 			folder = GetFolderByName(FOLDER_SOURCE, GetDriverFilename(Picker_GetSelectedItem(hwndList)) );
 			InitPropertyPage(hInst, hwnd, GetSelectedPickItemIcon(), OPTIONS_GAME, folder->m_nFolderId, Picker_GetSelectedItem(hwndList));
-#ifdef MESS
 			{
 				extern BOOL g_bModifiedSoftwarePaths;
 				if (g_bModifiedSoftwarePaths) {
@@ -4415,7 +4455,6 @@ static BOOL MameCommand(HWND hwnd,int id, HWND hwndCtl, UINT codeNotify)
 					MessUpdateSoftwareList();
 				}
 			}
-#endif
 		}
 		/* Just in case the toggle MMX on/off */
 		UpdateStatusBar();
@@ -4474,6 +4513,10 @@ static BOOL MameCommand(HWND hwnd,int id, HWND hwndCtl, UINT codeNotify)
 		ToggleScreenShot();
 		break;
 
+	case ID_VIEW_SOFTWARE_AREA :
+		ToggleSoftware();
+		break;
+
 	case ID_UPDATE_GAMELIST:
 		UpdateGameList(TRUE, TRUE);
 		break;
@@ -4501,9 +4544,7 @@ static BOOL MameCommand(HWND hwnd,int id, HWND hwndCtl, UINT codeNotify)
 			int  nResult;
 			BOOL bUpdateRoms;
 			BOOL bUpdateSamples;
-#ifdef MESS
 			BOOL bUpdateSoftware;
-#endif
 
 			nResult = DialogBox(GetModuleHandle(NULL),
 								MAKEINTRESOURCE(IDD_DIRECTORIES),
@@ -4514,12 +4555,10 @@ static BOOL MameCommand(HWND hwnd,int id, HWND hwndCtl, UINT codeNotify)
 
 			bUpdateRoms    = ((nResult & DIRDLG_ROMS)	 == DIRDLG_ROMS)	? TRUE : FALSE;
 			bUpdateSamples = ((nResult & DIRDLG_SAMPLES) == DIRDLG_SAMPLES) ? TRUE : FALSE;
-#ifdef MESS
 			bUpdateSoftware = ((nResult & DIRDLG_SOFTWARE) == DIRDLG_SOFTWARE) ? TRUE : FALSE;
 
 			if (bUpdateSoftware)
 				MessUpdateSoftwareList();
-#endif /* MESS */
 
 			if (s_pWatcher)
 			{
@@ -4758,11 +4797,7 @@ static BOOL MameCommand(HWND hwnd,int id, HWND hwndCtl, UINT codeNotify)
 				return FALSE;
 			}
 		}
-#ifdef MESS
 		return MessCommand(hwnd, id, hwndCtl, codeNotify);
-#else
-		break;
-#endif
 	}
 
 	return FALSE;
@@ -4947,9 +4982,7 @@ static void GamePicker_EnteringItem(HWND hwndPicker, int nItem)
 	}
 
 	EnableSelection(nItem);
-#ifdef MESS
 	MessReadMountedSoftware(nItem);
-#endif
 }
 
 static int GamePicker_FindItemParent(HWND hwndPicker, int nItem)
@@ -5181,11 +5214,7 @@ static void CreateIcons(void)
 	int icon_count;
 	DWORD dwStyle;
 	int i;
-#ifdef MESS
-	int grow = 3000;
-#else
 	int grow = 5000;
-#endif
 
 	icon_count = 0;
 	while(g_iconData[icon_count].icon_name)
@@ -5227,9 +5256,7 @@ static void CreateIcons(void)
 	// restore our view
 	SetWindowLong(hwndList,GWL_STYLE,dwStyle);
 
-#ifdef MESS
 	CreateMessIcons();
-#endif
 
 	// Now set up header specific stuff
 	hHeaderImages = ImageList_Create(8,8,ILC_COLORDDB | ILC_MASK,2,2);
@@ -5930,10 +5957,8 @@ static void MamePlayGameWithOptions(int nGame, const play_options *playopts)
 	DWORD dwExitCode;
 	BOOL res;
 
-#ifdef MESS
 	if (!MessApproveImageList(hMain, nGame))
 		return;
-#endif
 
 	if (g_pJoyGUI != NULL)
 		KillTimer(hMain, JOYGUI_TIMER);
@@ -5980,6 +6005,18 @@ static void ToggleScreenShot(void)
 
 	/* Redraw list view */
 	if (hBackground != NULL && showScreenShot)
+		InvalidateRect(hwndList, NULL, FALSE);
+}
+
+static void ToggleSoftware(void)
+{
+	BOOL showSoftware = GetShowSoftware();
+
+	SetShowSoftware((showSoftware) ? FALSE : TRUE);
+	UpdateSoftware();
+
+	/* Redraw list view */
+	if (hBackground != NULL && showSoftware)
 		InvalidateRect(hwndList, NULL, FALSE);
 }
 

@@ -18,10 +18,7 @@
 #include "options.h"
 #include "emu.h" /* for input_seq definition */
 #include <video.h> /* for MAX_SCREENS Definition*/
-
-#ifdef MESS
 #include "optionsms.h"
-#endif
 
 // Various levels of ini's we can edit.
 typedef enum {
@@ -209,6 +206,9 @@ UINT GetSavedFolderID(void);
 
 void SetShowScreenShot(BOOL val);
 BOOL GetShowScreenShot(void);
+
+void SetShowSoftware(BOOL val);
+BOOL GetShowSoftware(void);
 
 void SetShowFolderList(BOOL val);
 BOOL GetShowFolderList(void);
@@ -412,6 +412,7 @@ input_seq* Get_ui_key_view_folders(void);
 input_seq* Get_ui_key_view_fullscreen(void);
 input_seq* Get_ui_key_view_pagetab(void);
 input_seq* Get_ui_key_view_picture_area(void);
+input_seq* Get_ui_key_view_software_area(void);
 input_seq* Get_ui_key_view_status(void);
 input_seq* Get_ui_key_view_toolbars(void);
 

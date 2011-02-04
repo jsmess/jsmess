@@ -43,6 +43,8 @@
 #include "mui_audit.h"
 #include "winui.h"
 #include "properties.h"
+#include "resourcems.h"
+#include "propertiesms.h"
 
 static BOOL FilterAvailable(int driver_index);
 
@@ -129,8 +131,9 @@ extern const DIRECTORYINFO g_directoryInfo[] =
 
 extern const SPLITTERINFO g_splitterInfo[] =
 {
-	{ 0.25,	IDC_SPLITTER,	IDC_TREE,	IDC_LIST,		AdjustSplitter1Rect },
-	{ 0.5,	IDC_SPLITTER2,	IDC_LIST,	IDC_SSFRAME,	AdjustSplitter2Rect },
+	{ 0.2,	IDC_SPLITTER,	IDC_TREE,	IDC_LIST,		AdjustSplitter1Rect },
+	{ 0.4,	IDC_SPLITTER2,	IDC_LIST,	IDC_SWLIST,		AdjustSplitter1Rect },
+	{ 0.6,	IDC_SPLITTER3,	IDC_SWTAB,	IDC_SSFRAME,	AdjustSplitter2Rect },
 	{ -1 }
 };
 
@@ -167,9 +170,16 @@ extern const ICONDATA g_iconData[] =
 	{ IDI_WIN_UNKNOWN,			"unknown" },
 	{ IDI_WIN_CLONE,			"clone" },
 	{ IDI_WIN_REDX,				"warning" },
+	{ IDI_WIN_NOROMSNEEDED,		"noromsneeded" },
+	{ IDI_WIN_MISSINGOPTROM,	"missingoptrom" },
+	{ IDI_WIN_FLOP,				"floppy" },
+	{ IDI_WIN_CASS,				"cassette" },
+	{ IDI_WIN_SERL,				"serial" },
+	{ IDI_WIN_SNAP,				"snapshot" },
+	{ IDI_WIN_PRIN,				"printer" },
+	{ IDI_WIN_HARD,				"hard" },
 	{ 0 }
 };
-
 extern const TCHAR g_szPlayGameString[] = TEXT("&Play %s");
 extern const char g_szGameCountString[] = "%d games";
 extern const char g_szHistoryFileName[] = "history.dat";
