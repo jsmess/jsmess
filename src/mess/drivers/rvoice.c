@@ -143,7 +143,7 @@ static READ8_HANDLER( main_hd63701_internal_registers_r )
 		case 0x20: // Port 5 DDR
 			logerror("a write only register! returning 0\n");
 			data = 0;
-			break;
+			return data;
 		case 0x02: // Port 1
 			logerror("Port 1\n");
 			data = state->hd63701y0.PORT1;

@@ -105,6 +105,16 @@ TODO: Which clock signals are available in a PC Jr?
       - What clock is Y1? This eventually gets passed on to the CPU (ZM40?) and some other components by a 8284 (ZM8?).
       - Is the clock attached to the Video Gate Array (ZM36?) exactly 14MHz?
 
+IBM CGA/MDA:
+Several different font roms were available, depending on what region the card was purchased in;
+Currently known: (probably exist for all the standard codepages)
+5788005: US (code page 437)
+???????: Greek (code page 737) NOT DUMPED!
+???????: Estonian/Lithuanian/Latvian (code page 775) NOT DUMPED!
+???????: Icelandic (code page 861, characters 0x8B-0x8D, 0x95, 0x97-0x98, 0x9B, 0x9D, 0xA4-0xA7 differ from cp437) NOT DUMPED!
+4733197: Danish/Norwegian (code page 865, characters 0x9B and 0x9D differ from cp437) NOT DUMPED!
+???????: Hebrew (code page 862) NOT DUMPED!
+
 ***************************************************************************/
 
 

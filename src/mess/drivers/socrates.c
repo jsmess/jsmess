@@ -374,7 +374,7 @@ end hd38880 info.*/
 				timer_set(space->machine, attotime::from_seconds(4), NULL, 0, clear_speech_cb); // hack
 			}
 			break;
-		case 0x90: // unknown
+		case 0x90: // unknown, one of these is probably read and branch
 			break;
 		case 0xA0: // unknown
 			break;
