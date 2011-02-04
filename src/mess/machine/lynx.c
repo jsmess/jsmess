@@ -956,7 +956,7 @@ static READ8_HANDLER( suzy_read )
 			value = 0x01; // must not be 0 for correct power up
 			break;
 		case 0x92:	/* Better check this with docs! */
-			if (state->blitter.time!=attotime::zero)
+			if (state->blitter.time==attotime::zero)
 			{
 				if (space->machine->device<cpu_device>("maincpu")->attotime_to_cycles(timer_get_time(space->machine) - state->blitter.time) > state->blitter.memory_accesses * 20)
 				{

@@ -1445,7 +1445,7 @@ static UINT8 coco_update_keyboard( running_machine *machine )
 			break;
 	}
 
-	if (dclg_time == attotime::zero)
+	if (dclg_time != attotime::zero)
 	{
 		/* schedule lightgun events */
 		timer_reset(state->update_keyboard_timer, dclg_time);

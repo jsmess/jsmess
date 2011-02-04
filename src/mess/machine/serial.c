@@ -82,7 +82,7 @@ struct _serial_t
 INLINE serial_t *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
-	assert(device->type() == SERIAL);
+	//assert(device->type() == SERIAL);
 
 	return (serial_t *)downcast<legacy_device_base *>(device)->token();
 }

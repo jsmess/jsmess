@@ -270,7 +270,7 @@ static void mc6854_send_bits( device_t *device, UINT32 data, int len, int zi )
 
 	/* schedule when to ask the MC6854 for more bits */
 	expire = timer_timeleft( mc6854->ttimer );
-	if ( expire!= attotime::never )
+	if ( expire== attotime::never )
 		expire = attotime::zero;
 	timer_reset( mc6854->ttimer, expire + (BIT_LENGTH * len));
 }
