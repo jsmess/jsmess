@@ -180,6 +180,7 @@ TIMER_CALLBACK(x68k_hsync)
 	attotime hsync_time;
 
 	state->crtc.hblank = hstate;
+	state->m_mfp->i7_w(!state->crtc.hblank);
 	if(state->crtc.vmultiple == 2) // 256-line (doublescan)
 	{
 		if(hstate == 1)
@@ -299,7 +300,7 @@ TIMER_CALLBACK(x68k_crtc_vblank_irq)
 	attotime irq_time;
 	int vblank_line;
 
-	if(val == 1)  // VBlank on
+	if(val == 1)  // V-DISP on
 	{
 		state->crtc.vblank = 1;
 		vblank_line = state->crtc.vbegin;
@@ -307,7 +308,7 @@ TIMER_CALLBACK(x68k_crtc_vblank_irq)
 		timer_adjust_oneshot(state->vblank_irq, irq_time, 0);
 		logerror("CRTC: VBlank on\n");
 	}
-	if(val == 0)  // VBlank off
+	if(val == 0)  // V-DISP off
 	{
 		state->crtc.vblank = 0;
 		vblank_line = state->crtc.vend;
@@ -319,7 +320,10 @@ TIMER_CALLBACK(x68k_crtc_vblank_irq)
 	}
 
 	if (x68k_mfp != NULL)
+	{
 		state->m_mfp->tai_w(!state->crtc.vblank);
+		state->m_mfp->i4_w(!state->crtc.vblank);
+	}
 }
 
 
