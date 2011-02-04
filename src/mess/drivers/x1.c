@@ -22,18 +22,17 @@
         - (anything else?)
 
     per-game/program specific TODO:
-    - Bosconian: title screen background is completely white because it reverts the pen used
-      (it's gray in the Arcade version),could be either flickering for pseudo-alpha effect or it's
-      a btanb;
     - Exoa II - Warroid: major tile width/height positioning bugs (especially during gameplay);
     - Hydlide 2 / 3: can't get the user disk to work properly
     - Gruppe: shows a random bitmap graphic then returns "program load error"
-    - Sorcerian / Ys 3 / Psy-O-Blade (and others): they all fails tight loops with the fdc ready bit check
-    - Turbo Alpha: has z80dma / fdc bugs, doesn't show the presentation properly and then hangs;
     - Legend of Kage: has serious graphic artifacts, pcg doesn't scroll properly, bitmap-based sprites aren't shown properly, dma bugs?
     - "newtype": dies with a z80dma assert;
-    - Ys 2: fills the screen with "syntax errors"
-    - Thexder: Can't start a play, keyboard related issue?
+    - Turbo Alpha: has z80dma / fdc bugs, doesn't show the presentation properly and then hangs;
+    - Ys 2: crashes after the disclaimer screen;
+    - Ys 3: missing user disk, to hack it (and play with x1turboz features):
+      bp 81ca,pc += 2
+	- Ys 3: never uploads a valid 4096 palette, probably related to the fact that we don't have an user disk
+    - Thexder: (x1turbo) Can't start a play, keyboard related issue?
     - V.I.P.: can't get inputs to work at all there;
 
     Notes:
@@ -228,6 +227,8 @@ static VIDEO_START( x1 )
 	state->colorram = auto_alloc_array(machine, UINT8, 0x1000);
 	state->videoram = auto_alloc_array(machine, UINT8, 0x1000);
 	state->gfx_bitmap_ram = auto_alloc_array(machine, UINT8, 0xc000*2);
+	state->videoram = auto_alloc_array(machine, UINT8, 0x1000);
+	state->pal_4096 = auto_alloc_array(machine, UINT8, 0x1000*3);
 }
 
 static void x1_draw_pixel(running_machine *machine, bitmap_t *bitmap,int y,int x,UINT16	pen,UINT8 width,UINT8 height)
@@ -275,20 +276,20 @@ static void draw_fgtilemap(running_machine *machine, bitmap_t *bitmap,const rect
 	int screen_mask;
 	UINT8 prev_width;
 
-	screen_mask = (w == 2) ? 0xfff : 0x7ff;
+	screen_mask = 0x7ff;//(w == 2) ? 0xfff : 0x7ff;
+
+	prev_width = 0;
 
 	for (y=0;y<50;y++)
 	{
-		prev_width = 0;
-
 		for (x=0;x<40*w;x++)
 		{
 			int tile = videoram[(x+(y*40*w)+state->crtc_start_addr) & screen_mask];
 			int color = state->colorram[(x+(y*40*w)+state->crtc_start_addr) & screen_mask] & 0x1f;
 			int width = (state->colorram[(x+(y*40*w)+state->crtc_start_addr) & screen_mask] & 0x80)>>7;
-			//int height = (state->colorram[(x+(y*40*w)+state->crtc_start_addr) & screen_mask] & 0x40)>>6;
+			int height = 0;//(state->colorram[(x+(y*40*w)+state->crtc_start_addr) & screen_mask] & 0x40)>>6;
 			int pcg_bank = (state->colorram[(x+(y*40*w)+state->crtc_start_addr) & screen_mask] & 0x20)>>5;
-			UINT8 *gfx_data = pcg_bank ? machine->region("pcg")->base() : machine->region("cgrom")->base();
+			UINT8 *gfx_data = machine->region(pcg_bank ? "pcg" : "cgrom")->base();
 
 			if(prev_width && x) { prev_width = 0; continue; }
 			if(width)
@@ -324,18 +325,18 @@ static void draw_fgtilemap(running_machine *machine, bitmap_t *bitmap,const rect
 
 						res_x = x*8+xi*(width+1);
 						if(state->scrn_reg.v400_mode)
-							res_y = y*((state->tile_height+1)/2)+yi*(0+1);
+							res_y = y*((state->tile_height+1)/2)+yi*(height+1);
 						else
-							res_y = y*(state->tile_height+1)+yi*(0+1);
+							res_y = y*(state->tile_height+1)+yi*(height+1);
 
 						if(state->scrn_reg.v400_mode)
 						{
-							x1_draw_pixel(machine,bitmap,res_y*2+0,res_x,pcg_pen,width,0);
-							x1_draw_pixel(machine,bitmap,res_y*2+1,res_x,pcg_pen,width,0);
+							x1_draw_pixel(machine,bitmap,res_y*2+0,res_x,pcg_pen,width,height);
+							x1_draw_pixel(machine,bitmap,res_y*2+1,res_x,pcg_pen,width,height);
 						}
 						else
 						{
-							x1_draw_pixel(machine,bitmap,res_y,res_x,pcg_pen,width,0);
+							x1_draw_pixel(machine,bitmap,res_y,res_x,pcg_pen,width,height);
 						}
 					}
 				}
@@ -626,6 +627,9 @@ static void cmt_command( running_machine* machine, UINT8 cmd )
 	// E9 0A - Record
 	state->cmt_current_cmd = cmd;
 
+	if(cassette_get_image(machine->device("cass")) == NULL) //avoid a crash if a disk game tries to access this
+		return;
+
 	switch(cmd)
 	{
 		case 0x01:  // Stop
@@ -674,6 +678,10 @@ static TIMER_CALLBACK( cmt_wind_timer )
 {
 	x1_state *state = machine->driver_data<x1_state>();
 	device_t* cmt = machine->device("cass");
+
+	if(cassette_get_image(machine->device("cass")) == NULL) //avoid a crash if a disk game tries to access this
+		return;
+
 	switch(state->cmt_current_cmd)
 	{
 		case 0x03:
@@ -886,7 +894,7 @@ static READ8_HANDLER( x1_fdc_r )
 			printf("FDC: read FM type\n");
 			return 0xff;
 		case 0x0ffd:
-			printf("FDC: read MFM typex\n");
+			printf("FDC: read MFM type\n");
 			return 0xff;
 		case 0x0ffe:
 			printf("FDC: read 1.6M type\n");
@@ -1115,33 +1123,71 @@ static void set_current_palette(running_machine *machine)
 	}
 }
 
+static WRITE8_HANDLER( x1turboz_4096_palette_w )
+{
+	x1_state *state = space->machine->driver_data<x1_state>();
+	static UINT32 pal_entry;
+	UINT8 r,g,b;
+
+	pal_entry = ((offset & 0xff) << 4) | ((data & 0xf0) >> 4);
+
+	state->pal_4096[pal_entry+((offset & 0x300)<<4)] = data & 0xf;
+
+	r = state->pal_4096[pal_entry+(1<<12)];
+	g = state->pal_4096[pal_entry+(2<<12)];
+	b = state->pal_4096[pal_entry+(0<<12)];
+
+	palette_set_color_rgb(space->machine, pal_entry+16, pal3bit(r), pal3bit(g), pal3bit(b));
+}
+
 /* Note: docs claims that reading the palette ports makes the value to change somehow in X1 mode ...
          In 4096 color mode, it's used for reading the value back. */
 static WRITE8_HANDLER( x1_pal_r_w )
 {
 	x1_state *state = space->machine->driver_data<x1_state>();
-	state->x_r = data;
-	set_current_palette(space->machine);
 
-	/* TODO: 4096 mode for x1turboz */
+	if(state->turbo_reg.pal & 0x80) //AEN bit, Turbo Z
+	{
+		if(state->turbo_reg.gfx_pal & 0x80) //APEN bit
+			x1turboz_4096_palette_w(space,offset & 0x3ff,data);
+	}
+	else //compatible mode
+	{
+		state->x_r = data;
+		set_current_palette(space->machine);
+	}
 }
 
 static WRITE8_HANDLER( x1_pal_g_w )
 {
 	x1_state *state = space->machine->driver_data<x1_state>();
-	state->x_g = data;
-	set_current_palette(space->machine);
 
-	/* TODO: 4096 mode for x1turboz */
+	if(state->turbo_reg.pal & 0x80) //AEN bit, Turbo Z
+	{
+		if(state->turbo_reg.gfx_pal & 0x80) //APEN bit
+			x1turboz_4096_palette_w(space,offset & 0x3ff,data);
+	}
+	else
+	{
+		state->x_g = data;
+		set_current_palette(space->machine);
+	}
 }
 
 static WRITE8_HANDLER( x1_pal_b_w )
 {
 	x1_state *state = space->machine->driver_data<x1_state>();
-	state->x_b = data;
-	set_current_palette(space->machine);
 
-	/* TODO: 4096 mode for x1turboz */
+	if(state->turbo_reg.pal & 0x80) //AEN bit, Turbo Z
+	{
+		if(state->turbo_reg.gfx_pal & 0x80) //APEN bit
+			x1turboz_4096_palette_w(space,offset & 0x3ff,data);
+	}
+	else
+	{
+		state->x_b = data;
+		set_current_palette(space->machine);
+	}
 }
 
 static WRITE8_HANDLER( x1_ex_gfxram_w )
@@ -1178,8 +1224,8 @@ static WRITE8_HANDLER( x1_scrn_w )
 	state->scrn_reg.gfx_bank = (data & 0x10)>>4;
 	state->scrn_reg.disp_bank = (data & 0x08)>>3;
 	state->scrn_reg.v400_mode = ((data & 0x03) == 3) ? 1 : 0;
-	if(data & 0xc4)
-		printf("SCRN = %02x\n",data & 0xc4);
+	if(data & 0x84)
+		printf("SCRN = %02x\n",data & 0x84);
 	if((data & 0x03) == 1)
 		printf("SCRN sets true 400 lines mode\n");
 }
@@ -1341,6 +1387,55 @@ static WRITE8_HANDLER( x1_kanji_w )
 	}
 }
 
+static READ8_HANDLER( x1_emm_r )
+{
+	x1_state *state = space->machine->driver_data<x1_state>();
+	UINT8 *emm_ram = space->machine->region("emm")->base();
+	UINT8 res;
+
+	if(offset & ~3)
+	{
+		printf("Warning: read EMM BASIC area [%02x]\n",offset & 0xff);
+		return 0xff;
+	}
+
+	if(offset != 3)
+		printf("Warning: read EMM address [%02x]\n",offset);
+
+	res = 0xff;
+
+	if(offset == 3)
+	{
+		res = emm_ram[state->emm_addr];
+		state->emm_addr++;
+	}
+
+	return res;
+}
+
+static WRITE8_HANDLER( x1_emm_w )
+{
+	x1_state *state = space->machine->driver_data<x1_state>();
+	UINT8 *emm_ram = space->machine->region("emm")->base();
+
+	if(offset & ~3)
+	{
+		printf("Warning: write EMM BASIC area [%02x] %02x\n",offset & 0xff,data);
+		return;
+	}
+
+	switch(offset)
+	{
+		case 0: state->emm_addr = (state->emm_addr & 0xffff00) | (data & 0xff); break;
+		case 1: state->emm_addr = (state->emm_addr & 0xff00ff) | (data << 8);   break;
+		case 2: state->emm_addr = (state->emm_addr & 0x00ffff) | (data << 16);  break; //TODO: this has a max size limit, check exactly how much
+		case 3:
+			emm_ram[state->emm_addr] = data;
+			state->emm_addr++;
+			break;
+	}
+}
+
 /*************************************
  *
  *  Memory maps
@@ -1370,7 +1465,8 @@ static READ8_HANDLER( x1_io_r )
 //  else if(offset >= 0x1fd0 && offset <= 0x1fdf)   { return x1_scrn_r(space,offset-0x1fd0); }
 //  else if(offset == 0x1fe0)                       { return x1_blackclip_r(space,0); }
 	else if(offset >= 0x2000 && offset <= 0x2fff)	{ return state->colorram[offset-0x2000]; }
-	else if(offset >= 0x3000 && offset <= 0x3fff)	{ return videoram[offset-0x3000]; }
+	else if(offset >= 0x3000 && offset <= 0x37ff)	{ return videoram[offset-0x3000]; }
+	else if(offset >= 0x3800 && offset <= 0x3fff)	{ return videoram[offset-0x3800]; } // Ys checks x1/x1turbo by checking if this area is a mirror
 	else if(offset >= 0x4000 && offset <= 0xffff)	{ return state->gfx_bitmap_ram[offset-0x4000+(state->scrn_reg.gfx_bank*0xc000)]; }
 	else
 	{
@@ -1415,7 +1511,8 @@ static WRITE8_HANDLER( x1_io_w )
 //	else if(offset >= 0x1fd0 && offset <= 0x1fdf)	{ x1_scrn_w(space,0,data); }
 //  else if(offset == 0x1fe0)                       { x1_blackclip_w(space,0,data); }
 	else if(offset >= 0x2000 && offset <= 0x2fff)	{ state->colorram[offset-0x2000] = data; }
-	else if(offset >= 0x3000 && offset <= 0x3fff)	{ videoram[offset-0x3000] = state->pcg_write_addr = data; }
+	else if(offset >= 0x3000 && offset <= 0x37ff)	{ videoram[offset-0x3000] = state->pcg_write_addr = data; }
+	else if(offset >= 0x3800 && offset <= 0x3fff)	{ videoram[offset-0x3800] = state->pcg_write_addr = data; }
 	else if(offset >= 0x4000 && offset <= 0xffff)	{ state->gfx_bitmap_ram[offset-0x4000+(state->scrn_reg.gfx_bank*0xc000)] = data; }
 	else
 	{
@@ -1440,7 +1537,7 @@ static READ8_HANDLER( x1turbo_io_r )
 	else if(offset >= 0x0a00 && offset <= 0x0a07)	{ printf("Stereoscopic board read %04x\n",offset); return 0xff; } // *
 	else if(offset == 0x0b00)						{ printf("Bank memory switch read\n"); return 0xff; }
 	else if(offset >= 0x0c00 && offset <= 0x0cff)   { printf("RS-232C read %04x\n",offset); return 0xff; } // *
-	else if(offset >= 0x0d00 && offset <= 0x0dff)	{ printf("EMM read %04x\n",offset); return 0xff; } // *
+	else if(offset >= 0x0d00 && offset <= 0x0dff)	{ return x1_emm_r(space,offset & 0xff); } // *
 	else if(offset == 0x0e03)                   	{ return x1_rom_r(space, 0); }
 	else if(offset >= 0x0e80 && offset <= 0x0e81)	{ return x1_kanji_r(space, offset-0xe80); }
 	else if(offset >= 0x0fd0 && offset <= 0x0fd3)	{ /* printf("SASI HDD read %04x\n",offset); */ return 0xff; } // *
@@ -1488,15 +1585,15 @@ static WRITE8_HANDLER( x1turbo_io_w )
 	else if(offset >= 0x0a00 && offset <= 0x0a07)	{ printf("Stereoscopic board write %04x %02x\n",offset,data); } // *
 	else if(offset == 0x0b00)						{ printf("Bank memory switch write %02x\n",data); }
 	else if(offset >= 0x0c00 && offset <= 0x0cff)   { printf("RS-232C write %04x %02x\n",offset,data); } // *
-	else if(offset >= 0x0d00 && offset <= 0x0dff)	{ printf("EMM write %04x %02x\n",offset,data); } // *
+	else if(offset >= 0x0d00 && offset <= 0x0dff)	{ x1_emm_w(space,offset & 0xff,data); } // *
 	else if(offset >= 0x0e00 && offset <= 0x0e02)	{ x1_rom_w(space, offset-0xe00,data); }
 	else if(offset >= 0x0e80 && offset <= 0x0e83)	{ x1_kanji_w(space, offset-0xe80,data); }
 	else if(offset >= 0x0fd0 && offset <= 0x0fd3)	{ printf("SASI HDD write %04x %02x\n",offset,data); } // *
 	else if(offset >= 0x0fe8 && offset <= 0x0fef)	{ printf("8-inch FD write %04x %02x\n",offset,data); } // *
 	else if(offset >= 0x0ff8 && offset <= 0x0fff)	{ x1_fdc_w(space, offset-0xff8,data); }
-	else if(offset >= 0x1000 && offset <= 0x10ff)	{ x1_pal_b_w(space, 0,data); }
-	else if(offset >= 0x1100 && offset <= 0x11ff)	{ x1_pal_r_w(space, 0,data); }
-	else if(offset >= 0x1200 && offset <= 0x12ff)	{ x1_pal_g_w(space, 0,data); }
+	else if(offset >= 0x1000 && offset <= 0x10ff)	{ x1_pal_b_w(space, offset & 0x3ff,data); }
+	else if(offset >= 0x1100 && offset <= 0x11ff)	{ x1_pal_r_w(space, offset & 0x3ff,data); }
+	else if(offset >= 0x1200 && offset <= 0x12ff)	{ x1_pal_g_w(space, offset & 0x3ff,data); }
 	else if(offset >= 0x1300 && offset <= 0x13ff)	{ x1_pri_w(space, 0,data); }
 	else if(offset >= 0x1400 && offset <= 0x17ff)	{ x1_pcg_w(space, offset-0x1400,data); }
 	else if(offset == 0x1800 || offset == 0x1801)	{ x1_6845_w(space, offset-0x1800, data); }
@@ -2239,14 +2336,14 @@ static MACHINE_RESET( x1 )
 	for(i=0;i<0x10;i++)
 		palette_set_color_rgb(machine, i, pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
 
-	timer_adjust_periodic(state->rtc_timer, attotime::zero, 0, attotime::from_seconds(1));
+	timer_adjust_periodic(state->rtc_timer, attotime_zero, 0, ATTOTIME_IN_SEC(1));
 }
 
 static MACHINE_START( x1 )
 {
 	x1_state *state = machine->driver_data<x1_state>();
-	timer_pulse(machine, attotime::from_hz(240), NULL, 0, keyboard_callback);
-	timer_pulse(machine, attotime::from_hz(16), NULL, 0, cmt_wind_timer);
+	timer_pulse(machine, ATTOTIME_IN_HZ(240), NULL, 0, keyboard_callback);
+	timer_pulse(machine, ATTOTIME_IN_HZ(16), NULL, 0, cmt_wind_timer);
 
 	/* set up RTC */
 	{
@@ -2319,7 +2416,7 @@ static MACHINE_CONFIG_START( x1, x1_state )
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_MC6845_ADD("crtc", H46505, (VDP_CLOCK/48), mc6845_intf) //unknown divider
-	MCFG_PALETTE_LENGTH(0x10)
+	MCFG_PALETTE_LENGTH(0x10+0x1000)
 	MCFG_PALETTE_INIT(x1)
 
 	MCFG_GFXDECODE(x1)
@@ -2380,6 +2477,8 @@ MACHINE_CONFIG_END
 	ROM_REGION(0x1000, "mcu", ROMREGION_ERASEFF) //MCU for the Keyboard, "sub cpu"
 	ROM_LOAD( "80c48", 0x0000, 0x1000, NO_DUMP )
 
+	ROM_REGION( 0x1000000, "emm", ROMREGION_ERASEFF )
+
 	ROM_REGION(0x1800, "pcg", ROMREGION_ERASEFF)
 
 	ROM_REGION(0x2000, "font", 0) //TODO: this contains 8x16 charset only, maybe it's possible that it derivates a 8x8 charset by skipping gfx lines?
@@ -2404,6 +2503,8 @@ ROM_START( x1twin )
 
 	ROM_REGION(0x1000, "mcu", ROMREGION_ERASEFF) //MCU for the Keyboard, "sub cpu"
 	ROM_LOAD( "80c48", 0x0000, 0x1000, NO_DUMP )
+
+	ROM_REGION( 0x1000000, "emm", ROMREGION_ERASEFF )
 
 	ROM_REGION(0x1800, "pcg", ROMREGION_ERASEFF)
 
@@ -2433,6 +2534,8 @@ ROM_START( x1turbo )
 
 	ROM_REGION(0x1000, "mcu", ROMREGION_ERASEFF) //MCU for the Keyboard, "sub cpu"
 	ROM_LOAD( "80c48", 0x0000, 0x1000, NO_DUMP )
+
+	ROM_REGION( 0x1000000, "emm", ROMREGION_ERASEFF )
 
 	ROM_REGION(0x1800, "pcg", ROMREGION_ERASEFF)
 
@@ -2464,6 +2567,8 @@ ROM_START( x1turbo40 )
 	ROM_LOAD( "80c48", 0x0000, 0x1000, NO_DUMP )
 
 	ROM_REGION(0x1800, "pcg", ROMREGION_ERASEFF)
+
+	ROM_REGION( 0x1000000, "emm", ROMREGION_ERASEFF )
 
 	ROM_REGION(0x2000, "font", 0) //TODO: this contains 8x16 charset only, maybe it's possible that it derivates a 8x8 charset by skipping gfx lines?
 	ROM_LOAD( "ank.fnt", 0x0000, 0x2000, CRC(19689fbd) SHA1(0d4e072cd6195a24a1a9b68f1d37500caa60e599) )

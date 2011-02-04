@@ -127,6 +127,8 @@ public:
 	UINT32 old_fkey;
 	UINT8 key_irq_flag;
 	UINT8 key_irq_vector;
+	UINT32 emm_addr;
+	UINT8 *pal_4096;
 };
 
 
