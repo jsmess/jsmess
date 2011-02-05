@@ -28,8 +28,8 @@
 -->
 
 <softwarelist name="sms" description="Sega Master System cartridges">
-	<!-- Id: 0002 -->
-	<software name="20embr">
+	<!-- Serial: 0002 -->
+	<software name="20em1">
 		<description>20 em 1 (Bra)</description>
 		<year>1995</year>
 		<publisher>Tec Toy</publisher>
@@ -51,7 +51,7 @@
 		</part>
 	</software>
 
-	<!-- Id: 7054 -->
+	<!-- Serial: 7054 -->
 	<software name="aceoface">
 		<description>Ace of Aces (Euro)</description>
 		<year>1991</year>
@@ -63,7 +63,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1305, 5055, 41008 - Releases: 1986-08-17 (JPN) - Alt Title: アクションファイター -->
+	<!-- Serial: 5055 -->
 	<software name="actionfg">
 		<description>Action Fighter (Euro, USA, Bra, v2)</description>
 		<year>1986</year>
@@ -75,6 +75,7 @@
 		</part>
 	</software>
 
+	<!-- Serial: G-1305, 5055, 41008 - Releases: 1986-08-17 (JPN) - Alt Title: アクションファイター -->
 	<software name="actionfg1" cloneof="actionfg">
 		<description>Action Fighter (Euro, Jpn, v1)</description>
 		<year>1986</year>
@@ -86,7 +87,7 @@
 		</part>
 	</software>
 
-	<!-- Id: 27067-50 -->
+	<!-- Serial: MK-27067-50 -->
 	<software name="addamfam">
 		<description>The Addams Family (Euro)</description>
 		<year>1993</year>
@@ -98,7 +99,7 @@
 		</part>
 	</software>
 
-	<!-- Id: 7041 -->
+	<!-- Serial: 7041 -->
 	<software name="aerialas">
 		<description>Aerial Assault (Euro, Bra)</description>
 		<year>1990</year>
@@ -110,6 +111,7 @@
 		</part>
 	</software>
 
+	<!-- Serial: 7041 -->
 	<software name="aerialasu" cloneof="aerialas">
 		<description>Aerial Assault (USA)</description>
 		<year>1990</year>
@@ -121,7 +123,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1340, 9001 - Releases: 1987-12-12 (JPN) - Alt Title: アフターバーナー - Notes: FM support -->
+	<!-- Serial: G-1340, 9001 - Releases: 1987-12-12 (JPN) - Alt Title: アフターバーナー - Notes: FM support -->
 	<software name="afterb">
 		<description>After Burner (World)</description>
 		<year>1987</year>
@@ -134,8 +136,8 @@
 	</software>
 
 	<software name="agidooly" cloneof="dinodool">
+		<!-- Korean version of dinodool (which is also a Korean cart, but in English) -->
 		<description>Agigongnyong Dooly (Kor)</description>
-        <!-- Korean version of dinodool (which is also a Korean cart, but in English) -->
 		<year>1991</year>
 		<publisher>Daou Infosys</publisher>
 		<part name="cart" interface="sms_cart">
@@ -145,7 +147,7 @@
 		</part>
 	</software>
 
-	<!-- Id: 7102, GB2018JG -->
+	<!-- Serial: 7102, GB2018JG -->
 	<software name="airresc">
 		<description>Air Rescue (Euro, Bra, Kor)</description>
 		<year>1992</year>
@@ -157,9 +159,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 9027, 028420, GB94001JG -->
+	<!-- Serial: 9027, 028.420, GB94001JG -->
 	<software name="aladdin">
-		<description>Aladdin (Euro, Bra, Kor)</description>
+		<description>Disney's Aladdin (Euro, Bra, Kor)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -169,7 +171,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1352, 5109 - Releases: 1988-02-29 (JPN) - Alt Title: アレスタ - Notes: FM support -->
+	<!-- Serial: G-1352 - Releases: 1988-02-29 (JPN) - Alt Title: アレスタ - Notes: FM support -->
 	<software name="aleste" cloneof="powstrik">
 		<description>Aleste (Jpn)</description>
 		<year>1988</year>
@@ -181,7 +183,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1330 - Releases: 1987-11-15 (JPN) - Alt Title: アレックスキッド BMXトライアル - Notes: FM support -->
+	<!-- Serial: G-1330 - Releases: 1987-11-15 (JPN) - Alt Title: アレックスキッド BMXトライアル - Notes: FM support -->
 	<software name="alexbmx">
 		<description>Alex Kidd BMX Trial (Jpn)</description>
 		<year>1987</year>
@@ -193,6 +195,7 @@
 		</part>
 	</software>
 
+	<!-- Serial: 5116, 023.020 -->
 	<software name="alexhitw">
 		<description>Alex Kidd - High-Tech World (Euro, USA)</description>
 		<year>1989</year>
@@ -204,8 +207,9 @@
 		</part>
 	</software>
 
+	<!-- Serial: 5067 -->
 	<software name="alexkidd">
-		<description>Alex Kidd in Miracle World (Euro, USA, v1.1)</description>
+		<description>Alex Kidd in Miracle World (Euro, USA, v1)</description>
 		<year>1986</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -216,7 +220,7 @@
 	</software>
 
 	<software name="alexkidd1" cloneof="alexkidd">
-		<description>Alex Kidd in Miracle World (Euro, USA)</description>
+		<description>Alex Kidd in Miracle World (Euro, USA, v0)</description>
 		<year>1986</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -227,17 +231,17 @@
 	</software>
 
 	<software name="alexkiddb" cloneof="alexkidd">
-		<description>Alex Kidd in Miracle World (Bra, v1.1, Pirate)</description>
+		<description>Alex Kidd in Miracle World (Bra, v1, Pirate)</description>
 		<year>1986</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="131072">
-				<rom name="alex kidd in miracle world (b) (v1.1) [p1][!].bin" size="131072" crc="7545d7c2" sha1="823c3051018c7acce15a7ff1d704eab5dd686a1f" offset="000000" />
+				<rom name="alex kidd in miracle world (b) [hack].bin" size="131072" crc="7545d7c2" sha1="823c3051018c7acce15a7ff1d704eab5dd686a1f" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
 
-	<!-- Id: G-1306, 5067 - Releases: 1986-11-01 (JPN) - Alt Title: アレックスキッドのミラクルワールド -->
+	<!-- Serial: G-1306 - Releases: 1986-11-01 (JPN) - Alt Title: アレックスキッドのミラクルワールド -->
 	<software name="alexkiddj" cloneof="alexkidd">
 		<description>Alex Kidd no Miracle World (Jpn)</description>
 		<year>1986</year>
@@ -249,7 +253,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1347, 7005 - Releases: 1988-03-10 (JPN) - Alt Title: アレックスキッド ザ・ロストスターズ - Notes: FM support -->
+	<!-- Serial: G-1347, 7005, GB-2347 - Releases: 1988-03-10 (JPN) - Alt Title: アレックスキッド ザ・ロストスターズ - Notes: FM support -->
 	<software name="alexlost">
 		<description>Alex Kidd - The Lost Stars (World)</description>
 		<year>1988</year>
@@ -261,9 +265,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 7044 -->
+	<!-- Serial: 7044 -->
 	<software name="alexshin">
-		<description>Alex Kidd in Shinobi World (Euro, USA)</description>
+		<description>Alex Kidd in Shinobi World (Euro, USA, Bra)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -273,9 +277,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 5111? -->
+	<!-- Serial: 5111 -->
 	<software name="alf">
-		<description>Alf (USA)</description>
+		<description>Alf (USA, Bra)</description>
 		<year>1989</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -285,9 +289,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 27043-50 -->
+	<!-- Serial: MK-27043-50 -->
 	<software name="alien3">
-		<description>Alien 3 (Euro)</description>
+		<description>Alien³ (Euro, Bra)</description>
 		<year>1992</year>
 		<publisher>Arena</publisher>
 		<part name="cart" interface="sms_cart">
@@ -297,9 +301,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 7018 -->
+	<!-- Serial: 7018 -->
 	<software name="altbeast">
-		<description>Altered Beast (Euro, USA)</description>
+		<description>Altered Beast (Euro, USA, Bra)</description>
 		<year>1989</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -309,9 +313,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 7019 -->
+	<!-- Serial: 7019 -->
 	<software name="ameribb">
-		<description>American Baseball (Euro)</description>
+		<description>American Baseball (Euro, Bra)</description>
 		<year>1989</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -321,7 +325,7 @@
 		</part>
 	</software>
 
-	<!-- Id: 7020 -->
+	<!-- Serial: 7020 -->
 	<software name="ameripf">
 		<description>American Pro Football (Euro)</description>
 		<year>1989</year>
@@ -333,9 +337,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 27051-50 -->
+	<!-- Serial: MK-27051-50, 025.420 -->
 	<software name="andreaga">
-		<description>Andre Agassi Tennis (Euro)</description>
+		<description>Andre Agassi Tennis (Euro, Bra)</description>
 		<year>1993</year>
 		<publisher>TecMagik</publisher>
 		<part name="cart" interface="sms_cart">
@@ -345,7 +349,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1328, 5116 - Releases: 1987-07-19 (JPN) - Alt Title: あんみつ姫 - Note: the Western release, "Alex Kidd Hiigh-Tech World" is quite different -->
+	<!-- Serial: G-1328 - Releases: 1987-07-19 (JPN) - Alt Title: あんみつ姫 - Note: the Western release, "Alex Kidd Hiigh-Tech World" is quite different -->
 	<software name="anmitsu" cloneof="alexhitw">
 		<description>Anmitsu Hime (Jpn)</description>
 		<year>1987</year>
@@ -357,7 +361,7 @@
 		</part>
 	</software>
 
-	<!-- Id: 27032-50 -->
+	<!-- Serial: 27032-50 -->
 	<software name="arcadesh">
 		<description>Arcade Smash Hits (Euro)</description>
 		<year>1992</year>
@@ -369,6 +373,7 @@
 		</part>
 	</software>
 
+	<!-- Serial: S-001 - Releases: 1988-03-25 (JPN) - Alt Title: アルゴスの十字剣 -->
 	<software name="argosnj">
 		<description>Argos no Juujiken (Jpn)</description>
 		<year>1988</year>
@@ -380,21 +385,20 @@
 		</part>
 	</software>
 
-	<!-- S-001 - Releases: 1988-03-25 (JPN) - Alt Title: アルゴスの十字剣 -->
 	<software name="argosnj1" cloneof="argosnj">
-		<description>Argos no Juujiken (Jpn, Alt)</description>
+		<description>Argos no Juujiken (Jpn, Pirate?)</description>
 		<year>1988</year>
 		<publisher>Tecmo</publisher>
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="131072">
-				<rom name="argos no juujiken (j) [a1][!].bin" size="131072" crc="32da4b0d" sha1="6c11879612dc00c18f6d2a1823bdd26522dc9c91" offset="000000" />
+				<rom name="argos no juujiken [hack].bin" size="131072" crc="32da4b0d" sha1="6c11879612dc00c18f6d2a1823bdd26522dc9c91" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
 
-	<!-- Id: 026.350 - Releases: 1997 (BRA) -->
+	<!-- Serial: 026.350 - Releases: 1997 (BRA) -->
 	<software name="arielmer">
-		<description>Ariel - The Little Mermaid (Bra)</description>
+		<description>Disney's Ariel The Little Mermaid (Bra)</description>
 		<year>1997</year>
 		<publisher>Tec Toy</publisher>
 		<part name="cart" interface="sms_cart">
@@ -404,7 +408,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1307, 5064 (USA), 5081 (EUR) - Releases: 1986-11-16 (JPN) - Alt Title: アシュラ - 阿修羅 -->
+	<!-- Serial: G-1307 - Releases: 1986-11-16 - Alt Title: アシュラ - 阿修羅 -->
 	<software name="ashura" cloneof="secret">
 		<description>Ashura (Jpn)</description>
 		<year>1986</year>
@@ -416,9 +420,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 7040 -->
+	<!-- Serial: 7040 -->
 	<software name="assaultc">
-		<description>Assault City (Euro, Light Phaser version)</description>
+		<description>Assault City (Euro, Bra, Light Phaser version)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -428,7 +432,7 @@
 		</part>
 	</software>
 
-	<!-- Id: 7034 -->
+	<!-- Serial: 7034 -->
 	<software name="assaultc1" cloneof="assaultc">
 		<description>Assault City (Euro)</description>
 		<year>1990</year>
@@ -440,9 +444,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 9032 -->
+	<!-- Serial: 9032, 028.490 -->
 	<software name="astergre">
-		<description>Asterix and the Great Rescue (Euro)</description>
+		<description>Astérix and the Great Rescue (Euro, Bra)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -452,9 +456,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 9008 -->
+	<!-- Serial: 9008 -->
 	<software name="asterix">
-		<description>Asterix (Euro, v1.1)</description>
+		<description>Asterix (Euro, v1)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -464,8 +468,9 @@
 		</part>
 	</software>
 
+	<!-- Serial: 9008 -->
 	<software name="asterix1" cloneof="asterix">
-		<description>Asterix (Euro)</description>
+		<description>Asterix (Euro, Bra, v0)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -475,7 +480,7 @@
 		</part>
 	</software>
 
-	<!-- Id: 9023 -->
+	<!-- Serial: 9023 -->
 	<software name="astermis">
 		<description>Asterix and the Secret Mission (Euro)</description>
 		<year>1993</year>
@@ -487,9 +492,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 7075 -->
+	<!-- Serial: 7075 -->
 	<software name="astorm">
-		<description>Alien Storm (Euro)</description>
+		<description>Alien Storm (Euro, Bra)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -499,7 +504,7 @@
 		</part>
 	</software>
 
-	<!-- Id: C-503, 4004 (Card), 4504 (Cart) - Releases: 1985-12-22 (Jpn, card) -->
+	<!-- Serial: C-503 - Releases: 1985-12-22 (Jpn, card) -->
 	<software name="astrof" cloneof="transbot">
 		<description>Astro Flash (Jpn)</description>
 		<year>1985</year>
@@ -511,18 +516,19 @@
 		</part>
 	</software>
 
+    <!-- This has been found in unlicensed GG compilation too (or has it been ripped from such a compilation only?) -->
 	<software name="astrof1" cloneof="transbot">
 		<description>Astro Flash (Jpn, Pirate)</description>
 		<year>1985</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="astro flash (j) [p1][!].bin" size="32768" crc="0e21e6cf" sha1="e522a7ad519091a0955a6cf54590a7bd9708c56f" offset="000000" />
+				<rom name="astro flash [hack].bin" size="32768" crc="0e21e6cf" sha1="e522a7ad519091a0955a6cf54590a7bd9708c56f" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
 
-	<!-- Id: 6081 -->
+	<!-- Serial: 6081, 41011 -->
 	<software name="astrow">
 		<description>Astro Warrior &amp; Pit Pot (Euro)</description>
 		<year>1987</year>
@@ -534,9 +540,9 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1312, 5069 - Releases: 1986-11-16 (JPN) - Alt Title: アストロ ウォリアー -->
+	<!-- Serial: G-1312, 5069 - Releases: 1986-11-16 (JPN) - Alt Title: アストロ ウォリアー -->
 	<software name="astrowj" cloneof="astrow">
-		<description>Astro Warrior (Jpn, USA)</description>
+		<description>Astro Warrior (Jpn, USA, Bra)</description>
 		<year>1986</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -546,8 +552,9 @@
 		</part>
 	</software>
 
+	<!-- Serial: 7006 -->
 	<software name="asyndrom">
-		<description>Alien Syndrome (Euro, USA)</description>
+		<description>Alien Syndrome (Euro, USA, Bra)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -557,7 +564,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1339, 7006 - Releases: 1987-10-18 (JPN) - Alt Title: エイリアン シンドローム - Notes: FM support -->
+	<!-- Serial: G-1339 - Releases: 1987-10-18 (JPN) - Alt Title: エイリアン シンドローム - Notes: FM support -->
 	<software name="asyndromj" cloneof="asyndrom">
 		<description>Alien Syndrome (Jpn)</description>
 		<year>1987</year>
@@ -569,9 +576,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 9011 -->
+	<!-- Serial: 9011 -->
 	<software name="ayrton">
-		<description>Ayrton Senna's Super Monaco GP II (Euro)</description>
+		<description>Ayrton Senna's Super Monaco GP II (Euro, Bra, Kor)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -581,9 +588,9 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1335, 5100 - Releases: 1987-09-20 (JPN) - Alt Title: ナスカ'88 -THE GOLDEN ROAD TO PARADISE- - Notes: FM support -->
+	<!-- Serial: G-1335, 5100 - Releases: 1987-09-20 (JPN) - Alt Title: ナスカ'88 -THE GOLDEN ROAD TO PARADISE- - Notes: FM support -->
 	<software name="aztecadv">
-		<description>Aztec Adventure - The Golden Road to Paradise (World) ~ Nazca '88 - The Golden Road to Paradise (Jpn)</description>
+		<description>Aztec Adventure - The Golden Road to Paradise (Euro, USA) ~ Nazca '88 - The Golden Road to Paradise (Jpn)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -593,9 +600,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 27010-50 -->
+	<!-- Serial: 27010-50 -->
 	<software name="backtof2">
-		<description>Back to the Future Part II (Euro)</description>
+		<description>Back to the Future Part II (Euro, Bra)</description>
 		<year>1990</year>
 		<publisher>Image Works</publisher>
 		<part name="cart" interface="sms_cart">
@@ -605,7 +612,7 @@
 		</part>
 	</software>
 
-	<!-- Id: 27020-50 -->
+	<!-- Serial: MK-27020-50 -->
 	<software name="backtof3">
 		<description>Back to the Future Part III (Euro)</description>
 		<year>1992</year>
@@ -617,9 +624,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 025470 - Notes: Title screen says "Baku Baku Animal" -->
+	<!-- Serial: 025.470 - Alt. Title: Baku Baku (Box) -->
 	<software name="bakubaku">
-		<description>Baku Baku(Bra)</description>
+		<description>Baku Baku Animal (Bra)</description>
 		<year>1996</year>
 		<publisher>Tec Toy</publisher>
 		<part name="cart" interface="sms_cart">
@@ -629,7 +636,7 @@
 		</part>
 	</software>
 
-	<!-- Id: 4084 (Card), 4584 (Cart) -->
+	<!-- Serial: 4084 (Card), 4584 (Cart), 41022 -->
 	<software name="bankpani">
 		<description>Bank Panic (Euro)</description>
 		<year>1987</year>
@@ -641,20 +648,9 @@
 		</part>
 	</software>
 
-	<software name="bankpani1" cloneof="bankpani">
-		<description>Bank Panic (Euro, Pirate)</description>
-		<year>1987</year>
-		<publisher>&lt;pirate&gt;</publisher>
-		<part name="cart" interface="sms_cart">
-			<dataarea name="rom" size="32768">
-				<rom name="bank panic (e) [p1][!].bin" size="32768" crc="b4dfb825" sha1="983c10f9431e19e0f79627cf72d5425895fd32f8" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- Id: 27031-50 -->
+	<!-- Serial: MK-27031-50 -->
 	<software name="bartvssm">
-		<description>The Simpsons - Bart vs. The Space Mutants (Euro)</description>
+		<description>The Simpsons - Bart vs. The Space Mutants (Euro, Bra)</description>
 		<year>1992</year>
 		<publisher>Flying Edge</publisher>
 		<part name="cart" interface="sms_cart">
@@ -664,9 +660,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 27053-50 -->
+	<!-- Serial: MK-27053-50, 027.210 -->
 	<software name="bartvswd">
-		<description>The Simpsons - Bart vs. The World (Euro)</description>
+		<description>The Simpsons - Bart vs. The World (Euro, Bra)</description>
 		<year>1993</year>
 		<publisher>Flying Edge</publisher>
 		<part name="cart" interface="sms_cart">
@@ -676,9 +672,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 7025 - Notes: Title screen says "Basket Ball Nightmare" -->
+	<!-- Serial: 7025 - Alt. Title: Basketball Nightmare (Box) -->
 	<software name="basketni">
-		<description>Basketball Nightmare (Euro)</description>
+		<description>Basket Ball Nightmare (Euro, Bra)</description>
 		<year>1989</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -688,9 +684,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 7112 -->
+	<!-- Serial: 7112, 7112-50 -->
 	<software name="batmanre">
-		<description>Batman Returns (Euro)</description>
+		<description>Batman Returns (Euro, Bra)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -700,8 +696,8 @@
 		</part>
 	</software>
 
-	<!-- Id: 027-370 -->
-	<software name="battlem">
+	<!-- Serial: 027.376 -->
+	<software name="batmania">
 		<description>Battlemaniacs (Bra)</description>
 		<year>1994</year>
 		<publisher>Tec Toy</publisher>
@@ -712,9 +708,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 7033 -->
+	<!-- Serial: 7033 -->
 	<software name="battleor">
-		<description>Battle Out Run (Euro)</description>
+		<description>Battle Out Run (Euro, Bra)</description>
 		<year>1989</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -724,9 +720,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 27019-50 -->
+	<!-- Serial: 27019-50, 025.270 -->
 	<software name="beast">
-		<description>Shadow of the Beast (Euro)</description>
+		<description>Shadow of the Beast (Euro, Bra)</description>
 		<year>1991</year>
 		<publisher>TecMagik</publisher>
 		<part name="cart" interface="sms_cart">
@@ -736,6 +732,7 @@
 		</part>
 	</software>
 
+	<!-- Serial: 5054 -->
 	<software name="blackblt">
 		<description>Black Belt (Euro, USA)</description>
 		<year>1986</year>
@@ -747,7 +744,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1351, 8005 - Releases: 1988-03-26 (JPN) - Alt Title: ブレード イーグル - Notes: FM support, 3D glasses support -->
+	<!-- Serial: G-1351, 8005 - Releases: 1988-03-26 (JPN) - Alt Title: ブレード イーグル - Notes: FM support, 3D glasses support -->
 	<software name="bladeag">
 		<description>Blade Eagle (World)</description>
 		<year>1988</year>
@@ -760,7 +757,7 @@
 	</software>
 
 	<software name="bladeag1" cloneof="bladeag">
-		<description>Blade Eagle (World, Prototype)</description>
+		<description>Blade Eagle (USA, Prototype)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -770,7 +767,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1373, 27006 - Releases: 1989-02-04 (JPN) - Alt Title: ボンバーレイド - Notes: FM support -->
+	<!-- Serial: G-1373, QC-003, 27006 - Releases: 1989-02-04 (JPN) - Alt Title: ボンバーレイド - Notes: FM support -->
 	<software name="bomber">
 		<description>Bomber Raid (World)</description>
 		<year>1989</year>
@@ -782,9 +779,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 7073 -->
+	<!-- Serial: 7073 -->
 	<software name="bonanza">
-		<description>Bonanza Bros. (Euro)</description>
+		<description>Bonanza Bros. (Euro, Bra)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -794,9 +791,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 028600 -->
+	<!-- Serial: 028.600 -->
 	<software name="bonkers">
-		<description>Bonkers Wax Up! (Bra)</description>
+		<description>Disney's Bonkers Wax Up! (Bra)</description>
 		<year>1994</year>
 		<publisher>Tec Toy</publisher>
 		<part name="cart" interface="sms_cart">
@@ -806,7 +803,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1371 - Releases: 1988-12-01 (JPN) - Alt Title: 超音戦士ボーグマン - Notes: FM support -->
+	<!-- Serial: G-1371 - Releases: 1988-12-01 (JPN) - Alt Title: 超音戦士ボーグマン - Notes: FM support -->
 	<software name="borgman" cloneof="cyborgh">
 		<description>Chouon Senshi Borgman (Jpn)</description>
 		<year>1988</year>
@@ -829,7 +826,7 @@
 		</part>
 	</software>
 
-	<!-- Id: 27065-50 -->
+	<!-- Serial: MK-27065-50 -->
 	<software name="bramst">
 		<description>Bram Stoker's Dracula (Euro)</description>
 		<year>1993</year>
@@ -841,8 +838,9 @@
 		</part>
 	</software>
 
+	<!-- Serial: 7077 - Alt. Title: Dragon Maze (Bra Box?) -->
 	<software name="bublbobl">
-		<description>Bubble Bobble (Euro)</description>
+		<description>Bubble Bobble (Euro, Bra)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -852,9 +850,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 9025 -->
+	<!-- Serial: 9025, 028.340 -->
 	<software name="buggyrun">
-		<description>Buggy Run (Euro)</description>
+		<description>Buggy Run (Euro, Bra)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -864,7 +862,7 @@
 		</part>
 	</software>
 
-	<!-- Id: 7105 -->
+	<!-- Serial: 7105 -->
 	<software name="calgame2">
 		<description>California Games II (Euro)</description>
 		<year>1993</year>
@@ -876,6 +874,7 @@
 		</part>
 	</software>
 
+	<!-- Serial: 025.190, GB93006JG -->
 	<software name="calgame2b" cloneof="calgame2">
 		<description>California Games II (Bra, Kor)</description>
 		<year>1993</year>
@@ -887,9 +886,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 7014 -->
+	<!-- Serial: 7014 -->
 	<software name="calgames">
-		<description>California Games (Euro, USA)</description>
+		<description>California Games (Euro, USA, Bra)</description>
 		<year>1989</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -899,7 +898,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1356, 5117 - Releases: 1988-07-02 (JPN) - Alt Title: キャプテン シルバー - Notes: FM support -->
+	<!-- Serial: G-1356, 7008 - Releases: 1988-07-02 (JPN) - Alt Title: キャプテン シルバー - Notes: FM support -->
 	<software name="captsilv">
 		<description>Captain Silver (Euro, Jpn)</description>
 		<year>1988</year>
@@ -911,6 +910,7 @@
 		</part>
 	</software>
 
+	<!-- Serial: 5117 -->
 	<software name="captsilvu" cloneof="captsilv">
 		<description>Captain Silver (USA)</description>
 		<year>1988</year>
@@ -922,7 +922,7 @@
 		</part>
 	</software>
 
-	<!-- Id: 7021 -->
+	<!-- Serial: 7021 -->
 	<software name="casino">
 		<description>Casino Games (Euro, USA)</description>
 		<year>1989</year>
@@ -934,9 +934,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 028.720 -->
+	<!-- Serial: 028.720 -->
 	<software name="castelo">
-		<description>Castelo Ra-Tim-Bum (Bra)</description>
+		<description>Castelo Rá-Tim-Bum (Bra)</description>
 		<year>1997</year>
 		<publisher>Tec Toy</publisher>
 		<part name="cart" interface="sms_cart">
@@ -946,9 +946,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 7053 -->
+	<!-- Serial: 7053 -->
 	<software name="castlill">
-		<description>Castle of Illusion Starring Mickey Mouse (Euro)</description>
+		<description>Castle of Illusion Starring Mickey Mouse (Euro, Bra)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -959,7 +959,7 @@
 	</software>
 
 	<software name="castlills" cloneof="castlill">
-		<description>Castle of Illusion Starring Mickey Mouse (Display Unit Sample)</description>
+		<description>Castle of Illusion Starring Mickey Mouse (USA, Display Unit Sample)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -969,6 +969,7 @@
 		</part>
 	</software>
 
+	<!-- Serial: 7053 -->
 	<software name="castlillu" cloneof="castlill">
 		<description>Castle of Illusion Starring Mickey Mouse (USA)</description>
 		<year>1990</year>
@@ -980,9 +981,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 7073 -->
+	<!-- Serial: 27034-50, 025.430 -->
 	<software name="champeur">
-		<description>Champions of Europe (Euro)</description>
+		<description>Champions of Europe (Euro, Bra)</description>
 		<year>1992</year>
 		<publisher>TecMagik</publisher>
 		<part name="cart" interface="sms_cart">
@@ -992,7 +993,7 @@
 		</part>
 	</software>
 
-	<!-- Id: 023430 -->
+	<!-- Serial: 023.430 -->
 	<software name="chapolim" cloneof="ghosth">
 		<description>Chapolim x Dracula - Um Duelo Assustador (Bra)</description>
 		<year>1990</year>
@@ -1004,7 +1005,7 @@
 		</part>
 	</software>
 
-	<!-- Id: 7038 -->
+	<!-- Serial: 7038 -->
 	<software name="chasehq">
 		<description>Taito Chase H.Q. (Euro)</description>
 		<year>1990</year>
@@ -1016,9 +1017,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 9033 -->
+	<!-- Serial: 9033-50, 028550 -->
 	<software name="cheese">
-		<description>Cheese Cat-astrophe Starring Speedy Gonzales (Euro)</description>
+		<description>Cheese Cat-astrophe Starring Speedy Gonzales (Euro, Bra)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -1028,7 +1029,7 @@
 		</part>
 	</software>
 
-	<!-- Id: 27084-50 -->
+	<!-- Serial: 27084-50 -->
 	<software name="chmphock">
 		<description>Championship Hockey (Euro)</description>
 		<year>1994</year>
@@ -1040,9 +1041,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 5051 -->
+	<!-- Serial: 5051, 41001 -->
 	<software name="choplift">
-		<description>Choplifter (Euro, USA)</description>
+		<description>Choplifter (Euro, USA, Bra)</description>
 		<year>1986</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -1063,9 +1064,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 29004 -->
+	<!-- Serial: MK-29004-50, 028.040 -->
 	<software name="chuckrck">
-		<description>Chuck Rock (Euro)</description>
+		<description>Chuck Rock (Euro, Bra)</description>
 		<year>1992</year>
 		<publisher>Virgin Interactive</publisher>
 		<part name="cart" interface="sms_cart">
@@ -1075,7 +1076,7 @@
 		</part>
 	</software>
 
-	<!-- Id: 29019 -->
+	<!-- Serial: MK-29019-50 -->
 	<software name="chukrck2">
 		<description>Chuck Rock II - Son of Chuck (Euro)</description>
 		<year>1993</year>
@@ -1087,6 +1088,7 @@
 		</part>
 	</software>
 
+	<!-- Serial: 028.440 -->
 	<software name="chukrck2b" cloneof="chukrck2">
 		<description>Chuck Rock II - Son of Chuck (Bra)</description>
 		<year>1993</year>
@@ -1098,7 +1100,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1304 - Releases: 1986-09-21 (JPN) - Alt Title: ザ・サーキット -->
+	<!-- Serial: G-1304 - Releases: 1986-09-21 (JPN) - Alt Title: ザ・サーキット -->
 	<software name="circuit" cloneof="worldgp">
 		<description>The Circuit (Jpn)</description>
 		<year>1986</year>
@@ -1110,7 +1112,7 @@
 		</part>
 	</software>
 
-	<!-- Id: 7027 -->
+	<!-- Serial: 7027 -->
 	<software name="cloudmst">
 		<description>Cloud Master (Euro, USA)</description>
 		<year>1989</year>
@@ -1133,9 +1135,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 5120 -->
+	<!-- Serial: 5120,GB-1001, GB-1002JG - Alt. Title: Shapes and Columns (Bra Box?) -->
 	<software name="columns">
-		<description>Columns (Euro, USA)</description>
+		<description>Columns (Euro, USA, Bra, Kor)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -1146,7 +1148,7 @@
 	</software>
 
 	<software name="columnsp" cloneof="columns">
-		<description>Columns (Euro, USA, Prototype)</description>
+		<description>Columns (Prototype)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -1156,7 +1158,7 @@
 		</part>
 	</software>
 
-	<!-- Id: C-511 - Releases: 1986-04-21 (Jpn, card) -->
+	<!-- Serial: C-511 - Releases: 1986-04-21 (Jpn, card) -->
 	<software name="comical">
 		<description>Comical Machine Gun Joe (Jpn)</description>
 		<year>1986</year>
@@ -1168,7 +1170,7 @@
 		</part>
 	</software>
 
-    <!-- Alt. Title: Dàzhàn hēishǒu dǎng ~ 大戰黑手黨 -->
+	<!-- Serial: K-317 - Alt. Title: Dàzhàn hēishǒu dǎng ~ 大戰黑手黨 -->
 	<software name="comicaltw" cloneof="comical">
 		<description>Comical Machine Gun Joe (Tw)</description>
 		<year>1986?</year>
@@ -1180,7 +1182,7 @@
 		</part>
 	</software>
 
-	<!-- Id: 27068-50 -->
+	<!-- Serial: MK-27068-50 -->
 	<software name="coolspot">
 		<description>Cool Spot (Euro)</description>
 		<year>1993</year>
@@ -1192,7 +1194,7 @@
 		</part>
 	</software>
 
-	<!-- Id: 27074-50 -->
+	<!-- Serial: MK-27074-50 -->
 	<software name="cosmic">
 		<description>Cosmic Spacehead (Euro)</description>
 		<year>1993</year>
@@ -1204,9 +1206,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 7050 -->
+	<!-- Serial: 7050 -->
 	<software name="cybers">
-		<description>The Cyber Shinobi (Euro)</description>
+		<description>The Cyber Shinobi (Euro, Bra)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -1216,8 +1218,9 @@
 		</part>
 	</software>
 
+	<!-- Serial: QC-002, 25003 -->
 	<software name="cyborgh">
-		<description>Cyborg Hunter (Euro, USA)</description>
+		<description>Cyborg Hunter (Euro, USA, Bra)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -1227,9 +1230,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 9031 -->
+	<!-- Serial: 9031, 028.360 -->
 	<software name="daffy">
-		<description>Daffy Duck in Hollywood (Euro)</description>
+		<description>Daffy Duck in Hollywood (Euro, Bra)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -1239,6 +1242,7 @@
 		</part>
 	</software>
 
+	<!-- Serial: G9511-RP4 -->
 	<software name="dallye">
 		<description>Dallyeora Pigu-Wang (Kor)</description>
 		<year>1995</year>
@@ -1250,9 +1254,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 7049 -->
+	<!-- Serial: 7049 -->
 	<software name="danan">
-		<description>Danan - The Jungle Fighter (Euro)</description>
+		<description>Danan: The Jungle Fighter (Euro, Bra)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -1262,7 +1266,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1369, 7012 - Releases: 1988-10-01 (JPN) - Alt Title: 双截龍（ダブルドラゴン） - Notes: FM support -->
+	<!-- Serial: G-1369, 7012 - Releases: 1988-10-01 (JPN) - Alt Title: 双截龍（ダブルドラゴン） - Notes: FM support -->
 	<software name="ddragon">
 		<description>Double Dragon (World)</description>
 		<year>1988</year>
@@ -1274,7 +1278,7 @@
 		</part>
 	</software>
 
-	<!-- Id: 7030 -->
+	<!-- Serial: 7030 -->
 	<software name="deadang">
 		<description>Dead Angle (Euro, USA)</description>
 		<year>1989</year>
@@ -1286,9 +1290,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 9022 -->
+	<!-- Serial: 9022 -->
 	<software name="deepduck">
-		<description>Deep Duck Trouble Starring Donald Duck (Euro)</description>
+		<description>Deep Duck Trouble Starring Donald Duck (Euro, Bra)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -1298,9 +1302,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 7122 -->
+	<!-- Serial: 7122, 027.250 -->
 	<software name="desert">
-		<description>Desert Speedtrap Starring Road Runner and Wile E. Coyote (Euro)</description>
+		<description>Desert Speedtrap Starring Road Runner and Wile E. Coyote (Euro, Bra)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -1310,9 +1314,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 7057 -->
+	<!-- Serial: 7057 -->
 	<software name="dicktr">
-		<description>Dick Tracy (Euro, USA)</description>
+		<description>Dick Tracy (Euro, USA, Bra)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -1344,7 +1348,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1334 - Releases: 1987-08-18 (JPN) - Alt Title: どきどきペンギンランド 宇宙大冒険 - Notes: FM support -->
+	<!-- Serial: G-1334 - Releases: 1987-08-18 (JPN) - Alt Title: どきどきペンギンランド 宇宙大冒険 - Notes: FM support -->
 	<software name="dokidoki" cloneof="penguin">
 		<description>Doki Doki Penguin Land - Uchuu Daibouken (Jpn)</description>
 		<year>1987</year>
@@ -1367,7 +1371,7 @@
 		</part>
 	</software>
 
-	<!-- Id: 7036 -->
+	<!-- Serial: 7036 -->
 	<software name="doublhwk">
 		<description>Double Hawk (Euro)</description>
 		<year>1990</year>
@@ -1379,7 +1383,7 @@
 		</part>
 	</software>
 
-	<software name="doublhwk1" cloneof="doublhwk">
+	<software name="doublhwkp" cloneof="doublhwk">
 		<description>Double Hawk (Euro, Prototype)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
@@ -1390,7 +1394,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1314 - Releases: 1987-01-18 (JPN) - Alt Title: ダブルターゲット シンシアの眠り -->
+	<!-- Serial: G-1314 - Releases: 1987-01-18 (JPN) - Alt Title: ダブルターゲット シンシアの眠り -->
 	<software name="doubltgt" cloneof="quartet">
 		<description>Double Target - Cynthia no Nemuri (Jpn)</description>
 		<year>1987</year>
@@ -1402,7 +1406,7 @@
 		</part>
 	</software>
 
-	<!-- Id: 27079-50 -->
+	<!-- Serial: MK-27079-50 -->
 	<software name="dragon">
 		<description>Dragon - The Bruce Lee Story (Euro)</description>
 		<year>1994</year>
@@ -1414,9 +1418,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 5123 -->
+	<!-- Serial: 5123, 023.440 -->
 	<software name="dragoncr">
-		<description>Dragon Crystal (Euro)</description>
+		<description>Dragon Crystal (Euro, Bra)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -1437,9 +1441,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 7123 -->
+	<!-- Serial: 7123 -->
 	<software name="drrobotn">
-		<description>Dr. Robotnik's Mean Bean Machine (Euro)</description>
+		<description>Dr. Robotnik's Mean Bean Machine (Euro, Bra)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -1449,7 +1453,7 @@
 		</part>
 	</software>
 
-	<!-- Id: 29010-50 -->
+	<!-- Serial: MK-29010-50 -->
 	<software name="dstrike">
 		<description>Desert Strike (Euro)</description>
 		<year>1992</year>
@@ -1461,7 +1465,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1302, 5056 - Releases: 1986-07-20 (JPN) - Alt Title: 極悪同盟 ダンプ松本 -->
+	<!-- Serial: G-1302 - Releases: 1986-07-20 (JPN) - Alt Title: 極悪同盟 ダンプ松本 -->
 	<software name="dumpmats" cloneof="prowrest">
 		<description>Gokuaku Doumei Dump Matsumoto (Jpn)</description>
 		<year>1986</year>
@@ -1473,9 +1477,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 7067 -->
+	<!-- Serial: 7067 -->
 	<software name="dynaduke">
-		<description>Dynamite Duke (Euro)</description>
+		<description>Dynamite Duke (Euro, Bra)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -1485,9 +1489,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 7029 -->
+	<!-- Serial: 7029 -->
 	<software name="dynadux">
-		<description>Dynamite Dux (Euro)</description>
+		<description>Dynamite Dux (Euro, Bra)</description>
 		<year>1989</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -1497,7 +1501,7 @@
 		</part>
 	</software>
 
-	<!-- Id: 028.570 -->
+	<!-- Serial: 028.570 -->
 	<software name="dynahead">
 		<description>Dynamite Headdy (Bra)</description>
 		<year>1994</year>
@@ -1509,9 +1513,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 9029 -->
+	<!-- Serial: 9029 -->
 	<software name="ecco">
-		<description>Ecco the Dolphin (Euro)</description>
+		<description>Ecco the Dolphin (Euro, Bra)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -1521,7 +1525,7 @@
 		</part>
 	</software>
 
-	<!-- Id: 028.630 -->
+	<!-- Serial: 028.630 -->
 	<software name="eccotide">
 		<description>Ecco - The Tides of Time (Bra)</description>
 		<year>1996</year>
@@ -1533,7 +1537,7 @@
 		</part>
 	</software>
 
-	<!-- Id: 028.690 -->
+	<!-- Serial: 028.690 -->
 	<software name="ejim">
 		<description>Earthworm Jim (Bra)</description>
 		<year>1996</year>
@@ -1545,8 +1549,9 @@
 		</part>
 	</software>
 
+	<!-- Serial: 5077 - Alt. Title: Super Cross (Bra Box?) -->
 	<software name="enduro">
-		<description>Enduro Racer (Euro, USA)</description>
+		<description>Enduro Racer (Euro, USA, Bra)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -1556,7 +1561,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1322, 5077 - Releases: 1987-05-18 (JPN) - Alt Title: エンデューロレーサー -->
+	<!-- Serial: G-1322 - Releases: 1987-05-18 (JPN) - Alt Title: エンデューロレーサー -->
 	<software name="enduroj" cloneof="enduro">
 		<description>Enduro Racer (Jpn)</description>
 		<year>1987</year>
@@ -1568,7 +1573,7 @@
 		</part>
 	</software>
 
-	<!-- Id: 7042 -->
+	<!-- Serial: 7042 -->
 	<software name="eswatc">
 		<description>E-SWAT - City Under Siege (Euro, USA, Easy Version)</description>
 		<year>1990</year>
@@ -1581,7 +1586,7 @@
 	</software>
 
 	<software name="eswatc1">
-		<description>E-SWAT - City Under Siege (Euro, USA, Hard Version)</description>
+		<description>E-SWAT - City Under Siege (Euro, USA, Bra, Hard Version)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -1602,9 +1607,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 27072-50 -->
+	<!-- Serial: MK-27072-50, 026.330 -->
 	<software name="f1">
-		<description>F1 (Euro)</description>
+		<description>F1 (Euro, Bra)</description>
 		<year>1993</year>
 		<publisher>Domark</publisher>
 		<part name="cart" interface="sms_cart">
@@ -1625,6 +1630,7 @@
 		</part>
 	</software>
 
+	<!-- Serial: 4005 -->
 	<software name="f16falc" cloneof="f16fight">
 		<description>F-16 Fighting Falcon (USA)</description>
 		<year>1985</year>
@@ -1636,7 +1642,7 @@
 		</part>
 	</software>
 
-	<!-- Id: C-508, 4081 - Releases: 1985-12-22 (Jpn, card) -->
+	<!-- Serial: C-508 - Releases: 1985-12-22 (Jpn, card) -->
 	<software name="f16falcj" cloneof="f16fight">
 		<description>F-16 Fighting Falcon (Jpn)</description>
 		<year>1985</year>
@@ -1648,7 +1654,7 @@
 		</part>
 	</software>
 
-    <!-- Alt Title: F-16 -->
+	<!-- Serial: K-313 - Alt. Title: F-16 -->
 	<software name="f16falctw" cloneof="f16fight">
 		<description>F-16 Fighting Falcon (Tw)</description>
 		<year>1985?</year>
@@ -1660,7 +1666,7 @@
 		</part>
 	</software>
 
-	<!-- Id: 4581 (Euro Cart re-release?) -->
+	<!-- Serial: 4581 (Euro Cart re-release?), 4081, 4005M, 41005 -->
 	<software name="f16fight">
 		<description>F-16 Fighter (Euro, USA)</description>
 		<year>1986</year>
@@ -1684,7 +1690,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1342, 5103 - Releases: 1987-12-27 (JPN) - Alt Title: ファミリーゲームズ - Notes: FM support -->
+	<!-- Serial: G-1342 - Releases: 1987-12-27 (JPN) - Alt Title: ファミリーゲームズ - Notes: FM support -->
 	<software name="family" cloneof="parlour">
 		<description>Family Games (Jpn)</description>
 		<year>1987</year>
@@ -1696,7 +1702,7 @@
 		</part>
 	</software>
 
-	<!-- Id: 27074-50 -->
+	<!-- Serial: MK-27074-50 -->
 	<software name="fantdizz">
 		<description>Fantastic Dizzy (Euro)</description>
 		<year>1993</year>
@@ -1708,9 +1714,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 5108 -->
+	<!-- Serial: 7004 -->
 	<software name="fantzon2">
-		<description>Fantasy Zone II - The Tears of Opa-Opa (Euro, USA)</description>
+		<description>Fantasy Zone II - The Tears of Opa-Opa (Euro, USA, Bra)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -1720,7 +1726,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1329, 7004 - Releases: 1987-10-17 (JPN) - Alt Title: ファンタジーゾーンII オパオパの涙 - Notes: FM support -->
+	<!-- Serial: G-1329 - Releases: 1987-10-17 (JPN) - Alt Title: ファンタジーゾーンII オパオパの涙 - Notes: FM support -->
 	<software name="fantzon2j" cloneof="fantzon2">
 		<description>Fantasy Zone II - Opa Opa no Namida (Jpn)</description>
 		<year>1987</year>
@@ -1732,8 +1738,9 @@
 		</part>
 	</software>
 
+	<!-- Serial: G-1301, 5108, 41002 - Releases: 1986-06-15 (JPN) - Alt Title: ファンタジーゾーン -->
 	<software name="fantzone">
-		<description>Fantasy Zone (World, v1.2)</description>
+		<description>Fantasy Zone (World, v2)</description>
 		<year>1986</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -1744,7 +1751,7 @@
 	</software>
 
 	<software name="fantzone1" cloneof="fantzone">
-		<description>Fantasy Zone (World, v1.1 Prototype)</description>
+		<description>Fantasy Zone (World, v1, Prototype)</description>
 		<year>1986</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -1754,9 +1761,9 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1301, 5052 - Releases: 1986-06-15 (JPN) - Alt Title: ファンタジーゾーン -->
+	<!-- Serial: G-1301 -->
 	<software name="fantzonej" cloneof="fantzone">
-		<description>Fantasy Zone (Jpn)</description>
+		<description>Fantasy Zone (Jpn, v0)</description>
 		<year>1986</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -1766,7 +1773,7 @@
 		</part>
 	</software>
 
-    <!-- Alt Title: Kuàilè xiǎo fēidié ~ 快樂小飛碟 -->
+	<!-- Alt Title: Kuàilè xiǎo fēidié ~ 快樂小飛碟 -->
 	<software name="fantzonetw" cloneof="fantzone">
 		<description>Fantasy Zone (Tw)</description>
 		<year>1986?</year>
@@ -1778,6 +1785,7 @@
 		</part>
 	</software>
 
+	<!-- Serial: 5108 -->
 	<software name="fantzonm">
 		<description>Fantasy Zone - The Maze (Euro, USA)</description>
 		<year>1987</year>
@@ -1789,7 +1797,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1362, 7077 - Releases: 1988-07-02 (JPN) - Alt Title: ファイナル バブル ボブル -->
+	<!-- Serial: G-1362 - Releases: 1988-07-02 (JPN) - Alt Title: ファイナル バブル ボブル -->
 	<software name="fbubbobl" cloneof="bublbobl">
 		<description>Final Bubble Bobble (Jpn)</description>
 		<year>1988</year>
@@ -1812,9 +1820,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 028.660 -->
+	<!-- Serial: 028.660 -->
 	<software name="ferias">
-		<description>Ferias Frustradas do Pica Pau (Bra)</description>
+		<description>Férias Frustradas do Pica-Pau (Bra)</description>
 		<year>1996</year>
 		<publisher>Tec Toy</publisher>
 		<part name="cart" interface="sms_cart">
@@ -1824,7 +1832,7 @@
 		</part>
 	</software>
 
-	<!-- Id: 028.670 -->
+	<!-- Serial: 028.670 -->
 	<software name="fifa">
 		<description>FIFA International Soccer (Bra)</description>
 		<year>1994</year>
@@ -1836,7 +1844,7 @@
 		</part>
 	</software>
 
-	<!-- Id: 27009-50 -->
+	<!-- Serial: 27009-50 -->
 	<software name="fireforg">
 		<description>Fire &amp; Forget II (Euro)</description>
 		<year>1990</year>
@@ -1848,7 +1856,7 @@
 		</part>
 	</software>
 
-	<!-- Id: 027.360 -->
+	<!-- Serial: 027.360 -->
 	<software name="fireice">
 		<description>Fire &amp; Ice (Bra)</description>
 		<year>1993</year>
@@ -1860,9 +1868,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 7506 -->
+	<!-- Serial: 7506 -->
 	<software name="flash">
-		<description>The Flash (Euro)</description>
+		<description>The Flash (Euro, Bra)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -1884,9 +1892,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 27013-50 -->
+	<!-- Serial: MK-27013-50 -->
 	<software name="flints">
-		<description>The Flintstones (Euro)</description>
+		<description>The Flintstones (Euro, Bra)</description>
 		<year>1991</year>
 		<publisher>Grandslam</publisher>
 		<part name="cart" interface="sms_cart">
@@ -1896,9 +1904,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 27041-50 -->
+	<!-- Serial: MK-27041-50, 026.180 -->
 	<software name="foremnko">
-		<description>George Foreman's KO Boxing (Euro)</description>
+		<description>George Foreman's KO Boxing (Euro, Bra)</description>
 		<year>1992</year>
 		<publisher>Flying Edge</publisher>
 		<part name="cart" interface="sms_cart">
@@ -1908,9 +1916,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 7056 -->
+	<!-- Serial: 7056 -->
 	<software name="forgottn">
-		<description>Forgotten Worlds (Euro)</description>
+		<description>Forgotten Worlds (Euro, Bra, Aus)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -1920,7 +1928,7 @@
 		</part>
 	</software>
 
-	<!-- Id: C-507 - Releases: 1985-12-14 (Jpn, card) -->
+	<!-- Serial: C-507 - Releases: 1985-12-14 (Jpn, card) -->
 	<software name="fushigi" cloneof="astrow">
 		<description>Fushigi no Oshiro Pit Pot (Jpn)</description>
 		<year>1985</year>
@@ -1933,16 +1941,17 @@
 	</software>
 
 	<software name="fushigi1" cloneof="astrow">
-		<description>Fushigi no Oshiro Pit Pot (Jpn, Pirate)</description>
+		<description>Fushigi no Oshiro Pit Pot (Jpn, Pirate?)</description>
 		<year>1985</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="fushigi no oshiro pit pot (j) [p1][!].bin" size="32768" crc="5d08e823" sha1="1298aab2a29071e258dcbb962c3b80f8fc337b7a" offset="000000" />
+				<rom name="fushigi no oshiro pit pot [hack].bin" size="32768" crc="5d08e823" sha1="1298aab2a29071e258dcbb962c3b80f8fc337b7a" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
-
+	
+	<!-- Serial: GB-4001 -->
 	<software name="gaegujan">
 		<description>Gaegujangi Ggachi (Kor)</description>
 		<year>19??</year>
@@ -1954,9 +1963,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 7045 -->
+	<!-- Serial: 7045 -->
 	<software name="gaingrnd">
-		<description>Gain Ground (Euro)</description>
+		<description>Gain Ground (Euro, Bra)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -1966,7 +1975,7 @@
 		</part>
 	</software>
 
-	<!-- Id: 7045 -->
+	<!-- Serial: 7045 -->
 	<software name="gaingrndp" cloneof="gaingrnd">
 		<description>Gain Ground (Euro, Prototype)</description>
 		<year>1990</year>
@@ -1978,7 +1987,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1348 - Releases: 1988-02-21 (JPN) - Alt Title: ギャラクティック プロテクター - Notes: FM support -->
+	<!-- Serial: G-1348 - Releases: 1988-02-21 (JPN) - Alt Title: ギャラクティック プロテクター - Notes: FM support -->
 	<software name="galactpr">
 		<description>Galactic Protector (Jpn)</description>
 		<year>1988</year>
@@ -1990,9 +1999,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 29001 -->
+	<!-- Serial: 29001 -->
 	<software name="galaxyf">
-		<description>Galaxy Force (Euro)</description>
+		<description>Galaxy Force (Euro, Bra)</description>
 		<year>1989</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -2002,6 +2011,7 @@
 		</part>
 	</software>
 
+	<!-- Serial: QC-004-02 -->
 	<software name="galaxyfu">
 		<description>Galaxy Force (USA)</description>
 		<year>1989</year>
@@ -2013,6 +2023,7 @@
 		</part>
 	</software>
 
+	<!-- Serial: 023.480 -->
 	<software name="gamebox">
 		<description>Game Box Serie Esportes Radicais (Bra)</description>
 		<year>19??</year>
@@ -2024,9 +2035,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 5074 -->
+	<!-- Serial: 5074, 023.120 -->
 	<software name="gangster">
-		<description>Gangster Town (Euro, USA)</description>
+		<description>Gangster Town (Euro, USA, Bra)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -2036,9 +2047,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 25006 -->
+	<!-- Serial: 25006 -->
 	<software name="gauntlet">
-		<description>Gauntlet (Euro)</description>
+		<description>Gauntlet (Euro, Bra)</description>
 		<year>1990</year>
 		<publisher>U.S. Gold</publisher>
 		<part name="cart" interface="sms_cart">
@@ -2048,7 +2059,7 @@
 		</part>
 	</software>
 
-	<!-- Id: 9004 -->
+	<!-- Serial: 9004, 028.060 -->
 	<software name="gaxe">
 		<description>Golden Axe (Euro, USA)</description>
 		<year>1989</year>
@@ -2060,9 +2071,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 7505 -->
+	<!-- Serial: 7505 -->
 	<software name="gaxewarr">
-		<description>Golden Axe Warrior (Euro, USA)</description>
+		<description>Golden Axe Warrior (Euro, USA, Bra)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -2072,6 +2083,7 @@
 		</part>
 	</software>
 
+	<!-- Serial: 021.080 -->
 	<software name="gerald" cloneof="teddyboy">
 		<description>Geraldinho (Bra)</description>
 		<year>19??</year>
@@ -2083,9 +2095,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 5065 -->
+	<!-- Serial: 5065, GB1024JG -->
 	<software name="ghostbst">
-		<description>Ghostbusters (Euro, USA)</description>
+		<description>Ghostbusters (Euro, USA, Kor)</description>
 		<year>1989</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -2095,8 +2107,9 @@
 		</part>
 	</software>
 
+	<!-- Serial: 4002 (Card), 4502 (Cart) -->
 	<software name="ghosth">
-		<description>Ghost House (Euro, USA)</description>
+		<description>Ghost House (Euro, USA, Bra)</description>
 		<year>1986</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -2107,7 +2120,7 @@
 	</software>
 
 	<software name="ghosthp" cloneof="ghosth">
-		<description>Ghost House (Euro, USA, Prototype)</description>
+		<description>Ghost House (Prototype)</description>
 		<year>1986</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -2117,7 +2130,7 @@
 		</part>
 	</software>
 
-	<!-- Id: C-512, 4002 (Card), 4502 (Cart) - Releases: 1986-04-21 (Jpn, card) -->
+	<!-- Serial: C-512 - Releases: 1986-04-21 (Jpn, card) -->
 	<software name="ghosthj" cloneof="ghosth">
 		<description>Ghost House (Jpn)</description>
 		<year>1986</year>
@@ -2130,19 +2143,19 @@
 	</software>
 
 	<software name="ghosthj1" cloneof="ghosth">
-		<description>Ghost House (Jpn, Pirate)</description>
+		<description>Ghost House (Jpn, Pirate?)</description>
 		<year>1986</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="ghost house (j) [p1][!].bin" size="32768" crc="dabcc054" sha1="4f93c7185c9ebdd70d9f7be56761bf9031934c6a" offset="000000" />
+				<rom name="ghost house (j) [hack].bin" size="32768" crc="dabcc054" sha1="4f93c7185c9ebdd70d9f7be56761bf9031934c6a" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
 
-	<!-- Id: 7055 -->
+	<!-- Serial: 7055, 025.170 -->
 	<software name="ghouls">
-		<description>Ghouls'n Ghosts (Euro, USA)</description>
+		<description>Ghouls'n Ghosts (Euro, USA, Bra)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -2153,7 +2166,7 @@
 	</software>
 
 	<software name="ghoulsd" cloneof="ghouls">
-		<description>Ghouls'n Ghosts (Demo)</description>
+		<description>Ghouls'n Ghosts (USA, Demo)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -2163,6 +2176,7 @@
 		</part>
 	</software>
 
+	<!-- Serial: 5102 -->
 	<software name="global">
 		<description>Global Defense (Euro, USA)</description>
 		<year>1987</year>
@@ -2185,9 +2199,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 7071 -->
+	<!-- Serial: 7071, GB2009JG -->
 	<software name="glocair">
-		<description>G-LOC Air Battle (Euro)</description>
+		<description>G-LOC Air Battle (Euro, Bra, Kor)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -2197,9 +2211,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 7502 -->
+	<!-- Serial: 7502 -->
 	<software name="golfaman">
-		<description>Golfamania (Euro)</description>
+		<description>Golfamania (Euro, Bra)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -2210,7 +2224,7 @@
 	</software>
 
 	<software name="golfamanp" cloneof="golfaman">
-		<description>Golfamania (Euro, Prototype)</description>
+		<description>Golfamania (Prototype)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -2220,7 +2234,7 @@
 		</part>
 	</software>
 
-	<!-- Id: 7017 -->
+	<!-- Serial: 7017 -->
 	<software name="golvell">
 		<description>Golvellius (Euro, USA)</description>
 		<year>1988</year>
@@ -2232,9 +2246,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 9013 -->
+	<!-- Serial: 9013, 028.200 -->
 	<software name="gprider">
-		<description>GP Rider (Euro)</description>
+		<description>GP Rider (Euro, Bra)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -2244,8 +2258,9 @@
 		</part>
 	</software>
 
+	<!-- Serial: 5061 -->
 	<software name="greatbas">
-		<description>Great Baseball (Euro, USA)</description>
+		<description>Great Baseball (Euro, USA, Bra)</description>
 		<year>1985</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -2255,7 +2270,7 @@
 		</part>
 	</software>
 
-	<!-- Id: C-505, 5061 - Releases: 1985-12-15 (Jpn, card) -->
+	<!-- Serial: C-505 - Releases: 1985-12-15 (Jpn, card) -->
 	<software name="greatbasj" cloneof="greatbas">
 		<description>Great Baseball (Jpn)</description>
 		<year>1985</year>
@@ -2268,17 +2283,17 @@
 	</software>
 
 	<software name="greatbasj1" cloneof="greatbas">
-		<description>Great Baseball (Jpn, Pirate)</description>
+		<description>Great Baseball (Jpn, Pirate?)</description>
 		<year>1985</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="great baseball (j) [p1][!].bin" size="32768" crc="c1e699db" sha1="878852cb66427b0de11fba76bf6c8830a751d29f" offset="000000" />
+				<rom name="great baseball (j) [hack].bin" size="32768" crc="c1e699db" sha1="878852cb66427b0de11fba76bf6c8830a751d29f" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
 
-	<!-- Id: G-1320, 5071 - Releases: 1987-03-29 (JPN) - Alt Title: グレート バスケットボール -->
+	<!-- Serial: G-1320, 5071 - Releases: 1987-03-29 (JPN) - Alt Title: グレート バスケットボール -->
 	<software name="greatbsk">
 		<description>Great Basketball (World)</description>
 		<year>1987</year>
@@ -2290,7 +2305,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1321, 5058 - Releases: 1987-04-29 (JPN) - Alt Title: グレート フットボール -->
+	<!-- Serial: G-1321, 5058 - Releases: 1987-04-29 (JPN) - Alt Title: グレート フットボール -->
 	<software name="greatftb">
 		<description>Great Football (World)</description>
 		<year>1987</year>
@@ -2302,9 +2317,9 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1332, 5057 - Releases: 1987-10-10 (JPN) - Alt Title: マスターズ ゴルフ - Notes: FM support -->
+	<!-- Serial: G-1332, 5057 - Releases: 1987-10-10 (JPN) - Alt Title: マスターズ ゴルフ - Notes: FM support -->
 	<software name="greatglf">
-		<description>Great Golf (World) ~ Masters Golf (Japan)</description>
+		<description>Great Golf (Euro, USA) ~ Masters Golf (Japan)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -2326,7 +2341,7 @@
 	</software>
 
 	<software name="greatglfp" cloneof="greatglf">
-		<description>Great Golf (World, Prototype)</description>
+		<description>Great Golf (Prototype)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -2336,7 +2351,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1313 - Releases: 1986-12-20 (JPN) - Alt Title: グレートゴルフ -->
+	<!-- Serial: G-1313 - Releases: 1986-12-20 (JPN) - Alt Title: グレートゴルフ -->
 	<software name="greatglj">
 		<description>Great Golf (Jpn)</description>
 		<year>1986</year>
@@ -2348,7 +2363,7 @@
 		</part>
 	</software>
 
-	<!-- Id: 5062 (USA) - Releases: 1986 (USA), 1987 (Jpn, only 1000 copies as a prize for a contest) - Notes: FM support -->
+	<!-- Serial: 5062 (USA) - Releases: 1986 (USA), 1987 (Jpn, only 1000 copies as a prize for a contest) - Notes: FM support -->
 	<software name="greatice">
 		<description>Great Ice Hockey (Jpn, USA)</description>
 		<year>1987</year>
@@ -2360,6 +2375,7 @@
 		</part>
 	</software>
 
+	<!-- Serial: 4082 (Euro card), 41018 -->
 	<software name="greatscr">
 		<description>Great Soccer (Euro)</description>
 		<year>1985</year>
@@ -2371,7 +2387,7 @@
 		</part>
 	</software>
 
-	<!-- Id: C-504, 4082 (Euro card), 5059 - Releases: 1985-10-27 (Jpn, card) -->
+	<!-- Serial: C-504 - Releases: 1985-10-27 (Jpn, card) -->
 	<software name="greatscrj" cloneof="greatscr">
 		<description>Great Soccer (Jpn)</description>
 		<year>1985</year>
@@ -2383,7 +2399,7 @@
 		</part>
 	</software>
 
-    <!-- Alt Title: Shìjiè bēi zúqiú sài ~ 世界杯足球賽 -->
+	<!-- Serial: K-307 - Alt Title: Shìjiè bēi zúqiú sài ~ 世界杯足球賽 -->
 	<software name="greatscrtw" cloneof="greatscr">
 		<description>Great Soccer (Tw)</description>
 		<year>1985?</year>
@@ -2395,7 +2411,7 @@
 		</part>
 	</software>
 
-	<!-- Id: C-515 - Releases: 1985-12-22 (Jpn, card) -->
+	<!-- Serial: C-515 - Releases: 1985-12-22 (Jpn, card) -->
 	<software name="greattns" cloneof="superten">
 		<description>Great Tennis (Jpn)</description>
 		<year>1985</year>
@@ -2407,9 +2423,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 5070 -->
+	<!-- Serial: 5070, 023.170, 028.560 -->
 	<software name="greatvol">
-		<description>Great Volleyball (Euro, USA)</description>
+		<description>Great Volleyball (Euro, USA, Bra)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -2419,7 +2435,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1317 - Releases: 1987-03-29 (JPN) - Alt Title: グレート バレーボール -->
+	<!-- Serial: G-1317 - Releases: 1987-03-29 (JPN) - Alt Title: グレート バレーボール -->
 	<software name="greatvolj" cloneof="greatvol">
 		<description>Great Volleyball (Jpn)</description>
 		<year>1987</year>
@@ -2431,7 +2447,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1331, 7500 - Releases: 1987-10-18 (JPN) - Alt Title: 覇邪の封印 - Notes: FM support -->
+	<!-- Serial: G-1331 - Releases: 1987-10-18 (JPN) - Alt Title: 覇邪の封印 - Notes: FM support -->
 	<software name="hajafuin" cloneof="miracle">
 		<description>Haja no Fuuin (Jpn)</description>
 		<year>1987</year>
@@ -2443,8 +2459,9 @@
 		</part>
 	</software>
 
+	<!-- 4080 (Card), 4580 (Cart) -->
 	<software name="hangon">
-		<description>Hang-On (Euro)</description>
+		<description>Hang-On (Euro, Bra, Aus)</description>
 		<year>1985</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -2454,7 +2471,7 @@
 		</part>
 	</software>
 
-	<!-- Id: 6001 -->
+	<!-- Serial: 6002 -->
 	<software name="hangonaw" cloneof="hangon">
 		<description>Hang-On &amp; Astro Warrior (USA)</description>
 		<year>1986</year>
@@ -2466,7 +2483,7 @@
 		</part>
 	</software>
 
-	<!-- Id: C-502, 4080 (Card), 4580 (Cart) - Releases: 1985-10-20 (Jpn, card) -->
+	<!-- Serial: C-502 - Releases: 1985-10-20 (Jpn, card) -->
 	<software name="hangonj" cloneof="hangon">
 		<description>Hang-On (Jpn)</description>
 		<year>1985</year>
@@ -2478,6 +2495,7 @@
 		</part>
 	</software>
 
+	<!-- Serial: 6001 -->
 	<software name="hangonsh" cloneof="hangon">
 		<description>Hang-On &amp; Safari Hunt (USA)</description>
 		<year>1986</year>
@@ -2501,9 +2519,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 29003-50 -->
+	<!-- Serial: 29003-50 -->
 	<software name="heroes">
-		<description>Advanced Dungeon &amp; Dragons - Heroes of the Lance (Euro)</description>
+		<description>Advanced Dungeon &amp; Dragons - Heroes of the Lance (Euro, Bra)</description>
 		<year>1991</year>
 		<publisher>U.S. Gold</publisher>
 		<part name="cart" interface="sms_cart">
@@ -2513,7 +2531,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1309 - Releases: 1986-12-15 (JPN) - Alt Title: ハイスクール！奇面組 -->
+	<!-- Serial: G-1309 - Releases: 1986-12-15 (JPN) - Alt Title: ハイスクール！奇面組 -->
 	<software name="highsc">
 		<description>High School! Kimengumi (Jpn)</description>
 		<year>1986</year>
@@ -2525,7 +2543,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1303, 5054 - Releases: 1986-07-20 (JPN) - Alt Title: 北斗の拳 - Notes: The Western version "Black Belt" is quite different -->
+	<!-- Serial: G-1303 - Releases: 1986-07-20 (JPN) - Alt Title: 北斗の拳 - Notes: The Western version "Black Belt" is quite different -->
 	<software name="hokuto" cloneof="blackblt">
 		<description>Hokuto no Ken (Jpn)</description>
 		<year>1986</year>
@@ -2537,7 +2555,7 @@
 		</part>
 	</software>
 
-    <!-- Alt Title: Běidǒu shén quán ~ 北斗神拳 -->
+	<!-- Alt Title: Běidǒu shén quán ~ 北斗神拳 -->
 	<software name="hokutotw" cloneof="blackblt">
 		<description>Hokuto no Ken (Tw)</description>
 		<year>1986?</year>
@@ -2549,18 +2567,7 @@
 		</part>
 	</software>
 
-	<software name="hokuto1" cloneof="blackblt">
-		<description>Hokuto no Ken (Jpn, Pirate)</description>
-		<year>1986</year>
-		<publisher>&lt;pirate&gt;</publisher>
-		<part name="cart" interface="sms_cart">
-			<dataarea name="rom" size="131072">
-				<rom name="hokuto no ken (j) [p1][!].bin" size="131072" crc="656d1a3e" sha1="e77c7150ad274fb9d7df378e460e64daa9b9e9b6" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- Id: 7109 -->
+	<!-- Serial: 7109 -->
 	<software name="homea">
 		<description>Home Alone (Euro)</description>
 		<year>1993</year>
@@ -2583,7 +2590,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1354 - Releases: 1988-04-02 (JPN) - Alt Title: 星をさがして… - Notes: FM support -->
+	<!-- Serial: G-1354 - Releases: 1988-04-02 (JPN) - Alt Title: 星をさがして… - Notes: FM support -->
 	<software name="hoshiw">
 		<description>Hoshi wo Sagashite... (Jpn)</description>
 		<year>1988</year>
@@ -2595,7 +2602,8 @@
 		</part>
 	</software>
 
-	<software name="hwaran">
+	<!-- Serial: GB-2356 -->
+	<software name="hwaran" cloneof="kenseid">
 		<description>Hwarang Ui Geom (Kor)</description>
 		<year>1988</year>
 		<publisher>Samsung</publisher>
@@ -2606,9 +2614,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 25007-50 -->
+	<!-- Serial: 25007-50 -->
 	<software name="impmiss">
-		<description>Impossible Mission (Euro)</description>
+		<description>Impossible Mission (Euro, Bra)</description>
 		<year>1990</year>
 		<publisher>U.S. Gold</publisher>
 		<part name="cart" interface="sms_cart">
@@ -2629,9 +2637,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 27057-50 -->
-	<software name="incred">
-		<description>The Incredible Crash Dummies (Euro)</description>
+	<!-- Serial: MK-27057-50 -->
+	<software name="crashdum">
+		<description>The Incredible Crash Dummies (Euro, Bra)</description>
 		<year>1993</year>
 		<publisher>Flying Edge</publisher>
 		<part name="cart" interface="sms_cart">
@@ -2641,9 +2649,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 29016-50 -->
+	<!-- Serial: 29016-50 -->
 	<software name="incrhulk">
-		<description>The Incredible Hulk (Euro)</description>
+		<description>The Incredible Hulk (Euro, Bra)</description>
 		<year>1994</year>
 		<publisher>U.S. Gold</publisher>
 		<part name="cart" interface="sms_cart">
@@ -2653,9 +2661,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 27008-50 -->
+	<!-- Serial: 27008-50, 027.079 -->
 	<software name="indycrus">
-		<description>Indiana Jones and the Last Crusade (Euro)</description>
+		<description>Indiana Jones and the Last Crusade (Euro, Bra)</description>
 		<year>1990</year>
 		<publisher>U.S. Gold</publisher>
 		<part name="cart" interface="sms_cart">
@@ -2676,7 +2684,7 @@
 		</part>
 	</software>
 
-	<!-- Id: 7063 -->
+	<!-- Serial: 7063 -->
 	<software name="jamesb" cloneof="heavyw">
 		<description>James 'Buster' Douglas Knockout Boxing (USA)</description>
 		<year>1990</year>
@@ -2699,7 +2707,7 @@
 		</part>
 	</software>
 
-	<!-- Id: 27046-50 -->
+	<!-- Serial: MK-27046-50 -->
 	<software name="jb007">
 		<description>James Bond 007 - The Duel (Euro)</description>
 		<year>1993</year>
@@ -2711,6 +2719,7 @@
 		</part>
 	</software>
 
+	<!-- Serial: 027.230 -->
 	<software name="jb007b" cloneof="jb007">
 		<description>James Bond 007 - The Duel (Bra)</description>
 		<year>1993</year>
@@ -2733,9 +2742,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 7062 -->
+	<!-- Serial: 7062 -->
 	<software name="joemont">
-		<description>Joe Montana Football (Euro, USA)</description>
+		<description>Joe Montana Football (Euro, USA, Bra)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -2745,9 +2754,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 27069-5* -->
+	<!-- Serial: MK-27069-50, MK-27069-09, MK-27069-18, 027.330 - Alt. Titles: Le Livre de la Jungle (Fra Box), Das Dschungelbuch (Ger Box) -->
 	<software name="jungle">
-		<description>The Jungle Book (Euro)</description>
+		<description>The Jungle Book (Euro, Bra)</description>
 		<year>1994</year>
 		<publisher>Virgin Interactive</publisher>
 		<part name="cart" interface="sms_cart">
@@ -2757,7 +2766,7 @@
 		</part>
 	</software>
 
-	<!-- Id: 9030 -->
+	<!-- Serial: 9030, 027.330 -->
 	<software name="jurassic">
 		<description>Jurassic Park (Euro)</description>
 		<year>1993</year>
@@ -2769,8 +2778,9 @@
 		</part>
 	</software>
 
+	<!-- Serial: 7013 -->
 	<software name="kenseid">
-		<description>Kenseiden (Euro, USA)</description>
+		<description>Kenseiden (Euro, USA, Bra)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -2780,7 +2790,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1358, 7013 - Releases: 1988-06-02 (JPN) - Alt Title: 剣聖伝 - Notes: FM support -->
+	<!-- Serial: G-1358 - Releases: 1988-06-02 (JPN) - Alt Title: 剣聖伝 - Notes: FM support -->
 	<software name="kenseidj" cloneof="kenseid">
 		<description>Kenseiden (Jpn)</description>
 		<year>1988</year>
@@ -2792,7 +2802,7 @@
 		</part>
 	</software>
 
-	<!-- Id: 4360 -->
+	<!-- Serial: 4360 -->
 	<software name="kingsq">
 		<description>King's Quest - Quest for the Crown (USA)</description>
 		<year>1989</year>
@@ -2815,7 +2825,7 @@
 		</part>
 	</software>
 
-	<!-- Id: 301040-0160 -->
+	<!-- Serial: 301040-0160 -->
 	<software name="klax">
 		<description>Klax (Euro)</description>
 		<year>1991</year>
@@ -2827,9 +2837,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 27056-50 -->
+	<!-- Serial: MK-27056-50, 026.280 -->
 	<software name="krusty">
-		<description>Krusty's Fun House (Euro)</description>
+		<description>Krusty's Fun House (Euro, Bra)</description>
 		<year>1992</year>
 		<publisher>Flying Edge</publisher>
 		<part name="cart" interface="sms_cart">
@@ -2839,7 +2849,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1366, 9003 - Releases: 1988-09-23 (JPN) - Alt Title: 孔雀王 - Notes: FM support -->
+	<!-- Serial: G-1366 - Releases: 1988-09-23 (JPN) - Alt Title: 孔雀王 - Notes: FM support -->
 	<software name="kujaku" cloneof="spellcst">
 		<description>Kujaku Ou (Jpn)</description>
 		<year>1988</year>
@@ -2851,9 +2861,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 5078 -->
+	<!-- Serial: 5078 -->
 	<software name="kungfuk">
-		<description>Kung Fu Kid (Euro, USA)</description>
+		<description>Kung Fu Kid (Euro, USA, Bra)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -2863,9 +2873,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 9014 -->
+	<!-- Serial: 9014 -->
 	<software name="landill">
-		<description>Land of Illusion Starring Mickey Mouse (Euro)</description>
+		<description>Land of Illusion Starring Mickey Mouse (Euro, Bra)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -2875,7 +2885,7 @@
 		</part>
 	</software>
 
-	<!-- Id: 7074 -->
+	<!-- Serial: 7074 -->
 	<software name="laserg">
 		<description>Laser Ghost (Euro)</description>
 		<year>1991</year>
@@ -2887,7 +2897,7 @@
 		</part>
 	</software>
 
-	<!-- Id: 028750 -->
+	<!-- Serial: 028.750 -->
 	<software name="legndill">
 		<description>Legend of Illusion Starring Mickey Mouse (Bra)</description>
 		<year>1994</year>
@@ -2899,9 +2909,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 7108 -->
+	<!-- Serial: 7108, 025.204, GB2032JG -->
 	<software name="lemmings">
-		<description>Lemmings (Euro)</description>
+		<description>Lemmings (Euro, Bra, Kor)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -2922,9 +2932,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 9006 -->
-	<software name="lineof">
-		<description>Line of Fire (Euro)</description>
+	<!-- Serial: 9006, GB-4011JG -->
+	<software name="linefire">
+		<description>Line of Fire (Euro, Bra, Kor)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -2934,9 +2944,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 27081-5* -->
+	<!-- Serial: MK-27081-50, MK-27081-06, MK-27081-09, MK-27081-18, 028.450 - Alt. Titles: El Rey Leon (Spa Box), Le Roi Lion (Fra Box), Der Konig Der Lowen (Ger Box) -->
 	<software name="lionking">
-		<description>Disney's The Lion King (Euro)</description>
+		<description>Disney's The Lion King (Euro, Bra)</description>
 		<year>1994</year>
 		<publisher>Virgin Interactive</publisher>
 		<part name="cart" interface="sms_cart">
@@ -2946,8 +2956,9 @@
 		</part>
 	</software>
 
+	<!-- Serial: 7016 -->
 	<software name="lordswrd">
-		<description>Lord of the Sword (Euro, USA)</description>
+		<description>Lord of the Sword (Euro, USA, Bra)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -2957,7 +2968,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1361, 7016 - Releases: 1988-06-02 (JPN) - Alt Title: ロード オブ ソード - Notes: FM support -->
+	<!-- Serial: G-1361 - Releases: 1988-06-02 (JPN) - Alt Title: ロード オブ ソード - Notes: FM support -->
 	<software name="lordswrdj" cloneof="lordswrd">
 		<description>Lord of Sword (Jpn)</description>
 		<year>1988</year>
@@ -2969,7 +2980,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1315 - Releases: 1987-02-18 (JPN) - Alt Title: シャーロック・ホームズ - ロレッタの肖像 - Notes: This is actually compatible with SG-1000 and SG-1000 Mark II (and SC-3000) -->
+	<!-- Serial: G-1315 - Releases: 1987-02-18 (JPN) - Alt Title: シャーロック・ホームズ - ロレッタの肖像 - Notes: This is actually compatible with SG-1000 and SG-1000 Mark II (and SC-3000) -->
 	<software name="loretta">
 		<description>Loretta no Shouzou (Jpn)</description>
 		<year>1987</year>
@@ -2981,9 +2992,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 7072 -->
+	<!-- Serial: 7072 -->
 	<software name="luckydim">
-		<description>The Lucky Dime Caper Starring Donald Duck (Euro)</description>
+		<description>The Lucky Dime Caper Starring Donald Duck (Euro, Bra)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -3004,9 +3015,9 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1337 - Releases: 1987-10-18 (JPN) - Alt Title: 麻雀戦国時代 -->
+	<!-- Serial: G-1337 - Releases: 1987-10-18 (JPN) - Alt Title: 麻雀戦国時代 -->
 	<software name="mahjong">
-		<description>Mahjong Sengoku Jidai (Jpn)</description>
+		<description>Mahjong Sengoku Jidai (Jpn, HK)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -3027,7 +3038,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1324 - Releases: 1987-05-17 (JPN) - Alt Title: 魔界列伝 -->
+	<!-- Serial: G-1324 - Releases: 1987-05-17 (JPN) - Alt Title: 魔界列伝 -->
 	<software name="makairet" cloneof="kungfuk">
 		<description>Makai Retsuden (Jpn)</description>
 		<year>1987</year>
@@ -3039,7 +3050,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1363, 7017 - Releases: 1988-08-14 (JPN) - Alt Title: 魔王ゴルベリアス - Notes: FM support -->
+	<!-- Serial: G-1363 - Releases: 1988-08-14 (JPN) - Alt Title: 魔王ゴルベリアス - Notes: FM support -->
 	<software name="maougolv" cloneof="golvell">
 		<description>Maou Golvellius (Jpn)</description>
 		<year>1988</year>
@@ -3062,7 +3073,7 @@
 		</part>
 	</software>
 
-	<!-- Id: 27024-50 -->
+	<!-- Serial: 27024-50 -->
 	<software name="marble">
 		<description>Marble Madness (Euro)</description>
 		<year>1992</year>
@@ -3074,9 +3085,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 6080 -->
+	<!-- Serial: 6080 -->
 	<software name="marksman">
-		<description>Marksman Shooting &amp; Trap Shooting &amp; Safari Hunt (Euro)</description>
+		<description>Marksman Shooting &amp; Trap Shooting &amp; Safari Hunt (Euro, Bra)</description>
 		<year>1986</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -3086,6 +3097,7 @@
 		</part>
 	</software>
 
+	<!-- Serial: 6003 -->
 	<software name="marksmanu" cloneof="marksman">
 		<description>Marksman Shooting &amp; Trap Shooting (USA)</description>
 		<year>1986</year>
@@ -3097,9 +3109,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 7124 -->
+	<!-- Serial: 7124, 9028 -->
 	<software name="mastcomb">
-		<description>Masters of Combat (Euro)</description>
+		<description>Masters of Combat (Euro, Bra, Aus)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -3109,9 +3121,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 7107 -->
+	<!-- Serial: 7107, 7107-50, 025.112 -->
 	<software name="mastdark">
-		<description>Master of Darkness (Euro)</description>
+		<description>Master of Darkness (Euro, Bra)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -3121,8 +3133,9 @@
 		</part>
 	</software>
 
+	<!-- Serial: 8003 -->
 	<software name="mazehunt">
-		<description>Maze Hunter 3-D (Euro, USA)</description>
+		<description>Maze Hunter 3-D (Euro, USA, Bra)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -3132,7 +3145,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1345, 8003 - Releases: 1988-01-31 (JPN) - Alt Title: メイズ ウォーカー - Notes: FM support, 3D glasses support -->
+	<!-- Serial: G-1345 - Releases: 1988-01-31 (JPN) - Alt Title: メイズ ウォーカー - Notes: FM support, 3D glasses support -->
 	<software name="mazewalk" cloneof="mazehunt">
 		<description>Maze Walker (Jpn)</description>
 		<year>1988</year>
@@ -3144,7 +3157,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1359 - Releases: 1988-07-30 (JPN) - Alt Title: (め)組レスキュー - Notes: FM support -->
+	<!-- Serial: G-1359 - Releases: 1988-07-30 (JPN) - Alt Title: (め)組レスキュー - Notes: FM support -->
 	<software name="megumi">
 		<description>Megumi Rescue (Jpn)</description>
 		<year>1988</year>
@@ -3156,9 +3169,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 9007 -->
+	<!-- Serial: 9007 -->
 	<software name="mercs">
-		<description>Mercs (Euro)</description>
+		<description>Mercs (Euro, Bra)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -3168,7 +3181,7 @@
 		</part>
 	</software>
 
-	<!-- Id: 028.700 -->
+	<!-- Serial: 028.700 -->
 	<software name="mickeyuc">
 		<description>Mickey's Ultimate Challenge (Bra)</description>
 		<year>1998</year>
@@ -3180,9 +3193,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 27062-50 -->
+	<!-- Serial: MK-27062-50, 027.090 -->
 	<software name="mickmack">
-		<description>Mick &amp; Mack as the Global Gladiators (Euro)</description>
+		<description>Mick &amp; Mack as the Global Gladiators (Euro, Bra)</description>
 		<year>1993</year>
 		<publisher>Virgin Interactive</publisher>
 		<part name="cart" interface="sms_cart">
@@ -3192,7 +3205,7 @@
 		</part>
 	</software>
 
-	<!-- Id: 19001 -->
+	<!-- Serial: 19001 -->
 	<software name="microm">
 		<description>Micro Machines (Euro)</description>
 		<year>1994</year>
@@ -3204,8 +3217,9 @@
 		</part>
 	</software>
 
+	<!-- Serial: 7500 -->
 	<software name="miracle">
-		<description>Miracle Warriors - Seal of the Dark Lord (Euro, USA)</description>
+		<description>Miracle Warriors - Seal of the Dark Lord (Euro, USA, Bra)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -3216,7 +3230,7 @@
 	</software>
 
 	<software name="miraclep" cloneof="miracle">
-		<description>Miracle Warriors - Seal of the Dark Lord (Euro, USA, Prototype)</description>
+		<description>Miracle Warriors - Seal of the Dark Lord (Prototype)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -3226,9 +3240,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 8001 -->
+	<!-- Serial: 8001, 023.230 -->
 	<software name="missil3d">
-		<description>Missile Defense 3-D (Euro, USA)</description>
+		<description>Missile Defense 3-D (Euro, USA, Bra)</description>
 		<year>19??</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -3238,9 +3252,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 29021-50 -->
+	<!-- Serial: MK-29021-50, 028.240 -->
 	<software name="mk">
-		<description>Mortal Kombat (Euro)</description>
+		<description>Mortal Kombat (Euro, Bra)</description>
 		<year>1993</year>
 		<publisher>Arena</publisher>
 		<part name="cart" interface="sms_cart">
@@ -3250,9 +3264,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 29029-50 -->
+	<!-- Serial: MK-29029-50, 028.530 -->
 	<software name="mk2">
-		<description>Mortal Kombat II (Euro)</description>
+		<description>Mortal Kombat II (Euro, Bra)</description>
 		<year>1994</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<part name="cart" interface="sms_cart">
@@ -3262,7 +3276,7 @@
 		</part>
 	</software>
 
-	<!-- Id: 028730 -->
+	<!-- Serial: 028.730 -->
 	<software name="mk3b">
 		<description>Mortal Kombat 3 (Bra)</description>
 		<year>1996</year>
@@ -3275,8 +3289,8 @@
 	</software>
 
 	<software name="monica" cloneof="wboymlnd">
-		<description>Monica no Castelo do Dragao (Bra)</description>
-		<year>19??</year>
+		<description>Mônica no Castelo do Dragao (Bra)</description>
+		<year>1991</year>
 		<publisher>Tec Toy</publisher>
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="262144">
@@ -3286,7 +3300,7 @@
 	</software>
 
 	<software name="monopoly">
-		<description>Monopoly (Euro, USA)</description>
+		<description>Monopoly (Euro)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -3296,7 +3310,7 @@
 		</part>
 	</software>
 
-	<!-- Id: 5500 -->
+	<!-- Serial: 5500 -->
 	<software name="monopolyu" cloneof="monopoly">
 		<description>Monopoly (USA)</description>
 		<year>1988</year>
@@ -3309,7 +3323,7 @@
 	</software>
 
 	<software name="monopolyp" cloneof="monopoly">
-		<description>Monopoly (Prototype)</description>
+		<description>Monopoly (USA, Prototype)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -3319,7 +3333,7 @@
 		</part>
 	</software>
 
-	<!-- Id: 4370 -->
+	<!-- Serial: 4370 -->
 	<software name="montezum">
 		<description>Montezuma's Revenge Featuring Panama Joe (USA)</description>
 		<year>1989</year>
@@ -3342,9 +3356,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 301030-0160 -->
+	<!-- Serial: 301030-0160 -->
 	<software name="mspacman">
-		<description>Ms. Pac-Man (Euro)</description>
+		<description>Ms. Pac-Man (Euro, Bra)</description>
 		<year>1991</year>
 		<publisher>Tengen</publisher>
 		<part name="cart" interface="sms_cart">
@@ -3354,9 +3368,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 7052 -->
+	<!-- Serial: 7052, GB2004JG -->
 	<software name="mwalk">
-		<description>Michael Jackson's Moonwalker (Euro, USA)</description>
+		<description>Michael Jackson's Moonwalker (Euro, USA, Bra, Kor)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -3367,7 +3381,7 @@
 	</software>
 
 	<software name="mwalkp" cloneof="mwalk">
-		<description>Michael Jackson's Moonwalker (Euro, USA, Prototype)</description>
+		<description>Michael Jackson's Moonwalker (USA, Prototype)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -3377,8 +3391,9 @@
 		</part>
 	</software>
 
+	<!-- Serial: 4001 (card), 4501 (cart), 021.030, 41004 -->
 	<software name="myhero">
-		<description>My Hero (Euro, USA)</description>
+		<description>My Hero (Euro, USA, Bra)</description>
 		<year>1986</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -3388,7 +3403,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1367 - Releases: 1988-09-09 (JPN) - Alt Title: 熱球甲子園 - Notes: FM support -->
+	<!-- Serial: G-1367 - Releases: 1988-09-09 (JPN) - Alt Title: 熱球甲子園 - Notes: FM support -->
 	<software name="nekkyu">
 		<description>Nekkyuu Koushien (Jpn)</description>
 		<year>1988</year>
@@ -3400,6 +3415,7 @@
 		</part>
 	</software>
 
+	<!-- Serial: 5066 - Alt. Title: I Ninja (Ita Box) -->
 	<software name="ninja">
 		<description>The Ninja (Euro, USA)</description>
 		<year>1986</year>
@@ -3411,9 +3427,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 7101 -->
+	<!-- Serial: 7101 -->
 	<software name="ninjag">
-		<description>Ninja Gaiden (Euro)</description>
+		<description>Ninja Gaiden (Euro, Bra)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -3434,7 +3450,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1308, 5066 - Releases: 1986-11-08 (JPN) - Alt Title: 忍者 忍者プリンセス1メガ版 -->
+	<!-- Serial: G-1308 - Releases: 1986-11-08 (JPN) - Alt Title: 忍者 忍者プリンセス1メガ版 -->
 	<software name="ninjaj" cloneof="ninja">
 		<description>The Ninja (Jpn)</description>
 		<year>1986</year>
@@ -3446,8 +3462,8 @@
 		</part>
 	</software>
 
-	<!-- Id: 27030-50 -->
-	<software name="olympi">
+	<!-- Serial: MK-27030-50, MK-27030-05, MK-27030-06, MK-27030-09, MK-27030-18 -->
+	<software name="olympgld">
 		<description>Olympic Gold (Euro)</description>
 		<year>1992</year>
 		<publisher>U.S. Gold</publisher>
@@ -3458,7 +3474,8 @@
 		</part>
 	</software>
 
-	<software name="olympik" cloneof="olympi">
+	<!-- Serial: GB2023JG -->
+	<software name="olympgldk" cloneof="olympgld">
 		<description>Olympic Gold (Kor)</description>
 		<year>1992</year>
 		<publisher>U.S. Gold</publisher>
@@ -3469,7 +3486,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1343 - Releases: 1987-12-20 (JPN) - Alt Title: オパオパ - Notes: FM support -->
+	<!-- Serial: G-1343 - Releases: 1987-12-20 (JPN) - Alt Title: オパオパ - Notes: FM support -->
 	<software name="opaopa" cloneof="fantzonm">
 		<description>Opa Opa (Jpn)</description>
 		<year>1987</year>
@@ -3481,9 +3498,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 7039 -->
+	<!-- Serial: 7039 -->
 	<software name="opwolf">
-		<description>Operation Wolf (Euro)</description>
+		<description>Operation Wolf (Euro, Bra)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -3493,9 +3510,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 7120 -->
+	<!-- Serial: 7120, 025.450 -->
 	<software name="ottifant">
-		<description>The Ottifants (Euro)</description>
+		<description>The Ottifants (Euro, Bra)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -3505,7 +3522,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1326, 7003 - Releases: 1987-06-30 (JPN) - Alt Title: アウト ラン - Notes: FM support -->
+	<!-- Serial: G-1326, 7003, 024.240 - Releases: 1987-06-30 (JPN) - Alt Title: アウト ラン - Notes: FM support -->
 	<software name="outrun">
 		<description>Out Run (World)</description>
 		<year>1987</year>
@@ -3517,9 +3534,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 8007 -->
+	<!-- Serial: 8007 -->
 	<software name="outrun3d">
-		<description>Out Run 3-D (Euro)</description>
+		<description>Out Run 3-D (Euro, Bra)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -3529,9 +3546,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 27016-50 -->
+	<!-- Serial: 27016-50 -->
 	<software name="outruneu">
-		<description>Out Run Europa (Euro)</description>
+		<description>Out Run Europa (Euro, Bra)</description>
 		<year>1991</year>
 		<publisher>U.S. Gold</publisher>
 		<part name="cart" interface="sms_cart">
@@ -3541,7 +3558,7 @@
 		</part>
 	</software>
 
-	<!-- Id: 25010-50 -->
+	<!-- Serial: 25010-50 -->
 	<software name="pacmania">
 		<description>Pac-Mania (Euro)</description>
 		<year>1991</year>
@@ -3553,9 +3570,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 5121 -->
+	<!-- Serial: 25008-50 -->
 	<software name="paperboy">
-		<description>Paperboy (Euro)</description>
+		<description>Paperboy (Euro, v0)</description>
 		<year>1990</year>
 		<publisher>U.S. Gold</publisher>
 		<part name="cart" interface="sms_cart">
@@ -3565,8 +3582,9 @@
 		</part>
 	</software>
 
+	<!-- Serial: 5121 -->
 	<software name="paperboyu" cloneof="paperboy">
-		<description>Paperboy (USA)</description>
+		<description>Paperboy (USA, Bra, v1)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -3576,6 +3594,7 @@
 		</part>
 	</software>
 
+	<!-- Serial: 5013 -->
 	<software name="parlour">
 		<description>Parlour Games (Euro, USA)</description>
 		<year>1987</year>
@@ -3610,7 +3629,7 @@
 		</part>
 	</software>
 
-	<!-- Id: 5501 -->
+	<!-- Serial: 5501 -->
 	<software name="penguin">
 		<description>Penguin Land (Euro, USA)</description>
 		<year>1987</year>
@@ -3622,7 +3641,7 @@
 		</part>
 	</software>
 
-	<!-- Id: 27070-50 -->
+	<!-- Serial: 27070-50, 301045-0160 -->
 	<software name="pgatour">
 		<description>PGA Tour Golf (Euro)</description>
 		<year>1991</year>
@@ -3634,7 +3653,7 @@
 		</part>
 	</software>
 
-	<!-- Id: 29009-50 -->
+	<!-- Serial: MK-29009-50 -->
 	<software name="pitfight">
 		<description>Pit Fighter (Euro)</description>
 		<year>1991</year>
@@ -3646,6 +3665,7 @@
 		</part>
 	</software>
 
+	<!-- Serial: 028.250 -->
 	<software name="pitfightb" cloneof="pitfight">
 		<description>Pit Fighter (Bra)</description>
 		<year>1991</year>
@@ -3657,9 +3677,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 27014-50 -->
+	<!-- Serial: 27014-50 -->
 	<software name="populous">
-		<description>Populous (Euro)</description>
+		<description>Populous (Euro, Bra)</description>
 		<year>1989</year>
 		<publisher>TecMagik</publisher>
 		<part name="cart" interface="sms_cart">
@@ -3669,9 +3689,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 8006 -->
+	<!-- Serial: 8006 -->
 	<software name="poseidon">
-		<description>Poseidon Wars 3-D (Euro, USA)</description>
+		<description>Poseidon Wars 3-D (Euro, USA, Bra)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -3681,8 +3701,9 @@
 		</part>
 	</software>
 
+	<!-- Serial: 5109, GB-1004 -->
 	<software name="powstrik">
-		<description>Power Strike (Euro, USA)</description>
+		<description>Power Strike (Euro, Bra, Kor)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -3692,9 +3713,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 9024 -->
+	<!-- Serial: 9024 -->
 	<software name="powstrk2">
-		<description>Power Strike II (Euro)</description>
+		<description>Power Strike II (Euro, Bra)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -3704,9 +3725,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 27022-50 -->
+	<!-- Serial: 27022-50, 027.270 -->
 	<software name="ppersia">
-		<description>Prince of Persia (Euro)</description>
+		<description>Prince of Persia (Euro, Bra)</description>
 		<year>1992</year>
 		<publisher>Domark</publisher>
 		<part name="cart" interface="sms_cart">
@@ -3716,9 +3737,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 27026-50 -->
+	<!-- Serial: MK-27026-50 -->
 	<software name="predator">
-		<description>Predator 2 (Euro)</description>
+		<description>Predator 2 (Euro, Bra)</description>
 		<year>1992</year>
 		<publisher>Arena</publisher>
 		<part name="cart" interface="sms_cart">
@@ -3728,8 +3749,9 @@
 		</part>
 	</software>
 
+	<!-- Serial: 5056 -->
 	<software name="prowrest">
-		<description>Pro Wrestling (Euro, USA)</description>
+		<description>Pro Wrestling (Euro, USA, Bra)</description>
 		<year>1986</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -3739,7 +3761,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1323 - Releases: 1987-08-17 (JPN) - Alt Title: ザ・プロ野球 ペナントレース -->
+	<!-- Serial: G-1323 - Releases: 1987-08-17 (JPN) - Alt Title: ザ・プロ野球 ペナントレース -->
 	<software name="proyakyu">
 		<description>The Pro Yakyuu Pennant Race (Jpn)</description>
 		<year>1987</year>
@@ -3751,8 +3773,9 @@
 		</part>
 	</software>
 
+	<!-- Serial: 9500 -->
 	<software name="pstar">
-		<description>Phantasy Star (Euro, USA, v1.3)</description>
+		<description>Phantasy Star (Euro, USA, v3)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -3763,7 +3786,7 @@
 	</software>
 
 	<software name="pstar1" cloneof="pstar">
-		<description>Phantasy Star (Euro, USA, v1.2)</description>
+		<description>Phantasy Star (Euro, USA, v2)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -3773,6 +3796,7 @@
 		</part>
 	</software>
 
+	<!-- Serial: 029.010 -->
 	<software name="pstarb" cloneof="pstar">
 		<description>Phantasy Star (Bra)</description>
 		<year>1987</year>
@@ -3784,7 +3808,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1341, 9500 - Releases: 1987-12-20 (JPN) - Alt Title: ファンタシースター - Notes: FM support -->
+	<!-- Serial: G-1341 - Releases: 1987-12-20 (JPN) - Alt Title: ファンタシースター - Notes: FM support -->
 	<software name="pstarj" cloneof="pstar">
 		<description>Phantasy Star (Jpn)</description>
 		<year>1987</year>
@@ -3796,9 +3820,11 @@
 		</part>
 	</software>
 
-	<software name="pstarj1" cloneof="pstar">
-		<description>Phantasy Star (Jpn, Saturn Collection CD)</description>
-		<year>1987</year>
+    <!-- This is the MegaDrive version (released in 1994), also included in "Phantasy Star Collection" for the Sega Saturn -->
+    <!-- It currently does not work in the megadrij driver -->
+	<software name="pstarjmd" cloneof="pstar">
+		<description>Phantasy Star (Jpn, MD / Saturn Collection CD)</description>
+		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="524288">
@@ -3807,6 +3833,7 @@
 		</part>
 	</software>
 
+	<!-- Serial: GB-4014KS -->
 	<software name="pstark" cloneof="pstar">
 		<description>Phantasy Star (Kor)</description>
 		<year>1987</year>
@@ -3818,9 +3845,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 7066 -->
+	<!-- Serial: 7066 -->
 	<software name="psychic">
-		<description>Psychic World (Euro)</description>
+		<description>Psychic World (Euro, Bra)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -3830,9 +3857,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 7032 -->
+	<!-- Serial: 7032 -->
 	<software name="psychof">
-		<description>Psycho Fox (Euro, USA)</description>
+		<description>Psycho Fox (Euro, USA, Bra)</description>
 		<year>1989</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -3842,9 +3869,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 5122 -->
+	<!-- Serial: 5122 -->
 	<software name="puttputt">
-		<description>Putt &amp; Putter (Euro)</description>
+		<description>Putt &amp; Putter (Euro, Bra)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -3865,7 +3892,7 @@
 		</part>
 	</software>
 
-	<!-- Id: 5073 -->
+	<!-- Serial: 5073 -->
 	<software name="quartet">
 		<description>Quartet (Euro, USA)</description>
 		<year>1987</year>
@@ -3877,7 +3904,7 @@
 		</part>
 	</software>
 
-	<!-- Id: 028.540 -->
+	<!-- Serial: 028.540 -->
 	<software name="questfsy">
 		<description>Quest for the Shaven Yak Starring Ren Hoek &amp; Stimpy (Bra)</description>
 		<year>1993</year>
@@ -3889,7 +3916,7 @@
 		</part>
 	</software>
 
-	<!-- Id: 7117 -->
+	<!-- Serial: 7117 -->
 	<software name="rainbow">
 		<description>Rainbow Islands - The Story of Bubble Bobble 2 (Euro)</description>
 		<year>1993</year>
@@ -3901,6 +3928,7 @@
 		</part>
 	</software>
 
+	<!-- Serial: 026.360 -->
 	<software name="rainbowb" cloneof="rainbow">
 		<description>Rainbow Islands - The Story of Bubble Bobble 2 (Bra)</description>
 		<year>1993</year>
@@ -3912,6 +3940,7 @@
 		</part>
 	</software>
 
+	<!-- Serial: 5064 -->
 	<software name="rambo2" cloneof="secret">
 		<description>Rambo - First Blood Part II (USA)</description>
 		<year>1986</year>
@@ -3923,9 +3952,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 7015 -->
+	<!-- Serial: 7015 -->
 	<software name="rambo3">
-		<description>Rambo III (Euro, USA)</description>
+		<description>Rambo III (Euro, USA, Bra)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -3935,9 +3964,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 27005, QC-001 (USA) -->
+	<!-- Serial: 27005, QC-001 (USA) -->
 	<software name="rampage">
-		<description>Rampage (Euro, USA)</description>
+		<description>Rampage (Euro, USA, Bra)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -3947,7 +3976,7 @@
 		</part>
 	</software>
 
-	<!-- Id: 301026-0160 -->
+	<!-- Serial: 301026-0160 -->
 	<software name="rampart">
 		<description>Rampart (Euro)</description>
 		<year>1991</year>
@@ -3959,9 +3988,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 7022 -->
+	<!-- Serial: 7022 -->
 	<software name="rastan">
-		<description>Rastan (Euro, USA)</description>
+		<description>Rastan (Euro, USA, Bra)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -3971,9 +4000,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 27007 -->
+	<!-- Serial: 27007 -->
 	<software name="rcgp">
-		<description>R.C. Grand Prix (Euro, USA)</description>
+		<description>R.C. Grand Prix (Euro, USA, Bra)</description>
 		<year>1989</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -3994,7 +4023,7 @@
 		</part>
 	</software>
 
-	<!-- Id: 7019 -->
+	<!-- Serial: 7019 -->
 	<software name="regjacks" cloneof="ameribb">
 		<description>Reggie Jackson Baseball (USA)</description>
 		<year>1988</year>
@@ -4006,9 +4035,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 7116 -->
+	<!-- Serial: 7116 -->
 	<software name="renegade">
-		<description>Renegade (Euro)</description>
+		<description>Renegade (Euro, Bra)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -4018,9 +4047,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 5106 -->
+	<!-- Serial: 5106 -->
 	<software name="rescuems">
-		<description>Rescue Mission (Euro, USA)</description>
+		<description>Rescue Mission (Euro, USA, Bra)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -4030,9 +4059,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 29012-50 -->
+	<!-- Serial: MK-29012-50, 028.410 -->
 	<software name="roadrash">
-		<description>Road Rash (Euro)</description>
+		<description>Road Rash (Euro, Bra)</description>
 		<year>1993</year>
 		<publisher>U.S. Gold</publisher>
 		<part name="cart" interface="sms_cart">
@@ -4042,9 +4071,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 29013-50 -->
+	<!-- Serial: 29013-50, 028.580 -->
 	<software name="robocod">
-		<description>James Pond 2 - Codename RoboCod (Euro)</description>
+		<description>James Pond 2 - Codename RoboCod (Euro, Bra)</description>
 		<year>1993</year>
 		<publisher>U.S. Gold</publisher>
 		<part name="cart" interface="sms_cart">
@@ -4054,9 +4083,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 27064-50 -->
+	<!-- Serial: MK-27064-50, 027.350 -->
 	<software name="robocop">
-		<description>RoboCop 3 (Euro)</description>
+		<description>RoboCop 3 (Euro, Bra)</description>
 		<year>1993</year>
 		<publisher>Flying Edge</publisher>
 		<part name="cart" interface="sms_cart">
@@ -4066,9 +4095,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 29022-50 -->
+	<!-- Serial: MK-29022-50, 29022-50, 028.520 -->
 	<software name="roboterm">
-		<description>RoboCop versus The Terminator (Euro)</description>
+		<description>RoboCop versus The Terminator (Euro, Bra)</description>
 		<year>1993</year>
 		<publisher>Virgin Interactive</publisher>
 		<part name="cart" interface="sms_cart">
@@ -4078,7 +4107,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1319, 7002 - Releases: 1987-04-19 (JPN) - Alt Title: ロッキー -->
+	<!-- Serial: G-1319, 7002 - Releases: 1987-04-19 (JPN) - Alt Title: ロッキー -->
 	<software name="rocky">
 		<description>Rocky (World)</description>
 		<year>1987</year>
@@ -4090,7 +4119,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1364, 9002 - Releases: 1988-10-01 (JPN) - Alt Title: アールタイプ - Notes: FM support -->
+	<!-- Serial: G-1364, 9002 - Releases: 1988-10-01 (JPN) - Alt Title: アールタイプ - Notes: FM support -->
 	<software name="rtype">
 		<description>R-Type (World)</description>
 		<year>1988</year>
@@ -4102,9 +4131,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 7037 -->
+	<!-- Serial: 7037, 024.300 -->
 	<software name="running">
-		<description>Running Battle (Euro)</description>
+		<description>Running Battle (Euro, Bra)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -4114,9 +4143,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 7078 -->
+	<!-- Serial: 7078 -->
 	<software name="sagaia">
-		<description>Sagaia (Euro)</description>
+		<description>Sagaia (Euro, Bra)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -4137,8 +4166,9 @@
 		</part>
 	</software>
 
+	<!-- Serial: 023.500 -->
 	<software name="sapomestr" cloneof="kungfuk">
-		<description>Sapo Xul&#233; - O Mestre do Kung Fu (Bra)</description>
+		<description>Sapo Xulé - O Mestre do Kung Fu (Bra)</description>
 		<year>1995</year>
 		<publisher>Tec Toy</publisher>
 		<part name="cart" interface="sms_cart">
@@ -4148,8 +4178,9 @@
 		</part>
 	</software>
 
+	<!-- Serial: 023.510 - Alt. Title: Sapo Xulé - S.O.S Lagoa Poluida (Box) -->
 	<software name="saposos" cloneof="astrow">
-		<description>Sapo Xul&#233; - S.O.S Lagoa Poluida (Bra)</description>
+		<description>S.O.S Lagoa Poluida (Bra)</description>
 		<year>1995</year>
 		<publisher>Tec Toy</publisher>
 		<part name="cart" interface="sms_cart">
@@ -4159,8 +4190,9 @@
 		</part>
 	</software>
 
+	<!-- Serial: 026.340 -->
 	<software name="sapoxu" cloneof="psychof">
-		<description>Sapo Xul&#233; vs. Os Invasores do Brejo (Bra)</description>
+		<description>Sapo Xulé vs. Os Invasores do Brejo (Bra)</description>
 		<year>1995</year>
 		<publisher>Tec Toy</publisher>
 		<part name="cart" interface="sms_cart">
@@ -4170,7 +4202,7 @@
 		</part>
 	</software>
 
-	<!-- Id: C-506 - Releases: 1985-12-20 (Jpn, card) -->
+	<!-- Serial: C-506 - Releases: 1985-12-20 (Jpn, card) -->
 	<software name="satell7">
 		<description>Satellite 7 (Jpn)</description>
 		<year>1985</year>
@@ -4183,19 +4215,19 @@
 	</software>
 
 	<software name="satell7a" cloneof="satell7">
-		<description>Satellite 7 (Jpn, Pirate)</description>
+		<description>Satellite 7 (Jpn, Pirate?)</description>
 		<year>1985</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="satellite 7 (j) [p1][!].bin" size="32768" crc="87b9ecb8" sha1="a48b642ac12379944fc829585dacb8e7effdcc82" offset="000000" />
+				<rom name="satellite 7 (j) [hack].bin" size="32768" crc="87b9ecb8" sha1="a48b642ac12379944fc829585dacb8e7effdcc82" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
 
-	<!-- Id: 27085-50 -->
-	<software name="schtroum">
-		<description>Les Schtroumpfs Autour du Monde (Euro)</description>
+	<!-- Serial: 27085-50, Alt. Title: Les Schtroumpfs Autour du Monde (Box) -->
+	<software name="smurfs2">
+		<description>The Smurfs 2 (Euro)</description>
 		<year>1996</year>
 		<publisher>Infogrames</publisher>
 		<part name="cart" interface="sms_cart">
@@ -4205,8 +4237,9 @@
 		</part>
 	</software>
 
-	<software name="schtroump" cloneof="schtroum">
-		<description>Les Schtroumpfs Autour du Monde (Euro, Prototype)</description>
+	<!-- Alt. Title: Les Schtroumpfs Autour du Monde (Box) -->
+	<software name="smurfs2p" cloneof="smurfs2">
+		<description>The Smurfs 2 (Euro, Prototype)</description>
 		<year>1996</year>
 		<publisher>Infogrames</publisher>
 		<part name="cart" interface="sms_cart">
@@ -4216,7 +4249,7 @@
 		</part>
 	</software>
 
-	<!-- Id: 7079 -->
+	<!-- Serial: 7079 -->
 	<software name="sci">
 		<description>Special Criminal Investigation (Euro)</description>
 		<year>1992</year>
@@ -4239,9 +4272,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 7031 -->
+	<!-- Serial: 7031 -->
 	<software name="scrambsp">
-		<description>Scramble Spirits (Euro)</description>
+		<description>Scramble Spirits (Euro, Bra)</description>
 		<year>1989</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -4251,7 +4284,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1338, 5102 - Releases: 1987-10-24 (JPN) - Alt Title: SDI - Notes: FM support -->
+	<!-- Serial: G-1338 - Releases: 1987-10-24 (JPN) - Notes: FM support -->
 	<software name="sdi" cloneof="global">
 		<description>SDI (Jpn)</description>
 		<year>1987</year>
@@ -4263,6 +4296,7 @@
 		</part>
 	</software>
 
+	<!-- Id; 5081 -->
 	<software name="secret">
 		<description>Secret Command (Euro)</description>
 		<year>1986</year>
@@ -4274,9 +4308,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 7069 -->
+	<!-- Serial: 7069 -->
 	<software name="segachss">
-		<description>Sega Chess (Euro)</description>
+		<description>Sega Chess (Euro, Bra)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -4286,9 +4320,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 7103 -->
+	<!-- Serial: 7103, 024.420,GB2038JG -->
 	<software name="segawtg">
-		<description>Sega World Tournament Golf (Euro)</description>
+		<description>Sega World Tournament Golf (Euro, Bra, Kor)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -4298,7 +4332,7 @@
 		</part>
 	</software>
 
-	<!-- Id: C-510, 4001 (card), 4501 (cart) - Releases: 1986-01-31 (Jpn, card) -->
+	<!-- Serial: C-510 - Releases: 1986-01-31 (Jpn, card) -->
 	<software name="seishun" cloneof="myhero">
 		<description>Seishun Scandal (Jpn)</description>
 		<year>1986</year>
@@ -4311,17 +4345,17 @@
 	</software>
 
 	<software name="seishun1" cloneof="myhero">
-		<description>Seishyun Scandal (Jpn, Pirate)</description>
+		<description>Seishyun Scandal (Jpn, Pirate?)</description>
 		<year>1986</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="seishyun scandal (j) [p1][!].bin" size="32768" crc="bcd91d78" sha1="3da61c3f36aaa885c3efa58807fd122f24643ded" offset="000000" />
+				<rom name="seishyun scandal (j) [hack].bin" size="32768" crc="bcd91d78" sha1="3da61c3f36aaa885c3efa58807fd122f24643ded" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
 
-	<!-- Id: 8011 -->
+	<!-- Serial: 8011, MK-25014-50 -->
 	<software name="sensible">
 		<description>Sensible Soccer (Euro)</description>
 		<year>1993</year>
@@ -4333,7 +4367,7 @@
 		</part>
 	</software>
 
-	<!-- Id: 030.010 -->
+	<!-- Serial: 030.010 -->
 	<software name="sf2">
 		<description>Street Fighter II (Bra)</description>
 		<year>1997</year>
@@ -4345,9 +4379,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 9009 -->
+	<!-- Serial: 9009, GB4010JG -->
 	<software name="shadow">
-		<description>Shadow Dancer (Euro)</description>
+		<description>Shadow Dancer (Euro, Bra, Kor)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -4357,7 +4391,7 @@
 		</part>
 	</software>
 
-	<!-- Id: 5110 -->
+	<!-- Serial: 5110 -->
 	<software name="shangh">
 		<description>Shanghai (Euro, USA)</description>
 		<year>1988</year>
@@ -4370,7 +4404,7 @@
 	</software>
 
 	<software name="shanghp" cloneof="shangh">
-		<description>Shanghai (Euro, USA, Prototype)</description>
+		<description>Shanghai (Prototype)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -4380,8 +4414,9 @@
 		</part>
 	</software>
 
+	<!-- Serial: 7080 -->
 	<software name="sharr">
-		<description>Space Harrier (Euro, USA)</description>
+		<description>Space Harrier (Euro)</description>
 		<year>1986</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -4391,8 +4426,9 @@
 		</part>
 	</software>
 
+	<!-- Serial: 8004 -->
 	<software name="sharr3d">
-		<description>Space Harrier 3-D (Euro, USA)</description>
+		<description>Space Harrier 3-D (Euro, USA, Bra)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -4402,7 +4438,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1349, 8004 - Releases: 1988-02-29 (JPN) - Alt Title: スペースハリアー3D - Notes: FM support, 3D glasses support -->
+	<!-- Serial: G-1349 - Releases: 1988-02-29 (JPN) - Alt Title: スペースハリアー3D - Notes: FM support, 3D glasses support -->
 	<software name="sharr3dj" cloneof="sharr3d">
 		<description>Space Harrier 3D (Jpn)</description>
 		<year>1988</year>
@@ -4414,9 +4450,9 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1310, 7001, 7080 - Releases: 1986-12-21 (JPN) - Alt Title: スペースハリアー -->
+	<!-- Serial: G-1310, 7001, 7080 - Releases: 1986-12-21 (JPN) - Alt Title: スペースハリアー -->
 	<software name="sharrj" cloneof="sharr">
-		<description>Space Harrier (Jpn)</description>
+		<description>Space Harrier (Jpn, USA)</description>
 		<year>1986</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -4426,9 +4462,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 7009 -->
+	<!-- Serial: 7009 -->
 	<software name="shinobi">
-		<description>Shinobi (Euro, USA)</description>
+		<description>Shinobi (Euro, USA, Bra, v1)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -4438,9 +4474,9 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1353 - Releases: 1988-06-19 (JPN) - Alt Title: シノビ - SHINOBI 忍 - Notes: FM support -->
+	<!-- Serial: G-1353, 028.380 - Releases: 1988-06-19 (JPN) - Alt Title: シノビ - SHINOBI 忍 - Notes: FM support -->
 	<software name="shinobij">
-		<description>Shinobi (Jpn)</description>
+		<description>Shinobi (Jpn, Bra, v0)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -4450,9 +4486,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 5072 -->
+	<!-- Serial: 5072 -->
 	<software name="shooting">
-		<description>Shooting Gallery (Euro, USA)</description>
+		<description>Shooting Gallery (Euro, USA, Bra)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -4462,8 +4498,9 @@
 		</part>
 	</software>
 
+	<!-- Serial: 028.710 -->
 	<software name="sitio">
-		<description>Sitio do Picapau Amarelo (Bra)</description>
+		<description>Sítio do Picapau Amarelo (Bra)</description>
 		<year>1997</year>
 		<publisher>Tec Toy</publisher>
 		<part name="cart" interface="sms_cart">
@@ -4473,9 +4510,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 7035 -->
+	<!-- Serial: 7035 -->
 	<software name="slapshot">
-		<description>Slap Shot (USA, v1.2)</description>
+		<description>Slap Shot (USA, v2)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -4486,7 +4523,7 @@
 	</software>
 
 	<software name="slapshota" cloneof="slapshot">
-		<description>Slap Shot (Euro, v1.1)</description>
+		<description>Slap Shot (Euro, v1)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -4497,8 +4534,8 @@
 	</software>
 
 	<software name="slapshotb" cloneof="slapshot">
-		<description>Slap Shot (USA)</description>
-		<year>1990</year>
+		<description>Slap Shot (Euro, v0)</description>
+		<year>1989</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="262144">
@@ -4508,7 +4545,7 @@
 	</software>
 
 	<software name="slapshotp" cloneof="slapshot">
-		<description>Slap Shot (Prototype)</description>
+		<description>Slap Shoot (Prototype)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -4518,9 +4555,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 7043 -->
+	<!-- Serial: 7043 -->
 	<software name="smgp">
-		<description>Super Monaco GP (Euro)</description>
+		<description>Super Monaco GP (Euro, Bra)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -4563,9 +4600,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 27082-50 -->
+	<!-- Serial: MK-27082-50, 027.380 - Alt. Title: Les Schtroumpfs (Cart)  -->
 	<software name="smurfs">
-		<description>The Smurfs (Euro)</description>
+		<description>The Smurfs (Euro, Bra)</description>
 		<year>1994</year>
 		<publisher>Infogrames</publisher>
 		<part name="cart" interface="sms_cart">
@@ -4587,9 +4624,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 7076 -->
+	<!-- Serial: 7076 -->
 	<software name="sonic">
-		<description>Sonic The Hedgehog (Euro, USA)</description>
+		<description>Sonic The Hedgehog (Euro, USA, Bra)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -4599,9 +4636,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 9015 -->
+	<!-- Serial: 9015, 028.120, GB-4030JG -->
 	<software name="sonic2">
-		<description>Sonic The Hedgehog 2 (Euro, v1.1)</description>
+		<description>Sonic The Hedgehog 2 (Euro, Bra, Kor, v1)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -4611,8 +4648,9 @@
 		</part>
 	</software>
 
+	<!-- Serial: 9015, 028.120 -->
 	<software name="sonic2a" cloneof="sonic2">
-		<description>Sonic The Hedgehog 2 (Euro)</description>
+		<description>Sonic The Hedgehog 2 (Euro, Bra, v0)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -4622,7 +4660,7 @@
 		</part>
 	</software>
 
-	<!-- Id: 030.030 -->
+	<!-- Serial: 030.030 -->
 	<software name="sonicbl">
 		<description>Sonic Blast (Bra)</description>
 		<year>1997</year>
@@ -4634,9 +4672,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 9021 -->
+	<!-- Serial: 9021, 028.120 -->
 	<software name="sonicc">
-		<description>Sonic The Hedgehog Chaos (Euro)</description>
+		<description>Sonic The Hedgehog Chaos (Euro, Bra)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -4657,9 +4695,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 9034 -->
+	<!-- Serial: 9034, 028.489 -->
 	<software name="sonicsp">
-		<description>Sonic The Hedgehog Spinball (Euro)</description>
+		<description>Sonic The Hedgehog Spinball (Euro, Bra)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -4669,9 +4707,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 9019 -->
+	<!-- Serial: 9019 -->
 	<software name="sor">
-		<description>Streets of Rage (Euro)</description>
+		<description>Streets of Rage (Euro, Bra)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -4681,9 +4719,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 9026 -->
+	<!-- Serial: 9026, 028.300 -->
 	<software name="sor2">
-		<description>Streets of Rage II (Euro)</description>
+		<description>Streets of Rage II (Euro, Bra)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -4693,7 +4731,7 @@
 		</part>
 	</software>
 
-	<!-- Id: 9010 -->
+	<!-- Serial: 9010 -->
 	<software name="spacegun">
 		<description>Space Gun (Euro)</description>
 		<year>1992</year>
@@ -4705,9 +4743,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 25009-50 -->
+	<!-- Serial: 25009-50 -->
 	<software name="speedbl">
-		<description>Speedball (Mirrorsoft) (Euro)</description>
+		<description>Speedball (Image Works) (Euro)</description>
 		<year>1990</year>
 		<publisher>Image Works</publisher>
 		<part name="cart" interface="sms_cart">
@@ -4717,6 +4755,7 @@
 		</part>
 	</software>
 
+	<!-- Serial: 27039-50 -->
 	<software name="speedbl2">
 		<description>Speedball 2 (Euro)</description>
 		<year>1992</year>
@@ -4728,7 +4767,7 @@
 		</part>
 	</software>
 
-	<!-- Id: 25013-50 -->
+	<!-- Serial: 25013-50 -->
 	<software name="speedblv">
 		<description>Speedball (Virgin) (Euro, USA)</description>
 		<year>1992</year>
@@ -4740,8 +4779,9 @@
 		</part>
 	</software>
 
+	<!-- Serial: 9003 -->
 	<software name="spellcst">
-		<description>SpellCaster (Euro, USA)</description>
+		<description>SpellCaster (Euro, USA, Bra)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -4751,9 +4791,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 27055-50 -->
+	<!-- Serial: MK-27055-50, 026.290 -->
 	<software name="spidermn">
-		<description>Spider-Man - Return of the Sinister Six (Euro)</description>
+		<description>Spider-Man - Return of the Sinister Six (Euro, Bra)</description>
 		<year>1992</year>
 		<publisher>Flying Edge</publisher>
 		<part name="cart" interface="sms_cart">
@@ -4763,9 +4803,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 7065 -->
+	<!-- Serial: 7065 -->
 	<software name="spidking">
-		<description>Spider-Man vs. The Kingpin (Euro, USA)</description>
+		<description>Spider-Man vs. The Kingpin (Euro, USA, Bra)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -4775,7 +4815,7 @@
 		</part>
 	</software>
 
-	<!-- Id: 5060 -->
+	<!-- Serial: 5060 -->
 	<software name="sportsft">
 		<description>Sports Pad Football (USA)</description>
 		<year>1987</year>
@@ -4787,7 +4827,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1365 - Releases: 1988-10-29 (JPN) - Alt Title: スポーツパッドサッカー - Notes: Sports Pad support -->
+	<!-- Serial: G-1365 - Releases: 1988-10-29 (JPN) - Alt Title: スポーツパッドサッカー - Notes: Sports Pad support -->
 	<software name="sportssc" cloneof="worldscr">
 		<description>Sports Pad Soccer (Jpn)</description>
 		<year>1988</year>
@@ -4799,8 +4839,9 @@
 		</part>
 	</software>
 
+	<!-- Serial: 4083 (Card), 4583 (Cart), 41021 -->
 	<software name="spyvsspy">
-		<description>Spy vs. Spy (Euro, USA)</description>
+		<description>Spy vs. Spy (Euro, USA, Bra)</description>
 		<year>1986</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -4810,9 +4851,9 @@
 		</part>
 	</software>
 
-	<!-- Id: C-514, 4083 (Card), 4583 (Cart) - Releases: 1986-09-20 (Jpn, card) -->
+	<!-- Serial: C-514, SG15C - Releases: 1986-09-20 (Jpn, card) -->
 	<software name="spyvsspyj" cloneof="spyvsspy">
-		<description>Spy vs Spy (Jpn)</description>
+		<description>Spy vs Spy (Jpn, Kor)</description>
 		<year>1986</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -4822,7 +4863,18 @@
 		</part>
 	</software>
 
-    <!-- Alt Title: Dié duì dié ~ 諜對諜 -->
+	<software name="spyvsspyj1" cloneof="spyvsspy">
+		<description>Spy vs. Spy (Jpn, Pirate?)</description>
+		<year>1986</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="spy vs. spy (j) [hack].bin" size="32768" crc="a71bc542" sha1="5f87871a120c2de05a0d60cbca2a8007cab27c61" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Serial: K-321 - Alt Title: Dié duì dié ~ 諜對諜 -->
 	<software name="spyvsspytw" cloneof="spyvsspy">
 		<description>Spy vs Spy (Tw)</description>
 		<year>1986?</year>
@@ -4834,7 +4886,7 @@
 		</part>
 	</software>
 
-	<software name="spyvsspyu" cloneof="spyvsspy">
+	<software name="spyvsspys" cloneof="spyvsspy">
 		<description>Spy vs. Spy (USA, Display Unit Sample)</description>
 		<year>1986</year>
 		<publisher>Sega</publisher>
@@ -4845,7 +4897,7 @@
 		</part>
 	</software>
 
-	<!-- Id: 27023-50 -->
+	<!-- Serial: MK-27023-50 -->
 	<software name="ssinv">
 		<description>Super Space Invaders (Euro)</description>
 		<year>1991</year>
@@ -4857,9 +4909,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 27044-50 -->
-	<software name="ssmashtv">
-		<description>Super Smash T.V. (Euro)</description>
+	<!-- Serial: 27044-50 - Alt. Title: Super Smash T.V.  -->
+	<software name="smashtv">
+		<description>Smash T.V. (Euro)</description>
 		<year>1992</year>
 		<publisher>Flying Edge</publisher>
 		<part name="cart" interface="sms_cart">
@@ -4869,9 +4921,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 29014-50 -->
+	<!-- Serial: 29014-50, 028.260 -->
 	<software name="starwars">
-		<description>Star Wars (Euro)</description>
+		<description>Star Wars (Euro, Bra)</description>
 		<year>1993</year>
 		<publisher>U.S. Gold</publisher>
 		<part name="cart" interface="sms_cart">
@@ -4892,9 +4944,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 9005 -->
+	<!-- Serial: 9005, GB4028JG -->
 	<software name="strider">
-		<description>Strider (Euro, USA)</description>
+		<description>Strider (Euro, USA, Bra, Kor)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -4904,9 +4956,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 29005-50 -->
+	<!-- Serial: 29005-50 -->
 	<software name="strider2">
-		<description>Strider II (Euro)</description>
+		<description>Strider II (Euro, Bra)</description>
 		<year>1992</year>
 		<publisher>U.S. Gold</publisher>
 		<part name="cart" interface="sms_cart">
@@ -4916,7 +4968,7 @@
 		</part>
 	</software>
 
-	<!-- Id: 7048 -->
+	<!-- Serial: 7048 -->
 	<software name="submarin">
 		<description>Submarine Attack (Euro)</description>
 		<year>1990</year>
@@ -4928,8 +4980,9 @@
 		</part>
 	</software>
 
+	<!-- Serial: DS-G402 -->
 	<software name="suhocheo">
-		<description>Suho Cheonsha (Kor)</description>
+		<description>Suho Jeonsa (Kor)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="sms_cart">
@@ -4939,7 +4992,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1318 - Releases: 1987-04-19 (JPN) - Alt Title: デカ - スケバン刑事II 少女鉄仮面伝説 -->
+	<!-- Serial: G-1318 - Releases: 1987-04-19 (JPN) - Alt Title: デカ - スケバン刑事II 少女鉄仮面伝説 -->
 	<software name="sukeban">
 		<description>Sukeban Deka II - Shoujo Tekkamen Densetsu (Jpn)</description>
 		<year>1987</year>
@@ -4951,7 +5004,7 @@
 		</part>
 	</software>
 
-	<!-- Id: 5119 -->
+	<!-- Serial: 5119 -->
 	<software name="summerg">
 		<description>Summer Games (Euro)</description>
 		<year>1991</year>
@@ -4974,9 +5027,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 27050-50 -->
+	<!-- Serial: MK-27050-50, 027.190 -->
 	<software name="superman">
-		<description>Superman - The Man of Steel (Euro)</description>
+		<description>Superman - The Man of Steel (Euro, Bra)</description>
 		<year>1993</year>
 		<publisher>Virgin Interactive</publisher>
 		<part name="cart" interface="sms_cart">
@@ -4986,7 +5039,7 @@
 		</part>
 	</software>
 
-	<!-- Id: 27059-50 -->
+	<!-- Serial: MK-27059-50 -->
 	<software name="superoff">
 		<description>Super Off Road (Euro)</description>
 		<year>1992</year>
@@ -4998,7 +5051,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1357 - Releases: 1988-07-02 (JPN) - Alt Title: スーパーレーシング - Notes: FM support -->
+	<!-- Serial: G-1357 - Releases: 1988-07-02 (JPN) - Alt Title: スーパーレーシング - Notes: FM support -->
 	<software name="superrac">
 		<description>Super Racing (Jpn)</description>
 		<year>1988</year>
@@ -5010,7 +5063,7 @@
 		</part>
 	</software>
 
-	<!-- Id: 4507 -->
+	<!-- Serial: 4507, 4007, 41010 -->
 	<software name="superten">
 		<description>Super Tennis (Euro, USA)</description>
 		<year>1985</year>
@@ -5023,8 +5076,8 @@
 	</software>
 
 	<software name="suprbskt">
-		<description>Super Basketball (USA, Sample)</description>
-		<year>19??</year>
+		<description>Super Basketball (USA, CES Demo)</description>
+		<year>1989?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="65536">
@@ -5055,9 +5108,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 27017-50 -->
+	<!-- Serial: 27017-50 -->
 	<software name="suprkick">
-		<description>Super Kick Off (Euro)</description>
+		<description>Super Kick Off (Euro, Bra)</description>
 		<year>1991</year>
 		<publisher>U.S. Gold</publisher>
 		<part name="cart" interface="sms_cart">
@@ -5067,7 +5120,7 @@
 		</part>
 	</software>
 
-	<!-- Id: 27061-50 -->
+	<!-- Serial: MK-27061-50 -->
 	<software name="t2ag">
 		<description>T2 - The Arcade Game (Euro)</description>
 		<year>1993</year>
@@ -5079,9 +5132,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 7111 -->
+	<!-- Serial: 7111, 027.150 -->
 	<software name="tazmania">
-		<description>Taz-Mania (Euro)</description>
+		<description>Taz-Mania (Euro, Bra)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -5102,7 +5155,7 @@
 		</part>
 	</software>
 
-	<!-- Id: 028.620 -->
+	<!-- Serial: 028.620 -->
 	<software name="tazmars">
 		<description>Taz in Escape from Mars (Bra)</description>
 		<year>19??</year>
@@ -5125,7 +5178,7 @@
 		</part>
 	</software>
 
-	<!-- Id: 7106 -->
+	<!-- Serial: 7106 -->
 	<software name="tecmow93">
 		<description>Tecmo World Cup '93 (Euro)</description>
 		<year>1993</year>
@@ -5137,8 +5190,9 @@
 		</part>
 	</software>
 
+	<!-- Serial: 4003 (Card), 4503 (Cart), 021.060 -->
 	<software name="teddyboy">
-		<description>Teddy Boy (Euro, USA)</description>
+		<description>Teddy Boy (Euro, USA, Bra)</description>
 		<year>1985</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -5148,7 +5202,7 @@
 		</part>
 	</software>
 
-	<!-- Id: C-501, 4003 (Card), 4503 (Cart) - Releases: 1985-10-20 (Jpn, card) -->
+	<!-- Serial: C-501 - Releases: 1985-10-20 (Jpn, card) -->
 	<software name="teddyboyj" cloneof="teddyboy">
 		<description>Teddy Boy Blues (Jpn)</description>
 		<year>1985</year>
@@ -5161,12 +5215,12 @@
 	</software>
 
 	<software name="teddyboyj1" cloneof="teddyboy">
-		<description>Teddy Boy Blues (Jpn, Pirate)</description>
+		<description>Teddy Boy Blues (Jpn, Pirate?)</description>
 		<year>1985</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="teddy boy blues (j) [p1][!].bin" size="32768" crc="9dfa67ee" sha1="839da36557b494299b427bda4e32d2ba61977b25" offset="000000" />
+				<rom name="teddy boy blues (j) [hack].bin" size="32768" crc="9dfa67ee" sha1="839da36557b494299b427bda4e32d2ba61977b25" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -5182,9 +5236,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 7028 -->
+	<!-- Serial: 7028 -->
 	<software name="tennis">
-		<description>Tennis Ace (Euro)</description>
+		<description>Tennis Ace (Euro, Bra)</description>
 		<year>1989</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -5194,7 +5248,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1355 - Releases: 1988-06-02 (JPN) - Alt Title: 天才バカボン - Notes: FM support -->
+	<!-- Serial: G-1355 - Releases: 1988-06-02 (JPN) - Alt Title: 天才バカボン - Notes: FM support -->
 	<software name="tensai">
 		<description>Tensai Bakabon (Jpn)</description>
 		<year>1988</year>
@@ -5206,7 +5260,7 @@
 		</part>
 	</software>
 
-	<!-- Id: 27052-50 -->
+	<!-- Serial: MK-27052-50 -->
 	<software name="term2">
 		<description>Terminator 2 - Judgment Day (Euro)</description>
 		<year>1993</year>
@@ -5218,7 +5272,7 @@
 		</part>
 	</software>
 
-	<!-- Id: 27025-50 -->
+	<!-- Serial: MK-27025-50 -->
 	<software name="termntr">
 		<description>The Terminator (Euro)</description>
 		<year>1992</year>
@@ -5230,6 +5284,7 @@
 		</part>
 	</software>
 
+	<!-- Serial: 027.320 -->
 	<software name="termntrb">
 		<description>The Terminator (Bra)</description>
 		<year>1992</year>
@@ -5241,8 +5296,9 @@
 		</part>
 	</software>
 
+	<!-- Serial: 7011 -->
 	<software name="thunderb">
-		<description>Thunder Blade (Euro, USA)</description>
+		<description>Thunder Blade (Euro, USA, Bra)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -5252,7 +5308,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1360, 7011 - Releases: 1988-07-30 (JPN) - Alt Title: サンダーブレード - Notes: FM support -->
+	<!-- Serial: G-1360 - Releases: 1988-07-30 (JPN) - Alt Title: サンダーブレード - Notes: FM support -->
 	<software name="thunderbj" cloneof="thunderb">
 		<description>Thunder Blade (Jpn)</description>
 		<year>1988</year>
@@ -5264,9 +5320,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 7024 -->
+	<!-- Serial: 7024 -->
 	<software name="timesold">
-		<description>Time Soldiers (Euro, USA)</description>
+		<description>Time Soldiers (Euro, USA, Bra)</description>
 		<year>1989</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -5276,7 +5332,7 @@
 		</part>
 	</software>
 
-	<!-- Id: 27035-50 -->
+	<!-- Serial: 27035-50 -->
 	<software name="tnzs">
 		<description>The New Zealand Story (Euro)</description>
 		<year>1992</year>
@@ -5288,9 +5344,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 7070 -->
+	<!-- Serial: 7070, 026.150 -->
 	<software name="tomjermv">
-		<description>Tom and Jerry - The Movie (Euro)</description>
+		<description>Tom and Jerry - The Movie (Euro, Bra)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -5301,7 +5357,7 @@
 	</software>
 
 	<software name="tomjerry">
-		<description>Tom &amp; Jerry (Euro, Prototype)</description>
+		<description>Tom &amp; Jerry (Prototype)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -5311,6 +5367,7 @@
 		</part>
 	</software>
 
+	<!-- Serial: DS-G301 -->
 	<software name="totowld3">
 		<description>Toto World 3 (Kor)</description>
 		<year>1993</year>
@@ -5322,8 +5379,9 @@
 		</part>
 	</software>
 
+	<!-- Serial: 4004 (Card), 4504 (Cart), 41003, 021.050 -->
 	<software name="transbot">
-		<description>TransBot (Euro, USA)</description>
+		<description>TransBot (Euro, USA, Bra)</description>
 		<year>1985</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -5344,7 +5402,7 @@
 		</part>
 	</software>
 
-	<!-- Id: 29008-50 -->
+	<!-- Serial: MK29008-50 -->
 	<software name="trivial">
 		<description>Trivial Pursuit - Genus Edition (Euro)</description>
 		<year>1992</year>
@@ -5356,7 +5414,8 @@
 		</part>
 	</software>
 
-	<software name="ttoriui">
+	<!-- G-37 -->
+	<software name="ttoriui" cloneof="myhero">
 		<description>Ttoriui Moheom  (Kor)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -5367,9 +5426,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 026.260 -->
+	<!-- Serial: 026.260 -->
 	<software name="turmamon" cloneof="wboy3">
-		<description>Turma da Monica em O Resgate (Bra)</description>
+		<description>Turma da Mônica em O Resgate (Bra)</description>
 		<year>1993</year>
 		<publisher>Tec Toy</publisher>
 		<part name="cart" interface="sms_cart">
@@ -5379,6 +5438,7 @@
 		</part>
 	</software>
 
+	<!-- Serial: 028.650 -->
 	<software name="tvcolos" cloneof="asterix">
 		<description>As Aventuras da TV Colosso (Bra)</description>
 		<year>1996</year>
@@ -5390,9 +5450,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 9501 -->
+	<!-- Serial: 9501 -->
 	<software name="ultima4">
-		<description>Ultima IV - Quest of the Avatar (Euro)</description>
+		<description>Ultima IV - Quest of the Avatar (Euro, Bra)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -5413,9 +5473,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 7119 -->
+	<!-- Serial: 7119, 024.440 -->
 	<software name="ultimscr">
-		<description>Ultimate Soccer (Euro)</description>
+		<description>Ultimate Soccer (Euro, Bra)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -5436,7 +5496,7 @@
 		</part>
 	</software>
 
-	<!-- Id: 030.020 -->
+	<!-- Serial: 030.020 -->
 	<software name="vf">
 		<description>Virtua Fighter Animation (Bra)</description>
 		<year>1997</year>
@@ -5448,9 +5508,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 7023 -->
+	<!-- Serial: 7023 -->
 	<software name="vigilant">
-		<description>Vigilante (Euro, USA)</description>
+		<description>Vigilante (Euro, USA, Bra)</description>
 		<year>1989</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -5460,7 +5520,7 @@
 		</part>
 	</software>
 
-	<!-- Id: 7020 -->
+	<!-- Serial: 7020 -->
 	<software name="waltpay" cloneof="ameripf">
 		<description>Walter Payton Football (USA)</description>
 		<year>1989</year>
@@ -5472,9 +5532,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 5118 -->
+	<!-- Serial: 5118 -->
 	<software name="wanted">
-		<description>Wanted (Euro, USA)</description>
+		<description>Wanted (Euro, USA, Bra)</description>
 		<year>1989</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -5484,8 +5544,9 @@
 		</part>
 	</software>
 
+	<!-- Serial: 5068 -->
 	<software name="wboy">
-		<description>Wonder Boy (Euro, USA)</description>
+		<description>Wonder Boy (Euro, USA, Bra, v1)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -5495,21 +5556,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 7026 -->
-	<software name="wboy3">
-		<description>Wonder Boy III - The Dragon's Trap (Euro, USA)</description>
-		<year>1989</year>
-		<publisher>Sega</publisher>
-		<part name="cart" interface="sms_cart">
-			<dataarea name="rom" size="262144">
-				<rom name="wonder boy iii - the dragon's trap (usa, europe).bin" size="262144" crc="679e1676" sha1="99e73de2ffe5ea5d40998faec16504c226f4c1ba" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- Id: G-1316, 5068 - Releases: 1987-03-22 (JPN) - Alt Title: スーパーワンダーボーイ -->
-	<software name="wboyj" cloneof="wboy">
-		<description>Super Wonder Boy (Jpn)</description>
+	<!-- Serial: G-1316, 5068, GB-1003 - Releases: 1987-03-22 (JPN) - Alt Title: スーパーワンダーボーイ -->
+	<software name="wboya" cloneof="wboy">
+		<description>Wonder Boy (Euro, Kor, v0) ~ Super Wonder Boy (Jpn, v0)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -5519,25 +5568,26 @@
 		</part>
 	</software>
 
-	<software name="wboymlnd">
-		<description>Wonder Boy in Monster Land (Euro, USA, v1.1, Hacked?)</description>
-		<year>1988</year>
+	<!-- Serial: 7026, GB-2004 -->
+	<software name="wboy3">
+		<description>Wonder Boy III - The Dragon's Trap (Euro, USA, Kor)</description>
+		<year>1989</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="wonder boy in monster land (ue) (v1.1) [h1].bin" size="262144" crc="7522cf0a" sha1="24889396756fc5a1e043e89d70c5431c9d98df7d" offset="000000" />
+				<rom name="wonder boy iii - the dragon's trap (usa, europe).bin" size="262144" crc="679e1676" sha1="99e73de2ffe5ea5d40998faec16504c226f4c1ba" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
 
-	<!-- Id: G-1346, 7007 - Releases: 1988-01-31 (JPN) - Alt Title: スーパーワンダーボーイ モンスターワールド - Notes: FM support -->
-	<software name="wboymlndj" cloneof="wboymlnd">
-		<description>Super Wonder Boy - Monster World (Jpn)</description>
+	<!--  Id: 7007 -->
+	<software name="wboymlnd">
+		<description>Wonder Boy in Monster Land (Euro, USA)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="super wonder boy - monster world (japan).bin" size="262144" crc="b1da6a30" sha1="f4cd1ee6f98bc77fb36e232bf755d61d88e219d7" offset="000000" />
+				<rom name="wonder boy in monster land (usa, europe).bin" size="262144" crc="8cbef0c1" sha1="51715db7a49a18452292dadb2bba0108aa6d6402" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -5553,20 +5603,34 @@
 		</part>
 	</software>
 
-	<software name="wboymlndu" cloneof="wboymlnd">
-		<description>Wonder Boy in Monster Land (Euro, USA)</description>
+	<!-- Serial: G-1346 - Releases: 1988-01-31 (JPN) - Alt Title: スーパーワンダーボーイ モンスターワールド - Notes: FM support -->
+	<software name="wboymlndj" cloneof="wboymlnd">
+		<description>Super Wonder Boy - Monster World (Jpn)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="wonder boy in monster land (usa, europe).bin" size="262144" crc="8cbef0c1" sha1="51715db7a49a18452292dadb2bba0108aa6d6402" offset="000000" />
+				<rom name="super wonder boy - monster world (japan).bin" size="262144" crc="b1da6a30" sha1="f4cd1ee6f98bc77fb36e232bf755d61d88e219d7" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
 
-	<!-- Id: 9012 -->
+    <!-- From Bock: "This hack does two things: force the game to run in Japanese mode (with an harder difficulty level), and allows to 
+    Pause the game by pressing LEFT+RIGHT+Button 2 on joypad 1 (a combination that cannot be done on a normal SMS joypad). -->
+	<software name="wboymlnda" cloneof="wboymlnd">
+		<description>Wonder Boy in Monster Land (Euro, USA, Hacked?)</description>
+		<year>1988</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="wonder boy in monster land [hack].bin" size="262144" crc="7522cf0a" sha1="24889396756fc5a1e043e89d70c5431c9d98df7d" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Serial: 9012, 9012-50, GB4021JG -->
 	<software name="wboymwld">
-		<description>Wonder Boy in Monster World (Euro)</description>
+		<description>Wonder Boy in Monster World (Euro, Kor)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -5598,9 +5662,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 27015-50 -->
+	<!-- Serial: 27015-50, 025.330 -->
 	<software name="wclead">
-		<description>World Class Leader Board (Euro)</description>
+		<description>World Class Leader Board (Euro, Bra)</description>
 		<year>1991</year>
 		<publisher>U.S. Gold</publisher>
 		<part name="cart" interface="sms_cart">
@@ -5610,9 +5674,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 5084 -->
+	<!-- Serial: 5084, 023.340 -->
 	<software name="wcup90">
-		<description>World Cup Italia '90 (Euro)</description>
+		<description>World Cup Italia '90 (Euro, Bra)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -5623,7 +5687,7 @@
 	</software>
 
 	<software name="wcup90d" cloneof="wcup90">
-		<description>World Cup Italia '90 (Demo)</description>
+		<description>World Cup Italia '90 (USA, Demo)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -5633,9 +5697,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 29028-5* -->
+	<!-- Serial: 29028-50, 29028-05, 29028-06, 29028-09, 29028-18, 028.430 -->
 	<software name="wcup94">
-		<description>World Cup USA 94 (Euro)</description>
+		<description>World Cup USA 94 (Euro, Bra)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -5645,9 +5709,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 7115 -->
+	<!-- Serial: 7115, 024.390 -->
 	<software name="wimbled2">
-		<description>Wimbledon II (Euro)</description>
+		<description>Wimbledon II (Euro, Bra)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -5657,7 +5721,7 @@
 		</part>
 	</software>
 
-	<!-- Id: 7100 -->
+	<!-- Serial: 7100 -->
 	<software name="wimbledn">
 		<description>Wimbledon (Euro)</description>
 		<year>1992</year>
@@ -5669,7 +5733,7 @@
 		</part>
 	</software>
 
-	<!-- Id: 29015-50 -->
+	<!-- Serial: 29015-50, 29015-09, 29015-18 -->
 	<software name="winterol">
 		<description>Winter Olympics - Lillehammer '94 (Euro)</description>
 		<year>1993</year>
@@ -5681,6 +5745,7 @@
 		</part>
 	</software>
 
+	<!-- Serial: 028.350 -->
 	<software name="winterolb" cloneof="winterol">
 		<description>Winter Olympics - Lillehammer '94 (Bra)</description>
 		<year>1993</year>
@@ -5692,9 +5757,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 27060-50 -->
+	<!-- Serial: MK-27060-50 -->
 	<software name="wolfch">
-		<description>Wolfchild (Euro)</description>
+		<description>Wolfchild (Euro, Bra)</description>
 		<year>1993</year>
 		<publisher>Virgin Interactive</publisher>
 		<part name="cart" interface="sms_cart">
@@ -5704,7 +5769,7 @@
 		</part>
 	</software>
 
-	<!-- Id: C-519 - Releases: 1987-03-15 (Jpn, card) -->
+	<!-- Serial: C-519 - Releases: 1987-03-15 (Jpn, card) -->
 	<software name="woodypop">
 		<description>Woody Pop - Shinjinrui no Block Kuzushi (Jpn)</description>
 		<year>1987</year>
@@ -5716,9 +5781,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 5114 -->
-	<software name="worldg">
-		<description>World Games (Euro)</description>
+	<!-- Serial: 5114 -->
+	<software name="worldgam">
+		<description>World Games (Euro, Bra)</description>
 		<year>1989</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -5728,7 +5793,7 @@
 		</part>
 	</software>
 
-	<software name="worldgb" cloneof="worldg">
+	<software name="worldgamp" cloneof="worldgam">
 		<description>World Games (Euro, Prototype)</description>
 		<year>1989</year>
 		<publisher>Sega</publisher>
@@ -5739,7 +5804,7 @@
 		</part>
 	</software>
 
-	<!-- Id: 5080, 5053? -->
+	<!-- Serial: 5080 -->
 	<software name="worldgp">
 		<description>World Grand Prix (Euro)</description>
 		<year>1986</year>
@@ -5751,8 +5816,9 @@
 		</part>
 	</software>
 
+	<!-- Serial: 5080, GB-1304 -->
 	<software name="worldgpu" cloneof="worldgp">
-		<description>World Grand Prix (USA)</description>
+		<description>World Grand Prix (USA, Bra, Kor)</description>
 		<year>1986</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -5762,9 +5828,9 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1327, 5059 - Releases: 1987-07-19 (JPN) - Alt Title: ワールド サッカー -->
+	<!-- Serial: G-1327, 5059 - Releases: 1987-07-19 (JPN) - Alt Title: ワールド サッカー -->
 	<software name="worldscr">
-		<description>World Soccer (World)</description>
+		<description>World Soccer (Euro, Jpn, Kor) ~ Great Soccer (USA)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -5774,9 +5840,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 27054-50 -->
+	<!-- Serial: 27054-50, 026.270 -->
 	<software name="wwfwre">
-		<description>WWF Wrestlemania - Steel Cage Challenge (Euro)</description>
+		<description>WWF Wrestlemania - Steel Cage Challenge (Euro, Bra)</description>
 		<year>1993</year>
 		<publisher>Flying Edge</publisher>
 		<part name="cart" interface="sms_cart">
@@ -5786,9 +5852,9 @@
 		</part>
 	</software>
 
-	<!-- Id: 4350 -->
+	<!-- Serial: 4350 -->
 	<software name="wwrld">
-		<description>Where in the World is Carmen Sandiego (USA)</description>
+		<description>Where in the World is Carmen Sandiego? (USA)</description>
 		<year>1989</year>
 		<publisher>Parker Brothers</publisher>
 		<part name="cart" interface="sms_cart">
@@ -5798,8 +5864,9 @@
 		</part>
 	</software>
 
+	<!-- Serial: 023.450 -->
 	<software name="wwrldb" cloneof="wwrld">
-		<description>Where in the World is Carmen Sandiego (Bra)</description>
+		<description>Where in the World is Carmen Sandiego? (Bra)</description>
 		<year>1989</year>
 		<publisher>Tec Toy</publisher>
 		<part name="cart" interface="sms_cart">
@@ -5809,7 +5876,7 @@
 		</part>
 	</software>
 
-	<!-- Id: 27012-50 -->
+	<!-- Serial: 27012-50 -->
 	<software name="xenon2">
 		<description>Xenon 2 - Megablast (Image Works) (Euro)</description>
 		<year>1991</year>
@@ -5821,7 +5888,7 @@
 		</part>
 	</software>
 
-	<!-- Id: 27038-50 -->
+	<!-- Serial: 27038-50 -->
 	<software name="xenon2v">
 		<description>Xenon 2 - Megablast (Virgin) (Euro)</description>
 		<year>1991</year>
@@ -5833,6 +5900,7 @@
 		</part>
 	</software>
 
+	<!-- Serial: 028.740 -->
 	<software name="xmenmojo">
 		<description>X-Men - Mojo World (Bra)</description>
 		<year>1996</year>
@@ -5844,7 +5912,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1370, 7501 - Releases: 1988-10-15 (JPN) - Alt Title: イース - Notes: FM support -->
+	<!-- Serial: G-1370 - Releases: 1988-10-15 (JPN) - Alt Title: イース - Notes: FM support -->
 	<software name="ys" cloneof="ysomens">
 		<description>Ys (Jpn)</description>
 		<year>1988</year>
@@ -5856,8 +5924,9 @@
 		</part>
 	</software>
 
+	<!-- Serial: 7501 -->
 	<software name="ysomens">
-		<description>Ys - The Vanished Omens (Euro, USA)</description>
+		<description>Ys - The Vanished Omens (Euro, USA, Bra)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -5867,7 +5936,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1336, 8002 - Releases: 1987-11-07 (JPN) - Alt Title: ザクソン3D - Notes: FM support, 3D glasses support -->
+	<!-- Serial: G-1336, 8002 - Releases: 1987-11-07 (JPN) - Alt Title: ザクソン3D - Notes: FM support, 3D glasses support -->
 	<software name="zaxxon3d">
 		<description>Zaxxon 3-D (World)</description>
 		<year>1987</year>
@@ -5890,8 +5959,9 @@
 		</part>
 	</software>
 
+	<!-- Serial: 5075 -->
 	<software name="zillion">
-		<description>Zillion (Euro, v1.2)</description>
+		<description>Zillion (Euro, v2)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -5901,7 +5971,31 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1344, 5105 - Releases: 1987-12-13 (JPN) - Alt Title: トライフォーメーション - Notes: FM support -->
+	<!-- Serial: G-1325, 5075 - Releases: 1987-05-24 (JPN) - Alt Title: 赤い光弾 ジリオン -->
+	<software name="zillionb" cloneof="zillion">
+		<description>Zillion (Euro, v0) ~ Akai Koudan Zillion (Jpn, v0)</description>
+		<year>1987</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="zillion (japan, europe) (en,ja).bin" size="131072" crc="60c19645" sha1="6a0a21426cadadb5567907d9cc4cdaf63195d5c3" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Serial: 5075 -->
+	<software name="zilliona" cloneof="zillion">
+		<description>Zillion (USA, v1)</description>
+		<year>1987</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="zillion (usa) (v1.1).bin" size="131072" crc="5718762c" sha1="3aab3e95dac0fa93612da20cf525dba4dc4ca6ba" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Serial: G-1344, 5105 - Releases: 1987-12-13 (JPN) - Alt Title: トライフォーメーション - Notes: FM support -->
 	<software name="zillion2">
 		<description>Zillion II - The Tri Formation (Euro, USA) ~ Tri Formation (Jpn)</description>
 		<year>1987</year>
@@ -5913,30 +6007,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1325, 5075 - Releases: 1987-05-24 (JPN) - Alt Title: 赤い光弾 ジリオン -->
-	<software name="zillionb" cloneof="zillion">
-		<description>Zillion (Euro) ~ Akai Koudan Zillion (Jpn)</description>
-		<year>1987</year>
-		<publisher>Sega</publisher>
-		<part name="cart" interface="sms_cart">
-			<dataarea name="rom" size="131072">
-				<rom name="zillion (japan, europe) (en,ja).bin" size="131072" crc="60c19645" sha1="6a0a21426cadadb5567907d9cc4cdaf63195d5c3" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="zilliona" cloneof="zillion">
-		<description>Zillion (USA, v1.1)</description>
-		<year>1987</year>
-		<publisher>Sega</publisher>
-		<part name="cart" interface="sms_cart">
-			<dataarea name="rom" size="131072">
-				<rom name="zillion (usa) (v1.1).bin" size="131072" crc="5718762c" sha1="3aab3e95dac0fa93612da20cf525dba4dc4ca6ba" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- Id: 27075-50 -->
+	<!-- Serial: 27075-50 -->
 	<software name="zool">
 		<description>Zool - Ninja of the 'Nth' Dimension (Euro)</description>
 		<year>1993</year>

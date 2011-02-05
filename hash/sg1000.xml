@@ -912,7 +912,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 
 	<software name="jb007">
 		<!-- Serial: OM-G008 - Alt Title: ダブルオーセブン ジェームス・ボンド -->
-		<description>James Bond 007 (Jpn, v2.7, OMV)</description>
+		<description>007 James Bond (Jpn, v2.7, OMV)</description>
 		<year>1984</year>
 		<publisher>Tsukuda Original</publisher>
 		<part name="cart" interface="sg1000_cart">
@@ -924,7 +924,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 
 	<software name="jb007t" cloneof="jb007">
 		<!-- Serial: W-009 - Alt Title: 007 -->
-		<description>James Bond 007 (Tw)</description>
+		<description>007 James Bond (Tw)</description>
 		<year>1984?</year>
 		<publisher>Aaronix</publisher>
 		<part name="cart" interface="sg1000_cart">
@@ -1246,9 +1246,9 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		</part>
 	</software>
 
-	<software name="pitfall2">
+	<software name="pitfall2a" cloneof="pitfall2">
 		<!-- Serial: C-49 - Alt Title: ピットフォールII -->
-		<description>Pitfall II - The Lost Caverns (Jpn)</description>
+		<description>Pitfall II - The Lost Caverns (Jpn, v0)</description>
 		<year>1985</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sg1000_cart">
@@ -1258,8 +1258,8 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		</part>
 	</software>
 
-	<software name="pitfall2a" cloneof="pitfall2">
-		<description>Pitfall II - The Lost Caverns (Jpn, Alt)</description>
+	<software name="pitfall2">
+		<description>Pitfall II - The Lost Caverns (Jpn, v1)</description>
 		<year>1985</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sg1000_cart">
@@ -1714,7 +1714,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 
 	<software name="wboya" cloneof="wboy">
 		<!-- Serial: C-69 - Alt Title: ワンダーボーイ -->
-		<description>Wonder Boy (Jpn)</description>
+		<description>Wonder Boy (Jpn, v0)</description>
 		<year>1986</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sg1000_cart">

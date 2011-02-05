@@ -5,7 +5,7 @@
 <!-- Gamepacks - These are re-release of 2 or 3 standalone games in a single cart -->
 
 	<software name="2asterix">
-		<description>2 in 1: Asterix &amp; Obelix - Bash Them All! + Asterix &amp; Obelix XXL (Euro)</description>
+		<description>2 in 1: Astérix &amp; Obélix - Bash Them All! + Astérix &amp; Obélix XXL (Euro)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gba_cart">
@@ -2550,7 +2550,7 @@
 	</software>
 
 	<software name="astobelx">
-		<description>Asterix &amp; Obelix - Bash Them All! (Euro)</description>
+		<description>Astérix &amp; Obélix - Bash Them All! (Euro)</description>
 		<year>2002</year>
 		<publisher>Infogrames</publisher>
 		<part name="cart" interface="gba_cart">
@@ -2561,7 +2561,7 @@
 	</software>
 
 	<software name="asterxxl">
-		<description>Asterix &amp; Obelix XXL (Euro)</description>
+		<description>Astérix &amp; Obélix XXL (Euro)</description>
 		<year>2004</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="gba_cart">

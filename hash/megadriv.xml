@@ -1661,7 +1661,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 	</software>
 
 	<software name="alien3">
-		<description>Alien 3 (Euro, USA, Rev. A)</description>
+		<description>Alien³ (Euro, USA, Rev. A)</description>
 		<year>1993</year>
 		<publisher>Arena Entertainment</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -1672,7 +1672,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 	</software>
 
 	<software name="alien3a" cloneof="alien3">
-		<description>Alien 3 (Euro, USA)</description>
+		<description>Alien³ (Euro, USA)</description>
 		<year>1993</year>
 		<publisher>Arena Entertainment</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -2011,7 +2011,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 	</software>
 
 	<software name="asterix">
-		<description>Asterix and the Great Rescue (Euro)</description>
+		<description>Astérix and the Great Rescue (Euro)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -2022,7 +2022,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 	</software>
 
 	<software name="asterixu" cloneof="asterix">
-		<description>Asterix and the Great Rescue (USA)</description>
+		<description>Astérix and the Great Rescue (USA)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -2033,7 +2033,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 	</software>
 
 	<software name="asterpg">
-		<description>Asterix and the Power of the Gods (Euro)</description>
+		<description>Astérix and the Power of the Gods (Euro)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -2044,7 +2044,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 	</software>
 
 	<software name="asterpgp" cloneof="asterpg">
-		<description>Asterix and the Power of the Gods (Euro, Prototype)</description>
+		<description>Astérix and the Power of the Gods (Euro, Prototype)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -7709,7 +7709,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 	</software>
 
 	<software name="ferias">
-		<description>Ferias Frustradas do Pica-Pau (Bra)</description>
+		<description>Férias Frustradas do Pica-Pau (Bra)</description>
 		<year>1995</year>
 		<publisher>Tec Toy</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -18013,7 +18013,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 	</software>
 
 	<software name="sdmilhao">
-		<description>Show do Milhao (Bra)</description>
+		<description>Show do Milhão (Bra)</description>
 		<year>2001</year>
 		<publisher>Tec Toy</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -18024,7 +18024,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 	</software>
 
 	<software name="sdmilha2">
-		<description>Show do Milhao Volume 2 (Bra)</description>
+		<description>Show do Milhão Volume 2 (Bra)</description>
 		<year>2002</year>
 		<publisher>Tec Toy</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -18035,7 +18035,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 	</software>
 
 	<software name="sdmilha2a" cloneof="sdmilha2">
-		<description>Show do Milhao Volume 2 (Brazil, Alt)</description>
+		<description>Show do Milhão Volume 2 (Bra, Alt)</description>
 		<year>2002</year>
 		<publisher>Tec Toy</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -21053,8 +21053,8 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="tecmocup">
-		<description>Tecmo Cup (Jpn, Pirate)</description>
+	<software name="bsteam3" cloneof="tecmocup">
+		<description>Boy Soccer Team III (Jpn, Pirate)</description>
 		<year>199?</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -21065,7 +21065,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 	</software>
 
 	<!-- // BAD DUMP -->
-	<software name="tecmocupp" cloneof="tecmocup">
+	<software name="tecmocup">
 		<description>Tecmo Cup (Jpn, Prototype?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -23013,7 +23013,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 	</software>
 
 	<software name="wwrld">
-		<description>Where in the World Is Carmen Sandiego (Euro, USA)</description>
+		<description>Where in the World Is Carmen Sandiego? (Euro, USA)</description>
 		<year>1992</year>
 		<publisher>Electronic Arts</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -23024,7 +23024,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 	</software>
 
 	<software name="wwrldbr" cloneof="wwrld">
-		<description>Where in the World Is Carmen Sandiego (Bra)</description>
+		<description>Where in the World Is Carmen Sandiego? (Bra)</description>
 		<year>199?</year>
 		<publisher>Tec Toy</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -23035,7 +23035,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 	</software>
 
 	<software name="wtime">
-		<description>Where in Time Is Carmen Sandiego (Euro, USA)</description>
+		<description>Where in Time Is Carmen Sandiego? (Euro, USA)</description>
 		<year>1992</year>
 		<publisher>Electronic Arts</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -23046,7 +23046,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 	</software>
 
 	<software name="wtimebr" cloneof="wtime">
-		<description>Where in Time Is Carmen Sandiego (Bra)</description>
+		<description>Where in Time Is Carmen Sandiego? (Bra)</description>
 		<year>199?</year>
 		<publisher>Tec Toy</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -23295,7 +23295,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 	</software>
 
 	<software name="turmad" cloneof="wbmw">
-		<description>Turma da Monica na Terra dos Monstros (Bra)</description>
+		<description>Turma da Mônica na Terra dos Monstros (Bra)</description>
 		<year>1996</year>
 		<publisher>Tec Toy</publisher>
 		<part name="cart" interface="megadriv_cart">

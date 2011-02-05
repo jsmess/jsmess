@@ -2184,7 +2184,7 @@ The software list will be divided in four categories:
 	</software>
 
 	<software name="alien3">
-		<description>Alien 3 (Euro)</description>
+		<description>Alien³ (Euro)</description>
 		<year>1993</year>
 		<publisher>Acclaim</publisher>
 		<part name="cart" interface="snes_cart">
@@ -2196,7 +2196,7 @@ The software list will be divided in four categories:
 
 	<software name="alien3j" cloneof="alien3">
 		<!-- Serial: SHVC-A3 - Release Date: 1993-07-09 - Alt. Title: エイリアン3 -->
-		<description>Alien 3 (Jpn)</description>
+		<description>Alien³ (Jpn)</description>
 		<year>1993</year>
 		<publisher>Acclaim</publisher>
 		<part name="cart" interface="snes_cart">
@@ -2865,7 +2865,7 @@ The software list will be divided in four categories:
 	</software>
 
 	<software name="asterxob">
-		<description>Asterix &amp; Obelix (Euro)</description>
+		<description>Astérix &amp; Obelix (Euro)</description>
 		<year>1995</year>
 		<publisher>Infogrames</publisher>
 		<part name="cart" interface="snes_cart">
@@ -2876,7 +2876,7 @@ The software list will be divided in four categories:
 	</software>
 
 	<software name="asterix">
-		<description>Asterix (Euro)</description>
+		<description>Astérix (Euro)</description>
 		<year>1996</year>
 		<publisher>Infogrames</publisher>
 		<part name="cart" interface="snes_cart">
@@ -39523,7 +39523,7 @@ The software list will be divided in four categories:
 	</software>
 
 	<software name="wwrld">
-		<description>Where in the World is Carmen Sandiego (Euro)</description>
+		<description>Where in the World is Carmen Sandiego? (Euro)</description>
 		<year>1993</year>
 		<publisher>Hi Tech Expressions</publisher>
 		<part name="cart" interface="snes_cart">
@@ -39535,7 +39535,7 @@ The software list will be divided in four categories:
 
 	<software name="wwrldu" cloneof="wwrld">
 		<!-- Serial:  - Release Date: 1993-06 -->
-		<description>Where in the World is Carmen Sandiego (USA)</description>
+		<description>Where in the World is Carmen Sandiego? (USA)</description>
 		<year>1993</year>
 		<publisher>Hi Tech Expressions</publisher>
 		<part name="cart" interface="snes_cart">
@@ -39547,7 +39547,7 @@ The software list will be divided in four categories:
 
 	<software name="wtime">
 		<!-- Serial:  - Release Date: 1993-05 -->
-		<description>Where in Time is Carmen Sandiego (USA)</description>
+		<description>Where in Time is Carmen Sandiego? (USA)</description>
 		<year>1993</year>
 		<publisher>Hi Tech Expressions</publisher>
 		<part name="cart" interface="snes_cart">

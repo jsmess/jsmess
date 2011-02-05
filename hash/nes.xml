@@ -1120,7 +1120,7 @@
 
 	<software name="alien3u" cloneof="alien3" supported="partial">
 		<!-- Serial: NES-X3-USA - Release Date: 1993-03 -->
-		<description>Alien&#226;&#179; (USA)</description>
+		<description>Alien³ (USA)</description>
 		<year>1993</year>
 		<publisher>LJN</publisher>
 		<part name="cart" interface="nes_cart">
@@ -1136,7 +1136,7 @@
 
 	<software name="alien3" supported="partial">
 		<!-- Serial: NES-X3 (FRA/NOE) - Release Date: 1993 -->
-		<description>Alien&#226;&#179; (Euro)</description>
+		<description>Alien³ (Euro)</description>
 		<year>1993</year>
 		<publisher>LJN</publisher>
 		<part name="cart" interface="nes_cart">
@@ -1674,7 +1674,7 @@
 
 	<software name="asterix">
 		<!-- Serial: NES-AX (UKV/ESP) - Release Date: 1993 -->
-		<description>Ast&#227;&#169;rix (Euro)</description>
+		<description>Astérix (Euro)</description>
 		<year>1993</year>
 		<publisher>Infogrames</publisher>
 		<part name="cart" interface="nes_cart">
