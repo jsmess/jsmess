@@ -323,7 +323,7 @@ OSDOBJS += \
 	$(UIOBJ)/softwarelist.o \
 	$(UIOBJ)/devview.o
 
-ifeq ($(TARGET),mame)
+ifneq ($(TARGET),mess)
 OSDOBJS += \
 	$(UIOBJ)/layout.o
 endif
