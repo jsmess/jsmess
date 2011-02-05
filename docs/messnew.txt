@@ -16,7 +16,8 @@ Systems Promoted from GAME_NOT_WORKING:
 
 Skeleton drivers:
 -----------------
-- Ferguson Big Board II [Miodrag Milanovic]
+- Ferguson Big Board II
+- Savia 84
 
 
 

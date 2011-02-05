@@ -1761,6 +1761,7 @@ $(MESSOBJ)/skeleton.a:			\
 	$(MESS_DRIVERS)/qtsbc.o		\
 	$(MESS_DRIVERS)/rvoice.o	\
 	$(MESS_DRIVERS)/sage2.o		\
+	$(MESS_DRIVERS)/savia84.o	\
 	$(MESS_DRIVERS)/sbc6510.o	\
 	$(MESS_DRIVERS)/selz80.o	\
 	$(MESS_DRIVERS)/sm1800.o	\
