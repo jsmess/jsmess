@@ -233,16 +233,13 @@ MC6845_UPDATE_ROW( dim68k_update_row )
 	ma /= 2;
 	xx = 0;
 
-	if (!screen_on)
-		cursor_x = 0xff; // disable cursor if screen is off
-
 	for (x = 0; x < x_count; x++)
 	{
 		if (screen_on)
 			chr16 = state->ram[ma+x]; // reads 2 characters
 
 		inv=0;
-		if (xx == cursor_x) inv=0xff;
+		if (xx == cursor_x && screen_on) inv=0xff;
 		xx++;
 
 		chr = chr16>>8;
