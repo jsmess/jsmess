@@ -47,7 +47,7 @@
 //	CONSTANTS / MACROS
 //**************************************************************************
 
-#define LOG 1
+#define LOG 0
 
 static const int IKBD_MOUSE_XYA[3][4] = { { 0, 0, 0, 0 }, { 1, 1, 0, 0 }, { 0, 1, 1, 0 } };
 static const int IKBD_MOUSE_XYB[3][4] = { { 0, 0, 0, 0 }, { 0, 1, 1, 0 }, { 1, 1, 0, 0 } };
@@ -431,33 +431,27 @@ void st_state::mouse_tick()
 	{
 		if (x == m_ikbd_mouse_x)
 		{
-			logerror("IKBD Mouse X: static\n");
 			m_ikbd_mouse_px = IKBD_MOUSE_PHASE_STATIC;
 		}
 		else if ((x > m_ikbd_mouse_x) || (x == 0 && m_ikbd_mouse_x == 0xff))
 		{
-			logerror("IKBD Mouse X: positive\n");
 			m_ikbd_mouse_px = IKBD_MOUSE_PHASE_POSITIVE;
 		}
 		else if ((x < m_ikbd_mouse_x) || (x == 0xff && m_ikbd_mouse_x == 0))
 		{
-			logerror("IKBD Mouse X: negative\n");
 			m_ikbd_mouse_px = IKBD_MOUSE_PHASE_NEGATIVE;
 		}
 
 		if (y == m_ikbd_mouse_y)
 		{
-			logerror("IKBD Mouse Y: static\n");
 			m_ikbd_mouse_py = IKBD_MOUSE_PHASE_STATIC;
 		}
 		else if ((y > m_ikbd_mouse_y) || (y == 0 && m_ikbd_mouse_y == 0xff))
 		{
-			logerror("IKBD Mouse Y: positive\n");
 			m_ikbd_mouse_py = IKBD_MOUSE_PHASE_POSITIVE;
 		}
 		else if ((y < m_ikbd_mouse_y) || (y == 0xff && m_ikbd_mouse_y == 0))
 		{
-			logerror("IKBD Mouse Y: negative\n");
 			m_ikbd_mouse_py = IKBD_MOUSE_PHASE_NEGATIVE;
 		}
 
@@ -467,12 +461,10 @@ void st_state::mouse_tick()
 
 	m_ikbd_mouse = 0;
 
-	m_ikbd_mouse |= IKBD_MOUSE_XYB[m_ikbd_mouse_px][m_ikbd_mouse_pc];		 // XB
+	m_ikbd_mouse |= IKBD_MOUSE_XYB[m_ikbd_mouse_px][m_ikbd_mouse_pc];	   // XB
 	m_ikbd_mouse |= IKBD_MOUSE_XYA[m_ikbd_mouse_px][m_ikbd_mouse_pc] << 1; // XA
 	m_ikbd_mouse |= IKBD_MOUSE_XYB[m_ikbd_mouse_py][m_ikbd_mouse_pc] << 2; // YA
 	m_ikbd_mouse |= IKBD_MOUSE_XYA[m_ikbd_mouse_py][m_ikbd_mouse_pc] << 3; // YB
-
-	logerror("IBKD Mouse pc %u data %02x\n", m_ikbd_mouse_pc, m_ikbd_mouse);
 
 	m_ikbd_mouse_pc++;
 	m_ikbd_mouse_pc &= 0x03;
