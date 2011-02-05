@@ -1295,10 +1295,38 @@ void UpdateSoftware(void)
 
 	if (GetShowSoftware())
 	{
-		ShowWindow(GetDlgItem(hMain,IDC_SWLIST),SW_SHOW);
-		ShowWindow(GetDlgItem(hMain,IDC_SWDEVVIEW),SW_SHOW);
-		ShowWindow(GetDlgItem(hMain,IDC_SOFTLIST),SW_SHOW);
+		int nTab;
+		HWND hwndSoftwarePicker;
+		HWND hwndSoftwareDevView;
+		HWND hwndSoftwareList;
+
 		ShowWindow(GetDlgItem(hMain,IDC_SWTAB),SW_SHOW);
+		
+		hwndSoftwarePicker = GetDlgItem(GetMainWindow(), IDC_SWLIST);
+		hwndSoftwareDevView = GetDlgItem(GetMainWindow(), IDC_SWDEVVIEW);
+		hwndSoftwareList = GetDlgItem(GetMainWindow(), IDC_SOFTLIST);
+
+		nTab = TabView_GetCurrentTab(GetDlgItem(GetMainWindow(), IDC_SWTAB));
+
+		switch(nTab)
+		{
+			case 0:
+				ShowWindow(hwndSoftwarePicker, SW_SHOW);
+				ShowWindow(hwndSoftwareDevView, SW_HIDE);
+				ShowWindow(hwndSoftwareList, SW_HIDE);
+				break;
+
+			case 1:
+				ShowWindow(hwndSoftwarePicker, SW_HIDE);
+				ShowWindow(hwndSoftwareDevView, SW_SHOW);
+				ShowWindow(hwndSoftwareList, SW_HIDE);
+				break;
+			case 2:
+				ShowWindow(hwndSoftwarePicker, SW_HIDE);
+				ShowWindow(hwndSoftwareDevView, SW_HIDE);
+				ShowWindow(hwndSoftwareList, SW_SHOW);
+				break;
+		}
 	}
 	else
 	{
@@ -3340,7 +3368,8 @@ static BOOL TreeViewNotify(LPNMHDR nm)
 			if (bListReady)
 			{
 				ResetListView();
-				UpdateScreenShot();
+				MessUpdateSoftwareList();
+				UpdateScreenShot();				
 			}
 		}
 		return TRUE;
