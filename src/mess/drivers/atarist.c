@@ -430,7 +430,26 @@ READ8_MEMBER( st_state::ikbd_port1_r )
 
     */
 
-	return m_ikbd_keylatch;
+	UINT8 data = 0xff;
+
+	// keyboard data
+	if (!BIT(m_ikbd_keylatch, 1)) data &= input_port_read(machine, "P31");
+	if (!BIT(m_ikbd_keylatch, 2)) data &= input_port_read(machine, "P32");
+	if (!BIT(m_ikbd_keylatch, 3)) data &= input_port_read(machine, "P33");
+	if (!BIT(m_ikbd_keylatch, 4)) data &= input_port_read(machine, "P34");
+	if (!BIT(m_ikbd_keylatch, 5)) data &= input_port_read(machine, "P35");
+	if (!BIT(m_ikbd_keylatch, 6)) data &= input_port_read(machine, "P36");
+	if (!BIT(m_ikbd_keylatch, 7)) data &= input_port_read(machine, "P37");
+	if (!BIT(m_ikbd_keylatch, 8)) data &= input_port_read(machine, "P40");
+	if (!BIT(m_ikbd_keylatch, 9)) data &= input_port_read(machine, "P41");
+	if (!BIT(m_ikbd_keylatch, 10)) data &= input_port_read(machine, "P42");
+	if (!BIT(m_ikbd_keylatch, 11)) data &= input_port_read(machine, "P43");
+	if (!BIT(m_ikbd_keylatch, 12)) data &= input_port_read(machine, "P44");
+	if (!BIT(m_ikbd_keylatch, 13)) data &= input_port_read(machine, "P45");
+	if (!BIT(m_ikbd_keylatch, 14)) data &= input_port_read(machine, "P46");
+	if (!BIT(m_ikbd_keylatch, 15)) data &= input_port_read(machine, "P47");
+
+	return data;
 }
 
 
@@ -448,11 +467,16 @@ READ8_MEMBER( st_state::ikbd_port2_r )
         1       JOY 0-6
         2       JOY 1-6
         3       SD FROM CPU
-        4       SD TO CPU
+        4       
 
     */
 
-	return (m_ikbd_tx << 3) | (input_port_read_safe(machine, "IKBD_JOY1", 0xff) & 0x06);
+	UINT8 data = input_port_read_safe(machine, "IKBD_JOY1", 0xff) & 0x06;
+
+	// serial receive
+	data |= m_ikbd_tx << 3;
+
+	return data;
 }
 
 
@@ -466,14 +490,18 @@ WRITE8_MEMBER( st_state::ikbd_port2_w )
 
         bit     description
 
-        0       JOY 1-5
-        1       JOY 0-6
-        2       JOY 1-6
-        3       SD FROM CPU
+        0       joystick enable
+        1       
+        2       
+        3       
         4       SD TO CPU
 
     */
 
+	// joystick enable
+	m_ikbd_joy = BIT(data, 0);
+
+	// serial transmit
 	m_ikbd_rx = BIT(data, 4);
 }
 
@@ -502,14 +530,8 @@ WRITE8_MEMBER( st_state::ikbd_port3_w )
 	// caps lock led
 	set_led_status(machine, 1, BIT(data, 0));
 
-	// keyboard data
-	if (!BIT(data, 1)) m_ikbd_keylatch = input_port_read(machine, "P31");
-	if (!BIT(data, 2)) m_ikbd_keylatch = input_port_read(machine, "P32");
-	if (!BIT(data, 3)) m_ikbd_keylatch = input_port_read(machine, "P33");
-	if (!BIT(data, 4)) m_ikbd_keylatch = input_port_read(machine, "P34");
-	if (!BIT(data, 5)) m_ikbd_keylatch = input_port_read(machine, "P35");
-	if (!BIT(data, 6)) m_ikbd_keylatch = input_port_read(machine, "P36");
-	if (!BIT(data, 7)) m_ikbd_keylatch = input_port_read(machine, "P37");
+	// keyboard row select
+	m_ikbd_keylatch = (m_ikbd_keylatch & 0xff00) | data;
 }
 
 
@@ -534,7 +556,13 @@ READ8_MEMBER( st_state::ikbd_port4_r )
 
     */
 
+	if (m_ikbd_joy) return 0xff;
+
 	if (input_port_read(machine, "config") & 0x01)
+	{
+		return input_port_read_safe(machine, "IKBD_JOY0", 0xff);
+	}
+	else
 	{
 		/*
 
@@ -592,10 +620,6 @@ READ8_MEMBER( st_state::ikbd_port4_r )
 
 		return data;
 	}
-	else
-	{
-		return input_port_read_safe(machine, "IKBD_JOY0", 0xff);
-	}
 }
 
 
@@ -620,14 +644,9 @@ WRITE8_MEMBER( st_state::ikbd_port4_w )
 
     */
 
-	if (!BIT(data, 0)) m_ikbd_keylatch = input_port_read(machine, "P40");
-	if (!BIT(data, 1)) m_ikbd_keylatch = input_port_read(machine, "P41");
-	if (!BIT(data, 2)) m_ikbd_keylatch = input_port_read(machine, "P42");
-	if (!BIT(data, 3)) m_ikbd_keylatch = input_port_read(machine, "P43");
-	if (!BIT(data, 4)) m_ikbd_keylatch = input_port_read(machine, "P44");
-	if (!BIT(data, 5)) m_ikbd_keylatch = input_port_read(machine, "P45");
-	if (!BIT(data, 6)) m_ikbd_keylatch = input_port_read(machine, "P46");
-	if (!BIT(data, 7)) m_ikbd_keylatch = input_port_read(machine, "P47");
+
+	// keyboard row select
+	m_ikbd_keylatch = (data << 8) | (m_ikbd_keylatch & 0xff);
 }
 
 
@@ -1468,20 +1487,20 @@ static INPUT_PORTS_START( st )
 	PORT_CATEGORY_ITEM( 0x00, "Mouse", 1 )
 	PORT_CATEGORY_ITEM( 0x01, DEF_STR( Joystick ), 2 )
 	PORT_CONFNAME( 0x80, 0x80, "Monitor")
-	PORT_CONFSETTING( 0x00, "Monochrome" )
-	PORT_CONFSETTING( 0x80, "Color" )
+	PORT_CONFSETTING( 0x00, "Monochrome (Atari SM124)" )
+	PORT_CONFSETTING( 0x80, "Color (Atari SC1224)" )
 
 	PORT_INCLUDE( ikbd )
 
 	PORT_START("IKBD_JOY0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_PLAYER(1) PORT_8WAY PORT_CATEGORY(2) // XB
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_PLAYER(1) PORT_8WAY PORT_CATEGORY(2) // XA
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_PLAYER(1) PORT_8WAY PORT_CATEGORY(2) // YA
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_8WAY PORT_CATEGORY(2) // YB
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_PLAYER(2) PORT_8WAY PORT_CATEGORY(2)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_PLAYER(2) PORT_8WAY PORT_CATEGORY(2)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_PLAYER(2) PORT_8WAY PORT_CATEGORY(2)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2) PORT_8WAY PORT_CATEGORY(2)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_PLAYER(1) PORT_8WAY PORT_CATEGORY(2) // XB
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_8WAY PORT_CATEGORY(2) // XA
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_PLAYER(1) PORT_8WAY PORT_CATEGORY(2) // YA
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_PLAYER(1) PORT_8WAY PORT_CATEGORY(2) // YB
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_PLAYER(2) PORT_8WAY PORT_CATEGORY(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2) PORT_8WAY PORT_CATEGORY(2)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_PLAYER(2) PORT_8WAY PORT_CATEGORY(2)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_PLAYER(2) PORT_8WAY PORT_CATEGORY(2)
 
 	PORT_START("IKBD_JOY1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_CATEGORY(1)
@@ -1506,8 +1525,8 @@ static INPUT_PORTS_START( ste )
 	PORT_CONFSETTING( 0x00, "Mouse" )
 	PORT_CONFSETTING( 0x01, DEF_STR( Joystick ) )
 	PORT_CONFNAME( 0x80, 0x80, "Monitor")
-	PORT_CONFSETTING( 0x00, "Monochrome" )
-	PORT_CONFSETTING( 0x80, "Color" )
+	PORT_CONFSETTING( 0x00, "Monochrome (Atari SM124)" )
+	PORT_CONFSETTING( 0x80, "Color (Atari SC1435)" )
 
 	PORT_INCLUDE( ikbd )
 
@@ -2155,6 +2174,7 @@ void st_state::state_save()
 	state_save_register_global(machine, m_ikbd_mouse_pc);
 	state_save_register_global(machine, m_ikbd_rx);
 	state_save_register_global(machine, m_ikbd_tx);
+	state_save_register_global(machine, m_ikbd_joy);
 	state_save_register_global(machine, m_midi_rx);
 	state_save_register_global(machine, m_midi_tx);
 	state_save_register_global(machine, m_acia_ikbd_irq);

@@ -63,7 +63,8 @@ public:
 		  m_rs232(*this, RS232_TAG),
 		  m_ram(*this, RAM_TAG),
 		  m_acia_ikbd_irq(1),
-		  m_acia_midi_irq(1)
+		  m_acia_midi_irq(1),
+		  m_ikbd_joy(1)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -171,7 +172,7 @@ public:
 	/* keyboard state */
 	int m_acia_ikbd_irq;
 	int m_acia_midi_irq;
-	UINT8 m_ikbd_keylatch;
+	UINT16 m_ikbd_keylatch;
 	UINT8 m_ikbd_mouse_x;
 	UINT8 m_ikbd_mouse_y;
 	UINT8 m_ikbd_mouse_px;
@@ -179,6 +180,7 @@ public:
 	UINT8 m_ikbd_mouse_pc;
 	int m_ikbd_rx;
 	int m_ikbd_tx;
+	int m_ikbd_joy;
 	int m_midi_rx;
 	int m_midi_tx;
 
