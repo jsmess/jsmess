@@ -27,7 +27,7 @@
     - floppy write
     - floppy DMA transfer timer
     - MSA disk image support
-    - mouse
+    - mouse moves too fast?
     - UK keyboard layout for the special keys
     - accurate screen timing
     - STe DMA sound and LMC1992 Microwire mixer
@@ -410,6 +410,88 @@ WRITE8_MEMBER( st_state::mmu_w )
 //**************************************************************************
 
 //-------------------------------------------------
+//  mouse_tick -
+//-------------------------------------------------
+
+void st_state::mouse_tick()
+{
+	/*
+
+            Right   Left        Up      Down
+
+        XA  1100    0110    YA  1100    0110
+        XB  0110    1100    YB  0110    1100
+
+    */
+
+	UINT8 x = input_port_read_safe(machine, "IKBD_MOUSEX", 0x00);
+	UINT8 y = input_port_read_safe(machine, "IKBD_MOUSEY", 0x00);
+
+	if (m_ikbd_mouse_pc == 0)
+	{
+		if (x == m_ikbd_mouse_x)
+		{
+			logerror("IKBD Mouse X: static\n");
+			m_ikbd_mouse_px = IKBD_MOUSE_PHASE_STATIC;
+		}
+		else if ((x > m_ikbd_mouse_x) || (x == 0 && m_ikbd_mouse_x == 0xff))
+		{
+			logerror("IKBD Mouse X: positive\n");
+			m_ikbd_mouse_px = IKBD_MOUSE_PHASE_POSITIVE;
+		}
+		else if ((x < m_ikbd_mouse_x) || (x == 0xff && m_ikbd_mouse_x == 0))
+		{
+			logerror("IKBD Mouse X: negative\n");
+			m_ikbd_mouse_px = IKBD_MOUSE_PHASE_NEGATIVE;
+		}
+
+		if (y == m_ikbd_mouse_y)
+		{
+			logerror("IKBD Mouse Y: static\n");
+			m_ikbd_mouse_py = IKBD_MOUSE_PHASE_STATIC;
+		}
+		else if ((y > m_ikbd_mouse_y) || (y == 0 && m_ikbd_mouse_y == 0xff))
+		{
+			logerror("IKBD Mouse Y: positive\n");
+			m_ikbd_mouse_py = IKBD_MOUSE_PHASE_POSITIVE;
+		}
+		else if ((y < m_ikbd_mouse_y) || (y == 0xff && m_ikbd_mouse_y == 0))
+		{
+			logerror("IKBD Mouse Y: negative\n");
+			m_ikbd_mouse_py = IKBD_MOUSE_PHASE_NEGATIVE;
+		}
+
+		m_ikbd_mouse_x = x;
+		m_ikbd_mouse_y = y;
+	}
+
+	m_ikbd_mouse = 0;
+
+	m_ikbd_mouse |= IKBD_MOUSE_XYB[m_ikbd_mouse_px][m_ikbd_mouse_pc];		 // XB
+	m_ikbd_mouse |= IKBD_MOUSE_XYA[m_ikbd_mouse_px][m_ikbd_mouse_pc] << 1; // XA
+	m_ikbd_mouse |= IKBD_MOUSE_XYB[m_ikbd_mouse_py][m_ikbd_mouse_pc] << 2; // YA
+	m_ikbd_mouse |= IKBD_MOUSE_XYA[m_ikbd_mouse_py][m_ikbd_mouse_pc] << 3; // YB
+
+	logerror("IBKD Mouse pc %u data %02x\n", m_ikbd_mouse_pc, m_ikbd_mouse);
+
+	m_ikbd_mouse_pc++;
+	m_ikbd_mouse_pc &= 0x03;
+}
+
+
+//-------------------------------------------------
+//  TIMER_CALLBACK( st_mouse_tick )
+//-------------------------------------------------
+
+static TIMER_CALLBACK( st_mouse_tick )
+{
+	st_state *state = machine->driver_data<st_state>();
+
+	state->mouse_tick();
+}
+
+
+//-------------------------------------------------
 //  ikbd_port1_r -
 //-------------------------------------------------
 
@@ -558,68 +640,14 @@ READ8_MEMBER( st_state::ikbd_port4_r )
 
 	if (m_ikbd_joy) return 0xff;
 
-	if (input_port_read(machine, "config") & 0x01)
+	UINT8 data = input_port_read_safe(machine, "IKBD_JOY0", 0xff);
+
+	if ((input_port_read(machine, "config") & 0x01) == 0)
 	{
-		return input_port_read_safe(machine, "IKBD_JOY0", 0xff);
+		data = (data & 0xf0) | m_ikbd_mouse;
 	}
-	else
-	{
-		/*
 
-                Right   Left        Up      Down
-
-            XA  1100    0110    YA  1100    0110
-            XB  0110    1100    YB  0110    1100
-
-        */
-
-		UINT8 data = input_port_read_safe(machine, "IKBD_JOY0", 0xff) & 0xf0;
-		UINT8 x = input_port_read_safe(machine, "IKBD_MOUSEX", 0x00);
-		UINT8 y = input_port_read_safe(machine, "IKBD_MOUSEY", 0x00);
-
-		if (x == m_ikbd_mouse_x)
-		{
-			m_ikbd_mouse_px = IKBD_MOUSE_PHASE_STATIC;
-		}
-		else if (x > m_ikbd_mouse_x)
-		{
-			m_ikbd_mouse_px = IKBD_MOUSE_PHASE_POSITIVE;
-		}
-		else if (x < m_ikbd_mouse_x)
-		{
-			m_ikbd_mouse_px = IKBD_MOUSE_PHASE_NEGATIVE;
-		}
-
-		if (y == m_ikbd_mouse_y)
-		{
-			m_ikbd_mouse_py = IKBD_MOUSE_PHASE_STATIC;
-		}
-		else if (y > m_ikbd_mouse_y)
-		{
-			m_ikbd_mouse_py = IKBD_MOUSE_PHASE_POSITIVE;
-		}
-		else if (y < m_ikbd_mouse_y)
-		{
-			m_ikbd_mouse_py = IKBD_MOUSE_PHASE_NEGATIVE;
-		}
-
-		data |= IKBD_MOUSE_XYB[m_ikbd_mouse_px][m_ikbd_mouse_pc];		 // XB
-		data |= IKBD_MOUSE_XYA[m_ikbd_mouse_px][m_ikbd_mouse_pc] << 1; // XA
-		data |= IKBD_MOUSE_XYA[m_ikbd_mouse_py][m_ikbd_mouse_pc] << 2; // YA
-		data |= IKBD_MOUSE_XYB[m_ikbd_mouse_py][m_ikbd_mouse_pc] << 3; // YB
-
-		m_ikbd_mouse_pc++;
-
-		if (m_ikbd_mouse_pc == 4)
-		{
-			m_ikbd_mouse_pc = 0;
-		}
-
-		m_ikbd_mouse_x = x;
-		m_ikbd_mouse_y = y;
-
-		return data;
-	}
+	return data;
 }
 
 
@@ -1196,6 +1224,18 @@ static ADDRESS_MAP_START( st_map, ADDRESS_SPACE_PROGRAM, 16, st_state )
 	AM_RANGE(0xff8608, 0xff860d) AM_READWRITE8(dma_counter_r, dma_base_w, 0x00ff)
 	AM_RANGE(0xff8800, 0xff8801) AM_DEVREADWRITE8_LEGACY(YM2149_TAG, ay8910_r, ay8910_data_w, 0xff00)
 	AM_RANGE(0xff8802, 0xff8803) AM_DEVWRITE8_LEGACY(YM2149_TAG, ay8910_data_w, 0xff00)
+	AM_RANGE(0xff8a00, 0xff8a1f) AM_READWRITE(blitter_halftone_r, blitter_halftone_w)
+	AM_RANGE(0xff8a20, 0xff8a21) AM_READWRITE(blitter_src_inc_x_r, blitter_src_inc_x_w)
+	AM_RANGE(0xff8a22, 0xff8a23) AM_READWRITE(blitter_src_inc_y_r, blitter_src_inc_y_w)
+	AM_RANGE(0xff8a24, 0xff8a27) AM_READWRITE(blitter_src_r, blitter_src_w)
+	AM_RANGE(0xff8a28, 0xff8a2d) AM_READWRITE(blitter_end_mask_r, blitter_end_mask_w)
+	AM_RANGE(0xff8a2e, 0xff8a2f) AM_READWRITE(blitter_dst_inc_x_r, blitter_dst_inc_x_w)
+	AM_RANGE(0xff8a30, 0xff8a31) AM_READWRITE(blitter_dst_inc_y_r, blitter_dst_inc_y_w)
+	AM_RANGE(0xff8a32, 0xff8a35) AM_READWRITE(blitter_dst_r, blitter_dst_w)
+	AM_RANGE(0xff8a36, 0xff8a37) AM_READWRITE(blitter_count_x_r, blitter_count_x_w)
+	AM_RANGE(0xff8a38, 0xff8a39) AM_READWRITE(blitter_count_y_r, blitter_count_y_w)
+	AM_RANGE(0xff8a3a, 0xff8a3b) AM_READWRITE(blitter_op_r, blitter_op_w)
+	AM_RANGE(0xff8a3c, 0xff8a3d) AM_READWRITE(blitter_ctrl_r, blitter_ctrl_w)
 	AM_RANGE(0xfffa00, 0xfffa3f) AM_DEVREADWRITE8(MC68901_TAG, mc68901_device, read, write, 0x00ff)
 	AM_RANGE(0xfffc00, 0xfffc01) AM_DEVREADWRITE8_LEGACY(MC6850_0_TAG, acia6850_stat_r, acia6850_ctrl_w, 0xff00)
 	AM_RANGE(0xfffc02, 0xfffc03) AM_DEVREADWRITE8_LEGACY(MC6850_0_TAG, acia6850_data_r, acia6850_data_w, 0xff00)
@@ -2209,6 +2249,7 @@ void st_state::state_save()
 	state_save_register_global(machine, m_fdc_sectors);
 	state_save_register_global(machine, m_fdc_dmabytes);
 	state_save_register_global(machine, m_ikbd_keylatch);
+	state_save_register_global(machine, m_ikbd_mouse);
 	state_save_register_global(machine, m_ikbd_mouse_x);
 	state_save_register_global(machine, m_ikbd_mouse_y);
 	state_save_register_global(machine, m_ikbd_mouse_px);
@@ -2230,13 +2271,17 @@ void st_state::state_save()
 
 void st_state::machine_start()
 {
-	/* configure RAM banking */
+	// configure RAM banking
 	configure_memory();
 
-	/* set CPU interrupt callback */
+	// set CPU interrupt callback
 	cpu_set_irq_callback(m_maincpu, atarist_int_ack);
 
-	/* register for state saving */
+	// allocate timers
+	m_mouse_timer = timer_alloc(machine, st_mouse_tick, NULL);
+	timer_adjust_periodic(m_mouse_timer, attotime::zero, 0, attotime::from_hz(500));
+	
+	// register for state saving
 	state_save();
 }
 

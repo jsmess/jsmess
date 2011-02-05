@@ -64,6 +64,11 @@ public:
 		  m_ram(*this, RAM_TAG),
 		  m_acia_ikbd_irq(1),
 		  m_acia_midi_irq(1),
+		  m_ikbd_mouse_x(0),
+		  m_ikbd_mouse_y(0),
+		  m_ikbd_mouse_px(IKBD_MOUSE_PHASE_STATIC),
+		  m_ikbd_mouse_py(IKBD_MOUSE_PHASE_STATIC),
+		  m_ikbd_mouse_pc(0),
 		  m_ikbd_joy(1)
 	{ }
 
@@ -116,6 +121,7 @@ public:
 	DECLARE_WRITE16_MEMBER( blitter_op_w );
 	DECLARE_WRITE16_MEMBER( blitter_ctrl_w );
 
+	void mouse_tick();
 	inline pen_t shift_mode_0();
 	inline pen_t shift_mode_1();
 	inline pen_t shift_mode_2();
@@ -173,6 +179,7 @@ public:
 	int m_acia_ikbd_irq;
 	int m_acia_midi_irq;
 	UINT16 m_ikbd_keylatch;
+	UINT8 m_ikbd_mouse;
 	UINT8 m_ikbd_mouse_x;
 	UINT8 m_ikbd_mouse_y;
 	UINT8 m_ikbd_mouse_px;
@@ -238,6 +245,7 @@ public:
 	UINT32 m_blitter_srcbuf;
 	
 	/* timers */
+	emu_timer *m_mouse_timer;
 	emu_timer *m_glue_timer;
 	emu_timer *m_shifter_timer;
 };
