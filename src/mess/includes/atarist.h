@@ -249,7 +249,8 @@ public:
 		: st_state(machine, config)
 	{ }
 
-	void machine_start();
+	DECLARE_READ16_MEMBER( fpu_r );
+	DECLARE_WRITE16_MEMBER( fpu_w );
 };
 
 class ste_state : public st_state

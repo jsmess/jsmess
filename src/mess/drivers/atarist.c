@@ -643,10 +643,30 @@ WRITE8_MEMBER( st_state::ikbd_port4_w )
         7       Keyboard row select
 
     */
-
-
+		
 	// keyboard row select
 	m_ikbd_keylatch = (data << 8) | (m_ikbd_keylatch & 0xff);
+}
+
+
+
+//**************************************************************************
+//	FPU
+//**************************************************************************
+
+//-------------------------------------------------
+//  fpu_r -
+//-------------------------------------------------
+
+READ16_MEMBER( megast_state::fpu_r )
+{
+	// HACK diagnostic cartridge wants to see this value
+	return 0x0802;
+}
+
+
+WRITE16_MEMBER( megast_state::fpu_w )
+{
 }
 
 
@@ -1159,6 +1179,7 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 static ADDRESS_MAP_START( st_map, ADDRESS_SPACE_PROGRAM, 16, st_state )
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x000007) AM_ROM AM_REGION(M68000_TAG, 0)
 	AM_RANGE(0x000008, 0x1fffff) AM_RAM
 	AM_RANGE(0x200000, 0x3fffff) AM_RAM
@@ -1188,21 +1209,42 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 static ADDRESS_MAP_START( megast_map, ADDRESS_SPACE_PROGRAM, 16, megast_state )
-	AM_IMPORT_FROM(st_map)
-/*	AM_RANGE(0xff7f30, 0xff7f31) AM_READWRITE(blitter_dst_inc_y_r, blitter_dst_inc_y_w) // for TOS 1.02
-	AM_RANGE(0xff8a00, 0xff8a1f) AM_READWRITE(blitter_halftone_r, blitter_halftone_w)
-	AM_RANGE(0xff8a20, 0xff8a21) AM_READWRITE(blitter_src_inc_x_r, blitter_src_inc_x_w)
-	AM_RANGE(0xff8a22, 0xff8a23) AM_READWRITE(blitter_src_inc_y_r, blitter_src_inc_y_w)
-	AM_RANGE(0xff8a24, 0xff8a27) AM_READWRITE(blitter_src_r, blitter_src_w)
-	AM_RANGE(0xff8a28, 0xff8a2d) AM_READWRITE(blitter_end_mask_r, blitter_end_mask_w)
-	AM_RANGE(0xff8a2e, 0xff8a2f) AM_READWRITE(blitter_dst_inc_x_r, blitter_dst_inc_x_w)
-	AM_RANGE(0xff8a30, 0xff8a31) AM_READWRITE(blitter_dst_inc_y_r, blitter_dst_inc_y_w)
-	AM_RANGE(0xff8a32, 0xff8a35) AM_READWRITE(blitter_dst_r, blitter_dst_w)
-	AM_RANGE(0xff8a36, 0xff8a37) AM_READWRITE(blitter_count_x_r, blitter_count_x_w)
-	AM_RANGE(0xff8a38, 0xff8a39) AM_READWRITE(blitter_count_y_r, blitter_count_y_w)
-	AM_RANGE(0xff8a3a, 0xff8a3b) AM_READWRITE(blitter_op_r, blitter_op_w)
-	AM_RANGE(0xff8a3c, 0xff8a3d) AM_READWRITE(blitter_ctrl_r, blitter_ctrl_w)
-	AM_RANGE(0xfffa40, 0xfffa57) AM_READWRITE(fpu_r, fpu_w)*/
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x000000, 0x000007) AM_ROM AM_REGION(M68000_TAG, 0)
+	AM_RANGE(0x000008, 0x1fffff) AM_RAM
+	AM_RANGE(0x200000, 0x3fffff) AM_RAM
+	AM_RANGE(0xfa0000, 0xfbffff) AM_ROM AM_REGION("cart", 0)
+	AM_RANGE(0xfc0000, 0xfeffff) AM_ROM AM_REGION(M68000_TAG, 0)
+//	AM_RANGE(0xff7f30, 0xff7f31) AM_READWRITE_BASE(st_state, blitter_dst_inc_y_r, blitter_dst_inc_y_w) // for TOS 1.02
+	AM_RANGE(0xff8000, 0xff8001) AM_READWRITE8_BASE(st_state, mmu_r, mmu_w, 0x00ff)
+	AM_RANGE(0xff8200, 0xff8203) AM_READWRITE8_BASE(st_state, shifter_base_r, shifter_base_w, 0x00ff)
+	AM_RANGE(0xff8204, 0xff8209) AM_READ8_BASE(st_state, shifter_counter_r, 0x00ff)
+	AM_RANGE(0xff820a, 0xff820b) AM_READWRITE8_BASE(st_state, shifter_sync_r, shifter_sync_w, 0xff00)
+	AM_RANGE(0xff8240, 0xff825f) AM_READWRITE_BASE(st_state, shifter_palette_r, shifter_palette_w)
+	AM_RANGE(0xff8260, 0xff8261) AM_READWRITE8_BASE(st_state, shifter_mode_r, shifter_mode_w, 0xff00)
+	AM_RANGE(0xff8604, 0xff8605) AM_READWRITE_BASE(st_state, fdc_data_r, fdc_data_w)
+	AM_RANGE(0xff8606, 0xff8607) AM_READWRITE_BASE(st_state, dma_status_r, dma_mode_w)
+	AM_RANGE(0xff8608, 0xff860d) AM_READWRITE8_BASE(st_state, dma_counter_r, dma_base_w, 0x00ff)
+	AM_RANGE(0xff8800, 0xff8801) AM_DEVREADWRITE8_LEGACY(YM2149_TAG, ay8910_r, ay8910_data_w, 0xff00)
+	AM_RANGE(0xff8802, 0xff8803) AM_DEVWRITE8_LEGACY(YM2149_TAG, ay8910_data_w, 0xff00)
+	AM_RANGE(0xff8a00, 0xff8a1f) AM_READWRITE_BASE(st_state, blitter_halftone_r, blitter_halftone_w)
+	AM_RANGE(0xff8a20, 0xff8a21) AM_READWRITE_BASE(st_state, blitter_src_inc_x_r, blitter_src_inc_x_w)
+	AM_RANGE(0xff8a22, 0xff8a23) AM_READWRITE_BASE(st_state, blitter_src_inc_y_r, blitter_src_inc_y_w)
+	AM_RANGE(0xff8a24, 0xff8a27) AM_READWRITE_BASE(st_state, blitter_src_r, blitter_src_w)
+	AM_RANGE(0xff8a28, 0xff8a2d) AM_READWRITE_BASE(st_state, blitter_end_mask_r, blitter_end_mask_w)
+	AM_RANGE(0xff8a2e, 0xff8a2f) AM_READWRITE_BASE(st_state, blitter_dst_inc_x_r, blitter_dst_inc_x_w)
+	AM_RANGE(0xff8a30, 0xff8a31) AM_READWRITE_BASE(st_state, blitter_dst_inc_y_r, blitter_dst_inc_y_w)
+	AM_RANGE(0xff8a32, 0xff8a35) AM_READWRITE_BASE(st_state, blitter_dst_r, blitter_dst_w)
+	AM_RANGE(0xff8a36, 0xff8a37) AM_READWRITE_BASE(st_state, blitter_count_x_r, blitter_count_x_w)
+	AM_RANGE(0xff8a38, 0xff8a39) AM_READWRITE_BASE(st_state, blitter_count_y_r, blitter_count_y_w)
+	AM_RANGE(0xff8a3a, 0xff8a3b) AM_READWRITE_BASE(st_state, blitter_op_r, blitter_op_w)
+	AM_RANGE(0xff8a3c, 0xff8a3d) AM_READWRITE_BASE(st_state, blitter_ctrl_r, blitter_ctrl_w)
+	AM_RANGE(0xfffa00, 0xfffa3f) AM_DEVREADWRITE8(MC68901_TAG, mc68901_device, read, write, 0x00ff)
+	AM_RANGE(0xfffa40, 0xfffa57) AM_READWRITE(fpu_r, fpu_w)
+	AM_RANGE(0xfffc00, 0xfffc01) AM_DEVREADWRITE8_LEGACY(MC6850_0_TAG, acia6850_stat_r, acia6850_ctrl_w, 0xff00)
+	AM_RANGE(0xfffc02, 0xfffc03) AM_DEVREADWRITE8_LEGACY(MC6850_0_TAG, acia6850_data_r, acia6850_data_w, 0xff00)
+	AM_RANGE(0xfffc04, 0xfffc05) AM_DEVREADWRITE8_LEGACY(MC6850_1_TAG, acia6850_stat_r, acia6850_ctrl_w, 0xff00)
+	AM_RANGE(0xfffc06, 0xfffc07) AM_DEVREADWRITE8_LEGACY(MC6850_1_TAG, acia6850_data_r, acia6850_data_w, 0xff00)
 	AM_RANGE(0xfffc20, 0xfffc3f) AM_DEVREADWRITE_LEGACY(RP5C15_TAG, rp5c15_r, rp5c15_w)
 ADDRESS_MAP_END
 
@@ -2340,13 +2382,49 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( megast )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( megast, st )
-	MCFG_CPU_MODIFY(M68000_TAG)
+static MACHINE_CONFIG_START( megast, megast_state )
+	// basic machine hardware
+	MCFG_CPU_ADD(M68000_TAG, M68000, Y2/4)
 	MCFG_CPU_PROGRAM_MAP(megast_map)
+
+	MCFG_CPU_ADD(HD6301V1_TAG, HD63701, XTAL_4MHz)
+	MCFG_CPU_PROGRAM_MAP(ikbd_map)
+	MCFG_CPU_IO_MAP(ikbd_io_map)
+
+	// video hardware
+	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_RAW_PARAMS(Y2/4, ATARIST_HTOT_PAL, ATARIST_HBEND_PAL, ATARIST_HBSTART_PAL, ATARIST_VTOT_PAL, ATARIST_VBEND_PAL, ATARIST_VBSTART_PAL)
+
+	MCFG_PALETTE_LENGTH(16)
+
+	MCFG_VIDEO_UPDATE(generic_bitmapped)
+
+	// sound hardware
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD(YM2149_TAG, YM2149, Y2/16)
+	MCFG_SOUND_CONFIG(psg_intf)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+
+	// devices
+	MCFG_ACIA6850_ADD(MC6850_0_TAG, acia_ikbd_intf)
+	MCFG_ACIA6850_ADD(MC6850_1_TAG, acia_midi_intf)
+	MCFG_MC68901_ADD(MC68901_TAG, Y2/8, mfp_intf)
+	MCFG_WD1772_ADD(WD1772_TAG, fdc_intf)
+	MCFG_FLOPPY_2_DRIVES_ADD(atarist_floppy_config)
+	MCFG_RS232_ADD(RS232_TAG, rs232_intf)
+	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_intf)
 	MCFG_RP5C15_ADD(RP5C15_TAG, rtc_intf)
 
-	/* internal ram */
-	MCFG_RAM_MODIFY(RAM_TAG)
+	// cartridge
+	MCFG_CARTSLOT_ADD("cart")
+	MCFG_CARTSLOT_EXTENSION_LIST("bin,rom")
+	MCFG_CARTSLOT_NOT_MANDATORY
+	MCFG_CARTSLOT_INTERFACE("st_cart")
+	MCFG_SOFTWARE_LIST_ADD("cart_list", "st")
+
+	// internal ram
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("4M")  //  Mega ST 4
 	MCFG_RAM_EXTRA_OPTIONS("2M,1M") //  Mega ST 2 ,Mega ST 1
 MACHINE_CONFIG_END
