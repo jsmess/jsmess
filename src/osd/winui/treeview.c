@@ -336,8 +336,8 @@ BOOL GameFiltered(int nGame, DWORD dwMask)
 	//Filter out the Bioses on all Folders, except for the Bios Folder
 	if( lpFolder->m_nFolderId != FOLDER_BIOS )
 	{
-		if( !( (drivers[nGame]->flags & GAME_IS_BIOS_ROOT ) == 0) )
-			return TRUE;
+//		if( !( (drivers[nGame]->flags & GAME_IS_BIOS_ROOT ) == 0) )
+//			return TRUE;
 	}
  	// Filter games--return TRUE if the game should be HIDDEN in this view
 	if( GetFilterInherit() )
