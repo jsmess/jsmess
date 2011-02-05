@@ -346,15 +346,6 @@ static int GetMessIcon(int drvindex, int nSoftwareType)
     return nIconPos;
 }
 
-
-#ifdef UNUSED_FUNCTION
-static void MessHashErrorProc(const char *message)
-{
-	SetStatusBarTextF(0, "Hash file: %s", message);
-}
-#endif
-
-
 static BOOL AddSoftwarePickerDirs(HWND hwndPicker, LPCSTR pszDirectories, LPCSTR pszSubDir)
 {
 	LPCSTR s;

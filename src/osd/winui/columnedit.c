@@ -162,16 +162,6 @@ INT_PTR InternalColumnDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lPar
 		/* Get the Column Order and save it */
 		pfnGetRealColumnOrder(order);
 
-#if 0
-        {
-            char tmp[80];
-            
-            sprintf(tmp,"ColumnOrder: %d,%d,%d,%d,%d,%d,%d,%d,%d,%d, %d",
-                order[0], order[1], order[2], order[3], order[4],
-                order[5], order[6], order[7], order[8], order[9], order[10]);
-            MessageBox(0, tmp, "Column Order", IDOK);
-        }
-#endif
 		for (i = 0 ; i < nColumnMax; i++)
 		{		 
 			lvi.pszText = (TCHAR *) names[order[i]];
@@ -425,21 +415,6 @@ INT_PTR InternalColumnDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lPar
 						order[nCount++]   = lvi.lParam;
 						shown[lvi.lParam] = FALSE;
 					}
-#if 0
-					{
-						char tmp[80];
-						sprintf(tmp,"Shown (%d) - Hidden (%d)",nShown,nAvail);
-						MessageBox(0,tmp,"List Counts",IDOK);
-						sprintf(tmp,"ColumnOrder: %d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d",
-							order[0], order[1], order[2], order[3], order[4],
-							order[5], order[6], order[7], order[8], order[9], shown[10]);
-						MessageBox(0,tmp,"Column Order", IDOK);
-						sprintf(tmp,"ColumnShown: %d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d",
-							shown[0], shown[1], shown[2], shown[3], shown[4],
-							shown[5], shown[6], shown[7], shown[8], shown[9], shown[10]);
-						MessageBox(0,tmp,"Column Shown", IDOK);
-					}
-#endif
 					pfnSetColumnInfo(order, shown);
 					EndDialog(hDlg, 1);
 					return TRUE;

@@ -224,15 +224,7 @@ static void remove_all_source_options(void);
     Internal structures
  ***************************************************************************/
 
-#if 0
-typedef struct
-{
-	int folder_index;
-	int filters;
-} folder_filter_type;
-#endif
-
-/***************************************************************************
+ /***************************************************************************
     Internal variables
  ***************************************************************************/
 
@@ -428,12 +420,6 @@ static const char *const image_tabs_short_name[MAX_TAB_TYPES] =
 static BOOL save_gui_settings = TRUE;
 static BOOL save_default_options = TRUE;
 
-#if 0
-folder_filter_type *folder_filters;
-int size_folder_filters;
-int num_folder_filters;
-#endif
-
 /***************************************************************************
     External functions
  ***************************************************************************/
@@ -562,12 +548,6 @@ BOOL OptionsInit()
 
 	// set up global options
 	global = CreateGameOptions(OPTIONS_TYPE_GLOBAL);
-#if 0
-	// set up folders
-	size_folder_filters = 1;
-	num_folder_filters = 0;
-	folder_filters = (folder_filter_type *) pool_malloc_lib(options_memory_pool, size_folder_filters * sizeof(*folder_filters));
-#endif
 	// now load the options and settings
 	LoadOptionsAndSettings();
 
@@ -599,24 +579,6 @@ core_options * MameUIGlobal(void)
 {
 	return global;
 }
-
-#if 0
-static void LoadFolderFilter(int folder_index,int filters)
-{
-	//dprintf("loaded folder filter %i %i\n",folder_index,filters);
-
-	if (num_folder_filters == size_folder_filters)
-	{
-		size_folder_filters *= 2;
-		folder_filters = (folder_filter_type *)realloc(
-			folder_filters,size_folder_filters * sizeof(folder_filter_type));
-	}
-	folder_filters[num_folder_filters].folder_index = folder_index;
-	folder_filters[num_folder_filters].filters = filters;
-
-	num_folder_filters++;
-}
-#endif
 
 // Restore ui settings to factory
 void ResetGUI(void)
@@ -2368,19 +2330,6 @@ DWORD GetFolderFlags(int folder_index)
 		return lpFolder->m_dwFlags & F_MASK;
 
 	return 0;
-#if 0
-	int i;
-
-	for (i=0;i<num_folder_filters;i++)
-	{
-		if (folder_filters[i].folder_index == folder_index)
-		{
-			//dprintf("found folder filter %i %i\n",folder_index,folder_filters[i].filters);
-			return folder_filters[i].filters;
-		}
-	}
-	return 0;
-#endif
 }
 
 

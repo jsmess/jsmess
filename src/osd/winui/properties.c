@@ -195,10 +195,6 @@ static BOOL ResetDebugscript(HWND hWnd);
 static void BuildDataMap(void);
 static void ResetDataMap(HWND hWnd);
 
-#if 0
-static BOOL IsControlOptionValue(HWND hDlg,HWND hwnd_ctrl, core_options *opts );
-#endif
-
 static void UpdateBackgroundBrush(HWND hwndTab);
 static HBRUSH hBkBrush;
 
@@ -1346,116 +1342,6 @@ INT_PTR CALLBACK GameOptionsProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lPar
 		}
 		break;
 
-#if 0
-	/* FIXME 
-	 * We need to figure out in which ini of our hierarchy the current value is set, then apply the corresponding colouring.
-	 * Is there an easy way to figure this out?
-	 * The actual colour coding should still work
-	 */
-	case WM_CTLCOLORSTATIC :
-	case WM_CTLCOLOREDIT :
-		{
-			int nParentIndex = 0;
-			if( g_nGame >= 0 )
-			{
-				if( DriverIsClone(g_nGame) )
-				{
-					nParentIndex = GetParentIndex( drivers[g_nGame] );
-				}
-			}
-			//Set the Coloring of the elements
-			if (GetWindowLong((HWND)lParam, GWL_ID) < 0) {
-				break;
-			}
-			if (IsControlOptionValue(hDlg,(HWND)lParam, GetDefaultOptions( -1, FALSE) ) )
-			{
-				//Normal Black case
-				SetTextColor((HDC)wParam,COLOR_WINDOWTEXT);
-			}
-			else if (IsControlOptionValue(hDlg,(HWND)lParam, GetHorizontalOptions() )  && !DriverIsVertical(g_nFolderGame) )
-			{
-				SetTextColor((HDC)wParam,ORIENTATION_COLOR);
-			}
-			else if (IsControlOptionValue(hDlg,(HWND)lParam, GetVerticalOptions() )  && DriverIsVertical(g_nFolderGame) )
-			{
-				SetTextColor((HDC)wParam,ORIENTATION_COLOR);
-			}
-			else if (IsControlOptionValue(hDlg,(HWND)lParam, GetVectorOptions() )  && DriverIsVector(g_nFolderGame) )
-			{
-				SetTextColor((HDC)wParam,VECTOR_COLOR);
-			}
-			else if (IsControlOptionValue(hDlg,(HWND)lParam, GetSourceOptions(g_nFolderGame ) ) )
-			{
-				SetTextColor((HDC)wParam,FOLDER_COLOR);
-			}
-			else if ((nParentIndex >=0) && (IsControlOptionValue(hDlg,(HWND)lParam, GetGameOptions(nParentIndex, g_nFolder ) ) ) )
-			{
-				SetTextColor((HDC)wParam,PARENT_COLOR);
-			}
-			else if ( (g_nGame >= 0) && (IsControlOptionValue(hDlg,(HWND)lParam, pOrigOpts ) ) )
-			{
-				SetTextColor((HDC)wParam,GAME_COLOR);
-			}
-			else
-			{
-				switch ( g_nPropertyMode )
-				{
-					case OPTIONS_GAME:
-						SetTextColor((HDC)wParam,GAME_COLOR);
-						break;
-					case OPTIONS_SOURCE:
-						SetTextColor((HDC)wParam,FOLDER_COLOR);
-						break;
-					case OPTIONS_VECTOR:
-						SetTextColor((HDC)wParam,VECTOR_COLOR);
-						break;
-					case OPTIONS_HORIZONTAL:
-						SetTextColor((HDC)wParam,ORIENTATION_COLOR);
-						break;
-					case OPTIONS_VERTICAL:
-						SetTextColor((HDC)wParam,ORIENTATION_COLOR);
-						break;
-					default:
-					case OPTIONS_GLOBAL:
-						SetTextColor((HDC)wParam,COLOR_WINDOWTEXT);
-						break;
-				}
-			}
-			if( Msg == WM_CTLCOLORSTATIC )
-			{
-				if (SafeIsAppThemed())
-				{
-					RECT rc;
-					HWND hWnd = PropSheet_GetTabControl(GetParent(hDlg));
-					// Set the background mode to transparent
-					SetBkMode((HDC)wParam, TRANSPARENT);
-
-					// Get the controls window dimensions
-					GetWindowRect((HWND)lParam, &rc);
-
-					// Map the coordinates to coordinates with the upper left corner of dialog control as base
-					MapWindowPoints(NULL, hWnd, (LPPOINT)(&rc), 2);
-
-					// Adjust the position of the brush for this control (else we see the top left of the brush as background)
-					SetBrushOrgEx((HDC)wParam, -rc.left, -rc.top, NULL);
-
-					// Return the brush
-					return (INT_PTR)(hBkBrush);
-				}
-				else
-				{
-					SetBkColor((HDC) wParam,GetSysColor(COLOR_3DFACE) );
-				}
-			}
-			else {
-				SetBkColor((HDC)wParam,RGB(255,255,255) );
-			}
-			UnrealizeObject(background_brush);
-			return (DWORD)background_brush;
-		}
-		break;
-#endif
-
 	case WM_HELP:
 		/* User clicked the ? from the upper right on a control */
 		HelpFunction((HWND)((LPHELPINFO)lParam)->hItemHandle, MAMEUICONTEXTHELP, HH_TP_HELP_WM_HELP, GetHelpIDs());
@@ -2505,75 +2391,6 @@ static void BuildDataMap(void)
 
 	MessBuildDataMap(properties_datamap);
 }
-
-#if 0
-BOOL IsControlOptionValue(HWND hDlg,HWND hwnd_ctrl, core_options *opts )
-{
-	int control_id = GetWindowLong(hwnd_ctrl, GWL_ID);
-
-	// certain controls we need to handle specially
-	switch (control_id)
-	{
-		case IDC_ASPECTRATION :
-		{
-			char aspect_option[32];
-			int n1 = 0, n2 = 0;
-			int d1 = 0, d2 = 0;
-
-			snprintf(aspect_option, ARRAY_LENGTH(aspect_option), "aspect%d", GetSelectedScreen(hDlg));
-
-			sscanf(options_get_string(pCurrentOpts, aspect_option), "%d:%d", &n1, &d1);
-			sscanf(options_get_string(opts, aspect_option), "%d:%d", &n2, &d2);
-
-			return n1 == n2;
-		}
-		case IDC_ASPECTRATIOD :
-		{
-			char aspect_option[32];
-			int n1 = 0, n2 = 0;
-			int d1 = 0, d2 = 0;
-
-			snprintf(aspect_option, ARRAY_LENGTH(aspect_option), "aspect%d", GetSelectedScreen(hDlg));
-
-			sscanf(options_get_string(pCurrentOpts, aspect_option), "%d:%d", &n1, &d1);
-			sscanf(options_get_string(opts, aspect_option), "%d:%d", &n2, &d2);
-
-			return d1 == d2;
-		}
-		case IDC_SIZES :
-		{
-			char resolution_option[32];
-			int x1=0,y1=0,x2=0,y2=0;
-
-			snprintf(resolution_option, ARRAY_LENGTH(resolution_option), "resolution%d", GetSelectedScreen(hDlg));
-
-			if ((strcmp(options_get_string(pCurrentOpts, resolution_option), "auto") == 0) &&
-				(strcmp(options_get_string(opts, resolution_option), "auto") == 0))
-				return TRUE;
-			
-			sscanf(options_get_string(pCurrentOpts, resolution_option),"%d x %d",&x1,&y1);
-			sscanf(options_get_string(opts, resolution_option),"%d x %d",&x2,&y2);
-
-			return x1 == x2 && y1 == y2;		
-		}
-		case IDC_ROTATE :
-		{
-			datamap_read_control(properties_datamap, hDlg, pCurrentOpts, control_id);
-
-			return (options_get_bool(pCurrentOpts, OPTION_ROR) == options_get_bool(opts, OPTION_ROR))
-				|| (options_get_bool(pCurrentOpts, OPTION_ROL) == options_get_bool(opts, OPTION_ROL))
-				|| (options_get_bool(pCurrentOpts, OPTION_AUTOROR) == options_get_bool(opts, OPTION_AUTOROR))
-				|| (options_get_bool(pCurrentOpts, OPTION_AUTOROL) == options_get_bool(opts, OPTION_AUTOROL));
-		}
-	}
-
-	// most options we can compare using data in the data map
-	//if (IsControlDifferent(hDlg,hwnd_ctrl,pCurrentOpts,opts))
-	//	return FALSE;
-
-	return TRUE;
-}
-#endif
 
 static void SetSamplesEnabled(HWND hWnd, int nIndex, BOOL bSoundEnabled)
 {

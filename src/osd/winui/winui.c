@@ -870,56 +870,6 @@ extern const LPCTSTR column_names[COLUMN_MAX] =
 /***************************************************************************
     External functions
  ***************************************************************************/
-#if 0
-static void CopyOptions(core_options *pDestOpts, core_options *pSourceOpts)
-{
-	options_enumerator *enumerator;
-	const char *option_name;
-	const char *option_value;
-
-	enumerator = options_enumerator_begin(pSourceOpts);
-	if (enumerator != NULL)
-	{
-		while((option_name = options_enumerator_next(enumerator)) != NULL)
-		{
-			option_value = options_get_string(pSourceOpts, option_name);
-			if (option_value != NULL)
-			{
-				dprintf("CopyOptions(): Copying %s = \"%s\"\n", option_name, option_value);
-				options_set_string(pDestOpts, option_name, option_value, OPTION_PRIORITY_CMDLINE);
-			}
-		}
-		options_enumerator_free(enumerator);
-	}
-}
-
-static BOOL WaitWithMessageLoop(HANDLE hEvent)
-{
-	DWORD dwRet;
-	MSG   msg;
-
-	while (1)
-	{
-		dwRet = MsgWaitForMultipleObjects(1, &hEvent, FALSE, INFINITE, QS_ALLINPUT);
-
-		if (dwRet == WAIT_OBJECT_0)
-			return TRUE;
-
-		if (dwRet != WAIT_OBJECT_0 + 1)
-			break;
-
-		while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
-		{
-			TranslateMessage(&msg);
-			DispatchMessage(&msg);
-			if (WaitForSingleObject(hEvent, 0) == WAIT_OBJECT_0)
-				return TRUE;
-		}
-	}
-	return FALSE;
-}
-#endif
-
 static DWORD RunMAME(int nGameIndex, const play_options *playopts)
 {
 	time_t start, end;
@@ -1172,10 +1122,6 @@ static HICON FormatICOInMemoryToHICON(PBYTE ptrBuffer, UINT nBufferSize)
 
 	IconImage.lpBits = &ptrBuffer[nBufferIndex];
 	nBufferIndex += lpIDE->dwBytesInRes;
-#if 0  // Not sure we want odd sized icons.
-	hIcon = CreateIconFromResourceEx(IconImage.lpBits, IconImage.dwNumBytes, TRUE, 0x00030000,
-			(*(LPBITMAPINFOHEADER)(IconImage.lpBits)).biWidth, (*(LPBITMAPINFOHEADER)(IconImage.lpBits)).biHeight/2, 0 );
-#endif
 	/* It failed, odds are good we're on NT so try the non-Ex way */
 	if (hIcon == NULL)
 	{
@@ -2042,19 +1988,6 @@ static BOOL Win32UI_init(HINSTANCE hInstance, LPWSTR lpCmdLine, int nCmdShow)
 
 	/* clear keyboard state */
 	KeyboardStateClear();
-
-	#if 0
-	for (i = 0; i < NUM_GUI_SEQUENCES; i++)
-	{
-		const input_seq *is1;
-		input_seq *is2;
-		is1 = &(GUISequenceControl[i].is);
-		is2 = GUISequenceControl[i].getiniptr();
-		// FIXME
-		//input_seq_copy(is1, is2);
-		//dprintf("seq =%s is: %4i %4i %4i %4i\n",GUISequenceControl[i].name, (*is1)[0], (*is1)[1], (*is1)[2], (*is1)[3]);
-	}
-	#endif
 
 	if (GetJoyGUI() == TRUE)
 	{
@@ -3389,25 +3322,6 @@ static LPCSTR GetCloneParentName(int nItem)
 	return "";
 }
 
-#if 0
-static BOOL PickerHitTest(HWND hWnd)
-{
-	RECT			rect;
-	POINTS			p;
-	DWORD			res = GetMessagePos();
-	LVHITTESTINFO	htInfo;
-
-	ZeroMemory(&htInfo,sizeof(LVHITTESTINFO));
-	p = MAKEPOINTS(res);
-	GetWindowRect(hWnd, &rect);
-	htInfo.pt.x = p.x - rect.left;
-	htInfo.pt.y = p.y - rect.top;
-	ListView_HitTest(hWnd, &htInfo);
-
-	return (! (htInfo.flags & LVHT_NOWHERE));
-}
-#endif
-
 static BOOL TreeViewNotify(LPNMHDR nm)
 {
 	switch (nm->code)
@@ -3848,14 +3762,6 @@ static void PollGUIJoystick()
 		exec_counter = 0;
 	}
 }
-
-#if 0
-static void PressKey(HWND hwnd, UINT vk)
-{
-	SendMessage(hwnd, WM_KEYDOWN, vk, 0);
-	SendMessage(hwnd, WM_KEYUP,   vk, 0xc0000000);
-}
-#endif
 
 static void SetView(int menu_id)
 {
@@ -4873,12 +4779,6 @@ static const TCHAR *GamePicker_GetItemString(HWND hwndPicker, int nItem, int nCo
 		case COLUMN_ORIENTATION:
 			utf8_s = DriverIsVertical(nItem) ? "Vertical" : "Horizontal";
 			break;
-#if 0
-		case COLUMN_ROMS:
-			/* Has Roms */
-			utf8_s = GetAuditString(GetRomAuditResults(nItem));
-			break;
-#endif
 		case COLUMN_SAMPLES:
 			/* Samples */
 			if (DriverUsesSamples(nItem))
@@ -5301,39 +5201,6 @@ static int GamePicker_Compare(HWND hwndPicker, int index1, int index2, int sort_
 		nTemp2 = DriverIsVertical(index2) ? 1 : 0;
 		value = nTemp1 - nTemp2;
 		break;
-#if 0
-	case COLUMN_ROMS:
-		nTemp1 = GetRomAuditResults(index1);
-		nTemp2 = GetRomAuditResults(index2);
-
-		if (IsAuditResultKnown(nTemp1) == FALSE && IsAuditResultKnown(nTemp2) == FALSE)
-			return GamePicker_Compare(hwndPicker, index1, index2, COLUMN_GAMES);
-
-		if (IsAuditResultKnown(nTemp1) == FALSE)
-		{
-			value = 1;
-			break;
-		}
-
-		if (IsAuditResultKnown(nTemp2) == FALSE)
-		{
-			value = -1;
-			break;
-		}
-
-		// ok, both are known
-		if (IsAuditResultYes(nTemp1) && IsAuditResultYes(nTemp2))
-			return GamePicker_Compare(hwndPicker, index1, index2, COLUMN_GAMES);
-
-		if (IsAuditResultNo(nTemp1) && IsAuditResultNo(nTemp2))
-			return GamePicker_Compare(hwndPicker, index1, index2, COLUMN_GAMES);
-
-		if (IsAuditResultYes(nTemp1) && IsAuditResultNo(nTemp2))
-			value = -1;
-		else
-			value = 1;
-		break;
-#endif
 	case COLUMN_SAMPLES:
 		nTemp1 = -1;
 		if (DriverUsesSamples(index1))
@@ -6089,13 +5956,6 @@ static void AdjustMetrics(void)
 	SetWindowArea(&area);
 	SetWindowPos(hMain, 0, area.x, area.y, area.width, area.height, SWP_NOZORDER | SWP_SHOWWINDOW | SWP_NOACTIVATE);
 }
-
-#if 0
-/* Adjust options - tune them to the currently selected game */
-static void EnablePlayOptions(int nIndex, core_options *o)
-{
-}
-#endif
 
 int FindIconIndex(int nIconResource)
 {

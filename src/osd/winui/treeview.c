@@ -230,17 +230,6 @@ void InitTree(LPCFOLDERDATA lpFolderData, LPCFILTER_ITEM lpFilterList)
 	SetWindowLongPtr(GetTreeView(), GWLP_WNDPROC, (LONG_PTR)TreeWndProc);
 }
 
-#ifdef UNUSED_FUNCTION
-void DestroyTree(HWND hWnd)
-{
-    if ( hTreeSmall )
-    {
-        ImageList_Destroy( hTreeSmall );
-        hTreeSmall = NULL;
-    }
-}
-#endif
-
 void SetCurrentFolder(LPTREEFOLDER lpFolder)
 {
 	lpCurrentFolder = (lpFolder == 0) ? treeFolders[0] : lpFolder;
