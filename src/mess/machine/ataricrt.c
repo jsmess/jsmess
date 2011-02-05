@@ -224,10 +224,10 @@ static void a800_setup_mappers(running_machine *machine, int type)
 	switch (type)
 	{
 		case A800_4K:
-		case A800_8K:
-		case A800_12K:
-		case A800_16K:
 		case A800_RIGHT_4K:
+		case A800_12K:
+		case A800_8K:
+		case A800_16K:
 		case A800_RIGHT_8K:
 		case OSS_034M:
 		case OSS_M091:
@@ -247,13 +247,63 @@ static int a800_get_type(device_image_interface &image)
 {
 	UINT8 header[16];
 	image.fread(header, 0x10);
+	int hdr_type, cart_type;
 
 	// add check of CART format
 	if (strncmp((const char *)header, "CART", 4))
 		fatalerror("Invalid header detected!\n");
 
-	int cart_type = (header[4] << 24) + (header[5] << 16) +  (header[6] << 8) + (header[7] << 0);
-	printf("cart type: %x\n", cart_type);
+	hdr_type = (header[4] << 24) + (header[5] << 16) +  (header[6] << 8) + (header[7] << 0);
+	switch (hdr_type)
+	{
+		case 1:
+			cart_type = A800_8K;
+			break;
+		case 2:
+			cart_type = A800_16K;
+			break;
+		case 3:
+			cart_type = OSS_034M;
+			break;
+		case 8:
+			cart_type = WILLIAMS_64K;
+			break;
+		case 9:
+			cart_type = DIAMOND_64K;
+			break;
+		case 10:
+			cart_type = EXPRESS_64;
+			break;
+		case 11:
+			cart_type = SPARTADOS_X;
+			break;
+		case 12:
+			cart_type = XEGS_32K;
+			break;
+		case 15:
+			cart_type = OSS_M091;
+			break;
+		case 18:
+			cart_type = BBSB;
+			break;
+		case 21:
+			cart_type = A800_RIGHT_8K;
+			break;
+		case 39:
+			cart_type = PHOENIX_8K;
+			break;
+		case 4:
+		case 6:
+		case 7:
+		case 16:
+		case 19:
+		case 20:
+			fatalerror("Cart type \"%d\" means this is an Atari 5200 cart.\n", hdr_type);
+			break;
+		default:
+			mame_printf_info("Cart type \"%d\" is currently unsupported.\n", hdr_type);
+			break;
+	}	
 	return cart_type;
 }
 
@@ -261,42 +311,54 @@ DEVICE_IMAGE_LOAD( a800_cart )
 {
 	UINT8 *mem = image.device().machine->region("maincpu")->base();
 	const char	*pcb_name;
-	int cart_type = 0;
+	int cart_type = A800_UNKNOWN;
 	UINT32 size;
 
 	if (image.software_entry() == NULL)
 	{
 		size = image.length();
-		// check if there is an header, if so extract cart_type from it (after a800_get_type, we point at the start of the data)
+
+		// check if there is an header, if so extract cart_type from it, otherwise 
+		// try to guess the cart_type from the file size (notice that after the 
+		// a800_get_type call, we point at the start of the data)
 		if ((size % 0x1000) == 0x10)
 			cart_type = a800_get_type(image);
-		//else check size to decide type (assuming base type of cart only!)
+		else if (size == 0x4000)
+			cart_type = A800_16K;
+		else if (size == 0x2000)
+		{
+			if (strcmp(image.device().tag(),"cart2") == 0)
+				cart_type = A800_RIGHT_8K;
+			else
+				cart_type = A800_8K;
+		}
 	}
 	else
 	{
 		size = image.get_software_region_length("rom");
-		if ((pcb_name = image.get_feature("cart_type")) == NULL)
-			cart_type = A800_UNKNOWN;
-		else
+		if ((pcb_name = image.get_feature("cart_type")) != NULL)
 			cart_type = a800_get_pcb_id(pcb_name);
+
 		switch (cart_type)
 		{
+			case A800_UNKNOWN:
 			case A800_4K:
-			case A800_8K:
-			case A800_12K:
-			case A800_16K:
 			case A800_RIGHT_4K:
+			case A800_12K:
+			case A800_8K:
+			case A800_16K:
 			case A800_RIGHT_8K:
 				break;
 			default:
 				mame_printf_info("Cart type \"%s\" currently unsupported.\n", pcb_name);
 				break;
 		}
-		a800_setup_mappers(image.device().machine, cart_type);
 	}
 
+	a800_setup_mappers(image.device().machine, cart_type);
+
 	/* load an optional (dual) cartridge (e.g. basic.rom) */
-	if( strcmp(image.device().tag(),"cart2") == 0 )
+	if (strcmp(image.device().tag(),"cart2") == 0)
 	{
 		a800_cart_is_16k = (size >= 0x2000) ? 1 : 0;
 
