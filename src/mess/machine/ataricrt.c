@@ -76,13 +76,13 @@ static void a800_setbank(running_machine *machine, int n)
 
 	if (read_addr) {
 		memory_set_bankptr(machine, "bank1", read_addr);
-		memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0xbfff, 0, 0,"bank1");
+		memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0xbfff, 0, 0, "bank1");
 	} else {
 		memory_nop_read(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0xbfff, 0, 0);
 	}
 	if (write_addr) {
 		memory_set_bankptr(machine, "bank1", write_addr);
-		memory_install_write_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0xbfff, 0, 0,"bank1");
+		memory_install_write_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0xbfff, 0, 0, "bank1");
 	} else {
 		memory_nop_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0xbfff, 0, 0);
 	}
@@ -247,7 +247,7 @@ static int a800_get_type(device_image_interface &image)
 {
 	UINT8 header[16];
 	image.fread(header, 0x10);
-	int hdr_type, cart_type;
+	int hdr_type, cart_type = A800_UNKNOWN;
 
 	// add check of CART format
 	if (strncmp((const char *)header, "CART", 4))
