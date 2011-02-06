@@ -251,49 +251,6 @@ static SNAPSHOT_LOAD( vtech1 )
 	return IMAGE_INIT_PASS;
 }
 
-static Z80BIN_EXECUTE( vtech1 )
-{
-	device_t *cpu = machine->device("maincpu");
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-
-	/* A Microsoft Basic program needs some manipulation before it can be run.
-    1. A start address of 7ae9 indicates a basic program which needs its pointers fixed up.
-    2. If autorun is turned off, the pointers still need fixing, but then display READY.
-    Important addresses:
-        7ae9 = start (load) address of a conventional basic program
-        791e = custom routine to fix basic pointers */
-
-	space->write_word(0x791c, end_address + 1);
-	space->write_word(0x781e, execute_address);
-
-	if (start_address == 0x7ae9)
-	{
-		UINT8 i;
-		static const UINT8 data[]={
-			0xe5,			// PUSH HL  ;save pcode pointer
-			0x2a, 0x1c, 0x79,	// LD HL,(791C) ;get saved end_addr+1
-			0x22, 0xf9, 0x78,	// LD (78F9),HL ;move it to correct place
-			0x21, 0x39, 0x78,	// LD HL,7839   ;point to control flag
-			0xcb, 0xf6,		// SET 6,(HL)   ;turn on autorun (cb b6 = manual run)
-			0xcb, 0x9e,		// RES 3,(HL)   ;turn off verify (just in case)
-			0xc3, 0xcf, 0x36	// JP 36CF  ;enter bios at autorun point
-		};
-
-		for (i = 0; i < ARRAY_LENGTH(data); i++)
-			space->write_byte(0x791e + i, data[i]);
-
-		if (!autorun)
-			space->write_byte(0x7929, 0xb6);	/* turn off autorun */
-
-		cpu_set_reg(cpu, STATE_GENPC, 0x791e);
-	}
-	else
-	{
-		if (autorun)
-			cpu_set_reg(cpu, STATE_GENPC, execute_address);
-	}
-}
-
 
 /***************************************************************************
     FLOPPY DRIVE
@@ -324,7 +281,7 @@ static void vtech1_get_track(running_machine *machine)
 		size = image->fread(vtech1->fdc_data, size);
 		if (LOG_VTECH1_FDC)
 			logerror("get track @$%05x $%04x bytes\n", offs, size);
-    }
+	}
 	vtech1->fdc_offs = 0;
 	vtech1->fdc_write = 0;
 }
@@ -344,55 +301,55 @@ static void vtech1_put_track(running_machine *machine)
 		size = image->fwrite(&vtech1->fdc_data[vtech1->fdc_start], vtech1->fdc_write);
 		if (LOG_VTECH1_FDC)
 			logerror("put track @$%05X+$%X $%04X/$%04X bytes\n", offs, vtech1->fdc_start, size, vtech1->fdc_write);
-    }
+	}
 }
 
 static READ8_HANDLER( vtech1_fdc_r )
 {
 	vtech1_state *vtech1 = space->machine->driver_data<vtech1_state>();
-    int data = 0xff;
+	int data = 0xff;
 
-    switch (offset)
-    {
-    case 1: /* data (read-only) */
+	switch (offset)
+	{
+	case 1: /* data (read-only) */
 		if (vtech1->fdc_bits > 0)
-        {
+		{
 			if( vtech1->fdc_status & 0x80 )
 				vtech1->fdc_bits--;
 			data = (vtech1->data >> vtech1->fdc_bits) & 0xff;
 			if (LOG_VTECH1_FDC) {
 				logerror("vtech1_fdc_r bits %d%d%d%d%d%d%d%d\n",
-	                (data>>7)&1,(data>>6)&1,(data>>5)&1,(data>>4)&1,
-	                (data>>3)&1,(data>>2)&1,(data>>1)&1,(data>>0)&1 );
+					(data>>7)&1,(data>>6)&1,(data>>5)&1,(data>>4)&1,
+					(data>>3)&1,(data>>2)&1,(data>>1)&1,(data>>0)&1 );
 			}
-        }
+		}
 		if (vtech1->fdc_bits == 0)
-        {
+		{
 			vtech1->data = vtech1->fdc_data[vtech1->fdc_offs];
 			if (LOG_VTECH1_FDC)
 				logerror("vtech1_fdc_r %d : data ($%04X) $%02X\n", offset, vtech1->fdc_offs, vtech1->data);
 			if(vtech1->fdc_status & 0x80)
-            {
+			{
 				vtech1->fdc_bits = 8;
 				vtech1->fdc_offs = (vtech1->fdc_offs + 1) % TRKSIZE_FM;
-            }
+			}
 			vtech1->fdc_status &= ~0x80;
-        }
-        break;
-    case 2: /* polling (read-only) */
-        /* fake */
+		}
+		break;
+	case 2: /* polling (read-only) */
+		/* fake */
 		if (vtech1->drive >= 0)
 			vtech1->fdc_status |= 0x80;
 		data = vtech1->fdc_status;
-        break;
-    case 3: /* write protect status (read-only) */
+		break;
+	case 3: /* write protect status (read-only) */
 		if (vtech1->drive >= 0)
 			data = vtech1->fdc_wrprot[vtech1->drive];
 		if (LOG_VTECH1_FDC)
 			logerror("vtech1_fdc_r %d : write_protect $%02X\n", offset, data);
-        break;
-    }
-    return data;
+		break;
+	}
+	return data;
 }
 
 static WRITE8_HANDLER( vtech1_fdc_w )
@@ -400,7 +357,7 @@ static WRITE8_HANDLER( vtech1_fdc_w )
 	vtech1_state *vtech1 = space->machine->driver_data<vtech1_state>();
 	int drive;
 
-    switch (offset)
+	switch (offset)
 	{
 	case 0: /* latch (write-only) */
 		drive = (data & 0x10) ? 0 : (data & 0x80) ? 1 : -1;
@@ -409,41 +366,41 @@ static WRITE8_HANDLER( vtech1_fdc_w )
 			vtech1->drive = drive;
 			if (vtech1->drive >= 0)
 				vtech1_get_track(space->machine);
-        }
+		}
 		if (vtech1->drive >= 0)
-        {
+		{
 			if ((PHI0(data) && !(PHI1(data) || PHI2(data) || PHI3(data)) && PHI1(vtech1->fdc_latch)) ||
 				(PHI1(data) && !(PHI0(data) || PHI2(data) || PHI3(data)) && PHI2(vtech1->fdc_latch)) ||
 				(PHI2(data) && !(PHI0(data) || PHI1(data) || PHI3(data)) && PHI3(vtech1->fdc_latch)) ||
 				(PHI3(data) && !(PHI0(data) || PHI1(data) || PHI2(data)) && PHI0(vtech1->fdc_latch)))
-            {
+			{
 				if (vtech1->fdc_track_x2[vtech1->drive] > 0)
 					vtech1->fdc_track_x2[vtech1->drive]--;
 				if (LOG_VTECH1_FDC)
 					logerror("vtech1_fdc_w(%d) $%02X drive %d: stepout track #%2d.%d\n", offset, data, vtech1->drive, vtech1->fdc_track_x2[vtech1->drive]/2,5*(vtech1->fdc_track_x2[vtech1->drive]&1));
 				if ((vtech1->fdc_track_x2[vtech1->drive] & 1) == 0)
 					vtech1_get_track(space->machine);
-            }
-            else
+			}
+			else
 			if ((PHI0(data) && !(PHI1(data) || PHI2(data) || PHI3(data)) && PHI3(vtech1->fdc_latch)) ||
 				(PHI1(data) && !(PHI0(data) || PHI2(data) || PHI3(data)) && PHI0(vtech1->fdc_latch)) ||
 				(PHI2(data) && !(PHI0(data) || PHI1(data) || PHI3(data)) && PHI1(vtech1->fdc_latch)) ||
 				(PHI3(data) && !(PHI0(data) || PHI1(data) || PHI2(data)) && PHI2(vtech1->fdc_latch)))
-            {
+			{
 				if (vtech1->fdc_track_x2[vtech1->drive] < 2*40)
 					vtech1->fdc_track_x2[vtech1->drive]++;
 				if (LOG_VTECH1_FDC)
 					logerror("vtech1_fdc_w(%d) $%02X drive %d: stepin track #%2d.%d\n", offset, data, vtech1->drive, vtech1->fdc_track_x2[vtech1->drive]/2,5*(vtech1->fdc_track_x2[vtech1->drive]&1));
 				if ((vtech1->fdc_track_x2[vtech1->drive] & 1) == 0)
 					vtech1_get_track(space->machine);
-            }
-            if ((data & 0x40) == 0)
+			}
+			if ((data & 0x40) == 0)
 			{
 				vtech1->data <<= 1;
 				if ((vtech1->fdc_latch ^ data) & 0x20)
 					vtech1->data |= 1;
 				if ((vtech1->fdc_edge ^= 1) == 0)
-                {
+				{
 					vtech1->fdc_bits--;
 
 					if (vtech1->fdc_bits == 0)
@@ -465,30 +422,30 @@ static WRITE8_HANDLER( vtech1_fdc_w )
 						vtech1->fdc_write++;
 						vtech1->fdc_bits = 8;
 					}
-                }
-            }
+				}
+			}
 			/* change of write signal? */
 			if ((vtech1->fdc_latch ^ data) & 0x40)
-            {
-                /* falling edge? */
+			{
+				/* falling edge? */
 				if (vtech1->fdc_latch & 0x40)
-                {
+				{
 					vtech1->fdc_start = vtech1->fdc_offs;
 					vtech1->fdc_edge = 0;
-                }
-                else
-                {
-                    /* data written to track before? */
+				}
+				else
+				{
+					/* data written to track before? */
 					if (vtech1->fdc_write)
 						vtech1_put_track(space->machine);
-                }
+				}
 				vtech1->fdc_bits = 8;
 				vtech1->fdc_write = 0;
-            }
-        }
+			}
+		}
 		vtech1->fdc_latch = data;
 		break;
-    }
+	}
 }
 
 static FLOPPY_IDENTIFY( vtech1_dsk_identify )
@@ -527,7 +484,7 @@ static const floppy_config vtech1_floppy_config =
 };
 
 /***************************************************************************
-    PRINTER
+	PRINTER
 ***************************************************************************/
 
 static READ8_DEVICE_HANDLER( vtech1_printer_r )
@@ -544,7 +501,7 @@ static WRITE8_DEVICE_HANDLER( vtech1_strobe_w )
 
 
 /***************************************************************************
-    RS232 SERIAL
+	RS232 SERIAL
 ***************************************************************************/
 
 static READ8_HANDLER( vtech1_serial_r )
@@ -560,7 +517,7 @@ static WRITE8_HANDLER( vtech1_serial_w )
 
 
 /***************************************************************************
-    INPUTS
+	INPUTS
 ***************************************************************************/
 
 static READ8_HANDLER( vtech1_lightpen_r )
@@ -571,14 +528,14 @@ static READ8_HANDLER( vtech1_lightpen_r )
 
 static READ8_HANDLER( vtech1_joystick_r )
 {
-    int result = 0xff;
+	int result = 0xff;
 
 	if (!BIT(offset, 0)) result &= input_port_read(space->machine, "joystick_0");
 	if (!BIT(offset, 1)) result &= input_port_read(space->machine, "joystick_0_arm");
 	if (!BIT(offset, 2)) result &= input_port_read(space->machine, "joystick_1");
 	if (!BIT(offset, 3)) result &= input_port_read(space->machine, "joystick_1_arm");
 
-    return result;
+	return result;
 }
 
 static READ8_HANDLER( vtech1_keyboard_r )
@@ -602,12 +559,12 @@ static READ8_HANDLER( vtech1_keyboard_r )
 	/* bit 7, field sync */
 	result |= mc6847_fs_r(vtech1->mc6847) << 7;
 
-    return result;
+	return result;
 }
 
 
 /***************************************************************************
-    I/O LATCH
+	I/O LATCH
 ***************************************************************************/
 
 static WRITE8_HANDLER( vtech1_latch_w )
@@ -637,7 +594,7 @@ static WRITE8_HANDLER( vtech1_latch_w )
 
 
 /***************************************************************************
-    MEMORY BANKING
+	MEMORY BANKING
 ***************************************************************************/
 
 static WRITE8_HANDLER( vtech1_memory_bank_w )
@@ -659,7 +616,7 @@ static WRITE8_HANDLER( vtech1_video_bank_w )
 
 
 /***************************************************************************
-    VIDEO EMULATION
+	VIDEO EMULATION
 ***************************************************************************/
 
 static READ8_DEVICE_HANDLER( vtech1_mc6847_videoram_r )
@@ -679,7 +636,7 @@ static VIDEO_UPDATE( vtech1 )
 
 
 /***************************************************************************
-    DRIVER INIT
+	DRIVER INIT
 ***************************************************************************/
 
 static DRIVER_INIT( vtech1 )
@@ -759,40 +716,40 @@ static DRIVER_INIT( vtech1h )
 }
 
 /***************************************************************************
-    ADDRESS MAPS
+	ADDRESS MAPS
 ***************************************************************************/
 
 static ADDRESS_MAP_START( laser110_mem, ADDRESS_SPACE_PROGRAM, 8 )
-    AM_RANGE(0x0000, 0x3fff) AM_ROM	/* basic rom */
-    AM_RANGE(0x4000, 0x5fff) AM_ROM	/* dos rom or other catridges */
-    AM_RANGE(0x6000, 0x67ff) AM_ROM	/* reserved for cartridges */
-    AM_RANGE(0x6800, 0x6fff) AM_READWRITE(vtech1_keyboard_r, vtech1_latch_w)
-    AM_RANGE(0x7000, 0x77ff) AM_RAM AM_BASE_MEMBER(vtech1_state, videoram) /* (6847) */
-    AM_RANGE(0x7800, 0x7fff) AM_RAMBANK("bank1") /* 2k user ram */
-    AM_RANGE(0x8000, 0xbfff) AM_NOP /* 16k ram expansion */
-    AM_RANGE(0xc000, 0xffff) AM_NOP
+	AM_RANGE(0x0000, 0x3fff) AM_ROM	/* basic rom */
+	AM_RANGE(0x4000, 0x5fff) AM_ROM	/* dos rom or other catridges */
+	AM_RANGE(0x6000, 0x67ff) AM_ROM	/* reserved for cartridges */
+	AM_RANGE(0x6800, 0x6fff) AM_READWRITE(vtech1_keyboard_r, vtech1_latch_w)
+	AM_RANGE(0x7000, 0x77ff) AM_RAM AM_BASE_MEMBER(vtech1_state, videoram) /* (6847) */
+	AM_RANGE(0x7800, 0x7fff) AM_RAMBANK("bank1") /* 2k user ram */
+	AM_RANGE(0x8000, 0xbfff) AM_NOP /* 16k ram expansion */
+	AM_RANGE(0xc000, 0xffff) AM_NOP
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( laser210_mem, ADDRESS_SPACE_PROGRAM, 8 )
-    AM_RANGE(0x0000, 0x3fff) AM_ROM	/* basic rom */
-    AM_RANGE(0x4000, 0x5fff) AM_ROM	/* dos rom or other catridges */
-    AM_RANGE(0x6000, 0x67ff) AM_ROM	/* reserved for cartridges */
-    AM_RANGE(0x6800, 0x6fff) AM_READWRITE(vtech1_keyboard_r, vtech1_latch_w)
-    AM_RANGE(0x7000, 0x77ff) AM_RAM AM_BASE_MEMBER(vtech1_state, videoram) /* U7 (6847) */
-    AM_RANGE(0x7800, 0x8fff) AM_RAMBANK("bank1") /* 6k user ram */
-    AM_RANGE(0x9000, 0xcfff) AM_NOP /* 16k ram expansion */
-    AM_RANGE(0xd000, 0xffff) AM_NOP
+	AM_RANGE(0x0000, 0x3fff) AM_ROM	/* basic rom */
+	AM_RANGE(0x4000, 0x5fff) AM_ROM	/* dos rom or other catridges */
+	AM_RANGE(0x6000, 0x67ff) AM_ROM	/* reserved for cartridges */
+	AM_RANGE(0x6800, 0x6fff) AM_READWRITE(vtech1_keyboard_r, vtech1_latch_w)
+	AM_RANGE(0x7000, 0x77ff) AM_RAM AM_BASE_MEMBER(vtech1_state, videoram) /* U7 (6847) */
+	AM_RANGE(0x7800, 0x8fff) AM_RAMBANK("bank1") /* 6k user ram */
+	AM_RANGE(0x9000, 0xcfff) AM_NOP /* 16k ram expansion */
+	AM_RANGE(0xd000, 0xffff) AM_NOP
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( laser310_mem, ADDRESS_SPACE_PROGRAM, 8 )
-    AM_RANGE(0x0000, 0x3fff) AM_ROM	/* basic rom */
-    AM_RANGE(0x4000, 0x5fff) AM_ROM	/* dos rom or other catridges */
-    AM_RANGE(0x6000, 0x67ff) AM_ROM	/* reserved for cartridges */
-    AM_RANGE(0x6800, 0x6fff) AM_READWRITE(vtech1_keyboard_r, vtech1_latch_w)
-    AM_RANGE(0x7000, 0x77ff) AM_RAM AM_BASE_MEMBER(vtech1_state, videoram) /* (6847) */
-    AM_RANGE(0x7800, 0xb7ff) AM_RAMBANK("bank1") /* 16k user ram */
-    AM_RANGE(0xb800, 0xf7ff) AM_NOP /* 16k ram expansion */
-    AM_RANGE(0xf8ff, 0xffff) AM_NOP
+	AM_RANGE(0x0000, 0x3fff) AM_ROM	/* basic rom */
+	AM_RANGE(0x4000, 0x5fff) AM_ROM	/* dos rom or other catridges */
+	AM_RANGE(0x6000, 0x67ff) AM_ROM	/* reserved for cartridges */
+	AM_RANGE(0x6800, 0x6fff) AM_READWRITE(vtech1_keyboard_r, vtech1_latch_w)
+	AM_RANGE(0x7000, 0x77ff) AM_RAM AM_BASE_MEMBER(vtech1_state, videoram) /* (6847) */
+	AM_RANGE(0x7800, 0xb7ff) AM_RAMBANK("bank1") /* 16k user ram */
+	AM_RANGE(0xb800, 0xf7ff) AM_NOP /* 16k ram expansion */
+	AM_RANGE(0xf8ff, 0xffff) AM_NOP
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( vtech1_io, ADDRESS_SPACE_IO, 8 )
@@ -814,7 +771,7 @@ ADDRESS_MAP_END
 
 
 /***************************************************************************
-    INPUT PORTS
+	INPUT PORTS
 ***************************************************************************/
 
 static INPUT_PORTS_START(vtech1)
@@ -1006,12 +963,12 @@ static const mc6847_interface vtech1_shrg_mc6847_intf =
 
 static MACHINE_CONFIG_START( laser110, vtech1_state )
 
-    /* basic machine hardware */
-    MCFG_CPU_ADD("maincpu", Z80, VTECH1_CLK)  /* 3.57950 MHz */
-    MCFG_CPU_PROGRAM_MAP(laser110_mem)
-    MCFG_CPU_IO_MAP(vtech1_io)
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", Z80, VTECH1_CLK)  /* 3.57950 MHz */
+	MCFG_CPU_PROGRAM_MAP(laser110_mem)
+	MCFG_CPU_IO_MAP(vtech1_io)
 
-    /* video hardware */
+	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(M6847_PAL_FRAMES_PER_SECOND)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
@@ -1024,7 +981,7 @@ static MACHINE_CONFIG_START( laser110, vtech1_state )
 	MCFG_MC6847_TYPE(M6847_VERSION_ORIGINAL_PAL)
 	MCFG_MC6847_PALETTE(vtech1_palette_mono)
 
-    /* sound hardware */
+	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_WAVE_ADD("wave", "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
@@ -1037,7 +994,6 @@ static MACHINE_CONFIG_START( laser110, vtech1_state )
 
 	/* snapshot/quickload */
 	MCFG_SNAPSHOT_ADD("snapshot", vtech1, "vz", 1.5)
-	MCFG_Z80BIN_QUICKLOAD_ADD("quickload", vtech1, 1.5)
 
 	MCFG_CASSETTE_ADD( "cassette", laser_cassette_config )
 
@@ -1054,14 +1010,13 @@ static MACHINE_CONFIG_START( laser110, vtech1_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( laser200, laser110 )
-
-    MCFG_DEVICE_MODIFY("mc6847")
-    MCFG_MC6847_PALETTE(NULL)
+	MCFG_DEVICE_MODIFY("mc6847")
+	MCFG_MC6847_PALETTE(NULL)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( laser210, laser200 )
-    MCFG_CPU_MODIFY("maincpu")
-    MCFG_CPU_PROGRAM_MAP(laser210_mem)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(laser210_mem)
 
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)
@@ -1070,8 +1025,8 @@ static MACHINE_CONFIG_DERIVED( laser210, laser200 )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( laser310, laser200 )
-    MCFG_CPU_REPLACE("maincpu", Z80, VZ300_XTAL1_CLK / 5)  /* 3.546894 MHz */
-    MCFG_CPU_PROGRAM_MAP(laser310_mem)
+	MCFG_CPU_REPLACE("maincpu", Z80, VZ300_XTAL1_CLK / 5)  /* 3.546894 MHz */
+	MCFG_CPU_PROGRAM_MAP(laser310_mem)
 
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)
@@ -1080,68 +1035,67 @@ static MACHINE_CONFIG_DERIVED( laser310, laser200 )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( laser310h, laser310 )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_IO_MAP(vtech1_shrg_io)
 
-    MCFG_CPU_MODIFY("maincpu")
-    MCFG_CPU_IO_MAP(vtech1_shrg_io)
-
-    MCFG_DEVICE_REMOVE("mc6847")
-    MCFG_MC6847_ADD("mc6847", vtech1_shrg_mc6847_intf)
+	MCFG_DEVICE_REMOVE("mc6847")
+	MCFG_MC6847_ADD("mc6847", vtech1_shrg_mc6847_intf)
 	MCFG_MC6847_TYPE(M6847_VERSION_ORIGINAL_PAL)
 MACHINE_CONFIG_END
 
 
 /***************************************************************************
-    ROM DEFINITIONS
+	ROM DEFINITIONS
 ***************************************************************************/
 
 ROM_START( laser110 )
-    ROM_REGION(0x6800, "maincpu", 0)
-    ROM_LOAD("vtechv12.u09",   0x0000, 0x2000, CRC(99412d43) SHA1(6aed8872a0818be8e1b08ecdfd92acbe57a3c96d))
-    ROM_LOAD("vtechv12.u10",   0x2000, 0x2000, CRC(e4c24e8b) SHA1(9d8fb3d24f3d4175b485cf081a2d5b98158ab2fb))
-    ROM_CART_LOAD("cart",  0x4000, 0x27ff, ROM_NOMIRROR | ROM_OPTIONAL)
+	ROM_REGION(0x6800, "maincpu", 0)
+	ROM_LOAD("vtechv12.u09",   0x0000, 0x2000, CRC(99412d43) SHA1(6aed8872a0818be8e1b08ecdfd92acbe57a3c96d))
+	ROM_LOAD("vtechv12.u10",   0x2000, 0x2000, CRC(e4c24e8b) SHA1(9d8fb3d24f3d4175b485cf081a2d5b98158ab2fb))
+	ROM_CART_LOAD("cart",  0x4000, 0x27ff, ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
 /* The VZ-200 sold in Germany and the Netherlands came with BASIC V1.1, which
    is currently not dumped. */
 ROM_START( vz200de )
-    ROM_REGION(0x6800, "maincpu", 0)
-    ROM_LOAD("vtechv11.u09",   0x0000, 0x2000, NO_DUMP)
-    ROM_LOAD("vtechv11.u10",   0x2000, 0x2000, NO_DUMP)
-    ROM_CART_LOAD("cart",  0x4000, 0x27ff, ROM_NOMIRROR | ROM_OPTIONAL)
+	ROM_REGION(0x6800, "maincpu", 0)
+	ROM_LOAD("vtechv11.u09",   0x0000, 0x2000, NO_DUMP)
+	ROM_LOAD("vtechv11.u10",   0x2000, 0x2000, NO_DUMP)
+	ROM_CART_LOAD("cart",  0x4000, 0x27ff, ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
-#define rom_las110de    rom_laser110
-#define rom_laser200    rom_laser110
-#define rom_fellow      rom_laser110
+#define rom_las110de	rom_laser110
+#define rom_laser200	rom_laser110
+#define rom_fellow	rom_laser110
 
 /* It's possible that the Texet TX8000 came with BASIC V1.0, but this
    needs to be verified */
-#define rom_tx8000      rom_laser110
+#define rom_tx8000	rom_laser110
 
 ROM_START( laser210 )
-    ROM_REGION(0x6800, "maincpu", 0)
-    ROM_LOAD("vtechv20.u09",   0x0000, 0x2000, CRC(cc854fe9) SHA1(6e66a309b8e6dc4f5b0b44e1ba5f680467353d66))
-    ROM_LOAD("vtechv20.u10",   0x2000, 0x2000, CRC(7060f91a) SHA1(8f3c8f24f97ebb98f3c88d4e4ba1f91ffd563440))
-    ROM_CART_LOAD("cart",  0x4000, 0x27ff, ROM_NOMIRROR | ROM_OPTIONAL)
+	ROM_REGION(0x6800, "maincpu", 0)
+	ROM_LOAD("vtechv20.u09",   0x0000, 0x2000, CRC(cc854fe9) SHA1(6e66a309b8e6dc4f5b0b44e1ba5f680467353d66))
+	ROM_LOAD("vtechv20.u10",   0x2000, 0x2000, CRC(7060f91a) SHA1(8f3c8f24f97ebb98f3c88d4e4ba1f91ffd563440))
+	ROM_CART_LOAD("cart",  0x4000, 0x27ff, ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
-#define rom_las210de    rom_laser210
-#define rom_vz200       rom_laser210
+#define rom_las210de	rom_laser210
+#define rom_vz200	rom_laser210
 
 ROM_START( laser310 )
-    ROM_REGION(0x6800, "maincpu", 0)
+	ROM_REGION(0x6800, "maincpu", 0)
 	ROM_SYSTEM_BIOS(0, "basic20", "BASIC V2.0")
-    ROMX_LOAD("vtechv20.u12", 0x0000, 0x4000, CRC(613de12c) SHA1(f216c266bc09b0dbdbad720796e5ea9bc7d91e53), ROM_BIOS(1))
+	ROMX_LOAD("vtechv20.u12", 0x0000, 0x4000, CRC(613de12c) SHA1(f216c266bc09b0dbdbad720796e5ea9bc7d91e53), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(1, "basic21", "BASIC V2.1 (hack)")
-    ROMX_LOAD("vtechv21.u12", 0x0000, 0x4000, CRC(f7df980f) SHA1(5ba14a7a2eedca331b033901080fa5d205e245ea), ROM_BIOS(2))
-    ROM_CART_LOAD("cart", 0x4000, 0x27ff, ROM_NOMIRROR | ROM_OPTIONAL)
+	ROMX_LOAD("vtechv21.u12", 0x0000, 0x4000, CRC(f7df980f) SHA1(5ba14a7a2eedca331b033901080fa5d205e245ea), ROM_BIOS(2))
+	ROM_CART_LOAD("cart", 0x4000, 0x27ff, ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
-#define rom_vz300       rom_laser310
+#define rom_vz300	rom_laser310
 #define rom_laser310h   rom_laser310
 
 /***************************************************************************
-    GAME DRIVERS
+	GAME DRIVERS
 ***************************************************************************/
 
 /*    YEAR  NAME       PARENT    COMPAT  MACHINE    INPUT   INIT     COMPANY                   FULLNAME                          FLAGS */
