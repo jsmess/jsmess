@@ -682,7 +682,7 @@ static MACHINE_CONFIG_START( super80, super80_state )
 	MCFG_CENTRONICS_ADD("centronics", standard_centronics)
 
 	/* quickload */
-	MCFG_Z80BIN_QUICKLOAD_ADD("quickload", default, 1)
+	MCFG_Z80BIN_QUICKLOAD_ADD("quickload", default, 3)
 
 	/* cassette */
 	MCFG_CASSETTE_ADD( "cassette", super80_cassette_config )
@@ -752,7 +752,7 @@ static MACHINE_CONFIG_START( super80v, super80_state )
 	MCFG_CENTRONICS_ADD("centronics", standard_centronics)
 
 	/* quickload */
-	MCFG_Z80BIN_QUICKLOAD_ADD("quickload", default, 1)
+	MCFG_Z80BIN_QUICKLOAD_ADD("quickload", default, 3)
 
 	/* cassette */
 	MCFG_CASSETTE_ADD( "cassette", super80_cassette_config )
