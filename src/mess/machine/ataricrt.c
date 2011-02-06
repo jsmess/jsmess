@@ -10,12 +10,23 @@
 #include "ataridev.h"
 #include "machine/ram.h"
 
-static int a800_cart_loaded = 0;
-static int a800_cart_is_16k = 0;
-static int atari = 0;
-
 #define LEFT_CARTSLOT_MOUNTED  1
 #define RIGHT_CARTSLOT_MOUNTED 2
+
+/* PCB */
+enum
+{
+    A800_UNKNOWN = 0,
+	A800_4K, A800_8K, A800_12K, A800_16K,
+	A800_RIGHT_4K, A800_RIGHT_8K,
+	OSS_034M, OSS_M091, PHOENIX_8K, XEGS_32K,
+	BBSB, DIAMOND_64K, WILLIAMS_64K, EXPRESS_64,
+	SPARTADOS_X
+};
+
+static int a800_cart_loaded = 0;
+static int atari = 0;
+static int a800_cart_type = A800_UNKNOWN;
 
 /*************************************
  *
@@ -40,9 +51,9 @@ static void a800_setbank(running_machine *machine, int cart_mounted)
 	{
 		memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0x9fff, 0, 0, "8000");
 		memory_set_bankptr(machine, "8000", machine->region("rslot")->base());
-		memory_nop_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0x9fff, 0, 0);
+		memory_unmap_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0x9fff, 0, 0);
 	}
-	else
+	else if (a800_cart_type != BBSB)
 	{
 		ram_top = MIN(ram_get_size(machine->device(RAM_TAG)), 0xa000) - 1;
 		if (ram_top > 0x8000)
@@ -55,30 +66,64 @@ static void a800_setbank(running_machine *machine, int cart_mounted)
 	// take care of 0xa000-0xbfff: is there anything in the left slot?
 	if (cart_mounted & LEFT_CARTSLOT_MOUNTED)
 	{
+		// FIXME: this is an hack to keep XL working until we clean up its memory map as well!
 		if (atari == ATARI_800XL)
 		{
-			// FIXME: this is an hack to keep XL working until we clean up its memory map as well!
-			if (a800_cart_is_16k)
+			if (a800_cart_type == A800_16K)
 			{
 				memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0x9fff, 0, 0, "8000");
 				memory_set_bankptr(machine, "8000", machine->region("lslot")->base());
-				memory_nop_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0x9fff, 0, 0);
+				memory_unmap_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0x9fff, 0, 0);
 
 				memcpy(machine->region("maincpu")->base() + 0x10000, machine->region("lslot")->base() + 0x2000, 0x2000);
 			}
-			else
+			else if (a800_cart_type == A800_8K)
 				memcpy(machine->region("maincpu")->base() + 0x10000, machine->region("lslot")->base(), 0x2000);
+			else
+				fatalerror("This type of cart is not supported yet in this driver. Please use a400 or a800.\n");
 		}
-		else if (a800_cart_is_16k)
+		else if (a800_cart_type == A800_16K)
 		{
 			memory_set_bankptr(machine, "8000", machine->region("lslot")->base());
 			memory_set_bankptr(machine, "a000", machine->region("lslot")->base() + 0x2000);
-			memory_nop_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0xbfff, 0, 0);
+			memory_unmap_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0xbfff, 0, 0);
+		}
+		else if (a800_cart_type == BBSB)
+		{
+			// this requires separate banking in 0x8000 & 0x9000!
+			memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0x8fff, 0, 0, "8000");
+			memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x9000, 0x9fff, 0, 0, "9000");
+			memory_set_bankptr(machine, "8000", machine->region("lslot")->base() + 0x0000);	
+			memory_set_bankptr(machine, "9000", machine->region("lslot")->base() + 0x4000);	
+			memory_set_bankptr(machine, "a000", machine->region("lslot")->base() + 0x8000);
+			memory_unmap_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa000, 0xbfff, 0, 0);
+		}
+		else if (a800_cart_type == OSS_034M)
+		{
+			// this requires separate banking in 0xa000 & 0xb000!
+			memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa000, 0xafff, 0, 0, "a000");
+			memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xb000, 0xbfff, 0, 0, "b000");
+			memory_set_bankptr(machine, "b000", machine->region("lslot")->base() + 0x3000);
+			memory_unmap_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa000, 0xbfff, 0, 0);
+		}
+		else if (a800_cart_type == OSS_M091)
+		{
+			// this requires separate banking in 0xa000 & 0xb000!
+			memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa000, 0xafff, 0, 0, "a000");
+			memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xb000, 0xbfff, 0, 0, "b000");
+			memory_set_bankptr(machine, "b000", machine->region("lslot")->base());
+			memory_unmap_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa000, 0xbfff, 0, 0);
+		}
+		else if (a800_cart_type == XEGS_32K)
+		{
+			memory_set_bankptr(machine, "8000", machine->region("lslot")->base());
+			memory_set_bankptr(machine, "a000", machine->region("lslot")->base() + 0x6000);
+			memory_unmap_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0xbfff, 0, 0);
 		}
 		else
 		{
 			memory_set_bankptr(machine, "a000", machine->region("lslot")->base());
-			memory_nop_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa000, 0xbfff, 0, 0);
+			memory_unmap_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa000, 0xbfff, 0, 0);
 		}
 	}
 }
@@ -123,17 +168,133 @@ MACHINE_START( a800 )
 	ms_atari_machine_start(machine, ATARI_800, TRUE);
 }
 
-
-/* PCB */
-enum
+static WRITE8_HANDLER( x32_bank_w )
 {
-    A800_UNKNOWN = 0,
-	A800_4K, A800_8K, A800_12K, A800_16K,
-	A800_RIGHT_4K, A800_RIGHT_8K,
-	OSS_034M, OSS_M091, PHOENIX_8K, XEGS_32K,
-	BBSB, DIAMOND_64K, WILLIAMS_64K, EXPRESS_64,
-	SPARTADOS_X
-};
+	//	printf("written %x\n", data);
+	int bank = data & 0x03;
+	memory_set_bankptr(space->machine, "8000", space->machine->region("lslot")->base() + bank * 0x2000);
+}
+
+static WRITE8_HANDLER( w64_bank_w )
+{
+//	printf("write to %x\n", offset);
+
+	if (offset < 8)
+		memory_set_bankptr(space->machine, "a000", space->machine->region("lslot")->base() + offset * 0x2000);	
+	else
+		memory_set_bankptr(space->machine, "a000", space->machine->region("maincpu")->base());	
+	// FIXME: writes to 0x8-0xf should disable the cart
+}
+
+// this covers Express 64, Diamond 64 and SpartaDOS (same bankswitch, but at different addresses)
+static WRITE8_HANDLER( ex64_bank_w )
+{
+//	printf("write to %x\n", offset);
+
+	if (offset < 8)
+		memory_set_bankptr(space->machine, "a000", space->machine->region("lslot")->base() + (7 - offset) * 0x2000);	
+	else
+		memory_set_bankptr(space->machine, "a000", space->machine->region("maincpu")->base());	
+	// FIXME: writes to 0x8-0xf should disable the cart
+}
+
+static WRITE8_HANDLER( bbsb_bankl_w )
+{
+//	printf("write to %x\n", 0x8000 + offset);
+	if (offset >= 0xff6 && offset <= 0xff9)
+		memory_set_bankptr(space->machine, "8000", space->machine->region("lslot")->base() + 0x0000 + (offset - 0xff6) * 0x1000);	
+}
+
+static WRITE8_HANDLER( bbsb_bankh_w )
+{
+//	printf("write to %x\n", 0x9000 + offset);
+	if (offset >= 0xff6 && offset <= 0xff9)
+		memory_set_bankptr(space->machine, "9000", space->machine->region("lslot")->base() + 0x4000 + (offset - 0xff6) * 0x1000);	
+}
+
+static WRITE8_HANDLER( oss_034m_w )
+{
+	switch (offset & 0x0f)
+	{
+		case 0:
+		case 1:
+			memory_set_bankptr(space->machine, "a000", space->machine->region("lslot")->base());	
+			memory_set_bankptr(space->machine, "b000", space->machine->region("lslot")->base() + 0x3000);
+			break;
+		case 2:
+		case 6:
+			// docs says this should put 0xff in the 0xa000 bank -> let's point to the end of the cart
+			memory_set_bankptr(space->machine, "a000", space->machine->region("lslot")->base() + 0x4000);	
+			memory_set_bankptr(space->machine, "b000", space->machine->region("lslot")->base() + 0x3000);
+			break;
+		case 3:
+		case 7:
+			memory_set_bankptr(space->machine, "a000", space->machine->region("lslot")->base() + 0x1000);	
+			memory_set_bankptr(space->machine, "b000", space->machine->region("lslot")->base() + 0x3000);
+			break;
+		case 4:
+		case 5:
+			memory_set_bankptr(space->machine, "a000", space->machine->region("lslot")->base() + 0x2000);	
+			memory_set_bankptr(space->machine, "b000", space->machine->region("lslot")->base() + 0x3000);
+			break;
+		default:
+			memory_set_bankptr(space->machine, "a000", space->machine->region("maincpu")->base() + 0xa000);	
+			memory_set_bankptr(space->machine, "b000", space->machine->region("maincpu")->base() + 0xb000);
+			break;
+	}
+}
+
+static WRITE8_HANDLER( oss_m091_w )
+{
+	switch (offset & 0x09)
+	{
+		case 0:
+			memory_set_bankptr(space->machine, "a000", space->machine->region("lslot")->base() + 0x1000);	
+			memory_set_bankptr(space->machine, "b000", space->machine->region("lslot")->base());
+			break;
+		case 1:
+			memory_set_bankptr(space->machine, "a000", space->machine->region("lslot")->base() + 0x3000);	
+			memory_set_bankptr(space->machine, "b000", space->machine->region("lslot")->base());
+			break;
+		case 8:
+			memory_set_bankptr(space->machine, "a000", space->machine->region("maincpu")->base() + 0xa000);	
+			memory_set_bankptr(space->machine, "b000", space->machine->region("maincpu")->base() + 0xb000);
+			break;
+		case 9:
+			memory_set_bankptr(space->machine, "a000", space->machine->region("lslot")->base() + 0x2000);	
+			memory_set_bankptr(space->machine, "b000", space->machine->region("lslot")->base());
+			break;
+	}
+}
+
+#if 0
+static int bbsb_bankl = 0;
+static int bbsb_bankh = 0;
+
+static WRITE8_HANDLER( bbsb_bankl_w )
+{
+	bbsb_bankl = offset; // 0,1,2,3
+}
+
+static WRITE8_HANDLER( bbsb_bankh_w )
+{
+	bbsb_bankh = offset; // 4,5,6,7
+}
+
+static READ8_HANDLER( bbsb_bankl_r )
+{
+	// return data from the selected bank (0,1,2,3)
+	UINT8 *mem = space->machine->region("lslot")->base();
+	return &mem[0x0000 + bbsb_bankl * 0x1000];
+}
+
+static READ8_HANDLER( bbsb_bankh_r )
+{
+	// return data from the selected bank (4,5,6,7)
+	UINT8 *mem = space->machine->region("lslot")->base();
+	return &mem[0x4000 + bbsb_bankh * 0x1000];
+}
+#endif
 
 typedef struct _a800_pcb  a800_pcb;
 struct _a800_pcb
@@ -146,9 +307,9 @@ struct _a800_pcb
 // WARNING: most of these are still unsupported by the driver
 static const a800_pcb pcb_list[] =
 {
-	{"standard 4k", A800_4K},
+	{"standard 4k", A800_8K},
 	{"standard 8k", A800_8K},
-	{"standard 12k", A800_12K},
+	{"standard 12k", A800_16K},
 	{"standard 16k", A800_16K},
 	{"right slot 4k", A800_RIGHT_4K},
 	{"right slot 8k", A800_RIGHT_8K},
@@ -189,15 +350,33 @@ static void a800_setup_mappers(running_machine *machine, int type)
 		case A800_8K:
 		case A800_16K:
 		case A800_RIGHT_8K:
-		case OSS_034M:
-		case OSS_M091:
-		case PHOENIX_8K:
+		case PHOENIX_8K:	// as normal 8k cart, but it can be disabled by writing to 0xd500-0xdfff
+			break;
 		case XEGS_32K:
+			memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xd500, 0xd5ff, 0, 0, x32_bank_w);
+			break;
+		case OSS_034M:
+			memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xd500, 0xd5ff, 0, 0, oss_034m_w);
+			break;
+		case OSS_M091:
+			memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xd500, 0xd5ff, 0, 0, oss_m091_w);
+			break;
 		case BBSB:
-		case DIAMOND_64K:
+			memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0x8fff, 0, 0, bbsb_bankl_w);
+			memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x9000, 0x9fff, 0, 0, bbsb_bankh_w);
+			break;
 		case WILLIAMS_64K:
+			memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xd500, 0xd50f, 0, 0, w64_bank_w);
+			break;
+		case DIAMOND_64K:
+			memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xd5d0, 0xd5df, 0, 0, ex64_bank_w);
+			break;
 		case EXPRESS_64:
+			memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xd570, 0xd57f, 0, 0, ex64_bank_w);
+			break;
 		case SPARTADOS_X:
+			memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xd5e0, 0xd5ef, 0, 0, ex64_bank_w);
+			break;
 		default:
 			break;
 	}
@@ -290,9 +469,6 @@ static int a800_check_cart_type(device_image_interface &image)
 			else
 				type = A800_8K;
 		}
-		
-		if ((strcmp(image.device().tag(),"cart2") == 0) && (type != A800_RIGHT_8K))
-			fatalerror("You cannot load this image '%s' in the right slot", image.filename());
 	}
 	else
 	{
@@ -314,19 +490,21 @@ static int a800_check_cart_type(device_image_interface &image)
 				break;
 		}
 	}
+	
+	if ((strcmp(image.device().tag(),"cart2") == 0) && (type != A800_RIGHT_8K))
+		fatalerror("You cannot load this image '%s' in the right slot", image.filename());
+
 	return type;
 }
 
 DEVICE_IMAGE_LOAD( a800_cart )
 {
-	int cart_type;
 	UINT32 size, start = 0;
 
 	a800_cart_loaded = a800_cart_loaded & ~LEFT_CARTSLOT_MOUNTED;
-	a800_cart_is_16k = 0;
-	cart_type = a800_check_cart_type(image);
+	a800_cart_type = a800_check_cart_type(image);
 
-	a800_setup_mappers(image.device().machine, cart_type);
+	a800_setup_mappers(image.device().machine, a800_cart_type);
 
 	if (image.software_entry() == NULL)
 	{
@@ -346,21 +524,19 @@ DEVICE_IMAGE_LOAD( a800_cart )
 	}	
 
 	a800_cart_loaded |= (size > 0x0000) ? 1 : 0;
-	a800_cart_is_16k = (size > 0x2000) ? 1 : 0;
 
-	logerror("%s loaded left cartridge '%s' size %s\n", image.device().machine->gamedrv->name, image.filename(), (a800_cart_is_16k) ? "16K":"8K");
+	logerror("%s loaded left cartridge '%s' size %dK\n", image.device().machine->gamedrv->name, image.filename(), size/1024);
 	return IMAGE_INIT_PASS;
 }
 
 DEVICE_IMAGE_LOAD( a800_cart_right )
 {
-	int cart_type;
 	UINT32 size, start = 0;
 	
 	a800_cart_loaded = a800_cart_loaded & ~RIGHT_CARTSLOT_MOUNTED;
-	cart_type = a800_check_cart_type(image);
+	a800_cart_type = a800_check_cart_type(image);
 	
-	a800_setup_mappers(image.device().machine, cart_type);
+	a800_setup_mappers(image.device().machine, a800_cart_type);
 	
 	if (image.software_entry() == NULL)
 	{
@@ -387,14 +563,15 @@ DEVICE_IMAGE_LOAD( a800_cart_right )
 
 DEVICE_IMAGE_UNLOAD( a800_cart )
 {
-	a800_cart_is_16k = 0;
 	a800_cart_loaded = a800_cart_loaded & ~LEFT_CARTSLOT_MOUNTED;
+	a800_cart_type = A800_UNKNOWN;
 	a800_setbank(image.device().machine, a800_cart_loaded);
 }
 
 DEVICE_IMAGE_UNLOAD( a800_cart_right )
 {
 	a800_cart_loaded = a800_cart_loaded & ~RIGHT_CARTSLOT_MOUNTED;
+	a800_cart_type = A800_UNKNOWN;
 	a800_setbank(image.device().machine, a800_cart_loaded);
 }
 

@@ -1170,6 +1170,9 @@ static MACHINE_CONFIG_DERIVED( a600xl, atari_common )
 
 	MCFG_FRAGMENT_ADD(a400_cartslot)
 
+	/* software lists */
+	MCFG_SOFTWARE_LIST_ADD("cart_list","a800")
+
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("16K")
@@ -1191,6 +1194,9 @@ static MACHINE_CONFIG_DERIVED( a800xl, atari_common )
 	MCFG_SCREEN_SIZE(HWIDTH*8, TOTAL_LINES_60HZ)
 
 	MCFG_FRAGMENT_ADD(a400_cartslot)
+
+	/* software lists */
+	MCFG_SOFTWARE_LIST_ADD("cart_list","a800")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( a800xlpal, a800xl )
@@ -1221,6 +1227,7 @@ static MACHINE_CONFIG_DERIVED( xegs, a800xl )
 	MCFG_PIA6821_MODIFY( "pia", xegs_pia_interface )
 
 	MCFG_DEVICE_REMOVE("cart1")
+	MCFG_DEVICE_REMOVE("cart_list")
 
 	MCFG_CARTSLOT_ADD("cart1")
 	MCFG_CARTSLOT_EXTENSION_LIST("rom,bin")
