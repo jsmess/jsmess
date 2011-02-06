@@ -69,7 +69,7 @@ static int instruction_hook(device_t &device, offs_t curpc);
 READ8_HANDLER(ppi8255_r)
 {
 	device_t *ppi8255 = space->machine->device(PPI8255_TAG);
-	
+
 	switch(offset)
 	{
 		case 0 	: return i8255a_r(ppi8255,0); break;
@@ -83,7 +83,7 @@ READ8_HANDLER(ppi8255_r)
 WRITE8_HANDLER(ppi8255_w)
 {
 	device_t *ppi8255 = space->machine->device(PPI8255_TAG);
-	
+
 	switch(offset)
 	{
 		case 0 	: i8255a_w(ppi8255,0,data); break;
@@ -119,7 +119,7 @@ WRITE8_DEVICE_HANDLER(mbc55x_ppi_portb_w)
 WRITE8_DEVICE_HANDLER(mbc55x_ppi_portc_w)
 {
 	device_t *wd17xx = device->machine->device(FDC_TAG);
-	
+
 	wd17xx_set_drive(wd17xx,(data & 0x03));
 	wd17xx_set_side(wd17xx,((data & 0x04) >> 2));
 }
@@ -168,7 +168,7 @@ WRITE8_HANDLER(pic8259_w)
 static IRQ_CALLBACK(mbc55x_irq_callback)
 {
 	device_t *pic8259 = device->machine->device(PIC8259_TAG);
-	
+
 	return pic8259_acknowledge( pic8259 );
 }
 
@@ -178,17 +178,17 @@ const struct pit8253_config mbc55x_pit8253_config =
 {
 	{
 		{
-			PIT_C0_CLOCK,				
+			PIT_C0_CLOCK,
 			DEVCB_NULL,
 			DEVCB_DEVICE_LINE(PIC8259_TAG, pic8259_ir0_w)
 		}, 
 		{
-			PIT_C1_CLOCK,				
+			PIT_C1_CLOCK,
 			DEVCB_NULL,
 			DEVCB_DEVICE_LINE(PIC8259_TAG, pic8259_ir1_w)
 		}, 
 		{
-			PIT_C2_CLOCK,				
+			PIT_C2_CLOCK,
 			DEVCB_NULL,
 			DEVCB_NULL
 		}
@@ -198,7 +198,7 @@ const struct pit8253_config mbc55x_pit8253_config =
 READ8_HANDLER(pit8253_r)
 {
 	device_t *pit8253 = space->machine->device(PIT8253_TAG);
-	
+
 	switch(offset)
 	{
 		case 0 	: return pit8253_r(pit8253,0); break;
@@ -212,7 +212,7 @@ READ8_HANDLER(pit8253_r)
 WRITE8_HANDLER(pit8253_w)
 {
 	device_t *pit8253 = space->machine->device(PIT8253_TAG);
-	
+
 	switch(offset)
 	{
 		case 0 	: pit8253_w(pit8253,0,data); break;
@@ -227,7 +227,7 @@ WRITE8_HANDLER(pit8253_w)
 READ8_HANDLER(vram_page_r)
 {
 	mbc55x_state *state	= space->machine->driver_data<mbc55x_state>();
-	
+
 	return state->vram_page;
 }
 
@@ -243,7 +243,7 @@ WRITE8_HANDLER(vram_page_w)
 READ8_HANDLER(mbc55x_disk_r)
 {
 	device_t *wd17xx = space->machine->device(FDC_TAG);
-	
+
 	switch(offset)
 	{
 		case 0 	: return wd17xx_status_r(wd17xx,0);	break;
@@ -257,7 +257,7 @@ READ8_HANDLER(mbc55x_disk_r)
 WRITE8_HANDLER(mbc55x_disk_w)
 {
 	device_t *wd17xx = space->machine->device(FDC_TAG);
-	
+
 	switch(offset)
 	{
 		case 0 	: wd17xx_command_w(wd17xx,0,data);	break;
@@ -278,7 +278,7 @@ static WRITE_LINE_DEVICE_HANDLER( mbc55x_fdc_drq_w )
 /* msm8251 serial */
 
 const msm8251_interface mbc55x_msm8251a_interface = 
-{	
+{
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -321,27 +321,27 @@ DRIVER_INIT(mbc55x)
 static void set_ram_size(running_machine *machine)
 {
 	mbc55x_state 	*state 		= machine->driver_data<mbc55x_state>();
-    address_space 	*space 		= cputag_get_address_space( machine, MAINCPU_TAG, ADDRESS_SPACE_PROGRAM );
-    int 			ramsize 	= ram_get_size(machine->device(RAM_TAG));
+	address_space 	*space 		= cputag_get_address_space( machine, MAINCPU_TAG, ADDRESS_SPACE_PROGRAM );
+	int 			ramsize 	= ram_get_size(machine->device(RAM_TAG));
 	int 			nobanks		= ramsize / RAM_BANK_SIZE;
 	char 			bank[10];
-    int 			bankno;
+	int 			bankno;
 	UINT8 			*ram    	= &ram_get_ptr(machine->device(RAM_TAG))[0];
-    UINT8			*map_base;
+	UINT8			*map_base;
 	int				bank_base;
-	
-	
+
+
 	logerror("Ramsize is %d bytes\n",ramsize);
 	logerror("RAM_BANK_SIZE=%d, nobanks=%d\n",RAM_BANK_SIZE,nobanks);
-	
+
 	// Main memory mapping
-	
+
 	for(bankno=0; bankno<RAM_BANK_COUNT; bankno++)
 	{
 		sprintf(bank,"bank%x",bankno);
 		bank_base=bankno*RAM_BANK_SIZE;
 		map_base=&ram[bank_base];
-		
+
 		if(bankno<nobanks)
 		{
 			memory_set_bankptr(machine, bank, map_base);
@@ -354,7 +354,7 @@ static void set_ram_size(running_machine *machine)
 			logerror("Mapping bank %d at %05X to NOP\n",bankno,bank_base);
 		}
 	}
-	
+
 	// Graphics red and blue plane memory mapping, green is in main memory
 	memory_set_bankptr(machine, RED_PLANE_TAG, &state->video_mem[RED_PLANE_OFFSET]);
 	memory_install_readwrite_bank(space, RED_PLANE_MEMBASE, RED_PLANE_MEMBASE+(COLOUR_PLANE_SIZE-1), 0, 0, RED_PLANE_TAG);
@@ -374,12 +374,11 @@ MACHINE_START( mbc55x )
 	/* init cpu */
 //	mbc55x_cpu_init(machine);
 
-
 	/* setup debug commands */
 	if (machine->debug_flags & DEBUG_FLAG_ENABLED)
 	{
 		debug_console_register_command(machine, "mbc55x_debug", CMDFLAG_NONE, 0, 0, 1, mbc55x_debug);
-		
+
 		/* set up the instruction hook */
 		machine->device(MAINCPU_TAG)->debug()->set_instruction_hook(instruction_hook);
 	}
@@ -391,15 +390,15 @@ MACHINE_START( mbc55x )
 static void mbc55x_debug(running_machine *machine, int ref, int params, const char *param[])
 {
 	mbc55x_state *state = machine->driver_data<mbc55x_state>();
-    if(params>0)
-    {
-        sscanf(param[0],"%d",&state->debug_machine);
-    }
-    else
-    {
-        debug_console_printf(machine,"Error usage : mbc55x_debug <debuglevel>\n");
-        debug_console_printf(machine,"Current debuglevel=%02X\n",state->debug_machine);
-    }
+	if(params>0)
+	{
+		sscanf(param[0],"%d",&state->debug_machine);
+	}
+	else
+	{
+		debug_console_printf(machine,"Error usage : mbc55x_debug <debuglevel>\n");
+		debug_console_printf(machine,"Current debuglevel=%02X\n",state->debug_machine);
+	}
 }
 
 /*-----------------------------------------------
@@ -409,46 +408,46 @@ static void mbc55x_debug(running_machine *machine, int ref, int params, const ch
 static int instruction_hook(device_t &device, offs_t curpc)
 {
 	mbc55x_state 	*state = device.machine->driver_data<mbc55x_state>();
-    address_space 	*space = cpu_get_address_space(&device, ADDRESS_SPACE_PROGRAM);
-    UINT8           *addr_ptr;
+	address_space 	*space = cpu_get_address_space(&device, ADDRESS_SPACE_PROGRAM);
+	UINT8           *addr_ptr;
 
-    addr_ptr = (UINT8*)space->get_read_ptr(curpc);
+	addr_ptr = (UINT8*)space->get_read_ptr(curpc);
 
 	if ((addr_ptr !=NULL) && (addr_ptr[0]==0xCD))
 	{
 //		logerror("int %02X called\n",addr_ptr[1]);
-		
+
 		if(DEBUG_SET(DECODE_DOS21) && (addr_ptr[1]==0x21))
-            decode_dos21(&device,curpc);
+			decode_dos21(&device,curpc);
 	}
 
-    return 0;
+	return 0;
 }
 
 static void decode_dos21(device_t *device,offs_t pc)
 {
-    device_t *cpu = device->machine->device(MAINCPU_TAG);
+	device_t *cpu = device->machine->device(MAINCPU_TAG);
 
-    UINT16  ax = cpu_get_reg(cpu,I8086_AX);
-    UINT16  bx = cpu_get_reg(cpu,I8086_BX);
-    UINT16  cx = cpu_get_reg(cpu,I8086_CX);
+	UINT16  ax = cpu_get_reg(cpu,I8086_AX);
+	UINT16  bx = cpu_get_reg(cpu,I8086_BX);
+	UINT16  cx = cpu_get_reg(cpu,I8086_CX);
 	UINT16  dx = cpu_get_reg(cpu,I8086_DX);
-    UINT16  cs = cpu_get_reg(cpu,I8086_CS);
+	UINT16  cs = cpu_get_reg(cpu,I8086_CS);
 	UINT16  ds = cpu_get_reg(cpu,I8086_DS);
 	UINT16  es = cpu_get_reg(cpu,I8086_ES);
 	UINT16  ss = cpu_get_reg(cpu,I8086_SS);
-	
-    UINT16  si = cpu_get_reg(cpu,I8086_SI);
-    UINT16  di = cpu_get_reg(cpu,I8086_DI);
+
+	UINT16  si = cpu_get_reg(cpu,I8086_SI);
+	UINT16  di = cpu_get_reg(cpu,I8086_DI);
 	UINT16  bp = cpu_get_reg(cpu,I8086_BP);
 
-    logerror("=======================================================================\n");
-    logerror("DOS Int 0x21 call at %05X\n",pc); 
+	logerror("=======================================================================\n");
+	logerror("DOS Int 0x21 call at %05X\n",pc); 
 	logerror("AX=%04X, BX=%04X, CX=%04X, DX=%04X\n",ax,bx,cx,dx);
 	logerror("CS=%04X, DS=%04X, ES=%04X, SS=%04X\n",cs,ds,es,ss);
 	logerror("SI=%04X, DI=%04X, BP=%04X\n",si,di,bp);
-    logerror("=======================================================================\n");
-	
+	logerror("=======================================================================\n");
+
 	if((ax & 0xff00)==0x0900)
 		debugger_break(device->machine);
 }

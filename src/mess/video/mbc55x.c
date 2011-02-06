@@ -107,35 +107,35 @@ const mc6845_interface mb55x_mc6845_intf =
 static void video_debug(running_machine *machine, int ref, int params, const char *param[])
 {
 	mbc55x_state *state = machine->driver_data<mbc55x_state>();
-    if(params>0)
-    {
-        sscanf(param[0],"%d",&state->debug_video);
-    }
-    else
-    {
-        debug_console_printf(machine,"Error usage : mbc55x_vid_debug <debuglevel>\n");
-        debug_console_printf(machine,"Current debuglevel=%02X\n",state->debug_video);
-    }
+	if(params>0)
+	{
+		sscanf(param[0],"%d",&state->debug_video);
+	}
+	else
+	{
+		debug_console_printf(machine,"Error usage : mbc55x_vid_debug <debuglevel>\n");
+		debug_console_printf(machine,"Current debuglevel=%02X\n",state->debug_video);
+	}
 }
 
 static MC6845_UPDATE_ROW( vid_update_row )
 {
 	mbc55x_state *state = device->machine->driver_data<mbc55x_state>();
-	
+
 	UINT8	*ram	= &ram_get_ptr(device->machine->device(RAM_TAG))[0];
 	UINT8	*red	= &state->video_mem[RED_PLANE_OFFSET];
 	UINT8	*blue	= &state->video_mem[BLUE_PLANE_OFFSET];
 	UINT8	*green;
-	int		offset;
+	int	offset;
 	UINT8	rpx,gpx,bpx;
 	UINT8	rb,gb,bb;
-	
-	int		x_pos;
-	int		pixelno;
+
+	int	x_pos;
+	int	pixelno;
 	UINT8	bitno;
 	UINT8	shifts;
 	UINT8	colour;
-	
+
 	switch(state->vram_page)
 	{
 		case 4	: green=&ram[0x08000]; break;
@@ -145,33 +145,32 @@ static MC6845_UPDATE_ROW( vid_update_row )
 		default :
 			green=&ram[0x0C000];
 	}
-		
+
 	if(DEBUG_SET(DEBUG_LINES))
 		logerror("MC6845_UPDATE_ROW: ma=%d, ra=%d, y=%d, x_count=%d\n",ma,ra,y,x_count);
-	
+
 	offset=(ra) + ((y/4)*(x_count*4));
-	
+
 	if(DEBUG_SET(DEBUG_LINES))
 		logerror("offset=%05X\n",offset);
-	
+
 	for(x_pos=0; x_pos<x_count; x_pos++)
 	{
 		rpx=red[offset+(x_pos*4)];
 		gpx=green[offset+(x_pos*4)];
 		bpx=blue[offset+(x_pos*4)];
-		
+
 		bitno=0x80;
 		shifts=7;
-		
+
 		for(pixelno=0; pixelno<8; pixelno++)
 		{
-			
 			rb=(rpx & bitno) >> shifts;
 			gb=(gpx & bitno) >> shifts;
 			bb=(bpx & bitno) >> shifts;
-			
+
 			colour=(rb<<2) | (gb<<1) | (bb<<0);
-			
+
 			*BITMAP_ADDR16(bitmap, y, (x_pos*8)+pixelno)=colour;
 			//logerror("set pixel (%d,%d)=%d\n",y, ((x_pos*8)+pixelno),colour);
 			bitno=bitno>>1; 
@@ -192,7 +191,7 @@ static WRITE_LINE_DEVICE_HANDLER( vid_vsync_changed )
 READ8_HANDLER( mbc55x_video_io_r)
 {
 	device_t *mc6845 = space->machine->device(VID_MC6845_NAME);
-	
+
 	switch(offset & 0x03)
 	{
 		case 0 : return mc6845_status_r(mc6845, 0); break;
@@ -205,7 +204,7 @@ READ8_HANDLER( mbc55x_video_io_r)
 WRITE8_HANDLER( mbc55x_video_io_w )
 {
 	device_t *mc6845 = space->machine->device(VID_MC6845_NAME);
-	
+
 	switch(offset & 0x03)
 	{
 		case 0 : mc6845_address_w(mc6845,0,data);
@@ -216,29 +215,28 @@ WRITE8_HANDLER( mbc55x_video_io_w )
 VIDEO_START( mbc55x )
 {
 	mbc55x_state *state = machine->driver_data<mbc55x_state>();
-    state->debug_video=0;
+	state->debug_video=0;
 
-    logerror("VIDEO_START\n");
+	logerror("VIDEO_START\n");
 
 	if (machine->debug_flags & DEBUG_FLAG_ENABLED)
 	{
-        debug_console_register_command(machine, "mbc55x_vid_debug", CMDFLAG_NONE, 0, 0, 1, video_debug);
-    }
+		debug_console_register_command(machine, "mbc55x_vid_debug", CMDFLAG_NONE, 0, 0, 1, video_debug);
+	}
 }
 
 VIDEO_RESET( mbc55x )
 {
 	mbc55x_state *state = machine->driver_data<mbc55x_state>();
-    // When we reset clear the video registers and video memory.
-    memset(&state->video_mem,0,sizeof(state->video_mem));
+	// When we reset clear the video registers and video memory.
+	memset(&state->video_mem,0,sizeof(state->video_mem));
 
-    logerror("Video reset\n");
+	logerror("Video reset\n");
 }
 
 VIDEO_EOF( mbc55x )
 {
-
-//    logerror("VIDEO_EOF( mbc55x )\n");
+//	logerror("VIDEO_EOF( mbc55x )\n");
 }
 
 VIDEO_UPDATE( mbc55x )
@@ -248,14 +246,14 @@ VIDEO_UPDATE( mbc55x )
 
 #if 0	
 	mbc55x_state *state = screen->machine->driver_data<mbc55x_state>();
-    int     XCoord;
-    int     YCoord = screen->vpos();
+	int	 XCoord;
+	int	 YCoord = screen->vpos();
 
-    for(XCoord=0;XCoord<SCREEN_WIDTH_PIXELS;XCoord++)
-    {
-        *BITMAP_ADDR16(bitmap, YCoord, XCoord)=state->video_mem[XCoord*YCoord];
-    }
+	for(XCoord=0;XCoord<SCREEN_WIDTH_PIXELS;XCoord++)
+	{
+		*BITMAP_ADDR16(bitmap, YCoord, XCoord)=state->video_mem[XCoord*YCoord];
+	}
 #endif
-    return 0;
+	return 0;
 }
 
