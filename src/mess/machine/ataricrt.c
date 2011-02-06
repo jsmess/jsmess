@@ -14,128 +14,88 @@ static int a800_cart_loaded = 0;
 static int a800_cart_is_16k = 0;
 static int atari = 0;
 
+#define LEFT_CARTSLOT_MOUNTED  1
+#define RIGHT_CARTSLOT_MOUNTED 2
+
 /*************************************
  *
  *  Generic code
  *
  *************************************/
 
-#ifdef UNUSED_CODE
-DRIVER_INIT( atari )
+
+// Currently, the drivers have fixed 40k RAM, however the function here is ready for different sizes too
+static void a800_setbank(running_machine *machine, int cart_mounted)
 {
 	offs_t ram_top;
-	offs_t ram_size;
+	
+	// take care of 0x0000-0x7fff: RAM or NOP
+	ram_top = MIN(ram_get_size(machine->device(RAM_TAG)), 0x8000) - 1;
+	memory_install_readwrite_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000, ram_top, 0, 0, "0000");
+	memory_set_bankptr(machine, "0000", ram_get_ptr(machine->device(RAM_TAG)));
 
-	if (!strcmp(machine->gamedrv->name, "a5200")
-		|| !strcmp(machine->gamedrv->name, "a600xl"))
+	// take care of 0x8000-0x9fff: A800 -> either right slot or RAM or NOP, others -> RAM or NOP
+	// is there anything in the right slot?
+	if (cart_mounted & RIGHT_CARTSLOT_MOUNTED)
 	{
-		ram_size = 0x8000;
+		memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0x9fff, 0, 0, "8000");
+		memory_set_bankptr(machine, "8000", machine->region("rslot")->base());
+		memory_nop_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0x9fff, 0, 0);
 	}
 	else
 	{
-		ram_size = 0xa000;
+		ram_top = MIN(ram_get_size(machine->device(RAM_TAG)), 0xa000) - 1;
+		if (ram_top > 0x8000)
+		{
+			memory_install_readwrite_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, ram_top, 0, 0, "8000");
+			memory_set_bankptr(machine, "8000", ram_get_ptr(machine->device(RAM_TAG)) + 0x8000);
+		}
 	}
-
-	/* install RAM */
-	ram_top = MIN(ram_get_size(machine->device(RAM_TAG)), ram_size) - 1;
-	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM),
-		0x0000, ram_top, 0, 0, SMH_BANK(2));
-	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM),
-		0x0000, ram_top, 0, 0, SMH_BANK(2));
-	memory_set_bankptr(machine, 2, ram_get_ptr(machine->device(RAM_TAG)));
-}
-#endif
-
-
-static void a800_setbank(running_machine *machine, int n)
-{
-	void *read_addr;
-	void *write_addr;
-	UINT8 *mem = machine->region("maincpu")->base();
-
-	switch (n)
+	
+	// take care of 0xa000-0xbfff: is there anything in the left slot?
+	if (cart_mounted & LEFT_CARTSLOT_MOUNTED)
 	{
-		case 1:
-			read_addr = &mem[0x10000];
-			write_addr = NULL;
-			break;
-		default:
-			if( atari <= ATARI_400 )
+		if (atari == ATARI_800XL)
+		{
+			// FIXME: this is an hack to keep XL working until we clean up its memory map as well!
+			if (a800_cart_is_16k)
 			{
-				/* Atari 400 has no RAM here, so install the NOP handler */
-				read_addr = NULL;
-				write_addr = NULL;
+				memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0x9fff, 0, 0, "8000");
+				memory_set_bankptr(machine, "8000", machine->region("lslot")->base());
+				memory_nop_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0x9fff, 0, 0);
+
+				memcpy(machine->region("maincpu")->base() + 0x10000, machine->region("lslot")->base() + 0x2000, 0x2000);
 			}
 			else
-			{
-				read_addr = &ram_get_ptr(machine->device(RAM_TAG))[0x08000];
-				write_addr = &ram_get_ptr(machine->device(RAM_TAG))[0x08000];
-			}
-			break;
+				memcpy(machine->region("maincpu")->base() + 0x10000, machine->region("lslot")->base(), 0x2000);
+		}
+		else if (a800_cart_is_16k)
+		{
+			memory_set_bankptr(machine, "8000", machine->region("lslot")->base());
+			memory_set_bankptr(machine, "a000", machine->region("lslot")->base() + 0x2000);
+			memory_nop_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0xbfff, 0, 0);
+		}
+		else
+		{
+			memory_set_bankptr(machine, "a000", machine->region("lslot")->base());
+			memory_nop_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa000, 0xbfff, 0, 0);
+		}
 	}
-
-	if (read_addr) {
-		memory_set_bankptr(machine, "bank1", read_addr);
-		memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0xbfff, 0, 0, "bank1");
-	} else {
-		memory_nop_read(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0xbfff, 0, 0);
-	}
-	if (write_addr) {
-		memory_set_bankptr(machine, "bank1", write_addr);
-		memory_install_write_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0xbfff, 0, 0, "bank1");
-	} else {
-		memory_nop_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0xbfff, 0, 0);
-	}
-}
-
-
-static void cart_reset(running_machine &machine)
-{
-	if (a800_cart_loaded)
-		a800_setbank(&machine, 1);
 }
 
 /* MESS specific parts that have to be started */
 static void ms_atari_machine_start(running_machine *machine, int type, int has_cart)
 {
-	offs_t ram_top;
-	offs_t ram_size;
-
-	/* set atari type (needed for banks above) */
+	/* set atari type (temporarily not used) */
 	atari = type;
-
-	/* determine RAM */
-	if (!strcmp(machine->gamedrv->name, "a400")
-		|| !strcmp(machine->gamedrv->name, "a400pal")
-		|| !strcmp(machine->gamedrv->name, "a800")
-		|| !strcmp(machine->gamedrv->name, "a800pal")
-		|| !strcmp(machine->gamedrv->name, "a800xl"))
-	{
-		ram_size = 0xA000;
-	}
-	else
-	{
-		ram_size = 0x8000;
-	}
-
-	/* install RAM */
-	ram_top = MIN(ram_get_size(machine->device(RAM_TAG)), ram_size) - 1;
-	memory_install_readwrite_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM),0x0000, ram_top, 0, 0, "bank2");
-	memory_set_bankptr(machine, "bank2", ram_get_ptr(machine->device(RAM_TAG)));
-
-	/* cartridge */
-	if (has_cart)
-		machine->add_notifier(MACHINE_NOTIFY_RESET, cart_reset);
+	a800_setbank(machine, a800_cart_loaded);
 }
 
 static void ms_atari800xl_machine_start(running_machine *machine, int type, int has_cart)
 {
-	/* set atari type (needed for banks above) */
+	/* set atari type (temporarily not used) */
 	atari = type;
-
-	/* cartridge */
-	if (has_cart)
-		machine->add_notifier(MACHINE_NOTIFY_RESET, cart_reset);
+	a800_setbank(machine, a800_cart_loaded);
 }
 
 /*************************************
@@ -307,39 +267,39 @@ static int a800_get_type(device_image_interface &image)
 	return cart_type;
 }
 
-DEVICE_IMAGE_LOAD( a800_cart )
+static int a800_check_cart_type(device_image_interface &image)
 {
-	UINT8 *mem = image.device().machine->region("maincpu")->base();
 	const char	*pcb_name;
-	int cart_type = A800_UNKNOWN;
-	UINT32 size;
+	int type = A800_UNKNOWN;
 
 	if (image.software_entry() == NULL)
 	{
-		size = image.length();
-
+		UINT32 size = image.length();
+		
 		// check if there is an header, if so extract cart_type from it, otherwise 
 		// try to guess the cart_type from the file size (notice that after the 
 		// a800_get_type call, we point at the start of the data)
 		if ((size % 0x1000) == 0x10)
-			cart_type = a800_get_type(image);
+			type = a800_get_type(image);
 		else if (size == 0x4000)
-			cart_type = A800_16K;
+			type = A800_16K;
 		else if (size == 0x2000)
 		{
 			if (strcmp(image.device().tag(),"cart2") == 0)
-				cart_type = A800_RIGHT_8K;
+				type = A800_RIGHT_8K;
 			else
-				cart_type = A800_8K;
+				type = A800_8K;
 		}
+		
+		if ((strcmp(image.device().tag(),"cart2") == 0) && (type != A800_RIGHT_8K))
+			fatalerror("You cannot load this image '%s' in the right slot", image.filename());
 	}
 	else
 	{
-		size = image.get_software_region_length("rom");
 		if ((pcb_name = image.get_feature("cart_type")) != NULL)
-			cart_type = a800_get_pcb_id(pcb_name);
-
-		switch (cart_type)
+			type = a800_get_pcb_id(pcb_name);
+		
+		switch (type)
 		{
 			case A800_UNKNOWN:
 			case A800_4K:
@@ -354,54 +314,88 @@ DEVICE_IMAGE_LOAD( a800_cart )
 				break;
 		}
 	}
+	return type;
+}
+
+DEVICE_IMAGE_LOAD( a800_cart )
+{
+	int cart_type;
+	UINT32 size, start = 0;
+
+	a800_cart_loaded = a800_cart_loaded & ~LEFT_CARTSLOT_MOUNTED;
+	a800_cart_is_16k = 0;
+	cart_type = a800_check_cart_type(image);
 
 	a800_setup_mappers(image.device().machine, cart_type);
 
-	/* load an optional (dual) cartridge (e.g. basic.rom) */
-	if (strcmp(image.device().tag(),"cart2") == 0)
+	if (image.software_entry() == NULL)
 	{
-		a800_cart_is_16k = (size >= 0x2000) ? 1 : 0;
-
-		if (image.software_entry() == NULL)
-			image.fread(&mem[0x12000], 0x2000);
-		else
-			memcpy(&mem[0x12000], image.get_software_region("rom"), 0x2000);
-
-		logerror("%s loaded right cartridge '%s' size 16K\n", image.device().machine->gamedrv->name, image.filename() );
+		size = image.length();
+		// if there is an header, skip it
+		if ((size % 0x1000) == 0x10)
+		{
+			size -= 0x10;
+			start = 0x10;
+		}
+		image.fread(image.device().machine->region("lslot")->base(), size - start);
 	}
 	else
 	{
-		a800_cart_loaded = (size > 0x0000) ? 1 : 0;
-		a800_cart_is_16k = (size > 0x2000) ? 1 : 0;
-		
-		if (image.software_entry() == NULL)
+		size = image.get_software_region_length("rom");
+		memcpy(image.device().machine->region("lslot")->base(), image.get_software_region("rom"), size);
+	}	
+
+	a800_cart_loaded |= (size > 0x0000) ? 1 : 0;
+	a800_cart_is_16k = (size > 0x2000) ? 1 : 0;
+
+	logerror("%s loaded left cartridge '%s' size %s\n", image.device().machine->gamedrv->name, image.filename(), (a800_cart_is_16k) ? "16K":"8K");
+	return IMAGE_INIT_PASS;
+}
+
+DEVICE_IMAGE_LOAD( a800_cart_right )
+{
+	int cart_type;
+	UINT32 size, start = 0;
+	
+	a800_cart_loaded = a800_cart_loaded & ~RIGHT_CARTSLOT_MOUNTED;
+	cart_type = a800_check_cart_type(image);
+	
+	a800_setup_mappers(image.device().machine, cart_type);
+	
+	if (image.software_entry() == NULL)
+	{
+		size = image.length();
+		// if there is an header, skip it
+		if ((size % 0x1000) == 0x10)
 		{
-			image.fread(&mem[0x10000], 0x2000);
-			image.fread(&mem[0x12000], 0x2000);
+			size -= 0x10;
+			start = 0x10;
 		}
-		else
-		{
-			memcpy(&mem[0x10000], image.get_software_region("rom"), (size > 0x2000) ? 0x2000 : size);
-			if (a800_cart_is_16k)
-				memcpy(&mem[0x12000], image.get_software_region("rom") + 0x2000, (size > 0x4000) ? 0x2000 : size - 0x2000);
-		}
-		logerror("%s loaded left cartridge '%s' size %s\n", image.device().machine->gamedrv->name, image.filename() , (a800_cart_is_16k) ? "16K":"8K");
+		image.fread(image.device().machine->region("rslot")->base(), size - start);
 	}
+	else
+	{
+		size = image.get_software_region_length("rom");
+		memcpy(image.device().machine->region("rslot")->base(), image.get_software_region("rom"), size);
+	}	
+
+	a800_cart_loaded |= (size > 0x0000) ? 2 : 0;
+
+	logerror("%s loaded right cartridge '%s' size 8K\n", image.device().machine->gamedrv->name, image.filename());
 	return IMAGE_INIT_PASS;
 }
 
 DEVICE_IMAGE_UNLOAD( a800_cart )
 {
-	if( strcmp(image.device().tag(),"cart2") == 0 )
-	{
-		a800_cart_is_16k = 0;
-		a800_setbank(image.device().machine, 1);
-    }
-	else
-	{
-		a800_cart_loaded = 0;
-		a800_setbank(image.device().machine, 0);
-    }
+	a800_cart_is_16k = 0;
+	a800_cart_loaded = a800_cart_loaded & ~LEFT_CARTSLOT_MOUNTED;
+	a800_setbank(image.device().machine, a800_cart_loaded);
+}
+
+DEVICE_IMAGE_UNLOAD( a800_cart_right )
+{
+	a800_cart_loaded = a800_cart_loaded & ~RIGHT_CARTSLOT_MOUNTED;
+	a800_setbank(image.device().machine, a800_cart_loaded);
 }
 
 
@@ -416,47 +410,6 @@ MACHINE_START( a800xl )
 	atari_machine_start(machine);
 	ms_atari800xl_machine_start(machine, ATARI_800XL, TRUE);
 }
-
-DEVICE_IMAGE_LOAD( a800xl_cart )
-{
-	UINT8 *mem = image.device().machine->region("maincpu")->base();
-	astring *fname;
-	mame_file *basic_fp;
-	file_error filerr;
-	unsigned size;
-
-	fname = astring_assemble_3(astring_alloc(), image.device().machine->gamedrv->name, PATH_SEPARATOR, "basic.rom");
-	filerr = mame_fopen(SEARCHPATH_ROM, astring_c(fname), OPEN_FLAG_READ, &basic_fp);
-	astring_free(fname);
-
-	if (filerr != FILERR_NONE)
-	{
-		size = mame_fread(basic_fp, &mem[0x14000], 0x2000);
-		if( size < 0x2000 )
-		{
-			logerror("%s image '%s' load failed (less than 8K)\n", image.device().machine->gamedrv->name, astring_c(fname));
-			mame_fclose(basic_fp);
-			return 2;
-		}
-	}
-
-	/* load an optional (dual) cartidge (e.g. basic.rom) */
-	if (filerr != FILERR_NONE)
-	{
-		{
-			size = image.fread(&mem[0x14000], 0x2000);
-			a800_cart_loaded = size / 0x2000;
-			size = image.fread(&mem[0x16000], 0x2000);
-			a800_cart_is_16k = size / 0x2000;
-			logerror("%s loaded cartridge '%s' size %s\n",
-					image.device().machine->gamedrv->name, image.filename(), (a800_cart_is_16k) ? "16K":"8K");
-		}
-		mame_fclose(basic_fp);
-	}
-
-	return IMAGE_INIT_PASS;
-}
-
 
 /*************************************
  *
@@ -573,4 +526,8 @@ DEVICE_IMAGE_LOAD( xegs_cart )
 	return IMAGE_INIT_PASS;
 }
 
-
+DEVICE_IMAGE_UNLOAD( xegs_cart )
+{
+	xegs_cart = 0;
+	xegs_banks = 0;
+}

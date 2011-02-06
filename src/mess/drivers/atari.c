@@ -239,7 +239,7 @@
 
 static ADDRESS_MAP_START(a400_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x9fff) AM_NOP	/* RAM installed at runtime */
-	AM_RANGE(0xa000, 0xbfff) AM_RAMBANK("bank1")
+	AM_RANGE(0xa000, 0xbfff) AM_RAMBANK("a000")
 	AM_RANGE(0xc000, 0xcfff) AM_ROM
 	AM_RANGE(0xd000, 0xd0ff) AM_READWRITE(atari_gtia_r, atari_gtia_w)
 	AM_RANGE(0xd100, 0xd1ff) AM_NOP
@@ -252,8 +252,9 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START(a800_mem, ADDRESS_SPACE_PROGRAM, 8)
-	AM_RANGE(0x0000, 0x9fff) AM_NOP	/* RAM installed at runtime */
-	AM_RANGE(0xa000, 0xbfff) AM_RAMBANK("bank1")
+	AM_RANGE(0x0000, 0x7fff) AM_RAMBANK("0000")
+	AM_RANGE(0x8000, 0x9fff) AM_RAMBANK("8000")
+	AM_RANGE(0xa000, 0xbfff) AM_RAMBANK("a000")
 	AM_RANGE(0xc000, 0xcfff) AM_ROM
 	AM_RANGE(0xd000, 0xd0ff) AM_READWRITE(atari_gtia_r, atari_gtia_w)
 	AM_RANGE(0xd100, 0xd1ff) AM_NOP
@@ -899,13 +900,13 @@ static void xegs_mmu(running_machine *machine, UINT8 new_mmu)
 static WRITE8_DEVICE_HANDLER(a1200xl_pia_pb_w) { a1200xl_mmu(device->machine, data); }
 static WRITE8_DEVICE_HANDLER(a800xl_pia_pb_w)
 {
-	if ( pia6821_get_port_b_z_mask(device) != 0xff )
+	if (pia6821_get_port_b_z_mask(device) != 0xff)
 		a800xl_mmu(device->machine, data);
 }
 
 static WRITE8_DEVICE_HANDLER(xegs_pia_pb_w)
 {
-	if ( pia6821_get_port_b_z_mask(device) != 0xff )
+	if (pia6821_get_port_b_z_mask(device) != 0xff)
 		xegs_mmu(device->machine, data);
 }
 
@@ -1021,6 +1022,7 @@ static MACHINE_CONFIG_FRAGMENT( a400_cartslot )
 	MCFG_CARTSLOT_NOT_MANDATORY
 	MCFG_CARTSLOT_LOAD(a800_cart)
 	MCFG_CARTSLOT_UNLOAD(a800_cart)
+	MCFG_CARTSLOT_INTERFACE("a800_cart")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_FRAGMENT( a800_cartslot )
@@ -1034,8 +1036,8 @@ static MACHINE_CONFIG_FRAGMENT( a800_cartslot )
 	MCFG_CARTSLOT_ADD("cart2")
 	MCFG_CARTSLOT_EXTENSION_LIST("rom,bin")
 	MCFG_CARTSLOT_NOT_MANDATORY
-	MCFG_CARTSLOT_LOAD(a800_cart)
-	MCFG_CARTSLOT_UNLOAD(a800_cart)
+	MCFG_CARTSLOT_LOAD(a800_cart_right)
+	MCFG_CARTSLOT_UNLOAD(a800_cart_right)
 	MCFG_CARTSLOT_INTERFACE("a800_cart")
 MACHINE_CONFIG_END
 
@@ -1089,6 +1091,9 @@ static MACHINE_CONFIG_DERIVED( a400, atari_common )
 	MCFG_SCREEN_SIZE(HWIDTH*8, TOTAL_LINES_60HZ)
 
 	MCFG_FRAGMENT_ADD(a400_cartslot)
+
+	/* software lists */
+	MCFG_SOFTWARE_LIST_ADD("cart_list","a800")
 MACHINE_CONFIG_END
 
 
@@ -1105,6 +1110,9 @@ static MACHINE_CONFIG_DERIVED( a400pal, atari_common )
 	MCFG_SCREEN_SIZE(HWIDTH*8, TOTAL_LINES_50HZ)
 
 	MCFG_FRAGMENT_ADD(a400_cartslot)
+
+	/* software lists */
+	MCFG_SOFTWARE_LIST_ADD("cart_list","a800")
 MACHINE_CONFIG_END
 
 
@@ -1217,8 +1225,9 @@ static MACHINE_CONFIG_DERIVED( xegs, a800xl )
 	MCFG_CARTSLOT_ADD("cart1")
 	MCFG_CARTSLOT_EXTENSION_LIST("rom,bin")
 	MCFG_CARTSLOT_NOT_MANDATORY
-	MCFG_CARTSLOT_INTERFACE("xegs_cart")
 	MCFG_CARTSLOT_LOAD(xegs_cart)
+	MCFG_CARTSLOT_UNLOAD(xegs_cart)
+	MCFG_CARTSLOT_INTERFACE("xegs_cart")
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","xegs")
@@ -1268,6 +1277,8 @@ ROM_START(a400)
 	ROM_SYSTEM_BIOS(1, "reva", "OS Rev. A")
 	ROMX_LOAD( "co12499a.rom",  0xe000, 0x1000, BAD_DUMP CRC(29f64e17) SHA1(abf7ec488c6b600f1b7f30bdc7f8a2bf6a727675), ROM_BIOS(2) )	// CRC and label waiting for confirmation
 	ROMX_LOAD( "co14599a.rom",  0xf000, 0x1000, BAD_DUMP CRC(bc533f0c) SHA1(e217148495fa747fe5488132d8d22533e68c7e58), ROM_BIOS(2) )	// CRC and label waiting for confirmation
+
+	ROM_REGION(0x10000, "lslot", ROMREGION_ERASEFF)
 ROM_END
 
 ROM_START(a400pal)
@@ -1275,6 +1286,8 @@ ROM_START(a400pal)
 	ROM_LOAD( "co12399b.rom", 0xd800, 0x0800, CRC(6a5d766e) SHA1(01a6044f7a81d409c938e7dfde0a1af5832229d2) )
 	ROM_LOAD( "co15199.rom", 0xe000, 0x1000, BAD_DUMP CRC(8e547f56) SHA1(1bd746ea798b723bfb18495a7facca113183d713) )	// Rev. A - CRC and label waiting for confirmation
 	ROM_LOAD( "co15299.rom", 0xf000, 0x1000, BAD_DUMP CRC(be55b413) SHA1(d88afae49b08e75943d0258cb580e5d34756414a) )	// Rev. A - CRC and label waiting for confirmation
+
+	ROM_REGION(0x10000, "lslot", ROMREGION_ERASEFF)
 ROM_END
 
 ROM_START(a800)
@@ -1286,6 +1299,10 @@ ROM_START(a800)
 	ROM_SYSTEM_BIOS(1, "reva", "OS Rev. A")
 	ROMX_LOAD( "co12499a.rom",  0xe000, 0x1000, BAD_DUMP CRC(29f64e17) SHA1(abf7ec488c6b600f1b7f30bdc7f8a2bf6a727675), ROM_BIOS(2) )	// CRC and label waiting for confirmation
 	ROMX_LOAD( "co14599a.rom",  0xf000, 0x1000, BAD_DUMP CRC(bc533f0c) SHA1(e217148495fa747fe5488132d8d22533e68c7e58), ROM_BIOS(2) )	// CRC and label waiting for confirmation
+
+	ROM_REGION(0x10000, "lslot", ROMREGION_ERASEFF)
+
+	ROM_REGION(0x2000, "rslot", ROMREGION_ERASEFF)
 ROM_END
 
 ROM_START(a800pal)
@@ -1293,6 +1310,10 @@ ROM_START(a800pal)
 	ROM_LOAD( "co12399b.rom", 0xd800, 0x0800, CRC(6a5d766e) SHA1(01a6044f7a81d409c938e7dfde0a1af5832229d2) )
 	ROM_LOAD( "co15199.rom", 0xe000, 0x1000, BAD_DUMP CRC(8e547f56) SHA1(1bd746ea798b723bfb18495a7facca113183d713) )	// Rev. A - CRC and label waiting for confirmation
 	ROM_LOAD( "co15299.rom", 0xf000, 0x1000, BAD_DUMP CRC(be55b413) SHA1(d88afae49b08e75943d0258cb580e5d34756414a) )	// Rev. A - CRC and label waiting for confirmation
+
+	ROM_REGION(0x10000, "lslot", ROMREGION_ERASEFF)
+
+	ROM_REGION(0x2000, "rslot", ROMREGION_ERASEFF)
 ROM_END
 
 ROM_START(a1200xl)
@@ -1303,12 +1324,16 @@ ROM_START(a1200xl)
 	ROM_SYSTEM_BIOS(1, "rev10", "OS Rev. 10")
 	ROMX_LOAD( "co60616a.rom", 0x14000, 0x2000, BAD_DUMP CRC(0391386b) SHA1(7c176657c88b89b8a69bf021fa8e0939efc0dff2), ROM_BIOS(2) )	// CRC and label waiting for confirmation
 	ROMX_LOAD( "co60617a.rom", 0x16000, 0x2000, BAD_DUMP CRC(b502f1e7) SHA1(6688db57d97fa570aef5c15cef3e5fb2688879c2), ROM_BIOS(2) )	// CRC and label waiting for confirmation
+
+	ROM_REGION(0x10000, "lslot", ROMREGION_ERASEFF)
 ROM_END
 
 ROM_START(a600xl)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD( "co60302a.rom", 0xa000, 0x2000, CRC(f0202fb3) SHA1(7ad88dd99ff4a6ee66f6d162074db6f8bef7a9b6) )	// Rev. B
 	ROM_LOAD( "co62024.rom",  0xc000, 0x4000, CRC(643bcc98) SHA1(881d030656b40bbe48f15a696b28f22c0b752ab0) )	// Rev. 1
+
+	ROM_REGION(0x10000, "lslot", ROMREGION_ERASEFF)
 ROM_END
 
 ROM_START(a800xl)
@@ -1316,6 +1341,8 @@ ROM_START(a800xl)
 	ROM_FILL( 0, 0x10000, 0x00 )
 	ROM_LOAD( "co60302a.rom", 0x10000, 0x2000, CRC(f0202fb3) SHA1(7ad88dd99ff4a6ee66f6d162074db6f8bef7a9b6) )	// Rev. B
 	ROM_LOAD( "co61598b.rom", 0x14000, 0x4000, CRC(1f9cd270) SHA1(ae4f523ba08b6fd59f3cae515a2b2410bbd98f55) )	// Rev. 2
+
+	ROM_REGION(0x10000, "lslot", ROMREGION_ERASEFF)
 ROM_END
 
 #define rom_a800xlp rom_a800xl
@@ -1324,6 +1351,8 @@ ROM_START(a65xe)
 	ROM_REGION(0x18000, "maincpu", 0)
 	ROM_LOAD( "co24947a.rom", 0x10000, 0x2000, CRC(7d684184) SHA1(3693c9cb9bf3b41bae1150f7a8264992468fc8c0) )	// Rev. C
 	ROM_LOAD( "co61598b.rom", 0x14000, 0x4000, CRC(1f9cd270) SHA1(ae4f523ba08b6fd59f3cae515a2b2410bbd98f55) )	// Rev. 2
+
+	ROM_REGION(0x10000, "lslot", ROMREGION_ERASEFF)
 ROM_END
 
 ROM_START(a65xea)
@@ -1331,18 +1360,24 @@ ROM_START(a65xea)
 	ROM_LOAD( "basic_ar.rom", 0x10000, 0x2000, CRC(c899f4d6) SHA1(043df191d1fe402e792266a108e147ffcda35130) )	// is this correct? or shall we use Rev. C?
 //  ROM_LOAD( "c101700.rom",  0x14000, 0x4000, CRC(7f9a76c8) SHA1(57eb6d87850a763f11767f53d4eaede186f831a2) )   // this was from Savetz and has wrong bits!
 	ROM_LOAD( "c101700.rom",  0x14000, 0x4000, CRC(45f47988) SHA1(a36b8b20f657580f172749bb0625c08706ed824c) )	// Rev. 3B ?
+
+	ROM_REGION(0x10000, "lslot", ROMREGION_ERASEFF)
 ROM_END
 
 ROM_START(a130xe)
 	ROM_REGION(0x18000, "maincpu", 0)
 	ROM_LOAD( "co24947a.rom", 0x10000, 0x2000, CRC(7d684184) SHA1(3693c9cb9bf3b41bae1150f7a8264992468fc8c0) )	// Rev. C
 	ROM_LOAD( "co61598b.rom", 0x14000, 0x4000, CRC(1f9cd270) SHA1(ae4f523ba08b6fd59f3cae515a2b2410bbd98f55) )	// Rev. 2
+
+	ROM_REGION(0x10000, "lslot", ROMREGION_ERASEFF)
 ROM_END
 
 ROM_START(a800xe)
 	ROM_REGION(0x18000, "maincpu", 0)
 	ROM_LOAD( "co24947a.rom", 0x10000, 0x2000, CRC(7d684184) SHA1(3693c9cb9bf3b41bae1150f7a8264992468fc8c0) )	// Rev. C
 	ROM_LOAD( "c300717.rom",  0x14000, 0x4000, CRC(29f133f7) SHA1(f03b9b93000ee84abb9cf8d6367241006f172182) )	// Rev. 3
+
+	ROM_REGION(0x10000, "lslot", ROMREGION_ERASEFF)
 ROM_END
 
 ROM_START(xegs)
