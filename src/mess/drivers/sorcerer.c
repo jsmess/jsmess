@@ -440,7 +440,7 @@ static MACHINE_CONFIG_START( sorcerer, sorcerer_state )
 
 	/* quickload */
 	MCFG_SNAPSHOT_ADD("snapshot", sorcerer, "snp", 2)
-	MCFG_Z80BIN_QUICKLOAD_ADD("quickload", sorcerer, 2)
+	MCFG_Z80BIN_QUICKLOAD_ADD("quickload", sorcerer, 3)
 
 	MCFG_CASSETTE_ADD( "cassette1", sorcerer_cassette_config )
 	MCFG_CASSETTE_ADD( "cassette2", sorcerer_cassette_config )
