@@ -1067,7 +1067,7 @@ Compiled by K1W1
 		<publisher>Big Five Software</publisher>
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="bbsb" />
-			<dataarea name="rom" size="40969">
+			<dataarea name="rom" size="40960">
 				<rom name="bounty bob strikes back!.rom" size="40960" crc="0d00f072" sha1="57e3856b6b00e94490350156620dc61cf0669c17" offset="0" />
 			</dataarea>
 		</part>
@@ -1481,7 +1481,7 @@ Compiled by K1W1
 	</software>
 
 	<software name="dltadraw">
-		<description>Delta Drawing : Learning Program</description>
+		<description>Delta Drawing: Learning Program</description>
 		<!-- Serial: DLD-AT -->
 		<year>1983</year>
 		<publisher>Spinnaker</publisher>
@@ -1520,7 +1520,7 @@ Compiled by K1W1
 	</software>
 
 	<software name="destiny">
-		<description>Destiny : The Cruiser (Prototype)</description>
+		<description>Destiny: The Cruiser (Prototype)</description>
 		<!-- Serial: N/A -->
 		<year>198?</year>
 		<publisher>Adventure International</publisher>

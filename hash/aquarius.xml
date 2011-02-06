@@ -5,6 +5,7 @@
 
 	<software name="addtot">
 		<description>Advanced Dungeons and Dragons: Treasue of Tarmin</description>
+		<!-- Serial: 4023 -->
 		<year>1982</year>
 		<publisher>TRS Hobbies, Inc.</publisher>
 		<part name="cart" interface="aquarius_cart">
@@ -16,6 +17,7 @@
 	
 	<software name="basic">
 		<description>Aquarius BASIC ROM</description>
+		<!-- Serial: N/A -->
 		<year>1982</year>
 		<publisher>Microsoft</publisher>
 		<part name="cart" interface="aquarius_cart">
@@ -27,6 +29,7 @@
 	
 	<software name="astrsmah">
 		<description>Astrosmash</description>
+		<!-- Serial: 4003 -->
 		<year>1982</year>
 		<publisher>Mattel</publisher>
 		<part name="cart" interface="aquarius_cart">
@@ -38,6 +41,7 @@
 	
 	<software name="biorhtms">
 		<description>Biorhythms</description>
+		<!-- Serial: 4673 -->
 		<year>1983</year>
 		<publisher>Mattel</publisher>
 		<part name="cart" interface="aquarius_cart">
@@ -49,6 +53,7 @@
 	
 	<software name="btime">
 		<description>Burgertime</description>
+		<!-- Serial: 4653 -->
 		<year>1982</year>
 		<publisher>Data East</publisher>
 		<part name="cart" interface="aquarius_cart">
@@ -60,6 +65,7 @@
 	
 	<software name="chess">
 		<description>Chess</description>
+		<!-- Serial: 4594 -->
 		<year>1982</year>
 		<publisher>Mattel</publisher>
 		<part name="cart" interface="aquarius_cart">
@@ -70,7 +76,8 @@
 	</software>
 	
 	<software name="ebasic">
-		<description>Extended Basic</description>
+		<description>Extended BASIC</description>
+		<!-- Serial: 4392 -->
 		<year>1982</year>
 		<publisher>Microsoft</publisher>
 		<part name="cart" interface="aquarius_cart">
@@ -81,7 +88,8 @@
 	</software>
 	
 	<software name="dosbasic">
-		<description>Dos Basic</description>
+		<description>Dos BASIC</description>
+		<!-- Serial: N/A -->
 		<year>1982</year>
 		<publisher>Microsoft</publisher>
 		<part name="cart" interface="aquarius_cart">
@@ -93,6 +101,7 @@
 	
 	<software name="fileform">
 		<description>Fileform</description>
+		<!-- Serial: 4177 -->
 		<year>1982</year>
 		<publisher>Mattel</publisher>
 		<part name="cart" interface="aquarius_cart">
@@ -104,6 +113,7 @@
 	
 	<software name="finform">
 		<description>Finform</description>
+		<!-- Serial: 4178 -->
 		<year>1982</year>
 		<publisher>Mattel</publisher>
 		<part name="cart" interface="aquarius_cart">
@@ -113,8 +123,21 @@
 		</part>
 	</software>
 	
+	<software name="logo">
+		<description>Aquarius LOGO</description>
+		<!-- Serial: 4391 -->
+		<year>1983</year>
+		<publisher>Mattel</publisher>
+		<part name="cart" interface="aquarius_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="logo.bin" size="16384" crc="0b8d198e" sha1="8e1fa06e81f9cc02d00fceb33a794591d5ea83cd" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+	
 	<software name="demo">
 		<description>MarqueeDemo</description>
+		<!-- Serial: N/A -->
 		<year>1982</year>
 		<publisher>Mattel</publisher>
 		<part name="cart" interface="aquarius_cart">
@@ -126,6 +149,7 @@
 	
 	<software name="melchase">
 		<description>Melody Chase</description>
+		<!-- Serial: 4652 -->
 		<year>1982</year>
 		<publisher>Mattel</publisher>
 		<part name="cart" interface="aquarius_cart">
@@ -138,6 +162,7 @@
 	<software name="modem" supported="no">
 	<!-- no modem emulation -->
 		<description>Modem Terminal Software</description>
+		<!-- Serial: N/A -->
 		<year>1982</year>
 		<publisher>Mattel</publisher>
 		<part name="cart" interface="aquarius_cart">
@@ -149,6 +174,7 @@
 	
 	<software name="nstalker">
 		<description>Night Stalker</description>
+		<!-- Serial: 4595 -->
 		<year>1982</year>
 		<publisher>Mattel</publisher>
 		<part name="cart" interface="aquarius_cart">
@@ -160,6 +186,7 @@
 	
 	<software name="shark">
 		<description>Shark!</description>
+		<!-- Serial: N/A -->
 		<year>1983</year>
 		<publisher>Mattel</publisher>
 		<part name="cart" interface="aquarius_cart">
@@ -171,6 +198,7 @@
 	
 	<software name="snafu">
 		<description>Snafu</description>
+		<!-- Serial: 4028 -->
 		<year>1982</year>
 		<publisher>Mattel</publisher>
 		<part name="cart" interface="aquarius_cart">
@@ -182,6 +210,7 @@
 	
 	<software name="speller">
 		<description>Space Speller</description>
+		<!-- Serial: 4682 -->
 		<year>1983</year>
 		<publisher>Mattel</publisher>
 		<part name="cart" interface="aquarius_cart">
@@ -193,6 +222,7 @@
 	
 	<software name="tron">
 		<description>Tron Deadly Discs</description>
+		<!-- Serial: 4024 -->
 		<year>1982</year>
 		<publisher>Walt Disney</publisher>
 		<part name="cart" interface="aquarius_cart">
@@ -204,6 +234,7 @@
 	
 	<software name="utopia">
 		<description>Utopia</description>
+		<!-- Serial: 4596 -->
 		<year>1982</year>
 		<publisher>Mattel</publisher>
 		<part name="cart" interface="aquarius_cart">
@@ -215,6 +246,7 @@
 	
 	<software name="word">
 		<description>Word Processor</description>
+		<!-- Serial: N/A -->
 		<year>1986</year>
 		<publisher>Balen</publisher>
 		<part name="cart" interface="aquarius_cart">
@@ -226,6 +258,7 @@
 	
 	<software name="zeroin">
 		<description>Zero-in</description>
+		<!-- Serial: 4895C -->
 		<year>1982</year>
 		<publisher>Mattel</publisher>
 		<part name="cart" interface="aquarius_cart">
