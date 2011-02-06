@@ -1791,8 +1791,6 @@ static MACHINE_CONFIG_DERIVED( nc200, nc100 )
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("128K")
 
-	/* dummy timer */
-	MCFG_TIMER_ADD_PERIODIC("dummy_timer", dummy_timer_callback, attotime::from_hz(50))	
 MACHINE_CONFIG_END
 
 
