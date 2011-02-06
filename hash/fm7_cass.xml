@@ -123,7 +123,7 @@
 		<publisher>Unknown</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="16">
-				<rom name="azusa.t77" size="16" crc="24B4D6C4" sha1="0F397F343CC74993777E10DEFFE6F9579713FB8E" offset="000000" />
+				<rom name="azusa_chara.t77" size="16" crc="24B4D6C4" sha1="0F397F343CC74993777E10DEFFE6F9579713FB8E" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="cass2" interface="fm7_cass">
@@ -408,7 +408,7 @@
 		</part>
 		<part name="cassa" interface="fm7_cass">
 			<dataarea name="cass" size="34030">
-				<rom name="savedisk.t77" size="34030" crc="5901992E" sha1="8BC20F85750E9FC2C322EE313398F741A62D9A32" offset="000000" />
+				<rom name="savedisk2.t77" size="34030" crc="5901992E" sha1="8BC20F85750E9FC2C322EE313398F741A62D9A32" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="cassb" interface="fm7_cass">
