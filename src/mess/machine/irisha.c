@@ -34,7 +34,7 @@ static TIMER_CALLBACK( irisha_key )
 
 MACHINE_START( irisha )
 {
-	timer_pulse(machine, attotime::from_msec(30), NULL, 0, irisha_key);
+	machine->scheduler().timer_pulse(attotime::from_msec(30), FUNC(irisha_key));
 }
 
 MACHINE_RESET( irisha )

@@ -139,9 +139,9 @@ static DEVICE_START(amiga_fdc)
 	int id;
 	for(id=0;id<2;id++)
 	{
-		fdc->fdc_status[id].rev_timer = timer_alloc(device->machine, fdc_rev_proc, (void*)device);
-		fdc->fdc_status[id].dma_timer = timer_alloc(device->machine, fdc_dma_proc, (void*)device);
-		fdc->fdc_status[id].sync_timer = timer_alloc(device->machine, fdc_sync_proc, (void*)device);
+		fdc->fdc_status[id].rev_timer = device->machine->scheduler().timer_alloc(FUNC(fdc_rev_proc), (void*)device);
+		fdc->fdc_status[id].dma_timer = device->machine->scheduler().timer_alloc(FUNC(fdc_dma_proc), (void*)device);
+		fdc->fdc_status[id].sync_timer = device->machine->scheduler().timer_alloc(FUNC(fdc_sync_proc), (void*)device);
 		floppy_install_load_proc(amiga_floppy_get_device_child(device, id), amiga_load_proc);
 		floppy_install_unload_proc(amiga_floppy_get_device_child(device, id), amiga_unload_proc);
 		fdc->fdc_status[id].motor_on = 0;

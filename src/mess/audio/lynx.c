@@ -225,7 +225,7 @@ UINT8 lynx_audio_read(device_t *device, int offset)
 void lynx_audio_write(device_t *device, int offset, UINT8 data)
 {
 	lynx_sound_state *state = get_safe_token(device);
-//  logerror("%.6f audio write %.2x %.2x\n", timer_get_time(machine), offset, data);
+//  logerror("%.6f audio write %.2x %.2x\n", machine->time(), offset, data);
     LYNX_AUDIO *channel=state->audio+((offset>>3)&3);
     state->mixer_channel->update();
     switch (offset) {

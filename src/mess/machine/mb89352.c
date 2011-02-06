@@ -165,7 +165,7 @@ void mb89352_device::device_start()
     }
 
     // allocate read timer
-    m_transfer_timer = device_timer_alloc(*this,TIMER_TRANSFER);
+    m_transfer_timer = timer_alloc(TIMER_TRANSFER);
 }
 
 void mb89352_device::device_reset()

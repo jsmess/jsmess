@@ -148,7 +148,7 @@ static void process_clock(running_machine *machine)
 	seconds_t current_interval;
 
 	/* update clock_curtime */
-	current_interval = timer_get_time(machine).seconds;
+	current_interval = machine->time().seconds;
 	state->clock_curtime += current_interval - state->clock_curtime_interval;
 	state->clock_curtime_interval = current_interval;
 
@@ -1802,13 +1802,13 @@ MACHINE_START( apple2gs )
 	state_save_register_item(machine, "SNDGLUADDR", NULL,0, state->sndglu_addr);
 	state_save_register_item(machine, "SNDGLUDUMMYRD", NULL,0, state->sndglu_dummy_read);
 
-	state->clock_timer = timer_alloc(machine, apple2gs_clock_tick, NULL);
+	state->clock_timer = machine->scheduler().timer_alloc(FUNC(apple2gs_clock_tick));
 	timer_adjust_periodic(state->clock_timer, attotime::from_seconds(1), 0, attotime::from_seconds(1));
 
-	state->qsecond_timer = timer_alloc(machine, apple2gs_qsecond_tick, NULL);
+	state->qsecond_timer = machine->scheduler().timer_alloc(FUNC(apple2gs_qsecond_tick));
 	timer_adjust_periodic(state->qsecond_timer, attotime::from_usec(266700), 0, attotime::from_usec(266700));
 
-	state->scanline_timer = timer_alloc(machine, apple2gs_scanline_tick, NULL);
+	state->scanline_timer = machine->scheduler().timer_alloc(FUNC(apple2gs_scanline_tick));
 	timer_adjust_oneshot(state->scanline_timer, attotime::never, 0);
 
 	// fire on scanline zero

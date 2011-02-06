@@ -1029,7 +1029,7 @@ static void common_sxrom_write_handler( address_space *space, offs_t offset, UIN
 	else
 	{
 		state->mmc1_reg_write_enable = 0;
-		timer_call_after_resynch(space->machine, NULL, 0, mmc1_resync_callback);
+		space->machine->scheduler().synchronize(FUNC(mmc1_resync_callback));
 	}
 
 	if (data & 0x80)

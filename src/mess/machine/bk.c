@@ -68,7 +68,7 @@ static TIMER_CALLBACK(keyboard_callback)
 
 MACHINE_START(bk0010)
 {
-	timer_pulse(machine, attotime::from_hz(2400), NULL, 0, keyboard_callback);
+	machine->scheduler().timer_pulse(attotime::from_hz(2400), FUNC(keyboard_callback));
 }
 
 static IRQ_CALLBACK(bk0010_irq_callback)

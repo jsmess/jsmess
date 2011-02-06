@@ -305,7 +305,7 @@ static DEVICE_START( xmodem )
 	state->image = NULL;
 	state->conf = (xmodem_config*) device->baseconfig().static_config();
 	state->machine = device->machine;
-	state->timer = timer_alloc(device->machine,  xmodem_nak_cb, state );
+	state->timer = device->machine->scheduler().timer_alloc(FUNC(xmodem_nak_cb), state );
 }
 
 static DEVICE_RESET( xmodem )

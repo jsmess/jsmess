@@ -1070,7 +1070,7 @@ void coco_set_halt_line(running_machine *machine, int halt_line)
 	coco_state *state = machine->driver_data<coco_state>();
 	cpunum_set_input_line(machine, 0, INPUT_LINE_HALT, halt_line);
 	if (halt_line == CLEAR_LINE)
-		timer_set(machine, machine->device<cpu_device>("maincpu")->cycles_to_attotime(1), NULL, 0, state->recalc_interrupts);
+		machine->scheduler().timer_set(machine->device<cpu_device>("maincpu")->cycles_to_attotime(1), FUNC(state->recalc_interrupts));
 }
 #endif
 
@@ -1103,7 +1103,7 @@ static attotime coco_hiresjoy_computetransitiontime( running_machine *machine, U
 		val = val * 4160.0 + 592.0;
 	}
 
-	return (timer_get_time(machine) + (COCO_CPU_SPEED * val));
+	return (machine->time() + (COCO_CPU_SPEED * val));
 }
 
 static void coco_hiresjoy_w( running_machine *machine, int data, UINT8 port )
@@ -1127,7 +1127,7 @@ static void coco_hiresjoy_w( running_machine *machine, int data, UINT8 port )
 
 static int coco_hiresjoy_readone( running_machine *machine, attotime transitiontime )
 {
-	return timer_get_time(machine) >= transitiontime;
+	return machine->time() >= transitiontime;
 }
 
 static int coco_hiresjoy_rx( running_machine *machine )
@@ -1336,7 +1336,7 @@ static TIMER_CALLBACK( coco_update_sel2_timerproc )
 static attotime get_relative_time( running_machine *machine, attotime absolute_time )
 {
 	attotime result;
-	attotime now = timer_get_time(machine);
+	attotime now = machine->time();
 
 	if (absolute_time > now) 
 		result = absolute_time - now;
@@ -2277,7 +2277,7 @@ static TIMER_CALLBACK(coco3_timer_proc)
 static void coco3_timer_init(running_machine *machine)
 {
 	coco3_state *state = machine->driver_data<coco3_state>();
-	state->gime_timer = timer_alloc(machine, coco3_timer_proc, NULL);
+	state->gime_timer = machine->scheduler().timer_alloc(FUNC(coco3_timer_proc));
 }
 
 
@@ -2823,7 +2823,7 @@ WRITE8_DEVICE_HANDLER(coco_pia_1_w)
 typedef struct _machine_init_interface machine_init_interface;
 struct _machine_init_interface
 {
-	timer_fired_func recalc_interrupts_;			/* recalculate inturrupts callback */
+	timer_expired_func recalc_interrupts_;			/* recalculate inturrupts callback */
 	void (*printer_out_)(running_machine *machine, int data);				/* printer output callback */
 };
 
@@ -2859,11 +2859,11 @@ static void generic_init_machine(running_machine *machine, const machine_init_in
 	state->recalc_interrupts = init->recalc_interrupts_;
 
 	/* this timer is used to schedule keyboard updating */
-	state->update_keyboard_timer = timer_alloc(machine, coco_update_keyboard_timerproc, NULL);
+	state->update_keyboard_timer = machine->scheduler().timer_alloc(FUNC(coco_update_keyboard_timerproc));
 
 	/* these are the timers to delay the MUX switching */
-	state->mux_sel1_timer = timer_alloc(machine, coco_update_sel1_timerproc, NULL);
-	state->mux_sel2_timer = timer_alloc(machine, coco_update_sel2_timerproc, NULL);
+	state->mux_sel1_timer = machine->scheduler().timer_alloc(FUNC(coco_update_sel1_timerproc));
+	state->mux_sel2_timer = machine->scheduler().timer_alloc(FUNC(coco_update_sel2_timerproc));
 
 	/* setup ROM */
 	state->rom = machine->region("maincpu")->base();
@@ -2935,7 +2935,7 @@ MACHINE_START( dragon32 )
 	generic_coco12_dragon_init(machine, &init);
 
 	/* need to specify lightgun crosshairs */
-	timer_set(machine, attotime::zero, NULL, 0, update_lightgun_timer_callback);
+	machine->scheduler().timer_set(attotime::zero, FUNC(update_lightgun_timer_callback));
 }
 
 MACHINE_START( dragon64 )
@@ -2950,7 +2950,7 @@ MACHINE_START( dragon64 )
 	generic_coco12_dragon_init(machine, &init);
 
 	/* need to specify lightgun crosshairs */
-	timer_set(machine, attotime::zero, NULL, 0, update_lightgun_timer_callback);
+	machine->scheduler().timer_set(attotime::zero, FUNC(update_lightgun_timer_callback));
 }
 
 MACHINE_START( tanodr64 )
@@ -2965,7 +2965,7 @@ MACHINE_START( tanodr64 )
 	generic_coco12_dragon_init(machine, &init);
 
 	/* need to specify lightgun crosshairs */
-	timer_set(machine, attotime::zero, NULL, 0, update_lightgun_timer_callback);
+	machine->scheduler().timer_set(attotime::zero, FUNC(update_lightgun_timer_callback));
 }
 
 MACHINE_START( dgnalpha )
@@ -2980,7 +2980,7 @@ MACHINE_START( dgnalpha )
 	generic_coco12_dragon_init(machine, &init);
 
 	/* need to specify lightgun crosshairs */
-	timer_set(machine, attotime::zero, NULL, 0, update_lightgun_timer_callback);
+	machine->scheduler().timer_set(attotime::zero, FUNC(update_lightgun_timer_callback));
 }
 
 MACHINE_RESET( dgnalpha )
@@ -2994,7 +2994,7 @@ MACHINE_RESET( dgnalpha )
 	state->dgnalpha_just_reset=1;
 
 	/* need to specify lightgun crosshairs */
-	timer_set(machine, attotime::zero, NULL, 0, update_lightgun_timer_callback);
+	machine->scheduler().timer_set(attotime::zero, FUNC(update_lightgun_timer_callback));
 }
 
 const wd17xx_interface dgnalpha_wd17xx_interface =
@@ -3019,7 +3019,7 @@ MACHINE_START( coco )
 	generic_coco12_dragon_init(machine, &init);
 
 	/* need to specify lightgun crosshairs */
-	timer_set(machine, attotime::zero, NULL, 0, update_lightgun_timer_callback);
+	machine->scheduler().timer_set(attotime::zero, FUNC(update_lightgun_timer_callback));
 }
 
 MACHINE_START( coco2 )
@@ -3034,7 +3034,7 @@ MACHINE_START( coco2 )
 	generic_coco12_dragon_init(machine, &init);
 
 	/* need to specify lightgun crosshairs */
-	timer_set(machine, attotime::zero, NULL, 0, update_lightgun_timer_callback);
+	machine->scheduler().timer_set(attotime::zero, FUNC(update_lightgun_timer_callback));
 }
 
 MACHINE_RESET( coco3 )
@@ -3087,7 +3087,7 @@ MACHINE_START( coco3 )
 	state_save_register_postload(machine, coco3_state_postload, NULL);
 
 	/* need to specify lightgun crosshairs */
-	timer_set(machine, attotime::zero, NULL, 0, update_lightgun_timer_callback);
+	machine->scheduler().timer_set(attotime::zero, FUNC(update_lightgun_timer_callback));
 }
 
 

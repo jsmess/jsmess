@@ -516,8 +516,8 @@ MACHINE_START( amigacd )
 	/* initialize the dmac */
 	memset( &dmac_data, 0, sizeof( dmac_data ) );
 
-	dmac_data.dma_timer = timer_alloc(machine, dmac_dma_proc, NULL);
-	tp6525_delayed_timer = timer_alloc(machine, tp6525_delayed_irq, NULL);
+	dmac_data.dma_timer = machine->scheduler().timer_alloc(FUNC(dmac_dma_proc));
+	tp6525_delayed_timer = machine->scheduler().timer_alloc(FUNC(tp6525_delayed_irq));
 
 	/* set up DMAC with autoconfig */
 	amiga_add_autoconfig( machine, &dmac_device );

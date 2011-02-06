@@ -149,7 +149,7 @@ static DEVICE_START( adc080x )
 	adc080x->eoc = 1;
 
 	/* allocate cycle timer */
-	adc080x->cycle_timer = timer_alloc(device->machine, cycle_tick, (void *)device);
+	adc080x->cycle_timer = device->machine->scheduler().timer_alloc(FUNC(cycle_tick), (void *)device);
 	timer_adjust_periodic(adc080x->cycle_timer, attotime::zero, 0, attotime::from_hz(device->clock()));
 
 	/* register for state saving */

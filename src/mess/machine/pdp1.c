@@ -312,10 +312,10 @@ MACHINE_START( pdp1 )
 
 	machine->add_notifier(MACHINE_NOTIFY_EXIT, pdp1_machine_stop);
 
-	state->tape_reader.timer = timer_alloc(machine, reader_callback, NULL);
-	state->tape_puncher.timer = timer_alloc(machine, puncher_callback, NULL);
-	state->typewriter.tyo_timer = timer_alloc(machine, tyo_callback, NULL);
-	state->dpy_timer = timer_alloc(machine, dpy_callback, NULL);
+	state->tape_reader.timer = machine->scheduler().timer_alloc(FUNC(reader_callback));
+	state->tape_puncher.timer = machine->scheduler().timer_alloc(FUNC(puncher_callback));
+	state->typewriter.tyo_timer = machine->scheduler().timer_alloc(FUNC(tyo_callback));
+	state->dpy_timer = machine->scheduler().timer_alloc(FUNC(dpy_callback));
 }
 
 
@@ -1027,10 +1027,10 @@ static TIMER_CALLBACK(il_timer_callback)
 
 static void parallel_drum_init(pdp1_state *state)
 {
-	state->parallel_drum.rotation_timer = timer_alloc(machine, NULL, NULL);
+	state->parallel_drum.rotation_timer = machine->scheduler().timer_alloc();
 	timer_adjust_periodic(state->parallel_drum.rotation_timer, PARALLEL_DRUM_ROTATION_TIME, 0, PARALLEL_DRUM_ROTATION_TIME);
 
-	state->parallel_drum.il_timer = timer_alloc(machine, il_timer_callback, NULL);
+	state->parallel_drum.il_timer = machine->scheduler().timer_alloc(FUNC(il_timer_callback));
 	parallel_drum_set_il(0);
 }
 #endif

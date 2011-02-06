@@ -458,7 +458,7 @@ static PALETTE_INIT( bml3 )
 
 static MACHINE_START(bml3)
 {
-	timer_pulse(machine, attotime::from_hz(240/8), NULL, 0, keyboard_callback);
+	machine->scheduler().timer_pulse(attotime::from_hz(240/8), FUNC(keyboard_callback));
 	beep_set_frequency(machine->device("beeper"),1200); //guesswork
 	beep_set_state(machine->device("beeper"),0);
 }

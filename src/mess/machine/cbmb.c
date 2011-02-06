@@ -27,7 +27,7 @@ drivers 8 & 9 as in pet.c ? */
 		if(VERBOSE_LEVEL >= N) \
 		{ \
 			if( M ) \
-				logerror("%11.6f: %-24s", timer_get_time(MACHINE).as_double(), (char*) M ); \
+				logerror("%11.6f: %-24s", MACHINE->time().as_double(), (char*) M ); \
 			logerror A; \
 		} \
 	} while (0)
@@ -313,7 +313,7 @@ static void cbmb_common_driver_init( running_machine *machine )
 	state->chargen = machine->region("maincpu")->base() + 0x100000;
 	/*    memset(c64_memory, 0, 0xfd00); */
 
-	timer_pulse(machine, attotime::from_msec(10), NULL, 0, cbmb_frame_interrupt);
+	machine->scheduler().timer_pulse(attotime::from_msec(10), FUNC(cbmb_frame_interrupt));
 
 	state->p500 = 0;
 	state->cbm700 = 0;
@@ -483,7 +483,7 @@ static TIMER_CALLBACK(cbmb_frame_interrupt)
 //  vic2_frame_interrupt (device);
 
 	/* for p500, check if lightpen has been chosen as input: if so, enable crosshair (but c64-like inputs for p500 are not working atm) */
-	timer_set(machine, attotime::zero, NULL, 0, p500_lightpen_tick);
+	machine->scheduler().timer_set(attotime::zero, FUNC(p500_lightpen_tick));
 
 	set_led_status(machine, 1, input_port_read(machine, "SPECIAL") & 0x04 ? 1 : 0);		/* Shift Lock */
 }

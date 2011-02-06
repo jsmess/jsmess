@@ -108,7 +108,7 @@ struct _rp5c15_t
 	int pulse_count;
 	int pulse1_state;
 	int pulse16_state;
-	void (*timer_fired_func)(int state);
+	void (*timer_expired_func)(int state);
 	void (*alarm_callback)(running_machine *machine, int state);
 	const rp5c15_intf* intf;
 	emu_timer* timer;
@@ -193,7 +193,7 @@ static DEVICE_START( rp5c15 )
 	rtc->test = 0x00;
 	rtc->pulse_count = 0;
 
-	rtc->timer = timer_alloc(device->machine, rtc_alarm_pulse, (void*)device);
+	rtc->timer = device->machine->scheduler().timer_alloc(FUNC(rtc_alarm_pulse), (void*)device);
 	timer_adjust_periodic(rtc->timer, attotime::zero, 0, attotime::from_hz(32));
 }
 

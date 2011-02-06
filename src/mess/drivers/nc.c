@@ -993,14 +993,14 @@ static MACHINE_START( nc100 )
 	machine->add_notifier(MACHINE_NOTIFY_EXIT, nc100_machine_stop);
 
 	/* keyboard timer */
-	state->keyboard_timer = timer_alloc(machine, nc_keyboard_timer_callback, NULL);
+	state->keyboard_timer = machine->scheduler().timer_alloc(FUNC(nc_keyboard_timer_callback));
 	timer_adjust_oneshot(state->keyboard_timer, attotime::from_msec(10), 0);
 
 	/* dummy timer */
-	timer_pulse(machine, attotime::from_hz(50), NULL, 0, dummy_timer_callback);
+	machine->scheduler().timer_pulse(attotime::from_hz(50), FUNC(dummy_timer_callback));
 
 	/* serial timer */
-	state->serial_timer = timer_alloc(machine, nc_serial_timer_callback, NULL);
+	state->serial_timer = machine->scheduler().timer_alloc(FUNC(nc_serial_timer_callback));
 }
 
 
@@ -1392,14 +1392,14 @@ static MACHINE_START( nc200 )
 	machine->add_notifier(MACHINE_NOTIFY_EXIT, nc200_machine_stop);
 
 	/* keyboard timer */
-	state->keyboard_timer = timer_alloc(machine, nc_keyboard_timer_callback, NULL);
+	state->keyboard_timer = machine->scheduler().timer_alloc(FUNC(nc_keyboard_timer_callback));
 	timer_adjust_oneshot(state->keyboard_timer, attotime::from_msec(10), 0);
 
 	/* dummy timer */
-	timer_pulse(machine, attotime::from_hz(50), NULL, 0, dummy_timer_callback);
+	machine->scheduler().timer_pulse(attotime::from_hz(50), FUNC(dummy_timer_callback));
 
 	/* serial timer */
-	state->serial_timer = timer_alloc(machine, nc_serial_timer_callback, NULL);
+	state->serial_timer = machine->scheduler().timer_alloc(FUNC(nc_serial_timer_callback));
 }
 
 /*

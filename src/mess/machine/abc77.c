@@ -415,7 +415,7 @@ static DEVICE_START( abc77 )
 	abc77->cpu = device->subdevice(I8035_TAG);
 
 	/* allocate reset timer */
-	abc77->reset_timer = timer_alloc(device->machine, reset_tick, (FPTR *) device);
+	abc77->reset_timer = device->machine->scheduler().timer_alloc(FUNC(reset_tick), (FPTR *) device);
 
 	/* register for state saving */
 	state_save_register_device_item(device, 0, abc77->keylatch);

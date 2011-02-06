@@ -2800,10 +2800,10 @@ static DEVICE_START( mc68328 )
 
     mc68328->iface = (const mc68328_interface*)device->baseconfig().static_config();
 
-    mc68328->gptimer[0] = timer_alloc(device->machine, mc68328_timer1_hit, 0);
-    mc68328->gptimer[1] = timer_alloc(device->machine, mc68328_timer2_hit, 0);
-    mc68328->rtc = timer_alloc(device->machine, mc68328_rtc_tick, 0);
-    mc68328->pwm = timer_alloc(device->machine, mc68328_pwm_transition, 0);
+    mc68328->gptimer[0] = device->machine->scheduler().timer_alloc(FUNC(mc68328_timer1_hit));
+    mc68328->gptimer[1] = device->machine->scheduler().timer_alloc(FUNC(mc68328_timer2_hit));
+    mc68328->rtc = device->machine->scheduler().timer_alloc(FUNC(mc68328_rtc_tick));
+    mc68328->pwm = device->machine->scheduler().timer_alloc(FUNC(mc68328_pwm_transition));
 
     mc68328_register_state_save(device);
 }

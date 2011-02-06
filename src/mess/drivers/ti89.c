@@ -461,7 +461,7 @@ void ti68k_state::machine_start()
 		}
 	}
 
-	timer_pulse(machine, attotime::from_hz(1<<14), NULL, 0, ti68k_timer_callback);
+	machine->scheduler().timer_pulse(attotime::from_hz(1<<14), FUNC(ti68k_timer_callback));
 
 	logerror("HW=v%x, PC=%06x, Type=%s\n", m_hw_version, m_initial_pc, (m_flash_mem) ? "Flash" : "ROM");
 }

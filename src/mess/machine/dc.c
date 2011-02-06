@@ -545,7 +545,7 @@ void dreamcast_atapi_init(running_machine *machine)
 	atapi_data_len = 0;
 	atapi_cdata_wait = 0;
 
-	atapi_timer = timer_alloc(machine,  atapi_xfer_end , NULL);
+	atapi_timer = machine->scheduler().timer_alloc(FUNC(atapi_xfer_end));
 	timer_adjust_oneshot(atapi_timer, attotime::never, 0);
 
 	gdrom_device = NULL;

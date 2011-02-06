@@ -1388,11 +1388,11 @@ static MACHINE_START( newbrain )
 	state->cassette2 = machine->device(CASSETTE2_TAG);
 
 	/* allocate reset timer */
-	state->reset_timer = timer_alloc(machine, reset_tick, NULL);
+	state->reset_timer = machine->scheduler().timer_alloc(FUNC(reset_tick));
 	timer_adjust_oneshot(state->reset_timer, attotime::from_usec(get_reset_t()), 0);
 
 	/* allocate power up timer */
-	state->pwrup_timer = timer_alloc(machine, pwrup_tick, NULL);
+	state->pwrup_timer = machine->scheduler().timer_alloc(FUNC(pwrup_tick));
 	timer_adjust_oneshot(state->pwrup_timer, attotime::from_usec(get_pwrup_t()), 0);
 
 	/* initialize variables */

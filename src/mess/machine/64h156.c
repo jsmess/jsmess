@@ -121,7 +121,7 @@ static DEVICE_START( c64h156 )
 //  c64h156_t *c64h156 = get_safe_token(device);
 
 	/* allocate data timer */
-//  c64h156->bit_timer = timer_alloc(device->machine, bit_tick, (void *)device);
+//  c64h156->bit_timer = device->machine->scheduler().timer_alloc(FUNC(bit_tick), (void *)device);
 
 	/* register for state saving */
 //  state_save_register_device_item(device, 0, c64h156->);

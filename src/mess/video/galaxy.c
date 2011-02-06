@@ -115,7 +115,7 @@ VIDEO_START( galaxy )
 	galaxy_state *state = machine->driver_data<galaxy_state>();
 	state->gal_cnt = 0;
 
-	state->gal_video_timer = timer_alloc(machine, gal_video, NULL);
+	state->gal_video_timer = machine->scheduler().timer_alloc(FUNC(gal_video));
 	timer_adjust_periodic(state->gal_video_timer, attotime::zero, 0, attotime::never);
 
 	VIDEO_START_CALL( generic_bitmapped );

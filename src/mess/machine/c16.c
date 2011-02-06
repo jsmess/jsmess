@@ -25,7 +25,7 @@
 		if(VERBOSE_LEVEL >= N) \
 		{ \
 			if( M ) \
-				logerror("%11.6f: %-24s", timer_get_time(MACHINE).as_double(), (char*) M ); \
+				logerror("%11.6f: %-24s", MACHINE->time().as_double(), (char*) M ); \
 			logerror A; \
 		} \
 	} while (0)
@@ -598,10 +598,10 @@ INTERRUPT_GEN( c16_frame_interrupt )
 	if (state->sidcard)
 	{
 		/* if we are emulating the SID card, check which memory area should be accessed */
-		timer_set(device->machine, attotime::zero, NULL, 0, c16_sidcard_tick);
+		device->machine->scheduler().timer_set(attotime::zero, FUNC(c16_sidcard_tick));
 #if 0
 		/* if we are emulating the SID card, check if writes to 0xd400 have been enabled */
-		timer_set(device->machine, attotime::zero, NULL, 0, c16_sidhack_tick);
+		device->machine->scheduler().timer_set(attotime::zero, FUNC(c16_sidhack_tick));
 #endif
 	}
 

@@ -7,7 +7,7 @@
 #endif
 
 //#define LOG(N,M,A)
-//  if(VERBOSE>=N){ if( M )logerror("%11.6f: %-24s",timer_get_time(machine).as_double(), (const char*)M ); logerror A; }
+//  if(VERBOSE>=N){ if( M )logerror("%11.6f: %-24s",machine->time().as_double(), (const char*)M ); logerror A; }
 
 #define LOG(N,M,A)	\
 	if(VERBOSE>=N){ if( M )logerror("%-24s",(const char*)M ); logerror A; }

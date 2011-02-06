@@ -175,7 +175,7 @@ struct _vic2_state
 		if(VERBOSE_LEVEL >= N) \
 		{ \
 			if( M ) \
-				logerror("%11.6f: %-24s", timer_get_time(machine).as_double(), (char*) M ); \
+				logerror("%11.6f: %-24s", machine->time().as_double(), (char*) M ); \
 			logerror A; \
 		} \
 	} while (0)
@@ -1046,7 +1046,7 @@ if (input_code_pressed_once(machine, KEYCODE_Z)) printf("b:%02x 1:%02x 2:%02x 3:
 //          if (LIGHTPEN_BUTTON)
 			{
 				/* lightpen timer start */
-				timer_set(machine, attotime(0, 0), vic2, 1, vic2_timer_timeout);
+				machine->scheduler().timer_set(attotime(0, 0), FUNC(vic2_timer_timeout), 1, vic2);
 			}
 		}
 		else
@@ -1615,7 +1615,7 @@ if (input_code_pressed_once(machine, KEYCODE_Z)) printf("b:%02x 1:%02x 2:%02x 3:
 	}
 
 	vic2->raster_x += 8;
-	timer_set(machine, machine->device<cpu_device>("maincpu")->cycles_to_attotime(1), vic2, 0, pal_timer_callback);
+	machine->scheduler().timer_set(machine->device<cpu_device>("maincpu")->cycles_to_attotime(1), FUNC(pal_timer_callback), 0, vic2);
 }
 
 static TIMER_CALLBACK( ntsc_timer_callback )
@@ -1637,7 +1637,7 @@ static TIMER_CALLBACK( ntsc_timer_callback )
 //          if (LIGHTPEN_BUTTON)
 			{
 				/* lightpen timer starten */
-				timer_set(machine, attotime(0, 0), vic2, 1, vic2_timer_timeout);
+				machine->scheduler().timer_set(attotime(0, 0), FUNC(vic2_timer_timeout), 1, vic2);
 			}
 		}
 		else
@@ -2194,7 +2194,7 @@ static TIMER_CALLBACK( ntsc_timer_callback )
 	}
 
 	vic2->raster_x += 8;
-	timer_set(machine, machine->device<cpu_device>("maincpu")->cycles_to_attotime(1), vic2, 0, ntsc_timer_callback);
+	machine->scheduler().timer_set(machine->device<cpu_device>("maincpu")->cycles_to_attotime(1), FUNC(ntsc_timer_callback), 0, vic2);
 }
 
 
@@ -2623,9 +2623,9 @@ static DEVICE_START( vic2 )
 
 	// immediately call the timer to handle the first line
 	if (vic2->type == VIC6569 || vic2->type == VIC8566)
-		timer_set(device->machine, downcast<cpu_device *>(vic2->cpu)->cycles_to_attotime(0), vic2, 0, pal_timer_callback);
+		device->machine->scheduler().timer_set(downcast<cpu_device *>(vic2->cpu)->cycles_to_attotime(0), FUNC(pal_timer_callback), 0, vic2);
 	else
-		timer_set(device->machine, downcast<cpu_device *>(vic2->cpu)->cycles_to_attotime(0), vic2, 0, ntsc_timer_callback);
+		device->machine->scheduler().timer_set(downcast<cpu_device *>(vic2->cpu)->cycles_to_attotime(0), FUNC(ntsc_timer_callback), 0, vic2);
 
 	for (i = 0; i < 256; i++)
 	{

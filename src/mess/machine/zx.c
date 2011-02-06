@@ -151,7 +151,7 @@ READ8_HANDLER ( zx80_io_r )
 			if ((cassette_input(space->machine->device("cassette")) < -0.75) && state->tape_bit)
 			{
 				state->tape_bit = 0x00;
-				timer_set(space->machine, attotime::from_usec(362), NULL, 0, zx_tape_pulse);
+				space->machine->scheduler().timer_set(attotime::from_usec(362), FUNC(zx_tape_pulse));
 			}
 
 			data &= ~state->tape_bit;
@@ -216,7 +216,7 @@ READ8_HANDLER ( zx81_io_r )
 			if ((cassette_input(space->machine->device("cassette")) < -0.75) && state->tape_bit)
 			{
 				state->tape_bit = 0x00;
-				timer_set(space->machine, attotime::from_usec(362), NULL, 0, zx_tape_pulse);
+				space->machine->scheduler().timer_set(attotime::from_usec(362), FUNC(zx_tape_pulse));
 			}
 
 			data &= ~state->tape_bit;
@@ -288,7 +288,7 @@ READ8_HANDLER ( pc8300_io_r )
 			if ((cassette_input(space->machine->device("cassette")) < -0.75) && state->tape_bit)
 			{
 				state->tape_bit = 0x00;
-				timer_set(space->machine, attotime::from_usec(362), NULL, 0, zx_tape_pulse);
+				space->machine->scheduler().timer_set(attotime::from_usec(362), FUNC(zx_tape_pulse));
 			}
 
 			data &= ~state->tape_bit;
@@ -364,7 +364,7 @@ READ8_HANDLER ( pow3000_io_r )
 			if ((cassette_input(space->machine->device("cassette")) < -0.75) && state->tape_bit)
 			{
 				state->tape_bit = 0x00;
-				timer_set(space->machine, attotime::from_usec(362), NULL, 0, zx_tape_pulse);
+				space->machine->scheduler().timer_set(attotime::from_usec(362), FUNC(zx_tape_pulse));
 			}
 
 			data &= ~state->tape_bit;

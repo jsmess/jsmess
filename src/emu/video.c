@@ -180,7 +180,7 @@ video_manager::video_manager(running_machine &machine)
 	// if no screens, create a periodic timer to drive updates
 	if (machine.primary_screen == NULL)
 	{
-		m_screenless_frame_timer = timer_alloc(&machine, &screenless_update_callback, this);
+		m_screenless_frame_timer = machine.scheduler().timer_alloc(FUNC(&screenless_update_callback), this);
 		timer_adjust_periodic(m_screenless_frame_timer, screen_device::DEFAULT_FRAME_PERIOD, 0, screen_device::DEFAULT_FRAME_PERIOD);
 	}
 }
@@ -240,7 +240,7 @@ void video_manager::frame_update(bool debug)
 	debugint_update_during_game(&m_machine);
 
 	// if we're throttling, synchronize before rendering
-	attotime current_time = timer_get_time(&m_machine);
+	attotime current_time = m_machine.time();
 	if (!debug && !skipped_it && effective_throttle())
 		update_throttle(current_time);
 
@@ -403,7 +403,7 @@ void video_manager::begin_recording(const char *name, movie_format format)
 
 	// reset the state
 	m_movie_frame = 0;
-	m_movie_next_frame_time = timer_get_time(&m_machine);
+	m_movie_next_frame_time = m_machine.time();
 
 	// start up an AVI recording
 	if (format == MF_AVI)
@@ -576,7 +576,7 @@ TIMER_CALLBACK( video_manager::screenless_update_callback )
 
 void video_manager::postload()
 {
-	m_movie_next_frame_time = timer_get_time(&m_machine);
+	m_movie_next_frame_time = m_machine.time();
 }
 
 
@@ -1229,7 +1229,7 @@ void video_manager::record_frame()
 
 	// start the profiler and get the current time
 	g_profiler.start(PROFILER_MOVIE_REC);
-	attotime curtime = timer_get_time(&m_machine);
+	attotime curtime = m_machine.time();
 
 	// create the bitmap
 	create_snapshot_bitmap(NULL);

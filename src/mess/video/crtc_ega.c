@@ -739,28 +739,28 @@ static void common_start(device_t *device, int device_type)
 
 		/* create the timers */
 		if (crtc_ega->intf->on_de_changed != NULL)
-			crtc_ega->de_changed_timer = timer_alloc(device->machine, de_changed_timer_cb, (void *)device);
+			crtc_ega->de_changed_timer = device->machine->scheduler().timer_alloc(FUNC(de_changed_timer_cb), (void *)device);
 
 		if (crtc_ega->intf->on_hsync_changed != NULL)
 		{
-			crtc_ega->hsync_on_timer = timer_alloc(device->machine, hsync_on_timer_cb, (void *)device);
-			crtc_ega->hsync_off_timer = timer_alloc(device->machine, hsync_off_timer_cb, (void *)device);
+			crtc_ega->hsync_on_timer = device->machine->scheduler().timer_alloc(FUNC(hsync_on_timer_cb), (void *)device);
+			crtc_ega->hsync_off_timer = device->machine->scheduler().timer_alloc(FUNC(hsync_off_timer_cb), (void *)device);
 		}
 
 		if (crtc_ega->intf->on_vsync_changed != NULL)
 		{
-			crtc_ega->vsync_on_timer = timer_alloc(device->machine, vsync_on_timer_cb, (void *)device);
-			crtc_ega->vsync_off_timer = timer_alloc(device->machine, vsync_off_timer_cb, (void *)device);
+			crtc_ega->vsync_on_timer = device->machine->scheduler().timer_alloc(FUNC(vsync_on_timer_cb), (void *)device);
+			crtc_ega->vsync_off_timer = device->machine->scheduler().timer_alloc(FUNC(vsync_off_timer_cb), (void *)device);
 		}
 
 		if (crtc_ega->intf->on_vblank_changed != NULL)
 		{
-			crtc_ega->vblank_on_timer = timer_alloc(device->machine, vblank_on_timer_cb, (void *)device);
-			crtc_ega->vblank_off_timer = timer_alloc(device->machine, vblank_off_timer_cb, (void *)device);
+			crtc_ega->vblank_on_timer = device->machine->scheduler().timer_alloc(FUNC(vblank_on_timer_cb), (void *)device);
+			crtc_ega->vblank_off_timer = device->machine->scheduler().timer_alloc(FUNC(vblank_off_timer_cb), (void *)device);
 		}
 	}
 
-	crtc_ega->light_pen_latch_timer = timer_alloc(device->machine, light_pen_latch_timer_cb, (void *)device);
+	crtc_ega->light_pen_latch_timer = device->machine->scheduler().timer_alloc(FUNC(light_pen_latch_timer_cb), (void *)device);
 
 	/* register for state saving */
 

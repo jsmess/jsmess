@@ -471,7 +471,7 @@ static MACHINE_START(jr200)
 	jr200_state *state = machine->driver_data<jr200_state>();
 	beep_set_frequency(machine->device("beeper"),0);
 	beep_set_state(machine->device("beeper"),0);
-	state->timer_d = timer_alloc(machine, timer_d_callback, NULL);
+	state->timer_d = machine->scheduler().timer_alloc(FUNC(timer_d_callback));
 }
 
 static MACHINE_RESET(jr200)

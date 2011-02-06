@@ -171,7 +171,7 @@ static TIMER_CALLBACK( mk1_update_leds )
 
 static MACHINE_START( mk1 )
 {
-	timer_pulse(machine,  attotime::from_hz(30), NULL, 0, mk1_update_leds );
+	machine->scheduler().timer_pulse(attotime::from_hz(30), FUNC(mk1_update_leds));
 }
 
 

@@ -85,7 +85,7 @@ static TIMER_CALLBACK( mikro80_reset )
 MACHINE_RESET( mikro80 )
 {
 	mikro80_state *state = machine->driver_data<mikro80_state>();
-	timer_set(machine, attotime::from_usec(10), NULL, 0, mikro80_reset);
+	machine->scheduler().timer_set(attotime::from_usec(10), FUNC(mikro80_reset));
 	memory_set_bank(machine, "bank1", 1);
 	state->keyboard_mask = 0;
 }

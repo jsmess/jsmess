@@ -2045,14 +2045,14 @@ static MACHINE_START(pc6001)
 {
 	pc6001_state *state = machine->driver_data<pc6001_state>();
 	/* TODO: accurate timing on this */
-	timer_pulse(machine, attotime::from_hz(250), NULL, 0, keyboard_callback);
+	machine->scheduler().timer_pulse(attotime::from_hz(250), FUNC(keyboard_callback));
 
-	timer_pulse(machine, attotime::from_hz(1200/12), NULL, 0, cassette_callback); //1200 bauds / (1 start bit -> 8 data bits -> 3 stop bits)
+	machine->scheduler().timer_pulse(attotime::from_hz(1200/12), FUNC(cassette_callback)); //1200 bauds / (1 start bit -> 8 data bits -> 3 stop bits)
 
 	state->timer_hz_div = 3;
 	{
 		attotime period = attotime::from_hz((487.5*4)/(state->timer_hz_div+1));
-		state->timer_irq_timer = timer_alloc(machine, audio_callback, NULL);
+		state->timer_irq_timer = machine->scheduler().timer_alloc(FUNC(audio_callback));
 		timer_adjust_periodic(state->timer_irq_timer, period,  0, period);
 	}
 }

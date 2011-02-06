@@ -1545,7 +1545,7 @@ static DEVICE_START( c2040 )
 	c2040->gcr = region->base() + region->bytes() - 0x800;
 
 	/* allocate data timer */
-	c2040->bit_timer = timer_alloc(device->machine, bit_tick, (void *)device);
+	c2040->bit_timer = device->machine->scheduler().timer_alloc(FUNC(bit_tick), (void *)device);
 
 	/* register for state saving */
 	state_save_register_device_item(device, 0, c2040->drive);

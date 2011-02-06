@@ -179,7 +179,7 @@ WRITE8_DEVICE_HANDLER( mos6530_w )
 	if (offset & 0x04)
 	{
 		static const UINT8 timershift[4] = { 0, 3, 6, 10 };
-		attotime curtime = timer_get_time(device->machine);
+		attotime curtime = device->machine->time();
 		INT64 target;
 
 		/* A0-A1 contain the timer divisor */
@@ -394,7 +394,7 @@ static DEVICE_START( mos6530 )
 	devcb_resolve_write8(&miot->port[1].out_port_func, &intf->out_pb_func, device);
 
 	/* allocate timers */
-	miot->timer = timer_alloc(device->machine, timer_end_callback, (void *)device);
+	miot->timer = device->machine->scheduler().timer_alloc(FUNC(timer_end_callback), (void *)device);
 
 	/* register for save states */
 	state_save_register_device_item(device, 0, miot->port[0].in);

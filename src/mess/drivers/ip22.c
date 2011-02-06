@@ -1063,7 +1063,7 @@ static WRITE32_HANDLER( hal2_w )
 static TIMER_CALLBACK(ip22_dma)
 {
 	//ip22_state *state = machine->driver_data<ip22_state>();
-	timer_set(machine, attotime::never, NULL, 0, ip22_dma);
+	machine->scheduler().timer_set(attotime::never, FUNC(ip22_dma));
 #if 0
 	if( state->nPBUS_DMA_Active )
 	{
@@ -1090,7 +1090,7 @@ static TIMER_CALLBACK(ip22_dma)
 				return;
 			}
 		}
-		timer_set(machine, attotime::from_hz(44100), NULL, 0, ip22_dma);
+		machine->scheduler().timer_set(attotime::from_hz(44100), FUNC(ip22_dma));
 	}
 #endif
 }
@@ -1162,7 +1162,7 @@ static WRITE32_HANDLER( hpc3_pbusdma_w )
 		verboselog(machine, 0, "    FIFO End: Rowe %04x\n", ( data & PBUS_CTRL_FIFO_END ) >> 24 );
 		if( ( data & PBUS_CTRL_DMASTART ) || ( data & PBUS_CTRL_LOAD_EN ) )
 		{
-			timer_set(machine, attotime::from_hz(44100), NULL, 0, ip22_dma);
+			machine->scheduler().timer_set(attotime::from_hz(44100), FUNC(ip22_dma));
 			state->nPBUS_DMA_Active = 1;
 		}
 		return;
@@ -1211,7 +1211,7 @@ ADDRESS_MAP_END
 static TIMER_CALLBACK(ip22_timer)
 {
 	sgi_mc_update();
-	timer_set(machine, attotime::from_msec(1), NULL, 0, ip22_timer);
+	machine->scheduler().timer_set(attotime::from_msec(1), FUNC(ip22_timer));
 }
 
 static MACHINE_START( ip225015 )
@@ -1229,7 +1229,7 @@ static MACHINE_RESET( ip225015 )
 	RTC_REGISTERB = 0x08;
 	RTC_REGISTERD = 0x80;
 
-	timer_set(machine, attotime::from_msec(1), NULL, 0, ip22_timer);
+	machine->scheduler().timer_set(attotime::from_msec(1), FUNC(ip22_timer));
 
 	// set up low RAM mirror
 	memory_set_bankptr(machine, "bank1", state->mainram);

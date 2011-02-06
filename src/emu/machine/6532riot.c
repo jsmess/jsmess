@@ -238,7 +238,7 @@ void riot6532_device::reg_w(UINT8 offset, UINT8 data)
 	if ((offset & 0x14) == 0x14)
 	{
 		static const UINT8 timershift[4] = { 0, 3, 6, 10 };
-		attotime curtime = timer_get_time(&m_machine);
+		attotime curtime = m_machine.time();
 		INT64 target;
 
 		/* A0-A1 contain the timer divisor */
@@ -534,7 +534,7 @@ void riot6532_device::device_start()
 	devcb_resolve_write_line(&m_irq_func, &m_config.m_irq_func, this);
 
 	/* allocate timers */
-	m_timer = timer_alloc(&m_machine, timer_end_callback, (void *)this);
+	m_timer = m_machine.scheduler().timer_alloc(FUNC(timer_end_callback), (void *)this);
 
 	/* register for save states */
 	state_save_register_device_item(this, 0, m_port[0].m_in);

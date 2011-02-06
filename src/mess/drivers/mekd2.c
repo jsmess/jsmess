@@ -59,7 +59,7 @@ static WRITE_LINE_DEVICE_HANDLER( mekd2_nmi_w )
 	if (state)
 		cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
 	else
-		timer_set(device->machine, attotime::from_usec(18), NULL, 0, mekd2_trace);
+		device->machine->scheduler().timer_set(attotime::from_usec(18), FUNC(mekd2_trace));
 }
 
 /***********************************************************

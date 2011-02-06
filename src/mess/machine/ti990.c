@@ -84,7 +84,7 @@ static TIMER_CALLBACK(clear_load)
 void ti990_hold_load(running_machine *machine)
 {
 	cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, ASSERT_LINE);
-	timer_set(machine, attotime::from_msec(100), NULL, 0, clear_load);
+	machine->scheduler().timer_set(attotime::from_msec(100), FUNC(clear_load));
 }
 
 /*

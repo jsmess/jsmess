@@ -337,10 +337,10 @@ static DEVICE_START( rp5c01a )
 	devcb_resolve_write_line(&rp5c01a->out_alarm_func, &intf->out_alarm_func, device);
 
 	/* create the timers */
-	rp5c01a->clock_timer = timer_alloc(device->machine, clock_tick, (void *)device);
+	rp5c01a->clock_timer = device->machine->scheduler().timer_alloc(FUNC(clock_tick), (void *)device);
 	timer_adjust_periodic(rp5c01a->clock_timer, attotime::zero, 0, attotime::from_hz(1));
 
-	rp5c01a->alarm_timer = timer_alloc(device->machine, alarm_tick, (void *)device);
+	rp5c01a->alarm_timer = device->machine->scheduler().timer_alloc(FUNC(alarm_tick), (void *)device);
 	timer_adjust_periodic(rp5c01a->alarm_timer, attotime::zero, 0, attotime::from_hz(16));
 	timer_enable(rp5c01a->alarm_timer, 0);
 

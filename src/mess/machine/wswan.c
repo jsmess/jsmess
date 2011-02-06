@@ -197,14 +197,14 @@ MACHINE_START( wswan )
 	state->ws_bios_bank = NULL;
 	state->system_type = TYPE_WSWAN;
 	machine->add_notifier(MACHINE_NOTIFY_EXIT, wswan_machine_stop );
-	state->vdp.timer = timer_alloc( machine, wswan_scanline_interrupt, &state->vdp );
+	state->vdp.timer = machine->scheduler().timer_alloc(FUNC(wswan_scanline_interrupt), &state->vdp );
 	timer_adjust_periodic( state->vdp.timer, attotime::from_ticks( 256, 3072000 ), 0, attotime::from_ticks( 256, 3072000 ) );
 
 	wswan_setup_bios(machine);
 
 	/* Set up RTC timer */
 	if ( state->rtc.present )
-		timer_pulse(machine,  attotime::from_seconds(1), NULL, 0, wswan_rtc_callback );
+		machine->scheduler().timer_pulse(attotime::from_seconds(1), FUNC(wswan_rtc_callback));
 }
 
 MACHINE_START( wscolor )
@@ -213,14 +213,14 @@ MACHINE_START( wscolor )
 	state->ws_bios_bank = NULL;
 	state->system_type = TYPE_WSC;
 	machine->add_notifier(MACHINE_NOTIFY_EXIT, wswan_machine_stop );
-	state->vdp.timer = timer_alloc( machine, wswan_scanline_interrupt, &state->vdp );
+	state->vdp.timer = machine->scheduler().timer_alloc(FUNC(wswan_scanline_interrupt), &state->vdp );
 	timer_adjust_periodic( state->vdp.timer, attotime::from_ticks( 256, 3072000 ), 0, attotime::from_ticks( 256, 3072000 ) );
 
 	wswan_setup_bios(machine);
 
 	/* Set up RTC timer */
 	if ( state->rtc.present )
-		timer_pulse(machine,  attotime::from_seconds(1), NULL, 0, wswan_rtc_callback );
+		machine->scheduler().timer_pulse(attotime::from_seconds(1), FUNC(wswan_rtc_callback));
 }
 
 MACHINE_RESET( wswan )

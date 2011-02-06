@@ -493,7 +493,7 @@ static TIMER_CALLBACK( sol20_boot )
 static MACHINE_START( sol20 )
 {
 	sol20_state *state = machine->driver_data<sol20_state>();
-	state->m_cassette_timer = timer_alloc(machine, sol20_cassette_tc, NULL);
+	state->m_cassette_timer = machine->scheduler().timer_alloc(FUNC(sol20_cassette_tc));
 }
 
 static MACHINE_RESET( sol20 )
@@ -546,7 +546,7 @@ static MACHINE_RESET( sol20 )
 
 	// boot-bank
 	memory_set_bank(machine, "boot", 1);
-	timer_set(machine, attotime::from_usec(9), NULL, 0, sol20_boot);
+	machine->scheduler().timer_set(attotime::from_usec(9), FUNC(sol20_boot));
 }
 
 static DRIVER_INIT( sol20 )

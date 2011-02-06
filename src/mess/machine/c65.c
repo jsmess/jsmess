@@ -23,7 +23,7 @@
 		if(VERBOSE_LEVEL >= N) \
 		{ \
 			if( M ) \
-				logerror("%11.6f: %-24s", timer_get_time(MACHINE).as_double(), (char*) M ); \
+				logerror("%11.6f: %-24s", MACHINE->time().as_double(), (char*) M ); \
 			logerror A; \
 		} \
 	} while (0)
@@ -524,7 +524,7 @@ static void c65_fdc_state(void)
 	switch (state->fdc.state)
 	{
 	case FDC_CMD_MOTOR_SPIN_UP:
-		if (timer_get_time(machine) - state->fdc.time)
+		if (machine->time() - state->fdc.time)
 		{
 			state->fdc.state = 0;
 			state->fdc.status &= ~FDC_BUSY;
@@ -550,7 +550,7 @@ static void c65_fdc_w( running_machine *machine, int offset, int data )
 		case 0x20: // wait for motor spin up
 			state->fdc.status &= ~(FDC_IRQ|FDC_LOST|FDC_CRC|FDC_RNF);
 			state->fdc.status |= FDC_BUSY;
-			state->fdc.time = timer_get_time(machine);
+			state->fdc.time = machine->time();
 			state->fdc.state = FDC_CMD_MOTOR_SPIN_UP;
 			break;
 		case 0: // cancel

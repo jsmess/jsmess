@@ -243,7 +243,7 @@ static const TMS9928a_interface tms9928a_interface =
 static MACHINE_START( coleco )
 {
 	TMS9928A_configure(&tms9928a_interface);
-	timer_pulse(machine, attotime::from_msec(20), NULL, 0, paddle_callback);
+	machine->scheduler().timer_pulse(attotime::from_msec(20), FUNC(paddle_callback));
 }
 
 static MACHINE_RESET( coleco )

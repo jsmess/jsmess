@@ -735,7 +735,7 @@ static READ8_HANDLER(vga_crtc_r)
 			int clock=vga.monitor.get_clock();
 			int lines=vga.monitor.get_lines();
 			int columns=vga.monitor.get_columns();
-			int diff = (((timer_get_time(space->machine) - vga.monitor.start_time) * clock).seconds)
+			int diff = (((space->machine->time() - vga.monitor.start_time) * clock).seconds)
 				%(lines*columns);
 			if (diff<columns*vga.monitor.get_sync_lines()) data|=8;
 			diff=diff/lines;
@@ -745,7 +745,7 @@ static READ8_HANDLER(vga_crtc_r)
 		if (vga.monitor.retrace)
 		{
 			data |= 1;
-			if ((timer_get_time(space->machine) - vga.monitor.start_time) > attotime::from_usec(300))
+			if ((space->machine->time() - vga.monitor.start_time) > attotime::from_usec(300))
 			{
 				data |= 8;
 				vga.monitor.retrace=0;
@@ -753,9 +753,9 @@ static READ8_HANDLER(vga_crtc_r)
 		}
 		else
 		{
-			if ((timer_get_time(space->machine) - vga.monitor.start_time)  > attotime::from_msec(15))
+			if ((space->machine->time() - vga.monitor.start_time)  > attotime::from_msec(15))
 				vga.monitor.retrace=1;
-			vga.monitor.start_time=timer_get_time(space->machine);
+			vga.monitor.start_time=space->machine->time();
 		}
 #else
 		// not working with ps2m30
@@ -1010,7 +1010,7 @@ WRITE8_HANDLER(vga_port_03c0_w)
 			vga_cpu_interface(space->machine);
 
 			if (vga.sequencer.index == 0)
-				vga.monitor.start_time = timer_get_time(space->machine);
+				vga.monitor.start_time = space->machine->time();
 		}
 		break;
 	case 6:
@@ -1279,7 +1279,7 @@ static VIDEO_START( ega )
 	vga.monitor.get_columns = ega_get_crtc_columns;
 	vga.monitor.get_sync_lines = vga_get_crtc_sync_lines;
 	vga.monitor.get_sync_columns = vga_get_crtc_sync_columns;
-	timer_pulse(machine, attotime::from_hz(60), NULL, 0, vga_timer);
+	machine->scheduler().timer_pulse(attotime::from_hz(60), FUNC(vga_timer));
 	pc_video_start(machine, NULL, pc_ega_choosevideomode, 0);
 }
 
@@ -1294,7 +1294,7 @@ static VIDEO_START( vga )
 	vga.monitor.get_columns=vga_get_crtc_columns;
 	vga.monitor.get_sync_lines=vga_get_crtc_sync_lines;
 	vga.monitor.get_sync_columns=vga_get_crtc_sync_columns;
-	timer_pulse(machine, attotime::from_hz(60), NULL, 0, vga_timer);
+	machine->scheduler().timer_pulse(attotime::from_hz(60), FUNC(vga_timer));
 	pc_video_start(machine, NULL, pc_vga_choosevideomode, 0);
 }
 

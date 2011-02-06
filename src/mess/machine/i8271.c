@@ -1546,8 +1546,8 @@ static DEVICE_START( i8271 )
 
 	i8271->intf = (const i8271_interface*)device->baseconfig().static_config();
 
-	i8271->data_timer = timer_alloc(device->machine, i8271_data_timer_callback, (void *)device);
-	i8271->command_complete_timer = timer_alloc(device->machine, i8271_timed_command_complete_callback, (void *)device);
+	i8271->data_timer = device->machine->scheduler().timer_alloc(FUNC(i8271_data_timer_callback), (void *)device);
+	i8271->command_complete_timer = device->machine->scheduler().timer_alloc(FUNC(i8271_timed_command_complete_callback), (void *)device);
 	i8271->drive = 0;
 	i8271->pExecutionPhaseData = auto_alloc_array(device->machine, char, 0x4000);
 

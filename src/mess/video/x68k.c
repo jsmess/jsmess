@@ -287,7 +287,7 @@ TIMER_CALLBACK(x68k_crtc_raster_irq)
 		// end of HBlank period clears GPIP6 also?
 		end_time = machine->primary_screen->time_until_pos(scan,state->crtc.hend);
 		timer_adjust_oneshot(state->raster_irq, irq_time, scan);
-		timer_set(machine, end_time,NULL,0,x68k_crtc_raster_end);
+		machine->scheduler().timer_set(end_time, FUNC(x68k_crtc_raster_end));
 		logerror("GPIP6: Raster triggered at line %i (%i)\n",scan,machine->primary_screen->vpos());
 	}
 }
@@ -448,12 +448,12 @@ WRITE16_HANDLER( x68k_crtc_w )
 		if(data & 0x08)  // text screen raster copy
 		{
 			x68k_crtc_text_copy(state, (state->crtc.reg[22] & 0xff00) >> 8,(state->crtc.reg[22] & 0x00ff));
-			timer_set(space->machine, attotime::from_msec(1), NULL, 0x02,x68k_crtc_operation_end);  // time taken to do operation is a complete guess.
+			space->machine->scheduler().timer_set(attotime::from_msec(1), FUNC(x68k_crtc_operation_end), 0x02);  // time taken to do operation is a complete guess.
 		}
 		if(data & 0x02)  // high-speed graphic screen clear
 		{
 			memset(state->gvram,0,0x40000);
-			timer_set(space->machine, attotime::from_msec(10), NULL, 0x02,x68k_crtc_operation_end);  // time taken to do operation is a complete guess.
+			space->machine->scheduler().timer_set(attotime::from_msec(10), FUNC(x68k_crtc_operation_end), 0x02);  // time taken to do operation is a complete guess.
 		}
 		break;
 	}

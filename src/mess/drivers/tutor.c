@@ -200,7 +200,7 @@ enum
 static DRIVER_INIT(tutor)
 {
 	tutor_state *state = machine->driver_data<tutor_state>();
-	state->tape_interrupt_timer = timer_alloc(machine, tape_interrupt_handler, NULL);
+	state->tape_interrupt_timer = machine->scheduler().timer_alloc(FUNC(tape_interrupt_handler));
 
 	memory_configure_bank(machine, "bank1", 0, 1, machine->region("maincpu")->base() + basic_base, 0);
 	memory_configure_bank(machine, "bank1", 1, 1, machine->region("maincpu")->base() + cartridge_base, 0);

@@ -466,7 +466,7 @@ static MACHINE_START( micronic )
 	/* RAM banks */
 	memory_configure_bank(machine, "bank1", 0x02, 0x07, ram_get_ptr(machine->device(RAM_TAG)), 0x8000);
 
-	state->rtc_periodic_irq = timer_alloc(machine, rtc_periodic_irq, 0);
+	state->rtc_periodic_irq = machine->scheduler().timer_alloc(FUNC(rtc_periodic_irq));
 	/* register for state saving */
 //  state_save_register_global(machine, state->);
 }

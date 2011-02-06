@@ -495,12 +495,12 @@ static DEVICE_START( upd1990a )
 	devcb_resolve_write_line(&upd1990a->out_tp_func, &intf->out_tp_func, device);
 
 	/* create the timers */
-	upd1990a->clock_timer = timer_alloc(device->machine, clock_tick, (void *)device);
+	upd1990a->clock_timer = device->machine->scheduler().timer_alloc(FUNC(clock_tick), (void *)device);
 	timer_adjust_periodic(upd1990a->clock_timer, attotime::zero, 0, attotime::from_hz(1));
 
-	upd1990a->tp_timer = timer_alloc(device->machine, tp_tick, (void *)device);
+	upd1990a->tp_timer = device->machine->scheduler().timer_alloc(FUNC(tp_tick), (void *)device);
 
-	upd1990a->data_out_timer = timer_alloc(device->machine, data_out_tick, (void *)device);
+	upd1990a->data_out_timer = device->machine->scheduler().timer_alloc(FUNC(data_out_tick), (void *)device);
 
 	/* register for state saving */
     state_save_register_global_array(device->machine, upd1990a->time_counter);

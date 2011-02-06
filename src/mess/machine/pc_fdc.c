@@ -118,7 +118,7 @@ void pc_fdc_init(running_machine *machine, const struct pc_fdc_interface *iface)
 	if (iface)
 		memcpy(&fdc->fdc_interface, iface, sizeof(fdc->fdc_interface));
 
-	fdc->watchdog = timer_alloc(machine,  watchdog_timeout, NULL );
+	fdc->watchdog = machine->scheduler().timer_alloc(FUNC(watchdog_timeout));
 
 	pc_fdc_reset(machine);
 }

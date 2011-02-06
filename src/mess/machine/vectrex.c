@@ -289,19 +289,19 @@ TIMER_CALLBACK(vectrex_imager_eye)
 	{
 		state->imager_status = param;
 		coffset = param > 1? 3: 0;
-		timer_set (machine, attotime::from_double(rtime * state->imager_angles[0]), NULL, state->imager_colors[coffset+2], vectrex_imager_change_color);
-		timer_set (machine, attotime::from_double(rtime * state->imager_angles[1]), NULL, state->imager_colors[coffset+1], vectrex_imager_change_color);
-		timer_set (machine, attotime::from_double(rtime * state->imager_angles[2]), NULL, state->imager_colors[coffset], vectrex_imager_change_color);
+		machine->scheduler().timer_set (attotime::from_double(rtime * state->imager_angles[0]), FUNC(vectrex_imager_change_color), state->imager_colors[coffset+2]);
+		machine->scheduler().timer_set (attotime::from_double(rtime * state->imager_angles[1]), FUNC(vectrex_imager_change_color), state->imager_colors[coffset+1]);
+		machine->scheduler().timer_set (attotime::from_double(rtime * state->imager_angles[2]), FUNC(vectrex_imager_change_color), state->imager_colors[coffset]);
 
 		if (param == 2)
 		{
-			timer_set (machine, attotime::from_double(rtime * 0.50), NULL, 1, vectrex_imager_eye);
+			machine->scheduler().timer_set (attotime::from_double(rtime * 0.50), FUNC(vectrex_imager_eye), 1);
 
 			/* Index hole sensor is connected to IO7 which triggers also CA1 of VIA */
 			via_0->write_ca1(1);
 			via_0->write_ca1(0);
 			state->imager_pinlevel |= 0x80;
-			timer_set (machine, attotime::from_double(rtime / 360.0), &state->imager_pinlevel, 0, update_level);
+			machine->scheduler().timer_set (attotime::from_double(rtime / 360.0), FUNC(update_level), 0, &state->imager_pinlevel);
 		}
 	}
 }
@@ -318,7 +318,7 @@ WRITE8_HANDLER(vectrex_psg_port_w)
 	if (!mcontrol && mcontrol ^ state->old_mcontrol)
 	{
 		state->old_mcontrol = mcontrol;
-		tmp = timer_get_time(space->machine).as_double();
+		tmp = space->machine->time().as_double();
 		wavel = tmp - state->sl;
 		state->sl = tmp;
 
@@ -345,7 +345,7 @@ WRITE8_HANDLER(vectrex_psg_port_w)
 	if (mcontrol && mcontrol ^ state->old_mcontrol)
 	{
 		state->old_mcontrol = mcontrol;
-		state->pwl = timer_get_time(space->machine).as_double() - state->sl;
+		state->pwl = space->machine->time().as_double() - state->sl;
 	}
 }
 

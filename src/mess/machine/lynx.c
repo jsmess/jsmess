@@ -838,7 +838,7 @@ static void lynx_blitter(running_machine *machine)
 	}
 
 	if (0)
-		timer_set(machine, machine->device<cpu_device>("maincpu")->cycles_to_attotime(state->blitter.memory_accesses*20), NULL, 0, lynx_blitter_timer);
+		machine->scheduler().timer_set(machine->device<cpu_device>("maincpu")->cycles_to_attotime(state->blitter.memory_accesses*20), FUNC(lynx_blitter_timer));
 }
 
 
@@ -958,7 +958,7 @@ static READ8_HANDLER( suzy_read )
 		case 0x92:	/* Better check this with docs! */
 			if (state->blitter.time==attotime::zero)
 			{
-				if (space->machine->device<cpu_device>("maincpu")->attotime_to_cycles(timer_get_time(space->machine) - state->blitter.time) > state->blitter.memory_accesses * 20)
+				if (space->machine->device<cpu_device>("maincpu")->attotime_to_cycles(space->machine->time() - state->blitter.time) > state->blitter.memory_accesses * 20)
 				{
 					state->suzy.data[offset] &= ~0x01; //state->blitter finished
 					state->blitter.time = attotime::zero;
@@ -1091,7 +1091,7 @@ static WRITE8_HANDLER( suzy_write )
 	case 0x91:
 		if (data & 0x01)
 		{
-			state->blitter.time = timer_get_time(space->machine);
+			state->blitter.time = space->machine->time();
 			lynx_blitter(space->machine);
 		}
 		break;
@@ -1297,7 +1297,7 @@ static void lynx_timer_init(running_machine *machine, int which)
 {
 	lynx_state *state = machine->driver_data<lynx_state>();
 	memset( &state->timer[which], 0, sizeof(LYNX_TIMER) );
-	state->timer[which].timer = timer_alloc(machine,  lynx_timer_shot , NULL);
+	state->timer[which].timer = machine->scheduler().timer_alloc(FUNC(lynx_timer_shot));
 }
 
 static void lynx_timer_signal_irq(running_machine *machine, int which)
@@ -1479,7 +1479,7 @@ static TIMER_CALLBACK(lynx_uart_timer)
 	{
 		state->uart.data_to_send = state->uart.buffer;
 		state->uart.buffer_loaded = FALSE;
-		timer_set(machine, attotime::from_usec(11), NULL, 0, lynx_uart_timer);
+		machine->scheduler().timer_set(attotime::from_usec(11), FUNC(lynx_uart_timer));
 	}
 	else
 		state->uart.sending = FALSE;
@@ -1535,7 +1535,7 @@ static WRITE8_HANDLER(lynx_uart_w)
 			{
 				state->uart.sending = TRUE;
 				state->uart.data_to_send = data;
-				timer_set(space->machine, attotime::from_usec(11), NULL, 0, lynx_uart_timer);
+				space->machine->scheduler().timer_set(attotime::from_usec(11), FUNC(lynx_uart_timer));
 			}
 			break;
 	}

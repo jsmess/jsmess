@@ -379,7 +379,7 @@ static void abc80_keyboard_scan(running_machine *machine)
 	if (!state->m_key_strobe && state->m_key_data)
 	{
 		z80pio_pa_w(state->m_pio, 0, state->m_key_data);
-		timer_set(machine, attotime::from_msec(50), NULL, 0, keyboard_data_clear);
+		machine->scheduler().timer_set(attotime::from_msec(50), FUNC(keyboard_data_clear));
 	}
 }
 

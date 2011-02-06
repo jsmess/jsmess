@@ -128,6 +128,6 @@ DRIVER_INIT( pc1251 )
 	for (i=0; i<128; i++) gfx[i]=i;
 
 	state->power = 1;
-	timer_set(machine, attotime::from_seconds(1), NULL, 0, pc1251_power_up);
+	machine->scheduler().timer_set(attotime::from_seconds(1), FUNC(pc1251_power_up));
 }
 

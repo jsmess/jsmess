@@ -147,7 +147,7 @@ void cbm_common_interrupt( device_t *device )
 //  vic2_frame_interrupt (device);
 
 	/* check if lightpen has been chosen as input: if so, enable crosshair */
-	timer_set(device->machine, attotime::zero, NULL, 0, lightpen_tick);
+	device->machine->scheduler().timer_set(attotime::zero, FUNC(lightpen_tick));
 
 	set_led_status (device->machine, 1, input_port_read(device->machine, "SPECIAL") & 0x40 ? 1 : 0);		/* Shift Lock */
 	set_led_status (device->machine, 0, input_port_read(device->machine, "CTRLSEL") & 0x80 ? 1 : 0);		/* Joystick Swap */

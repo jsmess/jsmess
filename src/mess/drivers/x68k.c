@@ -175,11 +175,11 @@ static void mfp_init(running_machine *machine)
 	state->mfp.current_irq = -1;  // No current interrupt
 
 #if 0
-    mfp_timer[0] = timer_alloc(machine, mfp_timer_a_callback, NULL);
-    mfp_timer[1] = timer_alloc(machine, mfp_timer_b_callback, NULL);
-    mfp_timer[2] = timer_alloc(machine, mfp_timer_c_callback, NULL);
-    mfp_timer[3] = timer_alloc(machine, mfp_timer_d_callback, NULL);
-    mfp_irq = timer_alloc(machine, mfp_update_irq, NULL);
+    mfp_timer[0] = machine->scheduler().timer_alloc(FUNC(mfp_timer_a_callback));
+    mfp_timer[1] = machine->scheduler().timer_alloc(FUNC(mfp_timer_b_callback));
+    mfp_timer[2] = machine->scheduler().timer_alloc(FUNC(mfp_timer_c_callback));
+    mfp_timer[3] = machine->scheduler().timer_alloc(FUNC(mfp_timer_d_callback));
+    mfp_irq = machine->scheduler().timer_alloc(FUNC(mfp_update_irq));
     timer_adjust_periodic(mfp_irq, attotime::zero, 0, attotime::from_usec(32));
 #endif
 }
@@ -738,8 +738,8 @@ static TIMER_CALLBACK(md_6button_port2_timeout)
 static void md_6button_init(running_machine* machine)
 {
 	x68k_state *state = machine->driver_data<x68k_state>();
-	state->mdctrl.io_timeout1 = timer_alloc(machine,md_6button_port1_timeout,NULL);
-	state->mdctrl.io_timeout2 = timer_alloc(machine,md_6button_port2_timeout,NULL);
+	state->mdctrl.io_timeout1 = machine->scheduler().timer_alloc(FUNC(md_6button_port1_timeout));
+	state->mdctrl.io_timeout2 = machine->scheduler().timer_alloc(FUNC(md_6button_port2_timeout));
 }
 
 static UINT8 md_6button_r(device_t* device, int port)
@@ -1729,7 +1729,7 @@ static READ16_HANDLER( x68k_rom0_r )
 		offset *= 2;
 		if(ACCESSING_BITS_0_7)
 			offset++;
-		timer_set(space->machine, space->machine->device<cpu_device>("maincpu")->cycles_to_attotime(4), NULL, 0xbffffc+offset,x68k_fake_bus_error);
+		space->machine->scheduler().timer_set(space->machine->device<cpu_device>("maincpu")->cycles_to_attotime(4), FUNC(x68k_fake_bus_error), 0xbffffc+offset);
 	}
 	return 0xff;
 }
@@ -1747,7 +1747,7 @@ static WRITE16_HANDLER( x68k_rom0_w )
 		offset *= 2;
 		if(ACCESSING_BITS_0_7)
 			offset++;
-		timer_set(space->machine, space->machine->device<cpu_device>("maincpu")->cycles_to_attotime(4), NULL, 0xbffffc+offset,x68k_fake_bus_error);
+		space->machine->scheduler().timer_set(space->machine->device<cpu_device>("maincpu")->cycles_to_attotime(4), FUNC(x68k_fake_bus_error), 0xbffffc+offset);
 	}
 }
 
@@ -1764,7 +1764,7 @@ static READ16_HANDLER( x68k_emptyram_r )
 		offset *= 2;
 		if(ACCESSING_BITS_0_7)
 			offset++;
-		timer_set(space->machine, space->machine->device<cpu_device>("maincpu")->cycles_to_attotime(4), NULL, offset,x68k_fake_bus_error);
+		space->machine->scheduler().timer_set(space->machine->device<cpu_device>("maincpu")->cycles_to_attotime(4), FUNC(x68k_fake_bus_error), offset);
 	}
 	return 0xff;
 }
@@ -1782,7 +1782,7 @@ static WRITE16_HANDLER( x68k_emptyram_w )
 		offset *= 2;
 		if(ACCESSING_BITS_0_7)
 			offset++;
-		timer_set(space->machine, space->machine->device<cpu_device>("maincpu")->cycles_to_attotime(4), NULL, offset,x68k_fake_bus_error);
+		space->machine->scheduler().timer_set(space->machine->device<cpu_device>("maincpu")->cycles_to_attotime(4), FUNC(x68k_fake_bus_error), offset);
 	}
 }
 
@@ -1797,7 +1797,7 @@ static READ16_HANDLER( x68k_exp_r )
 		offset *= 2;
 		if(ACCESSING_BITS_0_7)
 			offset++;
-		timer_set(space->machine, space->machine->device<cpu_device>("maincpu")->cycles_to_attotime(16), NULL, 0xeafa00+offset,x68k_fake_bus_error);
+		space->machine->scheduler().timer_set(space->machine->device<cpu_device>("maincpu")->cycles_to_attotime(16), FUNC(x68k_fake_bus_error), 0xeafa00+offset);
 //      cputag_set_input_line_and_vector(machine, "maincpu",2,ASSERT_LINE,state->current_vector[2]);
 	}
 	return 0xffff;
@@ -1814,7 +1814,7 @@ static WRITE16_HANDLER( x68k_exp_w )
 		offset *= 2;
 		if(ACCESSING_BITS_0_7)
 			offset++;
-		timer_set(space->machine, space->machine->device<cpu_device>("maincpu")->cycles_to_attotime(16), NULL, 0xeafa00+offset,x68k_fake_bus_error);
+		space->machine->scheduler().timer_set(space->machine->device<cpu_device>("maincpu")->cycles_to_attotime(16), FUNC(x68k_fake_bus_error), 0xeafa00+offset);
 //      cputag_set_input_line_and_vector(machine, "maincpu",2,ASSERT_LINE,state->current_vector[2]);
 	}
 }
@@ -2693,12 +2693,12 @@ static DRIVER_INIT( x68000 )
 	// init keyboard
 	state->keyboard.delay = 500;  // 3*100+200
 	state->keyboard.repeat = 110;  // 4^2*5+30
-	state->kb_timer = timer_alloc(machine, x68k_keyboard_poll,NULL);
-	state->scanline_timer = timer_alloc(machine, x68k_hsync,NULL);
-	state->raster_irq = timer_alloc(machine, x68k_crtc_raster_irq,NULL);
-	state->vblank_irq = timer_alloc(machine, x68k_crtc_vblank_irq,NULL);
-	state->mouse_timer = timer_alloc(machine, x68k_scc_ack,NULL);
-	state->led_timer = timer_alloc(machine, x68k_led_callback,NULL);
+	state->kb_timer = machine->scheduler().timer_alloc(FUNC(x68k_keyboard_poll));
+	state->scanline_timer = machine->scheduler().timer_alloc(FUNC(x68k_hsync));
+	state->raster_irq = machine->scheduler().timer_alloc(FUNC(x68k_crtc_raster_irq));
+	state->vblank_irq = machine->scheduler().timer_alloc(FUNC(x68k_crtc_vblank_irq));
+	state->mouse_timer = machine->scheduler().timer_alloc(FUNC(x68k_scc_ack));
+	state->led_timer = machine->scheduler().timer_alloc(FUNC(x68k_led_callback));
 
 	// Initialise timers for 6-button MD controllers
 	md_6button_init(machine);

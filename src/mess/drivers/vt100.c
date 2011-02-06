@@ -323,7 +323,7 @@ static IRQ_CALLBACK(vt100_irq_callback)
 
 static MACHINE_START(vt100)
 {
-	timer_pulse(machine, attotime::from_hz(800), NULL, 0, keyboard_callback);
+	machine->scheduler().timer_pulse(attotime::from_hz(800), FUNC(keyboard_callback));
 }
 
 static MACHINE_RESET(vt100)

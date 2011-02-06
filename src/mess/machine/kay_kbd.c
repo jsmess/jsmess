@@ -510,7 +510,7 @@ void kay_kbd_d_w( running_machine *machine, UINT8 data )
 		if (length)
 		{
 			kbd->control_status &= 0xfb;
-			timer_set(machine, attotime::from_msec(length), NULL, 0, kay_kbd_beepoff);
+			machine->scheduler().timer_set(attotime::from_msec(length), FUNC(kay_kbd_beepoff));
 			beep_set_state(kbd->beeper, 1);
 		}
 	}

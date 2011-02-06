@@ -356,7 +356,7 @@ static void sms_get_inputs( address_space *space )
 	}
 
 	/* Check if lightgun has been chosen as input: if so, enable crosshair */
-	timer_set(machine, attotime::zero, NULL, 0, lightgun_tick);
+	machine->scheduler().timer_set(attotime::zero, FUNC(lightgun_tick));
 
 	/* Player 1 */
 	switch (input_port_read_safe(machine, "CTRLSEL", 0x00) & 0x0f)
@@ -1705,11 +1705,11 @@ MACHINE_START( sms )
 	sms_state *state = machine->driver_data<sms_state>();
 
 	machine->add_notifier(MACHINE_NOTIFY_EXIT, sms_machine_stop);
-	state->rapid_fire_timer = timer_alloc(machine, rapid_fire_callback , NULL);
+	state->rapid_fire_timer = machine->scheduler().timer_alloc(FUNC(rapid_fire_callback));
 	timer_adjust_periodic(state->rapid_fire_timer, attotime::from_hz(10), 0, attotime::from_hz(10));
 
-	state->lphaser_1_timer = timer_alloc(machine, lphaser_1_callback , NULL);
-	state->lphaser_2_timer = timer_alloc(machine, lphaser_2_callback , NULL);
+	state->lphaser_1_timer = machine->scheduler().timer_alloc(FUNC(lphaser_1_callback));
+	state->lphaser_2_timer = machine->scheduler().timer_alloc(FUNC(lphaser_2_callback));
 
 	state->main_cpu = machine->device("maincpu");
 	state->control_cpu = machine->device("control");
@@ -1720,7 +1720,7 @@ MACHINE_START( sms )
 	state->right_lcd = machine->device("right_lcd");
 	
 	/* Check if lightgun has been chosen as input: if so, enable crosshair */
-	timer_set(machine, attotime::zero, NULL, 0, lightgun_tick);
+	machine->scheduler().timer_set(attotime::zero, FUNC(lightgun_tick));
 }
 
 #ifdef MESS

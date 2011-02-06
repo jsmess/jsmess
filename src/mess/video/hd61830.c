@@ -202,7 +202,7 @@ hd61830_device::hd61830_device(running_machine &_machine, const hd61830_device_c
 void hd61830_device::device_start()
 {
 	// allocate timers
-	m_busy_timer = device_timer_alloc(*this);
+	m_busy_timer = timer_alloc();
 
 	// resolve callbacks
     devcb_resolve_read8(&m_in_rd_func, &m_config.m_in_rd_func, this);

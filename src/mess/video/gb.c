@@ -1231,13 +1231,13 @@ static TIMER_CALLBACK( gb_video_init_vbl )
 MACHINE_START( gb_video )
 {
 	gb_state *state = machine->driver_data<gb_state>();
-	state->lcd.lcd_timer = timer_alloc(machine, gb_lcd_timer_proc, NULL);
+	state->lcd.lcd_timer = machine->scheduler().timer_alloc(FUNC(gb_lcd_timer_proc));
 }
 
 MACHINE_START( gbc_video )
 {
 	gb_state *state = machine->driver_data<gb_state>();
-	state->lcd.lcd_timer = timer_alloc(machine, gbc_lcd_timer_proc, NULL);
+	state->lcd.lcd_timer = machine->scheduler().timer_alloc(FUNC(gbc_lcd_timer_proc));
 }
 
 void gb_video_reset( running_machine *machine, int mode )
@@ -1311,7 +1311,7 @@ void gb_video_reset( running_machine *machine, int mode )
 		memcpy( state->lcd.gb_oam->base(), mgb_oam_fingerprint, 0x100 );
 
 		/* Make sure the VBlank interrupt is set when the first instruction gets executed */
-		timer_set(machine,  machine->device<cpu_device>("maincpu")->cycles_to_attotime(1), NULL, 0, gb_video_init_vbl );
+		machine->scheduler().timer_set(machine->device<cpu_device>("maincpu")->cycles_to_attotime(1), FUNC(gb_video_init_vbl));
 
 		/* Initialize some video registers */
 		gb_video_w( space, 0x0, 0x91 );    /* LCDCONT */

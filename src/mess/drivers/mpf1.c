@@ -366,14 +366,14 @@ static MACHINE_START( mpf1 )
 	state->speaker = machine->device(SPEAKER_TAG);
 	state->cassette = machine->device(CASSETTE_TAG);
 
-	state->led_refresh_timer = timer_alloc(machine, led_refresh, 0);
+	state->led_refresh_timer = machine->scheduler().timer_alloc(FUNC(led_refresh));
 
 	/* register for state saving */
 	state_save_register_global(machine, state->_break);
 	state_save_register_global(machine, state->m1);
 	state_save_register_global(machine, state->lednum);
 
-	timer_pulse(machine,  attotime::from_hz(1), NULL, 0, check_halt_callback);
+	machine->scheduler().timer_pulse(attotime::from_hz(1), FUNC(check_halt_callback));
 }
 
 static MACHINE_RESET( mpf1 )

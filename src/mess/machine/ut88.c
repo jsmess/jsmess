@@ -69,7 +69,7 @@ static TIMER_CALLBACK( ut88_reset )
 MACHINE_RESET( ut88 )
 {
 	ut88_state *state = machine->driver_data<ut88_state>();
-	timer_set(machine, attotime::from_usec(10), NULL, 0, ut88_reset);
+	machine->scheduler().timer_set(attotime::from_usec(10), FUNC(ut88_reset));
 	memory_set_bank(machine, "bank1", 1);
 	state->keyboard_mask = 0;
 }
@@ -164,7 +164,7 @@ DRIVER_INIT(ut88mini)
 }
 MACHINE_START( ut88mini )
 {
-	timer_pulse(machine, attotime::from_hz(60), NULL, 0, update_display);
+	machine->scheduler().timer_pulse(attotime::from_hz(60), FUNC(update_display));
 }
 
 MACHINE_RESET( ut88mini )

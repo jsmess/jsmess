@@ -541,14 +541,14 @@ MACHINE_RESET( mbee )
 {
 	machine_reset_common(machine);
 	memory_set_bank(machine, "boot", 1);
-	timer_set(machine, attotime::from_usec(4), NULL, 0, mbee_reset);
+	machine->scheduler().timer_set(attotime::from_usec(4), FUNC(mbee_reset));
 }
 
 MACHINE_RESET( mbee56 )
 {
 	machine_reset_common_disk(machine);
 	memory_set_bank(machine, "boot", 1);
-	timer_set(machine, attotime::from_usec(4), NULL, 0, mbee_reset);
+	machine->scheduler().timer_set(attotime::from_usec(4), FUNC(mbee_reset));
 }
 
 MACHINE_RESET( mbee64 )
@@ -578,7 +578,7 @@ MACHINE_RESET( mbee256 )
 	state->mbee256_q_pos = 0;
 	mbee256_50_w(mem,0,0); // set banks to default
 	memory_set_bank(machine, "boot", 8); // boot time
-	timer_set(machine, attotime::from_usec(4), NULL, 0, mbee_reset);
+	machine->scheduler().timer_set(attotime::from_usec(4), FUNC(mbee_reset));
 }
 
 MACHINE_RESET( mbeett )
@@ -590,7 +590,7 @@ MACHINE_RESET( mbeett )
 	state->mbee256_q_pos = 0;
 	machine_reset_common(machine);
 	memory_set_bank(machine, "boot", 1);
-	timer_set(machine, attotime::from_usec(4), NULL, 0, mbee_reset);
+	machine->scheduler().timer_set(attotime::from_usec(4), FUNC(mbee_reset));
 }
 
 INTERRUPT_GEN( mbee_interrupt )
@@ -757,8 +757,8 @@ DRIVER_INIT( mbee256 )
 	memory_configure_bank(machine, "bank8l", 0, 1, &RAM[0x0000], 0x0000); // rom
 	memory_configure_bank(machine, "bank8h", 0, 1, &RAM[0x0800], 0x0000); // rom
 
-	timer_pulse(machine, attotime::from_hz(1),NULL,0,mbee_rtc_irq);	/* timer for rtc */
-	timer_pulse(machine, attotime::from_hz(25),NULL,0,mbee256_kbd);	/* timer for kbd */
+	machine->scheduler().timer_pulse(attotime::from_hz(1), FUNC(mbee_rtc_irq));	/* timer for rtc */
+	machine->scheduler().timer_pulse(attotime::from_hz(25), FUNC(mbee256_kbd));	/* timer for kbd */
 
 	state->size = 0x8000;
 }
@@ -778,8 +778,8 @@ DRIVER_INIT( mbeett )
 	memory_set_bank(machine, "pak", 5);
 	memory_set_bank(machine, "telcom", 0);
 
-	timer_pulse(machine, attotime::from_hz(1),NULL,0,mbee_rtc_irq);	/* timer for rtc */
-	timer_pulse(machine, attotime::from_hz(25),NULL,0,mbee256_kbd);	/* timer for kbd */
+	machine->scheduler().timer_pulse(attotime::from_hz(1), FUNC(mbee_rtc_irq));	/* timer for rtc */
+	machine->scheduler().timer_pulse(attotime::from_hz(25), FUNC(mbee256_kbd));	/* timer for kbd */
 
 	state->size = 0x8000;
 }

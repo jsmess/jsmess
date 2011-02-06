@@ -868,14 +868,14 @@ static MACHINE_START( pockstat )
 	int index = 0;
 	for(index = 0; index < 3; index++)
 	{
-		state->timer_regs.timer[index].timer = timer_alloc(machine, timer_tick, 0);
+		state->timer_regs.timer[index].timer = machine->scheduler().timer_alloc(FUNC(timer_tick));
 		timer_adjust_oneshot(state->timer_regs.timer[index].timer, attotime::never, index);
 	}
 
 	state->rtc_regs.time = 0x01000000;
 	state->rtc_regs.date = 0x19990101;
 
-	state->rtc_regs.timer = timer_alloc(machine, rtc_tick, 0);
+	state->rtc_regs.timer = machine->scheduler().timer_alloc(FUNC(rtc_tick));
 	timer_adjust_oneshot(state->rtc_regs.timer, attotime::from_hz(1), index);
 
 	state_save_register_global(machine, state->ftlb_regs.control);

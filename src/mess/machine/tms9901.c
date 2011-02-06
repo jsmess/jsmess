@@ -589,7 +589,7 @@ static DEVICE_START( tms9901 )
 
 	tms->intf = (const tms9901_interface*)device->baseconfig().static_config();
 
-	tms->timer = timer_alloc(device->machine, decrementer_callback, (void *) device);
+	tms->timer = device->machine->scheduler().timer_alloc(FUNC(decrementer_callback), (void *) device);
 
 	tms->supported_int_mask = tms->intf->supported_int_mask;
 

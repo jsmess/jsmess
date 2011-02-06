@@ -131,7 +131,7 @@ WRITE8_DEVICE_HANDLER( aim65_printer_data_b )
 VIDEO_START( aim65 )
 {
 	aim65_state *state = machine->driver_data<aim65_state>();
-	state->print_timer = timer_alloc(machine, aim65_printer_timer, NULL);
+	state->print_timer = machine->scheduler().timer_alloc(FUNC(aim65_printer_timer));
 
 #if 0
 	videoram_size = 600 * 10 * 2;

@@ -2321,9 +2321,9 @@ static void common_start(device_t *device, int device_type)
 	fdc->intf = (const upd765_interface*)device->baseconfig().static_config();
 
 	fdc->version = (UPD765_VERSION)device_type;
-	fdc->timer = timer_alloc(device->machine, upd765_timer_callback, (void*)device);
-	fdc->seek_timer = timer_alloc(device->machine, upd765_seek_timer_callback, (void*)device);
-	fdc->command_timer = timer_alloc(device->machine, upd765_continue_command, (void*)device);
+	fdc->timer = device->machine->scheduler().timer_alloc(FUNC(upd765_timer_callback), (void*)device);
+	fdc->seek_timer = device->machine->scheduler().timer_alloc(FUNC(upd765_seek_timer_callback), (void*)device);
+	fdc->command_timer = device->machine->scheduler().timer_alloc(FUNC(upd765_continue_command), (void*)device);
 
 	fdc->upd765_flags &= UPD765_FDD_READY;
 	fdc->data_buffer = auto_alloc_array(device->machine, char, 32*1024);

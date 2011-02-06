@@ -150,7 +150,7 @@ static DEVICE_START( acia6551 )
 	memset(acia, 0, sizeof(*acia));
 	/* transmit data reg is empty */
 	acia->status_register |= (1<<4);
-	acia->timer = timer_alloc(device->machine, acia_6551_timer_callback, (void *) device);
+	acia->timer = device->machine->scheduler().timer_alloc(FUNC(acia_6551_timer_callback), (void *) device);
 
 	serial_connection_init(device->machine, &acia->connection);
 	serial_connection_set_in_callback(device->machine, &acia->connection, acia_6551_in_callback);

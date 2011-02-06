@@ -915,10 +915,10 @@ static DEVICE_START( scsibus )
     bus->phase=SCSI_PHASE_BUS_FREE;
 
     // Setup req/ack/sel timers
-    bus->req_timer=timer_alloc(device->machine, req_timer_callback, (void *)device);
-    bus->ack_timer=timer_alloc(device->machine, ack_timer_callback, (void *)device);
-	bus->sel_timer=timer_alloc(device->machine, sel_timer_callback, (void *)device);
-	bus->dataout_timer=timer_alloc(device->machine, dataout_timer_callback, (void *)device);
+    bus->req_timer=device->machine->scheduler().timer_alloc(FUNC(req_timer_callback), (void *)device);
+    bus->ack_timer=device->machine->scheduler().timer_alloc(FUNC(ack_timer_callback), (void *)device);
+	bus->sel_timer=device->machine->scheduler().timer_alloc(FUNC(sel_timer_callback), (void *)device);
+	bus->dataout_timer=device->machine->scheduler().timer_alloc(FUNC(dataout_timer_callback), (void *)device);
 	
 }
 

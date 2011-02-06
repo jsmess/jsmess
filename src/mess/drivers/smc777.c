@@ -637,7 +637,7 @@ static MACHINE_START(smc777)
 	for(i=0;i<0x4000;i++)
 		state->wram[i] = rom[i];
 
-	timer_pulse(machine, attotime::from_hz(240/32), NULL, 0, keyboard_callback);
+	machine->scheduler().timer_pulse(attotime::from_hz(240/32), FUNC(keyboard_callback));
 	beep_set_frequency(machine->device("beeper"),300); //guesswork
 	beep_set_state(machine->device("beeper"),0);
 }

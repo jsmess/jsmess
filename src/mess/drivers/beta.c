@@ -242,7 +242,7 @@ static MACHINE_START( beta )
 	/* find devices */
 	state->speaker = machine->device(SPEAKER_TAG);
 
-	state->led_refresh_timer = timer_alloc(machine, led_refresh, 0);
+	state->led_refresh_timer = machine->scheduler().timer_alloc(FUNC(led_refresh));
 
 	/* register for state saving */
 	state_save_register_global(machine, state->eprom_oe);

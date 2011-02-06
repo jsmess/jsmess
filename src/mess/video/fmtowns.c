@@ -1806,7 +1806,7 @@ INTERRUPT_GEN( towns_vsync_irq )
 	pic8259_ir3_w(dev, 1);  // IRQ11 = VSync
 	if(IRQ_LOG) logerror("PIC: IRQ11 (VSync) set high\n");
 	state->video.towns_vblank_flag = 1;
-	timer_set(device->machine,device->machine->primary_screen->time_until_vblank_end(),(void*)dev,0,towns_vblank_end);
+	device->machine->scheduler().timer_set(device->machine->primary_screen->time_until_vblank_end(), FUNC(towns_vblank_end), 0, (void*)dev);
 	if(state->video.towns_tvram_enable)
 		draw_text_layer(dev->machine);
 	if(state->video.towns_sprite_reg[1] & 0x80)
@@ -1819,7 +1819,7 @@ VIDEO_START( towns )
 
 	state->video.towns_vram_wplane = 0x00;
 	state->video.towns_sprite_page = 0;
-	state->video.sprite_timer = timer_alloc(machine,towns_sprite_done,NULL);
+	state->video.sprite_timer = machine->scheduler().timer_alloc(FUNC(towns_sprite_done));
 }
 
 VIDEO_UPDATE( towns )

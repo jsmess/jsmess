@@ -36,7 +36,7 @@ void pc1401_outb(device_t *device, int data)
 void pc1401_outc(device_t *device, int data)
 {
 	pc1401_state *state = device->machine->driver_data<pc1401_state>();
-	//logerror("%g outc %.2x\n", timer_get_time(machine).as_double(), data);
+	//logerror("%g outc %.2x\n", machine->time().as_double(), data);
 	state->portc = data;
 }
 
@@ -249,5 +249,5 @@ DRIVER_INIT( pc1401 )
 		gfx[i]=i;
 
 	state->power = 1;
-	timer_set(machine, attotime::from_seconds(1), NULL, 0, pc1401_power_up);
+	machine->scheduler().timer_set(attotime::from_seconds(1), FUNC(pc1401_power_up));
 }

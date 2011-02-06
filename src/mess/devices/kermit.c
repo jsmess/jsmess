@@ -646,7 +646,7 @@ static DEVICE_START( kermit )
 	state->image = NULL;
 	state->conf = (kermit_config*) device->baseconfig().static_config();
 	state->machine = device->machine;
-	state->resend = timer_alloc(device->machine,  kermit_resend_cb, state );
+	state->resend = device->machine->scheduler().timer_alloc(FUNC(kermit_resend_cb), state );
 	kermit_reset( state );
 }
 

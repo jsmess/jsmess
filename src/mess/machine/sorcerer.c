@@ -406,9 +406,9 @@ SNAPSHOT_LOAD(sorcerer)
 MACHINE_START( sorcerer )
 {
 	sorcerer_state *state = machine->driver_data<sorcerer_state>();
-	state->m_cassette_timer = timer_alloc(machine, sorcerer_cassette_tc, NULL);
+	state->m_cassette_timer = machine->scheduler().timer_alloc(FUNC(sorcerer_cassette_tc));
 #if SORCERER_USING_RS232
-	state->m_serial_timer = timer_alloc(machine, sorcerer_serial_tc, NULL);
+	state->m_serial_timer = machine->scheduler().timer_alloc(FUNC(sorcerer_serial_tc));
 #endif
 
 #if SORCERER_USING_DISKS
@@ -450,5 +450,5 @@ MACHINE_RESET( sorcerer )
 	state->sorcerer_fe_w(*space, 0, 0, 0xff);
 
 	memory_set_bank(machine, "boot", 1);
-	timer_set(machine, attotime::from_usec(10), NULL, 0, sorcerer_reset);
+	machine->scheduler().timer_set(attotime::from_usec(10), FUNC(sorcerer_reset));
 }

@@ -104,7 +104,7 @@ static TIMER_CALLBACK( update_leds )
 
 static MACHINE_START( mk2 )
 {
-	timer_pulse(machine, attotime::from_hz(60), NULL, 0, update_leds);
+	machine->scheduler().timer_pulse(attotime::from_hz(60), FUNC(update_leds));
 }
 
 static READ8_DEVICE_HANDLER( mk2_read_a )

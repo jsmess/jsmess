@@ -416,7 +416,7 @@ static MACHINE_START(nanos)
 {
 	nanos_state *state = machine->driver_data<nanos_state>();
 	state->key_pressed = 0xff;
-	timer_pulse(machine, attotime::from_hz(24000), NULL, 0, keyboard_callback);
+	machine->scheduler().timer_pulse(attotime::from_hz(24000), FUNC(keyboard_callback));
 }
 
 static MACHINE_RESET(nanos)

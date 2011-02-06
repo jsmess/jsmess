@@ -320,7 +320,7 @@ static DEVICE_START( msm58321 )
 	devcb_resolve_write_line(&msm58321->out_busy_func, &intf->out_busy_func, device);
 
 	/* create busy timer */
-	msm58321->busy_timer = timer_alloc(device->machine, busy_tick, (void *)device);
+	msm58321->busy_timer = device->machine->scheduler().timer_alloc(FUNC(busy_tick), (void *)device);
 	timer_adjust_periodic(msm58321->busy_timer, attotime::zero, 0, attotime::from_hz(2));
 
 	/* register for state saving */

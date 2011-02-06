@@ -180,7 +180,7 @@ WRITE8_HANDLER(radio_io_w )
 MACHINE_RESET( radio86 )
 {
 	radio86_state *state = machine->driver_data<radio86_state>();
-	timer_set(machine, attotime::from_usec(10), NULL, 0, radio86_reset);
+	machine->scheduler().timer_set(attotime::from_usec(10), FUNC(radio86_reset));
 	memory_set_bank(machine, "bank1", 1);
 
 	state->keyboard_mask = 0;

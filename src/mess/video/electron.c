@@ -46,7 +46,7 @@ VIDEO_START( electron )
 		state->map4[i] = ( ( i & 0x10 ) >> 3 ) | ( i & 0x01 );
 		state->map16[i] = ( ( i & 0x40 ) >> 3 ) | ( ( i & 0x10 ) >> 2 ) | ( ( i & 0x04 ) >> 1 ) | ( i & 0x01 );
 	}
-	state->scanline_timer = timer_alloc( machine, electron_scanline_interrupt, NULL );
+	state->scanline_timer = machine->scheduler().timer_alloc(FUNC(electron_scanline_interrupt));
 	timer_adjust_periodic( state->scanline_timer,  machine->primary_screen->time_until_pos(0), 0, machine->primary_screen->scan_period() );
 }
 

@@ -87,8 +87,8 @@ void fmscsi_device::device_start()
     }
 
     // allocate read timer
-    m_transfer_timer = device_timer_alloc(*this,TIMER_TRANSFER);
-    m_phase_timer = device_timer_alloc(*this,TIMER_PHASE);
+    m_transfer_timer = timer_alloc(TIMER_TRANSFER);
+    m_phase_timer = timer_alloc(TIMER_PHASE);
 }
 
 void fmscsi_device::device_reset()

@@ -1385,14 +1385,14 @@ ADDRESS_MAP_END
 
 static READ8_DEVICE_HANDLER( cpu_8255_c_r )
 {
-	timer_call_after_resynch(device->machine, NULL, 0, 0); // force resync
+	device->machine->scheduler().synchronize(); // force resync
 
 	return i8255_1_pc >> 4;
 }
 
 static WRITE8_DEVICE_HANDLER( cpu_8255_c_w )
 {
-	timer_call_after_resynch(device->machine, NULL, 0, 0); // force resync
+	device->machine->scheduler().synchronize(); // force resync
 
 	i8255_0_pc = data;
 }
@@ -1409,14 +1409,14 @@ static I8255A_INTERFACE( master_fdd_intf )
 
 static READ8_DEVICE_HANDLER( fdc_8255_c_r )
 {
-	timer_call_after_resynch(device->machine, NULL, 0, 0); // force resync
+	device->machine->scheduler().synchronize(); // force resync
 
 	return i8255_0_pc >> 4;
 }
 
 static WRITE8_DEVICE_HANDLER( fdc_8255_c_w )
 {
-	timer_call_after_resynch(device->machine, NULL, 0, 0); // force resync
+	device->machine->scheduler().synchronize(); // force resync
 
 	i8255_1_pc = data;
 }
@@ -1457,7 +1457,7 @@ static READ8_HANDLER( upd765_tc_r )
 
 	upd765_tc_w(space->machine->device("upd765"), 1);
 	 //TODO: I'm not convinced that this works correctly with current hook-up ... 1000 usec is needed by Aploon, a bigger value breaks Alpha.
-	timer_set(space->machine,  attotime::from_usec(750), NULL, 0, pc8801fd_upd765_tc_to_zero );
+	space->machine->scheduler().timer_set(attotime::from_usec(750), FUNC(pc8801fd_upd765_tc_to_zero));
 	return 0xff; // value is meaningless
 }
 
@@ -1943,7 +1943,7 @@ static MACHINE_START( pc8801 )
 {
 	cpu_set_irq_callback(machine->device("maincpu"), pc8801_irq_callback);
 
-	timer_pulse(machine, attotime::from_hz(600), NULL, 0, pc8801_rtc_irq);
+	machine->scheduler().timer_pulse(attotime::from_hz(600), FUNC(pc8801_rtc_irq));
 }
 
 static MACHINE_RESET( pc8801 )

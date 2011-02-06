@@ -259,13 +259,13 @@ static DEVICE_START( vdt911 )
 	else
 		vdt->cursor_address_mask = 0x7ff;	/* 2 kb of RAM */
 
-	timer_set(device->machine, attotime::zero, vdt, 0, setup_beep);
+	device->machine->scheduler().timer_set(attotime::zero, FUNC(setup_beep), 0, vdt);
 
 	/* set up cursor blink clock.  2Hz frequency -> .25s half-period. */
-	/*vdt->blink_clock =*/ timer_pulse(device->machine, attotime::from_msec(250), vdt, 0, blink_callback);
+	/*vdt->blink_clock =*/ device->machine->scheduler().timer_pulse(attotime::from_msec(250), FUNC(blink_callback), 0, vdt);
 
 	/* alloc beep timer */
-	vdt->beep_timer = timer_alloc(device->machine, beep_callback, NULL);
+	vdt->beep_timer = device->machine->scheduler().timer_alloc(FUNC(beep_callback));
 }
 
 DEVICE_GET_INFO( vdt911 )

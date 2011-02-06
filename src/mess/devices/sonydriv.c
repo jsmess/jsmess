@@ -332,7 +332,7 @@ int sony_read_status(device_t *device)
 			/* (time in seconds) / (60 sec/minute) * (rounds/minute) * (60 pulses) * (2 pulse phases) */
 			if (cur_image)
 			{
-				result = ((int) (timer_get_time(device->machine).as_double() / 60.0 * sony_rpm(f, &cur_image->device()) * 60.0 * 2.0)) & 1;
+				result = ((int) (device->machine->time().as_double() / 60.0 * sony_rpm(f, &cur_image->device()) * 60.0 * 2.0)) & 1;
 			}
 			break;
 		case 0x0f:	/* 400k/800k: Drive installed: 0=drive connected, 1=drive not connected */

@@ -2145,11 +2145,11 @@ static DEVICE_START( smc92x4 )
 	devcb_resolve_read_line(&w->in_auxbus_func, &w->intf->in_auxbus_func, device);
 
 	/* allocate timers */
-	/* w->timer_data = timer_alloc(device->machine, smc92x4_data_callback, (void *)device); */
-	w->timer_rs = timer_alloc(device->machine, smc92x4_read_sector_callback, (void *)device);
-	w->timer_ws = timer_alloc(device->machine, smc92x4_write_sector_callback, (void *)device);
-	w->timer_track = timer_alloc(device->machine, smc92x4_track_callback, (void *)device);
-	w->timer_seek = timer_alloc(device->machine, smc92x4_seek_callback, (void *)device);
+	/* w->timer_data = device->machine->scheduler().timer_alloc(FUNC(smc92x4_data_callback), (void *)device); */
+	w->timer_rs = device->machine->scheduler().timer_alloc(FUNC(smc92x4_read_sector_callback), (void *)device);
+	w->timer_ws = device->machine->scheduler().timer_alloc(FUNC(smc92x4_write_sector_callback), (void *)device);
+	w->timer_track = device->machine->scheduler().timer_alloc(FUNC(smc92x4_track_callback), (void *)device);
+	w->timer_seek = device->machine->scheduler().timer_alloc(FUNC(smc92x4_seek_callback), (void *)device);
 
 	w->use_real_timing = TRUE;
 }

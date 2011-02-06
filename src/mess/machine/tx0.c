@@ -55,10 +55,10 @@ static void tx0_machine_stop(running_machine &machine)
 MACHINE_START( tx0 )
 {
 	tx0_state *state = machine->driver_data<tx0_state>();
-	state->tape_reader.timer = timer_alloc(machine, reader_callback, NULL);
-	state->tape_puncher.timer = timer_alloc(machine, puncher_callback, NULL);
-	state->typewriter.prt_timer = timer_alloc(machine, prt_callback, NULL);
-	state->dis_timer = timer_alloc(machine, dis_callback, NULL);
+	state->tape_reader.timer = machine->scheduler().timer_alloc(FUNC(reader_callback));
+	state->tape_puncher.timer = machine->scheduler().timer_alloc(FUNC(puncher_callback));
+	state->typewriter.prt_timer = machine->scheduler().timer_alloc(FUNC(prt_callback));
+	state->dis_timer = machine->scheduler().timer_alloc(FUNC(dis_callback));
 
 	machine->add_notifier(MACHINE_NOTIFY_EXIT, tx0_machine_stop);
 }

@@ -420,7 +420,7 @@ struct _ted7360_state
 		if(VERBOSE_LEVEL >= N) \
 		{ \
 			if( M ) \
-				logerror("%11.6f: %-24s", timer_get_time(device->machine).as_double(), (char*) M ); \
+				logerror("%11.6f: %-24s", device->machine->time().as_double(), (char*) M ); \
 			logerror A; \
 		} \
 	} while(0)
@@ -549,7 +549,7 @@ static void ted7360_clear_interrupt( device_t *device, int mask )
 static int ted7360_rastercolumn( device_t *device )
 {
 	ted7360_state *ted7360 = get_safe_token(device);
-	return (int) ((timer_get_time(device->machine).as_double() - ted7360->rastertime) * TED7360_VRETRACERATE * ted7360->lines * 57 * 8 + 0.5);
+	return (int) ((device->machine->time().as_double() - ted7360->rastertime) * TED7360_VRETRACERATE * ted7360->lines * 57 * 8 + 0.5);
 }
 
 static TIMER_CALLBACK(ted7360_timer_timeout)
@@ -1183,7 +1183,7 @@ void ted7360_raster_interrupt_gen( device_t *device )
 	ted7360_state *ted7360 = get_safe_token(device);
 
 	ted7360->rasterline++;
-	ted7360->rastertime = timer_get_time(device->machine).as_double();
+	ted7360->rastertime = device->machine->time().as_double();
 	if (ted7360->rasterline >= ted7360->lines)
 	{
 		ted7360->rasterline = 0;
@@ -1404,9 +1404,9 @@ static DEVICE_START( ted7360 )
 
 	ted7360->keyboard_cb = intf->keyb_cb;
 
-	ted7360->timer1 = timer_alloc(device->machine, ted7360_timer_timeout, ted7360);
-	ted7360->timer2 = timer_alloc(device->machine, ted7360_timer_timeout, ted7360);
-	ted7360->timer3 = timer_alloc(device->machine, ted7360_timer_timeout, ted7360);
+	ted7360->timer1 = device->machine->scheduler().timer_alloc(FUNC(ted7360_timer_timeout), ted7360);
+	ted7360->timer2 = device->machine->scheduler().timer_alloc(FUNC(ted7360_timer_timeout), ted7360);
+	ted7360->timer3 = device->machine->scheduler().timer_alloc(FUNC(ted7360_timer_timeout), ted7360);
 
 	ted7360_sound_start(device);
 

@@ -2342,8 +2342,8 @@ static MACHINE_RESET( x1 )
 static MACHINE_START( x1 )
 {
 	x1_state *state = machine->driver_data<x1_state>();
-	timer_pulse(machine, attotime::from_hz(240), NULL, 0, keyboard_callback);
-	timer_pulse(machine, attotime::from_hz(16), NULL, 0, cmt_wind_timer);
+	machine->scheduler().timer_pulse(attotime::from_hz(240), FUNC(keyboard_callback));
+	machine->scheduler().timer_pulse(attotime::from_hz(16), FUNC(cmt_wind_timer));
 
 	/* set up RTC */
 	{
@@ -2358,7 +2358,7 @@ static MACHINE_START( x1 )
 		state->rtc.min = ((systime.local_time.minute / 10)<<4) | ((systime.local_time.minute % 10) & 0xf);
 		state->rtc.sec = ((systime.local_time.second / 10)<<4) | ((systime.local_time.second % 10) & 0xf);
 
-		state->rtc_timer = timer_alloc(machine, x1_rtc_increment, 0);
+		state->rtc_timer = machine->scheduler().timer_alloc(FUNC(x1_rtc_increment));
 	}
 }
 

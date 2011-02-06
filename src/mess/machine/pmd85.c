@@ -866,7 +866,7 @@ static TIMER_CALLBACK( pmd_reset )
 DIRECT_UPDATE_HANDLER(pmd85_opbaseoverride)
 {
 	if (input_port_read(machine, "RESET") & 0x01)
-		timer_set(machine, attotime::from_usec(10), NULL, 0, pmd_reset);
+		machine->scheduler().timer_set(attotime::from_usec(10), FUNC(pmd_reset));
 	return address;
 }
 
@@ -875,7 +875,7 @@ static void pmd85_common_driver_init (running_machine *machine)
 	pmd85_state *state = machine->driver_data<pmd85_state>();
 	state->previous_level = 0;
 	state->clk_level = state->clk_level_tape = 1;
-	state->cassette_timer = timer_alloc(machine, pmd85_cassette_timer_callback, NULL);
+	state->cassette_timer = machine->scheduler().timer_alloc(FUNC(pmd85_cassette_timer_callback));
 	timer_adjust_periodic(state->cassette_timer, attotime::zero, 0, attotime::from_hz(2400));
 
 	serial_connection_init(machine, &state->cassette_serial_connection);
@@ -968,7 +968,7 @@ MACHINE_RESET( pmd85 )
 	state->startup_mem_map = 1;
 	state->update_memory(machine);
 
-	timer_set(machine, attotime::zero, NULL, 0, setup_machine_state);
+	machine->scheduler().timer_set(attotime::zero, FUNC(setup_machine_state));
 
 	cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(pmd85_opbaseoverride, *machine));
 }

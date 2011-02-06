@@ -2270,7 +2270,7 @@ void st_state::machine_start()
 	cpu_set_irq_callback(m_maincpu, atarist_int_ack);
 
 	// allocate timers
-	m_mouse_timer = timer_alloc(machine, st_mouse_tick, NULL);
+	m_mouse_timer = machine->scheduler().timer_alloc(FUNC(st_mouse_tick));
 	timer_adjust_periodic(m_mouse_timer, attotime::zero, 0, attotime::from_hz(500));
 	
 	// register for state saving
@@ -2315,8 +2315,8 @@ void ste_state::machine_start()
 	cpu_set_irq_callback(m_maincpu, atarist_int_ack);
 
 	/* allocate timers */
-	m_dmasound_timer = timer_alloc(machine, atariste_dmasound_tick, NULL);
-	m_microwire_timer = timer_alloc(machine, atariste_microwire_tick, NULL);
+	m_dmasound_timer = machine->scheduler().timer_alloc(FUNC(atariste_dmasound_tick));
+	m_microwire_timer = machine->scheduler().timer_alloc(FUNC(atariste_microwire_tick));
 
 	/* register for state saving */
 	state_save();

@@ -592,10 +592,10 @@ VIDEO_START( odyssey2 )
 
 	state->tmp_bitmap = auto_bitmap_alloc( machine, width, height, screen->format() );
 
-	state->i824x_line_timer = timer_alloc(machine,  i824x_scanline_callback, NULL );
+	state->i824x_line_timer = machine->scheduler().timer_alloc(FUNC(i824x_scanline_callback));
 	timer_adjust_periodic( state->i824x_line_timer, machine->primary_screen->time_until_pos(1, I824X_START_ACTIVE_SCAN ), 0,  machine->primary_screen->scan_period() );
 
-	state->i824x_hblank_timer = timer_alloc(machine,  i824x_hblank_callback, NULL );
+	state->i824x_hblank_timer = machine->scheduler().timer_alloc(FUNC(i824x_hblank_callback));
 	timer_adjust_periodic( state->i824x_hblank_timer, machine->primary_screen->time_until_pos(1, I824X_END_ACTIVE_SCAN + 18 ), 0, machine->primary_screen->scan_period() );
 }
 

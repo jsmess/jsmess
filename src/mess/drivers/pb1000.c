@@ -497,7 +497,7 @@ void pb1000_state::machine_start()
 {
 	memory_set_bankptr(machine, "bank1", machine->region("rom")->base());
 
-	m_kb_timer = timer_alloc(machine, keyboard_timer, NULL);
+	m_kb_timer = machine->scheduler().timer_alloc(FUNC(keyboard_timer));
 	timer_adjust_periodic(m_kb_timer, attotime::from_hz(192), 0, attotime::from_hz(192));
 }
 

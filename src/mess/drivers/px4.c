@@ -1088,14 +1088,14 @@ static DRIVER_INIT( px4 )
 	px4->alarm_int_enabled = TRUE;
 
 	/* art */
-	px4->receive_timer = timer_alloc(machine, receive_data, NULL);
-	px4->transmit_timer = timer_alloc(machine, transmit_data, NULL);
+	px4->receive_timer = machine->scheduler().timer_alloc(FUNC(receive_data));
+	px4->transmit_timer = machine->scheduler().timer_alloc(FUNC(transmit_data));
 
 	/* printer */
 	px4->printer = machine->device("centronics");
 
 	/* external cassette or barcode reader */
-	px4->ext_cas_timer = timer_alloc(machine, ext_cassette_read, NULL);
+	px4->ext_cas_timer = machine->scheduler().timer_alloc(FUNC(ext_cassette_read));
 	px4->ext_cas = machine->device("extcas");
 	px4->ear_last_state = 0;
 

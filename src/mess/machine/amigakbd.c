@@ -103,7 +103,7 @@ void amigakbd_init( running_machine *machine )
 	key_buf = auto_alloc_array(machine, UINT8, KEYBOARD_BUFFER_SIZE );
 	key_buf_pos = 0;
 	key_cur_pos = 0;
-	kbd_timer = timer_alloc(machine, kbd_update_callback, NULL);
+	kbd_timer = machine->scheduler().timer_alloc(FUNC(kbd_update_callback));
 	timer_reset( kbd_timer, attotime::never );
 }
 

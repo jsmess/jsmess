@@ -229,10 +229,10 @@ UINT8 samcoupe_mouse_r(running_machine *machine)
 MACHINE_START( samcoupe )
 {
 	samcoupe_state *state = machine->driver_data<samcoupe_state>();
-	state->mouse_reset = timer_alloc(machine, samcoupe_mouse_reset, 0);
+	state->mouse_reset = machine->scheduler().timer_alloc(FUNC(samcoupe_mouse_reset));
 
 	/* schedule our video updates */
-	state->video_update_timer = timer_alloc(machine, sam_video_update_callback, NULL);
+	state->video_update_timer = machine->scheduler().timer_alloc(FUNC(sam_video_update_callback));
 	timer_adjust_oneshot(state->video_update_timer, machine->primary_screen->time_until_pos(0, 0), 0);
 }
 

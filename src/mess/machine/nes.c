@@ -286,7 +286,7 @@ MACHINE_START( nes )
 	state->sound = machine->device("nessound");
 	state->cart = machine->device("cart");
 
-	state->irq_timer = timer_alloc(machine, nes_irq_callback, NULL);
+	state->irq_timer = machine->scheduler().timer_alloc(FUNC(nes_irq_callback));
 	nes_state_register(machine);
 }
 
@@ -532,7 +532,7 @@ WRITE8_HANDLER( nes_IN0_w )
 	int cfg = input_port_read(space->machine, "CTRLSEL");
 
 	/* Check if lightgun has been chosen as input: if so, enable crosshair */
-	timer_set(space->machine, attotime::zero, NULL, 0, lightgun_tick);
+	space->machine->scheduler().timer_set(attotime::zero, FUNC(lightgun_tick));
 
 	if ((cfg & 0x000f) >= 0x07)	// for now we treat the FC keyboard separately from other inputs!
 	{

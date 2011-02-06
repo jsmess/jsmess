@@ -329,12 +329,12 @@ static TIMER_CALLBACK( delayed_sound_2_callback )
 
 WRITE8_HANDLER( n8080_sound_1_w )
 {
-	timer_call_after_resynch(space->machine, NULL, data, delayed_sound_1_callback); /* force CPUs to sync */
+	space->machine->scheduler().synchronize(FUNC(delayed_sound_1_callback), data); /* force CPUs to sync */
 }
 
 WRITE8_HANDLER( n8080_sound_2_w )
 {
-	timer_call_after_resynch(space->machine, NULL, data, delayed_sound_2_callback); /* force CPUs to sync */
+	space->machine->scheduler().synchronize(FUNC(delayed_sound_2_callback), data); /* force CPUs to sync */
 }
 
 
@@ -431,7 +431,7 @@ static WRITE8_HANDLER( helifire_sound_ctrl_w )
 		state->helifire_dac_timing = DECAY_RATE * log(state->helifire_dac_volume);
 	}
 
-	state->helifire_dac_timing += timer_get_time(space->machine).as_double();
+	state->helifire_dac_timing += space->machine->time().as_double();
 }
 
 
@@ -453,7 +453,7 @@ static TIMER_DEVICE_CALLBACK( spacefev_vco_voltage_timer )
 static TIMER_DEVICE_CALLBACK( helifire_dac_volume_timer )
 {
 	n8080_state *state = timer.machine->driver_data<n8080_state>();
-	double t = state->helifire_dac_timing - timer_get_time(timer.machine).as_double();
+	double t = state->helifire_dac_timing - timer.machine->time().as_double();
 
 	if (state->helifire_dac_phase)
 	{
@@ -470,9 +470,9 @@ MACHINE_START( spacefev_sound )
 {
 	n8080_state *state = machine->driver_data<n8080_state>();
 
-	state->sound_timer[0] = timer_alloc(machine, stop_mono_flop_callback, NULL);
-	state->sound_timer[1] = timer_alloc(machine, stop_mono_flop_callback, NULL);
-	state->sound_timer[2] = timer_alloc(machine, stop_mono_flop_callback, NULL);
+	state->sound_timer[0] = machine->scheduler().timer_alloc(FUNC(stop_mono_flop_callback));
+	state->sound_timer[1] = machine->scheduler().timer_alloc(FUNC(stop_mono_flop_callback));
+	state->sound_timer[2] = machine->scheduler().timer_alloc(FUNC(stop_mono_flop_callback));
 
 	state_save_register_global(machine, state->prev_snd_data);
 	state_save_register_global(machine, state->prev_sound_pins);
@@ -502,8 +502,8 @@ MACHINE_START( sheriff_sound )
 {
 	n8080_state *state = machine->driver_data<n8080_state>();
 
-	state->sound_timer[0] = timer_alloc(machine, stop_mono_flop_callback, NULL);
-	state->sound_timer[1] = timer_alloc(machine, stop_mono_flop_callback, NULL);
+	state->sound_timer[0] = machine->scheduler().timer_alloc(FUNC(stop_mono_flop_callback));
+	state->sound_timer[1] = machine->scheduler().timer_alloc(FUNC(stop_mono_flop_callback));
 
 	state_save_register_global(machine, state->prev_snd_data);
 	state_save_register_global(machine, state->prev_sound_pins);

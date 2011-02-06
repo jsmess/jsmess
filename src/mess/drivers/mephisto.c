@@ -340,8 +340,8 @@ static MACHINE_START( mephisto )
 	mephisto_state *state = machine->driver_data<mephisto_state>();
 	state->lcd_shift_counter=3;
 
-	timer_pulse(machine, attotime::from_hz(600), NULL, 0, update_nmi);
-	timer_pulse(machine, attotime::from_hz(100), NULL, 0, mboard_update_artwork);
+	machine->scheduler().timer_pulse(attotime::from_hz(600), FUNC(update_nmi));
+	machine->scheduler().timer_pulse(attotime::from_hz(100), FUNC(mboard_update_artwork));
 
 	mboard_savestate_register(machine);
 }
@@ -352,8 +352,8 @@ static MACHINE_START( mm2 )
 	state->lcd_shift_counter=3;
 	state->led7=0xff;
 
-	timer_pulse(machine, attotime::from_hz(450), NULL, 0, update_irq);
-	timer_pulse(machine, attotime::from_hz(100), NULL, 0, mboard_update_artwork);
+	machine->scheduler().timer_pulse(attotime::from_hz(450), FUNC(update_irq));
+	machine->scheduler().timer_pulse(attotime::from_hz(100), FUNC(mboard_update_artwork));
 
 	mboard_savestate_register(machine);
 }

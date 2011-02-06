@@ -271,7 +271,7 @@ static MACHINE_START(cat)
 	cat_state *state = machine->driver_data<cat_state>();
 
 	state->duart_inp = 0x0e;
-	state->keyboard_timer = timer_alloc(machine, keyboard_callback, NULL);
+	state->keyboard_timer = machine->scheduler().timer_alloc(FUNC(keyboard_callback));
 }
 
 static MACHINE_RESET(cat)
@@ -324,7 +324,7 @@ static MACHINE_START(swyft)
 
 static MACHINE_RESET(swyft)
 {
-	timer_set(machine, attotime::from_usec(10), NULL, 0, swyft_reset);
+	machine->scheduler().timer_set(attotime::from_usec(10), FUNC(swyft_reset));
 }
 
 static VIDEO_START( swyft )

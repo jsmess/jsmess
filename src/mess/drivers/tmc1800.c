@@ -727,7 +727,7 @@ static MACHINE_START( nano )
 	memory_configure_bank(machine, "bank1", 0, 2, machine->region(CDP1802_TAG)->base(), 0x8000);
 
 	/* allocate monitor timer */
-	state->ef4_timer = timer_alloc(machine, nano_ef4_tick, NULL);
+	state->ef4_timer = machine->scheduler().timer_alloc(FUNC(nano_ef4_tick));
 
 	/* find devices */
 	state->cdp1864 = machine->device(CDP1864_TAG);
@@ -925,7 +925,7 @@ static TIMER_CALLBACK(setup_beep)
 
 static DRIVER_INIT( tmc1800 )
 {
-	timer_set(machine, attotime::zero, NULL, 0, setup_beep);
+	machine->scheduler().timer_set(attotime::zero, FUNC(setup_beep));
 }
 
 /* System Drivers */

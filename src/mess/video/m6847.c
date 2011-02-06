@@ -1349,7 +1349,7 @@ static TIMER_CALLBACK( hs_fall )
 	mc6847_state *mc6847 = (mc6847_state *) ptr;
 
 	if (LOG_HS)
-		logerror("hs_fall(): time=%s\n", timer_get_time(machine).as_string(ATTOTIME_STRING_PRECISION));
+		logerror("hs_fall(): time=%s\n", machine->time().as_string(ATTOTIME_STRING_PRECISION));
 
 	mc6847->hs = ASSERT_LINE;
 	devcb_call_write_line(&mc6847->out_hs_func, mc6847->hs);
@@ -1360,7 +1360,7 @@ static TIMER_CALLBACK( hs_rise )
 	mc6847_state *mc6847 = (mc6847_state *) ptr;
 
 	if (LOG_HS)
-		logerror("hs_rise(): time=%s\n", timer_get_time(machine).as_string(ATTOTIME_STRING_PRECISION));
+		logerror("hs_rise(): time=%s\n", machine->time().as_string(ATTOTIME_STRING_PRECISION));
 
 	timer_adjust_oneshot(mc6847->hs_rise_timer,
 		attotime(0, mc6847->scanline_period), 0);
@@ -1378,7 +1378,7 @@ static TIMER_CALLBACK( fs_fall )
 	mc6847_state *mc6847 = (mc6847_state *) ptr;
 
 	if (LOG_FS)
-		logerror("fs_fall(): time=%s scanline=%d\n", timer_get_time(machine).as_string(ATTOTIME_STRING_PRECISION), get_scanline(mc6847));
+		logerror("fs_fall(): time=%s scanline=%d\n", machine->time().as_string(ATTOTIME_STRING_PRECISION), get_scanline(mc6847));
 
 	mc6847->fs = ASSERT_LINE;
 	devcb_call_write_line(&mc6847->out_fs_func, mc6847->fs);
@@ -1389,7 +1389,7 @@ static TIMER_CALLBACK( fs_rise )
 	mc6847_state *mc6847 = (mc6847_state *) ptr;
 
 	if (LOG_FS)
-		logerror("fs_rise(): time=%s scanline=%d\n", timer_get_time(machine).as_string(ATTOTIME_STRING_PRECISION), get_scanline(mc6847));
+		logerror("fs_rise(): time=%s scanline=%d\n", machine->time().as_string(ATTOTIME_STRING_PRECISION), get_scanline(mc6847));
 
 	/* adjust field sync falling edge timer */
 	timer_adjust_oneshot(mc6847->fs_fall_timer,
@@ -1865,10 +1865,10 @@ static DEVICE_START( mc6847 )
 	}
 
 	/* allocate timers */
-	mc6847->fs_rise_timer = timer_alloc(device->machine, fs_rise, mc6847);
-	mc6847->fs_fall_timer = timer_alloc(device->machine, fs_fall, mc6847);
-	mc6847->hs_rise_timer = timer_alloc(device->machine, hs_rise, mc6847);
-	mc6847->hs_fall_timer = timer_alloc(device->machine, hs_fall, mc6847);
+	mc6847->fs_rise_timer = device->machine->scheduler().timer_alloc(FUNC(fs_rise), mc6847);
+	mc6847->fs_fall_timer = device->machine->scheduler().timer_alloc(FUNC(fs_fall), mc6847);
+	mc6847->hs_rise_timer = device->machine->scheduler().timer_alloc(FUNC(hs_rise), mc6847);
+	mc6847->hs_fall_timer = device->machine->scheduler().timer_alloc(FUNC(hs_fall), mc6847);
 
 	/* setup dimensions */
 	mc6847->top_border_scanlines = v->top_border_scanlines;

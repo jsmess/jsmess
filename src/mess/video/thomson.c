@@ -203,7 +203,7 @@ static void (*thom_lightpen_cb) ( running_machine *machine, int );
 
 void thom_set_lightpen_callback ( running_machine *machine, int nb, void (*cb) ( running_machine *machine, int step ) )
 {
-	LOG (( "%f thom_set_lightpen_callback called\n", timer_get_time(machine).as_double()));
+	LOG (( "%f thom_set_lightpen_callback called\n", machine->time().as_double()));
 	thom_lightpen_nb = nb;
 	thom_lightpen_cb = cb;
 }
@@ -913,7 +913,7 @@ VIDEO_UPDATE ( thom )
 	rectangle lrect = { 0, xbleft - 1, 0, 0 };
 	rectangle rrect = { xbright, xright - 1, 0, 0 };
 
-	//LOG (( "%f thom: video update called\n", timer_get_time(machine).as_double()));
+	//LOG (( "%f thom: video update called\n", machine->time().as_double()));
 
 	/* upper border */
 	for ( y = 0; y < THOM_BORDER_HEIGHT - thom_bheight; y++ )
@@ -1025,7 +1025,7 @@ void thom_set_init_callback ( running_machine *machine, void (*cb) ( running_mac
 static TIMER_CALLBACK( thom_set_init )
 {
 	int init = param;
-	LOG (( "%f thom_set_init: %i, at line %i col %i\n", timer_get_time(machine).as_double(), init, thom_video_elapsed( machine ) / 64, thom_video_elapsed( machine ) % 64 ));
+	LOG (( "%f thom_set_init: %i, at line %i col %i\n", machine->time().as_double(), init, thom_video_elapsed( machine ) / 64, thom_video_elapsed( machine ) % 64 ));
 
 	if ( thom_init_cb )
 		thom_init_cb( machine, init );
@@ -1041,7 +1041,7 @@ VIDEO_EOF ( thom )
 	UINT16 b = 0;
 	struct thom_vsignal l = thom_get_lightpen_vsignal( machine, 0, -1, 0 );
 
-	LOG (( "%f thom: video eof called\n", timer_get_time(machine).as_double() ));
+	LOG (( "%f thom: video eof called\n", machine->time().as_double() ));
 
 	/* floppy indicator count */
 	if ( thom_floppy_wcount )
@@ -1153,17 +1153,17 @@ VIDEO_START ( thom )
 	state_save_register_global(machine,  thom_floppy_rcount );
 	output_set_value( "floppy", 0 );
 
-	thom_video_timer = timer_alloc(machine,  NULL , NULL);
+	thom_video_timer = machine->scheduler().timer_alloc(FUNC(NULL));
 
-	thom_scanline_timer = timer_alloc(machine,  thom_scanline_start , NULL);
+	thom_scanline_timer = machine->scheduler().timer_alloc(FUNC(thom_scanline_start));
 
 	thom_lightpen_nb = 0;
 	thom_lightpen_cb = NULL;
-	thom_lightpen_timer = timer_alloc(machine,  thom_lightpen_step , NULL);
+	thom_lightpen_timer = machine->scheduler().timer_alloc(FUNC(thom_lightpen_step));
 	state_save_register_global(machine,  thom_lightpen_nb );
 
 	thom_init_cb = NULL;
-	thom_init_timer = timer_alloc(machine,  thom_set_init , NULL);
+	thom_init_timer = machine->scheduler().timer_alloc(FUNC(thom_set_init));
 
 	state_save_register_global(machine,  thom_bwidth );
 	state_save_register_global(machine,  thom_bheight );

@@ -299,7 +299,7 @@ static void z88_refresh_memory_bank(running_machine *machine, int bank)
 
 static MACHINE_START( z88 )
 {
-	timer_pulse(machine, attotime::from_msec(5), NULL, 0, z88_rtc_timer_callback);
+	machine->scheduler().timer_pulse(attotime::from_msec(5), FUNC(z88_rtc_timer_callback));
 }
 
 static MACHINE_RESET( z88 )

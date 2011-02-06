@@ -925,7 +925,7 @@ static TIMER_CALLBACK( setup_beep )
 
 static DRIVER_INIT( c1p )
 {
-	timer_set(machine, attotime::zero, NULL, 0, setup_beep);
+	machine->scheduler().timer_set(attotime::zero, FUNC(setup_beep));
 }
 
 

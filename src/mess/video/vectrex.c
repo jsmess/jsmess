@@ -252,7 +252,7 @@ static TIMER_CALLBACK(update_signal)
 	if (!state->ramp)
 	{
 		length = cputag_get_clock(machine, "maincpu") * INT_PER_CLOCK
-			* (timer_get_time(machine) - state->vector_start_time).as_double();
+			* (machine->time() - state->vector_start_time).as_double();
 
 		state->x_int += length * (state->analog[A_X] + state->analog[A_ZR]);
 		state->y_int += length * (state->analog[A_Y] + state->analog[A_ZR]);
@@ -265,7 +265,7 @@ static TIMER_CALLBACK(update_signal)
 			(*state->vector_add_point_function)(machine, state->x_int, state->y_int, state->beam_color, 2 * state->analog[A_Z]);
 	}
 
-	state->vector_start_time = timer_get_time(machine);
+	state->vector_start_time = machine->time();
 
 	if (ptr)
 		* (UINT8 *) ptr = param;
@@ -292,15 +292,15 @@ VIDEO_START(vectrex)
 	state->imager_freq = 1;
 
 	state->vector_add_point_function = vectrex_add_point;
-	state->imager_timer = timer_alloc(machine, vectrex_imager_eye, NULL);
+	state->imager_timer = machine->scheduler().timer_alloc(FUNC(vectrex_imager_eye));
 	timer_adjust_periodic(state->imager_timer,
 						  attotime::from_hz(state->imager_freq),
 						  2,
 						  attotime::from_hz(state->imager_freq));
 
-	state->lp_t = timer_alloc(machine, lightpen_trigger, NULL);
+	state->lp_t = machine->scheduler().timer_alloc(FUNC(lightpen_trigger));
 
-	state->refresh = timer_alloc(machine, vectrex_refresh, NULL);
+	state->refresh = machine->scheduler().timer_alloc(FUNC(vectrex_refresh));
 
 	VIDEO_START_CALL(vector);
 }
@@ -317,7 +317,7 @@ static void vectrex_multiplexer(running_machine *machine, int mux)
 	vectrex_state *state = machine->driver_data<vectrex_state>();
 	device_t *dac_device = machine->device("dac");
 
-	timer_set(machine, attotime::from_nsec(ANALOG_DELAY), &state->analog[mux], state->via_out[PORTA], update_signal);
+	machine->scheduler().timer_set(attotime::from_nsec(ANALOG_DELAY), FUNC(update_signal), state->via_out[PORTA], &state->analog[mux]);
 
 	if (mux == A_AUDIO)
 		dac_data_w(dac_device, state->via_out[PORTA]);
@@ -373,7 +373,7 @@ static WRITE8_DEVICE_HANDLER(v_via_pb_w)
 		if (!(data & 0x1) && (state->via_out[PORTB] & 0x1))
 		{
 			/* MUX has been enabled */
-			timer_set(device->machine, attotime::from_nsec(ANALOG_DELAY), NULL, 0, update_signal);
+			device->machine->scheduler().timer_set(attotime::from_nsec(ANALOG_DELAY), FUNC(update_signal));
 		}
 	}
 	else
@@ -402,7 +402,7 @@ static WRITE8_DEVICE_HANDLER(v_via_pb_w)
 		vectrex_multiplexer (device->machine, (data >> 1) & 0x3);
 
 	state->via_out[PORTB] = data;
-	timer_set(device->machine, attotime::from_nsec(ANALOG_DELAY), &state->ramp, data & 0x80, update_signal);
+	device->machine->scheduler().timer_set(attotime::from_nsec(ANALOG_DELAY), FUNC(update_signal), data & 0x80, &state->ramp);
 }
 
 
@@ -411,7 +411,7 @@ static WRITE8_DEVICE_HANDLER(v_via_pa_w)
 	vectrex_state *state = device->machine->driver_data<vectrex_state>();
 	/* DAC output always goes to Y integrator */
 	state->via_out[PORTA] = data;
-	timer_set(device->machine, attotime::from_nsec(ANALOG_DELAY), &state->analog[A_Y], data, update_signal);
+	device->machine->scheduler().timer_set(attotime::from_nsec(ANALOG_DELAY), FUNC(update_signal), data, &state->analog[A_Y]);
 
 	if (!(state->via_out[PORTB] & 0x1))
 		vectrex_multiplexer (device->machine, (state->via_out[PORTB] >> 1) & 0x3);
@@ -421,7 +421,7 @@ static WRITE8_DEVICE_HANDLER(v_via_pa_w)
 static WRITE8_DEVICE_HANDLER(v_via_ca2_w)
 {
 	if (data == 0)
-		timer_set(device->machine, attotime::from_nsec(ANALOG_DELAY), NULL, 0, vectrex_zero_integrators);
+		device->machine->scheduler().timer_set(attotime::from_nsec(ANALOG_DELAY), FUNC(vectrex_zero_integrators));
 }
 
 
@@ -446,11 +446,11 @@ static WRITE8_DEVICE_HANDLER(v_via_cb2_w)
 				dx = abs(state->pen_x - state->x_int);
 				dy = abs(state->pen_y - state->y_int);
 				if (dx < 500000 && dy < 500000 && data > 0)
-					timer_set(device->machine, attotime::zero, NULL, 0, lightpen_trigger);
+					device->machine->scheduler().timer_set(attotime::zero, FUNC(lightpen_trigger));
 			}
 		}
 
-		timer_set(device->machine, attotime::zero, &state->blank, data, update_signal);
+		device->machine->scheduler().timer_set(attotime::zero, FUNC(update_signal), data, &state->blank);
 		state->cb2 = data;
 	}
 }
@@ -490,7 +490,7 @@ VIDEO_START(raaspec)
 	state->y_max = visarea.max_y << 16;
 
 	state->vector_add_point_function = vectrex_add_point;
-	state->refresh = timer_alloc(machine, vectrex_refresh, NULL);
+	state->refresh = machine->scheduler().timer_alloc(FUNC(vectrex_refresh));
 
 	VIDEO_START_CALL(vector);
 }

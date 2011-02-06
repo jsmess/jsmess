@@ -1737,18 +1737,18 @@ static WRITE32_HANDLER( s3c240x_mmc_w )
 static void s3c240x_machine_start( running_machine *machine)
 {
 	gp32_state *state = machine->driver_data<gp32_state>();
-	state->s3c240x_pwm_timer[0] = timer_alloc( machine, s3c240x_pwm_timer_exp, (void *)(FPTR)0);
-	state->s3c240x_pwm_timer[1] = timer_alloc( machine, s3c240x_pwm_timer_exp, (void *)(FPTR)1);
-	state->s3c240x_pwm_timer[2] = timer_alloc( machine, s3c240x_pwm_timer_exp, (void *)(FPTR)2);
-	state->s3c240x_pwm_timer[3] = timer_alloc( machine, s3c240x_pwm_timer_exp, (void *)(FPTR)3);
-	state->s3c240x_pwm_timer[4] = timer_alloc( machine, s3c240x_pwm_timer_exp, (void *)(FPTR)4);
-	state->s3c240x_dma_timer[0] = timer_alloc( machine, s3c240x_dma_timer_exp, (void *)(FPTR)0);
-	state->s3c240x_dma_timer[1] = timer_alloc( machine, s3c240x_dma_timer_exp, (void *)(FPTR)1);
-	state->s3c240x_dma_timer[2] = timer_alloc( machine, s3c240x_dma_timer_exp, (void *)(FPTR)2);
-	state->s3c240x_dma_timer[3] = timer_alloc( machine, s3c240x_dma_timer_exp, (void *)(FPTR)3);
-	state->s3c240x_iic_timer = timer_alloc( machine, s3c240x_iic_timer_exp, (void *)(FPTR)0);
-	state->s3c240x_iis_timer = timer_alloc( machine, s3c240x_iis_timer_exp, (void *)(FPTR)0);
-	state->s3c240x_lcd_timer = timer_alloc( machine, s3c240x_lcd_timer_exp, (void *)(FPTR)0);
+	state->s3c240x_pwm_timer[0] = machine->scheduler().timer_alloc(FUNC(s3c240x_pwm_timer_exp), (void *)(FPTR)0);
+	state->s3c240x_pwm_timer[1] = machine->scheduler().timer_alloc(FUNC(s3c240x_pwm_timer_exp), (void *)(FPTR)1);
+	state->s3c240x_pwm_timer[2] = machine->scheduler().timer_alloc(FUNC(s3c240x_pwm_timer_exp), (void *)(FPTR)2);
+	state->s3c240x_pwm_timer[3] = machine->scheduler().timer_alloc(FUNC(s3c240x_pwm_timer_exp), (void *)(FPTR)3);
+	state->s3c240x_pwm_timer[4] = machine->scheduler().timer_alloc(FUNC(s3c240x_pwm_timer_exp), (void *)(FPTR)4);
+	state->s3c240x_dma_timer[0] = machine->scheduler().timer_alloc(FUNC(s3c240x_dma_timer_exp), (void *)(FPTR)0);
+	state->s3c240x_dma_timer[1] = machine->scheduler().timer_alloc(FUNC(s3c240x_dma_timer_exp), (void *)(FPTR)1);
+	state->s3c240x_dma_timer[2] = machine->scheduler().timer_alloc(FUNC(s3c240x_dma_timer_exp), (void *)(FPTR)2);
+	state->s3c240x_dma_timer[3] = machine->scheduler().timer_alloc(FUNC(s3c240x_dma_timer_exp), (void *)(FPTR)3);
+	state->s3c240x_iic_timer = machine->scheduler().timer_alloc(FUNC(s3c240x_iic_timer_exp), (void *)(FPTR)0);
+	state->s3c240x_iis_timer = machine->scheduler().timer_alloc(FUNC(s3c240x_iis_timer_exp), (void *)(FPTR)0);
+	state->s3c240x_lcd_timer = machine->scheduler().timer_alloc(FUNC(s3c240x_lcd_timer_exp), (void *)(FPTR)0);
 	state->eeprom_data = auto_alloc_array( machine, UINT8, 0x2000);
 	smc_init( machine);
 	i2s_init( machine);

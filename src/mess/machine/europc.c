@@ -293,7 +293,7 @@ void europc_rtc_init(running_machine *machine)
 	memset(&europc_rtc,0,sizeof(europc_rtc));
 	europc_rtc.data[0xf]=1;
 
-	europc_rtc.timer = timer_alloc(machine, europc_rtc_timer, NULL);
+	europc_rtc.timer = machine->scheduler().timer_alloc(FUNC(europc_rtc_timer));
 	timer_adjust_periodic(europc_rtc.timer, attotime::zero, 0, attotime(1, 0));
 }
 

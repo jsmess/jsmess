@@ -341,7 +341,7 @@ void ti99_handset_task(device_t *device)
 static DEVICE_START( ti99_handset )
 {
 	ti99_handset_state *handset = get_safe_token(device);
-	handset->timer = timer_alloc(device->machine, ti99_handset_ack_callback, (void *)device);
+	handset->timer = device->machine->scheduler().timer_alloc(FUNC(ti99_handset_ack_callback), (void *)device);
 }
 
 static DEVICE_RESET( ti99_handset )

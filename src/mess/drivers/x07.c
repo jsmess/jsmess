@@ -1339,10 +1339,10 @@ GFXDECODE_END
 
 void x07_state::machine_start()
 {
-	m_rsta_clear = timer_alloc(machine, rsta_clear, 0);
-	m_rstb_clear = timer_alloc(machine, rstb_clear, 0);
-	m_beep_stop = timer_alloc(machine, beep_stop, 0);
-	m_k7irq = timer_alloc(machine, k7_irq, 0);
+	m_rsta_clear = machine->scheduler().timer_alloc(FUNC(rsta_clear));
+	m_rstb_clear = machine->scheduler().timer_alloc(FUNC(rstb_clear));
+	m_beep_stop = machine->scheduler().timer_alloc(FUNC(beep_stop));
+	m_k7irq = machine->scheduler().timer_alloc(FUNC(k7_irq));
 
 	/* Save State */
 	state_save_register_global(machine, m_sleep);

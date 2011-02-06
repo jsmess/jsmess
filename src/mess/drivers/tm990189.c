@@ -105,7 +105,7 @@ static MACHINE_RESET( tm990_189 )
 static MACHINE_START( tm990_189 )
 {
 	tm990189_state *state = machine->driver_data<tm990189_state>();
-	state->displayena_timer = timer_alloc(machine, NULL, NULL);
+	state->displayena_timer = machine->scheduler().timer_alloc(FUNC(NULL));
 }
 static const TMS9928a_interface tms9918_interface =
 {
@@ -120,12 +120,12 @@ static MACHINE_START( tm990_189_v )
 	tm990189_state *state = machine->driver_data<tm990189_state>();
 	TMS9928A_configure(&tms9918_interface);
 
-	state->displayena_timer = timer_alloc(machine, NULL, NULL);
+	state->displayena_timer = machine->scheduler().timer_alloc(FUNC(NULL));
 
-	state->joy1x_timer = timer_alloc(machine, NULL, NULL);
-	state->joy1y_timer = timer_alloc(machine, NULL, NULL);
-	state->joy2x_timer = timer_alloc(machine, NULL, NULL);
-	state->joy2y_timer = timer_alloc(machine, NULL, NULL);
+	state->joy1x_timer = machine->scheduler().timer_alloc(FUNC(NULL));
+	state->joy1y_timer = machine->scheduler().timer_alloc(FUNC(NULL));
+	state->joy2x_timer = machine->scheduler().timer_alloc(FUNC(NULL));
+	state->joy2y_timer = machine->scheduler().timer_alloc(FUNC(NULL));
 }
 
 static MACHINE_RESET( tm990_189_v )
@@ -279,7 +279,7 @@ static void hold_load(running_machine *machine)
 	tm990189_state *state = machine->driver_data<tm990189_state>();
 	state->load_state = TRUE;
 	field_interrupts(machine);
-	timer_set(machine, attotime::from_msec(100), NULL, 0, clear_load);
+	machine->scheduler().timer_set(attotime::from_msec(100), FUNC(clear_load));
 }
 
 /*
@@ -403,7 +403,7 @@ static DEVICE_IMAGE_LOAD( tm990_189_rs232 )
 {
 	tm990189_state *state = image.device().machine->driver_data<tm990189_state>();
 	tms9902_set_dsr(image.device().machine->device("tms9902"), 1);
-	state->rs232_input_timer = timer_alloc(image.device().machine, rs232_input_callback, (void*)image);
+	state->rs232_input_timer = image.device().machine->scheduler().timer_alloc(FUNC(rs232_input_callback), (void*)image);
 	timer_adjust_periodic(state->rs232_input_timer, attotime::zero, 0, attotime::from_msec(10));
 
 	return IMAGE_INIT_PASS;

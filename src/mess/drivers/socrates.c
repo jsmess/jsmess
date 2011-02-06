@@ -371,7 +371,7 @@ end hd38880 info.*/
 			{
 				/* write me: start talking */
 				state->speech_running = 1;
-				timer_set(space->machine, attotime::from_seconds(4), NULL, 0, clear_speech_cb); // hack
+				space->machine->scheduler().timer_set(attotime::from_seconds(4), FUNC(clear_speech_cb)); // hack
 			}
 			break;
 		case 0x90: // unknown, one of these is probably read and branch
@@ -395,7 +395,7 @@ end hd38880 info.*/
 			if ((data&0xF) == 0) // speak
 			{
 				state->speech_running = 1;
-				timer_set(space->machine, attotime::from_seconds(4), NULL, 0, clear_speech_cb); // hack
+				space->machine->scheduler().timer_set(attotime::from_seconds(4), FUNC(clear_speech_cb)); // hack
 			}
 			else if ((data&0xF) == 8) // reset
 			{
@@ -894,7 +894,7 @@ static INTERRUPT_GEN( assert_irq )
 {
 	socrates_state *state = device->machine->driver_data<socrates_state>();
 	cpu_set_input_line(device, 0, ASSERT_LINE);
-	timer_set(device->machine, downcast<cpu_device *>(device)->cycles_to_attotime(44), NULL, 0, clear_irq_cb);
+	device->machine->scheduler().timer_set(downcast<cpu_device *>(device)->cycles_to_attotime(44), FUNC(clear_irq_cb));
 // 44 is a complete and total guess, need to properly measure how many clocks/microseconds the int line is high for.
 	state->vblankstate = 1;
 }

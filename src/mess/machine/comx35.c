@@ -609,7 +609,7 @@ void comx35_state::machine_start()
 	}
 
 	/* allocate reset timer */
-	m_reset_timer = timer_alloc(machine, reset_tick, NULL);
+	m_reset_timer = machine->scheduler().timer_alloc(FUNC(reset_tick));
 
 	/* register for state saving */
 	state_save_register_postload(machine, comx35_state_save_postload, NULL);

@@ -173,7 +173,7 @@ void zx_ula_r(running_machine *machine, int offs, const char *region, const UINT
 		for (y = state->charline_ptr; y < ARRAY_LENGTH(state->charline); y++)
 			state->charline[y] = 0;
 
-		timer_set(machine, machine->device<cpu_device>("maincpu")->cycles_to_attotime(((32 - state->charline_ptr) << 2)), NULL, 0, zx_ula_irq);
+		machine->scheduler().timer_set(machine->device<cpu_device>("maincpu")->cycles_to_attotime(((32 - state->charline_ptr) << 2)), FUNC(zx_ula_irq));
 		state->ula_irq_active++;
 
 		scanline = BITMAP_ADDR16(bitmap, state->ula_scanline_count, 0);
@@ -203,7 +203,7 @@ void zx_ula_r(running_machine *machine, int offs, const char *region, const UINT
 VIDEO_START( zx )
 {
 	zx_state *state = machine->driver_data<zx_state>();
-	state->ula_nmi = timer_alloc(machine, zx_ula_nmi, NULL);
+	state->ula_nmi = machine->scheduler().timer_alloc(FUNC(zx_ula_nmi));
 	state->ula_irq_active = 0;
 	VIDEO_START_CALL(generic_bitmapped);
 }

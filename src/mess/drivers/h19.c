@@ -86,7 +86,7 @@ static WRITE8_HANDLER( h19_c0_w )
 
 	UINT8 length = (offset & 0x20) ? 200 : 4;
 	beep_set_state(state->beeper, 1);
-	timer_set(space->machine, attotime::from_msec(length), NULL, 0, h19_beepoff);
+	space->machine->scheduler().timer_set(attotime::from_msec(length), FUNC(h19_beepoff));
 }
 
 static ADDRESS_MAP_START(h19_mem, ADDRESS_SPACE_PROGRAM, 8)

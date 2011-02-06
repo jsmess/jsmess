@@ -177,7 +177,7 @@ static TIMER_CALLBACK(pcw_timer_interrupt)
 
 	state->timer_irq_flag = 1;
 	pcw_update_irqs(machine);
-	timer_set(machine,attotime::from_usec(100),NULL,0,pcw_timer_pulse);
+	machine->scheduler().timer_set(attotime::from_usec(100), FUNC(pcw_timer_pulse));
 }
 
 /* fdc interrupt callback. set/clear fdc int */
@@ -1118,12 +1118,12 @@ static DRIVER_INIT(pcw)
 	state->roller_ram_offset = 0;
 
 	/* timer interrupt */
-	timer_pulse(machine, attotime::from_hz(300), NULL, 0, pcw_timer_interrupt);
+	machine->scheduler().timer_pulse(attotime::from_hz(300), FUNC(pcw_timer_interrupt));
 
-	timer_set(machine, attotime::zero, NULL, 0, setup_beep);
+	machine->scheduler().timer_set(attotime::zero, FUNC(setup_beep));
 
-	state->prn_stepper = timer_alloc(machine,pcw_stepper_callback,NULL);
-	state->prn_pins = timer_alloc(machine,pcw_pins_callback,NULL);
+	state->prn_stepper = machine->scheduler().timer_alloc(FUNC(pcw_stepper_callback));
+	state->prn_pins = machine->scheduler().timer_alloc(FUNC(pcw_pins_callback));
 }
 
 

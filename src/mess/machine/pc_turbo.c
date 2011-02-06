@@ -49,6 +49,6 @@ int pc_turbo_setup(running_machine *machine, device_t *cpu, const char *port, in
 	ti->cur_val = -1;
 	ti->off_speed = off_speed;
 	ti->on_speed = on_speed;
-	timer_pulse(machine, attotime::from_msec(100), ti, 0, pc_turbo_callback);
+	machine->scheduler().timer_pulse(attotime::from_msec(100), FUNC(pc_turbo_callback), 0, ti);
 	return 0;
 }

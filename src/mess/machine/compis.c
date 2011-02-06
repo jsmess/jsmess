@@ -426,7 +426,7 @@ static IRQ_CALLBACK(int_callback)
 {
 	compis_state *state = device->machine->driver_data<compis_state>();
 	if (LOG_INTERRUPTS)
-		logerror("(%f) **** Acknowledged interrupt vector %02X\n", timer_get_time(device->machine).as_double(), state->i186.intr.poll_status & 0x1f);
+		logerror("(%f) **** Acknowledged interrupt vector %02X\n", device->machine->time().as_double(), state->i186.intr.poll_status & 0x1f);
 
 	/* clear the interrupt */
 	cpu_set_input_line(device, 0, CLEAR_LINE);
@@ -542,7 +542,7 @@ generate_int:
 	state->i186.intr.pending = 1;
 	cpuexec_trigger(machine, CPU_RESUME_TRIGGER);
 	if (LOG_OPTIMIZATION) logerror("  - trigger due to interrupt pending\n");
-	if (LOG_INTERRUPTS) logerror("(%f) **** Requesting interrupt vector %02X\n", timer_get_time(machine).as_double(), new_vector);
+	if (LOG_INTERRUPTS) logerror("(%f) **** Requesting interrupt vector %02X\n", machine->time().as_double(), new_vector);
 }
 
 
@@ -568,7 +568,7 @@ static void handle_eoi(running_machine *machine,int data)
 			case 0x0f:	state->i186.intr.in_service &= ~0x80;	break;
 			default:	logerror("%05X:ERROR - 80186 EOI with unknown vector %02X\n", cpu_get_pc(machine->device("maincpu")), data & 0x1f);
 		}
-		if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for vector %02X\n", timer_get_time(machine).as_double(), data & 0x1f);
+		if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for vector %02X\n", machine->time().as_double(), data & 0x1f);
 	}
 
 	/* non-specific case */
@@ -581,7 +581,7 @@ static void handle_eoi(running_machine *machine,int data)
 			if ((state->i186.intr.timer & 7) == i && (state->i186.intr.in_service & 0x01))
 			{
 				state->i186.intr.in_service &= ~0x01;
-				if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for timer\n", timer_get_time(machine).as_double());
+				if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for timer\n", machine->time().as_double());
 				return;
 			}
 
@@ -590,7 +590,7 @@ static void handle_eoi(running_machine *machine,int data)
 				if ((state->i186.intr.dma[j] & 7) == i && (state->i186.intr.in_service & (0x04 << j)))
 				{
 					state->i186.intr.in_service &= ~(0x04 << j);
-					if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for DMA%d\n", timer_get_time(machine).as_double(), j);
+					if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for DMA%d\n", machine->time().as_double(), j);
 					return;
 				}
 
@@ -599,7 +599,7 @@ static void handle_eoi(running_machine *machine,int data)
 				if ((state->i186.intr.ext[j] & 7) == i && (state->i186.intr.in_service & (0x10 << j)))
 				{
 					state->i186.intr.in_service &= ~(0x10 << j);
-					if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for INT%d\n", timer_get_time(machine).as_double(), j);
+					if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for INT%d\n", machine->time().as_double(), j);
 					return;
 				}
 		}
@@ -1324,14 +1324,14 @@ static void compis_cpu_init(running_machine *machine)
 {
 	compis_state *state = machine->driver_data<compis_state>();
 	/* create timers here so they stick around */
-	state->i186.timer[0].int_timer = timer_alloc(machine, internal_timer_int, NULL);
-	state->i186.timer[1].int_timer = timer_alloc(machine, internal_timer_int, NULL);
-	state->i186.timer[2].int_timer = timer_alloc(machine, internal_timer_int, NULL);
-	state->i186.timer[0].time_timer = timer_alloc(machine, NULL, NULL);
-	state->i186.timer[1].time_timer = timer_alloc(machine, NULL, NULL);
-	state->i186.timer[2].time_timer = timer_alloc(machine, NULL, NULL);
-	state->i186.dma[0].finish_timer = timer_alloc(machine, dma_timer_callback, NULL);
-	state->i186.dma[1].finish_timer = timer_alloc(machine, dma_timer_callback, NULL);
+	state->i186.timer[0].int_timer = machine->scheduler().timer_alloc(FUNC(internal_timer_int));
+	state->i186.timer[1].int_timer = machine->scheduler().timer_alloc(FUNC(internal_timer_int));
+	state->i186.timer[2].int_timer = machine->scheduler().timer_alloc(FUNC(internal_timer_int));
+	state->i186.timer[0].time_timer = machine->scheduler().timer_alloc(FUNC(NULL));
+	state->i186.timer[1].time_timer = machine->scheduler().timer_alloc(FUNC(NULL));
+	state->i186.timer[2].time_timer = machine->scheduler().timer_alloc(FUNC(NULL));
+	state->i186.dma[0].finish_timer = machine->scheduler().timer_alloc(FUNC(dma_timer_callback));
+	state->i186.dma[1].finish_timer = machine->scheduler().timer_alloc(FUNC(dma_timer_callback));
 }
 
 /*-------------------------------------------------------------------------*/

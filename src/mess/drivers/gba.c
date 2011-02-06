@@ -2176,32 +2176,32 @@ static MACHINE_START( gba )
 	machine->add_notifier(MACHINE_NOTIFY_EXIT, gba_machine_stop);
 
 	/* create a timer to fire scanline functions */
-	state->scan_timer = timer_alloc(machine, perform_scan, 0);
-	state->hbl_timer = timer_alloc(machine, perform_hbl, 0);
+	state->scan_timer = machine->scheduler().timer_alloc(FUNC(perform_scan));
+	state->hbl_timer = machine->scheduler().timer_alloc(FUNC(perform_hbl));
 	timer_adjust_oneshot(state->scan_timer, machine->primary_screen->time_until_pos(0, 0), 0);
 
 	/* and one for each DMA channel */
-	state->dma_timer[0] = timer_alloc(machine, dma_complete, 0);
-	state->dma_timer[1] = timer_alloc(machine, dma_complete, 0);
-	state->dma_timer[2] = timer_alloc(machine, dma_complete, 0);
-	state->dma_timer[3] = timer_alloc(machine, dma_complete, 0);
+	state->dma_timer[0] = machine->scheduler().timer_alloc(FUNC(dma_complete));
+	state->dma_timer[1] = machine->scheduler().timer_alloc(FUNC(dma_complete));
+	state->dma_timer[2] = machine->scheduler().timer_alloc(FUNC(dma_complete));
+	state->dma_timer[3] = machine->scheduler().timer_alloc(FUNC(dma_complete));
 	timer_adjust_oneshot(state->dma_timer[0], attotime::never, 0);
 	timer_adjust_oneshot(state->dma_timer[1], attotime::never, 1);
 	timer_adjust_oneshot(state->dma_timer[2], attotime::never, 2);
 	timer_adjust_oneshot(state->dma_timer[3], attotime::never, 3);
 
 	/* also one for each timer (heh) */
-	state->tmr_timer[0] = timer_alloc(machine, timer_expire, 0);
-	state->tmr_timer[1] = timer_alloc(machine, timer_expire, 0);
-	state->tmr_timer[2] = timer_alloc(machine, timer_expire, 0);
-	state->tmr_timer[3] = timer_alloc(machine, timer_expire, 0);
+	state->tmr_timer[0] = machine->scheduler().timer_alloc(FUNC(timer_expire));
+	state->tmr_timer[1] = machine->scheduler().timer_alloc(FUNC(timer_expire));
+	state->tmr_timer[2] = machine->scheduler().timer_alloc(FUNC(timer_expire));
+	state->tmr_timer[3] = machine->scheduler().timer_alloc(FUNC(timer_expire));
 	timer_adjust_oneshot(state->tmr_timer[0], attotime::never, 0);
 	timer_adjust_oneshot(state->tmr_timer[1], attotime::never, 1);
 	timer_adjust_oneshot(state->tmr_timer[2], attotime::never, 2);
 	timer_adjust_oneshot(state->tmr_timer[3], attotime::never, 3);
 
 	/* and an IRQ handling timer */
-	state->irq_timer = timer_alloc(machine, handle_irq, 0);
+	state->irq_timer = machine->scheduler().timer_alloc(FUNC(handle_irq));
 	timer_adjust_oneshot(state->irq_timer, attotime::never, 0);
 
 	gba_video_start(machine);

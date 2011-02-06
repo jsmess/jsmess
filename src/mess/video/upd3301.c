@@ -635,8 +635,8 @@ static DEVICE_START( upd3301 )
 	upd3301->width = intf->width;
 
 	/* create the timers */
-	upd3301->vrtc_timer = timer_alloc(device->machine, vrtc_tick, (void *)device);
-	upd3301->hrtc_timer = timer_alloc(device->machine, hrtc_tick, (void *)device);
+	upd3301->vrtc_timer = device->machine->scheduler().timer_alloc(FUNC(vrtc_tick), (void *)device);
+	upd3301->hrtc_timer = device->machine->scheduler().timer_alloc(FUNC(hrtc_tick), (void *)device);
 
 	/* register for state saving */
 //  state_save_register_device_item(device, 0, upd3301->);

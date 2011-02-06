@@ -99,7 +99,7 @@ static READ8_DEVICE_HANDLER( tf20_upd765_tc_r )
 
 	/* toggle tc on read */
 	upd765_tc_w(device, ASSERT_LINE);
-	timer_set(device->machine, attotime::zero, device, 0, tf20_upd765_tc_reset);
+	device->machine->scheduler().timer_set(attotime::zero, FUNC(tf20_upd765_tc_reset), 0, device);
 
 	return 0xff;
 }

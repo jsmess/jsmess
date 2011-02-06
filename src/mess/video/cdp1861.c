@@ -266,9 +266,9 @@ static DEVICE_START( cdp1861 )
 	cdp1861->bitmap = auto_bitmap_alloc(device->machine, cdp1861->screen->width(), cdp1861->screen->height(), cdp1861->screen->format());
 
 	/* create the timers */
-	cdp1861->int_timer = timer_alloc(device->machine, cdp1861_int_tick, (void *)device);
-	cdp1861->efx_timer = timer_alloc(device->machine, cdp1861_efx_tick, (void *)device);
-	cdp1861->dma_timer = timer_alloc(device->machine, cdp1861_dma_tick, (void *)device);
+	cdp1861->int_timer = device->machine->scheduler().timer_alloc(FUNC(cdp1861_int_tick), (void *)device);
+	cdp1861->efx_timer = device->machine->scheduler().timer_alloc(FUNC(cdp1861_efx_tick), (void *)device);
+	cdp1861->dma_timer = device->machine->scheduler().timer_alloc(FUNC(cdp1861_dma_tick), (void *)device);
 
 	/* register for state saving */
 	state_save_register_device_item(device, 0, cdp1861->disp);

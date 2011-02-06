@@ -704,7 +704,7 @@ static TIMER_CALLBACK( outfifo_read_cb )
 #ifdef VERBOSE
 	if (data!= 0x8000) logerror("sample output: %04X\n", data);
 #endif
-	timer_set(machine, attotime::from_hz(10000), NULL, 0, outfifo_read_cb);
+	machine->scheduler().timer_set(attotime::from_hz(10000), FUNC(outfifo_read_cb));
 	dac_signed_data_16_w( speaker, data );
 }
 
@@ -714,7 +714,7 @@ static DRIVER_INIT( dectalk )
 	dectalk_state *state = machine->driver_data<dectalk_state>();
 	dectalk_clear_all_fifos(machine);
 	state->simulate_outfifo_error = 0;
-	timer_set(machine, attotime::from_hz(10000), NULL, 0,  outfifo_read_cb);
+	machine->scheduler().timer_set(attotime::from_hz(10000), FUNC(outfifo_read_cb));
 }
 
 static WRITE8_DEVICE_HANDLER( dectalk_kbd_put )

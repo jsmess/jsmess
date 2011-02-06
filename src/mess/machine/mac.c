@@ -728,7 +728,7 @@ static void kbd_shift_out(running_machine *machine, int data)
 	if (mac->m_kbd_comm == TRUE)
 	{
 		mac->m_kbd_shift_reg = data;
-		timer_set(machine, attotime::from_msec(1), NULL, 0, kbd_clock);
+		machine->scheduler().timer_set(attotime::from_msec(1), FUNC(kbd_clock));
 	}
 }
 
@@ -741,7 +741,7 @@ static WRITE8_DEVICE_HANDLER(mac_via_out_cb2)
 		/* Mac pulls CB2 down to initiate communication */
 		mac->m_kbd_comm = TRUE;
 		mac->m_kbd_receive = TRUE;
-		timer_set(device->machine, attotime::from_usec(100), NULL, 0, kbd_clock);
+		device->machine->scheduler().timer_set(attotime::from_usec(100), FUNC(kbd_clock));
 	}
 	if (mac->m_kbd_comm == TRUE && mac->m_kbd_receive == TRUE)
 	{
@@ -3031,21 +3031,21 @@ void mac_state::machine_start()
 {
 	if (has_adb())
 	{
-		this->adb_timer = timer_alloc(machine, mac_adb_tick, NULL);
+		this->adb_timer = machine->scheduler().timer_alloc(FUNC(mac_adb_tick));
 		timer_adjust_oneshot(this->adb_timer, attotime::never, 0);
 
 		// also allocate PMU timer
 		if (ADB_IS_PM_CLASS)
 		{
-			m_pmu_send_timer = timer_alloc(machine, mac_pmu_tick, NULL);
+			m_pmu_send_timer = machine->scheduler().timer_alloc(FUNC(mac_pmu_tick));
 			timer_adjust_oneshot(this->adb_timer, attotime::never, 0);
 		}
 
 	}
-	this->scanline_timer = timer_alloc(machine, mac_scanline_tick, NULL);
+	this->scanline_timer = machine->scheduler().timer_alloc(FUNC(mac_scanline_tick));
 	timer_adjust_oneshot(this->scanline_timer, machine->primary_screen->time_until_pos(0, 0), 0);
 
-	m_6015_timer = timer_alloc(machine, mac_6015_tick, NULL);
+	m_6015_timer = machine->scheduler().timer_alloc(FUNC(mac_6015_tick));
 	timer_adjust_oneshot(m_6015_timer, attotime::never, 0);
 }
 
@@ -3230,7 +3230,7 @@ static void mac_driver_init(running_machine *machine, model_t model)
 	/* setup keyboard */
 	keyboard_init(mac);
 
-	mac->m_inquiry_timeout = timer_alloc(machine, inquiry_timeout_func, NULL);
+	mac->m_inquiry_timeout = machine->scheduler().timer_alloc(FUNC(inquiry_timeout_func));
 
 	/* save state stuff */
 	state_save_register_postload(machine, mac_state_load, NULL);

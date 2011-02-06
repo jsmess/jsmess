@@ -340,7 +340,7 @@ const ldplayer_interface pr8210_interface =
 static void pr8210_init(laserdisc_state *ld)
 {
 	astring tempstring;
-	attotime curtime = timer_get_time(ld->device->machine);
+	attotime curtime = ld->device->machine->time();
 	ldplayer_data *player = ld->player;
 
 	/* reset our state */
@@ -380,10 +380,10 @@ static void pr8210_vsync(laserdisc_state *ld, const vbi_metadata *vbi, int field
 
 	/* signal VSYNC and set a timer to turn it off */
 	player->vsync = TRUE;
-	timer_set(ld->device->machine, ld->screen->scan_period() * 4, ld, 0, vsync_off);
+	ld->device->machine->scheduler().timer_set(ld->screen->scan_period() * 4, FUNC(vsync_off), 0, ld);
 
 	/* also set a timer to fetch the VBI data when it is ready */
-	timer_set(ld->device->machine, ld->screen->time_until_pos(19*2), ld, 0, vbi_data_fetch);
+	ld->device->machine->scheduler().timer_set(ld->screen->time_until_pos(19*2), FUNC(vbi_data_fetch), 0, ld);
 }
 
 
@@ -451,7 +451,7 @@ static void pr8210_control_w(laserdisc_state *ld, UINT8 prev, UINT8 data)
 	/* handle rising edge */
 	if (prev != ASSERT_LINE && data == ASSERT_LINE)
 	{
-		attotime curtime = timer_get_time(ld->device->machine);
+		attotime curtime = ld->device->machine->time();
 		attotime delta, overalldelta;
 		int longpulse;
 
@@ -840,7 +840,7 @@ static WRITE8_HANDLER( pr8210_port2_w )
 
 	/* on the falling edge of bit 5, start the slow timer */
 	if (!(data & 0x20) && (prev & 0x20))
-		player->slowtrg = timer_get_time(space->machine);
+		player->slowtrg = space->machine->time();
 
 	/* bit 6 when low triggers an IRQ on the MCU */
 	if (player->cpu != NULL)
@@ -1119,7 +1119,7 @@ static void simutrek_vsync(laserdisc_state *ld, const vbi_metadata *vbi, int fie
 		if (LOG_SIMUTREK)
 			printf("%3d:VSYNC IRQ\n", ld->screen->vpos());
 		cpu_set_input_line(player->simutrek.cpu, MCS48_INPUT_IRQ, ASSERT_LINE);
-		timer_set(ld->device->machine, ld->screen->scan_period(), ld, 0, irq_off);
+		ld->device->machine->scheduler().timer_set(ld->screen->scan_period(), FUNC(irq_off), 0, ld);
 	}
 }
 
@@ -1164,7 +1164,7 @@ static UINT8 simutrek_status_r(laserdisc_state *ld)
 
 static void simutrek_data_w(laserdisc_state *ld, UINT8 prev, UINT8 data)
 {
-	timer_call_after_resynch(ld->device->machine, ld, data, simutrek_latched_data_w);
+	ld->device->machine->scheduler().synchronize(FUNC(simutrek_latched_data_w), data, ld);
 	if (LOG_SIMUTREK)
 		printf("%03d:**** Simutrek Command = %02X\n", ld->screen->vpos(), data);
 }

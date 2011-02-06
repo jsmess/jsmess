@@ -553,7 +553,7 @@ static TIMER_CALLBACK(ip20_timer)
 		}
 	}
 
-	timer_set(machine, attotime::from_msec(1), NULL, 0, ip20_timer);
+	machine->scheduler().timer_set(attotime::from_msec(1), FUNC(ip20_timer));
 }
 
 static MACHINE_START( ip204415 )
@@ -574,7 +574,7 @@ static MACHINE_START( ip204415 )
 
 	state->nRTC_Temp = 0;
 
-	timer_set(machine, attotime::from_msec(1), NULL, 0, ip20_timer);
+	machine->scheduler().timer_set(attotime::from_msec(1), FUNC(ip20_timer));
 }
 
 static INPUT_PORTS_START( ip204415 )

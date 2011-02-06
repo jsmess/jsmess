@@ -143,7 +143,7 @@ void serial_device_setup(device_t *device, int baud_rate, int num_data_bits, int
 	ser->form.word_length = num_data_bits;
 	ser->form.stop_bit_count = stop_bit_count;
 	ser->form.parity = parity_code;
-	ser->timer = timer_alloc(device->machine, serial_device_baud_rate_callback, (void *)device);
+	ser->timer = device->machine->scheduler().timer_alloc(FUNC(serial_device_baud_rate_callback), (void *)device);
 
 	serial_connection_init(device->machine,&ser->connection);
 	serial_connection_set_in_callback(device->machine,&ser->connection, serial_device_in_callback);

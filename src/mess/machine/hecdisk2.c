@@ -202,8 +202,8 @@ if ((hector_disc2_RNMI==1) &&  (NMI_current_state==1))
 
 void hector_disc2_init( running_machine *machine)
 {
-	DMA_timer = timer_alloc(machine, Callback_DMA_irq, 0);
-	INT_timer = timer_alloc(machine, Callback_INT_irq, 0);
+	DMA_timer = machine->scheduler().timer_alloc(FUNC(Callback_DMA_irq));
+	INT_timer = machine->scheduler().timer_alloc(FUNC(Callback_INT_irq));
 }
 
 static TIMER_CALLBACK( Callback_DMA_irq )

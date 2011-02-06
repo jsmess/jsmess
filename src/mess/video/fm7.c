@@ -635,7 +635,7 @@ static void fm77av_line_draw(running_machine* machine)
 
 	// set timer to disable busy flag
 	// 1/16 us for each byte changed
-	timer_set(machine,attotime::from_usec(byte_count/16),NULL,0,fm77av_alu_task_end);
+	machine->scheduler().timer_set(attotime::from_usec(byte_count/16), FUNC(fm77av_alu_task_end));
 }
 
 READ8_HANDLER( fm7_vram_r )

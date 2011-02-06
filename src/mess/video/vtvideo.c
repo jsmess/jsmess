@@ -314,7 +314,7 @@ static DEVICE_START( vt_video )
 	assert(vt->gfx != NULL);
 
     // LBA7 is scan line frequency update
-	timer_pulse(device->machine, attotime::from_nsec(31778), (void *) device, 0, lba7_change);
+	device->machine->scheduler().timer_pulse(attotime::from_nsec(31778), FUNC(lba7_change), 0, (void *) device);
 }
 
 

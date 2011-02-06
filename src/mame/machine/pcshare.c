@@ -31,11 +31,11 @@
 
 #define VERBOSE_DBG 0       /* general debug messages */
 #define DBG_LOG(N,M,A) \
-	if(VERBOSE_DBG>=N){ if( M )logerror("%11.6f: %-24s",timer_get_time(pc_keyb.machine).as_double(),(char*)M ); logerror A; }
+	if(VERBOSE_DBG>=N){ if( M )logerror("%11.6f: %-24s",pc_keyb.machine->time().as_double(),(char*)M ); logerror A; }
 
 #define VERBOSE_JOY 0		/* JOY (joystick port) */
 #define JOY_LOG(N,M,A) \
-	if(VERBOSE_JOY>=N){ if( M )logerror("%11.6f: %-24s",timer_get_time(pc_keyb.machine).as_double(),(char*)M ); logerror A; }
+	if(VERBOSE_JOY>=N){ if( M )logerror("%11.6f: %-24s",pc_keyb.machine->time().as_double(),(char*)M ); logerror A; }
 
 
 static TIMER_CALLBACK( pc_keyb_timer );
@@ -69,7 +69,7 @@ void init_pc_common(running_machine *machine, UINT32 flags, void (*set_keyb_int_
 	memset(&pc_keyb, 0, sizeof(pc_keyb));
 	pc_keyb.machine = machine;
 	pc_keyb.int_cb = set_keyb_int_func;
-	pc_keyb.timer = timer_alloc(machine, pc_keyb_timer, NULL);
+	pc_keyb.timer = machine->scheduler().timer_alloc(FUNC(pc_keyb_timer));
 }
 
 UINT8 pc_keyb_read(void)

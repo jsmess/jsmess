@@ -1227,7 +1227,7 @@ static DEVICE_START( c1541 )
 //  c1541->track_buffer = auto_alloc_array(device->machine, UINT8, G64_BUFFER_SIZE);
 
 	/* allocate data timer */
-	c1541->bit_timer = timer_alloc(device->machine, bit_tick, (void *)device);
+	c1541->bit_timer = device->machine->scheduler().timer_alloc(FUNC(bit_tick), (void *)device);
 
 	/* register for state saving */
 //  state_save_register_device_item_pointer(device, 0, c1541->track_buffer, G64_BUFFER_SIZE);

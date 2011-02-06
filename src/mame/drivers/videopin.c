@@ -31,13 +31,13 @@ static void update_plunger(running_machine *machine)
 	{
 		if (val == 0)
 		{
-			state->time_released = timer_get_time(machine);
+			state->time_released = machine->time();
 
 			if (!state->mask)
 				cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, ASSERT_LINE);
 		}
 		else
-			state->time_pushed = timer_get_time(machine);
+			state->time_pushed = machine->time();
 
 		state->prev = val;
 	}
@@ -57,7 +57,7 @@ static TIMER_CALLBACK( interrupt_callback )
 	if (scanline >= 263)
 		scanline = 32;
 
-	timer_set(machine, machine->primary_screen->time_until_pos(scanline), NULL, scanline, interrupt_callback);
+	machine->scheduler().timer_set(machine->primary_screen->time_until_pos(scanline), FUNC(interrupt_callback), scanline);
 }
 
 
@@ -65,7 +65,7 @@ static MACHINE_RESET( videopin )
 {
 	device_t *discrete = machine->device("discrete");
 
-	timer_set(machine, machine->primary_screen->time_until_pos(32), NULL, 32, interrupt_callback);
+	machine->scheduler().timer_set(machine->primary_screen->time_until_pos(32), FUNC(interrupt_callback), 32);
 
 	/* both output latches are cleared on reset */
 
@@ -77,7 +77,7 @@ static MACHINE_RESET( videopin )
 static double calc_plunger_pos(running_machine *machine)
 {
 	videopin_state *state = machine->driver_data<videopin_state>();
-	return (timer_get_time(machine).as_double() - state->time_released.as_double()) * (state->time_released.as_double() - state->time_pushed.as_double() + 0.2);
+	return (machine->time().as_double() - state->time_released.as_double()) * (state->time_released.as_double() - state->time_pushed.as_double() + 0.2);
 }
 
 

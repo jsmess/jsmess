@@ -1383,6 +1383,8 @@ const game_driver * const drivers[] =
 	DRIVER( cosmo )		/* TDS+Mints */
 	DRIVER( darthvdr )	/* bootleg */
 
+	DRIVER( 18w )		/* 653 (c) 1979 Midway */
+	DRIVER( 18w2 )		/* 653 (c) 1979 Midway */
 	DRIVER( sspeedr )	/* 1979 Midway */
 
 	/* Similar but with a M6800 instead of an 8080 */
@@ -4897,7 +4899,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( vfurlong )	/* 2005.03 Net Select Keiba Victory Furlong */
 						/* 2005.03 The Rumble Fish 2 */
 	DRIVER( ngbc )		/* 2005.07 NeoGeo Battle Colloseum */
-						/* 2005.09 Samurai Spirits Tenkaichi Kenkakuden */
+	DRIVER( samsptk )	/* 2005.09 Samurai Spirits Tenkaichi Kenkakuden */
 	DRIVER( kofxi )		/* 2005.10 The King of Fighters XI */
 	DRIVER( fotns )		/* 2005.12 Hokuto no Ken */
 	DRIVER( mslug6 )	/* 2006.02 Metal Slug 6 */
@@ -8961,10 +8963,14 @@ Other Sun games
 	DRIVER( eyesdown )	/* 199? */
 	DRIVER( eyesdownd )	/* 199? */
 
+	/* BwB games */
 	DRIVER( blox )		/* 199? */
 	DRIVER( bloxd )		/* 199? */
+	DRIVER( bwbtetrs )	/* 199? */
 	DRIVER( prizeinv )	/* 199? */
 	DRIVER( vgpoker )	/* 199? */
+	DRIVER( renoreel )	/* 199? */
+	DRIVER( redhtpkr )	/* 199? */
 
 	/* ADP games */
 	DRIVER( backgamn )	/* (c) 1990 */
@@ -9235,6 +9241,7 @@ Other Sun games
 	DRIVER( ironfortj )	/* (c) 1998 Eolith */
 	DRIVER( puzzlekg )	/* (c) 1998 Eolith */
 	DRIVER( hidctch2 )	/* (c) 1999 Eolith */
+	DRIVER( hidctch2a)	/* (c) 1999 Eolith */
 	DRIVER( nhidctch )	/* (c) 1999 Eolith */
 	DRIVER( landbrk )	/* (c) 1999 Eolith */
 	DRIVER( landbrka )	/* (c) 1999 Eolith */
@@ -10561,6 +10568,7 @@ Other Sun games
 	DRIVER( m_oldtmr )	/* Barcrest - highly prelim*/
 	DRIVER( m_ccelbr )
 	DRIVER( m_gmball )
+	DRIVER( m_grtecp )	/* 199? */
 
 	/* MPU5 */
 	DRIVER( m_honmon )

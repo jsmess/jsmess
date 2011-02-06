@@ -111,8 +111,8 @@ hd44780_device::hd44780_device( running_machine &_machine, const hd44780_device_
 
 void hd44780_device::device_start()
 {
-	m_busy_timer = device_timer_alloc(*this, BUSY_TIMER);
-	m_blink_timer = device_timer_alloc(*this, BLINKING_TIMER);
+	m_busy_timer = timer_alloc(BUSY_TIMER);
+	m_blink_timer = timer_alloc(BLINKING_TIMER);
 
 	timer_adjust_periodic(m_blink_timer, attotime::from_msec(409), 0, attotime::from_msec(409));
 

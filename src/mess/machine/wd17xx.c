@@ -2018,10 +2018,10 @@ static DEVICE_START( wd1770 )
     w->complete_command_delay = 12;
 
 	/* allocate timers */
-	w->timer_cmd = timer_alloc(device->machine, wd17xx_command_callback, (void *)device);
-	w->timer_data = timer_alloc(device->machine, wd17xx_data_callback, (void *)device);
-	w->timer_rs = timer_alloc(device->machine, wd17xx_read_sector_callback, (void *)device);
-	w->timer_ws = timer_alloc(device->machine, wd17xx_write_sector_callback, (void *)device);
+	w->timer_cmd = device->machine->scheduler().timer_alloc(FUNC(wd17xx_command_callback), (void *)device);
+	w->timer_data = device->machine->scheduler().timer_alloc(FUNC(wd17xx_data_callback), (void *)device);
+	w->timer_rs = device->machine->scheduler().timer_alloc(FUNC(wd17xx_read_sector_callback), (void *)device);
+	w->timer_ws = device->machine->scheduler().timer_alloc(FUNC(wd17xx_write_sector_callback), (void *)device);
 
 	/* resolve callbacks */
 	devcb_resolve_read_line(&w->in_dden_func, &w->intf->in_dden_func, device);

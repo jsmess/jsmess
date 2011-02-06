@@ -311,7 +311,7 @@ READ16_HANDLER( intv_ram16_r )
 WRITE16_HANDLER( intv_ram16_w )
 {
 	intv_state *state = space->machine->driver_data<intv_state>();
-	//logerror("%g: WRITING TO GRAM offset = %d\n",timer_get_time(machine),offset);
+	//logerror("%g: WRITING TO GRAM offset = %d\n",machine->time(),offset);
 	//logerror("ram16_w(%x) = %x\n",offset,data);
 	state->ram16[offset] = data&0xffff;
 }
@@ -498,7 +498,7 @@ INTERRUPT_GEN( intv_interrupt )
 	intv_state *state = device->machine->driver_data<intv_state>();
 	cputag_set_input_line(device->machine, "maincpu", CP1610_INT_INTRM, ASSERT_LINE);
 	state->sr1_int_pending = 1;
-	timer_set(device->machine, device->machine->device<cpu_device>("maincpu")->cycles_to_attotime(3791), NULL, 0, intv_interrupt_complete);
+	device->machine->scheduler().timer_set(device->machine->device<cpu_device>("maincpu")->cycles_to_attotime(3791), FUNC(intv_interrupt_complete));
 	intv_stic_screenrefresh(device->machine);
 }
 

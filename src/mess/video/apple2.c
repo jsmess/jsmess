@@ -442,7 +442,7 @@ VIDEO_UPDATE( apple2 )
 	running_machine *machine = screen->machine;
 
 	/* calculate the state->flash value */
-	state->flash = ((timer_get_time(screen->machine) * 4).seconds & 1) ? 1 : 0;
+	state->flash = ((screen->machine->time() * 4).seconds & 1) ? 1 : 0;
 
 	/* read out relevant softswitch variables; to see what has changed */
 	new_a2 = effective_a2(state);

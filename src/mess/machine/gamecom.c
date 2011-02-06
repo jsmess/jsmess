@@ -560,7 +560,7 @@ void gamecom_update_timers( device_t *device, int cycles )
 DRIVER_INIT( gamecom )
 {
 	gamecom_state *state = machine->driver_data<gamecom_state>();
-	state->clock_timer = timer_alloc(machine,  gamecom_clock_timer_callback , NULL);
+	state->clock_timer = machine->scheduler().timer_alloc(FUNC(gamecom_clock_timer_callback));
 }
 
 DEVICE_IMAGE_LOAD( gamecom_cart1 )

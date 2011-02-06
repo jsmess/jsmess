@@ -194,7 +194,7 @@ static TIMER_CALLBACK(timer_callback)
 
 static MACHINE_START(busicom)
 {
-	timer_pulse(machine, attotime::from_msec(28*2), NULL, 0, timer_callback);
+	machine->scheduler().timer_pulse(attotime::from_msec(28*2), FUNC(timer_callback));
 }
 
 static MACHINE_RESET(busicom)

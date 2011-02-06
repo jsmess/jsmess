@@ -54,7 +54,7 @@
 		if(VERBOSE_PIO>=N) \
 		{ \
 			if( M ) \
-				logerror("%11.6f: %-24s",timer_get_time(machine).as_double(),(char*)M ); \
+				logerror("%11.6f: %-24s",machine->time().as_double(),(char*)M ); \
 			logerror A; \
 		} \
 	} while (0)
@@ -1363,8 +1363,8 @@ MACHINE_START( pcjr )
 {
 	pc_state *st = machine->driver_data<pc_state>();
 	pc_fdc_init( machine, &pcjr_fdc_interface_nc );
-	pcjr_keyb.keyb_signal_timer = timer_alloc(machine,  pcjr_keyb_signal_callback, NULL );
-	pc_int_delay_timer = timer_alloc(machine,  pcjr_delayed_pic8259_irq, NULL );
+	pcjr_keyb.keyb_signal_timer = machine->scheduler().timer_alloc(FUNC(pcjr_keyb_signal_callback));
+	pc_int_delay_timer = machine->scheduler().timer_alloc(FUNC(pcjr_delayed_pic8259_irq));
 	st->maincpu = machine->device("maincpu" );
 	cpu_set_irq_callback(st->maincpu, pc_irq_callback);
 

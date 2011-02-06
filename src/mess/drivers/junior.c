@@ -189,7 +189,7 @@ static MACHINE_START( junior )
 	junior_state *state = machine->driver_data<junior_state>();
 	state_save_register_item(machine, "junior", NULL, 0, state->port_a );
 	state_save_register_item(machine, "junior", NULL, 0, state->port_b );
-	timer_pulse(machine,  attotime::from_hz(50), NULL, 0, junior_update_leds );
+	machine->scheduler().timer_pulse(attotime::from_hz(50), FUNC(junior_update_leds));
 }
 
 

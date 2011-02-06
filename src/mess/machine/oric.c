@@ -1081,7 +1081,7 @@ static void oric_common_init_machine(running_machine *machine)
 	state->irqs = 0;
 	state->ram_0x0c000 = NULL;
 
-    timer_pulse(machine, attotime::from_hz(4800), NULL, 0, oric_refresh_tape);
+    machine->scheduler().timer_pulse(attotime::from_hz(4800), FUNC(oric_refresh_tape));
 }
 
 MACHINE_START( oric )

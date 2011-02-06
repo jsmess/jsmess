@@ -1198,7 +1198,7 @@ static MACHINE_START( prof80 )
 	floppy_drive_set_index_pulse_callback(floppy_get_device(machine, 0), prof80_fdc_index_callback);
 
 	/* allocate floppy motor off timer */
-	state->floppy_motor_off_timer = timer_alloc(machine, floppy_motor_off_tick, NULL);
+	state->floppy_motor_off_timer = machine->scheduler().timer_alloc(FUNC(floppy_motor_off_tick));
 
 	/* bank switch */
 	prof80_bankswitch(machine);

@@ -547,7 +547,7 @@ static void snes_input_read( running_machine *machine )
 	UINT8 ctrl2 = (input_port_read(machine, "CTRLSEL") & 0xf0) >> 4;
 
 	/* Check if lightgun has been chosen as input: if so, enable crosshair */
-	timer_set(machine, attotime::zero, NULL, 0, lightgun_tick);
+	machine->scheduler().timer_set(attotime::zero, FUNC(lightgun_tick));
 
 	switch (ctrl1)
 	{

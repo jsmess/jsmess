@@ -1094,9 +1094,9 @@ static DEVICE_START( upd7220 )
 	assert(upd7220->screen != NULL);
 
 	/* create the timers */
-	upd7220->vsync_timer = timer_alloc(device->machine, vsync_tick, (void *)device);
-	upd7220->hsync_timer = timer_alloc(device->machine, hsync_tick, (void *)device);
-	upd7220->blank_timer = timer_alloc(device->machine, blank_tick, (void *)device);
+	upd7220->vsync_timer = device->machine->scheduler().timer_alloc(FUNC(vsync_tick), (void *)device);
+	upd7220->hsync_timer = device->machine->scheduler().timer_alloc(FUNC(hsync_tick), (void *)device);
+	upd7220->blank_timer = device->machine->scheduler().timer_alloc(FUNC(blank_tick), (void *)device);
 
 	/* set initial values */
 	upd7220->fifo_ptr = -1;

@@ -697,8 +697,8 @@ static DEVICE_START(ay31015)
 	ay31015->tx_clock = ay31015->config->transmitter_clock;
 	ay31015->rx_clock = ay31015->config->receiver_clock;
 
-	ay31015->rx_timer = timer_alloc(device->machine, ay31015_rx_process, (void *)device );
-	ay31015->tx_timer = timer_alloc(device->machine, ay31015_tx_process, (void *)device );
+	ay31015->rx_timer = device->machine->scheduler().timer_alloc(FUNC(ay31015_rx_process), (void *)device );
+	ay31015->tx_timer = device->machine->scheduler().timer_alloc(FUNC(ay31015_tx_process), (void *)device );
 
 	ay31015_update_rx_timer( device );
 	ay31015_update_tx_timer( device );

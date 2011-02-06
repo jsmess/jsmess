@@ -103,7 +103,7 @@ public:
 	int dgnalpha_just_reset;
 	UINT8 *bas_rom_bank;
 	UINT8 *bottom_32k;
-	timer_fired_func recalc_interrupts;
+	timer_expired_func recalc_interrupts;
 	int hiresjoy_ca;
 	attotime hiresjoy_xtransitiontime;
 	attotime hiresjoy_ytransitiontime;

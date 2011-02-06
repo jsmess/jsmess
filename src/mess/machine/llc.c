@@ -101,7 +101,7 @@ MACHINE_RESET( llc1 )
 
 MACHINE_START(llc1)
 {
-	timer_pulse(machine, attotime::from_hz(5), NULL, 0, keyboard_callback);
+	machine->scheduler().timer_pulse(attotime::from_hz(5), FUNC(keyboard_callback));
 }
 
 DRIVER_INIT(llc2)

@@ -287,8 +287,8 @@ static MACHINE_START( kim1 )
 	state_save_register_item(machine, "kim1", NULL, 0, state->u2_port_b );
 	state_save_register_item(machine, "kim1", NULL, 0, state->_311_output );
 	state_save_register_item(machine, "kim1", NULL, 0, state->cassette_high_count );
-	timer_pulse(machine,  attotime::from_hz(60), NULL, 0, kim1_update_leds );
-	timer_pulse(machine,  attotime::from_hz(44100), NULL, 0, kim1_cassette_input );
+	machine->scheduler().timer_pulse(attotime::from_hz(60), FUNC(kim1_update_leds));
+	machine->scheduler().timer_pulse(attotime::from_hz(44100), FUNC(kim1_cassette_input));
 }
 
 

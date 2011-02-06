@@ -935,7 +935,7 @@ static READ8_HANDLER( upd765_tc_r )
 	//pc88va_state *state = space->machine->driver_data<pc88va_state>();
 
 	upd765_tc_w(space->machine->device("upd765"), 1);
-	timer_set(space->machine,  attotime::from_usec(500), NULL, 0, pc8801fd_upd765_tc_to_zero );
+	space->machine->scheduler().timer_set(attotime::from_usec(500), FUNC(pc8801fd_upd765_tc_to_zero));
 	return 0;
 }
 
@@ -1511,7 +1511,7 @@ static MACHINE_START( pc88va )
 	pc88va_state *state = machine->driver_data<pc88va_state>();
 	cpu_set_irq_callback(machine->device("maincpu"), pc88va_irq_callback);
 
-	state->t3_mouse_timer = timer_alloc(machine, t3_mouse_callback, 0);
+	state->t3_mouse_timer = machine->scheduler().timer_alloc(FUNC(t3_mouse_callback));
 	timer_adjust_oneshot(state->t3_mouse_timer, attotime::never, 0);
 }
 

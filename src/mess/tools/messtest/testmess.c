@@ -604,7 +604,7 @@ static const input_setting_config *find_switch(running_machine *machine, const c
 
 static void command_wait(running_machine *machine)
 {
-	attotime current_time = timer_get_time(machine);
+	attotime current_time = machine->time();
 
 	if (state == STATE_READY)
 	{
@@ -648,7 +648,7 @@ static void command_input(running_machine *machine)
 static void command_rawinput(running_machine *machine)
 {
 	//int parts;
-	attotime current_time = timer_get_time(machine);
+	attotime current_time = machine->time();
 	static const char *position;
 #if 0
 	int i;
@@ -1083,7 +1083,7 @@ static void command_end(running_machine *machine)
 {
 	/* at the end of our test */
 	state = STATE_DONE;
-	final_time = timer_get_time(machine);
+	final_time = machine->time();
 	machine->schedule_exit();
 }
 
@@ -1142,7 +1142,7 @@ void osd_update(running_machine *machine, int skip_redraw)
 	}
 
 	/* have we hit the time limit? */
-	current_time = timer_get_time(machine);
+	current_time = machine->time();
 	time_limit = (current_testcase.time_limit != attotime::zero) ? current_testcase.time_limit
 		: attotime::from_seconds(600);
 	if (current_time > time_limit)

@@ -334,8 +334,8 @@ static MACHINE_START( pv1000 )
 {
 	d65010_state *state = machine->driver_data<d65010_state>();
 
-	state->irq_on_timer = timer_alloc( machine, d65010_irq_on_cb, NULL );
-	state->irq_off_timer = timer_alloc( machine, d65010_irq_off_cb, NULL );
+	state->irq_on_timer = machine->scheduler().timer_alloc(FUNC(d65010_irq_on_cb));
+	state->irq_off_timer = machine->scheduler().timer_alloc(FUNC(d65010_irq_off_cb));
 	state->maincpu = machine->device( "maincpu" );
 	state->screen = machine->device<screen_device>("screen" );
 }

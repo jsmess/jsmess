@@ -135,7 +135,7 @@ READ8_HANDLER( odyssey2_getp1 )
 	odyssey2_state *state = space->machine->driver_data<odyssey2_state>();
 	UINT8 data = state->p1;
 
-	logerror("%.9f p1 read %.2x\n", timer_get_time(space->machine).as_double(), data);
+	logerror("%.9f p1 read %.2x\n", space->machine->time().as_double(), data);
 	return data;
 }
 
@@ -148,7 +148,7 @@ WRITE8_HANDLER( odyssey2_putp1 )
 
 	odyssey2_lum_w ( space, 0, state->p1 >> 7 );
 
-	logerror("%.6f p1 written %.2x\n", timer_get_time(space->machine).as_double(), data);
+	logerror("%.6f p1 written %.2x\n", space->machine->time().as_double(), data);
 }
 
 READ8_HANDLER( odyssey2_getp2 )
@@ -183,7 +183,7 @@ READ8_HANDLER( odyssey2_getp2 )
     else
         state->p2 = state->p2 | 0xF0;
 
-    logerror("%.6f p2 read %.2x\n", timer_get_time(space->machine).as_double(), state->p2);
+    logerror("%.6f p2 read %.2x\n", space->machine->time().as_double(), state->p2);
     return state->p2;
 }
 
@@ -192,7 +192,7 @@ WRITE8_HANDLER( odyssey2_putp2 )
 	odyssey2_state *state = space->machine->driver_data<odyssey2_state>();
     state->p2 = data;
 
-    logerror("%.6f p2 written %.2x\n", timer_get_time(space->machine).as_double(), data);
+    logerror("%.6f p2 written %.2x\n", space->machine->time().as_double(), data);
 }
 
 READ8_HANDLER( odyssey2_getbus )
@@ -206,13 +206,13 @@ READ8_HANDLER( odyssey2_getbus )
     if ((state->p2 & P2_KEYBOARD_SELECT_MASK) == 0)
 		data &= input_port_read(space->machine, "JOY1");       /* read joystick 2 */
 
-    logerror("%.6f bus read %.2x\n", timer_get_time(space->machine).as_double(), data);
+    logerror("%.6f bus read %.2x\n", space->machine->time().as_double(), data);
     return data;
 }
 
 WRITE8_HANDLER( odyssey2_putbus )
 {
-    logerror("%.6f bus written %.2x\n", timer_get_time(space->machine).as_double(), data);
+    logerror("%.6f bus written %.2x\n", space->machine->time().as_double(), data);
 }
 
 ///////////////////////////////////

@@ -230,7 +230,7 @@ static TIMER_CALLBACK(kc85_disk_reset_timer_callback)
 
 static void kc_disc_interface_init(running_machine *machine)
 {
-	timer_set(machine, attotime::zero, NULL, 0, kc85_disk_reset_timer_callback);
+	machine->scheduler().timer_set(attotime::zero, FUNC(kc85_disk_reset_timer_callback));
 
 	/* hold cpu at reset */
 	cputag_set_input_line(machine, "disc", INPUT_LINE_RESET, ASSERT_LINE);
@@ -403,7 +403,7 @@ static TIMER_CALLBACK(kc_cassette_timer_callback)
 static void	kc_cassette_init(running_machine *machine)
 {
 	kc_state *state = machine->driver_data<kc_state>();
-	state->cassette_timer = timer_alloc(machine, kc_cassette_timer_callback, NULL);
+	state->cassette_timer = machine->scheduler().timer_alloc(FUNC(kc_cassette_timer_callback));
 }
 
 static void	kc_cassette_set_motor(running_machine *machine, int motor_state)
@@ -1788,13 +1788,13 @@ MACHINE_START(kc85)
 
 	// from keyboard init
 	/* 50 Hz is just a arbitrary value - used to put scan-codes into the queue for transmitting */
-	timer_pulse(machine, attotime::from_hz(50), NULL, 0, kc_keyboard_update);
+	machine->scheduler().timer_pulse(attotime::from_hz(50), FUNC(kc_keyboard_update));
 
 	/* timer to transmit pulses to kc base unit */
-	timer_pulse(machine, attotime::from_usec(1024), NULL, 0, kc_keyboard_transmit_timer_callback);
+	machine->scheduler().timer_pulse(attotime::from_usec(1024), FUNC(kc_keyboard_transmit_timer_callback));
 
-	timer_pulse(machine, attotime::from_hz(15625), (void *)machine->device("z80ctc"), 0, kc85_15khz_timer_callback);
-	timer_set(machine, attotime::zero, NULL, 0, kc85_reset_timer_callback);
+	machine->scheduler().timer_pulse(attotime::from_hz(15625), FUNC(kc85_15khz_timer_callback), 0, (void *)machine->device("z80ctc"));
+	machine->scheduler().timer_set(attotime::zero, FUNC(kc85_reset_timer_callback));
 }
 
 static void	kc85_common_init(running_machine *machine)

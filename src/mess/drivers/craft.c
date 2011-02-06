@@ -47,13 +47,13 @@ public:
 	craft_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config)
 	{
-    	timer0_timer = timer_alloc(&machine, avr8_timer0_tick, 0);
+    	timer0_timer = machine.scheduler().timer_alloc(FUNC(avr8_timer0_tick));
 		timer0_increment = 1;
 
-    	timer1_timer = timer_alloc(&machine, avr8_timer1_tick, 0);
+    	timer1_timer = machine.scheduler().timer_alloc(FUNC(avr8_timer1_tick));
 		timer1_increment = 1;
 
-    	timer2_timer = timer_alloc(&machine, avr8_timer2_tick, 0);
+    	timer2_timer = machine.scheduler().timer_alloc(FUNC(avr8_timer2_tick));
 		timer2_increment = 1;
 	}
 

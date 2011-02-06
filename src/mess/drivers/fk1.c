@@ -390,8 +390,8 @@ static MACHINE_RESET(fk1)
 
 static MACHINE_START( fk1 )
 {
-	timer_pulse(machine, attotime::from_hz(24000), NULL, 0, keyboard_callback);
-	timer_pulse(machine, attotime::from_hz(50), NULL, 0, vsync_callback);
+	machine->scheduler().timer_pulse(attotime::from_hz(24000), FUNC(keyboard_callback));
+	machine->scheduler().timer_pulse(attotime::from_hz(50), FUNC(vsync_callback));
 }
 
 static VIDEO_UPDATE( fk1 )

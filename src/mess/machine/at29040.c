@@ -134,7 +134,7 @@ void at29c040a_init_data_ptr(int id, UINT8 *data_ptr)
 */
 void at29c040a_init(running_machine *machine,int id)
 {
-	at29c040a[id].programming_timer = timer_alloc(machine, at29c040a_programming_timer_callback, NULL);
+	at29c040a[id].programming_timer = machine->scheduler().timer_alloc(FUNC(at29c040a_programming_timer_callback));
 }
 
 /*

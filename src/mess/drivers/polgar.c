@@ -391,9 +391,9 @@ static TIMER_CALLBACK( update_nmi )
 
 static MACHINE_START( polgar )
 {
-	// timer_pulse(machine, attotime::from_hz(60), NULL, 0, update_leds);
-	timer_pulse(machine, attotime::from_hz(600), NULL, 0, update_nmi);
-	timer_pulse(machine, attotime::from_hz(100), NULL, 0, mboard_update_artwork);
+	// machine->scheduler().timer_pulse(attotime::from_hz(60), FUNC(update_leds));
+	machine->scheduler().timer_pulse(attotime::from_hz(600), FUNC(update_nmi));
+	machine->scheduler().timer_pulse(attotime::from_hz(100), FUNC(mboard_update_artwork));
 	mboard_savestate_register(machine);
 }
 

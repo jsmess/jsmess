@@ -265,7 +265,7 @@ static WRITE8_HANDLER( fm7_beeper_w )
 		{
 			beep_set_state(space->machine->device("beeper"),1);
 			logerror("timed beeper on\n");
-			timer_set(space->machine,attotime::from_msec(205),NULL,0,fm7_beeper_off);
+			space->machine->scheduler().timer_set(attotime::from_msec(205), FUNC(fm7_beeper_off));
 		}
 	}
 	logerror("beeper state: %02x\n",data);
@@ -283,7 +283,7 @@ READ8_HANDLER( fm7_sub_beeper_r )
 	{
 		beep_set_state(space->machine->device("beeper"),1);
 		logerror("timed beeper on\n");
-		timer_set(space->machine,attotime::from_msec(205),NULL,0,fm7_beeper_off);
+		space->machine->scheduler().timer_set(attotime::from_msec(205), FUNC(fm7_beeper_off));
 	}
 	return 0xff;
 }
@@ -730,7 +730,7 @@ WRITE8_HANDLER( fm77av_key_encoder_w )
 			fm77av_encoder_handle_command(state);
 
 		// wait 5us to set ACK flag
-		timer_set(space->machine,attotime::from_usec(5),NULL,0,fm77av_encoder_ack);
+		space->machine->scheduler().timer_set(attotime::from_usec(5), FUNC(fm77av_encoder_ack));
 
 		//logerror("ENC: write 0x%02x to data register, moved to pos %i\n",data,state->encoder.position);
 	}
@@ -1695,11 +1695,11 @@ static DRIVER_INIT(fm7)
 	fm7_state *state = machine->driver_data<fm7_state>();
 //  state->shared_ram = auto_alloc_array(machine,UINT8,0x80);
 	state->video_ram = auto_alloc_array(machine,UINT8,0x18000);  // 2 pages on some systems
-	state->timer = timer_alloc(machine,fm7_timer_irq,NULL);
-	state->subtimer = timer_alloc(machine,fm7_subtimer_irq,NULL);
-	state->keyboard_timer = timer_alloc(machine,fm7_keyboard_poll,NULL);
+	state->timer = machine->scheduler().timer_alloc(FUNC(fm7_timer_irq));
+	state->subtimer = machine->scheduler().timer_alloc(FUNC(fm7_subtimer_irq));
+	state->keyboard_timer = machine->scheduler().timer_alloc(FUNC(fm7_keyboard_poll));
 	if(state->type != SYS_FM7)
-		state->fm77av_vsync_timer = timer_alloc(machine,fm77av_vsync,NULL);
+		state->fm77av_vsync_timer = machine->scheduler().timer_alloc(FUNC(fm77av_vsync));
 	cpu_set_irq_callback(machine->device("maincpu"),fm7_irq_ack);
 	cpu_set_irq_callback(machine->device("sub"),fm7_sub_irq_ack);
 }

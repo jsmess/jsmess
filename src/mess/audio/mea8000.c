@@ -507,27 +507,27 @@ static TIMER_CALLBACK( mea8000_timer_expire )
 		if (mea8000->bufpos == 4)
 		{
 			/* we have a successor */
-			LOG(( "%f mea8000_timer_expire: new frame\n", timer_get_time(machine).as_double() ));
+			LOG(( "%f mea8000_timer_expire: new frame\n", machine->time().as_double() ));
 			mea8000_decode_frame(mea8000);
 			mea8000_start_frame(mea8000);
 		}
 		else if (mea8000->cont)
 		{
 			/* repeat mode */
-			LOG(( "%f mea8000_timer_expire: repeat frame\n", timer_get_time(machine).as_double() ));
+			LOG(( "%f mea8000_timer_expire: repeat frame\n", machine->time().as_double() ));
 			mea8000_start_frame(mea8000);
 		}
 		/* slow stop */
 		else if (mea8000->state == MEA8000_STARTED)
 		{
 			mea8000->ampl = 0;
-			LOG(( "%f mea8000_timer_expire: fade frame\n", timer_get_time(machine).as_double() ));
+			LOG(( "%f mea8000_timer_expire: fade frame\n", machine->time().as_double() ));
 			mea8000_start_frame(mea8000);
 			mea8000->state = MEA8000_SLOWING;
 		}
 		else if (mea8000->state == MEA8000_SLOWING)
 		{
-			LOG(( "%f mea8000_timer_expire: stop frame\n", timer_get_time(machine).as_double() ));
+			LOG(( "%f mea8000_timer_expire: stop frame\n", machine->time().as_double() ));
 			mea8000_stop_frame(machine, mea8000);
 		}
 		mea8000_update_req(device);
@@ -555,7 +555,7 @@ READ8_DEVICE_HANDLER ( mea8000_r )
 	case 1:
 		/* ready to accept next frame */
 #if 0
-		LOG(( "$%04x %f: mea8000_r ready=%i\n", cpu_get_previouspc( device->machine->firstcpu ), timer_get_time(machine).as_double(), mea8000_accept_byte( mea8000 ) ));
+		LOG(( "$%04x %f: mea8000_r ready=%i\n", cpu_get_previouspc( device->machine->firstcpu ), machine->time().as_double(), mea8000_accept_byte( mea8000 ) ));
 #endif
 		return mea8000_accept_byte(mea8000) << 7;
 
@@ -576,19 +576,19 @@ WRITE8_DEVICE_HANDLER ( mea8000_w )
 		{
 			/* got pitch byte before first frame */
 			mea8000->pitch = 2 * data;
-			LOG(( "$%04x %f: mea8000_w pitch %i\n", cpu_get_previouspc( device->machine->firstcpu ), timer_get_time(device->machine).as_double(), mea8000->pitch ));
+			LOG(( "$%04x %f: mea8000_w pitch %i\n", cpu_get_previouspc( device->machine->firstcpu ), device->machine->time().as_double(), mea8000->pitch ));
 			mea8000->state = MEA8000_WAIT_FIRST;
 			mea8000->bufpos = 0;
 		}
 		else if (mea8000->bufpos == 4)
 		{
 			/* overflow */
-			LOG(( "$%04x %f: mea8000_w data overflow %02X\n", cpu_get_previouspc( device->machine->firstcpu ), timer_get_time(device->machine).as_double(), data ));
+			LOG(( "$%04x %f: mea8000_w data overflow %02X\n", cpu_get_previouspc( device->machine->firstcpu ), device->machine->time().as_double(), data ));
 		}
 		else
 		{
 			/* enqueue frame byte */
-			LOG(( "$%04x %f: mea8000_w data %02X in frame pos %i\n", cpu_get_previouspc( device->machine->firstcpu ), timer_get_time(device->machine).as_double(),
+			LOG(( "$%04x %f: mea8000_w data %02X in frame pos %i\n", cpu_get_previouspc( device->machine->firstcpu ), device->machine->time().as_double(),
 			      data, mea8000->bufpos ));
 			mea8000->buf[mea8000->bufpos] = data;
 			mea8000->bufpos++;
@@ -622,7 +622,7 @@ WRITE8_DEVICE_HANDLER ( mea8000_w )
 			mea8000_stop_frame(device->machine, mea8000);
 
 		LOG(( "$%04x %f: mea8000_w command %02X stop=%i cont=%i roe=%i\n",
-		      cpu_get_previouspc(device->machine->firstcpu), timer_get_time(device->machine).as_double(), data,
+		      cpu_get_previouspc(device->machine->firstcpu), device->machine->time().as_double(), data,
 		      stop, mea8000->cont, mea8000->roe ));
 
 		mea8000_update_req(device);
@@ -670,7 +670,7 @@ static DEVICE_START( mea8000 )
 
 	mea8000_init_tables(device->machine);
 
-	mea8000->timer = timer_alloc( device->machine, mea8000_timer_expire , (void*)device );
+	mea8000->timer = device->machine->scheduler().timer_alloc(FUNC(mea8000_timer_expire), (void*)device );
 
 	state_save_register_item( device->machine, "mea8000", device->tag(), 0, mea8000->state );
 	state_save_register_item_array( device->machine, "mea8000", device->tag(), 0, mea8000->buf );

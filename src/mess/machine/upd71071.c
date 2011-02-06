@@ -245,7 +245,7 @@ static DEVICE_START(upd71071)
 	dmac->intf = (const upd71071_intf*)device->baseconfig().static_config();
 	for(x=0;x<4;x++)
 	{
-		dmac->timer[x] = timer_alloc(device->machine,dma_transfer_timer,(void*)device);
+		dmac->timer[x] = device->machine->scheduler().timer_alloc(FUNC(dma_transfer_timer), (void*)device);
 	}
 	dmac->selected_channel = 0;
 }

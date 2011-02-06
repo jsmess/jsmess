@@ -728,7 +728,7 @@ static MACHINE_START( scv )
 {
 	scv_state *state = machine->driver_data<scv_state>();
 
-	state->vb_timer = timer_alloc( machine, scv_vb_callback, NULL );
+	state->vb_timer = machine->scheduler().timer_alloc(FUNC(scv_vb_callback));
 }
 
 

@@ -34,7 +34,7 @@
 		if(VERBOSE_LEVEL >= N) \
 		{ \
 			if( M ) \
-				logerror("%11.6f: %-24s", timer_get_time(MACHINE).as_double(), (char*) M ); \
+				logerror("%11.6f: %-24s", MACHINE->time().as_double(), (char*) M ); \
 			logerror A; \
 		} \
 	} while (0)
@@ -766,7 +766,7 @@ static void c64_common_driver_init( running_machine *machine )
 	}
 
 	if (state->tape_on)
-		state->datasette_timer = timer_alloc(machine, c64_tape_timer, NULL);
+		state->datasette_timer = machine->scheduler().timer_alloc(FUNC(c64_tape_timer));
 
 	// "cyberload" tape loader check the e000-ffff ram; the init ram need to return different value
 	{

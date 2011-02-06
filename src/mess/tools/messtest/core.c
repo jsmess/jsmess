@@ -629,7 +629,7 @@ void report_message(messtest_messagetype_t msgtype, const char *fmt, ...)
 	if ((msgtype == MSG_FAILURE) && (state != STATE_ABORTED))
 	{
 		state = STATE_ABORTED;
-		final_time = timer_get_time(machine);
+		final_time = machine->time();
 		if (final_time > 0.0)
 			dump_screenshot();
 	}

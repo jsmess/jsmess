@@ -105,7 +105,7 @@ static READ8_HANDLER(svision_r)
 			svision_irq( space->machine );
 			break;
 		default:
-			logerror("%.6f svision read %04x %02x\n", timer_get_time(space->machine).as_double(),offset,data);
+			logerror("%.6f svision read %04x %02x\n", space->machine->time().as_double(),offset,data);
 			break;
 	}
 
@@ -126,7 +126,7 @@ static WRITE8_HANDLER(svision_w)
 		case 3:
 			break;
 		case 0x26: /* bits 5,6 memory management for a000? */
-			logerror("%.6f svision write %04x %02x\n", timer_get_time(space->machine).as_double(),offset,data);
+			logerror("%.6f svision write %04x %02x\n", space->machine->time().as_double(),offset,data);
 			memory_set_bankptr(space->machine, "bank1", space->machine->region("user1")->base() + ((state->reg[0x26] & 0xe0) << 9));
 			svision_irq( space->machine );
 			break;
@@ -154,7 +154,7 @@ static WRITE8_HANDLER(svision_w)
 			svision_noise_w(state->sound, offset - 0x28, data);
 			break;
 		default:
-			logerror("%.6f svision write %04x %02x\n", timer_get_time(space->machine).as_double(), offset, data);
+			logerror("%.6f svision write %04x %02x\n", space->machine->time().as_double(), offset, data);
 			break;
 	}
 }
@@ -425,7 +425,7 @@ static INTERRUPT_GEN( svision_frame_int )
 static DRIVER_INIT( svision )
 {
 	svision_state *state = machine->driver_data<svision_state>();
-	state->svision.timer1 = timer_alloc(machine, svision_timer, NULL);
+	state->svision.timer1 = machine->scheduler().timer_alloc(FUNC(svision_timer));
 	state->sound = machine->device("custom");
 	state->dma_finished = svision_dma_finished(state->sound);
 	state->pet.on = FALSE;
@@ -435,14 +435,14 @@ static DRIVER_INIT( svision )
 static DRIVER_INIT( svisions )
 {
 	svision_state *state = machine->driver_data<svision_state>();
-	state->svision.timer1 = timer_alloc(machine, svision_timer, NULL);
+	state->svision.timer1 = machine->scheduler().timer_alloc(FUNC(svision_timer));
 	state->sound = machine->device("custom");
 	state->dma_finished = svision_dma_finished(state->sound);
 	memory_set_bankptr(machine, "bank2", machine->region("user1")->base() + 0x1c000);
-	state->svision.timer1 = timer_alloc(machine, svision_timer, NULL);
+	state->svision.timer1 = machine->scheduler().timer_alloc(FUNC(svision_timer));
 	state->pet.on = TRUE;
-	state->pet.timer = timer_alloc(machine, svision_pet_timer, NULL);
-	timer_pulse(machine, attotime::from_seconds(8) * 256/cputag_get_clock(machine, "maincpu"), NULL, 0, svision_pet_timer);
+	state->pet.timer = machine->scheduler().timer_alloc(FUNC(svision_pet_timer));
+	machine->scheduler().timer_pulse(attotime::from_seconds(8) * 256/cputag_get_clock(machine, "maincpu"),FUNC(svision_pet_timer),0);
 }
 
 static DEVICE_IMAGE_LOAD( svision_cart )

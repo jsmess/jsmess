@@ -1356,7 +1356,7 @@ static void corvus_process_command_packet(running_machine *machine, UINT8 invali
 	//
 	// Set up timers for command completion and timeout from host
 	//
-	timer_set(machine, attotime::from_usec(c->delay), NULL, CALLBACK_CTH_MODE, corvus_hdc_callback);
+	machine->scheduler().timer_set(attotime::from_usec(c->delay), FUNC(corvus_hdc_callback), CALLBACK_CTH_MODE);
 	timer_enable(c->timeout_timer, 0);			// We've received enough data, disable the timeout timer
 
 	c->delay = 0;									// Reset delay for next function
@@ -1455,7 +1455,7 @@ UINT8 corvus_hdc_init(running_machine *machine) {
 	c->xmit_bytes = 0;							// We don't have anything to say to the host
 	c->recv_bytes = 0;							// We aren't waiting on additional data from the host
 
-	c->timeout_timer = timer_alloc(machine, corvus_hdc_callback, NULL);	// Set up a timer to handle the four-second host-to-controller timeout
+	c->timeout_timer = machine->scheduler().timer_alloc(FUNC(corvus_hdc_callback));	// Set up a timer to handle the four-second host-to-controller timeout
 	timer_adjust_oneshot(c->timeout_timer, attotime::from_seconds(4), CALLBACK_TIMEOUT);
 	timer_enable(c->timeout_timer, 0);		// Start this timer out disabled
 
@@ -1623,14 +1623,14 @@ READ8_HANDLER ( corvus_hdc_data_r ) {
 		c->xmit_bytes = 0;		// We don't have anything more to say
 		c->recv_bytes = 0;		// No active commands
 
-		timer_set(space->machine, (attotime::from_usec(INTERBYTE_DELAY)), NULL, CALLBACK_HTC_MODE, corvus_hdc_callback);
+		space->machine->scheduler().timer_set((attotime::from_usec(INTERBYTE_DELAY)), FUNC(corvus_hdc_callback), CALLBACK_HTC_MODE);
 
 //      c->status &= ~(CONTROLLER_DIRECTION | CONTROLLER_BUSY); // Put us in Idle, Host-to-Controller mode
 	} else {
 		//
 		// Not finished with this packet.  Insert an interbyte delay and then let the host continue
 		//
-		timer_set(space->machine, (attotime::from_usec(INTERBYTE_DELAY)), NULL, CALLBACK_SAME_MODE, corvus_hdc_callback);
+		space->machine->scheduler().timer_set((attotime::from_usec(INTERBYTE_DELAY)), FUNC(corvus_hdc_callback), CALLBACK_SAME_MODE);
 	}
 
 	return result;
@@ -1704,6 +1704,6 @@ WRITE8_HANDLER ( corvus_hdc_data_w ) {
 		// Make the controller busy for a few microseconds while the command is processed
 		//
 		c->status |= CONTROLLER_BUSY;
-		timer_set(space->machine, (attotime::from_usec(INTERBYTE_DELAY)), NULL, CALLBACK_SAME_MODE, corvus_hdc_callback);
+		space->machine->scheduler().timer_set((attotime::from_usec(INTERBYTE_DELAY)), FUNC(corvus_hdc_callback), CALLBACK_SAME_MODE);
 	}
 }

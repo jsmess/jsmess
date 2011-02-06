@@ -405,8 +405,8 @@ MACHINE_START( z80ne )
 	state_save_register_item( machine, "z80ne", NULL, 0, state->lx383_downsampler );
 	state_save_register_item_array( machine, "z80ne", NULL, 0, state->lx383_key );
 	state_save_register_item( machine, "z80ne", NULL, 0, state->nmi_delay_counter );
-	state->cassette_timer = timer_alloc(machine, z80ne_cassette_tc, NULL);
-	timer_pulse( machine, attotime::from_hz(1000), NULL, 0, z80ne_kbd_scan );
+	state->cassette_timer = machine->scheduler().timer_alloc(FUNC(z80ne_cassette_tc));
+	machine->scheduler().timer_pulse( attotime::from_hz(1000), FUNC(z80ne_kbd_scan));
 }
 
 MACHINE_START( z80net )

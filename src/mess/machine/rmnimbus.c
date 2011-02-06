@@ -202,7 +202,7 @@ static IRQ_CALLBACK(int_callback)
     UINT16  oldreq;
 
 	if (LOG_INTERRUPTS)
-		logerror("(%f) **** Acknowledged interrupt vector %02X\n", timer_get_time(device->machine).as_double(), state->i186.intr.poll_status & 0x1f);
+		logerror("(%f) **** Acknowledged interrupt vector %02X\n", device->machine->time().as_double(), state->i186.intr.poll_status & 0x1f);
 
 	/* clear the interrupt */
 	cpu_set_input_line(device, 0, CLEAR_LINE);
@@ -351,7 +351,7 @@ generate_int:
 	state->i186.intr.pending = 1;
 	cpuexec_trigger(machine, CPU_RESUME_TRIGGER);
 	if (LOG_OPTIMIZATION) logerror("  - trigger due to interrupt pending\n");
-	if (LOG_INTERRUPTS) logerror("(%f) **** Requesting interrupt vector %02X\n", timer_get_time(machine).as_double(), new_vector);
+	if (LOG_INTERRUPTS) logerror("(%f) **** Requesting interrupt vector %02X\n", machine->time().as_double(), new_vector);
 }
 
 
@@ -379,7 +379,7 @@ static void handle_eoi(running_machine *machine,int data)
 			case 0x0f:	state->i186.intr.in_service &= ~0x80;	break;
 			default:	logerror("%05X:ERROR - 80186 EOI with unknown vector %02X\n", cpu_get_pc(machine->device(MAINCPU_TAG)), data & 0x1f);
 		}
-		if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for vector %02X\n", timer_get_time(machine).as_double(), data & 0x1f);
+		if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for vector %02X\n", machine->time().as_double(), data & 0x1f);
 	}
 
 	/* non-specific case */
@@ -392,7 +392,7 @@ static void handle_eoi(running_machine *machine,int data)
 			if ((state->i186.intr.timer & 0x07) == Priority && (state->i186.intr.in_service & 0x01))
 			{
 				state->i186.intr.in_service &= ~0x01;
-				if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for timer\n", timer_get_time(machine).as_double());
+				if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for timer\n", machine->time().as_double());
 				handled=1;
 			}
 
@@ -401,7 +401,7 @@ static void handle_eoi(running_machine *machine,int data)
 				if ((state->i186.intr.dma[IntNo] & 0x07) == Priority && (state->i186.intr.in_service & (0x04 << IntNo)))
 				{
 					state->i186.intr.in_service &= ~(0x04 << IntNo);
-					if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for DMA%d\n", timer_get_time(machine).as_double(), IntNo);
+					if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for DMA%d\n", machine->time().as_double(), IntNo);
 					handled=1;
 				}
 
@@ -410,7 +410,7 @@ static void handle_eoi(running_machine *machine,int data)
 				if ((state->i186.intr.ext[IntNo] & 0x07) == Priority && (state->i186.intr.in_service & (0x10 << IntNo)))
 				{
 					state->i186.intr.in_service &= ~(0x10 << IntNo);
-					if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for INT%d\n", timer_get_time(machine).as_double(), IntNo);
+					if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for INT%d\n", machine->time().as_double(), IntNo);
 					handled=1;
 				}
 		}
@@ -818,14 +818,14 @@ static void nimbus_cpu_init(running_machine *machine)
 	logerror("Machine reset\n");
 
 	/* create timers here so they stick around */
-	state->i186.timer[0].int_timer = timer_alloc(machine, internal_timer_int, NULL);
-	state->i186.timer[1].int_timer = timer_alloc(machine, internal_timer_int, NULL);
-	state->i186.timer[2].int_timer = timer_alloc(machine, internal_timer_int, NULL);
-	state->i186.timer[0].time_timer = timer_alloc(machine, NULL, NULL);
-	state->i186.timer[1].time_timer = timer_alloc(machine, NULL, NULL);
-	state->i186.timer[2].time_timer = timer_alloc(machine, NULL, NULL);
-	state->i186.dma[0].finish_timer = timer_alloc(machine, dma_timer_callback, NULL);
-	state->i186.dma[1].finish_timer = timer_alloc(machine, dma_timer_callback, NULL);
+	state->i186.timer[0].int_timer = machine->scheduler().timer_alloc(FUNC(internal_timer_int));
+	state->i186.timer[1].int_timer = machine->scheduler().timer_alloc(FUNC(internal_timer_int));
+	state->i186.timer[2].int_timer = machine->scheduler().timer_alloc(FUNC(internal_timer_int));
+	state->i186.timer[0].time_timer = machine->scheduler().timer_alloc(FUNC(NULL));
+	state->i186.timer[1].time_timer = machine->scheduler().timer_alloc(FUNC(NULL));
+	state->i186.timer[2].time_timer = machine->scheduler().timer_alloc(FUNC(NULL));
+	state->i186.dma[0].finish_timer = machine->scheduler().timer_alloc(FUNC(dma_timer_callback));
+	state->i186.dma[1].finish_timer = machine->scheduler().timer_alloc(FUNC(dma_timer_callback));
 }
 
 static void nimbus_cpu_reset(running_machine *machine)
@@ -1277,8 +1277,8 @@ MACHINE_START( nimbus )
 	/* init cpu */
 	nimbus_cpu_init(machine);
 
-	state->keyboard.keyscan_timer=timer_alloc(machine, keyscan_callback, NULL);
-	state->nimbus_mouse.mouse_timer=timer_alloc(machine, mouse_callback, NULL);
+	state->keyboard.keyscan_timer=machine->scheduler().timer_alloc(FUNC(keyscan_callback));
+	state->nimbus_mouse.mouse_timer=machine->scheduler().timer_alloc(FUNC(mouse_callback));
 
 	/* setup debug commands */
 	if (machine->debug_flags & DEBUG_FLAG_ENABLED)

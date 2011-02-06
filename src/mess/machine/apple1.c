@@ -159,7 +159,7 @@ DRIVER_INIT( apple1 )
 
        A 120-Hz poll rate seems to be fast enough to ensure no
        keystrokes are missed. */
-	timer_pulse(machine, attotime::from_hz(120), NULL, 0, apple1_kbd_poll);
+	machine->scheduler().timer_pulse(attotime::from_hz(120), FUNC(apple1_kbd_poll));
 }
 
 
@@ -367,7 +367,7 @@ static TIMER_CALLBACK(apple1_kbd_poll)
 		/* The keyboard will pulse its strobe line when a key is
            pressed.  A 10-usec pulse is typical. */
 		pia6821_ca1_w(pia, 1);
-		timer_set(machine, attotime::from_usec(10), NULL, 0, apple1_kbd_strobe_end);
+		machine->scheduler().timer_set(attotime::from_usec(10), FUNC(apple1_kbd_strobe_end));
 	}
 }
 
@@ -413,7 +413,7 @@ static WRITE8_DEVICE_HANDLER( apple1_pia0_dsp_write_signal )
        write.  Thus the write delay depends on the cursor position and
        where the display is in the refresh cycle. */
 	if (!data)
-		timer_set(device->machine, apple1_vh_dsp_time_to_ready(device->machine), NULL, 0, apple1_dsp_ready_start);
+		device->machine->scheduler().timer_set(apple1_vh_dsp_time_to_ready(device->machine), FUNC(apple1_dsp_ready_start));
 }
 
 static TIMER_CALLBACK(apple1_dsp_ready_start)
@@ -425,7 +425,7 @@ static TIMER_CALLBACK(apple1_dsp_ready_start)
        input CB1.  The end of this pulse will tell the PIA that the
        display is ready for another write. */
 	pia6821_cb1_w(pia, 0);
-	timer_set(machine, attotime::from_nsec(3500), NULL, 0, apple1_dsp_ready_end);
+	machine->scheduler().timer_set(attotime::from_nsec(3500), FUNC(apple1_dsp_ready_end));
 }
 
 static TIMER_CALLBACK(apple1_dsp_ready_end)

@@ -154,14 +154,10 @@ running_machine::running_machine(const machine_config &_config, osd_interface &o
 	  sample_rate(options_get_int(&options, OPTION_SAMPLERATE)),
 	  debug_flags(0),
       ui_active(false),
-	  mame_data(NULL),
-	  timer_data(NULL),
 	  state_data(NULL),
 	  memory_data(NULL),
 	  palette_data(NULL),
 	  tilemap_data(NULL),
-	  streams_data(NULL),
-	  devices_data(NULL),
 	  romload_data(NULL),
 	  input_data(NULL),
 	  input_port_data(NULL),
@@ -274,11 +270,11 @@ void running_machine::start()
 	m_render = auto_alloc(this, render_manager(*this));
 	generic_machine_init(this);
 	generic_sound_init(this);
+	
+	m_scheduler.register_for_save();
 
-	// initialize the timers and allocate a soft_reset timer
-	// this must be done before cpu_init so that CPU's can allocate timers
-	timer_init(this);
-	m_soft_reset_timer = timer_alloc(this, static_soft_reset, NULL);
+	// allocate a soft_reset timer
+	m_soft_reset_timer = m_scheduler.timer_alloc(MFUNC(timer_expired, running_machine, soft_reset), this);
 
 	// init the osd layer
 	m_osd.init(*this);
@@ -288,7 +284,7 @@ void running_machine::start()
 	ui_init(this);
 
 	// initialize the base time (needed for doing record/playback)
-	time(&m_base_time);
+	::time(&m_base_time);
 
 	// initialize the input system and input ports for the game
 	// this must be done before memory_init in order to allow specifying
@@ -386,7 +382,7 @@ int running_machine::run(bool firstrun)
 		ui_display_startup_screens(this, firstrun, !settingsloaded);
 
 		// perform a soft reset -- this takes us to the running phase
-		soft_reset();
+		soft_reset(*this);
 
 		// run the CPUs until a reset or exit
 		m_hard_reset_pending = false;
@@ -466,7 +462,7 @@ void running_machine::schedule_exit()
 	m_scheduler.eat_all_cycles();
 
 	// if we're autosaving on exit, schedule a save as well
-	if (options_get_bool(&m_options, OPTION_AUTOSAVE) && (m_game.flags & GAME_SUPPORTS_SAVE) && timer_get_time(this) > attotime::zero)
+	if (options_get_bool(&m_options, OPTION_AUTOSAVE) && (m_game.flags & GAME_SUPPORTS_SAVE) && this->time() > attotime::zero)
 		schedule_save("auto");
 }
 
@@ -550,7 +546,7 @@ void running_machine::schedule_save(const char *filename)
 
 	// note the start time and set a timer for the next timeslice to actually schedule it
 	m_saveload_schedule = SLS_SAVE;
-	m_saveload_schedule_time = timer_get_time(this);
+	m_saveload_schedule_time = this->time();
 
 	// we can't be paused since we need to clear out anonymous timers
 	resume();
@@ -569,7 +565,7 @@ void running_machine::schedule_load(const char *filename)
 
 	// note the start time and set a timer for the next timeslice to actually schedule it
 	m_saveload_schedule = SLS_LOAD;
-	m_saveload_schedule_time = timer_get_time(this);
+	m_saveload_schedule_time = this->time();
 
 	// we can't be paused since we need to clear out anonymous timers
 	resume();
@@ -735,7 +731,7 @@ void running_machine::base_datetime(system_time &systime)
 
 void running_machine::current_datetime(system_time &systime)
 {
-	systime.set(m_base_time + timer_get_time(this).seconds);
+	systime.set(m_base_time + this->time().seconds);
 }
 
 
@@ -783,10 +779,10 @@ void running_machine::handle_saveload()
 
 	// if there are anonymous timers, we can't save just yet, and we can't load yet either
 	// because the timers might overwrite data we have loaded
-	if (timer_count_anonymous(this) > 0)
+	if (m_scheduler.can_save())
 	{
 		// if more than a second has passed, we're probably screwed
-		if ((timer_get_time(this) - m_saveload_schedule_time) > attotime::from_seconds(1))
+		if ((this->time() - m_saveload_schedule_time) > attotime::from_seconds(1))
 		{
 			popmessage("Unable to %s due to pending anonymous timers. See error.log for details.", opname);
 			goto cancel;
@@ -856,9 +852,7 @@ cancel:
 //  of the system
 //-------------------------------------------------
 
-TIMER_CALLBACK( running_machine::static_soft_reset ) { machine->soft_reset(); }
-
-void running_machine::soft_reset()
+void running_machine::soft_reset(running_machine &machine, int param)
 {
 	logerror("Soft reset\n");
 
@@ -870,9 +864,6 @@ void running_machine::soft_reset()
 
 	// now we're running
 	m_current_phase = MACHINE_PHASE_RUNNING;
-
-	// allow 0-time queued callbacks to run before any CPUs execute
-	timer_execute_timers(this);
 }
 
 

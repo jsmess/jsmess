@@ -142,7 +142,7 @@ VIDEO_UPDATE ( hp48 )
 	int menu_start    = HP48_IO_20(0x30) & ~1;       /* menu bitmap address */
 	int fg = contrast + 2;
 
-	LOG(( "%f hp48 video_update called: ", timer_get_time(screen->machine).as_double()));
+	LOG(( "%f hp48 video_update called: ", screen->machine->time().as_double()));
 
 	if ( !display || refresh )
 	{

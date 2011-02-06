@@ -801,7 +801,7 @@ static void internal_video_start_coco3(running_machine *machine, m6847_type type
 	}
 
 	/* GIME field sync timer */
-	video->gime_fs_timer = timer_alloc(machine, gime_fs, NULL);
+	video->gime_fs_timer = machine->scheduler().timer_alloc(FUNC(gime_fs));
 
 	/* initialize the CoCo video code */
 	memset(&cfg, 0, sizeof(cfg));

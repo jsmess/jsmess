@@ -137,7 +137,7 @@ static MACHINE_START(4004clk)
 	state->timer = 0;
 	state->dac = machine->device("dac");
 
-	timer_pulse(machine, attotime::from_hz(120), NULL, 0, timer_callback);
+	machine->scheduler().timer_pulse(attotime::from_hz(120), FUNC(timer_callback));
 
 	/* register for state saving */
 	state_save_register_global(machine, state->timer);

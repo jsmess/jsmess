@@ -1088,7 +1088,7 @@ MACHINE_RESET( bebox )
 	state->devices.dma8237_1 = NULL;
 	state->devices.dma8237_2 = NULL;
 
-	timer_set(machine,  attotime::zero, NULL, 0, bebox_get_devices );
+	machine->scheduler().timer_set(attotime::zero, FUNC(bebox_get_devices));
 
 	cputag_set_input_line(machine, "ppc1", INPUT_LINE_RESET, CLEAR_LINE);
 	cputag_set_input_line(machine, "ppc2", INPUT_LINE_RESET, ASSERT_LINE);

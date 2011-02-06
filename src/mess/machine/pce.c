@@ -1269,19 +1269,19 @@ static void pce_cd_init( running_machine *machine )
 		}
 	}
 
-	pce_cd.data_timer = timer_alloc(machine,  pce_cd_data_timer_callback , NULL);
+	pce_cd.data_timer = machine->scheduler().timer_alloc(FUNC(pce_cd_data_timer_callback));
 	timer_adjust_oneshot(pce_cd.data_timer, attotime::never, 0);
-	pce_cd.adpcm_dma_timer = timer_alloc(machine,  pce_cd_adpcm_dma_timer_callback , NULL);
+	pce_cd.adpcm_dma_timer = machine->scheduler().timer_alloc(FUNC(pce_cd_adpcm_dma_timer_callback));
 	timer_adjust_oneshot(pce_cd.adpcm_dma_timer, attotime::never, 0);
 
-	pce_cd.cdda_fadeout_timer = timer_alloc(machine,  pce_cd_cdda_fadeout_callback , NULL);
+	pce_cd.cdda_fadeout_timer = machine->scheduler().timer_alloc(FUNC(pce_cd_cdda_fadeout_callback));
 	timer_adjust_oneshot(pce_cd.cdda_fadeout_timer, attotime::never, 0);
-	pce_cd.cdda_fadein_timer = timer_alloc(machine,  pce_cd_cdda_fadein_callback , NULL);
+	pce_cd.cdda_fadein_timer = machine->scheduler().timer_alloc(FUNC(pce_cd_cdda_fadein_callback));
 	timer_adjust_oneshot(pce_cd.cdda_fadein_timer, attotime::never, 0);
 
-	pce_cd.adpcm_fadeout_timer = timer_alloc(machine,  pce_cd_adpcm_fadeout_callback , NULL);
+	pce_cd.adpcm_fadeout_timer = machine->scheduler().timer_alloc(FUNC(pce_cd_adpcm_fadeout_callback));
 	timer_adjust_oneshot(pce_cd.adpcm_fadeout_timer, attotime::never, 0);
-	pce_cd.adpcm_fadein_timer = timer_alloc(machine,  pce_cd_adpcm_fadein_callback , NULL);
+	pce_cd.adpcm_fadein_timer = machine->scheduler().timer_alloc(FUNC(pce_cd_adpcm_fadein_callback));
 	timer_adjust_oneshot(pce_cd.adpcm_fadein_timer, attotime::never, 0);
 }
 
@@ -1581,7 +1581,7 @@ static UINT8 pce_cd_get_cd_data_byte(running_machine *machine)
 		if ( pce_cd.scsi_IO )
 		{
 			pce_cd.scsi_ACK = 1;
-			timer_set(machine, machine->device<cpu_device>("maincpu")->cycles_to_attotime(15), NULL, 0, pce_cd_clear_ack );
+			machine->scheduler().timer_set(machine->device<cpu_device>("maincpu")->cycles_to_attotime(15), FUNC(pce_cd_clear_ack));
 		}
 	}
 	return data;

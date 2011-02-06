@@ -24,7 +24,7 @@
 		if(VERBOSE_LEVEL >= N) \
 		{ \
 			if( M ) \
-				logerror("%11.6f: %-24s", timer_get_time(MACHINE).as_double(), (char*) M ); \
+				logerror("%11.6f: %-24s", MACHINE->time().as_double(), (char*) M ); \
 			logerror A; \
 		} \
 	} while (0)
@@ -716,11 +716,11 @@ static void pet_common_driver_init( running_machine *machine )
 	}
 
 	/* pet clock */
-	timer_pulse(machine, attotime::from_msec(10), NULL, 0, pet_interrupt);
+	machine->scheduler().timer_pulse(attotime::from_msec(10), FUNC(pet_interrupt));
 
 	/* datasette */
-	state->datasette1_timer = timer_alloc(machine, pet_tape1_timer, NULL);
-	state->datasette2_timer = timer_alloc(machine, pet_tape2_timer, NULL);
+	state->datasette1_timer = machine->scheduler().timer_alloc(FUNC(pet_tape1_timer));
+	state->datasette2_timer = machine->scheduler().timer_alloc(FUNC(pet_tape2_timer));
 }
 
 

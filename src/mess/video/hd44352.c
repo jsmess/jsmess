@@ -109,7 +109,7 @@ void hd44352_device::device_start()
 {
 	devcb_resolve_write_line(&m_on, &m_config.m_on, this);
 
-	m_on_timer = device_timer_alloc(*this, ON_TIMER);
+	m_on_timer = timer_alloc(ON_TIMER);
 	timer_adjust_periodic(m_on_timer, attotime::from_hz(m_clock/16384), 0, attotime::from_hz(m_clock/16384));
 
 	state_save_register_device_item( this, 0, m_control_lines);

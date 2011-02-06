@@ -344,7 +344,7 @@ static DEVICE_START( ti99_fdc )
 	peb_callback_if *topeb = (peb_callback_if *)device->baseconfig().static_config();
 	devcb_resolve_write_line(&card->lines.ready, &topeb->ready, device);
 
-	card->motor_on_timer = timer_alloc(device->machine, motor_on_timer_callback, (void *)device);
+	card->motor_on_timer = device->machine->scheduler().timer_alloc(FUNC(motor_on_timer_callback), (void *)device);
 
 	astring *region = new astring();
 	astring_assemble_3(region, device->tag(), ":", fdc_region);

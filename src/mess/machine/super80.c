@@ -209,7 +209,7 @@ MACHINE_RESET( super80 )
 {
 	super80_state *state = machine->driver_data<super80_state>();
 	state->super80_shared=0xff;
-	timer_set(machine, attotime::from_usec(10), NULL, 0, super80_reset);
+	machine->scheduler().timer_set(attotime::from_usec(10), FUNC(super80_reset));
 	memory_set_bank(machine, "boot", 1);
 	state->z80pio = machine->device("z80pio");
 	state->speaker = machine->device("speaker");
@@ -221,12 +221,12 @@ static void driver_init_common( running_machine *machine )
 {
 	UINT8 *RAM = machine->region("maincpu")->base();
 	memory_configure_bank(machine, "boot", 0, 2, &RAM[0x0000], 0xc000);
-	timer_pulse(machine, attotime::from_hz(200000),NULL,0,super80_timer);	/* timer for keyboard and cassette */
+	machine->scheduler().timer_pulse(attotime::from_hz(200000), FUNC(super80_timer));	/* timer for keyboard and cassette */
 }
 
 DRIVER_INIT( super80 )
 {
-	timer_pulse(machine, attotime::from_hz(100),NULL,0,super80_halfspeed);	/* timer for 1MHz slowdown */
+	machine->scheduler().timer_pulse(attotime::from_hz(100), FUNC(super80_halfspeed));	/* timer for 1MHz slowdown */
 	driver_init_common(machine);
 }
 

@@ -47,7 +47,7 @@ static TIMER_CALLBACK( lviv_reset )
 DIRECT_UPDATE_HANDLER(lviv_directoverride)
 {
 	if (input_port_read(machine, "RESET") & 0x01)
-		timer_set(machine, attotime::from_usec(10), NULL, 0, lviv_reset);
+		machine->scheduler().timer_set(attotime::from_usec(10), FUNC(lviv_reset));
 	return address;
 }
 
@@ -248,7 +248,7 @@ MACHINE_RESET( lviv )
 	memory_set_bankptr(machine,"bank3", machine->region("maincpu")->base() + 0x010000);
 	memory_set_bankptr(machine,"bank4", machine->region("maincpu")->base() + 0x010000);
 
-	/*timer_pulse(machine, TIME_IN_NSEC(200), NULL, 0, lviv_draw_pixel);*/
+	/*machine->scheduler().timer_pulse(TIME_IN_NSEC(200), FUNC(lviv_draw_pixel));*/
 
 	/*memset(ram_get_ptr(machine->device(RAM_TAG)), 0, sizeof(unsigned char)*0xffff);*/
 }

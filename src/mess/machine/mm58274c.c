@@ -471,9 +471,9 @@ static DEVICE_START( mm58274c )
 	state_save_register_item(device->machine, "mm58274c", device->tag(), 0, mm58274c->seconds2);
 	state_save_register_item(device->machine, "mm58274c", device->tag(), 0, mm58274c->tenths);
 
-	mm58274c->increment_rtc = timer_alloc(device->machine, increment_rtc, ((void*)device));
+	mm58274c->increment_rtc = device->machine->scheduler().timer_alloc(FUNC(increment_rtc), ((void*)device));
 	timer_adjust_periodic(mm58274c->increment_rtc, attotime::zero, 0, attotime::from_msec(100));
-	mm58274c->interrupt_timer = timer_alloc(device->machine, rtc_interrupt_callback, ((void*)device));
+	mm58274c->interrupt_timer = device->machine->scheduler().timer_alloc(FUNC(rtc_interrupt_callback), ((void*)device));
 }
 
 

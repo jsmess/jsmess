@@ -783,9 +783,9 @@ INPUT_PORTS_END
 static MACHINE_START(a7000)
 {
 	a7000_state *state = machine->driver_data<a7000_state>();
-	state->IOMD_timer[0] = timer_alloc(machine, IOMD_timer0_callback, NULL);
-	state->IOMD_timer[1] = timer_alloc(machine, IOMD_timer1_callback, NULL);
-	state->flyback_timer = timer_alloc(machine, flyback_timer_callback, NULL);
+	state->IOMD_timer[0] = machine->scheduler().timer_alloc(FUNC(IOMD_timer0_callback));
+	state->IOMD_timer[1] = machine->scheduler().timer_alloc(FUNC(IOMD_timer1_callback));
+	state->flyback_timer = machine->scheduler().timer_alloc(FUNC(flyback_timer_callback));
 
 	state->io_id = 0xd4e7;
 }

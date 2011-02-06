@@ -287,7 +287,7 @@ static DEVICE_START( teleprinter )
 
 	devcb_resolve_write8(&term->teleprinter_keyboard_func, &intf->teleprinter_keyboard_func, device);
 
-	timer_pulse(device->machine, attotime::from_hz(240), (void*)device, 0, keyboard_callback);
+	device->machine->scheduler().timer_pulse(attotime::from_hz(240), FUNC(keyboard_callback), 0, (void*)device);
 }
 
 /*-------------------------------------------------

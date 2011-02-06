@@ -971,7 +971,7 @@ void sg1000_state::machine_start()
 	TMS9928A_configure(&tms9928a_interface);
 
 	/* toggle light gun crosshair */
-	timer_set(machine, attotime::zero, NULL, 0, lightgun_tick);
+	machine->scheduler().timer_set(attotime::zero, FUNC(lightgun_tick));
 
 	/* register for state saving */
 	state_save_register_global(machine, m_tvdraw_data);
@@ -987,7 +987,7 @@ void sc3000_state::machine_start()
 	TMS9928A_configure(&tms9928a_interface);
 
 	/* toggle light gun crosshair */
-	timer_set(machine, attotime::zero, NULL, 0, lightgun_tick);
+	machine->scheduler().timer_set(attotime::zero, FUNC(lightgun_tick));
 
 	/* register for state saving */
 	state_save_register_global(machine, m_tvdraw_data);

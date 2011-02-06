@@ -1216,7 +1216,7 @@ static void towns_cd_set_status(running_machine* machine, UINT8 st0, UINT8 st1, 
 	state->towns_cd.cmd_status[2] = st2;
 	state->towns_cd.cmd_status[3] = st3;
 	// wait a bit
-	timer_set(machine,attotime::from_msec(1),machine,0,towns_cd_status_ready);
+	machine->scheduler().timer_set(attotime::from_msec(1), FUNC(towns_cd_status_ready), 0, machine);
 }
 
 static UINT8 towns_cd_get_track(running_machine* machine)
@@ -1420,7 +1420,7 @@ static void towns_cdrom_execute_command(device_t* device)
 				break;
 			case 0x04:  // Play Audio Track
 				logerror("CD: Command 0x04: PLAY CD-DA\n");
-				timer_set(device->machine,attotime::from_msec(1),device,0,towns_delay_cdda);
+				device->machine->scheduler().timer_set(attotime::from_msec(1), FUNC(towns_delay_cdda), 0, device);
 				break;
 			case 0x05:  // Read TOC
 				logerror("CD: Command 0x05: READ TOC\n");
@@ -2271,12 +2271,12 @@ static DRIVER_INIT( towns )
 	state->towns_serial_rom = auto_alloc_array(machine,UINT8,256/8);
 	towns_init_serial_rom(machine);
 	towns_init_rtc(machine);
-	state->towns_rtc_timer = timer_alloc(machine,rtc_second,NULL);
-	state->towns_kb_timer = timer_alloc(machine,poll_keyboard,NULL);
-	state->towns_mouse_timer = timer_alloc(machine,towns_mouse_timeout,NULL);
+	state->towns_rtc_timer = machine->scheduler().timer_alloc(FUNC(rtc_second));
+	state->towns_kb_timer = machine->scheduler().timer_alloc(FUNC(poll_keyboard));
+	state->towns_mouse_timer = machine->scheduler().timer_alloc(FUNC(towns_mouse_timeout));
 
 	// CD-ROM init
-	state->towns_cd.read_timer = timer_alloc(machine,towns_cdrom_read_byte,(void*)machine->device("dma_1"));
+	state->towns_cd.read_timer = machine->scheduler().timer_alloc(FUNC(towns_cdrom_read_byte), (void*)machine->device("dma_1"));
 
 	cpu_set_irq_callback(machine->device("maincpu"), towns_irq_callback);
 	memory_install_ram(cputag_get_address_space(machine,"maincpu",ADDRESS_SPACE_PROGRAM),0x100000,ram_get_size(machine->device(RAM_TAG))-1,0xffffffff,0,NULL);

@@ -333,7 +333,7 @@ static void cybiko_rs232_init(running_machine *machine)
 	cybiko_state *state = machine->driver_data<cybiko_state>();
 	_logerror( 0, ("cybiko_rs232_init\n"));
 	memset( &state->rs232, 0, sizeof( state->rs232));
-//  timer_pulse(machine,  TIME_IN_HZ( 10), NULL, 0, rs232_timer_callback);
+//  machine->scheduler().timer_pulse(TIME_IN_HZ( 10), FUNC(rs232_timer_callback));
 }
 
 static void cybiko_rs232_exit( void)

@@ -611,7 +611,7 @@ static TIMER_CALLBACK(set_COPS_ready)
 	state->COPS_Ready = 1;
 
 	/* impulsion width : +/- 20us */
-	timer_set(machine, attotime::from_usec(20), NULL, 0, read_COPS_command);
+	machine->scheduler().timer_set(attotime::from_usec(20), FUNC(read_COPS_command));
 }
 
 static void reset_COPS(lisa_state *state)
@@ -1044,10 +1044,10 @@ DRIVER_INIT( mac_xl )
 MACHINE_START( lisa )
 {
 	lisa_state *state = machine->driver_data<lisa_state>();
-	state->mouse_timer = timer_alloc(machine, handle_mouse, NULL);
+	state->mouse_timer = machine->scheduler().timer_alloc(FUNC(handle_mouse));
 
 	/* read command every ms (don't know the real value) */
-	timer_pulse(machine, attotime::from_msec(1), NULL, 0, set_COPS_ready);
+	machine->scheduler().timer_pulse(attotime::from_msec(1), FUNC(set_COPS_ready));
 }
 
 MACHINE_RESET( lisa )

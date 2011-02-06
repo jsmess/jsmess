@@ -210,7 +210,7 @@ int pc_hdc_setup(running_machine *machine, void (*hdc_set_irq_func)(running_mach
 		error[i] = 0;
 		dip[i] = 0xff;
 		pc_hdc_dma8237 = NULL;
-		timer[i] = timer_alloc(machine, pc_hdc_command, NULL);
+		timer[i] = machine->scheduler().timer_alloc(FUNC(pc_hdc_command));
 		if (!timer[i])
 			return -1;
 	}

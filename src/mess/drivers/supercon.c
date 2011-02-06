@@ -550,10 +550,10 @@ static MACHINE_START( supercon )
 	state->led_update=TRUE;
 	state->remove_led_flag=TRUE;
 
-	state->timer_update_irq = timer_alloc(machine,update_irq,NULL);
+	state->timer_update_irq = machine->scheduler().timer_alloc(FUNC(update_irq));
 	timer_adjust_periodic( state->timer_update_irq, attotime::zero, 0, attotime::from_hz(1000) );
 
-	timer_pulse(machine, attotime::from_hz(20), NULL, 0, update_artwork);
+	machine->scheduler().timer_pulse(attotime::from_hz(20), FUNC(update_artwork));
 
 	state_save_register_global_array(machine,state->save_board);
 	state_save_register_postload(machine,m_board_postload,NULL);

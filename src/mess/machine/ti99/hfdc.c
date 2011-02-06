@@ -654,7 +654,7 @@ static DEVICE_START( ti99_hfdc )
 	devcb_resolve_write_line(&card->lines.inta, &topeb->inta, device);
 	// The HFDC does not use READY; it has on-board RAM for DMA
 
-	card->motor_on_timer = timer_alloc(device->machine, motor_on_timer_callback, (void *)device);
+	card->motor_on_timer = device->machine->scheduler().timer_alloc(FUNC(motor_on_timer_callback), (void *)device);
 	card->ram = NULL;
 	card->ram_offset[0] = 0x2000; // static bank
 	card->controller = device->subdevice("smc92x4");

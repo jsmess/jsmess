@@ -316,7 +316,7 @@ void i8155_device::device_start()
 	devcb_resolve_write_line(&m_out_to_func, &m_config.out_to_func, this);
 
 	// allocate timers
-	m_timer = device_timer_alloc(*this);
+	m_timer = timer_alloc();
 
 	// register for state saving
 	state_save_register_device_item(this, 0, m_io_m);

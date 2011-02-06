@@ -110,9 +110,9 @@ static DEVICE_START(coco_cartridge)
 
 	for( i=0; i<TIMER_POOL; i++ )
 	{
-	   cococart->cart_line.timer[i]		= timer_alloc(device->machine, cart_timer_callback, (void *) device);
-	   cococart->nmi_line.timer[i] 		= timer_alloc(device->machine, nmi_timer_callback, (void *) device);
-	   cococart->halt_line.timer[i]		= timer_alloc(device->machine, halt_timer_callback, (void *) device);
+	   cococart->cart_line.timer[i]		= device->machine->scheduler().timer_alloc(FUNC(cart_timer_callback), (void *) device);
+	   cococart->nmi_line.timer[i] 		= device->machine->scheduler().timer_alloc(FUNC(nmi_timer_callback), (void *) device);
+	   cococart->halt_line.timer[i]		= device->machine->scheduler().timer_alloc(FUNC(halt_timer_callback), (void *) device);
 	}
    
 	cococart->cart_line.timer_index     = 0;

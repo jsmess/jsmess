@@ -173,8 +173,8 @@ void ef9345_device::device_start()
 
 	assert(m_screen != NULL);
 
-	m_busy_timer = device_timer_alloc(*this, BUSY_TIMER);
-	m_blink_timer = device_timer_alloc(*this, BLINKING_TIMER);
+	m_busy_timer = timer_alloc(BUSY_TIMER);
+	m_blink_timer = timer_alloc(BLINKING_TIMER);
 
 	m_videoram = space(0);
 	m_charset = region();

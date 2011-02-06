@@ -546,12 +546,12 @@ crt9007_device::crt9007_device(running_machine &_machine, const crt9007_device_c
 void crt9007_device::device_start()
 {
 	// allocate timers
-	m_hsync_timer = device_timer_alloc(*this, TIMER_HSYNC);
-	m_vsync_timer = device_timer_alloc(*this, TIMER_VSYNC);
-	m_vlt_timer = device_timer_alloc(*this, TIMER_VLT);
-	m_curs_timer = device_timer_alloc(*this, TIMER_CURS);
-	m_drb_timer = device_timer_alloc(*this, TIMER_DRB);
-	m_dma_timer = device_timer_alloc(*this, TIMER_DMA);
+	m_hsync_timer = timer_alloc(TIMER_HSYNC);
+	m_vsync_timer = timer_alloc(TIMER_VSYNC);
+	m_vlt_timer = timer_alloc(TIMER_VLT);
+	m_curs_timer = timer_alloc(TIMER_CURS);
+	m_drb_timer = timer_alloc(TIMER_DRB);
+	m_dma_timer = timer_alloc(TIMER_DMA);
 
 	// resolve callbacks
 	devcb_resolve_write_line(&m_out_int_func, &m_config.out_int_func, this);

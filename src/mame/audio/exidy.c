@@ -495,7 +495,7 @@ static WRITE8_DEVICE_HANDLER( r6532_porta_w )
 
 	if (state->tms != NULL)
 	{
-		logerror("(%f)%s:TMS5220 data write = %02X\n", timer_get_time(device->machine).as_double(), cpuexec_describe_context(device->machine), riot6532_porta_out_get(state->riot));
+		logerror("(%f)%s:TMS5220 data write = %02X\n", device->machine->time().as_double(), cpuexec_describe_context(device->machine), riot6532_porta_out_get(state->riot));
 		tms5220_data_w(state->tms, 0, data);
 	}
 }
@@ -505,7 +505,7 @@ static READ8_DEVICE_HANDLER( r6532_porta_r )
 	exidy_sound_state *state = get_safe_token(device);
 	if (state->tms != NULL)
 	{
-		logerror("(%f)%s:TMS5220 status read = %02X\n", timer_get_time(device->machine).as_double(), cpuexec_describe_context(device->machine), tms5220_status_r(state->tms, 0));
+		logerror("(%f)%s:TMS5220 status read = %02X\n", device->machine->time().as_double(), cpuexec_describe_context(device->machine), tms5220_status_r(state->tms, 0));
 		return tms5220_status_r(state->tms, 0);
 	}
 	else
@@ -1008,7 +1008,7 @@ WRITE8_DEVICE_HANDLER( victory_sound_command_w )
 
 	if (VICTORY_LOG_SOUND) logerror("%04X:!!!! Sound command = %02X\n", cpu_get_previouspc(state->maincpu), data);
 
-	timer_call_after_resynch(device->machine, state->pia1, data, delayed_command_w);
+	device->machine->scheduler().synchronize(FUNC(delayed_command_w), data, state->pia1);
 }
 
 

@@ -102,7 +102,7 @@ static void amiga_ar1_nmi( running_machine *machine )
 
 		/* trigger NMI irq */
 		amiga_ar1_spurious = 0;
-		timer_set(machine,  machine->device<cpu_device>("maincpu")->cycles_to_attotime(28), NULL, 0, amiga_ar1_delayed_nmi );
+		machine->scheduler().timer_set(machine->device<cpu_device>("maincpu")->cycles_to_attotime(28), FUNC(amiga_ar1_delayed_nmi));
 	}
 }
 
@@ -120,7 +120,7 @@ static WRITE16_HANDLER( amiga_ar1_chipmem_w )
 		{
 			/* trigger an NMI or spurious irq */
 			amiga_ar1_spurious = (offset == 0x60/2) ? 0 : 1;
-			timer_set(space->machine,  space->machine->device<cpu_device>("maincpu")->cycles_to_attotime(28), NULL, 0, amiga_ar1_delayed_nmi );
+			space->machine->scheduler().timer_set(space->machine->device<cpu_device>("maincpu")->cycles_to_attotime(28), FUNC(amiga_ar1_delayed_nmi));
 		}
 	}
 

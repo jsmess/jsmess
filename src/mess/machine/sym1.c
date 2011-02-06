@@ -295,7 +295,7 @@ DRIVER_INIT( sym1 )
 	}
 
 	/* allocate a timer to refresh the led display */
-	state->led_update = timer_alloc(machine, led_refresh, NULL);
+	state->led_update = machine->scheduler().timer_alloc(FUNC(led_refresh));
 }
 
 

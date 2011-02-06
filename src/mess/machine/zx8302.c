@@ -350,11 +350,11 @@ void zx8302_device::device_start()
 	devcb_resolve_read_line(&m_in_raw2_func, &m_config.in_raw2_func, this);
 
 	// allocate timers
-	m_txd_timer = device_timer_alloc(*this, TIMER_TXD);
-	m_baudx4_timer = device_timer_alloc(*this, TIMER_BAUDX4);
-	m_rtc_timer = device_timer_alloc(*this, TIMER_RTC);
-	m_gap_timer = device_timer_alloc(*this, TIMER_GAP);
-	m_ipc_timer = device_timer_alloc(*this, TIMER_IPC);
+	m_txd_timer = timer_alloc(TIMER_TXD);
+	m_baudx4_timer = timer_alloc(TIMER_BAUDX4);
+	m_rtc_timer = timer_alloc(TIMER_RTC);
+	m_gap_timer = timer_alloc(TIMER_GAP);
+	m_ipc_timer = timer_alloc(TIMER_IPC);
 
 	timer_adjust_periodic(m_rtc_timer, attotime::zero, 0, attotime::from_hz(m_config.rtc_clock / 32768));
 	timer_adjust_periodic(m_gap_timer, attotime::zero, 0, attotime::from_msec(31));

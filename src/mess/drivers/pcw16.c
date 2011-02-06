@@ -1361,11 +1361,11 @@ static MACHINE_START( pcw16 )
 	state->interrupt_counter = 0;
 
 	/* video ints */
-	timer_pulse(machine, attotime::from_usec(5830), NULL, 0,pcw16_timer_callback);
+	machine->scheduler().timer_pulse(attotime::from_usec(5830), FUNC(pcw16_timer_callback));
 	/* rtc timer */
-	timer_pulse(machine, attotime::from_hz(256), NULL, 0, rtc_timer_callback);
+	machine->scheduler().timer_pulse(attotime::from_hz(256), FUNC(rtc_timer_callback));
 	/* keyboard timer */
-	timer_pulse(machine, attotime::from_hz(50), NULL, 0, pcw16_keyboard_timer_callback);
+	machine->scheduler().timer_pulse(attotime::from_hz(50), FUNC(pcw16_keyboard_timer_callback));
 
 
 	pc_fdc_init(machine, &pcw16_fdc_interface);

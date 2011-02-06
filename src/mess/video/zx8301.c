@@ -184,8 +184,8 @@ void zx8301_device::device_start()
     devcb_resolve_write_line(&m_out_vsync_func, &m_config.out_vsync_func, this);
 	
 	// allocate timers
-	m_vsync_timer = device_timer_alloc(*this, TIMER_VSYNC);
-	m_flash_timer = device_timer_alloc(*this, TIMER_FLASH);
+	m_vsync_timer = timer_alloc(TIMER_VSYNC);
+	m_flash_timer = timer_alloc(TIMER_FLASH);
 
 	// adjust timer periods
 	timer_adjust_periodic(m_vsync_timer, attotime::zero, 0, attotime::from_hz(50));

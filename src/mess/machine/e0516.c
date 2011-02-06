@@ -215,7 +215,7 @@ static DEVICE_START( e0516 )
 	e0516_t *e0516 = get_safe_token(device);
 
 	/* create the timers */
-	e0516->clock_timer = timer_alloc(device->machine, clock_tick, (void *)device);
+	e0516->clock_timer = device->machine->scheduler().timer_alloc(FUNC(clock_tick), (void *)device);
 	timer_adjust_periodic(e0516->clock_timer, attotime::zero, 0, attotime::from_hz(device->clock() / 32768));
 
 	/* register for state saving */

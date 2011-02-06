@@ -196,7 +196,7 @@ static void applefdc_start(device_t *device, applefdc_t type)
 
 	memset(fdc, 0, sizeof(*fdc));
 	fdc->type = type;
-	fdc->motor_timer = timer_alloc(device->machine, iwm_turnmotor_onoff, (void *) device);
+	fdc->motor_timer = device->machine->scheduler().timer_alloc(FUNC(iwm_turnmotor_onoff), (void *) device);
 	fdc->lines = 0x00;
 	fdc->mode = 0x1F;	/* default value needed by Lisa 2 - no, I don't know if it is true */
 	fdc->swim_mode = SWIM_MODE_IWM;

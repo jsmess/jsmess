@@ -1568,22 +1568,22 @@ MACHINE_START( pokemini )
 	memset( state->pm_reg, 0, sizeof(state->pm_reg) );
 
 	/* Set up timers */
-	state->timers.seconds_timer = timer_alloc(machine,  pokemini_seconds_timer_callback , NULL );
+	state->timers.seconds_timer = machine->scheduler().timer_alloc(FUNC(pokemini_seconds_timer_callback));
 	timer_adjust_periodic( state->timers.seconds_timer, attotime::zero, 0, attotime::from_seconds( 1 ) );
 
-	state->timers.hz256_timer = timer_alloc(machine,  pokemini_256hz_timer_callback , NULL );
+	state->timers.hz256_timer = machine->scheduler().timer_alloc(FUNC(pokemini_256hz_timer_callback));
 	timer_adjust_periodic( state->timers.hz256_timer, attotime::zero, 0, attotime::from_hz( 256 ) );
 
-	state->timers.timer1 = timer_alloc(machine,  pokemini_timer1_callback , NULL );
-	state->timers.timer1_hi = timer_alloc(machine,  pokemini_timer1_hi_callback, NULL );
-	state->timers.timer2 = timer_alloc(machine,  pokemini_timer2_callback , NULL );
-	state->timers.timer2_hi = timer_alloc(machine,  pokemini_timer2_hi_callback, NULL );
-	state->timers.timer3 = timer_alloc(machine,  pokemini_timer3_callback , NULL );
-	state->timers.timer3_hi = timer_alloc(machine,  pokemini_timer3_hi_callback, NULL );
+	state->timers.timer1 = machine->scheduler().timer_alloc(FUNC(pokemini_timer1_callback));
+	state->timers.timer1_hi = machine->scheduler().timer_alloc(FUNC(pokemini_timer1_hi_callback));
+	state->timers.timer2 = machine->scheduler().timer_alloc(FUNC(pokemini_timer2_callback));
+	state->timers.timer2_hi = machine->scheduler().timer_alloc(FUNC(pokemini_timer2_hi_callback));
+	state->timers.timer3 = machine->scheduler().timer_alloc(FUNC(pokemini_timer3_callback));
+	state->timers.timer3_hi = machine->scheduler().timer_alloc(FUNC(pokemini_timer3_hi_callback));
 
 	/* Set up the PRC */
 	state->prc.max_frame_count = 2;
-	state->prc.count_timer = timer_alloc(machine,  pokemini_prc_counter_callback, NULL );
+	state->prc.count_timer = machine->scheduler().timer_alloc(FUNC(pokemini_prc_counter_callback));
 	timer_adjust_periodic( state->prc.count_timer, attotime::zero, 0, machine->device<cpu_device>("maincpu")->cycles_to_attotime(55640 / 65) );
 }
 

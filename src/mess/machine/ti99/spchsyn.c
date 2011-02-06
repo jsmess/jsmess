@@ -162,7 +162,7 @@ static WRITE8_DEVICE_HANDLER( speech_w )
 			logerror("time to ready: %f -> %d\n", time_to_ready.as_double(), (int) cycles_to_ready);
 
 			cpu_adjust_icount(device->machine->device("maincpu"),-cycles_to_ready);
-			timer_set(device->machine, attotime::zero, NULL, 0, NULL);
+			device->machine->scheduler().timer_set(attotime::zero, FUNC(NULL));
 		}
 		tms5220_data_w(adapter->vsp, offset, data);
 	}

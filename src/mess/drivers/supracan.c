@@ -1778,10 +1778,10 @@ static MACHINE_START( supracan )
 {
     supracan_state *state = machine->driver_data<supracan_state>();
 
-	state->video_timer = timer_alloc( machine, supracan_video_callback, NULL );
-    state->hbl_timer = timer_alloc( machine, supracan_hbl_callback, NULL );
-    state->line_on_timer = timer_alloc( machine, supracan_line_on_callback, NULL );
-    state->line_off_timer = timer_alloc( machine, supracan_line_off_callback, NULL );
+	state->video_timer = machine->scheduler().timer_alloc(FUNC(supracan_video_callback));
+    state->hbl_timer = machine->scheduler().timer_alloc(FUNC(supracan_hbl_callback));
+    state->line_on_timer = machine->scheduler().timer_alloc(FUNC(supracan_line_on_callback));
+    state->line_off_timer = machine->scheduler().timer_alloc(FUNC(supracan_line_off_callback));
 }
 
 

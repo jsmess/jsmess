@@ -829,7 +829,7 @@ static void m6845_set_new_vsync_set_time(int cycles)
 
 	m6845_remove_vsync_set_timer();
 
-	//crtc.vsync_set_timer = timer_alloc(machine, m6845_vsync_set_timer_callback, NULL);
+	//crtc.vsync_set_timer = machine->scheduler().timer_alloc(FUNC(m6845_vsync_set_timer_callback));
 	if (crtc_cycles_to_vsync_start!=-1)
 	{
 		timer_adjust_oneshot(crtc.vsync_set_timer, attotime::from_usec(crtc_cycles_to_vsync_start), 0);
@@ -846,7 +846,7 @@ static void m6845_set_new_vsync_clear_time(int cycles)
 	/* get number of cycles to end of vsync */
 	crtc_cycles_to_vsync_end = cycles;
 
-	//crtc.vsync_clear_timer = timer_alloc(machine, m6845_vsync_clear_timer_callback, NULL);
+	//crtc.vsync_clear_timer = machine->scheduler().timer_alloc(FUNC(m6845_vsync_clear_timer_callback));
 	if (crtc_cycles_to_vsync_end!=-1)
 	{
 		timer_adjust_oneshot(crtc.vsync_clear_timer, attotime::from_usec(crtc_cycles_to_vsync_end), 0);

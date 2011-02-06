@@ -37,7 +37,7 @@ VIDEO_START( oric )
 	/* initialise flash timer */
 	state->vh_state.flash_count = 0;
 	state->vh_state.flash_state = 0;
-	timer_pulse(machine, attotime::from_hz(50), NULL, 0, oric_vh_timer_callback);
+	machine->scheduler().timer_pulse(attotime::from_hz(50), FUNC(oric_vh_timer_callback));
 	/* mode */
 	oric_vh_update_attribute(machine,(1<<3)|(1<<4));
 }

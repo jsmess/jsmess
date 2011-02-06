@@ -962,7 +962,7 @@ static DEVICE_START( c1571 )
 	floppy_install_load_proc(c1571->image, on_disk_change);
 
 	/* allocate data timer */
-	c1571->bit_timer = timer_alloc(device->machine, bit_tick, (void *)device);
+	c1571->bit_timer = device->machine->scheduler().timer_alloc(FUNC(bit_tick), (void *)device);
 
 	/* register for state saving */
 	state_save_register_device_item(device, 0, c1571->address);

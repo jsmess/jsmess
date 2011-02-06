@@ -597,7 +597,7 @@ static DRIVER_INIT( osbexec )
 	memset( state->fontram, 0x00, 0x1000 );
 	memset( state->vram, 0x00, 0x2000 );
 
-	state->video_timer = timer_alloc( machine, osbexec_video_callback, NULL );
+	state->video_timer = machine->scheduler().timer_alloc(FUNC(osbexec_video_callback));
 }
 
 

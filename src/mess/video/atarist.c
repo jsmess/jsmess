@@ -1058,7 +1058,7 @@ WRITE16_MEMBER( st_state::blitter_ctrl_w )
 				m_mfp->i3_w(m_blitter_done);
 
 				int nops = BLITTER_NOPS[m_blitter_op][m_blitter_hop]; // each NOP takes 4 cycles
-				timer_set(machine, attotime::from_hz((Y2/4)/(4*nops)), NULL, 0, atarist_blitter_tick);
+				machine->scheduler().timer_set(attotime::from_hz((Y2/4)/(4*nops)), FUNC(atarist_blitter_tick));
 			}
 		}
 	}
@@ -1080,8 +1080,8 @@ WRITE16_MEMBER( st_state::blitter_ctrl_w )
 
 void st_state::video_start()
 {
-	m_shifter_timer = timer_alloc(machine, atarist_shifter_tick, NULL);
-	m_glue_timer = timer_alloc(machine, atarist_glue_tick, NULL);
+	m_shifter_timer = machine->scheduler().timer_alloc(FUNC(atarist_shifter_tick));
+	m_glue_timer = machine->scheduler().timer_alloc(FUNC(atarist_glue_tick));
 
 //	timer_adjust_periodic(m_shifter_timer, machine->primary_screen->time_until_pos(0,0), 0, attotime::from_hz(Y2/4)); // 125 ns
 	timer_adjust_periodic(m_glue_timer, machine->primary_screen->time_until_pos(0,0), 0, attotime::from_hz(Y2/16)); // 500 ns

@@ -2055,13 +2055,13 @@ DRIVER_INIT( bbc )
 {
 	bbc_state *state = machine->driver_data<bbc_state>();
 	state->Master=0;
-	state->tape_timer = timer_alloc(machine, bbc_tape_timer_cb, NULL);
+	state->tape_timer = machine->scheduler().timer_alloc(FUNC(bbc_tape_timer_cb));
 }
 DRIVER_INIT( bbcm )
 {
 	bbc_state *state = machine->driver_data<bbc_state>();
 	state->Master=1;
-	state->tape_timer = timer_alloc(machine, bbc_tape_timer_cb, NULL);
+	state->tape_timer = machine->scheduler().timer_alloc(FUNC(bbc_tape_timer_cb));
 }
 
 MACHINE_START( bbca )

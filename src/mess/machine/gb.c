@@ -248,7 +248,7 @@ MACHINE_START( gb )
 	machine->add_notifier(MACHINE_NOTIFY_EXIT, gb_machine_stop);
 
 	/* Allocate the serial timer, and disable it */
-	state->gb_serial_timer = timer_alloc(machine,  gb_serial_timer_proc , NULL);
+	state->gb_serial_timer = machine->scheduler().timer_alloc(FUNC(gb_serial_timer_proc));
 	timer_enable( state->gb_serial_timer, 0 );
 
 	MACHINE_START_CALL( gb_video );
@@ -260,7 +260,7 @@ MACHINE_START( gbc )
 	machine->add_notifier(MACHINE_NOTIFY_EXIT, gb_machine_stop);
 
 	/* Allocate the serial timer, and disable it */
-	state->gb_serial_timer = timer_alloc(machine,  gb_serial_timer_proc , NULL);
+	state->gb_serial_timer = machine->scheduler().timer_alloc(FUNC(gb_serial_timer_proc));
 	timer_enable( state->gb_serial_timer, 0 );
 
 	MACHINE_START_CALL( gbc_video );
@@ -292,7 +292,7 @@ MACHINE_START( sgb )
 	machine->add_notifier(MACHINE_NOTIFY_EXIT, gb_machine_stop);
 
 	/* Allocate the serial timer, and disable it */
-	state->gb_serial_timer = timer_alloc(machine,  gb_serial_timer_proc , NULL);
+	state->gb_serial_timer = machine->scheduler().timer_alloc(FUNC(gb_serial_timer_proc));
 	timer_enable( state->gb_serial_timer, 0 );
 
 	MACHINE_START_CALL( gb_video );
@@ -2048,7 +2048,7 @@ MACHINE_START( megaduck )
 {
 	gb_state *state = machine->driver_data<gb_state>();
 	/* Allocate the serial timer, and disable it */
-	state->gb_serial_timer = timer_alloc(machine,  gb_serial_timer_proc , NULL);
+	state->gb_serial_timer = machine->scheduler().timer_alloc(FUNC(gb_serial_timer_proc));
 	timer_enable( state->gb_serial_timer, 0 );
 
 	MACHINE_START_CALL( gb_video );

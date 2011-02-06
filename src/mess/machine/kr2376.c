@@ -359,7 +359,7 @@ static DEVICE_START( kr2376 )
 	change_output_lines(device);
 
 	/* create the timers */
-	kr2376->scan_timer = timer_alloc(device->machine, kr2376_scan_tick, (void *)device);
+	kr2376->scan_timer = device->machine->scheduler().timer_alloc(FUNC(kr2376_scan_tick), (void *)device);
 	timer_adjust_periodic(kr2376->scan_timer, attotime::zero, 0, attotime::from_hz(kr2376->intf->clock));
 
 	/* register for state saving */

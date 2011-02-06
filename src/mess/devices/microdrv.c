@@ -200,7 +200,7 @@ static DEVICE_START( microdrive )
 	mdv->right = auto_alloc_array(device->machine, UINT8, MDV_IMAGE_LENGTH / 2);
 
 	// allocate timers
-	mdv->bit_timer = timer_alloc(device->machine, bit_timer_tick, (void *) device);
+	mdv->bit_timer = device->machine->scheduler().timer_alloc(FUNC(bit_timer_tick), (void *) device);
 	timer_adjust_periodic(mdv->bit_timer, attotime::zero, 0, attotime::from_hz(MDV_BITRATE));
 	timer_enable(mdv->bit_timer, 0);
 }

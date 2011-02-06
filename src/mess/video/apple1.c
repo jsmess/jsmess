@@ -378,7 +378,7 @@ static void apple1_vh_cursor_blink (running_machine *machine)
        number of one-third-cycles elapsed, then checking the result
        modulo 3. */
 
-	if (((int) (timer_get_time(machine).as_double() / CURSOR_OFF_LENGTH)) % 3 < 2)
+	if (((int) (machine->time().as_double() / CURSOR_OFF_LENGTH)) % 3 < 2)
 		new_blink_on = 1;
 	else
 		new_blink_on = 0;

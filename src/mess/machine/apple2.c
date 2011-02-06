@@ -1384,19 +1384,19 @@ READ8_HANDLER ( apple2_c06x_r )
 				break;
 			case 0x04:
 				/* X Joystick 1 axis */
-				result = timer_get_time(space->machine).as_double() < state->joystick_x1_time;
+				result = space->machine->time().as_double() < state->joystick_x1_time;
 				break;
 			case 0x05:
 				/* Y Joystick 1 axis */
-				result = timer_get_time(space->machine).as_double() < state->joystick_y1_time;
+				result = space->machine->time().as_double() < state->joystick_y1_time;
 				break;
 			case 0x06:
 				/* X Joystick 2 axis */
-				result = timer_get_time(space->machine).as_double() < state->joystick_x2_time;
+				result = space->machine->time().as_double() < state->joystick_x2_time;
 				break;
 			case 0x07:
 				/* Y Joystick 2 axis */
-				result = timer_get_time(space->machine).as_double() < state->joystick_y2_time;
+				result = space->machine->time().as_double() < state->joystick_y2_time;
 				break;
 			default:
 				/* c060 Empty Cassette head read
@@ -1424,10 +1424,10 @@ READ8_HANDLER ( apple2_c07x_r )
 
 		if (offset == 0)
 		{
-			state->joystick_x1_time = timer_get_time(space->machine).as_double() + x_calibration * input_port_read(space->machine, "joystick_1_x");
-			state->joystick_y1_time = timer_get_time(space->machine).as_double() + y_calibration * input_port_read(space->machine, "joystick_1_y");
-			state->joystick_x2_time = timer_get_time(space->machine).as_double() + x_calibration * input_port_read(space->machine, "joystick_2_x");
-			state->joystick_y2_time = timer_get_time(space->machine).as_double() + y_calibration * input_port_read(space->machine, "joystick_2_y");
+			state->joystick_x1_time = space->machine->time().as_double() + x_calibration * input_port_read(space->machine, "joystick_1_x");
+			state->joystick_y1_time = space->machine->time().as_double() + y_calibration * input_port_read(space->machine, "joystick_1_y");
+			state->joystick_x2_time = space->machine->time().as_double() + x_calibration * input_port_read(space->machine, "joystick_2_x");
+			state->joystick_y2_time = space->machine->time().as_double() + y_calibration * input_port_read(space->machine, "joystick_2_y");
 		}
 	}
 	return 0;
