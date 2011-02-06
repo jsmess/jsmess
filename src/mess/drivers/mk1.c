@@ -156,9 +156,9 @@ static INPUT_PORTS_START( mk1 )
 INPUT_PORTS_END
 
 
-static TIMER_CALLBACK( mk1_update_leds )
+static TIMER_DEVICE_CALLBACK( mk1_update_leds )
 {
-	mk1_state *state = machine->driver_data<mk1_state>();
+	mk1_state *state = timer.machine->driver_data<mk1_state>();
 	int i;
 
 	for ( i = 0; i < 4; i++ ) {
@@ -171,7 +171,6 @@ static TIMER_CALLBACK( mk1_update_leds )
 
 static MACHINE_START( mk1 )
 {
-	machine->scheduler().timer_pulse(attotime::from_hz(30), FUNC(mk1_update_leds));
 }
 
 
@@ -202,6 +201,8 @@ static MACHINE_CONFIG_START( mk1, mk1_state )
 
     /* video hardware */
 	MCFG_DEFAULT_LAYOUT( layout_mk1 )
+	
+	MCFG_TIMER_ADD_PERIODIC("led_timer", mk1_update_leds, attotime::from_hz(30))
 MACHINE_CONFIG_END
 
 

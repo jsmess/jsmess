@@ -170,14 +170,14 @@ static TIMER_CALLBACK(pcw_timer_pulse)
 }
 
 /* callback for 1/300ths of a second interrupt */
-static TIMER_CALLBACK(pcw_timer_interrupt)
+static TIMER_DEVICE_CALLBACK(pcw_timer_interrupt)
 {
-	pcw_state *state = machine->driver_data<pcw_state>();
+	pcw_state *state = timer.machine->driver_data<pcw_state>();
 	pcw_update_interrupt_counter(state);
 
 	state->timer_irq_flag = 1;
-	pcw_update_irqs(machine);
-	machine->scheduler().timer_set(attotime::from_usec(100), FUNC(pcw_timer_pulse));
+	pcw_update_irqs(timer.machine);
+	timer.machine->scheduler().timer_set(attotime::from_usec(100), FUNC(pcw_timer_pulse));
 }
 
 /* fdc interrupt callback. set/clear fdc int */
@@ -1118,8 +1118,6 @@ static DRIVER_INIT(pcw)
 	state->roller_ram_offset = 0;
 
 	/* timer interrupt */
-	machine->scheduler().timer_pulse(attotime::from_hz(300), FUNC(pcw_timer_interrupt));
-
 	machine->scheduler().timer_set(attotime::zero, FUNC(setup_beep));
 
 	state->prn_stepper = machine->scheduler().timer_alloc(FUNC(pcw_stepper_callback));
@@ -1375,6 +1373,8 @@ static MACHINE_CONFIG_START( pcw, pcw_state )
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("256K")
+	
+	MCFG_TIMER_ADD_PERIODIC("pcw_timer", pcw_timer_interrupt, attotime::from_hz(300))	
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( pcw8256, pcw )

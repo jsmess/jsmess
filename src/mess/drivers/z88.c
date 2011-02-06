@@ -79,9 +79,9 @@ static void z88_update_rtc_interrupt(running_machine *machine)
 
 
 
-static TIMER_CALLBACK(z88_rtc_timer_callback)
+static TIMER_DEVICE_CALLBACK(z88_rtc_timer_callback)
 {
-	z88_state *state = machine->driver_data<z88_state>();
+	z88_state *state = timer.machine->driver_data<z88_state>();
 	int refresh_ints = 0;
 	static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7" };
 
@@ -94,7 +94,7 @@ static TIMER_CALLBACK(z88_rtc_timer_callback)
 		/* any key pressed will wake up z88 */
 		for (i=0; i<8; i++)
 		{
-			data &= input_port_read(machine, keynames[i]);
+			data &= input_port_read(timer.machine, keynames[i]);
 		}
 
 		/* if any key is pressed, then one or more bits will be 0 */
@@ -107,9 +107,9 @@ static TIMER_CALLBACK(z88_rtc_timer_callback)
 			/* column has gone low in snooze/coma */
 			state->blink.sta |= STA_KEY;
 
-			cpuexec_trigger(machine, Z88_SNOOZE_TRIGGER);
+			cpuexec_trigger(timer.machine, Z88_SNOOZE_TRIGGER);
 
-			z88_interrupt_refresh(machine);
+			z88_interrupt_refresh(timer.machine);
 		}
 	}
 
@@ -173,10 +173,10 @@ static TIMER_CALLBACK(z88_rtc_timer_callback)
 
 	if (refresh_ints)
 	{
-		z88_update_rtc_interrupt(machine);
+		z88_update_rtc_interrupt(timer.machine);
 
 		/* refresh */
-		z88_interrupt_refresh(machine);
+		z88_interrupt_refresh(timer.machine);
 	}
 }
 
@@ -299,7 +299,6 @@ static void z88_refresh_memory_bank(running_machine *machine, int bank)
 
 static MACHINE_START( z88 )
 {
-	machine->scheduler().timer_pulse(attotime::from_msec(5), FUNC(z88_rtc_timer_callback));
 }
 
 static MACHINE_RESET( z88 )
@@ -775,6 +774,8 @@ static MACHINE_CONFIG_START( z88, z88_state )
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("2M")
+	
+	MCFG_TIMER_ADD_PERIODIC("rtc_timer", z88_rtc_timer_callback, attotime::from_msec(5))
 MACHINE_CONFIG_END
 
 

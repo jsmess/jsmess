@@ -1961,15 +1961,15 @@ static UINT8 check_joy_press(running_machine *machine)
 	return joy_press;
 }
 
-static TIMER_CALLBACK(cassette_callback)
+static TIMER_DEVICE_CALLBACK(cassette_callback)
 {
-	pc6001_state *state = machine->driver_data<pc6001_state>();
+	pc6001_state *state = timer.machine->driver_data<pc6001_state>();
 	if(state->cas_switch == 1)
 	{
 		#if 0
 		static UINT8 cas_data_i = 0x80,cas_data_poll;
 		//state->cur_keycode = gfx_data[state->cas_offset++];
-		if(cassette_input(machine->device("cass")) > 0.03)
+		if(cassette_input(timer.machine->device("cass")) > 0.03)
 			cas_data_poll|= cas_data_i;
 		else
 			cas_data_poll&=~cas_data_i;
@@ -1979,12 +1979,12 @@ static TIMER_CALLBACK(cassette_callback)
 			cas_data_i = 0x80;
 			/* data ready, poll irq */
 			state->irq_vector = 0x08;
-			cputag_set_input_line(machine,"maincpu", 0, ASSERT_LINE);
+			cputag_set_input_line(timer.machine,"maincpu", 0, ASSERT_LINE);
 		}
 		else
 			cas_data_i>>=1;
 		#else
-			UINT8 *cas_data = machine->region("cas")->base();
+			UINT8 *cas_data = timer.machine->region("cas")->base();
 
 			state->cur_keycode = cas_data[state->cas_offset++];
 			popmessage("%04x %04x",state->cas_offset,state->cas_maxsize);
@@ -1994,26 +1994,26 @@ static TIMER_CALLBACK(cassette_callback)
 				state->cas_switch = 0;
 				if(IRQ_LOG) printf("Tape-E IRQ 0x12\n");
 				state->irq_vector = 0x12;
-				cputag_set_input_line(machine,"maincpu", 0, ASSERT_LINE);
+				cputag_set_input_line(timer.machine,"maincpu", 0, ASSERT_LINE);
 			}
 			else
 			{
 				if(IRQ_LOG) printf("Tape-D IRQ 0x08\n");
 				state->irq_vector = 0x08;
-				cputag_set_input_line(machine,"maincpu", 0, ASSERT_LINE);
+				cputag_set_input_line(timer.machine,"maincpu", 0, ASSERT_LINE);
 			}
 		#endif
 	}
 }
 
-static TIMER_CALLBACK(keyboard_callback)
+static TIMER_DEVICE_CALLBACK(keyboard_callback)
 {
-	pc6001_state *state = machine->driver_data<pc6001_state>();
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	UINT32 key1 = input_port_read(machine,"key1");
-	UINT32 key2 = input_port_read(machine,"key2");
-	UINT32 key3 = input_port_read(machine,"key3");
-//  UINT8 p1_key = input_port_read(machine, "P1");;
+	pc6001_state *state = timer.machine->driver_data<pc6001_state>();
+	address_space *space = cputag_get_address_space(timer.machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	UINT32 key1 = input_port_read(timer.machine,"key1");
+	UINT32 key2 = input_port_read(timer.machine,"key2");
+	UINT32 key3 = input_port_read(timer.machine,"key3");
+//  UINT8 p1_key = input_port_read(timer.machine, "P1");;
 
 	if(state->cas_switch == 0)
 	{
@@ -2022,7 +2022,7 @@ static TIMER_CALLBACK(keyboard_callback)
 			state->cur_keycode = check_keyboard_press(space->machine);
 			if(IRQ_LOG) printf("KEY IRQ 0x02\n");
 			state->irq_vector = 0x02;
-			cputag_set_input_line(machine,"maincpu", 0, ASSERT_LINE);
+			cputag_set_input_line(timer.machine,"maincpu", 0, ASSERT_LINE);
 			state->old_key1 = key1;
 			state->old_key2 = key2;
 			state->old_key3 = key3;
@@ -2034,7 +2034,7 @@ static TIMER_CALLBACK(keyboard_callback)
 			if(state->cur_keycode)
 			{
 				state->irq_vector = 0x16;
-				cputag_set_input_line(machine,"maincpu", 0, ASSERT_LINE);
+				cputag_set_input_line(timer.machine,"maincpu", 0, ASSERT_LINE);
 			}
 		}
 		#endif
@@ -2044,11 +2044,6 @@ static TIMER_CALLBACK(keyboard_callback)
 static MACHINE_START(pc6001)
 {
 	pc6001_state *state = machine->driver_data<pc6001_state>();
-	/* TODO: accurate timing on this */
-	machine->scheduler().timer_pulse(attotime::from_hz(250), FUNC(keyboard_callback));
-
-	machine->scheduler().timer_pulse(attotime::from_hz(1200/12), FUNC(cassette_callback)); //1200 bauds / (1 start bit -> 8 data bits -> 3 stop bits)
-
 	state->timer_hz_div = 3;
 	{
 		attotime period = attotime::from_hz((487.5*4)/(state->timer_hz_div+1));
@@ -2318,6 +2313,10 @@ static MACHINE_CONFIG_START( pc6001, pc6001_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 //	MCFG_SOUND_WAVE_ADD("wave","cass")
 //	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.05)
+
+	/* TODO: accurate timing on this */
+	MCFG_TIMER_ADD_PERIODIC("keyboard_timer", keyboard_callback, attotime::from_hz(250))
+	MCFG_TIMER_ADD_PERIODIC("cassette_timer", cassette_callback, attotime::from_hz(1200/12)) //1200 bauds / (1 start bit -> 8 data bits -> 3 stop bits)
 MACHINE_CONFIG_END
 
 

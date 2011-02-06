@@ -87,9 +87,9 @@ static INPUT_PORTS_START( mk2 )
 INPUT_PORTS_END
 
 
-static TIMER_CALLBACK( update_leds )
+static TIMER_DEVICE_CALLBACK( update_leds )
 {
-	mk2_state *state = machine->driver_data<mk2_state>();
+	mk2_state *state = timer.machine->driver_data<mk2_state>();
 	int i;
 
 	for (i=0; i<4; i++)
@@ -104,7 +104,6 @@ static TIMER_CALLBACK( update_leds )
 
 static MACHINE_START( mk2 )
 {
-	machine->scheduler().timer_pulse(attotime::from_hz(60), FUNC(update_leds));
 }
 
 static READ8_DEVICE_HANDLER( mk2_read_a )
@@ -196,6 +195,8 @@ static MACHINE_CONFIG_START( mk2, mk2_state )
 
 	MCFG_SOUND_ADD("dac", DAC, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	
+	MCFG_TIMER_ADD_PERIODIC("led_timer", update_leds, attotime::from_hz(60))
 MACHINE_CONFIG_END
 
 

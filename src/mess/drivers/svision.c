@@ -24,7 +24,6 @@
 #define YPOS state->reg[3]
 #define BANK state->reg[0x26]
 
-
 static TIMER_CALLBACK(svision_pet_timer)
 {
 	svision_state *state = machine->driver_data<svision_state>();
@@ -50,6 +49,11 @@ static TIMER_CALLBACK(svision_pet_timer)
 			state->pet.state++;
 			break;
 	}
+}
+
+static TIMER_DEVICE_CALLBACK(svision_pet_timer_dev)
+{
+	svision_pet_timer(timer.machine,ptr,param);
 }
 
 void svision_irq(running_machine *machine)
@@ -442,7 +446,6 @@ static DRIVER_INIT( svisions )
 	state->svision.timer1 = machine->scheduler().timer_alloc(FUNC(svision_timer));
 	state->pet.on = TRUE;
 	state->pet.timer = machine->scheduler().timer_alloc(FUNC(svision_pet_timer));
-	machine->scheduler().timer_pulse(attotime::from_seconds(8) * 256/cputag_get_clock(machine, "maincpu"),FUNC(svision_pet_timer),0);
 }
 
 static DEVICE_IMAGE_LOAD( svision_cart )
@@ -551,6 +554,10 @@ static MACHINE_CONFIG_START( svision, svision_state )
 	MCFG_SOFTWARE_LIST_ADD("cart_list","svision")
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( svisions, svision )
+	MCFG_TIMER_ADD_PERIODIC("pet_timer", svision_pet_timer_dev, attotime::from_seconds(8) * 256/4000000)
+MACHINE_CONFIG_END
+
 static MACHINE_CONFIG_DERIVED( svisionp, svision )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(4430000)
@@ -599,7 +606,7 @@ ROM_END
 // marketed under a ton of firms and names
 CONS(1992,	svision,	0,	0,	svision,	svision,	svision,	"Watara",	"Super Vision", 0)
 // svdual 2 connected via communication port
-CONS( 1992, svisions,      svision,          0,svision,  svisions,    svisions,   "Watara", "Super Vision (PeT Communication Simulation)", 0 )
+CONS( 1992, svisions,      svision,          0,svisions,  svisions,    svisions,   "Watara", "Super Vision (PeT Communication Simulation)", 0 )
 
 CONS( 1993, svisionp,      svision,          0,svisionp,  svision,    svision,   "Watara", "Super Vision (PAL TV Link Colored)", 0 )
 CONS( 1993, svisionn,      svision,          0,svisionn,  svision,    svision,   "Watara", "Super Vision (NTSC TV Link Colored)", 0 )

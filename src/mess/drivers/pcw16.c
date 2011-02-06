@@ -136,9 +136,9 @@ static void pcw16_refresh_ints(running_machine *machine)
 }
 
 
-static TIMER_CALLBACK(pcw16_timer_callback)
+static TIMER_DEVICE_CALLBACK(pcw16_timer_callback)
 {
-	pcw16_state *state = machine->driver_data<pcw16_state>();
+	pcw16_state *state = timer.machine->driver_data<pcw16_state>();
 	/* do not increment past 15 */
 	if (state->interrupt_counter!=15)
 	{
@@ -149,7 +149,7 @@ static TIMER_CALLBACK(pcw16_timer_callback)
 
 	if (state->interrupt_counter!=0)
 	{
-		pcw16_refresh_ints(machine);
+		pcw16_refresh_ints(timer.machine);
 	}
 }
 
@@ -781,9 +781,9 @@ static WRITE8_HANDLER(pcw16_keyboard_control_w)
 }
 
 
-static TIMER_CALLBACK(pcw16_keyboard_timer_callback)
+static TIMER_DEVICE_CALLBACK(pcw16_keyboard_timer_callback)
 {
-	pcw16_state *state = machine->driver_data<pcw16_state>();
+	pcw16_state *state = timer.machine->driver_data<pcw16_state>();
 	at_keyboard_polling();
 	if (pcw16_keyboard_can_transmit(state))
 	{
@@ -798,7 +798,7 @@ static TIMER_CALLBACK(pcw16_keyboard_timer_callback)
 //              pcw16_dump_cpu_ram();
 //          }
 
-			pcw16_keyboard_signal_byte_received(machine, data);
+			pcw16_keyboard_signal_byte_received(timer.machine, data);
 		}
 	}
 }
@@ -839,9 +839,9 @@ static void rtc_setup_max_days(pcw16_state *state)
 	}
 }
 
-static TIMER_CALLBACK(rtc_timer_callback)
+static TIMER_DEVICE_CALLBACK(rtc_timer_callback)
 {
-	pcw16_state *state = machine->driver_data<pcw16_state>();
+	pcw16_state *state = timer.machine->driver_data<pcw16_state>();
 	int fraction_of_second;
 
 	/* halt counter? */
@@ -1360,14 +1360,6 @@ static MACHINE_START( pcw16 )
 	state->system_status = 0;
 	state->interrupt_counter = 0;
 
-	/* video ints */
-	machine->scheduler().timer_pulse(attotime::from_usec(5830), FUNC(pcw16_timer_callback));
-	/* rtc timer */
-	machine->scheduler().timer_pulse(attotime::from_hz(256), FUNC(rtc_timer_callback));
-	/* keyboard timer */
-	machine->scheduler().timer_pulse(attotime::from_hz(50), FUNC(pcw16_keyboard_timer_callback));
-
-
 	pc_fdc_init(machine, &pcw16_fdc_interface);
 
 	/* initialise mouse */
@@ -1457,6 +1449,13 @@ static MACHINE_CONFIG_START( pcw16, pcw16_state )
 	MCFG_RAM_DEFAULT_SIZE("2M")
 	MCFG_INTEL_E28F008SA_ADD("flash0")
 	MCFG_INTEL_E28F008SA_ADD("flash1")
+	
+	/* video ints */
+	MCFG_TIMER_ADD_PERIODIC("video_timer", pcw16_timer_callback, attotime::from_hz(5830))
+	/* rtc timer */
+	MCFG_TIMER_ADD_PERIODIC("rtc_timer", rtc_timer_callback, attotime::from_hz(256))
+	/* keyboard timer */
+	MCFG_TIMER_ADD_PERIODIC("keyboard_timer", pcw16_keyboard_timer_callback, attotime::from_hz(50))
 MACHINE_CONFIG_END
 
 /***************************************************************************

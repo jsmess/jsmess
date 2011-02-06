@@ -212,12 +212,12 @@ void datapack::reset()
 
 ***********************************************/
 
-static TIMER_CALLBACK( nmi_timer )
+static TIMER_DEVICE_CALLBACK( nmi_timer )
 {
-	psion_state *state = machine->driver_data<psion_state>();
+	psion_state *state = timer.machine->driver_data<psion_state>();
 
 	if (state->m_enable_nmi)
-		cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
+		cputag_set_input_line(timer.machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 UINT8 psion_state::kb_read(running_machine *machine)
@@ -678,8 +678,6 @@ void psion_state::machine_start()
 		memory_set_bank(machine, "rambank", 0);
 	}
 
-	machine->scheduler().timer_pulse(attotime::from_seconds(1), FUNC(nmi_timer));
-
 	state_save_register_global(machine, m_kb_counter);
 	state_save_register_global(machine, m_enable_nmi);
 	state_save_register_global(machine, m_tcsr_value);
@@ -796,6 +794,8 @@ static MACHINE_CONFIG_START( psion_2lines, psion_state )
 	MCFG_NVRAM_HANDLER(psion)
 
 	MCFG_FRAGMENT_ADD( psion_slot )
+	
+	MCFG_TIMER_ADD_PERIODIC("nmi_timer", nmi_timer, attotime::from_seconds(1))
 MACHINE_CONFIG_END
 
 static const UINT8 psion_4line_layout[] =
@@ -840,6 +840,8 @@ static MACHINE_CONFIG_START( psion_4lines, psion_state )
 	MCFG_NVRAM_HANDLER(psion)
 
 	MCFG_FRAGMENT_ADD( psion_slot )
+	
+	MCFG_TIMER_ADD_PERIODIC("nmi_timer", nmi_timer, attotime::from_seconds(1))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( psioncm, psion_2lines )

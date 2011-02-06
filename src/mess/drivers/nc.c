@@ -492,13 +492,13 @@ static void nc_common_close_stream(running_machine *machine)
 
 
 
-static TIMER_CALLBACK(dummy_timer_callback)
+static TIMER_DEVICE_CALLBACK(dummy_timer_callback)
 {
-	nc_state *state = machine->driver_data<nc_state>();
+	nc_state *state = timer.machine->driver_data<nc_state>();
 	int inputport_10_state;
 	int changed_bits;
 
-	inputport_10_state = input_port_read(machine, "EXTRA");
+	inputport_10_state = input_port_read(timer.machine, "EXTRA");
 
 	changed_bits = inputport_10_state^state->previous_inputport_10_state;
 
@@ -514,14 +514,14 @@ static TIMER_CALLBACK(dummy_timer_callback)
 				case NC_TYPE_1xx:
 				{
 			        LOG(("nmi triggered\n"));
-				    cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
+				    cputag_set_input_line(timer.machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
 				}
 				break;
 
 				case NC_TYPE_200:
 				{
 					state->irq_status |= (1 << 4);
-					nc_update_interrupts(machine);
+					nc_update_interrupts(timer.machine);
 				}
 				break;
 			}
@@ -532,7 +532,7 @@ static TIMER_CALLBACK(dummy_timer_callback)
 	if (changed_bits & 0x02)
 	{
 		/* yes refresh memory config */
-		nc_refresh_memory_config(machine);
+		nc_refresh_memory_config(timer.machine);
 	}
 
 	state->previous_inputport_10_state = inputport_10_state;
@@ -996,9 +996,6 @@ static MACHINE_START( nc100 )
 	state->keyboard_timer = machine->scheduler().timer_alloc(FUNC(nc_keyboard_timer_callback));
 	timer_adjust_oneshot(state->keyboard_timer, attotime::from_msec(10), 0);
 
-	/* dummy timer */
-	machine->scheduler().timer_pulse(attotime::from_hz(50), FUNC(dummy_timer_callback));
-
 	/* serial timer */
 	state->serial_timer = machine->scheduler().timer_alloc(FUNC(nc_serial_timer_callback));
 }
@@ -1395,9 +1392,6 @@ static MACHINE_START( nc200 )
 	state->keyboard_timer = machine->scheduler().timer_alloc(FUNC(nc_keyboard_timer_callback));
 	timer_adjust_oneshot(state->keyboard_timer, attotime::from_msec(10), 0);
 
-	/* dummy timer */
-	machine->scheduler().timer_pulse(attotime::from_hz(50), FUNC(dummy_timer_callback));
-
 	/* serial timer */
 	state->serial_timer = machine->scheduler().timer_alloc(FUNC(nc_serial_timer_callback));
 }
@@ -1745,6 +1739,9 @@ static MACHINE_CONFIG_START( nc100, nc_state )
 	MCFG_RAM_DEFAULT_SIZE("64K")
 
 	MCFG_NC_SERIAL_ADD("serial")
+	
+	/* dummy timer */
+	MCFG_TIMER_ADD_PERIODIC("dummy_timer", dummy_timer_callback, attotime::from_hz(50))	
 MACHINE_CONFIG_END
 
 static const floppy_config nc200_floppy_config =
@@ -1793,6 +1790,9 @@ static MACHINE_CONFIG_DERIVED( nc200, nc100 )
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("128K")
+
+	/* dummy timer */
+	MCFG_TIMER_ADD_PERIODIC("dummy_timer", dummy_timer_callback, attotime::from_hz(50))	
 MACHINE_CONFIG_END
 
 

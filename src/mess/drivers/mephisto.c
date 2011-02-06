@@ -316,22 +316,22 @@ static INPUT_PORTS_START( mephisto )
 INPUT_PORTS_END
 
 
-static TIMER_CALLBACK( update_nmi )
+static TIMER_DEVICE_CALLBACK( update_nmi )
 {
-	mephisto_state *state = machine->driver_data<mephisto_state>();
-	device_t *speaker = machine->device("beep");
-	cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI,PULSE_LINE);
+	mephisto_state *state = timer.machine->driver_data<mephisto_state>();
+	device_t *speaker = timer.machine->device("beep");
+	cputag_set_input_line(timer.machine, "maincpu", INPUT_LINE_NMI,PULSE_LINE);
 	// dac_data_w(0,state->led_status&64?128:0);
 	beep_set_state(speaker,state->led_status&64?1:0);
 }
 
-static TIMER_CALLBACK( update_irq )		//only mm2
+static TIMER_DEVICE_CALLBACK( update_irq )		//only mm2
 {
-	mephisto_state *state = machine->driver_data<mephisto_state>();
-	device_t *speaker = machine->device("beep");
+	mephisto_state *state = timer.machine->driver_data<mephisto_state>();
+	device_t *speaker = timer.machine->device("beep");
 
-	cputag_set_input_line(machine, "maincpu", M6502_IRQ_LINE, ASSERT_LINE);
-	cputag_set_input_line(machine, "maincpu", M6502_IRQ_LINE, CLEAR_LINE);
+	cputag_set_input_line(timer.machine, "maincpu", M6502_IRQ_LINE, ASSERT_LINE);
+	cputag_set_input_line(timer.machine, "maincpu", M6502_IRQ_LINE, CLEAR_LINE);
 
 	beep_set_state(speaker,state->led_status&64?1:0);
 }
@@ -339,9 +339,6 @@ static MACHINE_START( mephisto )
 {
 	mephisto_state *state = machine->driver_data<mephisto_state>();
 	state->lcd_shift_counter=3;
-
-	machine->scheduler().timer_pulse(attotime::from_hz(600), FUNC(update_nmi));
-	machine->scheduler().timer_pulse(attotime::from_hz(100), FUNC(mboard_update_artwork));
 
 	mboard_savestate_register(machine);
 }
@@ -351,9 +348,6 @@ static MACHINE_START( mm2 )
 	mephisto_state *state = machine->driver_data<mephisto_state>();
 	state->lcd_shift_counter=3;
 	state->led7=0xff;
-
-	machine->scheduler().timer_pulse(attotime::from_hz(450), FUNC(update_irq));
-	machine->scheduler().timer_pulse(attotime::from_hz(100), FUNC(mboard_update_artwork));
 
 	mboard_savestate_register(machine);
 }
@@ -397,6 +391,9 @@ static MACHINE_CONFIG_START( mephisto, mephisto_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("beep", BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	
+	MCFG_TIMER_ADD_PERIODIC("nmi_timer", update_nmi, attotime::from_hz(600))
+	MCFG_TIMER_ADD_PERIODIC("artwork_timer", mboard_update_artwork, attotime::from_hz(100))	
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( rebel5, mephisto )
@@ -412,6 +409,9 @@ static MACHINE_CONFIG_DERIVED( mm2, mephisto )
 	MCFG_CPU_REPLACE("maincpu", M65C02, 3700000)
 	MCFG_CPU_PROGRAM_MAP(mm2_mem)
 	MCFG_MACHINE_START( mm2 )
+	
+	MCFG_DEVICE_REMOVE("nmi_timer")
+	MCFG_TIMER_ADD_PERIODIC("irq_timer", update_irq, attotime::from_hz(450))
 MACHINE_CONFIG_END
 
 

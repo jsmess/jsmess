@@ -350,12 +350,12 @@ static const tms5220_interface mpf1_tms5220_intf =
 
 /* Machine Initialization */
 
-static TIMER_CALLBACK( check_halt_callback )
+static TIMER_DEVICE_CALLBACK( check_halt_callback )
 {
 	// halt-LED; the red one, is turned on when the processor is halted
 	// TODO: processor seems to halt, but restarts(?) at 0x0000 after a while -> fix
-	INT64 led_halt = cpu_get_reg(machine->device(Z80_TAG), Z80_HALT);
-	set_led_status(machine, 1, led_halt);
+	INT64 led_halt = cpu_get_reg(timer.machine->device(Z80_TAG), Z80_HALT);
+	set_led_status(timer.machine, 1, led_halt);
 }
 
 static MACHINE_START( mpf1 )
@@ -372,8 +372,6 @@ static MACHINE_START( mpf1 )
 	state_save_register_global(machine, state->_break);
 	state_save_register_global(machine, state->m1);
 	state_save_register_global(machine, state->lednum);
-
-	machine->scheduler().timer_pulse(attotime::from_hz(1), FUNC(check_halt_callback));
 }
 
 static MACHINE_RESET( mpf1 )
@@ -409,6 +407,8 @@ static MACHINE_CONFIG_START( mpf1, mpf1_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+
+	MCFG_TIMER_ADD_PERIODIC("halt_timer", check_halt_callback, attotime::from_hz(1))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( mpf1b, mpf1_state )
@@ -439,6 +439,8 @@ static MACHINE_CONFIG_START( mpf1b, mpf1_state )
 	MCFG_SOUND_ADD(TMS5220_TAG, TMS5220, 680000L)
 	MCFG_SOUND_CONFIG(mpf1_tms5220_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	
+	MCFG_TIMER_ADD_PERIODIC("halt_timer", check_halt_callback, attotime::from_hz(1))	
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( mpf1p, mpf1_state )
@@ -465,6 +467,8 @@ static MACHINE_CONFIG_START( mpf1p, mpf1_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+
+	MCFG_TIMER_ADD_PERIODIC("halt_timer", check_halt_callback, attotime::from_hz(1))	
 MACHINE_CONFIG_END
 
 /* ROMs */

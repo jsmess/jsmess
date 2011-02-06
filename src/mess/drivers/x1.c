@@ -674,12 +674,12 @@ static void cmt_command( running_machine* machine, UINT8 cmd )
 	logerror("CMT: Command 0xe9-0x%02x received.\n",cmd);
 }
 
-static TIMER_CALLBACK( cmt_wind_timer )
+static TIMER_DEVICE_CALLBACK( cmt_wind_timer )
 {
-	x1_state *state = machine->driver_data<x1_state>();
-	device_t* cmt = machine->device("cass");
+	x1_state *state = timer.machine->driver_data<x1_state>();
+	device_t* cmt = timer.machine->device("cass");
 
-	if(cassette_get_image(machine->device("cass")) == NULL) //avoid a crash if a disk game tries to access this
+	if(cassette_get_image(timer.machine->device("cass")) == NULL) //avoid a crash if a disk game tries to access this
 		return;
 
 	switch(state->cmt_current_cmd)
@@ -688,13 +688,13 @@ static TIMER_CALLBACK( cmt_wind_timer )
 		case 0x05:  // Fast Forwarding tape
 			cassette_seek(cmt,1,SEEK_CUR);
 			if(cassette_get_position(cmt) >= cassette_get_length(cmt))  // at end?
-				cmt_command(machine,0x01);  // Stop tape
+				cmt_command(timer.machine,0x01);  // Stop tape
 			break;
 		case 0x04:
 		case 0x06:  // Rewinding tape
 			cassette_seek(cmt,-1,SEEK_CUR);
 			if(cassette_get_position(cmt) <= 0) // at beginning?
-				cmt_command(machine,0x01);  // Stop tape
+				cmt_command(timer.machine,0x01);  // Stop tape
 			break;
 	}
 }
@@ -2240,15 +2240,15 @@ static IRQ_CALLBACK(x1_irq_callback)
 }
 #endif
 
-static TIMER_CALLBACK(keyboard_callback)
+static TIMER_DEVICE_CALLBACK(keyboard_callback)
 {
-	x1_state *state = machine->driver_data<x1_state>();
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	UINT32 key1 = input_port_read(machine,"key1");
-	UINT32 key2 = input_port_read(machine,"key2");
-	UINT32 key3 = input_port_read(machine,"key3");
-	UINT32 key4 = input_port_read(machine,"tenkey");
-	UINT32 f_key = input_port_read(machine, "f_keys");
+	x1_state *state = timer.machine->driver_data<x1_state>();
+	address_space *space = cputag_get_address_space(timer.machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	UINT32 key1 = input_port_read(timer.machine,"key1");
+	UINT32 key2 = input_port_read(timer.machine,"key2");
+	UINT32 key3 = input_port_read(timer.machine,"key3");
+	UINT32 key4 = input_port_read(timer.machine,"tenkey");
+	UINT32 f_key = input_port_read(timer.machine, "f_keys");
 
 	if(state->key_irq_vector)
 	{
@@ -2258,7 +2258,7 @@ static TIMER_CALLBACK(keyboard_callback)
 			sub_io_w(space,0,0xe6);
 			state->irq_vector = state->key_irq_vector;
 			state->key_irq_flag = 1;
-			cputag_set_input_line(machine,"maincpu",0,ASSERT_LINE);
+			cputag_set_input_line(timer.machine,"maincpu",0,ASSERT_LINE);
 			state->old_key1 = key1;
 			state->old_key2 = key2;
 			state->old_key3 = key3;
@@ -2342,8 +2342,6 @@ static MACHINE_RESET( x1 )
 static MACHINE_START( x1 )
 {
 	x1_state *state = machine->driver_data<x1_state>();
-	machine->scheduler().timer_pulse(attotime::from_hz(240), FUNC(keyboard_callback));
-	machine->scheduler().timer_pulse(attotime::from_hz(16), FUNC(cmt_wind_timer));
 
 	/* set up RTC */
 	{
@@ -2444,7 +2442,9 @@ static MACHINE_CONFIG_START( x1, x1_state )
 
 	MCFG_FLOPPY_4_DRIVES_ADD(x1_floppy_config)
 	MCFG_SOFTWARE_LIST_ADD("flop_list","x1_flop")
-
+	
+	MCFG_TIMER_ADD_PERIODIC("keyboard_timer", keyboard_callback, attotime::from_hz(240))	
+	MCFG_TIMER_ADD_PERIODIC("cmt_wind_timer", cmt_wind_timer, attotime::from_hz(16))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( x1turbo, x1 )

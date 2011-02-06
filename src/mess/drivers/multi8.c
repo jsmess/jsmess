@@ -395,12 +395,12 @@ static INPUT_PORTS_START( multi8 )
 	PORT_BIT(0x00000010,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("GRPH") PORT_CODE(KEYCODE_LALT)
 INPUT_PORTS_END
 
-static TIMER_CALLBACK( keyboard_callback )
+static TIMER_DEVICE_CALLBACK( keyboard_callback )
 {
-	multi8_state *state = machine->driver_data<multi8_state>();
+	multi8_state *state = timer.machine->driver_data<multi8_state>();
 	static const char *const portnames[3] = { "key1","key2","key3" };
 	int i,port_i,scancode;
-	UINT8 keymod = input_port_read(machine,"key_modifiers") & 0x1f;
+	UINT8 keymod = input_port_read(timer.machine,"key_modifiers") & 0x1f;
 	scancode = 0;
 
 	state->shift_press_flag = ((keymod & 0x02) >> 1);
@@ -409,7 +409,7 @@ static TIMER_CALLBACK( keyboard_callback )
 	{
 		for(i=0;i<32;i++)
 		{
-			if((input_port_read(machine,portnames[port_i])>>i) & 1)
+			if((input_port_read(timer.machine,portnames[port_i])>>i) & 1)
 			{
 				//key_flag = 1;
 				if(!state->shift_press_flag)  // shift not pressed
@@ -563,7 +563,6 @@ static const ym2203_interface ym2203_config =
 
 static MACHINE_START(multi8)
 {
-	machine->scheduler().timer_pulse(attotime::from_hz(240/32), FUNC(keyboard_callback));
 }
 
 static MACHINE_RESET(multi8)
@@ -609,6 +608,8 @@ static MACHINE_CONFIG_START( multi8, multi8_state )
 
 	MCFG_SOUND_ADD("beeper", BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
+	
+	MCFG_TIMER_ADD_PERIODIC("keyboard_timer", keyboard_callback, attotime::from_hz(240/32))
 MACHINE_CONFIG_END
 
 /* ROM definition */

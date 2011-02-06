@@ -464,13 +464,13 @@ static const UINT8 mycom_keyval[] = { 0,
 0x0d,0x0d,0x38,0x28,0x49,0x69,0x4b,0x6b,0x2c,0x3c,0x39,0x39,0x36,0x36,0x33,0x33,0x12,0x12,
 0x07,0x07,0x39,0x29,0x4f,0x6f,0x4c,0x6c,0x2e,0x3e,0x63,0x63,0x66,0x66,0x61,0x61,0x2f,0x3f };
 
-static TIMER_CALLBACK( mycom_kbd )
+static TIMER_DEVICE_CALLBACK( mycom_kbd )
 {
-	mycom_state *state = machine->driver_data<mycom_state>();
+	mycom_state *state = timer.machine->driver_data<mycom_state>();
 	UINT8 x, y, scancode = 0;
 	UINT16 pressed[9];
 	char kbdrow[2];
-	UINT8 modifiers = input_port_read(machine, "XX");
+	UINT8 modifiers = input_port_read(timer.machine, "XX");
 	UINT8 shift_pressed = (modifiers & 2) >> 1;
 	state->keyb_press_flag = 0;
 
@@ -478,7 +478,7 @@ static TIMER_CALLBACK( mycom_kbd )
 	for (x = 0; x < 9; x++)
 	{
 		sprintf(kbdrow,"X%d",x);
-		pressed[x] = (input_port_read(machine, kbdrow));
+		pressed[x] = (input_port_read(timer.machine, kbdrow));
 	}
 
 	/* find what has changed */
@@ -513,7 +513,6 @@ static MACHINE_START(mycom)
 	state->cassette = machine->device("cassette");
 	state->fdc = machine->device("fdc");
 	state->RAM = machine->region("maincpu")->base();
-	machine->scheduler().timer_pulse(attotime::from_hz(20), FUNC(mycom_kbd));
 }
 
 static MACHINE_RESET(mycom)
@@ -570,6 +569,8 @@ static MACHINE_CONFIG_START( mycom, mycom_state )
 	/* Devices */
 	MCFG_CASSETTE_ADD( "cassette", default_cassette_config )
 	MCFG_WD179X_ADD("fdc", wd1771_intf) // WD1771
+	
+	MCFG_TIMER_ADD_PERIODIC("keyboard_timer", mycom_kbd, attotime::from_hz(20))
 MACHINE_CONFIG_END
 
 /* ROM definition */

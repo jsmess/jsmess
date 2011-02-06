@@ -220,14 +220,14 @@ static void coleco_vdp_interrupt(running_machine *machine, int state)
 	drvstate->last_state = state;
 }
 
-static TIMER_CALLBACK( paddle_callback )
+static TIMER_DEVICE_CALLBACK( paddle_callback )
 {
-	coleco_state *state = machine->driver_data<coleco_state>();
+	coleco_state *state = timer.machine->driver_data<coleco_state>();
 
-	coleco_scan_paddles(machine, &state->joy_status[0], &state->joy_status[1]);
+	coleco_scan_paddles(timer.machine, &state->joy_status[0], &state->joy_status[1]);
 
     if (state->joy_status[0] || state->joy_status[1])
-		cputag_set_input_line(machine, "maincpu", INPUT_LINE_IRQ0, HOLD_LINE);
+		cputag_set_input_line(timer.machine, "maincpu", INPUT_LINE_IRQ0, HOLD_LINE);
 }
 
 /* Machine Initialization */
@@ -243,7 +243,6 @@ static const TMS9928a_interface tms9928a_interface =
 static MACHINE_START( coleco )
 {
 	TMS9928A_configure(&tms9928a_interface);
-	machine->scheduler().timer_pulse(attotime::from_msec(20), FUNC(paddle_callback));
 }
 
 static MACHINE_RESET( coleco )
@@ -317,6 +316,8 @@ static MACHINE_CONFIG_START( coleco, coleco_state )
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","coleco")
+	
+	MCFG_TIMER_ADD_PERIODIC("paddle_timer", paddle_callback, attotime::from_msec(20))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( czz50, coleco_state )
@@ -349,6 +350,8 @@ static MACHINE_CONFIG_START( czz50, coleco_state )
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","coleco")
+	
+	MCFG_TIMER_ADD_PERIODIC("paddle_timer", paddle_callback, attotime::from_msec(20))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( dina, czz50 )

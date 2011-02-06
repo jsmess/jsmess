@@ -92,9 +92,9 @@ static UINT8 bit_sel(UINT8 data) {
 	return 0;
 }
 
-static TIMER_CALLBACK(keyboard_callback)
+static TIMER_DEVICE_CALLBACK(keyboard_callback)
 {
-	vt100_state *state = machine->driver_data<vt100_state>();
+	vt100_state *state = timer.machine->driver_data<vt100_state>();
 	int i;
 	static const char *const keynames[] = {
 		"LINE0", "LINE1", "LINE2", "LINE3",
@@ -106,11 +106,11 @@ static TIMER_CALLBACK(keyboard_callback)
 	if (state->key_scan) {
 		for(i = 0; i < 16; i++)
 		{
-			code =	input_port_read(machine, keynames[i]);
+			code =	input_port_read(timer.machine, keynames[i]);
 			if (code!=0xff) {
 				state->keyboard_int = 1;
 				state->key_code = i | bit_sel(code);
-				cputag_set_input_line(machine, "maincpu", 0, HOLD_LINE);
+				cputag_set_input_line(timer.machine, "maincpu", 0, HOLD_LINE);
 				break;
 			}
 		}
@@ -323,7 +323,6 @@ static IRQ_CALLBACK(vt100_irq_callback)
 
 static MACHINE_START(vt100)
 {
-	machine->scheduler().timer_pulse(attotime::from_hz(800), FUNC(keyboard_callback));
 }
 
 static MACHINE_RESET(vt100)
@@ -423,6 +422,8 @@ static MACHINE_CONFIG_START( vt100, vt100_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	
+	MCFG_TIMER_ADD_PERIODIC("keyboard_timer", keyboard_callback, attotime::from_hz(800))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( vt180, vt100 )

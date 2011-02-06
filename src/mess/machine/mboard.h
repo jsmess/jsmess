@@ -64,7 +64,7 @@ READ32_HANDLER( mboard_read_board_32 );
 WRITE32_HANDLER( mboard_write_board_32 );
 WRITE32_HANDLER( mboard_write_LED_32 );
 
-TIMER_CALLBACK( mboard_update_artwork );
+TIMER_DEVICE_CALLBACK( mboard_update_artwork );
 
 void mboard_savestate_register(running_machine *machine);
 

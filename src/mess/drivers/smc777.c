@@ -590,19 +590,19 @@ static INPUT_PORTS_START( smc777 )
 	PORT_BIT(0x80000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("_")
 INPUT_PORTS_END
 
-static TIMER_CALLBACK( keyboard_callback )
+static TIMER_DEVICE_CALLBACK( keyboard_callback )
 {
-	smc777_state *state = machine->driver_data<smc777_state>();
+	smc777_state *state = timer.machine->driver_data<smc777_state>();
 	static const char *const portnames[3] = { "key1","key2","key3" };
 	int i,port_i,scancode;
-	//UINT8 keymod = input_port_read(machine,"key_modifiers") & 0x1f;
+	//UINT8 keymod = input_port_read(timer.machine,"key_modifiers") & 0x1f;
 	scancode = 0;
 
 	for(port_i=0;port_i<3;port_i++)
 	{
 		for(i=0;i<32;i++)
 		{
-			if((input_port_read(machine,portnames[port_i])>>i) & 1)
+			if((input_port_read(timer.machine,portnames[port_i])>>i) & 1)
 			{
 				//key_flag = 1;
 //              if(keymod & 0x02)  // shift not pressed
@@ -636,8 +636,7 @@ static MACHINE_START(smc777)
 
 	for(i=0;i<0x4000;i++)
 		state->wram[i] = rom[i];
-
-	machine->scheduler().timer_pulse(attotime::from_hz(240/32), FUNC(keyboard_callback));
+	
 	beep_set_frequency(machine->device("beeper"),300); //guesswork
 	beep_set_state(machine->device("beeper"),0);
 }
@@ -760,6 +759,8 @@ static MACHINE_CONFIG_START( smc777, smc777_state )
 
 	MCFG_SOUND_ADD("beeper", BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
+	
+	MCFG_TIMER_ADD_PERIODIC("keyboard_timer", keyboard_callback, attotime::from_hz(240/32))
 MACHINE_CONFIG_END
 
 /* ROM definition */

@@ -245,10 +245,10 @@ static MOS6530_INTERFACE( kim1_u3_mos6530_interface )
 };
 
 
-static TIMER_CALLBACK( kim1_cassette_input )
+static TIMER_DEVICE_CALLBACK( kim1_cassette_input )
 {
-	kim1_state *state = machine->driver_data<kim1_state>();
-	double tap_val = cassette_input( machine->device("cassette") );
+	kim1_state *state = timer.machine->driver_data<kim1_state>();
+	double tap_val = cassette_input( timer.machine->device("cassette") );
 
 	if ( tap_val <= 0 )
 	{
@@ -266,9 +266,9 @@ static TIMER_CALLBACK( kim1_cassette_input )
 }
 
 
-static TIMER_CALLBACK( kim1_update_leds )
+static TIMER_DEVICE_CALLBACK( kim1_update_leds )
 {
-	kim1_state *state = machine->driver_data<kim1_state>();
+	kim1_state *state = timer.machine->driver_data<kim1_state>();
 	int i;
 
 	for ( i = 0; i < 6; i++ )
@@ -287,8 +287,6 @@ static MACHINE_START( kim1 )
 	state_save_register_item(machine, "kim1", NULL, 0, state->u2_port_b );
 	state_save_register_item(machine, "kim1", NULL, 0, state->_311_output );
 	state_save_register_item(machine, "kim1", NULL, 0, state->cassette_high_count );
-	machine->scheduler().timer_pulse(attotime::from_hz(60), FUNC(kim1_update_leds));
-	machine->scheduler().timer_pulse(attotime::from_hz(44100), FUNC(kim1_cassette_input));
 }
 
 
@@ -339,6 +337,9 @@ static MACHINE_CONFIG_START( kim1, kim1_state )
 
 	/* video */
 	MCFG_DEFAULT_LAYOUT( layout_kim1 )
+	
+	MCFG_TIMER_ADD_PERIODIC("update_led_timer", kim1_update_leds, attotime::from_hz(60))
+	MCFG_TIMER_ADD_PERIODIC("cassette_timer", kim1_cassette_input, attotime::from_hz(44100))
 MACHINE_CONFIG_END
 
 

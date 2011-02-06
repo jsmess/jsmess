@@ -65,9 +65,9 @@ public:
 };
 
 
-static TIMER_CALLBACK( vg230_timer )
+static TIMER_DEVICE_CALLBACK( vg230_timer )
 {
-	pasogo_state *state = machine->driver_data<pasogo_state>();
+	pasogo_state *state = timer.machine->driver_data<pasogo_state>();
 	vg230_t *vg230 = &state->vg230;
 
 	vg230->rtc.seconds+=1;
@@ -104,9 +104,6 @@ static void vg230_reset(running_machine *machine)
 
 	memset(vg230, 0, sizeof(*vg230));
 	vg230->pmu.write_protected=TRUE;
-	machine->scheduler().timer_pulse(attotime::from_hz(1), FUNC(vg230_timer));
-
-
 	machine->base_datetime(systime);
 
 	vg230->rtc.seconds= systime.local_time.second;
@@ -536,6 +533,8 @@ static MACHINE_CONFIG_START( pasogo, pasogo_state )
 	MCFG_CARTSLOT_MANDATORY
 	MCFG_CARTSLOT_INTERFACE("pasogo_cart")
 	MCFG_SOFTWARE_LIST_ADD("cart_list","pasogo")
+
+	MCFG_TIMER_ADD_PERIODIC("vg230_timer", vg230_timer, attotime::from_hz(1))
 MACHINE_CONFIG_END
 
 

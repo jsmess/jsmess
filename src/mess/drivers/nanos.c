@@ -328,21 +328,21 @@ static UINT8 row_number(UINT8 code) {
 	return 0;
 }
 
-static TIMER_CALLBACK(keyboard_callback)
+static TIMER_DEVICE_CALLBACK(keyboard_callback)
 {
-	nanos_state *state = machine->driver_data<nanos_state>();
+	nanos_state *state = timer.machine->driver_data<nanos_state>();
 	static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6" };
 
 	int i;
 	UINT8 code;
 	UINT8 key_code = 0;
-	UINT8 shift = input_port_read(machine, "LINEC") & 0x02 ? 1 : 0;
-	UINT8 ctrl =  input_port_read(machine, "LINEC") & 0x01 ? 1 : 0;
+	UINT8 shift = input_port_read(timer.machine, "LINEC") & 0x02 ? 1 : 0;
+	UINT8 ctrl =  input_port_read(timer.machine, "LINEC") & 0x01 ? 1 : 0;
 	state->key_pressed = 0xff;
 	for(i = 0; i < 7; i++)
 	{
 
-		code =	input_port_read(machine, keynames[i]);
+		code =	input_port_read(timer.machine, keynames[i]);
 		if (code != 0)
 		{
 			if (i==0 && shift==0) {
@@ -416,7 +416,6 @@ static MACHINE_START(nanos)
 {
 	nanos_state *state = machine->driver_data<nanos_state>();
 	state->key_pressed = 0xff;
-	machine->scheduler().timer_pulse(attotime::from_hz(24000), FUNC(keyboard_callback));
 }
 
 static MACHINE_RESET(nanos)
@@ -534,6 +533,8 @@ static MACHINE_CONFIG_START( nanos, nanos_state )
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
+	
+	MCFG_TIMER_ADD_PERIODIC("keyboard_timer", keyboard_callback, attotime::from_hz(24000))
 MACHINE_CONFIG_END
 
 /* ROM definition */

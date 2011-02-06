@@ -409,9 +409,9 @@ static const mc6845_interface mc6845_intf =
 	NULL		/* update address callback */
 };
 
-static TIMER_CALLBACK( keyboard_callback )
+static TIMER_DEVICE_CALLBACK( keyboard_callback )
 {
-	bml3_state *state = machine->driver_data<bml3_state>();
+	bml3_state *state = timer.machine->driver_data<bml3_state>();
 	static const char *const portnames[3] = { "key1","key2","key3" };
 	int i,port_i,scancode;
 	scancode = 0;
@@ -420,12 +420,12 @@ static TIMER_CALLBACK( keyboard_callback )
 	{
 		for(i=0;i<32;i++)
 		{
-			if((input_port_read(machine,portnames[port_i])>>i) & 1)
+			if((input_port_read(timer.machine,portnames[port_i])>>i) & 1)
 			{
 				{
 					state->keyb_press = scancode;
 					state->keyb_press_flag = 1;
-					cputag_set_input_line(machine, "maincpu", M6809_IRQ_LINE, HOLD_LINE);
+					cputag_set_input_line(timer.machine, "maincpu", M6809_IRQ_LINE, HOLD_LINE);
 					return;
 				}
 			}
@@ -458,7 +458,6 @@ static PALETTE_INIT( bml3 )
 
 static MACHINE_START(bml3)
 {
-	machine->scheduler().timer_pulse(attotime::from_hz(240/8), FUNC(keyboard_callback));
 	beep_set_frequency(machine->device("beeper"),1200); //guesswork
 	beep_set_state(machine->device("beeper"),0);
 }
@@ -515,6 +514,8 @@ static MACHINE_CONFIG_START( bml3, bml3_state )
 
 	MCFG_SOUND_ADD("beeper", BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
+	
+	MCFG_TIMER_ADD_PERIODIC("keyboard_timer", keyboard_callback, attotime::from_hz(240/8))
 MACHINE_CONFIG_END
 
 /* ROM definition */

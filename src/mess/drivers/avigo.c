@@ -160,9 +160,9 @@ static void avigo_refresh_ints(running_machine *machine)
 /* this is not a real interrupt. This timer updates the stylus position from mouse
 movements, and checks if the mouse button is pressed to emulate a press of the stylus to the screen.
 */
-static TIMER_CALLBACK(avigo_dummy_timer_callback)
+static TIMER_DEVICE_CALLBACK(avigo_dummy_timer_callback)
 {
-	avigo_state *state = machine->driver_data<avigo_state>();
+	avigo_state *state = timer.machine->driver_data<avigo_state>();
 	int i;
 	int current_input_port_data[4];
 	int changed;
@@ -172,7 +172,7 @@ static TIMER_CALLBACK(avigo_dummy_timer_callback)
 
 	for (i = 0; i < 4; i++)
 	{
-		current_input_port_data[i] = input_port_read(machine, linenames[i]);
+		current_input_port_data[i] = input_port_read(timer.machine, linenames[i]);
 	}
 
 	changed = current_input_port_data[3]^state->previous_input_port_data[3];
@@ -201,7 +201,7 @@ static TIMER_CALLBACK(avigo_dummy_timer_callback)
 		if ((current_input_port_data[3] & 0x02)!=0)
 		{
 			/* ????? causes a NMI */
-			cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
+			cputag_set_input_line(timer.machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
 		}
 	}
 
@@ -210,14 +210,14 @@ static TIMER_CALLBACK(avigo_dummy_timer_callback)
 		state->previous_input_port_data[i] = current_input_port_data[i];
 	}
 
-	nx = input_port_read(machine, "POSX");
+	nx = input_port_read(timer.machine, "POSX");
 	if (nx>=0x800) nx-=0x1000;
 	else if (nx<=-0x800) nx+=0x1000;
 
 	dx = nx - state->ox;
 	state->ox = nx;
 
-	ny = input_port_read(machine, "POSY");
+	ny = input_port_read(timer.machine, "POSY");
 	if (ny>=0x800) ny-=0x1000;
 	else if (ny<=-0x800) ny+=0x1000;
 
@@ -227,7 +227,7 @@ static TIMER_CALLBACK(avigo_dummy_timer_callback)
 	state->stylus_marker_x +=dx;
 	state->stylus_marker_y +=dy;
 
-	avigo_vh_set_stylus_marker_position(machine, state->stylus_marker_x, state->stylus_marker_y);
+	avigo_vh_set_stylus_marker_position(timer.machine, state->stylus_marker_x, state->stylus_marker_y);
 #if 0
 	/* not sure if keyboard generates an interrupt, or if something
     is plugged in for synchronisation! */
@@ -256,7 +256,7 @@ static TIMER_CALLBACK(avigo_dummy_timer_callback)
 	memcpy(state->previous_input_port_data, current_input_port_data, sizeof(int)*4);
 
 	/* refresh status of interrupts */
-	avigo_refresh_ints(machine);
+	avigo_refresh_ints(timer.machine);
 }
 
 /* does not do anything yet */
@@ -432,11 +432,7 @@ static MACHINE_RESET( avigo )
 
 static MACHINE_START( avigo )
 {
-	/* a timer used to check status of pen */
-	/* an interrupt is generated when the pen is pressed to the screen */
-	machine->scheduler().timer_pulse(attotime::from_hz(50), FUNC(avigo_dummy_timer_callback));
 }
-
 
 static ADDRESS_MAP_START( avigo_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x3fff) AM_READ_BANK("bank1") AM_WRITE_BANK("bank5")
@@ -985,6 +981,10 @@ static MACHINE_CONFIG_START( avigo, avigo_state )
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("128K")
+	
+	/* a timer used to check status of pen */
+	/* an interrupt is generated when the pen is pressed to the screen */
+	MCFG_TIMER_ADD_PERIODIC("avigo_timer", avigo_dummy_timer_callback, attotime::from_hz(50))	
 MACHINE_CONFIG_END
 
 

@@ -280,11 +280,11 @@ static TIMER_CALLBACK( z80_irq_clear )
 }
 
 
-static TIMER_CALLBACK( z80_irq )
+static TIMER_DEVICE_CALLBACK( z80_irq )
 {
-	cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
+	cputag_set_input_line(timer.machine, "maincpu", 0, ASSERT_LINE);
 
-	machine->scheduler().timer_set(attotime::from_usec(100), FUNC(z80_irq_clear));
+	timer.machine->scheduler().timer_set(attotime::from_usec(100), FUNC(z80_irq_clear));
 }
 
 static TIMER_DEVICE_CALLBACK( vg5k_scanline )
@@ -303,8 +303,6 @@ static MACHINE_START( vg5k )
 	vg5k->dac = machine->device("dac");
 	vg5k->printer = machine->device("printer");
 	vg5k->cassette = machine->device("cassette");
-
-	machine->scheduler().timer_pulse(attotime::from_msec(20), FUNC(z80_irq));
 
 	state_save_register_global(machine, vg5k->ef9345_offset);
 }
@@ -440,6 +438,8 @@ static MACHINE_CONFIG_START( vg5k, vg5k_state )
 
 	/* Software lists */
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "vg5k")
+	
+	MCFG_TIMER_ADD_PERIODIC("irq_timer", z80_irq, attotime::from_msec(20))
 MACHINE_CONFIG_END
 
 /* ROM definition */

@@ -252,19 +252,19 @@ static WRITE32_HANDLER ( write_beeper32 )
 	state->beeper = data;
 }
 
-static TIMER_CALLBACK( update_nmi )
+static TIMER_DEVICE_CALLBACK( update_nmi )
 {
-	//cputag_set_input_line_and_vector(machine, "maincpu", M68K_IRQ_7, irq_edge & 0xff ? CLEAR_LINE : ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
-		cputag_set_input_line_and_vector(machine, "maincpu", M68K_IRQ_7, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
-		cputag_set_input_line_and_vector(machine, "maincpu", M68K_IRQ_7, CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR);
+	//cputag_set_input_line_and_vector(timer.machine, "maincpu", M68K_IRQ_7, irq_edge & 0xff ? CLEAR_LINE : ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
+		cputag_set_input_line_and_vector(timer.machine, "maincpu", M68K_IRQ_7, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
+		cputag_set_input_line_and_vector(timer.machine, "maincpu", M68K_IRQ_7, CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR);
 	// irq_edge = ~irq_edge;
 }
 
-static TIMER_CALLBACK( update_nmi32 )
+static TIMER_DEVICE_CALLBACK( update_nmi32 )
 {
-	// cputag_set_input_line_and_vector(machine, "maincpu", M68K_IRQ_7, irq_edge & 0xff ? CLEAR_LINE : ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
-		cputag_set_input_line_and_vector(machine, "maincpu", M68K_IRQ_7, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
-		cputag_set_input_line_and_vector(machine, "maincpu", M68K_IRQ_7, CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR);
+	// cputag_set_input_line_and_vector(timer.machine, "maincpu", M68K_IRQ_7, irq_edge & 0xff ? CLEAR_LINE : ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
+		cputag_set_input_line_and_vector(timer.machine, "maincpu", M68K_IRQ_7, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
+		cputag_set_input_line_and_vector(timer.machine, "maincpu", M68K_IRQ_7, CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR);
 	// irq_edge = ~irq_edge;
 }
 
@@ -276,8 +276,6 @@ static MACHINE_START( glasgow )
 	mboard_key_selector = 0;
 	state->irq_flag = 0;
 	state->lcd_shift_counter = 3;
-	machine->scheduler().timer_pulse(attotime::from_hz(50), FUNC(update_nmi));
-	machine->scheduler().timer_pulse(attotime::from_hz(100), FUNC(mboard_update_artwork));
 	beep_set_frequency(speaker, 44);
 
 	mboard_savestate_register(machine);
@@ -290,8 +288,6 @@ static MACHINE_START( dallas32 )
 	device_t *speaker = machine->device("beep");
 
 	state->lcd_shift_counter = 3;
-	machine->scheduler().timer_pulse(attotime::from_hz(50), FUNC(update_nmi32));
-	machine->scheduler().timer_pulse(attotime::from_hz(100), FUNC(mboard_update_artwork));
 	beep_set_frequency(speaker, 44);
 
 	mboard_savestate_register(machine);
@@ -509,6 +505,9 @@ static MACHINE_CONFIG_START( glasgow, glasgow_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("beep", BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	
+	MCFG_TIMER_ADD_PERIODIC("nmi_timer", update_nmi, attotime::from_hz(50))
+	MCFG_TIMER_ADD_PERIODIC("artwork_timer", mboard_update_artwork, attotime::from_hz(100))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( amsterd, glasgow )
@@ -522,6 +521,9 @@ static MACHINE_CONFIG_DERIVED( dallas32, glasgow )
     MCFG_CPU_REPLACE("maincpu", M68020, 14000000)
     MCFG_CPU_PROGRAM_MAP(dallas32_mem)
     MCFG_MACHINE_START( dallas32 )
+
+	MCFG_DEVICE_REMOVE("nmi_timer")
+	MCFG_TIMER_ADD_PERIODIC("nmi_timer", update_nmi32, attotime::from_hz(50))
 MACHINE_CONFIG_END
 
 /***************************************************************************

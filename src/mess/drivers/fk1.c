@@ -338,13 +338,13 @@ static INPUT_PORTS_START( fk1 )
 		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR('\'')
 INPUT_PORTS_END
 
-static TIMER_CALLBACK(keyboard_callback)
+static TIMER_DEVICE_CALLBACK(keyboard_callback)
 {
-	fk1_state *state = machine->driver_data<fk1_state>();
+	fk1_state *state = timer.machine->driver_data<fk1_state>();
 
-	if (input_port_read(machine, "LINE0")) {
+	if (input_port_read(timer.machine, "LINE0")) {
 		state->int_vector = 6;
-		cputag_set_input_line(machine, "maincpu", 0, HOLD_LINE);
+		cputag_set_input_line(timer.machine, "maincpu", 0, HOLD_LINE);
 	}
 }
 
@@ -367,12 +367,12 @@ static IRQ_CALLBACK (fk1_irq_callback)
 	return state->int_vector * 2;
 }
 
-static TIMER_CALLBACK( vsync_callback )
+static TIMER_DEVICE_CALLBACK( vsync_callback )
 {
-	fk1_state *state = machine->driver_data<fk1_state>();
+	fk1_state *state = timer.machine->driver_data<fk1_state>();
 
 	state->int_vector = 3;
-	cputag_set_input_line(machine, "maincpu", 0, HOLD_LINE);
+	cputag_set_input_line(timer.machine, "maincpu", 0, HOLD_LINE);
 }
 
 
@@ -390,8 +390,6 @@ static MACHINE_RESET(fk1)
 
 static MACHINE_START( fk1 )
 {
-	machine->scheduler().timer_pulse(attotime::from_hz(24000), FUNC(keyboard_callback));
-	machine->scheduler().timer_pulse(attotime::from_hz(50), FUNC(vsync_callback));
 }
 
 static VIDEO_UPDATE( fk1 )
@@ -447,6 +445,9 @@ static MACHINE_CONFIG_START( fk1, fk1_state )
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("80K") // 64 + 16
+	
+	MCFG_TIMER_ADD_PERIODIC("keyboard_timer", keyboard_callback, attotime::from_hz(24000))
+	MCFG_TIMER_ADD_PERIODIC("vsync_timer", vsync_callback, attotime::from_hz(50))
 MACHINE_CONFIG_END
 
 /* ROM definition */

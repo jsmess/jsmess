@@ -262,15 +262,15 @@ DIRECT_UPDATE_HANDLER( scorpion_direct )
 	return address;
 }
 
-static TIMER_CALLBACK(nmi_check_callback)
+static TIMER_DEVICE_CALLBACK(nmi_check_callback)
 {
-	spectrum_state *state = machine->driver_data<spectrum_state>();
+	spectrum_state *state = timer.machine->driver_data<spectrum_state>();
 
-	if ((input_port_read(machine, "NMI") & 1)==1)
+	if ((input_port_read(timer.machine, "NMI") & 1)==1)
 	{
 		state->port_1ffd_data |= 0x02;
-		scorpion_update_memory(machine);
-		cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
+		scorpion_update_memory(timer.machine);
+		cputag_set_input_line(timer.machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -345,7 +345,6 @@ static MACHINE_RESET( scorpion )
 }
 static MACHINE_START( scorpion )
 {
-	machine->scheduler().timer_pulse(attotime::from_hz(50), FUNC(nmi_check_callback));
 }
 
 
@@ -416,6 +415,8 @@ static MACHINE_CONFIG_DERIVED( scorpion, spectrum_128 )
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("256K")
+	
+	MCFG_TIMER_ADD_PERIODIC("nmi_timer", nmi_check_callback, attotime::from_hz(50))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( profi, scorpion )

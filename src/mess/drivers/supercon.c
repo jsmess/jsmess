@@ -513,9 +513,9 @@ static WRITE8_HANDLER( supercon_port4_w )
 
 }
 
-static TIMER_CALLBACK( update_artwork )
+static TIMER_DEVICE_CALLBACK( update_artwork )
 {
-	mouse_update(machine);
+	mouse_update(timer.machine);
 }
 
 static TIMER_CALLBACK( update_irq )
@@ -552,8 +552,6 @@ static MACHINE_START( supercon )
 
 	state->timer_update_irq = machine->scheduler().timer_alloc(FUNC(update_irq));
 	timer_adjust_periodic( state->timer_update_irq, attotime::zero, 0, attotime::from_hz(1000) );
-
-	machine->scheduler().timer_pulse(attotime::from_hz(20), FUNC(update_artwork));
 
 	state_save_register_global_array(machine,state->save_board);
 	state_save_register_postload(machine,m_board_postload,NULL);
@@ -765,7 +763,7 @@ static MACHINE_CONFIG_START( supercon, supercon_state )
 	MCFG_SOUND_ADD("beep", BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-
+	MCFG_TIMER_ADD_PERIODIC("artwork_timer", update_artwork, attotime::from_hz(20))
 MACHINE_CONFIG_END
 
 /* ROM definition */

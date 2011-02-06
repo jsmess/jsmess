@@ -378,12 +378,12 @@ static INPUT_PORTS_START( polgar )
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("A") PORT_CODE(KEYCODE_1)
 INPUT_PORTS_END
 
-static TIMER_CALLBACK( update_nmi )
+static TIMER_DEVICE_CALLBACK( update_nmi )
 {
-	//polgar_state *state = machine->driver_data<polgar_state>();
-	// running_device *speaker = machine->device("beep");
-	cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI,PULSE_LINE);
-	// cputag_set_input_line(machine, "maincpu", M6502_IRQ_LINE, CLEAR_LINE);
+	//polgar_state *state = timer.machine->driver_data<polgar_state>();
+	// running_device *speaker = timer.machine->device("beep");
+	cputag_set_input_line(timer.machine, "maincpu", INPUT_LINE_NMI,PULSE_LINE);
+	// cputag_set_input_line(timer.machine, "maincpu", M6502_IRQ_LINE, CLEAR_LINE);
 	// dac_data_w(0,state->led_status&64?128:0);
 	// beep_set_state(speaker,state->led_status&64?1:0);
 }
@@ -391,9 +391,6 @@ static TIMER_CALLBACK( update_nmi )
 
 static MACHINE_START( polgar )
 {
-	// machine->scheduler().timer_pulse(attotime::from_hz(60), FUNC(update_leds));
-	machine->scheduler().timer_pulse(attotime::from_hz(600), FUNC(update_nmi));
-	machine->scheduler().timer_pulse(attotime::from_hz(100), FUNC(mboard_update_artwork));
 	mboard_savestate_register(machine);
 }
 
@@ -440,6 +437,10 @@ static MACHINE_CONFIG_START( polgar, polgar_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("beep", BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	
+	//MCFG_TIMER_ADD_PERIODIC("led_timer", update_leds, attotime::from_hz(60))
+	MCFG_TIMER_ADD_PERIODIC("nmi_timer", update_nmi, attotime::from_hz(600))
+	MCFG_TIMER_ADD_PERIODIC("artwork_timer", mboard_update_artwork, attotime::from_hz(100))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( milano, polgar )

@@ -286,10 +286,10 @@ void mboard_set_border_pieces (void)
 		output_set_indexed_value("Q", i, border_pieces[i]);
 }
 
-TIMER_CALLBACK( mboard_update_artwork )
+TIMER_DEVICE_CALLBACK( mboard_update_artwork )
 {
-	check_board_buttons(machine);
-	set_artwork(machine);
+	check_board_buttons(timer.machine);
+	set_artwork(timer.machine);
 	mboard_set_border_pieces();
 }
 

@@ -1920,12 +1920,12 @@ static void pc8801_sound_irq( device_t *device, int irq )
 	}
 }
 
-static TIMER_CALLBACK( pc8801_rtc_irq )
+static TIMER_DEVICE_CALLBACK( pc8801_rtc_irq )
 {
 	if(timer_irq_mask)
 	{
 		timer_irq_latch = 1;
-		cputag_set_input_line(machine,"maincpu",0,HOLD_LINE);
+		cputag_set_input_line(timer.machine,"maincpu",0,HOLD_LINE);
 	}
 }
 
@@ -1942,8 +1942,6 @@ static INTERRUPT_GEN( pc8801_vrtc_irq )
 static MACHINE_START( pc8801 )
 {
 	cpu_set_irq_callback(machine->device("maincpu"), pc8801_irq_callback);
-
-	machine->scheduler().timer_pulse(attotime::from_hz(600), FUNC(pc8801_rtc_irq));
 }
 
 static MACHINE_RESET( pc8801 )
@@ -2143,6 +2141,8 @@ static MACHINE_CONFIG_START( pc8801, driver_device )
 
 	MCFG_SOUND_ADD("beeper", BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
+
+	MCFG_TIMER_ADD_PERIODIC("rtc_timer", pc8801_rtc_irq, attotime::from_hz(600))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( pc8801fh, pc8801 )

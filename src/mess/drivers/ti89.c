@@ -153,9 +153,9 @@ READ16_MEMBER ( ti68k_state::flash_r )
 }
 
 
-static TIMER_CALLBACK( ti68k_timer_callback )
+static TIMER_DEVICE_CALLBACK( ti68k_timer_callback )
 {
-	ti68k_state *state = machine->driver_data<ti68k_state>();
+	ti68k_state *state = timer.machine->driver_data<ti68k_state>();
 
 	state->timer++;
 
@@ -182,7 +182,7 @@ static TIMER_CALLBACK( ti68k_timer_callback )
 		}
 	}
 
-	if (state->keypad_r(machine) != 0xff)
+	if (state->keypad_r(timer.machine) != 0xff)
 		state->m_maincpu->set_input_line(M68K_IRQ_2, HOLD_LINE);
 }
 
@@ -461,8 +461,6 @@ void ti68k_state::machine_start()
 		}
 	}
 
-	machine->scheduler().timer_pulse(attotime::from_hz(1<<14), FUNC(ti68k_timer_callback));
-
 	logerror("HW=v%x, PC=%06x, Type=%s\n", m_hw_version, m_initial_pc, (m_flash_mem) ? "Flash" : "ROM");
 }
 
@@ -532,6 +530,8 @@ static MACHINE_CONFIG_START( ti89, ti68k_state )
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
 	MCFG_SHARP_UNK128MBIT_ADD("flash")	//should be LH28F320 for ti89t and v200 and LH28F160S3T for other models
+	
+	MCFG_TIMER_ADD_PERIODIC("ti68k_timer", ti68k_timer_callback, attotime::from_hz(1<<14))
 MACHINE_CONFIG_END
 
 
