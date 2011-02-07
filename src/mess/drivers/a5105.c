@@ -12,49 +12,28 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "video/upd7220.h"
 
 
 class a5105_state : public driver_device
 {
 public:
 	a5105_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+		: driver_device(machine, config),
+		  m_hgdc(*this, "upd7220")
+		{ }
+
+	required_device<device_t> m_hgdc;
+
+	virtual void video_start();
+	virtual bool video_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
+	UINT8 *m_char_rom;
+
 
 	UINT16 pcg_addr;
 	UINT16 pcg_internal_addr;
 	UINT8 key_mux;
 };
-
-
-static VIDEO_START( a5105 )
-{
-}
-
-static VIDEO_UPDATE( a5105 )
-{
-	UINT8 *vram = screen->machine->region("vram")->base();
-	//UINT8 *attr = screen->machine->region("attr")->base();
-	int x,y;
-	int count;
-	const gfx_element *gfx = screen->machine->gfx[0];
-	UINT8 tile;
-
-	count = 0;
-
-	for(y=0;y<32;y++)
-	{
-		for(x=0;x<40;x++)
-		{
-			tile = vram[count];
-
-			drawgfx_opaque(bitmap,cliprect,gfx,tile,0,0,0,x*8,y*8);
-			count++;
-		}
-	}
-
-
-	return 0;
-}
 
 static ADDRESS_MAP_START(a5105_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
@@ -63,129 +42,6 @@ static ADDRESS_MAP_START(a5105_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xc000, 0xefff) AM_RAM
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
-
-
-/*
-VDP sequence is:
-- polls the command ($99)
-- polls the params ($98)
-*/
-
-static UINT8 vdp_cmd,vdp_index,vdp_param[0x10],vdp_stack[0x100];
-static UINT32 vdp_offset,vdp_read_stack;
-
-static READ8_HANDLER( vdp_status_r )
-{
-	/*
-	[0]
-	--x- ---- vblank
-	---- --x- processed command?
-	*/
-
-	return 0xdd | input_port_read(space->machine,"VBLANK");
-}
-
-static READ8_HANDLER( vdp_data_r )
-{
-	//printf("Read data port\n");
-	UINT8 res;
-	//UINT8 *vram = space->machine->region("vram")->base();
-
-	res = vdp_stack[vdp_read_stack];
-
-	if(vdp_read_stack < 0x100)
-		vdp_read_stack++;
-
-	//res = vdp_stack[vdp_offset+vdp_read_stack];
-	//vdp_read_stack++;
-	//printf("%04x %04x %02x\n",vdp_offset,vram_read_stack,res);
-
-	return res;
-}
-
-static WRITE8_HANDLER( vdp_cmd_w )
-{
-	/*
-
-	*/
-
-	vdp_cmd = data;
-	vdp_index = 0;
-
-	switch(data)
-	{
-		case 0x00: printf("VDP: Reset / screen param issued 0x00\n"); break;
-		case 0x20: printf("VDP: Put char command issued 0x20\n"); break;
-		case 0x49: printf("VDP: current videoram offset command issued 0x49\n"); break;
-		case 0x4c: printf("VDP: repeat command issued? 0x4c\n"); break;
-		case 0xa0:
-			vdp_read_stack = 0;
-			printf("VDP: get current videoram offset 0xa0 = %04x\n",vdp_offset);
-			vdp_stack[0] = vdp_offset & 0xff;
-			vdp_stack[1] = vdp_offset >> 8;
-			break;
-
-		default: printf("VDP: Unknown command issued %02x\n",data);
-	}
-
-}
-
-static WRITE8_HANDLER( vdp_data_w )
-{
-	UINT8 *vram = space->machine->region("vram")->base();
-	UINT8 *attr = space->machine->region("attr")->base();
-
-	/**/
-
-	vdp_param[vdp_index] = data;
-
-	printf("%02x\n",data);
-
-	if(vdp_index < 0x10)
-		vdp_index++;
-
-	switch(vdp_cmd)
-	{
-		case 0x20:
-			if(vdp_index == 2)
-			{
-				vram[vdp_offset] = vdp_param[0];
-				attr[vdp_offset] = vdp_param[1];
-				vdp_offset++;
-				vdp_offset&=0xffff; //TODO: this is wrong
-			}
-			break;
-		case 0x49:
-			if(vdp_index == 2)
-			{
-				vdp_offset = (vdp_param[1]<<8)|(vdp_param[0]);
-				//vdp_offset++;
-				//vdp_offset&=0xffff;
-			}
-			if(vdp_index == 3)
-				vdp_offset = 0;
-			break;
-		case 0x4c:
-			if(vdp_index == 3)
-			{
-				if(vdp_param[0] == 2 && vdp_param[1] == 0x27 && vdp_param[2] == 0x00)
-				{
-					int i;
-
-					for(i=1;i<0x50;i++)
-					{
-						vram[vdp_offset+i] = vram[vdp_offset];
-						attr[vdp_offset+i] = attr[vdp_offset];
-					}
-				}
-			}
-			break;
-		default:
-			break;
-	}
-
-
-}
 
 static WRITE8_HANDLER( pcg_addr_w )
 {
@@ -229,19 +85,29 @@ static WRITE8_HANDLER( key_mux_w )
 	state->key_mux = data;
 }
 
+static UINT8 io_latch;
+
+static READ8_HANDLER( a5105_system_r )
+{
+	return io_latch;
+}
+
+static WRITE8_HANDLER( a5105_system_w )
+{
+	io_latch = data;
+}
+
 static ADDRESS_MAP_START( a5105_io , ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x98, 0x98) AM_READ(vdp_status_r)
-	AM_RANGE(0x99, 0x99) AM_READ(vdp_data_r)
+	AM_RANGE(0x98, 0x99) AM_DEVREADWRITE("upd7220", upd7220_r, upd7220_w)
 
-	AM_RANGE(0x98, 0x98) AM_WRITE(vdp_data_w)
-	AM_RANGE(0x99, 0x99) AM_WRITE(vdp_cmd_w)
 	AM_RANGE(0x9c, 0x9c) AM_WRITE(pcg_val_w)
-	//0x9d palette?
+
 	AM_RANGE(0x9e, 0x9e) AM_WRITE(pcg_addr_w)
 
 	//0xa8 is an i/o component (bankswitch lies there?)
+	AM_RANGE(0xa8, 0xa8) AM_READWRITE(a5105_system_r,a5105_system_w)
 	AM_RANGE(0xa9, 0xa9) AM_READ(key_r)
 	AM_RANGE(0xaa, 0xaa) AM_READ(key_mux_w)
 
@@ -316,13 +182,13 @@ static INPUT_PORTS_START( a5105 )
 	PORT_BIT (0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("GRAPH") PORT_CODE(KEYCODE_PGUP)		PORT_CHAR(UCHAR_MAMEKEY(F6))
 	PORT_BIT (0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("CAPS") PORT_CODE(KEYCODE_CAPSLOCK)	PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK))
 	PORT_BIT (0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("CODE") PORT_CODE(KEYCODE_PGDN)		PORT_CHAR(UCHAR_MAMEKEY(F7))
-	PORT_BIT (0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F1  F6") PORT_CODE(KEYCODE_F1)		PORT_CHAR(UCHAR_MAMEKEY(F1))
-	PORT_BIT (0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F2  F7") PORT_CODE(KEYCODE_F2)		PORT_CHAR(UCHAR_MAMEKEY(F2))
-	PORT_BIT (0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F3  F8") PORT_CODE(KEYCODE_F3)		PORT_CHAR(UCHAR_MAMEKEY(F3))
+	PORT_BIT (0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F1") PORT_CODE(KEYCODE_F5)		PORT_CHAR(UCHAR_MAMEKEY(F5))
+	PORT_BIT (0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F2") PORT_CODE(KEYCODE_F4)		PORT_CHAR(UCHAR_MAMEKEY(F4))
+	PORT_BIT (0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F3") PORT_CODE(KEYCODE_F3)		PORT_CHAR(UCHAR_MAMEKEY(F3))
 
 	PORT_START("KEY7")
-	PORT_BIT (0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F4  F9") PORT_CODE(KEYCODE_F4)		PORT_CHAR(UCHAR_MAMEKEY(F4))
-	PORT_BIT (0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F5  F10") PORT_CODE(KEYCODE_F5)		PORT_CHAR(UCHAR_MAMEKEY(F5))
+	PORT_BIT (0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F4") PORT_CODE(KEYCODE_F2)		PORT_CHAR(UCHAR_MAMEKEY(F2))
+	PORT_BIT (0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F5") PORT_CODE(KEYCODE_F1)		PORT_CHAR(UCHAR_MAMEKEY(F1))
 	PORT_BIT (0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_ESC)							PORT_CHAR(UCHAR_MAMEKEY(ESC))
 	PORT_BIT (0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_TAB)							PORT_CHAR('\t')
 	PORT_BIT (0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("STOP") PORT_CODE(KEYCODE_RCONTROL)	PORT_CHAR(UCHAR_MAMEKEY(F8))
@@ -394,6 +260,61 @@ static INTERRUPT_GEN( a5105_vblank_irq )
 	cpu_set_input_line_and_vector(device, 0, HOLD_LINE,0x44);
 }
 
+static PALETTE_INIT( gdc )
+{
+	int i;
+	int r,g,b;
+
+	for ( i = 0; i < 16; i++ )
+	{
+		r = i & 4 ? ((i & 8) ? 0xaa : 0xff) : 0x00;
+		g = i & 2 ? ((i & 8) ? 0xaa : 0xff) : 0x00;
+		b = i & 1 ? ((i & 8) ? 0xaa : 0xff) : 0x00;
+
+		palette_set_color(machine, i, MAKE_RGB(r,g,b));
+	}
+}
+
+void a5105_state::video_start()
+{
+	// find memory regions
+	m_char_rom = machine->region("pcg")->base();
+
+	VIDEO_START_CALL(generic_bitmapped);
+}
+
+bool a5105_state::video_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+{
+	/* graphics */
+	upd7220_update(m_hgdc, &bitmap, &cliprect);
+
+	return 0;
+}
+
+static ADDRESS_MAP_START( a5105_upd7220_map, 0, 16 )
+	AM_RANGE(0x00000, 0x3ffff) AM_RAM
+ADDRESS_MAP_END
+
+static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
+{
+	int i;
+
+	for (i = 0; i < 16; i++)
+	{
+		if (BIT(data, i)) *BITMAP_ADDR16(bitmap, y, x + i) = 1;
+	}
+}
+
+static UPD7220_INTERFACE( hgdc_intf )
+{
+	"screen",
+	hgdc_display_pixels,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
 static MACHINE_CONFIG_START( a5105, a5105_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
@@ -409,14 +330,13 @@ static MACHINE_CONFIG_START( a5105, a5105_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(40*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0, 40*8-1, 0, 32*8-1)
-	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT(black_and_white)
+	MCFG_SCREEN_VISIBLE_AREA(0, 40*8-1, 0, 25*8-1)
+	MCFG_PALETTE_LENGTH(16)
+	MCFG_PALETTE_INIT(gdc)
 
 	MCFG_GFXDECODE(a5105)
 
-	MCFG_VIDEO_START(a5105)
-	MCFG_VIDEO_UPDATE(a5105)
+	MCFG_UPD7220_ADD("upd7220", XTAL_4MHz, hgdc_intf, a5105_upd7220_map) //unknown clock
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -425,11 +345,9 @@ ROM_START( a5105 )
 	ROM_LOAD( "k1505_00.rom", 0x0000, 0x8000, CRC(0ed5f556) SHA1(5c33139db9f59e50da5c76729752f8e653ae34ae))
 	ROM_LOAD( "k1505_80.rom", 0x8000, 0x2000, CRC(350e4958) SHA1(7e5b587c59676e8549561117ea0b70234f439a94))
 
-	ROM_REGION( 0x800, "pcg", ROMREGION_ERASEFF )
+	ROM_REGION( 0x800, "pcg", ROMREGION_ERASE00 )
 
-	ROM_REGION( 0x10000, "vram", ROMREGION_ERASE00 )
-
-	ROM_REGION( 0x10000, "attr", ROMREGION_ERASE00 )
+	ROM_REGION( 0x40000, "vram", ROMREGION_ERASE00 )
 
 	ROM_REGION( 0x4000, "gfx2", ROMREGION_ERASEFF )
 	ROM_LOAD( "k5651_40.rom", 0x0000, 0x2000, CRC(f4ad4739) SHA1(9a7bbe6f0d180dd513c7854f441cee986c8d9765))
