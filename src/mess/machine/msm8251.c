@@ -760,7 +760,7 @@ READ8_DEVICE_HANDLER(msm8251_data_r)
 {
 	msm8251_t *uart = get_token(device);
 
-	logerror("read data: %02x\n",uart->data);
+	logerror("read data: %02x, STATUS=%02x\n",uart->data,uart->status);
 	/* reading clears */
 	uart->status &= ~MSM8251_STATUS_RX_READY;
 

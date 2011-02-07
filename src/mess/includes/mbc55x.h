@@ -16,8 +16,6 @@
 
 #define MAINCPU_TAG "maincpu"
 
-#define KEYBOARD_QUEUE_SIZE 	32
-
 #define SCREEN_TAG				"screen"
 #define SCREEN_WIDTH_PIXELS     640
 #define SCREEN_HEIGHT_LINES     250
@@ -41,20 +39,46 @@
 #define RED_PLANE_TAG			"red"
 #define BLUE_PLANE_TAG			"blue"
 
+// Keyboard
+
+#define MBC55X_KEYROWS      	7
+#define KEYBOARD_QUEUE_SIZE 	32
+
+#define KB_BITMASK				0x1000
+#define KB_SHIFTS				12
+
+#define KEY_SPECIAL_TAG			"KEY_SPECIAL"
+#define KEY_BIT_LSHIFT			0x01
+#define KEY_BIT_RSHIFT			0x02
+#define KEY_BIT_CTRL			0x04
+#define KEY_BIT_GRAPH			0x08
+
+
+typedef struct
+{
+	UINT8       keyrows[MBC55X_KEYROWS];
+	emu_timer   *keyscan_timer;
+
+	UINT8		key_special;
+}  keyboard_t;
+
+
 class mbc55x_state : public driver_device
 {
 public:
 	mbc55x_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	device_t *maincpu;
-	device_t *pic8259;
-	device_t *pit8253;
+	device_t 	*maincpu;
+	device_t 	*pic8259;
+	device_t 	*pit8253;
 
-	UINT32 	debug_machine;
-	UINT32	debug_video;
-	UINT8 	video_mem[VIDEO_MEM_SIZE];
-	UINT8	vram_page;
+	UINT32 		debug_machine;
+	UINT32		debug_video;
+	UINT8 		video_mem[VIDEO_MEM_SIZE];
+	UINT8		vram_page;
+
+	keyboard_t	keyboard;
 };
 
 /* IO chips */
@@ -88,8 +112,11 @@ WRITE8_HANDLER(mbc55x_video_io_w);
 #define	SPEAKER_TAG				"speaker"
 #define MONO_TAG                "mono"
 
-#define MSM8251A_TAG			"msm8251a"
+#define MSM8251A_KB_TAG			"msm8251a_kb"
 
+typedef struct 
+{
+} msm_rx_t;
 
 /*----------- defined in drivers/mbc55x.c -----------*/
 
@@ -142,6 +169,8 @@ extern const wd17xx_interface mbc55x_wd17xx_interface;
 
 READ8_HANDLER( mbc55x_disk_r );
 WRITE8_HANDLER( mbc55x_disk_w );
+READ8_HANDLER(mbc55x_usart_r);
+WRITE8_HANDLER(mbc55x_usart_w);
 READ8_HANDLER(mbc55x_kb_usart_r);
 WRITE8_HANDLER(mbc55x_kb_usart_w);
 
