@@ -762,7 +762,7 @@ void ste_state::dmasound_tick()
 		}
 		else
 		{
-			timer_enable(m_dmasound_timer, 0);
+			m_dmasound_timer->enable(0);
 		}
 	}
 }
@@ -894,13 +894,13 @@ WRITE8_MEMBER( ste_state::sound_dma_control_w )
 		if (!m_dmasnd_active)
 		{
 			dmasound_set_state(1);
-			timer_adjust_periodic(m_dmasound_timer, attotime::zero, 0, attotime::from_hz(DMASOUND_RATE[m_dmasnd_mode & 0x03]));
+			m_dmasound_timer->adjust(attotime::zero, 0, attotime::from_hz(DMASOUND_RATE[m_dmasnd_mode & 0x03]));
 		}
 	}
 	else
 	{
 		dmasound_set_state(0);
-		timer_enable(m_dmasound_timer, 0);
+		m_dmasound_timer->enable(0);
 	}
 }
 
@@ -1013,7 +1013,7 @@ void ste_state::microwire_tick()
 		microwire_shift();
 		lmc1992_enable_w(m_lmc1992, 1);
 		m_mw_shift = 0;
-		timer_enable(m_microwire_timer, 0);
+		m_microwire_timer->enable(0);
 		break;
 	}
 }
@@ -1047,10 +1047,10 @@ READ16_MEMBER( ste_state::microwire_data_r )
 
 WRITE16_MEMBER( ste_state::microwire_data_w )
 {
-	if (!timer_enabled(m_microwire_timer))
+	if (!m_microwire_timer->enabled())
 	{
 		m_mw_data = data;
-		timer_adjust_periodic(m_microwire_timer, attotime::zero, 0, attotime::from_usec(2));
+		m_microwire_timer->adjust(attotime::zero, 0, attotime::from_usec(2));
 	}
 }
 
@@ -1071,7 +1071,7 @@ READ16_MEMBER( ste_state::microwire_mask_r )
 
 WRITE16_MEMBER( ste_state::microwire_mask_w )
 {
-	if (!timer_enabled(m_microwire_timer))
+	if (!m_microwire_timer->enabled())
 	{
 		m_mw_mask = data;
 	}
@@ -2271,7 +2271,7 @@ void st_state::machine_start()
 
 	// allocate timers
 	m_mouse_timer = machine->scheduler().timer_alloc(FUNC(st_mouse_tick));
-	timer_adjust_periodic(m_mouse_timer, attotime::zero, 0, attotime::from_hz(500));
+	m_mouse_timer->adjust(attotime::zero, 0, attotime::from_hz(500));
 	
 	// register for state saving
 	state_save();

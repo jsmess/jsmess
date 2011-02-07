@@ -29,13 +29,13 @@ static void electron_tape_start( electron_state *state )
 	state->ula.high_tone_set = 0;
 	state->ula.bit_count = 0;
 	state->ula.tape_running = 1;
-	timer_adjust_periodic(state->tape_timer, attotime::zero, 0, attotime::from_hz(4800));
+	state->tape_timer->adjust(attotime::zero, 0, attotime::from_hz(4800));
 }
 
 static void electron_tape_stop( electron_state *state )
 {
 	state->ula.tape_running = 0;
-	timer_reset( state->tape_timer, attotime::never );
+	state->tape_timer->reset(  );
 }
 
 #define TAPE_LOW	0x00;

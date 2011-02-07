@@ -1450,7 +1450,7 @@ static int get_scanline(void)
 	attotime duration;
 
 	/* get the time since last field sync */
-	duration = timer_starttime(m6847->hs_rise_timer) - timer_starttime(m6847->fs_rise_timer);
+	duration = m6847->hs_rise_timer->start() - m6847->fs_rise_timer->start();
 	assert_always(duration.seconds == 0, "get_scanline(): duration exceeds one second");
 
 	if (duration.attoseconds < m6847->vblank_period)
@@ -1471,7 +1471,7 @@ static int get_beamx(void)
 	attotime scanline_time;
 	int result;
 
-	scanline_time = timer_timeelapsed(m6847->hs_rise_timer);
+	scanline_time = m6847->hs_rise_timer->elapsed();
 	if (scanline_time.seconds != 0)
 		return 0;
 	assert(scanline_time.as_attoseconds() < m6847->scanline_period);
@@ -1587,7 +1587,7 @@ void coco6847_video_changed(void)
 
 int m6847_get_horizontal_sync(running_machine *machine)
 {
-	attotime fire_time = timer_firetime(m6847->hs_fall_timer);
+	attotime fire_time = m6847->hs_fall_timer->expire();
 	return fire_time > machine->time();
 }
 
@@ -1595,7 +1595,7 @@ int m6847_get_horizontal_sync(running_machine *machine)
 
 static void set_horizontal_sync(running_machine *machine)
 {
-	attotime fire_time = timer_firetime(m6847->hs_fall_timer);
+	attotime fire_time = m6847->hs_fall_timer->expire();
 	int horizontal_sync = fire_time >  machine->time();
 	if (m6847->horizontal_sync_callback)
 		m6847->horizontal_sync_callback(machine, !horizontal_sync);
@@ -1605,7 +1605,7 @@ static void set_horizontal_sync(running_machine *machine)
 
 int m6847_get_field_sync(running_machine *machine)
 {
-	attotime fire_time = timer_firetime(m6847->fs_fall_timer);
+	attotime fire_time = m6847->fs_fall_timer->expire();
 	return fire_time > machine->time();
 }
 
@@ -1613,7 +1613,7 @@ int m6847_get_field_sync(running_machine *machine)
 
 static void set_field_sync(running_machine *machine)
 {
-	attotime fire_time = timer_firetime(m6847->fs_fall_timer);
+	attotime fire_time = m6847->fs_fall_timer->expire();
 	int field_sync = fire_time > machine->time();
 	if (m6847->field_sync_callback)
 		m6847->field_sync_callback(machine,field_sync);
@@ -1640,9 +1640,9 @@ static TIMER_CALLBACK(hs_rise)
 	if (LOG_HS)
 		logerror("hs_rise(): time=%s\n", machine->time().as_string(ATTOTIME_STRING_PRECISION));
 
-	timer_adjust_oneshot(m6847->hs_rise_timer,
+	m6847->hs_rise_timer->adjust(
 		attotime(0, m6847->scanline_period), 0);
-	timer_adjust_oneshot(m6847->hs_fall_timer,
+	m6847->hs_fall_timer->adjust(
 		attotime(0, m6847->horizontal_sync_period), 0);
 
 	set_horizontal_sync(machine);
@@ -1663,11 +1663,11 @@ static TIMER_CALLBACK(fs_rise)
 		logerror("fs_rise(): time=%s scanline=%d\n", machine->time().as_string(ATTOTIME_STRING_PRECISION), get_scanline());
 
 	/* adjust field sync falling edge timer */
-	timer_adjust_oneshot(m6847->fs_fall_timer,
+	m6847->fs_fall_timer->adjust(
 		attotime(0, m6847->field_sync_period), 0);
 
 	/* adjust horizontal sync rising timer */
-	timer_adjust_oneshot(m6847->hs_rise_timer, attotime::zero, 0);
+	m6847->hs_rise_timer->adjust(attotime::zero);
 
 	/* this is a hook for the CoCo 3 code to extend this stuff */
 	if (m6847->new_frame_callback)
@@ -1907,7 +1907,7 @@ void m6847_init(running_machine *machine, const m6847_config *cfg)
 	/* setup timing */
 	frame_period = period *
 		(UINT32) (v->clocks_per_scanline * total_scanlines * GROSS_FACTOR);
-	timer_adjust_periodic(m6847->fs_rise_timer, attotime::zero, 0, attotime(0, frame_period));
+	m6847->fs_rise_timer->adjust(attotime::zero, 0, attotime(0, frame_period));
 
 	/* setup save states */
 	state_save_register_postload(machine, m6847_postload, NULL);

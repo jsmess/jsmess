@@ -95,12 +95,12 @@ WRITE8_DEVICE_HANDLER( aim65_printer_on )
 	if (!data)
 	{
 		aim65_printer_cr(state);
-		timer_adjust_periodic(state->print_timer, attotime::zero, 0, attotime::from_usec(10));
+		state->print_timer->adjust(attotime::zero, 0, attotime::from_usec(10));
 		via_0->write_cb1(0);
 		state->printer_level = 1;
 	}
 	else
-		timer_reset(state->print_timer, attotime::never);
+		state->print_timer->reset();
 }
 
 

@@ -918,7 +918,7 @@ static WRITE32_HANDLER(towns_pad_mask_w)
 				}
 				else
 					state->towns_mouse_output++;
-				timer_adjust_periodic(state->towns_mouse_timer,attotime::from_usec(600),0,attotime::zero);
+				state->towns_mouse_timer->adjust(attotime::from_usec(600),0,attotime::zero);
 			}
 			if((state->towns_pad_mask & 0x10) == 0 && (state->prev_pad_mask & 0x10) != 0)
 			{
@@ -934,7 +934,7 @@ static WRITE32_HANDLER(towns_pad_mask_w)
 				}
 				else
 					state->towns_mouse_output++;
-				timer_adjust_periodic(state->towns_mouse_timer,attotime::from_usec(600),0,attotime::zero);
+				state->towns_mouse_timer->adjust(attotime::from_usec(600),0,attotime::zero);
 			}
 			state->prev_pad_mask = state->towns_pad_mask;
 		}
@@ -954,7 +954,7 @@ static WRITE32_HANDLER(towns_pad_mask_w)
 				}
 				else
 					state->towns_mouse_output++;
-				timer_adjust_periodic(state->towns_mouse_timer,attotime::from_usec(600),0,attotime::zero);
+				state->towns_mouse_timer->adjust(attotime::from_usec(600),0,attotime::zero);
 			}
 			if((state->towns_pad_mask & 0x20) == 0 && (state->prev_pad_mask & 0x20) != 0)
 			{
@@ -970,7 +970,7 @@ static WRITE32_HANDLER(towns_pad_mask_w)
 				}
 				else
 					state->towns_mouse_output++;
-				timer_adjust_periodic(state->towns_mouse_timer,attotime::from_usec(600),0,attotime::zero);
+				state->towns_mouse_timer->adjust(attotime::from_usec(600),0,attotime::zero);
 			}
 			state->prev_pad_mask = state->towns_pad_mask;
 		}
@@ -1249,17 +1249,17 @@ static TIMER_CALLBACK( towns_cdrom_read_byte )
 //  logerror("DMARQ: param=%i ret=%i bufferptr=%i\n",param,masked,state->towns_cd.buffer_ptr);
 	if(param != 0)
 	{
-		timer_adjust_oneshot(state->towns_cd.read_timer,attotime::from_hz(300000),0);
+		state->towns_cd.read_timer->adjust(attotime::from_hz(300000));
 	}
 	else
 	{
 		if(masked != 0)  // check if the DMA channel is masked
 		{
-			timer_adjust_oneshot(state->towns_cd.read_timer,attotime::from_hz(300000),1);
+			state->towns_cd.read_timer->adjust(attotime::from_hz(300000),1);
 			return;
 		}
 		if(state->towns_cd.buffer_ptr < 2048)
-			timer_adjust_oneshot(state->towns_cd.read_timer,attotime::from_hz(300000),1);
+			state->towns_cd.read_timer->adjust(attotime::from_hz(300000),1);
 		else
 		{  // end of transfer
 			state->towns_cd.status &= ~0x10;  // no longer transferring by DMA
@@ -1279,7 +1279,7 @@ static TIMER_CALLBACK( towns_cdrom_read_byte )
 				towns_cd_set_status(device->machine,0x22,0x00,0x00,0x00);
 				towns_cdrom_set_irq(device->machine,TOWNS_CD_IRQ_DMA,1);
 				cdrom_read_data(cd_get_cdrom_file(state->cdrom),++state->towns_cd.lba_current,state->towns_cd.buffer,CD_TRACK_MODE1);
-				timer_adjust_oneshot(state->towns_cd.read_timer,attotime::from_hz(300000),1);
+				state->towns_cd.read_timer->adjust(attotime::from_hz(300000),1);
 				state->towns_cd.buffer_ptr = -1;
 			}
 		}
@@ -1332,7 +1332,7 @@ static void towns_cdrom_read(device_t* device)
 		state->towns_cd.status |= 0x10;  // DMA transfer begin
 		state->towns_cd.status &= ~0x20;  // not a software transfer
 //      state->towns_cd.buffer_ptr = 0;
-//      timer_adjust_oneshot(state->towns_cd.read_timer,attotime::from_hz(300000),1);
+//      state->towns_cd.read_timer->adjust(attotime::from_hz(300000),1);
 		if(state->towns_cd.command & 0x20)
 		{
 			state->towns_cd.extra_status = 2;
@@ -1686,7 +1686,7 @@ static WRITE8_HANDLER(towns_cdrom_w)
 				if(state->towns_cd.buffer_ptr < 0)
 				{
 					state->towns_cd.buffer_ptr = 0;
-					timer_adjust_oneshot(state->towns_cd.read_timer,attotime::from_hz(300000),1);
+					state->towns_cd.read_timer->adjust(attotime::from_hz(300000),1);
 				}
 			}
 			logerror("CD: transfer mode write %02x\n",data);
@@ -2325,8 +2325,8 @@ static MACHINE_RESET( towns )
 	state->towns_cd.status = 0x01;  // CDROM controller ready
 	state->towns_cd.buffer_ptr = -1;
 	state->towns_volume_select = 0;
-	timer_adjust_periodic(state->towns_rtc_timer,attotime::zero,0,attotime::from_hz(1));
-	timer_adjust_periodic(state->towns_kb_timer,attotime::zero,0,attotime::from_msec(10));
+	state->towns_rtc_timer->adjust(attotime::zero,0,attotime::from_hz(1));
+	state->towns_kb_timer->adjust(attotime::zero,0,attotime::from_msec(10));
 }
 
 static const struct pit8253_config towns_pit8253_config =

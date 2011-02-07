@@ -161,7 +161,7 @@ WRITE8_DEVICE_HANDLER( rp5c01a_w )
 	case RP5C01A_REGISTER_MODE:
 		rp5c01a->mode = data;
 
-		timer_enable(rp5c01a->clock_timer, data & RP5C01A_MODE_TIMER_EN);
+		rp5c01a->clock_timer->enable(data & RP5C01A_MODE_TIMER_EN);
 
 		if (LOG)
 		{
@@ -187,7 +187,7 @@ WRITE8_DEVICE_HANDLER( rp5c01a_w )
 			}
 		}
 
-		timer_enable(rp5c01a->alarm_timer, !(data & RP5C01A_RESET_16_HZ));
+		rp5c01a->alarm_timer->enable(!(data & RP5C01A_RESET_16_HZ));
 
 		if (LOG)
 		{
@@ -338,11 +338,11 @@ static DEVICE_START( rp5c01a )
 
 	/* create the timers */
 	rp5c01a->clock_timer = device->machine->scheduler().timer_alloc(FUNC(clock_tick), (void *)device);
-	timer_adjust_periodic(rp5c01a->clock_timer, attotime::zero, 0, attotime::from_hz(1));
+	rp5c01a->clock_timer->adjust(attotime::zero, 0, attotime::from_hz(1));
 
 	rp5c01a->alarm_timer = device->machine->scheduler().timer_alloc(FUNC(alarm_tick), (void *)device);
-	timer_adjust_periodic(rp5c01a->alarm_timer, attotime::zero, 0, attotime::from_hz(16));
-	timer_enable(rp5c01a->alarm_timer, 0);
+	rp5c01a->alarm_timer->adjust(attotime::zero, 0, attotime::from_hz(16));
+	rp5c01a->alarm_timer->enable(0);
 
 	/* register for state saving */
     state_save_register_global(device->machine, rp5c01a->mode);

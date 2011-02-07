@@ -669,7 +669,7 @@ static void avr8_update_timer1_clock_source(running_machine *machine)
 			verboselog(machine, 0, "avr8_update_timer1_clock_source: T1 Trigger mode not implemented yet\n");
 			break;
 	}
-	timer_adjust_periodic(state->timer1_timer, period, 0, period);
+	state->timer1_timer->adjust(period, 0, period);
 }
 
 static void avr8_changed_tccr1b(running_machine *machine, UINT8 data)
@@ -774,7 +774,7 @@ static void avr8_update_timer2_clock_source(running_machine *machine)
 			period = attotime::from_hz(MASTER_CLOCK/1024);
 			break;
 	}
-	timer_adjust_periodic(state->timer2_timer, period, 0, period);
+	state->timer2_timer->adjust(period, 0, period);
 }
 
 static void avr8_timer2_force_output_compare(running_machine *machine, int reg)

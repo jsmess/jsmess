@@ -562,17 +562,17 @@ static TIMER_CALLBACK(ted7360_timer_timeout)
 	{
 	case 1:
 		// proved by digisound of several intros like eoroidpro
-		timer_adjust_oneshot(ted7360->timer1, TEDTIME_IN_CYCLES((ted7360->type == TED7360_PAL), TIMER1), 1);
+		ted7360->timer1->adjust(TEDTIME_IN_CYCLES((ted7360->type == TED7360_PAL), TIMER1), 1);
 		ted7360->timer1_active = 1;
 		ted7360_set_interrupt(machine, 0x08, ted7360);
 		break;
 	case 2:
-		timer_adjust_oneshot(ted7360->timer2, TEDTIME_IN_CYCLES((ted7360->type == TED7360_PAL), 0x10000), 2);
+		ted7360->timer2->adjust(TEDTIME_IN_CYCLES((ted7360->type == TED7360_PAL), 0x10000), 2);
 		ted7360->timer2_active = 1;
 		ted7360_set_interrupt(machine, 0x10, ted7360);
 		break;
 	case 3:
-		timer_adjust_oneshot(ted7360->timer3, TEDTIME_IN_CYCLES((ted7360->type == TED7360_PAL), 0x10000), 3);
+		ted7360->timer3->adjust(TEDTIME_IN_CYCLES((ted7360->type == TED7360_PAL), 0x10000), 3);
 		ted7360->timer3_active = 1;
 		ted7360_set_interrupt(machine, 0x40, ted7360);
 		break;
@@ -858,42 +858,42 @@ WRITE8_DEVICE_HANDLER( ted7360_port_w )
 
 		if (ted7360->timer1_active)
 		{
-			ted7360->reg[1] = TEDTIME_TO_CYCLES((ted7360->type == TED7360_PAL), timer_timeleft(ted7360->timer1)) >> 8;
-			timer_reset(ted7360->timer1, attotime::never);
+			ted7360->reg[1] = TEDTIME_TO_CYCLES((ted7360->type == TED7360_PAL), ted7360->timer1->remaining()) >> 8;
+			ted7360->timer1->reset();
 			ted7360->timer1_active = 0;
 		}
 		break;
 	case 1:						   /* start timer 1 */
 		ted7360->reg[offset] = data;
-		timer_adjust_oneshot(ted7360->timer1, TEDTIME_IN_CYCLES((ted7360->type == TED7360_PAL), TIMER1), 1);
+		ted7360->timer1->adjust(TEDTIME_IN_CYCLES((ted7360->type == TED7360_PAL), TIMER1), 1);
 		ted7360->timer1_active = 1;
 		break;
 	case 2:						   /* stop timer 2 */
 		ted7360->reg[offset] = data;
 		if (ted7360->timer2_active)
 		{
-			ted7360->reg[3] = TEDTIME_TO_CYCLES((ted7360->type == TED7360_PAL), timer_timeleft(ted7360->timer2)) >> 8;
-			timer_reset(ted7360->timer2, attotime::never);
+			ted7360->reg[3] = TEDTIME_TO_CYCLES((ted7360->type == TED7360_PAL), ted7360->timer2->remaining()) >> 8;
+			ted7360->timer2->reset();
 			ted7360->timer2_active = 0;
 		}
 		break;
 	case 3:						   /* start timer 2 */
 		ted7360->reg[offset] = data;
-		timer_adjust_oneshot(ted7360->timer2, TEDTIME_IN_CYCLES((ted7360->type == TED7360_PAL), TIMER2), 2);
+		ted7360->timer2->adjust(TEDTIME_IN_CYCLES((ted7360->type == TED7360_PAL), TIMER2), 2);
 		ted7360->timer2_active = 1;
 		break;
 	case 4:						   /* stop timer 3 */
 		ted7360->reg[offset] = data;
 		if (ted7360->timer3_active)
 		{
-			ted7360->reg[5] = TEDTIME_TO_CYCLES((ted7360->type == TED7360_PAL), timer_timeleft(ted7360->timer3)) >> 8;
-			timer_reset(ted7360->timer3, attotime::never);
+			ted7360->reg[5] = TEDTIME_TO_CYCLES((ted7360->type == TED7360_PAL), ted7360->timer3->remaining()) >> 8;
+			ted7360->timer3->reset();
 			ted7360->timer3_active = 0;
 		}
 		break;
 	case 5:						   /* start timer 3 */
 		ted7360->reg[offset] = data;
-		timer_adjust_oneshot(ted7360->timer3, TEDTIME_IN_CYCLES((ted7360->type == TED7360_PAL), TIMER3), 3);
+		ted7360->timer3->adjust(TEDTIME_IN_CYCLES((ted7360->type == TED7360_PAL), TIMER3), 3);
 		ted7360->timer3_active = 1;
 		break;
 	case 6:
@@ -1067,37 +1067,37 @@ READ8_DEVICE_HANDLER( ted7360_port_r )
 	{
 	case 0:
 		if (ted7360->timer1)
-			val = TEDTIME_TO_CYCLES((ted7360->type == TED7360_PAL), timer_timeleft(ted7360->timer1)) & 0xff;
+			val = TEDTIME_TO_CYCLES((ted7360->type == TED7360_PAL), ted7360->timer1->remaining()) & 0xff;
 		else
 			val = ted7360->reg[offset];
 		break;
 	case 1:
 		if (ted7360->timer1)
-			val = TEDTIME_TO_CYCLES((ted7360->type == TED7360_PAL), timer_timeleft(ted7360->timer1)) >> 8;
+			val = TEDTIME_TO_CYCLES((ted7360->type == TED7360_PAL), ted7360->timer1->remaining()) >> 8;
 		else
 			val = ted7360->reg[offset];
 		break;
 	case 2:
 		if (ted7360->timer2)
-			val = TEDTIME_TO_CYCLES((ted7360->type == TED7360_PAL), timer_timeleft(ted7360->timer2)) & 0xff;
+			val = TEDTIME_TO_CYCLES((ted7360->type == TED7360_PAL), ted7360->timer2->remaining()) & 0xff;
 		else
 			val = ted7360->reg[offset];
 		break;
 	case 3:
 		if (ted7360->timer2)
-			val = TEDTIME_TO_CYCLES((ted7360->type == TED7360_PAL), timer_timeleft(ted7360->timer2)) >> 8;
+			val = TEDTIME_TO_CYCLES((ted7360->type == TED7360_PAL), ted7360->timer2->remaining()) >> 8;
 		else
 			val = ted7360->reg[offset];
 		break;
 	case 4:
 		if (ted7360->timer3)
-			val = TEDTIME_TO_CYCLES((ted7360->type == TED7360_PAL), timer_timeleft(ted7360->timer3)) & 0xff;
+			val = TEDTIME_TO_CYCLES((ted7360->type == TED7360_PAL), ted7360->timer3->remaining()) & 0xff;
 		else
 			val = ted7360->reg[offset];
 		break;
 	case 5:
 		if (ted7360->timer3)
-			val = TEDTIME_TO_CYCLES((ted7360->type == TED7360_PAL), timer_timeleft(ted7360->timer3)) >> 8;
+			val = TEDTIME_TO_CYCLES((ted7360->type == TED7360_PAL), ted7360->timer3->remaining()) >> 8;
 		else
 			val = ted7360->reg[offset];
 		break;

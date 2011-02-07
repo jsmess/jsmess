@@ -51,7 +51,7 @@ static TIMER_CALLBACK( kbd_update_callback )
 	/* if we still have more data, schedule another update */
 	if ( key_buf_pos != key_cur_pos )
 	{
-		timer_adjust_oneshot(kbd_timer, machine->primary_screen->frame_period() / 4, 0);
+		kbd_timer->adjust(machine->primary_screen->frame_period() / 4);
 	}
 }
 
@@ -92,7 +92,7 @@ static INPUT_CHANGED( kbd_update )
 		/* if the buffer was empty and we have new data, start a timer to send the keystrokes */
 		if ( key_buf_was_empty && ( key_buf_pos != key_cur_pos ) )
 		{
-			timer_adjust_oneshot(kbd_timer, field->port->machine->primary_screen->frame_period() / 4, 0);
+			kbd_timer->adjust(field->port->machine->primary_screen->frame_period() / 4);
 		}
 	}
 }
@@ -104,7 +104,7 @@ void amigakbd_init( running_machine *machine )
 	key_buf_pos = 0;
 	key_cur_pos = 0;
 	kbd_timer = machine->scheduler().timer_alloc(FUNC(kbd_update_callback));
-	timer_reset( kbd_timer, attotime::never );
+	kbd_timer->reset(  );
 }
 
 /*********************************************************************************************/

@@ -2336,7 +2336,7 @@ static MACHINE_RESET( x1 )
 	for(i=0;i<0x10;i++)
 		palette_set_color_rgb(machine, i, pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
 
-	timer_adjust_periodic(state->rtc_timer, attotime::zero, 0, attotime::from_seconds(1));
+	state->rtc_timer->adjust(attotime::zero, 0, attotime::from_seconds(1));
 }
 
 static MACHINE_START( x1 )

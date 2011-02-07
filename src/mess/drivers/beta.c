@@ -149,7 +149,7 @@ static WRITE8_DEVICE_HANDLER( beta_riot_a_w )
 
 	/* display */
 	state->segment = BITSWAP8(data, 7, 3, 4, 1, 0, 2, 5, 6) & 0x7f;
-	timer_adjust_oneshot(state->led_refresh_timer, attotime::from_usec(70), 0);
+	state->led_refresh_timer->adjust(attotime::from_usec(70));
 
 	/* EPROM data */
 	state->eprom_data = data;

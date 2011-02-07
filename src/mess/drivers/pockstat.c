@@ -141,7 +141,7 @@ INLINE void ATTR_PRINTF(3,4) verboselog( running_machine *machine, int n_level, 
 		va_start( v, s_fmt );
 		vsprintf( buf, s_fmt, v );
 		va_end( v );
-		logerror( "%s: %s", cpuexec_describe_context(machine), buf );
+		logerror( "%s: %s", machine->describe_context(), buf );
 	}
 }
 #else
@@ -433,7 +433,7 @@ static void ps_timer_start(running_machine *machine, int index)
 	}
 	period = attotime::from_hz(CPU_FREQ[state->clock_regs.mode & 0x0f] / 2) * divisor;
 	period = period * state->timer_regs.timer[index].count;
-	timer_adjust_oneshot(state->timer_regs.timer[index].timer, period, index);
+	state->timer_regs.timer[index].timer->adjust(period, index);
 }
 
 static READ32_HANDLER( ps_timer_r )
@@ -500,7 +500,7 @@ static WRITE32_HANDLER( ps_timer_w )
 			}
 			else
 			{
-				timer_adjust_oneshot(state->timer_regs.timer[offset / (0x10/4)].timer, attotime::never, offset / (0x10/4));
+				state->timer_regs.timer[offset / (0x10/4)].timer->adjust(attotime::never, offset / (0x10/4));
 			}
 			break;
 		default:
@@ -591,7 +591,7 @@ static TIMER_CALLBACK( rtc_tick )
 			}
 		}
 	}
-	timer_adjust_oneshot(state->rtc_regs.timer, attotime::from_hz(1), 0);
+	state->rtc_regs.timer->adjust(attotime::from_hz(1));
 }
 
 static READ32_HANDLER( ps_rtc_r )
@@ -869,14 +869,14 @@ static MACHINE_START( pockstat )
 	for(index = 0; index < 3; index++)
 	{
 		state->timer_regs.timer[index].timer = machine->scheduler().timer_alloc(FUNC(timer_tick));
-		timer_adjust_oneshot(state->timer_regs.timer[index].timer, attotime::never, index);
+		state->timer_regs.timer[index].timer->adjust(attotime::never, index);
 	}
 
 	state->rtc_regs.time = 0x01000000;
 	state->rtc_regs.date = 0x19990101;
 
 	state->rtc_regs.timer = machine->scheduler().timer_alloc(FUNC(rtc_tick));
-	timer_adjust_oneshot(state->rtc_regs.timer, attotime::from_hz(1), index);
+	state->rtc_regs.timer->adjust(attotime::from_hz(1), index);
 
 	state_save_register_global(machine, state->ftlb_regs.control);
 	state_save_register_global(machine, state->ftlb_regs.stat);

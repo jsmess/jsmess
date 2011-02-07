@@ -336,7 +336,7 @@ INTERRUPT_GEN( a7800_interrupt )
 
 	if( state->maria_wsync )
 	{
-		cpuexec_trigger( device->machine, TRIGGER_HSYNC );
+		device->machine->scheduler().trigger( TRIGGER_HSYNC );
 		state->maria_wsync = 0;
 	}
 

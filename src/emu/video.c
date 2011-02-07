@@ -181,7 +181,7 @@ video_manager::video_manager(running_machine &machine)
 	if (machine.primary_screen == NULL)
 	{
 		m_screenless_frame_timer = machine.scheduler().timer_alloc(FUNC(&screenless_update_callback), this);
-		timer_adjust_periodic(m_screenless_frame_timer, screen_device::DEFAULT_FRAME_PERIOD, 0, screen_device::DEFAULT_FRAME_PERIOD);
+		m_screenless_frame_timer->adjust(screen_device::DEFAULT_FRAME_PERIOD, 0, screen_device::DEFAULT_FRAME_PERIOD);
 	}
 }
 
@@ -1063,7 +1063,7 @@ void video_manager::create_snapshot_bitmap(device_t *screen)
 	// select the appropriate view in our dummy target
 	if (m_snap_native && screen != NULL)
 	{
-		int view_index = m_machine.m_devicelist.index(SCREEN, screen->tag());
+		int view_index = m_machine.m_devicelist.indexof(SCREEN, screen->tag());
 		assert(view_index != -1);
 		m_snap_target->set_view(view_index);
 	}

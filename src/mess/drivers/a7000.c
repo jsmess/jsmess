@@ -249,9 +249,9 @@ static WRITE32_HANDLER( a7000_vidc20_w )
 			if(vert_reg == 4)
 			{
 				if(state->vidc20_vert_reg[VDER] != 0)
-					timer_adjust_oneshot(state->flyback_timer, space->machine->primary_screen->time_until_pos(state->vidc20_vert_reg[VDER]),0);
+					state->flyback_timer->adjust(space->machine->primary_screen->time_until_pos(state->vidc20_vert_reg[VDER]));
 				else
-					timer_adjust_oneshot(state->flyback_timer, attotime::never,0);
+					state->flyback_timer->adjust(attotime::never);
 			}
 
 			// logerror("VIDC20: %s Register write = %08x (%d)\n",vidc20_vert_regnames[vert_reg],val,val);
@@ -577,9 +577,9 @@ static void fire_iomd_timer(a7000_state *state, int timer)
 	int val = timer_count / 2; // correct?
 
 	if(val==0)
-		timer_adjust_oneshot(state->IOMD_timer[timer], attotime::never, 0);
+		state->IOMD_timer[timer]->adjust(attotime::never);
 	else
-		timer_adjust_periodic(state->IOMD_timer[timer], attotime::from_usec(val), 0, attotime::from_usec(val));
+		state->IOMD_timer[timer]->adjust(attotime::from_usec(val), 0, attotime::from_usec(val));
 }
 
 static TIMER_CALLBACK( IOMD_timer0_callback )
@@ -611,7 +611,7 @@ static TIMER_CALLBACK( flyback_timer_callback )
 		generic_pulse_irq_line(machine->device("maincpu"), ARM7_IRQ_LINE);
 	}
 
-	timer_adjust_oneshot(state->flyback_timer, machine->primary_screen->time_until_pos(state->vidc20_vert_reg[VDER]),0);
+	state->flyback_timer->adjust(machine->primary_screen->time_until_pos(state->vidc20_vert_reg[VDER]));
 }
 
 static void viddma_transfer_start(address_space *space)
@@ -799,9 +799,9 @@ static MACHINE_RESET(a7000)
 
 	state->IOMD_keyb_ctrl = 0x00;
 
-	timer_adjust_oneshot( state->IOMD_timer[0], attotime::never, 0);
-	timer_adjust_oneshot( state->IOMD_timer[1], attotime::never, 0);
-	timer_adjust_oneshot( state->flyback_timer, attotime::never, 0);
+	state->IOMD_timer[0]->adjust( attotime::never);
+	state->IOMD_timer[1]->adjust( attotime::never);
+	state->flyback_timer->adjust( attotime::never);
 }
 
 static MACHINE_CONFIG_START( a7000, a7000_state )

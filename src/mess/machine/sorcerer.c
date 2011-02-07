@@ -173,7 +173,7 @@ WRITE8_MEMBER(sorcerer_state::sorcerer_fe_w)
 	if (!BIT(data, 7)) // cassette operations
 	{
 #if SORCERER_USING_RS232
-		timer_adjust_oneshot(m_serial_timer, attotime::zero, 0);
+		m_serial_timer->adjust(attotime::zero);
 #endif
 
 		UINT8 sound = input_port_read(machine, "CONFIG") & 8;
@@ -193,15 +193,15 @@ WRITE8_MEMBER(sorcerer_state::sorcerer_fe_w)
 			(BIT(data, 5)) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 
 		if (data & 0x30)
-			timer_adjust_periodic(m_cassette_timer, attotime::zero, 0, attotime::from_hz(19200));
+			m_cassette_timer->adjust(attotime::zero, 0, attotime::from_hz(19200));
 		else
-			timer_adjust_oneshot(m_cassette_timer, attotime::zero, 0);
+			m_cassette_timer->adjust(attotime::zero);
 	}
 #if SORCERER_USING_RS232
 	else
 	{
-		timer_adjust_periodic(m_serial_timer, attotime::zero, 0, attotime::from_hz(19200));
-		timer_adjust_oneshot(m_cassette_timer, attotime::zero, 0);
+		m_serial_timer->adjust(attotime::zero, 0, attotime::from_hz(19200));
+		m_cassette_timer->adjust(attotime::zero);
 	}
 #endif
 

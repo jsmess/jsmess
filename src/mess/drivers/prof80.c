@@ -244,7 +244,7 @@ static void ls259_w(running_machine *machine, int fa, int sa, int fb, int sb)
 			/* trigger floppy motor off NE555 timer */
 			int t = 110 * RES_M(10) * CAP_U(6.8); // t = 1.1 * R8 * C6
 
-			timer_adjust_oneshot(state->floppy_motor_off_timer, attotime::from_msec(t), 0);
+			state->floppy_motor_off_timer->adjust(attotime::from_msec(t));
 		}
 		else
 		{
@@ -257,7 +257,7 @@ static void ls259_w(running_machine *machine, int fa, int sa, int fb, int sb)
 			state->motor = 1;
 
 			/* reset floppy motor off NE555 timer */
-			timer_enable(state->floppy_motor_off_timer, 0);
+			state->floppy_motor_off_timer->enable(0);
 		}
 		break;
 
@@ -284,7 +284,7 @@ static void ls259_w(running_machine *machine, int fa, int sa, int fb, int sb)
 		if (!fb)
 		{
 			/* immediately turn off floppy motor */
-			timer_adjust_oneshot(state->floppy_motor_off_timer, attotime::zero, 0);
+			state->floppy_motor_off_timer->adjust(attotime::zero);
 		}
 		break;
 

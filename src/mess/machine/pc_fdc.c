@@ -374,7 +374,7 @@ static void pcjr_fdc_dor_w(running_machine *machine, UINT8 data)
 	/* Is the watchdog timer disabled */
 	if ( ! ( data & 0x20 ) )
 	{
-		timer_adjust_oneshot( fdc->watchdog, attotime::never, 0 );
+		fdc->watchdog->adjust( attotime::never );
 		if ( fdc->fdc_interface.pc_fdc_interrupt )
 		{
 			fdc->fdc_interface.pc_fdc_interrupt(machine, 0 );
@@ -384,7 +384,7 @@ static void pcjr_fdc_dor_w(running_machine *machine, UINT8 data)
 		if ( ( fdc->digital_output_register & 0x40 ) && ! ( data & 0x40 ) )
 		{
 			/* Start watchdog timer here */
-			timer_adjust_oneshot( fdc->watchdog, attotime::from_seconds(3), 0 );
+			fdc->watchdog->adjust( attotime::from_seconds(3) );
 		}
 	}
 

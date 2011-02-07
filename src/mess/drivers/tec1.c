@@ -185,7 +185,7 @@ static MACHINE_START( tec1 )
 {
 	tec1_state *state = machine->driver_data<tec1_state>();
 	state->m_kbd_timer = machine->scheduler().timer_alloc(FUNC(tec1_kbd_callback));
-	timer_adjust_periodic( state->m_kbd_timer, attotime::zero, 0, attotime::from_hz(500) );
+	state->m_kbd_timer->adjust( attotime::zero, 0, attotime::from_hz(500) );
 }
 
 static MACHINE_RESET( tec1 )

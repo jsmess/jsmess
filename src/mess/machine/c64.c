@@ -577,12 +577,12 @@ void c64_m6510_port_write( device_t *device, UINT8 direction, UINT8 data )
 			if(!(data & 0x20))
 			{
 				cassette_change_state(device->machine->device("cassette"), CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
-				timer_adjust_periodic(state->datasette_timer, attotime::zero, 0, attotime::from_hz(44100));
+				state->datasette_timer->adjust(attotime::zero, 0, attotime::from_hz(44100));
 			}
 			else
 			{
 				cassette_change_state(device->machine->device("cassette"), CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
-				timer_reset(state->datasette_timer, attotime::never);
+				state->datasette_timer->reset();
 			}
 		}
 	}

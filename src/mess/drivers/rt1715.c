@@ -39,7 +39,7 @@ public:
 
 static WRITE8_HANDLER( rt1715_floppy_enable )
 {
-	logerror("%s: rt1715_floppy_enable %02x\n", cpuexec_describe_context(space->machine), data);
+	logerror("%s: rt1715_floppy_enable %02x\n", space->machine->describe_context(), data);
 }
 
 
@@ -52,7 +52,7 @@ static READ8_HANDLER( k7658_led1_r )
 {
 	rt1715_state *state = space->machine->driver_data<rt1715_state>();
 	state->led1_val ^= 1;
-	logerror("%s: k7658_led1_r %02x\n", cpuexec_describe_context(space->machine), state->led1_val);
+	logerror("%s: k7658_led1_r %02x\n", space->machine->describe_context(), state->led1_val);
 	return 0xff;
 }
 
@@ -61,7 +61,7 @@ static READ8_HANDLER( k7658_led2_r )
 {
 	rt1715_state *state = space->machine->driver_data<rt1715_state>();
 	state->led2_val ^= 1;
-	logerror("%s: k7658_led2_r %02x\n", cpuexec_describe_context(space->machine), state->led2_val);
+	logerror("%s: k7658_led2_r %02x\n", space->machine->describe_context(), state->led2_val);
 	return 0xff;
 }
 
@@ -90,7 +90,7 @@ static READ8_HANDLER( k7658_data_r )
 /* serial output on D0 */
 static WRITE8_HANDLER( k7658_data_w )
 {
-	logerror("%s: k7658_data_w %02x\n", cpuexec_describe_context(space->machine), BIT(data, 0));
+	logerror("%s: k7658_data_w %02x\n", space->machine->describe_context(), BIT(data, 0));
 }
 
 
@@ -112,7 +112,7 @@ static MACHINE_RESET( rt1715 )
 
 static WRITE8_HANDLER( rt1715_rom_disable )
 {
-	logerror("%s: rt1715_set_bank %02x\n", cpuexec_describe_context(space->machine), data);
+	logerror("%s: rt1715_set_bank %02x\n", space->machine->describe_context(), data);
 
 	/* disable ROM, enable RAM */
 	memory_set_bankptr(space->machine, "bank1", ram_get_ptr(space->machine->device(RAM_TAG)));

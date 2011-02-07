@@ -135,28 +135,28 @@ DEVICE_GET_INFO( pf10 )
 /* serial interface in (to the host computer) */
 READ_LINE_DEVICE_HANDLER( pf10_txd1_r )
 {
-	logerror("%s: pf10_txd1_r\n", cpuexec_describe_context(device->machine));
+	logerror("%s: pf10_txd1_r\n", device->machine->describe_context());
 
 	return 0;
 }
 
 WRITE_LINE_DEVICE_HANDLER( pf10_rxd1_w )
 {
-	logerror("%s: pf10_rxd1_w %u\n", cpuexec_describe_context(device->machine), state);
+	logerror("%s: pf10_rxd1_w %u\n", device->machine->describe_context(), state);
 }
 
 
 /* serial interface out (to another floppy drive) */
 READ_LINE_DEVICE_HANDLER( pf10_txd2_r )
 {
-	logerror("%s: pf10_txd2_r\n", cpuexec_describe_context(device->machine));
+	logerror("%s: pf10_txd2_r\n", device->machine->describe_context());
 
 	return 0;
 }
 
 WRITE_LINE_DEVICE_HANDLER( pf10_rxd2_w )
 {
-	logerror("%s: pf10_rxd2_w %u\n", cpuexec_describe_context(device->machine), state);
+	logerror("%s: pf10_rxd2_w %u\n", device->machine->describe_context(), state);
 }
 
 DEFINE_LEGACY_DEVICE(PF10, pf10);

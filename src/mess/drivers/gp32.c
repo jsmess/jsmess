@@ -35,7 +35,7 @@ INLINE void ATTR_PRINTF(3,4) verboselog( running_machine *machine, int n_level, 
 		va_start( v, s_fmt);
 		vsprintf( buf, s_fmt, v);
 		va_end( v);
-		logerror( "%s: %s", cpuexec_describe_context( machine), buf);
+		logerror( "%s: %s", machine->describe_context( ), buf);
 	}
 }
 
@@ -284,7 +284,7 @@ static TIMER_CALLBACK( s3c240x_lcd_timer_exp )
 		}
 		if ((state->s3c240x_lcd.vpos == 0) && (state->s3c240x_lcd.hpos == 0)) break;
 	}
-	timer_adjust_oneshot( state->s3c240x_lcd_timer, screen->time_until_pos(state->s3c240x_lcd.vpos, state->s3c240x_lcd.hpos), 0);
+	state->s3c240x_lcd_timer->adjust( screen->time_until_pos(state->s3c240x_lcd.vpos, state->s3c240x_lcd.hpos));
 }
 
 static VIDEO_START( gp32 )
@@ -357,14 +357,14 @@ static void s3c240x_lcd_start( running_machine *machine)
 	verboselog( machine, 1, "LCD start\n");
 	s3c240x_lcd_configure( machine);
 	s3c240x_lcd_dma_init( machine);
-	timer_adjust_oneshot( state->s3c240x_lcd_timer, screen->time_until_pos(0, 0), 0);
+	state->s3c240x_lcd_timer->adjust( screen->time_until_pos(0, 0));
 }
 
 static void s3c240x_lcd_stop( running_machine *machine)
 {
 	gp32_state *state = machine->driver_data<gp32_state>();
 	verboselog( machine, 1, "LCD stop\n");
-	timer_adjust_oneshot( state->s3c240x_lcd_timer, attotime::never, 0);
+	state->s3c240x_lcd_timer->adjust( attotime::never);
 }
 
 static void s3c240x_lcd_recalc( running_machine *machine)
@@ -632,11 +632,11 @@ static void s3c240x_pwm_start( running_machine *machine, int timer)
 	verboselog( machine, 5, "PWM %d - FCLK=%d HCLK=%d PCLK=%d prescaler=%d div=%d freq=%f cnt=%d cmp=%d auto_reload=%d hz=%f\n", timer, s3c240x_get_fclk(state, MPLLCON), s3c240x_get_hclk(state, MPLLCON), s3c240x_get_pclk(state, MPLLCON), prescaler, mux_table[mux], freq, cnt, cmp, auto_reload, hz);
 	if (auto_reload)
 	{
-		timer_adjust_periodic( state->s3c240x_pwm_timer[timer], attotime::from_hz( hz), timer, attotime::from_hz( hz));
+		state->s3c240x_pwm_timer[timer]->adjust( attotime::from_hz( hz), timer, attotime::from_hz( hz));
 	}
 	else
 	{
-		timer_adjust_oneshot( state->s3c240x_pwm_timer[timer], attotime::from_hz( hz), timer);
+		state->s3c240x_pwm_timer[timer]->adjust( attotime::from_hz( hz), timer);
 	}
 }
 
@@ -644,7 +644,7 @@ static void s3c240x_pwm_stop( running_machine *machine, int timer)
 {
 	gp32_state *state = machine->driver_data<gp32_state>();
 	verboselog( machine, 1, "PWM %d stop\n", timer);
-	timer_adjust_oneshot( state->s3c240x_pwm_timer[timer], attotime::never, 0);
+	state->s3c240x_pwm_timer[timer]->adjust( attotime::never);
 }
 
 static void s3c240x_pwm_recalc( running_machine *machine, int timer)
@@ -1413,21 +1413,21 @@ static void iic_start( running_machine *machine)
 	gp32_state *state = machine->driver_data<gp32_state>();
 	verboselog( machine, 1, "IIC start\n");
 	state->s3c240x_iic.data_index = 0;
-	timer_adjust_oneshot( state->s3c240x_iic_timer, attotime::from_msec( 1), 0);
+	state->s3c240x_iic_timer->adjust( attotime::from_msec( 1));
 }
 
 static void iic_stop( running_machine *machine)
 {
 	gp32_state *state = machine->driver_data<gp32_state>();
 	verboselog( machine, 1, "IIC stop\n");
-	timer_adjust_oneshot( state->s3c240x_iic_timer, attotime::never, 0);
+	state->s3c240x_iic_timer->adjust( attotime::never);
 }
 
 static void iic_resume( running_machine *machine)
 {
 	gp32_state *state = machine->driver_data<gp32_state>();
 	verboselog( machine, 1, "IIC resume\n");
-	timer_adjust_oneshot( state->s3c240x_iic_timer, attotime::from_msec( 1), 0);
+	state->s3c240x_iic_timer->adjust( attotime::from_msec( 1));
 }
 
 static READ32_HANDLER( s3c240x_iic_r )
@@ -1563,14 +1563,14 @@ static void s3c240x_iis_start( running_machine *machine)
 	codeclk = BIT( state->s3c240x_iis_regs[1], 2);
 	freq = (double)(s3c240x_get_pclk(state, MPLLCON) / (prescaler_control_a + 1) / codeclk_table[codeclk]) * 2; // why do I have to multiply by two?
 	verboselog( machine, 5, "IIS - pclk %d psc_enable %d psc_a %d psc_b %d codeclk %d freq %f\n", s3c240x_get_pclk(state, MPLLCON), prescaler_enable, prescaler_control_a, prescaler_control_b, codeclk_table[codeclk], freq);
-	timer_adjust_periodic( state->s3c240x_iis_timer, attotime::from_hz( freq), 0, attotime::from_hz( freq));
+	state->s3c240x_iis_timer->adjust( attotime::from_hz( freq), 0, attotime::from_hz( freq));
 }
 
 static void s3c240x_iis_stop( running_machine *machine)
 {
 	gp32_state *state = machine->driver_data<gp32_state>();
 	verboselog( machine, 1, "IIS stop\n");
-	timer_adjust_oneshot( state->s3c240x_iis_timer, attotime::never, 0);
+	state->s3c240x_iis_timer->adjust( attotime::never);
 }
 
 static void s3c240x_iis_recalc( running_machine *machine)

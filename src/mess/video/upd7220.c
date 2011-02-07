@@ -311,7 +311,7 @@ static void update_vsync_timer(upd7220_t *upd7220, int state)
 
 	attotime duration = upd7220->screen->time_until_pos(next_y, 0);
 
-	timer_adjust_oneshot(upd7220->vsync_timer, duration, !state);
+	upd7220->vsync_timer->adjust(duration, !state);
 }
 
 /*-------------------------------------------------
@@ -350,7 +350,7 @@ static void update_hsync_timer(upd7220_t *upd7220, int state)
 
 	attotime duration = upd7220->screen->time_until_pos(next_y, next_x);
 
-	timer_adjust_oneshot(upd7220->hsync_timer, duration, !state);
+	upd7220->hsync_timer->adjust(duration, !state);
 }
 
 /*-------------------------------------------------
@@ -380,7 +380,7 @@ static void update_blank_timer(upd7220_t *upd7220, int state)
 
 	attotime duration = upd7220->screen->time_until_pos(next_y, next_x);
 
-	timer_adjust_oneshot(upd7220->hsync_timer, duration, !state);
+	upd7220->hsync_timer->adjust(duration, !state);
 }
 
 /*-------------------------------------------------
@@ -441,8 +441,8 @@ static void recompute_parameters(device_t *device)
 	}
 	else
 	{
-		timer_enable(upd7220->hsync_timer, 0);
-		timer_enable(upd7220->vsync_timer, 0);
+		upd7220->hsync_timer->enable(0);
+		upd7220->vsync_timer->enable(0);
 	}
 
 	update_blank_timer(upd7220, 0);

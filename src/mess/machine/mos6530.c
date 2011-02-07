@@ -118,11 +118,11 @@ INLINE UINT8 get_timer(mos6530_state *miot)
 
 	/* if counting, return the number of ticks remaining */
 	else if (miot->timerstate == TIMER_COUNTING)
-		return timer_timeleft(miot->timer).as_ticks(miot->clock) >> miot->timershift;
+		return miot->timer->remaining().as_ticks(miot->clock) >> miot->timershift;
 
 	/* if finishing, return the number of ticks without the shift */
 	else
-		return timer_timeleft(miot->timer).as_ticks(miot->clock);
+		return miot->timer->remaining().as_ticks(miot->clock);
 }
 
 
@@ -146,7 +146,7 @@ static TIMER_CALLBACK( timer_end_callback )
 	if (miot->timerstate == TIMER_COUNTING)
 	{
 		miot->timerstate = TIMER_FINISHING;
-		timer_adjust_oneshot(miot->timer, attotime::from_ticks(256, miot->clock), 0);
+		miot->timer->adjust(attotime::from_ticks(256, miot->clock));
 
 		/* signal timer IRQ as well */
 		miot->irqstate |= TIMER_FLAG;
@@ -157,7 +157,7 @@ static TIMER_CALLBACK( timer_end_callback )
 	else if (miot->timerstate == TIMER_FINISHING)
 	{
 		miot->timerstate = TIMER_IDLE;
-		timer_adjust_oneshot(miot->timer, attotime::never, 0);
+		miot->timer->adjust(attotime::never);
 	}
 }
 
@@ -199,7 +199,7 @@ WRITE8_DEVICE_HANDLER( mos6530_w )
 		/* update the timer */
 		miot->timerstate = TIMER_COUNTING;
 		target = curtime.as_ticks(miot->clock) + 1 + (data << miot->timershift);
-		timer_adjust_oneshot(miot->timer, attotime::from_ticks(target, miot->clock) - curtime, 0);
+		miot->timer->adjust(attotime::from_ticks(target, miot->clock) - curtime);
 	}
 
 	/* if A2 == 0, we are writing to the I/O section */
@@ -430,7 +430,7 @@ static DEVICE_RESET( mos6530 )
 	/* reset timer states */
 	miot->timershift = 0;
 	miot->timerstate = TIMER_IDLE;
-	timer_adjust_oneshot(miot->timer, attotime::never, 0);
+	miot->timer->adjust(attotime::never);
 }
 
 

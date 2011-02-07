@@ -249,7 +249,7 @@ MACHINE_START( gb )
 
 	/* Allocate the serial timer, and disable it */
 	state->gb_serial_timer = machine->scheduler().timer_alloc(FUNC(gb_serial_timer_proc));
-	timer_enable( state->gb_serial_timer, 0 );
+	state->gb_serial_timer->enable( 0 );
 
 	MACHINE_START_CALL( gb_video );
 }
@@ -261,7 +261,7 @@ MACHINE_START( gbc )
 
 	/* Allocate the serial timer, and disable it */
 	state->gb_serial_timer = machine->scheduler().timer_alloc(FUNC(gb_serial_timer_proc));
-	timer_enable( state->gb_serial_timer, 0 );
+	state->gb_serial_timer->enable( 0 );
 
 	MACHINE_START_CALL( gbc_video );
 }
@@ -293,7 +293,7 @@ MACHINE_START( sgb )
 
 	/* Allocate the serial timer, and disable it */
 	state->gb_serial_timer = machine->scheduler().timer_alloc(FUNC(gb_serial_timer_proc));
-	timer_enable( state->gb_serial_timer, 0 );
+	state->gb_serial_timer->enable( 0 );
 
 	MACHINE_START_CALL( gb_video );
 }
@@ -824,8 +824,8 @@ WRITE8_HANDLER ( gb_io_w )
 		case 0x81:				/* enabled & internal clock */
 			SIODATA = 0xFF;
 			state->SIOCount = 8;
-			timer_adjust_periodic(state->gb_serial_timer, space->machine->device<cpu_device>("maincpu")->cycles_to_attotime(512), 0, space->machine->device<cpu_device>("maincpu")->cycles_to_attotime(512));
-			timer_enable( state->gb_serial_timer, 1 );
+			state->gb_serial_timer->adjust(space->machine->device<cpu_device>("maincpu")->cycles_to_attotime(512), 0, space->machine->device<cpu_device>("maincpu")->cycles_to_attotime(512));
+			state->gb_serial_timer->enable( 1 );
 			break;
 		}
 		break;
@@ -1935,7 +1935,7 @@ static TIMER_CALLBACK(gb_serial_timer_proc)
 	if ( ! state->SIOCount )
 	{
 		SIOCONT &= 0x7F;
-		timer_enable( state->gb_serial_timer, 0 );
+		state->gb_serial_timer->enable( 0 );
 		cputag_set_input_line(machine, "maincpu", SIO_INT, ASSERT_LINE);
 	}
 }
@@ -2049,7 +2049,7 @@ MACHINE_START( megaduck )
 	gb_state *state = machine->driver_data<gb_state>();
 	/* Allocate the serial timer, and disable it */
 	state->gb_serial_timer = machine->scheduler().timer_alloc(FUNC(gb_serial_timer_proc));
-	timer_enable( state->gb_serial_timer, 0 );
+	state->gb_serial_timer->enable( 0 );
 
 	MACHINE_START_CALL( gb_video );
 }

@@ -238,7 +238,7 @@ static WRITE8_DEVICE_HANDLER( cru_w )
 			card->CD0 = data;
 			if (data && !card->strobe_motor)
 			{
-				timer_adjust_oneshot(card->motor_on_timer, attotime::from_msec(4230), 0);
+				card->motor_on_timer->adjust(attotime::from_msec(4230));
 			}
 			card->strobe_motor = data;
 			break;

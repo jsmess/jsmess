@@ -46,7 +46,7 @@ MACHINE_RESET( pecom )
 
 	state->reset = 0;
 	state->dma = 0;
-	timer_adjust_oneshot(state->reset_timer, attotime::from_msec(5), 0);
+	state->reset_timer->adjust(attotime::from_msec(5));
 }
 
 static READ8_HANDLER( pecom_cdp1869_charram_r )

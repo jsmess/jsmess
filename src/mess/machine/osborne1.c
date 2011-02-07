@@ -397,7 +397,7 @@ static TIMER_CALLBACK(osborne1_video_callback)
 		beep_set_state( speaker, 0 );
 	}
 
-	timer_adjust_oneshot(state->video_timer, machine->primary_screen->time_until_pos(y + 1, 0 ), 0);
+	state->video_timer->adjust(machine->primary_screen->time_until_pos(y + 1, 0 ));
 }
 
 static TIMER_CALLBACK( setup_osborne1 )
@@ -472,7 +472,7 @@ DRIVER_INIT( osborne1 )
 	/* Configure the 6850 ACIA */
 //  acia6850_config( 0, &osborne1_6850_config );
 	state->video_timer = machine->scheduler().timer_alloc(FUNC(osborne1_video_callback));
-	timer_adjust_oneshot(state->video_timer, machine->primary_screen->time_until_pos(1, 0 ), 0);
+	state->video_timer->adjust(machine->primary_screen->time_until_pos(1, 0 ));
 
 	machine->scheduler().timer_set(attotime::zero, FUNC(setup_osborne1));
 }

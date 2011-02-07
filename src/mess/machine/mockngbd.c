@@ -130,7 +130,7 @@ READ8_DEVICE_HANDLER(mockingboard_r)
 
 		default:
 			if (LOG_MOCKINGBOARD)
-				logerror("mockingboard_r unmapped, offset: %02x, pc: %s\n", offset, cpuexec_describe_context(device->machine));
+				logerror("mockingboard_r unmapped, offset: %02x, pc: %s\n", offset, device->machine->describe_context());
 			break;
 	}
 	return 0x00;

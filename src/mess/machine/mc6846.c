@@ -96,7 +96,7 @@ INLINE UINT16 mc6846_counter( device_t *device )
 	mc6846_t* mc6846 = get_safe_token( device );
 	if ( mc6846->timer_started )
 	{
-		attotime delay = timer_timeleft( mc6846->interval );
+		attotime delay = mc6846->interval ->remaining( );
 		return delay.as_ticks(1000000) / FACTOR;
 	}
 	else
@@ -173,7 +173,7 @@ INLINE void mc6846_timer_launch ( device_t *device )
 
 	case 0x20: /* single-shot */
 		mc6846->cto = 0;
-		timer_reset( mc6846->one_shot, attotime::from_usec(FACTOR) );
+		mc6846->one_shot->reset( attotime::from_usec(FACTOR) );
 		break;
 
 	case 0x30:  /* cascaded single-shot */
@@ -181,12 +181,12 @@ INLINE void mc6846_timer_launch ( device_t *device )
 
 	default:
 		logerror( "mc6846 timer mode %i not implemented\n", MODE );
-		timer_reset( mc6846->interval, attotime::never );
+		mc6846->interval->reset(  );
 		mc6846->timer_started = 0;
 		return;
 	}
 
-	timer_reset( mc6846->interval, attotime::from_usec(delay) );
+	mc6846->interval->reset( attotime::from_usec(delay) );
 	mc6846->timer_started = 1;
 
 	mc6846->csr &= ~1;
@@ -229,12 +229,12 @@ static TIMER_CALLBACK( mc6846_timer_expire )
 
 	default:
 		logerror( "mc6846 timer mode %i not implemented\n", MODE );
-		timer_reset( mc6846->interval, attotime::never );
+		mc6846->interval->reset(  );
 		mc6846->timer_started = 0;
 		return;
 	}
 
-	timer_reset( mc6846->interval, attotime::from_usec(delay) );
+	mc6846->interval->reset( attotime::from_usec(delay) );
 
 	mc6846->csr |= 1;
 	mc6846_update_cto( device );
@@ -435,8 +435,8 @@ WRITE8_DEVICE_HANDLER ( mc6846_w )
 			if ( MODE != 0x30 )
 				mc6846->cto = 0;
 			mc6846_update_cto( device );
-			timer_reset( mc6846->interval, attotime::never );
-			timer_reset( mc6846->one_shot, attotime::never );
+			mc6846->interval->reset(  );
+			mc6846->one_shot->reset(  );
 			mc6846->timer_started = 0;
 		}
 		else
@@ -575,8 +575,8 @@ static DEVICE_RESET( mc6846 )
 	mc6846->csr1_to_be_cleared = 0;
 	mc6846->csr2_to_be_cleared = 0;
 	mc6846->timer_started = 0;
-	timer_reset( mc6846->interval, attotime::never );
-	timer_reset( mc6846->one_shot, attotime::never );
+	mc6846->interval->reset(  );
+	mc6846->one_shot->reset(  );
 }
 
 

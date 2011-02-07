@@ -565,9 +565,9 @@ static TIMER_CALLBACK(read_COPS_command)
 
 		case 0x7:	/* send mouse command */
 			if (immediate & 0x8)
-				timer_adjust_periodic(state->mouse_timer, attotime::zero, 0, attotime::from_msec((immediate & 0x7)*4)); /* enable mouse */
+				state->mouse_timer->adjust(attotime::zero, 0, attotime::from_msec((immediate & 0x7)*4)); /* enable mouse */
 			else
-				timer_reset(state->mouse_timer, attotime::never);
+				state->mouse_timer->reset();
 			break;
 		}
 	}
@@ -626,7 +626,7 @@ static void reset_COPS(lisa_state *state)
 	for (i=0; i<8; i++)
 		state->key_matrix[i] = 0;
 
-	timer_reset(state->mouse_timer, attotime::never);
+	state->mouse_timer->reset();
 }
 
 static void unplug_keyboard(running_machine *machine)

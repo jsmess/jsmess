@@ -246,7 +246,7 @@ static void set_146818_periodic_irq(running_machine *machine, UINT8 data)
 		case 15:	timer_per = attotime::from_msec(500);				break;
 	}
 
-	timer_adjust_periodic(state->rtc_periodic_irq, timer_per, 0, timer_per);
+	state->rtc_periodic_irq->adjust(timer_per, 0, timer_per);
 }
 
 static WRITE8_HANDLER( rtc_address_w )

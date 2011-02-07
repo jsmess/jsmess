@@ -233,7 +233,7 @@ static void tms5501_timer_reload(device_t *device, int timer)
 
 	if (tms->timer_counter[timer])
 	{	/* reset clock interval */
-		timer_adjust_periodic(tms->timer[timer], attotime::from_double((double) tms->timer_counter[0] / (intf->clock_rate / 128.)), timer_name[timer], attotime::from_double((double) tms->timer_counter[timer] / (intf->clock_rate / 128.)));
+		tms->timer[timer]->adjust(attotime::from_double((double) tms->timer_counter[0] / (intf->clock_rate / 128.)), timer_name[timer], attotime::from_double((double) tms->timer_counter[timer] / (intf->clock_rate / 128.)));
 	}
 	else
 	{	/* clock interval == 0 -> no timer */
@@ -245,7 +245,7 @@ static void tms5501_timer_reload(device_t *device, int timer)
 			case 3: tms5501_timer_decrementer(device, TMS5501_TIMER_3_INT); break;
 			case 4: tms5501_timer_decrementer(device, TMS5501_TIMER_4_INT); break;
 		}
-		timer_enable(tms->timer[timer], 0);
+		tms->timer[timer]->enable(0);
 	}
 }
 
@@ -267,7 +267,7 @@ static DEVICE_RESET( tms5501 )
 	for (i=0; i<5; i++)
 	{
 		tms->timer_counter[i] = 0;
-		timer_enable(tms->timer[i], 0);
+		tms->timer[i]->enable(0);
 	}
 
 	LOG_TMS5501(device, "Reset", 0);
@@ -286,7 +286,7 @@ static DEVICE_START( tms5501 )
 	for (i = 0; i < 5; i++)
 	{
 		tms->timer[i] = device->machine->scheduler().timer_alloc(FUNC(tms5501_timer_decrementer_callback), (void *) device);
-		timer_set_param(tms->timer[i], i);
+		tms->timer[i]->set_param(i);
 	}
 
 	tms->interrupt_mask = 0;

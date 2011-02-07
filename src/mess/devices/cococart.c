@@ -197,7 +197,7 @@ static void set_line(device_t *device, const char *line_name, coco_cartridge_lin
 		line->value = value;
 
 		if (LOG_LINE)
-			logerror("[%s]: set_line(): %s <= %s\n", cpuexec_describe_context(device->machine), line_name, line_value_string(value));
+			logerror("[%s]: set_line(): %s <= %s\n", device->machine->describe_context(), line_name, line_value_string(value));
 
 		/* engage in a bit of gymnastics for this odious 'Q' value */
 		switch(line->value)
@@ -270,7 +270,7 @@ static void set_line_timer(device_t *device, coco_cartridge_line *line, cococart
 		? device->machine->firstcpu->cycles_to_attotime(line->delay)
 		: attotime::zero;
 
-   timer_adjust_oneshot(line->timer[line->timer_index], delay, (int) value);
+   line->timer[line->timer_index]->adjust(delay, (int) value);
    line->timer_index = (line->timer_index + 1) % TIMER_POOL;
 }
 

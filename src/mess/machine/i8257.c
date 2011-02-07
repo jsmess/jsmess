@@ -420,7 +420,7 @@ static TIMER_CALLBACK( dma_tick )
 		{
 			set_hrq(device, 0);
 			i8257->state = STATE_SI;
-			timer_enable(i8257->dma_timer, 0);
+			i8257->dma_timer->enable(0);
 		}
 		else
 		{
@@ -545,7 +545,7 @@ WRITE8_DEVICE_HANDLER( i8257_w )
 
 		if ((i8257->state == STATE_SI) && sample_drq(device))
 		{
-			timer_enable(i8257->dma_timer, 1);
+			i8257->dma_timer->enable(1);
 		}
 
 		if (LOG)
@@ -591,7 +591,7 @@ static void drq_w(device_t *device, int ch, int state)
 
 	if (state && (i8257->state == STATE_SI))
 	{
-		timer_enable(i8257->dma_timer, 1);
+		i8257->dma_timer->enable(1);
 	}
 }
 
@@ -626,7 +626,7 @@ static DEVICE_START( i8257 )
 
 	/* create the DMA timer */
 	i8257->dma_timer = device->machine->scheduler().timer_alloc(FUNC(dma_tick), (void *)device);
-	timer_adjust_periodic(i8257->dma_timer, attotime::zero, 0, attotime::from_hz(device->clock()));
+	i8257->dma_timer->adjust(attotime::zero, 0, attotime::from_hz(device->clock()));
 
 	/* register for state saving */
 	state_save_register_device_item(device, 0, i8257->mr);
@@ -668,7 +668,7 @@ static DEVICE_RESET( i8257 )
 	set_tc(device, 0);
 	set_dack(device, -1);
 
-	timer_enable(i8257->dma_timer, 0);
+	i8257->dma_timer->enable(0);
 }
 
 /*-------------------------------------------------

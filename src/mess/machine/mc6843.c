@@ -394,7 +394,7 @@ static TIMER_CALLBACK( mc6843_cont )
 
 	LOG(( "%f mc6843_cont: timer called for cmd=%s(%i)\n", device->machine->time().as_double(), mc6843_cmd[cmd], cmd ));
 
-	timer_adjust_oneshot( mc6843->timer_cont, attotime::never, 0 );
+	mc6843->timer_cont->adjust( attotime::never );
 
 	switch ( cmd )
 	{
@@ -463,7 +463,7 @@ READ8_DEVICE_HANDLER ( mc6843_r )
 					}
 					else
 					{
-						timer_adjust_oneshot( mc6843->timer_cont, DELAY_ADDR, 0 );
+						mc6843->timer_cont->adjust( DELAY_ADDR );
 					}
 				}
 				else
@@ -609,7 +609,7 @@ WRITE8_DEVICE_HANDLER ( mc6843_w )
 					}
 					else
 					{
-						timer_adjust_oneshot( mc6843->timer_cont, DELAY_ADDR, 0 );
+						mc6843->timer_cont->adjust( DELAY_ADDR );
 					}
 				}
 				else
@@ -710,12 +710,12 @@ WRITE8_DEVICE_HANDLER ( mc6843_w )
 			mc6843->STRA |=  0x80; /* set Busy */
 			mc6843->STRA &= ~0x22; /* clear Track Not Equal & Delete Data Mark Detected */
 			mc6843->STRB &= ~0x04; /* clear Data Mark Undetected */
-			timer_adjust_oneshot( mc6843->timer_cont, DELAY_ADDR, 0 );
+			mc6843->timer_cont->adjust( DELAY_ADDR );
 			break;
 		case CMD_STZ:
 		case CMD_SEK:
 			mc6843->STRA |= 0x80; /* set Busy */
-			timer_adjust_oneshot( mc6843->timer_cont, DELAY_SEEK, 0 );
+			mc6843->timer_cont->adjust( DELAY_SEEK );
 			break;
 		case CMD_FFW:
 		case CMD_FFR:
@@ -796,7 +796,7 @@ static DEVICE_RESET( mc6843 )
 
 	mc6843->data_size = 0;
 	mc6843->data_idx = 0;
-	timer_adjust_oneshot( mc6843->timer_cont, attotime::never, 0 );
+	mc6843->timer_cont->adjust( attotime::never );
 }
 
 

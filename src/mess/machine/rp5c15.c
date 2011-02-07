@@ -194,7 +194,7 @@ static DEVICE_START( rp5c15 )
 	rtc->pulse_count = 0;
 
 	rtc->timer = device->machine->scheduler().timer_alloc(FUNC(rtc_alarm_pulse), (void*)device);
-	timer_adjust_periodic(rtc->timer, attotime::zero, 0, attotime::from_hz(32));
+	rtc->timer->adjust(attotime::zero, 0, attotime::from_hz(32));
 }
 
 static int rp5c15_read(device_t* device, int offset, UINT16 mem_mask)

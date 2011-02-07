@@ -431,7 +431,7 @@ static void smc92x4_timed_data_request(device_t *device)
 		time = 1;
 
 	/* set new timer */
-	timer_adjust_oneshot(w->timer_data, attotime::from_usec(time, 0));
+	w->timer_data->adjust(attotime::from_usec(time));
 }
 #endif
 
@@ -451,7 +451,7 @@ static void smc92x4_timed_sector_read_request(device_t *device)
 	if (!w->use_real_timing)
 		time = 1;
 
-	timer_adjust_oneshot(w->timer_rs, attotime::from_usec(time), 0);
+	w->timer_rs->adjust(attotime::from_usec(time));
 	w->to_be_continued = TRUE;
 }
 
@@ -470,7 +470,7 @@ static void smc92x4_timed_sector_write_request(device_t *device)
 	if (!w->use_real_timing)
 		time = 1;
 
-	timer_adjust_oneshot(w->timer_ws, attotime::from_usec(time), 0);
+	w->timer_ws->adjust(attotime::from_usec(time));
 	w->to_be_continued = TRUE;
 }
 
@@ -490,7 +490,7 @@ static void smc92x4_timed_track_request(device_t *device)
 	if (!w->use_real_timing)
 		time = 1;
 
-	timer_adjust_oneshot(w->timer_track, attotime::from_usec(time), 0);
+	w->timer_track->adjust(attotime::from_usec(time));
 
 	w->to_be_continued = TRUE;
 }
@@ -524,7 +524,7 @@ static void smc92x4_timed_seek_request(device_t *device)
 		time = 1;
 	}
 
-	timer_adjust_oneshot(w->timer_seek, attotime::from_usec(time), 0);
+	w->timer_seek->adjust(attotime::from_usec(time));
 	w->to_be_continued = TRUE;
 }
 

@@ -199,13 +199,13 @@ static READ8_HANDLER( cartridge_r )
 /* note: 0xe6-0xe7 = drive 1, 0xea-0xeb = drive 2 */
 static READ8_HANDLER( floppy_r )
 {
-	logerror("%s: floppy_r[0x%02x]\n", cpuexec_describe_context(space->machine), offset);
+	logerror("%s: floppy_r[0x%02x]\n", space->machine->describe_context(), offset);
 	return 0xff;
 }
 
 static WRITE8_HANDLER( floppy_w )
 {
-	logerror("%s: floppy_w[0x%02x] (0x%02x)\n", cpuexec_describe_context(space->machine), offset, data);
+	logerror("%s: floppy_w[0x%02x] (0x%02x)\n", space->machine->describe_context(), offset, data);
 }
 
 

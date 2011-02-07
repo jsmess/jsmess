@@ -857,11 +857,11 @@ static WRITE8_HANDLER(mcu_printer_p2_w)
 	{
 		logerror("Strobe active [%02x]\n",state->printer_shift);
 		state->printer_shift_output = state->printer_shift;
-		timer_adjust_oneshot(state->prn_stepper,PERIOD_OF_555_MONOSTABLE(22000,0.00000001),0);
+		state->prn_stepper->adjust(PERIOD_OF_555_MONOSTABLE(22000,0.00000001));
 	}
 
 	if(data & 0x40)
-		timer_adjust_oneshot(state->prn_pins,PERIOD_OF_555_MONOSTABLE(22000,0.0000000068),0);
+		state->prn_pins->adjust(PERIOD_OF_555_MONOSTABLE(22000,0.0000000068));
 
 	if(data & 0x01)
 		state->printer_pins |= 0x0100;

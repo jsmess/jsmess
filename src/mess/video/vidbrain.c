@@ -175,8 +175,8 @@ void vidbrain_state::set_y_interrupt()
 {
 	int scanline = ((m_cmd & COMMAND_YINT_H_O) << 1) | m_y_int;
 
-	m_timer_y_odd->adjust(m_screen->time_until_pos(scanline, 0), 0, m_screen->frame_period());
-	m_timer_y_even->adjust(m_screen->time_until_pos(scanline + 262, 0), 0, m_screen->frame_period());
+	m_timer_y_odd->adjust(m_screen->time_until_pos(scanline), 0, m_screen->frame_period());
+	m_timer_y_even->adjust(m_screen->time_until_pos(scanline + 262), 0, m_screen->frame_period());
 }
 
 

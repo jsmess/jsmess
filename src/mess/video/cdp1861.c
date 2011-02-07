@@ -85,7 +85,7 @@ static TIMER_CALLBACK( cdp1861_int_tick )
 			devcb_call_write_line(&cdp1861->out_int_func, ASSERT_LINE);
 		}
 
-		timer_adjust_oneshot(cdp1861->int_timer, cdp1861->screen->time_until_pos( CDP1861_SCANLINE_INT_END, 0), 0);
+		cdp1861->int_timer->adjust(cdp1861->screen->time_until_pos( CDP1861_SCANLINE_INT_END, 0));
 	}
 	else
 	{
@@ -94,7 +94,7 @@ static TIMER_CALLBACK( cdp1861_int_tick )
 			devcb_call_write_line(&cdp1861->out_int_func, CLEAR_LINE);
 		}
 
-		timer_adjust_oneshot(cdp1861->int_timer, cdp1861->screen->time_until_pos(CDP1861_SCANLINE_INT_START, 0), 0);
+		cdp1861->int_timer->adjust(cdp1861->screen->time_until_pos(CDP1861_SCANLINE_INT_START, 0));
 	}
 }
 
@@ -113,22 +113,22 @@ static TIMER_CALLBACK( cdp1861_efx_tick )
 	{
 	case CDP1861_SCANLINE_EFX_TOP_START:
 		devcb_call_write_line(&cdp1861->out_efx_func, ASSERT_LINE);
-		timer_adjust_oneshot(cdp1861->efx_timer, cdp1861->screen->time_until_pos(CDP1861_SCANLINE_EFX_TOP_END, 0), 0);
+		cdp1861->efx_timer->adjust(cdp1861->screen->time_until_pos(CDP1861_SCANLINE_EFX_TOP_END, 0));
 		break;
 
 	case CDP1861_SCANLINE_EFX_TOP_END:
 		devcb_call_write_line(&cdp1861->out_efx_func, CLEAR_LINE);
-		timer_adjust_oneshot(cdp1861->efx_timer, cdp1861->screen->time_until_pos(CDP1861_SCANLINE_EFX_BOTTOM_START, 0), 0);
+		cdp1861->efx_timer->adjust(cdp1861->screen->time_until_pos(CDP1861_SCANLINE_EFX_BOTTOM_START, 0));
 		break;
 
 	case CDP1861_SCANLINE_EFX_BOTTOM_START:
 		devcb_call_write_line(&cdp1861->out_efx_func, ASSERT_LINE);
-		timer_adjust_oneshot(cdp1861->efx_timer, cdp1861->screen->time_until_pos(CDP1861_SCANLINE_EFX_BOTTOM_END, 0), 0);
+		cdp1861->efx_timer->adjust(cdp1861->screen->time_until_pos(CDP1861_SCANLINE_EFX_BOTTOM_END, 0));
 		break;
 
 	case CDP1861_SCANLINE_EFX_BOTTOM_END:
 		devcb_call_write_line(&cdp1861->out_efx_func, CLEAR_LINE);
-		timer_adjust_oneshot(cdp1861->efx_timer, cdp1861->screen->time_until_pos(CDP1861_SCANLINE_EFX_TOP_START, 0), 0);
+		cdp1861->efx_timer->adjust(cdp1861->screen->time_until_pos(CDP1861_SCANLINE_EFX_TOP_START, 0));
 		break;
 	}
 }
@@ -154,7 +154,7 @@ static TIMER_CALLBACK( cdp1861_dma_tick )
 			}
 		}
 
-		timer_adjust_oneshot(cdp1861->dma_timer, cdp1861->cpu->cycles_to_attotime(CDP1861_CYCLES_DMA_WAIT), 0);
+		cdp1861->dma_timer->adjust(cdp1861->cpu->cycles_to_attotime(CDP1861_CYCLES_DMA_WAIT));
 
 		cdp1861->dmaout = 0;
 	}
@@ -168,7 +168,7 @@ static TIMER_CALLBACK( cdp1861_dma_tick )
 			}
 		}
 
-		timer_adjust_oneshot(cdp1861->dma_timer, cdp1861->cpu->cycles_to_attotime(CDP1861_CYCLES_DMA_ACTIVE), 0);
+		cdp1861->dma_timer->adjust(cdp1861->cpu->cycles_to_attotime(CDP1861_CYCLES_DMA_ACTIVE));
 
 		cdp1861->dmaout = 1;
 	}
@@ -286,9 +286,9 @@ static DEVICE_RESET( cdp1861 )
 {
 	cdp1861_t *cdp1861 = get_safe_token(device);
 
-	timer_adjust_oneshot(cdp1861->int_timer, cdp1861->screen->time_until_pos(CDP1861_SCANLINE_INT_START, 0), 0);
-	timer_adjust_oneshot(cdp1861->efx_timer, cdp1861->screen->time_until_pos(CDP1861_SCANLINE_EFX_TOP_START, 0), 0);
-	timer_adjust_oneshot(cdp1861->dma_timer, cdp1861->cpu->cycles_to_attotime(CDP1861_CYCLES_DMA_START), 0);
+	cdp1861->int_timer->adjust(cdp1861->screen->time_until_pos(CDP1861_SCANLINE_INT_START, 0));
+	cdp1861->efx_timer->adjust(cdp1861->screen->time_until_pos(CDP1861_SCANLINE_EFX_TOP_START, 0));
+	cdp1861->dma_timer->adjust(cdp1861->cpu->cycles_to_attotime(CDP1861_CYCLES_DMA_START));
 
 	cdp1861->disp = 0;
 	cdp1861->dmaout = 0;

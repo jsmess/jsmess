@@ -52,7 +52,7 @@ static WRITE8_HANDLER( pv2000_cass_conf_w )
 {
 	pv2000_state *state = space->machine->driver_data<pv2000_state>();
 
-	logerror( "%s: pv2000_cass_conf_w %02x\n", cpuexec_describe_context(space->machine), data );
+	logerror( "%s: pv2000_cass_conf_w %02x\n", space->machine->describe_context(), data );
 
 	state->cass_conf = data & 0x0f;
 
@@ -67,7 +67,7 @@ static WRITE8_HANDLER( pv2000_keys_w )
 {
 	pv2000_state *state = space->machine->driver_data<pv2000_state>();
 
-	logerror( "%s: pv2000_keys_w %02x\n", cpuexec_describe_context(space->machine), data );
+	logerror( "%s: pv2000_keys_w %02x\n", space->machine->describe_context(), data );
 
 	state->keyb_column = data & 0x0f;
 
@@ -120,7 +120,7 @@ static READ8_HANDLER( pv2000_keys_lo_r )
 	pv2000_state *state = space->machine->driver_data<pv2000_state>();
 	UINT8 data = 0;
 
-	logerror("%s: pv2000_keys_r\n", cpuexec_describe_context(space->machine) );
+	logerror("%s: pv2000_keys_r\n", space->machine->describe_context() );
 
 	switch ( state->keyb_column )
 	{

@@ -119,7 +119,7 @@ static void adjust_display_position_interrupt_timer( running_machine *machine )
 		attotime period = (attotime::from_hz(NEOGEO_PIXEL_CLOCK) * (state->display_counter + 1));
 		if (LOG_VIDEO_SYSTEM) logerror("adjust_display_position_interrupt_timer  current y: %02x  current x: %02x   target y: %x  target x: %x\n", machine->primary_screen->vpos(), machine->primary_screen->hpos(), (state->display_counter + 1) / NEOGEO_HTOTAL, (state->display_counter + 1) % NEOGEO_HTOTAL);
 
-		timer_adjust_oneshot(state->display_position_interrupt_timer, period, 0);
+		state->display_position_interrupt_timer->adjust(period);
 	}
 }
 
@@ -224,7 +224,7 @@ static TIMER_CALLBACK( display_position_vblank_callback )
 	}
 
 	/* set timer for next screen */
-	timer_adjust_oneshot(state->display_position_vblank_timer, machine->primary_screen->time_until_pos(NEOGEO_VBSTART, NEOGEO_VBLANK_RELOAD_HPOS), 0);
+	state->display_position_vblank_timer->adjust(machine->primary_screen->time_until_pos(NEOGEO_VBSTART, NEOGEO_VBLANK_RELOAD_HPOS));
 }
 
 
@@ -242,7 +242,7 @@ static TIMER_CALLBACK( vblank_interrupt_callback )
 	update_interrupts(machine);
 
 	/* set timer for next screen */
-	timer_adjust_oneshot(state->vblank_interrupt_timer, machine->primary_screen->time_until_pos(NEOGEO_VBSTART, 0), 0);
+	state->vblank_interrupt_timer->adjust(machine->primary_screen->time_until_pos(NEOGEO_VBSTART, 0));
 }
 
 
@@ -258,8 +258,8 @@ static void create_interrupt_timers( running_machine *machine )
 static void start_interrupt_timers( running_machine *machine )
 {
 	neogeo_state *state = machine->driver_data<neogeo_state>();
-	timer_adjust_oneshot(state->vblank_interrupt_timer, machine->primary_screen->time_until_pos(NEOGEO_VBSTART, 0), 0);
-	timer_adjust_oneshot(state->display_position_vblank_timer, machine->primary_screen->time_until_pos(NEOGEO_VBSTART, NEOGEO_VBLANK_RELOAD_HPOS), 0);
+	state->vblank_interrupt_timer->adjust(machine->primary_screen->time_until_pos(NEOGEO_VBSTART, 0));
+	state->display_position_vblank_timer->adjust(machine->primary_screen->time_until_pos(NEOGEO_VBSTART, NEOGEO_VBLANK_RELOAD_HPOS));
 }
 
 
@@ -572,7 +572,7 @@ static WRITE16_HANDLER( audio_command_w )
 		audio_cpu_assert_nmi(space->machine);
 
 		/* boost the interleave to let the audio CPU read the command */
-		cpuexec_boost_interleave(space->machine, attotime::zero, attotime::from_usec(50));
+		space->machine->scheduler().boost_interleave(attotime::zero, attotime::from_usec(50));
 
 		if (LOG_CPU_COMM) logerror("MAIN CPU PC %06x: audio_command_w %04x - %04x\n", cpu_get_pc(space->cpu), data, mem_mask);
 	}

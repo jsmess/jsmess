@@ -486,7 +486,7 @@ static int coco3_new_frame(running_machine *machine)
 	}
 
 	/* set up GIME field sync */
-	timer_adjust_oneshot(video->gime_fs_timer,
+	video->gime_fs_timer->adjust(
 		coco6847_scanline_time(gime_field_sync), 0);
 
 	return video->legacy_video;

@@ -203,13 +203,13 @@ WRITE8_DEVICE_HANDLER (mm58274c_w)
 	case 0x0:	/* Control Register (test mode and interrupt not emulated) */
 		if ((! (mm58274c->control & ctl_intstop)) && (data & ctl_intstop))
 			/* interrupt stop */
-			timer_enable(mm58274c->interrupt_timer, 0);
+			mm58274c->interrupt_timer->enable(0);
 		else if ((mm58274c->control & ctl_intstop) && (! (data & ctl_intstop)))
 		{
 			/* interrupt run */
 			attotime period = interrupt_period_table(mm58274c->int_ctl & int_ctl_dly);
 
-			timer_adjust_periodic(mm58274c->interrupt_timer, period, 0, mm58274c->int_ctl & int_ctl_rpt ? period : attotime::zero);
+			mm58274c->interrupt_timer->adjust(period, 0, mm58274c->int_ctl & int_ctl_rpt ? period : attotime::zero);
 		}
 		if (data & ctl_clkstop)
 			/* stopping the clock clears the tenth counter */
@@ -282,7 +282,7 @@ WRITE8_DEVICE_HANDLER (mm58274c_w)
 				/* interrupt run */
 				attotime period = interrupt_period_table(mm58274c->int_ctl & int_ctl_dly);
 
-				timer_adjust_periodic(mm58274c->interrupt_timer, period, 0, mm58274c->int_ctl & int_ctl_rpt ? period : attotime::zero);
+				mm58274c->interrupt_timer->adjust(period, 0, mm58274c->int_ctl & int_ctl_rpt ? period : attotime::zero);
 			}
 		}
 		else
@@ -472,7 +472,7 @@ static DEVICE_START( mm58274c )
 	state_save_register_item(device->machine, "mm58274c", device->tag(), 0, mm58274c->tenths);
 
 	mm58274c->increment_rtc = device->machine->scheduler().timer_alloc(FUNC(increment_rtc), ((void*)device));
-	timer_adjust_periodic(mm58274c->increment_rtc, attotime::zero, 0, attotime::from_msec(100));
+	mm58274c->increment_rtc->adjust(attotime::zero, 0, attotime::from_msec(100));
 	mm58274c->interrupt_timer = device->machine->scheduler().timer_alloc(FUNC(rtc_interrupt_callback), ((void*)device));
 }
 

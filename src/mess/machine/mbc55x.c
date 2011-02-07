@@ -257,7 +257,7 @@ WRITE8_HANDLER(vram_page_w)
 {
 	mbc55x_state *state	= space->machine->driver_data<mbc55x_state>();
 
-	logerror("%s : set vram page to %02X\n",cpuexec_describe_context(space->machine),data);
+	logerror("%s : set vram page to %02X\n",space->machine->describe_context(),data);
 
 	state->vram_page=data;
 }
@@ -311,7 +311,7 @@ static void keyboard_reset(running_machine *machine)
 	state->keyboard.key_special=0;
 
     // Setup timer to scan state->keyboard.
-    timer_adjust_periodic(state->keyboard.keyscan_timer, attotime::zero, 0, attotime::from_hz(50));
+    state->keyboard.keyscan_timer->adjust(attotime::zero, 0, attotime::from_hz(50));
 }
 
 static void scan_keyboard(running_machine *machine)
@@ -408,7 +408,7 @@ READ8_HANDLER(mbc55x_kb_usart_r)
 	
 	switch (offset)
 	{
-		case 0	: //logerror("%s read kb_uart\n",cpuexec_describe_context(space->machine));
+		case 0	: //logerror("%s read kb_uart\n",space->machine->describe_context());
 				  result=msm8251_data_r(msm8251,0); break;
 				  	
 		case 2	: result=msm8251_status_r(msm8251,0); 

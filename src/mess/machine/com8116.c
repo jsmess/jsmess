@@ -73,7 +73,7 @@ WRITE8_DEVICE_HANDLER( com8116_str_w )
 
 	com8116->fr = data & 0x0f;
 
-	timer_adjust_periodic(com8116->fr_timer, attotime::zero, 0, attotime::from_hz(device->clock() / com8116->fr_divisors[com8116->fr] / 2));
+	com8116->fr_timer->adjust(attotime::zero, 0, attotime::from_hz(device->clock() / com8116->fr_divisors[com8116->fr] / 2));
 }
 
 /*-------------------------------------------------
@@ -88,7 +88,7 @@ WRITE8_DEVICE_HANDLER( com8116_stt_w )
 
 	com8116->ft = data & 0x0f;
 
-	timer_adjust_periodic(com8116->ft_timer, attotime::zero, 0, attotime::from_hz(device->clock() / com8116->ft_divisors[com8116->fr] / 2));
+	com8116->ft_timer->adjust(attotime::zero, 0, attotime::from_hz(device->clock() / com8116->ft_divisors[com8116->fr] / 2));
 }
 
 /*-------------------------------------------------
@@ -155,7 +155,7 @@ static DEVICE_START( com8116 )
 	if (com8116->out_fx4_func.target)
 	{
 		com8116->fx4_timer = device->machine->scheduler().timer_alloc(FUNC(fx4_tick), (void *)device);
-		timer_adjust_periodic(com8116->fx4_timer, attotime::zero, 0, attotime::from_hz(device->clock() / 4));
+		com8116->fx4_timer->adjust(attotime::zero, 0, attotime::from_hz(device->clock() / 4));
 	}
 
 	com8116->fr_timer = device->machine->scheduler().timer_alloc(FUNC(fr_tick), (void *)device);

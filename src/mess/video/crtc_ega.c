@@ -365,7 +365,7 @@ static void update_de_changed_timer(crtc_ega_t *crtc_ega)
 		else
 			duration = attotime::never;
 
-		timer_adjust_oneshot(crtc_ega->de_changed_timer, duration, 0);
+		crtc_ega->de_changed_timer->adjust(duration);
 	}
 }
 
@@ -388,8 +388,8 @@ static void update_hsync_changed_timers(crtc_ega_t *crtc_ega)
 		if (next_y > crtc_ega->max_visible_y)
 			next_y = 0;
 
-		timer_adjust_oneshot(crtc_ega->hsync_on_timer,  crtc_ega->screen->time_until_pos(next_y, crtc_ega->hsync_on_pos) , 0);
-		timer_adjust_oneshot(crtc_ega->hsync_off_timer, crtc_ega->screen->time_until_pos(next_y, crtc_ega->hsync_off_pos), 0);
+		crtc_ega->hsync_on_timer->adjust(crtc_ega->screen->time_until_pos(next_y, crtc_ega->hsync_on_pos) );
+		crtc_ega->hsync_off_timer->adjust(crtc_ega->screen->time_until_pos(next_y, crtc_ega->hsync_off_pos));
 	}
 }
 
@@ -398,8 +398,8 @@ static void update_vsync_changed_timers(crtc_ega_t *crtc_ega)
 {
 	if (crtc_ega->has_valid_parameters && (crtc_ega->vsync_on_timer != NULL))
 	{
-		timer_adjust_oneshot(crtc_ega->vsync_on_timer,  crtc_ega->screen->time_until_pos(crtc_ega->vsync_on_pos,  0), 0);
-		timer_adjust_oneshot(crtc_ega->vsync_off_timer, crtc_ega->screen->time_until_pos(crtc_ega->vsync_off_pos, 0), 0);
+		crtc_ega->vsync_on_timer->adjust(crtc_ega->screen->time_until_pos(crtc_ega->vsync_on_pos,  0));
+		crtc_ega->vsync_off_timer->adjust(crtc_ega->screen->time_until_pos(crtc_ega->vsync_off_pos, 0));
 	}
 }
 
@@ -408,8 +408,8 @@ static void update_vblank_changed_timers(crtc_ega_t *crtc_ega)
 {
 	if (crtc_ega->has_valid_parameters && (crtc_ega->vblank_on_timer != NULL))
 	{
-		timer_adjust_oneshot(crtc_ega->vblank_on_timer,  crtc_ega->screen->time_until_pos(crtc_ega->vert_disp_end,  crtc_ega->hsync_on_pos), 0);
-		timer_adjust_oneshot(crtc_ega->vblank_off_timer, crtc_ega->screen->time_until_pos(0, crtc_ega->hsync_off_pos), 0);
+		crtc_ega->vblank_on_timer->adjust(crtc_ega->screen->time_until_pos(crtc_ega->vert_disp_end,  crtc_ega->hsync_on_pos));
+		crtc_ega->vblank_off_timer->adjust(crtc_ega->screen->time_until_pos(0, crtc_ega->hsync_off_pos));
 	}
 }
 
@@ -585,7 +585,7 @@ void crtc_ega_assert_light_pen_input(device_t *device)
 		}
 
 		/* set the timer that will latch the display address into the light pen registers */
-		timer_adjust_oneshot(crtc_ega->light_pen_latch_timer, crtc_ega->screen->time_until_pos(y, x), 0);
+		crtc_ega->light_pen_latch_timer->adjust(crtc_ega->screen->time_until_pos(y, x));
 	}
 }
 

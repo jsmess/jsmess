@@ -389,7 +389,7 @@ WRITE_LINE_DEVICE_HANDLER( abc77_reset_w )
 
 		/* trigger reset */
 		cpu_set_input_line(abc77->cpu, INPUT_LINE_RESET, ASSERT_LINE);
-		timer_adjust_oneshot(abc77->reset_timer, attotime::from_msec(t), 0);
+		abc77->reset_timer->adjust(attotime::from_msec(t));
 
 		cpu_set_input_line(abc77->cpu, MCS48_INPUT_EA, ea ? CLEAR_LINE : ASSERT_LINE);
 	}

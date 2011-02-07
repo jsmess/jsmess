@@ -349,7 +349,7 @@ static TIMER_CALLBACK(upd765_seek_timer_callback)
 	/* seek complete */
 	upd765_seek_complete(device);
 
-	timer_reset(fdc->seek_timer, attotime::never);
+	fdc->seek_timer->reset();
 }
 
 static void upd765_timer_func(device_t *device, int timer_type)
@@ -368,12 +368,12 @@ static void upd765_timer_func(device_t *device, int timer_type)
 			if (fdc->upd765_command_bytes[0] & UPD765_MF)
 			{
 				/* MFM */
-				timer_reset(fdc->timer, attotime::from_usec(13));
+				fdc->timer->reset(attotime::from_usec(13));
 			}
 			else
 			{
 				/* FM */
-				timer_reset(fdc->timer, attotime::from_usec(27));
+				fdc->timer->reset(attotime::from_usec(27));
 			}
 		}
 		else
@@ -406,7 +406,7 @@ static void upd765_timer_func(device_t *device, int timer_type)
 
 		upd765_set_data_request(device);
 
-		timer_reset(fdc->timer, attotime::never);
+		fdc->timer->reset();
 	}
 	else if (fdc->timer_type == 4)
 	{
@@ -425,7 +425,7 @@ static void upd765_timer_func(device_t *device, int timer_type)
 			}
 		}
 
-		timer_reset(fdc->timer, attotime::never);
+		fdc->timer->reset();
 	}
 }
 
@@ -449,12 +449,12 @@ static void upd765_setup_timed_generic(device_t *device, int timer_type, attotim
 
 	if (!(fdc->upd765_flags & UPD765_DMA_MODE))
 	{
-		timer_adjust_oneshot(fdc->timer, duration, 0);
+		fdc->timer->adjust(duration);
 	}
 	else
 	{
 		upd765_timer_func(device,fdc->timer_type);
-		timer_reset(fdc->timer, attotime::never);
+		fdc->timer->reset();
 	}
 }
 
@@ -477,7 +477,7 @@ static void upd765_setup_timed_int(device_t *device,int signed_tracks)
 {
 	upd765_t *fdc = get_safe_token(device);
 	/* setup timer to signal after seek time is complete */
-	timer_adjust_oneshot(fdc->seek_timer, attotime::from_double(fdc->srt_in_ms*abs(signed_tracks)*0.001), 0);
+	fdc->seek_timer->adjust(attotime::from_double(fdc->srt_in_ms*abs(signed_tracks)*0.001));
 }
 
 static void upd765_seek_setup(device_t *device, int is_recalibrate)
@@ -760,14 +760,14 @@ WRITE_LINE_DEVICE_HANDLER( upd765_tc_w )
 			{
 				if (fdc->timer_type==0)
 				{
-					timer_reset(fdc->timer, attotime::never);
+					fdc->timer->reset();
 
 
 				}
 			}
 
 #ifdef NO_END_OF_CYLINDER
-			timer_adjust_oneshot(fdc->command_timer, attotime::zero, 0);
+			fdc->command_timer->adjust(attotime::zero);
 #else
 			upd765_update_state(device);
 #endif
@@ -779,7 +779,7 @@ READ8_DEVICE_HANDLER( upd765_status_r )
 {
 	upd765_t *fdc = get_safe_token(device);
 	if (LOG_EXTRA)
-		logerror("%s: upd765_status_r: %02x\n", cpuexec_describe_context(device->machine), fdc->FDC_main);
+		logerror("%s: upd765_status_r: %02x\n", device->machine->describe_context(), fdc->FDC_main);
 	return fdc->FDC_main;
 }
 
@@ -1671,7 +1671,7 @@ void upd765_update_state(device_t *device)
 
 		if ((fdc->upd765_transfer_bytes_remaining==0) || (fdc->upd765_flags & UPD765_TC))
 		{
-			timer_adjust_oneshot(fdc->command_timer, attotime::zero, 0);
+			fdc->command_timer->adjust(attotime::zero);
 		}
 		else
 		{
@@ -1684,7 +1684,7 @@ void upd765_update_state(device_t *device)
 		fdc->FDC_main |= 0x10;                      /* set BUSY */
 
 		if (LOG_VERBOSE)
-			logerror("%s: upd765(): command=0x%02x\n", cpuexec_describe_context(device->machine), fdc->upd765_data_reg);
+			logerror("%s: upd765(): command=0x%02x\n", device->machine->describe_context(), fdc->upd765_data_reg);
 
 		/* seek in progress? */
 		if (fdc->upd765_flags & UPD765_SEEK_ACTIVE)
@@ -1716,7 +1716,7 @@ void upd765_update_state(device_t *device)
 
     case UPD765_COMMAND_PHASE_BYTES:
 		if (LOG_VERBOSE)
-			logerror("%s: upd765(): command=0x%02x\n", cpuexec_describe_context(device->machine), fdc->upd765_data_reg);
+			logerror("%s: upd765(): command=0x%02x\n", device->machine->describe_context(), fdc->upd765_data_reg);
 
 		fdc->upd765_command_bytes[fdc->upd765_transfer_bytes_count] = fdc->upd765_data_reg;
 		fdc->upd765_transfer_bytes_count++;
@@ -1740,7 +1740,7 @@ void upd765_update_state(device_t *device)
 
 		if ((fdc->upd765_transfer_bytes_remaining == 0) || (fdc->upd765_flags & UPD765_TC))
 		{
-			timer_adjust_oneshot(fdc->command_timer, attotime::zero, 0);
+			fdc->command_timer->adjust(attotime::zero);
 		}
 		else
 		{

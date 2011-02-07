@@ -553,7 +553,7 @@ static TIMER_CALLBACK( wd17xx_data_callback )
 		else
 		{
 			/* requeue us for more data */
-			timer_adjust_oneshot(w->timer_data, attotime::from_usec(wd17xx_dden(device) ? 128 : 32), 0);
+			w->timer_data->adjust(attotime::from_usec(wd17xx_dden(device) ? 128 : 32));
 		}
 	}
 	else
@@ -569,7 +569,7 @@ static void wd17xx_set_busy(device_t *device, attotime duration)
 
 	w->status |= STA_1_BUSY;
 
-	timer_adjust_oneshot(w->timer_cmd, duration, 0);
+	w->timer_cmd->adjust(duration);
 }
 
 
@@ -1036,11 +1036,11 @@ static void wd17xx_complete_command(device_t *device, int delay)
     usecs   = w->complete_command_delay;
 
 	/* set new timer */
-	timer_adjust_oneshot(w->timer_cmd, attotime::from_usec(usecs), 0);
+	w->timer_cmd->adjust(attotime::from_usec(usecs));
 	
 	/* Kill onshot read/write sector timers */
-	timer_adjust_oneshot(w->timer_rs, attotime::never, 0);
-	timer_adjust_oneshot(w->timer_ws, attotime::never, 0);
+	w->timer_rs->adjust(attotime::never);
+	w->timer_ws->adjust(attotime::never);
 }
 
 
@@ -1189,7 +1189,7 @@ static void wd17xx_timed_data_request(device_t *device)
 	wd1770_state *w = get_safe_token(device);
 
 	/* set new timer */
-	timer_adjust_oneshot(w->timer_data, attotime::from_usec(wd17xx_dden(device) ? 128 : 32), 0);
+	w->timer_data->adjust(attotime::from_usec(wd17xx_dden(device) ? 128 : 32));
 }
 
 
@@ -1200,7 +1200,7 @@ static void wd17xx_timed_read_sector_request(device_t *device)
 	wd1770_state *w = get_safe_token(device);
 
 	/* set new timer */
-	timer_adjust_oneshot(w->timer_rs, attotime::from_usec(w->pause_time), 0);
+	w->timer_rs->adjust(attotime::from_usec(w->pause_time));
 }
 
 
@@ -1211,7 +1211,7 @@ static void wd17xx_timed_write_sector_request(device_t *device)
 	wd1770_state *w = get_safe_token(device);
 
 	/* set new timer */
-	timer_adjust_oneshot(w->timer_ws, attotime::from_usec(w->pause_time), 0);
+	w->timer_ws->adjust(attotime::from_usec(w->pause_time));
 }
 
 

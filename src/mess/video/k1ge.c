@@ -797,7 +797,7 @@ static TIMER_CALLBACK( k1ge_timer_callback )
 		{
 			if ( k1ge->vram[0x000] & 0x40 )
 				devcb_call_write8( &k1ge->hblank_pin_w, 0, 1 );
-			timer_adjust_oneshot( k1ge->hblank_on_timer, k1ge->screen->time_until_pos(y, 480 ), 0 );
+			k1ge->hblank_on_timer->adjust( k1ge->screen->time_until_pos(y, 480 ) );
 		}
 	}
 
@@ -807,7 +807,7 @@ static TIMER_CALLBACK( k1ge_timer_callback )
 		k1ge->draw( device, y - 1 );
 	}
 
-	timer_adjust_oneshot( k1ge->timer, k1ge->screen->time_until_pos(( y + 1 ) % K1GE_SCREEN_HEIGHT, 0 ), 0 );
+	k1ge->timer->adjust( k1ge->screen->time_until_pos(( y + 1 ) % K1GE_SCREEN_HEIGHT, 0 ) );
 }
 
 
@@ -888,7 +888,7 @@ static DEVICE_RESET( k1ge )
 	k1ge->vram[0x7e0] = 0x52;	/* RESET */
 	k1ge->vram[0x7e2] = 0x00;	/* MODE */
 
-	timer_adjust_oneshot( k1ge->timer, k1ge->screen->time_until_pos(( k1ge->screen->vpos() + 1 ) % K1GE_SCREEN_HEIGHT, 0 ), 0 );
+	k1ge->timer->adjust( k1ge->screen->time_until_pos(( k1ge->screen->vpos() + 1 ) % K1GE_SCREEN_HEIGHT, 0 ) );
 }
 
 

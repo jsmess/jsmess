@@ -420,12 +420,12 @@ static void	kc_cassette_set_motor(running_machine *machine, int motor_state)
 		if (motor_state)
 		{
 			/* start timer */
-			timer_adjust_periodic(state->cassette_timer, attotime::zero, 0, KC_CASSETTE_TIMER_FREQUENCY);
+			state->cassette_timer->adjust(attotime::zero, 0, KC_CASSETTE_TIMER_FREQUENCY);
 		}
 		else
 		{
 			/* stop timer */
-			timer_reset(state->cassette_timer, attotime::never);
+			state->cassette_timer->reset();
 		}
 	}
 

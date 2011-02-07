@@ -334,7 +334,7 @@ static READ8_HANDLER( supercon_port3_r )
 	if (!state->emu_started)
 		return 0xbf;
 	else
-		timer_adjust_periodic( state->timer_update_irq, attotime::zero, 0, attotime::from_hz(598) );  //HACK adjust timer after start ???
+		state->timer_update_irq->adjust( attotime::zero, 0, attotime::from_hz(598) );  //HACK adjust timer after start ???
 
 
 /* Buttons */
@@ -551,7 +551,7 @@ static MACHINE_START( supercon )
 	state->remove_led_flag=TRUE;
 
 	state->timer_update_irq = machine->scheduler().timer_alloc(FUNC(update_irq));
-	timer_adjust_periodic( state->timer_update_irq, attotime::zero, 0, attotime::from_hz(1000) );
+	state->timer_update_irq->adjust( attotime::zero, 0, attotime::from_hz(1000) );
 
 	state_save_register_global_array(machine,state->save_board);
 	state_save_register_postload(machine,m_board_postload,NULL);

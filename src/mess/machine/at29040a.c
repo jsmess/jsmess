@@ -111,7 +111,7 @@ static TIMER_CALLBACK(at29c040a_programming_timer_callback)
 		/* programming cycle start */
 		feeprom->s_pgm = s_pgm_3;
 		/* max delay 10ms, typical delay 5 to 7 ms */
-		timer_adjust_oneshot(feeprom->programming_timer, attotime::from_msec(5), 0);
+		feeprom->programming_timer->adjust(attotime::from_msec(5));
 		break;
 
 	case s_pgm_3:
@@ -180,7 +180,7 @@ READ8_DEVICE_HANDLER( at29c040a_r )
 		feeprom->s_pgm = s_pgm_0;
 		feeprom->s_enabling_sdb = FALSE;
 		feeprom->s_disabling_sdb = FALSE;
-		timer_adjust_oneshot(feeprom->programming_timer, attotime::never, 0);
+		feeprom->programming_timer->adjust(attotime::never);
 	}
 
 
@@ -215,7 +215,7 @@ READ8_DEVICE_HANDLER( at29c040a_r )
 		{	/* data polling starts the programming cycle (right???) */
 			feeprom->s_pgm = s_pgm_3;
 			/* max delay 10ms, typical delay 5 to 7 ms */
-			timer_adjust_oneshot(feeprom->programming_timer, attotime::from_msec(5), 0);
+			feeprom->programming_timer->adjust(attotime::from_msec(5));
 		}
 
 		reply = feeprom->toggle_bit;
@@ -291,7 +291,7 @@ WRITE8_DEVICE_HANDLER( at29c040a_w )
 			feeprom->s_pgm = s_pgm_0;
 			feeprom->s_enabling_sdb = FALSE;
 			feeprom->s_disabling_sdb = FALSE;
-			timer_adjust_oneshot(feeprom->programming_timer, attotime::never, 0);
+			feeprom->programming_timer->adjust(attotime::never);
 
 			/* process command */
 			switch (data)
@@ -317,7 +317,7 @@ WRITE8_DEVICE_HANDLER( at29c040a_w )
 					feeprom->s_pgm = s_pgm_1;
 					feeprom->s_disabling_sdb = TRUE;
 					/* set command timeout (right???) */
-					//timer_adjust_periodic(feeprom->programming_timer, attotime::from_usec(150), id, 0.);
+					//feeprom->programming_timer->adjust(attotime::from_usec(150), id, 0.);
 				}
 				break;
 
@@ -337,7 +337,7 @@ WRITE8_DEVICE_HANDLER( at29c040a_w )
 				feeprom->s_pgm = s_pgm_1;
 				feeprom->s_enabling_sdb = TRUE;
 				/* set command timeout (right???) */
-				//timer_adjust_periodic(feeprom->programming_timer, attotime::from_usec(150), id, 0.);
+				//feeprom->programming_timer->adjust(attotime::from_usec(150), id, 0.);
 				break;
 
 			case 0xf0:
@@ -366,7 +366,7 @@ WRITE8_DEVICE_HANDLER( at29c040a_w )
 		feeprom->s_pgm = s_pgm_0;
 		feeprom->s_enabling_sdb = FALSE;
 		feeprom->s_disabling_sdb = FALSE;
-		timer_adjust_oneshot(feeprom->programming_timer, attotime::never, 0);
+		feeprom->programming_timer->adjust(attotime::never);
 	}
 
 	if (((feeprom->s_pgm == s_pgm_0) && !feeprom->s_sdp)
@@ -392,7 +392,7 @@ WRITE8_DEVICE_HANDLER( at29c040a_w )
 		/* write data to programming buffer */
 		feeprom->programming_buffer[offset & 0xff] = data;
 		feeprom->programming_last_offset = offset;
-		timer_adjust_oneshot(feeprom->programming_timer, attotime::from_usec(150), 0);
+		feeprom->programming_timer->adjust(attotime::from_usec(150));
 	}
 }
 

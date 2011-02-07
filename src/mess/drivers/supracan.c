@@ -1494,7 +1494,7 @@ static TIMER_CALLBACK( supracan_hbl_callback )
 {
     supracan_state *state = machine->driver_data<supracan_state>();
 
-    timer_adjust_oneshot(state->hbl_timer, attotime::never, 0);
+    state->hbl_timer->adjust(attotime::never);
 }
 
 static TIMER_CALLBACK( supracan_line_on_callback )
@@ -1503,7 +1503,7 @@ static TIMER_CALLBACK( supracan_line_on_callback )
 
     cpu_set_input_line(machine->device("maincpu"), 5, HOLD_LINE);
 
-    timer_adjust_oneshot(state->line_on_timer, attotime::never, 0);
+    state->line_on_timer->adjust(attotime::never);
 }
 
 static TIMER_CALLBACK( supracan_line_off_callback )
@@ -1512,7 +1512,7 @@ static TIMER_CALLBACK( supracan_line_off_callback )
 
     cpu_set_input_line(machine->device("maincpu"), 5, CLEAR_LINE);
 
-    timer_adjust_oneshot(state->line_on_timer, attotime::never, 0);
+    state->line_on_timer->adjust(attotime::never);
 }
 
 static TIMER_CALLBACK( supracan_video_callback )
@@ -1551,8 +1551,8 @@ static TIMER_CALLBACK( supracan_video_callback )
 
     state->video_regs[1] = machine->primary_screen->vpos()-16; // for son of evil, wants vblank active around 224 instead...
 
-    timer_adjust_oneshot( state->hbl_timer, machine->primary_screen->time_until_pos( vpos, 320 ), 0 );
-    timer_adjust_oneshot( state->video_timer, machine->primary_screen->time_until_pos( ( vpos + 1 ) % 256, 0 ), 0 );
+    state->hbl_timer->adjust( machine->primary_screen->time_until_pos( vpos, 320 ) );
+    state->video_timer->adjust( machine->primary_screen->time_until_pos( ( vpos + 1 ) % 256, 0 ) );
 }
 
 static WRITE16_HANDLER( supracan_video_w )
@@ -1655,11 +1655,11 @@ static WRITE16_HANDLER( supracan_video_w )
                 verboselog("maincpu", space->machine, 0, "IRQ Trigger? = %04x\n", data);
                 if(data & 0x8000)
                 {
-                    timer_adjust_oneshot(state->line_on_timer, space->machine->primary_screen->time_until_pos((data & 0x00ff), 0), 0);
+                    state->line_on_timer->adjust(space->machine->primary_screen->time_until_pos((data & 0x00ff), 0));
                 }
                 else
                 {
-                    timer_adjust_oneshot(state->line_on_timer, attotime::never, 0);
+                    state->line_on_timer->adjust(attotime::never);
                 }
             }
             break;
@@ -1669,11 +1669,11 @@ static WRITE16_HANDLER( supracan_video_w )
                 verboselog("maincpu", space->machine, 0, "IRQ De-Trigger? = %04x\n", data);
                 if(data & 0x8000)
                 {
-                    timer_adjust_oneshot(state->line_off_timer, space->machine->primary_screen->time_until_pos(data & 0x00ff, 0), 0);
+                    state->line_off_timer->adjust(space->machine->primary_screen->time_until_pos(data & 0x00ff, 0));
                 }
                 else
                 {
-                    timer_adjust_oneshot(state->line_off_timer, attotime::never, 0);
+                    state->line_off_timer->adjust(attotime::never);
                 }
             }
             break;
@@ -1791,7 +1791,7 @@ static MACHINE_RESET( supracan )
 
 	cputag_set_input_line(machine, "soundcpu", INPUT_LINE_HALT, ASSERT_LINE);
 
-	timer_adjust_oneshot( state->video_timer, machine->primary_screen->time_until_pos( 0, 0 ), 0 );
+	state->video_timer->adjust( machine->primary_screen->time_until_pos( 0, 0 ) );
 	state->irq_mask = 0;
 }
 

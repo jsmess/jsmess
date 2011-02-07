@@ -640,7 +640,7 @@ static void stv_SMPC_w8(address_space *space, int offset, UINT8 data)
 				if(LOG_SMPC) logerror ("SMPC: Slave OFF\n");
 				smpc_ram[0x5f]=0x03;
 				stv_enable_slave_sh2 = 0;
-				cpuexec_trigger(machine, 1000);
+				machine->scheduler().trigger(1000);
 				cputag_set_input_line(machine, "slave", INPUT_LINE_RESET, ASSERT_LINE);
 				break;
 			case 0x06:
@@ -1853,15 +1853,15 @@ static WRITE32_HANDLER( stv_scsp_regs_w32 )
 static WRITE32_HANDLER( minit_w )
 {
 	logerror("cpu %s (PC=%08X) MINIT write = %08x\n", space->cpu->tag(), cpu_get_pc(space->cpu),data);
-	cpuexec_boost_interleave(space->machine, minit_boost_timeslice, attotime::from_usec(minit_boost));
-	cpuexec_trigger(space->machine, 1000);
+	space->machine->scheduler().boost_interleave(minit_boost_timeslice, attotime::from_usec(minit_boost));
+	space->machine->scheduler().trigger(1000);
 	sh2_set_frt_input(space->machine->device("slave"), PULSE_LINE);
 }
 
 static WRITE32_HANDLER( sinit_w )
 {
 	logerror("cpu %s (PC=%08X) SINIT write = %08x\n", space->cpu->tag(), cpu_get_pc(space->cpu),data);
-	cpuexec_boost_interleave(space->machine, sinit_boost_timeslice, attotime::from_usec(sinit_boost));
+	space->machine->scheduler().boost_interleave(sinit_boost_timeslice, attotime::from_usec(sinit_boost));
 	sh2_set_frt_input(space->machine->device("maincpu"), PULSE_LINE);
 }
 
@@ -2118,7 +2118,7 @@ static TIMER_DEVICE_CALLBACK( hblank_in_irq )
 		/*set the first Timer-1 event*/
 		cur_scan = scanline+1;
 		if(stv_irq.timer_1)
-			t1_timer->adjust(timer.machine->primary_screen->time_until_pos(scanline+1, 0));
+			t1_timer->adjust(timer.machine->primary_screen->time_until_pos(scanline+1));
 	}
 
 	timer_0++;
@@ -2161,7 +2161,7 @@ static INTERRUPT_GEN( stv_interrupt )
 
 	/*Next V-Blank-OUT event*/
 	if(stv_irq.vblank_out)
-		vblank_out_timer->adjust(device->machine->primary_screen->time_until_pos(0, 0));
+		vblank_out_timer->adjust(device->machine->primary_screen->time_until_pos(0));
 	/*Set the first Hblank-IN event*/
 	if(stv_irq.hblank_in || stv_irq.timer_0 || stv_irq.timer_1)
 		scan_timer->adjust(device->machine->primary_screen->time_until_pos(0, h_sync));
@@ -2286,7 +2286,7 @@ static MACHINE_RESET( saturn )
 	scan_timer = machine->device<timer_device>("scan_timer");
 	t1_timer = machine->device<timer_device>("t1_timer");
 	vblank_out_timer = machine->device<timer_device>("vbout_timer");
-	vblank_out_timer->adjust(machine->primary_screen->time_until_pos(0, 0));
+	vblank_out_timer->adjust(machine->primary_screen->time_until_pos(0));
 	scan_timer->adjust(machine->primary_screen->time_until_pos(224, 352));
 }
 

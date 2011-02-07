@@ -376,11 +376,11 @@ DEVICE_IMAGE_LOAD( pdp1_tape )
 			if (state->tape_reader.motor_on && state->tape_reader.rcl)
 			{
 				/* delay is approximately 1/400s */
-				timer_adjust_oneshot(state->tape_reader.timer, attotime::from_usec(2500), 0);
+				state->tape_reader.timer->adjust(attotime::from_usec(2500));
 			}
 			else
 			{
-				timer_enable(state->tape_reader.timer, 0);
+				state->tape_reader.timer->enable(0);
 			}
 		}
 		break;
@@ -409,7 +409,7 @@ DEVICE_IMAGE_UNLOAD( pdp1_tape )
 		state->tape_reader.motor_on = 0;
 
 		if (state->tape_reader.timer)
-			timer_enable(state->tape_reader.timer, 0);
+			state->tape_reader.timer->enable(0);
 		break;
 
 	case 1:
@@ -452,18 +452,18 @@ static void begin_tape_read(pdp1_state *state, int binary, int nac)
 
 	if (LOG_IOT_OVERLAP)
 	{
-		if (timer_enable(state->tape_reader.timer, 0))
+		if (state->tape_reader.timer->enable(0))
 			logerror("Error: overlapped perforated tape reads (Read-in mode, RPA/RPB instruction)\n");
 	}
 	/* set up delay if tape is advancing */
 	if (state->tape_reader.motor_on && state->tape_reader.rcl)
 	{
 		/* delay is approximately 1/400s */
-		timer_adjust_oneshot(state->tape_reader.timer, attotime::from_usec(2500), 0);
+		state->tape_reader.timer->adjust(attotime::from_usec(2500));
 	}
 	else
 	{
-		timer_enable(state->tape_reader.timer, 0);
+		state->tape_reader.timer->enable(0);
 	}
 }
 
@@ -513,9 +513,9 @@ static TIMER_CALLBACK(reader_callback)
 
 	if (state->tape_reader.motor_on && state->tape_reader.rcl)
 		/* delay is approximately 1/400s */
-		timer_adjust_oneshot(state->tape_reader.timer, attotime::from_usec(2500), 0);
+		state->tape_reader.timer->adjust(attotime::from_usec(2500));
 	else
-		timer_enable(state->tape_reader.timer, 0);
+		state->tape_reader.timer->enable(0);
 }
 
 /*
@@ -572,7 +572,7 @@ static void iot_rpa(device_t *device, int op2, int nac, int mb, int *io, int ac)
 {
 	pdp1_state *state = device->machine->driver_data<pdp1_state>();
 	if (LOG_IOT_EXTRA)
-		logerror("Warning, RPA instruction not fully emulated: mb=0%06o, (%s)\n", (unsigned) mb, cpuexec_describe_context(device->machine));
+		logerror("Warning, RPA instruction not fully emulated: mb=0%06o, (%s)\n", (unsigned) mb, device->machine->describe_context());
 
 	begin_tape_read(state, 0, nac);
 }
@@ -610,7 +610,7 @@ static void iot_rpb(device_t *device, int op2, int nac, int mb, int *io, int ac)
 {
 	pdp1_state *state = device->machine->driver_data<pdp1_state>();
 	if (LOG_IOT_EXTRA)
-		logerror("Warning, RPB instruction not fully emulated: mb=0%06o, (%s)\n", (unsigned) mb, cpuexec_describe_context(device->machine));
+		logerror("Warning, RPB instruction not fully emulated: mb=0%06o, (%s)\n", (unsigned) mb, device->machine->describe_context());
 
 	begin_tape_read(state, 1, nac);
 }
@@ -622,7 +622,7 @@ static void iot_rrb(device_t *device, int op2, int nac, int mb, int *io, int ac)
 {
 	pdp1_state *state = device->machine->driver_data<pdp1_state>();
 	if (LOG_IOT_EXTRA)
-		logerror("RRB instruction: mb=0%06o, (%s)\n", (unsigned) mb, cpuexec_describe_context(device->machine));
+		logerror("RRB instruction: mb=0%06o, (%s)\n", (unsigned) mb, device->machine->describe_context());
 
 	*io = state->tape_reader.rb;
 	state->io_status &= ~io_st_ptr;
@@ -646,18 +646,18 @@ static void iot_ppa(device_t *device, int op2, int nac, int mb, int *io, int ac)
 {
 	pdp1_state *state = device->machine->driver_data<pdp1_state>();
 	if (LOG_IOT_EXTRA)
-		logerror("PPA instruction: mb=0%06o, (%s)\n", (unsigned) mb, cpuexec_describe_context(device->machine));
+		logerror("PPA instruction: mb=0%06o, (%s)\n", (unsigned) mb, device->machine->describe_context());
 
 	tape_write(state, *io & 0377);
 	state->io_status &= ~io_st_ptp;
 	/* delay is approximately 1/63.3 second */
 	if (LOG_IOT_OVERLAP)
 	{
-		if (timer_enable(state->tape_puncher.timer, 0))
-			logerror("Error: overlapped PPA/PPB instructions: mb=0%06o, (%s)\n", (unsigned) mb, cpuexec_describe_context(device->machine));
+		if (state->tape_puncher.timer->enable(0))
+			logerror("Error: overlapped PPA/PPB instructions: mb=0%06o, (%s)\n", (unsigned) mb, device->machine->describe_context());
 	}
 
-	timer_adjust_oneshot(state->tape_puncher.timer, attotime::from_usec(15800), nac);
+	state->tape_puncher.timer->adjust(attotime::from_usec(15800), nac);
 }
 
 /*
@@ -675,17 +675,17 @@ static void iot_ppb(device_t *device, int op2, int nac, int mb, int *io, int ac)
 {
 	pdp1_state *state = device->machine->driver_data<pdp1_state>();
 	if (LOG_IOT_EXTRA)
-		logerror("PPB instruction: mb=0%06o, (%s)\n", (unsigned) mb, cpuexec_describe_context(device->machine));
+		logerror("PPB instruction: mb=0%06o, (%s)\n", (unsigned) mb, device->machine->describe_context());
 
 	tape_write(state, (*io >> 12) | 0200);
 	state->io_status &= ~io_st_ptp;
 	/* delay is approximately 1/63.3 second */
 	if (LOG_IOT_OVERLAP)
 	{
-		if (timer_enable(state->tape_puncher.timer, 0))
-			logerror("Error: overlapped PPA/PPB instructions: mb=0%06o, (%s)\n", (unsigned) mb, cpuexec_describe_context(device->machine));
+		if (state->tape_puncher.timer->enable(0))
+			logerror("Error: overlapped PPA/PPB instructions: mb=0%06o, (%s)\n", (unsigned) mb, device->machine->describe_context());
 	}
-	timer_adjust_oneshot(state->tape_puncher.timer, attotime::from_usec(15800), nac);
+	state->tape_puncher.timer->adjust(attotime::from_usec(15800), nac);
 }
 
 
@@ -847,7 +847,7 @@ static void iot_tyo(device_t *device, int op2, int nac, int mb, int *io, int ac)
 	int ch, delay;
 
 	if (LOG_IOT_EXTRA)
-		logerror("Warning, TYO instruction not fully emulated: mb=0%06o, (%s)\n", (unsigned) mb, cpuexec_describe_context(device->machine));
+		logerror("Warning, TYO instruction not fully emulated: mb=0%06o, (%s)\n", (unsigned) mb, device->machine->describe_context());
 
 	ch = (*io) & 077;
 
@@ -874,11 +874,11 @@ static void iot_tyo(device_t *device, int op2, int nac, int mb, int *io, int ac)
 	}
 	if (LOG_IOT_OVERLAP)
 	{
-		if (timer_enable(state->typewriter.tyo_timer, 0))
-			logerror("Error: overlapped TYO instruction: mb=0%06o, (%s)\n", (unsigned) mb, cpuexec_describe_context(device->machine));
+		if (state->typewriter.tyo_timer->enable(0))
+			logerror("Error: overlapped TYO instruction: mb=0%06o, (%s)\n", (unsigned) mb, device->machine->describe_context());
 	}
 
-	timer_adjust_oneshot(state->typewriter.tyo_timer, attotime::from_msec(delay), nac);
+	state->typewriter.tyo_timer->adjust(attotime::from_msec(delay), nac);
 }
 
 /*
@@ -899,7 +899,7 @@ static void iot_tyi(device_t *device, int op2, int nac, int mb, int *io, int ac)
 {
 	pdp1_state *state = device->machine->driver_data<pdp1_state>();
 	if (LOG_IOT_EXTRA)
-		logerror("Warning, TYI instruction not fully emulated: mb=0%06o, (%s)\n", (unsigned) mb, cpuexec_describe_context(device->machine));
+		logerror("Warning, TYI instruction not fully emulated: mb=0%06o, (%s)\n", (unsigned) mb, device->machine->describe_context());
 
 	*io = state->typewriter.tb;
 	if (! (state->io_status & io_st_tyi))
@@ -989,10 +989,10 @@ static void iot_dpy(device_t *device, int op2, int nac, int mb, int *io, int ac)
 		{
 			/* note that overlap detection is incomplete: it will only work if both DPY
             instructions require a completion pulse */
-			if (timer_enable(state->dpy_timer, 0))
-				logerror("Error: overlapped DPY instruction: mb=0%06o, (%s)\n", (unsigned) mb, cpuexec_describe_context(device->machine));
+			if (state->dpy_timer->enable(0))
+				logerror("Error: overlapped DPY instruction: mb=0%06o, (%s)\n", (unsigned) mb, device->machine->describe_context());
 		}
-		timer_adjust_oneshot(state->dpy_timer, attotime::from_usec(50), 0);
+		state->dpy_timer->adjust(attotime::from_usec(50));
 	}
 }
 
@@ -1008,10 +1008,10 @@ static void parallel_drum_set_il(pdp1_state *state, int il)
 
 	state->parallel_drum.il = il;
 
-	il_phase = ((PARALLEL_DRUM_WORD_TIME * il) - timer_timeelapsed(state->parallel_drum.rotation_timer));
+	il_phase = ((PARALLEL_DRUM_WORD_TIME * il) - state->parallel_drum.rotation_timer->elapsed());
 	if (il_phase < attotime::zero)
 		il_phase = il_phase + PARALLEL_DRUM_ROTATION_TIME;
-	timer_adjust_periodic(state->parallel_drum.il_timer, il_phase, 0, PARALLEL_DRUM_ROTATION_TIME);
+	state->parallel_drum.il_timer->adjust(il_phase, 0, PARALLEL_DRUM_ROTATION_TIME);
 }
 
 #ifdef UNUSED_FUNCTION
@@ -1028,7 +1028,7 @@ static TIMER_CALLBACK(il_timer_callback)
 static void parallel_drum_init(pdp1_state *state)
 {
 	state->parallel_drum.rotation_timer = machine->scheduler().timer_alloc();
-	timer_adjust_periodic(state->parallel_drum.rotation_timer, PARALLEL_DRUM_ROTATION_TIME, 0, PARALLEL_DRUM_ROTATION_TIME);
+	state->parallel_drum.rotation_timer->adjust(PARALLEL_DRUM_ROTATION_TIME, 0, PARALLEL_DRUM_ROTATION_TIME);
 
 	state->parallel_drum.il_timer = machine->scheduler().timer_alloc(FUNC(il_timer_callback));
 	parallel_drum_set_il(0);
@@ -1119,7 +1119,7 @@ static void iot_dcc(device_t *device, int op2, int nac, int mb, int *io, int ac)
 	/* clear status bit 5... */
 
 	/* do transfer */
-	delay = timer_timeleft(state->parallel_drum.il_timer);
+	delay = state->parallel_drum.il_timer->remaining();
 	dc = state->parallel_drum.il;
 	do
 	{
@@ -1147,7 +1147,7 @@ static void iot_dcc(device_t *device, int op2, int nac, int mb, int *io, int ac)
 static void iot_dra(device_t *device, int op2, int nac, int mb, int *io, int ac)
 {
 	pdp1_state *state = device->machine->driver_data<pdp1_state>();
-	(*io) = (timer_timeelapsed(state->parallel_drum.rotation_timer) *
+	(*io) = (state->parallel_drum.rotation_timer->elapsed() *
 		(ATTOSECONDS_PER_SECOND / (PARALLEL_DRUM_WORD_TIME.as_attoseconds()))).seconds & 0007777;
 
 	/* set parity error and timing error... */
@@ -1209,7 +1209,7 @@ static void iot_cks(device_t *device, int op2, int nac, int mb, int *io, int ac)
 {
 	pdp1_state *state = device->machine->driver_data<pdp1_state>();
 	if (LOG_IOT_EXTRA)
-		logerror("CKS instruction: mb=0%06o, (%s)\n", (unsigned) mb, cpuexec_describe_context(device->machine));
+		logerror("CKS instruction: mb=0%06o, (%s)\n", (unsigned) mb, device->machine->describe_context());
 
 	*io = state->io_status;
 }
@@ -1225,16 +1225,16 @@ void pdp1_io_sc_callback(device_t *device)
 	pdp1_state *state = device->machine->driver_data<pdp1_state>();
 	state->tape_reader.rcl = state->tape_reader.rc = 0;
 	if (state->tape_reader.timer)
-		timer_enable(state->tape_reader.timer, 0);
+		state->tape_reader.timer->enable(0);
 
 	if (state->tape_puncher.timer)
-		timer_enable(state->tape_puncher.timer, 0);
+		state->tape_puncher.timer->enable(0);
 
 	if (state->typewriter.tyo_timer)
-		timer_enable(state->typewriter.tyo_timer, 0);
+		state->typewriter.tyo_timer->enable(0);
 
 	if (state->dpy_timer)
-		timer_enable(state->dpy_timer, 0);
+		state->dpy_timer->enable(0);
 
 	state->io_status = io_st_tyo | io_st_ptp;
 }

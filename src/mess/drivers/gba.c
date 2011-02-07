@@ -117,7 +117,7 @@ static TIMER_CALLBACK( dma_complete )
 
 //  printf("dma complete: ch %d\n", ch);
 
-	timer_adjust_oneshot(state->dma_timer[ch], attotime::never, 0);
+	state->dma_timer[ch]->adjust(attotime::never);
 
 	ctrl = state->dma_regs[(ch*3)+2] >> 16;
 
@@ -279,7 +279,7 @@ static void dma_exec(running_machine *machine, FPTR ch)
 	state->dma_dst[ch] = dst;
 
 //  printf("settng DMA timer %d for %d cycs (tmr %x)\n", ch, cnt, (UINT32)state->dma_timer[ch]);
-//  timer_adjust_oneshot(state->dma_timer[ch], ATTOTIME_IN_CYCLES(0, cnt), ch);
+//  state->dma_timer[ch]->adjust(ATTOTIME_IN_CYCLES(0, cnt), ch);
 	dma_complete(machine, NULL, ch);
 }
 
@@ -395,7 +395,7 @@ static TIMER_CALLBACK(timer_expire)
 		state->timer_hz[tmr] = final;
 		time = attotime::from_hz(final);
 		GBA_ATTOTIME_NORMALIZE(time);
-		timer_adjust_periodic(state->tmr_timer[tmr], time, tmr, time);
+		state->tmr_timer[tmr]->adjust(time, tmr, time);
 	}
 
 	// check if timers 0 or 1 are feeding directsound
@@ -521,7 +521,7 @@ static TIMER_CALLBACK(handle_irq)
 
 	gba_request_irq(machine, state->IF);
 
-	timer_adjust_oneshot(state->irq_timer, attotime::never, 0);
+	state->irq_timer->adjust(attotime::never);
 }
 
 static READ32_HANDLER( gba_io_r )
@@ -884,7 +884,7 @@ static READ32_HANDLER( gba_io_r )
 					else
 					{
 
-					time = timer_timeelapsed(state->tmr_timer[timer]).as_double();
+					time = state->tmr_timer[timer]->elapsed().as_double();
 
 					ticks = (double)(0x10000 - (state->timer_regs[timer] & 0xffff));
 
@@ -1711,7 +1711,7 @@ static WRITE32_HANDLER( gba_io_w )
 					{
 						attotime time = attotime::from_hz(final);
 						GBA_ATTOTIME_NORMALIZE(time);
-						timer_adjust_periodic(state->tmr_timer[offset], time, offset, time);
+						state->tmr_timer[offset]->adjust(time, offset, time);
 					}
 				}
 			}
@@ -1852,7 +1852,7 @@ static WRITE32_HANDLER( gba_io_w )
 				// if we still have interrupts, yank the IRQ line again
 				if (state->IF)
 				{
-					timer_adjust_oneshot(state->irq_timer, machine->device<cpu_device>("maincpu")->clocks_to_attotime(120), 0);
+					state->irq_timer->adjust(machine->device<cpu_device>("maincpu")->clocks_to_attotime(120));
 				}
 			}
 			break;
@@ -1874,7 +1874,7 @@ static WRITE32_HANDLER( gba_io_w )
 				state->IME = ( state->IME & ~mem_mask ) | ( data & mem_mask );
 				if (state->IF)
 				{
-					timer_adjust_oneshot(state->irq_timer, attotime::zero, 0);
+					state->irq_timer->adjust(attotime::zero);
 				}
 			}
 			if( (mem_mask) & 0xffff0000 )
@@ -1987,7 +1987,7 @@ static READ32_HANDLER(gba_10000000_r)
 		UINT16 insn = space->read_word( pc + 4);
 		data = (insn << 16) | (insn << 0);
 	}
-	logerror( "%s: unmapped program memory read from %08X = %08X & %08X\n", cpuexec_describe_context( space->machine), 0x10000000 + (offset << 2), data, mem_mask);
+	logerror( "%s: unmapped program memory read from %08X = %08X & %08X\n", space->machine->describe_context( ), 0x10000000 + (offset << 2), data, mem_mask);
 	return data;
 }
 
@@ -2049,7 +2049,7 @@ static TIMER_CALLBACK( perform_hbl )
 		}
 	}
 
-	timer_adjust_oneshot(state->hbl_timer, attotime::never, 0);
+	state->hbl_timer->adjust(attotime::never);
 }
 
 static TIMER_CALLBACK( perform_scan )
@@ -2104,8 +2104,8 @@ static TIMER_CALLBACK( perform_scan )
 		}
 	}
 
-	timer_adjust_oneshot(state->hbl_timer, machine->primary_screen->time_until_pos(scanline, 240), 0);
-	timer_adjust_oneshot(state->scan_timer, machine->primary_screen->time_until_pos(( scanline + 1 ) % 228, 0), 0);
+	state->hbl_timer->adjust(machine->primary_screen->time_until_pos(scanline, 240));
+	state->scan_timer->adjust(machine->primary_screen->time_until_pos(( scanline + 1 ) % 228, 0));
 }
 
 static MACHINE_RESET( gba )
@@ -2138,12 +2138,12 @@ static MACHINE_RESET( gba )
 
 	state->bios_protected = 0;
 
-	timer_adjust_oneshot(state->scan_timer, machine->primary_screen->time_until_pos(0, 0), 0);
-	timer_adjust_oneshot(state->hbl_timer, attotime::never, 0);
-	timer_adjust_oneshot(state->dma_timer[0], attotime::never, 0);
-	timer_adjust_oneshot(state->dma_timer[1], attotime::never, 1);
-	timer_adjust_oneshot(state->dma_timer[2], attotime::never, 2);
-	timer_adjust_oneshot(state->dma_timer[3], attotime::never, 3);
+	state->scan_timer->adjust(machine->primary_screen->time_until_pos(0, 0));
+	state->hbl_timer->adjust(attotime::never);
+	state->dma_timer[0]->adjust(attotime::never);
+	state->dma_timer[1]->adjust(attotime::never, 1);
+	state->dma_timer[2]->adjust(attotime::never, 2);
+	state->dma_timer[3]->adjust(attotime::never, 3);
 
 	state->fifo_a_ptr = state->fifo_b_ptr = 17;	// indicate empty
 	state->fifo_a_in = state->fifo_b_in = 17;
@@ -2178,31 +2178,31 @@ static MACHINE_START( gba )
 	/* create a timer to fire scanline functions */
 	state->scan_timer = machine->scheduler().timer_alloc(FUNC(perform_scan));
 	state->hbl_timer = machine->scheduler().timer_alloc(FUNC(perform_hbl));
-	timer_adjust_oneshot(state->scan_timer, machine->primary_screen->time_until_pos(0, 0), 0);
+	state->scan_timer->adjust(machine->primary_screen->time_until_pos(0, 0));
 
 	/* and one for each DMA channel */
 	state->dma_timer[0] = machine->scheduler().timer_alloc(FUNC(dma_complete));
 	state->dma_timer[1] = machine->scheduler().timer_alloc(FUNC(dma_complete));
 	state->dma_timer[2] = machine->scheduler().timer_alloc(FUNC(dma_complete));
 	state->dma_timer[3] = machine->scheduler().timer_alloc(FUNC(dma_complete));
-	timer_adjust_oneshot(state->dma_timer[0], attotime::never, 0);
-	timer_adjust_oneshot(state->dma_timer[1], attotime::never, 1);
-	timer_adjust_oneshot(state->dma_timer[2], attotime::never, 2);
-	timer_adjust_oneshot(state->dma_timer[3], attotime::never, 3);
+	state->dma_timer[0]->adjust(attotime::never);
+	state->dma_timer[1]->adjust(attotime::never, 1);
+	state->dma_timer[2]->adjust(attotime::never, 2);
+	state->dma_timer[3]->adjust(attotime::never, 3);
 
 	/* also one for each timer (heh) */
 	state->tmr_timer[0] = machine->scheduler().timer_alloc(FUNC(timer_expire));
 	state->tmr_timer[1] = machine->scheduler().timer_alloc(FUNC(timer_expire));
 	state->tmr_timer[2] = machine->scheduler().timer_alloc(FUNC(timer_expire));
 	state->tmr_timer[3] = machine->scheduler().timer_alloc(FUNC(timer_expire));
-	timer_adjust_oneshot(state->tmr_timer[0], attotime::never, 0);
-	timer_adjust_oneshot(state->tmr_timer[1], attotime::never, 1);
-	timer_adjust_oneshot(state->tmr_timer[2], attotime::never, 2);
-	timer_adjust_oneshot(state->tmr_timer[3], attotime::never, 3);
+	state->tmr_timer[0]->adjust(attotime::never);
+	state->tmr_timer[1]->adjust(attotime::never, 1);
+	state->tmr_timer[2]->adjust(attotime::never, 2);
+	state->tmr_timer[3]->adjust(attotime::never, 3);
 
 	/* and an IRQ handling timer */
 	state->irq_timer = machine->scheduler().timer_alloc(FUNC(handle_irq));
-	timer_adjust_oneshot(state->irq_timer, attotime::never, 0);
+	state->irq_timer->adjust(attotime::never);
 
 	gba_video_start(machine);
 }

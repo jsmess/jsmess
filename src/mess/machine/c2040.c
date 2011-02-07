@@ -817,7 +817,7 @@ static WRITE8_DEVICE_HANDLER( via_pb_w )
 	int s0 = (data >> 2) & 0x03;
 	micropolis_step_motor(c2040, 0, mtr0, s0);
 
-	timer_enable(c2040->bit_timer, !mtr1 | !mtr0);
+	c2040->bit_timer->enable(!mtr1 | !mtr0);
 }
 
 static READ_LINE_DEVICE_HANDLER( ready_r )
@@ -941,7 +941,7 @@ static WRITE8_DEVICE_HANDLER( c8050_via_pb_w )
 	int s0 = (data >> 2) & 0x03;
 	mpi_step_motor(c2040, 0, mtr0, s0);
 
-	timer_enable(c2040->bit_timer, !mtr1 | !mtr0);
+	c2040->bit_timer->enable(!mtr1 | !mtr0);
 }
 
 static const via6522_interface c8050_via_intf =
@@ -1068,7 +1068,7 @@ static WRITE8_DEVICE_HANDLER( miot_pb_w )
 
 	if (c2040->ds != ds)
 	{
-		timer_adjust_periodic(c2040->bit_timer, attotime::zero, 0, attotime::from_hz(C2040_BITRATE[ds]/4));
+		c2040->bit_timer->adjust(attotime::zero, 0, attotime::from_hz(C2040_BITRATE[ds]/4));
 		c2040->ds = ds;
 	}
 
@@ -1158,7 +1158,7 @@ static WRITE8_DEVICE_HANDLER( c8050_miot_pb_w )
 
 	if (c2040->ds != ds)
 	{
-		timer_adjust_periodic(c2040->bit_timer, attotime::zero, 0, attotime::from_hz(C8050_BITRATE[ds]));
+		c2040->bit_timer->adjust(attotime::zero, 0, attotime::from_hz(C8050_BITRATE[ds]));
 		c2040->ds = ds;
 	}
 

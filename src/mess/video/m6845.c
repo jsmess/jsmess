@@ -805,7 +805,7 @@ static void m6845_remove_vsync_set_timer(void)
 {
 	if (crtc.vsync_set_timer!=NULL)
 	{
-		timer_adjust_oneshot(crtc.vsync_set_timer, attotime::never, 0);
+		crtc.vsync_set_timer->adjust(attotime::never);
 	}
 }
 
@@ -814,7 +814,7 @@ static void m6845_remove_vsync_clear_timer(void)
 {
 	if (crtc.vsync_clear_timer != NULL)
 	{
-		timer_adjust_oneshot(crtc.vsync_clear_timer, attotime::never, 0);
+		crtc.vsync_clear_timer->adjust(attotime::never);
 	}
 }
 
@@ -832,7 +832,7 @@ static void m6845_set_new_vsync_set_time(int cycles)
 	//crtc.vsync_set_timer = machine->scheduler().timer_alloc(FUNC(m6845_vsync_set_timer_callback));
 	if (crtc_cycles_to_vsync_start!=-1)
 	{
-		timer_adjust_oneshot(crtc.vsync_set_timer, attotime::from_usec(crtc_cycles_to_vsync_start), 0);
+		crtc.vsync_set_timer->adjust(attotime::from_usec(crtc_cycles_to_vsync_start));
 	}
 }
 
@@ -849,7 +849,7 @@ static void m6845_set_new_vsync_clear_time(int cycles)
 	//crtc.vsync_clear_timer = machine->scheduler().timer_alloc(FUNC(m6845_vsync_clear_timer_callback));
 	if (crtc_cycles_to_vsync_end!=-1)
 	{
-		timer_adjust_oneshot(crtc.vsync_clear_timer, attotime::from_usec(crtc_cycles_to_vsync_end), 0);
+		crtc.vsync_clear_timer->adjust(attotime::from_usec(crtc_cycles_to_vsync_end));
 	}
 }
 
@@ -872,7 +872,7 @@ static TIMER_CALLBACK( m6845_vsync_clear_timer_callback )
 	m6845_set_new_vsync_set_time(m6845_cycles_per_frame()-m6845_vsync_length_in_cycles());
 
 	/* prevent timer from being free'd and don't let it trigger again */
-	timer_adjust_oneshot(crtc.vsync_clear_timer, attotime::never, 0);
+	crtc.vsync_clear_timer->adjust(attotime::never);
 }
 
 /* called when vsync is set */
@@ -893,7 +893,7 @@ static TIMER_CALLBACK( m6845_vsync_set_timer_callback )
 	m6845_set_new_vsync_clear_time( m6845_vsync_length_in_cycles());
 
 	/* prevent timer from being free'd and don't let it trigger again */
-	timer_reset(crtc.vsync_set_timer, attotime::never);
+	crtc.vsync_set_timer->reset();
 }
 static void m6845_recalc_cycles_to_vsync_end(void)
 {

@@ -1307,7 +1307,7 @@ WRITE8_HANDLER( dgnalpha_psg_porta_write )
 static WRITE8_DEVICE_HANDLER( d_pia0_ca2_w )
 {
 	coco_state *state = device->machine->driver_data<coco_state>();
-	timer_adjust_oneshot(state->mux_sel1_timer, JOYSTICK_MUX_DELAY, data);
+	state->mux_sel1_timer->adjust(JOYSTICK_MUX_DELAY, data);
 }
 
 static TIMER_CALLBACK( coco_update_sel1_timerproc )
@@ -1321,7 +1321,7 @@ static TIMER_CALLBACK( coco_update_sel1_timerproc )
 static WRITE8_DEVICE_HANDLER( d_pia0_cb2_w )
 {
 	coco_state *state = device->machine->driver_data<coco_state>();
-	timer_adjust_oneshot(state->mux_sel2_timer, JOYSTICK_MUX_DELAY, data);
+	state->mux_sel2_timer->adjust(JOYSTICK_MUX_DELAY, data);
 }
 
 static TIMER_CALLBACK( coco_update_sel2_timerproc )
@@ -1448,7 +1448,7 @@ static UINT8 coco_update_keyboard( running_machine *machine )
 	if (dclg_time != attotime::zero)
 	{
 		/* schedule lightgun events */
-		timer_reset(state->update_keyboard_timer, dclg_time);
+		state->update_keyboard_timer->reset(dclg_time);
 	}
 	else
 	{
@@ -1456,7 +1456,7 @@ static UINT8 coco_update_keyboard( running_machine *machine )
 		attotime xtrans = get_relative_time(machine, state->hiresjoy_xtransitiontime);
 		attotime ytrans = get_relative_time(machine, state->hiresjoy_ytransitiontime);
 
-		timer_reset(state->update_keyboard_timer,
+		state->update_keyboard_timer->reset(
 			(xtrans > ytrans) ? ytrans : xtrans);
 	}
 
@@ -2251,12 +2251,12 @@ static void coco3_timer_reset(running_machine *machine)
 			logerror("coco3_reset_timer(): delay_time=%g\n", delay_time.as_double());
 
 		/* and adjust the timer */
-		timer_adjust_oneshot(state->gime_timer, delay_time, 0);
+		state->gime_timer->adjust(delay_time);
 	}
 	else
 	{
 		/* timer is shut off */
-		timer_reset(state->gime_timer, attotime::never);
+		state->gime_timer->reset();
 		if (LOG_TIMER)
 			logerror("coco3_reset_timer(): timer is off\n");
 	}

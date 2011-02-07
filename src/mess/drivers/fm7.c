@@ -1749,11 +1749,11 @@ static MACHINE_RESET(fm7)
 	UINT8* RAM = machine->region("maincpu")->base();
 	UINT8* ROM = machine->region("init")->base();
 
-	timer_adjust_periodic(state->timer,attotime::from_nsec(2034500),0,attotime::from_nsec(2034500));
-	timer_adjust_periodic(state->subtimer,attotime::from_msec(20),0,attotime::from_msec(20));
-	timer_adjust_periodic(state->keyboard_timer,attotime::zero,0,attotime::from_msec(10));
+	state->timer->adjust(attotime::from_nsec(2034500),0,attotime::from_nsec(2034500));
+	state->subtimer->adjust(attotime::from_msec(20),0,attotime::from_msec(20));
+	state->keyboard_timer->adjust(attotime::zero,0,attotime::from_msec(10));
 	if(state->type != SYS_FM7)
-		timer_adjust_oneshot(state->fm77av_vsync_timer,machine->primary_screen->time_until_vblank_end(),0);
+		state->fm77av_vsync_timer->adjust(machine->primary_screen->time_until_vblank_end());
 
 	state->irq_mask = 0x00;
 	state->irq_flags = 0x00;

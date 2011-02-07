@@ -909,7 +909,7 @@ MACHINE_START( trs80 )
 	state->nmi_data=0xff;
 
 	state->cassette_data_timer = machine->scheduler().timer_alloc(FUNC(cassette_data_callback));
-	timer_adjust_periodic( state->cassette_data_timer, attotime::zero, 0, attotime::from_hz(11025) );
+	state->cassette_data_timer->adjust( attotime::zero, 0, attotime::from_hz(11025) );
 	state->printer = machine->device("centronics");
 	state->ay31015 = machine->device("tr1602");
 	state->cass = machine->device("cassette");

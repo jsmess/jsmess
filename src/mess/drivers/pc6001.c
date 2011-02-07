@@ -1301,7 +1301,7 @@ static WRITE8_HANDLER( pc6001m2_timer_adj_w )
 	pc6001_state *state = space->machine->driver_data<pc6001_state>();
 	state->timer_hz_div = data;
 	attotime period = attotime::from_hz((487.5*4)/(state->timer_hz_div+1));
-	timer_adjust_periodic(state->timer_irq_timer, period,  0, period);
+	state->timer_irq_timer->adjust(period,  0, period);
 }
 
 static WRITE8_HANDLER( pc6001m2_timer_irqv_w )
@@ -2048,7 +2048,7 @@ static MACHINE_START(pc6001)
 	{
 		attotime period = attotime::from_hz((487.5*4)/(state->timer_hz_div+1));
 		state->timer_irq_timer = machine->scheduler().timer_alloc(FUNC(audio_callback));
-		timer_adjust_periodic(state->timer_irq_timer, period,  0, period);
+		state->timer_irq_timer->adjust(period,  0, period);
 	}
 }
 

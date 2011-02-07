@@ -278,7 +278,7 @@ static MACHINE_RESET(cat)
 {
 	cat_state *state = machine->driver_data<cat_state>();
 	cpu_set_irq_callback(machine->device("maincpu"), cat_int_ack);
-	timer_adjust_periodic(state->keyboard_timer, attotime::zero, 0, attotime::from_hz(120));
+	state->keyboard_timer->adjust(attotime::zero, 0, attotime::from_hz(120));
 }
 
 static VIDEO_START( cat )

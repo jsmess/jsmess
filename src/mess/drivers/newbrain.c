@@ -1389,11 +1389,11 @@ static MACHINE_START( newbrain )
 
 	/* allocate reset timer */
 	state->reset_timer = machine->scheduler().timer_alloc(FUNC(reset_tick));
-	timer_adjust_oneshot(state->reset_timer, attotime::from_usec(get_reset_t()), 0);
+	state->reset_timer->adjust(attotime::from_usec(get_reset_t()));
 
 	/* allocate power up timer */
 	state->pwrup_timer = machine->scheduler().timer_alloc(FUNC(pwrup_tick));
-	timer_adjust_oneshot(state->pwrup_timer, attotime::from_usec(get_pwrup_t()), 0);
+	state->pwrup_timer->adjust(attotime::from_usec(get_pwrup_t()));
 
 	/* initialize variables */
 	state->pwrup = 1;
@@ -1462,7 +1462,7 @@ static MACHINE_RESET( newbrain )
 	cputag_set_input_line(machine, Z80_TAG, INPUT_LINE_RESET, HOLD_LINE);
 	cputag_set_input_line(machine, COP420_TAG, INPUT_LINE_RESET, HOLD_LINE);
 
-	timer_adjust_oneshot(state->reset_timer, attotime::from_msec(get_reset_t()), 0);
+	state->reset_timer->adjust(attotime::from_msec(get_reset_t()));
 }
 
 static INTERRUPT_GEN( newbrain_interrupt )

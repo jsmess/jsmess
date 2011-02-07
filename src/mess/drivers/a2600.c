@@ -2023,7 +2023,7 @@ static MACHINE_RESET( a2600 )
 				state->dpc.df[data_fetcher].music_mode = 0;
 			}
 		}
-		timer_adjust_periodic(state->dpc.oscillator, attotime::from_hz(42000), 0, attotime::from_hz(42000));
+		state->dpc.oscillator->adjust(attotime::from_hz(42000), 0, attotime::from_hz(42000));
 		break;
 
 	case mode32in1:

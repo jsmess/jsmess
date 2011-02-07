@@ -259,10 +259,10 @@ static void dma_transfer_start(device_t* device, int channel, int dir)
 	{
 		device_t *cpu = device->machine->device(dmac->intf->cpu_tag);
 		cpu_set_input_line(cpu, INPUT_LINE_HALT, ASSERT_LINE);
-		timer_adjust_periodic(dmac->timer[channel], attotime::zero, channel, dmac->burst_clock[channel]);
+		dmac->timer[channel]->adjust(attotime::zero, channel, dmac->burst_clock[channel]);
 	}
 	else
-		timer_adjust_periodic(dmac->timer[channel], attotime::from_usec(500), channel, dmac->clock[channel]);
+		dmac->timer[channel]->adjust(attotime::from_usec(500), channel, dmac->clock[channel]);
 
 	dmac->transfer_size[channel] = dmac->reg[channel].mtc;
 
@@ -275,7 +275,7 @@ void hd63450_set_timer(device_t* device, int channel, attotime tm)
 
 	dmac->clock[channel] = tm;
 	if(dmac->in_progress[channel] != 0)
-		timer_adjust_periodic(dmac->timer[channel], attotime::zero, channel, dmac->clock[channel]);
+		dmac->timer[channel]->adjust(attotime::zero, channel, dmac->clock[channel]);
 }
 
 static TIMER_CALLBACK(dma_transfer_timer)
@@ -288,7 +288,7 @@ static void dma_transfer_abort(device_t* device, int channel)
 	hd63450_t* dmac = get_safe_token(device);
 
 	logerror("DMA#%i: Transfer aborted\n",channel);
-	timer_adjust_oneshot(dmac->timer[channel], attotime::zero, 0);
+	dmac->timer[channel]->adjust(attotime::zero);
 	dmac->in_progress[channel] = 0;
 	dmac->reg[channel].mtc = dmac->transfer_size[channel];
 	dmac->reg[channel].csr |= 0xe0;  // channel operation complete, block transfer complete
@@ -300,7 +300,7 @@ static void dma_transfer_halt(device_t* device, int channel)
 	hd63450_t* dmac = get_safe_token(device);
 
 	dmac->halted[channel] = 1;
-	timer_adjust_oneshot(dmac->timer[channel], attotime::zero, 0);
+	dmac->timer[channel]->adjust(attotime::zero);
 }
 
 static void dma_transfer_continue(device_t* device, int channel)
@@ -310,7 +310,7 @@ static void dma_transfer_continue(device_t* device, int channel)
 	if(dmac->halted[channel] != 0)
 	{
 		dmac->halted[channel] = 0;
-		timer_adjust_periodic(dmac->timer[channel], attotime::zero, channel, dmac->clock[channel]);
+		dmac->timer[channel]->adjust(attotime::zero, channel, dmac->clock[channel]);
 	}
 }
 
@@ -431,7 +431,7 @@ void hd63450_single_transfer(device_t* device, int x)
 					dmac->reg[x].mtc = space->read_word(dmac->reg[x].bar+4);
 					return;
 				}
-				timer_adjust_oneshot(dmac->timer[x], attotime::zero, 0);
+				dmac->timer[x]->adjust(attotime::zero);
 				dmac->in_progress[x] = 0;
 				dmac->reg[x].csr |= 0xe0;  // channel operation complete, block transfer complete
 				dmac->reg[x].csr &= ~0x08;  // channel no longer active

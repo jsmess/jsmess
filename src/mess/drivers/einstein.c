@@ -120,7 +120,7 @@ static READ8_HANDLER( einstein_80col_state_r )
 	result |= einstein->crtc_screen->vblank() ? 1 : 0;
 	result |= input_port_read(space->machine, "80column_dips") & 0x06;
 
-	logerror("%s: einstein_80col_state_r %02x\n", cpuexec_describe_context(space->machine), result);
+	logerror("%s: einstein_80col_state_r %02x\n", space->machine->describe_context(), result);
 
 	return result;
 }
@@ -212,7 +212,7 @@ static READ8_HANDLER( einstein_keyboard_data_read )
 
 static WRITE8_DEVICE_HANDLER( einstein_drsel_w )
 {
-	logerror("%s: einstein_drsel_w %02x\n", cpuexec_describe_context(device->machine), data);
+	logerror("%s: einstein_drsel_w %02x\n", device->machine->describe_context(), data);
 
 	/* bit 0 to 3 select the drive */
 	if (BIT(data, 0)) wd17xx_set_drive(device, 0);
@@ -306,7 +306,7 @@ static READ8_HANDLER( einstein_kybintmsk_r )
 	/* bit 5 to 7: graph, control and shift key */
 	data |= input_port_read(space->machine, "EXTRA");
 
-	logerror("%s: einstein_kybintmsk_r %02x\n", cpuexec_describe_context(space->machine), data);
+	logerror("%s: einstein_kybintmsk_r %02x\n", space->machine->describe_context(), data);
 
 	return data;
 }
@@ -315,7 +315,7 @@ static WRITE8_HANDLER( einstein_kybintmsk_w )
 {
 	einstein_state *einstein = space->machine->driver_data<einstein_state>();
 
-	logerror("%s: einstein_kybintmsk_w %02x\n", cpuexec_describe_context(space->machine), data);
+	logerror("%s: einstein_kybintmsk_w %02x\n", space->machine->describe_context(), data);
 
 	/* set mask from bit 0 */
 	if (data & 0x01)
@@ -336,7 +336,7 @@ static WRITE8_HANDLER( einstein_adcintmsk_w )
 {
 	einstein_state *einstein = space->machine->driver_data<einstein_state>();
 
-	logerror("%s: einstein_adcintmsk_w %02x\n", cpuexec_describe_context(space->machine), data);
+	logerror("%s: einstein_adcintmsk_w %02x\n", space->machine->describe_context(), data);
 
 	if (data & 0x01)
 	{
@@ -356,7 +356,7 @@ static WRITE8_HANDLER( einstein_fire_int_w )
 {
 	einstein_state *einstein = space->machine->driver_data<einstein_state>();
 
-	logerror("%s: einstein_fire_int_w %02x\n", cpuexec_describe_context(space->machine), data);
+	logerror("%s: einstein_fire_int_w %02x\n", space->machine->describe_context(), data);
 
 	if (data & 0x01)
 	{

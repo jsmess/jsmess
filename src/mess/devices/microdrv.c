@@ -102,7 +102,7 @@ WRITE_LINE_DEVICE_HANDLER( microdrive_clk_w )
 
 		devcb_call_write_line(&mdv->out_comms_out_func, mdv->comms_out);
 		
-		timer_enable(mdv->bit_timer, mdv->comms_out);
+		mdv->bit_timer->enable(mdv->comms_out);
 	}
 
 	mdv->clk = state;
@@ -201,8 +201,8 @@ static DEVICE_START( microdrive )
 
 	// allocate timers
 	mdv->bit_timer = device->machine->scheduler().timer_alloc(FUNC(bit_timer_tick), (void *) device);
-	timer_adjust_periodic(mdv->bit_timer, attotime::zero, 0, attotime::from_hz(MDV_BITRATE));
-	timer_enable(mdv->bit_timer, 0);
+	mdv->bit_timer->adjust(attotime::zero, 0, attotime::from_hz(MDV_BITRATE));
+	mdv->bit_timer->enable(0);
 }
 
 static DEVICE_IMAGE_LOAD( microdrive )

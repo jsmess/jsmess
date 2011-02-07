@@ -321,7 +321,7 @@ static DEVICE_START( msm58321 )
 
 	/* create busy timer */
 	msm58321->busy_timer = device->machine->scheduler().timer_alloc(FUNC(busy_tick), (void *)device);
-	timer_adjust_periodic(msm58321->busy_timer, attotime::zero, 0, attotime::from_hz(2));
+	msm58321->busy_timer->adjust(attotime::zero, 0, attotime::from_hz(2));
 
 	/* register for state saving */
 	state_save_register_device_item(device, 0, msm58321->cs1);

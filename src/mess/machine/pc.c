@@ -220,7 +220,7 @@ static WRITE_LINE_DEVICE_HANDLER( pcjr_pic8259_set_int_line )
 {
 	if ( cpu_get_reg( device->machine->firstcpu, STATE_GENPC ) == 0xF0454 )
 	{
-		timer_adjust_oneshot( pc_int_delay_timer, device->machine->firstcpu->cycles_to_attotime(1), state );
+		pc_int_delay_timer->adjust( device->machine->firstcpu->cycles_to_attotime(1), state );
 	}
 	else
 	{
@@ -479,7 +479,7 @@ static TIMER_CALLBACK( pcjr_keyb_signal_callback )
 
 	if ( pcjr_keyb.signal_count <= 0 )
 	{
-		timer_adjust_periodic( pcjr_keyb.keyb_signal_timer, attotime::never, 0, attotime::never );
+		pcjr_keyb.keyb_signal_timer->adjust( attotime::never, 0, attotime::never );
 		pcjr_keyb.transferring = 0;
 	}
 }
@@ -517,7 +517,7 @@ static void pcjr_set_keyb_int(running_machine *machine, int state)
 		pcjr_keyb.transferring = 1;
 
 		/* Set timer */
-		timer_adjust_periodic( pcjr_keyb.keyb_signal_timer, attotime::from_usec(220), 0, attotime::from_usec(220) );
+		pcjr_keyb.keyb_signal_timer->adjust( attotime::from_usec(220), 0, attotime::from_usec(220) );
 
 		/* Trigger NMI */
 		if ( ! pcjr_keyb.latch )

@@ -142,7 +142,7 @@ static void matsucd_cdda_stop( running_machine *machine )
 	if (cdda != NULL)
 	{
 		cdda_stop_audio(cdda);
-		timer_reset( cd.frame_timer, attotime::never );
+		cd.frame_timer->reset(  );
 	}
 }
 
@@ -152,7 +152,7 @@ static void matsucd_cdda_play( running_machine *machine, UINT32 lba, UINT32 num_
 	if (cdda != NULL)
 	{
 		cdda_start_audio(cdda, lba, num_blocks);
-		timer_adjust_oneshot(cd.frame_timer, attotime::from_hz( 75 ), 0);
+		cd.frame_timer->adjust(attotime::from_hz( 75 ));
 	}
 }
 
@@ -165,11 +165,11 @@ static void matsucd_cdda_pause( running_machine *machine, int pause )
 
 		if ( pause )
 		{
-			timer_reset( cd.frame_timer, attotime::never );
+			cd.frame_timer->reset(  );
 		}
 		else
 		{
-			timer_adjust_oneshot(cd.frame_timer, attotime::from_hz( 75 ), 0);
+			cd.frame_timer->adjust(attotime::from_hz( 75 ));
 		}
 	}
 }
@@ -299,7 +299,7 @@ static TIMER_CALLBACK(matsu_subcode_proc)
 
 			newstatus |= MATSU_STATUS_PLAYING;
 
-			timer_adjust_oneshot(cd.frame_timer, attotime::from_hz( 75 ), 0);
+			cd.frame_timer->adjust(attotime::from_hz( 75 ));
 		}
 		else
 		{

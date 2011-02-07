@@ -1186,7 +1186,7 @@ static int get_scanline(mc6847_state *mc6847)
 	attotime duration;
 
 	/* get the time since last field sync */
-	duration = timer_starttime(mc6847->hs_rise_timer) - timer_starttime(mc6847->fs_rise_timer);
+	duration = mc6847->hs_rise_timer->start() - mc6847->fs_rise_timer->start();
 	assert_always(duration.seconds == 0, "get_scanline(): duration exceeds one second");
 
 	if (duration.attoseconds < mc6847->vblank_period)
@@ -1362,9 +1362,9 @@ static TIMER_CALLBACK( hs_rise )
 	if (LOG_HS)
 		logerror("hs_rise(): time=%s\n", machine->time().as_string(ATTOTIME_STRING_PRECISION));
 
-	timer_adjust_oneshot(mc6847->hs_rise_timer,
+	mc6847->hs_rise_timer->adjust(
 		attotime(0, mc6847->scanline_period), 0);
-	timer_adjust_oneshot(mc6847->hs_fall_timer,
+	mc6847->hs_fall_timer->adjust(
 		attotime(0, mc6847->horizontal_sync_period), 0);
 
 	mc6847->hs = CLEAR_LINE;
@@ -1392,11 +1392,11 @@ static TIMER_CALLBACK( fs_rise )
 		logerror("fs_rise(): time=%s scanline=%d\n", machine->time().as_string(ATTOTIME_STRING_PRECISION), get_scanline(mc6847));
 
 	/* adjust field sync falling edge timer */
-	timer_adjust_oneshot(mc6847->fs_fall_timer,
+	mc6847->fs_fall_timer->adjust(
 		attotime(0, mc6847->field_sync_period), 0);
 
 	/* adjust horizontal sync rising timer */
-	timer_adjust_oneshot(mc6847->hs_rise_timer, attotime::zero, 0);
+	mc6847->hs_rise_timer->adjust(attotime::zero);
 
 	/* this is a hook for the CoCo 3 code to extend this stuff */
 	if (mc6847->new_frame_callback)
@@ -1421,7 +1421,7 @@ static int get_beamx(mc6847_state *mc6847)
 	attotime scanline_time;
 	int result;
 
-	scanline_time = timer_timeelapsed(mc6847->hs_rise_timer);
+	scanline_time = mc6847->hs_rise_timer->elapsed();
 	if (scanline_time.seconds != 0)
 		return 0;
 	assert(scanline.as_attoseconds() < mc6847->scanline_period);
@@ -1896,7 +1896,7 @@ static DEVICE_START( mc6847 )
 	/* setup timing */
 	frame_period = period *
 		(UINT32) (v->clocks_per_scanline * total_scanlines * GROSS_FACTOR);
-	timer_adjust_periodic(mc6847->fs_rise_timer, attotime::zero, 0, attotime(0, frame_period));
+	mc6847->fs_rise_timer->adjust(attotime::zero, 0, attotime(0, frame_period));
 
 	/* build font */
 	build_fontdata(device, v);

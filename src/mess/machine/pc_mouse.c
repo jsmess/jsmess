@@ -234,12 +234,12 @@ INS8250_HANDSHAKE_OUT( pc_mouse_handshake_in )
 			}
 
 			/* start a timer to scan the mouse input */
-			timer_adjust_periodic(pc_mouse.timer, attotime::zero, 0, attotime::from_hz(240));
+			pc_mouse.timer->adjust(attotime::zero, 0, attotime::from_hz(240));
 		}
 		else
 		{
 			/* CTS just went to 0 */
-			timer_adjust_oneshot(pc_mouse.timer, attotime::zero, 0);
+			pc_mouse.timer->adjust(attotime::zero);
 			pc_mouse.head = pc_mouse.tail = 0;
 		}
 	}

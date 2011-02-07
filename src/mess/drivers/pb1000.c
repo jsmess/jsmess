@@ -406,16 +406,16 @@ void pb1000_state::kb_matrix_w(running_machine *machine, UINT8 matrix)
 	if (matrix & 0x80)
 	{
 		if ((m_kb_matrix & 0x80) != (matrix & 0x80))
-			timer_adjust_periodic(m_kb_timer, attotime::never, 0, attotime::never);
+			m_kb_timer->adjust(attotime::never, 0, attotime::never);
 	}
 	else
 	{
 		if ((m_kb_matrix & 0x40) != (matrix & 0x40))
 		{
 			if (matrix & 0x40)
-				timer_adjust_periodic(m_kb_timer, attotime::from_hz(32), 0, attotime::from_hz(32));
+				m_kb_timer->adjust(attotime::from_hz(32), 0, attotime::from_hz(32));
 			else
-				timer_adjust_periodic(m_kb_timer, attotime::from_hz(256), 0, attotime::from_hz(256));
+				m_kb_timer->adjust(attotime::from_hz(256), 0, attotime::from_hz(256));
 		}
 	}
 
@@ -498,7 +498,7 @@ void pb1000_state::machine_start()
 	memory_set_bankptr(machine, "bank1", machine->region("rom")->base());
 
 	m_kb_timer = machine->scheduler().timer_alloc(FUNC(keyboard_timer));
-	timer_adjust_periodic(m_kb_timer, attotime::from_hz(192), 0, attotime::from_hz(192));
+	m_kb_timer->adjust(attotime::from_hz(192), 0, attotime::from_hz(192));
 }
 
 static const hd44352_interface hd44352_pb1000_conf =

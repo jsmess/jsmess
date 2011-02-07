@@ -24,7 +24,7 @@ WRITE8_HANDLER(poly88_baud_rate_w)
 	poly88_state *state = space->machine->driver_data<poly88_state>();
 	logerror("poly88_baud_rate_w %02x\n",data);
 	state->usart_timer = space->machine->scheduler().timer_alloc(FUNC(poly88_usart_timer_callback));
-	timer_adjust_periodic(state->usart_timer, attotime::zero, 0, attotime::from_hz(300));
+	state->usart_timer->adjust(attotime::zero, 0, attotime::from_hz(300));
 
 }
 
@@ -210,7 +210,7 @@ DRIVER_INIT ( poly88 )
 	state->previous_level = 0;;
 	state->clk_level = state->clk_level_tape = 1;
 	state->cassette_timer = machine->scheduler().timer_alloc(FUNC(poly88_cassette_timer_callback));
-	timer_adjust_periodic(state->cassette_timer, attotime::zero, 0, attotime::from_hz(600));
+	state->cassette_timer->adjust(attotime::zero, 0, attotime::from_hz(600));
 
 	serial_connection_init(machine, &state->cassette_serial_connection);
 	serial_connection_set_in_callback(machine, &state->cassette_serial_connection, poly88_cassette_write);

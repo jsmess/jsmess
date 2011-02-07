@@ -876,7 +876,7 @@ static void pmd85_common_driver_init (running_machine *machine)
 	state->previous_level = 0;
 	state->clk_level = state->clk_level_tape = 1;
 	state->cassette_timer = machine->scheduler().timer_alloc(FUNC(pmd85_cassette_timer_callback));
-	timer_adjust_periodic(state->cassette_timer, attotime::zero, 0, attotime::from_hz(2400));
+	state->cassette_timer->adjust(attotime::zero, 0, attotime::from_hz(2400));
 
 	serial_connection_init(machine, &state->cassette_serial_connection);
 	serial_connection_set_in_callback(machine, &state->cassette_serial_connection, pmd85_cassette_write);

@@ -107,7 +107,7 @@ void galaxy_set_timer(running_machine *machine)
 {
 	galaxy_state *state = machine->driver_data<galaxy_state>();
 	state->gal_cnt = 0;
-	timer_adjust_periodic(state->gal_video_timer, attotime::zero, 0, attotime::from_hz(6144000 / 8));
+	state->gal_video_timer->adjust(attotime::zero, 0, attotime::from_hz(6144000 / 8));
 }
 
 VIDEO_START( galaxy )
@@ -116,7 +116,7 @@ VIDEO_START( galaxy )
 	state->gal_cnt = 0;
 
 	state->gal_video_timer = machine->scheduler().timer_alloc(FUNC(gal_video));
-	timer_adjust_periodic(state->gal_video_timer, attotime::zero, 0, attotime::never);
+	state->gal_video_timer->adjust(attotime::zero, 0, attotime::never);
 
 	VIDEO_START_CALL( generic_bitmapped );
 }
@@ -124,7 +124,7 @@ VIDEO_START( galaxy )
 VIDEO_UPDATE( galaxy )
 {
 	galaxy_state *state = screen->machine->driver_data<galaxy_state>();
-	timer_adjust_periodic(state->gal_video_timer, attotime::zero, 0, attotime::never);
+	state->gal_video_timer->adjust(attotime::zero, 0, attotime::never);
 	if (state->interrupts_enabled == FALSE)
 	{
 		static const rectangle black_area = {0, 384 - 1, 0, 208 - 1};

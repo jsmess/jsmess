@@ -113,7 +113,7 @@ void pc_rtc_init(running_machine *machine)
 {
 	memset(&pc_rtc,0,sizeof(pc_rtc));
 	pc_rtc.timer = machine->scheduler().timer_alloc(FUNC(pc_rtc_timer));
-	timer_adjust_periodic(pc_rtc.timer, attotime::zero, 0, attotime(1, 0));
+	pc_rtc.timer->adjust(attotime::zero, 0, attotime(1,0));
 }
 
 READ8_HANDLER( pc_rtc_r )

@@ -201,13 +201,13 @@ static WRITE8_HANDLER( samcoupe_vmpr_w )
 
 static READ8_HANDLER( samcoupe_midi_r )
 {
-	logerror("%s: read from midi port\n", cpuexec_describe_context(space->machine));
+	logerror("%s: read from midi port\n", space->machine->describe_context());
 	return 0xff;
 }
 
 static WRITE8_HANDLER( samcoupe_midi_w )
 {
-	logerror("%s: write to midi port: 0x%02x\n", cpuexec_describe_context(space->machine), data);
+	logerror("%s: write to midi port: 0x%02x\n", space->machine->describe_context(), data);
 }
 
 static READ8_HANDLER( samcoupe_keyboard_r )

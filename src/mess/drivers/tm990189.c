@@ -345,7 +345,7 @@ static WRITE8_DEVICE_HANDLER( sys9901_segment_w )
 	else
 	{
 		state->segment &= ~ (1 << (offset-4));
-		if ((timer_timeleft(state->displayena_timer) > attotime::zero)  && (state->digitsel < 10))
+		if ((state->displayena_timer->remaining() > attotime::zero)  && (state->digitsel < 10))
 			draw_digit(state);
 	}
 }
@@ -355,7 +355,7 @@ static WRITE8_DEVICE_HANDLER( sys9901_dsplytrgr_w )
 	tm990189_state *state = device->machine->driver_data<tm990189_state>();
 	if ((!data) && (state->digitsel < 10))
 	{
-		timer_reset(state->displayena_timer, displayena_duration);
+		state->displayena_timer->reset(displayena_duration);
 		draw_digit(state);
 	}
 }
@@ -404,7 +404,7 @@ static DEVICE_IMAGE_LOAD( tm990_189_rs232 )
 	tm990189_state *state = image.device().machine->driver_data<tm990189_state>();
 	tms9902_set_dsr(image.device().machine->device("tms9902"), 1);
 	state->rs232_input_timer = image.device().machine->scheduler().timer_alloc(FUNC(rs232_input_callback), (void*)image);
-	timer_adjust_periodic(state->rs232_input_timer, attotime::zero, 0, attotime::from_msec(10));
+	state->rs232_input_timer->adjust(attotime::zero, 0, attotime::from_msec(10));
 
 	return IMAGE_INIT_PASS;
 }
@@ -417,7 +417,7 @@ static DEVICE_IMAGE_UNLOAD( tm990_189_rs232 )
 	tm990189_state *state = image.device().machine->driver_data<tm990189_state>();
 	tms9902_set_dsr(image.device().machine->device("tms9902"), 0);
 
-	timer_reset(state->rs232_input_timer, attotime::never);	/* FIXME - timers should only be allocated once */
+	state->rs232_input_timer->reset();	/* FIXME - timers should only be allocated once */
 }
 
 DEVICE_GET_INFO( tm990_189_rs232 )
@@ -562,16 +562,16 @@ static READ8_HANDLER(video_joy_r)
 	int reply = input_port_read(space->machine, "BUTTONS");
 
 
-	if (timer_timeleft(state->joy1x_timer) < attotime::zero)
+	if (state->joy1x_timer->remaining() < attotime::zero)
 		reply |= 0x01;
 
-	if (timer_timeleft(state->joy1y_timer) < attotime::zero)
+	if (state->joy1y_timer->remaining() < attotime::zero)
 		reply |= 0x02;
 
-	if (timer_timeleft(state->joy2x_timer) < attotime::zero)
+	if (state->joy2x_timer->remaining() < attotime::zero)
 		reply |= 0x08;
 
-	if (timer_timeleft(state->joy2y_timer) < attotime::zero)
+	if (state->joy2y_timer->remaining() < attotime::zero)
 		reply |= 0x10;
 
 	return reply;
@@ -580,10 +580,10 @@ static READ8_HANDLER(video_joy_r)
 static WRITE8_HANDLER(video_joy_w)
 {
 	tm990189_state *state = space->machine->driver_data<tm990189_state>();
-	timer_reset(state->joy1x_timer, attotime::from_usec(input_port_read(space->machine, "JOY1_X")*28+28));
-	timer_reset(state->joy1y_timer, attotime::from_usec(input_port_read(space->machine, "JOY1_Y")*28+28));
-	timer_reset(state->joy2x_timer, attotime::from_usec(input_port_read(space->machine, "JOY2_X")*28+28));
-	timer_reset(state->joy2y_timer, attotime::from_usec(input_port_read(space->machine, "JOY2_Y")*28+28));
+	state->joy1x_timer->reset(attotime::from_usec(input_port_read(space->machine, "JOY1_X")*28+28));
+	state->joy1y_timer->reset(attotime::from_usec(input_port_read(space->machine, "JOY1_Y")*28+28));
+	state->joy2x_timer->reset(attotime::from_usec(input_port_read(space->machine, "JOY2_X")*28+28));
+	state->joy2y_timer->reset(attotime::from_usec(input_port_read(space->machine, "JOY2_Y")*28+28));
 }
 
 /* user tms9901 setup */

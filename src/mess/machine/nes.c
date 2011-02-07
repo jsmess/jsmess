@@ -207,7 +207,7 @@ static TIMER_CALLBACK( nes_irq_callback )
 {
 	nes_state *state = machine->driver_data<nes_state>();
 	cpu_set_input_line(state->maincpu, M6502_IRQ_LINE, HOLD_LINE);
-	timer_adjust_oneshot(state->irq_timer, attotime::never, 0);
+	state->irq_timer->adjust(attotime::never);
 }
 
 static STATE_POSTLOAD( nes_banks_restore )

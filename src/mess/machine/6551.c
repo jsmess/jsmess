@@ -451,7 +451,7 @@ WRITE8_DEVICE_HANDLER(acia_6551_w)
                 rate = data & 0x07;
 
 				/* baud rate changed? */
-				timer_reset(acia->timer, attotime::never);
+				acia->timer->reset();
 
 				if (rate==0)
 				{
@@ -557,7 +557,7 @@ WRITE8_DEVICE_HANDLER(acia_6551_w)
 						break;
 					}
 
-					timer_adjust_periodic(acia->timer, attotime::zero, 0, attotime::from_hz(baud_rate));
+					acia->timer->adjust(attotime::zero, 0, attotime::from_hz(baud_rate));
 				}
 			}
 

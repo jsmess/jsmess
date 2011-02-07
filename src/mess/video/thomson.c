@@ -98,7 +98,7 @@ static emu_timer* thom_video_timer; /* time elapsed from begining of frame */
 INLINE unsigned thom_video_elapsed ( running_machine *machine )
 {
 	unsigned u;
-	attotime elapsed = timer_timeelapsed( thom_video_timer );
+	attotime elapsed = thom_video_timer ->elapsed( );
 	u = (elapsed * 1000000 ).seconds;
 	if ( u >= 19968 )
 		u = 19968;
@@ -216,7 +216,7 @@ static TIMER_CALLBACK( thom_lightpen_step )
 		thom_lightpen_cb( machine, step );
 
 	if ( step < thom_lightpen_nb )
-		timer_adjust_oneshot(thom_lightpen_timer, attotime::from_usec( 64 ), step + 1);
+		thom_lightpen_timer->adjust(attotime::from_usec( 64 ), step + 1);
 }
 
 
@@ -822,7 +822,7 @@ static TIMER_CALLBACK( thom_scanline_start )
 
 	/* prepare for next scanline */
 	if ( y == 199 )
-		timer_adjust_oneshot(thom_scanline_timer, attotime::never, 0);
+		thom_scanline_timer->adjust(attotime::never);
 	else
 	{
 
@@ -847,7 +847,7 @@ static TIMER_CALLBACK( thom_scanline_start )
 			thom_pal_changed = 0;
 		}
 
-		timer_adjust_oneshot(thom_scanline_timer, attotime::from_usec(64), y + 1);
+		thom_scanline_timer->adjust(attotime::from_usec(64), y + 1);
 	}
 }
 
@@ -1030,7 +1030,7 @@ static TIMER_CALLBACK( thom_set_init )
 	if ( thom_init_cb )
 		thom_init_cb( machine, init );
 	if ( ! init )
-		timer_adjust_oneshot(thom_init_timer, attotime::from_usec( 64 * THOM_ACTIVE_HEIGHT - 24 ), 1-init);
+		thom_init_timer->adjust(attotime::from_usec( 64 * THOM_ACTIVE_HEIGHT - 24 ), 1-init);
 }
 
 /* call this at the very begining of each new frame */
@@ -1068,18 +1068,18 @@ VIDEO_EOF ( thom )
 	thom_vstate_dirty = 0;
 
 	/* schedule first init signal */
-	timer_adjust_oneshot(thom_init_timer, attotime::from_usec( 64 * THOM_BORDER_HEIGHT + 7 ), 0);
+	thom_init_timer->adjust(attotime::from_usec( 64 * THOM_BORDER_HEIGHT + 7 ));
 
 	/* schedule first lightpen signal */
 	l.line &= ~1; /* hack (avoid lock in MO6 palette selection) */
-	timer_adjust_oneshot(thom_lightpen_timer,
+	thom_lightpen_timer->adjust(
 			   attotime::from_usec( 64 * ( THOM_BORDER_HEIGHT + l.line - 2 ) + 16 ), 0);
 
 	/* schedule first active-area scanline call-back */
-	timer_adjust_oneshot(thom_scanline_timer, attotime::from_usec( 64 * THOM_BORDER_HEIGHT + 7), -1);
+	thom_scanline_timer->adjust(attotime::from_usec( 64 * THOM_BORDER_HEIGHT + 7), -1);
 
 	/* reset video frame time */
-	timer_adjust_oneshot(thom_video_timer, attotime::zero, 0);
+	thom_video_timer->adjust(attotime::zero);
 
 	/* update screen size according to user options */
 	if ( thom_update_screen_size( machine ) )

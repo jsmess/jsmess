@@ -1441,12 +1441,12 @@ static void BBC_Cassette_motor(running_machine *machine, unsigned char status)
 	if (status)
 	{
 		cassette_change_state(machine->device("cassette"), CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
-		timer_adjust_periodic(state->tape_timer, attotime::zero, 0, attotime::from_hz(44100));
+		state->tape_timer->adjust(attotime::zero, 0, attotime::from_hz(44100));
 	}
 	else
 	{
 		cassette_change_state(machine->device("cassette"), CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
-		timer_reset(state->tape_timer, attotime::never);
+		state->tape_timer->reset();
 		state->len0 = 0;
 		state->len1 = 0;
 		state->len2 = 0;

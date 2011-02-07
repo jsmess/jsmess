@@ -298,7 +298,7 @@ static void gb_update_scanline( running_machine *machine )
 	if ( ( LCDSTAT & 0x03 ) == 0x03 )
 	{
 		/* Calculate number of pixels to render based on time still left on the timer */
-		UINT32 cycles_to_go = machine->device<cpu_device>("maincpu")->attotime_to_cycles(timer_timeleft( state->lcd.lcd_timer ) );
+		UINT32 cycles_to_go = machine->device<cpu_device>("maincpu")->attotime_to_cycles(state->lcd.lcd_timer ->remaining( ) );
 		int l = 0;
 
 		if ( state->lcd.start_x < 0 )
@@ -623,7 +623,7 @@ static void sgb_update_scanline( running_machine *machine )
 	if ( ( LCDSTAT & 0x03 ) == 0x03 )
 	{
 		/* Calcuate number of pixels to render based on time still left on the timer */
-		UINT32 cycles_to_go = machine->device<cpu_device>("maincpu")->attotime_to_cycles(timer_timeleft( state->lcd.lcd_timer ) );
+		UINT32 cycles_to_go = machine->device<cpu_device>("maincpu")->attotime_to_cycles(state->lcd.lcd_timer ->remaining( ) );
 		int l = 0;
 
 		if ( state->lcd.start_x < 0 )
@@ -931,7 +931,7 @@ static void cgb_update_scanline ( running_machine *machine )
 	if ( ( LCDSTAT & 0x03 ) == 0x03 )
 	{
 		/* Calcuate number of pixels to render based on time still left on the timer */
-		UINT32 cycles_to_go = machine->device<cpu_device>("maincpu")->attotime_to_cycles(timer_timeleft( state->lcd.lcd_timer ) );
+		UINT32 cycles_to_go = machine->device<cpu_device>("maincpu")->attotime_to_cycles(state->lcd.lcd_timer ->remaining( ) );
 		int l = 0;
 
 		if ( state->lcd.start_x < 0 )
@@ -1288,7 +1288,7 @@ void gb_video_reset( running_machine *machine, int mode )
 	switch( mode )
 	{
 	case GB_VIDEO_DMG:
-		timer_adjust_oneshot(state->lcd.lcd_timer, machine->device<cpu_device>("maincpu")->cycles_to_attotime(456), 0);
+		state->lcd.lcd_timer->adjust(machine->device<cpu_device>("maincpu")->cycles_to_attotime(456));
 
 		/* set the scanline update function */
 		state->update_scanline = gb_update_scanline;
@@ -1322,7 +1322,7 @@ void gb_video_reset( running_machine *machine, int mode )
 		CURLINE = state->lcd.current_line = 0;
 		LCDSTAT = ( LCDSTAT & 0xF8 ) | 0x05;
 		state->lcd.mode = 1;
-		timer_adjust_oneshot(state->lcd.lcd_timer, machine->device<cpu_device>("maincpu")->cycles_to_attotime(60), GB_LCD_STATE_LY00_M0);
+		state->lcd.lcd_timer->adjust(machine->device<cpu_device>("maincpu")->cycles_to_attotime(60), GB_LCD_STATE_LY00_M0);
 
 		break;
 	case GB_VIDEO_SGB:
@@ -1418,7 +1418,7 @@ static TIMER_CALLBACK(gb_lcd_timer_proc)
 					state->lcd.mode_irq = 0;
 				}
 			}
-			timer_adjust_oneshot(state->lcd.lcd_timer, machine->device<cpu_device>("maincpu")->cycles_to_attotime(4), GB_LCD_STATE_LYXX_M0);
+			state->lcd.lcd_timer->adjust(machine->device<cpu_device>("maincpu")->cycles_to_attotime(4), GB_LCD_STATE_LYXX_M0);
 			break;
 		case GB_LCD_STATE_LYXX_M0:		/* Switch to mode 0 */
 			/* update current scanline */
@@ -1443,7 +1443,7 @@ static TIMER_CALLBACK(gb_lcd_timer_proc)
 			if ( ( SCROLLX & 0x03 ) == 0x03 )
 			{
 				state->lcd.scrollx_adjust += 4;
-				timer_adjust_oneshot(state->lcd.lcd_timer, machine->device<cpu_device>("maincpu")->cycles_to_attotime(4), GB_LCD_STATE_LYXX_M0_SCX3);
+				state->lcd.lcd_timer->adjust(machine->device<cpu_device>("maincpu")->cycles_to_attotime(4), GB_LCD_STATE_LYXX_M0_SCX3);
 				break;
 			}
 		case GB_LCD_STATE_LYXX_M0_SCX3:
@@ -1453,7 +1453,7 @@ static TIMER_CALLBACK(gb_lcd_timer_proc)
 			{
 				cputag_set_input_line( machine, "maincpu", LCD_INT, ASSERT_LINE );
 			}
-			timer_adjust_oneshot(state->lcd.lcd_timer, machine->device<cpu_device>("maincpu")->cycles_to_attotime(196 - state->lcd.scrollx_adjust - state->lcd.sprite_cycles), GB_LCD_STATE_LYXX_M0_PRE_INC);
+			state->lcd.lcd_timer->adjust(machine->device<cpu_device>("maincpu")->cycles_to_attotime(196 - state->lcd.scrollx_adjust - state->lcd.sprite_cycles), GB_LCD_STATE_LYXX_M0_PRE_INC);
 			break;
 		case GB_LCD_STATE_LYXX_M0_PRE_INC:	/* Just before incrementing the line counter go to mode 2 internally */
 			if ( CURLINE < 143 )
@@ -1476,7 +1476,7 @@ static TIMER_CALLBACK(gb_lcd_timer_proc)
 					}
 				}
 			}
-			timer_adjust_oneshot(state->lcd.lcd_timer, machine->device<cpu_device>("maincpu")->cycles_to_attotime(4), GB_LCD_STATE_LYXX_M0_INC);
+			state->lcd.lcd_timer->adjust(machine->device<cpu_device>("maincpu")->cycles_to_attotime(4), GB_LCD_STATE_LYXX_M0_INC);
 			break;
 		case GB_LCD_STATE_LYXX_M0_INC:	/* Increment LY, stay in M0 for 4 more cycles */
 			gb_increment_scanline(state);
@@ -1493,7 +1493,7 @@ static TIMER_CALLBACK(gb_lcd_timer_proc)
 			/* Check if we're going into VBlank next */
 			if ( CURLINE == 144 )
 			{
-				timer_adjust_oneshot(state->lcd.lcd_timer, machine->device<cpu_device>("maincpu")->cycles_to_attotime(4), GB_LCD_STATE_LY9X_M1);
+				state->lcd.lcd_timer->adjust(machine->device<cpu_device>("maincpu")->cycles_to_attotime(4), GB_LCD_STATE_LY9X_M1);
 			}
 			else
 			{
@@ -1506,7 +1506,7 @@ static TIMER_CALLBACK(gb_lcd_timer_proc)
 					state->lcd.mode_irq = 1;
 					cputag_set_input_line( machine, "maincpu", LCD_INT, ASSERT_LINE );
 				}
-				timer_adjust_oneshot(state->lcd.lcd_timer, machine->device<cpu_device>("maincpu")->cycles_to_attotime(4), GB_LCD_STATE_LYXX_M2);
+				state->lcd.lcd_timer->adjust(machine->device<cpu_device>("maincpu")->cycles_to_attotime(4), GB_LCD_STATE_LYXX_M2);
 			}
 			break;
 		case GB_LCD_STATE_LY00_M2:		/* Switch to mode 2 on line #0 */
@@ -1522,7 +1522,7 @@ static TIMER_CALLBACK(gb_lcd_timer_proc)
 			/* Check for regular compensation of x-scroll register */
 			state->lcd.scrollx_adjust = ( SCROLLX & 0x04 ) ? 4 : 0;
 			/* Mode 2 lasts approximately 80 clock cycles */
-			timer_adjust_oneshot(state->lcd.lcd_timer, machine->device<cpu_device>("maincpu")->cycles_to_attotime(80), GB_LCD_STATE_LYXX_M3);
+			state->lcd.lcd_timer->adjust(machine->device<cpu_device>("maincpu")->cycles_to_attotime(80), GB_LCD_STATE_LYXX_M3);
 			break;
 		case GB_LCD_STATE_LYXX_M2:		/* Switch to mode 2 */
 			/* Update STAT register to the correct state */
@@ -1544,7 +1544,7 @@ static TIMER_CALLBACK(gb_lcd_timer_proc)
 			/* Check for regular compensation of x-scroll register */
 			state->lcd.scrollx_adjust = ( SCROLLX & 0x04 ) ? 4 : 0;
 			/* Mode 2 last for approximately 80 clock cycles */
-			timer_adjust_oneshot(state->lcd.lcd_timer, machine->device<cpu_device>("maincpu")->cycles_to_attotime(80), GB_LCD_STATE_LYXX_M3);
+			state->lcd.lcd_timer->adjust(machine->device<cpu_device>("maincpu")->cycles_to_attotime(80), GB_LCD_STATE_LYXX_M3);
 			break;
 		case GB_LCD_STATE_LYXX_M3:		/* Switch to mode 3 */
 			gb_select_sprites(state);
@@ -1555,7 +1555,7 @@ static TIMER_CALLBACK(gb_lcd_timer_proc)
 			state->lcd.vram_locked = LOCKED;
 			/* Check for compensations of x-scroll register */
 			/* Mode 3 lasts for approximately 172+cycles needed to handle sprites clock cycles */
-			timer_adjust_oneshot(state->lcd.lcd_timer, machine->device<cpu_device>("maincpu")->cycles_to_attotime(168 + state->lcd.scrollx_adjust + state->lcd.sprite_cycles), GB_LCD_STATE_LYXX_PRE_M0);
+			state->lcd.lcd_timer->adjust(machine->device<cpu_device>("maincpu")->cycles_to_attotime(168 + state->lcd.scrollx_adjust + state->lcd.sprite_cycles), GB_LCD_STATE_LYXX_PRE_M0);
 			state->lcd.start_x = -1;
 			break;
 		case GB_LCD_STATE_LY9X_M1:		/* Switch to or stay in mode 1 */
@@ -1581,7 +1581,7 @@ static TIMER_CALLBACK(gb_lcd_timer_proc)
 			{
 				cputag_set_input_line( machine, "maincpu", LCD_INT, ASSERT_LINE );
 			}
-			timer_adjust_oneshot(state->lcd.lcd_timer, machine->device<cpu_device>("maincpu")->cycles_to_attotime(452), GB_LCD_STATE_LY9X_M1_INC);
+			state->lcd.lcd_timer->adjust(machine->device<cpu_device>("maincpu")->cycles_to_attotime(452), GB_LCD_STATE_LY9X_M1_INC);
 			break;
 		case GB_LCD_STATE_LY9X_M1_INC:		/* Increment scanline counter */
 			gb_increment_scanline(state);
@@ -1597,11 +1597,11 @@ static TIMER_CALLBACK(gb_lcd_timer_proc)
 			LCDSTAT &= 0xFB;
 			if ( state->lcd.current_line == 153 )
 			{
-				timer_adjust_oneshot(state->lcd.lcd_timer, machine->device<cpu_device>("maincpu")->cycles_to_attotime(4), GB_LCD_STATE_LY00_M1);
+				state->lcd.lcd_timer->adjust(machine->device<cpu_device>("maincpu")->cycles_to_attotime(4), GB_LCD_STATE_LY00_M1);
 			}
 			else
 			{
-				timer_adjust_oneshot(state->lcd.lcd_timer, machine->device<cpu_device>("maincpu")->cycles_to_attotime(4), GB_LCD_STATE_LY9X_M1);
+				state->lcd.lcd_timer->adjust(machine->device<cpu_device>("maincpu")->cycles_to_attotime(4), GB_LCD_STATE_LY9X_M1);
 			}
 			break;
 		case GB_LCD_STATE_LY00_M1:		/* we stay in VBlank but current line counter should already be incremented */
@@ -1622,7 +1622,7 @@ static TIMER_CALLBACK(gb_lcd_timer_proc)
 			state->lcd.triggering_line_irq = ( ( CMPLINE == CURLINE ) && ( LCDSTAT & 0x40 ) ) ? 1 : 0;
 			state->lcd.line_irq = 0;
 			LCDSTAT &= 0xFB;
-			timer_adjust_oneshot(state->lcd.lcd_timer, machine->device<cpu_device>("maincpu")->cycles_to_attotime(4/*8*/), GB_LCD_STATE_LY00_M1_1);
+			state->lcd.lcd_timer->adjust(machine->device<cpu_device>("maincpu")->cycles_to_attotime(4/*8*/), GB_LCD_STATE_LY00_M1_1);
 			break;
 		case GB_LCD_STATE_LY00_M1_1:
 			if ( ! state->lcd.delayed_line_irq && state->lcd.triggering_line_irq )
@@ -1630,7 +1630,7 @@ static TIMER_CALLBACK(gb_lcd_timer_proc)
 				state->lcd.line_irq = state->lcd.triggering_line_irq;
 				cputag_set_input_line( machine, "maincpu", LCD_INT, ASSERT_LINE );
 			}
-			timer_adjust_oneshot(state->lcd.lcd_timer, machine->device<cpu_device>("maincpu")->cycles_to_attotime(4), GB_LCD_STATE_LY00_M1_2);
+			state->lcd.lcd_timer->adjust(machine->device<cpu_device>("maincpu")->cycles_to_attotime(4), GB_LCD_STATE_LY00_M1_2);
 			break;
 		case GB_LCD_STATE_LY00_M1_2:	/* Rest of line #0 during VBlank */
 			if ( state->lcd.delayed_line_irq && state->lcd.triggering_line_irq )
@@ -1642,13 +1642,13 @@ static TIMER_CALLBACK(gb_lcd_timer_proc)
 			{
 				LCDSTAT |= 0x04;
 			}
-			timer_adjust_oneshot(state->lcd.lcd_timer, machine->device<cpu_device>("maincpu")->cycles_to_attotime(444), GB_LCD_STATE_LY00_M0);
+			state->lcd.lcd_timer->adjust(machine->device<cpu_device>("maincpu")->cycles_to_attotime(444), GB_LCD_STATE_LY00_M0);
 			break;
 		case GB_LCD_STATE_LY00_M0:		/* The STAT register seems to go to 0 for about 4 cycles */
 			/* Set Mode 0 lcdstat */
 			state->lcd.mode = 0;
 			LCDSTAT = ( LCDSTAT & 0xFC );
-			timer_adjust_oneshot(state->lcd.lcd_timer, machine->device<cpu_device>("maincpu")->cycles_to_attotime(4), GB_LCD_STATE_LY00_M2);
+			state->lcd.lcd_timer->adjust(machine->device<cpu_device>("maincpu")->cycles_to_attotime(4), GB_LCD_STATE_LY00_M2);
 			break;
 		}
 	}
@@ -1659,7 +1659,7 @@ static TIMER_CALLBACK(gb_lcd_timer_proc)
 		{
 			(*state->update_scanline)( machine );
 		}
-		timer_adjust_oneshot(state->lcd.lcd_timer, machine->device<cpu_device>("maincpu")->cycles_to_attotime(456), 0);
+		state->lcd.lcd_timer->adjust(machine->device<cpu_device>("maincpu")->cycles_to_attotime(456));
 	}
 }
 
@@ -1691,7 +1691,7 @@ static TIMER_CALLBACK(gbc_lcd_timer_proc)
 					state->lcd.mode_irq = 0;
 				}
 			}
-			timer_adjust_oneshot(state->lcd.lcd_timer, machine->device<cpu_device>("maincpu")->cycles_to_attotime(4), GB_LCD_STATE_LYXX_M0);
+			state->lcd.lcd_timer->adjust(machine->device<cpu_device>("maincpu")->cycles_to_attotime(4), GB_LCD_STATE_LYXX_M0);
 			break;
 		case GB_LCD_STATE_LYXX_M0:		/* Switch to mode 0 */
 			/* update current scanline */
@@ -1717,7 +1717,7 @@ static TIMER_CALLBACK(gbc_lcd_timer_proc)
 			if ( ( SCROLLX & 0x03 ) == 0x03 )
 			{
 				state->lcd.scrollx_adjust += 4;
-				timer_adjust_oneshot(state->lcd.lcd_timer, machine->device<cpu_device>("maincpu")->cycles_to_attotime(4), GB_LCD_STATE_LYXX_M0_SCX3);
+				state->lcd.lcd_timer->adjust(machine->device<cpu_device>("maincpu")->cycles_to_attotime(4), GB_LCD_STATE_LYXX_M0_SCX3);
 				break;
 			}
 		case GB_LCD_STATE_LYXX_M0_SCX3:
@@ -1732,7 +1732,7 @@ static TIMER_CALLBACK(gbc_lcd_timer_proc)
 			{
 				state->lcd.pal_locked = UNLOCKED;
 			}
-			timer_adjust_oneshot(state->lcd.lcd_timer, machine->device<cpu_device>("maincpu")->cycles_to_attotime(4), GB_LCD_STATE_LYXX_M0_GBC_PAL);
+			state->lcd.lcd_timer->adjust(machine->device<cpu_device>("maincpu")->cycles_to_attotime(4), GB_LCD_STATE_LYXX_M0_GBC_PAL);
 			break;
 		case GB_LCD_STATE_LYXX_M0_GBC_PAL:
 			state->lcd.pal_locked = UNLOCKED;
@@ -1746,7 +1746,7 @@ static TIMER_CALLBACK(gbc_lcd_timer_proc)
 			{
 				state->lcd.hdma_possible = 1;
 			}
-			timer_adjust_oneshot(state->lcd.lcd_timer, machine->device<cpu_device>("maincpu")->cycles_to_attotime(192 - state->lcd.scrollx_adjust - state->lcd.sprite_cycles), GB_LCD_STATE_LYXX_M0_PRE_INC);
+			state->lcd.lcd_timer->adjust(machine->device<cpu_device>("maincpu")->cycles_to_attotime(192 - state->lcd.scrollx_adjust - state->lcd.sprite_cycles), GB_LCD_STATE_LYXX_M0_PRE_INC);
 			break;
 		case GB_LCD_STATE_LYXX_M0_PRE_INC:	/* Just before incrementing the line counter go to mode 2 internally */
 			state->lcd.cmp_line = CMPLINE;
@@ -1769,7 +1769,7 @@ static TIMER_CALLBACK(gbc_lcd_timer_proc)
 					}
 				}
 			}
-			timer_adjust_oneshot(state->lcd.lcd_timer, machine->device<cpu_device>("maincpu")->cycles_to_attotime(4), GB_LCD_STATE_LYXX_M0_INC);
+			state->lcd.lcd_timer->adjust(machine->device<cpu_device>("maincpu")->cycles_to_attotime(4), GB_LCD_STATE_LYXX_M0_INC);
 			break;
 		case GB_LCD_STATE_LYXX_M0_INC:	/* Increment LY, stay in M0 for 4 more cycles */
 			gb_increment_scanline(state);
@@ -1785,7 +1785,7 @@ static TIMER_CALLBACK(gbc_lcd_timer_proc)
 			/* Check if we're going into VBlank next */
 			if ( CURLINE == 144 )
 			{
-				timer_adjust_oneshot(state->lcd.lcd_timer, machine->device<cpu_device>("maincpu")->cycles_to_attotime(4), GB_LCD_STATE_LY9X_M1);
+				state->lcd.lcd_timer->adjust(machine->device<cpu_device>("maincpu")->cycles_to_attotime(4), GB_LCD_STATE_LY9X_M1);
 			}
 			else
 			{
@@ -1798,7 +1798,7 @@ static TIMER_CALLBACK(gbc_lcd_timer_proc)
 					state->lcd.mode_irq = 1;
 					cputag_set_input_line( machine, "maincpu", LCD_INT, ASSERT_LINE );
 				}
-				timer_adjust_oneshot(state->lcd.lcd_timer, machine->device<cpu_device>("maincpu")->cycles_to_attotime(4), GB_LCD_STATE_LYXX_M2);
+				state->lcd.lcd_timer->adjust(machine->device<cpu_device>("maincpu")->cycles_to_attotime(4), GB_LCD_STATE_LYXX_M2);
 			}
 			break;
 		case GB_LCD_STATE_LY00_M2:		/* Switch to mode 2 on line #0 */
@@ -1814,7 +1814,7 @@ static TIMER_CALLBACK(gbc_lcd_timer_proc)
 			/* Check for regular compensation of x-scroll register */
 			state->lcd.scrollx_adjust = ( SCROLLX & 0x04 ) ? 4 : 0;
 			/* Mode 2 lasts approximately 80 clock cycles */
-			timer_adjust_oneshot(state->lcd.lcd_timer, machine->device<cpu_device>("maincpu")->cycles_to_attotime(80), GB_LCD_STATE_LYXX_M3);
+			state->lcd.lcd_timer->adjust(machine->device<cpu_device>("maincpu")->cycles_to_attotime(80), GB_LCD_STATE_LYXX_M3);
 			break;
 		case GB_LCD_STATE_LYXX_M2:		/* Switch to mode 2 */
 			/* Update STAT register to the correct state */
@@ -1839,7 +1839,7 @@ static TIMER_CALLBACK(gbc_lcd_timer_proc)
 			/* Check for regular compensation of x-scroll register */
 			state->lcd.scrollx_adjust = ( SCROLLX & 0x04 ) ? 4 : 0;
 			/* Mode 2 last for approximately 80 clock cycles */
-			timer_adjust_oneshot(state->lcd.lcd_timer, machine->device<cpu_device>("maincpu")->cycles_to_attotime(80), GB_LCD_STATE_LYXX_M3);
+			state->lcd.lcd_timer->adjust(machine->device<cpu_device>("maincpu")->cycles_to_attotime(80), GB_LCD_STATE_LYXX_M3);
 			break;
 		case GB_LCD_STATE_LYXX_M3:		/* Switch to mode 3 */
 			gb_select_sprites(state);
@@ -1851,7 +1851,7 @@ static TIMER_CALLBACK(gbc_lcd_timer_proc)
 			state->lcd.pal_locked = LOCKED;
 			/* Check for compensations of x-scroll register */
 			/* Mode 3 lasts for approximately 172+cycles needed to handle sprites clock cycles */
-			timer_adjust_oneshot(state->lcd.lcd_timer, machine->device<cpu_device>("maincpu")->cycles_to_attotime(168 + state->lcd.scrollx_adjust + state->lcd.sprite_cycles), GB_LCD_STATE_LYXX_PRE_M0);
+			state->lcd.lcd_timer->adjust(machine->device<cpu_device>("maincpu")->cycles_to_attotime(168 + state->lcd.scrollx_adjust + state->lcd.sprite_cycles), GB_LCD_STATE_LYXX_PRE_M0);
 			state->lcd.start_x = -1;
 			break;
 		case GB_LCD_STATE_LY9X_M1:		/* Switch to or stay in mode 1 */
@@ -1881,7 +1881,7 @@ static TIMER_CALLBACK(gbc_lcd_timer_proc)
 			{
 				cputag_set_input_line( machine, "maincpu", LCD_INT, ASSERT_LINE );
 			}
-			timer_adjust_oneshot(state->lcd.lcd_timer, machine->device<cpu_device>("maincpu")->cycles_to_attotime(452), GB_LCD_STATE_LY9X_M1_INC);
+			state->lcd.lcd_timer->adjust(machine->device<cpu_device>("maincpu")->cycles_to_attotime(452), GB_LCD_STATE_LY9X_M1_INC);
 			break;
 		case GB_LCD_STATE_LY9X_M1_INC:		/* Increment scanline counter */
 			gb_increment_scanline(state);
@@ -1895,11 +1895,11 @@ static TIMER_CALLBACK(gbc_lcd_timer_proc)
 			}
 			if ( state->lcd.current_line == 153 )
 			{
-				timer_adjust_oneshot(state->lcd.lcd_timer, machine->device<cpu_device>("maincpu")->cycles_to_attotime(4), GB_LCD_STATE_LY00_M1);
+				state->lcd.lcd_timer->adjust(machine->device<cpu_device>("maincpu")->cycles_to_attotime(4), GB_LCD_STATE_LY00_M1);
 			}
 			else
 			{
-				timer_adjust_oneshot(state->lcd.lcd_timer, machine->device<cpu_device>("maincpu")->cycles_to_attotime(4), GB_LCD_STATE_LY9X_M1);
+				state->lcd.lcd_timer->adjust(machine->device<cpu_device>("maincpu")->cycles_to_attotime(4), GB_LCD_STATE_LY9X_M1);
 			}
 			break;
 		case GB_LCD_STATE_LY00_M1:		/* we stay in VBlank but current line counter should already be incremented */
@@ -1924,7 +1924,7 @@ static TIMER_CALLBACK(gbc_lcd_timer_proc)
 			state->lcd.triggering_line_irq = ( ( CMPLINE == CURLINE ) && ( LCDSTAT & 0x40 ) ) ? 1 : 0;
 			state->lcd.line_irq = 0;
 			LCDSTAT &= 0xFB;
-			timer_adjust_oneshot(state->lcd.lcd_timer, machine->device<cpu_device>("maincpu")->cycles_to_attotime(4), GB_LCD_STATE_LY00_M1_1);
+			state->lcd.lcd_timer->adjust(machine->device<cpu_device>("maincpu")->cycles_to_attotime(4), GB_LCD_STATE_LY00_M1_1);
 			break;
 		case GB_LCD_STATE_LY00_M1_1:
 			if ( ! state->lcd.delayed_line_irq && state->lcd.triggering_line_irq )
@@ -1932,7 +1932,7 @@ static TIMER_CALLBACK(gbc_lcd_timer_proc)
 				state->lcd.line_irq = state->lcd.triggering_line_irq;
 				cputag_set_input_line( machine, "maincpu", LCD_INT, ASSERT_LINE );
 			}
-			timer_adjust_oneshot(state->lcd.lcd_timer, machine->device<cpu_device>("maincpu")->cycles_to_attotime(4), GB_LCD_STATE_LY00_M1_2);
+			state->lcd.lcd_timer->adjust(machine->device<cpu_device>("maincpu")->cycles_to_attotime(4), GB_LCD_STATE_LY00_M1_2);
 			break;
 		case GB_LCD_STATE_LY00_M1_2:	/* Rest of line #0 during VBlank */
 			if ( state->lcd.delayed_line_irq && state->lcd.triggering_line_irq )
@@ -1948,12 +1948,12 @@ static TIMER_CALLBACK(gbc_lcd_timer_proc)
 			{
 				LCDSTAT &= ~0x04;
 			}
-			timer_adjust_oneshot(state->lcd.lcd_timer, machine->device<cpu_device>("maincpu")->cycles_to_attotime(444), GB_LCD_STATE_LY00_M0);
+			state->lcd.lcd_timer->adjust(machine->device<cpu_device>("maincpu")->cycles_to_attotime(444), GB_LCD_STATE_LY00_M0);
 			break;
 		case GB_LCD_STATE_LY00_M0:		/* The STAT register seems to go to 0 for about 4 cycles */
 			/* Set Mode 0 lcdstat */
 			state->lcd.mode = 0;
-			timer_adjust_oneshot(state->lcd.lcd_timer, machine->device<cpu_device>("maincpu")->cycles_to_attotime(4), GB_LCD_STATE_LY00_M2);
+			state->lcd.lcd_timer->adjust(machine->device<cpu_device>("maincpu")->cycles_to_attotime(4), GB_LCD_STATE_LY00_M2);
 			break;
 		}
 	}
@@ -1964,7 +1964,7 @@ static TIMER_CALLBACK(gbc_lcd_timer_proc)
 		{
 			(*state->update_scanline)( machine );
 		}
-		timer_adjust_oneshot(state->lcd.lcd_timer, machine->device<cpu_device>("maincpu")->cycles_to_attotime(456), 0);
+		state->lcd.lcd_timer->adjust(machine->device<cpu_device>("maincpu")->cycles_to_attotime(456));
 	}
 }
 
@@ -1989,7 +1989,7 @@ static void gb_lcd_switch_on( running_machine *machine )
 		}
 	}
 	state->lcd.state = GB_LCD_STATE_LY00_M2;
-	timer_adjust_oneshot(state->lcd.lcd_timer, machine->device<cpu_device>("maincpu")->cycles_to_attotime(80), GB_LCD_STATE_LYXX_M3);
+	state->lcd.lcd_timer->adjust(machine->device<cpu_device>("maincpu")->cycles_to_attotime(80), GB_LCD_STATE_LYXX_M3);
 }
 
 READ8_HANDLER( gb_video_r )

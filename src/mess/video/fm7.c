@@ -1394,12 +1394,12 @@ TIMER_CALLBACK( fm77av_vsync )
 	if(param == 0)  // start of vsync
 	{
 		state->video.vsync_flag = 1;
-		timer_adjust_oneshot(state->fm77av_vsync_timer,attotime::from_usec(510),1);  // VSync length for 200 line modes = 0.51ms
+		state->fm77av_vsync_timer->adjust(attotime::from_usec(510),1);  // VSync length for 200 line modes = 0.51ms
 	}
 	else
 	{
 		state->video.vsync_flag = 0;
-		timer_adjust_oneshot(state->fm77av_vsync_timer,machine->primary_screen->time_until_vblank_end(),0);
+		state->fm77av_vsync_timer->adjust(machine->primary_screen->time_until_vblank_end());
 	}
 }
 

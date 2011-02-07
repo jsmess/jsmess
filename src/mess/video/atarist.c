@@ -1083,8 +1083,8 @@ void st_state::video_start()
 	m_shifter_timer = machine->scheduler().timer_alloc(FUNC(atarist_shifter_tick));
 	m_glue_timer = machine->scheduler().timer_alloc(FUNC(atarist_glue_tick));
 
-//	timer_adjust_periodic(m_shifter_timer, machine->primary_screen->time_until_pos(0,0), 0, attotime::from_hz(Y2/4)); // 125 ns
-	timer_adjust_periodic(m_glue_timer, machine->primary_screen->time_until_pos(0,0), 0, attotime::from_hz(Y2/16)); // 500 ns
+//	m_shifter_timer->adjust(machine->primary_screen->time_until_pos(0), 0, attotime::from_hz(Y2/4)); // 125 ns
+	m_glue_timer->adjust(machine->primary_screen->time_until_pos(0), 0, attotime::from_hz(Y2/16)); // 500 ns
 
 	/* register for state saving */
 	state_save_register_global(machine, m_shifter_base);

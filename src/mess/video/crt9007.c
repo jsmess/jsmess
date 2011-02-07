@@ -372,7 +372,7 @@ inline void crt9007_device::update_hsync_timer(int state)
 
 	attotime duration = m_screen->time_until_pos(next_y, next_x);
 
-	timer_adjust_oneshot(m_hsync_timer, duration, !state);
+	m_hsync_timer->adjust(duration, !state);
 }
 
 
@@ -386,7 +386,7 @@ inline void crt9007_device::update_vsync_timer(int state)
 
 	attotime duration = m_screen->time_until_pos(next_y, 0);
 
-	timer_adjust_oneshot(m_vsync_timer, duration, !state);
+	m_vsync_timer->adjust(duration, !state);
 }
 
 
@@ -404,7 +404,7 @@ inline void crt9007_device::update_vlt_timer(int state)
 
 	attotime duration = m_screen->time_until_pos(next_y, next_x);
 
-	timer_adjust_oneshot(m_vlt_timer, duration, !state);
+	m_vlt_timer->adjust(duration, !state);
 }
 
 
@@ -451,7 +451,7 @@ inline void crt9007_device::update_drb_timer(int state)
 
 	attotime duration = m_screen->time_until_pos(next_y, next_x);
 
-	timer_adjust_oneshot(m_drb_timer, duration, !state);
+	m_drb_timer->adjust(duration, !state);
 }
 
 
@@ -514,10 +514,10 @@ inline void crt9007_device::recompute_parameters()
 
 	m_screen->configure(horiz_pix_total, vert_pix_total, visarea, refresh);
 
-	timer_adjust_oneshot(m_hsync_timer, m_screen->time_until_pos(0, 0), 0);
-	timer_adjust_oneshot(m_vsync_timer, m_screen->time_until_pos(0, 0), 0);
-	timer_adjust_oneshot(m_vlt_timer, m_screen->time_until_pos(0, m_vlt_start), 1);
-	timer_adjust_oneshot(m_drb_timer, m_screen->time_until_pos(0, 0), 0);
+	m_hsync_timer->adjust(m_screen->time_until_pos(0, 0));
+	m_vsync_timer->adjust(m_screen->time_until_pos(0, 0));
+	m_vlt_timer->adjust(m_screen->time_until_pos(0, m_vlt_start), 1);
+	m_drb_timer->adjust(m_screen->time_until_pos(0, 0));
 }
 
 
@@ -962,7 +962,7 @@ WRITE_LINE_MEMBER( crt9007_device::ack_w )
 	if (m_dmar && !m_ack && state)
 	{
 		// start DMA transfer
-		timer_adjust_oneshot(m_dma_timer, attotime::from_hz(clock()), 0);
+		m_dma_timer->adjust(attotime::from_hz(clock()));
 	}
 
 	m_ack = state;

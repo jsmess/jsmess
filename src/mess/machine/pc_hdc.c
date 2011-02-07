@@ -707,7 +707,7 @@ static void pc_hdc_data_w(running_machine *machine, int n, int data)
 			status[n] |= STA_INPUT;
 
 			assert(timer[n]);
-			timer_adjust_oneshot(timer[n], attotime::from_msec(1), n);
+			timer[n]->adjust(attotime::from_msec(1), n);
         }
 	}
 }

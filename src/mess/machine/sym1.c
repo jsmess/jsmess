@@ -34,42 +34,42 @@
 static WRITE_LINE_DEVICE_HANDLER( sym1_74145_output_0_w )
 {
 	sym1_state *drvstate = device->machine->driver_data<sym1_state>();
-	if (state) timer_adjust_oneshot(drvstate->led_update, LED_REFRESH_DELAY, 0);
+	if (state) drvstate->led_update->adjust(LED_REFRESH_DELAY);
 }
 
 
 static WRITE_LINE_DEVICE_HANDLER( sym1_74145_output_1_w )
 {
 	sym1_state *drvstate = device->machine->driver_data<sym1_state>();
-	if (state) timer_adjust_oneshot(drvstate->led_update, LED_REFRESH_DELAY, 1);
+	if (state) drvstate->led_update->adjust(LED_REFRESH_DELAY, 1);
 }
 
 
 static WRITE_LINE_DEVICE_HANDLER( sym1_74145_output_2_w )
 {
 	sym1_state *drvstate = device->machine->driver_data<sym1_state>();
-	if (state) timer_adjust_oneshot(drvstate->led_update, LED_REFRESH_DELAY, 2);
+	if (state) drvstate->led_update->adjust(LED_REFRESH_DELAY, 2);
 }
 
 
 static WRITE_LINE_DEVICE_HANDLER( sym1_74145_output_3_w )
 {
 	sym1_state *drvstate = device->machine->driver_data<sym1_state>();
-	if (state) timer_adjust_oneshot(drvstate->led_update, LED_REFRESH_DELAY, 3);
+	if (state) drvstate->led_update->adjust(LED_REFRESH_DELAY, 3);
 }
 
 
 static WRITE_LINE_DEVICE_HANDLER( sym1_74145_output_4_w )
 {
 	sym1_state *drvstate = device->machine->driver_data<sym1_state>();
-	if (state) timer_adjust_oneshot(drvstate->led_update, LED_REFRESH_DELAY, 4);
+	if (state) drvstate->led_update->adjust(LED_REFRESH_DELAY, 4);
 }
 
 
 static WRITE_LINE_DEVICE_HANDLER( sym1_74145_output_5_w )
 {
 	sym1_state *drvstate = device->machine->driver_data<sym1_state>();
-	if (state) timer_adjust_oneshot(drvstate->led_update, LED_REFRESH_DELAY, 5);
+	if (state) drvstate->led_update->adjust(LED_REFRESH_DELAY, 5);
 }
 
 
@@ -186,7 +186,7 @@ static READ8_DEVICE_HANDLER( sym1_via0_b_r )
 
 static WRITE8_DEVICE_HANDLER( sym1_via0_b_w )
 {
-	logerror("%s: via0_b_w 0x%02x\n", cpuexec_describe_context(device->machine), data);
+	logerror("%s: via0_b_w 0x%02x\n", device->machine->describe_context(), data);
 }
 
 

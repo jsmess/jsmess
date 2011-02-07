@@ -1036,7 +1036,7 @@ static void thmfc_floppy_cmd_complete( running_machine *machine )
 	thmfc1->stat0 |= THMFC1_STAT0_FINISHED;
 	thmfc1->data_idx = 0;
 	thmfc1->data_size = 0;
-	timer_adjust_oneshot(thmfc_floppy_cmd, attotime::never, 0);
+	thmfc_floppy_cmd->adjust(attotime::never);
 }
 
 
@@ -1342,7 +1342,7 @@ WRITE8_HANDLER ( thmfc_floppy_w )
 
 		/* abort previous command, if any */
 		thmfc1->op = THMFC1_OP_RESET;
-		timer_adjust_oneshot(thmfc_floppy_cmd, attotime::never, 0);
+		thmfc_floppy_cmd->adjust(attotime::never);
 
 		switch ( data & 3 )
 		{
@@ -1362,7 +1362,7 @@ WRITE8_HANDLER ( thmfc_floppy_w )
 				thmfc1->data_finish = thmfc1->sector_size + 3;
 				thmfc1->stat0 |= THMFC1_STAT0_BYTE_READY_OP;
 				thmfc1->op = THMFC1_OP_WRITE_SECT;
-				timer_adjust_oneshot(thmfc_floppy_cmd, attotime::from_msec( 10 ), 0);
+				thmfc_floppy_cmd->adjust(attotime::from_msec( 10 ));
 			}
 			break;
 
@@ -1378,7 +1378,7 @@ WRITE8_HANDLER ( thmfc_floppy_w )
 				thmfc1->data_idx = 1;
 				thmfc1->stat0 |= THMFC1_STAT0_BYTE_READY_OP;
 				thmfc1->op = THMFC1_OP_READ_ADDR;
-				timer_adjust_oneshot(thmfc_floppy_cmd, attotime::from_msec( 1 ), 0);
+				thmfc_floppy_cmd->adjust(attotime::from_msec( 1 ));
 			}
 			break;
 
@@ -1394,7 +1394,7 @@ WRITE8_HANDLER ( thmfc_floppy_w )
 				thmfc1->data_idx = 1;
 				thmfc1->stat0 |= THMFC1_STAT0_BYTE_READY_OP;
 				thmfc1->op = THMFC1_OP_READ_SECT;
-				timer_adjust_oneshot(thmfc_floppy_cmd, attotime::from_msec( 10 ), 0);
+				thmfc_floppy_cmd->adjust(attotime::from_msec( 10 ));
 			}
 			break;
 		}
@@ -1554,7 +1554,7 @@ void thmfc_floppy_reset( running_machine *machine )
 	thmfc1->data_raw_size = 0;
 	thmfc1->data_crc = 0;
 	thmfc1->wsync = 0;
-	timer_adjust_oneshot(thmfc_floppy_cmd, attotime::never, 0);
+	thmfc_floppy_cmd->adjust(attotime::never);
 }
 
 

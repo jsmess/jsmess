@@ -188,7 +188,7 @@ static void kermit_start_sending( kermit* state )
 	state->posout = 1;
 
 	state->retries = KERMIT_MAX_RETRIES;
-	timer_adjust_periodic( state->resend, KERMIT_RETRY_DELAY, 0, KERMIT_RETRY_DELAY );
+	state->resend->adjust( KERMIT_RETRY_DELAY, 0, KERMIT_RETRY_DELAY );
 }
 
 static void kermit_reset( kermit* state );
@@ -402,7 +402,7 @@ static void kermit_reset( kermit* state )
 		state->image->fseek( SEEK_SET, 0 );
 	}
 
-	timer_adjust_periodic( state->resend, attotime::never, 0, attotime::never );
+	state->resend->adjust( attotime::never, 0, attotime::never );
 }
 
 

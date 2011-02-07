@@ -141,7 +141,7 @@ WRITE8_DEVICE_HANDLER( e05a03_w )
 {
 	e05a03_state *e05a03 = get_safe_token(device);
 
-	logerror("%s: e05a03_w(%02x): %02x\n", cpuexec_describe_context(device->machine), offset, data);
+	logerror("%s: e05a03_w(%02x): %02x\n", device->machine->describe_context(), offset, data);
 
 	switch (offset)
 	{
@@ -181,7 +181,7 @@ READ8_DEVICE_HANDLER( e05a03_r )
 	e05a03_state *e05a03 = get_safe_token(device);
 	UINT8 result = 0;
 
-	logerror("%s: e05a03_r(%02x)\n", cpuexec_describe_context(device->machine), offset);
+	logerror("%s: e05a03_r(%02x)\n", device->machine->describe_context(), offset);
 
 	switch (offset)
 	{

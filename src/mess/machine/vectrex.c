@@ -335,8 +335,8 @@ WRITE8_HANDLER(vectrex_psg_port_w)
 
 			if (state->imager_freq > 1)
 			{
-				timer_adjust_periodic(state->imager_timer,
-									  attotime::from_double(MIN(1.0 / state->imager_freq, timer_timeleft(state->imager_timer).as_double())),
+				state->imager_timer->adjust(
+									  attotime::from_double(MIN(1.0 / state->imager_freq, state->imager_timer->remaining().as_double())),
 									  2,
 									  attotime::from_double(1.0 / state->imager_freq));
 			}

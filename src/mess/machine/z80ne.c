@@ -617,9 +617,9 @@ WRITE8_HANDLER(lx385_ctrl_w)
 			(motor_b) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 
 		if (motor_a || motor_b)
-			timer_adjust_periodic(state->cassette_timer, attotime::zero, 0, attotime::from_hz(LX385_TAPE_SAMPLE_FREQ));
+			state->cassette_timer->adjust(attotime::zero, 0, attotime::from_hz(LX385_TAPE_SAMPLE_FREQ));
 		else
-			timer_adjust_oneshot(state->cassette_timer, attotime::zero, 0);
+			state->cassette_timer->adjust(attotime::zero);
 	}
 }
 

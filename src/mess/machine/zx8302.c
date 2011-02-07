@@ -356,8 +356,8 @@ void zx8302_device::device_start()
 	m_gap_timer = timer_alloc(TIMER_GAP);
 	m_ipc_timer = timer_alloc(TIMER_IPC);
 
-	timer_adjust_periodic(m_rtc_timer, attotime::zero, 0, attotime::from_hz(m_config.rtc_clock / 32768));
-	timer_adjust_periodic(m_gap_timer, attotime::zero, 0, attotime::from_msec(31));
+	m_rtc_timer->adjust(attotime::zero, 0, attotime::from_hz(m_config.rtc_clock / 32768));
+	m_gap_timer->adjust(attotime::zero, 0, attotime::from_msec(31));
 
 	// register for state saving
 	state_save_register_device_item(this, 0, m_idr);
@@ -461,8 +461,8 @@ WRITE8_MEMBER( zx8302_device::control_w )
 
 	m_tcr = data;
 
-	timer_adjust_periodic(m_txd_timer, attotime::zero, 0, attotime::from_hz(baud));
-	timer_adjust_periodic(m_baudx4_timer, attotime::zero, 0, attotime::from_hz(baudx4));
+	m_txd_timer->adjust(attotime::zero, 0, attotime::from_hz(baud));
+	m_baudx4_timer->adjust(attotime::zero, 0, attotime::from_hz(baudx4));
 }
 
 
@@ -540,7 +540,7 @@ WRITE8_MEMBER( zx8302_device::ipc_command_w )
 
 	if (data != 0x01)
 	{
-		timer_adjust_oneshot(m_ipc_timer, attotime::from_nsec(480), data);
+		m_ipc_timer->adjust(attotime::from_nsec(480), data);
 	}
 }
 

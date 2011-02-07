@@ -23,7 +23,7 @@ INLINE void verboselog(running_machine *machine, int n_level, const char *s_fmt,
         va_start( v, s_fmt );
         vsprintf( buf, s_fmt, v );
         va_end( v );
-        logerror( "%s: %s", cpuexec_describe_context(machine), buf );
+        logerror( "%s: %s", machine->describe_context(), buf );
     }
 }
 
@@ -191,11 +191,11 @@ static void mc68328_maybe_start_timer(device_t *device, UINT32 index, UINT32 new
     {
         if((mc68328->regs.tctl[index] & TCTL_CLKSOURCE) == TCTL_CLKSOURCE_TIN)
         {
-            timer_adjust_oneshot(mc68328->gptimer[index], attotime::never, 0);
+            mc68328->gptimer[index]->adjust(attotime::never);
         }
         else if(mc68328->regs.tcmp[index] == 0)
         {
-            timer_adjust_oneshot(mc68328->gptimer[index], attotime::never, 0);
+            mc68328->gptimer[index]->adjust(attotime::never);
         }
         else
         {
@@ -207,12 +207,12 @@ static void mc68328_maybe_start_timer(device_t *device, UINT32 index, UINT32 new
                 mc68328->regs.tcn[index] = 0x0000;
             }
 
-            timer_adjust_oneshot(mc68328->gptimer[index], period, 0);
+            mc68328->gptimer[index]->adjust(period);
         }
     }
     else
     {
-        timer_adjust_oneshot(mc68328->gptimer[index], attotime::never, 0);
+        mc68328->gptimer[index]->adjust(attotime::never);
     }
 }
 
@@ -233,11 +233,11 @@ static void mc68328_timer_compare_event(device_t *device, UINT32 index)
 
             mc68328->regs.tcn[index] = 0x0000;
 
-            timer_adjust_oneshot(mc68328->gptimer[index], period, 0);
+            mc68328->gptimer[index]->adjust(period);
         }
         else
         {
-            timer_adjust_oneshot(mc68328->gptimer[index], attotime::never, 0);
+            mc68328->gptimer[index]->adjust(attotime::never);
         }
     }
     else
@@ -248,11 +248,11 @@ static void mc68328_timer_compare_event(device_t *device, UINT32 index)
         {
             attotime period = attotime::from_hz(frequency) * 0x10000;
 
-            timer_adjust_oneshot(mc68328->gptimer[index], period, 0);
+            mc68328->gptimer[index]->adjust(period);
         }
         else
         {
-            timer_adjust_oneshot(mc68328->gptimer[index], attotime::never, 0);
+            mc68328->gptimer[index]->adjust(attotime::never);
         }
     }
     if((mc68328->regs.tctl[index] & TCTL_IRQEN) == TCTL_IRQEN_ENABLE)
@@ -282,7 +282,7 @@ static TIMER_CALLBACK( mc68328_pwm_transition )
 
     if(mc68328->regs.pwmw >= mc68328->regs.pwmp || mc68328->regs.pwmw == 0 || mc68328->regs.pwmp == 0)
     {
-        timer_adjust_oneshot(mc68328->pwm, attotime::never, 0);
+        mc68328->pwm->adjust(attotime::never);
         return;
     }
 
@@ -296,7 +296,7 @@ static TIMER_CALLBACK( mc68328_pwm_transition )
         frequency /= divisor;
         period = attotime::from_hz(frequency) * (mc68328->regs.pwmp - mc68328->regs.pwmw);
 
-        timer_adjust_oneshot(mc68328->pwm, period, 0);
+        mc68328->pwm->adjust(period);
 
         if(mc68328->regs.pwmc & PWMC_IRQEN)
         {
@@ -312,7 +312,7 @@ static TIMER_CALLBACK( mc68328_pwm_transition )
         frequency /= divisor;
         period = attotime::from_hz(frequency) * mc68328->regs.pwmw;
 
-        timer_adjust_oneshot(mc68328->pwm, period, 0);
+        mc68328->pwm->adjust(period);
     }
 
     mc68328->regs.pwmc ^= PWMC_PIN;
@@ -1114,7 +1114,7 @@ WRITE16_DEVICE_HANDLER( mc68328_w )
                 attotime period;
                 frequency /= divisor;
                 period = attotime::from_hz(frequency) * mc68328->regs.pwmw;
-                timer_adjust_oneshot(mc68328->pwm, period, 0);
+                mc68328->pwm->adjust(period);
                 if(mc68328->regs.pwmc & PWMC_IRQEN)
                 {
                     mc68328_set_interrupt_line(device, INT_PWM, 1);
@@ -1123,7 +1123,7 @@ WRITE16_DEVICE_HANDLER( mc68328_w )
             }
             else
             {
-                timer_adjust_oneshot(mc68328->pwm, attotime::never, 0);
+                mc68328->pwm->adjust(attotime::never);
             }
             break;
 
@@ -2651,7 +2651,7 @@ static DEVICE_RESET( mc68328 )
     mc68328->regs.rtcienr = 0x00;
     mc68328->regs.stpwtch = 0x00;
 
-    timer_adjust_periodic(mc68328->rtc, attotime::from_hz(1), 0, attotime::from_hz(1));
+    mc68328->rtc->adjust(attotime::from_hz(1), 0, attotime::from_hz(1));
 }
 
 static void mc68328_register_state_save(device_t *device)

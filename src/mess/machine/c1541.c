@@ -328,7 +328,7 @@ static void spindle_motor(c1541_t *c1541, int mtr)
 		}
 
 		floppy_mon_w(c1541->image, !mtr);
-		timer_enable(c1541->bit_timer, mtr);
+		c1541->bit_timer->enable(mtr);
 
 		c1541->mtr = mtr;
 	}
@@ -958,7 +958,7 @@ static WRITE8_DEVICE_HANDLER( via1_pb_w )
 
 	if (c1541->ds != ds)
 	{
-		timer_adjust_periodic(c1541->bit_timer, attotime::zero, 0, attotime::from_hz(C2040_BITRATE[ds]/4));
+		c1541->bit_timer->adjust(attotime::zero, 0, attotime::from_hz(C2040_BITRATE[ds]/4));
 		c1541->ds = ds;
 	}
 }

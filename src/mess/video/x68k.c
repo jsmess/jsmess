@@ -191,7 +191,7 @@ TIMER_CALLBACK(x68k_hsync)
 				if(scan > state->crtc.vend)
 					scan = state->crtc.vbegin;
 				hsync_time = machine->primary_screen->time_until_pos(scan,(state->crtc.htotal + state->crtc.hend) / 2);
-				timer_adjust_oneshot(state->scanline_timer, hsync_time, 0);
+				state->scanline_timer->adjust(hsync_time);
 				if(scan != 0)
 				{
 					if((input_port_read(machine, "options") & 0x04))
@@ -206,7 +206,7 @@ TIMER_CALLBACK(x68k_hsync)
 				if(scan > state->crtc.vend)
 					scan = state->crtc.vbegin;
 				hsync_time = machine->primary_screen->time_until_pos(scan,state->crtc.hend / 2);
-				timer_adjust_oneshot(state->scanline_timer, hsync_time, 0);
+				state->scanline_timer->adjust(hsync_time);
 				if(scan != 0)
 				{
 					if((input_port_read(machine, "options") & 0x04))
@@ -226,13 +226,13 @@ TIMER_CALLBACK(x68k_hsync)
 				else
 					scan++;
 				hsync_time = machine->primary_screen->time_until_pos(scan,state->crtc.hbegin / 2);
-				timer_adjust_oneshot(state->scanline_timer, hsync_time, 1);
+				state->scanline_timer->adjust(hsync_time, 1);
 				state->oddscanline = 0;
 			}
 			else
 			{
 				hsync_time = machine->primary_screen->time_until_pos(machine->primary_screen->vpos(),(state->crtc.htotal + state->crtc.hbegin) / 2);
-				timer_adjust_oneshot(state->scanline_timer, hsync_time, 1);
+				state->scanline_timer->adjust(hsync_time, 1);
 				state->oddscanline = 1;
 			}
 		}
@@ -245,7 +245,7 @@ TIMER_CALLBACK(x68k_hsync)
 			if(scan > state->crtc.vend)
 				scan = 0;
 			hsync_time = machine->primary_screen->time_until_pos(scan,state->crtc.hend);
-			timer_adjust_oneshot(state->scanline_timer, hsync_time, 0);
+			state->scanline_timer->adjust(hsync_time);
 			if(scan != 0)
 			{
 				if((input_port_read(machine, "options") & 0x04))
@@ -257,7 +257,7 @@ TIMER_CALLBACK(x68k_hsync)
 		if(hstate == 0)
 		{
 			hsync_time = machine->primary_screen->time_until_pos(machine->primary_screen->vpos()+1,state->crtc.hbegin);
-			timer_adjust_oneshot(state->scanline_timer, hsync_time, 1);
+			state->scanline_timer->adjust(hsync_time, 1);
 	//      if(!(state->mfp.gpio & 0x40))  // if GPIP6 is active, clear it
 	//          state->mfp.gpio |= 0x40;
 		}
@@ -286,7 +286,7 @@ TIMER_CALLBACK(x68k_crtc_raster_irq)
 		irq_time = machine->primary_screen->time_until_pos(scan,state->crtc.hbegin);
 		// end of HBlank period clears GPIP6 also?
 		end_time = machine->primary_screen->time_until_pos(scan,state->crtc.hend);
-		timer_adjust_oneshot(state->raster_irq, irq_time, scan);
+		state->raster_irq->adjust(irq_time, scan);
 		machine->scheduler().timer_set(end_time, FUNC(x68k_crtc_raster_end));
 		logerror("GPIP6: Raster triggered at line %i (%i)\n",scan,machine->primary_screen->vpos());
 	}
@@ -305,7 +305,7 @@ TIMER_CALLBACK(x68k_crtc_vblank_irq)
 		state->crtc.vblank = 1;
 		vblank_line = state->crtc.vbegin;
 		irq_time = machine->primary_screen->time_until_pos(vblank_line,2);
-		timer_adjust_oneshot(state->vblank_irq, irq_time, 0);
+		state->vblank_irq->adjust(irq_time);
 		logerror("CRTC: VBlank on\n");
 	}
 	if(val == 0)  // V-DISP off
@@ -315,7 +315,7 @@ TIMER_CALLBACK(x68k_crtc_vblank_irq)
 		if(vblank_line > state->crtc.vtotal)
 			vblank_line = state->crtc.vtotal;
 		irq_time = machine->primary_screen->time_until_pos(vblank_line,2);
-		timer_adjust_oneshot(state->vblank_irq, irq_time, 1);
+		state->vblank_irq->adjust(irq_time, 1);
 		logerror("CRTC: VBlank off\n");
 	}
 
@@ -397,7 +397,7 @@ WRITE16_HANDLER( x68k_crtc_w )
 			irq_time = space->machine->primary_screen->time_until_pos((data) / state->crtc.vmultiple,2);
 
 			if(irq_time.as_double() > 0)
-				timer_adjust_oneshot(state->raster_irq, irq_time, (data) / state->crtc.vmultiple);
+				state->raster_irq->adjust(irq_time, (data) / state->crtc.vmultiple);
 		}
 		logerror("CRTC: Write to raster IRQ register - %i\n",data);
 		break;
@@ -1111,7 +1111,7 @@ VIDEO_START( x68000 )
 	tilemap_set_transparent_pen(state->bg0_16,0);
 	tilemap_set_transparent_pen(state->bg1_16,0);
 
-//  timer_adjust_periodic(state->scanline_timer, attotime::zero, 0, attotime::from_hz(55.45)/568);
+//  state->scanline_timer->adjust(attotime::zero, 0, attotime::from_hz(55.45)/568);
 }
 
 VIDEO_UPDATE( x68000 )

@@ -1447,7 +1447,7 @@ static DEVICE_START( smsvdp )
 	smsvdp->tmpbitmap = auto_bitmap_alloc(device->machine, width, height, BITMAP_FORMAT_INDEXED32);
 
 	smsvdp->smsvdp_display_timer = device->machine->scheduler().timer_alloc(FUNC(smsvdp_display_callback), smsvdp);
-	timer_adjust_periodic(smsvdp->smsvdp_display_timer, screen->time_until_pos(0, DISPLAY_CB_HPOS), 0, screen->scan_period());
+	smsvdp->smsvdp_display_timer->adjust(screen->time_until_pos(0, DISPLAY_CB_HPOS), 0, screen->scan_period());
 
 	state_save_register_device_item(device, 0, smsvdp->status);
 	state_save_register_device_item(device, 0, smsvdp->reg9copy);

@@ -187,7 +187,7 @@ UINT8 samcoupe_mouse_r(running_machine *machine)
 	UINT8 result;
 
 	/* on a read, reset the timer */
-	timer_adjust_oneshot(state->mouse_reset, attotime::from_usec(50), 0);
+	state->mouse_reset->adjust(attotime::from_usec(50));
 
 	/* update when we are about to read the first real values */
 	if (state->mouse_index == 2)
@@ -233,7 +233,7 @@ MACHINE_START( samcoupe )
 
 	/* schedule our video updates */
 	state->video_update_timer = machine->scheduler().timer_alloc(FUNC(sam_video_update_callback));
-	timer_adjust_oneshot(state->video_update_timer, machine->primary_screen->time_until_pos(0, 0), 0);
+	state->video_update_timer->adjust(machine->primary_screen->time_until_pos(0, 0));
 }
 
 /***************************************************************************

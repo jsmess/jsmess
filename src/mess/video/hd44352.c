@@ -110,7 +110,7 @@ void hd44352_device::device_start()
 	devcb_resolve_write_line(&m_on, &m_config.m_on, this);
 
 	m_on_timer = timer_alloc(ON_TIMER);
-	timer_adjust_periodic(m_on_timer, attotime::from_hz(m_clock/16384), 0, attotime::from_hz(m_clock/16384));
+	m_on_timer->adjust(attotime::from_hz(m_clock/16384), 0, attotime::from_hz(m_clock/16384));
 
 	state_save_register_device_item( this, 0, m_control_lines);
 	state_save_register_device_item( this, 0, m_data_bus);
@@ -386,7 +386,7 @@ void hd44352_device::data_write(UINT8 data)
 							default:		on_timer_rate = 8192;		break;
 						}
 
-						timer_adjust_periodic(m_on_timer, attotime::from_hz(m_clock/on_timer_rate), 0, attotime::from_hz(m_clock/on_timer_rate));
+						m_on_timer->adjust(attotime::from_hz(m_clock/on_timer_rate), 0, attotime::from_hz(m_clock/on_timer_rate));
 					}
 					m_data_bus = 0xff;
 					m_state = 0;

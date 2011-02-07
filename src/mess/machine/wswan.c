@@ -198,7 +198,7 @@ MACHINE_START( wswan )
 	state->system_type = TYPE_WSWAN;
 	machine->add_notifier(MACHINE_NOTIFY_EXIT, wswan_machine_stop );
 	state->vdp.timer = machine->scheduler().timer_alloc(FUNC(wswan_scanline_interrupt), &state->vdp );
-	timer_adjust_periodic( state->vdp.timer, attotime::from_ticks( 256, 3072000 ), 0, attotime::from_ticks( 256, 3072000 ) );
+	state->vdp.timer->adjust( attotime::from_ticks( 256, 3072000 ), 0, attotime::from_ticks( 256, 3072000 ) );
 
 	wswan_setup_bios(machine);
 
@@ -214,7 +214,7 @@ MACHINE_START( wscolor )
 	state->system_type = TYPE_WSC;
 	machine->add_notifier(MACHINE_NOTIFY_EXIT, wswan_machine_stop );
 	state->vdp.timer = machine->scheduler().timer_alloc(FUNC(wswan_scanline_interrupt), &state->vdp );
-	timer_adjust_periodic( state->vdp.timer, attotime::from_ticks( 256, 3072000 ), 0, attotime::from_ticks( 256, 3072000 ) );
+	state->vdp.timer->adjust( attotime::from_ticks( 256, 3072000 ), 0, attotime::from_ticks( 256, 3072000 ) );
 
 	wswan_setup_bios(machine);
 

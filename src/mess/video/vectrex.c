@@ -131,10 +131,10 @@ WRITE8_HANDLER(vectrex_via_w)
 		period = (attotime::from_hz(cputag_get_clock(space->machine, "maincpu")) * state->via_timer2);
 
 		if (state->reset_refresh)
-			timer_adjust_periodic(state->refresh, period, 0, period);
+			state->refresh->adjust(period, 0, period);
 		else
-			timer_adjust_periodic(state->refresh,
-								  min(period, timer_timeleft(state->refresh)),
+			state->refresh->adjust(
+								  min(period, state->refresh->remaining()),
 								  0,
 								  period);
 		break;
@@ -293,7 +293,7 @@ VIDEO_START(vectrex)
 
 	state->vector_add_point_function = vectrex_add_point;
 	state->imager_timer = machine->scheduler().timer_alloc(FUNC(vectrex_imager_eye));
-	timer_adjust_periodic(state->imager_timer,
+	state->imager_timer->adjust(
 						  attotime::from_hz(state->imager_freq),
 						  2,
 						  attotime::from_hz(state->imager_freq));
@@ -365,7 +365,7 @@ static WRITE8_DEVICE_HANDLER(v_via_pb_w)
 						+(double)(state->pen_y - state->y_int) * (state->pen_y - state->y_int);
 					d2 = b2 - ab * ab / a2;
 					if (d2 < 2e10 && state->analog[A_Z] * state->blank > 0)
-						timer_adjust_oneshot(state->lp_t, attotime::from_double(ab / a2 / (cputag_get_clock(device->machine, "maincpu") * INT_PER_CLOCK)), 0);
+						state->lp_t->adjust(attotime::from_double(ab / a2 / (cputag_get_clock(device->machine, "maincpu") * INT_PER_CLOCK)));
 				}
 			}
 		}
@@ -383,7 +383,7 @@ static WRITE8_DEVICE_HANDLER(v_via_pb_w)
 		{
 			/* Cancel running timer, line already finished */
 			if (state->lightpen_down)
-				timer_adjust_oneshot(state->lp_t, attotime::never, 0);
+				state->lp_t->adjust(attotime::never);
 		}
 	}
 

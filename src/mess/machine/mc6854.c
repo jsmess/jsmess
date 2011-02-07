@@ -269,10 +269,10 @@ static void mc6854_send_bits( device_t *device, UINT32 data, int len, int zi )
 	}
 
 	/* schedule when to ask the MC6854 for more bits */
-	expire = timer_timeleft( mc6854->ttimer );
+	expire = mc6854->ttimer ->remaining( );
 	if ( expire== attotime::never )
 		expire = attotime::zero;
-	timer_reset( mc6854->ttimer, expire + (BIT_LENGTH * len));
+	mc6854->ttimer->reset( expire + (BIT_LENGTH * len));
 }
 
 
@@ -441,7 +441,7 @@ static void mc6854_tfifo_clear( device_t *device )
 	memset( mc6854->tfifo, 0, sizeof( mc6854->tfifo ) );
 	mc6854->tstate = 0;
 	mc6854->flen = 0;
-	timer_reset( mc6854->ttimer, attotime::never );
+	mc6854->ttimer->reset(  );
 }
 
 

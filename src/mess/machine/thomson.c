@@ -1247,7 +1247,7 @@ static void to7_game_init ( running_machine *machine )
 {
 	LOG (( "to7_game_init called\n" ));
 	to7_game_timer = machine->scheduler().timer_alloc(FUNC(to7_game_update_cb));
-	timer_adjust_periodic(to7_game_timer, TO7_GAME_POLL_PERIOD, 0, TO7_GAME_POLL_PERIOD);
+	to7_game_timer->adjust(TO7_GAME_POLL_PERIOD, 0, TO7_GAME_POLL_PERIOD);
 	state_save_register_global( machine, to7_game_sound );
 	state_save_register_global( machine, to7_game_mute );
 }
@@ -1899,7 +1899,7 @@ static TIMER_CALLBACK(mo5_periodic_cb)
 static void mo5_init_timer(running_machine *machine)
 {
 	/* time is a little faster than 50 Hz to match video framerate */
-	timer_adjust_periodic(mo5_periodic_timer, attotime::zero, 0, attotime::from_usec( 19968 ));
+	mo5_periodic_timer->adjust(attotime::zero, 0, attotime::from_usec( 19968 ));
 }
 
 
@@ -2976,7 +2976,7 @@ static TIMER_CALLBACK(to9_kbd_timer_cb)
 		}
 
 		to9_kbd_byte_count = ( to9_kbd_byte_count + 1 ) & 3;
-		timer_adjust_oneshot(to9_kbd_timer, to9_kbd_byte_count ? TO9_KBD_BYTE_SPACE : TO9_KBD_END_SPACE, 0);
+		to9_kbd_timer->adjust(to9_kbd_byte_count ? TO9_KBD_BYTE_SPACE : TO9_KBD_END_SPACE);
 	}
 	else
 	{
@@ -2984,7 +2984,7 @@ static TIMER_CALLBACK(to9_kbd_timer_cb)
 		/* keyboard mode: send a byte only if a key is down */
 		if ( key )
 			to9_kbd_send( machine, key, 0 );
-		timer_adjust_oneshot(to9_kbd_timer, TO9_KBD_POLL_PERIOD, 0);
+		to9_kbd_timer->adjust(TO9_KBD_POLL_PERIOD);
 	}
 }
 
@@ -3004,7 +3004,7 @@ static void to9_kbd_reset ( running_machine *machine )
 	to9_kbd_key_count = 0;
 	to9_kbd_last_key = 0xff;
 	to9_kbd_update_irq(machine);
-	timer_adjust_oneshot(to9_kbd_timer, TO9_KBD_POLL_PERIOD, 0);
+	to9_kbd_timer->adjust(TO9_KBD_POLL_PERIOD);
 }
 
 
@@ -3420,7 +3420,7 @@ static void to8_kbd_timer_func(running_machine *machine)
 		d = attotime::from_usec( bit ? 56 : 38 );
 		to8_kbd_step++;
 	}
-	timer_adjust_oneshot(to8_kbd_timer, d, 0);
+	to8_kbd_timer->adjust(d);
 }
 
 
@@ -3441,7 +3441,7 @@ static void to8_kbd_set_ack ( running_machine *machine, int data )
 
 	if ( data )
 	{
-		double len = timer_timeelapsed( to8_kbd_signal).as_double() * 1000. - 2.;
+		double len = to8_kbd_signal->elapsed( ).as_double() * 1000. - 2.;
 		LOG_KBD(( "%f to8_kbd_set_ack: CPU end ack, len=%f\n", machine->time().as_double(), len ));
 		if ( to8_kbd_data == 0xfff )
 		{
@@ -3455,12 +3455,12 @@ static void to8_kbd_set_ack ( running_machine *machine, int data )
 				/* send back signal: TODO returned codes ? */
 				to8_kbd_data = 0;
 				to8_kbd_step = 0;
-				timer_adjust_oneshot(to8_kbd_timer, attotime::from_msec( 1 ), 0);
+				to8_kbd_timer->adjust(attotime::from_msec( 1 ));
 			}
 			else
 			{
 				to8_kbd_step = 0;
-				timer_adjust_oneshot(to8_kbd_timer, TO8_KBD_POLL_PERIOD, 0);
+				to8_kbd_timer->adjust(TO8_KBD_POLL_PERIOD);
 				if ( len >= 1.2 && len <= 1.4 )
 				{
 					LOG (( "%f to8_kbd_set_ack: CAPS on signal\n", machine->time().as_double() ));
@@ -3478,7 +3478,7 @@ static void to8_kbd_set_ack ( running_machine *machine, int data )
 		{
 			/* end key transmission */
 			to8_kbd_step = 0;
-			timer_adjust_oneshot(to8_kbd_timer, TO8_KBD_POLL_PERIOD, 0);
+			to8_kbd_timer->adjust(TO8_KBD_POLL_PERIOD);
 		}
 	}
 
@@ -3488,15 +3488,15 @@ static void to8_kbd_set_ack ( running_machine *machine, int data )
 		{
 			/* CPU accepts key */
 			to8_kbd_step = 99;
-			timer_adjust_oneshot(to8_kbd_timer, attotime::from_usec( 400 ), 0);
+			to8_kbd_timer->adjust(attotime::from_usec( 400 ));
 		}
 		else
 		{
 			/* start signal from CPU */
 			to8_kbd_data = 0xfff;
 			to8_kbd_step = 91;
-			timer_adjust_oneshot(to8_kbd_timer, attotime::from_usec( 400 ), 0);
-			timer_adjust_oneshot(to8_kbd_signal, attotime::never, 0);
+			to8_kbd_timer->adjust(attotime::from_usec( 400 ));
+			to8_kbd_signal->adjust(attotime::never);
 		}
 		LOG_KBD(( "%f to8_kbd_set_ack: CPU ack, data=$%03X\n", machine->time().as_double(), to8_kbd_data ));
 	}
@@ -4618,7 +4618,7 @@ static void mo6_game_init ( running_machine *machine )
 {
 	LOG (( "mo6_game_init called\n" ));
 	to7_game_timer = machine->scheduler().timer_alloc(FUNC(mo6_game_update_cb));
-	timer_adjust_periodic(to7_game_timer, TO7_GAME_POLL_PERIOD, 0, TO7_GAME_POLL_PERIOD);
+	to7_game_timer->adjust(TO7_GAME_POLL_PERIOD, 0, TO7_GAME_POLL_PERIOD);
 	state_save_register_global( machine, to7_game_sound );
 	state_save_register_global( machine, to7_game_mute );
 }
@@ -5131,7 +5131,7 @@ static void mo5nr_game_init ( running_machine* machine )
 {
 	LOG (( "mo5nr_game_init called\n" ));
 	to7_game_timer = machine->scheduler().timer_alloc(FUNC(mo6_game_update_cb));
-	timer_adjust_periodic( to7_game_timer, TO7_GAME_POLL_PERIOD, 0, TO7_GAME_POLL_PERIOD );
+	to7_game_timer->adjust( TO7_GAME_POLL_PERIOD, 0, TO7_GAME_POLL_PERIOD );
 	state_save_register_global( machine, to7_game_sound );
 	state_save_register_global( machine, to7_game_mute );
 }

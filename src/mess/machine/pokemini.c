@@ -466,7 +466,7 @@ WRITE8_DEVICE_HANDLER( pokemini_hwreg_w )
 			int index = data & 0x07;
 			int cycles = ( state->pm_reg[0x19] & 0x01 ) ? timer_to_cycles_slow[index] : timer_to_cycles_fast[index];
 
-			timer_adjust_periodic(state->timers.timer1, attotime::zero, 0, device->machine->device<cpu_device>("maincpu")->cycles_to_attotime(cycles));
+			state->timers.timer1->adjust(attotime::zero, 0, device->machine->device<cpu_device>("maincpu")->cycles_to_attotime(cycles));
 		}
 
 		/* Check for prescaler change for the high counter */
@@ -475,7 +475,7 @@ WRITE8_DEVICE_HANDLER( pokemini_hwreg_w )
 			int index = ( data >> 4 ) & 0x07;
 			int cycles = ( state->pm_reg[0x19] & 0x02 ) ? timer_to_cycles_slow[index] : timer_to_cycles_fast[index];
 
-			timer_adjust_periodic(state->timers.timer1_hi, attotime::zero, 0, device->machine->device<cpu_device>("maincpu")->cycles_to_attotime(cycles));
+			state->timers.timer1_hi->adjust(attotime::zero, 0, device->machine->device<cpu_device>("maincpu")->cycles_to_attotime(cycles));
 		}
 
 		/* Check if timer1 low should be enabled */
@@ -483,11 +483,11 @@ WRITE8_DEVICE_HANDLER( pokemini_hwreg_w )
 		     ( ( ( state->pm_reg[0x19] & 0x10 ) && ( state->pm_reg[0x19] & 0x01 ) ) ||
 		       ( ( state->pm_reg[0x19] & 0x20 ) && ! ( state->pm_reg[0x19] & 0x01 ) ) ) )
 		{
-			timer_enable( state->timers.timer1, 1 );
+			state->timers.timer1->enable( 1 );
 		}
 		else
 		{
-			timer_enable( state->timers.timer1, 0 );
+			state->timers.timer1->enable( 0 );
 		}
 
 		/* Check if timer1 high should be enabled */
@@ -495,11 +495,11 @@ WRITE8_DEVICE_HANDLER( pokemini_hwreg_w )
 		     ( ( ( state->pm_reg[0x19] & 0x10 ) && ( state->pm_reg[0x19] & 0x02 ) ) ||
 		       ( ( state->pm_reg[0x19] & 0x20 ) && ! ( state->pm_reg[0x19] & 0x02 ) ) ) )
 		{
-			timer_enable( state->timers.timer1_hi, 1 );
+			state->timers.timer1_hi->enable( 1 );
 		}
 		else
 		{
-			timer_enable( state->timers.timer1_hi, 0 );
+			state->timers.timer1_hi->enable( 0 );
 		}
 		break;
 	case 0x19:	/* Timers 1 speed
@@ -516,7 +516,7 @@ WRITE8_DEVICE_HANDLER( pokemini_hwreg_w )
 			int index = state->pm_reg[0x18] & 0x07;
 			int cycles = ( data & 0x01 ) ? timer_to_cycles_slow[index] : timer_to_cycles_fast[index];
 
-			timer_adjust_periodic(state->timers.timer1, attotime::zero, 0, device->machine->device<cpu_device>("maincpu")->cycles_to_attotime(cycles));
+			state->timers.timer1->adjust(attotime::zero, 0, device->machine->device<cpu_device>("maincpu")->cycles_to_attotime(cycles));
 		}
 
 		/* Check for prescaler change for the low counter */
@@ -525,7 +525,7 @@ WRITE8_DEVICE_HANDLER( pokemini_hwreg_w )
 			int index = ( state->pm_reg[0x18] >> 4 ) & 0x07;
 			int cycles = ( data & 0x02 ) ? timer_to_cycles_slow[index] : timer_to_cycles_fast[index];
 
-			timer_adjust_periodic(state->timers.timer1_hi, attotime::zero, 0, device->machine->device<cpu_device>("maincpu")->cycles_to_attotime(cycles));
+			state->timers.timer1_hi->adjust(attotime::zero, 0, device->machine->device<cpu_device>("maincpu")->cycles_to_attotime(cycles));
 		}
 
 		{
@@ -567,12 +567,12 @@ WRITE8_DEVICE_HANDLER( pokemini_hwreg_w )
 				if ( ( state->pm_reg[0x1C] & 0x08 ) && ( state->pm_reg[0x1D] & 0x01 ) )
 					timer3_enable = 1;
 			}
-			timer_enable( state->timers.timer1, timer1_enable );
-			timer_enable( state->timers.timer1_hi, timer1_hi_enable );
-			timer_enable( state->timers.timer2, timer2_enable );
-			timer_enable( state->timers.timer2_hi, timer2_hi_enable );
-			timer_enable( state->timers.timer3, timer3_enable );
-			timer_enable( state->timers.timer3_hi, timer3_hi_enable );
+			state->timers.timer1->enable( timer1_enable );
+			state->timers.timer1_hi->enable( timer1_hi_enable );
+			state->timers.timer2->enable( timer2_enable );
+			state->timers.timer2_hi->enable( timer2_hi_enable );
+			state->timers.timer3->enable( timer3_enable );
+			state->timers.timer3_hi->enable( timer3_hi_enable );
 		}
 		break;
 	case 0x1A:	/* Timer 2 pre-scale + enable
@@ -595,7 +595,7 @@ WRITE8_DEVICE_HANDLER( pokemini_hwreg_w )
 			int index = data & 0x07;
 			int cycles = ( state->pm_reg[0x1B] & 0x01 ) ? timer_to_cycles_slow[index] : timer_to_cycles_fast[index];
 
-			timer_adjust_periodic(state->timers.timer2, attotime::zero, 0, device->machine->device<cpu_device>("maincpu")->cycles_to_attotime(cycles));
+			state->timers.timer2->adjust(attotime::zero, 0, device->machine->device<cpu_device>("maincpu")->cycles_to_attotime(cycles));
 		}
 
 		/* Check for prescaler change for the high counter */
@@ -604,7 +604,7 @@ WRITE8_DEVICE_HANDLER( pokemini_hwreg_w )
 			int index = ( data >> 4 ) & 0x07;
 			int cycles = ( state->pm_reg[0x1B] & 0x02 ) ? timer_to_cycles_slow[index] : timer_to_cycles_fast[index];
 
-			timer_adjust_periodic(state->timers.timer2_hi, attotime::zero, 0, device->machine->device<cpu_device>("maincpu")->cycles_to_attotime(cycles));
+			state->timers.timer2_hi->adjust(attotime::zero, 0, device->machine->device<cpu_device>("maincpu")->cycles_to_attotime(cycles));
 		}
 
 		/* Check if timer2 low should be enabled */
@@ -612,11 +612,11 @@ WRITE8_DEVICE_HANDLER( pokemini_hwreg_w )
 		     ( ( ( state->pm_reg[0x19] & 0x10 ) && ( state->pm_reg[0x1B] & 0x01 ) ) ||
 		       ( ( state->pm_reg[0x19] & 0x20 ) && ! ( state->pm_reg[0x1B] & 0x01 ) ) ) )
 		{
-			timer_enable( state->timers.timer2, 1 );
+			state->timers.timer2->enable( 1 );
 		}
 		else
 		{
-			timer_enable( state->timers.timer2, 0 );
+			state->timers.timer2->enable( 0 );
 		}
 
 		/* Check if timer2 high should be enabled */
@@ -624,11 +624,11 @@ WRITE8_DEVICE_HANDLER( pokemini_hwreg_w )
 		     ( ( ( state->pm_reg[0x19] & 0x10 ) && ( state->pm_reg[0x1B] & 0x02 ) ) ||
 		       ( ( state->pm_reg[0x19] & 0x20 ) && ! ( state->pm_reg[0x1B] & 0x02 ) ) ) )
 		{
-			timer_enable( state->timers.timer2_hi, 1 );
+			state->timers.timer2_hi->enable( 1 );
 		}
 		else
 		{
-			timer_enable( state->timers.timer2_hi, 0 );
+			state->timers.timer2_hi->enable( 0 );
 		}
 		break;
 	case 0x1B:	/* Timer 2 speeds
@@ -641,17 +641,17 @@ WRITE8_DEVICE_HANDLER( pokemini_hwreg_w )
 			int index = state->pm_reg[0x1A] & 0x07;
 			int cycles = ( data & 0x01 ) ? timer_to_cycles_slow[index] : timer_to_cycles_fast[index];
 
-			timer_adjust_periodic(state->timers.timer2, attotime::zero, 0, device->machine->device<cpu_device>("maincpu")->cycles_to_attotime(cycles));
+			state->timers.timer2->adjust(attotime::zero, 0, device->machine->device<cpu_device>("maincpu")->cycles_to_attotime(cycles));
 
 			if ( ( state->pm_reg[0x1A] & 0x08 ) && ( state->pm_reg[0x38] & 0x04 ) &&
 			     ( ( ( state->pm_reg[0x19] & 0x10 ) && ( data & 0x01 ) ) ||
 			       ( ( state->pm_reg[0x19] & 0x20 ) && ! ( data & 0x01 ) ) ) )
 			{
-				timer_enable( state->timers.timer2, 1 );
+				state->timers.timer2->enable( 1 );
 			}
 			else
 			{
-				timer_enable( state->timers.timer2, 0 );
+				state->timers.timer2->enable( 0 );
 			}
 		}
 
@@ -661,17 +661,17 @@ WRITE8_DEVICE_HANDLER( pokemini_hwreg_w )
 			int index = ( state->pm_reg[0x1A] >> 4 ) & 0x07;
 			int cycles = ( data & 0x02 ) ? timer_to_cycles_slow[index] : timer_to_cycles_fast[index];
 
-			timer_adjust_periodic(state->timers.timer2_hi, attotime::zero, 0, device->machine->device<cpu_device>("maincpu")->cycles_to_attotime(cycles));
+			state->timers.timer2_hi->adjust(attotime::zero, 0, device->machine->device<cpu_device>("maincpu")->cycles_to_attotime(cycles));
 
 			if ( ( state->pm_reg[0x1A] & 0x80 ) && ( state->pm_reg[0x39] & 0x04 ) && ! ( state->pm_reg[0x38] & 0x80 ) &&
 			     ( ( ( state->pm_reg[0x19] & 0x10 ) && ( data & 0x02 ) ) ||
 			       ( ( state->pm_reg[0x19] & 0x20 ) && ! ( data & 0x02 ) ) ) )
 			{
-				timer_enable( state->timers.timer2_hi, 1 );
+				state->timers.timer2_hi->enable( 1 );
 			}
 			else
 			{
-				timer_enable( state->timers.timer2_hi, 0 );
+				state->timers.timer2_hi->enable( 0 );
 			}
 		}
 		break;
@@ -695,7 +695,7 @@ WRITE8_DEVICE_HANDLER( pokemini_hwreg_w )
 			int index = data & 0x07;
 			int cycles = ( state->pm_reg[0x1D] & 0x01 ) ? timer_to_cycles_slow[index] : timer_to_cycles_fast[index];
 
-			timer_adjust_periodic(state->timers.timer3, attotime::zero, 0, device->machine->device<cpu_device>("maincpu")->cycles_to_attotime(cycles));
+			state->timers.timer3->adjust(attotime::zero, 0, device->machine->device<cpu_device>("maincpu")->cycles_to_attotime(cycles));
 		}
 
 		/* Check for prescaler change for the high counter */
@@ -704,7 +704,7 @@ WRITE8_DEVICE_HANDLER( pokemini_hwreg_w )
 			int index = ( data >> 4 ) & 0x07;
 			int cycles = ( state->pm_reg[0x1D] & 0x02 ) ? timer_to_cycles_slow[index] : timer_to_cycles_fast[index];
 
-			timer_adjust_periodic(state->timers.timer3_hi, attotime::zero, 0, device->machine->device<cpu_device>("maincpu")->cycles_to_attotime(cycles));
+			state->timers.timer3_hi->adjust(attotime::zero, 0, device->machine->device<cpu_device>("maincpu")->cycles_to_attotime(cycles));
 		}
 
 		/* Check if timer2 low should be enabled */
@@ -712,11 +712,11 @@ WRITE8_DEVICE_HANDLER( pokemini_hwreg_w )
 		     ( ( ( state->pm_reg[0x19] & 0x10 ) && ( state->pm_reg[0x1D] & 0x01 ) ) ||
 		       ( ( state->pm_reg[0x19] & 0x20 ) && ! ( state->pm_reg[0x1D] & 0x01 ) ) ) )
 		{
-			timer_enable( state->timers.timer3, 1 );
+			state->timers.timer3->enable( 1 );
 		}
 		else
 		{
-			timer_enable( state->timers.timer3, 0 );
+			state->timers.timer3->enable( 0 );
 		}
 
 		/* Check if timer2 high should be enabled */
@@ -724,11 +724,11 @@ WRITE8_DEVICE_HANDLER( pokemini_hwreg_w )
 		     ( ( ( state->pm_reg[0x19] & 0x10 ) && ( state->pm_reg[0x1D] & 0x02 ) ) ||
 		       ( ( state->pm_reg[0x19] & 0x20 ) && ! ( state->pm_reg[0x1D] & 0x02 ) ) ) )
 		{
-			timer_enable( state->timers.timer3_hi, 1 );
+			state->timers.timer3_hi->enable( 1 );
 		}
 		else
 		{
-			timer_enable( state->timers.timer3_hi, 0 );
+			state->timers.timer3_hi->enable( 0 );
 		}
 		break;
 	case 0x1D:	/* Timer 3 speeds
@@ -741,17 +741,17 @@ WRITE8_DEVICE_HANDLER( pokemini_hwreg_w )
 			int index = state->pm_reg[0x1C] & 0x07;
 			int cycles = ( data & 0x01 ) ? timer_to_cycles_slow[index] : timer_to_cycles_fast[index];
 
-			timer_adjust_periodic(state->timers.timer3, attotime::zero, 0, device->machine->device<cpu_device>("maincpu")->cycles_to_attotime(cycles));
+			state->timers.timer3->adjust(attotime::zero, 0, device->machine->device<cpu_device>("maincpu")->cycles_to_attotime(cycles));
 
 			if ( ( state->pm_reg[0x1C] & 0x08 ) && ( state->pm_reg[0x48] & 0x04 ) &&
 			     ( ( ( state->pm_reg[0x19] & 0x10 ) && ( data & 0x01 ) ) ||
 			       ( ( state->pm_reg[0x19] & 0x20 ) && ! ( data & 0x01 ) ) ) )
 			{
-				timer_enable( state->timers.timer3, 1 );
+				state->timers.timer3->enable( 1 );
 			}
 			else
 			{
-				timer_enable( state->timers.timer3, 0 );
+				state->timers.timer3->enable( 0 );
 			}
 		}
 
@@ -761,17 +761,17 @@ WRITE8_DEVICE_HANDLER( pokemini_hwreg_w )
 			int index = ( state->pm_reg[0x1C] >> 4 ) & 0x07;
 			int cycles = ( data & 0x02 ) ? timer_to_cycles_slow[index] : timer_to_cycles_fast[index];
 
-			timer_adjust_periodic(state->timers.timer3_hi, attotime::zero, 0, device->machine->device<cpu_device>("maincpu")->cycles_to_attotime(cycles));
+			state->timers.timer3_hi->adjust(attotime::zero, 0, device->machine->device<cpu_device>("maincpu")->cycles_to_attotime(cycles));
 
 			if ( ( state->pm_reg[0x1C] & 0x80 ) && ( state->pm_reg[0x49] & 0x04 ) && ! ( state->pm_reg[0x48] & 0x80 ) &&
 			     ( ( ( state->pm_reg[0x19] & 0x10 ) && ( data & 0x02 ) ) ||
 			       ( ( state->pm_reg[0x19] & 0x20 ) && ! ( data & 0x02 ) ) ) )
 			{
-				timer_enable( state->timers.timer3_hi, 1 );
+				state->timers.timer3_hi->enable( 1 );
 			}
 			else
 			{
-				timer_enable( state->timers.timer3_hi, 0 );
+				state->timers.timer3_hi->enable( 0 );
 			}
 		}
 		break;
@@ -905,22 +905,22 @@ WRITE8_DEVICE_HANDLER( pokemini_hwreg_w )
 		     ( ( ( state->pm_reg[0x19] & 0x20 ) && ! ( state->pm_reg[0x19] & 0x01 ) ) ||
 		       ( ( state->pm_reg[0x19] & 0x10 ) && ( state->pm_reg[0x19] & 0x01 ) ) ) )
 		{
-			timer_enable( state->timers.timer1, 1 );
+			state->timers.timer1->enable( 1 );
 		}
 		else
 		{
-			timer_enable( state->timers.timer1, 0 );
+			state->timers.timer1->enable( 0 );
 		}
 
 		if ( ( state->pm_reg[0x31] & 0x04 ) && ! ( data & 0x80 ) && ( state->pm_reg[0x18] & 0x80 ) &&
 		     ( ( ( state->pm_reg[0x19] & 0x20 ) && ! ( state->pm_reg[0x19] & 0x02 ) ) ||
 		       ( ( state->pm_reg[0x19] & 0x10 ) && ( state->pm_reg[0x19] & 0x02 ) ) ) )
 		{
-			timer_enable( state->timers.timer1_hi, 1 );
+			state->timers.timer1_hi->enable( 1 );
 		}
 		else
 		{
-			timer_enable( state->timers.timer1_hi, 0 );
+			state->timers.timer1_hi->enable( 0 );
 		}
 		break;
 	case 0x31:	/* Timer 1 control 2
@@ -940,11 +940,11 @@ WRITE8_DEVICE_HANDLER( pokemini_hwreg_w )
 		     ( ( ( state->pm_reg[0x19] & 0x20 ) && ! ( state->pm_reg[0x19] & 0x02 ) ) ||
 		       ( ( state->pm_reg[0x19] & 0x10 ) && ( state->pm_reg[0x19] & 0x02 ) ) ) )
 		{
-			timer_enable( state->timers.timer1_hi, 1 );
+			state->timers.timer1_hi->enable( 1 );
 		}
 		else
 		{
-			timer_enable( state->timers.timer1_hi, 0 );
+			state->timers.timer1_hi->enable( 0 );
 		}
 		break;
 	case 0x32:	/* Timer 1 preset value (low)
@@ -985,21 +985,21 @@ WRITE8_DEVICE_HANDLER( pokemini_hwreg_w )
 		     ( ( ( state->pm_reg[0x19] & 0x20 ) && ! ( state->pm_reg[0x1A] & 0x01 ) ) ||
 		       ( ( state->pm_reg[0x19] & 0x10 ) && ( state->pm_reg[0x1A] & 0x01 ) ) ) )
 		{
-			timer_enable( state->timers.timer2, 1 );
+			state->timers.timer2->enable( 1 );
 		}
 		else
 		{
-			timer_enable( state->timers.timer2, 0 );
+			state->timers.timer2->enable( 0 );
 		}
 		if ( ( state->pm_reg[0x39] & 0x04 ) && ! ( data & 0x80 ) && ( state->pm_reg[0x1A] & 0x80 ) &&
 		     ( ( ( state->pm_reg[0x19] & 0x20 ) && ! ( state->pm_reg[0x1B] & 0x02 ) ) ||
 		       ( ( state->pm_reg[0x19] & 0x10 ) && ( state->pm_reg[0x1B] & 0x02 ) ) ) )
 		{
-			timer_enable( state->timers.timer2_hi, 1 );
+			state->timers.timer2_hi->enable( 1 );
 		}
 		else
 		{
-			timer_enable( state->timers.timer2_hi, 0 );
+			state->timers.timer2_hi->enable( 0 );
 		}
 		break;
 	case 0x39:	/* Timer 2 control 2
@@ -1019,11 +1019,11 @@ WRITE8_DEVICE_HANDLER( pokemini_hwreg_w )
 		     ( ( ( state->pm_reg[0x19] & 0x20 ) && ! ( state->pm_reg[0x1B] & 0x02 ) ) ||
 		       ( ( state->pm_reg[0x19] & 0x10 ) && ( state->pm_reg[0x1B] & 0x02 ) ) ) )
 		{
-			timer_enable( state->timers.timer2_hi, 1 );
+			state->timers.timer2_hi->enable( 1 );
 		}
 		else
 		{
-			timer_enable( state->timers.timer2_hi, 0 );
+			state->timers.timer2_hi->enable( 0 );
 		}
 		break;
 	case 0x3A:	/* Timer 2 preset value (low)
@@ -1081,21 +1081,21 @@ WRITE8_DEVICE_HANDLER( pokemini_hwreg_w )
 		     ( ( ( state->pm_reg[0x19] & 0x20 ) && ! ( state->pm_reg[0x1D] & 0x01 ) ) ||
 		       ( ( state->pm_reg[0x19] & 0x10 ) && ( state->pm_reg[0x1D] & 0x01 ) ) ) )
 		{
-			timer_enable( state->timers.timer3, 1 );
+			state->timers.timer3->enable( 1 );
 		}
 		else
 		{
-			timer_enable( state->timers.timer3, 0 );
+			state->timers.timer3->enable( 0 );
 		}
 		if ( ( state->pm_reg[0x49] & 0x04 ) && ! ( data & 0x80 ) && ( state->pm_reg[0x1C] & 0x80 ) &&
 		     ( ( ( state->pm_reg[0x19] & 0x20 ) && ! ( state->pm_reg[0x1D] & 0x02 ) ) ||
 		       ( ( state->pm_reg[0x19] & 0x10 ) && ( state->pm_reg[0x1D] & 0x02 ) ) ) )
 		{
-			timer_enable( state->timers.timer3_hi, 1 );
+			state->timers.timer3_hi->enable( 1 );
 		}
 		else
 		{
-			timer_enable( state->timers.timer3_hi, 0 );
+			state->timers.timer3_hi->enable( 0 );
 		}
 		state->pm_reg[0x48] = data;
 		pokemini_update_sound( device->machine );
@@ -1117,11 +1117,11 @@ WRITE8_DEVICE_HANDLER( pokemini_hwreg_w )
 		     ( ( ( state->pm_reg[0x19] & 0x20 ) && ! ( state->pm_reg[0x1D] & 0x02 ) ) ||
 		       ( ( state->pm_reg[0x19] & 0x10 ) && ( state->pm_reg[0x1D] & 0x02 ) ) ) )
 		{
-			timer_enable( state->timers.timer3_hi, 1 );
+			state->timers.timer3_hi->enable( 1 );
 		}
 		else
 		{
-			timer_enable( state->timers.timer3_hi, 0 );
+			state->timers.timer3_hi->enable( 0 );
 		}
 		state->pm_reg[0x49] = data;
 		pokemini_update_sound( device->machine );
@@ -1569,10 +1569,10 @@ MACHINE_START( pokemini )
 
 	/* Set up timers */
 	state->timers.seconds_timer = machine->scheduler().timer_alloc(FUNC(pokemini_seconds_timer_callback));
-	timer_adjust_periodic( state->timers.seconds_timer, attotime::zero, 0, attotime::from_seconds( 1 ) );
+	state->timers.seconds_timer->adjust( attotime::zero, 0, attotime::from_seconds( 1 ) );
 
 	state->timers.hz256_timer = machine->scheduler().timer_alloc(FUNC(pokemini_256hz_timer_callback));
-	timer_adjust_periodic( state->timers.hz256_timer, attotime::zero, 0, attotime::from_hz( 256 ) );
+	state->timers.hz256_timer->adjust( attotime::zero, 0, attotime::from_hz( 256 ) );
 
 	state->timers.timer1 = machine->scheduler().timer_alloc(FUNC(pokemini_timer1_callback));
 	state->timers.timer1_hi = machine->scheduler().timer_alloc(FUNC(pokemini_timer1_hi_callback));
@@ -1584,6 +1584,6 @@ MACHINE_START( pokemini )
 	/* Set up the PRC */
 	state->prc.max_frame_count = 2;
 	state->prc.count_timer = machine->scheduler().timer_alloc(FUNC(pokemini_prc_counter_callback));
-	timer_adjust_periodic( state->prc.count_timer, attotime::zero, 0, machine->device<cpu_device>("maincpu")->cycles_to_attotime(55640 / 65) );
+	state->prc.count_timer->adjust( attotime::zero, 0, machine->device<cpu_device>("maincpu")->cycles_to_attotime(55640 / 65) );
 }
 

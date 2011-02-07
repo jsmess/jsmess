@@ -217,7 +217,7 @@ static void update_hrtc_timer(upd3301_t *upd3301, int state)
 
 	attotime duration = upd3301->screen->time_until_pos(next_y, next_x);
 
-	timer_adjust_oneshot(upd3301->hrtc_timer, duration, !state);
+	upd3301->hrtc_timer->adjust(duration, !state);
 }
 
 /*-------------------------------------------------
@@ -231,7 +231,7 @@ static void update_vrtc_timer(upd3301_t *upd3301, int state)
 
 	attotime duration = upd3301->screen->time_until_pos(next_y, 0);
 
-	timer_adjust_oneshot(upd3301->vrtc_timer, duration, !state);
+	upd3301->vrtc_timer->adjust(duration, !state);
 }
 
 /*-------------------------------------------------

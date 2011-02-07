@@ -190,12 +190,12 @@ static WRITE8_DEVICE_HANDLER( cass1_motor_w )
 	if (!data)
 	{
 		cassette_change_state(device->machine->device("cassette1"),CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
-		timer_adjust_periodic(state->datasette1_timer, attotime::zero, 0, attotime::from_hz(48000));	// I put 48000 because I was given some .wav with this freq
+		state->datasette1_timer->adjust(attotime::zero, 0, attotime::from_hz(48000));	// I put 48000 because I was given some .wav with this freq
 	}
 	else
 	{
 		cassette_change_state(device->machine->device("cassette1"),CASSETTE_MOTOR_DISABLED ,CASSETTE_MASK_MOTOR);
-		timer_reset(state->datasette1_timer, attotime::never);
+		state->datasette1_timer->reset();
 	}
 }
 
@@ -403,12 +403,12 @@ static WRITE8_DEVICE_HANDLER( via_pb_w )
 	if (BIT(data, 4))
 	{
 		cassette_change_state(device->machine->device("cassette2"), CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
-		timer_adjust_periodic(state->datasette2_timer, attotime::zero, 0, attotime::from_hz(48000));	// I put 48000 because I was given some .wav with this freq
+		state->datasette2_timer->adjust(attotime::zero, 0, attotime::from_hz(48000));	// I put 48000 because I was given some .wav with this freq
 	}
 	else
 	{
 		cassette_change_state(device->machine->device("cassette2"), CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
-		timer_reset(state->datasette2_timer, attotime::never);
+		state->datasette2_timer->reset();
 	}
 }
 

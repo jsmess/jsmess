@@ -175,7 +175,7 @@ static int lgun_bright_aim_area( running_machine *machine, emu_timer *timer, int
 		else
 			break;
 	}
-	timer_adjust_oneshot(timer, machine->first_screen()->time_until_pos(beam_y, beam_x), 0);
+	timer->adjust(machine->first_screen()->time_until_pos(beam_y, beam_x));
 
 	return result;
 }
@@ -278,28 +278,28 @@ static TIMER_CALLBACK( lightgun_tick )
 	{
 		/* enable crosshair */
 		crosshair_set_screen(machine, 0, CROSSHAIR_SCREEN_ALL);
-		if (!timer_enabled(state->lphaser_1_timer))
+		if (!state->lphaser_1_timer->enabled())
 			lphaser1_sensor_check(machine);
 	}
 	else
 	{
 		/* disable crosshair */
 		crosshair_set_screen(machine, 0, CROSSHAIR_SCREEN_NONE);
-		timer_enable(state->lphaser_1_timer, 0);
+		state->lphaser_1_timer->enable(0);
 	}
 	
 	if ((input_port_read_safe(machine, "CTRLSEL", 0x00) & 0xf0) == 0x10)
 	{
 		/* enable crosshair */
 		crosshair_set_screen(machine, 1, CROSSHAIR_SCREEN_ALL);
-		if (!timer_enabled(state->lphaser_2_timer))
+		if (!state->lphaser_2_timer->enabled())
 			lphaser2_sensor_check(machine);
 	}
 	else
 	{
 		/* disable crosshair */
 		crosshair_set_screen(machine, 1, CROSSHAIR_SCREEN_NONE);
-		timer_enable(state->lphaser_2_timer, 0);
+		state->lphaser_2_timer->enable(0);
 	}
 }
 
@@ -1706,7 +1706,7 @@ MACHINE_START( sms )
 
 	machine->add_notifier(MACHINE_NOTIFY_EXIT, sms_machine_stop);
 	state->rapid_fire_timer = machine->scheduler().timer_alloc(FUNC(rapid_fire_callback));
-	timer_adjust_periodic(state->rapid_fire_timer, attotime::from_hz(10), 0, attotime::from_hz(10));
+	state->rapid_fire_timer->adjust(attotime::from_hz(10), 0, attotime::from_hz(10));
 
 	state->lphaser_1_timer = machine->scheduler().timer_alloc(FUNC(lphaser_1_callback));
 	state->lphaser_2_timer = machine->scheduler().timer_alloc(FUNC(lphaser_2_callback));

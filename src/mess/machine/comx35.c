@@ -634,7 +634,7 @@ void comx35_state::machine_reset()
 	m_iden = 1;
 	m_cdp1802_ef4 = CLEAR_LINE;
 
-	timer_adjust_oneshot(m_reset_timer, attotime::from_msec(t), 0);
+	m_reset_timer->adjust(attotime::from_msec(t));
 }
 
 INPUT_CHANGED( comx35_reset )

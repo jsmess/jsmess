@@ -256,7 +256,7 @@ static WRITE8_DEVICE_HANDLER( mpf1_portb_w )
 	UINT8 led_data = BITSWAP8(data, 6, 1, 2, 0, 7, 5, 4, 3);
 
 	/* timer to update segments */
-	timer_adjust_oneshot(state->led_refresh_timer, attotime::from_usec(70), led_data);
+	state->led_refresh_timer->adjust(attotime::from_usec(70), led_data);
 }
 
 static WRITE8_DEVICE_HANDLER( mpf1_portc_w )
@@ -265,7 +265,7 @@ static WRITE8_DEVICE_HANDLER( mpf1_portc_w )
 
 	/* bits 0-5, led select and keyboard latch */
 	state->lednum = data & 0x3f;
-	timer_adjust_oneshot(state->led_refresh_timer, attotime::never, 0);
+	state->led_refresh_timer->adjust(attotime::never);
 
 	/* bit 6, monitor break control */
 	state->_break = BIT(data, 6);

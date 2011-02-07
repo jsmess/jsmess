@@ -321,7 +321,7 @@ static READ8_HANDLER( px4_icrlc_r )
 	px4_state *px4 = space->machine->driver_data<px4_state>();
 
 	if (VERBOSE)
-		logerror("%s: px4_icrlc_r\n", cpuexec_describe_context(space->machine));
+		logerror("%s: px4_icrlc_r\n", space->machine->describe_context());
 
 	/* latch value */
 	px4->frc_latch = px4->frc_value;
@@ -336,15 +336,15 @@ static WRITE8_HANDLER( px4_ctrl1_w )
 	int baud;
 
 	if (VERBOSE)
-		logerror("%s: px4_ctrl1_w (0x%02x)\n", cpuexec_describe_context(space->machine), data);
+		logerror("%s: px4_ctrl1_w (0x%02x)\n", space->machine->describe_context(), data);
 
 	/* baudrate generator */
 	baud = data >> 4;
 
 	if (baud <= 12)
 	{
-		timer_adjust_periodic(px4->transmit_timer, attotime::zero, 0, attotime::from_hz(XTAL_7_3728MHz/2/transmit_rate[baud]));
-		timer_adjust_periodic(px4->receive_timer, attotime::zero, 0, attotime::from_hz(XTAL_7_3728MHz/2/receive_rate[baud]));
+		px4->transmit_timer->adjust(attotime::zero, 0, attotime::from_hz(XTAL_7_3728MHz/2/transmit_rate[baud]));
+		px4->receive_timer->adjust(attotime::zero, 0, attotime::from_hz(XTAL_7_3728MHz/2/receive_rate[baud]));
 	}
 
 	px4->ctrl1 = data;
@@ -356,7 +356,7 @@ static READ8_HANDLER( px4_icrhc_r )
 	px4_state *px4 = space->machine->driver_data<px4_state>();
 
 	if (VERBOSE)
-		logerror("%s: px4_icrhc_r\n", cpuexec_describe_context(space->machine));
+		logerror("%s: px4_icrhc_r\n", space->machine->describe_context());
 
 	return (px4->frc_latch >> 8) & 0xff;
 }
@@ -367,7 +367,7 @@ static WRITE8_HANDLER( px4_cmdr_w )
 	px4_state *px4 = space->machine->driver_data<px4_state>();
 
 	if (VERBOSE)
-		logerror("%s: px4_cmdr_w (0x%02x)\n", cpuexec_describe_context(space->machine), data);
+		logerror("%s: px4_cmdr_w (0x%02x)\n", space->machine->describe_context(), data);
 
 	/* clear overflow interrupt? */
 	if (BIT(data, 2))
@@ -383,7 +383,7 @@ static READ8_HANDLER( px4_icrlb_r )
 	px4_state *px4 = space->machine->driver_data<px4_state>();
 
 	if (VERBOSE)
-		logerror("%s: px4_icrlb_r\n", cpuexec_describe_context(space->machine));
+		logerror("%s: px4_icrlb_r\n", space->machine->describe_context());
 
 	return px4->icrb & 0xff;
 }
@@ -394,7 +394,7 @@ static WRITE8_HANDLER( px4_ctrl2_w )
 	px4_state *px4 = space->machine->driver_data<px4_state>();
 
 	if (VERBOSE)
-		logerror("%s: px4_ctrl2_w (0x%02x)\n", cpuexec_describe_context(space->machine), data);
+		logerror("%s: px4_ctrl2_w (0x%02x)\n", space->machine->describe_context(), data);
 
 	/* bit 0, MIC, cassette output */
 	cassette_output(px4->ext_cas, BIT(data, 0) ? -1.0 : +1.0);
@@ -403,12 +403,12 @@ static WRITE8_HANDLER( px4_ctrl2_w )
 	if (BIT(data, 1))
 	{
 		cassette_change_state(px4->ext_cas, CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
-		timer_adjust_periodic(px4->ext_cas_timer, attotime::zero, 0, attotime::from_hz(44100));
+		px4->ext_cas_timer->adjust(attotime::zero, 0, attotime::from_hz(44100));
 	}
 	else
 	{
 		cassette_change_state(px4->ext_cas, CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
-		timer_adjust_oneshot(px4->ext_cas_timer, attotime::zero, 0);
+		px4->ext_cas_timer->adjust(attotime::zero);
 	}
 }
 
@@ -418,7 +418,7 @@ static READ8_HANDLER( px4_icrhb_r )
 	px4_state *px4 = space->machine->driver_data<px4_state>();
 
 	if (VERBOSE)
-		logerror("%s: px4_icrhb_r\n", cpuexec_describe_context(space->machine));
+		logerror("%s: px4_icrhb_r\n", space->machine->describe_context());
 
 	/* clear icf interrupt */
 	px4->isr &= ~INT2_ICF;
@@ -433,7 +433,7 @@ static READ8_HANDLER( px4_isr_r )
 	px4_state *px4 = space->machine->driver_data<px4_state>();
 
 	if (VERBOSE)
-		logerror("%s: px4_isr_r\n", cpuexec_describe_context(space->machine));
+		logerror("%s: px4_isr_r\n", space->machine->describe_context());
 
 	return px4->isr;
 }
@@ -444,7 +444,7 @@ static WRITE8_HANDLER( px4_ier_w )
 	px4_state *px4 = space->machine->driver_data<px4_state>();
 
 	if (VERBOSE)
-		logerror("%s: px4_ier_w (0x%02x)\n", cpuexec_describe_context(space->machine), data);
+		logerror("%s: px4_ier_w (0x%02x)\n", space->machine->describe_context(), data);
 
 	px4->ier = data;
 	gapnit_interrupt(space->machine);
@@ -457,7 +457,7 @@ static READ8_HANDLER( px4_str_r )
 	UINT8 result = 0;
 
 	if (VERBOSE)
-		logerror("%s: px4_str_r\n", cpuexec_describe_context(space->machine));
+		logerror("%s: px4_str_r\n", space->machine->describe_context());
 
 	result |= cassette_input(px4->ext_cas) > 0 ? 1 : 0;
 	result |= 1 << 1;	/* BCRD, barcode reader input */
@@ -502,7 +502,7 @@ static WRITE8_HANDLER( px4_bankr_w )
 	address_space *space_program = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	if (VERBOSE)
-		logerror("%s: px4_bankr_w (0x%02x)\n", cpuexec_describe_context(space->machine), data);
+		logerror("%s: px4_bankr_w (0x%02x)\n", space->machine->describe_context(), data);
 
 	px4->bankr = data;
 
@@ -544,7 +544,7 @@ static READ8_HANDLER( px4_sior_r )
 	px4_state *px4 = space->machine->driver_data<px4_state>();
 
 	if (VERBOSE)
-		logerror("%s: px4_sior_r 0x%02x\n", cpuexec_describe_context(space->machine), px4->sior);
+		logerror("%s: px4_sior_r 0x%02x\n", space->machine->describe_context(), px4->sior);
 
 	return px4->sior;
 }
@@ -555,7 +555,7 @@ static WRITE8_HANDLER( px4_sior_w )
 	px4_state *px4 = space->machine->driver_data<px4_state>();
 
 	if (VERBOSE)
-		logerror("%s: px4_sior_w (0x%02x)\n", cpuexec_describe_context(space->machine), data);
+		logerror("%s: px4_sior_w (0x%02x)\n", space->machine->describe_context(), data);
 
 	px4->sior = data;
 
@@ -687,7 +687,7 @@ static WRITE8_HANDLER( px4_vadr_w )
 	px4_state *px4 = space->machine->driver_data<px4_state>();
 
 	if (VERBOSE)
-		logerror("%s: px4_vadr_w (0x%02x)\n", cpuexec_describe_context(space->machine), data);
+		logerror("%s: px4_vadr_w (0x%02x)\n", space->machine->describe_context(), data);
 
 	px4->vadr = data;
 }
@@ -698,7 +698,7 @@ static WRITE8_HANDLER( px4_yoff_w )
 	px4_state *px4 = space->machine->driver_data<px4_state>();
 
 	if (VERBOSE)
-		logerror("%s: px4_yoff_w (0x%02x)\n", cpuexec_describe_context(space->machine), data);
+		logerror("%s: px4_yoff_w (0x%02x)\n", space->machine->describe_context(), data);
 
 	px4->yoff = data;
 }
@@ -707,14 +707,14 @@ static WRITE8_HANDLER( px4_yoff_w )
 static WRITE8_HANDLER( px4_fr_w )
 {
 	if (VERBOSE)
-		logerror("%s: px4_fr_w (0x%02x)\n", cpuexec_describe_context(space->machine), data);
+		logerror("%s: px4_fr_w (0x%02x)\n", space->machine->describe_context(), data);
 }
 
 /* speed-up register */
 static WRITE8_HANDLER( px4_spur_w )
 {
 	if (VERBOSE)
-		logerror("%s: px4_spur_w (0x%02x)\n", cpuexec_describe_context(space->machine), data);
+		logerror("%s: px4_spur_w (0x%02x)\n", space->machine->describe_context(), data);
 }
 
 
@@ -746,7 +746,7 @@ static TIMER_CALLBACK( receive_data )
 static READ8_HANDLER( px4_ctgif_r )
 {
 	if (VERBOSE)
-		logerror("%s: px4_ctgif_r @ 0x%02x\n", cpuexec_describe_context(space->machine), offset);
+		logerror("%s: px4_ctgif_r @ 0x%02x\n", space->machine->describe_context(), offset);
 
 	return 0xff;
 }
@@ -755,7 +755,7 @@ static READ8_HANDLER( px4_ctgif_r )
 static WRITE8_HANDLER( px4_ctgif_w )
 {
 	if (VERBOSE)
-		logerror("%s: px4_ctgif_w (0x%02x @ 0x%02x)\n", cpuexec_describe_context(space->machine), data, offset);
+		logerror("%s: px4_ctgif_w (0x%02x @ 0x%02x)\n", space->machine->describe_context(), data, offset);
 }
 
 /* art data input register */
@@ -764,7 +764,7 @@ static READ8_HANDLER( px4_artdir_r )
 	px4_state *px4 = space->machine->driver_data<px4_state>();
 
 	if (VERBOSE)
-		logerror("%s: px4_artdir_r\n", cpuexec_describe_context(space->machine));
+		logerror("%s: px4_artdir_r\n", space->machine->describe_context());
 
 	return px4->artdir;
 }
@@ -775,7 +775,7 @@ static WRITE8_HANDLER( px4_artdor_w )
 	px4_state *px4 = space->machine->driver_data<px4_state>();
 
 	if (VERBOSE)
-		logerror("%s: px4_artdor_w (0x%02x)\n", cpuexec_describe_context(space->machine), data);
+		logerror("%s: px4_artdor_w (0x%02x)\n", space->machine->describe_context(), data);
 
 	/* clear ready */
 	px4->artsr &= ~ART_TXRDY;
@@ -790,7 +790,7 @@ static READ8_HANDLER( px4_artsr_r )
 	UINT8 result = 0;
 
 	if (VERBOSE)
-		logerror("%s: px4_artsr_r\n", cpuexec_describe_context(space->machine));
+		logerror("%s: px4_artsr_r\n", space->machine->describe_context());
 
 	result |= px4_rs232c_dsr(px4->rs232c_device) << 7;
 
@@ -803,7 +803,7 @@ static WRITE8_HANDLER( px4_artmr_w )
 	px4_state *px4 = space->machine->driver_data<px4_state>();
 
 	if (VERBOSE)
-		logerror("%s: px4_artmr_w (0x%02x)\n", cpuexec_describe_context(space->machine), data);
+		logerror("%s: px4_artmr_w (0x%02x)\n", space->machine->describe_context(), data);
 
 	px4->artmr = data;
 }
@@ -815,7 +815,7 @@ static READ8_HANDLER( px4_iostr_r )
 	UINT8 result = 0;
 
 	if (VERBOSE)
-		logerror("%s: px4_iostr_r\n", cpuexec_describe_context(space->machine));
+		logerror("%s: px4_iostr_r\n", space->machine->describe_context());
 
 	result |= centronics_busy_r(px4->printer) << 0;
 	result |= !centronics_pe_r(px4->printer) << 1;
@@ -835,7 +835,7 @@ static WRITE8_HANDLER( px4_artcr_w )
 	px4_state *px4 = space->machine->driver_data<px4_state>();
 
 	if (VERBOSE)
-		logerror("%s: px4_artcr_w (0x%02x)\n", cpuexec_describe_context(space->machine), data);
+		logerror("%s: px4_artcr_w (0x%02x)\n", space->machine->describe_context(), data);
 
 	px4->artcr = data;
 
@@ -869,7 +869,7 @@ static WRITE8_HANDLER( px4_swr_w )
 	px4_state *px4 = space->machine->driver_data<px4_state>();
 
 	if (VERBOSE)
-		logerror("%s: px4_swr_w (0x%02x)\n", cpuexec_describe_context(space->machine), data);
+		logerror("%s: px4_swr_w (0x%02x)\n", space->machine->describe_context(), data);
 
 	px4->swr = data;
 }
@@ -880,7 +880,7 @@ static WRITE8_HANDLER( px4_ioctlr_w )
 	px4_state *px4 = space->machine->driver_data<px4_state>();
 
 	if (VERBOSE)
-		logerror("%s: px4_ioctlr_w (0x%02x)\n", cpuexec_describe_context(space->machine), data);
+		logerror("%s: px4_ioctlr_w (0x%02x)\n", space->machine->describe_context(), data);
 
 	centronics_strobe_w(px4->printer, !BIT(data, 0));
 	centronics_prime_w(px4->printer, BIT(data, 1));

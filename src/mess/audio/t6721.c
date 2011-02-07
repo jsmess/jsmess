@@ -150,7 +150,7 @@ WRITE8_DEVICE_HANDLER( t6721_speech_w )
 					t6721->playing = 0;
 					break;
 				case 1: /* start */
-					timer_adjust_periodic(t6721->timer, attotime::zero, 0, attotime::from_hz(8000));
+					t6721->timer->adjust(attotime::zero, 0, attotime::from_hz(8000));
 					t6721->playing = 1;
 					t6721->end_of_sample = 0;
 					t6721->sample_timeindex = 0;
@@ -158,7 +158,7 @@ WRITE8_DEVICE_HANDLER( t6721_speech_w )
 				case 2:
 					t6721->end_of_sample = 0;
 					/*t6721->busy = 0; */
-					timer_reset(t6721->timer, attotime::never);
+					t6721->timer->reset();
 					t6721->playing = 0;
 					break;
 				case 5: /* set rate (in next nibble) */

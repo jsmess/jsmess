@@ -431,7 +431,7 @@ static TIMER_CALLBACK( scv_vb_callback )
 		break;
 	}
 
-	timer_adjust_oneshot( state->vb_timer, machine->primary_screen->time_until_pos(( vpos + 1 ) % 262, 0 ), 0 );
+	state->vb_timer->adjust( machine->primary_screen->time_until_pos(( vpos + 1 ) % 262, 0 ) );
 }
 
 
@@ -736,7 +736,7 @@ static MACHINE_RESET( scv )
 {
 	scv_state *state = machine->driver_data<scv_state>();
 
-	timer_adjust_oneshot( state->vb_timer, machine->primary_screen->time_until_pos(0, 0 ), 0 );
+	state->vb_timer->adjust( machine->primary_screen->time_until_pos(0, 0 ) );
 }
 
 

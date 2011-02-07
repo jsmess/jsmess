@@ -161,5 +161,5 @@ TIMER_CALLBACK( sam_video_update_callback )
 		samcoupe_irq(machine->firstcpu, SAM_LINE_INT);
 
 	/* schedule next update */
-	timer_adjust_oneshot(state->video_update_timer, machine->primary_screen->time_until_pos(next_vpos, next_hpos), 0);
+	state->video_update_timer->adjust(machine->primary_screen->time_until_pos(next_vpos, next_hpos));
 }

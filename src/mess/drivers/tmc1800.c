@@ -430,7 +430,7 @@ static INPUT_CHANGED( monitor_pressed )
 	{
 		// TODO: what are the correct values?
 		int t = RES_K(27) * CAP_U(1) * 1000; // t = R26 * C1
-		timer_adjust_oneshot(state->ef4_timer, attotime::from_msec(t), 0);
+		state->ef4_timer->adjust(attotime::from_msec(t));
 	}
 }
 

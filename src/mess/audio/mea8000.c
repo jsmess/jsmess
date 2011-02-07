@@ -460,7 +460,7 @@ static void mea8000_decode_frame( mea8000_t* mea8000 )
 static void mea8000_start_frame( mea8000_t* mea8000 )
 {
 	/* enter or stay in active mode */
-	timer_reset( mea8000->timer, SAMPLING );
+	mea8000->timer->reset( SAMPLING );
 	mea8000->framepos = 0;
 }
 
@@ -469,7 +469,7 @@ static void mea8000_start_frame( mea8000_t* mea8000 )
 static void mea8000_stop_frame( running_machine *machine, mea8000_t* mea8000 )
 {
 	/* enter stop mode */
-	timer_reset( mea8000->timer, attotime::never );
+	mea8000->timer->reset(  );
 	mea8000->state = MEA8000_STOPPED;
 	dac_signed_data_16_w(machine->device(mea8000->iface->channel), 0x8000);
 }
@@ -535,7 +535,7 @@ static TIMER_CALLBACK( mea8000_timer_expire )
 	else
 	{
 		/* continue frame */
-		timer_reset( mea8000->timer, SAMPLING );
+		mea8000->timer->reset( SAMPLING );
 	}
 }
 
@@ -643,7 +643,7 @@ static DEVICE_RESET( mea8000 )
 	mea8000_t* mea8000 = get_safe_token( device );
 	int i;
 	LOG (( "mea8000_reset\n" ));
-	timer_reset( mea8000->timer, attotime::never );
+	mea8000->timer->reset(  );
 	mea8000->phi = 0;
 	mea8000->cont = 0;
 	mea8000->roe = 0;

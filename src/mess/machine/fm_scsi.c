@@ -187,8 +187,8 @@ UINT8 fmscsi_device::fmscsi_data_r(void)
 		if(m_result_index >= m_result_length)
 		{
 			// end of data transfer
-			timer_adjust_oneshot(m_transfer_timer,attotime::never,0);  // stop timer
-			timer_adjust_oneshot(m_phase_timer,attotime::from_usec(800),SCSI_PHASE_STATUS);
+			m_transfer_timer->adjust(attotime::never);  // stop timer
+			m_phase_timer->adjust(attotime::from_usec(800),SCSI_PHASE_STATUS);
 			if(m_output_lines & FMSCSI_LINE_DMAE)
 			{
 				devcb_call_write_line(&m_drq_func,0);
@@ -201,7 +201,7 @@ UINT8 fmscsi_device::fmscsi_data_r(void)
 	if(m_phase == SCSI_PHASE_MESSAGE_IN)
 	{
 		m_data = 0;  // command complete message
-		timer_adjust_oneshot(m_phase_timer,attotime::from_usec(800),SCSI_PHASE_BUS_FREE);
+		m_phase_timer->adjust(attotime::from_usec(800),SCSI_PHASE_BUS_FREE);
 		m_command_index = 0;
 		return m_data;
 	}
@@ -210,7 +210,7 @@ UINT8 fmscsi_device::fmscsi_data_r(void)
 	{
 		m_data = 0;  // GOOD status
 		// no command complete message?
-		timer_adjust_oneshot(m_phase_timer,attotime::from_usec(800),SCSI_PHASE_MESSAGE_IN);
+		m_phase_timer->adjust(attotime::from_usec(800),SCSI_PHASE_MESSAGE_IN);
 		m_command_index = 0;
 		//set_input_line(FMSCSI_LINE_REQ,1);  // raise REQ yet again
 		return m_data;
@@ -251,8 +251,8 @@ void fmscsi_device::fmscsi_data_w(UINT8 data)
 		if(m_result_index >= m_result_length)
 		{
 			// end of data transfer
-			timer_adjust_oneshot(m_transfer_timer,attotime::never,0);  // stop timer
-			timer_adjust_oneshot(m_phase_timer,attotime::from_usec(800),SCSI_PHASE_STATUS);
+			m_transfer_timer->adjust(attotime::never);  // stop timer
+			m_phase_timer->adjust(attotime::from_usec(800),SCSI_PHASE_STATUS);
 			if(m_output_lines & FMSCSI_LINE_DMAE)
 			{
 				devcb_call_write_line(&m_drq_func,0);
@@ -272,20 +272,20 @@ void fmscsi_device::fmscsi_data_w(UINT8 data)
 			SCSIExecCommand(m_SCSIdevices[m_target],&m_result_length);
 			SCSIGetPhase(m_SCSIdevices[m_target],&phase);
 			if(m_command[0] == 1)  // rezero unit command - not implemented in SCSI code
-				timer_adjust_oneshot(m_phase_timer,attotime::from_usec(800),SCSI_PHASE_STATUS);
+				m_phase_timer->adjust(attotime::from_usec(800),SCSI_PHASE_STATUS);
 			else
-				timer_adjust_oneshot(m_phase_timer,attotime::from_usec(800),phase);
+				m_phase_timer->adjust(attotime::from_usec(800),phase);
 
 			logerror("FMSCSI: Command %02x sent, result length = %i\n",m_command[0],m_result_length);
 		}
 		else
 		{
-			timer_adjust_oneshot(m_phase_timer,attotime::from_usec(800),SCSI_PHASE_COMMAND);
+			m_phase_timer->adjust(attotime::from_usec(800),SCSI_PHASE_COMMAND);
 		}
 	}
 	if(m_phase == SCSI_PHASE_MESSAGE_OUT)
 	{
-		timer_adjust_oneshot(m_phase_timer,attotime::from_usec(800),SCSI_PHASE_STATUS);
+		m_phase_timer->adjust(attotime::from_usec(800),SCSI_PHASE_STATUS);
 	}
 }
 
@@ -322,7 +322,7 @@ void fmscsi_device::set_phase(int phase)
 		set_input_line(FMSCSI_LINE_IO,1);
 		set_input_line(FMSCSI_LINE_REQ,1);
 		// start transfer timer
-		timer_adjust_periodic(m_transfer_timer,attotime::zero,0,attotime::from_hz(3000000));  // arbitrary value for now
+		m_transfer_timer->adjust(attotime::zero,0,attotime::from_hz(3000000));  // arbitrary value for now
 		SCSIReadData(m_SCSIdevices[m_target],m_buffer,512);
 		m_result_index = 0;
 		logerror("FMSCSI: Starting transfer (%i)\n",m_result_length);
@@ -333,7 +333,7 @@ void fmscsi_device::set_phase(int phase)
 		set_input_line(FMSCSI_LINE_IO,0);
 		set_input_line(FMSCSI_LINE_REQ,1);
 		// start transfer timer
-		timer_adjust_periodic(m_transfer_timer,attotime::zero,0,attotime::from_hz(3000000));  // arbitrary value for now
+		m_transfer_timer->adjust(attotime::zero,0,attotime::from_hz(3000000));  // arbitrary value for now
 		m_result_index = 0;
 		logerror("FMSCSI: Starting transfer (%i)\n",m_result_length);
 		break;
@@ -409,7 +409,7 @@ void fmscsi_device::set_output_line(UINT8 line, UINT8 state)
 		{
 			if (image->exists())  // if device is mounted
 			{
-				timer_adjust_oneshot(m_phase_timer,attotime::from_usec(800),SCSI_PHASE_COMMAND);
+				m_phase_timer->adjust(attotime::from_usec(800),SCSI_PHASE_COMMAND);
 				m_data = 0x08;
 			}
 		}
@@ -418,7 +418,7 @@ void fmscsi_device::set_output_line(UINT8 line, UINT8 state)
 	if(line == FMSCSI_LINE_ATN)
 	{
 		if(state != 0)
-			timer_adjust_oneshot(m_phase_timer,attotime::from_usec(800),SCSI_PHASE_MESSAGE_OUT);
+			m_phase_timer->adjust(attotime::from_usec(800),SCSI_PHASE_MESSAGE_OUT);
 	}
 
 	if(state != 0)

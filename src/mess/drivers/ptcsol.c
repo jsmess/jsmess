@@ -332,9 +332,9 @@ WRITE8_MEMBER( sol20_state::sol20_fa_w )
 		(BIT(data, 6)) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 
 	if (data & 0xc0)
-		timer_adjust_periodic(m_cassette_timer, attotime::zero, 0, attotime::from_hz(19200));
+		m_cassette_timer->adjust(attotime::zero, 0, attotime::from_hz(19200));
 	else
-		timer_adjust_oneshot(m_cassette_timer, attotime::zero, 0);
+		m_cassette_timer->adjust(attotime::zero);
 
 	// bit 5 baud rate */
 	ay31015_set_receiver_clock( m_uart, (BIT(data, 5)) ? 4800.0 : 19200.0);

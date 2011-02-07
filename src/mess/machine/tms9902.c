@@ -228,14 +228,14 @@ static void reload_interval_timer(device_t *device)
 	tms9902_t *tms9902 = get_token(device);
 	if (tms9902->TMR)
 	{	/* reset clock interval */
-		timer_adjust_periodic(tms9902->timer,
+		tms9902->timer->adjust(
 						attotime::from_double((double) tms9902->TMR / (tms9902->clock_rate / ((tms9902->CLK4M) ? 4. : 3.) / 64.)),
 						0,
 						attotime::from_double((double) tms9902->TMR / (tms9902->clock_rate / ((tms9902->CLK4M) ? 4. : 3.) / 64.)));
 	}
 	else
 	{	/* clock interval == 0 -> no timer */
-		timer_enable(tms9902->timer, 0);
+		tms9902->timer->enable(0);
 	}
 }
 
@@ -581,7 +581,7 @@ static DEVICE_STOP( tms9902 )
 
 	if (tms9902->timer)
 	{
-		timer_reset(tms9902->timer, attotime::never);	/* FIXME - timers should only be allocated once */
+		tms9902->timer->reset();	/* FIXME - timers should only be allocated once */
 		tms9902->timer = NULL;
 	}
 }

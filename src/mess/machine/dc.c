@@ -80,7 +80,7 @@ static TIMER_CALLBACK( atapi_xfer_end )
 {
 	UINT8 sector_buffer[ 4096 ];
 
-	timer_adjust_oneshot(atapi_timer, attotime::never, 0);
+	atapi_timer->adjust(attotime::never);
 
 	printf("atapi_xfer_end atapi_xferlen = %d, atapi_xfermod=%d\n", atapi_xfermod, atapi_xferlen );
 
@@ -126,7 +126,7 @@ static TIMER_CALLBACK( atapi_xfer_end )
 		atapi_regs[ATAPI_REG_COUNTLOW] = atapi_xferlen & 0xff;
 		atapi_regs[ATAPI_REG_COUNTHIGH] = (atapi_xferlen>>8)&0xff;
 
-		timer_adjust_oneshot(atapi_timer, machine->device<cpu_device>("maincpu")->cycles_to_attotime((ATAPI_CYCLES_PER_SECTOR * (atapi_xferlen/2048))), 0);
+		atapi_timer->adjust(machine->device<cpu_device>("maincpu")->cycles_to_attotime((ATAPI_CYCLES_PER_SECTOR * (atapi_xferlen/2048))));
 	}
 	else
 	{
@@ -369,7 +369,7 @@ static WRITE32_HANDLER( atapi_w )
 
 					case 0x45: // PLAY
 						atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_BSY;
-						timer_adjust_oneshot( atapi_timer, downcast<cpu_device *>(space->cpu)->cycles_to_attotime(ATAPI_CYCLES_PER_SECTOR ), 0 );
+						atapi_timer->adjust( downcast<cpu_device *>(space->cpu)->cycles_to_attotime(ATAPI_CYCLES_PER_SECTOR ) );
 						break;
 				}
 
@@ -546,7 +546,7 @@ void dreamcast_atapi_init(running_machine *machine)
 	atapi_cdata_wait = 0;
 
 	atapi_timer = machine->scheduler().timer_alloc(FUNC(atapi_xfer_end));
-	timer_adjust_oneshot(atapi_timer, attotime::never, 0);
+	atapi_timer->adjust(attotime::never);
 
 	gdrom_device = NULL;
 
@@ -670,7 +670,7 @@ INLINE int decode_reg32_64(running_machine *machine, UINT32 offset, UINT64 mem_m
 	// non 32-bit accesses have not yet been seen here, we need to know when they are
 	if ((mem_mask != U64(0xffffffff00000000)) && (mem_mask != U64(0x00000000ffffffff)))
 	{
-		mame_printf_verbose("%s:Wrong mask!\n", cpuexec_describe_context(machine));
+		mame_printf_verbose("%s:Wrong mask!\n", machine->describe_context());
 //      debugger_break(machine);
 	}
 
@@ -717,7 +717,7 @@ WRITE64_HANDLER( dc_mess_g1_ctrl_w )
 			}
 
 			atapi_xferbase = g1bus_regs[SB_GDSTAR];
-			timer_adjust_oneshot(atapi_timer, space->machine->device<cpu_device>("maincpu")->cycles_to_attotime((ATAPI_CYCLES_PER_SECTOR * (atapi_xferlen/2048))), 0);
+			atapi_timer->adjust(space->machine->device<cpu_device>("maincpu")->cycles_to_attotime((ATAPI_CYCLES_PER_SECTOR * (atapi_xferlen/2048))));
 		}
 		break;
 	}

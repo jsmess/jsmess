@@ -589,7 +589,7 @@ void x07_state::t6834_r (running_machine *machine)
 		m_regs_r[1] = m_out.data[m_out.read];
 		m_regs_r[2] |= 0x01;
 		cpu_set_input_line(m_maincpu, NSC800_RSTA, ASSERT_LINE);
-		timer_adjust_oneshot(m_rsta_clear, attotime::from_msec(50), 0);
+		m_rsta_clear->adjust(attotime::from_msec(50));
 	}
 }
 
@@ -658,7 +658,7 @@ void x07_state::t6834_w (running_machine *machine)
 				m_regs_r[1] = m_out.data[m_out.read];
 				m_regs_r[2] |= 0x01;
 				cpu_set_input_line(m_maincpu, NSC800_RSTA, ASSERT_LINE);
-				timer_adjust_oneshot(m_rsta_clear, attotime::from_msec(50), 0);
+				m_rsta_clear->adjust(attotime::from_msec(50));
 			}
 		}
 	}
@@ -674,7 +674,7 @@ void x07_state::cassette_r(running_machine *machine)
 
 		popmessage("%04x//%04x", m_k7pos, m_k7size);
 
-		timer_adjust_oneshot(m_k7irq, attotime::from_msec(2), 0);
+		m_k7irq->adjust(attotime::from_msec(2));
 	}
 }
 
@@ -844,7 +844,7 @@ void x07_state::kb_irq(running_machine *machine)
 		m_kb_size--;
 		m_regs_r[2] |= 0x01;
 		cpu_set_input_line(m_maincpu, NSC800_RSTA, ASSERT_LINE);
-		timer_adjust_oneshot(m_rsta_clear, attotime::from_msec(50), 0);
+		m_rsta_clear->adjust(attotime::from_msec(50));
 	}
 }
 
@@ -1070,7 +1070,7 @@ WRITE8_MEMBER( x07_state::x07_io_w )
 			beep_set_state(m_beep, 1);
 			beep_set_frequency(m_beep, 192000 / ((m_regs_w[2] | (m_regs_w[3] << 8)) & 0x0fff));
 
-			timer_adjust_oneshot(m_beep_stop, attotime::from_msec(ram_get_ptr(m_ram)[0x450] * 0x20), 0);
+			m_beep_stop->adjust(attotime::from_msec(ram_get_ptr(m_ram)[0x450] * 0x20));
 		}
 		else
 			beep_set_state(m_beep, 0);
@@ -1152,7 +1152,7 @@ static INPUT_CHANGED( kb_break )
 			state->m_regs_r[1] = 0x05;
 			state->m_regs_r[2] |= 0x01;
 			cpu_set_input_line(state->m_maincpu, NSC800_RSTA, ASSERT_LINE );
-			timer_adjust_oneshot(state->m_rsta_clear, attotime::from_msec(50), 0);
+			state->m_rsta_clear->adjust(attotime::from_msec(50));
 		}
 	}
 }
@@ -1319,7 +1319,7 @@ static TIMER_CALLBACK( k7_irq )
 
 	cpu_set_input_line(state->m_maincpu, NSC800_RSTB, ASSERT_LINE);
 
-	timer_adjust_oneshot(state->m_rstb_clear, attotime::from_usec(200), 0);
+	state->m_rstb_clear->adjust(attotime::from_usec(200));
 }
 
 static const gfx_layout x07_charlayout =

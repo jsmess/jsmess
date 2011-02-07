@@ -180,7 +180,7 @@ static void mfp_init(running_machine *machine)
     mfp_timer[2] = machine->scheduler().timer_alloc(FUNC(mfp_timer_c_callback));
     mfp_timer[3] = machine->scheduler().timer_alloc(FUNC(mfp_timer_d_callback));
     mfp_irq = machine->scheduler().timer_alloc(FUNC(mfp_update_irq));
-    timer_adjust_periodic(mfp_irq, attotime::zero, 0, attotime::from_usec(32));
+    mfp_irq->adjust(attotime::zero, 0, attotime::from_usec(32));
 #endif
 }
 
@@ -308,12 +308,12 @@ void mfp_set_timer(int timer, unsigned char data)
 {
     if((data & 0x07) == 0x0000)
     {  // Timer stop
-        timer_adjust_oneshot(mfp_timer[timer], attotime::zero, 0);
+        mfp_timer[timer]->adjust(attotime::zero);
         logerror("MFP: Timer #%i stopped. \n",timer);
         return;
     }
 
-    timer_adjust_periodic(mfp_timer[timer], attotime::zero, 0, prescale(data & 0x07));
+    mfp_timer[timer]->adjust(attotime::zero, 0, prescale(data & 0x07));
     logerror("MFP: Timer #%i set to %2.1fus\n",timer, prescale(data & 0x07).as_double() * 1000000);
 
 }
@@ -945,7 +945,7 @@ static WRITE8_DEVICE_HANDLER( ppi_port_c_w )
 	if((state->ppi_prev & 0x10) == 0x00 && (data & 0x10) == 0x10)
 	{
 		state->mdctrl.seq1++;
-		timer_adjust_oneshot(state->mdctrl.io_timeout1,device->machine->device<cpu_device>("maincpu")->cycles_to_attotime(8192),0);
+		state->mdctrl.io_timeout1->adjust(device->machine->device<cpu_device>("maincpu")->cycles_to_attotime(8192));
 	}
 
 	state->joy.joy2_enable = data & 0x20;
@@ -953,7 +953,7 @@ static WRITE8_DEVICE_HANDLER( ppi_port_c_w )
 	if((state->ppi_prev & 0x20) == 0x00 && (data & 0x20) == 0x20)
 	{
 		state->mdctrl.seq2++;
-		timer_adjust_oneshot(state->mdctrl.io_timeout2,device->machine->device<cpu_device>("maincpu")->cycles_to_attotime(8192),0);
+		state->mdctrl.io_timeout2->adjust(device->machine->device<cpu_device>("maincpu")->cycles_to_attotime(8192));
 	}
 	state->ppi_prev = data;
 
@@ -2572,10 +2572,10 @@ static MACHINE_RESET( x68000 )
 	// start VBlank timer
 	state->crtc.vblank = 1;
 	irq_time = machine->primary_screen->time_until_pos(state->crtc.reg[6],2);
-	timer_adjust_oneshot(state->vblank_irq, irq_time, 0);
+	state->vblank_irq->adjust(irq_time);
 
 	// start HBlank timer
-	timer_adjust_oneshot(state->scanline_timer, machine->primary_screen->scan_period(), 1);
+	state->scanline_timer->adjust(machine->primary_screen->scan_period(), 1);
 
 	state->mfp.gpio = 0xfb;
 
@@ -2621,14 +2621,14 @@ static MACHINE_START( x68000 )
 	memory_set_bankptr(machine, "bank4",state->m_nvram);  // so that code in SRAM is executable, there is an option for booting from SRAM
 
 	// start keyboard timer
-	timer_adjust_periodic(state->kb_timer, attotime::zero, 0, attotime::from_msec(5));  // every 5ms
+	state->kb_timer->adjust(attotime::zero, 0, attotime::from_msec(5));  // every 5ms
 
 	// start mouse timer
-	timer_adjust_periodic(state->mouse_timer, attotime::zero, 0, attotime::from_msec(1));  // a guess for now
+	state->mouse_timer->adjust(attotime::zero, 0, attotime::from_msec(1));  // a guess for now
 	state->mouse.inputtype = 0;
 
 	// start LED timer
-	timer_adjust_periodic(state->led_timer, attotime::zero, 0, attotime::from_msec(400));
+	state->led_timer->adjust(attotime::zero, 0, attotime::from_msec(400));
 }
 
 static MACHINE_START( x68030 )
@@ -2655,14 +2655,14 @@ static MACHINE_START( x68030 )
 	memory_set_bankptr(machine, "bank4",state->m_nvram);  // so that code in SRAM is executable, there is an option for booting from SRAM
 
 	// start keyboard timer
-	timer_adjust_periodic(state->kb_timer, attotime::zero, 0, attotime::from_msec(5));  // every 5ms
+	state->kb_timer->adjust(attotime::zero, 0, attotime::from_msec(5));  // every 5ms
 
 	// start mouse timer
-	timer_adjust_periodic(state->mouse_timer, attotime::zero, 0, attotime::from_msec(1));  // a guess for now
+	state->mouse_timer->adjust(attotime::zero, 0, attotime::from_msec(1));  // a guess for now
 	state->mouse.inputtype = 0;
 
 	// start LED timer
-	timer_adjust_periodic(state->led_timer, attotime::zero, 0, attotime::from_msec(400));
+	state->led_timer->adjust(attotime::zero, 0, attotime::from_msec(400));
 }
 
 static DRIVER_INIT( x68000 )

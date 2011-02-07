@@ -479,7 +479,7 @@ WRITE8_DEVICE_HANDLER( vdt911_cru_w )
 			/* beep enable strobe - not tested */
 			beep_set_state(device->machine->device("beep"), 1);
 
-			timer_adjust_oneshot(vdt->beep_timer, attotime::from_usec(300), 0);
+			vdt->beep_timer->adjust(attotime::from_usec(300));
 			break;
 
 		case 0xf:

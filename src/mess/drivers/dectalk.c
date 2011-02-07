@@ -376,7 +376,7 @@ static WRITE16_HANDLER( m68k_infifo_w ) // 68k write to the speech input fifo
 {
 	dectalk_state *state = space->machine->driver_data<dectalk_state>();
 #ifdef USE_LOOSE_TIMING
-	cpuexec_boost_interleave(space->machine, attotime::zero, attotime::from_usec(25));
+	space->machine->scheduler().boost_interleave(attotime::zero, attotime::from_usec(25));
 #endif
 #ifdef SPC_LOG_68K
 	logerror("m68k: SPC infifo written with data = %04X, fifo head was: %02X; fifo tail: %02X\n",data, state->infifo_head_ptr, state->infifo_tail_ptr);
@@ -411,7 +411,7 @@ static WRITE16_HANDLER( m68k_spcflags_w ) // 68k write to the speech flags (only
 {
 	dectalk_state *state = space->machine->driver_data<dectalk_state>();
 #ifdef USE_LOOSE_TIMING
-	cpuexec_boost_interleave(space->machine, attotime::zero, attotime::from_usec(25));
+	space->machine->scheduler().boost_interleave(attotime::zero, attotime::from_usec(25));
 #endif
 #ifdef SPC_LOG_68K
 	logerror("m68k: SPC flags written with %04X, only storing %04X\n",data, data&0x41);
@@ -560,7 +560,7 @@ static WRITE16_HANDLER( spc_latch_outfifo_error_stats ) // latch 74ls74 @ E64 up
 {
 	dectalk_state *state = space->machine->driver_data<dectalk_state>();
 #ifdef USE_LOOSE_TIMING
-	cpuexec_boost_interleave(space->machine, attotime::zero, attotime::from_usec(25));
+	space->machine->scheduler().boost_interleave(attotime::zero, attotime::from_usec(25));
 #endif
 #ifdef SPC_LOG_DSP
 	logerror("dsp: set fifo semaphore and set error status = %01X\n",data&1);

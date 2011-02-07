@@ -1024,7 +1024,7 @@ static TIMER_CALLBACK( t3_mouse_callback )
 	if(state->timer3_io_reg & 0x80)
 	{
 		pic8259_ir5_w(machine->device("pic8259_slave"), 1);
-		timer_adjust_oneshot(state->t3_mouse_timer, attotime::from_hz(120 >> (state->timer3_io_reg & 3)), 0);
+		state->t3_mouse_timer->adjust(attotime::from_hz(120 >> (state->timer3_io_reg & 3)));
 	}
 }
 
@@ -1038,11 +1038,11 @@ static WRITE8_HANDLER( timer3_ctrl_reg_w )
 	state->timer3_io_reg = data;
 
 	if(data & 0x80)
-		timer_adjust_oneshot(state->t3_mouse_timer, attotime::from_hz(120 >> (state->timer3_io_reg & 3)), 0);
+		state->t3_mouse_timer->adjust(attotime::from_hz(120 >> (state->timer3_io_reg & 3)));
 	else
 	{
 		pic8259_ir5_w(space->machine->device("pic8259_slave"), 0);
-		timer_adjust_oneshot(state->t3_mouse_timer, attotime::never, 0);
+		state->t3_mouse_timer->adjust(attotime::never);
 	}
 }
 
@@ -1512,7 +1512,7 @@ static MACHINE_START( pc88va )
 	cpu_set_irq_callback(machine->device("maincpu"), pc88va_irq_callback);
 
 	state->t3_mouse_timer = machine->scheduler().timer_alloc(FUNC(t3_mouse_callback));
-	timer_adjust_oneshot(state->t3_mouse_timer, attotime::never, 0);
+	state->t3_mouse_timer->adjust(attotime::never);
 }
 
 static MACHINE_RESET( pc88va )

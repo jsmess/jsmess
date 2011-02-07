@@ -311,14 +311,14 @@ static TIMER_CALLBACK( d65010_irq_on_cb )
 
 	/* Set IRQ line and schedule release of IRQ line */
 	cpu_set_input_line( state->maincpu, 0, ASSERT_LINE );
-	timer_adjust_oneshot( state->irq_off_timer, state->screen->time_until_pos(vpos, 380/2 ), 0 );
+	state->irq_off_timer->adjust( state->screen->time_until_pos(vpos, 380/2 ) );
 
 	/* Schedule next IRQ trigger */
 	if ( vpos >= 255 )
 	{
 		next_vpos = 195;
 	}
-	timer_adjust_oneshot( state->irq_on_timer, state->screen->time_until_pos(next_vpos, 0 ), 0 );
+	state->irq_on_timer->adjust( state->screen->time_until_pos(next_vpos, 0 ) );
 }
 
 
@@ -347,8 +347,8 @@ static MACHINE_RESET( pv1000 )
 
 	state->io_regs[5] = 0;
 	state->fd_data = 0;
-	timer_adjust_oneshot( state->irq_on_timer, state->screen->time_until_pos(195, 0 ), 0 );
-	timer_adjust_oneshot( state->irq_off_timer, attotime::never, 0 );
+	state->irq_on_timer->adjust( state->screen->time_until_pos(195, 0 ) );
+	state->irq_off_timer->adjust( attotime::never );
 }
 
 

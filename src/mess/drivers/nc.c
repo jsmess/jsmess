@@ -309,7 +309,7 @@ static TIMER_CALLBACK(nc_keyboard_timer_callback)
         nc_update_interrupts(machine);
 
         /* don't trigger again, but don't free it */
-        timer_reset(state->keyboard_timer, attotime::never);
+        state->keyboard_timer->reset();
 }
 
 
@@ -624,7 +624,7 @@ static WRITE8_HANDLER(nc_irq_status_w)
 		if ((data & (1<<3))!=0)
 		{
 			/* set timer to occur again */
-			timer_reset(state->keyboard_timer, attotime::from_msec(10));
+			state->keyboard_timer->reset(attotime::from_msec(10));
 
 			nc_update_interrupts(space->machine);
 		}
@@ -641,7 +641,7 @@ static WRITE8_HANDLER(nc_irq_status_w)
            )
         {
 			/* set timer to occur again */
-			timer_reset(state->keyboard_timer, attotime::from_msec(10));
+			state->keyboard_timer->reset(attotime::from_msec(10));
         }
 #endif
         state->irq_status &=~data;
@@ -670,7 +670,7 @@ static READ8_HANDLER(nc_key_data_in_r)
 		state->irq_status &= ~(1<<3);
 
 		/* set timer to occur again */
-		timer_reset(state->keyboard_timer, attotime::from_msec(10));
+		state->keyboard_timer->reset(attotime::from_msec(10));
 
 		nc_update_interrupts(space->machine);
 	}
@@ -797,7 +797,7 @@ static WRITE8_HANDLER(nc_uart_control_w)
 		}
 	}
 
-	timer_adjust_periodic(state->serial_timer, attotime::zero, 0, attotime::from_hz(baud_rate_table[(data & 0x07)]));
+	state->serial_timer->adjust(attotime::zero, 0, attotime::from_hz(baud_rate_table[(data & 0x07)]));
 
 	state->uart_control = data;
 }
@@ -994,7 +994,7 @@ static MACHINE_START( nc100 )
 
 	/* keyboard timer */
 	state->keyboard_timer = machine->scheduler().timer_alloc(FUNC(nc_keyboard_timer_callback));
-	timer_adjust_oneshot(state->keyboard_timer, attotime::from_msec(10), 0);
+	state->keyboard_timer->adjust(attotime::from_msec(10));
 
 	/* serial timer */
 	state->serial_timer = machine->scheduler().timer_alloc(FUNC(nc_serial_timer_callback));
@@ -1390,7 +1390,7 @@ static MACHINE_START( nc200 )
 
 	/* keyboard timer */
 	state->keyboard_timer = machine->scheduler().timer_alloc(FUNC(nc_keyboard_timer_callback));
-	timer_adjust_oneshot(state->keyboard_timer, attotime::from_msec(10), 0);
+	state->keyboard_timer->adjust(attotime::from_msec(10));
 
 	/* serial timer */
 	state->serial_timer = machine->scheduler().timer_alloc(FUNC(nc_serial_timer_callback));

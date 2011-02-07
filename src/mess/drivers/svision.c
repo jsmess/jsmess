@@ -69,7 +69,7 @@ static TIMER_CALLBACK(svision_timer)
 {
 	svision_state *state = machine->driver_data<svision_state>();
     state->svision.timer_shot = TRUE;
-    timer_enable(state->svision.timer1, FALSE);
+    state->svision.timer1->enable(FALSE);
     svision_irq( machine );
 }
 
@@ -142,8 +142,8 @@ static WRITE8_HANDLER(svision_w)
 				delay = 16384;
 			else
 				delay = 256;
-			timer_enable(state->svision.timer1, TRUE);
-			timer_reset(state->svision.timer1, space->machine->device<cpu_device>("maincpu")->cycles_to_attotime(value * delay));
+			state->svision.timer1->enable(TRUE);
+			state->svision.timer1->reset(space->machine->device<cpu_device>("maincpu")->cycles_to_attotime(value * delay));
 			break;
 		case 0x10: case 0x11: case 0x12: case 0x13:
 			svision_soundport_w(state->sound, 0, offset & 3, data);

@@ -580,7 +580,7 @@ static TIMER_CALLBACK( osbexec_video_callback )
 		}
 	}
 
-	timer_adjust_oneshot( state->video_timer, machine->primary_screen->time_until_pos( y + 1, 0 ), 0 );
+	state->video_timer->adjust( machine->primary_screen->time_until_pos( y + 1, 0 ) );
 }
 
 
@@ -609,7 +609,7 @@ static MACHINE_RESET( osbexec )
 
 	state->set_banks( machine );
 
-	timer_adjust_oneshot( state->video_timer, machine->primary_screen->time_until_pos( 0, 0 ), 0 );
+	state->video_timer->adjust( machine->primary_screen->time_until_pos( 0, 0 ) );
 
 	state->rtc = 0;
 }

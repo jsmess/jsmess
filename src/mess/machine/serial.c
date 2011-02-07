@@ -184,12 +184,12 @@ void serial_device_set_transmit_state(device_t *device, int state)
 		if (state)
 		{
 			/* start timer */
-			timer_adjust_periodic(ser->timer, attotime::zero, 0, attotime::from_hz(ser->BaudRate));
+			ser->timer->adjust(attotime::zero, 0, attotime::from_hz(ser->BaudRate));
 		}
 		else
 		{
 			/* remove timer */
-			timer_reset(ser->timer, attotime::never);
+			ser->timer->reset();
 		}
 	}
 

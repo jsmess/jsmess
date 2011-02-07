@@ -53,7 +53,7 @@ static WRITE8_HANDLER( phunsy_ctrl_w )
 	phunsy_state *state = space->machine->driver_data<phunsy_state>();
 
 	if (LOG)
-		logerror("%s: phunsy_ctrl_w %02x\n", cpuexec_describe_context(space->machine), data);
+		logerror("%s: phunsy_ctrl_w %02x\n", space->machine->describe_context(), data);
 
 	state->u_bank = data >> 4;
 	state->q_bank = data & 0x0F;
@@ -81,7 +81,7 @@ static WRITE8_HANDLER( phunsy_data_w )
 	phunsy_state *state = space->machine->driver_data<phunsy_state>();
 
 	if (LOG)
-		logerror("%s: phunsy_data_w %02x\n", cpuexec_describe_context(space->machine), data);
+		logerror("%s: phunsy_data_w %02x\n", space->machine->describe_context(), data);
 
 	state->data_out = data;
 
@@ -111,7 +111,7 @@ static READ8_HANDLER( phunsy_data_r )
 	UINT8 data;
 
 	if (LOG)
-		logerror("%s: phunsy_data_r\n", cpuexec_describe_context(space->machine));
+		logerror("%s: phunsy_data_r\n", space->machine->describe_context());
 
 	if ( state->data_out & 0x02 )
 	{

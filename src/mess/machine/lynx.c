@@ -1405,7 +1405,7 @@ static UINT8 lynx_timer_read(lynx_state *state, int which, int offset)
 			else
 			{
 				if ( state->timer[which].timer_active )
-					value = (UINT8) ( state->timer[which].bakup - (timer_timeleft(state->timer[which].timer) * lynx_time_factor( state->timer[which].cntrl1 & 0x07 )).seconds);
+					value = (UINT8) ( state->timer[which].bakup - (state->timer[which].timer->remaining() * lynx_time_factor( state->timer[which].cntrl1 & 0x07 )).seconds);
 			}
 			break;
 
@@ -1442,7 +1442,7 @@ static void lynx_timer_write(lynx_state *state, int which, int offset, UINT8 dat
 	/* Update timers */
 	if ( offset < 3 )
 	{
-		timer_reset(state->timer[which].timer, attotime::never);
+		state->timer[which].timer->reset();
 		state->timer[which].timer_active = 0;
 		if ((state->timer[which].cntrl1 & 0x08))		// 0x48?
 		{
@@ -1450,9 +1450,9 @@ static void lynx_timer_write(lynx_state *state, int which, int offset, UINT8 dat
 			{
 				attotime t = (attotime::from_hz(lynx_time_factor(state->timer[which].cntrl1 & 0x07)) * (state->timer[which].bakup + 1));
 				if (state->timer[which].cntrl1 & 0x10)
-					timer_adjust_periodic(state->timer[which].timer, attotime::zero, which, t);
+					state->timer[which].timer->adjust(attotime::zero, which, t);
 				else
-					timer_adjust_oneshot(state->timer[which].timer, t, which);
+					state->timer[which].timer->adjust(t, which);
 				state->timer[which].timer_active = 1;
 			}
 		}

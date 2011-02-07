@@ -348,7 +348,7 @@ void i8155_device::device_reset()
 	m_status &= ~STATUS_TIMER;
 
 	// stop counting
-	timer_enable(m_timer, 0);
+	m_timer->enable(0);
 
 	// clear timer output
 	m_to = 1;
@@ -379,7 +379,7 @@ void i8155_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 		{
 		case COMMAND_TM_STOP_AFTER_TC:
 			// stop timer
-			timer_enable(m_timer, 0);
+			m_timer->enable(0);
 
 			if (LOG) logerror("8155 '%s' Timer Stopped\n", tag());
 			break;
@@ -495,7 +495,7 @@ void i8155_device::register_w(int offset, UINT8 data)
 		case COMMAND_TM_STOP:
 			// NOP if timer has not started, stop counting if the timer is running
 			if (LOG) logerror("8155 '%s' Timer Command: Stop\n", tag());
-			timer_enable(m_timer, 0);
+			m_timer->enable(0);
 			break;
 
 		case COMMAND_TM_STOP_AFTER_TC:
@@ -506,7 +506,7 @@ void i8155_device::register_w(int offset, UINT8 data)
 		case COMMAND_TM_START:
 			if (LOG) logerror("8155 '%s' Timer Command: Start\n", tag());
 
-			if (timer_enabled(m_timer))
+			if (m_timer->enabled())
 			{
 				// if timer is running, start the new mode and CNT length immediately after present TC is reached
 			}
@@ -514,7 +514,7 @@ void i8155_device::register_w(int offset, UINT8 data)
 			{
 				// load mode and CNT length and start immediately after loading (if timer is not running)
 				m_counter = m_count_length;
-				timer_adjust_periodic(m_timer, attotime::zero, 0, attotime::from_hz(clock()));
+				m_timer->adjust(attotime::zero, 0, attotime::from_hz(clock()));
 			}
 			break;
 		}

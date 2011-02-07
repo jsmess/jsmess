@@ -183,7 +183,7 @@ static void scc8530_resetchannel(scc8530_t *scc, int ch)
 	scc->channel[ch].txUnderrun = 1;
 	scc->channel[ch].baudtimer = timersave;
 
-	timer_adjust_oneshot(scc->channel[ch].baudtimer, attotime::never, ch);
+	scc->channel[ch].baudtimer->adjust(attotime::never, ch);
 }
 
 /*-------------------------------------------------
@@ -212,7 +212,7 @@ static TIMER_CALLBACK( scc8530_baud_expire )
 	}
 
 	// reset timer according to current register values
-	timer_adjust_periodic(pChan->baudtimer, attotime::from_hz(rate), param, attotime::from_hz(rate));
+	pChan->baudtimer->adjust(attotime::from_hz(rate), param, attotime::from_hz(rate));
 }
 
 /*-------------------------------------------------
@@ -430,7 +430,7 @@ static void scc_putreg(device_t *device, int ch, int data)
 				int brconst = pChan->reg_val[13]<<8 | pChan->reg_val[14];
 				int rate = scc->clock / brconst;
 
-				timer_adjust_periodic(pChan->baudtimer, attotime::from_hz(rate), ch, attotime::from_hz(rate));
+				pChan->baudtimer->adjust(attotime::from_hz(rate), ch, attotime::from_hz(rate));
 			}
 			break;
 

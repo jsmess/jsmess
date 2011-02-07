@@ -44,7 +44,7 @@ static READ8_HANDLER( lx800_porta_r )
 {
 	UINT8 result = 0;
 
-	logerror("%s: lx800_porta_r(%02x)\n", cpuexec_describe_context(space->machine), offset);
+	logerror("%s: lx800_porta_r(%02x)\n", space->machine->describe_context(), offset);
 
 	result |= input_port_read(space->machine, "LINEFEED") << 3;
 	result |= input_port_read(space->machine, "FORMFEED") << 4;
@@ -57,7 +57,7 @@ static READ8_HANDLER( lx800_porta_r )
 
 static WRITE8_HANDLER( lx800_porta_w )
 {
-	logerror("%s: lx800_porta_w(%02x): %02x\n", cpuexec_describe_context(space->machine), offset, data);
+	logerror("%s: lx800_porta_w(%02x): %02x\n", space->machine->describe_context(), offset, data);
 	logerror("--> carriage: %d, paper feed: %d\n", BIT(data, 0), BIT(data, 2));
 }
 
@@ -74,7 +74,7 @@ static READ8_HANDLER( lx800_portc_r )
 {
 	UINT8 result = 0;
 
-	logerror("%s: lx800_portc_r(%02x)\n", cpuexec_describe_context(space->machine), offset);
+	logerror("%s: lx800_portc_r(%02x)\n", space->machine->describe_context(), offset);
 
 	result |= input_port_read(space->machine, "ONLINE") << 3;
 
@@ -85,7 +85,7 @@ static WRITE8_HANDLER( lx800_portc_w )
 {
 	lx800_state *lx800 = space->machine->driver_data<lx800_state>();
 
-	logerror("%s: lx800_portc_w(%02x): %02x\n", cpuexec_describe_context(space->machine), offset, data);
+	logerror("%s: lx800_portc_w(%02x): %02x\n", space->machine->describe_context(), offset, data);
 	logerror("--> err: %d, ack: %d, fire: %d, buzzer: %d\n", BIT(data, 4), BIT(data, 5), BIT(data, 6), BIT(data, 7));
 
 	output_set_value("online_led", !BIT(data, 2));
