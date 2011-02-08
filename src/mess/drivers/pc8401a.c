@@ -547,11 +547,11 @@ static MACHINE_START( pc8401a )
 	pc8401a_bankswitch(machine, 0);
 
 	/* register for state saving */
-	state_save_register_global_pointer(machine, state->crt_ram, PC8401A_CRT_VIDEORAM_SIZE);
-	state_save_register_global(machine, state->rtc_data);
-	state_save_register_global(machine, state->rtc_tp);
-	state_save_register_global(machine, state->mmr);
-	state_save_register_global(machine, state->io_addr);
+	state->save_pointer(NAME(state->crt_ram), PC8401A_CRT_VIDEORAM_SIZE);
+	state->save_item(NAME(state->rtc_data));
+	state->save_item(NAME(state->rtc_tp));
+	state->save_item(NAME(state->mmr));
+	state->save_item(NAME(state->io_addr));
 }
 
 static READ8_DEVICE_HANDLER( pc8401a_8255_c_r )

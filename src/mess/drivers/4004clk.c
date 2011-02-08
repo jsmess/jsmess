@@ -138,8 +138,8 @@ static MACHINE_START(4004clk)
 	state->dac = machine->device("dac");
 
 	/* register for state saving */
-	state_save_register_global(machine, state->timer);
-	state_save_register_global_pointer(machine, state->nixie, 6);
+	state->save_item(NAME(state->timer));
+	state->save_pointer(NAME(state->nixie), 6);
 }
 
 static MACHINE_CONFIG_START( 4004clk, _4004clk_state )

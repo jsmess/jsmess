@@ -2885,8 +2885,8 @@ static void generic_init_machine(running_machine *machine, const machine_init_in
    state->bitbanger_input_value = 0;
    state->dac_value = 0;
 
-	state_save_register_global(machine, state->mux_sel1);
-	state_save_register_global(machine, state->mux_sel2);
+	state->save_item(NAME(state->mux_sel1));
+	state->save_item(NAME(state->mux_sel2));
 }
 
 /* Setup for hardware common to CoCo 1/2 & Dragon machines, calls genertic_init_machine, to process */
@@ -3079,11 +3079,11 @@ MACHINE_START( coco3 )
 	state->interupt_line = 0;
 
 	/* set up state save variables */
-	state_save_register_global_array(machine, state->mmu);
-	state_save_register_global_array(machine, state->gimereg);
-	state_save_register_global(machine, state->interupt_line);
-	state_save_register_global(machine, state->gime_irq);
-	state_save_register_global(machine, state->gime_firq);
+	state->save_item(NAME(state->mmu));
+	state->save_item(NAME(state->gimereg));
+	state->save_item(NAME(state->interupt_line));
+	state->save_item(NAME(state->gime_irq));
+	state->save_item(NAME(state->gime_firq));
 	machine->state().register_postload(coco3_state_postload, NULL);
 
 	/* need to specify lightgun crosshairs */

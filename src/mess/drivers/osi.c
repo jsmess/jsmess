@@ -689,8 +689,8 @@ static MACHINE_START( osi600 )
 	}
 
 	/* register for state saving */
-	state_save_register_global(machine, state->keylatch);
-	state_save_register_global_pointer(machine, state->video_ram, OSI600_VIDEORAM_SIZE);
+	state->save_item(NAME(state->keylatch));
+	state->save_pointer(NAME(state->video_ram), OSI600_VIDEORAM_SIZE);
 }
 
 static MACHINE_START( c1p )
@@ -719,11 +719,11 @@ static MACHINE_START( c1p )
 	}
 
 	/* register for state saving */
-	state_save_register_global(machine, state->keylatch);
-	state_save_register_global(machine, state->_32);
-	state_save_register_global(machine, state->coloren);
-	state_save_register_global_pointer(machine, state->video_ram, OSI600_VIDEORAM_SIZE);
-	state_save_register_global_pointer(machine, state->color_ram, OSI630_COLORRAM_SIZE);
+	state->save_item(NAME(state->keylatch));
+	state->save_item(NAME(state->_32));
+	state->save_item(NAME(state->coloren));
+	state->save_pointer(NAME(state->video_ram), OSI600_VIDEORAM_SIZE);
+	state->save_pointer(NAME(state->color_ram), OSI630_COLORRAM_SIZE);
 }
 
 static MACHINE_START( c1pmf )

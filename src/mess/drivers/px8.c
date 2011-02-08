@@ -834,12 +834,12 @@ static MACHINE_START( px8 )
 	state->cassette = machine->device(CASSETTE_TAG);
 
 	/* register for state saving */
-	state_save_register_global(machine, state->ier);
-	state_save_register_global(machine, state->isr);
-	state_save_register_global(machine, state->bank0);
-	state_save_register_global(machine, state->bk2);
-	state_save_register_global(machine, state->sio);
-	state_save_register_global(machine, state->ksc);
+	state->save_item(NAME(state->ier));
+	state->save_item(NAME(state->isr));
+	state->save_item(NAME(state->bank0));
+	state->save_item(NAME(state->bk2));
+	state->save_item(NAME(state->sio));
+	state->save_item(NAME(state->ksc));
 }
 
 static MACHINE_RESET( px8 )

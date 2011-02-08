@@ -103,9 +103,9 @@ static VIDEO_START( pecom )
 	state->charram = auto_alloc_array(machine, UINT8, PECOM_CHAR_RAM_SIZE);
 
 	/* register for state saving */
-	state_save_register_global(machine, state->reset);
-	state_save_register_global(machine, state->dma);
-	state_save_register_global_pointer(machine, state->charram, PECOM_CHAR_RAM_SIZE);
+	state->save_item(NAME(state->reset));
+	state->save_item(NAME(state->dma));
+	state->save_pointer(NAME(state->charram), PECOM_CHAR_RAM_SIZE);
 }
 
 static VIDEO_UPDATE( pecom )

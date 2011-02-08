@@ -573,11 +573,11 @@ static VIDEO_START( jtc_es40 )
 	state->color_ram_b = auto_alloc_array(machine, UINT8, JTC_ES40_VIDEORAM_SIZE);
 
 	/* register for state saving */
-	state_save_register_global(machine, state->video_bank);
-	state_save_register_global_pointer(machine, state->video_ram, JTC_ES40_VIDEORAM_SIZE);
-	state_save_register_global_pointer(machine, state->color_ram_r, JTC_ES40_VIDEORAM_SIZE);
-	state_save_register_global_pointer(machine, state->color_ram_g, JTC_ES40_VIDEORAM_SIZE);
-	state_save_register_global_pointer(machine, state->color_ram_b, JTC_ES40_VIDEORAM_SIZE);
+	state->save_item(NAME(state->video_bank));
+	state->save_pointer(NAME(state->video_ram), JTC_ES40_VIDEORAM_SIZE);
+	state->save_pointer(NAME(state->color_ram_r), JTC_ES40_VIDEORAM_SIZE);
+	state->save_pointer(NAME(state->color_ram_g), JTC_ES40_VIDEORAM_SIZE);
+	state->save_pointer(NAME(state->color_ram_b), JTC_ES40_VIDEORAM_SIZE);
 }
 
 static VIDEO_UPDATE( jtc_es40 )

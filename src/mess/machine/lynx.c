@@ -1798,8 +1798,8 @@ MACHINE_START( lynx )
 {
 	lynx_state *state = machine->driver_data<lynx_state>();
 	int i;
-	state_save_register_global(machine, state->memory_config);
-	state_save_register_global_pointer(machine, state->mem_fe00, state->mem_fe00_size);
+	state->save_item(NAME(state->memory_config));
+	state->save_pointer(NAME(state->mem_fe00), state->mem_fe00_size);
 	machine->state().register_postload(lynx_postload, NULL);
 
 	memory_configure_bank(machine, "bank3", 0, 1, machine->region("maincpu")->base() + 0x0000, 0);

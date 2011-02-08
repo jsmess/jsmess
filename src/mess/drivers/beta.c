@@ -245,13 +245,13 @@ static MACHINE_START( beta )
 	state->led_refresh_timer = machine->scheduler().timer_alloc(FUNC(led_refresh));
 
 	/* register for state saving */
-	state_save_register_global(machine, state->eprom_oe);
-	state_save_register_global(machine, state->eprom_ce);
-	state_save_register_global(machine, state->eprom_addr);
-	state_save_register_global(machine, state->eprom_data);
-	state_save_register_global(machine, state->old_data);
-	state_save_register_global(machine, state->ls145_p);
-	state_save_register_global(machine, state->segment);
+	state->save_item(NAME(state->eprom_oe));
+	state->save_item(NAME(state->eprom_ce));
+	state->save_item(NAME(state->eprom_addr));
+	state->save_item(NAME(state->eprom_data));
+	state->save_item(NAME(state->old_data));
+	state->save_item(NAME(state->ls145_p));
+	state->save_item(NAME(state->segment));
 }
 
 /* Machine Driver */

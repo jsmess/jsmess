@@ -278,7 +278,7 @@ static MACHINE_START( elf2 )
 	memory_set_bank(machine, "bank1", 0);
 
 	/* register for state saving */
-	state_save_register_global(machine, state->data);
+	state->save_item(NAME(state->data));
 }
 
 /* Machine Driver */

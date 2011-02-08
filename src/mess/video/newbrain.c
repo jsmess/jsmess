@@ -11,10 +11,10 @@ static VIDEO_START( newbrain )
 
 	/* register for state saving */
 
-	state_save_register_global(machine, state->tvcnsl);
-	state_save_register_global(machine, state->tvctl);
-	state_save_register_global(machine, state->tvram);
-	state_save_register_global_array(machine, state->segment_data);
+	state->save_item(NAME(state->tvcnsl));
+	state->save_item(NAME(state->tvctl));
+	state->save_item(NAME(state->tvram));
+	state->save_item(NAME(state->segment_data));
 }
 
 static void newbrain_update(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)

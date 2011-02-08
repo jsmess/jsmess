@@ -342,8 +342,8 @@ static MACHINE_START( lc80 )
 	}
 
 	/* register for state saving */
-	state_save_register_global(machine, state->digit);
-	state_save_register_global(machine, state->segment);
+	state->save_item(NAME(state->digit));
+	state->save_item(NAME(state->segment));
 }
 
 /* Machine Driver */

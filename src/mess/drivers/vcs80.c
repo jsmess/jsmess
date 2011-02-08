@@ -200,8 +200,8 @@ static MACHINE_START(vcs80)
 	z80pio_bstb_w(state->z80pio, 1);
 
 	/* register for state saving */
-	state_save_register_global(machine, state->keylatch);
-	state_save_register_global(machine, state->keyclk);
+	state->save_item(NAME(state->keylatch));
+	state->save_item(NAME(state->keyclk));
 }
 
 /* Machine Driver */

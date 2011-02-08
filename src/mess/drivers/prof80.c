@@ -1204,14 +1204,14 @@ static MACHINE_START( prof80 )
 	prof80_bankswitch(machine);
 
 	/* register for state saving */
-	state_save_register_global(machine, state->c0);
-	state_save_register_global(machine, state->c1);
-	state_save_register_global(machine, state->c2);
-	state_save_register_global_array(machine, state->mmu);
-	state_save_register_global(machine, state->init);
-	state_save_register_global(machine, state->fdc_index);
-	state_save_register_global(machine, state->gripd);
-	state_save_register_global(machine, state->gripc);
+	state->save_item(NAME(state->c0));
+	state->save_item(NAME(state->c1));
+	state->save_item(NAME(state->c2));
+	state->save_item(NAME(state->mmu));
+	state->save_item(NAME(state->init));
+	state->save_item(NAME(state->fdc_index));
+	state->save_item(NAME(state->gripd));
+	state->save_item(NAME(state->gripc));
 }
 
 static MACHINE_RESET( prof80 )
@@ -1248,14 +1248,14 @@ static MACHINE_START( grip )
 	memory_set_bank(machine, "videoram", 0);
 
 	/* register for state saving */
-	state_save_register_global(machine, state->vol0);
-	state_save_register_global(machine, state->vol1);
-	state_save_register_global(machine, state->keydata);
-	state_save_register_global(machine, state->kbf);
-	state_save_register_global_pointer(machine, state->video_ram, GRIP_VIDEORAM_SIZE);
-	state_save_register_global(machine, state->lps);
-	state_save_register_global(machine, state->page);
-	state_save_register_global(machine, state->flash);
+	state->save_item(NAME(state->vol0));
+	state->save_item(NAME(state->vol1));
+	state->save_item(NAME(state->keydata));
+	state->save_item(NAME(state->kbf));
+	state->save_pointer(NAME(state->video_ram), GRIP_VIDEORAM_SIZE);
+	state->save_item(NAME(state->lps));
+	state->save_item(NAME(state->page));
+	state->save_item(NAME(state->flash));
 }
 
 static const floppy_config prof80_floppy_config =

@@ -140,7 +140,7 @@ static void init_nes_core( running_machine *machine )
 	if (state->four_screen_vram)
 	{
 		state->extended_ntram = auto_alloc_array(machine, UINT8, 0x2000);
-		state_save_register_global_pointer(machine, state->extended_ntram, 0x2000);
+		state->save_pointer(NAME(state->extended_ntram), 0x2000);
 	}
 
 	// there are still some quirk about writes to bank5... I hope to fix them soon. (mappers 34,45,52,246 have both mid_w and WRAM-->check)
@@ -225,51 +225,51 @@ static void nes_state_register( running_machine *machine )
 {
 	nes_state *state = machine->driver_data<nes_state>();
 
-	state_save_register_global_array(machine, state->prg_bank);
+	state->save_item(NAME(state->prg_bank));
 
-	state_save_register_global(machine, state->MMC5_floodtile);
-	state_save_register_global(machine, state->MMC5_floodattr);
-	state_save_register_global(machine, state->mmc5_vram_control);
+	state->save_item(NAME(state->MMC5_floodtile));
+	state->save_item(NAME(state->MMC5_floodattr));
+	state->save_item(NAME(state->mmc5_vram_control));
 
-	state_save_register_global_array(machine, state->nes_vram_sprite);
-	state_save_register_global(machine, state->last_frame_flip);
+	state->save_item(NAME(state->nes_vram_sprite));
+	state->save_item(NAME(state->last_frame_flip));
 
 	// shared mapper variables
-	state_save_register_global(machine, state->IRQ_enable);
-	state_save_register_global(machine, state->IRQ_enable_latch);
-	state_save_register_global(machine, state->IRQ_count);
-	state_save_register_global(machine, state->IRQ_count_latch);
-	state_save_register_global(machine, state->IRQ_toggle);
-	state_save_register_global(machine, state->IRQ_reset);
-	state_save_register_global(machine, state->IRQ_status);
-	state_save_register_global(machine, state->IRQ_mode);
-	state_save_register_global(machine, state->mult1);
-	state_save_register_global(machine, state->mult2);
-	state_save_register_global(machine, state->mmc_chr_source);
-	state_save_register_global(machine, state->mmc_cmd1);
-	state_save_register_global(machine, state->mmc_cmd2);
-	state_save_register_global(machine, state->mmc_count);
-	state_save_register_global(machine, state->mmc_prg_base);
-	state_save_register_global(machine, state->mmc_prg_mask);
-	state_save_register_global(machine, state->mmc_chr_base);
-	state_save_register_global(machine, state->mmc_chr_mask);
-	state_save_register_global_array(machine, state->mmc_prg_bank);
-	state_save_register_global_array(machine, state->mmc_vrom_bank);
-	state_save_register_global_array(machine, state->mmc_extra_bank);
+	state->save_item(NAME(state->IRQ_enable));
+	state->save_item(NAME(state->IRQ_enable_latch));
+	state->save_item(NAME(state->IRQ_count));
+	state->save_item(NAME(state->IRQ_count_latch));
+	state->save_item(NAME(state->IRQ_toggle));
+	state->save_item(NAME(state->IRQ_reset));
+	state->save_item(NAME(state->IRQ_status));
+	state->save_item(NAME(state->IRQ_mode));
+	state->save_item(NAME(state->mult1));
+	state->save_item(NAME(state->mult2));
+	state->save_item(NAME(state->mmc_chr_source));
+	state->save_item(NAME(state->mmc_cmd1));
+	state->save_item(NAME(state->mmc_cmd2));
+	state->save_item(NAME(state->mmc_count));
+	state->save_item(NAME(state->mmc_prg_base));
+	state->save_item(NAME(state->mmc_prg_mask));
+	state->save_item(NAME(state->mmc_chr_base));
+	state->save_item(NAME(state->mmc_chr_mask));
+	state->save_item(NAME(state->mmc_prg_bank));
+	state->save_item(NAME(state->mmc_vrom_bank));
+	state->save_item(NAME(state->mmc_extra_bank));
 
-	state_save_register_global(machine, state->fds_motor_on);
-	state_save_register_global(machine, state->fds_door_closed);
-	state_save_register_global(machine, state->fds_current_side);
-	state_save_register_global(machine, state->fds_head_position);
-	state_save_register_global(machine, state->fds_status0);
-	state_save_register_global(machine, state->fds_read_mode);
-	state_save_register_global(machine, state->fds_write_reg);
-	state_save_register_global(machine, state->fds_last_side);
-	state_save_register_global(machine, state->fds_count);
+	state->save_item(NAME(state->fds_motor_on));
+	state->save_item(NAME(state->fds_door_closed));
+	state->save_item(NAME(state->fds_current_side));
+	state->save_item(NAME(state->fds_head_position));
+	state->save_item(NAME(state->fds_status0));
+	state->save_item(NAME(state->fds_read_mode));
+	state->save_item(NAME(state->fds_write_reg));
+	state->save_item(NAME(state->fds_last_side));
+	state->save_item(NAME(state->fds_count));
 
-	state_save_register_global_pointer(machine, state->wram, state->wram_size);
+	state->save_pointer(NAME(state->wram), state->wram_size);
 	if (state->battery)
-		state_save_register_global_pointer(machine, state->battery_ram, state->battery_size);
+		state->save_pointer(NAME(state->battery_ram), state->battery_size);
 
 	machine->state().register_postload(nes_banks_restore, NULL);
 }
@@ -1697,7 +1697,7 @@ DRIVER_INIT( famicom )
 
 	state->fds_data = auto_alloc_array_clear(machine, UINT8, 65500 * 2);
 	state->fds_ram = auto_alloc_array_clear(machine, UINT8, 0x8000);
-	state_save_register_global_pointer(machine, state->fds_ram, 0x8000);
+	state->save_pointer(NAME(state->fds_ram), 0x8000);
 
 	// setup CHR accesses to 8k VRAM
 	state->vram = machine->region("gfx2")->base();

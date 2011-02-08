@@ -1948,8 +1948,8 @@ VIDEO_START( sms1 )
 	
 	state->prevleft_bitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED32);
 	state->prevright_bitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED32);
-	state_save_register_global_bitmap(machine, state->prevleft_bitmap);
-	state_save_register_global_bitmap(machine, state->prevright_bitmap);
+	state->save_item(NAME(*state->prevleft_bitmap));
+	state->save_item(NAME(*state->prevright_bitmap));
 }
 
 VIDEO_UPDATE( sms1 )
@@ -2013,7 +2013,7 @@ VIDEO_START( gamegear )
 	
 	state->prev_bitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED32);
 	state->tmp_bitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED32);
-	state_save_register_global_bitmap(machine, state->prev_bitmap);
+	state->save_item(NAME(*state->prev_bitmap));
 }
 
 VIDEO_UPDATE( gamegear )

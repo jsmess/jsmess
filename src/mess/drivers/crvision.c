@@ -884,7 +884,7 @@ static MACHINE_START( creativision )
 	state->centronics = machine->device(CENTRONICS_TAG);
 
 	/* register for state saving */
-	state_save_register_global(machine, state->keylatch);
+	state->save_item(NAME(state->keylatch));
 }
 
 /*-------------------------------------------------

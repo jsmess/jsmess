@@ -369,9 +369,9 @@ static MACHINE_START( mpf1 )
 	state->led_refresh_timer = machine->scheduler().timer_alloc(FUNC(led_refresh));
 
 	/* register for state saving */
-	state_save_register_global(machine, state->_break);
-	state_save_register_global(machine, state->m1);
-	state_save_register_global(machine, state->lednum);
+	state->save_item(NAME(state->_break));
+	state->save_item(NAME(state->m1));
+	state->save_item(NAME(state->lednum));
 }
 
 static MACHINE_RESET( mpf1 )

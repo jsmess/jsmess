@@ -1782,11 +1782,11 @@ MACHINE_START( apple2gs )
 	state_save_register_item(machine, "CLKCURTIME", NULL,0, state->clock_curtime);
 	state_save_register_item(machine, "CLKCURTIMEINT", NULL,0, state->clock_curtime_interval);
 	state_save_register_item(machine, "CLKMODE", NULL,0, state->clock_mode);
-	state_save_register_global_array(machine, state->clock_bram);
+	state->save_item(NAME(state->clock_bram));
 
-	state_save_register_global_array(machine, state->adb_memory);
-	state_save_register_global_array(machine, state->adb_command_bytes);
-	state_save_register_global_array(machine, state->adb_response_bytes);
+	state->save_item(NAME(state->adb_memory));
+	state->save_item(NAME(state->adb_command_bytes));
+	state->save_item(NAME(state->adb_response_bytes));
 	state_save_register_item(machine, "ADB", NULL,0, state->adb_state);
 	state_save_register_item(machine, "ADB", NULL,0, state->adb_command);
 	state_save_register_item(machine, "ADB", NULL,0, state->adb_mode);

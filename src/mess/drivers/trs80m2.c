@@ -968,21 +968,21 @@ static MACHINE_START( trs80m2 )
 	floppy_mon_w(state->floppy, CLEAR_LINE);
 
 	/* register for state saving */
-	state_save_register_global(machine, state->boot_rom);
-	state_save_register_global(machine, state->bank);
-	state_save_register_global(machine, state->msel);
-	state_save_register_global(machine, state->fdc_intrq);
-	state_save_register_global(machine, state->key_latch);
-	state_save_register_global(machine, state->key_data);
-	state_save_register_global(machine, state->key_bit);
-	state_save_register_global(machine, state->kbclk);
-	state_save_register_global(machine, state->kbdata);
-	state_save_register_global(machine, state->kbirq);
-	state_save_register_global(machine, state->blnkvid);
-	state_save_register_global(machine, state->_80_40_char_en);
-	state_save_register_global(machine, state->de);
-	state_save_register_global(machine, state->rtc_int);
-	state_save_register_global(machine, state->enable_rtc_int);
+	state->save_item(NAME(state->boot_rom));
+	state->save_item(NAME(state->bank));
+	state->save_item(NAME(state->msel));
+	state->save_item(NAME(state->fdc_intrq));
+	state->save_item(NAME(state->key_latch));
+	state->save_item(NAME(state->key_data));
+	state->save_item(NAME(state->key_bit));
+	state->save_item(NAME(state->kbclk));
+	state->save_item(NAME(state->kbdata));
+	state->save_item(NAME(state->kbirq));
+	state->save_item(NAME(state->blnkvid));
+	state->save_item(NAME(state->_80_40_char_en));
+	state->save_item(NAME(state->de));
+	state->save_item(NAME(state->rtc_int));
+	state->save_item(NAME(state->enable_rtc_int));
 }
 
 static MACHINE_RESET( trs80m2 )

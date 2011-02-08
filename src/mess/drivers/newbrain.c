@@ -1409,32 +1409,32 @@ static MACHINE_START( newbrain )
 	newbrain_a_bankswitch(machine);
 
 	/* register for state saving */
-	state_save_register_global(machine, state->pwrup);
-	state_save_register_global(machine, state->userint);
-	state_save_register_global(machine, state->userint0);
-	state_save_register_global(machine, state->clkint);
-	state_save_register_global(machine, state->aciaint);
-	state_save_register_global(machine, state->copint);
-	state_save_register_global(machine, state->anint);
-	state_save_register_global(machine, state->bee);
-	state_save_register_global(machine, state->enrg1);
-	state_save_register_global(machine, state->enrg2);
-	state_save_register_global(machine, state->cop_bus);
-	state_save_register_global(machine, state->cop_so);
-	state_save_register_global(machine, state->cop_tdo);
-	state_save_register_global(machine, state->cop_tdi);
-	state_save_register_global(machine, state->cop_rd);
-	state_save_register_global(machine, state->cop_wr);
-	state_save_register_global(machine, state->cop_access);
-	state_save_register_global(machine, state->keylatch);
-	state_save_register_global(machine, state->keydata);
-	state_save_register_global(machine, state->paging);
-	state_save_register_global(machine, state->mpm);
-	state_save_register_global(machine, state->a16);
-	state_save_register_global_array(machine, state->pr);
-	state_save_register_global(machine, state->fdc_int);
-	state_save_register_global(machine, state->fdc_att);
-	state_save_register_global(machine, state->user);
+	state->save_item(NAME(state->pwrup));
+	state->save_item(NAME(state->userint));
+	state->save_item(NAME(state->userint0));
+	state->save_item(NAME(state->clkint));
+	state->save_item(NAME(state->aciaint));
+	state->save_item(NAME(state->copint));
+	state->save_item(NAME(state->anint));
+	state->save_item(NAME(state->bee));
+	state->save_item(NAME(state->enrg1));
+	state->save_item(NAME(state->enrg2));
+	state->save_item(NAME(state->cop_bus));
+	state->save_item(NAME(state->cop_so));
+	state->save_item(NAME(state->cop_tdo));
+	state->save_item(NAME(state->cop_tdi));
+	state->save_item(NAME(state->cop_rd));
+	state->save_item(NAME(state->cop_wr));
+	state->save_item(NAME(state->cop_access));
+	state->save_item(NAME(state->keylatch));
+	state->save_item(NAME(state->keydata));
+	state->save_item(NAME(state->paging));
+	state->save_item(NAME(state->mpm));
+	state->save_item(NAME(state->a16));
+	state->save_item(NAME(state->pr));
+	state->save_item(NAME(state->fdc_int));
+	state->save_item(NAME(state->fdc_att));
+	state->save_item(NAME(state->user));
 }
 
 static MACHINE_START( newbrain_eim )
@@ -1452,7 +1452,7 @@ static MACHINE_START( newbrain_eim )
 	state->upd765 = machine->device(UPD765_TAG);
 
 	/* register for state saving */
-	state_save_register_global_pointer(machine, state->eim_ram, NEWBRAIN_EIM_RAM_SIZE);
+	state->save_pointer(NAME(state->eim_ram), NEWBRAIN_EIM_RAM_SIZE);
 }
 
 static MACHINE_RESET( newbrain )

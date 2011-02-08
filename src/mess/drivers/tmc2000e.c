@@ -253,9 +253,9 @@ static MACHINE_START( tmc2000e )
 	state->cassette = machine->device(CASSETTE_TAG);
 
 	/* register for state saving */
-	state_save_register_global_pointer(machine, state->colorram, TMC2000E_COLORRAM_SIZE);
-	state_save_register_global(machine, state->cdp1864_efx);
-	state_save_register_global(machine, state->keylatch);
+	state->save_pointer(NAME(state->colorram), TMC2000E_COLORRAM_SIZE);
+	state->save_item(NAME(state->cdp1864_efx));
+	state->save_item(NAME(state->keylatch));
 }
 
 static MACHINE_RESET( tmc2000e )

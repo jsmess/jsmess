@@ -878,38 +878,38 @@ static MACHINE_START( pockstat )
 	state->rtc_regs.timer = machine->scheduler().timer_alloc(FUNC(rtc_tick));
 	state->rtc_regs.timer->adjust(attotime::from_hz(1), index);
 
-	state_save_register_global(machine, state->ftlb_regs.control);
-	state_save_register_global(machine, state->ftlb_regs.stat);
-	state_save_register_global(machine, state->ftlb_regs.valid);
-	state_save_register_global(machine, state->ftlb_regs.wait1);
-	state_save_register_global(machine, state->ftlb_regs.wait2);
-	state_save_register_global_array(machine, state->ftlb_regs.entry);
+	state->save_item(NAME(state->ftlb_regs.control));
+	state->save_item(NAME(state->ftlb_regs.stat));
+	state->save_item(NAME(state->ftlb_regs.valid));
+	state->save_item(NAME(state->ftlb_regs.wait1));
+	state->save_item(NAME(state->ftlb_regs.wait2));
+	state->save_item(NAME(state->ftlb_regs.entry));
 
-	state_save_register_global(machine, state->intc_regs.hold);
-	state_save_register_global(machine, state->intc_regs.status);
-	state_save_register_global(machine, state->intc_regs.enable);
-	state_save_register_global(machine, state->intc_regs.mask);
+	state->save_item(NAME(state->intc_regs.hold));
+	state->save_item(NAME(state->intc_regs.status));
+	state->save_item(NAME(state->intc_regs.enable));
+	state->save_item(NAME(state->intc_regs.mask));
 
-	state_save_register_global(machine, state->timer_regs.timer[0].period);
-	state_save_register_global(machine, state->timer_regs.timer[0].count);
-	state_save_register_global(machine, state->timer_regs.timer[0].control);
-	state_save_register_global(machine, state->timer_regs.timer[1].period);
-	state_save_register_global(machine, state->timer_regs.timer[1].count);
-	state_save_register_global(machine, state->timer_regs.timer[1].control);
-	state_save_register_global(machine, state->timer_regs.timer[2].period);
-	state_save_register_global(machine, state->timer_regs.timer[2].count);
-	state_save_register_global(machine, state->timer_regs.timer[2].control);
+	state->save_item(NAME(state->timer_regs.timer[0].period));
+	state->save_item(NAME(state->timer_regs.timer[0].count));
+	state->save_item(NAME(state->timer_regs.timer[0].control));
+	state->save_item(NAME(state->timer_regs.timer[1].period));
+	state->save_item(NAME(state->timer_regs.timer[1].count));
+	state->save_item(NAME(state->timer_regs.timer[1].control));
+	state->save_item(NAME(state->timer_regs.timer[2].period));
+	state->save_item(NAME(state->timer_regs.timer[2].count));
+	state->save_item(NAME(state->timer_regs.timer[2].control));
 
-	state_save_register_global(machine, state->clock_regs.mode);
-	state_save_register_global(machine, state->clock_regs.control);
+	state->save_item(NAME(state->clock_regs.mode));
+	state->save_item(NAME(state->clock_regs.control));
 
-	state_save_register_global(machine, state->rtc_regs.mode);
-	state_save_register_global(machine, state->rtc_regs.control);
-	state_save_register_global(machine, state->rtc_regs.time);
-	state_save_register_global(machine, state->rtc_regs.date);
+	state->save_item(NAME(state->rtc_regs.mode));
+	state->save_item(NAME(state->rtc_regs.control));
+	state->save_item(NAME(state->rtc_regs.time));
+	state->save_item(NAME(state->rtc_regs.date));
 
-	state_save_register_global(machine, state->ps_flash_write_enable_count);
-	state_save_register_global(machine, state->ps_flash_write_count);
+	state->save_item(NAME(state->ps_flash_write_enable_count));
+	state->save_item(NAME(state->ps_flash_write_count));
 }
 
 static MACHINE_RESET( pockstat )

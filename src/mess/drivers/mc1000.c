@@ -396,12 +396,12 @@ static MACHINE_START( mc1000 )
 	mc1000_bankswitch(machine);
 
 	/* register for state saving */
-	state_save_register_global(machine, state->rom0000);
-	state_save_register_global(machine, state->mc6845_bank);
-	state_save_register_global(machine, state->mc6847_bank);
-	state_save_register_global(machine, state->keylatch);
-	state_save_register_global(machine, state->hsync);
-	state_save_register_global(machine, state->vsync);
+	state->save_item(NAME(state->rom0000));
+	state->save_item(NAME(state->mc6845_bank));
+	state->save_item(NAME(state->mc6847_bank));
+	state->save_item(NAME(state->keylatch));
+	state->save_item(NAME(state->hsync));
+	state->save_item(NAME(state->vsync));
 }
 
 static MACHINE_RESET( mc1000 )

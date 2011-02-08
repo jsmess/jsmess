@@ -111,8 +111,8 @@ static MACHINE_START( palm )
     memory_install_write_bank(space, 0x000000, ram_get_size(machine->device(RAM_TAG)) - 1, ram_get_size(machine->device(RAM_TAG)) - 1, 0, "bank1");
     memory_set_bankptr(machine, "bank1", ram_get_ptr(machine->device(RAM_TAG)));
 
-    state_save_register_global(machine, state->port_f_latch);
-    state_save_register_global(machine, state->spim_data);
+    state->save_item(NAME(state->port_f_latch));
+    state->save_item(NAME(state->spim_data));
 	if (machine->device<cpu_device>("maincpu")->debug()) {
 		machine->device<cpu_device>("maincpu")->debug()->set_dasm_override(palm_dasm_override);
 	}

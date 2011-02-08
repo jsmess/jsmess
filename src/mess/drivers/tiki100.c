@@ -604,13 +604,13 @@ static MACHINE_START( tiki100 )
 	tiki100_bankswitch(machine);
 
 	/* register for state saving */
-	state_save_register_global(machine, state->rome);
-	state_save_register_global(machine, state->vire);
-	state_save_register_global_pointer(machine, state->video_ram, TIKI100_VIDEORAM_SIZE);
-	state_save_register_global(machine, state->scroll);
-	state_save_register_global(machine, state->mode);
-	state_save_register_global(machine, state->palette);
-	state_save_register_global(machine, state->keylatch);
+	state->save_item(NAME(state->rome));
+	state->save_item(NAME(state->vire));
+	state->save_pointer(NAME(state->video_ram), TIKI100_VIDEORAM_SIZE);
+	state->save_item(NAME(state->scroll));
+	state->save_item(NAME(state->mode));
+	state->save_item(NAME(state->palette));
+	state->save_item(NAME(state->keylatch));
 }
 
 static FLOPPY_OPTIONS_START(tiki100)

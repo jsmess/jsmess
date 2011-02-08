@@ -91,11 +91,11 @@ static MACHINE_START(sc2)
 
 	state->beep = machine->device("beep");
 	
-	state_save_register_global_array(machine, state->led_7seg_data);
-	state_save_register_global(machine, state->kp_matrix);
-	state_save_register_global(machine, state->led_selected);
-	state_save_register_global(machine, state->digit_data);
-	state_save_register_global(machine, state->beep_state);
+	state->save_item(NAME(state->led_7seg_data));
+	state->save_item(NAME(state->kp_matrix));
+	state->save_item(NAME(state->led_selected));
+	state->save_item(NAME(state->digit_data));
+	state->save_item(NAME(state->beep_state));
 }
 
 static MACHINE_RESET(sc2)

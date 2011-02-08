@@ -455,11 +455,11 @@ static MACHINE_START( c16 )
 	state->messram = machine->device(RAM_TAG);
 	state->sid = machine->device("sid");
 
-	state_save_register_global(machine, state->old_level);
-	state_save_register_global(machine, state->lowrom);
-	state_save_register_global(machine, state->highrom);
-	state_save_register_global(machine, state->port6529);
-	state_save_register_global_array(machine, state->keyline);
+	state->save_item(NAME(state->old_level));
+	state->save_item(NAME(state->lowrom));
+	state->save_item(NAME(state->highrom));
+	state->save_item(NAME(state->port6529));
+	state->save_item(NAME(state->keyline));
 }
 
 static MACHINE_CONFIG_START( c16, c16_state )

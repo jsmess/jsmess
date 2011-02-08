@@ -639,7 +639,7 @@ static MACHINE_START( tmc1800 )
 	state->cassette = machine->device(CASSETTE_TAG);
 
 	/* register for state saving */
-	state_save_register_global(machine, state->keylatch);
+	state->save_item(NAME(state->keylatch));
 }
 
 static MACHINE_RESET( tmc1800 )
@@ -660,7 +660,7 @@ static MACHINE_START( osc1000b )
 	state->cassette = machine->device(CASSETTE_TAG);
 
 	/* register for state saving */
-	state_save_register_global(machine, state->keylatch);
+	state->save_item(NAME(state->keylatch));
 }
 
 static MACHINE_RESET( osc1000b )
@@ -695,8 +695,8 @@ static MACHINE_START( tmc2000 )
 	state->cassette = machine->device(CASSETTE_TAG);
 
 	/* register for state saving */
-	state_save_register_global_pointer(machine, state->colorram, TMC2000_COLORRAM_SIZE);
-	state_save_register_global(machine, state->keylatch);
+	state->save_pointer(NAME(state->colorram), TMC2000_COLORRAM_SIZE);
+	state->save_item(NAME(state->keylatch));
 }
 
 static MACHINE_RESET( tmc2000 )
@@ -734,7 +734,7 @@ static MACHINE_START( nano )
 	state->cassette = machine->device(CASSETTE_TAG);
 
 	/* register for state saving */
-	state_save_register_global(machine, state->keylatch);
+	state->save_item(NAME(state->keylatch));
 }
 
 static MACHINE_RESET( nano )

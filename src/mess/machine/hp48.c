@@ -1215,20 +1215,20 @@ static void hp48_machine_start( running_machine *machine, hp48_models model )
 	machine->scheduler().timer_pulse(attotime::from_msec( 1 ), FUNC(hp48_kbd_cb));
 
 	/* save state */
-	state_save_register_global(machine,  state->out );
-	state_save_register_global(machine,  state->kdn );
-	state_save_register_global(machine,  state->io_addr );
-	state_save_register_global(machine,  state->crc );
-	state_save_register_global(machine,  state->timer1 );
-	state_save_register_global(machine,  state->timer2 );
-	state_save_register_global(machine,  state->bank_switch );
+	state->save_item(NAME(state->out) );
+	state->save_item(NAME(state->kdn) );
+	state->save_item(NAME(state->io_addr) );
+	state->save_item(NAME(state->crc) );
+	state->save_item(NAME(state->timer1) );
+	state->save_item(NAME(state->timer2) );
+	state->save_item(NAME(state->bank_switch) );
 	for ( i = 0; i < 6; i++ )
 	{
 		state_save_register_item(machine, "globals", NULL, i, state->modules[i].state );
 		state_save_register_item(machine, "globals", NULL, i, state->modules[i].base );
 		state_save_register_item(machine, "globals", NULL, i, state->modules[i].mask );
 	}
-	state_save_register_global_array(machine,  state->io );
+	state->save_item(NAME(state->io) );
 	//state_save_register_global_pointer(machine,  machine->generic.nvram.u8, machine->generic.nvram_size );
 
 	machine->state().register_postload( hp48_update_annunciators, NULL );

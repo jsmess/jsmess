@@ -408,7 +408,7 @@ static MACHINE_START( cgc7900 )
 	cgc7900_state *state = machine->driver_data<cgc7900_state>();
 
 	/* register for state saving */
-	state_save_register_global_pointer(machine, state->overlay_ram, 0x4000);
+	state->save_pointer(NAME(state->overlay_ram), 0x4000);
 }
 
 /*-------------------------------------------------

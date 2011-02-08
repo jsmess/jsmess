@@ -548,7 +548,7 @@ static MACHINE_START( vic20 )
 	}
 
 	/* register for state saving */
-	state_save_register_global(machine, state->key_col);
+	state->save_item(NAME(state->key_col));
 }
 
 

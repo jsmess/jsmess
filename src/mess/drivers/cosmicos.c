@@ -566,21 +566,21 @@ static MACHINE_START( cosmicos )
 	set_ram_mode(machine);
 
 	/* register for state saving */
-	state_save_register_global(machine, state->wait);
-	state_save_register_global(machine, state->clear);
-	state_save_register_global(machine, state->sc1);
-	state_save_register_global(machine, state->data);
-	state_save_register_global(machine, state->boot);
-	state_save_register_global(machine, state->ram_protect);
-	state_save_register_global(machine, state->ram_disable);
-	state_save_register_global(machine, state->keylatch);
-	state_save_register_global(machine, state->segment);
-	state_save_register_global(machine, state->digit);
-	state_save_register_global(machine, state->counter);
-	state_save_register_global(machine, state->q);
-	state_save_register_global(machine, state->dmaout);
-	state_save_register_global(machine, state->efx);
-	state_save_register_global(machine, state->video_on);
+	state->save_item(NAME(state->wait));
+	state->save_item(NAME(state->clear));
+	state->save_item(NAME(state->sc1));
+	state->save_item(NAME(state->data));
+	state->save_item(NAME(state->boot));
+	state->save_item(NAME(state->ram_protect));
+	state->save_item(NAME(state->ram_disable));
+	state->save_item(NAME(state->keylatch));
+	state->save_item(NAME(state->segment));
+	state->save_item(NAME(state->digit));
+	state->save_item(NAME(state->counter));
+	state->save_item(NAME(state->q));
+	state->save_item(NAME(state->dmaout));
+	state->save_item(NAME(state->efx));
+	state->save_item(NAME(state->video_on));
 }
 
 static MACHINE_RESET( cosmicos )

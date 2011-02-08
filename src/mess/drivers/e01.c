@@ -405,13 +405,13 @@ static MACHINE_START( e01 )
 	memory_set_bank(machine, "bank4", 0);
 
 	/* register for state saving */
-	state_save_register_global(machine, state->adlc_ie);
-	state_save_register_global(machine, state->hdc_ie);
-	state_save_register_global(machine, state->rtc_irq);
-	state_save_register_global(machine, state->via_irq);
-	state_save_register_global(machine, state->hdc_irq);
-	state_save_register_global(machine, state->fdc_drq);
-	state_save_register_global(machine, state->adlc_irq);
+	state->save_item(NAME(state->adlc_ie));
+	state->save_item(NAME(state->hdc_ie));
+	state->save_item(NAME(state->rtc_irq));
+	state->save_item(NAME(state->via_irq));
+	state->save_item(NAME(state->hdc_irq));
+	state->save_item(NAME(state->fdc_drq));
+	state->save_item(NAME(state->adlc_irq));
 }
 
 /*-------------------------------------------------

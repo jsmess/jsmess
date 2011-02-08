@@ -20,7 +20,7 @@ static VIDEO_START( pc8401a )
 	state->video_ram = auto_alloc_array(machine, UINT8, PC8401A_LCD_VIDEORAM_SIZE);
 
 	/* register for state saving */
-	state_save_register_global_pointer(machine, state->video_ram, PC8401A_LCD_VIDEORAM_SIZE);
+	state->save_pointer(NAME(state->video_ram), PC8401A_LCD_VIDEORAM_SIZE);
 }
 
 static VIDEO_UPDATE( pc8401a )
@@ -43,7 +43,7 @@ static VIDEO_START( pc8500 )
 	state->video_ram = auto_alloc_array(machine, UINT8, PC8500_LCD_VIDEORAM_SIZE);
 
 	/* register for state saving */
-	state_save_register_global_pointer(machine, state->video_ram, PC8500_LCD_VIDEORAM_SIZE);
+	state->save_pointer(NAME(state->video_ram), PC8500_LCD_VIDEORAM_SIZE);
 }
 
 static VIDEO_UPDATE( pc8500 )

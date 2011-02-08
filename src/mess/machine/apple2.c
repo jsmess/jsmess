@@ -1630,7 +1630,7 @@ void apple2_init_common(running_machine *machine)
 	machine->add_notifier(MACHINE_NOTIFY_RESET, apple2_reset);
 
 	/* state save registers */
-	state_save_register_global(machine, state->flags);
+	state->save_item(NAME(state->flags));
 	machine->state().register_postload(apple2_update_memory_postload, NULL);
 
 	/* --------------------------------------------- *

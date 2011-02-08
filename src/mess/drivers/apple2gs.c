@@ -378,7 +378,7 @@ static DRIVER_INIT(apple2gs)
 {
 	apple2gs_state *state = machine->driver_data<apple2gs_state>();
 	es5503_set_base(machine->device("es5503"), state->docram);
-	state_save_register_global_array(machine, state->docram);
+	state->save_item(NAME(state->docram));
 }
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT       INIT      COMPANY            FULLNAME */

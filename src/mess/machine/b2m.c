@@ -334,17 +334,17 @@ MACHINE_START(b2m)
 	wd17xx_set_pause_time(state->fdc,10);
 
 	/* register for state saving */
-	state_save_register_global(machine, state->b2m_8255_porta);
-	state_save_register_global(machine, state->b2m_video_scroll);
-	state_save_register_global(machine, state->b2m_8255_portc);
-	state_save_register_global(machine, state->b2m_video_page);
-	state_save_register_global(machine, state->b2m_drive);
-	state_save_register_global(machine, state->b2m_side);
-	state_save_register_global(machine, state->b2m_romdisk_lsb);
-	state_save_register_global(machine, state->b2m_romdisk_msb);
-	state_save_register_global_pointer(machine, state->b2m_color, 4);
-	state_save_register_global(machine, state->b2m_localmachine);
-	state_save_register_global(machine, state->vblank_state);
+	state->save_item(NAME(state->b2m_8255_porta));
+	state->save_item(NAME(state->b2m_video_scroll));
+	state->save_item(NAME(state->b2m_8255_portc));
+	state->save_item(NAME(state->b2m_video_page));
+	state->save_item(NAME(state->b2m_drive));
+	state->save_item(NAME(state->b2m_side));
+	state->save_item(NAME(state->b2m_romdisk_lsb));
+	state->save_item(NAME(state->b2m_romdisk_msb));
+	state->save_pointer(NAME(state->b2m_color), 4);
+	state->save_item(NAME(state->b2m_localmachine));
+	state->save_item(NAME(state->vblank_state));
 
 	machine->state().register_postload(b2m_postload, NULL);
 }

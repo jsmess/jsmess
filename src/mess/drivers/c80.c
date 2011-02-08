@@ -232,10 +232,10 @@ static MACHINE_START( c80 )
 	state->cassette = machine->device(CASSETTE_TAG);
 
 	/* register for state saving */
-	state_save_register_global(machine, state->keylatch);
-	state_save_register_global(machine, state->digit);
-	state_save_register_global(machine, state->pio1_a5);
-	state_save_register_global(machine, state->pio1_brdy);
+	state->save_item(NAME(state->keylatch));
+	state->save_item(NAME(state->digit));
+	state->save_item(NAME(state->pio1_a5));
+	state->save_item(NAME(state->pio1_brdy));
 }
 
 /* Machine Driver */
