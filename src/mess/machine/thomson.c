@@ -1600,7 +1600,7 @@ MACHINE_START ( to7 )
 	state_save_register_global( machine, to7_lightpen );
 	state_save_register_global( machine, to7_lightpen_step );
 	state_save_register_global_pointer( machine, (mem + 0x10000), 0x10000 );
-	state_save_register_postload( machine,  to7_update_cart_bank_postload, NULL );
+	machine->state().register_postload( to7_update_cart_bank_postload, NULL );
 }
 
 
@@ -1845,8 +1845,8 @@ MACHINE_START ( to770 )
 	state_save_register_global( machine, to7_lightpen );
 	state_save_register_global( machine, to7_lightpen_step );
 	state_save_register_global_pointer( machine, (mem + 0x10000), 0x10000 );
-	state_save_register_postload( machine,  to770_update_ram_bank_postload, NULL );
-	state_save_register_postload( machine,  to7_update_cart_bank_postload, NULL );
+	machine->state().register_postload( to770_update_ram_bank_postload, NULL );
+	machine->state().register_postload( to7_update_cart_bank_postload, NULL );
 }
 
 
@@ -2220,7 +2220,7 @@ MACHINE_START ( mo5 )
 	state_save_register_global( machine, to7_lightpen_step );
 	state_save_register_global( machine, mo5_reg_cart );
 	state_save_register_global_pointer( machine, (mem + 0x10000), 0x10000 );
-	state_save_register_postload( machine,  mo5_update_cart_bank_postload, NULL );
+	machine->state().register_postload( mo5_update_cart_bank_postload, NULL );
 }
 
 
@@ -3184,8 +3184,8 @@ MACHINE_START ( to9 )
 	state_save_register_global( machine, to7_lightpen_step );
 	state_save_register_global( machine, to9_soft_bank );
 	state_save_register_global_pointer( machine, (mem + 0x10000), 0x10000 );
-	state_save_register_postload( machine,  to9_update_ram_bank_postload, NULL );
-	state_save_register_postload( machine,  to9_update_cart_bank_postload, NULL );
+	machine->state().register_postload( to9_update_ram_bank_postload, NULL );
+	machine->state().register_postload( to9_update_cart_bank_postload, NULL );
 }
 
 
@@ -4193,9 +4193,9 @@ MACHINE_START ( to8 )
 	state_save_register_global( machine, to8_data_vpage );
 	state_save_register_global( machine, to8_cart_vpage );
 	state_save_register_global_pointer( machine, (mem + 0x10000), 0x10000 );
-	state_save_register_postload( machine,  to8_update_ram_bank_postload, NULL );
-	state_save_register_postload( machine,  to8_update_cart_bank_postload, NULL );
-	state_save_register_postload( machine,  to8_update_floppy_bank_postload, NULL );
+	machine->state().register_postload( to8_update_ram_bank_postload, NULL );
+	machine->state().register_postload( to8_update_cart_bank_postload, NULL );
+	machine->state().register_postload( to8_update_floppy_bank_postload, NULL );
 }
 
 
@@ -4363,9 +4363,9 @@ MACHINE_START ( to9p )
 	state_save_register_global( machine, to8_data_vpage );
 	state_save_register_global( machine, to8_cart_vpage );
 	state_save_register_global_pointer( machine, (mem + 0x10000), 0x10000 );
-	state_save_register_postload( machine,  to8_update_ram_bank_postload, NULL );
-	state_save_register_postload( machine,  to8_update_cart_bank_postload, NULL );
-	state_save_register_postload( machine,  to8_update_floppy_bank_postload, NULL );
+	machine->state().register_postload( to8_update_ram_bank_postload, NULL );
+	machine->state().register_postload( to8_update_cart_bank_postload, NULL );
+	machine->state().register_postload( to8_update_floppy_bank_postload, NULL );
 }
 
 
@@ -4987,8 +4987,8 @@ MACHINE_START ( mo6 )
 	state_save_register_global( machine, to8_cart_vpage );
 	state_save_register_global( machine, mo5_reg_cart );
 	state_save_register_global_pointer( machine, (mem + 0x10000), 0x10000 );
-	state_save_register_postload( machine,  mo6_update_ram_bank_postload, NULL );
-	state_save_register_postload( machine,  mo6_update_cart_bank_postload, NULL );
+	machine->state().register_postload( mo6_update_ram_bank_postload, NULL );
+	machine->state().register_postload( mo6_update_cart_bank_postload, NULL );
 }
 
 
@@ -5247,6 +5247,6 @@ MACHINE_START ( mo5nr )
 	state_save_register_global( machine, to8_cart_vpage );
 	state_save_register_global( machine, mo5_reg_cart );
 	state_save_register_global_pointer( machine, (mem + 0x10000), 0x10000 );
-	state_save_register_postload( machine,  mo6_update_ram_bank_postload, NULL );
-	state_save_register_postload( machine,  mo6_update_cart_bank_postload, NULL );
+	machine->state().register_postload( mo6_update_ram_bank_postload, NULL );
+	machine->state().register_postload( mo6_update_cart_bank_postload, NULL );
 }

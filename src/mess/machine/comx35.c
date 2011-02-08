@@ -612,7 +612,7 @@ void comx35_state::machine_start()
 	m_reset_timer = machine->scheduler().timer_alloc(FUNC(reset_tick));
 
 	/* register for state saving */
-	state_save_register_postload(machine, comx35_state_save_postload, NULL);
+	machine->state().register_postload(comx35_state_save_postload, NULL);
 	state_save_register_global(machine, m_reset);
 	state_save_register_global(machine, m_cdp1802_q);
 	state_save_register_global(machine, m_cdp1802_ef4);

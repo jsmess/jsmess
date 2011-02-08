@@ -271,7 +271,7 @@ static void nes_state_register( running_machine *machine )
 	if (state->battery)
 		state_save_register_global_pointer(machine, state->battery_ram, state->battery_size);
 
-	state_save_register_postload(machine, nes_banks_restore, NULL);
+	machine->state().register_postload(nes_banks_restore, NULL);
 }
 
 MACHINE_START( nes )

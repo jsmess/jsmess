@@ -1273,7 +1273,7 @@ static void common_machine_start(running_machine* machine)
 	state_save_register_global(machine, state->led2_value);
 	state_save_register_global(machine, state->recurse);
 
-	state_save_register_postload(machine, aes_postload, NULL);
+	machine->state().register_postload(aes_postload, NULL);
 }
 
 static MACHINE_START( neogeo )

@@ -1757,7 +1757,7 @@ MACHINE_START( apple2gs )
 	apple2gs_setup_memory(machine);
 
 	/* save state stuff.  note that the driver takes care of docram. */
-	state_save_register_global_array(machine, ram_get_ptr(machine->device(RAM_TAG)));
+	state_save_register_global_pointer(machine, ram_get_ptr(machine->device(RAM_TAG)),ram_get_size(machine->device(RAM_TAG)));
 
 	state_save_register_item(machine, "NEWVIDEO", NULL, 0, state->newvideo);
 

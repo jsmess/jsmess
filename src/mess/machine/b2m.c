@@ -346,7 +346,7 @@ MACHINE_START(b2m)
 	state_save_register_global(machine, state->b2m_localmachine);
 	state_save_register_global(machine, state->vblank_state);
 
-	state_save_register_postload(machine, b2m_postload, NULL);
+	machine->state().register_postload(b2m_postload, NULL);
 }
 
 static IRQ_CALLBACK(b2m_irq_callback)

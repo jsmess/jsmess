@@ -1231,8 +1231,8 @@ static void hp48_machine_start( running_machine *machine, hp48_models model )
 	state_save_register_global_array(machine,  state->io );
 	//state_save_register_global_pointer(machine,  machine->generic.nvram.u8, machine->generic.nvram_size );
 
-	state_save_register_postload( machine, hp48_update_annunciators, NULL );
-	state_save_register_postload( machine, hp48_apply_modules, NULL );
+	machine->state().register_postload( hp48_update_annunciators, NULL );
+	machine->state().register_postload( hp48_apply_modules, NULL );
 
 #ifdef CHARDEV
 	/* direct I/O */

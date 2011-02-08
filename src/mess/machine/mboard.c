@@ -254,8 +254,8 @@ static STATE_POSTLOAD( m_board_postload )
 void mboard_savestate_register(running_machine *machine)
 {
 	state_save_register_global_array(machine,save_board);
-	state_save_register_postload(machine,m_board_postload,NULL);
-	state_save_register_presave(machine,m_board_presave,NULL);
+	machine->state().register_postload(m_board_postload,NULL);
+	machine->state().register_presave(m_board_presave,NULL);
 }
 
 void mboard_set_board( void )

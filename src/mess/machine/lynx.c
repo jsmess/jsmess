@@ -1800,7 +1800,7 @@ MACHINE_START( lynx )
 	int i;
 	state_save_register_global(machine, state->memory_config);
 	state_save_register_global_pointer(machine, state->mem_fe00, state->mem_fe00_size);
-	state_save_register_postload(machine, lynx_postload, NULL);
+	machine->state().register_postload(lynx_postload, NULL);
 
 	memory_configure_bank(machine, "bank3", 0, 1, machine->region("maincpu")->base() + 0x0000, 0);
 	memory_configure_bank(machine, "bank3", 1, 1, state->mem_fe00, 0);

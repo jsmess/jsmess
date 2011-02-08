@@ -3084,7 +3084,7 @@ MACHINE_START( coco3 )
 	state_save_register_global(machine, state->interupt_line);
 	state_save_register_global(machine, state->gime_irq);
 	state_save_register_global(machine, state->gime_firq);
-	state_save_register_postload(machine, coco3_state_postload, NULL);
+	machine->state().register_postload(coco3_state_postload, NULL);
 
 	/* need to specify lightgun crosshairs */
 	machine->scheduler().timer_set(attotime::zero, FUNC(update_lightgun_timer_callback));

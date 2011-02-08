@@ -554,8 +554,8 @@ static MACHINE_START( supercon )
 	state->timer_update_irq->adjust( attotime::zero, 0, attotime::from_hz(1000) );
 
 	state_save_register_global_array(machine,state->save_board);
-	state_save_register_postload(machine,m_board_postload,NULL);
-	state_save_register_presave(machine,m_board_presave,NULL);
+	machine->state().register_postload(m_board_postload,NULL);
+	machine->state().register_presave(m_board_presave,NULL);
 }
 
 static MACHINE_RESET( supercon )

@@ -1935,7 +1935,7 @@ static DEVICE_START( mc6847 )
 	devcb_resolve_read_line(&mc6847->in_css_func, &intf->in_css_func, device);
 
 	/* setup save states */
-	state_save_register_postload(device->machine, mc6847_postload, mc6847);
+	device->machine->state().register_postload(mc6847_postload, mc6847);
 }
 
 static DEVICE_RESET( mc6847 )

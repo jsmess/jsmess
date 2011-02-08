@@ -66,7 +66,7 @@ struct mscrtc6845 *pc_video_start(running_machine *machine, const struct mscrtc6
 		video_start_generic_bitmapped(machine);
 	}
 
-	state_save_register_postload(machine, pc_video_postload, NULL);
+	machine->state().register_postload(pc_video_postload, NULL);
 	return pc_crtc;
 }
 
