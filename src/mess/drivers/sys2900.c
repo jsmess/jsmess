@@ -48,7 +48,8 @@ public:
 
 static ADDRESS_MAP_START(sys2900_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0xefff ) AM_RAM
+	AM_RANGE( 0x0000, 0x07ff ) AM_RAMBANK("boot")
+	AM_RANGE( 0x0800, 0xefff ) AM_RAM
 	AM_RANGE( 0xf000, 0xf7ff ) AM_ROM
 	AM_RANGE( 0xf800, 0xffff ) AM_RAM
 ADDRESS_MAP_END
@@ -62,8 +63,22 @@ static INPUT_PORTS_START( sys2900 )
 INPUT_PORTS_END
 
 
+/* after the first 4 bytes have been read from ROM, switch the ram back in */
+static TIMER_CALLBACK( sys2900_boot )
+{
+	memory_set_bank(machine, "boot", 0);
+}
+
 static MACHINE_RESET(sys2900)
 {
+	memory_set_bank(machine, "boot", 1);
+	machine->scheduler().timer_set(attotime::from_usec(5), FUNC(sys2900_boot));
+}
+
+DRIVER_INIT( sys2900 )
+{
+	UINT8 *RAM = machine->region("maincpu")->base();
+	memory_configure_bank(machine, "boot", 0, 2, &RAM[0x0000], 0xf000);
 }
 
 static VIDEO_START( sys2900 )
@@ -72,40 +87,39 @@ static VIDEO_START( sys2900 )
 
 static VIDEO_UPDATE( sys2900 )
 {
-    return 0;
+	return 0;
 }
 
 static MACHINE_CONFIG_START( sys2900, sys2900_state )
-    /* basic machine hardware */
-    MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
-    MCFG_CPU_PROGRAM_MAP(sys2900_mem)
-    MCFG_CPU_IO_MAP(sys2900_io)
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
+	MCFG_CPU_PROGRAM_MAP(sys2900_mem)
+	MCFG_CPU_IO_MAP(sys2900_io)
 
-    MCFG_MACHINE_RESET(sys2900)
+	MCFG_MACHINE_RESET(sys2900)
 
-    /* video hardware */
-    MCFG_SCREEN_ADD("screen", RASTER)
-    MCFG_SCREEN_REFRESH_RATE(50)
-    MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-    MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-    MCFG_SCREEN_SIZE(640, 480)
-    MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-    MCFG_PALETTE_LENGTH(2)
-    MCFG_PALETTE_INIT(black_and_white)
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(640, 480)
+	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+	MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_INIT(black_and_white)
 
-    MCFG_VIDEO_START(sys2900)
-    MCFG_VIDEO_UPDATE(sys2900)
+	MCFG_VIDEO_START(sys2900)
+	MCFG_VIDEO_UPDATE(sys2900)
 MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( sys2900 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "104401cpc.bin", 0xf000, 0x0800, CRC(6c8848bc) SHA1(890e0578e5cb0e3433b4b173e5ed71d72a92af26))
-
 ROM_END
 
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1981, sys2900,  0,       0,	sys2900,	sys2900,	 0,  "Systems Group",   "System 2900",		GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1981, sys2900,  0,       0,    sys2900, sys2900, sys2900,  "Systems Group",   "System 2900", GAME_NOT_WORKING | GAME_NO_SOUND)
 
