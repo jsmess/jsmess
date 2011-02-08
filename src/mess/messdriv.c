@@ -863,6 +863,8 @@ const game_driver * const drivers[] =
 	DRIVER( pc8801mc )
 	DRIVER( pc88va )
 
+	DRIVER( pc9801f )	/* 1983 */
+
 	DRIVER( pc9801 )
 	DRIVER( pc9821 )
 	DRIVER( pc9821ne )
