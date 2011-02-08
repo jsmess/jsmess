@@ -99,7 +99,7 @@ static INPUT_PORTS_START(ti99_4a)
 	PORT_CONFNAME( 0x07, 0x01, "RAM extension" )
 		PORT_CONFSETTING(    0x00, DEF_STR( None ) )
 		PORT_CONFSETTING(    0x01, "Console 32 KiB (16 bit)" )
-		PORT_CONFSETTING(    0x02, "TI Memexp card 32 KiB" )
+		PORT_CONFSETTING(    0x02, "TI 32 KiB card" )
 		PORT_CONFSETTING(    0x03, "Super AMS 1MiB" )
 		PORT_CONFSETTING(    0x07, "Myarc 512 KiB" )
 
@@ -143,6 +143,12 @@ static INPUT_PORTS_START(ti99_4a)
 	PORT_CONFNAME( 0x01, 0x00, "Mouse support" )
 		PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 		PORT_CONFSETTING(    0x01, "Mechatronics Mouse" )
+
+	// We do not want to show this setting; makes only sense for Geneve
+	PORT_START( "MODE" )
+	PORT_CONFNAME( 0x01, 0x00, "Ext. cards modification" ) PORT_CONDITION( "HFDCDIP", 0x0f, PORTCOND_EQUALS, GM_NEVER )
+		PORT_CONFSETTING(    0x00, "Standard" )
+		PORT_CONFSETTING(    GENMOD, "GenMod" )
 
 	PORT_START( "CARTSLOT" )
 	PORT_DIPNAME( 0x0f, CART_AUTO, "Cartridge slot" )
@@ -327,11 +333,11 @@ static INPUT_PORTS_START(ti99_4ev)
 	PORT_DIPNAME( 0x01, 0x00, "EVPC Configuration" )
 		PORT_DIPSETTING(    0x00, "DIP" )
 		PORT_DIPSETTING(    0x01, "NOVRAM" )
-		
+
 	PORT_START( "V9938-MEM" )
 	PORT_CONFNAME( 0x01, 0x00, "V9938 RAM size" )
 		PORT_CONFSETTING(	0x00, "128 KiB" )
-		PORT_CONFSETTING(	0x01, "192 KiB" )	
+		PORT_CONFSETTING(	0x01, "192 KiB" )
 
 INPUT_PORTS_END
 
@@ -343,12 +349,10 @@ static INPUT_PORTS_START(ti99_4)
 
 	PORT_START( "RAM" )	/* config */
 	PORT_CONFNAME( 0x07, 0x01, "RAM extension" )
+		PORT_CONFSETTING(    0x00, DEF_STR( None ) )
 		PORT_CONFSETTING(    0x01, "Console 32 KiB (16 bit)" )
-		PORT_CONFSETTING(    0x02, "Texas Instruments 32 KiB" )
+		PORT_CONFSETTING(    0x02, "TI 32 KiB card" )
 		PORT_CONFSETTING(    0x03, "Super AMS 1MiB" )
-		PORT_CONFSETTING(    0x04, "Foundation 128 KiB" )
-		PORT_CONFSETTING(    0x05, "Foundation 512 KiB" )
-		PORT_CONFSETTING(    0x06, "Myarc 128 KiB" )
 		PORT_CONFSETTING(    0x07, "Myarc 512 KiB" )
 
 	PORT_START( "SPEECH" )
@@ -434,6 +438,12 @@ static INPUT_PORTS_START(ti99_4)
 		PORT_DIPSETTING( 0xaa, "40 track, 8 ms")
 		PORT_DIPSETTING( 0x55, "80 track, 2 ms")
 		PORT_DIPSETTING( 0xff, "80 track HD, 2 ms")
+
+	// We do not want to show this setting; makes only sense for Geneve
+	PORT_START( "MODE" )
+	PORT_CONFNAME( 0x01, 0x00, "Ext. cards modification" ) PORT_CONDITION( "HFDCDIP", 0x0f, PORTCOND_EQUALS, GM_NEVER )
+		PORT_CONFSETTING(    0x00, "Standard" )
+		PORT_CONFSETTING(    GENMOD, "GenMod" )
 
 	PORT_START( "DRVSPD" )
 	PORT_CONFNAME( 0x01, 0x01, "Floppy and HD speed" ) PORT_CONDITION( "DISKCTRL", 0x07, PORTCOND_EQUALS, 0x03 )

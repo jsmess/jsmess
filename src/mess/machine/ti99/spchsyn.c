@@ -24,7 +24,7 @@ typedef ti99_pebcard_config ti99_speech_config;
 
 typedef struct _ti99_speech_state
 {
-	device_t			*vsp;
+	device_t				*vsp;
 	UINT8					*speechrom_data;		/* pointer to speech ROM data */
 	int 					load_pointer;			/* which 4-bit nibble will be affected by load address */
 	int 					ROM_bits_count;				/* current bit position in ROM */
@@ -32,6 +32,8 @@ typedef struct _ti99_speech_state
 	UINT32					speechROMlen;			/* length of data pointed by speechrom_data, from 0 to 2^18 */
 	ti99_peb_connect		lines;
 
+	int						select_mask;
+	int						select_value;
 } ti99_speech_state;
 
 INLINE ti99_speech_state *get_safe_token(device_t *device)
@@ -133,7 +135,7 @@ static READ8Z_DEVICE_HANDLER( speech_rz )
 {
 	ti99_speech_state *adapter = get_safe_token(device);
 
-	if ((offset & 0xfc01)==0x9000)
+	if ((offset & adapter->select_mask)==adapter->select_value)
 	{
 		cpu_adjust_icount(device->machine->device("maincpu"),-(18+3));		/* this is just a minimum, it can be more */
 		*value = tms5220_status_r(adapter->vsp, offset) & 0xff;
@@ -147,7 +149,7 @@ static WRITE8_DEVICE_HANDLER( speech_w )
 {
 	ti99_speech_state *adapter = get_safe_token(device);
 
-	if ((offset & 0xfc01)==0x9400)
+	if ((offset & adapter->select_mask)==(adapter->select_value | 0x0400))
 	{
 		cpu_adjust_icount(device->machine->device("maincpu"),-(54+3));		/* this is just an approx. minimum, it can be much more */
 
@@ -214,6 +216,16 @@ static DEVICE_RESET( ti99_speech )
 		adapter->speechROMaddr = 0;
 		adapter->load_pointer = 0;
 		adapter->ROM_bits_count = 0;
+
+		adapter->select_mask = 0x7fc01;
+		adapter->select_value = 0x79000;
+
+		if (input_port_read(device->machine, "MODE")==GENMOD)
+		{
+			// GenMod card modification
+			adapter->select_mask = 0x1ffc01;
+			adapter->select_value = 0x179000;
+		}
 	}
 }
 

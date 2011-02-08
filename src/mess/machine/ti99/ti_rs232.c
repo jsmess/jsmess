@@ -34,6 +34,8 @@ typedef struct _ti_rs232_state
 	device_t *uart0, *uart1, *serdev0, *serdev1, *piodev;
 
 	int 	selected;
+	int		select_mask;
+	int		select_value;
 
 	// PIO flags
 	int pio_direction;		// a.k.a. PIOOC pio in output mode if 0
@@ -330,7 +332,7 @@ static READ8Z_DEVICE_HANDLER( data_rz )
 		// lines are there.
 		card->ila = 0;
 	}
-	if (((offset & 0xe000)==0x4000) && card->selected)
+	if (((offset & card->select_mask)==card->select_value) && card->selected)
 	{
 		if ((offset & 0x1000)==0x0000)
 		{
@@ -350,7 +352,7 @@ static WRITE8_DEVICE_HANDLER( data_w )
 {
 	ti_rs232_state *card = get_safe_token(device);
 
-	if (((offset & 0xe000)==0x4000) && card->selected)
+	if (((offset & card->select_mask)==card->select_value) && card->selected)
 	{
 		if ((offset & 0x1001)==0x1000)
 		{
@@ -539,6 +541,16 @@ static DEVICE_RESET( ti_rs232 )
 		card->cts2 = 0;
 		card->led = 0;
 		card->pio_write = 1;
+
+		card->select_mask = 0x7e000;
+		card->select_value = 0x74000;
+
+		if (input_port_read(device->machine, "MODE")==GENMOD)
+		{
+			// GenMod card modification
+			card->select_mask = 0x1fe000;
+			card->select_value = 0x174000;
+		}
 	}
 }
 

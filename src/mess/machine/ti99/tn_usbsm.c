@@ -48,6 +48,11 @@ typedef struct _tn_usbsm_state
 	device_t *strata;
 
 	int 	selected;
+
+	/* Used for GenMod */
+	int 	select_mask;
+	int		select_value;
+
 	int		feeprom_page;
 	int		sram_page;
 	int		cru_register;
@@ -259,16 +264,17 @@ static WRITE8_DEVICE_HANDLER( cru_w )
 
 /*
     Memory read
+    TODO: Check whether AMA/B/C is actually checked
 */
 static READ8Z_DEVICE_HANDLER( data_rz )
 {
 	tn_usbsm_state *card = get_safe_token(device);
 
-	if (((offset & 0xe000)==0x4000) && card->selected)
+	if (((offset & card->select_mask)==card->select_value) && card->selected)
 	{
 		if (card->tms9995_mode ? (!(offset & 1)) : (offset & 1))
 		{	/* first read triggers 16-bit read cycle */
-			card->input_latch = usbsm_mem_16_r(device, offset >> 1);
+			card->input_latch = usbsm_mem_16_r(device, (offset >> 1)&0xffff);
 		}
 
 		/* return latched input */
@@ -283,7 +289,7 @@ static WRITE8_DEVICE_HANDLER( data_w )
 {
 	tn_usbsm_state *card = get_safe_token(device);
 
-	if (((offset & 0xe000)==0x4000) && card->selected)
+	if (((offset & card->select_mask)==card->select_value) && card->selected)
 	{
 		/* latch write */
 		if (offset & 1)
@@ -293,7 +299,7 @@ static WRITE8_DEVICE_HANDLER( data_w )
 
 		if ((card->tms9995_mode)? (offset & 1) : (!(offset & 1)))
 		{	/* second write triggers 16-bit write cycle */
-			usbsm_mem_16_w(device, offset >> 1, card->output_latch);
+			usbsm_mem_16_w(device, (offset >> 1)&0xffff, card->output_latch);
 		}
 	}
 }
@@ -335,6 +341,16 @@ static DEVICE_RESET( tn_usbsm )
 		card->sram_page = 0;
 		card->cru_register = 0;
 		card->tms9995_mode = (device->type()==TMS9995);
+
+		card->select_mask = 0x7e000;
+		card->select_value = 0x74000;
+
+		if (input_port_read(device->machine, "MODE")==GENMOD)
+		{
+			// GenMod card modification
+			card->select_mask = 0x1fe000;
+			card->select_value = 0x174000;
+		}
 	}
 }
 

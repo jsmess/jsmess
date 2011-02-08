@@ -241,10 +241,16 @@ ADDRESS_MAP_END
 
 /* 101-key PC XT keyboard + TI joysticks */
 static INPUT_PORTS_START(geneve)
-	PORT_START( "BOOTROM" )	/* config */
-	PORT_CONFNAME( 0x01, 0x00, "Boot ROM" )
-		PORT_CONFSETTING(    0x00, "Version 0.9" )
-		PORT_CONFSETTING(    0x01, "Version 1.0" )
+
+	PORT_START( "MODE" )
+	PORT_CONFNAME( 0x01, 0x00, "Operating mode" )
+		PORT_CONFSETTING(    0x00, "Standard" )
+		PORT_CONFSETTING(    GENMOD, "GenMod" )
+
+	PORT_START( "BOOTROM" )
+	PORT_CONFNAME( 0x01, 0x00, "Boot ROM" ) PORT_CONDITION( "MODE", 0x01, PORTCOND_EQUALS, 0x00 )
+		PORT_CONFSETTING(    0x00, "Version 0.98" )
+		PORT_CONFSETTING(    0x01, "Version 1.00" )
 
 	PORT_START( "SPEECH" )
 	PORT_CONFNAME( 0x01, 0x00, "Speech synthesizer" )
@@ -252,10 +258,15 @@ static INPUT_PORTS_START(geneve)
 		PORT_CONFSETTING( 0x01, DEF_STR( On ) )
 
 	PORT_START( "SRAM" )
-	PORT_CONFNAME( 0x03, 0x01, "Onboard SRAM" )
+	PORT_CONFNAME( 0x03, 0x01, "Onboard SRAM" ) PORT_CONDITION( "MODE", 0x01, PORTCOND_EQUALS, 0x00 )
 		PORT_CONFSETTING( 0x00, "32 KiB" )
 		PORT_CONFSETTING( 0x01, "64 KiB" )
 		PORT_CONFSETTING( 0x02, "384 KiB" )
+
+	PORT_START( "EXTRAM" )
+	PORT_CONFNAME( 0x01, 0x01, "Memory expansion" )
+		PORT_CONFSETTING( 0x00, DEF_STR( None ) )
+		PORT_CONFSETTING( 0x01, "Memex 2 MiB" )
 
 	PORT_START( "DISKCTRL" )
 	PORT_CONFNAME( 0x07, 0x03, "Disk controller" )
@@ -278,6 +289,32 @@ static INPUT_PORTS_START(geneve)
 	PORT_CONFNAME( 0x03, 0x00, "Serial/Parallel interface" )
 		PORT_CONFSETTING(    0x00, DEF_STR( None ) )
 		PORT_CONFSETTING(    0x01, "TI RS-232 card" )
+
+	PORT_START( "MEMEXDIPS" )
+	PORT_DIPNAME( MDIP1, MDIP1, "MEMEX SW1" ) PORT_CONDITION( "EXTRAM", 0x01, PORTCOND_EQUALS, 0x01 )
+		PORT_DIPSETTING( 0x00, "LED half-bright for 0 WS")
+		PORT_DIPSETTING( MDIP1, "LED full-bright")
+	PORT_DIPNAME( MDIP2, 0x00, "MEMEX SW2" ) PORT_CONDITION( "EXTRAM", 0x01, PORTCOND_EQUALS, 0x01 )
+		PORT_DIPSETTING( 0x00, "Lock out all BA mirrors")
+		PORT_DIPSETTING( MDIP2, "Lock out page BA only")
+	PORT_DIPNAME( MDIP3, 0x00, "MEMEX SW3" ) PORT_CONDITION( "EXTRAM", 0x01, PORTCOND_EQUALS, 0x01 )
+		PORT_DIPSETTING( 0x00, "Enable pages E8-EB")
+		PORT_DIPSETTING( MDIP3, "Lock out pages E8-EB")
+	PORT_DIPNAME( MDIP4, 0x00, "MEMEX SW4" ) PORT_CONDITION( "EXTRAM", 0x01, PORTCOND_EQUALS, 0x01 )
+		PORT_DIPSETTING( 0x00, "Enable pages EC-EF")
+		PORT_DIPSETTING( MDIP4, "Lock out pages EC-EF")
+	PORT_DIPNAME( MDIP5, 0x00, "MEMEX SW5" ) PORT_CONDITION( "EXTRAM", 0x01, PORTCOND_EQUALS, 0x01 )
+		PORT_DIPSETTING( 0x00, "Enable pages F0-F3")
+		PORT_DIPSETTING( MDIP5, "Lock out pages F0-F3")
+	PORT_DIPNAME( MDIP6, 0x00, "MEMEX SW6" ) PORT_CONDITION( "EXTRAM", 0x01, PORTCOND_EQUALS, 0x01 )
+		PORT_DIPSETTING( 0x00, "Enable pages F4-F7")
+		PORT_DIPSETTING( MDIP6, "Lock out pages F4-F7")
+	PORT_DIPNAME( MDIP7, 0x00, "MEMEX SW7" ) PORT_CONDITION( "EXTRAM", 0x01, PORTCOND_EQUALS, 0x01 )
+		PORT_DIPSETTING( 0x00, "Enable pages F8-FB")
+		PORT_DIPSETTING( MDIP7, "Lock out pages F8-FB")
+	PORT_DIPNAME( MDIP8, 0x00, "MEMEX SW8" ) PORT_CONDITION( "EXTRAM", 0x01, PORTCOND_EQUALS, 0x01 )
+		PORT_DIPSETTING( 0x00, "Enable pages FC-FF")
+		PORT_DIPSETTING( MDIP8, "Lock out pages FC-FF")
 
 	PORT_START( "HFDCDIP" )
 	PORT_DIPNAME( 0xff, 0x55, "HFDC drive config" ) PORT_CONDITION( "DISKCTRL", 0x07, PORTCOND_EQUALS, 0x03 )
@@ -455,14 +492,8 @@ static INPUT_PORTS_START(geneve)
 
 INPUT_PORTS_END
 
-static DRIVER_INIT( genmod )
-{
-	/*has_genmod = TRUE;*/
-}
-
 static DRIVER_INIT( geneve )
 {
-	/*has_genmod = FALSE;*/
 }
 
 static MACHINE_START( geneve )
@@ -495,12 +526,13 @@ static MACHINE_CONFIG_START( geneve_60hz, geneve_state )
 	MCFG_SOUND_ADD("soundgen", SN76496, 3579545)	/* 3.579545 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
-	/* Peripheral Box. Take the same as the TI-99/4A. */
+	/* Peripheral Box. Take the Geneve combo. */
 	MCFG_PBOXGEN_ADD( "peribox", board_inta, board_intb, board_ready )
 
+	/* tms9901 */
 	MCFG_TMS9901_ADD("tms9901", tms9901_wiring_geneve)
 
-	/* tms9901 */
+	/* Main board. Slight mods for the GenMod system. */
 	MCFG_GENEVE_BOARD_ADD("geneve_board")
 MACHINE_CONFIG_END
 
@@ -512,19 +544,19 @@ MACHINE_CONFIG_END
 
 ROM_START(geneve)
 	/*CPU memory space*/
-	ROM_REGION(0x8000, "maincpu", 0)
+	ROM_REGION(0xc000, "maincpu", 0)
 	ROM_LOAD("genbt100.bin", 0x0000, 0x4000, CRC(8001e386) SHA1(b44618b54dabac3882543e18555d482b299e0109)) /* CPU ROMs */
 	ROM_LOAD_OPTIONAL("genbt090.bin", 0x4000, 0x4000, CRC(b2e20df9) SHA1(2d5d09177afe97d63ceb3ad59b498b1c9e2153f7)) /* CPU ROMs */
+	ROM_LOAD_OPTIONAL("gnmbt100.bin", 0x8000, 0x4000, CRC(19b89479) SHA1(6ef297eda78dc705946f6494e9d7e95e5216ec47)) /* CPU ROMs */
 ROM_END
 
-ROM_START(genmod)
-	/*CPU memory space*/
-	ROM_REGION(0x8000, "maincpu", 0)
-	ROM_LOAD("gnmbt100.bin", 0x0000, 0x4000, CRC(19b89479) SHA1(6ef297eda78dc705946f6494e9d7e95e5216ec47)) /* CPU ROMs */
-	ROM_LOAD_OPTIONAL("genbt090.bin", 0x4000, 0x4000, CRC(b2e20df9) SHA1(2d5d09177afe97d63ceb3ad59b498b1c9e2153f7)) /* CPU ROMs */
+/*ROM_START(genmod)
+    ROM_REGION(0x8000, "maincpu", 0)
+    ROM_LOAD("gnmbt100.bin", 0x0000, 0x4000, CRC(19b89479) SHA1(6ef297eda78dc705946f6494e9d7e95e5216ec47))
+    ROM_LOAD_OPTIONAL("genbt090.bin", 0x4000, 0x4000, CRC(b2e20df9) SHA1(2d5d09177afe97d63ceb3ad59b498b1c9e2153f7))
 ROM_END
-
+*/
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE      INPUT    INIT       COMPANY     FULLNAME */
 COMP( 1987,geneve,   0,		0,		geneve_60hz,  geneve,  geneve,		"Myarc",	"Geneve 9640" , 0)
-COMP( 1990,genmod,   geneve,	0,		geneve_60hz,  geneve,  genmod,	"Myarc",	"Geneve 9640 (with Genmod modification)" , 0)
+//COMP( 1990,genmod,   geneve,  0,      genmod_60hz,  geneve,  geneve,  "Myarc",    "Geneve 9640 (with Genmod modification)" , 0)
 

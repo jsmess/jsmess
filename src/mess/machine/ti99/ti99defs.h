@@ -9,6 +9,9 @@
 #define READ8Z_DEVICE_HANDLER(name)		void name(ATTR_UNUSED device_t *device, ATTR_UNUSED offs_t offset, UINT8 *value)
 #define READ16Z_DEVICE_HANDLER(name)		void name(ATTR_UNUSED device_t *device, ATTR_UNUSED offs_t offset, UINT16 *value)
 
+#define GM_NEVER 42
+#define GENMOD 0x01
+
 enum
 {
 	RAM_NONE = 0,

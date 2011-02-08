@@ -163,7 +163,7 @@ static READ8Z_DEVICE_HANDLER( data_rz )
 			return;
 		}
 
-		if ((offset & 0xe000)==0x4000)
+		if ((offset & 0x7e000)==0x74000)
 		{
 			if ((offset & 0x1ff0)==0x1ff0)
 			{
@@ -247,7 +247,7 @@ static WRITE8_DEVICE_HANDLER( data_w )
 	ti99_evpc_state *card = get_safe_token(device);
 	if (card->selected)
 	{
-		if ((offset & 0xe000)==0x4000)
+		if ((offset & 0x7e000)==0x74000)
 		{
 			if ((offset & 0x1ff0)==0x1ff0)
 			{

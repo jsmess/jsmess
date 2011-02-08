@@ -74,6 +74,8 @@ typedef struct _genboard_state
 	int		keep_keybuf;
 	int		zero_wait;
 
+	int		genmod;
+
 	/* GROM simulation */
 	int		grom_address;
 	int		gromraddr_LSB;
@@ -324,8 +326,8 @@ READ8_DEVICE_HANDLER( geneve_r )
 			// speech
 			// ++++ ++-- ---- ---+
 			// 1001 0000 0000 0000
-			// 0x17000 represents the proper AMA/B/C setting; will be masked away currently
-			ti99_peb_data_rz(board->peribox, offset | 0x17000, &value);
+			// We need to add the address prefix bits
+			ti99_peb_data_rz(board->peribox, offset | ((board->genmod)? 0x170000 : 0x070000), &value);
 			return value;
 		}
 		if ((offset & 0xfc01)==0x9800)
@@ -364,25 +366,11 @@ READ8_DEVICE_HANDLER( geneve_r )
 
 	physaddr |= (offset & 0x1fff);
 
-	if ((physaddr & 0x180000)==0x000000)
+	if (((physaddr & 0x180000)==0x000000) && !board->genmod)
 	{
-		// DRAM. One wait state.
+		// DRAM. One wait state (only if not GenMod, in which case we route this to the P-Box)
 		cpu_adjust_icount(board->cpu, -4);
 		value = board->dram[physaddr & 0x07ffff];
-		return value;
-	}
-	if ((physaddr & 0x180000)==0x080000)
-	{
-		// Memex in PEB
-		// 0 1aaa xxxx xxxx xxxx xxxx
-		ti99_peb_data_rz(board->peribox, physaddr, &value);
-		return value;
-	}
-	if ((physaddr & 0x180000)==0x100000)
-	{
-		// 1 0aaa xxxx xxxx xxxx xxxx p-box address block
-		// Cards in PEB (aaa = AMC, AMB, AMA)
-		ti99_peb_data_rz(board->peribox, physaddr, &value);
 		return value;
 	}
 
@@ -394,7 +382,7 @@ READ8_DEVICE_HANDLER( geneve_r )
 		return value;
 	}
 
-	if ((physaddr & board->sram_mask)==board->sram_val)
+	if (((physaddr & board->sram_mask)==board->sram_val) && !board->genmod)
 	{
 		//  1 100. .... .... .... .... on-board sram (128K) -+
 		//  1 101. .... .... .... .... on-board sram (128K) -+-- maximum SRAM expansion
@@ -402,11 +390,27 @@ READ8_DEVICE_HANDLER( geneve_r )
 		//  1 1101 0... .... .... .... on-board sram (32K) - additional 32 KiB required for MDOS 2.50s and higher
 		//  1 1101 1... .... .... .... on-board sram (32K) - standard setup
 		// NOTE: This must be tested after the EPROM test above
+		// Also note that we assume a full Genmod which also replaces the SRAM
 		value = board->sram[physaddr & 0x00ffff];
 		return value;
 	}
 
-	return 0;
+	// Route everything else to the P-Box
+	//   0x000000-0x07ffff for the stock Geneve (AMC,AMB,AMA,A0 ...,A15)
+	//   0x000000-0x1fffff for the GenMod.(AME,AMD,AMC,AMB,AMA,A0 ...,A15)
+	// Add a wait state (if not GenMod)
+	if (board->genmod)
+	{
+		physaddr = (physaddr & 0x001fffff);  // 21 bit address for Genmod (with AMA..AME)
+	}
+	else
+	{
+		// Add one wait state
+		cpu_adjust_icount(board->cpu,-4);
+		physaddr = (physaddr & 0x0007ffff);  // 19 bit address (with AMA..AMC)
+	}
+	ti99_peb_data_rz(board->peribox, physaddr, &value);
+	return value;
 }
 /*
 Geneve mode:
@@ -504,7 +508,8 @@ WRITE8_DEVICE_HANDLER( geneve_w )
 			// speech
 			// ++++ ++-- ---- ---+
 			// 1001 0100 0000 0000
-			ti99_peb_data_w(board->peribox, offset | 0x17000, data);
+			// We need to add the address prefix bits
+			ti99_peb_data_w(board->peribox, offset | ((board->genmod)? 0x170000 : 0x070000), data);
 			return;
 		}
 		if ((offset & 0xfc01)==0x9c00)
@@ -553,23 +558,11 @@ WRITE8_DEVICE_HANDLER( geneve_w )
 
 	physaddr |= offset & 0x1fff;
 
-	if ((physaddr & 0x180000)==0x000000)
+	if (((physaddr & 0x180000)==0x000000) && !board->genmod)
 	{
-		// DRAM write. One wait state.
+		// DRAM write. One wait state. (only for normal Geneve)
 		cpu_adjust_icount(board->cpu, -4);
 		board->dram[physaddr & 0x07ffff] = data;
-		return;
-	}
-	if ((physaddr & 0x180000)==0x080000)
-	{
-		// Memex in PEB
-		ti99_peb_data_w(board->peribox, physaddr, data);
-		return;
-	}
-	if ((physaddr & 0x180000)==0x100000)
-	{
-		// Classic cards in PEB
-		ti99_peb_data_w(board->peribox, physaddr, data);
 		return;
 	}
 
@@ -581,7 +574,7 @@ WRITE8_DEVICE_HANDLER( geneve_w )
 		return;
 	}
 
-	if ((physaddr & board->sram_mask)==board->sram_val)
+	if (((physaddr & board->sram_mask)==board->sram_val) && !board->genmod)
 	{
 		//  1 100. .... .... .... .... on-board sram (128K) -+
 		//  1 101. .... .... .... .... on-board sram (128K) -+-- maximum SRAM expansion
@@ -592,6 +585,20 @@ WRITE8_DEVICE_HANDLER( geneve_w )
 		board->sram[physaddr & 0x00ffff] = data;
 		return;
 	}
+
+	// Route everything else to the P-Box
+	// Add a wait state
+	if (board->genmod)
+	{
+		physaddr = (physaddr & 0x001fffff);  // 21 bit address for Genmod
+	}
+	else
+	{
+		cpu_adjust_icount(board->cpu,-4);
+		// only AMA, AMB, AMC are used; AMD=0, AME=1
+		physaddr = (physaddr & 0x0007ffff) | 0x00100000;  // 19 bit address
+	}
+	ti99_peb_data_w(board->peribox, physaddr, data);
 }
 
 /*
@@ -636,6 +643,30 @@ b bbbb bbbc cccc cccc cccc
 1 111. ..0. .... .... .... on-board boot1
 1 111. ..1. .... .... .... on-board boot2
 
+
+Mapping issues (in original hardware)
+
+The standard Geneve routes all accesses from 0x040000 to 0x17ffff to the P-Box.
+The standard TI puts AMA/B/C to 1, and all cards decode these, assuming them
+to be set to 1.
+
+The 2 MiB Memex occupies the whole address space, which means that some
+portions of it must remain unaccessible. As the standard Geneve only uses the
+AMA/B/C lines but cannot use AMD/E, the 2 MiB reduce to 512 KiB, mirrored three
+more times.
+
+Pages
+00-3f are internal (DRAM)
+40-7f are 512 KiB usable for the Memex
+80-bf are a mirror of 40-7f
+c0-ff are internal (SRAM, EPROM)
+
+However, pages 70-7f mirror to pages b0-bf which are used for the legacy cards.
+Thus they have to be blocked. If only cards are used which occupy the address
+space 4000-5fff, only page ba needs to be blocked (bc for the speech synthesizer).
+
+If there is a card in the system which does not decode AMA/B/C, all pages must
+be blocked that mirror to ba on a 16-bit base: 4a, 5a, 6a, 7a, 8a, 9a, aa, ba.
 
 */
 
@@ -716,7 +747,9 @@ WRITE8_DEVICE_HANDLER ( geneve_cru_w )
 		}
 	}
 	else
+	{
 		ti99_peb_cru_w(board->peribox, addroff, data);
+	}
 }
 
 
@@ -1230,6 +1263,7 @@ static DEVICE_START( genboard )
 {
 	logerror("Starting Geneve board\n");
 	genboard_state *board = get_safe_token(device);
+
 	board->video = device->siblingdevice("video");
 	board->tms9901 = device->siblingdevice("tms9901");
 	board->peribox = device->siblingdevice("peribox");
@@ -1294,9 +1328,30 @@ static DEVICE_RESET( genboard )
 	board->cartridge7_writable = 0;
 	for (int i=0; i < 8; i++) board->map[i] = 0;
 
-	if (input_port_read(device->machine, "BOOTROM")==0)
+	board->genmod = FALSE;
+	if (input_port_read(device->machine, "MODE")==0)
 	{
-		board->eprom = device->machine->region("maincpu")->base() + 0x4000;
+		switch (input_port_read(device->machine, "BOOTROM"))
+		{
+		case GENEVE_098:
+			logerror("Geneve 9640: Using 0.98 boot eprom\n");
+			board->eprom = device->machine->region("maincpu")->base() + 0x4000;
+			break;
+		case GENEVE_100:
+			logerror("Geneve 9640: Using 1.00 boot eprom\n");
+			board->eprom = device->machine->region("maincpu")->base();
+			break;
+		}
+	}
+	else
+	{
+		logerror("Geneve 9640: Using GenMod modification\n");
+		board->eprom = device->machine->region("maincpu")->base() + 0x8000;
+		if (board->eprom[0] != 0xf0)
+		{
+			fatalerror("GenMod boot rom missing.\n");
+		}
+		board->genmod = TRUE;
 	}
 
 	switch (input_port_read(device->machine, "SRAM"))

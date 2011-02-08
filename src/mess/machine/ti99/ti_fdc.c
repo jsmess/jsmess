@@ -28,6 +28,10 @@ typedef struct _ti99_fdc_state
 	/* When TRUE, card is accessible. Indicated by a LED. */
 	int					selected;
 
+	/* Used for GenMod. */
+	int					select_mask;
+	int					select_value;
+
 	/* When TRUE, keeps DVENA high. */
 	int					strobe_motor;
 
@@ -235,7 +239,7 @@ static READ8Z_DEVICE_HANDLER( data_r )
 
 	if (card->selected)
 	{
-		if ((offset & 0xe000)==0x4000)
+		if ((offset & card->select_mask)==card->select_value)
 		{
 			// only use the even addresses from 1ff0 to 1ff6.
 			// Note that data is inverted.
@@ -260,7 +264,7 @@ static WRITE8_DEVICE_HANDLER( data_w )
 	ti99_fdc_state *card = get_safe_token(device);
 	if (card->selected)
 	{
-		if ((offset & 0xe000)==0x4000)
+		if ((offset & card->select_mask)==card->select_value)
 		{
 			// only use the even addresses from 1ff8 to 1ffe.
 			// Note that data is inverted.
@@ -372,6 +376,16 @@ static DEVICE_RESET( ti99_fdc )
 		card->SIDSEL = 0;
 		card->DVENA = 0;
 		card->strobe_motor = 0;
+
+		card->select_mask = 0x7e000;
+		card->select_value = 0x74000;
+
+		if (input_port_read(device->machine, "MODE")==GENMOD)
+		{
+			// GenMod card modification
+			card->select_mask = 0x1fe000;
+			card->select_value = 0x174000;
+		}
 
 		ti99_set_80_track_drives(FALSE);
 

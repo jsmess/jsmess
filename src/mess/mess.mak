@@ -1373,8 +1373,8 @@ $(MESSOBJ)/samsung.a:			\
 $(MESSOBJ)/sanyo.a:				\
 	$(MESS_DRIVERS)/phc25.o		\
 	$(MESS_DRIVERS)/mbc55x.o	\
-	$(MESS_MACHINE)/mbc55x.o  	\
-	$(MESS_VIDEO)/mbc55x.o    	\
+	$(MESS_MACHINE)/mbc55x.o	\
+	$(MESS_VIDEO)/mbc55x.o  	\
 
 $(MESSOBJ)/sega.a:				\
 	$(MESS_DRIVERS)/saturn.o	\
@@ -1422,7 +1422,7 @@ $(MESSOBJ)/sharp.a:				\
 	$(MESS_FORMATS)/x1_tap.o	\
 	$(MESS_DRIVERS)/mz2500.o	\
 	$(MESS_DRIVERS)/pce220.o	\
-	
+
 $(MESSOBJ)/sinclair.a:			\
 	$(MESS_VIDEO)/spectrum.o	\
 	$(MESS_VIDEO)/timex.o		\
@@ -1571,6 +1571,7 @@ $(MESSOBJ)/ti.a:				\
 	$(MESS_MACHINE)/ti99/gromport.o	\
 	$(MESS_MACHINE)/ti99/ti32kmem.o	\
 	$(MESS_MACHINE)/ti99/samsmem.o	\
+	$(MESS_MACHINE)/ti99/memex.o	\
 	$(MESS_MACHINE)/ti99/myarcmem.o	\
 	$(MESS_MACHINE)/ti99/ti_fdc.o	\
 	$(MESS_MACHINE)/ti99/hfdc.o	\
@@ -1579,7 +1580,7 @@ $(MESSOBJ)/ti.a:				\
 	$(MESS_MACHINE)/ti99/tn_usbsm.o	\
 	$(MESS_MACHINE)/ti99/tn_ide.o	\
 	$(MESS_MACHINE)/ti99/spchsyn.o  \
-	$(MESS_MACHINE)/ti99/evpc.o  	\
+	$(MESS_MACHINE)/ti99/evpc.o 	\
 	$(MESS_MACHINE)/ti99/videowrp.o \
 	$(MESS_MACHINE)/ti99/mapper8.o  \
 	$(MESS_MACHINE)/ti99/speech8.o  \
@@ -1710,7 +1711,7 @@ $(MESSOBJ)/skeleton.a:			\
 	$(MESS_DRIVERS)/busicom.o	\
 	$(MESS_VIDEO)/busicom.o		\
 	$(MESS_DRIVERS)/c10.o		\
-	$(MESS_DRIVERS)/casloopy.o 	\
+	$(MESS_DRIVERS)/casloopy.o	\
 	$(MESS_DRIVERS)/chaos.o 	\
 	$(MESS_DRIVERS)/cd2650.o	\
 	$(MESS_DRIVERS)/codata.o	\

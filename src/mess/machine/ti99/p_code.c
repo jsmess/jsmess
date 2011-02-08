@@ -148,7 +148,7 @@ static READ8Z_DEVICE_HANDLER( data_r )
 
 	if (card->selected)
 	{
-		if ((offset & 0xe000)==0x4000)
+		if ((offset & 0x7e000)==0x74000)
 		{
 			if ((offset & 0xfffd)==GROMBASE)
 			{
@@ -157,16 +157,16 @@ static READ8Z_DEVICE_HANDLER( data_r )
 				return;
 			}
 
-			if (offset < 0x5000)
+			if ((offset & 0x1000) == 0x0000)
 			{
 				/* Accesses ROM 4732 (4K) */
-				*value = card->rom0[offset-0x4000];
+				*value = card->rom0[offset & 0x0fff];
 			}
 			else
 				// Accesses ROM 4764 (2*4K)
 			// We have two banks here which are activated according
 			// to the setting of CRU bit 4
-			*value = (card->bank_select==0)? card->rom1[offset-0x5000] : card->rom2[offset-0x5000];
+			*value = (card->bank_select==0)? card->rom1[offset & 0x0fff] : card->rom2[offset & 0x0fff];
 		}
 	}
 }
@@ -180,7 +180,7 @@ static WRITE8_DEVICE_HANDLER( data_w )
 	ti99_pcoden_state *card = get_safe_token(device);
 	if (card->selected)
 	{
-		if ((offset & 0xfffd)==(GROMBASE|0x0400))
+		if ((offset & 0x7fffd)==(GROMBASE|0x70400))
 		{
 			for (int i=0; i < 8; i++)
 				ti99grom_w(card->gromdev[i], offset, data);

@@ -130,6 +130,7 @@ do not depend on the card being active at that time.
 #include "hsgpl.h"
 #include "spchsyn.h"
 #include "evpc.h"
+#include "memex.h"
 
 #include "imagedev/flopdrv.h"
 #include "imagedev/harddriv.h"
@@ -165,6 +166,9 @@ typedef struct _ti99_peb_state
 	UINT32					ready_state;
 
 	int						highest;
+
+	/* Address bits that are preset to 1 (AMA/AMB/AMC) */
+	int						address_prefix;
 
 	// Callback to the main system
 	ti99_peb_connect		lines;
@@ -289,7 +293,7 @@ READ8Z_DEVICE_HANDLER( ti99_peb_data_rz )
 	for (i=1; i <= peb->highest; i++)
 	{
 		if ((peb->slot[i].card != NULL) && (*peb->slot[i].intf->card_read_data))
-			(*peb->slot[i].intf->card_read_data)(peb->slot[i].card, offset, value);
+			(*peb->slot[i].intf->card_read_data)(peb->slot[i].card, peb->address_prefix | offset, value);
 	}
 }
 
@@ -300,7 +304,7 @@ WRITE8_DEVICE_HANDLER( ti99_peb_data_w )
 	for (i=1; i <= peb->highest; i++)
 	{
 		if ((peb->slot[i].card != NULL) && (*peb->slot[i].intf->card_write_data))
-			(*peb->slot[i].intf->card_write_data)(peb->slot[i].card, offset, data);
+			(*peb->slot[i].intf->card_write_data)(peb->slot[i].card, peb->address_prefix | offset, data);
 	}
 }
 
@@ -336,7 +340,7 @@ READ16Z_DEVICE_HANDLER( ti99_peb_data16_rz )
 	for (i=1; i <= peb->highest; i++)
 	{
 		if ((peb->slot[i].card != NULL) && (*peb->slot[i].intf->card_read_data16))
-			(*peb->slot[i].intf->card_read_data16)(peb->slot[i].card, offset, value);
+			(*peb->slot[i].intf->card_read_data16)(peb->slot[i].card, peb->address_prefix | offset, value);
 	}
 }
 
@@ -350,7 +354,7 @@ WRITE16_DEVICE_HANDLER( ti99_peb_data16_w )
 	for (i=1; i <= peb->highest; i++)
 	{
 		if ((peb->slot[i].card != NULL) && (*peb->slot[i].intf->card_write_data16))
-			(*peb->slot[i].intf->card_write_data16)(peb->slot[i].card, offset, data);
+			(*peb->slot[i].intf->card_write_data16)(peb->slot[i].card, peb->address_prefix | offset, data);
 	}
 }
 
@@ -401,6 +405,8 @@ static DEVICE_START( ti99_peb )
 	devcb_resolve_write_line(&peb->lines.ready, &ready, device);
 	devcb_resolve_write_line(&peb->lines.inta, &inta, device);
 	devcb_resolve_write_line(&peb->lines.intb, &intb, device);
+
+	peb->address_prefix = (pebconf->amx << 16);
 }
 
 static DEVICE_STOP( ti99_peb )
@@ -524,9 +530,10 @@ static MACHINE_CONFIG_FRAGMENT( ti99sg_peb )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_FRAGMENT( geneve_peb )
-	MCFG_PBOXCARD_ADD( "speech",		TISPEECH, 1 )
-	MCFG_PBOXCARD_ADD( "usbsmart",		USBSMART, 2 )
-	MCFG_PBOXCARD_ADD( "ide",			TNIDE,	  3 )
+	MCFG_PBOXCARD_ADD( "memex",			GENMEMEX, 1 )
+	MCFG_PBOXCARD_ADD( "speech",		TISPEECH, 2 )
+	MCFG_PBOXCARD_ADD( "usbsmart",		USBSMART, 3 )
+	MCFG_PBOXCARD_ADD( "ide",			TNIDE,	  4 )
 	MCFG_PBOXCARD_ADD( "rs232_card",	TIRS232,  6 )
 	MCFG_PBOXCARD_ADD( "ti_fdc",		TIFDC,	  7 )
 	MCFG_PBOXCARD_ADD( "hfdc",			HFDC,	  7 )

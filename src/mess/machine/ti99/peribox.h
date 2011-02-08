@@ -13,13 +13,17 @@
     inta: callback called when the state of INTA changes (may be NULL)
     intb: callback called when the state of INTB changes (may be NULL)
     ready: callback called when the state of INTB changes (may be NULL)
+    amx: Determines whether the AMA, AMB, and AMC address bus extension lines
+         must be preset to some value. The standard TI Flex Cable Interface
+         locks these valuies to 1. The Geneve, however, can drive these lines.
 */
 
 typedef struct _ti99_peb_config
 {
-	write_line_device_func inta;
-	write_line_device_func intb;
-	write_line_device_func ready;
+	write_line_device_func	inta;
+	write_line_device_func	intb;
+	write_line_device_func	ready;
+	int						amx;
 } ti99_peb_config;
 
 /*
@@ -128,36 +132,42 @@ DECLARE_LEGACY_DEVICE( PBOXGEN, geneve_peb );
 	MCFG_DEVICE_ADD(_tag, PBOX4, 0)							\
 	MCFG_DEVICE_CONFIG_DATAPTR(ti99_peb_config, inta, _inta)		\
 	MCFG_DEVICE_CONFIG_DATAPTR(ti99_peb_config, intb, _intb)		\
-	MCFG_DEVICE_CONFIG_DATAPTR(ti99_peb_config, ready, _ready)
+	MCFG_DEVICE_CONFIG_DATAPTR(ti99_peb_config, ready, _ready)		\
+	MCFG_DEVICE_CONFIG_DATA32(ti99_peb_config, amx, 0x07)
 
 #define MCFG_PBOX4A_ADD(_tag, _inta, _intb, _ready)			\
 	MCFG_DEVICE_ADD(_tag, PBOX4A, 0)							\
 	MCFG_DEVICE_CONFIG_DATAPTR(ti99_peb_config, inta, _inta)		\
 	MCFG_DEVICE_CONFIG_DATAPTR(ti99_peb_config, intb, _intb)		\
-	MCFG_DEVICE_CONFIG_DATAPTR(ti99_peb_config, ready, _ready)
+	MCFG_DEVICE_CONFIG_DATAPTR(ti99_peb_config, ready, _ready)		\
+	MCFG_DEVICE_CONFIG_DATA32(ti99_peb_config, amx, 0x07)
 
 #define MCFG_PBOXEV_ADD(_tag, _inta, _intb, _ready)			\
 	MCFG_DEVICE_ADD(_tag, PBOXEV, 0)							\
 	MCFG_DEVICE_CONFIG_DATAPTR(ti99_peb_config, inta, _inta)		\
 	MCFG_DEVICE_CONFIG_DATAPTR(ti99_peb_config, intb, _intb)		\
-	MCFG_DEVICE_CONFIG_DATAPTR(ti99_peb_config, ready, _ready)
+	MCFG_DEVICE_CONFIG_DATAPTR(ti99_peb_config, ready, _ready)		\
+	MCFG_DEVICE_CONFIG_DATA32(ti99_peb_config, amx, 0x07)
 
 #define MCFG_PBOX8_ADD(_tag, _inta, _intb, _ready)			\
 	MCFG_DEVICE_ADD(_tag, PBOX8, 0)							\
 	MCFG_DEVICE_CONFIG_DATAPTR(ti99_peb_config, inta, _inta)		\
 	MCFG_DEVICE_CONFIG_DATAPTR(ti99_peb_config, intb, _intb)		\
-	MCFG_DEVICE_CONFIG_DATAPTR(ti99_peb_config, ready, _ready)
+	MCFG_DEVICE_CONFIG_DATAPTR(ti99_peb_config, ready, _ready)		\
+	MCFG_DEVICE_CONFIG_DATA32(ti99_peb_config, amx, 0x07)
 
 #define MCFG_PBOXSG_ADD(_tag, _inta, _intb, _ready)			\
 	MCFG_DEVICE_ADD(_tag, PBOXSG, 0)							\
 	MCFG_DEVICE_CONFIG_DATAPTR(ti99_peb_config, inta, _inta)		\
 	MCFG_DEVICE_CONFIG_DATAPTR(ti99_peb_config, intb, _intb)		\
-	MCFG_DEVICE_CONFIG_DATAPTR(ti99_peb_config, ready, _ready)
+	MCFG_DEVICE_CONFIG_DATAPTR(ti99_peb_config, ready, _ready)	\
+	MCFG_DEVICE_CONFIG_DATA32(ti99_peb_config, amx, 0x07)
 
 #define MCFG_PBOXGEN_ADD(_tag, _inta, _intb, _ready)			\
 	MCFG_DEVICE_ADD(_tag, PBOXGEN, 0)							\
 	MCFG_DEVICE_CONFIG_DATAPTR(ti99_peb_config, inta, _inta)		\
 	MCFG_DEVICE_CONFIG_DATAPTR(ti99_peb_config, intb, _intb)		\
-	MCFG_DEVICE_CONFIG_DATAPTR(ti99_peb_config, ready, _ready)
+	MCFG_DEVICE_CONFIG_DATAPTR(ti99_peb_config, ready, _ready)	\
+	MCFG_DEVICE_CONFIG_DATA32(ti99_peb_config, amx, 0x00)
 
 #endif /* __PBOX__ */

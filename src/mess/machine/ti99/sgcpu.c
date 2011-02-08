@@ -6,6 +6,10 @@
     This component implements the address decoder and mapper logic from the
     SGCPU expansion card (inofficially called TI-99/4P).
 
+    AMA/B/C: According to the manual, the 19-bit address extension is not
+    supported by the SGCPU, due to some cards not checking these lines (like
+    the Horizon Ramdisk)
+
     Michael Zapf, October 2010
 
     TODO: Check for wait states

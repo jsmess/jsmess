@@ -209,7 +209,6 @@ static READ8Z_DEVICE_HANDLER ( hsgpl_grom_rz )
 {
 	int port;
 	hsgpl_state *card = get_safe_token(device);
-
 	//activecpu_adjust_icount(-4);
 
 	// 1001 10bb bbbb bba0
@@ -398,7 +397,7 @@ static READ8Z_DEVICE_HANDLER ( hsgpl_dsrspace_rz )
 	hsgpl_state *card = get_safe_token(device);
 	if (card->dsr_enabled)
 	{
-		*value = at29c040a_r(card->dsr, (offset-0x4000) + 0x2000 * card->dsr_page);
+		*value = at29c040a_r(card->dsr, (offset & 0x1fff) + 0x2000 * card->dsr_page);
 //      logerror("hsgpl: read dsr %04x[%02x] -> %02x\n", offset, card->dsr_page, *value);
 	}
 }
@@ -417,21 +416,21 @@ static READ8Z_DEVICE_HANDLER ( hsgpl_cartspace_rz )
 
 	if ((port < 2) && (card->ram_enabled))
 	{
-		*value = card->ram6[(offset-0x6000) + 0x2000*card->current_bank + 0x8000*port];
+		*value = card->ram6[(offset & 0x1fff) + 0x2000*card->current_bank + 0x8000*port];
 //      logerror("hsgpl cart ram read %04x -> %02x\n", offset, *value);
 		return;
 	}
 
 	if (port < 16)
 	{
-		*value = at29c040a_r(card->rom6, (offset-0x6000) + 0x2000*card->current_bank + 0x8000*port);
+		*value = at29c040a_r(card->rom6, (offset & 0x1fff) + 0x2000*card->current_bank + 0x8000*port);
 //      logerror("hsgpl cart read %04x -> %02x\n", offset, *value);
 	}
 	else
 	{
 		if (port==32 || port==33)
 		{
-			*value = card->ram6[(offset-0x6000) + 0x2000*card->current_bank + 0x8000*(port-32)];
+			*value = card->ram6[(offset & 0x1fff) + 0x2000*card->current_bank + 0x8000*(port-32)];
 		}
 		else
 		{
@@ -473,7 +472,7 @@ static WRITE8_DEVICE_HANDLER ( hsgpl_cartspace_w )
 	{
 		if ((port < 2) && (card->ram_enabled))
 		{
-			card->ram6[(offset-0x6000) + 0x2000*card->current_bank + 0x8000*port ] = data;
+			card->ram6[(offset & 0x1fff) + 0x2000*card->current_bank + 0x8000*port ] = data;
 		}
 		else
 		{	// keep in mind that these lines are also reached for port < 2
@@ -491,7 +490,7 @@ static WRITE8_DEVICE_HANDLER ( hsgpl_cartspace_w )
 			{
 				if (port==32 || port==33)
 				{
-					card->ram6[(offset-0x6000) + 0x2000*card->current_bank + 0x8000*(port-32)] = data;
+					card->ram6[(offset & 0x1fff) + 0x2000*card->current_bank + 0x8000*(port-32)] = data;
 				}
 				else
 				{
@@ -507,20 +506,20 @@ static WRITE8_DEVICE_HANDLER ( hsgpl_cartspace_w )
 */
 static READ8Z_DEVICE_HANDLER ( data_rz )
 {
-	if ((offset & 0xe000)==0x4000)
+	if ((offset & 0x7e000)==0x74000)
 	{
-		hsgpl_dsrspace_rz(device, offset, value);
+		hsgpl_dsrspace_rz(device, offset & 0xffff, value);
 	}
 
-	if ((offset & 0xe000)==0x6000)
+	if ((offset & 0x7e000)==0x76000)
 	{
-		hsgpl_cartspace_rz(device, offset, value);
+		hsgpl_cartspace_rz(device, offset & 0xffff, value);
 	}
 
 	// 1001 1wbb bbbb bba0
-	if ((offset & 0xfc01)==0x9800)
+	if ((offset & 0x7fc01)==0x79800)
 	{
-		hsgpl_grom_rz(device, offset, value);
+		hsgpl_grom_rz(device, offset & 0xffff, value);
 	}
 }
 
@@ -529,15 +528,15 @@ static READ8Z_DEVICE_HANDLER ( data_rz )
 */
 static WRITE8_DEVICE_HANDLER ( data_w )
 {
-	if ((offset & 0xe000)==0x6000)
+	if ((offset & 0x7e000)==0x76000)
 	{
-		hsgpl_cartspace_w(device, offset, data);
+		hsgpl_cartspace_w(device, offset & 0xffff, data);
 	}
 
 	// 1001 1wbb bbbb bba0
-	if ((offset & 0xfc01)==0x9c00)
+	if ((offset & 0x7fc01)==0x79c00)
 	{
-		hsgpl_grom_w(device, offset, data);
+		hsgpl_grom_w(device, offset & 0xffff, data);
 	}
 }
 

@@ -32,6 +32,12 @@ typedef struct _ti99_hfdc_state
 	/* When TRUE, card is accessible. Indicated by a LED. */
 	int					selected;
 
+	/* Card select mask. Required to support Genmod. */
+	int					select_mask;
+
+	/* Card select mask. Required to support Genmod. */
+	int					select_value;
+
 	/* When TRUE, triggers motor monoflop. */
 	int					strobe_motor;
 
@@ -162,13 +168,12 @@ static READ8Z_DEVICE_HANDLER( cru_r )
 			/* CRU bits */
 			if (card->cru_select)
 			{
-				/* DIP switches.  Logic levels are inverted (on->0, off->1).  CRU
-                bit order is the reverse of DIP-switch order, too (dip 1 -> bit 7,
-                dip 8 -> bit 0).
-
-                MZ: 00 should not be used since there is a bug in the
-                DSR of the HFDC which causes problems with SD disks
-                (controller tries DD and then fails to fall back to SD) */
+				// DIP switches.  Logic levels are inverted (on->0, off->1).  CRU
+				// bit order is the reverse of DIP-switch order, too (dip 1 -> bit 7,
+				// dip 8 -> bit 0).
+				// MZ: 00 should not be used since there is a bug in the
+				// DSR of the HFDC which causes problems with SD disks
+				// (controller tries DD and then fails to fall back to SD) */
 				reply = ~(input_port_read(device->machine, "HFDCDIP"));
 			}
 			else
@@ -281,7 +286,7 @@ static READ8Z_DEVICE_HANDLER( data_r )
 {
 	ti99_hfdc_state *card = get_safe_token(device);
 
-	if (card->selected && (offset & 0xe000)==0x4000)
+	if (card->selected && ((offset & card->select_mask)==card->select_value))
 	{
 		/* DSR region */
 		if ((offset & 0x1000)==0x0000)
@@ -336,7 +341,7 @@ static READ8Z_DEVICE_HANDLER( data_r )
 static WRITE8_DEVICE_HANDLER( data_w )
 {
 	ti99_hfdc_state *card = get_safe_token(device);
-	if (card->selected && (offset & 0xe000)==0x4000)
+	if (card->selected && ((offset & card->select_mask)==card->select_value))
 	{
 		// Tape: 4fc0...4fcf
 		if ((offset & 0x1ff0)==TAPE_ADDR)
@@ -682,6 +687,17 @@ static DEVICE_RESET( ti99_hfdc )
 		device_t *peb = device->owner();
 		int success = mount_card(peb, device, &hfdc_card, get_pebcard_config(device)->slot);
 		if (!success) return;
+
+		card->select_mask = 0x7e000;
+		card->select_value = 0x74000;
+
+		if (input_port_read(device->machine, "MODE")==GENMOD)
+		{
+			// GenMod card modification
+			logerror("HFDC: Configuring for GenMod\n");
+			card->select_mask = 0x1fe000;
+			card->select_value = 0x174000;
+		}
 
 		// Allocate 32 KiB for on-board buffer memory
 		if (card->ram==NULL)

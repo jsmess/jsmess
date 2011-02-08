@@ -125,6 +125,12 @@ static INPUT_PORTS_START(ti99_4p)
 		PORT_CONFSETTING(    0x01, "Flash" )
 		PORT_CONFSETTING(    0x02, DEF_STR( On ) )
 
+	// We do not want to show this setting; makes only sense for Geneve
+	PORT_START( "MODE" )
+	PORT_CONFNAME( 0x01, 0x00, "Ext. cards modification" ) PORT_CONDITION( "HFDCDIP", 0xff, PORTCOND_EQUALS, GM_NEVER )
+		PORT_CONFSETTING(    0x00, "Standard" )
+		PORT_CONFSETTING(    GENMOD, "GenMod" )
+
 	PORT_START( "HFDCDIP" )
 	PORT_DIPNAME( 0xff, 0x55, "HFDC drive config" ) PORT_CONDITION( "DISKCTRL", 0x07, PORTCOND_EQUALS, 0x03 )
 		PORT_DIPSETTING( 0x00, "40 track, 16 ms")
@@ -135,7 +141,7 @@ static INPUT_PORTS_START(ti99_4p)
 	PORT_START( "V9938-MEM" )
 	PORT_CONFNAME( 0x01, 0x00, "V9938 RAM size" )
 		PORT_CONFSETTING(	0x00, "128 KiB" )
-		PORT_CONFSETTING(	0x01, "192 KiB" )	
+		PORT_CONFSETTING(	0x01, "192 KiB" )
 
 	PORT_START( "DRVSPD" )
 	PORT_CONFNAME( 0x01, 0x01, "Floppy and HD speed" ) PORT_CONDITION( "DISKCTRL", 0x07, PORTCOND_EQUALS, 0x03 )

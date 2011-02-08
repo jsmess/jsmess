@@ -43,6 +43,10 @@ typedef struct _ti99_bwg_state
 	/* When TRUE, card is accessible. Indicated by a LED. */
 	int					selected;
 
+	/* Used for GenMod. */
+	int					select_mask;
+	int					select_value;
+
 	/* When TRUE, keeps DVENA high. */
 	int					strobe_motor;
 
@@ -378,7 +382,7 @@ static READ8Z_DEVICE_HANDLER( data_r )
 
 	if (card->selected)
 	{
-		if ((offset & 0xe000)==0x4000)
+		if ((offset & card->select_mask)==card->select_value)
 		{
 			// 010x xxxx xxxx xxxx
 			if ((offset & 0x1c00)==0x1c00)
@@ -437,7 +441,7 @@ static WRITE8_DEVICE_HANDLER( data_w )
 
 	if (card->selected)
 	{
-		if ((offset & 0xe000)==0x4000)
+		if ((offset & card->select_mask)==card->select_value)
 		{
 			// 010x xxxx xxxx xxxx
 			if ((offset & 0x1c00)==0x1c00)
@@ -543,6 +547,16 @@ static DEVICE_RESET( ti99_bwg )
 		card->ram_offset = 0;
 		card->rom_offset = 0;
 		card->rtc_enabled = 0;
+
+		card->select_mask = 0x7e000;
+		card->select_value = 0x74000;
+
+		if (input_port_read(device->machine, "MODE")==GENMOD)
+		{
+			// GenMod card modification
+			card->select_mask = 0x1fe000;
+			card->select_value = 0x174000;
+		}
 
 		wd17xx_dden_w(card->controller, CLEAR_LINE);	// Correct?
 	}
