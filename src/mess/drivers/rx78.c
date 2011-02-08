@@ -2,8 +2,7 @@
 
     Gundam RX-78 (c) 1983 Bandai
 
-    preliminary driver by Angelo Salese
-    Monitor command list, and cassette interface added by Robbbert.
+    driver by Angelo Salese & Robbbert.
 
     TODO:
     - implement printer
@@ -520,5 +519,5 @@ static DRIVER_INIT( rx78 )
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY   FULLNAME       FLAGS */
-COMP( 1983, rx78,	0,       0, 		rx78,	rx78,	 rx78,  	  "Bandai",   "Gundam RX-78",		GAME_NOT_WORKING)
+COMP( 1983, rx78,	0,       0, 		rx78,	rx78,	 rx78,  	  "Bandai",   "Gundam RX-78",		0)
 
