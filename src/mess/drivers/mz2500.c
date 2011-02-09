@@ -20,7 +20,7 @@
     - Moon Child: needs mixed 3+3bpp tvram supported, kludged for now (not a real test case);
     - Moon Child: window masking doesn't mask bottom part of the screen?
     - Moon Child: appears to be a network / system link game, obviously doesn't work with current MAME / MESS framework;
-   	- Marchen Veil I: doesn't load if you try to run it directly, it does if you load another game first (for example Mappy) then do a soft reset;
+    - Marchen Veil I: doesn't load if you try to run it directly, it does if you load another game first (for example Mappy) then do a soft reset;
     - Mugen no Shinzou II - The Prince of Darkness: dies on IPLPRO loading, presumably a wd17xx core bug;
     - Multiplan: random hangs/crashes after you set the RTC, sometimes it loads properly;
     - Murder Club: has lots of CG artifacts, FDC issue?
@@ -409,7 +409,7 @@ static void draw_cg16_screen(running_machine *machine, bitmap_t *bitmap,const re
 	cg_interlace = state->text_font_reg ? 1 : 2;
 	pen_mask = (state->cg_reg[0x18] >> ((plane & 1) * 4)) & 0x0f;
 
-//	popmessage("%d %d %d %d",state->cg_hs,state->cg_he,state->cg_vs,state->cg_ve);
+//  popmessage("%d %d %d %d",state->cg_hs,state->cg_he,state->cg_vs,state->cg_ve);
 
 	for(y=0;y<200;y++)
 	{
@@ -509,8 +509,8 @@ static void draw_tv_screen(running_machine *machine, bitmap_t *bitmap,const rect
 
 	base_addr = state->text_reg[1] | ((state->text_reg[2] & 0x7) << 8);
 
-//	popmessage("%02x",state->clut16[0]);
-//	popmessage("%d %d %d %d",state->tv_hs,(state->tv_he),state->tv_vs,(state->tv_ve));
+//  popmessage("%02x",state->clut16[0]);
+//  popmessage("%d %d %d %d",state->tv_hs,(state->tv_he),state->tv_vs,(state->tv_ve));
 
 	if(state->text_col_size)
 		draw_80x25(machine,bitmap,cliprect,base_addr);
@@ -1474,7 +1474,7 @@ static ADDRESS_MAP_START(mz2500_io, ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 //  AM_RANGE(0x60, 0x63) AM_WRITE(w3100a_w)
 //  AM_RANGE(0x63, 0x63) AM_READ(w3100a_r)
-//	AM_RANGE(0x98, 0x99) ADPCM, unknown type, custom?
+//  AM_RANGE(0x98, 0x99) ADPCM, unknown type, custom?
 	AM_RANGE(0xa0, 0xa3) AM_DEVREADWRITE("z80sio",z80sio_ba_cd_r,z80sio_ba_cd_w)
 //  AM_RANGE(0xa4, 0xa5) AM_READWRITE(sasi_r, sasi_w)
 	AM_RANGE(0xa8, 0xa8) AM_WRITE(mz2500_rom_w)
@@ -1731,7 +1731,7 @@ static MACHINE_RESET(mz2500)
 	beep_set_frequency(machine->device("beeper"),4096);
 	beep_set_state(machine->device("beeper"),0);
 
-//	state->monitor_type = input_port_read(machine,"DSW1") & 0x40 ? 1 : 0;
+//  state->monitor_type = input_port_read(machine,"DSW1") & 0x40 ? 1 : 0;
 }
 
 static const gfx_layout mz2500_cg_layout =
@@ -1845,10 +1845,10 @@ static WRITE8_DEVICE_HANDLER( mz2500_portc_w )
 {
 	mz2500_state *state = device->machine->driver_data<mz2500_state>();
 	/*
-	---- x--- 0->1 transition = IPL reset
-	---- -x-- beeper state
-	---- --x- 0->1 transition = Work RAM reset
-	*/
+    ---- x--- 0->1 transition = IPL reset
+    ---- -x-- beeper state
+    ---- --x- 0->1 transition = Work RAM reset
+    */
 
 	/* work RAM reset */
 	if((state->old_portc & 0x02) == 0x00 && (data & 0x02))

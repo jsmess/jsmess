@@ -32,7 +32,7 @@ public:
 	bw2_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config),
 		  m_maincpu(*this, Z80_TAG),
-  		  m_uart(*this, MSM8251_TAG),
+		  m_uart(*this, MSM8251_TAG),
 		  m_fdc(*this, WD2797_TAG),
 		  m_lcdc(*this, MSM6255_TAG),
 		  m_centronics(*this, CENTRONICS_TAG),
@@ -49,7 +49,7 @@ public:
 	required_device<device_t> m_ram;
 	required_device<device_t> m_floppy0;
 	required_device<device_t> m_floppy1;
-	
+
 	virtual void machine_start();
 	virtual void machine_reset();
 

@@ -547,7 +547,7 @@ static int snes_find_addon_chip( running_machine *machine )
 				state->has_addon_chip = HAS_DSP3;
 				dsp_prg_offset = SNES_DSP3_OFFSET;
 			}
-			else						  
+			else
 			{
 				state->has_addon_chip = HAS_DSP1;
 				dsp_prg_offset = SNES_DSP1B_OFFSET;
@@ -643,8 +643,8 @@ static int snes_find_addon_chip( running_machine *machine )
 	if ((state->has_addon_chip >= HAS_DSP1) && (state->has_addon_chip <= HAS_DSP4))
 	{
 		UINT8 *dspsrc = (UINT8 *)machine->region("addons")->base();
-		UINT32 *dspprg = (UINT32 *)machine->region("dspprg")->base(); 
-		UINT16 *dspdata = (UINT16 *)machine->region("dspdata")->base(); 
+		UINT32 *dspprg = (UINT32 *)machine->region("dspprg")->base();
+		UINT16 *dspdata = (UINT16 *)machine->region("dspdata")->base();
 
 		// copy DSP program
 		for (int i = 0; i < 0x2000; i+= 4)
@@ -663,8 +663,8 @@ static int snes_find_addon_chip( running_machine *machine )
 	if ((state->has_addon_chip == HAS_ST010) || (state->has_addon_chip == HAS_ST011))
 	{
 		UINT8 *dspsrc = (UINT8 *)machine->region("addons")->base();
-		UINT32 *dspprg = (UINT32 *)machine->region("dspprg")->base(); 
-		UINT16 *dspdata = (UINT16 *)machine->region("dspdata")->base(); 
+		UINT32 *dspprg = (UINT32 *)machine->region("dspprg")->base();
+		UINT16 *dspdata = (UINT16 *)machine->region("dspdata")->base();
 
 		// copy DSP program
 		for (int i = 0; i < 0x10000; i+= 4)
@@ -1097,33 +1097,33 @@ static DEVICE_IMAGE_LOAD( snes_cart )
 
 	/* Find the amount of cart ram (even if we call it sram...) */
 	if (image.software_entry() == NULL)
-	{	
+	{
 		if ((state->has_addon_chip != HAS_SUPERFX))
 			state->cart[0].sram = snes_r_bank1(space, 0x00ffd8);
 		else
 			state->cart[0].sram = (snes_r_bank1(space, 0x00ffbd) & 0x07);
-		
+
 		if (state->cart[0].sram > 0)
 		{
 			state->cart[0].sram = (1024 << state->cart[0].sram);
 			if (state->cart[0].sram > state->cart[0].sram_max)
 				state->cart[0].sram = state->cart[0].sram_max;
 		}
-//		printf("size %x\n", state->cart[0].sram);
+//      printf("size %x\n", state->cart[0].sram);
 	}
 	else
 	{
 		// if we are loading from softlist, take sram from the xml
 		state->cart[0].sram = image.get_software_region("sram") ? image.get_software_region_length("sram") : 0;
-		
+
 		if (state->cart[0].sram > 0)
 		{
 			if (state->cart[0].sram > state->cart[0].sram_max)
 				fatalerror("Found more SRAM than max allowed (found: %x, max: %x), check xml file!\n", state->cart[0].sram, state->cart[0].sram_max);
 		}
-		// TODO: Eventually sram handlers should point to the allocated cart:sram region! 
+		// TODO: Eventually sram handlers should point to the allocated cart:sram region!
 		// For now, we only use the region as a placeholder to carry size info...
-//		printf("size %x\n", state->cart[0].sram);
+//      printf("size %x\n", state->cart[0].sram);
 	}
 
 	/* adjust size for very large carts */

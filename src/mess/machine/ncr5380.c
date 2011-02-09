@@ -75,7 +75,7 @@ ncr5380_device_config::ncr5380_device_config(const machine_config &mconfig, cons
 }
 
 device_config *ncr5380_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-{ 
+{
 	return global_alloc(ncr5380_device_config(mconfig, tag, owner, clock));
 }
 
@@ -138,8 +138,8 @@ void ncr5380_device::device_start()
 	// try to open the devices
 	for (i = 0; i < m_config.scsidevs->devs_present; i++)
 	{
-		SCSIAllocInstance( machine, 
-				m_config.scsidevs->devices[i].scsiClass, 
+		SCSIAllocInstance( machine,
+				m_config.scsidevs->devices[i].scsiClass,
 				&m_scsi_devices[m_config.scsidevs->devices[i].scsiID],
 				m_config.scsidevs->devices[i].diskregion );
 	}
@@ -517,8 +517,8 @@ void ncr5380_device::ncr5380_scan_devices()
 		// if a device wasn't already allocated
 		if (!m_scsi_devices[m_config.scsidevs->devices[i].scsiID])
 		{
-			SCSIAllocInstance( machine, 
-					m_config.scsidevs->devices[i].scsiClass, 
+			SCSIAllocInstance( machine,
+					m_config.scsidevs->devices[i].scsiClass,
 					&m_scsi_devices[m_config.scsidevs->devices[i].scsiID],
 					m_config.scsidevs->devices[i].diskregion );
 		}

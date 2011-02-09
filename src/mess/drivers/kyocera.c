@@ -344,12 +344,12 @@ WRITE8_MEMBER( pc8201_state::romah_w )
 
         0       A16
         1       ROM SEL
-        2       
-        3       
-        4       
-        5       
-        6       
-        7       
+        2
+        3
+        4
+        5
+        6
+        7
 
     */
 
@@ -1475,7 +1475,7 @@ ROM_END
 ROM_START( pc8201 )
 	ROM_REGION( 0x10000, I8085_TAG, 0 )
 	ROM_LOAD( "ipl.rom", 0x0000, 0x8000, BAD_DUMP CRC(3725d32a) SHA1(5b63b520e667b202b27c630cda821beae819e914) )
-	
+
 	ROM_REGION( 0x8000, "option", ROMREGION_ERASEFF )
 	ROM_CART_LOAD("cart1", 0x0000, 0x8000, ROM_MIRROR | ROM_OPTIONAL)
 
@@ -1497,7 +1497,7 @@ ROM_END
 ROM_START( npc8300 )
 	ROM_REGION( 0x10000, I8085_TAG, 0 )
 	ROM_LOAD( "831000-438_n83a_basic_1986_microsoft_8716_z01.bin", 0x0000, 0x8000, CRC(a3c15dcb) SHA1(f0322dfe3f2e951de043bf6d0973e6ffc2c87181))
-	
+
 	ROM_REGION( 0x8000, "option", ROMREGION_ERASEFF )
 	ROM_CART_LOAD("cart1", 0x0000, 0x8000, ROM_MIRROR | ROM_OPTIONAL)
 

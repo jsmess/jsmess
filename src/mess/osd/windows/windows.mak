@@ -12,7 +12,7 @@ MESS_WINOBJ = $(OBJ)/mess/osd/windows
 OBJDIRS += \
 	$(MESSOBJ)/osd \
 	$(MESSOBJ)/osd/windows
-	
+
 RESFILE = $(MESS_WINOBJ)/mess.res
 
 $(LIBOSD): $(OSDOBJS)

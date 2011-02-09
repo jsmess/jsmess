@@ -1,77 +1,77 @@
 /*
 
-	Atari Portfolio
+    Atari Portfolio
 
-	http://portfolio.wz.cz/
-	http://www.pofowiki.de/doku.php
-	http://www.best-electronics-ca.com/portfoli.htm
-	http://www.atari-portfolio.co.uk/pfnews/pf9.txt
+    http://portfolio.wz.cz/
+    http://www.pofowiki.de/doku.php
+    http://www.best-electronics-ca.com/portfoli.htm
+    http://www.atari-portfolio.co.uk/pfnews/pf9.txt
 
 
-	Undumped Atari cartridges:
+    Undumped Atari cartridges:
 
-	Utility-Card				HPC-701
-	Finance-Card				HPC-702
-	Science-Card				HPC-703	
-	File Manager / Tutorial		HPC-704
-	PowerBASIC					HPC-705
-	Instant Spell				HPC-709
-	Hyperlist					HPC-713
-	Bridge Baron				HPC-724
-	Wine Companion				HPC-725	
-	Diet / Cholesterol Counter	HPC-726	
-	Astrologer					HPC-728	
-	Stock Tracker				HPC-729	
-	Chess						HPC-750
-	
+    Utility-Card                HPC-701
+    Finance-Card                HPC-702
+    Science-Card                HPC-703
+    File Manager / Tutorial     HPC-704
+    PowerBASIC                  HPC-705
+    Instant Spell               HPC-709
+    Hyperlist                   HPC-713
+    Bridge Baron                HPC-724
+    Wine Companion              HPC-725
+    Diet / Cholesterol Counter  HPC-726
+    Astrologer                  HPC-728
+    Stock Tracker               HPC-729
+    Chess                       HPC-750
 
-	Undumped 3rd party cartridges:
 
-	Adcalc						AAC-1000
-	Alpha Paging Interface		SAMpage
-	Business Contacts and Information Manager		BCIM
-	Checkwriter
-	Colossal Cave Adventure
-	Drug Interactions
-	Dynapulse										200M-A
-	Form Letters
-	FORTH programming system						UTIL
-	FX-3 DUAT Flight Software
-	FX-4 Flight Planner
-	Graphics Screens
-	Marine Device Interface							CM380 UMPIRE
-	Message Mover (Mac)								MSG-PKG6
-	Message Mover (PC)								MSG-PKG5
-	Micro Hedge
-	Micro-Roentgen Radiation Monitor				RM-60
-	Patient Management
-	PBase
-	PDD2 Utilities
-	Pharmaceuticals
-	Physician's Reference I
-	PIPELINE Fuel Management
-	REACT
-	Stocks Games
-	Terminal+
-	Timekeeper
-	TIMEPAC-5
+    Undumped 3rd party cartridges:
+
+    Adcalc                      AAC-1000
+    Alpha Paging Interface      SAMpage
+    Business Contacts and Information Manager       BCIM
+    Checkwriter
+    Colossal Cave Adventure
+    Drug Interactions
+    Dynapulse                                       200M-A
+    Form Letters
+    FORTH programming system                        UTIL
+    FX-3 DUAT Flight Software
+    FX-4 Flight Planner
+    Graphics Screens
+    Marine Device Interface                         CM380 UMPIRE
+    Message Mover (Mac)                             MSG-PKG6
+    Message Mover (PC)                              MSG-PKG5
+    Micro Hedge
+    Micro-Roentgen Radiation Monitor                RM-60
+    Patient Management
+    PBase
+    PDD2 Utilities
+    Pharmaceuticals
+    Physician's Reference I
+    PIPELINE Fuel Management
+    REACT
+    Stocks Games
+    Terminal+
+    Timekeeper
+    TIMEPAC-5
 
 */
 
 /*
 
-	TODO:
+    TODO:
 
-	- clock is running too fast
-	- access violation after OFF command
-	- create chargen ROM from tech manual
-	- memory error interrupt vector
-	- i/o port 8051
-	- screen contrast
-	- system tick frequency selection (1 or 128 Hz)
-	- speaker
-	- credit card memory (A:/B:)
-	- software list
+    - clock is running too fast
+    - access violation after OFF command
+    - create chargen ROM from tech manual
+    - memory error interrupt vector
+    - i/o port 8051
+    - screen contrast
+    - system tick frequency selection (1 or 128 Hz)
+    - speaker
+    - credit card memory (A:/B:)
+    - software list
 
 */
 
@@ -92,7 +92,7 @@
 #include "rendlay.h"
 
 //**************************************************************************
-//	MACROS / CONSTANTS
+//  MACROS / CONSTANTS
 //**************************************************************************
 
 enum
@@ -116,7 +116,7 @@ enum
 static const UINT8 INTERRUPT_VECTOR[] = { 0x08, 0x09, 0x00 };
 
 //**************************************************************************
-//	INTERRUPTS
+//  INTERRUPTS
 //**************************************************************************
 
 //-------------------------------------------------
@@ -126,7 +126,7 @@ static const UINT8 INTERRUPT_VECTOR[] = { 0x08, 0x09, 0x00 };
 void portfolio_state::check_interrupt()
 {
 	int level = (m_ip & m_ie) ? ASSERT_LINE : CLEAR_LINE;
-	
+
 	cpu_set_input_line(m_maincpu, INPUT_LINE_INT0, level);
 }
 
@@ -182,7 +182,7 @@ static IRQ_CALLBACK( portfolio_int_ack )
 	portfolio_state *state = device->machine->driver_data<portfolio_state>();
 
 	UINT8 vector = state->m_sivr;
-	
+
 	for (int i = 0; i < 4; i++)
 	{
 		if (BIT(state->m_ip, i))
@@ -205,7 +205,7 @@ static IRQ_CALLBACK( portfolio_int_ack )
 }
 
 //**************************************************************************
-//	KEYBOARD
+//  KEYBOARD
 //**************************************************************************
 
 //-------------------------------------------------
@@ -277,7 +277,7 @@ READ8_MEMBER( portfolio_state::keyboard_r )
 }
 
 //**************************************************************************
-//	INTERNAL SPEAKER
+//  INTERNAL SPEAKER
 //**************************************************************************
 
 //-------------------------------------------------
@@ -288,18 +288,18 @@ WRITE8_MEMBER( portfolio_state::speaker_w )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		0		
-		1		
-		2		
-		3		
-		4		
-		5		
-		6		
-		7		speaker level
+        0
+        1
+        2
+        3
+        4
+        5
+        6
+        7       speaker level
 
-	*/
+    */
 
 	speaker_level_w(m_speaker, !BIT(data, 7));
 
@@ -307,7 +307,7 @@ WRITE8_MEMBER( portfolio_state::speaker_w )
 }
 
 //**************************************************************************
-//	POWER MANAGEMENT
+//  POWER MANAGEMENT
 //**************************************************************************
 
 //-------------------------------------------------
@@ -318,18 +318,18 @@ WRITE8_MEMBER( portfolio_state::power_w )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		0		
-		1		1=power off
-		2		
-		3		
-		4		
-		5		
-		6		
-		7		
+        0
+        1       1=power off
+        2
+        3
+        4
+        5
+        6
+        7
 
-	*/
+    */
 
 	//logerror("POWER %02x\n", data);
 }
@@ -342,18 +342,18 @@ READ8_MEMBER( portfolio_state::battery_r )
 {
 	/*
 
-		bit		signal		description
+        bit     signal      description
 
-		0		
-		1		
-		2		
-		3		
-		4		
-		5		PDET		1=peripheral connected
-		6		BATD?		0=battery low
-		7					1=cold boot
+        0
+        1
+        2
+        3
+        4
+        5       PDET        1=peripheral connected
+        6       BATD?       0=battery low
+        7                   1=cold boot
 
-	*/
+    */
 
 	UINT8 data = 0;
 
@@ -376,7 +376,7 @@ WRITE8_MEMBER( portfolio_state::unknown_w )
 }
 
 //**************************************************************************
-//	SYSTEM TIMERS
+//  SYSTEM TIMERS
 //**************************************************************************
 
 //-------------------------------------------------
@@ -442,7 +442,7 @@ WRITE8_MEMBER( portfolio_state::counter_w )
 }
 
 //**************************************************************************
-//	EXPANSION
+//  EXPANSION
 //**************************************************************************
 
 //-------------------------------------------------
@@ -476,25 +476,25 @@ READ8_MEMBER( portfolio_state::pid_r )
 {
 	/*
 
-		PID		peripheral
+        PID     peripheral
 
-		00		communication card
-		01		serial port
-		02		parallel port
-		03		printer peripheral
-		04		modem
-		05-3f	reserved
-		40-7f	user peripherals
-		80		file-transfer interface
-		81-ff	reserved
+        00      communication card
+        01      serial port
+        02      parallel port
+        03      printer peripheral
+        04      modem
+        05-3f   reserved
+        40-7f   user peripherals
+        80      file-transfer interface
+        81-ff   reserved
 
-	*/
+    */
 
 	return m_pid;
 }
 
 //**************************************************************************
-//	ADDRESS MAPS
+//  ADDRESS MAPS
 //**************************************************************************
 
 //-------------------------------------------------
@@ -523,14 +523,14 @@ static ADDRESS_MAP_START( portfolio_io, ADDRESS_SPACE_IO, 8, portfolio_state )
 	AM_RANGE(0x8050, 0x8050) AM_READWRITE(irq_status_r, irq_mask_w)
 	AM_RANGE(0x8051, 0x8051) AM_READWRITE(battery_r, unknown_w)
 	AM_RANGE(0x8060, 0x8060) AM_RAM AM_BASE(m_contrast)
-//	AM_RANGE(0x8070, 0x8077) AM_DEVREADWRITE_LEGACY(M82C50A_TAG, ins8250_r, ins8250_w) // Serial Interface
-//	AM_RANGE(0x8078, 0x807b) AM_DEVREADWRITE_LEGACY(M82C55A_TAG, i8255a_r, i8255a_w) // Parallel Interface
+//  AM_RANGE(0x8070, 0x8077) AM_DEVREADWRITE_LEGACY(M82C50A_TAG, ins8250_r, ins8250_w) // Serial Interface
+//  AM_RANGE(0x8078, 0x807b) AM_DEVREADWRITE_LEGACY(M82C55A_TAG, i8255a_r, i8255a_w) // Parallel Interface
 	AM_RANGE(0x807c, 0x807c) AM_WRITE(ncc1_w)
 	AM_RANGE(0x807f, 0x807f) AM_READWRITE(pid_r, sivr_w)
 ADDRESS_MAP_END
 
 //**************************************************************************
-//	INPUT PORTS
+//  INPUT PORTS
 //**************************************************************************
 
 //-------------------------------------------------
@@ -651,7 +651,7 @@ static INPUT_PORTS_START( portfolio )
 INPUT_PORTS_END
 
 //**************************************************************************
-//	VIDEO
+//  VIDEO
 //**************************************************************************
 
 //-------------------------------------------------
@@ -706,7 +706,7 @@ static GFXDECODE_START( portfolio )
 GFXDECODE_END
 
 //**************************************************************************
-//	DEVICE CONFIGURATION
+//  DEVICE CONFIGURATION
 //**************************************************************************
 
 //-------------------------------------------------
@@ -756,7 +756,7 @@ static const centronics_interface centronics_intf =
 };
 
 //**************************************************************************
-//	IMAGE LOADING
+//  IMAGE LOADING
 //**************************************************************************
 
 //-------------------------------------------------
@@ -769,7 +769,7 @@ static DEVICE_IMAGE_LOAD( portfolio_cart )
 }
 
 //**************************************************************************
-//	MACHINE INITIALIZATION
+//  MACHINE INITIALIZATION
 //**************************************************************************
 
 //-------------------------------------------------
@@ -837,7 +837,7 @@ void portfolio_state::machine_reset()
 }
 
 //**************************************************************************
-//	MACHINE CONFIGURATION
+//  MACHINE CONFIGURATION
 //**************************************************************************
 
 //-------------------------------------------------
@@ -849,7 +849,7 @@ static MACHINE_CONFIG_START( portfolio, portfolio_state )
     MCFG_CPU_ADD(M80C88A_TAG, I8088, XTAL_4_9152MHz)
     MCFG_CPU_PROGRAM_MAP(portfolio_mem)
     MCFG_CPU_IO_MAP(portfolio_io)
-	
+
     /* video hardware */
 	MCFG_SCREEN_ADD(SCREEN_TAG, LCD)
 	MCFG_SCREEN_REFRESH_RATE(72)
@@ -888,18 +888,18 @@ static MACHINE_CONFIG_START( portfolio, portfolio_state )
 	MCFG_CARTSLOT_LOAD(portfolio_cart)
 
 	/* memory card */
-/*	MCFG_MEMCARD_ADD("memcard_a")
-	MCFG_MEMCARD_EXTENSION_LIST("bin")
-	MCFG_MEMCARD_LOAD(portfolio_memcard)
-	MCFG_MEMCARD_SIZE_OPTIONS("32K,64K,128K")
+/*  MCFG_MEMCARD_ADD("memcard_a")
+    MCFG_MEMCARD_EXTENSION_LIST("bin")
+    MCFG_MEMCARD_LOAD(portfolio_memcard)
+    MCFG_MEMCARD_SIZE_OPTIONS("32K,64K,128K")
 
-	MCFG_MEMCARD_ADD("memcard_b")
-	MCFG_MEMCARD_EXTENSION_LIST("bin")
-	MCFG_MEMCARD_LOAD(portfolio_memcard)
-	MCFG_MEMCARD_SIZE_OPTIONS("32K,64K,128K")*/
+    MCFG_MEMCARD_ADD("memcard_b")
+    MCFG_MEMCARD_EXTENSION_LIST("bin")
+    MCFG_MEMCARD_LOAD(portfolio_memcard)
+    MCFG_MEMCARD_SIZE_OPTIONS("32K,64K,128K")*/
 
 	/* software lists */
-//	MCFG_SOFTWARE_LIST_ADD("cart_list", "pofo")
+//  MCFG_SOFTWARE_LIST_ADD("cart_list", "pofo")
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -911,7 +911,7 @@ static MACHINE_CONFIG_START( portfolio, portfolio_state )
 MACHINE_CONFIG_END
 
 //**************************************************************************
-//	ROMS
+//  ROMS
 //**************************************************************************
 
 //-------------------------------------------------
@@ -929,7 +929,7 @@ ROM_START( pofo )
 ROM_END
 
 //**************************************************************************
-//	SYSTEM DRIVERS
+//  SYSTEM DRIVERS
 //**************************************************************************
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT       INIT    COMPANY     FULLNAME        FLAGS */

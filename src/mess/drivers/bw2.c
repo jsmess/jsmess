@@ -494,7 +494,7 @@ WRITE8_MEMBER( bw2_state::ppi_pa_w )
 	if (BIT(data, 4))
 	{
 		m_drive = 0;
-		
+
 		wd17xx_set_drive(m_fdc, m_drive);
 	}
 

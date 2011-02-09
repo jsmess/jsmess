@@ -193,7 +193,7 @@ VIDEO_UPDATE( mac_cb264 )
 						*scanline++ = mac->m_cb264_palette[pixels&0xf0];
 						*scanline++ = mac->m_cb264_palette[(pixels<<4)&0xf0];
 					}
-				}	      
+				}
 			}
 			break;
 
@@ -350,7 +350,7 @@ VIDEO_RESET(macrbv)
 		case 1:	// 15" portrait display
 			visarea.max_x = 640-1;
 			visarea.max_y = 870-1;
-		     	htotal = 832;
+		    	htotal = 832;
 			vtotal = 918;
 			framerate = 75.0;
 			break;
@@ -358,7 +358,7 @@ VIDEO_RESET(macrbv)
 		case 2: // 12" RGB
 			visarea.max_x = 512-1;
 			visarea.max_y = 384-1;
-		     	htotal = 640;
+		    	htotal = 640;
 			vtotal = 407;
 			framerate = 60.15;
 			break;
@@ -367,13 +367,13 @@ VIDEO_RESET(macrbv)
 		default:
 			visarea.max_x = 640-1;
 			visarea.max_y = 480-1;
-		     	htotal = 800;
+		    	htotal = 800;
 			vtotal = 525;
 			framerate = 59.94;
 			break;
 	}
 
-//    	printf("RBV reset: monitor is %dx%d @ %f Hz\n", visarea.max_x+1, visarea.max_y+1, framerate);
+//      printf("RBV reset: monitor is %dx%d @ %f Hz\n", visarea.max_x+1, visarea.max_y+1, framerate);
 	machine->primary_screen->configure(htotal, vtotal, visarea, HZ_TO_ATTOSECONDS(framerate));
 }
 
@@ -420,7 +420,7 @@ VIDEO_UPDATE( macrbv )
 	UINT32 *scanline;
 	int x, y, hres, vres;
 	mac_state *mac = screen->machine->driver_data<mac_state>();
-	UINT8 *vram8 = (UINT8 *)ram_get_ptr(screen->machine->device(RAM_TAG)); 
+	UINT8 *vram8 = (UINT8 *)ram_get_ptr(screen->machine->device(RAM_TAG));
 
 	switch (mac->m_rbv_montype)
 	{
@@ -515,7 +515,7 @@ VIDEO_UPDATE( macrbv )
 		case 3: // 8bpp
 		{
 			UINT8 pixels;
-			
+
 			for (y = 0; y < vres; y++)
 			{
 				scanline = BITMAP_ADDR32(bitmap, y, 0);
@@ -653,7 +653,7 @@ VIDEO_UPDATE( macrbvvram )
 		{
 			UINT8 *vram8 = (UINT8 *)mac->m_rbv_vram;
 			UINT8 pixels;
-			
+
 			for (y = 0; y < 480; y++)
 			{
 				scanline = BITMAP_ADDR32(bitmap, y, 0);

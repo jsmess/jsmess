@@ -49,15 +49,15 @@ public:
 	UINT8 store_control;
 	UINT8 input_port0;
 	UINT8 input_port1;
-	
+
 	// for gamegear LCD persistence hack
 	bitmap_t *tmp_bitmap;
 	bitmap_t *prev_bitmap;
-	
+
 	// for 3D glass binocular hack
 	bitmap_t *prevleft_bitmap;
 	bitmap_t *prevright_bitmap;
-	
+
 	/* Model identifiers */
 	UINT8 is_gamegear;
 	UINT8 is_region_japan;
@@ -66,16 +66,16 @@ public:
 	UINT8 has_bios_full;
 	UINT8 has_bios;
 	UINT8 has_fm;
-	
+
 	/* Data needed for Rapid Fire Unit support */
 	emu_timer *rapid_fire_timer;
 	UINT8 rapid_fire_state_1;
 	UINT8 rapid_fire_state_2;
-	
+
 	/* Data needed for Paddle Control controller */
 	UINT32 last_paddle_read_time;
 	UINT8 paddle_read_state;
-	
+
 	/* Data needed for Sports Pad controller */
 	UINT32 last_sports_pad_time_1;
 	UINT32 last_sports_pad_time_2;
@@ -87,20 +87,20 @@ public:
 	UINT8 sports_pad_1_y;
 	UINT8 sports_pad_2_x;
 	UINT8 sports_pad_2_y;
-	
+
 	/* Data needed for Light Phaser */
 	emu_timer *lphaser_1_timer;
 	emu_timer *lphaser_2_timer;
 	UINT8 lphaser_1_latch;
 	UINT8 lphaser_2_latch;
 	int lphaser_x_offs;	/* Needed to 'calibrate' lphaser; set at cart loading */
-	
+
 	/* Data needed for SegaScope (3D glasses) */
 	UINT8 sscope_state;
-	
+
 	/* Data needed for Terebi Oekaki (TV Draw) */
 	UINT8 tvdraw_data;
-	
+
 	/* Cartridge slot info */
 	UINT8 current_cartridge;
 	struct

@@ -774,7 +774,7 @@ static MACHINE_CONFIG_START( z88, z88_state )
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("2M")
-	
+
 	MCFG_TIMER_ADD_PERIODIC("rtc_timer", z88_rtc_timer_callback, attotime::from_msec(5))
 MACHINE_CONFIG_END
 

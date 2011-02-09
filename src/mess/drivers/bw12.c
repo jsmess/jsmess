@@ -115,7 +115,7 @@ void bw12_state::set_floppy_motor_off_timer()
             C11 = CAP_U(4.7)
 
         */
-		
+
 		m_floppy_timer->adjust(attotime::zero);
 	}
 }

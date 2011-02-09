@@ -234,13 +234,13 @@ static const a7800_pcb pcb_list[] =
 static UINT16 a7800_get_pcb_id(const char *pcb)
 {
 	int	i;
-	
+
 	for (i = 0; i < ARRAY_LENGTH(pcb_list); i++)
 	{
 		if (!mame_stricmp(pcb_list[i].pcb_name, pcb))
 			return pcb_list[i].type;
 	}
-	
+
 	return 0;
 }
 
@@ -257,18 +257,18 @@ DEVICE_IMAGE_LOAD( a7800_cart )
 	{
 		/* Load and decode the header */
 		image.fread(header, 128);
-		
+
 		/* Check the cart */
 		if( a7800_verify_cart((char *)header) == IMAGE_VERIFY_FAIL)
 			return IMAGE_INIT_FAIL;
-		
+
 		len =(header[49] << 24) |(header[50] << 16) |(header[51] << 8) | header[52];
 		state->cart_size = len;
-		
+
 		state->cart_type =(header[53] << 8) | header[54];
 		state->stick_type = header[55];
 		logerror("Cart type: %x\n", state->cart_type);
-		
+
 		/* For now, if game support stick and gun, set it to stick */
 		if (state->stick_type == 3)
 			state->stick_type = 1;
@@ -361,7 +361,7 @@ DEVICE_IMAGE_LOAD( a7800_cart )
 			image.fread(state->cartridge_rom, len);
 		else
 			memcpy(state->cartridge_rom, image.get_software_region("rom") + start, len);
-		
+
 		/* bank 0 */
 		memcpy(memory + 0xa000, memory + 0x10000, 0x4000);
 

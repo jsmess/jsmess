@@ -88,7 +88,7 @@ static DEVICE_START(coco_cartridge)
 	coco_cartridge_t *cococart = get_token(device);
 	const cococart_config *config = (const cococart_config *) downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
    int i;
-   
+
 	/* initialize */
 	memset(cococart, 0, sizeof(*cococart));
 
@@ -111,10 +111,10 @@ static DEVICE_START(coco_cartridge)
 	for( i=0; i<TIMER_POOL; i++ )
 	{
 	   cococart->cart_line.timer[i]		= device->machine->scheduler().timer_alloc(FUNC(cart_timer_callback), (void *) device);
-	   cococart->nmi_line.timer[i] 		= device->machine->scheduler().timer_alloc(FUNC(nmi_timer_callback), (void *) device);
+	   cococart->nmi_line.timer[i]		= device->machine->scheduler().timer_alloc(FUNC(nmi_timer_callback), (void *) device);
 	   cococart->halt_line.timer[i]		= device->machine->scheduler().timer_alloc(FUNC(halt_timer_callback), (void *) device);
 	}
-   
+
 	cococart->cart_line.timer_index     = 0;
 	cococart->cart_line.delay		      = 0;
 	cococart->cart_line.callback        = config->cart_callback;

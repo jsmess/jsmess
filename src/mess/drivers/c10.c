@@ -86,9 +86,9 @@ static VIDEO_UPDATE( c10 )
 				{
 					chr = state->videoram[xx++];
 
-				//	/* Take care of flashing characters */
-				//	if ((chr < 0x80) && (framecnt & 0x08))
-				//		chr |= 0x80;
+				//  /* Take care of flashing characters */
+				//  if ((chr < 0x80) && (framecnt & 0x08))
+				//      chr |= 0x80;
 
 					if (chr & 0x80)  // ignore attribute bytes
 						x--;
@@ -174,4 +174,4 @@ ROM_END
 /* Driver */
 
 /*   YEAR  NAME    PARENT  COMPAT   MACHINE  INPUT  INIT        COMPANY   FULLNAME       FLAGS */
-COMP( 1982, c10,  0,       0,	c10,	c10,	 c10, 	  "Cromemco",   "C-10",		GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1982, c10,  0,       0,	c10,	c10,	 c10,	  "Cromemco",   "C-10",		GAME_NOT_WORKING | GAME_NO_SOUND)

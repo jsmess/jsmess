@@ -155,7 +155,7 @@ ADDRESS_MAP_END
 /*
 
 Enter the 4 digit address then the command key:
- 
+
   - M : Examine and Change Memory
   - E : Escape (abort) operation (H key in our emulation)
   - R : Examine Registers
@@ -299,12 +299,12 @@ static const pia6821_interface mekd2_u_mc6821_intf =
 
 static ACIA6850_INTERFACE( mekd2_acia_intf )
 {
-	XTAL_MEKD2 / 256,	//connected to cassette circuit	/* tx clock 4800Hz */
-	XTAL_MEKD2 / 256,	//connected to cassette circuit	/* rx clock varies, controlled by cassette circuit */
-	DEVCB_NULL,//LINE(cass),//connected to cassette circuit	/* in rxd func */
-	DEVCB_NULL,//LINE(cass),//connected to cassette circuit	/* out txd func */
+	XTAL_MEKD2 / 256,	//connected to cassette circuit /* tx clock 4800Hz */
+	XTAL_MEKD2 / 256,	//connected to cassette circuit /* rx clock varies, controlled by cassette circuit */
+	DEVCB_NULL,//LINE(cass),//connected to cassette circuit /* in rxd func */
+	DEVCB_NULL,//LINE(cass),//connected to cassette circuit /* out txd func */
 	DEVCB_NULL,						/* in cts func */
-	DEVCB_NULL,		//connected to cassette circuit	/* out rts func */
+	DEVCB_NULL,		//connected to cassette circuit /* out rts func */
 	DEVCB_NULL,						/* in dcd func */
 	DEVCB_NULL						/* out irq func */
 };

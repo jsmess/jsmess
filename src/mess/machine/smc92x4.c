@@ -394,7 +394,7 @@ static void sync_status_in(device_t *device)
 
 	prev = w->register_r[DRIVE_STATUS];
 	w->register_r[DRIVE_STATUS] = devcb_call_read_line(&w->in_auxbus_func);
-	
+
 	/* Raise interrupt if ready changes. TODO: Check this more closely. */
 //  logerror("disk status = %02x\n", reply);
 	if (((w->register_r[DRIVE_STATUS] & DS_READY) != (prev & DS_READY))

@@ -1,5 +1,5 @@
 /***************************************************************************
-   
+
         Peripheral Technology PT68K4
 
         03/01/2011 Skeleton driver.
@@ -30,8 +30,8 @@ INPUT_PORTS_START( pt68k4 )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET(pt68k4) 
-{	
+static MACHINE_RESET(pt68k4)
+{
 	pt68k4_state *state = machine->driver_data<pt68k4_state>();
 	UINT8* user1 = machine->region("user1")->base();
 
@@ -84,5 +84,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY   FULLNAME       FLAGS */
-COMP( 1990, pt68k4,  0,       0, 	pt68k4, 	pt68k4, 	 0,   	 "Peripheral Technology",   "PT68K4",		GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1990, pt68k4,  0,       0,	pt68k4, 	pt68k4, 	 0, 	 "Peripheral Technology",   "PT68K4",		GAME_NOT_WORKING | GAME_NO_SOUND)
 

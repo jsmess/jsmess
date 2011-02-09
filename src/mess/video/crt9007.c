@@ -11,11 +11,11 @@
 
     TODO:
 
-	- cursor timer
+    - cursor timer
     - interrupts
-		- light pen
-		- frame timer
-	- non-DMA mode
+        - light pen
+        - frame timer
+    - non-DMA mode
     - DMA mode
     - cursor/blank skew
     - sequential breaks
@@ -38,7 +38,7 @@
 
 
 //**************************************************************************
-//	MACROS / CONSTANTS
+//  MACROS / CONSTANTS
 //**************************************************************************
 
 #define LOG 1
@@ -316,7 +316,7 @@ inline UINT8 crt9007_device::readbyte(offs_t address)
 
 
 //-------------------------------------------------
-//  trigger_interrupt - 
+//  trigger_interrupt -
 //-------------------------------------------------
 
 inline void crt9007_device::trigger_interrupt(int line)
@@ -337,7 +337,7 @@ inline void crt9007_device::trigger_interrupt(int line)
 
 
 //-------------------------------------------------
-//  update_cblank_line - 
+//  update_cblank_line -
 //-------------------------------------------------
 
 inline void crt9007_device::update_cblank_line()
@@ -347,20 +347,20 @@ inline void crt9007_device::update_cblank_line()
 
 	// composite blank
 	int cblank = !(m_hs & m_vs);
-		
+
 	if (m_cblank != cblank)
 	{
 		m_cblank = cblank;
-			
+
 		if (LOG) logerror("CRT9007 '%s' y %03u x %04u : CBLANK %u\n", tag(), y, x, m_cblank);
-			
+
 		devcb_call_write_line(&m_out_cblank_func, m_cblank);
 	}
 }
 
 
 //-------------------------------------------------
-//  update_hsync_timer - 
+//  update_hsync_timer -
 //-------------------------------------------------
 
 inline void crt9007_device::update_hsync_timer(int state)
@@ -377,7 +377,7 @@ inline void crt9007_device::update_hsync_timer(int state)
 
 
 //-------------------------------------------------
-//  update_vsync_timer - 
+//  update_vsync_timer -
 //-------------------------------------------------
 
 inline void crt9007_device::update_vsync_timer(int state)
@@ -391,7 +391,7 @@ inline void crt9007_device::update_vsync_timer(int state)
 
 
 //-------------------------------------------------
-//  update_vlt_timer - 
+//  update_vlt_timer -
 //-------------------------------------------------
 
 inline void crt9007_device::update_vlt_timer(int state)
@@ -409,7 +409,7 @@ inline void crt9007_device::update_vlt_timer(int state)
 
 
 //-------------------------------------------------
-//  update_curs_timer - 
+//  update_curs_timer -
 //-------------------------------------------------
 
 inline void crt9007_device::update_curs_timer(int state)
@@ -420,7 +420,7 @@ inline void crt9007_device::update_curs_timer(int state)
 
 
 //-------------------------------------------------
-//  update_drb_timer - 
+//  update_drb_timer -
 //-------------------------------------------------
 
 inline void crt9007_device::update_drb_timer(int state)
@@ -456,7 +456,7 @@ inline void crt9007_device::update_drb_timer(int state)
 
 
 //-------------------------------------------------
-//  update_dma_timer - 
+//  update_dma_timer -
 //-------------------------------------------------
 
 inline void crt9007_device::update_dma_timer()
@@ -466,7 +466,7 @@ inline void crt9007_device::update_dma_timer()
 
 
 //-------------------------------------------------
-//  recompute_parameters - 
+//  recompute_parameters -
 //-------------------------------------------------
 
 inline void crt9007_device::recompute_parameters()
@@ -573,7 +573,7 @@ void crt9007_device::device_start()
 	m_hpixels_per_column = m_config.hpixels_per_column;
 
 	// register for state saving
-//	state_save_register_device_item(this, 0, );
+//  state_save_register_device_item(this, 0, );
 }
 
 
@@ -987,7 +987,7 @@ WRITE_LINE_MEMBER( crt9007_device::lpstb_w )
 
 
 //-------------------------------------------------
-//  vlt_r - 
+//  vlt_r -
 //-------------------------------------------------
 
 READ_LINE_MEMBER( crt9007_device::vlt_r )
@@ -997,7 +997,7 @@ READ_LINE_MEMBER( crt9007_device::vlt_r )
 
 
 //-------------------------------------------------
-//  wben_r - 
+//  wben_r -
 //-------------------------------------------------
 
 READ_LINE_MEMBER( crt9007_device::wben_r )
@@ -1007,7 +1007,7 @@ READ_LINE_MEMBER( crt9007_device::wben_r )
 
 
 //-------------------------------------------------
-//  set_hpixels_per_column - 
+//  set_hpixels_per_column -
 //-------------------------------------------------
 
 void crt9007_device::set_hpixels_per_column(int hpixels_per_column)

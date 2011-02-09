@@ -438,7 +438,7 @@ static MACHINE_CONFIG_START( vg5k, vg5k_state )
 
 	/* Software lists */
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "vg5k")
-	
+
 	MCFG_TIMER_ADD_PERIODIC("irq_timer", z80_irq, attotime::from_msec(20))
 MACHINE_CONFIG_END
 

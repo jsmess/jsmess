@@ -9,31 +9,31 @@
 
 /*
 
-	TODO:
+    TODO:
 
-	- attributes
-		- reverse video
-		- character blank
-		- character blink
-		- underline
-		- full/half intensity
-	- operation modes
-		- wide graphics
-		- thin graphics
-		- character mode w/o underline
-		- character mode w/underline
-	- double height characters
-	- double width characters
-	- parallel scan line
-	- serial scan line
-	- cursor
-		- underline
-		- blinking underline
-		- reverse video
-		- blinking reverse video
-	- programmable character blink rate (75/25 duty)
-	- programmable cursor blink rate (50/50 duty)
-	- data/attribute latches
+    - attributes
+        - reverse video
+        - character blank
+        - character blink
+        - underline
+        - full/half intensity
+    - operation modes
+        - wide graphics
+        - thin graphics
+        - character mode w/o underline
+        - character mode w/underline
+    - double height characters
+    - double width characters
+    - parallel scan line
+    - serial scan line
+    - cursor
+        - underline
+        - blinking underline
+        - reverse video
+        - blinking reverse video
+    - programmable character blink rate (75/25 duty)
+    - programmable cursor blink rate (50/50 duty)
+    - data/attribute latches
 
 */
 
@@ -43,7 +43,7 @@
 
 
 //**************************************************************************
-//	MACROS / CONSTANTS
+//  MACROS / CONSTANTS
 //**************************************************************************
 
 #define LOG 1

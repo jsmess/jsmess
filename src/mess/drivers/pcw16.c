@@ -194,7 +194,7 @@ static int pcw16_flash0_bank_handler_r(running_machine *machine, int bank, int o
 {
 	pcw16_state *state = machine->driver_data<pcw16_state>();
 	intel_e28f008sa_device *flash = machine->device<intel_e28f008sa_device>("flash0");
-	int flash_offset = (state->banks[bank]<<14) | offset;	
+	int flash_offset = (state->banks[bank]<<14) | offset;
 	return flash->read(flash_offset);
 }
 
@@ -434,7 +434,7 @@ static void pcw16_update_bank(running_machine *machine, int bank)
 
 			/* nvram */
 			if ((bank_id & 0x040)==0)
-			{			
+			{
 				flashdev = machine->device<intelfsh8_device>("flash0");
 			}
 			else
@@ -1449,7 +1449,7 @@ static MACHINE_CONFIG_START( pcw16, pcw16_state )
 	MCFG_RAM_DEFAULT_SIZE("2M")
 	MCFG_INTEL_E28F008SA_ADD("flash0")
 	MCFG_INTEL_E28F008SA_ADD("flash1")
-	
+
 	/* video ints */
 	MCFG_TIMER_ADD_PERIODIC("video_timer", pcw16_timer_callback, attotime::from_hz(5830))
 	/* rtc timer */
@@ -1473,4 +1473,4 @@ ROM_END
 
 
 /*     YEAR  NAME     PARENT    COMPAT  MACHINE    INPUT     INIT    COMPANY          FULLNAME */
-COMP( 1995, pcw16,	  0,		0,		pcw16,	   pcw16,    0,	 	"Amstrad plc",   "PCW16", GAME_NOT_WORKING )
+COMP( 1995, pcw16,	  0,		0,		pcw16,	   pcw16,    0,		"Amstrad plc",   "PCW16", GAME_NOT_WORKING )

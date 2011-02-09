@@ -411,7 +411,7 @@ static NVRAM_HANDLER( micronic )
 		if (file)
 		{
 			mame_fread(file, state->ram, 0x8000);
-			mame_fread(file, ram_get_ptr(machine->device(RAM_TAG)), 224*1024);			
+			mame_fread(file, ram_get_ptr(machine->device(RAM_TAG)), 224*1024);
 
 			/* reload register A and B for restore the periodic irq state */
 			mame_fseek(file, 0x4000a, SEEK_SET);
@@ -513,7 +513,7 @@ static MACHINE_CONFIG_START( micronic, micronic_state )
 	MCFG_RAM_DEFAULT_SIZE("224K")
 
 	MCFG_NVRAM_HANDLER(micronic)
-	
+
 	MCFG_MC146818_ADD( "rtc", MC146818_IGNORE_CENTURY )
 MACHINE_CONFIG_END
 

@@ -383,7 +383,7 @@ static WRITE8_HANDLER(pcw_bank_select_w)
 	state->banks[offset] = data;
 
 	pcw_update_mem(space->machine, offset, data);
-//	popmessage("RAM Banks: %02x %02x %02x %02x",state->banks[0],state->banks[1],state->banks[2],state->banks[3]);
+//  popmessage("RAM Banks: %02x %02x %02x %02x",state->banks[0],state->banks[1],state->banks[2],state->banks[3]);
 }
 
 static WRITE8_HANDLER(pcw_bank_force_selection_w)
@@ -677,8 +677,8 @@ static void pcw_printer_fire_pins(running_machine* machine, UINT16 pins)
 			*BITMAP_ADDR16(state->prn_output,line,state->printer_headpos) = (UINT16)(pins & 0x01);
 		pins >>= 1;
 	}
-//	if(state->printer_headpos < PCW_PRINTER_WIDTH)
-//		state->printer_headpos++;
+//  if(state->printer_headpos < PCW_PRINTER_WIDTH)
+//      state->printer_headpos++;
 }
 
 static WRITE8_HANDLER(pcw_printer_data_w)
@@ -812,7 +812,7 @@ static TIMER_CALLBACK(pcw_pins_callback)
 static READ8_HANDLER(mcu_printer_p1_r)
 {
 	pcw_state *state = space->machine->driver_data<pcw_state>();
-//	logerror("PRN: MCU reading data from P1\n");
+//  logerror("PRN: MCU reading data from P1\n");
 	return state->printer_pins & 0x00ff;
 }
 
@@ -828,7 +828,7 @@ static READ8_HANDLER(mcu_printer_p2_r)
 {
 	UINT8 ret = 0x00;
 	pcw_state *state = space->machine->driver_data<pcw_state>();
-//	logerror("PRN: MCU reading data from P2\n");
+//  logerror("PRN: MCU reading data from P2\n");
 	ret |= 0x80;  // make sure bail bar is in
 	ret |= (state->printer_p2 & 0x70);
 	ret |= (state->printer_pins & 0x100) ? 0x01 : 0x00;  // ninth pin
@@ -1342,7 +1342,7 @@ static MACHINE_CONFIG_START( pcw, pcw_state )
 	MCFG_CPU_ADD("keyboard_mcu", I8048, 5000000) // 5MHz
 	MCFG_CPU_IO_MAP(pcw_keyboard_io)
 
-//	MCFG_QUANTUM_TIME(attotime::from_hz(50))
+//  MCFG_QUANTUM_TIME(attotime::from_hz(50))
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
 	MCFG_MACHINE_START(pcw)
@@ -1373,8 +1373,8 @@ static MACHINE_CONFIG_START( pcw, pcw_state )
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("256K")
-	
-	MCFG_TIMER_ADD_PERIODIC("pcw_timer", pcw_timer_interrupt, attotime::from_hz(300))	
+
+	MCFG_TIMER_ADD_PERIODIC("pcw_timer", pcw_timer_interrupt, attotime::from_hz(300))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( pcw8256, pcw )

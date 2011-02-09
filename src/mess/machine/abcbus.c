@@ -179,7 +179,7 @@ WRITE_LINE_DEVICE_HANDLER( abcbus_resin_w )
 	if (abcbus->resin != state)
 	{
 		if (LOG) logerror("ABCBUS: '%s' RESIN %u\n", device->tag(), state);
-		
+
 		cpu_set_input_line(abcbus->cpu, INPUT_LINE_RESET, state);
 		abcbus->resin = state;
 	}

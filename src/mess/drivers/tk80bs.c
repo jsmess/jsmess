@@ -365,7 +365,7 @@ static MACHINE_CONFIG_START( tk80, tk80bs_state )
 	MCFG_PALETTE_INIT(black_and_white)
 
 	MCFG_I8255A_ADD( "ppi8255_0", ppi8255_intf_0 )
-	
+
 	MCFG_VIDEO_START(tk80)
 	MCFG_VIDEO_UPDATE(tk80)
 MACHINE_CONFIG_END

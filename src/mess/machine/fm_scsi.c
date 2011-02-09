@@ -141,7 +141,7 @@ void fmscsi_device::fmscsi_rescan()
 	for (i = 0; i < m_config.scsidevs->devs_present; i++)
 	{
 		// if a device wasn't already allocated
-//		if (!m_SCSIdevices[m_config.scsidevs->devices[i].scsiID])
+//      if (!m_SCSIdevices[m_config.scsidevs->devices[i].scsiID])
 		{
 			SCSIDeleteInstance( m_SCSIdevices[m_config.scsidevs->devices[i].scsiID] );
 			SCSIAllocInstance( machine,
@@ -384,7 +384,7 @@ void fmscsi_device::set_input_line(UINT8 line, UINT8 state)
 		m_input_lines |= line;
 	else
 		m_input_lines &= ~line;
-//	logerror("FMSCSI: input line %02x set to %i\n",line,state);
+//  logerror("FMSCSI: input line %02x set to %i\n",line,state);
 }
 
 UINT8 fmscsi_device::get_input_line(UINT8 line)
@@ -425,7 +425,7 @@ void fmscsi_device::set_output_line(UINT8 line, UINT8 state)
 		m_output_lines |= line;
 	else
 		m_output_lines &= ~line;
-//	logerror("FMSCSI: output line %02x set to %i\n",line,state);
+//  logerror("FMSCSI: output line %02x set to %i\n",line,state);
 }
 
 UINT8 fmscsi_device::get_output_line(UINT8 line)

@@ -39,7 +39,7 @@ public:
 	required_device<device_t> m_ram;
 
 	virtual void machine_start();
-	
+
 	void install_cartridge(UINT8 *ptr, int size);
 
 	DECLARE_WRITE8_MEMBER( tvdraw_axis_w );

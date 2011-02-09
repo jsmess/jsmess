@@ -10,7 +10,7 @@
     TODO:
 
     - keyboard repeat
-	- shift lock is not PORT_TOGGLE, instead RS flipflop
+    - shift lock is not PORT_TOGGLE, instead RS flipflop
     - tone generator
     - cassette serial clock
     - eprom programmer
@@ -81,11 +81,11 @@ READ8_MEMBER( amu880_state::keyboard_r )
     */
 
 	UINT8 special = input_port_read(machine, "SPECIAL");
-	
+
 	int ctrl = BIT(special, 0);
 	int shift = BIT(special, 2) & BIT(special, 1);
 	int ab0 = BIT(offset, 0);
-	
+
 	UINT16 address = (ab0 << 9) | (m_key_a8 << 8) | (ctrl << 7) | (shift << 6) | (m_key_a5 << 5) | (m_key_a4 << 4) | m_key_d7;
 
 	return m_kb_rom[address];

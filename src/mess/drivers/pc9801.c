@@ -1,16 +1,16 @@
 /***************************************************************************************************
 
-	PC-9801 (c) 1981 NEC
+    PC-9801 (c) 1981 NEC
 
-	fork / rewrite from pc98.c, contents of that file will be moved to here once that things gets
-	consolidated there.
+    fork / rewrite from pc98.c, contents of that file will be moved to here once that things gets
+    consolidated there.
 
-	preliminary driver by Angelo Salese
+    preliminary driver by Angelo Salese
 
-	TODO:
-	- floppy interface doesn't seem to work at all with either floppy inserted or not, missing DMA irq?
-	- proper 8251 uart hook-up on keyboard
-	- boot is too slow right now, might be due of the floppy / HDD devices
+    TODO:
+    - floppy interface doesn't seem to work at all with either floppy inserted or not, missing DMA irq?
+    - proper 8251 uart hook-up on keyboard
+    - boot is too slow right now, might be due of the floppy / HDD devices
 
 ****************************************************************************************************/
 
@@ -359,7 +359,7 @@ static WRITE8_HANDLER( pc9801_video_ff_w )
 			{
 				"Attribute Select",	// 0
 				"Graphic",			// 1
-				"Column", 			// 2
+				"Column",			// 2
 				"Font Select",		// 3
 				"200 lines",		// 4
 				"KAC?",				// 5
@@ -493,7 +493,7 @@ static WRITE8_HANDLER( pc9801_a0_w )
 			case 0x04:
 			case 0x06:
 				//if(data)
-				//	printf("Warning: write to bitmap bank %02x\n",data);
+				//  printf("Warning: write to bitmap bank %02x\n",data);
 				return;
 			/* bitmap palette clut write */
 			case 0x08:
@@ -617,29 +617,29 @@ static ADDRESS_MAP_START( pc9801_map, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0x00000, 0x9ffff) AM_RAM //work RAM
 	AM_RANGE(0xa0000, 0xa3fff) AM_READWRITE(pc9801_tvram_r,pc9801_tvram_w) //TVRAM
 	AM_RANGE(0xa8000, 0xbffff) AM_RAM //bitmap VRAM
-//	AM_RANGE(0xcc000, 0xcdfff) AM_ROM //sound BIOS
+//  AM_RANGE(0xcc000, 0xcdfff) AM_ROM //sound BIOS
 	AM_RANGE(0xd6000, 0xd6fff) AM_ROM AM_REGION("fdc_bios_2dd",0) //floppy BIOS 2dd
-//	AM_RANGE(0xd7000, 0xd7fff) AM_ROM AM_REGION("fdc_bios_2hd",0) //floppy BIOS 2hd
+//  AM_RANGE(0xd7000, 0xd7fff) AM_ROM AM_REGION("fdc_bios_2hd",0) //floppy BIOS 2hd
 	AM_RANGE(0xe8000, 0xfffff) AM_ROM AM_REGION("ipl",0)
 ADDRESS_MAP_END
 
 /* first device is even offsets, second one is odd offsets */
 static ADDRESS_MAP_START( pc9801_io, ADDRESS_SPACE_IO, 16)
 	AM_RANGE(0x0000, 0x001f) AM_READWRITE8(pc9801_00_r,pc9801_00_w,0xffff) // i8259 PIC (bit 3 ON slave / master) / i8237 DMA
-//	AM_RANGE(0x0020, 0x0027) RTC / DMA registers (LS244)
+//  AM_RANGE(0x0020, 0x0027) RTC / DMA registers (LS244)
 	AM_RANGE(0x0030, 0x0037) AM_READWRITE8(pc9801_30_r,pc9801_30_w,0xffff) //i8251 RS232c / i8255 system port
 	AM_RANGE(0x0040, 0x0047) AM_READWRITE8(pc9801_40_r,pc9801_40_w,0xffff) //i8255 printer port / i8251 keyboard
 	AM_RANGE(0x0050, 0x0057) AM_READWRITE8(pc9801_50_r,pc9801_50_w,0xffff) // NMI FF / i8255 floppy port (2d?)
 	AM_RANGE(0x0060, 0x0063) AM_READWRITE8(pc9801_60_r,pc9801_60_w,0xffff) //upd7220 character ports / <undefined>
 	AM_RANGE(0x0064, 0x0065) AM_WRITE8(pc9801_vrtc_mask_w,0xffff)
 	AM_RANGE(0x0068, 0x0069) AM_WRITE8(pc9801_video_ff_w,0xffff) //mode FF / <undefined>
-//	AM_RANGE(0x006c, 0x006f) border color / <undefined>
+//  AM_RANGE(0x006c, 0x006f) border color / <undefined>
 	AM_RANGE(0x0070, 0x007b) AM_READWRITE8(pc9801_70_r,pc9801_70_w,0xffff) //display registers / i8253 pit
 	AM_RANGE(0x0080, 0x0083) AM_READWRITE8(pc9801_sasi_r,pc9801_sasi_w,0xffff) //HDD SASI interface / <undefined>
-//	AM_RANGE(0x0090, 0x0097) upd765a 2hd / cmt
+//  AM_RANGE(0x0090, 0x0097) upd765a 2hd / cmt
 	AM_RANGE(0x00a0, 0x00af) AM_READWRITE8(pc9801_a0_r,pc9801_a0_w,0xffff) //upd7220 bitmap ports / display registers
 	AM_RANGE(0x00c8, 0x00cd) AM_READWRITE8(pc9801_fdc_2dd_r,pc9801_fdc_2dd_w,0xffff) //upd765a 2dd / <undefined>
-//	AM_RANGE(0x0188, 0x018b) ym2203 opn / <undefined>
+//  AM_RANGE(0x0188, 0x018b) ym2203 opn / <undefined>
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( pc9801 )
@@ -996,10 +996,10 @@ static I8237_INTERFACE( dma8237_config )
 static READ8_DEVICE_HANDLER( ppi_sys_porta_r )
 {
 	/*
-	---- x--- lines 20 (1) / 25 (0)
-	---- -x-- width 40 (1) / width 80 (0)
-	---- ---x jumps to daa00 if off?
-	*/
+    ---- x--- lines 20 (1) / 25 (0)
+    ---- -x-- width 40 (1) / width 80 (0)
+    ---- ---x jumps to daa00 if off?
+    */
 
 	return 0xe3 | input_port_read(device->machine,"DSW1");
 }
@@ -1248,8 +1248,8 @@ static MACHINE_CONFIG_START( pc9801, pc9801_state )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-//	MCFG_SOUND_ADD("opn", YM2203, 4000000) // unknown clock / divider
-//	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+//  MCFG_SOUND_ADD("opn", YM2203, 4000000) // unknown clock / divider
+//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_SOUND_ADD("beeper", BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)

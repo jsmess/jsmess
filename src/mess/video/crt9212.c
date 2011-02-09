@@ -13,7 +13,7 @@
 
 
 //**************************************************************************
-//	MACROS / CONSTANTS
+//  MACROS / CONSTANTS
 //**************************************************************************
 
 #define LOG 1
@@ -222,7 +222,7 @@ WRITE_LINE_MEMBER( crt9212_device::rclk_w )
 		{
 			if (REN && (m_rac < CRT9212_RAM_SIZE))
 			{
-				// 
+				//
 				m_output = m_ram[m_rac][!m_buffer];
 
 				// increment read address counter
@@ -251,7 +251,7 @@ WRITE_LINE_MEMBER( crt9212_device::wclk_w )
 	{
 		if (WEN && WEN2 && (m_wac < CRT9212_RAM_SIZE))
 		{
-			// 
+			//
 			m_ram[m_rac][m_buffer] = m_input;
 
 			// increment read address counter

@@ -1,6 +1,6 @@
 /*
 
-    M-Systems DiskOnChip G3 - Flash Disk with MLC NAND and M-Systems’ x2 Technology
+    M-Systems DiskOnChip G3 - Flash Disk with MLC NAND and M-Systems? x2 Technology
 
     (c) 2009 Tim Schuerewegen
 
@@ -72,7 +72,7 @@ INLINE diskonchip_g3_t *get_token( device_t *device)
 INLINE const diskonchip_g3_config *get_config( device_t *device)
 {
 	assert(device != NULL);
-	assert(device->type() == DISKONCHIP_G3);	
+	assert(device->type() == DISKONCHIP_G3);
 	assert(downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config() != NULL);
 	return (const diskonchip_g3_config *)downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
 }
@@ -84,7 +84,7 @@ INLINE const diskonchip_g3_config *get_config( device_t *device)
 static UINT32 diskonchip_g3_offset_data_1( device_t *device)
 {
 	diskonchip_g3_t *doc = get_token( device);
-//	printf( "block %d pages %d page %d planes %d plane %d user_data_size %d extra_area_size %d\n", doc->block, doc->pages, doc->page, doc->planes, doc->plane, doc->user_data_size, doc->extra_area_size);
+//  printf( "block %d pages %d page %d planes %d plane %d user_data_size %d extra_area_size %d\n", doc->block, doc->pages, doc->page, doc->planes, doc->plane, doc->user_data_size, doc->extra_area_size);
 	return ((((doc->block * doc->pages) + doc->page) * doc->planes) + doc->plane) * (doc->user_data_size + doc->extra_area_size);
 }
 
@@ -569,60 +569,60 @@ static void diskonchip_sec_2_write_1034( device_t *device, UINT8 data)
 	}
 	else if (doc->sec_2[0x32] == 0x09)
 	{
-	 	if (data == 0x22)
-	 	{
+		if (data == 0x22)
+		{
 			// do nothing
-	 	}
-	 	else if (data == 0xA2)
-	 	{
+		}
+		else if (data == 0xA2)
+		{
 			// do nothing
-	 	}
-	 	else
-	 	{
+		}
+		else
+		{
 			verboselog( device->machine, 0, "diskonchip_sec_2_write_1034: unknown value %02X/%02X\n", data, doc->sec_2[0x32]);
-	 	}
+		}
 	}
 	else if (doc->sec_2[0x32] == 0x12)
 	{
-	 	if (data == 0x60)
-	 	{
+		if (data == 0x60)
+		{
 			doc->data_1036 = 0;
 			doc->data_1036_count = 0;
 			doc->address_count++;
-	 	}
-	 	else if (data == 0x30)
-	 	{
+		}
+		else if (data == 0x30)
+		{
 			// do nothing
-	 	}
-	 	else if (data == 0x05)
-	 	{
+		}
+		else if (data == 0x05)
+		{
 			// do nothing
-	 	}
-	 	else if (data == 0xE0)
-	 	{
+		}
+		else if (data == 0xE0)
+		{
 			// do nothing
-	 	}
-	 	else
-	 	{
+		}
+		else
+		{
 			verboselog( device->machine, 0, "diskonchip_sec_2_write_1034: unknown value %02X/%02X\n", data, doc->sec_2[0x32]);
-	 	}
+		}
 	}
 	else if (doc->sec_2[0x32] == 0x27)
 	{
-	 	if (data == 0x60)
-	 	{
+		if (data == 0x60)
+		{
 			doc->data_1036 = 0;
 			doc->data_1036_count = 0;
 			doc->address_count++;
-	 	}
-	 	else if (data == 0xD0)
-	 	{
+		}
+		else if (data == 0xD0)
+		{
 			diskonchip_g3_erase_block( device);
-	 	}
-	 	else
-	 	{
+		}
+		else
+		{
 			verboselog( device->machine, 0, "diskonchip_sec_2_write_1034: unknown value %02X/%02X\n", data, doc->sec_2[0x32]);
-	 	}
+		}
 	}
 	else if ((doc->sec_2[0x32] == 0x31) && (data == 0x71))
 	{
@@ -631,20 +631,20 @@ static void diskonchip_sec_2_write_1034( device_t *device, UINT8 data)
 	}
 	else if (doc->sec_2[0x32] == 0x1D)
 	{
-	 	if (data == 0x80)
-	 	{
+		if (data == 0x80)
+		{
 			doc->data_1036 = 0;
 			doc->data_1036_count = 0;
 			doc->address_count++;
-	 	}
-	 	else if (data == 0x11)
-	 	{
+		}
+		else if (data == 0x11)
+		{
 			doc->test = 3;
-	 	}
-	 	else
-	 	{
+		}
+		else
+		{
 			verboselog( device->machine, 0, "diskonchip_sec_2_write_1034: unknown value %02X/%02X\n", data, doc->sec_2[0x32]);
-	 	}
+		}
 	}
 	else
 	{
@@ -870,7 +870,7 @@ static DEVICE_START( diskonchip_g3 )
 	doc->data[1] = auto_alloc_array( device->machine, UINT8, doc->data_size[1]);
 	doc->data[2] = auto_alloc_array( device->machine, UINT8, doc->data_size[2]);
 
-//	diskonchip_load( device, "diskonchip");
+//  diskonchip_load( device, "diskonchip");
 
 	device->save_item( NAME(doc->planes));
 	device->save_item( NAME(doc->blocks));
@@ -885,7 +885,7 @@ static DEVICE_START( diskonchip_g3 )
 static DEVICE_STOP( diskonchip_g3 )
 {
 	verboselog( device->machine, 9, "(DOC) device stop\n");
-//	diskonchip_save( device, "diskonchip");
+//  diskonchip_save( device, "diskonchip");
 }
 
 static DEVICE_RESET( diskonchip_g3 )
@@ -908,8 +908,8 @@ static DEVICE_NVRAM( diskonchip_g3 )
 	}
 	else
 	{
-	 	if (file)
-	 	{
+		if (file)
+		{
 			mame_fread( file, doc->data[0], doc->data_size[0]);
 			mame_fread( file, doc->data[1], doc->data_size[1]);
 			mame_fread( file, doc->data[2], doc->data_size[2]);
@@ -930,7 +930,7 @@ DEVICE_GET_INFO( diskonchip_g3 )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES: info->i = sizeof(diskonchip_g3_t); break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES: info->i = sizeof(diskonchip_g3_config); break;
-//		case DEVINFO_INT_CLASS: info->i = DEVICE_CLASS_PERIPHERAL; break;
+//      case DEVINFO_INT_CLASS: info->i = DEVICE_CLASS_PERIPHERAL; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START: info->start = DEVICE_START_NAME(diskonchip_g3); break;

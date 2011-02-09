@@ -17,7 +17,7 @@
 
 
 //**************************************************************************
-//	MACROS / CONSTANTS
+//  MACROS / CONSTANTS
 //**************************************************************************
 
 #define S1410_TAG	"s1410"
@@ -34,7 +34,7 @@
 
 
 //**************************************************************************
-//	TYPE DEFINITIONS
+//  TYPE DEFINITIONS
 //**************************************************************************
 
 // ======================> s1410_interface
@@ -58,7 +58,7 @@ public:
     // allocators
     static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
     virtual device_t *alloc_device(running_machine &machine) const;
-	
+
 	// optional information overrides
 	virtual const rom_entry *rom_region() const;
 	virtual machine_config_constructor machine_config_additions() const;

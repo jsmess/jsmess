@@ -339,7 +339,7 @@ static READ8_DEVICE_HANDLER( keydata_r )
 	if (!BIT(state->keylatch, 5)) data &= input_port_read(device->machine, "ROW5");
 	if (!BIT(state->keylatch, 6)) data &= input_port_read(device->machine, "ROW6");
 	if (!BIT(state->keylatch, 7)) data &= input_port_read(device->machine, "ROW7");
-	
+
 	data = (input_port_read(device->machine, "MODIFIERS") & 0xc0) | (data & 0x3f);
 
 	if (cassette_input(state->cassette) < +0.0)	data &= 0x7f;
@@ -416,10 +416,10 @@ static MACHINE_RESET( mc1000 )
 /* Machine Driver */
 
 /*
- 
+
  Interrupt generator:
  NE555 chip in astable circuit.
- 
+
   +---------*---*---o V+
   |         |   |
  +-+        |   |
@@ -435,20 +435,20 @@ static MACHINE_RESET( mc1000 )
  | |   |  |  555  |
  +-+   |  |       |
   |    | 6|       |5
-  *----*—-|       |---+
+  *----*?-|       |---+
   |       |       |   |
  ---C30   +-------+  ---C29
  ---103       |1     ---103
  _|_         _|_     _|_
  ///         ///     ///
- 
+
  Calculated properties:
- 
+
  * 99.74489795918367 Duty Cycle Percentage
  * 368.1126130105722 Frequency in Hertz
  * 0.00000693 Seconds Low
  * 0.0027096299999999998 Seconds High
- 
+
  */
 
 #define MC1000_NE555_FREQ       (368) /* Hz */

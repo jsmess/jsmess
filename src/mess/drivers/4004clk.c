@@ -159,7 +159,7 @@ static MACHINE_CONFIG_START( 4004clk, _4004clk_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("dac", DAC, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	
+
 	MCFG_TIMER_ADD_PERIODIC("4004clk_timer", timer_callback, attotime::from_hz(120))
 MACHINE_CONFIG_END
 

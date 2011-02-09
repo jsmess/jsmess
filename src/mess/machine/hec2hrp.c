@@ -1,39 +1,39 @@
 /////////////////////////////////////////////////////////////////////////
 // HEC2HRP.C  in machine
-/*		Hector 2HR+
-		Victor
-		Hector 2HR
-		Hector HRX
-		Hector MX40c
-		Hector MX80c
-		Hector 1
-		Interact
+/*      Hector 2HR+
+        Victor
+        Hector 2HR
+        Hector HRX
+        Hector MX40c
+        Hector MX80c
+        Hector 1
+        Interact
 
-		12/05/2009 Skeleton driver - Micko : mmicko@gmail.com
-		31/06/2009 Video - Robbbert
+        12/05/2009 Skeleton driver - Micko : mmicko@gmail.com
+        31/06/2009 Video - Robbbert
 
-		29/10/2009 Update skeleton to functional machine
-						by yo_fr       (jj.stac @ aliceadsl.fr)
+        29/10/2009 Update skeleton to functional machine
+                        by yo_fr       (jj.stac @ aliceadsl.fr)
 
-				=> add Keyboard,
-				=> add color,
-				=> add cassette,
-				=> add sn76477 sound and 1bit sound,
-				=> add joysticks (stick, pot, fire)
-				=> add BR/HR switching
-				=> add bank switch for HRX
-				=> add device MX80c and bank switching for the ROM
-		03/01/2010 Update and clean prog  by yo_fr       (jj.stac@aliceadsl.fr)
-				=> add the port mapping for keyboard
-		28/09/2010 add the DISK II support by yo_fr      (jj.stac@aliceadsl.fr)
-				=> Note that actually the DISK II boot (loading CPM : OK) but do not run (don't run the CPM...).
-		20/11/2010 : synchronization between uPD765 and Z80 are now OK, CP/M runnig! JJStacino
+                => add Keyboard,
+                => add color,
+                => add cassette,
+                => add sn76477 sound and 1bit sound,
+                => add joysticks (stick, pot, fire)
+                => add BR/HR switching
+                => add bank switch for HRX
+                => add device MX80c and bank switching for the ROM
+        03/01/2010 Update and clean prog  by yo_fr       (jj.stac@aliceadsl.fr)
+                => add the port mapping for keyboard
+        28/09/2010 add the DISK II support by yo_fr      (jj.stac@aliceadsl.fr)
+                => Note that actually the DISK II boot (loading CPM : OK) but do not run (don't run the CPM...).
+        20/11/2010 : synchronization between uPD765 and Z80 are now OK, CP/M runnig! JJStacino
 
-	don't forget to keep some information about these machines, see DChector project : http://dchector.free.fr/ made by DanielCoulom
-		(and thank's to Daniel!)
+    don't forget to keep some information about these machines, see DChector project : http://dchector.free.fr/ made by DanielCoulom
+        (and thank's to Daniel!)
 
-	TODO :	Add the cartridge function,
-			Adjust the one shot and A/D timing (sn76477)
+    TODO :  Add the cartridge function,
+            Adjust the one shot and A/D timing (sn76477)
 */
 
 #include "emu.h"
@@ -155,8 +155,8 @@ READ8_HANDLER( hector_keyboard_r )
 		{
 		  cputag_set_input_line(machine, "maincpu", INPUT_LINE_RESET, PULSE_LINE);
 		  hector_flag_hr=1;
-		if (strncmp(machine->gamedrv->name , "hec2hrx"  , 7)==0 || 
-				strncmp(machine->gamedrv->name , "hec2mx40" , 8)==0 || 
+		if (strncmp(machine->gamedrv->name , "hec2hrx"  , 7)==0 ||
+				strncmp(machine->gamedrv->name , "hec2mx40" , 8)==0 ||
 				strncmp(machine->gamedrv->name , "hec2mx80" , 8)==0   ) /* aviable for HRX and up */
 			{
 				memory_set_bank(machine, "bank1", HECTOR_BANK_PROG);
@@ -164,11 +164,11 @@ READ8_HANDLER( hector_keyboard_r )
 				hector_disc2_reset(machine);
 
 			}
-		if (strncmp(machine->gamedrv->name , "hector1"  , 7)==0 || 
+		if (strncmp(machine->gamedrv->name , "hector1"  , 7)==0 ||
 				strncmp(machine->gamedrv->name , "interact" , 8)==0   ) /* aviable for BR machines */
 
 					hector_flag_hr=0;
-				
+
 		/*Common flag*/
 		hector_flag_80c = 0;
 		flag_clk = 0;
@@ -353,7 +353,7 @@ UINT8 data_h=0;
 
 
 if ((offset & 0x3) == 0x0) /* Port A */
-	data = hector_port_a; 
+	data = hector_port_a;
 
 if ((offset & 0x3) == 0x1) /* Port B */
 	{
@@ -375,10 +375,10 @@ if ((offset & 0x3) == 0x2) /* Port C */
 		{
 			hector_port_c_h = (hector_port_c_h & 0x0c0);	/* Clear bits 4 & 5*/
 
-			if (hector_disc2_data_w_ready != 0x00) 
+			if (hector_disc2_data_w_ready != 0x00)
 				hector_port_c_h = hector_port_c_h + 0x010;	// PC4 (data write ready from Disc II to Hector)
 
-			if (hector_disc2_data_r_ready != 0x00) 
+			if (hector_disc2_data_r_ready != 0x00)
 				hector_port_c_h = hector_port_c_h + 0x020;	// PC5 (data read ready from Hector to Disc2)
 
 			hector_port_c_h = hector_port_c_h & 0x07F;		// PC7 (printer busy=0)
@@ -391,15 +391,15 @@ if ((offset & 0x3) == 0x2) /* Port C */
 
 /*******************  WRITE PIO 8255 *******************/
 
-WRITE8_HANDLER( hector_io_8255_w) 
+WRITE8_HANDLER( hector_io_8255_w)
 {
 /* 8255 in mode 0 */
 if ((offset & 0x3) == 0x0) /* Port A => to printer or Disc II*/
 	{
 	hector_port_a = data;
 	/* Port A => to printer*/
-	/*	Caution : The strobe connection to the printer seems not be used 
-		So, all what is send to the Disc2 unit will be printed too! */
+	/*  Caution : The strobe connection to the printer seems not be used
+        So, all what is send to the Disc2 unit will be printed too! */
 
 	if (BIT(hector_port_c_l, 0))		// PC0 (bit X0)= strobe printer !
 		printer_output(space->machine->device("printer"), hector_port_a);
@@ -408,7 +408,7 @@ if ((offset & 0x3) == 0x0) /* Port A => to printer or Disc II*/
 		printf("\nEcriture data par Hector %x (dans portA)",data);
 	#endif
 	}
-  
+
 if ((offset & 0x3) == 0x1) /* Port B */
 	hector_port_b = data;
 
@@ -426,8 +426,8 @@ if ((offset & 0x3) == 0x2) /* Port C => depending cmd word */
 			}
 			// Utilizing bits port C : PC1 // PC2  for the communication with disc2
 			if (!BIT(hector_port_c_l  , 1))		// PC1 (bit X1)= true
-			{   
-				// Lecture effectuee => RAZ memoire donnee hector_disc2_data_write dispo	
+			{
+				// Lecture effectuee => RAZ memoire donnee hector_disc2_data_write dispo
 				hector_port_b = hector_disc2_data_write; // Mep sur port B si 2eme 74374 existant !
 				hector_disc2_data_w_ready = 0x00;
 				#ifdef DEBUG_TRACE_COM_HECTOR
@@ -443,13 +443,13 @@ if ((offset & 0x3) == 0x2) /* Port C => depending cmd word */
 				#endif
 			}
 		}
-		if (!BIT(hector_port_cmd, 3))	 /* cmd -> Quartet sup en sortie ?*/ 
+		if (!BIT(hector_port_cmd, 3))	 /* cmd -> Quartet sup en sortie ?*/
 			hector_port_c_h = (data & 0xf0);
 	}
 
 	if ((offset & 0x3) == 0x3) /* Port commande */
 	{
-		hector_port_cmd = data; 
+		hector_port_cmd = data;
 	}
 }
 /* End of 8255 managing */
@@ -589,10 +589,10 @@ static void Init_Value_SN76477_Hector(void)
 	Pin_Value[10][0]= RES_K(32.054); /* 32.054 (180 // 39 KOhm)*/
 
 	/* Version 3 : Ajuste pour les frequences mesurees :
-				// 4  0 SOUND 255 Hz => ajuste a l'oreille
-				// 4  4 SOUND  65 Hz => ajuste a l'oreille
-				// 4  8 SOUND  17 Hz =>  ajuste a l'oreille
-				// 4 12 SOUND 4,3 Hz =>  ajuste a l'oreille*/
+                // 4  0 SOUND 255 Hz => ajuste a l'oreille
+                // 4  4 SOUND  65 Hz => ajuste a l'oreille
+                // 4  8 SOUND  17 Hz =>  ajuste a l'oreille
+                // 4 12 SOUND 4,3 Hz =>  ajuste a l'oreille*/
 	/*   SLF C       Version 3*/
 	Pin_Value[21][0]= CAP_U(0.1);  /*CAPU(0.1) */
 	Pin_Value[21][1]= CAP_U(1.1);  /*1.1*/
@@ -603,10 +603,10 @@ static void Init_Value_SN76477_Hector(void)
 
 	/* Capa VCO*/
 	/* Version 3 : Ajust?? pour les frequences mesur??es :
-			// 0 0  SOUND 5,5KHz => 5,1KHz
-			// 0 16 SOUND 1,3KHz => 1,2KHz
-			// 0 32 SOUND 580Hz  => 570Hz
-			// 0 48 SOUND 132Hz  => 120Hz*/
+            // 0 0  SOUND 5,5KHz => 5,1KHz
+            // 0 16 SOUND 1,3KHz => 1,2KHz
+            // 0 32 SOUND 580Hz  => 570Hz
+            // 0 48 SOUND 132Hz  => 120Hz*/
 	Pin_Value[17][0] = CAP_N(47.0) ;  /*47,0 mesure ok */
 	Pin_Value[17][1] = CAP_N(580.0) ; /*580  mesure ok */
 	/* R VCO   Version 3*/
@@ -637,8 +637,8 @@ static void Init_Value_SN76477_Hector(void)
 	Pin_Value[9][1] = 1;
 
 	/* Volume*/
-	Pin_Value[11][0] = 128; /* Rapport 50% et 100%	128*/
-	Pin_Value[11][1] = 255; /*						255*/
+	Pin_Value[11][0] = 128; /* Rapport 50% et 100%  128*/
+	Pin_Value[11][1] = 255; /*                      255*/
 
 	/* Noise filter*/
 	Pin_Value[6][0] = CAP_U(0.390);    /* 0.390*/
@@ -756,7 +756,7 @@ const sn76477_interface hector_sn76477_interface =
 
 void hector_reset(running_machine *machine, int hr, int with_D2 )
 {
-	// Initialization Hector 
+	// Initialization Hector
 	hector_flag_hr = hr;
 	flag_clk = 0;
 	write_cassette = 0;
@@ -767,8 +767,8 @@ void hector_reset(running_machine *machine, int hr, int with_D2 )
 
 	{
 		cputag_set_input_line(machine, "disc2cpu", INPUT_LINE_RESET, PULSE_LINE);
-		device_t *fdc = machine->device("upd765");	
-		cputag_set_input_line(machine, "disc2cpu", INPUT_LINE_RESET, PULSE_LINE); 
+		device_t *fdc = machine->device("upd765");
+		cputag_set_input_line(machine, "disc2cpu", INPUT_LINE_RESET, PULSE_LINE);
 		upd765_reset(fdc, 1);
 		upd765_reset_w(fdc, 1);
 	}
@@ -777,7 +777,7 @@ void hector_reset(running_machine *machine, int hr, int with_D2 )
 void hector_init(running_machine *machine)
 {
 	pot0 = pot1 = 0x40;
-	
+
 	/* For Cassette synchro*/
 	Cassette_timer = machine->scheduler().timer_alloc(FUNC(Callback_CK));
 	Cassette_timer->adjust(attotime::from_msec(100), 0, attotime::from_usec(64));/* => real synchro scan speed for 15,624Khz*/

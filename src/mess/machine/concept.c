@@ -475,7 +475,7 @@ WRITE16_HANDLER(concept_io_w)
 
 		case 3:
 			/* NVIA versatile system interface */
-			{				
+			{
 				via6522_device *via_0 = space->machine->device<via6522_device>("via6522_0");
 				via_0->write(*space, offset & 0xf, data);
 			}

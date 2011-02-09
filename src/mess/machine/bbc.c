@@ -614,7 +614,7 @@ long myo;
 
 
 	if ((offset>=0x200) && (offset<=0x2ff)) /* SHEILA */
-	{		
+	{
 		via6522_device *via_0 = space->machine->device<via6522_device>("via6522_0");
 		via6522_device *via_1 = space->machine->device<via6522_device>("via6522_1");
 
@@ -945,7 +945,7 @@ static void MC146818_set(address_space *space)
 	bbc_state *state = space->machine->driver_data<bbc_state>();
 	logerror ("146181 WR=%d DS=%d AS=%d CE=%d \n",state->MC146818_WR,state->MC146818_DS,state->MC146818_AS,state->MC146818_CE);
 	mc146818_device *rtc = space->machine->device<mc146818_device>("rtc");
-	
+
 	// if chip enabled
 	if (state->MC146818_CE)
 	{
@@ -1377,7 +1377,7 @@ static void MC6850_Receive_Clock(running_machine *machine, int new_clock)
 
 static TIMER_CALLBACK(bbc_tape_timer_cb)
 {
-	bbc_state *state = machine->driver_data<bbc_state>();	
+	bbc_state *state = machine->driver_data<bbc_state>();
 
 	double dev_val;
 	dev_val=cassette_input(machine->device("cassette"));

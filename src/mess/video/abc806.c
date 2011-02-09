@@ -8,7 +8,7 @@
 
     TODO:
 
-	- check compatibility with new MC6845
+    - check compatibility with new MC6845
     - HRU II PROM reading
 
 */
@@ -181,7 +181,7 @@ READ8_MEMBER( abc806_state::sti_r )
 
 
 //-------------------------------------------------
-//  abc806_sto_w - 
+//  abc806_sto_w -
 //-------------------------------------------------
 
 WRITE8_MEMBER( abc806_state::sto_w )

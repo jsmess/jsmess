@@ -445,7 +445,7 @@ static MACHINE_CONFIG_START( fk1, fk1_state )
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("80K") // 64 + 16
-	
+
 	MCFG_TIMER_ADD_PERIODIC("keyboard_timer", keyboard_callback, attotime::from_hz(24000))
 	MCFG_TIMER_ADD_PERIODIC("vsync_timer", vsync_callback, attotime::from_hz(50))
 MACHINE_CONFIG_END

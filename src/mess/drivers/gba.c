@@ -1672,7 +1672,7 @@ static WRITE32_HANDLER( gba_io_w )
 
 				offset -= (0x100/4);
 
- 				old_timer_regs = state->timer_regs[offset];
+				old_timer_regs = state->timer_regs[offset];
 
 				state->timer_regs[offset] = (state->timer_regs[offset] & ~(mem_mask & 0xFFFF0000)) | (data & (mem_mask & 0xFFFF0000));
 
@@ -2920,7 +2920,7 @@ static const gba_chip_fix_eeprom_item gba_chip_fix_eeprom_list[] =
 
 static int gba_chip_has_conflict( UINT32 chip)
 {
- 	int count1 = 0, count2 = 0;
+	int count1 = 0, count2 = 0;
 	if (chip & GBA_CHIP_EEPROM) count1++;
 	if (chip & GBA_CHIP_EEPROM_4K) count1++;
 	if (chip & GBA_CHIP_EEPROM_64K) count1++;

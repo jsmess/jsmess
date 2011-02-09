@@ -323,7 +323,7 @@ static READ8_HANDLER(towns_dma1_r)
 	towns_state* state = space->machine->driver_data<towns_state>();
 	device_t* dev = state->dma_1;
 
-//	logerror("DMA#1: read register %i\n",offset);
+//  logerror("DMA#1: read register %i\n",offset);
 	return upd71071_r(dev,offset);
 }
 
@@ -332,7 +332,7 @@ static WRITE8_HANDLER(towns_dma1_w)
 	towns_state* state = space->machine->driver_data<towns_state>();
 	device_t* dev = state->dma_1;
 
-//	logerror("DMA#1: wrote 0x%02x to register %i\n",data,offset);
+//  logerror("DMA#1: wrote 0x%02x to register %i\n",data,offset);
 	upd71071_w(dev,offset,data);
 }
 
@@ -747,7 +747,7 @@ static READ8_HANDLER(towns_sound_ctrl_r)
 			pic8259_ir5_w(state->pic_slave, 0);
 			if(IRQ_LOG) logerror("PIC: IRQ13 (PCM) set low\n");
 			break;
-//		default:
+//      default:
 			//logerror("FM: unimplemented port 0x%04x read\n",offset + 0x4e8);
 	}
 	return ret;
@@ -1157,7 +1157,7 @@ static void towns_cdrom_set_irq(running_machine* machine,int line,int state)
 			{
 				if(tstate->towns_cd.command & 0x40)
 				{
-//					if(tstate->towns_cd.mpu_irq_enable)
+//                  if(tstate->towns_cd.mpu_irq_enable)
 					{
 						tstate->towns_cd.status |= 0x80;
 						pic8259_ir1_w(tstate->pic_slave, 1);
@@ -1179,7 +1179,7 @@ static void towns_cdrom_set_irq(running_machine* machine,int line,int state)
 			{
 				if(tstate->towns_cd.command & 0x40)
 				{
-//					if(tstate->towns_cd.dma_irq_enable)
+//                  if(tstate->towns_cd.dma_irq_enable)
 					{
 						tstate->towns_cd.status |= 0x40;
 						pic8259_ir1_w(tstate->pic_slave, 1);

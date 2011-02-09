@@ -11,8 +11,8 @@
     TODO:
 
     - CRT9007
-	- CRT9212 Double Row Buffer
-	- CRT9021B Attribute Generator
+    - CRT9212 Double Row Buffer
+    - CRT9021B Attribute Generator
     - 80186
     - keyboard ROM
     - hires graphics board
@@ -60,7 +60,7 @@ void tandy2k_state::speaker_update()
 READ8_MEMBER( tandy2k_state::videoram_r )
 {
 	address_space *program = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);
-	
+
 	offs_t addr = (m_vram_base << 15) | (offset << 1);
 	UINT16 data = program->read_word(addr);
 
@@ -293,18 +293,18 @@ WRITE8_MEMBER( tandy2k_state::keyboard_y0_w )
 {
 	/*
 
-		bit     description
+        bit     description
 
-		0       Y0
-		1       Y1
-		2       Y2
-		3       Y3
-		4       Y4
-		5       Y5
-		6       Y6
-		7       Y7
+        0       Y0
+        1       Y1
+        2       Y2
+        3       Y3
+        4       Y4
+        5       Y5
+        6       Y6
+        7       Y7
 
-	*/
+    */
 
 	/* keyboard row select */
 	m_keylatch = (m_keylatch & 0xff00) | data;
@@ -314,18 +314,18 @@ WRITE8_MEMBER( tandy2k_state::keyboard_y8_w )
 {
 	/*
 
-		bit     description
+        bit     description
 
-		0       Y8
-		1       Y9
-		2       Y10
-		3       Y11
-		4       LED 2
-		5       LED 1
-		6
-		7
+        0       Y8
+        1       Y9
+        2       Y10
+        3       Y11
+        4       LED 2
+        5       LED 1
+        6
+        7
 
-	*/
+    */
 
 	/* keyboard row select */
 	m_keylatch = ((data & 0x0f) << 8) | (m_keylatch & 0xff);
@@ -354,7 +354,7 @@ static ADDRESS_MAP_START( tandy2k_io, ADDRESS_SPACE_IO, 16, tandy2k_state )
 	AM_RANGE(0x00060, 0x00063) AM_DEVREADWRITE8_LEGACY(I8259A_0_TAG, pic8259_r, pic8259_w, 0x00ff)
 	AM_RANGE(0x00070, 0x00073) AM_DEVREADWRITE8_LEGACY(I8259A_1_TAG, pic8259_r, pic8259_w, 0x00ff)
 	AM_RANGE(0x00080, 0x00081) AM_DEVREADWRITE8_LEGACY(I8272A_TAG, upd765_dack_r, upd765_dack_w, 0x00ff)
-//	AM_RANGE(0x00100, 0x0017f) AM_DEVREADWRITE8(CRT9007_TAG, crt9007_device, read, write, 0x00ff) AM_WRITE8(addr_ctrl_w, 0xff00)
+//  AM_RANGE(0x00100, 0x0017f) AM_DEVREADWRITE8(CRT9007_TAG, crt9007_device, read, write, 0x00ff) AM_WRITE8(addr_ctrl_w, 0xff00)
 	AM_RANGE(0x00100, 0x0017f) AM_READWRITE(vpac_r, vpac_w)
 //  AM_RANGE(0x00180, 0x00180) AM_READ8(hires_status_r, 0x00ff)
 //  AM_RANGE(0x00180, 0x001bf) AM_WRITE(hires_palette_w)
@@ -517,29 +517,29 @@ bool tandy2k_state::video_update(screen_device &screen, bitmap_t &bitmap, const 
 /*
 static CRT9007_DRAW_SCANLINE( tandy2k_crt9007_display_pixels )
 {
-	tandy2k_state *state = device->machine->driver_data<tandy2k_state>();
-	address_space *program = cpu_get_address_space(state->m_maincpu, ADDRESS_SPACE_PROGRAM);
+    tandy2k_state *state = device->machine->driver_data<tandy2k_state>();
+    address_space *program = cpu_get_address_space(state->m_maincpu, ADDRESS_SPACE_PROGRAM);
 
-	for (int sx = 0; sx < x_count; sx++)
-	{
-		UINT32 videoram_addr = ((state->m_vram_base << 15) | (va << 1)) + sx;
-		UINT8 videoram_data = program->read_word(videoram_addr);
-		UINT16 charram_addr = (videoram_data << 4) | sl;
-		UINT8 charram_data = state->m_char_ram[charram_addr] & 0xff;
+    for (int sx = 0; sx < x_count; sx++)
+    {
+        UINT32 videoram_addr = ((state->m_vram_base << 15) | (va << 1)) + sx;
+        UINT8 videoram_data = program->read_word(videoram_addr);
+        UINT16 charram_addr = (videoram_data << 4) | sl;
+        UINT8 charram_data = state->m_char_ram[charram_addr] & 0xff;
 
-		for (int bit = 0; bit < 10; bit++)
-		{
-			if (BIT(charram_data, 7))
-			{
-				*BITMAP_ADDR16(bitmap, y, x + (sx * 10) + bit) = 1;
-			}
+        for (int bit = 0; bit < 10; bit++)
+        {
+            if (BIT(charram_data, 7))
+            {
+                *BITMAP_ADDR16(bitmap, y, x + (sx * 10) + bit) = 1;
+            }
 
-			charram_data <<= 1;
-		}
-	}
+            charram_data <<= 1;
+        }
+    }
 }
 */
-	
+
 WRITE_LINE_MEMBER( tandy2k_state::vpac_vlt_w )
 {
 	m_drb0->clrcnt_w(state);
@@ -557,7 +557,7 @@ static CRT9007_INTERFACE( vpac_intf )
 	SCREEN_TAG,
 	10,
 	DEVCB_DEVICE_LINE(I8259A_1_TAG, pic8259_ir1_w),
-	DEVCB_NULL,	// DMAR		80186 HOLD
+	DEVCB_NULL,	// DMAR     80186 HOLD
 	DEVCB_DEVICE_LINE_MEMBER(CRT9021B_TAG, crt9021_device, vsync_w), // VS
 	DEVCB_NULL,	// HS
 	DEVCB_DRIVER_LINE_MEMBER(tandy2k_state, vpac_vlt_w), // VLT
@@ -618,7 +618,7 @@ static const msm8251_interface i8251_intf =
 	DEVCB_DRIVER_LINE_MEMBER(tandy2k_state, rxrdy_w),
 	DEVCB_DRIVER_LINE_MEMBER(tandy2k_state, txrdy_w),
 	DEVCB_NULL,
-	DEVCB_NULL	
+	DEVCB_NULL
 };
 
 /* Intel 8253 Interface */

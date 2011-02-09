@@ -58,12 +58,12 @@
 
 
 	<element name="button" defstate="0">
- 
+
 	</element>
 
 	<element name="button_border_pieces" defstate="0">
- 		<rect state="1">
-      			<color red="1.0" green="1.0" blue="1.0"/>
+		<rect state="1">
+    			<color red="1.0" green="1.0" blue="1.0"/>
 		</rect>
 	</element>
 
@@ -152,7 +152,7 @@
 		<bezel name="P63" element="piece"><bounds x="441" y="406" width="40" height="45" /></bezel>
 
 
-<!-- Board and Status LED's --> 
+<!-- Board and Status LED's -->
 
 		<bezel name="led1" element="led">
 			<bounds x="42" y="52" width="10" height="10" />
@@ -206,15 +206,15 @@
 		<bezel name="led13" element="led">
 			<bounds x="296" y="464" width="10" height="10" />
 		</bezel>
-	
+
 		<bezel name="led14" element="led">
 			<bounds x="349" y="464" width="10" height="10" />
-		</bezel>	
+		</bezel>
 
 		<bezel name="led15" element="led">
 			<bounds x="402" y="464" width="10" height="10" />
 		</bezel>
-	
+
 		<bezel name="led16" element="led">
 			<bounds x="455" y="464" width="10" height="10" />
 		</bezel>

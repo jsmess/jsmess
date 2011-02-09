@@ -99,7 +99,7 @@ DEVICE_IMAGE_LOAD( svi318_cart )
 
 	if (size > 0x8000)
 		logerror("Cart image %s larger than expected. Please report the issue.\n", image.filename());
-		
+
 	if (image.software_entry() == NULL)
 	{
 		if (image.fread(p, size) != size)

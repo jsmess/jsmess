@@ -1,5 +1,5 @@
 /***************************************************************************
-   
+
         Okean-240
 
         28/12/2011 Skeleton driver.
@@ -47,8 +47,8 @@ static TIMER_CALLBACK( okean240_boot )
 	memory_set_bank(machine, "boot", 0);
 }
 
-static MACHINE_RESET(okean240) 
-{	
+static MACHINE_RESET(okean240)
+{
 	machine->scheduler().timer_set(attotime::from_usec(10), FUNC(okean240_boot));
 	memory_set_bank(machine, "boot", 1);
 }
@@ -114,10 +114,10 @@ static MACHINE_CONFIG_START( okean240, okean240_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8080, XTAL_12MHz / 6)
 	MCFG_CPU_PROGRAM_MAP(okean240_mem)
-	MCFG_CPU_IO_MAP(okean240_io)	
+	MCFG_CPU_IO_MAP(okean240_io)
 
 	MCFG_MACHINE_RESET(okean240)
-	
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
@@ -147,5 +147,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( ????, okean240,  0,       0, 	okean240, 	okean240, okean240,  "<unknown>",   "Okean-240",		GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( ????, okean240,  0,       0,	okean240,	okean240, okean240,  "<unknown>",   "Okean-240",		GAME_NOT_WORKING | GAME_NO_SOUND)
 

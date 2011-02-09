@@ -1,49 +1,49 @@
 /***************************************************************************
 
-		Hector 2HR+
-		Victor
-		Hector 2HR
-		Hector HRX
-		Hector MX40c
-		Hector MX80c
-		Hector 1
-		Interact
+        Hector 2HR+
+        Victor
+        Hector 2HR
+        Hector HRX
+        Hector MX40c
+        Hector MX80c
+        Hector 1
+        Interact
 
-	These machines can load and run cassettes for the interact / hector1.
-	hec2hr - press 2 then 1
-	hec2hrp - press 2 then 1
-	hec2hrx - press 5 then 1
-	hec2mx40 - press 5 then 1
-	hec2mx80 - not compatible
-	victor - press R then L
+    These machines can load and run cassettes for the interact / hector1.
+    hec2hr - press 2 then 1
+    hec2hrp - press 2 then 1
+    hec2hrx - press 5 then 1
+    hec2mx40 - press 5 then 1
+    hec2mx80 - not compatible
+    victor - press R then L
 
-		12/05/2009 Skeleton driver - Micko : mmicko@gmail.com
-		31/06/2009 Video - Robbbert
+        12/05/2009 Skeleton driver - Micko : mmicko@gmail.com
+        31/06/2009 Video - Robbbert
 
-		29/10/2009 Update skeleton to functional machine
-					by yo_fr			(jj.stac @ aliceadsl.fr)
+        29/10/2009 Update skeleton to functional machine
+                    by yo_fr            (jj.stac @ aliceadsl.fr)
 
-				=> add Keyboard,
-				=> add color,
-				=> add cassette,
-				=> add sn76477 sound and 1bit sound,
-				=> add joysticks (stick, pot, fire)
-				=> add BR/HR switching
-				=> add bank switch for HRX
-				=> add device MX80c and bank switching for the ROM
+                => add Keyboard,
+                => add color,
+                => add cassette,
+                => add sn76477 sound and 1bit sound,
+                => add joysticks (stick, pot, fire)
+                => add BR/HR switching
+                => add bank switch for HRX
+                => add device MX80c and bank switching for the ROM
     Importante note : the keyboard function add been piked from
-					DChector project : http://dchector.free.fr/ made by DanielCoulom
-					(thank's Daniel)
-		03/01/2010 Update and clean prog  by yo_fr       (jj.stac@aliceadsl.fr)
-				=> add the port mapping for keyboard
-		20/11/2010 : synchronization between uPD765 and Z80 are now OK, CP/M runnig! JJStacino
+                    DChector project : http://dchector.free.fr/ made by DanielCoulom
+                    (thank's Daniel)
+        03/01/2010 Update and clean prog  by yo_fr       (jj.stac@aliceadsl.fr)
+                => add the port mapping for keyboard
+        20/11/2010 : synchronization between uPD765 and Z80 are now OK, CP/M runnig! JJStacino
 
-		don't forget to keep some information about these machine see DChector project : http://dchector.free.fr/ made by DanielCoulom
-		(and thanks to Daniel!)
+        don't forget to keep some information about these machine see DChector project : http://dchector.free.fr/ made by DanielCoulom
+        (and thanks to Daniel!)
 
-	TODO :	Add the cartridge function,
-			Add diskette support, (done !)
-			Adjust the one shot and A/D timing (sn76477)
+    TODO :  Add the cartridge function,
+            Add diskette support, (done !)
+            Adjust the one shot and A/D timing (sn76477)
 ****************************************************************************/
 /* Joystick 1 :
  clavier numerique :
@@ -62,10 +62,10 @@
 
  Fire <0> on numpad
  Pot => INS /SUPPR
- 
- Cassette :	wav file (1 way, 16 bits, 44100hz)
-			K7 file  (For data and games)
-			FOR file (for forth screen data)
+
+ Cassette : wav file (1 way, 16 bits, 44100hz)
+            K7 file  (For data and games)
+            FOR file (for forth screen data)
 */
 
 #include "emu.h"
@@ -77,7 +77,7 @@
 #include "sound/wave.h"      /* for K7 sound*/
 #include "sound/discrete.h"  /* for 1 Bit sound*/
 #include "machine/upd765.h"	/* for floppy disc controller */
-#include "imagedev/flopdrv.h" 
+#include "imagedev/flopdrv.h"
 #include "formats/basicdsk.h"
 #include "cpu/z80/z80.h"
 
@@ -108,8 +108,8 @@ static ADDRESS_MAP_START( hecdisc2_io , ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x050,0x05f) AM_READWRITE( hector_disc2_io50_port_r, hector_disc2_io50_port_w )
 	// uPD765 link:
 	AM_RANGE(0x060,0x060) AM_DEVREAD	 ("upd765",upd765_status_r			  )
-//	AM_RANGE(0x061,0x061) AM_DEVREADWRITE("upd765",upd765_data_r,upd765_data_w)
-//	AM_RANGE(0x070,0x07f) AM_DEVREADWRITE("upd765",upd765_dack_r,upd765_dack_w)
+//  AM_RANGE(0x061,0x061) AM_DEVREADWRITE("upd765",upd765_data_r,upd765_data_w)
+//  AM_RANGE(0x070,0x07f) AM_DEVREADWRITE("upd765",upd765_dack_r,upd765_dack_w)
 AM_RANGE(0x061,0x061) AM_READWRITE( hector_disc2_io61_port_r, hector_disc2_io61_port_w )//patched version
 AM_RANGE(0x070,0x07F) AM_READWRITE( hector_disc2_io70_port_r, hector_disc2_io70_port_w )//patched version
 ADDRESS_MAP_END
@@ -119,7 +119,7 @@ static ADDRESS_MAP_START(hec2hrp_mem, ADDRESS_SPACE_PROGRAM, 8)
 /*****************************************************************************/
 	ADDRESS_MAP_UNMAP_HIGH
 	/* Hardware address mapping*/
-//	AM_RANGE(0x0800,0x0808) AM_WRITE( hector_switch_bank_w)/* Bank management*/
+//  AM_RANGE(0x0800,0x0808) AM_WRITE( hector_switch_bank_w)/* Bank management*/
 	AM_RANGE(0x1000,0x1000) AM_WRITE( hector_color_a_w)  /* Color c0/c1*/
 	AM_RANGE(0x1800,0x1800) AM_WRITE( hector_color_b_w)  /* Color c2/c3*/
 	AM_RANGE(0x2000,0x2003) AM_WRITE( hector_sn_2000_w)  /* Sound*/
@@ -285,7 +285,7 @@ INPUT_PORTS_END
 static MACHINE_START( hec2hrp )
 /*****************************************************************************/
 {
-	hector_init(machine);	
+	hector_init(machine);
 }
 
 static MACHINE_RESET(hec2hrp)
@@ -465,7 +465,7 @@ static MACHINE_CONFIG_START( hec2mx40, hec2hrp_state )
 	MCFG_FLOPPY_2_DRIVES_ADD(hector_disc2_floppy_config)
 	MCFG_MACHINE_RESET(hec2hrx)
 	MCFG_MACHINE_START(hec2hrx)
-	
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
@@ -557,7 +557,7 @@ static MACHINE_CONFIG_START( hec2mx80, hec2hrp_state )
 	MCFG_CPU_PERIODIC_INT(irq0_line_hold,50) //  put on the Z80 irq in Hz
 	MCFG_MACHINE_RESET(hec2hrx)
 	MCFG_MACHINE_START(hec2hrx)
-	
+
 	/* Disc II unit */
 	MCFG_CPU_ADD("disc2cpu",Z80, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(hecdisc2_mem)
@@ -628,7 +628,7 @@ ROM_START( hec2hrx )
 	ROM_REGION( 0x4000, "page1", ROMREGION_ERASEFF )
 	ROM_REGION( 0x4000, "page2", ROMREGION_ERASEFF )
 	ROM_REGION( 0x10000, "disc2cpu", ROMREGION_ERASEFF )
-	
+
 	ROM_REGION( 0x04000, "rom_disc2", ROMREGION_ERASEFF )
 	ROM_LOAD( "d800k.bin" , 0x0000,0x1000, CRC(831bd584) SHA1(9782ee58f570042608d9d568b2c3fc4c6d87d8b9))
 	ROM_REGION( 0x10000,  "disc2mem", ROMREGION_ERASE00 )
@@ -641,7 +641,7 @@ ROM_START( hec2mx80 )
 	ROM_LOAD( "mx80c_page1.rom", 0x0000, 0x4000, CRC(4615f57c) SHA1(5de291bf3ae0320915133b99f1a088cb56c41658))
 	ROM_REGION( 0x4000, "page2", ROMREGION_ERASEFF )
 	ROM_LOAD( "mx80c_page2.rom" , 0x0000,0x4000, CRC(2D5D975E) SHA1(48307132E0F3FAD0262859BB8142D108F694A436))
-	
+
 	ROM_REGION( 0x04000, "rom_disc2", ROMREGION_ERASEFF )
 	ROM_LOAD( "d800k.bin" , 0x0000,0x1000, CRC(831bd584) SHA1(9782ee58f570042608d9d568b2c3fc4c6d87d8b9))
 	ROM_REGION( 0x10000,  "disc2mem", ROMREGION_ERASE00 )
@@ -656,16 +656,16 @@ ROM_START( hec2mx40 )
 	ROM_LOAD( "mx40c_page2.rom" , 0x0000,0x4000, CRC(ef1b2654) SHA1(66624ea040cb7ede4720ad2eca0738d0d3bad89a))
 
 	ROM_REGION( 0x04000, "rom_disc2", ROMREGION_ERASEFF )
-//	ROM_LOAD( "d360k.bin" , 0x0000,0x4000, CRC(2454eacb) SHA1(dc0d5a7d5891a7e422d9d142a2419527bb15dfd5))
+//  ROM_LOAD( "d360k.bin" , 0x0000,0x4000, CRC(2454eacb) SHA1(dc0d5a7d5891a7e422d9d142a2419527bb15dfd5))
 	ROM_LOAD( "d800k.bin" , 0x0000,0x1000, CRC(831bd584) SHA1(9782ee58f570042608d9d568b2c3fc4c6d87d8b9))
-//	ROM_LOAD( "d200k.bin" , 0x0000,0x4000, CRC(e2801377) SHA1(0926df5b417ecd8013e35c71b76780c5a25c1cbf))
+//  ROM_LOAD( "d200k.bin" , 0x0000,0x4000, CRC(e2801377) SHA1(0926df5b417ecd8013e35c71b76780c5a25c1cbf))
 	ROM_REGION( 0x10000,  "disc2mem", ROMREGION_ERASE00 )
 
 ROM_END
 
 /* Driver */
 
-/*	YEAR	NAME	PARENT		COMPAT		MACHINE		INPUT	INIT	COMPANY			FULLNAME			FLAGS */
+/*  YEAR    NAME    PARENT      COMPAT      MACHINE     INPUT   INIT    COMPANY         FULLNAME            FLAGS */
 COMP(1983,	hec2hrp,	0,		interact,	hec2hrp,	hec2hrp,0,		"Micronique",	"Hector 2HR+",		GAME_IMPERFECT_SOUND)
 COMP(1980,	victor,		hec2hrp, 0,			hec2hrp,	hec2hrp,0,		"Micronique",	"Victor",			GAME_IMPERFECT_SOUND)
 COMP(1983,	hec2hr,		hec2hrp, 0,			hec2hr,		hec2hrp,0,		 "Micronique",	"Hector 2HR",		GAME_IMPERFECT_SOUND)

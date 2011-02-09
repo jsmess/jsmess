@@ -636,7 +636,7 @@ static MACHINE_START(smc777)
 
 	for(i=0;i<0x4000;i++)
 		state->wram[i] = rom[i];
-	
+
 	beep_set_frequency(machine->device("beeper"),300); //guesswork
 	beep_set_state(machine->device("beeper"),0);
 }
@@ -759,7 +759,7 @@ static MACHINE_CONFIG_START( smc777, smc777_state )
 
 	MCFG_SOUND_ADD("beeper", BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
-	
+
 	MCFG_TIMER_ADD_PERIODIC("keyboard_timer", keyboard_callback, attotime::from_hz(240/32))
 MACHINE_CONFIG_END
 

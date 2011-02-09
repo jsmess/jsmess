@@ -75,7 +75,7 @@ the CoCo 1/2 should stay in coco.c, and that the coco3 and dragon specifc code
 should go into coco3.c and dragon.c which should (hopefully) make the code
 easier to manage.
     P.Harvey-Smith, Dec 2006-Feb 2007
-    
+
 Added bi-directional bitbanger support. Also fixed reading PIA 1, port A. The
 DAC and bitbanger values written should be reflected in the read.
     tim lindner, October 2010
@@ -1338,7 +1338,7 @@ static attotime get_relative_time( running_machine *machine, attotime absolute_t
 	attotime result;
 	attotime now = machine->time();
 
-	if (absolute_time > now) 
+	if (absolute_time > now)
 		result = absolute_time - now;
 	else
 		result = attotime::never;

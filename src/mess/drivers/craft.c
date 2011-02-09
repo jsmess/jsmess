@@ -97,102 +97,102 @@ static TIMER_CALLBACK( avr8_timer1_tick )
 
     for(INT32 reg = AVR8_REG_A; reg <= AVR8_REG_B; reg++)
     {
-		UINT8 mode = (reg == AVR8_REG_A) ? AVR8_TCCR1A_COM1A : AVR8_TCCR1A_COM1B;
-		switch(mode)
-		{
-			case 0:
-				//verboselog(machine, 0, "avr8_update_timer1_compare_mode: Normal port operation (OC1 disconnected)\n");
-				break;
+        UINT8 mode = (reg == AVR8_REG_A) ? AVR8_TCCR1A_COM1A : AVR8_TCCR1A_COM1B;
+        switch(mode)
+        {
+            case 0:
+                //verboselog(machine, 0, "avr8_update_timer1_compare_mode: Normal port operation (OC1 disconnected)\n");
+                break;
 
-			case 1:
-				switch(AVR8_WGM1)
-				{
-					case Avr8::WGM1_NORMAL:
-					case Avr8::WGM1_CTC_OCR:
-					case Avr8::WGM1_CTC_ICR:
-					case Avr8::WGM1_FAST_PWM_8:
-					case Avr8::WGM1_FAST_PWM_9:
-					case Avr8::WGM1_FAST_PWM_10:
-					case Avr8::WGM1_PWM_8_PC:
-					case Avr8::WGM1_PWM_9_PC:
-					case Avr8::WGM1_PWM_10_PC:
-					case Avr8::WGM1_PWM_PFC_ICR:
-					case Avr8::WGM1_PWM_PC_ICR:
-						//verboselog(machine, 0, "avr8_update_timer1_compare_mode: Normal port operation (OC1 disconnected)\n");
-						break;
+            case 1:
+                switch(AVR8_WGM1)
+                {
+                    case Avr8::WGM1_NORMAL:
+                    case Avr8::WGM1_CTC_OCR:
+                    case Avr8::WGM1_CTC_ICR:
+                    case Avr8::WGM1_FAST_PWM_8:
+                    case Avr8::WGM1_FAST_PWM_9:
+                    case Avr8::WGM1_FAST_PWM_10:
+                    case Avr8::WGM1_PWM_8_PC:
+                    case Avr8::WGM1_PWM_9_PC:
+                    case Avr8::WGM1_PWM_10_PC:
+                    case Avr8::WGM1_PWM_PFC_ICR:
+                    case Avr8::WGM1_PWM_PC_ICR:
+                        //verboselog(machine, 0, "avr8_update_timer1_compare_mode: Normal port operation (OC1 disconnected)\n");
+                        break;
 
-					case Avr8::WGM1_FAST_PWM_ICR:
-					case Avr8::WGM1_FAST_PWM_OCR:
-					case Avr8::WGM1_PWM_PFC_OCR:
-					case Avr8::WGM1_PWM_PC_OCR:
-						//verboselog(machine, 0, "avr8_update_timer1_compare_mode: Toggle OC1A on compare match, OC1B disconnected\n");
-						break;
-				}
-				break;
+                    case Avr8::WGM1_FAST_PWM_ICR:
+                    case Avr8::WGM1_FAST_PWM_OCR:
+                    case Avr8::WGM1_PWM_PFC_OCR:
+                    case Avr8::WGM1_PWM_PC_OCR:
+                        //verboselog(machine, 0, "avr8_update_timer1_compare_mode: Toggle OC1A on compare match, OC1B disconnected\n");
+                        break;
+                }
+                break;
 
-			case 2:
-				switch(AVR8_WGM1)
-				{
-					case Avr8::WGM1_NORMAL:
-					case Avr8::WGM1_CTC_OCR:
-					case Avr8::WGM1_CTC_ICR:
-						//verboselog(machine, 0, "avr8_update_timer1_compare_mode: Clear OC1%c on compare match\n", avr8_reg_name[reg]);
-						break;
+            case 2:
+                switch(AVR8_WGM1)
+                {
+                    case Avr8::WGM1_NORMAL:
+                    case Avr8::WGM1_CTC_OCR:
+                    case Avr8::WGM1_CTC_ICR:
+                        //verboselog(machine, 0, "avr8_update_timer1_compare_mode: Clear OC1%c on compare match\n", avr8_reg_name[reg]);
+                        break;
 
-					case Avr8::WGM1_PWM_8_PC:
-					case Avr8::WGM1_PWM_9_PC:
-					case Avr8::WGM1_PWM_10_PC:
-					case Avr8::WGM1_PWM_PFC_ICR:
-					case Avr8::WGM1_PWM_PC_ICR:
-					case Avr8::WGM1_PWM_PFC_OCR:
-					case Avr8::WGM1_PWM_PC_OCR:
-						//verboselog(machine, 0, "avr8_update_timer1_compare_mode: Clear OC1%c on match when up-counting, set when down-counting\n", avr8_reg_name[reg]);
-						break;
+                    case Avr8::WGM1_PWM_8_PC:
+                    case Avr8::WGM1_PWM_9_PC:
+                    case Avr8::WGM1_PWM_10_PC:
+                    case Avr8::WGM1_PWM_PFC_ICR:
+                    case Avr8::WGM1_PWM_PC_ICR:
+                    case Avr8::WGM1_PWM_PFC_OCR:
+                    case Avr8::WGM1_PWM_PC_OCR:
+                        //verboselog(machine, 0, "avr8_update_timer1_compare_mode: Clear OC1%c on match when up-counting, set when down-counting\n", avr8_reg_name[reg]);
+                        break;
 
-					case Avr8::WGM1_FAST_PWM_8:
-					case Avr8::WGM1_FAST_PWM_9:
-					case Avr8::WGM1_FAST_PWM_10:
-					case Avr8::WGM1_FAST_PWM_ICR:
-					case Avr8::WGM1_FAST_PWM_OCR:
-						//verboselog(machine, 0, "avr8_update_timer1_compare_mode: Clear OC1%c on compare match, set at BOTTOM\n", avr8_reg_name[reg]);
-						break;
-				}
-				break;
+                    case Avr8::WGM1_FAST_PWM_8:
+                    case Avr8::WGM1_FAST_PWM_9:
+                    case Avr8::WGM1_FAST_PWM_10:
+                    case Avr8::WGM1_FAST_PWM_ICR:
+                    case Avr8::WGM1_FAST_PWM_OCR:
+                        //verboselog(machine, 0, "avr8_update_timer1_compare_mode: Clear OC1%c on compare match, set at BOTTOM\n", avr8_reg_name[reg]);
+                        break;
+                }
+                break;
 
-			case 3:
-				switch(AVR8_WGM1)
-				{
-					case Avr8::WGM1_NORMAL:
-					case Avr8::WGM1_CTC_OCR:
-					case Avr8::WGM1_CTC_ICR:
-						//verboselog(machine, 0, "avr8_update_timer1_compare_mode: Set OC1%c on compare match\n", avr8_reg_name[reg]);
-						break;
+            case 3:
+                switch(AVR8_WGM1)
+                {
+                    case Avr8::WGM1_NORMAL:
+                    case Avr8::WGM1_CTC_OCR:
+                    case Avr8::WGM1_CTC_ICR:
+                        //verboselog(machine, 0, "avr8_update_timer1_compare_mode: Set OC1%c on compare match\n", avr8_reg_name[reg]);
+                        break;
 
-					case Avr8::WGM1_PWM_8_PC:
-					case Avr8::WGM1_PWM_9_PC:
-					case Avr8::WGM1_PWM_10_PC:
-					case Avr8::WGM1_PWM_PFC_ICR:
-					case Avr8::WGM1_PWM_PC_ICR:
-					case Avr8::WGM1_PWM_PFC_OCR:
-					case Avr8::WGM1_PWM_PC_OCR:
-						//verboselog(machine, 0, "avr8_update_timer1_compare_mode: Set OC1%c on match when up-counting, clear on match when down-counting\n", avr8_reg_name[reg]);
-						break;
+                    case Avr8::WGM1_PWM_8_PC:
+                    case Avr8::WGM1_PWM_9_PC:
+                    case Avr8::WGM1_PWM_10_PC:
+                    case Avr8::WGM1_PWM_PFC_ICR:
+                    case Avr8::WGM1_PWM_PC_ICR:
+                    case Avr8::WGM1_PWM_PFC_OCR:
+                    case Avr8::WGM1_PWM_PC_OCR:
+                        //verboselog(machine, 0, "avr8_update_timer1_compare_mode: Set OC1%c on match when up-counting, clear on match when down-counting\n", avr8_reg_name[reg]);
+                        break;
 
-					case Avr8::WGM1_FAST_PWM_8:
-					case Avr8::WGM1_FAST_PWM_9:
-					case Avr8::WGM1_FAST_PWM_10:
-					case Avr8::WGM1_FAST_PWM_ICR:
-					case Avr8::WGM1_FAST_PWM_OCR:
-						//verboselog(machine, 0, "avr8_update_timer1_compare_mode: Set OC1%c on compare match, clear at BOTTOM\n", avr8_reg_name[reg]);
-						break;
-				}
-				break;
-			default:
-				verboselog(machine, 0, "avr8_update_timer1_compare_mode: Unknown COM1%c mode setting (%d)\n", avr8_reg_name[reg], mode);
-				break;
-		}
-	}
-	*/
+                    case Avr8::WGM1_FAST_PWM_8:
+                    case Avr8::WGM1_FAST_PWM_9:
+                    case Avr8::WGM1_FAST_PWM_10:
+                    case Avr8::WGM1_FAST_PWM_ICR:
+                    case Avr8::WGM1_FAST_PWM_OCR:
+                        //verboselog(machine, 0, "avr8_update_timer1_compare_mode: Set OC1%c on compare match, clear at BOTTOM\n", avr8_reg_name[reg]);
+                        break;
+                }
+                break;
+            default:
+                verboselog(machine, 0, "avr8_update_timer1_compare_mode: Unknown COM1%c mode setting (%d)\n", avr8_reg_name[reg], mode);
+                break;
+        }
+    }
+    */
 }
 
 static READ8_HANDLER( avr8_read )
@@ -544,99 +544,99 @@ static TIMER_CALLBACK( avr8_timer2_tick )
     count += state->timer1_increment;
     for(INT32 reg = AVR8_REG_A; reg <= AVR8_REG_B; reg++)
     {
-		UINT8 mode = (reg == AVR8_REG_A) ? AVR8_TCCR2A_COM2A : AVR8_TCCR2A_COM2B;
+        UINT8 mode = (reg == AVR8_REG_A) ? AVR8_TCCR2A_COM2A : AVR8_TCCR2A_COM2B;
 
-		if(!mode)
-		{
-			// Normal port operation, OC2n disconnected
-			//verboselog(machine, 0, "avr8_update_timer2_compare_mode: TODO; OC2%c disconnected, normal port operation\n", avr8_reg_name[reg]);
-			return;
-		}
+        if(!mode)
+        {
+            // Normal port operation, OC2n disconnected
+            //verboselog(machine, 0, "avr8_update_timer2_compare_mode: TODO; OC2%c disconnected, normal port operation\n", avr8_reg_name[reg]);
+            return;
+        }
 
-		switch(AVR8_WGM2)
-		{
-			case Avr8::WGM2_NORMAL:
-			case Avr8::WGM2_CTC_CMP:
-				switch(mode)
-				{
-					case 1: // Toggle OC2n on Compare Match
-						//verboselog(machine, 0, "avr8_update_timer2_compare_mode: TODO; Toggle OC2%c on Compare Match\n", avr8_reg_name[reg]);
-						break;
-					case 2: // Clear OC2n on Compare Match
-						//verboselog(machine, 0, "avr8_update_timer2_compare_mode: TODO; Clear OC2%c on Compare Match\n", avr8_reg_name[reg]);
-						break;
-					case 3: // Set OC2n on Compare Match
-						//verboselog(machine, 0, "avr8_update_timer2_compare_mode: TODO; Set OC2%c on Compare Match\n", avr8_reg_name[reg]);
-						break;
-				}
-				break;
+        switch(AVR8_WGM2)
+        {
+            case Avr8::WGM2_NORMAL:
+            case Avr8::WGM2_CTC_CMP:
+                switch(mode)
+                {
+                    case 1: // Toggle OC2n on Compare Match
+                        //verboselog(machine, 0, "avr8_update_timer2_compare_mode: TODO; Toggle OC2%c on Compare Match\n", avr8_reg_name[reg]);
+                        break;
+                    case 2: // Clear OC2n on Compare Match
+                        //verboselog(machine, 0, "avr8_update_timer2_compare_mode: TODO; Clear OC2%c on Compare Match\n", avr8_reg_name[reg]);
+                        break;
+                    case 3: // Set OC2n on Compare Match
+                        //verboselog(machine, 0, "avr8_update_timer2_compare_mode: TODO; Set OC2%c on Compare Match\n", avr8_reg_name[reg]);
+                        break;
+                }
+                break;
 
-			case Avr8::WGM2_PWM_PC:
-				switch(mode)
-				{
-					case 1: // Normal port operation, OC2n disconnected
-						//verboselog(machine, 0, "avr8_update_timer2_compare_mode: TODO; OC2%c disconnected, normal port operation\n", avr8_reg_name[reg]);
-						break;
-					case 2: // Clear OC2n on match when up-counting, set when down-counting
-						//verboselog(machine, 0, "avr8_update_timer2_compare_mode: TODO; Clear OC2%c on match when up-counting, set when down-counting\n", avr8_reg_name[reg]);
-						break;
-					case 3: // Set OC2n on match when up-counting, clear when down-counting
-						//verboselog(machine, 0, "avr8_update_timer2_compare_mode: TODO; Set OC2%c on match when up-counting, clear when down-counting\n", avr8_reg_name[reg]);
-						break;
-				}
-				break;
+            case Avr8::WGM2_PWM_PC:
+                switch(mode)
+                {
+                    case 1: // Normal port operation, OC2n disconnected
+                        //verboselog(machine, 0, "avr8_update_timer2_compare_mode: TODO; OC2%c disconnected, normal port operation\n", avr8_reg_name[reg]);
+                        break;
+                    case 2: // Clear OC2n on match when up-counting, set when down-counting
+                        //verboselog(machine, 0, "avr8_update_timer2_compare_mode: TODO; Clear OC2%c on match when up-counting, set when down-counting\n", avr8_reg_name[reg]);
+                        break;
+                    case 3: // Set OC2n on match when up-counting, clear when down-counting
+                        //verboselog(machine, 0, "avr8_update_timer2_compare_mode: TODO; Set OC2%c on match when up-counting, clear when down-counting\n", avr8_reg_name[reg]);
+                        break;
+                }
+                break;
 
-			case Avr8::WGM2_PWM_PC_CMP:
-				switch(mode)
-				{
-					case 1: // Toggle OC2n on compare match
-						//verboselog(machine, 0, "avr8_update_timer2_compare_mode: TODO; Toggle OC2%c on compare match\n", avr8_reg_name[reg]);
-						break;
-					case 2: // Clear OC2n on match when up-counting, set when down-counting
-						//verboselog(machine, 0, "avr8_update_timer2_compare_mode: TODO; Clear OC2%c on match when up-counting, set when down-counting\n", avr8_reg_name[reg]);
-						break;
-					case 3: // Set OC2n on match when up-counting, clear when down-counting
-						//verboselog(machine, 0, "avr8_update_timer2_compare_mode: TODO; Set OC2%c on match when up-counting, clear when down-counting\n", avr8_reg_name[reg]);
-						break;
-				}
-				break;
+            case Avr8::WGM2_PWM_PC_CMP:
+                switch(mode)
+                {
+                    case 1: // Toggle OC2n on compare match
+                        //verboselog(machine, 0, "avr8_update_timer2_compare_mode: TODO; Toggle OC2%c on compare match\n", avr8_reg_name[reg]);
+                        break;
+                    case 2: // Clear OC2n on match when up-counting, set when down-counting
+                        //verboselog(machine, 0, "avr8_update_timer2_compare_mode: TODO; Clear OC2%c on match when up-counting, set when down-counting\n", avr8_reg_name[reg]);
+                        break;
+                    case 3: // Set OC2n on match when up-counting, clear when down-counting
+                        //verboselog(machine, 0, "avr8_update_timer2_compare_mode: TODO; Set OC2%c on match when up-counting, clear when down-counting\n", avr8_reg_name[reg]);
+                        break;
+                }
+                break;
 
 
-			case Avr8::WGM2_FAST_PWM:
-				switch(mode)
-				{
-					case 1: // Normal port operation, OC2n disconnected
-						//verboselog(machine, 0, "avr8_update_timer2_compare_mode: TODO; OC2%c disconnected, normal port operation\n", avr8_reg_name[reg]);
-						break;
-					case 2: // Clear OC2n on match, set at BOTTOM
-						//verboselog(machine, 0, "avr8_update_timer2_compare_mode: TODO; Clear OC2%c on match, set at BOTTOM\n", avr8_reg_name[reg]);
-						break;
-					case 3: // Set OC2n on match, clear at BOTTOM
-						//verboselog(machine, 0, "avr8_update_timer2_compare_mode: TODO; Set OC2%c on match, clear at BOTTOM\n", avr8_reg_name[reg]);
-						break;
-				}
-				break;
+            case Avr8::WGM2_FAST_PWM:
+                switch(mode)
+                {
+                    case 1: // Normal port operation, OC2n disconnected
+                        //verboselog(machine, 0, "avr8_update_timer2_compare_mode: TODO; OC2%c disconnected, normal port operation\n", avr8_reg_name[reg]);
+                        break;
+                    case 2: // Clear OC2n on match, set at BOTTOM
+                        //verboselog(machine, 0, "avr8_update_timer2_compare_mode: TODO; Clear OC2%c on match, set at BOTTOM\n", avr8_reg_name[reg]);
+                        break;
+                    case 3: // Set OC2n on match, clear at BOTTOM
+                        //verboselog(machine, 0, "avr8_update_timer2_compare_mode: TODO; Set OC2%c on match, clear at BOTTOM\n", avr8_reg_name[reg]);
+                        break;
+                }
+                break;
 
-			case Avr8::WGM2_FAST_PWM_CMP:
-				switch(mode)
-				{
-					case 1: // Toggle OC2n on compare match
-						//verboselog(machine, 0, "avr8_update_timer2_compare_mode: TODO; Toggle OC2%c on compare match\n", avr8_reg_name[reg]);
-						break;
-					case 2: // Clear OC2n on match, set at BOTTOM
-						//verboselog(machine, 0, "avr8_update_timer2_compare_mode: TODO; Clear OC2%c on match, set at BOTTOM\n", avr8_reg_name[reg]);
-						break;
-					case 3: // Set OC2n on match, clear at BOTTOM
-						//verboselog(machine, 0, "avr8_update_timer2_compare_mode: TODO; Set OC2%c on match, clear at BOTTOM\n", avr8_reg_name[reg]);
-						break;
-				}
-				break;
+            case Avr8::WGM2_FAST_PWM_CMP:
+                switch(mode)
+                {
+                    case 1: // Toggle OC2n on compare match
+                        //verboselog(machine, 0, "avr8_update_timer2_compare_mode: TODO; Toggle OC2%c on compare match\n", avr8_reg_name[reg]);
+                        break;
+                    case 2: // Clear OC2n on match, set at BOTTOM
+                        //verboselog(machine, 0, "avr8_update_timer2_compare_mode: TODO; Clear OC2%c on match, set at BOTTOM\n", avr8_reg_name[reg]);
+                        break;
+                    case 3: // Set OC2n on match, clear at BOTTOM
+                        //verboselog(machine, 0, "avr8_update_timer2_compare_mode: TODO; Set OC2%c on match, clear at BOTTOM\n", avr8_reg_name[reg]);
+                        break;
+                }
+                break;
 
-			default:
-				break;
-		}
-	}
-	*/
+            default:
+                break;
+        }
+    }
+    */
 }
 
 static void avr8_update_timer1_clock_source(running_machine *machine)

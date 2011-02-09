@@ -2,11 +2,11 @@
 
     TODO:
 
-	- rewrite shifter
+    - rewrite shifter
     - STe pixelofs
     - blitter hog
     - high resolution
-	
+
 */
 
 #include "emu.h"
@@ -19,7 +19,7 @@
 
 
 //**************************************************************************
-//	CONSTANTS / MACROS
+//  CONSTANTS / MACROS
 //**************************************************************************
 
 #define LOG 0
@@ -47,7 +47,7 @@ static const int BLITTER_NOPS[16][4] =
 
 
 //**************************************************************************
-//	SHIFTER
+//  SHIFTER
 //**************************************************************************
 
 //-------------------------------------------------
@@ -152,7 +152,7 @@ void st_state::shifter_tick()
 	case 2:
 		pen = shift_mode_2();
 		break;
-		
+
 	default:
 		pen = get_black_pen(machine);
 		break;
@@ -233,7 +233,7 @@ void st_state::glue_tick()
 	if (x == m_shifter_hblank_start)
 	{
 		cpu_set_input_line(m_maincpu, M68K_IRQ_2, HOLD_LINE);
-//		m_shifter_ofs += (m_shifter_lineofs * 2); // STe
+//      m_shifter_ofs += (m_shifter_lineofs * 2); // STe
 	}
 
 	pen_t pen;
@@ -258,7 +258,7 @@ void st_state::glue_tick()
 	case 2:
 		pen = shift_mode_2();
 		break;
-		
+
 	default:
 		pen = get_black_pen(machine);
 		break;
@@ -444,7 +444,7 @@ WRITE16_MEMBER( st_state::shifter_palette_w )
 
 
 //**************************************************************************
-//	STE SHIFTER
+//  STE SHIFTER
 //**************************************************************************
 
 //-------------------------------------------------
@@ -582,7 +582,7 @@ WRITE8_MEMBER( ste_state::shifter_pixelofs_w )
 
 
 //**************************************************************************
-//	BLITTER
+//  BLITTER
 //**************************************************************************
 
 //-------------------------------------------------
@@ -727,7 +727,7 @@ void st_state::blitter_tick()
 static TIMER_CALLBACK( atarist_blitter_tick )
 {
 	st_state *state = machine->driver_data<st_state>();
-	
+
 	state->blitter_tick();
 }
 
@@ -1071,7 +1071,7 @@ WRITE16_MEMBER( st_state::blitter_ctrl_w )
 
 
 //**************************************************************************
-//	VIDEO
+//  VIDEO
 //**************************************************************************
 
 //-------------------------------------------------
@@ -1083,7 +1083,7 @@ void st_state::video_start()
 	m_shifter_timer = machine->scheduler().timer_alloc(FUNC(atarist_shifter_tick));
 	m_glue_timer = machine->scheduler().timer_alloc(FUNC(atarist_glue_tick));
 
-//	m_shifter_timer->adjust(machine->primary_screen->time_until_pos(0), 0, attotime::from_hz(Y2/4)); // 125 ns
+//  m_shifter_timer->adjust(machine->primary_screen->time_until_pos(0), 0, attotime::from_hz(Y2/4)); // 125 ns
 	m_glue_timer->adjust(machine->primary_screen->time_until_pos(0), 0, attotime::from_hz(Y2/16)); // 500 ns
 
 	/* register for state saving */

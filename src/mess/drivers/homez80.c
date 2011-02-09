@@ -1,9 +1,9 @@
 /***************************************************************************
-   
+
         Homebrew Z80 Computer by Kun-Szabo Marton
 
-			http://digitarworld.uw.hu/z80.htm
-		
+            http://digitarworld.uw.hu/z80.htm
+
         31/10/2010 Initial driver by Miodrag Milanovic
 
 ****************************************************************************/
@@ -49,15 +49,15 @@ static READ8_HANDLER( homez80_keyboard_r )
 static ADDRESS_MAP_START(homez80_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
     AM_RANGE( 0x0000, 0x0fff ) AM_ROM  // Monitor
-	AM_RANGE( 0x2000, 0x23ff ) AM_RAM  AM_BASE_MEMBER(homez80_state, video_ram) // Video RAM	
+	AM_RANGE( 0x2000, 0x23ff ) AM_RAM  AM_BASE_MEMBER(homez80_state, video_ram) // Video RAM
 	AM_RANGE( 0x7020, 0x702f ) AM_READ(homez80_keyboard_r)
-    AM_RANGE( 0x8000, 0xffff ) AM_RAM  // 32 K RAM	
+    AM_RANGE( 0x8000, 0xffff ) AM_RAM  // 32 K RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( homez80_io , ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 ADDRESS_MAP_END
-			
+
 /* Input ports */
 INPUT_PORTS_START( homez80 )
 	PORT_START("LINE0")
@@ -68,7 +68,7 @@ INPUT_PORTS_START( homez80 )
 		PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_ESC)
 		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED)
 		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Z)
-		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_A)	
+		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_A)
 	PORT_START("LINE1")
 		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
 		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNUSED)
@@ -195,7 +195,7 @@ INPUT_PORTS_START( homez80 )
 		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED)
 		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_COMMA)
 		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_K)
-	PORT_START("LINE15")	
+	PORT_START("LINE15")
 		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F9)
 		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNUSED)
 		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F10)
@@ -207,8 +207,8 @@ INPUT_PORTS_START( homez80 )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET(homez80) 
-{	
+static MACHINE_RESET(homez80)
+{
 }
 
 static VIDEO_START( homez80 )
@@ -236,7 +236,7 @@ GFXDECODE_END
 
 static INTERRUPT_GEN( homez80_interrupt )
 {
-	homez80_state *state = device->machine->driver_data<homez80_state>();	
+	homez80_state *state = device->machine->driver_data<homez80_state>();
 	cpu_set_input_line(device, 0, (state->irq & 1) ? HOLD_LINE : CLEAR_LINE);
 	state->irq ^= 1;
 }
@@ -245,11 +245,11 @@ static MACHINE_CONFIG_START( homez80, homez80_state )
     /* basic machine hardware */
     MCFG_CPU_ADD("maincpu",Z80, XTAL_8MHz / 2)
     MCFG_CPU_PROGRAM_MAP(homez80_mem)
-    MCFG_CPU_IO_MAP(homez80_io)	
+    MCFG_CPU_IO_MAP(homez80_io)
 	MCFG_CPU_PERIODIC_INT(homez80_interrupt, 50)
-	
+
     MCFG_MACHINE_RESET(homez80)
-	
+
     /* video hardware */
     MCFG_SCREEN_ADD("screen", RASTER)
     MCFG_SCREEN_REFRESH_RATE(50)
@@ -276,5 +276,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 2008, homez80,  0,       0, 	homez80, 	homez80, 	 0,  "Kun-Szabo Marton",   "Homebrew Z80 Computer",		GAME_NO_SOUND_HW)
+COMP( 2008, homez80,  0,       0,	homez80,	homez80,	 0,  "Kun-Szabo Marton",   "Homebrew Z80 Computer",		GAME_NO_SOUND_HW)
 

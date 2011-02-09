@@ -2,38 +2,38 @@
 //////   HECTOR HEADER FILE /////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////
 /*
-		Hector 2HR+
-		Victor
-		Hector 2HR
-		Hector HRX
-		Hector MX40c
-		Hector MX80c
-		Hector 1
-		Interact
+        Hector 2HR+
+        Victor
+        Hector 2HR
+        Hector HRX
+        Hector MX40c
+        Hector MX80c
+        Hector 1
+        Interact
 
-		12/05/2009 Skeleton driver - Micko : mmicko@gmail.com
-		31/06/2009 Video - Robbbert
+        12/05/2009 Skeleton driver - Micko : mmicko@gmail.com
+        31/06/2009 Video - Robbbert
 
-		29/10/2009 Update skeleton to functional machine
-					by yo_fr			(jj.stac @ aliceadsl.fr)
+        29/10/2009 Update skeleton to functional machine
+                    by yo_fr            (jj.stac @ aliceadsl.fr)
 
-				=> add Keyboard,
-				=> add color,
-				=> add cassette,
-				=> add sn76477 sound and 1bit sound,
-				=> add joysticks (stick, pot, fire)
-				=> add BR/HR switching
-				=> add bank switch for HRX
-				=> add device MX80c and bank switching for the ROM
-		03/01/2010 Update and clean prog  by yo_fr       (jj.stac@aliceadsl.fr)
-				=> add the port mapping for keyboard
-		20/11/2010 : synchronization between uPD765 and Z80 are now OK, CP/M runnig! JJStacino
+                => add Keyboard,
+                => add color,
+                => add cassette,
+                => add sn76477 sound and 1bit sound,
+                => add joysticks (stick, pot, fire)
+                => add BR/HR switching
+                => add bank switch for HRX
+                => add device MX80c and bank switching for the ROM
+        03/01/2010 Update and clean prog  by yo_fr       (jj.stac@aliceadsl.fr)
+                => add the port mapping for keyboard
+        20/11/2010 : synchronization between uPD765 and Z80 are now OK, CP/M runnig! JJStacino
 
-			don't forget to keep some information about these machine see DChector project : http://dchector.free.fr/ made by DanielCoulom
-			(and thank's to Daniel!)
+            don't forget to keep some information about these machine see DChector project : http://dchector.free.fr/ made by DanielCoulom
+            (and thank's to Daniel!)
 
-	TODO :	Add the cartridge function,
-			Adjust the one shot and A/D timing (sn76477)
+    TODO :  Add the cartridge function,
+            Adjust the one shot and A/D timing (sn76477)
 */
 
 #include "machine/upd765.h"
@@ -112,7 +112,7 @@ extern UINT8 hector_color[4];
 /* Sound function*/
 extern const sn76477_interface hector_sn76477_interface;
 
-// state disc2 port 
+// state disc2 port
 extern UINT8 hector_disc2_data_r_ready; /* =ff when PC2 = true and data in read buffer (hector_disc2_data_read) */
 extern UINT8 hector_disc2_data_w_ready; /* =ff when Disc 2 Port 40 had send a data in write buffer (hector_disc2_data_write) */
 extern UINT8 hector_disc2_data_read;    /* Data send by Hector to Disc 2 when PC2=true */

@@ -589,7 +589,7 @@ void comx35_state::machine_start()
 		memory_unmap_readwrite(program, 0xe000, 0xefff, 0, 0);
 		memory_set_bank(machine, "bank2", 0);
 	}
-	
+
 	/* card slot banking */
 	memory_configure_bank(machine, "bank1", 0, 1, machine->region(CDP1802_TAG)->base() + 0xc000, 0);
 	memory_configure_bank(machine, "bank1", BANK_FLOPPY, 1, machine->region("fdc")->base(), 0);

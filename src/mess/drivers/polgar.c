@@ -240,7 +240,7 @@ static ADDRESS_MAP_START(polgar_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE( 0x2c00, 0x2c07) AM_READ( read_keys)	// CL Key
 	AM_RANGE( 0x2004, 0x2004) AM_WRITE( write_io)	// LCD Instr. Reg + Beeper
 	AM_RANGE( 0x2000, 0x2000) AM_WRITE( write_lcd)	// LCD Char Reg.
- 	AM_RANGE( 0x4000, 0xffff) AM_ROM
+	AM_RANGE( 0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
@@ -437,7 +437,7 @@ static MACHINE_CONFIG_START( polgar, polgar_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("beep", BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	
+
 	//MCFG_TIMER_ADD_PERIODIC("led_timer", update_leds, attotime::from_hz(60))
 	MCFG_TIMER_ADD_PERIODIC("nmi_timer", update_nmi, attotime::from_hz(600))
 	MCFG_TIMER_ADD_PERIODIC("artwork_timer", mboard_update_artwork, attotime::from_hz(100))

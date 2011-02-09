@@ -67,11 +67,11 @@ Video PCB Layout (Color)
 |-------------------------------------------|
 |                                           |
 |                                           |
-|				2114						|
+|               2114                        |
 |                                           |
-|				2114		TROM			|
+|               2114        TROM            |
 |                                           |
-|		12MHz				TIC				|
+|       12MHz               TIC             |
 |                                           |
 |                                           |
 |-------------------------------------------|
@@ -115,23 +115,23 @@ Video PCB Layout (High Resolution)
 55 10791-01
 
 |-------------------------------------------|
-|											|
-|	4116		PROM1						|
-|	4116									|
-|	4116									|
-|	4116									|
-|	4116									|
-|	4116									|
-|	4116									|
-|	4116				PROM0				|
+|                                           |
+|   4116        PROM1                       |
+|   4116                                    |
+|   4116                                    |
+|   4116                                    |
+|   4116                                    |
+|   4116                                    |
+|   4116                                    |
+|   4116                PROM0               |
 |-------------------------------------------|
 
 Notes:
     Relevant IC's shown.
 
     4116    - Motorola MCM4116AC25 1Kx8 RAM
-	PROM0	- Philips 82S123 32x8 Bipolar PROM "HRU I"
-	PROM1	- Philips 82S131 512x4 Bipolar PROM "HRU II"
+    PROM0   - Philips 82S123 32x8 Bipolar PROM "HRU I"
+    PROM1   - Philips 82S131 512x4 Bipolar PROM "HRU II"
 
 
 UNI-800 PCB Layout
@@ -140,25 +140,25 @@ UNI-800 PCB Layout
 8120 821025 REV.3
 
 |-------------------------------------------|
-|											|
-|					4164		PROM0	CN3	|
-|					4164					|
-|					4164					|
-|					4164					|
-|					4164					|
-|					4164					|
-|CN1				4164				CN2	|
-|					4164					|
+|                                           |
+|                   4164        PROM0   CN3 |
+|                   4164                    |
+|                   4164                    |
+|                   4164                    |
+|                   4164                    |
+|                   4164                    |
+|CN1                4164                CN2 |
+|                   4164                    |
 |-------------------------------------------|
 
 Notes:
     Relevant IC's shown.
 
     4164    - Hitachi HM4864P-2 64Kx1 RAM
-	PROM0	- Philips 82S129 256x4 Bipolar PROM ".800 1.2"
-	CN1		- 2x6 pin PCB header
-	CN2		- 2x10 pin PCB header
-	CN3		- 2x10 pin PCB header
+    PROM0   - Philips 82S129 256x4 Bipolar PROM ".800 1.2"
+    CN1     - 2x6 pin PCB header
+    CN2     - 2x10 pin PCB header
+    CN3     - 2x10 pin PCB header
 
 
 Keyboard PCB Layout
@@ -225,9 +225,9 @@ XR22-050-3B Pinout
 
     TODO:
 
-	- update Z80 DART/CTC/SIO references to use new device system
-	- rewrite abc806 bankswitch to use install_ram/rom
-	- ABC800 keyboard: T1 clock frequency, caps lock led, keydown
+    - update Z80 DART/CTC/SIO references to use new device system
+    - rewrite abc806 bankswitch to use install_ram/rom
+    - ABC800 keyboard: T1 clock frequency, caps lock led, keydown
     - ABC802/806 ABC77 keyboard
     - hard disks (ABC-850 10MB, ABC-852 20MB, ABC-856 60MB)
 
@@ -256,7 +256,7 @@ XR22-050-3B Pinout
 
 
 //**************************************************************************
-//	KEYBOARD HACK
+//  KEYBOARD HACK
 //**************************************************************************
 
 static INPUT_PORTS_START( fake_keyboard )
@@ -457,7 +457,7 @@ static TIMER_DEVICE_CALLBACK( abc806_keyboard_tick )
 
 
 //**************************************************************************
-//	SOUND
+//  SOUND
 //**************************************************************************
 
 //-------------------------------------------------
@@ -500,7 +500,7 @@ READ8_MEMBER( abc802_state::pling_r )
 
 
 //**************************************************************************
-//	MEMORY BANKING
+//  MEMORY BANKING
 //**************************************************************************
 
 //-------------------------------------------------
@@ -724,7 +724,7 @@ WRITE8_MEMBER( abc806_state::mao_w )
 
 
 //**************************************************************************
-//	INTEGRATED KEYBOARD
+//  INTEGRATED KEYBOARD
 //**************************************************************************
 
 //-------------------------------------------------
@@ -787,18 +787,18 @@ WRITE8_MEMBER( abc800_state::keyboard_row_w )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		0		A0
-		1		A1
-		2		A2
-		3		A3
-		4		?
-		5		?
-		6		
-		7		
+        0       A0
+        1       A1
+        2       A2
+        3       A3
+        4       ?
+        5       ?
+        6
+        7
 
-	*/
+    */
 
 	// keyboard row
 	if (!m_kb_stb)
@@ -816,18 +816,18 @@ WRITE8_MEMBER( abc800_state::keyboard_ctrl_w )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		0		
-		1		
-		2		
-		3		
-		4		TxD
-		5		?
-		6		22-008-03 CLR, 22-050-3B STB
-		7		22-008-03 HYS
+        0
+        1
+        2
+        3
+        4       TxD
+        5       ?
+        6       22-008-03 CLR, 22-050-3B STB
+        7       22-008-03 HYS
 
-	*/
+    */
 
 	// TxD
 	m_kb_txd = !BIT(data, 4);
@@ -852,7 +852,7 @@ READ8_MEMBER( abc800_state::keyboard_t1_r )
 
 
 //**************************************************************************
-//	ADDRESS MAPS
+//  ADDRESS MAPS
 //**************************************************************************
 
 //-------------------------------------------------
@@ -1016,7 +1016,7 @@ ADDRESS_MAP_END
 
 
 //**************************************************************************
-//	INPUT PORTS
+//  INPUT PORTS
 //**************************************************************************
 
 //-------------------------------------------------
@@ -1207,7 +1207,7 @@ INPUT_PORTS_END
 
 
 //**************************************************************************
-//	DEVICE CONFIGURATION
+//  DEVICE CONFIGURATION
 //**************************************************************************
 
 
@@ -1478,7 +1478,7 @@ static ABCBUS_DAISY( abcbus_daisy )
 
 
 //**************************************************************************
-//	MACHINE INITIALIZATION
+//  MACHINE INITIALIZATION
 //**************************************************************************
 
 //-------------------------------------------------
@@ -1624,7 +1624,7 @@ void abc806_state::machine_reset()
 
 
 //**************************************************************************
-//	MACHINE DRIVERS
+//  MACHINE DRIVERS
 //**************************************************************************
 
 //-------------------------------------------------
@@ -1680,7 +1680,7 @@ static MACHINE_CONFIG_START( abc800m, abc800m_state )
 	MCFG_CPU_CONFIG(abc800_daisy_chain)
 	MCFG_CPU_PROGRAM_MAP(abc800m_mem)
 	MCFG_CPU_IO_MAP(abc800m_io)
-	
+
 	MCFG_CPU_ADD(I8048_TAG, I8048, XTAL_5_9904MHz)
 	MCFG_CPU_IO_MAP(abc800_keyboard_io)
 
@@ -1798,7 +1798,7 @@ MACHINE_CONFIG_END
 
 
 //**************************************************************************
-//	ROMS
+//  ROMS
 //**************************************************************************
 
 /*
@@ -1965,7 +1965,7 @@ ROM_END
 
 
 //**************************************************************************
-//	DRIVER INITIALIZATION
+//  DRIVER INITIALIZATION
 //**************************************************************************
 
 //-------------------------------------------------
@@ -2108,7 +2108,7 @@ static DRIVER_INIT( abc806 )
 
 
 //**************************************************************************
-//	SYSTEM DRIVERS
+//  SYSTEM DRIVERS
 //**************************************************************************
 
 //    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT     COMPANY             FULLNAME        FLAGS

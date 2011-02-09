@@ -410,12 +410,12 @@ static WRITE8_DEVICE_HANDLER( mycom_0a_w )
 	state->_0a = data;
 
 	/* Info about sound
-	- uses a SN76489N chip at an unknown clock
-	- each time a key is pressed, 4 lots of data are output to port 4
-	- after each data byte, there is a 4 byte control sequence to port 0a
-	- the control sequence is 9F,8F,AF,BF
-	- the data bytes are 8D,01,9F,9F
-	- the end result is silence  :(  */
+    - uses a SN76489N chip at an unknown clock
+    - each time a key is pressed, 4 lots of data are output to port 4
+    - after each data byte, there is a 4 byte control sequence to port 0a
+    - the control sequence is 9F,8F,AF,BF
+    - the data bytes are 8D,01,9F,9F
+    - the end result is silence  :(  */
 
 	// no sound comes out
 	if ((data & 0x30)==0)
@@ -554,7 +554,7 @@ static MACHINE_CONFIG_START( mycom, mycom_state )
 	MCFG_GFXDECODE(mycom)
 
 	/* Manual states clock is 1.008mhz for 40 cols, and 2.016 mhz for 80 cols.
-	The CRTC is a HD46505S - same as a 6845. The start registers need to be readable. */
+    The CRTC is a HD46505S - same as a 6845. The start registers need to be readable. */
 	MCFG_MC6845_ADD("crtc", MC6845, 1008000, mc6845_intf)
 
 	MCFG_VIDEO_START(mycom)
@@ -569,7 +569,7 @@ static MACHINE_CONFIG_START( mycom, mycom_state )
 	/* Devices */
 	MCFG_CASSETTE_ADD( "cassette", default_cassette_config )
 	MCFG_WD179X_ADD("fdc", wd1771_intf) // WD1771
-	
+
 	MCFG_TIMER_ADD_PERIODIC("keyboard_timer", mycom_kbd, attotime::from_hz(20))
 MACHINE_CONFIG_END
 

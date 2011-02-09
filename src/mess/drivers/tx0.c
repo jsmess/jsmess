@@ -316,7 +316,7 @@ static const tx0_reset_param_t tx0_reset_param =
 	tx0_io_reset_callback
 };
 
-static const crt_interface tx0_crt_interface = 
+static const crt_interface tx0_crt_interface =
 {
 	pen_crt_num_levels,
 	crt_window_offset_x, crt_window_offset_y,

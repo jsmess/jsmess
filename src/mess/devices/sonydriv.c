@@ -7,7 +7,7 @@
     Nate Woods, Raphael Nabet, R. Belmont
 
     This floppy drive was present in all variants of Lisa 2 (including Mac XL),
-    all Apple IIgs and IIc Plus machines, and in all Macintoshes in production 
+    all Apple IIgs and IIc Plus machines, and in all Macintoshes in production
     before 1988, when SWIM and SuperDrive were introduced.
 
     There were three major variants :
@@ -21,7 +21,7 @@
       an external or internal unit.  Some Lisa2/10 and Mac XL were upgraded to
       use it, too, but a fdc ROM upgrade was required.
     - A double-sided 1440k unit.  This is fully back compatible with the 800k
-      drive, and adds 1440k MFM capability.  This drive, called FDHD or 
+      drive, and adds 1440k MFM capability.  This drive, called FDHD or
       SuperDrive by Apple, came in automatic and manual-inject versions.
 
     TODO :
@@ -85,7 +85,7 @@ typedef struct
 	size_t loadedtrack_size;		/* size of loaded track */
 	size_t loadedtrack_pos;			/* position within loaded track */
 	UINT8 *loadedtrack_data;		/* pointer to track buffer */
-	
+
 	int is_fdhd;				/* is drive an FDHD? */
 } floppy;
 
@@ -428,8 +428,8 @@ void sony_set_lines(device_t *device,UINT8 lines)
 	sony_lines = lines & 0x0F;
 
 	{
-//		int action = ((sony_lines & (SONY_CA1 | SONY_CA0)) << 2) | (sony_sel_line << 1) | ((sony_lines & SONY_CA2) >> 2);
-//		printf("sony_set_lines: %02x, action now %d\n", lines&0xf, action);
+//      int action = ((sony_lines & (SONY_CA1 | SONY_CA0)) << 2) | (sony_sel_line << 1) | ((sony_lines & SONY_CA2) >> 2);
+//      printf("sony_set_lines: %02x, action now %d\n", lines&0xf, action);
 	}
 
 	/* have we just set LSTRB ? */
@@ -470,8 +470,8 @@ void sony_set_sel_line(device_t *device,int sel)
 	sony_sel_line = sel ? 1 : 0;
 
 	{
-//		int action = ((sony_lines & (SONY_CA1 | SONY_CA0)) << 2) | (sony_sel_line << 1) | ((sony_lines & SONY_CA2) >> 2);
-//		printf("sony_set_sel_line: %d, action now %d\n", sony_sel_line, action);
+//      int action = ((sony_lines & (SONY_CA1 | SONY_CA0)) << 2) | (sony_sel_line << 1) | ((sony_lines & SONY_CA2) >> 2);
+//      printf("sony_set_sel_line: %d, action now %d\n", sony_sel_line, action);
 	}
 
 	if (LOG_SONY_EXTRA)

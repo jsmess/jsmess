@@ -2311,8 +2311,8 @@ static MACHINE_CONFIG_START( pc6001, pc6001_state )
 	MCFG_SOUND_ADD("ay8910", AY8910, PC6001_MAIN_CLOCK/4)
 	MCFG_SOUND_CONFIG(pc6001_ay_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-//	MCFG_SOUND_WAVE_ADD("wave","cass")
-//	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.05)
+//  MCFG_SOUND_WAVE_ADD("wave","cass")
+//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.05)
 
 	/* TODO: accurate timing on this */
 	MCFG_TIMER_ADD_PERIODIC("keyboard_timer", keyboard_callback, attotime::from_hz(250))

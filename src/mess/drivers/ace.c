@@ -25,17 +25,17 @@ Ports:
     In 0xfe:
         Keyboard input, tape, and buzzer
 
-	http://www.jupiter-ace.co.uk/
+    http://www.jupiter-ace.co.uk/
 
 ***************************************************************************/
 
 /*
 
-	TODO:
+    TODO:
 
-	- Ace Colour Board
-	- 96K ram expansion
-	- Deep Thought disc interface (6850, 6821)
+    - Ace Colour Board
+    - 96K ram expansion
+    - Deep Thought disc interface (6850, 6821)
 
 */
 
@@ -60,11 +60,11 @@ Ports:
 
 
 //**************************************************************************
-//	READ/WRITE HANDLERS
+//  READ/WRITE HANDLERS
 //**************************************************************************
 
 //-------------------------------------------------
-//   io_r - 
+//   io_r -
 //-------------------------------------------------
 
 READ8_MEMBER( ace_state::io_r )
@@ -78,8 +78,8 @@ READ8_MEMBER( ace_state::io_r )
 	if (!BIT(offset, 12)) data &= input_port_read(machine, "A12");
 	if (!BIT(offset, 13)) data &= input_port_read(machine, "A13");
 	if (!BIT(offset, 14)) data &= input_port_read(machine, "A14");
-	
-	if (!BIT(offset, 15)) 
+
+	if (!BIT(offset, 15))
 	{
 		data &= input_port_read(machine, "A15");
 
@@ -97,7 +97,7 @@ READ8_MEMBER( ace_state::io_r )
 
 
 //-------------------------------------------------
-//   io_w - 
+//   io_w -
 //-------------------------------------------------
 
 WRITE8_MEMBER( ace_state::io_w )
@@ -108,7 +108,7 @@ WRITE8_MEMBER( ace_state::io_w )
 
 
 //-------------------------------------------------
-//   ppi_r - 
+//   ppi_r -
 //-------------------------------------------------
 
 static READ8_DEVICE_HANDLER( ppi_pa_r )
@@ -133,7 +133,7 @@ static READ8_DEVICE_HANDLER( ppi_control_r )
 
 
 //-------------------------------------------------
-//   ppi_w - 
+//   ppi_w -
 //-------------------------------------------------
 
 static WRITE8_DEVICE_HANDLER( ppi_pa_w )
@@ -158,7 +158,7 @@ static WRITE8_DEVICE_HANDLER( ppi_control_w )
 
 
 //-------------------------------------------------
-//   pio_r - 
+//   pio_r -
 //-------------------------------------------------
 
 static READ8_DEVICE_HANDLER( pio_ad_r )
@@ -183,7 +183,7 @@ static READ8_DEVICE_HANDLER( pio_bc_r )
 
 
 //-------------------------------------------------
-//   pio_w - 
+//   pio_w -
 //-------------------------------------------------
 
 static WRITE8_DEVICE_HANDLER( pio_ad_w )
@@ -209,7 +209,7 @@ static WRITE8_DEVICE_HANDLER( pio_bc_w )
 
 
 //**************************************************************************
-//	ADDRESS MAPS
+//  ADDRESS MAPS
 //**************************************************************************
 
 //-------------------------------------------------
@@ -247,7 +247,7 @@ ADDRESS_MAP_END
 
 
 //**************************************************************************
-//	INPUT PORTS
+//  INPUT PORTS
 //**************************************************************************
 
 //-------------------------------------------------
@@ -318,7 +318,7 @@ static INPUT_PORTS_START( ace )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_B)			PORT_CHAR('b') PORT_CHAR('B') PORT_CHAR('*')
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_V)			PORT_CHAR('v') PORT_CHAR('V') PORT_CHAR('/')
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
-	
+
 	PORT_START("JOY")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
@@ -333,7 +333,7 @@ INPUT_PORTS_END
 
 
 //**************************************************************************
-//	VIDEO
+//  VIDEO
 //**************************************************************************
 
 //-------------------------------------------------
@@ -422,7 +422,7 @@ bool ace_state::video_update(screen_device &screen, bitmap_t &bitmap, const rect
 
 
 //**************************************************************************
-//	DEVICE CONFIGURATION
+//  DEVICE CONFIGURATION
 //**************************************************************************
 
 //-------------------------------------------------
@@ -472,18 +472,18 @@ static READ8_DEVICE_HANDLER( sby_r )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		PC0		SP0256 SBY
-		PC1		
-		PC2		
-		PC3		
-		PC4		
-		PC5		
-		PC6		
-		PC7		
+        PC0     SP0256 SBY
+        PC1
+        PC2
+        PC3
+        PC4
+        PC5
+        PC6
+        PC7
 
-	*/
+    */
 
 	return sp0256_sby_r(device);
 }
@@ -492,18 +492,18 @@ static WRITE8_DEVICE_HANDLER( ald_w )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		PA0		SP0256 A1
-		PA1		SP0256 A2
-		PA2		SP0256 A3
-		PA3		SP0256 A4
-		PA4		SP0256 A5
-		PA5		SP0256 A6
-		PA6		SP0256 _ALD
-		PA7		
+        PA0     SP0256 A1
+        PA1     SP0256 A2
+        PA2     SP0256 A3
+        PA3     SP0256 A4
+        PA4     SP0256 A5
+        PA5     SP0256 A6
+        PA6     SP0256 _ALD
+        PA7
 
-	*/
+    */
 
 	if (!BIT(data, 6))
 	{
@@ -532,14 +532,14 @@ READ8_MEMBER( ace_state::pio_pa_r )
 
         bit     description
 
-        PA0		
-        PA1		RxD
-        PA2		
-        PA3		
-        PA4		
-        PA5		
-        PA6		
-        PA7	
+        PA0
+        PA1     RxD
+        PA2
+        PA3
+        PA4
+        PA5
+        PA6
+        PA7
 
     */
 
@@ -552,14 +552,14 @@ WRITE8_MEMBER( ace_state::pio_pa_w )
 
         bit     description
 
-        PA0		RTS
-        PA1		
-        PA2		CTS
-        PA3		TxD
-        PA4		
-        PA5		
-        PA6		STB
-        PA7	
+        PA0     RTS
+        PA1
+        PA2     CTS
+        PA3     TxD
+        PA4
+        PA5
+        PA6     STB
+        PA7
 
     */
 
@@ -581,7 +581,7 @@ static Z80PIO_INTERFACE( pio_intf )
 
 
 //**************************************************************************
-//	MACHINE INITIALIZATION
+//  MACHINE INITIALIZATION
 //**************************************************************************
 
 //-------------------------------------------------
@@ -612,7 +612,7 @@ void ace_state::machine_start()
 
 
 //**************************************************************************
-//	MACHINE CONFIGURATION
+//  MACHINE CONFIGURATION
 //**************************************************************************
 
 //-------------------------------------------------
@@ -669,7 +669,7 @@ MACHINE_CONFIG_END
 
 
 //**************************************************************************
-//	ROMS
+//  ROMS
 //**************************************************************************
 
 //-------------------------------------------------
@@ -691,8 +691,8 @@ ROM_END
 
 
 //**************************************************************************
-//	SYSTEM DRIVERS
+//  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME		PARENT		COMPAT	MACHINE		INPUT		INIT	COMPANY			FULLNAME				FLAGS
+//    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       INIT    COMPANY         FULLNAME                FLAGS
 COMP( 1981, ace,  0,	0,	ace,  ace,  0,	"Jupiter Cantab",  "Jupiter Ace" , 0 )

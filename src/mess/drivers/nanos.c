@@ -533,7 +533,7 @@ static MACHINE_CONFIG_START( nanos, nanos_state )
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
-	
+
 	MCFG_TIMER_ADD_PERIODIC("keyboard_timer", keyboard_callback, attotime::from_hz(24000))
 MACHINE_CONFIG_END
 

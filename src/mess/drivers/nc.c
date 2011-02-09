@@ -921,7 +921,7 @@ static const msm8251_interface nc100_uart_interface =
 	DEVCB_LINE(nc100_rxrdy_callback),
 	DEVCB_LINE(nc100_txrdy_callback),
 	DEVCB_NULL,
-	DEVCB_NULL	
+	DEVCB_NULL
 };
 
 
@@ -1305,7 +1305,7 @@ static const msm8251_interface nc200_uart_interface=
 	DEVCB_LINE(nc200_rxrdy_callback),
 	DEVCB_LINE(nc200_txrdy_callback),
 	DEVCB_NULL,
-	DEVCB_NULL	
+	DEVCB_NULL
 };
 
 
@@ -1733,15 +1733,15 @@ static MACHINE_CONFIG_START( nc100, nc_state )
 	MCFG_CARTSLOT_START(nc_pcmcia_card)
 	MCFG_CARTSLOT_LOAD(nc_pcmcia_card)
 	MCFG_CARTSLOT_UNLOAD(nc_pcmcia_card)
-	
+
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
 
 	MCFG_NC_SERIAL_ADD("serial")
-	
+
 	/* dummy timer */
-	MCFG_TIMER_ADD_PERIODIC("dummy_timer", dummy_timer_callback, attotime::from_hz(50))	
+	MCFG_TIMER_ADD_PERIODIC("dummy_timer", dummy_timer_callback, attotime::from_hz(50))
 MACHINE_CONFIG_END
 
 static const floppy_config nc200_floppy_config =

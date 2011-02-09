@@ -129,8 +129,8 @@ WRITE8_HANDLER ( mbee_fdc_motor_w )
 	wd17xx_set_drive(state->fdc, data & 3);
 	wd17xx_set_side(state->fdc, (data & 4) ? 1 : 0);
 	wd17xx_dden_w(state->fdc, !BIT(data, 3));
-	/* no idea what turns the motors on & off, guessing it could be drive select 
-	commented out because it prevents 128k and 256TC from booting up */
+	/* no idea what turns the motors on & off, guessing it could be drive select
+    commented out because it prevents 128k and 256TC from booting up */
 	//floppy_mon_w(floppy_get_device(space->machine, data & 3), CLEAR_LINE); // motor on
 }
 
@@ -605,12 +605,12 @@ INTERRUPT_GEN( mbee_interrupt )
         The line below does what the interrupt should be doing. */
 	/* But it would break any program loaded to that area of memory, such as CP/M programs */
 
-	//z80pio_astb_w( state->z80pio, centronics_busy_r(state->printer));	/* signal int when not busy (L->H) */
+	//z80pio_astb_w( state->z80pio, centronics_busy_r(state->printer)); /* signal int when not busy (L->H) */
 	//space->write_byte(0x109, centronics_busy_r(state->printer));
 
 
 	/* once per frame, pulse the PIO B bit 7 - it is in the schematic as an option,
-	but need to find out what it does */
+    but need to find out what it does */
 	state->clock_pulse = 0x80;
 	irq0_line_hold(device);
 

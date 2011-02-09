@@ -10,7 +10,7 @@
 
 
 //**************************************************************************
-//	MACROS / CONSTANTS
+//  MACROS / CONSTANTS
 //**************************************************************************
 
 #define ABC800_X01	XTAL_12MHz
@@ -35,7 +35,7 @@
 
 #define SCREEN_TAG		"screen"
 #define Z80_TAG			"z80"
-#define I8048_TAG 		"i8048"
+#define I8048_TAG		"i8048"
 #define E0516_TAG		"j13"
 #define MC6845_TAG		"b12"
 #define SAA5052_TAG		"5c"
@@ -48,7 +48,7 @@
 
 
 //**************************************************************************
-//	TYPE DEFINITIONS
+//  TYPE DEFINITIONS
 //**************************************************************************
 
 // ======================> abc800_state
@@ -227,13 +227,13 @@ public:
 	required_device<device_t> m_rtc;
 	optional_device<device_t> abc77;
 	required_device<device_t> m_ram;
-	
+
 	virtual void machine_start();
 	virtual void machine_reset();
 
 	virtual void video_start();
 	virtual bool video_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
-	
+
 	void bankswitch();
 	void hr_update(bitmap_t *bitmap, const rectangle *cliprect);
 
@@ -288,7 +288,7 @@ public:
 
 
 //**************************************************************************
-//	MACHINE CONFIGURATION
+//  MACHINE CONFIGURATION
 //**************************************************************************
 
 /*----------- defined in video/abc800.c -----------*/

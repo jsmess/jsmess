@@ -1,5 +1,5 @@
 /***************************************************************************
-   
+
         DEC DCT11-EM
 
         03/12/2010 Skeleton driver.
@@ -28,8 +28,8 @@ INPUT_PORTS_START( dct11em )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET(dct11em) 
-{	
+static MACHINE_RESET(dct11em)
+{
 }
 
 static VIDEO_START( dct11em )
@@ -53,7 +53,7 @@ static MACHINE_CONFIG_START( dct11em, dct11em_state )
     MCFG_CPU_PROGRAM_MAP(dct11em_mem)
 
     MCFG_MACHINE_RESET(dct11em)
-	
+
     /* video hardware */
     MCFG_SCREEN_ADD("screen", RASTER)
     MCFG_SCREEN_REFRESH_RATE(50)
@@ -80,5 +80,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY   FULLNAME       FLAGS */
-COMP( 1983, dct11em,  0,       0, 	dct11em, 	dct11em, 	 0,   "Digital Equipment Corporation",   "DCT11-EM",		GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1983, dct11em,  0,       0,	dct11em,	dct11em,	 0,   "Digital Equipment Corporation",   "DCT11-EM",		GAME_NOT_WORKING | GAME_NO_SOUND)
 

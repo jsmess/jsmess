@@ -1,9 +1,9 @@
 /***************************************************************************
-   
+
         Savia 84
 
-		More data at : 
-				http://www.nostalcomp.cz/pdfka/savia84.pdf
+        More data at :
+                http://www.nostalcomp.cz/pdfka/savia84.pdf
 
         05/02/2011 Skeleton driver.
 
@@ -102,8 +102,8 @@ static INPUT_PORTS_START( savia84 )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET(savia84) 
-{	
+static MACHINE_RESET(savia84)
+{
 }
 
 WRITE8_MEMBER( savia84_state::savia84_8255_porta_w )
@@ -135,7 +135,7 @@ printf("FA=%X ",data);
 READ8_MEMBER( savia84_state::savia84_8255_portc_r )
 {
 	if (m_kbd < 9)
-	{ 
+	{
 		char kbdrow[4];
 		sprintf(kbdrow,"X%d",m_kbd);
 		return input_port_read(machine, kbdrow);
@@ -159,7 +159,7 @@ static MACHINE_CONFIG_START( savia84, savia84_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(savia84_mem)
-	MCFG_CPU_IO_MAP(savia84_io)	
+	MCFG_CPU_IO_MAP(savia84_io)
 
 	MCFG_MACHINE_RESET(savia84)
 
@@ -179,5 +179,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY   FULLNAME       FLAGS */
-COMP( 1984, savia84,  0,       0, 	savia84, 	savia84, 	 0,   "<unknown>",   "Savia 84", GAME_NOT_WORKING | GAME_NO_SOUND_HW)
+COMP( 1984, savia84,  0,       0,	savia84,	savia84,	 0,   "<unknown>",   "Savia 84", GAME_NOT_WORKING | GAME_NO_SOUND_HW)
 

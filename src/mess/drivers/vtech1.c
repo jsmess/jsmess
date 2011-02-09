@@ -484,7 +484,7 @@ static const floppy_config vtech1_floppy_config =
 };
 
 /***************************************************************************
-	PRINTER
+    PRINTER
 ***************************************************************************/
 
 static READ8_DEVICE_HANDLER( vtech1_printer_r )
@@ -501,7 +501,7 @@ static WRITE8_DEVICE_HANDLER( vtech1_strobe_w )
 
 
 /***************************************************************************
-	RS232 SERIAL
+    RS232 SERIAL
 ***************************************************************************/
 
 static READ8_HANDLER( vtech1_serial_r )
@@ -517,7 +517,7 @@ static WRITE8_HANDLER( vtech1_serial_w )
 
 
 /***************************************************************************
-	INPUTS
+    INPUTS
 ***************************************************************************/
 
 static READ8_HANDLER( vtech1_lightpen_r )
@@ -564,7 +564,7 @@ static READ8_HANDLER( vtech1_keyboard_r )
 
 
 /***************************************************************************
-	I/O LATCH
+    I/O LATCH
 ***************************************************************************/
 
 static WRITE8_HANDLER( vtech1_latch_w )
@@ -594,7 +594,7 @@ static WRITE8_HANDLER( vtech1_latch_w )
 
 
 /***************************************************************************
-	MEMORY BANKING
+    MEMORY BANKING
 ***************************************************************************/
 
 static WRITE8_HANDLER( vtech1_memory_bank_w )
@@ -616,7 +616,7 @@ static WRITE8_HANDLER( vtech1_video_bank_w )
 
 
 /***************************************************************************
-	VIDEO EMULATION
+    VIDEO EMULATION
 ***************************************************************************/
 
 static READ8_DEVICE_HANDLER( vtech1_mc6847_videoram_r )
@@ -636,7 +636,7 @@ static VIDEO_UPDATE( vtech1 )
 
 
 /***************************************************************************
-	DRIVER INIT
+    DRIVER INIT
 ***************************************************************************/
 
 static DRIVER_INIT( vtech1 )
@@ -716,7 +716,7 @@ static DRIVER_INIT( vtech1h )
 }
 
 /***************************************************************************
-	ADDRESS MAPS
+    ADDRESS MAPS
 ***************************************************************************/
 
 static ADDRESS_MAP_START( laser110_mem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -771,7 +771,7 @@ ADDRESS_MAP_END
 
 
 /***************************************************************************
-	INPUT PORTS
+    INPUT PORTS
 ***************************************************************************/
 
 static INPUT_PORTS_START(vtech1)
@@ -1045,7 +1045,7 @@ MACHINE_CONFIG_END
 
 
 /***************************************************************************
-	ROM DEFINITIONS
+    ROM DEFINITIONS
 ***************************************************************************/
 
 ROM_START( laser110 )
@@ -1095,7 +1095,7 @@ ROM_END
 #define rom_laser310h   rom_laser310
 
 /***************************************************************************
-	GAME DRIVERS
+    GAME DRIVERS
 ***************************************************************************/
 
 /*    YEAR  NAME       PARENT    COMPAT  MACHINE    INPUT   INIT     COMPANY                   FULLNAME                          FLAGS */

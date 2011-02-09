@@ -47,6 +47,6 @@ DECLARE_LEGACY_IMAGE_DEVICE(MICRODRIVE, microdrive);
 	MCFG_DEVICE_CONFIG(_config)
 
 #define MICRODRIVE_CONFIG(_name) \
-	const microdrive_config (_name) = 
+	const microdrive_config (_name) =
 
 #endif

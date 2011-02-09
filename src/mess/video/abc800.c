@@ -8,9 +8,9 @@
 
     TODO:
 
-	- convert SAA5050 to C++ device and fix its memory interface
-	- check compatibility with new MC6845
-	- ABC800C video: http://www.qsl.net/zl1vfo/teletext.htm
+    - convert SAA5050 to C++ device and fix its memory interface
+    - check compatibility with new MC6845
+    - ABC800C video: http://www.qsl.net/zl1vfo/teletext.htm
 
 */
 
@@ -30,7 +30,7 @@
 
 
 //**************************************************************************
-//	HIGH RESOLUTION GRAPHICS
+//  HIGH RESOLUTION GRAPHICS
 //**************************************************************************
 
 //-------------------------------------------------
@@ -55,12 +55,12 @@ WRITE8_MEMBER( abc800_state::hrc_w )
 
 
 //**************************************************************************
-//	ABC 800 COLOR
+//  ABC 800 COLOR
 //**************************************************************************
 
 //-------------------------------------------------
 //  abc800m_hr_update - color high resolution
-//	screen update
+//  screen update
 //-------------------------------------------------
 
 void abc800c_state::hr_update(bitmap_t *bitmap, const rectangle *cliprect)
@@ -137,7 +137,7 @@ static const saa5050_interface trom_intf =
 	SCREEN_TAG,
 	0,	// starting gfxnum
 	40, 24 - 1, 0x80,  // x, y, size
-	0 	// rev y order
+	0	// rev y order
 };
 
 
@@ -165,7 +165,7 @@ MACHINE_CONFIG_END
 
 
 //**************************************************************************
-//	ABC 800 MONOCHROME
+//  ABC 800 MONOCHROME
 //**************************************************************************
 
 //-------------------------------------------------
@@ -181,7 +181,7 @@ static PALETTE_INIT( abc800m )
 
 //-------------------------------------------------
 //  abc800m_hr_update - monochrome high resolution
-//	screen update
+//  screen update
 //-------------------------------------------------
 
 void abc800m_state::hr_update(bitmap_t *bitmap, const rectangle *cliprect)

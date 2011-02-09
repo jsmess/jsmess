@@ -8,16 +8,16 @@
 
 #include "emu.h"
 #include "sound/cdp1869.h"
-#include "sound/wave.h"	
+#include "sound/wave.h"
 #include "cpu/cosmac/cosmac.h"
 #include "includes/pecom.h"
 
 WRITE8_HANDLER( pecom_cdp1869_w )
 {
 	pecom_state *state = space->machine->driver_data<pecom_state>();
-	
+
 	UINT16 ma = state->cdp1802->get_memory_address();
-	
+
 	switch (offset + 3)
 	{
 	case 3:
@@ -27,7 +27,7 @@ WRITE8_HANDLER( pecom_cdp1869_w )
 	case 4:
 		state->cdp1869->out4_w(*space, ma, data);
 		break;
-		
+
 	case 5:
 		state->cdp1869->out5_w(*space, ma, data);
 		break;

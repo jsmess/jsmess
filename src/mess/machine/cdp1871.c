@@ -15,7 +15,7 @@
 
 
 //**************************************************************************
-//	MACROS / CONSTANTS
+//  MACROS / CONSTANTS
 //**************************************************************************
 
 static const UINT8 CDP1871_KEY_CODES[4][11][8] =
@@ -226,7 +226,7 @@ void cdp1871_device::change_output_lines()
 
 //-------------------------------------------------
 //  clock_scan_counters - clock the keyboard
-//	scan counters
+//  scan counters
 //-------------------------------------------------
 
 void cdp1871_device::clock_scan_counters()

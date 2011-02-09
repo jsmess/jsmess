@@ -930,8 +930,8 @@ static void towns_crtc_draw_scan_layer_hicolour(running_machine* machine, bitmap
 	if(state->video.towns_display_page_sel != 0)
 		off = 0x20000;
 
-//	if((layer == 1) && (state->video.towns_sprite_reg[1] & 0x80) && (state->video.towns_sprite_page == 1))
-//		off = 0x20000;
+//  if((layer == 1) && (state->video.towns_sprite_reg[1] & 0x80) && (state->video.towns_sprite_page == 1))
+//      off = 0x20000;
 
 	if(layer != 0)
 	{
@@ -1117,8 +1117,8 @@ static void towns_crtc_draw_scan_layer_256(running_machine* machine, bitmap_t* b
 	if(state->video.towns_display_page_sel != 0)
 		off = 0x20000;
 
-//	if((layer == 1) && (state->video.towns_sprite_reg[1] & 0x80) && (state->video.towns_sprite_page == 1))
-//		off = 0x20000;
+//  if((layer == 1) && (state->video.towns_sprite_reg[1] & 0x80) && (state->video.towns_sprite_page == 1))
+//      off = 0x20000;
 
 	if(layer == 0)
 		linesize = state->video.towns_crtc_reg[20] * 8;
@@ -1308,8 +1308,8 @@ static void towns_crtc_draw_scan_layer_16(running_machine* machine, bitmap_t* bi
 	if(state->video.towns_display_page_sel != 0)
 		off = 0x20000;
 
-//	if((layer == 1) && (state->video.towns_sprite_reg[1] & 0x80) && (state->video.towns_sprite_page == 1))
-//		off = 0x20000;
+//  if((layer == 1) && (state->video.towns_sprite_reg[1] & 0x80) && (state->video.towns_sprite_page == 1))
+//      off = 0x20000;
 
 	if(layer == 0)
 		linesize = state->video.towns_crtc_reg[20] * 4;

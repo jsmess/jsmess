@@ -36,15 +36,15 @@
     - Mega STe 16KB cache
     - Mega STe LAN
 
-	http://dev-docs.atariforge.org/
-	http://info-coach.fr/atari/software/protection.php
+    http://dev-docs.atariforge.org/
+    http://info-coach.fr/atari/software/protection.php
 
 */
 
 
 
 //**************************************************************************
-//	CONSTANTS / MACROS
+//  CONSTANTS / MACROS
 //**************************************************************************
 
 #define LOG 0
@@ -56,7 +56,7 @@ static const int DMASOUND_RATE[] = { Y2/640/8, Y2/640/4, Y2/640/2, Y2/640 };
 
 
 //**************************************************************************
-//	FLOPPY
+//  FLOPPY
 //**************************************************************************
 
 //-------------------------------------------------
@@ -79,13 +79,13 @@ void st_state::toggle_dma_fifo()
 void st_state::flush_dma_fifo()
 {
 	address_space *program = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);
-	
+
 	if (m_fdc_fifo_empty[m_fdc_fifo_sel]) return;
 
 	for (int i = 0; i < 8; i++)
 	{
 		UINT16 data = m_fdc_fifo[m_fdc_fifo_sel][i];
-		
+
 		if (LOG) logerror("Flushing DMA FIFO %u data %04x to address %06x\n", m_fdc_fifo_sel, data, m_dma_base);
 
 		program->write_word(m_dma_base, data);
@@ -134,7 +134,7 @@ void st_state::fdc_dma_transfer()
 		{
 			// write LSB to disk
 			wd17xx_data_w(m_fdc, 0, data & 0xff);
-			
+
 			if (LOG) logerror("DMA Write to FDC %02x\n", data & 0xff);
 
 			m_fdc_fifo_index++;
@@ -169,7 +169,7 @@ void st_state::fdc_dma_transfer()
 		UINT8 data = wd17xx_data_r(m_fdc, 0);
 
 		m_fdc_fifo_empty[m_fdc_fifo_sel] = 0;
-			
+
 		if (LOG) logerror("DMA Read from FDC %02x\n", data);
 
 		if (m_fdc_fifo_msb)
@@ -252,7 +252,7 @@ WRITE16_MEMBER( st_state::fdc_data_w )
 
 		// sector count register
 		m_fdc_sectors = data;
-	
+
 		if (m_fdc_sectors)
 		{
 			m_fdc_dmabytes = DMA_SECTOR_SIZE;
@@ -379,7 +379,7 @@ WRITE8_MEMBER( st_state::dma_base_w )
 
 
 //**************************************************************************
-//	MMU
+//  MMU
 //**************************************************************************
 
 //-------------------------------------------------
@@ -406,7 +406,7 @@ WRITE8_MEMBER( st_state::mmu_w )
 
 
 //**************************************************************************
-//	IKBD
+//  IKBD
 //**************************************************************************
 
 //-------------------------------------------------
@@ -541,7 +541,7 @@ READ8_MEMBER( st_state::ikbd_port2_r )
         1       JOY 0-6
         2       JOY 1-6
         3       SD FROM CPU
-        4       
+        4
 
     */
 
@@ -565,9 +565,9 @@ WRITE8_MEMBER( st_state::ikbd_port2_w )
         bit     description
 
         0       joystick enable
-        1       
-        2       
-        3       
+        1
+        2
+        3
         4       SD TO CPU
 
     */
@@ -663,7 +663,7 @@ WRITE8_MEMBER( st_state::ikbd_port4_w )
         7       Keyboard row select
 
     */
-		
+
 	// keyboard row select
 	m_ikbd_keylatch = (data << 8) | (m_ikbd_keylatch & 0xff);
 }
@@ -671,7 +671,7 @@ WRITE8_MEMBER( st_state::ikbd_port4_w )
 
 
 //**************************************************************************
-//	FPU
+//  FPU
 //**************************************************************************
 
 //-------------------------------------------------
@@ -692,7 +692,7 @@ WRITE16_MEMBER( megast_state::fpu_w )
 
 
 //**************************************************************************
-//	DMA SOUND
+//  DMA SOUND
 //**************************************************************************
 
 //-------------------------------------------------
@@ -775,7 +775,7 @@ void ste_state::dmasound_tick()
 static TIMER_CALLBACK( atariste_dmasound_tick )
 {
 	ste_state *state = machine->driver_data<ste_state>();
-	
+
 	state->dmasound_tick();
 }
 
@@ -969,7 +969,7 @@ WRITE8_MEMBER( ste_state::sound_mode_w )
 
 
 //**************************************************************************
-//	MICROWIRE
+//  MICROWIRE
 //**************************************************************************
 
 //-------------------------------------------------
@@ -1080,7 +1080,7 @@ WRITE16_MEMBER( ste_state::microwire_mask_w )
 
 
 //**************************************************************************
-//	CACHE
+//  CACHE
 //**************************************************************************
 
 //-------------------------------------------------
@@ -1107,7 +1107,7 @@ WRITE16_MEMBER( megaste_state::cache_w )
 
 
 //**************************************************************************
-//	STBOOK
+//  STBOOK
 //**************************************************************************
 
 //-------------------------------------------------
@@ -1168,7 +1168,7 @@ WRITE16_MEMBER( stbook_state::lcd_control_w )
 
 
 //**************************************************************************
-//	ADDRESS MAPS
+//  ADDRESS MAPS
 //**************************************************************************
 
 //-------------------------------------------------
@@ -1247,7 +1247,7 @@ static ADDRESS_MAP_START( megast_map, ADDRESS_SPACE_PROGRAM, 16, megast_state )
 	AM_RANGE(0x200000, 0x3fffff) AM_RAM
 	AM_RANGE(0xfa0000, 0xfbffff) AM_ROM AM_REGION("cart", 0)
 	AM_RANGE(0xfc0000, 0xfeffff) AM_ROM AM_REGION(M68000_TAG, 0)
-//	AM_RANGE(0xff7f30, 0xff7f31) AM_READWRITE_BASE(st_state, blitter_dst_inc_y_r, blitter_dst_inc_y_w) // for TOS 1.02
+//  AM_RANGE(0xff7f30, 0xff7f31) AM_READWRITE_BASE(st_state, blitter_dst_inc_y_r, blitter_dst_inc_y_w) // for TOS 1.02
 	AM_RANGE(0xff8000, 0xff8001) AM_READWRITE8_BASE(st_state, mmu_r, mmu_w, 0x00ff)
 	AM_RANGE(0xff8200, 0xff8203) AM_READWRITE8_BASE(st_state, shifter_base_r, shifter_base_w, 0x00ff)
 	AM_RANGE(0xff8204, 0xff8209) AM_READ8_BASE(st_state, shifter_counter_r, 0x00ff)
@@ -1287,30 +1287,30 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ste_map, ADDRESS_SPACE_PROGRAM, 16, ste_state )
 	AM_IMPORT_FROM(st_map)
-/*	AM_RANGE(0xe00000, 0xe3ffff) AM_ROM AM_REGION(M68000_TAG, 0)
-	AM_RANGE(0xff8204, 0xff8209) AM_READWRITE8(shifter_counter_r, shifter_counter_w, 0x00ff)
-	AM_RANGE(0xff820c, 0xff820d) AM_READWRITE8(shifter_base_low_r, shifter_base_low_w, 0x00ff)
-	AM_RANGE(0xff820e, 0xff820f) AM_READWRITE8(shifter_lineofs_r, shifter_lineofs_w, 0x00ff)
-	AM_RANGE(0xff8264, 0xff8265) AM_READWRITE8(shifter_pixelofs_r, shifter_pixelofs_w, 0xffff)
-	AM_RANGE(0xff8900, 0xff8901) AM_READWRITE8(sound_dma_control_r, sound_dma_control_w, 0x00ff)
-	AM_RANGE(0xff8902, 0xff8907) AM_READWRITE8(sound_dma_base_r, sound_dma_base_w, 0x00ff)
-	AM_RANGE(0xff8908, 0xff890d) AM_READ8(sound_dma_counter_r, 0x00ff)
-	AM_RANGE(0xff890e, 0xff8913) AM_READWRITE8(sound_dma_end_r, sound_dma_end_w, 0x00ff)
-	AM_RANGE(0xff8920, 0xff8921) AM_READWRITE8(sound_mode_r, sound_mode_w, 0x00ff)
-	AM_RANGE(0xff8922, 0xff8923) AM_READWRITE(microwire_data_r, microwire_data_w)
-	AM_RANGE(0xff8924, 0xff8925) AM_READWRITE(microwire_mask_r, microwire_mask_w)
-	AM_RANGE(0xff8a00, 0xff8a1f) AM_READWRITE(blitter_halftone_r, blitter_halftone_w)
-	AM_RANGE(0xff8a20, 0xff8a21) AM_READWRITE(blitter_src_inc_x_r, blitter_src_inc_x_w)
-	AM_RANGE(0xff8a22, 0xff8a23) AM_READWRITE(blitter_src_inc_y_r, blitter_src_inc_y_w)
-	AM_RANGE(0xff8a24, 0xff8a27) AM_READWRITE(blitter_src_r, blitter_src_w)
-	AM_RANGE(0xff8a28, 0xff8a2d) AM_READWRITE(blitter_end_mask_r, blitter_end_mask_w)
-	AM_RANGE(0xff8a2e, 0xff8a2f) AM_READWRITE(blitter_dst_inc_x_r, blitter_dst_inc_x_w)
-	AM_RANGE(0xff8a30, 0xff8a31) AM_READWRITE(blitter_dst_inc_y_r, blitter_dst_inc_y_w)
-	AM_RANGE(0xff8a32, 0xff8a35) AM_READWRITE(blitter_dst_r, blitter_dst_w)
-	AM_RANGE(0xff8a36, 0xff8a37) AM_READWRITE(blitter_count_x_r, blitter_count_x_w)
-	AM_RANGE(0xff8a38, 0xff8a39) AM_READWRITE(blitter_count_y_r, blitter_count_y_w)
-	AM_RANGE(0xff8a3a, 0xff8a3b) AM_READWRITE(blitter_op_r, blitter_op_w)
-	AM_RANGE(0xff8a3c, 0xff8a3d) AM_READWRITE(blitter_ctrl_r, blitter_ctrl_w)*/
+/*  AM_RANGE(0xe00000, 0xe3ffff) AM_ROM AM_REGION(M68000_TAG, 0)
+    AM_RANGE(0xff8204, 0xff8209) AM_READWRITE8(shifter_counter_r, shifter_counter_w, 0x00ff)
+    AM_RANGE(0xff820c, 0xff820d) AM_READWRITE8(shifter_base_low_r, shifter_base_low_w, 0x00ff)
+    AM_RANGE(0xff820e, 0xff820f) AM_READWRITE8(shifter_lineofs_r, shifter_lineofs_w, 0x00ff)
+    AM_RANGE(0xff8264, 0xff8265) AM_READWRITE8(shifter_pixelofs_r, shifter_pixelofs_w, 0xffff)
+    AM_RANGE(0xff8900, 0xff8901) AM_READWRITE8(sound_dma_control_r, sound_dma_control_w, 0x00ff)
+    AM_RANGE(0xff8902, 0xff8907) AM_READWRITE8(sound_dma_base_r, sound_dma_base_w, 0x00ff)
+    AM_RANGE(0xff8908, 0xff890d) AM_READ8(sound_dma_counter_r, 0x00ff)
+    AM_RANGE(0xff890e, 0xff8913) AM_READWRITE8(sound_dma_end_r, sound_dma_end_w, 0x00ff)
+    AM_RANGE(0xff8920, 0xff8921) AM_READWRITE8(sound_mode_r, sound_mode_w, 0x00ff)
+    AM_RANGE(0xff8922, 0xff8923) AM_READWRITE(microwire_data_r, microwire_data_w)
+    AM_RANGE(0xff8924, 0xff8925) AM_READWRITE(microwire_mask_r, microwire_mask_w)
+    AM_RANGE(0xff8a00, 0xff8a1f) AM_READWRITE(blitter_halftone_r, blitter_halftone_w)
+    AM_RANGE(0xff8a20, 0xff8a21) AM_READWRITE(blitter_src_inc_x_r, blitter_src_inc_x_w)
+    AM_RANGE(0xff8a22, 0xff8a23) AM_READWRITE(blitter_src_inc_y_r, blitter_src_inc_y_w)
+    AM_RANGE(0xff8a24, 0xff8a27) AM_READWRITE(blitter_src_r, blitter_src_w)
+    AM_RANGE(0xff8a28, 0xff8a2d) AM_READWRITE(blitter_end_mask_r, blitter_end_mask_w)
+    AM_RANGE(0xff8a2e, 0xff8a2f) AM_READWRITE(blitter_dst_inc_x_r, blitter_dst_inc_x_w)
+    AM_RANGE(0xff8a30, 0xff8a31) AM_READWRITE(blitter_dst_inc_y_r, blitter_dst_inc_y_w)
+    AM_RANGE(0xff8a32, 0xff8a35) AM_READWRITE(blitter_dst_r, blitter_dst_w)
+    AM_RANGE(0xff8a36, 0xff8a37) AM_READWRITE(blitter_count_x_r, blitter_count_x_w)
+    AM_RANGE(0xff8a38, 0xff8a39) AM_READWRITE(blitter_count_y_r, blitter_count_y_w)
+    AM_RANGE(0xff8a3a, 0xff8a3b) AM_READWRITE(blitter_op_r, blitter_op_w)
+    AM_RANGE(0xff8a3c, 0xff8a3d) AM_READWRITE(blitter_ctrl_r, blitter_ctrl_w)*/
 	AM_RANGE(0xff9200, 0xff9201) AM_READ_PORT("JOY0")
 	AM_RANGE(0xff9202, 0xff9203) AM_READ_PORT("JOY1")
 	AM_RANGE(0xff9210, 0xff9211) AM_READ_PORT("PADDLE0X")
@@ -1328,31 +1328,31 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( megaste_map, ADDRESS_SPACE_PROGRAM, 16, megaste_state )
 	AM_IMPORT_FROM(st_map)
-/*	AM_RANGE(0xff8204, 0xff8209) AM_READWRITE(shifter_counter_r, shifter_counter_w)
-	AM_RANGE(0xff820c, 0xff820d) AM_READWRITE(shifter_base_low_r, shifter_base_low_w)
-	AM_RANGE(0xff820e, 0xff820f) AM_READWRITE(shifter_lineofs_r, shifter_lineofs_w)
-	AM_RANGE(0xff8264, 0xff8265) AM_READWRITE(shifter_pixelofs_r, shifter_pixelofs_w)
-	AM_RANGE(0xff8900, 0xff8901) AM_READWRITE8(sound_dma_control_r, sound_dma_control_w, 0x00ff)
-	AM_RANGE(0xff8902, 0xff8907) AM_READWRITE8(sound_dma_base_r, sound_dma_base_w, 0x00ff)
-	AM_RANGE(0xff8908, 0xff890d) AM_READ8(sound_dma_counter_r, 0x00ff)
-	AM_RANGE(0xff890e, 0xff8913) AM_READWRITE8(sound_dma_end_r, sound_dma_end_w, 0x00ff)
-	AM_RANGE(0xff8920, 0xff8921) AM_READWRITE8(sound_mode_r, sound_mode_w, 0x00ff)
-	AM_RANGE(0xff8922, 0xff8923) AM_READWRITE(microwire_data_r, microwire_data_w)
-	AM_RANGE(0xff8924, 0xff8925) AM_READWRITE(microwire_mask_r, microwire_mask_w)
-	AM_RANGE(0xff8a00, 0xff8a1f) AM_READWRITE(blitter_halftone_r, blitter_halftone_w)
-	AM_RANGE(0xff8a20, 0xff8a21) AM_READWRITE(blitter_src_inc_x_r, blitter_src_inc_x_w)
-	AM_RANGE(0xff8a22, 0xff8a23) AM_READWRITE(blitter_src_inc_y_r, blitter_src_inc_y_w)
-	AM_RANGE(0xff8a24, 0xff8a27) AM_READWRITE(blitter_src_r, blitter_src_w)
-	AM_RANGE(0xff8a28, 0xff8a2d) AM_READWRITE(blitter_end_mask_r, blitter_end_mask_w)
-	AM_RANGE(0xff8a2e, 0xff8a2f) AM_READWRITE(blitter_dst_inc_x_r, blitter_dst_inc_x_w)
-	AM_RANGE(0xff8a30, 0xff8a31) AM_READWRITE(blitter_dst_inc_y_r, blitter_dst_inc_y_w)
-	AM_RANGE(0xff8a32, 0xff8a35) AM_READWRITE(blitter_dst_r, blitter_dst_w)
-	AM_RANGE(0xff8a36, 0xff8a37) AM_READWRITE(blitter_count_x_r, blitter_count_x_w)
-	AM_RANGE(0xff8a38, 0xff8a39) AM_READWRITE(blitter_count_y_r, blitter_count_y_w)
-	AM_RANGE(0xff8a3a, 0xff8a3b) AM_READWRITE(blitter_op_r, blitter_op_w)
-	AM_RANGE(0xff8a3c, 0xff8a3d) AM_READWRITE(blitter_ctrl_r, blitter_ctrl_w)
-	AM_RANGE(0xff8e00, 0xff8e0f) AM_READWRITE(vme_r, vme_w)
-	AM_RANGE(0xff8e20, 0xff8e21) AM_READWRITE(cache_r, cache_w)
+/*  AM_RANGE(0xff8204, 0xff8209) AM_READWRITE(shifter_counter_r, shifter_counter_w)
+    AM_RANGE(0xff820c, 0xff820d) AM_READWRITE(shifter_base_low_r, shifter_base_low_w)
+    AM_RANGE(0xff820e, 0xff820f) AM_READWRITE(shifter_lineofs_r, shifter_lineofs_w)
+    AM_RANGE(0xff8264, 0xff8265) AM_READWRITE(shifter_pixelofs_r, shifter_pixelofs_w)
+    AM_RANGE(0xff8900, 0xff8901) AM_READWRITE8(sound_dma_control_r, sound_dma_control_w, 0x00ff)
+    AM_RANGE(0xff8902, 0xff8907) AM_READWRITE8(sound_dma_base_r, sound_dma_base_w, 0x00ff)
+    AM_RANGE(0xff8908, 0xff890d) AM_READ8(sound_dma_counter_r, 0x00ff)
+    AM_RANGE(0xff890e, 0xff8913) AM_READWRITE8(sound_dma_end_r, sound_dma_end_w, 0x00ff)
+    AM_RANGE(0xff8920, 0xff8921) AM_READWRITE8(sound_mode_r, sound_mode_w, 0x00ff)
+    AM_RANGE(0xff8922, 0xff8923) AM_READWRITE(microwire_data_r, microwire_data_w)
+    AM_RANGE(0xff8924, 0xff8925) AM_READWRITE(microwire_mask_r, microwire_mask_w)
+    AM_RANGE(0xff8a00, 0xff8a1f) AM_READWRITE(blitter_halftone_r, blitter_halftone_w)
+    AM_RANGE(0xff8a20, 0xff8a21) AM_READWRITE(blitter_src_inc_x_r, blitter_src_inc_x_w)
+    AM_RANGE(0xff8a22, 0xff8a23) AM_READWRITE(blitter_src_inc_y_r, blitter_src_inc_y_w)
+    AM_RANGE(0xff8a24, 0xff8a27) AM_READWRITE(blitter_src_r, blitter_src_w)
+    AM_RANGE(0xff8a28, 0xff8a2d) AM_READWRITE(blitter_end_mask_r, blitter_end_mask_w)
+    AM_RANGE(0xff8a2e, 0xff8a2f) AM_READWRITE(blitter_dst_inc_x_r, blitter_dst_inc_x_w)
+    AM_RANGE(0xff8a30, 0xff8a31) AM_READWRITE(blitter_dst_inc_y_r, blitter_dst_inc_y_w)
+    AM_RANGE(0xff8a32, 0xff8a35) AM_READWRITE(blitter_dst_r, blitter_dst_w)
+    AM_RANGE(0xff8a36, 0xff8a37) AM_READWRITE(blitter_count_x_r, blitter_count_x_w)
+    AM_RANGE(0xff8a38, 0xff8a39) AM_READWRITE(blitter_count_y_r, blitter_count_y_w)
+    AM_RANGE(0xff8a3a, 0xff8a3b) AM_READWRITE(blitter_op_r, blitter_op_w)
+    AM_RANGE(0xff8a3c, 0xff8a3d) AM_READWRITE(blitter_ctrl_r, blitter_ctrl_w)
+    AM_RANGE(0xff8e00, 0xff8e0f) AM_READWRITE(vme_r, vme_w)
+    AM_RANGE(0xff8e20, 0xff8e21) AM_READWRITE(cache_r, cache_w)
 //  AM_RANGE(0xfffa40, 0xfffa5f) AM_READWRITE(fpu_r, fpu_w)*/
 	AM_RANGE(0xff8c80, 0xff8c87) AM_DEVREADWRITE8_LEGACY(Z8530_TAG, scc8530_r, scc8530_w, 0x00ff)
 	AM_RANGE(0xfffc20, 0xfffc3f) AM_DEVREADWRITE_LEGACY(RP5C15_TAG, rp5c15_r, rp5c15_w)
@@ -1366,13 +1366,13 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( stbook_map, ADDRESS_SPACE_PROGRAM, 16, stbook_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_RAM
 	AM_RANGE(0x200000, 0x3fffff) AM_RAM
-//	AM_RANGE(0xd40000, 0xd7ffff) AM_ROM
+//  AM_RANGE(0xd40000, 0xd7ffff) AM_ROM
 	AM_RANGE(0xe00000, 0xe3ffff) AM_ROM AM_REGION(M68000_TAG, 0)
-//	AM_RANGE(0xe80000, 0xebffff) AM_ROM
-//	AM_RANGE(0xfa0000, 0xfbffff) AM_ROM // cartridge
+//  AM_RANGE(0xe80000, 0xebffff) AM_ROM
+//  AM_RANGE(0xfa0000, 0xfbffff) AM_ROM // cartridge
 	AM_RANGE(0xfc0000, 0xfeffff) AM_ROM AM_REGION(M68000_TAG, 0)
-/*	AM_RANGE(0xf00000, 0xf1ffff) AM_READWRITE(stbook_ide_r, stbook_ide_w)
-	AM_RANGE(0xff8000, 0xff8001) AM_READWRITE(stbook_mmu_r, stbook_mmu_w)
+/*  AM_RANGE(0xf00000, 0xf1ffff) AM_READWRITE(stbook_ide_r, stbook_ide_w)
+    AM_RANGE(0xff8000, 0xff8001) AM_READWRITE(stbook_mmu_r, stbook_mmu_w)
     AM_RANGE(0xff8200, 0xff8203) AM_READWRITE(stbook_shifter_base_r, stbook_shifter_base_w)
     AM_RANGE(0xff8204, 0xff8209) AM_READWRITE(stbook_shifter_counter_r, stbook_shifter_counter_w)
     AM_RANGE(0xff820a, 0xff820b) AM_READWRITE8(stbook_shifter_sync_r, stbook_shifter_sync_w, 0xff00)
@@ -1381,30 +1381,30 @@ static ADDRESS_MAP_START( stbook_map, ADDRESS_SPACE_PROGRAM, 16, stbook_state )
     AM_RANGE(0xff8240, 0xff8241) AM_READWRITE(stbook_shifter_palette_r, stbook_shifter_palette_w)
     AM_RANGE(0xff8260, 0xff8261) AM_READWRITE8(stbook_shifter_mode_r, stbook_shifter_mode_w, 0xff00)
     AM_RANGE(0xff8264, 0xff8265) AM_READWRITE(stbook_shifter_pixelofs_r, stbook_shifter_pixelofs_w)
-	AM_RANGE(0xff827e, 0xff827f) AM_WRITE(lcd_control_w)*/
+    AM_RANGE(0xff827e, 0xff827f) AM_WRITE(lcd_control_w)*/
 	AM_RANGE(0xff8800, 0xff8801) AM_DEVREADWRITE8_LEGACY(YM3439_TAG, ay8910_r, ay8910_data_w, 0xff00)
 	AM_RANGE(0xff8802, 0xff8803) AM_DEVWRITE8_LEGACY(YM3439_TAG, ay8910_data_w, 0xff00)
-/*	AM_RANGE(0xff8900, 0xff8901) AM_READWRITE8(sound_dma_control_r, sound_dma_control_w, 0x00ff)
-	AM_RANGE(0xff8902, 0xff8907) AM_READWRITE8(sound_dma_base_r, sound_dma_base_w, 0x00ff)
-	AM_RANGE(0xff8908, 0xff890d) AM_READ8(sound_dma_counter_r, 0x00ff)
-	AM_RANGE(0xff890e, 0xff8913) AM_READWRITE8(sound_dma_end_r, sound_dma_end_w, 0x00ff)
-	AM_RANGE(0xff8920, 0xff8921) AM_READWRITE8(sound_mode_r, sound_mode_w, 0x00ff)
-	AM_RANGE(0xff8922, 0xff8923) AM_READWRITE(microwire_data_r, microwire_data_w)
-	AM_RANGE(0xff8924, 0xff8925) AM_READWRITE(microwire_mask_r, microwire_mask_w)
-	AM_RANGE(0xff8a00, 0xff8a1f) AM_READWRITE(blitter_halftone_r, blitter_halftone_w)
-	AM_RANGE(0xff8a20, 0xff8a21) AM_READWRITE(blitter_src_inc_x_r, blitter_src_inc_x_w)
-	AM_RANGE(0xff8a22, 0xff8a23) AM_READWRITE(blitter_src_inc_y_r, blitter_src_inc_y_w)
-	AM_RANGE(0xff8a24, 0xff8a27) AM_READWRITE(blitter_src_r, blitter_src_w)
-	AM_RANGE(0xff8a28, 0xff8a2d) AM_READWRITE(blitter_end_mask_r, blitter_end_mask_w)
-	AM_RANGE(0xff8a2e, 0xff8a2f) AM_READWRITE(blitter_dst_inc_x_r, blitter_dst_inc_x_w)
-	AM_RANGE(0xff8a30, 0xff8a31) AM_READWRITE(blitter_dst_inc_y_r, blitter_dst_inc_y_w)
-	AM_RANGE(0xff8a32, 0xff8a35) AM_READWRITE(blitter_dst_r, blitter_dst_w)
-	AM_RANGE(0xff8a36, 0xff8a37) AM_READWRITE(blitter_count_x_r, blitter_count_x_w)
-	AM_RANGE(0xff8a38, 0xff8a39) AM_READWRITE(blitter_count_y_r, blitter_count_y_w)
-	AM_RANGE(0xff8a3a, 0xff8a3b) AM_READWRITE(blitter_op_r, blitter_op_w)
-	AM_RANGE(0xff8a3c, 0xff8a3d) AM_READWRITE(blitter_ctrl_r, blitter_ctrl_w)
-	AM_RANGE(0xff9200, 0xff9201) AM_READ(config_r)
-	AM_RANGE(0xff9202, 0xff9203) AM_READWRITE(lcd_contrast_r, lcd_contrast_w)
+/*  AM_RANGE(0xff8900, 0xff8901) AM_READWRITE8(sound_dma_control_r, sound_dma_control_w, 0x00ff)
+    AM_RANGE(0xff8902, 0xff8907) AM_READWRITE8(sound_dma_base_r, sound_dma_base_w, 0x00ff)
+    AM_RANGE(0xff8908, 0xff890d) AM_READ8(sound_dma_counter_r, 0x00ff)
+    AM_RANGE(0xff890e, 0xff8913) AM_READWRITE8(sound_dma_end_r, sound_dma_end_w, 0x00ff)
+    AM_RANGE(0xff8920, 0xff8921) AM_READWRITE8(sound_mode_r, sound_mode_w, 0x00ff)
+    AM_RANGE(0xff8922, 0xff8923) AM_READWRITE(microwire_data_r, microwire_data_w)
+    AM_RANGE(0xff8924, 0xff8925) AM_READWRITE(microwire_mask_r, microwire_mask_w)
+    AM_RANGE(0xff8a00, 0xff8a1f) AM_READWRITE(blitter_halftone_r, blitter_halftone_w)
+    AM_RANGE(0xff8a20, 0xff8a21) AM_READWRITE(blitter_src_inc_x_r, blitter_src_inc_x_w)
+    AM_RANGE(0xff8a22, 0xff8a23) AM_READWRITE(blitter_src_inc_y_r, blitter_src_inc_y_w)
+    AM_RANGE(0xff8a24, 0xff8a27) AM_READWRITE(blitter_src_r, blitter_src_w)
+    AM_RANGE(0xff8a28, 0xff8a2d) AM_READWRITE(blitter_end_mask_r, blitter_end_mask_w)
+    AM_RANGE(0xff8a2e, 0xff8a2f) AM_READWRITE(blitter_dst_inc_x_r, blitter_dst_inc_x_w)
+    AM_RANGE(0xff8a30, 0xff8a31) AM_READWRITE(blitter_dst_inc_y_r, blitter_dst_inc_y_w)
+    AM_RANGE(0xff8a32, 0xff8a35) AM_READWRITE(blitter_dst_r, blitter_dst_w)
+    AM_RANGE(0xff8a36, 0xff8a37) AM_READWRITE(blitter_count_x_r, blitter_count_x_w)
+    AM_RANGE(0xff8a38, 0xff8a39) AM_READWRITE(blitter_count_y_r, blitter_count_y_w)
+    AM_RANGE(0xff8a3a, 0xff8a3b) AM_READWRITE(blitter_op_r, blitter_op_w)
+    AM_RANGE(0xff8a3c, 0xff8a3d) AM_READWRITE(blitter_ctrl_r, blitter_ctrl_w)
+    AM_RANGE(0xff9200, 0xff9201) AM_READ(config_r)
+    AM_RANGE(0xff9202, 0xff9203) AM_READWRITE(lcd_contrast_r, lcd_contrast_w)
     AM_RANGE(0xff9210, 0xff9211) AM_READWRITE(power_r, power_w)
     AM_RANGE(0xff9214, 0xff9215) AM_READWRITE(reference_r, reference_w)*/
 ADDRESS_MAP_END
@@ -1412,7 +1412,7 @@ ADDRESS_MAP_END
 
 
 //**************************************************************************
-//	INPUT PORTS
+//  INPUT PORTS
 //**************************************************************************
 
 //-------------------------------------------------
@@ -1688,7 +1688,7 @@ INPUT_PORTS_END
 
 
 //**************************************************************************
-//	DEVICE CONFIGURATION
+//  DEVICE CONFIGURATION
 //**************************************************************************
 
 //-------------------------------------------------
@@ -1704,11 +1704,11 @@ WRITE8_MEMBER( st_state::psg_pa_w )
         0       SIDE 0
         1       DRIVE 0
         2       DRIVE 1
-        3		RTS
+        3       RTS
         4       DTR
         5       STROBE
         6       GPO
-        7       
+        7
 
     */
 
@@ -1753,7 +1753,7 @@ WRITE8_MEMBER( stbook_state::psg_pa_w )
         0       SIDE 0
         1       DRIVE 0
         2       DRIVE 1
-        3		RTS
+        3       RTS
         4       DTR
         5       STROBE
         6       IDE RESET
@@ -1776,7 +1776,7 @@ WRITE8_MEMBER( stbook_state::psg_pa_w )
 
 	// centronics strobe
 	centronics_strobe_w(m_centronics, BIT(data, 5));
-	
+
 	// density select
 	wd17xx_dden_w(m_fdc, BIT(data, 7));
 }
@@ -1889,7 +1889,7 @@ READ8_MEMBER( st_state::mfp_gpio_r )
     */
 
 	UINT8 data = 0;
-	
+
 	// centronics busy
 	data |= centronics_busy_r(m_centronics);
 
@@ -1967,7 +1967,7 @@ READ8_MEMBER( ste_state::mfp_gpio_r )
     */
 
 	UINT8 data = 0;
-	
+
 	// centronics busy
 	data |= centronics_busy_r(m_centronics);
 
@@ -2034,7 +2034,7 @@ READ8_MEMBER( stbook_state::mfp_gpio_r )
     */
 
 	UINT8 data = 0;
-		
+
 	// centronics busy
 	data |= centronics_busy_r(m_centronics);
 
@@ -2167,7 +2167,7 @@ static const struct rp5c15_interface rtc_intf =
 //  centronics_interface centronics_intf
 //-------------------------------------------------
 
-static const centronics_interface centronics_intf = 
+static const centronics_interface centronics_intf =
 {
 	0,
 	DEVCB_NULL,
@@ -2178,7 +2178,7 @@ static const centronics_interface centronics_intf =
 
 
 //**************************************************************************
-//	MACHINE INITIALIZATION
+//  MACHINE INITIALIZATION
 //**************************************************************************
 
 //-------------------------------------------------
@@ -2199,7 +2199,7 @@ static IRQ_CALLBACK( atarist_int_ack )
 
 
 //-------------------------------------------------
-//  configure_memory - 
+//  configure_memory -
 //-------------------------------------------------
 
 void st_state::configure_memory()
@@ -2227,7 +2227,7 @@ void st_state::configure_memory()
 }
 
 //-------------------------------------------------
-//  state_save - 
+//  state_save -
 //-------------------------------------------------
 
 void st_state::state_save()
@@ -2258,7 +2258,7 @@ void st_state::state_save()
 
 
 //-------------------------------------------------
-//	MACHINE_START( st )
+//  MACHINE_START( st )
 //-------------------------------------------------
 
 void st_state::machine_start()
@@ -2272,14 +2272,14 @@ void st_state::machine_start()
 	// allocate timers
 	m_mouse_timer = machine->scheduler().timer_alloc(FUNC(st_mouse_tick));
 	m_mouse_timer->adjust(attotime::zero, 0, attotime::from_hz(500));
-	
+
 	// register for state saving
 	state_save();
 }
 
 
 //-------------------------------------------------
-//  state_save - 
+//  state_save -
 //-------------------------------------------------
 
 void ste_state::state_save()
@@ -2303,7 +2303,7 @@ void ste_state::state_save()
 
 
 //-------------------------------------------------
-//	MACHINE_START( ste )
+//  MACHINE_START( ste )
 //-------------------------------------------------
 
 void ste_state::machine_start()
@@ -2324,7 +2324,7 @@ void ste_state::machine_start()
 
 
 //-------------------------------------------------
-//	MACHINE_START( megaste )
+//  MACHINE_START( megaste )
 //-------------------------------------------------
 
 void megaste_state::machine_start()
@@ -2336,7 +2336,7 @@ void megaste_state::machine_start()
 
 
 //-------------------------------------------------
-//	MACHINE_START( stbook )
+//  MACHINE_START( stbook )
 //-------------------------------------------------
 
 void stbook_state::machine_start()
@@ -2361,7 +2361,7 @@ void stbook_state::machine_start()
 
 
 //**************************************************************************
-//	MACHINE CONFIGURATION
+//  MACHINE CONFIGURATION
 //**************************************************************************
 
 //-------------------------------------------------
@@ -2408,7 +2408,7 @@ static MACHINE_CONFIG_START( st, st_state )
 	MCFG_CARTSLOT_INTERFACE("st_cart")
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "st")
 
-	// internal ram 
+	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("1M")  // 1040ST
 	MCFG_RAM_EXTRA_OPTIONS("512K,256K") // 520ST, 260ST
@@ -2516,7 +2516,7 @@ static MACHINE_CONFIG_START( ste, ste_state )
 	MCFG_CARTSLOT_EXTENSION_LIST("bin,rom")
 	MCFG_CARTSLOT_NOT_MANDATORY
 	MCFG_CARTSLOT_INTERFACE("st_cart")
-//	MCFG_SOFTWARE_LIST_ADD("cart_list", "ste")
+//  MCFG_SOFTWARE_LIST_ADD("cart_list", "ste")
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
@@ -2622,7 +2622,7 @@ MACHINE_CONFIG_END
 
 
 //**************************************************************************
-//	ROMS
+//  ROMS
 //**************************************************************************
 
 //-------------------------------------------------
@@ -2662,7 +2662,7 @@ ROM_START( st_uk )
 	ROMX_LOAD( "tos102uk.bin", 0x00000, 0x30000, BAD_DUMP CRC(3b5cd0c5) SHA1(87900a40a890fdf03bd08be6c60cc645855cbce5), ROM_BIOS(2) )
 	ROM_SYSTEM_BIOS( 2, "tos104", "TOS 1.04 (Rainbow TOS)" )
 	ROMX_LOAD( "tos104uk.bin", 0x00000, 0x30000, BAD_DUMP CRC(a50d1d43) SHA1(9526ef63b9cb1d2a7109e278547ae78a5c1db6c6), ROM_BIOS(3) )
-	
+
 	ROM_REGION( 0x20000, "cart", ROMREGION_ERASE00 )
 	ROM_CART_LOAD( "cart", 0x00000, 0x20000, ROM_MIRROR | ROM_OPTIONAL )
 
@@ -2691,7 +2691,7 @@ ROM_START( st_de )
 	ROMX_LOAD( "st 7a4 a6.u6", 0x10001, 0x08000, CRC(969d7bbe) SHA1(72b998c1f25211c2a96c81a038d71b6a390585c2), ROM_SKIP(1) | ROM_BIOS(4) )
 	ROMX_LOAD( "st 7c1 a2.u2", 0x20000, 0x08000, CRC(d0513329) SHA1(49855a3585e2f75b2af932dd4414ed64e6d9501f), ROM_SKIP(1) | ROM_BIOS(4) )
 	ROMX_LOAD( "st 7c1 b1.u5", 0x20001, 0x08000, CRC(c115cbc8) SHA1(2b52b81a1a4e0818d63f98ee4b25c30e2eba61cb), ROM_SKIP(1) | ROM_BIOS(4) )
-	
+
 	ROM_REGION( 0x20000, "cart", ROMREGION_ERASE00 )
 	ROM_CART_LOAD( "cart", 0x00000, 0x20000, ROM_MIRROR | ROM_OPTIONAL )
 
@@ -2720,7 +2720,7 @@ ROM_START( st_fr )
 	ROMX_LOAD( "c101660-001.u62", 0x10001, 0x08000, CRC(a813892c) SHA1(d041c113050dfb00166c4a7a52766e1b7eac9cab), ROM_SKIP(1) | ROM_BIOS(4) )
 	ROMX_LOAD( "c101656-001.u48", 0x20000, 0x08000, CRC(dbd93fb8) SHA1(cf9ec11e4bc2465490e7e6c981d9f61eae6cb359), ROM_SKIP(1) | ROM_BIOS(4) )
 	ROMX_LOAD( "c101659-001.u53", 0x20001, 0x08000, CRC(67c9785a) SHA1(917a17e9f83bee015c25b327780eebb11cb2c5a5), ROM_SKIP(1) | ROM_BIOS(4) )
-	
+
 	ROM_REGION( 0x20000, "cart", ROMREGION_ERASE00 )
 	ROM_CART_LOAD( "cart", 0x00000, 0x20000, ROM_MIRROR | ROM_OPTIONAL )
 
@@ -2738,7 +2738,7 @@ ROM_START( st_es )
 	ROM_DEFAULT_BIOS("tos104")
 	ROM_SYSTEM_BIOS( 0, "tos104", "TOS 1.04 (Rainbow TOS)" )
 	ROMX_LOAD( "tos104es.bin", 0x00000, 0x30000, BAD_DUMP CRC(f4e8ecd2) SHA1(df63f8ac09125d0877b55d5ba1282779b7f99c16), ROM_BIOS(1) )
-	
+
 	ROM_REGION( 0x20000, "cart", ROMREGION_ERASE00 )
 	ROM_CART_LOAD( "cart", 0x00000, 0x20000, ROM_MIRROR | ROM_OPTIONAL )
 
@@ -2756,7 +2756,7 @@ ROM_START( st_nl )
 	ROM_DEFAULT_BIOS("tos104")
 	ROM_SYSTEM_BIOS( 0, "tos104", "TOS 1.04 (Rainbow TOS)" )
 	ROMX_LOAD( "tos104nl.bin", 0x00000, 0x30000, BAD_DUMP CRC(bb4370d4) SHA1(6de7c96b2d2e5c68778f4bce3eaf85a4e121f166), ROM_BIOS(1) )
-	
+
 	ROM_REGION( 0x20000, "cart", ROMREGION_ERASE00 )
 	ROM_CART_LOAD( "cart", 0x00000, 0x20000, ROM_MIRROR | ROM_OPTIONAL )
 
@@ -2776,7 +2776,7 @@ ROM_START( st_se )
 	ROMX_LOAD( "tos102se.bin", 0x00000, 0x30000, BAD_DUMP CRC(673fd0c2) SHA1(433de547e09576743ae9ffc43d43f2279782e127), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 1, "tos104", "TOS 1.04 (Rainbow TOS)" )
 	ROMX_LOAD( "tos104se.bin", 0x00000, 0x30000, BAD_DUMP CRC(80ecfdce) SHA1(b7ad34d5cdfbe86ea74ae79eca11dce421a7bbfd), ROM_BIOS(2) )
-	
+
 	ROM_REGION( 0x20000, "cart", ROMREGION_ERASE00 )
 	ROM_CART_LOAD( "cart", 0x00000, 0x20000, ROM_MIRROR | ROM_OPTIONAL )
 
@@ -2796,7 +2796,7 @@ ROM_START( st_sg )
 	ROMX_LOAD( "tos102sg.bin", 0x00000, 0x30000, BAD_DUMP CRC(5fe16c66) SHA1(45acb2fc4b1b13bd806c751aebd66c8304fc79bc), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 1, "tos104", "TOS 1.04 (Rainbow TOS)" )
 	ROMX_LOAD( "tos104sg.bin", 0x00000, 0x30000, BAD_DUMP CRC(e58f0bdf) SHA1(aa40bf7203f02b2251b9e4850a1a73ff1c7da106), ROM_BIOS(2) )
-	
+
 	ROM_REGION( 0x20000, "cart", ROMREGION_ERASE00 )
 	ROM_CART_LOAD( "cart", 0x00000, 0x20000, ROM_MIRROR | ROM_OPTIONAL )
 
@@ -2816,7 +2816,7 @@ ROM_START( megast )
 	ROMX_LOAD( "tos102.bin", 0x00000, 0x30000, BAD_DUMP CRC(d3c32283) SHA1(735793fdba07fe8d5295caa03484f6ef3de931f5), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 1, "tos104", "TOS 1.04 (Rainbow TOS)" )
 	ROMX_LOAD( "tos104.bin", 0x00000, 0x30000, BAD_DUMP CRC(90f4fbff) SHA1(2487f330b0895e5d88d580d4ecb24061125e88ad), ROM_BIOS(2) )
-	
+
 	ROM_REGION( 0x20000, "cart", ROMREGION_ERASE00 )
 	ROM_CART_LOAD( "cart", 0x00000, 0x20000, ROM_MIRROR | ROM_OPTIONAL )
 
@@ -2836,7 +2836,7 @@ ROM_START( megast_uk )
 	ROMX_LOAD( "tos102uk.bin", 0x00000, 0x30000, BAD_DUMP CRC(3b5cd0c5) SHA1(87900a40a890fdf03bd08be6c60cc645855cbce5), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 1, "tos104", "TOS 1.04 (Rainbow TOS)" )
 	ROMX_LOAD( "tos104uk.bin", 0x00000, 0x30000, BAD_DUMP CRC(a50d1d43) SHA1(9526ef63b9cb1d2a7109e278547ae78a5c1db6c6), ROM_BIOS(2) )
-	
+
 	ROM_REGION( 0x20000, "cart", ROMREGION_ERASE00 )
 	ROM_CART_LOAD( "cart", 0x00000, 0x20000, ROM_MIRROR | ROM_OPTIONAL )
 
@@ -2856,7 +2856,7 @@ ROM_START( megast_de )
 	ROMX_LOAD( "tos102de.bin", 0x00000, 0x30000, BAD_DUMP CRC(36a0058e) SHA1(cad5d2902e875d8bf0a14dc5b5b8080b30254148), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 1, "tos104", "TOS 1.04 (Rainbow TOS)" )
 	ROMX_LOAD( "tos104de.bin", 0x00000, 0x30000, BAD_DUMP CRC(62b82b42) SHA1(5313733f91b083c6265d93674cb9d0b7efd02da8), ROM_BIOS(2) )
-	
+
 	ROM_REGION( 0x20000, "cart", ROMREGION_ERASE00 )
 	ROM_CART_LOAD( "cart", 0x00000, 0x20000, ROM_MIRROR | ROM_OPTIONAL )
 
@@ -2876,7 +2876,7 @@ ROM_START( megast_fr )
 	ROMX_LOAD( "tos102fr.bin", 0x00000, 0x30000, BAD_DUMP CRC(8688fce6) SHA1(f5a79aac0a4e812ca77b6ac51d58d98726f331fe), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 1, "tos104", "TOS 1.04 (Rainbow TOS)" )
 	ROMX_LOAD( "tos104fr.bin", 0x00000, 0x30000, BAD_DUMP CRC(a305a404) SHA1(20dba880344b810cf63cec5066797c5a971db870), ROM_BIOS(2) )
-	
+
 	ROM_REGION( 0x20000, "cart", ROMREGION_ERASE00 )
 	ROM_CART_LOAD( "cart", 0x00000, 0x20000, ROM_MIRROR | ROM_OPTIONAL )
 
@@ -2896,7 +2896,7 @@ ROM_START( megast_se )
 	ROMX_LOAD( "tos102se.bin", 0x00000, 0x30000, BAD_DUMP CRC(673fd0c2) SHA1(433de547e09576743ae9ffc43d43f2279782e127), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 1, "tos104", "TOS 1.04 (Rainbow TOS)" )
 	ROMX_LOAD( "tos104se.bin", 0x00000, 0x30000, BAD_DUMP CRC(80ecfdce) SHA1(b7ad34d5cdfbe86ea74ae79eca11dce421a7bbfd), ROM_BIOS(2) )
-	
+
 	ROM_REGION( 0x20000, "cart", ROMREGION_ERASE00 )
 	ROM_CART_LOAD( "cart", 0x00000, 0x20000, ROM_MIRROR | ROM_OPTIONAL )
 
@@ -2916,7 +2916,7 @@ ROM_START( megast_sg )
 	ROMX_LOAD( "tos102sg.bin", 0x00000, 0x30000, BAD_DUMP CRC(5fe16c66) SHA1(45acb2fc4b1b13bd806c751aebd66c8304fc79bc), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 1, "tos104", "TOS 1.04 (Rainbow TOS)" )
 	ROMX_LOAD( "tos104sg.bin", 0x00000, 0x30000, BAD_DUMP CRC(e58f0bdf) SHA1(aa40bf7203f02b2251b9e4850a1a73ff1c7da106), ROM_BIOS(2) )
-	
+
 	ROM_REGION( 0x20000, "cart", ROMREGION_ERASE00 )
 	ROM_CART_LOAD( "cart", 0x00000, 0x20000, ROM_MIRROR | ROM_OPTIONAL )
 
@@ -2933,7 +2933,7 @@ ROM_START( stacy )
 	ROM_REGION16_BE( 0x30000, M68000_TAG, 0 )
 	ROM_SYSTEM_BIOS( 0, "tos104", "TOS 1.04 (Rainbow TOS)" )
 	ROMX_LOAD( "tos104.bin", 0x00000, 0x30000, BAD_DUMP CRC(a50d1d43) SHA1(9526ef63b9cb1d2a7109e278547ae78a5c1db6c6), ROM_BIOS(1) )
-	
+
 	ROM_REGION( 0x20000, "cart", ROMREGION_ERASE00 )
 	ROM_CART_LOAD( "cart", 0x00000, 0x20000, ROM_MIRROR | ROM_OPTIONAL )
 
@@ -2955,7 +2955,7 @@ ROM_START( ste )
 	ROMX_LOAD( "tos162.bin", 0x00000, 0x40000, BAD_DUMP CRC(1c1a4eba) SHA1(42b875f542e5b728905d819c83c31a095a6a1904), ROM_BIOS(2) )
 	ROM_SYSTEM_BIOS( 2, "tos206", "TOS 2.06 (ST/STE TOS)" )
 	ROMX_LOAD( "tos206.bin", 0x00000, 0x40000, BAD_DUMP CRC(3f2f840f) SHA1(ee58768bdfc602c9b14942ce5481e97dd24e7c83), ROM_BIOS(3) )
-	
+
 	ROM_REGION( 0x20000, "cart", ROMREGION_ERASE00 )
 	ROM_CART_LOAD( "cart", 0x00000, 0x20000, ROM_MIRROR | ROM_OPTIONAL )
 
@@ -2977,7 +2977,7 @@ ROM_START( ste_uk )
 	ROMX_LOAD( "tos162uk.bin", 0x00000, 0x40000, BAD_DUMP CRC(d1c6f2fa) SHA1(70db24a7c252392755849f78940a41bfaebace71), ROM_BIOS(2) )
 	ROM_SYSTEM_BIOS( 2, "tos206", "TOS 2.06 (ST/STE TOS)" )
 	ROMX_LOAD( "tos206uk.bin", 0x00000, 0x40000, BAD_DUMP CRC(08538e39) SHA1(2400ea95f547d6ea754a99d05d8530c03f8b28e3), ROM_BIOS(3) )
-	
+
 	ROM_REGION( 0x20000, "cart", ROMREGION_ERASE00 )
 	ROM_CART_LOAD( "cart", 0x00000, 0x20000, ROM_MIRROR | ROM_OPTIONAL )
 
@@ -2999,7 +2999,7 @@ ROM_START( ste_de )
 	ROMX_LOAD( "tos162de.bin", 0x00000, 0x40000, BAD_DUMP CRC(2cdeb5e5) SHA1(10d9f61705048ee3dcbec67df741bed49b922149), ROM_BIOS(2) )
 	ROM_SYSTEM_BIOS( 2, "tos206", "TOS 2.06 (ST/STE TOS)" )
 	ROMX_LOAD( "tos206de.bin", 0x00000, 0x40000, BAD_DUMP CRC(143cd2ab) SHA1(d1da866560734289c4305f1028c36291d331d417), ROM_BIOS(3) )
-	
+
 	ROM_REGION( 0x20000, "cart", ROMREGION_ERASE00 )
 	ROM_CART_LOAD( "cart", 0x00000, 0x20000, ROM_MIRROR | ROM_OPTIONAL )
 
@@ -3017,7 +3017,7 @@ ROM_START( ste_es )
 	ROM_DEFAULT_BIOS("tos106")
 	ROM_SYSTEM_BIOS( 0, "tos106", "TOS 1.06 (STE TOS, Revision 1)" )
 	ROMX_LOAD( "tos106es.bin", 0x00000, 0x40000, BAD_DUMP CRC(5cd2a540) SHA1(3a18f342c8288c0bc1879b7a209c73d5d57f7e81), ROM_BIOS(1) )
-	
+
 	ROM_REGION( 0x20000, "cart", ROMREGION_ERASE00 )
 	ROM_CART_LOAD( "cart", 0x00000, 0x20000, ROM_MIRROR | ROM_OPTIONAL )
 
@@ -3039,7 +3039,7 @@ ROM_START( ste_fr )
 	ROMX_LOAD( "tos162fr.bin", 0x00000, 0x40000, BAD_DUMP CRC(0ab003be) SHA1(041e134da613f718fca8bd47cd7733076e8d7588), ROM_BIOS(2) )
 	ROM_SYSTEM_BIOS( 2, "tos206", "TOS 2.06 (ST/STE TOS)" )
 	ROMX_LOAD( "tos206fr.bin", 0x00000, 0x40000, BAD_DUMP CRC(e3a99ca7) SHA1(387da431e6e3dd2e0c4643207e67d06cf33618c3), ROM_BIOS(3) )
-	
+
 	ROM_REGION( 0x20000, "cart", ROMREGION_ERASE00 )
 	ROM_CART_LOAD( "cart", 0x00000, 0x20000, ROM_MIRROR | ROM_OPTIONAL )
 
@@ -3057,7 +3057,7 @@ ROM_START( ste_it )
 	ROM_DEFAULT_BIOS("tos106")
 	ROM_SYSTEM_BIOS( 0, "tos106", "TOS 1.06 (STE TOS, Revision 1)" )
 	ROMX_LOAD( "tos106it.bin", 0x00000, 0x40000, BAD_DUMP CRC(d3a55216) SHA1(28dc74e5e0fa56b685bbe15f9837f52684fee9fd), ROM_BIOS(1) )
-	
+
 	ROM_REGION( 0x20000, "cart", ROMREGION_ERASE00 )
 	ROM_CART_LOAD( "cart", 0x00000, 0x20000, ROM_MIRROR | ROM_OPTIONAL )
 
@@ -3077,7 +3077,7 @@ ROM_START( ste_se )
 	ROMX_LOAD( "tos162se.bin", 0x00000, 0x40000, BAD_DUMP CRC(90f124b1) SHA1(6e5454e861dbf4c46ce5020fc566c31202087b88), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 1, "tos206", "TOS 2.06 (ST/STE TOS)" )
 	ROMX_LOAD( "tos206se.bin", 0x00000, 0x40000, BAD_DUMP CRC(be61906d) SHA1(ebdf5a4cf08471cd315a91683fcb24e0f029d451), ROM_BIOS(2) )
-	
+
 	ROM_REGION( 0x20000, "cart", ROMREGION_ERASE00 )
 	ROM_CART_LOAD( "cart", 0x00000, 0x20000, ROM_MIRROR | ROM_OPTIONAL )
 
@@ -3095,7 +3095,7 @@ ROM_START( ste_sg )
 	ROM_DEFAULT_BIOS("tos206")
 	ROM_SYSTEM_BIOS( 0, "tos206", "TOS 2.06 (ST/STE TOS)" )
 	ROMX_LOAD( "tos206sg.bin", 0x00000, 0x40000, BAD_DUMP CRC(8c4fe57d) SHA1(c7a9ae3162f020dcac0c2a46cf0c033f91b98644), ROM_BIOS(1) )
-	
+
 	ROM_REGION( 0x20000, "cart", ROMREGION_ERASE00 )
 	ROM_CART_LOAD( "cart", 0x00000, 0x20000, ROM_MIRROR | ROM_OPTIONAL )
 
@@ -3115,7 +3115,7 @@ ROM_START( megaste )
 	ROMX_LOAD( "tos205.bin", 0x00000, 0x40000, BAD_DUMP CRC(d8845f8d) SHA1(e069c14863819635bea33074b90c22e5bd99f1bd), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 1, "tos206", "TOS 2.06 (ST/STE TOS)" )
 	ROMX_LOAD( "tos206.bin", 0x00000, 0x40000, BAD_DUMP CRC(3f2f840f) SHA1(ee58768bdfc602c9b14942ce5481e97dd24e7c83), ROM_BIOS(2) )
-	
+
 	ROM_REGION( 0x20000, "cart", ROMREGION_ERASE00 )
 	ROM_CART_LOAD( "cart", 0x00000, 0x20000, ROM_MIRROR | ROM_OPTIONAL )
 
@@ -3137,7 +3137,7 @@ ROM_START( megaste_uk )
 	ROMX_LOAD( "tos205uk.bin", 0x00000, 0x40000, NO_DUMP, ROM_BIOS(2) )
 	ROM_SYSTEM_BIOS( 2, "tos206", "TOS 2.06 (ST/STE TOS)" )
 	ROMX_LOAD( "tos206uk.bin", 0x00000, 0x40000, BAD_DUMP CRC(08538e39) SHA1(2400ea95f547d6ea754a99d05d8530c03f8b28e3), ROM_BIOS(3) )
-	
+
 	ROM_REGION( 0x20000, "cart", ROMREGION_ERASE00 )
 	ROM_CART_LOAD( "cart", 0x00000, 0x20000, ROM_MIRROR | ROM_OPTIONAL )
 
@@ -3157,7 +3157,7 @@ ROM_START( megaste_fr )
 	ROMX_LOAD( "tos205fr.bin", 0x00000, 0x40000, BAD_DUMP CRC(27b83d2f) SHA1(83963b0feb0d119b2ca6f51e483e8c20e6ab79e1), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 1, "tos206", "TOS 2.06 (ST/STE TOS)" )
 	ROMX_LOAD( "tos206fr.bin", 0x00000, 0x40000, BAD_DUMP CRC(e3a99ca7) SHA1(387da431e6e3dd2e0c4643207e67d06cf33618c3), ROM_BIOS(2) )
-	
+
 	ROM_REGION( 0x20000, "cart", ROMREGION_ERASE00 )
 	ROM_CART_LOAD( "cart", 0x00000, 0x20000, ROM_MIRROR | ROM_OPTIONAL )
 
@@ -3177,7 +3177,7 @@ ROM_START( megaste_de )
 	ROMX_LOAD( "tos205de.bin", 0x00000, 0x40000, BAD_DUMP CRC(518b24e6) SHA1(084e083422f8fd9ac7a2490f19b81809c52b91b4), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 1, "tos206", "TOS 2.06 (ST/STE TOS)" )
 	ROMX_LOAD( "tos206de.bin", 0x00000, 0x40000, BAD_DUMP CRC(143cd2ab) SHA1(d1da866560734289c4305f1028c36291d331d417), ROM_BIOS(2) )
-	
+
 	ROM_REGION( 0x20000, "cart", ROMREGION_ERASE00 )
 	ROM_CART_LOAD( "cart", 0x00000, 0x20000, ROM_MIRROR | ROM_OPTIONAL )
 
@@ -3195,7 +3195,7 @@ ROM_START( megaste_es )
 	ROM_DEFAULT_BIOS("tos205")
 	ROM_SYSTEM_BIOS( 0, "tos205", "TOS 2.05 (Mega STE TOS)" )
 	ROMX_LOAD( "tos205es.bin", 0x00000, 0x40000, BAD_DUMP CRC(2a426206) SHA1(317715ad8de718b5acc7e27ecf1eb833c2017c91), ROM_BIOS(1) )
-	
+
 	ROM_REGION( 0x20000, "cart", ROMREGION_ERASE00 )
 	ROM_CART_LOAD( "cart", 0x00000, 0x20000, ROM_MIRROR | ROM_OPTIONAL )
 
@@ -3213,7 +3213,7 @@ ROM_START( megaste_it )
 	ROM_DEFAULT_BIOS("tos205")
 	ROM_SYSTEM_BIOS( 0, "tos205", "TOS 2.05 (Mega STE TOS)" )
 	ROMX_LOAD( "tos205it.bin", 0x00000, 0x40000, BAD_DUMP CRC(b28bf5a1) SHA1(8e0581b442384af69345738849cf440d72f6e6ab), ROM_BIOS(1) )
-	
+
 	ROM_REGION( 0x20000, "cart", ROMREGION_ERASE00 )
 	ROM_CART_LOAD( "cart", 0x00000, 0x20000, ROM_MIRROR | ROM_OPTIONAL )
 
@@ -3233,7 +3233,7 @@ ROM_START( megaste_se )
 	ROMX_LOAD( "tos205se.bin", 0x00000, 0x40000, BAD_DUMP CRC(6d49ccbe) SHA1(c065b1a9a2e42e5e373333e99be829028902acaa), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 1, "tos206", "TOS 2.06 (ST/STE TOS)" )
 	ROMX_LOAD( "tos206se.bin", 0x00000, 0x40000, BAD_DUMP CRC(be61906d) SHA1(ebdf5a4cf08471cd315a91683fcb24e0f029d451), ROM_BIOS(2) )
-	
+
 	ROM_REGION( 0x20000, "cart", ROMREGION_ERASE00 )
 	ROM_CART_LOAD( "cart", 0x00000, 0x20000, ROM_MIRROR | ROM_OPTIONAL )
 
@@ -3250,7 +3250,7 @@ ROM_START( stbook )
 	ROM_REGION16_BE( 0x40000, M68000_TAG, 0 )
 	ROM_SYSTEM_BIOS( 0, "tos208", "TOS 2.08" )
 	ROMX_LOAD( "tos208.bin", 0x00000, 0x40000, NO_DUMP, ROM_BIOS(1) )
-	
+
 	ROM_REGION( 0x20000, "cart", ROMREGION_ERASE00 )
 	ROM_CART_LOAD( "cart", 0x00000, 0x20000, ROM_MIRROR | ROM_OPTIONAL )
 
@@ -3282,7 +3282,7 @@ ROM_START( tt030 )
 	ROM_DEFAULT_BIOS("tos306")
 	ROM_SYSTEM_BIOS( 0, "tos306", "TOS 3.06 (TT TOS)" )
 	ROMX_LOAD( "tos306.bin", 0x00000, 0x80000, BAD_DUMP CRC(e65adbd7) SHA1(b15948786278e1f2abc4effbb6d40786620acbe8), ROM_BIOS(1) )
-	
+
 	ROM_REGION( 0x20000, "cart", ROMREGION_ERASE00 )
 	ROM_CART_LOAD( "cart", 0x00000, 0x20000, ROM_MIRROR | ROM_OPTIONAL )
 
@@ -3300,7 +3300,7 @@ ROM_START( tt030_uk )
 	ROM_DEFAULT_BIOS("tos306")
 	ROM_SYSTEM_BIOS( 0, "tos306", "TOS 3.06 (TT TOS)" )
 	ROMX_LOAD( "tos306uk.bin", 0x00000, 0x80000, BAD_DUMP CRC(75dda215) SHA1(6325bdfd83f1b4d3afddb2b470a19428ca79478b), ROM_BIOS(1) )
-	
+
 	ROM_REGION( 0x20000, "cart", ROMREGION_ERASE00 )
 	ROM_CART_LOAD( "cart", 0x00000, 0x20000, ROM_MIRROR | ROM_OPTIONAL )
 
@@ -3318,7 +3318,7 @@ ROM_START( tt030_de )
 	ROM_DEFAULT_BIOS("tos306")
 	ROM_SYSTEM_BIOS( 0, "tos306", "TOS 3.06 (TT TOS)" )
 	ROMX_LOAD( "tos306de.bin", 0x00000, 0x80000, BAD_DUMP CRC(4fcbb59d) SHA1(80af04499d1c3b8551fc4d72142ff02c2182e64a), ROM_BIOS(1) )
-	
+
 	ROM_REGION( 0x20000, "cart", ROMREGION_ERASE00 )
 	ROM_CART_LOAD( "cart", 0x00000, 0x20000, ROM_MIRROR | ROM_OPTIONAL )
 
@@ -3336,7 +3336,7 @@ ROM_START( tt030_fr )
 	ROM_DEFAULT_BIOS("tos306")
 	ROM_SYSTEM_BIOS( 0, "tos306", "TOS 3.06 (TT TOS)" )
 	ROMX_LOAD( "tos306fr.bin", 0x00000, 0x80000, BAD_DUMP CRC(1945511c) SHA1(6bb19874e1e97dba17215d4f84b992c224a81b95), ROM_BIOS(1) )
-	
+
 	ROM_REGION( 0x20000, "cart", ROMREGION_ERASE00 )
 	ROM_CART_LOAD( "cart", 0x00000, 0x20000, ROM_MIRROR | ROM_OPTIONAL )
 
@@ -3354,7 +3354,7 @@ ROM_START( tt030_pl )
 	ROM_DEFAULT_BIOS("tos306")
 	ROM_SYSTEM_BIOS( 0, "tos306", "TOS 3.06 (TT TOS)" )
 	ROMX_LOAD( "tos306pl.bin", 0x00000, 0x80000, BAD_DUMP CRC(4f2404bc) SHA1(d122b8ceb202b52754ff0d442b1c81f8b4de3436), ROM_BIOS(1) )
-	
+
 	ROM_REGION( 0x20000, "cart", ROMREGION_ERASE00 )
 	ROM_CART_LOAD( "cart", 0x00000, 0x20000, ROM_MIRROR | ROM_OPTIONAL )
 
@@ -3371,7 +3371,7 @@ ROM_START( fx1 )
 	ROM_REGION16_BE( 0x40000, M68000_TAG, 0 )
 	ROM_SYSTEM_BIOS( 0, "tos207", "TOS 2.07" )
 	ROMX_LOAD( "tos207.bin", 0x00000, 0x40000, NO_DUMP, ROM_BIOS(1) )
-	
+
 	ROM_REGION( 0x20000, "cart", ROMREGION_ERASE00 )
 	ROM_CART_LOAD( "cart", 0x00000, 0x20000, ROM_MIRROR | ROM_OPTIONAL )
 
@@ -3395,7 +3395,7 @@ ROM_START( falcon30 )
 	ROMX_LOAD( "tos402.bin", 0x00000, 0x80000, BAD_DUMP CRC(63f82f23) SHA1(75de588f6bbc630fa9c814f738195da23b972cc6), ROM_BIOS(3) )
 	ROM_SYSTEM_BIOS( 3, "tos404", "TOS 4.04" )
 	ROMX_LOAD( "tos404.bin", 0x00000, 0x80000, BAD_DUMP CRC(028b561d) SHA1(27dcdb31b0951af99023b2fb8c370d8447ba6ebc), ROM_BIOS(4) )
-	
+
 	ROM_REGION( 0x20000, "cart", ROMREGION_ERASE00 )
 	ROM_CART_LOAD( "cart", 0x00000, 0x20000, ROM_MIRROR | ROM_OPTIONAL )
 
@@ -3412,7 +3412,7 @@ ROM_START( falcon40 )
 	ROM_REGION32_BE( 0x80000, M68000_TAG, 0 )
 	ROM_SYSTEM_BIOS( 0, "tos492", "TOS 4.92" )
 	ROMX_LOAD( "tos492.bin", 0x00000, 0x7d314, BAD_DUMP CRC(bc8e497f) SHA1(747a38042844a6b632dcd9a76d8525fccb5eb892), ROM_BIOS(2) )
-	
+
 	ROM_REGION( 0x20000, "cart", ROMREGION_ERASE00 )
 	ROM_CART_LOAD( "cart", 0x00000, 0x20000, ROM_MIRROR | ROM_OPTIONAL )
 
@@ -3423,7 +3423,7 @@ ROM_END
 
 
 //**************************************************************************
-//	SYSTEM DRIVERS
+//  SYSTEM DRIVERS
 //**************************************************************************
 
 //    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       INIT     COMPANY    FULLNAME                FLAGS

@@ -1,10 +1,10 @@
 /***************************************************************************
-   
+
         VTA-2000 Terminal
-		
-			board images : http://fotki.yandex.ru/users/lodedome/album/93699?p=0
-			
-		BDP-15 board only
+
+            board images : http://fotki.yandex.ru/users/lodedome/album/93699?p=0
+
+        BDP-15 board only
 
         29/11/2010 Skeleton driver.
 
@@ -38,8 +38,8 @@ static INPUT_PORTS_START( vta2000 )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET(vta2000) 
-{	
+static MACHINE_RESET(vta2000)
+{
 }
 
 static VIDEO_START( vta2000 )
@@ -121,10 +121,10 @@ static MACHINE_CONFIG_START( vta2000, vta2000_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8080, XTAL_4MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(vta2000_mem)
-	MCFG_CPU_IO_MAP(vta2000_io)	
+	MCFG_CPU_IO_MAP(vta2000_io)
 
 	MCFG_MACHINE_RESET(vta2000)
-	
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
@@ -155,5 +155,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY   FULLNAME       FLAGS */
-COMP( ????, vta2000,  0,       0, 	vta2000, 	vta2000, 	 0,  	  "<unknown>",   "VTA-2000",		GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( ????, vta2000,  0,       0,	vta2000,	vta2000,	 0, 	  "<unknown>",   "VTA-2000",		GAME_NOT_WORKING | GAME_NO_SOUND)
 

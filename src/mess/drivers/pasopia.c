@@ -421,7 +421,7 @@ static WRITE8_HANDLER( pasopia7_memory_ctrl_w )
 
 	// bank4 is always RAM
 
-//	printf("%02x\n",state->vram_sel);
+//  printf("%02x\n",state->vram_sel);
 }
 
 #if 0
@@ -584,8 +584,8 @@ static READ8_HANDLER( pasopia7_io_r )
 		return i8255a_r(space->machine->device("ppi8255_2"), (io_port-0x20) & 3);
 	}
 	else if(io_port >= 0x28 && io_port <= 0x2b) { return z80ctc_r(space->machine->device("ctc"), (io_port-0x28) & 3);  }
-	else if(io_port == 0x30) 					{ return z80pio_d_r(space->machine->device("z80pio_0"), (io_port-0x30) & 1); }
-	else if(io_port == 0x31)				 	{ return z80pio_c_r(space->machine->device("z80pio_0"), (io_port-0x31) & 1); }
+	else if(io_port == 0x30)					{ return z80pio_d_r(space->machine->device("z80pio_0"), (io_port-0x30) & 1); }
+	else if(io_port == 0x31)					{ return z80pio_c_r(space->machine->device("z80pio_0"), (io_port-0x31) & 1); }
 //  else if(io_port == 0x3a)                    { SN1 }
 //  else if(io_port == 0x3b)                    { SN2 }
 //  else if(io_port == 0x3c)                    { bankswitch }
@@ -765,7 +765,7 @@ static WRITE8_DEVICE_HANDLER( screen_mode_w )
 	state->x_width = data & 0x20;
 	state->gfx_mode = data & 0x80;
 
-//	printf("%02x\n",state->gfx_mode);
+//  printf("%02x\n",state->gfx_mode);
 }
 
 static WRITE8_DEVICE_HANDLER( plane_reg_w )

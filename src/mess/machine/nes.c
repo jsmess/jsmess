@@ -907,7 +907,7 @@ DEVICE_IMAGE_LOAD( nes_cart )
 
 			if (state->pcb_id == FUKUTAKE_BOARD)
 				state->mapper_ram = auto_alloc_array(image.device().machine, UINT8, 2816);
-			
+
 			/* Position past the header */
 			image.fseek(16, SEEK_SET);
 
@@ -1094,7 +1094,7 @@ DEVICE_IMAGE_LOAD( nes_cart )
 						logerror("[TVSC] chunk found. No support yet.\n");
 						image.fread(&buffer, 4);
 						chunk_length = buffer[0] | (buffer[1] << 8) | (buffer[2] << 16) | (buffer[3] << 24);
-						
+
 						read_length += (chunk_length + 8);
 					}
 					else if ((magic2[0] == 'D') && (magic2[1] == 'I') && (magic2[2] == 'N') && (magic2[3] == 'F'))
@@ -1240,7 +1240,7 @@ DEVICE_IMAGE_LOAD( nes_cart )
 				auto_free(image.device().machine, temp_chr);
 				fatalerror("Unsupported UNIF chunk or corrupted header. Please report the problem at MESS Board.\n");
 			}
-			
+
 			/* Free the regions that were allocated by the ROM loader */
 			image.device().machine->region_free("maincpu");
 			image.device().machine->region_free("gfx1");

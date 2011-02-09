@@ -13,7 +13,7 @@
 
 
 //**************************************************************************
-//	MACROS / CONSTANTS
+//  MACROS / CONSTANTS
 //**************************************************************************
 
 #define LOG 0
@@ -213,7 +213,7 @@ void hd61830_device::device_start()
 	save_item(NAME(m_bf));
 	save_item(NAME(m_ir));
 	save_item(NAME(m_mcr));
- 	save_item(NAME(m_dor));
+	save_item(NAME(m_dor));
 	save_item(NAME(m_cac));
 	save_item(NAME(m_dsa));
 	save_item(NAME(m_vp));
@@ -527,7 +527,7 @@ void hd61830_device::draw_char(bitmap_t *bitmap, const rectangle *cliprect, UINT
 			if (blink && (ma == m_cac))
 			{
 				// cursor off, character blink
-				if (!cursor) 
+				if (!cursor)
 					pixel = m_cursor ? pixel : 0;
 
 				// cursor blink

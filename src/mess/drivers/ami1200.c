@@ -558,7 +558,7 @@ static MACHINE_CONFIG_START( cd32, ami1200_state )
 	/* cia */
 	MCFG_MOS8520_ADD("cia_0", AMIGA_68EC020_PAL_CLOCK / 10, cd32_cia_0_intf)
 	MCFG_MOS8520_ADD("cia_1", AMIGA_68EC020_PAL_CLOCK / 10, cd32_cia_1_intf)
-	
+
 	MCFG_CDROM_ADD( "cdrom" )
 	MCFG_CDROM_INTERFACE("cd32_cdrom")
 

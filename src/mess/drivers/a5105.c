@@ -6,7 +6,7 @@
 
     http://www.robotrontechnik.de/index.htm?/html/computer/a5105.htm
 
-	- this looks like "somehow" inspired by the MSX1 machine?
+    - this looks like "somehow" inspired by the MSX1 machine?
 
 ****************************************************************************/
 
@@ -131,9 +131,9 @@ static INPUT_PORTS_START( a5105 )
 	PORT_BIT(0x04,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("<") //PORT_CODE(KEYCODE_8) PORT_CHAR('8')
 	PORT_BIT(0x08,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("+") //PORT_CODE(KEYCODE_8) PORT_CHAR('8')
 	/* TODO: following three aren't marked correctly */
-	PORT_BIT(0x10,IP_ACTIVE_LOW,IPT_KEYBOARD) //PORT_NAME("ò") PORT_CODE(KEYCODE_8) PORT_CHAR('8')
-	PORT_BIT(0x20,IP_ACTIVE_LOW,IPT_KEYBOARD) //PORT_NAME("à") PORT_CODE(KEYCODE_8) PORT_CHAR('8')
-	PORT_BIT(0x40,IP_ACTIVE_LOW,IPT_KEYBOARD) //PORT_NAME("ù") PORT_CODE(KEYCODE_8) PORT_CHAR('8')
+	PORT_BIT(0x10,IP_ACTIVE_LOW,IPT_KEYBOARD) //PORT_NAME("?") PORT_CODE(KEYCODE_8) PORT_CHAR('8')
+	PORT_BIT(0x20,IP_ACTIVE_LOW,IPT_KEYBOARD) //PORT_NAME("?") PORT_CODE(KEYCODE_8) PORT_CHAR('8')
+	PORT_BIT(0x40,IP_ACTIVE_LOW,IPT_KEYBOARD) //PORT_NAME("?") PORT_CODE(KEYCODE_8) PORT_CHAR('8')
 	PORT_BIT(0x80,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("#") //PORT_CODE(KEYCODE_8) PORT_CHAR('8')
 
 	PORT_START("KEY2")

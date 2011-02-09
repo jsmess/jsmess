@@ -9,13 +9,13 @@
 
 /*
 
-	TODO:
+    TODO:
 
-	- set time
-	- read from microdrive
-	- write to microdrive
-	- DTR/CTS handling
-	- network
+    - set time
+    - read from microdrive
+    - write to microdrive
+    - DTR/CTS handling
+    - network
 
 */
 
@@ -28,7 +28,7 @@
 
 
 //**************************************************************************
-//	MACROS / CONSTANTS
+//  MACROS / CONSTANTS
 //**************************************************************************
 
 #define LOG 0
@@ -160,7 +160,7 @@ void zx8302_device_config::device_config_complete()
 //**************************************************************************
 
 //-------------------------------------------------
-//  trigger_interrupt - 
+//  trigger_interrupt -
 //-------------------------------------------------
 
 inline void zx8302_device::trigger_interrupt(UINT8 line)

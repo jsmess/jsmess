@@ -5,7 +5,7 @@
 
     Phill Harvey-Smith
     2011-01-29.
-	
+
 */
 
 /*
@@ -17,9 +17,9 @@ Video Controller
 To a programmer, the MBC's video hardware appears as a 6845 chip and three bitmapped graphics planes.
 The 6845
 
-The 6845 appears at I/O ports 30h (register select) and 32h (data). At system boot, it is programmed 
-for 25 lines x 72 columns. The RAM BIOS then reprograms it for 25 x 80. The ROM also provides timings 
-for what appears to be a different 80-column mode; it decides which to use by reading port 1Ch. 
+The 6845 appears at I/O ports 30h (register select) and 32h (data). At system boot, it is programmed
+for 25 lines x 72 columns. The RAM BIOS then reprograms it for 25 x 80. The ROM also provides timings
+for what appears to be a different 80-column mode; it decides which to use by reading port 1Ch.
 If bit 7 of the result is 1, the 72-column mode is used; otherwise, the 80-column mode is.
 
 Here are the values written to the 6845 in each case, plus (for comparison) the values used by a real CGA:
@@ -40,12 +40,12 @@ Here are the values written to the 6845 in each case, plus (for comparison) the 
     Cursor end               |    0   |    0   |    0   |     7
 =============================+========+========+========+==========
 
-The important thing to note here is that from the 6845's point of view, a character is 4 lines high. 
+The important thing to note here is that from the 6845's point of view, a character is 4 lines high.
 This explains why the framebuffer memory is mapped as it is.
 
 The framebuffers
 
-The MBC video RAM is composed of three planes - green, red and blue. The green plane occupies main memory, 
+The MBC video RAM is composed of three planes - green, red and blue. The green plane occupies main memory,
 and its position varies; writes to port 10h set its address:
 
 Value | Address
@@ -58,11 +58,11 @@ Value | Address
 
 The red and blue planes appear to have fixed locations of F0000h and F4000h respectively.
 
-When output goes to a composite monitor, the green plane is usually used by itself. 
+When output goes to a composite monitor, the green plane is usually used by itself.
 The red plane becomes "blink", causing pixels in it to blink; and the blue plane becomes "bright".
 
-Within each plane, memory is organised as 50 rows of 320 bytes (288 bytes in 72-column mode). 
-This corresponds to a rectangle, 640 (576) pixels wide and four pixels high. The first four bytes 
+Within each plane, memory is organised as 50 rows of 320 bytes (288 bytes in 72-column mode).
+This corresponds to a rectangle, 640 (576) pixels wide and four pixels high. The first four bytes
 give the leftmost column of the rectangle, the next four give the next column, and so on:
 
 [--byte 0--] [--byte 4--] [--byte  8--] [--byte 12--] ...
@@ -122,7 +122,7 @@ static void video_debug(running_machine *machine, int ref, int params, const cha
 static MC6845_UPDATE_ROW( vid_update_row )
 {
 	mbc55x_state *mstate = device->machine->driver_data<mbc55x_state>();
-	
+
 	UINT8	*ram	= &ram_get_ptr(device->machine->device(RAM_TAG))[0];
 	UINT8	*red	= &mstate->video_mem[RED_PLANE_OFFSET];
 	UINT8	*blue	= &mstate->video_mem[BLUE_PLANE_OFFSET];
@@ -130,13 +130,13 @@ static MC6845_UPDATE_ROW( vid_update_row )
 	int		offset;
 	UINT8	rpx,gpx,bpx;
 	UINT8	rb,gb,bb;
-	
+
 	int		x_pos;
 	int		pixelno;
 	UINT8	bitno;
 	UINT8	shifts;
 	UINT8	colour;
-	
+
 	switch(mstate->vram_page)
 	{
 		case 4	: green=&ram[0x08000]; break;
@@ -146,36 +146,36 @@ static MC6845_UPDATE_ROW( vid_update_row )
 		default :
 			green=&ram[0x0C000];
 	}
-		
+
 	if(DEBUG_SET(DEBUG_LINES))
 		logerror("MC6845_UPDATE_ROW: ma=%d, ra=%d, y=%d, x_count=%d\n",ma,ra,y,x_count);
-		
+
 	offset=((ma*4) + ra) % COLOUR_PLANE_SIZE;
-	
+
 	if(DEBUG_SET(DEBUG_LINES))
 		logerror("offset=%05X\n",offset);
-	
+
 	for(x_pos=0; x_pos<x_count; x_pos++)
 	{
 		rpx=red[offset+(x_pos*4)];
 		gpx=green[offset+(x_pos*4)];
 		bpx=blue[offset+(x_pos*4)];
-		
+
 		bitno=0x80;
 		shifts=7;
-		
+
 		for(pixelno=0; pixelno<8; pixelno++)
 		{
-			
+
 			rb=(rpx & bitno) >> shifts;
 			gb=(gpx & bitno) >> shifts;
 			bb=(bpx & bitno) >> shifts;
-			
+
 			colour=(rb<<2) | (gb<<1) | (bb<<0);
-			
+
 			*BITMAP_ADDR16(bitmap, y, (x_pos*8)+pixelno)=colour;
 			//logerror("set pixel (%d,%d)=%d\n",y, ((x_pos*8)+pixelno),colour);
-			bitno=bitno>>1; 
+			bitno=bitno>>1;
 			shifts--;
 		}
 	}
@@ -193,7 +193,7 @@ static WRITE_LINE_DEVICE_HANDLER( vid_vsync_changed )
 READ8_HANDLER( mbc55x_video_io_r)
 {
 	device_t *mc6845 = space->machine->device(VID_MC6845_NAME);
-	
+
 	switch(offset & 0x03)
 	{
 		case 0 : return mc6845_status_r(mc6845, 0); break;
@@ -205,14 +205,14 @@ READ8_HANDLER( mbc55x_video_io_r)
 
 WRITE8_HANDLER( mbc55x_video_io_w )
 {
-	device_t 		*mc6845 = space->machine->device(VID_MC6845_NAME);
-	
+	device_t		*mc6845 = space->machine->device(VID_MC6845_NAME);
+
 	switch(offset & 0x03)
 	{
-		case 0 : 
-			mc6845_address_w(mc6845,0,data); 
+		case 0 :
+			mc6845_address_w(mc6845,0,data);
 			break;
-		case 2 : 
+		case 2 :
 			mc6845_register_w(mc6845,0,data);
 			break;
 	}

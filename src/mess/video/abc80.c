@@ -72,7 +72,7 @@ static TIMER_DEVICE_CALLBACK( vsync_off_tick )
 
 
 //-------------------------------------------------
-//  update_screen - 
+//  update_screen -
 //-------------------------------------------------
 
 void abc80_state::update_screen(bitmap_t *bitmap, const rectangle *cliprect)
@@ -238,7 +238,7 @@ MACHINE_CONFIG_FRAGMENT( abc80_video )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 
 	MCFG_GFXDECODE(abc80)
-	
+
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
 

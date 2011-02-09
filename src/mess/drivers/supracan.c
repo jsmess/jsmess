@@ -47,17 +47,17 @@ STATUS:
     - All: Priorities are largely unknown.
     - C.U.G.: Gameplay backgrounds are broken.
     - Sango Fighter: Possible missing masking on the upper edges of the screen during gameplay.
-	- Sango Fighter: Raster effects off by 1 line
-	- Sango Fighter: Specifies tiles out of range of video ram??
+    - Sango Fighter: Raster effects off by 1 line
+    - Sango Fighter: Specifies tiles out of range of video ram??
     - Speedy Dragon: Backgrounds are broken (wrong tile bank/region).
     - Super Taiwanese Baseball League: Does not boot, uses an unemulated DMA type
     - Super Taiwanese Baseball League: Missing window effect applied on tilemaps?
     - The Son of Evil: Many graphical issues.
-	- Visible area, looks like it should be 224 pixels high at most, most games need 8 off the top and 8 off the bottom (or a global scroll)
-	  Sango looks like it needs 16 off the bottom instead
-	  Visible area is almost certainly 224 as Son of Evil has an explicit check in the vblank handler
+    - Visible area, looks like it should be 224 pixels high at most, most games need 8 off the top and 8 off the bottom (or a global scroll)
+      Sango looks like it needs 16 off the bottom instead
+      Visible area is almost certainly 224 as Son of Evil has an explicit check in the vblank handler
 
-	- All: are ALL the layers ROZ capable??
+    - All: are ALL the layers ROZ capable??
 
 DEBUG TRICKS:
 
@@ -145,7 +145,7 @@ public:
 	UINT32 sprite_base_addr;
 	UINT8 sprite_flags;
 
- 	UINT32 tilemap_base_addr[3];
+	UINT32 tilemap_base_addr[3];
 	int tilemap_scrollx[3];
 	int tilemap_scrolly[3];
 	UINT16 video_flags;
@@ -325,7 +325,7 @@ static void supracan_tilemap_get_info_roz(running_machine* machine, int layer, t
 			// this isn't understood properly, it's rendering a single 64x64 tile, which for convenience we've rearranged and decoded as 8x8 for the tilemaps
 			{
 				int tile = 0x880 + ((count & 7)*2);
-			//	tile += (count & 0x070) >> 2;
+			//  tile += (count & 0x070) >> 2;
 
 				if (count & 0x20) tile ^= 1;
 				tile |= (count & 0xc0)>>2;
@@ -477,7 +477,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
     UINT32 end_word = start_word + (state->sprite_count - skip_count) * 4;
 	int region = (state->sprite_flags & 1) ? 0 : 1; //8bpp : 4bpp
 
-//	printf("frame\n");
+//  printf("frame\n");
 	#define VRAM_MASK (0xffff)
 
    for(int i = start_word; i < end_word; i += 4)
@@ -503,12 +503,12 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 		if((supracan_vram[i+0] & 0x4000))
 		{
-		
+
 		#if 0
 			printf("%d (unk %02x) (enable %02x) (unk Y2 %02x, %02x) (y pos %02x) (bank %01x) (flip %01x) (unknown %02x) (x size %02x) (xscale %01x) (unk %01x) (xpos %02x) (code %04x)\n", i,
 				(supracan_vram[i+0] & 0x8000) >> 15,
 				(supracan_vram[i+0] & 0x4000) >> 14,
-				(supracan_vram[i+0] & 0x2000) >> 13,			
+				(supracan_vram[i+0] & 0x2000) >> 13,
 				(supracan_vram[i+0] & 0x1e00) >> 8,
 				(supracan_vram[i+0] & 0x01ff),
 				(supracan_vram[i+1] & 0xf000) >> 12,
@@ -521,7 +521,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 				(supracan_vram[i+3] & 0xffff));
 		#endif
 
-		
+
 			if (supracan_vram[i+3] &0x8000)
 			{
 				UINT16 data = supracan_vram[i+3];
@@ -541,10 +541,10 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			{
 				int xsize = 1 << (supracan_vram[i+1] & 7);
 				int ysize = ((supracan_vram[i+0] & 0x1e00) >> 9) + 1;
-		
+
 				// I think the xsize must influence the ysize somehow, there are too many conflicting cases otherwise
 				// there don't appear to be any special markers in the actual looked up tile data to indicate skip / end of list
-	
+
 				for(int ytile = 0; ytile < ysize; ytile++)
 				{
 					for(int xtile = 0; xtile< xsize; xtile++)
@@ -554,30 +554,30 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 						int palette = (data & 0xf000) >> 12;
 
 						int xpos, ypos;
-						
+
 						if (!sprite_yflip)
 						{
-							ypos = y + ytile*8;								
+							ypos = y + ytile*8;
 						}
 						else
 						{
 							ypos = y - (ytile+1)*8;
 							ypos += ysize*8;
 						}
-						
+
 						if (!sprite_xflip)
 						{
-							xpos = x + xtile*8;	
+							xpos = x + xtile*8;
 						}
 						else
 						{
 							xpos = x - (xtile+1)*8;
 							xpos += xsize*8;
 						}
-					
+
 						int tile_xflip = sprite_xflip ^ ((data & 0x0800)>>11);
 						int tile_yflip = sprite_yflip ^ ((data & 0x0400)>>10);
-						
+
 						drawgfx_transpen(bitmap,cliprect,gfx,tile,palette,tile_xflip,tile_yflip,xpos,ypos,0);
 					}
 				}
@@ -614,8 +614,8 @@ static void mark_active_tilemap_all_dirty(running_machine* machine, int layer)
 	int which_tilemap_size;
 
 	which_tilemap_size = get_tilemap_dimensions(machine, xsize, ysize, layer);
-//	for (int i=0;i<4;i++)
-//		tilemap_mark_all_tiles_dirty(state->tilemap_sizes[layer][i]);
+//  for (int i=0;i<4;i++)
+//      tilemap_mark_all_tiles_dirty(state->tilemap_sizes[layer][i]);
 	tilemap_mark_all_tiles_dirty(state->tilemap_sizes[layer][which_tilemap_size]);
 }
 
@@ -639,7 +639,7 @@ static void supracan_suprnova_draw_roz(running_machine* machine, bitmap_t* bitma
 	int ex;
 	int ey;
 	UINT16 *dest;
-//	UINT8* destflags;
+//  UINT8* destflags;
 //  UINT8 *pri;
 	//const UINT16 *src;
 	//const UINT8 *maskptr;
@@ -682,7 +682,7 @@ static void supracan_suprnova_draw_roz(running_machine* machine, bitmap_t* bitma
 
 						UINT16 data = BITMAP_ADDR16(srcbitmap,
 						                        ((cy >> 16) - scroll) & ymask,
-					 	                        (cx >> 16) & xmask)[0];
+						                        (cx >> 16) & xmask)[0];
 
 						if ((data & transmask)!=0)
 							dest[0] = data;
@@ -710,7 +710,7 @@ static void supracan_suprnova_draw_roz(running_machine* machine, bitmap_t* bitma
 				cy += incxy;
 				x++;
 				dest++;
-//				destflags++;
+//              destflags++;
 //              pri++;
 			}
 
@@ -794,7 +794,7 @@ static VIDEO_UPDATE( supracan )
 
 		for (int layer = 3; layer >=0; layer--)
 		{
-		//	popmessage("%04x\n",state->video_flags);
+		//  popmessage("%04x\n",state->video_flags);
 			int enabled = 0;
 
 			if(state->video_flags & 0x04)
@@ -844,7 +844,7 @@ static VIDEO_UPDATE( supracan )
 						if (scrollx&0x8000) scrollx-= 0x10000;
 						if (scrolly&0x8000) scrolly-= 0x10000;
 
-					  	int mosaic_count = (state->tilemap_flags[layer] & 0x001c) >> 2;
+						int mosaic_count = (state->tilemap_flags[layer] & 0x001c) >> 2;
 						int mosaic_mask = 0xffffffff << mosaic_count;
 
 						int y,x;
@@ -1535,12 +1535,12 @@ static TIMER_CALLBACK( supracan_video_callback )
 
 
 		break;
-		
+
 	case 224://FIXME: Son of Evil is pretty picky about this one, a timing of 240 makes it to crash
 		state->video_regs[0] |= 0x8000;
 		break;
-		
-	case 240: 
+
+	case 240:
         if(state->irq_mask & 1)
         {
             verboselog("maincpu", machine, 0, "Triggering VBL IRQ\n\n");

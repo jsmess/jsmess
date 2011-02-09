@@ -438,7 +438,7 @@ static TIMER_CALLBACK(read_COPS_command)
 	int command;
 	via6522_device *via_0 = machine->device<via6522_device>("via6522_0");
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	
+
 	state->COPS_Ready = 0;
 
 	/*logerror("read_COPS_command : trying to send data to VIA\n");*/
@@ -887,7 +887,7 @@ DIRECT_UPDATE_HANDLER (lisa_OPbaseoverride)
 	}
 
 	if (cpu_get_reg(machine->device("maincpu"), M68K_SR) & 0x2000)
-	{   				  
+	{
 		/* supervisor mode -> force register file 0 */
 		the_seg = 0;
 	}
@@ -1057,8 +1057,8 @@ MACHINE_RESET( lisa )
 	state->rom_ptr = machine->region("maincpu")->base() + ROM_OFFSET;
 	state->videoROM_ptr = machine->region("gfx1")->base();
 
-//	cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(lisa_OPbaseoverride, *machine));
-//	m68k_set_reset_callback(machine->device("maincpu"), /*lisa_reset_instr_callback*/NULL);
+//  cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(lisa_OPbaseoverride, *machine));
+//  m68k_set_reset_callback(machine->device("maincpu"), /*lisa_reset_instr_callback*/NULL);
 
 	/* init MMU */
 	state->setup = 1;

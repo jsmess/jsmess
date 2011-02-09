@@ -2,10 +2,10 @@
 
     Sord m.5
 
-	http://www.retropc.net/mm/m5/
-	http://www.museo8bits.es/wiki/index.php/Sord_M5
-	http://k5.web.klfree.net/content/view/10/11/
-	http://k5.web.klfree.net/images/stories/sord/m5heap.htm
+    http://www.retropc.net/mm/m5/
+    http://www.museo8bits.es/wiki/index.php/Sord_M5
+    http://k5.web.klfree.net/content/view/10/11/
+    http://k5.web.klfree.net/images/stories/sord/m5heap.htm
 
 ****************************************************************************/
 
@@ -13,9 +13,9 @@
 
     TODO:
 
-	- floppy
-	- SI-5 serial interface (8251, ROM)
-	- 64KB RAM expansions
+    - floppy
+    - SI-5 serial interface (8251, ROM)
+    - 64KB RAM expansions
 
 */
 
@@ -41,29 +41,29 @@
 
 
 //**************************************************************************
-//	MEMORY BANKING
+//  MEMORY BANKING
 //**************************************************************************
 
 //-------------------------------------------------
-//  sts_r - 
+//  sts_r -
 //-------------------------------------------------
 
 READ8_MEMBER( m5_state::sts_r )
 {
 	/*
 
-		bit		description
-		
-		0		cassette input
-		1		busy
-		2		
-		3		
-		4		
-		5		
-		6		
-		7		RESET key
+        bit     description
 
-	*/
+        0       cassette input
+        1       busy
+        2
+        3
+        4
+        5
+        6
+        7       RESET key
+
+    */
 
 	UINT8 data = 0;
 
@@ -75,31 +75,31 @@ READ8_MEMBER( m5_state::sts_r )
 
 	// RESET key
 	data |= input_port_read(machine, "RESET");
-	
+
 	return data;
 }
 
 
 //-------------------------------------------------
-//  com_w - 
+//  com_w -
 //-------------------------------------------------
 
 WRITE8_MEMBER( m5_state::com_w )
 {
 	/*
 
-		bit		description
-		
-		0		cassette output, centronics strobe
-		1		cassette remote
-		2		
-		3		
-		4		
-		5		
-		6		
-		7		
+        bit     description
 
-	*/
+        0       cassette output, centronics strobe
+        1       cassette remote
+        2
+        3
+        4
+        5
+        6
+        7
+
+    */
 
 	// cassette output
 	cassette_output(m_cassette, BIT(data, 0) ? -1.0 : 1.0);
@@ -114,11 +114,11 @@ WRITE8_MEMBER( m5_state::com_w )
 
 
 //**************************************************************************
-//	FD-5
+//  FD-5
 //**************************************************************************
 
 //-------------------------------------------------
-//  fd5_data_r - 
+//  fd5_data_r -
 //-------------------------------------------------
 
 READ8_MEMBER( m5_state::fd5_data_r )
@@ -130,7 +130,7 @@ READ8_MEMBER( m5_state::fd5_data_r )
 
 
 //-------------------------------------------------
-//  fd5_data_w - 
+//  fd5_data_w -
 //-------------------------------------------------
 
 WRITE8_MEMBER( m5_state::fd5_data_w )
@@ -142,75 +142,75 @@ WRITE8_MEMBER( m5_state::fd5_data_w )
 
 
 //-------------------------------------------------
-//  fd5_com_r - 
+//  fd5_com_r -
 //-------------------------------------------------
 
 READ8_MEMBER( m5_state::fd5_com_r )
 {
 	/*
 
-		bit		description
-		
-		0		?
-		1		1?
-		2		IBFA?
-		3		OBFA?
-		4		
-		5		
-		6		
-		7		
+        bit     description
 
-	*/
+        0       ?
+        1       1?
+        2       IBFA?
+        3       OBFA?
+        4
+        5
+        6
+        7
+
+    */
 
 	return m_obfa << 3 | m_ibfa << 2 | 0x02;
 }
 
 
 //-------------------------------------------------
-//  fd5_com_w - 
+//  fd5_com_w -
 //-------------------------------------------------
 
 WRITE8_MEMBER( m5_state::fd5_com_w )
 {
 	/*
 
-		bit		description
-		
-		0		PPI PC2
-		1		PPI PC0
-		2		PPI PC1
-		3		
-		4		
-		5		
-		6		
-		7		
+        bit     description
 
-	*/
+        0       PPI PC2
+        1       PPI PC0
+        2       PPI PC1
+        3
+        4
+        5
+        6
+        7
+
+    */
 
 	m_fd5_com = data;
 }
 
 
 //-------------------------------------------------
-//  fd5_com_w - 
+//  fd5_com_w -
 //-------------------------------------------------
 
 WRITE8_MEMBER( m5_state::fd5_ctrl_w )
 {
 	/*
 
-		bit		description
-		
-		0		
-		1		
-		2		
-		3		
-		4		
-		5		
-		6		
-		7		
+        bit     description
 
-	*/
+        0
+        1
+        2
+        3
+        4
+        5
+        6
+        7
+
+    */
 
 	floppy_mon_w(m_floppy0, !BIT(data, 0));
 	floppy_drive_set_ready_state(m_floppy0, 1, 1);
@@ -218,7 +218,7 @@ WRITE8_MEMBER( m5_state::fd5_ctrl_w )
 
 
 //-------------------------------------------------
-//  fd5_com_w - 
+//  fd5_com_w -
 //-------------------------------------------------
 
 WRITE8_MEMBER( m5_state::fd5_tc_w )
@@ -230,7 +230,7 @@ WRITE8_MEMBER( m5_state::fd5_tc_w )
 
 
 //**************************************************************************
-//	ADDRESS MAPS
+//  ADDRESS MAPS
 //**************************************************************************
 
 //-------------------------------------------------
@@ -267,10 +267,10 @@ static ADDRESS_MAP_START( m5_io, ADDRESS_SPACE_IO, 8, m5_state )
 	AM_RANGE(0x37, 0x37) AM_READ_PORT("JOY")
 	AM_RANGE(0x40, 0x40) AM_MIRROR(0x0f) AM_DEVWRITE_LEGACY(CENTRONICS_TAG, centronics_data_w)
 	AM_RANGE(0x50, 0x50) AM_MIRROR(0x0f) AM_READWRITE(sts_r, com_w)
-//	AM_RANGE(0x60, 0x63) SIO
-//	AM_RANGE(0x6c, 0x6c) EM-64/64KBI bank select
+//  AM_RANGE(0x60, 0x63) SIO
+//  AM_RANGE(0x6c, 0x6c) EM-64/64KBI bank select
 	AM_RANGE(0x70, 0x73) AM_MIRROR(0x0c) AM_DEVREADWRITE_LEGACY(I8255A_TAG, i8255a_r, i8255a_w)
-//	AM_RANGE(0x7f, 0x7f) 64KRD/64KRX bank select
+//  AM_RANGE(0x7f, 0x7f) 64KRD/64KRX bank select
 ADDRESS_MAP_END
 
 
@@ -302,7 +302,7 @@ ADDRESS_MAP_END
 
 
 //**************************************************************************
-//	INPUT PORTS
+//  INPUT PORTS
 //**************************************************************************
 
 //-------------------------------------------------
@@ -397,7 +397,7 @@ INPUT_PORTS_END
 
 
 //**************************************************************************
-//	DEVICE CONFIGURATION
+//  DEVICE CONFIGURATION
 //**************************************************************************
 
 //-------------------------------------------------
@@ -478,18 +478,18 @@ READ8_MEMBER( m5_state::ppi_pc_r )
 {
 	/*
 
-		bit		description
-		
-		0		?
-		1		?
-		2		?
-		3		
-		4		STBA
-		5		
-		6		ACKA
-		7		
+        bit     description
 
-	*/
+        0       ?
+        1       ?
+        2       ?
+        3
+        4       STBA
+        5
+        6       ACKA
+        7
+
+    */
 
 	return (
 			/* FD5 bit 0-> M5 bit 2 */
@@ -510,18 +510,18 @@ WRITE8_MEMBER( m5_state::ppi_pb_w )
 {
 	/*
 
-		bit		description
-		
-		0		
-		1		
-		2		
-		3		
-		4		
-		5		
-		6		
-		7		
+        bit     description
 
-	*/
+        0
+        1
+        2
+        3
+        4
+        5
+        6
+        7
+
+    */
 
 	if (data == 0xf0)
 	{
@@ -534,18 +534,18 @@ WRITE8_MEMBER( m5_state::ppi_pc_w )
 {
 	/*
 
-		bit		description
-		
-		0		
-		1		
-		2		
-		3		INTRA
-		4		
-		5		IBFA
-		6		
-		7		OBFA
+        bit     description
 
-	*/
+        0
+        1
+        2
+        3       INTRA
+        4
+        5       IBFA
+        6
+        7       OBFA
+
+    */
 
 	m_intra = BIT(data, 3);
 	m_ibfa = BIT(data, 5);
@@ -611,7 +611,7 @@ static const z80_daisy_config m5_daisy_chain[] =
 
 
 //**************************************************************************
-//	MACHINE INITIALIZATION
+//  MACHINE INITIALIZATION
 //**************************************************************************
 
 //-------------------------------------------------
@@ -660,7 +660,7 @@ void m5_state::machine_reset()
 
 
 //**************************************************************************
-//	MACHINE CONFIGURATION
+//  MACHINE CONFIGURATION
 //**************************************************************************
 
 //-------------------------------------------------
@@ -736,7 +736,7 @@ MACHINE_CONFIG_END
 
 
 //**************************************************************************
-//	ROMS
+//  ROMS
 //**************************************************************************
 
 //-------------------------------------------------
@@ -769,7 +769,7 @@ ROM_END
 
 
 //**************************************************************************
-//	DRIVER INITIALIZATION
+//  DRIVER INITIALIZATION
 //**************************************************************************
 
 //-------------------------------------------------
@@ -782,7 +782,7 @@ static DRIVER_INIT( ntsc )
 
 	state->m_vdp_intf = &ntsc_vdp_intf;
 }
-	
+
 
 //-------------------------------------------------
 //  ROM( pal )
@@ -798,7 +798,7 @@ static DRIVER_INIT( pal )
 
 
 //**************************************************************************
-//	SYSTEM DRIVERS
+//  SYSTEM DRIVERS
 //**************************************************************************
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    COMPANY     FULLNAME            FLAGS

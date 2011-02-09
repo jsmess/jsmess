@@ -120,7 +120,7 @@ static floperr_t get_offset(floppy_image *floppy, int head, int track, int secto
 static int internal_basicdsk_translate_sector_interleave(floppy_image *floppy, int sector)
 {
 	const struct basicdsk_geometry *geom = get_geometry(floppy);
-	if (sector >= geom->sectors) 
+	if (sector >= geom->sectors)
 		return sector;
 	return geom->sector_map[sector];
 }
@@ -313,9 +313,9 @@ static void basicdsk_default_geometry(const struct FloppyFormat *format, struct 
 		for (int i = 0; i < geometry->sectors; i++)
 		{
 			geometry->sector_map[i] = sector;
-			
+
 			sector += geometry->interleave;
-			
+
 			if (sector >= geometry->sectors)
 				sector -= geometry->sectors;
 		}

@@ -5,8 +5,8 @@
         12/05/2009 Skeleton driver.
 
 
-	TODO:
-	- Proper artwork
+    TODO:
+    - Proper artwork
 
 ****************************************************************************/
 #define ADDRESS_MAP_MODERN
@@ -58,7 +58,7 @@ WRITE8_MEMBER( et3400_state::et3400_display_w )
 		segdata |= segment;
 	else
 		segdata &= ~segment;
-	
+
 	output_set_digit_value(digit, segdata);
 }
 

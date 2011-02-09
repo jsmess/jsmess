@@ -316,7 +316,7 @@ READ8_HANDLER( super80v_low_r )
 WRITE8_HANDLER( super80v_low_w )
 {
 	super80_state *state = space->machine->driver_data<super80_state>();
-	
+
 	if (state->super80_shared & 4)
 		state->videoram[offset] = data;
 	else

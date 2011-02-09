@@ -92,9 +92,9 @@ static void sms_vdp_hcount_lphaser( running_machine *machine, int hpos )
 	sms_state *state = machine->driver_data<sms_state>();
 	int hpos_tmp = hpos + state->lphaser_x_offs;
 	UINT8 tmp = ((hpos_tmp - 46) >> 1) & 0xff;
-	
+
 	//printf ("sms_vdp_hcount_lphaser: hpos %3d hpos_tmp %3d => hcount %2X\n", hpos, hpos_tmp, tmp);
- 	sms_vdp_hcount_latch_w(state->vdp, 0, tmp);
+	sms_vdp_hcount_latch_w(state->vdp, 0, tmp);
 }
 
 
@@ -256,7 +256,7 @@ static void lphaser2_sensor_check( running_machine *machine )
 	sms_state *state = machine->driver_data<sms_state>();
 	const int x = screen_hpos_nonscaled(machine->first_screen(), input_port_read(machine, "LPHASER2"));
 	const int y = screen_vpos_nonscaled(machine->first_screen(), input_port_read(machine, "LPHASER3"));
-	
+
 	if (lgun_bright_aim_area(machine, state->lphaser_2_timer, x, y))
 	{
 		if (state->lphaser_2_latch == 0)
@@ -287,7 +287,7 @@ static TIMER_CALLBACK( lightgun_tick )
 		crosshair_set_screen(machine, 0, CROSSHAIR_SCREEN_NONE);
 		state->lphaser_1_timer->enable(0);
 	}
-	
+
 	if ((input_port_read_safe(machine, "CTRLSEL", 0x00) & 0xf0) == 0x10)
 	{
 		/* enable crosshair */
@@ -322,7 +322,7 @@ INPUT_CHANGED( lgun1_changed )
 	if (!state->lphaser_1_timer ||
 		(input_port_read_safe(field->port->machine, "CTRLSEL", 0x00) & 0x0f) != 0x01)
 		return;
-	
+
 	if (newval != oldval)
 		lphaser1_sensor_check(field->port->machine);
 }
@@ -333,7 +333,7 @@ INPUT_CHANGED( lgun2_changed )
 	if (!state->lphaser_2_timer ||
 		(input_port_read_safe(field->port->machine, "CTRLSEL", 0x00) & 0xf0) != 0x10)
 		return;
-	
+
 	if (newval != oldval)
 		lphaser2_sensor_check(field->port->machine);
 }
@@ -625,7 +625,7 @@ READ8_HANDLER( sms_input_port_1_r )
 			state->input_port1 &= ~0x40;
 			state->lphaser_1_latch = 0;
 		}
-			
+
 		if (state->ctrl_reg & 0x08 && state->lphaser_2_latch)
 		{
 			state->input_port1 &= ~0x80;
@@ -1718,7 +1718,7 @@ MACHINE_START( sms )
 	state->main_scr = machine->device("screen");
 	state->left_lcd = machine->device("left_lcd");
 	state->right_lcd = machine->device("right_lcd");
-	
+
 	/* Check if lightgun has been chosen as input: if so, enable crosshair */
 	machine->scheduler().timer_set(attotime::zero, FUNC(lightgun_tick));
 }
@@ -1945,7 +1945,7 @@ VIDEO_START( sms1 )
 	screen_device *screen = machine->first_screen();
 	int width = screen->width();
 	int height = screen->height();
-	
+
 	state->prevleft_bitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED32);
 	state->prevright_bitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED32);
 	state->save_item(NAME(*state->prevleft_bitmap));
@@ -1970,7 +1970,7 @@ VIDEO_UPDATE( sms1 )
 	// with SegaScope, sscope_state 1 = left screen ON, right screen OFF
 	if ((state->sscope_state & 0x01) && (screen == state->right_lcd))
 		occluded_view = 1;
-			
+
 	if (!occluded_view)
 	{
 		sms_vdp_update(state->vdp, bitmap, cliprect);
@@ -2010,7 +2010,7 @@ VIDEO_START( gamegear )
 	screen_device *screen = machine->first_screen();
 	int width = screen->width();
 	int height = screen->height();
-	
+
 	state->prev_bitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED32);
 	state->tmp_bitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED32);
 	state->save_item(NAME(*state->prev_bitmap));
@@ -2025,7 +2025,7 @@ VIDEO_UPDATE( gamegear )
 
 	sms_vdp_update(state->vdp, state->tmp_bitmap, cliprect);
 
-	// HACK: fake LCD persistence effect 
+	// HACK: fake LCD persistence effect
 	// (it would be better to generalize this in the core, to be used for all LCD systems)
 	for (y = 0; y < height; y++)
 	{

@@ -96,7 +96,7 @@ static CDP1864_INTERFACE( nano_cdp1864_intf )
 static VIDEO_UPDATE( nano )
 {
 	nano_state *state = screen->machine->driver_data<nano_state>();
-	
+
 	cdp1864_update(state->cdp1864, bitmap, cliprect);
 
 	return 0;

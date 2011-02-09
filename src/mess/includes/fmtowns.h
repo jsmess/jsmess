@@ -83,7 +83,7 @@ class towns_state : public driver_device
 	towns_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config),
 		  m_nvram(*this, "nvram") { }
-		  
+
 	UINT8 ftimer;
 	UINT8 nmi_mask;
 	UINT8 compat_mode;

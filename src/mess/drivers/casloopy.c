@@ -1,17 +1,17 @@
 /*****************************************************************************
 
-	Casio Loopy (c) 1995 Casio
+    Casio Loopy (c) 1995 Casio
 
-	skeleton driver
+    skeleton driver
 
-	TODO:
-	- Identify what actually is the NEC CDT-109 CPU, it should contain a program
-	  controller for the thermal printer device
+    TODO:
+    - Identify what actually is the NEC CDT-109 CPU, it should contain a program
+      controller for the thermal printer device
 
-	Note:
-	- just a placeholder for any HW discovery, until we decap/trojan the BIOS,
-	  the idea is to understand the HW enough to extract the SH-1 internal BIOS
-	  data via a trojan;
+    Note:
+    - just a placeholder for any HW discovery, until we decap/trojan the BIOS,
+      the idea is to understand the HW enough to extract the SH-1 internal BIOS
+      data via a trojan;
 
 ===============================================================================
 
@@ -167,7 +167,7 @@ static VIDEO_UPDATE( casloopy )
 
 static ADDRESS_MAP_START( casloopy_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x00000007) AM_RAM AM_BASE_MEMBER(casloopy_state, bios_rom)
-//	AM_RANGE(0x01000000, 0x017fffff) - i/o?
+//  AM_RANGE(0x01000000, 0x017fffff) - i/o?
 	AM_RANGE(0x06000000, 0x061fffff) AM_ROM AM_REGION("cart",0) // wrong?
 	AM_RANGE(0x07fff000, 0x07ffffff) AM_RAM
 ADDRESS_MAP_END
@@ -193,8 +193,8 @@ static MACHINE_CONFIG_START( casloopy, casloopy_state )
 	MCFG_CPU_ADD("maincpu",SH2,8000000)
 	MCFG_CPU_PROGRAM_MAP(casloopy_map)
 
-//	MCFG_CPU_ADD("subcpu",V60,8000000)
-//	MCFG_CPU_PROGRAM_MAP(casloopy_sub_map)
+//  MCFG_CPU_ADD("subcpu",V60,8000000)
+//  MCFG_CPU_PROGRAM_MAP(casloopy_sub_map)
 
 	MCFG_MACHINE_RESET(casloopy)
 

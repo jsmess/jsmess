@@ -8,7 +8,7 @@
 
     TODO:
 
-	- check compatibility with new MC6845
+    - check compatibility with new MC6845
 
 */
 

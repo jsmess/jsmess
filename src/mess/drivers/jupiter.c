@@ -18,7 +18,7 @@ Wave Mate Jupiter
 
 
 //**************************************************************************
-//	ADDRESS MAPS
+//  ADDRESS MAPS
 //**************************************************************************
 
 //-------------------------------------------------
@@ -27,23 +27,23 @@ Wave Mate Jupiter
 
 static ADDRESS_MAP_START( jupiter_m6800_mem, ADDRESS_SPACE_PROGRAM, 8, jupiter2_state )
 	AM_RANGE(0x0000, 0x7fff) AM_RAM
-//	AM_RANGE(0xc000, 0xcfff) Video RAM
+//  AM_RANGE(0xc000, 0xcfff) Video RAM
 	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION(MCM6571AP_TAG, 0)
-//	AM_RANGE(0xff58, 0xff5c) Cartridge Disk Controller PIA
-//	AM_RANGE(0xff60, 0xff76) DMA Controller
-//	AM_RANGE(0xff80, 0xff83) Floppy PIA
-//	AM_RANGE(0xff84, 0xff87) AM_DEVREADWRITE_LEGACY(INS1771N1_TAG, wd17xx_r, wd17xx_w)
-//	AM_RANGE(0xff90, 0xff93) Hytype Parallel Printer PIA
-//	AM_RANGE(0xffa0, 0xffa7) Persci Floppy Disk Controller
-//	AM_RANGE(0xffb0, 0xffb3) Video PIA
-//	AM_RANGE(0xffc0, 0xffc1) Serial Port 0 ACIA
-//	AM_RANGE(0xffc4, 0xffc5) Serial Port 1 ACIA
-//	AM_RANGE(0xffc8, 0xffc9) Serial Port 2 ACIA
-//	AM_RANGE(0xffcc, 0xffcd) Serial Port 3 ACIA
-//	AM_RANGE(0xffd0, 0xffd1) Serial Port 4 ACIA / Cassette
-//	AM_RANGE(0xffd4, 0xffd5) Serial Port 5 ACIA / EPROM Programmer (2704/2708)
-//	AM_RANGE(0xffd8, 0xffd9) Serial Port 6 ACIA / Hardware Breakpoint Registers
-//	AM_RANGE(0xffdc, 0xffdd) Serial Port 7 ACIA
+//  AM_RANGE(0xff58, 0xff5c) Cartridge Disk Controller PIA
+//  AM_RANGE(0xff60, 0xff76) DMA Controller
+//  AM_RANGE(0xff80, 0xff83) Floppy PIA
+//  AM_RANGE(0xff84, 0xff87) AM_DEVREADWRITE_LEGACY(INS1771N1_TAG, wd17xx_r, wd17xx_w)
+//  AM_RANGE(0xff90, 0xff93) Hytype Parallel Printer PIA
+//  AM_RANGE(0xffa0, 0xffa7) Persci Floppy Disk Controller
+//  AM_RANGE(0xffb0, 0xffb3) Video PIA
+//  AM_RANGE(0xffc0, 0xffc1) Serial Port 0 ACIA
+//  AM_RANGE(0xffc4, 0xffc5) Serial Port 1 ACIA
+//  AM_RANGE(0xffc8, 0xffc9) Serial Port 2 ACIA
+//  AM_RANGE(0xffcc, 0xffcd) Serial Port 3 ACIA
+//  AM_RANGE(0xffd0, 0xffd1) Serial Port 4 ACIA / Cassette
+//  AM_RANGE(0xffd4, 0xffd5) Serial Port 5 ACIA / EPROM Programmer (2704/2708)
+//  AM_RANGE(0xffd8, 0xffd9) Serial Port 6 ACIA / Hardware Breakpoint Registers
+//  AM_RANGE(0xffdc, 0xffdd) Serial Port 7 ACIA
 ADDRESS_MAP_END
 
 
@@ -74,7 +74,7 @@ ADDRESS_MAP_END
 
 
 //**************************************************************************
-//	INPUT PORTS
+//  INPUT PORTS
 //**************************************************************************
 
 //-------------------------------------------------
@@ -88,7 +88,7 @@ INPUT_PORTS_END
 
 
 //**************************************************************************
-//	DEVICE CONFIGURATION
+//  DEVICE CONFIGURATION
 //**************************************************************************
 
 //-------------------------------------------------
@@ -128,7 +128,7 @@ static GENERIC_TERMINAL_INTERFACE( terminal_intf )
 
 
 //**************************************************************************
-//	MACHINE INITIALIZATION
+//  MACHINE INITIALIZATION
 //**************************************************************************
 
 //-------------------------------------------------
@@ -151,7 +151,7 @@ void jupiter3_state::machine_start()
 
 
 //**************************************************************************
-//	MACHINE CONFIGURATION
+//  MACHINE CONFIGURATION
 //**************************************************************************
 
 //-------------------------------------------------
@@ -170,7 +170,7 @@ static MACHINE_CONFIG_START( jupiter, jupiter2_state )
 	// devices
 	MCFG_WD1771_ADD(INS1771N1_TAG, fdc_intf)
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
-	
+
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
@@ -193,7 +193,7 @@ static MACHINE_CONFIG_START( jupiter3, jupiter3_state )
 	// devices
 	MCFG_WD1771_ADD(INS1771N1_TAG, fdc_intf)
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
-	
+
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
@@ -202,7 +202,7 @@ MACHINE_CONFIG_END
 
 
 //**************************************************************************
-//	ROMS
+//  ROMS
 //**************************************************************************
 
 //-------------------------------------------------
@@ -234,7 +234,7 @@ ROM_END
 
 
 //**************************************************************************
-//	DRIVER INITIALIZATION
+//  DRIVER INITIALIZATION
 //**************************************************************************
 
 //-------------------------------------------------
@@ -281,9 +281,9 @@ static DRIVER_INIT( jupiter3 )
 }
 
 //**************************************************************************
-//	SYSTEM DRIVERS
+//  SYSTEM DRIVERS
 //**************************************************************************
 
 //    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS
-COMP( 1976, jupiter2,	0,		0, 	jupiter, 	jupiter, 	 jupiter,	"Wave Mate",   "Jupiter II",	GAME_NOT_WORKING | GAME_NO_SOUND_HW )
-COMP( 1976, jupiter3,	0,		0, 	jupiter3, 	jupiter, 	 jupiter3,	"Wave Mate",   "Jupiter III",	GAME_NOT_WORKING | GAME_NO_SOUND_HW )
+COMP( 1976, jupiter2,	0,		0,	jupiter,	jupiter,	 jupiter,	"Wave Mate",   "Jupiter II",	GAME_NOT_WORKING | GAME_NO_SOUND_HW )
+COMP( 1976, jupiter3,	0,		0,	jupiter3,	jupiter,	 jupiter3,	"Wave Mate",   "Jupiter III",	GAME_NOT_WORKING | GAME_NO_SOUND_HW )

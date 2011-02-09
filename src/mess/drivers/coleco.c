@@ -316,7 +316,7 @@ static MACHINE_CONFIG_START( coleco, coleco_state )
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","coleco")
-	
+
 	MCFG_TIMER_ADD_PERIODIC("paddle_timer", paddle_callback, attotime::from_msec(20))
 MACHINE_CONFIG_END
 
@@ -350,7 +350,7 @@ static MACHINE_CONFIG_START( czz50, coleco_state )
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","coleco")
-	
+
 	MCFG_TIMER_ADD_PERIODIC("paddle_timer", paddle_callback, attotime::from_msec(20))
 MACHINE_CONFIG_END
 

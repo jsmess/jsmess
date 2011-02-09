@@ -75,7 +75,7 @@ static WRITE8_HANDLER( pecom_cdp1869_pageram_w )
 
 WRITE8_HANDLER( pecom_bank_w )
 {
-//	pecom_state *state = space->machine->driver_data<pecom_state>();
+//  pecom_state *state = space->machine->driver_data<pecom_state>();
 	address_space *space2 = cputag_get_address_space(space->machine, CDP1802_TAG, ADDRESS_SPACE_PROGRAM);
 	UINT8 *rom = space->machine->region(CDP1802_TAG)->base();
 	memory_install_write_bank(cputag_get_address_space(space->machine, CDP1802_TAG, ADDRESS_SPACE_PROGRAM), 0x0000, 0x3fff, 0, 0, "bank1");
@@ -87,7 +87,7 @@ WRITE8_HANDLER( pecom_bank_w )
 		memory_install_write8_handler(space2, 0xf000, 0xf7ff, 0, 0, pecom_cdp1869_charram_w);
 		memory_install_read8_handler (space2, 0xf800, 0xffff, 0, 0, pecom_cdp1869_pageram_r);
 		memory_install_write8_handler(space2, 0xf800, 0xffff, 0, 0, pecom_cdp1869_pageram_w);
-	} 
+	}
 	else
 	{
 		memory_unmap_write(space2, 0xf000, 0xf7ff, 0, 0);
@@ -138,23 +138,23 @@ static READ_LINE_DEVICE_HANDLER( ef2_r )
 /*
 static COSMAC_EF_READ( pecom64_ef_r )
 {
-	int flags = 0x0f;
-	double valcas = cassette_input(cassette_device_image(device->machine));
-	UINT8 val = input_port_read(device->machine, "CNT");
+    int flags = 0x0f;
+    double valcas = cassette_input(cassette_device_image(device->machine));
+    UINT8 val = input_port_read(device->machine, "CNT");
 
-	if ((val & 0x04)==0x04 && pecom_prev_caps_state==0)
-	{
-		pecom_caps_state = (pecom_caps_state==4) ? 0 : 4; // Change CAPS state
-	}
-	pecom_prev_caps_state = val & 0x04;
-	if (valcas!=0.0)
-	{ // If there is any cassette signal
-		val = (val & 0x0D); // remove EF2 from SHIFT
-		flags -= EF2;
-		if ( valcas > 0.00) flags += EF2;
-	}
-	flags -= (val & 0x0b) + pecom_caps_state;
-	return flags;
+    if ((val & 0x04)==0x04 && pecom_prev_caps_state==0)
+    {
+        pecom_caps_state = (pecom_caps_state==4) ? 0 : 4; // Change CAPS state
+    }
+    pecom_prev_caps_state = val & 0x04;
+    if (valcas!=0.0)
+    { // If there is any cassette signal
+        val = (val & 0x0D); // remove EF2 from SHIFT
+        flags -= EF2;
+        if ( valcas > 0.00) flags += EF2;
+    }
+    flags -= (val & 0x0b) + pecom_caps_state;
+    return flags;
 }
 */
 static WRITE_LINE_DEVICE_HANDLER( pecom64_q_w )

@@ -90,7 +90,7 @@ static MACHINE_START(sc2)
 	sc2_state *state = machine->driver_data<sc2_state>();
 
 	state->beep = machine->device("beep");
-	
+
 	state->save_item(NAME(state->led_7seg_data));
 	state->save_item(NAME(state->kp_matrix));
 	state->save_item(NAME(state->led_selected));

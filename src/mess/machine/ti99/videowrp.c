@@ -263,10 +263,10 @@ static DEVICE_RESET( ti99_video )
 		TMS9928A_reset();
 	}
 	else
-	{		
+	{
 		running_machine *machine = device->machine;
 		int memsize = (input_port_read(machine, "V9938-MEM")==0)? 0x20000 : 0x30000;
-		
+
 		v9938_init(machine, 0, *machine->primary_screen, machine->generic.tmpbitmap,
 			MODEL_V9938, memsize, conf->callback);
 		v9938_reset(0);

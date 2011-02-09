@@ -114,5 +114,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT   COMPANY   FULLNAME       FLAGS */
-COMP( ????, mikrolab,  0,       0, 	mikrolab, 	mikrolab, 	 0,	 "<unknown>",   "Mikrolab KR580IK80",		GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( ????, mikrolab,  0,       0,	mikrolab,	mikrolab,	 0,	 "<unknown>",   "Mikrolab KR580IK80",		GAME_NOT_WORKING | GAME_NO_SOUND)
 

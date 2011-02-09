@@ -49,7 +49,7 @@ DECLARE_LEGACY_DEVICE(SCSIBUS, scsibus);
 #define CMD_BUF_SIZE    			32
 #define ADAPTEC_BUF_SIZE			1024
 
-#define DATA_BLOCK_SIZE				512				
+#define DATA_BLOCK_SIZE				512
 
 #define SCSI_CMD_TEST_READY			0x00
 #define SCSI_CMD_RECALIBRATE		0x01
@@ -131,12 +131,12 @@ typedef struct
 	// parameter list
 	UINT8		reserved1[3];
 	UINT8		length;
-	
+
 	// descriptor list
 	UINT8		density;
 	UINT8		reserved2[4];
 	UINT8		block_size[3];
-	
+
 	// drive parameter list
 	UINT8		format_code;
 	UINT8		cylinder_count[2];

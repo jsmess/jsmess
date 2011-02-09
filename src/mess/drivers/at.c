@@ -869,7 +869,7 @@ static MACHINE_CONFIG_DERIVED( at586, at386 )
 	MCFG_PCI_BUS_DEVICE(0, "i82439tx", i82439tx_pci_read, i82439tx_pci_write)
 	MCFG_PCI_BUS_DEVICE(1, "i82371ab", i82371ab_pci_read, i82371ab_pci_write)
 MACHINE_CONFIG_END
-		
+
 static MACHINE_CONFIG_DERIVED( c386sx16, at386 )
 
 	MCFG_CPU_REPLACE("maincpu", I386, 16000000)		/* 386SX */

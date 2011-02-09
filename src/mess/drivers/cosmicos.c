@@ -457,7 +457,7 @@ static READ_LINE_DEVICE_HANDLER( ef2_r )
 {
 	UINT8 special = input_port_read(device->machine, "SPECIAL");
 	int casin = cassette_input(device) < 0.0;
-	
+
 	output_set_led_value(LED_CASSETTE, casin);
 
 	return BIT(special, 1) | BIT(special, 3) | casin;

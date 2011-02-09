@@ -1,5 +1,5 @@
 /***************************************************************************
-   
+
         TIM-011
 
         04/09/2010 Skeleton driver.
@@ -21,14 +21,14 @@ public:
 
 static ADDRESS_MAP_START(tim011_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000, 0x01fff) AM_ROM 
+	AM_RANGE(0x00000, 0x01fff) AM_ROM
 	AM_RANGE(0x40000, 0x7ffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tim011_io , ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x7f) AM_NOP	/* Z180 internal registers */		
+	AM_RANGE(0x00, 0x7f) AM_NOP	/* Z180 internal registers */
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -36,8 +36,8 @@ INPUT_PORTS_START( tim011 )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET(tim011) 
-{	
+static MACHINE_RESET(tim011)
+{
 }
 
 static VIDEO_START( tim011 )
@@ -53,10 +53,10 @@ static MACHINE_CONFIG_START( tim011,tim011_state )
     /* basic machine hardware */
     MCFG_CPU_ADD("maincpu",Z180, XTAL_12_288MHz / 2)
     MCFG_CPU_PROGRAM_MAP(tim011_mem)
-    MCFG_CPU_IO_MAP(tim011_io)	
+    MCFG_CPU_IO_MAP(tim011_io)
 
     MCFG_MACHINE_RESET(tim011)
-	
+
     /* video hardware */
     MCFG_SCREEN_ADD("screen", RASTER)
     MCFG_SCREEN_REFRESH_RATE(50)
@@ -82,5 +82,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1987, tim011,  0,       0, 	tim011, 	tim011, 	 0,  "Mihajlo Pupin Institute",   "TIM-011",		GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1987, tim011,  0,       0,	tim011, 	tim011, 	 0,  "Mihajlo Pupin Institute",   "TIM-011",		GAME_NOT_WORKING | GAME_NO_SOUND)
 

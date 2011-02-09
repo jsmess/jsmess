@@ -1,6 +1,6 @@
 /*
 
-Super80.c written by Robbbert, 2005-2010. 
+Super80.c written by Robbbert, 2005-2010.
 
 2010-12-19: Added V3.7 bios freshly dumped today.
 

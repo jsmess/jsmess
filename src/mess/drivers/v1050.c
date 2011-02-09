@@ -374,18 +374,18 @@ WRITE8_MEMBER( v1050_state::p2_w )
 {
 	/*
 
-		bit     description
+        bit     description
 
-		P20
-		P21
-		P22
-		P23
-		P24
-		P25     led output
-		P26     speaker (NE555) output
-		P27     serial output
+        P20
+        P21
+        P22
+        P23
+        P24
+        P25     led output
+        P26     speaker (NE555) output
+        P27     serial output
 
-	*/
+    */
 
 	// led output
 	output_set_led_value(0, BIT(data, 5));
@@ -999,7 +999,7 @@ static const msm8251_interface kb_8251_intf =
 	DEVCB_DRIVER_LINE_MEMBER(v1050_state, kb_rxrdy_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_NULL	
+	DEVCB_NULL
 };
 
 /* Serial 8251A Interface */
@@ -1036,7 +1036,7 @@ static const msm8251_interface sio_8251_intf =
 	DEVCB_DRIVER_LINE_MEMBER(v1050_state, sio_rxrdy_w),
 	DEVCB_DRIVER_LINE_MEMBER(v1050_state, sio_txrdy_w),
 	DEVCB_NULL,
-	DEVCB_NULL	
+	DEVCB_NULL
 };
 
 /* MB8877 Interface */

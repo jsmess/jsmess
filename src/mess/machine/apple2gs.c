@@ -1531,7 +1531,7 @@ static UINT8 apple2gs_xxCxxx_r(running_machine *machine, offs_t address)
 			{
 				// accessing a slot mapped to internal, let's put back the internal ROM
 				state->a2_cnxx_slot = -1;
-			 	result = *apple2gs_getslotmem(machine, address);
+				result = *apple2gs_getslotmem(machine, address);
 			}
 			else
 			{
@@ -1565,7 +1565,7 @@ static UINT8 apple2gs_xxCxxx_r(running_machine *machine, offs_t address)
 
 			if (slotdevice)
 			{
-				result = apple2_c800_slot_r(slotdevice, address&0x7ff); 
+				result = apple2_c800_slot_r(slotdevice, address&0x7ff);
 			}
 			else
 			{
@@ -1835,13 +1835,13 @@ MACHINE_START( apple2gs )
 	state_save_register_item(machine, "CLKREG1", NULL,0, state->clock_reg1);
 	state_save_register_item(machine, "CLKCURTIME", NULL,0, state->clock_curtime);
 	state_save_register_item(machine, "CLKCURTIMEINT", NULL,0, state->clock_curtime_interval);
-//	state_save_register_item(machine, "CLKMODE", NULL,0, state->clock_mode);
+//  state_save_register_item(machine, "CLKMODE", NULL,0, state->clock_mode);
 	state->save_item(NAME(state->clock_bram));
 
 	state->save_item(NAME(state->adb_memory));
 	state->save_item(NAME(state->adb_command_bytes));
 	state->save_item(NAME(state->adb_response_bytes));
-//	state_save_register_item(machine, "ADB", NULL,0, state->adb_state);
+//  state_save_register_item(machine, "ADB", NULL,0, state->adb_state);
 	state_save_register_item(machine, "ADB", NULL,0, state->adb_command);
 	state_save_register_item(machine, "ADB", NULL,0, state->adb_mode);
 	state_save_register_item(machine, "ADB", NULL,0, state->adb_kmstatus);

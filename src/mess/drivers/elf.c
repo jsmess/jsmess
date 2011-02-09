@@ -166,7 +166,7 @@ static COSMAC_SC_WRITE( elf2_sc_w )
 		/* clear DMAIN */
 		cpu_set_input_line(device, COSMAC_INPUT_LINE_DMAIN, CLEAR_LINE);
 		break;
-	
+
 	default:
 		break;
 	}

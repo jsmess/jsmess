@@ -794,7 +794,7 @@ static MACHINE_CONFIG_START( psion_2lines, psion_state )
 	MCFG_NVRAM_HANDLER(psion)
 
 	MCFG_FRAGMENT_ADD( psion_slot )
-	
+
 	MCFG_TIMER_ADD_PERIODIC("nmi_timer", nmi_timer, attotime::from_seconds(1))
 MACHINE_CONFIG_END
 
@@ -840,7 +840,7 @@ static MACHINE_CONFIG_START( psion_4lines, psion_state )
 	MCFG_NVRAM_HANDLER(psion)
 
 	MCFG_FRAGMENT_ADD( psion_slot )
-	
+
 	MCFG_TIMER_ADD_PERIODIC("nmi_timer", nmi_timer, attotime::from_seconds(1))
 MACHINE_CONFIG_END
 

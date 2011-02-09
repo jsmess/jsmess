@@ -44,7 +44,7 @@ public:
 	required_device<device_t> m_ram;
 	required_device<device_t> m_floppy0;
 	required_device<device_t> m_floppy1;
-	
+
 	DECLARE_WRITE8_MEMBER( scroll_w );
 	//DECLARE_WRITE8_MEMBER( x120_system_w );
 	DECLARE_READ8_MEMBER( kbpio_pa_r );
@@ -84,7 +84,7 @@ public:
 	xerox820ii_state(running_machine &machine, const driver_device_config_base &config)
 		: xerox820_state(machine, config)
 	{ }
-	
+
 	virtual void machine_reset();
 
 	DECLARE_WRITE8_MEMBER( bell_w );

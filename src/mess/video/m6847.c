@@ -979,7 +979,7 @@ enum
  * VOL ("Output Low") = 1.0V; VR ("Reference"?) = 1.5V; VIH ("Input High") = 2.0V.
  *
  * Color composition:
- * 
+ *
  * COLOR       |  Y  | phiA | phiB
  * ------------+-----+------+------
  * GREEN       | VWM | VOL  | VOL
@@ -1008,7 +1008,7 @@ enum
  * R = Y' + 1.13983 x U
  * G = Y' - 0.39465 x U - 0.58060 x V
  * B = Y' + 2.03211 x V
- * 
+ *
  * So we get:
  * GREEN = Y'UV(153,-128,-128) = RGB(7,277,-107) --> #07ff00
  * YELLOW = Y'UV(255,-128,0) = RGB(255,305,-5) --> #ffff00

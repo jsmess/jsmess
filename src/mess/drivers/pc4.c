@@ -1,9 +1,9 @@
 /*
 
-	Laser pc4
+    Laser pc4
 
-	http://www.8bit-micro.com/laser.htm
-	http://www.euskalnet.net/ingepal/images/Vtech_Laser_PC4_1988.jpg
+    http://www.8bit-micro.com/laser.htm
+    http://www.euskalnet.net/ingepal/images/Vtech_Laser_PC4_1988.jpg
 
 */
 
@@ -49,7 +49,7 @@ static MACHINE_CONFIG_START( pc4, pc4_state )
     MCFG_CPU_ADD("maincpu", Z80, XTAL_4MHz)
     MCFG_CPU_PROGRAM_MAP(pc4_mem)
     MCFG_CPU_IO_MAP(pc4_io)
-	
+
 	MCFG_MACHINE_START(pc4)
 
     /* video hardware */

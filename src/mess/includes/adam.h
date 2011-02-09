@@ -51,7 +51,7 @@ public:
 
 	void bankswitch();
 	void adamnet_txd_w(int device, int state);
-	
+
 	DECLARE_WRITE_LINE_MEMBER( os3_w );
 
 	DECLARE_READ8_MEMBER( adamnet_r );
@@ -62,7 +62,7 @@ public:
 	DECLARE_WRITE8_MEMBER( joystick_w );
 	DECLARE_READ8_MEMBER( input1_r );
 	DECLARE_READ8_MEMBER( input2_r );
-	
+
 	DECLARE_WRITE8_MEMBER( master6801_p1_w );
 	DECLARE_READ8_MEMBER( master6801_p2_r );
 	DECLARE_WRITE8_MEMBER( master6801_p2_w );
@@ -82,7 +82,7 @@ public:
 	DECLARE_READ8_MEMBER( ddp6801_p2_r );
 	DECLARE_WRITE8_MEMBER( ddp6801_p2_w );
 	DECLARE_READ8_MEMBER( ddp6801_p4_r );
-	
+
 	DECLARE_WRITE8_MEMBER( printer6801_p1_w );
 	DECLARE_READ8_MEMBER( printer6801_p2_r );
 	DECLARE_WRITE8_MEMBER( printer6801_p2_w );
@@ -95,7 +95,7 @@ public:
 	DECLARE_READ8_MEMBER( fdc6801_p2_r );
 	DECLARE_WRITE8_MEMBER( fdc6801_p2_w );
 	DECLARE_WRITE8_MEMBER( fdc6801_p4_w );
-	
+
 	// memory state
 	UINT8 m_mioc;
 	int m_game;
@@ -123,7 +123,7 @@ public:
 
 	// video state
 	int m_vdp_nmi;
-	
+
 	// cassette state
 	int m_wr0;
 	int m_wr1;

@@ -1,5 +1,5 @@
 /***************************************************************************
-   
+
         PHUNSY (Philipse Universal System)
 
         04/11/2010 Skeleton driver.
@@ -177,7 +177,7 @@ static DRIVER_INIT( phunsy )
 }
 
 
-static MACHINE_RESET(phunsy) 
+static MACHINE_RESET(phunsy)
 {
 	phunsy_state *state = machine->driver_data<phunsy_state>();
 
@@ -278,18 +278,18 @@ static MACHINE_CONFIG_START( phunsy, phunsy_state )
     /* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",S2650, XTAL_1MHz)
 	MCFG_CPU_PROGRAM_MAP(phunsy_mem)
-	MCFG_CPU_IO_MAP(phunsy_io)	
+	MCFG_CPU_IO_MAP(phunsy_io)
 
 	MCFG_MACHINE_RESET(phunsy)
-	
+
     /* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	/* Display (page 12 of pdf)
-	   - 8Mhz clock
-	   - 64 6 pixel characters on a line.
-	   - 16us not active, 48us active: ( 64 * 6 ) * 60 / 48 => 480 pixels wide
-	   - 313 line display of which 256 are displayed.
-	*/
+       - 8Mhz clock
+       - 64 6 pixel characters on a line.
+       - 16us not active, 48us active: ( 64 * 6 ) * 60 / 48 => 480 pixels wide
+       - 313 line display of which 256 are displayed.
+    */
 	MCFG_SCREEN_RAW_PARAMS(XTAL_8MHz, 480, 0, 64*6, 313, 0, 256)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_PALETTE_LENGTH(8)
@@ -319,5 +319,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1980, phunsy,  0,       0, 	phunsy, 	phunsy, 	 phunsy,  	   	 "J.F.P. Philipse",   "PHUNSY",		GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1980, phunsy,  0,       0,	phunsy, 	phunsy, 	 phunsy,		 "J.F.P. Philipse",   "PHUNSY",		GAME_NOT_WORKING | GAME_NO_SOUND)
 

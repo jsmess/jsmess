@@ -217,7 +217,7 @@ void mb89352_device::mb89352_rescan()
 	for (i = 0; i < m_config.scsidevs->devs_present; i++)
 	{
 		// if a device wasn't already allocated
-//		if (!m_SCSIdevices[m_config.scsidevs->devices[i].scsiID])
+//      if (!m_SCSIdevices[m_config.scsidevs->devices[i].scsiID])
 		{
 			SCSIDeleteInstance( m_SCSIdevices[m_config.scsidevs->devices[i].scsiID] );
 			SCSIAllocInstance( machine,
@@ -257,36 +257,36 @@ void mb89352_device::set_phase(int phase)
 		m_line_status &= ~MB89352_LINE_IO;
 		break;
 	case SCSI_PHASE_STATUS:
-//		m_line_status |= MB89352_LINE_REQ;
-//		m_line_status &= ~MB89352_LINE_ACK;
+//      m_line_status |= MB89352_LINE_REQ;
+//      m_line_status &= ~MB89352_LINE_ACK;
 		m_line_status &= ~MB89352_LINE_MSG;
 		m_line_status |= MB89352_LINE_CD;
 		m_line_status |= MB89352_LINE_IO;
 		break;
 	case SCSI_PHASE_DATAIN:
-//		m_line_status |= MB89352_LINE_REQ;
-//		m_line_status &= ~MB89352_LINE_ACK;
+//      m_line_status |= MB89352_LINE_REQ;
+//      m_line_status &= ~MB89352_LINE_ACK;
 		m_line_status &= ~MB89352_LINE_MSG;
 		m_line_status &= ~MB89352_LINE_CD;
 		m_line_status |= MB89352_LINE_IO;
 		break;
 	case SCSI_PHASE_DATAOUT:
-//		m_line_status |= MB89352_LINE_REQ;
-//		m_line_status &= ~MB89352_LINE_ACK;
+//      m_line_status |= MB89352_LINE_REQ;
+//      m_line_status &= ~MB89352_LINE_ACK;
 		m_line_status &= ~MB89352_LINE_MSG;
 		m_line_status &= ~MB89352_LINE_CD;
 		m_line_status &= ~MB89352_LINE_IO;
 		break;
 	case SCSI_PHASE_MESSAGE_IN:
-//		m_line_status |= MB89352_LINE_REQ;
-//		m_line_status &= ~MB89352_LINE_ACK;
+//      m_line_status |= MB89352_LINE_REQ;
+//      m_line_status &= ~MB89352_LINE_ACK;
 		m_line_status |= MB89352_LINE_MSG;
 		m_line_status |= MB89352_LINE_CD;
 		m_line_status |= MB89352_LINE_IO;
 		break;
 	case SCSI_PHASE_MESSAGE_OUT:
-//		m_line_status |= MB89352_LINE_REQ;
-//		m_line_status &= ~MB89352_LINE_ACK;
+//      m_line_status |= MB89352_LINE_REQ;
+//      m_line_status &= ~MB89352_LINE_ACK;
 		m_line_status |= MB89352_LINE_MSG;
 		m_line_status |= MB89352_LINE_CD;
 		m_line_status &= ~MB89352_LINE_IO;

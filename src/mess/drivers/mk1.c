@@ -201,7 +201,7 @@ static MACHINE_CONFIG_START( mk1, mk1_state )
 
     /* video hardware */
 	MCFG_DEFAULT_LAYOUT( layout_mk1 )
-	
+
 	MCFG_TIMER_ADD_PERIODIC("led_timer", mk1_update_leds, attotime::from_hz(30))
 MACHINE_CONFIG_END
 

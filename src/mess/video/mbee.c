@@ -284,7 +284,7 @@ READ8_HANDLER ( m6545_data_r )
 		break;
 	case 31:
 		/* This firstly pushes the contents of the transparent registers onto the MA lines,
-		then increments the address, then sets update strobe on. */
+        then increments the address, then sets update strobe on. */
 		addr = (state->sy6545_reg[18] << 8) | state->sy6545_reg[19];
 		keyboard_matrix_r(space->machine, addr);
 		state->sy6545_reg[19]++;
@@ -317,7 +317,7 @@ WRITE8_HANDLER ( m6545_data_w )
 		break;
 	case 31:
 		/* This firstly pushes the contents of the transparent registers onto the MA lines,
-		then increments the address, then sets update strobe on. */
+        then increments the address, then sets update strobe on. */
 		addr = (state->sy6545_reg[18] << 8) | state->sy6545_reg[19];
 		keyboard_matrix_r(space->machine, addr);
 		state->sy6545_reg[19]++;

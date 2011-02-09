@@ -75,7 +75,7 @@ static TIMER_CALLBACK( bit_timer_tick )
 	microdrive_t *mdv = get_safe_token(device);
 
 	mdv->bit_offset++;
-	
+
 	if (mdv->bit_offset == 8)
 	{
 		mdv->bit_offset = 0;
@@ -101,7 +101,7 @@ WRITE_LINE_DEVICE_HANDLER( microdrive_clk_w )
 		if (LOG) logerror("Microdrive '%s' COMMS OUT: %u\n", device->tag(), mdv->comms_out);
 
 		devcb_call_write_line(&mdv->out_comms_out_func, mdv->comms_out);
-		
+
 		mdv->bit_timer->enable(mdv->comms_out);
 	}
 

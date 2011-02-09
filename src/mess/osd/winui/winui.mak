@@ -21,7 +21,7 @@ RESFILE = $(MESS_WINUIOBJ)/messui.res
 
 CFLAGS += \
 	-I$(MESSSRC)/osd/winui
-	
+
 OBJDIRS += \
 	$(MESSOBJ)/osd \
 	$(MESSOBJ)/osd/winui
@@ -34,7 +34,7 @@ $(MESS_WINUIOBJ)/messui.res:	$(WINUISRC)/mameui.rc $(MESS_WINUISRC)/messui.rc $(
 $(WINUIOBJ)/mamevers.rc: $(OBJ)/build/verinfo$(EXE) $(SRC)/version.c
 	@echo Emitting $@...
 	@"$(VERINFO)" -b mess $(SRC)/version.c  > $@
-	
+
 $(LIBOSD): $(OSDOBJS)
 
 $(LIBOCORE): $(OSDCOREOBJS)

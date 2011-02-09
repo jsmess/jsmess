@@ -4,14 +4,14 @@
 
         12/05/2009 Skeleton driver.
 
-	STATUS:
-	- It runs, keyboard works, you can enter data
+    STATUS:
+    - It runs, keyboard works, you can enter data
 
-	TODO:
-	- Proper artwork
-	- Fix interrupts
-	- Seems to crash when GO pressed (needs a subject-matter expert to test)
-	- Add load/dump facility (cassette port)
+    TODO:
+    - Proper artwork
+    - Fix interrupts
+    - Seems to crash when GO pressed (needs a subject-matter expert to test)
+    - Add load/dump facility (cassette port)
 
 ****************************************************************************/
 
@@ -200,7 +200,7 @@ But, all of this can only occur if bit 5 of port F0 is low. */
 		drvstate->ff_b=1;
 	}
 
-		
+
         // operate the RUN LED
 	output_set_value("run_led", (data & I8085_STATUS_M1) ? 0 : 1);
 }

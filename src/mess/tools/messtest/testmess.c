@@ -307,28 +307,28 @@ public:
 	// construction/destruction
 	test_osd_interface();
 	virtual ~test_osd_interface();
-	
+
 	// general overridables
 	virtual void init(running_machine &machine);
 	virtual void update(bool skip_redraw);
 
 	// debugger overridables
-//	virtual void init_debugger();
+//  virtual void init_debugger();
 	virtual void wait_for_debugger(device_t &device, bool firststop);
-	
+
 	// audio overridables
 	virtual void update_audio_stream(const INT16 *buffer, int samples_this_frame);
 	virtual void set_mastervolume(int attenuation);
 
 	// input overridables
 	virtual void customize_input_type_list(input_type_desc *typelist);
-	
+
 	// font overridables
 	virtual osd_font font_open(const char *name, int &height);
 	virtual void font_close(osd_font font);
 	virtual bitmap_t *font_get_bitmap(osd_font font, unicode_char chnum, INT32 &width, INT32 &xoffs, INT32 &yoffs);
 };
-	
+
 test_osd_interface::test_osd_interface()
 {
 }
@@ -417,7 +417,7 @@ static messtest_result_t run_test(int flags, messtest_results *results)
 	options_set_bool(opts, OPTION_DEBUG, FALSE, OPTION_PRIORITY_CMDLINE);
 	options_set_bool(opts, OPTION_DEBUG_INTERNAL, FALSE, OPTION_PRIORITY_CMDLINE);
 	options_set_bool(opts, OPTION_WRITECONFIG, FALSE, OPTION_PRIORITY_CMDLINE);
-	
+
 	if (current_testcase.ram != 0)
 	{
 		options_set_int(opts, OPTION_RAMSIZE, current_testcase.ram, OPTION_PRIORITY_CMDLINE);
@@ -930,7 +930,7 @@ static void command_verify_memory(running_machine *machine)
 		report_message(MSG_FAILURE, "Invalid verify offset range (0x%x-0x%x)", offset_start, offset_end);
 		return;
 	}
-	
+
 	if (region) {
 		if (offset_end >= target_data_size)
 		{
@@ -959,7 +959,7 @@ static void command_verify_memory(running_machine *machine)
 			}
 		} else {
 			address_space *space = cputag_get_address_space(machine, cpu_name, ADDRESS_SPACE_PROGRAM);
-			
+
 			if (verify_data[i] != space->read_byte(offset))
 			{
 				state = STATE_ABORTED;

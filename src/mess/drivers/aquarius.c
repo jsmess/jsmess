@@ -439,7 +439,7 @@ static MACHINE_CONFIG_START( aquarius, aquarius_state )
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("4K")
 	MCFG_RAM_EXTRA_OPTIONS("8K,20K,36K")
-	
+
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","aquarius")
 MACHINE_CONFIG_END

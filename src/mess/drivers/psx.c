@@ -430,7 +430,7 @@ DIRECT_UPDATE_HANDLER( psx_setopbase )
 		device_t *cpu = machine->device("maincpu");
 
 		cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(psx_default, *machine));
-		
+
 		if( load_psxexe( cpu, state->exe_buffer, state->exe_size ) ||
 			load_cpe( cpu, state->exe_buffer, state->exe_size ) ||
 			load_psf( cpu, state->exe_buffer, state->exe_size ) )

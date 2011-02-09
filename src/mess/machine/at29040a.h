@@ -1,8 +1,8 @@
 /*
-	ATMEL 29040a
-	
-	Rewritten as device
-	Michael Zapf, September 2010
+    ATMEL 29040a
+
+    Rewritten as device
+    Michael Zapf, September 2010
 */
 
 /* device interface */

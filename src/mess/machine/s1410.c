@@ -21,29 +21,29 @@ ASSY 104527 REV E04 SN 127623
 |CN1                                        |
 |                                           |
 |                                           |
-|CN2			    						|
+|CN2                                        |
 |                   XEBEC2               CN5|
-|	PROM						2114		|
+|   PROM                        2114        |
 |CN3                XEBEC1      2114        |
-|											|
-|CN4				Z80			ROM         |
+|                                           |
+|CN4                Z80         ROM         |
 |   20MHz                             16MHz |
 |-------------------------------------------|
 
 Notes:
     Relevant IC's shown.
 
-    Z80		- Zilog Z8400APS Z80A CPU
-	ROM		- 2732 pinout ROM "XEBEC 104521G 2155008 M460949"
-	PROM	- National Semiconductor DM74S288N "103911" 32x8 TTL PROM
-	2114	- National Semiconductor NMC2148HN-3 1Kx4 RAM
-	XEBEC1	- Xebec 3198-0009
-	XEBEC2	- Xebec 3198-0045 "T20"
-	CN1		- 4-pin Molex, drive power
-	CN2		- 34-pin PCB edge, ST-506 drive 0/1 control
-	CN3		- 2x10 PCB header, ST-506 drive 0 data
-	CN4		- 2x10 PCB header, ST-506 drive 1 data
-	CN5		- 2x25 PCB header, SASI host interface
+    Z80     - Zilog Z8400APS Z80A CPU
+    ROM     - 2732 pinout ROM "XEBEC 104521G 2155008 M460949"
+    PROM    - National Semiconductor DM74S288N "103911" 32x8 TTL PROM
+    2114    - National Semiconductor NMC2148HN-3 1Kx4 RAM
+    XEBEC1  - Xebec 3198-0009
+    XEBEC2  - Xebec 3198-0045 "T20"
+    CN1     - 4-pin Molex, drive power
+    CN2     - 34-pin PCB edge, ST-506 drive 0/1 control
+    CN3     - 2x10 PCB header, ST-506 drive 0 data
+    CN4     - 2x10 PCB header, ST-506 drive 1 data
+    CN5     - 2x25 PCB header, SASI host interface
 
 */
 
@@ -57,7 +57,7 @@ Notes:
 
 
 //**************************************************************************
-//	MACROS / CONSTANTS
+//  MACROS / CONSTANTS
 //**************************************************************************
 
 #define Z8400A_TAG			"z80"
@@ -135,7 +135,7 @@ static ADDRESS_MAP_START( s1410_io, ADDRESS_SPACE_IO, 8, s1410_device )
 	AM_RANGE(0x69, 0x69) AM_WRITENOP
 	AM_RANGE(0x6a, 0x6a) AM_WRITENOP
 	AM_RANGE(0x6b, 0x6b) AM_WRITENOP
-	AM_RANGE(0x6c, 0x6c) AM_WRITENOP 
+	AM_RANGE(0x6c, 0x6c) AM_WRITENOP
 	AM_RANGE(0xa0, 0xa0) AM_NOP
 	AM_RANGE(0xc1, 0xc1) AM_WRITENOP
 	AM_RANGE(0xc2, 0xc2) AM_WRITENOP
@@ -155,7 +155,7 @@ MACHINE_CONFIG_END
 
 //-------------------------------------------------
 //  machine_config_additions - device-specific
-//	machine configurations
+//  machine configurations
 //-------------------------------------------------
 
 machine_config_constructor s1410_device_config::machine_config_additions() const

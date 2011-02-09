@@ -1,6 +1,6 @@
 /*
 
-    M-Systems DiskOnChip G3 - Flash Disk with MLC NAND and M-Systems’ x2 Technology
+    M-Systems DiskOnChip G3 - Flash Disk with MLC NAND and M-Systems? x2 Technology
 
     (c) 2009 Tim Schuerewegen
 

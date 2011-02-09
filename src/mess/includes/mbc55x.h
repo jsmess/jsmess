@@ -69,13 +69,13 @@ public:
 	mbc55x_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	device_t 	*maincpu;
-	device_t 	*pic8259;
-	device_t 	*pit8253;
+	device_t	*maincpu;
+	device_t	*pic8259;
+	device_t	*pit8253;
 
-	UINT32 		debug_machine;
+	UINT32		debug_machine;
 	UINT32		debug_video;
-	UINT8 		video_mem[VIDEO_MEM_SIZE];
+	UINT8		video_mem[VIDEO_MEM_SIZE];
 	UINT8		vram_page;
 
 	keyboard_t	keyboard;
@@ -114,7 +114,7 @@ WRITE8_HANDLER(mbc55x_video_io_w);
 
 #define MSM8251A_KB_TAG			"msm8251a_kb"
 
-typedef struct 
+typedef struct
 {
 } msm_rx_t;
 

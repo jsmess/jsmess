@@ -981,10 +981,10 @@ static MACHINE_CONFIG_START( avigo, avigo_state )
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("128K")
-	
+
 	/* a timer used to check status of pen */
 	/* an interrupt is generated when the pen is pressed to the screen */
-	MCFG_TIMER_ADD_PERIODIC("avigo_timer", avigo_dummy_timer_callback, attotime::from_hz(50))	
+	MCFG_TIMER_ADD_PERIODIC("avigo_timer", avigo_dummy_timer_callback, attotime::from_hz(50))
 MACHINE_CONFIG_END
 
 

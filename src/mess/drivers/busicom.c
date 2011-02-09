@@ -237,8 +237,8 @@ static MACHINE_CONFIG_START( busicom, busicom_state )
 
 	MCFG_VIDEO_START(busicom)
 	MCFG_VIDEO_UPDATE(busicom)
-	
-	MCFG_TIMER_ADD_PERIODIC("busicom_timer", timer_callback, attotime::from_msec(28*2))	
+
+	MCFG_TIMER_ADD_PERIODIC("busicom_timer", timer_callback, attotime::from_msec(28*2))
 MACHINE_CONFIG_END
 
 /* ROM definition */

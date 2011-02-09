@@ -509,7 +509,7 @@ static COSMAC_SC_WRITE( vip_sc_w )
 	case SOUND_VP550:
 		vp550_sc1_w(device, BIT(sc, 1)); // device = CPU since the handler calls cpu_set_input_line on it!
 		break;
-	
+
 	case SOUND_VP551:
 		vp550_sc1_w(device, BIT(sc, 1)); // device = CPU since the handler calls cpu_set_input_line on it!
 		break;
@@ -648,7 +648,7 @@ void vip_state::machine_reset()
 
 	case VIDEO_CDP1862:
 		memory_install_write8_device_handler(io, m_cgc, 0x05, 0x05, 0, 0, cdp1862_bkg_w);
-//		memory_install_write8_handler(program, 0xc000, 0xdfff, 0, 0, vip_colorram_w);
+//      memory_install_write8_handler(program, 0xc000, 0xdfff, 0, 0, vip_colorram_w);
 		break;
 	}
 

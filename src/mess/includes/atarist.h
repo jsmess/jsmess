@@ -78,7 +78,7 @@ public:
 	required_device<device_t> m_centronics;
 	required_device<device_t> m_rs232;
 	required_device<device_t> m_ram;
-	
+
 	void machine_start();
 
 	void video_start();
@@ -94,7 +94,7 @@ public:
 	DECLARE_WRITE8_MEMBER( shifter_sync_w );
 	DECLARE_WRITE16_MEMBER( shifter_palette_w );
 	DECLARE_WRITE8_MEMBER( shifter_mode_w );
-	
+
 	DECLARE_READ16_MEMBER( blitter_halftone_r );
 	DECLARE_READ16_MEMBER( blitter_src_inc_x_r );
 	DECLARE_READ16_MEMBER( blitter_src_inc_y_r );
@@ -163,7 +163,7 @@ public:
 	DECLARE_READ8_MEMBER( mfp_gpio_r );
 	DECLARE_WRITE_LINE_MEMBER( mfp_tdo_w );
 	DECLARE_WRITE_LINE_MEMBER( mfp_so_w );
-	
+
 	void toggle_dma_fifo();
 	void flush_dma_fifo();
 	void fill_dma_fifo();
@@ -243,7 +243,7 @@ public:
 	UINT8 m_blitter_ctrl;
 	UINT8 m_blitter_skew;
 	UINT32 m_blitter_srcbuf;
-	
+
 	/* timers */
 	emu_timer *m_mouse_timer;
 	emu_timer *m_glue_timer;

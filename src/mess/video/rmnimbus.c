@@ -526,7 +526,7 @@ static void write_reg_014(rmnimbus_state *state)
 static void write_reg_016(rmnimbus_state *state)
 {
 	state->vidregs[reg002]=state->vidregs[reg016];
-	
+
     write_pixel_data(state, state->vidregs[reg002],state->vidregs[reg00C]++,FG_COLOUR);
 }
 

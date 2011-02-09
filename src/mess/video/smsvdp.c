@@ -1351,9 +1351,9 @@ int sms_vdp_check_brightness(device_t *device, int x, int y)
 	/* a shot at right border (HC~=0x90) really appear at active scr, near to left border? */
 	if (x < LBORDER_START + LBORDER_X_PIXELS || x >= LBORDER_START + LBORDER_X_PIXELS + 256)
 		return 0;
-	
+
 	smsvdp_t *smsvdp = get_safe_token(device);
-	rgb_t color = *BITMAP_ADDR32(smsvdp->tmpbitmap, y, x); 
+	rgb_t color = *BITMAP_ADDR32(smsvdp->tmpbitmap, y, x);
 
 	/* reference: http://www.w3.org/TR/AERT#color-contrast */
 	UINT8 brightness = (RGB_RED(color) * 0.299) + (RGB_GREEN(color) * 0.587) + (RGB_BLUE(color) * 0.114);

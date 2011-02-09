@@ -30,7 +30,7 @@ static READ8_HANDLER( k8915_52_r )
 {
 // get data from ascii keyboard
 	k8915_state *state = space->machine->driver_data<k8915_state>();
-	state->k8915_53 = 0;	
+	state->k8915_53 = 0;
 	return state->term_data;
 }
 

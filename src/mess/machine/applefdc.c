@@ -66,9 +66,9 @@ typedef enum
 } applefdc_t;
 
 
-static UINT8 swim_default_parms[16] = 
+static UINT8 swim_default_parms[16] =
 {
-	0x38, 0x18, 0x41, 0x2e, 0x2e, 0x18, 0x18, 0x1b, 
+	0x38, 0x18, 0x41, 0x2e, 0x2e, 0x18, 0x18, 0x1b,
 	0x1b, 0x2f, 0x2f, 0x19, 0x19, 0x97, 0x1b, 0x57
 };
 
@@ -331,7 +331,7 @@ static void iwm_modereg_w(device_t *device, UINT8 data)
 					fdc->swim_magic_state = 0;
 				}
 				break;
-			case 1: 
+			case 1:
 				if (!(data & 0x40))
 				{
 					fdc->swim_magic_state++;
@@ -346,7 +346,7 @@ static void iwm_modereg_w(device_t *device, UINT8 data)
 		if (fdc->swim_magic_state == 4)
 		{
 			fdc->swim_magic_state = 0;
-//			printf("IWM: switching to SWIM mode\n");
+//          printf("IWM: switching to SWIM mode\n");
 			fdc->swim_mode = SWIM_MODE_SWIM;
 		}
 	}
@@ -378,10 +378,10 @@ static UINT8 applefdc_read_reg(device_t *device, int lines)
 			else
 			{
 				/*
-		                 * Right now, this function assumes latch mode; which is always used for
-		                 * 3.5 inch drives.  Eventually we should check to see if latch mode is
-		                 * off
-		                 */
+                         * Right now, this function assumes latch mode; which is always used for
+                         * 3.5 inch drives.  Eventually we should check to see if latch mode is
+                         * off
+                         */
 				if (LOG_APPLEFDC)
 				{
 					if ((fdc->mode & IWM_MODE_LATCHMODE) == 0x00)
@@ -431,10 +431,10 @@ static void applefdc_write_reg(device_t *device, UINT8 data)
 			else if (!iwm_enable2(device))
 			{
 				/*
-		                 * Right now, this function assumes latch mode; which is always used for
-		                 * 3.5 inch drives.  Eventually we should check to see if latch mode is
-		                 * off
-		                 */
+                         * Right now, this function assumes latch mode; which is always used for
+                         * 3.5 inch drives.  Eventually we should check to see if latch mode is
+                         * off
+                         */
 				if (LOG_APPLEFDC)
 				{
 					if ((fdc->mode & IWM_MODE_LATCHMODE) == 0)

@@ -72,9 +72,9 @@ static VIDEO_UPDATE( mes )
 				{
 					chr = state->videoram[xx++];
 
-				//	/* Take care of flashing characters */
-				//	if ((chr < 0x80) && (framecnt & 0x08))
-				//		chr |= 0x80;
+				//  /* Take care of flashing characters */
+				//  if ((chr < 0x80) && (framecnt & 0x08))
+				//      chr |= 0x80;
 
 					if (chr & 0x80)  // ignore attribute bytes
 						x--;

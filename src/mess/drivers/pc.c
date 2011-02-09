@@ -2184,7 +2184,7 @@ static MACHINE_CONFIG_START( ppc512, pc_state )
 	MCFG_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
 
 	MCFG_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_config)
-	
+
 	MCFG_MC146818_ADD( "rtc", MC146818_IGNORE_CENTURY )
 
 	/* internal ram */
@@ -3476,7 +3476,7 @@ ROM_END
 
 ROM_START( mc1502 )
 	ROM_REGION16_LE(0x100000,"maincpu", 0)
-    ROM_LOAD( "basic.rom", 		  0xe8000, 0x8000, CRC(173d69fa) SHA1(003f872e12f00800e22ab6bbc009d36bfde67b9d))
+    ROM_LOAD( "basic.rom",		  0xe8000, 0x8000, CRC(173d69fa) SHA1(003f872e12f00800e22ab6bbc009d36bfde67b9d))
 	ROM_SYSTEM_BIOS(0, "v50", "v5.0")
 	ROMX_LOAD( "monitor_5_0.rom",  0xfc000, 0x4000, CRC(9e97c6a0) SHA1(16a304e8de69ec4d8b92acda6bf28454c361a24f),ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(1, "v52", "v5.2")

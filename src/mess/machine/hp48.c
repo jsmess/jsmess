@@ -1159,10 +1159,10 @@ static void hp48_machine_start( running_machine *machine, hp48_models model )
 
 	/* internal RAM */
 	ram_size = HP48_GX_MODEL ? (128 * 1024) : (32 * 1024);
-		
+
 	ram = auto_alloc_array(machine, UINT8, 2 * ram_size);
-	machine->device<nvram_device>("nvram")->set_base(ram, 2 * ram_size);	
-	
+	machine->device<nvram_device>("nvram")->set_base(ram, 2 * ram_size);
+
 
 	/* ROM load */
 	rom_size = HP48_S_SERIES ? (256 * 1024) : (512 * 1024);

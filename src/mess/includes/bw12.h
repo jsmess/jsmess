@@ -45,7 +45,7 @@ public:
 	required_device<device_t> m_floppy0;
 	required_device<device_t> m_floppy1;
 	required_device<timer_device> m_floppy_timer;
-	
+
 	virtual void machine_start();
 	virtual void machine_reset();
 

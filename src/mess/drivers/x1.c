@@ -7,7 +7,7 @@
     TODO:
     - Rewrite keyboard input hook-up and decap/dump the keyboard MCU if possible;
     - x1turbo keyboard inputs are currently broken;
-	- Implement proper PCG index hooks by beam positions;
+    - Implement proper PCG index hooks by beam positions;
     - Hook-up remaining .tap image formats;
     - Implement .rom format support (needs an image for it);
     - Implement tape commands;
@@ -31,7 +31,7 @@
     - Ys 2: crashes after the disclaimer screen;
     - Ys 3: missing user disk, to hack it (and play with x1turboz features):
       bp 81ca,pc += 2
-	- Ys 3: never uploads a valid 4096 palette, probably related to the fact that we don't have an user disk
+    - Ys 3: never uploads a valid 4096 palette, probably related to the fact that we don't have an user disk
     - Thexder: (x1turbo) Can't start a play, keyboard related issue?
     - V.I.P.: can't get inputs to work at all there;
 
@@ -505,16 +505,16 @@ static UINT8 check_keyboard_shift(running_machine *machine)
 {
 	UINT8 val = 0xe0;
 	/*
-	all of those are active low
-	x--- ---- TEN: Numpad, Function key, special input key
-	-x-- ---- KIN: Valid key
-	--x- ---- REP: Key repeat
-	---x ---- GRAPH key ON
-	---- x--- CAPS lock ON
-	---- -x-- KANA lock ON
-	---- --x- SHIFT ON
-	---- ---x CTRL ON
-	*/
+    all of those are active low
+    x--- ---- TEN: Numpad, Function key, special input key
+    -x-- ---- KIN: Valid key
+    --x- ---- REP: Key repeat
+    ---x ---- GRAPH key ON
+    ---- x--- CAPS lock ON
+    ---- -x-- KANA lock ON
+    ---- --x- SHIFT ON
+    ---- ---x CTRL ON
+    */
 
 	val |= input_port_read(machine,"key_modifiers") & 0x1f;
 
@@ -703,11 +703,11 @@ static WRITE8_HANDLER( sub_io_w )
 {
 	x1_state *state = space->machine->driver_data<x1_state>();
 	/* sub-routine at $10e sends to these sub-routines when a keyboard input is triggered:
-	 $17a -> floppy
-	 $094 -> ROM
-	 $0c0 -> timer
-	 $052 -> cmt
-	 $0f5 -> reload sub-routine? */
+     $17a -> floppy
+     $094 -> ROM
+     $0c0 -> timer
+     $052 -> cmt
+     $0f5 -> reload sub-routine? */
 
 	if(state->sub_cmd == 0xe4)
 	{
@@ -721,34 +721,34 @@ static WRITE8_HANDLER( sub_io_w )
 	if((data & 0xf0) == 0xd0) //reads here tv recording timer data. (Timer set (0xd0) / Timer readout (0xd8))
 	{
 		/*
-			xx-- ---- mode
-			--xx xxxx interval
-		*/
+            xx-- ---- mode
+            --xx xxxx interval
+        */
 		state->sub_val[0] = 0;
 		/*
-			xxxx xxxx command code:
-			00 timer disabled
-			01 TV command
-			10 interrupt
-			11 Cassette deck
-		*/
+            xxxx xxxx command code:
+            00 timer disabled
+            01 TV command
+            10 interrupt
+            11 Cassette deck
+        */
 		state->sub_val[1] = 0;
 		/*
-			---x xxxx minute
-		*/
+            ---x xxxx minute
+        */
 		state->sub_val[2] = 0;
 		/*
-			---- xxxx hour
-		*/
+            ---- xxxx hour
+        */
 		state->sub_val[3] = 0;
 		/*
-			xxxx ---- month
-			---- -xxx day of the week
-		*/
+            xxxx ---- month
+            ---- -xxx day of the week
+        */
 		state->sub_val[4] = 0;
 		/*
-			--xx xxxx day
-		*/
+            --xx xxxx day
+        */
 		state->sub_val[5] = 0;
 		state->sub_cmd_length = 6;
 	}
@@ -764,14 +764,14 @@ static WRITE8_HANDLER( sub_io_w )
 		case 0xe4: //irq vector setting
 			break;
 		//case 0xe5: //timer irq clear
-		//	break;
+		//  break;
 		case 0xe6: //key data readout
 			state->sub_val[0] = check_keyboard_shift(space->machine);
 			state->sub_val[1] = check_keyboard_press(space->machine);
 			state->sub_cmd_length = 2;
 			break;
-//		case 0xe7: // TV Control
-//			break;
+//      case 0xe7: // TV Control
+//          break;
 		case 0xe8: // TV Control read-out
 			state->sub_val[0] = state->sub_cmd;
 			state->sub_cmd_length = 1;
@@ -793,16 +793,16 @@ static WRITE8_HANDLER( sub_io_w )
 			state->sub_cmd_length = 1;
 			logerror("CMT: Command 0xEB received, returning 0x%02x.\n",state->sub_val[0]);
 			break;
-//		case 0xec: //set date
-//			break;
+//      case 0xec: //set date
+//          break;
 		case 0xed: //get date
 			state->sub_val[0] = state->rtc.day;
 			state->sub_val[1] = (state->rtc.month<<4) | (state->rtc.wday & 0xf);
 			state->sub_val[2] = state->rtc.year;
 			state->sub_cmd_length = 3;
 			break;
-//		case 0xee: //set time
-//			break;
+//      case 0xee: //set time
+//          break;
 		case 0xef: //get time
 			state->sub_val[0] = state->rtc.hour;
 			state->sub_val[1] = state->rtc.min;
@@ -1479,7 +1479,7 @@ static WRITE8_HANDLER( x1_io_w )
 {
 	x1_state *state = space->machine->driver_data<x1_state>();
 	UINT8 *videoram = state->videoram;
-	if(state->io_bank_mode == 1)                       	{ x1_ex_gfxram_w(space, offset, data); }
+	if(state->io_bank_mode == 1)                    	{ x1_ex_gfxram_w(space, offset, data); }
 	// TODO: user could install ym2151 on plain X1 too
 	//0x700, 0x701
 //  else if(offset >= 0x0704 && offset <= 0x0707)   { z80ctc_w(space->machine->device("ctc"), offset-0x0704,data); }
@@ -1508,7 +1508,7 @@ static WRITE8_HANDLER( x1_io_w )
 //  else if(offset >= 0x1fb9 && offset <= 0x1fbf)   { x1turbo_txpal_w(space,offset-0x1fb9,data); }
 //  else if(offset == 0x1fc0)                       { x1turbo_txdisp_w(space,0,data); }
 //  else if(offset == 0x1fc5)                       { x1turbo_gfxpal_w(space,0,data); }
-//	else if(offset >= 0x1fd0 && offset <= 0x1fdf)	{ x1_scrn_w(space,0,data); }
+//  else if(offset >= 0x1fd0 && offset <= 0x1fdf)   { x1_scrn_w(space,0,data); }
 //  else if(offset == 0x1fe0)                       { x1_blackclip_w(space,0,data); }
 	else if(offset >= 0x2000 && offset <= 0x2fff)	{ state->colorram[offset-0x2000] = data; }
 	else if(offset >= 0x3000 && offset <= 0x37ff)	{ videoram[offset-0x3000] = state->pcg_write_addr = data; }
@@ -1559,7 +1559,7 @@ static READ8_HANDLER( x1turbo_io_r )
 	else if(offset == 0x1fc5)						{ return x1turbo_gfxpal_r(space,0); } // Z only!
 //  else if(offset >= 0x1fd0 && offset <= 0x1fdf)   { return x1_scrn_r(space,offset-0x1fd0); } //Z only
 	else if(offset == 0x1fe0)						{ return x1_blackclip_r(space,0); }
-	else if(offset == 0x1ff0) 						{ return input_port_read(space->machine, "X1TURBO_DSW"); }
+	else if(offset == 0x1ff0)						{ return input_port_read(space->machine, "X1TURBO_DSW"); }
 	else if(offset >= 0x2000 && offset <= 0x2fff)	{ return state->colorram[offset-0x2000]; }
 	else if(offset >= 0x3000 && offset <= 0x3fff)	{ return videoram[offset-0x3000]; }
 	else if(offset >= 0x4000 && offset <= 0xffff)	{ return state->gfx_bitmap_ram[offset-0x4000+(state->scrn_reg.gfx_bank*0xc000)]; }
@@ -1704,7 +1704,7 @@ static READ8_DEVICE_HANDLER( x1_portc_r )
     -x-- ---- 320 mode (r/w)
     --x- ---- i/o mode (r/w)
     ---x ---- smooth scroll enabled (?)
-	---- ---x cassette output data
+    ---- ---x cassette output data
     */
 	return (state->io_sys & 0x9f) | state->hres_320 | ~state->io_switch;
 }
@@ -1749,7 +1749,7 @@ static WRITE_LINE_DEVICE_HANDLER(vsync_changed)
 	drvstate->vsync = (state & 1) ? 0x04 : 0x00;
 
 	if(state & 1 && drvstate->pcg_reset_occurred == 0) { drvstate->pcg_reset = drvstate->pcg_reset_occurred = 1; }
-	if(!(state & 1))                         		   { drvstate->pcg_reset_occurred = 0; }
+	if(!(state & 1))                        		   { drvstate->pcg_reset_occurred = 0; }
 
 	//printf("%d %02x\n",device->machine->primary_screen->vpos(),drvstate->vsync);
 }
@@ -2442,8 +2442,8 @@ static MACHINE_CONFIG_START( x1, x1_state )
 
 	MCFG_FLOPPY_4_DRIVES_ADD(x1_floppy_config)
 	MCFG_SOFTWARE_LIST_ADD("flop_list","x1_flop")
-	
-	MCFG_TIMER_ADD_PERIODIC("keyboard_timer", keyboard_callback, attotime::from_hz(240))	
+
+	MCFG_TIMER_ADD_PERIODIC("keyboard_timer", keyboard_callback, attotime::from_hz(240))
 	MCFG_TIMER_ADD_PERIODIC("cmt_wind_timer", cmt_wind_timer, attotime::from_hz(16))
 MACHINE_CONFIG_END
 

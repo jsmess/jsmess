@@ -4,7 +4,7 @@
 
     Skeleton driver.
 
-	http://www.electronixandmore.com/articles/teksystem.html
+    http://www.electronixandmore.com/articles/teksystem.html
 
 ****************************************************************************/
 
@@ -12,13 +12,13 @@
 
     TODO:
 
-	- bank switch
-	- keyboard
-	- video (persistent vector display)
-	- joystick
-	- magnetic tape storage (3M 300)
-	- communications backpack
-	- 4051E01 ROM expander
+    - bank switch
+    - keyboard
+    - video (persistent vector display)
+    - joystick
+    - magnetic tape storage (3M 300)
+    - communications backpack
+    - 4051E01 ROM expander
 
 */
 
@@ -38,7 +38,7 @@
 
 
 //**************************************************************************
-//	MACROS / CONSTANTS
+//  MACROS / CONSTANTS
 //**************************************************************************
 
 enum {
@@ -55,7 +55,7 @@ enum {
 
 
 //**************************************************************************
-//	INTERRUPTS
+//  INTERRUPTS
 //**************************************************************************
 
 //-------------------------------------------------
@@ -71,7 +71,7 @@ void tek4051_state::update_irq()
 
 
 //-------------------------------------------------
-//  update_nmi - 
+//  update_nmi -
 //-------------------------------------------------
 
 void tek4051_state::update_nmi()
@@ -84,7 +84,7 @@ void tek4051_state::update_nmi()
 
 
 //**************************************************************************
-//	KEYBOARD
+//  KEYBOARD
 //**************************************************************************
 
 //-------------------------------------------------
@@ -110,11 +110,11 @@ static TIMER_DEVICE_CALLBACK( keyboard_tick )
 
 
 //**************************************************************************
-//	MEMORY BANKING
+//  MEMORY BANKING
 //**************************************************************************
 
 //-------------------------------------------------
-//  bankswitch - 
+//  bankswitch -
 //-------------------------------------------------
 
 void tek4051_state::bankswitch(UINT8 data)
@@ -148,18 +148,18 @@ WRITE8_MEMBER( tek4051_state::lbs_w )
 {
 	/*
 
-		bit		description
-		
-		0		ROM Expander Slot Address
-		1		ROM Expander Slot Address
-		2		ROM Expander Slot Address
-		3		Bank Switch
-		4		Bank Switch
-		5		Bank Switch
-		6		
-		7		
+        bit     description
 
-	*/
+        0       ROM Expander Slot Address
+        1       ROM Expander Slot Address
+        2       ROM Expander Slot Address
+        3       Bank Switch
+        4       Bank Switch
+        5       Bank Switch
+        6
+        7
+
+    */
 
 	logerror("LBS %02x\n", data);
 
@@ -169,7 +169,7 @@ WRITE8_MEMBER( tek4051_state::lbs_w )
 
 
 //**************************************************************************
-//	ADDRESS MAPS
+//  ADDRESS MAPS
 //**************************************************************************
 
 //-------------------------------------------------
@@ -186,12 +186,12 @@ static ADDRESS_MAP_START( tek4051_mem, ADDRESS_SPACE_PROGRAM, 8, tek4051_state )
 	AM_RANGE(0x87a8, 0x87ab) AM_DEVREADWRITE_LEGACY(MC6820_KB_TAG, pia6821_r, pia6821_w)
 	AM_RANGE(0x87b0, 0x87b3) AM_DEVREADWRITE_LEGACY(MC6820_GPIB_TAG, pia6821_r, pia6821_w)
 	AM_RANGE(0x87c0, 0x87c0) AM_MIRROR(0x03) AM_WRITE(lbs_w)
-//	AM_RANGE(0x87c0, 0x87c3) AM_DEVREADWRITE_LEGACY(MC6820_COM_TAG, pia6821_r, pia6821_w)
-//	AM_RANGE(0x87c4, 0x87c4) AM_MIRROR(0x02) AM_DEVREADWRITE_LEGACY(MC6850_TAG, acia6850_stat_r, acia6850_ctrl_w)
-//	AM_RANGE(0x87c5, 0x87c5) AM_MIRROR(0x02) AM_DEVREADWRITE_LEGACY(MC6850_TAG, acia6850_data_r, acia6850_data_w)
-//	AM_RANGE(0x87c8, 0x87cb) XPC2
-//	AM_RANGE(0x87cc, 0x87cf) XPC3
-//	AM_RANGE(0x87d0, 0x87d3) XPC4
+//  AM_RANGE(0x87c0, 0x87c3) AM_DEVREADWRITE_LEGACY(MC6820_COM_TAG, pia6821_r, pia6821_w)
+//  AM_RANGE(0x87c4, 0x87c4) AM_MIRROR(0x02) AM_DEVREADWRITE_LEGACY(MC6850_TAG, acia6850_stat_r, acia6850_ctrl_w)
+//  AM_RANGE(0x87c5, 0x87c5) AM_MIRROR(0x02) AM_DEVREADWRITE_LEGACY(MC6850_TAG, acia6850_data_r, acia6850_data_w)
+//  AM_RANGE(0x87c8, 0x87cb) XPC2
+//  AM_RANGE(0x87cc, 0x87cf) XPC3
+//  AM_RANGE(0x87d0, 0x87d3) XPC4
 	AM_RANGE(0x8800, 0xa7ff) AM_ROM AM_REGION(MC6800_TAG, 0x800)
 	AM_RANGE(0xa800, 0xffff) AM_ROM AM_REGION(MC6800_TAG, 0x2800)
 ADDRESS_MAP_END
@@ -207,7 +207,7 @@ ADDRESS_MAP_END
 
 
 //**************************************************************************
-//	INPUT PORTS
+//  INPUT PORTS
 //**************************************************************************
 
 //-------------------------------------------------
@@ -216,164 +216,164 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( tek4051 )
 	PORT_START("Y0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )
 
 	PORT_START("Y1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )
 
 	PORT_START("Y2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )
 
 	PORT_START("Y3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )
 
 	PORT_START("Y4")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )
 
 	PORT_START("Y5")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )
 
 	PORT_START("Y6")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )
 
 	PORT_START("Y7")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )
 
 	PORT_START("Y8")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )
 
 	PORT_START("Y9")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )
 
 	PORT_START("Y10")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )
 
 	PORT_START("Y11")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )
 
 	PORT_START("Y12")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )
 
 	PORT_START("Y13")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )
 
 	PORT_START("Y14")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )
 
 	PORT_START("Y15")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )
 
 	PORT_START("SPECIAL")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Left SHIFT") PORT_CODE(KEYCODE_LSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
@@ -385,7 +385,7 @@ INPUT_PORTS_END
 
 
 //**************************************************************************
-//	VIDEO
+//  VIDEO
 //**************************************************************************
 
 //-------------------------------------------------
@@ -408,7 +408,7 @@ void tek4052_state::video_start()
 
 
 //**************************************************************************
-//	DEVICE CONFIGURATION
+//  DEVICE CONFIGURATION
 //**************************************************************************
 
 //-------------------------------------------------
@@ -419,18 +419,18 @@ READ8_MEMBER( tek4051_state::x_pia_pa_r )
 {
 	/*
 
-		bit		description
-		
-		PA0		
-		PA1		
-		PA2		DRBUSY-0
-		PA3		VPULSE-1
-		PA4		
-		PA5		
-		PA6		
-		PA7		
+        bit     description
 
-	*/
+        PA0
+        PA1
+        PA2     DRBUSY-0
+        PA3     VPULSE-1
+        PA4
+        PA5
+        PA6
+        PA7
+
+    */
 
 	return 0;
 }
@@ -439,36 +439,36 @@ WRITE8_MEMBER( tek4051_state::x_pia_pa_w )
 {
 	/*
 
-		bit		description
-		
-		PA0		X D/A
-		PA1		X D/A
-		PA2		
-		PA3		
-		PA4		ERASE-0
-		PA5		COPY-0
-		PA6		VECTOR-0
-		PA7		VEN-1
+        bit     description
 
-	*/
+        PA0     X D/A
+        PA1     X D/A
+        PA2
+        PA3
+        PA4     ERASE-0
+        PA5     COPY-0
+        PA6     VECTOR-0
+        PA7     VEN-1
+
+    */
 }
 
 WRITE8_MEMBER( tek4051_state::x_pia_pb_w )
 {
 	/*
 
-		bit		description
-		
-		PB0		X D/A
-		PB1		X D/A
-		PB2		X D/A
-		PB3		X D/A
-		PB4		X D/A
-		PB5		X D/A
-		PB6		X D/A
-		PB7		X D/A
+        bit     description
 
-	*/
+        PB0     X D/A
+        PB1     X D/A
+        PB2     X D/A
+        PB3     X D/A
+        PB4     X D/A
+        PB5     X D/A
+        PB6     X D/A
+        PB7     X D/A
+
+    */
 }
 
 WRITE_LINE_MEMBER( tek4051_state::adot_w )
@@ -521,18 +521,18 @@ READ8_MEMBER( tek4051_state::sa_r )
 {
 	/*
 
-		bit		description
-		
-		PA0		SA0
-		PA1		SA1
-		PA2		SA2
-		PA3		SA3
-		PA4		SA4
-		PA5		SA5
-		PA6		SA6
-		PA7		SA7
+        bit     description
 
-	*/
+        PA0     SA0
+        PA1     SA1
+        PA2     SA2
+        PA3     SA3
+        PA4     SA4
+        PA5     SA5
+        PA6     SA6
+        PA7     SA7
+
+    */
 
 	return 0;
 }
@@ -541,36 +541,36 @@ WRITE8_MEMBER( tek4051_state::y_pia_pa_w )
 {
 	/*
 
-		bit		description
-		
-		PA0		Y D/A
-		PA1		Y D/A
-		PA2		Y CHAR D/A
-		PA3		Y CHAR D/A
-		PA4		Y CHAR D/A
-		PA5		X CHAR D/A
-		PA6		X CHAR D/A
-		PA7		X CHAR D/A
+        bit     description
 
-	*/
+        PA0     Y D/A
+        PA1     Y D/A
+        PA2     Y CHAR D/A
+        PA3     Y CHAR D/A
+        PA4     Y CHAR D/A
+        PA5     X CHAR D/A
+        PA6     X CHAR D/A
+        PA7     X CHAR D/A
+
+    */
 }
 
 WRITE8_MEMBER( tek4051_state::sb_w )
 {
 	/*
 
-		bit		description
-		
-		PB0		SB0
-		PB1		SB1
-		PB2		SB2
-		PB3		SB3
-		PB4		SB4
-		PB5		SB5
-		PB6		SB6
-		PB7		SB7
+        bit     description
 
-	*/
+        PB0     SB0
+        PB1     SB1
+        PB2     SB2
+        PB3     SB3
+        PB4     SB4
+        PB5     SB5
+        PB6     SB6
+        PB7     SB7
+
+    */
 }
 
 READ_LINE_MEMBER( tek4051_state::rdbyte_r )
@@ -629,18 +629,18 @@ READ8_MEMBER( tek4051_state::kb_pia_pa_r )
 {
 	/*
 
-		bit		description
-		
-		PA0		KC0-1
-		PA1		KC1-1
-		PA2		KC2-1
-		PA3		KC3-1
-		PA4		KC4-1
-		PA5		KC5-1
-		PA6		KC6-1
-		PA7		TTY-0
+        bit     description
 
-	*/
+        PA0     KC0-1
+        PA1     KC1-1
+        PA2     KC2-1
+        PA3     KC3-1
+        PA4     KC4-1
+        PA5     KC5-1
+        PA6     KC6-1
+        PA7     TTY-0
+
+    */
 
 	UINT8 data = 0;
 	UINT8 special = input_port_read(machine, "SPECIAL");
@@ -658,18 +658,18 @@ READ8_MEMBER( tek4051_state::kb_pia_pb_r )
 {
 	/*
 
-		bit		description
-		
-		PB0		SHIFT-0
-		PB1		CTRL-0
-		PB2		
-		PB3		LOAD-0
-		PB4		
-		PB5		
-		PB6		
-		PB7		
+        bit     description
 
-	*/
+        PB0     SHIFT-0
+        PB1     CTRL-0
+        PB2
+        PB3     LOAD-0
+        PB4
+        PB5
+        PB6
+        PB7
+
+    */
 
 	UINT8 data = 0;
 	UINT8 special = input_port_read(machine, "SPECIAL");
@@ -687,25 +687,25 @@ WRITE8_MEMBER( tek4051_state::kb_pia_pb_w )
 {
 	/*
 
-		bit		description
-		
-		PB0		
-		PB1		
-		PB2		
-		PB3		
-		PB4		EOI-1
-		PB5		BREAK-1
-		PB6		I/O-1
-		PB7		BUSY-1/REN-0/SPEAKER
+        bit     description
 
-	*/
+        PB0
+        PB1
+        PB2
+        PB3
+        PB4     EOI-1
+        PB5     BREAK-1
+        PB6     I/O-1
+        PB7     BUSY-1/REN-0/SPEAKER
+
+    */
 
 	// lamps
 	output_set_led_value(1, !BIT(data, 5));
 	output_set_led_value(2, !BIT(data, 6));
 	output_set_led_value(3, !BIT(data, 7));
 
-	// end or identify	
+	// end or identify
 	ieee488_eoi_w(m_ieee, m_gpib_pia, !BIT(data, 4));
 
 	// speaker
@@ -761,18 +761,18 @@ READ8_MEMBER( tek4051_state::tape_pia_pa_r )
 {
 	/*
 
-		bit		description
-		
-		PA0		DELAY OUT-1
-		PA1		
-		PA2		TUTS-1
-		PA3		SAFE-1
-		PA4		SAFE-1
-		PA5		JOYSTICK
-		PA6		FILFND-1
-		PA7		JOYSTICK
+        bit     description
 
-	*/
+        PA0     DELAY OUT-1
+        PA1
+        PA2     TUTS-1
+        PA3     SAFE-1
+        PA4     SAFE-1
+        PA5     JOYSTICK
+        PA6     FILFND-1
+        PA7     JOYSTICK
+
+    */
 
 	return 0;
 }
@@ -781,36 +781,36 @@ WRITE8_MEMBER( tek4051_state::tape_pia_pa_w )
 {
 	/*
 
-		bit		description
-		
-		PA0		
-		PA1		LDCLK-1
-		PA2		
-		PA3		
-		PA4		
-		PA5		XERR-1
-		PA6		
-		PA7		YERR-1
+        bit     description
 
-	*/
+        PA0
+        PA1     LDCLK-1
+        PA2
+        PA3
+        PA4
+        PA5     XERR-1
+        PA6
+        PA7     YERR-1
+
+    */
 }
 
 WRITE8_MEMBER( tek4051_state::tape_pia_pb_w )
 {
 	/*
 
-		bit		description
-		
-		PB0		WR-0
-		PB1		FAST-1
-		PB2		REV-1
-		PB3		DRTAPE-0
-		PB4		GICG-1
-		PB5		FICG-1
-		PB6		WENABLE-1
-		PB7		FSENABLE-0
+        bit     description
 
-	*/
+        PB0     WR-0
+        PB1     FAST-1
+        PB2     REV-1
+        PB3     DRTAPE-0
+        PB4     GICG-1
+        PB5     FICG-1
+        PB6     WENABLE-1
+        PB7     FSENABLE-0
+
+    */
 }
 
 READ_LINE_MEMBER( tek4051_state::rmark_r )
@@ -870,18 +870,18 @@ WRITE8_MEMBER( tek4051_state::dio_w )
 {
 	/*
 
-		bit		description
-		
-		PA0		DIO1-1
-		PA1		DIO2-1
-		PA2		DIO3-1
-		PA3		DIO4-1
-		PA4		DIO5-1
-		PA5		DIO6-1
-		PA6		DIO7-1
-		PA7		DIO8-1
+        bit     description
 
-	*/
+        PA0     DIO1-1
+        PA1     DIO2-1
+        PA2     DIO3-1
+        PA3     DIO4-1
+        PA4     DIO5-1
+        PA5     DIO6-1
+        PA6     DIO7-1
+        PA7     DIO8-1
+
+    */
 
 	if (m_talk)
 	{
@@ -893,18 +893,18 @@ READ8_MEMBER( tek4051_state::gpib_pia_pb_r )
 {
 	/*
 
-		bit		description
-		
-		PB0		
-		PB1		
-		PB2		
-		PB3		
-		PB4		NRFD
-		PB5		SRQ-1
-		PB6		DAV-1
-		PB7		NDAC
+        bit     description
 
-	*/
+        PB0
+        PB1
+        PB2
+        PB3
+        PB4     NRFD
+        PB5     SRQ-1
+        PB6     DAV-1
+        PB7     NDAC
+
+    */
 
 	UINT8 data = 0;
 
@@ -930,18 +930,18 @@ WRITE8_MEMBER( tek4051_state::gpib_pia_pb_w )
 {
 	/*
 
-		bit		description
-		
-		PB0		EOI-1
-		PB1		IFC-1
-		PB2		
-		PB3		ATN-0
-		PB4		NRFD
-		PB5		
-		PB6		
-		PB7		NDAC
+        bit     description
 
-	*/
+        PB0     EOI-1
+        PB1     IFC-1
+        PB2
+        PB3     ATN-0
+        PB4     NRFD
+        PB5
+        PB6
+        PB7     NDAC
+
+    */
 
 	// end or identify
 	ieee488_eoi_w(m_ieee, m_gpib_pia, !BIT(data, 0));
@@ -1011,18 +1011,18 @@ WRITE8_MEMBER( tek4051_state::com_pia_pa_w )
 {
 	/*
 
-		bit		description
-		
-		PA0		
-		PA1		
-		PA2		
-		PA3		Bank Switch Register
-		PA4		Bank Switch Register
-		PA5		Bank Switch Register
-		PA6		
-		PA7		
+        bit     description
 
-	*/
+        PA0
+        PA1
+        PA2
+        PA3     Bank Switch Register
+        PA4     Bank Switch Register
+        PA5     Bank Switch Register
+        PA6
+        PA7
+
+    */
 
 	bankswitch(data);
 }
@@ -1031,18 +1031,18 @@ READ8_MEMBER( tek4051_state::com_pia_pb_r )
 {
 	/*
 
-		bit		description
-		
-		PB0		SRX
-		PB1		DTR
-		PB2		RTS
-		PB3		
-		PB4		
-		PB5		
-		PB6		
-		PB7		
+        bit     description
 
-	*/
+        PB0     SRX
+        PB1     DTR
+        PB2     RTS
+        PB3
+        PB4
+        PB5
+        PB6
+        PB7
+
+    */
 
 	UINT8 data = 0;
 
@@ -1059,19 +1059,19 @@ WRITE8_MEMBER( tek4051_state::com_pia_pb_w )
 {
 	/*
 
-		bit		description
-		
-		PB0		
-		PB1		
-		PB2		
-		PB3		CTS
-		PB4		STXA-C
-		PB5		Baud Rate Select
-		PB6		Baud Rate Select
-		PB7		Baud Rate Select
+        bit     description
 
-	*/
-	
+        PB0
+        PB1
+        PB2
+        PB3     CTS
+        PB4     STXA-C
+        PB5     Baud Rate Select
+        PB6     Baud Rate Select
+        PB7     Baud Rate Select
+
+    */
+
 	// clear to send
 	//rs232_cts_w(m_rs232, BIT(data, 3));
 
@@ -1156,7 +1156,7 @@ static IEEE488_DAISY( ieee488_daisy )
 
 
 //**************************************************************************
-//	MACHINE INITIALIZATION
+//  MACHINE INITIALIZATION
 //**************************************************************************
 
 //-------------------------------------------------
@@ -1184,7 +1184,7 @@ void tek4051_state::machine_start()
 	}
 
 	// register for state saving
-//	state_save_register_global(machine, );
+//  state_save_register_global(machine, );
 }
 
 
@@ -1199,7 +1199,7 @@ void tek4052_state::machine_start()
 
 
 //**************************************************************************
-//	MACHINE CONFIGURATION
+//  MACHINE CONFIGURATION
 //**************************************************************************
 
 //-------------------------------------------------
@@ -1267,7 +1267,7 @@ static MACHINE_CONFIG_START( tek4052, tek4052_state )
 	MCFG_PALETTE_INIT(monochrome_green)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_VIDEO_UPDATE(vector)
-	
+
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)
@@ -1293,7 +1293,7 @@ MACHINE_CONFIG_END
 
 
 //**************************************************************************
-//	ROMS
+//  ROMS
 //**************************************************************************
 
 //-------------------------------------------------
@@ -1318,7 +1318,7 @@ ROM_START( tek4051 )
 	ROM_LOAD( "156-0672-xx.u395", 0x6800, 0x0800, CRC(93ad68d1) SHA1(8242058bfc89d11cd9ae82d967410714875eface) ) // -01 or -02 ?
 	ROM_LOAD( "156-0673-xx.u391", 0x7000, 0x0800, CRC(ee1f5d4c) SHA1(a6fb8347a0dfa94268f091fb7ca091c8bfabeabd) ) // -01 or -02 or -03 ?
 	ROM_LOAD( "156-0674-xx.u295", 0x7800, 0x0800, CRC(50582341) SHA1(1a028176e5d5ca83012e2f75e9daad88cd7d8fc3) ) // -01 or -02 ?
-	
+
 	ROM_REGION( 0x2000, "020_0147_00", 0 ) // Firmware Backpack (020-0147-00)
 	ROM_LOAD( "156-0747-xx.u101", 0x0000, 0x0800, CRC(9e1facc1) SHA1(7e7a118c3e8c49630f630ee02c3de843dd95d7e1) ) // -00 or -01 ?
 	ROM_LOAD( "156-0748-xx.u201", 0x0800, 0x0800, CRC(be42bfbf) SHA1(23575b411bd9dcb7d7116628820096e3064ff93b) ) // -00 or -01 ?
@@ -1393,10 +1393,10 @@ ROM_END
 
 
 //**************************************************************************
-//	SYSTEM DRIVERS
+//  SYSTEM DRIVERS
 //**************************************************************************
 
 /*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       INIT    COMPANY         FULLNAME            FLAGS */
 COMP( 1975, tek4051,	0,			0,		tek4051,	tek4051,	0,		"Tektronix",	"Tektronix 4051",	GAME_NOT_WORKING )
 COMP( 1978, tek4052a,	tek4051,	0,		tek4052,	tek4051,	0,		"Tektronix",	"Tektronix 4052A",	GAME_NOT_WORKING )
-//COMP( 1979, tek4054,	tek4051,	0,		tek4054,	tek4054,	0,		"Tektronix",	"Tektronix 4054",	GAME_NOT_WORKING )
+//COMP( 1979, tek4054,  tek4051,    0,      tek4054,    tek4054,    0,      "Tektronix",    "Tektronix 4054",   GAME_NOT_WORKING )

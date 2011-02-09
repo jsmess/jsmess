@@ -65,7 +65,7 @@ static void wswan_ch_set_freq( running_machine *machine, struct CHAN *ch, UINT16
 WRITE8_DEVICE_HANDLER( wswan_sound_port_w )
 {
 	wswan_sound_state *state = get_safe_token(device);
-	
+
 	state->channel->update();
 
 	switch( offset ) {

@@ -351,7 +351,7 @@ static void generic_terminal_update(device_t *device, bitmap_t *bitmap, const re
 						}
 					}
 				}
-						
+
 				/* Display a scanline of a character */
 				*p++ = ( gfx & 0x80 ) ? 1 : 0;
 				*p++ = ( gfx & 0x40 ) ? 1 : 0;

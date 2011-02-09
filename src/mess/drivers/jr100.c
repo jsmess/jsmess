@@ -73,7 +73,7 @@ static WRITE8_HANDLER( jr100_via_w )
 			beep_set_frequency(space->machine->device("beeper"),894886.25 / (double)(state->t1latch) / 2.0);
 		}
 	}
-	via6522_device *via = space->machine->device<via6522_device>("via");	
+	via6522_device *via = space->machine->device<via6522_device>("via");
 	via->write(*space,offset,data);
 }
 

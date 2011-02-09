@@ -422,14 +422,14 @@ static MACHINE_CONFIG_START( vt100, vt100_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	
+
 	MCFG_TIMER_ADD_PERIODIC("keyboard_timer", keyboard_callback, attotime::from_hz(800))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( vt180, vt100 )
 	MCFG_CPU_ADD("z80cpu", Z80, XTAL_24_8832MHz / 9)
 	MCFG_CPU_PROGRAM_MAP(vt180_mem)
-    MCFG_CPU_IO_MAP(vt180_io)	
+    MCFG_CPU_IO_MAP(vt180_io)
 MACHINE_CONFIG_END
 
 /* VT1xx models:
@@ -748,22 +748,22 @@ ROM_START( vt180 )
 	ROM_LOAD_OPTIONAL ( "23-094e2-00.e9", 0x0800, 0x0800, NO_DUMP) // optional (comes default with some models) alternate character set rom
 
 	ROM_REGION(0x10000, "z80cpu", 0) // z80 daughterboard
-	ROM_LOAD( "23-021e3-00.bin", 0x0000, 0x1000, CRC(a2a575d2) SHA1(47a2c40aaec89e8476240f25515d75ab157f2911))	
-	ROM_LOAD( "23-017e3-00.bin", 0x1000, 0x1000, CRC(4bdd2398) SHA1(84f288def6c143a2d2ed9dedf947c862c66bb18e))	
+	ROM_LOAD( "23-021e3-00.bin", 0x0000, 0x1000, CRC(a2a575d2) SHA1(47a2c40aaec89e8476240f25515d75ab157f2911))
+	ROM_LOAD( "23-017e3-00.bin", 0x1000, 0x1000, CRC(4bdd2398) SHA1(84f288def6c143a2d2ed9dedf947c862c66bb18e))
 ROM_END
 
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY FULLNAME       FLAGS */
 COMP( 1978, vt100,  0,       0,     vt100,	 vt100, 	 0, 	 "Digital Equipment Corporation",   "VT100",		GAME_NOT_WORKING)
-//COMP( 1978, vt100wp,  vt100, 0,     vt100,	 vt100, 	 0, 	 "Digital Equipment Corporation",   "VT100-Wx",		GAME_NOT_WORKING)
+//COMP( 1978, vt100wp,  vt100, 0,     vt100,     vt100,      0,      "Digital Equipment Corporation",   "VT100-Wx",     GAME_NOT_WORKING)
 //COMP( 1978, vt100stp,  vt100,       0,    vt100,   vt100,       0,     "Digital Equipment Corporation",   "VT100 w/VT1xx-AC STP",       GAME_NOT_WORKING)
-//COMP( 1981, vt101,  0,       0,     vt100,	 vt100, 	 0, 	 "Digital Equipment Corporation",   "VT101",		GAME_NOT_WORKING)
-//COMP( 1981, vt102,  vt101,   0,     vt100,	 vt100, 	 0, 	 "Digital Equipment Corporation",   "VT102",		GAME_NOT_WORKING)
-//COMP( 1979, vt103,  vt100,   0,     vt100,	 vt100, 	 0, 	 "Digital Equipment Corporation",   "VT103",		GAME_NOT_WORKING)
+//COMP( 1981, vt101,  0,       0,     vt100,     vt100,      0,      "Digital Equipment Corporation",   "VT101",        GAME_NOT_WORKING)
+//COMP( 1981, vt102,  vt101,   0,     vt100,     vt100,      0,      "Digital Equipment Corporation",   "VT102",        GAME_NOT_WORKING)
+//COMP( 1979, vt103,  vt100,   0,     vt100,     vt100,      0,      "Digital Equipment Corporation",   "VT103",        GAME_NOT_WORKING)
 COMP( 1978, vt105,  vt100,   0,     vt100,   vt100, 	 0, 	 "Digital Equipment Corporation",   "VT105",		GAME_NOT_WORKING)
-//COMP( 1978, vt110,  vt100,   0,     vt100,	 vt100, 	 0, 	 "Digital Equipment Corporation",   "VT110",		GAME_NOT_WORKING)
-//COMP( 1981, vt125,  vt100,   0,     vt100,	 vt100, 	 0, 	 "Digital Equipment Corporation",   "VT125",		GAME_NOT_WORKING)
+//COMP( 1978, vt110,  vt100,   0,     vt100,     vt100,      0,      "Digital Equipment Corporation",   "VT110",        GAME_NOT_WORKING)
+//COMP( 1981, vt125,  vt100,   0,     vt100,     vt100,      0,      "Digital Equipment Corporation",   "VT125",        GAME_NOT_WORKING)
 COMP( 1981, vt131,  /*vt101*/0, 0,  vt100,	 vt100, 	 0, 	 "Digital Equipment Corporation",   "VT131",		GAME_NOT_WORKING)	// this should be a vt101 clone, once the vt101 has been enabled (i.e. its roms dumped)
 //COMP( 1979, vt132,  vt100,   0,    vt100,   vt100,     0,      "Digital Equipment Corporation",   "VT132",      GAME_NOT_WORKING)
 COMP( 1983, vt180,  vt100,   0,     vt180,   vt100, 	 0, 	 "Digital Equipment Corporation",   "VT180",		GAME_NOT_WORKING)

@@ -1400,7 +1400,7 @@ static WRITE8_HANDLER( pc_cga8_w )
 					default:
 						fatalerror("CGA: Bus width %d not supported", buswidth);
 						break;
-				}			
+				}
 			}
 
 		}

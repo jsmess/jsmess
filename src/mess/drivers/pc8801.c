@@ -5,71 +5,71 @@
     preliminary driver by Angelo Salese, original MESS PC-88SR driver by ???
 
     TODO:
-	- implement proper i8214 routing, also add irq latch mechanism;
-	- Fix up Floppy Terminal Count 0 / 1 writes properly, Castle Excellent (and presumably other games) is very picky about it.
+    - implement proper i8214 routing, also add irq latch mechanism;
+    - Fix up Floppy Terminal Count 0 / 1 writes properly, Castle Excellent (and presumably other games) is very picky about it.
 
-	- add differences between various models;
-	- implement proper upd3301 / i8257 support;
-	- mouse support;
-	- RTC support;
-	- Add limits for extend work RAM;
-	- What happens to the palette contents when the analog/digital palette mode changes?
-	- waitstates;
-	- dipswitches needs to be controlled;
-	- below notes states that plain PC-8801 doesn't have a disk CPU, but the BIOS clearly checks the floppy ports. Wrong info?
-	- PC-8801MC disk shows that bitmap and text colors mixes with additive blending (basically if the tv charset has white then the bitmap draws
-	  with inverted color output).
+    - add differences between various models;
+    - implement proper upd3301 / i8257 support;
+    - mouse support;
+    - RTC support;
+    - Add limits for extend work RAM;
+    - What happens to the palette contents when the analog/digital palette mode changes?
+    - waitstates;
+    - dipswitches needs to be controlled;
+    - below notes states that plain PC-8801 doesn't have a disk CPU, but the BIOS clearly checks the floppy ports. Wrong info?
+    - PC-8801MC disk shows that bitmap and text colors mixes with additive blending (basically if the tv charset has white then the bitmap draws
+      with inverted color output).
 
-	per-game specific TODO:
-	- 177: gameplay is too fast (parent pc8801 only);
-	- Acro Jet: hangs waiting for an irq;
-	- Advanced Fantasian: wants an irq that can't happen (I is equal to 0x3f)
-	- American Success: reads the light pen?
-	- Alpha (demo): crashes with "illegal function" msg;
-	- Aploon: crashes because it doesn't clear irqs when it's supposed to do so;
-	- Balance of Power: attempt to use the SIO port for mouse polling, worked around for now;
-	- Battle Entry: moans with a JP msg then dies if you try to press either numpad 1 or 2 (asks if the user wants to use the sound board (yes 1 / no 2)
-	- Bishoujo Baseball Gakuen: checks ym2608 after intro screen;
-	- Blue Moon Story: moans with a kanji msg;.
-	- Bubblegum Crisis: crashes due of a spurious irq (works if you soft reset the emulation when it triggers the halt opcode);
-	- Can Can Bunny: bitmap artifacts on intro, could be either ALU or floppy issues;
-	- Grobda: palette is ugly (parent pc8801 only);
-	- Wanderers from Ys: user data disk looks screwed? It loads with everything as maximum as per now ...
-	- Xevious: game is too fast (parent pc8801 only)
+    per-game specific TODO:
+    - 177: gameplay is too fast (parent pc8801 only);
+    - Acro Jet: hangs waiting for an irq;
+    - Advanced Fantasian: wants an irq that can't happen (I is equal to 0x3f)
+    - American Success: reads the light pen?
+    - Alpha (demo): crashes with "illegal function" msg;
+    - Aploon: crashes because it doesn't clear irqs when it's supposed to do so;
+    - Balance of Power: attempt to use the SIO port for mouse polling, worked around for now;
+    - Battle Entry: moans with a JP msg then dies if you try to press either numpad 1 or 2 (asks if the user wants to use the sound board (yes 1 / no 2)
+    - Bishoujo Baseball Gakuen: checks ym2608 after intro screen;
+    - Blue Moon Story: moans with a kanji msg;.
+    - Bubblegum Crisis: crashes due of a spurious irq (works if you soft reset the emulation when it triggers the halt opcode);
+    - Can Can Bunny: bitmap artifacts on intro, could be either ALU or floppy issues;
+    - Grobda: palette is ugly (parent pc8801 only);
+    - Wanderers from Ys: user data disk looks screwed? It loads with everything as maximum as per now ...
+    - Xevious: game is too fast (parent pc8801 only)
 
-	list of games that crashes due of floppy issues:
-	- Agni no Ishi
-	- American Truck / American Truck SR (polls read deleted data command)
-	- Bersekers Front Gaiden 3
-	- Bokosuka Wars (polls read ID command)
-	- Bouken Roman
-	- Bruce Lee
-	- Burning Point
-	- Burunet
-	- Castle Excellent (sets sector 0xf4?)
-	- Jark (needs PC-8801MC)
-	- Tobira wo Akete (random crashes in parent pc8801 only)
+    list of games that crashes due of floppy issues:
+    - Agni no Ishi
+    - American Truck / American Truck SR (polls read deleted data command)
+    - Bersekers Front Gaiden 3
+    - Bokosuka Wars (polls read ID command)
+    - Bouken Roman
+    - Bruce Lee
+    - Burning Point
+    - Burunet
+    - Castle Excellent (sets sector 0xf4?)
+    - Jark (needs PC-8801MC)
+    - Tobira wo Akete (random crashes in parent pc8801 only)
 
-	games that needs to NOT have write-protect floppies (BTANBs):
-	- Balance of Power
-	- Tobira wo Akete (hangs at title screen)
+    games that needs to NOT have write-protect floppies (BTANBs):
+    - Balance of Power
+    - Tobira wo Akete (hangs at title screen)
 
-	Notes:
-	- BIOS disk ROM defines what kind of floppies you could load:
-	  * with 0x0800 ROM size you can load 2d floppies only;
-	  * with 0x2000 ROM size you can load 2d and 2hd floppies;
-	- Later models have palette bugs with some games (Alphos, Tokyo Nampa Street).
-	  This is because you have to set up the V1 / V2 DIP-SW to V1 for those games (it's the BIOS that sets up to analog and never changes back otherwise).
+    Notes:
+    - BIOS disk ROM defines what kind of floppies you could load:
+      * with 0x0800 ROM size you can load 2d floppies only;
+      * with 0x2000 ROM size you can load 2d and 2hd floppies;
+    - Later models have palette bugs with some games (Alphos, Tokyo Nampa Street).
+      This is because you have to set up the V1 / V2 DIP-SW to V1 for those games (it's the BIOS that sets up to analog and never changes back otherwise).
 
-	Bankswitch Notes:
-	- 0x31 - graphic banking
-	- 0x32 - misc banking
-	- 0x5c / 0x5f - VRAM banking
-	- 0x70 - window offset (banking)
-	- 0x71 - extra ROM banking
-	- 0x78 - window offset (banking) increment (+ 0x100)
-	- 0xe2 / 0xe3 - extra RAM banking
-	- 0xf0 / 0xf1 = kanji banking
+    Bankswitch Notes:
+    - 0x31 - graphic banking
+    - 0x32 - misc banking
+    - 0x5c / 0x5f - VRAM banking
+    - 0x70 - window offset (banking)
+    - 0x71 - extra ROM banking
+    - 0x78 - window offset (banking) increment (+ 0x100)
+    - 0xe2 / 0xe3 - extra RAM banking
+    - 0xf0 / 0xf1 = kanji banking
 
 ======================================================================================================================================
 
@@ -863,14 +863,14 @@ ADDRESS_MAP_END
 static READ8_HANDLER( pc8801_ctrl_r )
 {
 	/*
-	11-- ----
-	--x- ---- vrtc
-	---x ---- calendar CDO
-	---- x--- fdc auto-boot DIP-SW
-	---- -x-- (RS-232C related)
-	---- --x- monitor refresh rate DIP-SW
-	---- ---x (pbsy?)
-	*/
+    11-- ----
+    --x- ---- vrtc
+    ---x ---- calendar CDO
+    ---- x--- fdc auto-boot DIP-SW
+    ---- -x-- (RS-232C related)
+    ---- --x- monitor refresh rate DIP-SW
+    ---- ---x (pbsy?)
+    */
 
 	return input_port_read(space->machine, "CTRL");
 }
@@ -878,11 +878,11 @@ static READ8_HANDLER( pc8801_ctrl_r )
 static WRITE8_HANDLER( pc8801_ctrl_w )
 {
 	/*
-	x--- ---- SING (buzzer mirror?)
-	-x-- ---- mouse latch (JOP1, routes on OPN sound port A)
-	--x- ---- beeper
-	---
-	*/
+    x--- ---- SING (buzzer mirror?)
+    -x-- ---- mouse latch (JOP1, routes on OPN sound port A)
+    --x- ---- beeper
+    ---
+    */
 
 	/* TODO: this might actually be two beepers */
 	if(((device_ctrl_data & 0x20) == 0x00) && ((data & 0x20) == 0x20))
@@ -925,13 +925,13 @@ static void pc8801_dynamic_res_change(running_machine *machine)
 static WRITE8_HANDLER( pc8801_gfx_ctrl_w )
 {
 	/*
-	--x- ---- VRAM y 25 (1) / 20 (0)
-	---x ---- graphic color yes (1) / no (0)
-	---- x--- graphic display yes (1) / no (0)
-	---- -x-- Basic N (1) / N88 (0)
-	---- --x- RAM select yes (1) / no (0)
-	---- ---x VRAM 200 lines (1) / 400 lines (0), 15 KHz / 24 KHz
-	*/
+    --x- ---- VRAM y 25 (1) / 20 (0)
+    ---x ---- graphic color yes (1) / no (0)
+    ---- x--- graphic display yes (1) / no (0)
+    ---- -x-- Basic N (1) / N88 (0)
+    ---- --x- RAM select yes (1) / no (0)
+    ---- ---x VRAM 200 lines (1) / 400 lines (0), 15 KHz / 24 KHz
+    */
 
 	gfx_ctrl = data;
 
@@ -987,7 +987,7 @@ static WRITE8_HANDLER( pc8801_irq_mask_w )
 		vrtc_irq_latch = 0;
 
 	//if(data & 4)
-	//	printf("IRQ mask %02x\n",data);
+	//  printf("IRQ mask %02x\n",data);
 }
 #endif
 
@@ -1060,11 +1060,11 @@ static WRITE8_HANDLER( pc8801_palram_w )
 static WRITE8_HANDLER( pc8801_layer_masking_w )
 {
 	/*
-	---- x--- green gvram masked flag
-	---- -x-- red gvram masked flag
-	---- --x- blue gvram masked flag
-	---- ---x text vram masked
-	*/
+    ---- x--- green gvram masked flag
+    ---- -x-- red gvram masked flag
+    ---- --x- blue gvram masked flag
+    ---- ---x text vram masked
+    */
 
 	layer_mask = data;
 }
@@ -1086,12 +1086,12 @@ static WRITE8_HANDLER( pc88_crtc_param_w )
 static READ8_HANDLER( pc8801_crtc_status_r )
 {
 	/*
-	---x ---- video enable
-	---- x--- DMA is running
-	---- -x-- special control character IRQ
-	---- --x- indication end IRQ
-	---- ---x light pen input
-	*/
+    ---x ---- video enable
+    ---- x--- DMA is running
+    ---- -x-- special control character IRQ
+    ---- --x- indication end IRQ
+    ---- ---x light pen input
+    */
 
 	return crtc.status;
 }
@@ -1099,7 +1099,7 @@ static READ8_HANDLER( pc8801_crtc_status_r )
 static const char *const crtc_command[] =
 {
 	"Reset / Stop Display",				// 0
-	"Start Display", 					// 1
+	"Start Display",					// 1
 	"Set IRQ MASK",						// 2
 	"Read Light Pen",					// 3
 	"Load Cursor Position",				// 4
@@ -1140,7 +1140,7 @@ static WRITE8_HANDLER( pc88_crtc_cmd_w )
 	}
 
 	//if((data >> 5) != 4)
-	//	printf("CRTC cmd %s polled\n",crtc_command[data >> 5]);
+	//  printf("CRTC cmd %s polled\n",crtc_command[data >> 5]);
 }
 
 static WRITE8_HANDLER( pc8801_dmac_w )
@@ -1168,9 +1168,9 @@ static READ8_HANDLER( pc8801_extram_mode_r )
 static WRITE8_HANDLER( pc8801_extram_mode_w )
 {
 	/*
-	---x ---- Write EXT RAM access at 0x0000 - 0x7fff
-	---- ---x Read EXT RAM access at 0x0000 - 0x7fff
-	*/
+    ---x ---- Write EXT RAM access at 0x0000 - 0x7fff
+    ---- ---x Read EXT RAM access at 0x0000 - 0x7fff
+    */
 
 	extram_mode = data & 0x11;
 }
@@ -1266,7 +1266,7 @@ static READ8_HANDLER( pc8801_cdrom_r )
 	//printf("CD-ROM read [%02x]\n",offset);
 
 	//if(has_cdrom)
-	//	return cdrom_reg[offset];
+	//  return cdrom_reg[offset];
 
 	return 0xff;
 }
@@ -1274,9 +1274,9 @@ static READ8_HANDLER( pc8801_cdrom_r )
 static WRITE8_HANDLER( pc8801_cdrom_w )
 {
 	/*
-	[9] ---x ---- CD-ROM BIOS bank
-	    ---- ---x CD-ROM E-ROM bank (?)
-	*/
+    [9] ---x ---- CD-ROM BIOS bank
+        ---- ---x CD-ROM E-ROM bank (?)
+    */
 	//printf("CD-ROM write %02x -> [%02x]\n",data,offset);
 
 	if(has_cdrom)
@@ -1364,8 +1364,8 @@ static ADDRESS_MAP_START( pc8801_io, ADDRESS_SPACE_IO, 8 )
 //  AM_RANGE(0xd0, 0xd7) AM_NOP                                     /* music & GP-IB */
 //  AM_RANGE(0xd8, 0xd8) AM_NOP                                     /* GP-IB */
 //  AM_RANGE(0xdc, 0xdf) AM_NOP                                     /* MODEM */
-	AM_RANGE(0xe2, 0xe2) AM_READWRITE(pc8801_extram_mode_r,pc8801_extram_mode_w) 			/* expand RAM mode */
-	AM_RANGE(0xe3, 0xe3) AM_READWRITE(pc8801_extram_bank_r,pc8801_extram_bank_w) 			/* expand RAM bank */
+	AM_RANGE(0xe2, 0xe2) AM_READWRITE(pc8801_extram_mode_r,pc8801_extram_mode_w)			/* expand RAM mode */
+	AM_RANGE(0xe3, 0xe3) AM_READWRITE(pc8801_extram_bank_r,pc8801_extram_bank_w)			/* expand RAM bank */
 #ifdef USE_PROPER_I8214
 	AM_RANGE(0xe4, 0xe4) AM_WRITE(i8214_irq_level_w)
 	AM_RANGE(0xe6, 0xe6) AM_WRITE(i8214_irq_mask_w)
@@ -1439,7 +1439,7 @@ ADDRESS_MAP_END
 
 static TIMER_CALLBACK( pc8801fd_upd765_tc_to_zero )
 {
-//	pc88va_state *state = machine->driver_data<pc88va_state>();
+//  pc88va_state *state = machine->driver_data<pc88va_state>();
 
 	upd765_tc_w(machine->device("upd765"), 0);
 }
@@ -1479,7 +1479,7 @@ static ADDRESS_MAP_START( pc8801fdc_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xf0, 0xf0) AM_WRITE(fdc_irq_vector_w) // Interrupt Opcode Port
 	AM_RANGE(0xf4, 0xf4) AM_WRITE(fdc_drive_mode_w) // Drive mode, 2d, 2dd, 2hd
-//	AM_RANGE(0xf7, 0xf7) AM_WRITENOP // printer port output
+//  AM_RANGE(0xf7, 0xf7) AM_WRITENOP // printer port output
 	AM_RANGE(0xf8, 0xf8) AM_READWRITE(upd765_tc_r,upd765_mc_w) // (R) Terminal Count Port (W) Motor Control Port
 	AM_RANGE(0xfa, 0xfa) AM_DEVREAD("upd765", upd765_status_r )
 	AM_RANGE(0xfb, 0xfb) AM_DEVREADWRITE("upd765", upd765_data_r, upd765_data_w )
@@ -1682,9 +1682,9 @@ static INPUT_PORTS_START( pc8001 )
 	PORT_DIPNAME( 0x20, 0x20, "Duplex" )
 	PORT_DIPSETTING(    0x20, "Half" )
 	PORT_DIPSETTING(    0x00, "Full" )
-/*	PORT_DIPNAME( 0x80, 0x80, "Disable floppy" )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )*/
+/*  PORT_DIPNAME( 0x80, 0x80, "Disable floppy" )
+    PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+    PORT_DIPSETTING(    0x00, DEF_STR( On ) )*/
 	PORT_DIPNAME( 0xc0, 0x40, "Basic mode" )
 	PORT_DIPSETTING(    0x80, "N-BASIC" )
 	PORT_DIPSETTING(    0xc0, "N88-BASIC (V1)" )
@@ -1842,9 +1842,9 @@ void pc8801_raise_irq(running_machine *machine,UINT8 irq,UINT8 state)
 
 static WRITE_LINE_DEVICE_HANDLER( pic_int_w )
 {
-//	if (state == ASSERT_LINE)
-//	{
-//	}
+//  if (state == ASSERT_LINE)
+//  {
+//  }
 }
 
 static WRITE_LINE_DEVICE_HANDLER( pic_enlg_w )
@@ -2219,9 +2219,9 @@ ROM_START( pc8801mk2sr )
 	ROM_REGION( 0x10000, "n88rom", ROMREGION_ERASEFF ) // 2.0
 	ROM_LOAD( "mk2sr_n88.rom",   0x0000, 0x8000, CRC(a0fc0473) SHA1(3b31fc68fa7f47b21c1a1cb027b86b9e87afbfff) )
 	ROM_LOAD( "mk2sr_n88_0.rom", 0x8000, 0x2000, CRC(710a63ec) SHA1(d239c26ad7ac5efac6e947b0e9549b1534aa970d) )
-	ROM_LOAD( "n88_1.rom", 		 0xa000, 0x2000, CRC(c0bd2aa6) SHA1(8528eef7946edf6501a6ccb1f416b60c64efac7c) )
-	ROM_LOAD( "n88_2.rom", 		 0xc000, 0x2000, CRC(af2b6efa) SHA1(b7c8bcea219b77d9cc3ee0efafe343cc307425d1) )
-	ROM_LOAD( "n88_3.rom", 		 0xe000, 0x2000, CRC(7713c519) SHA1(efce0b51cab9f0da6cf68507757f1245a2867a72) )
+	ROM_LOAD( "n88_1.rom",		 0xa000, 0x2000, CRC(c0bd2aa6) SHA1(8528eef7946edf6501a6ccb1f416b60c64efac7c) )
+	ROM_LOAD( "n88_2.rom",		 0xc000, 0x2000, CRC(af2b6efa) SHA1(b7c8bcea219b77d9cc3ee0efafe343cc307425d1) )
+	ROM_LOAD( "n88_3.rom",		 0xe000, 0x2000, CRC(7713c519) SHA1(efce0b51cab9f0da6cf68507757f1245a2867a72) )
 
 	ROM_REGION( 0x10000, "fdccpu", 0)
 	ROM_LOAD( "disk.rom", 0x0000, 0x0800, CRC(2158d307) SHA1(bb7103a0818850a039c67ff666a31ce49a8d516f) )
@@ -2453,17 +2453,17 @@ ROM_END
 COMP( 1981, pc8801,         0,		0,     pc8801,  	pc88sr,  0,    "Nippon Electronic Company",  "PC-8801", GAME_NOT_WORKING )
 COMP( 1983, pc8801mk2,      pc8801, 0,     pc8801,  	pc88sr,  0,    "Nippon Electronic Company",  "PC-8801mkII", GAME_NOT_WORKING )
 COMP( 1985, pc8801mk2sr,    pc8801,	0,     pc8801,  	pc88sr,  0,    "Nippon Electronic Company",  "PC-8801mkIISR", GAME_NOT_WORKING )
-//COMP( 1985, pc8801mk2tr,  pc8801, 0,     pc8801,  	pc88sr,  0,    "Nippon Electronic Company",  "PC-8801mkIITR", GAME_NOT_WORKING )
+//COMP( 1985, pc8801mk2tr,  pc8801, 0,     pc8801,      pc88sr,  0,    "Nippon Electronic Company",  "PC-8801mkIITR", GAME_NOT_WORKING )
 COMP( 1985, pc8801mk2fr,    pc8801,	0,     pc8801,  	pc88sr,  0,    "Nippon Electronic Company",  "PC-8801mkIIFR", GAME_NOT_WORKING )
 COMP( 1985, pc8801mk2mr,    pc8801,	0,     pc8801,  	pc88sr,  0,    "Nippon Electronic Company",  "PC-8801mkIIMR", GAME_NOT_WORKING )
 
-//COMP( 1986, pc8801fh,     0,      0,     pc8801,  	pc88sr,  0,    "Nippon Electronic Company",  "PC-8801FH", GAME_NOT_WORKING )
-COMP( 1986, pc8801mh,       pc8801,	0,     pc8801fh,  	pc88sr,  0,    "Nippon Electronic Company",  "PC-8801MH", GAME_NOT_WORKING )
-COMP( 1987, pc8801fa,       pc8801,	0,     pc8801fh,  	pc88sr,  0,    "Nippon Electronic Company",  "PC-8801FA", GAME_NOT_WORKING )
+//COMP( 1986, pc8801fh,     0,      0,     pc8801,      pc88sr,  0,    "Nippon Electronic Company",  "PC-8801FH", GAME_NOT_WORKING )
+COMP( 1986, pc8801mh,       pc8801,	0,     pc8801fh,	pc88sr,  0,    "Nippon Electronic Company",  "PC-8801MH", GAME_NOT_WORKING )
+COMP( 1987, pc8801fa,       pc8801,	0,     pc8801fh,	pc88sr,  0,    "Nippon Electronic Company",  "PC-8801FA", GAME_NOT_WORKING )
 COMP( 1987, pc8801ma,       pc8801,	0,     pc8801ma,    pc88sr,  0,    "Nippon Electronic Company",  "PC-8801MA", GAME_NOT_WORKING )
-//COMP( 1988, pc8801fe,     pc8801, 0,     pc8801,  	pc88sr,  0,    "Nippon Electronic Company",  "PC-8801FE", GAME_NOT_WORKING )
+//COMP( 1988, pc8801fe,     pc8801, 0,     pc8801,      pc88sr,  0,    "Nippon Electronic Company",  "PC-8801FE", GAME_NOT_WORKING )
 COMP( 1988, pc8801ma2,      pc8801,	0,     pc8801ma,    pc88sr,  0,    "Nippon Electronic Company",  "PC-8801MA2", GAME_NOT_WORKING )
-//COMP( 1989, pc8801fe2,    pc8801, 0,     pc8801,  	pc88sr,  0,    "Nippon Electronic Company",  "PC-8801FE2", GAME_NOT_WORKING )
+//COMP( 1989, pc8801fe2,    pc8801, 0,     pc8801,      pc88sr,  0,    "Nippon Electronic Company",  "PC-8801FE2", GAME_NOT_WORKING )
 COMP( 1989, pc8801mc,       pc8801,	0,     pc8801mc,	pc88sr,  0,    "Nippon Electronic Company",  "PC-8801MC", GAME_NOT_WORKING )
 
 //COMP( 1989, pc98do,       0,      0,     pc88va,   pc88sr,  0,    "Nippon Electronic Company",  "PC-98DO", GAME_NOT_WORKING )

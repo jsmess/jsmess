@@ -125,9 +125,9 @@
     2010-March-22 Curt Coder:
     - Implemented immediate and index pulse interrupts.
 
-	2010-Dec-31 Phill Harvey-Smith
-	- Copied multi-sector write code from r7263, for some reason this had been
-	  silently removed, but is required for the rmnimbus driver.
+    2010-Dec-31 Phill Harvey-Smith
+    - Copied multi-sector write code from r7263, for some reason this had been
+      silently removed, but is required for the rmnimbus driver.
 
     TODO:
         - What happens if a track is read that doesn't have any id's on it?
@@ -1037,7 +1037,7 @@ static void wd17xx_complete_command(device_t *device, int delay)
 
 	/* set new timer */
 	w->timer_cmd->adjust(attotime::from_usec(usecs));
-	
+
 	/* Kill onshot read/write sector timers */
 	w->timer_rs->adjust(attotime::never);
 	w->timer_ws->adjust(attotime::never);
@@ -1844,7 +1844,7 @@ WRITE8_DEVICE_HANDLER( wd17xx_data_w )
                         w->data_offset = 0;
 
 						/* Check we should handle the next sector for a multi record write */
-						if ( w->command_type == TYPE_II && w->command == FDC_WRITE_SEC && ( w->write_cmd & FDC_MULTI_REC ) ) 
+						if ( w->command_type == TYPE_II && w->command == FDC_WRITE_SEC && ( w->write_cmd & FDC_MULTI_REC ) )
 						{
 							w->sector++;
 							if (wd17xx_locate_sector(device))

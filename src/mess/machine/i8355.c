@@ -13,7 +13,7 @@
 
 
 //**************************************************************************
-//	MACROS / CONSTANTS
+//  MACROS / CONSTANTS
 //**************************************************************************
 
 #define LOG 0
@@ -244,14 +244,14 @@ WRITE8_MEMBER( i8355_device::io_w )
 	case REGISTER_PORT_A:
 	case REGISTER_PORT_B:
 		if (LOG) logerror("I8355 '%s' Port %c Write %02x\n", tag(), 'A' + port, data);
-		
+
 		write_port(port, data);
 		break;
 
 	case REGISTER_PORT_A_DDR:
 	case REGISTER_PORT_B_DDR:
 		if (LOG) logerror("I8355 '%s' Port %c DDR: %02x\n", tag(), 'A' + port, data);
-		
+
 		m_ddr[port] = data;
 		write_port(port, data);
 		break;

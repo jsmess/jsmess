@@ -54,7 +54,7 @@ public:
 	required_device<device_t> m_ram;
 	required_device<device_t> m_floppy0;
 	required_device<device_t> m_floppy1;
-	
+
 	virtual void machine_start();
 
 	virtual bool video_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);

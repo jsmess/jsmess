@@ -10,9 +10,9 @@
 
     TODO:
 
-	- microdrive
-	- ZX8301 memory access slowdown
-	- use resnet.h to create palette
+    - microdrive
+    - ZX8301 memory access slowdown
+    - use resnet.h to create palette
     - Tyche bios is broken
     - several disk interfaces (720K/1.44MB/3.2MB)
     - Gold Card (68000 @ 16MHz, 2MB RAM)
@@ -59,11 +59,11 @@
 
 
 //**************************************************************************
-//	INTELLIGENT PERIPHERAL CONTROLLER
+//  INTELLIGENT PERIPHERAL CONTROLLER
 //**************************************************************************
 
 //-------------------------------------------------
-//  ipc_w - 
+//  ipc_w -
 //-------------------------------------------------
 
 WRITE8_MEMBER( ql_state::ipc_w )
@@ -74,7 +74,7 @@ WRITE8_MEMBER( ql_state::ipc_w )
 
 
 //-------------------------------------------------
-//  ipc_port1_w - 
+//  ipc_port1_w -
 //-------------------------------------------------
 
 WRITE8_MEMBER( ql_state::ipc_port1_w )
@@ -99,7 +99,7 @@ WRITE8_MEMBER( ql_state::ipc_port1_w )
 
 
 //-------------------------------------------------
-//  ipc_port2_w - 
+//  ipc_port2_w -
 //-------------------------------------------------
 
 WRITE8_MEMBER( ql_state::ipc_port2_w )
@@ -152,7 +152,7 @@ WRITE8_MEMBER( ql_state::ipc_port2_w )
 
 
 //-------------------------------------------------
-//  ipc_port2_r - 
+//  ipc_port2_r -
 //-------------------------------------------------
 
 READ8_MEMBER( ql_state::ipc_port2_r )
@@ -172,16 +172,16 @@ READ8_MEMBER( ql_state::ipc_port2_r )
 
     */
 
-//	int irq = (m_ser2_rxd | m_ser1_txd);
+//  int irq = (m_ser2_rxd | m_ser1_txd);
 
-//	cpu_set_input_line(m_ipc, INPUT_LINE_IRQ0, irq);
+//  cpu_set_input_line(m_ipc, INPUT_LINE_IRQ0, irq);
 
 	return (m_comdata << 7);
 }
 
 
 //-------------------------------------------------
-//  ipc_t1_r - 
+//  ipc_t1_r -
 //-------------------------------------------------
 
 READ8_MEMBER( ql_state::ipc_t1_r )
@@ -191,7 +191,7 @@ READ8_MEMBER( ql_state::ipc_t1_r )
 
 
 //-------------------------------------------------
-//  ipc_bus_r - 
+//  ipc_bus_r -
 //-------------------------------------------------
 
 READ8_MEMBER( ql_state::ipc_bus_r )
@@ -228,7 +228,7 @@ READ8_MEMBER( ql_state::ipc_bus_r )
 
 
 //**************************************************************************
-//	ADDRESS MAPS
+//  ADDRESS MAPS
 //**************************************************************************
 
 //-------------------------------------------------
@@ -270,7 +270,7 @@ ADDRESS_MAP_END
 
 
 //**************************************************************************
-//	INPUT PORTS
+//  INPUT PORTS
 //**************************************************************************
 
 //-------------------------------------------------
@@ -536,7 +536,7 @@ INPUT_PORTS_END
 
 
 //**************************************************************************
-//	VIDEO
+//  VIDEO
 //**************************************************************************
 
 //-------------------------------------------------
@@ -570,7 +570,7 @@ bool ql_state::video_update(screen_device &screen, bitmap_t &bitmap, const recta
 
 
 //**************************************************************************
-//	DEVICE CONFIGURATION
+//  DEVICE CONFIGURATION
 //**************************************************************************
 
 //-------------------------------------------------
@@ -734,7 +734,7 @@ static MICRODRIVE_CONFIG( mdv2_config )
 
 
 //**************************************************************************
-//	MACHINE INITIALIZATION
+//  MACHINE INITIALIZATION
 //**************************************************************************
 
 //-------------------------------------------------
@@ -745,7 +745,7 @@ void ql_state::machine_start()
 {
 	address_space *program = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);
 
-	// configure RAM 
+	// configure RAM
 	switch (ram_get_size(m_ram))
 	{
 	case 128*1024:
@@ -779,7 +779,7 @@ void ql_state::machine_start()
 
 
 //**************************************************************************
-//	MACHINE CONFIGURATION
+//  MACHINE CONFIGURATION
 //**************************************************************************
 
 //-------------------------------------------------
@@ -853,10 +853,10 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 
 static MACHINE_CONFIG_DERIVED( opd, ql )
-	// internal ram
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("128K")
-	MCFG_RAM_EXTRA_OPTIONS("256K")
+    // internal ram
+    MCFG_RAM_MODIFY(RAM_TAG)
+    MCFG_RAM_DEFAULT_SIZE("128K")
+    MCFG_RAM_EXTRA_OPTIONS("256K")
 MACHINE_CONFIG_END
 */
 
@@ -866,15 +866,15 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 
 static MACHINE_CONFIG_DERIVED( megaopd, ql )
-	// internal ram
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("256K")
+    // internal ram
+    MCFG_RAM_MODIFY(RAM_TAG)
+    MCFG_RAM_DEFAULT_SIZE("256K")
 MACHINE_CONFIG_END
 */
 
 
 //**************************************************************************
-//	ROMS
+//  ROMS
 //**************************************************************************
 
 //-------------------------------------------------
@@ -1124,7 +1124,7 @@ ROM_END
 
 
 //**************************************************************************
-//	SYSTEM DRIVERS
+//  SYSTEM DRIVERS
 //**************************************************************************
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT   INIT    COMPANY                     FULLNAME        FLAGS
@@ -1137,5 +1137,5 @@ COMP( 1985, ql_it,  ql,     0,      ql,         ql_it,  0,      "Sinclair Resear
 COMP( 1985, ql_se,  ql,     0,      ql,         ql_se,  0,      "Sinclair Research Ltd",    "QL (Sweden)",  GAME_NOT_WORKING )
 COMP( 1985, ql_dk,  ql,     0,      ql,         ql_dk,  0,      "Sinclair Research Ltd",    "QL (Denmark)", GAME_NOT_WORKING )
 COMP( 1985, ql_gr,  ql,     0,      ql,         ql,     0,      "Sinclair Research Ltd",    "QL (Greece)",  GAME_SUPPORTS_SAVE )
-//COMP( 1984, tonto,  0,		0,		opd,		ql,		0,		"British Telecom Business Systems", "Merlin M1800 Tonto", GAME_NOT_WORKING )
-//COMP( 1986, megaopd,tonto,	0,		megaopd,	ql,		0,		"International Computer Limited", "MegaOPD (USA)", GAME_NOT_WORKING )
+//COMP( 1984, tonto,  0,        0,      opd,        ql,     0,      "British Telecom Business Systems", "Merlin M1800 Tonto", GAME_NOT_WORKING )
+//COMP( 1986, megaopd,tonto,    0,      megaopd,    ql,     0,      "International Computer Limited", "MegaOPD (USA)", GAME_NOT_WORKING )

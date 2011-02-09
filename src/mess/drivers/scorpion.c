@@ -415,7 +415,7 @@ static MACHINE_CONFIG_DERIVED( scorpion, spectrum_128 )
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("256K")
-	
+
 	MCFG_TIMER_ADD_PERIODIC("nmi_timer", nmi_check_callback, attotime::from_hz(50))
 MACHINE_CONFIG_END
 

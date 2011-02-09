@@ -1,33 +1,33 @@
 /*
 
-	The Dream 6800 is a CHIP-8 computer roughly modelled on the Cosmac VIP.
-	It was decribed in Electronics Australia magazine in 4 articles starting
-	in May 1979. It has 1k of ROM and 1k of RAM. The video consists of 64x32
-	pixels.	The keyboard is a hexcode 4x4 matrix, plus a Function key.
-	
-	Function keys:
-	FN 0 - Modify memory - firstly enter a 4-digit address, then 2-digit data
-	                the address will increment by itself, enter the next byte.
-	                FN by itself will step to the next address.
+    The Dream 6800 is a CHIP-8 computer roughly modelled on the Cosmac VIP.
+    It was decribed in Electronics Australia magazine in 4 articles starting
+    in May 1979. It has 1k of ROM and 1k of RAM. The video consists of 64x32
+    pixels. The keyboard is a hexcode 4x4 matrix, plus a Function key.
 
-	FN 1 - Tape load
+    Function keys:
+    FN 0 - Modify memory - firstly enter a 4-digit address, then 2-digit data
+                    the address will increment by itself, enter the next byte.
+                    FN by itself will step to the next address.
 
-	FN 2 - Tape save
+    FN 1 - Tape load
 
-	FN 3 - Run. Enter the 4-digit go address, then it starts executing.
+    FN 2 - Tape save
 
-
-	Information and programs can be found at http://chip8.com/?page=78
+    FN 3 - Run. Enter the 4-digit go address, then it starts executing.
 
 
-	To change the large numbers at the bottom, start in debug mode, enter
-	some data at memory 6 and 7, then G to run.
+    Information and programs can be found at http://chip8.com/?page=78
+
+
+    To change the large numbers at the bottom, start in debug mode, enter
+    some data at memory 6 and 7, then G to run.
 
 
     TODO:
-	- Cassette
-	- CPU should freeze while screen is being drawn
-	- Keyboard (should work but it doesn't)
+    - Cassette
+    - CPU should freeze while screen is being drawn
+    - Keyboard (should work but it doesn't)
 */
 
 #define ADDRESS_MAP_MODERN
@@ -179,11 +179,11 @@ WRITE_LINE_MEMBER( d6800_state::d6800_screen_w )
 READ8_MEMBER( d6800_state::d6800_cassette_r )
 {
 	/*
-	Cassette circuit consists of a 741 op-amp, a 74121 oneshot, and a 74LS74.
-	When a pulse arrives, the oneshot is set. After a preset time, it triggers
-	and the 74LS74 compares this pulse to the output of the 741. Therefore it
-	knows if the tone is 1200 or 2400 Hz. Input to PIA is bit 7.
-	*/
+    Cassette circuit consists of a 741 op-amp, a 74121 oneshot, and a 74LS74.
+    When a pulse arrives, the oneshot is set. After a preset time, it triggers
+    and the 74LS74 compares this pulse to the output of the 741. Therefore it
+    knows if the tone is 1200 or 2400 Hz. Input to PIA is bit 7.
+    */
 
 	return 0xff;
 }
@@ -191,10 +191,10 @@ READ8_MEMBER( d6800_state::d6800_cassette_r )
 WRITE8_MEMBER( d6800_state::d6800_cassette_w )
 {
 	/*
-	Cassette circuit consists of a 566 and a transistor. The 556 runs at 2400
-	or 1200 Hz depending on the state of the transistor. This is controlled by
-	bit 0 of the PIA. Bit 6 drives the speaker.
-	*/
+    Cassette circuit consists of a 566 and a transistor. The 556 runs at 2400
+    or 1200 Hz depending on the state of the transistor. This is controlled by
+    bit 0 of the PIA. Bit 6 drives the speaker.
+    */
 
 	speaker_level_w(m_speaker, (data & 0x40) ? 0 : 1);
 }

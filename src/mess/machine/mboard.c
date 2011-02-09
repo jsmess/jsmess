@@ -71,22 +71,22 @@ Example board scan:
 Starting postion and pawn on E2 is lifted
 
 
-mask: 7f 0111 1111	Line 8
-data:  0 0000 0000	all fields occupied
-mask: bf 1011 1111	Line 7
-data:  0 0000 0000	all fields occupied
-mask: df 1101 1111	Line 6
-data: ff 1111 1111	all fields empty
-mask: ef 1110 1111	Line 5
-data: ff 1111 1111	all fields empty
-mask: f7 1111 0111	Line 4
-data: ff 1111 1111	all fields empty
-mask: fb 1111 1011	Line 3
-data: ff 1111 1111	all fields empty
-mask: fd 1111 1101	Line 2
-data: 10 0001 0000	E2 is empty rest is occupied
-mask: fe 1111 1110	Line 1
-data:  0 0000 0000	all fields occupied
+mask: 7f 0111 1111  Line 8
+data:  0 0000 0000  all fields occupied
+mask: bf 1011 1111  Line 7
+data:  0 0000 0000  all fields occupied
+mask: df 1101 1111  Line 6
+data: ff 1111 1111  all fields empty
+mask: ef 1110 1111  Line 5
+data: ff 1111 1111  all fields empty
+mask: f7 1111 0111  Line 4
+data: ff 1111 1111  all fields empty
+mask: fb 1111 1011  Line 3
+data: ff 1111 1111  all fields empty
+mask: fd 1111 1101  Line 2
+data: 10 0001 0000  E2 is empty rest is occupied
+mask: fe 1111 1110  Line 1
+data:  0 0000 0000  all fields occupied
 
 
 */
@@ -139,8 +139,8 @@ static void write_LED(UINT8 data)
 
 Example: turn led E2 on
 
-mask:  fd 1111 1101	Line 2
-data:  10 0001 0000	Line E
+mask:  fd 1111 1101 Line 2
+data:  10 0001 0000 Line E
 
 */
 
@@ -159,7 +159,7 @@ data:  10 0001 0000	Line E
 					if (!(Line18_LED & (1 << i_18)))	/* cleared bit */
 						output_set_led_value(LED, 1);
 					//else
-					//	output_set_led_value(LED, 0);
+					//  output_set_led_value(LED, 0);
 				}
 			}
 		}

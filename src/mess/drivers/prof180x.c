@@ -8,15 +8,15 @@
 
 /*
 
-	TODO:
+    TODO:
 
-	- HD64180 CPU (DMA, MMU, SIO, etc) (Z80180 like)
-	- memory banking
-	- keyboard
-	- floppy
-	- floppy motor off timer
-	- floppy index callback
-	- RTC
+    - HD64180 CPU (DMA, MMU, SIO, etc) (Z80180 like)
+    - memory banking
+    - keyboard
+    - floppy
+    - floppy motor off timer
+    - floppy index callback
+    - RTC
 
 */
 
@@ -36,15 +36,15 @@ void prof180x_state::bankswitch()
 	case 0:
 		// bank0_r = EPROM, bank0_w = RAM, bank1 = RAM
 		break;
-	
+
 	case 1:
 		// bank0_r = RAM, bank0_w = RAM, bank1 = RAM
 		break;
-	
+
 	case 2:
 		// bank0_r = UNMAP, bank0_w = UNMAP, bank1 = RAM
 		break;
-	
+
 	case 3:
 		// bank0_r = RAM, bank0_w = RAM, bank1 = UNMAP
 		break;
@@ -94,14 +94,14 @@ WRITE8_MEMBER( prof180x_state::flr_w )
 
         bit     description
 
-        0		VAL
+        0       VAL
         1       FLG0
         2       FLG1
         3       FLG2
-        4       
-        5       
-        6       
-        7       
+        4
+        5
+        6
+        7
 
     */
 
@@ -117,13 +117,13 @@ READ8_MEMBER( prof180x_state::status0_r )
 
         bit     description
 
-        0		BUSY
-        1       
-        2       
-        3       
+        0       BUSY
+        1
+        2
+        3
         4       B-E
         5       IDX
-        6       
+        6
         7       MOT
 
     */
@@ -137,13 +137,13 @@ READ8_MEMBER( prof180x_state::status1_r )
 
         bit     description
 
-        0		FREE
-        1       
-        2       
-        3       
+        0       FREE
+        1
+        2
+        3
         4       J18
         5       J19
-        6       
+        6
         7       TDO
 
     */
@@ -203,7 +203,7 @@ static const floppy_config prof180x_floppy_config =
 /*
 static RTC8583_INTERFCE( rtc_intf )
 {
-	DEVCB_CPU_INPUT_LINE(HD64180_TAG, INPUT_LINE_INT2)
+    DEVCB_CPU_INPUT_LINE(HD64180_TAG, INPUT_LINE_INT2)
 };
 */
 

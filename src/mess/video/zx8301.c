@@ -11,9 +11,9 @@
 
     TODO:
 
-	- wait state on memory access during video update
+    - wait state on memory access during video update
     - proper video timing
-	- get rid of flash timer
+    - get rid of flash timer
 
 */
 
@@ -23,7 +23,7 @@
 
 
 //**************************************************************************
-//	MACROS / CONSTANTS
+//  MACROS / CONSTANTS
 //**************************************************************************
 
 #define LOG 0
@@ -182,7 +182,7 @@ void zx8301_device::device_start()
 
 	// resolve callbacks
     devcb_resolve_write_line(&m_out_vsync_func, &m_config.out_vsync_func, this);
-	
+
 	// allocate timers
 	m_vsync_timer = timer_alloc(TIMER_VSYNC);
 	m_flash_timer = timer_alloc(TIMER_FLASH);
@@ -195,7 +195,7 @@ void zx8301_device::device_start()
 	save_item(NAME(m_dispoff));
 	save_item(NAME(m_mode8));
 	save_item(NAME(m_base));
- 	save_item(NAME(m_flash));
+	save_item(NAME(m_flash));
 	save_item(NAME(m_vsync));
 	save_item(NAME(m_vda));
 }
@@ -229,18 +229,18 @@ WRITE8_MEMBER( zx8301_device::control_w )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		0
-		1		display off
-		2
-		3		graphics mode
-		4
-		5
-		6
-		7		display base address
+        0
+        1       display off
+        2
+        3       graphics mode
+        4
+        5
+        6
+        7       display base address
 
-	*/
+    */
 
 	if (LOG) logerror("ZX8301 Control: %02x\n", data);
 

@@ -117,7 +117,7 @@ WRITE8_MEMBER( advision_state::sound_g_w )
 WRITE8_MEMBER( advision_state::sound_d_w )
 {
 	m_sound_d = data & 0x01;
-	
+
 	update_dac();
 }
 

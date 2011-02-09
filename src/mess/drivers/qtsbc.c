@@ -4,7 +4,7 @@
 
         11/12/2009 Skeleton driver.
 
-	It expects a rom or similar at E377-up, so currently it crashes.
+    It expects a rom or similar at E377-up, so currently it crashes.
 
 ****************************************************************************/
 

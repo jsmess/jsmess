@@ -1,16 +1,16 @@
 /***************************************************************************
-   
+
         SM1800 (original name is CM1800 in cyrilic letters)
 
         10/12/2010 Skeleton driver.
 
-		On board hardware :
-			KR580VM80A central processing unit (i8080)
-			KR580VG75  programmable CRT video display controller (i8275)
-			KR580VV55  programmable parallel interface (i8255)
-			KR580IK51  programmable serial interface/communication controller (i8251)
-			KR580VV79  programmable peripheral device, keyboard and display controller (i8279)
-		
+        On board hardware :
+            KR580VM80A central processing unit (i8080)
+            KR580VG75  programmable CRT video display controller (i8275)
+            KR580VV55  programmable parallel interface (i8255)
+            KR580IK51  programmable serial interface/communication controller (i8251)
+            KR580VV79  programmable peripheral device, keyboard and display controller (i8279)
+
 ****************************************************************************/
 
 #include "emu.h"
@@ -30,7 +30,7 @@ public:
 
 static ADDRESS_MAP_START(sm1800_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x07ff ) AM_ROM	
+	AM_RANGE( 0x0000, 0x07ff ) AM_ROM
 	//AM_RANGE( 0x0fb0, 0x0fff ) AM_DEVWRITE("i8275", i8275_dack_w)
 	AM_RANGE( 0x1000, 0x17ff ) AM_RAM
 ADDRESS_MAP_END
@@ -41,7 +41,7 @@ static ADDRESS_MAP_START( sm1800_io , ADDRESS_SPACE_IO, 8)
 	AM_RANGE( 0x6c, 0x6f ) AM_DEVREADWRITE("i8255", i8255a_r, i8255a_w)
 	//AM_RANGE( 0x74, 0x75 ) AM_DEVREADWRITE("i8279", i8279_r, i8279_w)
 	AM_RANGE( 0x5c, 0x5c) AM_DEVREADWRITE("i8251", msm8251_data_r,msm8251_data_w)
-	AM_RANGE( 0x5d, 0x5d) AM_DEVREADWRITE("i8251", msm8251_status_r,msm8251_control_w)	
+	AM_RANGE( 0x5d, 0x5d) AM_DEVREADWRITE("i8251", msm8251_status_r,msm8251_control_w)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -53,8 +53,8 @@ static IRQ_CALLBACK(sm1800_irq_callback)
 	return 0xff;
 }
 
-static MACHINE_RESET(sm1800) 
-{	
+static MACHINE_RESET(sm1800)
+{
 	cpu_set_irq_callback(machine->device("maincpu"), sm1800_irq_callback);
 }
 
@@ -146,11 +146,11 @@ static MACHINE_CONFIG_START( sm1800, sm1800_state )
     /* basic machine hardware */
     MCFG_CPU_ADD("maincpu",I8080, XTAL_2MHz)
     MCFG_CPU_PROGRAM_MAP(sm1800_mem)
-    MCFG_CPU_IO_MAP(sm1800_io)	
+    MCFG_CPU_IO_MAP(sm1800_io)
 	MCFG_CPU_VBLANK_INT("screen", sm1800_vblank_interrupt)
-	
+
     MCFG_MACHINE_RESET(sm1800)
-	
+
 	MCFG_I8255A_ADD ("i8255", sm1800_ppi8255_interface )
 	MCFG_I8275_ADD	("i8275", sm1800_i8275_interface)
 	MCFG_MSM8251_ADD("i8251", default_msm8251_interface)
@@ -179,5 +179,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( ????, sm1800,  0,       0, 	sm1800, 	sm1800, 	 0,  	  "<unknown>",   "SM1800",		GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( ????, sm1800,  0,       0,	sm1800, 	sm1800, 	 0, 	  "<unknown>",   "SM1800",		GAME_NOT_WORKING | GAME_NO_SOUND)
 

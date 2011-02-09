@@ -6,7 +6,7 @@
       of the Commodore drives (designed by Chuck Peddle)
 
     Skeleton driver
-	
+
 ***************************************************************************/
 
 /*

@@ -1,26 +1,26 @@
 /*
-	
-	Luxor ABC 1600
 
-	Skeleton driver
-	
+    Luxor ABC 1600
+
+    Skeleton driver
+
 */
 
 /*
 
-	TODO:
+    TODO:
 
-	- MCS-48 PC:01DC - Unimplemented opcode = 75 (ENT0 CLK, enable clock/3 output on T0)
-	- video
-	- keyboard
-	- mouse
-	- floppy
-	- DMA
-	- DART
-	- CIO
-	- RTC
-	- hard disk (Xebec S1410)
-	- monitor portrait/landscape mode
+    - MCS-48 PC:01DC - Unimplemented opcode = 75 (ENT0 CLK, enable clock/3 output on T0)
+    - video
+    - keyboard
+    - mouse
+    - floppy
+    - DMA
+    - DART
+    - CIO
+    - RTC
+    - hard disk (Xebec S1410)
+    - monitor portrait/landscape mode
 
 */
 
@@ -42,7 +42,7 @@
 
 
 //**************************************************************************
-//	ADDRESS MAPS
+//  ADDRESS MAPS
 //**************************************************************************
 
 //-------------------------------------------------
@@ -54,21 +54,21 @@ static ADDRESS_MAP_START( abc1600_mem, ADDRESS_SPACE_PROGRAM, 8, abc1600_state )
 	AM_RANGE(0x04000, 0x7efff) AM_RAM
 	AM_RANGE(0x7f100, 0x7f100) AM_DEVWRITE_LEGACY(SY6845E_TAG, mc6845_address_w)
 	AM_RANGE(0x7f101, 0x7f101) AM_DEVREADWRITE_LEGACY(SY6845E_TAG, mc6845_register_r, mc6845_register_w)
-//	AM_RANGE(0x7f000, 0x7f000) AM_DEVREADWRITE_LEGACY(Z8410AB1_0_TAG, z80dma_r, z80dma_w)
-//	AM_RANGE(0x7f000, 0x7f000) AM_DEVREADWRITE_LEGACY(Z8410AB1_1_TAG, z80dma_r, z80dma_w)
-//	AM_RANGE(0x7f000, 0x7f000) AM_DEVREADWRITE_LEGACY(Z8410AB1_2_TAG, z80dma_r, z80dma_w)
-//	AM_RANGE(0x7f000, 0x7f003) AM_DEVREADWRITE_LEGACY(Z80DART_TAG, z80dart_ba_cd_r, z80dart_ba_cd_w)
-//	AM_RANGE(0x7f000, 0x7f003) AM_DEVREADWRITE_LEGACY(SAB1797_02P_TAG, wd17xx_r, wd17xx_w)
-//	AM_RANGE(0x7f000, 0x7f003) AM_DEVREADWRITE(Z8530B1_TAG, scc8530_r, scc8530_w)
-//	AM_RANGE(0x7f000, 0x7f003) AM_DEVREADWRITE(Z8536B1_TAG, z8536_r, z8536_w)
-//	AM_RANGE(0x7f000, 0x7f003) AM_DEVREADWRITE(E050_C16PC_TAG, e050c16pc_r, e050c16pc_w)
+//  AM_RANGE(0x7f000, 0x7f000) AM_DEVREADWRITE_LEGACY(Z8410AB1_0_TAG, z80dma_r, z80dma_w)
+//  AM_RANGE(0x7f000, 0x7f000) AM_DEVREADWRITE_LEGACY(Z8410AB1_1_TAG, z80dma_r, z80dma_w)
+//  AM_RANGE(0x7f000, 0x7f000) AM_DEVREADWRITE_LEGACY(Z8410AB1_2_TAG, z80dma_r, z80dma_w)
+//  AM_RANGE(0x7f000, 0x7f003) AM_DEVREADWRITE_LEGACY(Z80DART_TAG, z80dart_ba_cd_r, z80dart_ba_cd_w)
+//  AM_RANGE(0x7f000, 0x7f003) AM_DEVREADWRITE_LEGACY(SAB1797_02P_TAG, wd17xx_r, wd17xx_w)
+//  AM_RANGE(0x7f000, 0x7f003) AM_DEVREADWRITE(Z8530B1_TAG, scc8530_r, scc8530_w)
+//  AM_RANGE(0x7f000, 0x7f003) AM_DEVREADWRITE(Z8536B1_TAG, z8536_r, z8536_w)
+//  AM_RANGE(0x7f000, 0x7f003) AM_DEVREADWRITE(E050_C16PC_TAG, e050c16pc_r, e050c16pc_w)
 	AM_RANGE(0x80000, 0xfffff) AM_RAM
 ADDRESS_MAP_END
 
 
 
 //**************************************************************************
-//	INPUT PORTS
+//  INPUT PORTS
 //**************************************************************************
 
 //-------------------------------------------------
@@ -82,7 +82,7 @@ INPUT_PORTS_END
 
 
 //**************************************************************************
-//	VIDEO
+//  VIDEO
 //**************************************************************************
 
 //-------------------------------------------------
@@ -137,7 +137,7 @@ bool abc1600_state::video_update(screen_device &screen, bitmap_t &bitmap, const 
 
 
 //**************************************************************************
-//	DEVICE CONFIGURATION
+//  DEVICE CONFIGURATION
 //**************************************************************************
 
 //-------------------------------------------------
@@ -241,7 +241,7 @@ static const wd17xx_interface fdc_intf =
 
 
 //**************************************************************************
-//	MACHINE INITIALIZATION
+//  MACHINE INITIALIZATION
 //**************************************************************************
 
 //-------------------------------------------------
@@ -255,7 +255,7 @@ void abc1600_state::machine_start()
 
 
 //**************************************************************************
-//	MACHINE CONFIGURATION
+//  MACHINE CONFIGURATION
 //**************************************************************************
 
 //-------------------------------------------------
@@ -299,7 +299,7 @@ MACHINE_CONFIG_END
 
 
 //**************************************************************************
-//	ROMS
+//  ROMS
 //**************************************************************************
 
 //-------------------------------------------------
@@ -334,7 +334,7 @@ ROM_END
 
 
 //**************************************************************************
-//	SYSTEM DRIVERS
+//  SYSTEM DRIVERS
 //**************************************************************************
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     INIT  COMPANY     FULLNAME     FLAGS

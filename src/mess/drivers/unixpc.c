@@ -4,8 +4,8 @@
 
     Skeleton driver
 
-	Note: The 68k core needs restartable instruction support for this
-	to have a chance to run.
+    Note: The 68k core needs restartable instruction support for this
+    to have a chance to run.
 
 ***************************************************************************/
 

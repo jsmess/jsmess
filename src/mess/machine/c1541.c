@@ -977,7 +977,7 @@ static WRITE_LINE_DEVICE_HANDLER( soe_w )
 
 	c1541->soe = state;
 
-	cpu_set_input_line(c1541->cpu, M6502_SET_OVERFLOW, byte_ready);	
+	cpu_set_input_line(c1541->cpu, M6502_SET_OVERFLOW, byte_ready);
 	c1541->via1->write_ca1(byte_ready);
 }
 

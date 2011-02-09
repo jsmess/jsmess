@@ -533,7 +533,7 @@ static MACHINE_CONFIG_START( qx10, qx10_state )
 	MCFG_VIDEO_UPDATE(compis_gdc)
 
 	MCFG_MC146818_ADD( "rtc", MC146818_STANDARD )
-	
+
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("256K")
@@ -597,4 +597,4 @@ static DRIVER_INIT(qx10)
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY   FULLNAME       FLAGS */
 COMP( 1983, qx10,  0,       0,	qx10,	qx10,	 qx10,  		  "Epson",   "QX-10",		GAME_NOT_WORKING | GAME_NO_SOUND )
-COMP( 1983, qc10,  qx10,    0,	qx10,	qx10,	 0,  		      "Epson",   "QC-10 (Japan)",		GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP( 1983, qc10,  qx10,    0,	qx10,	qx10,	 0, 		      "Epson",   "QC-10 (Japan)",		GAME_NOT_WORKING | GAME_NO_SOUND )

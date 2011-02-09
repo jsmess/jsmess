@@ -1,5 +1,5 @@
 /***************************************************************************
-   
+
         Micro Craft Dimension 68000
 
         28/12/2011 Skeleton driver.
@@ -46,7 +46,7 @@ public:
 		  m_crtc(*this, "crtc"),
 		  m_speaker(*this, "speaker")
 	{ }
-		
+
 	required_device<cpu_device> m_maincpu;
 	required_device<device_t> m_crtc;
 	required_device<device_t> m_speaker;
@@ -195,14 +195,14 @@ static INPUT_PORTS_START( dim68k )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET(dim68k) 
+static MACHINE_RESET(dim68k)
 {
 	dim68k_state *state = machine->driver_data<dim68k_state>();
 	UINT8* ROM = machine->region("bootrom")->base();
 
 	memcpy((UINT8*)state->ram, ROM, 0x2000);
 
-	machine->device("maincpu")->reset();	
+	machine->device("maincpu")->reset();
 }
 
 static VIDEO_START( dim68k )
@@ -304,7 +304,7 @@ static const mc6845_interface dim68k_crtc = {
 static MACHINE_CONFIG_START( dim68k, dim68k_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)
-	MCFG_CPU_PROGRAM_MAP(dim68k_mem)	
+	MCFG_CPU_PROGRAM_MAP(dim68k_mem)
 
 	MCFG_MACHINE_RESET(dim68k)
 
@@ -330,30 +330,30 @@ static MACHINE_CONFIG_START( dim68k, dim68k_state )
 MACHINE_CONFIG_END
 
 /*
-68000 
+68000
 
-MC101A	82S100
-MC102B	82S100
-MC103E	2732A
-MC104	2732A	label "4050" underneath
-MC105	2732A	char gen
+MC101A  82S100
+MC102B  82S100
+MC103E  2732A
+MC104   2732A   label "4050" underneath
+MC105   2732A   char gen
 
 6512
 
-MC106	82LS135	U24
-MC107	82LS135	U20
-MC108	82S137	U23
-MC109	82S131	U16
-MC110	82LS135	U35
+MC106   82LS135 U24
+MC107   82LS135 U20
+MC108   82S137  U23
+MC109   82S131  U16
+MC110   82LS135 U35
 
 Z80
 
-MC111	82S123	U11
+MC111   82S123  U11
 
 8086
 
-MC112	82LS135	U18
-MC113	82S153	U16
+MC112   82LS135 U18
+MC113   82S153  U16
 */
 /* ROM definition */
 ROM_START( dim68k )
@@ -361,7 +361,7 @@ ROM_START( dim68k )
 	ROM_LOAD16_BYTE( "mc103e.bin", 0x0000, 0x1000, CRC(4730c902) SHA1(5c4bb79ad22def721a22eb63dd05e0391c8082be))
 	ROM_LOAD16_BYTE( "mc104.bin",  0x0001, 0x1000, CRC(14b04575) SHA1(43e15d9ebe1c9c1bf1bcfc1be3899a49e6748200))
 
-	ROM_REGION( 0x1000, "chargen", ROMREGION_ERASEFF )   
+	ROM_REGION( 0x1000, "chargen", ROMREGION_ERASEFF )
 	ROM_LOAD( "mc105e.bin", 0x0000, 0x1000, CRC(7a09daa8) SHA1(844bfa579293d7c3442fcbfa21bda75fff930394))
 
     // The remaining roms may not be in the correct positions or being loaded correctly
@@ -378,7 +378,7 @@ ROM_START( dim68k )
 	ROM_REGION( 0x1000, "cop8086", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "mc112.bin", 0x0000, 0x0100, CRC(dfd4cdbb) SHA1(a7831d415943fa86c417066807038bccbabb2573))
 	ROM_LOAD( "mc113.bin", 0x0100, 0x00ef, CRC(594bdf05) SHA1(36db911a27d930e023fa12683e86e9eecfffdba6))
-  
+
 	ROM_REGION( 0x1000, "mb", ROMREGION_ERASEFF )	// mainboard unknown
 	ROM_LOAD( "mc102.bin", 0x0000, 0x00fa, CRC(38e2abac) SHA1(0d7e730b46fc162764c69c51dea3bbe8337b1a7d))
 	ROM_LOAD( "mc101.bin", 0x0100, 0x00fa, CRC(caffb3a0) SHA1(36f5140b306565794c4d856e0c20589b8f2a37f4))

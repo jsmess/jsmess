@@ -10,19 +10,19 @@ TODO
 Notes:
     Relevant IC's shown.
 
-    CPU		- Zilog Z8400APS Z80A CPU
-	FDC		- SMC FDC1797
-	8155	- Intel P8155H
-	ROM0	- 
-	ROM1,2	- AMD AM2732-1DC 4Kx8 EPROM
-	CN1		- keyboard connector
-	CN2		- 
-	CN3		- 
-	CN4		- floppy connector
-	CN5		- power connector
-	CN6		- composite video connector
-	SW1		- reset switch
-	SW2		- 
+    CPU     - Zilog Z8400APS Z80A CPU
+    FDC     - SMC FDC1797
+    8155    - Intel P8155H
+    ROM0    -
+    ROM1,2  - AMD AM2732-1DC 4Kx8 EPROM
+    CN1     - keyboard connector
+    CN2     -
+    CN3     -
+    CN4     - floppy connector
+    CN5     - power connector
+    CN6     - composite video connector
+    SW1     - reset switch
+    SW2     -
 
 
 I/O PCB Layout
@@ -33,24 +33,24 @@ TODO
 Notes:
     Relevant IC's shown.
 
-	8155	- Intel P8155H
-	8251	- AMD P8251A
-	CN1		- IEEE488 connector
-	CN2		- RS232 connector
-	CN3		- 
+    8155    - Intel P8155H
+    8251    - AMD P8251A
+    CN1     - IEEE488 connector
+    CN2     - RS232 connector
+    CN3     -
 
 */
 
 /*
 
-	TODO:
+    TODO:
 
-	- video line buffer
-	- floppy
-	- keyboard
-	- RS232 RI interrupt
-	- PCB layouts
-	
+    - video line buffer
+    - floppy
+    - keyboard
+    - RS232 RI interrupt
+    - PCB layouts
+
 */
 
 #define ADDRESS_MAP_MODERN
@@ -69,11 +69,11 @@ Notes:
 
 
 //**************************************************************************
-//	INTERRUPTS
+//  INTERRUPTS
 //**************************************************************************
 
 //-------------------------------------------------
-//  update_interrupt - 
+//  update_interrupt -
 //-------------------------------------------------
 
 void vixen_state::update_interrupt()
@@ -103,22 +103,22 @@ WRITE8_MEMBER( vixen_state::ctl_w )
 READ8_MEMBER( vixen_state::status_r )
 {
 	/*
-		
-		bit		description
 
-		0		VSYNC enable
-		1		FDINT enable
-		2		VSYNC
-		3		1
-		4		1
-		5		1
-		6		1
-		7		1
-		
-	*/
+        bit     description
+
+        0       VSYNC enable
+        1       FDINT enable
+        2       VSYNC
+        3       1
+        4       1
+        5       1
+        6       1
+        7       1
+
+    */
 
 	UINT8 data = 0xf8;
-	
+
 	// vertical sync interrupt enable
 	data |= m_cmd_d0;
 
@@ -139,21 +139,21 @@ READ8_MEMBER( vixen_state::status_r )
 WRITE8_MEMBER( vixen_state::cmd_w )
 {
 	/*
-		
-		bit		description
 
-		0		VSYNC enable
-		1		FDINT enable
-		2		
-		3		
-		4		
-		5		
-		6		
-		7		
+        bit     description
 
-	*/
+        0       VSYNC enable
+        1       FDINT enable
+        2
+        3
+        4
+        5
+        6
+        7
 
-//	logerror("CMD %u\n", data);
+    */
+
+//  logerror("CMD %u\n", data);
 
 	// vertical sync interrupt enable
 	m_cmd_d0 = BIT(data, 0);
@@ -178,19 +178,19 @@ WRITE8_MEMBER( vixen_state::cmd_w )
 READ8_MEMBER( vixen_state::port3_r )
 {
 	/*
-		
-		bit		description
 
-		0		RI
-		1		DCD
-		2		1
-		3		1
-		4		1
-		5		1
-		6		1
-		7		1
+        bit     description
 
-	*/
+        0       RI
+        1       DCD
+        2       1
+        3       1
+        4       1
+        5       1
+        6       1
+        7       1
+
+    */
 
 	UINT8 data = 0xff; //0xfc;
 
@@ -206,7 +206,7 @@ READ8_MEMBER( vixen_state::port3_r )
 
 
 //**************************************************************************
-//	ADDRESS MAPS
+//  ADDRESS MAPS
 //**************************************************************************
 
 //-------------------------------------------------
@@ -238,13 +238,13 @@ static ADDRESS_MAP_START( vixen_io, ADDRESS_SPACE_IO, 8, vixen_state )
 	AM_RANGE(0x30, 0x30) AM_MIRROR(0x06) AM_DEVREADWRITE_LEGACY(P8251A_TAG, msm8251_data_r, msm8251_data_w)
 	AM_RANGE(0x31, 0x31) AM_MIRROR(0x06) AM_DEVREADWRITE_LEGACY(P8251A_TAG, msm8251_status_r, msm8251_control_w)
 	AM_RANGE(0x38, 0x38) AM_MIRROR(0x07) AM_READ(port3_r)
-//	AM_RANGE(0xf0, 0xff) Hard Disk?
+//  AM_RANGE(0xf0, 0xff) Hard Disk?
 ADDRESS_MAP_END
 
 
 
 //**************************************************************************
-//	INPUT PORTS
+//  INPUT PORTS
 //**************************************************************************
 
 //-------------------------------------------------
@@ -253,84 +253,84 @@ ADDRESS_MAP_END
 
 INPUT_PORTS_START( vixen )
 	PORT_START("ROW0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )
 
 	PORT_START("ROW1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )
 
 	PORT_START("ROW2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )
 
 	PORT_START("ROW3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )
 
 	PORT_START("ROW4")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )
 
 	PORT_START("ROW5")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )
 
 	PORT_START("ROW6")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )
 
 	PORT_START("ROW7")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )
 
 	PORT_START("IEEE488")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE(IEEE488_TAG, ieee488_atn_r)
@@ -346,7 +346,7 @@ INPUT_PORTS_END
 
 
 //**************************************************************************
-//	VIDEO
+//  VIDEO
 //**************************************************************************
 
 //-------------------------------------------------
@@ -364,7 +364,7 @@ static TIMER_DEVICE_CALLBACK( vsync_tick )
 	}
 }
 
-	
+
 //-------------------------------------------------
 //  VIDEO_START( vixenc )
 //-------------------------------------------------
@@ -399,15 +399,15 @@ bool vixen_state::video_update(screen_device &screen, bitmap_t &bitmap, const re
 				UINT8 sync_data = m_sync_rom[sync_addr];
 				int blank = BIT(sync_data, 4);
 				/*
-				int clrchadr = BIT(sync_data, 7);
-				int hsync = BIT(sync_data, 6);
-				int clrtxadr = BIT(sync_data, 5);
-				int vsync = BIT(sync_data, 3);
-				int comp_sync = BIT(sync_data, 2);
+                int clrchadr = BIT(sync_data, 7);
+                int hsync = BIT(sync_data, 6);
+                int clrtxadr = BIT(sync_data, 5);
+                int vsync = BIT(sync_data, 3);
+                int comp_sync = BIT(sync_data, 2);
 
-				logerror("SYNC %03x:%02x TXADR %u SCAN %u CHADR %u : COMPSYNC %u VSYNC %u BLANK %u CLRTXADR %u HSYNC %u CLRCHADR %u\n", 
-					sync_addr,sync_data,txadr,scan,chadr,comp_sync,vsync,blank,clrtxadr,hsync,clrchadr);
-				*/
+                logerror("SYNC %03x:%02x TXADR %u SCAN %u CHADR %u : COMPSYNC %u VSYNC %u BLANK %u CLRTXADR %u HSYNC %u CLRCHADR %u\n",
+                    sync_addr,sync_data,txadr,scan,chadr,comp_sync,vsync,blank,clrtxadr,hsync,clrchadr);
+                */
 
 				int reverse = 0;
 
@@ -425,13 +425,13 @@ bool vixen_state::video_update(screen_device &screen, bitmap_t &bitmap, const re
 					char_addr = (scan << 7) | (video_data & 0x7f);
 					reverse = BIT(video_data, 7);
 				}
-				
+
 				UINT8 char_data = m_char_rom[char_addr];
 
 				for (int x = 0; x < 8; x++)
 				{
 					int color = (BIT(char_data, 7 - x) ^ reverse) & !blank;
-					
+
 					*BITMAP_ADDR16(&bitmap, (txadr * 10) + scan, (chadr * 8) + x) = color;
 				}
 			}
@@ -444,7 +444,7 @@ bool vixen_state::video_update(screen_device &screen, bitmap_t &bitmap, const re
 
 
 //**************************************************************************
-//	SOUND
+//  SOUND
 //**************************************************************************
 
 //-------------------------------------------------
@@ -460,7 +460,7 @@ DISCRETE_SOUND_END
 
 
 //**************************************************************************
-//	DEVICE CONFIGURATION
+//  DEVICE CONFIGURATION
 //**************************************************************************
 
 //-------------------------------------------------
@@ -491,19 +491,19 @@ WRITE8_MEMBER( vixen_state::i8155_pb_w )
 WRITE8_MEMBER( vixen_state::i8155_pc_w )
 {
 	/*
-		
-		bit		description
 
-		0		DSEL1
-		1		DSEL2
-		2		DDEN
-		3		ALT CHARSET
-		4		256 CHARS
-		5		BEEP ENB
-		6		
-		7		
+        bit     description
 
-	*/
+        0       DSEL1
+        1       DSEL2
+        2       DDEN
+        3       ALT CHARSET
+        4       256 CHARS
+        5       BEEP ENB
+        6
+        7
+
+    */
 
 	// drive select
 	if (!BIT(data, 0)) wd17xx_set_drive(m_fdc, 0);
@@ -595,8 +595,8 @@ WRITE8_MEMBER( vixen_state::io_i8155_pc_w )
         PC3     ENB XMT INT
         PC4     ENB ATN INT
         PC5     ENB SRQ INT
-        PC6     
-        PC7     
+        PC6
+        PC7
 
     */
 
@@ -715,7 +715,7 @@ static const wd17xx_interface fdc_intf =
 
 
 //**************************************************************************
-//	MACHINE INITIALIZATION
+//  MACHINE INITIALIZATION
 //**************************************************************************
 
 //-------------------------------------------------
@@ -743,13 +743,13 @@ void vixen_state::machine_start()
 
 	memory_configure_bank(machine, "bank1", 0, 1, ram, 0);
 	memory_configure_bank(machine, "bank1", 1, 1, machine->region(Z8400A_TAG)->base(), 0);
-	
+
 	memory_configure_bank(machine, "bank2", 0, 1, ram, 0);
 	memory_configure_bank(machine, "bank2", 1, 1, m_video_ram, 0);
 
 	memory_configure_bank(machine, "bank3", 0, 1, m_video_ram, 0);
 	memory_configure_bank(machine, "bank3", 1, 1, machine->region(Z8400A_TAG)->base(), 0);
-	
+
 	memory_configure_bank(machine, "bank4", 0, 1, m_video_ram, 0);
 
 	// register for state saving
@@ -777,7 +777,7 @@ void vixen_state::machine_reset()
 	memory_set_bank(machine, "bank3", 1);
 
 	m_reset = 1;
-	
+
 	m_vsync = 0;
 	m_cmd_d0 = 0;
 	m_cmd_d1 = 0;
@@ -787,7 +787,7 @@ void vixen_state::machine_reset()
 
 
 //**************************************************************************
-//	MACHINE CONFIGURATION
+//  MACHINE CONFIGURATION
 //**************************************************************************
 
 //-------------------------------------------------
@@ -799,7 +799,7 @@ static MACHINE_CONFIG_START( vixen, vixen_state )
     MCFG_CPU_ADD(Z8400A_TAG, Z80, XTAL_23_9616MHz/6)
     MCFG_CPU_PROGRAM_MAP(vixen_mem)
     MCFG_CPU_IO_MAP(vixen_io)
-	
+
     // video hardware
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -834,7 +834,7 @@ MACHINE_CONFIG_END
 
 
 //**************************************************************************
-//	ROMS
+//  ROMS
 //**************************************************************************
 
 //-------------------------------------------------
@@ -855,7 +855,7 @@ ROM_END
 
 
 //**************************************************************************
-//	DRIVER INITIALIZATION
+//  DRIVER INITIALIZATION
 //**************************************************************************
 
 //-------------------------------------------------
@@ -874,7 +874,7 @@ DIRECT_UPDATE_HANDLER( vixen_direct_update_handler )
 
 			memory_install_read_bank(program, 0x0000, 0xefff, 0, 0, "bank1");
 			memory_install_write_bank(program, 0x0000, 0xefff, 0, 0, "bank2");
-		
+
 			memory_set_bank(machine, "bank1", 0);
 			memory_set_bank(machine, "bank2", 0);
 
@@ -898,8 +898,8 @@ static DRIVER_INIT( vixen )
 
 
 //**************************************************************************
-//	SYSTEM DRIVERS
+//  SYSTEM DRIVERS
 //**************************************************************************
 
 //    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS
-COMP( 1984, vixen,  0,       0, 	vixen, 	vixen, 	 vixen,  "Osborne",   "Vixen",		GAME_NOT_WORKING )
+COMP( 1984, vixen,  0,       0, 	vixen,	vixen,	 vixen,  "Osborne",   "Vixen",		GAME_NOT_WORKING )

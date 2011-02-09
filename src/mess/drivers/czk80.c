@@ -9,7 +9,7 @@
         FDC board contains Z80A DMA and NEC 765A (XTAL on it is 8MHZ)
         Mega board contains 74LS612 and memory chips
 
-	27/11/2010 Connected to a terminal
+    27/11/2010 Connected to a terminal
 
 ****************************************************************************/
 

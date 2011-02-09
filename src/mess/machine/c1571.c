@@ -823,7 +823,7 @@ FLOPPY_OPTIONS_END
 static WRITE_LINE_DEVICE_HANDLER( wpt_w )
 {
 	c1571_t *c1571 = get_safe_token(device->owner());
-	
+
 	c1571->via0->write_ca2(!state);
 }
 

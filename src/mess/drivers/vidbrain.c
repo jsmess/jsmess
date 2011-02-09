@@ -5,7 +5,7 @@
     http://www.atariprotos.com/othersystems/videobrain/videobrain.htm
     http://www.seanriddle.com/vbinfo.html
     http://www.seanriddle.com/videobrain.html
-	http://www.google.com/patents?q=4232374
+    http://www.google.com/patents?q=4232374
 
     07/04/2009 Skeleton driver.
 
@@ -15,7 +15,7 @@
 
     TODO:
 
-	- use machine/f3853.h
+    - use machine/f3853.h
     - discrete sound
     - joystick scan timer 555
     - reset on cartridge eject
@@ -37,7 +37,7 @@
 
 
 //**************************************************************************
-//	READ/WRITE HANDLERS
+//  READ/WRITE HANDLERS
 //**************************************************************************
 
 //-------------------------------------------------
@@ -112,8 +112,8 @@ WRITE8_MEMBER( vidbrain_state::sound_w )
 
         bit     description
 
-        0		sound Q0
-        1		sound Q1
+        0       sound Q0
+        1       sound Q1
         2
         3
         4       sound clock
@@ -125,7 +125,7 @@ WRITE8_MEMBER( vidbrain_state::sound_w )
 
 	// sound clock
 	int sound_clk = BIT(data, 7);
-	
+
 	if (!m_sound_clk && sound_clk)
 	{
 		discrete_sound_w(m_discrete, NODE_01, BIT(m_keylatch, 0));
@@ -201,7 +201,7 @@ WRITE8_MEMBER( vidbrain_state::f3853_w )
 
 
 //**************************************************************************
-//	ADDRESS MAPS
+//  ADDRESS MAPS
 //**************************************************************************
 
 //-------------------------------------------------
@@ -225,13 +225,13 @@ static ADDRESS_MAP_START( vidbrain_io, ADDRESS_SPACE_IO, 8, vidbrain_state )
 	AM_RANGE(0x00, 0x00) AM_WRITE(keyboard_w)
 	AM_RANGE(0x01, 0x01) AM_READWRITE(keyboard_r, sound_w)
 	AM_RANGE(0x0c, 0x0f) AM_WRITE(f3853_w)
-//	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE_LEGACY(F3853_TAG, f3853_r, f3853_w)
+//  AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE_LEGACY(F3853_TAG, f3853_r, f3853_w)
 ADDRESS_MAP_END
 
 
 
 //**************************************************************************
-//	INPUT PORTS
+//  INPUT PORTS
 //**************************************************************************
 
 //-------------------------------------------------
@@ -340,7 +340,7 @@ INPUT_PORTS_END
 
 
 //**************************************************************************
-//	SOUND
+//  SOUND
 //**************************************************************************
 
 //-------------------------------------------------
@@ -356,7 +356,7 @@ DISCRETE_SOUND_END
 
 
 //**************************************************************************
-//	DEVICE CONFIGURATION
+//  DEVICE CONFIGURATION
 //**************************************************************************
 
 //-------------------------------------------------
@@ -365,14 +365,14 @@ DISCRETE_SOUND_END
 /*
 static void f3853_int_req_w(device_t *device, UINT16 addr, int level)
 {
-	cpu_set_input_line_vector(device->machine->device(F3850_TAG), 0, addr);
+    cpu_set_input_line_vector(device->machine->device(F3850_TAG), 0, addr);
 
-	cputag_set_input_line(device->machine, F3850_TAG, F8_INPUT_LINE_INT_REQ, level);
+    cputag_set_input_line(device->machine, F3850_TAG, F8_INPUT_LINE_INT_REQ, level);
 }
 
 static const f3853_interface smi_intf =
 {
-	f3853_int_req_w
+    f3853_int_req_w
 };
 */
 
@@ -391,7 +391,7 @@ static const cassette_config vidbrain_cassette_config =
 
 
 //**************************************************************************
-//	MACHINE INITIALIZATION
+//  MACHINE INITIALIZATION
 //**************************************************************************
 
 //-------------------------------------------------
@@ -441,7 +441,7 @@ void vidbrain_state::machine_start()
 
 
 //**************************************************************************
-//	MACHINE CONFIGURATION
+//  MACHINE CONFIGURATION
 //**************************************************************************
 
 //-------------------------------------------------
@@ -465,7 +465,7 @@ static MACHINE_CONFIG_START( vidbrain, vidbrain_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	// devices
-//	MCFG_F3853_ADD(F3853_TAG, XTAL_14_31818MHz/8, smi_intf)
+//  MCFG_F3853_ADD(F3853_TAG, XTAL_14_31818MHz/8, smi_intf)
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, vidbrain_cassette_config)
 
 	// cartridge
@@ -484,7 +484,7 @@ MACHINE_CONFIG_END
 
 
 //**************************************************************************
-//	ROMS
+//  ROMS
 //**************************************************************************
 
 //-------------------------------------------------
@@ -501,7 +501,7 @@ ROM_END
 
 
 //**************************************************************************
-//	SYSTEM DRIVERS
+//  SYSTEM DRIVERS
 //**************************************************************************
 
 //    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT    COMPANY                         FULLNAME                        FLAGS

@@ -17,34 +17,34 @@
     This in turn gets upgraded (2HR, HRX, MX). The line is finally
     retired in about 1985.
 
-		Hector 2HR+
-		Victor
-		Hector 2HR
-		Hector HRX
-		Hector MX40c
-		Hector MX80c
-		Hector 1
-		Interact
+        Hector 2HR+
+        Victor
+        Hector 2HR
+        Hector HRX
+        Hector MX40c
+        Hector MX80c
+        Hector 1
+        Interact
 
-		12/05/2009 Skeleton driver - Micko : mmicko@gmail.com
-		31/06/2009 Video - Robbbert
+        12/05/2009 Skeleton driver - Micko : mmicko@gmail.com
+        31/06/2009 Video - Robbbert
 
-		29/10/2009 Update skeleton to functional machine
-					by yo_fr			(jj.stac @ aliceadsl.fr)
+        29/10/2009 Update skeleton to functional machine
+                    by yo_fr            (jj.stac @ aliceadsl.fr)
 
-				=> add Keyboard,
-				=> add color,
-				=> add cassette,
-				=> add sn76477 sound and 1bit sound,
-				=> add joysticks (stick, pot, fire)
-				=> add BR/HR switching
-				=> add bank switch for HRX
-				=> add device MX80c and bank switching for the ROM
+                => add Keyboard,
+                => add color,
+                => add cassette,
+                => add sn76477 sound and 1bit sound,
+                => add joysticks (stick, pot, fire)
+                => add BR/HR switching
+                => add bank switch for HRX
+                => add device MX80c and bank switching for the ROM
     Importante note : the keyboard function add been piked from
-					DChector project : http://dchector.free.fr/ made by DanielCoulom
-					(thank's Daniel)
-	TODO :	Add the cartridge function,
-			Adjust the one shot and A/D timing (sn76477)
+                    DChector project : http://dchector.free.fr/ made by DanielCoulom
+                    (thank's Daniel)
+    TODO :  Add the cartridge function,
+            Adjust the one shot and A/D timing (sn76477)
 ****************************************************************************/
 /* Mapping for joystick see hec2hrp.c*/
 

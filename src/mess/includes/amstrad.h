@@ -65,7 +65,7 @@ typedef struct
 	UINT8	addr_6845;			/* We need these to store a shadow copy of R1 of the mc6845 */
 	UINT8	horiz_disp;
 	UINT8	hscroll;
-	UINT8   de_start; 			/* flag to check if DE is been enabled this frame yet */
+	UINT8   de_start;			/* flag to check if DE is been enabled this frame yet */
 
 	/* DMA */
 	UINT8	dma_status;

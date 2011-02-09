@@ -171,8 +171,8 @@ Notes:
         0706: call $073F
 
     - S2-S5 jumpers
-	- ABC80 ERR 48 on boot
-	- side select makes controller go crazy and try to WRITE_TRK
+    - ABC80 ERR 48 on boot
+    - side select makes controller go crazy and try to WRITE_TRK
 
 */
 
@@ -196,7 +196,7 @@ Notes:
 #define Z80PIO_TAG	"3a"
 #define FD1791_TAG	"7a"
 
-//#define Z80_TAG	"5ab"
+//#define Z80_TAG   "5ab"
 #define Z80DMA_TAG	"6ab"
 #define SAB1793_TAG	"7ab"
 #define FDC9229_TAG	"8b"
@@ -428,7 +428,7 @@ static WRITE8_DEVICE_HANDLER( slow_status_w )
 	slow_t *conkort = get_safe_token_slow(device->owner());
 
 	// interrupt
-//	abcbus_int_w(conkort->bus, BIT(data, 0) ? CLEAR_LINE : ASSERT_LINE);
+//  abcbus_int_w(conkort->bus, BIT(data, 0) ? CLEAR_LINE : ASSERT_LINE);
 
 	conkort->status = data & 0xfe;
 }
@@ -485,7 +485,7 @@ WRITE8_DEVICE_HANDLER( luxor_55_21046_cs_w )
 {
 	fast_t *conkort = get_safe_token_fast(device);
 
-//	conkort->cs = (data == input_port_read(device->machine, "luxor_55_21046:SW3"));
+//  conkort->cs = (data == input_port_read(device->machine, "luxor_55_21046:SW3"));
 	conkort->cs = (data == conkort->sw3);
 }
 
@@ -575,7 +575,7 @@ static READ8_DEVICE_HANDLER( fast_3d_r )
 static WRITE8_DEVICE_HANDLER( fast_4d_w )
 {
 	fast_t *conkort = get_safe_token_fast(device->owner());
-	
+
 	if (BIT(conkort->status, 0))
 	{
 		conkort->busy = 0;
@@ -588,18 +588,18 @@ static WRITE8_DEVICE_HANDLER( fast_4b_w )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		0		force busy
-		1		
-		2		
-		3		
-		4		N/C
-		5		N/C
-		6		
-		7		
+        0       force busy
+        1
+        2
+        3
+        4       N/C
+        5       N/C
+        6
+        7
 
-	*/
+    */
 
 	fast_t *conkort = get_safe_token_fast(device->owner());
 
@@ -616,18 +616,18 @@ static WRITE8_DEVICE_HANDLER( fast_9b_w )
 {
 	/*
 
-		bit		signal		description
+        bit     signal      description
 
-		0		DS0			drive select 0
-		1		DS1			drive select 1
-		2		DS2			drive select 2
-		3		MTRON		motor on
-		4		TG43		track > 43
-		5		SIDE1		side 1 select
-		6
-		7
+        0       DS0         drive select 0
+        1       DS1         drive select 1
+        2       DS2         drive select 2
+        3       MTRON       motor on
+        4       TG43        track > 43
+        5       SIDE1       side 1 select
+        6
+        7
 
-	*/
+    */
 
 	fast_t *conkort = get_safe_token_fast(device->owner());
 
@@ -651,20 +651,20 @@ static WRITE8_DEVICE_HANDLER( fast_8a_w )
 {
 	/*
 
-		bit		signal							description
+        bit     signal                          description
 
-		0		FD1793 _MR						FDC master reset
-		1		FD1793 _DDEN, FDC9229 DENS		density select
-		2		FDC9229 MINI					
-		3		READY signal polarity			(0=inverted)
-		4		FDC9229 P2						
-		5		FDC9229 P1						
-		6
-		7
+        0       FD1793 _MR                      FDC master reset
+        1       FD1793 _DDEN, FDC9229 DENS      density select
+        2       FDC9229 MINI
+        3       READY signal polarity           (0=inverted)
+        4       FDC9229 P2
+        5       FDC9229 P1
+        6
+        7
 
-		FDC9229 P0 is grounded
+        FDC9229 P0 is grounded
 
-	*/
+    */
 
 	// FDC master reset
 	wd17xx_mr_w(device, BIT(data, 0));
@@ -677,18 +677,18 @@ static READ8_DEVICE_HANDLER( fast_9a_r )
 {
 	/*
 
-		bit		signal		description
+        bit     signal      description
 
-		0		busy		controller busy
-		1		_FD2S		double-sided disk
-		2		SW2			
-		3		_DCG ?		disk changed
-		4		SW1-1
-		5		SW1-2
-		6		SW1-3
-		7		SW1-4
+        0       busy        controller busy
+        1       _FD2S       double-sided disk
+        2       SW2
+        3       _DCG ?      disk changed
+        4       SW1-1
+        5       SW1-2
+        6       SW1-3
+        7       SW1-4
 
-	*/
+    */
 
 	fast_t *conkort = get_safe_token_fast(device->owner());
 
@@ -698,22 +698,22 @@ static READ8_DEVICE_HANDLER( fast_9a_r )
 	data |= conkort->busy;
 
 	// SW1
-//	UINT8 sw1 = input_port_read(device->machine, "luxor_55_21046:SW1") & 0x0f;
+//  UINT8 sw1 = input_port_read(device->machine, "luxor_55_21046:SW1") & 0x0f;
 	UINT8 sw1 = conkort->sw1;
 
 	data |= sw1 << 4;
 
 	// SW2
-//	UINT8 sw2 = input_port_read(device->machine, "luxor_55_21046:SW2") & 0x0f;
+//  UINT8 sw2 = input_port_read(device->machine, "luxor_55_21046:SW2") & 0x0f;
 	UINT8 sw2 = conkort->sw2;
-	
+
 	// TTL inputs float high so DIP switch in off position equals 1
 	int sw2_1 = BIT(sw2, 0) ? 1 : BIT(offset, 8);
 	int sw2_2 = BIT(sw2, 1) ? 1 : BIT(offset, 9);
 	int sw2_3 = BIT(sw2, 2) ? 1 : BIT(offset, 10);
 	int sw2_4 = BIT(sw2, 3) ? 1 : BIT(offset, 11);
 	int sw2_data = !(sw2_1 & sw2_2 & !(sw2_3 ^ sw2_4));
-	
+
 	data |= sw2_data << 2;
 
 	return data ^ 0xff;
@@ -825,7 +825,7 @@ INPUT_PORTS_START( luxor_55_21046 )
 	PORT_DIPSETTING(    0x09, "MPI 51 (ABC 830)" ) PORT_CONDITION("luxor_55_21046:SW3", 0x7f, PORTCOND_EQUALS, 0x2d) // 190 9206-16
 	PORT_DIPSETTING(    0x0e, "BASF 6105 (ABC 838)" ) PORT_CONDITION("luxor_55_21046:SW3", 0x7f, PORTCOND_EQUALS, 0x2e)
 	PORT_DIPSETTING(    0x0f, "BASF 6106 (ABC 838)" ) PORT_CONDITION("luxor_55_21046:SW3", 0x7f, PORTCOND_EQUALS, 0x2e) // 230 8838-15
-	
+
 	PORT_START("luxor_55_21046:SW3")
 	PORT_DIPNAME( 0x7f, 0x2c, "Card Address" ) PORT_DIPLOCATION("SW3:1,2,3,4,5,6,7")
 	PORT_DIPSETTING(    0x2c, "44 (ABC 832/834/850)" )
@@ -1268,7 +1268,7 @@ static DEVICE_START( luxor_55_10828 )
 	slow_t *conkort = get_safe_token_slow(device);
 	const conkort_config *config = get_safe_config(device);
 
-	// find our CPU 
+	// find our CPU
 	conkort->cpu = device->subdevice(Z80_TAG);
 
 	// find devices

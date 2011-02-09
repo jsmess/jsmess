@@ -2,174 +2,174 @@
 
     Coleco Adam
 
-	The Coleco ADAM is a Z80-based micro with all peripheral devices
-	attached to an internal serial serial bus (ADAMnet) managed by 6801
-	microcontrollers (processor, internal RAM, internal ROM, serial port).Each
-	device had its own 6801, and the ADAMnet was managed by a "master" 6801 on
-	the ADAM motherboard.  Each device was allotted a block of 21 bytes in Z80
-	address space; device control was accomplished by poking function codes into
-	the first byte of each device control block (hereafter DCB) after setup of
-	other DCB locations with such things as:  buffer address in Z80 space, # of
-	bytes to transfer, block # to access if it was a block device like a tape
-	or disk drive, etc.  The master 6801 would interpret this data, and pass
-	along internal ADAMnet requests to the desired peripheral, which would then
-	send/receive its data and return the status of the operation.  The status
-	codes were left in the same byte of the DCB as the function request, and
-	certain bits of the status byte would reflect done/working on it/error/
-	not present, and error codes were left in another DCB byte for things like
-	CRC error, write protected disk, missing block, etc.
+    The Coleco ADAM is a Z80-based micro with all peripheral devices
+    attached to an internal serial serial bus (ADAMnet) managed by 6801
+    microcontrollers (processor, internal RAM, internal ROM, serial port).Each
+    device had its own 6801, and the ADAMnet was managed by a "master" 6801 on
+    the ADAM motherboard.  Each device was allotted a block of 21 bytes in Z80
+    address space; device control was accomplished by poking function codes into
+    the first byte of each device control block (hereafter DCB) after setup of
+    other DCB locations with such things as:  buffer address in Z80 space, # of
+    bytes to transfer, block # to access if it was a block device like a tape
+    or disk drive, etc.  The master 6801 would interpret this data, and pass
+    along internal ADAMnet requests to the desired peripheral, which would then
+    send/receive its data and return the status of the operation.  The status
+    codes were left in the same byte of the DCB as the function request, and
+    certain bits of the status byte would reflect done/working on it/error/
+    not present, and error codes were left in another DCB byte for things like
+    CRC error, write protected disk, missing block, etc.
 
-	ADAM's ROM operating system, EOS (Elementary OS), was constructed
-	similar to CP/M in that it provided both a filesystem (like BDOS) and raw
-	device interface (BIOS).  At the file level, sequential files could be
-	created, opened, read, written, appended, closed, and deleted.  Forward-
-	only random access was implemented (you could not move the R/W pointer
-	backward, except clear to the beginning!), and all files had to be
-	contiguous on disk/tape.  Directories could be initialized or searched
-	for a matching filename (no wildcards allowed).  At the device level,
-	individual devices could be read/written by block (for disks/tapes) or
-	character-by-character (for printer, keyboard, and a prototype serial
-	board which was never released).  Devices could be checked for their
-	ADAMnet status, and reset if necessary.  There was no function provided
-	to do low-level formatting of disks/tapes.
+    ADAM's ROM operating system, EOS (Elementary OS), was constructed
+    similar to CP/M in that it provided both a filesystem (like BDOS) and raw
+    device interface (BIOS).  At the file level, sequential files could be
+    created, opened, read, written, appended, closed, and deleted.  Forward-
+    only random access was implemented (you could not move the R/W pointer
+    backward, except clear to the beginning!), and all files had to be
+    contiguous on disk/tape.  Directories could be initialized or searched
+    for a matching filename (no wildcards allowed).  At the device level,
+    individual devices could be read/written by block (for disks/tapes) or
+    character-by-character (for printer, keyboard, and a prototype serial
+    board which was never released).  Devices could be checked for their
+    ADAMnet status, and reset if necessary.  There was no function provided
+    to do low-level formatting of disks/tapes.
 
-	 At system startup, the EOS was loaded from ROM into the highest
-	8K of RAM, a function call made to initialize the ADAMnet, and then
-	any disks or tapes were checked for a boot medium; if found, block 0 of
-	the medium was loaded in, and a jump made to the start of the boot code.
-	The boot block would take over loading in the rest of the program.  If no
-	boot media were found, a jump would be made to a ROM word processor (called
-	SmartWriter).
+     At system startup, the EOS was loaded from ROM into the highest
+    8K of RAM, a function call made to initialize the ADAMnet, and then
+    any disks or tapes were checked for a boot medium; if found, block 0 of
+    the medium was loaded in, and a jump made to the start of the boot code.
+    The boot block would take over loading in the rest of the program.  If no
+    boot media were found, a jump would be made to a ROM word processor (called
+    SmartWriter).
 
-	 Coleco designed the ADAMnet to have up to 15 devices attached.
-	Before they went bankrupt, Coleco had released a 64K memory expander and
-	a 300-baud internal modem, but surprisingly neither of these was an
-	ADAMnet device.  Disassembly of the RAMdisk drivers in ADAM CP/M 2.2, and
-	of the ADAMlink terminal program revealed that these were simple port I/O
-	devices, banks of XRAM being accessed by a special memory switch port not
-	documented as part of the EOS.  The modem did not even use the interrupt
-	capabilities of the Z80--it was simply polled.  A combination serial/
-	parallel interface, each port of which *was* an ADAMnet device, reached the
-	prototype stage, as did a 5MB hard disk, but neither was ever released to
-	the public.  (One prototype serial/parallel board is still in existence,
-	but the microcontroller ROMs have not yet been succcessfully read.)  So
-	when Coleco finally bailed out of the computer business, a maximum ADAM
-	system consisted of a daisy wheel printer, a keyboard, 2 tape drives, and
-	2 disk drives (all ADAMnet devices), a 64K expander and a 300-baud modem
-	(which were not ADAMnet devices).
+     Coleco designed the ADAMnet to have up to 15 devices attached.
+    Before they went bankrupt, Coleco had released a 64K memory expander and
+    a 300-baud internal modem, but surprisingly neither of these was an
+    ADAMnet device.  Disassembly of the RAMdisk drivers in ADAM CP/M 2.2, and
+    of the ADAMlink terminal program revealed that these were simple port I/O
+    devices, banks of XRAM being accessed by a special memory switch port not
+    documented as part of the EOS.  The modem did not even use the interrupt
+    capabilities of the Z80--it was simply polled.  A combination serial/
+    parallel interface, each port of which *was* an ADAMnet device, reached the
+    prototype stage, as did a 5MB hard disk, but neither was ever released to
+    the public.  (One prototype serial/parallel board is still in existence,
+    but the microcontroller ROMs have not yet been succcessfully read.)  So
+    when Coleco finally bailed out of the computer business, a maximum ADAM
+    system consisted of a daisy wheel printer, a keyboard, 2 tape drives, and
+    2 disk drives (all ADAMnet devices), a 64K expander and a 300-baud modem
+    (which were not ADAMnet devices).
 
-	 Third-party vendors reverse-engineered the modem (which had a
-	2651 UART at its heart) and made a popular serial interface board.  It was
-	not an ADAMnet device, however, because nobody knew how to make a new ADAMnet
-	device (no design specs were ever released), and the 6801 microcontrollers
-	had unreadable mask ROMs.  Disk drives, however, were easily upgraded from
-	160K to as high as 1MB because, for some unknown reason, the disk controller
-	boards used a separate microprocessor and *socketed* EPROM (which was
-	promptly disassembled and reworked).  Hard drives were cobbled together from
-	a Kaypro-designed board and accessed as standard I/O port devices.  A parallel
-	interface card was similarly set up at its own I/O port.
+     Third-party vendors reverse-engineered the modem (which had a
+    2651 UART at its heart) and made a popular serial interface board.  It was
+    not an ADAMnet device, however, because nobody knew how to make a new ADAMnet
+    device (no design specs were ever released), and the 6801 microcontrollers
+    had unreadable mask ROMs.  Disk drives, however, were easily upgraded from
+    160K to as high as 1MB because, for some unknown reason, the disk controller
+    boards used a separate microprocessor and *socketed* EPROM (which was
+    promptly disassembled and reworked).  Hard drives were cobbled together from
+    a Kaypro-designed board and accessed as standard I/O port devices.  A parallel
+    interface card was similarly set up at its own I/O port.
 
-	  Devices (15 max):
-		Device 0 = Master 6801 ADAMnet controller (uses the adam_pcb as DCB)
-		Device 1 = Keyboard
-		Device 2 = ADAM printer
-		Device 3 = Copywriter (projected)
-		Device 4 = Disk drive 1
-		Device 5 = Disk drive 2
-		Device 6 = Disk drive 3 (third party)
-		Device 7 = Disk drive 4 (third party)
-		Device 8 = Tape drive 1
-		Device 9 = Tape drive 3 (projected)
-		Device 10 = Unused
-		Device 11 = Non-ADAMlink modem
-		Device 12 = Hi-resolution monitor
-		Device 13 = ADAM parallel interface (never released)
-		Device 14 = ADAM serial interface (never released)
-		Device 15 = Gateway
-		Device 24 = Tape drive 2 (share DCB with Tape1)
-		Device 25 = Tape drive 4 (projected, may have share DCB with Tape3)
-		Device 26 = Expansion RAM disk drive (third party ID, not used by Coleco)
+      Devices (15 max):
+        Device 0 = Master 6801 ADAMnet controller (uses the adam_pcb as DCB)
+        Device 1 = Keyboard
+        Device 2 = ADAM printer
+        Device 3 = Copywriter (projected)
+        Device 4 = Disk drive 1
+        Device 5 = Disk drive 2
+        Device 6 = Disk drive 3 (third party)
+        Device 7 = Disk drive 4 (third party)
+        Device 8 = Tape drive 1
+        Device 9 = Tape drive 3 (projected)
+        Device 10 = Unused
+        Device 11 = Non-ADAMlink modem
+        Device 12 = Hi-resolution monitor
+        Device 13 = ADAM parallel interface (never released)
+        Device 14 = ADAM serial interface (never released)
+        Device 15 = Gateway
+        Device 24 = Tape drive 2 (share DCB with Tape1)
+        Device 25 = Tape drive 4 (projected, may have share DCB with Tape3)
+        Device 26 = Expansion RAM disk drive (third party ID, not used by Coleco)
 
-	  Terminology:
-		EOS = Elementary Operating System
-		DCB = Device Control Block Table (21bytes each DCB, DCB+16=dev#, DCB+0=Status Byte) (0xFD7C)
+      Terminology:
+        EOS = Elementary Operating System
+        DCB = Device Control Block Table (21bytes each DCB, DCB+16=dev#, DCB+0=Status Byte) (0xFD7C)
 
-			   0     Status byte
-			 1-2     Buffer start address (lobyte, hibyte)
-			 3-4     Buffer length (lobyte, hibyte)
-			 5-8     Block number accessed (loword, hiword in lobyte, hibyte format)
-			   9     High nibble of device number
-			10-15    Always zero (unknown purpose)
-			  16     Low nibble of device number
-			17-18    Maximum block length (lobyte, hibyte)
-			  19     Device type (0 for block device, 1 for character device)
-			  20     Node type
+               0     Status byte
+             1-2     Buffer start address (lobyte, hibyte)
+             3-4     Buffer length (lobyte, hibyte)
+             5-8     Block number accessed (loword, hiword in lobyte, hibyte format)
+               9     High nibble of device number
+            10-15    Always zero (unknown purpose)
+              16     Low nibble of device number
+            17-18    Maximum block length (lobyte, hibyte)
+              19     Device type (0 for block device, 1 for character device)
+              20     Node type
 
-			- Writing to byte0 requests the following operations:
-				1     Return current status
-				2     Soft reset
-				3     Write
-				4     Read
-
-
-		FCB = File Control Block Table (32bytes, 2 max each application) (0xFCB0)
-		OCB = Overlay Control Block Table
-		adam_pcb = Processor Control Block Table, 4bytes (adam_pcb+3 = Number of valid DCBs) (0xFEC0 relocatable), current adam_pcb=[0xFD70]
-				adam_pcb+0 = Status, 0=Request Status of Z80 -> must return 0x81..0x82 to sync Master 6801 clk with Z80 clk
-				adam_pcb+1,adam_pcb+2 = address of adam_pcb start
-				adam_pcb+3 = device #
-
-				- Writing to byte0:
-					1   Synchronize the Z80 clock (should return 0x81)
-					2   Synchronize the Master 6801 clock (should return 0x82)
-					3   Relocate adam_pcb
-
-				- Status values:
-					0x80 -> Success
-					0x81 -> Z80 clock in sync
-					0x82 -> Master 6801 clock in sync
-					0x83 -> adam_pcb relocated
-					0x9B -> Time Out
-
-		DEV_ID = Device id
+            - Writing to byte0 requests the following operations:
+                1     Return current status
+                2     Soft reset
+                3     Write
+                4     Read
 
 
-		The ColecoAdam I/O map is contolled by the MIOC (Memory Input Output Controller):
+        FCB = File Control Block Table (32bytes, 2 max each application) (0xFCB0)
+        OCB = Overlay Control Block Table
+        adam_pcb = Processor Control Block Table, 4bytes (adam_pcb+3 = Number of valid DCBs) (0xFEC0 relocatable), current adam_pcb=[0xFD70]
+                adam_pcb+0 = Status, 0=Request Status of Z80 -> must return 0x81..0x82 to sync Master 6801 clk with Z80 clk
+                adam_pcb+1,adam_pcb+2 = address of adam_pcb start
+                adam_pcb+3 = device #
 
-				20-3F (W) = Adamnet Writes
-				20-3F (R) = Adamnet Reads
+                - Writing to byte0:
+                    1   Synchronize the Z80 clock (should return 0x81)
+                    2   Synchronize the Master 6801 clock (should return 0x82)
+                    3   Relocate adam_pcb
 
-				42-42 (W) = Expansion RAM page selection, only useful if expansion greater than 64k
+                - Status values:
+                    0x80 -> Success
+                    0x81 -> Z80 clock in sync
+                    0x82 -> Master 6801 clock in sync
+                    0x83 -> adam_pcb relocated
+                    0x9B -> Time Out
 
-				40-40 (W) = Printer Data Out
-				40-40 (R) = Printer (Returns 0x41)
+        DEV_ID = Device id
 
-				5E-5E (RW)= Modem Data I/O
-				5F-5F (RW)= Modem Data Control Status
 
-				60-7F (W) = Set Memory configuration
-				60-7F (R) = Read Memory configuration
+        The ColecoAdam I/O map is contolled by the MIOC (Memory Input Output Controller):
 
-				80-9F (W) = Set both controllers to keypad mode
-				80-9F (R) = Not Connected
+                20-3F (W) = Adamnet Writes
+                20-3F (R) = Adamnet Reads
 
-				A0-BF (W) = Video Chip (TMS9928A), A0=0 -> Write Register 0 , A0=1 -> Write Register 1
-				A0-BF (R) = Video Chip (TMS9928A), A0=0 -> Read Register 0 , A0=1 -> Read Register 1
+                42-42 (W) = Expansion RAM page selection, only useful if expansion greater than 64k
 
-				C0-DF (W) = Set both controllers to joystick mode
-				C0-DF (R) = Not Connected
+                40-40 (W) = Printer Data Out
+                40-40 (R) = Printer (Returns 0x41)
 
-				E0-FF (W) = Sound Chip (SN76489A)
-				E0-FF (R) = Read Controller data, A1=0 -> read controller 1, A1=1 -> read controller 2
+                5E-5E (RW)= Modem Data I/O
+                5F-5F (RW)= Modem Data Control Status
 
-	http://drushel.cwru.edu/atm/atm.html
-	http://rich.dirocco.org/Coleco/adam/ADAM.htm
-	http://users.stargate.net/~drushel/pub/coleco/twwmca/index.html
+                60-7F (W) = Set Memory configuration
+                60-7F (R) = Read Memory configuration
 
-	- fc75 GET_STATUS
-	- fbe7 MMR_MAC
-	- febe MMR_TR_REC
-	- ff0f MMR_TR_TCU
+                80-9F (W) = Set both controllers to keypad mode
+                80-9F (R) = Not Connected
+
+                A0-BF (W) = Video Chip (TMS9928A), A0=0 -> Write Register 0 , A0=1 -> Write Register 1
+                A0-BF (R) = Video Chip (TMS9928A), A0=0 -> Read Register 0 , A0=1 -> Read Register 1
+
+                C0-DF (W) = Set both controllers to joystick mode
+                C0-DF (R) = Not Connected
+
+                E0-FF (W) = Sound Chip (SN76489A)
+                E0-FF (R) = Read Controller data, A1=0 -> read controller 1, A1=1 -> read controller 2
+
+    http://drushel.cwru.edu/atm/atm.html
+    http://rich.dirocco.org/Coleco/adam/ADAM.htm
+    http://users.stargate.net/~drushel/pub/coleco/twwmca/index.html
+
+    - fc75 GET_STATUS
+    - fbe7 MMR_MAC
+    - febe MMR_TR_REC
+    - ff0f MMR_TR_TCU
 
 ****************************************************************************/
 
@@ -177,14 +177,14 @@
 
     TODO:
 
-	- sound (PSG RDY -> Z80 WAIT)
-	- tape
-		- add track selection to cassette input/output
-		- add motor speed/direction controls
-		- DDP format converter
-	- floppy
-	- printer
-	- SPI
+    - sound (PSG RDY -> Z80 WAIT)
+    - tape
+        - add track selection to cassette input/output
+        - add motor speed/direction controls
+        - DDP format converter
+    - floppy
+    - printer
+    - SPI
 
 */
 
@@ -207,7 +207,7 @@
 
 
 //**************************************************************************
-//	MACROS / CONSTANTS
+//  MACROS / CONSTANTS
 //**************************************************************************
 
 enum
@@ -240,11 +240,11 @@ enum
 
 
 //**************************************************************************
-//	MEMORY BANKING
+//  MEMORY BANKING
 //**************************************************************************
 
 //-------------------------------------------------
-//  bankswitch - 
+//  bankswitch -
 //-------------------------------------------------
 
 void adam_state::bankswitch()
@@ -315,7 +315,7 @@ void adam_state::bankswitch()
 
 
 //-------------------------------------------------
-//  mioc_r - 
+//  mioc_r -
 //-------------------------------------------------
 
 READ8_MEMBER( adam_state::mioc_r )
@@ -325,25 +325,25 @@ READ8_MEMBER( adam_state::mioc_r )
 
 
 //-------------------------------------------------
-//  mioc_w - 
+//  mioc_w -
 //-------------------------------------------------
 
 WRITE8_MEMBER( adam_state::mioc_w )
 {
 	/*
 
-		bit		description
-		
-		0		Lower memory option 0
-		1		Lower memory option 1
-		2		Upper memory option 0
-		3		Upper memory option 1
-		4		
-		5		
-		6		
-		7		
+        bit     description
 
-	*/
+        0       Lower memory option 0
+        1       Lower memory option 1
+        2       Upper memory option 0
+        3       Upper memory option 1
+        4
+        5
+        6
+        7
+
+    */
 
 	m_mioc = data;
 
@@ -353,11 +353,11 @@ WRITE8_MEMBER( adam_state::mioc_w )
 
 
 //**************************************************************************
-//	ADAMNET
+//  ADAMNET
 //**************************************************************************
 
 //-------------------------------------------------
-//  adamnet_txd_w - 
+//  adamnet_txd_w -
 //-------------------------------------------------
 
 void adam_state::adamnet_txd_w(int device, int state)
@@ -374,7 +374,7 @@ void adam_state::adamnet_txd_w(int device, int state)
 
 
 //-------------------------------------------------
-//  adamnet_r - 
+//  adamnet_r -
 //-------------------------------------------------
 
 READ8_MEMBER( adam_state::adamnet_r )
@@ -384,31 +384,31 @@ READ8_MEMBER( adam_state::adamnet_r )
 
 
 //-------------------------------------------------
-//  adamnet_w - 
+//  adamnet_w -
 //-------------------------------------------------
 
 WRITE8_MEMBER( adam_state::adamnet_w )
 {
 	/*
 
-		bit		description
-		
-		0		Network reset
-		1		EOS enable
-		2		
-		3		
-		4		
-		5		
-		6		
-		7		
+        bit     description
 
-	*/
+        0       Network reset
+        1       EOS enable
+        2
+        3
+        4
+        5
+        6
+        7
+
+    */
 
 	// network reset
 	if (BIT(m_adamnet, 0) && !BIT(data, 0))
 	{
 		m_reset = 1;
-		
+
 		machine->device(M6801_KB_TAG)->reset();
 		machine->device(M6801_DDP_TAG)->reset();
 		machine->device(M6801_PRN_TAG)->reset();
@@ -416,7 +416,7 @@ WRITE8_MEMBER( adam_state::adamnet_w )
 		wd17xx_mr_w(m_fdc, 0);
 		wd17xx_mr_w(m_fdc, 1);
 		//machine->device(M6801_SPI_TAG)->reset();
-		
+
 		m_reset = 0;
 	}
 
@@ -427,47 +427,47 @@ WRITE8_MEMBER( adam_state::adamnet_w )
 
 
 //-------------------------------------------------
-//  kb6801_p1_r - 
+//  kb6801_p1_r -
 //-------------------------------------------------
 
 WRITE8_MEMBER( adam_state::master6801_p1_w )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		0		BA8
-		1		BA9
-		2		BA10
-		3		BA11
-		4		BA12
-		5		BA13
-		6		BA14
-		7		BA15
-		
-	*/
+        0       BA8
+        1       BA9
+        2       BA10
+        3       BA11
+        4       BA12
+        5       BA13
+        6       BA14
+        7       BA15
+
+    */
 
 	m_ba = (data << 8) | (m_ba & 0xff);
 }
 
 
 //-------------------------------------------------
-//  master6801_p2_r - 
+//  master6801_p2_r -
 //-------------------------------------------------
 
 READ8_MEMBER( adam_state::master6801_p2_r )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		0		M6801 mode bit 0
-		1		M6801 mode bit 1
-		2		M6801 mode bit 2
-		3		NET RXD
-		4		
+        0       M6801 mode bit 0
+        1       M6801 mode bit 1
+        2       M6801 mode bit 2
+        3       NET RXD
+        4
 
-	*/
+    */
 
 	UINT8 data = M6801_MODE_7;
 
@@ -479,22 +479,22 @@ READ8_MEMBER( adam_state::master6801_p2_r )
 
 
 //-------------------------------------------------
-//  master6801_p2_w - 
+//  master6801_p2_w -
 //-------------------------------------------------
 
 WRITE8_MEMBER( adam_state::master6801_p2_w )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		0		_DMA
-		1		
-		2		_BWR
-		3		
-		4		NET TXD
+        0       _DMA
+        1
+        2       _BWR
+        3
+        4       NET TXD
 
-	*/
+    */
 
 	// DMA
 	m_dma = BIT(data, 0);
@@ -508,100 +508,100 @@ WRITE8_MEMBER( adam_state::master6801_p2_w )
 
 
 //-------------------------------------------------
-//  master6801_p3_r - 
+//  master6801_p3_r -
 //-------------------------------------------------
 
 READ8_MEMBER( adam_state::master6801_p3_r )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		0		BD0
-		1		BD1
-		2		BD2
-		3		BD3
-		4		BD4
-		5		BD5
-		6		BD6
-		7		BD7
-		
-	*/
+        0       BD0
+        1       BD1
+        2       BD2
+        3       BD3
+        4       BD4
+        5       BD5
+        6       BD6
+        7       BD7
+
+    */
 
 	return m_data_out;
 }
 
 
 //-------------------------------------------------
-//  master6801_p3_w - 
+//  master6801_p3_w -
 //-------------------------------------------------
 
 WRITE8_MEMBER( adam_state::master6801_p3_w )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		0		BD0
-		1		BD1
-		2		BD2
-		3		BD3
-		4		BD4
-		5		BD5
-		6		BD6
-		7		BD7
-		
-	*/
+        0       BD0
+        1       BD1
+        2       BD2
+        3       BD3
+        4       BD4
+        5       BD5
+        6       BD6
+        7       BD7
+
+    */
 
 	m_data_in = data;
 }
 
 
 //-------------------------------------------------
-//  master6801_p4_w - 
+//  master6801_p4_w -
 //-------------------------------------------------
 
 WRITE8_MEMBER( adam_state::master6801_p4_w )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		0		BA0
-		1		BA1
-		2		BA2
-		3		BA3
-		4		BA4
-		5		BA5
-		6		BA6
-		7		BA7
-		
-	*/
+        0       BA0
+        1       BA1
+        2       BA2
+        3       BA3
+        4       BA4
+        5       BA5
+        6       BA6
+        7       BA7
+
+    */
 
 	m_ba = (m_ba & 0xff00) | data;
 }
 
 
 //-------------------------------------------------
-//  kb6801_p1_r - 
+//  kb6801_p1_r -
 //-------------------------------------------------
 
 READ8_MEMBER( adam_state::kb6801_p1_r )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		0		X0
-		1		X1
-		2		X2
-		3		X3
-		4		X4
-		5		X5
-		6		X6
-		7		X7
-		
-	*/
+        0       X0
+        1       X1
+        2       X2
+        3       X3
+        4       X4
+        5       X5
+        6       X6
+        7       X7
+
+    */
 
 	UINT8 data = 0xff;
 
@@ -624,22 +624,22 @@ READ8_MEMBER( adam_state::kb6801_p1_r )
 
 
 //-------------------------------------------------
-//  kb6801_p2_r - 
+//  kb6801_p2_r -
 //-------------------------------------------------
 
 READ8_MEMBER( adam_state::kb6801_p2_r )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		0		mode bit 0
-		1		mode bit 1
-		2		mode bit 2
-		3		NET RXD
-		4		NET TXD
+        0       mode bit 0
+        1       mode bit 1
+        2       mode bit 2
+        3       NET RXD
+        4       NET TXD
 
-	*/
+    */
 
 	UINT8 data = M6801_MODE_7;
 
@@ -651,29 +651,29 @@ READ8_MEMBER( adam_state::kb6801_p2_r )
 
 
 //-------------------------------------------------
-//  kb6801_p2_w - 
+//  kb6801_p2_w -
 //-------------------------------------------------
 
 WRITE8_MEMBER( adam_state::kb6801_p2_w )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		0		mode bit 0
-		1		mode bit 1
-		2		mode bit 2
-		3		NET RXD
-		4		NET TXD
+        0       mode bit 0
+        1       mode bit 1
+        2       mode bit 2
+        3       NET RXD
+        4       NET TXD
 
-	*/
+    */
 
 	adamnet_txd_w(ADAMNET_KEYBOARD, BIT(data, 4));
 }
 
 
 //-------------------------------------------------
-//  kb6801_p3_r - 
+//  kb6801_p3_r -
 //-------------------------------------------------
 
 READ8_MEMBER( adam_state::kb6801_p3_r )
@@ -683,32 +683,32 @@ READ8_MEMBER( adam_state::kb6801_p3_r )
 
 
 //-------------------------------------------------
-//  kb6801_p3_w - 
+//  kb6801_p3_w -
 //-------------------------------------------------
 
 WRITE8_MEMBER( adam_state::kb6801_p3_w )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		0		Y0
-		1		Y1
-		2		Y2
-		3		Y3
-		4		Y4
-		5		Y5
-		6		Y6
-		7		Y7
+        0       Y0
+        1       Y1
+        2       Y2
+        3       Y3
+        4       Y4
+        5       Y5
+        6       Y6
+        7       Y7
 
-	*/
+    */
 
 	m_key_y = (m_key_y & 0x1f00) | data;
 }
 
 
 //-------------------------------------------------
-//  kb6801_p4_r - 
+//  kb6801_p4_r -
 //-------------------------------------------------
 
 READ8_MEMBER( adam_state::kb6801_p4_r )
@@ -718,96 +718,96 @@ READ8_MEMBER( adam_state::kb6801_p4_r )
 
 
 //-------------------------------------------------
-//  kb6801_p4_w - 
+//  kb6801_p4_w -
 //-------------------------------------------------
 
 WRITE8_MEMBER( adam_state::kb6801_p4_w )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		0		Y8
-		1		Y9
-		2		Y10
-		3		Y11
-		4		Y12
-		5		
-		6		
-		7		
+        0       Y8
+        1       Y9
+        2       Y10
+        3       Y11
+        4       Y12
+        5
+        6
+        7
 
-	*/
+    */
 
 	m_key_y = ((data & 0x1f) << 8) | (m_key_y & 0xff);
 }
 
 
 //-------------------------------------------------
-//  ddp6801_p1_w - 
+//  ddp6801_p1_w -
 //-------------------------------------------------
 
 WRITE8_MEMBER( adam_state::ddp6801_p1_w )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		0		SPD SEL (0=20 ips, 1=80ips)
-		1		STOP0
-		2		STOP1
-		3		_GO FWD
-		4		_GO REV
-		5		BRAKE
-		6		_WR0
-		7		_WR1
-		
-	*/
-	
+        0       SPD SEL (0=20 ips, 1=80ips)
+        1       STOP0
+        2       STOP1
+        3       _GO FWD
+        4       _GO REV
+        5       BRAKE
+        6       _WR0
+        7       _WR1
+
+    */
+
 	// speed select
-//	cassette_set_speed(m_ddp0, BIT(data, 0) ? 80 : 20);
-//	cassette_set_speed(m_ddp1, BIT(data, 0) ? 80 : 20);
+//  cassette_set_speed(m_ddp0, BIT(data, 0) ? 80 : 20);
+//  cassette_set_speed(m_ddp1, BIT(data, 0) ? 80 : 20);
 
 	// motor stop 0
 	cassette_set_state(m_ddp0, BIT(data, 1) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED);
-	
+
 	// motor stop 1
 	cassette_set_state(m_ddp1, BIT(data, 2) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED);
-		
+
 	// data write 0
 	m_wr0 = BIT(data, 6);
-	
+
 	// data write 1
 	m_wr1 = BIT(data, 7);
 }
 
 
 //-------------------------------------------------
-//  ddp6801_p2_r - 
+//  ddp6801_p2_r -
 //-------------------------------------------------
 
 READ8_MEMBER( adam_state::ddp6801_p2_r )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		0		mode bit 0
-		1		mode bit 1 / CIP1
-		2		mode bit 2
-		3		NET RXD
-		4		
+        0       mode bit 0
+        1       mode bit 1 / CIP1
+        2       mode bit 2
+        3       NET RXD
+        4
 
-	*/
+    */
 
 	UINT8 data = M6801_MODE_6;
-	
+
 	if (!m_reset)
 	{
 		// cassette in place 1
 		data &= ~0x01;
-		//data |= dynamic_cast<device_image_interface *>(&m_ddp1)->exists() << 1;	
+		//data |= dynamic_cast<device_image_interface *>(&m_ddp1)->exists() << 1;
 	}
-	
+
 	// NET RXD
 	data |= m_rxd << 3;
 
@@ -816,117 +816,117 @@ READ8_MEMBER( adam_state::ddp6801_p2_r )
 
 
 //-------------------------------------------------
-//  ddp6801_p2_w - 
+//  ddp6801_p2_w -
 //-------------------------------------------------
 
 WRITE8_MEMBER( adam_state::ddp6801_p2_w )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		0		WRT DATA
-		1		
-		2		TRACK A/B (0=B, 1=A)
-		3		
-		4		NET TXD
+        0       WRT DATA
+        1
+        2       TRACK A/B (0=B, 1=A)
+        3
+        4       NET TXD
 
-	*/
+    */
 
 	// track
 	m_track = !BIT(data, 2);
-	
+
 	// write data
 	if (!m_wr0) cassette_output(m_ddp0, BIT(data, 0) ? 1.0 : -1.0);
 	if (!m_wr1) cassette_output(m_ddp0, BIT(data, 0) ? 1.0 : -1.0);
-	
+
 	// NET TXD
 	adamnet_txd_w(ADAMNET_DDP, BIT(data, 4));
 }
 
 
 //-------------------------------------------------
-//  ddp6801_p4_r - 
+//  ddp6801_p4_r -
 //-------------------------------------------------
 
 READ8_MEMBER( adam_state::ddp6801_p4_r )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		0		A8
-		1		A9
-		2		A10 (2114 _S)
-		3		MSENSE 0
-		4		MSENSE 1
-		5		CIP0
-		6		RD DATA 0 (always 1)
-		7		RD DATA 1 (data from drives ORed together)
+        0       A8
+        1       A9
+        2       A10 (2114 _S)
+        3       MSENSE 0
+        4       MSENSE 1
+        5       CIP0
+        6       RD DATA 0 (always 1)
+        7       RD DATA 1 (data from drives ORed together)
 
-	*/
-	
+    */
+
 	UINT8 data = 0;
 
 	// motion sense 0
 	data |= ((cassette_get_state(m_ddp0) & CASSETTE_MASK_UISTATE) != CASSETTE_STOPPED) << 3;
-	
+
 	// motion sense 1
 	data |= ((cassette_get_state(m_ddp1) & CASSETTE_MASK_UISTATE) != CASSETTE_STOPPED) << 4;
-	
+
 	// cassette in place 0
-//	data |= dynamic_cast<device_image_interface *>(&m_ddp0)->exists() << 5;
-	
+//  data |= dynamic_cast<device_image_interface *>(&m_ddp0)->exists() << 5;
+
 	// read data 0
 	data |= 0x40;
-	
+
 	// read data 1
 	data |= ((cassette_input(m_ddp0) < 0) || (cassette_input(m_ddp1) < 0)) << 7;
-	
+
 	return data;
 }
 
 
 //-------------------------------------------------
-//  printer6801_p1_w - 
+//  printer6801_p1_w -
 //-------------------------------------------------
 
 WRITE8_MEMBER( adam_state::printer6801_p1_w )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		0		M2 phase D
-		1		M2 phase B
-		2		M2 phase C
-		3		M2 phase A
-		4		M3 phase B
-		5		M3 phase D
-		6		M3 phase A
-		7		M3 phase C
+        0       M2 phase D
+        1       M2 phase B
+        2       M2 phase C
+        3       M2 phase A
+        4       M3 phase B
+        5       M3 phase D
+        6       M3 phase A
+        7       M3 phase C
 
-	*/
+    */
 }
 
 
 //-------------------------------------------------
-//  printer6801_p2_r - 
+//  printer6801_p2_r -
 //-------------------------------------------------
 
 READ8_MEMBER( adam_state::printer6801_p2_r )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		0		mode bit 0
-		1		mode bit 1
-		2		mode bit 2
-		3		NET RXD
-		4		NET TXD
+        0       mode bit 0
+        1       mode bit 1
+        2       mode bit 2
+        3       NET RXD
+        4       NET TXD
 
-	*/
+    */
 
 	UINT8 data = M6801_MODE_7;
 
@@ -938,29 +938,29 @@ READ8_MEMBER( adam_state::printer6801_p2_r )
 
 
 //-------------------------------------------------
-//  printer6801_p2_w - 
+//  printer6801_p2_w -
 //-------------------------------------------------
 
 WRITE8_MEMBER( adam_state::printer6801_p2_w )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		0		mode bit 0
-		1		mode bit 1
-		2		mode bit 2
-		3		NET RXD
-		4		NET TXD
+        0       mode bit 0
+        1       mode bit 1
+        2       mode bit 2
+        3       NET RXD
+        4       NET TXD
 
-	*/
+    */
 
 	adamnet_txd_w(ADAMNET_PRINTER, BIT(data, 4));
 }
 
 
 //-------------------------------------------------
-//  printer6801_p3_r - 
+//  printer6801_p3_r -
 //-------------------------------------------------
 
 READ8_MEMBER( adam_state::printer6801_p3_r )
@@ -970,107 +970,107 @@ READ8_MEMBER( adam_state::printer6801_p3_r )
 
 
 //-------------------------------------------------
-//  printer6801_p4_r - 
+//  printer6801_p4_r -
 //-------------------------------------------------
 
 READ8_MEMBER( adam_state::printer6801_p4_r )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		0		
-		1		
-		2		
-		3		
-		4		left margin
-		5		platen detent
-		6		wheel home
-		7		self-test
+        0
+        1
+        2
+        3
+        4       left margin
+        5       platen detent
+        6       wheel home
+        7       self-test
 
-	*/
+    */
 
 	return 0x80;
 }
 
 
 //-------------------------------------------------
-//  printer6801_p4_w - 
+//  printer6801_p4_w -
 //-------------------------------------------------
 
 WRITE8_MEMBER( adam_state::printer6801_p4_w )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		0		print hammer solenoid
-		1		ribbon advance solenoid
-		2		platen motor advance
-		3		platen motor break
-		4		
-		5		
-		6		
-		7		
+        0       print hammer solenoid
+        1       ribbon advance solenoid
+        2       platen motor advance
+        3       platen motor break
+        4
+        5
+        6
+        7
 
-	*/
+    */
 }
 
 
 //-------------------------------------------------
-//  fdc6801_p1_r - 
+//  fdc6801_p1_r -
 //-------------------------------------------------
 
 READ8_MEMBER( adam_state::fdc6801_p1_r )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		0		some kind of optic sensor
-		1		
-		2		FDC DRQ
-		3		
-		4		
-		5		
-		6		
-		7		SW3 (0=DS1, 1=DS2)
+        0       some kind of optic sensor
+        1
+        2       FDC DRQ
+        3
+        4
+        5
+        6
+        7       SW3 (0=DS1, 1=DS2)
 
-	*/
-	
+    */
+
 	UINT8 data = 0;
-	
+
 	// floppy data request
 	data |= wd17xx_drq_r(m_fdc) << 2;
-	
+
 	return data;
 }
 
 
 //-------------------------------------------------
-//  fdc6801_p1_w - 
+//  fdc6801_p1_w -
 //-------------------------------------------------
 
 WRITE8_MEMBER( adam_state::fdc6801_p1_w )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		0		
-		1		FDC ENP
-		2		
-		3		FDC _DDEN
-		4		
-		5		DRIVE SELECT
-		6		MOTOR ON
-		7		
+        0
+        1       FDC ENP
+        2
+        3       FDC _DDEN
+        4
+        5       DRIVE SELECT
+        6       MOTOR ON
+        7
 
-	*/
-	
+    */
+
 	// density select
 	wd17xx_dden_w(m_fdc, BIT(data, 3));
-	
+
 	// motor enable
 	floppy_mon_w(m_floppy0, !BIT(data, 6));
 	floppy_drive_set_ready_state(m_floppy0, 1, 1);
@@ -1078,22 +1078,22 @@ WRITE8_MEMBER( adam_state::fdc6801_p1_w )
 
 
 //-------------------------------------------------
-//  fdc6801_p2_r - 
+//  fdc6801_p2_r -
 //-------------------------------------------------
 
 READ8_MEMBER( adam_state::fdc6801_p2_r )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		0		mode bit 0
-		1		mode bit 1
-		2		mode bit 2
-		3		NET RXD
-		4		
+        0       mode bit 0
+        1       mode bit 1
+        2       mode bit 2
+        3       NET RXD
+        4
 
-	*/
+    */
 
 	UINT8 data = M6801_MODE_2;
 
@@ -1105,53 +1105,53 @@ READ8_MEMBER( adam_state::fdc6801_p2_r )
 
 
 //-------------------------------------------------
-//  fdc6801_p2_w - 
+//  fdc6801_p2_w -
 //-------------------------------------------------
 
 WRITE8_MEMBER( adam_state::fdc6801_p2_w )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		0		
-		1		
-		2		
-		3		
-		4		NET TXD
+        0
+        1
+        2
+        3
+        4       NET TXD
 
-	*/
+    */
 
 	adamnet_txd_w(ADAMNET_FDC, BIT(data, 4));
 }
 
 
 //-------------------------------------------------
-//  fdc6801_p4_w - 
+//  fdc6801_p4_w -
 //-------------------------------------------------
 
 WRITE8_MEMBER( adam_state::fdc6801_p4_w )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		0		A8
-		1		A9
-		2		A10
-		3		A11
-		4		_WE
-		5		FDC CA0
-		6		FDC CA1
-		7		chip select logic?
+        0       A8
+        1       A9
+        2       A10
+        3       A11
+        4       _WE
+        5       FDC CA0
+        6       FDC CA1
+        7       chip select logic?
 
-	*/
+    */
 }
 
 
 
 //**************************************************************************
-//	PADDLES
+//  PADDLES
 //**************************************************************************
 
 //-------------------------------------------------
@@ -1172,7 +1172,7 @@ static TIMER_DEVICE_CALLBACK( paddle_tick )
 
 
 //-------------------------------------------------
-//  paddle_w - 
+//  paddle_w -
 //-------------------------------------------------
 
 WRITE8_MEMBER( adam_state::paddle_w )
@@ -1182,7 +1182,7 @@ WRITE8_MEMBER( adam_state::paddle_w )
 
 
 //-------------------------------------------------
-//  joystick_w - 
+//  joystick_w -
 //-------------------------------------------------
 
 WRITE8_MEMBER( adam_state::joystick_w )
@@ -1192,7 +1192,7 @@ WRITE8_MEMBER( adam_state::joystick_w )
 
 
 //-------------------------------------------------
-//  input1_r - 
+//  input1_r -
 //-------------------------------------------------
 
 READ8_MEMBER( adam_state::input1_r )
@@ -1202,7 +1202,7 @@ READ8_MEMBER( adam_state::input1_r )
 
 
 //-------------------------------------------------
-//  input2_r - 
+//  input2_r -
 //-------------------------------------------------
 
 READ8_MEMBER( adam_state::input2_r )
@@ -1213,7 +1213,7 @@ READ8_MEMBER( adam_state::input2_r )
 
 
 //**************************************************************************
-//	ADDRESS MAPS
+//  ADDRESS MAPS
 //**************************************************************************
 
 //-------------------------------------------------
@@ -1230,15 +1230,15 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( adam_io, ADDRESS_SPACE_IO, 8, adam_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-//	AM_RANGE(0x1e, 0x1e) Optional Auto Dialer
+//  AM_RANGE(0x1e, 0x1e) Optional Auto Dialer
 	AM_RANGE(0x20, 0x20) AM_MIRROR(0x1f) AM_READWRITE(adamnet_r, adamnet_w)
-//	AM_RANGE(0x40, 0x40) Printer Data
-//	AM_RANGE(0x42, 0x42) Expansion RAM Page Select
-//	AM_RANGE(0x52, 0x52) Adam Resident Debugger ?
-//	AM_RANGE(0x54, 0x54) Adam Resident Debugger ?
-//	AM_RANGE(0x55, 0x55) Adam Resident Debugger ?
-//	AM_RANGE(0x5e, 0x5e) Optional Modem Data I/O
-//	AM_RANGE(0x5f, 0x5f) Optional Modem Control Status
+//  AM_RANGE(0x40, 0x40) Printer Data
+//  AM_RANGE(0x42, 0x42) Expansion RAM Page Select
+//  AM_RANGE(0x52, 0x52) Adam Resident Debugger ?
+//  AM_RANGE(0x54, 0x54) Adam Resident Debugger ?
+//  AM_RANGE(0x55, 0x55) Adam Resident Debugger ?
+//  AM_RANGE(0x5e, 0x5e) Optional Modem Data I/O
+//  AM_RANGE(0x5f, 0x5f) Optional Modem Control Status
 	AM_RANGE(0x60, 0x60) AM_MIRROR(0x1f) AM_READWRITE(mioc_r, mioc_w)
 	AM_RANGE(0x80, 0x80) AM_MIRROR(0x1f) AM_WRITE(paddle_w)
 	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x1e) AM_READWRITE_LEGACY(TMS9928A_vram_r, TMS9928A_vram_w)
@@ -1361,14 +1361,14 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( fdc6801_io, ADDRESS_SPACE_IO, 8, adam_state )
 	AM_RANGE(M6801_PORT1, M6801_PORT1) AM_READWRITE(fdc6801_p1_r, fdc6801_p1_w)
 	AM_RANGE(M6801_PORT2, M6801_PORT2) AM_READWRITE(fdc6801_p2_r, fdc6801_p2_w)
-	AM_RANGE(M6801_PORT3, M6801_PORT3) 
+	AM_RANGE(M6801_PORT3, M6801_PORT3)
 	AM_RANGE(M6801_PORT4, M6801_PORT4) AM_WRITE(fdc6801_p4_w)
 ADDRESS_MAP_END
 
 
 
 //**************************************************************************
-//	INPUT PORTS
+//  INPUT PORTS
 //**************************************************************************
 
 //-------------------------------------------------
@@ -1468,19 +1468,19 @@ static INPUT_PORTS_START( adam )
 
 	PORT_START("Y9")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("CONTROL") PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_MAMEKEY(LCONTROL))
-	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNUSED ) 
+	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("Y10")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("SHIFT") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
-	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNUSED ) 
+	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("Y11")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("LOCK") PORT_CODE(KEYCODE_CAPSLOCK) PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK))
-	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNUSED ) 
+	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("Y12")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("HOME") PORT_CODE(KEYCODE_F9)
-	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNUSED ) 
+	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_INCLUDE( coleco )
 INPUT_PORTS_END
@@ -1488,7 +1488,7 @@ INPUT_PORTS_END
 
 
 //**************************************************************************
-//	DEVICE CONFIGURATION
+//  DEVICE CONFIGURATION
 //**************************************************************************
 
 //-------------------------------------------------
@@ -1604,7 +1604,7 @@ static M6801_INTERFACE( master6801_intf )
 
 
 //**************************************************************************
-//	MACHINE INITIALIZATION
+//  MACHINE INITIALIZATION
 //**************************************************************************
 
 //-------------------------------------------------
@@ -1654,12 +1654,12 @@ void adam_state::machine_reset()
 		m_mioc = (HI_CARTRIDGE_ROM << 2) | LO_OS7_ROM_INTERNAL_RAM;
 	}
 	else
-	{	
+	{
 		// computer reset
 		m_game = 0;
 		m_mioc = 0;
 	}
-		
+
 	m_adamnet = 0;
 
 	bankswitch();
@@ -1668,7 +1668,7 @@ void adam_state::machine_reset()
 
 
 //**************************************************************************
-//	MACHINE CONFIGURATION
+//  MACHINE CONFIGURATION
 //**************************************************************************
 
 //-------------------------------------------------
@@ -1685,7 +1685,7 @@ static MACHINE_CONFIG_START( adam, adam_state )
 	MCFG_CPU_PROGRAM_MAP(master6801_mem)
 	MCFG_CPU_IO_MAP(master6801_io)
 	MCFG_CPU_CONFIG(master6801_intf)
-	
+
 	MCFG_CPU_ADD(M6801_KB_TAG, M6801, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(kb6801_mem)
 	MCFG_CPU_IO_MAP(kb6801_io)
@@ -1746,7 +1746,7 @@ MACHINE_CONFIG_END
 
 
 //**************************************************************************
-//	ROMS
+//  ROMS
 //**************************************************************************
 
 //-------------------------------------------------
@@ -1793,7 +1793,7 @@ ROM_END
 
 
 //**************************************************************************
-//	SYSTEM DRIVERS
+//  SYSTEM DRIVERS
 //**************************************************************************
 
 /*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       INIT    COMPANY         FULLNAME            FLAGS */

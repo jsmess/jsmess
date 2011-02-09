@@ -10,27 +10,27 @@
     R. Belmont
 
     Mac Model Feature Summary:
-                                CPU             FDC     Kbd/Mouse  PRAM		Video
-         - Mac 128k             68k             IWM     orig       orig		Original
-         - Mac 512k             68k             IWM     orig       orig		Original
-         - Mac 512ke        	68k             IWM     orig       orig		Original
-         - Mac Plus         	68k             IWM     orig       ext		Original
-         - Mac SE               68k             IWM     MacII ADB  ext		Original
-         - Mac Classic          68k             SWIM    MacII ADB  ext		Original
-         - Mac Portable         68k (16 MHz)    SWIM    ADB-PMU    PMU		640x400 B&W
-         - PowerBook 100        68k (16 MHz)    SWIM    ADB-PMU    PMU		640x400 B&W
-         - Mac II               020             IWM     MacII ADB  ext		NuBus card
-         - Mac IIx              030             SWIM    MacII ADB  ext		NuBus card
-         - Mac IIfx             030             SWIM    ADB-IOP    ext		NuBus card
-         - Mac SE/30            030             SWIM    MacII ADB  ext		Internal fake NuBus card
-         - Mac IIcx             030             SWIM    MacII ADB  ext		NuBus card
-         - Mac IIci             030             SWIM    Egret ADB  ext		Internal "RBV" type
-         - Mac IIsi             030             SWIM    Egret ADB  n/a		Internal "RBV" type
-         - Mac IIvx/IIvi        030             SWIM    Egret ADB  n/a		Internal "VASP" type
-         - Mac LC               020             SWIM    Egret ADB  n/a		Internal "V8" type
-         - Mac LC II            030             SWIM    Egret ADB  n/a		Internal "V8" type
-    	 - Mac LC III           030             SWIM    Egret ADB  n/a		Internal "Sonora" type
-    	 - Mac Classic II		030				SWIM	Egret ADB  n/a		Internal "Eagle" type
+                                CPU             FDC     Kbd/Mouse  PRAM     Video
+         - Mac 128k             68k             IWM     orig       orig     Original
+         - Mac 512k             68k             IWM     orig       orig     Original
+         - Mac 512ke            68k             IWM     orig       orig     Original
+         - Mac Plus             68k             IWM     orig       ext      Original
+         - Mac SE               68k             IWM     MacII ADB  ext      Original
+         - Mac Classic          68k             SWIM    MacII ADB  ext      Original
+         - Mac Portable         68k (16 MHz)    SWIM    ADB-PMU    PMU      640x400 B&W
+         - PowerBook 100        68k (16 MHz)    SWIM    ADB-PMU    PMU      640x400 B&W
+         - Mac II               020             IWM     MacII ADB  ext      NuBus card
+         - Mac IIx              030             SWIM    MacII ADB  ext      NuBus card
+         - Mac IIfx             030             SWIM    ADB-IOP    ext      NuBus card
+         - Mac SE/30            030             SWIM    MacII ADB  ext      Internal fake NuBus card
+         - Mac IIcx             030             SWIM    MacII ADB  ext      NuBus card
+         - Mac IIci             030             SWIM    Egret ADB  ext      Internal "RBV" type
+         - Mac IIsi             030             SWIM    Egret ADB  n/a      Internal "RBV" type
+         - Mac IIvx/IIvi        030             SWIM    Egret ADB  n/a      Internal "VASP" type
+         - Mac LC               020             SWIM    Egret ADB  n/a      Internal "V8" type
+         - Mac LC II            030             SWIM    Egret ADB  n/a      Internal "V8" type
+         - Mac LC III           030             SWIM    Egret ADB  n/a      Internal "Sonora" type
+         - Mac Classic II       030             SWIM    Egret ADB  n/a      Internal "Eagle" type
 
     Notes:
         - The Mac Plus boot code seems to check to see the extent of ROM
@@ -351,7 +351,7 @@ void mac_asc_irq(device_t *device, int state)
 		mac->m_via2->write_cb1(state^1);
 	}
 
-	// todo: portable/pb100 hook up ASC IRQ differently 
+	// todo: portable/pb100 hook up ASC IRQ differently
 }
 
 WRITE16_MEMBER ( mac_state::mac_autovector_w )
@@ -407,14 +407,14 @@ void mac_state::v8_resize()
 		is_rom = FALSE;
 	}
 
-//	printf("mac_v8_resize: memory_size = %x, ctrl bits %02x (overlay %d = %s)\n", memory_size, mac->m_rbv_regs[1] & 0xe0, mac->m_overlay, is_rom ? "ROM" : "RAM");
+//  printf("mac_v8_resize: memory_size = %x, ctrl bits %02x (overlay %d = %s)\n", memory_size, mac->m_rbv_regs[1] & 0xe0, mac->m_overlay, is_rom ? "ROM" : "RAM");
 
 	if (is_rom)
 	{
 		mac_install_memory(machine, 0x00000000, memory_size-1, memory_size, memory_data, is_rom, "bank1");
 	}
 	else
-	{	
+	{
 		address_space* space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 		UINT32 onboard_amt, simm_amt, simm_size;
 		static const UINT32 simm_sizes[4] = { 0, 2*1024*1024, 4*1024*1024, 8*1024*1024 };
@@ -423,17 +423,17 @@ void mac_state::v8_resize()
 		memory_unmap_write(space, 0, 0x9fffff, 0x9fffff, 0);
 
 		// LC has 2 MB built-in, all other V8-style machines have 4 MB
-		// we reserve the first 2 or 4 MB of mess_ram for the onboard, 
+		// we reserve the first 2 or 4 MB of mess_ram for the onboard,
 		// RAM above that mark is the SIMM
 		onboard_amt = ((m_model == MODEL_MAC_LC) || (m_model == MODEL_MAC_CLASSIC_II)) ? 2*1024*1024 : 4*1024*1024;
 		simm_amt = (m_rbv_regs[1]>>6) & 3;	// size of SIMM RAM window
 		simm_size = memory_size - onboard_amt;	// actual amount of RAM available for SIMMs
-		
+
 		// installing SIMM RAM?
 		if (simm_amt != 0)
 		{
-//			printf("mac_v8_resize: SIMM region size is %x, SIMM size is %x, onboard size is %x\n", simm_sizes[simm_amt], simm_size, onboard_amt);
-			
+//          printf("mac_v8_resize: SIMM region size is %x, SIMM size is %x, onboard size is %x\n", simm_sizes[simm_amt], simm_size, onboard_amt);
+
 			if ((simm_amt > 0) && (simm_size > 0))
 			{
 				mac_install_memory(machine, 0x000000, simm_sizes[simm_amt]-1, simm_sizes[simm_amt], memory_data + onboard_amt, is_rom, "bank1");
@@ -444,13 +444,13 @@ void mac_state::v8_resize()
 			{
 				mac_install_memory(machine, simm_sizes[simm_amt], simm_sizes[simm_amt] + onboard_amt - 1, onboard_amt, memory_data, is_rom, "bank2");
 			}
-				
+
 			// a mirror of the first 2 MB of on board RAM always lives at 0x800000
 			mac_install_memory(machine, 0x800000, 0x9fffff, 0x200000, memory_data, is_rom, "bank3");
 		}
 		else
 		{
-//			printf("mac_v8_resize: SIMM off, mobo RAM at 0 and top\n");
+//          printf("mac_v8_resize: SIMM off, mobo RAM at 0 and top\n");
 
 			mac_install_memory(machine, 0x000000, onboard_amt-1, onboard_amt, memory_data, is_rom, "bank1");
 			mac_install_memory(machine, 0x800000, 0x9fffff, 0x200000, memory_data, is_rom, "bank3");
@@ -493,7 +493,7 @@ void mac_state::set_memory_overlay(int overlay)
 		}
 		else if ((m_model >= MODEL_MAC_POWERMAC_6100) && (m_model >= MODEL_MAC_POWERMAC_8100))
 		{
-//			mac_install_memory(machine, 0x00000000, memory_size-1, memory_size, memory_data, is_rom, "bank1");
+//          mac_install_memory(machine, 0x00000000, memory_size-1, memory_size, memory_data, is_rom, "bank1");
 		}
 		else if ((m_model == MODEL_MAC_IICI) || (m_model == MODEL_MAC_IISI))
 		{
@@ -1768,7 +1768,7 @@ void mac_state::adb_talk()
 				// keep track of what device the Mac last TALKed to
 				m_adb_last_talk = addr;
 
-				m_adb_direction = 0; 	// output to Mac
+				m_adb_direction = 0;	// output to Mac
 				if (addr == m_adb_mouseaddr)
 				{
 					UINT8 mouseX, mouseY;
@@ -2153,7 +2153,7 @@ static void mac_egret_mcu_exec(mac_state *mac)
 			{
 				int addr = mac->m_adb_buffer[2]<<8 | mac->m_adb_buffer[3];
 
-				#if LOG_ADB || LOG_ADB_MCU_CMD 
+				#if LOG_ADB || LOG_ADB_MCU_CMD
 				printf("ADB: Egret read 6805 address %x\n", addr);
 				#endif
 
@@ -2172,7 +2172,7 @@ static void mac_egret_mcu_exec(mac_state *mac)
 			break;
 
 		case 0x03: // read RTC
-			#if LOG_ADB || LOG_ADB_MCU_CMD 
+			#if LOG_ADB || LOG_ADB_MCU_CMD
 			printf("ADB: Egret read RTC = %08x\n", mac->m_rtc_seconds[3]<<24|mac->m_rtc_seconds[2]<<16|mac->m_rtc_seconds[1]<<8|mac->m_rtc_seconds[0]);
 			#endif
 
@@ -2180,7 +2180,7 @@ static void mac_egret_mcu_exec(mac_state *mac)
 			break;
 
 		case 0x07: // read PRAM
-			#if LOG_ADB || LOG_ADB_MCU_CMD 
+			#if LOG_ADB || LOG_ADB_MCU_CMD
 			printf("ADB: Egret read PRAM from %x\n", mac->m_adb_buffer[2]<<8 | mac->m_adb_buffer[3]);
 			#endif
 
@@ -2192,7 +2192,7 @@ static void mac_egret_mcu_exec(mac_state *mac)
 				int addr = mac->m_adb_buffer[2]<<8 | mac->m_adb_buffer[3];
 				int len = mac->m_adb_datasize - 4;
 
-				#if LOG_ADB || LOG_ADB_MCU_CMD 
+				#if LOG_ADB || LOG_ADB_MCU_CMD
 				printf("ADB: Egret write %d bytes to address %x\n", len, addr);
 				#endif
 
@@ -2204,7 +2204,7 @@ static void mac_egret_mcu_exec(mac_state *mac)
 						mac->m_rtc_ram[(addr-0x100)+i] = mac->m_adb_buffer[4+i];
 					}
 				}
-				#if LOG_ADB || LOG_ADB_MCU_CMD 
+				#if LOG_ADB || LOG_ADB_MCU_CMD
 				else
 				{
 					printf("ADB: Egret unhandled direct write @ %x\n", addr);
@@ -2216,7 +2216,7 @@ static void mac_egret_mcu_exec(mac_state *mac)
 			break;
 
 		case 0x0c: // write PRAM
-			#if LOG_ADB || LOG_ADB_MCU_CMD 
+			#if LOG_ADB || LOG_ADB_MCU_CMD
 			printf("ADB: Egret write %02x to PRAM at %x\n", mac->m_adb_buffer[4], mac->m_adb_buffer[2]<<8 | mac->m_adb_buffer[3]);
 			#endif
 
@@ -2233,7 +2233,7 @@ static void mac_egret_mcu_exec(mac_state *mac)
 			break;
 
 		case 0x0e: // send to DFAC
-			#if LOG_ADB || LOG_ADB_MCU_CMD 
+			#if LOG_ADB || LOG_ADB_MCU_CMD
 			printf("ADB: Egret send %02x to DFAC\n", mac->m_adb_buffer[2]);
 			#endif
 
@@ -2241,7 +2241,7 @@ static void mac_egret_mcu_exec(mac_state *mac)
 			break;
 
 		case 0x19: // set device list bitmap
-			#if LOG_ADB || LOG_ADB_MCU_CMD 
+			#if LOG_ADB || LOG_ADB_MCU_CMD
 			printf("ADB: Egret set device list bitmap %02x%02x\n", mac->m_adb_buffer[2], mac->m_adb_buffer[3]);
 			#endif
 
@@ -2249,7 +2249,7 @@ static void mac_egret_mcu_exec(mac_state *mac)
 			break;
 
 		case 0x1b: // set one-second interrupt
-			#if LOG_ADB || LOG_ADB_MCU_CMD 
+			#if LOG_ADB || LOG_ADB_MCU_CMD
 			if (mac->m_adb_buffer[2])
 			{
 				printf("ADB: Egret enable one-second IRQ\n");
@@ -2264,7 +2264,7 @@ static void mac_egret_mcu_exec(mac_state *mac)
 			break;
 
 		case 0x1c:	// enable/disable keyboard NMI
-			#if LOG_ADB || LOG_ADB_MCU_CMD 
+			#if LOG_ADB || LOG_ADB_MCU_CMD
 			if (mac->m_adb_buffer[2])
 			{
 				printf("ADB: Egret enable keyboard NMI\n");
@@ -2279,7 +2279,7 @@ static void mac_egret_mcu_exec(mac_state *mac)
 			break;
 
 		default:
-			#if LOG_ADB || LOG_ADB_MCU_CMD 
+			#if LOG_ADB || LOG_ADB_MCU_CMD
 			printf("ADB: Unknown Egret MCU command %02x\n", mac->m_adb_buffer[1]);
 			#endif
 			break;
@@ -2330,7 +2330,7 @@ static void mac_egret_newaction(mac_state *mac, int state)
 		// if bit 2 drops and bit 1 is zero, execute the command
 		if (!(state & 0x02) && !(state & 0x04) && (mac->m_adb_state & 0x04) && (mac->m_adb_datasize > 0))
 		{
-			#if LOG_ADB || LOG_ADB_MCU_CMD 
+			#if LOG_ADB || LOG_ADB_MCU_CMD
 			int i;
 
 			printf("Egret ADB: exec command with %d bytes: ", mac->m_adb_datasize);
@@ -2350,14 +2350,14 @@ static void mac_egret_newaction(mac_state *mac, int state)
 					switch (mac->m_adb_buffer[1] & 0xf)
 					{
 						case 0:		// reset
-							#if LOG_ADB || LOG_ADB_MCU_CMD 
+							#if LOG_ADB || LOG_ADB_MCU_CMD
 							printf("Egret: ADB Reset\n");
 							#endif
 							mac_egret_response_adb(mac, 0, 0, 0, 0);
 							break;
 
 						case 1:		// flush
-							#if LOG_ADB || LOG_ADB_MCU_CMD 
+							#if LOG_ADB || LOG_ADB_MCU_CMD
 							printf("Egret: ADB Flush\n");
 							#endif
 							mac_egret_response_std(mac, 1, 1, 0);
@@ -2367,21 +2367,21 @@ static void mac_egret_newaction(mac_state *mac, int state)
 							switch ((mac->m_adb_buffer[1]>>2)&3)
 							{
 								case 2:	// ADB listen
-									#if LOG_ADB || LOG_ADB_MCU_CMD 
+									#if LOG_ADB || LOG_ADB_MCU_CMD
 									printf("Egret: ADB listen to device %d\n", mac->m_adb_buffer[1]>>4);
 									#endif
 									mac_egret_response_adb(mac, 0, 2, 0, 0);
 									break;
 
 								case 3: // ADB talk
-									#if LOG_ADB || LOG_ADB_MCU_CMD 
+									#if LOG_ADB || LOG_ADB_MCU_CMD
 									printf("Egret: ADB talk to device %d\n", mac->m_adb_buffer[1]>>4);
 									#endif
 									mac_egret_response_adb(mac, 0, 2, 0, 0);
 									break;
 							}
 
-							#if LOG_ADB || LOG_ADB_MCU_CMD 
+							#if LOG_ADB || LOG_ADB_MCU_CMD
 							printf("Egret: Unhandled ADB command %02x\n", mac->m_adb_buffer[1]);
 							#endif
 							mac->m_adb_datasize = 0;
@@ -2635,7 +2635,7 @@ static READ8_DEVICE_HANDLER(mac_via_in_a)
 		case MODEL_MAC_PORTABLE:
 		case MODEL_MAC_PB100:
 			#if LOG_ADB
-//			printf("Read PM data %x\n", mac->m_pm_data_recv);
+//          printf("Read PM data %x\n", mac->m_pm_data_recv);
 			#endif
 			return mac->m_pm_data_recv;
 
@@ -2748,7 +2748,7 @@ static WRITE8_DEVICE_HANDLER(mac_via_out_a)
 	if (mac->m_model >= MODEL_MAC_PORTABLE && mac->m_model <= MODEL_MAC_PB100)
 	{
 		#if LOG_ADB
-//		printf("%02x to PM\n", data);
+//      printf("%02x to PM\n", data);
 		#endif
 		mac->m_pm_data_send = data;
 		return;
@@ -2946,7 +2946,7 @@ READ16_MEMBER ( mac_state::mac_via2_r )
 
 	data = m_via2->read(space, offset);
 
-//	if (LOG_VIA)
+//  if (LOG_VIA)
 		logerror("mac_via2_r: offset=0x%02x = %02x (PC=%x)\n", offset*2, data, cpu_get_pc(space.machine->device("maincpu")));
 
 	return (data & 0xff) | (data << 8);
@@ -2957,7 +2957,7 @@ WRITE16_MEMBER ( mac_state::mac_via2_w )
 	offset >>= 8;
 	offset &= 0x0f;
 
-//	if (LOG_VIA)
+//  if (LOG_VIA)
 		logerror("mac_via2_w: offset=%x data=0x%08x (PC=%x)\n", offset, data, cpu_get_pc(space.machine->device("maincpu")));
 
 	if (ACCESSING_BITS_8_15)
@@ -3093,7 +3093,7 @@ void mac_state::machine_reset()
 		mac_set_sound_buffer(machine->device("custom"), 0);
 	}
 	else if (MAC_HAS_VIA2)	// prime CB1 for ASC and slot interrupts
-	{	
+	{
 		m_via2->write_ca1(1);
 		m_via2->write_cb1(1);
 	}
@@ -3112,7 +3112,7 @@ void mac_state::machine_reset()
 	}
 
 	m_scsi_interrupt = 0;
-	if (machine->device<cpu_device>("maincpu")->debug()) 
+	if (machine->device<cpu_device>("maincpu")->debug())
 	{
 		machine->device<cpu_device>("maincpu")->debug()->set_dasm_override(mac_dasm_override);
 	}
@@ -3392,7 +3392,7 @@ static TIMER_CALLBACK(mac_scanline_tick)
 	scanline = machine->primary_screen->vpos();
 	if (scanline == MAC_V_VIS)
 		mac->vblank_irq();
-	
+
 	/* check for mouse changes at 10 irqs per frame */
 	if (mac->m_model <= MODEL_MAC_PLUS)
 	{

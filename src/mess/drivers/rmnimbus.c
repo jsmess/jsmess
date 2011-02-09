@@ -126,7 +126,7 @@ static ADDRESS_MAP_START(nimbus_io, ADDRESS_SPACE_IO, 16)
     AM_RANGE( 0X00e0, 0X00ef) AM_READWRITE8( nimbus_sound_ay8910_r, nimbus_sound_ay8910_w, 0x00FF)
     AM_RANGE( 0x00f0, 0x00f7) AM_DEVREADWRITE8(Z80SIO_TAG, z80sio_cd_ba_r, z80sio_cd_ba_w, 0x00ff)
     AM_RANGE( 0x0400, 0x041f) AM_READWRITE8( nimbus_disk_r, nimbus_disk_w, 0x00FF)
-	AM_RANGE( 0x0480, 0x049f) AM_DEVREADWRITE8_MODERN(VIA_TAG, via6522_device, read, write, 0x00FF)	
+	AM_RANGE( 0x0480, 0x049f) AM_DEVREADWRITE8_MODERN(VIA_TAG, via6522_device, read, write, 0x00FF)
 	AM_RANGE( 0xff00, 0xffff) AM_READWRITE( nimbus_i186_internal_port_r, nimbus_i186_internal_port_w)/* CPU 80186         */
 ADDRESS_MAP_END
 
@@ -358,7 +358,7 @@ static MACHINE_CONFIG_START( nimbus, rmnimbus_state )
 	MCFG_SOUND_ADD(AY8910_TAG, AY8910, 2000000)
 	MCFG_SOUND_CONFIG(nimbus_ay8910_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,MONO_TAG, 0.75)
-	
+
 	MCFG_SOUND_ADD(MSM5205_TAG, MSM5205, 384000)
 	MCFG_SOUND_CONFIG(msm5205_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, MONO_TAG, 0.75)

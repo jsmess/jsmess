@@ -1,13 +1,13 @@
 /*
 
     TODO:
-	
-	- X order
-	- freeze (light pen)
-	- screen size
-	- scanline based update
 
-	http://zone.ni.com/devzone/cda/tut/p/id/4750
+    - X order
+    - freeze (light pen)
+    - screen size
+    - scanline based update
+
+    http://zone.ni.com/devzone/cda/tut/p/id/4750
 
 */
 
@@ -18,7 +18,7 @@
 
 
 //**************************************************************************
-//	CONSTANTS / MACROS
+//  CONSTANTS / MACROS
 //**************************************************************************
 
 #define LOG 0
@@ -76,7 +76,7 @@
 
 
 //**************************************************************************
-//	READ/WRITE HANDLERS
+//  READ/WRITE HANDLERS
 //**************************************************************************
 
 //-------------------------------------------------
@@ -86,7 +86,7 @@
 int vidbrain_state::get_field_vpos()
 {
 	int vpos = m_screen->vpos();
-	
+
 	if (vpos >= 262)
 	{
 		// even field
@@ -132,18 +132,18 @@ READ8_MEMBER( vidbrain_state::vlsi_r )
 	case REGISTER_Y_FREEZE_HIGH:
 		/*
 
-			bit		signal		description
+            bit     signal      description
 
-			0		Y-F8		Y freeze high order (MSB) bit
-			1		Y-C8		current Y counter high order (MSB) bit
-			2
-			3
-			4
-			5
-			6
-			7		O/_E		odd/even field
+            0       Y-F8        Y freeze high order (MSB) bit
+            1       Y-C8        current Y counter high order (MSB) bit
+            2
+            3
+            4
+            5
+            6
+            7       O/_E        odd/even field
 
-		*/
+        */
 
 		data = (get_field() << 7) | (BIT(get_field_vpos(), 8) << 1) | BIT(m_freeze_y, 8);
 
@@ -187,9 +187,9 @@ void vidbrain_state::set_y_interrupt()
 void vidbrain_state::do_partial_update()
 {
 	int vpos = m_screen->vpos();
-	
+
 	if (LOG) logerror("Partial screen update at scanline %u\n", vpos);
-	
+
 	m_screen->update_partial(vpos);
 }
 
@@ -215,18 +215,18 @@ WRITE8_MEMBER( vidbrain_state::vlsi_w )
 	case REGISTER_FINAL_MODIFIER:
 		/*
 
-			bit		signal		description
+            bit     signal      description
 
-			0		RED			red
-			1		GREEN		green
-			2		BLUE		blue
-			3		INT 0		intensity 0
-			4		INT 1		intensity 1
-			5		not used
-			6		not used
-			7		not used
+            0       RED         red
+            1       GREEN       green
+            2       BLUE        blue
+            3       INT 0       intensity 0
+            4       INT 1       intensity 1
+            5       not used
+            6       not used
+            7       not used
 
-		*/
+        */
 
 		if (LOG) logerror("Final Modifier %02x\n", data);
 
@@ -237,18 +237,18 @@ WRITE8_MEMBER( vidbrain_state::vlsi_w )
 	case REGISTER_BACKGROUND:
 		/*
 
-			bit		signal		description
+            bit     signal      description
 
-			0		RED			red
-			1		GREEN		green
-			2		BLUE		blue
-			3		INT 0		intensity 0
-			4		INT 1		intensity 1
-			5		not used
-			6		not used
-			7		not used
+            0       RED         red
+            1       GREEN       green
+            2       BLUE        blue
+            3       INT 0       intensity 0
+            4       INT 1       intensity 1
+            5       not used
+            6       not used
+            7       not used
 
-		*/
+        */
 
 		if (LOG) logerror("Background %02x\n", data);
 
@@ -259,21 +259,21 @@ WRITE8_MEMBER( vidbrain_state::vlsi_w )
 	case REGISTER_COMMAND:
 		/*
 
-			bit		signal		description
+            bit     signal      description
 
-			0		X-ZM		X zoom
-			1		FRZ			freeze
-			2		ENB			COMMAND_ENB
-			3		INT			COMMAND_INT
-			4		KBD			general purpose output
-			5		Y-ZM		Y zoom
-			6		A/_B		list selection
-			7		YINT H.O.	Y COMMAND_INT register high order bit
+            0       X-ZM        X zoom
+            1       FRZ         freeze
+            2       ENB         COMMAND_ENB
+            3       INT         COMMAND_INT
+            4       KBD         general purpose output
+            5       Y-ZM        Y zoom
+            6       A/_B        list selection
+            7       YINT H.O.   Y COMMAND_INT register high order bit
 
-		*/
+        */
 
 		if (LOG) logerror("Command %02x\n", data);
-		
+
 		if (IS_CHANGED(COMMAND_YINT_H_O))
 		{
 			set_y_interrupt();
@@ -298,7 +298,7 @@ WRITE8_MEMBER( vidbrain_state::vlsi_w )
 
 
 //**************************************************************************
-//	VIDEO
+//  VIDEO
 //**************************************************************************
 
 //-------------------------------------------------
@@ -480,7 +480,7 @@ static TIMER_DEVICE_CALLBACK( y_int_tick )
 	if ((state->m_cmd & COMMAND_INT) && !(state->m_cmd & COMMAND_FRZ))
 	{
 		if (LOG) logerror("Y-Interrupt at scanline %u\n", state->m_screen->vpos());
-//		f3853_set_external_interrupt_in_line(state->m_smi, 1);
+//      f3853_set_external_interrupt_in_line(state->m_smi, 1);
 		state->m_ext_int_latch = 1;
 		state->interrupt_check();
 	}
@@ -489,7 +489,7 @@ static TIMER_DEVICE_CALLBACK( y_int_tick )
 
 
 //**************************************************************************
-//	MACHINE CONFIGURATION
+//  MACHINE CONFIGURATION
 //**************************************************************************
 
 //-------------------------------------------------
@@ -500,7 +500,7 @@ MACHINE_CONFIG_FRAGMENT( vidbrain_video )
     MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
     MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_14_31818MHz, 455, 0, 320, 525, 0, 243)
-		
+
 	MCFG_GFXDECODE(vidbrain)
 
     MCFG_PALETTE_LENGTH(32)

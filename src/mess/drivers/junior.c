@@ -188,7 +188,7 @@ static MACHINE_START( junior )
 {
 	junior_state *state = machine->driver_data<junior_state>();
 	state_save_register_item(machine, "junior", NULL, 0, state->port_a );
-	state_save_register_item(machine, "junior", NULL, 0, state->port_b );	
+	state_save_register_item(machine, "junior", NULL, 0, state->port_b );
 }
 
 
@@ -217,7 +217,7 @@ static MACHINE_CONFIG_START( junior, junior_state )
     MCFG_DEFAULT_LAYOUT( layout_junior )
 
     MCFG_RIOT6532_ADD("riot", XTAL_1MHz, junior_riot_interface)
-	
+
 	MCFG_TIMER_ADD_PERIODIC("led_timer", junior_update_leds, attotime::from_hz(50))
 MACHINE_CONFIG_END
 

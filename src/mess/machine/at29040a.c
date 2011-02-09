@@ -7,7 +7,7 @@
     Datasheets were found on Atmel's site (www.atmel.com)
 
     Raphael Nabet 2003
-    
+
     Rewritten as device
     Michael Zapf, September 2010
 */
@@ -56,12 +56,12 @@ enum  s_pgm_t
 
 typedef struct _at29c040a_state
 {
-	UINT8	 	*memptr;
-	
+	UINT8		*memptr;
+
 	int 		s_lower_bbl;		/* set when lower boot block lockout is enabled */
 	int 		s_higher_bbl;		/* set when upper boot block lockout is enabled */
 	int 		s_sdp;				/* set when in software data protect mode */
-	
+
 	int 		s_id_mode;			/* set when in chip id mode */
 	s_cmd_t		s_cmd;				/* command state */
 	int 		s_enabling_bbl;		/* set when a boot block lockout command is expecting its parameter */
@@ -70,10 +70,10 @@ typedef struct _at29c040a_state
 	int 		s_enabling_sdb;		/* set when a sdp enable command is in progress */
 	int 		s_disabling_sdb;	/* set when a sdp disable command is in progress */
 	int 		s_dirty;			/* set when the memory contents should be set */
-	UINT8 		toggle_bit;
-	UINT8 		programming_buffer[SECTOR_SIZE];
+	UINT8		toggle_bit;
+	UINT8		programming_buffer[SECTOR_SIZE];
 	int 		programming_last_offset;
-	emu_timer 	*programming_timer;
+	emu_timer	*programming_timer;
 } at29c040a_state;
 
 INLINE at29c040a_state *get_safe_token(device_t *device)
@@ -98,8 +98,8 @@ INLINE const at29c040a_config *get_config(device_t *device)
 static TIMER_CALLBACK(at29c040a_programming_timer_callback)
 {
 	device_t *device = (device_t *)ptr;
-	at29c040a_state *feeprom = get_safe_token(device); 
-	
+	at29c040a_state *feeprom = get_safe_token(device);
+
 	switch (feeprom->s_pgm)
 	{
 	case s_pgm_1:
@@ -139,21 +139,21 @@ static TIMER_CALLBACK(at29c040a_programming_timer_callback)
 
 int at29c040a_is_dirty(device_t *device)
 {
-	at29c040a_state *feeprom = get_safe_token(device); 
+	at29c040a_state *feeprom = get_safe_token(device);
 	return feeprom->s_dirty;
 }
 
 static void sync_flags(device_t *device)
 {
-	at29c040a_state *feeprom = get_safe_token(device); 
-	if (feeprom->s_lower_bbl) feeprom->memptr[1] |= 0x04; 
-	else feeprom->memptr[1] &= ~0x04; 
-		
-	if (feeprom->s_higher_bbl) feeprom->memptr[1] |= 0x02; 
-	else feeprom->memptr[1] &= ~0x02; 
+	at29c040a_state *feeprom = get_safe_token(device);
+	if (feeprom->s_lower_bbl) feeprom->memptr[1] |= 0x04;
+	else feeprom->memptr[1] &= ~0x04;
 
-	if (feeprom->s_sdp) feeprom->memptr[1] |= 0x01; 
-	else feeprom->memptr[1] &= ~0x01; 
+	if (feeprom->s_higher_bbl) feeprom->memptr[1] |= 0x02;
+	else feeprom->memptr[1] &= ~0x02;
+
+	if (feeprom->s_sdp) feeprom->memptr[1] |= 0x01;
+	else feeprom->memptr[1] &= ~0x01;
 }
 
 /*
@@ -161,7 +161,7 @@ static void sync_flags(device_t *device)
 */
 READ8_DEVICE_HANDLER( at29c040a_r )
 {
-	at29c040a_state *feeprom = get_safe_token(device); 
+	at29c040a_state *feeprom = get_safe_token(device);
 	int reply;
 
 	offset &= ADDRESS_MASK;
@@ -234,7 +234,7 @@ READ8_DEVICE_HANDLER( at29c040a_r )
 */
 WRITE8_DEVICE_HANDLER( at29c040a_w )
 {
-	at29c040a_state *feeprom = get_safe_token(device); 
+	at29c040a_state *feeprom = get_safe_token(device);
 
 	offset &= ADDRESS_MASK;
 
@@ -398,7 +398,7 @@ WRITE8_DEVICE_HANDLER( at29c040a_w )
 
 static DEVICE_START( at29c040a )
 {
-	at29c040a_state *feeprom = get_safe_token(device); 
+	at29c040a_state *feeprom = get_safe_token(device);
 	feeprom->programming_timer = device->machine->scheduler().timer_alloc(FUNC(at29c040a_programming_timer_callback), (void *)device);
 }
 
@@ -409,7 +409,7 @@ static DEVICE_STOP( at29c040a )
 
 static DEVICE_RESET( at29c040a )
 {
-	at29c040a_state *feeprom = get_safe_token(device); 
+	at29c040a_state *feeprom = get_safe_token(device);
 	const at29c040a_config* atconf = (const at29c040a_config*)get_config(device);
 	feeprom->memptr = (*atconf->get_memory)(device->owner()) + atconf->offset;
 
@@ -418,7 +418,7 @@ static DEVICE_RESET( at29c040a )
 		logerror("AT29040A: Version mismatch; expected 0 but found %x for %s\n", feeprom->memptr[0], device->tag());
 		return;
 	}
-		
+
 	feeprom->s_lower_bbl = (feeprom->memptr[1] >> 2) & 1;
 	feeprom->s_higher_bbl = (feeprom->memptr[1] >> 1) & 1;
 	feeprom->s_sdp = feeprom->memptr[1] & 1;

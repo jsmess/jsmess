@@ -88,7 +88,7 @@ static UINT8 pce_io_port_options;
 /* system RAM */
 #ifdef MESS
 unsigned char *pce_user_ram;    /* scratch RAM at F8 */
-#else 
+#else
 extern unsigned char *pce_user_ram;    /* scratch RAM at F8 */
 #endif
 
@@ -378,7 +378,7 @@ MACHINE_RESET( pce )
 	//pce_cd.regs[0x03] = (pce_cd.regs[0x03] & ~0x0c) | (PCE_CD_SAMPLE_STOP_PLAY);
 
 	/* Note: Arcade Card BIOS contents are the same as System 3, only internal HW differs.
-	   We use a category to select between modes (some games can be run in either S-CD or A-CD modes) */
+       We use a category to select between modes (some games can be run in either S-CD or A-CD modes) */
 	pce_acard = input_port_read(machine, "A_CARD") & 1;
 }
 
@@ -432,12 +432,12 @@ READ8_HANDLER ( pce_joystick_r )
 				break;
 			case 2: //6-buttons pad
 				/*
-				Two packets:
-				1st packet: directions + I, II, Run, Select
-				2nd packet: 6 buttons "header" (high 4 bits active low) + III, IV, V, VI
-				Note that six buttons pad just doesn't work with (almost?) every single 2-button-only games, it's really just an after-thought and it is like this
-				on real HW.
-				*/
+                Two packets:
+                1st packet: directions + I, II, Run, Select
+                2nd packet: 6 buttons "header" (high 4 bits active low) + III, IV, V, VI
+                Note that six buttons pad just doesn't work with (almost?) every single 2-button-only games, it's really just an after-thought and it is like this
+                on real HW.
+                */
 				data = input_port_read(space->machine, joyname[2][joystick_port_select]) >> (joy_6b_packet[joystick_port_select]*8);
 				break;
 			default:
@@ -508,7 +508,7 @@ static void pce_cd_msm5205_int(device_t *device)
 {
 	UINT8 msm_data;
 
-//	popmessage("%08x %08x %08x %02x %02x",pce_cd.msm_start_addr,pce_cd.msm_end_addr,pce_cd.msm_half_addr,pce_cd.regs[0x0c],pce_cd.regs[0x0d]);
+//  popmessage("%08x %08x %08x %02x %02x",pce_cd.msm_start_addr,pce_cd.msm_end_addr,pce_cd.msm_half_addr,pce_cd.regs[0x0c],pce_cd.regs[0x0d]);
 
 	if ( pce_cd.msm_idle )
 		return;
@@ -1786,8 +1786,8 @@ WRITE8_HANDLER( pce_cd_acard_w )
 					if(pce_cd.acard_shift_reg != 0)
 					{
 						 pce_cd.acard_shift = (pce_cd.acard_shift_reg < 8) ?
-						 					(pce_cd.acard_shift << pce_cd.acard_shift_reg)
-						 					: (pce_cd.acard_shift >> (16 - pce_cd.acard_shift_reg));
+											(pce_cd.acard_shift << pce_cd.acard_shift_reg)
+											: (pce_cd.acard_shift >> (16 - pce_cd.acard_shift_reg));
 					}
 				}
 				break;
@@ -1822,10 +1822,10 @@ WRITE8_HANDLER( pce_cd_acard_w )
 
 				break;
 
-			case 0x02: pce_cd.acard_base_addr[w_num] = (data & 0xff) | (pce_cd.acard_base_addr[w_num] & 0xffff00); 	break;
-			case 0x03: pce_cd.acard_base_addr[w_num] = (data << 8) | (pce_cd.acard_base_addr[w_num] & 0xff00ff); 		break;
-			case 0x04: pce_cd.acard_base_addr[w_num] = (data << 16) | (pce_cd.acard_base_addr[w_num] & 0x00ffff); 	break;
-			case 0x05: pce_cd.acard_addr_offset[w_num] = (data & 0xff) | (pce_cd.acard_addr_offset[w_num] & 0xff00); 	break;
+			case 0x02: pce_cd.acard_base_addr[w_num] = (data & 0xff) | (pce_cd.acard_base_addr[w_num] & 0xffff00);	break;
+			case 0x03: pce_cd.acard_base_addr[w_num] = (data << 8) | (pce_cd.acard_base_addr[w_num] & 0xff00ff);		break;
+			case 0x04: pce_cd.acard_base_addr[w_num] = (data << 16) | (pce_cd.acard_base_addr[w_num] & 0x00ffff);	break;
+			case 0x05: pce_cd.acard_addr_offset[w_num] = (data & 0xff) | (pce_cd.acard_addr_offset[w_num] & 0xff00);	break;
 			case 0x06:
 				pce_cd.acard_addr_offset[w_num] = (data << 8) | (pce_cd.acard_addr_offset[w_num] & 0x00ff);
 
@@ -1835,9 +1835,9 @@ WRITE8_HANDLER( pce_cd_acard_w )
 					pce_cd.acard_base_addr[w_num] &= 0xffffff;
 				}
 				break;
-			case 0x07: pce_cd.acard_addr_inc[w_num] = (data & 0xff) | (pce_cd.acard_addr_inc[w_num] & 0xff00); 		break;
-			case 0x08: pce_cd.acard_addr_inc[w_num] = (data << 8) | (pce_cd.acard_addr_inc[w_num] & 0x00ff); 			break;
-			case 0x09: pce_cd.acard_ctrl[w_num] = data & 0x7f; 												break;
+			case 0x07: pce_cd.acard_addr_inc[w_num] = (data & 0xff) | (pce_cd.acard_addr_inc[w_num] & 0xff00);		break;
+			case 0x08: pce_cd.acard_addr_inc[w_num] = (data << 8) | (pce_cd.acard_addr_inc[w_num] & 0x00ff);			break;
+			case 0x09: pce_cd.acard_ctrl[w_num] = data & 0x7f;												break;
 			case 0x0a:
 				if((pce_cd.acard_ctrl[w_num] & 0x60) == 0x60)
 				{

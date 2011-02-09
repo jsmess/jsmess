@@ -8,42 +8,42 @@ PCB Layout
 REV B
 
 |-----------------------------------------------------------|
-|		CN1		CN2		CN3		CN4			SW1		CN5		|
-|															|
-|			3.6864MHz	3.6864MHz	ROM1					|
-|									ROM0					|
-|		SIO			SIO		SW3 SW2							|
-|								PIT							|
-|				12.5MHz					41256 41256 41256	|
-|										41256 41256 41256	|
-|	8MHz						CPU			  41245 41256	|
-|															|
-|												8419		|
-|							SW4								|
+|       CN1     CN2     CN3     CN4         SW1     CN5     |
+|                                                           |
+|           3.6864MHz   3.6864MHz   ROM1                    |
+|                                   ROM0                    |
+|       SIO         SIO     SW3 SW2                         |
+|                               PIT                         |
+|               12.5MHz                 41256 41256 41256   |
+|                                       41256 41256 41256   |
+|   8MHz                        CPU           41245 41256   |
+|                                                           |
+|                                               8419        |
+|                           SW4                             |
 |-|-------------CN6----------------|----|-------CN7-------|-|
-  |--------------------------------|	|-----------------|
+  |--------------------------------|    |-----------------|
 
 Notes:
     Relevant IC's shown.
 
-    CPU		- Motorola MC68000R12
-	SIO		- Mostek MK68564N-5A Serial Input/Output
-	PIT		- Motorola MC68230L10 Parallel Interface/Timer
-	8419	- National Semiconductor DP8419N DRAM Controller
-	41256	- Fujitsu MB81256-12 256Kx1 RAM
-	ROM0	- AMD AM27128ADC 16Kx8 ROM "47-2818-36G1"
-	ROM1	- AMD AM27128ADC 16Kx8 ROM "47-2818-36G2"
-	SW1		- push button
-	SW2		- rotary hex DIP
-	SW3		- rotary hex DIP
-	SW4		- DIP8
-	CN1		-
-	CN2		- 
-	CN3		-
-	CN4		-
-	CN5		-
-	CN6		-
-	CN7		-
+    CPU     - Motorola MC68000R12
+    SIO     - Mostek MK68564N-5A Serial Input/Output
+    PIT     - Motorola MC68230L10 Parallel Interface/Timer
+    8419    - National Semiconductor DP8419N DRAM Controller
+    41256   - Fujitsu MB81256-12 256Kx1 RAM
+    ROM0    - AMD AM27128ADC 16Kx8 ROM "47-2818-36G1"
+    ROM1    - AMD AM27128ADC 16Kx8 ROM "47-2818-36G2"
+    SW1     - push button
+    SW2     - rotary hex DIP
+    SW3     - rotary hex DIP
+    SW4     - DIP8
+    CN1     -
+    CN2     -
+    CN3     -
+    CN4     -
+    CN5     -
+    CN6     -
+    CN7     -
 
 */
 

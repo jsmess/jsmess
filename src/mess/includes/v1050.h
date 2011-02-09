@@ -72,10 +72,10 @@ public:
 	required_device<device_t> m_floppy0;
 	required_device<device_t> m_floppy1;
 	required_device<timer_device> m_timer_sio;
-	
+
 	virtual void machine_start();
 	virtual void machine_reset();
-	
+
 	virtual void video_start();
 	virtual bool video_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 
@@ -105,7 +105,7 @@ public:
 	DECLARE_READ8_MEMBER( videoram_r );
 	DECLARE_WRITE8_MEMBER( videoram_w );
 	DECLARE_WRITE_LINE_MEMBER( crtc_vs_w );
-	
+
 	void bankswitch();
 	void set_interrupt(UINT8 mask, int state);
 	void scan_keyboard();
