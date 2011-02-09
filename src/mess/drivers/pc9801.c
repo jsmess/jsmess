@@ -24,8 +24,6 @@
 #include "sound/beep.h"
 #include "imagedev/flopdrv.h"
 
-//#define LOAD_2dd_BIOS //compile switch, disabled because system gives black screen otherwise
-
 class pc9801_state : public driver_device
 {
 public:
@@ -620,9 +618,7 @@ static ADDRESS_MAP_START( pc9801_map, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0xa0000, 0xa3fff) AM_READWRITE(pc9801_tvram_r,pc9801_tvram_w) //TVRAM
 	AM_RANGE(0xa8000, 0xbffff) AM_RAM //bitmap VRAM
 //	AM_RANGE(0xcc000, 0xcdfff) AM_ROM //sound BIOS
-	#ifdef LOAD_2dd_BIOS
 	AM_RANGE(0xd6000, 0xd6fff) AM_ROM AM_REGION("fdc_bios_2dd",0) //floppy BIOS 2dd
-	#endif
 //	AM_RANGE(0xd7000, 0xd7fff) AM_ROM AM_REGION("fdc_bios_2hd",0) //floppy BIOS 2hd
 	AM_RANGE(0xe8000, 0xfffff) AM_ROM AM_REGION("ipl",0)
 ADDRESS_MAP_END
@@ -807,7 +803,6 @@ static INPUT_PORTS_START( pc9801 )
 	PORT_BIT(0x40,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME(" un 7-7") //PORT_CODE(KEYCODE_HOME) //PORT_CHAR(' ')
 	PORT_BIT(0x80,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME(" un 7-8") //PORT_CODE(KEYCODE_M) PORT_CHAR('M')
 
-
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x04, 0x00, "Text width" )
 	PORT_DIPSETTING(    0x04, "40 chars/line" )
@@ -815,6 +810,11 @@ static INPUT_PORTS_START( pc9801 )
 	PORT_DIPNAME( 0x08, 0x00, "Text height" )
 	PORT_DIPSETTING(    0x08, "20 lines/screen" )
 	PORT_DIPSETTING(    0x00, "25 lines/screen" )
+
+	PORT_START("ROM_LOAD")
+	PORT_CONFNAME( 0x01, 0x01, "Load floppy 2dd BIOS" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_CONFSETTING(    0x01, DEF_STR( No ) )
 
 	PORT_START("VBLANK")
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_VBLANK )
@@ -1155,6 +1155,19 @@ static MACHINE_RESET(pc9801)
 	floppy_mon_w(floppy_get_device(machine, 1), CLEAR_LINE);
 	floppy_drive_set_ready_state(floppy_get_device(machine, 0), (1), 0);
 	floppy_drive_set_ready_state(floppy_get_device(machine, 1), (1), 0);
+
+	{
+		UINT8 op_mode;
+		UINT8 *ROM = machine->region("fdc_bios_2dd")->base();
+		UINT8 *PRG = machine->region("fdc_data")->base();
+		int i;
+
+		op_mode = input_port_read(machine, "ROM_LOAD") & 1;
+
+		for(i=0;i<0x1000;i++)
+			ROM[i] = PRG[i+op_mode*0x8000];
+
+	}
 }
 
 static INTERRUPT_GEN(pc9801_vrtc_irq)
@@ -1253,7 +1266,9 @@ ROM_START( pc9801f )
 	ROM_LOAD16_BYTE( "urm05-02.bin", 0x10000, 0x4000, CRC(ffefec65) SHA1(106e0d920e857e59da12225a489ca2756ca405c1) )
 	ROM_LOAD16_BYTE( "urm06-02.bin", 0x10001, 0x4000, CRC(1147760b) SHA1(4e0299091dfd53ac7988d40c5a6775a10389faac) )
 
-	ROM_REGION( 0x8000, "fdc_bios_2dd", ROMREGION_ERASEFF ) // 2dd fdc bios, presumably bad size (should be 0x800 for each rom)
+	ROM_REGION( 0x1000, "fdc_bios_2dd", ROMREGION_ERASEFF )
+
+	ROM_REGION( 0x10000, "fdc_data", ROMREGION_ERASEFF ) // 2dd fdc bios, presumably bad size (should be 0x800 for each rom)
 	ROM_LOAD16_BYTE( "urf01-01.bin", 0x00000, 0x4000, BAD_DUMP CRC(2f5ae147) SHA1(69eb264d520a8fc826310b4fce3c8323867520ee) )
 	ROM_LOAD16_BYTE( "urf02-01.bin", 0x00001, 0x4000, BAD_DUMP CRC(62a86928) SHA1(4160a6db096dbeff18e50cbee98f5d5c1a29e2d1) )
 
