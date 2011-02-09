@@ -1579,6 +1579,9 @@ static DEVICE_START(ti99_multicart)
 
 	devcb_resolve_write_line(&cartslots->ready, &ready, device);
 
+	cartslots->gk_slot = -1;
+	cartslots->gk_guest_slot = -1;
+
 	// The cartslot system is initialized now. The cartridges themselves
 	// need to check whether their parts are available.
 }
@@ -1888,10 +1891,6 @@ static void cartridge_gram_kracker_readg(device_t *cartsys, UINT8 *value)
 
 	// Not null, since this is only called when there is really a GK module
 	gromkrackerbox = &cartslots->cartridge[cartslots->gk_slot];
-
-	// In case the GramKracker is not plugged in
-	if (gromkrackerbox->ram_ptr == NULL)
-		return;
 
 	if ((gromkrackerbox->grom_address & 0xe000) == 0x0000)
 	{
