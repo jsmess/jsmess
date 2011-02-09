@@ -2050,62 +2050,62 @@ static DEVICE_START( vic3 )
 			vic3->expandx_multi[i] |= 0xa000;
 	}
 
-	state_save_register_device_item_array(device, 0, vic3->reg);
+	device->save_item(NAME(vic3->reg));
 
-	state_save_register_device_item(device, 0, vic3->on);
+	device->save_item(NAME(vic3->on));
 
-	state_save_register_device_item_bitmap(device, 0, vic3->bitmap);
+	device->save_item(NAME(*vic3->bitmap));
 
-	state_save_register_device_item(device, 0, vic3->lines);
+	device->save_item(NAME(vic3->lines));
 
-	state_save_register_device_item(device, 0, vic3->chargenaddr);
-	state_save_register_device_item(device, 0, vic3->videoaddr);
-	state_save_register_device_item(device, 0, vic3->bitmapaddr);
+	device->save_item(NAME(vic3->chargenaddr));
+	device->save_item(NAME(vic3->videoaddr));
+	device->save_item(NAME(vic3->bitmapaddr));
 
-	state_save_register_device_item(device, 0, vic3->x_begin);
-	state_save_register_device_item(device, 0, vic3->x_end);
-	state_save_register_device_item(device, 0, vic3->y_begin);
-	state_save_register_device_item(device, 0, vic3->y_end);
+	device->save_item(NAME(vic3->x_begin));
+	device->save_item(NAME(vic3->x_end));
+	device->save_item(NAME(vic3->y_begin));
+	device->save_item(NAME(vic3->y_end));
 
-	state_save_register_device_item_array(device, 0, vic3->c64_bitmap);
-	state_save_register_device_item_array(device, 0, vic3->bitmapmulti);
-	state_save_register_device_item_array(device, 0, vic3->mono);
-	state_save_register_device_item_array(device, 0, vic3->multi);
-	state_save_register_device_item_array(device, 0, vic3->ecmcolor);
-	state_save_register_device_item_array(device, 0, vic3->colors);
-	state_save_register_device_item_array(device, 0, vic3->spritemulti);
+	device->save_item(NAME(vic3->c64_bitmap));
+	device->save_item(NAME(vic3->bitmapmulti));
+	device->save_item(NAME(vic3->mono));
+	device->save_item(NAME(vic3->multi));
+	device->save_item(NAME(vic3->ecmcolor));
+	device->save_item(NAME(vic3->colors));
+	device->save_item(NAME(vic3->spritemulti));
 
-	state_save_register_device_item(device, 0, vic3->lastline);
-	state_save_register_device_item(device, 0, vic3->rasterline);
-	state_save_register_device_item(device, 0, vic3->interlace);
+	device->save_item(NAME(vic3->lastline));
+	device->save_item(NAME(vic3->rasterline));
+	device->save_item(NAME(vic3->interlace));
 
-	state_save_register_device_item(device, 0, vic3->columns);
-	state_save_register_device_item(device, 0, vic3->rows);
+	device->save_item(NAME(vic3->columns));
+	device->save_item(NAME(vic3->rows));
 
-	state_save_register_device_item_array(device, 0, vic3->shift);
-	state_save_register_device_item_array(device, 0, vic3->foreground);
-	state_save_register_device_item_array(device, 0, vic3->multi_collision);
+	device->save_item(NAME(vic3->shift));
+	device->save_item(NAME(vic3->foreground));
+	device->save_item(NAME(vic3->multi_collision));
 
-	state_save_register_device_item_array(device, 0, vic3->palette_red);
-	state_save_register_device_item_array(device, 0, vic3->palette_green);
-	state_save_register_device_item_array(device, 0, vic3->palette_blue);
-	state_save_register_device_item(device, 0, vic3->palette_dirty);
+	device->save_item(NAME(vic3->palette_red));
+	device->save_item(NAME(vic3->palette_green));
+	device->save_item(NAME(vic3->palette_blue));
+	device->save_item(NAME(vic3->palette_dirty));
 
 	for (i = 0; i < 8; i++)
 	{
-		state_save_register_device_item(device, i, vic3->sprites[i].x);
-		state_save_register_device_item(device, i, vic3->sprites[i].y);
-		state_save_register_device_item(device, i, vic3->sprites[i].repeat);
-		state_save_register_device_item(device, i, vic3->sprites[i].line);
-		state_save_register_device_item_array(device, i, vic3->sprites[i].paintedline);
-		state_save_register_device_item_array(device, i, vic3->sprites[i].bitmap[0]);
-		state_save_register_device_item_array(device, i, vic3->sprites[i].bitmap[1]);
-		state_save_register_device_item_array(device, i, vic3->sprites[i].bitmap[2]);
-		state_save_register_device_item_array(device, i, vic3->sprites[i].bitmap[3]);
-		state_save_register_device_item_array(device, i, vic3->sprites[i].bitmap[4]);
-		state_save_register_device_item_array(device, i, vic3->sprites[i].bitmap[5]);
-		state_save_register_device_item_array(device, i, vic3->sprites[i].bitmap[6]);
-		state_save_register_device_item_array(device, i, vic3->sprites[i].bitmap[7]);
+		device->save_item(NAME(vic3->sprites[i].x), i);
+		device->save_item(NAME(vic3->sprites[i].y), i);
+		device->save_item(NAME(vic3->sprites[i].repeat), i);
+		device->save_item(NAME(vic3->sprites[i].line), i);
+		device->save_item(NAME(vic3->sprites[i].paintedline), i);
+		device->save_item(NAME(vic3->sprites[i].bitmap[0]), i);
+		device->save_item(NAME(vic3->sprites[i].bitmap[1]), i);
+		device->save_item(NAME(vic3->sprites[i].bitmap[2]), i);
+		device->save_item(NAME(vic3->sprites[i].bitmap[3]), i);
+		device->save_item(NAME(vic3->sprites[i].bitmap[4]), i);
+		device->save_item(NAME(vic3->sprites[i].bitmap[5]), i);
+		device->save_item(NAME(vic3->sprites[i].bitmap[6]), i);
+		device->save_item(NAME(vic3->sprites[i].bitmap[7]), i);
 	}
 }
 

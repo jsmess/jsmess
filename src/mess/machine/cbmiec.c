@@ -395,7 +395,7 @@ static DEVICE_START( cbm_iec )
 	cbm_iec->daisy_state = head;
 
 	/* register for state saving */
-//  state_save_register_device_item(device, 0, cbm_iec->);
+//  device->save_item(NAME(cbm_iec->));
 }
 
 /*-------------------------------------------------

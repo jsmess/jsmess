@@ -2669,68 +2669,68 @@ static DEVICE_START( vic2 )
 			vic2->expandx_multi[i] |= 0xa000;
 	}
 
-	state_save_register_device_item_array(device, 0, vic2->reg);
+	device->save_item(NAME(vic2->reg));
 
-	state_save_register_device_item(device, 0, vic2->on);
+	device->save_item(NAME(vic2->on));
 
-	state_save_register_device_item_bitmap(device, 0, vic2->bitmap);
+	device->save_item(NAME(*vic2->bitmap));
 
-	state_save_register_device_item(device, 0, vic2->chargenaddr);
-	state_save_register_device_item(device, 0, vic2->videoaddr);
-	state_save_register_device_item(device, 0, vic2->bitmapaddr);
+	device->save_item(NAME(vic2->chargenaddr));
+	device->save_item(NAME(vic2->videoaddr));
+	device->save_item(NAME(vic2->bitmapaddr));
 
-	state_save_register_device_item_array(device, 0, vic2->colors);
-	state_save_register_device_item_array(device, 0, vic2->spritemulti);
+	device->save_item(NAME(vic2->colors));
+	device->save_item(NAME(vic2->spritemulti));
 
-	state_save_register_device_item(device, 0, vic2->rasterline);
-	state_save_register_device_item(device, 0, vic2->cycles_counter);
-	state_save_register_device_item(device, 0, vic2->cycle);
-	state_save_register_device_item(device, 0, vic2->raster_x);
-	state_save_register_device_item(device, 0, vic2->graphic_x);
+	device->save_item(NAME(vic2->rasterline));
+	device->save_item(NAME(vic2->cycles_counter));
+	device->save_item(NAME(vic2->cycle));
+	device->save_item(NAME(vic2->raster_x));
+	device->save_item(NAME(vic2->graphic_x));
 
-	state_save_register_device_item(device, 0, vic2->dy_start);
-	state_save_register_device_item(device, 0, vic2->dy_stop);
+	device->save_item(NAME(vic2->dy_start));
+	device->save_item(NAME(vic2->dy_stop));
 
-	state_save_register_device_item(device, 0, vic2->draw_this_line);
-	state_save_register_device_item(device, 0, vic2->is_bad_line);
-	state_save_register_device_item(device, 0, vic2->bad_lines_enabled);
-	state_save_register_device_item(device, 0, vic2->display_state);
-	state_save_register_device_item(device, 0, vic2->char_data);
-	state_save_register_device_item(device, 0, vic2->gfx_data);
-	state_save_register_device_item(device, 0, vic2->color_data);
-	state_save_register_device_item(device, 0, vic2->last_char_data);
-	state_save_register_device_item_array(device, 0, vic2->matrix_line);
-	state_save_register_device_item_array(device, 0, vic2->color_line);
-	state_save_register_device_item(device, 0, vic2->vblanking);
-	state_save_register_device_item(device, 0, vic2->ml_index);
-	state_save_register_device_item(device, 0, vic2->rc);
-	state_save_register_device_item(device, 0, vic2->vc);
-	state_save_register_device_item(device, 0, vic2->vc_base);
-	state_save_register_device_item(device, 0, vic2->ref_cnt);
+	device->save_item(NAME(vic2->draw_this_line));
+	device->save_item(NAME(vic2->is_bad_line));
+	device->save_item(NAME(vic2->bad_lines_enabled));
+	device->save_item(NAME(vic2->display_state));
+	device->save_item(NAME(vic2->char_data));
+	device->save_item(NAME(vic2->gfx_data));
+	device->save_item(NAME(vic2->color_data));
+	device->save_item(NAME(vic2->last_char_data));
+	device->save_item(NAME(vic2->matrix_line));
+	device->save_item(NAME(vic2->color_line));
+	device->save_item(NAME(vic2->vblanking));
+	device->save_item(NAME(vic2->ml_index));
+	device->save_item(NAME(vic2->rc));
+	device->save_item(NAME(vic2->vc));
+	device->save_item(NAME(vic2->vc_base));
+	device->save_item(NAME(vic2->ref_cnt));
 
-	state_save_register_device_item_array(device, 0, vic2->spr_coll_buf);
-	state_save_register_device_item_array(device, 0, vic2->fore_coll_buf);
-	state_save_register_device_item(device, 0, vic2->spr_exp_y);
-	state_save_register_device_item(device, 0, vic2->spr_dma_on);
-	state_save_register_device_item(device, 0, vic2->spr_draw);
-	state_save_register_device_item(device, 0, vic2->spr_disp_on);
-	state_save_register_device_item_array(device, 0, vic2->spr_ptr);
-	state_save_register_device_item_array(device, 0, vic2->mc_base);
-	state_save_register_device_item_array(device, 0, vic2->mc);
+	device->save_item(NAME(vic2->spr_coll_buf));
+	device->save_item(NAME(vic2->fore_coll_buf));
+	device->save_item(NAME(vic2->spr_exp_y));
+	device->save_item(NAME(vic2->spr_dma_on));
+	device->save_item(NAME(vic2->spr_draw));
+	device->save_item(NAME(vic2->spr_disp_on));
+	device->save_item(NAME(vic2->spr_ptr));
+	device->save_item(NAME(vic2->mc_base));
+	device->save_item(NAME(vic2->mc));
 
 	for (i = 0; i < 8; i++)
 	{
-		state_save_register_device_item_array(device, i, vic2->spr_data[i]);
-		state_save_register_device_item_array(device, i, vic2->spr_draw_data[i]);
+		device->save_item(NAME(vic2->spr_data[i]), i);
+		device->save_item(NAME(vic2->spr_draw_data[i]), i);
 	}
 
-	state_save_register_device_item(device, 0, vic2->border_on);
-	state_save_register_device_item(device, 0, vic2->ud_border_on);
-	state_save_register_device_item_array(device, 0, vic2->border_on_sample);
-	state_save_register_device_item_array(device, 0, vic2->border_color_sample);
+	device->save_item(NAME(vic2->border_on));
+	device->save_item(NAME(vic2->ud_border_on));
+	device->save_item(NAME(vic2->border_on_sample));
+	device->save_item(NAME(vic2->border_color_sample));
 
-	state_save_register_device_item(device, 0, vic2->first_ba_cycle);
-	state_save_register_device_item(device, 0, vic2->cpu_suspended);
+	device->save_item(NAME(vic2->first_ba_cycle));
+	device->save_item(NAME(vic2->cpu_suspended));
 }
 
 static DEVICE_RESET( vic2 )

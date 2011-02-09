@@ -187,8 +187,8 @@ void i8355_device::device_start()
 	devcb_resolve_write8(&m_out_port_func[1], &m_config.out_pb_func, this);
 
 	// register for state saving
-	state_save_register_device_item_array(this, 0, m_output);
-	state_save_register_device_item_array(this, 0, m_ddr);
+	save_item(NAME(m_output));
+	save_item(NAME(m_ddr));
 }
 
 

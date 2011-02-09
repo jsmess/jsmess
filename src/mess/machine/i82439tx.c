@@ -224,8 +224,8 @@ static DEVICE_START( i82439tx )
 	i82439tx->rom = device->machine->region(config->rom_region)->base();
 
 	/* setup save states */
-	state_save_register_device_item_array(device, 0, i82439tx->regs);
-	state_save_register_device_item_array(device, 0, i82439tx->bios_ram);
+	device->save_item(NAME(i82439tx->regs));
+	device->save_item(NAME(i82439tx->bios_ram));
 }
 
 static DEVICE_RESET( i82439tx )

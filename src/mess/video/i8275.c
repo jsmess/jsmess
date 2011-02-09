@@ -516,30 +516,30 @@ static DEVICE_START( i8275 )
 	devcb_resolve_write_line(&i8275->out_irq_func, &i8275->intf->out_irq_func, device);
 
 	/* register for state saving */
-	state_save_register_device_item(device, 0, i8275->status_reg);
-	state_save_register_device_item(device, 0, i8275->num_of_params);
-	state_save_register_device_item(device, 0, i8275->current_command);
-	state_save_register_device_item(device, 0, i8275->param_type);
+	device->save_item(NAME(i8275->status_reg));
+	device->save_item(NAME(i8275->num_of_params));
+	device->save_item(NAME(i8275->current_command));
+	device->save_item(NAME(i8275->param_type));
 
-	state_save_register_device_item(device, 0, i8275->cursor_col);
-	state_save_register_device_item(device, 0, i8275->cursor_row);
+	device->save_item(NAME(i8275->cursor_col));
+	device->save_item(NAME(i8275->cursor_row));
 
-	state_save_register_device_item(device, 0, i8275->light_pen_col);
-	state_save_register_device_item(device, 0, i8275->light_pen_row);
+	device->save_item(NAME(i8275->light_pen_col));
+	device->save_item(NAME(i8275->light_pen_row));
 
-	state_save_register_device_item(device, 0, i8275->rows_type);
-	state_save_register_device_item(device, 0, i8275->chars_per_row);
-	state_save_register_device_item(device, 0, i8275->vert_retrace_rows);
-	state_save_register_device_item(device, 0, i8275->rows_per_frame);
-	state_save_register_device_item(device, 0, i8275->undeline_line_num);
-	state_save_register_device_item(device, 0, i8275->lines_per_row);
-	state_save_register_device_item(device, 0, i8275->line_counter_mode);
-	state_save_register_device_item(device, 0, i8275->field_attribute_mode);
-	state_save_register_device_item(device, 0, i8275->cursor_format);
-	state_save_register_device_item(device, 0, i8275->hor_retrace_count);
+	device->save_item(NAME(i8275->rows_type));
+	device->save_item(NAME(i8275->chars_per_row));
+	device->save_item(NAME(i8275->vert_retrace_rows));
+	device->save_item(NAME(i8275->rows_per_frame));
+	device->save_item(NAME(i8275->undeline_line_num));
+	device->save_item(NAME(i8275->lines_per_row));
+	device->save_item(NAME(i8275->line_counter_mode));
+	device->save_item(NAME(i8275->field_attribute_mode));
+	device->save_item(NAME(i8275->cursor_format));
+	device->save_item(NAME(i8275->hor_retrace_count));
 
-	state_save_register_device_item(device, 0, i8275->burst_space_code);
-	state_save_register_device_item(device, 0, i8275->burst_count_code);
+	device->save_item(NAME(i8275->burst_space_code));
+	device->save_item(NAME(i8275->burst_count_code));
 }
 
 static DEVICE_RESET( i8275 )

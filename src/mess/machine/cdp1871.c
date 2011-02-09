@@ -178,15 +178,15 @@ void cdp1871_device::device_start()
 	m_scan_timer->adjust(attotime::zero, 0, attotime::from_hz(clock()));
 
 	// register for state saving
-	state_save_register_device_item(this, 0, m_inhibit);
-	state_save_register_device_item(this, 0, m_sense);
-	state_save_register_device_item(this, 0, m_drive);
-	state_save_register_device_item(this, 0, m_shift);
-	state_save_register_device_item(this, 0, m_control);
-	state_save_register_device_item(this, 0, m_da);
-	state_save_register_device_item(this, 0, m_next_da);
-	state_save_register_device_item(this, 0, m_rpt);
-	state_save_register_device_item(this, 0, m_next_rpt);
+	save_item(NAME(m_inhibit));
+	save_item(NAME(m_sense));
+	save_item(NAME(m_drive));
+	save_item(NAME(m_shift));
+	save_item(NAME(m_control));
+	save_item(NAME(m_da));
+	save_item(NAME(m_next_da));
+	save_item(NAME(m_rpt));
+	save_item(NAME(m_next_rpt));
 }
 
 

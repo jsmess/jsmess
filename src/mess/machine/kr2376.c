@@ -363,13 +363,13 @@ static DEVICE_START( kr2376 )
 	kr2376->scan_timer->adjust(attotime::zero, 0, attotime::from_hz(kr2376->intf->clock));
 
 	/* register for state saving */
-	state_save_register_device_item(device, 0, kr2376->ring11);
-	state_save_register_device_item(device, 0, kr2376->ring8);
-	state_save_register_device_item(device, 0, kr2376->modifiers);
-	state_save_register_device_item(device, 0, kr2376->strobe);
-	state_save_register_device_item(device, 0, kr2376->strobe_old);
-	state_save_register_device_item(device, 0, kr2376->parity);
-	state_save_register_device_item(device, 0, kr2376->data);
+	device->save_item(NAME(kr2376->ring11));
+	device->save_item(NAME(kr2376->ring8));
+	device->save_item(NAME(kr2376->modifiers));
+	device->save_item(NAME(kr2376->strobe));
+	device->save_item(NAME(kr2376->strobe_old));
+	device->save_item(NAME(kr2376->parity));
+	device->save_item(NAME(kr2376->data));
 }
 
 DEVICE_GET_INFO( kr2376 )

@@ -389,18 +389,18 @@ static DEVICE_START( msm6255 )
 	assert(msm6255->screen != NULL);
 
 	/* register for state saving */
-	state_save_register_device_item(device, 0, msm6255->ir);
-	state_save_register_device_item(device, 0, msm6255->mor);
-	state_save_register_device_item(device, 0, msm6255->pr);
-	state_save_register_device_item(device, 0, msm6255->hnr);
-	state_save_register_device_item(device, 0, msm6255->dvr);
-	state_save_register_device_item(device, 0, msm6255->cpr);
-	state_save_register_device_item(device, 0, msm6255->slr);
-	state_save_register_device_item(device, 0, msm6255->sur);
-	state_save_register_device_item(device, 0, msm6255->clr);
-	state_save_register_device_item(device, 0, msm6255->cur);
-	state_save_register_device_item(device, 0, msm6255->cursor);
-	state_save_register_device_item(device, 0, msm6255->frame);
+	device->save_item(NAME(msm6255->ir));
+	device->save_item(NAME(msm6255->mor));
+	device->save_item(NAME(msm6255->pr));
+	device->save_item(NAME(msm6255->hnr));
+	device->save_item(NAME(msm6255->dvr));
+	device->save_item(NAME(msm6255->cpr));
+	device->save_item(NAME(msm6255->slr));
+	device->save_item(NAME(msm6255->sur));
+	device->save_item(NAME(msm6255->clr));
+	device->save_item(NAME(msm6255->cur));
+	device->save_item(NAME(msm6255->cursor));
+	device->save_item(NAME(msm6255->frame));
 }
 
 /*-------------------------------------------------

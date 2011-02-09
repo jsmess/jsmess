@@ -965,28 +965,28 @@ static DEVICE_START( c1571 )
 	c1571->bit_timer = device->machine->scheduler().timer_alloc(FUNC(bit_tick), (void *)device);
 
 	/* register for state saving */
-	state_save_register_device_item(device, 0, c1571->address);
-	state_save_register_device_item(device, 0, c1571->data_out);
-	state_save_register_device_item(device, 0, c1571->atn_ack);
-	state_save_register_device_item(device, 0, c1571->ser_dir);
-	state_save_register_device_item(device, 0, c1571->sp_out);
-	state_save_register_device_item(device, 0, c1571->cnt_out);
-	state_save_register_device_item(device, 0, c1571->stp);
-	state_save_register_device_item(device, 0, c1571->mtr);
-	state_save_register_device_item(device, 0, c1571->track_len);
-	state_save_register_device_item(device, 0, c1571->buffer_pos);
-	state_save_register_device_item(device, 0, c1571->bit_pos);
-	state_save_register_device_item(device, 0, c1571->bit_count);
-	state_save_register_device_item(device, 0, c1571->data);
-	state_save_register_device_item(device, 0, c1571->yb);
-	state_save_register_device_item(device, 0, c1571->ds);
-	state_save_register_device_item(device, 0, c1571->soe);
-	state_save_register_device_item(device, 0, c1571->byte);
-	state_save_register_device_item(device, 0, c1571->mode);
-	state_save_register_device_item(device, 0, c1571->side);
-	state_save_register_device_item(device, 0, c1571->via0_irq);
-	state_save_register_device_item(device, 0, c1571->via1_irq);
-	state_save_register_device_item(device, 0, c1571->cia_irq);
+	device->save_item(NAME(c1571->address));
+	device->save_item(NAME(c1571->data_out));
+	device->save_item(NAME(c1571->atn_ack));
+	device->save_item(NAME(c1571->ser_dir));
+	device->save_item(NAME(c1571->sp_out));
+	device->save_item(NAME(c1571->cnt_out));
+	device->save_item(NAME(c1571->stp));
+	device->save_item(NAME(c1571->mtr));
+	device->save_item(NAME(c1571->track_len));
+	device->save_item(NAME(c1571->buffer_pos));
+	device->save_item(NAME(c1571->bit_pos));
+	device->save_item(NAME(c1571->bit_count));
+	device->save_item(NAME(c1571->data));
+	device->save_item(NAME(c1571->yb));
+	device->save_item(NAME(c1571->ds));
+	device->save_item(NAME(c1571->soe));
+	device->save_item(NAME(c1571->byte));
+	device->save_item(NAME(c1571->mode));
+	device->save_item(NAME(c1571->side));
+	device->save_item(NAME(c1571->via0_irq));
+	device->save_item(NAME(c1571->via1_irq));
+	device->save_item(NAME(c1571->cia_irq));
 }
 
 /*-------------------------------------------------

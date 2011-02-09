@@ -91,9 +91,9 @@ void i8212_device::device_start()
 	devcb_resolve_write8(&m_out_do_func, &m_config.out_do_func, this);
 
 	// register for state saving
-	state_save_register_device_item(this, 0, m_md);
-	state_save_register_device_item(this, 0, m_stb);
-	state_save_register_device_item(this, 0, m_data);
+	save_item(NAME(m_md));
+	save_item(NAME(m_stb));
+	save_item(NAME(m_data));
 }
 
 

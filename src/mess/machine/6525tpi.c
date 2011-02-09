@@ -149,21 +149,21 @@ static DEVICE_START( tpi6525 )
 	assert(device->baseconfig().static_config() != NULL);
 
 	/* register for state saving */
-	state_save_register_device_item(device, 0, tpi6525->port_a);
-	state_save_register_device_item(device, 0, tpi6525->ddr_a);
-	state_save_register_device_item(device, 0, tpi6525->in_a);
-	state_save_register_device_item(device, 0, tpi6525->port_b);
-	state_save_register_device_item(device, 0, tpi6525->ddr_b);
-	state_save_register_device_item(device, 0, tpi6525->in_b);
-	state_save_register_device_item(device, 0, tpi6525->port_c);
-	state_save_register_device_item(device, 0, tpi6525->ddr_c);
-	state_save_register_device_item(device, 0, tpi6525->in_c);
-	state_save_register_device_item(device, 0, tpi6525->ca_level);
-	state_save_register_device_item(device, 0, tpi6525->cb_level);
-	state_save_register_device_item(device, 0, tpi6525->interrupt_level);
-	state_save_register_device_item(device, 0, tpi6525->cr);
-	state_save_register_device_item(device, 0, tpi6525->air);
-	state_save_register_device_item_array(device, 0, tpi6525->irq_level);
+	device->save_item(NAME(tpi6525->port_a));
+	device->save_item(NAME(tpi6525->ddr_a));
+	device->save_item(NAME(tpi6525->in_a));
+	device->save_item(NAME(tpi6525->port_b));
+	device->save_item(NAME(tpi6525->ddr_b));
+	device->save_item(NAME(tpi6525->in_b));
+	device->save_item(NAME(tpi6525->port_c));
+	device->save_item(NAME(tpi6525->ddr_c));
+	device->save_item(NAME(tpi6525->in_c));
+	device->save_item(NAME(tpi6525->ca_level));
+	device->save_item(NAME(tpi6525->cb_level));
+	device->save_item(NAME(tpi6525->interrupt_level));
+	device->save_item(NAME(tpi6525->cr));
+	device->save_item(NAME(tpi6525->air));
+	device->save_item(NAME(tpi6525->irq_level));
 }
 
 

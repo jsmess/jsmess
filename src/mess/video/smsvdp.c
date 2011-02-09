@@ -1449,25 +1449,25 @@ static DEVICE_START( smsvdp )
 	smsvdp->smsvdp_display_timer = device->machine->scheduler().timer_alloc(FUNC(smsvdp_display_callback), smsvdp);
 	smsvdp->smsvdp_display_timer->adjust(screen->time_until_pos(0, DISPLAY_CB_HPOS), 0, screen->scan_period());
 
-	state_save_register_device_item(device, 0, smsvdp->status);
-	state_save_register_device_item(device, 0, smsvdp->reg9copy);
-	state_save_register_device_item(device, 0, smsvdp->addrmode);
-	state_save_register_device_item(device, 0, smsvdp->addr);
-	state_save_register_device_item(device, 0, smsvdp->cram_mask);
-	state_save_register_device_item(device, 0, smsvdp->cram_dirty);
-	state_save_register_device_item(device, 0, smsvdp->pending);
-	state_save_register_device_item(device, 0, smsvdp->buffer);
-	state_save_register_device_item(device, 0, smsvdp->gg_sms_mode);
-	state_save_register_device_item(device, 0, smsvdp->irq_state);
-	state_save_register_device_item(device, 0, smsvdp->vdp_mode);
-	state_save_register_device_item(device, 0, smsvdp->y_pixels);
-	state_save_register_device_item(device, 0, smsvdp->line_counter);
-	state_save_register_device_item(device, 0, smsvdp->hcounter);
-	state_save_register_device_item_array(device, 0, smsvdp->reg);
-	state_save_register_device_item_array(device, 0, smsvdp->current_palette);
-	state_save_register_device_item_pointer(device, 0, smsvdp->line_buffer, 256 * 5);
-	state_save_register_device_item_pointer(device, 0, smsvdp->collision_buffer, SMS_X_PIXELS);
-	state_save_register_device_item_bitmap(device, 0, smsvdp->tmpbitmap);
+	device->save_item(NAME(smsvdp->status));
+	device->save_item(NAME(smsvdp->reg9copy));
+	device->save_item(NAME(smsvdp->addrmode));
+	device->save_item(NAME(smsvdp->addr));
+	device->save_item(NAME(smsvdp->cram_mask));
+	device->save_item(NAME(smsvdp->cram_dirty));
+	device->save_item(NAME(smsvdp->pending));
+	device->save_item(NAME(smsvdp->buffer));
+	device->save_item(NAME(smsvdp->gg_sms_mode));
+	device->save_item(NAME(smsvdp->irq_state));
+	device->save_item(NAME(smsvdp->vdp_mode));
+	device->save_item(NAME(smsvdp->y_pixels));
+	device->save_item(NAME(smsvdp->line_counter));
+	device->save_item(NAME(smsvdp->hcounter));
+	device->save_item(NAME(smsvdp->reg));
+	device->save_item(NAME(smsvdp->current_palette));
+	device->save_pointer(NAME(smsvdp->line_buffer), 256 * 5);
+	device->save_pointer(NAME(smsvdp->collision_buffer), SMS_X_PIXELS);
+	device->save_item(NAME(*smsvdp->tmpbitmap));
 }
 
 static DEVICE_RESET( smsvdp )

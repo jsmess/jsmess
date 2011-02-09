@@ -397,18 +397,18 @@ static DEVICE_START( mos6530 )
 	miot->timer = device->machine->scheduler().timer_alloc(FUNC(timer_end_callback), (void *)device);
 
 	/* register for save states */
-	state_save_register_device_item(device, 0, miot->port[0].in);
-	state_save_register_device_item(device, 0, miot->port[0].out);
-	state_save_register_device_item(device, 0, miot->port[0].ddr);
-	state_save_register_device_item(device, 0, miot->port[1].in);
-	state_save_register_device_item(device, 0, miot->port[1].out);
-	state_save_register_device_item(device, 0, miot->port[1].ddr);
+	device->save_item(NAME(miot->port[0].in));
+	device->save_item(NAME(miot->port[0].out));
+	device->save_item(NAME(miot->port[0].ddr));
+	device->save_item(NAME(miot->port[1].in));
+	device->save_item(NAME(miot->port[1].out));
+	device->save_item(NAME(miot->port[1].ddr));
 
-	state_save_register_device_item(device, 0, miot->irqstate);
-	state_save_register_device_item(device, 0, miot->irqenable);
+	device->save_item(NAME(miot->irqstate));
+	device->save_item(NAME(miot->irqenable));
 
-	state_save_register_device_item(device, 0, miot->timershift);
-	state_save_register_device_item(device, 0, miot->timerstate);
+	device->save_item(NAME(miot->timershift));
+	device->save_item(NAME(miot->timerstate));
 }
 
 

@@ -142,10 +142,10 @@ static DEVICE_START( cdp1863 )
 	cdp1863->oe = 1;
 
 	/* register for state saving */
-	state_save_register_device_item(device, 0, cdp1863->oe);
-	state_save_register_device_item(device, 0, cdp1863->latch);
-	state_save_register_device_item(device, 0, cdp1863->signal);
-	state_save_register_device_item(device, 0, cdp1863->incr);
+	device->save_item(NAME(cdp1863->oe));
+	device->save_item(NAME(cdp1863->latch));
+	device->save_item(NAME(cdp1863->signal));
+	device->save_item(NAME(cdp1863->incr));
 }
 
 static DEVICE_RESET( cdp1863 )

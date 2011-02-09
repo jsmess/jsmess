@@ -2664,6 +2664,7 @@ V-V                           TP-027
 	DRIVER( 1943j )		/*  6/1987 (c) 1987 (Japan) */
 	DRIVER( 1943b )		/* bootleg */
 	DRIVER( blktiger )	/*  8/1987 (c) 1987 (US) */
+	DRIVER( blktigera )	/*  8/1987 (c) 1987 (US) */
 	DRIVER( blktigerb1 )/* bootleg */
 	DRIVER( blktigerb2 )/* bootleg */
 	DRIVER( blkdrgon )	/*  8/1987 (c) 1987 (Japan) */
@@ -2717,9 +2718,10 @@ V-V                           TP-027
 	DRIVER( dynwar )	/*  4/1989 (c) 1989 (USA) */
 	DRIVER( dynwara )	/*  4/1989 (c) 1989 (USA) */
 	DRIVER( dynwarj )	/*  4/1989 (c) 1989 (Japan) */
+	DRIVER( dynwarjr )	/*  4/1989 (c) 1989 (Japan) */
 	DRIVER( willow )	/*  6/1989 (c) 1989 (USA) */
+	DRIVER( willowo )	/*  6/1989 (c) 1989 (USA) */
 	DRIVER( willowj )	/*  6/1989 (c) 1989 (Japan) */
-	DRIVER( willowje )	/*  6/1989 (c) 1989 (Japan) */
 	DRIVER( unsquad )	/*  8/1989 (c) 1989 (USA) */
 	DRIVER( area88 )	/*  8/1989 (c) 1989 (Japan) */
 	DRIVER( area88r )	/*  8/1989 (c) 1989 (Japan) */
@@ -3136,7 +3138,9 @@ V-V                           TP-027
 
 	/* Capcom CPS3 games */
 	DRIVER( redearth )	/* 21/11/1996 (c) 1996 (Euro) */
+	DRIVER( redeartha ) /* 23/10/1996 (c) 1996 (Euro) */
 	DRIVER( warzard )	/* 21/11/1996 (c) 1996 (Japan) */
+	DRIVER( warzarda )	/* 23/10/1996 (c) 1996 (Japan) */
 	DRIVER( sfiii )	/* 04/02/1997 (c) 1997 (USA) */
 	DRIVER( sfiiij )	/* 04/02/1997 (c) 1997 (Japan) */
 	DRIVER( sfiii2 )	/* 30/09/1997 (c) 1997 (USA) */
@@ -3149,7 +3153,6 @@ V-V                           TP-027
 	DRIVER( sfiii3a )	/* 12/05/1999 (c) 1999 (USA) */
 	DRIVER( jojoba )	/* 13/09/1999 (c) 1999 (Japan) */
 
-	DRIVER( redeartn )	/* 21/11/1996 (c) 1996 (?) */
 	DRIVER( sfiiin )	/* 04/02/1997 (c) 1997 (Asia) */
 	DRIVER( sfiii2n )	/* 30/09/1997 (c) 1997 (Asia) */
 	DRIVER( jojon )	/* 08/01/1999 (c) 1998 (Asia) */
@@ -3323,7 +3326,7 @@ V-V                           TP-027
 	DRIVER( pocketrc )	/* 1997.03 Pocket Racer (PKR1/VER.B, Japan) */
 	DRIVER( starswep )	/* 1997.07 Star Sweep (STP1/VER.A, Japan) */
 	DRIVER( myangel3 )	/* 1998.03 Kosodate Quiz My Angel 3 (KQT1/VER.A, Japan) */
-	DRIVER( ptblnk2a )	/* 1999.?? Point Blank 2 (GNB3/VER.A) */
+	DRIVER( ptblank2a )	/* 1999.?? Point Blank 2 (GNB3/VER.A) */
 						/* 1999.02 Gunbaarl (GNB1, Japan) */
 
 	/* Namco System 12 */
@@ -4617,7 +4620,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( mt_sonia )	/* ^^ */
 	DRIVER( mt_fshrk )	/* 53 */
 	DRIVER( mt_spman )	/* 54 */
-	DRIVER( mt_calga )	/* 55? */
+	DRIVER( mt_calga )	/* 55 */
 						/* 56 */
 	DRIVER( mt_gaxe2 )	/* 57 */
 	DRIVER( mt_stf )	/* 58 */
@@ -5531,6 +5534,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( jackalj )	/* GX631 (c) 1986 (Japan) */
 	DRIVER( topgunbl )	/* bootleg */
 	DRIVER( ddribble )	/* GX690 (c) 1986 */
+	DRIVER( ddribblep )	/* GX690 (c) 1986 */
 	DRIVER( contra )	/* GX633 (c) 1987 */
 	DRIVER( contra1 )	/* GX633 (c) 1987 */
 	DRIVER( contrab )	/* bootleg */
@@ -5765,6 +5769,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( viostormub )	/* GX168 (c) 1993 (US) */
 	DRIVER( viostormj )	/* GX168 (c) 1993 (Japan) */
 	DRIVER( viostorma )	/* GX168 (c) 1993 (Asia) */
+	DRIVER( viostormab )/* GX168 (c) 1993 (Asia) */
 	DRIVER( mmaulers )	/* GX170 (c) 1993 (Europe) */
 	DRIVER( dadandrn )	/* GX170 (c) 1993 (Japan) */
 	DRIVER( metamrph )	/* GX224 (c) 1993 (Europe) */
@@ -6848,6 +6853,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	/* Neo Print */
 	DRIVER( npcartv1 )
 	DRIVER( 98best44 )
+	DRIVER( nprsp )
 
 	/* Alpha Denshi games */
 	DRIVER( shougi )	/* (c) 1982 (Arcade TV Game List - P.80, Left, 9 from top) */
@@ -7572,6 +7578,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( scudhamm )	/* (c) 1994 Jaleco */
 	DRIVER( tetrisp2 )	/* (c) 1997 Jaleco */
 	DRIVER( tetrisp2j )	/* (c) 1997 Jaleco */
+	DRIVER( tetrisp2ja )/* (c) 1997 Jaleco */
 	DRIVER( nndmseal )	/* (c) 1997 I'Max/Jaleco */
 	DRIVER( stepstag )	/* (c) 1999 Jaleco */
 	DRIVER( step3 )		/* (c) 1999 Jaleco */
@@ -9074,6 +9081,7 @@ Other Sun games
 	DRIVER( sprcros2 )	/* (c) 1986 GM Shoji */
 	DRIVER( sprcros2a )	/* (c) 1986 GM Shoji */
 	DRIVER( d9final )	/* (c) 1992 Excellent System */
+	DRIVER( lastbank )	/* (c) 1994 Excellent System */
 	DRIVER( gcpinbal )	/* (c) 1994 Excellent System */
 	DRIVER( vmetal )	/* (c) 1995 Excellent System? */
 	DRIVER( vmetaln )	/* (c) 1995 Excellent System? */

@@ -360,21 +360,21 @@ void zx8302_device::device_start()
 	m_gap_timer->adjust(attotime::zero, 0, attotime::from_msec(31));
 
 	// register for state saving
-	state_save_register_device_item(this, 0, m_idr);
-	state_save_register_device_item(this, 0, m_tcr);
-	state_save_register_device_item(this, 0, m_tdr);
-	state_save_register_device_item(this, 0, m_irq);
-	state_save_register_device_item(this, 0, m_ctr);
-	state_save_register_device_item(this, 0, m_status);
-	state_save_register_device_item(this, 0, m_comdata);
-	state_save_register_device_item(this, 0, m_comctl);
-	state_save_register_device_item(this, 0, m_ipc_state);
-	state_save_register_device_item(this, 0, m_ipc_rx);
-	state_save_register_device_item(this, 0, m_ipc_busy);
-	state_save_register_device_item(this, 0, m_baudx4);
-	state_save_register_device_item(this, 0, m_tx_bits);
-	state_save_register_device_item_array(this, 0, m_mdv_data);
-	state_save_register_device_item(this, 0, m_track);
+	save_item(NAME(m_idr));
+	save_item(NAME(m_tcr));
+	save_item(NAME(m_tdr));
+	save_item(NAME(m_irq));
+	save_item(NAME(m_ctr));
+	save_item(NAME(m_status));
+	save_item(NAME(m_comdata));
+	save_item(NAME(m_comctl));
+	save_item(NAME(m_ipc_state));
+	save_item(NAME(m_ipc_rx));
+	save_item(NAME(m_ipc_busy));
+	save_item(NAME(m_baudx4));
+	save_item(NAME(m_tx_bits));
+	save_item(NAME(m_mdv_data));
+	save_item(NAME(m_track));
 }
 
 

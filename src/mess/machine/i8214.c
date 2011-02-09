@@ -197,13 +197,13 @@ static DEVICE_START( i8214 )
 	devcb_resolve_write_line(&i8214->out_enlg_func, &intf->out_enlg_func, device);
 
 	/* register for state saving */
-	state_save_register_device_item(device, 0, i8214->inte);
-	state_save_register_device_item(device, 0, i8214->int_dis);
-	state_save_register_device_item(device, 0, i8214->a);
-	state_save_register_device_item(device, 0, i8214->b);
-	state_save_register_device_item(device, 0, i8214->r);
-	state_save_register_device_item(device, 0, i8214->sgs);
-	state_save_register_device_item(device, 0, i8214->etlg);
+	device->save_item(NAME(i8214->inte));
+	device->save_item(NAME(i8214->int_dis));
+	device->save_item(NAME(i8214->a));
+	device->save_item(NAME(i8214->b));
+	device->save_item(NAME(i8214->r));
+	device->save_item(NAME(i8214->sgs));
+	device->save_item(NAME(i8214->etlg));
 }
 
 /*-------------------------------------------------

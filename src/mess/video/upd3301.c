@@ -639,7 +639,7 @@ static DEVICE_START( upd3301 )
 	upd3301->hrtc_timer = device->machine->scheduler().timer_alloc(FUNC(hrtc_tick), (void *)device);
 
 	/* register for state saving */
-//  state_save_register_device_item(device, 0, upd3301->);
+//  device->save_item(NAME(upd3301->));
 }
 
 /*-------------------------------------------------

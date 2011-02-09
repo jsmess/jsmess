@@ -614,28 +614,28 @@ static DEVICE_START( vdc8563 )
 		vdc8563->fontmask = 0xe000;
 	}
 
-	state_save_register_device_item_pointer(device, 0, vdc8563->ram, 0x20000);
+	device->save_pointer(NAME(vdc8563->ram), 0x20000);
 
-	state_save_register_device_item_array(device, 0, vdc8563->reg);
-	state_save_register_device_item(device, 0, vdc8563->state);
-	state_save_register_device_item(device, 0, vdc8563->index);
+	device->save_item(NAME(vdc8563->reg));
+	device->save_item(NAME(vdc8563->state));
+	device->save_item(NAME(vdc8563->index));
 
-	state_save_register_device_item(device, 0, vdc8563->addr);
-	state_save_register_device_item(device, 0, vdc8563->src);
+	device->save_item(NAME(vdc8563->addr));
+	device->save_item(NAME(vdc8563->src));
 
-	state_save_register_device_item(device, 0, vdc8563->videoram_start);
-	state_save_register_device_item(device, 0, vdc8563->colorram_start);
-	state_save_register_device_item(device, 0, vdc8563->fontram_start);
-	state_save_register_device_item(device, 0, vdc8563->videoram_size);
+	device->save_item(NAME(vdc8563->videoram_start));
+	device->save_item(NAME(vdc8563->colorram_start));
+	device->save_item(NAME(vdc8563->fontram_start));
+	device->save_item(NAME(vdc8563->videoram_size));
 
-	state_save_register_device_item(device, 0, vdc8563->rastering);
+	device->save_item(NAME(vdc8563->rastering));
 
-	state_save_register_device_item_array(device, 0, vdc8563->fontdirty);
+	device->save_item(NAME(vdc8563->fontdirty));
 
-	state_save_register_device_item(device, 0, vdc8563->cursor_time);
-	state_save_register_device_item(device, 0, vdc8563->cursor_on);
+	device->save_item(NAME(vdc8563->cursor_time));
+	device->save_item(NAME(vdc8563->cursor_on));
 
-	state_save_register_device_item(device, 0, vdc8563->changed);
+	device->save_item(NAME(vdc8563->changed));
 }
 
 

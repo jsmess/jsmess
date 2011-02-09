@@ -1279,14 +1279,14 @@ static DEVICE_START( luxor_55_10828 )
 	conkort->image1 = device->subdevice(FLOPPY_1);
 
 	// register for state saving
-	state_save_register_device_item(device, 0, conkort->cs);
-	state_save_register_device_item(device, 0, conkort->status);
-	state_save_register_device_item(device, 0, conkort->data);
-	state_save_register_device_item(device, 0, conkort->fdc_irq);
-	state_save_register_device_item(device, 0, conkort->fdc_drq);
-	state_save_register_device_item(device, 0, conkort->wait_enable);
-	state_save_register_device_item(device, 0, conkort->sel0);
-	state_save_register_device_item(device, 0, conkort->sel1);
+	device->save_item(NAME(conkort->cs));
+	device->save_item(NAME(conkort->status));
+	device->save_item(NAME(conkort->data));
+	device->save_item(NAME(conkort->fdc_irq));
+	device->save_item(NAME(conkort->fdc_drq));
+	device->save_item(NAME(conkort->wait_enable));
+	device->save_item(NAME(conkort->sel0));
+	device->save_item(NAME(conkort->sel1));
 
 	// patch out protection checks
 	UINT8 *rom = device->subregion("abc830")->base();
@@ -1389,13 +1389,13 @@ static DEVICE_START( luxor_55_21046 )
 	conkort->sw3 = config->address;
 
 	// register for state saving
-	state_save_register_device_item(device, 0, conkort->cs);
-	state_save_register_device_item(device, 0, conkort->status);
-	state_save_register_device_item(device, 0, conkort->data_in);
-	state_save_register_device_item(device, 0, conkort->data_out);
-	state_save_register_device_item(device, 0, conkort->fdc_irq);
-	state_save_register_device_item(device, 0, conkort->dma_irq);
-	state_save_register_device_item(device, 0, conkort->busy);
+	device->save_item(NAME(conkort->cs));
+	device->save_item(NAME(conkort->status));
+	device->save_item(NAME(conkort->data_in));
+	device->save_item(NAME(conkort->data_out));
+	device->save_item(NAME(conkort->fdc_irq));
+	device->save_item(NAME(conkort->dma_irq));
+	device->save_item(NAME(conkort->busy));
 
 	// patch out sector skew table
 	UINT8 *rom = device->subregion("conkort")->base();

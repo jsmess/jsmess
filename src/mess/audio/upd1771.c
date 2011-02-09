@@ -353,9 +353,9 @@ static DEVICE_START( upd1771c )
 
     state->channel = device->machine->sound().stream_alloc( *device, 0, 1, sample_rate, state, upd1771c_update );
 
-    state_save_register_device_item_array( device, 0, state->packet );
-    state_save_register_device_item(device, 0, state->index );
-    state_save_register_device_item(device, 0, state->expected_bytes );
+    device->save_item( NAME(state->packet) );
+    device->save_item(NAME(state->index) );
+    device->save_item(NAME(state->expected_bytes) );
 }
 
 

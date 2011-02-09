@@ -126,8 +126,8 @@ static DEVICE_START( dm9368 )
 	}
 
 	/* register for state saving */
-	state_save_register_device_item(device, 0, dm9368->latch);
-	state_save_register_device_item(device, 0, dm9368->rbi);
+	device->save_item(NAME(dm9368->latch));
+	device->save_item(NAME(dm9368->rbi));
 }
 
 /*-------------------------------------------------

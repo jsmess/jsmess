@@ -116,22 +116,22 @@ void hd44780_device::device_start()
 
 	m_blink_timer->adjust(attotime::from_msec(409), 0, attotime::from_msec(409));
 
-	state_save_register_device_item( this, 0, m_ac);
-	state_save_register_device_item( this, 0, m_ac_mode);
-	state_save_register_device_item( this, 0, m_data_bus_flag);
-	state_save_register_device_item( this, 0, m_cursor_pos);
-	state_save_register_device_item( this, 0, m_display_on);
-	state_save_register_device_item( this, 0, m_cursor_on);
-	state_save_register_device_item( this, 0, m_shift_on);
-	state_save_register_device_item( this, 0, m_blink_on);
-	state_save_register_device_item( this, 0, m_direction);
-	state_save_register_device_item( this, 0, m_data_len);
-	state_save_register_device_item( this, 0, m_num_line);
-	state_save_register_device_item( this, 0, m_char_size);
-	state_save_register_device_item( this, 0, disp_shift);
-	state_save_register_device_item( this, 0, m_blink);
-	state_save_register_device_item_array( this, 0, m_ddram);
-	state_save_register_device_item_array( this, 0, m_cgram);
+	save_item( NAME(m_ac));
+	save_item( NAME(m_ac_mode));
+	save_item( NAME(m_data_bus_flag));
+	save_item( NAME(m_cursor_pos));
+	save_item( NAME(m_display_on));
+	save_item( NAME(m_cursor_on));
+	save_item( NAME(m_shift_on));
+	save_item( NAME(m_blink_on));
+	save_item( NAME(m_direction));
+	save_item( NAME(m_data_len));
+	save_item( NAME(m_num_line));
+	save_item( NAME(m_char_size));
+	save_item( NAME(disp_shift));
+	save_item( NAME(m_blink));
+	save_item( NAME(m_ddram));
+	save_item( NAME(m_cgram));
 
 }
 

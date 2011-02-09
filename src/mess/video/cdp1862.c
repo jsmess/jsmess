@@ -189,9 +189,9 @@ static DEVICE_START( cdp1862 )
 	initialize_palette(device);
 
 	/* register for state saving */
-	state_save_register_device_item(device, 0, cdp1862->bgcolor);
-	state_save_register_device_item(device, 0, cdp1862->con);
-	state_save_register_device_item_bitmap(device, 0, cdp1862->bitmap);
+	device->save_item(NAME(cdp1862->bgcolor));
+	device->save_item(NAME(cdp1862->con));
+	device->save_item(NAME(*cdp1862->bitmap));
 }
 
 /*-------------------------------------------------

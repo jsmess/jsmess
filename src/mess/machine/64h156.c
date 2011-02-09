@@ -124,7 +124,7 @@ static DEVICE_START( c64h156 )
 //  c64h156->bit_timer = device->machine->scheduler().timer_alloc(FUNC(bit_tick), (void *)device);
 
 	/* register for state saving */
-//  state_save_register_device_item(device, 0, c64h156->);
+//  device->save_item(NAME(c64h156->));
 }
 
 /*-------------------------------------------------

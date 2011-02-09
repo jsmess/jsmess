@@ -144,14 +144,14 @@ void ncr5380_device::device_start()
 				m_config.scsidevs->devices[i].diskregion );
 	}
 
-	state_save_register_device_item_array(this, 0, m_5380_Registers);
-	state_save_register_device_item_array(this, 0, m_5380_Command);
-	state_save_register_device_item_array(this, 0, m_5380_Data);
-	state_save_register_device_item(this, 0, m_last_id);
-	state_save_register_device_item(this, 0, m_cmd_ptr);
-	state_save_register_device_item(this, 0, m_d_ptr);
-	state_save_register_device_item(this, 0, m_d_limit);
-	state_save_register_device_item(this, 0, m_next_req_flag);
+	save_item(NAME(m_5380_Registers));
+	save_item(NAME(m_5380_Command));
+	save_item(NAME(m_5380_Data));
+	save_item(NAME(m_last_id));
+	save_item(NAME(m_cmd_ptr));
+	save_item(NAME(m_d_ptr));
+	save_item(NAME(m_d_limit));
+	save_item(NAME(m_next_req_flag));
 }
 
 //-------------------------------------------------

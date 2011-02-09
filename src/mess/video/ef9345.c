@@ -185,26 +185,26 @@ void ef9345_device::device_start()
 
 	init_accented_chars();
 
-	state_save_register_device_item_array(this, 0, m_border);
-	state_save_register_device_item_array(this, 0, m_registers);
-	state_save_register_device_item_array(this, 0, m_last_dial);
-	state_save_register_device_item_array(this, 0, m_ram_base);
-	state_save_register_device_item(this, 0, m_bf);
-	state_save_register_device_item(this, 0, m_char_mode);
-	state_save_register_device_item(this, 0, m_state);
-	state_save_register_device_item(this, 0, m_tgs);
-	state_save_register_device_item(this, 0, m_mat);
-	state_save_register_device_item(this, 0, m_pat);
-	state_save_register_device_item(this, 0, m_dor);
-	state_save_register_device_item(this, 0, m_ror);
-	state_save_register_device_item(this, 0, m_block);
-	state_save_register_device_item(this, 0, m_blink);
-	state_save_register_device_item(this, 0, m_latchc0);
-	state_save_register_device_item(this, 0, m_latchm);
-	state_save_register_device_item(this, 0, m_latchi);
-	state_save_register_device_item(this, 0, m_latchu);
+	save_item(NAME(m_border));
+	save_item(NAME(m_registers));
+	save_item(NAME(m_last_dial));
+	save_item(NAME(m_ram_base));
+	save_item(NAME(m_bf));
+	save_item(NAME(m_char_mode));
+	save_item(NAME(m_state));
+	save_item(NAME(m_tgs));
+	save_item(NAME(m_mat));
+	save_item(NAME(m_pat));
+	save_item(NAME(m_dor));
+	save_item(NAME(m_ror));
+	save_item(NAME(m_block));
+	save_item(NAME(m_blink));
+	save_item(NAME(m_latchc0));
+	save_item(NAME(m_latchm));
+	save_item(NAME(m_latchi));
+	save_item(NAME(m_latchu));
 
-	state_save_register_device_item_bitmap(this, 0, m_screen_out);
+	save_item(NAME(*m_screen_out));
 }
 
 //-------------------------------------------------

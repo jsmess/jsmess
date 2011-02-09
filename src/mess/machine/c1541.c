@@ -1230,25 +1230,25 @@ static DEVICE_START( c1541 )
 	c1541->bit_timer = device->machine->scheduler().timer_alloc(FUNC(bit_tick), (void *)device);
 
 	/* register for state saving */
-//  state_save_register_device_item_pointer(device, 0, c1541->track_buffer, G64_BUFFER_SIZE);
-	state_save_register_device_item(device, 0, c1541->address);
-	state_save_register_device_item(device, 0, c1541->track_len);
-	state_save_register_device_item(device, 0, c1541->buffer_pos);
-	state_save_register_device_item(device, 0, c1541->bit_pos);
-	state_save_register_device_item(device, 0, c1541->bit_count);
-	state_save_register_device_item(device, 0, c1541->data);
-	state_save_register_device_item(device, 0, c1541->yb);
-	state_save_register_device_item(device, 0, c1541->byte);
-	state_save_register_device_item(device, 0, c1541->atna);
-	state_save_register_device_item(device, 0, c1541->ds);
-	state_save_register_device_item(device, 0, c1541->stp);
-	state_save_register_device_item(device, 0, c1541->soe);
-	state_save_register_device_item(device, 0, c1541->mode);
-	state_save_register_device_item(device, 0, c1541->via0_irq);
-	state_save_register_device_item(device, 0, c1541->via1_irq);
-	state_save_register_device_item(device, 0, c1541->data_out);
-	state_save_register_device_item(device, 0, c1541->nrfd_out);
-	state_save_register_device_item(device, 0, c1541->ndac_out);
+//  device->save_pointer(NAME(c1541->track_buffer), G64_BUFFER_SIZE);
+	device->save_item(NAME(c1541->address));
+	device->save_item(NAME(c1541->track_len));
+	device->save_item(NAME(c1541->buffer_pos));
+	device->save_item(NAME(c1541->bit_pos));
+	device->save_item(NAME(c1541->bit_count));
+	device->save_item(NAME(c1541->data));
+	device->save_item(NAME(c1541->yb));
+	device->save_item(NAME(c1541->byte));
+	device->save_item(NAME(c1541->atna));
+	device->save_item(NAME(c1541->ds));
+	device->save_item(NAME(c1541->stp));
+	device->save_item(NAME(c1541->soe));
+	device->save_item(NAME(c1541->mode));
+	device->save_item(NAME(c1541->via0_irq));
+	device->save_item(NAME(c1541->via1_irq));
+	device->save_item(NAME(c1541->data_out));
+	device->save_item(NAME(c1541->nrfd_out));
+	device->save_item(NAME(c1541->ndac_out));
 }
 
 /*-------------------------------------------------

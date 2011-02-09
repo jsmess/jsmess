@@ -157,7 +157,7 @@ static DEVICE_START( upd7201 )
 	/* create the timers */
 
 	/* register for state saving */
-//  state_save_register_device_item(device, 0, upd7201->);
+//  device->save_item(NAME(upd7201->));
 }
 
 static DEVICE_RESET( upd7201 )

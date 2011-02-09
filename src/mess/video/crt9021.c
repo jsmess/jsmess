@@ -170,11 +170,11 @@ void crt9021_device::device_start()
 	assert(m_screen != NULL);
 
 	// register for state saving
-	state_save_register_device_item(this, 0, m_slg);
-	state_save_register_device_item(this, 0, m_sld);
-	state_save_register_device_item(this, 0, m_cursor);
-	state_save_register_device_item(this, 0, m_retbl);
-	state_save_register_device_item(this, 0, m_vsync);
+	save_item(NAME(m_slg));
+	save_item(NAME(m_sld));
+	save_item(NAME(m_cursor));
+	save_item(NAME(m_retbl));
+	save_item(NAME(m_vsync));
 }
 
 

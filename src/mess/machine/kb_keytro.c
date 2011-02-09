@@ -618,13 +618,13 @@ static DEVICE_START( kb_keytr )
 	keytronic->p3 = 0xff;
 
 	/* setup savestates */
-	state_save_register_device_item(device, 0, keytronic->clock_signal);
-	state_save_register_device_item(device, 0, keytronic->data_signal);
-	state_save_register_device_item(device, 0, keytronic->p1);
-	state_save_register_device_item(device, 0, keytronic->p1_data);
-	state_save_register_device_item(device, 0, keytronic->p2);
-	state_save_register_device_item(device, 0, keytronic->p3);
-	state_save_register_device_item(device, 0, keytronic->last_write_addr);
+	device->save_item(NAME(keytronic->clock_signal));
+	device->save_item(NAME(keytronic->data_signal));
+	device->save_item(NAME(keytronic->p1));
+	device->save_item(NAME(keytronic->p1_data));
+	device->save_item(NAME(keytronic->p2));
+	device->save_item(NAME(keytronic->p3));
+	device->save_item(NAME(keytronic->last_write_addr));
 }
 
 

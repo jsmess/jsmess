@@ -872,14 +872,14 @@ static DEVICE_START( diskonchip_g3 )
 
 //	diskonchip_load( device, "diskonchip");
 
-	state_save_register_device_item( device, 0, doc->planes);
-	state_save_register_device_item( device, 0, doc->blocks);
-	state_save_register_device_item( device, 0, doc->pages);
-	state_save_register_device_item( device, 0, doc->user_data_size);
-	state_save_register_device_item( device, 0, doc->extra_area_size);
-	state_save_register_device_item_pointer( device, 0, doc->data[0], doc->data_size[0]);
-	state_save_register_device_item_pointer( device, 0, doc->data[1], doc->data_size[1]);
-	state_save_register_device_item_pointer( device, 0, doc->data[2], doc->data_size[2]);
+	device->save_item( NAME(doc->planes));
+	device->save_item( NAME(doc->blocks));
+	device->save_item( NAME(doc->pages));
+	device->save_item( NAME(doc->user_data_size));
+	device->save_item( NAME(doc->extra_area_size));
+	device->save_pointer( NAME(doc->data[0]), doc->data_size[0]);
+	device->save_pointer( NAME(doc->data[1]), doc->data_size[1]);
+	device->save_pointer( NAME(doc->data[2]), doc->data_size[2]);
 }
 
 static DEVICE_STOP( diskonchip_g3 )

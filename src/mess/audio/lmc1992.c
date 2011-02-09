@@ -146,18 +146,18 @@ static DEVICE_START( lmc1992 )
 
 	/* register for state saving */
 
-	state_save_register_device_item(device, 0, lmc1992->enable);
-	state_save_register_device_item(device, 0, lmc1992->data);
-	state_save_register_device_item(device, 0, lmc1992->clock);
-	state_save_register_device_item(device, 0, lmc1992->si);
-	state_save_register_device_item(device, 0, lmc1992->input);
-	state_save_register_device_item(device, 0, lmc1992->bass);
-	state_save_register_device_item(device, 0, lmc1992->treble);
-	state_save_register_device_item(device, 0, lmc1992->volume);
-	state_save_register_device_item(device, 0, lmc1992->fader_rf);
-	state_save_register_device_item(device, 0, lmc1992->fader_lf);
-	state_save_register_device_item(device, 0, lmc1992->fader_rr);
-	state_save_register_device_item(device, 0, lmc1992->fader_lr);
+	device->save_item(NAME(lmc1992->enable));
+	device->save_item(NAME(lmc1992->data));
+	device->save_item(NAME(lmc1992->clock));
+	device->save_item(NAME(lmc1992->si));
+	device->save_item(NAME(lmc1992->input));
+	device->save_item(NAME(lmc1992->bass));
+	device->save_item(NAME(lmc1992->treble));
+	device->save_item(NAME(lmc1992->volume));
+	device->save_item(NAME(lmc1992->fader_rf));
+	device->save_item(NAME(lmc1992->fader_lf));
+	device->save_item(NAME(lmc1992->fader_rr));
+	device->save_item(NAME(lmc1992->fader_lr));
 }
 
 DEVICE_GET_INFO( lmc1992 )

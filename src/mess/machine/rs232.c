@@ -216,13 +216,13 @@ static DEVICE_START( rs232 )
 	rs232_t *rs232 = get_safe_token(device);
 
 	/* register for state saving */
-	state_save_register_device_item(device, 0, rs232->data);
-	state_save_register_device_item(device, 0, rs232->dcd);
-	state_save_register_device_item(device, 0, rs232->dtr);
-	state_save_register_device_item(device, 0, rs232->dsr);
-	state_save_register_device_item(device, 0, rs232->rts);
-	state_save_register_device_item(device, 0, rs232->cts);
-	state_save_register_device_item(device, 0, rs232->ri);
+	device->save_item(NAME(rs232->data));
+	device->save_item(NAME(rs232->dcd));
+	device->save_item(NAME(rs232->dtr));
+	device->save_item(NAME(rs232->dsr));
+	device->save_item(NAME(rs232->rts));
+	device->save_item(NAME(rs232->cts));
+	device->save_item(NAME(rs232->ri));
 }
 
 /*-------------------------------------------------

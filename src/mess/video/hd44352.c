@@ -112,28 +112,28 @@ void hd44352_device::device_start()
 	m_on_timer = timer_alloc(ON_TIMER);
 	m_on_timer->adjust(attotime::from_hz(m_clock/16384), 0, attotime::from_hz(m_clock/16384));
 
-	state_save_register_device_item( this, 0, m_control_lines);
-	state_save_register_device_item( this, 0, m_data_bus);
-	state_save_register_device_item( this, 0, m_state);
-	state_save_register_device_item( this, 0, m_offset);
-	state_save_register_device_item( this, 0, m_char_width);
-	state_save_register_device_item( this, 0, m_bank);
-	state_save_register_device_item( this, 0, m_lcd_on);
-	state_save_register_device_item( this, 0, m_scroll);
-	state_save_register_device_item( this, 0, m_contrast);
-	state_save_register_device_item( this, 0, m_byte_count);
-	state_save_register_device_item( this, 0, m_cursor_status);
-	state_save_register_device_item( this, 0, m_cursor_x);
-	state_save_register_device_item( this, 0, m_cursor_y);
-	state_save_register_device_item( this, 0, m_cursor_lcd);
-	state_save_register_device_item_array( this, 0, m_video_ram[0]);
-	state_save_register_device_item_array( this, 0, m_video_ram[1]);
-	state_save_register_device_item_array( this, 0, m_par);
-	state_save_register_device_item_array( this, 0, m_cursor);
-	state_save_register_device_item_array( this, 0, m_custom_char[0]);
-	state_save_register_device_item_array( this, 0, m_custom_char[1]);
-	state_save_register_device_item_array( this, 0, m_custom_char[2]);
-	state_save_register_device_item_array( this, 0, m_custom_char[3]);
+	save_item( NAME(m_control_lines));
+	save_item( NAME(m_data_bus));
+	save_item( NAME(m_state));
+	save_item( NAME(m_offset));
+	save_item( NAME(m_char_width));
+	save_item( NAME(m_bank));
+	save_item( NAME(m_lcd_on));
+	save_item( NAME(m_scroll));
+	save_item( NAME(m_contrast));
+	save_item( NAME(m_byte_count));
+	save_item( NAME(m_cursor_status));
+	save_item( NAME(m_cursor_x));
+	save_item( NAME(m_cursor_y));
+	save_item( NAME(m_cursor_lcd));
+	save_item( NAME(m_video_ram[0]));
+	save_item( NAME(m_video_ram[1]));
+	save_item( NAME(m_par));
+	save_item( NAME(m_cursor));
+	save_item( NAME(m_custom_char[0]));
+	save_item( NAME(m_custom_char[1]));
+	save_item( NAME(m_custom_char[2]));
+	save_item( NAME(m_custom_char[3]));
 }
 
 

@@ -192,12 +192,12 @@ void zx8301_device::device_start()
 	m_flash_timer->adjust(attotime::from_hz(2), 0, attotime::from_hz(2));
 
 	// register for state saving
-	state_save_register_device_item(this, 0, m_dispoff);
-	state_save_register_device_item(this, 0, m_mode8);
-	state_save_register_device_item(this, 0, m_base);
- 	state_save_register_device_item(this, 0, m_flash);
-	state_save_register_device_item(this, 0, m_vsync);
-	state_save_register_device_item(this, 0, m_vda);
+	save_item(NAME(m_dispoff));
+	save_item(NAME(m_mode8));
+	save_item(NAME(m_base));
+ 	save_item(NAME(m_flash));
+	save_item(NAME(m_vsync));
+	save_item(NAME(m_vda));
 }
 
 

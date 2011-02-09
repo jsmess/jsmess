@@ -293,12 +293,12 @@ static DEVICE_START( hd44102 )
 	assert(hd44102->screen != NULL);
 
 	/* register for state saving */
-	state_save_register_device_item(device, 0, hd44102->cs2);
-	state_save_register_device_item(device, 0, hd44102->status);
-	state_save_register_device_item(device, 0, hd44102->output);
-	state_save_register_device_item(device, 0, hd44102->page);
-	state_save_register_device_item(device, 0, hd44102->x);
-	state_save_register_device_item(device, 0, hd44102->y);
+	device->save_item(NAME(hd44102->cs2));
+	device->save_item(NAME(hd44102->status));
+	device->save_item(NAME(hd44102->output));
+	device->save_item(NAME(hd44102->page));
+	device->save_item(NAME(hd44102->x));
+	device->save_item(NAME(hd44102->y));
 }
 
 /*-------------------------------------------------

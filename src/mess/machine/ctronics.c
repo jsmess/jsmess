@@ -105,11 +105,11 @@ static DEVICE_START( centronics )
 	devcb_resolve_write_line(&centronics->out_not_busy_func, &intf->out_not_busy_func, device);
 
 	/* register for state saving */
-	state_save_register_device_item(device, 0, centronics->auto_fd);
-	state_save_register_device_item(device, 0, centronics->strobe);
-	state_save_register_device_item(device, 0, centronics->busy);
-	state_save_register_device_item(device, 0, centronics->ack);
-	state_save_register_device_item(device, 0, centronics->data);
+	device->save_item(NAME(centronics->auto_fd));
+	device->save_item(NAME(centronics->strobe));
+	device->save_item(NAME(centronics->busy));
+	device->save_item(NAME(centronics->ack));
+	device->save_item(NAME(centronics->data));
 }
 
 static DEVICE_RESET( centronics )

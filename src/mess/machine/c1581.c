@@ -463,12 +463,12 @@ static DEVICE_START( c1581 )
 	c1581->image = device->subdevice(FLOPPY_0);
 
 	/* register for state saving */
-	state_save_register_device_item(device, 0, c1581->address);
-	state_save_register_device_item(device, 0, c1581->data_out);
-	state_save_register_device_item(device, 0, c1581->atn_ack);
-	state_save_register_device_item(device, 0, c1581->ser_dir);
-	state_save_register_device_item(device, 0, c1581->sp_out);
-	state_save_register_device_item(device, 0, c1581->cnt_out);
+	device->save_item(NAME(c1581->address));
+	device->save_item(NAME(c1581->data_out));
+	device->save_item(NAME(c1581->atn_ack));
+	device->save_item(NAME(c1581->ser_dir));
+	device->save_item(NAME(c1581->sp_out));
+	device->save_item(NAME(c1581->cnt_out));
 }
 
 /*-------------------------------------------------

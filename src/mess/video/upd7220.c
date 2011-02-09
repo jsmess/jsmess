@@ -1109,32 +1109,32 @@ static DEVICE_START( upd7220 )
 	}
 
 	/* register for state saving */
-	state_save_register_device_item_array(device, 0, upd7220->ra);
-	state_save_register_device_item(device, 0, upd7220->sr);
-	state_save_register_device_item(device, 0, upd7220->mode);
-	state_save_register_device_item(device, 0, upd7220->de);
-	state_save_register_device_item(device, 0, upd7220->aw);
-	state_save_register_device_item(device, 0, upd7220->al);
-	state_save_register_device_item(device, 0, upd7220->vs);
-	state_save_register_device_item(device, 0, upd7220->vfp);
-	state_save_register_device_item(device, 0, upd7220->vbp);
-	state_save_register_device_item(device, 0, upd7220->hs);
-	state_save_register_device_item(device, 0, upd7220->hfp);
-	state_save_register_device_item(device, 0, upd7220->hbp);
-	state_save_register_device_item(device, 0, upd7220->m);
-	state_save_register_device_item(device, 0, upd7220->dc);
-	state_save_register_device_item(device, 0, upd7220->sc);
-	state_save_register_device_item(device, 0, upd7220->br);
-	state_save_register_device_item(device, 0, upd7220->lr);
-	state_save_register_device_item(device, 0, upd7220->ctop);
-	state_save_register_device_item(device, 0, upd7220->cbot);
-	state_save_register_device_item(device, 0, upd7220->ead);
-	state_save_register_device_item(device, 0, upd7220->dad);
-	state_save_register_device_item(device, 0, upd7220->lad);
-	state_save_register_device_item(device, 0, upd7220->disp);
-	state_save_register_device_item(device, 0, upd7220->gchr);
-	state_save_register_device_item(device, 0, upd7220->mask);
-	state_save_register_device_item(device, 0, upd7220->pitch);
+	device->save_item(NAME(upd7220->ra));
+	device->save_item(NAME(upd7220->sr));
+	device->save_item(NAME(upd7220->mode));
+	device->save_item(NAME(upd7220->de));
+	device->save_item(NAME(upd7220->aw));
+	device->save_item(NAME(upd7220->al));
+	device->save_item(NAME(upd7220->vs));
+	device->save_item(NAME(upd7220->vfp));
+	device->save_item(NAME(upd7220->vbp));
+	device->save_item(NAME(upd7220->hs));
+	device->save_item(NAME(upd7220->hfp));
+	device->save_item(NAME(upd7220->hbp));
+	device->save_item(NAME(upd7220->m));
+	device->save_item(NAME(upd7220->dc));
+	device->save_item(NAME(upd7220->sc));
+	device->save_item(NAME(upd7220->br));
+	device->save_item(NAME(upd7220->lr));
+	device->save_item(NAME(upd7220->ctop));
+	device->save_item(NAME(upd7220->cbot));
+	device->save_item(NAME(upd7220->ead));
+	device->save_item(NAME(upd7220->dad));
+	device->save_item(NAME(upd7220->lad));
+	device->save_item(NAME(upd7220->disp));
+	device->save_item(NAME(upd7220->gchr));
+	device->save_item(NAME(upd7220->mask));
+	device->save_item(NAME(upd7220->pitch));
 }
 
 /*-------------------------------------------------

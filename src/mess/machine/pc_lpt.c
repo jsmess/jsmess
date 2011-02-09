@@ -87,12 +87,12 @@ static DEVICE_START( pc_lpt )
 	devcb_resolve_write_line(&lpt->out_irq_func, &intf->out_irq_func, device);
 
 	/* register for state saving */
-	state_save_register_device_item(device, 0, lpt->ack);
-	state_save_register_device_item(device, 0, lpt->strobe);
-	state_save_register_device_item(device, 0, lpt->autofd);
-	state_save_register_device_item(device, 0, lpt->init);
-	state_save_register_device_item(device, 0, lpt->select);
-	state_save_register_device_item(device, 0, lpt->irq_enabled);
+	device->save_item(NAME(lpt->ack));
+	device->save_item(NAME(lpt->strobe));
+	device->save_item(NAME(lpt->autofd));
+	device->save_item(NAME(lpt->init));
+	device->save_item(NAME(lpt->select));
+	device->save_item(NAME(lpt->irq_enabled));
 }
 
 static DEVICE_RESET( pc_lpt )

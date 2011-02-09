@@ -298,7 +298,7 @@ static DEVICE_START( ieee488 )
 	ieee488->daisy_state = head;
 
 	/* register for state saving */
-//  state_save_register_device_item(device, 0, ieee488->);
+//  device->save_item(NAME(ieee488->));
 }
 
 /*-------------------------------------------------

@@ -324,15 +324,15 @@ static DEVICE_START( msm58321 )
 	msm58321->busy_timer->adjust(attotime::zero, 0, attotime::from_hz(2));
 
 	/* register for state saving */
-	state_save_register_device_item(device, 0, msm58321->cs1);
-	state_save_register_device_item(device, 0, msm58321->cs2);
-	state_save_register_device_item(device, 0, msm58321->busy);
-	state_save_register_device_item(device, 0, msm58321->read);
-	state_save_register_device_item(device, 0, msm58321->write);
-	state_save_register_device_item(device, 0, msm58321->address_write);
-	state_save_register_device_item_array(device, 0, msm58321->reg);
-	state_save_register_device_item(device, 0, msm58321->latch);
-	state_save_register_device_item(device, 0, msm58321->address);
+	device->save_item(NAME(msm58321->cs1));
+	device->save_item(NAME(msm58321->cs2));
+	device->save_item(NAME(msm58321->busy));
+	device->save_item(NAME(msm58321->read));
+	device->save_item(NAME(msm58321->write));
+	device->save_item(NAME(msm58321->address_write));
+	device->save_item(NAME(msm58321->reg));
+	device->save_item(NAME(msm58321->latch));
+	device->save_item(NAME(msm58321->address));
 }
 
 /*-------------------------------------------------

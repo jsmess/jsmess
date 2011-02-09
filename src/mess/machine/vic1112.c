@@ -317,8 +317,8 @@ static DEVICE_START( vic1112 )
 	ieee488_ren_w(vic1112->bus, device, 0);
 
 	/* register for state saving */
-	state_save_register_device_item(device, 0, vic1112->via0_irq);
-	state_save_register_device_item(device, 0, vic1112->via1_irq);
+	device->save_item(NAME(vic1112->via0_irq));
+	device->save_item(NAME(vic1112->via1_irq));
 }
 
 /*-------------------------------------------------

@@ -140,15 +140,15 @@ void crt9212_device::device_start()
 	devcb_resolve_read_line(&m_in_wen2_func, &m_config.in_wen2_func, this);
 
 	// register for state saving
-	state_save_register_device_item(this, 0, m_input);
-	state_save_register_device_item(this, 0, m_output);
-	state_save_register_device_item(this, 0, m_buffer);
-	state_save_register_device_item(this, 0, m_rac);
-	state_save_register_device_item(this, 0, m_wac);
-	state_save_register_device_item(this, 0, m_tog);
-	state_save_register_device_item(this, 0, m_clrcnt);
-	state_save_register_device_item(this, 0, m_rclk);
-	state_save_register_device_item(this, 0, m_wclk);
+	save_item(NAME(m_input));
+	save_item(NAME(m_output));
+	save_item(NAME(m_buffer));
+	save_item(NAME(m_rac));
+	save_item(NAME(m_wac));
+	save_item(NAME(m_tog));
+	save_item(NAME(m_clrcnt));
+	save_item(NAME(m_rclk));
+	save_item(NAME(m_wclk));
 }
 
 

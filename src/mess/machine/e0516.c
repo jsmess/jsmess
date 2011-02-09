@@ -219,14 +219,14 @@ static DEVICE_START( e0516 )
 	e0516->clock_timer->adjust(attotime::zero, 0, attotime::from_hz(device->clock() / 32768));
 
 	/* register for state saving */
-	state_save_register_device_item(device, 0, e0516->cs);
-	state_save_register_device_item(device, 0, e0516->data_latch);
-	state_save_register_device_item(device, 0, e0516->reg_latch);
-	state_save_register_device_item(device, 0, e0516->read_write);
-	state_save_register_device_item(device, 0, e0516->state);
-	state_save_register_device_item(device, 0, e0516->bits);
-	state_save_register_device_item(device, 0, e0516->dio);
-	state_save_register_device_item_array(device, 0, e0516->reg);
+	device->save_item(NAME(e0516->cs));
+	device->save_item(NAME(e0516->data_latch));
+	device->save_item(NAME(e0516->reg_latch));
+	device->save_item(NAME(e0516->read_write));
+	device->save_item(NAME(e0516->state));
+	device->save_item(NAME(e0516->bits));
+	device->save_item(NAME(e0516->dio));
+	device->save_item(NAME(e0516->reg));
 }
 
 /*-------------------------------------------------

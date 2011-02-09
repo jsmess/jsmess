@@ -1410,42 +1410,42 @@ static DEVICE_START( ted7360 )
 
 	ted7360_sound_start(device);
 
-	state_save_register_device_item_array(device, 0, ted7360->reg);
+	device->save_item(NAME(ted7360->reg));
 
-	state_save_register_device_item_bitmap(device, 0, ted7360->bitmap);
+	device->save_item(NAME(*ted7360->bitmap));
 
-	state_save_register_device_item(device, 0, ted7360->rom);
-	state_save_register_device_item(device, 0, ted7360->lines);
-	state_save_register_device_item(device, 0, ted7360->chargenaddr);
-	state_save_register_device_item(device, 0, ted7360->bitmapaddr);
-	state_save_register_device_item(device, 0, ted7360->videoaddr);
-	state_save_register_device_item(device, 0, ted7360->timer1_active);
-	state_save_register_device_item(device, 0, ted7360->timer2_active);
-	state_save_register_device_item(device, 0, ted7360->timer3_active);
-	state_save_register_device_item(device, 0, ted7360->cursor1);
-	state_save_register_device_item(device, 0, ted7360->rasterline);
-	state_save_register_device_item(device, 0, ted7360->lastline);
-	state_save_register_device_item(device, 0, ted7360->rastertime);
-	state_save_register_device_item(device, 0, ted7360->frame_count);
-	state_save_register_device_item(device, 0, ted7360->x_begin);
-	state_save_register_device_item(device, 0, ted7360->x_end);
-	state_save_register_device_item(device, 0, ted7360->y_begin);
-	state_save_register_device_item(device, 0, ted7360->y_end);
+	device->save_item(NAME(ted7360->rom));
+	device->save_item(NAME(ted7360->lines));
+	device->save_item(NAME(ted7360->chargenaddr));
+	device->save_item(NAME(ted7360->bitmapaddr));
+	device->save_item(NAME(ted7360->videoaddr));
+	device->save_item(NAME(ted7360->timer1_active));
+	device->save_item(NAME(ted7360->timer2_active));
+	device->save_item(NAME(ted7360->timer3_active));
+	device->save_item(NAME(ted7360->cursor1));
+	device->save_item(NAME(ted7360->rasterline));
+	device->save_item(NAME(ted7360->lastline));
+	device->save_item(NAME(ted7360->rastertime));
+	device->save_item(NAME(ted7360->frame_count));
+	device->save_item(NAME(ted7360->x_begin));
+	device->save_item(NAME(ted7360->x_end));
+	device->save_item(NAME(ted7360->y_begin));
+	device->save_item(NAME(ted7360->y_end));
 
-	state_save_register_device_item_array(device, 0, ted7360->c16_bitmap);
-	state_save_register_device_item_array(device, 0, ted7360->bitmapmulti);
-	state_save_register_device_item_array(device, 0, ted7360->mono);
-	state_save_register_device_item_array(device, 0, ted7360->monoinversed);
-	state_save_register_device_item_array(device, 0, ted7360->multi);
-	state_save_register_device_item_array(device, 0, ted7360->ecmcolor);
-	state_save_register_device_item_array(device, 0, ted7360->colors);
+	device->save_item(NAME(ted7360->c16_bitmap));
+	device->save_item(NAME(ted7360->bitmapmulti));
+	device->save_item(NAME(ted7360->mono));
+	device->save_item(NAME(ted7360->monoinversed));
+	device->save_item(NAME(ted7360->multi));
+	device->save_item(NAME(ted7360->ecmcolor));
+	device->save_item(NAME(ted7360->colors));
 
-	state_save_register_device_item(device, 0, ted7360->tone1pos);
-	state_save_register_device_item(device, 0, ted7360->tone2pos);
-	state_save_register_device_item(device, 0, ted7360->tone1samples);
-	state_save_register_device_item(device, 0, ted7360->tone2samples);
-	state_save_register_device_item(device, 0, ted7360->noisepos);
-	state_save_register_device_item(device, 0, ted7360->noisesamples);
+	device->save_item(NAME(ted7360->tone1pos));
+	device->save_item(NAME(ted7360->tone2pos));
+	device->save_item(NAME(ted7360->tone1samples));
+	device->save_item(NAME(ted7360->tone2samples));
+	device->save_item(NAME(ted7360->noisepos));
+	device->save_item(NAME(ted7360->noisesamples));
 }
 
 static DEVICE_RESET( ted7360 )

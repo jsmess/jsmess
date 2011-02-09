@@ -418,11 +418,11 @@ static DEVICE_START( abc77 )
 	abc77->reset_timer = device->machine->scheduler().timer_alloc(FUNC(reset_tick), (FPTR *) device);
 
 	/* register for state saving */
-	state_save_register_device_item(device, 0, abc77->keylatch);
-	state_save_register_device_item(device, 0, abc77->clock);
-	state_save_register_device_item(device, 0, abc77->hys);
-	state_save_register_device_item(device, 0, abc77->txd);
-	state_save_register_device_item(device, 0, abc77->reset);
+	device->save_item(NAME(abc77->keylatch));
+	device->save_item(NAME(abc77->clock));
+	device->save_item(NAME(abc77->hys));
+	device->save_item(NAME(abc77->txd));
+	device->save_item(NAME(abc77->reset));
 }
 
 /*-------------------------------------------------

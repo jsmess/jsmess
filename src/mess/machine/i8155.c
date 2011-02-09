@@ -319,14 +319,14 @@ void i8155_device::device_start()
 	m_timer = timer_alloc();
 
 	// register for state saving
-	state_save_register_device_item(this, 0, m_io_m);
-	state_save_register_device_item(this, 0, m_ad);
-	state_save_register_device_item(this, 0, m_command);
-	state_save_register_device_item(this, 0, m_status);
-	state_save_register_device_item_array(this, 0, m_output);
-	state_save_register_device_item(this, 0, m_count_length);
-	state_save_register_device_item(this, 0, m_counter);
-	state_save_register_device_item(this, 0, m_to);
+	save_item(NAME(m_io_m));
+	save_item(NAME(m_ad));
+	save_item(NAME(m_command));
+	save_item(NAME(m_status));
+	save_item(NAME(m_output));
+	save_item(NAME(m_count_length));
+	save_item(NAME(m_counter));
+	save_item(NAME(m_to));
 }
 
 

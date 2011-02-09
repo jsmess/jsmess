@@ -629,23 +629,23 @@ static DEVICE_START( i8257 )
 	i8257->dma_timer->adjust(attotime::zero, 0, attotime::from_hz(device->clock()));
 
 	/* register for state saving */
-	state_save_register_device_item(device, 0, i8257->mr);
-	state_save_register_device_item(device, 0, i8257->sr);
-	state_save_register_device_item_array(device, 0, i8257->ar);
-	state_save_register_device_item_array(device, 0, i8257->cr);
-	state_save_register_device_item(device, 0, i8257->fl);
-	state_save_register_device_item_array(device, 0, i8257->drq);
-	state_save_register_device_item(device, 0, i8257->hlda);
-	state_save_register_device_item(device, 0, i8257->ready);
-	state_save_register_device_item(device, 0, i8257->tc);
-	state_save_register_device_item(device, 0, i8257->mark);
-	state_save_register_device_item(device, 0, i8257->state);
-	state_save_register_device_item(device, 0, i8257->channel);
-	state_save_register_device_item(device, 0, i8257->priority);
-	state_save_register_device_item(device, 0, i8257->data);
-	state_save_register_device_item(device, 0, i8257->address);
-	state_save_register_device_item(device, 0, i8257->count);
-	state_save_register_device_item(device, 0, i8257->mode);
+	device->save_item(NAME(i8257->mr));
+	device->save_item(NAME(i8257->sr));
+	device->save_item(NAME(i8257->ar));
+	device->save_item(NAME(i8257->cr));
+	device->save_item(NAME(i8257->fl));
+	device->save_item(NAME(i8257->drq));
+	device->save_item(NAME(i8257->hlda));
+	device->save_item(NAME(i8257->ready));
+	device->save_item(NAME(i8257->tc));
+	device->save_item(NAME(i8257->mark));
+	device->save_item(NAME(i8257->state));
+	device->save_item(NAME(i8257->channel));
+	device->save_item(NAME(i8257->priority));
+	device->save_item(NAME(i8257->data));
+	device->save_item(NAME(i8257->address));
+	device->save_item(NAME(i8257->count));
+	device->save_item(NAME(i8257->mode));
 }
 
 /*-------------------------------------------------

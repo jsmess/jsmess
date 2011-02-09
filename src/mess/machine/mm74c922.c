@@ -215,13 +215,13 @@ static DEVICE_START( mm74c922 )
 	mm74c922->scan_timer->adjust(attotime::zero, 0, attotime::from_hz(50));
 
 	/* register for state saving */
-	state_save_register_device_item(device, 0, mm74c922->inhibit);
-	state_save_register_device_item(device, 0, mm74c922->x);
-	state_save_register_device_item(device, 0, mm74c922->y);
-	state_save_register_device_item(device, 0, mm74c922->max_y);
-	state_save_register_device_item(device, 0, mm74c922->data);
-	state_save_register_device_item(device, 0, mm74c922->da);
-	state_save_register_device_item(device, 0, mm74c922->next_da);
+	device->save_item(NAME(mm74c922->inhibit));
+	device->save_item(NAME(mm74c922->x));
+	device->save_item(NAME(mm74c922->y));
+	device->save_item(NAME(mm74c922->max_y));
+	device->save_item(NAME(mm74c922->data));
+	device->save_item(NAME(mm74c922->da));
+	device->save_item(NAME(mm74c922->next_da));
 }
 
 /*-------------------------------------------------

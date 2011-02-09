@@ -153,8 +153,8 @@ static DEVICE_START( ay3600 )
 	ay3600->scan_timer->adjust(attotime::zero, 0, attotime::from_hz(60));
 
 	/* register for state saving */
-	state_save_register_device_item(device, 0, ay3600->b);
-	state_save_register_device_item(device, 0, ay3600->ako);
+	device->save_item(NAME(ay3600->b));
+	device->save_item(NAME(ay3600->ako));
 }
 
 /*-------------------------------------------------

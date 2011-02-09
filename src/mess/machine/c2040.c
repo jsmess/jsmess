@@ -1548,32 +1548,32 @@ static DEVICE_START( c2040 )
 	c2040->bit_timer = device->machine->scheduler().timer_alloc(FUNC(bit_tick), (void *)device);
 
 	/* register for state saving */
-	state_save_register_device_item(device, 0, c2040->drive);
-	state_save_register_device_item(device, 0, c2040->side);
-	state_save_register_device_item(device, 0, c2040->address);
-	state_save_register_device_item(device, 0, c2040->rfdo);
-	state_save_register_device_item(device, 0, c2040->daco);
-	state_save_register_device_item(device, 0, c2040->atna);
-	state_save_register_device_item(device, 0, c2040->ds);
-	state_save_register_device_item(device, 0, c2040->bit_count);
-	state_save_register_device_item(device, 0, c2040->sr);
-	state_save_register_device_item(device, 0, c2040->pi);
-	state_save_register_device_item(device, 0, c2040->i);
-	state_save_register_device_item(device, 0, c2040->e);
-	state_save_register_device_item(device, 0, c2040->ready);
-	state_save_register_device_item(device, 0, c2040->mode);
-	state_save_register_device_item(device, 0, c2040->rw);
-	state_save_register_device_item(device, 0, c2040->miot_irq);
-	state_save_register_device_item(device, 0, c2040->unit[0].stp);
-	state_save_register_device_item(device, 0, c2040->unit[0].mtr);
-	state_save_register_device_item(device, 0, c2040->unit[0].track_len);
-	state_save_register_device_item(device, 0, c2040->unit[0].buffer_pos);
-	state_save_register_device_item(device, 0, c2040->unit[0].bit_pos);
-	state_save_register_device_item(device, 0, c2040->unit[1].stp);
-	state_save_register_device_item(device, 0, c2040->unit[1].mtr);
-	state_save_register_device_item(device, 0, c2040->unit[1].track_len);
-	state_save_register_device_item(device, 0, c2040->unit[1].buffer_pos);
-	state_save_register_device_item(device, 0, c2040->unit[1].bit_pos);
+	device->save_item(NAME(c2040->drive));
+	device->save_item(NAME(c2040->side));
+	device->save_item(NAME(c2040->address));
+	device->save_item(NAME(c2040->rfdo));
+	device->save_item(NAME(c2040->daco));
+	device->save_item(NAME(c2040->atna));
+	device->save_item(NAME(c2040->ds));
+	device->save_item(NAME(c2040->bit_count));
+	device->save_item(NAME(c2040->sr));
+	device->save_item(NAME(c2040->pi));
+	device->save_item(NAME(c2040->i));
+	device->save_item(NAME(c2040->e));
+	device->save_item(NAME(c2040->ready));
+	device->save_item(NAME(c2040->mode));
+	device->save_item(NAME(c2040->rw));
+	device->save_item(NAME(c2040->miot_irq));
+	device->save_item(NAME(c2040->unit[0].stp));
+	device->save_item(NAME(c2040->unit[0].mtr));
+	device->save_item(NAME(c2040->unit[0].track_len));
+	device->save_item(NAME(c2040->unit[0].buffer_pos));
+	device->save_item(NAME(c2040->unit[0].bit_pos));
+	device->save_item(NAME(c2040->unit[1].stp));
+	device->save_item(NAME(c2040->unit[1].mtr));
+	device->save_item(NAME(c2040->unit[1].track_len));
+	device->save_item(NAME(c2040->unit[1].buffer_pos));
+	device->save_item(NAME(c2040->unit[1].bit_pos));
 }
 
 /*-------------------------------------------------

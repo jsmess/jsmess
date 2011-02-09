@@ -210,19 +210,19 @@ void hd61830_device::device_start()
 	m_screen = machine->device<screen_device>(m_config.screen_tag);
 
 	// register for state saving
-	state_save_register_device_item(this, 0, m_bf);
-	state_save_register_device_item(this, 0, m_ir);
-	state_save_register_device_item(this, 0, m_mcr);
- 	state_save_register_device_item(this, 0, m_dor);
-	state_save_register_device_item(this, 0, m_cac);
-	state_save_register_device_item(this, 0, m_dsa);
-	state_save_register_device_item(this, 0, m_vp);
-	state_save_register_device_item(this, 0, m_hp);
-	state_save_register_device_item(this, 0, m_hn);
-	state_save_register_device_item(this, 0, m_nx);
-	state_save_register_device_item(this, 0, m_cp);
-	state_save_register_device_item(this, 0, m_blink);
-	state_save_register_device_item(this, 0, m_cursor);
+	save_item(NAME(m_bf));
+	save_item(NAME(m_ir));
+	save_item(NAME(m_mcr));
+ 	save_item(NAME(m_dor));
+	save_item(NAME(m_cac));
+	save_item(NAME(m_dsa));
+	save_item(NAME(m_vp));
+	save_item(NAME(m_hp));
+	save_item(NAME(m_hn));
+	save_item(NAME(m_nx));
+	save_item(NAME(m_cp));
+	save_item(NAME(m_blink));
+	save_item(NAME(m_cursor));
 }
 
 

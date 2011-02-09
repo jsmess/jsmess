@@ -729,22 +729,22 @@ static DEVICE_START( c1551 )
 	memory_install_readwrite8_device_handler(program, c1551->tpi1, start_address, start_address + 7, 0, 0, tpi6525_r, tpi6525_w);
 
 	/* register for state saving */
-	state_save_register_device_item(device, 0, c1551->tcbm_data);
-	state_save_register_device_item(device, 0, c1551->status);
-	state_save_register_device_item(device, 0, c1551->dav);
-	state_save_register_device_item(device, 0, c1551->ack);
-	state_save_register_device_item(device, 0, c1551->stp);
-	state_save_register_device_item(device, 0, c1551->mtr);
-	state_save_register_device_item(device, 0, c1551->track_len);
-	state_save_register_device_item(device, 0, c1551->buffer_pos);
-	state_save_register_device_item(device, 0, c1551->bit_pos);
-	state_save_register_device_item(device, 0, c1551->bit_count);
-	state_save_register_device_item(device, 0, c1551->data);
-	state_save_register_device_item(device, 0, c1551->yb);
-	state_save_register_device_item(device, 0, c1551->ds);
-	state_save_register_device_item(device, 0, c1551->soe);
-	state_save_register_device_item(device, 0, c1551->byte);
-	state_save_register_device_item(device, 0, c1551->mode);
+	device->save_item(NAME(c1551->tcbm_data));
+	device->save_item(NAME(c1551->status));
+	device->save_item(NAME(c1551->dav));
+	device->save_item(NAME(c1551->ack));
+	device->save_item(NAME(c1551->stp));
+	device->save_item(NAME(c1551->mtr));
+	device->save_item(NAME(c1551->track_len));
+	device->save_item(NAME(c1551->buffer_pos));
+	device->save_item(NAME(c1551->bit_pos));
+	device->save_item(NAME(c1551->bit_count));
+	device->save_item(NAME(c1551->data));
+	device->save_item(NAME(c1551->yb));
+	device->save_item(NAME(c1551->ds));
+	device->save_item(NAME(c1551->soe));
+	device->save_item(NAME(c1551->byte));
+	device->save_item(NAME(c1551->mode));
 }
 
 /*-------------------------------------------------

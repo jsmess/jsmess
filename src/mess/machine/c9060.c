@@ -515,7 +515,7 @@ static DEVICE_START( c9060 )
 	c9060->bus = device->machine->device(config->bus_tag);
 
 	/* register for state saving */
-//  state_save_register_device_item(device, 0, c9060->);
+//  device->save_item(NAME(c9060->));
 }
 
 /*-------------------------------------------------

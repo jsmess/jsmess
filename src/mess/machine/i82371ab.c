@@ -211,7 +211,7 @@ static DEVICE_START( i82371ab )
 	i82371ab_state *i82371ab = get_safe_token(device);
 
 	/* setup save states */
-	state_save_register_device_item_2d_array(device, 0, i82371ab->regs);
+	device->save_item(NAME(i82371ab->regs));
 }
 
 static DEVICE_RESET( i82371ab )
