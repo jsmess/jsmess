@@ -68,7 +68,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<device_t> m_ctc;
-	required_device<device_t> m_dart;
+	required_device<z80dart_device> m_dart;
 	required_device<device_t> m_sio;
 	required_device<device_t> m_discrete;
 	required_device<device_t> m_ram;
@@ -112,7 +112,6 @@ public:
 	// serial state
 	int m_sio_rxcb;
 	int m_sio_txcb;
-	int keylatch;
 };
 
 class abc800m_state : public abc800_state
@@ -164,7 +163,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<device_t> m_ctc;
-	required_device<device_t> m_dart;
+	required_device<z80dart_device> m_dart;
 	required_device<device_t> m_sio;
 	required_device<device_t> m_crtc;
 	optional_device<device_t> abc77;
@@ -197,6 +196,9 @@ public:
 
 	// sound state
 	int m_pling;				// pling
+
+	// fake keyboard state
+	int m_keylatch;
 };
 
 
@@ -219,7 +221,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<device_t> m_ctc;
-	required_device<device_t> m_dart;
+	required_device<z80dart_device> m_dart;
 	required_device<device_t> m_sio;
 	required_device<device_t> m_crtc;
 	required_device<device_t> m_rtc;
@@ -278,6 +280,9 @@ public:
 	UINT32 m_vsync_shift;		// vertical sync shift register
 	int m_vsync;				// vertical sync
 	int m_d_vsync;				// delayed vertical sync
+
+	// fake keyboard state
+	int m_keylatch;
 };
 
 

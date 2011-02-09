@@ -381,9 +381,8 @@ static const UINT8 abc800_keycodes[7*4][8] =
 	{ 0x5f, 0x09, 0x20, 0x00, 0x00, 0x00, 0x00, 0x00 }
 };
 
-static void scan_keyboard(running_machine *machine)
+static void scan_keyboard(running_machine *machine, z80dart_device *dart, int *keylatch)
 {
-	abc800_state *state = machine->driver_data<abc800_state>();
 	UINT8 keycode = 0;
 	UINT8 data;
 	int table = 0, row, col;
@@ -419,33 +418,40 @@ static void scan_keyboard(running_machine *machine)
 
 	if (keycode)
 	{
-		if (keycode != state->keylatch)
+		if (keycode != *keylatch)
 		{
-			z80dart_device *m_dart = machine->device<z80dart_device>(Z80DART_TAG);
+			dart->dcd_w(1, 0);
+			dart->receive_data(1, keycode);
 
-			z80dart_dcdb_w(m_dart, 0);
-			m_dart->receive_data(1, keycode);
-
-			state->keylatch = keycode;
+			*keylatch = keycode;
 		}
 	}
 	else
 	{
-		if (state->keylatch)
+		if (*keylatch)
 		{
-			z80dart_device *m_dart = machine->device<z80dart_device>(Z80DART_TAG);
+			dart->dcd_w(1, 1);
+			dart->receive_data(1, 0);
 
-			z80dart_dcdb_w(m_dart, 1);
-			m_dart->receive_data(1, 0);
-
-			state->keylatch = 0;
+			*keylatch = 0;
 		}
 	}
 }
 
-static TIMER_DEVICE_CALLBACK( keyboard_tick )
+
+static TIMER_DEVICE_CALLBACK( abc802_keyboard_tick )
 {
-	scan_keyboard(timer.machine);
+	abc802_state *state = timer.machine->driver_data<abc802_state>();
+
+	scan_keyboard(timer.machine, state->m_dart, &state->m_keylatch);
+}
+
+
+static TIMER_DEVICE_CALLBACK( abc806_keyboard_tick )
+{
+	abc806_state *state = timer.machine->driver_data<abc806_state>();
+
+	scan_keyboard(timer.machine, state->m_dart, &state->m_keylatch);
 }
 
 
@@ -827,7 +833,7 @@ WRITE8_MEMBER( abc800_state::keyboard_ctrl_w )
 	m_kb_txd = !BIT(data, 4);
 
 	// keydown
-	z80dart_dcdb_w(m_dart, !BIT(data, 5));
+	m_dart->dcd_w(1, !BIT(data, 5));
 
 	// strobe
 	m_kb_stb = BIT(data, 6);
@@ -1240,7 +1246,6 @@ static WRITE_LINE_DEVICE_HANDLER( ctc_z0_w )
 	abc800_state *drvstate = device->machine->driver_data<abc800_state>();
 	device_t *sio = device->machine->device(Z80SIO_TAG);
 
-
 	UINT8 sb = input_port_read(device->machine, "SB");
 
 	if (BIT(sb, 2))
@@ -1281,11 +1286,9 @@ static WRITE_LINE_DEVICE_HANDLER( ctc_z1_w )
 
 static WRITE_LINE_DEVICE_HANDLER( ctc_z2_w )
 {
-	device_t *m_dart = device->machine->device(Z80DART_TAG);
-
 	// connected to DART channel A clock inputs
-	z80dart_rxca_w(m_dart, state);
-	z80dart_txca_w(m_dart, state);
+	z80dart_rxca_w(device, state);
+	z80dart_txca_w(device, state);
 }
 
 static Z80CTC_INTERFACE( ctc_intf )
@@ -1294,7 +1297,7 @@ static Z80CTC_INTERFACE( ctc_intf )
 	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),	// interrupt handler
 	DEVCB_LINE(ctc_z0_w),							// ZC/TO0 callback
 	DEVCB_LINE(ctc_z1_w),							// ZC/TO1 callback
-	DEVCB_LINE(ctc_z2_w)    						// ZC/TO2 callback
+	DEVCB_DEVICE_LINE(Z80DART_TAG, ctc_z2_w)    	// ZC/TO2 callback
 };
 
 
@@ -1508,10 +1511,10 @@ void abc800_state::machine_reset()
 	m_fetch_charram = 0;
 	bankswitch();
 
-	z80dart_ria_w(m_dart, 1);
+	m_dart->ri_w(0, 1);
 
 	// 50/60 Hz
-	z80dart_ctsb_w(m_dart, 0); // 0 = 50Hz, 1 = 60Hz
+	m_dart->cts_w(1, 0); // 0 = 50Hz, 1 = 60Hz
 }
 
 
@@ -1524,6 +1527,7 @@ void abc802_state::machine_start()
 	// register for state saving
 	state_save_register_global(machine, m_lrs);
 	state_save_register_global(machine, m_pling);
+	state_save_register_global(machine, m_keylatch);
 }
 
 
@@ -1546,10 +1550,10 @@ void abc802_state::machine_reset()
 	z80dart_ctsb_w(m_sio, BIT(config, 1));
 
 	// 40/80 char (S3)
-	z80dart_ria_w(m_dart, BIT(config, 2)); // 0 = 40, 1 = 80
+	m_dart->ri_w(0, BIT(config, 2)); // 0 = 40, 1 = 80
 
 	// 50/60 Hz
-	z80dart_ctsb_w(m_dart, BIT(config, 3)); // 0 = 50Hz, 1 = 60Hz
+	m_dart->cts_w(1, BIT(config, 3)); // 0 = 50Hz, 1 = 60Hz
 }
 
 
@@ -1580,6 +1584,7 @@ void abc806_state::machine_start()
 	state_save_register_global(machine, m_eme);
 	state_save_register_global(machine, m_fetch_charram);
 	state_save_register_global_array(machine, m_map);
+	state_save_register_global(machine, m_keylatch);
 }
 
 
@@ -1610,10 +1615,10 @@ void abc806_state::machine_reset()
 	e0516_clk_w(m_rtc, 1);
 	e0516_dio_w(m_rtc, 1);
 
-	z80dart_ria_w(m_dart, 1);
+	m_dart->ri_w(0, 1);
 
 	// 50/60 Hz
-	z80dart_ctsb_w(m_dart, 0); // 0 = 50Hz, 1 = 60Hz
+	m_dart->cts_w(1, 0); // 0 = 50Hz, 1 = 60Hz
 }
 
 
@@ -1742,7 +1747,7 @@ static MACHINE_CONFIG_START( abc802, abc802_state )
 	MCFG_ABC834_ADD("luxor_55_21046", ABCBUS_TAG)
 
 	// fake keyboard
-	MCFG_TIMER_ADD_PERIODIC("keyboard", keyboard_tick, attotime::from_usec(2500))
+	MCFG_TIMER_ADD_PERIODIC("keyboard", abc802_keyboard_tick, attotime::from_usec(2500))
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
@@ -1782,7 +1787,7 @@ static MACHINE_CONFIG_START( abc806, abc806_state )
 	MCFG_ABC832_ADD("luxor_55_21046", ABCBUS_TAG, DRIVE_TEAC_FD55F)
 
 	// fake keyboard
-	MCFG_TIMER_ADD_PERIODIC("keyboard", keyboard_tick, attotime::from_usec(2500))
+	MCFG_TIMER_ADD_PERIODIC("keyboard", abc806_keyboard_tick, attotime::from_usec(2500))
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)

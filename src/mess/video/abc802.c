@@ -190,7 +190,7 @@ WRITE_LINE_MEMBER( abc802_state::vs_w )
 	}
 
 	// signal _DEW to DART
-	z80dart_rib_w(m_dart, !state);
+	m_dart->ri_w(1, !state);
 }
 
 
