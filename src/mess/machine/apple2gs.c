@@ -118,6 +118,7 @@
 #include "sound/es5503.h"
 #include "machine/ram.h"
 #include "debugger.h"
+#include "machine/ap2_slot.h"
 
 #define LOG_C0XX			0
 #define LOG_ADB				0
@@ -1507,22 +1508,70 @@ static UINT8 apple2gs_xxCxxx_r(running_machine *machine, offs_t address)
 	UINT8 result;
 	int slot;
 
-	if ((state->shadow & 0x40) && ((address & 0xF00000) == 0x000000))
+	if ((state->shadow & 0x40) && ((address & 0xF00000) == 0x000000))	// shadow all banks and C0xx?
 	{
 		result = ram_get_ptr(machine->device(RAM_TAG))[address];
 	}
-	else if ((address & 0x000F00) == 0x000000)
+	else if ((address & 0x000F00) == 0x000000)	// accessing C0xx?
 	{
+		state->a2_cnxx_slot = -1;
 		result = apple2gs_c0xx_r(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), address);
 	}
 	else
 	{
-		slot = (address & 0x000F00) / 0x100;
+		device_t *slotdevice;
 
-		if ((slot > 7) || ((state->sltromsel & (1 << slot)) == 0))
-			result = *apple2gs_getslotmem(machine, address);
-		else
-			result = apple2_getfloatingbusvalue(machine);
+		slot = (address & 0x000F00) / 0x100;
+		if (slot <= 7)	// slots 1-7, it's the slot
+		{
+			slotdevice = apple2_slot(machine, slot);
+
+			// is this slot internal or "Your Card"?
+			if ((state->sltromsel & (1 << slot)) == 0)
+			{
+				// accessing a slot mapped to internal, let's put back the internal ROM
+				state->a2_cnxx_slot = -1;
+			 	result = *apple2gs_getslotmem(machine, address);
+			}
+			else
+			{
+				// accessing a slot mapped to "Your Card", C800 should belong to that card
+				if (state->a2_cnxx_slot == -1)
+				{
+					state->a2_cnxx_slot = slot;
+				}
+
+				if (slotdevice != NULL)
+				{
+					result = apple2_slot_ROM_r(slotdevice, address&0xff);
+				}
+				else
+				{
+					result = apple2_getfloatingbusvalue(machine);
+				}
+			}
+		}
+		else	// C800-CFFF, not cards
+		{
+			slotdevice = NULL;
+
+			// if CFFF accessed, reset C800 area to internal ROM
+			if ((address & 0xfff) == 0xfff)
+			{
+				state->a2_cnxx_slot = -1;
+			}
+
+			slotdevice = apple2_slot(machine, state->a2_cnxx_slot);
+
+			if (slotdevice)
+			{
+				result = apple2_c800_slot_r(slotdevice, address&0x7ff); 
+			}
+			else
+			{
+				result = *apple2gs_getslotmem(machine, address);
+			}
+		}
 	}
 	return result;
 }
@@ -1533,6 +1582,12 @@ static void apple2gs_xxCxxx_w(running_machine *machine, offs_t address, UINT8 da
 {
 	apple2gs_state *state = machine->driver_data<apple2gs_state>();
 	int slot;
+
+	// if CFFF accessed, reset C800 area to internal ROM
+	if ((address & 0xfff) == 0xfff)
+	{
+		state->a2_cnxx_slot = -1;
+	}
 
 	if ((state->shadow & 0x40) && ((address & 0xF00000) == 0x000000))
 	{
@@ -1637,8 +1692,7 @@ static void apple2gs_setup_memory(running_machine *machine)
 
 	/* allocate memory for E00000-E1FFFF */
 	state->slowmem = auto_alloc_array_clear(machine, UINT8, 128*1024);
-
-	state_save_register_item_array(machine, "APPLE2GS_SLOWMEM", NULL, 0, state->slowmem);
+	state_save_register_item_pointer(machine, "APPLE2GS_SLOWMEM", NULL, 0, state->slowmem, 128*1024);
 
 	/* install expanded memory */
 	memory_install_readwrite_bank(space, 0x010000, ram_get_size(machine->device(RAM_TAG)) - 1, 0, 0, "bank1");
@@ -1758,7 +1812,7 @@ MACHINE_START( apple2gs )
 
 	/* save state stuff.  note that the driver takes care of docram. */
 	UINT8* ram = ram_get_ptr(machine->device(RAM_TAG));
-	state_save_register_global_array(machine, ram);
+	state_save_register_item_pointer(machine, "APPLE2GS_RAM", NULL, 0, ram, ram_get_size(machine->device(RAM_TAG)));
 
 	state_save_register_item(machine, "NEWVIDEO", NULL, 0, state->newvideo);
 
@@ -1781,13 +1835,13 @@ MACHINE_START( apple2gs )
 	state_save_register_item(machine, "CLKREG1", NULL,0, state->clock_reg1);
 	state_save_register_item(machine, "CLKCURTIME", NULL,0, state->clock_curtime);
 	state_save_register_item(machine, "CLKCURTIMEINT", NULL,0, state->clock_curtime_interval);
-	state_save_register_item(machine, "CLKMODE", NULL,0, state->clock_mode);
+//	state_save_register_item(machine, "CLKMODE", NULL,0, state->clock_mode);
 	state->save_item(NAME(state->clock_bram));
 
 	state->save_item(NAME(state->adb_memory));
 	state->save_item(NAME(state->adb_command_bytes));
 	state->save_item(NAME(state->adb_response_bytes));
-	state_save_register_item(machine, "ADB", NULL,0, state->adb_state);
+//	state_save_register_item(machine, "ADB", NULL,0, state->adb_state);
 	state_save_register_item(machine, "ADB", NULL,0, state->adb_command);
 	state_save_register_item(machine, "ADB", NULL,0, state->adb_mode);
 	state_save_register_item(machine, "ADB", NULL,0, state->adb_kmstatus);
