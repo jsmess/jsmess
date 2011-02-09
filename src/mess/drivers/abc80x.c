@@ -225,7 +225,7 @@ XR22-050-3B Pinout
 
     TODO:
 
-    - update Z80 DART/CTC/SIO references to use new device system
+    - update Z80 DART/CTC/SIO references to C++ style
     - rewrite abc806 bankswitch to use install_ram/rom
     - ABC800 keyboard: T1 clock frequency, caps lock led, keydown
     - ABC802/806 ABC77 keyboard
@@ -1241,63 +1241,54 @@ static TIMER_DEVICE_CALLBACK( ctc_tick )
 	z80ctc_trg2_w(z80ctc, 0);
 }
 
-static WRITE_LINE_DEVICE_HANDLER( ctc_z0_w )
+WRITE_LINE_MEMBER( abc800_state::ctc_z0_w )
 {
-	abc800_state *drvstate = device->machine->driver_data<abc800_state>();
-	device_t *sio = device->machine->device(Z80SIO_TAG);
-
-	UINT8 sb = input_port_read(device->machine, "SB");
-
-	if (BIT(sb, 2))
+	if (BIT(m_sb, 2))
 	{
 		// connected to SIO/2 TxCA, CTC CLK/TRG3
-		z80dart_txca_w(sio, state);
-		z80ctc_trg3_w(device, state);
+		z80dart_txca_w(m_sio, state);
+		z80ctc_trg3_w(m_ctc, state);
 	}
 
 	// connected to SIO/2 RxCB through a thingy
-	//drvstate->m_sio_rxcb = ?
-	z80dart_rxcb_w(sio, drvstate->m_sio_rxcb);
+	//m_sio_rxcb = ?
+	z80dart_rxcb_w(m_sio, m_sio_rxcb);
 
 	// connected to SIO/2 TxCB through a JK divide by 2
-	drvstate->m_sio_txcb = !drvstate->m_sio_txcb;
-	z80dart_txcb_w(sio, drvstate->m_sio_txcb);
+	m_sio_txcb = !m_sio_txcb;
+	z80dart_txcb_w(m_sio, m_sio_txcb);
 }
 
-static WRITE_LINE_DEVICE_HANDLER( ctc_z1_w )
+WRITE_LINE_MEMBER( abc800_state::ctc_z1_w )
 {
-	device_t *sio = device->machine->device(Z80SIO_TAG);
-
-	UINT8 sb = input_port_read(device->machine, "SB");
-
-	if (BIT(sb, 3))
+	if (BIT(m_sb, 3))
 	{
 		// connected to SIO/2 RxCA
-		z80dart_rxca_w(sio, state);
+		z80dart_rxca_w(m_sio, state);
 	}
 
-	if (BIT(sb, 4))
+	if (BIT(m_sb, 4))
 	{
 		// connected to SIO/2 TxCA, CTC CLK/TRG3
-		z80dart_txca_w(sio, state);
-		z80ctc_trg3_w(device, state);
+		z80dart_txca_w(m_sio, state);
+		z80ctc_trg3_w(m_ctc, state);
 	}
 }
 
-static WRITE_LINE_DEVICE_HANDLER( ctc_z2_w )
+WRITE_LINE_MEMBER( abc800_state::ctc_z2_w )
 {
 	// connected to DART channel A clock inputs
-	z80dart_rxca_w(device, state);
-	z80dart_txca_w(device, state);
+	z80dart_rxca_w(m_dart, state);
+	z80dart_txca_w(m_dart, state);
 }
 
 static Z80CTC_INTERFACE( ctc_intf )
 {
 	0,              								// timer disables
 	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),	// interrupt handler
-	DEVCB_LINE(ctc_z0_w),							// ZC/TO0 callback
-	DEVCB_LINE(ctc_z1_w),							// ZC/TO1 callback
-	DEVCB_DEVICE_LINE(Z80DART_TAG, ctc_z2_w)    	// ZC/TO2 callback
+	DEVCB_DRIVER_LINE_MEMBER(abc800_state, ctc_z0_w),	// ZC/TO0 callback
+	DEVCB_DRIVER_LINE_MEMBER(abc800_state, ctc_z1_w),	// ZC/TO1 callback
+	DEVCB_DRIVER_LINE_MEMBER(abc800_state, ctc_z2_w),	// ZC/TO2 callback
 };
 
 
@@ -1508,6 +1499,8 @@ void abc800_state::machine_start()
 
 void abc800_state::machine_reset()
 {
+	m_sb = input_port_read(machine, "SB");
+
 	m_fetch_charram = 0;
 	bankswitch();
 
@@ -1538,6 +1531,7 @@ void abc802_state::machine_start()
 void abc802_state::machine_reset()
 {
 	UINT8 config = input_port_read(machine, "CONFIG");
+	m_sb = input_port_read(machine, "SB");
 
 	// memory banking
 	m_lrs = 1;
@@ -1594,6 +1588,8 @@ void abc806_state::machine_start()
 
 void abc806_state::machine_reset()
 {
+	m_sb = input_port_read(machine, "SB");
+
 	// setup memory banking
 	int bank;
 	char bank_name[10];
@@ -1770,7 +1766,7 @@ static MACHINE_CONFIG_START( abc806, abc806_state )
 	MCFG_FRAGMENT_ADD(abc806_video)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+//  MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	// peripheral hardware
 	MCFG_E0516_ADD(E0516_TAG, ABC806_X02)

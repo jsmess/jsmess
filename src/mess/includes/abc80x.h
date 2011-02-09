@@ -70,7 +70,7 @@ public:
 	required_device<device_t> m_ctc;
 	required_device<z80dart_device> m_dart;
 	required_device<device_t> m_sio;
-	required_device<device_t> m_discrete;
+	optional_device<device_t> m_discrete;
 	required_device<device_t> m_ram;
 
 	virtual void machine_start();
@@ -88,6 +88,9 @@ public:
 	DECLARE_READ8_MEMBER( keyboard_t1_r );
 	DECLARE_WRITE8_MEMBER( hrs_w );
 	DECLARE_WRITE8_MEMBER( hrc_w );
+	DECLARE_WRITE_LINE_MEMBER( ctc_z0_w );
+	DECLARE_WRITE_LINE_MEMBER( ctc_z1_w );
+	DECLARE_WRITE_LINE_MEMBER( ctc_z2_w );
 
 	// cpu state
 	int m_fetch_charram;			// opcode fetched from character RAM region (0x7800-0x7fff)
@@ -110,6 +113,7 @@ public:
 	int m_pling;					// pling
 
 	// serial state
+	UINT8 m_sb;
 	int m_sio_rxcb;
 	int m_sio_txcb;
 };
@@ -146,29 +150,17 @@ public:
 
 // ======================> abc802_state
 
-class abc802_state : public driver_device
+class abc802_state : public abc800_state
 {
 public:
 	abc802_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config),
-		  m_maincpu(*this, Z80_TAG),
-		  m_ctc(*this, Z80CTC_TAG),
-		  m_dart(*this, Z80DART_TAG),
-		  m_sio(*this, Z80SIO_TAG),
+		: abc800_state(machine, config),
 		  m_crtc(*this, MC6845_TAG),
-		  abc77(*this, ABC77_TAG),
-		  m_discrete(*this, "discrete"),
-		  m_ram(*this, RAM_TAG)
+		  abc77(*this, ABC77_TAG)
 	{ }
 
-	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_ctc;
-	required_device<z80dart_device> m_dart;
-	required_device<device_t> m_sio;
 	required_device<device_t> m_crtc;
 	optional_device<device_t> abc77;
-	required_device<device_t> m_discrete;
-	required_device<device_t> m_ram;
 
 	virtual void machine_start();
 	virtual void machine_reset();
@@ -187,15 +179,11 @@ public:
 	int m_lrs;					// low RAM select
 
 	// video state
-	UINT8 *m_char_ram;			// character RAM
 	const UINT8 *m_char_rom;	// character generator ROM
 
 	int m_flshclk_ctr;			// flash clock counter
 	int m_flshclk;				// flash clock
 	int m_80_40_mux;			// 40/80 column mode
-
-	// sound state
-	int m_pling;				// pling
 
 	// fake keyboard state
 	int m_keylatch;
@@ -204,29 +192,19 @@ public:
 
 // ======================> abc806_state
 
-class abc806_state : public driver_device
+class abc806_state : public abc800_state
 {
 public:
 	abc806_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config),
-		  m_maincpu(*this, Z80_TAG),
-		  m_ctc(*this, Z80CTC_TAG),
-		  m_dart(*this, Z80DART_TAG),
-		  m_sio(*this, Z80SIO_TAG),
+		: abc800_state(machine, config),
 		  m_crtc(*this, MC6845_TAG),
 		  m_rtc(*this, E0516_TAG),
-		  abc77(*this, ABC77_TAG),
-		  m_ram(*this, RAM_TAG)
+		  abc77(*this, ABC77_TAG)
 	{ }
 
-	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_ctc;
-	required_device<z80dart_device> m_dart;
-	required_device<device_t> m_sio;
 	required_device<device_t> m_crtc;
 	required_device<device_t> m_rtc;
 	optional_device<device_t> abc77;
-	required_device<device_t> m_ram;
 
 	virtual void machine_start();
 	virtual void machine_reset();
@@ -260,9 +238,7 @@ public:
 	UINT8 m_map[16];			// memory page register
 
 	// video state
-	UINT8 *m_char_ram;			// character RAM
 	UINT8 *m_color_ram;			// attribute RAM
-	UINT8 *m_video_ram;			// HR video RAM
 	const UINT8 *m_rad_prom;	// line address PROM
 	const UINT8 *m_hru2_prom;	// HR palette PROM
 	const UINT8 *m_char_rom;	// character generator ROM
