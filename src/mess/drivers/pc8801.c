@@ -32,6 +32,7 @@
 	- Bishoujo Baseball Gakuen: checks ym2608 after intro screen;
 	- Blue Moon Story: moans with a kanji msg;.
 	- Bubblegum Crisis: crashes due of a spurious irq (works if you soft reset the emulation when it triggers the halt opcode);
+	- Can Can Bunny: bitmap artifacts on intro, could be either ALU or floppy issues;
 	- Grobda: palette is ugly (parent pc8801 only);
 	- Wanderers from Ys: user data disk looks screwed? It loads with everything as maximum as per now ...
 	- Xevious: game is too fast (parent pc8801 only)
@@ -1875,10 +1876,10 @@ static void pc8801_sound_irq( device_t *device, int irq )
 		pc8801_raise_irq(device->machine,1<<(4),1);
 }
 
-static TIMER_CALLBACK( pc8801_rtc_irq )
+static TIMER_DEVICE_CALLBACK( pc8801_rtc_irq )
 {
 	if(timer_irq_mask)
-		pc8801_raise_irq(machine,1<<(2),1);
+		pc8801_raise_irq(timer.machine,1<<(2),1);
 }
 
 static INTERRUPT_GEN( pc8801_vrtc_irq )
