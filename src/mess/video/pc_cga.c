@@ -102,6 +102,7 @@
 ***************************************************************************/
 
 static VIDEO_START( pc_cga );
+static VIDEO_START( pc_cga32k );
 static PALETTE_INIT( pc_cga );
 
 
@@ -202,6 +203,11 @@ MACHINE_CONFIG_FRAGMENT( pcvideo_cga )
 
 	MCFG_VIDEO_START( pc_cga )
 	MCFG_VIDEO_UPDATE( mc6845_cga )
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_FRAGMENT( pcvideo_cga32k )
+	MCFG_FRAGMENT_ADD( pcvideo_cga )
+	MCFG_VIDEO_START( pc_cga32k )
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_FRAGMENT( pcvideo_poisk2 )
@@ -461,10 +467,6 @@ static VIDEO_START( pc_cga )
 	address_space *space = cpu_get_address_space(machine->firstcpu, ADDRESS_SPACE_PROGRAM);
 	address_space *spaceio = cpu_get_address_space(machine->firstcpu, ADDRESS_SPACE_IO);
 
-	/* Changed video RAM size to full 32k, for cards which support the
-     * Plantronics chipset.
-     * TODO: Cards which don't support Plantronics should repeat at
-     * BC000h */
 	buswidth = device_memory(machine->firstcpu)->space_config(AS_PROGRAM)->m_databus_width;
 	switch(buswidth)
 	{
@@ -505,6 +507,51 @@ static VIDEO_START( pc_cga )
 }
 
 
+static VIDEO_START( pc_cga32k )
+{
+	int buswidth;
+	address_space *space = cpu_get_address_space(machine->firstcpu, ADDRESS_SPACE_PROGRAM);
+	address_space *spaceio = cpu_get_address_space(machine->firstcpu, ADDRESS_SPACE_IO);
+
+
+	buswidth = device_memory(machine->firstcpu)->space_config(AS_PROGRAM)->m_databus_width;
+	switch(buswidth)
+	{
+		case 8:
+			memory_install_read_bank(space, 0xb8000, 0xbffff, 0, 0, "bank11" );
+			memory_install_write8_handler(space, 0xb8000, 0xbffff, 0, 0, pc_video_videoram_w );
+			memory_install_read8_handler(spaceio, 0x3d0, 0x3df, 0, 0, pc_cga8_r );
+			memory_install_write8_handler(spaceio, 0x3d0, 0x3df, 0, 0, pc_cga8_w );
+			break;
+
+		case 16:
+			memory_install_read_bank(space, 0xb8000, 0xbffff, 0, 0, "bank11" );
+			memory_install_write16_handler(space, 0xb8000, 0xbffff, 0, 0, pc_video_videoram16le_w );
+			memory_install_read16_handler(spaceio, 0x3d0, 0x3df, 0, 0, pc_cga16le_r );
+			memory_install_write16_handler(spaceio, 0x3d0, 0x3df, 0, 0, pc_cga16le_w );
+			break;
+
+		case 32:
+			memory_install_read_bank(space, 0xb8000, 0xbffff, 0, 0, "bank11" );
+			memory_install_write32_handler(space, 0xb8000, 0xbffff, 0, 0, pc_video_videoram32_w );
+			memory_install_read32_handler(spaceio, 0x3d0, 0x3df, 0, 0, pc_cga32le_r );
+			memory_install_write32_handler(spaceio, 0x3d0, 0x3df, 0, 0, pc_cga32le_w );
+			break;
+
+		default:
+			fatalerror("CGA: Bus width %d not supported", buswidth);
+			break;
+	}
+
+	pc_videoram_size = 0x8000;
+	pc_videoram = auto_alloc_array(machine, UINT8, 0x8000);
+
+	memory_set_bankptr(machine,"bank11", pc_videoram);
+
+	internal_pc_cga_video_start(machine, M6845_PERSONALITY_GENUINE);
+
+	ntsc_decoder_init( machine, &s_ntsc, 8, 256 );
+}
 
 static VIDEO_UPDATE( mc6845_cga )
 {
@@ -1314,24 +1361,46 @@ static WRITE8_HANDLER( pc_cga8_w )
 					break;
 			}
 		} else {
-			memory_install_read_bank(space_prg, 0xb8000, 0xbbfff, 0, 0x04000, "bank11" );
-			switch(buswidth)
-			{
-				case 8:
-					memory_install_write8_handler(space_prg, 0xb8000, 0xbbfff, 0, 0x04000, pc_video_videoram_w );
-					break;
+			if (pc_videoram_size== 0x4000) {
+				memory_install_read_bank(space_prg, 0xb8000, 0xbbfff, 0, 0x04000, "bank11" );
+				switch(buswidth)
+				{
+					case 8:
+						memory_install_write8_handler(space_prg, 0xb8000, 0xbbfff, 0, 0x04000, pc_video_videoram_w );
+						break;
 
-				case 16:
-					memory_install_write16_handler(space_prg, 0xb8000, 0xbbfff, 0, 0x04000, pc_video_videoram16le_w );
-					break;
+					case 16:
+						memory_install_write16_handler(space_prg, 0xb8000, 0xbbfff, 0, 0x04000, pc_video_videoram16le_w );
+						break;
 
-				case 32:
-					memory_install_write32_handler(space_prg, 0xb8000, 0xbbfff, 0, 0x04000, pc_video_videoram32_w );
-					break;
+					case 32:
+						memory_install_write32_handler(space_prg, 0xb8000, 0xbbfff, 0, 0x04000, pc_video_videoram32_w );
+						break;
 
-				default:
-					fatalerror("CGA: Bus width %d not supported", buswidth);
-					break;
+					default:
+						fatalerror("CGA: Bus width %d not supported", buswidth);
+						break;
+				}
+			} else {
+				memory_install_read_bank(space_prg, 0xb8000, 0xbffff, 0, 0, "bank11" );
+				switch(buswidth)
+				{
+					case 8:
+						memory_install_write8_handler(space_prg, 0xb8000, 0xbffff, 0, 0, pc_video_videoram_w );
+						break;
+
+					case 16:
+						memory_install_write16_handler(space_prg, 0xb8000, 0xbffff, 0, 0, pc_video_videoram16le_w );
+						break;
+
+					case 32:
+						memory_install_write32_handler(space_prg, 0xb8000, 0xbffff, 0, 0, pc_video_videoram32_w );
+						break;
+
+					default:
+						fatalerror("CGA: Bus width %d not supported", buswidth);
+						break;
+				}			
 			}
 
 		}

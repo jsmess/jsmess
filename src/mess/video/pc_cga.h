@@ -8,6 +8,7 @@
 #define CGA_MC6845_NAME	"mc6845_cga"
 
 MACHINE_CONFIG_EXTERN( pcvideo_cga );
+MACHINE_CONFIG_EXTERN( pcvideo_cga32k );
 INPUT_PORTS_EXTERN( pcvideo_cga );
 
 /* has a special 640x200 in 16 color mode, 4 banks at 0xb8000 */
