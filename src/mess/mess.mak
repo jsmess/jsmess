@@ -1398,6 +1398,7 @@ $(MESSOBJ)/sharp.a:				\
 	$(MESS_VIDEO)/mz700.o		\
 	$(MESS_DRIVERS)/mz700.o		\
 	$(MESS_FORMATS)/mz_cas.o	\
+	$(MESS_DRIVERS)/pc1500.o	\
 	$(MESS_DRIVERS)/pocketc.o	\
 	$(MESS_VIDEO)/pc1401.o		\
 	$(MESS_MACHINE)/pc1401.o	\

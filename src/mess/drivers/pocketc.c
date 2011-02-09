@@ -1008,13 +1008,6 @@ ROM_END
    clone tandy pc2 look into drivers/pc1500.c
    pc1600
 */
-ROM_START( pc1500 )
-    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "sys1500.rom", 0x0000, 0x4000, CRC(d480b50d) SHA1(4bf748ba4d7c2b7cd7da7f3fdefcdd2e4cd41c4e))
-    ROM_REGION( 0x10000, "ce150", ROMREGION_ERASEFF )
-	ROM_LOAD( "ce-150.rom", 0x0000, 0x2000, CRC(8fa1df6d) SHA1(a3aa02a641a46c27c0d4c0dc025b0dbe9b5b79c8))
-	ROM_REGION(0x100,"gfx1",ROMREGION_ERASEFF)
-ROM_END
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE INPUT   INIT         COMPANY     FULLNAME */
 /* cpu sc61860 */
@@ -1030,7 +1023,6 @@ COMP( 1982, pc1261,	pc1260,	0,	pc1261,	pc1251,	pc1251,	 "Sharp", "Pocket Compute
 /* pc1261/pc1262 */
 COMP( 1984, pc1350,	0,	0,	pc1350,	pc1350,	0,	 "Sharp", "Pocket Computer 1350", GAME_NO_SOUND )
 COMP( 198?, pc1450,	0,	0,	pc1350,	pc1350,	0,	 "Sharp", "Pocket Computer 1450", GAME_NOT_WORKING | GAME_NO_SOUND )
-COMP( 198?, pc1500,	0,	0,	pc1350,	pc1350,	0,	 "Sharp", "Pocket Computer 1500", GAME_NOT_WORKING | GAME_NO_SOUND )
 
 COMP( 1983, pc1401,	0,	0,	pc1401,	pc1401,	pc1401,	"Sharp", "Pocket Computer 1401", GAME_NO_SOUND)
 COMP( 1984, pc1402,	pc1401,	0,	pc1402,	pc1401,	pc1401,	 "Sharp", "Pocket Computer 1402", GAME_NO_SOUND)
