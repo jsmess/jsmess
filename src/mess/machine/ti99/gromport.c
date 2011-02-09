@@ -1889,6 +1889,10 @@ static void cartridge_gram_kracker_readg(device_t *cartsys, UINT8 *value)
 	// Not null, since this is only called when there is really a GK module
 	gromkrackerbox = &cartslots->cartridge[cartslots->gk_slot];
 
+	// In case the GramKracker is not plugged in
+	if (gromkrackerbox->ram_ptr == NULL)
+		return;
+
 	if ((gromkrackerbox->grom_address & 0xe000) == 0x0000)
 	{
 		// GRAM 0. Only return a value if switch 2 is in GRAM0 position.
