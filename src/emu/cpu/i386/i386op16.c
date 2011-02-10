@@ -2858,18 +2858,19 @@ static void I386OP(group0F00_16)(i386_state *cpustate)			// Opcode 0x0f 00
 			{
 				if( modrm >= 0xc0 ) {
 					address = LOAD_RM16(modrm);
-					ea = i386_translate(cpustate, CS, address );
+					cpustate->ldtr.segment = address;
 					CYCLES(cpustate,CYCLES_LLDT_REG);
 				} else {
 					ea = GetEA(cpustate,modrm);
+					cpustate->ldtr.segment = READ16(cpustate,ea);
 					CYCLES(cpustate,CYCLES_LLDT_MEM);
 				}
-				cpustate->ldtr.segment = READ16(cpustate,ea);
 				memset(&seg, 0, sizeof(seg));
 				seg.selector = cpustate->ldtr.segment;
 				i386_load_protected_mode_segment(cpustate,&seg);
 				cpustate->ldtr.limit = seg.limit;
 				cpustate->ldtr.base = seg.base;
+				cpustate->ldtr.flags = seg.flags;
 			}
 			else
 			{
@@ -2882,13 +2883,19 @@ static void I386OP(group0F00_16)(i386_state *cpustate)			// Opcode 0x0f 00
 			{
 				if( modrm >= 0xc0 ) {
 					address = LOAD_RM16(modrm);
-					ea = i386_translate(cpustate, CS, address );
+					cpustate->task.segment = address;
 					CYCLES(cpustate,CYCLES_LTR_REG);
 				} else {
 					ea = GetEA(cpustate,modrm);
+					cpustate->task.segment = READ16(cpustate,ea);
 					CYCLES(cpustate,CYCLES_LTR_MEM);
 				}
-				cpustate->task.segment = READ16(cpustate,ea);
+				memset(&seg, 0, sizeof(seg));
+				seg.selector = cpustate->task.segment;
+				i386_load_protected_mode_segment(cpustate,&seg);
+				cpustate->task.limit = seg.limit;
+				cpustate->task.base = seg.base;
+				cpustate->task.flags = seg.flags;
 			}
 			else
 			{
