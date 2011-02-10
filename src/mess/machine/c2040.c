@@ -1623,6 +1623,7 @@ DEVICE_GET_INFO( c2040 )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "Commodore 2040");							break;
+		case DEVINFO_STR_SHORTNAME:						strcpy(info->s, "c2040");									break;
 		case DEVINFO_STR_FAMILY:						strcpy(info->s, "Commodore PET");							break;
 		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");										break;
 		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);									break;
@@ -1644,6 +1645,7 @@ DEVICE_GET_INFO( c3040 )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "Commodore 3040");							break;
+		case DEVINFO_STR_SHORTNAME:						strcpy(info->s, "c3040");									break;
 
 		default:										DEVICE_GET_INFO_CALL(c2040);								break;
 	}
@@ -1663,6 +1665,7 @@ DEVICE_GET_INFO( c4040 )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "Commodore 4040");							break;
+		case DEVINFO_STR_SHORTNAME:						strcpy(info->s, "c4040");									break;
 
 		default:										DEVICE_GET_INFO_CALL(c3040);								break;
 	}
@@ -1682,6 +1685,7 @@ DEVICE_GET_INFO( c8050 )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "Commodore 8050");							break;
+		case DEVINFO_STR_SHORTNAME:						strcpy(info->s, "c8050");									break;		
 
 		default:										DEVICE_GET_INFO_CALL(c2040);								break;
 	}
@@ -1701,7 +1705,8 @@ DEVICE_GET_INFO( c8250 )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "Commodore 8250");							break;
-
+		case DEVINFO_STR_SHORTNAME:						strcpy(info->s, "c8250");									break;
+	
 		default:										DEVICE_GET_INFO_CALL(c2040);								break;
 	}
 }
@@ -1720,6 +1725,7 @@ DEVICE_GET_INFO( sfd1001 )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "Commodore SFD-1001");						break;
+		case DEVINFO_STR_SHORTNAME:						strcpy(info->s, "sfd1001");									break;
 
 		default:										DEVICE_GET_INFO_CALL(c2040);								break;
 	}

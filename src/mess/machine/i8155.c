@@ -114,7 +114,7 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 i8155_device_config::i8155_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-	: device_config(mconfig, static_alloc_device_config, "Intel 8155", tag, owner, clock),
+	: device_config(mconfig, static_alloc_device_config, "Intel 8155", "i8155", tag, owner, clock),
 	  device_config_memory_interface(mconfig, *this),
 	  m_space_config("ram", ENDIANNESS_LITTLE, 8, 8, 0, NULL, *ADDRESS_MAP_NAME(i8155))
 {

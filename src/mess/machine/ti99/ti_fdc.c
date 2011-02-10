@@ -419,6 +419,7 @@ static const char DEVTEMPLATE_SOURCE[] = __FILE__;
 #define DEVTEMPLATE_ID(p,s)             p##ti99_fdc##s
 #define DEVTEMPLATE_FEATURES            DT_HAS_START | DT_HAS_STOP | DT_HAS_RESET | DT_HAS_ROM_REGION | DT_HAS_INLINE_CONFIG | DT_HAS_MACHINE_CONFIG
 #define DEVTEMPLATE_NAME                "TI Floppy Disk Controller Card"
+#define DEVTEMPLATE_SHORTNAME           "tifdc"
 #define DEVTEMPLATE_FAMILY              "Peripheral expansion"
 #include "devtempl.h"
 

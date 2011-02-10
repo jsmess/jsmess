@@ -54,7 +54,7 @@ const device_type CRT9212 = crt9212_device_config::static_alloc_device_config;
 //-------------------------------------------------
 
 crt9212_device_config::crt9212_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-	: device_config(mconfig, static_alloc_device_config, "SMC CRT9212", tag, owner, clock)
+	: device_config(mconfig, static_alloc_device_config, "SMC CRT9212", "crt9212", tag, owner, clock)
 {
 }
 

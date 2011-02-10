@@ -1175,6 +1175,7 @@ DEVICE_GET_INFO( upd7220 )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "NEC uPD7220");						break;
+		case DEVINFO_STR_SHORTNAME:						strcpy(info->s, "upd7220");							break;
 		case DEVINFO_STR_FAMILY:						strcpy(info->s, "NEC uPD7220");						break;
 		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");								break;
 		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);							break;

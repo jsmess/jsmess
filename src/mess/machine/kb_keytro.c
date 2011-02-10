@@ -637,6 +637,7 @@ static const char DEVTEMPLATE_SOURCE[] = __FILE__;
 #define DEVTEMPLATE_ID(p,s)				p##kb_keytr##s
 #define DEVTEMPLATE_FEATURES			DT_HAS_START | DT_HAS_ROM_REGION | DT_HAS_MACHINE_CONFIG
 #define DEVTEMPLATE_NAME				"Keytronic Keyboard"
+#define DEVTEMPLATE_SHORTNAME			"kb_keytro"
 #define DEVTEMPLATE_FAMILY				"PC Keyboard"
 #define DEVTEMPLATE_CLASS				DEVICE_CLASS_PERIPHERAL
 #define DEVTEMPLATE_VERSION				"1.0"

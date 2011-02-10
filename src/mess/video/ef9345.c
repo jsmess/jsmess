@@ -42,7 +42,7 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 ef9345_device_config::ef9345_device_config( const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock ):
-	device_config( mconfig, static_alloc_device_config, "ef9345", tag, owner, clock),
+	device_config(mconfig, static_alloc_device_config, "ef9345", "ef9345", tag, owner, clock),
 	device_config_memory_interface(mconfig, *this),
 	m_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, NULL, *ADDRESS_MAP_NAME(ef9345))
 {

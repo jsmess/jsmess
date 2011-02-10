@@ -70,7 +70,7 @@ static int get_cmd_len(int cbyte)
 //**************************************************************************
 
 ncr5380_device_config::ncr5380_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-    : device_config(mconfig, static_alloc_device_config, "5380 SCSI", tag, owner, clock)
+    : device_config(mconfig, static_alloc_device_config, "5380 SCSI", "5380scsi", tag, owner, clock)
 {
 }
 

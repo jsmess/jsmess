@@ -25,7 +25,7 @@
 //-------------------------------------------------
 
 hd44780_device_config::hd44780_device_config( const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock ):
-	device_config( mconfig, static_alloc_device_config, "HD44780", tag, owner, clock)
+	device_config(mconfig, static_alloc_device_config, "HD44780", "hd44780",tag, owner, clock)
 {
 }
 

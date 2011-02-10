@@ -784,6 +784,7 @@ DEVICE_GET_INFO( c1551 )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "Commodore 1551");							break;
+		case DEVINFO_STR_SHORTNAME:						strcpy(info->s, "c1551");									break;				
 		case DEVINFO_STR_FAMILY:						strcpy(info->s, "Commodore Plus/4");						break;
 		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");										break;
 		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);									break;

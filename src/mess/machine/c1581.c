@@ -510,6 +510,7 @@ DEVICE_GET_INFO( c1581 )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "Commodore 1581");							break;
+		case DEVINFO_STR_SHORTNAME:						strcpy(info->s, "c1581");									break;		
 		case DEVINFO_STR_FAMILY:						strcpy(info->s, "Commodore 1581");							break;
 		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");										break;
 		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);									break;
@@ -531,6 +532,7 @@ DEVICE_GET_INFO( c1563 )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "Commodore 1563");							break;
+		case DEVINFO_STR_SHORTNAME:						strcpy(info->s, "c1563");									break;				
 
 		default:										DEVICE_GET_INFO_CALL(c1581);								break;
 	}

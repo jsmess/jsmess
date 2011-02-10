@@ -376,6 +376,7 @@ DEVICE_GET_INFO( tf20 )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:					strcpy(info->s, "TF-20");						break;
+		case DEVINFO_STR_SHORTNAME:				strcpy(info->s, "tf20");						break;
 		case DEVINFO_STR_FAMILY:				strcpy(info->s, "Floppy drive");				break;
 		case DEVINFO_STR_VERSION:				strcpy(info->s, "1.0");							break;
 		case DEVINFO_STR_SOURCE_FILE:			strcpy(info->s, __FILE__);						break;

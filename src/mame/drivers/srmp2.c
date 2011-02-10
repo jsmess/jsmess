@@ -36,7 +36,9 @@ System specs :
 
 Known issues :
 ===============
- - I/O port isn't fully analized. Currently avoid I/O error message with hack.
+ - IOX might be either a shared component between PCBs or every game have its own configuration.
+   For now I've opted for the latter solution, until an HW test will be done ...
+ - IOX might be a MCU of some sort.
  - AY-3-8910 sound may be wrong.
  - CPU clock of srmp3 does not match the real machine.
  - MSM5205 clock frequency in srmp3 is wrong.
@@ -60,6 +62,10 @@ Note:
 #include "includes/srmp2.h"
 #include "machine/nvram.h"
 
+static struct
+{
+	int reset,ff_event,ff_1,protcheck[4],protlatch[4];
+}iox;
 
 /***************************************************************************
 
@@ -76,52 +82,45 @@ static INTERRUPT_GEN( srmp2_interrupt )
 	}
 }
 
+/***************************************************************************
 
-static DRIVER_INIT( srmp2 )
+  Configure IOX
+
+***************************************************************************/
+
+static MACHINE_START( srmp2 )
 {
-	UINT16 *RAM = (UINT16 *) machine->region("maincpu")->base();
-
-	/* Fix "ERROR BACK UP" and "ERROR IOX" */
-	RAM[0x20c80 / 2] = 0x4e75;								// RTS
+	iox.reset = 0x1f;
+	iox.ff_event = -1;
+	iox.ff_1 = 0x00;
+	/* note: protection in srmp1/mjyuugi/ponchin is never checked, assume to be the same */
+	iox.protcheck[0] = 0x60; iox.protlatch[0] = 0x2a;
+	iox.protcheck[1] = -1;   iox.protlatch[1] = -1;
+	iox.protcheck[2] = -1;   iox.protlatch[2] = -1;
+	iox.protcheck[3] = -1;   iox.protlatch[3] = -1;
 }
 
-static DRIVER_INIT( srmp3 )
+static MACHINE_START( srmp3 )
 {
-	UINT8 *RAM = machine->region("maincpu")->base();
-
-	/* BANK ROM (0x08000 - 0x1ffff) Check skip [MAIN ROM side] */
-	RAM[0x00000 + 0x7b69] = 0x00;							// NOP
-	RAM[0x00000 + 0x7b6a] = 0x00;							// NOP
-
-	/* MAIN ROM (0x00000 - 0x07fff) Check skip [BANK ROM side] */
-	RAM[0x08000 + 0xc10b] = 0x00;							// NOP
-	RAM[0x08000 + 0xc10c] = 0x00;							// NOP
-	RAM[0x08000 + 0xc10d] = 0x00;							// NOP
-	RAM[0x08000 + 0xc10e] = 0x00;							// NOP
-	RAM[0x08000 + 0xc10f] = 0x00;							// NOP
-	RAM[0x08000 + 0xc110] = 0x00;							// NOP
-	RAM[0x08000 + 0xc111] = 0x00;							// NOP
-
-	/* "ERR IOX" Check skip [MAIN ROM side] */
-	RAM[0x00000 + 0x784e] = 0x00;							// NOP
-	RAM[0x00000 + 0x784f] = 0x00;							// NOP
-	RAM[0x00000 + 0x7850] = 0x00;							// NOP
+	iox.reset = 0xc8;
+	iox.ff_event = 0xef;
+	iox.ff_1 = -1;
+	iox.protcheck[0] = 0x49; iox.protlatch[0] = 0xc9;
+	iox.protcheck[1] = 0x4c; iox.protlatch[1] = 0x00;
+	iox.protcheck[2] = 0x1c; iox.protlatch[2] = 0x04;
+	iox.protcheck[3] = 0x45; iox.protlatch[3] = 0x00;
 }
 
-static MACHINE_RESET( srmp2 )
+static MACHINE_START( rmgoldyh )
 {
-	srmp2_state *state = machine->driver_data<srmp2_state>();
-
-	state->port_select = 0;
+	iox.reset = 0xc8;
+	iox.ff_event = 0xff;
+	iox.ff_1 = -1;
+	iox.protcheck[0] = 0x43; iox.protlatch[0] = 0x9a;
+	iox.protcheck[1] = 0x45; iox.protlatch[1] = 0x00;
+	iox.protcheck[2] = -1;   iox.protlatch[2] = -1;
+	iox.protcheck[3] = -1;   iox.protlatch[3] = -1;
 }
-
-static MACHINE_RESET( srmp3 )
-{
-	srmp2_state *state = machine->driver_data<srmp2_state>();
-
-	state->port_select = 0;
-}
-
 
 /***************************************************************************
 
@@ -256,87 +255,108 @@ static void srmp2_adpcm_int(device_t *device)
 	}
 }
 
-
-static READ16_HANDLER( srmp2_cchip_status_0_r )
+static READ8_HANDLER( vox_status_r )
 {
-	return 0x01;
+	return 1;
 }
 
+static UINT8 iox_data,iox_mux,iox_ff;
 
-static READ16_HANDLER( srmp2_cchip_status_1_r )
+static UINT8 iox_key_matrix_calc(running_machine *machine,UINT8 p_side)
 {
-	return 0x01;
-}
+	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5", "KEY6", "KEY7" };
+	int i, j, t;
 
-
-static READ16_HANDLER( srmp2_input_1_r )
-{
-/*
-    ---x xxxx : Key code
-    --x- ---- : Player 1 and 2 side flag
-*/
-
-	srmp2_state *state = space->machine->driver_data<srmp2_state>();
-	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3" };
-
-	if (!ACCESSING_BITS_0_7)
+	for (i = 0x00 ; i < 0x20 ; i += 8)
 	{
-		return 0xffff;
-	}
+		j = (i / 0x08);
 
-	if (state->port_select != 2)			/* Panel keys */
-	{
-		int i, j, t;
-
-		for (i = 0x00 ; i < 0x20 ; i += 8)
+		for (t = 0 ; t < 8 ; t ++)
 		{
-			j = (i / 0x08);
-
-			for (t = 0 ; t < 8 ; t ++)
+			if (!(input_port_read(machine, keynames[j+p_side]) & ( 1 << t )))
 			{
-				if (!(input_port_read(space->machine, keynames[j]) & ( 1 << t )))
-				{
-					return (i + t);
-				}
+				return (i + t) | (p_side ? 0x20 : 0x00);
 			}
 		}
 	}
-	else								/* Analizer and memory reset keys */
+
+	return 0;
+}
+
+static READ8_HANDLER( iox_mux_r )
+{
+	/* first off check any pending protection value */
 	{
-		return input_port_read(space->machine, "SERVICE");
+		static int i;
+
+		for(i=0;i<4;i++)
+		{
+			if(iox.protcheck[i] == -1)
+				continue; //skip
+
+			if(iox_data == iox.protcheck[i])
+			{
+				iox_data = 0; //clear write latch
+				return iox.protlatch[i];
+			}
+		}
 	}
 
-	return 0xffff;
-}
-
-
-static READ16_HANDLER( srmp2_input_2_r )
-{
-	if (!ACCESSING_BITS_0_7)
+	if(iox_ff == 0)
 	{
-		return 0x0001;
+		if(iox_mux != 1 && iox_mux != 2 && iox_mux != 4)
+			return 0xff; //unknown command
+
+		/* both side checks */
+		if(iox_mux == 1)
+		{
+			UINT8 p1_side = iox_key_matrix_calc(space->machine,0);
+			UINT8 p2_side = iox_key_matrix_calc(space->machine,4);
+
+			if(p1_side != 0)
+				return p1_side;
+
+			return p2_side;
+		}
+
+		/* check individual input side */
+		return iox_key_matrix_calc(space->machine,(iox_mux == 2) ? 0 : 4);
 	}
 
-	/* Always return 1, otherwise freeze. Maybe read I/O status */
-	return 0x0001;
+	return input_port_read(space->machine,"SERVICE") & 0xff;
 }
 
-
-static WRITE16_HANDLER( srmp2_input_1_w )
+static READ8_HANDLER( iox_status_r )
 {
-	srmp2_state *state = space->machine->driver_data<srmp2_state>();
-
-	state->port_select = (data != 0x0000) ? 1 : 0;
+	return 1;
 }
 
-
-static WRITE16_HANDLER( srmp2_input_2_w )
+static WRITE8_HANDLER( iox_command_w )
 {
-	srmp2_state *state = space->machine->driver_data<srmp2_state>();
+	/*
+	bit wise command port apparently
+	0x01: selects both sides
+	0x02: selects p1 side
+	0x04: selects p2 side
+	*/
 
-	state->port_select = (data == 0x0000) ? 2 : 0;
+	iox_mux = data;
+	iox_ff = 0; // this also set flip flop back to 0
 }
 
+static WRITE8_HANDLER( iox_data_w )
+{
+	iox_data = data;
+
+	if(data == iox.reset && iox.reset != -1) //resets device
+		iox_ff = 0;
+
+	if(data == iox.ff_event && iox.ff_event != -1) // flip flop event
+		iox_ff ^= 1;
+
+	if(data == iox.ff_1 && iox.ff_1 != -1) // set flip flop to 1
+		iox_ff = 1;
+}
 
 static WRITE8_HANDLER( srmp3_rombank_w )
 {
@@ -373,11 +393,10 @@ static ADDRESS_MAP_START( srmp2_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x800000, 0x800001) AM_WRITE(srmp2_flags_w)			/* ADPCM bank, Color bank, etc. */
 	AM_RANGE(0x900000, 0x900001) AM_READ_PORT("SYSTEM")				/* Coinage */
 	AM_RANGE(0x900000, 0x900001) AM_WRITENOP						/* ??? */
-	AM_RANGE(0xa00000, 0xa00001) AM_READWRITE(srmp2_input_1_r,srmp2_input_1_w)	/* I/O port 1 */
-	AM_RANGE(0xa00002, 0xa00003) AM_READWRITE(srmp2_input_2_r,srmp2_input_2_w)	/* I/O port 2 */
-	AM_RANGE(0xb00000, 0xb00001) AM_READ(srmp2_cchip_status_0_r)	/* Custom chip status ??? */
+	AM_RANGE(0xa00000, 0xa00001) AM_READWRITE8(iox_mux_r, iox_command_w,0x00ff)	/* key matrix | I/O */
+	AM_RANGE(0xa00002, 0xa00003) AM_READWRITE8(iox_status_r,iox_data_w,0x00ff)
 	AM_RANGE(0xb00000, 0xb00001) AM_DEVWRITE("msm", srmp2_adpcm_code_w)	/* ADPCM number */
-	AM_RANGE(0xb00002, 0xb00003) AM_READ(srmp2_cchip_status_1_r)	/* Custom chip status ??? */
+	AM_RANGE(0xb00002, 0xb00003) AM_READ8(vox_status_r,0x00ff)		/* ADPCM voice status */
 	AM_RANGE(0xc00000, 0xc00001) AM_WRITENOP						/* ??? */
 	AM_RANGE(0xd00000, 0xd00001) AM_WRITENOP						/* ??? */
 	AM_RANGE(0xe00000, 0xe00001) AM_WRITENOP						/* ??? */
@@ -398,11 +417,10 @@ static ADDRESS_MAP_START( mjyuugi_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x500010, 0x500011) AM_READ_PORT("DSW3-2")				/* DSW 3-2 */
 	AM_RANGE(0x700000, 0x7003ff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x800000, 0x800001) AM_READNOP				/* ??? */
-	AM_RANGE(0x900000, 0x900001) AM_READWRITE(srmp2_input_1_r,srmp2_input_1_w)		/* I/O port 1 */
-	AM_RANGE(0x900002, 0x900003) AM_READWRITE(srmp2_input_2_r,srmp2_input_2_w)		/* I/O port 2 */
-	AM_RANGE(0xa00000, 0xa00001) AM_READ(srmp2_cchip_status_0_r)	/* custom chip status ??? */
+	AM_RANGE(0x900000, 0x900001) AM_READWRITE8(iox_mux_r, iox_command_w,0x00ff)	/* key matrix | I/O */
+	AM_RANGE(0x900002, 0x900003) AM_READWRITE8(iox_status_r,iox_data_w,0x00ff)
 	AM_RANGE(0xa00000, 0xa00001) AM_DEVWRITE("msm", srmp2_adpcm_code_w)			/* ADPCM number */
-	AM_RANGE(0xa00002, 0xa00003) AM_READ(srmp2_cchip_status_1_r)	/* custom chip status ??? */
+	AM_RANGE(0xb00002, 0xb00003) AM_READ8(vox_status_r,0x00ff)		/* ADPCM voice status */
 	AM_RANGE(0xb00000, 0xb00001) AM_DEVREAD8("aysnd", ay8910_r, 0x00ff)
 	AM_RANGE(0xb00000, 0xb00003) AM_DEVWRITE8("aysnd", ay8910_address_data_w, 0x00ff)
 	AM_RANGE(0xc00000, 0xc00001) AM_WRITENOP					/* ??? */
@@ -411,102 +429,6 @@ static ADDRESS_MAP_START( mjyuugi_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xe00000, 0xe03fff) AM_RAM AM_BASE_MEMBER(srmp2_state,spriteram2.u16)	/* Sprites Code + X + Attr */
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
-
-
-static READ8_HANDLER( srmp3_cchip_status_0_r )
-{
-	return 0x01;
-}
-
-static READ8_HANDLER( srmp3_cchip_status_1_r )
-{
-	return 0x01;
-}
-
-static WRITE8_HANDLER( srmp3_input_1_w )
-{
-/*
-    ---- --x- : Player 1 side flag ?
-    ---- -x-- : Player 2 side flag ?
-*/
-
-	srmp2_state *state = space->machine->driver_data<srmp2_state>();
-	logerror("PC:%04X DATA:%02X  srmp3_input_1_w\n", cpu_get_pc(space->cpu), data);
-
-	state->port_select = 0;
-
-	{
-		static int qqq01 = 0;
-		static int qqq02 = 0;
-		static int qqq49 = 0;
-		static int qqqzz = 0;
-
-		if (data == 0x01) qqq01++;
-		else if (data == 0x02) qqq02++;
-		else if (data == 0x49) qqq49++;
-		else qqqzz++;
-
-//      popmessage("%04X %04X %04X %04X", qqq01, qqq02, qqq49, qqqzz);
-	}
-}
-
-static WRITE8_HANDLER( srmp3_input_2_w )
-{
-	srmp2_state *state = space->machine->driver_data<srmp2_state>();
-
-	/* Key matrix reading related ? */
-
-	logerror("PC:%04X DATA:%02X  srmp3_input_2_w\n", cpu_get_pc(space->cpu), data);
-
-	state->port_select = 1;
-
-}
-
-static READ8_HANDLER( srmp3_input_r )
-{
-/*
-    ---x xxxx : Key code
-    --x- ---- : Player 1 and 2 side flag
-*/
-
-	/* Currently I/O port of srmp3 is fully understood. */
-
-	int keydata = 0xff;
-	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3" };
-
-	logerror("PC:%04X          srmp3_input_r\n", cpu_get_pc(space->cpu));
-
-	// PC:0x8903    ROM:0xC903
-	// PC:0x7805    ROM:0x7805
-
-	if ((cpu_get_pc(space->cpu) == 0x8903) || (cpu_get_pc(space->cpu) == 0x7805))	/* Panel keys */
-	{
-		int i, j, t;
-
-		for (i = 0x00 ; i < 0x20 ; i += 8)
-		{
-			j = (i / 0x08);
-
-			for (t = 0 ; t < 8 ; t ++)
-			{
-				if (!(input_port_read(space->machine, keynames[j]) & ( 1 << t )))
-				{
-					keydata = (i + t);
-				}
-			}
-		}
-	}
-
-	// PC:0x8926    ROM:0xC926
-	// PC:0x7822    ROM:0x7822
-
-	if ((cpu_get_pc(space->cpu) == 0x8926) || (cpu_get_pc(space->cpu) == 0x7822))	/* Analizer and memory reset keys */
-	{
-		keydata = input_port_read(space->machine, "SERVICE");
-	}
-
-	return keydata;
-}
 
 static WRITE8_HANDLER( srmp3_flags_w )
 {
@@ -540,14 +462,51 @@ static ADDRESS_MAP_START( srmp3_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x20, 0x20) AM_WRITENOP								/* elapsed interrupt signal */
 	AM_RANGE(0x40, 0x40) AM_READ_PORT("SYSTEM")	AM_WRITE(srmp3_flags_w)	/* coin, service | GFX bank, counter, lockout */
 	AM_RANGE(0x60, 0x60) AM_WRITE(srmp3_rombank_w)						/* ROM bank select */
-	AM_RANGE(0xa0, 0xa0) AM_DEVWRITE("msm", srmp3_adpcm_code_w)					/* ADPCM number */
-	AM_RANGE(0xa1, 0xa1) AM_READ(srmp3_cchip_status_0_r)				/* custom chip status ??? */
-	AM_RANGE(0xc0, 0xc0) AM_READWRITE(srmp3_input_r, srmp3_input_1_w)	/* key matrix | I/O ??? */
-	AM_RANGE(0xc1, 0xc1) AM_READWRITE(srmp3_cchip_status_1_r, srmp3_input_2_w)	/* custom chip status ??? | I/O ??? */
+	AM_RANGE(0xa0, 0xa0) AM_DEVWRITE("msm", srmp3_adpcm_code_w)	/* ADPCM number */
+	AM_RANGE(0xa1, 0xa1) AM_READ(vox_status_r)				/* ADPCM voice status */
+	AM_RANGE(0xc0, 0xc0) AM_READWRITE(iox_mux_r, iox_command_w)	/* key matrix | I/O */
+	AM_RANGE(0xc1, 0xc1) AM_READWRITE(iox_status_r,iox_data_w)
 	AM_RANGE(0xe0, 0xe1) AM_DEVWRITE("aysnd", ay8910_address_data_w)
 	AM_RANGE(0xe2, 0xe2) AM_DEVREAD("aysnd", ay8910_r)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( rmgoldyh_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")							/* rom bank */
+	AM_RANGE(0xa000, 0xafff) AM_RAM AM_SHARE("nvram")	/* work ram */
+	AM_RANGE(0xb000, 0xb303) AM_RAM AM_BASE_MEMBER(srmp2_state,spriteram1.u8)				/* Sprites Y */
+	AM_RANGE(0xb800, 0xb800) AM_WRITENOP							/* flag ? */
+	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_BASE_MEMBER(srmp2_state,spriteram2.u8)			/* Sprites Code + X + Attr */
+	AM_RANGE(0xe000, 0xffff) AM_RAM AM_BASE_MEMBER(srmp2_state,spriteram3.u8)
+ADDRESS_MAP_END
+
+static WRITE8_HANDLER( rmgoldyh_rombank_w )
+{
+/*
+    ---x xxxx : MAIN ROM bank
+    xxx- ---- : ADPCM ROM bank
+*/
+
+	srmp2_state *state = space->machine->driver_data<srmp2_state>();
+	UINT8 *ROM = space->machine->region("maincpu")->base();
+	int addr;
+
+	state->adpcm_bank = ((data & 0xe0) >> 5);
+
+	if (data & 0x1f) addr = ((0x10000 + (0x2000 * (data & 0x1f))) - 0x8000);
+	else addr = 0x10000;
+
+	memory_set_bankptr(space->machine, "bank1", &ROM[addr]);
+}
+
+static ADDRESS_MAP_START( rmgoldyh_io_map, ADDRESS_SPACE_IO, 8 )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x00, 0x00) AM_WRITENOP /* watchdog */
+	AM_RANGE(0x60, 0x60) AM_WRITE(rmgoldyh_rombank_w)						/* ROM bank select */
+	AM_RANGE(0x80, 0x80) AM_READ_PORT("DSW4")
+	AM_RANGE(0x81, 0x81) AM_READ_PORT("DSW3")
+	AM_IMPORT_FROM(srmp3_io_map)
+ADDRESS_MAP_END
 
 /***************************************************************************
 
@@ -557,46 +516,90 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( seta_mjctrl )
 	PORT_START("KEY0")	/* KEY MATRIX INPUT (3) */
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MAHJONG_BIG )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE )
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_PLAYER(1)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL ) PORT_PLAYER(1)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP ) PORT_PLAYER(1)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MAHJONG_BIG ) PORT_PLAYER(1)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE ) PORT_PLAYER(1)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP ) PORT_PLAYER(1)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE ) PORT_PLAYER(1)
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("KEY1")	/* KEY MATRIX INPUT (4) */
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_MAHJONG_K )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_RON )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_G )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MAHJONG_CHI )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_MAHJONG_C )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_MAHJONG_L )
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_MAHJONG_K ) PORT_PLAYER(1)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_RON ) PORT_PLAYER(1)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_G ) PORT_PLAYER(1)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MAHJONG_CHI ) PORT_PLAYER(1)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_MAHJONG_C ) PORT_PLAYER(1)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_PLAYER(1)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_MAHJONG_L ) PORT_PLAYER(1)
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("KEY2")	/* KEY MATRIX INPUT (5) */
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_MAHJONG_H )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_PON )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_D )
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_MAHJONG_H ) PORT_PLAYER(1)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_PON ) PORT_PLAYER(1)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_D ) PORT_PLAYER(1)
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_MAHJONG_I )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_MAHJONG_KAN )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_MAHJONG_E )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_MAHJONG_M )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_MAHJONG_I ) PORT_PLAYER(1)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_MAHJONG_KAN ) PORT_PLAYER(1)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_MAHJONG_E ) PORT_PLAYER(1)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_MAHJONG_M ) PORT_PLAYER(1)
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("KEY3")	/* KEY MATRIX INPUT (6) */
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_MAHJONG_A )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_BET )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_J )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MAHJONG_REACH )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_MAHJONG_F )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_MAHJONG_N )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_MAHJONG_B )
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_MAHJONG_A ) PORT_PLAYER(1)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_BET ) PORT_PLAYER(1)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_J ) PORT_PLAYER(1)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MAHJONG_REACH ) PORT_PLAYER(1)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_MAHJONG_F ) PORT_PLAYER(1)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_MAHJONG_N ) PORT_PLAYER(1)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_MAHJONG_B ) PORT_PLAYER(1)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("KEY4")	/* KEY MATRIX INPUT (3) */
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL ) PORT_PLAYER(2)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP ) PORT_PLAYER(2)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MAHJONG_BIG ) PORT_PLAYER(2)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE ) PORT_PLAYER(2)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP ) PORT_PLAYER(2)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE ) PORT_PLAYER(2)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("KEY5")	/* KEY MATRIX INPUT (4) */
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_MAHJONG_K ) PORT_PLAYER(2)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_RON ) PORT_PLAYER(2)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_G ) PORT_PLAYER(2)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MAHJONG_CHI ) PORT_PLAYER(2)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_MAHJONG_C ) PORT_PLAYER(2)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_MAHJONG_L ) PORT_PLAYER(2)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("KEY6")	/* KEY MATRIX INPUT (5) */
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_MAHJONG_H ) PORT_PLAYER(2)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_PON ) PORT_PLAYER(2)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_D ) PORT_PLAYER(2)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_MAHJONG_I ) PORT_PLAYER(2)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_MAHJONG_KAN ) PORT_PLAYER(2)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_MAHJONG_E ) PORT_PLAYER(2)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_MAHJONG_M ) PORT_PLAYER(2)
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("KEY7")	/* KEY MATRIX INPUT (6) */
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_MAHJONG_A ) PORT_PLAYER(2)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_BET ) PORT_PLAYER(2)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_J ) PORT_PLAYER(2)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MAHJONG_REACH ) PORT_PLAYER(2)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_MAHJONG_F ) PORT_PLAYER(2)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_MAHJONG_N ) PORT_PLAYER(2)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_MAHJONG_B ) PORT_PLAYER(2)
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
@@ -750,6 +753,134 @@ static INPUT_PORTS_START( srmp3 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( rmgoldyh )
+	PORT_START("SYSTEM")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("SERVICE")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SERVICE4 ) PORT_NAME("Payout")
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Memory Clear")
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Test Mode")
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_SERVICE3 ) PORT_NAME("Analyzer")
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_INCLUDE( seta_mjctrl )
+
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x01, 0x01, "DSW1" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x01, 0x01, "DSW2" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSW3")
+	PORT_DIPNAME( 0x01, 0x01, "DSW3" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSW4")
+	PORT_DIPNAME( 0x01, 0x01, "DSW4" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "Game Title" )
+	PORT_DIPSETTING(    0x08, "Real Mahjong Gold Yumehai" )
+	PORT_DIPSETTING(    0x00, "Super Real Mahjong GOLD part.2" )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
 
 static INPUT_PORTS_START( mjyuugi )
 	PORT_START("SYSTEM")			/* Coinage (0) */
@@ -1007,6 +1138,11 @@ static GFXDECODE_START( srmp3 )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 32 )
 GFXDECODE_END
 
+static GFXDECODE_START( rmgoldyh )
+	GFXDECODE_ENTRY( "gfx1",        0, charlayout, 0, 32 )
+	GFXDECODE_ENTRY( "gfx_ex",      0, charlayout, 0, 32 )
+GFXDECODE_END
+
 
 static MACHINE_CONFIG_START( srmp2, srmp2_state )
 
@@ -1015,7 +1151,7 @@ static MACHINE_CONFIG_START( srmp2, srmp2_state )
 	MCFG_CPU_PROGRAM_MAP(srmp2_map)
 	MCFG_CPU_VBLANK_INT_HACK(srmp2_interrupt,16)		/* Interrupt times is not understood */
 
-	MCFG_MACHINE_RESET(srmp2)
+	MCFG_MACHINE_START(srmp2)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
@@ -1055,7 +1191,7 @@ static MACHINE_CONFIG_START( srmp3, srmp2_state )
 	MCFG_CPU_IO_MAP(srmp3_io_map)
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MCFG_MACHINE_RESET(srmp3)
+	MCFG_MACHINE_START(srmp3)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
@@ -1084,6 +1220,16 @@ static MACHINE_CONFIG_START( srmp3, srmp2_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( rmgoldyh, srmp3 )
+
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(rmgoldyh_map)
+	MCFG_CPU_IO_MAP(rmgoldyh_io_map)
+
+	MCFG_MACHINE_START(rmgoldyh)
+
+	MCFG_GFXDECODE(rmgoldyh)
+MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( mjyuugi, srmp2_state )
 
@@ -1092,7 +1238,8 @@ static MACHINE_CONFIG_START( mjyuugi, srmp2_state )
 	MCFG_CPU_PROGRAM_MAP(mjyuugi_map)
 	MCFG_CPU_VBLANK_INT_HACK(srmp2_interrupt,16)		/* Interrupt times is not understood */
 
-	MCFG_MACHINE_RESET(srmp2)
+	MCFG_MACHINE_START(srmp2)
+
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
@@ -1233,6 +1380,87 @@ ROM_START( srmp3 )
 	ROM_LOAD( "za0-13.prm", 0x000200, 0x000200, CRC(4ea3d2fe) SHA1(c7d18b9c1331e08faadf33e52033c658bf2b16fc) )
 ROM_END
 
+/***************************************************************************
+
+Real Mahjong Gold Yumehai
+(c)1988? Alba
+The game is BET version of Super Real Mahjong P3,
+but the PCB is totally different.
+
+PO-064A
+
+CPU: Z80
+Sound: AY-3-8910, M5205
+OSC: 16.000MHz (X1), 10.000MHz (X3)
+
+Custom chips:
+X1-001
+X1-002
+X2-003 x3
+X1-004 x2
+X0-005
+X1-007
+
+ROMs:
+ZF0_001_001.U2 [ce5b0ba0] \
+ZF0_002_002.U3 [e2226425] -- Main programs
+
+ZF0_1.U70    [78ba5d05] \
+ZF0_2.U71    [b0f548e6] |-- tiles?
+ZF0_3.U72    [771c27a1] /
+
+ZA0-1.U52 \
+ZA0-2.U51 |
+ZA0-3.U50 |
+ZA0-4.U49 |
+ZA0-5.U48 |- Sprites (same as srmp3)
+ZA0-6.U47 |
+ZA0-7.U46 |
+ZA0-8.U45 /
+
+ZA0-11.U16 - Samples (same as srmp3)
+
+ZF0-12.U58   [1ac5387c] \
+ZF0-13.U59   [4ea3d2fe] -- Color PROM
+
+ZF0-5.U35 - PAL16L8A-2CN(not dumped)
+
+Others:
+CR2032 battery
+***************************************************************************/
+
+ROM_START( rmgoldyh )
+	ROM_REGION( 0x048000, "maincpu", 0 )					/* 68000 Code */
+	ROM_LOAD( "zf0_001_001.u2", 0x000000, 0x008000, CRC(ce5b0ba0) SHA1(c499e7dc0e3ffe783204e930356c91ea228baf62) )
+	ROM_CONTINUE(               0x010000, 0x018000 )
+	ROM_LOAD( "zf0_002_002.u3", 0x028000, 0x020000, CRC(e2226425) SHA1(36925c68492a3ea4af19d611a455eae688aaab62) )
+
+	ROM_REGION( 0x20000, "gfx_ex", ROMREGION_ERASE00 )	/* extra sprite roms */
+	/* socket 4 is empty */
+	ROM_LOAD16_BYTE( "zf0_3.u72",  0x00001, 0x08000, CRC(771c27a1) SHA1(5c95edcd5e155cbb4448888bba62c98cf8d4b577) )
+	ROM_LOAD16_BYTE( "zf0_2.u71",  0x10000, 0x08000, CRC(b0f548e6) SHA1(84e3acb10ae3669bf65bd8c93273acacb5136737) )
+	ROM_LOAD16_BYTE( "zf0_1.u70",  0x10001, 0x08000, CRC(78ba5d05) SHA1(21cd5ecbd55a5beaece82c974752dac4281b467a) )
+
+	ROM_REGION( 0x800000, "gfx1", 0 )	/* Sprites */
+	ROM_LOAD16_BYTE( "za0-02.u51", 0x000000, 0x080000, CRC(85691946) SHA1(8b91210b1b6671ba2c9ec6722e5dc40bdf44e4b5) )
+	ROM_LOAD16_BYTE( "za0-04.u49", 0x000001, 0x080000, CRC(c06e7a96) SHA1(a2dfb81004ea72bfa21724374eb8533af606a5df) )
+	ROM_LOAD16_BYTE( "za0-01.u52", 0x100000, 0x080000, CRC(95e0d87c) SHA1(34e6c0a95e63cf092092e27c7ba2f649ebf56507) )
+	ROM_LOAD16_BYTE( "za0-03.u50", 0x100001, 0x080000, CRC(7c98570e) SHA1(26e28e67bca9954d62d72260370ea872c6058a10) )
+	ROM_COPY( "gfx_ex",   0x00000, 0x200000, 0x010000 )
+	ROM_LOAD16_BYTE( "za0-06.u47", 0x400000, 0x080000, CRC(8b874b0a) SHA1(27fe1ccc2938e1703e484e2925a2f073064cf019) )
+	ROM_LOAD16_BYTE( "za0-08.u45", 0x400001, 0x080000, CRC(3de89d88) SHA1(1e6dabe6aeee6a2613feab26b871c235bf491bfa) )
+	ROM_LOAD16_BYTE( "za0-05.u48", 0x500000, 0x080000, CRC(80d3b4e6) SHA1(d31d3f904ee8463c1efbb1d106eeb3dc0dc42ab8) )
+	ROM_LOAD16_BYTE( "za0-07.u46", 0x500001, 0x080000, CRC(39d15129) SHA1(62b71a82cfc39e6dab3175e03eca5ff92e854f13) )
+	ROM_COPY( "gfx_ex",   0x10000, 0x600000, 0x010000 )
+
+	ROM_REGION( 0x080000, "adpcm", 0 )				/* Samples */
+	ROM_LOAD( "za0-11.u16", 0x000000, 0x080000, CRC(2248c23f) SHA1(35591b51bb23dfd7fa81a05026e9ec0789bb0dde) )
+
+	ROM_REGION( 0x000400, "proms", 0 )					/* Color PROMs */
+	ROM_LOAD( "zf0-12.u58", 0x000000, 0x000200, CRC(1ac5387c) SHA1(022f204dbe2374478279b586451673a08ee489c8) )
+	ROM_LOAD( "zf0-13.u59", 0x000200, 0x000200, CRC(4ea3d2fe) SHA1(c7d18b9c1331e08faadf33e52033c658bf2b16fc) )
+ROM_END
+
 ROM_START( mjyuugi )
 	ROM_REGION( 0x080000, "maincpu", 0 )					/* 68000 Code */
 	ROM_LOAD16_BYTE( "um001.001", 0x000000, 0x020000, CRC(28d5340f) SHA1(683d89987b8b794695fdb6104d8e6ff5204afafb) )
@@ -1314,12 +1542,14 @@ ROM_START( ponchina )
 ROM_END
 
 
-GAME( 1987, srmp1,     0,        srmp2,    srmp2,    0,       ROT0, "Seta",  "Super Real Mahjong Part 1 (Japan)",  0 )
-GAME( 1987, srmp2,     0,        srmp2,    srmp2,    srmp2,   ROT0, "Seta",  "Super Real Mahjong Part 2 (Japan)",  0 )
-GAME( 1988, srmp3,     0,        srmp3,    srmp3,    srmp3,   ROT0, "Seta",  "Super Real Mahjong Part 3 (Japan)",  0 )
-GAME( 1990, mjyuugi,   0,        mjyuugi,  mjyuugi,  0,       ROT0, "Visco", "Mahjong Yuugi (Japan set 1)",        0 )
-GAME( 1990, mjyuugia,  mjyuugi,  mjyuugi,  mjyuugi,  0,       ROT0, "Visco", "Mahjong Yuugi (Japan set 2)",        0 )
-GAME( 1991, ponchin,   0,        mjyuugi,  ponchin,  0,       ROT0, "Visco", "Mahjong Pon Chin Kan (Japan set 1)", 0 )
-GAME( 1991, ponchina,  ponchin,  mjyuugi,  ponchin,  0,       ROT0, "Visco", "Mahjong Pon Chin Kan (Japan set 2)", 0 )
+
+GAME( 1987, srmp1,     0,        srmp2,    srmp2,    0,       ROT0, "Seta",  				"Super Real Mahjong Part 1 (Japan)",  0 )
+GAME( 1987, srmp2,     0,        srmp2,    srmp2,    0,       ROT0, "Seta",  				"Super Real Mahjong Part 2 (Japan)",  0 )
+GAME( 1988, srmp3,     0,        srmp3,    srmp3,    0,       ROT0, "Seta",  				"Super Real Mahjong Part 3 (Japan)",  0 )
+GAME( 1988, rmgoldyh,  srmp3,    rmgoldyh, rmgoldyh, 0,       ROT0, "[Seta] / Alba",	    "Real Mahjong Gold Yumehai / Super Real Mahjong GOLD part.2 [BET] (Japan)",  0 )
+GAME( 1990, mjyuugi,   0,        mjyuugi,  mjyuugi,  0,       ROT0, "Visco", 				"Mahjong Yuugi (Japan set 1)",        0 )
+GAME( 1990, mjyuugia,  mjyuugi,  mjyuugi,  mjyuugi,  0,       ROT0, "Visco", 				"Mahjong Yuugi (Japan set 2)",        0 )
+GAME( 1991, ponchin,   0,        mjyuugi,  ponchin,  0,       ROT0, "Visco", 				"Mahjong Pon Chin Kan (Japan set 1)", 0 )
+GAME( 1991, ponchina,  ponchin,  mjyuugi,  ponchin,  0,       ROT0, "Visco", 				"Mahjong Pon Chin Kan (Japan set 2)", 0 )
 
 

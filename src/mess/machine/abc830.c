@@ -1334,6 +1334,7 @@ static DEVICE_GET_INFO( luxor_55_10828 )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "Luxor 55 10828-01");						break;
+		case DEVINFO_STR_SHORTNAME:						strcpy(info->s, "luxor55");									break;
 		case DEVINFO_STR_FAMILY:						strcpy(info->s, "Luxor ABC");								break;
 		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");										break;
 		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);									break;
@@ -1354,6 +1355,7 @@ DEVICE_GET_INFO( abc830_pio )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "Luxor ABC 830");							break;
+		case DEVINFO_STR_SHORTNAME:						strcpy(info->s, "abc830");									break;
 
 		default:                                        DEVICE_GET_INFO_CALL(luxor_55_10828);						break;
 	}
@@ -1445,6 +1447,7 @@ static DEVICE_GET_INFO( luxor_55_21046 )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "Luxor Conkort 55 21046-41");				break;
+		case DEVINFO_STR_SHORTNAME:						strcpy(info->s, "conkort55");								break;
 		case DEVINFO_STR_FAMILY:						strcpy(info->s, "Luxor ABC");								break;
 		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");										break;
 		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);									break;
@@ -1465,7 +1468,8 @@ DEVICE_GET_INFO( abc830 )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "Luxor ABC 830");							break;
-
+		case DEVINFO_STR_SHORTNAME:						strcpy(info->s, "abc830");									break;
+		
 		default:                                        DEVICE_GET_INFO_CALL(luxor_55_21046);						break;
 	}
 }
@@ -1483,7 +1487,8 @@ DEVICE_GET_INFO( abc832 )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "Luxor ABC 832");							break;
-
+		case DEVINFO_STR_SHORTNAME:						strcpy(info->s, "abc832");									break;
+		
 		default:                                        DEVICE_GET_INFO_CALL(luxor_55_21046);						break;
 	}
 }
@@ -1501,6 +1506,7 @@ DEVICE_GET_INFO( abc838 )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "Luxor ABC 838");							break;
+		case DEVINFO_STR_SHORTNAME:						strcpy(info->s, "abc838");									break;
 
 		default:                                        DEVICE_GET_INFO_CALL(luxor_55_21046);						break;
 	}

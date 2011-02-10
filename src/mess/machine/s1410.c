@@ -76,7 +76,7 @@ const device_type S1410 = s1410_device_config::static_alloc_device_config;
 //  DEVICE CONFIGURATION
 //**************************************************************************
 
-GENERIC_DEVICE_CONFIG_SETUP(s1410, "Xebec S1410")
+GENERIC_DEVICE_CONFIG_SETUP(s1410, "Xebec S1410", "s1410")
 
 
 //-------------------------------------------------

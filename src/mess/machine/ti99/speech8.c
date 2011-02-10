@@ -221,6 +221,7 @@ static const char DEVTEMPLATE_SOURCE[] = __FILE__;
 #define DEVTEMPLATE_ID(p,s)             p##ti99_speech8##s
 #define DEVTEMPLATE_FEATURES            DT_HAS_START | DT_HAS_STOP | DT_HAS_RESET | DT_HAS_ROM_REGION | DT_HAS_MACHINE_CONFIG
 #define DEVTEMPLATE_NAME                "TI-99/8 Speech Synthesizer"
+#define DEVTEMPLATE_SHORTNAME           "ti998sp"
 #define DEVTEMPLATE_FAMILY              "Internal subsystem"
 #include "devtempl.h"
 

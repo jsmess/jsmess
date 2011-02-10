@@ -265,6 +265,7 @@ static const char DEVTEMPLATE_SOURCE[] = __FILE__;
 #define DEVTEMPLATE_ID(p,s)             p##ti99_speech##s
 #define DEVTEMPLATE_FEATURES            DT_HAS_START | DT_HAS_STOP | DT_HAS_RESET | DT_HAS_INLINE_CONFIG | DT_HAS_ROM_REGION | DT_HAS_MACHINE_CONFIG
 #define DEVTEMPLATE_NAME                "TI-99 Speech Synthesizer"
+#define DEVTEMPLATE_SHORTNAME           "ti99spsyn"
 #define DEVTEMPLATE_FAMILY              "Peripheral expansion"
 #include "devtempl.h"
 
