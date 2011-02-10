@@ -7,6 +7,20 @@
 
         05/02/2011 Skeleton driver.
 
+        According to the schematic, the rom is at 0000-03FF (no mirrors),
+        and the RAM is at 1800-1FFF (no mirrors). However the first thing
+        the rom does is to jump to 2061, which would cause an instant crash.
+        Perhaps it is a bad dump? It doesn't do anything sensible at the
+        moment.
+
+        All photos of this computer are of it pulled apart. There are no
+        photos of it running. I assume all the LEDs are red ones. The LEDs
+        down the left side I assume to be bit 0 through 7 in that order.
+
+        ToDo:
+        - Make better artwork
+        - It should run but bad rom suspected
+
 ****************************************************************************/
 #define ADDRESS_MAP_MODERN
 
@@ -37,8 +51,8 @@ public:
 
 static ADDRESS_MAP_START(savia84_mem, ADDRESS_SPACE_PROGRAM, 8, savia84_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
-	AM_RANGE(0x0000, 0x03ff) AM_ROM AM_MIRROR(0x2c00) AM_WRITENOP
+	ADDRESS_MAP_GLOBAL_MASK(0x7fff) // A15 not connected at the cPU
+	AM_RANGE(0x0000, 0x03ff) AM_ROM AM_MIRROR(0x2000) AM_WRITENOP // see notes above
 	AM_RANGE(0x1800, 0x1fff) AM_RAM
 ADDRESS_MAP_END
 
@@ -106,21 +120,24 @@ static MACHINE_RESET(savia84)
 {
 }
 
-WRITE8_MEMBER( savia84_state::savia84_8255_porta_w )
+WRITE8_MEMBER( savia84_state::savia84_8255_porta_w ) // OUT F8 - output segments on the selected digit
 {
-	m_segment = data & 0x7f;
+	m_segment = ~data & 0x7f;
 	if (m_digit) output_set_digit_value(m_digit, m_segment);
-printf("F8=%X ",data);
 }
 
-WRITE8_MEMBER( savia84_state::savia84_8255_portb_w )
-{ // 8 leds
-printf("F9=%X ",data);
-}
-
-WRITE8_MEMBER( savia84_state::savia84_8255_portc_w )
+WRITE8_MEMBER( savia84_state::savia84_8255_portb_w ) // OUT F9 - light the 8 leds down the left side
 {
-printf("FA=%X ",data);
+	char ledname[8];
+	for (int i = 0; i < 8; i++)
+	{
+		sprintf(ledname,"led%d",i);
+		output_set_value(ledname, BIT(data, i));
+	}
+}
+
+WRITE8_MEMBER( savia84_state::savia84_8255_portc_w ) // OUT FA - set keyboard scanning row; set digit to display
+{
 	m_digit = 0;
 	m_kbd = data & 15;
 	if (m_kbd == 0)
@@ -132,7 +149,7 @@ printf("FA=%X ",data);
 	if (m_digit) output_set_digit_value(m_digit, m_segment);
 }
 
-READ8_MEMBER( savia84_state::savia84_8255_portc_r )
+READ8_MEMBER( savia84_state::savia84_8255_portc_r ) // IN FA - read keyboard
 {
 	if (m_kbd < 9)
 	{
