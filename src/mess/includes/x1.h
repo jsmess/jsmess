@@ -89,8 +89,6 @@ public:
 	UINT8 *gfx_bitmap_ram;
 	UINT16 pcg_index[3];
 	UINT8 pcg_reset;
-	UINT16 crtc_start_addr;
-	UINT8 tile_height;
 	UINT8 sub_obf;
 	UINT8 ctc_irq_flag;
 	scrn_reg_t scrn_reg;
@@ -115,7 +113,6 @@ public:
 	UINT8 x_b;
 	UINT8 x_g;
 	UINT8 x_r;
-	int addr_latch;
 	UINT16 kanji_addr_latch;
 	UINT32 kanji_addr;
 	UINT8 kanji_eksel;
@@ -129,6 +126,7 @@ public:
 	UINT8 key_irq_vector;
 	UINT32 emm_addr;
 	UINT8 *pal_4096;
+	UINT8 crtc_vreg[0x100],crtc_index;
 };
 
 

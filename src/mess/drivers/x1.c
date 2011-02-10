@@ -265,8 +265,10 @@ x--- ---- double width
 ---x ---- color blinking
 ---- x--- reverse color
 ---- -xxx color pen
-
 */
+
+#define mc6845_tile_height (state->crtc_vreg[9]+1)
+#define mc6845_start_addr  (((state->crtc_vreg[0x0c]<<8) & 0x3f00) | (state->crtc_vreg[0x0d] & 0xff))
 
 static void draw_fgtilemap(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int w)
 {
@@ -284,11 +286,11 @@ static void draw_fgtilemap(running_machine *machine, bitmap_t *bitmap,const rect
 	{
 		for (x=0;x<40*w;x++)
 		{
-			int tile = videoram[(x+(y*40*w)+state->crtc_start_addr) & screen_mask];
-			int color = state->colorram[(x+(y*40*w)+state->crtc_start_addr) & screen_mask] & 0x1f;
-			int width = (state->colorram[(x+(y*40*w)+state->crtc_start_addr) & screen_mask] & 0x80)>>7;
-			int height = 0;//(state->colorram[(x+(y*40*w)+state->crtc_start_addr) & screen_mask] & 0x40)>>6;
-			int pcg_bank = (state->colorram[(x+(y*40*w)+state->crtc_start_addr) & screen_mask] & 0x20)>>5;
+			int tile = videoram[(x+(y*40*w)+mc6845_start_addr) & screen_mask];
+			int color = state->colorram[(x+(y*40*w)+mc6845_start_addr) & screen_mask] & 0x1f;
+			int width = (state->colorram[(x+(y*40*w)+mc6845_start_addr) & screen_mask] & 0x80)>>7;
+			int height = 0;//(state->colorram[(x+(y*40*w)+mc6845_start_addr) & screen_mask] & 0x40)>>6;
+			int pcg_bank = (state->colorram[(x+(y*40*w)+mc6845_start_addr) & screen_mask] & 0x20)>>5;
 			UINT8 *gfx_data = machine->region(pcg_bank ? "pcg" : "cgrom")->base();
 
 			if(prev_width && x) { prev_width = 0; continue; }
@@ -325,9 +327,9 @@ static void draw_fgtilemap(running_machine *machine, bitmap_t *bitmap,const rect
 
 						res_x = x*8+xi*(width+1);
 						if(state->scrn_reg.v400_mode)
-							res_y = y*((state->tile_height+1)/2)+yi*(height+1);
+							res_y = y*((mc6845_tile_height)/2)+yi*(height+1);
 						else
-							res_y = y*(state->tile_height+1)+yi*(height+1);
+							res_y = y*(mc6845_tile_height)+yi*(height+1);
 
 						if(state->scrn_reg.v400_mode)
 						{
@@ -384,13 +386,13 @@ static void draw_gfxbitmap(running_machine *machine, bitmap_t *bitmap,const rect
 	{
 		for(x=0;x<40*w;x++)
 		{
-			for(yi=0;yi<(state->tile_height+1);yi++)
+			for(yi=0;yi<(mc6845_tile_height);yi++)
 			{
 				for(xi=0;xi<8;xi++)
 				{
-					pen_b = (state->gfx_bitmap_ram[(((x+(y*40*w)+yi*0x800)+state->crtc_start_addr) & 0x3fff)+0x0000+plane*0xc000]>>(7-xi)) & 1;
-					pen_r = (state->gfx_bitmap_ram[(((x+(y*40*w)+yi*0x800)+state->crtc_start_addr) & 0x3fff)+0x4000+plane*0xc000]>>(7-xi)) & 1;
-					pen_g = (state->gfx_bitmap_ram[(((x+(y*40*w)+yi*0x800)+state->crtc_start_addr) & 0x3fff)+0x8000+plane*0xc000]>>(7-xi)) & 1;
+					pen_b = (state->gfx_bitmap_ram[(((x+(y*40*w)+yi*0x800)+mc6845_start_addr) & 0x3fff)+0x0000+plane*0xc000]>>(7-xi)) & 1;
+					pen_r = (state->gfx_bitmap_ram[(((x+(y*40*w)+yi*0x800)+mc6845_start_addr) & 0x3fff)+0x4000+plane*0xc000]>>(7-xi)) & 1;
+					pen_g = (state->gfx_bitmap_ram[(((x+(y*40*w)+yi*0x800)+mc6845_start_addr) & 0x3fff)+0x8000+plane*0xc000]>>(7-xi)) & 1;
 
 					color =  (pen_g<<2 | pen_r<<1 | pen_b<<0) | 8;
 
@@ -399,11 +401,11 @@ static void draw_gfxbitmap(running_machine *machine, bitmap_t *bitmap,const rect
 
 					if(state->scrn_reg.v400_mode)
 					{
-						x1_draw_pixel(machine,bitmap,(y*(state->tile_height+1)+yi)*2+0,x*8+xi,color,0,0);
-						x1_draw_pixel(machine,bitmap,(y*(state->tile_height+1)+yi)*2+1,x*8+xi,color,0,0);
+						x1_draw_pixel(machine,bitmap,(y*(mc6845_tile_height)+yi)*2+0,x*8+xi,color,0,0);
+						x1_draw_pixel(machine,bitmap,(y*(mc6845_tile_height)+yi)*2+1,x*8+xi,color,0,0);
 					}
 					else
-						x1_draw_pixel(machine,bitmap,y*(state->tile_height+1)+yi,x*8+xi,color,0,0);
+						x1_draw_pixel(machine,bitmap,y*(mc6845_tile_height)+yi,x*8+xi,color,0,0);
 
 				}
 			}
@@ -934,7 +936,7 @@ static WRITE8_HANDLER( x1_fdc_w )
 		case 0x0ffd:
 		case 0x0ffe:
 		case 0x0fff:
-			logerror("FDC: invalid write to %04x = %02x\n",offset+0xff8,data);
+			logerror("FDC: undefined write to %04x = %02x\n",offset+0xff8,data);
 			break;
 	}
 }
@@ -1242,19 +1244,12 @@ static WRITE8_HANDLER( x1_6845_w )
 	x1_state *state = space->machine->driver_data<x1_state>();
 	if(offset == 0)
 	{
-		state->addr_latch = data;
+		state->crtc_index = data;
 		mc6845_address_w(space->machine->device("crtc"), 0,data);
 	}
 	else
 	{
-		/* FIXME: this should be inside the MC6845 core! */
-		if(state->addr_latch == 0x09)
-			state->tile_height = data;
-		if(state->addr_latch == 0x0c)
-			state->crtc_start_addr = ((data<<8) & 0x3f00) | (state->crtc_start_addr & 0xff);
-		else if(state->addr_latch == 0x0d)
-			state->crtc_start_addr = (state->crtc_start_addr & 0x3f00) | (data & 0xff);
-
+		state->crtc_vreg[state->crtc_index] = data;
 		mc6845_register_w(space->machine->device("crtc"), 0,data);
 
 		/* double pump the pixel clock if we are in 640 x 200 mode */
@@ -2443,7 +2438,7 @@ static MACHINE_CONFIG_START( x1, x1_state )
 	MCFG_FLOPPY_4_DRIVES_ADD(x1_floppy_config)
 	MCFG_SOFTWARE_LIST_ADD("flop_list","x1_flop")
 
-	MCFG_TIMER_ADD_PERIODIC("keyboard_timer", keyboard_callback, attotime::from_hz(240))
+	MCFG_TIMER_ADD_PERIODIC("keyboard_timer", keyboard_callback, attotime::from_hz(250))
 	MCFG_TIMER_ADD_PERIODIC("cmt_wind_timer", cmt_wind_timer, attotime::from_hz(16))
 MACHINE_CONFIG_END
 
