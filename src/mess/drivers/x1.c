@@ -22,7 +22,6 @@
         - (anything else?)
 
     per-game/program specific TODO:
-    - Exoa II - Warroid: major tile width/height positioning bugs (especially during gameplay);
     - Hydlide 2 / 3: can't get the user disk to work properly
     - Gruppe: shows a random bitmap graphic then returns "program load error"
     - Legend of Kage: has serious graphic artifacts, pcg doesn't scroll properly, bitmap-based sprites aren't shown properly, dma bugs?
@@ -270,46 +269,70 @@ x--- ---- double width
 #define mc6845_tile_height (state->crtc_vreg[9]+1)
 #define mc6845_start_addr  (((state->crtc_vreg[0x0c]<<8) & 0x3f00) | (state->crtc_vreg[0x0d] & 0xff))
 
-static void draw_fgtilemap(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int w)
+static UINT8 check_prev_height(running_machine *machine,int x,int y,int w)
 {
 	x1_state *state = machine->driver_data<x1_state>();
-	UINT8 *videoram = state->videoram;
+	UINT8 prev_tile = state->videoram[(x+((y-1)*40*w)+mc6845_start_addr) & 0x7ff];
+	UINT8 cur_tile = state->videoram[(x+(y*40*w)+mc6845_start_addr) & 0x7ff];
+	UINT8 prev_attr = state->colorram[(x+((y-1)*40*w)+mc6845_start_addr) & 0x7ff];
+	UINT8 cur_attr = state->colorram[(x+(y*40*w)+mc6845_start_addr) & 0x7ff];
+
+	if(prev_tile == cur_tile && prev_attr == cur_attr)
+		return 8;
+
+	return 0;
+}
+
+/* Exoa II - Warroid: if double height isn't enabled on the first tile of the line then double height is disabled on everything else. */
+static UINT8 check_line_valid_height(running_machine *machine,int y,int w,int height)
+{
+	x1_state *state = machine->driver_data<x1_state>();
+	UINT8 line_attr = state->colorram[(0+(y*40*w)+mc6845_start_addr) & 0x7ff];
+
+	if((line_attr & 0x40) == 0)
+		return 0;
+
+	return height;
+}
+
+static void draw_fgtilemap(running_machine *machine, bitmap_t *bitmap,int w)
+{
+	x1_state *state = machine->driver_data<x1_state>();
 	int y,x,res_x,res_y;
-	int screen_mask;
-	UINT8 prev_width;
-
-	screen_mask = 0x7ff;//(w == 2) ? 0xfff : 0x7ff;
-
-	prev_width = 0;
 
 	for (y=0;y<50;y++)
 	{
 		for (x=0;x<40*w;x++)
 		{
-			int tile = videoram[(x+(y*40*w)+mc6845_start_addr) & screen_mask];
-			int color = state->colorram[(x+(y*40*w)+mc6845_start_addr) & screen_mask] & 0x1f;
-			int width = (state->colorram[(x+(y*40*w)+mc6845_start_addr) & screen_mask] & 0x80)>>7;
-			int height = 0;//(state->colorram[(x+(y*40*w)+mc6845_start_addr) & screen_mask] & 0x40)>>6;
-			int pcg_bank = (state->colorram[(x+(y*40*w)+mc6845_start_addr) & screen_mask] & 0x20)>>5;
+			int tile = state->videoram[(x+(y*40*w)+mc6845_start_addr) & 0x7ff];
+			int color = state->colorram[(x+(y*40*w)+mc6845_start_addr) & 0x7ff] & 0x1f;
+			int width = (state->colorram[(x+(y*40*w)+mc6845_start_addr) & 0x7ff] & 0x80)>>7;
+			int height = (state->colorram[(x+(y*40*w)+mc6845_start_addr) & 0x7ff] & 0x40)>>6;
+			int pcg_bank = (state->colorram[(x+(y*40*w)+mc6845_start_addr) & 0x7ff] & 0x20)>>5;
 			UINT8 *gfx_data = machine->region(pcg_bank ? "pcg" : "cgrom")->base();
 
-			if(prev_width && x) { prev_width = 0; continue; }
-			if(width)
-				prev_width = 1;
-
 			{
-				int pen[3],pen_mask,pcg_pen,xi,yi;
+				int pen[3],pen_mask,pcg_pen,xi,yi,dy;
 
 				pen_mask = color & 7;
 
-				/* We use custom drawing code due of the bitplane disable and the color revert stuff. */
+				dy = 0;
+
+				height = check_line_valid_height(machine,y,w,height);
+
+				if(height)
+				{
+					if(y)
+						dy = check_prev_height(machine,x,y,w);
+				}
+
 				for(yi=0;yi<8;yi++)
 				{
 					for(xi=0;xi<8;xi++)
 					{
-						pen[0] = gfx_data[((tile*8)+yi)+0x0000]>>(7-xi) & (pen_mask & 1)>>0;
-						pen[1] = gfx_data[((tile*8)+yi)+0x0800]>>(7-xi) & (pen_mask & 2)>>1;
-						pen[2] = gfx_data[((tile*8)+yi)+0x1000]>>(7-xi) & (pen_mask & 4)>>2;
+						pen[0] = gfx_data[((tile*8)+((yi+dy) >> height))+0x0000]>>(7-xi) & (pen_mask & 1)>>0;
+						pen[1] = gfx_data[((tile*8)+((yi+dy) >> height))+0x0800]>>(7-xi) & (pen_mask & 2)>>1;
+						pen[2] = gfx_data[((tile*8)+((yi+dy) >> height))+0x1000]>>(7-xi) & (pen_mask & 4)>>2;
 
 						pcg_pen = pen[2]<<2|pen[1]<<1|pen[0]<<0;
 
@@ -327,22 +350,25 @@ static void draw_fgtilemap(running_machine *machine, bitmap_t *bitmap,const rect
 
 						res_x = x*8+xi*(width+1);
 						if(state->scrn_reg.v400_mode)
-							res_y = y*((mc6845_tile_height)/2)+yi*(height+1);
+							res_y = y*((mc6845_tile_height)/2)+yi;
 						else
-							res_y = y*(mc6845_tile_height)+yi*(height+1);
+							res_y = y*(mc6845_tile_height)+yi;
 
 						if(state->scrn_reg.v400_mode)
 						{
-							x1_draw_pixel(machine,bitmap,res_y*2+0,res_x,pcg_pen,width,height);
-							x1_draw_pixel(machine,bitmap,res_y*2+1,res_x,pcg_pen,width,height);
+							x1_draw_pixel(machine,bitmap,res_y*2+0,res_x,pcg_pen,width,0);
+							x1_draw_pixel(machine,bitmap,res_y*2+1,res_x,pcg_pen,width,0);
 						}
 						else
 						{
-							x1_draw_pixel(machine,bitmap,res_y,res_x,pcg_pen,width,height);
+							x1_draw_pixel(machine,bitmap,res_y,res_x,pcg_pen,width,0);
 						}
 					}
 				}
 			}
+
+			if(width) //skip next char if we are under double width condition
+				x++;
 		}
 	}
 }
@@ -375,7 +401,7 @@ static int priority_mixer_pri(running_machine *machine,int color)
 	return pri_mask_calc;
 }
 
-static void draw_gfxbitmap(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int w,int plane,int pri)
+static void draw_gfxbitmap(running_machine *machine, bitmap_t *bitmap,int w,int plane,int pri)
 {
 	x1_state *state = machine->driver_data<x1_state>();
 	int xi,yi,x,y;
@@ -422,11 +448,9 @@ static VIDEO_UPDATE( x1 )
 
 	bitmap_fill(bitmap, cliprect, MAKE_ARGB(0xff,0x00,0x00,0x00));
 
-	draw_gfxbitmap(screen->machine,bitmap,cliprect,w,state->scrn_reg.disp_bank,state->scrn_reg.pri);
-	draw_fgtilemap(screen->machine,bitmap,cliprect,w);
-	draw_gfxbitmap(screen->machine,bitmap,cliprect,w,state->scrn_reg.disp_bank,state->scrn_reg.pri^0xff);
-	/* Y's uses the following as a normal buffer/work ram without anything reasonable to draw */
-//  draw_gfxbitmap(screen->machine,bitmap,cliprect,w,1);
+	draw_gfxbitmap(screen->machine,bitmap,w,state->scrn_reg.disp_bank,state->scrn_reg.pri);
+	draw_fgtilemap(screen->machine,bitmap,w);
+	draw_gfxbitmap(screen->machine,bitmap,w,state->scrn_reg.disp_bank,state->scrn_reg.pri^0xff);
 
 	return 0;
 }
