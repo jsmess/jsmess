@@ -25,6 +25,7 @@
     - Hydlide 2 / 3: can't get the user disk to work properly
     - Gruppe: shows a random bitmap graphic then returns "program load error"
     - Legend of Kage: has serious graphic artifacts, pcg doesn't scroll properly, bitmap-based sprites aren't shown properly, dma bugs?
+	- Nuts & Milk (x1 collection number 14): currently hangs due of sub obf bit always on.
     - "newtype": dies with a z80dma assert;
     - Turbo Alpha: has z80dma / fdc bugs, doesn't show the presentation properly and then hangs;
     - Ys 2: crashes after the disclaimer screen;
