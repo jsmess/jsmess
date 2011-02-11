@@ -45,9 +45,10 @@ WIMGTOOL_OBJS = \
 ifdef MSVC_BUILD
 # workaround to allow linking with MSVC
 LDFLAGS_WIN = $(subst /ENTRY:wmainCRTStartup,,$(LDFLAGS))
-LIBS += shell32.lib
+LIBS_WIN = $(LIBS) shell32.lib
 else
 LDFLAGS_WIN = $(LDFLAGS)
+LIBS_WIN = $(LIBS)
 endif
 
 #-------------------------------------------------
@@ -60,4 +61,4 @@ $(WIMGTOOLOBJ)/%.res: $(WIMGTOOLSRC)/%.rc | $(OSPREBUILD)
 
 $(WIMGTOOL): $(WIMGTOOL_OBJS) $(LIBIMGTOOL) $(LIBUTIL) $(EXPAT) $(ZLIB) $(LIBOCORE_NOMAIN)
 	@echo Linking $@...
-	$(LD) $(LDFLAGS_WIN) -mwindows $^ $(LIBS) -o $@
+	$(LD) $(LDFLAGS_WIN) -mwindows $^ $(LIBS_WIN) -o $@
