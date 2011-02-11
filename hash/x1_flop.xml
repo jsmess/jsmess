@@ -1062,8 +1062,8 @@
 
 	<software name="gruppe">
 		<description>Gruppe</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1985</year>
+		<publisher>Micomhouse SPS</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="gruppe.d88" size="348848" crc="a50dfd33" sha1="551749d2ec4deb3919f2111d234450fd4f90d54a" offset="0" />

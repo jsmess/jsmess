@@ -15,17 +15,21 @@
     - X1Turbo: Implement SIO.
     - X1Twin: Hook-up the PC Engine part (actually needs his own driver?);
     - Implement SASI HDD interface;
-    - clean-ups!
+ 	- clean-ups!
     - There are various unclear video things, these are:
         - Implement the remaining scrn regs;
-        - Implement the new features of the x1turbo, namely the 4096 color feature amongst other things
+        - Implement the new features of the x1turboz, namely the 4096 color feature amongst other things
         - (anything else?)
+ 	- Driver Configuration switches:
+		- OPN for X1
+		- EMM, and hook-up for X1 too
+		- RAM size for EMM
+		- specific x1turboz features?
 
     per-game/program specific TODO:
     - Hydlide 2 / 3: can't get the user disk to work properly
-    - Gruppe: shows a random bitmap graphic then returns "program load error"
+    - Gruppe: shows a random bitmap graphic then returns "program load error" ... wd17xx, it wants write protection bit to be enabled
     - Legend of Kage: has serious graphic artifacts, pcg doesn't scroll properly, bitmap-based sprites aren't shown properly, dma bugs?
-	- Nuts & Milk (x1 collection number 14): currently hangs due of sub obf bit always on.
     - "newtype": dies with a z80dma assert;
     - Turbo Alpha: has z80dma / fdc bugs, doesn't show the presentation properly and then hangs;
     - Ys 2: crashes after the disclaimer screen;
@@ -300,6 +304,7 @@ static void draw_fgtilemap(running_machine *machine, bitmap_t *bitmap,int w)
 {
 	x1_state *state = machine->driver_data<x1_state>();
 	int y,x,res_x,res_y;
+	UINT32 tile_offset;
 
 	for (y=0;y<50;y++)
 	{
@@ -321,19 +326,27 @@ static void draw_fgtilemap(running_machine *machine, bitmap_t *bitmap,int w)
 
 				height = check_line_valid_height(machine,y,w,height);
 
-				if(height)
-				{
-					if(y)
-						dy = check_prev_height(machine,x,y,w);
-				}
+				if(height && y)
+					dy = check_prev_height(machine,x,y,w);
 
-				for(yi=0;yi<8;yi++)
+				for(yi=0;yi<mc6845_tile_height;yi++)
 				{
 					for(xi=0;xi<8;xi++)
 					{
-						pen[0] = gfx_data[((tile*8)+((yi+dy) >> height))+0x0000]>>(7-xi) & (pen_mask & 1)>>0;
-						pen[1] = gfx_data[((tile*8)+((yi+dy) >> height))+0x0800]>>(7-xi) & (pen_mask & 2)>>1;
-						pen[2] = gfx_data[((tile*8)+((yi+dy) >> height))+0x1000]>>(7-xi) & (pen_mask & 4)>>2;
+						if(state->scrn_reg.v400_mode /*&& pcg_bank == 0*/) //latter is unconfirmed
+						{
+							tile_offset = ((tile*16)+((yi+dy*2) >> height));
+							pen[0] = gfx_data[tile_offset+0x0000+0x1800]>>(7-xi) & (pen_mask & 1)>>0;
+							pen[1] = gfx_data[tile_offset+0x1000+0x1800]>>(7-xi) & (pen_mask & 2)>>1;
+							pen[2] = gfx_data[tile_offset+0x2000+0x1800]>>(7-xi) & (pen_mask & 4)>>2;
+						}
+						else
+						{
+							tile_offset = ((tile*8)+((yi+dy) >> height));
+							pen[0] = gfx_data[tile_offset+0x0000]>>(7-xi) & (pen_mask & 1)>>0;
+							pen[1] = gfx_data[tile_offset+0x0800]>>(7-xi) & (pen_mask & 2)>>1;
+							pen[2] = gfx_data[tile_offset+0x1000]>>(7-xi) & (pen_mask & 4)>>2;
+						}
 
 						pcg_pen = pen[2]<<2|pen[1]<<1|pen[0]<<0;
 
@@ -350,20 +363,9 @@ static void draw_fgtilemap(running_machine *machine, bitmap_t *bitmap,int w)
 							pcg_pen = 0; // clip the pen to black
 
 						res_x = x*8+xi*(width+1);
-						if(state->scrn_reg.v400_mode)
-							res_y = y*((mc6845_tile_height)/2)+yi;
-						else
-							res_y = y*(mc6845_tile_height)+yi;
+						res_y = y*(mc6845_tile_height)+yi;
 
-						if(state->scrn_reg.v400_mode)
-						{
-							x1_draw_pixel(machine,bitmap,res_y*2+0,res_x,pcg_pen,width,0);
-							x1_draw_pixel(machine,bitmap,res_y*2+1,res_x,pcg_pen,width,0);
-						}
-						else
-						{
-							x1_draw_pixel(machine,bitmap,res_y,res_x,pcg_pen,width,0);
-						}
+						x1_draw_pixel(machine,bitmap,res_y,res_x,pcg_pen,width,0);
 					}
 				}
 			}
@@ -637,8 +639,6 @@ static READ8_HANDLER( sub_io_r )
 
 	return ret;
 }
-
-//static UINT8 ctc_irq_vector; //always 0x5e?
 
 static void cmt_command( running_machine* machine, UINT8 cmd )
 {
@@ -2351,6 +2351,15 @@ static MACHINE_RESET( x1 )
 	cassette_change_state(machine->device("cass" ),CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
 
 	state->key_irq_flag = state->ctc_irq_flag = 0;
+	state->sub_cmd = 0;
+	state->key_irq_vector = 0;
+	state->sub_cmd_length = 0;
+	state->sub_val[0] = 0;
+	state->sub_val[1] = 0;
+	state->sub_val[2] = 0;
+	state->sub_val[3] = 0;
+	state->sub_val[4] = 0;
+	state->sub_obf = (state->sub_cmd_length) ? 0x00 : 0x20;
 
 	/* Reinitialize palette here if there's a soft reset for the Turbo PAL stuff*/
 	for(i=0;i<0x10;i++)
@@ -2505,9 +2514,12 @@ MACHINE_CONFIG_END
 	ROM_LOAD( "ank.fnt", 0x0000, 0x2000, BAD_DUMP CRC(19689fbd) SHA1(0d4e072cd6195a24a1a9b68f1d37500caa60e599) )
 
 	ROM_REGION(0x4d600, "cgrom", 0)
-	ROM_LOAD("fnt0808.x1", 0x00000, 0x00800, CRC(e3995a57) SHA1(1c1a0d8c9f4c446ccd7470516b215ddca5052fb2) )
-	ROM_RELOAD(            0x00800, 0x00800)
-	ROM_RELOAD(            0x01000, 0x00800)
+	ROM_LOAD("fnt0808.x1",  0x00000, 0x00800, CRC(e3995a57) SHA1(1c1a0d8c9f4c446ccd7470516b215ddca5052fb2) )
+	ROM_RELOAD(            	0x00800, 0x00800)
+	ROM_RELOAD(            	0x01000, 0x00800)
+	ROM_COPY("font", 	0x1000, 0x01800, 0x1000 )
+	ROM_COPY("font", 	0x1000, 0x02800, 0x1000 )
+	ROM_COPY("font", 	0x1000, 0x03800, 0x1000 )
 
 	ROM_REGION(0x20000, "kanji", ROMREGION_ERASEFF)
 
@@ -2533,8 +2545,11 @@ ROM_START( x1twin )
 
 	ROM_REGION(0x4d600, "cgrom", 0)
 	ROM_LOAD("ank8.rom", 0x00000, 0x00800, CRC(e3995a57) SHA1(1c1a0d8c9f4c446ccd7470516b215ddca5052fb2) )
-	ROM_RELOAD(          0x00800, 0x00800)
-	ROM_RELOAD(          0x01000, 0x00800)
+	ROM_RELOAD(            	0x00800, 0x00800)
+	ROM_RELOAD(            	0x01000, 0x00800)
+	ROM_COPY("font", 	0x0000, 0x01800, 0x1000 )
+	ROM_COPY("font", 	0x0000, 0x02800, 0x1000 )
+	ROM_COPY("font", 	0x0000, 0x03800, 0x1000 )
 
 	ROM_REGION(0x20000, "kanji", ROMREGION_ERASEFF)
 
@@ -2562,10 +2577,13 @@ ROM_START( x1turbo )
 	ROM_REGION(0x2000, "font", 0) //TODO: this contains 8x16 charset only, maybe it's possible that it derivates a 8x8 charset by skipping gfx lines?
 	ROM_LOAD( "ank.fnt", 0x0000, 0x2000, CRC(19689fbd) SHA1(0d4e072cd6195a24a1a9b68f1d37500caa60e599) )
 
-	ROM_REGION(0x4d600, "cgrom", 0)
+	ROM_REGION(0x4800, "cgrom", 0)
 	ROM_LOAD("fnt0808_turbo.x1", 0x00000, 0x00800, CRC(84a47530) SHA1(06c0995adc7a6609d4272417fe3570ca43bd0454) )
-	ROM_RELOAD(            0x00800, 0x00800)
-	ROM_RELOAD(            0x01000, 0x00800)
+	ROM_RELOAD(            	0x00800, 0x00800)
+	ROM_RELOAD(            	0x01000, 0x00800)
+	ROM_COPY("font", 	0x1000, 0x01800, 0x1000 )
+	ROM_COPY("font", 	0x1000, 0x02800, 0x1000 )
+	ROM_COPY("font", 	0x1000, 0x03800, 0x1000 )
 
 	ROM_REGION(0x20000, "kanji", ROMREGION_ERASEFF)
 
@@ -2593,10 +2611,13 @@ ROM_START( x1turbo40 )
 	ROM_REGION(0x2000, "font", 0) //TODO: this contains 8x16 charset only, maybe it's possible that it derivates a 8x8 charset by skipping gfx lines?
 	ROM_LOAD( "ank.fnt", 0x0000, 0x2000, CRC(19689fbd) SHA1(0d4e072cd6195a24a1a9b68f1d37500caa60e599) )
 
-	ROM_REGION(0x1800, "cgrom", 0)
-	ROM_LOAD("fnt0808_turbo.x1", 0x0000, 0x0800, CRC(84a47530) SHA1(06c0995adc7a6609d4272417fe3570ca43bd0454) )
-	ROM_RELOAD(            0x00800, 0x00800)
-	ROM_RELOAD(            0x01000, 0x00800)
+	ROM_REGION(0x4800, "cgrom", 0)
+	ROM_LOAD("fnt0808_turbo.x1",0x00000, 0x0800, CRC(84a47530) SHA1(06c0995adc7a6609d4272417fe3570ca43bd0454) )
+	ROM_RELOAD(            		0x00800, 0x0800 )
+	ROM_RELOAD(            		0x01000, 0x0800 )
+	ROM_COPY("font", 	0x1000, 0x01800, 0x1000 )
+	ROM_COPY("font", 	0x1000, 0x02800, 0x1000 )
+	ROM_COPY("font", 	0x1000, 0x03800, 0x1000 )
 
 	ROM_REGION(0x20000, "kanji", ROMREGION_ERASEFF)
 
