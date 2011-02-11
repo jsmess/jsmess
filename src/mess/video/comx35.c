@@ -37,7 +37,7 @@ WRITE8_MEMBER( comx35_state::cdp1869_w )
 /* CDP1869 */
 
 static ADDRESS_MAP_START( cdp1869_page_ram, 0, 8 )
-	AM_RANGE(0x000, 0x3ff) AM_MIRROR(0x400) AM_RAM
+	AM_RANGE(0x000, 0x7ff) AM_RAM
 ADDRESS_MAP_END
 
 static CDP1869_CHAR_RAM_READ( comx35_charram_r )
