@@ -261,19 +261,24 @@ static void x1_draw_pixel(running_machine *machine, bitmap_t *bitmap,int y,int x
 		*BITMAP_ADDR16(bitmap, y, x) = machine->pens[pen];
 }
 
-/*
-attribute:
-x--- ---- double width
--x-- ---- double height
---x- ---- PCG select
----x ---- color blinking
----- x--- reverse color
----- -xxx color pen
-*/
+#define mc6845_h_char_total 	(state->crtc_vreg[0])
+#define mc6845_h_display 		(state->crtc_vreg[1])
+#define mc6845_h_sync_pos		(state->crtc_vreg[2])
+#define mc6845_sync_width		(state->crtc_vreg[3])
+#define mc6845_v_char_total		(state->crtc_vreg[4])
+#define mc6845_v_total_adj 		(state->crtc_vreg[5])
+#define mc6845_v_disp			(state->crtc_vreg[6])
+#define mc6845_v_sync_pos		(state->crtc_vreg[7])
+#define mc6845_mode_ctrl		(state->crtc_vreg[8])
+#define mc6845_tile_height 		(state->crtc_vreg[9]+1)
+#define mc6845_cursor_y_start 	(state->crtc_vreg[0x0a])
+#define mc6845_cursor_y_end 	(state->crtc_vreg[0x0b])
+#define mc6845_start_addr  		(((state->crtc_vreg[0x0c]<<8) & 0x700) | (state->crtc_vreg[0x0d] & 0xff))
+#define mc6845_cursor_addr  	(((state->crtc_vreg[0x0e]<<8) & 0x700) | (state->crtc_vreg[0x0f] & 0xff))
+#define mc6845_light_pen_addr  	(((state->crtc_vreg[0x10]<<8) & 0x700) | (state->crtc_vreg[0x11] & 0xff))
+#define mc6845_update_addr  	(((state->crtc_vreg[0x12]<<8) & 0x700) | (state->crtc_vreg[0x13] & 0xff))
 
-#define mc6845_tile_height (state->crtc_vreg[9]+1)
-#define mc6845_start_addr  (((state->crtc_vreg[0x0c]<<8) & 0x3f00) | (state->crtc_vreg[0x0d] & 0xff))
-
+/* adjust tile index when we are under double height condition */
 static UINT8 check_prev_height(running_machine *machine,int x,int y,int w)
 {
 	x1_state *state = machine->driver_data<x1_state>();
@@ -302,6 +307,18 @@ static UINT8 check_line_valid_height(running_machine *machine,int y,int w,int he
 
 static void draw_fgtilemap(running_machine *machine, bitmap_t *bitmap,int w)
 {
+	/*
+		attribute table:
+		x--- ---- double width
+		-x-- ---- double height
+		--x- ---- PCG select
+		---x ---- color blinking
+		---- x--- reverse color
+		---- -xxx color pen
+
+		TODO: kanji area
+	*/
+
 	x1_state *state = machine->driver_data<x1_state>();
 	int y,x,res_x,res_y;
 	UINT32 tile_offset;
@@ -333,7 +350,7 @@ static void draw_fgtilemap(running_machine *machine, bitmap_t *bitmap,int w)
 				{
 					for(xi=0;xi<8;xi++)
 					{
-						if(state->scrn_reg.v400_mode /*&& pcg_bank == 0*/) //latter is unconfirmed
+						if(state->scrn_reg.v400_mode && pcg_bank == 0) //latter is unconfirmed
 						{
 							tile_offset = ((tile*16)+((yi+dy*2) >> height));
 							pen[0] = gfx_data[tile_offset+0x0000+0x1800]>>(7-xi) & (pen_mask & 1)>>0;
