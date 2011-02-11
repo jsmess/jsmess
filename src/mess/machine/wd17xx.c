@@ -1403,6 +1403,8 @@ READ8_DEVICE_HANDLER( wd17xx_status_r )
 				w->status &= ~ STA_1_HD_LOADED;
 		}
 
+		/* bit 6, write protect, inverted */
+		result |= !floppy_wpt_r(w->drive) << 6;
 	}
 
 	/* eventually set data request bit */
