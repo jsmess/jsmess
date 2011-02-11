@@ -33,7 +33,7 @@
 
 const device_type FMSCSI = fmscsi_device_config::static_alloc_device_config;
 
-GENERIC_DEVICE_CONFIG_SETUP(fmscsi, "FM-SCSI", "fmscsi")
+GENERIC_DEVICE_CONFIG_SETUP(fmscsi, "FM-SCSI")
 
 void fmscsi_device_config::device_config_complete()
 {

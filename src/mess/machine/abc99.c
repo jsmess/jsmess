@@ -63,7 +63,7 @@ const device_type ABC99 = abc99_device_config::static_alloc_device_config;
 //  DEVICE CONFIGURATION
 //**************************************************************************
 
-GENERIC_DEVICE_CONFIG_SETUP(abc99, "Luxor ABC 99", "abc99")
+GENERIC_DEVICE_CONFIG_SETUP(abc99, "Luxor ABC 99")
 
 
 //-------------------------------------------------
@@ -74,6 +74,7 @@ GENERIC_DEVICE_CONFIG_SETUP(abc99, "Luxor ABC 99", "abc99")
 
 void abc99_device_config::device_config_complete()
 {
+	m_shortname = "abc99";
 }
 
 

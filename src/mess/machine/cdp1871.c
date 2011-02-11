@@ -95,7 +95,7 @@ const device_type CDP1871 = cdp1871_device_config::static_alloc_device_config;
 //  DEVICE CONFIGURATION
 //**************************************************************************
 
-GENERIC_DEVICE_CONFIG_SETUP(cdp1871, "RCA CDP1871", "cdp1871")
+GENERIC_DEVICE_CONFIG_SETUP(cdp1871, "RCA CDP1871")
 
 
 //-------------------------------------------------

@@ -3630,6 +3630,7 @@ V-V                           TP-027
 	DRIVER( pairs )		/* (c) 1994 Strata/Incredible Technologies */
 	DRIVER( pairsa )	/* (c) 1994 Strata/Incredible Technologies */
 	DRIVER( hotmemry )	/* (c) 1994 Tuning/Incredible Technologies */
+	DRIVER( hotmemry11 )	/* (c) 1994 Tuning/Incredible Technologies */
 	DRIVER( drivedge )	/* (c) 1994 Strata/Incredible Technologies */
 	DRIVER( wcbowl )	/* (c) 1995 Incredible Technologies */
 	DRIVER( wcbowl165 )	/* (c) 1995 Incredible Technologies */
@@ -6016,6 +6017,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( canyon )	/* 009493-009504    1977/10 [6502] */
 	DRIVER( canyonp )	/* 009493-009504    1977/10 [6502] */
 	DRIVER( destroyr )	/* 030131-030136    1977/10 [6800] */
+	DRIVER( destroyr1 )	/* 030131-030136    1977/10 [6800] */
 	DRIVER( sprint1 )	/* 006443           1978/01 [6502] */
 	DRIVER( ultratnk )	/* 009801           1978/02 [6502] */
 	DRIVER( skyraid )	/* 009709           1978/03 [6502] */

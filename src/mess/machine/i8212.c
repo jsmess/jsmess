@@ -34,7 +34,7 @@ const device_type I8212 = i8212_device_config::static_alloc_device_config;
 //  DEVICE CONFIGURATION
 //**************************************************************************
 
-GENERIC_DEVICE_CONFIG_SETUP(i8212, "Intel 8212", "i8212")
+GENERIC_DEVICE_CONFIG_SETUP(i8212, "Intel 8212")
 
 
 //-------------------------------------------------

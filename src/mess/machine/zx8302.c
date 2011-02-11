@@ -114,7 +114,7 @@ const device_type ZX8302 = zx8302_device_config::static_alloc_device_config;
 //  DEVICE CONFIGURATION
 //**************************************************************************
 
-GENERIC_DEVICE_CONFIG_SETUP(zx8302, "Sinclair ZX8302", "zx8302")
+GENERIC_DEVICE_CONFIG_SETUP(zx8302, "Sinclair ZX8302")
 
 
 //-------------------------------------------------

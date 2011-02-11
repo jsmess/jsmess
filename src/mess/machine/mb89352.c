@@ -109,7 +109,7 @@
 
 const device_type MB89352A = mb89352_device_config::static_alloc_device_config;
 
-GENERIC_DEVICE_CONFIG_SETUP(mb89352, "MB89352A", "mb89352")
+GENERIC_DEVICE_CONFIG_SETUP(mb89352, "MB89352A")
 
 void mb89352_device_config::device_config_complete()
 {

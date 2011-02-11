@@ -231,7 +231,7 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 crt9007_device_config::crt9007_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-	: device_config(mconfig, static_alloc_device_config, "SMC CRT9007", "crt9007", tag, owner, clock),
+	: device_config(mconfig, static_alloc_device_config, "SMC CRT9007", tag, owner, clock),
 	  device_config_memory_interface(mconfig, *this),
 	  m_space_config("videoram", ENDIANNESS_LITTLE, 8, 14, 0, NULL, *ADDRESS_MAP_NAME(crt9007))
 {
