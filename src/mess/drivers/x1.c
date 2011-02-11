@@ -1056,7 +1056,7 @@ static READ8_HANDLER( x1_pcg_r )
 		if(state->scrn_reg.pcg_mode)
 		{
 			gfx_data = space->machine->region("kanji")->base();
-			calc_pcg_offset = (state->tvram[check_chr_addr(space->machine)]+(state->tvram[check_chr_addr(space->machine)+0x800]<<8)) & 0xfff;
+			calc_pcg_offset = (state->tvram[check_chr_addr(space->machine)]+(state->kvram[check_chr_addr(space->machine)]<<8)) & 0xfff;
 
 			state->kanji_offset = calc_pcg_offset*0x20;
 
