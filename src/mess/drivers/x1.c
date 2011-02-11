@@ -1013,6 +1013,8 @@ static const wd17xx_interface x1turbo_mb8877a_interface =
 static UINT16 check_pcg_addr(running_machine *machine)
 {
 	x1_state *state = machine->driver_data<x1_state>();
+
+
 	if(state->colorram[0x7ff] & 0x20) return 0x7ff;
 	if(state->colorram[0x3ff] & 0x20) return 0x3ff;
 	if(state->colorram[0x5ff] & 0x20) return 0x5ff;
@@ -1482,7 +1484,6 @@ static WRITE8_HANDLER( x1_emm_w )
 static READ8_HANDLER( x1_io_r )
 {
 	x1_state *state = space->machine->driver_data<x1_state>();
-	UINT8 *videoram = state->videoram;
 	state->io_bank_mode = 0; //any read disables the extended mode.
 
 	if(offset == 0x0e03)                    		{ return x1_rom_r(space, 0); }
@@ -1501,9 +1502,8 @@ static READ8_HANDLER( x1_io_r )
 	else if(offset >= 0x1fa8 && offset <= 0x1fab)	{ return z80ctc_r(space->machine->device("ctc"), offset-0x1fa8); }
 //  else if(offset >= 0x1fd0 && offset <= 0x1fdf)   { return x1_scrn_r(space,offset-0x1fd0); }
 //  else if(offset == 0x1fe0)                       { return x1_blackclip_r(space,0); }
-	else if(offset >= 0x2000 && offset <= 0x2fff)	{ return state->colorram[offset-0x2000]; }
-	else if(offset >= 0x3000 && offset <= 0x37ff)	{ return videoram[offset-0x3000]; }
-	else if(offset >= 0x3800 && offset <= 0x3fff)	{ return videoram[offset-0x3800]; } // Ys checks x1/x1turbo by checking if this area is a mirror
+	else if(offset >= 0x2000 && offset <= 0x2fff)	{ return state->colorram[offset & 0x7ff]; }
+	else if(offset >= 0x3000 && offset <= 0x3fff)	{ return state->videoram[offset & 0x7ff]; } // Ys checks x1/x1turbo by checking if this area is a mirror
 	else if(offset >= 0x4000 && offset <= 0xffff)	{ return state->gfx_bitmap_ram[offset-0x4000+(state->scrn_reg.gfx_bank*0xc000)]; }
 	else
 	{
@@ -1515,7 +1515,7 @@ static READ8_HANDLER( x1_io_r )
 static WRITE8_HANDLER( x1_io_w )
 {
 	x1_state *state = space->machine->driver_data<x1_state>();
-	UINT8 *videoram = state->videoram;
+
 	if(state->io_bank_mode == 1)                    	{ x1_ex_gfxram_w(space, offset, data); }
 	// TODO: user could install ym2151 on plain X1 too
 	//0x700, 0x701
@@ -1547,9 +1547,8 @@ static WRITE8_HANDLER( x1_io_w )
 //  else if(offset == 0x1fc5)                       { x1turbo_gfxpal_w(space,0,data); }
 //  else if(offset >= 0x1fd0 && offset <= 0x1fdf)   { x1_scrn_w(space,0,data); }
 //  else if(offset == 0x1fe0)                       { x1_blackclip_w(space,0,data); }
-	else if(offset >= 0x2000 && offset <= 0x2fff)	{ state->colorram[offset-0x2000] = data; }
-	else if(offset >= 0x3000 && offset <= 0x37ff)	{ videoram[offset-0x3000] = state->pcg_write_addr = data; }
-	else if(offset >= 0x3800 && offset <= 0x3fff)	{ videoram[offset-0x3800] = state->pcg_write_addr = data; }
+	else if(offset >= 0x2000 && offset <= 0x2fff)	{ state->colorram[offset & 0x7ff] = data; }
+	else if(offset >= 0x3000 && offset <= 0x3fff)	{ state->videoram[offset & 0x7ff] = state->pcg_write_addr = data; }
 	else if(offset >= 0x4000 && offset <= 0xffff)	{ state->gfx_bitmap_ram[offset-0x4000+(state->scrn_reg.gfx_bank*0xc000)] = data; }
 	else
 	{
@@ -1561,7 +1560,6 @@ static WRITE8_HANDLER( x1_io_w )
 static READ8_HANDLER( x1turbo_io_r )
 {
 	x1_state *state = space->machine->driver_data<x1_state>();
-	UINT8 *videoram = state->videoram;
 	state->io_bank_mode = 0; //any read disables the extended mode.
 
 	// a * at the end states devices used on plain X1 too
@@ -1597,8 +1595,8 @@ static READ8_HANDLER( x1turbo_io_r )
 //  else if(offset >= 0x1fd0 && offset <= 0x1fdf)   { return x1_scrn_r(space,offset-0x1fd0); } //Z only
 	else if(offset == 0x1fe0)						{ return x1_blackclip_r(space,0); }
 	else if(offset == 0x1ff0)						{ return input_port_read(space->machine, "X1TURBO_DSW"); }
-	else if(offset >= 0x2000 && offset <= 0x2fff)	{ return state->colorram[offset-0x2000]; }
-	else if(offset >= 0x3000 && offset <= 0x3fff)	{ return videoram[offset-0x3000]; }
+	else if(offset >= 0x2000 && offset <= 0x2fff)	{ return state->colorram[offset & 0x7ff]; }
+	else if(offset >= 0x3000 && offset <= 0x3fff)	{ return state->videoram[offset & 0xfff]; }
 	else if(offset >= 0x4000 && offset <= 0xffff)	{ return state->gfx_bitmap_ram[offset-0x4000+(state->scrn_reg.gfx_bank*0xc000)]; }
 	else
 	{
@@ -1610,7 +1608,6 @@ static READ8_HANDLER( x1turbo_io_r )
 static WRITE8_HANDLER( x1turbo_io_w )
 {
 	x1_state *state = space->machine->driver_data<x1_state>();
-	UINT8 *videoram = state->videoram;
 
 	// a * at the end states devices used on plain X1 too
 	if(state->io_bank_mode == 1)                    { x1_ex_gfxram_w(space, offset, data); }
@@ -1656,8 +1653,8 @@ static WRITE8_HANDLER( x1turbo_io_w )
 	else if(offset == 0x1fc5)						{ x1turbo_gfxpal_w(space,0,data); } // Z only!
 	else if(offset >= 0x1fd0 && offset <= 0x1fdf)	{ x1_scrn_w(space,0,data); }
 	else if(offset == 0x1fe0)						{ x1_blackclip_w(space,0,data); }
-	else if(offset >= 0x2000 && offset <= 0x2fff)	{ state->colorram[offset-0x2000] = data; }
-	else if(offset >= 0x3000 && offset <= 0x3fff)	{ videoram[offset-0x3000] = state->pcg_write_addr = data; }
+	else if(offset >= 0x2000 && offset <= 0x2fff)	{ state->colorram[offset & 0x7ff] = data; }
+	else if(offset >= 0x3000 && offset <= 0x3fff)	{ state->videoram[offset & 0xfff] = state->pcg_write_addr = data; }
 	else if(offset >= 0x4000 && offset <= 0xffff)	{ state->gfx_bitmap_ram[offset-0x4000+(state->scrn_reg.gfx_bank*0xc000)] = data; }
 	else
 	{
