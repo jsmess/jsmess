@@ -79,7 +79,9 @@ public:
 	x1_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *videoram;
+	UINT8 *tvram;
+	UINT8 *avram;
+	UINT8 *kvram;
 	UINT8 hres_320;
 	UINT8 io_switch;
 	UINT8 io_sys;
@@ -96,7 +98,6 @@ public:
 	x1_rtc_t rtc;
 	emu_timer *rtc_timer;
 	UINT8 pcg_write_addr;
-	UINT8 *colorram;
 	UINT8 sub_cmd;
 	UINT8 sub_cmd_length;
 	UINT8 sub_val[8];

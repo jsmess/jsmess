@@ -228,10 +228,10 @@
 static VIDEO_START( x1 )
 {
 	x1_state *state = machine->driver_data<x1_state>();
-	state->colorram = auto_alloc_array(machine, UINT8, 0x1000);
-	state->videoram = auto_alloc_array(machine, UINT8, 0x1000);
+	state->avram = auto_alloc_array(machine, UINT8, 0x800);
+	state->tvram = auto_alloc_array(machine, UINT8, 0x800);
+	state->kvram = auto_alloc_array(machine, UINT8, 0x800);
 	state->gfx_bitmap_ram = auto_alloc_array(machine, UINT8, 0xc000*2);
-	state->videoram = auto_alloc_array(machine, UINT8, 0x1000);
 	state->pal_4096 = auto_alloc_array(machine, UINT8, 0x1000*3);
 }
 
@@ -282,10 +282,10 @@ static void x1_draw_pixel(running_machine *machine, bitmap_t *bitmap,int y,int x
 static UINT8 check_prev_height(running_machine *machine,int x,int y,int w)
 {
 	x1_state *state = machine->driver_data<x1_state>();
-	UINT8 prev_tile = state->videoram[(x+((y-1)*40*w)+mc6845_start_addr) & 0x7ff];
-	UINT8 cur_tile = state->videoram[(x+(y*40*w)+mc6845_start_addr) & 0x7ff];
-	UINT8 prev_attr = state->colorram[(x+((y-1)*40*w)+mc6845_start_addr) & 0x7ff];
-	UINT8 cur_attr = state->colorram[(x+(y*40*w)+mc6845_start_addr) & 0x7ff];
+	UINT8 prev_tile = state->tvram[(x+((y-1)*40*w)+mc6845_start_addr) & 0x7ff];
+	UINT8 cur_tile = state->tvram[(x+(y*40*w)+mc6845_start_addr) & 0x7ff];
+	UINT8 prev_attr = state->avram[(x+((y-1)*40*w)+mc6845_start_addr) & 0x7ff];
+	UINT8 cur_attr = state->avram[(x+(y*40*w)+mc6845_start_addr) & 0x7ff];
 
 	if(prev_tile == cur_tile && prev_attr == cur_attr)
 		return 8;
@@ -297,7 +297,7 @@ static UINT8 check_prev_height(running_machine *machine,int x,int y,int w)
 static UINT8 check_line_valid_height(running_machine *machine,int y,int w,int height)
 {
 	x1_state *state = machine->driver_data<x1_state>();
-	UINT8 line_attr = state->colorram[(0+(y*40*w)+mc6845_start_addr) & 0x7ff];
+	UINT8 line_attr = state->avram[(0+(y*40*w)+mc6845_start_addr) & 0x7ff];
 
 	if((line_attr & 0x40) == 0)
 		return 0;
@@ -327,11 +327,11 @@ static void draw_fgtilemap(running_machine *machine, bitmap_t *bitmap,int w)
 	{
 		for (x=0;x<40*w;x++)
 		{
-			int tile = state->videoram[(x+(y*40*w)+mc6845_start_addr) & 0x7ff];
-			int color = state->colorram[(x+(y*40*w)+mc6845_start_addr) & 0x7ff] & 0x1f;
-			int width = (state->colorram[(x+(y*40*w)+mc6845_start_addr) & 0x7ff] & 0x80)>>7;
-			int height = (state->colorram[(x+(y*40*w)+mc6845_start_addr) & 0x7ff] & 0x40)>>6;
-			int pcg_bank = (state->colorram[(x+(y*40*w)+mc6845_start_addr) & 0x7ff] & 0x20)>>5;
+			int tile = state->tvram[(x+(y*40*w)+mc6845_start_addr) & 0x7ff];
+			int color = state->avram[(x+(y*40*w)+mc6845_start_addr) & 0x7ff] & 0x1f;
+			int width = (state->avram[(x+(y*40*w)+mc6845_start_addr) & 0x7ff] & 0x80)>>7;
+			int height = (state->avram[(x+(y*40*w)+mc6845_start_addr) & 0x7ff] & 0x40)>>6;
+			int pcg_bank = (state->avram[(x+(y*40*w)+mc6845_start_addr) & 0x7ff] & 0x20)>>5;
 			UINT8 *gfx_data = machine->region(pcg_bank ? "pcg" : "cgrom")->base();
 
 			{
@@ -1015,10 +1015,10 @@ static UINT16 check_pcg_addr(running_machine *machine)
 	x1_state *state = machine->driver_data<x1_state>();
 
 
-	if(state->colorram[0x7ff] & 0x20) return 0x7ff;
-	if(state->colorram[0x3ff] & 0x20) return 0x3ff;
-	if(state->colorram[0x5ff] & 0x20) return 0x5ff;
-	if(state->colorram[0x1ff] & 0x20) return 0x1ff;
+	if(state->avram[0x7ff] & 0x20) return 0x7ff;
+	if(state->avram[0x3ff] & 0x20) return 0x3ff;
+	if(state->avram[0x5ff] & 0x20) return 0x5ff;
+	if(state->avram[0x1ff] & 0x20) return 0x1ff;
 
 	return 0x3ff;
 }
@@ -1026,10 +1026,10 @@ static UINT16 check_pcg_addr(running_machine *machine)
 static UINT16 check_chr_addr(running_machine *machine)
 {
 	x1_state *state = machine->driver_data<x1_state>();
-	if(!(state->colorram[0x7ff] & 0x20)) return 0x7ff;
-	if(!(state->colorram[0x3ff] & 0x20)) return 0x3ff;
-	if(!(state->colorram[0x5ff] & 0x20)) return 0x5ff;
-	if(!(state->colorram[0x1ff] & 0x20)) return 0x1ff;
+	if(!(state->avram[0x7ff] & 0x20)) return 0x7ff;
+	if(!(state->avram[0x3ff] & 0x20)) return 0x3ff;
+	if(!(state->avram[0x5ff] & 0x20)) return 0x5ff;
+	if(!(state->avram[0x1ff] & 0x20)) return 0x1ff;
 
 	return 0x3ff;
 }
@@ -1037,7 +1037,6 @@ static UINT16 check_chr_addr(running_machine *machine)
 static READ8_HANDLER( x1_pcg_r )
 {
 	x1_state *state = space->machine->driver_data<x1_state>();
-	UINT8 *videoram = state->videoram;
 	int addr;
 	int calc_pcg_offset;
 	UINT8 res;
@@ -1057,7 +1056,7 @@ static READ8_HANDLER( x1_pcg_r )
 		if(state->scrn_reg.pcg_mode)
 		{
 			gfx_data = space->machine->region("kanji")->base();
-			calc_pcg_offset = (videoram[check_chr_addr(space->machine)]+(videoram[check_chr_addr(space->machine)+0x800]<<8)) & 0xfff;
+			calc_pcg_offset = (state->tvram[check_chr_addr(space->machine)]+(state->tvram[check_chr_addr(space->machine)+0x800]<<8)) & 0xfff;
 
 			state->kanji_offset = calc_pcg_offset*0x20;
 
@@ -1097,7 +1096,6 @@ static READ8_HANDLER( x1_pcg_r )
 static WRITE8_HANDLER( x1_pcg_w )
 {
 	x1_state *state = space->machine->driver_data<x1_state>();
-	UINT8 *videoram = state->videoram;
 	int addr,pcg_offset;
 	UINT8 *PCG_RAM = space->machine->region("pcg")->base();
 
@@ -1119,7 +1117,7 @@ static WRITE8_HANDLER( x1_pcg_w )
 	{
 		if(state->scrn_reg.pcg_mode)
 		{
-			state->used_pcg_addr = videoram[check_pcg_addr(space->machine)]*8;
+			state->used_pcg_addr = state->tvram[check_pcg_addr(space->machine)]*8;
 			state->pcg_index[addr-1] = (offset & 0xe) >> 1;
 			pcg_offset = (state->pcg_index[addr-1]+state->used_pcg_addr) & 0x7ff;
 			pcg_offset+=((addr-1)*0x800);
@@ -1502,8 +1500,8 @@ static READ8_HANDLER( x1_io_r )
 	else if(offset >= 0x1fa8 && offset <= 0x1fab)	{ return z80ctc_r(space->machine->device("ctc"), offset-0x1fa8); }
 //  else if(offset >= 0x1fd0 && offset <= 0x1fdf)   { return x1_scrn_r(space,offset-0x1fd0); }
 //  else if(offset == 0x1fe0)                       { return x1_blackclip_r(space,0); }
-	else if(offset >= 0x2000 && offset <= 0x2fff)	{ return state->colorram[offset & 0x7ff]; }
-	else if(offset >= 0x3000 && offset <= 0x3fff)	{ return state->videoram[offset & 0x7ff]; } // Ys checks x1/x1turbo by checking if this area is a mirror
+	else if(offset >= 0x2000 && offset <= 0x2fff)	{ return state->avram[offset & 0x7ff]; }
+	else if(offset >= 0x3000 && offset <= 0x3fff)	{ return state->tvram[offset & 0x7ff]; } // Ys checks if it's a x1/x1turbo machine by checking if this area is a mirror
 	else if(offset >= 0x4000 && offset <= 0xffff)	{ return state->gfx_bitmap_ram[offset-0x4000+(state->scrn_reg.gfx_bank*0xc000)]; }
 	else
 	{
@@ -1547,8 +1545,8 @@ static WRITE8_HANDLER( x1_io_w )
 //  else if(offset == 0x1fc5)                       { x1turbo_gfxpal_w(space,0,data); }
 //  else if(offset >= 0x1fd0 && offset <= 0x1fdf)   { x1_scrn_w(space,0,data); }
 //  else if(offset == 0x1fe0)                       { x1_blackclip_w(space,0,data); }
-	else if(offset >= 0x2000 && offset <= 0x2fff)	{ state->colorram[offset & 0x7ff] = data; }
-	else if(offset >= 0x3000 && offset <= 0x3fff)	{ state->videoram[offset & 0x7ff] = state->pcg_write_addr = data; }
+	else if(offset >= 0x2000 && offset <= 0x2fff)	{ state->avram[offset & 0x7ff] = data; }
+	else if(offset >= 0x3000 && offset <= 0x3fff)	{ state->tvram[offset & 0x7ff] = state->pcg_write_addr = data; }
 	else if(offset >= 0x4000 && offset <= 0xffff)	{ state->gfx_bitmap_ram[offset-0x4000+(state->scrn_reg.gfx_bank*0xc000)] = data; }
 	else
 	{
@@ -1595,8 +1593,9 @@ static READ8_HANDLER( x1turbo_io_r )
 //  else if(offset >= 0x1fd0 && offset <= 0x1fdf)   { return x1_scrn_r(space,offset-0x1fd0); } //Z only
 	else if(offset == 0x1fe0)						{ return x1_blackclip_r(space,0); }
 	else if(offset == 0x1ff0)						{ return input_port_read(space->machine, "X1TURBO_DSW"); }
-	else if(offset >= 0x2000 && offset <= 0x2fff)	{ return state->colorram[offset & 0x7ff]; }
-	else if(offset >= 0x3000 && offset <= 0x3fff)	{ return state->videoram[offset & 0xfff]; }
+	else if(offset >= 0x2000 && offset <= 0x2fff)	{ return state->avram[offset & 0x7ff]; }
+	else if(offset >= 0x3000 && offset <= 0x37ff)	{ return state->tvram[offset & 0x7ff]; }
+	else if(offset >= 0x3800 && offset <= 0x3fff)	{ return state->kvram[offset & 0x7ff]; }
 	else if(offset >= 0x4000 && offset <= 0xffff)	{ return state->gfx_bitmap_ram[offset-0x4000+(state->scrn_reg.gfx_bank*0xc000)]; }
 	else
 	{
@@ -1653,8 +1652,9 @@ static WRITE8_HANDLER( x1turbo_io_w )
 	else if(offset == 0x1fc5)						{ x1turbo_gfxpal_w(space,0,data); } // Z only!
 	else if(offset >= 0x1fd0 && offset <= 0x1fdf)	{ x1_scrn_w(space,0,data); }
 	else if(offset == 0x1fe0)						{ x1_blackclip_w(space,0,data); }
-	else if(offset >= 0x2000 && offset <= 0x2fff)	{ state->colorram[offset & 0x7ff] = data; }
-	else if(offset >= 0x3000 && offset <= 0x3fff)	{ state->videoram[offset & 0xfff] = state->pcg_write_addr = data; }
+	else if(offset >= 0x2000 && offset <= 0x2fff)	{ state->avram[offset & 0x7ff] = data; }
+	else if(offset >= 0x3000 && offset <= 0x37ff)	{ state->tvram[offset & 0x7ff] = state->pcg_write_addr = data; }
+	else if(offset >= 0x3800 && offset <= 0x3fff)	{ if(data) { printf("Write to Kanji VRAM %04x %02x\n",offset,data); } state->kvram[offset & 0x7ff] = state->pcg_write_addr = data; }
 	else if(offset >= 0x4000 && offset <= 0xffff)	{ state->gfx_bitmap_ram[offset-0x4000+(state->scrn_reg.gfx_bank*0xc000)] = data; }
 	else
 	{
