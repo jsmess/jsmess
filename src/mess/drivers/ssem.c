@@ -651,7 +651,6 @@ static MACHINE_CONFIG_START( ssem, ssem_state )
     /* cartridge */
     MCFG_CARTSLOT_ADD("cart")
     MCFG_CARTSLOT_EXTENSION_LIST("snp,asm")
-    MCFG_CARTSLOT_MANDATORY
     MCFG_CARTSLOT_LOAD(ssem_store)
 MACHINE_CONFIG_END
 
