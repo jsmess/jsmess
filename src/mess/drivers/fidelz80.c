@@ -9,6 +9,8 @@
 *  * Figure out why it says the first speech line twice; it shouldn't. (It sometimes does this on the sensory chess challenger real hardware)
 *  * Get rom locations from pcb (done for UVC, VCC is probably similar)
 *  * Add sensory chess challenger to driver, similar hardware.
+*  * Add rom for speech and attach speech chip to ABC
+*  * Add VBC (older version of ABC rom)
 *
 ***********************************************************************
 
@@ -53,33 +55,33 @@ I/O map:
 8255 connections:
 -----------------
 
-PA.0 - segment G, TSI A0
-PA.1 - segment F, TSI A1
-PA.2 - segment E, TSI A2
-PA.3 - segment D, TSI A3
-PA.4 - segment C, TSI A4
-PA.5 - segment B, TSI A5
-PA.6 - segment A, language latch Data
-PA.7 - TSI START line, language latch clock (see below)
+PA.0 - segment G, TSI A0 (W)
+PA.1 - segment F, TSI A1 (W)
+PA.2 - segment E, TSI A2 (W)
+PA.3 - segment D, TSI A3 (W)
+PA.4 - segment C, TSI A4 (W)
+PA.5 - segment B, TSI A5 (W)
+PA.6 - segment A, language latch Data (W)
+PA.7 - TSI START line, language latch clock (W, see below)
 
-PB.0 - dot commons
+PB.0 - dot commons (W)
 PB.1 - NC
-PB.2 - digit 0, bottom dot
-PB.3 - digit 1, top dot
-PB.4 - digit 2
-PB.5 - digit 3
-PB.6 - enable language switches (see below)
-PB.7 - TSI DONE line
+PB.2 - digit 0, bottom dot (W)
+PB.3 - digit 1, top dot (W)
+PB.4 - digit 2 (W)
+PB.5 - digit 3 (W)
+PB.6 - enable language switches (W, see below)
+PB.7 - TSI DONE line (R)
 
 (button rows pulled up to 5V thru 2.2K resistors)
-PC.0 - button row 0, german language jumper
-PC.1 - button row 1, french language jumper
-PC.2 - button row 2, spanish language jumper
-PC.3 - button row 3, special language jumper
-PC.4 - button column A
-PC.5 - button column B
-PC.6 - button column C
-PC.7 - button column D
+PC.0 - button row 0, german language jumper (R)
+PC.1 - button row 1, french language jumper (R)
+PC.2 - button row 2, spanish language jumper (R)
+PC.3 - button row 3, special language jumper (R)
+PC.4 - button column A (W)
+PC.5 - button column B (W)
+PC.6 - button column C (W)
+PC.7 - button column D (W)
 
 
 language switches:
@@ -110,8 +112,55 @@ determination and give you a language option on power up or something.
 
 ***********************************************************************
 
-Sensory Chess Challenger
-add me
+Chess Challenger 3/10
+----------------------
+
+This is an earlier hardware upon which the VCC and UVC above were based on;
+The hardware is nearly the same; in fact the only significant differences are
+the RAM being located in a different place, the lack of a speech chip, and
+the connections to ports A and B on the PPI:
+
+8255 connections:
+-----------------
+
+PA.0 - segment G (W)
+PA.1 - segment F (W)
+PA.2 - segment E (W)
+PA.3 - segment D (W)
+PA.4 - segment C (W)
+PA.5 - segment B (W)
+PA.6 - segment A (W)
+PA.7 - 'beeper' direct speaker output (W)
+
+PB.0 - dot commons (W)
+PB.1 - NC
+PB.2 - digit 0, bottom dot (W)
+PB.3 - digit 1, top dot (W)
+PB.4 - digit 2 (W)
+PB.5 - digit 3 (W)
+PB.6 - NC
+PB.7 - Mode select (cc3 vs cc10, R)
+
+(button rows pulled up to 5V thru 2.2K resistors)
+PC.0 - button row 0 (R)
+PC.1 - button row 1 (R)
+PC.2 - button row 2 (R)
+PC.3 - button row 3 (R)
+PC.4 - button column A (W)
+PC.5 - button column B (W)
+PC.6 - button column C (W)
+PC.7 - button column D (W)
+
+******************************************************************************
+Voice Bridge Challenger (VBC) [needs adding]
+and Advanced Bridge Challenger (ABC)
+(add details)
+(s14001a sound is missing from both of these!)
+
+******************************************************************************
+
+Sensory Chess Challenger [needs adding]
+(add details)
 
 ******************************************************************************/
 
@@ -269,7 +318,7 @@ static I8255A_INTERFACE( vcc_ppi8255_intf )
 };
 
 /******************************************************************************
-    I8041 MCU
+    I8041 MCU, for VBC and ABC
 ******************************************************************************/
 
 WRITE8_MEMBER(fidelz80_state::kp_matrix_w)
@@ -489,7 +538,7 @@ static ADDRESS_MAP_START(abc_mcu_io, ADDRESS_SPACE_IO, 8, fidelz80_state)
 	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READWRITE(exp_i8243_p2_r, exp_i8243_p2_w)
 	AM_RANGE(MCS48_PORT_PROG, MCS48_PORT_PROG) AM_DEVWRITE_LEGACY("i8243", i8243_prog_w)
 
-	// probably related to the card scanner
+	// probably related to the card scanner and the speech chip
 	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_READ(unknown_r)
 	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(rand_r)
 ADDRESS_MAP_END
