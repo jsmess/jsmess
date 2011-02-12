@@ -210,7 +210,6 @@ static astring *assemble_software_path(astring *str, const game_driver *gamedrv,
 static void dump_screenshot(running_machine *machine, int write_file)
 {
 	file_error filerr;
-	emu_file *fp;
 	char buf[128];
 	int is_blank = 0;
 
@@ -220,7 +219,8 @@ static void dump_screenshot(running_machine *machine, int write_file)
 		snprintf(buf, ARRAY_LENGTH(buf),
 			(screenshot_num >= 0) ? "_%s_%d.png" : "_%s.png",
 			current_testcase.name, screenshot_num);
-		filerr = mame_fopen(SEARCHPATH_SCREENSHOT, buf, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, &fp);
+		emu_file fp(machine->options(), SEARCHPATH_SCREENSHOT, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE);
+		filerr = fp.open(buf);
 		if (filerr == FILERR_NONE)
 		{
 			/* choose a screen */
@@ -233,14 +233,13 @@ static void dump_screenshot(running_machine *machine, int write_file)
 			/* did we find a live screen? */
 			if (screen != NULL)
 			{
-				screen->machine->video().save_snapshot(screen, *fp);
+				screen->machine->video().save_snapshot(screen, fp);
 				report_message(MSG_INFO, "Saved screenshot as %s", buf);
 			}
 			else
 			{
 				report_message(MSG_FAILURE, "Could not save screenshot; no live screen");
 			}
-			mame_fclose(fp);
 		}
 		else
 		{
