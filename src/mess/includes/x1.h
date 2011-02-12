@@ -128,7 +128,9 @@ public:
 	UINT32 emm_addr;
 	UINT8 *pal_4096;
 	UINT8 crtc_vreg[0x100],crtc_index;
-	int tilemap_matrix[50*8][80*8];
+	UINT16 gate_array_ma;
+	UINT8 gate_array_ra;
+	UINT8 gate_array_de;
 };
 
 

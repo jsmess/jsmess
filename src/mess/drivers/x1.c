@@ -1032,8 +1032,6 @@ static const wd17xx_interface x1turbo_mb8877a_interface =
 static UINT16 check_pcg_addr(running_machine *machine)
 {
 	x1_state *state = machine->driver_data<x1_state>();
-
-
 	if(state->avram[0x7ff] & 0x20) return 0x7ff;
 	if(state->avram[0x3ff] & 0x20) return 0x3ff;
 	if(state->avram[0x5ff] & 0x20) return 0x5ff;
@@ -1149,8 +1147,19 @@ static WRITE8_HANDLER( x1_pcg_w )
 		else
 		{
 			/* TODO: understand what 1942, Herzog and friends wants there */
+			#if 0
+			printf("%04x %02x %04x\n",state->gate_array_ma,state->gate_array_ra,mc6845_start_addr);
+			state->used_pcg_addr = (state->gate_array_ma+0x500);
+			if(state->gate_array_ma >= 0x7ff)
+				state->used_pcg_addr = state->tvram[0x7ff]<<3;
+			else
+				state->used_pcg_addr = state->tvram[state->used_pcg_addr]<<3;
+			pcg_offset = state->used_pcg_addr;
+			pcg_offset|= state->gate_array_ra & (mc6845_tile_height-1);
+			#else
 			state->used_pcg_addr = state->pcg_write_addr*8;
 			pcg_offset = (state->pcg_index[addr-1]+state->used_pcg_addr) & 0x7ff;
+			#endif
 			pcg_offset+=((addr-1)*0x800);
 			PCG_RAM[pcg_offset] = data;
 
@@ -1807,6 +1816,19 @@ static WRITE_LINE_DEVICE_HANDLER(vsync_changed)
 	//printf("%d %02x\n",device->machine->primary_screen->vpos(),drvstate->vsync);
 }
 
+static WRITE_LINE_DEVICE_HANDLER(de_changed)
+{
+	x1_state *drvstate = device->machine->driver_data<x1_state>();
+
+	if ( ! drvstate->gate_array_de && state )
+	{
+		drvstate->gate_array_ma = mc6845_get_ma(device->machine->device("crtc"));
+		drvstate->gate_array_ra = mc6845_get_ra(device->machine->device("crtc"));
+	}
+
+	drvstate->gate_array_de = state ? 1 : 0;
+}
+
 static const mc6845_interface mc6845_intf =
 {
 	"screen",	/* screen we are acting on */
@@ -1814,7 +1836,7 @@ static const mc6845_interface mc6845_intf =
 	NULL,		/* before pixel update callback */
 	NULL,		/* row update callback */
 	NULL,		/* after pixel update callback */
-	DEVCB_NULL,	/* callback for display state changes */
+	DEVCB_LINE(de_changed),	/* callback for display state changes */
 	DEVCB_NULL,	/* callback for cursor state changes */
 	DEVCB_NULL,	/* HSYNC callback */
 	DEVCB_LINE(vsync_changed),	/* VSYNC callback */
