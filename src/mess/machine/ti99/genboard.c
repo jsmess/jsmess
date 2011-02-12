@@ -23,6 +23,68 @@
     adapter for a larger socket. From the 512 KiB, only 384 KiB will be
     accessed, since the higher pages are hidden behind the EPROM pages.
 
+    === Address map ===
+    p,q = page value bit (q = AMC, AMB, AMA)
+    c = address offset within 8 KiB page
+
+    p pqqq pppc cccc cccc cccc
+
+    0 0... .... .... .... .... on-board dram 512 KiB
+
+    0 1... .... .... .... .... on-board future expansion 512 KiB or Memex with Genmod
+
+    1 00.. .... .... .... .... p-box AMA=0 (256 KiB)
+    1 010. .... .... .... .... p-box AMA=1 AMB=0 (128 KiB)
+    1 0110 .... .... .... .... p-box AMA=1 AMB=1 AMC=0 (64 KiB)
+
+    1 0111 00.. .... .... .... p-box address block 0xxx, 2xxx
+    1 0111 010. .... .... .... p-box address block 4xxx (DSR)
+    1 0111 011. .... .... .... p-box address block 6xxx
+    1 0111 100. .... .... .... p-box address block 8xxx
+    1 0111 101. .... .... .... p-box address block axxx
+    1 0111 11.. .... .... .... p-box address block cxxx, exxx
+
+    1 100. .... .... .... .... on-board sram (128K) -\
+    1 101. .... .... .... .... on-board sram (128K) --+- maximum SRAM expansion
+    1 1100 .... .... .... .... on-board sram (64K) --/
+    1 1101 0... .... .... .... on-board sram (32K) - additional 32 KiB required for MDOS 2.50s and higher
+    1 1101 1... .... .... .... on-board sram (32K) - standard setup
+
+    1 111. ..0. .... .... .... on-board boot1
+    1 111. ..1. .... .... .... on-board boot2
+
+    The TI console (or more precise, the Flex Cable Interface) sets the AMA/B/C
+    lines to 1. Most cards actually check for AMA/B/C=1. However, this decoding
+    was forgotten in some designs which cause the card memory to be mirrored. The
+    usual DSR space at 0x4000-0x5fff which would be reachable via page 0xba is then
+    mirrored on a number of other pages:
+
+    10 xxx 010x = 82, 8a, 92, 9a, a2, aa, b2, ba
+
+    Another block to take care of is 0xbc which covers 8000-9fff since this
+    area contains the speech synthesizer port at 9000/9400.
+
+    For the standard Geneve, only prefix 10 is routed to the P-Box. The Genmod
+    modification wires these address lines to pins 8 and 9 in the P-Box as AMD and
+    AME. This requires all cards to be equipped with an additional selection logic
+    to detect AMD=0, AME=1. Otherwise these cards, although completely decoding the
+    19-bit address, would reappear at 512 KiB distances.
+
+    For the page numbers we get
+
+    Standard:
+    00-3f are internal (DRAM)
+    40-7f are internal expansion, never used
+    80-bf are the P-Box address space (optional Memex and peripheral cards at that location)
+    c0-ff are internal (SRAM, EPROM)
+
+    Genmod:
+    00-3f are the P-Box address space (expect Memex at that location)
+    40-7f are the P-Box address space (expect Memex at that location)
+    80-bf are the P-Box address space (expect Memex at that location)
+    c0-ef are the P-Box address space (expect Memex at that location)
+    f0-ff are internal (EPROM)
+
     Michael Zapf, February 2011
 ***************************************************************************/
 
@@ -39,7 +101,7 @@
 #define KEYAUTOREPEATDELAY 30
 #define KEYAUTOREPEATRATE 6
 
-#define SRAM_SIZE 384*1024   // maximum expansion on-board
+#define SRAM_SIZE 384*1024   // maximum SRAM expansion on-board
 #define DRAM_SIZE 512*1024
 
 typedef struct _genboard_state
@@ -245,7 +307,22 @@ static WRITE8_DEVICE_HANDLER( write_grom )
 /****************************************************************************
     Mapper
 *****************************************************************************/
+/*
+Geneve mode:
+f100 / fff5: v9938_r
+f110 / fff8: mapper_r
+f118 / ffff: key_r
+f130 / fff0: clock_r
 
+TI mode:
+8000 / fff8: mapper_r
+8008 / ffff: key_r
+8010 / fff0: clock_r
+8800 / fffd: v9938_r
+9000 / ffc0: speech_r
+9800 / ffc0: grom_r
+
+*/
 READ8_DEVICE_HANDLER( geneve_r )
 {
 	genboard_state *board = get_safe_token(device);
@@ -366,68 +443,66 @@ READ8_DEVICE_HANDLER( geneve_r )
 
 	physaddr |= (offset & 0x1fff);
 
-	if (((physaddr & 0x180000)==0x000000) && !board->genmod)
+	if (!board->genmod)
 	{
-		// DRAM. One wait state (only if not GenMod, in which case we route this to the P-Box)
+		// Standard Geneve
+		if ((physaddr & 0x180000)==0x000000)
+		{
+			// DRAM. One wait state.
+			cpu_adjust_icount(board->cpu, -4);
+			value = board->dram[physaddr & 0x07ffff];
+			return value;
+		}
+
+		if ((physaddr & 0x180000)==0x080000)
+		{
+			// On-board memory expansion for standard Geneve (never used)
+			cpu_adjust_icount(board->cpu, -4);
+			return 0;
+		}
+
+		if ((physaddr & 0x1e0000)==0x1e0000)
+		{
+			// 1 111. ..xx xxxx xxxx xxxx on-board eprom (16K)
+			// mirrored for f0, f2, f4, ...; f1, f3, f5, ...
+			value = board->eprom[physaddr & 0x003fff];
+			return value;
+		}
+
+		if ((physaddr & 0x180000)==0x180000)
+		{
+			if ((physaddr & board->sram_mask)==board->sram_val)
+			{
+				value = board->sram[physaddr & ~board->sram_mask];
+			}
+			// Return in any case
+			return value;
+		}
+
+		// Route everything else to the P-Box
+		//   0x000000-0x07ffff for the stock Geneve (AMC,AMB,AMA,A0 ...,A15)
+		//   0x000000-0x1fffff for the GenMod.(AME,AMD,AMC,AMB,AMA,A0 ...,A15)
+		// Add a wait state (if not GenMod)
 		cpu_adjust_icount(board->cpu, -4);
-		value = board->dram[physaddr & 0x07ffff];
+		physaddr = (physaddr & 0x0007ffff);  // 19 bit address (with AMA..AMC)
+		ti99_peb_data_rz(board->peribox, physaddr, &value);
 		return value;
-	}
-
-	if ((physaddr & 0x1e0000)==0x1e0000)
-	{
-		// 1 111. ..xx xxxx xxxx xxxx on-board eprom (16K)
-		// mirrored for f0, f2, f4, ...; f1, f3, f5, ...
-		value = board->eprom[physaddr & 0x003fff];
-		return value;
-	}
-
-	if (((physaddr & board->sram_mask)==board->sram_val) && !board->genmod)
-	{
-		//  1 100. .... .... .... .... on-board sram (128K) -+
-		//  1 101. .... .... .... .... on-board sram (128K) -+-- maximum SRAM expansion
-		//  1 1100 .... .... .... .... on-board sram (64K) --+
-		//  1 1101 0... .... .... .... on-board sram (32K) - additional 32 KiB required for MDOS 2.50s and higher
-		//  1 1101 1... .... .... .... on-board sram (32K) - standard setup
-		// NOTE: This must be tested after the EPROM test above
-		// Also note that we assume a full Genmod which also replaces the SRAM
-		value = board->sram[physaddr & 0x00ffff];
-		return value;
-	}
-
-	// Route everything else to the P-Box
-	//   0x000000-0x07ffff for the stock Geneve (AMC,AMB,AMA,A0 ...,A15)
-	//   0x000000-0x1fffff for the GenMod.(AME,AMD,AMC,AMB,AMA,A0 ...,A15)
-	// Add a wait state (if not GenMod)
-	if (board->genmod)
-	{
-		physaddr = (physaddr & 0x001fffff);  // 21 bit address for Genmod (with AMA..AME)
 	}
 	else
 	{
-		// Add one wait state
-		cpu_adjust_icount(board->cpu,-4);
-		physaddr = (physaddr & 0x0007ffff);  // 19 bit address (with AMA..AMC)
+		if ((physaddr & 0x1e0000)==0x1e0000)
+		{
+			// 1 111. ..xx xxxx xxxx xxxx on-board eprom (16K)
+			// mirrored for f0, f2, f4, ...; f1, f3, f5, ...
+			value = board->eprom[physaddr & 0x003fff];
+			return value;
+		}
+		// Route everything else to the P-Box
+		physaddr = (physaddr & 0x001fffff);  // 21 bit address for Genmod
+		ti99_peb_data_rz(board->peribox, physaddr, &value);
+		return value;
 	}
-	ti99_peb_data_rz(board->peribox, physaddr, &value);
-	return value;
 }
-/*
-Geneve mode:
-f100 / fff5: v9938_r
-f110 / fff8: mapper_r
-f118 / ffff: key_r
-f130 / fff0: clock_r
-
-TI mode:
-8000 / fff8: mapper_r
-8008 / ffff: key_r
-8010 / fff0: clock_r
-8800 / fffd: v9938_r
-9000 / ffc0: speech_r
-9800 / ffc0: grom_r
-
-*/
 
 WRITE8_DEVICE_HANDLER( geneve_w )
 {
@@ -558,47 +633,60 @@ WRITE8_DEVICE_HANDLER( geneve_w )
 
 	physaddr |= offset & 0x1fff;
 
-	if (((physaddr & 0x180000)==0x000000) && !board->genmod)
+	if (!board->genmod)
 	{
-		// DRAM write. One wait state. (only for normal Geneve)
+		if ((physaddr & 0x180000)==0x000000)
+		{
+			// DRAM write. One wait state. (only for normal Geneve)
+			cpu_adjust_icount(board->cpu, -4);
+			board->dram[physaddr & 0x07ffff] = data;
+			return;
+		}
+
+		if ((physaddr & 0x180000)==0x080000)
+		{
+			// On-board memory expansion for standard Geneve (never used)
+			return;
+		}
+
+		if ((physaddr & 0x1e0000)==0x1e0000)
+		{
+			// 1 111. ..xx xxxx xxxx xxxx on-board eprom (16K)
+			// mirrored for f0, f2, f4, ...; f1, f3, f5, ...
+			// Ignore EPROM write
+			return;
+		}
+
+		if ((physaddr & 0x180000)==0x180000)
+		{
+			if ((physaddr & board->sram_mask)==board->sram_val)
+			{
+				board->sram[physaddr & ~board->sram_mask] = data;
+			}
+			// Return in any case
+			return;
+		}
+		// Route everything else to the P-Box
+		// Add a wait state
 		cpu_adjust_icount(board->cpu, -4);
-		board->dram[physaddr & 0x07ffff] = data;
-		return;
-	}
 
-	if ((physaddr & 0x1e0000)==0x1e0000)
-	{
-		// 1 111. ..xx xxxx xxxx xxxx on-board eprom (16K)
-		// mirrored for f0, f2, f4, ...; f1, f3, f5, ...
-		// Ignore EPROM write
-		return;
-	}
-
-	if (((physaddr & board->sram_mask)==board->sram_val) && !board->genmod)
-	{
-		//  1 100. .... .... .... .... on-board sram (128K) -+
-		//  1 101. .... .... .... .... on-board sram (128K) -+-- maximum SRAM expansion
-		//  1 1100 .... .... .... .... on-board sram (64K) --+
-		//  1 1101 0... .... .... .... on-board sram (32K) - additional 32 KiB required for MDOS 2.50s and higher
-		//  1 1101 1... .... .... .... on-board sram (32K) - standard setup
-		// NOTE: This must be tested after the EPROM test above
-		board->sram[physaddr & 0x00ffff] = data;
-		return;
-	}
-
-	// Route everything else to the P-Box
-	// Add a wait state
-	if (board->genmod)
-	{
-		physaddr = (physaddr & 0x001fffff);  // 21 bit address for Genmod
+		// only AMA, AMB, AMC are used; AMD and AME are not used
+		physaddr = (physaddr & 0x0007ffff);  // 19 bit address
+		ti99_peb_data_w(board->peribox, physaddr, data);
 	}
 	else
 	{
-		cpu_adjust_icount(board->cpu,-4);
-		// only AMA, AMB, AMC are used; AMD=0, AME=1
-		physaddr = (physaddr & 0x0007ffff) | 0x00100000;  // 19 bit address
+		if ((physaddr & 0x1e0000)==0x1e0000)
+		{
+			// 1 111. ..xx xxxx xxxx xxxx on-board eprom (16K)
+			// mirrored for f0, f2, f4, ...; f1, f3, f5, ...
+			// Ignore EPROM write
+			return;
+		}
+		// Route everything else to the P-Box
+		physaddr = (physaddr & 0x001fffff);  // 21 bit address for Genmod
+		ti99_peb_data_w(board->peribox, physaddr, data);
 	}
-	ti99_peb_data_w(board->peribox, physaddr, data);
 }
 
 /*
@@ -615,58 +703,6 @@ TI mode:
 8c00 / fff9: v9938_w
 9400 / fc00: speech_w
 9c00 / fffd: grom_w
-
-
-Address: (max 2 MB)
-b bbbb bbbc cccc cccc cccc
-
-0 0... .... .... .... .... on-board dram 512 KiB
-
-0 1... .... .... .... .... p-box optional memex 512 KiB
-1 00.. .... .... .... .... p-box AMA=0 (256 KiB)
-1 010. .... .... .... .... p-box AMA=1 AMB=0 (128 KiB)
-1 0110 .... .... .... .... p-box AMA=1 AMB=1 AMC=0 (64 KiB)
-
-1 0111 00.. .... .... .... p-box address block 0xxx, 2xxx
-1 0111 010. .... .... .... p-box address block 4xxx (DSR)
-1 0111 011. .... .... .... p-box address block 6xxx
-1 0111 100. .... .... .... p-box address block 8xxx
-1 0111 101. .... .... .... p-box address block axxx
-1 0111 11.. .... .... .... p-box address block cxxx, exxx
-
-1 100. .... .... .... .... on-board sram (128K) -+
-1 101. .... .... .... .... on-board sram (128K) -+-- maximum SRAM expansion
-1 1100 .... .... .... .... on-board sram (64K) --+
-1 1101 0... .... .... .... on-board sram (32K) - additional 32 KiB required for MDOS 2.50s and higher
-1 1101 1... .... .... .... on-board sram (32K) - standard setup
-
-1 111. ..0. .... .... .... on-board boot1
-1 111. ..1. .... .... .... on-board boot2
-
-
-Mapping issues (in original hardware)
-
-The standard Geneve routes all accesses from 0x040000 to 0x17ffff to the P-Box.
-The standard TI puts AMA/B/C to 1, and all cards decode these, assuming them
-to be set to 1.
-
-The 2 MiB Memex occupies the whole address space, which means that some
-portions of it must remain unaccessible. As the standard Geneve only uses the
-AMA/B/C lines but cannot use AMD/E, the 2 MiB reduce to 512 KiB, mirrored three
-more times.
-
-Pages
-00-3f are internal (DRAM)
-40-7f are 512 KiB usable for the Memex
-80-bf are a mirror of 40-7f
-c0-ff are internal (SRAM, EPROM)
-
-However, pages 70-7f mirror to pages b0-bf which are used for the legacy cards.
-Thus they have to be blocked. If only cards are used which occupy the address
-space 4000-5fff, only page ba needs to be blocked (bc for the speech synthesizer).
-
-If there is a card in the system which does not decode AMA/B/C, all pages must
-be blocked that mirror to ba on a 16-bit base: 4a, 5a, 6a, 7a, 8a, 9a, aa, ba.
 
 */
 
