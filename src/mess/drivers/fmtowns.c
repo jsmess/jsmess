@@ -156,7 +156,7 @@ INLINE UINT8 bcd_to_byte(UINT8 val)
 	return (((val & 0xf0) >> 4) * 10) + (val & 0x0f);
 }
 
-INLINE UINT32 msf_to_lba(UINT32 val)  // because the CDROM core doesn't provide this
+INLINE UINT32 msf_to_lbafm(UINT32 val)  // because the CDROM core doesn't provide this
 {
 	UINT8 m,s,f;
 	f = bcd_to_byte(val & 0x0000ff);
@@ -1304,8 +1304,8 @@ static void towns_cdrom_read(device_t* device)
 	lba2 = state->towns_cd.parameter[4] << 16;
 	lba2 += state->towns_cd.parameter[3] << 8;
 	lba2 += state->towns_cd.parameter[2];
-	state->towns_cd.lba_current = msf_to_lba(lba1);
-	state->towns_cd.lba_last = msf_to_lba(lba2);
+	state->towns_cd.lba_current = msf_to_lbafm(lba1);
+	state->towns_cd.lba_last = msf_to_lbafm(lba2);
 
 	// first track starts at 00:02:00 - this is hardcoded in the boot procedure
 	track = cdrom_get_track(cd_get_cdrom_file(device),state->towns_cd.lba_current);
@@ -1363,8 +1363,8 @@ static void towns_cdrom_play_cdda(device_t* device)
 	lba2 = state->towns_cd.parameter[4] << 16;
 	lba2 += state->towns_cd.parameter[3] << 8;
 	lba2 += state->towns_cd.parameter[2];
-	state->towns_cd.cdda_current = msf_to_lba(lba1);
-	state->towns_cd.cdda_length = msf_to_lba(lba2) - state->towns_cd.cdda_current;
+	state->towns_cd.cdda_current = msf_to_lbafm(lba1);
+	state->towns_cd.cdda_length = msf_to_lbafm(lba2) - state->towns_cd.cdda_current;
 
 	cdda_set_cdrom(cdda,cd_get_cdrom_file(device));
 	cdda_start_audio(cdda,state->towns_cd.cdda_current,state->towns_cd.cdda_length);
