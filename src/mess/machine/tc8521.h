@@ -47,8 +47,8 @@ extern const tc8521_interface default_tc8521_interface;
 READ8_DEVICE_HANDLER(tc8521_r);
 WRITE8_DEVICE_HANDLER(tc8521_w);
 
-void tc8521_load_stream(device_t *device, mame_file *file);
-void tc8521_save_stream(device_t *device, mame_file *file);
+void tc8521_load_stream(device_t *device, emu_file *file);
+void tc8521_save_stream(device_t *device, emu_file *file);
 
 
 #endif /* __TC8521_H__ */

@@ -375,30 +375,29 @@ static DEVICE_NVRAM( ti99_evpc )
 	ti99_evpc_state *card = get_safe_token(device);
 	astring *hsname = astring_assemble_3(astring_alloc(), device->machine->gamedrv->name, PATH_SEPARATOR, "evpc.nv");
 	file_error filerr;
-	mame_file *nvfile;
 
 	if (read_or_write==0)
 	{
 		logerror("evpc: device nvram load %s\n", astring_c(hsname));
 
-		filerr = mame_fopen(SEARCHPATH_NVRAM, astring_c(hsname), OPEN_FLAG_READ, &nvfile);
+		emu_file nvfile(device->machine->options(), SEARCHPATH_NVRAM, OPEN_FLAG_READ);
+		filerr = nvfile.open(astring_c(hsname));
 		if (filerr == FILERR_NONE)
 		{
-			if (mame_fread(nvfile, card->novram, 256) != 256)
+			if (nvfile.read(card->novram, 256) != 256)
 				logerror("evpc: NOVRAM load error\n");
-			mame_fclose(nvfile);
 		}
 	}
 	else
 	{
 		logerror("evpc: device nvram save %s\n", astring_c(hsname));
-		filerr = mame_fopen(SEARCHPATH_NVRAM, astring_c(hsname), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, &nvfile);
+		emu_file nvfile(device->machine->options(), SEARCHPATH_NVRAM, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+		filerr = nvfile.open(astring_c(hsname));
 
 		if (filerr == FILERR_NONE)
 		{
-			if (mame_fwrite(nvfile, card->novram, 256) != 256)
+			if (nvfile.write(card->novram, 256) != 256)
 				logerror("evpc: NOVRAM save error\n");
-			mame_fclose(nvfile);
 		}
 	}
 }

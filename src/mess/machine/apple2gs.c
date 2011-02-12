@@ -242,11 +242,11 @@ NVRAM_HANDLER( apple2gs )
 	apple2gs_state *state = machine->driver_data<apple2gs_state>();
 	if (read_or_write)
 	{
-		mame_fwrite(file, state->clock_bram, sizeof(state->clock_bram));
+		file->write(state->clock_bram, sizeof(state->clock_bram));
 	}
 	else if (file)
 	{
-		mame_fread(file, state->clock_bram, sizeof(state->clock_bram));
+		file->read(state->clock_bram, sizeof(state->clock_bram));
 	}
 	else
 	{

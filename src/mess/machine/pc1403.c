@@ -151,13 +151,13 @@ NVRAM_HANDLER( pc1403 )
 
 	if (read_or_write)
 	{
-		mame_fwrite(file, cpu, 96);
-		mame_fwrite(file, ram, 0x8000);
+		file->write(cpu, 96);
+		file->write(ram, 0x8000);
 	}
 	else if (file)
 	{
-		mame_fread(file, cpu, 96);
-		mame_fread(file, ram, 0x8000);
+		file->read(cpu, 96);
+		file->read(ram, 0x8000);
 	}
 	else
 	{

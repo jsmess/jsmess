@@ -182,15 +182,15 @@ static const UINT8 rtc_write_masks[16*4]=
     supplied file
 -------------------------------------------------*/
 
-void tc8521_load_stream(device_t *device, mame_file *file)
+void tc8521_load_stream(device_t *device, emu_file *file)
 {
 	tc8521_t *rtc = get_token(device);
 
 	if (file)
 	{
-		mame_fread(file, &rtc->registers[0], sizeof(unsigned char)*16*4);
-		mame_fread(file, &rtc->alarm_outputs, sizeof(UINT32));
-		mame_fread(file, &rtc->thirty_two_hz_counter, sizeof(UINT32));
+		file->read(&rtc->registers[0], sizeof(unsigned char)*16*4);
+		file->read(&rtc->alarm_outputs, sizeof(UINT32));
+		file->read(&rtc->thirty_two_hz_counter, sizeof(UINT32));
 	}
 }
 
@@ -201,15 +201,15 @@ void tc8521_load_stream(device_t *device, mame_file *file)
     supplied file
 -------------------------------------------------*/
 
-void tc8521_save_stream(device_t *device, mame_file *file)
+void tc8521_save_stream(device_t *device, emu_file *file)
 {
 	tc8521_t *rtc = get_token(device);
 
 	if (file)
 	{
-		mame_fwrite(file, &rtc->registers[0], sizeof(unsigned char)*16*4);
-		mame_fwrite(file, &rtc->alarm_outputs, sizeof(UINT32));
-		mame_fwrite(file, &rtc->thirty_two_hz_counter, sizeof(UINT32));
+		file->write(&rtc->registers[0], sizeof(unsigned char)*16*4);
+		file->write(&rtc->alarm_outputs, sizeof(UINT32));
+		file->write(&rtc->thirty_two_hz_counter, sizeof(UINT32));
 	}
 }
 

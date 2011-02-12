@@ -24,30 +24,30 @@ void CLIB_DECL logerror(const char *text,...)
 /* ----------------------------------------------------------------------- */
 /* total hack */
 
-file_error mame_fopen(const char *searchpath, const char *filename, UINT32 openflags, mame_file **file)
+file_error mame_fopen(const char *searchpath, const char *filename, UINT32 openflags, emu_file **file)
 {
 	char buffer[2048];
 	snprintf(buffer, sizeof(buffer), "crc/%s", filename);
-	*file = (mame_file *) fopen(buffer, "r");
+	*file = (emu_file *) fopen(buffer, "r");
 	return FILERR_NONE;
 }
 
-char *mame_fgets(char *s, int n, mame_file *file)
+char *mame_fgets(char *s, int n, emu_file *file)
 {
 	return fgets(s, n, (FILE *) file);
 }
 
-UINT32 mame_fwrite(mame_file *file, const void *buffer, UINT32 length)
+UINT32 mame_fwrite(emu_file *file, const void *buffer, UINT32 length)
 {
 	return fwrite(buffer, 1, length, (FILE *) file);
 }
 
-void mame_fclose(mame_file *file)
+void mame_fclose(emu_file *file)
 {
 	fclose((FILE *) file);
 }
 
-int CLIB_DECL mame_fprintf(mame_file *f, const char *fmt, ...)
+int CLIB_DECL mame_fprintf(emu_file *f, const char *fmt, ...)
 {
 	int rc;
 	va_list va;

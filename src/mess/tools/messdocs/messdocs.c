@@ -40,10 +40,10 @@ static void rtrim(char *buf);
 
 
 //============================================================
-//  win_error_to_mame_file_error
+//  win_error_to_emu_file_error
 //============================================================
 
-static file_error win_error_to_mame_file_error(DWORD error)
+static file_error win_error_to_emu_file_error(DWORD error)
 {
 	file_error filerr;
 
@@ -104,7 +104,7 @@ file_error osd_mkdir(const char *dir)
 
 	if (!CreateDirectory(tempstr, NULL))
 	{
-		filerr = win_error_to_mame_file_error(GetLastError());
+		filerr = win_error_to_emu_file_error(GetLastError());
 		goto done;
 	}
 
@@ -132,7 +132,7 @@ file_error osd_rmdir(const char *dir)
 
 	if (!RemoveDirectory(tempstr))
 	{
-		filerr = win_error_to_mame_file_error(GetLastError());
+		filerr = win_error_to_emu_file_error(GetLastError());
 		goto done;
 	}
 
@@ -151,7 +151,7 @@ file_error osd_copyfile(const char *destfile, const char *srcfile)
 {
 	// wrapper for win_copy_file_utf8()
 	if (!win_copy_file_utf8(srcfile, destfile, TRUE))
-		return win_error_to_mame_file_error(GetLastError());
+		return win_error_to_emu_file_error(GetLastError());
 
 	return FILERR_NONE;
 }

@@ -625,33 +625,30 @@ static DEVICE_NVRAM( hsgpl )
 	hsgpl_state *card = get_safe_token(device);
 	astring *hsname = astring_assemble_3(astring_alloc(), device->machine->gamedrv->name, PATH_SEPARATOR, "hsgpl.nv");
 	file_error filerr;
-	mame_file *nvfile;
 
 	if (read_or_write==0)
 	{
 		logerror("hsgpl: device nvram load %s\n", astring_c(hsname));
 
-		filerr = mame_fopen(SEARCHPATH_NVRAM, astring_c(hsname), OPEN_FLAG_READ, &nvfile);
+		emu_file nvfile(device->machine->options(), SEARCHPATH_NVRAM, OPEN_FLAG_READ);
+		filerr = nvfile.open(astring_c(hsname));
 		if (filerr != FILERR_NONE)
 		{
 			logerror("hsgpl: Could not restore NVRAM\n");
 			return;
 		}
 
-		if (mame_fread(nvfile, card->flashrom, FLROMSIZE) != FLROMSIZE)
+		if (nvfile.read(card->flashrom, FLROMSIZE) != FLROMSIZE)
 		{
 			logerror("hsgpl: Error loading NVRAM; unexpected EOF\n");
-			mame_fclose(nvfile);
 			return;
 		}
 
 		if (card->flashrom[0] != NVVERSION)
 		{
 			logerror("hsgpl: Wrong NVRAM image version: %d\n", card->flashrom[0]);
-			mame_fclose(nvfile);
 			return;
 		}
-		mame_fclose(nvfile);
 	}
 	else
 	{
@@ -663,20 +660,20 @@ static DEVICE_NVRAM( hsgpl )
 			at29c040a_is_dirty(card->gromb))
 		{
 			card->flashrom[0] = NVVERSION;
-			filerr = mame_fopen(SEARCHPATH_NVRAM, astring_c(hsname), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, &nvfile);
-
+			
+			emu_file nvfile(device->machine->options(), SEARCHPATH_NVRAM, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+			filerr = nvfile.open(astring_c(hsname));
 			if (filerr != FILERR_NONE)
 			{
 				logerror("hsgpl: Could not save NVRAM\n");
 			}
 			else
 			{
-				if (mame_fwrite(nvfile, card->flashrom, FLROMSIZE) != FLROMSIZE)
+				if (nvfile.write(card->flashrom, FLROMSIZE) != FLROMSIZE)
 				{
 					logerror("hsgpl: Error while saving contents of NVRAM.\n");
 				}
 			}
-			mame_fclose(nvfile);
 			return;
 		}
 		else

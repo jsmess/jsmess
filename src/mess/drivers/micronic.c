@@ -403,20 +403,20 @@ static NVRAM_HANDLER( micronic )
 
 	if (read_or_write)
 	{
-		mame_fwrite(file, state->ram, 0x8000);
-		mame_fwrite(file, ram_get_ptr(machine->device(RAM_TAG)), 224*1024);
+		file->write(state->ram, 0x8000);
+		file->write(ram_get_ptr(machine->device(RAM_TAG)), 224*1024);
 	}
 	else
 	{
 		if (file)
 		{
-			mame_fread(file, state->ram, 0x8000);
-			mame_fread(file, ram_get_ptr(machine->device(RAM_TAG)), 224*1024);
+			file->read(state->ram, 0x8000);
+			file->read(ram_get_ptr(machine->device(RAM_TAG)), 224*1024);
 
 			/* reload register A and B for restore the periodic irq state */
-			mame_fseek(file, 0x4000a, SEEK_SET);
-			mame_fread(file, &reg_a, 0x01);
-			mame_fread(file, &reg_b, 0x01);
+			file->seek(0x4000a, SEEK_SET);
+			file->read(&reg_a, 0x01);
+			file->read(&reg_b, 0x01);
 
 			set_146818_periodic_irq(machine, reg_a);
 			state->periodic_irq = (reg_b & 0x40) ? 1 : 0;

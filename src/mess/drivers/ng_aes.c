@@ -541,15 +541,15 @@ static MEMCARD_HANDLER( neogeo )
 	{
 	case MEMCARD_CREATE:
 		memset(state->memcard_data, 0, MEMCARD_SIZE);
-		mame_fwrite(file, state->memcard_data, MEMCARD_SIZE);
+		file.write(state->memcard_data, MEMCARD_SIZE);
 		break;
 
 	case MEMCARD_INSERT:
-		mame_fread(file, state->memcard_data, MEMCARD_SIZE);
+		file.read(state->memcard_data, MEMCARD_SIZE);
 		break;
 
 	case MEMCARD_EJECT:
-		mame_fwrite(file, state->memcard_data, MEMCARD_SIZE);
+		file.write(state->memcard_data, MEMCARD_SIZE);
 		break;
 	}
 }

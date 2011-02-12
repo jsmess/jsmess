@@ -1392,7 +1392,7 @@ NVRAM_HANDLER( mac )
 	{
 		if (LOG_RTC)
 			logerror("Writing PRAM to file\n");
-		mame_fwrite(file, mac->m_rtc_ram, sizeof(mac->m_rtc_ram));
+		file->write(mac->m_rtc_ram, sizeof(mac->m_rtc_ram));
 	}
 	else
 	{
@@ -1400,7 +1400,7 @@ NVRAM_HANDLER( mac )
 		{
 			if (LOG_RTC)
 				logerror("Reading PRAM from file\n");
-			mame_fread(file, mac->m_rtc_ram, sizeof(mac->m_rtc_ram));
+			file->read(mac->m_rtc_ram, sizeof(mac->m_rtc_ram));
 		}
 		else
 		{

@@ -813,11 +813,11 @@ WRITE16_DEVICE_HANDLER( diskonchip_g3_sec_3_w )
 
 #if 0
 
-static mame_file *nvram_system_fopen( running_machine *machine, UINT32 openflags, const char *name)
+static emu_file *nvram_system_fopen( running_machine *machine, UINT32 openflags, const char *name)
 {
 	astring *fname;
 	file_error filerr;
-	mame_file *file;
+	emu_file *file;
 	fname = astring_assemble_4( astring_alloc(), machine->gamedrv->name, PATH_SEPARATOR, name, ".nv");
 	filerr = mame_fopen( SEARCHPATH_NVRAM, astring_c( fname), openflags, &file);
 	astring_free( fname);
@@ -826,7 +826,7 @@ static mame_file *nvram_system_fopen( running_machine *machine, UINT32 openflags
 
 static void diskonchip_load( device_t *device, const char *name)
 {
-	mame_file *file;
+	emu_file *file;
 	file = nvram_system_fopen( device->machine, OPEN_FLAG_READ, name);
 	device_nvram_diskonchip_g3( device, file, 0);
 	if (file) mame_fclose( file);
@@ -834,7 +834,7 @@ static void diskonchip_load( device_t *device, const char *name)
 
 static void diskonchip_save( device_t *device, const char *name)
 {
-	mame_file *file;
+	emu_file *file;
 	file = nvram_system_fopen( device->machine, OPEN_FLAG_CREATE | OPEN_FLAG_WRITE | OPEN_FLAG_CREATE_PATHS, name);
 	device_nvram_diskonchip_g3( device, file, 1);
 	if (file) mame_fclose( file);
@@ -901,18 +901,18 @@ static DEVICE_NVRAM( diskonchip_g3 )
 	{
 		if (file)
 		{
-			mame_fwrite( file, doc->data[0], doc->data_size[0]);
-			mame_fwrite( file, doc->data[1], doc->data_size[1]);
-			mame_fwrite( file, doc->data[2], doc->data_size[2]);
+			file->write(doc->data[0], doc->data_size[0]);
+			file->write(doc->data[1], doc->data_size[1]);
+			file->write(doc->data[2], doc->data_size[2]);
 		}
 	}
 	else
 	{
 		if (file)
 		{
-			mame_fread( file, doc->data[0], doc->data_size[0]);
-			mame_fread( file, doc->data[1], doc->data_size[1]);
-			mame_fread( file, doc->data[2], doc->data_size[2]);
+			file->read(doc->data[0], doc->data_size[0]);
+			file->read(doc->data[1], doc->data_size[1]);
+			file->read(doc->data[2], doc->data_size[2]);
 		}
 		else
 		{

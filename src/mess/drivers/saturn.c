@@ -1886,12 +1886,12 @@ static NVRAM_HANDLER(saturn)
 	int i;
 
 	if (read_or_write)
-		mame_fwrite(file, backup, 64*1024/4);
+		file->write(backup, 64*1024/4);
 	else
 	{
 		if (file)
 		{
-			mame_fread(file, backup, 64*1024/4);
+			file->read(backup, 64*1024/4);
 		}
 		else
 		{

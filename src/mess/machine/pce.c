@@ -464,13 +464,13 @@ NVRAM_HANDLER( pce )
 {
 	if (read_or_write)
 	{
-		mame_fwrite(file, pce_cd.bram, PCE_BRAM_SIZE);
+		file->write(pce_cd.bram, PCE_BRAM_SIZE);
 	}
 	else
 	{
 		/* load battery backed memory from disk */
 		if (file)
-			mame_fread(file, pce_cd.bram, PCE_BRAM_SIZE);
+			file->read(pce_cd.bram, PCE_BRAM_SIZE);
 	}
 }
 

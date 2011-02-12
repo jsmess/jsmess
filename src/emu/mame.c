@@ -96,11 +96,10 @@
     GLOBAL VARIABLES
 ***************************************************************************/
 
-/* the current options */
-static core_options *mame_opts;
-
 /* started empty? */
 static bool started_empty;
+
+static bool print_verbose = false;
 
 static running_machine *global_machine;
 
@@ -153,14 +152,15 @@ int mame_execute(osd_interface &osd, core_options *options)
 	bool firstgame = true;
 	bool firstrun = true;
 
+	// extract the verbose printing option
+	if (options_get_bool(options, OPTION_VERBOSE))
+		print_verbose = true;
+
 	// loop across multiple hard resets
 	bool exit_pending = false;
 	int error = MAMERR_NONE;
 	while (error == MAMERR_NONE && !exit_pending)
 	{
-		// specify the global mame_options
-		mame_opts = options;
-
 		// convert the specified gamename to a driver
 		astring gamename;
 		core_filename_extract_base(&gamename, options_get_string(options, OPTION_GAMENAME), true);
@@ -175,7 +175,7 @@ int mame_execute(osd_interface &osd, core_options *options)
 		}
 
 		// otherwise, perform validity checks before anything else
-		else if (mame_validitychecks(driver) != 0)
+		else if (mame_validitychecks(*options, driver) != 0)
 			return MAMERR_FAILED_VALIDITY;
 
 		firstgame = false;
@@ -217,37 +217,10 @@ int mame_execute(osd_interface &osd, core_options *options)
 			// clear flag for added devices
 			options_set_bool(options, OPTION_ADDED_DEVICE_OPTIONS, FALSE, OPTION_PRIORITY_CMDLINE);
 		}
-
-		// reset the options
-		mame_opts = NULL;
 	}
 
 	// return an error
 	return error;
-}
-
-
-/*-------------------------------------------------
-    mame_options - accesses the options for the
-    currently running emulation
--------------------------------------------------*/
-
-core_options *mame_options(void)
-{
-	assert(mame_opts != NULL);
-	return mame_opts;
-}
-
-
-
-/*-------------------------------------------------
-    set_mame_options - set mame options, used by
-    validate option
--------------------------------------------------*/
-
-void set_mame_options(core_options *options)
-{
-	mame_opts = options;
 }
 
 
@@ -377,7 +350,7 @@ void mame_printf_verbose(const char *format, ...)
 	va_list argptr;
 
 	/* if we're not verbose, skip it */
-	if (mame_opts == NULL || !options_get_bool(mame_options(), OPTION_VERBOSE))
+	if (!print_verbose)
 		return;
 
 	/* by default, we go to stdout */
@@ -567,27 +540,22 @@ void mame_parse_ini_files(core_options *options, const game_driver *driver)
 
 static int parse_ini_file(core_options *options, const char *name, int priority)
 {
-	file_error filerr;
-	mame_file *file;
-
 	/* update game name so depending callback options could be added */
-	if (priority==OPTION_PRIORITY_DRIVER_INI || priority==OPTION_PRIORITY_SOURCE_INI) {
+	if (priority == OPTION_PRIORITY_DRIVER_INI || priority == OPTION_PRIORITY_SOURCE_INI)
 		options_force_option_callback(options, OPTION_GAMENAME, name, priority);
-	}
 
 	/* don't parse if it has been disabled */
 	if (!options_get_bool(options, OPTION_READCONFIG))
 		return FALSE;
 
 	/* open the file; if we fail, that's ok */
-	astring fname(name, ".ini");
-	filerr = mame_fopen_options(options, SEARCHPATH_INI, fname, OPEN_FLAG_READ, &file);
+	emu_file file(*options, SEARCHPATH_INI, OPEN_FLAG_READ);
+	file_error filerr = file.open(name, ".ini");
 	if (filerr != FILERR_NONE)
 		return FALSE;
 
 	/* parse the file and close it */
 	mame_printf_verbose("Parsing %s.ini\n", name);
-	options_parse_ini_file(options, mame_core_file(file), priority, OPTION_PRIORITY_DRIVER_INI);
-	mame_fclose(file);
+	options_parse_ini_file(options, file, priority, OPTION_PRIORITY_DRIVER_INI);
 	return TRUE;
 }

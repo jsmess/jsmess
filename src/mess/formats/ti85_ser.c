@@ -718,7 +718,6 @@ static void ti85_receive_variables (device_t *device)
 {
 	ti85serial_state *ti85serial = get_token( device );
 	char var_file_name[16];
-	mame_file * var_file;
 	UINT8* temp;
 	file_error filerr;
 
@@ -889,11 +888,12 @@ static void ti85_receive_variables (device_t *device)
 				ti85serial->variable_number = 0;
 				ti85serial->status =  TI85_SEND_STOP;
 				sprintf (var_file_name, "%08d.85g", ti85serial->var_file_number);
-				filerr = mame_fopen(NULL, var_file_name, OPEN_FLAG_READ | OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, &var_file);
+				emu_file var_file(device->machine->options(), NULL, OPEN_FLAG_READ | OPEN_FLAG_WRITE | OPEN_FLAG_CREATE);
+				filerr = var_file.open(var_file_name);
+
 				if (filerr == FILERR_NONE)
 				{
-					mame_fwrite(var_file, ti85serial->var_file_data, ti85serial->var_file_size);
-					mame_fclose(var_file);
+					var_file.write(ti85serial->var_file_data, ti85serial->var_file_size);					
 					free (ti85serial->var_file_data);
 					ti85serial->var_file_data = NULL;
 					ti85serial->var_file_size = 0;
@@ -911,7 +911,6 @@ static void ti85_receive_backup (device_t *device)
 
 	file_error filerr;
 	char backup_file_name[] = "00000000.85b";
-	mame_file * backup_file;
 
 	switch (ti85serial->status)
 	{
@@ -1031,11 +1030,13 @@ static void ti85_receive_backup (device_t *device)
 					ti85serial->backup_file_data[0x42+0x06+ti85serial->backup_data_size[0]+ti85serial->backup_data_size[1]+ti85serial->backup_data_size[2]] = ti85_calculate_checksum(ti85serial->backup_file_data+0x37, 0x42+ti85serial->backup_data_size[0]+ti85serial->backup_data_size[1]+ti85serial->backup_data_size[2]+0x06-0x37)&0x00ff;
 					ti85serial->backup_file_data[0x42+0x06+ti85serial->backup_data_size[0]+ti85serial->backup_data_size[1]+ti85serial->backup_data_size[2]+0x01] = (ti85_calculate_checksum(ti85serial->backup_file_data+0x37, 0x42+ti85serial->backup_data_size[0]+ti85serial->backup_data_size[1]+ti85serial->backup_data_size[2]+0x06-0x37)&0xff00)>>8;
 					sprintf (backup_file_name, "%08d.85b", ti85serial->backup_file_number);
-					filerr = mame_fopen(NULL, backup_file_name, OPEN_FLAG_READ | OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, &backup_file);
+					
+					emu_file backup_file(device->machine->options(), NULL, OPEN_FLAG_READ | OPEN_FLAG_WRITE | OPEN_FLAG_CREATE);
+					filerr = backup_file.open(backup_file_name);
+					
 					if (filerr == FILERR_NONE)
 					{
-						mame_fwrite(backup_file, ti85serial->backup_file_data, 0x42+0x06+ti85serial->backup_data_size[0]+ti85serial->backup_data_size[1]+ti85serial->backup_data_size[2]+0x02);
-						mame_fclose(backup_file);
+						backup_file.write(ti85serial->backup_file_data, 0x42+0x06+ti85serial->backup_data_size[0]+ti85serial->backup_data_size[1]+ti85serial->backup_data_size[2]+0x02);
 						ti85serial->backup_file_number++;
 					}
 					free(ti85serial->backup_file_data); ti85serial->backup_file_data = NULL;
@@ -1051,7 +1052,6 @@ static void ti85_receive_screen (device_t *device)
 	ti85serial_state *ti85serial = get_token( device );
 	char image_file_name[] = "00000000.85i";
 	file_error filerr;
-	mame_file * image_file;
 	UINT8 * image_file_data;
 
 	switch (ti85serial->status)
@@ -1095,7 +1095,10 @@ static void ti85_receive_screen (device_t *device)
 			{
 				ti85_convert_stream_to_data (ti85serial->receive_buffer, 1030*8, ti85serial->receive_data);
 				sprintf (image_file_name, "%08d.85i", ti85serial->image_file_number);
-				filerr = mame_fopen(NULL, image_file_name, OPEN_FLAG_READ | OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, &image_file);
+				
+				emu_file image_file(device->machine->options(), NULL, OPEN_FLAG_READ | OPEN_FLAG_WRITE | OPEN_FLAG_CREATE);
+				filerr = image_file.open(image_file_name);
+				
 				if (filerr == FILERR_NONE)
 				{
 					image_file_data = (UINT8*)malloc (0x49+1008);
@@ -1124,8 +1127,7 @@ static void ti85_receive_screen (device_t *device)
 					memcpy(image_file_data+0x47, ti85serial->receive_data+4, 1008);
 					image_file_data[1008+0x49-2] = ti85_calculate_checksum(image_file_data+0x37, 1008+0x10)&0x00ff;
 					image_file_data[1008+0x49-1] = (ti85_calculate_checksum(image_file_data+0x37, 1008+0x10)&0xff00)>>8;
-					mame_fwrite(image_file, image_file_data, 1008+0x49);
-					mame_fclose(image_file);
+					image_file.write(image_file_data, 1008+0x49);					
 					free(image_file_data);
 					ti85serial->image_file_number++;
 				}

@@ -123,25 +123,25 @@ DEFINE_LEGACY_DEVICE(STRATAFLASH, strataflash);
 /*
     load the FEEPROM contents from file
 */
-int strataflash_load(device_t *device, mame_file *file)
+int strataflash_load(device_t *device, emu_file *file)
 {
 	strata_t *strata = get_safe_token(device);
 	UINT8 buf;
 	int i;
 
 	/* version flag */
-	if (mame_fread(file, & buf, 1) != 1)
+	if (file->read(& buf, 1) != 1)
 		return 1;
 	if (buf != 0)
 		return 1;
 
 	/* chip state: master lock */
-	if (mame_fread(file, & buf, 1) != 1)
+	if (file->read(& buf, 1) != 1)
 		return 1;
 	strata->master_lock = buf & 1;
 
 	/* main FEEPROM area */
-	if (mame_fread(file, strata->data_ptr, FEEPROM_SIZE) != FEEPROM_SIZE)
+	if (file->read(strata->data_ptr, FEEPROM_SIZE) != FEEPROM_SIZE)
 		return 1;
 	for (i = 0; i < FEEPROM_SIZE; i += 2)
 	{
@@ -150,7 +150,7 @@ int strataflash_load(device_t *device, mame_file *file)
 	}
 
 	/* protection registers */
-	if (mame_fread(file, strata->prot_regs, PROT_REGS_SIZE) != PROT_REGS_SIZE)
+	if (file->read(strata->prot_regs, PROT_REGS_SIZE) != PROT_REGS_SIZE)
 		return 1;
 	for (i = 0; i < PROT_REGS_SIZE; i += 2)
 	{
@@ -159,7 +159,7 @@ int strataflash_load(device_t *device, mame_file *file)
 	}
 
 	/* block lock flags */
-	if (mame_fread(file, strata->blocklock, BLOCKLOCK_SIZE) != BLOCKLOCK_SIZE)
+	if (file->read(strata->blocklock, BLOCKLOCK_SIZE) != BLOCKLOCK_SIZE)
 		return 1;
 
 	return 0;
@@ -168,7 +168,7 @@ int strataflash_load(device_t *device, mame_file *file)
 /*
     save the FEEPROM contents to file
 */
-int strataflash_save(device_t *device, mame_file *file)
+int strataflash_save(device_t *device, emu_file *file)
 {
 	strata_t *strata = get_safe_token(device);
 	UINT8 buf;
@@ -176,13 +176,13 @@ int strataflash_save(device_t *device, mame_file *file)
 
 	/* version flag */
 	buf = 0;
-	if (mame_fwrite(file, & buf, 1) != 1)
+	if (file->write(& buf, 1) != 1)
 		return 1;
 
 	/* chip state: lower boot block lockout, higher boot block lockout,
     software data protect */
 	buf = strata->master_lock;
-	if (mame_fwrite(file, & buf, 1) != 1)
+	if (file->write(& buf, 1) != 1)
 		return 1;
 
 	/* main FEEPROM area */
@@ -191,7 +191,7 @@ int strataflash_save(device_t *device, mame_file *file)
 		UINT16 *ptr = (UINT16 *) (&strata->data_ptr[i]);
 		*ptr = LITTLE_ENDIANIZE_INT16(*ptr);
 	}
-	if (mame_fwrite(file, strata->data_ptr, FEEPROM_SIZE) != FEEPROM_SIZE)
+	if (file->write(strata->data_ptr, FEEPROM_SIZE) != FEEPROM_SIZE)
 		return 1;
 	for (i = 0; i < FEEPROM_SIZE; i += 2)
 	{
@@ -205,7 +205,7 @@ int strataflash_save(device_t *device, mame_file *file)
 		UINT16 *ptr = (UINT16 *) (&strata->prot_regs[i]);
 		*ptr = LITTLE_ENDIANIZE_INT16(*ptr);
 	}
-	if (mame_fwrite(file, strata->prot_regs, PROT_REGS_SIZE) != PROT_REGS_SIZE)
+	if (file->write(strata->prot_regs, PROT_REGS_SIZE) != PROT_REGS_SIZE)
 		return 1;
 	for (i = 0; i < PROT_REGS_SIZE; i += 2)
 	{
@@ -214,7 +214,7 @@ int strataflash_save(device_t *device, mame_file *file)
 	}
 
 	/* block lock flags */
-	if (mame_fwrite(file, strata->blocklock, BLOCKLOCK_SIZE) != BLOCKLOCK_SIZE)
+	if (file->write(strata->blocklock, BLOCKLOCK_SIZE) != BLOCKLOCK_SIZE)
 		return 1;
 
 	return 0;

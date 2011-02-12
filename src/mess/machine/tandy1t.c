@@ -36,11 +36,11 @@ NVRAM_HANDLER( tandy1000 )
 	}
 	else if (read_or_write)
 	{
-		mame_fwrite(file, eeprom.ee, sizeof(eeprom.ee));
+		file->write(eeprom.ee, sizeof(eeprom.ee));
 	}
 	else
 	{
-		mame_fread(file, eeprom.ee, sizeof(eeprom.ee));
+		file->read(eeprom.ee, sizeof(eeprom.ee));
 	}
 }
 

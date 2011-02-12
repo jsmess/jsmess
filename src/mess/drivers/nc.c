@@ -432,7 +432,7 @@ static void nc_common_restore_memory_from_stream(running_machine *machine)
 
 	LOG(("restoring nc memory\n"));
 	/* get size of memory data stored */
-	mame_fread(state->file, &stored_size, sizeof(unsigned long));
+	state->file->read(&stored_size, sizeof(unsigned long));
 
 	if (stored_size > ram_get_size(machine->device(RAM_TAG)))
 		restore_size = ram_get_size(machine->device(RAM_TAG));
@@ -440,9 +440,9 @@ static void nc_common_restore_memory_from_stream(running_machine *machine)
 		restore_size = stored_size;
 
 	/* read as much as will fit into memory */
-	mame_fread(state->file, ram_get_ptr(machine->device(RAM_TAG)), restore_size);
+	state->file->read(ram_get_ptr(machine->device(RAM_TAG)), restore_size);
 	/* seek over remaining data */
-	mame_fseek(state->file, SEEK_CUR,stored_size - restore_size);
+	state->file->seek(SEEK_CUR,stored_size - restore_size);
 }
 
 /* store a block of memory to the nvram file */
@@ -455,10 +455,10 @@ static void nc_common_store_memory_to_stream(running_machine *machine)
 
 	LOG(("storing nc memory\n"));
 	/* write size of memory data */
-	mame_fwrite(state->file, &size, sizeof(UINT32));
+	state->file->write(&size, sizeof(UINT32));
 
 	/* write data block */
-	mame_fwrite(state->file, ram_get_ptr(machine->device(RAM_TAG)), size);
+	state->file->write(ram_get_ptr(machine->device(RAM_TAG)), size);
 }
 
 static void nc_common_open_stream_for_reading(running_machine *machine)
@@ -468,7 +468,8 @@ static void nc_common_open_stream_for_reading(running_machine *machine)
 
 	sprintf(filename,"%s.nv", machine->gamedrv->name);
 
-	mame_fopen(SEARCHPATH_MEMCARD, filename, OPEN_FLAG_READ, &state->file);
+	state->file = global_alloc(emu_file(machine->options(), SEARCHPATH_MEMCARD, OPEN_FLAG_WRITE));
+	state->file->open(filename);
 }
 
 static void nc_common_open_stream_for_writing(running_machine *machine)
@@ -477,8 +478,9 @@ static void nc_common_open_stream_for_writing(running_machine *machine)
 	char filename[MAX_DRIVER_NAME_CHARS + 5];
 
 	sprintf(filename,"%s.nv", machine->gamedrv->name);
-
-	mame_fopen(SEARCHPATH_MEMCARD, filename, OPEN_FLAG_WRITE, &state->file);
+	
+	state->file = global_alloc(emu_file(machine->options(), SEARCHPATH_MEMCARD, OPEN_FLAG_WRITE));
+	state->file->open(filename);
 }
 
 
@@ -486,7 +488,7 @@ static void nc_common_close_stream(running_machine *machine)
 {
 	nc_state *state = machine->driver_data<nc_state>();
 	if (state->file)
-		mame_fclose(state->file);
+		global_free(state->file);
 }
 
 

@@ -44,7 +44,7 @@ public:
 	int irq_latch;
 	int irq_latch_mask;
 	int sound_channel_periods[2];
-	mame_file *file;
+	emu_file *file;
 	int previous_inputport_10_state;
 	int previous_alarm_state;
 	UINT8 nc200_uart_interrupt_irq;

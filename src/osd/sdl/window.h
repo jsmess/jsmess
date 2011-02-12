@@ -96,6 +96,7 @@ struct _sdl_window_info
 #if (SDL_VERSION_ATLEAST(1,3,0))
 	// Needs to be here as well so we can identify window
 	SDL_Window			*sdl_window;
+	SDL_Renderer 		*sdl_renderer;
 	// These are used in combine resizing events ... #if SDL13_COMBINE_RESIZE
 	int 				resize_width;
 	int					resize_height;
@@ -146,12 +147,12 @@ int drawsdl_scale_mode(const char *s);
 // PROTOTYPES - drawogl.c
 //============================================================
 
-int drawogl_init(sdl_draw_info *callbacks);
+int drawogl_init(running_machine &machine, sdl_draw_info *callbacks);
 
 //============================================================
 // PROTOTYPES - draw13.c
 //============================================================
 
-int draw13_init(sdl_draw_info *callbacks);
+int draw13_init(running_machine &machine, sdl_draw_info *callbacks);
 
 #endif /* __SDLWINDOW__ */

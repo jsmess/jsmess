@@ -611,19 +611,19 @@ static NVRAM_HANDLER( psion )
 
 	if (read_or_write)
 	{
-		mame_fwrite(file, state->m_sys_register, 0xc0);
-		mame_fwrite(file, state->m_ram, state->m_ram_size);
+		file->write(state->m_sys_register, 0xc0);
+		file->write(state->m_ram, state->m_ram_size);
 		if (state->m_ram_bank_count)
-			mame_fwrite(file, state->m_paged_ram, state->m_ram_bank_count * 0x4000);
+			file->write(state->m_paged_ram, state->m_ram_bank_count * 0x4000);
 	}
 	else
 	{
 		if (file)
 		{
-			mame_fread(file, state->m_sys_register, 0xc0);
-			mame_fread(file, state->m_ram, state->m_ram_size);
+			file->read(state->m_sys_register, 0xc0);
+			file->read(state->m_ram, state->m_ram_size);
 			if (state->m_ram_bank_count)
-				mame_fread(file, state->m_paged_ram, state->m_ram_bank_count * 0x4000);
+				file->read(state->m_paged_ram, state->m_ram_bank_count * 0x4000);
 
 			//warm start
 			state->m_stby_pwr = 1;

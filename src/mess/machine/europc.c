@@ -335,14 +335,14 @@ WRITE8_HANDLER( europc_rtc_w )
 	}
 }
 
-static void europc_rtc_load_stream(mame_file *file)
+static void europc_rtc_load_stream(emu_file *file)
 {
-	mame_fread(file, europc_rtc.data, sizeof(europc_rtc.data));
+	file->read(europc_rtc.data, sizeof(europc_rtc.data));
 }
 
-static void europc_rtc_save_stream(mame_file *file)
+static void europc_rtc_save_stream(emu_file *file)
 {
-	mame_fwrite(file, europc_rtc.data, sizeof(europc_rtc.data));
+	file->write(europc_rtc.data, sizeof(europc_rtc.data));
 }
 
 NVRAM_HANDLER( europc_rtc )

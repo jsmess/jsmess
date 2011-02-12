@@ -1257,15 +1257,15 @@ static NVRAM_HANDLER( x07 )
 
 	if (read_or_write)
 	{
-		mame_fwrite(file, state->m_t6834_ram, sizeof(state->m_t6834_ram));
-		mame_fwrite(file, ram_get_ptr(state->m_ram), ram_get_size(state->m_ram));
+		file->write(state->m_t6834_ram, sizeof(state->m_t6834_ram));
+		file->write(ram_get_ptr(state->m_ram), ram_get_size(state->m_ram));
 	}
 	else
 	{
 		if (file)
 		{
-			mame_fread(file, state->m_t6834_ram, sizeof(state->m_t6834_ram));
-			mame_fread(file, ram_get_ptr(state->m_ram), ram_get_size(state->m_ram));
+			file->read(state->m_t6834_ram, sizeof(state->m_t6834_ram));
+			file->read(ram_get_ptr(state->m_ram), ram_get_size(state->m_ram));
 			state->m_warm_start = 1;
 		}
 		else

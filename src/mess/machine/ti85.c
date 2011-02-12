@@ -804,13 +804,13 @@ NVRAM_HANDLER( ti83p )
 	ti85_state *state = machine->driver_data<ti85_state>();
 	if (read_or_write)
 	{
-		mame_fwrite(file, state->ti8x_ram, sizeof(unsigned char)*32*1024);
+		file->write(state->ti8x_ram, sizeof(unsigned char)*32*1024);
 	}
 	else
 	{
 			if (file)
 			{
-				mame_fread(file, state->ti8x_ram, sizeof(unsigned char)*32*1024);
+				file->read(state->ti8x_ram, sizeof(unsigned char)*32*1024);
 				cpu_set_reg(machine->device("maincpu"), Z80_PC,0x0c59);
 			}
 			else
@@ -823,13 +823,13 @@ NVRAM_HANDLER( ti86 )
 	ti85_state *state = machine->driver_data<ti85_state>();
 	if (read_or_write)
 	{
-		mame_fwrite(file, state->ti8x_ram, sizeof(unsigned char)*128*1024);
+		file->write(state->ti8x_ram, sizeof(unsigned char)*128*1024);
 	}
 	else
 	{
 			if (file)
 			{
-				mame_fread(file, state->ti8x_ram, sizeof(unsigned char)*128*1024);
+				file->read(state->ti8x_ram, sizeof(unsigned char)*128*1024);
 				cpu_set_reg(machine->device("maincpu"), Z80_PC,0x0c59);
 			}
 			else

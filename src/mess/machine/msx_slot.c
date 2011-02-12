@@ -746,25 +746,20 @@ MSX_SLOT_WRITE(ascii8_sram)
 
 MSX_SLOT_LOADSRAM(ascii8_sram)
 {
-	file_error filerr;
-	mame_file *f;
-
 	if (!state->sramfile)
 	{
 		logerror ("ascii8_sram: error: no sram filename provided\n");
 		return 1;
 	}
-
-	filerr = mame_fopen(SEARCHPATH_MEMCARD, state->sramfile, OPEN_FLAG_READ, &f);
+	emu_file f(machine->options(), SEARCHPATH_MEMCARD, OPEN_FLAG_READ);
+	file_error filerr = f.open(state->sramfile);
 	if (filerr == FILERR_NONE)
 	{
-		if (mame_fread (f, state->cart.sram.mem, 0x2000) == 0x2000)
+		if (f.read(state->cart.sram.mem, 0x2000) == 0x2000)
 		{
-			mame_fclose (f);
 			logerror ("ascii8_sram: info: sram loaded\n");
 			return 0;
 		}
-		mame_fclose (f);
 		memset (state->cart.sram.mem, 0, 0x2000);
 		logerror ("ascii8_sram: warning: could not read sram file\n");
 		return 1;
@@ -777,19 +772,16 @@ MSX_SLOT_LOADSRAM(ascii8_sram)
 
 MSX_SLOT_SAVESRAM(ascii8_sram)
 {
-	file_error filerr;
-	mame_file *f;
-
 	if (!state->sramfile)
 	{
 		return 0;
 	}
 
-	filerr = mame_fopen(SEARCHPATH_MEMCARD, state->sramfile, OPEN_FLAG_WRITE, &f);
+	emu_file f(machine->options(), SEARCHPATH_MEMCARD, OPEN_FLAG_WRITE);
+	file_error filerr = f.open(state->sramfile);
 	if (filerr == FILERR_NONE)
 	{
-		mame_fwrite (f, state->cart.sram.mem, 0x2000);
-		mame_fclose (f);
+		f.write(state->cart.sram.mem, 0x2000);
 		logerror ("ascii8_sram: info: sram saved\n");
 
 		return 0;
@@ -921,8 +913,6 @@ MSX_SLOT_WRITE(ascii16_sram)
 
 MSX_SLOT_LOADSRAM(ascii16_sram)
 {
-	file_error filerr;
-	mame_file *f;
 	UINT8 *p;
 
 	if (!state->sramfile)
@@ -931,17 +921,15 @@ MSX_SLOT_LOADSRAM(ascii16_sram)
 		return 1;
 	}
 
-	filerr = mame_fopen(SEARCHPATH_MEMCARD, state->sramfile, OPEN_FLAG_READ, &f);
+	emu_file f(machine->options(), SEARCHPATH_MEMCARD, OPEN_FLAG_READ);
+	file_error filerr = f.open(state->sramfile);
 	if (filerr == FILERR_NONE)
 	{
 		p = state->cart.sram.mem;
 
-		if (mame_fread (f, state->cart.sram.mem, 0x200) == 0x200)
+		if (f.read(state->cart.sram.mem, 0x200) == 0x200)
 		{
 			int /*offset,*/ i;
-
-			mame_fclose (f);
-
 			//offset = 0;
 			for (i=0; i<7; i++)
 			{
@@ -952,7 +940,6 @@ MSX_SLOT_LOADSRAM(ascii16_sram)
 			logerror ("ascii16_sram: info: sram loaded\n");
 			return 0;
 		}
-		mame_fclose (f);
 		memset (state->cart.sram.mem, 0, 0x4000);
 		logerror ("ascii16_sram: warning: could not read sram file\n");
 		return 1;
@@ -965,19 +952,15 @@ MSX_SLOT_LOADSRAM(ascii16_sram)
 
 MSX_SLOT_SAVESRAM(ascii16_sram)
 {
-	file_error filerr;
-	mame_file *f;
-
 	if (!state->sramfile)
 	{
 		return 0;
 	}
-
-	filerr = mame_fopen(SEARCHPATH_MEMCARD, state->sramfile, OPEN_FLAG_WRITE, &f);
+	emu_file f(machine->options(), SEARCHPATH_MEMCARD, OPEN_FLAG_WRITE);
+	file_error filerr = f.open(state->sramfile);
 	if (filerr == FILERR_NONE)
 	{
-		mame_fwrite (f, state->cart.sram.mem, 0x200);
-		mame_fclose (f);
+		f.write(state->cart.sram.mem, 0x200);
 		logerror ("ascii16_sram: info: sram saved\n");
 
 		return 0;
@@ -1207,23 +1190,21 @@ MSX_SLOT_WRITE(gmaster2)
 
 MSX_SLOT_LOADSRAM(gmaster2)
 {
-	file_error filerr;
-	mame_file *f;
 	UINT8 *p;
 
 	p = state->cart.sram.mem;
-	filerr = mame_fopen(SEARCHPATH_MEMCARD, state->sramfile, OPEN_FLAG_READ, &f);
+	
+	emu_file f(machine->options(), SEARCHPATH_MEMCARD, OPEN_FLAG_READ);
+	file_error filerr = f.open(state->sramfile);
 	if (filerr == FILERR_NONE)
 	{
-		if (mame_fread (f, p + 0x1000, 0x2000) == 0x2000)
+		if (f.read(p + 0x1000, 0x2000) == 0x2000)
 		{
 			memcpy (p, p + 0x1000, 0x1000);
 			memcpy (p + 0x3000, p + 0x2000, 0x1000);
-			mame_fclose (f);
 			logerror ("gmaster2: info: sram loaded\n");
 			return 0;
 		}
-		mame_fclose (f);
 		memset (p, 0, 0x4000);
 		logerror ("gmaster2: warning: could not read sram file\n");
 		return 1;
@@ -1236,14 +1217,11 @@ MSX_SLOT_LOADSRAM(gmaster2)
 
 MSX_SLOT_SAVESRAM(gmaster2)
 {
-	file_error filerr;
-	mame_file *f;
-
-	filerr = mame_fopen(SEARCHPATH_MEMCARD, state->sramfile, OPEN_FLAG_WRITE, &f);
+	emu_file f(machine->options(), SEARCHPATH_MEMCARD, OPEN_FLAG_WRITE);
+	file_error filerr = f.open(state->sramfile);
 	if (filerr == FILERR_NONE)
 	{
-		mame_fwrite (f, state->cart.sram.mem + 0x1000, 0x2000);
-		mame_fclose (f);
+		f.write(state->cart.sram.mem + 0x1000, 0x2000);
 		logerror ("gmaster2: info: sram saved\n");
 
 		return 0;
@@ -1782,8 +1760,6 @@ static const char PAC_HEADER[] = "PAC2 BACKUP DATA";
 
 MSX_SLOT_LOADSRAM(fmpac)
 {
-	file_error filerr;
-	mame_file *f;
 	char buf[PAC_HEADER_LEN];
 
 	if (!state->cart.fmpac.sram_support)
@@ -1797,22 +1773,20 @@ MSX_SLOT_LOADSRAM(fmpac)
 		logerror ("No sram filename provided\n");
 		return 1;
 	}
-
-	filerr = mame_fopen(SEARCHPATH_MEMCARD, state->sramfile, OPEN_FLAG_READ, &f);
+	emu_file f(machine->options(), SEARCHPATH_MEMCARD, OPEN_FLAG_READ);
+	file_error filerr = f.open(state->sramfile);
 	if (filerr == FILERR_NONE)
 	{
-		if ((mame_fread (f, buf, PAC_HEADER_LEN) == PAC_HEADER_LEN) &&
+		if ((f.read(buf, PAC_HEADER_LEN) == PAC_HEADER_LEN) &&
 			!strncmp (buf, PAC_HEADER, PAC_HEADER_LEN) &&
-			mame_fread (f, state->cart.fmpac.mem, 0x1ffe))
+			f.read(state->cart.fmpac.mem, 0x1ffe))
 		{
 			logerror ("fmpac: info: sram loaded\n");
-			mame_fclose (f);
 			return 0;
 		}
 		else
 		{
 			logerror ("fmpac: warning: failed to load sram\n");
-			mame_fclose (f);
 			return 1;
 		}
 	}
@@ -1823,28 +1797,24 @@ MSX_SLOT_LOADSRAM(fmpac)
 
 MSX_SLOT_SAVESRAM(fmpac)
 {
-	file_error filerr;
-	mame_file *f;
-
 	if (!state->cart.fmpac.sram_support || !state->sramfile)
 	{
 		return 0;
 	}
 
-	filerr = mame_fopen(SEARCHPATH_MEMCARD, state->sramfile, OPEN_FLAG_WRITE, &f);
+	emu_file f(machine->options(), SEARCHPATH_MEMCARD, OPEN_FLAG_WRITE);
+	file_error filerr = f.open(state->sramfile);
 	if (filerr == FILERR_NONE)
 	{
-		if ((mame_fwrite (f, PAC_HEADER, PAC_HEADER_LEN) == PAC_HEADER_LEN) &&
-			(mame_fwrite (f, state->cart.fmpac.mem, 0x1ffe) == 0x1ffe))
+		if ((f.write(PAC_HEADER, PAC_HEADER_LEN) == PAC_HEADER_LEN) &&
+			(f.write(state->cart.fmpac.mem, 0x1ffe) == 0x1ffe))
 		{
 			logerror ("fmpac: info: sram saved\n");
-			mame_fclose (f);
 			return 0;
 		}
 		else
 		{
 			logerror ("fmpac: warning: sram save to file failed\n");
-			mame_fclose (f);
 			return 1;
 		}
 	}

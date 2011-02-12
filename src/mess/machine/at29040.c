@@ -140,26 +140,26 @@ void at29c040a_init(running_machine *machine,int id)
 /*
     load the contents of one FEEPROM file
 */
-int at29c040a_file_load(int id, mame_file *file)
+int at29c040a_file_load(int id, emu_file *file)
 {
 	UINT8 buf;
 
 	/* version flag */
-	if (mame_fread(file, & buf, 1) != 1)
+	if (file->read(& buf, 1) != 1)
 		return 1;
 	if (buf != 0)
 		return 1;
 
 	/* chip state: lower boot block lockout, higher boot block lockout,
     software data protect */
-	if (mame_fread(file, & buf, 1) != 1)
+	if (file->read(& buf, 1) != 1)
 		return 1;
 	at29c040a[id].s_lower_bbl = (buf >> 2) & 1;
 	at29c040a[id].s_higher_bbl = (buf >> 1) & 1;
 	at29c040a[id].s_sdp = buf & 1;
 
 	/* data */
-	if (mame_fread(file, at29c040a[id].data_ptr, FEEPROM_SIZE) != FEEPROM_SIZE)
+	if (file->read(at29c040a[id].data_ptr, FEEPROM_SIZE) != FEEPROM_SIZE)
 		return 1;
 
 	at29c040a[id].s_dirty = FALSE;
@@ -170,23 +170,23 @@ int at29c040a_file_load(int id, mame_file *file)
 /*
     save the FEEPROM contents to file
 */
-int at29c040a_file_save(int id, mame_file *file)
+int at29c040a_file_save(int id, emu_file *file)
 {
 	UINT8 buf;
 
 	/* version flag */
 	buf = 0;
-	if (mame_fwrite(file, & buf, 1) != 1)
+	if (file->write(& buf, 1) != 1)
 		return 1;
 
 	/* chip state: lower boot block lockout, higher boot block lockout,
     software data protect */
 	buf = (at29c040a[id].s_lower_bbl << 2) | (at29c040a[id].s_higher_bbl << 1) | at29c040a[id].s_sdp;
-	if (mame_fwrite(file, & buf, 1) != 1)
+	if (file->write(& buf, 1) != 1)
 		return 1;
 
 	/* data */
-	if (mame_fwrite(file, at29c040a[id].data_ptr, FEEPROM_SIZE) != FEEPROM_SIZE)
+	if (file->write(at29c040a[id].data_ptr, FEEPROM_SIZE) != FEEPROM_SIZE)
 		return 1;
 
 	return 0;

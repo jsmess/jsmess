@@ -71,7 +71,7 @@ static unsigned int rotation_speed;		/* drive rotation speed - ignored if ext_sp
 typedef struct
 {
 	device_t *img;
-	mame_file *fd;
+	emu_file *fd;
 
 	unsigned int ext_speed_control : 1;	/* is motor rotation controlled by external device ? */
 

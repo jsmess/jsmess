@@ -1015,10 +1015,10 @@ static NVRAM_HANDLER( px4_ramdisk )
 	px4_state *px4 = machine->driver_data<px4_state>();
 
 	if (read_or_write)
-		mame_fwrite(file, px4->ramdisk, 0x20000);
+		file->write(px4->ramdisk, 0x20000);
 	else
 		if (file)
-			mame_fread(file, px4->ramdisk, 0x20000);
+			file->read(px4->ramdisk, 0x20000);
 }
 
 

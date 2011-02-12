@@ -46,8 +46,8 @@ void at45dbxx_pin_si(device_t *device,  int data);
 int  at45dbxx_pin_so(device_t *device);
 
 // load/save
-void at45dbxx_load(device_t *device, mame_file *file);
-void at45dbxx_save(device_t *device, mame_file *file);
+void at45dbxx_load(device_t *device, emu_file *file);
+void at45dbxx_save(device_t *device, emu_file *file);
 
 // non-volatile ram handler
 //NVRAM_HANDLER( at45dbxx );

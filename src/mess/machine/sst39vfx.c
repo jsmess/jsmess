@@ -137,22 +137,22 @@ static void sst39vfx_swap( device_t *device)
 	}
 }
 
-void sst39vfx_load(device_t *device, mame_file *file)
+void sst39vfx_load(device_t *device, emu_file *file)
 {
 	sst39vfx_t *flash = get_token(device);
 
 	_logerror( 0, ("sst39vfx_load (%p)\n", file));
-	mame_fread( file, flash->data, flash->size);
+	file->read(flash->data, flash->size);
 	if (flash->swap) sst39vfx_swap(device);
 }
 
-void sst39vfx_save(device_t *device, mame_file *file)
+void sst39vfx_save(device_t *device, emu_file *file)
 {
 	sst39vfx_t *flash = get_token(device);
 
 	_logerror( 0, ("sst39vfx_save (%p)\n", file));
 	if (flash->swap) sst39vfx_swap(device);
-	mame_fwrite( file, flash->data, flash->size);
+	file->write(flash->data, flash->size);
 	if (flash->swap) sst39vfx_swap(device);
 }
 

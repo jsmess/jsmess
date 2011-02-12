@@ -802,13 +802,13 @@ static NVRAM_HANDLER( pc1260 )
 
 	if (read_or_write)
 	{
-		mame_fwrite(file, cpu, 96);
-		mame_fwrite(file, ram, 0x2800);
+		file->write(cpu, 96);
+		file->write(ram, 0x2800);
 	}
 	else if (file)
 	{
-		mame_fread(file, cpu, 96);
-		mame_fread(file, ram, 0x2800);
+		file->read(cpu, 96);
+		file->read(ram, 0x2800);
 	}
 	else
 	{

@@ -377,18 +377,18 @@ void at45dbxx_pin_sck(device_t *device,  int data)
 	flash->pin.sck = data;
 }
 
-void at45dbxx_load(device_t *device, mame_file *file)
+void at45dbxx_load(device_t *device, emu_file *file)
 {
 	at45dbxx_t *flash = get_token(device);
 	_logerror( 0, ("at45dbxx_load (%p)\n", file));
-	mame_fread( file, flash->data, flash->size);
+	file->read(flash->data, flash->size);
 }
 
-void at45dbxx_save(device_t *device, mame_file *file)
+void at45dbxx_save(device_t *device, emu_file *file)
 {
 	at45dbxx_t *flash = get_token(device);
 	_logerror( 0, ("at45dbxx_save (%p)\n", file));
-	mame_fwrite( file, flash->data, flash->size);
+	file->write(flash->data, flash->size);
 }
 
 #ifdef UNUSED_FUNCTION

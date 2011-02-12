@@ -938,12 +938,12 @@ NVRAM_HANDLER(lisa)
 	lisa_state *state = machine->driver_data<lisa_state>();
 	if (read_or_write)
 	{
-		mame_fwrite(file, state->fdc_ram, 1024);
+		file->write(state->fdc_ram, 1024);
 	}
 	else
 	{
 		if (file)
-			mame_fread(file, state->fdc_ram, 1024);
+			file->read(state->fdc_ram, 1024);
 		else
 			memset(state->fdc_ram, 0, 1024);
 

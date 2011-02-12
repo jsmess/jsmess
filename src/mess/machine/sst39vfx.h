@@ -63,8 +63,8 @@ WRITE8_HANDLER( sst39vfx_w );
 #endif
 
 // load/save
-void sst39vfx_load(device_t *device, mame_file *file);
-void sst39vfx_save(device_t *device, mame_file *file);
+void sst39vfx_load(device_t *device, emu_file *file);
+void sst39vfx_save(device_t *device, emu_file *file);
 
 // non-volatile ram handler
 //NVRAM_HANDLER( sst39vfx );

@@ -210,7 +210,7 @@ static astring *assemble_software_path(astring *str, const game_driver *gamedrv,
 static void dump_screenshot(running_machine *machine, int write_file)
 {
 	file_error filerr;
-	mame_file *fp;
+	emu_file *fp;
 	char buf[128];
 	int is_blank = 0;
 

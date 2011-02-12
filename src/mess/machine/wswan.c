@@ -271,14 +271,14 @@ NVRAM_HANDLER( wswan )
 	if ( read_or_write )
 	{
 		/* Save the EEPROM data */
-		mame_fwrite( file, state->internal_eeprom, INTERNAL_EEPROM_SIZE );
+		file->write(state->internal_eeprom, INTERNAL_EEPROM_SIZE );
 	}
 	else
 	{
 		/* Load the EEPROM data */
 		if ( file )
 		{
-			mame_fread( file, state->internal_eeprom, INTERNAL_EEPROM_SIZE );
+			file->read(state->internal_eeprom, INTERNAL_EEPROM_SIZE );
 		}
 		else
 		{

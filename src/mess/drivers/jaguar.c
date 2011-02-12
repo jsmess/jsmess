@@ -193,12 +193,12 @@ static MACHINE_RESET( jaguar )
 *
 ********************************************************************/
 /*
-static mame_file *jaguar_nvram_fopen( running_machine *machine, UINT32 openflags)
+static emu_file *jaguar_nvram_fopen( running_machine *machine, UINT32 openflags)
 {
     device_image_interface *image = dynamic_cast<device_image_interface *>(machine->device("cart"));
     astring *fname;
     file_error filerr;
-    mame_file *file;
+    emu_file *file;
     if (image->exists())
     {
         fname = astring_assemble_4( astring_alloc(), machine->gamedrv->name, PATH_SEPARATOR, image->basename_noext(), ".nv");
@@ -212,7 +212,7 @@ static mame_file *jaguar_nvram_fopen( running_machine *machine, UINT32 openflags
 
 static void jaguar_nvram_load(running_machine *machine)
 {
-    mame_file *nvram_file = NULL;
+    emu_file *nvram_file = NULL;
     device_t *device;
 
     for (device = machine->m_devicelist.first(); device != NULL; device = device->next())
@@ -232,7 +232,7 @@ static void jaguar_nvram_load(running_machine *machine)
 
 static void jaguar_nvram_save(running_machine *machine)
 {
-    mame_file *nvram_file = NULL;
+    emu_file *nvram_file = NULL;
     device_t *device;
 
     for (device = machine->m_devicelist.first(); device != NULL; device = device->next())

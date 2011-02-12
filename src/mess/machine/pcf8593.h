@@ -35,7 +35,7 @@ void pcf8593_pin_sda_w(device_t *device, int data);
 int  pcf8593_pin_sda_r(device_t *device);
 
 /* load/save */
-void pcf8593_load(device_t *device, mame_file *file);
-void pcf8593_save(device_t *device, mame_file *file);
+void pcf8593_load(device_t *device, emu_file *file);
+void pcf8593_save(device_t *device, emu_file *file);
 
 #endif /* __PCF8593_H__ */

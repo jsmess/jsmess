@@ -131,15 +131,15 @@ static NVRAM_HANDLER( ip22 )
 	ip22_state *state = machine->driver_data<ip22_state>();
 	if (read_or_write)
 	{
-		mame_fwrite(file, state->nRTC_UserRAM, 0x200);
-		mame_fwrite(file, state->nRTC_RAM, 0x200);
+		file->write(state->nRTC_UserRAM, 0x200);
+		file->write(state->nRTC_RAM, 0x200);
 	}
 	else
 	{
 		if (file)
 		{
-			mame_fread(file, state->nRTC_UserRAM, 0x200);
-			mame_fread(file, state->nRTC_RAM, 0x200);
+			file->read(state->nRTC_UserRAM, 0x200);
+			file->read(state->nRTC_RAM, 0x200);
 		}
 	}
 }

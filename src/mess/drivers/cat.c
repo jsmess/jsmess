@@ -392,13 +392,13 @@ static NVRAM_HANDLER( cat )
 
 	if (read_or_write)
 	{
-		mame_fwrite(file, state->sram, 0x4000);
+		file->write(state->sram, 0x4000);
 	}
 	else
 	{
 		if (file)
 		{
-			mame_fread(file, state->sram, 0x4000);
+			file->read(state->sram, 0x4000);
 		}
 	}
 }

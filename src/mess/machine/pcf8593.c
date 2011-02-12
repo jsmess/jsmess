@@ -396,13 +396,13 @@ static TIMER_CALLBACK( pcf8593_timer_callback )
     pcf8593_load
 -------------------------------------------------*/
 
-void pcf8593_load(device_t *device, mame_file *file)
+void pcf8593_load(device_t *device, emu_file *file)
 {
 	pcf8593_t *rtc = get_token(device);
 	system_time systime;
 
 	_logerror( 0, ("pcf8593_load (%p)\n", file));
-	mame_fread( file, rtc->data, sizeof(rtc->data));
+	file->read(rtc->data, sizeof(rtc->data));
 	device->machine->current_datetime(systime);
 	pcf8593_set_date(device, systime.local_time.year, systime.local_time.month + 1, systime.local_time.mday);
 	pcf8593_set_time(device, systime.local_time.hour, systime.local_time.minute, systime.local_time.second);
@@ -414,12 +414,12 @@ void pcf8593_load(device_t *device, mame_file *file)
     pcf8593_save
 -------------------------------------------------*/
 
-void pcf8593_save(device_t *device, mame_file *file)
+void pcf8593_save(device_t *device, emu_file *file)
 {
 	pcf8593_t *rtc = get_token(device);
 
 	_logerror( 0, ("pcf8593_save (%p)\n", file));
-	mame_fwrite( file, rtc->data, sizeof(rtc->data));
+	file->write(rtc->data, sizeof(rtc->data));
 }
 
 #ifdef UNUSED_FUNCTION

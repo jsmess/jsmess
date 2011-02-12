@@ -1770,14 +1770,14 @@ static NVRAM_HANDLER( gp32 )
 	{
 		if (file)
 		{
-			mame_fwrite( file, state->eeprom_data, 0x2000);
+			file->write(state->eeprom_data, 0x2000);
 		}
 	}
 	else
 	{
 		if (file)
 		{
-			mame_fread( file, state->eeprom_data, 0x2000);
+			file->read(state->eeprom_data, 0x2000);
 		}
 		else
 		{

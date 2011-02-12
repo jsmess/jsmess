@@ -897,10 +897,10 @@ const imgtool_module *find_filter_module(int filter_index,
 }
 
 //============================================================
-//  win_error_to_mame_file_error
+//  win_error_to_emu_file_error
 //============================================================
 
-static file_error win_error_to_mame_file_error(DWORD error)
+static file_error win_error_to_emu_file_error(DWORD error)
 {
 	file_error filerr;
 
@@ -952,7 +952,7 @@ file_error win_mkdir(const char *dir)
 
 	if (!CreateDirectory(tempstr, NULL))
 	{
-		filerr = win_error_to_mame_file_error(GetLastError());
+		filerr = win_error_to_emu_file_error(GetLastError());
 		goto done;
 	}
 

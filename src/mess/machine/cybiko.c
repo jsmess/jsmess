@@ -137,22 +137,21 @@ NVRAM_HANDLER( cybikoxt )
 // MACHINE START //
 ///////////////////
 
-static mame_file *nvram_system_fopen( running_machine *machine, UINT32 openflags, const char *name)
+static emu_file *nvram_system_fopen( running_machine *machine, UINT32 openflags, const char *name)
 {
-	astring *fname;
 	file_error filerr;
-	mame_file *file;
-	fname = astring_assemble_4( astring_alloc(), machine->gamedrv->name, PATH_SEPARATOR, name, ".nv");
-	filerr = mame_fopen( SEARCHPATH_NVRAM, astring_c( fname), openflags, &file);
+	astring *fname = astring_assemble_4( astring_alloc(), machine->gamedrv->name, PATH_SEPARATOR, name, ".nv");	
+	emu_file *file = global_alloc(emu_file(machine->options(), SEARCHPATH_NVRAM, openflags));
+	filerr = file->open(astring_c( fname));	
 	astring_free( fname);
 	return (filerr == FILERR_NONE) ? file : NULL;
 }
 
-typedef void (nvram_load_func)(running_machine *machine, mame_file *file);
+typedef void (nvram_load_func)(running_machine *machine, emu_file *file);
 
 static int nvram_system_load( running_machine *machine, const char *name, nvram_load_func _nvram_load, int required)
 {
-	mame_file *file;
+	emu_file *file;
 	file = nvram_system_fopen( machine, OPEN_FLAG_READ, name);
 	if (!file)
 	{
@@ -160,15 +159,15 @@ static int nvram_system_load( running_machine *machine, const char *name, nvram_
 		return FALSE;
 	}
 	(*_nvram_load)(machine, file);
-	mame_fclose( file);
+	global_free(file);
 	return TRUE;
 }
 
-typedef void (nvram_save_func)(running_machine *machine, mame_file *file);
+typedef void (nvram_save_func)(running_machine *machine, emu_file *file);
 
 static int nvram_system_save( running_machine *machine, const char *name, nvram_save_func _nvram_save)
 {
-	mame_file *file;
+	emu_file *file;
 	file = nvram_system_fopen( machine, OPEN_FLAG_CREATE | OPEN_FLAG_WRITE | OPEN_FLAG_CREATE_PATHS, name);
 	if (!file)
 	{
@@ -176,41 +175,41 @@ static int nvram_system_save( running_machine *machine, const char *name, nvram_
 		return FALSE;
 	}
 	(*_nvram_save)(machine, file);
-	mame_fclose( file);
+	global_free(file);
 	return TRUE;
 }
 
-static void cybiko_pcf8593_load(running_machine *machine, mame_file *file)
+static void cybiko_pcf8593_load(running_machine *machine, emu_file *file)
 {
 	device_t *device = machine->device("rtc");
 	pcf8593_load(device, file);
 }
 
-static void cybiko_pcf8593_save(running_machine *machine, mame_file *file)
+static void cybiko_pcf8593_save(running_machine *machine, emu_file *file)
 {
 	device_t *device = machine->device("rtc");
 	pcf8593_save(device, file);
 }
 
-static void cybiko_at45dbxx_load(running_machine *machine, mame_file *file)
+static void cybiko_at45dbxx_load(running_machine *machine, emu_file *file)
 {
 	device_t *device = machine->device("flash1");
 	at45dbxx_load(device, file);
 }
 
-static void cybiko_at45dbxx_save(running_machine *machine, mame_file *file)
+static void cybiko_at45dbxx_save(running_machine *machine, emu_file *file)
 {
 	device_t *device = machine->device("flash1");
 	at45dbxx_save(device, file);
 }
 
-static void cybiko_sst39vfx_load(running_machine *machine, mame_file *file)
+static void cybiko_sst39vfx_load(running_machine *machine, emu_file *file)
 {
 	device_t *device = machine->device("flash2");
 	sst39vfx_load(device, file);
 }
 
-static void cybiko_sst39vfx_save(running_machine *machine, mame_file *file)
+static void cybiko_sst39vfx_save(running_machine *machine, emu_file *file)
 {
 	device_t *device = machine->device("flash2");
 	sst39vfx_save(device, file);

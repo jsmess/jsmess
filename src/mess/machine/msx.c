@@ -278,7 +278,7 @@ DEVICE_IMAGE_LOAD (msx_cart)
 		return IMAGE_INIT_FAIL;
 	}
 	if (msx_slot_list[type].loadsram) {
-		msx_slot_list[type].loadsram (st);
+		msx_slot_list[type].loadsram (image.device().machine, st);
 	}
 
 	state->cart_state[id] = st;
@@ -306,7 +306,7 @@ DEVICE_IMAGE_UNLOAD (msx_cart)
 
 	if (msx_slot_list[state->cart_state[id]->type].savesram)
 	{
-		msx_slot_list[state->cart_state[id]->type].savesram (state->cart_state[id]);
+		msx_slot_list[state->cart_state[id]->type].savesram (image.device().machine, state->cart_state[id]);
 	}
 }
 
