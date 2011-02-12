@@ -455,4 +455,4 @@ SYSTEM_CONFIG_END
 ***************************************************************************/
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT    COMPANY FULLNAME */
-COMP( 1961, pdp1,	  0,		0,		pdp1,	  pdp1, 	0,		"Digital Equipment Corporation",  "PDP-1" , GAME_NO_SOUND | GAME_NOT_WORKING)
+COMP( 1961, pdp1,	  0,		0,		pdp1,	  pdp1, 	0,		"Digital Equipment Corporation",  "PDP-1" , GAME_NO_SOUND_HW | GAME_NOT_WORKING)
