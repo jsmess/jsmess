@@ -28,7 +28,6 @@
 
     per-game/program specific TODO:
     - Hydlide 2 / 3: can't get the user disk to work properly
-    - Gruppe: shows a random bitmap graphic then returns "program load error" ... wd17xx, it wants write protection bit to be enabled
     - Legend of Kage: has serious graphic artifacts, pcg doesn't scroll properly, bitmap-based sprites aren't shown properly, dma bugs?
     - "newtype": dies with a z80dma assert;
     - Turbo Alpha: has z80dma / fdc bugs, doesn't show the presentation properly and then hangs;
@@ -52,6 +51,8 @@
       0xff16 - 0xff17 start-up vector
       In theory, you can convert your tape / floppy games into ROM format easily, provided that you know what's the pinout of the
       cartridge slot and it doesn't exceed 64k (0x10000) of size.
+    - Gruppe: shows a random bitmap graphic then returns "program load error" ... it wants that the floppy has write protection enabled (btanb)
+
 
 =================================================================================================
 
@@ -273,10 +274,10 @@ static void x1_draw_pixel(running_machine *machine, bitmap_t *bitmap,int y,int x
 #define mc6845_tile_height 		(state->crtc_vreg[9]+1)
 #define mc6845_cursor_y_start 	(state->crtc_vreg[0x0a])
 #define mc6845_cursor_y_end 	(state->crtc_vreg[0x0b])
-#define mc6845_start_addr  		(((state->crtc_vreg[0x0c]<<8) & 0x700) | (state->crtc_vreg[0x0d] & 0xff))
-#define mc6845_cursor_addr  	(((state->crtc_vreg[0x0e]<<8) & 0x700) | (state->crtc_vreg[0x0f] & 0xff))
-#define mc6845_light_pen_addr  	(((state->crtc_vreg[0x10]<<8) & 0x700) | (state->crtc_vreg[0x11] & 0xff))
-#define mc6845_update_addr  	(((state->crtc_vreg[0x12]<<8) & 0x700) | (state->crtc_vreg[0x13] & 0xff))
+#define mc6845_start_addr  		(((state->crtc_vreg[0x0c]<<8) & 0x3f00) | (state->crtc_vreg[0x0d] & 0xff))
+#define mc6845_cursor_addr  	(((state->crtc_vreg[0x0e]<<8) & 0x3f00) | (state->crtc_vreg[0x0f] & 0xff))
+#define mc6845_light_pen_addr  	(((state->crtc_vreg[0x10]<<8) & 0x3f00) | (state->crtc_vreg[0x11] & 0xff))
+#define mc6845_update_addr  	(((state->crtc_vreg[0x12]<<8) & 0x3f00) | (state->crtc_vreg[0x13] & 0xff))
 
 /* adjust tile index when we are under double height condition */
 static UINT8 check_prev_height(running_machine *machine,int x,int y,int w)
@@ -316,7 +317,7 @@ static void draw_fgtilemap(running_machine *machine, bitmap_t *bitmap,int w)
 		---- x--- reverse color
 		---- -xxx color pen
 
-		TODO: kanji area
+		TODO: kanji vram in x1turbo
 	*/
 
 	x1_state *state = machine->driver_data<x1_state>();
