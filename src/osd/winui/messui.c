@@ -456,7 +456,7 @@ void MyFillSoftwareList(int drvindex, BOOL bForce)
 		{
 			if (swlist->list_name[i])
 			{
-				software_list *list = software_list_open(options, swlist->list_name[i], FALSE, NULL);
+				software_list *list = software_list_open(*options, swlist->list_name[i], FALSE, NULL);
 
 				if (list)
 				{

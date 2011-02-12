@@ -27,7 +27,7 @@ software_config *software_config_alloc(int driver_index, core_options *opts, has
 	driver = drivers[driver_index];
 	while ((driver) && (!config->hashfile))
 	{
-		config->hashfile = hashfile_open_options(opts, driver->name, TRUE, error_proc);
+		config->hashfile = hashfile_open(*opts, driver->name, TRUE, error_proc);
 		driver = driver_get_compatible(driver);
 	}
 

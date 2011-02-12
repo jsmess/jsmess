@@ -5570,7 +5570,6 @@ static void MamePlayBackGame()
 	if (CommonFileDialog(GetOpenFileName, filename, FILETYPE_INPUT_FILES))
 	{
 		file_error fileerr;
-		mame_file* pPlayBack;
 		char drive[_MAX_DRIVE];
 		char dir[_MAX_DIR];
 		char bare_fname[_MAX_FNAME];
@@ -5587,7 +5586,8 @@ static void MamePlayBackGame()
 		if (path[strlen(path)-1] == '\\')
 			path[strlen(path)-1] = 0; // take off trailing back slash
 
-		fileerr = mame_fopen_options(MameUIGlobal(), SEARCHPATH_INPUTLOG, fname, OPEN_FLAG_READ, &pPlayBack);
+		emu_file pPlayBack(*MameUIGlobal(), SEARCHPATH_INPUTLOG, OPEN_FLAG_READ);
+		fileerr = pPlayBack.open(fname);
 		if (fileerr != FILERR_NONE)
 		{
 			MameMessageBox("Could not open '%s' as a valid input file.", filename);
@@ -5595,40 +5595,35 @@ static void MamePlayBackGame()
 		}
 
 		// check for game name embedded in .inp header
-		if (pPlayBack)
+		int i;
+		inp_header ihdr;
+
+		/* read the header and verify that it is a modern version; if not, print an error */
+		if (pPlayBack.read(&ihdr, sizeof(inp_header)) != sizeof(inp_header))
 		{
-			int i;
-			inp_header ihdr;
+			MameMessageBox("Input file is corrupt or invalid (missing header)");
+			return;
+		}
 
-			/* read the header and verify that it is a modern version; if not, print an error */
-			if (mame_fread(pPlayBack, &ihdr, sizeof(inp_header)) != sizeof(inp_header))
-			{
-				MameMessageBox("Input file is corrupt or invalid (missing header)");
-				return;
-			}
+		if (memcmp("MAMEINP\0", ihdr.header, 8) != 0)
+		{
+			MameMessageBox("Input file invalid or in an older, unsupported format");
+			return;
+		}
+		if (ihdr.majversion != INP_HEADER_MAJVERSION)
+		{
+			MameMessageBox("Input file format version mismatch");
+			return;
+		}
 
-			if (memcmp("MAMEINP\0", ihdr.header, 8) != 0)
+		for (i = 0; drivers[i] != 0; i++) // find game and play it
+		{
+			if (strcmp(drivers[i]->name, ihdr.gamename) == 0)
 			{
-				MameMessageBox("Input file invalid or in an older, unsupported format");
-				return;
-			}
-			if (ihdr.majversion != INP_HEADER_MAJVERSION)
-			{
-				MameMessageBox("Input file format version mismatch");
-				return;
-			}
-
-			for (i = 0; drivers[i] != 0; i++) // find game and play it
-			{
-				if (strcmp(drivers[i]->name, ihdr.gamename) == 0)
-				{
-					nGame = i;
-					break;
-				}
+				nGame = i;
+				break;
 			}
 		}
-		mame_fclose(pPlayBack);
-
 		memset(&playopts, 0, sizeof(playopts));
 		playopts.playback = fname;
 		MamePlayGameWithOptions(nGame, &playopts);
@@ -5652,7 +5647,6 @@ static void MameLoadState()
 	}
 	if (CommonFileDialog(GetOpenFileName, filename, FILETYPE_SAVESTATE_FILES))
 	{
-		mame_file* pSaveState;
 		char drive[_MAX_DRIVE];
 		char dir[_MAX_DIR];
 		char ext[_MAX_EXT];
@@ -5693,9 +5687,9 @@ static void MameLoadState()
 			state_fname = fname;
 		}
 #endif // MESS
-
-		mame_fopen_options(MameUIGlobal(), SEARCHPATH_STATE, state_fname, OPEN_FLAG_READ, &pSaveState);
-		if (pSaveState == NULL)
+		emu_file pSaveState(*MameUIGlobal(), SEARCHPATH_STATE, OPEN_FLAG_READ);
+		file_error fileerr = pSaveState.open(state_fname);
+		if (fileerr != FILERR_NONE)
 		{
 			MameMessageBox("Could not open '%s' as a valid savestate file.", filename);
 			return;
@@ -5703,7 +5697,6 @@ static void MameLoadState()
 
 		// call the MAME core function to check the save state file
 		rc = state_manager::check_file(NULL, pSaveState, selected_filename, MameMessageBox);
-		mame_fclose(pSaveState);
 		if (rc)
 			return;
 

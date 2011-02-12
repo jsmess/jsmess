@@ -1206,7 +1206,7 @@ static int is_windowed(void)
 //  frameskip_level_count
 //============================================================
 
-static int frameskip_level_count(void)
+static int frameskip_level_count(running_machine *machine)
 {
 	static int count = -1;
 
@@ -1214,7 +1214,7 @@ static int frameskip_level_count(void)
 	{
 		int frameskip_min = 0;
 		int frameskip_max = 10;
-		options_get_range_int(mame_options(), OPTION_FRAMESKIP, &frameskip_min, &frameskip_max);
+		options_get_range_int(&machine->options(), OPTION_FRAMESKIP, &frameskip_min, &frameskip_max);
 		count = frameskip_max + 1;
 	}
 	return count;
@@ -1323,7 +1323,7 @@ static void prepare_menus(HWND wnd)
 	set_command_state(menu_bar, ID_THROTTLE_UNTHROTTLED,	(speed == 0)								? MFS_CHECKED : MFS_ENABLED);
 
 	set_command_state(menu_bar, ID_FRAMESKIP_AUTO,			(frameskip < 0)								? MFS_CHECKED : MFS_ENABLED);
-	for (i = 0; i < frameskip_level_count(); i++)
+	for (i = 0; i < frameskip_level_count(window->machine); i++)
 		set_command_state(menu_bar, ID_FRAMESKIP_0 + i,		(frameskip == i)							? MFS_CHECKED : MFS_ENABLED);
 
 	// if we are using categorized input, we need to properly checkmark the categories
@@ -1423,11 +1423,11 @@ static void set_speed(running_machine *machine, int speed)
 	if (speed != 0)
 	{
 		machine->video().set_speed_factor(speed);
-		options_set_int(mame_options(), OPTION_SPEED, speed / 100, OPTION_PRIORITY_CMDLINE);
+		options_set_int(&machine->options(), OPTION_SPEED, speed / 100, OPTION_PRIORITY_CMDLINE);
 	}
 
 	machine->video().set_throttled(speed != 0);
-	options_set_bool(mame_options(), OPTION_THROTTLE, (speed != 0), OPTION_PRIORITY_CMDLINE);
+	options_set_bool(&machine->options(), OPTION_THROTTLE, (speed != 0), OPTION_PRIORITY_CMDLINE);
 }
 
 
@@ -1791,7 +1791,7 @@ static int invoke_command(HWND wnd, UINT command)
 
 		case ID_FRAMESKIP_AUTO:
 			window->machine->video().set_frameskip(-1);
-			options_set_bool(mame_options(), OPTION_AUTOFRAMESKIP, 1, OPTION_PRIORITY_CMDLINE);
+			options_set_bool(&window->machine->options(), OPTION_AUTOFRAMESKIP, 1, OPTION_PRIORITY_CMDLINE);
 			break;
 
 		case ID_HELP_ABOUT_NEWUI:
@@ -1827,12 +1827,12 @@ static int invoke_command(HWND wnd, UINT command)
 			break;
 
 		default:
-			if ((command >= ID_FRAMESKIP_0) && (command < ID_FRAMESKIP_0 + frameskip_level_count()))
+			if ((command >= ID_FRAMESKIP_0) && (command < ID_FRAMESKIP_0 + frameskip_level_count(window->machine)))
 			{
 				// change frameskip
 				window->machine->video().set_frameskip(command - ID_FRAMESKIP_0);
-				options_set_bool(mame_options(), OPTION_AUTOFRAMESKIP, 0, OPTION_PRIORITY_CMDLINE);
-				options_set_int(mame_options(), OPTION_FRAMESKIP, command - ID_FRAMESKIP_0, OPTION_PRIORITY_CMDLINE);
+				options_set_bool(&window->machine->options(), OPTION_AUTOFRAMESKIP, 0, OPTION_PRIORITY_CMDLINE);
+				options_set_int(&window->machine->options(), OPTION_FRAMESKIP, command - ID_FRAMESKIP_0, OPTION_PRIORITY_CMDLINE);
 			}
 			else if ((command >= ID_DEVICE_0) && (command < ID_DEVICE_0 + (IO_COUNT*DEVOPTION_MAX)))
 			{
@@ -1953,7 +1953,7 @@ int win_setup_menus(running_machine *machine, HMODULE module, HMENU menu_bar)
 	frameskip_menu = find_sub_menu(menu_bar, "&Options\0&Frameskip\0", FALSE);
 	if (!frameskip_menu)
 		return 1;
-	for(i = 0; i < frameskip_level_count(); i++)
+	for(i = 0; i < frameskip_level_count(machine); i++)
 	{
 		snprintf(buf, ARRAY_LENGTH(buf), "%i", i);
 		win_append_menu_utf8(frameskip_menu, MF_STRING, ID_FRAMESKIP_0 + i, buf);
