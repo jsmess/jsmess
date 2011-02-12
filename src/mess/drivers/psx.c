@@ -1090,7 +1090,10 @@ INPUT_PORTS_END
 
 static void spu_irq(device_t *device, UINT32 data)
 {
-	psx_irq_set(device->machine, data);
+	if (data)
+	{
+		psx_irq_set(device->machine, 1<<9);
+	}
 }
 
 static MACHINE_CONFIG_START( psxntsc, psx1_state )
