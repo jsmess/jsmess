@@ -308,16 +308,13 @@ static UINT16 dectalk_outfifo_r ( running_machine *machine )
 static void dectalk_reset(device_t *device)
 {
 	dectalk_state *state = device->machine->driver_data<dectalk_state>();
-	const device_t *devconf = device->machine->device("duart68681"); // this is probably an evil disgusting hack, and AaronGiles is gonna throttle me for doing this...
 	state->hack_self_test = 0; // hack
 	// stuff that is DIRECTLY affected by the RESET line
 	state->statusLED = 0; // clear status led latch
 	dectalk_x2212_recall(device->machine); // nvram recall
 	state->m68k_spcflags_latch = 1; // initial status is speech reset(d0) active and spc int(d6) disabled
 	state->m68k_tlcflags_latch = 0; // initial status is tone detect int(d6) off, answer phone(d8) off, ring detect int(d14) off
-	DEVICE_RESET(devconf); // reset the DUART
-	devconf = devconf; // hack to make gcc shut up about unused variables. the variable IS USED!
-	//device->machine->device("duart68681")->reset(); // reset the DUART
+	devtag_reset(device->machine, "duart68681"); // reset the DUART
 	// stuff that is INDIRECTLY affected by the RESET line
 	dectalk_clear_all_fifos(device->machine); // speech reset clears the fifos, though we have to do it explicitly here since we're not actually in the m68k_spcflags_w function.
 	dectalk_semaphore_w(device->machine, 0); // on the original state->dectalk pcb revision, this is a semaphore for the INPUT fifo, later dec hacked on a check for the 3 output fifo chips to see if they're in sync, and set both of these latches if true.

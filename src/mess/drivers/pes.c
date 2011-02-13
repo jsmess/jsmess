@@ -65,6 +65,7 @@ static WRITE8_DEVICE_HANDLER( pes_kbd_put )
 {
 	//duart68681_rx_data(device->machine->device("duart68681"), 1, data);
 	// nothing, yet
+	// todo: attach to serial
 }
 
 static GENERIC_TERMINAL_INTERFACE( pes_terminal_intf )
@@ -123,13 +124,11 @@ READ8_MEMBER( pes_state::port3_r )
 /* Reset */
 void pes_state::machine_reset()
 {
-	const device_t *devconf = machine->device("tms5220");
 	m_wsstate = 1;
 	m_rsstate = 1;
 	m_serial_rts = 1;
 	m_serial_cts = 1;
-	DEVICE_RESET(devconf);
-	devconf = devconf; // hack to make gcc shut up about unused variables
+	devtag_reset(machine, "tms5220");
 }
 
 /******************************************************************************
@@ -144,12 +143,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(i80c31_io, ADDRESS_SPACE_IO, 8, pes_state)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	/*  01 W: ? to tms5220 bus?
-  03 W: ? to serial?
-  03 R: ? from serial*/
 	AM_RANGE(0x0, 0x0) AM_WRITE(rsws_w) /* /WS(0) and /RS(1) */
 	AM_RANGE(0x1, 0x1) AM_READWRITE(port1_r, port1_w) /* tms5220 reads and writes */
-	AM_RANGE(0x3, 0x3) AM_READWRITE(port3_r, port3_w) /* writes and reads from port 3 */
+	AM_RANGE(0x3, 0x3) AM_READWRITE(port3_r, port3_w) /* writes and reads from port 3, see top of file */
 ADDRESS_MAP_END
 
 /******************************************************************************
