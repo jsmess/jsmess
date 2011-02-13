@@ -134,7 +134,7 @@ static const unsigned int sound_buffer_size=65536*4,
 													spu_ram_size=512*1024,
 													infinity=0xffffffff,
 
-													output_buffer_size=65536,
+													output_buffer_size=65536/8,
 
 													sample_loop_cache_pool_size=64,
 													sample_loop_cache_extend_size=64,
@@ -1325,6 +1325,7 @@ void spu_device::update_vol(const unsigned int addr)
 
 			if (newval&0x8000)
 			{
+				#if 0
 				printf("cur=%04x on=%d",voice[v].vol[ch],(spureg.chon>>ch)&1);
 				switch ((newval>>13)&3)
 				{
@@ -1333,6 +1334,7 @@ void spu_device::update_vol(const unsigned int addr)
 					case 2: printf("exp inc: phase=%d val=%02x\n",(newval>>12)&1,newval&0x7f); break;
 					case 3: printf("exp dec: phase=%d val=%02x\n",(newval>>12)&1,newval&0x7f); break;
 				}
+				#endif
 			} 
 			else
 			{
