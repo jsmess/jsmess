@@ -167,10 +167,11 @@ READ8_DEVICE_HANDLER( rf5c68_r )
 	UINT8 shift;
 
 	chip->stream->update();
-	shift = (offset & 2) * 8;
-	shift|= (~offset & 1) * 8;
+	shift = (offset & 1) ? 11 + 8 : 11;
 
-	return (chip->chan[(offset & 0x1c) >> 2].addr) >> (shift);
+//	printf("%08x\n",(chip->chan[(offset & 0x0e) >> 1].addr));
+
+	return (chip->chan[(offset & 0x0e) >> 1].addr) >> (shift);
 }
 
 WRITE8_DEVICE_HANDLER( rf5c68_w )
