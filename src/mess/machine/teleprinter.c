@@ -243,7 +243,7 @@ static void generic_teleprinter_update(device_t *device, bitmap_t *bitmap, const
 static TIMER_CALLBACK(keyboard_callback)
 {
 	teleprinter_state *term = get_safe_token((device_t *)ptr);
-	term->last_code = terminal_keyboard_handler(machine, &term->teleprinter_keyboard_func, term->last_code, &term->scan_line, NULL, NULL);
+	term->last_code = terminal_keyboard_handler(machine, &term->teleprinter_keyboard_func, term->last_code, &term->scan_line, NULL, NULL, (device_t *)ptr);
 }
 
 /***************************************************************************
@@ -320,6 +320,7 @@ DEVICE_GET_INFO( teleprinter )
 		case DEVINFO_FCT_STOP:							/* Nothing */												break;
 		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(teleprinter);					break;
 
+		case DEVINFO_PTR_INPUT_PORTS:					info->ipt = INPUT_PORTS_NAME(generic_terminal);				break;
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "Generic Teleprinter");						break;
 		case DEVINFO_STR_FAMILY:						strcpy(info->s, "Teleprinter");								break;
@@ -328,9 +329,5 @@ DEVICE_GET_INFO( teleprinter )
 		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright the MESS Team"); 				break;
 	}
 }
-
-INPUT_PORTS_START( generic_teleprinter )
-	PORT_INCLUDE(generic_terminal)
-INPUT_PORTS_END
 
 DEFINE_LEGACY_DEVICE(GENERIC_TELEPRINTER, teleprinter);

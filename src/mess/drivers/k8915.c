@@ -66,7 +66,6 @@ ADDRESS_MAP_END
 
 /* Input ports */
 static INPUT_PORTS_START( k8915 )
-	PORT_INCLUDE(generic_terminal)
 INPUT_PORTS_END
 
 static MACHINE_RESET(k8915)

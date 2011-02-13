@@ -69,7 +69,6 @@ ADDRESS_MAP_END
 
 /* Input ports */
 static INPUT_PORTS_START( czk80 )
-	PORT_INCLUDE(generic_terminal)
 INPUT_PORTS_END
 
 static MACHINE_RESET(czk80)

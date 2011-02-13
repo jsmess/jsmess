@@ -520,7 +520,6 @@ static INPUT_PORTS_START( sgi_ip2 )
 	PORT_DIPSETTING(	0x000e, "DSD Tape Boot (2)" )
 	PORT_DIPSETTING(	0x000f, "DSD Hard Disk Boot" )
 
-	PORT_INCLUDE(generic_terminal)
 INPUT_PORTS_END
 
 static DRIVER_INIT( sgi_ip2 )

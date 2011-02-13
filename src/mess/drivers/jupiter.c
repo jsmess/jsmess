@@ -82,7 +82,6 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 INPUT_PORTS_START( jupiter )
-	PORT_INCLUDE(generic_terminal)
 INPUT_PORTS_END
 
 

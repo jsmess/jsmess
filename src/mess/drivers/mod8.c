@@ -68,7 +68,6 @@ ADDRESS_MAP_END
 
 /* Input ports */
 static INPUT_PORTS_START( mod8 )
-	PORT_INCLUDE(generic_teleprinter)
 INPUT_PORTS_END
 
 static IRQ_CALLBACK ( mod8_irq_callback )
@@ -106,7 +105,6 @@ static MACHINE_CONFIG_START( mod8, mod8_state )
     /* video hardware */
     MCFG_FRAGMENT_ADD( generic_teleprinter )
 	MCFG_GENERIC_TELEPRINTER_ADD(TELEPRINTER_TAG,mod8_teleprinter_intf)
-
 MACHINE_CONFIG_END
 
 

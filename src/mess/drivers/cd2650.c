@@ -69,7 +69,6 @@ ADDRESS_MAP_END
 
 /* Input ports */
 static INPUT_PORTS_START( cd2650 )
-	PORT_INCLUDE(generic_terminal)
 INPUT_PORTS_END
 
 

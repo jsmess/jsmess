@@ -53,7 +53,6 @@ ADDRESS_MAP_END
 
 /* Input ports */
 static INPUT_PORTS_START( pimps )
-	PORT_INCLUDE(generic_terminal)
 INPUT_PORTS_END
 
 

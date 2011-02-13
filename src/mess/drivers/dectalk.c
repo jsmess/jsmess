@@ -687,7 +687,6 @@ PORT_START("hacks")
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
 
-	PORT_INCLUDE(generic_terminal)
 INPUT_PORTS_END
 
 /******************************************************************************

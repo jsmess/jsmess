@@ -281,7 +281,6 @@ ADDRESS_MAP_END
 /* Input Ports */
 
 static INPUT_PORTS_START( xor100 )
-	PORT_INCLUDE(generic_terminal)
 
 	PORT_START("DSW0")
 	PORT_DIPNAME( 0x0f, 0x05, "Serial Port A" )

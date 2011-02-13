@@ -44,6 +44,6 @@ MACHINE_CONFIG_EXTERN( generic_terminal );
 
 INPUT_PORTS_EXTERN(generic_terminal);
 
-UINT8 terminal_keyboard_handler(running_machine *machine, devcb_resolved_write8 *callback, UINT8 last_code, UINT8 *scan_line, UINT8 *tx_shift, int *tx_state);
+UINT8 terminal_keyboard_handler(running_machine *machine, devcb_resolved_write8 *callback, UINT8 last_code, UINT8 *scan_line, UINT8 *tx_shift, int *tx_state, device_t *device);
 
 #endif /* __TERMINAL_H__ */

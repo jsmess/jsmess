@@ -62,7 +62,6 @@ ADDRESS_MAP_END
 
 /* Input ports */
 static INPUT_PORTS_START( msbc1 )
-	PORT_INCLUDE(generic_terminal)
 INPUT_PORTS_END
 
 void msbc1_state::machine_reset()

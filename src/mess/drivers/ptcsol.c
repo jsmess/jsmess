@@ -454,7 +454,6 @@ static INPUT_PORTS_START( sol20 )
 	PORT_DIPSETTING(    0x00, "Half")
 	PORT_DIPSETTING(    0x20, "Full")
 
-	PORT_INCLUDE(generic_terminal)
 
 	PORT_START("CONFIG")
 	PORT_CONFNAME( 0x01, 0x01, "High Baud Rate") // jumper on the board

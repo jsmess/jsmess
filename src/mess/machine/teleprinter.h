@@ -39,6 +39,4 @@ WRITE8_DEVICE_HANDLER ( teleprinter_write );
 
 MACHINE_CONFIG_EXTERN( generic_teleprinter );
 
-INPUT_PORTS_EXTERN(generic_teleprinter);
-
 #endif /* __TELEPRINTER_H__ */

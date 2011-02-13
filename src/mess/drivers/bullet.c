@@ -385,7 +385,6 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 INPUT_PORTS_START( bullet )
-	PORT_INCLUDE(generic_terminal)
 
 	PORT_START("SW1")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW1:1")

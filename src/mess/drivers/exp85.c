@@ -58,7 +58,6 @@ static INPUT_CHANGED( trigger_rst75 )
 }
 
 static INPUT_PORTS_START( exp85 )
-	PORT_INCLUDE(generic_terminal)
 
 	PORT_START("SPECIAL")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("R") PORT_CODE(KEYCODE_F1) PORT_CHANGED(trigger_reset, 0)

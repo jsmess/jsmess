@@ -273,7 +273,6 @@ static INPUT_PORTS_START( h19 )
 	PORT_DIPSETTING(    0x00, "50Hz")
 	PORT_DIPSETTING(    0x80, "60Hz")
 
-	PORT_INCLUDE(generic_terminal)
 INPUT_PORTS_END
 
 
