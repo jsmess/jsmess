@@ -290,7 +290,7 @@ static MACHINE_START( dallas32 )
 	state->lcd_shift_counter = 3;
 	beep_set_frequency(speaker, 44);
 
-	machine->scheduler().timer_pulse(attotime::from_hz(50),FUNC(update_nmi32),NULL);
+	machine->scheduler().timer_pulse(attotime::from_hz(50),FUNC(update_nmi32),0);
 
 	mboard_savestate_register(machine);
 }
