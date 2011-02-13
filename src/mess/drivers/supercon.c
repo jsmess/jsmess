@@ -32,6 +32,7 @@ public:
 
 	UINT8 *ram;
 	emu_timer* timer_update_irq;
+	emu_timer* timer_mouse_click;
 	int emu_started;
 	int moving_piece;
 	UINT8 data_1E00;
@@ -44,8 +45,10 @@ public:
 	int led_update;
 	int remove_led_flag;
 	int selecting;
-	int confirm_board_click;
+	int save_key_data;
+	attotime wait_time; 
 	int *current_field;
+	int confirm_board_click;
 	int m_board[64];
 	int save_board[64];
 };
@@ -87,14 +90,6 @@ enum
 #define NO_ACTION	0
 #define	TAKE		1
 #define SET			2
-
-
-
-
-
-
-
-
 
 /* artwork board */
 static const int start_board[64] =
@@ -193,32 +188,8 @@ static void update_leds( supercon_state *state )
 static void mouse_update(running_machine *machine)
 {
 	supercon_state *state = machine->driver_data<supercon_state>();
-	UINT8 port_input, m_left;
+	UINT8 port_input; // m_left;
 	int i;
-
-/* Set-remove piece after mouse release and confirmation of a board click = beep */
-
-	 m_left=input_port_read(machine, "BUTTON_L");
-	 if (!m_left && state->selecting)
-	 {
-		 if (state->confirm_board_click)
-		 {
-			if (state->selecting==SET)
-			{
-				*state->current_field=state->moving_piece;
-				state->moving_piece=EM;
-			}else
-			{
-				state->moving_piece=*state->current_field;
-				*state->current_field=EM;
-			}
-			set_pieces(state);
-			output_set_value("MOVING",state->moving_piece);
-		 }
-
-		 state->selecting=NO_ACTION;
-		 state->confirm_board_click=FALSE;
-	 }
 
 /* Boarder pieces and moving pice */
 
@@ -262,6 +233,9 @@ static DRIVER_INIT(supercon)
 	state->LED_18=0;
 	state->LED_AH=0;
 	state->LED_ST=0;
+
+	state->wait_time =  attotime::from_hz(4);
+	state->save_key_data = 0xff;
 
 	state->moving_piece=0;
 }
@@ -391,13 +365,25 @@ static READ8_HANDLER( supercon_port4_r )
 	if (i_18==NOT_VALID)
 		return 0xff;
 
+/* if a button was pressed wait til timer -timer_mouse_click- is fired */
+
+	if (state->selecting)
+		return state->save_key_data;
+	else
+	{
+		set_pieces(state);
+		output_set_value("MOVING",state->moving_piece);
+	}
+
 	key_data=input_port_read(space->machine, board_lines[i_18]);
 
 	if (key_data != 0xff)
 	{
 		LOG(("%s key_data: %02x \n",board_lines[i_18],key_data));
 
-		if (key_data)
+/* Only if valid data and mouse button is pressed */
+
+		if (key_data && input_port_read(space->machine, "BUTTON_L")) 
 		{
 
 /* Set or remove pieces */
@@ -405,15 +391,23 @@ static READ8_HANDLER( supercon_port4_r )
 			i_AH=7-get_first_cleared_bit(key_data);
 			LOG(("Press -> AH: %d 18: %d Piece: %d\n",i_AH,i_18,state->m_board[i_18*8 + i_AH]););
 
-			if (state->selecting==NO_ACTION)
-			{
-				state->current_field=&state->m_board[i_18*8 + i_AH];
+			state->current_field=&state->m_board[i_18*8 + i_AH];
 
-				if (state->moving_piece)
-					state->selecting=SET;
-				else
-					state->selecting=TAKE;
+			if (state->moving_piece)
+			{
+				*state->current_field = state->moving_piece;
+				state->moving_piece = EM;
 			}
+			else
+			{
+				state->moving_piece = *state->current_field;
+				*state->current_field = EM;
+			}
+			state->selecting=TRUE;				/* Flag is removed in timer -timer_mouse_click- */
+			state->save_key_data=key_data;		/* return same key_data til flag selecting is removed */
+
+			state->timer_mouse_click->adjust(state->wait_time, 0);
+
 			return key_data;
 		}
 	}
@@ -504,13 +498,20 @@ static WRITE8_HANDLER( supercon_port4_w )
 	{
 		beep_set_state(speaker,1);
 		state->emu_started=TRUE;
-
-		if (state->selecting)					/* fast mouse clicks are recognized by the artwork but not by the emulation  */
-			state->confirm_board_click=TRUE;	/* therefore a beep must confirm each click on the board */
 	}
 	else
 		beep_set_state(speaker,0);
 
+}
+
+static TIMER_CALLBACK( mouse_click )
+{
+	supercon_state *state = machine->driver_data<supercon_state>();
+
+	if (input_port_read_safe(machine, "BUTTON_L",0) )				/* wait for mouse release */
+		state->timer_mouse_click->adjust(state->wait_time, 0);
+	else
+		state->selecting=FALSE;
 }
 
 static TIMER_DEVICE_CALLBACK( update_artwork )
@@ -528,34 +529,36 @@ static TIMER_CALLBACK( update_irq )
 
 static STATE_PRESAVE( m_board_presave )
 {
-	supercon_state *state = machine->driver_data<supercon_state>();
-	int i;
-	for (i=0;i<64;i++)
-		state->save_board[i]=state->m_board[i];
+    supercon_state *state = machine->driver_data<supercon_state>();
+    int i;
+    for (i=0;i<64;i++)
+        state->save_board[i]=state->m_board[i];
 }
 
 static STATE_POSTLOAD( m_board_postload )
 {
-	supercon_state *state = machine->driver_data<supercon_state>();
-	int i;
-	for (i=0;i<64;i++)
-		state->m_board[i]=state->save_board[i];
+    supercon_state *state = machine->driver_data<supercon_state>();
+    int i;
+    for (i=0;i<64;i++)
+        state->m_board[i]=state->save_board[i];
 
-	set_pieces(state);
+    set_pieces(state);
 }
 
 static MACHINE_START( supercon )
 {
 	supercon_state *state = machine->driver_data<supercon_state>();
-	state->led_update=TRUE;
-	state->remove_led_flag=TRUE;
 
 	state->timer_update_irq = machine->scheduler().timer_alloc(FUNC(update_irq));
 	state->timer_update_irq->adjust( attotime::zero, 0, attotime::from_hz(1000) );
 
-	state->save_item(NAME(state->save_board));
-	machine->state().register_postload(m_board_postload,NULL);
-	machine->state().register_presave(m_board_presave,NULL);
+	state->timer_mouse_click =  machine->scheduler().timer_alloc(FUNC(mouse_click),NULL);
+
+
+    state->save_item(NAME(state->save_board));
+    machine->state().register_postload(m_board_postload,NULL);
+    machine->state().register_presave(m_board_presave,NULL);
+
 }
 
 static MACHINE_RESET( supercon )
@@ -764,6 +767,7 @@ static MACHINE_CONFIG_START( supercon, supercon_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_TIMER_ADD_PERIODIC("artwork_timer", update_artwork, attotime::from_hz(20))
+
 MACHINE_CONFIG_END
 
 /* ROM definition */

@@ -260,11 +260,11 @@ static TIMER_DEVICE_CALLBACK( update_nmi )
 	// irq_edge = ~irq_edge;
 }
 
-static TIMER_DEVICE_CALLBACK( update_nmi32 )
+static TIMER_CALLBACK( update_nmi32 )
 {
 	// cputag_set_input_line_and_vector(timer.machine, "maincpu", M68K_IRQ_7, irq_edge & 0xff ? CLEAR_LINE : ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
-		cputag_set_input_line_and_vector(timer.machine, "maincpu", M68K_IRQ_7, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
-		cputag_set_input_line_and_vector(timer.machine, "maincpu", M68K_IRQ_7, CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR);
+		cputag_set_input_line_and_vector(machine, "maincpu", M68K_IRQ_7, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
+		cputag_set_input_line_and_vector(machine, "maincpu", M68K_IRQ_7, CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR);
 	// irq_edge = ~irq_edge;
 }
 
@@ -289,6 +289,8 @@ static MACHINE_START( dallas32 )
 
 	state->lcd_shift_counter = 3;
 	beep_set_frequency(speaker, 44);
+
+	machine->scheduler().timer_pulse(attotime::from_hz(50),FUNC(update_nmi32),NULL);
 
 	mboard_savestate_register(machine);
 }
@@ -523,7 +525,7 @@ static MACHINE_CONFIG_DERIVED( dallas32, glasgow )
     MCFG_MACHINE_START( dallas32 )
 
 	MCFG_DEVICE_REMOVE("nmi_timer")
-	MCFG_TIMER_ADD_PERIODIC("nmi_timer", update_nmi32, attotime::from_hz(50))
+
 MACHINE_CONFIG_END
 
 /***************************************************************************
