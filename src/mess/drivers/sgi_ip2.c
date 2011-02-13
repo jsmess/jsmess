@@ -64,6 +64,8 @@ public:
 	UINT16 stklmt;
 	UINT32 *mainram;
 	UINT32 *bss;
+	UINT8 parctl;
+	UINT8 mbp;
 };
 
 
@@ -222,18 +224,19 @@ static WRITE16_HANDLER(sgi_ip2_status_w)
 #define PAR_MBR		0x40	/* Check parity on multibus reads */
 #define PAR_MBW		0x80	/* Check parity on multibus writes */
 
-static UINT8 sgi_ip2_parctl;
 
 static READ8_HANDLER(sgi_ip2_parctl_r)
 {
-	verboselog(space->machine, 0, "sgi_ip2_parctl_r: %02x\n", sgi_ip2_parctl);
-	return sgi_ip2_parctl;
+	sgi_ip2_state *state = space->machine->driver_data<sgi_ip2_state>();
+	verboselog(space->machine, 0, "sgi_ip2_parctl_r: %02x\n", state->parctl);
+	return state->parctl;
 }
 
 static WRITE8_HANDLER(sgi_ip2_parctl_w)
 {
+	sgi_ip2_state *state = space->machine->driver_data<sgi_ip2_state>();
 	verboselog(space->machine, 0, "sgi_ip2_parctl_w: %02x\n", data);
-	sgi_ip2_parctl = data;
+	state->parctl = data;
 }
 
 #define MBP_DCACC	0x01	/* Display controller access (I/O page 4) */
@@ -245,18 +248,19 @@ static WRITE8_HANDLER(sgi_ip2_parctl_w)
 #define MBP_LMACC	0x40	/* Allow lower memory access (0x0nnnnn - 0x7nnnnn) */
 #define MBP_HMACC	0x80	/* Allow upper memory access (0x8nnnnn - 0xfnnnnn) */
 
-static UINT8 sgi_ip2_mbp;
 
 static READ8_HANDLER(sgi_ip2_mbp_r)
 {
-	verboselog(space->machine, 0, "sgi_ip2_mbp_r: %02x\n", sgi_ip2_mbp);
-	return sgi_ip2_mbp;
+	sgi_ip2_state *state = space->machine->driver_data<sgi_ip2_state>();
+	verboselog(space->machine, 0, "sgi_ip2_mbp_r: %02x\n", state->mbp);
+	return state->mbp;
 }
 
 static WRITE8_HANDLER(sgi_ip2_mbp_w)
 {
+	sgi_ip2_state *state = space->machine->driver_data<sgi_ip2_state>();
 	verboselog(space->machine, 0, "sgi_ip2_mbp_w: %02x\n", data);
-	sgi_ip2_mbp = data;
+	state->mbp = data;
 }
 
 

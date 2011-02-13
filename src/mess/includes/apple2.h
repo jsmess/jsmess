@@ -121,9 +121,9 @@ public:
 	apple2_meminfo *current_meminfo;
 	int fdc_diskreg;
 	unsigned int *ay3600_keys;
-	//UINT8 keycode;
+	UINT8 keycode;
 	UINT8 keycode_unmodified;
-	//UINT8 keywaiting;
+	UINT8 keywaiting;
 	UINT8 keystilldown;
 	UINT8 keymodreg;
 	int reset_flag;

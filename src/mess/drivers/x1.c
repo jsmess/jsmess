@@ -1198,7 +1198,7 @@ static void set_current_palette(running_machine *machine)
 static WRITE8_HANDLER( x1turboz_4096_palette_w )
 {
 	x1_state *state = space->machine->driver_data<x1_state>();
-	static UINT32 pal_entry;
+	UINT32 pal_entry;
 	UINT8 r,g,b;
 
 	pal_entry = ((offset & 0xff) << 4) | ((data & 0xf0) >> 4);

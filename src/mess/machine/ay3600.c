@@ -256,9 +256,6 @@ static const unsigned char ay3600_key_remap_2e[2][9*8][4] =
 	}
 };
 
-static UINT8 keycode;
-static UINT8 keywaiting;
-
 #define A2_KEY_NORMAL				0
 #define A2_KEY_CONTROL				1
 #define A2_KEY_SHIFT				2
@@ -327,8 +324,8 @@ int AY3600_init(running_machine *machine)
 	/* Set Caps Lock light to ON, since that's how we default it. */
 	set_led_status(machine,1,1);
 
-	keywaiting = 0;
-	keycode = 0;
+	state->keywaiting = 0;
+	state->keycode = 0;
 	state->keystilldown = 0;
 	state->keymodreg = A2_KEYMOD_CAPSLOCK;	// caps lock on
 
@@ -518,8 +515,8 @@ static TIMER_CALLBACK(AY3600_poll)
 		if (state->time_until_repeat == 0 ||
 			state->time_until_repeat == MAGIC_KEY_REPEAT_NUMBER-1)
 		{
-			keywaiting = 1;
-			keycode = state->last_key;
+			state->keywaiting = 1;
+			state->keycode = state->last_key;
 			state->keycode_unmodified = state->last_key_unmodified;
 			state->keymodreg |= A2_KEYMOD_REPEAT;
 		}
@@ -535,8 +532,9 @@ static TIMER_CALLBACK(AY3600_poll)
 
 int AY3600_keydata_strobe_r(running_machine *machine)
 {
+	apple2_state *state = machine->driver_data<apple2_state>();
 	int rc;
-	rc = keycode | (keywaiting ? 0x80 : 0x00);
+	rc = state->keycode | (state->keywaiting ? 0x80 : 0x00);
 	LOG(("AY3600_keydata_strobe_r(): rc=0x%02x\n", rc));
 	return rc;
 }
@@ -551,8 +549,8 @@ int AY3600_anykey_clearstrobe_r(running_machine *machine)
 {
 	apple2_state *state = machine->driver_data<apple2_state>();
 	int rc;
-	keywaiting = 0;
-	rc = keycode | (state->keystilldown ? 0x80 : 0x00);
+	state->keywaiting = 0;
+	rc = state->keycode | (state->keystilldown ? 0x80 : 0x00);
 	LOG(("AY3600_anykey_clearstrobe_r(): rc=0x%02x\n", rc));
 	return rc;
 }
@@ -606,10 +604,12 @@ static UINT8 AY3600_get_keycode(unicode_char ch)
 
 static int AY3600_keyboard_queue_chars(running_machine *machine, const unicode_char *text, size_t text_len)
 {
-	if (keywaiting)
+	apple2_state *state = machine->driver_data<apple2_state>();
+
+	if (state->keywaiting)
 		return 0;
-	keycode = AY3600_get_keycode(text[0]);
-	keywaiting = 1;
+	state->keycode = AY3600_get_keycode(text[0]);
+	state->keywaiting = 1;
 	return 1;
 }
 

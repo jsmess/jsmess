@@ -48,6 +48,7 @@ public:
 	UINT8 keyb_press;
 
 	UINT8 fdc_2dd_ctrl;
+	UINT8 pal_entry;
 };
 
 
@@ -501,15 +502,14 @@ static WRITE8_HANDLER( pc9801_a0_w )
 			case 0x0c:
 			case 0x0e:
 			{
-				static UINT8 pal_entry;
 				state->pal_clut[(offset & 0x6) >> 1] = data;
 
 				/* can't be more twisted I presume ... :-/ */
-				pal_entry = (((offset & 4) >> 1) | ((offset & 2) << 1)) >> 1;
-				pal_entry ^= 3;
+				state->pal_entry = (((offset & 4) >> 1) | ((offset & 2) << 1)) >> 1;
+				state->pal_entry ^= 3;
 
-				palette_set_color_rgb(space->machine, (pal_entry)|4|8, pal1bit((data & 0x2) >> 1), pal1bit((data & 4) >> 2), pal1bit((data & 1) >> 0));
-				palette_set_color_rgb(space->machine, (pal_entry)|8, pal1bit((data & 0x20) >> 5), pal1bit((data & 0x40) >> 6), pal1bit((data & 0x10) >> 4));
+				palette_set_color_rgb(space->machine, (state->pal_entry)|4|8, pal1bit((data & 0x2) >> 1), pal1bit((data & 4) >> 2), pal1bit((data & 1) >> 0));
+				palette_set_color_rgb(space->machine, (state->pal_entry)|8, pal1bit((data & 0x20) >> 5), pal1bit((data & 0x40) >> 6), pal1bit((data & 0x10) >> 4));
 				return;
 			}
 			default:
