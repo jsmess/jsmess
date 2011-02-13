@@ -1850,5 +1850,6 @@ const game_driver * const drivers[] =
 	DRIVER( bigboard )
 	DRIVER( bigbord2 )
 	DRIVER( savia84 )
+	DRIVER( pes )
 
 #endif /* DRIVER_RECURSIVE */

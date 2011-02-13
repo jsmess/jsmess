@@ -1752,6 +1752,7 @@ $(MESSOBJ)/skeleton.a:			\
 	$(MESS_DRIVERS)/p8k.o		\
 	$(MESS_DRIVERS)/pegasus.o	\
 	$(MESS_VIDEO)/pegasus.o 	\
+	$(MESS_DRIVERS)/pes.o		\
 	$(MESS_DRIVERS)/phunsy.o	\
 	$(MESS_DRIVERS)/pimps.o		\
 	$(MESS_DRIVERS)/pipbug.o	\
