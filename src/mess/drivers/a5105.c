@@ -33,6 +33,7 @@ public:
 	UINT16 pcg_addr;
 	UINT16 pcg_internal_addr;
 	UINT8 key_mux;
+	UINT8 memsel[4];
 };
 
 static ADDRESS_MAP_START(a5105_mem, ADDRESS_SPACE_PROGRAM, 8)
@@ -72,45 +73,76 @@ static READ8_HANDLER( key_r )
 	                                        "KEY8", "KEY9", "KEYA", "UNUSED",
 	                                        "UNUSED", "UNUSED", "UNUSED", "UNUSED" };
 
-	if((state->key_mux & 0xf0) == 0xf0)
-		return input_port_read(space->machine, keynames[state->key_mux & 0x0f]);
+	return input_port_read(space->machine, keynames[state->key_mux & 0x0f]);
+}
 
-	return 0xff;
+static READ8_HANDLER( key_mux_r )
+{
+	a5105_state *state = space->machine->driver_data<a5105_state>();
+
+	return state->key_mux;
 }
 
 static WRITE8_HANDLER( key_mux_w )
 {
 	a5105_state *state = space->machine->driver_data<a5105_state>();
+	/*
+		xxxx ---- unknown
+		---- xxxx keyboard mux
+	*/
 
 	state->key_mux = data;
 }
 
-static UINT8 io_latch;
+/*port $ab
+		---- 100x tape motor, active low
+		---- 101x tape data
+		---- 110x led (color green)
+		---- 111x key click, active high
+*/
 
-static READ8_HANDLER( a5105_system_r )
+static READ8_HANDLER( a5105_memsel_r )
 {
-	return io_latch;
+	a5105_state *state = space->machine->driver_data<a5105_state>();
+	UINT8 res;
+
+	res = (state->memsel[0] & 3) << 0;
+	res|= (state->memsel[1] & 3) << 2;
+	res|= (state->memsel[2] & 3) << 4;
+	res|= (state->memsel[3] & 3) << 6;
+
+	return res;
 }
 
-static WRITE8_HANDLER( a5105_system_w )
+static WRITE8_HANDLER( a5105_memsel_w )
 {
-	io_latch = data;
+	a5105_state *state = space->machine->driver_data<a5105_state>();
+
+	state->memsel[0] = (data & 0x03) >> 0;
+	state->memsel[1] = (data & 0x0c) >> 2;
+	state->memsel[2] = (data & 0x30) >> 4;
+	state->memsel[3] = (data & 0xc0) >> 6;
+
+	//printf("Memsel change to %02x %02x %02x %02x\n",state->memsel[0],state->memsel[1],state->memsel[2],state->memsel[3]);
 }
 
 static ADDRESS_MAP_START( a5105_io , ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
+//	AM_RANGE(0x40, 0x4b) fdc, upd765?
+//	AM_RANGE(0x80, 0x83) z80ctc
+//	AM_RANGE(0x90, 0x93) ppi8255?
 	AM_RANGE(0x98, 0x99) AM_DEVREADWRITE("upd7220", upd7220_r, upd7220_w)
 
 	AM_RANGE(0x9c, 0x9c) AM_WRITE(pcg_val_w)
-
+//	AM_RANGE(0x9d, 0x9d) crtc area (ff-based), palette routes here
 	AM_RANGE(0x9e, 0x9e) AM_WRITE(pcg_addr_w)
 
-	//0xa8 is an i/o component (bankswitch lies there?)
-	AM_RANGE(0xa8, 0xa8) AM_READWRITE(a5105_system_r,a5105_system_w)
+//	AM_RANGE(0xa0, 0xa1) ay8910?
+	AM_RANGE(0xa8, 0xa8) AM_READWRITE(a5105_memsel_r,a5105_memsel_w)
 	AM_RANGE(0xa9, 0xa9) AM_READ(key_r)
-	AM_RANGE(0xaa, 0xaa) AM_READ(key_mux_w)
-
+	AM_RANGE(0xaa, 0xaa) AM_READWRITE(key_mux_r,key_mux_w)
+//	AM_RANGE(0xab, 0xab) misc output, see above
 ADDRESS_MAP_END
 
 /* Input ports */
