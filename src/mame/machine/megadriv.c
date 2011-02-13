@@ -6016,7 +6016,7 @@ static WRITE16_HANDLER( segacd_irq_mask_w )
 	{
 		if (control & 0x04)
 		{
-			if (!segacd_irq_mask & 0x10)
+			if (!(segacd_irq_mask & 0x10))
 			{
 				segacd_irq_mask = data & 0x7e;
 				CDD_Process(space->machine, 0);
