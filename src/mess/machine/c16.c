@@ -182,13 +182,15 @@ WRITE8_HANDLER( c16_select_roms )
 WRITE8_HANDLER( c16_switch_to_ram )
 {
 	c16_state *state = space->machine->driver_data<c16_state>();
+	UINT8 *ram = ram_get_ptr(state->messram);
+	UINT32 ram_size = ram_get_size(state->messram);
 
 	ted7360_rom_switch_w(state->ted7360, 0);
 
-	memory_set_bankptr(space->machine, "bank2", ram_get_ptr(state->messram) + (0x8000 % ram_get_size(state->messram)));
-	memory_set_bankptr(space->machine, "bank3", ram_get_ptr(state->messram) + (0xc000 % ram_get_size(state->messram)));
-	memory_set_bankptr(space->machine, "bank4", ram_get_ptr(state->messram) + (0xfc00 % ram_get_size(state->messram)));
-	memory_set_bankptr(space->machine, "bank8", ram_get_ptr(state->messram) + (0xff20 % ram_get_size(state->messram)));
+	memory_set_bankptr(space->machine, "bank2", ram + (0x8000 % ram_size));
+	memory_set_bankptr(space->machine, "bank3", ram + (0xc000 % ram_size));
+	memory_set_bankptr(space->machine, "bank4", ram + (0xfc00 % ram_size));
+	memory_set_bankptr(space->machine, "bank8", ram + (0xff20 % ram_size));
 }
 
 UINT8 c16_read_keyboard( running_machine *machine, int databus )
@@ -453,6 +455,8 @@ MACHINE_RESET( c16 )
 {
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	c16_state *state = machine->driver_data<c16_state>();
+	UINT8 *ram = ram_get_ptr(state->messram);
+	UINT32 ram_size = ram_get_size(state->messram);
 
 	memset(state->keyline, 0xff, ARRAY_LENGTH(state->keyline));
 
@@ -463,21 +467,21 @@ MACHINE_RESET( c16 )
 
 	if (state->pal)
 	{
-		memory_set_bankptr(machine, "bank1", ram_get_ptr(state->messram) + (0x4000 % ram_get_size(state->messram)));
+		memory_set_bankptr(machine, "bank1", ram + (0x4000 % ram_size));
 
-		memory_set_bankptr(machine, "bank5", ram_get_ptr(state->messram) + (0x4000 % ram_get_size(state->messram)));
-		memory_set_bankptr(machine, "bank6", ram_get_ptr(state->messram) + (0x8000 % ram_get_size(state->messram)));
-		memory_set_bankptr(machine, "bank7", ram_get_ptr(state->messram) + (0xc000 % ram_get_size(state->messram)));
+		memory_set_bankptr(machine, "bank5", ram + (0x4000 % ram_size));
+		memory_set_bankptr(machine, "bank6", ram + (0x8000 % ram_size));
+		memory_set_bankptr(machine, "bank7", ram + (0xc000 % ram_size));
 
 		memory_install_write_bank(space, 0xff20, 0xff3d, 0, 0,"bank10");
 		memory_install_write_bank(space, 0xff40, 0xffff, 0, 0, "bank11");
-		memory_set_bankptr(machine, "bank10", ram_get_ptr(state->messram) + (0xff20 % ram_get_size(state->messram)));
-		memory_set_bankptr(machine, "bank11", ram_get_ptr(state->messram) + (0xff40 % ram_get_size(state->messram)));
+		memory_set_bankptr(machine, "bank10", ram + (0xff20 % ram_size));
+		memory_set_bankptr(machine, "bank11", ram + (0xff40 % ram_size));
 	}
 	else
 	{
 		memory_install_write_bank(space, 0x4000, 0xfcff, 0, 0, "bank10");
-		memory_set_bankptr(machine, "bank10", ram_get_ptr(state->messram) + (0x4000 % ram_get_size(state->messram)));
+		memory_set_bankptr(machine, "bank10", ram + (0x4000 % ram_size));
 	}
 }
 
@@ -488,11 +492,12 @@ MACHINE_RESET( c16 )
 static WRITE8_HANDLER( c16_sidcart_16k )
 {
 	c16_state *state = space->machine->driver_data<c16_state>();
+	UINT8 *ram = ram_get_ptr(state->messram);
 
-	ram_get_ptr(state->messram)[0x1400 + offset] = data;
-	ram_get_ptr(state->messram)[0x5400 + offset] = data;
-	ram_get_ptr(state->messram)[0x9400 + offset] = data;
-	ram_get_ptr(state->messram)[0xd400 + offset] = data;
+	ram[0x1400 + offset] = data;
+	ram[0x5400 + offset] = data;
+	ram[0x9400 + offset] = data;
+	ram[0xd400 + offset] = data;
 
 	sid6581_w(state->sid, offset, data);
 }

@@ -44,6 +44,7 @@ static void b2m_set_bank(running_machine *machine,int bank)
 {
 	UINT8 *rom;
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	UINT8 *ram = ram_get_ptr(machine->device(RAM_TAG));
 
 	memory_install_write_bank(space, 0x0000, 0x27ff, 0, 0, "bank1");
 	memory_install_write_bank(space, 0x2800, 0x2fff, 0, 0, "bank2");
@@ -57,10 +58,10 @@ static void b2m_set_bank(running_machine *machine,int bank)
 		case 1 :
 						memory_unmap_write(space, 0xe000, 0xffff, 0, 0);
 
-						memory_set_bankptr(machine, "bank1", ram_get_ptr(machine->device(RAM_TAG)));
-						memory_set_bankptr(machine, "bank2", ram_get_ptr(machine->device(RAM_TAG)) + 0x2800);
-						memory_set_bankptr(machine, "bank3", ram_get_ptr(machine->device(RAM_TAG)) + 0x3000);
-						memory_set_bankptr(machine, "bank4", ram_get_ptr(machine->device(RAM_TAG)) + 0x7000);
+						memory_set_bankptr(machine, "bank1", ram);
+						memory_set_bankptr(machine, "bank2", ram + 0x2800);
+						memory_set_bankptr(machine, "bank3", ram + 0x3000);
+						memory_set_bankptr(machine, "bank4", ram + 0x7000);
 						memory_set_bankptr(machine, "bank5", rom + 0x10000);
 						break;
 #if 0
@@ -68,8 +69,8 @@ static void b2m_set_bank(running_machine *machine,int bank)
 						memory_unmap_write(space, 0x3000, 0x6fff, 0, 0);
 						memory_unmap_write(space, 0xe000, 0xffff, 0, 0);
 
-						memory_set_bankptr(machine, "bank1", ram_get_ptr(machine->device(RAM_TAG)));
-						memory_set_bankptr(machine, "bank2", ram_get_ptr(machine->device(RAM_TAG)) + 0x2800);
+						memory_set_bankptr(machine, "bank1", ram);
+						memory_set_bankptr(machine, "bank2", ram + 0x2800);
 						memory_set_bankptr(machine, "bank3", rom + 0x12000);
 						memory_set_bankptr(machine, "bank4", rom + 0x16000);
 						memory_set_bankptr(machine, "bank5", rom + 0x10000);
@@ -79,30 +80,30 @@ static void b2m_set_bank(running_machine *machine,int bank)
 						memory_unmap_write(space, 0x2800, 0x2fff, 0, 0);
 						memory_unmap_write(space, 0xe000, 0xffff, 0, 0);
 
-						memory_set_bankptr(machine, "bank1", ram_get_ptr(machine->device(RAM_TAG)));
+						memory_set_bankptr(machine, "bank1", ram);
 						memory_install_read8_handler(space, 0x2800, 0x2fff, 0, 0, b2m_keyboard_r);
-						memory_set_bankptr(machine, "bank3", ram_get_ptr(machine->device(RAM_TAG)) + 0x10000);
-						memory_set_bankptr(machine, "bank4", ram_get_ptr(machine->device(RAM_TAG)) + 0x7000);
+						memory_set_bankptr(machine, "bank3", ram + 0x10000);
+						memory_set_bankptr(machine, "bank4", ram + 0x7000);
 						memory_set_bankptr(machine, "bank5", rom + 0x10000);
 						break;
 		case 3 :
 						memory_unmap_write(space, 0x2800, 0x2fff, 0, 0);
 						memory_unmap_write(space, 0xe000, 0xffff, 0, 0);
 
-						memory_set_bankptr(machine, "bank1", ram_get_ptr(machine->device(RAM_TAG)));
+						memory_set_bankptr(machine, "bank1", ram);
 						memory_install_read8_handler(space, 0x2800, 0x2fff, 0, 0, b2m_keyboard_r);
-						memory_set_bankptr(machine, "bank3", ram_get_ptr(machine->device(RAM_TAG)) + 0x14000);
-						memory_set_bankptr(machine, "bank4", ram_get_ptr(machine->device(RAM_TAG)) + 0x7000);
+						memory_set_bankptr(machine, "bank3", ram + 0x14000);
+						memory_set_bankptr(machine, "bank4", ram + 0x7000);
 						memory_set_bankptr(machine, "bank5", rom + 0x10000);
 						break;
 		case 4 :
 						memory_unmap_write(space, 0x2800, 0x2fff, 0, 0);
 						memory_unmap_write(space, 0xe000, 0xffff, 0, 0);
 
-						memory_set_bankptr(machine, "bank1", ram_get_ptr(machine->device(RAM_TAG)));
+						memory_set_bankptr(machine, "bank1", ram);
 						memory_install_read8_handler(space, 0x2800, 0x2fff, 0, 0, b2m_keyboard_r);
-						memory_set_bankptr(machine, "bank3", ram_get_ptr(machine->device(RAM_TAG)) + 0x18000);
-						memory_set_bankptr(machine, "bank4", ram_get_ptr(machine->device(RAM_TAG)) + 0x7000);
+						memory_set_bankptr(machine, "bank3", ram + 0x18000);
+						memory_set_bankptr(machine, "bank4", ram + 0x7000);
 						memory_set_bankptr(machine, "bank5", rom + 0x10000);
 
 						break;
@@ -110,19 +111,19 @@ static void b2m_set_bank(running_machine *machine,int bank)
 						memory_unmap_write(space, 0x2800, 0x2fff, 0, 0);
 						memory_unmap_write(space, 0xe000, 0xffff, 0, 0);
 
-						memory_set_bankptr(machine, "bank1", ram_get_ptr(machine->device(RAM_TAG)));
+						memory_set_bankptr(machine, "bank1", ram);
 						memory_install_read8_handler(space, 0x2800, 0x2fff, 0, 0, b2m_keyboard_r);
-						memory_set_bankptr(machine, "bank3", ram_get_ptr(machine->device(RAM_TAG)) + 0x1c000);
-						memory_set_bankptr(machine, "bank4", ram_get_ptr(machine->device(RAM_TAG)) + 0x7000);
+						memory_set_bankptr(machine, "bank3", ram + 0x1c000);
+						memory_set_bankptr(machine, "bank4", ram + 0x7000);
 						memory_set_bankptr(machine, "bank5", rom + 0x10000);
 
 						break;
 		case 6 :
-						memory_set_bankptr(machine, "bank1", ram_get_ptr(machine->device(RAM_TAG)));
-						memory_set_bankptr(machine, "bank2", ram_get_ptr(machine->device(RAM_TAG)) + 0x2800);
-						memory_set_bankptr(machine, "bank3", ram_get_ptr(machine->device(RAM_TAG)) + 0x3000);
-						memory_set_bankptr(machine, "bank4", ram_get_ptr(machine->device(RAM_TAG)) + 0x7000);
-						memory_set_bankptr(machine, "bank5", ram_get_ptr(machine->device(RAM_TAG)) + 0xe000);
+						memory_set_bankptr(machine, "bank1", ram);
+						memory_set_bankptr(machine, "bank2", ram + 0x2800);
+						memory_set_bankptr(machine, "bank3", ram + 0x3000);
+						memory_set_bankptr(machine, "bank4", ram + 0x7000);
+						memory_set_bankptr(machine, "bank5", ram + 0xe000);
 						break;
 		case 7 :
 						memory_unmap_write(space, 0x0000, 0x27ff, 0, 0);

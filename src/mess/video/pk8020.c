@@ -19,18 +19,19 @@ VIDEO_UPDATE( pk8020 )
 	pk8020_state *state = screen->machine->driver_data<pk8020_state>();
 	int y, x, b, j;
 	UINT8 *gfx = screen->machine->region("gfx1")->base();
+	UINT8 *ram = ram_get_ptr(screen->machine->device(RAM_TAG));
 
 	for (y = 0; y < 16; y++)
 	{
 		for (x = 0; x < 64; x++)
 		{
-			UINT8 chr = ram_get_ptr(screen->machine->device(RAM_TAG))[x +(y*64) + 0x40000];
-			UINT8 attr= ram_get_ptr(screen->machine->device(RAM_TAG))[x +(y*64) + 0x40400];
+			UINT8 chr = ram[x +(y*64) + 0x40000];
+			UINT8 attr= ram[x +(y*64) + 0x40400];
 			for (j = 0; j < 16; j++) {
 				UINT32 addr = 0x10000 + x + ((y*16+j)*64) + (state->video_page * 0xC000);
-				UINT8 code1 = ram_get_ptr(screen->machine->device(RAM_TAG))[addr];
-				UINT8 code2 = ram_get_ptr(screen->machine->device(RAM_TAG))[addr + 0x4000];
-				UINT8 code3 = ram_get_ptr(screen->machine->device(RAM_TAG))[addr + 0x8000];
+				UINT8 code1 = ram[addr];
+				UINT8 code2 = ram[addr + 0x4000];
+				UINT8 code3 = ram[addr + 0x8000];
 				UINT8 code4 = gfx[((chr<<4) + j) + (state->font*0x1000)];
 				if (attr) code4 ^= 0xff;
 				for (b = 0; b < 8; b++)

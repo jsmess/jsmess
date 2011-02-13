@@ -23,33 +23,34 @@ static void pp01_video_w(running_machine *machine,UINT8 block,UINT16 offset,UINT
 {
 	pp01_state *state = machine->driver_data<pp01_state>();
 	UINT16 addroffset = part ? 0x1000  : 0x0000;
+	UINT8 *ram = ram_get_ptr(machine->device(RAM_TAG));
 
 	if (BIT(state->video_write_mode,3)) {
 		// Copy mode
 		if(BIT(state->video_write_mode,0)) {
-			ram_get_ptr(machine->device(RAM_TAG))[0x6000+offset+addroffset] = data;
+			ram[0x6000+offset+addroffset] = data;
 		} else {
-			ram_get_ptr(machine->device(RAM_TAG))[0x6000+offset+addroffset] = 0;
+			ram[0x6000+offset+addroffset] = 0;
 		}
 		if(BIT(state->video_write_mode,1)) {
-			ram_get_ptr(machine->device(RAM_TAG))[0xa000+offset+addroffset] = data;
+			ram[0xa000+offset+addroffset] = data;
 		} else {
-			ram_get_ptr(machine->device(RAM_TAG))[0xa000+offset+addroffset] = 0;
+			ram[0xa000+offset+addroffset] = 0;
 		}
 		if(BIT(state->video_write_mode,2)) {
-			ram_get_ptr(machine->device(RAM_TAG))[0xe000+offset+addroffset] = data;
+			ram[0xe000+offset+addroffset] = data;
 		} else {
-			ram_get_ptr(machine->device(RAM_TAG))[0xe000+offset+addroffset] = 0;
+			ram[0xe000+offset+addroffset] = 0;
 		}
 	} else {
 		if (block==0) {
-			ram_get_ptr(machine->device(RAM_TAG))[0x6000+offset+addroffset] = data;
+			ram[0x6000+offset+addroffset] = data;
 		}
 		if (block==1) {
-			ram_get_ptr(machine->device(RAM_TAG))[0xa000+offset+addroffset] = data;
+			ram[0xa000+offset+addroffset] = data;
 		}
 		if (block==2) {
-			ram_get_ptr(machine->device(RAM_TAG))[0xe000+offset+addroffset] = data;
+			ram[0xe000+offset+addroffset] = data;
 		}
 	}
 }

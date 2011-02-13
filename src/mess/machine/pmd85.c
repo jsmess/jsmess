@@ -29,6 +29,7 @@ static void pmd851_update_memory(running_machine *machine)
 {
 	pmd85_state *state = machine->driver_data<pmd85_state>();
 	address_space* space = cputag_get_address_space(machine, "maincpu",ADDRESS_SPACE_PROGRAM);
+	UINT8 *ram = ram_get_ptr(machine->device(RAM_TAG));
 
 	if (state->startup_mem_map)
 	{
@@ -44,11 +45,11 @@ static void pmd851_update_memory(running_machine *machine)
 
 		memory_set_bankptr(machine, "bank1", mem + 0x010000);
 		memory_set_bankptr(machine, "bank3", mem + 0x010000);
-		memory_set_bankptr(machine, "bank5", ram_get_ptr(machine->device(RAM_TAG)) + 0xc000);
+		memory_set_bankptr(machine, "bank5", ram + 0xc000);
 
 		memory_set_bankptr(machine, "bank6", mem + 0x010000);
 		memory_set_bankptr(machine, "bank7", mem + 0x010000);
-		memory_set_bankptr(machine, "bank8", ram_get_ptr(machine->device(RAM_TAG)) + 0xc000);
+		memory_set_bankptr(machine, "bank8", ram + 0xc000);
 	}
 	else
 	{
@@ -61,11 +62,11 @@ static void pmd851_update_memory(running_machine *machine)
 		memory_install_read_bank(space, 0x1000, 0x1fff, 0, 0, "bank2");
 		memory_install_read_bank(space, 0x3000, 0x3fff, 0, 0, "bank4");
 
-		memory_set_bankptr(machine, "bank1", ram_get_ptr(machine->device(RAM_TAG)));
-		memory_set_bankptr(machine, "bank2", ram_get_ptr(machine->device(RAM_TAG)) + 0x1000);
-		memory_set_bankptr(machine, "bank3", ram_get_ptr(machine->device(RAM_TAG)) + 0x2000);
-		memory_set_bankptr(machine, "bank4", ram_get_ptr(machine->device(RAM_TAG)) + 0x3000);
-		memory_set_bankptr(machine, "bank5", ram_get_ptr(machine->device(RAM_TAG)) + 0x4000);
+		memory_set_bankptr(machine, "bank1", ram);
+		memory_set_bankptr(machine, "bank2", ram + 0x1000);
+		memory_set_bankptr(machine, "bank3", ram + 0x2000);
+		memory_set_bankptr(machine, "bank4", ram + 0x3000);
+		memory_set_bankptr(machine, "bank5", ram + 0x4000);
 	}
 }
 
@@ -73,6 +74,7 @@ static void pmd852a_update_memory(running_machine *machine)
 {
 	pmd85_state *state = machine->driver_data<pmd85_state>();
 	address_space* space = cputag_get_address_space(machine, "maincpu",ADDRESS_SPACE_PROGRAM);
+	UINT8 *ram = ram_get_ptr(machine->device(RAM_TAG));
 
 	if (state->startup_mem_map)
 	{
@@ -82,15 +84,15 @@ static void pmd852a_update_memory(running_machine *machine)
 		memory_unmap_write(space, 0x2000, 0x2fff, 0, 0);
 
 		memory_set_bankptr(machine, "bank1", mem + 0x010000);
-		memory_set_bankptr(machine, "bank2", ram_get_ptr(machine->device(RAM_TAG)) + 0x9000);
+		memory_set_bankptr(machine, "bank2", ram + 0x9000);
 		memory_set_bankptr(machine, "bank3", mem + 0x010000);
-		memory_set_bankptr(machine, "bank4", ram_get_ptr(machine->device(RAM_TAG)) + 0xb000);
-		memory_set_bankptr(machine, "bank5", ram_get_ptr(machine->device(RAM_TAG)) + 0xc000);
+		memory_set_bankptr(machine, "bank4", ram + 0xb000);
+		memory_set_bankptr(machine, "bank5", ram + 0xc000);
 		memory_set_bankptr(machine, "bank6", mem + 0x010000);
-		memory_set_bankptr(machine, "bank7", ram_get_ptr(machine->device(RAM_TAG)) + 0x9000);
+		memory_set_bankptr(machine, "bank7", ram + 0x9000);
 		memory_set_bankptr(machine, "bank8", mem + 0x010000);
-		memory_set_bankptr(machine, "bank9", ram_get_ptr(machine->device(RAM_TAG)) + 0xb000);
-		memory_set_bankptr(machine, "bank10", ram_get_ptr(machine->device(RAM_TAG)) + 0xc000);
+		memory_set_bankptr(machine, "bank9", ram + 0xb000);
+		memory_set_bankptr(machine, "bank10", ram + 0xc000);
 
 	}
 	else
@@ -98,21 +100,22 @@ static void pmd852a_update_memory(running_machine *machine)
 		memory_install_write_bank(space, 0x0000, 0x0fff, 0, 0, "bank1");
 		memory_install_write_bank(space, 0x2000, 0x2fff, 0, 0, "bank3");
 
-		memory_set_bankptr(machine, "bank1", ram_get_ptr(machine->device(RAM_TAG)));
-		memory_set_bankptr(machine, "bank2", ram_get_ptr(machine->device(RAM_TAG)) + 0x1000);
-		memory_set_bankptr(machine, "bank3", ram_get_ptr(machine->device(RAM_TAG)) + 0x2000);
-		memory_set_bankptr(machine, "bank4", ram_get_ptr(machine->device(RAM_TAG)) + 0x5000);
-		memory_set_bankptr(machine, "bank5", ram_get_ptr(machine->device(RAM_TAG)) + 0x4000);
+		memory_set_bankptr(machine, "bank1", ram);
+		memory_set_bankptr(machine, "bank2", ram + 0x1000);
+		memory_set_bankptr(machine, "bank3", ram + 0x2000);
+		memory_set_bankptr(machine, "bank4", ram + 0x5000);
+		memory_set_bankptr(machine, "bank5", ram + 0x4000);
 	}
 }
 
 static void pmd853_update_memory(running_machine *machine)
 {
 	pmd85_state *state = machine->driver_data<pmd85_state>();
+	UINT8 *mem = machine->region("maincpu")->base();
+	UINT8 *ram = ram_get_ptr(machine->device(RAM_TAG));
+
 	if (state->startup_mem_map)
 	{
-		UINT8 *mem = machine->region("maincpu")->base();
-
 		memory_set_bankptr(machine, "bank1", mem + 0x010000);
 		memory_set_bankptr(machine, "bank2", mem + 0x010000);
 		memory_set_bankptr(machine, "bank3", mem + 0x010000);
@@ -121,25 +124,25 @@ static void pmd853_update_memory(running_machine *machine)
 		memory_set_bankptr(machine, "bank6", mem + 0x010000);
 		memory_set_bankptr(machine, "bank7", mem + 0x010000);
 		memory_set_bankptr(machine, "bank8", mem + 0x010000);
-		memory_set_bankptr(machine, "bank9", ram_get_ptr(machine->device(RAM_TAG)));
-		memory_set_bankptr(machine, "bank10", ram_get_ptr(machine->device(RAM_TAG)) + 0x2000);
-		memory_set_bankptr(machine, "bank11", ram_get_ptr(machine->device(RAM_TAG)) + 0x4000);
-		memory_set_bankptr(machine, "bank12", ram_get_ptr(machine->device(RAM_TAG)) + 0x6000);
-		memory_set_bankptr(machine, "bank13", ram_get_ptr(machine->device(RAM_TAG)) + 0x8000);
-		memory_set_bankptr(machine, "bank14", ram_get_ptr(machine->device(RAM_TAG)) + 0xa000);
-		memory_set_bankptr(machine, "bank15", ram_get_ptr(machine->device(RAM_TAG)) + 0xc000);
-		memory_set_bankptr(machine, "bank16", ram_get_ptr(machine->device(RAM_TAG)) + 0xe000);
+		memory_set_bankptr(machine, "bank9", ram);
+		memory_set_bankptr(machine, "bank10", ram + 0x2000);
+		memory_set_bankptr(machine, "bank11", ram + 0x4000);
+		memory_set_bankptr(machine, "bank12", ram + 0x6000);
+		memory_set_bankptr(machine, "bank13", ram + 0x8000);
+		memory_set_bankptr(machine, "bank14", ram + 0xa000);
+		memory_set_bankptr(machine, "bank15", ram + 0xc000);
+		memory_set_bankptr(machine, "bank16", ram + 0xe000);
 	}
 	else
 	{
-		memory_set_bankptr(machine,  "bank1", ram_get_ptr(machine->device(RAM_TAG)));
-		memory_set_bankptr(machine,  "bank2", ram_get_ptr(machine->device(RAM_TAG)) + 0x2000);
-		memory_set_bankptr(machine,  "bank3", ram_get_ptr(machine->device(RAM_TAG)) + 0x4000);
-		memory_set_bankptr(machine,  "bank4", ram_get_ptr(machine->device(RAM_TAG)) + 0x6000);
-		memory_set_bankptr(machine,  "bank5", ram_get_ptr(machine->device(RAM_TAG)) + 0x8000);
-		memory_set_bankptr(machine,  "bank6", ram_get_ptr(machine->device(RAM_TAG)) + 0xa000);
-		memory_set_bankptr(machine,  "bank7", ram_get_ptr(machine->device(RAM_TAG)) + 0xc000);
-		memory_set_bankptr(machine,  "bank8", state->pmd853_memory_mapping ? machine->region("maincpu")->base() + 0x010000 : ram_get_ptr(machine->device(RAM_TAG)) + 0xe000);
+		memory_set_bankptr(machine,  "bank1", ram);
+		memory_set_bankptr(machine,  "bank2", ram + 0x2000);
+		memory_set_bankptr(machine,  "bank3", ram + 0x4000);
+		memory_set_bankptr(machine,  "bank4", ram + 0x6000);
+		memory_set_bankptr(machine,  "bank5", ram + 0x8000);
+		memory_set_bankptr(machine,  "bank6", ram + 0xa000);
+		memory_set_bankptr(machine,  "bank7", ram + 0xc000);
+		memory_set_bankptr(machine,  "bank8", state->pmd853_memory_mapping ? mem + 0x010000 : ram + 0xe000);
 	}
 }
 
@@ -147,6 +150,7 @@ static void alfa_update_memory(running_machine *machine)
 {
 	pmd85_state *state = machine->driver_data<pmd85_state>();
 	address_space* space = cputag_get_address_space(machine, "maincpu",ADDRESS_SPACE_PROGRAM);
+	UINT8 *ram = ram_get_ptr(machine->device(RAM_TAG));
 
 	if (state->startup_mem_map)
 	{
@@ -158,10 +162,10 @@ static void alfa_update_memory(running_machine *machine)
 
 		memory_set_bankptr(machine, "bank1", mem + 0x010000);
 		memory_set_bankptr(machine, "bank2", mem + 0x011000);
-		memory_set_bankptr(machine, "bank4", ram_get_ptr(machine->device(RAM_TAG)) + 0xc000);
+		memory_set_bankptr(machine, "bank4", ram + 0xc000);
 		memory_set_bankptr(machine, "bank5", mem + 0x010000);
 		memory_set_bankptr(machine, "bank6", mem + 0x011000);
-		memory_set_bankptr(machine, "bank7", ram_get_ptr(machine->device(RAM_TAG)) + 0xc000);
+		memory_set_bankptr(machine, "bank7", ram + 0xc000);
 	}
 	else
 	{
@@ -169,10 +173,10 @@ static void alfa_update_memory(running_machine *machine)
 		memory_install_write_bank(space, 0x1000, 0x33ff, 0, 0, "bank2");
 		memory_install_write_bank(space, 0x3400, 0x3fff, 0, 0, "bank3");
 
-		memory_set_bankptr(machine, "bank1", ram_get_ptr(machine->device(RAM_TAG)));
-		memory_set_bankptr(machine, "bank2", ram_get_ptr(machine->device(RAM_TAG)) + 0x1000);
-		memory_set_bankptr(machine, "bank3", ram_get_ptr(machine->device(RAM_TAG)) + 0x3400);
-		memory_set_bankptr(machine, "bank4", ram_get_ptr(machine->device(RAM_TAG)) + 0x4000);
+		memory_set_bankptr(machine, "bank1", ram);
+		memory_set_bankptr(machine, "bank2", ram + 0x1000);
+		memory_set_bankptr(machine, "bank3", ram + 0x3400);
+		memory_set_bankptr(machine, "bank4", ram + 0x4000);
 	}
 }
 
@@ -180,6 +184,7 @@ static void mato_update_memory(running_machine *machine)
 {
 	pmd85_state *state = machine->driver_data<pmd85_state>();
 	address_space* space = cputag_get_address_space(machine, "maincpu",ADDRESS_SPACE_PROGRAM);
+	UINT8 *ram = ram_get_ptr(machine->device(RAM_TAG));
 
 	if (state->startup_mem_map)
 	{
@@ -188,16 +193,16 @@ static void mato_update_memory(running_machine *machine)
 		memory_unmap_write(space, 0x0000, 0x3fff, 0, 0);
 
 		memory_set_bankptr(machine, "bank1", mem + 0x010000);
-		memory_set_bankptr(machine, "bank2", ram_get_ptr(machine->device(RAM_TAG)) + 0xc000);
+		memory_set_bankptr(machine, "bank2", ram + 0xc000);
 		memory_set_bankptr(machine, "bank3", mem + 0x010000);
-		memory_set_bankptr(machine, "bank4", ram_get_ptr(machine->device(RAM_TAG)) + 0xc000);
+		memory_set_bankptr(machine, "bank4", ram + 0xc000);
 	}
 	else
 	{
 		memory_install_write_bank(space, 0x0000, 0x3fff, 0, 0, "bank1");
 
-		memory_set_bankptr(machine, "bank1", ram_get_ptr(machine->device(RAM_TAG)));
-		memory_set_bankptr(machine, "bank2", ram_get_ptr(machine->device(RAM_TAG)) + 0x4000);
+		memory_set_bankptr(machine, "bank1", ram);
+		memory_set_bankptr(machine, "bank2", ram + 0x4000);
 	}
 }
 
@@ -205,22 +210,23 @@ static void c2717_update_memory(running_machine *machine)
 {
 	pmd85_state *state = machine->driver_data<pmd85_state>();
 	address_space* space = cputag_get_address_space(machine, "maincpu",ADDRESS_SPACE_PROGRAM);
-
 	UINT8 *mem = machine->region("maincpu")->base();
+	UINT8 *ram = ram_get_ptr(machine->device(RAM_TAG));
+
 	if (state->startup_mem_map)
 	{
 		memory_unmap_write(space, 0x0000, 0x3fff, 0, 0);
 
 		memory_set_bankptr(machine, "bank1", mem + 0x010000);
-		memory_set_bankptr(machine, "bank2", ram_get_ptr(machine->device(RAM_TAG)) + 0x4000);
+		memory_set_bankptr(machine, "bank2", ram + 0x4000);
 		memory_set_bankptr(machine, "bank3", mem + 0x010000);
-		memory_set_bankptr(machine, "bank4", ram_get_ptr(machine->device(RAM_TAG)) + 0xc000);
+		memory_set_bankptr(machine, "bank4", ram + 0xc000);
 	}
 	else
 	{
 		memory_install_write_bank(space, 0x0000, 0x3fff, 0, 0, "bank1");
-		memory_set_bankptr(machine, "bank1", ram_get_ptr(machine->device(RAM_TAG)));
-		memory_set_bankptr(machine, "bank2", ram_get_ptr(machine->device(RAM_TAG)) + 0x4000);
+		memory_set_bankptr(machine, "bank1", ram);
+		memory_set_bankptr(machine, "bank2", ram + 0x4000);
 	}
 }
 

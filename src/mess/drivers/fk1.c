@@ -254,9 +254,11 @@ static WRITE8_HANDLER( fk1_intr_w )
 static READ8_HANDLER( fk1_bank_ram_r )
 {
 	address_space *space_mem = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	UINT8 *ram = ram_get_ptr(space->machine->device(RAM_TAG));
+
 	memory_install_write_bank(space_mem, 0x0000, 0x3fff, 0, 0, "bank1");
-	memory_set_bankptr(space->machine, "bank1", ram_get_ptr(space->machine->device(RAM_TAG)));
-	memory_set_bankptr(space->machine, "bank2", ram_get_ptr(space->machine->device(RAM_TAG)) + 0x4000);
+	memory_set_bankptr(space->machine, "bank1", ram);
+	memory_set_bankptr(space->machine, "bank2", ram + 0x4000);
 	return 0;
 }
 
@@ -379,11 +381,13 @@ static TIMER_DEVICE_CALLBACK( vsync_callback )
 static MACHINE_RESET(fk1)
 {
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	UINT8 *ram = ram_get_ptr(machine->device(RAM_TAG));
+
 	memory_unmap_write(space, 0x0000, 0x3fff, 0, 0);
 	memory_set_bankptr(machine, "bank1", machine->region("maincpu")->base()); // ROM
-	memory_set_bankptr(machine, "bank2", ram_get_ptr(machine->device(RAM_TAG)) + 0x10000); // VRAM
-	memory_set_bankptr(machine, "bank3", ram_get_ptr(machine->device(RAM_TAG)) + 0x8000);
-	memory_set_bankptr(machine, "bank4", ram_get_ptr(machine->device(RAM_TAG)) + 0xc000);
+	memory_set_bankptr(machine, "bank2", ram + 0x10000); // VRAM
+	memory_set_bankptr(machine, "bank3", ram + 0x8000);
+	memory_set_bankptr(machine, "bank4", ram + 0xc000);
 
 	cpu_set_irq_callback(machine->device("maincpu"), fk1_irq_callback);
 }

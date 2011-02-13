@@ -698,6 +698,8 @@ static void svi318_set_banks(running_machine *machine)
 {
 	svi318_state *state = machine->driver_data<svi318_state>();
 	const UINT8 v = state->svi.bank_switch;
+	UINT8 *ram = ram_get_ptr(machine->device(RAM_TAG));
+	UINT32 ram_size = ram_get_size(machine->device(RAM_TAG));
 
 	state->svi.bankLow = ( v & 1 ) ? ( ( v & 2 ) ? ( ( v & 8 ) ? SVI_INTERNAL : SVI_EXPRAM3 ) : SVI_EXPRAM2 ) : SVI_CART;
 	state->svi.bankHigh1 = ( v & 4 ) ? ( ( v & 16 ) ? SVI_INTERNAL : SVI_EXPRAM3 ) : SVI_EXPRAM2;
@@ -717,16 +719,16 @@ static void svi318_set_banks(running_machine *machine)
 		}
 		break;
 	case SVI_EXPRAM2:
-		if ( ram_get_size(machine->device(RAM_TAG)) >= 64 * 1024 )
+		if ( ram_size >= 64 * 1024 )
 		{
-			state->svi.bankLow_ptr = ram_get_ptr(machine->device(RAM_TAG)) + ram_get_size(machine->device(RAM_TAG)) - 64 * 1024;
+			state->svi.bankLow_ptr = ram + ram_size - 64 * 1024;
 			state->svi.bankLow_read_only = 0;
 		}
 		break;
 	case SVI_EXPRAM3:
-		if ( ram_get_size(machine->device(RAM_TAG)) > 128 * 1024 )
+		if ( ram_size > 128 * 1024 )
 		{
-			state->svi.bankLow_ptr = ram_get_ptr(machine->device(RAM_TAG)) + ram_get_size(machine->device(RAM_TAG)) - 128 * 1024;
+			state->svi.bankLow_ptr = ram + ram_size - 128 * 1024;
 			state->svi.bankLow_read_only = 0;
 		}
 		break;
@@ -738,34 +740,34 @@ static void svi318_set_banks(running_machine *machine)
 	switch( state->svi.bankHigh1 )
 	{
 	case SVI_INTERNAL:
-		if ( ram_get_size(machine->device(RAM_TAG)) == 16 * 1024 )
+		if ( ram_size == 16 * 1024 )
 		{
-			state->svi.bankHigh2_ptr = ram_get_ptr(machine->device(RAM_TAG));
+			state->svi.bankHigh2_ptr = ram;
 			state->svi.bankHigh2_read_only = 0;
 		}
 		else
 		{
-			state->svi.bankHigh1_ptr = ram_get_ptr(machine->device(RAM_TAG));
+			state->svi.bankHigh1_ptr = ram;
 			state->svi.bankHigh1_read_only = 0;
-			state->svi.bankHigh2_ptr = ram_get_ptr(machine->device(RAM_TAG)) + 0x4000;
+			state->svi.bankHigh2_ptr = ram + 0x4000;
 			state->svi.bankHigh2_read_only = 0;
 		}
 		break;
 	case SVI_EXPRAM2:
-		if ( ram_get_size(machine->device(RAM_TAG)) > 64 * 1024 )
+		if ( ram_size > 64 * 1024 )
 		{
-			state->svi.bankHigh1_ptr = ram_get_ptr(machine->device(RAM_TAG)) + ram_get_size(machine->device(RAM_TAG)) - 64 * 1024 + 32 * 1024;
+			state->svi.bankHigh1_ptr = ram + ram_size - 64 * 1024 + 32 * 1024;
 			state->svi.bankHigh1_read_only = 0;
-			state->svi.bankHigh2_ptr = ram_get_ptr(machine->device(RAM_TAG)) + ram_get_size(machine->device(RAM_TAG)) - 64 * 1024 + 48 * 1024;
+			state->svi.bankHigh2_ptr = ram + ram_size - 64 * 1024 + 48 * 1024;
 			state->svi.bankHigh2_read_only = 0;
 		}
 		break;
 	case SVI_EXPRAM3:
-		if ( ram_get_size(machine->device(RAM_TAG)) > 128 * 1024 )
+		if ( ram_size > 128 * 1024 )
 		{
-			state->svi.bankHigh1_ptr = ram_get_ptr(machine->device(RAM_TAG)) + ram_get_size(machine->device(RAM_TAG)) - 128 * 1024 + 32 * 1024;
+			state->svi.bankHigh1_ptr = ram + ram_size - 128 * 1024 + 32 * 1024;
 			state->svi.bankHigh1_read_only = 0;
-			state->svi.bankHigh2_ptr = ram_get_ptr(machine->device(RAM_TAG)) + ram_get_size(machine->device(RAM_TAG)) - 128 * 1024 + 48 * 1024;
+			state->svi.bankHigh2_ptr = ram + ram_size - 128 * 1024 + 48 * 1024;
 			state->svi.bankHigh2_read_only = 0;
 		}
 		break;

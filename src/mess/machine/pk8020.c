@@ -74,20 +74,21 @@ static WRITE8_HANDLER(sysreg_w)
 static READ8_HANDLER(text_r)
 {
 	pk8020_state *state = space->machine->driver_data<pk8020_state>();
-    if (state->attr == 3) state->text_attr=ram_get_ptr(space->machine->device(RAM_TAG))[0x40400+offset];
+	if (state->attr == 3) state->text_attr=ram_get_ptr(space->machine->device(RAM_TAG))[0x40400+offset];
 	return ram_get_ptr(space->machine->device(RAM_TAG))[0x40000+offset];
 }
 
 static WRITE8_HANDLER(text_w)
 {
 	pk8020_state *state = space->machine->driver_data<pk8020_state>();
-	ram_get_ptr(space->machine->device(RAM_TAG))[0x40000+offset] = data;
+	UINT8 *ram = ram_get_ptr(space->machine->device(RAM_TAG));
+	ram[0x40000+offset] = data;
 	switch (state->attr) {
-        case 0: break;
-        case 1: ram_get_ptr(space->machine->device(RAM_TAG))[0x40400+offset]=0x01;break;
-        case 2: ram_get_ptr(space->machine->device(RAM_TAG))[0x40400+offset]=0x00;break;
-        case 3: ram_get_ptr(space->machine->device(RAM_TAG))[0x40400+offset]=state->text_attr;break;
-    }
+		case 0: break;
+		case 1: ram[0x40400+offset]=0x01;break;
+		case 2: ram[0x40400+offset]=0x00;break;
+		case 3: ram[0x40400+offset]=state->text_attr;break;
+	}
 }
 
 static READ8_HANDLER(gzu_r)
@@ -234,18 +235,21 @@ static WRITE8_HANDLER(devices_w)
 static void pk8020_set_bank(running_machine *machine,UINT8 data)
 {
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	UINT8 *mem = machine->region("maincpu")->base();
+	UINT8 *ram = ram_get_ptr(machine->device(RAM_TAG));
+
 	switch(data & 0x1F) {
 		case 0x00 :
 					{
 						// ROM
 						memory_install_read_bank (space, 0x0000, 0x37ff, 0, 0, "bank1");
 						memory_install_write_bank(space, 0x0000, 0x37ff, 0, 0, "bank2");
-						memory_set_bankptr(machine, "bank1", machine->region("maincpu")->base() + 0x10000);
-						memory_set_bankptr(machine, "bank2", ram_get_ptr(machine->device(RAM_TAG)) + 0x0000);
+						memory_set_bankptr(machine, "bank1", mem + 0x10000);
+						memory_set_bankptr(machine, "bank2", ram + 0x0000);
 						// Keyboard
 						memory_install_read8_handler (space, 0x3800, 0x39ff, 0, 0, keyboard_r);
 						memory_install_write_bank(space, 0x3800, 0x39ff, 0, 0, "bank3");
-						memory_set_bankptr(machine, "bank3", ram_get_ptr(machine->device(RAM_TAG)) + 0x3800);
+						memory_set_bankptr(machine, "bank3", ram + 0x3800);
 						// System reg
 						memory_install_read8_handler (space, 0x3a00, 0x3aff, 0, 0, sysreg_r);
 						memory_install_write8_handler(space, 0x3a00, 0x3aff, 0, 0, sysreg_w);
@@ -258,42 +262,42 @@ static void pk8020_set_bank(running_machine *machine,UINT8 data)
 						// RAM
 						memory_install_read_bank (space, 0x4000, 0xffff, 0, 0, "bank4");
 						memory_install_write_bank(space, 0x4000, 0xffff, 0, 0, "bank5");
-						memory_set_bankptr(machine, "bank4", ram_get_ptr(machine->device(RAM_TAG)) + 0x4000);
-						memory_set_bankptr(machine, "bank5", ram_get_ptr(machine->device(RAM_TAG)) + 0x4000);
+						memory_set_bankptr(machine, "bank4", ram + 0x4000);
+						memory_set_bankptr(machine, "bank5", ram + 0x4000);
 					}
 					break;
 		case 0x01 : {
 						// ROM
 						memory_install_read_bank (space, 0x0000, 0x1fff, 0, 0, "bank1");
 						memory_install_write_bank(space, 0x0000, 0x1fff, 0, 0, "bank2");
-						memory_set_bankptr(machine, "bank1", machine->region("maincpu")->base() + 0x10000);
-						memory_set_bankptr(machine, "bank2", ram_get_ptr(machine->device(RAM_TAG)) + 0x0000);
+						memory_set_bankptr(machine, "bank1", mem + 0x10000);
+						memory_set_bankptr(machine, "bank2", ram + 0x0000);
 						// RAM
 						memory_install_read_bank (space, 0x2000, 0xffff, 0, 0, "bank3");
 						memory_install_write_bank(space, 0x2000, 0xffff, 0, 0, "bank4");
-						memory_set_bankptr(machine, "bank3", ram_get_ptr(machine->device(RAM_TAG)) + 0x2000);
-						memory_set_bankptr(machine, "bank4", ram_get_ptr(machine->device(RAM_TAG)) + 0x2000);
+						memory_set_bankptr(machine, "bank3", ram + 0x2000);
+						memory_set_bankptr(machine, "bank4", ram + 0x2000);
 					}
 					break;
 		case 0x02 : {
 						// ROM
 						memory_install_read_bank (space, 0x0000, 0x3fff, 0, 0, "bank1");
 						memory_install_write_bank(space, 0x0000, 0x3fff, 0, 0, "bank2");
-						memory_set_bankptr(machine, "bank1", machine->region("maincpu")->base() + 0x10000);
-						memory_set_bankptr(machine, "bank2", ram_get_ptr(machine->device(RAM_TAG)) + 0x0000);
+						memory_set_bankptr(machine, "bank1", mem + 0x10000);
+						memory_set_bankptr(machine, "bank2", ram + 0x0000);
 						// RAM
 						memory_install_read_bank (space, 0x4000, 0xffff, 0, 0, "bank3");
 						memory_install_write_bank(space, 0x4000, 0xffff, 0, 0, "bank4");
-						memory_set_bankptr(machine, "bank3", ram_get_ptr(machine->device(RAM_TAG)) + 0x4000);
-						memory_set_bankptr(machine, "bank4", ram_get_ptr(machine->device(RAM_TAG)) + 0x4000);
+						memory_set_bankptr(machine, "bank3", ram + 0x4000);
+						memory_set_bankptr(machine, "bank4", ram + 0x4000);
 					}
 					break;
 		case 0x03 : {
 						// RAM
 						memory_install_read_bank (space, 0x0000, 0xffff, 0, 0, "bank1");
 						memory_install_write_bank(space, 0x0000, 0xffff, 0, 0, "bank2");
-						memory_set_bankptr(machine, "bank1", ram_get_ptr(machine->device(RAM_TAG)));
-						memory_set_bankptr(machine, "bank2", ram_get_ptr(machine->device(RAM_TAG)));
+						memory_set_bankptr(machine, "bank1", ram);
+						memory_set_bankptr(machine, "bank2", ram);
 					}
 					break;
 		case 0x04 :
@@ -302,17 +306,17 @@ static void pk8020_set_bank(running_machine *machine,UINT8 data)
 						// ROM
 						memory_install_read_bank (space, 0x0000, 0x1fff, 0, 0, "bank1");
 						memory_install_write_bank(space, 0x0000, 0x1fff, 0, 0, "bank2");
-						memory_set_bankptr(machine, "bank1", machine->region("maincpu")->base() + 0x10000);
-						memory_set_bankptr(machine, "bank2", ram_get_ptr(machine->device(RAM_TAG)) + 0x0000);
+						memory_set_bankptr(machine, "bank1", mem + 0x10000);
+						memory_set_bankptr(machine, "bank2", ram + 0x0000);
 						// RAM
 						memory_install_read_bank (space, 0x2000, 0xf7ff, 0, 0, "bank3");
 						memory_install_write_bank(space, 0x2000, 0xf7ff, 0, 0, "bank4");
-						memory_set_bankptr(machine, "bank3", ram_get_ptr(machine->device(RAM_TAG)) + 0x2000);
-						memory_set_bankptr(machine, "bank4", ram_get_ptr(machine->device(RAM_TAG)) + 0x2000);
+						memory_set_bankptr(machine, "bank3", ram + 0x2000);
+						memory_set_bankptr(machine, "bank4", ram + 0x2000);
 						// Keyboard
 						memory_install_read8_handler (space, 0xf800, 0xf9ff, 0, 0, keyboard_r);
 						memory_install_write_bank(space, 0xf800, 0xf9ff, 0, 0, "bank5");
-						memory_set_bankptr(machine, "bank5", ram_get_ptr(machine->device(RAM_TAG)) + 0xf800);
+						memory_set_bankptr(machine, "bank5", ram + 0xf800);
 						// System reg
 						memory_install_read8_handler (space, 0xfa00, 0xfaff, 0, 0, sysreg_r);
 						memory_install_write8_handler(space, 0xfa00, 0xfaff, 0, 0, sysreg_w);
@@ -329,17 +333,17 @@ static void pk8020_set_bank(running_machine *machine,UINT8 data)
 						// ROM
 						memory_install_read_bank (space, 0x0000, 0x3fff, 0, 0, "bank1");
 						memory_install_write_bank(space, 0x0000, 0x3fff, 0, 0, "bank2");
-						memory_set_bankptr(machine, "bank1", machine->region("maincpu")->base() + 0x10000);
-						memory_set_bankptr(machine, "bank2", ram_get_ptr(machine->device(RAM_TAG)) + 0x0000);
+						memory_set_bankptr(machine, "bank1", mem + 0x10000);
+						memory_set_bankptr(machine, "bank2", ram + 0x0000);
 						// RAM
 						memory_install_read_bank (space, 0x4000, 0xf7ff, 0, 0, "bank3");
 						memory_install_write_bank(space, 0x4000, 0xf7ff, 0, 0, "bank4");
-						memory_set_bankptr(machine, "bank3", ram_get_ptr(machine->device(RAM_TAG)) + 0x4000);
-						memory_set_bankptr(machine, "bank4", ram_get_ptr(machine->device(RAM_TAG)) + 0x4000);
+						memory_set_bankptr(machine, "bank3", ram + 0x4000);
+						memory_set_bankptr(machine, "bank4", ram + 0x4000);
 						// Keyboard
 						memory_install_read8_handler (space, 0xf800, 0xf9ff, 0, 0, keyboard_r);
 						memory_install_write_bank(space, 0xf800, 0xf9ff, 0, 0, "bank5");
-						memory_set_bankptr(machine, "bank5", ram_get_ptr(machine->device(RAM_TAG)) + 0xf800);
+						memory_set_bankptr(machine, "bank5", ram + 0xf800);
 						// System reg
 						memory_install_read8_handler (space, 0xfa00, 0xfaff, 0, 0, sysreg_r);
 						memory_install_write8_handler(space, 0xfa00, 0xfaff, 0, 0, sysreg_w);
@@ -356,12 +360,12 @@ static void pk8020_set_bank(running_machine *machine,UINT8 data)
 						// RAM
 						memory_install_read_bank (space, 0x0000, 0xf7ff, 0, 0, "bank1");
 						memory_install_write_bank(space, 0x0000, 0xf7ff, 0, 0, "bank2");
-						memory_set_bankptr(machine, "bank1", ram_get_ptr(machine->device(RAM_TAG)));
-						memory_set_bankptr(machine, "bank2", ram_get_ptr(machine->device(RAM_TAG)));
+						memory_set_bankptr(machine, "bank1", ram);
+						memory_set_bankptr(machine, "bank2", ram);
 						// Keyboard
 						memory_install_read8_handler (space, 0xf800, 0xf9ff, 0, 0, keyboard_r);
 						memory_install_write_bank(space, 0xf800, 0xf9ff, 0, 0, "bank3");
-						memory_set_bankptr(machine, "bank3", ram_get_ptr(machine->device(RAM_TAG)) + 0xf800);
+						memory_set_bankptr(machine, "bank3", ram + 0xf800);
 						// System reg
 						memory_install_read8_handler (space, 0xfa00, 0xfaff, 0, 0, sysreg_r);
 						memory_install_write8_handler(space, 0xfa00, 0xfaff, 0, 0, sysreg_w);
@@ -378,12 +382,12 @@ static void pk8020_set_bank(running_machine *machine,UINT8 data)
 						// ROM
 						memory_install_read_bank (space, 0x0000, 0x3fff, 0, 0, "bank1");
 						memory_install_write_bank(space, 0x0000, 0x3fff, 0, 0, "bank2");
-						memory_set_bankptr(machine, "bank1", machine->region("maincpu")->base() + 0x10000);
-						memory_set_bankptr(machine, "bank2", ram_get_ptr(machine->device(RAM_TAG)) + 0x0000);
+						memory_set_bankptr(machine, "bank1", mem + 0x10000);
+						memory_set_bankptr(machine, "bank2", ram + 0x0000);
 						// Keyboard
 						memory_install_read8_handler (space, 0x3800, 0x39ff, 0, 0, keyboard_r);
 						memory_install_write_bank(space, 0x3800, 0x39ff, 0, 0, "bank3");
-						memory_set_bankptr(machine, "bank3", ram_get_ptr(machine->device(RAM_TAG)) + 0x3800);
+						memory_set_bankptr(machine, "bank3", ram + 0x3800);
 						// System reg
 						memory_install_read8_handler (space, 0x3a00, 0x3aff, 0, 0, sysreg_r);
 						memory_install_write8_handler(space, 0x3a00, 0x3aff, 0, 0, sysreg_w);
@@ -396,8 +400,8 @@ static void pk8020_set_bank(running_machine *machine,UINT8 data)
 						// RAM
 						memory_install_read_bank (space, 0x4000, 0xbfff, 0, 0, "bank4");
 						memory_install_write_bank(space, 0x4000, 0xbfff, 0, 0, "bank5");
-						memory_set_bankptr(machine, "bank4", ram_get_ptr(machine->device(RAM_TAG)) + 0x4000);
-						memory_set_bankptr(machine, "bank5", ram_get_ptr(machine->device(RAM_TAG)) + 0x4000);
+						memory_set_bankptr(machine, "bank4", ram + 0x4000);
+						memory_set_bankptr(machine, "bank5", ram + 0x4000);
 						// Video RAM
 						memory_install_read8_handler (space, 0xc000, 0xffff, 0, 0, gzu_r);
 						memory_install_write8_handler(space, 0xc000, 0xffff, 0, 0, gzu_w);
@@ -409,13 +413,13 @@ static void pk8020_set_bank(running_machine *machine,UINT8 data)
 						// ROM
 						memory_install_read_bank (space, 0x0000, 0x1fff, 0, 0, "bank1");
 						memory_install_write_bank(space, 0x0000, 0x1fff, 0, 0, "bank2");
-						memory_set_bankptr(machine, "bank1", machine->region("maincpu")->base() + 0x10000);
-						memory_set_bankptr(machine, "bank2", ram_get_ptr(machine->device(RAM_TAG)) + 0x0000);
+						memory_set_bankptr(machine, "bank1", mem + 0x10000);
+						memory_set_bankptr(machine, "bank2", ram + 0x0000);
 						// RAM
 						memory_install_read_bank (space, 0x2000, 0xbfff, 0, 0, "bank3");
 						memory_install_write_bank(space, 0x2000, 0xbfff, 0, 0, "bank4");
-						memory_set_bankptr(machine, "bank3", ram_get_ptr(machine->device(RAM_TAG)) + 0x2000);
-						memory_set_bankptr(machine, "bank4", ram_get_ptr(machine->device(RAM_TAG)) + 0x2000);
+						memory_set_bankptr(machine, "bank3", ram + 0x2000);
+						memory_set_bankptr(machine, "bank4", ram + 0x2000);
 						// Video RAM
 						memory_install_read8_handler (space, 0xc000, 0xffff, 0, 0, gzu_r);
 						memory_install_write8_handler(space, 0xc000, 0xffff, 0, 0, gzu_w);
@@ -426,13 +430,13 @@ static void pk8020_set_bank(running_machine *machine,UINT8 data)
 						// ROM
 						memory_install_read_bank (space, 0x0000, 0x3fff, 0, 0, "bank1");
 						memory_install_write_bank(space, 0x0000, 0x3fff, 0, 0, "bank2");
-						memory_set_bankptr(machine, "bank1", machine->region("maincpu")->base() + 0x10000);
-						memory_set_bankptr(machine, "bank2", ram_get_ptr(machine->device(RAM_TAG)) + 0x0000);
+						memory_set_bankptr(machine, "bank1", mem + 0x10000);
+						memory_set_bankptr(machine, "bank2", ram + 0x0000);
 						// RAM
 						memory_install_read_bank (space, 0x4000, 0xbfff, 0, 0, "bank3");
 						memory_install_write_bank(space, 0x4000, 0xbfff, 0, 0, "bank4");
-						memory_set_bankptr(machine, "bank3", ram_get_ptr(machine->device(RAM_TAG)) + 0x4000);
-						memory_set_bankptr(machine, "bank4", ram_get_ptr(machine->device(RAM_TAG)) + 0x4000);
+						memory_set_bankptr(machine, "bank3", ram + 0x4000);
+						memory_set_bankptr(machine, "bank4", ram + 0x4000);
 						// Video RAM
 						memory_install_read8_handler (space, 0xc000, 0xffff, 0, 0, gzu_r);
 						memory_install_write8_handler(space, 0xc000, 0xffff, 0, 0, gzu_w);
@@ -443,8 +447,8 @@ static void pk8020_set_bank(running_machine *machine,UINT8 data)
 						// RAM
 						memory_install_read_bank (space, 0x0000, 0xbfff, 0, 0, "bank1");
 						memory_install_write_bank(space, 0x0000, 0xbfff, 0, 0, "bank2");
-						memory_set_bankptr(machine, "bank1", ram_get_ptr(machine->device(RAM_TAG)) + 0x0000);
-						memory_set_bankptr(machine, "bank2", ram_get_ptr(machine->device(RAM_TAG)) + 0x0000);
+						memory_set_bankptr(machine, "bank1", ram + 0x0000);
+						memory_set_bankptr(machine, "bank2", ram + 0x0000);
 						// Video RAM
 						memory_install_read8_handler (space, 0xc000, 0xffff, 0, 0, gzu_r);
 						memory_install_write8_handler(space, 0xc000, 0xffff, 0, 0, gzu_w);
@@ -456,21 +460,21 @@ static void pk8020_set_bank(running_machine *machine,UINT8 data)
 						// ROM
 						memory_install_read_bank (space, 0x0000, 0x1fff, 0, 0, "bank1");
 						memory_install_write_bank(space, 0x0000, 0x1fff, 0, 0, "bank2");
-						memory_set_bankptr(machine, "bank1", machine->region("maincpu")->base() + 0x10000);
-						memory_set_bankptr(machine, "bank2", ram_get_ptr(machine->device(RAM_TAG)) + 0x0000);
+						memory_set_bankptr(machine, "bank1", mem + 0x10000);
+						memory_set_bankptr(machine, "bank2", ram + 0x0000);
 						// RAM
 						memory_install_read_bank (space, 0x2000, 0x3fff, 0, 0, "bank3");
 						memory_install_write_bank(space, 0x2000, 0x3fff, 0, 0, "bank4");
-						memory_set_bankptr(machine, "bank3", ram_get_ptr(machine->device(RAM_TAG)) + 0x2000);
-						memory_set_bankptr(machine, "bank4", ram_get_ptr(machine->device(RAM_TAG)) + 0x2000);
+						memory_set_bankptr(machine, "bank3", ram + 0x2000);
+						memory_set_bankptr(machine, "bank4", ram + 0x2000);
 						// Video RAM
 						memory_install_read8_handler (space, 0x4000, 0x7fff, 0, 0, gzu_r);
 						memory_install_write8_handler(space, 0x4000, 0x7fff, 0, 0, gzu_w);
 						// RAM
 						memory_install_read_bank (space, 0x8000, 0xfdff, 0, 0, "bank5");
 						memory_install_write_bank(space, 0x8000, 0xfdff, 0, 0, "bank6");
-						memory_set_bankptr(machine, "bank5", ram_get_ptr(machine->device(RAM_TAG)) + 0x8000);
-						memory_set_bankptr(machine, "bank6", ram_get_ptr(machine->device(RAM_TAG)) + 0x8000);
+						memory_set_bankptr(machine, "bank5", ram + 0x8000);
+						memory_set_bankptr(machine, "bank6", ram + 0x8000);
 						// Devices
 						memory_install_read8_handler (space, 0xfe00, 0xfeff, 0, 0, devices_r);
 						memory_install_write8_handler(space, 0xfe00, 0xfeff, 0, 0, devices_w);
@@ -484,16 +488,16 @@ static void pk8020_set_bank(running_machine *machine,UINT8 data)
 						// ROM
 						memory_install_read_bank (space, 0x0000, 0x3fff, 0, 0, "bank1");
 						memory_install_write_bank(space, 0x0000, 0x3fff, 0, 0, "bank2");
-						memory_set_bankptr(machine, "bank1", machine->region("maincpu")->base() + 0x10000);
-						memory_set_bankptr(machine, "bank2", ram_get_ptr(machine->device(RAM_TAG)) + 0x0000);
+						memory_set_bankptr(machine, "bank1", mem + 0x10000);
+						memory_set_bankptr(machine, "bank2", ram + 0x0000);
 						// Video RAM
 						memory_install_read8_handler (space, 0x4000, 0x7fff, 0, 0, gzu_r);
 						memory_install_write8_handler(space, 0x4000, 0x7fff, 0, 0, gzu_w);
 						// RAM
 						memory_install_read_bank (space, 0x8000, 0xfdff, 0, 0, "bank5");
 						memory_install_write_bank(space, 0x8000, 0xfdff, 0, 0, "bank6");
-						memory_set_bankptr(machine, "bank5", ram_get_ptr(machine->device(RAM_TAG)) + 0x8000);
-						memory_set_bankptr(machine, "bank6", ram_get_ptr(machine->device(RAM_TAG)) + 0x8000);
+						memory_set_bankptr(machine, "bank5", ram + 0x8000);
+						memory_set_bankptr(machine, "bank6", ram + 0x8000);
 						// Devices
 						memory_install_read8_handler (space, 0xfe00, 0xfeff, 0, 0, devices_r);
 						memory_install_write8_handler(space, 0xfe00, 0xfeff, 0, 0, devices_w);
@@ -507,16 +511,16 @@ static void pk8020_set_bank(running_machine *machine,UINT8 data)
 						// RAM
 						memory_install_read_bank (space, 0x0000, 0x3fff, 0, 0, "bank1");
 						memory_install_write_bank(space, 0x0000, 0x3fff, 0, 0, "bank2");
-						memory_set_bankptr(machine, "bank1", ram_get_ptr(machine->device(RAM_TAG)) + 0x0000);
-						memory_set_bankptr(machine, "bank2", ram_get_ptr(machine->device(RAM_TAG)) + 0x0000);
+						memory_set_bankptr(machine, "bank1", ram + 0x0000);
+						memory_set_bankptr(machine, "bank2", ram + 0x0000);
 						// Video RAM
 						memory_install_read8_handler (space, 0x4000, 0x7fff, 0, 0, gzu_r);
 						memory_install_write8_handler(space, 0x4000, 0x7fff, 0, 0, gzu_w);
 						// RAM
 						memory_install_read_bank (space, 0x8000, 0xfdff, 0, 0, "bank3");
 						memory_install_write_bank(space, 0x8000, 0xfdff, 0, 0, "bank4");
-						memory_set_bankptr(machine, "bank3", ram_get_ptr(machine->device(RAM_TAG)) + 0x8000);
-						memory_set_bankptr(machine, "bank4", ram_get_ptr(machine->device(RAM_TAG)) + 0x8000);
+						memory_set_bankptr(machine, "bank3", ram + 0x8000);
+						memory_set_bankptr(machine, "bank4", ram + 0x8000);
 						// Devices
 						memory_install_read8_handler (space, 0xfe00, 0xfeff, 0, 0, devices_r);
 						memory_install_write8_handler(space, 0xfe00, 0xfeff, 0, 0, devices_w);
@@ -530,17 +534,17 @@ static void pk8020_set_bank(running_machine *machine,UINT8 data)
 						// ROM
 						memory_install_read_bank (space, 0x0000, 0x5fff, 0, 0, "bank1");
 						memory_install_write_bank(space, 0x0000, 0x5fff, 0, 0, "bank2");
-						memory_set_bankptr(machine, "bank1", machine->region("maincpu")->base() + 0x10000);
-						memory_set_bankptr(machine, "bank2", ram_get_ptr(machine->device(RAM_TAG)) + 0x0000);
+						memory_set_bankptr(machine, "bank1", mem + 0x10000);
+						memory_set_bankptr(machine, "bank2", ram + 0x0000);
 						// RAM
 						memory_install_read_bank (space, 0x6000, 0xf7ff, 0, 0, "bank3");
 						memory_install_write_bank(space, 0x6000, 0xf7ff, 0, 0, "bank4");
-						memory_set_bankptr(machine, "bank3", ram_get_ptr(machine->device(RAM_TAG)) + 0x6000);
-						memory_set_bankptr(machine, "bank4", ram_get_ptr(machine->device(RAM_TAG)) + 0x6000);
+						memory_set_bankptr(machine, "bank3", ram + 0x6000);
+						memory_set_bankptr(machine, "bank4", ram + 0x6000);
 						// Keyboard
 						memory_install_read8_handler (space, 0xf800, 0xf9ff, 0, 0, keyboard_r);
 						memory_install_write_bank(space, 0xf800, 0xf9ff, 0, 0, "bank5");
-						memory_set_bankptr(machine, "bank5", ram_get_ptr(machine->device(RAM_TAG)) + 0xf800);
+						memory_set_bankptr(machine, "bank5", ram + 0xf800);
 						// System reg
 						memory_install_read8_handler (space, 0xfa00, 0xfaff, 0, 0, sysreg_r);
 						memory_install_write8_handler(space, 0xfa00, 0xfaff, 0, 0, sysreg_w);
@@ -557,17 +561,17 @@ static void pk8020_set_bank(running_machine *machine,UINT8 data)
 						// ROM
 						memory_install_read_bank (space, 0x0000, 0x1fff, 0, 0, "bank1");
 						memory_install_write_bank(space, 0x0000, 0x1fff, 0, 0, "bank2");
-						memory_set_bankptr(machine, "bank1", machine->region("maincpu")->base() + 0x10000);
-						memory_set_bankptr(machine, "bank2", ram_get_ptr(machine->device(RAM_TAG)) + 0x0000);
+						memory_set_bankptr(machine, "bank1", mem + 0x10000);
+						memory_set_bankptr(machine, "bank2", ram + 0x0000);
 						// RAM
 						memory_install_read_bank (space, 0x2000, 0xf7ff, 0, 0, "bank3");
 						memory_install_write_bank(space, 0x2000, 0xf7ff, 0, 0, "bank4");
-						memory_set_bankptr(machine, "bank3", ram_get_ptr(machine->device(RAM_TAG)) + 0x2000);
-						memory_set_bankptr(machine, "bank4", ram_get_ptr(machine->device(RAM_TAG)) + 0x2000);
+						memory_set_bankptr(machine, "bank3", ram + 0x2000);
+						memory_set_bankptr(machine, "bank4", ram + 0x2000);
 						// Keyboard
 						memory_install_read8_handler (space, 0xf800, 0xf9ff, 0, 0, keyboard_r);
 						memory_install_write_bank(space, 0xf800, 0xf9ff, 0, 0, "bank5");
-						memory_set_bankptr(machine, "bank5", ram_get_ptr(machine->device(RAM_TAG)) + 0xf800);
+						memory_set_bankptr(machine, "bank5", ram + 0xf800);
 						// System reg
 						memory_install_read8_handler (space, 0xfa00, 0xfaff, 0, 0, sysreg_r);
 						memory_install_write8_handler(space, 0xfa00, 0xfaff, 0, 0, sysreg_w);
@@ -584,17 +588,17 @@ static void pk8020_set_bank(running_machine *machine,UINT8 data)
 						// ROM
 						memory_install_read_bank (space, 0x0000, 0x3fff, 0, 0, "bank1");
 						memory_install_write_bank(space, 0x0000, 0x3fff, 0, 0, "bank2");
-						memory_set_bankptr(machine, "bank1", machine->region("maincpu")->base() + 0x10000);
-						memory_set_bankptr(machine, "bank2", ram_get_ptr(machine->device(RAM_TAG)) + 0x0000);
+						memory_set_bankptr(machine, "bank1", mem + 0x10000);
+						memory_set_bankptr(machine, "bank2", ram + 0x0000);
 						// RAM
 						memory_install_read_bank (space, 0x4000, 0xf7ff, 0, 0, "bank3");
 						memory_install_write_bank(space, 0x4000, 0xf7ff, 0, 0, "bank4");
-						memory_set_bankptr(machine, "bank3", ram_get_ptr(machine->device(RAM_TAG)) + 0x4000);
-						memory_set_bankptr(machine, "bank4", ram_get_ptr(machine->device(RAM_TAG)) + 0x4000);
+						memory_set_bankptr(machine, "bank3", ram + 0x4000);
+						memory_set_bankptr(machine, "bank4", ram + 0x4000);
 						// Keyboard
 						memory_install_read8_handler (space, 0xf800, 0xf9ff, 0, 0, keyboard_r);
 						memory_install_write_bank(space, 0xf800, 0xf9ff, 0, 0, "bank5");
-						memory_set_bankptr(machine, "bank5", ram_get_ptr(machine->device(RAM_TAG)) + 0xf800);
+						memory_set_bankptr(machine, "bank5", ram + 0xf800);
 						// System reg
 						memory_install_read8_handler (space, 0xfa00, 0xfaff, 0, 0, sysreg_r);
 						memory_install_write8_handler(space, 0xfa00, 0xfaff, 0, 0, sysreg_w);
@@ -611,12 +615,12 @@ static void pk8020_set_bank(running_machine *machine,UINT8 data)
 						// RAM
 						memory_install_read_bank (space, 0x0000, 0xf7ff, 0, 0, "bank1");
 						memory_install_write_bank(space, 0x0000, 0xf7ff, 0, 0, "bank2");
-						memory_set_bankptr(machine, "bank1", ram_get_ptr(machine->device(RAM_TAG)) + 0x0000);
-						memory_set_bankptr(machine, "bank2", ram_get_ptr(machine->device(RAM_TAG)) + 0x0000);
+						memory_set_bankptr(machine, "bank1", ram + 0x0000);
+						memory_set_bankptr(machine, "bank2", ram + 0x0000);
 						// Keyboard
 						memory_install_read8_handler (space, 0xf800, 0xf9ff, 0, 0, keyboard_r);
 						memory_install_write_bank(space, 0xf800, 0xf9ff, 0, 0, "bank3");
-						memory_set_bankptr(machine, "bank3", ram_get_ptr(machine->device(RAM_TAG)) + 0xf800);
+						memory_set_bankptr(machine, "bank3", ram + 0xf800);
 						// System reg
 						memory_install_read8_handler (space, 0xfa00, 0xfaff, 0, 0, sysreg_r);
 						memory_install_write8_handler(space, 0xfa00, 0xfaff, 0, 0, sysreg_w);
@@ -633,13 +637,13 @@ static void pk8020_set_bank(running_machine *machine,UINT8 data)
 						// ROM
 						memory_install_read_bank (space, 0x0000, 0x5fff, 0, 0, "bank1");
 						memory_install_write_bank(space, 0x0000, 0x5fff, 0, 0, "bank2");
-						memory_set_bankptr(machine, "bank1", machine->region("maincpu")->base() + 0x10000);
-						memory_set_bankptr(machine, "bank2", ram_get_ptr(machine->device(RAM_TAG)) + 0x0000);
+						memory_set_bankptr(machine, "bank1", mem + 0x10000);
+						memory_set_bankptr(machine, "bank2", ram + 0x0000);
 						// RAM
 						memory_install_read_bank (space, 0x6000, 0xfdff, 0, 0, "bank3");
 						memory_install_write_bank(space, 0x6000, 0xfdff, 0, 0, "bank4");
-						memory_set_bankptr(machine, "bank3", ram_get_ptr(machine->device(RAM_TAG)) + 0x6000);
-						memory_set_bankptr(machine, "bank4", ram_get_ptr(machine->device(RAM_TAG)) + 0x6000);
+						memory_set_bankptr(machine, "bank3", ram + 0x6000);
+						memory_set_bankptr(machine, "bank4", ram + 0x6000);
 						// Devices
 						memory_install_read8_handler (space, 0xfe00, 0xfeff, 0, 0, devices_r);
 						memory_install_write8_handler(space, 0xfe00, 0xfeff, 0, 0, devices_w);
@@ -653,13 +657,13 @@ static void pk8020_set_bank(running_machine *machine,UINT8 data)
 						// ROM
 						memory_install_read_bank (space, 0x0000, 0x1fff, 0, 0, "bank1");
 						memory_install_write_bank(space, 0x0000, 0x1fff, 0, 0, "bank2");
-						memory_set_bankptr(machine, "bank1", machine->region("maincpu")->base() + 0x10000);
-						memory_set_bankptr(machine, "bank2", ram_get_ptr(machine->device(RAM_TAG)) + 0x0000);
+						memory_set_bankptr(machine, "bank1", mem + 0x10000);
+						memory_set_bankptr(machine, "bank2", ram + 0x0000);
 						// RAM
 						memory_install_read_bank (space, 0x2000, 0xfdff, 0, 0, "bank3");
 						memory_install_write_bank(space, 0x2000, 0xfdff, 0, 0, "bank4");
-						memory_set_bankptr(machine, "bank3", ram_get_ptr(machine->device(RAM_TAG)) + 0x2000);
-						memory_set_bankptr(machine, "bank4", ram_get_ptr(machine->device(RAM_TAG)) + 0x2000);
+						memory_set_bankptr(machine, "bank3", ram + 0x2000);
+						memory_set_bankptr(machine, "bank4", ram + 0x2000);
 						// Devices
 						memory_install_read8_handler (space, 0xfe00, 0xfeff, 0, 0, devices_r);
 						memory_install_write8_handler(space, 0xfe00, 0xfeff, 0, 0, devices_w);
@@ -673,13 +677,13 @@ static void pk8020_set_bank(running_machine *machine,UINT8 data)
 						// ROM
 						memory_install_read_bank (space, 0x0000, 0x3fff, 0, 0, "bank1");
 						memory_install_write_bank(space, 0x0000, 0x3fff, 0, 0, "bank2");
-						memory_set_bankptr(machine, "bank1", machine->region("maincpu")->base() + 0x10000);
-						memory_set_bankptr(machine, "bank2", ram_get_ptr(machine->device(RAM_TAG)) + 0x0000);
+						memory_set_bankptr(machine, "bank1", mem + 0x10000);
+						memory_set_bankptr(machine, "bank2", ram + 0x0000);
 						// RAM
 						memory_install_read_bank (space, 0x4000, 0xfdff, 0, 0, "bank3");
 						memory_install_write_bank(space, 0x4000, 0xfdff, 0, 0, "bank4");
-						memory_set_bankptr(machine, "bank3", ram_get_ptr(machine->device(RAM_TAG)) + 0x4000);
-						memory_set_bankptr(machine, "bank4", ram_get_ptr(machine->device(RAM_TAG)) + 0x4000);
+						memory_set_bankptr(machine, "bank3", ram + 0x4000);
+						memory_set_bankptr(machine, "bank4", ram + 0x4000);
 						// Devices
 						memory_install_read8_handler (space, 0xfe00, 0xfeff, 0, 0, devices_r);
 						memory_install_write8_handler(space, 0xfe00, 0xfeff, 0, 0, devices_w);
@@ -693,8 +697,8 @@ static void pk8020_set_bank(running_machine *machine,UINT8 data)
 						// RAM
 						memory_install_read_bank (space, 0x0000, 0xfdff, 0, 0, "bank1");
 						memory_install_write_bank(space, 0x0000, 0xfdff, 0, 0, "bank2");
-						memory_set_bankptr(machine, "bank1", ram_get_ptr(machine->device(RAM_TAG)));
-						memory_set_bankptr(machine, "bank2", ram_get_ptr(machine->device(RAM_TAG)));
+						memory_set_bankptr(machine, "bank1", ram);
+						memory_set_bankptr(machine, "bank2", ram);
 						// Devices
 						memory_install_read8_handler (space, 0xfe00, 0xfeff, 0, 0, devices_r);
 						memory_install_write8_handler(space, 0xfe00, 0xfeff, 0, 0, devices_w);
@@ -708,13 +712,13 @@ static void pk8020_set_bank(running_machine *machine,UINT8 data)
 						// ROM
 						memory_install_read_bank (space, 0x0000, 0x5fff, 0, 0, "bank1");
 						memory_install_write_bank(space, 0x0000, 0x5fff, 0, 0, "bank2");
-						memory_set_bankptr(machine, "bank1", machine->region("maincpu")->base() + 0x10000);
-						memory_set_bankptr(machine, "bank2", ram_get_ptr(machine->device(RAM_TAG)) + 0x0000);
+						memory_set_bankptr(machine, "bank1", mem + 0x10000);
+						memory_set_bankptr(machine, "bank2", ram + 0x0000);
 						// RAM
 						memory_install_read_bank (space, 0x6000, 0xbeff, 0, 0, "bank3");
 						memory_install_write_bank(space, 0x6000, 0xbeff, 0, 0, "bank4");
-						memory_set_bankptr(machine, "bank3", ram_get_ptr(machine->device(RAM_TAG)) + 0x6000);
-						memory_set_bankptr(machine, "bank4", ram_get_ptr(machine->device(RAM_TAG)) + 0x6000);
+						memory_set_bankptr(machine, "bank3", ram + 0x6000);
+						memory_set_bankptr(machine, "bank4", ram + 0x6000);
 						// System reg
 						memory_install_read8_handler (space, 0xbf00, 0xbfff, 0, 0, sysreg_r);
 						memory_install_write8_handler(space, 0xbf00, 0xbfff, 0, 0, sysreg_w);
@@ -728,13 +732,13 @@ static void pk8020_set_bank(running_machine *machine,UINT8 data)
 						// ROM
 						memory_install_read_bank (space, 0x0000, 0x1fff, 0, 0, "bank1");
 						memory_install_write_bank(space, 0x0000, 0x1fff, 0, 0, "bank2");
-						memory_set_bankptr(machine, "bank1", machine->region("maincpu")->base() + 0x10000);
-						memory_set_bankptr(machine, "bank2", ram_get_ptr(machine->device(RAM_TAG)) + 0x0000);
+						memory_set_bankptr(machine, "bank1", mem + 0x10000);
+						memory_set_bankptr(machine, "bank2", ram + 0x0000);
 						// RAM
 						memory_install_read_bank (space, 0x2000, 0xbeff, 0, 0, "bank3");
 						memory_install_write_bank(space, 0x2000, 0xbeff, 0, 0, "bank4");
-						memory_set_bankptr(machine, "bank3", ram_get_ptr(machine->device(RAM_TAG)) + 0x2000);
-						memory_set_bankptr(machine, "bank4", ram_get_ptr(machine->device(RAM_TAG)) + 0x2000);
+						memory_set_bankptr(machine, "bank3", ram + 0x2000);
+						memory_set_bankptr(machine, "bank4", ram + 0x2000);
 						// System reg
 						memory_install_read8_handler (space, 0xbf00, 0xbfff, 0, 0, sysreg_r);
 						memory_install_write8_handler(space, 0xbf00, 0xbfff, 0, 0, sysreg_w);
@@ -748,13 +752,13 @@ static void pk8020_set_bank(running_machine *machine,UINT8 data)
 						// ROM
 						memory_install_read_bank (space, 0x0000, 0x3fff, 0, 0, "bank1");
 						memory_install_write_bank(space, 0x0000, 0x3fff, 0, 0, "bank2");
-						memory_set_bankptr(machine, "bank1", machine->region("maincpu")->base() + 0x10000);
-						memory_set_bankptr(machine, "bank2", ram_get_ptr(machine->device(RAM_TAG)) + 0x0000);
+						memory_set_bankptr(machine, "bank1", mem + 0x10000);
+						memory_set_bankptr(machine, "bank2", ram + 0x0000);
 						// RAM
 						memory_install_read_bank (space, 0x4000, 0xbeff, 0, 0, "bank3");
 						memory_install_write_bank(space, 0x4000, 0xbeff, 0, 0, "bank4");
-						memory_set_bankptr(machine, "bank3", ram_get_ptr(machine->device(RAM_TAG)) + 0x4000);
-						memory_set_bankptr(machine, "bank4", ram_get_ptr(machine->device(RAM_TAG)) + 0x4000);
+						memory_set_bankptr(machine, "bank3", ram + 0x4000);
+						memory_set_bankptr(machine, "bank4", ram + 0x4000);
 						// System reg
 						memory_install_read8_handler (space, 0xbf00, 0xbfff, 0, 0, sysreg_r);
 						memory_install_write8_handler(space, 0xbf00, 0xbfff, 0, 0, sysreg_w);
@@ -768,8 +772,8 @@ static void pk8020_set_bank(running_machine *machine,UINT8 data)
 						// RAM
 						memory_install_read_bank (space, 0x0000, 0xbeff, 0, 0, "bank1");
 						memory_install_write_bank(space, 0x0000, 0xbeff, 0, 0, "bank2");
-						memory_set_bankptr(machine, "bank1", ram_get_ptr(machine->device(RAM_TAG)));
-						memory_set_bankptr(machine, "bank2", ram_get_ptr(machine->device(RAM_TAG)));
+						memory_set_bankptr(machine, "bank1", ram);
+						memory_set_bankptr(machine, "bank2", ram);
 						// System reg
 						memory_install_read8_handler (space, 0xbf00, 0xbfff, 0, 0, sysreg_r);
 						memory_install_write8_handler(space, 0xbf00, 0xbfff, 0, 0, sysreg_w);
@@ -783,13 +787,13 @@ static void pk8020_set_bank(running_machine *machine,UINT8 data)
 						// ROM
 						memory_install_read_bank (space, 0x0000, 0x5fff, 0, 0, "bank1");
 						memory_install_write_bank(space, 0x0000, 0x5fff, 0, 0, "bank2");
-						memory_set_bankptr(machine, "bank1", machine->region("maincpu")->base() + 0x10000);
-						memory_set_bankptr(machine, "bank2", ram_get_ptr(machine->device(RAM_TAG)) + 0x0000);
+						memory_set_bankptr(machine, "bank1", mem + 0x10000);
+						memory_set_bankptr(machine, "bank2", ram + 0x0000);
 						// RAM
 						memory_install_read_bank (space, 0x6000, 0xbfff, 0, 0, "bank3");
 						memory_install_write_bank(space, 0x6000, 0xbfff, 0, 0, "bank4");
-						memory_set_bankptr(machine, "bank3", ram_get_ptr(machine->device(RAM_TAG)) + 0x6000);
-						memory_set_bankptr(machine, "bank4", ram_get_ptr(machine->device(RAM_TAG)) + 0x6000);
+						memory_set_bankptr(machine, "bank3", ram + 0x6000);
+						memory_set_bankptr(machine, "bank4", ram + 0x6000);
 						// Video RAM
 						memory_install_read8_handler (space, 0xc000, 0xffff, 0, 0, gzu_r);
 						memory_install_write8_handler(space, 0xc000, 0xffff, 0, 0, gzu_w);
@@ -800,13 +804,13 @@ static void pk8020_set_bank(running_machine *machine,UINT8 data)
 						// ROM
 						memory_install_read_bank (space, 0x0000, 0x1fff, 0, 0, "bank1");
 						memory_install_write_bank(space, 0x0000, 0x1fff, 0, 0, "bank2");
-						memory_set_bankptr(machine, "bank1", machine->region("maincpu")->base() + 0x10000);
-						memory_set_bankptr(machine, "bank2", ram_get_ptr(machine->device(RAM_TAG)) + 0x0000);
+						memory_set_bankptr(machine, "bank1", mem + 0x10000);
+						memory_set_bankptr(machine, "bank2", ram + 0x0000);
 						// RAM
 						memory_install_read_bank (space, 0x2000, 0xbfff, 0, 0, "bank3");
 						memory_install_write_bank(space, 0x2000, 0xbfff, 0, 0, "bank4");
-						memory_set_bankptr(machine, "bank3", ram_get_ptr(machine->device(RAM_TAG)) + 0x2000);
-						memory_set_bankptr(machine, "bank4", ram_get_ptr(machine->device(RAM_TAG)) + 0x2000);
+						memory_set_bankptr(machine, "bank3", ram + 0x2000);
+						memory_set_bankptr(machine, "bank4", ram + 0x2000);
 						// Video RAM
 						memory_install_read8_handler (space, 0xc000, 0xffff, 0, 0, gzu_r);
 						memory_install_write8_handler(space, 0xc000, 0xffff, 0, 0, gzu_w);
@@ -817,13 +821,13 @@ static void pk8020_set_bank(running_machine *machine,UINT8 data)
 						// ROM
 						memory_install_read_bank (space, 0x0000, 0x3fff, 0, 0, "bank1");
 						memory_install_write_bank(space, 0x0000, 0x3fff, 0, 0, "bank2");
-						memory_set_bankptr(machine, "bank1", machine->region("maincpu")->base() + 0x10000);
-						memory_set_bankptr(machine, "bank2", ram_get_ptr(machine->device(RAM_TAG)) + 0x0000);
+						memory_set_bankptr(machine, "bank1", mem + 0x10000);
+						memory_set_bankptr(machine, "bank2", ram + 0x0000);
 						// RAM
 						memory_install_read_bank (space, 0x4000, 0xbfff, 0, 0, "bank3");
 						memory_install_write_bank(space, 0x4000, 0xbfff, 0, 0, "bank4");
-						memory_set_bankptr(machine, "bank3", ram_get_ptr(machine->device(RAM_TAG)) + 0x4000);
-						memory_set_bankptr(machine, "bank4", ram_get_ptr(machine->device(RAM_TAG)) + 0x4000);
+						memory_set_bankptr(machine, "bank3", ram + 0x4000);
+						memory_set_bankptr(machine, "bank4", ram + 0x4000);
 						// Video RAM
 						memory_install_read8_handler (space, 0xc000, 0xffff, 0, 0, gzu_r);
 						memory_install_write8_handler(space, 0xc000, 0xffff, 0, 0, gzu_w);
@@ -834,8 +838,8 @@ static void pk8020_set_bank(running_machine *machine,UINT8 data)
 						// RAM
 						memory_install_read_bank (space, 0x0000, 0xbfff, 0, 0, "bank1");
 						memory_install_write_bank(space, 0x0000, 0xbfff, 0, 0, "bank2");
-						memory_set_bankptr(machine, "bank1", ram_get_ptr(machine->device(RAM_TAG)));
-						memory_set_bankptr(machine, "bank2", ram_get_ptr(machine->device(RAM_TAG)));
+						memory_set_bankptr(machine, "bank1", ram);
+						memory_set_bankptr(machine, "bank2", ram);
 						// Video RAM
 						memory_install_read8_handler (space, 0xc000, 0xffff, 0, 0, gzu_r);
 						memory_install_write8_handler(space, 0xc000, 0xffff, 0, 0, gzu_w);
@@ -854,14 +858,14 @@ static READ8_DEVICE_HANDLER(pk8020_porta_r)
 static WRITE8_DEVICE_HANDLER(pk8020_portc_w)
 {
 	pk8020_state *state = device->machine->driver_data<pk8020_state>();
-   state->video_page_access =(data>>6) & 3;
-   state->attr = (data >> 4) & 3;
-   state->wide = (data >> 3) & 1;
-   state->font = (data >> 2) & 1;
-   state->video_page = (data & 3);
+	state->video_page_access =(data>>6) & 3;
+	state->attr = (data >> 4) & 3;
+	state->wide = (data >> 3) & 1;
+	state->font = (data >> 2) & 1;
+	state->video_page = (data & 3);
 
 
-   state->portc_data = data;
+	state->portc_data = data;
 }
 
 static WRITE8_DEVICE_HANDLER(pk8020_portb_w)

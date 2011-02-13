@@ -89,6 +89,9 @@ Imgtool Changes:
 
 Source Changes:
 ----------------
+- The core is based on MAME 0.141u2.  This incorporates all features of the
+  update to this core.  [MAME team]
+
 - Added support for a new template to -snapname to use software names for 
   snapshots. It is now possible to use %d_XXXX to name snaps after the name
   of the file mounted in the device XXXX, being XXXX the brief name of any
@@ -105,7 +108,7 @@ Source Changes:
   Curt Coder, MESSfan, Fabio Priuli]
 
 - Cleanups; static qualifiers, added driver_states, consistent get_safe_token
-  usage.  [Atari Ace]
+  usage, reduced calls to ram_get_ptr() and region(...)->base().  [Atari Ace]
 
 
 

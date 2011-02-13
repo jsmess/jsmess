@@ -343,13 +343,14 @@ INPUT_PORTS_END
 static MACHINE_RESET(pyl601)
 {
 	pyl601_state *state = machine->driver_data<pyl601_state>();
+	UINT8 *ram = ram_get_ptr(machine->device(RAM_TAG));
 	state->key_code = 0xff;
-	memory_set_bankptr(machine, "bank1", ram_get_ptr(machine->device(RAM_TAG)) + 0x0000);
-	memory_set_bankptr(machine, "bank2", ram_get_ptr(machine->device(RAM_TAG)) + 0xc000);
-	memory_set_bankptr(machine, "bank3", ram_get_ptr(machine->device(RAM_TAG)) + 0xe000);
-	memory_set_bankptr(machine, "bank4", ram_get_ptr(machine->device(RAM_TAG)) + 0xe700);
+	memory_set_bankptr(machine, "bank1", ram + 0x0000);
+	memory_set_bankptr(machine, "bank2", ram + 0xc000);
+	memory_set_bankptr(machine, "bank3", ram + 0xe000);
+	memory_set_bankptr(machine, "bank4", ram + 0xe700);
 	memory_set_bankptr(machine, "bank5", machine->region("maincpu")->base() + 0xf000);
-	memory_set_bankptr(machine, "bank6", ram_get_ptr(machine->device(RAM_TAG)) + 0xf000);
+	memory_set_bankptr(machine, "bank6", ram + 0xf000);
 
 	machine->device("maincpu")->reset();
 }

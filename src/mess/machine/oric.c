@@ -1081,7 +1081,7 @@ static void oric_common_init_machine(running_machine *machine)
 	state->irqs = 0;
 	state->ram_0x0c000 = NULL;
 
-    machine->scheduler().timer_pulse(attotime::from_hz(4800), FUNC(oric_refresh_tape));
+	machine->scheduler().timer_pulse(attotime::from_hz(4800), FUNC(oric_refresh_tape));
 }
 
 MACHINE_START( oric )
@@ -1378,17 +1378,18 @@ static WRITE8_DEVICE_HANDLER(telestrat_via2_out_b_func)
 static void telestrat_via2_irq_func(device_t *device, int state)
 {
 	oric_state *drvstate = device->machine->driver_data<oric_state>();
-    drvstate->irqs &=~(1<<2);
+	drvstate->irqs &=~(1<<2);
 
 	if (state)
 	{
-        //logerror("telestrat via2 interrupt\n");
+		//logerror("telestrat via2 interrupt\n");
 
-        drvstate->irqs |=(1<<2);
+		drvstate->irqs |=(1<<2);
 	}
 
-    oric_refresh_ints(device->machine);
+	oric_refresh_ints(device->machine);
 }
+
 const via6522_interface telestrat_via2_interface=
 {
 	DEVCB_HANDLER(telestrat_via2_in_a_func),
@@ -1425,6 +1426,8 @@ static void telestrat_acia_callback(running_machine *machine, int irq_state)
 MACHINE_START( telestrat )
 {
 	oric_state *state = machine->driver_data<oric_state>();
+	UINT8 *mem = machine->region("maincpu")->base();
+
 	oric_common_init_machine(machine);
 
 	state->is_telestrat = 1;
@@ -1440,27 +1443,27 @@ MACHINE_START( telestrat )
 
 	/* initialise default cartridge */
 	state->telestrat_blocks[3].MemType = TELESTRAT_MEM_BLOCK_ROM;
-	state->telestrat_blocks[3].ptr = machine->region("maincpu")->base()+0x010000;
+	state->telestrat_blocks[3].ptr = mem+0x010000;
 
 	state->telestrat_blocks[4].MemType = TELESTRAT_MEM_BLOCK_RAM;
 	state->telestrat_blocks[4].ptr = auto_alloc_array(machine, UINT8, 16384);
 
 	/* initialise default cartridge */
 	state->telestrat_blocks[5].MemType = TELESTRAT_MEM_BLOCK_ROM;
-	state->telestrat_blocks[5].ptr = machine->region("maincpu")->base()+0x014000;
+	state->telestrat_blocks[5].ptr = mem+0x014000;
 
 	/* initialise default cartridge */
 	state->telestrat_blocks[6].MemType = TELESTRAT_MEM_BLOCK_ROM;
-	state->telestrat_blocks[6].ptr = machine->region("maincpu")->base()+0x018000;
+	state->telestrat_blocks[6].ptr = mem+0x018000;
 
 	/* initialise default cartridge */
 	state->telestrat_blocks[7].MemType = TELESTRAT_MEM_BLOCK_ROM;
-	state->telestrat_blocks[7].ptr = machine->region("maincpu")->base()+0x01c000;
+	state->telestrat_blocks[7].ptr = mem+0x01c000;
 
 	state->telestrat_bank_selection = 7;
 	telestrat_refresh_mem(machine);
 
 	/* disable os rom, enable microdisc rom */
 	/* 0x0c000-0x0dfff will be ram, 0x0e000-0x0ffff will be microdisc rom */
-    state->port_314_w = 0x0ff^((1<<7) | (1<<1));
+	state->port_314_w = 0x0ff^((1<<7) | (1<<1));
 }

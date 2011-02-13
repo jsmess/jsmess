@@ -1547,7 +1547,7 @@ static void AmstradCPC_GA_SetRamConfiguration(running_machine *machine)
 /* if b5 = 0 */
 	if(((state->GateArray_RamConfiguration) & (1<<5)) == 0)
 	{
-	    for (i=0;i<4;i++)
+		for (i=0;i<4;i++)
 		{
 			BankIndex = RamConfigurations[(ConfigurationIndex << 2) + i];
 			BankAddr = ram_get_ptr(machine->device(RAM_TAG)) + (BankIndex << 14);
@@ -1770,18 +1770,18 @@ READ8_HANDLER( amstrad_plus_asic_6000_r )
 	}
 #if 0
 	if(offset == 0x0c0f)  // DMA status and control
-        {
-            int result = 0;
-            if(state->plus_irq_cause == 0x00)
-                result |= 0x40;
-            if(state->plus_irq_cause == 0x02)
-                result |= 0x20;
-            if(state->plus_irq_cause == 0x04)
-                result |= 0x10;
-            if(state->plus_irq_cause == 0x06)
-                result |= 0x80;
-            return result;
-        }
+	{
+		int result = 0;
+		if(state->plus_irq_cause == 0x00)
+			result |= 0x40;
+		if(state->plus_irq_cause == 0x02)
+			result |= 0x20;
+		if(state->plus_irq_cause == 0x04)
+			result |= 0x10;
+		if(state->plus_irq_cause == 0x06)
+			result |= 0x80;
+		return result;
+	}
 #endif
 	return state->asic.ram[offset+0x2000];
 }
@@ -1945,6 +1945,7 @@ static WRITE8_HANDLER( aleste_msx_mapper )
 	int ramptr = (data & 0x1f) * 0x4000;
 	int rampage = data & 0x1f;
 	int function = (data & 0xc0) >> 6;
+	UINT8 *ram = ram_get_ptr(space->machine->device(RAM_TAG));
 
 	// It is assumed that functions are all mapped to each port &7cff-&7fff, and b8 and b9 are only used for RAM bank location
 	switch(function)
@@ -1962,38 +1963,38 @@ static WRITE8_HANDLER( aleste_msx_mapper )
 		switch(page)
 		{
 		case 0:  /* 0x0000 - 0x3fff */
-			memory_set_bankptr(space->machine,"bank1",ram_get_ptr(space->machine->device(RAM_TAG))+ramptr);
-			memory_set_bankptr(space->machine,"bank2",ram_get_ptr(space->machine->device(RAM_TAG))+ramptr+0x2000);
-			memory_set_bankptr(space->machine,"bank9",ram_get_ptr(space->machine->device(RAM_TAG))+ramptr);
-			memory_set_bankptr(space->machine,"bank10",ram_get_ptr(space->machine->device(RAM_TAG))+ramptr+0x2000);
-			state->Aleste_RamBanks[0] = ram_get_ptr(space->machine->device(RAM_TAG))+ramptr;
+			memory_set_bankptr(space->machine,"bank1",ram+ramptr);
+			memory_set_bankptr(space->machine,"bank2",ram+ramptr+0x2000);
+			memory_set_bankptr(space->machine,"bank9",ram+ramptr);
+			memory_set_bankptr(space->machine,"bank10",ram+ramptr+0x2000);
+			state->Aleste_RamBanks[0] = ram+ramptr;
 			state->aleste_active_page[0] = data;
 			logerror("RAM: RAM location 0x%06x (page %02x) mapped to 0x0000\n",ramptr,rampage);
 			break;
 		case 1:  /* 0x4000 - 0x7fff */
-			memory_set_bankptr(space->machine,"bank3",ram_get_ptr(space->machine->device(RAM_TAG))+ramptr);
-			memory_set_bankptr(space->machine,"bank4",ram_get_ptr(space->machine->device(RAM_TAG))+ramptr+0x2000);
-			memory_set_bankptr(space->machine,"bank11",ram_get_ptr(space->machine->device(RAM_TAG))+ramptr);
-			memory_set_bankptr(space->machine,"bank12",ram_get_ptr(space->machine->device(RAM_TAG))+ramptr+0x2000);
-			state->Aleste_RamBanks[1] = ram_get_ptr(space->machine->device(RAM_TAG))+ramptr;
+			memory_set_bankptr(space->machine,"bank3",ram+ramptr);
+			memory_set_bankptr(space->machine,"bank4",ram+ramptr+0x2000);
+			memory_set_bankptr(space->machine,"bank11",ram+ramptr);
+			memory_set_bankptr(space->machine,"bank12",ram+ramptr+0x2000);
+			state->Aleste_RamBanks[1] = ram+ramptr;
 			state->aleste_active_page[1] = data;
 			logerror("RAM: RAM location 0x%06x (page %02x) mapped to 0x4000\n",ramptr,rampage);
 			break;
 		case 2:  /* 0x8000 - 0xbfff */
-			memory_set_bankptr(space->machine,"bank5",ram_get_ptr(space->machine->device(RAM_TAG))+ramptr);
-			memory_set_bankptr(space->machine,"bank6",ram_get_ptr(space->machine->device(RAM_TAG))+ramptr+0x2000);
-			memory_set_bankptr(space->machine,"bank13",ram_get_ptr(space->machine->device(RAM_TAG))+ramptr);
-			memory_set_bankptr(space->machine,"bank14",ram_get_ptr(space->machine->device(RAM_TAG))+ramptr+0x2000);
-			state->Aleste_RamBanks[2] = ram_get_ptr(space->machine->device(RAM_TAG))+ramptr;
+			memory_set_bankptr(space->machine,"bank5",ram+ramptr);
+			memory_set_bankptr(space->machine,"bank6",ram+ramptr+0x2000);
+			memory_set_bankptr(space->machine,"bank13",ram+ramptr);
+			memory_set_bankptr(space->machine,"bank14",ram+ramptr+0x2000);
+			state->Aleste_RamBanks[2] = ram+ramptr;
 			state->aleste_active_page[2] = data;
 			logerror("RAM: RAM location 0x%06x (page %02x) mapped to 0x8000\n",ramptr,rampage);
 			break;
 		case 3:  /* 0xc000 - 0xffff */
-			memory_set_bankptr(space->machine,"bank7",ram_get_ptr(space->machine->device(RAM_TAG))+ramptr);
-			memory_set_bankptr(space->machine,"bank8",ram_get_ptr(space->machine->device(RAM_TAG))+ramptr+0x2000);
-			memory_set_bankptr(space->machine,"bank15",ram_get_ptr(space->machine->device(RAM_TAG))+ramptr);
-			memory_set_bankptr(space->machine,"bank16",ram_get_ptr(space->machine->device(RAM_TAG))+ramptr+0x2000);
-			state->Aleste_RamBanks[3] = ram_get_ptr(space->machine->device(RAM_TAG))+ramptr;
+			memory_set_bankptr(space->machine,"bank7",ram+ramptr);
+			memory_set_bankptr(space->machine,"bank8",ram+ramptr+0x2000);
+			memory_set_bankptr(space->machine,"bank15",ram+ramptr);
+			memory_set_bankptr(space->machine,"bank16",ram+ramptr+0x2000);
+			state->Aleste_RamBanks[3] = ram+ramptr;
 			state->aleste_active_page[3] = data;
 			logerror("RAM: RAM location 0x%06x (page %02x) mapped to 0xc000\n",ramptr,rampage);
 			break;
@@ -2095,19 +2096,21 @@ READ8_HANDLER ( amstrad_cpc_io_r )
 		{
 		case 0x02:
 			data = mc6845_status_r( mc6845, 0 );
-//          /* CRTC Type 1 : Read Status Register
-//               CRTC Type 3 or 4 : Read from selected internal 6845 register */
-//          switch(crtc_type) {
-//          case M6845_PERSONALITY_UM6845R:
-//              data = amstrad_CRTC_CR; /* Read Status Register */
-//              break;
-//          case M6845_PERSONALITY_AMS40489:
-//          case M6845_PERSONALITY_PREASIC:
-//              data = m6845_register_r(0);
-//              break;
-//          default:
-//              break;
-//          }
+#if 0
+			/* CRTC Type 1 : Read Status Register
+               CRTC Type 3 or 4 : Read from selected internal 6845 register */
+			switch(crtc_type) {
+			case M6845_PERSONALITY_UM6845R:
+				data = amstrad_CRTC_CR; /* Read Status Register */
+				break;
+			case M6845_PERSONALITY_AMS40489:
+			case M6845_PERSONALITY_PREASIC:
+				data = m6845_register_r(0);
+				break;
+			default:
+				break;
+			}
+#endif
 			break;
 		case 0x03:
 			/* All CRTC type : Read from selected internal 6845 register Read only */
@@ -2519,7 +2522,7 @@ static void amstrad_reset_machine(running_machine *machine)
 	/* set ram config 0 */
 	amstrad_GateArray_write(machine, 0x0c0);
 
-  // Get manufacturer name and TV refresh rate from PCB link (dipswitch for mess emulation)
+	// Get manufacturer name and TV refresh rate from PCB link (dipswitch for mess emulation)
 	state->ppi_port_inputs[amstrad_ppi_PortB] = (((input_port_read(machine, "solder_links")&MANUFACTURER_NAME)<<1) | (input_port_read(machine, "solder_links")&TV_REFRESH_RATE));
 
 	if ( state->system_type == SYSTEM_PLUS || state->system_type == SYSTEM_GX4000 )
@@ -3461,11 +3464,11 @@ DEVICE_IMAGE_LOAD(amstrad_plus_cartridge)
 #if 0
 static DEVICE_IMAGE_LOAD( aleste )
 {
-    if (device_load_basicdsk_floppy(image)==IMAGE_INIT_PASS)
-    {
-        basicdsk_set_geometry(image, 80, 2, 9, 512, 0x01, 0, FALSE);
-        return IMAGE_INIT_PASS;
-    }
-    return IMAGE_INIT_FAIL;
+	if (device_load_basicdsk_floppy(image)==IMAGE_INIT_PASS)
+	{
+		basicdsk_set_geometry(image, 80, 2, 9, 512, 0x01, 0, FALSE);
+		return IMAGE_INIT_PASS;
+	}
+	return IMAGE_INIT_FAIL;
 }
 #endif

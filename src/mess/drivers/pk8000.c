@@ -37,6 +37,7 @@ static device_t *cassette_device_image(running_machine *machine)
 static void pk8000_set_bank(running_machine *machine,UINT8 data)
 {
 	UINT8 *rom = machine->region("maincpu")->base();
+	UINT8 *ram = ram_get_ptr(machine->device(RAM_TAG));
 	UINT8 block1 = data & 3;
 	UINT8 block2 = (data >> 2) & 3;
 	UINT8 block3 = (data >> 4) & 3;
@@ -45,50 +46,50 @@ static void pk8000_set_bank(running_machine *machine,UINT8 data)
 	switch(block1) {
 		case 0:
 				memory_set_bankptr(machine, "bank1", rom + 0x10000);
-				memory_set_bankptr(machine, "bank5", ram_get_ptr(machine->device(RAM_TAG)));
+				memory_set_bankptr(machine, "bank5", ram);
 				break;
 		case 1: break;
 		case 2: break;
 		case 3:
-				memory_set_bankptr(machine, "bank1", ram_get_ptr(machine->device(RAM_TAG)));
-				memory_set_bankptr(machine, "bank5", ram_get_ptr(machine->device(RAM_TAG)));
+				memory_set_bankptr(machine, "bank1", ram);
+				memory_set_bankptr(machine, "bank5", ram);
 				break;
 	}
 
 	switch(block2) {
 		case 0:
 				memory_set_bankptr(machine, "bank2", rom + 0x14000);
-				memory_set_bankptr(machine, "bank6", ram_get_ptr(machine->device(RAM_TAG)) + 0x4000);
+				memory_set_bankptr(machine, "bank6", ram + 0x4000);
 				break;
 		case 1: break;
 		case 2: break;
 		case 3:
-				memory_set_bankptr(machine, "bank2", ram_get_ptr(machine->device(RAM_TAG)) + 0x4000);
-				memory_set_bankptr(machine, "bank6", ram_get_ptr(machine->device(RAM_TAG)) + 0x4000);
+				memory_set_bankptr(machine, "bank2", ram + 0x4000);
+				memory_set_bankptr(machine, "bank6", ram + 0x4000);
 				break;
 	}
 	switch(block3) {
 		case 0:
 				memory_set_bankptr(machine, "bank3", rom + 0x18000);
-				memory_set_bankptr(machine, "bank7", ram_get_ptr(machine->device(RAM_TAG)) + 0x8000);
+				memory_set_bankptr(machine, "bank7", ram + 0x8000);
 				break;
 		case 1: break;
 		case 2: break;
 		case 3:
-				memory_set_bankptr(machine, "bank3", ram_get_ptr(machine->device(RAM_TAG)) + 0x8000);
-				memory_set_bankptr(machine, "bank7", ram_get_ptr(machine->device(RAM_TAG)) + 0x8000);
+				memory_set_bankptr(machine, "bank3", ram + 0x8000);
+				memory_set_bankptr(machine, "bank7", ram + 0x8000);
 				break;
 	}
 	switch(block4) {
 		case 0:
 				memory_set_bankptr(machine, "bank4", rom + 0x1c000);
-				memory_set_bankptr(machine, "bank8", ram_get_ptr(machine->device(RAM_TAG)) + 0xc000);
+				memory_set_bankptr(machine, "bank8", ram + 0xc000);
 				break;
 		case 1: break;
 		case 2: break;
 		case 3:
-				memory_set_bankptr(machine, "bank4", ram_get_ptr(machine->device(RAM_TAG)) + 0xc000);
-				memory_set_bankptr(machine, "bank8", ram_get_ptr(machine->device(RAM_TAG)) + 0xc000);
+				memory_set_bankptr(machine, "bank4", ram + 0xc000);
+				memory_set_bankptr(machine, "bank8", ram + 0xc000);
 				break;
 	}
 }
@@ -337,38 +338,38 @@ static const cassette_config pk8000_cassette_config =
 };
 
 static MACHINE_CONFIG_START( pk8000, pk8000_state )
-    /* basic machine hardware */
-    MCFG_CPU_ADD("maincpu",I8080, 1780000)
-    MCFG_CPU_PROGRAM_MAP(pk8000_mem)
-    MCFG_CPU_IO_MAP(pk8000_io)
-    MCFG_CPU_VBLANK_INT("screen", pk8000_interrupt)
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu",I8080, 1780000)
+	MCFG_CPU_PROGRAM_MAP(pk8000_mem)
+	MCFG_CPU_IO_MAP(pk8000_io)
+	MCFG_CPU_VBLANK_INT("screen", pk8000_interrupt)
 
-    MCFG_MACHINE_RESET(pk8000)
+	MCFG_MACHINE_RESET(pk8000)
 
-    /* video hardware */
-    MCFG_SCREEN_ADD("screen", RASTER)
-    MCFG_SCREEN_REFRESH_RATE(50)
-    MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-    MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-    MCFG_SCREEN_SIZE(256+32, 192+32)
-    MCFG_SCREEN_VISIBLE_AREA(0, 256+32-1, 0, 192+32-1)
-    MCFG_PALETTE_LENGTH(16)
-    MCFG_PALETTE_INIT(pk8000)
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(256+32, 192+32)
+	MCFG_SCREEN_VISIBLE_AREA(0, 256+32-1, 0, 192+32-1)
+	MCFG_PALETTE_LENGTH(16)
+	MCFG_PALETTE_INIT(pk8000)
 
-    MCFG_VIDEO_START(pk8000)
-    MCFG_VIDEO_UPDATE(pk8000)
+	MCFG_VIDEO_START(pk8000)
+	MCFG_VIDEO_UPDATE(pk8000)
 
-    MCFG_I8255A_ADD( "ppi8255_1", pk8000_ppi8255_interface_1 )
-    MCFG_I8255A_ADD( "ppi8255_2", pk8000_ppi8255_interface_2 )
+	MCFG_I8255A_ADD( "ppi8255_1", pk8000_ppi8255_interface_1 )
+	MCFG_I8255A_ADD( "ppi8255_2", pk8000_ppi8255_interface_2 )
 
-    /* audio hardware */
+	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MCFG_SOUND_WAVE_ADD("wave", "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-    MCFG_CASSETTE_ADD( "cassette", pk8000_cassette_config )
+	MCFG_CASSETTE_ADD( "cassette", pk8000_cassette_config )
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -377,18 +378,18 @@ MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( vesta )
-  ROM_REGION( 0x18000, "maincpu", ROMREGION_ERASEFF )
-  ROM_LOAD( "vesta.rom", 0x10000, 0x4000, CRC(fbf7e2cc) SHA1(4bc5873066124bd926c3c6aa2fd1a062c87af339))
+	ROM_REGION( 0x18000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "vesta.rom", 0x10000, 0x4000, CRC(fbf7e2cc) SHA1(4bc5873066124bd926c3c6aa2fd1a062c87af339))
 ROM_END
 
 ROM_START( hobby )
-  ROM_REGION( 0x18000, "maincpu", ROMREGION_ERASEFF )
-  ROM_LOAD( "hobby.rom", 0x10000, 0x4000, CRC(a25b4b2c) SHA1(0d86e6e4be8d1aa389bfa9dd79e3604a356729f7))
+	ROM_REGION( 0x18000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "hobby.rom", 0x10000, 0x4000, CRC(a25b4b2c) SHA1(0d86e6e4be8d1aa389bfa9dd79e3604a356729f7))
 ROM_END
 
 ROM_START( pk8002 )
-  ROM_REGION( 0x18000, "maincpu", ROMREGION_ERASEFF )
-  ROM_LOAD( "pk8002.rom", 0x10000, 0x4000, CRC(07b9ae71) SHA1(2137a41cc095c7aba58b7b109fce63f30a4568b2))
+	ROM_REGION( 0x18000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "pk8002.rom", 0x10000, 0x4000, CRC(07b9ae71) SHA1(2137a41cc095c7aba58b7b109fce63f30a4568b2))
 ROM_END
 
 /* Driver */

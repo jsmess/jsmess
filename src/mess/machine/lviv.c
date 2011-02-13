@@ -27,15 +27,17 @@
 static void lviv_update_memory (running_machine *machine)
 {
 	lviv_state *state = machine->driver_data<lviv_state>();
+	UINT8 *ram = ram_get_ptr(machine->device(RAM_TAG));
+
 	if (state->ppi_port_outputs[0][2] & 0x02)
 	{
-		memory_set_bankptr(machine,"bank1", ram_get_ptr(machine->device(RAM_TAG)));
-		memory_set_bankptr(machine,"bank2", ram_get_ptr(machine->device(RAM_TAG)) + 0x4000);
+		memory_set_bankptr(machine,"bank1", ram);
+		memory_set_bankptr(machine,"bank2", ram + 0x4000);
 	}
 	else
 	{
-		memory_set_bankptr(machine,"bank1", ram_get_ptr(machine->device(RAM_TAG)) + 0x8000);
-		memory_set_bankptr(machine,"bank2", ram_get_ptr(machine->device(RAM_TAG)) + 0xc000);
+		memory_set_bankptr(machine,"bank1", ram + 0x8000);
+		memory_set_bankptr(machine,"bank2", ram + 0xc000);
 	}
 }
 
@@ -175,6 +177,8 @@ WRITE8_HANDLER ( lviv_io_w )
 	address_space *cpuspace = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	if (state->startup_mem_map)
 	{
+		UINT8 *ram = ram_get_ptr(space->machine->device(RAM_TAG));
+
 		state->startup_mem_map = 0;
 
 		memory_install_write_bank(cpuspace, 0x0000, 0x3fff, 0, 0, "bank1");
@@ -182,9 +186,9 @@ WRITE8_HANDLER ( lviv_io_w )
 		memory_install_write_bank(cpuspace, 0x8000, 0xbfff, 0, 0, "bank3");
 		memory_unmap_write(cpuspace, 0xC000, 0xffff, 0, 0);
 
-		memory_set_bankptr(space->machine,"bank1", ram_get_ptr(space->machine->device(RAM_TAG)));
-		memory_set_bankptr(space->machine,"bank2", ram_get_ptr(space->machine->device(RAM_TAG)) + 0x4000);
-		memory_set_bankptr(space->machine,"bank3", ram_get_ptr(space->machine->device(RAM_TAG)) + 0x8000);
+		memory_set_bankptr(space->machine,"bank1", ram);
+		memory_set_bankptr(space->machine,"bank2", ram + 0x4000);
+		memory_set_bankptr(space->machine,"bank3", ram + 0x8000);
 		memory_set_bankptr(space->machine,"bank4", space->machine->region("maincpu")->base() + 0x010000);
 	}
 	else
@@ -232,6 +236,8 @@ MACHINE_RESET( lviv )
 {
 	lviv_state *state = machine->driver_data<lviv_state>();
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	UINT8 *mem;
+
 	space->set_direct_update_handler(direct_update_delegate_create_static(lviv_directoverride, *machine));
 
 	state->video_ram = ram_get_ptr(machine->device(RAM_TAG)) + 0xc000;
@@ -243,10 +249,11 @@ MACHINE_RESET( lviv )
 	memory_unmap_write(space, 0x8000, 0xbfff, 0, 0);
 	memory_unmap_write(space, 0xC000, 0xffff, 0, 0);
 
-	memory_set_bankptr(machine,"bank1", machine->region("maincpu")->base() + 0x010000);
-	memory_set_bankptr(machine,"bank2", machine->region("maincpu")->base() + 0x010000);
-	memory_set_bankptr(machine,"bank3", machine->region("maincpu")->base() + 0x010000);
-	memory_set_bankptr(machine,"bank4", machine->region("maincpu")->base() + 0x010000);
+	mem = machine->region("maincpu")->base();
+	memory_set_bankptr(machine,"bank1", mem + 0x010000);
+	memory_set_bankptr(machine,"bank2", mem + 0x010000);
+	memory_set_bankptr(machine,"bank3", mem + 0x010000);
+	memory_set_bankptr(machine,"bank4", mem + 0x010000);
 
 	/*machine->scheduler().timer_pulse(TIME_IN_NSEC(200), FUNC(lviv_draw_pixel));*/
 

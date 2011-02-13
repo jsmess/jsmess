@@ -131,18 +131,19 @@ MACHINE_RESET( llc2 )
 WRITE8_HANDLER( llc2_rom_disable_w )
 {
 	address_space *mem_space = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	UINT8 *ram = ram_get_ptr(space->machine->device(RAM_TAG));
 
 	memory_install_write_bank(mem_space, 0x0000, 0xbfff, 0, 0, "bank1");
-	memory_set_bankptr(space->machine, "bank1", ram_get_ptr(space->machine->device(RAM_TAG)));
+	memory_set_bankptr(space->machine, "bank1", ram);
 
 	memory_install_write_bank(mem_space, 0x4000, 0x5fff, 0, 0, "bank2");
-	memory_set_bankptr(space->machine, "bank2", ram_get_ptr(space->machine->device(RAM_TAG)) + 0x4000);
+	memory_set_bankptr(space->machine, "bank2", ram + 0x4000);
 
 	memory_install_write_bank(mem_space, 0x6000, 0xbfff, 0, 0, "bank3");
-	memory_set_bankptr(space->machine, "bank3", ram_get_ptr(space->machine->device(RAM_TAG)) + 0x6000);
+	memory_set_bankptr(space->machine, "bank3", ram + 0x6000);
 
 	memory_install_write_bank(mem_space, 0xc000, 0xffff, 0, 0, "bank4");
-	memory_set_bankptr(space->machine, "bank4", ram_get_ptr(space->machine->device(RAM_TAG)) + 0xc000);
+	memory_set_bankptr(space->machine, "bank4", ram + 0xc000);
 
 }
 

@@ -21,6 +21,7 @@ VIDEO_UPDATE( vector06 )
 	UINT8 code1,code2,code3,code4;
 	UINT8 col;
 	int y, x, b,draw_y;
+	UINT8 *ram = ram_get_ptr(screen->machine->device(RAM_TAG));
 
 	int width = (state->video_mode==0x00) ? 256 : 512;
 	rectangle screen_area = {0,width+64-1,0,256+64-1};
@@ -34,10 +35,10 @@ VIDEO_UPDATE( vector06 )
 		{
 			// port A form 8255 also used as scroll
 			draw_y = ((255-y-state->keyboard_mask) & 0xff) +32;
-			code1 = ram_get_ptr(screen->machine->device(RAM_TAG))[0x8000 + x*256 + y];
-			code2 = ram_get_ptr(screen->machine->device(RAM_TAG))[0xa000 + x*256 + y];
-			code3 = ram_get_ptr(screen->machine->device(RAM_TAG))[0xc000 + x*256 + y];
-			code4 = ram_get_ptr(screen->machine->device(RAM_TAG))[0xe000 + x*256 + y];
+			code1 = ram[0x8000 + x*256 + y];
+			code2 = ram[0xa000 + x*256 + y];
+			code3 = ram[0xc000 + x*256 + y];
+			code4 = ram[0xe000 + x*256 + y];
 			for (b = 0; b < 8; b++)
 			{
 				col = ((code1 >> b) & 0x01) * 8 + ((code2 >> b) & 0x01) * 4 + ((code3 >> b) & 0x01)* 2+ ((code4 >> b) & 0x01);

@@ -23,17 +23,18 @@ VIDEO_UPDATE( orion128 )
 	int y, x,b;
 	int orionproshift = (state->orion128_video_mode & 0x10) ? 1 : 0;
 	int part1addr = (3-((state->orion128_video_page & 3) | orionproshift)) * 0x4000;
-
 	int part2addr = part1addr + 0x10000;
 	int video_mode = state->orion128_video_mode & state->video_mode_mask;
+	UINT8 *ram = ram_get_ptr(screen->machine->device(RAM_TAG));
+
 	for (x = 0; x < state->orion128_video_width; x++)
 	{
 		for (y = 0; y < 256; y++)
 		{
-			code1 = ram_get_ptr(screen->machine->device(RAM_TAG))[part1addr + y + x*256];
-			code2 = ram_get_ptr(screen->machine->device(RAM_TAG))[part2addr + y + x*256];
-			code3 = ram_get_ptr(screen->machine->device(RAM_TAG))[part1addr + y + x*256 + 0x4000];
-			code4 = ram_get_ptr(screen->machine->device(RAM_TAG))[part2addr + y + x*256 + 0x4000];
+			code1 = ram[part1addr + y + x*256];
+			code2 = ram[part2addr + y + x*256];
+			code3 = ram[part1addr + y + x*256 + 0x4000];
+			code4 = ram[part2addr + y + x*256 + 0x4000];
 			if ((video_mode==14) || (video_mode==15)) {
 				code2 = state->orionpro_pseudo_color;
 			}

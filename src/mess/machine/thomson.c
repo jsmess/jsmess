@@ -1559,6 +1559,7 @@ MACHINE_START ( to7 )
 {
 	address_space* space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT8* mem = machine->region("maincpu")->base();
+	UINT8* ram = ram_get_ptr(machine->device(RAM_TAG));
 
 	LOG (( "to7: machine start called\n" ));
 
@@ -1572,8 +1573,8 @@ MACHINE_START ( to7 )
 
 	/* memory */
 	thom_cart_bank = 0;
-	thom_vram = ram_get_ptr(machine->device(RAM_TAG));
-	memory_configure_bank( machine, THOM_BASE_BANK, 0, 1, ram_get_ptr(machine->device(RAM_TAG)) + 0x4000, 0x2000 );
+	thom_vram = ram;
+	memory_configure_bank( machine, THOM_BASE_BANK, 0, 1, ram + 0x4000, 0x2000 );
 	memory_configure_bank( machine, THOM_VRAM_BANK, 0, 2, thom_vram, 0x2000 );
 	memory_configure_bank( machine, THOM_CART_BANK, 0, 4, mem + 0x10000, 0x4000 );
 	memory_set_bank( machine, THOM_BASE_BANK, 0 );
@@ -1587,7 +1588,7 @@ MACHINE_START ( to7 )
 		int extram = ram_get_size(machine->device(RAM_TAG)) - 24*1024;
 		memory_install_write_bank(space, 0x8000, 0x8000 + extram - 1, 0, 0, THOM_RAM_BANK);
 		memory_install_read_bank(space, 0x8000, 0x8000 + extram - 1, 0, 0, THOM_RAM_BANK );
-		memory_configure_bank( machine, THOM_RAM_BANK,  0, 1, ram_get_ptr(machine->device(RAM_TAG)) + 0x6000, extram );
+		memory_configure_bank( machine, THOM_RAM_BANK,  0, 1, ram + 0x6000, extram );
 		memory_set_bank( machine, THOM_RAM_BANK, 0 );
 	}
 
@@ -1816,6 +1817,7 @@ MACHINE_RESET( to770 )
 MACHINE_START ( to770 )
 {
 	UINT8* mem = machine->region("maincpu")->base();
+	UINT8* ram = ram_get_ptr(machine->device(RAM_TAG));
 
 	LOG (( "to770: machine start called\n" ));
 
@@ -1829,9 +1831,9 @@ MACHINE_START ( to770 )
 
 	/* memory */
 	thom_cart_bank = 0;
-	thom_vram = ram_get_ptr(machine->device(RAM_TAG));
-	memory_configure_bank( machine, THOM_BASE_BANK, 0, 1, ram_get_ptr(machine->device(RAM_TAG)) + 0x4000, 0x4000 );
-	memory_configure_bank( machine, THOM_RAM_BANK,  0, 6, ram_get_ptr(machine->device(RAM_TAG)) + 0x8000, 0x4000 );
+	thom_vram = ram;
+	memory_configure_bank( machine, THOM_BASE_BANK, 0, 1, ram + 0x4000, 0x4000 );
+	memory_configure_bank( machine, THOM_RAM_BANK,  0, 6, ram + 0x8000, 0x4000 );
 	memory_configure_bank( machine, THOM_VRAM_BANK, 0, 2, thom_vram, 0x2000 );
 	memory_configure_bank( machine, THOM_CART_BANK, 0, 4, mem + 0x10000, 0x4000 );
 	memory_set_bank( machine, THOM_BASE_BANK, 0 );
@@ -2189,6 +2191,7 @@ MACHINE_RESET( mo5 )
 MACHINE_START ( mo5 )
 {
 	UINT8* mem = machine->region("maincpu")->base();
+	UINT8* ram = ram_get_ptr(machine->device(RAM_TAG));
 
 	LOG (( "mo5: machine start called\n" ));
 
@@ -2204,10 +2207,10 @@ MACHINE_START ( mo5 )
 	/* memory */
 	thom_cart_bank = 0;
 	mo5_reg_cart = 0;
-	thom_vram = ram_get_ptr(machine->device(RAM_TAG));
-	memory_configure_bank( machine, THOM_BASE_BANK, 0, 1, ram_get_ptr(machine->device(RAM_TAG)) + 0x4000, 0x8000 );
+	thom_vram = ram;
+	memory_configure_bank( machine, THOM_BASE_BANK, 0, 1, ram + 0x4000, 0x8000 );
 	memory_configure_bank( machine, THOM_CART_BANK, 0, 4, mem + 0x10000, 0x4000 );
-	memory_configure_bank( machine, THOM_CART_BANK, 4, 4, ram_get_ptr(machine->device(RAM_TAG)) + 0xc000, 0x4000 );
+	memory_configure_bank( machine, THOM_CART_BANK, 4, 4, ram + 0xc000, 0x4000 );
 	memory_configure_bank( machine, THOM_VRAM_BANK, 0, 2, thom_vram, 0x2000 );
 	memory_set_bank( machine, THOM_BASE_BANK, 0 );
 	memory_set_bank( machine, THOM_CART_BANK, 0 );
@@ -3153,6 +3156,7 @@ MACHINE_RESET ( to9 )
 MACHINE_START ( to9 )
 {
 	UINT8* mem = machine->region("maincpu")->base();
+	UINT8* ram = ram_get_ptr(machine->device(RAM_TAG));
 
 	LOG (( "to9: machine start called\n" ));
 
@@ -3166,12 +3170,12 @@ MACHINE_START ( to9 )
 	to7_midi_init(machine);
 
 	/* memory */
-	thom_vram = ram_get_ptr(machine->device(RAM_TAG));
+	thom_vram = ram;
 	thom_cart_bank = 0;
 	memory_configure_bank( machine, THOM_VRAM_BANK, 0,  2, thom_vram, 0x2000 );
 	memory_configure_bank( machine, THOM_CART_BANK, 0, 12, mem + 0x10000, 0x4000 );
-	memory_configure_bank( machine, THOM_BASE_BANK, 0,  1, ram_get_ptr(machine->device(RAM_TAG)) + 0x4000, 0x4000 );
-	memory_configure_bank( machine, THOM_RAM_BANK,  0, 10, ram_get_ptr(machine->device(RAM_TAG)) + 0x8000, 0x4000 );
+	memory_configure_bank( machine, THOM_BASE_BANK, 0,  1, ram + 0x4000, 0x4000 );
+	memory_configure_bank( machine, THOM_RAM_BANK,  0, 10, ram + 0x8000, 0x4000 );
 	memory_set_bank( machine, THOM_VRAM_BANK, 0 );
 	memory_set_bank( machine, THOM_CART_BANK, 0 );
 	memory_set_bank( machine, THOM_BASE_BANK, 0 );
@@ -4146,6 +4150,7 @@ MACHINE_RESET ( to8 )
 MACHINE_START ( to8 )
 {
 	UINT8* mem = machine->region("maincpu")->base();
+	UINT8* ram = ram_get_ptr(machine->device(RAM_TAG));
 
 	LOG (( "to8: machine start called\n" ));
 
@@ -4160,14 +4165,14 @@ MACHINE_START ( to8 )
 
 	/* memory */
 	thom_cart_bank = 0;
-	thom_vram = ram_get_ptr(machine->device(RAM_TAG));
+	thom_vram = ram;
 	memory_configure_bank( machine, THOM_CART_BANK, 0,  8, mem + 0x10000, 0x4000 );
-	memory_configure_bank( machine, THOM_CART_BANK, 8, 32, ram_get_ptr(machine->device(RAM_TAG)), 0x4000 );
-	memory_configure_bank( machine, THOM_VRAM_BANK, 0,  2, ram_get_ptr(machine->device(RAM_TAG)), 0x2000 );
-	memory_configure_bank( machine, TO8_SYS_LO,     0,  1, ram_get_ptr(machine->device(RAM_TAG)) + 0x6000, 0x4000 );
-	memory_configure_bank( machine, TO8_SYS_HI,     0,  1, ram_get_ptr(machine->device(RAM_TAG)) + 0x4000, 0x4000 );
-	memory_configure_bank( machine, TO8_DATA_LO,    0, 32, ram_get_ptr(machine->device(RAM_TAG)) + 0x2000, 0x4000 );
-	memory_configure_bank( machine, TO8_DATA_HI,    0, 32, ram_get_ptr(machine->device(RAM_TAG)) + 0x0000, 0x4000 );
+	memory_configure_bank( machine, THOM_CART_BANK, 8, 32, ram, 0x4000 );
+	memory_configure_bank( machine, THOM_VRAM_BANK, 0,  2, ram, 0x2000 );
+	memory_configure_bank( machine, TO8_SYS_LO,     0,  1, ram + 0x6000, 0x4000 );
+	memory_configure_bank( machine, TO8_SYS_HI,     0,  1, ram + 0x4000, 0x4000 );
+	memory_configure_bank( machine, TO8_DATA_LO,    0, 32, ram + 0x2000, 0x4000 );
+	memory_configure_bank( machine, TO8_DATA_HI,    0, 32, ram + 0x0000, 0x4000 );
 	memory_configure_bank( machine, TO8_BIOS_BANK,  0,  2, mem + 0x30800, 0x2000 );
 	memory_set_bank( machine, THOM_CART_BANK, 0 );
 	memory_set_bank( machine, THOM_VRAM_BANK, 0 );
@@ -4316,6 +4321,7 @@ MACHINE_RESET ( to9p )
 MACHINE_START ( to9p )
 {
 	UINT8* mem = machine->region("maincpu")->base();
+	UINT8* ram = ram_get_ptr(machine->device(RAM_TAG));
 
 	LOG (( "to9p: machine start called\n" ));
 
@@ -4330,14 +4336,14 @@ MACHINE_START ( to9p )
 
 	/* memory */
 	thom_cart_bank = 0;
-	thom_vram = ram_get_ptr(machine->device(RAM_TAG));
+	thom_vram = ram;
 	memory_configure_bank( machine, THOM_CART_BANK, 0,  8, mem + 0x10000, 0x4000 );
-	memory_configure_bank( machine, THOM_CART_BANK, 8, 32, ram_get_ptr(machine->device(RAM_TAG)), 0x4000 );
-	memory_configure_bank( machine, THOM_VRAM_BANK, 0,  2, ram_get_ptr(machine->device(RAM_TAG)), 0x2000 );
-	memory_configure_bank( machine, TO8_SYS_LO,     0,  1, ram_get_ptr(machine->device(RAM_TAG)) + 0x6000, 0x4000 );
-	memory_configure_bank( machine, TO8_SYS_HI,     0,  1, ram_get_ptr(machine->device(RAM_TAG)) + 0x4000, 0x4000 );
-	memory_configure_bank( machine, TO8_DATA_LO,    0, 32, ram_get_ptr(machine->device(RAM_TAG)) + 0x2000, 0x4000 );
-	memory_configure_bank( machine, TO8_DATA_HI,    0, 32, ram_get_ptr(machine->device(RAM_TAG)) + 0x0000, 0x4000 );
+	memory_configure_bank( machine, THOM_CART_BANK, 8, 32, ram, 0x4000 );
+	memory_configure_bank( machine, THOM_VRAM_BANK, 0,  2, ram, 0x2000 );
+	memory_configure_bank( machine, TO8_SYS_LO,     0,  1, ram + 0x6000, 0x4000 );
+	memory_configure_bank( machine, TO8_SYS_HI,     0,  1, ram + 0x4000, 0x4000 );
+	memory_configure_bank( machine, TO8_DATA_LO,    0, 32, ram + 0x2000, 0x4000 );
+	memory_configure_bank( machine, TO8_DATA_HI,    0, 32, ram + 0x0000, 0x4000 );
 	memory_configure_bank( machine, TO8_BIOS_BANK,  0,  2, mem + 0x30800, 0x2000 );
 	memory_set_bank( machine, THOM_CART_BANK, 0 );
 	memory_set_bank( machine, THOM_VRAM_BANK, 0 );
@@ -4939,6 +4945,7 @@ MACHINE_RESET ( mo6 )
 MACHINE_START ( mo6 )
 {
 	UINT8* mem = machine->region("maincpu")->base();
+	UINT8* ram = ram_get_ptr(machine->device(RAM_TAG));
 
 	LOG (( "mo6: machine start called\n" ));
 
@@ -4954,16 +4961,16 @@ MACHINE_START ( mo6 )
 	/* memory */
 	thom_cart_bank = 0;
 	mo5_reg_cart = 0;
-	thom_vram = ram_get_ptr(machine->device(RAM_TAG));
+	thom_vram = ram;
 	memory_configure_bank( machine, THOM_CART_BANK, 0, 4, mem + 0x10000, 0x4000 );
 	memory_configure_bank( machine, THOM_CART_BANK, 4, 2, mem + 0x1f000, 0x4000 );
 	memory_configure_bank( machine, THOM_CART_BANK, 6, 2, mem + 0x28000, 0x4000 );
-	memory_configure_bank( machine, THOM_CART_BANK, 8, 8, ram_get_ptr(machine->device(RAM_TAG)), 0x4000 );
-	memory_configure_bank( machine, THOM_VRAM_BANK, 0, 2, ram_get_ptr(machine->device(RAM_TAG)), 0x2000 );
-	memory_configure_bank( machine, TO8_SYS_LO,     0, 1, ram_get_ptr(machine->device(RAM_TAG)) + 0x6000, 0x4000 );
-	memory_configure_bank( machine, TO8_SYS_HI,     0, 1, ram_get_ptr(machine->device(RAM_TAG)) + 0x4000, 0x4000 );
-	memory_configure_bank( machine, TO8_DATA_LO,    0, 8, ram_get_ptr(machine->device(RAM_TAG)) + 0x2000, 0x4000 );
-	memory_configure_bank( machine, TO8_DATA_HI,    0, 8, ram_get_ptr(machine->device(RAM_TAG)) + 0x0000, 0x4000 );
+	memory_configure_bank( machine, THOM_CART_BANK, 8, 8, ram, 0x4000 );
+	memory_configure_bank( machine, THOM_VRAM_BANK, 0, 2, ram, 0x2000 );
+	memory_configure_bank( machine, TO8_SYS_LO,     0, 1, ram + 0x6000, 0x4000 );
+	memory_configure_bank( machine, TO8_SYS_HI,     0, 1, ram + 0x4000, 0x4000 );
+	memory_configure_bank( machine, TO8_DATA_LO,    0, 8, ram + 0x2000, 0x4000 );
+	memory_configure_bank( machine, TO8_DATA_HI,    0, 8, ram + 0x0000, 0x4000 );
 	memory_configure_bank( machine, TO8_BIOS_BANK,  0, 2, mem + 0x23000, 0x4000 );
 	memory_set_bank( machine, THOM_CART_BANK, 0 );
 	memory_set_bank( machine, THOM_VRAM_BANK, 0 );
@@ -5199,6 +5206,7 @@ MACHINE_RESET ( mo5nr )
 MACHINE_START ( mo5nr )
 {
 	UINT8* mem = machine->region("maincpu")->base();
+	UINT8* ram = ram_get_ptr(machine->device(RAM_TAG));
 
 	LOG (( "mo5nr: machine start called\n" ));
 
@@ -5214,16 +5222,16 @@ MACHINE_START ( mo5nr )
 	/* memory */
 	thom_cart_bank = 0;
 	mo5_reg_cart = 0;
-	thom_vram = ram_get_ptr(machine->device(RAM_TAG));
+	thom_vram = ram;
 	memory_configure_bank( machine, THOM_CART_BANK, 0, 4, mem + 0x10000, 0x4000 );
 	memory_configure_bank( machine, THOM_CART_BANK, 4, 2, mem + 0x1f000, 0x4000 );
 	memory_configure_bank( machine, THOM_CART_BANK, 6, 2, mem + 0x28000, 0x4000 );
-	memory_configure_bank( machine, THOM_CART_BANK, 8, 8, ram_get_ptr(machine->device(RAM_TAG)), 0x4000 );
-	memory_configure_bank( machine, THOM_VRAM_BANK, 0, 2, ram_get_ptr(machine->device(RAM_TAG)), 0x2000 );
-	memory_configure_bank( machine, TO8_SYS_LO,     0, 1, ram_get_ptr(machine->device(RAM_TAG)) + 0x6000, 0x4000 );
-	memory_configure_bank( machine, TO8_SYS_HI,     0, 1, ram_get_ptr(machine->device(RAM_TAG)) + 0x4000, 0x4000 );
-	memory_configure_bank( machine, TO8_DATA_LO,    0, 8, ram_get_ptr(machine->device(RAM_TAG)) + 0x2000, 0x4000 );
-	memory_configure_bank( machine, TO8_DATA_HI,    0, 8, ram_get_ptr(machine->device(RAM_TAG)) + 0x0000, 0x4000 );
+	memory_configure_bank( machine, THOM_CART_BANK, 8, 8, ram, 0x4000 );
+	memory_configure_bank( machine, THOM_VRAM_BANK, 0, 2, ram, 0x2000 );
+	memory_configure_bank( machine, TO8_SYS_LO,     0, 1, ram + 0x6000, 0x4000 );
+	memory_configure_bank( machine, TO8_SYS_HI,     0, 1, ram + 0x4000, 0x4000 );
+	memory_configure_bank( machine, TO8_DATA_LO,    0, 8, ram + 0x2000, 0x4000 );
+	memory_configure_bank( machine, TO8_DATA_HI,    0, 8, ram + 0x0000, 0x4000 );
 	memory_configure_bank( machine, TO8_BIOS_BANK,  0, 2, mem + 0x23000, 0x4000 );
 	memory_set_bank( machine, THOM_CART_BANK, 0 );
 	memory_set_bank( machine, THOM_VRAM_BANK, 0 );

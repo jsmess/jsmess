@@ -431,6 +431,8 @@ static void orionpro_bank_switch(running_machine *machine)
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	int page = state->orionpro_page & 7; // we have only 8 pages
 	int is128 = (state->orionpro_dispatcher & 0x80) ? 1 : 0;
+	UINT8 *ram = ram_get_ptr(machine->device(RAM_TAG));
+
 	if (is128==1)
 	{
 		page = state->orionpro_128_page & 7;
@@ -447,13 +449,13 @@ static void orionpro_bank_switch(running_machine *machine)
 
 	if ((state->orionpro_dispatcher & 0x01)==0x00)
 	{	// RAM0 segment disabled
-		memory_set_bankptr(machine, "bank1", ram_get_ptr(machine->device(RAM_TAG)) + 0x10000 * page);
-		memory_set_bankptr(machine, "bank2", ram_get_ptr(machine->device(RAM_TAG)) + 0x10000 * page + 0x2000);
+		memory_set_bankptr(machine, "bank1", ram + 0x10000 * page);
+		memory_set_bankptr(machine, "bank2", ram + 0x10000 * page + 0x2000);
 	}
 	else
 	{
-		memory_set_bankptr(machine, "bank1", ram_get_ptr(machine->device(RAM_TAG)) + (state->orionpro_ram0_segment & 31) * 0x4000);
-		memory_set_bankptr(machine, "bank2", ram_get_ptr(machine->device(RAM_TAG)) + (state->orionpro_ram0_segment & 31) * 0x4000 + 0x2000);
+		memory_set_bankptr(machine, "bank1", ram + (state->orionpro_ram0_segment & 31) * 0x4000);
+		memory_set_bankptr(machine, "bank2", ram + (state->orionpro_ram0_segment & 31) * 0x4000 + 0x2000);
 	}
 	if ((state->orionpro_dispatcher & 0x10)==0x10)
 	{	// ROM1 enabled
@@ -468,27 +470,27 @@ static void orionpro_bank_switch(running_machine *machine)
 
 	if ((state->orionpro_dispatcher & 0x02)==0x00)
 	{	// RAM1 segment disabled
-		memory_set_bankptr(machine, "bank3", ram_get_ptr(machine->device(RAM_TAG)) + 0x10000 * page + 0x4000);
+		memory_set_bankptr(machine, "bank3", ram + 0x10000 * page + 0x4000);
 	}
 	else
 	{
-		memory_set_bankptr(machine, "bank3", ram_get_ptr(machine->device(RAM_TAG)) + (state->orionpro_ram1_segment & 31) * 0x4000);
+		memory_set_bankptr(machine, "bank3", ram + (state->orionpro_ram1_segment & 31) * 0x4000);
 	}
 
 	if ((state->orionpro_dispatcher & 0x04)==0x00)
 	{	// RAM2 segment disabled
-		memory_set_bankptr(machine, "bank4", ram_get_ptr(machine->device(RAM_TAG)) + 0x10000 * page + 0x8000);
+		memory_set_bankptr(machine, "bank4", ram + 0x10000 * page + 0x8000);
 	}
 	else
 	{
-		memory_set_bankptr(machine, "bank4", ram_get_ptr(machine->device(RAM_TAG)) + (state->orionpro_ram2_segment & 31) * 0x4000);
+		memory_set_bankptr(machine, "bank4", ram + (state->orionpro_ram2_segment & 31) * 0x4000);
 	}
 
-	memory_set_bankptr(machine, "bank5", ram_get_ptr(machine->device(RAM_TAG)) + 0x10000 * page + 0xc000);
+	memory_set_bankptr(machine, "bank5", ram + 0x10000 * page + 0xc000);
 
 	if (is128)
 	{
-		memory_set_bankptr(machine, "bank6", ram_get_ptr(machine->device(RAM_TAG)) + 0x10000 * 0 + 0xf000);
+		memory_set_bankptr(machine, "bank6", ram + 0x10000 * 0 + 0xf000);
 
 		memory_install_write8_handler(space, 0xf400, 0xf4ff, 0, 0, orion128_system_w);
 		memory_install_write8_handler(space, 0xf500, 0xf5ff, 0, 0, orion128_romdisk_w);
@@ -506,21 +508,21 @@ static void orionpro_bank_switch(running_machine *machine)
 		memory_install_write8_handler(space, 0xff00, 0xffff, 0, 0, orionz80_sound_w);
 
 
-		memory_set_bankptr(machine, "bank8", ram_get_ptr(machine->device(RAM_TAG)) + 0x10000 * 0 + 0xf800);
+		memory_set_bankptr(machine, "bank8", ram + 0x10000 * 0 + 0xf800);
 	}
 	else
 	{
 		if ((state->orionpro_dispatcher & 0x40)==0x40)
 		{	// FIX F000 enabled
-			memory_set_bankptr(machine, "bank6", ram_get_ptr(machine->device(RAM_TAG)) + 0x10000 * 0 + 0xf000);
-			memory_set_bankptr(machine, "bank7", ram_get_ptr(machine->device(RAM_TAG)) + 0x10000 * 0 + 0xf400);
-			memory_set_bankptr(machine, "bank8", ram_get_ptr(machine->device(RAM_TAG)) + 0x10000 * 0 + 0xf800);
+			memory_set_bankptr(machine, "bank6", ram + 0x10000 * 0 + 0xf000);
+			memory_set_bankptr(machine, "bank7", ram + 0x10000 * 0 + 0xf400);
+			memory_set_bankptr(machine, "bank8", ram + 0x10000 * 0 + 0xf800);
 		}
 		else
 		{
-			memory_set_bankptr(machine, "bank6", ram_get_ptr(machine->device(RAM_TAG)) + 0x10000 * page + 0xf000);
-			memory_set_bankptr(machine, "bank7", ram_get_ptr(machine->device(RAM_TAG)) + 0x10000 * page + 0xf400);
-			memory_set_bankptr(machine, "bank8", ram_get_ptr(machine->device(RAM_TAG)) + 0x10000 * page + 0xf800);
+			memory_set_bankptr(machine, "bank6", ram + 0x10000 * page + 0xf000);
+			memory_set_bankptr(machine, "bank7", ram + 0x10000 * page + 0xf400);
+			memory_set_bankptr(machine, "bank8", ram + 0x10000 * page + 0xf800);
 		}
 	}
 }

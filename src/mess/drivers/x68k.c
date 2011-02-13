@@ -1025,13 +1025,15 @@ static WRITE16_HANDLER( x68k_fdc_w )
 		floppy_drive_set_ready_state(floppy_get_device(space->machine, 1),1,1);
 		floppy_drive_set_ready_state(floppy_get_device(space->machine, 2),1,1);
 		floppy_drive_set_ready_state(floppy_get_device(space->machine, 3),1,1);
-//      for(drive=0;drive<4;drive++)
-//      {
-//          if(floppy_drive_get_flag_state(floppy_get_device(machine, drive),FLOPPY_DRIVE_MOTOR_ON))
-//              output_set_indexed_value("access_drv",drive,0);
-//          else
-//              output_set_indexed_value("access_drv",drive,1);
-//      }
+#if 0
+		for(drive=0;drive<4;drive++)
+		{
+			if(floppy_drive_get_flag_state(floppy_get_device(machine, drive),FLOPPY_DRIVE_MOTOR_ON))
+				output_set_indexed_value("access_drv",drive,0);
+			else
+				output_set_indexed_value("access_drv",drive,1);
+		}
+#endif
 		logerror("FDC: Drive #%i: Drive selection set to %02x\n",data & 0x03,data);
 		break;
 	default:
@@ -1376,7 +1378,7 @@ static WRITE16_HANDLER( x68k_mfp_w )
 	switch(offset)
 	{
 #if 0
-  case 0:  // GPDR
+    case 0:  // GPDR
         // All bits are inputs generally, so no action taken.
         break;
     case 1:  // AER
@@ -1455,12 +1457,12 @@ static WRITE16_HANDLER( x68k_mfp_w )
         state->mfp.ucr = data;
         break;
 #endif
-    case 21:
-        if(data & 0x01)
-            state->mfp.usart.recv_enable = 1;
-        else
-            state->mfp.usart.recv_enable = 0;
-        break;
+	case 21:
+		if(data & 0x01)
+			state->mfp.usart.recv_enable = 1;
+		else
+			state->mfp.usart.recv_enable = 0;
+		break;
 	case 22:
 		if(data & 0x01)
 			state->mfp.usart.send_enable = 1;
@@ -1547,11 +1549,11 @@ static READ16_HANDLER( x68k_sram_r )
 		return ram_get_size(space->machine->device(RAM_TAG)) >> 16;  // RAM size
 #if 0
 	if(offset == 0x46/2)
-        return 0x0024;
-    if(offset == 0x6e/2)
-        return 0xff00;
-    if(offset == 0x70/2)
-        return 0x0700;
+		return 0x0024;
+	if(offset == 0x6e/2)
+		return 0xff00;
+	if(offset == 0x70/2)
+		return 0x0700;
 #endif
 	return state->m_nvram[offset];
 }
@@ -1563,11 +1565,11 @@ static READ32_HANDLER( x68k_sram32_r )
 		return (ram_get_size(space->machine->device(RAM_TAG)) & 0xffff0000);  // RAM size
 #if 0
 	if(offset == 0x46/2)
-        return 0x0024;
-    if(offset == 0x6e/2)
-        return 0xff00;
-    if(offset == 0x70/2)
-        return 0x0700;
+		return 0x0024;
+	if(offset == 0x6e/2)
+		return 0xff00;
+	if(offset == 0x70/2)
+		return 0x0700;
 #endif
 	return state->m_nvram[offset];
 }
@@ -1682,6 +1684,7 @@ static TIMER_CALLBACK(x68k_fake_bus_error)
 {
 	int val = param;
 	int v;
+	UINT8 *ram = ram_get_ptr(machine->device(RAM_TAG));
 
 	if(strcmp(machine->gamedrv->name,"x68030") == 0)
 		v = 0x0b;
@@ -1689,28 +1692,28 @@ static TIMER_CALLBACK(x68k_fake_bus_error)
 		v = 0x09;
 
 	// rather hacky, but this generally works for programs that check for MIDI hardware
-	if(ram_get_ptr(machine->device(RAM_TAG))[v] != 0x02)  // normal vector for bus errors points to 02FF0540
+	if(ram[v] != 0x02)  // normal vector for bus errors points to 02FF0540
 	{
-		int addr = (ram_get_ptr(machine->device(RAM_TAG))[0x09] << 24) | (ram_get_ptr(machine->device(RAM_TAG))[0x08] << 16) |(ram_get_ptr(machine->device(RAM_TAG))[0x0b] << 8) | ram_get_ptr(machine->device(RAM_TAG))[0x0a];
+		int addr = (ram[0x09] << 24) | (ram[0x08] << 16) |(ram[0x0b] << 8) | ram[0x0a];
 		int sp = cpu_get_reg(machine->device("maincpu"), STATE_GENSP);
 		int pc = cpu_get_reg(machine->device("maincpu"), STATE_GENPC);
 		int sr = cpu_get_reg(machine->device("maincpu"), M68K_SR);
 		//int pda = cpu_get_reg(machine->device("maincpu"), M68K_PREF_DATA);
 		if(strcmp(machine->gamedrv->name,"x68030") == 0)
 		{  // byte order varies on the 68030
-			addr = (ram_get_ptr(machine->device(RAM_TAG))[0x0b] << 24) | (ram_get_ptr(machine->device(RAM_TAG))[0x0a] << 16) |(ram_get_ptr(machine->device(RAM_TAG))[0x09] << 8) | ram_get_ptr(machine->device(RAM_TAG))[0x08];
+			addr = (ram[0x0b] << 24) | (ram[0x0a] << 16) |(ram[0x09] << 8) | ram[0x08];
 		}
 		cpu_set_reg(machine->device("maincpu"), STATE_GENSP, sp - 14);
-		ram_get_ptr(machine->device(RAM_TAG))[sp-11] = (val & 0xff000000) >> 24;
-		ram_get_ptr(machine->device(RAM_TAG))[sp-12] = (val & 0x00ff0000) >> 16;
-		ram_get_ptr(machine->device(RAM_TAG))[sp-9] = (val & 0x0000ff00) >> 8;
-		ram_get_ptr(machine->device(RAM_TAG))[sp-10] = (val & 0x000000ff);  // place address onto the stack
-		ram_get_ptr(machine->device(RAM_TAG))[sp-3] = (pc & 0xff000000) >> 24;
-		ram_get_ptr(machine->device(RAM_TAG))[sp-4] = (pc & 0x00ff0000) >> 16;
-		ram_get_ptr(machine->device(RAM_TAG))[sp-1] = (pc & 0x0000ff00) >> 8;
-		ram_get_ptr(machine->device(RAM_TAG))[sp-2] = (pc & 0x000000ff);  // place PC onto the stack
-		ram_get_ptr(machine->device(RAM_TAG))[sp-5] = (sr & 0xff00) >> 8;
-		ram_get_ptr(machine->device(RAM_TAG))[sp-6] = (sr & 0x00ff);  // place SR onto the stack
+		ram[sp-11] = (val & 0xff000000) >> 24;
+		ram[sp-12] = (val & 0x00ff0000) >> 16;
+		ram[sp-9] = (val & 0x0000ff00) >> 8;
+		ram[sp-10] = (val & 0x000000ff);  // place address onto the stack
+		ram[sp-3] = (pc & 0xff000000) >> 24;
+		ram[sp-4] = (pc & 0x00ff0000) >> 16;
+		ram[sp-1] = (pc & 0x0000ff00) >> 8;
+		ram[sp-2] = (pc & 0x000000ff);  // place PC onto the stack
+		ram[sp-5] = (sr & 0xff00) >> 8;
+		ram[sp-6] = (sr & 0x00ff);  // place SR onto the stack
 		cpu_set_reg(machine->device("maincpu"), STATE_GENPC, addr);  // real exceptions seem to take too long to be acknowledged
 		popmessage("Expansion access [%08x]: PC jump to %08x", val, addr);
 	}
@@ -2741,7 +2744,7 @@ static MACHINE_CONFIG_START( x68000_base, x68k_state )
 
 	MCFG_RP5C15_ADD( "rp5c15" , rtc_intf)
 
-    /* video hardware */
+	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(55.45)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
@@ -2763,10 +2766,10 @@ static MACHINE_CONFIG_START( x68000_base, x68k_state )
 	MCFG_SOUND_CONFIG(x68k_ym2151_interface)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
-    MCFG_SOUND_ADD("okim6258", OKIM6258, 4000000)
-    MCFG_SOUND_CONFIG(x68k_okim6258_interface)
-    MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
-    MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
+	MCFG_SOUND_ADD("okim6258", OKIM6258, 4000000)
+	MCFG_SOUND_CONFIG(x68k_okim6258_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
