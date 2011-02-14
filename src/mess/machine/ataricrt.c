@@ -9,6 +9,7 @@
 #include "includes/atari.h"
 #include "ataridev.h"
 #include "machine/ram.h"
+#include "hashfile.h"
 
 #define LEFT_CARTSLOT_MOUNTED  1
 #define RIGHT_CARTSLOT_MOUNTED 2
@@ -621,7 +622,7 @@ DEVICE_IMAGE_LOAD( a5200_cart )
 	{
 		const char *info;
 		memcpy(&mem[0x4000], &mem[0x8000], 0x4000);
-		info = image.extrainfo();
+		info = hashfile_extrainfo(image);		
 		if (strcmp(info, "") && !strcmp(info, "A13MIRRORING"))
 		{
 			memcpy(&mem[0x8000], &mem[0xa000], 0x2000);

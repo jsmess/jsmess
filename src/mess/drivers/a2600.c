@@ -13,6 +13,7 @@
 #include "imagedev/cassette.h"
 #include "formats/a26_cas.h"
 #include "video/tia.h"
+#include "hashfile.h"
 
 typedef struct {
 	UINT8	top;
@@ -627,8 +628,7 @@ static DEVICE_IMAGE_LOAD( a2600_cart )
 		}
 	}
 
-	if (strcmp(image.extrainfo(), ""))
-		extrainfo = image.extrainfo();
+	extrainfo = hashfile_extrainfo(image);
 
 	if (extrainfo && extrainfo[0])
 	{

@@ -19,7 +19,6 @@
 #include "emu.h"
 #include "unzip.h"
 #include "strconv.h"
-#include "hashfile.h"
 #include "picker.h"
 #include "screenshot.h"
 #include "bitmask.h"

@@ -28,6 +28,7 @@
 #include "sound/ay8910.h"
 #include "sound/2413intf.h"
 #include "sound/dac.h"
+#include "hashfile.h"
 
 #define VERBOSE 0
 
@@ -139,8 +140,7 @@ DEVICE_IMAGE_LOAD (msx_cart)
 	}
 
 	/* see if msx.crc will tell us more */
-	if (strcmp(image.extrainfo(), ""))
-		extra = image.extrainfo ();
+	extra = hashfile_extrainfo(image);
 
 	if (!extra)
 	{

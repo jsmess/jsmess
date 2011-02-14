@@ -5,7 +5,7 @@
 #include "emu.h"
 #include "includes/lynx.h"
 #include "cpu/m6502/m6502.h"
-
+#include "hashfile.h"
 #include "imagedev/cartslot.h"
 #include "hash.h"
 
@@ -1877,11 +1877,9 @@ void lynx_crc_keyword(device_image_interface &image)
 	lynx_state *state = image.device().machine->driver_data<lynx_state>();
 	const char *info = NULL;
 
-	if (strcmp(image.extrainfo(), ""))
-		info = image.extrainfo();
+	info = hashfile_extrainfo(image);
 
-	state->rotate0 = 0;
-
+	state->rotate0 = 0;	
 	if (info)
 	{
 		if(strcmp(info, "ROTATE90DEGREE") == 0)

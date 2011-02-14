@@ -2,6 +2,7 @@
 #include "includes/intv.h"
 #include "cpu/cp1610/cp1610.h"
 #include "image.h"
+#include "hashfile.h"
 
 #define INTELLIVOICE_MASK	0x02
 #define ECS_MASK			0x01
@@ -395,8 +396,8 @@ static int intv_load_rom_file(device_image_interface &image)
 		// 7. extra = 1 ECS, 2 Intellivoice
 		int start, size;
 		int mapper, rom[5], ram, extra;
-
-		if (!strcmp(image.extrainfo(), ""))
+		const char *extrainfo = hashfile_extrainfo(image);
+		if (!extrainfo)
 		{
 			/* If no extrainfo, we assume a single 0x2000 chunk at 0x5000 */
 			for (i = 0; i < 0x2000; i++ )
@@ -409,7 +410,7 @@ static int intv_load_rom_file(device_image_interface &image)
 		}
 		else
 		{
-			sscanf(image.extrainfo(),"%d %d %d %d %d %d %d", &mapper, &rom[0], &rom[1], &rom[2],
+			sscanf(extrainfo,"%d %d %d %d %d %d %d", &mapper, &rom[0], &rom[1], &rom[2],
 																&rom[3], &ram, &extra);
 
 //          logerror("extrainfo: %d %d %d %d %d %d %d \n", mapper, rom[0], rom[1], rom[2],

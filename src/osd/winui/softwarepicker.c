@@ -19,7 +19,6 @@
 #include "emu.h"
 #include "unzip.h"
 #include "strconv.h"
-#include "hashfile.h"
 #include "picker.h"
 #include "screenshot.h"
 #include "bitmask.h"
@@ -29,6 +28,7 @@
 #include "mui_opts.h"
 #include "softwarepicker.h"
 #include "mui_util.h"
+#include "hash.h"
 
 
 
@@ -44,7 +44,7 @@ struct _file_info
 	// hash information
 	//hash_collection hashes;
 	BOOL hash_realized;
-	const hash_info *hashinfo;
+	//const hash_info *hashinfo;
 
 	const char *zip_entry_name;
 	const char *base_name;
@@ -205,7 +205,7 @@ void SoftwarePicker_SetDriver(HWND hwndPicker, const software_config *config)
 	// invalidate the hash "realization"
 	for (i = 0; i < pPickerInfo->file_index_length; i++)
 	{
-		pPickerInfo->file_index[i]->hashinfo = NULL;
+		//pPickerInfo->file_index[i]->hashinfo = NULL;
 		pPickerInfo->file_index[i]->hash_realized = FALSE;
 	}
 	pPickerInfo->hashes_realized = 0;
@@ -213,21 +213,21 @@ void SoftwarePicker_SetDriver(HWND hwndPicker, const software_config *config)
 
 
 
-static void ComputeFileHash(software_picker_info *pPickerInfo,
-	file_info *pFileInfo, const unsigned char *pBuffer, unsigned int nLength)
-{
-	const char *functions;
+//static void ComputeFileHash(software_picker_info *pPickerInfo,
+//	file_info *pFileInfo, const unsigned char *pBuffer, unsigned int nLength)
+//{
+	//const char *functions;
 
 	// determine which functions to use
-	functions = hashfile_functions_used(pPickerInfo->config->hashfile, pFileInfo->device->image_type());
+	//functions = hashfile_functions_used(pPickerInfo->config->hashfile, pFileInfo->device->image_type());
 
 	// compute the hash
 	//pFileInfo->device->device_compute_hash(pFileInfo->hashes, (const void *)pBuffer, (size_t)nLength, functions);
-}
+//}
 
 
 
-static BOOL SoftwarePicker_CalculateHash(HWND hwndPicker, int nIndex)
+/*static BOOL SoftwarePicker_CalculateHash(HWND hwndPicker, int nIndex)
 {
 	software_picker_info *pPickerInfo;
 	file_info *pFileInfo;
@@ -319,7 +319,7 @@ static BOOL SoftwarePicker_CalculateHash(HWND hwndPicker, int nIndex)
 	return rc;
 }
 
-
+*/
 
 static void SoftwarePicker_RealizeHash(HWND hwndPicker, int nIndex)
 {
@@ -674,7 +674,7 @@ BOOL SoftwarePicker_Idle(HWND hwndPicker)
 			SoftwarePicker_FreeSearchInfo(pSearchInfo);
 		}
 	}
-	else if (pPickerInfo->config!=NULL  && pPickerInfo->config->hashfile && (pPickerInfo->hashes_realized
+	else if (pPickerInfo->config!=NULL  && (pPickerInfo->hashes_realized
 		< pPickerInfo->file_index_length))
 	{
 		// time to realize some hashes
@@ -690,12 +690,12 @@ BOOL SoftwarePicker_Idle(HWND hwndPicker)
 		pFileInfo = pPickerInfo->file_index[pPickerInfo->current_position];
 		if (!pFileInfo->hash_realized)
 		{
-			if (hashfile_functions_used(pPickerInfo->config->hashfile, pFileInfo->device->image_type()))
+/*			if (hashfile_functions_used(pPickerInfo->config->hashfile, pFileInfo->device->image_type()))
 			{
 				// only calculate the hash if it is appropriate for this device
 				if (!SoftwarePicker_CalculateHash(hwndPicker, pPickerInfo->current_position))
 					return FALSE;
-			}
+			}*/
 			SoftwarePicker_RealizeHash(hwndPicker, pPickerInfo->current_position);
 
 			// under normal circumstances this will be redundant, but in the unlikely
@@ -725,7 +725,7 @@ LPCTSTR SoftwarePicker_GetItemString(HWND hwndPicker, int nRow, int nColumn,
 	software_picker_info *pPickerInfo;
 	const file_info *pFileInfo;
 	LPCTSTR s = NULL;
-	const char *pszUtf8 = NULL;
+	//const char *pszUtf8 = NULL;
 	unsigned int nHashFunction = 0;
 //	char szBuffer[256];
 	TCHAR* t_buf;
@@ -751,7 +751,7 @@ LPCTSTR SoftwarePicker_GetItemString(HWND hwndPicker, int nRow, int nColumn,
 		case MESS_COLUMN_MANUFACTURER:
 		case MESS_COLUMN_YEAR:
 		case MESS_COLUMN_PLAYABLE:
-			if (pFileInfo->hashinfo)
+/*			if (pFileInfo->hashinfo)
 			{
 				switch(nColumn)
 				{
@@ -777,7 +777,7 @@ LPCTSTR SoftwarePicker_GetItemString(HWND hwndPicker, int nRow, int nColumn,
 					s = pszBuffer;
 					osd_free(t_buf);
 				}
-			}
+			}*/
 			break;
 
 		case MESS_COLUMN_CRC:

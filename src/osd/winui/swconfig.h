@@ -9,7 +9,6 @@
 
 #include "emu.h"
 #include "mconfig.h"
-#include "hashfile.h"
 
 
 //============================================================
@@ -22,7 +21,6 @@ struct _software_config
 	int driver_index;
 	const game_driver *gamedrv;
 	machine_config *mconfig;
-	hash_file *hashfile;
 };
 
 
@@ -31,7 +29,7 @@ struct _software_config
 //  PROTOTYPES
 //============================================================
 
-software_config *software_config_alloc(int driver_index, core_options *opts, hashfile_error_func error_proc);
+software_config *software_config_alloc(int driver_index, core_options *opts); //, hashfile_error_func error_proc);
 void software_config_free(software_config *config);
 
 #endif // __SWCONFIG_H__

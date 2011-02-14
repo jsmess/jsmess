@@ -10,6 +10,50 @@
 #include "pool.h"
 #include "expat.h"
 #include "emuopts.h"
+#include "hash.h"
+
+
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
+
+typedef struct _hash_info hash_info;
+struct _hash_info
+{
+	hash_collection *hashes;
+	const char *longname;
+	const char *manufacturer;
+	const char *year;
+	const char *playable;
+	const char *pcb;
+	const char *extrainfo;
+};
+
+typedef struct _hash_file hash_file;
+
+typedef void (*hashfile_error_func)(const char *message);
+
+
+
+/***************************************************************************
+    FUNCTION PROTOTYPES
+***************************************************************************/
+
+/* opens a hash file; if is_preload is non-zero, the entire file is preloaded */
+hash_file *hashfile_open(core_options &options, const char *sysname, int is_preload, hashfile_error_func error_proc);
+
+/* closes a hash file and associated resources */
+void hashfile_close(hash_file *hashfile);
+
+/* looks up information in a hash file */
+const hash_info *hashfile_lookup(hash_file *hashfile, const hash_collection *hashes);
+
+/* performs a syntax check on a hash file */
+int hashfile_verify(const char *sysname, void (*error_proc)(const char *message));
+
+/* returns the functions used in this hash file */
+const char *hashfile_functions_used(hash_file *hashfile, iodevice_t devtype);
+
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
@@ -43,7 +87,7 @@ struct hash_parse_state
 	hash_file *hashfile;
 	int done;
 
-	int (*selector_proc)(hash_file *hashfile, void *param, const char *name, const hash_collection &hashes);
+	int (*selector_proc)(hash_file *hashfile, void *param, const char *name, const hash_collection *hashes);
 	void (*use_proc)(hash_file *hashfile, void *param, hash_info *hi);
 	void (*error_proc)(const char *message);
 	void *param;
@@ -214,14 +258,14 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 					attributes += 2;
 				}
 
-				for (i = 0; i < IO_COUNT; i++)
-					if (i == device || device == IO_COUNT)
-						state->hashfile->functions[i] = all_functions;
+				//for (i = 0; i < IO_COUNT; i++)
+					//if (i == device || device == IO_COUNT)
+						//state->hashfile->functions[i] = all_functions;
 
 				/* do we use this hash? */
-				if (!state->selector_proc || state->selector_proc(state->hashfile, state->param, name, hashes))
+				if (!state->selector_proc || state->selector_proc(state->hashfile, state->param, name, &hashes))
 				{
-					hi = (hash_info*)pool_malloc_lib(state->hashfile->pool, sizeof(hash_info));
+					hi = (hash_info*)pool_malloc_lib(state->hashfile->pool, sizeof(hash_info));					
 					if (!hi)
 						return;
 					memset(hi, 0, sizeof(*hi));
@@ -229,8 +273,7 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 					hi->longname = pool_strdup_lib(state->hashfile->pool, name);
 					if (!hi->longname)
 						return;
-
-					hi->hashes = hashes;
+					hi->hashes = &hashes;
 					state->hi = hi;
 				}
 			}
@@ -251,11 +294,12 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 				text_dest = (char **) &state->hi->playable;
 			else if (!strcmp(tagname, "pcb"))
 				text_dest = (char **) &state->hi->pcb;
-			else if (!strcmp(tagname, "extrainfo"))
-				text_dest = (char **) &state->hi->extrainfo;
+			else if (!strcmp(tagname, "extrainfo")) {
+				text_dest = (char **) &state->hi->extrainfo;		
+			}
 			else
 				unknown_tag(state, tagname);
-
+			
 			if (text_dest && state->hi)
 				state->text_dest = text_dest;
 			break;
@@ -326,7 +370,7 @@ static void data_handler(void *data, const XML_Char *s, int len)
 -------------------------------------------------*/
 
 static void hashfile_parse(hash_file *hashfile,
-	int (*selector_proc)(hash_file *hashfile, void *param, const char *name, const hash_collection &hashes),
+	int (*selector_proc)(hash_file *hashfile, void *param, const char *name, const hash_collection *hashes),
 	void (*use_proc)(hash_file *hashfile, void *param, hash_info *hi),
 	void (*error_proc)(const char *message),
 	void *param)
@@ -464,14 +508,15 @@ void hashfile_close(hash_file *hashfile)
 
 struct hashlookup_params
 {
-	hash_collection hashes;
+	const hash_collection *hashes;
 	hash_info *hi;
 };
 
-static int singular_selector_proc(hash_file *hashfile, void *param, const char *name, const hash_collection &hashes)
+static int singular_selector_proc(hash_file *hashfile, void *param, const char *name, const hash_collection *hashes)
 {
+	astring tempstr;
 	struct hashlookup_params *hlparams = (struct hashlookup_params *) param;
-	return (hashes == hlparams->hashes);
+	return (*hashes == *hlparams->hashes);
 }
 
 
@@ -492,14 +537,14 @@ static void singular_use_proc(hash_file *hashfile, void *param, hash_info *hi)
     hashfile_lookup
 -------------------------------------------------*/
 
-const hash_info *hashfile_lookup(hash_file *hashfile, const hash_collection &hashes)
+const hash_info *hashfile_lookup(hash_file *hashfile, const hash_collection *hashes)
 {
 	struct hashlookup_params param;
 	int i;
 
 	param.hashes = hashes;
 	param.hi = NULL;
-
+	
 	for (i = 0; i < hashfile->preloaded_hash_count; i++)
 	{
 		if (singular_selector_proc(hashfile, &param, NULL, hashfile->preloaded_hashes[i]->hashes))
@@ -543,7 +588,50 @@ int hashfile_verify(core_options &options, const char *sysname, void (*my_error_
 	return 0;
 }
 
+const char *read_hash_config(device_image_interface &image, const char *sysname)
+{
+    hash_file *hashfile = NULL;
+    const hash_info *info = NULL;
+	char *temp = NULL;
+	
+    /* open the hash file */
+    hashfile = hashfile_open(image.device().machine->options(), sysname, FALSE, NULL);
+    if (!hashfile)
+        goto done;
 
+    /* look up this entry in the hash file */
+    info = hashfile_lookup(hashfile, &image.hash());
+
+    if (!info)
+        goto done;
+
+	temp = core_strdup(info->extrainfo);
+    /* copy the relevant entries */
+    if (hashfile != NULL)
+        hashfile_close(hashfile);
+		
+    return temp  ? astring(temp).cstr() : (const char*)NULL;
+done:
+    if (hashfile != NULL)
+        hashfile_close(hashfile);
+    return NULL;
+}
+const char *hashfile_extrainfo(device_image_interface &image)
+{
+    const game_driver *drv;
+    const char *rc;	
+
+	/* now read the hash file */
+	image.crc();
+	drv = image.device().machine->gamedrv;
+	do
+	{
+		rc = read_hash_config(image, drv->name);
+		drv = driver_get_compatible(drv);
+	}
+	while(rc!=NULL && drv != NULL);
+	return rc;
+}
 
 /***************************************************************************
     EXPAT INTERFACES

@@ -11,7 +11,7 @@
 //  IMPLEMENTATION
 //============================================================
 
-software_config *software_config_alloc(int driver_index, core_options *opts, hashfile_error_func error_proc)
+software_config *software_config_alloc(int driver_index, core_options *opts) //, hashfile_error_func error_proc)
 {
 	const game_driver *driver;
 	software_config *config;
@@ -25,7 +25,7 @@ software_config *software_config_alloc(int driver_index, core_options *opts, has
 
 	// allocate the hash file
 	driver = drivers[driver_index];
-	while ((driver) && (!config->hashfile))
+	while (driver) //&& (!config->hashfile))
 	{
 		//config->hashfile = hashfile_open(*opts, driver->name, TRUE, error_proc);
 		driver = driver_get_compatible(driver);
@@ -47,10 +47,10 @@ void software_config_free(software_config *config)
 		global_free(config->mconfig);
 		config->mconfig = NULL;
 	}
-	if (config->hashfile != NULL)
+	/*if (config->hashfile != NULL)
 	{
 		hashfile_close(config->hashfile);
 		config->hashfile = NULL;
-	}
+	}*/
 	free(config);
 }

@@ -416,7 +416,7 @@ void MyFillSoftwareList(int drvindex, BOOL bForce)
 	// allocate the machine config, if necessary
 	if (drvindex >= 0)
 	{
-		s_config = software_config_alloc(drvindex, MameUIGlobal(), NULL);
+		s_config = software_config_alloc(drvindex, MameUIGlobal());
 	}
 
 	// locate key widgets
