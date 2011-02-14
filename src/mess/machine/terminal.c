@@ -283,8 +283,7 @@ WRITE8_DEVICE_HANDLER ( terminal_write )
 			case 0x08:	if (term->x_pos) term->x_pos--;
 					break;
 
-			case 0x09:	term->x_pos ++;
-					term->x_pos += term->x_pos % 8;
+			case 0x09:	term->x_pos = (term->x_pos & 0xf8) + 8;
 					if (term->x_pos >= TERMINAL_WIDTH)
 						term->x_pos = TERMINAL_WIDTH-1;
 					break;
@@ -525,7 +524,9 @@ static DEVICE_START( terminal )
 	const terminal_interface *intf = get_interface(device);
 
 	devcb_resolve_write8(&term->terminal_keyboard_func, &intf->terminal_keyboard_func, device);
-	device->machine->scheduler().timer_pulse(attotime::from_hz(2400), FUNC(keyboard_callback), 0, (void*)device);
+
+	if (term->terminal_keyboard_func.target)
+		device->machine->scheduler().timer_pulse(attotime::from_hz(2400), FUNC(keyboard_callback), 0, (void*)device);
 }
 
 /*-------------------------------------------------
