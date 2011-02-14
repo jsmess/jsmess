@@ -4206,9 +4206,15 @@ void CDD_Length(void)
 	if(segacd.cd == NULL) // no cd is there, bail out
 		return;
 	CDD_STATUS |= SCD_STATUS;
-	CDD_MIN = 259; 	// HACK!!!!
-	CDD_SEC = 258; 	// HACK!!!!
-	CDD_FRAME = 257; 	// HACK!!!!
+
+	UINT32 startlba = (segacd.toc->tracks[cdrom_get_last_track(segacd.cd)].physframeofs);
+	UINT32 startmsf = lba_to_msf_alt( startlba );
+
+	printf("%08x %08x\n",startlba,startmsf);
+
+	CDD_MIN = to_bcd((startmsf&0x00ff0000)>>16,false);
+	CDD_SEC = to_bcd((startmsf&0x0000ff00)>>8,false);
+	CDD_FRAME = to_bcd((startmsf&0x000000ff)>>0,false);
 }
 
 
@@ -4220,7 +4226,7 @@ void CDD_FirstLast(void)
 		return;
 	CDD_STATUS |= SCD_STATUS;
 	CDD_MIN = 1; // first
-	CDD_SEC = to_bcd(cdrom_get_last_track(segacd.cd)+1,false); // last
+	CDD_SEC = to_bcd(cdrom_get_last_track(segacd.cd),false); // last
 }
 
 void CDD_GetTrackAdr(void)
@@ -4228,7 +4234,7 @@ void CDD_GetTrackAdr(void)
 	CLEAR_CDD_RESULT
 
 	int track = (CDD_TX[4] & 0xF) + (CDD_TX[5] & 0xF) * 10;
-	int last_track = cdrom_get_last_track(segacd.cd)+1;
+	int last_track = cdrom_get_last_track(segacd.cd);
 
 	CDD_STATUS &= 0xFF;
 	if(segacd.cd == NULL) // no cd is there, bail out
@@ -4639,7 +4645,7 @@ void CDD_Handle_TOC_Commands(void)
 	{
 		case TOCCMD_CURPOS:	   CDD_GetPos();	  break;
 		case TOCCMD_TRKPOS:	   CDD_GetTrackPos(); break;
-		case TOCCMD_CURTRK:    CDD_GetTrack ();   break;
+		case TOCCMD_CURTRK:    CDD_GetTrack();   break;
 		case TOCCMD_LENGTH:    CDD_Length();      break;
 		case TOCCMD_FIRSTLAST: CDD_FirstLast();   break;
 		case TOCCMD_TRACKADDR: CDD_GetTrackAdr(); break;
