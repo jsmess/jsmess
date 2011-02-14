@@ -4178,11 +4178,13 @@ void CDD_GetTrackPos(void)
 	int elapsedlba;
 	UINT32 msf;
 	CDD_STATUS &= 0xFF;
+	//	UINT32 end_msf = ;
 	if(segacd.cd == NULL) // no cd is there, bail out
 		return;
 	CDD_STATUS |= SCD_STATUS;
-	elapsedlba = SCD_CURLBA - cdrom_get_track_start(segacd.cd, SCD_CURTRK);
-	msf = lba_to_msf_alt (elapsedlba+150);
+	elapsedlba = SCD_CURLBA - segacd.toc->tracks[ cdrom_get_track(segacd.cd, SCD_CURLBA) ].physframeofs;
+	msf = lba_to_msf_alt (elapsedlba);
+	//popmessage("%08x %08x",SCD_CURLBA,segacd.toc->tracks[ cdrom_get_track(segacd.cd, SCD_CURLBA) + 1 ].physframeofs);
 	CDD_MIN = to_bcd(((msf & 0x00ff0000)>>16),false);
 	CDD_SEC = to_bcd(((msf & 0x0000ff00)>>8),false);
 	CDD_FRAME = to_bcd(((msf & 0x000000ff)>>0),false);
@@ -4209,8 +4211,6 @@ void CDD_Length(void)
 
 	UINT32 startlba = (segacd.toc->tracks[cdrom_get_last_track(segacd.cd)].physframeofs);
 	UINT32 startmsf = lba_to_msf_alt( startlba );
-
-	printf("%08x %08x\n",startlba,startmsf);
 
 	CDD_MIN = to_bcd((startmsf&0x00ff0000)>>16,false);
 	CDD_SEC = to_bcd((startmsf&0x0000ff00)>>8,false);
@@ -4312,8 +4312,8 @@ void CDD_Pause(running_machine *machine)
 	SET_CDD_DATA_MODE
 
 	//segacd.current_frame = cdda_get_audio_lba( machine->device( "cdda" ) );
-	if(!(CURRENT_TRACK_IS_DATA))
-		cdda_pause_audio( machine->device( "cdda" ), 1 );
+	//if(!(CURRENT_TRACK_IS_DATA))
+	cdda_pause_audio( machine->device( "cdda" ), 1 );
 }
 
 void CDD_Resume(running_machine *machine)
@@ -4326,8 +4326,8 @@ void CDD_Resume(running_machine *machine)
 	set_data_audio_mode();
 	CDD_MIN = to_bcd (SCD_CURTRK, false);
 	SET_CDC_READ
-	if(!(CURRENT_TRACK_IS_DATA))
-		cdda_pause_audio( machine->device( "cdda" ), 0 );
+	//if(!(CURRENT_TRACK_IS_DATA))
+	cdda_pause_audio( machine->device( "cdda" ), 0 );
 }
 
 
@@ -5832,7 +5832,8 @@ void segacd_init_main_cpu( running_machine* machine )
 	segacd_gfx_conversion_timer->adjust(attotime::never);
 
 	segacd_hock_timer = machine->scheduler().timer_alloc(FUNC(segacd_access_timer_callback));
-	segacd_hock_timer->adjust( attotime::from_nsec(5000000), 0, attotime::from_nsec(5000000));
+//	segacd_hock_timer->adjust( attotime::from_nsec(20000000), 0, attotime::from_nsec(20000000));
+	segacd_hock_timer->adjust( attotime::from_hz(75),0, attotime::from_hz(75));
 
 	segacd_irq3_timer = machine->scheduler().timer_alloc(FUNC(segacd_irq3_timer_callback));
 	segacd_irq3_timer->adjust(attotime::never);
@@ -5888,6 +5889,7 @@ static MACHINE_RESET( segacd )
 			{
 				segacd.toc = cdrom_get_toc( segacd.cd );
 				cdda_set_cdrom( machine->device("cdda"), segacd.cd );
+				cdda_stop_audio( machine->device( "cdda" ) ); //stop any pending CD-DA
 			}
 		}
 	}
@@ -9465,8 +9467,6 @@ MACHINE_CONFIG_DERIVED( genesis_scd, megadriv )
 	MCFG_SOUND_ROUTE( 1, "rspeaker", 0.25 )
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
-
-
 MACHINE_CONFIG_END
 
 /* Different Softlists for different regions (for now at least) */
