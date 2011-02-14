@@ -68,6 +68,9 @@ System Driver Changes:
 
 - [PIPPIN] Added pre release rom
 
+- [PSX] Added CD-ROM support.  Some commercial games work well.  Some don't.
+        [pSXAuthor, R. Belmont]
+
 - [PV1000] 4 new cartridge dumps for the software list.  [anondumper]
 
 - [SNES] uPD96050 DSP (aka Seta ST-010) is now emulated instead of
