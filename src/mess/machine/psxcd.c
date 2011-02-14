@@ -226,7 +226,7 @@ void psxcd_device::device_reset()
 
 unsigned char psxcd_device::read_byte(const unsigned int addr)
 {
-	unsigned char ret;
+	unsigned char ret = 0;
 
 	switch (addr&3)
 	{
