@@ -42,7 +42,7 @@ struct _file_info
 	const device_config_image_interface *device;
 
 	// hash information
-	char hash_string[HASH_BUF_SIZE];
+	//hash_collection hashes;
 	BOOL hash_realized;
 	const hash_info *hashinfo;
 
@@ -216,13 +216,13 @@ void SoftwarePicker_SetDriver(HWND hwndPicker, const software_config *config)
 static void ComputeFileHash(software_picker_info *pPickerInfo,
 	file_info *pFileInfo, const unsigned char *pBuffer, unsigned int nLength)
 {
-	unsigned int functions;
+	const char *functions;
 
 	// determine which functions to use
 	functions = hashfile_functions_used(pPickerInfo->config->hashfile, pFileInfo->device->image_type());
 
 	// compute the hash
-	pFileInfo->device->device_compute_hash((char *)pFileInfo->hash_string, (const void *)pBuffer, (size_t)nLength, functions);
+	//pFileInfo->device->device_compute_hash(pFileInfo->hashes, (const void *)pBuffer, (size_t)nLength, functions);
 }
 
 
@@ -325,9 +325,9 @@ static void SoftwarePicker_RealizeHash(HWND hwndPicker, int nIndex)
 {
 	software_picker_info *pPickerInfo;
 	file_info *pFileInfo;
-	unsigned int nHashFunctionsUsed = 0;
-	unsigned int nCalculatedHashes = 0;
-	iodevice_t type;
+//	const char *nHashFunctionsUsed = NULL;
+	//unsigned int nCalculatedHashes = 0;
+//	iodevice_t type;
 
 	pPickerInfo = GetSoftwarePickerInfo(hwndPicker);
 	assert((nIndex >= 0) && (nIndex < pPickerInfo->file_index_length));
@@ -335,16 +335,16 @@ static void SoftwarePicker_RealizeHash(HWND hwndPicker, int nIndex)
 
 	// Determine which hash functions we need to use for this file, and which hashes
 	// have already been calculated
-	if ((pPickerInfo->config->hashfile != NULL) && (pFileInfo->device != NULL))
+	/*if ((pPickerInfo->config->hashfile != NULL) && (pFileInfo->device != NULL))
 	{
 		type = pFileInfo->device->image_type();
 		if (type < IO_COUNT)
 	        nHashFunctionsUsed = hashfile_functions_used(pPickerInfo->config->hashfile, type);
 		nCalculatedHashes = hash_data_used_functions(pFileInfo->hash_string);
-	}
+	}*/
 
 	// Did we fully compute all hashes?
-	if ((nHashFunctionsUsed & ~nCalculatedHashes) == 0)
+/*	if ((nHashFunctionsUsed & ~nCalculatedHashes) == 0)
 	{
 		// We have calculated all hashs for this file; mark it as realized
 		pPickerInfo->file_index[nIndex]->hash_realized = TRUE;
@@ -353,9 +353,9 @@ static void SoftwarePicker_RealizeHash(HWND hwndPicker, int nIndex)
 		if (pPickerInfo->config->hashfile)
 		{
 			pPickerInfo->file_index[nIndex]->hashinfo = hashfile_lookup(pPickerInfo->config->hashfile,
-				pPickerInfo->file_index[nIndex]->hash_string);
+				pPickerInfo->file_index[nIndex]->hashes);
 		}
-	}
+	}*/
 }
 
 
@@ -407,8 +407,8 @@ static BOOL SoftwarePicker_AddFileEntry(HWND hwndPicker, LPCSTR pszFilename,
 	pInfo->device = device;
 	if ((device != NULL) && (device->has_partial_hash() != 0))
 		nCrc = 0;
-	if (nCrc != 0)
-		snprintf(pInfo->hash_string, ARRAY_LENGTH(pInfo->hash_string), "c:%08x#", nCrc);
+	//if (nCrc != 0)
+		//snprintf(pInfo->hash_string, ARRAY_LENGTH(pInfo->hash_string), "c:%08x#", nCrc);
 
 	// set up zip entry name length, if specified
 	if (nZipEntryNameLength > 0)
@@ -727,7 +727,7 @@ LPCTSTR SoftwarePicker_GetItemString(HWND hwndPicker, int nRow, int nColumn,
 	LPCTSTR s = NULL;
 	const char *pszUtf8 = NULL;
 	unsigned int nHashFunction = 0;
-	char szBuffer[256];
+//	char szBuffer[256];
 	TCHAR* t_buf;
 
 	pPickerInfo = GetSoftwarePickerInfo(hwndPicker);
@@ -785,11 +785,11 @@ LPCTSTR SoftwarePicker_GetItemString(HWND hwndPicker, int nRow, int nColumn,
 		case MESS_COLUMN_SHA1:
 		switch (nColumn)
 			{
-				case MESS_COLUMN_CRC:	nHashFunction = HASH_CRC;	break;
-				case MESS_COLUMN_MD5:	nHashFunction = HASH_MD5;	break;
-				case MESS_COLUMN_SHA1:	nHashFunction = HASH_SHA1;	break;
+				case MESS_COLUMN_CRC:	nHashFunction = hash_collection::HASH_CRC;	break;
+				case MESS_COLUMN_MD5:	nHashFunction = hash_collection::HASH_MD5;	break;
+				case MESS_COLUMN_SHA1:	nHashFunction = hash_collection::HASH_SHA1;	break;
 			}
-			if (hash_data_extract_printable_checksum(pFileInfo->hash_string, nHashFunction, szBuffer))
+/*			if (hash_data_extract_printable_checksum(pFileInfo->hash_string, nHashFunction, szBuffer))
 			{
 				t_buf = tstring_from_utf8(szBuffer);
 				if( !t_buf )
@@ -797,7 +797,7 @@ LPCTSTR SoftwarePicker_GetItemString(HWND hwndPicker, int nRow, int nColumn,
 				_sntprintf(pszBuffer, nBufferLength, TEXT("%s"), t_buf);
 				s = pszBuffer;
 				osd_free(t_buf);
-			}
+			}*/
 			break;
 	}
 	return s;

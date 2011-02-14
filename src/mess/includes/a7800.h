@@ -65,8 +65,7 @@ extern const riot6532_interface a7800_r6532_interface;
 
 MACHINE_RESET( a7800 );
 
-void a7800_partialhash(char *dest, const unsigned char *data,
-	unsigned long length, unsigned int functions);
+void a7800_partialhash(hash_collection &dest, const unsigned char *data, unsigned long length, const char *functions);
 
 DEVICE_START( a7800_cart );
 DEVICE_IMAGE_LOAD( a7800_cart );

@@ -1515,11 +1515,12 @@ DEVICE_IMAGE_LOAD( nes_cart )
 
 
 
-void nes_partialhash( char *dest, const unsigned char *data, unsigned long length, unsigned int functions )
+void nes_partialhash(hash_collection &dest, const unsigned char *data,
+	unsigned long length, const char *functions)
 {
 	if (length <= 16)
 		return;
-	hash_compute(dest, &data[16], length - 16, functions);
+	dest.compute(&data[16], length - 16, functions);	
 }
 
 /**************************

@@ -161,13 +161,12 @@ Versions:
                Changed 53 bit 2, added bit 3
 
 */
-
-void a7800_partialhash(char *dest, const unsigned char *data,
-	unsigned long length, unsigned int functions)
+void a7800_partialhash(hash_collection &dest, const unsigned char *data,
+	unsigned long length, const char *functions)
 {
 	if (length <= 128)
 		return;
-	hash_compute(dest, &data[128], length - 128, functions);
+	dest.compute(&data[128], length - 128, functions);	
 }
 
 

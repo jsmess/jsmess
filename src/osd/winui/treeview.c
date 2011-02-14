@@ -1239,9 +1239,10 @@ void CreateDumpingFolders(int parent_index)
 					if (ROMREGION_ISROMDATA(region) || ROMREGION_ISDISKDATA(region) )
 					{
 						//name = ROM_GETNAME(rom);
-						if (hash_data_has_info(ROM_GETHASHDATA(rom), HASH_INFO_BAD_DUMP))				
+						hash_collection hashes(ROM_GETHASHDATA(rom));						
+						if (hashes.flag(hash_collection::FLAG_BAD_DUMP))
 							bBadDump = TRUE;
-						if (hash_data_has_info(ROM_GETHASHDATA(rom), HASH_INFO_NO_DUMP))				
+						if (hashes.flag(hash_collection::FLAG_NO_DUMP))
 							bNoDump = TRUE;
 					}
 				}

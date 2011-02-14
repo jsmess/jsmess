@@ -514,7 +514,7 @@ WRITE32_HANDLER( psx_dma_w )
 				}
 				else
 				{
-					printf("dma %d unknown mode %08x\n", n_channel, dma->n_channelcontrol );
+					verboselog( p_psx, 1, "dma %d unknown mode %08x\n", n_channel, dma->n_channelcontrol );
 				}
 			}
 			else if( dma->n_channelcontrol != 0 )

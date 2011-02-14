@@ -287,13 +287,13 @@ static INPUT_PORTS_START( pce )
 INPUT_PORTS_END
 
 
-static void pce_partialhash(char *dest, const unsigned char *data,
-        unsigned long length, unsigned int functions)
+static void pce_partialhash(hash_collection &dest, const unsigned char *data,
+	unsigned long length, const char *functions)
 {
 	if ( ( length <= PCE_HEADER_SIZE ) || ( length & PCE_HEADER_SIZE ) ) {
-	        hash_compute(dest, &data[PCE_HEADER_SIZE], length - PCE_HEADER_SIZE, functions);
-	} else {
-		hash_compute(dest, data, length, functions);
+			dest.compute(&data[PCE_HEADER_SIZE], length - PCE_HEADER_SIZE, functions);	
+	} else {		
+		dest.compute(data, length, functions);	
 	}
 }
 

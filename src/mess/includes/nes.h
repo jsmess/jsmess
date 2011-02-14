@@ -265,7 +265,7 @@ READ8_HANDLER( nes_IN1_r );
 
 int nes_ppu_vidaccess( device_t *device, int address, int data );
 
-void nes_partialhash(char *dest, const unsigned char *data, unsigned long length, unsigned int functions);
+void nes_partialhash(hash_collection &dest, const unsigned char *data, unsigned long length, const char *functions);
 
 /*----------- defined in video/nes.c -----------*/
 

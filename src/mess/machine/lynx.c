@@ -1828,12 +1828,12 @@ MACHINE_START( lynx )
 ****************************************/
 
 
-static void lynx_partialhash(char *dest, const unsigned char *data,
-	unsigned long length, unsigned int functions)
+static void lynx_partialhash(hash_collection &dest, const unsigned char *data,
+	unsigned long length, const char *functions)
 {
 	if (length <= 64)
 		return;
-	hash_compute(dest, &data[64], length - 64, functions);
+	dest.compute(&data[64], length - 64, functions);
 }
 
 int lynx_verify_cart (char *header, int kind)
