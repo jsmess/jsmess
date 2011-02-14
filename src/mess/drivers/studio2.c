@@ -149,7 +149,7 @@ Notes:
     Freeway                         built-in                yes
     Math                            built-in                yes
     Patterns                        built-in                yes
-    Gunfighter/Moonship Battle      TV Arcade               no, but Guru has one
+    Gunfighter/Moonship Battle      TV Arcade               yes
     Space War                       TV Arcade I             yes
     Fun with Numbers                TV Arcade II            no, but Guru has one
     Tennis/Squash                   TV Arcade III           yes
@@ -158,8 +158,8 @@ Notes:
     Blackjack                       TV Casino I             yes
     Bingo                           TV Casino               no
     Math and Social Studies         TV School House I       no, but Guru has one
-    Math Fun                        TV School House II      no, but Guru has one
-    Biorhythm                       TV Mystic               no, but Guru has one
+    Math Fun                        TV School House II      yes
+    Biorhythm                       TV Mystic               yes
 
 
     MPT-02 games list
