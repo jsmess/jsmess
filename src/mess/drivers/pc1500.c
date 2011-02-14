@@ -15,7 +15,7 @@
 #include "cpu/lh5801/lh5801.h"
 #include "machine/lh5810.h"
 #include "machine/upd1990a.h"
-#include "rendlay.h"
+#include "pc1500.lh"
 
 
 class pc1500_state : public driver_device
@@ -103,6 +103,21 @@ bool pc1500_state::video_update(screen_device &screen, bitmap_t &bitmap, const r
 					*BITMAP_ADDR16(&bitmap, b - 4 * (BIT(~a,0)), (a>>1) + 0x4e + 0x27*p) = BIT(data, b);
 			}
 		}
+
+	output_set_value("BUSY",  BIT(m_lcd_data[0x4e], 0));
+	output_set_value("SHIFT", BIT(m_lcd_data[0x4e], 1));
+	output_set_value("SML",   BIT(m_lcd_data[0x4e], 2));
+	output_set_value("SMALL", BIT(m_lcd_data[0x4e], 3));
+	output_set_value("III",   BIT(m_lcd_data[0x4e], 4));
+	output_set_value("II",    BIT(m_lcd_data[0x4e], 5));
+	output_set_value("I",     BIT(m_lcd_data[0x4e], 6));
+	output_set_value("DEF",   BIT(m_lcd_data[0x4e], 7));
+	output_set_value("DE",    BIT(m_lcd_data[0x4f], 0));
+	output_set_value("G",     BIT(m_lcd_data[0x4f], 1));
+	output_set_value("RAD",   BIT(m_lcd_data[0x4f], 2));
+	output_set_value("RESERVE", BIT(m_lcd_data[0x4f], 4));
+	output_set_value("PRO",   BIT(m_lcd_data[0x4f], 5));
+	output_set_value("RUN",   BIT(m_lcd_data[0x4f], 6));
 
 	return 0;
 }
@@ -282,7 +297,7 @@ static MACHINE_CONFIG_START( pc1500, pc1500_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(156, 8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 156-1, 0, 7-1)
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
+	MCFG_DEFAULT_LAYOUT(layout_pc1500)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(pc1500)
 
