@@ -588,11 +588,12 @@ int hashfile_verify(core_options &options, const char *sysname, void (*my_error_
 	return 0;
 }
 
+const char *extra_info = NULL;
+
 const char *read_hash_config(device_image_interface &image, const char *sysname)
 {
 	hash_file *hashfile = NULL;
 	const hash_info *info = NULL;
-	char *temp = NULL;
 	
 	/* open the hash file */
 	hashfile = hashfile_open(image.device().machine->options(), sysname, FALSE, NULL);
@@ -608,20 +609,17 @@ const char *read_hash_config(device_image_interface &image, const char *sysname)
 		return NULL;
 	}
 	
-	temp = core_strdup(info->extrainfo);
-	if (!temp)
+	extra_info = auto_strdup(image.device().machine,info->extrainfo);
+	if (!extra_info)
 	{
 		hashfile_close(hashfile);
 		return NULL;
 	}
-	
-	astring result(temp);
-	
+		
 	/* copy the relevant entries */
 	hashfile_close(hashfile);
 	
-	//printf("%s\n", result.cstr());	
-	return result.cstr();
+	return extra_info;
 }
 
 const char *hashfile_extrainfo(device_image_interface &image)
@@ -631,6 +629,7 @@ const char *hashfile_extrainfo(device_image_interface &image)
 
 	/* now read the hash file */
 	image.crc();
+	extra_info = NULL;
 	drv = image.device().machine->gamedrv;
 	do
 	{
