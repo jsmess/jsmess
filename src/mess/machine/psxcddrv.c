@@ -440,7 +440,7 @@ unsigned int mess_cdrom_driver::get_first_track() const
 
 unsigned int mess_cdrom_driver::get_num_tracks() const
 {
-	printf("get_num_tracks = %d\n", num_tracks);
+//	printf("get_num_tracks = %d\n", num_tracks);
 	return num_tracks;
 }
 
@@ -448,7 +448,7 @@ bool mess_cdrom_driver::get_track_address(const unsigned int track, unsigned cha
 {
 	if ((track>=1) && ((int)track<=num_tracks))
 	{
-		UINT32 trkstart = cdrom_get_track(m_cd, track);
+		UINT32 trkstart = cdrom_get_track_start(m_cd, track);
 
 		sector_to_msf(trkstart, address);
 
@@ -456,7 +456,7 @@ bool mess_cdrom_driver::get_track_address(const unsigned int track, unsigned cha
 		address[1] = decimal_to_bcd(address[1]);
 		address[2] = decimal_to_bcd(address[2]);
 
-		printf("get_track_address %d = %02x:%02x:%02x\n", track, address[0], address[1], address[2]);
+//		printf("get_track_address %d = %02x:%02x:%02x\n", track, address[0], address[1], address[2]);
 
 		return true;
 	} 
@@ -475,7 +475,7 @@ unsigned int mess_cdrom_driver::find_track(const unsigned int sector, unsigned i
 	*start_sector = cdrom_get_track_start(m_cd, track);
 	*end_sector = *start_sector + toc->tracks[track].frames;
 
-	printf("find_track: track %d start %d end %d\n", track, *start_sector, *end_sector);
+//	printf("find_track: track %d start %d end %d\n", track, *start_sector, *end_sector);
 
 	return -1;
 }
@@ -486,7 +486,7 @@ unsigned int mess_cdrom_driver::find_track(const unsigned int sector, unsigned i
 
 cdromtype mess_cdrom_driver::get_type() const
 {
-	printf("get_type\n");
+//	printf("get_type\n");
 	return cdromtype_cd;
 }
 
@@ -498,7 +498,7 @@ tracktype mess_cdrom_driver::get_track_type(const unsigned int track) const
 {
 	const cdrom_toc *toc = cdrom_get_toc(m_cd);
 
-	printf("get_track_type %d = %d\n", track, toc->tracks[track].trktype);
+//	printf("get_track_type %d = %d\n", track, toc->tracks[track].trktype);
 
 	switch (toc->tracks[track].trktype)
 	{
