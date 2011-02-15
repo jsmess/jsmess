@@ -1,4 +1,4 @@
-﻿0.141.1
+0.141.1
 
 New System Drivers Supported:
 -----------------------------
@@ -17,6 +17,7 @@ Systems Promoted from GAME_NOT_WORKING:
 Skeleton drivers:
 -----------------
 - Ferguson Big Board II
+- Hewlett-Packard HP9816
 - Savia 84
 
 

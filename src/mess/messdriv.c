@@ -1247,6 +1247,7 @@ const game_driver * const drivers[] =
 	DRIVER( hp49g )
 	DRIVER( hp49gp )	/* HP 49G+ */
 	DRIVER( hp16500b )
+	DRIVER( hp9816 )
 
 	/* SpectraVideo */
 	DRIVER( svi318 )	/* SVI-318 (PAL)    */
