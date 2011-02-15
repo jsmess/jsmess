@@ -153,14 +153,12 @@ psxcd_device::psxcd_device(running_machine &_machine, const psxcd_device_config 
 
 void psxcd_device::device_start()
 {
-	unsigned int sysclk=m_machine.device<cpu_device>("maincpu")->clock();
+	unsigned int sysclk=m_machine.device<cpu_device>("maincpu")->clock()/2;
 	start_read_delay=(sysclk/60);
 	read_sector_cycles=(sysclk/75);
 	preread_delay=(read_sector_cycles>>2)-500;
 
 	m_sysclock = sysclk;
-
-//	printf("PSXCD: device start!  maincpu clock is %d, devname is %s\n", m_sysclock, m_devname);
 
 	secleft = 0;
 	secsize = 2048;
@@ -847,19 +845,17 @@ void psxcd_device::cdcmd_id()
 
 	if (open)
 	{
-		static unsigned char data[8]=
-		{
-			0x08,
-			0x00,
-			0x00,
-			0x00,
-			'S',
-			'C',
-			'E',
-			'A'
-		};
+		static unsigned char gamedata[8] = { 0x08, 0x00, 0x00, 0x00, 'S', 'C', 'E', 'A' };
+		static unsigned char audiodata[8] = { 0x08, 0x90, 0x00, 0x00, 'S', 'C', 'E', 'A' };	// drops into the audio CD player.  08 80 goes to the menu.
 
-		send_result(intr_acknowledge,data,8);
+		if (cdrom_get_track_type(m_cd, 0) == CD_TRACK_AUDIO)
+		{
+			send_result(intr_acknowledge,audiodata,8);
+		}
+		else
+		{
+			send_result(intr_acknowledge,gamedata,8);
+		}
 	} else
 	{
 		status=status_error|status_shellopen;
@@ -1678,6 +1674,7 @@ void psxcd_device::add_system_event(event *ev)
 
 	// ev->t is in maincpu clock cycles
 	UINT32 hz = m_sysclock / ev->t;
+//	printf("add_system_event: event type %d, ev->t %lld hz %d\n", ev->type, ev->t, hz);
 	timer->adjust(attotime::from_hz(hz), 0, attotime::never);
 
 	// back-reference the timer from the event

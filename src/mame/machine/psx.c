@@ -434,7 +434,7 @@ WRITE32_HANDLER( psx_dma_w )
 					(*dma->fn_read)( space->machine, n_address, n_size );
 					dma_finished( p_psx, n_channel );
 				}
-				else if( dma->n_channelcontrol == 0x11000000 &&	// CD DMA
+				else if (((dma->n_channelcontrol == 0x11000000) || (dma->n_channelcontrol == 0x11400100)) &&	// CD DMA
 					dma->fn_read != NULL )
 				{
 					verboselog( p_psx, 1, "dma %d read block %08x %08x\n", n_channel, n_address, n_size );
@@ -454,7 +454,7 @@ WRITE32_HANDLER( psx_dma_w )
 					(*dma->fn_read)( space->machine, n_address, n_size );
 					if( n_channel == 1 )
 					{
-						dma_start_timer( p_psx, n_channel, 26000 );
+						dma_start_timer( p_psx, n_channel, 15000 );	// was 26000, that's waaaay too slow for home console MDECs
 					}
 					else
 					{
@@ -514,7 +514,7 @@ WRITE32_HANDLER( psx_dma_w )
 				}
 				else
 				{
-					verboselog( p_psx, 1, "dma %d unknown mode %08x\n", n_channel, dma->n_channelcontrol );
+					printf( "dma %d unknown mode %08x\n", n_channel, dma->n_channelcontrol );
 				}
 			}
 			else if( dma->n_channelcontrol != 0 )
