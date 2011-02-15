@@ -132,20 +132,24 @@ static WRITE16_HANDLER( write_lcd )
 static WRITE16_HANDLER( write_lcd_flag )
 {
 	glasgow_state *state = space->machine->driver_data<glasgow_state>();
-	UINT8 lcd_flag;
+//	UINT8 lcd_flag;
 	mboard_lcd_invert = 0;
-	lcd_flag=data >> 8;
-	//beep_set_state(0, lcd_flag & 1 ? 1 : 0);
-	if (lcd_flag == 0)
+//	lcd_flag=data >> 8;
+	//beep_set_state(0, (data >> 8) & 1 ? 1 : 0);
+	if ((data >> 8) == 0) {
 		mboard_key_selector = 1;
-
- // The key function in the rom expects after writing to
- // the  a value from the second key row;
-	if (lcd_flag != 0)
-		state->led7 = 255;
-	else
 		state->led7 = 0;
+	} else {
+		state->led7 = 0xff;
+	}
 
+//  The key function in the rom expects after writing to
+//  the  a value from the second key row;
+//	if (lcd_flag != 0)
+//		state->led7 = 255;
+//	else
+//		state->led7 = 0;
+//
 	logerror("LCD Flag 16 = %x \n", data);
 }
 
@@ -203,20 +207,24 @@ static WRITE32_HANDLER( write_lcd32 )
 static WRITE32_HANDLER( write_lcd_flag32 )
 {
 	glasgow_state *state = space->machine->driver_data<glasgow_state>();
-	UINT8 lcd_flag = data >> 24;
+//	UINT8 lcd_flag = data >> 24;
 
 	mboard_lcd_invert = 0;
 
-	if (lcd_flag == 0)
+	if ((data >> 24) == 0) {
 		mboard_key_selector = 1;
-
-	//logerror("LCD Flag 32 = %x \n", lcd_flag);
-	//beep_set_state(0, lcd_flag & 1 ? 1 : 0);
-
-	if (lcd_flag != 0)
-		state->led7 = 255;
-	else
 		state->led7 = 0;
+	} else {
+		state->led7 = 0xff;
+	}
+
+	//logerror("LCD Flag 32 = %x \n", data >> 24);
+	//beep_set_state(0, (data >> 24) & 1 ? 1 : 0);
+
+//	if (lcd_flag != 0)
+//		state->led7 = 255;
+//	else
+//		state->led7 = 0;
 }
 
 static READ32_HANDLER( read_newkeys32 ) // Dallas 32, Roma 32
@@ -254,18 +262,12 @@ static WRITE32_HANDLER ( write_beeper32 )
 
 static TIMER_DEVICE_CALLBACK( update_nmi )
 {
-	//cputag_set_input_line_and_vector(timer.machine, "maincpu", M68K_IRQ_7, irq_edge & 0xff ? CLEAR_LINE : ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
-		cputag_set_input_line_and_vector(timer.machine, "maincpu", M68K_IRQ_7, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
-		cputag_set_input_line_and_vector(timer.machine, "maincpu", M68K_IRQ_7, CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR);
-	// irq_edge = ~irq_edge;
+	cputag_set_input_line(timer.machine, "maincpu", 7, HOLD_LINE);
 }
 
-static TIMER_CALLBACK( update_nmi32 )
+static TIMER_DEVICE_CALLBACK( update_nmi32 )
 {
-	// cputag_set_input_line_and_vector(timer.machine, "maincpu", M68K_IRQ_7, irq_edge & 0xff ? CLEAR_LINE : ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
-		cputag_set_input_line_and_vector(machine, "maincpu", M68K_IRQ_7, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
-		cputag_set_input_line_and_vector(machine, "maincpu", M68K_IRQ_7, CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR);
-	// irq_edge = ~irq_edge;
+	cputag_set_input_line(timer.machine, "maincpu", 6, HOLD_LINE);
 }
 
 static MACHINE_START( glasgow )
@@ -289,8 +291,6 @@ static MACHINE_START( dallas32 )
 
 	state->lcd_shift_counter = 3;
 	beep_set_frequency(speaker, 44);
-
-	machine->scheduler().timer_pulse(attotime::from_hz(50),FUNC(update_nmi32),0);
 
 	mboard_savestate_register(machine);
 }
@@ -525,6 +525,7 @@ static MACHINE_CONFIG_DERIVED( dallas32, glasgow )
     MCFG_MACHINE_START( dallas32 )
 
 	MCFG_DEVICE_REMOVE("nmi_timer")
+	MCFG_TIMER_ADD_PERIODIC("nmi_timer", update_nmi32, attotime::from_hz(50))
 
 MACHINE_CONFIG_END
 
