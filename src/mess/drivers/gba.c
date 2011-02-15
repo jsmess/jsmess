@@ -2082,8 +2082,8 @@ static TIMER_CALLBACK( perform_scan )
 		}
 	}
 
-	// entering VBL, handle interrupts and DMA triggers
-	if (scanline == 160)
+	// exiting VBL, handle interrupts and DMA triggers
+	if (scanline == 227)
 	{
 		int ch, ctrl;
 
