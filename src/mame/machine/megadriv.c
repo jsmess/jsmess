@@ -392,7 +392,7 @@ static bitmap_t* render_bitmap;
 static int sega_cd_connected = 0x00;
 UINT16 segacd_irq_mask;
 static UINT16 *segacd_backupram;
-
+static timer_device *stopwatch_timer;
 
 
 
@@ -5908,6 +5908,7 @@ static MACHINE_RESET( segacd )
 	segacd_dmna_ret_timer->adjust(attotime::zero);
 
 	hock_cmd = 0;
+	stopwatch_timer = machine->device<timer_device>("sw_timer");
 }
 
 
@@ -6440,14 +6441,17 @@ static TIMER_CALLBACK( segacd_irq3_timer_callback )
 
 WRITE16_HANDLER( segacd_stopwatch_timer_w )
 {
-	printf("Stopwatch timer %04x\n",data);
+	if(data == 0)
+		stopwatch_timer->reset();
+	else
+		printf("Stopwatch timer %04x\n",data);
 }
 
 READ16_HANDLER( segacd_stopwatch_timer_r )
 {
-	printf("Stopwatch timer read\n");
+	INT32 result = (stopwatch_timer->time_elapsed() * ATTOSECONDS_TO_HZ(ATTOSECONDS_IN_USEC(30.72))).as_double();
 
-	return space->machine->rand();
+	return result & 0xfff;
 }
 
 READ16_HANDLER( cdc_dmaaddr_r )
@@ -9501,6 +9505,8 @@ MACHINE_CONFIG_DERIVED( genesis_scd, megadriv )
 
 	MCFG_CPU_ADD("segacd_68k", M68000, SEGACD_CLOCK ) /* 12.5 MHz */
 	MCFG_CPU_PROGRAM_MAP(segacd_map)
+
+	MCFG_TIMER_ADD("sw_timer", NULL) //stopwatch timer
 
 	MCFG_NVRAM_ADD_0FILL("backupram")
 
