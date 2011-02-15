@@ -1255,7 +1255,7 @@ void psxcd_device::read_sector()
 			next_sector_t+=cyc;
 
 			event *ev=new event;
-			ev->t=next_sector_t - m_machine.device<cpu_device>("maincpu")->total_cycles();
+			ev->t=cyc;
 			ev->type=event_read_sector;
 			next_read_event=ev;
 			add_system_event(ev);

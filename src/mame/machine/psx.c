@@ -454,7 +454,7 @@ WRITE32_HANDLER( psx_dma_w )
 					(*dma->fn_read)( space->machine, n_address, n_size );
 					if( n_channel == 1 )
 					{
-						dma_start_timer( p_psx, n_channel, 15000 );	// was 26000, that's waaaay too slow for home console MDECs
+						dma_start_timer( p_psx, n_channel, 25000 );
 					}
 					else
 					{
