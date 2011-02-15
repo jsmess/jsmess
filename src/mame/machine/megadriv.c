@@ -6439,11 +6439,13 @@ static TIMER_CALLBACK( segacd_irq3_timer_callback )
 
 WRITE16_HANDLER( segacd_stopwatch_timer_w )
 {
-
+	printf("Stopwatch timer %04x\n",data);
 }
 
 READ16_HANDLER( segacd_stopwatch_timer_r )
 {
+	printf("Stopwatch timer read\n");
+
 	return space->machine->rand();
 }
 
@@ -6455,6 +6457,29 @@ READ16_HANDLER( cdc_dmaaddr_r )
 WRITE16_HANDLER( cdc_dmaaddr_w )
 {
 	COMBINE_DATA(&CDC_DMA_ADDR);
+}
+
+READ16_HANDLER( segacd_cdfader_r )
+{
+	return 0;
+}
+
+WRITE16_HANDLER( segacd_cdfader_w )
+{
+	static double cdfader_vol;
+	if(data & 0x800f)
+		printf("CD Fader register write %04x\n",data);
+
+	cdfader_vol = (double)((data & 0x3ff0) >> 4);
+
+	if(data & 0x4000)
+		cdfader_vol = 100.0;
+	else
+		cdfader_vol = (cdfader_vol / 1024.0) * 100.0;
+
+	printf("%f\n",cdfader_vol);
+
+	cdda_set_volume(space->machine->device("cdda"), cdfader_vol);
 }
 
 static ADDRESS_MAP_START( segacd_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -6483,7 +6508,7 @@ static ADDRESS_MAP_START( segacd_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xff8020 ,0xff802f) AM_READWRITE(segacd_comms_sub_part2_r, segacd_comms_sub_part2_w)
 	AM_RANGE(0xff8030, 0xff8031) AM_READWRITE(segacd_irq3timer_r, segacd_irq3timer_w) // Timer W/INT3
 	AM_RANGE(0xff8032, 0xff8033) AM_READWRITE(segacd_irq_mask_r,segacd_irq_mask_w)
-	AM_RANGE(0xff8034, 0xff8035) AM_NOP // CD Fader
+	AM_RANGE(0xff8034, 0xff8035) AM_READWRITE(segacd_cdfader_r,segacd_cdfader_w) // CD Fader
 	AM_RANGE(0xff8036, 0xff8037) AM_READWRITE(segacd_cdd_ctrl_r,segacd_cdd_ctrl_w)
 	AM_RANGE(0xff8038, 0xff8041) AM_READ8(segacd_cdd_rx_r,0xffff)
 	AM_RANGE(0xff8042, 0xff804b) AM_WRITE8(segacd_cdd_tx_w,0xffff)
@@ -9459,12 +9484,12 @@ MACHINE_CONFIG_DERIVED( genesis_scd, megadriv )
 	MCFG_CPU_PROGRAM_MAP(segacd_map)
 
 	MCFG_SOUND_ADD( "cdda", CDDA, 0 )
-	MCFG_SOUND_ROUTE( 0, "lspeaker", 1.00 )
-	MCFG_SOUND_ROUTE( 1, "rspeaker", 1.00 )
+	MCFG_SOUND_ROUTE( 0, "lspeaker", 0.50 ) // TODO: accurate volume balance
+	MCFG_SOUND_ROUTE( 1, "rspeaker", 0.50 )
 
 	MCFG_SOUND_ADD("rfsnd", RF5C68, SEGACD_CLOCK) // RF5C164!
-	MCFG_SOUND_ROUTE( 0, "lspeaker", 0.25 )
-	MCFG_SOUND_ROUTE( 1, "rspeaker", 0.25 )
+	MCFG_SOUND_ROUTE( 0, "lspeaker", 0.50 )
+	MCFG_SOUND_ROUTE( 1, "rspeaker", 0.50 )
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 MACHINE_CONFIG_END
@@ -9494,8 +9519,8 @@ MACHINE_CONFIG_DERIVED( genesis_32x_scd, genesis_32x )
 	MCFG_CPU_PROGRAM_MAP(segacd_map)
 
 	MCFG_SOUND_ADD( "cdda", CDDA, 0 )
-	MCFG_SOUND_ROUTE( 0, "lspeaker", 1.00 )
-	MCFG_SOUND_ROUTE( 1, "rspeaker", 1.00 )
+	MCFG_SOUND_ROUTE( 0, "lspeaker", 0.50 )
+	MCFG_SOUND_ROUTE( 1, "rspeaker", 0.50 )
 
 	MCFG_SOUND_ADD("rfsnd", RF5C68, SEGACD_CLOCK) // RF5C164
 	MCFG_SOUND_ROUTE( 0, "lspeaker", 0.25 )
