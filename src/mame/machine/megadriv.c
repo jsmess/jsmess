@@ -5039,30 +5039,35 @@ static READ16_HANDLER( segacd_comms_flags_r )
 
 static WRITE16_HANDLER( segacd_comms_flags_subcpu_w )
 {
+	if (ACCESSING_BITS_0_7 && ACCESSING_BITS_8_15)
+	{
+		printf("sub cpu attempting to word write data to comms flags %04x!\n",data);
+	}
+
 	if (ACCESSING_BITS_0_7)
 	{
 		segacd_comms_flags = (segacd_comms_flags & 0xff00) | (data & 0x00ff);
 		space->machine->scheduler().synchronize();
 	}
 
-	if (ACCESSING_BITS_8_15)
+	if (ACCESSING_BITS_8_15) // Dragon's Lair
 	{
-		if (data & 0xff00)
-		{
-			printf("sub cpu attempting to write non-zero data to read-only comms flags!\n");
-		}
+		segacd_comms_flags = (segacd_comms_flags & 0xff00) | ((data >> 8) & 0x00ff);
+		space->machine->scheduler().synchronize();
 	}
 }
 
 static WRITE16_HANDLER( segacd_comms_flags_maincpu_w )
 {
+	if (ACCESSING_BITS_0_7 && ACCESSING_BITS_8_15)
+	{
+		printf("main cpu attempting to word write data to comms flags %04x!\n",data);
+	}
+
 	if (ACCESSING_BITS_0_7)
 	{
-		if (data & 0x00ff)
-		{
-			printf("main cpu attempting to write non-zero data to read-only comms flags!\n");
-		}
-
+		segacd_comms_flags = (segacd_comms_flags & 0x00ff) | ((data << 8) & 0xff00);
+		space->machine->scheduler().synchronize();
 	}
 
 	if (ACCESSING_BITS_8_15)
