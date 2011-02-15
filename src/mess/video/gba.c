@@ -106,20 +106,18 @@ static void draw_roz_bitmap_scanline(gba_state *state, UINT32 *scanline, int ypo
 	UINT8 *src8 = (UINT8 *)state->gba_vram;
 	UINT16 *src16 = (UINT16 *)state->gba_vram;
 	UINT16 *palette = (UINT16 *)state->gba_pram;
-	INT32 sx = 240;
-	INT32 sy = 160;
+	INT32 sx = (depth == 4) ? 160 : 240;
+	INT32 sy = (depth == 4) ? 128 : 160;
 	UINT32 prio = ((ctrl & BGCNT_PRIORITY) << 25) + 0x1000000;
 	INT32 dx, dmx, dy, dmy, startx, starty;
 	INT32 rx, ry, pixx, pixy, x;
 
-	if(depth == 8)
-	{
-		if(state->DISPCNT & DISPCNT_FRAMESEL)
-		{
-			src8 += 0xa000;
-		}
-	}
+	if ((depth == 8) && (state->DISPCNT & DISPCNT_FRAMESEL))
+		src8 += 0xa000;
 
+	if ((depth == 4) && (state->DISPCNT & DISPCNT_FRAMESEL))
+		src16 += 0xa000/2;
+	
 	// sign extend roz parameters
 	if (X & 0x08000000) X |= 0xf0000000;
 	if (Y & 0x08000000) Y |= 0xf0000000;
@@ -137,27 +135,17 @@ static void draw_roz_bitmap_scanline(gba_state *state, UINT32 *scanline, int ypo
 	starty = Y;
 
 	if(ypos == 0)
-	{
 		changed = 3;
-	}
 
 	if(changed & 1)
-	{
 		*currentx = startx;
-	}
 	else
-	{
 		*currentx += dmx;
-	}
 
 	if(changed & 2)
-	{
 		*currenty = starty;
-	}
 	else
-	{
 		*currenty += dmy;
-	}
 
 	rx = *currentx;
 	ry = *currenty;
@@ -181,20 +169,12 @@ static void draw_roz_bitmap_scanline(gba_state *state, UINT32 *scanline, int ypo
 		}
 		else
 		{
-			if(depth == 8)
+			if (depth == 8)
 			{
 				UINT8 color = src8[pixy*sx + pixx];
-
-				if(color)
-				{
-					scanline[x] = palette[color] | prio;
-				}
-				else
-				{
-					scanline[x] = 0x80000000;
-				}
+				scanline[x] = color ? (palette[color] | prio) : 0x80000000;
 			}
-			else if(depth == 16)
+			else
 			{
 				scanline[x] = src16[pixy*sx + pixx] | prio;
 			}
