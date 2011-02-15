@@ -271,6 +271,7 @@ a tilemap-like structure, from which data is copied)
 #include "sound/sn76496.h"
 #include "imagedev/chd_cd.h"
 #include "includes/megadriv.h"
+#include "machine/nvram.h"
 
 
 #define MEGADRIV_VDP_VRAM(address) megadrive_vdp_vram[(address)&0x7fff]
@@ -390,7 +391,7 @@ static bitmap_t* render_bitmap;
 /* Sega CD stuff */
 static int sega_cd_connected = 0x00;
 UINT16 segacd_irq_mask;
-
+static UINT16 *segacd_backupram;
 
 
 
@@ -6482,13 +6483,31 @@ WRITE16_HANDLER( segacd_cdfader_w )
 	cdda_set_volume(space->machine->device("cdda"), cdfader_vol);
 }
 
+READ16_HANDLER( segacd_backupram_r )
+{
+	if(ACCESSING_BITS_8_15 && !(space->debugger_access()))
+		printf("Warning: read to backupram even bytes! [%04x]\n",offset);
+
+	return segacd_backupram[offset] & 0xff;
+}
+
+WRITE16_HANDLER( segacd_backupram_w )
+{
+	if(ACCESSING_BITS_0_7)
+		segacd_backupram[offset] = data;
+
+	if(ACCESSING_BITS_8_15 && !(space->debugger_access()))
+		printf("Warning: write to backupram even bytes! [%04x] %02x\n",offset,data);
+}
+
+
 static ADDRESS_MAP_START( segacd_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_RAM AM_BASE(&segacd_4meg_prgram)
 
 	AM_RANGE(0x080000, 0x0bffff) AM_READWRITE(segacd_sub_dataram_part1_r, segacd_sub_dataram_part1_w) AM_BASE(&segacd_dataram)
 	AM_RANGE(0x0c0000, 0x0dffff) AM_READWRITE(segacd_sub_dataram_part2_r, segacd_sub_dataram_part2_w) AM_BASE(&segacd_dataram2)
 
-	AM_RANGE(0xfe0000, 0xfe3fff) AM_RAM // backup RAM, odd bytes only!
+	AM_RANGE(0xfe0000, 0xfe3fff) AM_READWRITE(segacd_backupram_r,segacd_backupram_w) AM_SHARE("backupram") AM_BASE(&segacd_backupram)// backup RAM, odd bytes only!
 
 	AM_RANGE(0xff0000, 0xff001f) AM_DEVWRITE8("rfsnd", rf5c68_w, 0x00ff)  // PCM, RF5C164
 	AM_RANGE(0xff0020, 0xff003f) AM_DEVREAD8("rfsnd", rf5c68_r, 0x00ff)
@@ -9482,6 +9501,8 @@ MACHINE_CONFIG_DERIVED( genesis_scd, megadriv )
 
 	MCFG_CPU_ADD("segacd_68k", M68000, SEGACD_CLOCK ) /* 12.5 MHz */
 	MCFG_CPU_PROGRAM_MAP(segacd_map)
+
+	MCFG_NVRAM_ADD_0FILL("backupram")
 
 	MCFG_SOUND_ADD( "cdda", CDDA, 0 )
 	MCFG_SOUND_ROUTE( 0, "lspeaker", 0.50 ) // TODO: accurate volume balance
