@@ -590,36 +590,44 @@ int hashfile_verify(core_options &options, const char *sysname, void (*my_error_
 
 const char *read_hash_config(device_image_interface &image, const char *sysname)
 {
-    hash_file *hashfile = NULL;
-    const hash_info *info = NULL;
+	hash_file *hashfile = NULL;
+	const hash_info *info = NULL;
 	char *temp = NULL;
 	
-    /* open the hash file */
-    hashfile = hashfile_open(image.device().machine->options(), sysname, FALSE, NULL);
-    if (!hashfile)
-        goto done;
-
-    /* look up this entry in the hash file */
-    info = hashfile_lookup(hashfile, &image.hash());
-
-    if (!info)
-        goto done;
-
+	/* open the hash file */
+	hashfile = hashfile_open(image.device().machine->options(), sysname, FALSE, NULL);
+	if (!hashfile)
+		return NULL;
+	
+	/* look up this entry in the hash file */
+	info = hashfile_lookup(hashfile, &image.hash());
+	
+	if (!info)
+	{
+		hashfile_close(hashfile);
+		return NULL;
+	}
+	
 	temp = core_strdup(info->extrainfo);
-    /* copy the relevant entries */
-    if (hashfile != NULL)
-        hashfile_close(hashfile);
-		
-    return temp  ? astring(temp).cstr() : (const char*)NULL;
-done:
-    if (hashfile != NULL)
-        hashfile_close(hashfile);
-    return NULL;
+	if (!temp)
+	{
+		hashfile_close(hashfile);
+		return NULL;
+	}
+	
+	astring result(temp);
+	
+	/* copy the relevant entries */
+	hashfile_close(hashfile);
+	
+	//printf("%s\n", result.cstr());	
+	return result.cstr();
 }
+
 const char *hashfile_extrainfo(device_image_interface &image)
 {
-    const game_driver *drv;
-    const char *rc;	
+	const game_driver *drv;
+	const char *rc;	
 
 	/* now read the hash file */
 	image.crc();
