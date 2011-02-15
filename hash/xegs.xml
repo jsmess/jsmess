@@ -6,20 +6,20 @@ Compiled by K1W1
 -->
 
 <!--
-  Re-released games for XEGS not shown here but available on a800.xml:
+  Re-released games for XEGS not shown here but available on a800.xml
   - Donkey Kong - Atari (RX8031)
   - Eastern Front (1941) - Atari (RX8039)
 
-  Missing Cartridges:
+  Missing Cartridge
      - Xenophobe (Prototype)
 
-  XE Demo Cartridge (CA400201) contained 4 Games:
+  XE Demo Cartridge (CA400201) contained 4 Games
   - One on One (Same as the retail cartridge)
   - Ms. PacMan (Same as the retail cartridge, see a800 list)
   - Joust (Same as the retail cartridge, see a800 list)
   - Flight Simulator 2 (Proper demo version, included on this list)
 
-  Cartridges to use with the XEGS Light Gun:
+  Cartridges to use with the XEGS Light Gun
   - Barnyard Blasterokook
   - Bug Hunt
   - Crime Buster
@@ -172,6 +172,8 @@ Compiled by K1W1
 	</software>
 
 	<software name="crossbowa" cloneof="crossbow" supported="partial">
+		<!-- File Difference -->
+		<!-- 0x96c8 : 0xff ('crossbow') - 0xfc ('crossbowa') -->
 		<description>Crossbow (Alt)</description>
 		<!-- Serial: RX8088 -->
 		<year>1988</year>

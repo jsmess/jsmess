@@ -36,11 +36,11 @@ Compiled by K1W1
     
   * Cartridge Types : -
   
-  	- Standard 2k cartridges maps to address area $A000-$BFFF.
-    - Standard 4k cartridges maps to address area $A000-$BFFF.
-  	- Standard 8k cartridges maps to address area $A000-$BFFF.
-   	- Standard 12k cartridges maps to address area $8000-$BFFF. 	
-  	- Standard 16k cartridges maps to address area $8000-$BFFF.
+  	- Standard 2k cartridges are 8k roms with 2k of program data and map to address area $A000-$BFFF.
+    - Standard 4k cartridges are 8k roms with 4k of program data and map to address area $A000-$BFFF.
+  	- Standard 8k cartridges are 8k roms with 8k of program data and map to address area $A000-$BFFF.
+   	- Standard 12k cartridges are 16k roms with 12k of program data and map to address area $8000-$BFFF. 	
+  	- Standard 16k cartridges are 16k roms with 16k of program data and map to address area $8000-$BFFF.
   	 
   	- Right cartridge slot 4k cartridges are run in the address area from $8000-$9FFF. The Atari 800 was the only 8-bit Atari with a Right Cartridge slot.
   	- Right cartridge slot 8k cartridges are run in the address area from $8000-$9FFF. The Atari 800 was the only 8-bit Atari with a Right Cartridge slot.
@@ -88,13 +88,11 @@ Compiled by K1W1
                A3=1, A0=0 - disable cartridge.
                A3=1, A0=1 - $A000-$AFFF: bank C, $B000-$BFFF: bank A.
              
-             
       
-
   * Re-releases mentioned in the comments below were bit copies of the originals re-packaged in different cartridges.
 
   * In 1983, Romox released some games on EEPROM cartridges. Customers could purchase a blank ECPC (Edge Connector Programmable Cartridge), and
-    then have a game of their choice burned into its EEPROM at a Romox Programming Terminal. These are marked by "ECPC" in the cart number area below.
+    then have a game of their choice burned into its EEPROM at a Romox Programming Terminal. These are marked by "ECPC" in the cart "Serial: " number area below.
 
   * Missing Cartridges (Publisher, Cart #, Rarity, Year, Title) : -
   
@@ -595,6 +593,19 @@ Compiled by K1W1
 		</part>
 	</software>
 
+	<software name="asmedtg" cloneof="asmedit">
+		<description>Assembler Editor Computing Language (GER)</description>
+		<!-- Serial: RXG4003 -->
+		<year>1982</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="a800_cart">
+			<feature name="cart_type" value="standard 8k" />
+			<dataarea name="rom" size="8192">
+				<rom name="assembler editor computing language (ger).rom" size="8192" crc="ee72eeea" sha1="b9f0efedd8486d8034b25c5eedac4946bc70aa8d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ast2k">
 		<description>AST 2000</description>
 		<!-- Serial: N/A -->
@@ -656,7 +667,7 @@ Compiled by K1W1
 		<description>Astro Chase</description>
 		<!-- Serial: N/A -->
 		<year>1982</year>
-		<publisher>First Star Software</publisher>
+		<publisher>First Star</publisher>
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" /> <!-- Runs in OSb only -->
 			<dataarea name="rom" size="16384">
@@ -798,6 +809,13 @@ Compiled by K1W1
 	</software>
 
 	<software name="atlantisa" cloneof="atlantis">
+		<!-- File Difference -->
+		<!-- 0x109c : 0xea 0xea 0xea ('atlantis') - 0x8d 0x98 0xb0 ('atlantisa') -->
+		<!-- 0x1267 : 0xea 0xa9 0x98 ('atlantis') - 0xad 0x9d 0xb0 ('atlantisa') -->
+		<!-- 0x12a5 : 0xea 0xea 0xea ('atlantis') - 0x8d 0x6f 0xb2 ('atlantisa') -->
+		<!-- 0x148e : 0xea 0xa9 ('atlantis') - 0xad 0x9e ('atlantisa') -->
+		<!-- 0x14ec : 0xea 0xa9 0x8d ('atlantis') - 0xad 0x9c 0xb0 ('atlantisa') -->
+		<!-- 0x1bb7 : 0xea 0xea 0xea ('atlantis') - 0x8d 0x8d 0xbb ('atlantisa') -->
 		<description>Atlantis (Alt)</description>
 		<!-- Serial: 720125 -->
 		<year>1983</year>
@@ -982,6 +1000,8 @@ Compiled by K1W1
 	</software>
 
 	<software name="berzerka" cloneof="berzerk">
+		<!-- File Difference -->
+		<!-- 0x3a88 : 0x65 ('berzerk') - 0x66 ('berzerka') -->
 		<description>Berzerk (Prototype, Alt)</description>
 		<!-- Serial: N/A -->
 		<year>1983</year>
@@ -1248,7 +1268,7 @@ Compiled by K1W1
 		<description>Choplifter!</description>
 		<!-- Serial: ATCART191 -->
 		<year>1982</year>
-		<publisher>Br0derbund Software</publisher>
+		<publisher>Br0derbund</publisher>
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
@@ -1431,7 +1451,7 @@ Compiled by K1W1
 		<description>Dance Fantasy</description>
 		<!-- Serial: DCF-AT -->
 		<year>1984</year>
-		<publisher>Fisher Price</publisher>
+		<publisher>Fisher-Price</publisher>
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
@@ -1454,6 +1474,9 @@ Compiled by K1W1
 	</software>
 
 	<software name="decathlna" cloneof="decathln">
+		<!-- File Difference -->
+		<!-- 0x0abd : 0xbf ('decathln') - 0x7f ('decatlna') -->
+		<!-- 0x0b92 : 0xea ('decathln') - 0x60 ('decatlna') -->
 		<description>Decathalon (Alt)</description>
 		<!-- Serial: CC-008 -->
 		<year>1983</year>
@@ -1707,7 +1730,7 @@ Compiled by K1W1
 	</software>
 
 	<software name="edusysd" cloneof="edusys">
-		<description>Educational System Master Cartridge (Re-Badge)</description>
+		<description>Educational System Master Cartridge (Re-Badged)</description>
 		<!-- Serial: D4001 -->
 		<year>1983</year>
 		<publisher>Dorsett Educational Systems</publisher>
@@ -1923,7 +1946,7 @@ Compiled by K1W1
 		<description>Firebird</description>
 		<!-- Serial: N/A -->
 		<year>1981</year>
-		<publisher>Gebelli</publisher>
+		<publisher>Gebelli Software</publisher>
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 4k" />
 			<dataarea name="rom" size="8192">
@@ -2300,7 +2323,7 @@ Compiled by K1W1
 	</software>
 
 	<software name="kritterc">
-		<description>K-Razy Kritters</description>
+		<description>K-Razy Kritters (Re-Badged)</description>
 		<!-- Serial: M8788 -->
 		<year>1982</year>
 		<publisher>CBS Software</publisher>
@@ -2313,7 +2336,7 @@ Compiled by K1W1
 	</software>
 
 	<software name="kritterk" cloneof="kritterc">
-		<description>K-Razy Kritters (Re-Badge)</description>
+		<description>K-Razy Kritters</description>
 		<!-- Serial: ATR1001/cart number> -->
 		<year>1981</year>
 		<publisher>K-Byte</publisher>
@@ -2326,7 +2349,7 @@ Compiled by K1W1
 	</software>
 
 	<software name="kshootc">
-		<description>K-Razy Shout Out</description>
+		<description>K-Razy Shout Out (Re-Badged)</description>
 		<!-- Serial: M8784 -->
 		<year>1982</year>
 		<publisher>CBS Software</publisher>
@@ -2339,7 +2362,7 @@ Compiled by K1W1
 	</software>
 
 	<software name="kshootk" cloneof="kshootc">
-		<description>K-Razy Shoot Out (Re-Badge)</description>
+		<description>K-Razy Shoot Out</description>
 		<!-- Serial: ATR1000/cart number> -->
 		<year>1981</year>
 		<publisher>K-Byte</publisher>
@@ -2580,7 +2603,7 @@ Compiled by K1W1
 		<description>M*A*S*H</description>
 		<!-- Serial: ECPC-01033 -->
 		<year>1982</year>
-		<publisher>Romox/20th Century Fox</publisher>
+		<publisher>Romox / 20th Century Fox</publisher>
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
@@ -2883,7 +2906,7 @@ Compiled by K1W1
 		<description>Mogul Maniac</description>
 		<!-- Serial: ECPC-03220 -->
 		<year>1983</year>
-		<publisher>Romox/Amiga</publisher>
+		<publisher>Romox / Amiga</publisher>
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
@@ -3209,7 +3232,7 @@ Compiled by K1W1
 	</software>
 
 	<software name="pitfall2">
-		<description>Pitfall! II - Lost Caverns</description>
+		<description>Pitfall II - Lost Caverns</description>
 		<!-- Serial: CA-011 -->
 		<year>1984</year>
 		<publisher>Activision</publisher>
@@ -3317,7 +3340,7 @@ Compiled by K1W1
 		<description>Porky's</description>
 		<!-- Serial: ECPC-02033 -->
 		<year>1983</year>
-		<publisher>Romox/20th Century Fox</publisher>
+		<publisher>Romox / 20th Century Fox</publisher>
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
@@ -3499,6 +3522,9 @@ Compiled by K1W1
 	</software>
 
 	<software name="rob2084a" cloneof="robo2084">
+		<!-- File Difference -->
+		<!-- 0x14e6 : 0xa4 0x73 0xa5 ('robo2084') - 0xfc 0xd2 0x7f ('rob2084a') -->
+		<!-- 0x206f : 0xa5 0xbd 0x85 ('robo2084') - 0x4c 0xbc 0x7f ('rob2084a') -->
 		<description>Robotron 2084 (Alt)</description>
 		<!-- Serial: RX8033 -->
 		<year>1983</year>
@@ -4193,7 +4219,7 @@ Compiled by K1W1
 	</software>
 
 	<software name="starftr1" cloneof="starfgtr">
-		<description>The Last Starfighter (Prototype)(Alt)</description>
+		<description>The Last Starfighter (Prototype)(Czech Translation)</description>
 		<!-- Serial: N/A -->
 		<year>1984</year>
 		<publisher>Atari</publisher>
@@ -4422,11 +4448,11 @@ Compiled by K1W1
 		<description>Video Poker Card Game</description>
 		<!-- Serial: N/A -->
 		<year>1998</year>
-		<publisher>Video 61</publisher>
+		<publisher>Video 61 / Atari</publisher>
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="video pokercard game.rom" size="16384" crc="dc492963" sha1="55c6ed5c2388a8cd228bc9fd5a69fa93180ee7ea"  offset="0" />
+				<rom name="video poker card game.rom" size="16384" crc="dc492963" sha1="55c6ed5c2388a8cd228bc9fd5a69fa93180ee7ea"  offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -4448,7 +4474,7 @@ Compiled by K1W1
 		<description>Weltraumkolonie (German)</description>
 		<!-- Serial: N/A -->
 		<year>1984</year>
-		<publisher>Spinnaker/Ravensburger</publisher>
+		<publisher>Spinnaker / Ravensburger</publisher>
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
