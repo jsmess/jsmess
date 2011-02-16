@@ -2,7 +2,7 @@
 
     SMC-777 (c) 1983 Sony
 
-    preliminary driver by Angelo Salese
+    driver by Angelo Salese
 
     TODO:
     - no documentation, the entire driver is just a bunch of educated
@@ -10,9 +10,11 @@
 	- ROM/RAM bankswitch, it apparently happens after one instruction prefetching.
 	  We currently use an hackish implementation until the MAME/MESS framework can
 	  support that ...
-	- keyboard input is very very sluggish;
-	- colors in Dragon's Alphabet, Bird Crash;
+	- keyboard input is very sluggish;
 	- clean up i/o ports, remove Z80_B usage and write custom code in place of it;
+	- cursor stuck in Bird Crash;
+	- add mc6845 features;
+	- many other missing features;
 
 **************************************************************************************/
 
@@ -69,7 +71,7 @@ static VIDEO_UPDATE( smc777 )
 	UINT8 *gram = screen->machine->region("fbuf")->base();
 	int x_width;
 
-	bitmap_fill(bitmap, cliprect, screen->machine->pens[state->backdrop_pen+0x10]);
+	bitmap_fill(bitmap, cliprect, screen->machine->pens[state->backdrop_pen]);
 
 	x_width = (state->display_reg & 0x80) ? 2 : 4;
 
@@ -87,23 +89,23 @@ static VIDEO_UPDATE( smc777 )
 				/* todo: clean this up! */
 				if(x_width == 2)
 				{
-					*BITMAP_ADDR16(bitmap, y+yi+CRTC_MIN_Y, x*2+0+CRTC_MIN_X) = screen->machine->pens[color+0x10];
+					*BITMAP_ADDR16(bitmap, y+yi+CRTC_MIN_Y, x*2+0+CRTC_MIN_X) = screen->machine->pens[color];
 				}
 				else
 				{
-					*BITMAP_ADDR16(bitmap, y+yi+CRTC_MIN_Y, x*4+0+CRTC_MIN_X) = screen->machine->pens[color+0x10];
-					*BITMAP_ADDR16(bitmap, y+yi+CRTC_MIN_Y, x*4+1+CRTC_MIN_X) = screen->machine->pens[color+0x10];
+					*BITMAP_ADDR16(bitmap, y+yi+CRTC_MIN_Y, x*4+0+CRTC_MIN_X) = screen->machine->pens[color];
+					*BITMAP_ADDR16(bitmap, y+yi+CRTC_MIN_Y, x*4+1+CRTC_MIN_X) = screen->machine->pens[color];
 				}
 
 				color = (gram[count] & 0x0f) >> 0;
 				if(x_width == 2)
 				{
-					*BITMAP_ADDR16(bitmap, y+yi+CRTC_MIN_Y, x*2+1+CRTC_MIN_X) = screen->machine->pens[color+0x10];
+					*BITMAP_ADDR16(bitmap, y+yi+CRTC_MIN_Y, x*2+1+CRTC_MIN_X) = screen->machine->pens[color];
 				}
 				else
 				{
-					*BITMAP_ADDR16(bitmap, y+yi+CRTC_MIN_Y, x*4+2+CRTC_MIN_X) = screen->machine->pens[color+0x10];
-					*BITMAP_ADDR16(bitmap, y+yi+CRTC_MIN_Y, x*4+3+CRTC_MIN_X) = screen->machine->pens[color+0x10];
+					*BITMAP_ADDR16(bitmap, y+yi+CRTC_MIN_Y, x*4+2+CRTC_MIN_X) = screen->machine->pens[color];
+					*BITMAP_ADDR16(bitmap, y+yi+CRTC_MIN_Y, x*4+3+CRTC_MIN_X) = screen->machine->pens[color];
 				}
 
 				count++;
@@ -121,26 +123,43 @@ static VIDEO_UPDATE( smc777 )
 	{
 		for(x=0;x<x_width;x++)
 		{
+			/*
+			-x-- ---- blink
+			--xx x--- bg color (00 transparent, 01 white, 10 black, 11 complementary to fg color
+			---- -xxx fg color
+			*/
 			int tile = vram[count];
 			int color = attr[count] & 7;
 			int bk_color = (attr[count] & 0x18) >> 3;
-			int yb,xb,bk_pen;
+			int blink = attr[count] & 0x40;
+			int yi,xi;
+			int bk_pen;
+			//int bk_struct[4] = { -1, 0x10, 0x11, (color & 7) ^ 8 };
 
-			bk_pen = 0x00;
-			switch(bk_color)
+			switch(bk_color & 3)
 			{
-				case 1: bk_pen = 0x07; break; //white
-				case 2: bk_pen = 0x00; break; //black
-				case 3: bk_pen = (color ^ 7)+0x08; break; //complementary
+				case 0: bk_pen = -1; break; //transparent
+				case 1: bk_pen = 0x10; break; //white
+				case 2: bk_pen = 0x11; break; //black
+				case 3: bk_pen = (color ^ 0xf); break; //complementary
 			}
 
-			if(bk_color)
-				for(yb=0;yb<8;yb++)
-					for(xb=0;xb<8;xb++)
-						*BITMAP_ADDR16(bitmap, y*8+CRTC_MIN_Y+yb, x*8+CRTC_MIN_X+xb) = screen->machine->pens[bk_pen+0x10];
+			if(blink && screen->machine->primary_screen->frame_number() & 0x10) //blinking, used by Dragon's Alphabet
+				color = bk_pen;
 
-			/*TODO: make this custom code*/
-			drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[0],tile,color,0,0,x*8+CRTC_MIN_X,y*8+CRTC_MIN_Y,0);
+			for(yi=0;yi<8;yi++)
+			{
+				for(xi=0;xi<8;xi++)
+				{
+					UINT8 *gfx_data = screen->machine->region("pcg")->base();
+					int pen;
+
+					pen = ((gfx_data[tile*8+yi]>>(7-xi)) & 1) ? color : bk_pen;
+
+					if(pen != -1)
+						*BITMAP_ADDR16(bitmap, y*8+CRTC_MIN_Y+yi, x*8+CRTC_MIN_X+xi) = screen->machine->pens[pen];
+				}
+			}
 
 			// draw cursor
 			if(state->cursor_addr == count)
@@ -162,7 +181,7 @@ static VIDEO_UPDATE( smc777 )
 					{
 						for(xc=0;xc<8;xc++)
 						{
-							*BITMAP_ADDR16(bitmap, y*8+CRTC_MIN_Y-yc+7, x*8+CRTC_MIN_X+xc) = screen->machine->pens[0x17];
+							*BITMAP_ADDR16(bitmap, y*8+CRTC_MIN_Y-yc+7, x*8+CRTC_MIN_X+xc) = screen->machine->pens[0x7];
 						}
 					}
 				}
@@ -355,7 +374,6 @@ static WRITE_LINE_DEVICE_HANDLER( smc777_fdc_intrq_w )
 {
 	smc777_state *drvstate = device->machine->driver_data<smc777_state>();
 	drvstate->fdc_irq_flag = state;
-//  cputag_set_input_line(device->machine, "maincpu", 0, (state) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( smc777_fdc_drq_w )
@@ -391,10 +409,17 @@ static READ8_HANDLER( system_input_r )
 {
 	smc777_state *state = space->machine->driver_data<smc777_state>();
 
+	printf("System FF %02x\n",state->system_data & 0x0f);
+
+	switch(state->system_data & 0x0f)
+	{
+		case 0x00:
+			return (state->raminh & 0x01) << 4; //unknown bit, Dragon's Alphabet and Bird Crush relies on this
+	}
+
 	return state->system_data;
 }
 
-//static TIMER_CALLBACK( raminh_change )
 
 
 static WRITE8_HANDLER( system_output_w )
@@ -467,9 +492,9 @@ static WRITE8_HANDLER( smc777_ramdac_w )
 
 	switch(gradient_index)
 	{
-		case 0: state->pal.r = data; palette_set_color_rgb(space->machine, pal_index+0x10, state->pal.r, state->pal.g, state->pal.b); break;
-		case 1: state->pal.g = data; palette_set_color_rgb(space->machine, pal_index+0x10, state->pal.r, state->pal.g, state->pal.b); break;
-		case 2: state->pal.b = data; palette_set_color_rgb(space->machine, pal_index+0x10, state->pal.r, state->pal.g, state->pal.b); break;
+		case 0: state->pal.r = data; palette_set_color_rgb(space->machine, pal_index, state->pal.r, state->pal.g, state->pal.b); break;
+		case 1: state->pal.g = data; palette_set_color_rgb(space->machine, pal_index, state->pal.r, state->pal.g, state->pal.b); break;
+		case 2: state->pal.b = data; palette_set_color_rgb(space->machine, pal_index, state->pal.r, state->pal.g, state->pal.b); break;
 	}
 }
 
@@ -590,8 +615,8 @@ static ADDRESS_MAP_START( smc777_io , ADDRESS_SPACE_IO, 8)
 //  AM_RANGE(0x48, 0x50) AM_NOP //HDD (Winchester)
 	AM_RANGE(0x51, 0x51) AM_READWRITE(smc777_keyboard_direct_r,smc777_keyboard_direct_w)
 	AM_RANGE(0x52, 0x52) AM_WRITE(smc777_ramdac_w)
+	AM_RANGE(0x53, 0x53) AM_DEVWRITE("sn1", sn76496_w) //SMC-777 specific
 //  AM_RANGE(0x54, 0x59) AM_NOP //VTR Controller
-	AM_RANGE(0x53, 0x53) AM_DEVWRITE("sn1", sn76496_w) //not in the datasheet ... almost certainly SMC-777 specific
 //  AM_RANGE(0x5a, 0x5b) AM_WRITENOP //RAM banking
 //  AM_RANGE(0x70, 0x70) AM_NOP //Auto Start ROM
 //  AM_RANGE(0x74, 0x74) AM_NOP //IEEE-488 ROM
@@ -704,78 +729,6 @@ static INPUT_PORTS_START( smc777 )
 	PORT_BIT(0x20000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("]") PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR(']')
 	PORT_BIT(0x40000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("^") PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('^')
 	PORT_BIT(0x80000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("_")
-
-	PORT_START("IN0")
-	PORT_DIPNAME( 0x01, 0x01, "SYSTEM" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) //space
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("IN1")
-	PORT_DIPNAME( 0x01, 0x01, "SYSTEM" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("DSW")
-	PORT_DIPNAME( 0x01, 0x01, "SYSTEM" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 static TIMER_DEVICE_CALLBACK( keyboard_callback )
@@ -865,22 +818,8 @@ static const mc6845_interface mc6845_intf =
 
 static PALETTE_INIT( smc777 )
 {
-	int i;
-
-	for (i = 0x000; i < 0x010; i++)
-	{
-		UINT8 r,g,b;
-
-		if((i & 0x01) == 0x01)
-		{
-			r = ((i >> 3) & 1) ? 0xff : 0x00;
-			g = ((i >> 2) & 1) ? 0xff : 0x00;
-			b = ((i >> 1) & 1) ? 0xff : 0x00;
-		}
-		else { r = g = b = 0x00; }
-
-		palette_set_color_rgb(machine, i, r,g,b);
-	}
+	palette_set_color_rgb(machine, 0x10, 0xff,0xff,0xff);
+	palette_set_color_rgb(machine, 0x11, 0x00,0x00,0x00);
 }
 
 static const wd17xx_interface smc777_mb8876_interface =
@@ -937,7 +876,7 @@ static MACHINE_CONFIG_START( smc777, smc777_state )
     MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
     MCFG_SCREEN_SIZE(0x400, 400)
     MCFG_SCREEN_VISIBLE_AREA(0, 660-1, 0, 220-1) //normal 640 x 200 + 20 pixels for border color
-    MCFG_PALETTE_LENGTH(0x20)
+    MCFG_PALETTE_LENGTH(0x10+2) //16 palette entries + 2 special white and black
     MCFG_PALETTE_INIT(smc777)
 	MCFG_GFXDECODE(smc777)
 
@@ -964,6 +903,7 @@ MACHINE_CONFIG_END
 ROM_START( smc777 )
     ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 
+	/* shadow ROM */
     ROM_REGION( 0x10000, "bios", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS(0, "1st", "1st rev.")
 	ROMX_LOAD( "smcrom.dat", 0x0000, 0x4000, CRC(b2520d31) SHA1(3c24b742c38bbaac85c0409652ba36e20f4687a1), ROM_BIOS(1))
