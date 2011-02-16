@@ -174,7 +174,7 @@ bool cdrom_driver::is_prefetch_sector_loaded(const unsigned int sec)
 	{
 		// The sector we want is in the last block in the prefetch buffer
 		// which might still be loading, check if the sector we want is loaded
-
+#if 0 // we do not load async in MESS
 		INT64 trans=pf_status->bytes_transferred();
 		unsigned int secmod=pfsec%num_pf_sectors,
 								 needbytes=(secmod+1)*native_sector_size;
@@ -185,6 +185,7 @@ bool cdrom_driver::is_prefetch_sector_loaded(const unsigned int sec)
 
 			return false;
 		} else
+#endif
 		{
 			// The sector is loaded
 
@@ -402,7 +403,7 @@ io_status *mess_cdrom_driver::read_sectors(const unsigned int startsec, const un
 	printf("mess: read %d sectors from %d (secsize %d)\n",numsec,startsec,secsize);
 	#endif
 
-	if ((startsec>=0) && ((int)startsec<num_sectors))
+	if ((startsec>=0)) // && ((int)startsec<num_sectors))
 	{
 //		fin->seek((INT64)startsec*(INT64)bin_sector_size);
 
@@ -452,9 +453,9 @@ bool mess_cdrom_driver::get_track_address(const unsigned int track, unsigned cha
 
 		sector_to_msf(trkstart, address);
 
-		address[0] = decimal_to_bcd(address[0]);
-		address[1] = decimal_to_bcd(address[1]);
-		address[2] = decimal_to_bcd(address[2]);
+		address[0] = address[0];
+		address[1] = address[1];
+		address[2] = address[2];
 
 //		printf("get_track_address %d = %02x:%02x:%02x\n", track, address[0], address[1], address[2]);
 
@@ -471,11 +472,21 @@ unsigned int mess_cdrom_driver::find_track(const unsigned int sector, unsigned i
 {
 	const cdrom_toc *toc = cdrom_get_toc(m_cd);
 	UINT32 track = cdrom_get_track(m_cd, sector);
+	int start;
 
-	*start_sector = cdrom_get_track_start(m_cd, track);
-	*end_sector = *start_sector + toc->tracks[track].frames;
+	start = cdrom_get_track_start(m_cd, track); 
 
-//	printf("find_track: track %d start %d end %d\n", track, *start_sector, *end_sector);
+	if (start_sector != NULL)
+	{
+		*start_sector = start;
+	}
+
+	if (end_sector != NULL)
+	{
+		*end_sector = start + toc->tracks[track].frames;
+	}
+
+	printf("find_track: track %d start %d end %d\n", track, start, *end_sector);
 
 	return -1;
 }
