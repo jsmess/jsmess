@@ -25,7 +25,7 @@ enum cdrom_events
 	event_cmd_complete=0,
 	event_preread_sector,
 	event_read_sector,
-	event_play_sector,
+	event_play_sector
 };
 
 //
@@ -181,6 +181,12 @@ void psxcd_device::device_start()
 	mode=0;
 
 	driver = NULL;
+
+	for (int i = 0; i < MAX_PSXCD_TIMERS; i++)
+	{
+		m_timers[i] = timer_alloc(i, NULL);
+		m_timerinuse[i] = false;
+	}
 }
 
 //
@@ -191,6 +197,11 @@ void psxcd_device::device_reset()
 {
 	stop_read();
 	open=false;
+
+	for (int i = 0; i < MAX_PSXCD_TIMERS; i++)
+	{
+		m_timerinuse[i] = false;
+	}
 
 	m_cddevice = machine->device(m_devname);
 	if (m_cddevice)
@@ -468,7 +479,7 @@ void psxcd_device::cdcmd_setloc()
 void psxcd_device::cdcmd_play()
 {
 	#ifdef debug_cdrom
-		printf("cdrom: play\n");
+		printf("cdrom: play %02x %02x %02x => %d\n", loc[0], loc[1], loc[2], msf_to_sector(loc));
 	#endif
 
 	curpos[0]=loc[0];
@@ -479,7 +490,6 @@ void psxcd_device::cdcmd_play()
 			(curpos[1]==0) &&
 			(curpos[2]==0))
 	{
-		printf("play 0?\n");
 	 	send_result(intr_acknowledge);
 	} else
 	{
@@ -766,8 +776,7 @@ void psxcd_device::cdcmd_gettn()
 void psxcd_device::cdcmd_gettd()
 {
 	unsigned char addr[3];
-	driver->get_track_address(bcd_to_decimal(cmdbuf[0]),
-														addr);
+	driver->get_track_address(bcd_to_decimal(cmdbuf[0]), addr);
 
 	unsigned char data[3]=
 	{
@@ -1005,8 +1014,16 @@ event *psxcd_device::send_result(const unsigned int res,
 	UINT64 systime = m_machine.device<cpu_device>("maincpu")->total_cycles();
 	if ((next_read_event) && ((systime+ev->t)>(next_sector_t)))
 	{
-		UINT32 hz = m_sysclock / (ev->t+2000);
-		next_read_event->timer->adjust(attotime::from_hz((double)hz), 0, attotime::never);
+		UINT32 hz = m_sysclock / (delay + 2000);
+		next_read_event->timer->adjust(attotime::from_hz(hz), 0, attotime::never);
+
+		for (int i = 0; i < MAX_PSXCD_TIMERS; i++)
+		{
+			if (m_eventfortimer[i] == next_read_event)
+			{
+				printf("Adjusting timer %d to %d hz]n", i, hz);
+			}
+		}
 	}
 
 	add_system_event(ev);
@@ -1535,7 +1552,6 @@ void psxcd_device::start_play()
 		unsigned int pos=msf_to_sector(curpos);
 		driver->find_track(pos+150,NULL,&autopause_sector);
 
-
 		printf("pos=%d auto=%d\n",pos,autopause_sector);
 	}
 
@@ -1571,7 +1587,15 @@ void psxcd_device::stop_read()
 	if (next_read_event)
 	{
 		next_read_event->timer->adjust(attotime::never, 0, attotime::never);
-		global_free(next_read_event->timer);
+		for (int i = 0; i < MAX_PSXCD_TIMERS; i++)
+		{
+			if (m_timers[i] == next_read_event->timer)
+			{
+				m_timerinuse[i] = false;
+				m_eventfortimer[i] = false;
+				break;
+			}
+		}
 		global_free(next_read_event);
 		next_read_event=NULL;
 	}
@@ -1627,9 +1651,11 @@ void psxcd_device::set_driver(cdrom_driver *d)
 //
 //
 //
-void psxcd_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void psxcd_device::device_timer(emu_timer &timer, device_timer_id tid, int param, void *ptr)
 {
-	event *ev = (event *)ptr;
+	event *ev = m_eventfortimer[tid];
+
+//	printf("timer %d fired, performing event type %d\n", tid, ev->type);
 
 	switch (ev->type)
 	{
@@ -1658,24 +1684,42 @@ void psxcd_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 			break;
 	}
 
-	// free the event
-	ev->timer->adjust(attotime::never, 0, attotime::never);
-	global_free(ev->timer);
-	global_free(ev);
+	// free the timer
+//	printf("Freeing timer %d\n", tid);
+	m_timers[tid]->adjust(attotime::never, 0, attotime::never);
+	m_timerinuse[tid] = false;
+	m_eventfortimer[tid] = NULL;
 
+	global_free(ev);
 }
 
 void psxcd_device::add_system_event(event *ev)
 {
-	emu_timer *timer;
+	emu_timer *timer = NULL;
+	int tnum = -1;
 
 	// allocate a timer for this event
-	timer = timer_alloc(ev->type, (void *)ev);
+	for (int i = 0; i < MAX_PSXCD_TIMERS; i++)
+	{
+		if (!m_timerinuse[i])
+		{
+			tnum = i;
+			timer = m_timers[i];
+			m_timerinuse[i] = true;
+			m_eventfortimer[i] = ev;
+			break;
+		}
+	}
+
+	if (tnum == -1)
+	{
+		fatalerror("PSXCD: ran out of timers!\n");
+	}
 
 	// ev->t is in maincpu clock cycles
 	UINT32 hz = m_sysclock / ev->t;
-//	printf("add_system_event: event type %d, ev->t %lld hz %d\n", ev->type, ev->t, hz);
-	timer->adjust(attotime::from_hz(hz), 0, attotime::never);
+//	printf("add_system_event: event type %d for %d hz (using timer %d)\n", ev->type, hz, tnum);
+	timer->adjust(attotime::from_hz(hz), tnum, attotime::never);
 
 	// back-reference the timer from the event
 	ev->timer = timer;

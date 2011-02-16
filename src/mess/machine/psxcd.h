@@ -4,6 +4,8 @@
 #include "imagedev/chd_cd.h"
 #include "psxcddrv.h"
 
+#define MAX_PSXCD_TIMERS	(4)
+
 class event;
 
 //
@@ -179,6 +181,9 @@ private:
 	const char *m_devname;
 	device_t *m_cddevice;
 	cdrom_file	*m_cd;
+	emu_timer *m_timers[MAX_PSXCD_TIMERS];
+	event *m_eventfortimer[MAX_PSXCD_TIMERS];
+	bool m_timerinuse[MAX_PSXCD_TIMERS];
 
 	void add_system_event(event *ev);
 };
