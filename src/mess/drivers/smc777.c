@@ -7,8 +7,8 @@
     TODO:
     - no documentation, the entire driver is just a bunch of educated
       guesses ...
-    - BEEP pitch is horrible
-    - fix fdc issue with 1dd disks (irq related?)
+	- fix ROM/RAM bankswitch, it happens after one instruction prefetching!
+	- add vblank irq;
 
 ****************************************************************************/
 
@@ -35,12 +35,12 @@ public:
 	UINT8 keyb_press_flag;
 	UINT8 backdrop_pen;
 	UINT8 display_reg;
-	UINT8 *wram;
 	int addr_latch;
 	UINT8 fdc_irq_flag;
 	UINT8 fdc_drq_flag;
 	UINT8 system_data;
 	struct { UINT8 r,g,b; } pal;
+	UINT8 raminh; //bankswitch
 };
 
 
@@ -64,26 +64,40 @@ static VIDEO_UPDATE( smc777 )
 
 	bitmap_fill(bitmap, cliprect, screen->machine->pens[state->backdrop_pen+0x10]);
 
-	x_width = (state->display_reg & 0x80) ? 80 : 160;
+	x_width = (state->display_reg & 0x80) ? 2 : 4;
 
 	count = 0x0000;
 
-	/* FIXME: Check width 40 there */
 	for(yi=0;yi<8;yi++)
 	{
 		for(y=0;y<200;y+=8)
 		{
-			for(x=0;x<x_width;x++)
+			for(x=0;x<160;x++)
 			{
 				UINT16 color;
 
 				color = (gram[count] & 0xf0) >> 4;
-				*BITMAP_ADDR16(bitmap, y+yi+CRTC_MIN_Y, x*4+0+CRTC_MIN_X) = screen->machine->pens[color+0x10];
-				*BITMAP_ADDR16(bitmap, y+yi+CRTC_MIN_Y, x*4+1+CRTC_MIN_X) = screen->machine->pens[color+0x10];
+				/* todo: clean this up! */
+				if(x_width == 2)
+				{
+					*BITMAP_ADDR16(bitmap, y+yi+CRTC_MIN_Y, x*2+0+CRTC_MIN_X) = screen->machine->pens[color+0x10];
+				}
+				else
+				{
+					*BITMAP_ADDR16(bitmap, y+yi+CRTC_MIN_Y, x*4+0+CRTC_MIN_X) = screen->machine->pens[color+0x10];
+					*BITMAP_ADDR16(bitmap, y+yi+CRTC_MIN_Y, x*4+1+CRTC_MIN_X) = screen->machine->pens[color+0x10];
+				}
 
 				color = (gram[count] & 0x0f) >> 0;
-				*BITMAP_ADDR16(bitmap, y+yi+CRTC_MIN_Y, x*4+2+CRTC_MIN_X) = screen->machine->pens[color+0x10];
-				*BITMAP_ADDR16(bitmap, y+yi+CRTC_MIN_Y, x*4+3+CRTC_MIN_X) = screen->machine->pens[color+0x10];
+				if(x_width == 2)
+				{
+					*BITMAP_ADDR16(bitmap, y+yi+CRTC_MIN_Y, x*2+1+CRTC_MIN_X) = screen->machine->pens[color+0x10];
+				}
+				else
+				{
+					*BITMAP_ADDR16(bitmap, y+yi+CRTC_MIN_Y, x*4+2+CRTC_MIN_X) = screen->machine->pens[color+0x10];
+					*BITMAP_ADDR16(bitmap, y+yi+CRTC_MIN_Y, x*4+3+CRTC_MIN_X) = screen->machine->pens[color+0x10];
+				}
 
 				count++;
 
@@ -380,7 +394,14 @@ static WRITE8_HANDLER( system_output_w )
     all the rest is unknown at current time
     */
 	state->system_data = data;
-	beep_set_state(space->machine->device("beeper"),data & 0x10);
+	switch(data & 0x0f)
+	{
+		case 0x00:
+			state->raminh = (((data & 0x10) >> 4) ^ 1) | 2;
+			break;
+		case 0x05: beep_set_state(space->machine->device("beeper"),data & 0x10); break;
+		default: printf("%02x\n",data); break;
+	}
 }
 
 static READ8_HANDLER( unk_r )
@@ -436,9 +457,38 @@ static WRITE8_HANDLER( display_reg_w )
 	state->display_reg = data;
 }
 
+static READ8_HANDLER( smc777_mem_r )
+{
+	smc777_state *state = space->machine->driver_data<smc777_state>();
+	UINT8 *wram = space->machine->region("wram")->base();
+	UINT8 *bios = space->machine->region("bios")->base();
+
+	if(state->raminh & 2)
+	{
+		state->raminh ^= 2;
+
+		if(state->raminh == 0 && ((offset & 0xc000) == 0))
+			return bios[offset];
+
+		return wram[offset];
+	}
+
+	if(state->raminh == 1 && ((offset & 0xc000) == 0))
+		return bios[offset];
+
+	return wram[offset];
+}
+
+static WRITE8_HANDLER( smc777_mem_w )
+{
+	UINT8 *wram = space->machine->region("wram")->base();
+
+	wram[offset] = data;
+}
+
 static ADDRESS_MAP_START(smc777_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0xffff) AM_RAM AM_BASE_MEMBER(smc777_state, wram)
+	AM_RANGE(0x0000, 0xffff) AM_READWRITE(smc777_mem_r,smc777_mem_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( smc777_io , ADDRESS_SPACE_IO, 8)
@@ -472,7 +522,7 @@ static ADDRESS_MAP_START( smc777_io , ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x51, 0x51) AM_READ(unk_r)
 	AM_RANGE(0x52, 0x52) AM_WRITE(smc777_ramdac_w)
 //  AM_RANGE(0x54, 0x59) AM_NOP //VTR Controller
-	AM_RANGE(0x53, 0x53) AM_DEVWRITE("sn1", sn76496_w) //not in the datasheet ... almost certainly SMC-777 specific
+//	AM_RANGE(0x53, 0x53) AM_DEVWRITE("sn1", sn76496_w) //not in the datasheet ... almost certainly SMC-777 specific
 //  AM_RANGE(0x5a, 0x5b) AM_WRITENOP //RAM banking
 //  AM_RANGE(0x70, 0x70) AM_NOP //Auto Start ROM
 //  AM_RANGE(0x74, 0x74) AM_NOP //IEEE-488 ROM
@@ -630,12 +680,8 @@ static TIMER_DEVICE_CALLBACK( keyboard_callback )
 
 static MACHINE_START(smc777)
 {
-	smc777_state *state = machine->driver_data<smc777_state>();
-	UINT8 *rom = machine->region("bios")->base();
-	int i;
+	//smc777_state *state = machine->driver_data<smc777_state>();
 
-	for(i=0;i<0x4000;i++)
-		state->wram[i] = rom[i];
 
 	beep_set_frequency(machine->device("beeper"),300); //guesswork
 	beep_set_state(machine->device("beeper"),0);
@@ -643,7 +689,9 @@ static MACHINE_START(smc777)
 
 static MACHINE_RESET(smc777)
 {
+	smc777_state *state = machine->driver_data<smc777_state>();
 
+	state->raminh = 1;
 }
 
 static const gfx_layout smc777_charlayout =
@@ -772,6 +820,11 @@ ROM_START( smc777 )
 	ROMX_LOAD( "smcrom.dat", 0x0000, 0x4000, CRC(b2520d31) SHA1(3c24b742c38bbaac85c0409652ba36e20f4687a1), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(1, "2nd", "2nd rev.")
 	ROMX_LOAD( "smcrom.v2",  0x0000, 0x4000, CRC(c1494b8f) SHA1(a7396f5c292f11639ffbf0b909e8473c5aa63518), ROM_BIOS(2))
+
+	ROM_REGION( 0x800, "mcu", ROMREGION_ERASEFF )
+	ROM_LOAD( "i80xx", 0x000, 0x800, NO_DUMP ) // keyboard mcu, needs decapping
+
+    ROM_REGION( 0x10000, "wram", ROMREGION_ERASE00 )
 
     ROM_REGION( 0x800, "vram", ROMREGION_ERASE00 )
 
