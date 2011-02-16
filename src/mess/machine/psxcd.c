@@ -1551,8 +1551,7 @@ void psxcd_device::start_play()
 	{
 		unsigned int pos=msf_to_sector(curpos);
 		driver->find_track(pos+150,NULL,&autopause_sector);
-
-		printf("pos=%d auto=%d\n",pos,autopause_sector);
+//		printf("pos=%d auto=%d\n",pos,autopause_sector);
 	}
 
 	unsigned int cyc=read_sector_cycles;
