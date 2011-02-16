@@ -41,6 +41,8 @@ public:
 	UINT8 system_data;
 	struct { UINT8 r,g,b; } pal;
 	UINT8 raminh; //bankswitch
+	UINT8 irq_mask;
+	UINT8 keyb_direct;
 };
 
 
@@ -383,6 +385,7 @@ static WRITE8_HANDLER( border_col_w )
 static READ8_HANDLER( system_input_r )
 {
 	smc777_state *state = space->machine->driver_data<smc777_state>();
+
 	return state->system_data;
 }
 
@@ -394,19 +397,55 @@ static WRITE8_HANDLER( system_output_w )
     all the rest is unknown at current time
     */
 	state->system_data = data;
-	switch(data & 0x0f)
+	switch(state->system_data & 0x0f)
 	{
 		case 0x00:
 			state->raminh = (((data & 0x10) >> 4) ^ 1) | 2;
 			break;
 		case 0x05: beep_set_state(space->machine->device("beeper"),data & 0x10); break;
-		default: printf("%02x\n",data); break;
+		default: printf("System FF %02x\n",data); break;
 	}
 }
 
-static READ8_HANDLER( unk_r )
+#define KEYBOARD_UP_PRESS    input_port_read(space->machine,"key1") & 0x00800000
+#define KEYBOARD_DOWN_PRESS  input_port_read(space->machine,"key1") & 0x10000000
+#define KEYBOARD_LEFT_PRESS  input_port_read(space->machine,"key1") & 0x00400000
+#define KEYBOARD_RIGHT_PRESS input_port_read(space->machine,"key1") & 0x02000000
+#define KEYBOARD_SPACE_PRESS input_port_read(space->machine,"key2") & 0x00000001
+
+/* presumably SMC-777 specific */
+static READ8_HANDLER( smc777_keyboard_direct_r )
 {
-	return 0;
+	//smc777_state *state = space->machine->driver_data<smc777_state>();
+	UINT8 res;
+
+	res = 0x7f;
+
+	if(KEYBOARD_UP_PRESS)
+		res ^= 1;
+
+	if(KEYBOARD_DOWN_PRESS)
+		res ^= 2;
+
+	if(KEYBOARD_LEFT_PRESS)
+		res ^= 4;
+
+	if(KEYBOARD_RIGHT_PRESS)
+		res ^= 8;
+
+	if(KEYBOARD_SPACE_PRESS)
+		res ^= 0x10;
+
+	return res;
+}
+
+static WRITE8_HANDLER( smc777_keyboard_direct_w )
+{
+	smc777_state *state = space->machine->driver_data<smc777_state>();
+
+	state->keyb_direct = data;
+
+	printf("%02x\n",state->keyb_direct);
 }
 
 static WRITE8_HANDLER( smc777_ramdac_w )
@@ -463,7 +502,7 @@ static READ8_HANDLER( smc777_mem_r )
 	UINT8 *wram = space->machine->region("wram")->base();
 	UINT8 *bios = space->machine->region("bios")->base();
 
-	if(state->raminh & 2)
+	if(state->raminh & 2) //todo: doesn't work!
 	{
 		state->raminh ^= 2;
 
@@ -486,6 +525,23 @@ static WRITE8_HANDLER( smc777_mem_w )
 	wram[offset] = data;
 }
 
+static READ8_HANDLER( smc777_irq_mask_r )
+{
+	smc777_state *state = space->machine->driver_data<smc777_state>();
+
+	return state->irq_mask;
+}
+
+static WRITE8_HANDLER( smc777_irq_mask_w )
+{
+	smc777_state *state = space->machine->driver_data<smc777_state>();
+
+	if(data & 0xfe)
+		printf("Irq mask = %02x\n",data & 0xfe);
+
+	state->irq_mask = data & 1;
+}
+
 static ADDRESS_MAP_START(smc777_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(smc777_mem_r,smc777_mem_w)
@@ -503,7 +559,7 @@ static ADDRESS_MAP_START( smc777_io , ADDRESS_SPACE_IO, 8)
 //  AM_RANGE(0x1d, 0x1d) AM_WRITENOP //status and control data / Printer status / strobe
 //  AM_RANGE(0x1e, 0x1f) AM_WRITENOP //RS232C irq control
 	AM_RANGE(0x20, 0x20) AM_READWRITE(display_reg_r,display_reg_w) //display mode switching
-//  AM_RANGE(0x21, 0x21) AM_WRITENOP //60 Hz irq control
+	AM_RANGE(0x21, 0x21) AM_READWRITE(smc777_irq_mask_r,smc777_irq_mask_w) //60 Hz irq control
 //  AM_RANGE(0x22, 0x22) AM_WRITENOP //printer output data
 	AM_RANGE(0x23, 0x23) AM_WRITE(border_col_w) //border area control
 //  AM_RANGE(0x24, 0x24) AM_WRITENOP //Timer write / specify address (RTC)
@@ -519,10 +575,10 @@ static ADDRESS_MAP_START( smc777_io , ADDRESS_SPACE_IO, 8)
 //  AM_RANGE(0x3c, 0x3d) AM_NOP //RGB Superimposer
 //  AM_RANGE(0x40, 0x47) AM_NOP //IEEE-488 interface unit
 //  AM_RANGE(0x48, 0x50) AM_NOP //HDD (Winchester)
-	AM_RANGE(0x51, 0x51) AM_READ(unk_r)
+	AM_RANGE(0x51, 0x51) AM_READWRITE(smc777_keyboard_direct_r,smc777_keyboard_direct_w)
 	AM_RANGE(0x52, 0x52) AM_WRITE(smc777_ramdac_w)
 //  AM_RANGE(0x54, 0x59) AM_NOP //VTR Controller
-//	AM_RANGE(0x53, 0x53) AM_DEVWRITE("sn1", sn76496_w) //not in the datasheet ... almost certainly SMC-777 specific
+	AM_RANGE(0x53, 0x53) AM_DEVWRITE("sn1", sn76496_w) //not in the datasheet ... almost certainly SMC-777 specific
 //  AM_RANGE(0x5a, 0x5b) AM_WRITENOP //RAM banking
 //  AM_RANGE(0x70, 0x70) AM_NOP //Auto Start ROM
 //  AM_RANGE(0x74, 0x74) AM_NOP //IEEE-488 ROM
@@ -550,9 +606,6 @@ static INPUT_PORTS_START( smc777 )
 	PORT_BIT(0x00004000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x0e cr
 	PORT_BIT(0x00008000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x0f so
 
-	#if 0
-
-	#endif
 	PORT_BIT(0x00010000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x10 si
 	PORT_BIT(0x00020000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x11 dle
 	PORT_BIT(0x00040000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x12 dc1
@@ -560,12 +613,12 @@ static INPUT_PORTS_START( smc777 )
 	PORT_BIT(0x00100000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("HOME") PORT_CODE(KEYCODE_HOME)
 	PORT_BIT(0x00200000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x15 dc4
 	PORT_BIT(0x00400000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Left") PORT_CODE(KEYCODE_LEFT)
-	PORT_BIT(0x00800000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x17 syn
+	PORT_BIT(0x00800000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Up") PORT_CODE(KEYCODE_UP)
 	PORT_BIT(0x01000000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x18 etb
 	PORT_BIT(0x02000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Right") PORT_CODE(KEYCODE_RIGHT)
 	PORT_BIT(0x04000000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x1a em
 	PORT_BIT(0x08000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("ESC") PORT_CHAR(27)
-	PORT_BIT(0x10000000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x1c ???
+	PORT_BIT(0x10000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Down") PORT_CODE(KEYCODE_DOWN)
 	PORT_BIT(0x20000000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x1d fs
 	PORT_BIT(0x40000000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x1e gs
 	PORT_BIT(0x80000000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x1f us
@@ -638,6 +691,78 @@ static INPUT_PORTS_START( smc777 )
 	PORT_BIT(0x20000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("]") PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR(']')
 	PORT_BIT(0x40000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("^") PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('^')
 	PORT_BIT(0x80000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("_")
+
+	PORT_START("IN0")
+	PORT_DIPNAME( 0x01, 0x01, "SYSTEM" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) //space
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("IN1")
+	PORT_DIPNAME( 0x01, 0x01, "SYSTEM" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSW")
+	PORT_DIPNAME( 0x01, 0x01, "SYSTEM" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 static TIMER_DEVICE_CALLBACK( keyboard_callback )
@@ -772,11 +897,20 @@ static const floppy_config smc777_floppy_config =
 	NULL
 };
 
+static INTERRUPT_GEN( smc777_vblank_irq )
+{
+	smc777_state *state = device->machine->driver_data<smc777_state>();
+
+	if(state->irq_mask)
+		cpu_set_input_line(device,0,HOLD_LINE);
+}
+
 static MACHINE_CONFIG_START( smc777, smc777_state )
     /* basic machine hardware */
     MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz) //4,028 Mhz!
     MCFG_CPU_PROGRAM_MAP(smc777_mem)
     MCFG_CPU_IO_MAP(smc777_io)
+	MCFG_CPU_VBLANK_INT("screen",smc777_vblank_irq)
 
     MCFG_MACHINE_START(smc777)
     MCFG_MACHINE_RESET(smc777)
@@ -802,7 +936,7 @@ static MACHINE_CONFIG_START( smc777, smc777_state )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("sn1", SN76489A, 1996800) // unknown clock / divider
+	MCFG_SOUND_ADD("sn1", SN76489A, XTAL_4MHz) // unknown clock / divider
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_SOUND_ADD("beeper", BEEP, 0)
@@ -838,5 +972,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1983, smc777,  0,       0,	smc777, 	smc777, 	 0,  "Sony",   "SMC-777",		GAME_NOT_WORKING | GAME_IMPERFECT_SOUND)
+COMP( 1983, smc777,  0,       0,	smc777, 	smc777, 	 0,  "Sony",   "SMC-777",		GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND)
 
