@@ -7579,6 +7579,17 @@ There appear to exist some undumped N64 protos
 		</part>
 	</software>
 
+	<software name="southprkb" cloneof="southprk">
+		<description>South Park (Bra)</description>
+		<year>1998</year>
+		<publisher>Acclaim Entertainment</publisher>
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="16777216">
+				<rom name="south park (brazil).bin" size="16777216" crc="40ac4211" sha1="def6ce5c26bb8acf51cb57002bea707bcdf0ec15" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="sparkchf">
 		<description>South Park - Chef's Luv Shack (Euro)</description>
 		<year>1999</year>
