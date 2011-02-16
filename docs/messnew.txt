@@ -1,4 +1,4 @@
-0.141.1
+﻿0.141.1
 
 New System Drivers Supported:
 -----------------------------
@@ -10,7 +10,7 @@ New System Drivers Supported:
 
 Systems Promoted from GAME_NOT_WORKING:
 ---------------------------------------
-(none)
+- ZRT80 terminal [Robbbert]
 
 
 
