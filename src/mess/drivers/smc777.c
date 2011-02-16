@@ -1,4 +1,4 @@
-/***************************************************************************
+/*************************************************************************************
 
     SMC-777 (c) 1983 Sony
 
@@ -7,10 +7,14 @@
     TODO:
     - no documentation, the entire driver is just a bunch of educated
       guesses ...
-	- fix ROM/RAM bankswitch, it happens after one instruction prefetching!
-	- add vblank irq;
+	- ROM/RAM bankswitch, it apparently happens after one instruction prefetching.
+	  We currently use an hackish implementation until the MAME/MESS framework can
+	  support that ...
+	- keyboard input is very very sluggish;
+	- colors in Dragon's Alphabet, Bird Crash;
+	- clean up i/o ports, remove Z80_B usage and write custom code in place of it;
 
-****************************************************************************/
+**************************************************************************************/
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
@@ -40,7 +44,8 @@ public:
 	UINT8 fdc_drq_flag;
 	UINT8 system_data;
 	struct { UINT8 r,g,b; } pal;
-	UINT8 raminh; //bankswitch
+	UINT8 raminh,raminh_pending_change; //bankswitch
+	UINT8 raminh_prefetch;
 	UINT8 irq_mask;
 	UINT8 keyb_direct;
 };
@@ -341,7 +346,7 @@ static WRITE8_HANDLER( smc777_fdc1_w )
 			wd17xx_set_drive(dev,data & 0x01);
 			//  wd17xx_set_side(dev,(data & 0x10)>>4);
 			if(data & 0xf0)
-			printf("%02x\n",data);
+				printf("floppy access %02x\n",data);
 			break;
 	}
 }
@@ -389,18 +394,23 @@ static READ8_HANDLER( system_input_r )
 	return state->system_data;
 }
 
+//static TIMER_CALLBACK( raminh_change )
+
+
 static WRITE8_HANDLER( system_output_w )
 {
 	smc777_state *state = space->machine->driver_data<smc777_state>();
 	/*
-    ---x --- beep
+	---x 0000 ram inibit signal
+    ---x 1001 beep
     all the rest is unknown at current time
     */
 	state->system_data = data;
 	switch(state->system_data & 0x0f)
 	{
 		case 0x00:
-			state->raminh = (((data & 0x10) >> 4) ^ 1) | 2;
+			state->raminh_pending_change = ((data & 0x10) >> 4) ^ 1;
+			state->raminh_prefetch = (UINT8)(cpu_get_reg(space->cpu, Z80_R)) & 0x7f;
 			break;
 		case 0x05: beep_set_state(space->machine->device("beeper"),data & 0x10); break;
 		default: printf("System FF %02x\n",data); break;
@@ -501,15 +511,17 @@ static READ8_HANDLER( smc777_mem_r )
 	smc777_state *state = space->machine->driver_data<smc777_state>();
 	UINT8 *wram = space->machine->region("wram")->base();
 	UINT8 *bios = space->machine->region("bios")->base();
+	UINT8 z80_r;
 
-	if(state->raminh & 2) //todo: doesn't work!
+	if(state->raminh_prefetch != 0xff) //do the bankswitch AFTER that the prefetch instruction is executed (FIXME: this is an hackish implementation)
 	{
-		state->raminh ^= 2;
+		z80_r = (UINT8)cpu_get_reg(space->cpu, Z80_R);
 
-		if(state->raminh == 0 && ((offset & 0xc000) == 0))
-			return bios[offset];
-
-		return wram[offset];
+		if(z80_r == ((state->raminh_prefetch+2) & 0x7f))
+		{
+			state->raminh = state->raminh_pending_change;
+			state->raminh_prefetch = 0xff;
+		}
 	}
 
 	if(state->raminh == 1 && ((offset & 0xc000) == 0))
@@ -520,6 +532,7 @@ static READ8_HANDLER( smc777_mem_r )
 
 static WRITE8_HANDLER( smc777_mem_w )
 {
+	//smc777_state *state = space->machine->driver_data<smc777_state>();
 	UINT8 *wram = space->machine->region("wram")->base();
 
 	wram[offset] = data;
@@ -817,6 +830,8 @@ static MACHINE_RESET(smc777)
 	smc777_state *state = machine->driver_data<smc777_state>();
 
 	state->raminh = 1;
+	state->raminh_pending_change = 1;
+	state->raminh_prefetch = 0xff;
 }
 
 static const gfx_layout smc777_charlayout =
