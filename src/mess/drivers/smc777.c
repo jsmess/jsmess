@@ -15,6 +15,7 @@
 	- cursor stuck in Bird Crash;
 	- add mc6845 features;
 	- many other missing features;
+	- Core Wars: implement F-keys, needed by this to run.
 
 **************************************************************************************/
 
@@ -50,7 +51,7 @@ public:
 	UINT8 raminh_prefetch;
 	UINT8 irq_mask;
 	UINT8 keyb_direct;
-	UINT8 pal_bank;
+	UINT8 pal_mode;
 };
 
 
@@ -155,7 +156,7 @@ static VIDEO_UPDATE( smc777 )
 					UINT8 *gfx_data = screen->machine->region("pcg")->base();
 					int pen;
 
-					pen = ((gfx_data[tile*8+yi]>>(7-xi)) & 1) ? (color+state->pal_bank) : bk_pen;
+					pen = ((gfx_data[tile*8+yi]>>(7-xi)) & 1) ? (color+state->pal_mode) : bk_pen;
 
 					if(pen != -1)
 						*BITMAP_ADDR16(bitmap, y*8+CRTC_MIN_Y+yi, x*8+CRTC_MIN_X+xi) = screen->machine->pens[pen];
@@ -401,6 +402,9 @@ static READ8_HANDLER( key_r )
 static WRITE8_HANDLER( border_col_w )
 {
 	smc777_state *state = space->machine->driver_data<smc777_state>();
+	if(data & 0xf0)
+		printf("Special border color enabled %02x\n",data);
+
 	state->backdrop_pen = data & 0xf;
 }
 
@@ -409,12 +413,12 @@ static READ8_HANDLER( system_input_r )
 {
 	smc777_state *state = space->machine->driver_data<smc777_state>();
 
-	printf("System FF %02x\n",state->system_data & 0x0f);
+	printf("System FF R %02x\n",state->system_data & 0x0f);
 
 	switch(state->system_data & 0x0f)
 	{
 		case 0x00:
-			return ((state->raminh & 1) << 4); //unknown bit, Dragon's Alphabet and Bird Crush relies on this
+			return ((state->raminh & 1) << 4); //unknown bit, Dragon's Alphabet and Bird Crush relies on this for correct colors
 	}
 
 	return state->system_data;
@@ -437,8 +441,9 @@ static WRITE8_HANDLER( system_output_w )
 			state->raminh_pending_change = ((data & 0x10) >> 4) ^ 1;
 			state->raminh_prefetch = (UINT8)(cpu_get_reg(space->cpu, Z80_R)) & 0x7f;
 			break;
+		case 0x02: printf("Interlace %s\n",data & 0x10 ? "on" : "off"); break;
 		case 0x05: beep_set_state(space->machine->device("beeper"),data & 0x10); break;
-		default: printf("System FF %02x\n",data); break;
+		default: printf("System FF W %02x\n",data); break;
 	}
 }
 
@@ -474,14 +479,15 @@ static READ8_HANDLER( smc777_keyboard_direct_r )
 	return res;
 }
 
-static WRITE8_HANDLER( smc777_keyboard_direct_w )
+static WRITE8_HANDLER( smc777_color_mode_w )
 {
 	smc777_state *state = space->machine->driver_data<smc777_state>();
 
-	state->pal_bank = data & 0x10;
-	state->keyb_direct = data;
-
-	printf("%02x\n",state->keyb_direct);
+	switch(data & 0x0f)
+	{
+		case 0x06: state->pal_mode = (data & 0x10) ^ 0x10; break;
+		default: printf("Color FF %02x\n",data); break;
+	}
 }
 
 static WRITE8_HANDLER( smc777_ramdac_w )
@@ -614,7 +620,7 @@ static ADDRESS_MAP_START( smc777_io , ADDRESS_SPACE_IO, 8)
 //  AM_RANGE(0x3c, 0x3d) AM_NOP //RGB Superimposer
 //  AM_RANGE(0x40, 0x47) AM_NOP //IEEE-488 interface unit
 //  AM_RANGE(0x48, 0x50) AM_NOP //HDD (Winchester)
-	AM_RANGE(0x51, 0x51) AM_READWRITE(smc777_keyboard_direct_r,smc777_keyboard_direct_w)
+	AM_RANGE(0x51, 0x51) AM_READWRITE(smc777_keyboard_direct_r,smc777_color_mode_w)
 	AM_RANGE(0x52, 0x52) AM_WRITE(smc777_ramdac_w)
 	AM_RANGE(0x53, 0x53) AM_DEVWRITE("sn1", sn76496_w) //SMC-777 specific
 //  AM_RANGE(0x54, 0x59) AM_NOP //VTR Controller
