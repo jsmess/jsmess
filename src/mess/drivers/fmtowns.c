@@ -2517,6 +2517,18 @@ static MACHINE_CONFIG_START( towns, towns_state )
 	MCFG_RAM_EXTRA_OPTIONS("2M,4M,8M,16M,32M,64M,96M")
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( townsux, towns )
+
+	MCFG_CPU_REPLACE("maincpu",I386, 16000000)
+	MCFG_CPU_PROGRAM_MAP(marty_mem)
+	MCFG_CPU_IO_MAP(towns_io)
+	MCFG_CPU_VBLANK_INT("screen", towns_vsync_irq)
+
+	MCFG_RAM_MODIFY(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("2M")
+	MCFG_RAM_EXTRA_OPTIONS("2M,4M,6M")
+MACHINE_CONFIG_END
+
 static MACHINE_CONFIG_DERIVED( marty, towns )
 
 	MCFG_CPU_REPLACE("maincpu",I386, 16000000)
@@ -2545,6 +2557,17 @@ ROM_START( fmtownsa )
 	ROM_LOAD("fmt_dic_a.rom",  0x100000, 0x080000, CRC(74b1d152) SHA1(f63602a1bd67c2ad63122bfb4ffdaf483510f6a8) )
 	ROM_LOAD("fmt_fnt_a.rom",  0x180000, 0x040000, CRC(0108a090) SHA1(1b5dd9d342a96b8e64070a22c3a158ca419894e1) )
 	ROM_LOAD("fmt_sys_a.rom",  0x200000, 0x040000, CRC(92f3fa67) SHA1(be21404098b23465d24c4201a81c96ac01aff7ab) )
+ROM_END
+
+ROM_START( fmtownsux )
+  ROM_REGION32_LE( 0x480000, "user", 0)
+	ROM_LOAD("fmt_dos_a.rom",  0x000000, 0x080000, CRC(22270e9f) SHA1(a7e97b25ff72b14121146137db8b45d6c66af2ae) )
+	// no F20 ROM
+	ROM_LOAD("fmt_dic.rom",  0x100000, 0x080000, CRC(82d1daa2) SHA1(7564020dba71deee27184824b84dbbbb7c72aa4e) )
+	ROM_LOAD("fmt_fnt.rom",  0x180000, 0x040000, CRC(dd6fd544) SHA1(a216482ea3162f348fcf77fea78e0b2e4288091a) )
+	ROM_LOAD("fmt_sys_a.rom",  0x200000, 0x040000, CRC(92f3fa67) SHA1(be21404098b23465d24c4201a81c96ac01aff7ab) )
+  ROM_REGION( 0x20, "serial", 0)
+    ROM_LOAD("mytownsux.rom",  0x00, 0x20, CRC(5cc7e6bc) SHA1(e245f8086df57ce6e48853f0e13525f738e5c4d8) )
 ROM_END
 
 ROM_START( fmtmarty )
@@ -2576,6 +2599,7 @@ ROM_END
 /*    YEAR  NAME    PARENT  COMPAT      MACHINE     INPUT    INIT    COMPANY      FULLNAME            FLAGS */
 COMP( 1989, fmtowns,  0,    	0,		towns,		towns,	 towns,  "Fujitsu",   "FM-Towns",		 GAME_NOT_WORKING)
 COMP( 1989, fmtownsa, fmtowns,	0,		towns,		towns,	 towns,  "Fujitsu",   "FM-Towns (alternate)", GAME_NOT_WORKING)
+COMP( 1991, fmtownsux,fmtowns,	0,		townsux,	towns,	 towns,  "Fujitsu",   "FM-Towns II UX", GAME_NOT_WORKING)
 CONS( 1993, fmtmarty, 0,    	0,		marty,		marty,	 marty,  "Fujitsu",   "FM-Towns Marty",	 GAME_NOT_WORKING)
 CONS( 1994, carmarty, fmtmarty,	0,		marty,		marty,	 marty,  "Fujitsu",   "FM-Towns Car Marty",	 GAME_NOT_WORKING)
 

@@ -5,6 +5,7 @@ New System Drivers Supported:
 - Victor Wondermega M2 (not working) [Justin Kerk]
 - Ferguson Big Board [Miodrag Milanovic]
 - Sanyo MBC-550, MBC-555 (boots but no keyboard) [Phill Harvey-Smith]
+- Fujitsu FM-Towns II UX (not working) [bernhardh, Anna Wu, Barry Rodewald]
 
 
 
