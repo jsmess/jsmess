@@ -417,6 +417,9 @@ static void recompute_parameters(device_t *device)
 	int horiz_pix_total = (upd7220->hs + upd7220->hbp + upd7220->aw + upd7220->hfp) * 16;
 	int vert_pix_total = upd7220->vs + upd7220->vbp + upd7220->al + upd7220->vfp;
 
+	if(horiz_pix_total == 0 || vert_pix_total == 0) //bail out if screen params aren't valid
+		return;
+
 	attoseconds_t refresh = HZ_TO_ATTOSECONDS(device->clock() * 8) * horiz_pix_total * vert_pix_total;
 
 	rectangle visarea;

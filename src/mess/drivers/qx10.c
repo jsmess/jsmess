@@ -23,7 +23,7 @@
 #include "machine/mc146818.h"
 #include "machine/i8255a.h"
 #include "machine/8237dma.h"
-#include "video/i82720.h"
+#include "video/upd7220.h"
 #include "machine/upd765.h"
 #include "machine/ram.h"
 
@@ -37,7 +37,15 @@ class qx10_state : public driver_device
 {
 public:
 	qx10_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+		: driver_device(machine, config),
+    	  m_hgdc(*this, "upd7220")
+		{ }
+
+	required_device<device_t> m_hgdc;
+
+	virtual void video_start();
+	virtual bool video_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
+	UINT8 *m_char_rom;
 
 	int		mc146818_offset;
 
@@ -426,7 +434,7 @@ static ADDRESS_MAP_START( qx10_io , ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x30, 0x30) AM_READWRITE(qx10_30_r, fdd_motor_w)
 	AM_RANGE(0x34, 0x34) AM_DEVREAD("upd765", upd765_status_r)
 	AM_RANGE(0x35, 0x35) AM_DEVREADWRITE("upd765", upd765_data_r, upd765_data_w)
-	AM_RANGE(0x38, 0x39) AM_READWRITE(compis_gdc_r, compis_gdc_w)
+	AM_RANGE(0x38, 0x39) AM_DEVREADWRITE("upd7220", upd7220_r, upd7220_w)
 	AM_RANGE(0x3c, 0x3c) AM_READWRITE(mc146818_data_r, mc146818_data_w)
 	AM_RANGE(0x3d, 0x3d) AM_WRITE(mc146818_offset_w)
 	AM_RANGE(0x40, 0x4f) AM_DEVREADWRITE("8237dma_1", i8237_r, i8237_w)
@@ -442,22 +450,12 @@ static INPUT_PORTS_START( qx10 )
 	PORT_BIT(0xfc, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
 
-/*
-    Video
-*/
-static const compis_gdc_interface i82720_interface =
-{
-	GDC_MODE_HRG,
-	0x8000
-};
 
 static MACHINE_START(qx10)
 {
 	qx10_state *state = machine->driver_data<qx10_state>();
 
 	cpu_set_irq_callback(machine->device("maincpu"), irq_callback);
-
-	compis_init( &i82720_interface );
 
 	// find devices
 	state->pic8259_master = machine->device("pic8259_master");
@@ -497,6 +495,62 @@ static GFXDECODE_START( qx10 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, qx10_charlayout, 1, 7 )
 GFXDECODE_END
 
+void qx10_state::video_start()
+{
+	// find memory regions
+	m_char_rom = machine->region("chargen")->base();
+
+	VIDEO_START_CALL(generic_bitmapped);
+}
+
+bool qx10_state::video_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+{
+	/* graphics */
+	upd7220_update(m_hgdc, &bitmap, &cliprect);
+
+	return 0;
+}
+
+static ADDRESS_MAP_START( qx10_upd7220_map, 0, 16 )
+	AM_RANGE(0x00000, 0x3ffff) AM_RAM
+ADDRESS_MAP_END
+
+static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
+{
+	int i;
+
+	for (i = 0; i < 16; i++)
+	{
+		if (BIT(data, i)) *BITMAP_ADDR16(bitmap, y, x + i) = 1;
+	}
+}
+
+static UPD7220_INTERFACE( hgdc_intf )
+{
+	"screen",
+	hgdc_display_pixels,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
+/* TODO: this is just a c&p code */
+static PALETTE_INIT( gdc )
+{
+	int i;
+	int r,g,b;
+
+	for ( i = 0; i < 16; i++ )
+	{
+		r = i & 4 ? ((i & 8) ? 0xaa : 0xff) : 0x00;
+		g = i & 2 ? ((i & 8) ? 0xaa : 0xff) : 0x00;
+		b = i & 1 ? ((i & 8) ? 0xaa : 0xff) : 0x00;
+
+		palette_set_color(machine, i, MAKE_RGB(r,g,b));
+	}
+}
+
 
 static MACHINE_CONFIG_START( qx10, qx10_state )
 	/* basic machine hardware */
@@ -526,11 +580,10 @@ static MACHINE_CONFIG_START( qx10, qx10_state )
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_GFXDECODE(qx10)
-	MCFG_PALETTE_LENGTH(COMPIS_PALETTE_SIZE)
-	MCFG_PALETTE_INIT(compis_gdc)
+	MCFG_PALETTE_LENGTH(16)
+	MCFG_PALETTE_INIT(gdc)
 
-	MCFG_VIDEO_START(compis_gdc)
-	MCFG_VIDEO_UPDATE(compis_gdc)
+	MCFG_UPD7220_ADD("upd7220", MAIN_CLK/4, hgdc_intf, qx10_upd7220_map)
 
 	MCFG_MC146818_ADD( "rtc", MC146818_STANDARD )
 
