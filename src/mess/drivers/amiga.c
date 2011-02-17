@@ -694,8 +694,8 @@ ROM_START( a500n )
 	ROMX_LOAD("kick40063.u6", 0x000000, 0x080000, CRC(fc24ae0d) SHA1(3b7f1493b27e212830f989f26ca76c02049f09ca), ROM_GROUPWORD | ROM_BIOS(4))	/* part number? */
 
 	/* action replay cartridge */
-	ROM_REGION16_BE(0x080000, "user2", 0)
-	ROM_CART_LOAD("cart", 0x0000, 0x080000, ROM_NOMIRROR | ROM_FILL_FF | ROM_OPTIONAL)
+	ROM_REGION16_BE(0x080000, "user2", ROMREGION_ERASEFF )
+	ROM_CART_LOAD("cart", 0x0000, 0x080000, ROM_NOMIRROR | ROM_OPTIONAL)
 
 	/* keyboard controller, mos 6500/1 mcu */
 	ROM_REGION(0x800, "keyboard", 0)
