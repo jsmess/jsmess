@@ -250,6 +250,7 @@ public:
 	int dma_channel;
 	UINT8 dma_offset[2][4];
 	UINT8 at_pages[0x10];
+	UINT8 soft_reset;
 };
 
 
@@ -330,10 +331,16 @@ static VIDEO_UPDATE( pc9801 )
 	return 0;
 }
 
+//FIXME: kludge to get over a PPI bug (doesn't get initialized?).
 static READ8_HANDLER( sys_port_r )
 {
+	pc98_state *state = space->machine->driver_data<pc98_state>();
+
+	if(cpu_get_pc(space->cpu) == 0xf808c)
+		return state->soft_reset | (i8255a_r(space->machine->device("ppi8255_0"), (offset & 6) >> 1) & 0x7f);
+
 	if(cpu_get_pc(space->cpu) == 0xf9088)
-		return 0x18; //FIXME: kludge to get over a probable PPI bug.
+		return 0x18;
 
 	if(cpu_get_pc(space->cpu) == 0xf90b2)
 		return 0x38;
@@ -343,6 +350,9 @@ static READ8_HANDLER( sys_port_r )
 
 	if(cpu_get_pc(space->cpu) == 0xf9233)
 		return 0x38;
+
+	if(cpu_get_pc(space->cpu) == 0xf926e)
+		return 0x18;
 
 	if(offset & 1)
 		return i8255a_r(space->machine->device("ppi8255_0"), (offset & 6) >> 1);
@@ -556,6 +566,11 @@ static WRITE8_HANDLER( port_f0_w )
 	pc98_state *state = space->machine->driver_data<pc98_state>();
 	if(offset == 0x00)
 	{
+		static UINT8 x;
+
+		state->soft_reset = 0x00;
+
+		popmessage("Press soft reset NOW! (%d pass)",x++);
 		//cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_RESET, PULSE_LINE);
 	}
 
@@ -734,7 +749,12 @@ static IRQ_CALLBACK(irq_callback)
 
 #include "cpu/i386/i386priv.h"
 
+static MACHINE_START(pc9801)
+{
+	pc98_state *state = machine->driver_data<pc98_state>();
 
+	state->soft_reset = 0x80;
+}
 
 static MACHINE_RESET(pc9801)
 {
@@ -824,7 +844,7 @@ static READ8_DEVICE_HANDLER( pc98_portb_r )
 static READ8_DEVICE_HANDLER( pc98_portc_r )
 {
 	//printf("PPI Port C read\n");
-	return 0x00;
+	return 0x08;
 }
 
 static WRITE8_DEVICE_HANDLER( pc98_porta_w )
@@ -1016,6 +1036,7 @@ static MACHINE_CONFIG_START( pc9801, pc98_state )
 	MCFG_CPU_PROGRAM_MAP(pc9801_mem)
 	MCFG_CPU_IO_MAP(pc9801_io)
 
+	MCFG_MACHINE_START(pc9801)
 	MCFG_MACHINE_RESET(pc9801)
 
 	MCFG_I8255A_ADD( "ppi8255_0", ppi8255_intf )
@@ -1113,62 +1134,7 @@ ROM_END
 
 static DRIVER_INIT( pc9801 )
 {
-	#if 0
-	UINT8 *ROM = machine->region("cpudata")->base();
-
-	/* patch unimplemented opcodes verr / verw */
-	ROM[0xf90be & 0x3ffff] = 0x90;
-	ROM[0xf90bf & 0x3ffff] = 0x90;
-	ROM[0xf90c0 & 0x3ffff] = 0x90;
-
-	ROM[0xf90c3 & 0x3ffff] = 0x90;
-	ROM[0xf90c4 & 0x3ffff] = 0x90;
-	ROM[0xf90c5 & 0x3ffff] = 0x90;
-
-	ROM[0xf90d8 & 0x3ffff] = 0x90;
-	ROM[0xf90d9 & 0x3ffff] = 0x90;
-	ROM[0xf90da & 0x3ffff] = 0x90;
-
-	ROM[0xf90dd & 0x3ffff] = 0x90;
-	ROM[0xf90de & 0x3ffff] = 0x90;
-	ROM[0xf90df & 0x3ffff] = 0x90;
-
-	/* patch verr / verw checks */
-	ROM[0xf90c1 & 0x3ffff] = 0x90;
-	ROM[0xf90c2 & 0x3ffff] = 0x90;
-
-	ROM[0xf90c6 & 0x3ffff] = 0x90;
-	ROM[0xf90c7 & 0x3ffff] = 0x90;
-
-	ROM[0xf90e0 & 0x3ffff] = 0x90;
-	ROM[0xf90e1 & 0x3ffff] = 0x90;
-
-	/* patch lldt / sldt checks (it tests a word at 0xf8070, and it wants zeroes on bits 8-15). */
-	ROM[0xf9103 & 0x3ffff] = 0x90;
-	ROM[0xf9104 & 0x3ffff] = 0x90;
-
-	/* patch ltr / str checks (it tests a word at 0xf8060, and it wants zeroes on bits 8-15).  */
-	ROM[0xf9118 & 0x3ffff] = 0x90;
-	ROM[0xf9119 & 0x3ffff] = 0x90;
-	ROM[0xf911a & 0x3ffff] = 0x90;
-
-	/* patch unimplemented lar opcode */
-	ROM[0xf91f6 & 0x3ffff] = 0x90;
-	ROM[0xf91f7 & 0x3ffff] = 0x90;
-	ROM[0xf91f8 & 0x3ffff] = 0x90;
-
-	/* patch lar checks */
-	ROM[0xf91fe & 0x3ffff] = 0x90;
-	ROM[0xf91ff & 0x3ffff] = 0x90;
-
-	/* can't avoid this??? */
-	ROM[0xf9258 & 0x3ffff] = 0xeb;
-	ROM[0xf9259 & 0x3ffff] = 0x33;
-
-	/* patch ROM checksum */
-	ROM[0xf8595 & 0x3ffff] = 0x90;
-	ROM[0xf8596 & 0x3ffff] = 0x90;
-	#endif
+	// ...
 }
 
 
