@@ -1089,10 +1089,10 @@ static READ16_HANDLER(neocd_transfer_r)
 	switch(state->neocd_ctrl.area_sel)
 	{
 	case NEOCD_AREA_AUDIO:
-		ret = Z80[offset & 0xffff];
+		ret = Z80[offset & 0xffff] | 0xff00;
 		break;
 	case NEOCD_AREA_PCM:
-		ret = PCM[offset + (0x100000*state->neocd_ctrl.pcm_bank_sel)];
+		ret = PCM[offset + (0x100000*state->neocd_ctrl.pcm_bank_sel)] | 0xff00;
 		break;
 	case NEOCD_AREA_SPR:
 		ret = SPR[offset + (0x80000*state->neocd_ctrl.spr_bank_sel)];
