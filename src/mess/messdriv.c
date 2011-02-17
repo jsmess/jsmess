@@ -1555,7 +1555,8 @@ const game_driver * const drivers[] =
 	DRIVER( fm7740sx )
 	DRIVER( fmtowns )   /* 1989 Fujitsu FM-Towns */
 	DRIVER( fmtownsa )
-	DRIVER( fmtownsux)  /* 1991 FM-Towns II UX */
+	DRIVER( fmtownsux )  /* 1991.11 FM-Towns II UX */
+	DRIVER( fmtownssj )  /* FM-Towns II SJ */
 	DRIVER( fmtmarty )  /* 1993 Fujitsu FM-Towns Marty */
 	DRIVER( carmarty )  /* Fujitsu FM-Towns Car Marty */
 

@@ -179,7 +179,7 @@ static void towns_init_serial_rom(running_machine* machine)
 	{
 		memcpy(state->towns_serial_rom,srom,32);
 		state->towns_machine_id = (state->towns_serial_rom[0x18] << 8) | state->towns_serial_rom[0x17];
-		popmessage("Machine ID in serial ROM: %04x",state->towns_machine_id);
+		logerror("Machine ID in serial ROM: %04x\n",state->towns_machine_id);
 		return;
 	}
 
@@ -1976,7 +1976,7 @@ static ADDRESS_MAP_START(marty_mem, ADDRESS_SPACE_PROGRAM, 32)
   AM_RANGE(0x000c8000, 0x000cafff) AM_READWRITE8(towns_spriteram_low_r,towns_spriteram_low_w,0xffffffff)
   AM_RANGE(0x000cb000, 0x000cbfff) AM_READ_BANK("bank6") AM_WRITE_BANK("bank7")
   AM_RANGE(0x000cc000, 0x000cff7f) AM_RAM
-  AM_RANGE(0x000cff80, 0x000cffff) AM_READWRITE8(towns_video_cff80_r,towns_video_cff80_w,0xffffffff)
+  AM_RANGE(0x000cff80, 0x000cffff) AM_READWRITE8(towns_video_cff80_mem_r,towns_video_cff80_mem_w,0xffffffff)
   AM_RANGE(0x000d0000, 0x000d7fff) AM_RAM
   AM_RANGE(0x000d8000, 0x000d9fff) AM_READWRITE8(towns_cmos_low_r,towns_cmos_low_w,0xffffffff) AM_SHARE("nvram") // CMOS? RAM
   AM_RANGE(0x000da000, 0x000effff) AM_RAM //READWRITE(SMH_BANK(11),SMH_BANK(11))
@@ -2526,7 +2526,19 @@ static MACHINE_CONFIG_DERIVED( townsux, towns )
 
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("2M")
-	MCFG_RAM_EXTRA_OPTIONS("2M,4M,6M")
+	MCFG_RAM_EXTRA_OPTIONS("10M")
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( townssj, towns )
+
+	MCFG_CPU_REPLACE("maincpu",I486, 66000000)
+	MCFG_CPU_PROGRAM_MAP(towns_mem)
+	MCFG_CPU_IO_MAP(towns_io)
+	MCFG_CPU_VBLANK_INT("screen", towns_vsync_irq)
+
+	MCFG_RAM_MODIFY(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("8M")
+	MCFG_RAM_EXTRA_OPTIONS("40M,72M")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( marty, towns )
@@ -2570,6 +2582,18 @@ ROM_START( fmtownsux )
     ROM_LOAD("mytownsux.rom",  0x00, 0x20, CRC(5cc7e6bc) SHA1(e245f8086df57ce6e48853f0e13525f738e5c4d8) )
 ROM_END
 
+ROM_START( fmtownssj )
+  ROM_REGION32_LE( 0x280000, "user", 0)
+  // Assumed for now, only the serial ROM has been dumped successfully so far
+	ROM_LOAD("fmt_dos.rom",  0x000000, 0x080000, CRC(112872ee) SHA1(57fd146478226f7f215caf63154c763a6d52165e) BAD_DUMP )
+	ROM_LOAD("fmt_f20.rom",  0x080000, 0x080000, CRC(9f55a20c) SHA1(1920711cb66340bb741a760de187de2f76040b8c) BAD_DUMP )
+	ROM_LOAD("fmt_dic.rom",  0x100000, 0x080000, CRC(82d1daa2) SHA1(7564020dba71deee27184824b84dbbbb7c72aa4e) BAD_DUMP )
+	ROM_LOAD("fmt_fnt.rom",  0x180000, 0x040000, CRC(dd6fd544) SHA1(a216482ea3162f348fcf77fea78e0b2e4288091a) BAD_DUMP )
+	ROM_LOAD("fmt_sys.rom",  0x200000, 0x040000, CRC(afe4ebcf) SHA1(4cd51de4fca9bd7a3d91d09ad636fa6b47a41df5) BAD_DUMP )
+  ROM_REGION( 0x20, "serial", 0)
+    ROM_LOAD("mytownssj.rom",  0x00, 0x20, CRC(d0ed8936) SHA1(bf9eeef25e9a1dc4a9ce1c70f4155ac973cae3f9) )
+ROM_END
+
 ROM_START( fmtmarty )
   ROM_REGION32_LE( 0x480000, "user", 0)
 	ROM_LOAD("mrom.m36",  0x000000, 0x080000, CRC(9c0c060c) SHA1(5721c5f9657c570638352fa9acac57fa8d0b94bd) )
@@ -2600,6 +2624,7 @@ ROM_END
 COMP( 1989, fmtowns,  0,    	0,		towns,		towns,	 towns,  "Fujitsu",   "FM-Towns",		 GAME_NOT_WORKING)
 COMP( 1989, fmtownsa, fmtowns,	0,		towns,		towns,	 towns,  "Fujitsu",   "FM-Towns (alternate)", GAME_NOT_WORKING)
 COMP( 1991, fmtownsux,fmtowns,	0,		townsux,	towns,	 towns,  "Fujitsu",   "FM-Towns II UX", GAME_NOT_WORKING)
+COMP( 19??, fmtownssj,fmtowns,	0,		townssj,	towns,	 towns,  "Fujitsu",   "FM-Towns II SJ", GAME_NOT_WORKING)
 CONS( 1993, fmtmarty, 0,    	0,		marty,		marty,	 marty,  "Fujitsu",   "FM-Towns Marty",	 GAME_NOT_WORKING)
 CONS( 1994, carmarty, fmtmarty,	0,		marty,		marty,	 marty,  "Fujitsu",   "FM-Towns Car Marty",	 GAME_NOT_WORKING)
 
