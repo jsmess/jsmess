@@ -204,7 +204,6 @@ static WRITE8_HANDLER( smc777_6845_w )
 	}
 	else
 	{
-		/* FIXME: this should be inside the MC6845 core! */
 		if(state->addr_latch == 0x0a)
 			state->cursor_raster = data;
 		else if(state->addr_latch == 0x0e)
@@ -414,7 +413,7 @@ static READ8_HANDLER( system_input_r )
 	switch(state->system_data & 0x0f)
 	{
 		case 0x00:
-			return (state->raminh & 0x01) << 4; //unknown bit, Dragon's Alphabet and Bird Crush relies on this
+			return ((state->raminh & 1) << 4); //unknown bit, Dragon's Alphabet and Bird Crush relies on this
 	}
 
 	return state->system_data;
@@ -859,9 +858,11 @@ static INTERRUPT_GEN( smc777_vblank_irq )
 		cpu_set_input_line(device,0,HOLD_LINE);
 }
 
+#define MASTER_CLOCK XTAL_4_028MHz
+
 static MACHINE_CONFIG_START( smc777, smc777_state )
     /* basic machine hardware */
-    MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz) //4,028 Mhz!
+    MCFG_CPU_ADD("maincpu",Z80, MASTER_CLOCK)
     MCFG_CPU_PROGRAM_MAP(smc777_mem)
     MCFG_CPU_IO_MAP(smc777_io)
 	MCFG_CPU_VBLANK_INT("screen",smc777_vblank_irq)
@@ -880,7 +881,7 @@ static MACHINE_CONFIG_START( smc777, smc777_state )
     MCFG_PALETTE_INIT(smc777)
 	MCFG_GFXDECODE(smc777)
 
-	MCFG_MC6845_ADD("crtc", H46505, XTAL_3_579545MHz/2, mc6845_intf)	/* unknown clock, hand tuned to get ~60 fps */
+	MCFG_MC6845_ADD("crtc", H46505, MASTER_CLOCK/2, mc6845_intf)	/* unknown clock, hand tuned to get ~60 fps */
 
     MCFG_VIDEO_START(smc777)
     MCFG_VIDEO_UPDATE(smc777)
@@ -890,7 +891,7 @@ static MACHINE_CONFIG_START( smc777, smc777_state )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("sn1", SN76489A, XTAL_4MHz) // unknown clock / divider
+	MCFG_SOUND_ADD("sn1", SN76489A, MASTER_CLOCK) // unknown clock / divider
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_SOUND_ADD("beeper", BEEP, 0)
