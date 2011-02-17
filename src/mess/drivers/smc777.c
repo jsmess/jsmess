@@ -50,6 +50,7 @@ public:
 	UINT8 raminh_prefetch;
 	UINT8 irq_mask;
 	UINT8 keyb_direct;
+	UINT8 pal_bank;
 };
 
 
@@ -139,8 +140,8 @@ static VIDEO_UPDATE( smc777 )
 			switch(bk_color & 3)
 			{
 				case 0: bk_pen = -1; break; //transparent
-				case 1: bk_pen = 0x10; break; //white
-				case 2: bk_pen = 0x11; break; //black
+				case 1: bk_pen = 0x17; break; //white
+				case 2: bk_pen = 0x10; break; //black
 				case 3: bk_pen = (color ^ 0xf); break; //complementary
 			}
 
@@ -154,7 +155,7 @@ static VIDEO_UPDATE( smc777 )
 					UINT8 *gfx_data = screen->machine->region("pcg")->base();
 					int pen;
 
-					pen = ((gfx_data[tile*8+yi]>>(7-xi)) & 1) ? color : bk_pen;
+					pen = ((gfx_data[tile*8+yi]>>(7-xi)) & 1) ? (color+state->pal_bank) : bk_pen;
 
 					if(pen != -1)
 						*BITMAP_ADDR16(bitmap, y*8+CRTC_MIN_Y+yi, x*8+CRTC_MIN_X+xi) = screen->machine->pens[pen];
@@ -477,6 +478,7 @@ static WRITE8_HANDLER( smc777_keyboard_direct_w )
 {
 	smc777_state *state = space->machine->driver_data<smc777_state>();
 
+	state->pal_bank = data & 0x10;
 	state->keyb_direct = data;
 
 	printf("%02x\n",state->keyb_direct);
@@ -817,8 +819,18 @@ static const mc6845_interface mc6845_intf =
 
 static PALETTE_INIT( smc777 )
 {
-	palette_set_color_rgb(machine, 0x10, 0xff,0xff,0xff);
-	palette_set_color_rgb(machine, 0x11, 0x00,0x00,0x00);
+	int i;
+
+	for(i=0x10;i<0x18;i++)
+	{
+		UINT8 r,g,b;
+
+		r = (i & 4) >> 2;
+		g = (i & 2) >> 1;
+		b = (i & 1) >> 0;
+
+		palette_set_color_rgb(machine, i, pal1bit(r),pal1bit(g),pal1bit(b));
+	}
 }
 
 static const wd17xx_interface smc777_mb8876_interface =
@@ -877,7 +889,7 @@ static MACHINE_CONFIG_START( smc777, smc777_state )
     MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
     MCFG_SCREEN_SIZE(0x400, 400)
     MCFG_SCREEN_VISIBLE_AREA(0, 660-1, 0, 220-1) //normal 640 x 200 + 20 pixels for border color
-    MCFG_PALETTE_LENGTH(0x10+2) //16 palette entries + 2 special white and black
+    MCFG_PALETTE_LENGTH(0x10+8) //16 palette entries + 8 special colors
     MCFG_PALETTE_INIT(smc777)
 	MCFG_GFXDECODE(smc777)
 
