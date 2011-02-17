@@ -137,6 +137,7 @@ static VIDEO_UPDATE( smc777 )
 			int bk_pen;
 			//int bk_struct[4] = { -1, 0x10, 0x11, (color & 7) ^ 8 };
 
+			bk_pen = -1;
 			switch(bk_color & 3)
 			{
 				case 0: bk_pen = -1; break; //transparent
