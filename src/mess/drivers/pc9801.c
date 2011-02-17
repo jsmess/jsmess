@@ -581,13 +581,16 @@ static WRITE8_HANDLER( pc9801_fdc_2dd_w )
 			case 2: upd765_data_w(space->machine->device("upd765_2dd"),0,data); return;
 			case 4:
 				printf("%02x ctrl\n",data);
+				if(((state->fdc_2dd_ctrl & 0x80) == 0) && (data & 0x80))
+					upd765_reset_w(space->machine->device("upd765_2dd"),1);
+				if((state->fdc_2dd_ctrl & 0x80) && (!(data & 0x80)))
+					upd765_reset_w(space->machine->device("upd765_2dd"),0);
+
 				state->fdc_2dd_ctrl = data;
 				floppy_mon_w(floppy_get_device(space->machine, 0), (data & 8) ? CLEAR_LINE : ASSERT_LINE);
 				floppy_mon_w(floppy_get_device(space->machine, 1), (data & 8) ? CLEAR_LINE : ASSERT_LINE);
 				floppy_drive_set_ready_state(floppy_get_device(space->machine, 0), (data & 8), 0);
 				floppy_drive_set_ready_state(floppy_get_device(space->machine, 1), (data & 8), 0);
-				if(((state->fdc_2dd_ctrl & 0x80) == 0) && (data & 0x80))
-					upd765_reset_w(space->machine->device("upd765_2dd"),1);
 				break;
 		}
 	}
@@ -1174,11 +1177,19 @@ static MACHINE_RESET(pc9801)
 static INTERRUPT_GEN(pc9801_vrtc_irq)
 {
 	pc9801_state *state = device->machine->driver_data<pc9801_state>();
+	address_space *space = cpu_get_address_space(device->machine->device("maincpu"), ADDRESS_SPACE_PROGRAM);
+	static UINT8 test;
+
+	if(input_code_pressed(device->machine,KEYCODE_Z))
+		test^=1;
+
+	if(test)
+		space->write_word(0x55e,space->machine->rand());
 
 	if(state->vrtc_irq_mask)
 	{
 		pic8259_ir2_w(device->machine->device("pic8259_master"), 1);
-		state->vrtc_irq_mask = 0; // TODO: this irq auto-masks?
+		//state->vrtc_irq_mask = 0; // TODO: this irq auto-masks?
 	}
 }
 
@@ -1205,13 +1216,14 @@ static TIMER_DEVICE_CALLBACK( keyboard_callback )
 				if(prev_scancode == scancode)
 					scancode|=0x80;
 
-				state->keyb_press = scancode;
+				state->keyb_press = scancode & 0x7f;
 				pic8259_ir1_w(timer.machine->device("pic8259_master"), 1);
 				return;
 			}
 			scancode++;
 		}
 	}
+	state->keyb_press = 0x00;
 }
 
 static MACHINE_CONFIG_START( pc9801, pc9801_state )
