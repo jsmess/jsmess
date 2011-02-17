@@ -501,7 +501,7 @@ static WRITE8_HANDLER( pc9801_a0_w )
 			case 0x0c:
 			case 0x0e:
 			{
-				static UINT8 pal_entry;
+				UINT8 pal_entry;
 
 				state->pal_clut[(offset & 0x6) >> 1] = data;
 
