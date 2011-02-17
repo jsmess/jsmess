@@ -1996,6 +1996,32 @@ static ADDRESS_MAP_START(marty_mem, ADDRESS_SPACE_PROGRAM, 32)
   AM_RANGE(0xfffc0000, 0xffffffff) AM_ROM AM_REGION("user",0x200000)  // SYSTEM ROM
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START(ux_mem, ADDRESS_SPACE_PROGRAM, 32)
+  AM_RANGE(0x00000000, 0x000bffff) AM_RAM
+  AM_RANGE(0x000c0000, 0x000c7fff) AM_READWRITE8(towns_gfx_r,towns_gfx_w,0xffffffff)
+  AM_RANGE(0x000c8000, 0x000cafff) AM_READWRITE8(towns_spriteram_low_r,towns_spriteram_low_w,0xffffffff)
+  AM_RANGE(0x000cb000, 0x000cbfff) AM_READ_BANK("bank6") AM_WRITE_BANK("bank7")
+  AM_RANGE(0x000cc000, 0x000cff7f) AM_RAM
+  AM_RANGE(0x000cff80, 0x000cffff) AM_READWRITE8(towns_video_cff80_mem_r,towns_video_cff80_mem_w,0xffffffff)
+  AM_RANGE(0x000d0000, 0x000d7fff) AM_RAM
+  AM_RANGE(0x000d8000, 0x000d9fff) AM_READWRITE8(towns_cmos_low_r,towns_cmos_low_w,0xffffffff) AM_SHARE("nvram") // CMOS? RAM
+  AM_RANGE(0x000da000, 0x000effff) AM_RAM //READWRITE(SMH_BANK(11),SMH_BANK(11))
+  AM_RANGE(0x000f0000, 0x000f7fff) AM_RAM //READWRITE(SMH_BANK(12),SMH_BANK(12))
+  AM_RANGE(0x000f8000, 0x000fffff) AM_READ_BANK("bank11") AM_WRITE_BANK("bank12")
+//  AM_RANGE(0x00100000, 0x005fffff) AM_RAM  // some extra RAM - the Marty has 6MB RAM (not upgradable)
+  AM_RANGE(0x00680000, 0x0087ffff) AM_ROM AM_REGION("user",0x280000)  // EX ROM
+  AM_RANGE(0x00a00000, 0x00a7ffff) AM_READWRITE8(towns_gfx_high_r,towns_gfx_high_w,0xffffffff) AM_MIRROR(0x180000) // VRAM
+  AM_RANGE(0x00b00000, 0x00b7ffff) AM_ROM AM_REGION("user",0x180000)  // FONT
+  AM_RANGE(0x00c00000, 0x00c1ffff) AM_READWRITE8(towns_spriteram_r,towns_spriteram_w,0xffffffff) // Sprite RAM
+  AM_RANGE(0x00d00000, 0x00dfffff) AM_RAM // ?? - used by ssf2
+  AM_RANGE(0x00e00000, 0x00e7ffff) AM_ROM AM_REGION("user",0x000000)  // OS
+  AM_RANGE(0x00e80000, 0x00efffff) AM_ROM AM_REGION("user",0x100000)  // DIC ROM
+  AM_RANGE(0x00f00000, 0x00f7ffff) AM_ROM AM_REGION("user",0x180000)  // FONT
+  AM_RANGE(0x00f80000, 0x00f8ffff) AM_DEVREADWRITE8("pcm",rf5c68_mem_r,rf5c68_mem_w,0xffffffff)  // WAVE RAM
+  AM_RANGE(0x00fc0000, 0x00ffffff) AM_ROM AM_REGION("user",0x200000)  // SYSTEM ROM
+  AM_RANGE(0xfffc0000, 0xffffffff) AM_ROM AM_REGION("user",0x200000)  // SYSTEM ROM
+ADDRESS_MAP_END
+
 static ADDRESS_MAP_START( towns_io , ADDRESS_SPACE_IO, 32)
   // I/O ports derived from FM Towns/Bochs, these are specific to the FM Towns
   // System ports
@@ -2520,7 +2546,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( townsux, towns )
 
 	MCFG_CPU_REPLACE("maincpu",I386, 16000000)
-	MCFG_CPU_PROGRAM_MAP(marty_mem)
+	MCFG_CPU_PROGRAM_MAP(ux_mem)
 	MCFG_CPU_IO_MAP(towns_io)
 	MCFG_CPU_VBLANK_INT("screen", towns_vsync_irq)
 
