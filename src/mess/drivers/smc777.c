@@ -389,7 +389,7 @@ static READ8_HANDLER( key_r )
 	UINT8 res;
 
 	if(offset == 1) //keyboard status
-		return (0xfc) | state->keyb_press_flag;
+		return (0x3c) | state->keyb_press_flag; //bit 6 or 7 is probably key repeat
 
 	state->keyb_press_flag = 0;
 	res = state->keyb_press;
