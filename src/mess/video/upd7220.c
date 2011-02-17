@@ -454,7 +454,7 @@ static void recompute_parameters(device_t *device)
 /*-------------------------------------------------
     advance_ead - advance EAD pointer
 -------------------------------------------------*/
-#ifdef UNUSED_FUNCTION
+
 #define EAD			upd7220->ead
 #define DAD			upd7220->dad
 #define P			upd7220->pitch
@@ -463,6 +463,7 @@ static void recompute_parameters(device_t *device)
 #define LR(value)	((value << 1) | MSB(value))
 #define RR(value)	((LSB(value) << 15) | (value >> 1))
 
+/* TODO: EAD addition/subtraction is wrong, must be direction param 0 + (direction param 1 x pitch) */
 static void advance_ead(upd7220_t *upd7220)
 {
 	switch (upd7220->draw_mode & 0x07)
@@ -512,7 +513,7 @@ static void advance_ead(upd7220_t *upd7220)
 
 	EAD &= 0x3ffff;
 }
-#endif
+
 /*-------------------------------------------------
     translate_command - translate command byte
 -------------------------------------------------*/
@@ -761,10 +762,10 @@ static void process_fifo(device_t *device)
 
 	case COMMAND_WDAT: /* write data into display memory */
 		logerror("uPD7220 '%s' Unimplemented command WDAT\n", device->tag());
-
-		if (flag == FIFO_PARAMETER)
+		if (upd7220->param_ptr == 2)
 		{
-			upd7220->param_ptr = 0;
+			printf("%02x %02x (%c) %04x\n",upd7220->pr[2],upd7220->pr[1],upd7220->pr[1],EAD);
+			advance_ead(upd7220);
 		}
 		break;
 
