@@ -603,7 +603,7 @@ const char *read_hash_config(device_image_interface &image, const char *sysname)
 	/* look up this entry in the hash file */
 	info = hashfile_lookup(hashfile, &image.hash());
 	
-	if (!info)
+	if (!info || !info->extrainfo)
 	{
 		hashfile_close(hashfile);
 		return NULL;
