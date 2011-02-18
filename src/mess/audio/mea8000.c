@@ -52,6 +52,7 @@ typedef enum
 	MEA8000_SLOWING,    /* repating last frame with decreasing amplitude, timer on */
 } mea8000_state;
 
+ALLOW_SAVE_TYPE( mea8000_state );
 
 
 typedef struct
