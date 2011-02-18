@@ -1031,14 +1031,14 @@ static void update_text(device_t *device, bitmap_t *bitmap, const rectangle *cli
 	int im, wd, area;
 	int y, sy = 0;
 
-	for (area = 0; area < 4; area++)
+	for (area = 0; area < 1; area++)
 	{
 		get_text_partition(upd7220, area, &sad, &len, &im, &wd);
 
 		for (y = sy; y < sy + len; y++)
 		{
 			addr = sad + (y * upd7220->pitch);
-			if (upd7220->draw_text_func) upd7220->draw_text_func(device, bitmap, addr, y, wd);
+			if (upd7220->draw_text_func) upd7220->draw_text_func(device, bitmap, upd7220->vram, addr, y, wd, upd7220->pitch);
 		}
 
 		sy = y + 1;
@@ -1095,7 +1095,7 @@ static void update_graphics(device_t *device, bitmap_t *bitmap, const rectangle 
 			if (im)
 				draw_graphics_line(device, bitmap, addr, y, wd);
 			else
-				if (upd7220->draw_text_func) upd7220->draw_text_func(device, bitmap, addr, y, wd);
+				if (upd7220->draw_text_func) upd7220->draw_text_func(device, bitmap, upd7220->vram, addr, y, wd, upd7220->pitch);
 		}
 
 		sy = y + 1;

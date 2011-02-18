@@ -268,6 +268,7 @@ INPUT_PORTS_END
 
 static MACHINE_RESET(a5105)
 {
+
 }
 
 
@@ -326,17 +327,36 @@ bool a5105_state::video_update(screen_device &screen, bitmap_t &bitmap, const re
 
 static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 {
-	int i;
+	//int i;
 
-	for (i = 0; i < 16; i++)
-	{
-		if (BIT(data, i)) *BITMAP_ADDR16(bitmap, y, x + i) = 1;
-	}
+	//for (i = 0; i < 16; i++)
+	//{
+	//	if (BIT(data, i)) *BITMAP_ADDR16(bitmap, y, x + i) = 1;
+	//}
 }
 
 static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 {
+	a5105_state *state = device->machine->driver_data<a5105_state>();
+	int x;
+	int xi,yi;
+	int tile;
 
+	for( x = 0; x < pitch; x++ )
+	{
+		tile = (vram[addr+x] & 0xff);
+
+		for( yi = 0; yi < 8; yi++)
+		{
+			for( xi = 0; xi < 8; xi++)
+			{
+				UINT8 pen = (state->m_char_rom[tile*8+yi] >> xi) & 1;
+
+				if((y * 8 + yi + 40) < 200) // TODO: screen borders, offsetted
+					*BITMAP_ADDR16(bitmap, y * 8 + yi + 40, x * 8 + xi + 240) = pen;
+			}
+		}
+	}
 }
 
 static UPD7220_INTERFACE( hgdc_intf )

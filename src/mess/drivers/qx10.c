@@ -524,7 +524,26 @@ static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 
 static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 {
+	qx10_state *state = device->machine->driver_data<qx10_state>();
+	int x;
+	int xi,yi;
+	int tile;
 
+	for( x = 0; x < pitch; x++ )
+	{
+		tile = (vram[addr+x] & 0x7f);
+
+		for( yi = 0; yi < 16; yi++)
+		{
+			for( xi = 0; xi < 8; xi++)
+			{
+				UINT8 pen = (state->m_char_rom[tile*16+yi] >> xi) & 1;
+
+				if((y * 16 + yi + 16) < 480)  //todo: screen limits, offsetted
+					*BITMAP_ADDR16(bitmap, y * 16 + yi + 16, x * 8 + xi + 352) = pen;
+			}
+		}
+	}
 }
 
 static UPD7220_INTERFACE( hgdc_intf )
