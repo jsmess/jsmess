@@ -65,6 +65,8 @@ public:
 	device_t *pic8259_slave;
 	device_t *dma8237_1;
 	device_t *upd765;
+
+	UINT8 color_mode;
 };
 
 /*
@@ -476,13 +478,34 @@ static MACHINE_RESET(qx10)
 	state->memcmos = 0;
 	state->membank = 0;
 	update_memory_mapping(machine);
+
+	{
+		int i;
+
+		/* TODO: is there a bit that sets this up? */
+		state->color_mode = input_port_read(machine, "CONFIG") & 1;
+
+		if(state->color_mode) //color
+		{
+			for ( i = 0; i < 8; i++ )
+				palette_set_color_rgb(machine, i, pal1bit((i >> 0) & 1), pal1bit((i >> 1) & 1), pal1bit((i >> 2) & 1));
+		}
+		else //monochrome
+		{
+			for ( i = 0; i < 8; i++ )
+				palette_set_color_rgb(machine, i, pal1bit(0), pal1bit(0), pal1bit(0));
+
+			palette_set_color_rgb(machine, 1, 0x00, 0x9f, 0x00);
+			palette_set_color_rgb(machine, 2, 0x00, 0xff, 0x00);
+		}
+	}
 }
 
 /* F4 Character Displayer */
 static const gfx_layout qx10_charlayout =
 {
 	8, 16,					/* 8 x 16 characters */
-	128,					/* 128 characters */
+	RGN_FRAC(1,1),			/* 128 characters */
 	1,					/* 1 bits per pixel */
 	{ 0 },					/* no bitplanes */
 	/* x offsets */
@@ -528,16 +551,21 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 	int x;
 	int xi,yi;
 	int tile;
+	int attr;
+	UINT8 color;
 
 	for( x = 0; x < pitch; x++ )
 	{
-		tile = (vram[addr+x] & 0x7f);
+		tile = (vram[addr+x] & 0xff);
+		attr = ((vram[addr+x] & 0xff00) >> 8);
+
+		color = (state->color_mode) ? 1 : (attr & 4) ? 2 : 1; /* TODO: color mode */
 
 		for( yi = 0; yi < 16; yi++)
 		{
 			for( xi = 0; xi < 8; xi++)
 			{
-				UINT8 pen = (state->m_char_rom[tile*16+yi] >> xi) & 1;
+				UINT8 pen = ((state->m_char_rom[tile*16+yi] >> xi) & 1) ? color : 0;
 
 				if((y * 16 + yi + 16) < 480)  //todo: screen limits, offsetted
 					*BITMAP_ADDR16(bitmap, y * 16 + yi + 16, x * 8 + xi + 352) = pen;
@@ -556,20 +584,9 @@ static UPD7220_INTERFACE( hgdc_intf )
 	DEVCB_NULL
 };
 
-/* TODO: this is just a c&p code */
 static PALETTE_INIT( gdc )
 {
-	int i;
-	int r,g,b;
-
-	for ( i = 0; i < 16; i++ )
-	{
-		r = i & 4 ? ((i & 8) ? 0xaa : 0xff) : 0x00;
-		g = i & 2 ? ((i & 8) ? 0xaa : 0xff) : 0x00;
-		b = i & 1 ? ((i & 8) ? 0xaa : 0xff) : 0x00;
-
-		palette_set_color(machine, i, MAKE_RGB(r,g,b));
-	}
+	// ...
 }
 
 
@@ -601,7 +618,7 @@ static MACHINE_CONFIG_START( qx10, qx10_state )
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_GFXDECODE(qx10)
-	MCFG_PALETTE_LENGTH(16)
+	MCFG_PALETTE_LENGTH(8)
 	MCFG_PALETTE_INIT(gdc)
 
 	MCFG_UPD7220_ADD("upd7220", MAIN_CLK/4, hgdc_intf, upd7220_map)
@@ -625,12 +642,13 @@ ROM_START( qx10 )
 	ROM_LOAD( "m12020a.3e", 0x0000, 0x0800, CRC(fa27f333) SHA1(73d27084ca7b002d5f370220d8da6623a6e82132))
 
 	/* This rom is a character generator containing special characters only */
-	ROM_REGION( 0x800, "chargen", 0 )
-	ROM_LOAD( "qge.2e", 0x0000, 0x0800, CRC(ed93cb81) SHA1(579e68bde3f4184ded7d89b72c6936824f48d10b))
+	ROM_REGION( 0x1000, "chargen", 0 )
+//	ROM_LOAD( "qge.2e",   0x0000, 0x0800, BAD_DUMP CRC(ed93cb81) SHA1(579e68bde3f4184ded7d89b72c6936824f48d10b)) //this one contains normal characters
+	ROM_LOAD( "qge.2e",   0x0000, 0x1000, BAD_DUMP CRC(eb31a2d5) SHA1(6dc581bf2854a07ae93b23b6dfc9c7abd3c0569e))
 ROM_END
 
 ROM_START( qc10 )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF ) /* already patched? */
 	ROM_LOAD( "ipl.rom", 0x0000, 0x0800, CRC(73e8b3cd) SHA1(be9a84a5a27b387798d2b94d3b5fe547b4b4620d))
 
 	/* This is probably the i8039 program ROM for the Q10MF Multifont card, and the actual font ROMs are missing (6 * HM43128) */
@@ -639,8 +657,9 @@ ROM_START( qc10 )
 	ROM_REGION( 0x800, "i8039", 0 )
 	ROM_LOAD( "m12020a.3e", 0x0000, 0x0800, CRC(fa27f333) SHA1(73d27084ca7b002d5f370220d8da6623a6e82132)) //mfont.rom
 
-	ROM_REGION( 0x800, "chargen", 0 ) //this one contains normal characters
-	ROM_LOAD( "font.rom", 0x0000, 0x0800, CRC(04a6da6d) SHA1(ef9743476f6fb30ca9209cf700e985a7f85066bb))
+	ROM_REGION( 0x1000, "chargen", 0 )
+//	ROM_LOAD( "font.rom", 0x0000, 0x0800, BAD_DUMP CRC(04a6da6d) SHA1(ef9743476f6fb30ca9209cf700e985a7f85066bb)) //this one contains normal characters
+	ROM_LOAD( "qge.2e",   0x0000, 0x1000, BAD_DUMP CRC(eb31a2d5) SHA1(6dc581bf2854a07ae93b23b6dfc9c7abd3c0569e))
 ROM_END
 
 
@@ -670,5 +689,5 @@ static DRIVER_INIT(qx10)
 }
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY   FULLNAME       FLAGS */
-COMP( 1983, qx10,  0,       0,	qx10,	qx10,	 qx10,  		  "Epson",   "QX-10",		GAME_NOT_WORKING | GAME_NO_SOUND )
-COMP( 1983, qc10,  qx10,    0,	qx10,	qx10,	 0, 		      "Epson",   "QC-10 (Japan)",		GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP( 1983, qx10,  0,       0,	qx10,	qx10,	 0,  		  "Epson",   "QX-10",		GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP( 1983, qc10,  qx10,    0,	qx10,	qx10,	 0, 		  "Epson",   "QC-10 (Japan)",		GAME_NOT_WORKING | GAME_NO_SOUND )

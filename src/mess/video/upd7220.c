@@ -1031,7 +1031,7 @@ static void update_text(device_t *device, bitmap_t *bitmap, const rectangle *cli
 	int im, wd, area;
 	int y, sy = 0;
 
-	for (area = 0; area < 1; area++)
+	for (area = 0; area < 4; area++)
 	{
 		get_text_partition(upd7220, area, &sad, &len, &im, &wd);
 
