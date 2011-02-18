@@ -568,7 +568,7 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 				UINT8 pen = ((state->m_char_rom[tile*16+yi] >> xi) & 1) ? color : 0;
 
 				if((y * 16 + yi + 16) < 480)  //todo: screen limits, offsetted
-					*BITMAP_ADDR16(bitmap, y * 16 + yi + 16, x * 8 + xi + 352) = pen;
+					*BITMAP_ADDR16(bitmap, y * 16 + yi + 16, x * 8 + xi + 352/2) = pen;
 			}
 		}
 	}

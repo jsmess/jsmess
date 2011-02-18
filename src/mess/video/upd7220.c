@@ -428,7 +428,7 @@ static void recompute_parameters(device_t *device)
 {
 	upd7220_t *upd7220 = get_safe_token(device);
 
-	int horiz_pix_total = (upd7220->hs + upd7220->hbp + upd7220->aw + upd7220->hfp) * 16;
+	int horiz_pix_total = (upd7220->hs + upd7220->hbp + upd7220->aw + upd7220->hfp) * 8;
 	int vert_pix_total = upd7220->vs + upd7220->vbp + upd7220->al + upd7220->vfp;
 
 	if(horiz_pix_total == 0 || vert_pix_total == 0) //bail out if screen params aren't valid
@@ -438,9 +438,9 @@ static void recompute_parameters(device_t *device)
 
 	rectangle visarea;
 
-	visarea.min_x = (upd7220->hs + upd7220->hbp) * 16;
+	visarea.min_x = (upd7220->hs + upd7220->hbp) * 8;
 	visarea.min_y = upd7220->vs + upd7220->vbp;
-	visarea.max_x = horiz_pix_total - (upd7220->hfp * 16) - 1;
+	visarea.max_x = horiz_pix_total - (upd7220->hfp * 8) - 1;
 	visarea.max_y = vert_pix_total - upd7220->vfp - 1;
 
 	if (LOG)
