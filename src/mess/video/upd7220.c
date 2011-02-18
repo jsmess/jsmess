@@ -438,10 +438,11 @@ static void recompute_parameters(device_t *device)
 
 	rectangle visarea;
 
-	visarea.min_x = (upd7220->hs + upd7220->hbp) * 8;
-	visarea.min_y = upd7220->vs + upd7220->vbp;
-	visarea.max_x = horiz_pix_total - (upd7220->hfp * 8) - 1;
-	visarea.max_y = vert_pix_total - upd7220->vfp - 1;
+	visarea.min_x = 0; //(upd7220->hs + upd7220->hbp) * 8;
+	visarea.min_y = 0; //upd7220->vs + upd7220->vbp;
+	visarea.max_x = upd7220->aw * 8 - 1;//horiz_pix_total - (upd7220->hfp * 8) - 1;
+	visarea.max_y = upd7220->al - 1;//vert_pix_total - upd7220->vfp - 1;
+
 
 	if (LOG)
 	{

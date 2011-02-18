@@ -353,8 +353,8 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 			{
 				int pen = (state->m_char_rom[tile*8+yi] >> xi) & 1 ? color : 0;
 
-				if((y * 8 + yi + 40/2) < 200) // TODO: screen borders, offsetted
-					*BITMAP_ADDR16(bitmap, y * 8 + yi + 40/2, x * 8 + xi + 240/2) = pen;
+				if((y * 8 + yi) <= 200) // TODO: screen borders
+					*BITMAP_ADDR16(bitmap, y * 8 + yi, x * 8 + xi) = pen;
 			}
 		}
 	}
