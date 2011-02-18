@@ -1561,7 +1561,10 @@ static UINT8 apple2gs_xxCxxx_r(running_machine *machine, offs_t address)
 				state->a2_cnxx_slot = -1;
 			}
 
-			slotdevice = apple2_slot(machine, state->a2_cnxx_slot);
+			if ( state->a2_cnxx_slot >= 0 && state->a2_cnxx_slot <= 7 )
+			{
+				slotdevice = apple2_slot(machine, state->a2_cnxx_slot);
+			}
 
 			if (slotdevice)
 			{
