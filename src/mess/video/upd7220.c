@@ -184,11 +184,22 @@ struct _upd7220_t
 	int disp;						/* display zoom factor */
 	int gchr;						/* zoom factor for graphics character writing and area filling */
 
+	UINT8 figs_dir;					/* figs param 0: drawing direction */
+	UINT8 figs_figure_type;			/* figs param 1: figure type */
+	UINT16 figs_dc;					/* figs param 2: */
+	UINT16 figs_d;					/* figs param 3: */
+	UINT16 figs_d1;					/* figs param 4: */
+	UINT16 figs_d2;					/* figs param 5: */
+	UINT16 figs_dm;					/* figs param 6: */
+
 	/* timers */
 	emu_timer *vsync_timer;			/* vertical sync timer */
 	emu_timer *hsync_timer;			/* horizontal sync timer */
 	emu_timer *blank_timer;			/* CRT blanking timer */
 };
+
+static const int x_dir[8] = { 0, 1, 1, 1, 0,-1,-1,-1};
+static const int y_dir[8] = { 1, 1, 0,-1,-1,-1, 0, 1};
 
 /***************************************************************************
     INLINE FUNCTIONS
@@ -457,7 +468,7 @@ static void recompute_parameters(device_t *device)
 
 #define EAD			upd7220->ead
 #define DAD			upd7220->dad
-#define P			upd7220->pitch
+#define P			x_dir[upd7220->figs_dir] + (y_dir[upd7220->figs_dir] * upd7220->pitch)
 #define MSB(value)	(BIT(value, 15))
 #define LSB(value)	(BIT(value, 0))
 #define LR(value)	((value << 1) | MSB(value))
@@ -722,13 +733,21 @@ static void process_fifo(device_t *device)
 		break;
 
 	case COMMAND_CURS: /* cursor position specify */
-		if (upd7220->param_ptr == 4)
+		if (upd7220->param_ptr >= 3)
 		{
-			upd7220->ead = ((upd7220->pr[3] & 0x03) << 16) | (upd7220->pr[2] << 8) | upd7220->pr[1];
-			upd7220->dad = upd7220->pr[3] >> 4;
+			UINT8 upper_addr;
+
+			upper_addr = (upd7220->param_ptr == 3) ? 0 : (upd7220->pr[3] & 0x03);
+
+			upd7220->ead = (upper_addr << 16) | (upd7220->pr[2] << 8) | upd7220->pr[1];
 
 			if (LOG) logerror("uPD7220 '%s' EAD: %06x\n", device->tag(), upd7220->ead);
-			if (LOG) logerror("uPD7220 '%s' DAD: %01x\n", device->tag(), upd7220->ead);
+
+			if(upd7220->param_ptr == 4)
+			{
+				upd7220->dad = upd7220->pr[3] >> 4;
+				if (LOG) logerror("uPD7220 '%s' DAD: %01x\n", device->tag(), upd7220->dad);
+			}
 		}
 		break;
 
@@ -762,7 +781,7 @@ static void process_fifo(device_t *device)
 
 	case COMMAND_WDAT: /* write data into display memory */
 		logerror("uPD7220 '%s' Unimplemented command WDAT\n", device->tag());
-		if (upd7220->param_ptr == 2)
+		if (upd7220->param_ptr == 3)
 		{
 			printf("%02x %02x (%c) %04x\n",upd7220->pr[2],upd7220->pr[1],upd7220->pr[1],EAD);
 			advance_ead(upd7220);
@@ -780,6 +799,29 @@ static void process_fifo(device_t *device)
 
 	case COMMAND_FIGS: /* figure drawing parameters specify */
 		logerror("uPD7220 '%s' Unimplemented command FIGS\n", device->tag());
+
+		if (upd7220->param_ptr == 2)
+		{
+			upd7220->figs_dir = upd7220->pr[1] & 0x7;
+			upd7220->figs_figure_type = (upd7220->pr[1] & 0xf8) >> 3;
+			printf("DIR %02x\n",upd7220->pr[1]);
+		}
+
+		if (upd7220->param_ptr == 4)
+			upd7220->figs_dc = (upd7220->pr[2]) | ((upd7220->pr[3] & 0x3f) << 8);
+
+		if (upd7220->param_ptr == 6)
+			upd7220->figs_d = (upd7220->pr[4]) | ((upd7220->pr[5] & 0x3f) << 8);
+
+		if (upd7220->param_ptr == 8)
+			upd7220->figs_d2 = (upd7220->pr[6]) | ((upd7220->pr[7] & 0x3f) << 8);
+
+		if (upd7220->param_ptr == 10)
+			upd7220->figs_d1 = (upd7220->pr[8]) | ((upd7220->pr[9] & 0x3f) << 8);
+
+		if (upd7220->param_ptr == 12)
+			upd7220->figs_dm = (upd7220->pr[10]) | ((upd7220->pr[11] & 0x3f) << 8);
+
 		break;
 
 	case COMMAND_FIGD: /* figure draw start */
