@@ -115,6 +115,7 @@ static WRITE8_HANDLER(qx10_18_w)
 	qx10_state *state = space->machine->driver_data<qx10_state>();
 	state->membank = (data >> 4) & 0x0f;
 	update_memory_mapping(space->machine);
+	printf("%02x\n",data);
 }
 
 static WRITE8_HANDLER(prom_sel_w)
@@ -511,10 +512,6 @@ bool qx10_state::video_update(screen_device &screen, bitmap_t &bitmap, const rec
 	return 0;
 }
 
-static ADDRESS_MAP_START( qx10_upd7220_map, 0, 16 )
-	AM_RANGE(0x00000, 0x3ffff) AM_RAM
-ADDRESS_MAP_END
-
 static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 {
 	int i;
@@ -583,7 +580,7 @@ static MACHINE_CONFIG_START( qx10, qx10_state )
 	MCFG_PALETTE_LENGTH(16)
 	MCFG_PALETTE_INIT(gdc)
 
-	MCFG_UPD7220_ADD("upd7220", MAIN_CLK/4, hgdc_intf, qx10_upd7220_map)
+	MCFG_UPD7220_ADD("upd7220", MAIN_CLK/4, hgdc_intf, upd7220_map)
 
 	MCFG_MC146818_ADD( "rtc", MC146818_STANDARD )
 

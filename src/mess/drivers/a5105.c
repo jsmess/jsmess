@@ -323,9 +323,6 @@ bool a5105_state::video_update(screen_device &screen, bitmap_t &bitmap, const re
 	return 0;
 }
 
-static ADDRESS_MAP_START( a5105_upd7220_map, 0, 16 )
-	AM_RANGE(0x00000, 0x3ffff) AM_RAM
-ADDRESS_MAP_END
 
 static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 {
@@ -368,7 +365,7 @@ static MACHINE_CONFIG_START( a5105, a5105_state )
 
 	MCFG_GFXDECODE(a5105)
 
-	MCFG_UPD7220_ADD("upd7220", XTAL_4MHz, hgdc_intf, a5105_upd7220_map) //unknown clock
+	MCFG_UPD7220_ADD("upd7220", XTAL_4MHz, hgdc_intf, upd7220_map) //unknown clock
 MACHINE_CONFIG_END
 
 /* ROM definition */

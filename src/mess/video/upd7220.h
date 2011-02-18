@@ -40,6 +40,7 @@
 ***************************************************************************/
 
 DECLARE_LEGACY_MEMORY_DEVICE(UPD7220, upd7220);
+ADDRESS_MAP_EXTERN( upd7220_map,16 );
 
 #define MCFG_UPD7220_ADD(_tag, _clock, _config, _map) \
 	MCFG_DEVICE_ADD(_tag, UPD7220, _clock) \

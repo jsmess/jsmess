@@ -196,6 +196,8 @@ struct _upd7220_t
 	emu_timer *vsync_timer;			/* vertical sync timer */
 	emu_timer *hsync_timer;			/* horizontal sync timer */
 	emu_timer *blank_timer;			/* CRT blanking timer */
+
+	UINT16 vram[0x40000/2];
 };
 
 static const int x_dir[8] = { 0, 1, 1, 1, 0,-1,-1,-1};
@@ -784,6 +786,8 @@ static void process_fifo(device_t *device)
 		if (upd7220->param_ptr == 3)
 		{
 			printf("%02x %02x (%c) %04x\n",upd7220->pr[2],upd7220->pr[1],upd7220->pr[1],EAD);
+
+			upd7220->vram[1] = 0x1234;
 			advance_ead(upd7220);
 		}
 		break;
@@ -1115,8 +1119,22 @@ ROM_END
     ADDRESS_MAP( upd7220 )
 -------------------------------------------------*/
 
-static ADDRESS_MAP_START( upd7220, 0, 16 )
-	AM_RANGE(0x00000, 0x3ffff) AM_RAM
+static READ16_HANDLER( upd7220_vram_r )
+{
+	upd7220_t *upd7220 = get_safe_token(space->cpu);
+
+	return upd7220->vram[offset];
+}
+
+static WRITE16_HANDLER( upd7220_vram_w )
+{
+	upd7220_t *upd7220 = get_safe_token(space->cpu);
+
+	COMBINE_DATA(&upd7220->vram[offset]);
+}
+
+ADDRESS_MAP_START( upd7220_map, 0, 16 )
+	AM_RANGE(0x00000, 0x3ffff) AM_READWRITE(upd7220_vram_r,upd7220_vram_w)
 ADDRESS_MAP_END
 
 /*-------------------------------------------------
@@ -1212,7 +1230,7 @@ DEVICE_GET_INFO( upd7220 )
 		case DEVINFO_PTR_ROM_REGION:					info->romregion = ROM_NAME(upd7220);				break;
 
 		/* --- the following bits of info are returned as pointers to data --- */
-		case DEVINFO_PTR_DEFAULT_MEMORY_MAP_0:			info->default_map16 = ADDRESS_MAP_NAME(upd7220);	break;
+		case DEVINFO_PTR_DEFAULT_MEMORY_MAP_0:			info->default_map16 = ADDRESS_MAP_NAME(upd7220_map);break;
 
 		/* --- the following bits of info are returned as pointers to functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(upd7220);			break;
