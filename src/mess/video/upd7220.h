@@ -57,12 +57,16 @@ ADDRESS_MAP_EXTERN( upd7220_map,16 );
 typedef void (*upd7220_display_pixels_func)(device_t *device, bitmap_t *bitmap, int y, int x, UINT32 address, UINT16 data);
 #define UPD7220_DISPLAY_PIXELS(name) void name(device_t *device, bitmap_t *bitmap, int y, int x, UINT32 address, UINT16 data)
 
+typedef void (*upd7220_draw_text_line)(device_t *device, bitmap_t *bitmap, UINT32 addr, int y, int wd);
+#define UPD7220_DRAW_TEXT_LINE(name) void name(device_t *device, bitmap_t *bitmap, UINT32 addr, int y, int wd)
+
 typedef struct _upd7220_interface upd7220_interface;
 struct _upd7220_interface
 {
 	const char *screen_tag;		/* screen we are acting on */
 
 	upd7220_display_pixels_func	display_func;
+	upd7220_draw_text_line draw_text_func;
 
 	/* this gets called for every change of the DRQ pin (pin 7) */
 	devcb_write_line		out_drq_func;

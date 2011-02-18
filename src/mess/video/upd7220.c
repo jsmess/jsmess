@@ -136,6 +136,7 @@ struct _upd7220_t
 	devcb_resolved_write_line	out_vsync_func;
 	devcb_resolved_write_line	out_blank_func;
 	upd7220_display_pixels_func display_func;
+	upd7220_draw_text_line	    draw_text_func;
 
 	screen_device *screen;	/* screen */
 
@@ -1009,14 +1010,6 @@ WRITE_LINE_DEVICE_HANDLER( upd7220_lpen_w )
     */
 }
 
-/*-------------------------------------------------
-    draw_text_line - draw text scanline
--------------------------------------------------*/
-
-static void draw_text_line(device_t *device, bitmap_t *bitmap, UINT32 addr, int y, int wd)
-{
-}
-
 INLINE void get_text_partition(upd7220_t *upd7220, int index, UINT32 *sad, UINT16 *len, int *im, int *wd)
 {
 	*sad = ((upd7220->ra[(index * 4) + 1] & 0x1f) << 8) | upd7220->ra[(index * 4) + 0];
@@ -1045,7 +1038,7 @@ static void update_text(device_t *device, bitmap_t *bitmap, const rectangle *cli
 		for (y = sy; y < sy + len; y++)
 		{
 			addr = sad + (y * upd7220->pitch);
-			draw_text_line(device, bitmap, addr, y, wd);
+			upd7220->draw_text_func(device, bitmap, addr, y, wd);
 		}
 
 		sy = y + 1;
@@ -1102,7 +1095,7 @@ static void update_graphics(device_t *device, bitmap_t *bitmap, const rectangle 
 			if (im)
 				draw_graphics_line(device, bitmap, addr, y, wd);
 			else
-				draw_text_line(device, bitmap, addr, y, wd);
+				upd7220->draw_text_func(device, bitmap, addr, y, wd);
 		}
 
 		sy = y + 1;
@@ -1182,6 +1175,7 @@ static DEVICE_START( upd7220 )
 	devcb_resolve_write_line(&upd7220->out_hsync_func, &intf->out_hsync_func, device);
 	devcb_resolve_write_line(&upd7220->out_vsync_func, &intf->out_vsync_func, device);
 	upd7220->display_func = intf->display_func;
+	upd7220->draw_text_func = intf->draw_text_func;
 
 	/* get the screen device */
 	upd7220->screen = device->machine->device<screen_device>(intf->screen_tag);
