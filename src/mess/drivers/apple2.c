@@ -1025,7 +1025,7 @@ COMP( 1983, mprof3,   apple2e,  0,        mprof3,	   apple2e,  0,        "Multit
 COMP( 1985, apple2ee, apple2e,  0,        apple2ee,	   apple2e,  0,        "Apple Computer",    "Apple //e (enhanced)", GAME_SUPPORTS_SAVE )
 COMP( 1987, apple2ep, apple2e,  0,        apple2ep,	   apple2ep, 0,        "Apple Computer",    "Apple //e (Platinum)", GAME_SUPPORTS_SAVE )
 COMP( 1984, apple2c,  0,        apple2,	  apple2c,	   apple2e,  0,        "Apple Computer",    "Apple //c" , GAME_SUPPORTS_SAVE )
-COMP( 1989, prav8c,   apple2c,  0,        apple2c,	   apple2e,  0,        "Pravetz",           "Pravetz 8C", GAME_SUPPORTS_SAVE )
+COMP( 1989, prav8c,   apple2c,  0,        apple2c,	   apple2e,  0,        "Pravetz",           "Pravetz 8C", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 COMP( 1983, las3000,  apple2,   0,        apple2p,	   apple2p,  0,        "Video Technology",  "Laser 3000",	GAME_NOT_WORKING )
 COMP( 1987, laser128, apple2c,  0,        apple2c,	   apple2e,  0,        "Video Technology",  "Laser 128 (rev 4)", GAME_NOT_WORKING )
 COMP( 1987, las128ex, apple2c,  0,        apple2c,	   apple2e,  0,        "Video Technology",  "Laser 128ex (rev 4a)", GAME_NOT_WORKING )
