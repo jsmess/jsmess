@@ -92,9 +92,9 @@ static INPUT_PORTS_START( bbcbc )
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Play, No") PORT_CODE(KEYCODE_B) PORT_IMPULSE(1)
 INPUT_PORTS_END
 
-static void tms_interrupt(running_machine *machine, int dummy)
+static void tms_interrupt(running_machine *machine, int irq_state)
 {
-	cputag_set_input_line(machine, "maincpu", 0, HOLD_LINE);
+	cputag_set_input_line(machine, "maincpu", 0, irq_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static INTERRUPT_GEN( bbcbc_interrupt )
