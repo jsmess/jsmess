@@ -466,35 +466,60 @@ static void recompute_parameters(device_t *device)
 	update_blank_timer(upd7220, 0);
 }
 
+/*-----------------------------------------------------
+    reset_figs_param - reset figs after each vrram rmw
+-----------------------------------------------------*/
+
+static void reset_figs_param(upd7220_t *upd7220)
+{
+	upd7220->figs_dc = 0x0000;
+	upd7220->figs_d = 0x0008;
+	upd7220->figs_d1 = 0x0008;
+	upd7220->figs_d2 = 0x0000;
+	upd7220->figs_dm = 0x0000;
+}
+
 /*-------------------------------------------------
     write_vram - write in the device memory space
 -------------------------------------------------*/
 
 static void write_vram(upd7220_t *upd7220,UINT8 type, UINT8 mod)
 {
+	int i;
 	if(type == 1)
 	{
 		logerror("uPD7220 invalid type 1 WDAT parameter\n");
 		return;
 	}
 
-	switch(mod & 3)
+	if(mod)
 	{
-		case 0x00: //replace
-			switch(type)
-			{
-				case 0: upd7220->vram[upd7220->ead] = ((upd7220->pr[1]) | (upd7220->pr[2] << 8)) & upd7220->mask; break;
-				case 2:	upd7220->vram[upd7220->ead] = (((upd7220->pr[1] & upd7220->mask) & 0xff) | (upd7220->vram[upd7220->ead] & 0xff00)); break;
-				case 3: upd7220->vram[upd7220->ead] = (((upd7220->pr[1] & upd7220->mask) << 8) | (upd7220->vram[upd7220->ead] & 0x00ff)); break;
-			}
-			break;
-		case 0x01: //complement
-			break;
-		case 0x02: //reset to zero
-			break;
-		case 0x03: //set to one
-			break;
+		printf("uPD7220 unimplemented WDAT modifier %02x\n",mod);
+		return;
 	}
+
+	for(i=0;i<upd7220->figs_dc + 1;i++)
+	{
+		switch(mod & 3)
+		{
+			case 0x00: //replace
+				switch(type)
+				{
+					case 0: upd7220->vram[upd7220->ead+i] = ((upd7220->pr[1]) | (upd7220->pr[2] << 8)) & upd7220->mask; break;
+					case 2:	upd7220->vram[upd7220->ead+i] = (((upd7220->pr[1] & upd7220->mask) & 0xff) | (upd7220->vram[upd7220->ead] & 0xff00)); break;
+					case 3: upd7220->vram[upd7220->ead+i] = (((upd7220->pr[1] & upd7220->mask) << 8) | (upd7220->vram[upd7220->ead] & 0x00ff)); break;
+				}
+				break;
+			case 0x01: //complement
+				break;
+			case 0x02: //reset to zero
+				break;
+			case 0x03: //set to one
+				break;
+		}
+	}
+
+	reset_figs_param(upd7220);
 }
 
 /*-------------------------------------------------
@@ -509,7 +534,6 @@ static void write_vram(upd7220_t *upd7220,UINT8 type, UINT8 mod)
 #define LR(value)	((value << 1) | MSB(value))
 #define RR(value)	((LSB(value) << 15) | (value >> 1))
 
-/* TODO: EAD addition/subtraction is wrong, must be direction param 0 + (direction param 1 x pitch) */
 static void advance_ead(upd7220_t *upd7220)
 {
 	switch (upd7220->draw_mode & 0x07)
@@ -840,7 +864,9 @@ static void process_fifo(device_t *device)
 		{
 			upd7220->figs_dir = upd7220->pr[1] & 0x7;
 			upd7220->figs_figure_type = (upd7220->pr[1] & 0xf8) >> 3;
-			printf("DIR %02x\n",upd7220->pr[1]);
+
+			if(upd7220->figs_dir != 2)
+				printf("DIR %02x\n",upd7220->pr[1]);
 		}
 
 		if (upd7220->param_ptr == 4)
