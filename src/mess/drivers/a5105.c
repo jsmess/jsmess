@@ -347,15 +347,17 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 		tile = (vram[addr+x] & 0xff);
 		color = ((vram[addr+x] & 0x0f00) >> 8);
 
-		for( yi = 0; yi < 8; yi++)
+		for( yi = 0; yi < lr; yi++)
 		{
 			for( xi = 0; xi < 8; xi++)
 			{
 				int res_x,res_y;
 				int pen = (state->m_char_rom[tile*8+yi] >> xi) & 1 ? color : 0;
 
+				if(yi >= 8) { pen = 0; }
+
 				res_x = x * 8 + xi;
-				res_y = y * 8 + yi;
+				res_y = y * lr + yi;
 
 				if(res_x > screen_max_x || res_y > screen_max_y)
 					continue;

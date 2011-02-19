@@ -561,15 +561,18 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 
 		color = (state->color_mode) ? 1 : (attr & 4) ? 2 : 1; /* TODO: color mode */
 
-		for( yi = 0; yi < 16; yi++)
+		for( yi = 0; yi < lr; yi++)
 		{
 			for( xi = 0; xi < 8; xi++)
 			{
 				int res_x,res_y;
 				UINT8 pen = ((state->m_char_rom[tile*16+yi] >> xi) & 1) ? color : 0;
 
+				if(yi >= 16)
+					pen = 0;
+
 				res_x = x * 8 + xi;
-				res_y = y * 16 + yi;
+				res_y = y * lr + yi;
 
 				if(res_x > screen_max_x || res_y > screen_max_y)
 					continue;
