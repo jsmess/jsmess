@@ -5,13 +5,12 @@
     driver by Angelo Salese
 
     TODO:
-    - no documentation, the entire driver is just a bunch of educated
+    - no real documentation, the entire driver is just a bunch of educated
       guesses ...
 	- ROM/RAM bankswitch, it apparently happens after one instruction prefetching.
 	  We currently use an hackish implementation until the MAME/MESS framework can
 	  support that ...
 	- keyboard input is very sluggish;
-	- clean up i/o ports, remove Z80_B usage and write custom code in place of it;
 	- cursor stuck in Bird Crash;
 	- add mc6845 features;
 	- many other missing features;
@@ -222,9 +221,10 @@ static READ8_HANDLER( smc777_vram_r )
 	UINT8 *vram = space->machine->region("vram")->base();
 	UINT16 vram_index;
 
-	vram_index = cpu_get_reg(space->machine->device("maincpu"), Z80_B);
+	vram_index  = ((offset & 0x0007) << 8);
+	vram_index |= ((offset & 0xff00) >> 8);
 
-	return vram[vram_index | offset*0x100];
+	return vram[vram_index];
 }
 
 static READ8_HANDLER( smc777_attr_r )
@@ -232,9 +232,10 @@ static READ8_HANDLER( smc777_attr_r )
 	UINT8 *attr = space->machine->region("attr")->base();
 	UINT16 vram_index;
 
-	vram_index = cpu_get_reg(space->machine->device("maincpu"), Z80_B);
+	vram_index  = ((offset & 0x0007) << 8);
+	vram_index |= ((offset & 0xff00) >> 8);
 
-	return attr[vram_index | offset*0x100];
+	return attr[vram_index];
 }
 
 static READ8_HANDLER( smc777_pcg_r )
@@ -242,9 +243,10 @@ static READ8_HANDLER( smc777_pcg_r )
 	UINT8 *pcg = space->machine->region("pcg")->base();
 	UINT16 vram_index;
 
-	vram_index = cpu_get_reg(space->machine->device("maincpu"), Z80_B);
+	vram_index  = ((offset & 0x0007) << 8);
+	vram_index |= ((offset & 0xff00) >> 8);
 
-	return pcg[vram_index | offset*0x100];
+	return pcg[vram_index];
 }
 
 static WRITE8_HANDLER( smc777_vram_w )
@@ -252,9 +254,10 @@ static WRITE8_HANDLER( smc777_vram_w )
 	UINT8 *vram = space->machine->region("vram")->base();
 	UINT16 vram_index;
 
-	vram_index = cpu_get_reg(space->machine->device("maincpu"), Z80_B);
+	vram_index  = ((offset & 0x0007) << 8);
+	vram_index |= ((offset & 0xff00) >> 8);
 
-	vram[vram_index | offset*0x100] = data;
+	vram[vram_index] = data;
 }
 
 static WRITE8_HANDLER( smc777_attr_w )
@@ -262,9 +265,10 @@ static WRITE8_HANDLER( smc777_attr_w )
 	UINT8 *attr = space->machine->region("attr")->base();
 	UINT16 vram_index;
 
-	vram_index = cpu_get_reg(space->machine->device("maincpu"), Z80_B);
+	vram_index  = ((offset & 0x0007) << 8);
+	vram_index |= ((offset & 0xff00) >> 8);
 
-	attr[vram_index | offset*0x100] = data;
+	attr[vram_index] = data;
 }
 
 static WRITE8_HANDLER( smc777_pcg_w )
@@ -272,9 +276,10 @@ static WRITE8_HANDLER( smc777_pcg_w )
 	UINT8 *pcg = space->machine->region("pcg")->base();
 	UINT16 vram_index;
 
-	vram_index = cpu_get_reg(space->machine->device("maincpu"), Z80_B);
+	vram_index  = ((offset & 0x0007) << 8);
+	vram_index |= ((offset & 0xff00) >> 8);
 
-	pcg[vram_index | offset*0x100] = data;
+	pcg[vram_index] = data;
 
     gfx_element_mark_dirty(space->machine->gfx[0], vram_index >> 3);
 }
@@ -284,9 +289,10 @@ static READ8_HANDLER( smc777_fbuf_r )
 	UINT8 *fbuf = space->machine->region("fbuf")->base();
 	UINT16 vram_index;
 
-	vram_index = cpu_get_reg(space->machine->device("maincpu"), Z80_B);
+	vram_index  = ((offset & 0x007f) << 8);
+	vram_index |= ((offset & 0xff00) >> 8);
 
-	return fbuf[vram_index | offset*0x100];
+	return fbuf[vram_index];
 }
 
 static WRITE8_HANDLER( smc777_fbuf_w )
@@ -294,9 +300,10 @@ static WRITE8_HANDLER( smc777_fbuf_w )
 	UINT8 *fbuf = space->machine->region("fbuf")->base();
 	UINT16 vram_index;
 
-	vram_index = cpu_get_reg(space->machine->device("maincpu"), Z80_B);
+	vram_index  = ((offset & 0x00ff) << 8);
+	vram_index |= ((offset & 0xff00) >> 8);
 
-	fbuf[vram_index | offset*0x100] = data;
+	fbuf[vram_index] = data;
 }
 
 
@@ -447,36 +454,12 @@ static WRITE8_HANDLER( system_output_w )
 	}
 }
 
-#define KEYBOARD_UP_PRESS    input_port_read(space->machine,"key1") & 0x00800000
-#define KEYBOARD_DOWN_PRESS  input_port_read(space->machine,"key1") & 0x10000000
-#define KEYBOARD_LEFT_PRESS  input_port_read(space->machine,"key1") & 0x00400000
-#define KEYBOARD_RIGHT_PRESS input_port_read(space->machine,"key1") & 0x02000000
-#define KEYBOARD_SPACE_PRESS input_port_read(space->machine,"key2") & 0x00000001
-
 /* presumably SMC-777 specific */
-static READ8_HANDLER( smc777_keyboard_direct_r )
+static READ8_HANDLER( smc777_joystick_r )
 {
 	//smc777_state *state = space->machine->driver_data<smc777_state>();
-	UINT8 res;
 
-	res = 0x7f;
-
-	if(KEYBOARD_UP_PRESS)
-		res ^= 1;
-
-	if(KEYBOARD_DOWN_PRESS)
-		res ^= 2;
-
-	if(KEYBOARD_LEFT_PRESS)
-		res ^= 4;
-
-	if(KEYBOARD_RIGHT_PRESS)
-		res ^= 8;
-
-	if(KEYBOARD_SPACE_PRESS)
-		res ^= 0x10;
-
-	return res;
+	return input_port_read(space->machine, "JOY_1P");
 }
 
 static WRITE8_HANDLER( smc777_color_mode_w )
@@ -493,15 +476,18 @@ static WRITE8_HANDLER( smc777_color_mode_w )
 static WRITE8_HANDLER( smc777_ramdac_w )
 {
 	smc777_state *state = space->machine->driver_data<smc777_state>();
-	UINT8 pal_index,gradient_index;
-	pal_index = cpu_get_reg(space->machine->device("maincpu"), Z80_B) & 0xf;
-	gradient_index = (cpu_get_reg(space->machine->device("maincpu"), Z80_B) & 0x30) >> 4;
+	UINT8 pal_index;
+	pal_index = (offset & 0xf00) >> 8;
 
-	switch(gradient_index)
+	if(data & 0x0f)
+		printf("RAMdac used with data bits 0-3 set (%02x)\n",data);
+
+	switch((offset & 0x3000) >> 12)
 	{
-		case 0: state->pal.r = data; palette_set_color_rgb(space->machine, pal_index, state->pal.r, state->pal.g, state->pal.b); break;
-		case 1: state->pal.g = data; palette_set_color_rgb(space->machine, pal_index, state->pal.r, state->pal.g, state->pal.b); break;
-		case 2: state->pal.b = data; palette_set_color_rgb(space->machine, pal_index, state->pal.r, state->pal.g, state->pal.b); break;
+		case 0: state->pal.r = (data & 0xf0) >> 4; palette_set_color_rgb(space->machine, pal_index, pal4bit(state->pal.r), pal4bit(state->pal.g), pal4bit(state->pal.b)); break;
+		case 1: state->pal.g = (data & 0xf0) >> 4; palette_set_color_rgb(space->machine, pal_index, pal4bit(state->pal.r), pal4bit(state->pal.g), pal4bit(state->pal.b)); break;
+		case 2: state->pal.b = (data & 0xf0) >> 4; palette_set_color_rgb(space->machine, pal_index, pal4bit(state->pal.r), pal4bit(state->pal.g), pal4bit(state->pal.b)); break;
+		case 3: printf("RAMdac used with gradient index = 3! pal_index = %02x data = %02x\n",pal_index,data); break;
 	}
 }
 
@@ -511,6 +497,7 @@ static READ8_HANDLER( display_reg_r )
 	return state->display_reg;
 }
 
+/* x */
 static WRITE8_HANDLER( display_reg_w )
 {
 	smc777_state *state = space->machine->driver_data<smc777_state>();
@@ -592,43 +579,88 @@ static ADDRESS_MAP_START(smc777_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(smc777_mem_r,smc777_mem_w)
 ADDRESS_MAP_END
 
+static READ8_HANDLER( smc777_io_r )
+{
+	UINT8 low_offs;
+
+	low_offs = offset & 0xff;
+
+	if(low_offs <= 0x07) 						  { return smc777_vram_r(space,offset & 0xff07); }
+	else if(low_offs >= 0x08 && low_offs <= 0x0f) { return smc777_attr_r(space,offset & 0xff07); }
+	else if(low_offs >= 0x10 && low_offs <= 0x17) { return smc777_pcg_r(space,offset & 0xff07); }
+	else if(low_offs >= 0x18 && low_offs <= 0x19) { logerror("6845 read %02x",low_offs & 1); }
+	else if(low_offs >= 0x1a && low_offs <= 0x1b) { return key_r(space,low_offs & 1); }
+	else if(low_offs == 0x1c)					  { return system_input_r(space,0); }
+	else if(low_offs == 0x1d)					  { logerror("System and control data R PC=%04x\n",cpu_get_pc(space->cpu)); return 0xff; }
+	else if(low_offs == 0x20)					  { return display_reg_r(space,0); }
+	else if(low_offs == 0x21)					  { return smc777_irq_mask_r(space,0); }
+	else if(low_offs == 0x25)					  { logerror("RTC read PC=%04x\n",cpu_get_pc(space->cpu)); return 0xff; }
+	else if(low_offs == 0x26)					  { logerror("RS-232c RX %04x\n",cpu_get_pc(space->cpu)); return 0xff; }
+	else if(low_offs >= 0x28 && low_offs <= 0x2c) { logerror("FDC 2 read %02x\n",low_offs & 7); return 0xff; }
+	else if(low_offs >= 0x2d && low_offs <= 0x2f) { logerror("RS-232c no. 2 read %02x\n",low_offs & 3); return 0xff; }
+	else if(low_offs >= 0x30 && low_offs <= 0x34) { return smc777_fdc1_r(space,low_offs & 7); }
+	else if(low_offs >= 0x35 && low_offs <= 0x37) { logerror("RS-232c no. 3 read %02x\n",low_offs & 3); return 0xff; }
+	else if(low_offs >= 0x38 && low_offs <= 0x3b) { logerror("Cache disk unit read %02x\n",low_offs & 7); return 0xff; }
+	else if(low_offs >= 0x3c && low_offs <= 0x3d) { logerror("RGB superimposer read %02x\n",low_offs & 1); return 0xff; }
+	else if(low_offs >= 0x40 && low_offs <= 0x47) { logerror("IEEE-488 interface unit read %02x\n",low_offs & 7); return 0xff; }
+	else if(low_offs >= 0x48 && low_offs <= 0x4f) { logerror("HDD (Winchester) read %02x\n",low_offs & 1); return 0xff; } //might be 0x48 - 0x50
+	else if(low_offs == 0x51)					  { return smc777_joystick_r(space,0); }
+	else if(low_offs >= 0x54 && low_offs <= 0x59) { logerror("VTR Controller read %02x\n",low_offs & 7); return 0xff; }
+	else if(low_offs == 0x5a || low_offs == 0x5b) { logerror("RAM Banking %02x\n",low_offs & 1); }
+	else if(low_offs == 0x70)					  { logerror("Auto-start ROM read\n"); }
+	else if(low_offs == 0x74)					  { logerror("IEEE-488 ROM read\n"); }
+	else if(low_offs == 0x75)					  { logerror("VTR Controller ROM read\n"); }
+	else if(low_offs == 0x7e || low_offs == 0x7f) { logerror("Kanji ROM read %02x\n",low_offs & 1); }
+	else if(low_offs >= 0x80) 					  { return smc777_fbuf_r(space,offset & 0xff7f); }
+
+	logerror("Undefined read at %04x offset = %02x\n",cpu_get_pc(space->cpu),low_offs);
+	return 0xff;
+}
+
+static WRITE8_HANDLER( smc777_io_w )
+{
+	UINT8 low_offs;
+
+	low_offs = offset & 0xff;
+
+	if(low_offs <= 0x07) 	 					  { smc777_vram_w(space,offset & 0xff07,data); }
+	else if(low_offs >= 0x08 && low_offs <= 0x0f) { smc777_attr_w(space,offset & 0xff07,data); }
+	else if(low_offs >= 0x10 && low_offs <= 0x17) { smc777_pcg_w(space,offset & 0xff07,data); }
+	else if(low_offs >= 0x18 && low_offs <= 0x19) { smc777_6845_w(space,low_offs & 1,data); }
+	else if(low_offs == 0x1a || low_offs == 0x1b) { logerror("Keyboard write %02x [%02x]\n",data,low_offs & 1); }
+	else if(low_offs == 0x1c)					  { system_output_w(space,0,data); }
+	else if(low_offs == 0x1d)					  { logerror("Printer status / strobe write %02x\n",data); }
+	else if(low_offs == 0x1e || low_offs == 0x1f) { logerror("RS-232C irq control [%02x] %02x\n",low_offs & 1,data); }
+	else if(low_offs == 0x20)					  { display_reg_w(space,0,data); }
+	else if(low_offs == 0x21)					  { smc777_irq_mask_w(space,0,data); }
+	else if(low_offs == 0x22)					  { logerror("Printer output data %02x\n",data); }
+	else if(low_offs == 0x23)					  { border_col_w(space,0,data); }
+	else if(low_offs == 0x24)					  { logerror("RTC write / specify address %02x\n",data); }
+	else if(low_offs == 0x26)					  { logerror("RS-232c TX %02x\n",data); }
+	else if(low_offs >= 0x28 && low_offs <= 0x2c) { logerror("FDC 2 write %02x %02x\n",low_offs & 7,data); }
+	else if(low_offs >= 0x2d && low_offs <= 0x2f) { logerror("RS-232c no. 2 write %02x %02x\n",low_offs & 3,data); }
+	else if(low_offs >= 0x30 && low_offs <= 0x34) { smc777_fdc1_w(space,low_offs & 7,data); }
+	else if(low_offs >= 0x35 && low_offs <= 0x37) { logerror("RS-232c no. 3 write %02x %02x\n",low_offs & 3,data); }
+	else if(low_offs >= 0x38 && low_offs <= 0x3b) { logerror("Cache disk unit write %02x %02x\n",low_offs & 7,data); }
+	else if(low_offs >= 0x3c && low_offs <= 0x3d) { logerror("RGB superimposer write %02x %02x\n",low_offs & 1,data); }
+	else if(low_offs >= 0x40 && low_offs <= 0x47) { logerror("IEEE-488 interface unit write %02x %02x\n",low_offs & 7,data); }
+	else if(low_offs >= 0x48 && low_offs <= 0x4f) { logerror("HDD (Winchester) write %02x %02x\n",low_offs & 1,data); } //might be 0x48 - 0x50
+	else if(low_offs == 0x51)					  { smc777_color_mode_w(space,0,data); }
+	else if(low_offs == 0x52)					  { smc777_ramdac_w(space,offset & 0xff00,data); }
+	else if(low_offs == 0x53)					  { sn76496_w(space->machine->device("sn1"),0,data); }
+	else if(low_offs >= 0x54 && low_offs <= 0x59) { logerror("VTR Controller write [%02x] %02x\n",low_offs & 7,data); }
+	else if(low_offs == 0x5a || low_offs == 0x5b) { logerror("RAM Banking write [%02x] %02x\n",low_offs & 1,data); }
+	else if(low_offs == 0x70)					  { logerror("Auto-start ROM write %02x\n",data); }
+	else if(low_offs == 0x74)					  { logerror("IEEE-488 ROM write %02x\n",data); }
+	else if(low_offs == 0x75)					  { logerror("VTR Controller ROM write %02x\n",data); }
+	else if(low_offs == 0x7e || low_offs == 0x7f) { logerror("Kanji ROM write [%02x] %02x\n",low_offs & 1,data); }
+	else if(low_offs >= 0x80) 					  { smc777_fbuf_w(space,offset & 0xff7f,data); }
+	else 										  { logerror("Undefined write at %04x offset = %02x data = %02x\n",cpu_get_pc(space->cpu),low_offs,data); }
+}
+
 static ADDRESS_MAP_START( smc777_io , ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x07) AM_READWRITE(smc777_vram_r,smc777_vram_w)
-	AM_RANGE(0x08, 0x0f) AM_READWRITE(smc777_attr_r,smc777_attr_w)
-	AM_RANGE(0x10, 0x17) AM_READWRITE(smc777_pcg_r, smc777_pcg_w)
-	AM_RANGE(0x18, 0x19) AM_WRITE(smc777_6845_w)
-	AM_RANGE(0x1a, 0x1b) AM_READ(key_r) AM_WRITENOP//keyboard data
-	AM_RANGE(0x1c, 0x1c) AM_READWRITE(system_input_r,system_output_w) //status and control data / Printer strobe
-//  AM_RANGE(0x1d, 0x1d) AM_WRITENOP //status and control data / Printer status / strobe
-//  AM_RANGE(0x1e, 0x1f) AM_WRITENOP //RS232C irq control
-	AM_RANGE(0x20, 0x20) AM_READWRITE(display_reg_r,display_reg_w) //display mode switching
-	AM_RANGE(0x21, 0x21) AM_READWRITE(smc777_irq_mask_r,smc777_irq_mask_w) //60 Hz irq control
-//  AM_RANGE(0x22, 0x22) AM_WRITENOP //printer output data
-	AM_RANGE(0x23, 0x23) AM_WRITE(border_col_w) //border area control
-//  AM_RANGE(0x24, 0x24) AM_WRITENOP //Timer write / specify address (RTC)
-//  AM_RANGE(0x25, 0x25) AM_READNOP  //Timer read (RTC)
-//  AM_RANGE(0x26, 0x26) AM_WRITENOP //RS232C RX / TX
-//  AM_RANGE(0x27, 0x27) AM_WRITENOP //RS232C Mode / Command / Status
-
-//  AM_RANGE(0x28, 0x2c) AM_READWRITE(smc777_fdc_r,smc777_fdc_w) //fdc 2, MB8876 -> FD1791
-//  AM_RANGE(0x2d, 0x2f) AM_NOP //rs-232c no. 2
-	AM_RANGE(0x30, 0x34) AM_READWRITE(smc777_fdc1_r,smc777_fdc1_w) //fdc 1, MB8876 -> FD1791
-//  AM_RANGE(0x35, 0x37) AM_NOP //rs-232c no. 3
-//  AM_RANGE(0x38, 0x3b) AM_NOP //cache disk unit
-//  AM_RANGE(0x3c, 0x3d) AM_NOP //RGB Superimposer
-//  AM_RANGE(0x40, 0x47) AM_NOP //IEEE-488 interface unit
-//  AM_RANGE(0x48, 0x50) AM_NOP //HDD (Winchester)
-	AM_RANGE(0x51, 0x51) AM_READWRITE(smc777_keyboard_direct_r,smc777_color_mode_w)
-	AM_RANGE(0x52, 0x52) AM_WRITE(smc777_ramdac_w)
-	AM_RANGE(0x53, 0x53) AM_DEVWRITE("sn1", sn76496_w) //SMC-777 specific
-//  AM_RANGE(0x54, 0x59) AM_NOP //VTR Controller
-//  AM_RANGE(0x5a, 0x5b) AM_WRITENOP //RAM banking
-//  AM_RANGE(0x70, 0x70) AM_NOP //Auto Start ROM
-//  AM_RANGE(0x74, 0x74) AM_NOP //IEEE-488 ROM
-//  AM_RANGE(0x75, 0x75) AM_NOP //VTR Controller ROM
-	AM_RANGE(0x80, 0xff) AM_READWRITE(smc777_fbuf_r, smc777_fbuf_w) //GRAM
+	AM_RANGE(0x0000, 0xffff) AM_READWRITE(smc777_io_r,smc777_io_w)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -736,6 +768,16 @@ static INPUT_PORTS_START( smc777 )
 	PORT_BIT(0x20000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("]") PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR(']')
 	PORT_BIT(0x40000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("^") PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('^')
 	PORT_BIT(0x80000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("_")
+
+	PORT_START("JOY_1P")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH,IPT_UNKNOWN ) //status?
 INPUT_PORTS_END
 
 static TIMER_DEVICE_CALLBACK( keyboard_callback )
