@@ -10042,17 +10042,6 @@ undumped GBC protos
 		</part>
 	</software>
 
-	<software name="pokeyells" cloneof="pokeyell">
-		<description>Pokemon - Edicion Amarilla (Spa)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="gameboy_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="pokemon - edicion amarilla (spain).bin" size="1048576" crc="964b7a10" sha1="1dc242039218fba50928d1afb66b70565b6b9daf" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="pokecryss" cloneof="pokecrys">
 		<description>Pokemon - Edicion Cristal (Spa)</description>
 		<year>19??</year>
@@ -10082,17 +10071,6 @@ undumped GBC protos
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="pokemon - edicion plata (spain).bin" size="2097152" crc="1d9faac5" sha1="05bd978ab2cb104b0aff3f696896e30885203a18" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="pokeyellg" cloneof="pokeyell">
-		<description>Pokemon - Gelbe Edition (Ger)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="gameboy_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="pokemon - gelbe edition (germany).bin" size="1048576" crc="7a01e45a" sha1="42f3714eec6eca25200d42461ff08d57c98f6d1d" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -10174,17 +10152,6 @@ undumped GBC protos
 		</part>
 	</software>
 
-	<software name="pokeyellf" cloneof="pokeyell">
-		<description>Pokemon - Version Jaune (Fra)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="gameboy_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="pokemon - version jaune (france).bin" size="1048576" crc="d03426e9" sha1="0aceec0ef7aa2ca5aa831554598d91f61a925591" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="pokegoldf" cloneof="pokegold">
 		<description>Pokemon - Version Or (Fra)</description>
 		<year>19??</year>
@@ -10218,17 +10185,6 @@ undumped GBC protos
 		</part>
 	</software>
 
-	<software name="pokeyelli" cloneof="pokeyell">
-		<description>Pokemon - Versione Gialla (Ita)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="gameboy_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="pokemon - versione gialla (italy).bin" size="1048576" crc="8b56fe33" sha1="05bb8e99f24d498613930949730afa8024e77d08" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="pokegoldi" cloneof="pokegold">
 		<description>Pokemon - Versione Oro (Ita)</description>
 		<year>19??</year>
@@ -10236,17 +10192,6 @@ undumped GBC protos
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="pokemon - versione oro (italy).bin" size="2097152" crc="4c184ce3" sha1="032608fe8947b627584a4a0eccc7bf9ad3588426" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="pokeyell">
-		<description>Pokemon - Yellow Version (Euro, USA)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="gameboy_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="pokemon - yellow version (usa, europe).bin" size="1048576" crc="7d527d62" sha1="cc7d03262ebfaf2f06772c1a480c7d9d5f4a38e1" offset="000000" />
 			</dataarea>
 		</part>
 	</software>

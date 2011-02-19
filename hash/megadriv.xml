@@ -23012,7 +23012,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="wwrld">
+	<software name="wworld">
 		<description>Where in the World Is Carmen Sandiego? (Euro, USA)</description>
 		<year>1992</year>
 		<publisher>Electronic Arts</publisher>
@@ -23023,7 +23023,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="wwrldbr" cloneof="wwrld">
+	<software name="wworldbr" cloneof="wworld">
 		<description>Where in the World Is Carmen Sandiego? (Bra)</description>
 		<year>199?</year>
 		<publisher>Tec Toy</publisher>

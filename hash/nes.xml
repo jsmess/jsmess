@@ -30555,7 +30555,7 @@
 		</part>
 	</software>
 
-	<software name="tenchia" cloneof="destempr">
+	<software name="tenchikua" cloneof="destempr">
 		<!-- Serial: CAP-YZ - Release Date: 1989-05-19 - Alternative Title: 天地を喰らう -->
 		<description>Tenchi wo Kurau (Jpn)</description>
 		<year>1989</year>
@@ -30575,7 +30575,7 @@
 		</part>
 	</software>
 
-	<software name="tenchi2a" cloneof="tenchi2">
+	<software name="tenchik2a" cloneof="tenchik2">
 		<!-- Serial: CAP-2V - Release Date: 1991-04-05 - Alternative Title: 天地を喰らうII　諸葛孔明伝 -->
 		<description>Tenchi wo Kurau II: Shokatsu Koumei Den (Jpn)</description>
 		<year>1991</year>
@@ -42018,7 +42018,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-	<software name="tenchi" cloneof="destempr">
+	<software name="tenchiku" cloneof="destempr">
 		<!-- Serial: CAP-YZ - Release Date: 1989-05-19 - Alternative Title: 天地を喰らう -->
 		<description>Tenchi wo Kurau (Jpn, Rev. A)</description>
 		<year>1989</year>
@@ -42037,7 +42037,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-	<software name="tenchi2">
+	<software name="tenchik2">
 		<!-- Serial: CAP-2V - Release Date: 1991-04-05 - Alternative Title: 天地を喰らうII　諸葛孔明伝 -->
 		<description>Tenchi wo Kurau II: Shokatsu Koumei Den (Jpn, Rev. A)</description>
 		<year>1991</year>
@@ -47604,7 +47604,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 
 <!-- REVIEW -->
 
-	<software name="tenchi2c" cloneof="tenchi2" supported="no">
+	<software name="tenchik2c" cloneof="tenchik2" supported="no">
 		<!-- Serial:  - Release Date:  - Alternative Title:  -->
 		<description>Tenchi wo Kurau II: Shokatsu Koumei Den (Chi, Simplified)</description>
 		<year>19??</year>
@@ -47620,7 +47620,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-	<software name="tenchi2c1" cloneof="tenchi2" supported="no">
+	<software name="tenchik2c1" cloneof="tenchik2" supported="no">
 		<!-- Serial:  - Release Date:  - Alternative Title:  -->
 		<description>Tenchi wo Kurau II: Shokatsu Koumei Den (Chi, Traditional)</description>
 		<year>19??</year>
@@ -47636,7 +47636,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-	<software name="tstd2b" cloneof="tenchi2" supported="no">
+	<software name="tstd2b" cloneof="tenchik2" supported="no">
 		<!-- Serial:  - Release Date:  - Alternative Title:  -->
 		<description>Tun Shi Tian Di II (Chi, Alt 2)</description>
 		<year>19??</year>
@@ -47652,7 +47652,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-	<software name="tstd2" cloneof="tenchi2" supported="no">
+	<software name="tstd2" cloneof="tenchik2" supported="no">
 		<!-- Serial:  - Release Date:  - Alternative Title:  -->
 		<description>Tun Shi Tian Di II (Chi)</description>
 		<year>19??</year>
@@ -47668,7 +47668,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-	<software name="tstd2a" cloneof="tenchi2" supported="no">
+	<software name="tstd2a" cloneof="tenchik2" supported="no">
 		<!-- Serial:  - Release Date:  - Alternative Title:  -->
 		<description>Tun Shi Tian Di II (Chi, Alt)</description>
 		<year>19??</year>

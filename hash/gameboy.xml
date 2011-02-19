@@ -11375,17 +11375,6 @@
 		</part>
 	</software>
 
-	<software name="pokeblueg" cloneof="pokeblue">
-		<description>Pokemon - Blaue Edition (Ger)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="gameboy_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="pokemon - blaue edition (germany).bin" size="1048576" crc="9c336307" sha1="20e72dc6f41493eee1fdd0cef54214e6c3389688" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="pokeblue">
 		<description>Pokemon - Blue Version (Euro, USA)</description>
 		<year>19??</year>
@@ -11397,46 +11386,13 @@
 		</part>
 	</software>
 
-	<software name="pokeblues" cloneof="pokeblue">
-		<description>Pokemon - Edicion Azul (Spa)</description>
+	<software name="pokeblueg" cloneof="pokeblue">
+		<description>Pokemon - Blaue Edition (Ger)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="pokemon - edicion azul (spain).bin" size="1048576" crc="d95416f9" sha1="7715e7b133e8634df48918b9138374110212a108" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="pokereds" cloneof="pokered">
-		<description>Pokemon - Edicion Roja (Spa)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="gameboy_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="pokemon - edicion roja (spain).bin" size="1048576" crc="d8507d8a" sha1="fc17c5b904d551b1b908054ccd1c493f755f832a" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="pokered">
-		<description>Pokemon - Red Version (Euro, USA)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="gameboy_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="pokemon - red version (usa, europe).bin" size="1048576" crc="9f7fdd53" sha1="ea9bcae617fdf159b045185467ae58b2e4a48b9a" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="pokeredg" cloneof="pokered">
-		<description>Pokemon - Rote Edition (Ger)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="gameboy_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="pokemon - rote edition (germany).bin" size="1048576" crc="89197825" sha1="87d523fe1a0c548db7c5477b451ddec1eb083c06" offset="000000" />
+				<rom name="pokemon - blaue edition (germany).bin" size="1048576" crc="9c336307" sha1="20e72dc6f41493eee1fdd0cef54214e6c3389688" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -11452,17 +11408,6 @@
 		</part>
 	</software>
 
-	<software name="pokeredf" cloneof="pokered">
-		<description>Pokemon - Version Rouge (Fra)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="gameboy_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="pokemon - version rouge (france).bin" size="1048576" crc="337fce11" sha1="47a7622fa30e6402a3891fe65b3a930bf9bd7aec" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="pokebluei" cloneof="pokeblue">
 		<description>Pokemon - Versione Blu (Ita)</description>
 		<year>19??</year>
@@ -11474,6 +11419,61 @@
 		</part>
 	</software>
 
+	<software name="pokeblues" cloneof="pokeblue">
+		<description>Pokemon - Edicion Azul (Spa)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="pokemon - edicion azul (spain).bin" size="1048576" crc="d95416f9" sha1="7715e7b133e8634df48918b9138374110212a108" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pokered">
+		<description>Pokemon - Red Version (Euro, USA)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="pokemon - red version (usa, europe).bin" size="1048576" crc="9f7fdd53" sha1="ea9bcae617fdf159b045185467ae58b2e4a48b9a" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pokereds" cloneof="pokered">
+		<description>Pokemon - Edicion Roja (Spa)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="pokemon - edicion roja (spain).bin" size="1048576" crc="d8507d8a" sha1="fc17c5b904d551b1b908054ccd1c493f755f832a" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pokeredg" cloneof="pokered">
+		<description>Pokemon - Rote Edition (Ger)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="pokemon - rote edition (germany).bin" size="1048576" crc="89197825" sha1="87d523fe1a0c548db7c5477b451ddec1eb083c06" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pokeredf" cloneof="pokered">
+		<description>Pokemon - Version Rouge (Fra)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="pokemon - version rouge (france).bin" size="1048576" crc="337fce11" sha1="47a7622fa30e6402a3891fe65b3a930bf9bd7aec" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="pokeredi" cloneof="pokered">
 		<description>Pokemon - Versione Rossa (Ita)</description>
 		<year>19??</year>
@@ -11481,6 +11481,61 @@
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="pokemon - versione rossa (italy).bin" size="1048576" crc="2945aceb" sha1="65b97cf8f2f1cff711a6d08c6c894c8ce65ce522" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pokeyell">
+		<description>Pokemon - Yellow Version (Euro, USA)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="pokemon - yellow version (usa, europe).bin" size="1048576" crc="7d527d62" sha1="cc7d03262ebfaf2f06772c1a480c7d9d5f4a38e1" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pokeyelli" cloneof="pokeyell">
+		<description>Pokemon - Versione Gialla (Ita)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="pokemon - versione gialla (italy).bin" size="1048576" crc="8b56fe33" sha1="05bb8e99f24d498613930949730afa8024e77d08" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pokeyells" cloneof="pokeyell">
+		<description>Pokemon - Edicion Amarilla (Spa)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="pokemon - edicion amarilla (spain).bin" size="1048576" crc="964b7a10" sha1="1dc242039218fba50928d1afb66b70565b6b9daf" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pokeyellg" cloneof="pokeyell">
+		<description>Pokemon - Gelbe Edition (Ger)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="pokemon - gelbe edition (germany).bin" size="1048576" crc="7a01e45a" sha1="42f3714eec6eca25200d42461ff08d57c98f6d1d" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pokeyellf" cloneof="pokeyell">
+		<description>Pokemon - Version Jaune (Fra)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="pokemon - version jaune (france).bin" size="1048576" crc="d03426e9" sha1="0aceec0ef7aa2ca5aa831554598d91f61a925591" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -15974,7 +16029,7 @@
 	</software>
 
 	<software name="uchiiwai">
-		<description>Uchiiwai - Kyoudai Kamiwaza no Puzzle Game (Jpn)</description>
+		<description>Uchiiwai - Kyoudaijingi no Puzzle Game (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gameboy_cart">

@@ -36623,9 +36623,9 @@ The software list will be divided in four categories:
 		</part>
 	</software>
 
-	<software name="tenchiwo">
+	<software name="tenchiku">
 		<!-- Serial: SHVC-AKTJ - Release Date: 1995-08-11 - Alt. Title: 天地を喰らう 三国志群雄伝 -->
-		<description>Tenchi o Kurau - Sangokushi Gunyuuden (Jpn)</description>
+		<description>Tenchi wo Kurau - Sangokushi Gunyuuden (Jpn)</description>
 		<year>1995</year>
 		<publisher>Capcom</publisher>
 		<part name="cart" interface="snes_cart">
