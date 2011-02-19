@@ -565,10 +565,16 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 		{
 			for( xi = 0; xi < 8; xi++)
 			{
+				int res_x,res_y;
 				UINT8 pen = ((state->m_char_rom[tile*16+yi] >> xi) & 1) ? color : 0;
 
-				if((y * 16 + yi) < 400)  //todo: screen limits
-					*BITMAP_ADDR16(bitmap, y * 16 + yi, x * 8 + xi) = pen;
+				res_x = x * 8 + xi;
+				res_y = y * 16 + yi;
+
+				if(res_x > screen_max_x || res_y > screen_max_y)
+					continue;
+
+				*BITMAP_ADDR16(bitmap, res_y, res_x) = pen;
 			}
 		}
 	}

@@ -1039,7 +1039,7 @@ static void update_text(device_t *device, bitmap_t *bitmap, const rectangle *cli
 		for (y = sy; y < sy + len; y++)
 		{
 			addr = sad + (y * upd7220->pitch);
-			if (upd7220->draw_text_func) upd7220->draw_text_func(device, bitmap, upd7220->vram, addr, y, wd, upd7220->pitch);
+			if (upd7220->draw_text_func) upd7220->draw_text_func(device, bitmap, upd7220->vram, addr, y, wd, upd7220->pitch,0,0,upd7220->aw * 8 - 1,upd7220->al - 1);
 		}
 
 		sy = y + 1;
@@ -1096,7 +1096,7 @@ static void update_graphics(device_t *device, bitmap_t *bitmap, const rectangle 
 			if (im)
 				draw_graphics_line(device, bitmap, addr, y, wd);
 			else
-				if (upd7220->draw_text_func) upd7220->draw_text_func(device, bitmap, upd7220->vram, addr, y, wd, upd7220->pitch);
+				if (upd7220->draw_text_func) upd7220->draw_text_func(device, bitmap, upd7220->vram, addr, y, wd, upd7220->pitch,0,0,upd7220->aw * 8 - 1,upd7220->al - 1);
 		}
 
 		sy = y + 1;
