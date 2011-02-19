@@ -609,25 +609,25 @@ static void write_vram(upd7220_t *upd7220,UINT8 type, UINT8 mod)
 			case 0x01: //complement
 				switch(type)
 				{
-					case 0: upd7220->vram[upd7220->ead] ^= ((upd7220->pr[1]) | (upd7220->pr[2] << 8)) & upd7220->mask; break;
-					case 2:	upd7220->vram[upd7220->ead] ^= (((upd7220->pr[1] & upd7220->mask) & 0xff); break;
-					case 3: upd7220->vram[upd7220->ead] ^= (((upd7220->pr[1] & upd7220->mask) << 8); break;
+					case 0: upd7220->vram[upd7220->ead] ^= (((upd7220->pr[1]) | (upd7220->pr[2] << 8)) & upd7220->mask); break;
+					case 2:	upd7220->vram[upd7220->ead] ^= ((upd7220->pr[1] & upd7220->mask) & 0xff); break;
+					case 3: upd7220->vram[upd7220->ead] ^= ((upd7220->pr[1] & upd7220->mask) << 8); break;
 				}
 				break;
 			case 0x02: //reset to zero
 				switch(type)
 				{
 					case 0: upd7220->vram[upd7220->ead] &= ~(((upd7220->pr[1]) | (upd7220->pr[2] << 8)) & upd7220->mask); break;
-					case 2:	upd7220->vram[upd7220->ead] &= ~(((upd7220->pr[1] & upd7220->mask) & 0xff); break;
-					case 3: upd7220->vram[upd7220->ead] &= ~(((upd7220->pr[1] & upd7220->mask) << 8); break;
+					case 2:	upd7220->vram[upd7220->ead] &= ~((upd7220->pr[1] & upd7220->mask) & 0xff); break;
+					case 3: upd7220->vram[upd7220->ead] &= ~((upd7220->pr[1] & upd7220->mask) << 8); break;
 				}
 				break;
 			case 0x03: //set to one
 				switch(type)
 				{
-					case 0: upd7220->vram[upd7220->ead] |= ((upd7220->pr[1]) | (upd7220->pr[2] << 8)) & upd7220->mask; break;
-					case 2:	upd7220->vram[upd7220->ead] |= (((upd7220->pr[1] & upd7220->mask) & 0xff); break;
-					case 3: upd7220->vram[upd7220->ead] |= (((upd7220->pr[1] & upd7220->mask) << 8); break;
+					case 0: upd7220->vram[upd7220->ead] |= (((upd7220->pr[1]) | (upd7220->pr[2] << 8)) & upd7220->mask); break;
+					case 2:	upd7220->vram[upd7220->ead] |= ((upd7220->pr[1] & upd7220->mask) & 0xff); break;
+					case 3: upd7220->vram[upd7220->ead] |= ((upd7220->pr[1] & upd7220->mask) << 8); break;
 				}
 				break;
 		}
@@ -894,6 +894,7 @@ static void process_fifo(device_t *device)
 		if (upd7220->param_ptr == 3 || (upd7220->param_ptr == 2 && upd7220->cr & 0x10))
 		{
 			//printf("%02x = %02x %02x (%c) %04x\n",upd7220->cr,upd7220->pr[2],upd7220->pr[1],upd7220->pr[1],EAD);
+			fifo_set_direction(upd7220, FIFO_WRITE);
 
 			write_vram(upd7220,(upd7220->cr & 0x18) >> 3,upd7220->cr & 3);
 			reset_figs_param(upd7220);
