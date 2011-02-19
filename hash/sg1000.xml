@@ -42,7 +42,7 @@ B-014 哥爾哥13 / Gē ěr gē 13 -> G-1014 Golgo 13 [WANTED]
 B-015 太空怪獸 / Tàikōng guàishòu -> G-1015 Orguss [WANTED, a Tw cart with no product number has been dumped and matched the Jpn cart, but a B-015 cart might exist!]
 W-016 帝國大反擊 / Dìguó dà fǎnjí -> OM-G007 Space Armor [dumped, same as Jpn v0 dump). 
 B-017 摩納哥賽車 / Mónàgē sàichē -> G-1017 Monaco GP [dumped]
-W-018 霹靂彈 / Pīlì dàn -> G-1018 Sega Flipper [dumped?]
+W-018 霹靂彈 / Pīlì dàn -> G-1018 Sega Flipper [dumped]
 W-019 精靈鼠 / Jīnglíng shǔ -> G-1019 Pop Flamer [dumped]
 W-020 迷魂車 / Mí hún chē -> G-1020 Pacar [dumped]
 B-021 女子高爾夫 / Nǚzǐ gāoěrfū -> OM-G006 Okamoto Ayako no Match Play Golf [dumped]
@@ -1422,6 +1422,18 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		<part name="cart" interface="sg1000_cart">
 			<dataarea name="rom" size="16384">
 				<rom name="sega flipper [40k map].bin" size="40960" crc="fd76ad99" sha1="d713dcbd79a3db8f1ef2cfb27da31a286fff16d1" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="segaflipt" cloneof="segaflip">
+		<!-- Serial: W-018 - Alt Title: Pīlì dàn ~ 霹靂彈 -->
+		<description>Flipper (Tw)</description>
+		<year>1984?</year>
+		<publisher>Aaronix</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="sega flipper (tw).bin" size="16384" crc="042c36ba" sha1="b7eb254a014772a83829e1991dcd32396e8dd9cc" offset="000000" />
 			</dataarea>
 		</part>
 	</software>

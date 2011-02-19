@@ -46178,6 +46178,25 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 	</software>
 
 <!-- [NJ081] 火影忍者 ~ Huo Ying Ren Zhe (Naruto) [or NJ060?] --> 
+
+<!-- is this NJ081?? -->
+	<software name="naruto">
+		<!-- Serial:  - Release Date:  -->
+		<description>Naruto RPG (Chi)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="UNL-NANJING" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="2097152">
+				<rom name="naruto.prg" size="2097152" crc="5e66e6c4" sha1="58a154a3696ba27a6e70984ee5d9eeacd88e80ca" offset="00000" />
+			</dataarea>
+			<!-- 8k WRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+ 		</part>
+	</software>
+
 <!-- [NJ082] ?? --> 
 <!-- [NJ083] 三国志-刘备传 ~ San Guo Zhi - Liu Bei Chuan --> 
 <!-- [NJ084] 圣斗士星矢2-北欧突击篇 ~ Sheng Dou Shi Xing Shi 2 - Beiou Tuji Pian (Saint Seiya 2) --> 
@@ -46191,7 +46210,27 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 <!-- [NJ092] ?? --> 
 <!-- [NJ093] ?? --> 
 <!-- [NJ094] ?? --> 
-<!-- [NJ095] 七龙珠大冒险 ~ Qi Long Zhu Da Mao Xian (Dragon Ball Adventure) --> 
+
+<!-- [NJ095] 七龙珠大冒险 ~ Qi Long Zhu Da Mao Xian (Dragon Ball Adventure) -->
+
+<!-- is this NJ095?? -->
+	<software name="dballc">
+		<!-- Serial:  - Release Date:  -->
+		<description>Dragonball (Chi)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="UNL-NANJING" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="1048576">
+				<rom name="dragonball (chi) (unl).prg" size="1048576" crc="9de10a91" sha1="68711e149b067808c135f8b67d9ade1489b019af" offset="00000" />
+			</dataarea>
+			<!-- 8k WRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+ 		</part>
+	</software>
+	
 <!-- [NJ096] ?? --> 
 <!-- [NJ097] 魔兽世界-恶魔猎人 ~ Mo Shou Shi Jie - Emo Lie Ren (World of Warcraft - Demon Hunter) --> 
 
