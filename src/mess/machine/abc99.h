@@ -53,6 +53,7 @@ public:
 	// optional information overrides
 	virtual const rom_entry *rom_region() const;
 	virtual machine_config_constructor machine_config_additions() const;
+	virtual const input_port_token *input_ports() const;
 
 protected:
     // device_config overrides
@@ -89,10 +90,6 @@ private:
 
 // device type definition
 extern const device_type ABC99;
-
-
-// keyboard matrix
-INPUT_PORTS_EXTERN( abc99 );
 
 
 
