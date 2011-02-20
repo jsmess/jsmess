@@ -48,6 +48,7 @@ public:
 	UINT8 keyb_press;
 
 	UINT8 fdc_2dd_ctrl;
+	UINT8 nmi_ff;
 };
 
 
@@ -291,12 +292,15 @@ static READ8_HANDLER( pc9801_50_r )
 
 static WRITE8_HANDLER( pc9801_50_w )
 {
+	pc9801_state *state = space->machine->driver_data<pc9801_state>();
+
 	if((offset & 1) == 0)
 	{
 		if(offset & 4)
 			printf("Write to undefined port [%02x] %02x\n",offset+0x50,data);
 		else
-			printf("Write to NMI FF port [%02x] %02x\n",offset+0x50,data);
+			state->nmi_ff = (offset & 2) >> 1;
+
 	}
 	else // odd
 	{
@@ -553,11 +557,7 @@ static READ8_HANDLER( pc9801_fdc_2dd_r )
 		{
 			case 0:	return upd765_status_r(space->machine->device("upd765_2dd"),0);
 			case 2: return upd765_data_r(space->machine->device("upd765_2dd"),0);
-			case 4:
-				if((flopimg_get_image(floppy_get_device(space->machine, 0)) == NULL) && flopimg_get_image(floppy_get_device(space->machine, 1)) == NULL)
-					return 0x6f;
-
-				return 0x7f;
+			case 4: return 0x40; //unknown port meaning, might be 0x70
 		}
 	}
 	else
@@ -587,10 +587,10 @@ static WRITE8_HANDLER( pc9801_fdc_2dd_w )
 					upd765_reset_w(space->machine->device("upd765_2dd"),0);
 
 				state->fdc_2dd_ctrl = data;
-				floppy_mon_w(floppy_get_device(space->machine, 0), (data & 8) ? CLEAR_LINE : ASSERT_LINE);
-				floppy_mon_w(floppy_get_device(space->machine, 1), (data & 8) ? CLEAR_LINE : ASSERT_LINE);
-				floppy_drive_set_ready_state(floppy_get_device(space->machine, 0), (data & 8), 0);
-				floppy_drive_set_ready_state(floppy_get_device(space->machine, 1), (data & 8), 0);
+				//floppy_mon_w(floppy_get_device(space->machine, 0), (data & 8) ? CLEAR_LINE : ASSERT_LINE);
+				//floppy_mon_w(floppy_get_device(space->machine, 1), (data & 8) ? CLEAR_LINE : ASSERT_LINE);
+				//floppy_drive_set_ready_state(floppy_get_device(space->machine, 0), (data & 8), 0);
+				//floppy_drive_set_ready_state(floppy_get_device(space->machine, 1), (data & 8), 0);
 				break;
 		}
 	}
@@ -1089,7 +1089,9 @@ static WRITE_LINE_DEVICE_HANDLER( fdc_2dd_irq )
 {
 	pc9801_state *drvstate = device->machine->driver_data<pc9801_state>();
 
-	if(drvstate->fdc_2dd_ctrl & 4)
+	printf("IRQ %d\n",state);
+
+	if(drvstate->fdc_2dd_ctrl & 8)
 	{
 		pic8259_ir2_w(device->machine->device("pic8259_slave"), state);
 	}
@@ -1175,6 +1177,8 @@ static MACHINE_RESET(pc9801)
 	floppy_mon_w(floppy_get_device(machine, 1), CLEAR_LINE);
 	floppy_drive_set_ready_state(floppy_get_device(machine, 0), (1), 0);
 	floppy_drive_set_ready_state(floppy_get_device(machine, 1), (1), 0);
+
+	state->nmi_ff = 0;
 
 	{
 		UINT8 op_mode;
