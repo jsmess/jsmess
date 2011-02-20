@@ -128,7 +128,8 @@ static WRITE8_HANDLER ( write_io )
 	{
 		for (i=0;i<8;i++)
 		output_set_led_value(10+i,!BIT(state->latch_data,7-i));
-	}else if (!data)
+	}
+	else if (!data && (!strcmp(space->machine->m_game.name,"milano")))
 		for (i=0;i<8;i++)
 		{
 			output_set_led_value(i,!BIT(state->latch_data,i));
@@ -242,9 +243,6 @@ static READ8_HANDLER(read_keys)
 #endif
 	data=input_port_read(space->machine, keynames[0][offset]);
 
-//	logerror("read_keys = %s Data = %d\n  ", keynames[0][offset], data);
-	//logerror("read_keys: Data = %d offset = %d\n  ",data, offset);
-
 	// logerror("Keyboard Port = %s Data = %d\n  ", ((state->led_status & 0x80) == 0x00) ? keynames[0][offset] : keynames[1][offset], data);
 	return data | 0x7f;
 }
@@ -322,14 +320,14 @@ static INPUT_PORTS_START( board )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)
 	PORT_START("LINE3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)	PORT_CODE(KEYCODE_1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)	PORT_CODE(KEYCODE_2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)	PORT_CODE(KEYCODE_3)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)	PORT_CODE(KEYCODE_4)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD)	PORT_CODE(KEYCODE_5)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)	PORT_CODE(KEYCODE_6)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)	PORT_CODE(KEYCODE_7)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)	PORT_CODE(KEYCODE_8)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)
 	PORT_START("LINE4")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)

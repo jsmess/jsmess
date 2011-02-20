@@ -32,9 +32,9 @@ static int save_board[64];
 static UINT16 Line18_LED;
 static UINT16 Line18_REED;
 
-static MOUSE_HOLD mouse_hold;
+static int led_updates;
 
-static int read_board_flag = TRUE;
+static MOUSE_HOLD mouse_hold;
 
 static int get_first_bit(UINT8 data)
 {
@@ -91,6 +91,8 @@ data:  0 0000 0000  all fields occupied
 
 */
 
+ led_updates=0;	
+
 /* looking for cleared bit in mask Line18_REED => current line */
 
  if (data && Line18_REED)
@@ -102,25 +104,17 @@ data:  0 0000 0000  all fields occupied
 	   for ( i_AH = 0; i_AH < 8; i_AH = i_AH + 1)
 			if (IsPiece(64-(i_18*8 + 8-i_AH)))
 				data &= ~(1 << i_AH);			// clear bit
-
-	   read_board_flag = TRUE;
  }
 
 	return data;
 }
 
 
-static void write_board( running_machine *machine, UINT8 data)
+static void write_board(UINT8 data)
 {
 
 	Line18_REED=data;
-
-	if (read_board_flag && !strcmp(machine->m_game.name,"glasgow") ) //HACK
-		Line18_LED = 0;
-	else
-		Line18_LED = data;
-
-	 read_board_flag = FALSE;
+	Line18_LED = data;
 
 	if (data == 0xff)
 		mboard_key_selector = 0;
@@ -128,13 +122,14 @@ static void write_board( running_machine *machine, UINT8 data)
 
 
 
-static void write_LED(UINT8 data)
+static void write_LED(running_machine *machine, UINT8 data)
 {
 	int i;
 	UINT8 i_AH, i_18;
 	UINT8 LED;
 
 	mboard_lcd_invert = 1;
+
 /*
 
 Example: turn led E2 on
@@ -146,6 +141,10 @@ data:  10 0001 0000 Line E
 
 	for (i=0; i < 64; i++)							/* all  LED's off */
 		output_set_led_value(i, 0);
+
+	led_updates++;
+	if ( (!strcmp(machine->m_game.name,"glasgow")) && led_updates <= 3) // HACK Change between board scan and trigger LED's
+		return;															// cause problems in glasgow emulation 
 
     if (Line18_LED)
     {
@@ -196,40 +195,40 @@ READ32_HANDLER( mboard_read_board_32 )
 
 WRITE8_HANDLER( mboard_write_board_8 )
 {
-	write_board(space->machine,data);
+	write_board(data);
 	logerror("Write Board Port  Data = %02x\n  ",data);
 }
 
 WRITE16_HANDLER( mboard_write_board_16 )
 {
-	if (data && 0xff) write_board(space->machine,data);
+	if (data && 0xff) write_board(data);
 	logerror("write board 16 %08x\n",data);
-	write_board(space->machine,data>>8);
+	write_board(data>>8);
 }
 
 WRITE32_HANDLER( mboard_write_board_32 )
 {
 	data |= data << 24;
 	logerror("write board 32 o: %08x d: %08x\n",offset,data);
-	write_board(space->machine,data>>24);
+	write_board(data>>24);
 }
 
 WRITE8_HANDLER( mboard_write_LED_8 )
 {
-	write_LED(data);
+	write_LED(space->machine,data);
 	cpu_spinuntil_time(space->cpu, attotime::from_usec(7));
 }
 
 WRITE16_HANDLER( mboard_write_LED_16 )
 {
-	 write_LED(data >> 8);
+	 write_LED(space->machine,data >> 8);
 	 cpu_spinuntil_time(space->cpu, attotime::from_usec(9));
 }
 
 WRITE32_HANDLER( mboard_write_LED_32 )
 {
 	data = data | data << 24;
-	write_LED(data >> 24);
+	write_LED(space->machine,data >> 24);
 	cpu_spinuntil_time(space->cpu, attotime::from_usec(20));
 }
 
@@ -366,7 +365,7 @@ static void check_board_buttons ( running_machine *machine )
 		if (!(pos2num_res < 8))
 			logerror("Position out of bound!");
 
-		else if ((mouse_hold.piece) && (!IsPiece(field)))
+		else if (mouse_hold.piece)  // && (!IsPiece(field))) capture move
 		{
 			/* Moving a piece onto a blank */
 			m_board[field] = mouse_hold.piece;
@@ -414,9 +413,9 @@ static void check_board_buttons ( running_machine *machine )
 			mouse_hold.piece = 0;
 			mouse_hold.border_piece = FALSE;
 		}
-
 		return;
 	}
+
 
 /* check additional buttons */
 	if (data == 0xff)
