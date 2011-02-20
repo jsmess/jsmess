@@ -44,7 +44,6 @@ Bit 7  LED A-H
 #include "machine/mboard.h"
 #include "rendlay.h"
 
-
 class polgar_state : public driver_device
 {
 public:
@@ -57,10 +56,6 @@ public:
 	UINT8 latch_data;
 };
 
-
-//static UINT8 lcd_shift_counter;
-// static UINT8 *milano_ram;
-
 static const int value[4] = {0x80,0x81,0x00,0x01};
 
 
@@ -71,6 +66,41 @@ static const hd44780_interface polgar_display =
 	NULL	// custom display layout
 };
 
+static UINT8 convert_imputmask(UINT8 input)
+{
+	input^=0xff;
+	switch (input) {
+		case 0x01:
+			return 0x80;
+		case 0x02:
+			return 0x40;
+		case 0x04:
+			return 0x20;
+		case 0x08:
+			return 0x10;
+		case 0x10:
+			return 0x08;
+		case 0x20:
+			return 0x04;
+		case 0x40:
+			return 0x02;
+		case 0x80:
+			return 0x01;
+		default:
+			return 0x00;
+		}
+}
+
+static int get_first_cleared_bit(UINT8 data)
+{
+	int i;
+
+	for (i = 0; i < 8; i++)
+		if (!BIT(data, i))
+			return i;
+
+	return NOT_VALID;
+}
 
 static WRITE8_HANDLER ( write_io )
 {
@@ -94,11 +124,17 @@ static WRITE8_HANDLER ( write_io )
 		for (i=0;i<8;i++)
 		output_set_led_value(i,!BIT(state->latch_data,i));
 	}
-	if (BIT(data,6) && BIT(data,5))
+	else if (BIT(data,6) && BIT(data,5))
 	{
 		for (i=0;i<8;i++)
 		output_set_led_value(10+i,!BIT(state->latch_data,7-i));
-	}
+	}else if (!data)
+		for (i=0;i<8;i++)
+		{
+			output_set_led_value(i,!BIT(state->latch_data,i));
+			output_set_led_value(10+i,!BIT(state->latch_data,7-i));
+		}
+		
 
 	//logerror("LCD Status  Data = %d\n",data);
 
@@ -115,14 +151,6 @@ static WRITE8_HANDLER ( write_lcd )
 
 }
 
-
-static WRITE8_HANDLER ( write_board )
-{
-	polgar_state *state = space->machine->driver_data<polgar_state>();
-	state->latch_data=data;
-}
-
-
 static WRITE8_HANDLER ( milano_write_led )
 {
 	UINT8 LED_offset=100;
@@ -131,7 +159,7 @@ static WRITE8_HANDLER ( milano_write_led )
 	else
 		output_set_led_value(LED_offset+offset,0);
 
-	//logerror("LEDs  Offset = %d Data = %d\n",offset,data);
+//	logerror("milano_write_led Offset = %d Data = %d\n",offset,data);
 }
 
 static WRITE8_HANDLER ( write_led )
@@ -164,12 +192,35 @@ static WRITE8_HANDLER ( write_led )
 }
 #endif
 
-static READ8_HANDLER(read_board)
+static WRITE8_HANDLER ( milano_write_board )
 {
-	UINT8 data;
-	data=input_port_read(space->machine, "KEY1_8");
-	logerror("Keydata  Data = %d\n  ",data);
+	polgar_state *state = space->machine->driver_data<polgar_state>();
+
+	state->latch_data=data;
+}
+
+static READ8_HANDLER(milano_read_board)
+{
+	int line;
+	polgar_state *state = space->machine->driver_data<polgar_state>();
+	static const char *const board_lines[8] =
+			{ "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7", "LINE8", "LINE9" };
+
+	UINT8 data=0x00;
+	UINT8 tmp=0xff;
+
+	if (state->latch_data)
+	{
+		line=get_first_cleared_bit(state->latch_data);
+		tmp=input_port_read(space->machine,  board_lines[line]);
+		
+		if (tmp != 0xff)
+			data=convert_imputmask(tmp);
+
+	}
+
 	return data;
+
 }
 
 static READ8_HANDLER(read_keys)
@@ -190,6 +241,10 @@ static READ8_HANDLER(read_keys)
 		data=input_port_read(space->machine, keynames[1][offset]);
 #endif
 	data=input_port_read(space->machine, keynames[0][offset]);
+
+//	logerror("read_keys = %s Data = %d\n  ", keynames[0][offset], data);
+	//logerror("read_keys: Data = %d offset = %d\n  ",data, offset);
+
 	// logerror("Keyboard Port = %s Data = %d\n  ", ((state->led_status & 0x80) == 0x00) ? keynames[0][offset] : keynames[1][offset], data);
 	return data | 0x7f;
 }
@@ -244,11 +299,10 @@ static ADDRESS_MAP_START(polgar_mem , ADDRESS_SPACE_PROGRAM, 8)
 ADDRESS_MAP_END
 
 
-
 static ADDRESS_MAP_START(milano_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE( 0x0000, 0x1f9f) AM_RAM
-	AM_RANGE( 0x1fd0, 0x1fd0) AM_WRITE ( write_board)		// Chessboard
-	AM_RANGE( 0x1fe0, 0x1fe0) AM_READ( read_board )		// Chessboard
+	AM_RANGE( 0x1fd0, 0x1fd0) AM_WRITE ( milano_write_board)	// Chessboard
+	AM_RANGE( 0x1fe0, 0x1fe0) AM_READ( milano_read_board )		// Chessboard
 	AM_RANGE( 0x1fe8, 0x1fed) AM_WRITE( milano_write_led )	// Function LEDs 3400 TRN 3401
 	AM_RANGE( 0x1fd8, 0x1fdf) AM_READ( read_keys)	// CL Key
 	AM_RANGE( 0x1ff0, 0x1ff0) AM_WRITE( write_io)	// IO control
@@ -268,14 +322,14 @@ static INPUT_PORTS_START( board )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)
 	PORT_START("LINE3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)	PORT_CODE(KEYCODE_1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)	PORT_CODE(KEYCODE_2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)	PORT_CODE(KEYCODE_3)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)	PORT_CODE(KEYCODE_4)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD)	PORT_CODE(KEYCODE_5)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)	PORT_CODE(KEYCODE_6)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)	PORT_CODE(KEYCODE_7)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)	PORT_CODE(KEYCODE_8)
 	PORT_START("LINE4")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)
@@ -374,9 +428,9 @@ static INPUT_PORTS_START( polgar )
 	PORT_BIT(0x080, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("ENT") PORT_CODE(KEYCODE_F7)
 	PORT_START("KEY1_7") //Port $2c07
 	PORT_BIT(0x080, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("CL") PORT_CODE(KEYCODE_F8)
-	PORT_START("KEY1_8")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("A") PORT_CODE(KEYCODE_1)
+
 INPUT_PORTS_END
+
 
 static TIMER_DEVICE_CALLBACK( update_nmi )
 {
@@ -388,7 +442,6 @@ static TIMER_DEVICE_CALLBACK( update_nmi )
 	// beep_set_state(speaker,state->led_status&64?1:0);
 }
 
-
 static MACHINE_START( polgar )
 {
 	mboard_savestate_register(machine);
@@ -397,11 +450,9 @@ static MACHINE_START( polgar )
 
 static MACHINE_RESET( polgar )
 {
-
 	mboard_set_border_pieces();
 	mboard_set_board();
 }
-
 
 static MACHINE_CONFIG_START( polgar, polgar_state )
 	/* basic machine hardware */
@@ -448,6 +499,7 @@ static MACHINE_CONFIG_DERIVED( milano, polgar )
 	// MCFG_IMPORT_FROM( polgar )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(milano_mem)
+
 	//beep_set_frequency(0, 4000);
 MACHINE_CONFIG_END
 
