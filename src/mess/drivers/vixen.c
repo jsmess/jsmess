@@ -389,7 +389,7 @@ void vixen_state::video_start()
 
 bool vixen_state::video_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
-	for (int txadr = 0; txadr < 27; txadr++)
+	for (int txadr = 0; txadr < 26; txadr++)
 	{
 		for (int scan = 0; scan < 10; scan++)
 		{
@@ -769,8 +769,8 @@ void vixen_state::machine_reset()
 {
 	const address_space *program = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);
 
-	memory_install_read_bank(program, 0x0000, 0x0fff, 0xfff, 0, "bank1");
-	memory_install_write_bank(program, 0x0000, 0x0fff, 0xfff, 0, "bank2");
+	memory_install_read_bank(program, 0x0000, 0xefff, 0xfff, 0, "bank1");
+	memory_install_write_bank(program, 0x0000, 0xefff, 0xfff, 0, "bank2");
 
 	memory_set_bank(machine, "bank1", 1);
 	memory_set_bank(machine, "bank2", 1);
