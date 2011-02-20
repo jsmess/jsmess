@@ -4,10 +4,11 @@
 
     preliminary driver by Angelo Salese
 
-    Reminder: tests A20 line feature, afaik it's NOT supported by the i386 core (along with protected mode / MMU)
-
     TODO:
-    - remove the A20 line hack
+    - remove the A20 line hack;
+    - bad colors, caused by bad memory eeprom values;
+    - no keyboard support;
+    - needs merging with pc9801.c driver;
 
     Debug tricks list (aka list of things that should be fixed):
     - run a first time without doing anything;
@@ -251,6 +252,7 @@ public:
 	UINT8 dma_offset[2][4];
 	UINT8 at_pages[0x10];
 	UINT8 soft_reset;
+	UINT8 vrtc_irq_mask;
 };
 
 
@@ -288,41 +290,36 @@ static VIDEO_UPDATE( pc9801 )
 			{
 				for(xi=0;xi<8;xi++)
 				{
-					int tile,attr,pen[3],pen_mask,color;
+					int tile,attr,pen,color;
+					UINT8 tile_data;
 
 					tile = (state->pc9801_vram[(x+y*40)] & 0x00ff0000) >> 16;
 					attr = (state->pc9801_vram[((x+y*40)+0x2000/4)] & 0x00ff0000) >> 16;
 
-					pen_mask = (attr & 0xe0)>>5;
+					color = (attr & 0xe0)>>5;
 
-					pen[0] = gfx_data[(tile*8)+yi]>>(7-xi) & (pen_mask & 1)>>0;
-					pen[1] = gfx_data[(tile*8)+yi]>>(7-xi) & (pen_mask & 2)>>1;
-					pen[2] = gfx_data[(tile*8)+yi]>>(7-xi) & (pen_mask & 4)>>2;
-
-					color = pen[2]<<2|pen[1]<<1|pen[0]<<0;
+					tile_data = gfx_data[tile*8+yi];
 
 					if(attr & 4)
-						color^=7;
+						tile_data^=0xff;
+
+					pen =  (tile_data >> (7-xi) & 1) ? color : 0;
 
 					if(((x*2+1)*8+xi)<screen->machine->primary_screen->visible_area().max_x && (y*8+yi)<screen->machine->primary_screen->visible_area().max_y)
-						*BITMAP_ADDR16(bitmap, y*8+yi, (x*2+1)*8+xi) = screen->machine->pens[color];
+						*BITMAP_ADDR16(bitmap, y*8+yi, (x*2+1)*8+xi) = screen->machine->pens[pen];
 
 					tile = (state->pc9801_vram[(x+y*40)] & 0x000000ff) >> 0;
 					attr = (state->pc9801_vram[((x+y*40)+0x2000/4)] & 0x000000ff) >> 0;
 
-					pen_mask = (attr & 0xe0)>>5;
-
-					pen[0] = gfx_data[(tile*8)+yi]>>(7-xi) & (pen_mask & 1)>>0;
-					pen[1] = gfx_data[(tile*8)+yi]>>(7-xi) & (pen_mask & 2)>>1;
-					pen[2] = gfx_data[(tile*8)+yi]>>(7-xi) & (pen_mask & 4)>>2;
-
-					color = pen[2]<<2|pen[1]<<1|pen[0]<<0;
+					tile_data = gfx_data[tile*8+yi];
 
 					if(attr & 4)
-						color^=7;
+						tile_data^=0xff;
+
+					pen =  (tile_data >> (7-xi) & 1) ? color : 0;
 
 					if(((x*2+0)*8+xi)<screen->machine->primary_screen->visible_area().max_x && (y*8+yi)<screen->machine->primary_screen->visible_area().max_y)
-						*BITMAP_ADDR16(bitmap, y*8+yi, (x*2+0)*8+xi) = screen->machine->pens[color];
+						*BITMAP_ADDR16(bitmap, y*8+yi, (x*2+0)*8+xi) = screen->machine->pens[pen];
 				}
 			}
 		}
@@ -463,19 +460,11 @@ static WRITE8_HANDLER( ems_sel_w )
 
 	if(offset == 1)
 	{
-		UINT8 *ROM = space->machine->region("cpudata")->base();
-
 		if(data == 0x00 || data == 0x10)
-		{
 			state->rom_bank = 1;
-			memory_set_bankptr(space->machine, "bank1", &ROM[0x20000]);
-		}
 
 		if(data == 0x02 || data == 0x12)
-		{
 			state->rom_bank = 0;
-			memory_set_bankptr(space->machine, "bank1", &ROM[0x00000]);
-		}
 	}
 
 	if(offset == 3)
@@ -566,12 +555,12 @@ static WRITE8_HANDLER( port_f0_w )
 	pc98_state *state = space->machine->driver_data<pc98_state>();
 	if(offset == 0x00)
 	{
-		static UINT8 x;
+		//static UINT8 x;
 
 		state->soft_reset = 0x00;
 
-		popmessage("Press soft reset NOW! (%d pass)",x++);
-		//cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_RESET, PULSE_LINE);
+		//popmessage("Press soft reset NOW! (%d pass)",x++);
+		cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_RESET, PULSE_LINE);
 	}
 
 	if(offset == 0x02)
@@ -654,6 +643,28 @@ static WRITE32_HANDLER( wram_ide_w )
 	COMBINE_DATA(&state->work_ram_banked[offset+4*0x2000/4]);
 }
 
+static READ8_HANDLER( rombios_r )
+{
+	pc98_state *state = space->machine->driver_data<pc98_state>();
+	UINT8 *ROM = space->machine->region("cpudata")->base();
+
+	return ROM[offset+((state->rom_bank & 1)*0x20000)];
+}
+
+static WRITE8_HANDLER( pc9801_vrtc_mask_w )
+{
+	pc98_state *state = space->machine->driver_data<pc98_state>();
+
+	if((offset & 3) == 0)
+	{
+		state->vrtc_irq_mask = 1;
+	}
+	else // odd
+	{
+		printf("Write to undefined port [%02x] <- %02x\n",offset+0x64,data);
+	}
+}
+
 static ADDRESS_MAP_START( pc9801_mem, ADDRESS_SPACE_PROGRAM, 32)
 	AM_RANGE(0x00000000, 0x0007ffff) AM_RAM
 	AM_RANGE(0x00080000, 0x0009ffff) AM_READWRITE(wram_bank_r,wram_bank_w)
@@ -662,11 +673,11 @@ static ADDRESS_MAP_START( pc9801_mem, ADDRESS_SPACE_PROGRAM, 32)
 	AM_RANGE(0x000a5000, 0x000a7fff) AM_RAM //??? (presumably another work ram bank)
 	AM_RANGE(0x000a8000, 0x000bffff) AM_READWRITE(gfx_bitmap_ram_r,gfx_bitmap_ram_w)
 	AM_RANGE(0x000c0000, 0x000dffff) AM_READWRITE(wram_ide_r,wram_ide_w)
-	AM_RANGE(0x000e0000, 0x000fffff) AM_ROMBANK("bank1") AM_WRITE8(rom_bank_w,0xffffffff)
+	AM_RANGE(0x000e0000, 0x000fffff) AM_READ8(rombios_r,0xffffffff) AM_WRITE8(rom_bank_w,0xffffffff)
 	AM_RANGE(0x00100000, 0x007fffff) AM_RAM //extended memory, 7168 KB for now
 	AM_RANGE(0x00800000, 0x00ffffff) AM_NOP
 
-	AM_RANGE(0xfffe0000, 0xffffffff) AM_ROMBANK("bank1") AM_WRITE8(rom_bank_w,0xffffffff)
+	AM_RANGE(0xfffe0000, 0xffffffff) AM_READ8(rombios_r,0xffffffff) AM_WRITE8(rom_bank_w,0xffffffff)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pc9801_io, ADDRESS_SPACE_IO, 32)
@@ -676,7 +687,7 @@ static ADDRESS_MAP_START( pc9801_io, ADDRESS_SPACE_IO, 32)
 	AM_RANGE(0x0030, 0x0037) AM_READWRITE8(sys_port_r,sys_port_w,0xffffffff) // rs232c (even ports) / system ppi8255 (odd ports)
 	AM_RANGE(0x0040, 0x0047) AM_READWRITE8(sio_port_r,sio_port_w,0xffffffff) // printer ppi8255 (even ports) / keyboard (odd ports)
 	AM_RANGE(0x0060, 0x0063) AM_READWRITE8(port_60_r,port_60_w,0xffffffff) // uPD7220 status & fifo (R) / param & cmd (W) master (even ports)
-//  AM_RANGE(0x0064, 0x0064) V-SYNC related write
+	AM_RANGE(0x0064, 0x0067) AM_WRITE8(pc9801_vrtc_mask_w,0xffffffff)
 //  AM_RANGE(0x0068, 0x0068) Flip-Flop 1 r/w
 //  AM_RANGE(0x006a, 0x006a) Flip-Flop 2 r/w
 //  AM_RANGE(0x006e, 0x006e) Flip-Flop 3 r/w
@@ -759,16 +770,15 @@ static MACHINE_START(pc9801)
 static MACHINE_RESET(pc9801)
 {
 	pc98_state *state = machine->driver_data<pc98_state>();
-	UINT8 *ROM = machine->region("cpudata")->base();
 
 	cpu_set_irq_callback(machine->device("maincpu"), irq_callback);
 
+	state->gate_a20 = 0;
 	cputag_set_input_line(machine, "maincpu", INPUT_LINE_A20, 0);
 
-	state->gate_a20 = 0;
+	cpu_set_reg(machine->device("maincpu"), I386_CS, 0xf000);
+	cpu_set_reg(machine->device("maincpu"), I386_PC, 0xfff0);
 	cpu_set_reg(machine->device("maincpu"), I386_EIP, 0xffff0+0x10000);
-
-	memory_set_bankptr(machine, "bank1", &ROM[0x20000]);
 
 	state->wram_bank = 0;
 	state->rom_bank = 1;
@@ -1028,13 +1038,23 @@ static I8237_INTERFACE( dma8237_1_config )
 	{ DEVCB_LINE(pc_dack0_w), DEVCB_LINE(pc_dack1_w), DEVCB_LINE(pc_dack2_w), DEVCB_LINE(pc_dack3_w) }
 };
 
-/* I suspect the dump for pc9801 comes from a i386 later model... the original machine would use a i8086 @ 5Mhz CPU (see notes at top) */
-/* More investigations are required, but in the meanwhile I set a I386 as main CPU */
+static INTERRUPT_GEN(pc9801_vrtc_irq)
+{
+	pc98_state *state = device->machine->driver_data<pc98_state>();
+
+	if(state->vrtc_irq_mask)
+	{
+		pic8259_ir2_w(device->machine->device("pic8259_master"), 1);
+		state->vrtc_irq_mask = 0; // TODO: this irq auto-masks?
+	}
+}
+
 static MACHINE_CONFIG_START( pc9801, pc98_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I386, 16000000)
+	MCFG_CPU_ADD("maincpu", I386, 16000000) /* almost certainly i386, unknown clock */
 	MCFG_CPU_PROGRAM_MAP(pc9801_mem)
 	MCFG_CPU_IO_MAP(pc9801_io)
+	MCFG_CPU_VBLANK_INT("screen",pc9801_vrtc_irq)
 
 	MCFG_MACHINE_START(pc9801)
 	MCFG_MACHINE_RESET(pc9801)
