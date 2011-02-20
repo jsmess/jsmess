@@ -1684,6 +1684,7 @@ $(MESSOBJ)/votrax.a:			\
 
 $(MESSOBJ)/vtech.a:				\
 	$(MESS_DRIVERS)/pc4.o		\
+	$(MESS_VIDEO)/pc4.o			\
 	$(MESS_DRIVERS)/vtech1.o	\
 	$(MESS_VIDEO)/vtech2.o		\
 	$(MESS_MACHINE)/vtech2.o	\
