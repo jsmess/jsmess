@@ -655,6 +655,7 @@ static int translate_command(UINT8 data)
 	case UPD7220_COMMAND_MASK:	command = COMMAND_MASK;	 break;
 	case UPD7220_COMMAND_FIGS:	command = COMMAND_FIGS;	 break;
 	case UPD7220_COMMAND_FIGD:	command = COMMAND_FIGD;  break;
+	case UPD7220_COMMAND_GCHRD:	command = COMMAND_GCHRD; break;
 	case UPD7220_COMMAND_CURD:	command = COMMAND_CURD;  break;
 	case UPD7220_COMMAND_LPRD:	command = COMMAND_LPRD;	 break;
 	default:
@@ -708,7 +709,7 @@ static void process_fifo(device_t *device)
 	switch (translate_command(upd7220->cr))
 	{
 	case COMMAND_INVALID:
-		logerror("uPD7220 '%s' Invalid Command Byte %02x\n", device->tag(), upd7220->cr);
+		printf("uPD7220 '%s' Invalid Command Byte %02x\n", device->tag(), upd7220->cr);
 		break;
 
 	case COMMAND_RESET: /* reset */
@@ -911,8 +912,6 @@ static void process_fifo(device_t *device)
 		break;
 
 	case COMMAND_FIGS: /* figure drawing parameters specify */
-		logerror("uPD7220 '%s' Unimplemented command FIGS\n", device->tag());
-
 		if (upd7220->param_ptr == 2)
 		{
 			upd7220->figs_dir = upd7220->pr[1] & 0x7;
@@ -940,11 +939,11 @@ static void process_fifo(device_t *device)
 		break;
 
 	case COMMAND_FIGD: /* figure draw start */
-		logerror("uPD7220 '%s' Unimplemented command FIGD\n", device->tag());
+		printf("uPD7220 '%s' Unimplemented command FIGD\n", device->tag());
 		break;
 
 	case COMMAND_GCHRD: /* graphics character draw and area filling start */
-		logerror("uPD7220 '%s' Unimplemented command GCHRD\n", device->tag());
+		printf("uPD7220 '%s' Unimplemented command GCHRD\n", device->tag());
 		break;
 
 	case COMMAND_RDAT: /* read data from display memory */
@@ -980,11 +979,11 @@ static void process_fifo(device_t *device)
 		break;
 
 	case COMMAND_DMAR: /* DMA read request */
-		logerror("uPD7220 '%s' Unimplemented command DMAR\n", device->tag());
+		printf("uPD7220 '%s' Unimplemented command DMAR\n", device->tag());
 		break;
 
 	case COMMAND_DMAW: /* DMA write request */
-		logerror("uPD7220 '%s' Unimplemented command DMAW\n", device->tag());
+		printf("uPD7220 '%s' Unimplemented command DMAW\n", device->tag());
 		break;
 	}
 }
