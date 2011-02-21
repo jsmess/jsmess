@@ -74,6 +74,8 @@ public:
 		UINT8 led[8];
 		UINT8 rx;
 	}keyb;
+
+	UINT8 vram_bank;
 };
 
 /*
@@ -124,7 +126,6 @@ static WRITE8_HANDLER(qx10_18_w)
 	qx10_state *state = space->machine->driver_data<qx10_state>();
 	state->membank = (data >> 4) & 0x0f;
 	update_memory_mapping(space->machine);
-	printf("%02x\n",data);
 }
 
 static WRITE8_HANDLER(prom_sel_w)
@@ -194,8 +195,13 @@ static WRITE8_HANDLER(fdd_motor_w)
 static READ8_HANDLER(qx10_30_r)
 {
 	qx10_state *driver_state = space->machine->driver_data<qx10_state>();
+	floppy_image *floppy;
+
+	floppy = flopimg_get_image(floppy_get_device(space->machine, 0));
+
 	return driver_state->fdcint |
 		   /*driver_state->fdcmotor*/ 0 << 1 |
+		   ((floppy != NULL) ? 1 : 0) << 3 |
 		   driver_state->membank << 4;
 };
 
@@ -480,6 +486,22 @@ static WRITE8_HANDLER( upd7201_w )
 
 }
 
+static READ8_HANDLER( vram_bank_r )
+{
+	qx10_state *state = space->machine->driver_data<qx10_state>();
+
+	return state->vram_bank;
+}
+
+static WRITE8_HANDLER( vram_bank_w )
+{
+	qx10_state *state = space->machine->driver_data<qx10_state>();
+
+	state->vram_bank = data & 7;
+	printf("VRAM %02x\n",data);
+}
+
+
 static ADDRESS_MAP_START(qx10_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x7fff ) AM_RAMBANK("bank1")
@@ -495,18 +517,22 @@ static ADDRESS_MAP_START( qx10_io , ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x0c, 0x0d) AM_DEVREADWRITE("pic8259_slave", pic8259_r, pic8259_w)
 	AM_RANGE(0x10, 0x13) AM_READWRITE(upd7201_r,upd7201_w) //AM_DEVREADWRITE("upd7201", upd7201_cd_ba_r, upd7201_cd_ba_w)
 	AM_RANGE(0x14, 0x17) AM_DEVREADWRITE("i8255", i8255a_r, i8255a_w)
-	AM_RANGE(0x18, 0x18) AM_WRITE(qx10_18_w)
-	AM_RANGE(0x1c, 0x1c) AM_WRITE(prom_sel_w)
-	AM_RANGE(0x20, 0x20) AM_WRITE(cmos_sel_w)
+	AM_RANGE(0x18, 0x1b) AM_READ_PORT("DSW") AM_WRITE(qx10_18_w)
+	AM_RANGE(0x1c, 0x1f) AM_WRITE(prom_sel_w)
+	AM_RANGE(0x20, 0x23) AM_WRITE(cmos_sel_w)
 	AM_RANGE(0x2c, 0x2c) AM_READ_PORT("CONFIG")
-	AM_RANGE(0x30, 0x30) AM_READWRITE(qx10_30_r, fdd_motor_w)
+	AM_RANGE(0x2d, 0x2d) AM_READWRITE(vram_bank_r,vram_bank_w)
+	AM_RANGE(0x30, 0x33) AM_READWRITE(qx10_30_r, fdd_motor_w)
 	AM_RANGE(0x34, 0x34) AM_DEVREAD("upd765", upd765_status_r)
 	AM_RANGE(0x35, 0x35) AM_DEVREADWRITE("upd765", upd765_data_r, upd765_data_w)
 	AM_RANGE(0x38, 0x39) AM_DEVREADWRITE("upd7220", upd7220_r, upd7220_w)
+//	AM_RANGE(0x3a, 0x3a) GDC zoom
+//	AM_RANGE(0x3b, 0x3b) GDC light pen req
 	AM_RANGE(0x3c, 0x3c) AM_READWRITE(mc146818_data_r, mc146818_data_w)
 	AM_RANGE(0x3d, 0x3d) AM_WRITE(mc146818_offset_w)
 	AM_RANGE(0x40, 0x4f) AM_DEVREADWRITE("8237dma_1", i8237_r, i8237_w)
 	AM_RANGE(0x50, 0x5f) AM_DEVREADWRITE("8237dma_2", i8237_r, i8237_w)
+//	AM_RANGE(0xfc, 0xfd) Multi-Font comms
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -687,6 +713,33 @@ static INPUT_PORTS_START( qx10 )
 	PORT_BIT(0x40,IP_ACTIVE_HIGH,IPT_UNUSED) //PORT_CHANGED(key_stroke, 0x7e)
 	PORT_BIT(0x80,IP_ACTIVE_HIGH,IPT_UNUSED) //PORT_CHANGED(key_stroke, 0x7f)
 
+	/* TODO: All of those have unknown meaning */
+	PORT_START("DSW")
+	PORT_DIPNAME( 0x01, 0x01, "DSW" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
 	PORT_START("CONFIG")
 	PORT_CONFNAME( 0x03, 0x02, "Video Board" )
 	PORT_CONFSETTING( 0x02, "Monochrome" )
@@ -794,6 +847,8 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 	int tile;
 	int attr;
 	UINT8 color;
+	UINT8 tile_data;
+	UINT8 pen;
 
 	for( x = 0; x < pitch; x++ )
 	{
@@ -804,13 +859,22 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 
 		for( yi = 0; yi < lr; yi++)
 		{
+			tile_data = (state->m_char_rom[tile*16+yi]);
+
+			if(attr & 8)
+				tile_data^=0xff;
+
+			if(cursor_on && cursor_addr == addr+x) //TODO
+				tile_data^=0xff;
+
 			for( xi = 0; xi < 8; xi++)
 			{
 				int res_x,res_y;
-				UINT8 pen = ((state->m_char_rom[tile*16+yi] >> xi) & 1) ? color : 0;
 
 				if(yi >= 16)
 					pen = 0;
+				else
+					pen = ((tile_data >> xi) & 1) ? color : 0;
 
 				res_x = x * 8 + xi;
 				res_y = y * lr + yi;

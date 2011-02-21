@@ -591,14 +591,14 @@ static void write_vram(upd7220_t *upd7220,UINT8 type, UINT8 mod)
 		return;
 	}
 
-	if(mod)
+	if(mod && mod != 3)
 		printf("uPD7220 check WDAT modifier %02x\n",mod);
 
 	for(i=0;i<upd7220->figs_dc + 1;i++)
 	{
 		switch(mod & 3)
 		{
-			case 0x00: //replace
+			case 0x00: //replace (trusted)
 				switch(type)
 				{
 					case 0: upd7220->vram[upd7220->ead] = ((upd7220->pr[1]) | (upd7220->pr[2] << 8)) & upd7220->mask; break;
@@ -622,7 +622,7 @@ static void write_vram(upd7220_t *upd7220,UINT8 type, UINT8 mod)
 					case 3: upd7220->vram[upd7220->ead] &= ~((upd7220->pr[1] & upd7220->mask) << 8); break;
 				}
 				break;
-			case 0x03: //set to one
+			case 0x03: //set to one (trusted)
 				switch(type)
 				{
 					case 0: upd7220->vram[upd7220->ead] |= (((upd7220->pr[1]) | (upd7220->pr[2] << 8)) & upd7220->mask); break;
@@ -943,7 +943,7 @@ static void process_fifo(device_t *device)
 		break;
 
 	case COMMAND_GCHRD: /* graphics character draw and area filling start */
-		printf("uPD7220 '%s' Unimplemented command GCHRD\n", device->tag());
+		printf("uPD7220 '%s' Unimplemented command GCHRD %02x\n", device->tag(),upd7220->figs_figure_type);
 		break;
 
 	case COMMAND_RDAT: /* read data from display memory */
@@ -1122,7 +1122,7 @@ static void update_text(device_t *device, bitmap_t *bitmap, const rectangle *cli
 		for (y = sy; y < sy + len; y++)
 		{
 			addr = sad + (y * upd7220->pitch);
-			if (upd7220->draw_text_func) upd7220->draw_text_func(device, bitmap, upd7220->vram, addr, y, wd, upd7220->pitch,0,0,upd7220->aw * 8 - 1,upd7220->al - 1, upd7220->lr);
+			if (upd7220->draw_text_func) upd7220->draw_text_func(device, bitmap, upd7220->vram, addr, y, wd, upd7220->pitch,0,0,upd7220->aw * 8 - 1,upd7220->al - 1, upd7220->lr, upd7220->dc, upd7220->ead);
 		}
 
 		sy = y + 1;
@@ -1179,7 +1179,7 @@ static void update_graphics(device_t *device, bitmap_t *bitmap, const rectangle 
 			if (im)
 				draw_graphics_line(device, bitmap, addr, y + sy, wd);
 			else
-				if (upd7220->draw_text_func) upd7220->draw_text_func(device, bitmap, upd7220->vram, addr, y + sy, wd, upd7220->pitch,0,0,upd7220->aw * 8 - 1,upd7220->al - 1,upd7220->lr);
+				if (upd7220->draw_text_func) upd7220->draw_text_func(device, bitmap, upd7220->vram, addr, y + sy, wd, upd7220->pitch,0,0,upd7220->aw * 8 - 1,upd7220->al - 1,upd7220->lr, upd7220->dc, upd7220->ead);
 		}
 
 		sy += (y / upd7220->lr);

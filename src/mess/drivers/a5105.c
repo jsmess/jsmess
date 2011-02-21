@@ -341,6 +341,7 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 	int x;
 	int xi,yi;
 	int tile,color;
+	UINT8 tile_data;
 
 	for( x = 0; x < pitch; x++ )
 	{
@@ -349,10 +350,15 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 
 		for( yi = 0; yi < lr; yi++)
 		{
+			tile_data = state->m_char_rom[tile*8+yi];
+
+			if(cursor_on && cursor_addr == addr+x) //TODO
+				tile_data^=0xff;
+
 			for( xi = 0; xi < 8; xi++)
 			{
 				int res_x,res_y;
-				int pen = (state->m_char_rom[tile*8+yi] >> xi) & 1 ? color : 0;
+				int pen = (tile_data >> xi) & 1 ? color : 0;
 
 				if(yi >= 8) { pen = 0; }
 
