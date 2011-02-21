@@ -37,13 +37,84 @@
 #include "machine/i8255a.h"
 #include "machine/ctronics.h"
 #include "includes/compis.h"
-#include "video/i82720.h"
 #include "imagedev/flopdrv.h"
 #include "machine/pit8253.h"
 #include "machine/pic8259.h"
 #include "machine/mm58274c.h"
 #include "machine/upd765.h"
 #include "formats/cpis_dsk.h"
+#include "video/upd7220.h"
+
+/* TODO: this is likely to come from a RAMdac ... */
+static const unsigned char COMPIS_palette[16*3] =
+{
+	0, 0, 0,
+	0, 0, 0,
+	33, 200, 66,
+	94, 220, 120,
+	84, 85, 237,
+	125, 118, 252,
+	212, 82, 77,
+	66, 235, 245,
+	252, 85, 84,
+	255, 121, 120,
+	212, 193, 84,
+	230, 206, 128,
+	33, 176, 59,
+	201, 91, 186,
+	204, 204, 204,
+	255, 255, 255
+};
+
+static PALETTE_INIT( compis_gdc )
+{
+	int i;
+
+	for ( i = 0; i < 16; i++ ) {
+		palette_set_color_rgb(machine, i, COMPIS_palette[i*3], COMPIS_palette[i*3+1], COMPIS_palette[i*3+2]);
+	}
+}
+
+void compis_state::video_start()
+{
+	// find memory regions
+	m_char_rom = machine->region("pcg")->base();
+
+	VIDEO_START_CALL(generic_bitmapped);
+}
+
+bool compis_state::video_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+{
+	/* graphics */
+	upd7220_update(m_hgdc, &bitmap, &cliprect);
+
+	return 0;
+}
+
+static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
+{
+	int i;
+
+	for (i = 0; i < 16; i++)
+	{
+		if (BIT(data, i)) *BITMAP_ADDR16(bitmap, y, x + i) = 1;
+	}
+}
+
+static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
+{
+
+}
+
+static UPD7220_INTERFACE( hgdc_intf )
+{
+	"screen",
+	hgdc_display_pixels,
+	hgdc_draw_text,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
+};
 
 static READ8_DEVICE_HANDLER( compis_ppi_r )
 {
@@ -62,14 +133,22 @@ static READ8_DEVICE_HANDLER( compis_ppi_r )
 	return i8255a_r(device, offset);
 }
 
+static WRITE8_HANDLER( vram_w )
+{
+	UINT8 *vram = space->machine->region("vram")->base();
+
+	vram[offset] = data;
+}
+
 static ADDRESS_MAP_START( compis_mem , ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0x00000, 0x3ffff) AM_RAM
 	AM_RANGE( 0x40000, 0x4ffff) AM_RAM
 	AM_RANGE( 0x50000, 0x5ffff) AM_RAM
 	AM_RANGE( 0x60000, 0x6ffff) AM_RAM
 	AM_RANGE( 0x70000, 0x7ffff) AM_RAM
-	AM_RANGE( 0x80000, 0xeffff) AM_NOP
-	AM_RANGE( 0xf0000, 0xfffff) AM_ROM
+//	AM_RANGE( 0x80000, 0xeffff) AM_NOP
+	AM_RANGE( 0xe8000, 0xeffff) AM_ROM AM_REGION("bios",0) AM_WRITE8(vram_w,0xffff)
+	AM_RANGE( 0xf0000, 0xfffff) AM_ROM AM_REGION("bios",0) AM_WRITE8(vram_w,0xffff)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( compis_io, ADDRESS_SPACE_IO, 16 )
@@ -79,7 +158,7 @@ static ADDRESS_MAP_START( compis_io, ADDRESS_SPACE_IO, 16 )
 	AM_RANGE( 0x0280, 0x0283) AM_DEVREADWRITE8("pic8259_master", pic8259_r, pic8259_w, 0xffff) /* 80150/80130 */
 //  AM_RANGE( 0x0288, 0x028e) AM_DEVREADWRITE("pit8254", compis_osp_pit_r, compis_osp_pit_w ) /* PIT 8254 (80150/80130)  */
 	AM_RANGE( 0x0310, 0x031f) AM_READWRITE( compis_usart_r, compis_usart_w )	/* USART 8251 Keyboard      */
-	AM_RANGE( 0x0330, 0x033f) AM_READWRITE( compis_gdc_16_r, compis_gdc_16_w )	/* GDC 82720 PCS6:6     */
+	AM_RANGE( 0x0330, 0x0333) AM_DEVREADWRITE8("upd7220", upd7220_r, upd7220_w,0x00ff)//AM_READWRITE( compis_gdc_16_r, compis_gdc_16_w )	/* GDC 82720 PCS6:6     */
 	AM_RANGE( 0x0340, 0x0343) AM_READWRITE( compis_fdc_r, compis_fdc_w )	/* iSBX0 (J8) FDC 8272      */
 	AM_RANGE( 0x0350, 0x0351) AM_READ( compis_fdc_dack_r)	/* iSBX0 (J8) DMA ACK       */
 	AM_RANGE( 0xff00, 0xffff) AM_READWRITE( compis_i186_internal_port_r, compis_i186_internal_port_w)/* CPU 80186         */
@@ -102,11 +181,12 @@ static ADDRESS_MAP_START( compis_io, ADDRESS_SPACE_IO, 16 )
 //{ 0xff20, 0xffff, compis_null_r },    /* CPU 80186            */
 ADDRESS_MAP_END
 
+/* TODO */
 static ADDRESS_MAP_START( keyboard_io, ADDRESS_SPACE_IO, 8 )
-//  AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1)
-//  AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2)
-//  AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1)
-//  AM_RANGE(MCS48_PORT_BUS, MCS48_PORT_BUS)
+  AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_NOP
+  AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_NOP
+  AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_NOP
+  AM_RANGE(MCS48_PORT_BUS, MCS48_PORT_BUS) AM_NOP
 ADDRESS_MAP_END
 
 /* COMPIS Keyboard */
@@ -268,6 +348,25 @@ static const floppy_config compis_floppy_config =
 	NULL
 };
 
+/* F4 Character Displayer */
+static const gfx_layout compis_charlayout =
+{
+	8, 16,					/* 8 x 16 characters */
+	RGN_FRAC(1,1),			/* 128 characters */
+	1,					/* 1 bits per pixel */
+	{ 0 },					/* no bitplanes */
+	/* x offsets */
+	{ 7, 6, 5, 4, 3, 2, 1, 0 },
+	/* y offsets */
+	{  0*8,  1*8,  2*8,  3*8,  4*8,  5*8,  6*8,  7*8, 8*8,  9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
+	8*16					/* every char takes 16 bytes */
+};
+
+static GFXDECODE_START( compis )
+	GFXDECODE_ENTRY( "bios", 0x0000, compis_charlayout, 1, 7 )
+GFXDECODE_END
+
+
 static MACHINE_CONFIG_START( compis, compis_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I80186, 8000000)	/* 8 MHz */
@@ -302,11 +401,11 @@ static MACHINE_CONFIG_START( compis, compis_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_PALETTE_LENGTH(COMPIS_PALETTE_SIZE)
+	MCFG_PALETTE_LENGTH(16)
 	MCFG_PALETTE_INIT(compis_gdc)
+	MCFG_GFXDECODE(compis)
 
-	MCFG_VIDEO_START(compis_gdc)
-	MCFG_VIDEO_UPDATE(compis_gdc)
+	MCFG_UPD7220_ADD("upd7220", XTAL_4MHz, hgdc_intf, upd7220_map) //unknown clock
 
 	/* printer */
 	MCFG_CENTRONICS_ADD("centronics", standard_centronics)
@@ -329,28 +428,33 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 ROM_START( compis )
-	ROM_REGION16_LE( 0x100000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "sa883003.u40", 0xf0000, 0x4000, CRC(195ef6bf) SHA1(eaf8ae897e1a4b62d3038ff23777ce8741b766ef) )
-	ROM_LOAD16_BYTE( "sa883003.u36", 0xf0001, 0x4000, CRC(7c918f56) SHA1(8ba33d206351c52f44f1aa76cc4d7f292dcef761) )
-	ROM_LOAD16_BYTE( "sa883003.u39", 0xf8000, 0x4000, CRC(3cca66db) SHA1(cac36c9caa2f5bb42d7a6d5b84f419318628935f) )
-	ROM_LOAD16_BYTE( "sa883003.u35", 0xf8001, 0x4000, CRC(43c38e76) SHA1(f32e43604107def2c2259898926d090f2ed62104) )
+	ROM_REGION16_LE( 0x10000, "bios", 0 )
+	ROM_LOAD16_BYTE( "sa883003.u40", 0x0000, 0x4000, CRC(195ef6bf) SHA1(eaf8ae897e1a4b62d3038ff23777ce8741b766ef) )
+	ROM_LOAD16_BYTE( "sa883003.u36", 0x0001, 0x4000, CRC(7c918f56) SHA1(8ba33d206351c52f44f1aa76cc4d7f292dcef761) )
+	ROM_LOAD16_BYTE( "sa883003.u39", 0x8000, 0x4000, CRC(3cca66db) SHA1(cac36c9caa2f5bb42d7a6d5b84f419318628935f) )
+	ROM_LOAD16_BYTE( "sa883003.u35", 0x8001, 0x4000, CRC(43c38e76) SHA1(f32e43604107def2c2259898926d090f2ed62104) )
 
 	ROM_REGION( 0x800, "i8749", 0 )
 	ROM_LOAD( "cmpkey13.u1", 0x0000, 0x0800, CRC(3f87d138) SHA1(c04e2d325b9c04818bc7c47c3bf32b13862b11ec) )
+
+	ROM_REGION( 0x10000, "vram", ROMREGION_ERASE00 )
+
 ROM_END
 
 ROM_START( compis2 )
-	ROM_REGION16_LE( 0x100000, "maincpu", 0 )
+	ROM_REGION16_LE( 0x10000, "bios", 0 )
 	ROM_DEFAULT_BIOS( "v303" )
 	ROM_SYSTEM_BIOS( 0, "v302", "Compis II v3.02 (1986-09-09)" )
-	ROMX_LOAD( "comp302.u39", 0xf0000, 0x8000, CRC(16a7651e) SHA1(4cbd4ba6c6c915c04dfc913ec49f87c1dd7344e3), ROM_BIOS(1) | ROM_SKIP(1) )
-	ROMX_LOAD( "comp302.u35", 0xf0001, 0x8000, CRC(ae546bef) SHA1(572e45030de552bb1949a7facbc885b8bf033fc6), ROM_BIOS(1) | ROM_SKIP(1) )
+	ROMX_LOAD( "comp302.u39", 0x0000, 0x8000, CRC(16a7651e) SHA1(4cbd4ba6c6c915c04dfc913ec49f87c1dd7344e3), ROM_BIOS(1) | ROM_SKIP(1) )
+	ROMX_LOAD( "comp302.u35", 0x0001, 0x8000, CRC(ae546bef) SHA1(572e45030de552bb1949a7facbc885b8bf033fc6), ROM_BIOS(1) | ROM_SKIP(1) )
 	ROM_SYSTEM_BIOS( 1, "v303", "Compis II v3.03 (1987-03-09)" )
-	ROMX_LOAD( "rysa094.u39", 0xf0000, 0x8000, CRC(e7302bff) SHA1(44ea20ef4008849af036c1a945bc4f27431048fb), ROM_BIOS(2) | ROM_SKIP(1) )
-	ROMX_LOAD( "rysa094.u35", 0xf0001, 0x8000, CRC(b0694026) SHA1(eb6b2e3cb0f42fd5ffdf44f70e652ecb9714ce30), ROM_BIOS(2) | ROM_SKIP(1) )
+	ROMX_LOAD( "rysa094.u39", 0x0000, 0x8000, CRC(e7302bff) SHA1(44ea20ef4008849af036c1a945bc4f27431048fb), ROM_BIOS(2) | ROM_SKIP(1) )
+	ROMX_LOAD( "rysa094.u35", 0x0001, 0x8000, CRC(b0694026) SHA1(eb6b2e3cb0f42fd5ffdf44f70e652ecb9714ce30), ROM_BIOS(2) | ROM_SKIP(1) )
 
 	ROM_REGION( 0x800, "i8749", 0 )
 	ROM_LOAD( "cmpkey13.u1", 0x0000, 0x0800, CRC(3f87d138) SHA1(c04e2d325b9c04818bc7c47c3bf32b13862b11ec) )
+
+	ROM_REGION( 0x10000, "vram", ROMREGION_ERASE00 )
 ROM_END
 
 /*   YEAR   NAME        PARENT  COMPAT MACHINE  INPUT   INIT    COMPANY     FULLNAME */

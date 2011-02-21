@@ -16,7 +16,6 @@
         - character
         - mixed
     - commands
-    	- WDAT, modifiers are untested
         - FIGS
         - FIGD
         - GCHRD
@@ -198,7 +197,7 @@ struct _upd7220_t
 	emu_timer *hsync_timer;			/* horizontal sync timer */
 	emu_timer *blank_timer;			/* CRT blanking timer */
 
-	UINT16 vram[0x40000/2];
+	UINT16 vram[0x40000];
 };
 
 static const int x_dir[8] = { 0, 1, 1, 1, 0,-1,-1,-1};
@@ -591,14 +590,11 @@ static void write_vram(upd7220_t *upd7220,UINT8 type, UINT8 mod)
 		return;
 	}
 
-	if(mod && mod != 3)
-		printf("uPD7220 check WDAT modifier %02x\n",mod);
-
 	for(i=0;i<upd7220->figs_dc + 1;i++)
 	{
 		switch(mod & 3)
 		{
-			case 0x00: //replace (trusted)
+			case 0x00: //replace
 				switch(type)
 				{
 					case 0: upd7220->vram[upd7220->ead] = ((upd7220->pr[1]) | (upd7220->pr[2] << 8)) & upd7220->mask; break;
@@ -622,7 +618,7 @@ static void write_vram(upd7220_t *upd7220,UINT8 type, UINT8 mod)
 					case 3: upd7220->vram[upd7220->ead] &= ~((upd7220->pr[1] & upd7220->mask) << 8); break;
 				}
 				break;
-			case 0x03: //set to one (trusted)
+			case 0x03: //set to one
 				switch(type)
 				{
 					case 0: upd7220->vram[upd7220->ead] |= (((upd7220->pr[1]) | (upd7220->pr[2] << 8)) & upd7220->mask); break;
@@ -634,6 +630,11 @@ static void write_vram(upd7220_t *upd7220,UINT8 type, UINT8 mod)
 
 		advance_ead(upd7220);
 	}
+}
+
+static void draw_char(upd7220_t *upd7220,int x,int y)
+{
+	// TODO
 }
 
 /*-------------------------------------------------
@@ -917,8 +918,8 @@ static void process_fifo(device_t *device)
 			upd7220->figs_dir = upd7220->pr[1] & 0x7;
 			upd7220->figs_figure_type = (upd7220->pr[1] & 0xf8) >> 3;
 
-			if(upd7220->figs_dir != 2)
-				printf("DIR %02x\n",upd7220->pr[1]);
+			//if(upd7220->figs_dir != 2)
+			//	printf("DIR %02x\n",upd7220->pr[1]);
 		}
 
 		if (upd7220->param_ptr == 4)
@@ -943,7 +944,10 @@ static void process_fifo(device_t *device)
 		break;
 
 	case COMMAND_GCHRD: /* graphics character draw and area filling start */
-		printf("uPD7220 '%s' Unimplemented command GCHRD %02x\n", device->tag(),upd7220->figs_figure_type);
+		if(upd7220->figs_figure_type == 2)
+			draw_char(upd7220,((upd7220->ead % upd7220->pitch) << 4) | (upd7220->dad & 0xf),(upd7220->ead / upd7220->pitch));
+		else
+			printf("uPD7220 '%s' Unimplemented command GCHRD %02x\n", device->tag(),upd7220->figs_figure_type);
 		break;
 
 	case COMMAND_RDAT: /* read data from display memory */

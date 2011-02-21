@@ -123,7 +123,15 @@ class compis_state : public driver_device
 {
 public:
 	compis_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+		: driver_device(machine, config),
+		  m_hgdc(*this, "upd7220")
+ 		  { }
+
+	required_device<device_t> m_hgdc;
+
+	virtual void video_start();
+	virtual bool video_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
+	UINT8 *m_char_rom;
 
 	i186_state i186;
 	compis_devices_t devices;

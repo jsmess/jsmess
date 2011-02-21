@@ -1133,7 +1133,7 @@ WRITE16_HANDLER( compis_i186_internal_port_w )
 			break;
 
 		case 0x19:
-			if (LOG_PORTS) logerror("%05X:80186 timer interrupt contol = %04X\n", cpu_get_pc(space->cpu), data16);
+			if (LOG_PORTS) logerror("%05X:80186 timer interrupt control = %04X\n", cpu_get_pc(space->cpu), data16);
 			state->i186.intr.timer = data16 & 0x000f;
 			break;
 
@@ -1205,7 +1205,7 @@ WRITE16_HANDLER( compis_i186_internal_port_w )
 
 		case 0x51:
 			if (LOG_PORTS) logerror("%05X:80186 lower chip select = %04X\n", cpu_get_pc(space->cpu), data16);
-			state->i186.mem.lower = (data16 & 0x3fff) | 0x0038; printf("%X",state->i186.mem.lower);
+			state->i186.mem.lower = (data16 & 0x3fff) | 0x0038; //printf("%X\n",state->i186.mem.lower);
 			break;
 
 		case 0x52:
@@ -1374,17 +1374,20 @@ static IRQ_CALLBACK( compis_irq_callback )
 	return pic8259_acknowledge(state->devices.pic8259_master);
 }
 
+#if 0
 static const compis_gdc_interface i82720_interface =
 {
 	GDC_MODE_HRG,
 	0x8000
 };
+#endif
 
 
 DRIVER_INIT( compis )
 {
 	compis_state *state = machine->driver_data<compis_state>();
-	compis_init( &i82720_interface );
+//	compis_init( &i82720_interface );
+
 	cpu_set_irq_callback(machine->device("maincpu"), compis_irq_callback);
 	memset (&state->compis, 0, sizeof (state->compis) );
 }
