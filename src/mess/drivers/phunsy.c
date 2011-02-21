@@ -36,6 +36,7 @@ public:
 	DECLARE_WRITE8_MEMBER( phunsy_data_w );
 	DECLARE_WRITE8_MEMBER( phunsy_kbd_put );
 	UINT8		*videoram;
+	UINT8		*FNT;
 	UINT8		data_out;
 	UINT8		keyboard_input;
 	UINT8		q_bank;
@@ -206,72 +207,54 @@ static PALETTE_INIT( phunsy )
 
 static VIDEO_START( phunsy )
 {
+	phunsy_state *state = machine->driver_data<phunsy_state>();
+	state->FNT = machine->region( "chargen" )->base();
 }
 
 
 static VIDEO_UPDATE( phunsy )
 {
 	phunsy_state *state = screen->machine->driver_data<phunsy_state>();
-	UINT8	*gfx = screen->machine->region( "chargen" )->base();
-	UINT8	*v = state->videoram;
+	UINT8 y,ra,chr,gfx,col;
+	UINT16 sy=0,ma=0,x;
 
-	for ( int h = 0; h < 32; h++ )
+	for (y = 0; y < 32; y++)
 	{
-		for ( int w = 0; w < 64; w++ )
+		for (ra = 0; ra < 8; ra++)
 		{
-			UINT8 c = *v;
+			UINT16 *p = BITMAP_ADDR16(bitmap, sy++, 0);
 
-			if ( c & 0x80 )
+			for (x = ma; x < ma+64; x++)
 			{
-				UINT8 grey = ( c >> 4 ) & 0x07;
-				/* Graphics mode */
-				for ( int i = 0; i < 4; i++ )
-				{
-					UINT16 *p = BITMAP_ADDR16( bitmap, h * 8 + i, w * 6 );
+				chr = state->videoram[x];
 
-					p[0] = ( c & 0x01 ) ? grey : 0;
-					p[1] = ( c & 0x01 ) ? grey : 0;
-					p[2] = ( c & 0x01 ) ? grey : 0;
-					p[3] = ( c & 0x02 ) ? grey : 0;
-					p[4] = ( c & 0x02 ) ? grey : 0;
-					p[5] = ( c & 0x02 ) ? grey : 0;
-				}
-				for ( int i = 0; i < 4; i++ )
+				if (BIT(chr, 7))
 				{
-					UINT16 *p = BITMAP_ADDR16( bitmap, h * 8 + 4 + i, w * 6 );
-
-					p[0] = ( c & 0x04 ) ? grey : 0;
-					p[1] = ( c & 0x04 ) ? grey : 0;
-					p[2] = ( c & 0x04 ) ? grey : 0;
-					p[3] = ( c & 0x08 ) ? grey : 0;
-					p[4] = ( c & 0x08 ) ? grey : 0;
-					p[5] = ( c & 0x08 ) ? grey : 0;
+					/* Graphics mode */
+					gfx = 0;
+					col = ( chr >> 4 ) & 7;
+					if ( (BIT(chr, 0) && (!BIT(ra, 2))) || (BIT(chr, 2) && (BIT(ra, 2))) )
+						gfx = 0x38;
+					if ( (BIT(chr, 1) && (!BIT(ra, 2))) || (BIT(chr, 3) && (BIT(ra, 2))) )
+						gfx |= 7;
 				}
+				else
+				{
+					/* ASCII mode */
+					gfx = state->FNT[(chr<<3) | ra];
+					col = 7;
+				}
+
+				/* Display a scanline of a character (6 pixels) */
+				*p++ = ( gfx & 0x20 ) ? col : 0;
+				*p++ = ( gfx & 0x10 ) ? col : 0;
+				*p++ = ( gfx & 0x08 ) ? col : 0;
+				*p++ = ( gfx & 0x04 ) ? col : 0;
+				*p++ = ( gfx & 0x02 ) ? col : 0;
+				*p++ = ( gfx & 0x01 ) ? col : 0;
 			}
-			else
-			{
-				/* ASCII mode */
-				if ( ! ( c & 0x20 ) )
-				{
-					c ^= 0x40;
-				}
-
-				for ( int i = 0; i < 8; i++ )
-				{
-					UINT16 *p = BITMAP_ADDR16( bitmap, h * 8 + i, w * 6 );
-					UINT8 pat = gfx[ c * 8 + i];
-
-					p[0] = ( pat & 0x20 ) ? 7 : 0;
-					p[1] = ( pat & 0x10 ) ? 7 : 0;
-					p[2] = ( pat & 0x08 ) ? 7 : 0;
-					p[3] = ( pat & 0x04 ) ? 7 : 0;
-					p[4] = ( pat & 0x02 ) ? 7 : 0;
-					p[5] = ( pat & 0x01 ) ? 7 : 0;
-				}
-			}
-
-			v++;
 		}
+		ma+=64;
 	}
 	return 0;
 }
@@ -279,14 +262,14 @@ static VIDEO_UPDATE( phunsy )
 /* F4 Character Displayer */
 static const gfx_layout phunsy_charlayout =
 {
-	8, 8,					/* 8 x 8 characters */
+	5, 7,					/* 6 x 8 characters */
 	128,					/* 128 characters */
 	1,					/* 1 bits per pixel */
 	{ 0 },					/* no bitplanes */
 	/* x offsets */
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	{ 3, 4, 5, 6, 7 },
 	/* y offsets */
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	{ 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
 	8*8					/* every char takes 8 bytes */
 };
 
@@ -340,8 +323,10 @@ ROM_START( phunsy )
 	ROM_LOAD( "labhnd.bin",      0x1800, 0x0800, CRC(1d5a106b) SHA1(a20d09e32e21cf14db8254cbdd1d691556b473f0))
 
 	ROM_REGION( 0x0400, "chargen", ROMREGION_ERASEFF )
-	ROM_LOAD( "ph_char1.bin", 0x0000, 0x0200, CRC(a7e567fc) SHA1(b18aae0a2d4f92f5a7e22640719bbc4652f3f4ee))
-	ROM_LOAD( "ph_char2.bin", 0x0200, 0x0200, CRC(3d5786d3) SHA1(8cf87d83be0b5e4becfa9fd6e05b01250a2feb3b))
+	ROM_LOAD( "ph_char1.bin", 0x0200, 0x0100, CRC(a7e567fc) SHA1(b18aae0a2d4f92f5a7e22640719bbc4652f3f4ee))
+	ROM_CONTINUE(0x0100, 0x0100)
+	ROM_LOAD( "ph_char2.bin", 0x0000, 0x0100, CRC(3d5786d3) SHA1(8cf87d83be0b5e4becfa9fd6e05b01250a2feb3b))
+	ROM_CONTINUE(0x0300, 0x0100)
 
 	/* 16 x 16KB RAM banks */
 	ROM_REGION( 0x40000, "ram_4000", ROMREGION_ERASEFF )
