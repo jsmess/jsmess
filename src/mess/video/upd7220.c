@@ -1173,17 +1173,17 @@ static void update_graphics(device_t *device, bitmap_t *bitmap, const rectangle 
 	{
 		get_graphics_partition(upd7220, area, &sad, &len, &im, &wd);
 
-		for (y = sy; y < sy + len; y++)
+		for (y = 0; y < len; y++)
 		{
 			addr = sad + (y * upd7220->pitch);
 
 			if (im)
-				draw_graphics_line(device, bitmap, addr, y, wd);
+				draw_graphics_line(device, bitmap, addr, y + sy, wd);
 			else
-				if (upd7220->draw_text_func) upd7220->draw_text_func(device, bitmap, upd7220->vram, addr, y, wd, upd7220->pitch,0,0,upd7220->aw * 8 - 1,upd7220->al - 1,upd7220->lr);
+				if (upd7220->draw_text_func) upd7220->draw_text_func(device, bitmap, upd7220->vram, addr, y + sy, wd, upd7220->pitch,0,0,upd7220->aw * 8 - 1,upd7220->al - 1,upd7220->lr);
 		}
 
-		sy = y + 1;
+		sy += (y / upd7220->lr);
 	}
 }
 
