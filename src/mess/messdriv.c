@@ -1393,6 +1393,7 @@ const game_driver * const drivers[] =
 	DRIVER( mikrosha )
 	DRIVER( partner )
 	DRIVER( impuls03 )
+	DRIVER( m86rk )
 
 	/* Homelab */
 	DRIVER ( homelab2 )

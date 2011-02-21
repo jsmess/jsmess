@@ -242,7 +242,15 @@ ROM_START( mikrosha )
 	ROM_LOAD ("mikrosha.fnt", 0x0000, 0x0800, CRC(B315DA1C) SHA1(b5bf9abc0fff75b1aba709a7f08b23d4a89bb04b))
 ROM_END
 
+ROM_START( m86rk )
+    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "m86rk.bin", 0xf800, 0x0800, CRC(a898d77a) SHA1(c2497bf8434b5028fe0a9fc09be311465d5553a5))
+	ROM_REGION(0x0800, "gfx1",0)
+	/* here should probably be different rom */
+	ROM_LOAD ("mikrosha.fnt", 0x0000, 0x0800, CRC(B315DA1C) SHA1(b5bf9abc0fff75b1aba709a7f08b23d4a89bb04b))
+ROM_END
 
 /* Driver */
 /*    YEAR  NAME      PARENT  COMPAT    MACHINE     INPUT       INIT        COMPANY     FULLNAME        FLAGS */
 COMP( 1987, mikrosha, radio86,0,		mikrosha,	mikrosha,	radio86,	"Lianozovo Electromechanical Factory",		"Mikrosha",		0)
+COMP( 1987, m86rk, 	  radio86,0,		mikrosha,	mikrosha,	radio86,	"<unknown>",		"Mikrosha-86RK",		0)
