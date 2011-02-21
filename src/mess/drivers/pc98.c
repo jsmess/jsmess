@@ -231,6 +231,7 @@
 #include "machine/pit8253.h"
 #include "machine/8237dma.h"
 #include "machine/pic8259.h"
+#include "machine/upd765.h"
 
 
 class pc98_state : public driver_device
@@ -239,7 +240,7 @@ public:
 	pc98_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT32 *pc9801_vram;
+	UINT16 tvram[0x4000/2];
 	UINT32 *gfx_bitmap_ram;
 	UINT32 *work_ram_banked;
 	UINT8 ems_bank;
@@ -254,6 +255,8 @@ public:
 	UINT8 soft_reset;
 	UINT8 vrtc_irq_mask;
 	UINT8 keyb_press;
+	UINT8 fdc_2dd_ctrl;
+	UINT8 video_ff[8];
 };
 
 
@@ -285,7 +288,7 @@ static VIDEO_UPDATE( pc9801 )
 
 	for (y=0;y<25;y++)
 	{
-		for (x=0;x<40;x++)
+		for (x=0;x<80;x++)
 		{
 			for(yi=0;yi<16;yi++)
 			{
@@ -294,23 +297,10 @@ static VIDEO_UPDATE( pc9801 )
 					int tile,attr,pen,color;
 					UINT8 tile_data;
 
-					tile = (state->pc9801_vram[(x+y*40)] & 0x00ff0000) >> 16;
-					attr = (state->pc9801_vram[((x+y*40)+0x2000/4)] & 0x00ff0000) >> 16;
+					tile = (state->tvram[(x+y*80)] & 0x00ff) >> 0;
+					attr = (state->tvram[((x+y*80)+0x2000/2)] & 0x00ff) >> 0;
 
-					color = (attr & 0xe0)>>5;
-
-					tile_data = gfx_data[tile*16+yi];
-
-					if(attr & 4)
-						tile_data^=0xff;
-
-					pen =  (tile_data >> (7-xi) & 1) ? color : 0;
-
-					if(((x*2+1)*8+xi)<screen->machine->primary_screen->visible_area().max_x && (y*8+yi)<screen->machine->primary_screen->visible_area().max_y)
-						*BITMAP_ADDR16(bitmap, y*16+yi, (x*2+1)*8+xi) = screen->machine->pens[pen];
-
-					tile = (state->pc9801_vram[(x+y*40)] & 0x000000ff) >> 0;
-					attr = (state->pc9801_vram[((x+y*40)+0x2000/4)] & 0x000000ff) >> 0;
+					color = (attr & 0xe0) >> 5;
 
 					tile_data = gfx_data[tile*16+yi];
 
@@ -319,8 +309,8 @@ static VIDEO_UPDATE( pc9801 )
 
 					pen =  (tile_data >> (7-xi) & 1) ? color : 0;
 
-					if(((x*2+0)*8+xi)<screen->machine->primary_screen->visible_area().max_x && (y*8+yi)<screen->machine->primary_screen->visible_area().max_y)
-						*BITMAP_ADDR16(bitmap, y*16+yi, (x*2+0)*8+xi) = screen->machine->pens[pen];
+					if(((x+0)*8+xi)<screen->machine->primary_screen->visible_area().max_x && (y*16+yi)<screen->machine->primary_screen->visible_area().max_y)
+						*BITMAP_ADDR16(bitmap, y*16+yi, (x+0)*8+xi) = screen->machine->pens[pen];
 				}
 			}
 		}
@@ -688,10 +678,107 @@ static WRITE8_HANDLER( pc9801_vrtc_mask_w )
 	}
 }
 
+static READ8_HANDLER( pc9801_fdc_2dd_r )
+{
+	if((offset & 1) == 0)
+	{
+		switch(offset & 6)
+		{
+			case 0:	return upd765_status_r(space->machine->device("upd765_2dd"),0);
+			case 2: return upd765_data_r(space->machine->device("upd765_2dd"),0);
+			case 4: return 0x40; //unknown port meaning, might be 0x70
+		}
+	}
+	else
+	{
+		printf("Read to undefined port [%02x]\n",offset+0xc8);
+		return 0xff;
+	}
+
+	return 0xff;
+}
+
+static WRITE8_HANDLER( pc9801_fdc_2dd_w )
+{
+	pc98_state *state = space->machine->driver_data<pc98_state>();
+
+	if((offset & 1) == 0)
+	{
+		switch(offset & 6)
+		{
+			case 0: printf("Write to undefined port [%02x] <- %02x\n",offset+0xc8,data); return;
+			case 2: upd765_data_w(space->machine->device("upd765_2dd"),0,data); return;
+			case 4:
+				printf("%02x ctrl\n",data);
+				if(((state->fdc_2dd_ctrl & 0x80) == 0) && (data & 0x80))
+					upd765_reset_w(space->machine->device("upd765_2dd"),1);
+				if((state->fdc_2dd_ctrl & 0x80) && (!(data & 0x80)))
+					upd765_reset_w(space->machine->device("upd765_2dd"),0);
+
+				state->fdc_2dd_ctrl = data;
+				//floppy_mon_w(floppy_get_device(space->machine, 0), (data & 8) ? CLEAR_LINE : ASSERT_LINE);
+				//floppy_mon_w(floppy_get_device(space->machine, 1), (data & 8) ? CLEAR_LINE : ASSERT_LINE);
+				//floppy_drive_set_ready_state(floppy_get_device(space->machine, 0), (data & 8), 0);
+				//floppy_drive_set_ready_state(floppy_get_device(space->machine, 1), (data & 8), 0);
+				break;
+		}
+	}
+	else
+	{
+		printf("Write to undefined port [%02x] <- %02x\n",offset+0xc8,data);
+	}
+}
+
+static READ16_HANDLER( pc9801_tvram_r )
+{
+	pc98_state *state = space->machine->driver_data<pc98_state>();
+
+	return state->tvram[offset] | ((offset & 0x1000) ? 0xff00 : 0x0000);
+}
+
+static WRITE16_HANDLER( pc9801_tvram_w )
+{
+	pc98_state *state = space->machine->driver_data<pc98_state>();
+
+	if(offset < (0x3fe2/2) || state->video_ff[6])
+		COMBINE_DATA(&state->tvram[offset]);
+}
+
+static WRITE8_HANDLER( pc9801_video_ff_w )
+{
+	pc98_state *state = space->machine->driver_data<pc98_state>();
+
+	if((offset & 1) == 0)
+	{
+		state->video_ff[(data & 0x0e) >> 1] = data & 1;
+
+		if(0)
+		{
+			static const char *const video_ff_regnames[] =
+			{
+				"Attribute Select",	// 0
+				"Graphic",			// 1
+				"Column",			// 2
+				"Font Select",		// 3
+				"200 lines",		// 4
+				"KAC?",				// 5
+				"Memory Switch",	// 6
+				"Display ON"		// 7
+			};
+
+			printf("Write to video FF register %s -> %02x\n",video_ff_regnames[(data & 0x0e) >> 1],data & 1);
+		}
+	}
+	else // odd
+	{
+		printf("Write to undefined port [%02x] <- %02x\n",offset+0x68,data);
+	}
+}
+
 static ADDRESS_MAP_START( pc9801_mem, ADDRESS_SPACE_PROGRAM, 32)
 	AM_RANGE(0x00000000, 0x0007ffff) AM_RAM
 	AM_RANGE(0x00080000, 0x0009ffff) AM_READWRITE(wram_bank_r,wram_bank_w)
-	AM_RANGE(0x000a0000, 0x000a3fff) AM_RAM AM_BASE_MEMBER(pc98_state, pc9801_vram) //vram + attr
+	AM_RANGE(0x000a0000, 0x000a3fff) AM_READWRITE16(pc9801_tvram_r,pc9801_tvram_w,0xffffffff) //vram + attr
 	AM_RANGE(0x000a4000, 0x000a4fff) AM_RAM //cg window
 	AM_RANGE(0x000a5000, 0x000a7fff) AM_RAM //??? (presumably another work ram bank)
 	AM_RANGE(0x000a8000, 0x000bffff) AM_READWRITE(gfx_bitmap_ram_r,gfx_bitmap_ram_w)
@@ -711,7 +798,7 @@ static ADDRESS_MAP_START( pc9801_io, ADDRESS_SPACE_IO, 32)
 	AM_RANGE(0x0040, 0x0047) AM_READWRITE8(sio_port_r,sio_port_w,0xffffffff) // printer ppi8255 (even ports) / keyboard (odd ports)
 	AM_RANGE(0x0060, 0x0063) AM_READWRITE8(port_60_r,port_60_w,0xffffffff) // uPD7220 status & fifo (R) / param & cmd (W) master (even ports)
 	AM_RANGE(0x0064, 0x0067) AM_WRITE8(pc9801_vrtc_mask_w,0xffffffff)
-//  AM_RANGE(0x0068, 0x0068) Flip-Flop 1 r/w
+	AM_RANGE(0x0068, 0x006f) AM_WRITE8(pc9801_video_ff_w,0xffffffff) //mode FF / <undefined>
 //  AM_RANGE(0x006a, 0x006a) Flip-Flop 2 r/w
 //  AM_RANGE(0x006e, 0x006e) Flip-Flop 3 r/w
 //  AM_RANGE(0x0070, 0x0070) crtc registers
@@ -724,6 +811,8 @@ static ADDRESS_MAP_START( pc9801_io, ADDRESS_SPACE_IO, 32)
 //  AM_RANGE(0x007e, 0x007e) GRCG tile write
 	AM_RANGE(0x0070, 0x007f) AM_READWRITE8(port_70_r,port_70_w,0xffffffff) // crtc regs (even ports) / pit8253 (odd ports)
 	AM_RANGE(0x00a0, 0x00a3) AM_READWRITE8(port_a0_r,port_a0_w,0xffffffff) // uPD7220 status & fifo (R) / param & cmd (W) slave (even ports)
+	AM_RANGE(0x0090, 0x0097) AM_READWRITE8(pc9801_fdc_2dd_r,pc9801_fdc_2dd_w,0xffffffff) //upd765a 2dd / <undefined>
+	AM_RANGE(0x00c8, 0x00cf) AM_READWRITE8(pc9801_fdc_2dd_r,pc9801_fdc_2dd_w,0xffffffff) //upd765a 2dd / <undefined>
 //  AM_RANGE(0x00e0, 0x00ef) DMA
 	AM_RANGE(0x00f0, 0x00ff) AM_READWRITE8(port_f0_r,port_f0_w,0xffffffff)
 	AM_RANGE(0x043c, 0x043f) AM_WRITE8(ems_sel_w,0xffffffff)
@@ -979,8 +1068,26 @@ static MACHINE_RESET(pc9801)
 	cpu_set_reg(machine->device("maincpu"), I386_PC, 0xfff0);
 	cpu_set_reg(machine->device("maincpu"), I386_EIP, 0xffff0+0x10000);
 
+	/* 2dd interface ready line is ON by default */
+	floppy_mon_w(floppy_get_device(machine, 0), CLEAR_LINE);
+	floppy_mon_w(floppy_get_device(machine, 1), CLEAR_LINE);
+	floppy_drive_set_ready_state(floppy_get_device(machine, 0), (1), 0);
+	floppy_drive_set_ready_state(floppy_get_device(machine, 1), (1), 0);
+
 	state->wram_bank = 0;
 	state->rom_bank = 1;
+
+	/* this looks like to be some kind of backup ram, system will boot with green colors otherwise */
+	{
+		int i;
+		//static const UINT16 default_memsw_data[8] =
+		//{
+		//	0xe148, 0xe105, 0xe104, 0xe100, 0xe101, 0xe100, 0xe100, 0xe100
+		//};
+
+		for(i=0;i<8;i++)
+			state->tvram[(0x3fe0/2)+i] = 0x00ff;//((default_memsw_data[i] & 0xff00) << 8) | (default_memsw_data[i] & 0xff);
+	}
 }
 
 /*************************************************************
@@ -1248,6 +1355,45 @@ static INTERRUPT_GEN(pc9801_vrtc_irq)
 	}
 }
 
+static WRITE_LINE_DEVICE_HANDLER( fdc_2dd_irq )
+{
+	pc98_state *drvstate = device->machine->driver_data<pc98_state>();
+
+	printf("IRQ %d\n",state);
+
+	if(drvstate->fdc_2dd_ctrl & 8)
+	{
+		pic8259_ir2_w(device->machine->device("pic8259_slave"), state);
+	}
+}
+
+static WRITE_LINE_DEVICE_HANDLER( fdc_2dd_drq )
+{
+	printf("%02x DRQ\n",state);
+}
+
+static const struct upd765_interface upd765_2dd_intf =
+{
+	DEVCB_LINE(fdc_2dd_irq),
+	DEVCB_LINE(fdc_2dd_drq), //DRQ, TODO
+	NULL,
+	UPD765_RDY_PIN_CONNECTED,
+	{FLOPPY_0, FLOPPY_1, NULL, NULL}
+};
+
+static const floppy_config pc9801_floppy_config =
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	FLOPPY_STANDARD_5_25_DSHD,
+	FLOPPY_OPTIONS_NAME(default),
+	NULL
+};
+
+
 static MACHINE_CONFIG_START( pc9801, pc98_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I386, 16000000) /* almost certainly i386, unknown clock */
@@ -1264,6 +1410,9 @@ static MACHINE_CONFIG_START( pc9801, pc98_state )
 	MCFG_I8237_ADD( "dma8237_1", XTAL_14_31818MHz/3, dma8237_1_config )
 	MCFG_PIC8259_ADD( "pic8259_master", pic8259_master_config )
 	MCFG_PIC8259_ADD( "pic8259_slave", pic8259_slave_config )
+
+	MCFG_UPD765A_ADD("upd765_2dd", upd765_2dd_intf)
+	MCFG_FLOPPY_4_DRIVES_ADD(pc9801_floppy_config)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
