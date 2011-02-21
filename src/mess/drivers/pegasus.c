@@ -23,6 +23,13 @@
     Basic cassettes are loaded in the usual way, that is, start Basic,
     type LOAD, press Enter. When done, RUN or LIST as needed.
 
+    The Aamber Pegasus uses a MCM66710P, which is functionally
+    equivalent to the MCM6571.
+
+    Note that datasheet is incorrect for the number "9".
+    The first byte is really 0x3E rather than 0x3F, confirmed on real
+    hardware.
+
     TO DO:
     - Identify which rom slots the multi-rom programs should be fitted to.
     - Work on the other non-working programs
@@ -31,7 +38,43 @@
 #define ADDRESS_MAP_MODERN
 
 #include "emu.h"
-#include "includes/pegasus.h"
+#include "cpu/m6809/m6809.h"
+#include "machine/6821pia.h"
+#include "imagedev/cartslot.h"
+#include "imagedev/cassette.h"
+
+class pegasus_state : public driver_device
+{
+public:
+	pegasus_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config),
+	m_maincpu(*this, "maincpu"),
+	m_cass(*this, "cassette"),
+	m_pia_s(*this, "pia_s"),
+	m_pia_u(*this, "pia_u")
+	{ }
+
+	required_device<cpu_device> m_maincpu;
+	required_device<device_t> m_cass;
+	required_device<device_t> m_pia_s;
+	required_device<device_t> m_pia_u;
+	DECLARE_READ8_MEMBER( pegasus_keyboard_r );
+	DECLARE_READ8_MEMBER( pegasus_protection_r );
+	DECLARE_READ8_MEMBER( pegasus_pcg_r );
+	DECLARE_WRITE8_MEMBER( pegasus_controls_w );
+	DECLARE_WRITE8_MEMBER( pegasus_keyboard_w );
+	DECLARE_WRITE8_MEMBER( pegasus_pcg_w );
+	DECLARE_READ_LINE_MEMBER( pegasus_keyboard_irq );
+	DECLARE_READ_LINE_MEMBER( pegasus_cassette_r );
+	DECLARE_WRITE_LINE_MEMBER( pegasus_cassette_w );
+	DECLARE_WRITE_LINE_MEMBER( pegasus_firq_clr );
+	UINT8 m_kbd_row;
+	UINT8 m_kbd_irq;
+	UINT8 *m_pcgram;
+	UINT8 *m_videoram;
+	UINT8 *FNT;
+	UINT8 m_control_bits;
+};
 
 static TIMER_DEVICE_CALLBACK( pegasus_firq )
 {
@@ -262,6 +305,107 @@ static const cassette_config pegasus_cassette_config =
 	NULL
 };
 
+
+static VIDEO_START( pegasus )
+{
+	pegasus_state *state = machine->driver_data<pegasus_state>();
+	state->FNT = machine->region("chargen")->base();
+}
+
+static const UINT8 mcm6571a_shift[] =
+{
+	0,1,1,0,0,0,1,0,0,0,0,1,0,0,0,0,
+	1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,
+	0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,
+	0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,
+	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+	0,0,0,0,0,0,0,1,0,0,1,0,0,0,0,0,
+	1,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0
+};
+
+
+static VIDEO_UPDATE( pegasus )
+{
+	pegasus_state *state = screen->machine->driver_data<pegasus_state>();
+	UINT8 y,ra,chr,gfx,inv;
+	UINT16 sy=0,ma=0,x;
+	UINT8 pcg_mode = state->m_control_bits & 2;
+
+	for(y = 0; y < 16; y++ )
+	{
+		for(ra = 0; ra < 16; ra++ )
+		{
+			UINT16 *p = BITMAP_ADDR16(bitmap, sy++, 0);
+
+			for(x = ma; x < ma + 32; x++ )
+			{
+				inv = 0xff;
+				gfx = 0;
+				chr = state->m_videoram[x];
+
+				if (BIT(chr, 7))
+				{
+					inv = 0;
+					chr &= 0x7f;
+				}
+
+				if (pcg_mode)
+				{
+					gfx = state->m_pcgram[(chr << 4) | ra] ^ inv;
+				}
+				else
+				if (mcm6571a_shift[chr])
+				{
+					if (ra < 3)
+						gfx = inv;
+					else
+						gfx = state->FNT[(chr<<4) | (ra-3) ] ^ inv;
+				}
+				else
+				{
+					if (ra < 10)
+						gfx = state->FNT[(chr<<4) | ra ] ^ inv;
+					else
+						gfx = inv;
+				}
+
+				/* Display a scanline of a character */
+				*p++ = BIT(gfx, 7) ? 1 : 0;
+				*p++ = BIT(gfx, 6) ? 1 : 0;
+				*p++ = BIT(gfx, 5) ? 1 : 0;
+				*p++ = BIT(gfx, 4) ? 1 : 0;
+				*p++ = BIT(gfx, 3) ? 1 : 0;
+				*p++ = BIT(gfx, 2) ? 1 : 0;
+				*p++ = BIT(gfx, 1) ? 1 : 0;
+				*p++ = BIT(gfx, 0) ? 1 : 0;
+			}
+		}
+		ma+=32;
+	}
+	return 0;
+}
+
+/* F4 Character Displayer */
+static const gfx_layout pegasus_charlayout =
+{
+	8, 16,					/* text = 7 x 9, pcg = 8 x 16 */
+	128,					/* 128 characters */
+	1,					/* 1 bits per pixel */
+	{ 0 },					/* no bitplanes */
+	/* x offsets */
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	/* y offsets */
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
+	8*16					/* every char takes 16 bytes */
+};
+
+static GFXDECODE_START( pegasus )
+	GFXDECODE_ENTRY( "chargen", 0x0000, pegasus_charlayout, 0, 1 )
+	GFXDECODE_ENTRY( "pcg", 0x0000, pegasus_charlayout, 0, 1 )
+GFXDECODE_END
+
+
 /* An encrypted single rom starts with 02, decrypted with 20. Not sure what
     multipart roms will have. */
 static void pegasus_decrypt_rom( running_machine *machine, UINT16 addr )
@@ -344,7 +488,7 @@ static DRIVER_INIT( pegasus )
 
 static MACHINE_CONFIG_START( pegasus, pegasus_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809E, XTAL_4MHz)	// actually a 6809C
+	MCFG_CPU_ADD("maincpu", M6809E, XTAL_4MHz)	// actually a 6809C - 4MHZ clock coming in, 1MHZ internally
 	MCFG_CPU_PROGRAM_MAP(pegasus_mem)
 
 	MCFG_TIMER_ADD_PERIODIC("pegasus_firq", pegasus_firq, attotime::from_hz(400))	// controls accuracy of the clock (ctrl-P)
@@ -357,8 +501,10 @@ static MACHINE_CONFIG_START( pegasus, pegasus_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*8, 16*16)
 	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 0, 16*16-1)
+	MCFG_GFXDECODE(pegasus)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
+	MCFG_VIDEO_START(pegasus)
 	MCFG_VIDEO_UPDATE(pegasus)
 
 	/* devices */
@@ -407,6 +553,9 @@ ROM_START( pegasus )
 	ROMX_LOAD( "mon23_2601.bin", 0xf000, 0x1000, CRC(0e024222) SHA1(9950cba08996931b9d5a3368b44c7309638b4e08), ROM_BIOS(7) )
 	ROM_SYSTEM_BIOS(7, "23ar2569", "Monitor 2.3A r2569")
 	ROMX_LOAD( "mon23a_2569.bin", 0xf000, 0x1000, CRC(248e62c9) SHA1(adbde27e69b38b29ff89bacf28d0240a8e5d90f3), ROM_BIOS(8) )
+
+	ROM_REGION( 0x800, "chargen", 0 )
+	ROM_LOAD( "6571.bin", 0x0000, 0x0800, CRC(5a25144b) SHA1(7b9fee0c8ef2605b85d12b6d9fe8feb82418c63a) )
 
 	ROM_REGION( 0x800, "pcg", ROMREGION_ERASEFF )
 ROM_END
