@@ -23,8 +23,9 @@ static ADDRESS_MAP_START(poly88_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xf800, 0xfbff) AM_RAM AM_BASE_MEMBER(poly88_state, video_ram) // Video RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( poly88_io , ADDRESS_SPACE_IO, 8)
+static ADDRESS_MAP_START( poly88_io, ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("uart", msm8251_data_r,msm8251_data_w)
 	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE("uart", msm8251_status_r,msm8251_control_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(poly88_baud_rate_w)
@@ -41,8 +42,9 @@ static ADDRESS_MAP_START(poly8813_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x2000, 0xffff) AM_RAM // RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( poly8813_io , ADDRESS_SPACE_IO, 8)
+static ADDRESS_MAP_START( poly8813_io, ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -143,38 +145,56 @@ static const cassette_config poly88_cassette_config =
 	NULL
 };
 
+/* F4 Character Displayer */
+static const gfx_layout poly88_charlayout =
+{
+	8, 16,					/* text = 7 x 9 */
+	128,					/* 128 characters */
+	1,					/* 1 bits per pixel */
+	{ 0 },					/* no bitplanes */
+	/* x offsets */
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	/* y offsets */
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
+	8*16					/* every char takes 16 bytes */
+};
+
+static GFXDECODE_START( poly88 )
+	GFXDECODE_ENTRY( "chargen", 0x0000, poly88_charlayout, 0, 1 )
+GFXDECODE_END
 
 static MACHINE_CONFIG_START( poly88, poly88_state )
-    /* basic machine hardware */
-    MCFG_CPU_ADD("maincpu",I8080, 1853000)
-    MCFG_CPU_PROGRAM_MAP(poly88_mem)
-    MCFG_CPU_IO_MAP(poly88_io)
-    MCFG_CPU_VBLANK_INT("screen", poly88_interrupt)
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu",I8080, 1853000)
+	MCFG_CPU_PROGRAM_MAP(poly88_mem)
+	MCFG_CPU_IO_MAP(poly88_io)
+	MCFG_CPU_VBLANK_INT("screen", poly88_interrupt)
 
-    MCFG_MACHINE_RESET(poly88)
+	MCFG_MACHINE_RESET(poly88)
 
-    /* video hardware */
-    MCFG_SCREEN_ADD("screen", RASTER)
-    MCFG_SCREEN_REFRESH_RATE(60)
-    MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-    MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-    MCFG_SCREEN_SIZE(64*10, 16*15)
-    MCFG_SCREEN_VISIBLE_AREA(0, 64*10-1, 0, 16*15-1)
-    MCFG_PALETTE_LENGTH(2)
-    MCFG_PALETTE_INIT(black_and_white)
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(64*10, 16*15)
+	MCFG_SCREEN_VISIBLE_AREA(0, 64*10-1, 0, 16*15-1)
+	MCFG_GFXDECODE(poly88)
+	MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_INIT(black_and_white)
 
-    MCFG_VIDEO_START(poly88)
-    MCFG_VIDEO_UPDATE(poly88)
+	MCFG_VIDEO_START(poly88)
+	MCFG_VIDEO_UPDATE(poly88)
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_WAVE_ADD("wave", "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-    /* cassette */
+	/* cassette */
 	MCFG_CASSETTE_ADD( "cassette", poly88_cassette_config )
 
-    /* uart */
+	/* uart */
 	MCFG_MSM8251_ADD("uart", poly88_usart_interface)
 
 	/* snapshot */
@@ -182,7 +202,6 @@ static MACHINE_CONFIG_START( poly88, poly88_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( poly8813, poly88 )
-
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(poly8813_mem)
 	MCFG_CPU_IO_MAP(poly8813_io)
@@ -194,6 +213,9 @@ ROM_START( poly88 )
 	ROM_LOAD( "polymon4.bin", 0x0000, 0x0400, CRC(0baa1a4c) SHA1(c6cf4b89bdde200813d34aab08150d5f3025ce33))
 	ROM_LOAD( "tbasic_1.rom", 0x0400, 0x0400, CRC(ec22740e) SHA1(bc606c58ef5f046200bdf402eda66ec070464306))
 	ROM_LOAD( "tbasic_2.rom", 0x0800, 0x0400, CRC(f2619232) SHA1(eb6fb0356d2fb153111cfddf39eab10253cb4c53))
+
+	ROM_REGION( 0x800, "chargen", 0 )
+	ROM_LOAD( "6571.bin", 0x0000, 0x0800, CRC(5a25144b) SHA1(7b9fee0c8ef2605b85d12b6d9fe8feb82418c63a) )
 ROM_END
 
 ROM_START( poly8813 )
@@ -201,6 +223,9 @@ ROM_START( poly8813 )
 	ROM_LOAD( "poly8813-1.bin", 0x0000, 0x0400, CRC(7fd980a0) SHA1(a71d5999deb4323a11db1c0ea0dcb1dacfaf47ef))
 	ROM_LOAD( "poly8813-2.rom", 0x0400, 0x0400, CRC(1ad7c06c) SHA1(c96b8f03c184de58dbdcee18d297dbccf2d77176))
 	ROM_LOAD( "poly8813-3.rom", 0x0800, 0x0400, CRC(3df57e5b) SHA1(5b0c4febfc7515fc07e63dcb21d0ab32bc6a2e46))
+
+	ROM_REGION( 0x800, "chargen", 0 )
+	ROM_LOAD( "6571.bin", 0x0000, 0x0800, CRC(5a25144b) SHA1(7b9fee0c8ef2605b85d12b6d9fe8feb82418c63a) )
 ROM_END
 /* Driver */
 

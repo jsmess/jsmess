@@ -18,6 +18,7 @@ public:
 		: driver_device(machine, config) { }
 
 	UINT8 *video_ram;
+	UINT8 *FNT;
 	UINT8 intr;
 	UINT8 last_code;
 	UINT8 int_vector;
