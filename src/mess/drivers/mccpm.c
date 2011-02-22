@@ -26,7 +26,7 @@ public:
 
 static WRITE8_HANDLER( mccpm_f0_w )
 {
-	device_t *terminal = space->machine->device("terminal");
+	device_t *terminal = space->machine->device(TERMINAL_TAG);
 
 	terminal_write(terminal, 0, data);
 }
@@ -85,7 +85,7 @@ static MACHINE_CONFIG_START( mccpm, mccpm_state )
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( generic_terminal )
 
-	MCFG_GENERIC_TERMINAL_ADD("terminal", mccpm_terminal_intf)
+	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, mccpm_terminal_intf)
 MACHINE_CONFIG_END
 
 /* ROM definition */

@@ -411,7 +411,7 @@ static MACHINE_CONFIG_START( h19, h19_state )
 
 	MCFG_MC6845_ADD("crtc", MC6845, XTAL_12_288MHz / 8, h19_crtc6845_interface) // clk taken from schematics
 	MCFG_INS8250_ADD( "ins8250", h19_ace_interface )
-	MCFG_GENERIC_TERMINAL_ADD("terminal", h19_terminal_intf) // keyboard only
+	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, h19_terminal_intf) // keyboard only
 
 	MCFG_VIDEO_START( h19 )
 	MCFG_VIDEO_UPDATE( h19 )

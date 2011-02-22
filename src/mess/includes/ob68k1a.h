@@ -12,7 +12,6 @@
 #define MC6850_0_TAG	"u34"
 #define MC6850_1_TAG	"u26"
 #define COM8116_TAG		"u56"
-#define TERMINAL_TAG	"terminal"
 
 class ob68k1a_state : public driver_device
 {

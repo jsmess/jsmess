@@ -31,7 +31,7 @@ public:
 
 static WRITE8_HANDLER( czk80_80_w )
 {
-	device_t *terminal = space->machine->device("terminal");
+	device_t *terminal = space->machine->device(TERMINAL_TAG);
 
 	terminal_write(terminal, 0, data);
 }
@@ -102,7 +102,7 @@ static MACHINE_CONFIG_START( czk80, czk80_state )
 
 	MCFG_FRAGMENT_ADD( generic_terminal )
 
-	MCFG_GENERIC_TERMINAL_ADD("terminal", czk80_terminal_intf)
+	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, czk80_terminal_intf)
 MACHINE_CONFIG_END
 
 

@@ -44,7 +44,7 @@ public:
 	zsbc3_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config),
 		  m_maincpu(*this, "maincpu"),
-		  m_terminal(*this, "terminal")
+		  m_terminal(*this, TERMINAL_TAG)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -119,7 +119,7 @@ static MACHINE_CONFIG_START( zsbc3, zsbc3_state )
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( generic_terminal )
 
-	MCFG_GENERIC_TERMINAL_ADD("terminal", zsbc3_terminal_intf)
+	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, zsbc3_terminal_intf)
 MACHINE_CONFIG_END
 
 /* ROM definition */

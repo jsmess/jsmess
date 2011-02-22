@@ -15,7 +15,6 @@
 #define WD1795_TAG		"wd1795"
 #define CASSETTE_TAG	"cassette"
 #define CENTRONICS_TAG	"centronics"
-#define TERMINAL_TAG	"terminal"
 
 class xor100_state : public driver_device
 {

@@ -10,7 +10,6 @@
 #define MC6820P_TAG		"fdi027_4b"
 #define MC6850P_TAG		"rsi068_6a"
 #define MC6821P_TAG		"sdm058_4b"
-#define TERMINAL_TAG	"terminal"
 
 class jupiter2_state : public driver_device
 {

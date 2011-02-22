@@ -6,7 +6,6 @@
 #define I8155_TAG		"u106"
 #define I8355_TAG		"u105"
 #define CASSETTE_TAG	"cassette"
-#define TERMINAL_TAG	"terminal"
 #define SPEAKER_TAG		"speaker"
 
 class exp85_state : public driver_device

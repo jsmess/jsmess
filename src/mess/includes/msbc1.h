@@ -7,7 +7,6 @@
 #define MK68564_0_TAG	"u14"
 #define MK68564_1_TAG	"u15"
 #define MC68230L10_TAG	"u16"
-#define TERMINAL_TAG	"terminal"
 
 class msbc1_state : public driver_device
 {

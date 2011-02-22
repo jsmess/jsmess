@@ -412,7 +412,7 @@ static void duarta_output(device_t *device, UINT8 data)
 
 static void duarta_tx(device_t *device, int channel, UINT8 data)
 {
-	device_t *devconf = device->machine->device("terminal");
+	device_t *devconf = device->machine->device(TERMINAL_TAG);
 	verboselog(device->machine, 0, "duarta_tx: %02x\n", data);
 	terminal_write(devconf,0,data);
 }

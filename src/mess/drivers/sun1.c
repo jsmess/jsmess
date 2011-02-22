@@ -36,7 +36,7 @@ static READ16_HANDLER(sun1_upd7201_r)
 
 static WRITE16_HANDLER(sun1_upd7201_w)
 {
-	device_t *devconf = space->machine->device("terminal");
+	device_t *devconf = space->machine->device(TERMINAL_TAG);
 	if (offset==0) terminal_write(devconf,0,data >> 8);
 }
 

@@ -46,7 +46,7 @@ static READ8_HANDLER(sio_data_r)
 
 static WRITE8_HANDLER(sio_data_w)
 {
-	device_t *devconf = space->machine->device("terminal");
+	device_t *devconf = space->machine->device(TERMINAL_TAG);
 	terminal_write(devconf,0,data);
 }
 

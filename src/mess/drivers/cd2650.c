@@ -168,7 +168,7 @@ static MACHINE_CONFIG_START( cd2650, cd2650_state )
 	MCFG_VIDEO_START(cd2650)
 	MCFG_VIDEO_UPDATE(cd2650)
 
-	MCFG_GENERIC_TERMINAL_ADD("terminal", cd2650_terminal_intf) // keyboard only
+	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, cd2650_terminal_intf) // keyboard only
 MACHINE_CONFIG_END
 
 /* ROM definition */

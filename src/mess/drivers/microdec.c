@@ -26,7 +26,7 @@ public:
 
 static WRITE8_HANDLER(microdec_terminal_w)
 {
-	device_t *devconf = space->machine->device("terminal");
+	device_t *devconf = space->machine->device(TERMINAL_TAG);
 	terminal_write(devconf,0,data);
 }
 

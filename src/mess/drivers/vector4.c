@@ -18,7 +18,7 @@ public:
 	vector4_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config),
 		  m_maincpu(*this, "maincpu"),
-		  m_terminal(*this, "terminal")
+		  m_terminal(*this, TERMINAL_TAG)
 	{ }
 
 	required_device<cpu_device> m_maincpu;

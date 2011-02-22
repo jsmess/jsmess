@@ -19,7 +19,6 @@
 #define ADDRESS_MAP_MODERN
 
 #include "emu.h"
-#include "includes/exp85.h"
 #include "cpu/i8085/i8085.h"
 #include "imagedev/cassette.h"
 #include "machine/i8155.h"
@@ -27,6 +26,7 @@
 #include "machine/terminal.h"
 #include "sound/speaker.h"
 #include "machine/ram.h"
+#include "includes/exp85.h"
 
 /* Memory Maps */
 

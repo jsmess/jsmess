@@ -154,7 +154,7 @@ static MACHINE_CONFIG_START( pcm, pcm_state )
 	MCFG_VIDEO_START(pcm)
 	MCFG_VIDEO_UPDATE(pcm)
 
-	MCFG_GENERIC_TERMINAL_ADD("terminal", pcm_terminal_intf)
+	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, pcm_terminal_intf)
 MACHINE_CONFIG_END
 
 /* ROM definition */

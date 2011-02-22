@@ -172,7 +172,7 @@ static MACHINE_CONFIG_START( k8915, k8915_state )
 	MCFG_VIDEO_START(k8915)
 	MCFG_VIDEO_UPDATE(k8915)
 
-	MCFG_GENERIC_TERMINAL_ADD("terminal", k8915_terminal_intf) // keyboard only
+	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, k8915_terminal_intf) // keyboard only
 MACHINE_CONFIG_END
 
 

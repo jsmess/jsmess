@@ -209,7 +209,7 @@ static void duart_output(device_t *device, UINT8 data)
 
 static void duart_tx(device_t *device, int channel, UINT8 data)
 {
-	device_t *devconf = device->machine->device("terminal");
+	device_t *devconf = device->machine->device(TERMINAL_TAG);
 	terminal_write(devconf,0,data);
 #ifdef SERIAL_TO_STDERR
 	fprintf(stderr, "%02X ",data);

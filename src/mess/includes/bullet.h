@@ -12,7 +12,6 @@
 #define Z80PIO_TAG		"z80pio"
 #define MB8877_TAG		"u55"
 #define CENTRONICS_TAG	"centronics"
-#define TERMINAL_TAG	"terminal"
 
 class bullet_state : public driver_device
 {

@@ -38,7 +38,7 @@ static READ8_HANDLER( ccs2422_11_r )
 
 static WRITE8_HANDLER(ccs2422_10_w)
 {
-	device_t *devconf = space->machine->device("terminal");
+	device_t *devconf = space->machine->device(TERMINAL_TAG);
 	terminal_write(devconf,0,data & 0x7f);
 }
 

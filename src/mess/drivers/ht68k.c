@@ -57,7 +57,7 @@ static void duart_irq_handler(device_t *device, UINT8 vector)
 
 static void duart_tx(device_t *device, int channel, UINT8 data)
 {
-	device_t *devconf = device->machine->device("terminal");
+	device_t *devconf = device->machine->device(TERMINAL_TAG);
 	terminal_write(devconf,0,data);
 }
 
