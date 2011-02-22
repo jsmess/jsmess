@@ -202,6 +202,8 @@ struct _upd7220_t
 
 static const int x_dir[8] = { 0, 1, 1, 1, 0,-1,-1,-1};
 static const int y_dir[8] = { 1, 1, 0,-1,-1,-1, 0, 1};
+static const int x_dir_dot[8] = { 1, 1, 0,-1,-1,-1, 0, 1};
+static const int y_dir_dot[8] = { 0,-1,-1,-1, 0, 1, 1, 1};
 
 /***************************************************************************
     INLINE FUNCTIONS
@@ -632,9 +634,48 @@ static void write_vram(upd7220_t *upd7220,UINT8 type, UINT8 mod)
 	}
 }
 
+/*-------------------------------------------------
+    draw_char - put per-pixel VRAM data (charset)
+-------------------------------------------------*/
+
 static void draw_char(upd7220_t *upd7220,int x,int y)
 {
-	// TODO
+	int xi,yi;
+	UINT8 tile_data;
+	UINT16 bitmask,upper_byte;
+
+	#if 0
+	/* snippet for character checking */
+	for(yi=0;yi<8;yi++)
+	{
+		for(xi=0;xi<8;xi++)
+		{
+			printf("%d",(upd7220->ra[(yi & 7) | 8] >> xi) & 1);
+		}
+		printf("\n");
+	}
+	#endif
+
+	/* TODO: internal direction, slanted character, zooming */
+	for(yi=0;yi<8;yi++)
+	{
+		tile_data = upd7220->ra[(yi & 7) | 8];
+
+		for(xi=0;xi<8;xi++)
+		{
+			UINT32 addr = ((y+yi) * upd7220->pitch) + ((x+xi) >> 4);
+
+			upper_byte = ((x+xi) & 8);
+
+			bitmask = (upper_byte) ? 0x8000 : 0x80;
+
+			upd7220->vram[addr] &= ~(bitmask >> xi);
+			upd7220->vram[addr] |= ((tile_data << upper_byte) & (bitmask >> xi));
+		}
+	}
+
+	upd7220->ead = ((x+8*x_dir_dot[upd7220->figs_dir]) >> 4) + ((y+8*y_dir_dot[upd7220->figs_dir]) * upd7220->pitch);
+	upd7220->dad = ((x+8*x_dir_dot[upd7220->figs_dir]) & 0xf);
 }
 
 /*-------------------------------------------------
@@ -1146,7 +1187,10 @@ static void draw_graphics_line(device_t *device, bitmap_t *bitmap, UINT32 addr, 
 	for (sx = 0; sx < upd7220->aw; sx++)
 	{
 		UINT16 data = space->direct().read_raw_word(addr & 0x3ffff);
-		upd7220->display_func(device, bitmap, y, sx << 4, addr, data);
+
+		if((sx << 4) <= upd7220->aw * 8 - 1 && y <= upd7220->al - 1)
+			upd7220->display_func(device, bitmap, y, sx << 4, addr, data, upd7220->vram);
+
 		if (wd) addr += 2; else addr++;
 	}
 }
@@ -1163,7 +1207,7 @@ INLINE void get_graphics_partition(upd7220_t *upd7220, int index, UINT32 *sad, U
     update_graphics - update graphics mode screen
 -------------------------------------------------*/
 
-static void update_graphics(device_t *device, bitmap_t *bitmap, const rectangle *cliprect)
+static void update_graphics(device_t *device, bitmap_t *bitmap, const rectangle *cliprect, int force_bitmap)
 {
 	upd7220_t *upd7220 = get_safe_token(device);
 
@@ -1180,7 +1224,7 @@ static void update_graphics(device_t *device, bitmap_t *bitmap, const rectangle 
 		{
 			addr = sad + (y * upd7220->pitch);
 
-			if (im)
+			if (im || force_bitmap)
 				draw_graphics_line(device, bitmap, addr, y + sy, wd);
 			else
 				if (upd7220->draw_text_func) upd7220->draw_text_func(device, bitmap, upd7220->vram, addr, y + sy, wd, upd7220->pitch,0,0,upd7220->aw * 8 - 1,upd7220->al - 1,upd7220->lr, upd7220->dc, upd7220->ead);
@@ -1203,8 +1247,11 @@ void upd7220_update(device_t *device, bitmap_t *bitmap, const rectangle *cliprec
 		switch (upd7220->mode & UPD7220_MODE_DISPLAY_MASK)
 		{
 		case UPD7220_MODE_DISPLAY_MIXED:
+			update_graphics(device, bitmap, cliprect,0);
+			break;
+
 		case UPD7220_MODE_DISPLAY_GRAPHICS:
-			update_graphics(device, bitmap, cliprect);
+			update_graphics(device, bitmap, cliprect,1);
 			break;
 
 		case UPD7220_MODE_DISPLAY_CHARACTER:

@@ -78,7 +78,7 @@ static PALETTE_INIT( compis_gdc )
 void compis_state::video_start()
 {
 	// find memory regions
-	m_char_rom = machine->region("pcg")->base();
+//	m_char_rom = machine->region("pcg")->base();
 
 	VIDEO_START_CALL(generic_bitmapped);
 }
@@ -93,11 +93,16 @@ bool compis_state::video_update(screen_device &screen, bitmap_t &bitmap, const r
 
 static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 {
-	int i;
+	int xi,gfx;
+	UINT8 pen;
 
-	for (i = 0; i < 16; i++)
+	gfx = vram[address];
+
+	for(xi=0;xi<16;xi++)
 	{
-		if (BIT(data, i)) *BITMAP_ADDR16(bitmap, y, x + i) = 1;
+		pen = ((gfx >> xi) & 1) ? 15 : 0;
+
+		*BITMAP_ADDR16(bitmap, y, x + xi) = pen;
 	}
 }
 
@@ -116,23 +121,7 @@ static UPD7220_INTERFACE( hgdc_intf )
 	DEVCB_NULL
 };
 
-static READ8_DEVICE_HANDLER( compis_ppi_r )
-{
-/* Port 3 is the control port and mame returns a hardcoded FF, but compis
-    does not like it. Code at that point:
-    F8DBD:  mov dx, 3
-        in al, dx
-        and al, 8
-        je F8DF1
-    The jump must be taken to succeed. It seems that the read should
-    return some kind of status rather than FF. Until this matter is
-    resolved, this will have to do. - R */
-
-	if (offset == 3) return 0;
-	else
-	return i8255a_r(device, offset);
-}
-
+/* TODO: why it writes to ROM region? */
 static WRITE8_HANDLER( vram_w )
 {
 	UINT8 *vram = space->machine->region("vram")->base();
@@ -146,21 +135,22 @@ static ADDRESS_MAP_START( compis_mem , ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0x50000, 0x5ffff) AM_RAM
 	AM_RANGE( 0x60000, 0x6ffff) AM_RAM
 	AM_RANGE( 0x70000, 0x7ffff) AM_RAM
+
 //	AM_RANGE( 0x80000, 0xeffff) AM_NOP
 	AM_RANGE( 0xe8000, 0xeffff) AM_ROM AM_REGION("bios",0) AM_WRITE8(vram_w,0xffff)
 	AM_RANGE( 0xf0000, 0xfffff) AM_ROM AM_REGION("bios",0) AM_WRITE8(vram_w,0xffff)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( compis_io, ADDRESS_SPACE_IO, 16 )
-	AM_RANGE( 0x0000, 0x0007) AM_DEVREADWRITE8("ppi8255", compis_ppi_r, i8255a_w, 0xffff)
+	AM_RANGE( 0x0000, 0x0007) AM_DEVREADWRITE8("ppi8255", i8255a_r, i8255a_w, 0xff00)
 	AM_RANGE( 0x0080, 0x0087) AM_DEVREADWRITE8("pit8253", pit8253_r, pit8253_w, 0xffff)
 	AM_RANGE( 0x0100, 0x011b) AM_DEVREADWRITE8("mm58274c", mm58274c_r, mm58274c_w, 0xffff)
 	AM_RANGE( 0x0280, 0x0283) AM_DEVREADWRITE8("pic8259_master", pic8259_r, pic8259_w, 0xffff) /* 80150/80130 */
 //  AM_RANGE( 0x0288, 0x028e) AM_DEVREADWRITE("pit8254", compis_osp_pit_r, compis_osp_pit_w ) /* PIT 8254 (80150/80130)  */
 	AM_RANGE( 0x0310, 0x031f) AM_READWRITE( compis_usart_r, compis_usart_w )	/* USART 8251 Keyboard      */
 	AM_RANGE( 0x0330, 0x0333) AM_DEVREADWRITE8("upd7220", upd7220_r, upd7220_w,0x00ff)//AM_READWRITE( compis_gdc_16_r, compis_gdc_16_w )	/* GDC 82720 PCS6:6     */
-	AM_RANGE( 0x0340, 0x0343) AM_READWRITE( compis_fdc_r, compis_fdc_w )	/* iSBX0 (J8) FDC 8272      */
-	AM_RANGE( 0x0350, 0x0351) AM_READ( compis_fdc_dack_r)	/* iSBX0 (J8) DMA ACK       */
+	AM_RANGE( 0x0340, 0x0343) AM_READWRITE8( compis_fdc_r, compis_fdc_w, 0xffff )	/* iSBX0 (J8) FDC 8272      */
+	AM_RANGE( 0x0350, 0x0351) AM_READ(compis_fdc_dack_r)	/* iSBX0 (J8) DMA ACK       */
 	AM_RANGE( 0xff00, 0xffff) AM_READWRITE( compis_i186_internal_port_r, compis_i186_internal_port_w)/* CPU 80186         */
 //{ 0x0100, 0x017e, compis_null_r },    /* RTC              */
 //{ 0x0180, 0x01ff, compis_null_r },    /* PCS3?            */

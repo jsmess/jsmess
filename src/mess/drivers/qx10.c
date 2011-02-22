@@ -831,11 +831,16 @@ bool qx10_state::video_update(screen_device &screen, bitmap_t &bitmap, const rec
 
 static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 {
-	int i;
+	int xi,gfx;
+	UINT8 pen;
 
-	for (i = 0; i < 16; i++)
+	gfx = vram[address];
+
+	for(xi=0;xi<16;xi++)
 	{
-		if (BIT(data, i)) *BITMAP_ADDR16(bitmap, y, x + i) = 1;
+		pen = ((gfx >> xi) & 1) ? 7 : 0;
+
+		*BITMAP_ADDR16(bitmap, y, x + xi) = pen;
 	}
 }
 

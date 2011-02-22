@@ -54,8 +54,8 @@ ADDRESS_MAP_EXTERN( upd7220_map,16 );
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef void (*upd7220_display_pixels_func)(device_t *device, bitmap_t *bitmap, int y, int x, UINT32 address, UINT16 data);
-#define UPD7220_DISPLAY_PIXELS(name) void name(device_t *device, bitmap_t *bitmap, int y, int x, UINT32 address, UINT16 data)
+typedef void (*upd7220_display_pixels_func)(device_t *device, bitmap_t *bitmap, int y, int x, UINT32 address, UINT16 data, UINT16 *vram);
+#define UPD7220_DISPLAY_PIXELS(name) void name(device_t *device, bitmap_t *bitmap, int y, int x, UINT32 address, UINT16 data, UINT16 *vram)
 
 typedef void (*upd7220_draw_text_line)(device_t *device, bitmap_t *bitmap, UINT16 *vram, UINT32 addr, int y, int wd, int pitch,int screen_min_x,int screen_min_y,int screen_max_x, int screen_max_y,int lr, int cursor_on, int cursor_addr);
 #define UPD7220_DRAW_TEXT_LINE(name) void name(device_t *device, bitmap_t *bitmap, UINT16 *vram, UINT32 addr, int y, int wd, int pitch,int screen_min_x,int screen_min_y,int screen_max_x, int screen_max_y,int lr, int cursor_on, int cursor_addr)

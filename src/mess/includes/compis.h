@@ -168,8 +168,8 @@ WRITE16_HANDLER (compis_i186_internal_port_w);
 
 /* FDC 8272 */
 READ16_HANDLER (compis_fdc_dack_r);
-READ16_HANDLER (compis_fdc_r);
-WRITE16_HANDLER (compis_fdc_w);
+READ8_HANDLER (compis_fdc_r);
+WRITE8_HANDLER (compis_fdc_w);
 
 
 #endif /* COMPIS_H_ */

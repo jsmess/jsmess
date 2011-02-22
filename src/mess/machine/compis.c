@@ -232,7 +232,7 @@ READ16_HANDLER (compis_fdc_dack_r)
 	return data;
 }
 
-WRITE16_HANDLER (compis_fdc_w)
+WRITE8_HANDLER (compis_fdc_w)
 {
 	device_t *fdc = space->machine->device("upd765");
 	switch(offset)
@@ -241,12 +241,12 @@ WRITE16_HANDLER (compis_fdc_w)
 			upd765_data_w(fdc, 0, data);
 			break;
 		default:
-			logerror("FDC Unknown Port Write %04X = %04X\n", offset, data);
+			printf("FDC Unknown Port Write %04X = %04X\n", offset, data);
 			break;
 	}
 }
 
-READ16_HANDLER (compis_fdc_r)
+READ8_HANDLER (compis_fdc_r)
 {
 	device_t *fdc = space->machine->device("upd765");
 	UINT16 data;
@@ -256,11 +256,11 @@ READ16_HANDLER (compis_fdc_r)
 		case 0:
 			data = upd765_status_r(fdc, 0);
 			break;
-		case 1:
+		case 2:
 			data = upd765_data_r(fdc, 0);
 			break;
 		default:
-			logerror("FDC Unknown Port Read %04X\n", offset);
+			printf("FDC Unknown Port Read %04X\n", offset);
 			break;
 	}
 

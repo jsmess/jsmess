@@ -36,6 +36,60 @@ public:
 	UINT8 memsel[4];
 };
 
+static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
+{
+	int xi,gfx;
+	UINT8 pen;
+
+	gfx = vram[address];
+
+	for(xi=0;xi<16;xi++)
+	{
+		pen = ((gfx >> xi) & 1) ? 7 : 0;
+
+		*BITMAP_ADDR16(bitmap, y, x + xi) = pen;
+	}
+}
+
+static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
+{
+	a5105_state *state = device->machine->driver_data<a5105_state>();
+	int x;
+	int xi,yi;
+	int tile,color;
+	UINT8 tile_data;
+
+	for( x = 0; x < pitch; x++ )
+	{
+		tile = (vram[addr+x] & 0xff);
+		color = ((vram[addr+x] & 0x0f00) >> 8);
+
+		for( yi = 0; yi < lr; yi++)
+		{
+			tile_data = state->m_char_rom[tile*8+yi];
+
+			if(cursor_on && cursor_addr == addr+x) //TODO
+				tile_data^=0xff;
+
+			for( xi = 0; xi < 8; xi++)
+			{
+				int res_x,res_y;
+				int pen = (tile_data >> xi) & 1 ? color : 0;
+
+				if(yi >= 8) { pen = 0; }
+
+				res_x = x * 8 + xi;
+				res_y = y * lr + yi;
+
+				if(res_x > screen_max_x || res_y > screen_max_y)
+					continue;
+
+				*BITMAP_ADDR16(bitmap, res_y, res_x) = pen;
+			}
+		}
+	}
+}
+
 static ADDRESS_MAP_START(a5105_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
@@ -322,56 +376,6 @@ bool a5105_state::video_update(screen_device &screen, bitmap_t &bitmap, const re
 	upd7220_update(m_hgdc, &bitmap, &cliprect);
 
 	return 0;
-}
-
-
-static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
-{
-	int i;
-
-	for (i = 0; i < 16; i++)
-	{
-		if (BIT(data, i)) *BITMAP_ADDR16(bitmap, y, x + i) = 1;
-	}
-}
-
-static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
-{
-	a5105_state *state = device->machine->driver_data<a5105_state>();
-	int x;
-	int xi,yi;
-	int tile,color;
-	UINT8 tile_data;
-
-	for( x = 0; x < pitch; x++ )
-	{
-		tile = (vram[addr+x] & 0xff);
-		color = ((vram[addr+x] & 0x0f00) >> 8);
-
-		for( yi = 0; yi < lr; yi++)
-		{
-			tile_data = state->m_char_rom[tile*8+yi];
-
-			if(cursor_on && cursor_addr == addr+x) //TODO
-				tile_data^=0xff;
-
-			for( xi = 0; xi < 8; xi++)
-			{
-				int res_x,res_y;
-				int pen = (tile_data >> xi) & 1 ? color : 0;
-
-				if(yi >= 8) { pen = 0; }
-
-				res_x = x * 8 + xi;
-				res_y = y * lr + yi;
-
-				if(res_x > screen_max_x || res_y > screen_max_y)
-					continue;
-
-				*BITMAP_ADDR16(bitmap, res_y, res_x) = pen;
-			}
-		}
-	}
 }
 
 static UPD7220_INTERFACE( hgdc_intf )
