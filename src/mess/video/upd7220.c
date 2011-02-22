@@ -281,6 +281,7 @@ INLINE void queue(upd7220_t *upd7220, UINT8 data, int flag)
 	else
 	{
 		// TODO what happen? somebody set us up the bomb
+		printf("FIFO?\n");
 	}
 }
 
@@ -588,10 +589,14 @@ static void write_vram(upd7220_t *upd7220,UINT8 type, UINT8 mod)
 	int i;
 	if(type == 1)
 	{
-		logerror("uPD7220 invalid type 1 WDAT parameter\n");
+		printf("uPD7220 invalid type 1 WDAT parameter\n");
 		return;
 	}
 
+	//printf("%04x %02x %02x %04x %02x %02x\n",upd7220->vram[upd7220->ead],upd7220->pr[1],upd7220->pr[2],upd7220->mask,type,mod);
+	//printf("%04x %02x %02x\n",upd7220->ead,upd7220->figs_dir,upd7220->pitch);
+
+	/* TODO: clean this up */
 	for(i=0;i<upd7220->figs_dc + 1;i++)
 	{
 		switch(mod & 3)
@@ -601,7 +606,7 @@ static void write_vram(upd7220_t *upd7220,UINT8 type, UINT8 mod)
 				{
 					case 0: upd7220->vram[upd7220->ead] = ((upd7220->pr[1]) | (upd7220->pr[2] << 8)) & upd7220->mask; break;
 					case 2:	upd7220->vram[upd7220->ead] = (((upd7220->pr[1] & upd7220->mask) & 0xff) | (upd7220->vram[upd7220->ead] & 0xff00)); break;
-					case 3: upd7220->vram[upd7220->ead] = (((upd7220->pr[1] & upd7220->mask) << 8) | (upd7220->vram[upd7220->ead] & 0x00ff)); break;
+					case 3: upd7220->vram[upd7220->ead] = ((upd7220->pr[1] << 8) & (upd7220->mask & 0xff00)) | (upd7220->vram[upd7220->ead] & 0x00ff); break;
 				}
 				break;
 			case 0x01: //complement
@@ -609,7 +614,7 @@ static void write_vram(upd7220_t *upd7220,UINT8 type, UINT8 mod)
 				{
 					case 0: upd7220->vram[upd7220->ead] ^= (((upd7220->pr[1]) | (upd7220->pr[2] << 8)) & upd7220->mask); break;
 					case 2:	upd7220->vram[upd7220->ead] ^= ((upd7220->pr[1] & upd7220->mask) & 0xff); break;
-					case 3: upd7220->vram[upd7220->ead] ^= ((upd7220->pr[1] & upd7220->mask) << 8); break;
+					case 3: upd7220->vram[upd7220->ead] ^= ((upd7220->pr[1] << 8) & (upd7220->mask & 0xff00)); break;
 				}
 				break;
 			case 0x02: //reset to zero
@@ -617,7 +622,7 @@ static void write_vram(upd7220_t *upd7220,UINT8 type, UINT8 mod)
 				{
 					case 0: upd7220->vram[upd7220->ead] &= ~(((upd7220->pr[1]) | (upd7220->pr[2] << 8)) & upd7220->mask); break;
 					case 2:	upd7220->vram[upd7220->ead] &= ~((upd7220->pr[1] & upd7220->mask) & 0xff); break;
-					case 3: upd7220->vram[upd7220->ead] &= ~((upd7220->pr[1] & upd7220->mask) << 8); break;
+					case 3: upd7220->vram[upd7220->ead] &= ~((upd7220->pr[1] << 8) & (upd7220->mask & 0xff00)); break;
 				}
 				break;
 			case 0x03: //set to one
@@ -625,7 +630,7 @@ static void write_vram(upd7220_t *upd7220,UINT8 type, UINT8 mod)
 				{
 					case 0: upd7220->vram[upd7220->ead] |= (((upd7220->pr[1]) | (upd7220->pr[2] << 8)) & upd7220->mask); break;
 					case 2:	upd7220->vram[upd7220->ead] |= ((upd7220->pr[1] & upd7220->mask) & 0xff); break;
-					case 3: upd7220->vram[upd7220->ead] |= ((upd7220->pr[1] & upd7220->mask) << 8); break;
+					case 3: upd7220->vram[upd7220->ead] |= ((upd7220->pr[1] << 8) & (upd7220->mask & 0xff00)); break;
 				}
 				break;
 		}
@@ -941,6 +946,7 @@ static void process_fifo(device_t *device)
 
 			write_vram(upd7220,(upd7220->cr & 0x18) >> 3,upd7220->cr & 3);
 			reset_figs_param(upd7220);
+			upd7220->param_ptr = 0;
 		}
 		break;
 
@@ -1222,7 +1228,7 @@ static void update_graphics(device_t *device, bitmap_t *bitmap, const rectangle 
 
 		for (y = 0; y < len; y++)
 		{
-			addr = sad + (y * upd7220->pitch);
+			addr = (sad & 0x1ffff) + (y * upd7220->pitch); //TODO: sad needs to be & 0x3ffff
 
 			if (im || force_bitmap)
 				draw_graphics_line(device, bitmap, addr, y + sy, wd);
