@@ -179,17 +179,10 @@ points to the ROMs. When a machine reset occurs, bank 1 is switched in. A timer 
 after 4 bytes are read, bank 0 is selected. The timer is as close as can be to real operation of the
 hardware.
 
-*/
+***********************************************************************************************************/
+#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
-#include "sound/wave.h"
-#include "imagedev/snapquik.h"
-#include "imagedev/cartslot.h"
-#include "imagedev/cassette.h"
-#include "sound/speaker.h"
-#include "machine/ctronics.h"
 #include "super80.lh"
 #include "includes/super80.h"
 
@@ -211,23 +204,23 @@ hardware.
 
 /* A read_byte or write_byte to unmapped memory crashes MESS, and UNMAP doesnt fix it.
     This makes the H and E monitor commands show FF */
-static READ8_HANDLER( super80_read_ff ) { return 0xff; }
+READ8_MEMBER( super80_state::super80_read_ff ) { return 0xff; }
 
-static ADDRESS_MAP_START( super80_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( super80_map, ADDRESS_SPACE_PROGRAM, 8, super80_state )
 	AM_RANGE(0x0000, 0x3fff) AM_RAMBANK("boot") AM_REGION("maincpu", 0x0000)
 	AM_RANGE(0x4000, 0xbfff) AM_RAM AM_REGION("maincpu", 0x4000)
 	AM_RANGE(0xc000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xffff) AM_READ(super80_read_ff) AM_WRITENOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( super80m_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( super80m_map, ADDRESS_SPACE_PROGRAM, 8, super80_state )
 	AM_RANGE(0x0000, 0x3fff) AM_RAMBANK("boot") AM_REGION("maincpu", 0x0000)
 	AM_RANGE(0x4000, 0xbfff) AM_RAM AM_REGION("maincpu", 0x4000)
 	AM_RANGE(0xc000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xffff) AM_RAM AM_REGION("maincpu", 0xf000)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( super80v_map, ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START( super80v_map, ADDRESS_SPACE_PROGRAM, 8, super80_state)
 	AM_RANGE(0x0000, 0x3fff) AM_RAMBANK("boot")
 	AM_RANGE(0x4000, 0xbfff) AM_RAM
 	AM_RANGE(0xc000, 0xefff) AM_ROM
@@ -235,48 +228,48 @@ static ADDRESS_MAP_START( super80v_map, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xf800, 0xffff) AM_READWRITE(super80v_high_r, super80v_high_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( super80_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( super80_io, ADDRESS_SPACE_IO, 8, super80_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0xdc, 0xdc) AM_READWRITE(super80_dc_r, super80_dc_w)
 	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0x14) AM_WRITE(super80_f0_w)
 	AM_RANGE(0xe1, 0xe1) AM_MIRROR(0x14) AM_WRITE(super80_f1_w)
 	AM_RANGE(0xe2, 0xe2) AM_MIRROR(0x14) AM_READ(super80_f2_r)
-	AM_RANGE(0xf8, 0xfb) AM_MIRROR(0x04) AM_DEVREADWRITE("z80pio", z80pio_ba_cd_r, z80pio_ba_cd_w)
+	AM_RANGE(0xf8, 0xfb) AM_MIRROR(0x04) AM_DEVREADWRITE_LEGACY("z80pio", z80pio_ba_cd_r, z80pio_ba_cd_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( super80e_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( super80e_io, ADDRESS_SPACE_IO, 8, super80_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0xbc, 0xbc) AM_READWRITE(super80_dc_r, super80_dc_w)
 	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0x14) AM_WRITE(super80_f0_w)
 	AM_RANGE(0xe1, 0xe1) AM_MIRROR(0x14) AM_WRITE(super80_f1_w)
 	AM_RANGE(0xe2, 0xe2) AM_MIRROR(0x14) AM_READ(super80_f2_r)
-	AM_RANGE(0xf8, 0xfb) AM_MIRROR(0x04) AM_DEVREADWRITE("z80pio", z80pio_ba_cd_r, z80pio_ba_cd_w)
+	AM_RANGE(0xf8, 0xfb) AM_MIRROR(0x04) AM_DEVREADWRITE_LEGACY("z80pio", z80pio_ba_cd_r, z80pio_ba_cd_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( super80r_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( super80r_io, ADDRESS_SPACE_IO, 8, super80_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x10, 0x10) AM_WRITE(super80v_10_w)
-	AM_RANGE(0x11, 0x11) AM_DEVREAD("crtc", mc6845_register_r)
+	AM_RANGE(0x11, 0x11) AM_DEVREAD_LEGACY("crtc", mc6845_register_r)
 	AM_RANGE(0x11, 0x11) AM_WRITE(super80v_11_w)
 	AM_RANGE(0xdc, 0xdc) AM_READWRITE(super80_dc_r, super80_dc_w)
 	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0x14) AM_WRITE(super80r_f0_w)
 	AM_RANGE(0xe2, 0xe2) AM_MIRROR(0x14) AM_READ(super80_f2_r)
-	AM_RANGE(0xf8, 0xfb) AM_MIRROR(0x04) AM_DEVREADWRITE("z80pio", z80pio_ba_cd_r, z80pio_ba_cd_w)
+	AM_RANGE(0xf8, 0xfb) AM_MIRROR(0x04) AM_DEVREADWRITE_LEGACY("z80pio", z80pio_ba_cd_r, z80pio_ba_cd_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( super80v_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( super80v_io, ADDRESS_SPACE_IO, 8, super80_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x10, 0x10) AM_WRITE(super80v_10_w)
-	AM_RANGE(0x11, 0x11) AM_DEVREAD("crtc", mc6845_register_r)
+	AM_RANGE(0x11, 0x11) AM_DEVREAD_LEGACY("crtc", mc6845_register_r)
 	AM_RANGE(0x11, 0x11) AM_WRITE(super80v_11_w)
 	AM_RANGE(0xdc, 0xdc) AM_READWRITE(super80_dc_r, super80_dc_w)
 	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0x14) AM_WRITE(super80_f0_w)
 	AM_RANGE(0xe2, 0xe2) AM_MIRROR(0x14) AM_READ(super80_f2_r)
-	AM_RANGE(0xf8, 0xfb) AM_MIRROR(0x04) AM_DEVREADWRITE("z80pio", z80pio_ba_cd_r, z80pio_ba_cd_w)
+	AM_RANGE(0xf8, 0xfb) AM_MIRROR(0x04) AM_DEVREADWRITE_LEGACY("z80pio", z80pio_ba_cd_r, z80pio_ba_cd_w)
 ADDRESS_MAP_END
 
 /**************************** DIPSWITCHES, KEYBOARD, HARDWARE CONFIGURATION ****************************************/

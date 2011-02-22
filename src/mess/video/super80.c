@@ -10,9 +10,6 @@
 
 
 
-
-
-
 /**************************** PALETTES for super80m and super80v ******************************************/
 
 static const UINT8 super80_rgb_palette[16*3] =
@@ -79,10 +76,10 @@ VIDEO_EOF( super80m )
 	/* if we chose another palette or colour mode, enable it */
 	UINT8 chosen_palette = (input_port_read(machine, "CONFIG") & 0x60)>>5;				// read colour dipswitches
 
-	if (chosen_palette != state->current_palette)						// any changes?
+	if (chosen_palette != state->m_current_palette)						// any changes?
 	{
-		state->current_palette = chosen_palette;					// save new palette
-		if (!state->current_palette)
+		state->m_current_palette = chosen_palette;					// save new palette
+		if (!state->m_current_palette)
 			palette_set_colors_rgb(machine, super80_comp_palette);		// composite colour
 		else
 			palette_set_colors_rgb(machine, super80_rgb_palette);		// rgb and b&w
@@ -93,19 +90,19 @@ VIDEO_UPDATE( super80 )
 {
 	super80_state *state = screen->machine->driver_data<super80_state>();
 	UINT8 y,ra,chr=32,gfx,screen_on=0;
-	UINT16 sy=0,ma=state->vidpg,x;
+	UINT16 sy=0,ma=state->m_vidpg,x;
 	UINT8 *RAM = screen->machine->region("maincpu")->base();
 
-	output_set_value("cass_led",(state->super80_shared & 0x20) ? 1 : 0);
+	output_set_value("cass_led",(state->m_shared & 0x20) ? 1 : 0);
 
-	if ((state->super80_shared & 4) || (!(input_port_read(screen->machine, "CONFIG") & 4)))	/* bit 2 of port F0 is high, OR user turned on config switch */
+	if ((state->m_shared & 4) || (!(input_port_read(screen->machine, "CONFIG") & 4)))	/* bit 2 of port F0 is high, OR user turned on config switch */
 		screen_on++;
 
 	for (y = 0; y < 16; y++)
 	{
 		for (ra = 0; ra < 10; ra++)
 		{
-			UINT16  *p = BITMAP_ADDR16(bitmap, sy++, 0);
+			UINT16 *p = BITMAP_ADDR16(bitmap, sy++, 0);
 
 			for (x = 0; x < 32; x++)	// done this way to avoid x overflowing on page FF
 			{
@@ -116,14 +113,14 @@ VIDEO_UPDATE( super80 )
 				gfx = state->FNT[(chr<<4) | ((ra & 8) >> 3) | ((ra & 7) << 1)];
 
 				/* Display a scanline of a character (8 pixels) */
-				*p++ = ( gfx & 0x80 ) ? 1 : 0;
-				*p++ = ( gfx & 0x40 ) ? 1 : 0;
-				*p++ = ( gfx & 0x20 ) ? 1 : 0;
-				*p++ = ( gfx & 0x10 ) ? 1 : 0;
-				*p++ = ( gfx & 0x08 ) ? 1 : 0;
-				*p++ = ( gfx & 0x04 ) ? 1 : 0;
-				*p++ = ( gfx & 0x02 ) ? 1 : 0;
-				*p++ = ( gfx & 0x01 ) ? 1 : 0;
+				*p++ = BIT( gfx, 7 ) ? 1 : 0;
+				*p++ = BIT( gfx, 6 ) ? 1 : 0;
+				*p++ = BIT( gfx, 5 ) ? 1 : 0;
+				*p++ = BIT( gfx, 4 ) ? 1 : 0;
+				*p++ = BIT( gfx, 3 ) ? 1 : 0;
+				*p++ = BIT( gfx, 2 ) ? 1 : 0;
+				*p++ = BIT( gfx, 1 ) ? 1 : 0;
+				*p++ = BIT( gfx, 0 ) ? 1 : 0;
 			}
 		}
 		ma+=32;
@@ -135,19 +132,19 @@ VIDEO_UPDATE( super80d )
 {
 	super80_state *state = screen->machine->driver_data<super80_state>();
 	UINT8 y,ra,chr=32,gfx,screen_on=0;
-	UINT16 sy=0,ma=state->vidpg,x;
+	UINT16 sy=0,ma=state->m_vidpg,x;
 	UINT8 *RAM = screen->machine->region("maincpu")->base();
 
-	output_set_value("cass_led",(state->super80_shared & 0x20) ? 1 : 0);
+	output_set_value("cass_led",(state->m_shared & 0x20) ? 1 : 0);
 
-	if ((state->super80_shared & 4) || (!(input_port_read(screen->machine, "CONFIG") & 4)))	/* bit 2 of port F0 is high, OR user turned on config switch */
+	if ((state->m_shared & 4) || (!(input_port_read(screen->machine, "CONFIG") & 4)))	/* bit 2 of port F0 is high, OR user turned on config switch */
 		screen_on++;
 
 	for (y = 0; y < 16; y++)
 	{
 		for (ra = 0; ra < 10; ra++)
 		{
-			UINT16  *p = BITMAP_ADDR16(bitmap, sy++, 0);
+			UINT16 *p = BITMAP_ADDR16(bitmap, sy++, 0);
 
 			for (x = 0; x < 32; x++)
 			{
@@ -158,14 +155,14 @@ VIDEO_UPDATE( super80d )
 				gfx = state->FNT[((chr & 0x7f)<<4) | ((ra & 8) >> 3) | ((ra & 7) << 1)] ^ ((chr & 0x80) ? 0xff : 0);
 
 				/* Display a scanline of a character (8 pixels) */
-				*p++ = ( gfx & 0x80 ) ? 1 : 0;
-				*p++ = ( gfx & 0x40 ) ? 1 : 0;
-				*p++ = ( gfx & 0x20 ) ? 1 : 0;
-				*p++ = ( gfx & 0x10 ) ? 1 : 0;
-				*p++ = ( gfx & 0x08 ) ? 1 : 0;
-				*p++ = ( gfx & 0x04 ) ? 1 : 0;
-				*p++ = ( gfx & 0x02 ) ? 1 : 0;
-				*p++ = ( gfx & 0x01 ) ? 1 : 0;
+				*p++ = BIT( gfx, 7 ) ? 1 : 0;
+				*p++ = BIT( gfx, 6 ) ? 1 : 0;
+				*p++ = BIT( gfx, 5 ) ? 1 : 0;
+				*p++ = BIT( gfx, 4 ) ? 1 : 0;
+				*p++ = BIT( gfx, 3 ) ? 1 : 0;
+				*p++ = BIT( gfx, 2 ) ? 1 : 0;
+				*p++ = BIT( gfx, 1 ) ? 1 : 0;
+				*p++ = BIT( gfx, 0 ) ? 1 : 0;
 			}
 		}
 		ma+=32;
@@ -177,19 +174,19 @@ VIDEO_UPDATE( super80e )
 {
 	super80_state *state = screen->machine->driver_data<super80_state>();
 	UINT8 y,ra,chr=32,gfx,screen_on=0;
-	UINT16 sy=0,ma=state->vidpg,x;
+	UINT16 sy=0,ma=state->m_vidpg,x;
 	UINT8 *RAM = screen->machine->region("maincpu")->base();
 
-	output_set_value("cass_led",(state->super80_shared & 0x20) ? 1 : 0);
+	output_set_value("cass_led",(state->m_shared & 0x20) ? 1 : 0);
 
-	if ((state->super80_shared & 4) || (!(input_port_read(screen->machine, "CONFIG") & 4)))	/* bit 2 of port F0 is high, OR user turned on config switch */
+	if ((state->m_shared & 4) || (!(input_port_read(screen->machine, "CONFIG") & 4)))	/* bit 2 of port F0 is high, OR user turned on config switch */
 		screen_on++;
 
 	for (y = 0; y < 16; y++)
 	{
 		for (ra = 0; ra < 10; ra++)
 		{
-			UINT16  *p = BITMAP_ADDR16(bitmap, sy++, 0);
+			UINT16 *p = BITMAP_ADDR16(bitmap, sy++, 0);
 
 			for (x = 0; x < 32; x++)
 			{
@@ -200,14 +197,14 @@ VIDEO_UPDATE( super80e )
 				gfx = state->FNT[(chr<<4) | ((ra & 8) >> 3) | ((ra & 7) << 1)];
 
 				/* Display a scanline of a character (8 pixels) */
-				*p++ = ( gfx & 0x80 ) ? 1 : 0;
-				*p++ = ( gfx & 0x40 ) ? 1 : 0;
-				*p++ = ( gfx & 0x20 ) ? 1 : 0;
-				*p++ = ( gfx & 0x10 ) ? 1 : 0;
-				*p++ = ( gfx & 0x08 ) ? 1 : 0;
-				*p++ = ( gfx & 0x04 ) ? 1 : 0;
-				*p++ = ( gfx & 0x02 ) ? 1 : 0;
-				*p++ = ( gfx & 0x01 ) ? 1 : 0;
+				*p++ = BIT( gfx, 7 ) ? 1 : 0;
+				*p++ = BIT( gfx, 6 ) ? 1 : 0;
+				*p++ = BIT( gfx, 5 ) ? 1 : 0;
+				*p++ = BIT( gfx, 4 ) ? 1 : 0;
+				*p++ = BIT( gfx, 3 ) ? 1 : 0;
+				*p++ = BIT( gfx, 2 ) ? 1 : 0;
+				*p++ = BIT( gfx, 1 ) ? 1 : 0;
+				*p++ = BIT( gfx, 0 ) ? 1 : 0;
 			}
 		}
 		ma+=32;
@@ -219,16 +216,16 @@ VIDEO_UPDATE( super80m )
 {
 	super80_state *state = screen->machine->driver_data<super80_state>();
 	UINT8 y,ra,chr=32,gfx,screen_on=0;
-	UINT16 sy=0,ma=state->vidpg,x;
+	UINT16 sy=0,ma=state->m_vidpg,x;
 	UINT8 col, bg=0, fg=0, options=input_port_read(screen->machine, "CONFIG");
 	UINT8 *RAM = screen->machine->region("maincpu")->base();
 
 	/* get selected character generator */
-	UINT8 cgen = state->current_charset ^ ((options & 0x10)>>4);	/* bit 0 of port F1 and cgen config switch */
+	UINT8 cgen = state->m_current_charset ^ ((options & 0x10)>>4);	/* bit 0 of port F1 and cgen config switch */
 
-	output_set_value("cass_led",(state->super80_shared & 0x20) ? 1 : 0);
+	output_set_value("cass_led",(state->m_shared & 0x20) ? 1 : 0);
 
-	if ((state->super80_shared & 4) || (!(options & 4)))	/* bit 2 of port F0 is high, OR user turned on config switch */
+	if ((state->m_shared & 4) || (!(options & 4)))	/* bit 2 of port F0 is high, OR user turned on config switch */
 		screen_on++;
 
 	if (screen_on)
@@ -243,7 +240,7 @@ VIDEO_UPDATE( super80m )
 	{
 		for (ra = 0; ra < 10; ra++)
 		{
-			UINT16  *p = BITMAP_ADDR16(bitmap, sy++, 0);
+			UINT16 *p = BITMAP_ADDR16(bitmap, sy++, 0);
 
 			for (x = 0; x < 32; x++)
 			{
@@ -264,14 +261,14 @@ VIDEO_UPDATE( super80m )
 					gfx = state->FNT[0x1000 | ((chr & 0x7f)<<4) | ((ra & 8) >> 3) | ((ra & 7) << 1)] ^ ((chr & 0x80) ? 0xff : 0);
 
 				/* Display a scanline of a character (8 pixels) */
-				*p++ = ( gfx & 0x80 ) ? fg : bg;
-				*p++ = ( gfx & 0x40 ) ? fg : bg;
-				*p++ = ( gfx & 0x20 ) ? fg : bg;
-				*p++ = ( gfx & 0x10 ) ? fg : bg;
-				*p++ = ( gfx & 0x08 ) ? fg : bg;
-				*p++ = ( gfx & 0x04 ) ? fg : bg;
-				*p++ = ( gfx & 0x02 ) ? fg : bg;
-				*p++ = ( gfx & 0x01 ) ? fg : bg;
+				*p++ = BIT( gfx, 7 ) ? fg : bg;
+				*p++ = BIT( gfx, 6 ) ? fg : bg;
+				*p++ = BIT( gfx, 5 ) ? fg : bg;
+				*p++ = BIT( gfx, 4 ) ? fg : bg;
+				*p++ = BIT( gfx, 3 ) ? fg : bg;
+				*p++ = BIT( gfx, 2 ) ? fg : bg;
+				*p++ = BIT( gfx, 1 ) ? fg : bg;
+				*p++ = BIT( gfx, 0 ) ? fg : bg;
 			}
 		}
 		ma+=32;
@@ -282,17 +279,16 @@ VIDEO_UPDATE( super80m )
 VIDEO_START( super80 )
 {
 	super80_state *state = machine->driver_data<super80_state>();
-	state->vidpg = 0xfe00;
+	state->m_vidpg = 0xfe00;
 	state->FNT = machine->region("gfx1")->base();
 }
 
 /**************************** I/O PORTS *****************************************************************/
 
-WRITE8_HANDLER( super80_f1_w )
+WRITE8_MEMBER( super80_state::super80_f1_w )
 {
-	super80_state *state = space->machine->driver_data<super80_state>();
-	state->vidpg = (data & 0xfe) << 8;
-	state->current_charset = data & 1;
+	m_vidpg = (data & 0xfe) << 8;
+	m_current_charset = data & 1;
 }
 
 /*---------------------------------------------------------------
@@ -303,56 +299,48 @@ WRITE8_HANDLER( super80_f1_w )
 
 static const UINT8 mc6845_mask[32]={0xff,0xff,0xff,0x0f,0x7f,0x1f,0x7f,0x7f,3,0x1f,0x7f,0x1f,0x3f,0xff,0x3f,0xff,0,0};
 
-READ8_HANDLER( super80v_low_r )
+READ8_MEMBER( super80_state::super80v_low_r )
 {
-	super80_state *state = space->machine->driver_data<super80_state>();
-
-	if (state->super80_shared & 4)
-		return state->videoram[offset];
+	if (m_shared & 4)
+		return m_videoram[offset];
 	else
-		return state->colorram[offset];
+		return m_colorram[offset];
 }
 
-WRITE8_HANDLER( super80v_low_w )
+WRITE8_MEMBER( super80_state::super80v_low_w )
 {
-	super80_state *state = space->machine->driver_data<super80_state>();
-
-	if (state->super80_shared & 4)
-		state->videoram[offset] = data;
+	if (m_shared & 4)
+		m_videoram[offset] = data;
 	else
-		state->colorram[offset] = data;
+		m_colorram[offset] = data;
 }
 
-READ8_HANDLER( super80v_high_r )
+READ8_MEMBER( super80_state::super80v_high_r )
 {
-	super80_state *state = space->machine->driver_data<super80_state>();
-
-	if (~state->super80_shared & 4)
-		return state->colorram[0x800 | offset];
+	if (~m_shared & 4)
+		return m_colorram[0x800 | offset];
 	else
-	if (state->super80_shared & 0x10)
-		return state->pcgram[0x800 | offset];
+	if (m_shared & 0x10)
+		return m_pcgram[0x800 | offset];
 	else
-		return state->pcgram[offset];
+		return m_pcgram[offset];
 }
 
-WRITE8_HANDLER( super80v_high_w )
+WRITE8_MEMBER( super80_state::super80v_high_w )
 {
-	super80_state *state = space->machine->driver_data<super80_state>();
-
-	if (~state->super80_shared & 4)
-		state->colorram[0x800 | offset] = data;
+	if (~m_shared & 4)
+		m_colorram[0x800 | offset] = data;
 	else
 	{
-		state->videoram[0x800 | offset] = data;
+		m_videoram[0x800 | offset] = data;
 
-		if (state->super80_shared & 0x10)
-			state->pcgram[0x800 | offset] = data;
+		if (m_shared & 0x10)
+			m_pcgram[0x800 | offset] = data;
 	}
 }
 
 /* The 6845 can produce a variety of cursor shapes - all are emulated here - remove when mame fixed */
-static void mc6845_cursor_configure(super80_state *state)
+void super80_state::mc6845_cursor_configure()
 {
 	UINT8 i,curs_type=0,r9,r10,r11;
 
@@ -362,11 +350,11 @@ static void mc6845_cursor_configure(super80_state *state)
         2 = full cursor
         3 = two-part cursor (has a part at the top and bottom with the middle blank) */
 
-	for ( i = 0; i < ARRAY_LENGTH(state->mc6845_cursor); i++) state->mc6845_cursor[i] = 0;		// prepare cursor by erasing old one
+	for ( i = 0; i < ARRAY_LENGTH(mc6845_cursor); i++) mc6845_cursor[i] = 0;		// prepare cursor by erasing old one
 
-	r9  = state->mc6845_reg[9];					// number of scan lines - 1
-	r10 = state->mc6845_reg[10] & 0x1f;				// cursor start line = last 5 bits
-	r11 = state->mc6845_reg[11]+1;					// cursor end line incremented to suit for-loops below
+	r9  = mc6845_reg[9];					// number of scan lines - 1
+	r10 = mc6845_reg[10] & 0x1f;				// cursor start line = last 5 bits
+	r11 = mc6845_reg[11]+1;					// cursor end line incremented to suit for-loops below
 
 	/* decide the curs_type by examining the registers */
 	if (r10 < r11) curs_type=1;				// start less than end, show start to end
@@ -379,31 +367,30 @@ static void mc6845_cursor_configure(super80_state *state)
 	if (r11 > 16) r11=16;					// truncate 5-bit register to fit our 4-bit hardware
 
 	/* create the new cursor */
-	if (curs_type > 1) for (i = 0;i < ARRAY_LENGTH(state->mc6845_cursor);i++) state->mc6845_cursor[i]=0xff; // turn on full cursor
+	if (curs_type > 1) for (i = 0;i < ARRAY_LENGTH(mc6845_cursor);i++) mc6845_cursor[i]=0xff; // turn on full cursor
 
-	if (curs_type == 1) for (i = r10;i < r11;i++) state->mc6845_cursor[i]=0xff; // for each line that should show, turn on that scan line
+	if (curs_type == 1) for (i = r10;i < r11;i++) mc6845_cursor[i]=0xff; // for each line that should show, turn on that scan line
 
-	if (curs_type == 3) for (i = r11; i < r10;i++) state->mc6845_cursor[i]=0; // now take a bite out of the middle
+	if (curs_type == 3) for (i = r11; i < r10;i++) mc6845_cursor[i]=0; // now take a bite out of the middle
 }
 
 VIDEO_START( super80v )
 {
 	super80_state *state = machine->driver_data<super80_state>();
-	state->mc6845 = machine->device("crtc");
-	state->pcgram = machine->region("maincpu")->base()+0xf000;
-	state->videoram = machine->region("videoram")->base();
-	state->colorram = machine->region("colorram")->base();
+	state->m_pcgram = machine->region("maincpu")->base()+0xf000;
+	state->m_videoram = machine->region("videoram")->base();
+	state->m_colorram = machine->region("colorram")->base();
 }
 
 VIDEO_UPDATE( super80v )
 {
 	super80_state *state = screen->machine->driver_data<super80_state>();
-	state->framecnt++;
-	state->speed = state->mc6845_reg[10]&0x20, state->flash = state->mc6845_reg[10]&0x40;			// cursor modes
-	state->cursor = (state->mc6845_reg[14]<<8) | state->mc6845_reg[15];					// get cursor position
-	state->s_options=input_port_read(screen->machine, "CONFIG");
-	output_set_value("cass_led",(state->super80_shared & 0x20) ? 1 : 0);
-	mc6845_update(state->mc6845, bitmap, cliprect);
+	state->m_framecnt++;
+	state->m_speed = state->mc6845_reg[10]&0x20, state->m_flash = state->mc6845_reg[10]&0x40; // cursor modes
+	state->m_cursor = (state->mc6845_reg[14]<<8) | state->mc6845_reg[15]; // get cursor position
+	state->m_s_options=input_port_read(screen->machine, "CONFIG");
+	output_set_value("cass_led",(state->m_shared & 0x20) ? 1 : 0);
+	mc6845_update(state->m_6845, bitmap, cliprect);
 	return 0;
 }
 
@@ -412,68 +399,66 @@ MC6845_UPDATE_ROW( super80v_update_row )
 	super80_state *state = device->machine->driver_data<super80_state>();
 	UINT8 chr,col,gfx,fg,bg=0;
 	UINT16 mem,x;
-	UINT16  *p = BITMAP_ADDR16(bitmap, y, 0);
+	UINT16 *p = BITMAP_ADDR16(bitmap, y, 0);
 
 	for (x = 0; x < x_count; x++)				// for each character
 	{
 		UINT8 inv=0;
 		//      if (x == cursor_x) inv=0xff;    /* uncomment when mame fixed */
 		mem = (ma + x) & 0xfff;
-		chr = state->videoram[mem];
+		chr = state->m_videoram[mem];
 
 		/* get colour or b&w */
 		fg = 5;						/* green */
-		if ((state->s_options & 0x60) == 0x60) fg = 15;		/* b&w */
+		if ((state->m_s_options & 0x60) == 0x60) fg = 15;		/* b&w */
 
-		if (~state->s_options & 0x40)
+		if (~state->m_s_options & 0x40)
 		{
-			col = state->colorram[mem];					/* byte of colour to display */
+			col = state->m_colorram[mem];					/* byte of colour to display */
 			fg = col & 0x0f;
 			bg = (col & 0xf0) >> 4;
 		}
 
 		/* if inverse mode, replace any pcgram chrs with inverse chrs */
-		if ((~state->super80_shared & 0x10) && (chr & 0x80))			// is it a high chr in inverse mode
+		if ((~state->m_shared & 0x10) && (chr & 0x80))			// is it a high chr in inverse mode
 		{
 			inv ^= 0xff;						// invert the chr
 			chr &= 0x7f;						// and drop bit 7
 		}
 
 		/* process cursor - remove when mame fixed */
-		if ((((!state->flash) && (!state->speed)) ||
-			((state->flash) && (state->speed) && (state->framecnt & 0x10)) ||
-			((state->flash) && (!state->speed) && (state->framecnt & 8))) &&
-			(mem == state->cursor))
+		if ((((!state->m_flash) && (!state->m_speed)) ||
+			((state->m_flash) && (state->m_speed) && (state->m_framecnt & 0x10)) ||
+			((state->m_flash) && (!state->m_speed) && (state->m_framecnt & 8))) &&
+			(mem == state->m_cursor))
 				inv ^= state->mc6845_cursor[ra];
 
 		/* get pattern of pixels for that character scanline */
-		gfx = state->pcgram[(chr<<4) | ra] ^ inv;
+		gfx = state->m_pcgram[(chr<<4) | ra] ^ inv;
 
 		/* Display a scanline of a character (7 pixels) */
-		*p++ = ( gfx & 0x80 ) ? fg : bg;
-		*p++ = ( gfx & 0x40 ) ? fg : bg;
-		*p++ = ( gfx & 0x20 ) ? fg : bg;
-		*p++ = ( gfx & 0x10 ) ? fg : bg;
-		*p++ = ( gfx & 0x08 ) ? fg : bg;
-		*p++ = ( gfx & 0x04 ) ? fg : bg;
-		*p++ = ( gfx & 0x02 ) ? fg : bg;
+		*p++ = BIT( gfx, 7 ) ? fg : bg;
+		*p++ = BIT( gfx, 6 ) ? fg : bg;
+		*p++ = BIT( gfx, 5 ) ? fg : bg;
+		*p++ = BIT( gfx, 4 ) ? fg : bg;
+		*p++ = BIT( gfx, 3 ) ? fg : bg;
+		*p++ = BIT( gfx, 2 ) ? fg : bg;
+		*p++ = BIT( gfx, 1 ) ? fg : bg;
 	}
 }
 
 /**************************** I/O PORTS *****************************************************************/
 
-WRITE8_HANDLER( super80v_10_w )
+WRITE8_MEMBER( super80_state::super80v_10_w )
 {
-	super80_state *state = space->machine->driver_data<super80_state>();
 	data &= 0x1f;
-	state->mc6845_ind = data;
-	mc6845_address_w( state->mc6845, 0, data );
+	mc6845_ind = data;
+	mc6845_address_w( m_6845, 0, data );
 }
 
-WRITE8_HANDLER( super80v_11_w )
+WRITE8_MEMBER( super80_state::super80v_11_w )
 {
-	super80_state *state = space->machine->driver_data<super80_state>();
-	state->mc6845_reg[state->mc6845_ind] = data & mc6845_mask[state->mc6845_ind];	/* save data in register */
-	mc6845_register_w( state->mc6845, 0, data );
-	if ((state->mc6845_ind > 8) && (state->mc6845_ind < 12)) mc6845_cursor_configure(state);		/* adjust cursor shape - remove when mame fixed */
+	mc6845_reg[mc6845_ind] = data & mc6845_mask[mc6845_ind];	/* save data in register */
+	mc6845_register_w( m_6845, 0, data );
+	if ((mc6845_ind > 8) && (mc6845_ind < 12)) mc6845_cursor_configure();		/* adjust cursor shape - remove when mame fixed */
 }

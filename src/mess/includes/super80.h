@@ -1,3 +1,11 @@
+#include "cpu/z80/z80.h"
+#include "cpu/z80/z80daisy.h"
+#include "sound/wave.h"
+#include "imagedev/snapquik.h"
+#include "imagedev/cartslot.h"
+#include "imagedev/cassette.h"
+#include "sound/speaker.h"
+#include "machine/ctronics.h"
 #include "video/mc6845.h"
 #include "machine/z80pio.h"
 
@@ -13,33 +21,59 @@ class super80_state : public driver_device
 {
 public:
 	super80_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+		: driver_device(machine, config),
+		  m_maincpu(*this, "maincpu"),
+		  m_pio(*this, "z80pio"),
+		  m_cass(*this, "cassette"),
+		  m_wave(*this, "wave"),
+		  m_speaker(*this, "speaker"),
+		  m_printer(*this, "centronics"),
+		  m_6845(*this, "crtc")
+	{ }
 
-	UINT8 super80_shared;
-	device_t *z80pio;
-	device_t *speaker;
-	device_t *cassette;
-	device_t *printer;
-	UINT8 keylatch;
-	UINT8 cass_data[4];
-	UINT8 int_sw;
-	UINT8 last_data;
-	UINT16 vidpg;
-	UINT8 current_palette;
-	UINT8 current_charset;
+	required_device<cpu_device> m_maincpu;
+	required_device<device_t> m_pio;
+	required_device<device_t> m_cass;
+	required_device<device_t> m_wave;
+	required_device<device_t> m_speaker;
+	required_device<device_t> m_printer;
+	optional_device<device_t> m_6845;
+	READ8_MEMBER( super80v_low_r );
+	READ8_MEMBER( super80v_high_r );
+	WRITE8_MEMBER( super80v_low_w );
+	WRITE8_MEMBER( super80v_high_w );
+	WRITE8_MEMBER( super80v_10_w );
+	WRITE8_MEMBER( super80v_11_w );
+	WRITE8_MEMBER( super80_f1_w );
+	READ8_MEMBER( super80_dc_r );
+	READ8_MEMBER( super80_f2_r );
+	WRITE8_MEMBER( super80_dc_w );
+	WRITE8_MEMBER( super80_f0_w );
+	WRITE8_MEMBER( super80r_f0_w );
+	READ8_MEMBER( super80_read_ff );
+	WRITE8_MEMBER( pio_port_a_w );
+	//READ8_MEMBER( pio_port_b_r );
+	UINT8 m_shared;
+	UINT8 m_keylatch;
+	UINT8 m_cass_data[4];
+	UINT8 m_int_sw;
+	UINT8 m_last_data;
+	UINT16 m_vidpg;
+	UINT8 m_current_palette;
+	UINT8 m_current_charset;
 	const UINT8 *FNT;
-	UINT8 s_options;
+	UINT8 m_s_options;
 	UINT8 mc6845_cursor[16];
 	UINT8 mc6845_reg[32];
 	UINT8 mc6845_ind;
-	device_t *mc6845;
-	UINT8 framecnt;
-	UINT8 speed;
-	UINT8 flash;
-	UINT16 cursor;
-	UINT8 *videoram;
-	UINT8 *colorram;
-	UINT8 *pcgram;
+	UINT8 m_framecnt;
+	UINT8 m_speed;
+	UINT8 m_flash;
+	UINT16 m_cursor;
+	UINT8 *m_videoram;
+	UINT8 *m_colorram;
+	UINT8 *m_pcgram;
+	void mc6845_cursor_configure();
 };
 
 
@@ -52,25 +86,12 @@ VIDEO_UPDATE( super80e );
 VIDEO_UPDATE( super80m );
 VIDEO_START( super80 );
 VIDEO_EOF( super80m );
-
-READ8_HANDLER( super80v_low_r );
-READ8_HANDLER( super80v_high_r );
-WRITE8_HANDLER( super80v_low_w );
-WRITE8_HANDLER( super80v_high_w );
-WRITE8_HANDLER( super80v_10_w );
-WRITE8_HANDLER( super80v_11_w );
-WRITE8_HANDLER( super80_f1_w );
 VIDEO_START( super80v );
 VIDEO_UPDATE( super80v );
 MC6845_UPDATE_ROW( super80v_update_row );
 
 /*----------- defined in machine/super80.c -----------*/
 
-READ8_HANDLER( super80_dc_r );
-READ8_HANDLER( super80_f2_r );
-WRITE8_HANDLER( super80_dc_w );
-WRITE8_HANDLER( super80_f0_w );
-WRITE8_HANDLER( super80r_f0_w );
 MACHINE_RESET( super80 );
 DRIVER_INIT( super80 );
 DRIVER_INIT( super80v );
