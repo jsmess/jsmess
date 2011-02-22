@@ -111,39 +111,6 @@ enum
 	modeJVP
 };
 
-struct _extrainfo_banking_def {
-	char	extrainfo[10];
-	int		bank_mode;
-};
-
-static const struct _extrainfo_banking_def extrainfo_banking_defs[] = {
-	/* banking schemes */
-	{ "F8",	modeF8 },
-	{ "FA", modeFA },
-	{ "F6", modeF6 },
-	{ "F4", modeF4 },
-	{ "FE", modeFE },
-	{ "E0", modeE0 },
-	{ "3F", mode3F },
-	{ "UA", modeUA },
-	{ "E7", modeE7 },
-	{ "DC", modeDC },
-	{ "CV", modeCV },
-	{ "3E", mode3E },
-	{ "SS", modeSS },
-	{ "FV", modeFV },
-	{ "DPC", modeDPC },
-	{ "32in1", mode32in1 },
-	{ "JVP", modeJVP },
-
-	/* end of list - do not remove */
-	{ "\0", 0 },
-};
-
-
-
-
-
 static const UINT16 supported_screen_heights[4] = { 262, 312, 328, 342 };
 
 // try to detect 2600 controller setup. returns 32bits with left/right controller info
@@ -582,7 +549,7 @@ static int detect_super_chip(running_machine *machine)
 static DEVICE_START( a2600_cart )
 {
 	a2600_state *state = device->machine->driver_data<a2600_state>();
-	state->banking_mode = 0xFF;
+	state->banking_mode = 0xff;
 }
 
 
@@ -590,9 +557,7 @@ static DEVICE_IMAGE_LOAD( a2600_cart )
 {
 	a2600_state *state = image.device().machine->driver_data<a2600_state>();
 	running_machine *machine = image.device().machine;
-	const struct _extrainfo_banking_def *eibd;
 	UINT8 *cart = CART;
-	const char	*extrainfo = NULL;
 
 	state->cart_size = image.length();
 
@@ -628,18 +593,6 @@ static DEVICE_IMAGE_LOAD( a2600_cart )
 		}
 	}
 
-	extrainfo = hashfile_extrainfo(image);
-
-	if (extrainfo && extrainfo[0])
-	{
-		for (eibd = extrainfo_banking_defs; eibd->extrainfo[0]; eibd++)
-		{
-			if (! mame_stricmp(eibd->extrainfo, extrainfo))
-			{
-				state->banking_mode = eibd->bank_mode;
-			}
-		}
-	}
 	return 0;
 }
 
