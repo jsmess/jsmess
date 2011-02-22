@@ -46177,14 +46177,11 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-<!-- [NJ081] 火影忍者 ~ Huo Ying Ren Zhe (Naruto) [or NJ060?] --> 
-
-<!-- is this NJ081?? -->
 	<software name="naruto">
-		<!-- Serial:  - Release Date:  -->
+		<!-- Serial: NJ081 - Release Date:  - Alternative Title: 火影忍者 ~ Huo Ying Ren Zhe (Naruto) -->
 		<description>Naruto RPG (Chi)</description>
-		<year>198?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>19??</year>
+		<publisher>Nanjing</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="UNL-NANJING" />
 			<feature name="mirroring" value="vertical" />
@@ -46199,7 +46196,25 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 
 <!-- [NJ082] ?? --> 
 <!-- [NJ083] 三国志-刘备传 ~ San Guo Zhi - Liu Bei Chuan --> 
-<!-- [NJ084] 圣斗士星矢2-北欧突击篇 ~ Sheng Dou Shi Xing Shi 2 - Beiou Tuji Pian (Saint Seiya 2) --> 
+
+
+	<software name="sseiyac2">
+		<!-- Serial: NJ084 - Release Date: - Alternative Title: 圣斗士星矢2-北欧突击篇 ~ Sheng Dou Shi Xing Shi 2 - Beiou Tuji Pian (Saint Seiya 2) -->
+		<description>Saint Seiya - Beiou Tuji Pian (Chi)</description>
+		<year>19??</year>
+		<publisher>Nanjing</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="UNL-NANJING" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="1048576">
+				<rom name="saint seiya (china) (unl).prg" size="1048576" crc="054444a0" sha1="d2e034b948291e03808e2544b865aceea89fd73e" offset="00000" />
+			</dataarea>
+			<!-- 8k WRAM on cartridge-->
+			<dataarea name="vram" size="8192">
+			</dataarea> 
+ 		</part>
+	</software>
+
 <!-- [NJ085] ?? --> 
 <!-- [NJ086] 拳皇R1-最强格斗王 ~ Quan Huang R1 - Zui Qiang Gedou Wang (KOF R1) --> 
 <!-- [NJ087] 拳皇R2-大蛇四天王 ~ Quan Huang R2 - Dashe Sitian Wang (KOF R2) --> 
@@ -46211,14 +46226,11 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 <!-- [NJ093] ?? --> 
 <!-- [NJ094] ?? --> 
 
-<!-- [NJ095] 七龙珠大冒险 ~ Qi Long Zhu Da Mao Xian (Dragon Ball Adventure) -->
-
-<!-- is this NJ095?? -->
 	<software name="dballc">
-		<!-- Serial:  - Release Date:  -->
+		<!-- Serial: NJ095 - Release Date: - Alternative Title: 七龙珠大冒险 ~ Qi Long Zhu Da Mao Xian (Dragon Ball Adventure) -->
 		<description>Dragonball (Chi)</description>
-		<year>198?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>19??</year>
+		<publisher>Nanjing</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="UNL-NANJING" />
 			<feature name="mirroring" value="vertical" />
@@ -49494,6 +49506,23 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			</dataarea>
 		</part>
 	</software>
+	
+	<software name="jinghy">
+		<!-- Serial: ES-1033 - Release Date:  -->
+		<description>Jing Hua Yuan (Chi)</description>
+		<year>19??</year>
+		<publisher>Waixing</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-TLROM" />
+			<feature name="mirroring" value="horizontal" />
+			<dataarea name="chr" size="131072">
+				<rom name="jing hua yuan (china) (unl).chr" size="131072" crc="9c8ab31a" sha1="3091c868fce8beb9fbfc6358cbb69dc32408069f" offset="00000"/>
+			</dataarea>
+			<dataarea name="prg" size="131072">
+				<rom name="jing hua yuan (china) (unl).prg" size="131072" crc="4748f002" sha1="5bb4f3f42bf3378d84360e48066f6e493b114d15" offset="00000"/>
+			</dataarea>
+ 		</part>
+	</software>
 
 <!-- nointro -->
 	<software name="jwest" supported="no">
@@ -50024,6 +50053,22 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			<dataarea name="wram" size="8192">
 			</dataarea>
 		</part>
+	</software>
+	
+	<software name="saiwqxz">
+		<!-- Serial:  - Release Date:  -->
+		<description>Sai Wai Qi Xia Zhuan (Chi)</description>
+		<year>19??</year>
+		<publisher>Henggedianzi</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="WAIXING-G" />
+			<dataarea name="prg" size="524288">
+				<rom name="sai wai qi xia zhuan (china) (unl).prg" size="524288" crc="7abf0aaf" sha1="7389f765d0dc0ccab68853d2a2384e571a644276" offset="00000" />
+			</dataarea>
+			<!-- 8k WRAM on cartridge-->
+			<dataarea name="vram" size="8192">
+			</dataarea> 
+ 		</part>
 	</software>
 
 <!-- nointro -->
@@ -55466,7 +55511,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 
 	<software name="mc_lc14g">
 		<!-- Serial:  - Release Date:  - Alternative Title:  -->
-		<description>LCD 14 in 1 Game (Asia)</description>
+		<description>FC-LCD Shouzhang Ji - 14 in 1 Game (Asia)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
@@ -55483,7 +55528,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 
 	<software name="mc_lc14s">
 		<!-- Serial:  - Release Date:  - Alternative Title:  -->
-		<description>LCD 14 in 1 Study (Asia)</description>
+		<description>FC-LCD Shouzhang Ji - 14 in 1 Study (Asia)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
@@ -55498,13 +55543,14 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 		</part>
 	</software>
 
-	<software name="mc_lcds1">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
-		<description>LCD S1 (Asia, SB01)</description>
+<!-- This has an unemulated audio chip SB01 -->
+	<software name="mc_lcdd1">
+		<description>FC-LCD Shouzhang Ji - Ying Han Cidian 1</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="TXC-MXMDHTWO" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="262144">
 				<rom name="fc-lcd-s1(sb01) [!].prg" size="262144" crc="caaa65c1" sha1="118f0f21cbc83dee34e840911c054d4ac92ffa6c" offset="00000" status="baddump" />
 			</dataarea>
@@ -55514,13 +55560,13 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 		</part>
 	</software>
 
-	<software name="mc_lcds2">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
-		<description>LCD S2 (Asia)</description>
+	<software name="mc_lcdd2">
+		<description>FC-LCD Shouzhang Ji - Ying Han Cidian 2</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="TXC-MXMDHTWO" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="524288">
 				<rom name="fc-lcd-s2 [!].prg" size="524288" crc="0dbbf7a2" sha1="44e4e4d3bfa1c1447bce3e02629c0fd792e5c0d9" offset="00000" status="baddump" />
 			</dataarea>
@@ -63095,6 +63141,4 @@ that the real dumps might surface -->
 		</part>
 	</software>
 
-
 </softwarelist>
-
