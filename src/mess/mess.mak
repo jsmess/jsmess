@@ -694,6 +694,7 @@ $(MESSOBJ)/ascii.a:				\
 	$(MESS_MACHINE)/msx.o		\
 
 $(MESSOBJ)/at.a:				\
+	$(MESS_MACHINE)/at_keybc.o	\
 	$(MESS_MACHINE)/pc_ide.o	\
 	$(MESS_MACHINE)/ps2.o		\
 	$(MESS_MACHINE)/at.o		\

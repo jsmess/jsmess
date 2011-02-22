@@ -27,22 +27,18 @@
 #include "video/pc_mda.h"
 #include "video/pc_ega.h"
 #include "video/pc_video_mess.h"
-#include "includes/pc.h"
 
 #include "machine/pc_hdc.h"
 #include "includes/pc_ide.h"
 #include "machine/pc_fdc.h"
 #include "machine/pc_joy.h"
-#include "machine/pckeybrd.h"
 #include "machine/pc_lpt.h"
 #include "audio/sblaster.h"
 #include "includes/pc_mouse.h"
 
 #include "includes/at.h"
-#include "machine/8042kbdc.h"
+#include "machine/at_keybc.h"
 #include "includes/ps2.h"
-
-#include "machine/pcshare.h"
 
 #include "imagedev/flopdrv.h"
 #include "imagedev/harddriv.h"
@@ -59,7 +55,6 @@
 
 #include "memconv.h"
 
-/* window resizing with dirtybuffering traping in xmess window */
 
 #define ym3812_StdClock 3579545
 
@@ -155,22 +150,32 @@ static WRITE16_DEVICE_HANDLER( at16_388_w )
 	}
 }
 
-static READ32_HANDLER( at_kbdc8042_32le_r )
+static READ8_HANDLER( at_keybc_r )
 {
-	return read32le_with_read8_handler(at_kbdc8042_r, space, offset, mem_mask);
+	switch (offset)
+	{
+	case 0: return downcast<at_keyboard_controller_device *>(space->machine->device("keybc"))->data_r(*space, 0);
+	case 1: return at_portb_r(space, 0);
+	}
+
+	return 0xff;
 }
 
-static WRITE32_HANDLER( at_kbdc8042_32le_w )
+static WRITE8_HANDLER( at_keybc_w )
 {
-	write32le_with_write8_handler(at_kbdc8042_w, space, offset, data, mem_mask);
+	switch (offset)
+	{
+	case 0: downcast<at_keyboard_controller_device *>(space->machine->device("keybc"))->data_w(*space, 0, data); break;
+	case 1: at_portb_w(space, 0, data); break;
+	}
 }
-
 
 static ADDRESS_MAP_START(at16_io, ADDRESS_SPACE_IO, 16)
 	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8("dma8237_1", i8237_r, i8237_w, 0xffff)
 	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE8("pic8259_master", pic8259_r, pic8259_w, 0xffff)
 	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8("pit8254", pit8253_r, pit8253_w, 0xffff)
-	AM_RANGE(0x0060, 0x006f) AM_READWRITE8(at_kbdc8042_r,            at_kbdc8042_w, 0xffff)
+	AM_RANGE(0x0060, 0x0063) AM_READWRITE8(at_keybc_r, at_keybc_w, 0xffff)
+	AM_RANGE(0x0064, 0x0067) AM_DEVREADWRITE8_MODERN("keybc", at_keyboard_controller_device, status_r, command_w, 0xffff)
 	AM_RANGE(0x0070, 0x007f) AM_DEVREADWRITE8_MODERN("rtc", mc146818_device, read, write , 0xffff)
 	AM_RANGE(0x0080, 0x009f) AM_READWRITE8(at_page8_r,               at_page8_w, 0xffff)
 	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8("pic8259_slave", pic8259_r, pic8259_w, 0xffff)
@@ -198,7 +203,8 @@ static ADDRESS_MAP_START(at386_io, ADDRESS_SPACE_IO, 32)
 	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8("dma8237_1", i8237_r, i8237_w, 0xffffffff)
 	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE8("pic8259_master", pic8259_r, pic8259_w, 0xffffffff)
 	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8("pit8254", pit8253_r, pit8253_w, 0xffffffff)
-	AM_RANGE(0x0060, 0x006f) AM_READWRITE(at_kbdc8042_32le_r,      at_kbdc8042_32le_w)
+	AM_RANGE(0x0060, 0x0063) AM_READWRITE8(at_keybc_r, at_keybc_w, 0xffff)
+	AM_RANGE(0x0064, 0x0067) AM_DEVREADWRITE8_MODERN("keybc", at_keyboard_controller_device, status_r, command_w, 0xffff)
 	AM_RANGE(0x0070, 0x007f) AM_DEVREADWRITE8_MODERN("rtc", mc146818_device, read, write , 0xffffffff)
 	AM_RANGE(0x0080, 0x009f) AM_READWRITE8(at_page8_r,				at_page8_w, 0xffffffff)
 	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8("pic8259_slave", pic8259_r, pic8259_w, 0xffffffff)
@@ -220,7 +226,8 @@ static ADDRESS_MAP_START(at586_io, ADDRESS_SPACE_IO, 32)
 	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8("dma8237_1", i8237_r, i8237_w, 0xffffffff)
 	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE8("pic8259_master", pic8259_r, pic8259_w, 0xffffffff)
 	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8("pit8254", pit8253_r, pit8253_w, 0xffffffff)
-	AM_RANGE(0x0060, 0x006f) AM_READWRITE(at_kbdc8042_32le_r,      at_kbdc8042_32le_w)
+	AM_RANGE(0x0060, 0x0063) AM_READWRITE8(at_keybc_r, at_keybc_w, 0xffff)
+	AM_RANGE(0x0064, 0x0067) AM_DEVREADWRITE8_MODERN("keybc", at_keyboard_controller_device, status_r, command_w, 0xffff)
 	AM_RANGE(0x0070, 0x007f) AM_DEVREADWRITE8_MODERN("rtc", mc146818_device, read, write , 0xffffffff)
 	AM_RANGE(0x0080, 0x009f) AM_READWRITE8(at_page8_r,				at_page8_w, 0xffffffff)
 	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8("pic8259_slave", pic8259_r, pic8259_w, 0xffffffff)
@@ -481,10 +488,20 @@ static const floppy_config ibmat_floppy_config =
 	"floppy_5_25"
 };
 
+static const at_keyboard_controller_interface keyboard_controller_intf =
+{
+	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_RESET),
+	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_A20),
+	DEVCB_DEVICE_LINE("pic8259_master", pic8259_ir1_w),
+	DEVCB_NULL,
+	DEVCB_DEVICE_LINE("keyboard", kb_keytronic_clock_w),
+	DEVCB_DEVICE_LINE("keyboard", kb_keytronic_data_w)
+};
+
 static const kb_keytronic_interface at_keytronic_intf =
 {
-	DEVCB_MEMORY_HANDLER("kbdc8042", IO, at_kbdc8042_set_clock_signal),
-	DEVCB_MEMORY_HANDLER("kbdc8042", IO, at_kbdc8042_set_data_signal),
+	DEVCB_DEVICE_LINE_MEMBER("keybc", at_keyboard_controller_device, keyboard_clock_w),
+	DEVCB_DEVICE_LINE_MEMBER("keybc", at_keyboard_controller_device, keyboard_data_w)
 };
 
 
@@ -531,8 +548,8 @@ static MACHINE_CONFIG_START( ibm5170, at_state )
 	MCFG_SOUND_ADD("saa1099.2", SAA1099, 8000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 #endif
-	MCFG_FRAGMENT_ADD( at_kbdc8042 )
 
+	MCFG_AT_KEYBOARD_CONTROLLER_ADD("keybc", XTAL_12MHz, keyboard_controller_intf)
 	MCFG_KB_KEYTRONIC_ADD("keyboard", at_keytronic_intf)
 
 	MCFG_MC146818_ADD( "rtc", MC146818_STANDARD )
@@ -607,8 +624,7 @@ static MACHINE_CONFIG_START( ibm5162, at_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 #endif
 
-	MCFG_FRAGMENT_ADD( at_kbdc8042 )
-
+	MCFG_AT_KEYBOARD_CONTROLLER_ADD("keybc", XTAL_12MHz, keyboard_controller_intf)
 	MCFG_KB_KEYTRONIC_ADD("keyboard", at_keytronic_intf)
 
 	MCFG_MC146818_ADD( "rtc", MC146818_STANDARD )
@@ -678,8 +694,7 @@ static MACHINE_CONFIG_START( ps2m30286, at_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 #endif
 
-	MCFG_FRAGMENT_ADD( at_kbdc8042 )
-
+	MCFG_AT_KEYBOARD_CONTROLLER_ADD("keybc", XTAL_12MHz, keyboard_controller_intf)
 	MCFG_KB_KEYTRONIC_ADD("keyboard", at_keytronic_intf)
 
 	MCFG_MC146818_ADD( "rtc", MC146818_STANDARD )
@@ -751,8 +766,7 @@ static MACHINE_CONFIG_START( atvga, at_state )
 	MCFG_SOUND_ADD("dac", DAC, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_FRAGMENT_ADD( at_kbdc8042 )
-
+	MCFG_AT_KEYBOARD_CONTROLLER_ADD("keybc", XTAL_12MHz, keyboard_controller_intf)
 	MCFG_KB_KEYTRONIC_ADD("keyboard", at_keytronic_intf)
 
 	MCFG_MC146818_ADD( "rtc", MC146818_STANDARD )
@@ -825,8 +839,7 @@ static MACHINE_CONFIG_START( at386, at_state )
 	MCFG_SOUND_ADD("dac", DAC, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MCFG_FRAGMENT_ADD( at_kbdc8042 )
-
+	MCFG_AT_KEYBOARD_CONTROLLER_ADD("keybc", XTAL_12MHz, keyboard_controller_intf)
 	MCFG_KB_KEYTRONIC_ADD("keyboard", at_keytronic_intf)
 
 	MCFG_MC146818_ADD( "rtc", MC146818_STANDARD )
@@ -950,10 +963,6 @@ ROM_START( ibm5170 )
 	ROM_REGION(0x4000, "user1", 0)
 	ROM_LOAD("6277356.u44", 0x0000, 0x4000, CRC(dc146448) SHA1(dc0794499b3e499c5777b3aa39554bbf0f2cc19b))
 
-	/* 8042 keyboard controller */
-	ROM_REGION( 0x0800, "kbdc8042", 0 )
-	ROM_LOAD("1503033.bin", 0x0000, 0x0800, CRC(5a81c0d2) SHA1(0100f8789fb4de74706ae7f9473a12ec2b9bd729))
-
 	/* Mainboard PALS */
 	ROM_REGION( 0x2000, "pals", 0 )
 	ROM_LOAD("1501824.pal14l4.u87", 0x0000, 0x0800, NO_DUMP) /* MMI 1501824 717750 // (C)1983 IBM(M) */
@@ -978,10 +987,6 @@ ROM_START( ec1849 )
 	ROM_LOAD("cga.chr",     0x00000, 0x01000, CRC(42009069) SHA1(ed08559ce2d7f97f68b9f540bddad5b6295294dd))
 
 	ROM_REGION(0x50000, "gfx2", ROMREGION_ERASE00)
-
-	/* 8042 keyboard controller */
-	ROM_REGION( 0x0800, "kbdc8042", 0 )
-	ROM_LOAD("1503033.bin", 0x0000, 0x0800, CRC(5a81c0d2) SHA1(0100f8789fb4de74706ae7f9473a12ec2b9bd729))
 ROM_END
 
 ROM_START( ibm5170a )
@@ -1003,10 +1008,6 @@ ROM_START( ibm5170a )
 	/* This region holds the original EGA Video bios */
 	ROM_REGION(0x4000, "user1", 0)
 	ROM_LOAD("6277356.u44", 0x0000, 0x4000, CRC(dc146448) SHA1(dc0794499b3e499c5777b3aa39554bbf0f2cc19b))
-
-	/* 8042 keyboard controller */
-	ROM_REGION( 0x0800, "kbdc8042", 0 )
-	ROM_LOAD("1503033.bin", 0x0000, 0x0800, CRC(5a81c0d2) SHA1(0100f8789fb4de74706ae7f9473a12ec2b9bd729))
 
 	/* Mainboard PALS */
 	ROM_REGION( 0x2000, "pals", 0 )
@@ -1033,10 +1034,6 @@ ROM_START( ibm5162 ) //MB p/n 62x1168
 	ROM_REGION(0x2000,"gfx1", 0)
 	ROM_LOAD("5788005.u33", 0x00000, 0x2000, CRC(0bf56d70) SHA1(c2a8b10808bf51a3c123ba3eb1e9dd608231916f))
 
-	/* 8042 keyboard controller */
-	ROM_REGION( 0x0800, "kbdc8042", 0 )
-	ROM_LOAD("1503033.bin", 0x0000, 0x0800, CRC(5a81c0d2) SHA1(0100f8789fb4de74706ae7f9473a12ec2b9bd729))
-
 	/* Mainboard PALS */
 	ROM_REGION( 0x2000, "pals", 0 )
 	ROM_LOAD("59x7599.pal20l8.u27", 0x0000, 0x0800, NO_DUMP) /* MMI PAL20L8ACN5 8631 // N59X7599 IBM (C)85 K3 */
@@ -1059,10 +1056,6 @@ ROM_START( i8530286 )
 	ROM_RELOAD(0xfe0000,0x10000)
     ROM_LOAD16_BYTE("ps2m30.1", 0xe0001, 0x10000, CRC(1448d3cb) SHA1(13fa26d895ce084278cd5ab1208fc16c80115ebe))
 	ROM_RELOAD(0xfe0001,0x10000)
-
-	/* 8042 keyboard controller */
-	ROM_REGION( 0x0800, "kbdc8042", 0 )
-	ROM_LOAD("1503033.bin", 0x0000, 0x0800, CRC(5a81c0d2) SHA1(0100f8789fb4de74706ae7f9473a12ec2b9bd729))
 ROM_END
 
 
@@ -1074,10 +1067,6 @@ ROM_START( i8555081 )
 	ROM_RELOAD(0xfe0000, 0x10000)
     ROM_LOAD16_BYTE("33fb8146.zm41", 0xe0001, 0x10000, CRC(c6020680) SHA1(b25a64e4b2dca07c567648401100e04e89bbcddb))
 	ROM_RELOAD(0xfe0001, 0x10000)
-
-	/* 8042 keyboard controller */
-	ROM_REGION( 0x0800, "kbdc8042", 0 )
-	ROM_LOAD("1503033.bin", 0x0000, 0x0800, CRC(5a81c0d2) SHA1(0100f8789fb4de74706ae7f9473a12ec2b9bd729))
 ROM_END
 
 
@@ -1124,10 +1113,6 @@ ROM_START( at )
 	ROM_LOAD("5788005.u33", 0x00000, 0x2000, CRC(0bf56d70) SHA1(c2a8b10808bf51a3c123ba3eb1e9dd608231916f))
 
 	ROM_REGION(0x50000, "gfx2", ROMREGION_ERASE00)
-
-	/* 8042 keyboard controller */
-	ROM_REGION( 0x0800, "kbdc8042", 0 )
-	ROM_LOAD("1503033.bin", 0x0000, 0x0800, CRC(5a81c0d2) SHA1(0100f8789fb4de74706ae7f9473a12ec2b9bd729))
 ROM_END
 
 
@@ -1166,9 +1151,6 @@ ROM_START( atvga )
 	ROM_SYSTEM_BIOS(11, "amip1", "AMI P.1")
 	ROMX_LOAD( "poisk-h.bin",   0xf0001, 0x8000, CRC(83fd3f8c) SHA1(ca94850bbd949b97b11710629886b0ee69489a81),ROM_SKIP(1) | ROM_BIOS(12) )
 	ROMX_LOAD( "poisk-l.bin",   0xf0000, 0x8000, CRC(0b2ed291) SHA1(bb51a3f317cf4d429a6cfb44a46ca0ac39d9aaa7),ROM_SKIP(1) | ROM_BIOS(12) )
-	/* 8042 keyboard controller */
-	ROM_REGION( 0x0800, "kbdc8042", 0 )
-	ROM_LOAD("1503033.bin", 0x0000, 0x0800, CRC(5a81c0d2) SHA1(0100f8789fb4de74706ae7f9473a12ec2b9bd729))
 ROM_END
 
 
@@ -1186,10 +1168,6 @@ ROM_START( neat )
 	ROM_LOAD("5788005.u33", 0x00000, 0x2000, CRC(0bf56d70) SHA1(c2a8b10808bf51a3c123ba3eb1e9dd608231916f))
 
 	ROM_REGION(0x50000, "gfx2", ROMREGION_ERASE00)
-
-	/* 8042 keyboard controller */
-	ROM_REGION( 0x0800, "kbdc8042", 0 )
-	ROM_LOAD("1503033.bin", 0x0000, 0x0800, CRC(5a81c0d2) SHA1(0100f8789fb4de74706ae7f9473a12ec2b9bd729))
 ROM_END
 
 
@@ -1205,10 +1183,6 @@ ROM_START( at386 )
 	//ROM_RELOAD(0xff0000,0x8000)
 	ROMX_LOAD("012h-u24.bin", 0xf0001, 0x8000, CRC(17472521) SHA1(7588C148FE53D9DC4CB2D0AB6E0FD51A39BB5D1A),ROM_SKIP(1) | ROM_BIOS(2) )
 	//ROM_RELOAD(0xff0000,0x8000)
-
-	/* 8042 keyboard controller */
-	ROM_REGION( 0x0800, "kbdc8042", 0 )
-	ROM_LOAD("1503033.bin", 0x0000, 0x0800, CRC(5a81c0d2) SHA1(0100f8789fb4de74706ae7f9473a12ec2b9bd729))
 ROM_END
 
 
@@ -1279,10 +1253,6 @@ ROM_START( at486 )
 
 	ROM_SYSTEM_BIOS(20, "qdi", "QDI PX486DX33/50P3")
 	ROMX_LOAD("qdi_px486.u23", 0x0f0000, 0x10000, CRC(c80ecfb6) SHA1(34cc9ef68ff719cd0771297bf184efa83a805f3e), ROM_BIOS(21))
-
-	/* 8042 keyboard controller */
-	ROM_REGION( 0x0800, "kbdc8042", 0 )
-	ROM_LOAD("1503033.bin", 0x0000, 0x0800, CRC(5a81c0d2) SHA1(0100f8789fb4de74706ae7f9473a12ec2b9bd729))
 ROM_END
 
 
@@ -1301,10 +1271,6 @@ ROM_START( ficpio2 )
 	ROMX_LOAD("115c101.awd",  0x0e0000, 0x20000, CRC(5fadde88) SHA1(eff79692c1ecf34b6ea3f02409d14ce1f5c51bf9), ROM_BIOS(3))
 	ROM_SYSTEM_BIOS(3, "ficpio2b1", "FIC 486-PIO-2 1.15B101") /* non-pnp, i/o core: NS 311/312  */
 	ROMX_LOAD("115b101.awd",  0x0e0000, 0x20000, CRC(ff69617d) SHA1(ecbfc7315dcf6bd3e5b59e3ae9258759f64fe7a0), ROM_BIOS(4))
-
-	/* 8042 keyboard controller */
-	ROM_REGION( 0x0800, "kbdc8042", 0 )
-	ROM_LOAD("1503033.bin", 0x0000, 0x0800, CRC(5a81c0d2) SHA1(0100f8789fb4de74706ae7f9473a12ec2b9bd729))
 ROM_END
 
 
@@ -1323,10 +1289,6 @@ ROM_START( at586 )
     ROMX_LOAD("acorp_5tx52.bin", 0x20000, 0x20000, CRC(04d69419) SHA1(983377674fef05e710c8665c14cc348c99166fb6), ROM_BIOS(4))
 	ROM_SYSTEM_BIOS(4, "txp4", "ASUS TXP4") // W83977TF-A I/O
     ROMX_LOAD("asus_txp4.bin",   0x20000, 0x20000, CRC(a1321bb1) SHA1(92e5f14d8505119f85b148a63510617ac12bcdf3), ROM_BIOS(5))
-
-    /* 8042 keyboard controller */
-	ROM_REGION( 0x0800, "kbdc8042", 0 )
-	ROM_LOAD("1503033.bin", 0x0000, 0x0800, CRC(5a81c0d2) SHA1(0100f8789fb4de74706ae7f9473a12ec2b9bd729))
 ROM_END
 
 
@@ -1341,10 +1303,6 @@ ROM_START( c386sx16 )
 	/* Copyright (C) 1985-1990 Phoenix Technologies Ltd. */
 	ROM_LOAD16_BYTE( "390914-01.u39", 0xf0000, 0x8000, CRC(8f849198) SHA1(550b04bac0d0807d6e95ec25391a81272779b41b)) /* 390914-01 V1.03 CS-2100 U39 Copyright (C) 1990 CBM */
 	ROM_LOAD16_BYTE( "390915-01.u38", 0xf0001, 0x8000, CRC(ee4bad92) SHA1(6e02ef97a7ce336485814c06a1693bc099ce5cfb)) /* 390915-01 V1.03 CS-2100 U38 Copyright (C) 1990 CBM */
-
-	/* 8042 keyboard controller */
-	ROM_REGION( 0x0800, "kbdc8042", 0 )
-	ROM_LOAD("1503033.bin", 0x0000, 0x0800, CRC(5a81c0d2) SHA1(0100f8789fb4de74706ae7f9473a12ec2b9bd729))
 ROM_END
 
 /* FIC VT-503 (Intel TX chipset, ITE 8679 Super I/O) */
@@ -1363,10 +1321,6 @@ ROM_START( ficvt503 )
 	ROMX_LOAD("109gi16.bin", 0x20000, 0x20000, CRC(a928f271) SHA1(127a83a60752cc33b3ca49774488e511ec7bac55), ROM_BIOS(4))
 	ROM_SYSTEM_BIOS(4, "115gk140", "1.15GK140") /* 1999-03-03 */
 	ROMX_LOAD("115gk140.awd", 0x20000, 0x20000, CRC(65e88956) SHA1(f94bb0732e00b5b0f18f4e349db24a289f8379c5), ROM_BIOS(5))
-
-	/* 8042 keyboard controller */
-	ROM_REGION( 0x0800, "kbdc8042", 0 )
-	ROM_LOAD("1503033.bin", 0x0000, 0x0800, CRC(5a81c0d2) SHA1(0100f8789fb4de74706ae7f9473a12ec2b9bd729))
 ROM_END
 
 ROM_START( megapc )
@@ -1376,10 +1330,6 @@ ROM_START( megapc )
 
 	ROM_LOAD16_BYTE( "41651-bios lo.u18",  0xe0000, 0x10000, CRC(1e9bd3b7) SHA1(14fd39ec12df7fae99ccdb0484ee097d93bf8d95))
 	ROM_LOAD16_BYTE( "211253-bios hi.u19", 0xe0001, 0x10000, CRC(6acb573f) SHA1(376d483db2bd1c775d46424e1176b24779591525))
-
-	/* 8042 keyboard controller */
-	ROM_REGION( 0x0800, "kbdc8042", 0 )
-	ROM_LOAD("1503033.bin", 0x0000, 0x0800, CRC(5a81c0d2) SHA1(0100f8789fb4de74706ae7f9473a12ec2b9bd729))
 ROM_END
 
 ROM_START( megapcpl )
@@ -1389,18 +1339,11 @@ ROM_START( megapcpl )
 
 	ROM_LOAD16_BYTE( "41652.u18",  0xe0000, 0x10000, CRC(6f5b9a1c) SHA1(cae981a35a01234fcec99a96cb38075d7bf23474))
 	ROM_LOAD16_BYTE( "486slc.u19", 0xe0001, 0x10000, CRC(6fb7e3e9) SHA1(c439cb5a0d83176ceb2a3555e295dc1f84d85103))
-
-	/* 8042 keyboard controller */
-	ROM_REGION( 0x0800, "kbdc8042", 0 )
-	ROM_LOAD("1503033.bin", 0x0000, 0x0800, CRC(5a81c0d2) SHA1(0100f8789fb4de74706ae7f9473a12ec2b9bd729))
 ROM_END
 
 ROM_START( t2000sx )
     ROM_REGION( 0x1000000, "maincpu", 0 )
 	ROM_LOAD( "014d.ic9", 0xe0000, 0x20000, CRC(e9010b02) SHA1(75688fc8e222640fa22bcc90343c6966fe0da87f))
-	/* 8042 keyboard controller */
-	ROM_REGION( 0x0800, "kbdc8042", 0 )
-	ROM_LOAD("1503033.bin", 0x0000, 0x0800, CRC(5a81c0d2) SHA1(0100f8789fb4de74706ae7f9473a12ec2b9bd729))
 ROM_END
 
 

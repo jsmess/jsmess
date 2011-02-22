@@ -39,12 +39,8 @@ extern const ins8250_interface ibm5170_com_interface[4];
 READ8_HANDLER( at_page8_r );
 WRITE8_HANDLER( at_page8_w );
 
-MACHINE_CONFIG_EXTERN( at_kbdc8042 );
-
-READ8_HANDLER(at_kbdc8042_r);
-WRITE8_HANDLER(at_kbdc8042_w);
-WRITE8_HANDLER( at_kbdc8042_set_clock_signal );
-WRITE8_HANDLER( at_kbdc8042_set_data_signal );
+READ8_HANDLER( at_portb_r );
+WRITE8_HANDLER( at_portb_w );
 
 DRIVER_INIT( atcga );
 DRIVER_INIT( atega );
