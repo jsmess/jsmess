@@ -4,6 +4,7 @@
 #define __QL__
 
 #include "machine/ram.h"
+#include "machine/wd17xx.h"
 
 #define SCREEN_TAG	"screen"
 
@@ -13,12 +14,24 @@
 #define ZX8301_TAG	"ic22"
 #define ZX8302_TAG	"ic23"
 #define SPEAKER_TAG	"speaker"
+#define WD1772_TAG	"wd1772"
+
+#define ROMBANK_TAG	"rombank"
+#define RAMBANK_TAG	"rambank"
 
 #define X1 XTAL_15MHz
 #define X2 XTAL_32_768kHz
 #define X3 XTAL_4_436MHz
 #define X4 XTAL_11MHz
 
+#define DRIVE_1_MASK	0x01
+#define DRIVE_0_MASK	0x02
+#define MOTOR_MASK		0x04
+#define SIDE_SHIFT		3
+#define SIDE_MASK		(1 << SIDE_SHIFT)
+
+#define CART_ROM_BASE	0x0c000
+#define TRUMP_ROM_BASE	0x10000
 
 class ql_state : public driver_device
 {
@@ -32,7 +45,8 @@ public:
 		  m_speaker(*this, SPEAKER_TAG),
 		  m_mdv1(*this, MDV_1),
 		  m_mdv2(*this, MDV_2),
-		  m_ram(*this, RAM_TAG)
+		  m_ram(*this, RAM_TAG),
+		  m_fdc(*this, WD1772_TAG)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -43,9 +57,11 @@ public:
 	required_device<device_t> m_mdv1;
 	required_device<device_t> m_mdv2;
 	required_device<device_t> m_ram;
+	required_device<device_t> m_fdc;
 
 	virtual void machine_start();
-
+	virtual void machine_reset();
+	
 	virtual bool video_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 
 	DECLARE_WRITE8_MEMBER( ipc_w );
@@ -65,12 +81,20 @@ public:
 	DECLARE_READ_LINE_MEMBER( zx8302_raw1_r );
 	DECLARE_WRITE_LINE_MEMBER( zx8302_raw2_w );
 	DECLARE_READ_LINE_MEMBER( zx8302_raw2_r );
-
+	
 	/* IPC state */
 	UINT8 m_keylatch;
 	int m_ipl;
 	int m_comdata;
 	int m_baudx4;
+
+	// Trump card
+	DECLARE_READ8_MEMBER( trump_card_r );
+	DECLARE_WRITE8_MEMBER( trump_card_w );
+	DECLARE_READ8_MEMBER( trump_card_rom_r );
+	DECLARE_READ8_MEMBER( cart_rom_r );
+	
+	void trump_card_set_control(UINT8 data);
 };
 
 #endif

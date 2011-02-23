@@ -37,6 +37,38 @@
     - CST Thor XVI W40F  (40MB Winchester, 1 Floppy)
     - CST Thor XVI W40FF (40MB Winchester, 2 Floppies)
 
+
+	2011-02-22, P.Harvey-Smith,
+		Implemented Miracle Trump Card disk and ram interface.
+		
+		The trump card has some interesting memory mapping and re-mapping during initialisation which goes like this
+		
+		On rest the card ram is mapped into the entire $40000-$fffff area, this is the official 512K expansion ram area
+		plus the area set aside for addon card roms. The trump card onboard rom is also mapped in at $10000-$17fff.
+		
+		The main bios then performs a series of loops that initialise and size the ram, this will find either 
+		0K, 256K, 512K or 768K of expansion ram depending on how many banks of ram are populated.
+		
+		After the ram test, the main bios looks for the signature longword of a cartridge rom at $0c000, this read 
+		triggers the Trump Card to also map it's rom in at $c0000-$c7fff, the first addon rom area. If a cartridge 
+		rom is found it is first initialised.
+		
+		The main bios goes on to search the addon card rom area from $c0000 by searching for the signature word for
+		an addon rom at $c0000 and upwards in 16K steps (there is a bug in JM and before that means they only find
+		the first addon, but this does not matter).
+		
+		The main bios finds the trump card addon rom at $c0000, and calls it's initialisation routine at $c011e, this 
+		contains a jump instruction to jump to $10124 (in the lower mapped copy of the trumpcard rom). 
+		
+		The first memory access in the $10000-$17fff range triggers the trumcard to page out the rom at $c0000, and 
+		page the ram back in. Once it arrives at this state the ram will remain paged in until the next reset.
+		
+		I have implemented this with a pair of read handlers at $0c000-$0cfff and $10000-$17fff which do the apropreate 
+		re-map of the upper area and then remove themselves from the address map and return it to simple rom handlers.
+		
+		On the Trump card the above is implemented with a pair of 16L8 PAL chips, the logic of these was decoded with
+		the assistance of Malcolm Lear, without who's help working all this out would have been a much harder process.
+				
 */
 
 #define ADDRESS_MAP_MODERN
@@ -54,9 +86,7 @@
 #include "sound/speaker.h"
 #include "video/zx8301.h"
 #include "includes/ql.h"
-
-
-
+#include "machine/wd17xx.h"
 
 //**************************************************************************
 //  INTELLIGENT PERIPHERAL CONTROLLER
@@ -225,6 +255,86 @@ READ8_MEMBER( ql_state::ipc_bus_r )
 	return data;
 }
 
+READ8_MEMBER( ql_state::trump_card_r )
+{
+	UINT8	result = 0;
+	
+	//logerror("%s TrumpCard:Read of %08X\n",machine->describe_context(),0x1c000+offset);
+		
+	switch (offset)
+	{
+		case 0x0000	: result=wd17xx_r(m_fdc, offset); break; 
+		case 0x0001	: result=wd17xx_r(m_fdc, offset); break; 
+		case 0x0002	: result=wd17xx_r(m_fdc, offset); break;
+		case 0x0003	: result=wd17xx_r(m_fdc, offset); break;
+	}
+	
+	return result;
+}
+
+WRITE8_MEMBER( ql_state::trump_card_w )
+{
+	//logerror("%s TrumpCard:Write %02X to %08X\n",machine->describe_context(),data,0x1c000+offset);
+
+	switch (offset)
+	{
+		case 0x0000	: wd17xx_w(m_fdc, offset, data); break; 
+		case 0x0001	: wd17xx_w(m_fdc, offset, data); break; 
+		case 0x0002	: wd17xx_w(m_fdc, offset, data); break;
+		case 0x0003	: wd17xx_w(m_fdc, offset, data); break;
+		case 0x2000	: trump_card_set_control(data);  break;
+	}
+}
+
+READ8_MEMBER( ql_state::trump_card_rom_r )
+{
+	// If we have more than 640K them map extra ram into top 256K
+	// else just map to unmap.
+	if (ram_get_size(m_ram)>(640*1024))
+		memory_install_ram(&space, 0x0c0000, 0x0fffff, 0, 0, NULL); 
+	else
+		memory_unmap_readwrite(&space, 0x0c0000, 0x0fffff, 0, 0);
+	
+	// Setup trumcard rom mapped to rom so unlink us
+	memory_install_rom(&space, 0x010000, 0x018000, 0, 0, &machine->region(M68008_TAG)->base()[TRUMP_ROM_BASE]);
+
+	return machine->region(M68008_TAG)->base()[TRUMP_ROM_BASE+offset];	
+}
+
+READ8_MEMBER( ql_state::cart_rom_r )
+{
+	// Setup trumcard rom mapped in at $c0000	
+	memory_install_rom(&space, 0x0c0000, 0x0c8000, 0, 0, &machine->region(M68008_TAG)->base()[TRUMP_ROM_BASE]);
+
+	// Setup cart rom to rom handler, so unlink us
+	memory_install_rom(&space, 0x0c000, 0x0ffff, 0, 0, &machine->region(M68008_TAG)->base()[CART_ROM_BASE]);
+
+	return machine->region(M68008_TAG)->base()[CART_ROM_BASE+offset];
+}
+
+void ql_state::trump_card_set_control(UINT8 data)
+{
+	if(data & DRIVE_0_MASK)
+		wd17xx_set_drive(m_fdc,0);
+		
+	if(data & DRIVE_1_MASK)
+		wd17xx_set_drive(m_fdc,1);	
+
+	wd17xx_set_side(m_fdc,(data & SIDE_MASK) >> SIDE_SHIFT);
+}
+
+static READ_LINE_DEVICE_HANDLER( trump_card_dden_r )
+{
+	return 1;
+}
+
+static WRITE_LINE_DEVICE_HANDLER( trump_card_intrq_w )
+{
+}
+
+static WRITE_LINE_DEVICE_HANDLER( trump_card_drq_w )
+{
+}
 
 
 //**************************************************************************
@@ -237,8 +347,8 @@ READ8_MEMBER( ql_state::ipc_bus_r )
 
 static ADDRESS_MAP_START( ql_mem, ADDRESS_SPACE_PROGRAM, 8, ql_state )
 	AM_RANGE(0x000000, 0x00bfff) AM_ROM	// 48K System ROM
-	AM_RANGE(0x00c000, 0x00ffff) AM_ROM // 16K Cartridge ROM
-	AM_RANGE(0x010000, 0x017fff) AM_UNMAP // 32K Expansion I/O
+	AM_RANGE(0x00c000, 0x00ffff) AM_ROM AM_WRITENOP AM_READ( cart_rom_r ) // 16K Cartridge ROM
+	AM_RANGE(0x010000, 0x017fff) AM_ROM AM_WRITENOP AM_READ( trump_card_rom_r ) // Trump card ROM
 	AM_RANGE(0x018000, 0x018003) AM_DEVREAD(ZX8302_TAG, zx8302_device, rtc_r)
 	AM_RANGE(0x018000, 0x018001) AM_DEVWRITE(ZX8302_TAG, zx8302_device, rtc_w)
 	AM_RANGE(0x018002, 0x018002) AM_DEVWRITE(ZX8302_TAG, zx8302_device, control_w)
@@ -248,7 +358,7 @@ static ADDRESS_MAP_START( ql_mem, ADDRESS_SPACE_PROGRAM, 8, ql_state )
 	AM_RANGE(0x018022, 0x018022) AM_DEVREADWRITE(ZX8302_TAG, zx8302_device, mdv_track_r, data_w)
 	AM_RANGE(0x018023, 0x018023) AM_DEVREAD(ZX8302_TAG, zx8302_device, mdv_track_r) AM_WRITENOP
 	AM_RANGE(0x018063, 0x018063) AM_DEVWRITE(ZX8301_TAG, zx8301_device, control_w)
-	AM_RANGE(0x01c000, 0x01ffff) AM_UNMAP // 16K Expansion I/O
+	AM_RANGE(0x01c000, 0x01ffff) AM_READ(trump_card_r) AM_WRITE(trump_card_w) // 16K Expansion I/O
 	AM_RANGE(0x020000, 0x03ffff) AM_DEVREADWRITE(ZX8301_TAG, zx8301_device, data_r, data_w)
 	AM_RANGE(0x040000, 0x0fffff) AM_RAM
 ADDRESS_MAP_END
@@ -667,31 +777,31 @@ static ZX8302_INTERFACE( ql_zx8302_intf )
 //-------------------------------------------------
 
 static FLOPPY_OPTIONS_START( ql )
-	FLOPPY_OPTION(ql, "dsk", "SSSD disk image", basicdsk_identify_default, basicdsk_construct_default,
+	FLOPPY_OPTION(ql, "dsk", "SSDD 40 track disk image", basicdsk_identify_default, basicdsk_construct_default,
 		HEADS([1])
 		TRACKS([40])
 		SECTORS([9])
 		SECTOR_LENGTH([512])
 		FIRST_SECTOR_ID([1]))
-	FLOPPY_OPTION(ql, "dsk", "DSSD disk image", basicdsk_identify_default, basicdsk_construct_default,
+	FLOPPY_OPTION(ql, "dsk", "DSDD 40 track disk image", basicdsk_identify_default, basicdsk_construct_default,
 		HEADS([2])
 		TRACKS([40])
 		SECTORS([9])
 		SECTOR_LENGTH([512])
 		FIRST_SECTOR_ID([1]))
-	FLOPPY_OPTION(ql, "dsk", "DSDD disk image", basicdsk_identify_default, basicdsk_construct_default,
+	FLOPPY_OPTION(ql, "dsk", "DSDD 80 track disk image", basicdsk_identify_default, basicdsk_construct_default,
 		HEADS([2])
 		TRACKS([80])
 		SECTORS([9])
 		SECTOR_LENGTH([512])
 		FIRST_SECTOR_ID([1]))
-	FLOPPY_OPTION(ql, "dsk", "DSHD disk image", basicdsk_identify_default, basicdsk_construct_default,
+	FLOPPY_OPTION(ql, "dsk", "DSHD 80 track disk image", basicdsk_identify_default, basicdsk_construct_default,
 		HEADS([2])
 		TRACKS([80])
 		SECTORS([18])
 		SECTOR_LENGTH([512])
 		FIRST_SECTOR_ID([1]))
-	FLOPPY_OPTION(ql, "dsk", "DSED disk image", basicdsk_identify_default, basicdsk_construct_default,
+	FLOPPY_OPTION(ql, "dsk", "DSED disk 80 track image", basicdsk_identify_default, basicdsk_construct_default,
 		HEADS([2])
 		TRACKS([80])
 		SECTORS([40])
@@ -709,6 +819,14 @@ static const floppy_config ql_floppy_config =
 	FLOPPY_STANDARD_5_25_DSHD,
 	FLOPPY_OPTIONS_NAME(ql),
 	NULL
+};
+
+wd17xx_interface ql_wd17xx_interface = 
+{
+	DEVCB_LINE(trump_card_dden_r),
+	DEVCB_LINE(trump_card_intrq_w),
+	DEVCB_LINE(trump_card_drq_w),
+	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
 };
 
 
@@ -741,34 +859,16 @@ static MICRODRIVE_CONFIG( mdv2_config )
 //  MACHINE_START( ql )
 //-------------------------------------------------
 
+// 
+// The 896K option is dealt with once the machine is up and running as
+// the Trump Card ROM is initally mapped in at $C0000-$C8000, as this is 
+// oficially the expansion card rom area. Once the Trump Card has initialised
+// it maps the last 256K of ram into this area (asuming that it has 768K 
+// onboard).
+//
+
 void ql_state::machine_start()
 {
-	address_space *program = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);
-
-	// configure RAM
-	switch (ram_get_size(m_ram))
-	{
-	case 128*1024:
-		memory_unmap_readwrite(program, 0x040000, 0x0fffff, 0, 0);
-		break;
-
-	case 192*1024:
-		memory_unmap_readwrite(program, 0x050000, 0x0fffff, 0, 0);
-		break;
-
-	case 256*1024:
-		memory_unmap_readwrite(program, 0x060000, 0x0fffff, 0, 0);
-		break;
-
-	case 384*1024:
-		memory_unmap_readwrite(program, 0x080000, 0x0fffff, 0, 0);
-		break;
-
-	case 640*1024:
-		memory_unmap_readwrite(program, 0x0c0000, 0x0fffff, 0, 0);
-		break;
-	}
-
 	// register for state saving
 	state_save_register_global(machine, m_keylatch);
 	state_save_register_global(machine, m_ipl);
@@ -776,7 +876,34 @@ void ql_state::machine_start()
 	state_save_register_global(machine, m_baudx4);
 }
 
+void ql_state::machine_reset()
+{
+	address_space 	*program 	= cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);
 
+	// configure RAM
+	switch (ram_get_size(m_ram))
+	{
+		case 128*1024:
+			memory_unmap_readwrite(program, 0x040000, 0x0fffff, 0, 0);
+			break;
+
+		case 192*1024:
+			memory_unmap_readwrite(program, 0x050000, 0x0fffff, 0, 0);
+			break;
+
+		case 256*1024:
+			memory_unmap_readwrite(program, 0x060000, 0x0fffff, 0, 0);
+			break;
+
+		case 384*1024:
+			memory_unmap_readwrite(program, 0x080000, 0x0fffff, 0, 0);
+			break;
+
+		case 640*1024:
+			memory_unmap_readwrite(program, 0x0c0000, 0x0fffff, 0, 0);
+			break;
+	}	
+}
 
 //**************************************************************************
 //  MACHINE CONFIGURATION
@@ -815,6 +942,7 @@ static MACHINE_CONFIG_START( ql, ql_state )
 	MCFG_ZX8302_ADD(ZX8302_TAG, X1, ql_zx8302_intf)
 
 	MCFG_FLOPPY_2_DRIVES_ADD(ql_floppy_config)
+	MCFG_WD1772_ADD(WD1772_TAG,ql_wd17xx_interface)
 
 	MCFG_MICRODRIVE_ADD(MDV_1, mdv1_config)
 	MCFG_MICRODRIVE_ADD(MDV_2, mdv2_config)
@@ -882,7 +1010,7 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 
 ROM_START( ql )
-    ROM_REGION( 0x10000, M68008_TAG, 0 )
+    ROM_REGION( 0x18000, M68008_TAG, 0 )
 	ROM_DEFAULT_BIOS("js")
 	ROM_SYSTEM_BIOS( 0, "fb", "v1.00 (FB)" )
     ROMX_LOAD( "fb.ic33", 0x0000, 0x8000, NO_DUMP, ROM_BIOS(1) )
@@ -909,6 +1037,8 @@ ROM_START( ql )
     ROMX_LOAD( "minerva.rom", 0x0000, 0x00c000, BAD_DUMP CRC(930befe3) SHA1(84a99c4df13b97f90baf1ec8cb6c2e52e3e1bb4d), ROM_BIOS(8) )
 	ROM_CART_LOAD("cart", 0xc000, 0x4000, ROM_MIRROR | ROM_OPTIONAL)
 
+	ROM_LOAD( "trumpcard-125.rom", TRUMP_ROM_BASE, 0x08000, CRC(938eaa46) SHA1(9b3458cf3a279ed86ba395dc45c8f26939d6c44d))
+
 	ROM_REGION( 0x800, I8749_TAG, 0 )
 	ROM_LOAD( "ipc8049.ic24", 0x000, 0x800, CRC(6a0d1f20) SHA1(fcb1c97ee7c66e5b6d8fbb57c06fd2f6509f2e1b) )
 
@@ -922,8 +1052,8 @@ ROM_END
 //-------------------------------------------------
 
 ROM_START( ql_us )
-    ROM_REGION( 0x10000, M68008_TAG, 0 )
-    ROM_LOAD( "jsu.ic33", 0x0000, 0x8000, BAD_DUMP CRC(e397f49f) SHA1(c06f92eabaf3e6dd298c51cb7f7535d8ef0ef9c5) )
+    ROM_REGION( 0x18000, M68008_TAG, 0 )
+	ROM_LOAD( "jsu.ic33", 0x0000, 0x8000, BAD_DUMP CRC(e397f49f) SHA1(c06f92eabaf3e6dd298c51cb7f7535d8ef0ef9c5) )
     ROM_LOAD( "jsu.ic34", 0x8000, 0x4000, BAD_DUMP CRC(3debbacc) SHA1(9fbc3e42ec463fa42f9c535d63780ff53a9313ec) )
 	ROM_CART_LOAD("cart", 0xc000, 0x4000, ROM_MIRROR | ROM_OPTIONAL)
 
@@ -940,8 +1070,8 @@ ROM_END
 //-------------------------------------------------
 
 ROM_START( ql_es )
-    ROM_REGION( 0x10000, M68008_TAG, 0 )
-    ROM_LOAD( "mge.ic33", 0x0000, 0x8000, BAD_DUMP CRC(d5293bde) SHA1(bf5af7e53a472d4e9871f182210787d601db0634) )
+    ROM_REGION( 0x18000, M68008_TAG, 0 )
+	ROM_LOAD( "mge.ic33", 0x0000, 0x8000, BAD_DUMP CRC(d5293bde) SHA1(bf5af7e53a472d4e9871f182210787d601db0634) )
     ROM_LOAD( "mge.ic34", 0x8000, 0x4000, BAD_DUMP CRC(a694f8d7) SHA1(bd2868656008de85d7c191598588017ae8aa3339) )
 	ROM_CART_LOAD("cart", 0xc000, 0x4000, ROM_MIRROR | ROM_OPTIONAL)
 
@@ -958,8 +1088,8 @@ ROM_END
 //-------------------------------------------------
 
 ROM_START( ql_fr )
-    ROM_REGION( 0x10000, M68008_TAG, 0 )
-    ROM_LOAD( "mgf.ic33", 0x0000, 0x8000, NO_DUMP )
+    ROM_REGION( 0x18000, M68008_TAG, 0 )
+	ROM_LOAD( "mgf.ic33", 0x0000, 0x8000, NO_DUMP )
     ROM_LOAD( "mgf.ic34", 0x8000, 0x4000, NO_DUMP )
 	ROM_CART_LOAD("cart", 0xc000, 0x4000, ROM_MIRROR | ROM_OPTIONAL)
 
@@ -976,7 +1106,7 @@ ROM_END
 //-------------------------------------------------
 
 ROM_START( ql_de )
-    ROM_REGION( 0x10000, M68008_TAG, 0 )
+    ROM_REGION( 0x18000, M68008_TAG, 0 )
 	ROM_SYSTEM_BIOS( 0, "mg", "v1.10 (MG)" )
     ROMX_LOAD( "mgg.ic33", 0x0000, 0x8000, BAD_DUMP CRC(b4e468fd) SHA1(cd02a3cd79af90d48b65077d0571efc2f12f146e), ROM_BIOS(1) )
     ROMX_LOAD( "mgg.ic34", 0x8000, 0x4000, BAD_DUMP CRC(54959d40) SHA1(ffc0be9649f26019d7be82925c18dc699259877f), ROM_BIOS(1) )
@@ -1000,8 +1130,8 @@ ROM_END
 //-------------------------------------------------
 
 ROM_START( ql_it )
-    ROM_REGION( 0x10000, M68008_TAG, 0 )
-    ROM_LOAD( "mgi.ic33", 0x0000, 0x8000, BAD_DUMP CRC(d5293bde) SHA1(bf5af7e53a472d4e9871f182210787d601db0634) )
+    ROM_REGION( 0x18000, M68008_TAG, 0 )
+	ROM_LOAD( "mgi.ic33", 0x0000, 0x8000, BAD_DUMP CRC(d5293bde) SHA1(bf5af7e53a472d4e9871f182210787d601db0634) )
     ROM_LOAD( "mgi.ic34", 0x8000, 0x4000, BAD_DUMP CRC(a2fdfb83) SHA1(162b1052737500f3c13497cdf0f813ba006bdae9) )
 	ROM_CART_LOAD("cart", 0xc000, 0x4000, ROM_MIRROR | ROM_OPTIONAL)
 
@@ -1018,8 +1148,8 @@ ROM_END
 //-------------------------------------------------
 
 ROM_START( ql_se )
-    ROM_REGION( 0x10000, M68008_TAG, 0 )
-    ROM_LOAD( "mgs.ic33", 0x0000, 0x8000, NO_DUMP )
+    ROM_REGION( 0x18000, M68008_TAG, 0 )
+	ROM_LOAD( "mgs.ic33", 0x0000, 0x8000, NO_DUMP )
     ROM_LOAD( "mgs.ic34", 0x8000, 0x4000, NO_DUMP )
 	ROM_CART_LOAD("cart", 0xc000, 0x4000, ROM_MIRROR | ROM_OPTIONAL)
 
@@ -1036,8 +1166,8 @@ ROM_END
 //-------------------------------------------------
 
 ROM_START( ql_gr )
-    ROM_REGION( 0x10000, M68008_TAG, 0 )
-    ROM_LOAD( "efp.ic33", 0x0000, 0x8000, BAD_DUMP CRC(eb181641) SHA1(43c1e0215cf540cbbda240b1048910ff55681059) )
+    ROM_REGION( 0x18000, M68008_TAG, 0 )
+	ROM_LOAD( "efp.ic33", 0x0000, 0x8000, BAD_DUMP CRC(eb181641) SHA1(43c1e0215cf540cbbda240b1048910ff55681059) )
     ROM_LOAD( "efp.ic34", 0x8000, 0x4000, BAD_DUMP CRC(4c3b34b7) SHA1(f9dc571d2d4f68520b306ecc7516acaeea69ec0d) )
 	ROM_CART_LOAD("cart", 0xc000, 0x4000, ROM_MIRROR | ROM_OPTIONAL)
 
@@ -1054,8 +1184,8 @@ ROM_END
 //-------------------------------------------------
 
 ROM_START( ql_dk )
-    ROM_REGION( 0x10000, M68008_TAG, 0 )
-    ROM_LOAD( "mgd.ic33",  0x0000, 0x8000, BAD_DUMP CRC(f57755eb) SHA1(dc57939ffb8741e17967a1d2479c339750ec7ff6) )
+    ROM_REGION( 0x18000, M68008_TAG, 0 )
+	ROM_LOAD( "mgd.ic33",  0x0000, 0x8000, BAD_DUMP CRC(f57755eb) SHA1(dc57939ffb8741e17967a1d2479c339750ec7ff6) )
     ROM_LOAD( "mgd.ic34",  0x8000, 0x4000, BAD_DUMP CRC(1892465a) SHA1(0ff3046b5276da6639d3fe79b22ae25cc265d540) )
 	ROM_CART_LOAD("cart", 0xc000, 0x4000, ROM_MIRROR | ROM_OPTIONAL)
 
