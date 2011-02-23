@@ -1857,5 +1857,10 @@ const game_driver * const drivers[] =
 	DRIVER( bigbord2 )
 	DRIVER( savia84 )
 	DRIVER( pes )
-
+	DRIVER( pdp11ub )
+	DRIVER( pdp11ub2 )
+	DRIVER( pdp11qb )
+	DRIVER( terak )
+	DRIVER( sacstate )
+	
 #endif /* DRIVER_RECURSIVE */

@@ -1756,6 +1756,7 @@ $(MESSOBJ)/skeleton.a:			\
 	$(MESS_DRIVERS)/okean240.o	\
 	$(MESS_DRIVERS)/p112.o		\
 	$(MESS_DRIVERS)/p8k.o		\
+	$(MESS_DRIVERS)/pdp11.o		\
 	$(MESS_DRIVERS)/pegasus.o	\
 	$(MESS_DRIVERS)/pes.o		\
 	$(MESS_DRIVERS)/phunsy.o	\
@@ -1769,6 +1770,7 @@ $(MESSOBJ)/skeleton.a:			\
 	$(MESS_DRIVERS)/pyl601.o	\
 	$(MESS_DRIVERS)/qtsbc.o		\
 	$(MESS_DRIVERS)/rvoice.o	\
+	$(MESS_DRIVERS)/sacstate.o	\
 	$(MESS_DRIVERS)/sage2.o		\
 	$(MESS_DRIVERS)/savia84.o	\
 	$(MESS_DRIVERS)/sbc6510.o	\
@@ -1777,6 +1779,7 @@ $(MESSOBJ)/skeleton.a:			\
 	$(MESS_DRIVERS)/swtpc.o		\
 	$(MESS_DRIVERS)/sys2900.o	\
 	$(MESS_DRIVERS)/systec.o	\
+	$(MESS_DRIVERS)/terak.o		\
 	$(MESS_DRIVERS)/tim011.o	\
 	$(MESS_DRIVERS)/tricep.o	\
 	$(MESS_DRIVERS)/tvc.o		\
