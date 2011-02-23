@@ -2146,6 +2146,38 @@ ROM_START( mz2500 )
 	ROM_LOAD( "phone.rom", 0x00000, 0x4000, CRC(8e49e4dc) SHA1(2589f0c95028037a41ca32a8fd799c5f085dab51) )
 ROM_END
 
+ROM_START( mz2520 )
+	ROM_REGION( 0x80000, "maincpu", ROMREGION_ERASEFF )
+
+	ROM_REGION( 0x2000, "pcg", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x100000, "emm", ROMREGION_ERASEFF )
+
+	ROM_REGION( 0x08000, "ipl", 0 )
+	ROM_LOAD( "ipl.rom", 0x00000, 0x8000, CRC(0a126eb2) SHA1(faf71236b3ad82d30184adea951d43d10ced663d) )
+
+	/* this is probably an hand made ROM, will be removed in the end ...*/
+	ROM_REGION( 0x1000, "cgrom", 0 )
+	ROM_LOAD( "cg.rom", 0x0000, 0x0800, CRC(a082326f) SHA1(dfa1a797b2159838d078650801c7291fa746ad81) )
+
+	ROM_REGION( 0x40000, "kanji", 0 )
+	ROM_LOAD( "kanji.rom", 0x0000, 0x40000, CRC(dd426767) SHA1(cc8fae0cd1736bc11c110e1c84d3f620c5e35b80) )
+
+	ROM_REGION( 0x20000, "kanji2", 0 )
+	ROM_LOAD( "kanji2.rom", 0x0000, 0x20000, CRC(eaaf20c9) SHA1(771c4d559b5241390215edee798f3bce169d418c) )
+
+	ROM_REGION( 0x40000, "dictionary", 0 )
+	ROM_LOAD( "dict.rom", 0x00000, 0x40000, CRC(aa957c2b) SHA1(19a5ba85055f048a84ed4e8d471aaff70fcf0374) )
+
+	ROM_REGION( 0x8000, "rom", ROMREGION_ERASEFF ) //iplpro
+	ROM_LOAD( "sasi.rom", 0x00000, 0x8000, CRC(a7bf39ce) SHA1(3f4a237fc4f34bac6fe2bbda4ce4d16d42400081) )
+
+	ROM_REGION( 0x8000, "phone", ROMREGION_ERASEFF )
+	ROM_LOAD( "phone.rom", 0x00000, 0x4000, CRC(8e49e4dc) SHA1(2589f0c95028037a41ca32a8fd799c5f085dab51) )
+ROM_END
+
 /* Driver */
 
-COMP( 1985, mz2500,   0,        0,      mz2500,   mz2500,        0,      "Sharp",     "MZ-2500", 0 )
+COMP( 1985, mz2500,   0,        	 0,      mz2500,   mz2500,        0,      "Sharp",     "MZ-2500", 0 )
+COMP( 1985, mz2520,   mz2500,        0,      mz2500,   mz2500,        0,      "Sharp",     "MZ-2520", 0 ) // looks a stripped down version of the regular MZ-2500, with only two floppies drives and no cassette interface
+
