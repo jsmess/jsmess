@@ -32,6 +32,10 @@ public:
 
 	virtual void video_start();
 	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
+	
+	DECLARE_WRITE8_MEMBER( fw0_w );
+	DECLARE_WRITE8_MEMBER( fw1_w );
+	DECLARE_WRITE8_MEMBER( en_spec_contr_reg_w );
 
 	// video
 	UINT8 *m_video_ram;

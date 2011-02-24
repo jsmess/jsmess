@@ -333,7 +333,7 @@ static MACHINE_CONFIG_FRAGMENT( abc77 )
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_hz(XTAL_4_608MHz/(3*5)))
 
 	/* serial clock timer */
-	MCFG_TIMER_ADD_PERIODIC("serial", clock_tick, attotime::from_hz(XTAL_4_608MHz/(3*5)/16))
+	MCFG_TIMER_ADD_PERIODIC("serial", clock_tick, MCS48_ALE_CLOCK(XTAL_4_608MHz))
 
 	/* discrete sound */
 	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
