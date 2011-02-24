@@ -438,7 +438,7 @@ $(MESSOBJ)/mame.a: \
 	$(MAME_VIDEO)/amigaaga.o	\
 	$(MAME_MACHINE)/amiga.o		\
 	$(MAME_AUDIO)/amiga.o		\
-	$(MAME_MACHINE)/cubocd32.o	\
+	$(MAME_MACHINE)/cd32.o	\
 	$(MAME_VIDEO)/tia.o			\
 	$(MAME_MACHINE)/atari.o		\
 	$(MAME_VIDEO)/atari.o		\
@@ -484,6 +484,7 @@ $(MESSOBJ)/mame.a: \
 	$(MAME_MACHINE)/cdicdic.o	\
 	$(MAME_MACHINE)/cdislave.o	\
 	$(MAME_VIDEO)/mcd212.o		\
+	$(MAME_DRIVERS)/cd32.o  \
 
 #-------------------------------------------------
 # the following files are general components and

@@ -1,26 +1,9 @@
 /*
-    Amiga 1200 / CD32
+    Amiga 1200 
 
     Preliminary MAME driver by Mariusz Wojcieszek
     CD-ROM controller by Ernesto Corvi
     Borrowed by incog for MESS
-
-
-    Several of the games have Audio tracks, therefore the CRC / SHA1 information you get when
-    reading your own CDs may not match confirmed dumps.  There is currently no 100% accurate
-    way to rip the audio data with full sub-track and offset information.
-
-    CD32 Hardware Specs (from Wikipedia, http://en.wikipedia.org/wiki/Amiga_CD32)
-     * Main Processor: Motorola 68EC020 at 14.3 MHz
-     * System Memory: 2 MB Chip RAM
-     * 1 MB ROM with Kickstart ROM 3.1 and integrated cdfs.filesystem
-     * 1KB of FlashROM for game saves
-     * Graphics/Chipset: AGA Chipset
-     * Akiko chip, which handles CD-ROM and can do Chunky to Planar conversion
-     * Proprietary (MKE) CD-ROM drive at 2x speed
-     * Expansion socket for MPEG cartridge, as well as 3rd party devices such as the SX-1 and SX32 expansion packs.
-     * 4 8-bit audio channels (2 for left, 2 for right)
-     * Gamepad, Serial port, 2 Gameports, Interfaces for keyboard
 
     2009-05 Fabio Priuli:
     Amiga 1200 support is just sketched (I basically took cd32 and removed Akiko). I connected
@@ -39,17 +22,16 @@
 #include "machine/amigafdc.h"
 #include "machine/amigakbd.h"
 
-#include "sound/cdda.h"
 #include "includes/amiga.h"
-#include "includes/cubocd32.h"
-#include "imagedev/chd_cd.h"
+#include "includes/cd32.h"
 
 
-class ami1200_state : public cubocd32_state
+
+class ami1200_state : public cd32_state
 {
 public:
 	ami1200_state(running_machine &machine, const driver_device_config_base &config)
-		: cubocd32_state(machine, config) { }
+		: cd32_state(machine, config) { }
 
 	UINT16 potgo_value;
 	int cd32_shifter[2];
@@ -60,9 +42,7 @@ public:
 
 #define A1200PAL_XTAL_X1  XTAL_28_37516MHz
 #define A1200PAL_XTAL_X2  XTAL_4_433619MHz
-#define CD32PAL_XTAL_X1   XTAL_28_37516MHz
-#define CD32PAL_XTAL_X2   XTAL_4_433619MHz
-#define CD32PAL_XTAL_X3   XTAL_16_9344MHz
+
 
 
 static void handle_cd32_joystick_cia(ami1200_state *state, UINT8 pra, UINT8 dra);
@@ -101,15 +81,9 @@ static WRITE32_HANDLER( aga_overlay_w )
  *
  *************************************/
 
-static WRITE8_DEVICE_HANDLER( cd32_cia_0_porta_w )
+static WRITE8_DEVICE_HANDLER( ami1200_cia_0_porta_w )
 {
 	ami1200_state *state = device->machine->driver_data<ami1200_state>();
-
-	/* bit 1 = cd audio mute */
-	device_t *cdda = device->machine->device("cdda");
-
-	if (cdda != NULL)
-		device->machine->device<cdda_device>("cdda")->set_output_gain(0, BIT(data, 0) ? 0.0 : 1.0);
 
 	/* bit 2 = Power Led on Amiga */
 	set_led_status(device->machine, 0, !BIT(data, 1));
@@ -132,14 +106,14 @@ static WRITE8_DEVICE_HANDLER( cd32_cia_0_porta_w )
  *
  *************************************/
 
-static READ8_DEVICE_HANDLER( cd32_cia_0_portb_r )
+static READ8_DEVICE_HANDLER( ami1200_cia_0_portb_r )
 {
 	/* parallel port */
 	logerror("%s:CIA0_portb_r\n", device->machine->describe_context());
 	return 0xff;
 }
 
-static WRITE8_DEVICE_HANDLER( cd32_cia_0_portb_w )
+static WRITE8_DEVICE_HANDLER( ami1200_cia_0_portb_w )
 {
 	/* parallel port */
 	logerror("%s:CIA0_portb_w(%02x)\n", device->machine->describe_context(), data);
@@ -147,25 +121,14 @@ static WRITE8_DEVICE_HANDLER( cd32_cia_0_portb_w )
 
 static ADDRESS_MAP_START( a1200_map, ADDRESS_SPACE_PROGRAM, 32 )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x1fffff) AM_RAMBANK("bank1") AM_BASE_SIZE_MEMBER(cubocd32_state, chip_ram, chip_ram_size)
+	AM_RANGE(0x000000, 0x1fffff) AM_RAMBANK("bank1") AM_BASE_SIZE_MEMBER(cd32_state, chip_ram, chip_ram_size)
 	AM_RANGE(0xbfa000, 0xbfa003) AM_WRITE(aga_overlay_w)
 	AM_RANGE(0xbfd000, 0xbfefff) AM_READWRITE16(amiga_cia_r, amiga_cia_w, 0xffffffff)
-	AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE16(amiga_custom_r, amiga_custom_w, 0xffffffff) AM_BASE_MEMBER(cubocd32_state, custom_regs)
+	AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE16(amiga_custom_r, amiga_custom_w, 0xffffffff) AM_BASE_MEMBER(cd32_state, custom_regs)
 	AM_RANGE(0xe80000, 0xe8ffff) AM_READWRITE16(amiga_autoconfig_r, amiga_autoconfig_w, 0xffffffff)
 	AM_RANGE(0xf80000, 0xffffff) AM_ROM AM_REGION("user1", 0)	/* Kickstart */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cd32_map, ADDRESS_SPACE_PROGRAM, 32 )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x1fffff) AM_RAMBANK("bank1") AM_BASE_SIZE_MEMBER(cubocd32_state, chip_ram, chip_ram_size)
-	AM_RANGE(0xb80000, 0xb8003f) AM_DEVREADWRITE("akiko", amiga_akiko32_r, amiga_akiko32_w)
-	AM_RANGE(0xbfa000, 0xbfa003) AM_WRITE(aga_overlay_w)
-	AM_RANGE(0xbfd000, 0xbfefff) AM_READWRITE16(amiga_cia_r, amiga_cia_w, 0xffffffff)
-	AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE16(amiga_custom_r, amiga_custom_w, 0xffffffff) AM_BASE_MEMBER(cubocd32_state, custom_regs)
-	AM_RANGE(0xe00000, 0xe7ffff) AM_ROM AM_REGION("user1", 0x80000)	/* CD32 Extended ROM */
-	AM_RANGE(0xa00000, 0xf7ffff) AM_NOP
-	AM_RANGE(0xf80000, 0xffffff) AM_ROM AM_REGION("user1", 0x0)		/* Kickstart */
-ADDRESS_MAP_END
 
 //int cd32_input_port_val = 0;
 //int cd32_input_select = 0;
@@ -223,42 +186,6 @@ static void handle_cd32_joystick_cia(ami1200_state *state, UINT8 pra, UINT8 dra)
     }
 }
 
-static UINT16 handle_joystick_potgor (running_machine *machine, UINT16 potgor)
-{
-	ami1200_state *state = machine->driver_data<ami1200_state>();
-    int i;
-
-    for (i = 0; i < 2; i++)
-	{
-		UINT16 p9dir = 0x0800 << (i * 4); /* output enable P9 */
-		UINT16 p9dat = 0x0400 << (i * 4); /* data P9 */
-		UINT16 p5dir = 0x0200 << (i * 4); /* output enable P5 */
-		UINT16 p5dat = 0x0100 << (i * 4); /* data P5 */
-
-	    /* p5 is floating in input-mode */
-	    potgor &= ~p5dat;
-	    potgor |= state->potgo_value & p5dat;
-	    if (!(state->potgo_value & p9dir))
-			potgor |= p9dat;
-	    /* P5 output and 1 -> shift register is kept reset (Blue button) */
-	    if ((state->potgo_value & p5dir) && (state->potgo_value & p5dat))
-			state->cd32_shifter[i] = 8;
-	    /* shift at 1 == return one, >1 = return button states */
-	    if (state->cd32_shifter[i] == 0)
-			potgor &= ~p9dat; /* shift at zero == return zero */
-		if (i == 0)
-			if (state->cd32_shifter[i] >= 2 && (input_port_read(machine, "IN0") & (1 << (state->cd32_shifter[i] - 2))))
-				potgor &= ~p9dat;
-    }
-    return potgor;
-}
-
-static CUSTOM_INPUT(cd32_input)
-{
-	ami1200_state *state = field->port->machine->driver_data<ami1200_state>();
-	return handle_joystick_potgor(field->port->machine, state->potgo_value) >> 10;
-}
-
 
 static INPUT_PORTS_START( a1200 )
 	PORT_START("CIA0PORTA")
@@ -311,80 +238,6 @@ static INPUT_PORTS_START( a1200 )
 	PORT_INCLUDE( amiga_us_keyboard )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( cd32 )
-	PORT_START("CIA0PORTA")
-	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_SPECIAL )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
-
-	PORT_START("CIA0PORTB")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
-
-	PORT_START("JOY0DAT")
-	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(amiga_joystick_convert, "P1JOY")
-	PORT_BIT( 0xfcfc, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START("JOY1DAT")
-	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(amiga_joystick_convert, "P2JOY")
-	PORT_BIT( 0xfcfc, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START("POTGO")
-	PORT_BIT( 0x4400, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(cd32_input, 0)
-	PORT_BIT( 0xaaff, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("P1JOY")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
-
-	PORT_START("P2JOY")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
-
-	PORT_START("COINS")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
-
-	PORT_START("DIPSW1")
-	PORT_DIPNAME( 0x01, 0x01, "DSW1 1" )
-	PORT_DIPSETTING(    0x01, "Reset" )
-	PORT_DIPSETTING(    0x00, "Set" )
-	PORT_DIPNAME( 0x02, 0x02, "DSW1 2" )
-	PORT_DIPSETTING(    0x02, "Reset" )
-	PORT_DIPSETTING(    0x00, "Set" )
-	PORT_DIPNAME( 0x04, 0x04, "DSW1 3" )
-	PORT_DIPSETTING(    0x04, "Reset" )
-	PORT_DIPSETTING(    0x00, "Set" )
-	PORT_DIPNAME( 0x08, 0x08, "DSW1 4" )
-	PORT_DIPSETTING(    0x08, "Reset" )
-	PORT_DIPSETTING(    0x00, "Set" )
-	PORT_DIPNAME( 0x10, 0x10, "DSW1 5" )
-	PORT_DIPSETTING(    0x10, "Reset" )
-	PORT_DIPSETTING(    0x00, "Set" )
-	PORT_DIPNAME( 0x20, 0x20, "DSW1 6" )
-	PORT_DIPSETTING(    0x20, "Reset" )
-	PORT_DIPSETTING(    0x00, "Set" )
-	PORT_SERVICE( 0x40, IP_ACTIVE_HIGH )
-	PORT_DIPNAME( 0x80, 0x80, "DSW1 8" )
-	PORT_DIPSETTING(    0x80, "Reset" )
-	PORT_DIPSETTING(    0x00, "Set" )
-
-	PORT_START("IN0")
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_BUTTON1 )
-	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_BUTTON2 )
-	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_BUTTON3 )
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_BUTTON4 )
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON5 )
-	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON6 )
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON7 )
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-INPUT_PORTS_END
 
 /*************************************
  *
@@ -408,22 +261,9 @@ static const mos6526_interface a1200_cia_0_intf =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_HANDLER(a1200_cia_0_portA_r),
-	DEVCB_HANDLER(cd32_cia_0_porta_w),		/* port A */
-	DEVCB_HANDLER(cd32_cia_0_portb_r),
-	DEVCB_HANDLER(cd32_cia_0_portb_w)		/* port B */
-};
-
-static const mos6526_interface cd32_cia_0_intf =
-{
-	0,													/* tod_clock */
-	DEVCB_LINE(amiga_cia_0_irq),									/* irq_func */
-	DEVCB_NULL,	/* pc_func */
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_INPUT_PORT("CIA0PORTA"),
-	DEVCB_HANDLER(cd32_cia_0_porta_w),		/* port A */
-	DEVCB_HANDLER(cd32_cia_0_portb_r),
-	DEVCB_HANDLER(cd32_cia_0_portb_w)		/* port B */
+	DEVCB_HANDLER(ami1200_cia_0_porta_w),		/* port A */
+	DEVCB_HANDLER(ami1200_cia_0_portb_r),
+	DEVCB_HANDLER(ami1200_cia_0_portb_w)		/* port B */
 };
 
 static const mos6526_interface a1200_cia_1_intf =
@@ -439,18 +279,6 @@ static const mos6526_interface a1200_cia_1_intf =
 	DEVCB_DEVICE_HANDLER("fdc", amiga_fdc_control_w)			/* port B */
 };
 
-static const mos6526_interface cd32_cia_1_intf =
-{
-	0,													/* tod_clock */
-	DEVCB_LINE(amiga_cia_1_irq),									/* irq_func */
-	DEVCB_NULL,	/* pc_func */
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,									/* port A */
-	DEVCB_NULL,
-	DEVCB_NULL									/* port B */
-};
 
 static MACHINE_CONFIG_START( a1200n, ami1200_state )
 
@@ -512,59 +340,6 @@ static MACHINE_CONFIG_DERIVED( a1200p, a1200n )
 	MCFG_DEVICE_CLOCK(A1200PAL_XTAL_X1/20)
 MACHINE_CONFIG_END
 
-#define	NVRAM_SIZE 1024
-#define	NVRAM_PAGE_SIZE	16	/* max size of one write request */
-
-static const i2cmem_interface i2cmem_interface =
-{
-	I2CMEM_SLAVE_ADDRESS, NVRAM_PAGE_SIZE, NVRAM_SIZE
-};
-
-static MACHINE_CONFIG_START( cd32, ami1200_state )
-
-	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68EC020, AMIGA_68EC020_NTSC_CLOCK) /* 14.3 Mhz */
-	MCFG_CPU_PROGRAM_MAP(cd32_map)
-
-	MCFG_MACHINE_RESET(amiga)
-	MCFG_I2CMEM_ADD("i2cmem",i2cmem_interface)
-
-	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(59.997)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MCFG_SCREEN_SIZE(512*2, 312)
-	MCFG_SCREEN_VISIBLE_AREA((129-8-8)*2, (449+8-1+8)*2, 44-8, 300+8-1)
-	MCFG_SCREEN_UPDATE(amiga_aga)
-
-	MCFG_VIDEO_START(amiga_aga)
-
-	/* sound hardware */
-    MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-
-    MCFG_SOUND_ADD("amiga", AMIGA, XTAL_28_63636MHz/8)
-    MCFG_SOUND_ROUTE(0, "lspeaker", 0.25)
-    MCFG_SOUND_ROUTE(1, "rspeaker", 0.25)
-    MCFG_SOUND_ROUTE(2, "rspeaker", 0.25)
-    MCFG_SOUND_ROUTE(3, "lspeaker", 0.25)
-
-    MCFG_SOUND_ADD( "cdda", CDDA, 0 )
-	MCFG_SOUND_ROUTE( 0, "lspeaker", 0.50 )
-	MCFG_SOUND_ROUTE( 1, "rspeaker", 0.50 )
-
-	/* cia */
-	MCFG_MOS8520_ADD("cia_0", AMIGA_68EC020_PAL_CLOCK / 10, cd32_cia_0_intf)
-	MCFG_MOS8520_ADD("cia_1", AMIGA_68EC020_PAL_CLOCK / 10, cd32_cia_1_intf)
-
-	MCFG_CDROM_ADD( "cdrom" )
-	MCFG_CDROM_INTERFACE("cd32_cdrom")
-
-	MCFG_DEVICE_ADD("akiko", AKIKO, 0)
-MACHINE_CONFIG_END
-
 
 /***************************************************************************
     ROM DEFINITIONS
@@ -591,11 +366,6 @@ ROM_END
 
 #define rom_a1200p    rom_a1200n
 
-ROM_START( cd32 )
-	ROM_REGION32_BE(0x100000, "user1",0)
-	ROM_LOAD("391640-03.u6a", 0x000000, 0x100000, CRC(d3837ae4) SHA1(06807db3181637455f4d46582d9972afec8956d9))
-ROM_END
-
 
 /***************************************************************************************************/
 
@@ -608,7 +378,7 @@ static UINT16 a1200_read_dskbytr(running_machine *machine)
 
 static void a1200_write_dsklen(running_machine *machine, UINT16 data)
 {
-	cubocd32_state *state = machine->driver_data<cubocd32_state>();
+	cd32_state *state = machine->driver_data<cd32_state>();
 	if ( data & 0x8000 )
 	{
 		if ( CUSTOM_REG(REG_DSKLEN) & 0x8000 )
@@ -619,8 +389,8 @@ static void a1200_write_dsklen(running_machine *machine, UINT16 data)
 
 static DRIVER_INIT( a1200 )
 {
-	cubocd32_state *state = machine->driver_data<cubocd32_state>();
-	static const amiga_machine_interface cubocd32_intf =
+	cd32_state *state = machine->driver_data<cd32_state>();
+	static const amiga_machine_interface cd32_intf =
 	{
 		AGA_CHIP_RAM_MASK,
 		NULL, NULL,			/* joy0dat_r & joy1dat_r */
@@ -634,7 +404,7 @@ static DRIVER_INIT( a1200 )
 	};
 
 	/* configure our Amiga setup */
-	amiga_machine_config(machine, &cubocd32_intf);
+	amiga_machine_config(machine, &cd32_intf);
 
 	/* set up memory */
 	memory_configure_bank(machine, "bank1", 0, 1, state->chip_ram, 0);
@@ -644,33 +414,9 @@ static DRIVER_INIT( a1200 )
 	amigakbd_init(machine);
 }
 
-static DRIVER_INIT( cd32 )
-{
-	cubocd32_state *state = machine->driver_data<cubocd32_state>();
-	static const amiga_machine_interface cubocd32_intf =
-	{
-		AGA_CHIP_RAM_MASK,
-		NULL, NULL, 		/* joy0dat_r & joy1dat_r */
-		cd32_potgo_w,		/* potgo_w */
-		NULL, NULL,			/* dskbytr_r & dsklen_w */
-		NULL,				/* serdat_w */
-		NULL,				/* scanline0_callback */
-		NULL,				/* reset_callback */
-		NULL,				/* nmi_callback */
-		FLAGS_AGA_CHIPSET	/* flags */
-	};
-
-	/* configure our Amiga setup */
-	amiga_machine_config(machine, &cubocd32_intf);
-
-	/* set up memory */
-	memory_configure_bank(machine, "bank1", 0, 1, state->chip_ram, 0);
-	memory_configure_bank(machine, "bank1", 1, 1, machine->region("user1")->base(), 0);
-}
 
 /***************************************************************************************************/
 
 /*    YEAR  NAME     PARENT   COMPAT  MACHINE INPUT   INIT      COMPANY       FULLNAME */
 COMP( 1992, a1200n,  0,       0,      a1200n, a1200,  a1200,  "Commodore Business Machines",  "Amiga 1200 (NTSC)" , GAME_NOT_WORKING )
 COMP( 1992, a1200p,  a1200n,  0,      a1200p, a1200,  a1200,  "Commodore Business Machines",  "Amiga 1200 (PAL)" , GAME_NOT_WORKING  )
-CONS( 1993, cd32,    0,       0,      cd32,   cd32,   cd32,   "Commodore Business Machines",  "Amiga CD32 (NTSC)" , GAME_NOT_WORKING )
