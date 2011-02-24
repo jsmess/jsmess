@@ -444,7 +444,6 @@ located at I/O port 0x3CE, and a data register located at I/O port 0x3CF.
 #include "emu.h"
 #include "video/pc_ega.h"
 #include "video/crtc_ega.h"
-#include "video/pc_video_mess.h"
 #include "memconv.h"
 
 

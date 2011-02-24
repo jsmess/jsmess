@@ -10,10 +10,10 @@
 
 #include "emu.h"
 #include "pc_t1t.h"
-#include "video/pc_video_mess.h"
 #include "video/mc6845.h"
 #include "machine/pic8259.h"
 #include "machine/ram.h"
+#include "memconv.h"
 
 /***************************************************************************
 
@@ -141,6 +141,7 @@ static struct
 	int pc_framecnt;
 
 	UINT8 *displayram;
+	UINT8 *t1_displayram;
 
 	UINT8 *chr_gen;
 	UINT8	chr_size;
@@ -153,28 +154,6 @@ static struct
 	UINT8	palette_base;
 } pcjr = { 0 };
 
-
-static VIDEO_START( pc_t1t )
-{
-	pcjr.chr_gen = machine->region("gfx1")->base();
-	pcjr.update_row = NULL;
-	pcjr.bank = 0;
-	pcjr.chr_size = 16;
-
-	pc_videoram_size = 0x8000;
-}
-
-
-static VIDEO_START( pc_pcjr )
-{
-	pcjr.chr_gen = machine->region("gfx1")->base();
-	pcjr.update_row = NULL;
-	pcjr.bank = 0;
-	pcjr.mode_control = 0x08;
-	pcjr.chr_size = 8;
-
-	pc_videoram_size = 0x8000;
-}
 
 static SCREEN_UPDATE( mc6845_t1000 )
 {
@@ -405,15 +384,21 @@ static MC6845_UPDATE_ROW( t1000_update_row )
 }
 
 
- READ8_HANDLER ( pc_t1t_videoram_r )
+READ8_HANDLER ( pc_t1t_videoram_r )
 {
-	UINT8 *videoram = pc_videoram;
+	UINT8 *videoram = pcjr.t1_displayram;
 	int data = 0xff;
 	if( videoram )
 		data = videoram[offset];
 	return data;
 }
 
+WRITE8_HANDLER ( pc_t1t_videoram_w )
+{
+	UINT8 *videoram = pcjr.t1_displayram;
+	if( videoram )
+		videoram[offset] = data;
+}
 
 static void pc_t1t_mode_switch( void )
 {
@@ -741,7 +726,7 @@ static void pc_t1t_bank_w(running_machine *machine, int data)
 		dram = (data & 0x07) << 14;
 		vram = (data & 0x38) << (14-3);
 #endif
-		pc_videoram = &ram[vram];
+		pcjr.t1_displayram = &ram[vram];
 		pcjr.displayram = &ram[dram];
 		pc_t1t_mode_switch();
 	}
@@ -937,4 +922,65 @@ static WRITE_LINE_DEVICE_HANDLER( pcjr_vsync_changed )
 		pcjr.pc_framecnt++;
 	}
 	pic8259_ir5_w(device->machine->device("pic8259"), state);
+}
+
+READ16_HANDLER( pc_t1t_videoram16le_r )	{ return read16le_with_read8_handler(pc_t1t_videoram_r, space, offset, mem_mask); }
+WRITE16_HANDLER( pc_t1t_videoram16le_w )	{ write16le_with_write8_handler(pc_t1t_videoram_w, space, offset, data, mem_mask); }
+
+READ16_HANDLER( pc_T1T16le_r )	{ return read16le_with_read8_handler(pc_T1T_r, space, offset, mem_mask); }
+WRITE16_HANDLER( pc_T1T16le_w )	{ write16le_with_write8_handler(pc_T1T_w, space, offset, data, mem_mask); }
+
+static VIDEO_START( pc_t1t )
+{
+	int buswidth;
+	address_space *space = cpu_get_address_space(machine->firstcpu, ADDRESS_SPACE_PROGRAM);
+	address_space *spaceio = cpu_get_address_space(machine->firstcpu, ADDRESS_SPACE_IO);
+
+	pcjr.chr_gen = machine->region("gfx1")->base();
+	pcjr.update_row = NULL;
+	pcjr.bank = 0;
+	pcjr.chr_size = 16;
+	
+	buswidth = device_memory(machine->firstcpu)->space_config(AS_PROGRAM)->m_databus_width;
+	switch(buswidth)
+	{
+		case 8:
+			memory_install_readwrite8_handler(space,   0xb8000, 0xbbfff, 0, 0, pc_t1t_videoram_r, pc_t1t_videoram_w );
+			memory_install_readwrite8_handler(spaceio, 0x3d0, 0x3df, 0, 0, pc_T1T_r,pc_T1T_w );
+			break;
+
+		case 16:
+			memory_install_readwrite16_handler(space,   0xb8000, 0xbbfff, 0, 0, pc_t1t_videoram16le_r, pc_t1t_videoram16le_w );
+			memory_install_readwrite16_handler(spaceio, 0x3d0, 0x3df, 0, 0, pc_T1T16le_r,pc_T1T16le_w );
+			break;
+
+		default:
+			fatalerror("T1T: Bus width %d not supported", buswidth);
+			break;
+	}	
+}
+
+
+static VIDEO_START( pc_pcjr )
+{
+	int buswidth;
+	address_space *spaceio = cpu_get_address_space(machine->firstcpu, ADDRESS_SPACE_IO);
+
+	pcjr.chr_gen = machine->region("gfx1")->base();
+	pcjr.update_row = NULL;
+	pcjr.bank = 0;
+	pcjr.mode_control = 0x08;
+	pcjr.chr_size = 8;
+	
+	buswidth = device_memory(machine->firstcpu)->space_config(AS_PROGRAM)->m_databus_width;
+	switch(buswidth)
+	{
+		case 8:
+			memory_install_readwrite8_handler(spaceio, 0x3d0, 0x3df, 0, 0, pc_T1T_r,pc_pcjr_w );
+			break;
+
+		default:
+			fatalerror("PCJR: Bus width %d not supported", buswidth);
+			break;
+	}	
 }

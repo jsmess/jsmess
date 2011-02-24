@@ -23,7 +23,6 @@
 #include "video/pc_video_mess.h"
 #include "video/pc_vga.h"
 #include "video/pc_cga.h"
-#include "video/pc_aga.h"
 #include "video/pc_mda.h"
 #include "video/pc_t1t.h"
 
@@ -1223,7 +1222,6 @@ DRIVER_INIT( t1000hx )
 
 DRIVER_INIT( pc200 )
 {
-	address_space *space = cpu_get_address_space( machine->firstcpu, ADDRESS_SPACE_PROGRAM );
 	UINT8 *gfx = &machine->region("gfx1")->base()[0x8000];
 	int i;
 
@@ -1231,16 +1229,11 @@ DRIVER_INIT( pc200 )
     for (i = 0; i < 256; i++)
 		gfx[i] = i;
 
-	memory_install_read16_handler( space, 0xb0000, 0xbffff, 0, 0, pc200_videoram16le_r );
-	memory_install_write16_handler( space, 0xb0000, 0xbffff, 0, 0, pc200_videoram16le_w );
-	pc_videoram_size = 0x10000;
-	pc_videoram = machine->region("maincpu")->base()+0xb0000;
 	mess_init_pc_common(machine, PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
 }
 
 DRIVER_INIT( ppc512 )
 {
-	address_space *space = cpu_get_address_space( machine->firstcpu, ADDRESS_SPACE_PROGRAM );
 	UINT8 *gfx = &machine->region("gfx1")->base()[0x8000];
 	int i;
 
@@ -1248,28 +1241,16 @@ DRIVER_INIT( ppc512 )
     for (i = 0; i < 256; i++)
 		gfx[i] = i;
 
-	memory_install_read16_handler( space, 0xb0000, 0xbffff, 0, 0, pc200_videoram16le_r );
-	memory_install_write16_handler( space, 0xb0000, 0xbffff, 0, 0, pc200_videoram16le_w );
-	pc_videoram_size = 0x10000;
-	pc_videoram = machine->region("maincpu")->base()+0xb0000;
 	mess_init_pc_common(machine, PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
 }
 DRIVER_INIT( pc1512 )
 {
-	address_space *space = cpu_get_address_space( machine->firstcpu, ADDRESS_SPACE_PROGRAM );
-	address_space *io_space = cpu_get_address_space( machine->firstcpu, ADDRESS_SPACE_IO );
 	UINT8 *gfx = &machine->region("gfx1")->base()[0x8000];
 	int i;
 
     /* just a plain bit pattern for graphics data generation */
     for (i = 0; i < 256; i++)
 		gfx[i] = i;
-
-	memory_install_read_bank( space, 0xb8000, 0xbbfff, 0, 0x0C000, "bank1" );
-	memory_install_write16_handler( space, 0xb8000, 0xbbfff, 0, 0x0C000, pc1512_videoram16le_w );
-
-	memory_install_read16_handler( io_space, 0x3d0, 0x3df, 0, 0, pc1512_16le_r );
-	memory_install_write16_handler( io_space, 0x3d0, 0x3df, 0, 0, pc1512_16le_w );
 
 	mess_init_pc_common(machine, PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
 }

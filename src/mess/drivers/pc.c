@@ -138,7 +138,6 @@ Currently known: (probably exist for all the standard codepages)
 #include "video/pc_aga.h"
 #include "video/pc_t1t.h"
 #include "video/pc_ega.h"
-#include "video/pc_video_mess.h"
 
 #include "includes/pc_ide.h"
 #include "machine/pc_fdc.h"
@@ -334,7 +333,6 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( europc_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x00000, 0x9ffff) AM_RAMBANK("bank10")
 	AM_RANGE(0xa0000, 0xaffff) AM_NOP
-	AM_RANGE(0xb0000, 0xbffff) AM_READWRITE(pc_aga_videoram_r, pc_aga_videoram_w) AM_BASE(&pc_videoram) AM_SIZE(&pc_videoram_size)
 	AM_RANGE(0xc0000, 0xc7fff) AM_NOP
 	AM_RANGE(0xc8000, 0xcffff) AM_ROM
 	AM_RANGE(0xd0000, 0xeffff) AM_NOP
@@ -374,7 +372,6 @@ static ADDRESS_MAP_START(tandy1000_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x00000, 0x9ffff) AM_RAMBANK("bank10")
 	AM_RANGE(0xa0000, 0xaffff) AM_RAM
 	AM_RANGE(0xb0000, 0xb7fff) AM_NOP
-	AM_RANGE(0xb8000, 0xbffff) AM_READWRITE(pc_t1t_videoram_r, pc_video_videoram_w)
 	AM_RANGE(0xc0000, 0xc7fff) AM_NOP
 	AM_RANGE(0xc8000, 0xc9fff) AM_ROM
 	AM_RANGE(0xca000, 0xcffff) AM_NOP
@@ -397,7 +394,6 @@ static ADDRESS_MAP_START(tandy1000_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x0324, 0x0327) AM_READWRITE(pc_HDC2_r,				pc_HDC2_w)
 	AM_RANGE(0x0378, 0x037f) AM_READWRITE(pc_t1t_p37x_r,			pc_t1t_p37x_w)
 	AM_RANGE(0x03bc, 0x03be) AM_DEVREADWRITE("lpt_0", pc_lpt_r, pc_lpt_w)
-	AM_RANGE(0x03d0, 0x03df) AM_READWRITE(pc_T1T_r,					pc_T1T_w)
 	AM_RANGE(0x03f0, 0x03f7) AM_READWRITE(pc_fdc_r,					pc_fdc_w)
 	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE("ins8250_0", ins8250_r, ins8250_w)
 ADDRESS_MAP_END
@@ -408,7 +404,6 @@ static ADDRESS_MAP_START(tandy1000_16_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x9ffff) AM_RAMBANK("bank10")
 	AM_RANGE(0xa0000, 0xaffff) AM_RAM
 	AM_RANGE(0xb0000, 0xb7fff) AM_NOP
-	AM_RANGE(0xb8000, 0xbffff) AM_READWRITE8(pc_t1t_videoram_r, pc_video_videoram_w, 0xffff)
 	AM_RANGE(0xc0000, 0xc7fff) AM_NOP
 	AM_RANGE(0xc8000, 0xc9fff) AM_ROM
 	AM_RANGE(0xca000, 0xcffff) AM_NOP
@@ -431,7 +426,6 @@ static ADDRESS_MAP_START(tandy1000_16_io, ADDRESS_SPACE_IO, 16)
 	AM_RANGE(0x0324, 0x0327) AM_READWRITE8(pc_HDC2_r,				pc_HDC2_w, 0xffff)
 	AM_RANGE(0x0378, 0x037f) AM_READWRITE8(pc_t1t_p37x_r,			pc_t1t_p37x_w, 0xffff)
 	AM_RANGE(0x03bc, 0x03bf) AM_DEVREADWRITE8("lpt_0", pc_lpt_r, pc_lpt_w, 0xffff)
-	AM_RANGE(0x03d0, 0x03df) AM_READWRITE8(pc_T1T_r,					pc_T1T_w, 0xffff)
 	AM_RANGE(0x03f0, 0x03f7) AM_READWRITE8(pc_fdc_r,					pc_fdc_w, 0xffff)
 	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE8("ins8250_0", ins8250_r, ins8250_w, 0xffff)
 	AM_RANGE(0xffea, 0xffeb) AM_READWRITE8(tandy1000_bank_r, tandy1000_bank_w, 0xffff)
@@ -443,7 +437,6 @@ static ADDRESS_MAP_START(tandy1000_286_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x9ffff) AM_RAMBANK("bank10")
 	AM_RANGE(0xa0000, 0xaffff) AM_RAM
 	AM_RANGE(0xb0000, 0xb7fff) AM_NOP
-	AM_RANGE(0xb8000, 0xbffff) AM_READWRITE8(pc_t1t_videoram_r, pc_video_videoram_w, 0xffff)
 	AM_RANGE(0xc0000, 0xc7fff) AM_NOP
 	AM_RANGE(0xc8000, 0xc9fff) AM_ROM
 	AM_RANGE(0xca000, 0xcffff) AM_NOP
@@ -466,7 +459,6 @@ static ADDRESS_MAP_START(tandy1000_286_io, ADDRESS_SPACE_IO, 16)
 	AM_RANGE(0x0324, 0x0327) AM_READWRITE8(pc_HDC2_r,               pc_HDC2_w, 0xffff)
 	AM_RANGE(0x0378, 0x037f) AM_READWRITE8(pc_t1t_p37x_r,           pc_t1t_p37x_w, 0xffff)
 	AM_RANGE(0x03bc, 0x03bf) AM_DEVREADWRITE8("lpt_0", pc_lpt_r, pc_lpt_w, 0xffff)
-	AM_RANGE(0x03d0, 0x03df) AM_READWRITE8(pc_T1T_r,                    pc_T1T_w, 0xffff)
 	AM_RANGE(0x03f0, 0x03f7) AM_READWRITE8(pc_fdc_r,                    pc_fdc_w, 0xffff)
 	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE8("ins8250_0", ins8250_r, ins8250_w, 0xffff)
 ADDRESS_MAP_END
@@ -500,7 +492,6 @@ static ADDRESS_MAP_START(ibmpcjr_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x0324, 0x0327) AM_READWRITE(pc_HDC2_r,				pc_HDC2_w)
 	AM_RANGE(0x0378, 0x037f) AM_READWRITE(pc_t1t_p37x_r,			pc_t1t_p37x_w)
 	AM_RANGE(0x03bc, 0x03be) AM_DEVREADWRITE("lpt_0", pc_lpt_r, pc_lpt_w)
-	AM_RANGE(0x03d0, 0x03df) AM_READWRITE(pc_T1T_r,					pc_pcjr_w)
 	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE("ins8250_0", ins8250_r, ins8250_w)
 ADDRESS_MAP_END
 

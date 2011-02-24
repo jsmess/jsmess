@@ -11,7 +11,6 @@
 #include "video/pc_mda.h"
 #include "includes/amstr_pc.h"
 #include "video/mc6845.h"
-#include "video/pc_video_mess.h"
 #include "video/cgapal.h"
 
 
@@ -63,6 +62,8 @@ static struct {
 	UINT8	cga_palette_lut_2bpp[4];
 	UINT8	vsync;
 	UINT8	hsync;
+	
+	UINT8  *videoram;
 } aga;
 
 
@@ -124,7 +125,7 @@ static WRITE_LINE_DEVICE_HANDLER( aga_vsync_changed ) {
 
 /* colors need fixing in the mda_text_* functions ! */
 static MC6845_UPDATE_ROW( mda_text_inten_update_row ) {
-	UINT8 *videoram = pc_videoram;
+	UINT8 *videoram = aga.videoram;
 	UINT16	*p = BITMAP_ADDR16( bitmap, y, 0 );
 	UINT16	chr_base = ( ra & 0x08 ) ? 0x800 | ( ra & 0x07 ) : ra;
 	int i;
@@ -183,7 +184,7 @@ static MC6845_UPDATE_ROW( mda_text_inten_update_row ) {
 
 
 static MC6845_UPDATE_ROW( mda_text_blink_update_row ) {
-	UINT8 *videoram = pc_videoram;
+	UINT8 *videoram = aga.videoram;
 	UINT16	*p = BITMAP_ADDR16( bitmap, y, 0 );
 	UINT16	chr_base = ( ra & 0x08 ) ? 0x800 | ( ra & 0x07 ) : ra;
 	int i;
@@ -243,7 +244,7 @@ static MC6845_UPDATE_ROW( mda_text_blink_update_row ) {
 
 
 static MC6845_UPDATE_ROW( cga_text_inten_update_row ) {
-	UINT8 *videoram = pc_videoram;
+	UINT8 *videoram = aga.videoram;
 	UINT16  *p = BITMAP_ADDR16(bitmap, y, 0);
 	int i;
 
@@ -272,7 +273,7 @@ static MC6845_UPDATE_ROW( cga_text_inten_update_row ) {
 }
 
 static MC6845_UPDATE_ROW( cga_text_inten_alt_update_row ) {
-	UINT8 *videoram = pc_videoram;
+	UINT8 *videoram = aga.videoram;
 	UINT16  *p = BITMAP_ADDR16(bitmap, y, 0);
 	int i;
 
@@ -300,7 +301,7 @@ static MC6845_UPDATE_ROW( cga_text_inten_alt_update_row ) {
 }
 
 static MC6845_UPDATE_ROW( cga_text_blink_update_row ) {
-	UINT8 *videoram = pc_videoram;
+	UINT8 *videoram = aga.videoram;
 	UINT16	*p = BITMAP_ADDR16(bitmap, y, 0);
 	int i;
 
@@ -332,7 +333,7 @@ static MC6845_UPDATE_ROW( cga_text_blink_update_row ) {
 }
 
 static MC6845_UPDATE_ROW( cga_text_blink_alt_update_row ) {
-	UINT8 *videoram = pc_videoram;
+	UINT8 *videoram = aga.videoram;
 	UINT16  *p = BITMAP_ADDR16(bitmap, y, 0);
 	int i;
 
@@ -366,7 +367,7 @@ static MC6845_UPDATE_ROW( cga_text_blink_alt_update_row ) {
 }
 
 static MC6845_UPDATE_ROW( cga_gfx_4bppl_update_row ) {
-	UINT8 *videoram = pc_videoram;
+	UINT8 *videoram = aga.videoram;
 	UINT16  *p = BITMAP_ADDR16(bitmap, y, 0);
 	int i;
 
@@ -390,7 +391,7 @@ static MC6845_UPDATE_ROW( cga_gfx_4bppl_update_row ) {
 }
 
 static MC6845_UPDATE_ROW( cga_gfx_4bpph_update_row ) {
-	UINT8 *videoram = pc_videoram;
+	UINT8 *videoram = aga.videoram;
 	UINT16  *p = BITMAP_ADDR16(bitmap, y, 0);
 	int i;
 
@@ -422,7 +423,7 @@ static MC6845_UPDATE_ROW( cga_gfx_4bpph_update_row ) {
 }
 
 static MC6845_UPDATE_ROW( cga_gfx_2bpp_update_row ) {
-	UINT8 *videoram = pc_videoram;
+	UINT8 *videoram = aga.videoram;
 	UINT16  *p = BITMAP_ADDR16(bitmap, y, 0);
 	int i;
 
@@ -446,7 +447,7 @@ static MC6845_UPDATE_ROW( cga_gfx_2bpp_update_row ) {
 }
 
 static MC6845_UPDATE_ROW( cga_gfx_1bpp_update_row ) {
-	UINT8 *videoram = pc_videoram;
+	UINT8 *videoram = aga.videoram;
 	UINT16  *p = BITMAP_ADDR16(bitmap, y, 0);
 	UINT8	fg = aga.cga_color_select & 0x0F;
 	int i;
@@ -690,23 +691,20 @@ void pc_aga_set_mode(running_machine *machine, AGA_MODE mode)
 
 VIDEO_START( pc_aga )
 {
-	address_space *space = cpu_get_address_space( machine->firstcpu, ADDRESS_SPACE_IO );
+	address_space *space = cpu_get_address_space(machine->firstcpu, ADDRESS_SPACE_PROGRAM);
+	address_space *spaceio = cpu_get_address_space(machine->firstcpu, ADDRESS_SPACE_IO);
 	int buswidth = device_memory(machine->firstcpu)->space_config(AS_PROGRAM)->m_databus_width;
-
+	memory_install_readwrite_bank(space, 0xb0000, 0xbffff, 0, 0, "bank11" );
 	switch(buswidth)
 	{
 		case 8:
-			memory_install_read8_handler(space, 0x3b0, 0x3bf, 0, 0, pc_aga_mda_r );
-			memory_install_write8_handler(space, 0x3b0, 0x3bf, 0, 0, pc_aga_mda_w );
-			memory_install_read8_handler(space, 0x3d0, 0x3df, 0, 0, pc_aga_cga_r );
-			memory_install_write8_handler(space, 0x3d0, 0x3df, 0, 0, pc_aga_cga_w );
+			memory_install_readwrite8_handler(spaceio, 0x3b0, 0x3bf, 0, 0, pc_aga_mda_r, pc_aga_mda_w );
+			memory_install_readwrite8_handler(spaceio, 0x3d0, 0x3df, 0, 0, pc_aga_cga_r, pc_aga_cga_w );
 			break;
 
 		case 16:
-			memory_install_read16_handler(space, 0x3b0, 0x3bf, 0, 0, pc16le_aga_mda_r );
-			memory_install_write16_handler(space, 0x3b0, 0x3bf, 0, 0, pc16le_aga_mda_w );
-			memory_install_read16_handler(space, 0x3d0, 0x3df, 0, 0, pc16le_aga_cga_r );
-			memory_install_write16_handler(space, 0x3d0, 0x3df, 0, 0, pc16le_aga_cga_w );
+			memory_install_readwrite16_handler(spaceio, 0x3b0, 0x3bf, 0, 0, pc16le_aga_mda_r, pc16le_aga_mda_w );
+			memory_install_readwrite16_handler(spaceio, 0x3d0, 0x3df, 0, 0, pc16le_aga_cga_r, pc16le_aga_cga_w );
 			break;
 
 		default:
@@ -715,40 +713,43 @@ VIDEO_START( pc_aga )
 	}
 
 	memset( &aga, 0, sizeof( aga ) );
-
 	aga.mode = AGA_COLOR;
 	aga.mda_chr_gen = machine->region("gfx1")->base() + 0x1000;
 	aga.cga_chr_gen = machine->region("gfx1")->base();
+	aga.videoram = auto_alloc_array(machine, UINT8, 0x10000);
+	memory_set_bankptr(machine,"bank11", aga.videoram);
 }
 
 
 VIDEO_START( pc200 )
 {
-	address_space *space = cpu_get_address_space( machine->firstcpu, ADDRESS_SPACE_IO );
-	int buswidth;
-
-	VIDEO_START_CALL(pc_aga);
-
-	buswidth = device_memory(machine->firstcpu)->space_config(AS_PROGRAM)->m_databus_width;
+	address_space *space = cpu_get_address_space(machine->firstcpu, ADDRESS_SPACE_PROGRAM);
+	address_space *spaceio = cpu_get_address_space(machine->firstcpu, ADDRESS_SPACE_IO);
+	int buswidth = device_memory(machine->firstcpu)->space_config(AS_PROGRAM)->m_databus_width;
 	switch(buswidth)
 	{
 		case 8:
-			memory_install_read8_handler(space, 0x3d0, 0x3df, 0, 0, pc200_cga_r );
-			memory_install_write8_handler(space, 0x3d0, 0x3df, 0, 0, pc200_cga_w );
+			memory_install_readwrite8_handler(space,   0xb0000, 0xbffff, 0, 0, pc200_videoram_r, pc200_videoram_w );
+			memory_install_readwrite8_handler(spaceio, 0x3b0, 0x3bf, 0, 0, pc_aga_mda_r, pc_aga_mda_w );
+			memory_install_readwrite8_handler(spaceio, 0x3d0, 0x3df, 0, 0, pc200_cga_r,  pc200_cga_w );
 			break;
 
 		case 16:
-			memory_install_read16_handler(space, 0x3d0, 0x3df, 0, 0, pc200_cga16le_r );
-			memory_install_write16_handler(space, 0x3d0, 0x3df, 0, 0, pc200_cga16le_w );
+			memory_install_readwrite16_handler(space,   0xb0000, 0xbffff, 0, 0, pc200_videoram16le_r, pc200_videoram16le_w );
+			memory_install_readwrite16_handler(spaceio, 0x3b0, 0x3bf, 0, 0, pc16le_aga_mda_r, pc16le_aga_mda_w );
+			memory_install_readwrite16_handler(spaceio, 0x3d0, 0x3df, 0, 0, pc200_cga16le_r, pc200_cga16le_w );
 			break;
 
 		default:
 			fatalerror("AGA:  Bus width %d not supported", buswidth);
 			break;
 	}
+	memset( &aga, 0, sizeof( aga ) );
 
+	aga.mode = AGA_COLOR;
 	aga.mda_chr_gen = machine->region("gfx1")->base();
 	aga.cga_chr_gen = machine->region("gfx1")->base() + 0x1000;
+	aga.videoram = auto_alloc_array(machine, UINT8, 0x10000);
 }
 
 
@@ -766,10 +767,10 @@ WRITE8_HANDLER ( pc_aga_videoram_w )
 	switch (aga.mode) {
 	case AGA_COLOR:
 		if (offset>=0x8000)
-			pc_video_videoram_w(space, offset-0x8000, data);
+			aga.videoram[offset-0x8000]=data;
 		break;
 	case AGA_MONO:
-		pc_video_videoram_w(space, offset,data);
+		aga.videoram[offset]=data;
 		break;
 	case AGA_OFF: break;
 	}
@@ -777,7 +778,7 @@ WRITE8_HANDLER ( pc_aga_videoram_w )
 
  READ8_HANDLER( pc_aga_videoram_r )
 {
-	UINT8 *videoram = pc_videoram;
+	UINT8 *videoram = aga.videoram;
 	switch (aga.mode) {
 	case AGA_COLOR:
 		if (offset>=0x8000) return videoram[offset-0x8000];
@@ -791,7 +792,7 @@ WRITE8_HANDLER ( pc_aga_videoram_w )
 
 READ8_HANDLER( pc200_videoram_r )
 {
-	UINT8 *videoram = pc_videoram;
+	UINT8 *videoram = aga.videoram;
 	switch (aga.mode)
 	{
 		default:
@@ -809,10 +810,10 @@ WRITE8_HANDLER ( pc200_videoram_w )
 	{
 		default:
 			if (offset>=0x8000)
-				pc_video_videoram_w(space, offset-0x8000, data);
+				aga.videoram[offset-0x8000]=data;
 			break;
 		case AGA_MONO:
-			pc_video_videoram_w(space, offset,data);
+			aga.videoram[offset]=data;
 			break;
 	}
 }

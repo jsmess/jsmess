@@ -1,5 +1,4 @@
 #include "emu.h"
-#include "video/pc_video_mess.h"
 
 #define CGA_PALETTE_SETS 83	/* one for colour, one for mono,
                  * 81 for colour composite */

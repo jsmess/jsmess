@@ -26,7 +26,6 @@
 #include "video/pc_cga.h"
 #include "video/pc_mda.h"
 #include "video/pc_ega.h"
-#include "video/pc_video_mess.h"
 
 #include "machine/pc_hdc.h"
 #include "includes/pc_ide.h"

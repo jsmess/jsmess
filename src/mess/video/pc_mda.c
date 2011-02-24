@@ -6,7 +6,6 @@
 
 #include "emu.h"
 #include "pc_mda.h"
-#include "pc_video_mess.h"
 #include "video/mc6845.h"
 
 #define VERBOSE_MDA	0		/* MDA (Monochrome Display Adapter) */
@@ -39,12 +38,11 @@ static struct
 
 	UINT8 mode_control, configuration_switch; //hercules
 
-	gfx_element *gfx_char[4];
-
 	mc6845_update_row_func  update_row;
 	UINT8   *chr_gen;
 	UINT8   vsync;
 	UINT8   hsync;
+	UINT8  *videoram;
 } mda;
 
 /* Initialise the mda palette */
@@ -107,8 +105,7 @@ VIDEO_START( pc_mda )
 	switch(buswidth)
 	{
 		case 8:
-			memory_install_read_bank(space, 0xb0000, 0xb0fff, 0, 0x07000, "bank11" );
-			memory_install_write8_handler(space, 0xb0000, 0xb0fff, 0, 0x07000, pc_video_videoram_w );
+			memory_install_readwrite_bank(space, 0xb0000, 0xb0fff, 0, 0x07000, "bank11" );
 			memory_install_read8_handler(cpu_get_address_space(machine->firstcpu, ADDRESS_SPACE_IO), 0x3b0, 0x3bf, 0, 0, pc_MDA_r );
 			memory_install_write8_handler(cpu_get_address_space(machine->firstcpu, ADDRESS_SPACE_IO), 0x3b0, 0x3bf, 0, 0, pc_MDA_w );
 			break;
@@ -122,9 +119,8 @@ VIDEO_START( pc_mda )
 	mda.update_row = NULL;
 	mda.chr_gen = machine->region( "gfx1" )->base();
 
-	pc_videoram_size = 0x1000;	/* This is actually 0x1000 in reality */
-	pc_videoram = auto_alloc_array(machine, UINT8, 0x1000);
-	memory_set_bankptr(machine,"bank11", pc_videoram);
+	mda.videoram = auto_alloc_array(machine, UINT8, 0x1000);
+	memory_set_bankptr(machine,"bank11", mda.videoram);
 }
 
 
@@ -144,7 +140,7 @@ static SCREEN_UPDATE( mc6845_mda )
 
 static MC6845_UPDATE_ROW( mda_text_inten_update_row )
 {
-	UINT8 *videoram = pc_videoram;
+	UINT8 *videoram = mda.videoram;
 	UINT16	*p = BITMAP_ADDR16( bitmap, y, 0 );
 	UINT16	chr_base = ( ra & 0x08 ) ? 0x800 | ( ra & 0x07 ) : ra;
 	int i;
@@ -218,7 +214,7 @@ static MC6845_UPDATE_ROW( mda_text_inten_update_row )
 
 static MC6845_UPDATE_ROW( mda_text_blink_update_row )
 {
-	UINT8 *videoram = pc_videoram;
+	UINT8 *videoram = mda.videoram;
 	UINT16	*p = BITMAP_ADDR16( bitmap, y, 0 );
 	UINT16	chr_base = ( ra & 0x08 ) ? 0x800 | ( ra & 0x07 ) : ra;
 	int i;
@@ -462,8 +458,7 @@ static VIDEO_START( pc_hercules )
 	switch(buswidth)
 	{
 	case 8:
-		memory_install_read_bank(space, 0xb0000, 0xbffff, 0, 0, "bank11" );
-		memory_install_write8_handler(space, 0xb0000, 0xbffff, 0, 0, pc_video_videoram_w );
+		memory_install_readwrite_bank(space, 0xb0000, 0xbffff, 0, 0, "bank11" );
 		memory_install_read8_handler(cpu_get_address_space(machine->firstcpu, ADDRESS_SPACE_IO), 0x3b0, 0x3bf, 0, 0, pc_hercules_r );
 		memory_install_write8_handler(cpu_get_address_space(machine->firstcpu, ADDRESS_SPACE_IO), 0x3b0, 0x3bf, 0, 0, pc_hercules_w );
 		break;
@@ -477,9 +472,8 @@ static VIDEO_START( pc_hercules )
 	mda.update_row = NULL;
 	mda.chr_gen = machine->region( "gfx1" )->base();
 
-	pc_videoram_size = 0x10000;
-	pc_videoram = auto_alloc_array(machine, UINT8, 0x10000);
-	memory_set_bankptr(machine,"bank11", pc_videoram);
+	mda.videoram = auto_alloc_array(machine, UINT8, 0x10000);
+	memory_set_bankptr(machine,"bank11", mda.videoram);
 }
 
 
@@ -492,7 +486,7 @@ static VIDEO_START( pc_hercules )
 
 static MC6845_UPDATE_ROW( hercules_gfx_update_row )
 {
-	UINT8 *videoram = pc_videoram;
+	UINT8 *videoram = mda.videoram;
 	UINT16	*p = BITMAP_ADDR16( bitmap, y, 0 );
 	UINT16	gfx_base = ( ( mda.mode_control & 0x80 ) ? 0x8000 : 0x0000 ) | ( ( ra & 0x03 ) << 13 );
 	int i;
