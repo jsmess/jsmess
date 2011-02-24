@@ -5,26 +5,35 @@
         03/08/2009 Initial driver
 
 ****************************************************************************/
+#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/i4004/i4004.h"
 #include "sound/dac.h"
 #include "4004clk.lh"
 
-class _4004clk_state : public driver_device
+class nixieclock_state : public driver_device
 {
 public:
-	_4004clk_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	nixieclock_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config),
+		m_maincpu(*this, "maincpu"),
+		m_dac(*this, "dac")
+		{ }
 
+	required_device<cpu_device> m_maincpu;
+	required_device<device_t> m_dac;
+	DECLARE_READ8_MEMBER( data_r );
+	DECLARE_WRITE8_MEMBER( nixie_w );
+	DECLARE_WRITE8_MEMBER( neon_w );
+	DECLARE_WRITE8_MEMBER( relays_w );
 	UINT16 nixie[16];
 	UINT8 timer;
-	device_t *dac;
 };
 
-static READ8_HANDLER(data_r)
+READ8_MEMBER(nixieclock_state::data_r)
 {
-	return input_port_read(space->machine, "INPUT") & 0x0f;
+	return input_port_read(machine, "INPUT") & 0x0f;
 }
 
 static UINT8 nixie_to_num(UINT16 val)
@@ -52,26 +61,18 @@ INLINE void output_set_neon_value(int index, int value)
 	output_set_indexed_value("neon", index, value);
 }
 
-static void update_nixie(running_machine *machine)
+WRITE8_MEMBER(nixieclock_state::nixie_w)
 {
-	_4004clk_state *state = machine->driver_data<_4004clk_state>();
-
-	output_set_nixie_value(5,nixie_to_num(((state->nixie[2] & 3)<<8) | (state->nixie[1] << 4) | state->nixie[0]));
-	output_set_nixie_value(4,nixie_to_num((state->nixie[4] << 6) | (state->nixie[3] << 2) | (state->nixie[2] >>2)));
-	output_set_nixie_value(3,nixie_to_num(((state->nixie[7] & 3)<<8) | (state->nixie[6] << 4) | state->nixie[5]));
-	output_set_nixie_value(2,nixie_to_num((state->nixie[9] << 6) | (state->nixie[8] << 2) | (state->nixie[7] >>2)));
-	output_set_nixie_value(1,nixie_to_num(((state->nixie[12] & 3)<<8) | (state->nixie[11] << 4) | state->nixie[10]));
-	output_set_nixie_value(0,nixie_to_num((state->nixie[14] << 6) | (state->nixie[13] << 2) | (state->nixie[12] >>2)));
+	nixie[offset] = data;
+	output_set_nixie_value(5,nixie_to_num(((nixie[2] & 3)<<8) | (nixie[1] << 4) | nixie[0]));
+	output_set_nixie_value(4,nixie_to_num((nixie[4] << 6) | (nixie[3] << 2) | (nixie[2] >>2)));
+	output_set_nixie_value(3,nixie_to_num(((nixie[7] & 3)<<8) | (nixie[6] << 4) | nixie[5]));
+	output_set_nixie_value(2,nixie_to_num((nixie[9] << 6) | (nixie[8] << 2) | (nixie[7] >>2)));
+	output_set_nixie_value(1,nixie_to_num(((nixie[12] & 3)<<8) | (nixie[11] << 4) | nixie[10]));
+	output_set_nixie_value(0,nixie_to_num((nixie[14] << 6) | (nixie[13] << 2) | (nixie[12] >>2)));
 }
 
-static WRITE8_HANDLER(nixie_w)
-{
-	_4004clk_state *state = space->machine->driver_data<_4004clk_state>();
-	state->nixie[offset] = data;
-	update_nixie(space->machine);
-}
-
-static WRITE8_HANDLER(neon_w)
+WRITE8_MEMBER(nixieclock_state::neon_w)
 {
 	output_set_neon_value(0,BIT(data,3));
 	output_set_neon_value(1,BIT(data,2));
@@ -79,22 +80,21 @@ static WRITE8_HANDLER(neon_w)
 	output_set_neon_value(3,BIT(data,0));
 }
 
-static WRITE8_HANDLER(relays_w)
+WRITE8_MEMBER(nixieclock_state::relays_w)
 {
-	_4004clk_state *state = space->machine->driver_data<_4004clk_state>();
-	dac_data_w(state->dac, (data & 1) ? 0x80 : 0x40); //tick - tock
+	dac_data_w(m_dac, (data & 1) ? 0x80 : 0x40); //tick - tock
 }
 
-static ADDRESS_MAP_START(4004clk_rom, ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START(4004clk_rom, ADDRESS_SPACE_PROGRAM, 8, nixieclock_state)
 	AM_RANGE(0x0000, 0x0FFF) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(4004clk_mem, ADDRESS_SPACE_DATA, 8)
+static ADDRESS_MAP_START(4004clk_mem, ADDRESS_SPACE_DATA, 8, nixieclock_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x007F) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( 4004clk_io , ADDRESS_SPACE_IO, 8)
+static ADDRESS_MAP_START( 4004clk_io, ADDRESS_SPACE_IO, 8, nixieclock_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00, 0x0e) AM_WRITE(nixie_w)
 	AM_RANGE(0x00, 0x00) AM_READ(data_r)
@@ -126,23 +126,22 @@ INPUT_PORTS_END
 
 static TIMER_DEVICE_CALLBACK(timer_callback)
 {
-	_4004clk_state *state = timer.machine->driver_data<_4004clk_state>();
+	nixieclock_state *state = timer.machine->driver_data<nixieclock_state>();
 	i4004_set_test(timer.machine->device("maincpu"),state->timer);
 	state->timer^=1;
 }
 
 static MACHINE_START(4004clk)
 {
-	_4004clk_state *state = machine->driver_data<_4004clk_state>();
+	nixieclock_state *state = machine->driver_data<nixieclock_state>();
 	state->timer = 0;
-	state->dac = machine->device("dac");
 
 	/* register for state saving */
 	state->save_item(NAME(state->timer));
 	state->save_pointer(NAME(state->nixie), 6);
 }
 
-static MACHINE_CONFIG_START( 4004clk, _4004clk_state )
+static MACHINE_CONFIG_START( 4004clk, nixieclock_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I4004, XTAL_5MHz / 8)
@@ -153,7 +152,7 @@ static MACHINE_CONFIG_START( 4004clk, _4004clk_state )
 	MCFG_MACHINE_START(4004clk)
 
 	/* video hardware */
-	//MCFG_DEFAULT_LAYOUT(layout_4004clk)
+	//MCFG_DEFAULT_LAYOUT(layoutnixieclock)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
