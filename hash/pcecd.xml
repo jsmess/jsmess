@@ -19,6 +19,14 @@
 
     The USA CHDs are converted from the "Retro ISO Gaming Guild" (RIGG) which is the most complete and accurate
     currently known for Turbo Duo CDs, and therefore are included until better reads are available.
+    
+    
+    NOTE: there appears to be a problem with the either the 'REDUMP.ORG' images, or the emulation / cuesheet
+    handling.  The REDUMP.ORG images appear to have each data track as 2 seconds longer causing an additional
+    2 second offset in the cuesheet for each data track, furthermore they refuse to boot simply throwing a
+    'read error' in MESS/MAME.  Is this some kind of protection on the original discs, or just errors in the way
+    various PC software and/or emulators handle them?  There are multiple second audio offset issues with
+    several games in MESS/MAME which could be related.
        
 -->
 
@@ -1978,9 +1986,11 @@
 		</part>
 	</software>
 
-	<software name="xanadus" cloneof="xanadu">
+  <!-- This is exactly the same as xanadu ?!-->
+  <!-- Serial: HE4002 -->
+  <!--
+  <software name="xanadus" cloneof="xanadu">
 		<description>Kaze no Densetsu Xanadu - Sample Disc (SCD)(JPN)</description>
-		<!-- Serial: HE4002 -->
 		<year>1994</year>
 		<publisher>NEC Home Electronics</publisher>
 		<part name="cdrom" interface="pce_cdrom">
@@ -1989,7 +1999,8 @@
 			</diskarea>
 		</part>
 	</software>
-
+  -->
+  
 	<software name="xanadu2">
 		<description>Kaze no Densetsu Xanadu II (SCD)(JPN)</description>
 		<!-- Serial: NFCD5001 - Release Date: 1995-06-30 -->
@@ -2170,9 +2181,11 @@
 		</part>
 	</software>
 
-	<software name="lastarma1" cloneof="lastarma">
+  <!-- This is exactly the same as lastarma ?!-->
+  <!-- Serial: BRCD0001 - Release Date: 1990-08-31 -->
+  <!--
+  <software name="lastarma1" cloneof="lastarma">
 		<description>Last Armageddon {BRCD0001-6-0625-R3D} (CD)(JPN)</description>
-		<!-- Serial: BRCD0001 - Release Date: 1990-08-31 -->
 		<year>1990</year>
 		<publisher>Brain Gray</publisher>
 		<part name="cdrom" interface="pce_cdrom">
@@ -2181,6 +2194,7 @@
 			</diskarea>
 		</part>
 	</software>
+  -->
 
 	<software name="lastarm2" cloneof="lastarma">
 		<description>Last Armageddon {BRCD0001-7-0904-R1D} (CD)(JPN)</description>
@@ -2242,10 +2256,12 @@
 		</part>
 	</software>
 
-	<software name="lodosst" cloneof="lodoss">
-		<description>Lodoss Tousenki - Record of Lodoss War Taikenban (CD)(JPN)</description>
-		<!-- Serial:  -->
-		<year>1992</year>
+  <!-- This is exactly the same as lodoss ?!-->
+	<!-- Serial:  -->
+  <!--
+  <software name="lodosst" cloneof="lodoss">
+    <description>Lodoss Tousenki - Record of Lodoss War Taikenban (CD)(JPN)</description>
+    <year>1992</year>
 		<publisher>Hudson</publisher>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
@@ -2253,6 +2269,7 @@
 			</diskarea>
 		</part>
 	</software>
+  -->
 
 	<software name="lodoss2">
 		<description>Lodoss Tousenki II - Record of Lodoss War II (SCD)(JPN)</description>
@@ -4732,9 +4749,11 @@
 		</part>
 	</software>
 
-	<software name="tokimekia" cloneof="tokimeki">
+  <!-- This is exactly the same as tokimeki ?!-->
+  <!-- Serial: KMCD4007 - Release Date: 1994-05-27 -->
+  <!--
+  <software name="tokimekia" cloneof="tokimeki">
 		<description>Tokimeki Memorial {HRKM70414-1FABT} [Imperfect] (SCD)(JPN)</description>
-		<!-- Serial: KMCD4007 - Release Date: 1994-05-27 -->
 		<year>1994</year>
 		<publisher>Konami</publisher>
 		<part name="cdrom" interface="pce_cdrom">
@@ -4743,7 +4762,8 @@
 			</diskarea>
 		</part>
 	</software>
-
+  -->
+  
 	<software name="tokimekib" cloneof="tokimeki">
 		<description>Tokimeki Memorial {HRKM70701-2FAAT} (SCD)(JPN)</description>
 		<!-- Serial: KMCD4007 - Release Date: 1994-05-27 -->
@@ -4768,9 +4788,11 @@
 		</part>
 	</software>
 
-	<software name="tokimekid" cloneof="tokimeki">
+  <!-- This is exactly the same as tokimekic ?!-->
+  <!-- Serial: KMCD4007 - Release Date: 1994-05-27 -->
+  <!--
+  <software name="tokimekid" cloneof="tokimeki">
 		<description>Tokimeki Memorial {HRKM71014-3FABT} (SCD)(JPN)</description>
-		<!-- Serial: KMCD4007 - Release Date: 1994-05-27 -->
 		<year>1994</year>
 		<publisher>Konami</publisher>
 		<part name="cdrom" interface="pce_cdrom">
@@ -4779,6 +4801,7 @@
 			</diskarea>
 		</part>
 	</software>
+  -->
 
 	<software name="gunbust1">
 		<description>Top o Nerae! GunBuster Volume I (SCD)(JPN)</description>
