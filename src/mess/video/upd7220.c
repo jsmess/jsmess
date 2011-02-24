@@ -544,7 +544,7 @@ static void advance_ead(upd7220_t *upd7220)
 }
 
 /*-------------------------------------------------
-    write_vram - read in the device memory space
+    read_vram - read in the device memory space
 -------------------------------------------------*/
 
 static void read_vram(upd7220_t *upd7220,UINT8 type, UINT8 mod)
@@ -587,16 +587,39 @@ static void read_vram(upd7220_t *upd7220,UINT8 type, UINT8 mod)
 static void write_vram(upd7220_t *upd7220,UINT8 type, UINT8 mod)
 {
 	int i;
+	UINT16 result;
 	if(type == 1)
 	{
 		printf("uPD7220 invalid type 1 WDAT parameter\n");
 		return;
 	}
 
-	//printf("%04x %02x %02x %04x %02x %02x\n",upd7220->vram[upd7220->ead],upd7220->pr[1],upd7220->pr[2],upd7220->mask,type,mod);
-	//printf("%04x %02x %02x\n",upd7220->ead,upd7220->figs_dir,upd7220->pitch);
+	result = 0;
 
-	/* TODO: clean this up */
+	switch(type)
+	{
+		case 0:
+			result = (upd7220->pr[1] & 0xff);
+			result |= (upd7220->pr[2] << 8);
+			result &= upd7220->mask;
+			break;
+		case 2:
+			result = (upd7220->pr[1] & 0xff);
+			result &= (upd7220->mask & 0xff);
+			break;
+		case 3:
+			result = (upd7220->pr[1] << 8);
+			result &= (upd7220->mask & 0xff00);
+			break;
+	}
+
+	//if(result)
+	{
+		//printf("%04x %02x %02x %04x %02x %02x\n",upd7220->vram[upd7220->ead],upd7220->pr[1],upd7220->pr[2],upd7220->mask,type,mod);
+		//printf("%04x %02x %02x\n",upd7220->ead,upd7220->figs_dir,upd7220->pitch);
+		//printf("%04x %04x %02x %04x\n",upd7220->ead,result,mod,upd7220->figs_dc);
+	}
+
 	for(i=0;i<upd7220->figs_dc + 1;i++)
 	{
 		switch(mod & 3)
@@ -604,34 +627,19 @@ static void write_vram(upd7220_t *upd7220,UINT8 type, UINT8 mod)
 			case 0x00: //replace
 				switch(type)
 				{
-					case 0: upd7220->vram[upd7220->ead] = ((upd7220->pr[1]) | (upd7220->pr[2] << 8)) & upd7220->mask; break;
-					case 2:	upd7220->vram[upd7220->ead] = (((upd7220->pr[1] & upd7220->mask) & 0xff) | (upd7220->vram[upd7220->ead] & 0xff00)); break;
-					case 3: upd7220->vram[upd7220->ead] = ((upd7220->pr[1] << 8) & (upd7220->mask & 0xff00)) | (upd7220->vram[upd7220->ead] & 0x00ff); break;
+					case 0: upd7220->vram[upd7220->ead] = result; break;
+					case 2:	upd7220->vram[upd7220->ead] = result | (upd7220->vram[upd7220->ead] & 0xff00); break;
+					case 3: upd7220->vram[upd7220->ead] = result | (upd7220->vram[upd7220->ead] & 0x00ff); break;
 				}
 				break;
 			case 0x01: //complement
-				switch(type)
-				{
-					case 0: upd7220->vram[upd7220->ead] ^= (((upd7220->pr[1]) | (upd7220->pr[2] << 8)) & upd7220->mask); break;
-					case 2:	upd7220->vram[upd7220->ead] ^= ((upd7220->pr[1] & upd7220->mask) & 0xff); break;
-					case 3: upd7220->vram[upd7220->ead] ^= ((upd7220->pr[1] << 8) & (upd7220->mask & 0xff00)); break;
-				}
+				upd7220->vram[upd7220->ead] ^= result;
 				break;
 			case 0x02: //reset to zero
-				switch(type)
-				{
-					case 0: upd7220->vram[upd7220->ead] &= ~(((upd7220->pr[1]) | (upd7220->pr[2] << 8)) & upd7220->mask); break;
-					case 2:	upd7220->vram[upd7220->ead] &= ~((upd7220->pr[1] & upd7220->mask) & 0xff); break;
-					case 3: upd7220->vram[upd7220->ead] &= ~((upd7220->pr[1] << 8) & (upd7220->mask & 0xff00)); break;
-				}
+				upd7220->vram[upd7220->ead] &= ~result;
 				break;
 			case 0x03: //set to one
-				switch(type)
-				{
-					case 0: upd7220->vram[upd7220->ead] |= (((upd7220->pr[1]) | (upd7220->pr[2] << 8)) & upd7220->mask); break;
-					case 2:	upd7220->vram[upd7220->ead] |= ((upd7220->pr[1] & upd7220->mask) & 0xff); break;
-					case 3: upd7220->vram[upd7220->ead] |= ((upd7220->pr[1] << 8) & (upd7220->mask & 0xff00)); break;
-				}
+				upd7220->vram[upd7220->ead] |= result;
 				break;
 		}
 
@@ -925,7 +933,7 @@ static void process_fifo(device_t *device)
 				upd7220->ra_addr++;
 			}
 
-			upd7220->param_ptr = 0;
+			upd7220->param_ptr = 1;
 		}
 		break;
 
@@ -939,6 +947,7 @@ static void process_fifo(device_t *device)
 		break;
 
 	case COMMAND_WDAT: /* write data into display memory */
+		//printf("CR %02x\n",upd7220->cr);
 		if (upd7220->param_ptr == 3 || (upd7220->param_ptr == 2 && upd7220->cr & 0x10))
 		{
 			//printf("%02x = %02x %02x (%c) %04x\n",upd7220->cr,upd7220->pr[2],upd7220->pr[1],upd7220->pr[1],EAD);
@@ -946,7 +955,7 @@ static void process_fifo(device_t *device)
 
 			write_vram(upd7220,(upd7220->cr & 0x18) >> 3,upd7220->cr & 3);
 			reset_figs_param(upd7220);
-			upd7220->param_ptr = 0;
+			upd7220->param_ptr = 1;
 		}
 		break;
 
@@ -1190,7 +1199,7 @@ static void draw_graphics_line(device_t *device, bitmap_t *bitmap, UINT32 addr, 
 	address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	int sx;
 
-	for (sx = 0; sx < upd7220->aw; sx++)
+	for (sx = 0; sx < upd7220->aw * 2; sx++)
 	{
 		UINT16 data = space->direct().read_raw_word(addr & 0x3ffff);
 
