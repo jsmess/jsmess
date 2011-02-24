@@ -89,6 +89,10 @@ public:
 		UINT8 rx;
 	}keyb;
 
+	struct{
+		UINT8 rx;
+	}rs232c;
+
 	UINT8 vram_bank;
 };
 
@@ -137,6 +141,9 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 
 			if(cursor_on && cursor_addr == addr+x) //TODO
 				tile_data^=0xff;
+
+			if(attr & 0x80 && device->machine->primary_screen->frame_number() & 0x10) //TODO: check for blinking interval
+				tile_data=0;
 
 			for( xi = 0; xi < 8; xi++)
 			{
@@ -520,7 +527,7 @@ static READ8_HANDLER( upd7201_r )
 	}
 	//printf("R [%02x]\n",offset);
 
-	return 0xff;
+	return state->rs232c.rx;
 }
 
 static WRITE8_HANDLER( upd7201_w )
@@ -566,6 +573,14 @@ static WRITE8_HANDLER( upd7201_w )
 				state->keyb.rx = 0;
 				break;
 		}
+	}
+	else //RS-232c TX
+	{
+		//printf("RS-232c W %02x\n",data);
+		if(data == 0x01) //cheap, but needed for working inputs in "The QX-10 Diagnostic"
+			state->rs232c.rx = 0;
+		else
+			state->rs232c.rx = 0xff;
 	}
 
 }
