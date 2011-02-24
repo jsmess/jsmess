@@ -10,8 +10,8 @@
 
         Press space to input your command line (not return).
 
-        D - ? (prints random characters)
-        J - ? (does nothing noticeable)
+        D - Memory Dump
+        J - Jump to address
         M - Modify memory
 
 ****************************************************************************/

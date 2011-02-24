@@ -8,11 +8,18 @@
 
 #include "emu.h"
 #include "machine/z80pio.h"
+#include "imagedev/cassette.h"
 #include "includes/ac1.h"
 
 static READ8_DEVICE_HANDLER (ac1_port_b_r)
 {
-	return 0xff;
+	ac1_state *state = device->machine->driver_data<ac1_state>();
+	UINT8 data = 0x7f;
+
+	if (cassette_input(state->cassette) > 0.03)
+		data |= 0x80;
+
+	return data;
 }
 
 #define BNOT(x) ((x) ? 0 : 1)
@@ -87,6 +94,8 @@ static WRITE8_DEVICE_HANDLER (ac1_port_b_w)
         7       cassette in
 
     */
+	ac1_state *state = device->machine->driver_data<ac1_state>();
+	cassette_output(state->cassette, (data & 0x40) ? -1.0 : +1.0);
 }
 
 Z80PIO_INTERFACE( ac1_z80pio_intf )
@@ -107,4 +116,6 @@ DRIVER_INIT(ac1)
 
 MACHINE_RESET( ac1 )
 {
+	ac1_state *state = machine->driver_data<ac1_state>();
+	state->cassette = machine->device("cassette");
 }

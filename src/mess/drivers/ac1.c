@@ -4,11 +4,23 @@
 
         15/01/2009 Preliminary driver.
 
+        24/02/2011 Added cassette support ('ac1' and 'ac1_32' only)
+
+        Note that Z command will get you into BASIC, and BYE command
+        takes you back to the Monitor.
+
+        S xxxx yyyy = to save memory to tape.
+        L  = to load it back in.
+
+        Since there is no motor control, type in L then mount the tape.
+
 ****************************************************************************/
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/z80pio.h"
+#include "imagedev/cassette.h"
+#include "sound/wave.h"
 #include "includes/ac1.h"
 
 static GFXDECODE_START( ac1 )
@@ -18,18 +30,18 @@ GFXDECODE_END
 /* Address maps */
 static ADDRESS_MAP_START(ac1_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
-    AM_RANGE( 0x0000, 0x07ff ) AM_ROM  // Monitor
-    AM_RANGE( 0x0800, 0x0fff ) AM_ROM  // BASIC
-    AM_RANGE( 0x1000, 0x17ff ) AM_RAM  // Video RAM
-    AM_RANGE( 0x1800, 0x1fff ) AM_RAM  // RAM
+	AM_RANGE( 0x0000, 0x07ff ) AM_ROM  // Monitor
+	AM_RANGE( 0x0800, 0x0fff ) AM_ROM  // BASIC
+	AM_RANGE( 0x1000, 0x17ff ) AM_RAM  // Video RAM
+	AM_RANGE( 0x1800, 0x1fff ) AM_RAM  // RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(ac1_32_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
-    AM_RANGE( 0x0000, 0x07ff ) AM_ROM  // Monitor
-    AM_RANGE( 0x0800, 0x0fff ) AM_ROM  // BASIC
-    AM_RANGE( 0x1000, 0x17ff ) AM_RAM  // Video RAM
-    AM_RANGE( 0x1800, 0xffff ) AM_RAM  // RAM
+	AM_RANGE( 0x0000, 0x07ff ) AM_ROM  // Monitor
+	AM_RANGE( 0x0800, 0x0fff ) AM_ROM  // BASIC
+	AM_RANGE( 0x1000, 0x17ff ) AM_RAM  // Video RAM
+	AM_RANGE( 0x1800, 0xffff ) AM_RAM  // RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ac1_io, ADDRESS_SPACE_IO, 8 )
@@ -131,6 +143,12 @@ static MACHINE_CONFIG_START( ac1, ac1_state )
 
 	MCFG_VIDEO_START(ac1)
 	MCFG_VIDEO_UPDATE(ac1)
+
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_WAVE_ADD("wave", "cassette")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+
+	MCFG_CASSETTE_ADD( "cassette", default_cassette_config )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ac1_32, ac1 )
@@ -192,6 +210,6 @@ ROM_END
 
 /* Driver */
 /*    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT   INIT  COMPANY                 FULLNAME   FLAGS */
-COMP( 1984, ac1,     0,      0, 	ac1,	ac1,	ac1,  "Frank Heyder", "Amateurcomputer AC1 Berlin",		 GAME_NO_SOUND)
-COMP( 1984, ac1_32,  ac1,    0, 	ac1_32,	ac1,	ac1,  "Frank Heyder", "Amateurcomputer AC1 Berlin (32 lines)",		 GAME_NO_SOUND)
-COMP( 1984, ac1scch, ac1,    0, 	ac1_32,	ac1,	ac1,  "Frank Heyder", "Amateurcomputer AC1 SCCH",		 GAME_NO_SOUND)
+COMP( 1984, ac1,     0,      0, 	ac1,	ac1,	ac1,  "Frank Heyder", "Amateurcomputer AC1 Berlin", 0 )
+COMP( 1984, ac1_32,  ac1,    0, 	ac1_32,	ac1,	ac1,  "Frank Heyder", "Amateurcomputer AC1 Berlin (32 lines)", 0 )
+COMP( 1984, ac1scch, ac1,    0, 	ac1_32,	ac1,	ac1,  "Frank Heyder", "Amateurcomputer AC1 SCCH", 0 )

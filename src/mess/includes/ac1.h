@@ -15,6 +15,7 @@ public:
 	ac1_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
+	device_t *cassette;
 };
 
 
