@@ -111,9 +111,9 @@ static WRITE8_HANDLER ( write_io )
 
 	if (BIT(data,1)) {
 		if (BIT(data,0)) {
-			hd44780->data_write(128, state->lcd_char);
+			hd44780->data_write(*space, 128, state->lcd_char);
 		} else {
-			hd44780->control_write(128, state->lcd_char);
+			hd44780->control_write(*space, 128, state->lcd_char);
 		}
 	}
 

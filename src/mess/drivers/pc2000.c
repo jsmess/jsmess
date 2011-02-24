@@ -41,8 +41,6 @@ public:
 	virtual void machine_reset();
 	bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 
-	DECLARE_WRITE8_MEMBER( lcd_control_w );
-	DECLARE_WRITE8_MEMBER( lcd_data_w );
 	DECLARE_READ8_MEMBER( key_matrix_r );
 	DECLARE_WRITE8_MEMBER( key_matrix_w );
 	DECLARE_WRITE8_MEMBER( rombank1_w );
@@ -55,16 +53,6 @@ public:
 bool pc2000_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	return m_lcdc->video_update( &bitmap, &cliprect );
-}
-
-WRITE8_MEMBER( pc2000_state::lcd_control_w )
-{
-	m_lcdc->control_write(offset, data);
-}
-
-WRITE8_MEMBER( pc2000_state::lcd_data_w )
-{
-	m_lcdc->data_write(offset, data);
 }
 
 /* TODO: put a breakpoint at 1625 and test the inputs, writes at dce4 are the scancode values */
@@ -131,8 +119,8 @@ static ADDRESS_MAP_START( pc2000_io , ADDRESS_SPACE_IO, 8, pc2000_state)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x01, 0x01) AM_WRITE(rombank1_w)
 	AM_RANGE(0x03, 0x03) AM_WRITE(rombank2_w)
-	AM_RANGE(0x0a, 0x0a) AM_WRITE(lcd_control_w)
-	AM_RANGE(0x0b, 0x0b) AM_WRITE(lcd_data_w)
+	AM_RANGE(0x0a, 0x0a) AM_DEVREADWRITE("hd44780", hd44780_device, control_read, control_write)
+	AM_RANGE(0x0b, 0x0b) AM_DEVREADWRITE("hd44780", hd44780_device, data_read, data_write)
 	AM_RANGE(0x10, 0x11) AM_READWRITE(key_matrix_r, key_matrix_w)
 	AM_RANGE(0x12, 0x12) AM_READWRITE(beep_r, beep_w)
 ADDRESS_MAP_END

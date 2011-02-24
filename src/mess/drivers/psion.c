@@ -434,9 +434,9 @@ WRITE8_MEMBER( psion_state::io_w )
 	{
 	case 0x80:
 		if (offset & 1)
-			m_lcdc->data_write(offset, data);
+			m_lcdc->data_write(space, offset, data);
 		else
-			m_lcdc->control_write(offset, data);
+			m_lcdc->control_write(space, offset, data);
 		break;
 	default:
 		io_rw(space, offset);
@@ -449,9 +449,9 @@ READ8_MEMBER( psion_state::io_r )
 	{
 	case 0x80:
 		if (offset & 1)
-			return m_lcdc->data_read(offset);
+			return m_lcdc->data_read(space, offset);
 		else
-			return m_lcdc->control_read(offset);
+			return m_lcdc->control_read(space, offset);
 	default:
 		io_rw(space, offset);
 	}

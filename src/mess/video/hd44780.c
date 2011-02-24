@@ -265,7 +265,7 @@ int hd44780_device::video_update(bitmap_t *bitmap, const rectangle *cliprect)
 
 }
 
-void hd44780_device::control_write(offs_t offset, UINT8 data)
+WRITE8_MEMBER(hd44780_device::control_write)
 {
 	if (BIT(data, 7)) // Set DDRAM Address
 	{
@@ -342,7 +342,7 @@ void hd44780_device::control_write(offs_t offset, UINT8 data)
 	}
 }
 
-UINT8 hd44780_device::control_read(offs_t offset)
+READ8_MEMBER(hd44780_device::control_read)
 {
 	return m_busy_flag<<7 || m_ac&0x7f;
 }
@@ -361,7 +361,7 @@ void hd44780_device::update_ac(void) // m_data_bus_flag was left as global so ol
 }
 
 
-void hd44780_device::data_write(offs_t offset, UINT8 data)
+WRITE8_MEMBER(hd44780_device::data_write)
 {
 	if (m_busy_flag)
 	{
@@ -369,14 +369,17 @@ void hd44780_device::data_write(offs_t offset, UINT8 data)
 		return;
 	}
 
-	if (m_ac_mode == 0) m_ddram[m_ac] = data;
-	else m_cgram[m_ac] = data;
+	if (m_ac_mode == 0)
+		m_ddram[m_ac] = data;
+	else
+		m_cgram[m_ac] = data;
+
 	m_data_bus_flag = 1;
 	update_ac();
 	set_busy_flag(41);
 }
 
-UINT8 hd44780_device::data_read(offs_t offset)
+READ8_MEMBER(hd44780_device::data_read)
 {
 	UINT8 data;
 

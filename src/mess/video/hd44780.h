@@ -63,10 +63,10 @@ class hd44780_device :
 
 public:
 	// device interface
-	void control_write(offs_t offset, UINT8 data);
-	UINT8 control_read(offs_t offset);
-	void data_write(offs_t offset, UINT8 data);
-	UINT8 data_read(offs_t offset);
+	DECLARE_WRITE8_MEMBER(control_write);
+	DECLARE_READ8_MEMBER(control_read);
+	DECLARE_WRITE8_MEMBER(data_write);
+	DECLARE_READ8_MEMBER(data_read);
 
 	int video_update(bitmap_t *bitmap, const rectangle *cliprect);
 
