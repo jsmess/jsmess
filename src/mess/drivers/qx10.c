@@ -461,6 +461,8 @@ static WRITE8_HANDLER( upd7201_w )
 			case 0x40:
 				state->keyb.led[(data & 0xe) >> 1] = data & 1;
 				printf("keyb Set led %02x %s\n",((data & 0xe) >> 1),data & 1 ? "on" : "off");
+				state->keyb.rx = (data & 0xf) | 0xc0;
+				pic8259_ir4_w(space->machine->device("pic8259_master"), 1);
 				break;
 			case 0x60:
 				printf("keyb Read LED status\n");
@@ -536,6 +538,7 @@ static ADDRESS_MAP_START( qx10_io , ADDRESS_SPACE_IO, 8)
 ADDRESS_MAP_END
 
 /* Input ports */
+/* TODO: shift break */
 static INPUT_CHANGED( key_stroke )
 {
 	qx10_state *state = field->port->machine->driver_data<qx10_state>();
