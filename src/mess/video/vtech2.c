@@ -113,7 +113,7 @@ static const int offs_0[96] = {
 	0x26a0,0x2ea0,0x36a0,0x3ea0,0x27a0,0x2fa0,0x37a0,0x3fa0
 };
 
-VIDEO_UPDATE( laser )
+SCREEN_UPDATE( laser )
 {
 	vtech2_state *state = screen->machine->driver_data<vtech2_state>();
 	UINT8 *videoram = state->videoram;

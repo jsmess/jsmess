@@ -179,7 +179,7 @@ static void ts2068_lores_scanline(running_machine *machine,bitmap_t *bitmap, int
 	}
 }
 
-VIDEO_UPDATE( ts2068 )
+SCREEN_UPDATE( ts2068 )
 {
 	/* for now TS2068 will do a full-refresh */
 	spectrum_state *state = screen->machine->driver_data<spectrum_state>();
@@ -220,7 +220,7 @@ VIDEO_UPDATE( ts2068 )
 	return 0;
 }
 
-VIDEO_UPDATE( tc2048 )
+SCREEN_UPDATE( tc2048 )
 {
 	/* for now TS2068 will do a full-refresh */
 	spectrum_state *state = screen->machine->driver_data<spectrum_state>();

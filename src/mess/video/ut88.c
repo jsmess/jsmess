@@ -26,7 +26,7 @@ VIDEO_START( ut88 )
 {
 }
 
-VIDEO_UPDATE( ut88 )
+SCREEN_UPDATE( ut88 )
 {
 	ut88_state *state = screen->machine->driver_data<ut88_state>();
 	int x,y;

@@ -60,7 +60,7 @@ public:
 /*----------- defined in video/nc.c -----------*/
 
 extern VIDEO_START( nc );
-extern VIDEO_UPDATE( nc );
+extern SCREEN_UPDATE( nc );
 extern PALETTE_INIT( nc );
 
 void nc200_video_set_backlight(running_machine *machine, int state);

@@ -283,8 +283,8 @@ void pdp1_get_open_mode(int id, unsigned int *readable, unsigned int *writeable,
 /*----------- defined in video/pdp1.c -----------*/
 
 VIDEO_START( pdp1 );
-VIDEO_EOF( pdp1 );
-VIDEO_UPDATE( pdp1 );
+SCREEN_EOF( pdp1 );
+SCREEN_UPDATE( pdp1 );
 
 void pdp1_plot(running_machine *machine, int x, int y);
 void pdp1_typewriter_drawchar(running_machine *machine, int character);

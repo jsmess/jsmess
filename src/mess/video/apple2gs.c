@@ -25,7 +25,7 @@ VIDEO_START( apple2gs )
 
 
 
-VIDEO_UPDATE( apple2gs )
+SCREEN_UPDATE( apple2gs )
 {
 	apple2gs_state *state = screen->machine->driver_data<apple2gs_state>();
 	const UINT8 *vram;
@@ -122,7 +122,7 @@ VIDEO_UPDATE( apple2gs )
 			new_cliprect.min_y = 0;
 			new_cliprect.max_x = 559;
 			new_cliprect.max_y = 191;
-			video_update_apple2(screen, state->legacy_gfx, &new_cliprect);
+			SCREEN_UPDATE_NAME(apple2)(screen, state->legacy_gfx, &new_cliprect);
 		}
 
 		if ((beamy < (BORDER_TOP+4)) || (beamy >= (192+4+BORDER_TOP)))

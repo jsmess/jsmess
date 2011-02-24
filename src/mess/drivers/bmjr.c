@@ -38,7 +38,7 @@ static VIDEO_START( bmjr )
 {
 }
 
-static VIDEO_UPDATE( bmjr )
+static SCREEN_UPDATE( bmjr )
 {
 	bmjr_state *state = screen->machine->driver_data<bmjr_state>();
 	int x,y,xi,yi,count;
@@ -349,13 +349,14 @@ static MACHINE_CONFIG_START( bmjr, bmjr_state )
     MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
     MCFG_SCREEN_SIZE(256, 192)
     MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 192-1)
+    MCFG_SCREEN_UPDATE(bmjr)
+
     MCFG_PALETTE_LENGTH(8)
     MCFG_PALETTE_INIT(bmjr)
 
     MCFG_GFXDECODE(bmjr)
 
     MCFG_VIDEO_START(bmjr)
-    MCFG_VIDEO_UPDATE(bmjr)
 
 	MCFG_CASSETTE_ADD( "cassette", default_cassette_config )
 

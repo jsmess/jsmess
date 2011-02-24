@@ -44,7 +44,7 @@ static VIDEO_START( tim011 )
 {
 }
 
-static VIDEO_UPDATE( tim011 )
+static SCREEN_UPDATE( tim011 )
 {
     return 0;
 }
@@ -64,11 +64,12 @@ static MACHINE_CONFIG_START( tim011,tim011_state )
     MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
     MCFG_SCREEN_SIZE(512, 256)
     MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
+    MCFG_SCREEN_UPDATE(tim011)
+
     MCFG_PALETTE_LENGTH(4)
     MCFG_PALETTE_INIT(black_and_white)
 
     MCFG_VIDEO_START(tim011)
-    MCFG_VIDEO_UPDATE(tim011)
 MACHINE_CONFIG_END
 
 /* ROM definition */

@@ -633,7 +633,7 @@ static void kc85_4_pixel_grab_callback(struct grab_info *grab_data,int x,int y, 
   Do NOT call osd_update_display() from this function,
   it will be called by the main emulation engine.
 ***************************************************************************/
-VIDEO_UPDATE( kc85_4 )
+SCREEN_UPDATE( kc85_4 )
 {
 	kc_state *state = screen->machine->driver_data<kc_state>();
 #if 0
@@ -713,7 +713,7 @@ static void kc85_3_pixel_grab_callback(struct grab_info *grab_data,int x,int y, 
   Do NOT call osd_update_display() from this function,
   it will be called by the main emulation engine.
 ***************************************************************************/
-VIDEO_UPDATE( kc85_3 )
+SCREEN_UPDATE( kc85_3 )
 {
 #if 0
 	/* colour ram takes up 0x02800 bytes */

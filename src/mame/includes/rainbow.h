@@ -43,3 +43,13 @@ READ16_HANDLER( rainbow_cchip_ram_r );
 WRITE16_HANDLER( rainbow_cchip_ctrl_w );
 WRITE16_HANDLER( rainbow_cchip_bank_w );
 WRITE16_HANDLER( rainbow_cchip_ram_w );
+
+
+/*----------- defined in video/rainbow.c -----------*/
+
+SCREEN_UPDATE( rainbow );
+VIDEO_START( jumping );
+SCREEN_UPDATE( jumping );
+
+WRITE16_HANDLER( jumping_spritectrl_w );
+WRITE16_HANDLER( rainbow_spritectrl_w );

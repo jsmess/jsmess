@@ -184,7 +184,7 @@ static void ssystem3_draw_led(bitmap_t *bitmap,INT16 color, int x, int y, int ch
 	}
 }
 
-VIDEO_UPDATE( ssystem3 )
+SCREEN_UPDATE( ssystem3 )
 {
 	ssystem3_state *state = screen->machine->driver_data<ssystem3_state>();
 	int i;

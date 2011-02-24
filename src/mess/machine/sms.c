@@ -1952,7 +1952,7 @@ VIDEO_START( sms1 )
 	state->save_item(NAME(*state->prevright_bitmap));
 }
 
-VIDEO_UPDATE( sms1 )
+SCREEN_UPDATE( sms1 )
 {
 	sms_state *state = screen->machine->driver_data<sms_state>();
 	UINT8 sscope = input_port_read_safe(screen->machine, "SEGASCOPE", 0x00);
@@ -1997,7 +1997,7 @@ VIDEO_UPDATE( sms1 )
 	return 0;
 }
 
-VIDEO_UPDATE( sms )
+SCREEN_UPDATE( sms )
 {
 	sms_state *state = screen->machine->driver_data<sms_state>();
 	sms_vdp_update(state->vdp, bitmap, cliprect);
@@ -2016,7 +2016,7 @@ VIDEO_START( gamegear )
 	state->save_item(NAME(*state->prev_bitmap));
 }
 
-VIDEO_UPDATE( gamegear )
+SCREEN_UPDATE( gamegear )
 {
 	sms_state *state = screen->machine->driver_data<sms_state>();
 	int width = screen->width();

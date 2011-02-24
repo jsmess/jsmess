@@ -33,7 +33,7 @@ public:
 	UINT8 *m_lcd_data;
 	UINT8 m_kb_matrix;
 
-	bool video_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
+	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 	virtual void machine_reset();
 
 	DECLARE_WRITE8_MEMBER( kb_matrix_w );
@@ -87,7 +87,7 @@ UINT8 pc1500_state::pc1500_kb_r(device_t *device)
 	return data;
 }
 
-bool pc1500_state::video_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+bool pc1500_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	bitmap_fill(&bitmap, &cliprect, 0);
 

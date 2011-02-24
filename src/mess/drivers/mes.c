@@ -49,7 +49,7 @@ static VIDEO_START( mes )
 
 /* This system appears to have 2 screens. Not implemented.
     Also the screen dimensions are a guess. */
-static VIDEO_UPDATE( mes )
+static SCREEN_UPDATE( mes )
 {
 	mes_state *state = screen->machine->driver_data<mes_state>();
 	//static UINT8 framecnt=0;
@@ -115,12 +115,12 @@ static MACHINE_CONFIG_START( mes, mes_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(640, 250)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 249)
+    MCFG_SCREEN_UPDATE(mes)
 
     MCFG_PALETTE_LENGTH(2)
     MCFG_PALETTE_INIT(black_and_white)
 
     MCFG_VIDEO_START(mes)
-    MCFG_VIDEO_UPDATE(mes)
 MACHINE_CONFIG_END
 
 

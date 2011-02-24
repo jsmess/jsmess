@@ -98,7 +98,7 @@ static VIDEO_START( jr200 )
 {
 }
 
-static VIDEO_UPDATE( jr200 )
+static SCREEN_UPDATE( jr200 )
 {
 	jr200_state *state = screen->machine->driver_data<jr200_state>();
 	int x,y,xi,yi,pen;
@@ -507,13 +507,13 @@ static MACHINE_CONFIG_START( jr200, jr200_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(16 + 256 + 16, 16 + 192 + 16) /* border size not accurate */
 	MCFG_SCREEN_VISIBLE_AREA(0, 16 + 256 + 16 - 1, 0, 16 + 192 + 16 - 1)
+	MCFG_SCREEN_UPDATE(jr200)
 
 	MCFG_GFXDECODE(jr200)
 	MCFG_PALETTE_LENGTH(8)
 	MCFG_PALETTE_INIT(jr200)
 
 	MCFG_VIDEO_START(jr200)
-	MCFG_VIDEO_UPDATE(jr200)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

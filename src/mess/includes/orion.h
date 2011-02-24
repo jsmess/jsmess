@@ -70,7 +70,7 @@ extern WRITE8_HANDLER ( orionpro_io_w );
 /*----------- defined in video/orion.c -----------*/
 
 extern VIDEO_START( orion128 );
-extern VIDEO_UPDATE( orion128 );
+extern SCREEN_UPDATE( orion128 );
 extern PALETTE_INIT( orion128 );
 
 #endif /* ORION_H_ */

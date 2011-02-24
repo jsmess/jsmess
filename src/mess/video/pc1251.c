@@ -114,7 +114,7 @@ WRITE8_HANDLER(pc1251_lcd_write)
 #define DOWN 62
 #define RIGHT 68
 
-VIDEO_UPDATE( pc1251 )
+SCREEN_UPDATE( pc1251 )
 {
 	pc1251_state *state = screen->machine->driver_data<pc1251_state>();
 	int x, y, i, j;

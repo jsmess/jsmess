@@ -67,8 +67,8 @@ MACHINE_RESET( nascom2 );
 
 /*----------- defined in video/nascom1.c -----------*/
 
-VIDEO_UPDATE( nascom1 );
-VIDEO_UPDATE( nascom2 );
+SCREEN_UPDATE( nascom1 );
+SCREEN_UPDATE( nascom2 );
 
 
 #endif /* NASCOM1_H_ */

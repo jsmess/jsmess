@@ -12,7 +12,7 @@ static PALETTE_INIT( kc85 )
 	palette_set_color(machine, 1, MAKE_RGB(92, 83, 88));
 }
 
-bool kc85_state::video_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+bool kc85_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	hd44102_update(m_lcdc0, &bitmap, &cliprect);
 	hd44102_update(m_lcdc1, &bitmap, &cliprect);
@@ -28,7 +28,7 @@ bool kc85_state::video_update(screen_device &screen, bitmap_t &bitmap, const rec
 	return 0;
 }
 
-bool tandy200_state::video_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+bool tandy200_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	m_lcdc->update_screen(&bitmap, &cliprect);
 

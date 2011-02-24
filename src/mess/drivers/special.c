@@ -427,11 +427,12 @@ static MACHINE_CONFIG_START( special, special_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(384, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 256-1)
+    MCFG_SCREEN_UPDATE(special)
+
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
 
     MCFG_VIDEO_START(special)
-    MCFG_VIDEO_UPDATE(special)
 
     /* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -451,10 +452,11 @@ static MACHINE_CONFIG_DERIVED( specialp, special )
     MCFG_CPU_PROGRAM_MAP(specialp_mem)
 
     MCFG_SCREEN_MODIFY("screen")
-    MCFG_VIDEO_START(specialp)
-    MCFG_VIDEO_UPDATE(specialp)
+    MCFG_SCREEN_UPDATE(specialp)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
+
+    MCFG_VIDEO_START(specialp)	
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( specimx, special )
@@ -466,11 +468,12 @@ static MACHINE_CONFIG_DERIVED( specimx, special )
 
     /* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(specimx)
+	
+	MCFG_VIDEO_START(specimx)
+
 	MCFG_PALETTE_LENGTH(16)
 	MCFG_PALETTE_INIT( specimx )
-
-	MCFG_VIDEO_START(specimx)
-	MCFG_VIDEO_UPDATE(specimx)
 
     /* audio hardware */
 	MCFG_SOUND_ADD("custom", SPECIMX, 0)
@@ -503,11 +506,12 @@ static MACHINE_CONFIG_START( erik, special_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(384, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 256-1)
+    MCFG_SCREEN_UPDATE(erik)
+
 	MCFG_PALETTE_LENGTH(8)
 	MCFG_PALETTE_INIT(erik)
 
     MCFG_VIDEO_START(erik)
-    MCFG_VIDEO_UPDATE(erik)
     /* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("dac", DAC, 0)

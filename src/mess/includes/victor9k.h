@@ -57,7 +57,7 @@ public:
 
 	virtual void machine_start();
 
-	virtual bool video_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
+	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 
 	DECLARE_WRITE_LINE_MEMBER( vsync_w );
 	DECLARE_WRITE_LINE_MEMBER( ssda_irq_w );

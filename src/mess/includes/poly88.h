@@ -48,7 +48,7 @@ extern SNAPSHOT_LOAD( poly88 );
 /*----------- defined in video/poly88.c -----------*/
 
 extern VIDEO_START( poly88 );
-extern VIDEO_UPDATE( poly88 );
+extern SCREEN_UPDATE( poly88 );
 
 #endif /* POLY88_H_ */
 

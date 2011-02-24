@@ -645,7 +645,7 @@ INTERRUPT_GEN( vc4000_video_line )
 		}
 }
 
-VIDEO_UPDATE( vc4000 )
+SCREEN_UPDATE( vc4000 )
 {
 	vc4000_state *state = screen->machine->driver_data<vc4000_state>();
 	copybitmap(bitmap, state->video.bitmap, 0, 0, 0, 0, cliprect);

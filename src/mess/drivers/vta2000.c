@@ -49,7 +49,7 @@ static VIDEO_START( vta2000 )
 	state->videoram = machine->region("maincpu")->base()+0x80a0;
 }
 
-static VIDEO_UPDATE( vta2000 )
+static SCREEN_UPDATE( vta2000 )
 /* Video is 80A0 to B21F, this resolves to 48 lines of 132 character pairs.
 There should therefore be hardware scroll registers, for down and sideways.
 Each character pair consists of a data byte followed by an attribute.
@@ -132,12 +132,13 @@ static MACHINE_CONFIG_START( vta2000, vta2000_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(80*8, 25*12)
 	MCFG_SCREEN_VISIBLE_AREA(0, 80*8-1, 0, 25*12-1)
+	MCFG_SCREEN_UPDATE(vta2000)
+
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
 	MCFG_GFXDECODE(vta2000)
 
 	MCFG_VIDEO_START(vta2000)
-	MCFG_VIDEO_UPDATE(vta2000)
 MACHINE_CONFIG_END
 
 

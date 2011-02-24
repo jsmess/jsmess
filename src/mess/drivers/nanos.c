@@ -244,7 +244,7 @@ static VIDEO_START( nanos )
 	state->FNT = machine->region("gfx1")->base();
 }
 
-static VIDEO_UPDATE( nanos )
+static SCREEN_UPDATE( nanos )
 {
 	nanos_state *state = screen->machine->driver_data<nanos_state>();
 //  static UINT8 framecnt=0;
@@ -510,12 +510,13 @@ static MACHINE_CONFIG_START( nanos, nanos_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(80*8, 25*10)
 	MCFG_SCREEN_VISIBLE_AREA(0,80*8-1,0,25*10-1)
+	MCFG_SCREEN_UPDATE(nanos)
+
 	MCFG_GFXDECODE(nanos)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
 
 	MCFG_VIDEO_START(nanos)
-	MCFG_VIDEO_UPDATE(nanos)
 
 	/* devices */
 	MCFG_Z80CTC_ADD( "z80ctc_0", XTAL_4MHz, ctc_intf)

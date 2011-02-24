@@ -55,7 +55,7 @@ extern const z80sio_interface mc8030_asp_z80sio_intf;
 
 
 extern VIDEO_START( mc8020 );
-extern VIDEO_UPDATE( mc8020 );
+extern SCREEN_UPDATE( mc8020 );
 
 /*****************************************************************************/
 /*                            Implementation for MC80.3x                     */
@@ -63,6 +63,6 @@ extern VIDEO_UPDATE( mc8020 );
 
 
 extern VIDEO_START( mc8030 );
-extern VIDEO_UPDATE( mc8030 );
+extern SCREEN_UPDATE( mc8030 );
 
 #endif /* MC80_H_ */

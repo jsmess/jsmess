@@ -167,7 +167,7 @@ static VIDEO_START( jr100 )
 {
 }
 
-static VIDEO_UPDATE( jr100 )
+static SCREEN_UPDATE( jr100 )
 {
 	jr100_state *state = screen->machine->driver_data<jr100_state>();
 	int x,y,xi,yi;
@@ -361,13 +361,13 @@ static MACHINE_CONFIG_START( jr100, jr100_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(256, 192) /* border size not accurate */
 	MCFG_SCREEN_VISIBLE_AREA(0, 256 - 1, 0, 192 - 1)
+    MCFG_SCREEN_UPDATE(jr100)
 
 	MCFG_GFXDECODE(jr100)
     MCFG_PALETTE_LENGTH(2)
     MCFG_PALETTE_INIT(black_and_white)
 
     MCFG_VIDEO_START(jr100)
-    MCFG_VIDEO_UPDATE(jr100)
 
 	MCFG_VIA6522_ADD("via", XTAL_14_31818MHz / 16, jr100_via_intf)
 

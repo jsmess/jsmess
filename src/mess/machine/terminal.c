@@ -492,7 +492,7 @@ static VIDEO_START( terminal )
 
 }
 
-static VIDEO_UPDATE(terminal )
+static SCREEN_UPDATE(terminal )
 {
 	device_t *devconf = screen->machine->device(TERMINAL_TAG);
 	generic_terminal_update( devconf, bitmap, cliprect);
@@ -506,11 +506,12 @@ MACHINE_CONFIG_FRAGMENT( generic_terminal )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(TERMINAL_WIDTH*8, TERMINAL_HEIGHT*10)
 	MCFG_SCREEN_VISIBLE_AREA(0, TERMINAL_WIDTH*8-1, 0, TERMINAL_HEIGHT*10-1)
+	MCFG_SCREEN_UPDATE(terminal)
+
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
 
 	MCFG_VIDEO_START(terminal)
-	MCFG_VIDEO_UPDATE(terminal)
 MACHINE_CONFIG_END
 
 

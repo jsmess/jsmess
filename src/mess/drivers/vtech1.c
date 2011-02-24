@@ -628,7 +628,7 @@ static READ8_DEVICE_HANDLER( vtech1_mc6847_videoram_r )
 	return vtech1->videoram[offset];
 }
 
-static VIDEO_UPDATE( vtech1 )
+static SCREEN_UPDATE( vtech1 )
 {
 	vtech1_state *vtech1 = screen->machine->driver_data<vtech1_state>();
 	return mc6847_update(vtech1->mc6847, bitmap, cliprect);
@@ -974,8 +974,7 @@ static MACHINE_CONFIG_START( laser110, vtech1_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(320, 25+192+26)
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 1, 239)
-
-	MCFG_VIDEO_UPDATE(vtech1)
+	MCFG_SCREEN_UPDATE(vtech1)
 
 	MCFG_MC6847_ADD("mc6847", vtech1_mc6847_intf)
 	MCFG_MC6847_TYPE(M6847_VERSION_ORIGINAL_PAL)

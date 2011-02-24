@@ -1,10 +1,27 @@
+class baraduke_state : public driver_device
+{
+public:
+	baraduke_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	int inputport_selected;
+	int counter;
+	UINT8 *textram;
+	UINT8 *videoram;
+	UINT8 *spriteram;
+	tilemap_t *tx_tilemap;
+	tilemap_t *bg_tilemap[2];
+	int xscroll[2];
+	int yscroll[2];
+	int copy_sprites;
+};
+
+
 /*----------- defined in video/baraduke.c -----------*/
 
-extern UINT8 *baraduke_textram, *baraduke_videoram, *baraduke_spriteram;
-
 VIDEO_START( baraduke );
-VIDEO_UPDATE( baraduke );
-VIDEO_EOF( baraduke );
+SCREEN_UPDATE( baraduke );
+SCREEN_EOF( baraduke );
 READ8_HANDLER( baraduke_videoram_r );
 WRITE8_HANDLER( baraduke_videoram_w );
 READ8_HANDLER( baraduke_textram_r );

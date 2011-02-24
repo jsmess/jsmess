@@ -26,7 +26,7 @@ VIDEO_START( ac1 )
 {
 }
 
-VIDEO_UPDATE( ac1 )
+SCREEN_UPDATE( ac1 )
 {
 	int x,y;
 	address_space *space = cputag_get_address_space(screen->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
@@ -42,7 +42,7 @@ VIDEO_UPDATE( ac1 )
 	return 0;
 }
 
-VIDEO_UPDATE( ac1_32 )
+SCREEN_UPDATE( ac1_32 )
 {
 	int x,y;
 	address_space *space = cputag_get_address_space(screen->machine, "maincpu", ADDRESS_SPACE_PROGRAM);

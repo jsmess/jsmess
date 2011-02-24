@@ -56,7 +56,7 @@ static PALETTE_INIT( pc_mda )
 }
 
 static VIDEO_START( pc_mda );
-static VIDEO_UPDATE( mc6845_mda );
+static SCREEN_UPDATE( mc6845_mda );
 static READ8_HANDLER( pc_MDA_r );
 static WRITE8_HANDLER( pc_MDA_w );
 static MC6845_UPDATE_ROW( mda_update_row );
@@ -81,14 +81,14 @@ MACHINE_CONFIG_FRAGMENT( pcvideo_mda )
 	MCFG_SCREEN_ADD( MDA_SCREEN_NAME, RASTER)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_RAW_PARAMS(MDA_CLOCK, 882, 0, 720, 370, 0, 350 )
-	MCFG_PALETTE_LENGTH( sizeof(mda_palette) / 3 )
+	MCFG_SCREEN_UPDATE( mc6845_mda)
 
+	MCFG_PALETTE_LENGTH( sizeof(mda_palette) / 3 )
 	MCFG_PALETTE_INIT(pc_mda)
 
 	MCFG_MC6845_ADD( MDA_MC6845_NAME, MC6845, MDA_CLOCK/9, mc6845_mda_intf)
 
 	MCFG_VIDEO_START( pc_mda )
-	MCFG_VIDEO_UPDATE( mc6845_mda)
 MACHINE_CONFIG_END
 
 
@@ -128,7 +128,7 @@ VIDEO_START( pc_mda )
 }
 
 
-static VIDEO_UPDATE( mc6845_mda )
+static SCREEN_UPDATE( mc6845_mda )
 {
 	device_t *devconf = screen->machine->device(MDA_MC6845_NAME);
 	mc6845_update( devconf, bitmap, cliprect );
@@ -411,7 +411,7 @@ WRITE8_HANDLER ( pc_MDA_w )
 ***************************************************************************/
 
 static VIDEO_START( pc_hercules );
-static VIDEO_UPDATE( mc6845_hercules );
+static SCREEN_UPDATE( mc6845_hercules );
 static READ8_HANDLER( pc_hercules_r );
 static WRITE8_HANDLER( pc_hercules_w );
 
@@ -441,6 +441,8 @@ MACHINE_CONFIG_FRAGMENT( pcvideo_hercules )
 	MCFG_SCREEN_ADD( HERCULES_SCREEN_NAME, RASTER)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_RAW_PARAMS(MDA_CLOCK, 882, 0, 720, 370, 0, 350 )
+	MCFG_SCREEN_UPDATE( mc6845_hercules )
+
 	MCFG_PALETTE_LENGTH( sizeof(mda_palette) / 3 )
 
 	MCFG_PALETTE_INIT(pc_mda)
@@ -448,7 +450,6 @@ MACHINE_CONFIG_FRAGMENT( pcvideo_hercules )
 	MCFG_MC6845_ADD( HERCULES_MC6845_NAME, MC6845, MDA_CLOCK/9, mc6845_hercules_intf)
 
 	MCFG_VIDEO_START( pc_hercules )
-	MCFG_VIDEO_UPDATE( mc6845_hercules )
 MACHINE_CONFIG_END
 
 
@@ -525,7 +526,7 @@ static MC6845_UPDATE_ROW( hercules_gfx_update_row )
 }
 
 
-static VIDEO_UPDATE( mc6845_hercules )
+static SCREEN_UPDATE( mc6845_hercules )
 {
 	device_t *devconf = screen->machine->device(HERCULES_MC6845_NAME);
 	mc6845_update( devconf, bitmap, cliprect );

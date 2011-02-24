@@ -88,7 +88,7 @@ extern const via6522_interface vectrex_via6522_interface;
 extern const via6522_interface spectrum1_via6522_interface;
 
 VIDEO_START( vectrex );
-VIDEO_UPDATE( vectrex );
+SCREEN_UPDATE( vectrex );
 
 VIDEO_START( raaspec );
 

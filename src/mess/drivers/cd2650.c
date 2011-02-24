@@ -84,7 +84,7 @@ static VIDEO_START( cd2650 )
 	state->charrom = machine->region("chargen")->base();
 }
 
-static VIDEO_UPDATE( cd2650 )
+static SCREEN_UPDATE( cd2650 )
 {
 /* The video is unusual in that the characters in each line are spaced at 16 bytes in memory,
     thus line 1 starts at 1000, line 2 at 1001, etc. There are 16 lines of 80 characters.
@@ -162,11 +162,12 @@ static MACHINE_CONFIG_START( cd2650, cd2650_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(640, 160)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 159)
+	MCFG_SCREEN_UPDATE(cd2650)
+
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
 
 	MCFG_VIDEO_START(cd2650)
-	MCFG_VIDEO_UPDATE(cd2650)
 
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, cd2650_terminal_intf) // keyboard only
 MACHINE_CONFIG_END

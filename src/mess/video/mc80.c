@@ -97,7 +97,7 @@ VIDEO_START( mc8020 )
 {
 }
 
-VIDEO_UPDATE( mc8020 )
+SCREEN_UPDATE( mc8020 )
 {
 	mc80_state *state = screen->machine->driver_data<mc80_state>();
 	int x,y,j,b;
@@ -135,7 +135,7 @@ VIDEO_START( mc8030 )
 	state->mc8030_video_mem = auto_alloc_array_clear(machine, UINT8, 16*1024);
 }
 
-VIDEO_UPDATE( mc8030 )
+SCREEN_UPDATE( mc8030 )
 {
 	mc80_state *state = screen->machine->driver_data<mc80_state>();
 	UINT8 code;

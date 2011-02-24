@@ -164,7 +164,7 @@ static CDP1864_INTERFACE( tmc2000e_cdp1864_intf )
 	RES_K(4.7)	// unverified
 };
 
-static VIDEO_UPDATE( tmc2000e )
+static SCREEN_UPDATE( tmc2000e )
 {
 	tmc2000e_state *state = screen->machine->driver_data<tmc2000e_state>();
 
@@ -301,9 +301,9 @@ static MACHINE_CONFIG_START( tmc2000e, tmc2000e_state )
 
 	// video hardware
 	MCFG_CDP1864_SCREEN_ADD(SCREEN_TAG, XTAL_1_75MHz)
+	MCFG_SCREEN_UPDATE(tmc2000e)
 
 	MCFG_PALETTE_LENGTH(8)
-	MCFG_VIDEO_UPDATE(tmc2000e)
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")

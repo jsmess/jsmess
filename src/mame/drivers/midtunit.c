@@ -25,6 +25,7 @@
 #include "audio/williams.h"
 #include "audio/dcs.h"
 #include "machine/nvram.h"
+#include "includes/midyunit.h"
 #include "includes/midtunit.h"
 
 
@@ -617,9 +618,9 @@ static MACHINE_CONFIG_START( tunit_core, midtunit_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK * 2, 505, 0, 399, 289, 0, 253)
+	MCFG_SCREEN_UPDATE(tms340x0)
 
 	MCFG_VIDEO_START(midtunit)
-	MCFG_VIDEO_UPDATE(tms340x0)
 MACHINE_CONFIG_END
 
 

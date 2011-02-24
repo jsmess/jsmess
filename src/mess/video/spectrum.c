@@ -59,7 +59,7 @@ INLINE unsigned char get_display_color (unsigned char color, int invert)
 
 /* Code to change the FLASH status every 25 frames. Note this must be
    independent of frame skip etc. */
-VIDEO_EOF( spectrum )
+SCREEN_EOF( spectrum )
 {
 	spectrum_state *state = machine->driver_data<spectrum_state>();
 	EVENT_LIST_ITEM *pItem;
@@ -115,7 +115,7 @@ INLINE void spectrum_plot_pixel(bitmap_t *bitmap, int x, int y, UINT32 color)
 	*BITMAP_ADDR16(bitmap, y, x) = (UINT16)color;
 }
 
-VIDEO_UPDATE( spectrum )
+SCREEN_UPDATE( spectrum )
 {
 	/* for now do a full-refresh */
 	spectrum_state *state = screen->machine->driver_data<spectrum_state>();

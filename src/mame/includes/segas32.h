@@ -55,6 +55,7 @@ public:
 	UINT8 sprite_control_latched[8];
 	UINT8 sprite_control[8];
 	UINT32 *spriteram_32bit;
+	void (*system32_prot_vblank)(device_t *device);
 };
 
 
@@ -90,8 +91,8 @@ WRITE16_HANDLER( arescue_dsp_w );
 
 VIDEO_START(system32);
 VIDEO_START(multi32);
-VIDEO_UPDATE(system32);
-VIDEO_UPDATE(multi32);
+SCREEN_UPDATE(system32);
+SCREEN_UPDATE(multi32);
 void system32_set_vblank(running_machine *machine, int state);
 
 READ16_HANDLER( system32_videoram_r );

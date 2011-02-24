@@ -209,7 +209,7 @@ static DEVICE_IMAGE_LOAD( pv1000_cart )
 }
 
 
-static VIDEO_UPDATE( pv1000 )
+static SCREEN_UPDATE( pv1000 )
 {
 	d65010_state *state = screen->machine->driver_data<d65010_state>();
 	int x, y;
@@ -379,16 +379,15 @@ static MACHINE_CONFIG_START( pv1000, d65010_state )
 	MCFG_MACHINE_START( pv1000 )
 	MCFG_MACHINE_RESET( pv1000 )
 
+	/* D65010G031 - Video & sound chip */
 	MCFG_SCREEN_ADD( "screen", RASTER )
 	MCFG_SCREEN_FORMAT( BITMAP_FORMAT_INDEXED16 )
 	MCFG_SCREEN_RAW_PARAMS( 17897725/3, 380, 0, 256, 262, 0, 192 )
+	MCFG_SCREEN_UPDATE( pv1000 )
 
 	MCFG_PALETTE_LENGTH( 8 )
 	MCFG_PALETTE_INIT( pv1000 )
 	MCFG_GFXDECODE( pv1000 )
-
-	/* D65010G031 - Video & sound chip */
-	MCFG_VIDEO_UPDATE( pv1000 )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD( "pv1000_sound", PV1000, 17897725 )

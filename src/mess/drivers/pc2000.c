@@ -27,7 +27,7 @@ static VIDEO_START( pc2000 )
 {
 }
 
-static VIDEO_UPDATE( pc2000 )
+static SCREEN_UPDATE( pc2000 )
 {
 	pc2000_state *state = screen->machine->driver_data<pc2000_state>();
 	int x,y;
@@ -501,12 +501,13 @@ static MACHINE_CONFIG_START( pc2000, pc2000_state )
     MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
     MCFG_SCREEN_SIZE(640, 480) /* not accurate either */
     MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+    MCFG_SCREEN_UPDATE(pc2000)
+
     MCFG_PALETTE_LENGTH(2)
     MCFG_PALETTE_INIT(black_and_white)
 	MCFG_GFXDECODE(pc2000)
 
     MCFG_VIDEO_START(pc2000)
-    MCFG_VIDEO_UPDATE(pc2000)
 MACHINE_CONFIG_END
 
 /* ROM definition */

@@ -53,7 +53,7 @@ void nc200_video_set_backlight(running_machine *machine, int state)
   Do NOT call osd_update_display() from this function,
   it will be called by the main emulation engine.
 ***************************************************************************/
-VIDEO_UPDATE( nc )
+SCREEN_UPDATE( nc )
 {
 	nc_state *state = screen->machine->driver_data<nc_state>();
 	int y;

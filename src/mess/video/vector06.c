@@ -15,7 +15,7 @@ VIDEO_START( vector06 )
 {
 }
 
-VIDEO_UPDATE( vector06 )
+SCREEN_UPDATE( vector06 )
 {
 	vector06_state *state = screen->machine->driver_data<vector06_state>();
 	UINT8 code1,code2,code3,code4;

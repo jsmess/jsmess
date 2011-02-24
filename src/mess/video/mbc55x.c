@@ -240,12 +240,12 @@ VIDEO_RESET( mbc55x )
     logerror("Video reset\n");
 }
 
-VIDEO_EOF( mbc55x )
+SCREEN_EOF( mbc55x )
 {
-//    logerror("VIDEO_EOF( mbc55x )\n");
+//    logerror("SCREEN_EOF( mbc55x )\n");
 }
 
-VIDEO_UPDATE( mbc55x )
+SCREEN_UPDATE( mbc55x )
 {
 	device_t *devconf = screen->machine->device(VID_MC6845_NAME);
 	mc6845_update( devconf, bitmap, cliprect);

@@ -192,7 +192,7 @@ static PALETTE_INIT( cfx9850 )
 }
 
 
-static VIDEO_UPDATE( cfx9850 )
+static SCREEN_UPDATE( cfx9850 )
 {
 	cfx9850_state *state = screen->machine->driver_data<cfx9850_state>();
 	UINT16 offset = 0;
@@ -232,9 +232,10 @@ static MACHINE_CONFIG_START( cfx9850, cfx9850_state )
 	MCFG_SCREEN_FORMAT( BITMAP_FORMAT_INDEXED16 )
 	MCFG_SCREEN_SIZE( 128, 64 )
 	MCFG_SCREEN_VISIBLE_AREA( 0, 127, 0, 63 )
+	MCFG_SCREEN_UPDATE( cfx9850 )
+
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
-	MCFG_VIDEO_UPDATE( cfx9850 )
 
 	/* TODO: It uses a color display, but I'm being lazy here. 3 colour lcd */
 	MCFG_PALETTE_LENGTH( 4 )

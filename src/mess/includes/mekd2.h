@@ -31,7 +31,7 @@ DEVICE_IMAGE_LOAD( mekd2_cart );
 
 PALETTE_INIT( mekd2 );
 VIDEO_START( mekd2 );
-VIDEO_UPDATE( mekd2 );
+SCREEN_UPDATE( mekd2 );
 
 
 #endif /* MEKD2_H_ */

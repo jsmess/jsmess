@@ -554,7 +554,7 @@ WRITE8_HANDLER ( bbc_6845_w )
  * resfresh the BBC video screen
  ************************************************************************/
 
-VIDEO_UPDATE( bbc )
+SCREEN_UPDATE( bbc )
 {
 	bbc_state *state = screen->machine->driver_data<bbc_state>();
 	long c;

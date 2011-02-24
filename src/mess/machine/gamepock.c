@@ -135,7 +135,7 @@ MACHINE_RESET( gamepock )
 	hd44102ch_init( state, 2 );
 }
 
-VIDEO_UPDATE( gamepock )
+SCREEN_UPDATE( gamepock )
 {
 	gamepock_state *state = screen->machine->driver_data<gamepock_state>();
 	UINT8	ad;

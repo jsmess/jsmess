@@ -278,7 +278,7 @@ bit 4: vertical line / simple gfx (toggled by flip-flop bit) (?)
 bit 5-7: BRG colors
 */
 
-static VIDEO_UPDATE( pc9801 )
+static SCREEN_UPDATE( pc9801 )
 {
 	pc98_state *state = screen->machine->driver_data<pc98_state>();
 //  const gfx_element *gfx = screen->machine->gfx[0];
@@ -1421,12 +1421,13 @@ static MACHINE_CONFIG_START( pc9801, pc98_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 400-1)
+	MCFG_SCREEN_UPDATE(pc9801)
+
 	MCFG_PALETTE_LENGTH(8)
 	MCFG_PALETTE_INIT(pc9801)
 	MCFG_GFXDECODE(pc9801)
 
 	MCFG_VIDEO_START(pc9801)
-	MCFG_VIDEO_UPDATE(pc9801)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( pc9821, pc9801 )

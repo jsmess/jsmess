@@ -104,7 +104,7 @@ public:
 extern const UINT8 odyssey2_colors[];
 
 VIDEO_START( odyssey2 );
-VIDEO_UPDATE( odyssey2 );
+SCREEN_UPDATE( odyssey2 );
 PALETTE_INIT( odyssey2 );
 READ8_HANDLER ( odyssey2_t1_r );
 READ8_HANDLER ( odyssey2_video_r );

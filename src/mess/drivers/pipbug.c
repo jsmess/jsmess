@@ -66,7 +66,7 @@ static VIDEO_START( pipbug )
 {
 }
 
-static VIDEO_UPDATE( pipbug )
+static SCREEN_UPDATE( pipbug )
 {
 	return 0;
 }
@@ -86,11 +86,12 @@ static MACHINE_CONFIG_START( pipbug, pipbug_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+	MCFG_SCREEN_UPDATE(pipbug)
+
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
 
 	MCFG_VIDEO_START(pipbug)
-	MCFG_VIDEO_UPDATE(pipbug)
 MACHINE_CONFIG_END
 
 /* ROM definition */

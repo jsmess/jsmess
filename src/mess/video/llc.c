@@ -15,7 +15,7 @@ VIDEO_START( llc1 )
 {
 }
 
-VIDEO_UPDATE( llc1 )
+SCREEN_UPDATE( llc1 )
 {
 	llc_state *state = screen->machine->driver_data<llc_state>();
 	UINT8 code,disp;
@@ -47,7 +47,7 @@ VIDEO_START( llc2 )
 {
 }
 
-VIDEO_UPDATE( llc2 )
+SCREEN_UPDATE( llc2 )
 {
 	llc_state *state = screen->machine->driver_data<llc_state>();
 	UINT8 code,disp;

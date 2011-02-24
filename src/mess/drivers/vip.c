@@ -452,7 +452,7 @@ WRITE8_MEMBER( vip_state::vip_colorram_w )
 	cdp1862_con_w(m_cgc, 0);
 }
 
-bool vip_state::video_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+bool vip_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	switch (input_port_read(screen.machine, "VIDEO"))
 	{

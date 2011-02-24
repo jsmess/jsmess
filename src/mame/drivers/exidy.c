@@ -144,9 +144,10 @@ Fax                  1982  6502   FXL, FLA
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "deprecat.h"
-#include "includes/exidy.h"
-#include "includes/targ.h"
 #include "machine/6821pia.h"
+#include "audio/exidy.h"
+#include "includes/targ.h"
+#include "includes/exidy.h"
 
 
 static UINT8 last_dial;
@@ -699,12 +700,13 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( fax )
 	PORT_START("DSW")
 	PORT_BIT ( 0x01, IP_ACTIVE_HIGH, IPT_COIN2 )
-	PORT_DIPNAME( 0x06, 0x06, "Bonus Time" ) PORT_DIPLOCATION("SW1:2,3")
+	// note: set switches 2 to 8 to ON for freeplay
+	PORT_DIPNAME( 0x06, 0x04, "Bonus Time" ) PORT_DIPLOCATION("SW1:2,3")
 	PORT_DIPSETTING(    0x06, "8000" )
 	PORT_DIPSETTING(    0x04, "13000" )
 	PORT_DIPSETTING(    0x02, "18000" )
 	PORT_DIPSETTING(    0x00, "25000" )
-	PORT_DIPNAME( 0x60, 0x60, "Game/Bonus Times" ) PORT_DIPLOCATION("SW1:6,7")
+	PORT_DIPNAME( 0x60, 0x40, "Game/Bonus Times" ) PORT_DIPLOCATION("SW1:6,7")
 	PORT_DIPSETTING(    0x60, ":32/:24" )
 	PORT_DIPSETTING(    0x40, ":48/:36" )
 	PORT_DIPSETTING(    0x20, "1:04/:48" )
@@ -814,13 +816,13 @@ static MACHINE_CONFIG_START( base, driver_device )
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 	MCFG_VIDEO_START(exidy)
-	MCFG_VIDEO_UPDATE(exidy)
 	MCFG_GFXDECODE(exidy)
 	MCFG_PALETTE_LENGTH(8)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_RAW_PARAMS(EXIDY_PIXEL_CLOCK, EXIDY_HTOTAL, EXIDY_HBEND, EXIDY_HBSTART, EXIDY_VTOTAL, EXIDY_VBEND, EXIDY_VBSTART)
+	MCFG_SCREEN_UPDATE(exidy)
 
 MACHINE_CONFIG_END
 

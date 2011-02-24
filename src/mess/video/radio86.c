@@ -93,11 +93,11 @@ I8275_DISPLAY_PIXELS(partner_display_pixels)
 	}
 }
 
-VIDEO_UPDATE( radio86 )
+SCREEN_UPDATE( radio86 )
 {
 	device_t *devconf = screen->machine->device("i8275");
 	i8275_update( devconf, bitmap, cliprect);
-	VIDEO_UPDATE_CALL ( generic_bitmapped );
+	SCREEN_UPDATE_CALL ( generic_bitmapped );
 	return 0;
 }
 

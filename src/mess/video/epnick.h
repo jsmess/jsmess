@@ -26,7 +26,7 @@
 
 PALETTE_INIT( epnick );
 VIDEO_START( epnick );
-VIDEO_UPDATE( epnick );
+SCREEN_UPDATE( epnick );
 
 WRITE8_HANDLER( epnick_reg_w );
 

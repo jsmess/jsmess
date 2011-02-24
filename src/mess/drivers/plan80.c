@@ -157,7 +157,7 @@ static VIDEO_START( plan80 )
 {
 }
 
-static VIDEO_UPDATE( plan80 )
+static SCREEN_UPDATE( plan80 )
 {
 	plan80_state *state = screen->machine->driver_data<plan80_state>();
 	UINT8 *gfx = screen->machine->region("gfx")->base();
@@ -218,12 +218,13 @@ static MACHINE_CONFIG_START( plan80, plan80_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(48*6, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 48*6-1, 0, 32*8-1)
+	MCFG_SCREEN_UPDATE(plan80)
+
 	MCFG_GFXDECODE(plan80)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
 
 	MCFG_VIDEO_START(plan80)
-	MCFG_VIDEO_UPDATE(plan80)
 MACHINE_CONFIG_END
 
 /* ROM definition */

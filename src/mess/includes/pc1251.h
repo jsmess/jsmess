@@ -45,7 +45,7 @@ NVRAM_HANDLER( pc1251 );
 
 READ8_HANDLER(pc1251_lcd_read);
 WRITE8_HANDLER(pc1251_lcd_write);
-VIDEO_UPDATE( pc1251 );
+SCREEN_UPDATE( pc1251 );
 
 
 #endif /* PC1251_H_ */

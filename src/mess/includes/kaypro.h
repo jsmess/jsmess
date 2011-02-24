@@ -77,9 +77,9 @@ QUICKLOAD_LOAD( kaypro2x );
 MC6845_UPDATE_ROW( kaypro2x_update_row );
 PALETTE_INIT( kaypro );
 VIDEO_START( kaypro );
-VIDEO_UPDATE( kayproii );
-VIDEO_UPDATE( omni2 );
-VIDEO_UPDATE( kaypro2x );
+SCREEN_UPDATE( kayproii );
+SCREEN_UPDATE( omni2 );
+SCREEN_UPDATE( kaypro2x );
 
 READ8_HANDLER( kaypro_videoram_r );
 READ8_HANDLER( kaypro2x_status_r );

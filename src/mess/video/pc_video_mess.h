@@ -21,7 +21,7 @@ struct mscrtc6845 *pc_video_start(running_machine *machine, const struct mscrtc6
 	pc_video_update_proc (*choosevideomode)(running_machine *machine, int *width, int *height, struct mscrtc6845 *crtc),
 	size_t vramsize);
 
-VIDEO_UPDATE( pc_video );
+SCREEN_UPDATE( pc_video );
 
 WRITE8_HANDLER( pc_video_videoram_w );
 WRITE16_HANDLER( pc_video_videoram16le_w );

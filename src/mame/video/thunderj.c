@@ -117,36 +117,11 @@ VIDEO_START( thunderj )
 
 /*************************************
  *
- *  Mark high palette bits starting
- *  at the given X,Y and continuing
- *  until a stop or the end of line
- *
- *************************************/
-
-void thunderj_mark_high_palette(bitmap_t *bitmap, UINT16 *pf, UINT16 *mo, int x, int y)
-{
-	#define START_MARKER	((4 << ATARIMO_PRIORITY_SHIFT) | 2)
-	#define END_MARKER		((4 << ATARIMO_PRIORITY_SHIFT) | 4)
-	int offnext = 0;
-
-	for ( ; x < bitmap->width; x++)
-	{
-		pf[x] |= 0x400;
-		if (offnext && (mo[x] & START_MARKER) != START_MARKER)
-			break;
-		offnext = ((mo[x] & END_MARKER) == END_MARKER);
-	}
-}
-
-
-
-/*************************************
- *
  *  Main refresh
  *
  *************************************/
 
-VIDEO_UPDATE( thunderj )
+SCREEN_UPDATE( thunderj )
 {
 	thunderj_state *state = screen->machine->driver_data<thunderj_state>();
 	bitmap_t *priority_bitmap = screen->machine->priority_bitmap;
@@ -281,7 +256,7 @@ VIDEO_UPDATE( thunderj )
 					{
 						/* if bit 2 is set, start setting high palette bits */
 						if (mo[x] & 2)
-							thunderj_mark_high_palette(bitmap, pf, mo, x, y);
+							atarimo_mark_high_palette(bitmap, pf, mo, x, y);
 					}
 
 					/* erase behind ourselves */

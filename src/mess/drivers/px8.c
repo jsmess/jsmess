@@ -747,10 +747,10 @@ static VIDEO_START( px8 )
 }
 
 /*-------------------------------------------------
-    VIDEO_UPDATE( px8 )
+    SCREEN_UPDATE( px8 )
 -------------------------------------------------*/
 
-static VIDEO_UPDATE( px8 )
+static SCREEN_UPDATE( px8 )
 {
 	px8_state *state = screen->machine->driver_data<px8_state>();
 
@@ -885,11 +885,12 @@ static MACHINE_CONFIG_START( px8, px8_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(480, 64)
 	MCFG_SCREEN_VISIBLE_AREA(0, 479, 0, 63)
+	MCFG_SCREEN_UPDATE(px8)
+
 	MCFG_GFXDECODE(px8)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(px8)
 	MCFG_VIDEO_START(px8)
-	MCFG_VIDEO_UPDATE(px8)
 	MCFG_SED1330_ADD(SED1320_TAG, 0, sed1320_intf)
 
 	/* sound hardware */

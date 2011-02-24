@@ -131,12 +131,14 @@ static WRITE8_HANDLER( pbillian_sample_trigger_w )
 {
 	superqix_state *state = space->machine->driver_data<superqix_state>();
 	device_t *samples = space->machine->device("samples");
+	UINT8 *src = space->machine->region("samples")->base();
+	int len = space->machine->region("samples")->bytes();
 	int start,end;
 
 	start = data << 7;
 	/* look for end of sample marker */
 	end = start;
-	while (end < 0x8000 && state->samplebuf[end] != (0xff^0x80))
+	while (end < len && src[end] != 0xff)
 		end++;
 
 	sample_start_raw(samples, 0, state->samplebuf + start, end - start, 5000, 0); // 5khz ?
@@ -1042,12 +1044,12 @@ static MACHINE_CONFIG_START( pbillian, superqix_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE(pbillian)
 
 	MCFG_GFXDECODE(pbillian)
 	MCFG_PALETTE_LENGTH(512)
 
 	MCFG_VIDEO_START(pbillian)
-	MCFG_VIDEO_UPDATE(pbillian)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
@@ -1078,12 +1080,12 @@ static MACHINE_CONFIG_START( hotsmash, superqix_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE(pbillian)
 
 	MCFG_GFXDECODE(pbillian)
 	MCFG_PALETTE_LENGTH(512)
 
 	MCFG_VIDEO_START(pbillian)
-	MCFG_VIDEO_UPDATE(pbillian)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
@@ -1118,12 +1120,12 @@ static MACHINE_CONFIG_START( sqix, superqix_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE(superqix)
 
 	MCFG_GFXDECODE(sqix)
 	MCFG_PALETTE_LENGTH(256)
 
 	MCFG_VIDEO_START(superqix)
-	MCFG_VIDEO_UPDATE(superqix)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1162,12 +1164,12 @@ static MACHINE_CONFIG_START( sqixbl, superqix_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE(superqix)
 
 	MCFG_GFXDECODE(sqix)
 	MCFG_PALETTE_LENGTH(256)
 
 	MCFG_VIDEO_START(superqix)
-	MCFG_VIDEO_UPDATE(superqix)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

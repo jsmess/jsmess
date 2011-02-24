@@ -704,7 +704,7 @@ void psion_state::machine_reset()
 		update_banks(machine);
 }
 
-bool psion_state::video_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+bool psion_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	return m_lcdc->video_update( &bitmap, &cliprect );
 }

@@ -586,7 +586,7 @@ extern char atari_frame_message[64+1];
 extern int atari_frame_counter;
 
 extern VIDEO_START( atari );
-extern VIDEO_UPDATE( atari );
+extern SCREEN_UPDATE( atari );
 
 INTERRUPT_GEN( a400_interrupt );
 INTERRUPT_GEN( a800_interrupt );
@@ -597,7 +597,7 @@ extern PALETTE_INIT( atari );
 
 /*----------- defined in drivers/maxaflex.c -----------*/
 
-int atari_input_disabled(void);
+int atari_input_disabled(running_machine *machine);
 
 #endif /* ATARI_H */
 

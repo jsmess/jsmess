@@ -285,7 +285,7 @@ static VIDEO_START( cat )
 {
 }
 
-static VIDEO_UPDATE( cat )
+static SCREEN_UPDATE( cat )
 {
 	cat_state *state = screen->machine->driver_data<cat_state>();
 	UINT16 code;
@@ -331,7 +331,7 @@ static VIDEO_START( swyft )
 {
 }
 
-static VIDEO_UPDATE( swyft )
+static SCREEN_UPDATE( swyft )
 {
 	cat_state *state = screen->machine->driver_data<cat_state>();
 	UINT16 code;
@@ -419,11 +419,12 @@ static MACHINE_CONFIG_START( cat, cat_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(672, 344)
 	MCFG_SCREEN_VISIBLE_AREA(0, 672-1, 0, 344-1)
+	MCFG_SCREEN_UPDATE(cat)
+
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
 
 	MCFG_VIDEO_START(cat)
-	MCFG_VIDEO_UPDATE(cat)
 
 	MCFG_DUART68681_ADD( "duart68681", XTAL_5MHz, cat_duart68681_config )
 
@@ -446,11 +447,12 @@ static MACHINE_CONFIG_START( swyft, cat_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(320, 242)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 242-1)
+	MCFG_SCREEN_UPDATE(swyft)
+
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
 
 	MCFG_VIDEO_START(swyft)
-	MCFG_VIDEO_UPDATE(swyft)
 MACHINE_CONFIG_END
 
 /* ROM definition */

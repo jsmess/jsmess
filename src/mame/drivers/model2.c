@@ -734,12 +734,12 @@ static WRITE32_HANDLER( geo_ctl1_w )
 	{
 		if (data & 0x80000000)
 		{
-			logerror("Start state->geo upload\n");
+			logerror("Start geo upload\n");
 			state->geocnt = 0;
 		}
 		else
 		{
-			logerror("Boot state->geo, %d dwords\n", state->geocnt);
+			logerror("Boot geo, %d dwords\n", state->geocnt);
 		}
 	}
 
@@ -756,12 +756,12 @@ static WRITE32_HANDLER( geo_sharc_ctl1_w )
     {
         if (data & 0x80000000)
         {
-            logerror("Start state->geo upload\n");
+            logerror("Start geo upload\n");
             state->geocnt = 0;
         }
         else
         {
-            logerror("Boot state->geo, %d dwords\n", state->geocnt);
+            logerror("Boot geo, %d dwords\n", state->geocnt);
             cputag_set_input_line(space->machine, "dsp2", INPUT_LINE_HALT, CLEAR_LINE);
             //cpu_spinuntil_time(space->cpu, attotime::from_usec(1000));       // Give the SHARC enough time to boot itself
         }
@@ -2036,11 +2036,11 @@ static MACHINE_CONFIG_START( model2o, model2_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(62*8, 48*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 62*8-1, 0*8, 48*8-1)
+	MCFG_SCREEN_UPDATE(model2)
 
 	MCFG_PALETTE_LENGTH(8192)
 
 	MCFG_VIDEO_START(model2)
-	MCFG_VIDEO_UPDATE(model2)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
@@ -2093,11 +2093,11 @@ static MACHINE_CONFIG_START( model2a, model2_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(62*8, 48*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 62*8-1, 0*8, 48*8-1)
+	MCFG_SCREEN_UPDATE(model2)
 
 	MCFG_PALETTE_LENGTH(8192)
 
 	MCFG_VIDEO_START(model2)
-	MCFG_VIDEO_UPDATE(model2)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
@@ -2196,11 +2196,11 @@ static MACHINE_CONFIG_START( model2b, model2_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(62*8, 48*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 62*8-1, 0*8, 48*8-1)
+	MCFG_SCREEN_UPDATE(model2)
 
 	MCFG_PALETTE_LENGTH(8192)
 
 	MCFG_VIDEO_START(model2)
-	MCFG_VIDEO_UPDATE(model2)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
@@ -2242,11 +2242,11 @@ static MACHINE_CONFIG_START( model2c, model2_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(62*8, 48*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 62*8-1, 0*8, 48*8-1)
+	MCFG_SCREEN_UPDATE(model2)
 
 	MCFG_PALETTE_LENGTH(8192)
 
 	MCFG_VIDEO_START(model2)
-	MCFG_VIDEO_UPDATE(model2)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 

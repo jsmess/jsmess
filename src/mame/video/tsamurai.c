@@ -203,7 +203,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	}
 }
 
-VIDEO_UPDATE( tsamurai )
+SCREEN_UPDATE( tsamurai )
 {
 	tsamurai_state *state = screen->machine->driver_data<tsamurai_state>();
 	int i;
@@ -218,10 +218,10 @@ VIDEO_UPDATE( tsamurai )
 
 	/*
         This following isn't particularly efficient.  We'd be better off to
-        dynamically change every 8th palette to the state->background color, so we
-        could draw the state->background as an opaque tilemap.
+        dynamically change every 8th palette to the background color, so we
+        could draw the background as an opaque tilemap.
 
-        Note that the state->background color register isn't well understood
+        Note that the background color register isn't well understood
         (screenshots would be helpful)
     */
 	bitmap_fill(bitmap,cliprect,state->bgcolor);
@@ -268,7 +268,7 @@ VIDEO_START( vsgongf )
 	state->foreground = tilemap_create(machine, get_vsgongf_tile_info,tilemap_scan_rows,8,8,32,32);
 }
 
-VIDEO_UPDATE( vsgongf )
+SCREEN_UPDATE( vsgongf )
 {
 	tsamurai_state *state = screen->machine->driver_data<tsamurai_state>();
 	#ifdef MAME_DEBUG

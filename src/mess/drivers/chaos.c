@@ -43,7 +43,7 @@ static VIDEO_START( chaos )
 {
 }
 
-static VIDEO_UPDATE( chaos )
+static SCREEN_UPDATE( chaos )
 {
     return 0;
 }
@@ -63,11 +63,12 @@ static MACHINE_CONFIG_START( chaos, chaos_state )
     MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
     MCFG_SCREEN_SIZE(640, 480)
     MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+    MCFG_SCREEN_UPDATE(chaos)
+
     MCFG_PALETTE_LENGTH(2)
     MCFG_PALETTE_INIT(black_and_white)
 
     MCFG_VIDEO_START(chaos)
-    MCFG_VIDEO_UPDATE(chaos)
 MACHINE_CONFIG_END
 
 /* ROM definition */

@@ -11,7 +11,6 @@ Issues:
 #include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
-#include "includes/wiz.h"
 #include "includes/rollrace.h"
 
 static READ8_HANDLER( ra_fake_d800_r )
@@ -215,12 +214,12 @@ static MACHINE_CONFIG_START( rollrace, rollrace_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(16,255,16, 255-16)
+	MCFG_SCREEN_UPDATE(rollrace)
 
 	MCFG_GFXDECODE(rollrace)
 	MCFG_PALETTE_LENGTH(256)
 
-	MCFG_PALETTE_INIT(wiz)
-	MCFG_VIDEO_UPDATE(rollrace)
+	MCFG_PALETTE_INIT(rollrace)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

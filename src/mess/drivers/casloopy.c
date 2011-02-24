@@ -160,7 +160,7 @@ static VIDEO_START( casloopy )
 
 }
 
-static VIDEO_UPDATE( casloopy )
+static SCREEN_UPDATE( casloopy )
 {
 	return 0;
 }
@@ -205,10 +205,11 @@ static MACHINE_CONFIG_START( casloopy, casloopy_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE(casloopy)
+
 	MCFG_PALETTE_LENGTH(512)
 
 	MCFG_VIDEO_START(casloopy)
-	MCFG_VIDEO_UPDATE(casloopy)
 
 	MCFG_CARTSLOT_ADD("cart")
 	MCFG_CARTSLOT_EXTENSION_LIST("ic1,bin")

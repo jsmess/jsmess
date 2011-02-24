@@ -39,7 +39,7 @@ public:
 	required_device<device_t> m_wd2797;
 	required_device<device_t> m_floppy;
 
-	virtual bool video_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
+	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 
 	virtual void machine_reset();
 
@@ -138,7 +138,7 @@ WRITE_LINE_MEMBER( unixpc_state::wd2797_drq_w )
     VIDEO
 ***************************************************************************/
 
-bool unixpc_state::video_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+bool unixpc_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	for (int y = 0; y < 348; y++)
 		for (int x = 0; x < 720/16; x++)

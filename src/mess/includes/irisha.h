@@ -36,6 +36,6 @@ extern READ8_HANDLER (irisha_keyboard_r);
 /*----------- defined in video/irisha.c -----------*/
 
 extern VIDEO_START( irisha );
-extern VIDEO_UPDATE( irisha );
+extern SCREEN_UPDATE( irisha );
 
 #endif /* UT88_H_ */

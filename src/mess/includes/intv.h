@@ -75,7 +75,7 @@ WRITE16_HANDLER( intv_stic_w );
 /*----------- defined in video/intv.c -----------*/
 
 extern VIDEO_START( intv );
-extern VIDEO_UPDATE( intvkbd );
+extern SCREEN_UPDATE( intvkbd );
 
 void intv_stic_screenrefresh(running_machine *machine);
 

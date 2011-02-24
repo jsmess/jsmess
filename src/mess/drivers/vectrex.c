@@ -101,16 +101,15 @@ static MACHINE_CONFIG_START( vectrex, vectrex_state )
 	MCFG_CPU_ADD("maincpu", M6809, XTAL_6MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(vectrex_map)
 
+	/* video hardware */
 	MCFG_SCREEN_ADD("screen", VECTOR)
 	MCFG_SCREEN_REFRESH_RATE(60)
-
-	/* video hardware */
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(400, 300)
 	MCFG_SCREEN_VISIBLE_AREA(0, 399, 0, 299)
+	MCFG_SCREEN_UPDATE(vectrex)
 
 	MCFG_VIDEO_START(vectrex)
-	MCFG_VIDEO_UPDATE(vectrex)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

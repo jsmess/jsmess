@@ -151,7 +151,7 @@ static PALETTE_INIT(ti99_2)
 }
 
 
-static VIDEO_UPDATE(ti99_2)
+static SCREEN_UPDATE(ti99_2)
 {
 	ti99_2_state *state = screen->machine->driver_data<ti99_2_state>();
 	UINT8 *videoram = state->videoram;
@@ -388,11 +388,11 @@ static MACHINE_CONFIG_START( ti99_2, ti99_2_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(256, 192)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 192-1)
+	MCFG_SCREEN_UPDATE(ti99_2)
+
 	MCFG_GFXDECODE(ti99_2)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(ti99_2)
-
-	MCFG_VIDEO_UPDATE(ti99_2)
 MACHINE_CONFIG_END
 
 

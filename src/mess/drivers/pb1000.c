@@ -45,7 +45,7 @@ public:
 	UINT8 m_gatearray[2];
 
 	virtual void machine_start();
-	bool video_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
+	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE16_MEMBER( gatearray_w );
 	UINT16 pb2000c_kb_r(running_machine *machine);
 	UINT16 pb1000_kb_r(running_machine *machine);
@@ -311,7 +311,7 @@ WRITE16_MEMBER( pb1000_state::gatearray_w )
 		memory_set_bankptr(space.machine, "bank1", machine->region("rom")->base());
 }
 
-bool pb1000_state::video_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+bool pb1000_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	return m_hd44352->video_update(bitmap, cliprect);
 }

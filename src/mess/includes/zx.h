@@ -47,7 +47,7 @@ WRITE8_HANDLER ( zx81_io_w );
 /*----------- defined in video/zx.c -----------*/
 
 VIDEO_START( zx );
-VIDEO_EOF( zx );
+SCREEN_EOF( zx );
 
 void zx_ula_bkgnd(running_machine *machine, int color);
 void zx_ula_r(running_machine *machine, int offs, const char *region, const UINT8 param);

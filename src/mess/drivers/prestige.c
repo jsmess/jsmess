@@ -193,7 +193,7 @@ static VIDEO_START( prestige )
 {
 }
 
-static VIDEO_UPDATE( prestige )
+static SCREEN_UPDATE( prestige )
 {
 	address_space *program = cputag_get_address_space(screen->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT16 addr = 0xe000;
@@ -238,13 +238,14 @@ static MACHINE_CONFIG_START( prestige, prestige_state )
     MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE( 240, 100 )
 	MCFG_SCREEN_VISIBLE_AREA( 0, 240-1, 0, 100-1 )
+    MCFG_SCREEN_UPDATE(prestige)
+
 	MCFG_DEFAULT_LAYOUT( layout_lcd )
 
     MCFG_PALETTE_LENGTH(2)
     MCFG_PALETTE_INIT(prestige)
 
     MCFG_VIDEO_START(prestige)
-    MCFG_VIDEO_UPDATE(prestige)
 
 	/* cartridge */
 	MCFG_CARTSLOT_ADD("cart")

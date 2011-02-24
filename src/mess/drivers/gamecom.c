@@ -101,9 +101,6 @@ static MACHINE_CONFIG_START( gamecom, gamecom_state )
 	MCFG_CPU_CONFIG( gamecom_cpu_config )
 	MCFG_CPU_VBLANK_INT("screen", gamecom_interrupt)
 
-	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_REFRESH_RATE( 59.732155 )
-	MCFG_SCREEN_VBLANK_TIME(500)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	//MCFG_NVRAM_ADD_0FILL("nvram")
@@ -112,11 +109,15 @@ static MACHINE_CONFIG_START( gamecom, gamecom_state )
 
 	/* video hardware */
 	MCFG_VIDEO_START( gamecom )
-	MCFG_VIDEO_UPDATE( generic_bitmapped )
 
+	MCFG_SCREEN_ADD("screen", LCD)
+	MCFG_SCREEN_REFRESH_RATE( 59.732155 )
+	MCFG_SCREEN_VBLANK_TIME(500)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE( 200, 200 )
 	MCFG_SCREEN_VISIBLE_AREA( 0, 199, 0, 159 )
+	MCFG_SCREEN_UPDATE( generic_bitmapped )
+
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 	MCFG_PALETTE_LENGTH( GAMECOM_PALETTE_LENGTH )
 	MCFG_PALETTE_INIT( gamecom )

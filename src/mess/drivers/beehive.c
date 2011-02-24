@@ -55,7 +55,7 @@ static VIDEO_START( beehive )
 
 /* This system appears to have inline attribute bytes of unknown meaning.
     Currently they are ignored. */
-static VIDEO_UPDATE( beehive )
+static SCREEN_UPDATE( beehive )
 {
 	beehive_state *state = screen->machine->driver_data<beehive_state>();
 	//static UINT8 framecnt=0;
@@ -121,11 +121,12 @@ static MACHINE_CONFIG_START( beehive, beehive_state )
     MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
     MCFG_SCREEN_SIZE(640, 250)
     MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 249)
+    MCFG_SCREEN_UPDATE(beehive)
+
     MCFG_PALETTE_LENGTH(2)
     MCFG_PALETTE_INIT(black_and_white)
 
     MCFG_VIDEO_START(beehive)
-    MCFG_VIDEO_UPDATE(beehive)
 MACHINE_CONFIG_END
 
 /* ROM definition */

@@ -135,7 +135,7 @@ static unsigned char *z88_convert_address(running_machine *machine, unsigned lon
 }
 
 
-VIDEO_EOF( z88 )
+SCREEN_EOF( z88 )
 {
 	z88_state *state = machine->driver_data<z88_state>();
 	state->frame_number++;
@@ -153,7 +153,7 @@ VIDEO_EOF( z88 )
   Do NOT call osd_update_display() from this fuz88tion,
   it will be called by the main emulation engine.
 ***************************************************************************/
-VIDEO_UPDATE( z88 )
+SCREEN_UPDATE( z88 )
 {
 	z88_state *state = screen->machine->driver_data<z88_state>();
 	int x,y;

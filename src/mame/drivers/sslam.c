@@ -84,7 +84,6 @@ Notes:
 #include "cpu/m68000/m68000.h"
 #include "cpu/mcs51/mcs51.h"
 #include "sound/okim6295.h"
-#include "includes/playmark.h"
 #include "includes/sslam.h"
 
 
@@ -394,7 +393,7 @@ static ADDRESS_MAP_START( sslam_program_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x108000, 0x10ffff) AM_RAM_WRITE(sslam_tx_tileram_w) AM_BASE_MEMBER(sslam_state,tx_tileram)
 	AM_RANGE(0x110000, 0x11000d) AM_RAM AM_BASE_MEMBER(sslam_state,regs)
 	AM_RANGE(0x200000, 0x200001) AM_WRITENOP
-	AM_RANGE(0x280000, 0x280fff) AM_RAM_WRITE(bigtwin_paletteram_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x280000, 0x280fff) AM_RAM_WRITE(sslam_paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x201000, 0x201fff) AM_RAM AM_BASE_MEMBER(sslam_state,spriteram)
 	AM_RANGE(0x304000, 0x304001) AM_WRITENOP
 	AM_RANGE(0x300010, 0x300011) AM_READ_PORT("IN0")
@@ -417,7 +416,7 @@ static ADDRESS_MAP_START( powerbls_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x110000, 0x11000d) AM_RAM AM_BASE_MEMBER(sslam_state,regs)
 	AM_RANGE(0x200000, 0x200001) AM_WRITENOP
 	AM_RANGE(0x201000, 0x201fff) AM_RAM AM_BASE_MEMBER(sslam_state,spriteram)
-	AM_RANGE(0x280000, 0x2803ff) AM_RAM_WRITE(bigtwin_paletteram_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x280000, 0x2803ff) AM_RAM_WRITE(sslam_paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x300010, 0x300011) AM_READ_PORT("IN0")
 	AM_RANGE(0x300012, 0x300013) AM_READ_PORT("IN1")
 	AM_RANGE(0x300014, 0x300015) AM_READ_PORT("IN2")
@@ -728,12 +727,12 @@ static MACHINE_CONFIG_START( sslam, sslam_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 39*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_UPDATE(sslam)
 
 	MCFG_GFXDECODE(sslam)
 	MCFG_PALETTE_LENGTH(0x800)
 
 	MCFG_VIDEO_START(sslam)
-	MCFG_VIDEO_UPDATE(sslam)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -759,12 +758,12 @@ static MACHINE_CONFIG_START( powerbls, sslam_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_UPDATE(powerbls)
 
 	MCFG_GFXDECODE(powerbls)
 	MCFG_PALETTE_LENGTH(0x200)
 
 	MCFG_VIDEO_START(powerbls)
-	MCFG_VIDEO_UPDATE(powerbls)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

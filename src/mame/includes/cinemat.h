@@ -12,6 +12,7 @@ public:
 		: driver_device(machine, config) { }
 
 	UINT8 sound_control;
+	void (*sound_handler)(running_machine *,UINT8 sound_val, UINT8 bits_changed);
 	UINT32 current_shift;
 	UINT32 last_shift;
 	UINT32 last_shift2;
@@ -75,6 +76,6 @@ VIDEO_START( cinemat_16level );
 VIDEO_START( cinemat_64level );
 VIDEO_START( cinemat_color );
 VIDEO_START( cinemat_qb3color );
-VIDEO_UPDATE( cinemat );
+SCREEN_UPDATE( cinemat );
 
-VIDEO_UPDATE( spacewar );
+SCREEN_UPDATE( spacewar );

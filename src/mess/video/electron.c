@@ -60,7 +60,7 @@ INLINE void electron_plot_pixel(bitmap_t *bitmap, int x, int y, UINT32 color)
 	*BITMAP_ADDR16(bitmap, y, x) = (UINT16)color;
 }
 
-VIDEO_UPDATE( electron )
+SCREEN_UPDATE( electron )
 {
 	electron_state *state = screen->machine->driver_data<electron_state>();
 	int i;

@@ -57,7 +57,7 @@ extern const wd17xx_interface concept_wd17xx_interface;
 
 MACHINE_START(concept);
 VIDEO_START(concept);
-VIDEO_UPDATE(concept);
+SCREEN_UPDATE(concept);
 INTERRUPT_GEN( concept_interrupt );
 READ16_HANDLER(concept_io_r);
 WRITE16_HANDLER(concept_io_w);

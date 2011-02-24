@@ -70,7 +70,7 @@ PALETTE_INIT( super80m )
 
 
 
-VIDEO_EOF( super80m )
+SCREEN_EOF( super80m )
 {
 	super80_state *state = machine->driver_data<super80_state>();
 	/* if we chose another palette or colour mode, enable it */
@@ -86,7 +86,7 @@ VIDEO_EOF( super80m )
 	}
 }
 
-VIDEO_UPDATE( super80 )
+SCREEN_UPDATE( super80 )
 {
 	super80_state *state = screen->machine->driver_data<super80_state>();
 	UINT8 y,ra,chr=32,gfx,screen_on=0;
@@ -128,7 +128,7 @@ VIDEO_UPDATE( super80 )
 	return 0;
 }
 
-VIDEO_UPDATE( super80d )
+SCREEN_UPDATE( super80d )
 {
 	super80_state *state = screen->machine->driver_data<super80_state>();
 	UINT8 y,ra,chr=32,gfx,screen_on=0;
@@ -170,7 +170,7 @@ VIDEO_UPDATE( super80d )
 	return 0;
 }
 
-VIDEO_UPDATE( super80e )
+SCREEN_UPDATE( super80e )
 {
 	super80_state *state = screen->machine->driver_data<super80_state>();
 	UINT8 y,ra,chr=32,gfx,screen_on=0;
@@ -212,7 +212,7 @@ VIDEO_UPDATE( super80e )
 	return 0;
 }
 
-VIDEO_UPDATE( super80m )
+SCREEN_UPDATE( super80m )
 {
 	super80_state *state = screen->machine->driver_data<super80_state>();
 	UINT8 y,ra,chr=32,gfx,screen_on=0;
@@ -382,7 +382,7 @@ VIDEO_START( super80v )
 	state->m_colorram = machine->region("colorram")->base();
 }
 
-VIDEO_UPDATE( super80v )
+SCREEN_UPDATE( super80v )
 {
 	super80_state *state = screen->machine->driver_data<super80_state>();
 	state->m_framecnt++;

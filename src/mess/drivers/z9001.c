@@ -44,7 +44,7 @@ static VIDEO_START( z9001 )
 {
 }
 
-static VIDEO_UPDATE( z9001 )
+static SCREEN_UPDATE( z9001 )
 {
 	z9001_state *state = screen->machine->driver_data<z9001_state>();
 	UINT8 code;
@@ -106,12 +106,13 @@ static MACHINE_CONFIG_START( z9001, z9001_state )
     MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
     MCFG_SCREEN_SIZE(40*8, 24*8)
     MCFG_SCREEN_VISIBLE_AREA(0, 40*8-1, 0, 24*8-1)
+    MCFG_SCREEN_UPDATE(z9001)
+
 	MCFG_GFXDECODE(z9001)
     MCFG_PALETTE_LENGTH(2)
     MCFG_PALETTE_INIT(black_and_white)
 
     MCFG_VIDEO_START(z9001)
-    MCFG_VIDEO_UPDATE(z9001)
 MACHINE_CONFIG_END
 
 /* ROM definition */

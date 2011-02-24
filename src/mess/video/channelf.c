@@ -49,7 +49,7 @@ static int recalc_palette_offset(int reg1, int reg2)
 	return ((reg2&0x2)|(reg1>>1)) << 2;
 }
 
-VIDEO_UPDATE( channelf )
+SCREEN_UPDATE( channelf )
 {
 	channelf_state *state = screen->machine->driver_data<channelf_state>();
 	UINT8 *videoram = state->videoram;

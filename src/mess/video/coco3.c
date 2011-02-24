@@ -355,7 +355,7 @@ static void coco3_render_scanline(running_machine *machine, bitmap_t *bitmap, in
 
 
 
-VIDEO_UPDATE( coco3 )
+SCREEN_UPDATE( coco3 )
 {
 	coco3_state *state = screen->machine->driver_data<coco3_state>();
 	coco3_video *video = state->video;
@@ -384,7 +384,7 @@ VIDEO_UPDATE( coco3 )
 	if (video->legacy_video)
 	{
 		/* legacy CoCo 1/2 graphics */
-		rc = VIDEO_UPDATE_CALL(m6847);
+		rc = SCREEN_UPDATE_CALL(m6847);
 
 		if ((rc & UPDATE_HAS_NOT_CHANGED) == 0)
 		{

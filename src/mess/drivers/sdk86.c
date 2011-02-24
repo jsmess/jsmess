@@ -47,7 +47,7 @@ static VIDEO_START( sdk86 )
 {
 }
 
-static VIDEO_UPDATE( sdk86 )
+static SCREEN_UPDATE( sdk86 )
 {
     return 0;
 }
@@ -67,11 +67,12 @@ static MACHINE_CONFIG_START( sdk86, sdk86_state )
     MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
     MCFG_SCREEN_SIZE(640, 480)
     MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+    MCFG_SCREEN_UPDATE(sdk86)
+
     MCFG_PALETTE_LENGTH(2)
     MCFG_PALETTE_INIT(black_and_white)
 
     MCFG_VIDEO_START(sdk86)
-    MCFG_VIDEO_UPDATE(sdk86)
 MACHINE_CONFIG_END
 
 /* ROM definition */

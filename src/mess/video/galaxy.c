@@ -121,7 +121,7 @@ VIDEO_START( galaxy )
 	VIDEO_START_CALL( generic_bitmapped );
 }
 
-VIDEO_UPDATE( galaxy )
+SCREEN_UPDATE( galaxy )
 {
 	galaxy_state *state = screen->machine->driver_data<galaxy_state>();
 	state->gal_video_timer->adjust(attotime::zero, 0, attotime::never);
@@ -131,6 +131,6 @@ VIDEO_UPDATE( galaxy )
 		bitmap_fill(screen->machine->generic.tmpbitmap, &black_area, 0);
 	}
 	state->interrupts_enabled = FALSE;
-	return VIDEO_UPDATE_CALL ( generic_bitmapped );
+	return SCREEN_UPDATE_CALL ( generic_bitmapped );
 }
 

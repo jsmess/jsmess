@@ -152,7 +152,7 @@ static PALETTE_INIT( tm990_189 )
 	}
 }
 
-static VIDEO_EOF( tm990_189 )
+static SCREEN_EOF( tm990_189 )
 {
 	tm990189_state *state = machine->driver_data<tm990189_state>();
 	int i;
@@ -215,7 +215,7 @@ static void update_common(running_machine *machine, bitmap_t *bitmap,
 				(state->LED_state & 0x40) ? fore_color : back_color);
 }
 
-static VIDEO_UPDATE( tm990_189 )
+static SCREEN_UPDATE( tm990_189 )
 {
 	update_common(screen->machine, bitmap, 580, 150, 110, 508, 387, 456, 507, 478, 1, 0);
 	return 0;
@@ -235,10 +235,10 @@ static VIDEO_START( tm990_189_v )
 	state->LED_display_window_height = 32;
 }
 
-static VIDEO_UPDATE( tm990_189_v )
+static SCREEN_UPDATE( tm990_189_v )
 {
 	tm990189_state *state = screen->machine->driver_data<tm990189_state>();
-	VIDEO_UPDATE_CALL(tms9928a);
+	SCREEN_UPDATE_CALL(tms9928a);
 
 	plot_box(bitmap, state->LED_display_window_left, state->LED_display_window_top, state->LED_display_window_width, state->LED_display_window_height, screen->machine->pens[1]);
 	update_common(screen->machine, bitmap,
@@ -808,14 +808,14 @@ static MACHINE_CONFIG_START( tm990_189, tm990189_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(750, 532)
 	MCFG_SCREEN_VISIBLE_AREA(0, 750-1, 0, 532-1)
+	MCFG_SCREEN_UPDATE(tm990_189)
+	MCFG_SCREEN_EOF(tm990_189)
 
 	/*MCFG_GFXDECODE(tm990_189)*/
 	MCFG_PALETTE_LENGTH(tm990_189_palette_size)
 
 	MCFG_PALETTE_INIT(tm990_189)
 	/*MCFG_VIDEO_START(tm990_189)*/
-	MCFG_VIDEO_EOF(tm990_189)
-	MCFG_VIDEO_UPDATE(tm990_189)
 
 	/* sound hardware */
 	/* one two-level buzzer */
@@ -859,9 +859,10 @@ static MACHINE_CONFIG_START( tm990_189_v, tm990189_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(LEFT_BORDER+32*8+RIGHT_BORDER, TOP_BORDER_60HZ+24*8+BOTTOM_BORDER_60HZ + 32)
 	MCFG_SCREEN_VISIBLE_AREA(LEFT_BORDER-12, LEFT_BORDER+32*8+12-1, TOP_BORDER_60HZ-9, TOP_BORDER_60HZ+24*8+9-1 + 32)
-	MCFG_VIDEO_EOF(tm990_189)
+	MCFG_SCREEN_UPDATE(tm990_189_v)
+	MCFG_SCREEN_EOF(tm990_189)
+
 	MCFG_VIDEO_START(tm990_189_v)
-	MCFG_VIDEO_UPDATE(tm990_189_v)
 
 	/* sound hardware */
 	/* one two-level buzzer */

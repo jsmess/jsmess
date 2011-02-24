@@ -83,7 +83,7 @@ void compis_state::video_start()
 	VIDEO_START_CALL(generic_bitmapped);
 }
 
-bool compis_state::video_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+bool compis_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	/* graphics */
 	upd7220_update(m_hgdc, &bitmap, &cliprect);

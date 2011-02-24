@@ -18,7 +18,7 @@ PALETTE_INIT( kaypro )
 	palette_set_color(machine, 2, MAKE_RGB(0, 110, 0)); /* low intensity green */
 }
 
-VIDEO_UPDATE( kayproii )
+SCREEN_UPDATE( kayproii )
 {
 	kaypro_state *state = screen->machine->driver_data<kaypro_state>();
 	UINT8 *videoram = state->videoram;
@@ -72,7 +72,7 @@ VIDEO_UPDATE( kayproii )
 	return 0;
 }
 
-VIDEO_UPDATE( omni2 )
+SCREEN_UPDATE( omni2 )
 {
 	kaypro_state *state = screen->machine->driver_data<kaypro_state>();
 	UINT8 *videoram = state->videoram;
@@ -118,7 +118,7 @@ VIDEO_UPDATE( omni2 )
 	return 0;
 }
 
-VIDEO_UPDATE( kaypro2x )
+SCREEN_UPDATE( kaypro2x )
 {
 	kaypro_state *state = screen->machine->driver_data<kaypro_state>();
 	state->framecnt++;

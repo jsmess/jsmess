@@ -39,7 +39,7 @@ static VIDEO_START( mk90 )
 {
 }
 
-static VIDEO_UPDATE( mk90 )
+static SCREEN_UPDATE( mk90 )
 {
     return 0;
 }
@@ -64,11 +64,12 @@ static MACHINE_CONFIG_START( mk90, mk90_state )
     MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
     MCFG_SCREEN_SIZE(640, 480)
     MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+    MCFG_SCREEN_UPDATE(mk90)
+
     MCFG_PALETTE_LENGTH(2)
     MCFG_PALETTE_INIT(black_and_white)
 
     MCFG_VIDEO_START(mk90)
-    MCFG_VIDEO_UPDATE(mk90)
 MACHINE_CONFIG_END
 
 /* ROM definition */

@@ -49,7 +49,7 @@ WRITE8_HANDLER( dai_amd9511_w );
 extern const unsigned char dai_palette[16*3];
 
 VIDEO_START( dai );
-VIDEO_UPDATE( dai );
+SCREEN_UPDATE( dai );
 PALETTE_INIT( dai );
 
 

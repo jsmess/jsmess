@@ -46,7 +46,7 @@ PALETTE_INIT( mz700 )
 }
 
 
-VIDEO_UPDATE( mz700 )
+SCREEN_UPDATE( mz700 )
 {
 	mz_state *state = screen->machine->driver_data<mz_state>();
 	UINT8 *videoram = state->videoram;
@@ -82,7 +82,7 @@ VIDEO_START( mz800 )
 	gfx_element_set_source(machine->gfx[0], mz->cgram);
 }
 
-VIDEO_UPDATE( mz800 )
+SCREEN_UPDATE( mz800 )
 {
 	mz_state *state = screen->machine->driver_data<mz_state>();
 	UINT8 *videoram = state->videoram;
@@ -91,7 +91,7 @@ VIDEO_UPDATE( mz800 )
 	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 
 	if (mz->mz700_mode)
-		return VIDEO_UPDATE_CALL(mz700);
+		return SCREEN_UPDATE_CALL(mz700);
 	else
 	{
 		if (mz->hires_mode)

@@ -324,7 +324,7 @@ ADDRESS_MAP_END
 
 
 #ifdef MESS
-int atari_input_disabled(void)
+int atari_input_disabled(running_machine *machine)
 {
 	return 0;
 }
@@ -1055,9 +1055,9 @@ static MACHINE_CONFIG_START( atari_common_nodac, driver_device )
 	MCFG_SCREEN_VISIBLE_AREA(MIN_X, MAX_X, MIN_Y, MAX_Y)
 	MCFG_PALETTE_LENGTH(sizeof(atari_palette) / 3)
 	MCFG_PALETTE_INIT(mess_atari)
+	MCFG_SCREEN_UPDATE(atari)
 
 	MCFG_VIDEO_START(atari)
-	MCFG_VIDEO_UPDATE(atari)
 
 	MCFG_PIA6821_ADD( "pia", atari_pia_interface )
 

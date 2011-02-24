@@ -130,7 +130,7 @@ static VIDEO_START( ti990_4 )
 	state->terminal = machine->device("vdt911");
 }
 
-static VIDEO_UPDATE( ti990_4 )
+static SCREEN_UPDATE( ti990_4 )
 {
 	ti990_4_state *state = screen->machine->driver_data<ti990_4_state>();
 	vdt911_refresh(state->terminal, bitmap, 0, 0);
@@ -151,7 +151,7 @@ static VIDEO_START( ti990_4 )
 	state->terminal = machine->device("asr733");
 }
 
-static VIDEO_UPDATE( ti990_4 )
+static SCREEN_UPDATE( ti990_4 )
 {
 	ti990_4_state *state = screen->machine->driver_data<ti990_4_state>();
 	asr733_refresh(state->terminal, bitmap, 0, 0);
@@ -250,7 +250,7 @@ static MACHINE_CONFIG_START( ti990_4, ti990_4_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-
+	MCFG_SCREEN_UPDATE(ti990_4)
 #if VIDEO_911
 	MCFG_SCREEN_SIZE(560, 280)
 	MCFG_SCREEN_VISIBLE_AREA(0, 560-1, 0, /*250*/280-1)
@@ -275,7 +275,6 @@ static MACHINE_CONFIG_START( ti990_4, ti990_4_state )
 	MCFG_ASR733_VIDEO_ADD("asr733", asr733_intf)
 #endif
 	MCFG_VIDEO_START(ti990_4)
-	MCFG_VIDEO_UPDATE(ti990_4)
 
 #if VIDEO_911
 	/* 911 VDT has a beep tone generator */

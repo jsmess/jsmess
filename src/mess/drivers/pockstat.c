@@ -921,7 +921,7 @@ static MACHINE_RESET( pockstat )
 	state->ps_flash_write_count = 0;
 }
 
-static VIDEO_UPDATE( pockstat )
+static SCREEN_UPDATE( pockstat )
 {
 	pockstat_state *state = screen->machine->driver_data<pockstat_state>();
 	int x = 0;
@@ -992,11 +992,12 @@ static MACHINE_CONFIG_START( pockstat, pockstat_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(32, 32)
 	MCFG_SCREEN_VISIBLE_AREA(0, 32-1, 0, 32-1)
+	MCFG_SCREEN_UPDATE(pockstat)
+
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
 
 	MCFG_VIDEO_START(generic_bitmapped)
-	MCFG_VIDEO_UPDATE(pockstat)
 
     MCFG_SPEAKER_STANDARD_MONO("mono")
     MCFG_SOUND_ADD("dac", DAC, 0)

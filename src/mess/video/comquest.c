@@ -6,7 +6,7 @@ VIDEO_START( comquest )
 {
 }
 
-VIDEO_UPDATE( comquest )
+SCREEN_UPDATE( comquest )
 {
 	int x, y, j;
 

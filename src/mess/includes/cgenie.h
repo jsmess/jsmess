@@ -115,7 +115,7 @@ WRITE8_HANDLER ( cgenie_videoram_w );
 /*----------- defined in video/cgenie.c -----------*/
 
 VIDEO_START( cgenie );
-VIDEO_UPDATE( cgenie );
+SCREEN_UPDATE( cgenie );
 
 READ8_HANDLER ( cgenie_index_r );
 READ8_HANDLER ( cgenie_register_r );

@@ -736,7 +736,7 @@ static VIDEO_START( trs80m2 )
 	state->char_rom = machine->region(MC6845_TAG)->base();
 }
 
-static VIDEO_UPDATE( trs80m2 )
+static SCREEN_UPDATE( trs80m2 )
 {
 	trs80m2_state *state = screen->machine->driver_data<trs80m2_state>();
 
@@ -1025,12 +1025,12 @@ static MACHINE_CONFIG_START( trs80m2, trs80m2_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
+	MCFG_SCREEN_UPDATE(trs80m2)
 
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
 
 	MCFG_VIDEO_START(trs80m2)
-	MCFG_VIDEO_UPDATE(trs80m2)
 
 	MCFG_MC6845_ADD(MC6845_TAG, MC6845, XTAL_12_48MHz/8, mc6845_intf)
 

@@ -13,6 +13,7 @@
 
     Notes:
         * This hardware is a precursor to Phoenix
+        * Export license to Taito in 1980
 
           ----------------------------------
 
@@ -192,7 +193,7 @@ static VIDEO_START( safarir )
 }
 
 
-static VIDEO_UPDATE( safarir )
+static SCREEN_UPDATE( safarir )
 {
 	safarir_state *state = screen->machine->driver_data<safarir_state>();
 
@@ -398,14 +399,13 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( safarir, safarir_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8085A, 18000000/8)	/* 2.25 MHz ? */
+	MCFG_CPU_ADD("maincpu", I8080A, XTAL_18MHz/12)	/* 1.5 MHz ? */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 
 	MCFG_MACHINE_START(safarir)
 
 	/* video hardware */
 	MCFG_VIDEO_START(safarir)
-	MCFG_VIDEO_UPDATE(safarir)
 	MCFG_PALETTE_INIT(safarir)
 	MCFG_PALETTE_LENGTH(2*8)
 	MCFG_GFXDECODE(safarir)
@@ -415,6 +415,7 @@ static MACHINE_CONFIG_START( safarir, safarir_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 26*8-1)
 	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_UPDATE(safarir)
 
 	/* audio hardware */
 	MCFG_FRAGMENT_ADD(safarir_audio)

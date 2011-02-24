@@ -87,7 +87,7 @@ void advision_state::vh_update(int x)
 
 ***************************************************************************/
 
-bool advision_state::video_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+bool advision_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	int x, y;
 

@@ -53,13 +53,24 @@ Stephh's notes (based on the games Z80 code and some tests) :
 #include "includes/galaxold.h"
 #include "machine/7474.h"
 
-static int noise_data = 0;
+
+class dambustr_state : public driver_device
+{
+public:
+	dambustr_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	int noise_data;
+};
+
+
 
 /* FIXME: Really needed? - Should be handled by either interface */
 static WRITE8_DEVICE_HANDLER( dambustr_noise_enable_w )
 {
-	if (data != noise_data) {
-		noise_data = data;
+	dambustr_state *state = device->machine->driver_data<dambustr_state>();
+	if (data != state->noise_data) {
+		state->noise_data = data;
 		galaxian_noise_enable_w(device, offset, data);
 	}
 }
@@ -231,7 +242,7 @@ static DRIVER_INIT(dambustr)
 
 
 
-static MACHINE_CONFIG_START( dambustr, driver_device )
+static MACHINE_CONFIG_START( dambustr, dambustr_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 18432000/6)	/* 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(dambustr_map)
@@ -249,13 +260,13 @@ static MACHINE_CONFIG_START( dambustr, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE(dambustr)
 
 	MCFG_GFXDECODE(dambustr)
 	MCFG_PALETTE_LENGTH(32+2+64+8)		/* 32 for the characters, 2 for the bullets, 64 for the stars, 8 for the background */
 
 	MCFG_PALETTE_INIT(dambustr)
 	MCFG_VIDEO_START(dambustr)
-	MCFG_VIDEO_UPDATE(dambustr)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

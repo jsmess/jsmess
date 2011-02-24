@@ -14,7 +14,7 @@ VIDEO_START( cbmb_crtc )
 {
 }
 
-VIDEO_UPDATE( cbmb_crtc )
+SCREEN_UPDATE( cbmb_crtc )
 {
 	device_t *mc6845 = screen->machine->device("crtc");
 	mc6845_update(mc6845, bitmap, cliprect);

@@ -118,8 +118,8 @@ WRITE8_HANDLER( ti83p_port_0010_w );
 /*----------- defined in video/ti85.c -----------*/
 
 VIDEO_START( ti85 );
-VIDEO_UPDATE( ti85 );
-VIDEO_UPDATE( ti82 );
+SCREEN_UPDATE( ti85 );
+SCREEN_UPDATE( ti82 );
 PALETTE_INIT( ti85 );
 
 

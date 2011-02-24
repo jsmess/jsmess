@@ -82,7 +82,7 @@ static VIDEO_START( uts20 )
 	state->FNT = machine->region("chargen")->base();
 }
 
-static VIDEO_UPDATE( uts20 )
+static SCREEN_UPDATE( uts20 )
 {
 	univac_state *state = screen->machine->driver_data<univac_state>();
 	UINT8 y,ra,chr,gfx;
@@ -145,11 +145,12 @@ static MACHINE_CONFIG_START( uts20, univac_state )
     MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
     MCFG_SCREEN_SIZE(640, 250)
     MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 249)
+    MCFG_SCREEN_UPDATE(uts20)
+
     MCFG_PALETTE_LENGTH(2)
     MCFG_PALETTE_INIT(black_and_white)
 
     MCFG_VIDEO_START(uts20)
-    MCFG_VIDEO_UPDATE(uts20)
 MACHINE_CONFIG_END
 
 

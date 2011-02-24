@@ -51,8 +51,6 @@ static INPUT_CHANGED( gear_changed )
 static INTERRUPT_GEN( firetrk_interrupt )
 {
 	firetrk_state *state = device->machine->driver_data<firetrk_state>();
-	/* Super Bug - ASR - when is this used and what is an ASR? */
-//  discrete_sound_w(device->machine->device("discrete"), SUPERBUG_ASR_EN, 0);
 
 	/* NMI interrupts are disabled during service mode in firetrk and montecar */
 	if (!state->in_service_mode)
@@ -370,7 +368,7 @@ static ADDRESS_MAP_START( superbug_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x01c0, 0x01c0) AM_MIRROR(0x001f) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x01e0, 0x01e0) AM_MIRROR(0x001f) AM_WRITE(blink_on_w) AM_BASE_MEMBER(firetrk_state, blink)
 	AM_RANGE(0x0200, 0x0207) AM_MIRROR(0x0018) AM_READ(firetrk_input_r)
-	AM_RANGE(0x0220, 0x0220) AM_MIRROR(0x001f) AM_DEVWRITE("discrete", superbug_asr_w)
+	AM_RANGE(0x0220, 0x0220) AM_MIRROR(0x001f) AM_DEVWRITE("discrete", firetrk_xtndply_w)
 	AM_RANGE(0x0240, 0x0243) AM_MIRROR(0x001c) AM_READ(firetrk_dip_r)
 	AM_RANGE(0x0260, 0x026f) AM_MIRROR(0x0010) AM_WRITE(superbug_output_w)
 	AM_RANGE(0x0280, 0x0280) AM_MIRROR(0x001f) AM_DEVWRITE("discrete", superbug_motor_snd_w)
@@ -907,9 +905,9 @@ static MACHINE_CONFIG_START( firetrk, firetrk_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(320, 262)
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
+	MCFG_SCREEN_UPDATE(firetrk)
 
 	MCFG_VIDEO_START(firetrk)
-	MCFG_VIDEO_UPDATE(firetrk)
 	MCFG_PALETTE_INIT(firetrk)
 	MCFG_PALETTE_LENGTH(28)
 	MCFG_GFXDECODE(firetrk)
@@ -930,8 +928,10 @@ static MACHINE_CONFIG_DERIVED( superbug, firetrk )
 	MCFG_CPU_PROGRAM_MAP(superbug_map)
 
 	/* video hardware */
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(superbug)
+
 	MCFG_VIDEO_START(superbug)
-	MCFG_VIDEO_UPDATE(superbug)
 	MCFG_GFXDECODE(superbug)
 	MCFG_PALETTE_LENGTH(28)
 
@@ -949,8 +949,10 @@ static MACHINE_CONFIG_DERIVED( montecar, firetrk )
 	MCFG_CPU_PROGRAM_MAP(montecar_map)
 
 	/* video hardware */
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(montecar)
+	
 	MCFG_VIDEO_START(montecar)
-	MCFG_VIDEO_UPDATE(montecar)
 	MCFG_GFXDECODE(montecar)
 
 	MCFG_PALETTE_INIT(montecar)

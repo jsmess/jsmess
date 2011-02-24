@@ -15,7 +15,7 @@ VIDEO_START( irisha )
 {
 }
 
-VIDEO_UPDATE( irisha )
+SCREEN_UPDATE( irisha )
 {
 	UINT8 code1, code2;
 	UINT8 col;

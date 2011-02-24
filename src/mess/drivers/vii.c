@@ -353,7 +353,7 @@ static void vii_blit_sprites(running_machine *machine, bitmap_t *bitmap, const r
 	}
 }
 
-static VIDEO_UPDATE( vii )
+static SCREEN_UPDATE( vii )
 {
 	vii_state *state = screen->machine->driver_data<vii_state>();
 	int i, x, y;
@@ -965,6 +965,7 @@ static MACHINE_CONFIG_START( vii, vii_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(320, 240)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
+	MCFG_SCREEN_UPDATE( vii )
 
 	MCFG_PALETTE_LENGTH(32768)
 
@@ -974,7 +975,6 @@ static MACHINE_CONFIG_START( vii, vii_state )
 	MCFG_CARTSLOT_INTERFACE("vii_cart")
 
 	MCFG_VIDEO_START( vii )
-	MCFG_VIDEO_UPDATE( vii )
 
 	MCFG_SOFTWARE_LIST_ADD("vii_cart","vii")
 MACHINE_CONFIG_END
@@ -993,6 +993,7 @@ static MACHINE_CONFIG_START( vsmile, vii_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(320, 240)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
+	MCFG_SCREEN_UPDATE( vii )
 
 	MCFG_PALETTE_LENGTH(32768)
 
@@ -1002,7 +1003,6 @@ static MACHINE_CONFIG_START( vsmile, vii_state )
 	MCFG_CARTSLOT_LOAD( vsmile_cart )
 
 	MCFG_VIDEO_START( vii )
-	MCFG_VIDEO_UPDATE( vii )
 MACHINE_CONFIG_END
 
 static const i2cmem_interface i2cmem_interface =
@@ -1026,11 +1026,11 @@ static MACHINE_CONFIG_START( batman, vii_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(320, 240)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
+	MCFG_SCREEN_UPDATE( vii )
 
 	MCFG_PALETTE_LENGTH(32768)
 
 	MCFG_VIDEO_START( vii )
-	MCFG_VIDEO_UPDATE( vii )
 MACHINE_CONFIG_END
 
 static DRIVER_INIT( vii )

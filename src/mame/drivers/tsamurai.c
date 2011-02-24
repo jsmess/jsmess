@@ -669,13 +669,13 @@ static MACHINE_CONFIG_START( tsamurai, tsamurai_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 8, 255-8)
+	MCFG_SCREEN_UPDATE(tsamurai)
 
 	MCFG_GFXDECODE(tsamurai)
 	MCFG_PALETTE_LENGTH(256)
 
 	MCFG_PALETTE_INIT(RRRR_GGGG_BBBB)
 	MCFG_VIDEO_START(tsamurai)
-	MCFG_VIDEO_UPDATE(tsamurai)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -717,13 +717,13 @@ static MACHINE_CONFIG_START( m660, tsamurai_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 8, 255-8)
+	MCFG_SCREEN_UPDATE(tsamurai)
 
 	MCFG_GFXDECODE(tsamurai)
 	MCFG_PALETTE_LENGTH(256)
 
 	MCFG_PALETTE_INIT(RRRR_GGGG_BBBB)
 	MCFG_VIDEO_START(tsamurai)
-	MCFG_VIDEO_UPDATE(tsamurai)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -758,13 +758,13 @@ static MACHINE_CONFIG_START( vsgongf, tsamurai_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 8, 255-8)
+	MCFG_SCREEN_UPDATE(vsgongf)
 
 	MCFG_GFXDECODE(tsamurai)
 	MCFG_PALETTE_LENGTH(256)
 
 	MCFG_PALETTE_INIT(RRRR_GGGG_BBBB)
 	MCFG_VIDEO_START(vsgongf)
-	MCFG_VIDEO_UPDATE(vsgongf)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1218,7 +1218,7 @@ GAME( 1984, ringfgt2, vsgongf,  vsgongf,  vsgongf,  0, ROT90, "Kaneko (Taito lic
 
 GAME( 1985, tsamurai, 0,        tsamurai, tsamurai, 0, ROT90, "Kaneko / Taito", "Samurai Nihon-ichi (set 1)", 0 )
 GAME( 1985, tsamurai2,tsamurai, tsamurai, tsamurai, 0, ROT90, "Kaneko / Taito", "Samurai Nihon-ichi (set 2)", 0 )
-GAME( 1985, tsamuraih,tsamurai, tsamurai, tsamurai, 0, ROT90, "Kaneko / Taito", "Samurai Nihon-ichi (set 3, harder)", 0 )
+GAME( 1985, tsamuraih,tsamurai, tsamurai, tsamurai, 0, ROT90, "bootleg", "Samurai Nihon-ichi (bootleg, harder)", 0 )
 
 GAME( 1985, ladymstr, 0,		tsamurai, tsamurai, 0, ROT90, "Kaneko / Taito", "Lady Master of Kung Fu", 0 )
 GAME( 1985, nunchaku, ladymstr, tsamurai, nunchaku, 0, ROT90, "Kaneko / Taito", "Nunchackun", GAME_IMPERFECT_COLORS )

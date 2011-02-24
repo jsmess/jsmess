@@ -196,12 +196,13 @@ static MACHINE_CONFIG_START( galaxy, galaxy_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(384, 212)
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 208-1)
+	MCFG_SCREEN_UPDATE( galaxy )
+
 	MCFG_GFXDECODE(galaxy)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT( black_and_white )
 
 	MCFG_VIDEO_START( galaxy )
-	MCFG_VIDEO_UPDATE( galaxy )
 
 	/* snapshot */
 	MCFG_SNAPSHOT_ADD("snapshot", galaxy, "gal", 0)
@@ -233,11 +234,12 @@ static MACHINE_CONFIG_START( galaxyp, galaxy_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(384, 208)
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 208-1)
+	MCFG_SCREEN_UPDATE( galaxy )
+
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT( black_and_white )
 
 	MCFG_VIDEO_START( galaxy )
-	MCFG_VIDEO_UPDATE( galaxy )
 
 	/* snapshot */
 	MCFG_SNAPSHOT_ADD("snapshot", galaxy, "gal", 0)

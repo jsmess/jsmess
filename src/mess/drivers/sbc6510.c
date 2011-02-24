@@ -49,7 +49,7 @@ static VIDEO_START( sbc6510 )
 {
 }
 
-static VIDEO_UPDATE( sbc6510 )
+static SCREEN_UPDATE( sbc6510 )
 {
     return 0;
 }
@@ -97,11 +97,12 @@ static MACHINE_CONFIG_START( sbc6510, sbc6510_state )
     MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
     MCFG_SCREEN_SIZE(640, 480)
     MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+    MCFG_SCREEN_UPDATE(sbc6510)
+
     MCFG_PALETTE_LENGTH(2)
     MCFG_PALETTE_INIT(black_and_white)
 
     MCFG_VIDEO_START(sbc6510)
-    MCFG_VIDEO_UPDATE(sbc6510)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -1026,7 +1026,7 @@ static NVRAM_HANDLER( px4_ramdisk )
     VIDEO EMULATION
 ***************************************************************************/
 
-static VIDEO_UPDATE( px4 )
+static SCREEN_UPDATE( px4 )
 {
 	px4_state *px4 = screen->machine->driver_data<px4_state>();
 
@@ -1370,13 +1370,12 @@ static MACHINE_CONFIG_START( px4, px4_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(240, 64)
 	MCFG_SCREEN_VISIBLE_AREA(0, 239, 0, 63)
+	MCFG_SCREEN_UPDATE(px4)
 
 	MCFG_DEFAULT_LAYOUT(layout_px4)
 
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(px4)
-
-	MCFG_VIDEO_UPDATE(px4)
 
 	MCFG_TIMER_ADD_PERIODIC("one_sec", upd7508_1sec_callback, attotime::from_seconds(1))
 	MCFG_TIMER_ADD_PERIODIC("frc", frc_tick, attotime::from_hz(XTAL_7_3728MHz / 2 / 6))

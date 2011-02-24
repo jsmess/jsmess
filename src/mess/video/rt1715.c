@@ -10,9 +10,9 @@
 #include "emu.h"
 #include "includes/rt1715.h"
 
-VIDEO_UPDATE( rt1715 )
+SCREEN_UPDATE( rt1715 )
 {
-	VIDEO_UPDATE_CALL ( generic_bitmapped );
+	SCREEN_UPDATE_CALL ( generic_bitmapped );
 	return 0;
 }
 

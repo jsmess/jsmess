@@ -63,7 +63,7 @@ static VIDEO_START( c10 )
 
 /* This system appears to have inline attribute bytes of unknown meaning.
     Currently they are ignored. The word at FAB5 looks like it might be cursor location. */
-static VIDEO_UPDATE( c10 )
+static SCREEN_UPDATE( c10 )
 {
 	c10_state *state = screen->machine->driver_data<c10_state>();
 	//static UINT8 framecnt=0;
@@ -148,13 +148,14 @@ static MACHINE_CONFIG_START( c10, c10_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(640, 250)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 249)
+	MCFG_SCREEN_UPDATE(c10)
+
 	MCFG_GFXDECODE(c10)
 
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
 
 	MCFG_VIDEO_START(c10)
-	MCFG_VIDEO_UPDATE(c10)
 MACHINE_CONFIG_END
 
 DRIVER_INIT( c10 )

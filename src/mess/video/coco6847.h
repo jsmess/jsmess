@@ -68,7 +68,7 @@ struct _m6847_config
 void m6847_init(running_machine *machine, const m6847_config *cfg);
 
 /* video update proc */
-VIDEO_UPDATE(m6847);
+SCREEN_UPDATE(m6847);
 void coco6847_video_changed(void);
 
 /* sync */

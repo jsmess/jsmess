@@ -14,7 +14,7 @@ extern MACHINE_RESET( rt1715 );
 
 /*----------- defined in video/rt1715.c -----------*/
 
-extern VIDEO_UPDATE( rt1715 );
+extern SCREEN_UPDATE( rt1715 );
 extern PALETTE_INIT( rt1715 );
 
 

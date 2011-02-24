@@ -396,11 +396,11 @@ VIDEO_START( svi328_806 )
 	VIDEO_START_CALL(tms9928a);
 }
 
-VIDEO_UPDATE( svi328_806 )
+SCREEN_UPDATE( svi328_806 )
 {
 	if (!strcmp(screen->tag(), "screen"))
 	{
-		VIDEO_UPDATE_CALL(tms9928a);
+		SCREEN_UPDATE_CALL(tms9928a);
 	}
 	else if (!strcmp(screen->tag(), "svi806"))
 	{

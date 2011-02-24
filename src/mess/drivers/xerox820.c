@@ -618,7 +618,7 @@ void xerox820_state::video_start()
 }
 
 
-bool xerox820_state::video_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+bool xerox820_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	UINT8 y,ra,chr,gfx;
 	UINT16 sy=0,ma=(m_scroll + 1) * 0x80,x;

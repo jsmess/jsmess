@@ -337,7 +337,7 @@ static PALETTE_INIT( p500 )
 	}
 }
 
-static VIDEO_UPDATE( p500 )
+static SCREEN_UPDATE( p500 )
 {
 	device_t *vic2 = screen->machine->device("vic6567");
 
@@ -433,6 +433,8 @@ static MACHINE_CONFIG_START( cbm600, cbmb_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(640, 200)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640 - 1, 0, 200 - 1)
+	MCFG_SCREEN_UPDATE( cbmb_crtc )
+
 	MCFG_GFXDECODE( cbm600 )
 	MCFG_PALETTE_LENGTH(ARRAY_LENGTH(cbm700_palette) / 3)
 	MCFG_PALETTE_INIT( cbm700 )
@@ -440,7 +442,6 @@ static MACHINE_CONFIG_START( cbm600, cbmb_state )
 	MCFG_MC6845_ADD("crtc", MC6845, XTAL_18MHz / 8 /*?*/ /*  I do not know if this is correct, please verify */, cbm600_crtc)
 
 	MCFG_VIDEO_START( cbmb_crtc )
-	MCFG_VIDEO_UPDATE( cbmb_crtc )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -511,11 +512,10 @@ static MACHINE_CONFIG_START( p500, cbmb_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, VIC6567_VISIBLECOLUMNS - 1, 0, VIC6567_VISIBLELINES - 1)
 	MCFG_SCREEN_REFRESH_RATE(VIC6567_VRETRACERATE)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_UPDATE( p500 )
 
 	MCFG_PALETTE_INIT( p500 )
 	MCFG_PALETTE_LENGTH(ARRAY_LENGTH(p500_palette) / 3)
-
-	MCFG_VIDEO_UPDATE( p500 )
 
 	MCFG_VIC2_ADD("vic6567", p500_vic2_intf)
 

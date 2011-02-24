@@ -292,10 +292,10 @@ static VIDEO_START( gp32 )
 	VIDEO_START_CALL(generic_bitmapped);
 }
 
-static VIDEO_UPDATE( gp32 )
+static SCREEN_UPDATE( gp32 )
 {
 	running_machine *machine = screen->machine;
-	VIDEO_UPDATE_CALL(generic_bitmapped);
+	SCREEN_UPDATE_CALL(generic_bitmapped);
 	s3c240x_lcd_dma_init( machine);
 	return 0;
 }
@@ -1847,11 +1847,12 @@ static MACHINE_CONFIG_START( gp32, gp32_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(240, 320)
 	MCFG_SCREEN_VISIBLE_AREA(0, 239, 0, 319)
+	MCFG_SCREEN_UPDATE(gp32)
+
 	/* 320x240 is 4:3 but ROT270 causes an aspect ratio of 3:4 by default */
 	MCFG_DEFAULT_LAYOUT(layout_lcd_rot)
 
 	MCFG_VIDEO_START(gp32)
-	MCFG_VIDEO_UPDATE(gp32)
 
 	MCFG_MACHINE_START(gp32)
 	MCFG_MACHINE_RESET(gp32)

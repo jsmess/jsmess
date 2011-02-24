@@ -66,7 +66,7 @@ struct _coco3_video
 	UINT8 video_type;
 
 	/* video state; every scanline the video state for the scanline is copied
-     * here and only rendered in VIDEO_UPDATE */
+     * here and only rendered in SCREEN_UPDATE */
 	coco3_scanline_record scanlines[384];
 };
 
@@ -145,7 +145,7 @@ VIDEO_START( coco2b );
 
 VIDEO_START( coco3 );
 VIDEO_START( coco3p );
-VIDEO_UPDATE( coco3 );
+SCREEN_UPDATE( coco3 );
 WRITE8_HANDLER ( coco3_palette_w );
 UINT32 coco3_get_video_base(running_machine *machine, UINT8 ff9d_mask, UINT8 ff9e_mask);
 void coco3_vh_blink(running_machine *machine);

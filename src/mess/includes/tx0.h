@@ -177,8 +177,8 @@ INTERRUPT_GEN( tx0_interrupt );
 /*----------- defined in video/tx0.c -----------*/
 
 VIDEO_START( tx0 );
-VIDEO_EOF( tx0 );
-VIDEO_UPDATE( tx0 );
+SCREEN_EOF( tx0 );
+SCREEN_UPDATE( tx0 );
 
 void tx0_plot(running_machine *machine, int x, int y);
 void tx0_typewriter_drawchar(running_machine *machine, int character);

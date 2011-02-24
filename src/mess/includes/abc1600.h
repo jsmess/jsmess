@@ -31,7 +31,7 @@ public:
 	virtual void machine_start();
 
 	virtual void video_start();
-	virtual bool video_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
+	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 
 	// video
 	UINT8 *m_video_ram;

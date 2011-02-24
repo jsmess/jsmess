@@ -72,7 +72,7 @@ static VIDEO_START( terak )
 {
 }
 
-static VIDEO_UPDATE( terak )
+static SCREEN_UPDATE( terak )
 {
     return 0;
 }
@@ -97,11 +97,12 @@ static MACHINE_CONFIG_START( terak, terak_state )
     MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
     MCFG_SCREEN_SIZE(640, 480)
     MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+    MCFG_SCREEN_UPDATE(terak)
+
     MCFG_PALETTE_LENGTH(2)
     MCFG_PALETTE_INIT(black_and_white)
 
     MCFG_VIDEO_START(terak)
-    MCFG_VIDEO_UPDATE(terak)
 MACHINE_CONFIG_END
 
 /* ROM definition */

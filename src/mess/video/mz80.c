@@ -38,7 +38,7 @@ VIDEO_START( mz80k )
 {
 }
 
-VIDEO_UPDATE( mz80k )
+SCREEN_UPDATE( mz80k )
 {
 	mz80_state *state = screen->machine->driver_data<mz80_state>();
 	int x,y;

@@ -37,7 +37,7 @@ public:
 
 PALETTE_INIT( channelf );
 VIDEO_START( channelf );
-VIDEO_UPDATE( channelf );
+SCREEN_UPDATE( channelf );
 
 
 /*----------- defined in audio/channelf.c -----------*/

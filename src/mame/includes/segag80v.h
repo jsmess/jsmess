@@ -4,6 +4,7 @@
 
 *************************************************************************/
 
+#include "machine/segag80.h"
 
 class segag80v_state : public driver_device
 {
@@ -18,6 +19,7 @@ public:
 	UINT8 spinner_select;
 	UINT8 spinner_sign;
 	UINT8 spinner_count;
+	segag80_decrypt_func decrypt;
 	UINT8 *vectorram;
 	size_t vectorram_size;
 	int min_x;
@@ -38,4 +40,4 @@ WRITE8_HANDLER( zektor2_sh_w );
 /*----------- defined in video/segag80v.c -----------*/
 
 VIDEO_START( segag80v );
-VIDEO_UPDATE( segag80v );
+SCREEN_UPDATE( segag80v );

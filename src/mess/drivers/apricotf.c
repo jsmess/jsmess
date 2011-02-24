@@ -32,7 +32,7 @@ static VIDEO_START( act_f1 )
 {
 }
 
-static VIDEO_UPDATE( act_f1 )
+static SCREEN_UPDATE( act_f1 )
 {
 	act_state *state = screen->machine->driver_data<act_state>();
 	int x,y,i;
@@ -309,6 +309,8 @@ static MACHINE_CONFIG_START( act_f1, act_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(640, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 256-1)
+	MCFG_SCREEN_UPDATE(act_f1)
+
 	MCFG_PALETTE_LENGTH(16)
 //  MCFG_PALETTE_INIT(black_and_white)
 
@@ -317,7 +319,6 @@ static MACHINE_CONFIG_START( act_f1, act_state )
 	MCFG_GFXDECODE(act_f1)
 
 	MCFG_VIDEO_START(act_f1)
-	MCFG_VIDEO_UPDATE(act_f1)
 
 	MCFG_FLOPPY_2_DRIVES_ADD(act_floppy_config)
 MACHINE_CONFIG_END

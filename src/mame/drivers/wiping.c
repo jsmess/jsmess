@@ -35,6 +35,7 @@ dip: 6.7 7.7
 ***************************************************************************/
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "audio/wiping.h"
 #include "includes/wiping.h"
 
 
@@ -296,12 +297,12 @@ static MACHINE_CONFIG_START( wiping, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(36*8, 28*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
+	MCFG_SCREEN_UPDATE(wiping)
 
 	MCFG_GFXDECODE(wiping)
 	MCFG_PALETTE_LENGTH(64*4+64*4)
 
 	MCFG_PALETTE_INIT(wiping)
-	MCFG_VIDEO_UPDATE(wiping)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

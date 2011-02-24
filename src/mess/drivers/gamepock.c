@@ -78,11 +78,12 @@ static MACHINE_CONFIG_START( gamepock, gamepock_state )
 	MCFG_SCREEN_FORMAT( BITMAP_FORMAT_INDEXED16 )
 	MCFG_SCREEN_SIZE( 75, 64 )
 	MCFG_SCREEN_VISIBLE_AREA( 0, 74, 0, 63 )
+	MCFG_SCREEN_UPDATE( gamepock )
+
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
 	MCFG_PALETTE_LENGTH( 2 )
 	MCFG_PALETTE_INIT(black_and_white)
-	MCFG_VIDEO_UPDATE( gamepock )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

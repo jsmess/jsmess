@@ -227,7 +227,7 @@ void amu880_state::video_start()
 	m_char_rom = machine->region("chargen")->base();
 }
 
-bool amu880_state::video_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+bool amu880_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	int y, sx, x, line;
 

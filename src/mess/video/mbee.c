@@ -414,7 +414,7 @@ VIDEO_START( mbeeppc )
 	state->is_premium = 1;
 }
 
-VIDEO_UPDATE( mbee )
+SCREEN_UPDATE( mbee )
 {
 	mbee_state *state = screen->machine->driver_data<mbee_state>();
 	state->framecnt++;

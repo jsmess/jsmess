@@ -80,7 +80,7 @@ READ8_HANDLER(arcadia_video_r);
 WRITE8_HANDLER(arcadia_video_w);
 
 extern VIDEO_START( arcadia );
-extern VIDEO_UPDATE( arcadia );
+extern SCREEN_UPDATE( arcadia );
 
 
 /*----------- defined in audio/arcadia.c -----------*/

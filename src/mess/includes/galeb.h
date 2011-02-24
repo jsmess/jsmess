@@ -30,7 +30,7 @@ extern READ8_HANDLER( galeb_keyboard_r );
 extern const gfx_layout galeb_charlayout;
 
 extern VIDEO_START( galeb );
-extern VIDEO_UPDATE( galeb );
+extern SCREEN_UPDATE( galeb );
 
 
 #endif /* GALEB_H_ */

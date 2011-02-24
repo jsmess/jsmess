@@ -204,7 +204,7 @@ static void oric_vh_render_6pixels(bitmap_t *bitmap,int x,int y, int fg, int bg,
 /***************************************************************************
   oric_vh_screenrefresh
 ***************************************************************************/
-VIDEO_UPDATE( oric )
+SCREEN_UPDATE( oric )
 {
 	oric_state *state = screen->machine->driver_data<oric_state>();
 	unsigned char *RAM;

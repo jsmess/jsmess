@@ -24,7 +24,7 @@
 
 
 static VIDEO_START( pc_aga );
-static VIDEO_UPDATE( mc6845_aga );
+static SCREEN_UPDATE( mc6845_aga );
 static PALETTE_INIT( pc_aga );
 static MC6845_UPDATE_ROW( aga_update_row );
 static WRITE_LINE_DEVICE_HANDLER( aga_hsync_changed );
@@ -70,14 +70,14 @@ MACHINE_CONFIG_FRAGMENT( pcvideo_aga )
 	MCFG_SCREEN_ADD( AGA_SCREEN_NAME, RASTER )
 	MCFG_SCREEN_FORMAT( BITMAP_FORMAT_INDEXED16 )
 	MCFG_SCREEN_RAW_PARAMS( XTAL_14_31818MHz,912,0,640,262,0,200 )
-	MCFG_PALETTE_LENGTH( CGA_PALETTE_SETS * 16 )
+	MCFG_SCREEN_UPDATE( mc6845_aga )
 
+	MCFG_PALETTE_LENGTH( CGA_PALETTE_SETS * 16 )
 	MCFG_PALETTE_INIT( pc_aga )
 
 	MCFG_MC6845_ADD( AGA_MC6845_NAME, MC6845, XTAL_14_31818MHz/8, mc6845_aga_intf )
 
 	MCFG_VIDEO_START( pc_aga )
-	MCFG_VIDEO_UPDATE( mc6845_aga )
 MACHINE_CONFIG_END
 
 
@@ -752,7 +752,7 @@ VIDEO_START( pc200 )
 }
 
 
-static VIDEO_UPDATE( mc6845_aga )
+static SCREEN_UPDATE( mc6845_aga )
 {
 	device_t *devconf = screen->machine->device(AGA_MC6845_NAME);
 	mc6845_update( devconf, bitmap, cliprect);

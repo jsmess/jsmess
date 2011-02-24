@@ -405,7 +405,7 @@ INPUT_PORTS_END
 
 /* Video */
 
-static VIDEO_UPDATE( tiki100 )
+static SCREEN_UPDATE( tiki100 )
 {
 	tiki100_state *state = screen->machine->driver_data<tiki100_state>();
 
@@ -671,10 +671,9 @@ static MACHINE_CONFIG_START( tiki100, tiki100_state )
     MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
     MCFG_SCREEN_SIZE(1024, 256)
     MCFG_SCREEN_VISIBLE_AREA(0, 1024-1, 0, 256-1)
+    MCFG_SCREEN_UPDATE(tiki100)
 
 	MCFG_PALETTE_LENGTH(16)
-
-    MCFG_VIDEO_UPDATE(tiki100)
 
 	/* devices */
 	MCFG_Z80DART_ADD(Z80DART_TAG, 2000000, dart_intf)

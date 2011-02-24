@@ -19,7 +19,7 @@ VIDEO_START( ondra )
 	state->video_enable = 0;
 }
 
-VIDEO_UPDATE( ondra )
+SCREEN_UPDATE( ondra )
 {
 	ondra_state *state = screen->machine->driver_data<ondra_state>();
 	UINT8 code1,code2;

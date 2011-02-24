@@ -263,7 +263,7 @@ static VIDEO_START( spc1000 )
 	state->video_ram = auto_alloc_array(machine, UINT8, 0x2000);
 }
 
-static VIDEO_UPDATE( spc1000 )
+static SCREEN_UPDATE( spc1000 )
 {
 	device_t *mc6847 = screen->machine->device("mc6847");
 	return mc6847_update(mc6847, bitmap, cliprect);
@@ -314,9 +314,9 @@ static MACHINE_CONFIG_START( spc1000, spc1000_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(320, 25+192+26)
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 1, 239)
+	MCFG_SCREEN_UPDATE(spc1000)
 
 	MCFG_VIDEO_START(spc1000)
-	MCFG_VIDEO_UPDATE(spc1000)
 
 	MCFG_MC6847_ADD("mc6847", spc1000_mc6847_intf)
 	MCFG_MC6847_TYPE(M6847_VERSION_ORIGINAL_NTSC)

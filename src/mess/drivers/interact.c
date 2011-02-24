@@ -124,7 +124,7 @@ static MACHINE_START(interact)
 	hector_init(machine);
 }
 
-static VIDEO_UPDATE( interact )
+static SCREEN_UPDATE( interact )
 {
 	interact_state *state = screen->machine->driver_data<interact_state>();
 	UINT8 *videoram = state->videoram;
@@ -150,10 +150,11 @@ static MACHINE_CONFIG_START( interact, interact_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(256, 79)
 	MCFG_SCREEN_VISIBLE_AREA(0, 112, 0, 77)
+	MCFG_SCREEN_UPDATE(interact)
+
 	MCFG_PALETTE_LENGTH(16)				/* 8 colours, but only 4 at a time*/
 
 	MCFG_VIDEO_START(hec2hrp)
-	MCFG_VIDEO_UPDATE(interact)
 		/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_WAVE_ADD("wave", "cassette")
@@ -191,10 +192,11 @@ static MACHINE_CONFIG_START( hector1, interact_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(256, 79)
 	MCFG_SCREEN_VISIBLE_AREA(0, 112, 0, 77)
+	MCFG_SCREEN_UPDATE(interact)
+
 	MCFG_PALETTE_LENGTH(16)				/* 8 colours, but only 4 at a time*/
 
 	MCFG_VIDEO_START(hec2hrp)
-	MCFG_VIDEO_UPDATE(interact)
 		/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_WAVE_ADD("wave", "cassette")

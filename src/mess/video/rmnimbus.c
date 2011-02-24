@@ -658,13 +658,13 @@ VIDEO_RESET( nimbus )
     logerror("Video reset\n");
 }
 
-VIDEO_EOF( nimbus )
+SCREEN_EOF( nimbus )
 {
 
-//    logerror("VIDEO_EOF( nimbus )\n");
+//    logerror("SCREEN_EOF( nimbus )\n");
 }
 
-VIDEO_UPDATE( nimbus )
+SCREEN_UPDATE( nimbus )
 {
 	rmnimbus_state *state = screen->machine->driver_data<rmnimbus_state>();
     int     XCoord;

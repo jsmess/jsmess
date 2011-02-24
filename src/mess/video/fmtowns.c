@@ -1822,7 +1822,7 @@ VIDEO_START( towns )
 	state->video.sprite_timer = machine->scheduler().timer_alloc(FUNC(towns_sprite_done));
 }
 
-VIDEO_UPDATE( towns )
+SCREEN_UPDATE( towns )
 {
 	towns_state* state = screen->machine->driver_data<towns_state>();
 

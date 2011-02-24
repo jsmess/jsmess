@@ -661,7 +661,7 @@ READ8_HANDLER(arcadia_vsync_r)
     return state->line>=216?0x80:0;
 }
 
-VIDEO_UPDATE( arcadia )
+SCREEN_UPDATE( arcadia )
 {
 	arcadia_state *state = screen->machine->driver_data<arcadia_state>();
 	copybitmap(bitmap, state->bitmap, 0, 0, 0, 0, cliprect);

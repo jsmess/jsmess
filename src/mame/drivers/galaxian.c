@@ -818,13 +818,13 @@ static WRITE8_DEVICE_HANDLER( sfx_sample_control_w )
 	/* the inverse of bit 0 clocks the flip flop to signal an INT */
 	/* it is automatically cleared on the acknowledge */
 	if ((old & 0x01) && !(data & 0x01))
-		cputag_set_input_line(device->machine, "audiocpu", 0, HOLD_LINE);
+		cputag_set_input_line(device->machine, "audio2", 0, HOLD_LINE);
 }
 
 
 static const ppi8255_interface sfx_ppi8255_2_intf =
 {
-	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, soundlatch2_r),	/* Port A read */
+	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, soundlatch2_r),/* Port A read */
 	DEVCB_NULL,												/* Port B read */
 	DEVCB_NULL,												/* Port C read */
 	DEVCB_NULL,												/* Port A write */
@@ -1972,10 +1972,10 @@ static MACHINE_CONFIG_START( galaxian_base, galaxian_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_RAW_PARAMS(GALAXIAN_PIXEL_CLOCK, GALAXIAN_HTOTAL, GALAXIAN_HBEND, GALAXIAN_HBSTART, GALAXIAN_VTOTAL, GALAXIAN_VBEND, GALAXIAN_VBSTART)
+	MCFG_SCREEN_UPDATE(galaxian)
 
 	MCFG_PALETTE_INIT(galaxian)
 	MCFG_VIDEO_START(galaxian)
-	MCFG_VIDEO_UPDATE(galaxian)
 
 	/* blinking frequency is determined by 555 counter with Ra=100k, Rb=10k, C=10uF */
 	MCFG_TIMER_ADD_PERIODIC("stars", galaxian_stars_blink_timer, PERIOD_OF_555_ASTABLE(100000, 10000, 0.00001))
@@ -2307,8 +2307,8 @@ static MACHINE_CONFIG_DERIVED( sfx, galaxian_base )
 	MCFG_PPI8255_ADD( "ppi8255_1", konami_ppi8255_1_intf )
 	MCFG_PPI8255_ADD( "ppi8255_2", sfx_ppi8255_2_intf )
 
-	/* port on 1st 8910 is used for communication */
-	MCFG_SOUND_MODIFY("8910.0")
+	/* port on 2nd 8910 is used for communication */
+	MCFG_SOUND_MODIFY("8910.1")
 	MCFG_SOUND_CONFIG(sfx_ay8910_interface)
 
 	/* DAC for the sample player */

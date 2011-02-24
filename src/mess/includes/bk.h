@@ -45,6 +45,6 @@ extern WRITE16_HANDLER(bk_floppy_data_w);
 /*----------- defined in video/bk.c -----------*/
 
 extern VIDEO_START( bk0010 );
-extern VIDEO_UPDATE( bk0010 );
+extern SCREEN_UPDATE( bk0010 );
 
 #endif /* BK_H_ */

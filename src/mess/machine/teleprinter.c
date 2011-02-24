@@ -256,7 +256,7 @@ static VIDEO_START( teleprinter )
 
 }
 
-static VIDEO_UPDATE(teleprinter )
+static SCREEN_UPDATE(teleprinter )
 {
 	device_t *devconf = screen->machine->device(TELEPRINTER_TAG);
 	generic_teleprinter_update( devconf, bitmap, cliprect);
@@ -270,11 +270,12 @@ MACHINE_CONFIG_FRAGMENT( generic_teleprinter )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(TELEPRINTER_WIDTH*8, TELEPRINTER_HEIGHT*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, TELEPRINTER_WIDTH*8-1, 0, TELEPRINTER_HEIGHT*8-1)
+	MCFG_SCREEN_UPDATE(teleprinter)
+
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
 
 	MCFG_VIDEO_START(teleprinter)
-	MCFG_VIDEO_UPDATE(teleprinter)
 MACHINE_CONFIG_END
 
 

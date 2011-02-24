@@ -430,7 +430,7 @@ static CBM_IEC_DAISY( c16_iec_1541 )
 	{ NULL}
 };
 
-static VIDEO_UPDATE( c16 )
+static SCREEN_UPDATE( c16 )
 {
 	c16_state *state = screen->machine->driver_data<c16_state>();
 	ted7360_video_update(state->ted7360, bitmap, cliprect);
@@ -482,10 +482,10 @@ static MACHINE_CONFIG_START( c16, c16_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(336, 216)
 	MCFG_SCREEN_VISIBLE_AREA(0, 336 - 1, 0, 216 - 1)
+	MCFG_SCREEN_UPDATE( c16 )
+
 	MCFG_PALETTE_LENGTH(ARRAY_LENGTH(ted7360_palette) / 3)
 	MCFG_PALETTE_INIT(c16)
-
-	MCFG_VIDEO_UPDATE( c16 )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

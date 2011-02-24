@@ -42,7 +42,7 @@ static VIDEO_START( chessmst )
 {
 }
 
-static VIDEO_UPDATE( chessmst )
+static SCREEN_UPDATE( chessmst )
 {
     return 0;
 }
@@ -62,11 +62,12 @@ static MACHINE_CONFIG_START( chessmst, chessmst_state )
     MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
     MCFG_SCREEN_SIZE(640, 480)
     MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+    MCFG_SCREEN_UPDATE(chessmst)
+
     MCFG_PALETTE_LENGTH(2)
     MCFG_PALETTE_INIT(black_and_white)
 
     MCFG_VIDEO_START(chessmst)
-    MCFG_VIDEO_UPDATE(chessmst)
 MACHINE_CONFIG_END
 
 /* ROM definition */

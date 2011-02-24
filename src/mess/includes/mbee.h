@@ -131,11 +131,11 @@ MC6845_ON_UPDATE_ADDR_CHANGED( mbee_update_addr );
 MC6845_ON_UPDATE_ADDR_CHANGED( mbee256_update_addr );
 
 VIDEO_START( mbee );
-VIDEO_UPDATE( mbee );
+SCREEN_UPDATE( mbee );
 VIDEO_START( mbeeic );
-VIDEO_UPDATE( mbeeic );
+SCREEN_UPDATE( mbeeic );
 VIDEO_START( mbeeppc );
-VIDEO_UPDATE( mbeeppc );
+SCREEN_UPDATE( mbeeppc );
 PALETTE_INIT( mbeeic );
 PALETTE_INIT( mbeepc85b );
 PALETTE_INIT( mbeeppc );

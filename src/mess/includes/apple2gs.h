@@ -108,7 +108,7 @@ void apple2gs_doc_irq(device_t *device, int state);
 /*----------- defined in video/apple2gs.c -----------*/
 
 VIDEO_START( apple2gs );
-VIDEO_UPDATE( apple2gs );
+SCREEN_UPDATE( apple2gs );
 
 
 #endif /* APPLE2GS_H_ */

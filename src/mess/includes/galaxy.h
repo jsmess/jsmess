@@ -43,7 +43,7 @@ DRIVER_INIT( galaxyp );
 /*----------- defined in video/galaxy.c -----------*/
 
 VIDEO_START( galaxy );
-VIDEO_UPDATE( galaxy );
+SCREEN_UPDATE( galaxy );
 
 void galaxy_set_timer(running_machine *machine);
 

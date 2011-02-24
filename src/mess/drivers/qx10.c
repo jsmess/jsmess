@@ -58,7 +58,7 @@ public:
 	required_device<device_t> m_hgdc;
 
 	virtual void video_start();
-	virtual bool video_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
+	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 	UINT8 *m_char_rom;
 
 	int		mc146818_offset;
@@ -906,7 +906,7 @@ void qx10_state::video_start()
 	VIDEO_START_CALL(generic_bitmapped);
 }
 
-bool qx10_state::video_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+bool qx10_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	/* graphics */
 	upd7220_update(m_hgdc, &bitmap, &cliprect);

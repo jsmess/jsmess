@@ -201,7 +201,7 @@ VIDEO_START( bbca );
 VIDEO_START( bbcb );
 VIDEO_START( bbcbp );
 VIDEO_START( bbcm );
-VIDEO_UPDATE( bbc );
+SCREEN_UPDATE( bbc );
 
 void bbc_draw_RGB_in(device_t *device, int offset, int data);
 void bbc_set_video_memory_lookups(running_machine *machine, int ramsize);

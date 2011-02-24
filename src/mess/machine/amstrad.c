@@ -1062,7 +1062,7 @@ VIDEO_START( amstrad )
 }
 
 
-VIDEO_UPDATE( amstrad )
+SCREEN_UPDATE( amstrad )
 {
 	amstrad_state *state = screen->machine->driver_data<amstrad_state>();
 	copybitmap( bitmap, state->gate_array.bitmap, 0, 0, 0, 0, cliprect );
@@ -2612,7 +2612,7 @@ static void kccomp_reset_machine(running_machine *machine)
 }
 
 
-VIDEO_EOF( amstrad )
+SCREEN_EOF( amstrad )
 {
 	if (input_port_read_safe(machine, "multiface", 0) & 0x02)
 	{

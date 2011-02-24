@@ -317,7 +317,7 @@ static CDP1861_INTERFACE( studio2_cdp1861_intf )
 	DEVCB_CPU_INPUT_LINE(CDP1802_TAG, COSMAC_INPUT_LINE_EF1)
 };
 
-static VIDEO_UPDATE( studio2 )
+static SCREEN_UPDATE( studio2 )
 {
 	studio2_state *state = screen->machine->driver_data<studio2_state>();
 
@@ -372,7 +372,7 @@ static CDP1864_INTERFACE( mpt02_cdp1864_intf )
 	RES_K(4.7)	// unverified
 };
 
-static VIDEO_UPDATE( mpt02 )
+static SCREEN_UPDATE( mpt02 )
 {
 	studio2_state *state = screen->machine->driver_data<studio2_state>();
 
@@ -503,10 +503,10 @@ static MACHINE_CONFIG_START( studio2, studio2_state )
 
     /* video hardware */
 	MCFG_CDP1861_SCREEN_ADD(SCREEN_TAG, 1760000)
+	MCFG_SCREEN_UPDATE(studio2)
 
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
-	MCFG_VIDEO_UPDATE(studio2)
 
 	MCFG_CDP1861_ADD(CDP1861_TAG, 1760000, studio2_cdp1861_intf)
 
@@ -527,10 +527,10 @@ static MACHINE_CONFIG_START( visicom, studio2_state )
 
     /* video hardware */
 	MCFG_CDP1861_SCREEN_ADD(SCREEN_TAG, XTAL_3_579545MHz/2)
+	MCFG_SCREEN_UPDATE(studio2)
 
 	MCFG_PALETTE_LENGTH(4)
 	MCFG_PALETTE_INIT(visicom)
-	MCFG_VIDEO_UPDATE(studio2)
 
 	MCFG_CDP1861_ADD(CDP1861_TAG, XTAL_3_579545MHz/2/8, studio2_cdp1861_intf)
 
@@ -551,9 +551,9 @@ static MACHINE_CONFIG_START( mpt02, studio2_state )
 
     /* video hardware */
 	MCFG_CDP1864_SCREEN_ADD(SCREEN_TAG, CDP1864_CLOCK)
+	MCFG_SCREEN_UPDATE(mpt02)
 
 	MCFG_PALETTE_LENGTH(8+8)
-	MCFG_VIDEO_UPDATE(mpt02)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

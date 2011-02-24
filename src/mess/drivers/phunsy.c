@@ -212,7 +212,7 @@ static VIDEO_START( phunsy )
 }
 
 
-static VIDEO_UPDATE( phunsy )
+static SCREEN_UPDATE( phunsy )
 {
 	phunsy_state *state = screen->machine->driver_data<phunsy_state>();
 	UINT8 y,ra,chr,gfx,col;
@@ -299,9 +299,9 @@ static MACHINE_CONFIG_START( phunsy, phunsy_state )
 	MCFG_GFXDECODE(phunsy)
 	MCFG_PALETTE_LENGTH(8)
 	MCFG_PALETTE_INIT(phunsy)
+	MCFG_SCREEN_UPDATE(phunsy)
 
 	MCFG_VIDEO_START(phunsy)
-	MCFG_VIDEO_UPDATE(phunsy)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

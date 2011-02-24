@@ -342,6 +342,9 @@ static MACHINE_CONFIG_START( tx0_64kw, tx0_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(virtual_width, virtual_height)
 	MCFG_SCREEN_VISIBLE_AREA(0, virtual_width-1, 0, virtual_height-1)
+	MCFG_SCREEN_UPDATE(tx0)
+	MCFG_SCREEN_EOF(tx0)
+
 	MCFG_CRT_ADD( "crt", tx0_crt_interface )
 
 	MCFG_GFXDECODE(tx0)
@@ -349,8 +352,6 @@ static MACHINE_CONFIG_START( tx0_64kw, tx0_state )
 
 	MCFG_PALETTE_INIT(tx0)
 	MCFG_VIDEO_START(tx0)
-	MCFG_VIDEO_EOF(tx0)
-	MCFG_VIDEO_UPDATE(tx0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( tx0_8kw, tx0_64kw )

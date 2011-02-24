@@ -535,12 +535,13 @@ static MACHINE_CONFIG_START( cgenie_common, cgenie_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(48*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1,0*8,32*8-1)
+	MCFG_SCREEN_UPDATE( cgenie )
+
 	MCFG_GFXDECODE( cgenie )
 	MCFG_PALETTE_LENGTH(108)
 
 	// Actually the video is driven by an HD46505 clocked at XTAL_17_73447MHz/16
 	MCFG_VIDEO_START( cgenie )
-	MCFG_VIDEO_UPDATE( cgenie )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -359,7 +359,7 @@ static VIDEO_START( pyl601 )
 {
 }
 
-static VIDEO_UPDATE( pyl601 )
+static SCREEN_UPDATE( pyl601 )
 {
 	device_t *mc6845 = screen->machine->device("crtc");
 	mc6845_update(mc6845, bitmap, cliprect);
@@ -567,6 +567,8 @@ static MACHINE_CONFIG_START( pyl601, pyl601_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(640, 200)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640 - 1, 0, 200 - 1)
+	MCFG_SCREEN_UPDATE( pyl601 )
+
 	MCFG_GFXDECODE(pyl601)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(monochrome_green)
@@ -574,7 +576,6 @@ static MACHINE_CONFIG_START( pyl601, pyl601_state )
 	MCFG_MC6845_ADD("crtc", MC6845, XTAL_2MHz, pyl601_crtc6845_interface)
 
 	MCFG_VIDEO_START( pyl601 )
-	MCFG_VIDEO_UPDATE( pyl601 )
 
 	MCFG_UPD765A_ADD("upd765", pyldin_upd765_interface)
 

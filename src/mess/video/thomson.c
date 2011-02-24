@@ -260,7 +260,7 @@ static  INT16 thom_border_r[THOM_TOTAL_HEIGHT+1];
 
 
 /* active area, updated one scan-line at a time every 64us,
-   then blitted in VIDEO_UPDATE
+   then blitted in SCREEN_UPDATE
 */
 static UINT16 thom_vbody[640*200];
 
@@ -897,7 +897,7 @@ void thom_floppy_active ( running_machine *machine, int write )
 
 
 
-VIDEO_UPDATE ( thom )
+SCREEN_UPDATE ( thom )
 {
 	int y, ypos;
 	const int scale = thom_hires ? 2 : 1;
@@ -1034,7 +1034,7 @@ static TIMER_CALLBACK( thom_set_init )
 }
 
 /* call this at the very begining of each new frame */
-VIDEO_EOF ( thom )
+SCREEN_EOF ( thom )
 {
 	int fnew, fold = FLOP_STATE;
 	int i;

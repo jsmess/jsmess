@@ -56,7 +56,7 @@ VIDEO_START( tx0 )
 }
 
 
-VIDEO_EOF( tx0 )
+SCREEN_EOF( tx0 )
 {
 	tx0_state *state = machine->driver_data<tx0_state>();
 
@@ -79,9 +79,9 @@ void tx0_plot(running_machine *machine, int x, int y)
 
 
 /*
-    VIDEO_UPDATE( tx0 ): effectively redraw the screen
+    SCREEN_UPDATE( tx0 ): effectively redraw the screen
 */
-VIDEO_UPDATE( tx0 )
+SCREEN_UPDATE( tx0 )
 {
 	tx0_state *state = screen->machine->driver_data<tx0_state>();
 	crt_update(state->crt, bitmap);

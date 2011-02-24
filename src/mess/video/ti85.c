@@ -191,7 +191,7 @@ VIDEO_START( ti85 )
 {
 }
 
-VIDEO_UPDATE( ti85 )
+SCREEN_UPDATE( ti85 )
 {
 	ti85_state *state = screen->machine->driver_data<ti85_state>();
 	address_space *space = cputag_get_address_space(screen->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
@@ -232,7 +232,7 @@ VIDEO_UPDATE( ti85 )
 	return 0;
 }
 
-VIDEO_UPDATE( ti82 )
+SCREEN_UPDATE( ti82 )
 {
 	ti85_state *state = screen->machine->driver_data<ti85_state>();
 	//for now use the ti85_palette

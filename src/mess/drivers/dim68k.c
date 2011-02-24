@@ -211,7 +211,7 @@ static VIDEO_START( dim68k )
 	state->FNT = machine->region("chargen")->base();
 }
 
-static VIDEO_UPDATE( dim68k )
+static SCREEN_UPDATE( dim68k )
 {
 	dim68k_state *state = screen->machine->driver_data<dim68k_state>();
 	mc6845_update(state->m_crtc, bitmap, cliprect);
@@ -315,12 +315,13 @@ static MACHINE_CONFIG_START( dim68k, dim68k_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 250-1)
+	MCFG_SCREEN_UPDATE(dim68k)
+
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
 	MCFG_GFXDECODE(dim68k)
 
 	MCFG_VIDEO_START(dim68k)
-	MCFG_VIDEO_UPDATE(dim68k)
 	MCFG_MC6845_ADD("crtc", MC6845, 1790000, dim68k_crtc)
 
 	/* sound hardware */

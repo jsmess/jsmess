@@ -95,7 +95,7 @@ extern WRITE8_HANDLER( hector_io_8255_w);
 extern void hector_80c(bitmap_t *bitmap, UINT8 *page, int ymax, int yram) ;
 extern void hector_hr(bitmap_t *bitmap, UINT8 *page, int ymax, int yram) ;
 VIDEO_START( hec2hrp );
-VIDEO_UPDATE( hec2hrp );
+SCREEN_UPDATE( hec2hrp );
 
 /* Global variables used in extern modules*/
 

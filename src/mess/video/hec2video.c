@@ -120,7 +120,7 @@ VIDEO_START( hec2hrp )
 	Init_Hector_Palette(machine);
 }
 
-VIDEO_UPDATE( hec2hrp )
+SCREEN_UPDATE( hec2hrp )
 {
 	hec2hrp_state *state = screen->machine->driver_data<hec2hrp_state>();
 	UINT8 *videoram = state->videoram;

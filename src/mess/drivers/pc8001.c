@@ -315,7 +315,7 @@ static VIDEO_START( pc8001 )
 	state->char_rom = machine->region("chargen")->base();
 }
 
-static VIDEO_UPDATE( pc8001 )
+static SCREEN_UPDATE( pc8001 )
 {
 	pc8001_state *state = screen->machine->driver_data<pc8001_state>();
 
@@ -528,12 +528,12 @@ static MACHINE_CONFIG_START( pc8001, pc8001_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(640, 220)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
+	MCFG_SCREEN_UPDATE(pc8001)
 
 	MCFG_PALETTE_LENGTH(8)
 	MCFG_PALETTE_INIT(pc8001)
 
 	MCFG_VIDEO_START(pc8001)
-	MCFG_VIDEO_UPDATE(pc8001)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

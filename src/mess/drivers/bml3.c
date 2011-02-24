@@ -57,7 +57,7 @@ static VIDEO_START( bml3 )
 {
 }
 
-static VIDEO_UPDATE( bml3 )
+static SCREEN_UPDATE( bml3 )
 {
 	bml3_state *state = screen->machine->driver_data<bml3_state>();
 	int x,y,count;
@@ -501,6 +501,8 @@ static MACHINE_CONFIG_START( bml3, bml3_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
+	MCFG_SCREEN_UPDATE(bml3)
+
 	MCFG_PALETTE_LENGTH(8)
 	MCFG_PALETTE_INIT(bml3)
 	MCFG_GFXDECODE(bml3)
@@ -508,7 +510,6 @@ static MACHINE_CONFIG_START( bml3, bml3_state )
 	MCFG_MC6845_ADD("crtc", H46505, XTAL_3_579545MHz/4, mc6845_intf)	/* unknown clock, hand tuned to get ~60 fps */
 
 	MCFG_VIDEO_START(bml3)
-	MCFG_VIDEO_UPDATE(bml3)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

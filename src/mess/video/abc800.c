@@ -107,10 +107,10 @@ void abc800_state::video_start()
 
 
 //-------------------------------------------------
-//  VIDEO_UPDATE( abc800c )
+//  SCREEN_UPDATE( abc800c )
 //-------------------------------------------------
 
-bool abc800c_state::video_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+bool abc800c_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	// clear screen
 	bitmap_fill(&bitmap, &cliprect, get_black_pen(machine));
@@ -276,10 +276,10 @@ static const mc6845_interface crtc_intf =
 
 
 //-------------------------------------------------
-//  VIDEO_UPDATE( abc800m )
+//  SCREEN_UPDATE( abc800m )
 //-------------------------------------------------
 
-bool abc800m_state::video_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+bool abc800m_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	// HACK expand visible area to workaround MC6845
 	screen.set_visible_area(0, 767, 0, 311);

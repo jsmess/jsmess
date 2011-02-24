@@ -50,7 +50,7 @@ VIDEO_START( mekd2 )
 }
 
 
-VIDEO_UPDATE( mekd2 )
+SCREEN_UPDATE( mekd2 )
 {
 	mekd2_state *state = screen->machine->driver_data<mekd2_state>();
 	UINT8 *videoram = state->videoram;

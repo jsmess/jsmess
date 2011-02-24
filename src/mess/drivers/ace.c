@@ -382,10 +382,10 @@ static TIMER_DEVICE_CALLBACK( clear_irq )
 
 
 //-------------------------------------------------
-//  VIDEO_UPDATE( ace )
+//  SCREEN_UPDATE( ace )
 //-------------------------------------------------
 
-bool ace_state::video_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+bool ace_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	UINT8 y,ra,chr,gfx;
 	UINT16 sy=56,ma=0,x;

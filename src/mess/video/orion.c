@@ -16,7 +16,7 @@ VIDEO_START( orion128 )
 {
 }
 
-VIDEO_UPDATE( orion128 )
+SCREEN_UPDATE( orion128 )
 {
 	orion_state *state = screen->machine->driver_data<orion_state>();
 	UINT8 code1,code2,code3,code4,color,val;

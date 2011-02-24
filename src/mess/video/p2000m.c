@@ -19,7 +19,7 @@ VIDEO_START( p2000m )
 }
 
 
-VIDEO_UPDATE( p2000m )
+SCREEN_UPDATE( p2000m )
 {
 	p2000t_state *state = screen->machine->driver_data<p2000t_state>();
 	UINT8 *videoram = state->videoram;

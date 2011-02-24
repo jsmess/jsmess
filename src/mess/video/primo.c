@@ -36,7 +36,7 @@ static void primo_draw_scanline(running_machine *machine,bitmap_t *bitmap, int p
 }
 
 
-VIDEO_UPDATE( primo )
+SCREEN_UPDATE( primo )
 {
 	int primo_scanline;
 

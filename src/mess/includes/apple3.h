@@ -70,7 +70,7 @@ WRITE8_HANDLER( apple3_indexed_write );
 /*----------- defined in video/apple3.c -----------*/
 
 VIDEO_START( apple3 );
-VIDEO_UPDATE( apple3 );
+SCREEN_UPDATE( apple3 );
 void apple3_write_charmem(running_machine *machine);
 
 

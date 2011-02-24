@@ -222,11 +222,11 @@ static MACHINE_CONFIG_START( snes, snes_state )
 
 	/* video hardware */
 	MCFG_VIDEO_START( snes )
-	MCFG_VIDEO_UPDATE( snes )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_RAW_PARAMS(DOTCLK_NTSC, SNES_HTOTAL, 0, SNES_SCR_WIDTH, SNES_VTOTAL_NTSC, 0, SNES_SCR_HEIGHT_NTSC)
+	MCFG_SCREEN_UPDATE( snes )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -282,7 +282,7 @@ ROM_START( pss62 )
 //  ROM_REGION( MAX_SNES_CART_SIZE, "cart", ROMREGION_ERASE00 )
 ROM_END
 
-GAME( 199?, sfcbox,      0,     sfcbox,      snes,    snes,    ROT0, "Nintendo",                   "Super Famicom Box BIOS", GAME_IS_BIOS_ROOT )
+GAME( 199?, sfcbox,      0,     sfcbox,      snes,    snes,    ROT0, "Nintendo",                   "Super Famicom Box BIOS", GAME_IS_BIOS_ROOT | GAME_NOT_WORKING )
 //pss61 - Super Mario Kart / Super Mario Collection / Star Fox
 GAME( 199?, pss62,       sfcbox,     sfcbox,      snes,    snes,    ROT0,  "T&E Soft / I'Max",         "New Super 3D Golf Simulation - Waialae No Kiseki / Super Mahjong 2 (Super Famicom Box)", GAME_NOT_WORKING )
 //pss63 - Super Donkey Kong / Super Tetris 2 + Bombliss

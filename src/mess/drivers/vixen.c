@@ -384,10 +384,10 @@ void vixen_state::video_start()
 
 
 //-------------------------------------------------
-//  VIDEO_UPDATE( vixen )
+//  SCREEN_UPDATE( vixen )
 //-------------------------------------------------
 
-bool vixen_state::video_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+bool vixen_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	for (int txadr = 0; txadr < 26; txadr++)
 	{

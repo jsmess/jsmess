@@ -31,7 +31,7 @@ extern const z80pio_interface kramermc_z80pio_intf;
 extern const gfx_layout kramermc_charlayout;
 
 VIDEO_START( kramermc );
-VIDEO_UPDATE( kramermc );
+SCREEN_UPDATE( kramermc );
 
 
 #endif /* KRAMERMC_h_ */

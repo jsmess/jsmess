@@ -250,6 +250,8 @@ static MACHINE_CONFIG_START( apple2gs, apple2gs_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(704, 262)	// 640+32+32 for the borders
 	MCFG_SCREEN_VISIBLE_AREA(0,703,0,230)
+	MCFG_SCREEN_UPDATE( apple2gs )
+
 	MCFG_PALETTE_LENGTH( 16+256 )
 	MCFG_GFXDECODE( apple2gs )
 
@@ -258,7 +260,6 @@ static MACHINE_CONFIG_START( apple2gs, apple2gs_state )
 
 	MCFG_PALETTE_INIT( apple2gs )
 	MCFG_VIDEO_START( apple2gs )
-	MCFG_VIDEO_UPDATE( apple2gs )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

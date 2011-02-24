@@ -27,7 +27,7 @@ VIDEO_START( poly88 )
 	state->FNT = machine->region("chargen")->base();
 }
 
-VIDEO_UPDATE( poly88 )
+SCREEN_UPDATE( poly88 )
 {
 	poly88_state *state = screen->machine->driver_data<poly88_state>();
 	int x,y,j,b;

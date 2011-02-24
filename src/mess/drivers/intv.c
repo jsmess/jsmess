@@ -389,12 +389,13 @@ static MACHINE_CONFIG_START( intv, intv_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(40*8, 24*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 40*8-1, 0, 24*8-1)
+	MCFG_SCREEN_UPDATE( generic_bitmapped )
+
 	MCFG_GFXDECODE( intv )
 	MCFG_PALETTE_LENGTH(0x400)
 	MCFG_PALETTE_INIT( intv )
 
 	MCFG_VIDEO_START( intv )
-	MCFG_VIDEO_UPDATE( generic_bitmapped )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -421,7 +422,8 @@ static MACHINE_CONFIG_DERIVED( intvkbd, intv )
 
 	/* video hardware */
 	MCFG_GFXDECODE(intvkbd)
-	MCFG_VIDEO_UPDATE(intvkbd)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(intvkbd)
 
 	/* cartridge */
 	MCFG_DEVICE_REMOVE("cart")

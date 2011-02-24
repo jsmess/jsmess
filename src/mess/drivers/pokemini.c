@@ -70,17 +70,19 @@ static MACHINE_CONFIG_START( pokemini, pokemini_state )
 
 	/* video hardware */
 	MCFG_VIDEO_START( generic_bitmapped )
-	MCFG_VIDEO_UPDATE( generic_bitmapped )
 
 	/* This still needs to be improved to actually match the hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE( 96, 64 )
 	MCFG_SCREEN_VISIBLE_AREA( 0, 95, 0, 63 )
+	MCFG_SCREEN_REFRESH_RATE( 72 )
+	MCFG_SCREEN_UPDATE( generic_bitmapped )
+
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
+
 	MCFG_PALETTE_LENGTH( 4 )
 	MCFG_PALETTE_INIT( pokemini )
-	MCFG_SCREEN_REFRESH_RATE( 72 )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

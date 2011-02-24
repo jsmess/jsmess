@@ -156,6 +156,6 @@ void towns_update_video_banks(address_space*);
 
 INTERRUPT_GEN( towns_vsync_irq );
 VIDEO_START( towns );
-VIDEO_UPDATE( towns );
+SCREEN_UPDATE( towns );
 
 #endif /*FMTOWNS_H_*/

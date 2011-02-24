@@ -176,7 +176,7 @@ struct _mc6847_state
 	unsigned int text_offset : 2;			/* needed for CoCo 3 */
 
 	/* video state; every scanline the video state for the scanline is copied
-     * here and only rendered in VIDEO_UPDATE */
+     * here and only rendered in SCREEN_UPDATE */
 	int dirty;
 	int using_custom;
 	UINT32 border[384];

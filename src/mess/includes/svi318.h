@@ -95,7 +95,7 @@ int svi318_cassette_present(running_machine *machine, int id);
 
 MC6845_UPDATE_ROW( svi806_crtc6845_update_row );
 VIDEO_START( svi328_806 );
-VIDEO_UPDATE( svi328_806 );
+SCREEN_UPDATE( svi328_806 );
 MACHINE_RESET( svi328_806 );
 
 #endif /* SVI318_H_ */

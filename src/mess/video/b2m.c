@@ -15,7 +15,7 @@ VIDEO_START( b2m )
 {
 }
 
-VIDEO_UPDATE( b2m )
+SCREEN_UPDATE( b2m )
 {
 	b2m_state *state = screen->machine->driver_data<b2m_state>();
 	UINT8 code1;

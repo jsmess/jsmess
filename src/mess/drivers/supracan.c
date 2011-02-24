@@ -746,7 +746,7 @@ static void supracan_suprnova_draw_roz(running_machine* machine, bitmap_t* bitma
 // Sango Fighter Intro: 03c8: 0000 0011 1100 1000   ----: ---- ---- ---- ----   6c20        4620        ----        0x01
 // Sango Fighter Game:  03ce: 0000 0011 1100 1110   0622: 0000 0110 0010 0010   2620        4620        ----        0x01
 
-static VIDEO_UPDATE( supracan )
+static SCREEN_UPDATE( supracan )
 {
 	supracan_state *state = (supracan_state *)screen->machine->driver_data<supracan_state>();
 
@@ -1927,6 +1927,7 @@ static MACHINE_CONFIG_START( supracan, supracan_state )
 	MCFG_SCREEN_FORMAT( BITMAP_FORMAT_INDEXED16 )
 	//MCFG_SCREEN_FORMAT( BITMAP_FORMAT_RGB32 )
 	MCFG_SCREEN_RAW_PARAMS(XTAL_10_738635MHz/2, 348, 0, 256, 256, 0, 240 )	/* No idea if this is correct */
+	MCFG_SCREEN_UPDATE( supracan )
 
 	MCFG_PALETTE_LENGTH( 32768 )
 	MCFG_PALETTE_INIT( supracan )
@@ -1943,7 +1944,6 @@ static MACHINE_CONFIG_START( supracan, supracan_state )
 	MCFG_SOFTWARE_LIST_ADD("cart_list","supracan")
 
 	MCFG_VIDEO_START( supracan )
-	MCFG_VIDEO_UPDATE( supracan )
 MACHINE_CONFIG_END
 
 

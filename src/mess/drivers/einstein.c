@@ -453,12 +453,12 @@ static MACHINE_START( einstein2 )
     VIDEO EMULATION
 ***************************************************************************/
 
-static VIDEO_UPDATE( einstein2 )
+static SCREEN_UPDATE( einstein2 )
 {
 	einstein_state *einstein = screen->machine->driver_data<einstein_state>();
 
 	if (screen == einstein->color_screen)
-		VIDEO_UPDATE_CALL(tms9928a);
+		SCREEN_UPDATE_CALL(tms9928a);
 	else if (screen == einstein->crtc_screen)
 		mc6845_update(einstein->mc6845, bitmap, cliprect);
 	else
@@ -800,13 +800,12 @@ static MACHINE_CONFIG_DERIVED( einstei2, einstein )
 	MCFG_SCREEN_SIZE(640, 400)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 400-1)
 	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_UPDATE(einstein2)
 
 	/* 2 additional colors for the 80 column screen */
 	MCFG_PALETTE_LENGTH(TMS9928A_PALETTE_SIZE + 2)
 
 	MCFG_MC6845_ADD("crtc", MC6845, XTAL_X002 / 4, einstein_crtc6845_interface)
-
-	MCFG_VIDEO_UPDATE(einstein2)
 
 MACHINE_CONFIG_END
 

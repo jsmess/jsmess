@@ -110,7 +110,7 @@ void comx35_state::video_start()
 	state_save_register_global_pointer(machine, m_videoram, COMX35_VIDEORAM_SIZE);
 }
 
-bool comx35_state::video_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+bool comx35_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	if (screen.width() == CDP1869_SCREEN_WIDTH)
 	{

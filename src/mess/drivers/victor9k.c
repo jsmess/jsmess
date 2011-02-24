@@ -151,7 +151,7 @@ static const mc6845_interface hd46505s_intf =
 	NULL
 };
 
-bool victor9k_state::video_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+bool victor9k_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	mc6845_update(m_crtc, &bitmap, &cliprect);
 

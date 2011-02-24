@@ -29,7 +29,7 @@ static VIDEO_START(kongambl)
 	k056832_set_layer_offs(k056832, 3,  6, 0);
 }
 
-static VIDEO_UPDATE(kongambl)
+static SCREEN_UPDATE(kongambl)
 {
 	device_t *k056832 = screen->machine->device("k056832");
 
@@ -141,11 +141,11 @@ static MACHINE_CONFIG_START( kongambl, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 32*8-1)
+	MCFG_SCREEN_UPDATE(kongambl)
 
 	MCFG_PALETTE_LENGTH(8192)
 
 	MCFG_VIDEO_START(kongambl)
-	MCFG_VIDEO_UPDATE(kongambl)
 
 	MCFG_K053247_ADD("k053246", k053247_intf)
 	MCFG_K056832_ADD("k056832", k056832_intf)
@@ -201,5 +201,5 @@ ROM_START( moneybnk )
 ROM_END
 
 
-GAME( 199?, kingtut,    0,        kongambl,    kongambl,    0, ROT0,  "Konami", "King Tut (NSW)", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 199?, moneybnk,   0,        kongambl,    kongambl,    0, ROT0,  "Konami", "Money In The Bank (NSW)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 199?, kingtut,    0,        kongambl,    kongambl,    0, ROT0,  "Konami", "King Tut (NSW, Australia)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 199?, moneybnk,   0,        kongambl,    kongambl,    0, ROT0,  "Konami", "Money In The Bank (NSW, Australia)", GAME_NOT_WORKING | GAME_NO_SOUND )

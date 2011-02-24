@@ -2494,10 +2494,11 @@ static MACHINE_CONFIG_START( towns, towns_state )
     MCFG_SCREEN_ADD("screen", RASTER)
     MCFG_SCREEN_REFRESH_RATE(60)
     MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-
     MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
     MCFG_SCREEN_SIZE(768,512)
     MCFG_SCREEN_VISIBLE_AREA(0, 768-1, 0, 512-1)
+    MCFG_SCREEN_UPDATE(towns)
+	
     MCFG_GFXDECODE(towns)
 
     /* sound hardware */
@@ -2535,7 +2536,6 @@ static MACHINE_CONFIG_START( towns, towns_state )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
     MCFG_VIDEO_START(towns)
-    MCFG_VIDEO_UPDATE(towns)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

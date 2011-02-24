@@ -92,7 +92,7 @@ extern  READ8_HANDLER(vc4000_video_r);
 extern WRITE8_HANDLER(vc4000_video_w);
 
 extern VIDEO_START( vc4000 );
-extern VIDEO_UPDATE( vc4000 );
+extern SCREEN_UPDATE( vc4000 );
 
 
 /*----------- defined in audio/vc4000.c -----------*/

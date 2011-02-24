@@ -154,7 +154,7 @@ static void pcw16_vh_decode_mode2(pcw16_state *state, bitmap_t *bitmap, int x, i
   Do NOT call osd_update_display() from this function,
   it will be called by the main emulation engine.
 ***************************************************************************/
-VIDEO_UPDATE( pcw16 )
+SCREEN_UPDATE( pcw16 )
 {
 	pcw16_state *state = screen->machine->driver_data<pcw16_state>();
 	UINT8 *ram = ram_get_ptr(screen->machine->device(RAM_TAG));

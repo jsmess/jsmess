@@ -130,7 +130,7 @@ VIDEO_START( hd66421 )
 	hd66421_state_save(machine);
 }
 
-VIDEO_UPDATE( hd66421 )
+SCREEN_UPDATE( hd66421 )
 {
 	pen_t pen[4];
 	int i;

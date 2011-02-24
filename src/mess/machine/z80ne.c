@@ -637,7 +637,7 @@ READ8_DEVICE_HANDLER( lx388_mc6847_videoram_r )
 	return videoram[offset];
 }
 
-VIDEO_UPDATE( lx388 )
+SCREEN_UPDATE( lx388 )
 {
 	device_t *mc6847 = screen->machine->device("mc6847");
 	return mc6847_update(mc6847, bitmap, cliprect);

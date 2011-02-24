@@ -326,10 +326,9 @@ routines :
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/cdda.h"
-#include "includes/amiga.h"
-#include "includes/cubocd32.h"
 #include "machine/6526cia.h"
 #include "machine/i2cmem.h"
+#include "includes/cubocd32.h"
 
 
 /* set to 0 to use control panel with only buttons (as in quiz games) - joy is default in dispenser setup */
@@ -1069,9 +1068,9 @@ static MACHINE_CONFIG_START( cd32, cubocd32_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(512*2, 312)
 	MCFG_SCREEN_VISIBLE_AREA((129-8-8)*2, (449+8-1+8)*2, 44-8, 300+8-1)
+	MCFG_SCREEN_UPDATE(amiga_aga)
 
 	MCFG_VIDEO_START(amiga_aga)
-	MCFG_VIDEO_UPDATE(amiga_aga)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

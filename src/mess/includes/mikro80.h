@@ -41,6 +41,6 @@ extern WRITE8_HANDLER (mikro80_8255_portc_w );
 /*----------- defined in video/mikro80.c -----------*/
 
 extern VIDEO_START( mikro80 );
-extern VIDEO_UPDATE( mikro80 );
+extern SCREEN_UPDATE( mikro80 );
 
 #endif /* UT88_H_ */

@@ -48,7 +48,7 @@ WRITE8_HANDLER(pc1403_asic_write);
 /*----------- defined in video/pc1403.c -----------*/
 
 VIDEO_START( pc1403 );
-VIDEO_UPDATE( pc1403 );
+SCREEN_UPDATE( pc1403 );
 
 READ8_HANDLER(pc1403_lcd_read);
 WRITE8_HANDLER(pc1403_lcd_write);

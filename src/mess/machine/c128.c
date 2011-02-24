@@ -1300,7 +1300,7 @@ INTERRUPT_GEN( c128_frame_interrupt )
 	}
 }
 
-VIDEO_UPDATE( c128 )
+SCREEN_UPDATE( c128 )
 {
 	device_t *vic2e = screen->machine->device("vic2e");
 	device_t *vdc8563 = screen->machine->device("vdc8563");

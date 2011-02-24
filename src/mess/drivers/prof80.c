@@ -980,7 +980,7 @@ static VIDEO_START( grip )
 {
 }
 
-static VIDEO_UPDATE( grip )
+static SCREEN_UPDATE( grip )
 {
 	prof80_state *state = screen->machine->driver_data<prof80_state>();
 
@@ -1326,7 +1326,8 @@ static MACHINE_CONFIG_DERIVED( grip, prof80 )
 
 
     MCFG_VIDEO_START(grip)
-    MCFG_VIDEO_UPDATE(grip)
+	MCFG_SCREEN_MODIFY("screen")
+    MCFG_SCREEN_UPDATE(grip)
 
 	MCFG_MC6845_ADD(MC6845_TAG, MC6845, XTAL_16MHz/4, grip_mc6845_interface)
 

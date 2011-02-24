@@ -66,16 +66,16 @@ WRITE8_HANDLER( erik_disk_reg_w );
 /*----------- defined in video/special.c -----------*/
 
 VIDEO_START( special );
-VIDEO_UPDATE( special );
+SCREEN_UPDATE( special );
 
 VIDEO_START( specialp );
-VIDEO_UPDATE( specialp );
+SCREEN_UPDATE( specialp );
 
 VIDEO_START( specimx );
-VIDEO_UPDATE( specimx );
+SCREEN_UPDATE( specimx );
 
 VIDEO_START( erik );
-VIDEO_UPDATE( erik );
+SCREEN_UPDATE( erik );
 PALETTE_INIT( erik );
 
 PALETTE_INIT( specimx );

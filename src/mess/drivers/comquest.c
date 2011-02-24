@@ -254,12 +254,13 @@ static MACHINE_CONFIG_START( comquest, comquest_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(64*4, 128)	/* 160 x 102 */
 	MCFG_SCREEN_VISIBLE_AREA(0, 64*4-1, 0, 128-1)
+	MCFG_SCREEN_UPDATE( comquest )
+
 	MCFG_GFXDECODE( comquest )
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
 
 	MCFG_VIDEO_START( comquest )
-	MCFG_VIDEO_UPDATE( comquest )
 
 	/* sound hardware */
 	/* unknown ? */

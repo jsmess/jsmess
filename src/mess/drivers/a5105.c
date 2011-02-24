@@ -26,7 +26,7 @@ public:
 	required_device<device_t> m_hgdc;
 
 	virtual void video_start();
-	virtual bool video_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
+	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 	UINT8 *m_char_rom;
 
 
@@ -370,7 +370,7 @@ void a5105_state::video_start()
 	VIDEO_START_CALL(generic_bitmapped);
 }
 
-bool a5105_state::video_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+bool a5105_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	/* graphics */
 	upd7220_update(m_hgdc, &bitmap, &cliprect);

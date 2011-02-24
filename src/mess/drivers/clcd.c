@@ -43,7 +43,7 @@ static VIDEO_START( clcd )
 {
 }
 
-static VIDEO_UPDATE( clcd )
+static SCREEN_UPDATE( clcd )
 {
     return 0;
 }
@@ -61,6 +61,7 @@ static MACHINE_CONFIG_START( clcd, clcd_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(480, 128)
 	MCFG_SCREEN_VISIBLE_AREA(0, 480-1, 0, 128-1)
+    MCFG_SCREEN_UPDATE(clcd)
 
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
@@ -68,7 +69,6 @@ static MACHINE_CONFIG_START( clcd, clcd_state )
 	MCFG_PALETTE_INIT(clcd)
 
     MCFG_VIDEO_START(clcd)
-    MCFG_VIDEO_UPDATE(clcd)
 MACHINE_CONFIG_END
 
 /* ROM definition */

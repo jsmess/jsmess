@@ -24,7 +24,7 @@ VIDEO_START( mc68328 )
 }
 
 /* THIS IS PRETTY MUCH TOTALLY WRONG AND DOESN'T REFLECT THE MC68328'S INTERNAL FUNCTIONALITY AT ALL! */
-VIDEO_UPDATE( mc68328 )
+SCREEN_UPDATE( mc68328 )
 {
     device_t *mc68328_device = screen->machine->device(MC68328_TAG);
     mc68328_t* mc68328 = mc68328_get_safe_token( mc68328_device );

@@ -89,6 +89,7 @@ Notes:
 #include "cpu/adsp2100/adsp2100.h"
 #include "audio/dcs.h"
 #include "machine/nvram.h"
+#include "includes/midtunit.h"
 #include "includes/midwunit.h"
 
 
@@ -647,9 +648,9 @@ static MACHINE_CONFIG_START( wunit, midwxunit_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 505, 0, 399, 289, 0, 253)
+	MCFG_SCREEN_UPDATE(tms340x0)
 
 	MCFG_VIDEO_START(midwunit)
-	MCFG_VIDEO_UPDATE(tms340x0)
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(dcs_audio_8k)

@@ -361,10 +361,10 @@ INPUT_PORTS_END
 ***************************************************************************/
 
 /*-------------------------------------------------
-    VIDEO_UPDATE( atom )
+    SCREEN_UPDATE( atom )
 -------------------------------------------------*/
 
-static VIDEO_UPDATE( atom )
+static SCREEN_UPDATE( atom )
 {
 	atom_state *state = screen->machine->driver_data<atom_state>();
 
@@ -842,11 +842,10 @@ static MACHINE_CONFIG_START( atom, atom_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(320, 25+192+26)
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 1, 239)
+	MCFG_SCREEN_UPDATE(atom)
 
 	MCFG_MC6847_ADD(MC6847_TAG, atom_mc6847_intf)
 	MCFG_MC6847_TYPE(M6847_VERSION_ORIGINAL_PAL)
-
-	MCFG_VIDEO_UPDATE(atom)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

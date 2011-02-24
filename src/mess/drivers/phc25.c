@@ -322,7 +322,7 @@ static VIDEO_START( ntsc )
 	state->char_substact = 0;
 }
 
-static VIDEO_UPDATE( phc25 )
+static SCREEN_UPDATE( phc25 )
 {
 	phc25_state *state = screen->machine->driver_data<phc25_state>();
 
@@ -377,9 +377,6 @@ static MACHINE_CONFIG_START( phc25, phc25_state )
 
     MCFG_MACHINE_START(phc25)
 
-    /* video hardware */
-    MCFG_VIDEO_UPDATE(phc25)
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD(AY8910_TAG, AY8910, 1996750)
@@ -404,6 +401,7 @@ static MACHINE_CONFIG_DERIVED( pal, phc25 )
     MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(320, 25+192+26)
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 1, 239)
+    MCFG_SCREEN_UPDATE(phc25)
 
     MCFG_PALETTE_LENGTH(16)
 
@@ -423,6 +421,7 @@ static MACHINE_CONFIG_DERIVED( ntsc, phc25 )
     MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(320, 25+192+26)
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 1, 239)
+    MCFG_SCREEN_UPDATE(phc25)
 
     MCFG_PALETTE_LENGTH(16)
 

@@ -589,7 +589,7 @@ static VIDEO_START( socrates )
 	state->scroll_offset = 0;
 }
 
-static VIDEO_UPDATE( socrates )
+static SCREEN_UPDATE( socrates )
 {
 	socrates_state *state = screen->machine->driver_data<socrates_state>();
 	static const UINT8 fixedcolors[8] =
@@ -916,10 +916,12 @@ static MACHINE_CONFIG_START( socrates, socrates_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(264, 228) // technically the screen size is 256x228 but super painter abuses what I suspect is a hardware bug to display repeated pixels of the very last pixel beyond this horizontal space, well into hblank
 	MCFG_SCREEN_VISIBLE_AREA(0, 263, 0, 219) // the last few rows are usually cut off by the screen bottom but are indeed displayed if you mess with v-hold
+	MCFG_SCREEN_UPDATE(socrates)
+
 	MCFG_PALETTE_LENGTH(256)
 	MCFG_PALETTE_INIT(socrates)
+
 	MCFG_VIDEO_START(socrates)
-	MCFG_VIDEO_UPDATE(socrates)
 
     /* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

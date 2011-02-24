@@ -161,7 +161,7 @@ static const wd17xx_interface apricot_wd17xx_intf =
     VIDEO EMULATION
 ***************************************************************************/
 
-static VIDEO_UPDATE( apricot )
+static SCREEN_UPDATE( apricot )
 {
 	apricot_state *apricot = screen->machine->driver_data<apricot_state>();
 
@@ -345,11 +345,10 @@ static MACHINE_CONFIG_START( apricot, apricot_state )
 	MCFG_SCREEN_SIZE(800, 400)
 	MCFG_SCREEN_VISIBLE_AREA(0, 800-1, 0, 400-1)
 	MCFG_SCREEN_REFRESH_RATE(72)
+	MCFG_SCREEN_UPDATE(apricot)
 
 	MCFG_PALETTE_LENGTH(3)
 	MCFG_PALETTE_INIT(apricot)
-
-	MCFG_VIDEO_UPDATE(apricot)
 
 	MCFG_MC6845_ADD("ic30", MC6845, XTAL_15MHz / 10, apricot_mc6845_intf)
 

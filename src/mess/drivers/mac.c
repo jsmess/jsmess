@@ -58,7 +58,7 @@
 #define C15M	(C7M*2)
 #define C32M	(C15M*2)
 
-// do this here - VIDEO_UPDATE is called each scanline when stepping in the
+// do this here - SCREEN_UPDATE is called each scanline when stepping in the
 // debugger, which means you can't escape the VIA2 IRQ handler
 //
 // RBV/MDU interrupts:
@@ -386,7 +386,7 @@ static VIDEO_START( mac_prtb )
 {
 }
 
-static VIDEO_UPDATE( mac_prtb )
+static SCREEN_UPDATE( mac_prtb )
 {
 	return 0;
 }
@@ -610,11 +610,12 @@ static MACHINE_CONFIG_START( mac512ke, mac_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(MAC_H_TOTAL, MAC_V_TOTAL)
 	MCFG_SCREEN_VISIBLE_AREA(0, MAC_H_VIS-1, 0, MAC_V_VIS-1)
+	MCFG_SCREEN_UPDATE(mac)
+
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(mac)
 
 	MCFG_VIDEO_START(mac)
-	MCFG_VIDEO_UPDATE(mac)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -687,11 +688,12 @@ static MACHINE_CONFIG_START( macprtb, mac_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(700, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 399)
+	MCFG_SCREEN_UPDATE(mac_prtb)
+
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(mac)
 
 	MCFG_VIDEO_START(mac_prtb)
-	MCFG_VIDEO_UPDATE(mac_prtb)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -738,10 +740,11 @@ static MACHINE_CONFIG_START( macii, mac_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(1024, 768)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+	MCFG_SCREEN_UPDATE(mac_cb264)
+
 	MCFG_PALETTE_LENGTH(256)
 
 	MCFG_VIDEO_START(mac_cb264)
-	MCFG_VIDEO_UPDATE(mac_cb264)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -783,7 +786,9 @@ static MACHINE_CONFIG_DERIVED( maclc, macii )
 
 	MCFG_VIDEO_START(macv8)
 	MCFG_VIDEO_RESET(macrbv)
-	MCFG_VIDEO_UPDATE(macrbvvram)
+	
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(macrbvvram)
 
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("2M")
@@ -813,7 +818,9 @@ static MACHINE_CONFIG_DERIVED( maclc3, maclc )
 
 	MCFG_VIDEO_START(macsonora)
 	MCFG_VIDEO_RESET(macrbv)
-	MCFG_VIDEO_UPDATE(macrbvvram)
+	
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(macrbvvram)
 
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("4M")
@@ -840,21 +847,22 @@ static MACHINE_CONFIG_START( macse30, mac_state )
 	MCFG_CPU_ADD("maincpu", M68030, 7833600*2)
 	MCFG_CPU_PROGRAM_MAP(macse30_map)
 
+	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+
+       /* video hardware */
+	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60.15)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1260))
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
-
-        /* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(MAC_H_TOTAL, MAC_V_TOTAL)
 	MCFG_SCREEN_VISIBLE_AREA(0, MAC_H_VIS-1, 0, MAC_V_VIS-1)
+	MCFG_SCREEN_UPDATE(macse30)
+
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(mac)
 
 	MCFG_VIDEO_START(mac)
-	MCFG_VIDEO_UPDATE(macse30)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -893,11 +901,11 @@ static MACHINE_CONFIG_DERIVED( macclas2, maclc )
 
 	MCFG_VIDEO_START(macv8)
 	MCFG_VIDEO_RESET(maceagle)
-	MCFG_VIDEO_UPDATE(macrbv)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_SIZE(MAC_H_TOTAL, MAC_V_TOTAL)
 	MCFG_SCREEN_VISIBLE_AREA(0, MAC_H_VIS-1, 0, MAC_V_VIS-1)
+	MCFG_SCREEN_UPDATE(macrbv)
 
 	MCFG_ASC_REPLACE("asc", C15M, ASC_TYPE_EAGLE, mac_asc_irq)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
@@ -918,11 +926,11 @@ static MACHINE_CONFIG_DERIVED( maciici, macii )
 
 	MCFG_VIDEO_START(macrbv)
 	MCFG_VIDEO_RESET(macrbv)
-	MCFG_VIDEO_UPDATE(macrbv)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_SIZE(640, 870)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+	MCFG_SCREEN_UPDATE(macrbv)
 
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)
@@ -940,11 +948,11 @@ static MACHINE_CONFIG_DERIVED( maciisi, macii )
 
 	MCFG_VIDEO_START(macrbv)
 	MCFG_VIDEO_RESET(macrbv)
-	MCFG_VIDEO_UPDATE(macrbv)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_SIZE(640, 870)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+	MCFG_SCREEN_UPDATE(macrbv)
 
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)
@@ -958,20 +966,20 @@ static MACHINE_CONFIG_START( pwrmac, mac_state )
 	MCFG_CPU_ADD("maincpu", PPC601, 66000000)
 	MCFG_CPU_PROGRAM_MAP(pwrmac_map)
 
+    /* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	// dot clock, htotal, hstart, hend, vtotal, vstart, vend
 	MCFG_SCREEN_RAW_PARAMS(25175000, 800, 0, 640, 525, 0, 480)
-
-        /* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(1024, 768)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+	MCFG_SCREEN_UPDATE(macrbv)
+
 	MCFG_PALETTE_LENGTH(256)
 
 	MCFG_VIDEO_START(macsonora)
 	MCFG_VIDEO_RESET(macrbv)
-	MCFG_VIDEO_UPDATE(macrbv)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

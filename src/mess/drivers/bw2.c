@@ -637,7 +637,7 @@ static PALETTE_INIT( bw2 )
     palette_set_color_rgb(machine, 1, 0x31, 0x39, 0x10);
 }
 
-bool bw2_state::video_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+bool bw2_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	msm6255_update(m_lcdc, &bitmap, &cliprect);
 

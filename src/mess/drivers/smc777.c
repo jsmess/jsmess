@@ -61,7 +61,7 @@ static VIDEO_START( smc777 )
 {
 }
 
-static VIDEO_UPDATE( smc777 )
+static SCREEN_UPDATE( smc777 )
 {
 	smc777_state *state = screen->machine->driver_data<smc777_state>();
 	int x,y,yi;
@@ -937,6 +937,8 @@ static MACHINE_CONFIG_START( smc777, smc777_state )
     MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
     MCFG_SCREEN_SIZE(0x400, 400)
     MCFG_SCREEN_VISIBLE_AREA(0, 660-1, 0, 220-1) //normal 640 x 200 + 20 pixels for border color
+    MCFG_SCREEN_UPDATE(smc777)
+
     MCFG_PALETTE_LENGTH(0x10+8) //16 palette entries + 8 special colors
     MCFG_PALETTE_INIT(smc777)
 	MCFG_GFXDECODE(smc777)
@@ -944,7 +946,6 @@ static MACHINE_CONFIG_START( smc777, smc777_state )
 	MCFG_MC6845_ADD("crtc", H46505, MASTER_CLOCK/2, mc6845_intf)	/* unknown clock, hand tuned to get ~60 fps */
 
     MCFG_VIDEO_START(smc777)
-    MCFG_VIDEO_UPDATE(smc777)
 
 	MCFG_WD179X_ADD("fdc",smc777_mb8876_interface)
 	MCFG_FLOPPY_2_DRIVES_ADD(smc777_floppy_config)

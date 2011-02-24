@@ -31,6 +31,7 @@ To Do:
 ***************************************************************************/
 
 #include "emu.h"
+#include "machine/ms32crpt.h"
 #include "includes/tetrisp2.h"
 
 
@@ -251,8 +252,6 @@ WRITE16_HANDLER( rocknms_sub_vram_rot_w )
 }
 
 
-
-extern void ms32_rearrange_sprites(running_machine *machine, const char *region);
 
 VIDEO_START( tetrisp2 )
 {
@@ -500,7 +499,7 @@ void tetrisp2_draw_sprites(running_machine *machine, bitmap_t *bitmap, bitmap_t 
 
 ***************************************************************************/
 
-VIDEO_UPDATE( tetrisp2 )
+SCREEN_UPDATE( tetrisp2 )
 {
 	int flipscreen;
 	int asc_pri;
@@ -584,7 +583,7 @@ VIDEO_UPDATE( tetrisp2 )
 	return 0;
 }
 
-VIDEO_UPDATE( rockntread )
+SCREEN_UPDATE( rockntread )
 {
 	int flipscreen;
 	int asc_pri;
@@ -671,7 +670,7 @@ VIDEO_UPDATE( rockntread )
 
 
 
-VIDEO_UPDATE( rocknms )
+SCREEN_UPDATE( rocknms )
 {
 	int asc_pri;
 	int scr_pri;

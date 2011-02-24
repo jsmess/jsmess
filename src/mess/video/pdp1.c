@@ -69,7 +69,7 @@ VIDEO_START( pdp1 )
 }
 
 
-VIDEO_EOF( pdp1 )
+SCREEN_EOF( pdp1 )
 {
 	pdp1_state *state = machine->driver_data<pdp1_state>();
 
@@ -92,7 +92,7 @@ void pdp1_plot(running_machine *machine, int x, int y)
 /*
     video_update_pdp1: effectively redraw the screen
 */
-VIDEO_UPDATE( pdp1 )
+SCREEN_UPDATE( pdp1 )
 {
 	pdp1_state *state = screen->machine->driver_data<pdp1_state>();
 	pdp1_erase_lightpen(state, bitmap);

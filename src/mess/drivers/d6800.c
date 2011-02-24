@@ -119,7 +119,7 @@ INPUT_PORTS_END
 
 /* Video */
 
-static VIDEO_UPDATE( d6800 )
+static SCREEN_UPDATE( d6800 )
 {
 	d6800_state *state = screen->machine->driver_data<d6800_state>();
 	UINT8 x,y,gfx=0;
@@ -285,9 +285,10 @@ static MACHINE_CONFIG_START( d6800, d6800_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(64, 32)
 	MCFG_SCREEN_VISIBLE_AREA(0, 63, 0, 31)
+	MCFG_SCREEN_UPDATE(d6800)
+
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
-	MCFG_VIDEO_UPDATE(d6800)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

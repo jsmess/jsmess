@@ -186,7 +186,7 @@ VIDEO_START( newport )
 	video_base = auto_alloc_array_clear(machine, UINT32, (1280+64) * (1024+64));
 }
 
-VIDEO_UPDATE( newport )
+SCREEN_UPDATE( newport )
 {
 	int y;
 

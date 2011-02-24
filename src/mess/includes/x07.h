@@ -162,7 +162,7 @@ public:
 
 	void machine_start();
 	void machine_reset();
-	bool video_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
+	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 	DECLARE_READ8_MEMBER( x07_io_r );
 	DECLARE_WRITE8_MEMBER( x07_io_w );
 

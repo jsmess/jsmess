@@ -505,7 +505,7 @@ INPUT_PORTS_END
 
 /* Video */
 
-bool tandy2k_state::video_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+bool tandy2k_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	if (m_vidouts)
 	{

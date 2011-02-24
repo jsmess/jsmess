@@ -944,7 +944,7 @@ INPUT_PORTS_END
 * Video hardware                                     *
 \****************************************************/
 
-static VIDEO_UPDATE( craft )
+static SCREEN_UPDATE( craft )
 {
     return 0;
 }
@@ -991,10 +991,11 @@ static MACHINE_CONFIG_START( craft, craft_state )
     MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
     MCFG_SCREEN_SIZE(634, 480)
     MCFG_SCREEN_VISIBLE_AREA(0, 633, 0, 479)
+    MCFG_SCREEN_UPDATE(craft)
+
     MCFG_PALETTE_LENGTH(0x1000)
 
     MCFG_VIDEO_START(generic_bitmapped)
-    MCFG_VIDEO_UPDATE(craft)
 
     /* sound hardware */
     MCFG_SPEAKER_STANDARD_MONO("avr8")

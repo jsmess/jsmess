@@ -408,7 +408,7 @@ void bw12_state::video_start()
 	m_char_rom = machine->region("chargen")->base();
 }
 
-bool bw12_state::video_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+bool bw12_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	mc6845_update(m_crtc, &bitmap, &cliprect);
 

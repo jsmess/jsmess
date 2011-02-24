@@ -225,7 +225,7 @@ static VIDEO_START( bcs3 )
 	state->fnt = machine->region("gfx1")->base();
 }
 
-static VIDEO_UPDATE( bcs3 )
+static SCREEN_UPDATE( bcs3 )
 {
 	bcs3_state *state = screen->machine->driver_data<bcs3_state>();
 	UINT8 y,ra,chr,gfx,rat;
@@ -268,7 +268,7 @@ static VIDEO_UPDATE( bcs3 )
 
 /* This has 100 lines of screen data. I'm assuming that it only shows a portion of this,
     with the cursor always in sight. */
-static VIDEO_UPDATE( bcs3a )
+static SCREEN_UPDATE( bcs3a )
 {
 	bcs3_state *state = screen->machine->driver_data<bcs3_state>();
 	UINT8 y,ra,chr,gfx,rat;
@@ -312,7 +312,7 @@ static VIDEO_UPDATE( bcs3a )
 	return 0;
 }
 
-static VIDEO_UPDATE( bcs3b )
+static SCREEN_UPDATE( bcs3b )
 {
 	bcs3_state *state = screen->machine->driver_data<bcs3_state>();
 	UINT8 y,ra,chr,gfx,rat;
@@ -356,7 +356,7 @@ static VIDEO_UPDATE( bcs3b )
 	return 0;
 }
 
-static VIDEO_UPDATE( bcs3c )
+static SCREEN_UPDATE( bcs3c )
 {
 	bcs3_state *state = screen->machine->driver_data<bcs3_state>();
 	UINT8 y,ra,chr,gfx,rat;
@@ -435,12 +435,13 @@ static MACHINE_CONFIG_START( bcs3, bcs3_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(28*8, 12*10)
 	MCFG_SCREEN_VISIBLE_AREA(0,28*8-1,0,12*10-1)
+	MCFG_SCREEN_UPDATE(bcs3)
+
 	MCFG_GFXDECODE(bcs3)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
 
 	MCFG_VIDEO_START(bcs3)
-	MCFG_VIDEO_UPDATE(bcs3)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( bcs3a, bcs3 )
@@ -451,7 +452,7 @@ static MACHINE_CONFIG_DERIVED( bcs3a, bcs3 )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_SIZE(29*8, 12*10)
 	MCFG_SCREEN_VISIBLE_AREA(0,29*8-1,0,12*10-1)
-	MCFG_VIDEO_UPDATE(bcs3a)
+	MCFG_SCREEN_UPDATE(bcs3a)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( bcs3b, bcs3 )
@@ -462,7 +463,7 @@ static MACHINE_CONFIG_DERIVED( bcs3b, bcs3 )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_SIZE(40*8, 24*10)
 	MCFG_SCREEN_VISIBLE_AREA(0,40*8-1,0,24*10-1)
-	MCFG_VIDEO_UPDATE(bcs3b)
+	MCFG_SCREEN_UPDATE(bcs3b)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( bcs3c, bcs3 )
@@ -473,7 +474,7 @@ static MACHINE_CONFIG_DERIVED( bcs3c, bcs3 )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_SIZE(29*8, 12*10)
 	MCFG_SCREEN_VISIBLE_AREA(0,29*8-1,0,12*10-1)
-	MCFG_VIDEO_UPDATE(bcs3c)
+	MCFG_SCREEN_UPDATE(bcs3c)
 MACHINE_CONFIG_END
 
 /* ROM definition */

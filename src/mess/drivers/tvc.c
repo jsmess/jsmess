@@ -274,7 +274,7 @@ static VIDEO_START( tvc )
 {
 }
 
-static VIDEO_UPDATE( tvc )
+static SCREEN_UPDATE( tvc )
 {
 	device_t *mc6845 = screen->machine->device("crtc");
 	mc6845_update(mc6845, bitmap, cliprect);
@@ -403,13 +403,14 @@ static MACHINE_CONFIG_START( tvc, tvc_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(512, 240)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512 - 1, 0, 240 - 1)
+    MCFG_SCREEN_UPDATE(tvc)
+
 	MCFG_PALETTE_LENGTH( 16 )
 	MCFG_PALETTE_INIT(tvc)
 
 	MCFG_MC6845_ADD("crtc", MC6845, 3125000, tvc_crtc6845_interface) // clk taken from schematics
 
     MCFG_VIDEO_START(tvc)
-    MCFG_VIDEO_UPDATE(tvc)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

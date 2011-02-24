@@ -345,10 +345,10 @@ void vidbrain_state::video_start()
 
 
 //-------------------------------------------------
-//  VIDEO_UPDATE( vidbrain )
+//  SCREEN_UPDATE( vidbrain )
 //-------------------------------------------------
 
-bool vidbrain_state::video_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+bool vidbrain_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	address_space *program = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);
 

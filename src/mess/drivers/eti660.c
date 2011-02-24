@@ -144,7 +144,7 @@ static CDP1864_INTERFACE( eti660_cdp1864_intf )
 	RES_K(4.7)	/* R4 */
 };
 
-static VIDEO_UPDATE( eti660 )
+static SCREEN_UPDATE( eti660 )
 {
 	eti660_state *state = screen->machine->driver_data<eti660_state>();
 
@@ -320,9 +320,9 @@ static MACHINE_CONFIG_START( eti660, eti660_state )
 
     /* video hardware */
 	MCFG_CDP1864_SCREEN_ADD(SCREEN_TAG, XTAL_8_867238MHz/5)
+	MCFG_SCREEN_UPDATE(eti660)
 
 	MCFG_PALETTE_LENGTH(8+8)
-	MCFG_VIDEO_UPDATE(eti660)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

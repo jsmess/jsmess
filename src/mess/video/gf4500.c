@@ -163,8 +163,8 @@ VIDEO_START( gf4500 )
 	return VIDEO_START_CALL(generic_bitmapped);
 }
 
-VIDEO_UPDATE( gf4500 )
+SCREEN_UPDATE( gf4500 )
 {
 	gf4500_render_screen( screen->machine, screen->machine->generic.tmpbitmap);
-	return VIDEO_UPDATE_CALL(generic_bitmapped);
+	return SCREEN_UPDATE_CALL(generic_bitmapped);
 }

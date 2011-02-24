@@ -63,7 +63,7 @@ VIDEO_START( lviv )
 {
 }
 
-VIDEO_UPDATE( lviv )
+SCREEN_UPDATE( lviv )
 {
 	lviv_state *state = screen->machine->driver_data<lviv_state>();
 	int x,y;

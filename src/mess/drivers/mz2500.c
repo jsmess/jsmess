@@ -575,7 +575,7 @@ static void draw_cg_screen(running_machine *machine, bitmap_t *bitmap,const rect
 	}
 }
 
-static VIDEO_UPDATE( mz2500 )
+static SCREEN_UPDATE( mz2500 )
 {
 	//mz2500_state *state = screen->machine->driver_data<mz2500_state>();
 	bitmap_fill(bitmap, cliprect, screen->machine->pens[0]); //TODO: correct?
@@ -2092,13 +2092,14 @@ static MACHINE_CONFIG_START( mz2500, mz2500_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_21_4772MHz, 640+108, 0, 640, 480, 0, 200) //unknown clock / divider
+    MCFG_SCREEN_UPDATE(mz2500)
+
 	MCFG_PALETTE_LENGTH(0x200)
 	MCFG_PALETTE_INIT(mz2500)
 
 	MCFG_GFXDECODE(mz2500)
 
     MCFG_VIDEO_START(mz2500)
-    MCFG_VIDEO_UPDATE(mz2500)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

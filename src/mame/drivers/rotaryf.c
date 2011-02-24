@@ -1,4 +1,6 @@
-/* Rotary Fighter
+/* Rotary Fighter, 01/1979, Kasco (Kansai Seiki Seisakusho Co.)
+ board KIV-101 CPU: xtal(??mhz), i8085A, 40 pin IC(i8255?), 6*ROM, 1*RAM, DIP(8 switches), ..
+ board KIV-101 CRT: 2*RAM, lots of 74xx TTL
 
 driver by Barry Rodewald
  based on Initial work by David Haywood
@@ -15,8 +17,18 @@ driver by Barry Rodewald
 #include "cpu/i8085/i8085.h"
 
 
-static UINT8 *rotaryf_videoram;
-static size_t rotaryf_videoram_size;
+class rotaryf_state : public driver_device
+{
+public:
+	rotaryf_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 *videoram;
+	size_t videoram_size;
+};
+
+
+
 
 
 
@@ -45,17 +57,18 @@ static INTERRUPT_GEN( rotaryf_interrupt )
  *
  *************************************/
 
-static VIDEO_UPDATE( rotaryf )
+static SCREEN_UPDATE( rotaryf )
 {
+	rotaryf_state *state = screen->machine->driver_data<rotaryf_state>();
 	offs_t offs;
 
-	for (offs = 0; offs < rotaryf_videoram_size; offs++)
+	for (offs = 0; offs < state->videoram_size; offs++)
 	{
 		int i;
 
 		UINT8 x = offs << 3;
 		int y = offs >> 5;
-		UINT8 data = rotaryf_videoram[offs];
+		UINT8 data = state->videoram[offs];
 
 		for (i = 0; i < 8; i++)
 		{
@@ -77,7 +90,7 @@ static ADDRESS_MAP_START( rotaryf_map, ADDRESS_SPACE_PROGRAM, 8 )
 //  AM_RANGE(0x6ffd, 0x6ffd) AM_READ(random_r) ??
 //  AM_RANGE(0x6fff, 0x6fff) AM_READ(random_r) ??
 	AM_RANGE(0x7000, 0x73ff) AM_RAM // clears to 1ff ?
-	AM_RANGE(0x8000, 0x9fff) AM_MIRROR(0x4000) AM_RAM AM_BASE(&rotaryf_videoram) AM_SIZE(&rotaryf_videoram_size)
+	AM_RANGE(0x8000, 0x9fff) AM_MIRROR(0x4000) AM_RAM AM_BASE_MEMBER(rotaryf_state, videoram) AM_SIZE_MEMBER(rotaryf_state, videoram_size)
 	AM_RANGE(0xa000, 0xa1ff) AM_RAM
 ADDRESS_MAP_END
 
@@ -148,22 +161,21 @@ static INPUT_PORTS_START( rotaryf )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( rotaryf, driver_device )
+static MACHINE_CONFIG_START( rotaryf, rotaryf_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8085A,4000000) /* 8080? */ /* 2 MHz? */
+	MCFG_CPU_ADD("maincpu",I8085A,4000000) /* ?? MHz */
 	MCFG_CPU_PROGRAM_MAP(rotaryf_map)
 	MCFG_CPU_IO_MAP(rotaryf_io_map)
 	MCFG_CPU_VBLANK_INT_HACK(rotaryf_interrupt,5)
 
 	/* video hardware */
-	MCFG_VIDEO_UPDATE(rotaryf)
-
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(32*8, 262)		/* vert size is a guess, taken from mw8080bw */
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 30*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_UPDATE(rotaryf)
 
 MACHINE_CONFIG_END
 
@@ -179,4 +191,4 @@ ROM_START( rotaryf )
 ROM_END
 
 
-GAME( 19??, rotaryf, 0, rotaryf, rotaryf, 0, ROT270, "<unknown>", "Rotary Fighter", GAME_NO_SOUND )
+GAME( 1979, rotaryf, 0, rotaryf, rotaryf, 0, ROT270, "Kasco", "Rotary Fighter", GAME_NO_SOUND )

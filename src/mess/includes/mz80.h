@@ -40,6 +40,6 @@ extern const gfx_layout mz80k_charlayout;
 extern const gfx_layout mz80kj_charlayout;
 
 extern VIDEO_START( mz80k );
-extern VIDEO_UPDATE( mz80k );
+extern SCREEN_UPDATE( mz80k );
 
 #endif /* MZ80_H_ */

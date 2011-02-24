@@ -132,7 +132,7 @@ static VIDEO_START( pippin )
 {
 }
 
-static VIDEO_UPDATE( pippin )
+static SCREEN_UPDATE( pippin )
 {
     return 0;
 }
@@ -151,11 +151,12 @@ static MACHINE_CONFIG_START( pippin, pippin_state )
     MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
     MCFG_SCREEN_SIZE(640, 480)
     MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+    MCFG_SCREEN_UPDATE(pippin)
+
     MCFG_PALETTE_LENGTH(2)
     MCFG_PALETTE_INIT(black_and_white)
 
     MCFG_VIDEO_START(pippin)
-    MCFG_VIDEO_UPDATE(pippin)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

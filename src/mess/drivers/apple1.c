@@ -224,6 +224,10 @@ static MACHINE_CONFIG_START( apple1, apple1_state )
        slows it to 960 kHz. */
 	MCFG_CPU_ADD("maincpu", M6502, 960000)        /* 1.023 MHz */
 	MCFG_CPU_PROGRAM_MAP(apple1_map)
+
+	MCFG_MACHINE_RESET( apple1 )
+	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	/* Video is blanked for 70 out of 262 scanlines per refresh cycle.
@@ -232,21 +236,19 @@ static MACHINE_CONFIG_START( apple1, apple1_state )
        is 2 cycles of the fundamental 14.31818 MHz oscillator.  The
        total blanking time is about 4450 microseconds. */
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC((int) (70 * 65 * 7 * 2 / 14.31818)))
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
-
-	MCFG_MACHINE_RESET( apple1 )
-
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	/* It would be nice if we could implement some sort of display
        overscan here. */
 	MCFG_SCREEN_SIZE(40 * 7, 24 * 8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 40 * 7 - 1, 0, 24 * 8 - 1)
+	MCFG_SCREEN_UPDATE(apple1)
+
+	
 	MCFG_GFXDECODE(apple1)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
 
 	MCFG_VIDEO_START(apple1)
-	MCFG_VIDEO_UPDATE(apple1)
 
 	MCFG_PIA6821_ADD( "pia", apple1_pia0 )
 

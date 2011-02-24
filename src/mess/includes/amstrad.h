@@ -150,8 +150,8 @@ extern const mc6845_interface amstrad_mc6845_intf;
 extern const mc6845_interface amstrad_plus_mc6845_intf;
 
 VIDEO_START( amstrad );
-VIDEO_UPDATE( amstrad );
-VIDEO_EOF( amstrad );
+SCREEN_UPDATE( amstrad );
+SCREEN_EOF( amstrad );
 
 PALETTE_INIT( amstrad_cpc );			/* For CPC464, CPC664, and CPC6128 */
 PALETTE_INIT( amstrad_cpc_green );		/* For CPC464, CPC664, and CPC6128 */

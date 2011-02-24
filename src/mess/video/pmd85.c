@@ -56,7 +56,7 @@ static void pmd85_draw_scanline(running_machine *machine,bitmap_t *bitmap, int p
 	}
 }
 
-VIDEO_UPDATE( pmd85 )
+SCREEN_UPDATE( pmd85 )
 {
 	int pmd85_scanline;
 

@@ -667,10 +667,10 @@ static PALETTE_INIT( ql )
 
 
 //-------------------------------------------------
-//  VIDEO_UPDATE( ql )
+//  SCREEN_UPDATE( ql )
 //-------------------------------------------------
 
-bool ql_state::video_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+bool ql_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	m_zx8301->update_screen(&bitmap, &cliprect);
 

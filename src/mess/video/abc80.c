@@ -214,10 +214,10 @@ void abc80_state::video_start()
 
 
 //-------------------------------------------------
-//  VIDEO_UPDATE( abc80 )
+//  SCREEN_UPDATE( abc80 )
 //-------------------------------------------------
 
-bool abc80_state::video_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+bool abc80_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	update_screen(&bitmap, &cliprect);
 

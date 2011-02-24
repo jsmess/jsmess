@@ -325,7 +325,7 @@ static const UINT8 mcm6571a_shift[] =
 };
 
 
-static VIDEO_UPDATE( pegasus )
+static SCREEN_UPDATE( pegasus )
 {
 	pegasus_state *state = screen->machine->driver_data<pegasus_state>();
 	UINT8 y,ra,chr,gfx,inv;
@@ -501,12 +501,13 @@ static MACHINE_CONFIG_START( pegasus, pegasus_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*8, 16*16)
 	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 0, 16*16-1)
+	MCFG_SCREEN_UPDATE(pegasus)
+	
 	MCFG_GFXDECODE(pegasus)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
 	MCFG_VIDEO_START(pegasus)
-	MCFG_VIDEO_UPDATE(pegasus)
-
+	
 	/* devices */
 	MCFG_PIA6821_ADD( "pia_s", pegasus_pia_s_intf )
 	MCFG_PIA6821_ADD( "pia_u", pegasus_pia_u_intf )

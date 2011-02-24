@@ -64,7 +64,7 @@ public:
 	UINT8 m_pr_counter;
 	UINT8 m_pr_state;
 
-	bool video_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
+	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER( mc10_bfff_r );
 	DECLARE_WRITE8_MEMBER( mc10_bfff_w );
@@ -198,7 +198,7 @@ READ8_MEMBER( mc10_state::mc10_mc6847_videoram_r )
 	return m_ram[offset];
 }
 
-bool mc10_state::video_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+bool mc10_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	if (m_mc6847)		//mc10, alice
 		return mc6847_update(m_mc6847, &bitmap, &cliprect);

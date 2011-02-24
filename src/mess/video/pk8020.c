@@ -14,7 +14,7 @@ VIDEO_START( pk8020 )
 {
 }
 
-VIDEO_UPDATE( pk8020 )
+SCREEN_UPDATE( pk8020 )
 {
 	pk8020_state *state = screen->machine->driver_data<pk8020_state>();
 	int y, x, b, j;

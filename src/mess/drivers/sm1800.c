@@ -59,11 +59,11 @@ static MACHINE_RESET(sm1800)
 }
 
 
-static VIDEO_UPDATE( sm1800 )
+static SCREEN_UPDATE( sm1800 )
 {
 	device_t *devconf = screen->machine->device("i8275");
 	i8275_update( devconf, bitmap, cliprect);
-	VIDEO_UPDATE_CALL ( generic_bitmapped );
+	SCREEN_UPDATE_CALL ( generic_bitmapped );
 	return 0;
 }
 
@@ -161,11 +161,12 @@ static MACHINE_CONFIG_START( sm1800, sm1800_state )
     MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
     MCFG_SCREEN_SIZE(640, 480)
     MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+    MCFG_SCREEN_UPDATE(sm1800)
+
     MCFG_PALETTE_LENGTH(3)
     MCFG_PALETTE_INIT(sm1800)
 
     MCFG_VIDEO_START(generic_bitmapped)
-    MCFG_VIDEO_UPDATE(sm1800)
 MACHINE_CONFIG_END
 
 /* ROM definition */

@@ -112,7 +112,7 @@ static const mc6845_interface crtc_intf =
 
 
 //-------------------------------------------------
-//  VIDEO_UPDATE( abc1600 )
+//  SCREEN_UPDATE( abc1600 )
 //-------------------------------------------------
 
 void abc1600_state::video_start()
@@ -123,10 +123,10 @@ void abc1600_state::video_start()
 
 
 //-------------------------------------------------
-//  VIDEO_UPDATE( abc1600 )
+//  SCREEN_UPDATE( abc1600 )
 //-------------------------------------------------
 
-bool abc1600_state::video_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+bool abc1600_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	mc6845_update(m_crtc, &bitmap, &cliprect);
 

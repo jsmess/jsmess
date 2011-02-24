@@ -895,7 +895,7 @@ static void cps1_render_high_layer(running_machine *machine, bitmap_t *bitmap, c
 
 ***************************************************************************/
 
-VIDEO_UPDATE( cps1 )
+SCREEN_UPDATE( cps1 )
 {
 	cpschngr_state *state = screen->machine->driver_data<cpschngr_state>();
 	int layercontrol,l0,l1,l2,l3;
@@ -961,7 +961,7 @@ VIDEO_UPDATE( cps1 )
 	return 0;
 }
 
-VIDEO_EOF( cps1 )
+SCREEN_EOF( cps1 )
 {
 	cpschngr_state *state = machine->driver_data<cpschngr_state>();
 	/* Get video memory base registers */

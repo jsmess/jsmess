@@ -25,7 +25,7 @@ void hd66421_reg_dat_w(UINT8 data);
 PALETTE_INIT( hd66421 );
 
 VIDEO_START( hd66421 );
-VIDEO_UPDATE( hd66421 );
+SCREEN_UPDATE( hd66421 );
 
 
 #endif /* HD66421_H_ */

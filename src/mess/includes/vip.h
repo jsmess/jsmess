@@ -76,7 +76,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 
-	virtual bool video_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
+	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER(dispon_r);
 	DECLARE_WRITE8_MEMBER(dispoff_w);

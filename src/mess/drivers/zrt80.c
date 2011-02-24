@@ -192,7 +192,7 @@ static VIDEO_START( zrt80 )
 	state->FNT = machine->region("chargen")->base();
 }
 
-static VIDEO_UPDATE( zrt80 )
+static SCREEN_UPDATE( zrt80 )
 {
 	device_t *mc6845 = screen->machine->device("crtc");
 	mc6845_update(mc6845, bitmap, cliprect);
@@ -308,6 +308,8 @@ static MACHINE_CONFIG_START( zrt80, zrt80_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(640, 200)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640 - 1, 0, 200 - 1)
+	MCFG_SCREEN_UPDATE(zrt80)
+
 	MCFG_GFXDECODE(zrt80)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
@@ -315,7 +317,6 @@ static MACHINE_CONFIG_START( zrt80, zrt80_state )
 	MCFG_MC6845_ADD("crtc", MC6845, XTAL_20MHz / 8, zrt80_crtc6845_interface)
 
 	MCFG_VIDEO_START(zrt80)
-	MCFG_VIDEO_UPDATE(zrt80)
 
 	MCFG_INS8250_ADD( "ins8250", zrt80_com_interface )
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, zrt80_terminal_intf)

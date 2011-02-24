@@ -118,7 +118,7 @@ PALETTE_INIT( avigo )
   Do NOT call osd_update_display() from this function,
   it will be called by the main emulation engine.
 ***************************************************************************/
-VIDEO_UPDATE( avigo )
+SCREEN_UPDATE( avigo )
 {
 	avigo_state *state = screen->machine->driver_data<avigo_state>();
 	int y;

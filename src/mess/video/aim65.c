@@ -152,7 +152,7 @@ VIDEO_START( aim65 )
 
 
 #ifdef UNUSED_FUNCTION
-VIDEO_UPDATE( aim65 )
+SCREEN_UPDATE( aim65 )
 {
 	/* Display printer output */
 #if 0

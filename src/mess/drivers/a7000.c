@@ -271,7 +271,7 @@ static VIDEO_START( a7000 )
 {
 }
 
-static VIDEO_UPDATE( a7000 )
+static SCREEN_UPDATE( a7000 )
 {
 	a7000_state *state = screen->machine->driver_data<a7000_state>();
 	int x_size,y_size,x_start,y_start;
@@ -820,11 +820,12 @@ static MACHINE_CONFIG_START( a7000, a7000_state )
     MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(1900, 1080) //max available size
     MCFG_SCREEN_VISIBLE_AREA(0, 1900-1, 0, 1080-1)
+    MCFG_SCREEN_UPDATE(a7000)
+
     MCFG_PALETTE_LENGTH(0x200)
 //  MCFG_PALETTE_INIT(black_and_white)
 
     MCFG_VIDEO_START(a7000)
-    MCFG_VIDEO_UPDATE(a7000)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( a7000p, a7000 )

@@ -212,10 +212,14 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 			zoomx = zoomxlatch;
 			zoomy = zoomylatch;
 
-			x = xlatch + x_no * (0x100 - zoomx) / 16;
-			y = ylatch + y_no * (0x100 - zoomy) / 16;
-			zx = xlatch + (x_no + 1) * (0x100 - zoomx) / 16 - x;
-			zy = ylatch + (y_no + 1) * (0x100 - zoomy) / 16 - y;
+			/* Note: like taito_f2.c, this zoom implementation is wrong,
+			chopped up into 16x16 sections instead of one sprite. This
+			is especially visible in rambo3. */
+
+			x = xlatch + (x_no * (0xff - zoomx) + 15) / 16;
+			y = ylatch + (y_no * (0xff - zoomy) + 15) / 16;
+			zx = xlatch + ((x_no + 1) * (0xff - zoomx) + 15) / 16 - x;
+			zy = ylatch + ((y_no + 1) * (0xff - zoomy) + 15) / 16 - y;
 			y_no++;
 
 			if (y_no > y_num)
@@ -355,7 +359,7 @@ g_profiler.start(PROFILER_USER1);
 g_profiler.stop();
 }
 
-VIDEO_UPDATE( taitob )
+SCREEN_UPDATE( taitob )
 {
 	taitob_state *state = screen->machine->driver_data<taitob_state>();
 	UINT8 video_control = tc0180vcu_get_videoctrl(state->tc0180vcu, 0);
@@ -391,7 +395,7 @@ VIDEO_UPDATE( taitob )
 
 
 
-VIDEO_EOF( taitob )
+SCREEN_EOF( taitob )
 {
 	taitob_state *state = machine->driver_data<taitob_state>();
 	UINT8 video_control = tc0180vcu_get_videoctrl(state->tc0180vcu, 0);

@@ -636,7 +636,7 @@ static UINT8 display_world(vboy_state *state, int num, bitmap_t *bitmap, UINT8 r
 	return BIT(def,6);
 }
 
-static VIDEO_UPDATE( vboy )
+static SCREEN_UPDATE( vboy )
 {
 	vboy_state *state = screen->machine->driver_data<vboy_state>();
 	int i;
@@ -705,7 +705,6 @@ static MACHINE_CONFIG_START( vboy, vboy_state )
 	MCFG_PALETTE_INIT(vboy)
 
 	MCFG_VIDEO_START(vboy)
-	MCFG_VIDEO_UPDATE(vboy)
 
 	/* Left screen */
 	MCFG_SCREEN_ADD("3dleft", RASTER)
@@ -714,6 +713,7 @@ static MACHINE_CONFIG_START( vboy, vboy_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_SIZE(384, 224)
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 224-1)
+	MCFG_SCREEN_UPDATE(vboy)
 
 	/* Right screen */
 	MCFG_SCREEN_ADD("3dright", RASTER)
@@ -722,6 +722,7 @@ static MACHINE_CONFIG_START( vboy, vboy_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_SIZE(384, 224)
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 224-1)
+	MCFG_SCREEN_UPDATE(vboy)
 
 	/* cartridge */
 	MCFG_CARTSLOT_ADD("cart")

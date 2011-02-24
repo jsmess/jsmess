@@ -434,7 +434,7 @@ VIDEO_START( apple2e )
 }
 
 
-VIDEO_UPDATE( apple2 )
+SCREEN_UPDATE( apple2 )
 {
 	apple2_state *state = screen->machine->driver_data<apple2_state>();
 	int page;

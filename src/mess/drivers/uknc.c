@@ -44,7 +44,7 @@ static VIDEO_START( uknc )
 {
 }
 
-static VIDEO_UPDATE( uknc )
+static SCREEN_UPDATE( uknc )
 {
     return 0;
 }
@@ -74,11 +74,12 @@ static MACHINE_CONFIG_START( uknc, uknc_state )
     MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
     MCFG_SCREEN_SIZE(640, 480)
     MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+    MCFG_SCREEN_UPDATE(uknc)
+
     MCFG_PALETTE_LENGTH(2)
     MCFG_PALETTE_INIT(black_and_white)
 
     MCFG_VIDEO_START(uknc)
-    MCFG_VIDEO_UPDATE(uknc)
 MACHINE_CONFIG_END
 
 /* ROM definition */

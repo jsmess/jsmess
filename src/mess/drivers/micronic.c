@@ -437,7 +437,7 @@ static VIDEO_START( micronic )
 {
 }
 
-static VIDEO_UPDATE( micronic )
+static SCREEN_UPDATE( micronic )
 {
 	micronic_state *state = screen->machine->driver_data<micronic_state>();
 
@@ -492,6 +492,7 @@ static MACHINE_CONFIG_START( micronic, micronic_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(120, 64)	//6x20, 8x8
 	MCFG_SCREEN_VISIBLE_AREA(0, 120-1, 0, 64-1)
+    MCFG_SCREEN_UPDATE(micronic)
 
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
@@ -499,7 +500,6 @@ static MACHINE_CONFIG_START( micronic, micronic_state )
 	MCFG_PALETTE_INIT(micronic)
 
     MCFG_VIDEO_START(micronic)
-    MCFG_VIDEO_UPDATE(micronic)
 
 	MCFG_HD61830_ADD(HD61830_TAG, XTAL_4_9152MHz/2/2, lcdc_intf)
 

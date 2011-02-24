@@ -43,7 +43,7 @@ extern WRITE8_HANDLER( ut88mini_write_led );
 extern const gfx_layout ut88_charlayout;
 
 extern VIDEO_START( ut88 );
-extern VIDEO_UPDATE( ut88 );
+extern SCREEN_UPDATE( ut88 );
 
 
 #endif /* UT88_H_ */

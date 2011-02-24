@@ -54,7 +54,7 @@ WRITE16_HANDLER( cps1_gfxram_w );
 DRIVER_INIT( cps1 );
 
 VIDEO_START( cps1 );
-VIDEO_UPDATE( cps1 );
-VIDEO_EOF( cps1 );
+SCREEN_UPDATE( cps1 );
+SCREEN_EOF( cps1 );
 
 #endif

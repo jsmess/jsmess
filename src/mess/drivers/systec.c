@@ -62,7 +62,7 @@ static VIDEO_START( systec )
 {
 }
 
-static VIDEO_UPDATE( systec )
+static SCREEN_UPDATE( systec )
 {
 	return 0;
 }
@@ -82,12 +82,12 @@ static MACHINE_CONFIG_START( systec, systec_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(256, 192) /* border size not accurate */
 	MCFG_SCREEN_VISIBLE_AREA(0, 256 - 1, 0, 192 - 1)
+    MCFG_SCREEN_UPDATE(systec)
 
     MCFG_PALETTE_LENGTH(2)
     MCFG_PALETTE_INIT(black_and_white)
 
     MCFG_VIDEO_START(systec)
-    MCFG_VIDEO_UPDATE(systec)
 MACHINE_CONFIG_END
 
 

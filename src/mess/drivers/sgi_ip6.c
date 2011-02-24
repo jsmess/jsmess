@@ -63,7 +63,7 @@ static VIDEO_START( sgi_ip6 )
 {
 }
 
-static VIDEO_UPDATE( sgi_ip6 )
+static SCREEN_UPDATE( sgi_ip6 )
 {
 	return 0;
 }
@@ -239,11 +239,11 @@ static MACHINE_CONFIG_START( sgi_ip6, sgi_ip6_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+	MCFG_SCREEN_UPDATE(sgi_ip6)
 
 	MCFG_MACHINE_START( sgi_ip6 )
 
 	MCFG_VIDEO_START(sgi_ip6)
-	MCFG_VIDEO_UPDATE(sgi_ip6)
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( sgi_ip6 )

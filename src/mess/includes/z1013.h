@@ -38,7 +38,7 @@ extern SNAPSHOT_LOAD( z1013 );
 /*----------- defined in video/z1013.c -----------*/
 
 VIDEO_START( z1013 );
-VIDEO_UPDATE( z1013 );
+SCREEN_UPDATE( z1013 );
 
 
 #endif /* Z1013_H_ */

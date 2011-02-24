@@ -290,7 +290,7 @@ VIDEO_START( gdfs )
                 ---- ba98 ---- ---- ?                           0101 for all games
                 ---- ---- 7654 3210 signed global tilemap x offset
     1c0076-77   -e-- ---- ---- ---- global/local sprites coordinates
-                ---- ---- -6-- ---- shadow (2bits - 4bits)
+                ---- ---- 7--- ---- shadow (0 = 2 bits, 1 = 4 bits)
     1c0078-79   ---- ---- ---- ---- ?
     1c007a-7b   ---- ---- ---- ---- ?
                 ---- b--- ---- ---- sprite coordinate mode
@@ -984,9 +984,9 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 ***************************************************************************/
 
-VIDEO_UPDATE( eaglshot )
+SCREEN_UPDATE( eaglshot )
 {
-	return VIDEO_UPDATE_CALL(ssv);
+	return SCREEN_UPDATE_CALL(ssv);
 }
 
 /*
@@ -1165,12 +1165,12 @@ static void gdfs_draw_zooming_sprites(running_machine *machine, bitmap_t *bitmap
 	}	/* sprites list */
 }
 
-VIDEO_UPDATE( gdfs )
+SCREEN_UPDATE( gdfs )
 {
 	ssv_state *state = screen->machine->driver_data<ssv_state>();
 	int pri;
 
-	VIDEO_UPDATE_CALL(ssv);
+	SCREEN_UPDATE_CALL(ssv);
 
 	for (pri = 0; pri <= 0xf; pri++)
 		gdfs_draw_zooming_sprites(screen->machine, bitmap, cliprect, pri);
@@ -1189,24 +1189,24 @@ void ssv_enable_video(running_machine *machine, int enable)
 	state->enable_video = enable;
 }
 
-VIDEO_UPDATE( ssv )
+SCREEN_UPDATE( ssv )
 {
 	rectangle clip = { 0, 0, 0, 0 };
 
 	ssv_state *state = screen->machine->driver_data<ssv_state>();
 
+	// Shadow
 	if (state->scroll[0x76/2] & 0x0080)
 	{
 		// 4 bit shadows (mslider, stmblade)
-		state->shadow_pen_mask		=	0x1fff;
-		state->shadow_pen_shift	=	11;
+		state->shadow_pen_shift = 15-4;
 	}
 	else
 	{
 		// 2 bit shadows
-		state->shadow_pen_mask		=	0x3fff;
-		state->shadow_pen_shift	=	13;
+		state->shadow_pen_shift = 15-2;
 	}
+	state->shadow_pen_mask = (1 << state->shadow_pen_shift) - 1;
 
 	/* The background color is the first one in the palette */
 	bitmap_fill(bitmap,cliprect, 0);

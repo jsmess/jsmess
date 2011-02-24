@@ -349,7 +349,7 @@ void mm1_state::video_start()
 	VIDEO_START_CALL(generic_bitmapped);
 }
 
-bool mm1_state::video_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+bool mm1_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	/* text */
 	i8275_update(m_crtc, &bitmap, &cliprect);

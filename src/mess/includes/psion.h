@@ -71,7 +71,7 @@ public:
 
 	virtual void machine_start();
 	virtual void machine_reset();
-	bool video_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
+	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 
 	UINT8 kb_read(running_machine *machine);
 	void update_banks(running_machine *machine);

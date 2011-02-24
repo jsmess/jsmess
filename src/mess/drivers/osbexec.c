@@ -633,10 +633,12 @@ static MACHINE_CONFIG_START( osbexec, osbexec_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_FORMAT( BITMAP_FORMAT_INDEXED16 )
 	MCFG_SCREEN_RAW_PARAMS( MAIN_CLOCK/2, 768, 0, 640, 260, 0, 240 )	/* May not be correct */
-	MCFG_VIDEO_START( generic_bitmapped )
-	MCFG_VIDEO_UPDATE( generic_bitmapped )
+	MCFG_SCREEN_UPDATE( generic_bitmapped )
+
 	MCFG_PALETTE_LENGTH( 3 )
 	MCFG_PALETTE_INIT( osbexec )
+
+	MCFG_VIDEO_START( generic_bitmapped )
 
 	MCFG_SPEAKER_STANDARD_MONO( "mono" )
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)

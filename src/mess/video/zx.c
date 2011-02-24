@@ -208,7 +208,7 @@ VIDEO_START( zx )
 	VIDEO_START_CALL(generic_bitmapped);
 }
 
-VIDEO_EOF( zx )
+SCREEN_EOF( zx )
 {
 	zx_state *state = machine->driver_data<zx_state>();
 	/* decrement video synchronization counter */

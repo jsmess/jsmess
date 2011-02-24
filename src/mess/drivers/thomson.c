@@ -615,11 +615,12 @@ static MACHINE_CONFIG_START( to7, driver_device )
      MCFG_SCREEN_SIZE ( THOM_TOTAL_WIDTH * 2, THOM_TOTAL_HEIGHT )
      MCFG_SCREEN_VISIBLE_AREA ( 0, THOM_TOTAL_WIDTH * 2 - 1,
 				0, THOM_TOTAL_HEIGHT - 1 )
+     MCFG_SCREEN_UPDATE ( thom )
+     MCFG_SCREEN_EOF ( thom )
+
      MCFG_PALETTE_LENGTH ( 4097 ) /* 12-bit color + transparency */
      MCFG_PALETTE_INIT ( thom )
      MCFG_VIDEO_START ( thom )
-     MCFG_VIDEO_UPDATE ( thom )
-     MCFG_VIDEO_EOF ( thom )
      MCFG_DEFAULT_LAYOUT( layout_thomson )
 
 /* sound */

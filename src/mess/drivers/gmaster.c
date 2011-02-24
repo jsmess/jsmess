@@ -176,7 +176,7 @@ static PALETTE_INIT( gmaster )
 	}
 }
 
-static VIDEO_UPDATE( gmaster )
+static SCREEN_UPDATE( gmaster )
 {
 	gmaster_state *state = screen->machine->driver_data<gmaster_state>();
     int x,y;
@@ -233,8 +233,9 @@ static MACHINE_CONFIG_START( gmaster, gmaster_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(64, 64)
 	MCFG_SCREEN_VISIBLE_AREA(0, 64-1-3, 0, 64-1)
+	MCFG_SCREEN_UPDATE(gmaster)
+
 	MCFG_PALETTE_LENGTH(sizeof(gmaster_palette)/sizeof(gmaster_palette[0]))
-	MCFG_VIDEO_UPDATE(gmaster)
 	MCFG_PALETTE_INIT(gmaster)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 

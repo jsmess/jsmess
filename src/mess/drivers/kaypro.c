@@ -236,12 +236,13 @@ static MACHINE_CONFIG_START( kayproii, kaypro_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(80*7, 24*10)
 	MCFG_SCREEN_VISIBLE_AREA(0,80*7-1,0,24*10-1)
+	MCFG_SCREEN_UPDATE( kayproii )
+
 	MCFG_GFXDECODE(kayproii)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(kaypro)
 
 	MCFG_VIDEO_START( kaypro )
-	MCFG_VIDEO_UPDATE( kayproii )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -283,6 +284,8 @@ static MACHINE_CONFIG_START( kaypro2x, kaypro_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(80*8, 25*16)
 	MCFG_SCREEN_VISIBLE_AREA(0,80*8-1,0,25*16-1)
+	MCFG_SCREEN_UPDATE( kaypro2x )
+
 	MCFG_GFXDECODE(kaypro2x)
 	MCFG_PALETTE_LENGTH(3)
 	MCFG_PALETTE_INIT(kaypro)
@@ -290,8 +293,7 @@ static MACHINE_CONFIG_START( kaypro2x, kaypro_state )
 	MCFG_MC6845_ADD("crtc", MC6845, 2000000, kaypro2x_crtc) /* comes out of ULA - needs to be measured */
 
 	MCFG_VIDEO_START( kaypro )
-	MCFG_VIDEO_UPDATE( kaypro2x )
-
+	
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("beep", BEEP, 0)
@@ -308,7 +310,8 @@ static MACHINE_CONFIG_START( kaypro2x, kaypro_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( omni2, kaypro4 )
-	MCFG_VIDEO_UPDATE( omni2 )
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE( omni2 )
 MACHINE_CONFIG_END
 
 /***********************************************************

@@ -35,7 +35,7 @@ static VIDEO_START( tk80 )
 {
 }
 
-static VIDEO_UPDATE( tk80 )
+static SCREEN_UPDATE( tk80 )
 {
 	return 0;
 }
@@ -65,7 +65,7 @@ static VIDEO_START( tk80bs )
 {
 }
 
-static VIDEO_UPDATE( tk80bs )
+static SCREEN_UPDATE( tk80bs )
 {
 	tk80bs_state *state = screen->machine->driver_data<tk80bs_state>();
 	int x,y;
@@ -361,13 +361,14 @@ static MACHINE_CONFIG_START( tk80, tk80bs_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+	MCFG_SCREEN_UPDATE(tk80)
+
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
 
 	MCFG_I8255A_ADD( "ppi8255_0", ppi8255_intf_0 )
 
 	MCFG_VIDEO_START(tk80)
-	MCFG_VIDEO_UPDATE(tk80)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( tk80bs, tk80bs_state )
@@ -387,12 +388,13 @@ static MACHINE_CONFIG_START( tk80bs, tk80bs_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(256, 128)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 128-1)
+	MCFG_SCREEN_UPDATE(tk80bs)
+
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
 	MCFG_GFXDECODE(tk80bs)
 
 	MCFG_VIDEO_START(tk80bs)
-	MCFG_VIDEO_UPDATE(tk80bs)
 
 	MCFG_TIMER_ADD_PERIODIC("keyboard_timer", keyboard_callback, attotime::from_hz(240/32))
 MACHINE_CONFIG_END

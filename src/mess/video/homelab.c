@@ -15,7 +15,7 @@ VIDEO_START( homelab )
 {
 }
 
-VIDEO_UPDATE( homelab )
+SCREEN_UPDATE( homelab )
 {
 	int x,y,j,b;
 	UINT8 *gfx = screen->machine->region("gfx1")->base();
@@ -38,7 +38,7 @@ VIDEO_UPDATE( homelab )
 	return 0;
 }
 
-VIDEO_UPDATE( homelab3 )
+SCREEN_UPDATE( homelab3 )
 {
 	int x,y,j,b;
 	UINT8 *gfx = screen->machine->region("gfx1")->base();

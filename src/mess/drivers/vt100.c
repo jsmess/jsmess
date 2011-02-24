@@ -300,7 +300,7 @@ static INPUT_PORTS_START( vt100 )
 		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED) // Always return 0x7f on last scan line
 INPUT_PORTS_END
 
-static VIDEO_UPDATE( vt100 )
+static SCREEN_UPDATE( vt100 )
 {
 	device_t *devconf = screen->machine->device("vt100_video");
 	vt_video_update( devconf, bitmap, cliprect);
@@ -408,13 +408,14 @@ static MACHINE_CONFIG_START( vt100, vt100_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(80*10, 25*10)
 	MCFG_SCREEN_VISIBLE_AREA(0, 80*10-1, 0, 25*10-1)
+	MCFG_SCREEN_UPDATE(vt100)
+
 	MCFG_GFXDECODE(vt100)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(monochrome_green)
 
 	MCFG_DEFAULT_LAYOUT( layout_vt100 )
 	MCFG_VIDEO_START(generic_bitmapped)
-	MCFG_VIDEO_UPDATE(vt100)
 
 	MCFG_VT100_VIDEO_ADD("vt100_video", vt100_video_interface)
 

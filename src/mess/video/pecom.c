@@ -108,7 +108,7 @@ static VIDEO_START( pecom )
 	state->save_pointer(NAME(state->charram), PECOM_CHAR_RAM_SIZE);
 }
 
-static VIDEO_UPDATE( pecom )
+static SCREEN_UPDATE( pecom )
 {
 	pecom_state *state = screen->machine->driver_data<pecom_state>();
 
@@ -119,9 +119,9 @@ static VIDEO_UPDATE( pecom )
 
 MACHINE_CONFIG_FRAGMENT( pecom_video )
 	MCFG_CDP1869_SCREEN_PAL_ADD(SCREEN_TAG, CDP1869_DOT_CLK_PAL)
+	MCFG_SCREEN_UPDATE(pecom)
 
 	MCFG_VIDEO_START(pecom)
-	MCFG_VIDEO_UPDATE(pecom)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

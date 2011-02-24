@@ -15,7 +15,7 @@ VIDEO_START( z1013 )
 {
 }
 
-VIDEO_UPDATE( z1013 )
+SCREEN_UPDATE( z1013 )
 {
 	z1013_state *state = screen->machine->driver_data<z1013_state>();
 	UINT8 code, line;

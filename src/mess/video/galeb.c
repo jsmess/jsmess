@@ -27,7 +27,7 @@ VIDEO_START( galeb )
 {
 }
 
-VIDEO_UPDATE( galeb )
+SCREEN_UPDATE( galeb )
 {
 	galeb_state *state = screen->machine->driver_data<galeb_state>();
 	int x,y;

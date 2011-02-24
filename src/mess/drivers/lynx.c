@@ -78,11 +78,12 @@ static MACHINE_CONFIG_START( lynx, lynx_state )
 	/*MCFG_SCREEN_SIZE(160, 102)*/
 	MCFG_SCREEN_SIZE(160, 160)
 	MCFG_SCREEN_VISIBLE_AREA(0, 160-1, 0, 102-1)
+	MCFG_SCREEN_UPDATE( generic_bitmapped )
+
 	MCFG_PALETTE_LENGTH(0x1000)
 	MCFG_PALETTE_INIT( lynx )
 
 	MCFG_VIDEO_START( generic_bitmapped )
-	MCFG_VIDEO_UPDATE( generic_bitmapped )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -106,7 +106,7 @@ MACHINE_START( telestrat );
 /*----------- defined in video/oric.c -----------*/
 
 VIDEO_START( oric );
-VIDEO_UPDATE( oric );
+SCREEN_UPDATE( oric );
 
 
 #endif /* ORIC_H_ */

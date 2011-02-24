@@ -15,7 +15,7 @@ VIDEO_START( orao )
 {
 }
 
-VIDEO_UPDATE( orao )
+SCREEN_UPDATE( orao )
 {
 	orao_state *state = screen->machine->driver_data<orao_state>();
 	UINT8 code;

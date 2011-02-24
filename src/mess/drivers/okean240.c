@@ -64,7 +64,7 @@ static VIDEO_START( okean240 )
 }
 
 // The video appears to be bitmapped, but atm this produces scrolling garbage
-static VIDEO_UPDATE( okean240 )
+static SCREEN_UPDATE( okean240 )
 {
 	okean240_state *state = screen->machine->driver_data<okean240_state>();
 	UINT8 gfx;
@@ -125,12 +125,13 @@ static MACHINE_CONFIG_START( okean240, okean240_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+	MCFG_SCREEN_UPDATE(okean240)
+
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
 	MCFG_GFXDECODE(okean240)
 
 	MCFG_VIDEO_START(okean240)
-	MCFG_VIDEO_UPDATE(okean240)
 MACHINE_CONFIG_END
 
 /* ROM definition */

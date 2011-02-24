@@ -42,7 +42,7 @@ static VIDEO_START( sc1 )
 {
 }
 
-static VIDEO_UPDATE( sc1 )
+static SCREEN_UPDATE( sc1 )
 {
     return 0;
 }
@@ -62,11 +62,12 @@ static MACHINE_CONFIG_START( sc1, sc1_state )
     MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
     MCFG_SCREEN_SIZE(640, 480)
     MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+    MCFG_SCREEN_UPDATE(sc1)
+
     MCFG_PALETTE_LENGTH(2)
     MCFG_PALETTE_INIT(black_and_white)
 
     MCFG_VIDEO_START(sc1)
-    MCFG_VIDEO_UPDATE(sc1)
 MACHINE_CONFIG_END
 
 /* ROM definition */

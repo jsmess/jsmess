@@ -89,7 +89,7 @@ static VIDEO_START( rx78 )
 {
 }
 
-static VIDEO_UPDATE( rx78 )
+static SCREEN_UPDATE( rx78 )
 {
 	rx78_state *state = screen->machine->driver_data<rx78_state>();
 	UINT8 *vram = screen->machine->region("vram")->base();
@@ -466,11 +466,12 @@ static MACHINE_CONFIG_START( rx78, rx78_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(192, 184)
 	MCFG_SCREEN_VISIBLE_AREA(0, 192-1, 0, 184-1)
+	MCFG_SCREEN_UPDATE(rx78)
+
 	MCFG_PALETTE_LENGTH(16+1) //+1 for the background color
 	MCFG_GFXDECODE(rx78)
 
 	MCFG_VIDEO_START(rx78)
-	MCFG_VIDEO_UPDATE(rx78)
 
 	MCFG_CARTSLOT_ADD("cart")
 	MCFG_CARTSLOT_EXTENSION_LIST("rom")

@@ -364,7 +364,7 @@ static void apple3_video_graphics_chires(running_machine *machine,bitmap_t *bitm
 
 
 
-VIDEO_UPDATE( apple3 )
+SCREEN_UPDATE( apple3 )
 {
 	apple3_state *state = screen->machine->driver_data<apple3_state>();
 	switch(state->flags & (VAR_VM3|VAR_VM1|VAR_VM0))

@@ -109,6 +109,7 @@ VIDEO_START( armedf )
 {
 	armedf_state *state = machine->driver_data<armedf_state>();
 
+	state->oldmode = -1;
 	if (state->scroll_type == 4 || /* cclimbr2 */
 		state->scroll_type == 3 || /* legion */
 		state->scroll_type == 6 )  /* legiono */
@@ -328,7 +329,7 @@ static void copy_textmap(running_machine *machine, int index)
 
 }
 
-VIDEO_UPDATE( armedf )
+SCREEN_UPDATE( armedf )
 {
 	armedf_state *state = screen->machine->driver_data<armedf_state>();
 	int sprite_enable = state->vreg & 0x200;
@@ -406,17 +407,16 @@ VIDEO_UPDATE( armedf )
 
 	if (state->vreg & 0x0800)
 		tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
-	/*
-    if(state->vreg & 0x0800)
-    {
-        tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
-    }
-    else
-    {
-        bitmap_fill(bitmap, cliprect , get_black_pen(screen->machine) & 0x0f);
-    }*/
-
-
+#if 0
+	if(state->vreg & 0x0800)
+	{
+		tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
+	}
+	else
+	{
+		bitmap_fill(bitmap, cliprect , get_black_pen(screen->machine) & 0x0f);
+	}
+#endif
 
 	if ((state->mcu_mode & 0x0030) == 0x0030)
 		tilemap_draw(bitmap, cliprect, state->tx_tilemap, 0, 0);
@@ -443,13 +443,11 @@ VIDEO_UPDATE( armedf )
 
 	if(state->scroll_type == 3) /* legion */
 	{
-		static int oldmode=-1;
-
 		int mode=state->text_videoram[1]&0xff;
 
-		if (mode != oldmode)
+		if (mode != state->oldmode)
 		{
-			oldmode=mode;
+			state->oldmode=mode;
 			switch(mode)
 			{
 				case 0x01: copy_textmap(screen->machine, 4); break; /* title screen */
@@ -466,7 +464,7 @@ VIDEO_UPDATE( armedf )
 }
 
 
-VIDEO_EOF( armedf )
+SCREEN_EOF( armedf )
 {
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 

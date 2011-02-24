@@ -27,7 +27,7 @@ VIDEO_START( kramermc )
 {
 }
 
-VIDEO_UPDATE( kramermc )
+SCREEN_UPDATE( kramermc )
 {
 	int x,y;
 	address_space *space = cputag_get_address_space(screen->machine, "maincpu", ADDRESS_SPACE_PROGRAM);

@@ -392,7 +392,7 @@ static void apple1_vh_cursor_blink (running_machine *machine)
 	}
 }
 
-VIDEO_UPDATE( apple1 )
+SCREEN_UPDATE( apple1 )
 {
 	apple1_state *state = screen->machine->driver_data<apple1_state>();
 	apple1_vh_cursor_blink(screen->machine);

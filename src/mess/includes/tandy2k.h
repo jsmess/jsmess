@@ -60,7 +60,7 @@ public:
 
 	virtual void machine_start();
 
-	virtual bool video_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
+	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 
 	void speaker_update();
 	void dma_request(int line, int state);

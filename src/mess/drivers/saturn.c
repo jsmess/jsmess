@@ -2420,11 +2420,12 @@ static MACHINE_CONFIG_START( saturn, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB15)
 	MCFG_SCREEN_SIZE(704*2, 512*2)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 703, 0*8, 511) // we need to use a resolution as high as the max size it can change to
+	MCFG_SCREEN_UPDATE(stv_vdp2)
+
 	MCFG_PALETTE_LENGTH(2048+(2048*2))//standard palette + extra memory for rgb brightness.
 	MCFG_GFXDECODE(saturn)
 
 	MCFG_VIDEO_START(stv_vdp2)
-	MCFG_VIDEO_UPDATE(stv_vdp2)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 

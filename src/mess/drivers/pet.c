@@ -637,7 +637,7 @@ static VIDEO_START( pet_crtc )
 {
 }
 
-static VIDEO_UPDATE( pet_crtc )
+static SCREEN_UPDATE( pet_crtc )
 {
 	device_t *mc6845 = screen->machine->device("crtc");
 	mc6845_update(mc6845, bitmap, cliprect);
@@ -674,11 +674,11 @@ static MACHINE_CONFIG_START( pet_general, pet_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(320, 200)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320 - 1, 0, 200 - 1)
+	MCFG_SCREEN_UPDATE( pet )
+	
 	MCFG_GFXDECODE( pet )
 	MCFG_PALETTE_LENGTH(ARRAY_LENGTH(pet_palette) / 3)
 	MCFG_PALETTE_INIT( pet )
-
-	MCFG_VIDEO_UPDATE( pet )
 
 	/* cassette */
 	MCFG_CASSETTE_ADD( "cassette1", cbm_cassette_config )
@@ -734,7 +734,8 @@ static MACHINE_CONFIG_DERIVED( pet40, pet )
 	MCFG_MC6845_ADD("crtc", MC6845, XTAL_17_73447MHz/3	/* This is a wild guess and mostly likely incorrect */, crtc_pet40)
 
 	MCFG_VIDEO_START( pet_crtc )
-	MCFG_VIDEO_UPDATE( pet_crtc )
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE( pet_crtc )
 
 	MCFG_FRAGMENT_ADD(pet4_cartslot)
 MACHINE_CONFIG_END
@@ -759,12 +760,12 @@ static MACHINE_CONFIG_DERIVED( pet80, pet_general )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(640, 250)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640 - 1, 0, 250 - 1)
+	MCFG_SCREEN_UPDATE( pet_crtc )
 
 	MCFG_MC6845_ADD("crtc", MC6845, XTAL_12MHz / 2	/* This is a wild guess and mostly likely incorrect */, crtc_pet80)
 
 	MCFG_GFXDECODE( pet80 )
 	MCFG_VIDEO_START( pet_crtc )
-	MCFG_VIDEO_UPDATE( pet_crtc )
 
 	MCFG_PIA6821_MODIFY( "pia_0", petb_pia0 )
 

@@ -481,7 +481,7 @@ static void draw_gfxbitmap(running_machine *machine, bitmap_t *bitmap,int plane,
 	}
 }
 
-static VIDEO_UPDATE( x1 )
+static SCREEN_UPDATE( x1 )
 {
 	x1_state *state = screen->machine->driver_data<x1_state>();
 
@@ -494,7 +494,7 @@ static VIDEO_UPDATE( x1 )
 	return 0;
 }
 
-static VIDEO_EOF( x1 )
+static SCREEN_EOF( x1 )
 {
 }
 
@@ -2497,6 +2497,9 @@ static MACHINE_CONFIG_START( x1, x1_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+	MCFG_SCREEN_UPDATE(x1)
+	MCFG_SCREEN_EOF(x1)
+
 	MCFG_MC6845_ADD("crtc", H46505, (VDP_CLOCK/48), mc6845_intf) //unknown divider
 	MCFG_PALETTE_LENGTH(0x10+0x1000)
 	MCFG_PALETTE_INIT(x1)
@@ -2504,8 +2507,6 @@ static MACHINE_CONFIG_START( x1, x1_state )
 	MCFG_GFXDECODE(x1)
 
 	MCFG_VIDEO_START(x1)
-	MCFG_VIDEO_UPDATE(x1)
-	MCFG_VIDEO_EOF(x1)
 
 	MCFG_MB8877_ADD("fdc",x1_mb8877a_interface)
 

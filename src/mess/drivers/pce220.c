@@ -33,7 +33,7 @@ static VIDEO_START( pce220 )
 {
 }
 
-static VIDEO_UPDATE( pce220 )
+static SCREEN_UPDATE( pce220 )
 {
 	int x, y, xi,yi;
 	int count = 0;
@@ -240,12 +240,13 @@ static MACHINE_CONFIG_START( pce220, pce220_state )
     MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
     MCFG_SCREEN_SIZE(32*8, 32*8)
     MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 0, 32*8-1)
+    MCFG_SCREEN_UPDATE(pce220)
+
     MCFG_PALETTE_LENGTH(2)
     MCFG_PALETTE_INIT(black_and_white)
 	MCFG_GFXDECODE(pce220)
 
     MCFG_VIDEO_START(pce220)
-    MCFG_VIDEO_UPDATE(pce220)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

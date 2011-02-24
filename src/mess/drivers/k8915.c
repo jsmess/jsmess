@@ -85,7 +85,7 @@ static VIDEO_START( k8915 )
 	state->charrom = machine->region("chargen")->base();
 }
 
-static VIDEO_UPDATE( k8915 )
+static SCREEN_UPDATE( k8915 )
 {
 	k8915_state *state = screen->machine->driver_data<k8915_state>();
 	UINT8 y,ra,chr,gfx;
@@ -165,12 +165,12 @@ static MACHINE_CONFIG_START( k8915, k8915_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(640, 250)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 249)
+	MCFG_SCREEN_UPDATE(k8915)
 
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(k8915)
 
 	MCFG_VIDEO_START(k8915)
-	MCFG_VIDEO_UPDATE(k8915)
 
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, k8915_terminal_intf) // keyboard only
 MACHINE_CONFIG_END

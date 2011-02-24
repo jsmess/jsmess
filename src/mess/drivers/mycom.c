@@ -88,7 +88,7 @@ static VIDEO_START( mycom )
 	state->gfx_rom = machine->region("gfx")->base();
 }
 
-static VIDEO_UPDATE( mycom )
+static SCREEN_UPDATE( mycom )
 {
 	mycom_state *state = screen->machine->driver_data<mycom_state>();
 	mc6845_update(state->mc6845, bitmap, cliprect);
@@ -549,6 +549,8 @@ static MACHINE_CONFIG_START( mycom, mycom_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 192-1)
+	MCFG_SCREEN_UPDATE(mycom)
+
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
 	MCFG_GFXDECODE(mycom)
@@ -558,7 +560,6 @@ static MACHINE_CONFIG_START( mycom, mycom_state )
 	MCFG_MC6845_ADD("crtc", MC6845, 1008000, mc6845_intf)
 
 	MCFG_VIDEO_START(mycom)
-	MCFG_VIDEO_UPDATE(mycom)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_WAVE_ADD("wave", "cassette")

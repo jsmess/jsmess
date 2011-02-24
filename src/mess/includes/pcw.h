@@ -66,7 +66,8 @@ public:
 /*----------- defined in video/pcw.c -----------*/
 
 extern VIDEO_START( pcw );
-extern VIDEO_UPDATE( pcw );
+extern SCREEN_UPDATE( pcw );
+extern SCREEN_UPDATE( pcw_printer );
 extern PALETTE_INIT( pcw );
 
 

@@ -394,7 +394,8 @@ static MACHINE_CONFIG_DERIVED( invadpt2, mw8080bw_root )
 	MCFG_MB14241_ADD("mb14241")
 
 	/* video hardware */
-	MCFG_VIDEO_UPDATE(invadpt2)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(invadpt2)
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(invaders_samples_audio)
@@ -569,7 +570,8 @@ static MACHINE_CONFIG_DERIVED( cosmo, mw8080bw_root )
 	MCFG_MACHINE_START(extra_8080bw)
 
 	/* video hardware */
-	MCFG_VIDEO_UPDATE(cosmo)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(cosmo)
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(invaders_samples_audio)
@@ -798,7 +800,8 @@ static MACHINE_CONFIG_DERIVED( lrescue, mw8080bw_root )
 	MCFG_MB14241_ADD("mb14241")
 
 	/* video hardware */
-	MCFG_VIDEO_UPDATE(invadpt2)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(invadpt2)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -946,7 +949,8 @@ static MACHINE_CONFIG_DERIVED( rollingc, mw8080bw_root )
 	MCFG_MB14241_ADD("mb14241")
 
 	/* video hardware */
-	MCFG_VIDEO_UPDATE(rollingc)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(rollingc)
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(invaders_samples_audio)
@@ -1063,7 +1067,8 @@ static MACHINE_CONFIG_DERIVED( schaser, mw8080bw_root )
 	MCFG_MB14241_ADD("mb14241")
 
 	/* video hardware */
-	MCFG_VIDEO_UPDATE(schaser)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(schaser)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1131,7 +1136,8 @@ static MACHINE_CONFIG_DERIVED( schasercv, mw8080bw_root )
 	MCFG_MB14241_ADD("mb14241")
 
 	/* video hardware */
-	MCFG_VIDEO_UPDATE(schasercv)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(schasercv)
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(invaders_samples_audio)
@@ -1150,18 +1156,7 @@ MACHINE_CONFIG_END
 
 static CUSTOM_INPUT( sflush_80_r )
 {
-	mw8080bw_state *state = field->port->machine->driver_data<mw8080bw_state>();
-	state->sfl_int ^= 1;	/* vblank flag ? */
-
-	return state->sfl_int;
-}
-
-static MACHINE_START( sflush )
-{
-	mw8080bw_state *state = machine->driver_data<mw8080bw_state>();
-	state->save_item(NAME(state->sfl_int));
-
-	MACHINE_START_CALL(mw8080bw);
+	return (field->port->machine->primary_screen->vpos() & 0x80) ? 1 : 0;
 }
 
 static ADDRESS_MAP_START( sflush_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -1203,7 +1198,7 @@ static INPUT_PORTS_START( sflush )
 	PORT_DIPNAME( 0x40, 0x00, "Coinage Display" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(sflush_80_r, NULL)	/* vblank? */
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(sflush_80_r, NULL) // 128V?
 
 	PORT_START("PADDLE")
 	PORT_BIT( 0xff, 0x6a, IPT_PADDLE ) PORT_MINMAX(0x16,0xbf) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_CENTERDELTA(0)
@@ -1213,16 +1208,17 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_DERIVED( sflush, mw8080bw_root )
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu",M6800,2000000)   	/* ?? */
+	MCFG_CPU_REPLACE("maincpu",M6800,1500000) // ?
 	MCFG_CPU_PROGRAM_MAP(sflush_map)
 	MCFG_CPU_VBLANK_INT_HACK(irq0_line_pulse,2)
-	MCFG_MACHINE_START(sflush)
+	MCFG_MACHINE_START(mw8080bw)
 
 	/* add shifter */
 	MCFG_MB14241_ADD("mb14241")
 
 	/* video hardware */
-	MCFG_VIDEO_UPDATE(sflush)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(sflush)
 
 MACHINE_CONFIG_END
 
@@ -1328,7 +1324,8 @@ static MACHINE_CONFIG_DERIVED( lupin3, mw8080bw_root )
 	MCFG_MB14241_ADD("mb14241")
 
 	/* video hardware */
-	MCFG_VIDEO_UPDATE(indianbt)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(indianbt)
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(invaders_samples_audio)
@@ -1347,7 +1344,8 @@ static MACHINE_CONFIG_DERIVED( lupin3a, mw8080bw_root )
 	MCFG_MB14241_ADD("mb14241")
 
 	/* video hardware */
-	MCFG_VIDEO_UPDATE(lupin3)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(lupin3)
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(invaders_samples_audio)
@@ -1467,7 +1465,8 @@ static MACHINE_CONFIG_DERIVED( polaris, mw8080bw_root )
 	MCFG_MB14241_ADD("mb14241")
 
 	/* video hardware */
-	MCFG_VIDEO_UPDATE(polaris)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(polaris)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1589,7 +1588,8 @@ static MACHINE_CONFIG_DERIVED( ballbomb, mw8080bw_root )
 	MCFG_MB14241_ADD("mb14241")
 
 	/* video hardware */
-	MCFG_VIDEO_UPDATE(ballbomb)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(ballbomb)
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(invaders_samples_audio)
@@ -1762,7 +1762,8 @@ static MACHINE_CONFIG_DERIVED( indianbt, mw8080bw_root )
 	MCFG_MB14241_ADD("mb14241")
 
 	/* video hardware */
-	MCFG_VIDEO_UPDATE(indianbt)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(indianbt)
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(invaders_samples_audio)
@@ -1835,7 +1836,8 @@ static MACHINE_CONFIG_DERIVED( steelwkr, mw8080bw_root )
 	MCFG_MB14241_ADD("mb14241")
 
 	/* video hardware */
-	MCFG_VIDEO_UPDATE(invadpt2)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(invadpt2)
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(invaders_samples_audio)
@@ -1970,7 +1972,7 @@ static MACHINE_CONFIG_DERIVED( shuttlei, mw8080bw_root )
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 24*8-1)
-	MCFG_VIDEO_UPDATE(shuttlei)
+	MCFG_SCREEN_UPDATE(shuttlei)
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(invaders_samples_audio)
@@ -2150,7 +2152,8 @@ MACHINE_CONFIG_DERIVED( vortex, mw8080bw_root )
 
 	/* video hardware */
 	// TODO: replace with modified invaders color renderer code allowing midscanline color writes
-	MCFG_VIDEO_UPDATE(invaders)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(invaders)
 
 	/* add shifter */
 	MCFG_MB14241_ADD("mb14241")
@@ -3309,7 +3312,7 @@ GAME( 1979, grescue,  lrescue,  lrescue,  lrescue,  0, ROT270, "Taito (Universal
 GAME( 1979, desterth, lrescue,  lrescue,  invrvnge, 0, ROT270, "bootleg", "Destination Earth", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
 GAME( 1979, invadpt2, 0,        invadpt2, invadpt2, 0, ROT270, "Taito", "Space Invaders Part II (Taito)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
 GAME( 1980, invaddlx, invadpt2, invaders, invadpt2, 0, ROT270, "Taito (Midway license)", "Space Invaders Deluxe", GAME_SUPPORTS_SAVE )
-GAME( 1980, vortex,   0,        vortex,   vortex, vortex, ROT270, "Zilec Electronics Ltd.", "Vortex", GAME_IMPERFECT_COLORS | GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND ) /* Encrypted 8080/IO */
+GAME( 1980, vortex,   0,        vortex,   vortex, vortex, ROT270, "Zilec Electronics", "Vortex", GAME_IMPERFECT_COLORS | GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND ) /* Encrypted 8080/IO */
 GAME( 1979, cosmo,    0,        cosmo,    cosmo,    0, ROT90,  "TDS & Mints", "Cosmo", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
 GAME( 1979, schaser,  0,        schaser,  schaser,  0, ROT270, "Taito", "Space Chaser", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_COLORS )
 GAME( 1979, schasercv,schaser,  schasercv,schasercv,0, ROT270, "Taito", "Space Chaser (CV version)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_COLORS )

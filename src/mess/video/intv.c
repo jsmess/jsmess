@@ -781,7 +781,7 @@ WRITE8_HANDLER( intvkbd_tms9927_w )
 	}
 }
 
-VIDEO_UPDATE( intvkbd )
+SCREEN_UPDATE( intvkbd )
 {
 	intv_state *state = screen->machine->driver_data<intv_state>();
 	UINT8 *videoram = state->videoram;
@@ -790,7 +790,7 @@ VIDEO_UPDATE( intvkbd )
 //  char c;
 
 	/* Draw the underlying INTV screen first */
-	VIDEO_UPDATE_CALL(generic_bitmapped);
+	SCREEN_UPDATE_CALL(generic_bitmapped);
 
 	/* if the intvkbd text is not blanked, overlay it */
 	if (!state->intvkbd_text_blanked)

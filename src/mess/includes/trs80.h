@@ -106,11 +106,11 @@ READ8_DEVICE_HANDLER (trs80_wd179x_r);
 /*----------- defined in video/trs80.c -----------*/
 
 VIDEO_START( trs80 );
-VIDEO_UPDATE( trs80 );
-VIDEO_UPDATE( ht1080z );
-VIDEO_UPDATE( lnw80 );
-VIDEO_UPDATE( radionic );
-VIDEO_UPDATE( trs80m4 );
+SCREEN_UPDATE( trs80 );
+SCREEN_UPDATE( ht1080z );
+SCREEN_UPDATE( lnw80 );
+SCREEN_UPDATE( radionic );
+SCREEN_UPDATE( trs80m4 );
 
 WRITE8_HANDLER ( trs80m4_88_w );
 

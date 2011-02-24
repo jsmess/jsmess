@@ -64,7 +64,7 @@ static VIDEO_START( pc9801 )
 	state->tvram = auto_alloc_array(machine, UINT16, 0x2000*2);
 }
 
-static VIDEO_UPDATE( pc9801 )
+static SCREEN_UPDATE( pc9801 )
 {
 	pc9801_state *state = screen->machine->driver_data<pc9801_state>();
 	int x,y;
@@ -1244,12 +1244,13 @@ static MACHINE_CONFIG_START( pc9801, pc9801_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
+	MCFG_SCREEN_UPDATE(pc9801)
+
 	MCFG_PALETTE_LENGTH(16)
 	MCFG_PALETTE_INIT(pc9801)
 	MCFG_GFXDECODE(pc9801)
 
 	MCFG_VIDEO_START(pc9801)
-	MCFG_VIDEO_UPDATE(pc9801)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

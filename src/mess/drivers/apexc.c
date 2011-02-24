@@ -590,7 +590,7 @@ static void apexc_draw_string(running_machine *machine, bitmap_t *bitmap, const 
 }
 
 
-static VIDEO_UPDATE( apexc )
+static SCREEN_UPDATE( apexc )
 {
 	apexc_state *state = screen->machine->driver_data<apexc_state>();
 	int i;
@@ -880,13 +880,13 @@ static MACHINE_CONFIG_START( apexc, apexc_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(256, 192)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 192-1)
+	MCFG_SCREEN_UPDATE(apexc)
 
 	MCFG_GFXDECODE(apexc)
 	MCFG_PALETTE_LENGTH(APEXC_PALETTE_SIZE)
 
 	MCFG_PALETTE_INIT(apexc)
 	MCFG_VIDEO_START(apexc)
-	MCFG_VIDEO_UPDATE(apexc)
 
 	MCFG_APEXC_CYLINDER_ADD("cylinder")
 	MCFG_APEXC_TAPE_PUNCHER_ADD("tape_puncher")

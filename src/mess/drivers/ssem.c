@@ -439,7 +439,7 @@ static void glyph_print(running_machine *machine, bitmap_t *bitmap, INT32 x, INT
     }
 }
 
-static VIDEO_UPDATE( ssem )
+static SCREEN_UPDATE( ssem )
 {
 	ssem_state *state = screen->machine->driver_data<ssem_state>();
     UINT32 line = 0;
@@ -642,11 +642,12 @@ static MACHINE_CONFIG_START( ssem, ssem_state )
     MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
     MCFG_SCREEN_SIZE(256, 280)
     MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 279)
+    MCFG_SCREEN_UPDATE(ssem)
+
     MCFG_PALETTE_LENGTH(2)
     MCFG_PALETTE_INIT(black_and_white)
 
     MCFG_VIDEO_START(generic_bitmapped)
-    MCFG_VIDEO_UPDATE(ssem)
 
     /* cartridge */
     MCFG_CARTSLOT_ADD("cart")

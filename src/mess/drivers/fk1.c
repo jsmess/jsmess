@@ -396,7 +396,7 @@ static MACHINE_START( fk1 )
 {
 }
 
-static VIDEO_UPDATE( fk1 )
+static SCREEN_UPDATE( fk1 )
 {
 	fk1_state *state = screen->machine->driver_data<fk1_state>();
 	UINT8 code;
@@ -434,10 +434,11 @@ static MACHINE_CONFIG_START( fk1, fk1_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
+	MCFG_SCREEN_UPDATE(fk1)
+
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
 
-	MCFG_VIDEO_UPDATE(fk1)
 
 	MCFG_PIT8253_ADD( "pit8253", fk1_pit8253_intf )
 	MCFG_I8255A_ADD( "ppi8255_1", fk1_ppi8255_interface_1 )

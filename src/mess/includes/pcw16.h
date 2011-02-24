@@ -55,7 +55,7 @@ public:
 
 extern PALETTE_INIT( pcw16 );
 extern VIDEO_START( pcw16 );
-extern VIDEO_UPDATE( pcw16 );
+extern SCREEN_UPDATE( pcw16 );
 
 
 #endif /* PCW16_H_ */

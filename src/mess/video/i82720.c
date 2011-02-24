@@ -1473,7 +1473,7 @@ static void compis_gdc_start(running_machine *machine, const compis_gdc_interfac
 	VIDEO_START_CALL(generic_bitmapped);
 }
 
-VIDEO_UPDATE(compis_gdc)
+SCREEN_UPDATE(compis_gdc)
 {
 	int dirty;
 

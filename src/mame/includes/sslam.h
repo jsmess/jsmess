@@ -32,11 +32,12 @@ public:
 
 /*----------- defined in video/sslam.c -----------*/
 
+WRITE16_HANDLER( sslam_paletteram_w );
 WRITE16_HANDLER( sslam_tx_tileram_w );
 WRITE16_HANDLER( sslam_md_tileram_w );
 WRITE16_HANDLER( sslam_bg_tileram_w );
 WRITE16_HANDLER( powerbls_bg_tileram_w );
 VIDEO_START(sslam);
 VIDEO_START(powerbls);
-VIDEO_UPDATE(sslam);
-VIDEO_UPDATE(powerbls);
+SCREEN_UPDATE(sslam);
+SCREEN_UPDATE(powerbls);

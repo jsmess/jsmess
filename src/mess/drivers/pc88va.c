@@ -370,7 +370,7 @@ static void draw_text(running_machine *machine, bitmap_t *bitmap, const rectangl
 	}
 }
 
-static VIDEO_UPDATE( pc88va )
+static SCREEN_UPDATE( pc88va )
 {
 	pc88va_state *state = screen->machine->driver_data<pc88va_state>();
 	UINT8 pri,cur_pri_lv;
@@ -1638,12 +1638,13 @@ static MACHINE_CONFIG_START( pc88va, pc88va_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
+	MCFG_SCREEN_UPDATE( pc88va )
+
 	MCFG_PALETTE_LENGTH(32)
 //  MCFG_PALETTE_INIT( pc8801 )
 	MCFG_GFXDECODE( pc88va )
 
 	MCFG_VIDEO_START( pc88va )
-	MCFG_VIDEO_UPDATE( pc88va )
 
 	MCFG_MACHINE_START( pc88va )
 	MCFG_MACHINE_RESET( pc88va )

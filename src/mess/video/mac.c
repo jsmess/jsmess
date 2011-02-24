@@ -34,7 +34,7 @@ VIDEO_START( mac )
 #define MAC_MAIN_SCREEN_BUF_OFFSET	0x5900
 #define MAC_ALT_SCREEN_BUF_OFFSET	0xD900
 
-VIDEO_UPDATE( mac )
+SCREEN_UPDATE( mac )
 {
 	UINT32 video_base;
 	const UINT16 *video_ram;
@@ -62,7 +62,7 @@ VIDEO_UPDATE( mac )
 	return 0;
 }
 
-VIDEO_UPDATE( macse30 )
+SCREEN_UPDATE( macse30 )
 {
 	UINT32 video_base;
 	const UINT16 *video_ram;
@@ -111,7 +111,7 @@ VIDEO_START( mac_cb264 )
 	mac->m_cb264_mode = 0;
 }
 
-// we do this here because VIDEO_UPDATE is called constantly when stepping in the debugger,
+// we do this here because SCREEN_UPDATE is called constantly when stepping in the debugger,
 // which makes it hard to get accurate timings (or escape the VIA2 IRQ handler)
 INTERRUPT_GEN( mac_cb264_vbl )
 {
@@ -123,7 +123,7 @@ INTERRUPT_GEN( mac_cb264_vbl )
 	}
 }
 
-VIDEO_UPDATE( mac_cb264 )
+SCREEN_UPDATE( mac_cb264 )
 {
 	UINT32 *scanline, *base;
 	int x, y;
@@ -415,7 +415,7 @@ VIDEO_START( macv8 )
 	mac->m_rbv_type = RBV_TYPE_V8;
 }
 
-VIDEO_UPDATE( macrbv )
+SCREEN_UPDATE( macrbv )
 {
 	UINT32 *scanline;
 	int x, y, hres, vres;
@@ -532,7 +532,7 @@ VIDEO_UPDATE( macrbv )
 	return 0;
 }
 
-VIDEO_UPDATE( macrbvvram )
+SCREEN_UPDATE( macrbvvram )
 {
 	UINT32 *scanline;
 	int x, y;

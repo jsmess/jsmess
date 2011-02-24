@@ -59,7 +59,7 @@ static VIDEO_START( vt520 )
 {
 }
 
-static VIDEO_UPDATE( vt520 )
+static SCREEN_UPDATE( vt520 )
 {
     return 0;
 }
@@ -79,11 +79,12 @@ static MACHINE_CONFIG_START( vt520, vt520_state )
     MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
     MCFG_SCREEN_SIZE(802, 480)
     MCFG_SCREEN_VISIBLE_AREA(0, 802-1, 0, 480-1)
+    MCFG_SCREEN_UPDATE(vt520)
+
     MCFG_PALETTE_LENGTH(2)
     MCFG_PALETTE_INIT(black_and_white)
 
     MCFG_VIDEO_START(vt520)
-    MCFG_VIDEO_UPDATE(vt520)
 
 	// On the board there are two M5M44256BJ-7 chips
 	// Which are DRAM 256K x 4bit

@@ -150,6 +150,18 @@ the layer is misplaced however, different scroll regs?
 #include "includes/kaneko16.h"
 #include "sound/okim6295.h"
 
+
+class expro02_state : public driver_device
+{
+public:
+	expro02_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT16 vram_0_bank_num;
+	UINT16 vram_1_bank_num;
+};
+
+
 /*************************************
  *
  *  Game-specific port definitions
@@ -313,12 +325,12 @@ static WRITE16_HANDLER( galsnew_paletteram_w )
 	palette_set_color_rgb(space->machine,offset,pal5bit(data >> 6),pal5bit(data >> 11),pal5bit(data >> 1));
 }
 
-static UINT16 vram_0_bank_num = 0, vram_1_bank_num = 0;
 
 static WRITE16_HANDLER(galsnew_vram_0_bank_w)
 {
+	expro02_state *state = space->machine->driver_data<expro02_state>();
 	int i;
-	if(vram_0_bank_num != data)
+	if(state->vram_0_bank_num != data)
 	{
 		for(i = 0; i < 0x1000 / 2; i += 2)
 		{
@@ -327,14 +339,15 @@ static WRITE16_HANDLER(galsnew_vram_0_bank_w)
 				kaneko16_vram_0_w(space, i+1, data << 8, 0xFF00);
 			}
 		}
-		vram_0_bank_num = data;
+		state->vram_0_bank_num = data;
 	}
 }
 
 static WRITE16_HANDLER(galsnew_vram_1_bank_w)
 {
+	expro02_state *state = space->machine->driver_data<expro02_state>();
 	int i;
-	if(vram_1_bank_num != data)
+	if(state->vram_1_bank_num != data)
 	{
 		for(i = 0; i < 0x1000 / 2; i += 2)
 		{
@@ -343,7 +356,7 @@ static WRITE16_HANDLER(galsnew_vram_1_bank_w)
 				kaneko16_vram_1_w(space, i+1, data << 8, 0xFF00);
 			}
 		}
-		vram_1_bank_num = data;
+		state->vram_1_bank_num = data;
 	}
 }
 
@@ -475,7 +488,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( galsnew, driver_device )
+static MACHINE_CONFIG_START( galsnew, expro02_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)
@@ -491,13 +504,13 @@ static MACHINE_CONFIG_START( galsnew, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 256-32-1)
+	MCFG_SCREEN_UPDATE(galsnew)
 
 	MCFG_GFXDECODE(1x4bit_1x4bit)
 	MCFG_PALETTE_LENGTH(2048 + 32768)
 	MCFG_MACHINE_RESET( galsnew )
 
 	MCFG_VIDEO_START(galsnew)
-	MCFG_VIDEO_UPDATE(galsnew)
 	MCFG_PALETTE_INIT(berlwall)
 
 	/* arm watchdog */

@@ -210,7 +210,7 @@ READ8_HANDLER( fm7_console_ram_banked_r );
 WRITE8_HANDLER( fm7_console_ram_banked_w );
 
 VIDEO_START( fm7 );
-VIDEO_UPDATE( fm7 );
+SCREEN_UPDATE( fm7 );
 PALETTE_INIT( fm7 );
 
 #endif /*FM7_H_*/

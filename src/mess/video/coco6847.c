@@ -137,7 +137,7 @@ struct _m6847_vdg
 	unsigned int text_offset : 2;			/* needed for CoCo 3 */
 
 	/* video state; every scanline the video state for the scanline is copied
-     * here and only rendered in VIDEO_UPDATE */
+     * here and only rendered in SCREEN_UPDATE */
 	int dirty;
 	int using_custom;
 	UINT32 border[384];
@@ -1937,7 +1937,7 @@ void m6847_init(running_machine *machine, const m6847_config *cfg)
 
 
 
-VIDEO_UPDATE(m6847)
+SCREEN_UPDATE(m6847)
 {
 	int row, i;
 	UINT32 rc = 0;

@@ -52,7 +52,7 @@ VIDEO_START( trs80 )
 
 
 /* 7 or 8-bit video, 32/64 characters per line = trs80, trs80l2, sys80 */
-VIDEO_UPDATE( trs80 )
+SCREEN_UPDATE( trs80 )
 {
 	trs80_state *state = screen->machine->driver_data<trs80_state>();
 	UINT8 *videoram = state->videoram;
@@ -116,7 +116,7 @@ VIDEO_UPDATE( trs80 )
 }
 
 /* 8-bit video, 32/64/40/80 characters per line = trs80m3, trs80m4. */
-VIDEO_UPDATE( trs80m4 )
+SCREEN_UPDATE( trs80m4 )
 {
 	trs80_state *state = screen->machine->driver_data<trs80_state>();
 	UINT8 *videoram = state->videoram;
@@ -213,7 +213,7 @@ VIDEO_UPDATE( trs80m4 )
 }
 
 /* 7 or 8-bit video, 64/32 characters per line = ht1080z, ht1080z2, ht108064 */
-VIDEO_UPDATE( ht1080z )
+SCREEN_UPDATE( ht1080z )
 {
 	trs80_state *state = screen->machine->driver_data<trs80_state>();
 	UINT8 *videoram = state->videoram;
@@ -274,7 +274,7 @@ VIDEO_UPDATE( ht1080z )
 }
 
 /* 8-bit video, 64/80 characters per line = lnw80 */
-VIDEO_UPDATE( lnw80 )
+SCREEN_UPDATE( lnw80 )
 {
 	trs80_state *state = screen->machine->driver_data<trs80_state>();
 	UINT8 *videoram = state->videoram;
@@ -449,7 +449,7 @@ VIDEO_UPDATE( lnw80 )
 }
 
 /* lores characters are in the character generator. Each character is 8x16. */
-VIDEO_UPDATE( radionic )
+SCREEN_UPDATE( radionic )
 {
 	trs80_state *state = screen->machine->driver_data<trs80_state>();
 	UINT8 *videoram = state->videoram;

@@ -47,6 +47,6 @@ extern WRITE8_HANDLER(vector06_disc_w);
 
 extern PALETTE_INIT( vector06 );
 extern VIDEO_START( vector06 );
-extern VIDEO_UPDATE( vector06 );
+extern SCREEN_UPDATE( vector06 );
 
 #endif /* VECTOR06_H_ */

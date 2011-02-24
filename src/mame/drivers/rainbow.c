@@ -325,7 +325,6 @@ Stephh's notes (based on the game M68000 code and some tests) :
 #include "audio/taitosnd.h"
 #include "sound/2203intf.h"
 #include "sound/2151intf.h"
-#include "includes/rastan.h"
 #include "includes/rainbow.h"
 
 
@@ -696,11 +695,10 @@ static MACHINE_CONFIG_START( rainbow, rainbow_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE(rainbow)
 
 	MCFG_GFXDECODE(rainbow)
 	MCFG_PALETTE_LENGTH(8192)
-
-	MCFG_VIDEO_UPDATE(rainbow)
 
 	MCFG_PC080SN_ADD("pc080sn", rainbow_pc080sn_intf)
 	MCFG_PC090OJ_ADD("pc090oj", rainbow_pc090oj_intf)
@@ -739,12 +737,12 @@ static MACHINE_CONFIG_START( jumping, rainbow_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE(jumping)
 
 	MCFG_GFXDECODE(jumping)
 	MCFG_PALETTE_LENGTH(8192)
 
 	MCFG_VIDEO_START(jumping)
-	MCFG_VIDEO_UPDATE(jumping)
 
 	MCFG_PC080SN_ADD("pc080sn", jumping_pc080sn_intf)
 

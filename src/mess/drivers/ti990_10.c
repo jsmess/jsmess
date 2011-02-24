@@ -150,7 +150,7 @@ static VIDEO_START( ti990_10 )
 	state->terminal = machine->device("vdt911");
 }
 
-static VIDEO_UPDATE( ti990_10 )
+static SCREEN_UPDATE( ti990_10 )
 {
 	ti990_10_state *state = screen->machine->driver_data<ti990_10_state>();
 	vdt911_refresh(state->terminal, bitmap, 0, 0);
@@ -224,6 +224,8 @@ static MACHINE_CONFIG_START( ti990_10, ti990_10_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(560, 280)
 	MCFG_SCREEN_VISIBLE_AREA(0, 560-1, 0, /*250*/280-1)
+	MCFG_SCREEN_UPDATE(ti990_10)
+	/*MCFG_SCREEN_EOF(name)*/
 
 	MCFG_GFXDECODE(vdt911)
 	MCFG_PALETTE_LENGTH(8)
@@ -231,8 +233,6 @@ static MACHINE_CONFIG_START( ti990_10, ti990_10_state )
 	MCFG_PALETTE_INIT(vdt911)
 	MCFG_VDT911_VIDEO_ADD("vdt911", vdt911_intf)
 	MCFG_VIDEO_START(ti990_10)
-	/*MCFG_VIDEO_EOF(name)*/
-	MCFG_VIDEO_UPDATE(ti990_10)
 
 	/* 911 VDT has a beep tone generator */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

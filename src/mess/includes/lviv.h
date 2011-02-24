@@ -37,7 +37,7 @@ SNAPSHOT_LOAD( lviv );
 /*----------- defined in video/lviv.c -----------*/
 
 extern VIDEO_START( lviv );
-extern VIDEO_UPDATE( lviv );
+extern SCREEN_UPDATE( lviv );
 extern const unsigned char lviv_palette[8*3];
 extern PALETTE_INIT( lviv );
 extern void lviv_update_palette(running_machine *, UINT8);

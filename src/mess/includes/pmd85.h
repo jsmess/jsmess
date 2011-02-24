@@ -53,7 +53,7 @@ extern MACHINE_RESET( pmd85 );
 /*----------- defined in video/pmd85.c -----------*/
 
 extern VIDEO_START( pmd85 );
-extern VIDEO_UPDATE( pmd85 );
+extern SCREEN_UPDATE( pmd85 );
 extern const unsigned char pmd85_palette[3*3];
 extern PALETTE_INIT( pmd85 );
 

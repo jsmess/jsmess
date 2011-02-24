@@ -626,7 +626,7 @@ static MACHINE_RESET( ngp )
 }
 
 
-static VIDEO_UPDATE( ngp )
+static SCREEN_UPDATE( ngp )
 {
 	ngp_state *state = screen->machine->driver_data<ngp_state>();
 
@@ -780,12 +780,13 @@ static MACHINE_CONFIG_START( ngp_common, ngp_state )
 	MCFG_SCREEN_ADD( "screen", LCD )
 	MCFG_SCREEN_FORMAT( BITMAP_FORMAT_INDEXED16 )
 	MCFG_SCREEN_RAW_PARAMS( XTAL_6_144MHz, 515, 0, 160 /*480*/, 199, 0, 152 )
+	MCFG_SCREEN_UPDATE( ngp )
+
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
 	MCFG_MACHINE_START( ngp )
 	MCFG_MACHINE_RESET( ngp )
 
-	MCFG_VIDEO_UPDATE( ngp )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO( "lspeaker","rspeaker" )

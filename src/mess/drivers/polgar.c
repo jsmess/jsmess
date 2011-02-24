@@ -254,7 +254,7 @@ static VIDEO_START( polgar )
 
 }
 
-static VIDEO_UPDATE( polgar )
+static SCREEN_UPDATE( polgar )
 {
 	hd44780_device * hd44780 = screen->machine->device<hd44780_device>("hd44780");
 	return hd44780->video_update( bitmap, cliprect );
@@ -467,6 +467,8 @@ static MACHINE_CONFIG_START( polgar, polgar_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(100, 20)
 	MCFG_SCREEN_VISIBLE_AREA(0, 100-1, 0, 20-1)
+	MCFG_SCREEN_UPDATE(polgar)
+
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(polgar)
 
@@ -475,7 +477,6 @@ static MACHINE_CONFIG_START( polgar, polgar_state )
 	MCFG_HD44780_ADD("hd44780", polgar_display)
 
 	MCFG_VIDEO_START(polgar)
-	MCFG_VIDEO_UPDATE(polgar)
 
 
 	//MCFG_DEFAULT_LAYOUT(layout_van16)

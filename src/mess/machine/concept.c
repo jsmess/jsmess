@@ -100,7 +100,7 @@ VIDEO_START(concept)
 {
 }
 
-VIDEO_UPDATE(concept)
+SCREEN_UPDATE(concept)
 {
 	/* resolution is 720*560 */
 	concept_state *state = screen->machine->driver_data<concept_state>();

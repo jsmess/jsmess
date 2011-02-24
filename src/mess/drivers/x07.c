@@ -968,7 +968,7 @@ static PALETTE_INIT( x07 )
 }
 
 
-bool x07_state::video_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+bool x07_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	bitmap_fill(&bitmap, NULL, 0);
 

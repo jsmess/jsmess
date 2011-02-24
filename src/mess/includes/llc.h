@@ -41,8 +41,8 @@ extern WRITE8_HANDLER(llc2_basic_enable_w);
 /*----------- defined in video/llc.c -----------*/
 
 extern VIDEO_START( llc1 );
-extern VIDEO_UPDATE( llc1 );
+extern SCREEN_UPDATE( llc1 );
 extern VIDEO_START( llc2 );
-extern VIDEO_UPDATE( llc2 );
+extern SCREEN_UPDATE( llc2 );
 
 #endif

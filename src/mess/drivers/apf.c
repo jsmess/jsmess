@@ -86,7 +86,7 @@ static WRITE_LINE_DEVICE_HANDLER( apf_mc6847_fs_w )
 	apf_update_ints(device->machine);
 }
 
-static VIDEO_UPDATE( apf )
+static SCREEN_UPDATE( apf )
 {
 	device_t *mc6847 = screen->machine->device("mc6847");
 	return mc6847_update(mc6847, bitmap, cliprect);
@@ -709,13 +709,13 @@ static MACHINE_CONFIG_START( apf_imagination, apf_state )
 	//  MCFG_CPU_ADD("maincpu", M6800, 3750000)        /* 7.8336 MHz, only 6800p type used 1 MHz max*/
 	MCFG_CPU_ADD("maincpu", M6800, 1000000 )        /* backgammon uses timing from vertical interrupt to switch between video modes during frame */
 	MCFG_CPU_PROGRAM_MAP(apf_imagination_map)
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(M6847_NTSC_FRAMES_PER_SECOND)
 
 	MCFG_MACHINE_START( apf_imagination )
 
 	/* video hardware */
-	MCFG_VIDEO_UPDATE(apf)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(M6847_NTSC_FRAMES_PER_SECOND)
+	MCFG_SCREEN_UPDATE(apf)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(320, 25+192+26)

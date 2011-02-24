@@ -421,7 +421,7 @@ static CDP1864_INTERFACE( cosmicos_cdp1864_intf )
 	0  // not connected
 };
 
-static VIDEO_UPDATE( cosmicos )
+static SCREEN_UPDATE( cosmicos )
 {
 	cosmicos_state *state = screen->machine->driver_data<cosmicos_state>();
 
@@ -628,9 +628,9 @@ static MACHINE_CONFIG_START( cosmicos, cosmicos_state )
 	MCFG_TIMER_ADD_PERIODIC("interrupt", int_tick, attotime::from_hz(1000))
 
 	MCFG_CDP1864_SCREEN_ADD(SCREEN_TAG, XTAL_1_75MHz)
+	MCFG_SCREEN_UPDATE(cosmicos)
 
 	MCFG_PALETTE_LENGTH(8+8)
-	MCFG_VIDEO_UPDATE(cosmicos)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

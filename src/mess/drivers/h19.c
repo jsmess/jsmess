@@ -289,7 +289,7 @@ static VIDEO_START( h19 )
 	state->charrom = machine->region("chargen")->base();
 }
 
-static VIDEO_UPDATE( h19 )
+static SCREEN_UPDATE( h19 )
 {
 	device_t *mc6845 = screen->machine->device("crtc");
 	mc6845_update(mc6845, bitmap, cliprect);
@@ -405,6 +405,8 @@ static MACHINE_CONFIG_START( h19, h19_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(640, 200)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640 - 1, 0, 200 - 1)
+	MCFG_SCREEN_UPDATE( h19 )
+
 	MCFG_GFXDECODE(h19)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
@@ -414,7 +416,6 @@ static MACHINE_CONFIG_START( h19, h19_state )
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, h19_terminal_intf) // keyboard only
 
 	MCFG_VIDEO_START( h19 )
-	MCFG_VIDEO_UPDATE( h19 )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

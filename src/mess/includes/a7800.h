@@ -52,7 +52,7 @@ public:
 /*----------- defined in video/a7800.c -----------*/
 
 VIDEO_START( a7800 );
-VIDEO_UPDATE( a7800 );
+SCREEN_UPDATE( a7800 );
 INTERRUPT_GEN( a7800_interrupt );
  READ8_HANDLER( a7800_MARIA_r );
 WRITE8_HANDLER( a7800_MARIA_w );

@@ -66,7 +66,7 @@ void superpet_vh_init (running_machine *machine)
 }
 
 //  commodore pet discrete video circuit
-VIDEO_UPDATE( pet )
+SCREEN_UPDATE( pet )
 {
 	pet_state *state = screen->machine->driver_data<pet_state>();
 	UINT8 *videoram = state->videoram;

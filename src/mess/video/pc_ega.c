@@ -502,7 +502,7 @@ static struct
     Prototypes
 */
 static VIDEO_START( pc_ega );
-static VIDEO_UPDATE( pc_ega );
+static SCREEN_UPDATE( pc_ega );
 static PALETTE_INIT( pc_ega );
 static CRTC_EGA_UPDATE_ROW( ega_update_row );
 static CRTC_EGA_ON_DE_CHANGED( ega_de_changed );
@@ -549,14 +549,14 @@ MACHINE_CONFIG_FRAGMENT( pcvideo_ega )
 	MCFG_SCREEN_ADD(EGA_SCREEN_NAME, RASTER)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_RAW_PARAMS(16257000,912,0,640,262,0,200)
-	MCFG_PALETTE_LENGTH( 64 )
+	MCFG_SCREEN_UPDATE( pc_ega )
 
+	MCFG_PALETTE_LENGTH( 64 )
 	MCFG_PALETTE_INIT(pc_ega)
 
 	MCFG_CRTC_EGA_ADD(EGA_CRTC_NAME, 16257000/8, crtc_ega_ega_intf)
 
 	MCFG_VIDEO_START( pc_ega )
-	MCFG_VIDEO_UPDATE( pc_ega )
 MACHINE_CONFIG_END
 
 
@@ -695,7 +695,7 @@ static VIDEO_START( pc_ega )
 }
 
 
-static VIDEO_UPDATE( pc_ega )
+static SCREEN_UPDATE( pc_ega )
 {
 	crtc_ega_update( ega.crtc_ega, bitmap, cliprect);
 	return 0;

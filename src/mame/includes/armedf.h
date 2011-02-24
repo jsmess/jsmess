@@ -24,13 +24,14 @@ public:
 	UINT16   bg_scrollx, bg_scrolly;
 	int      scroll_type, sprite_offy, mcu_mode, old_mcu_mode;
 	int      waiting_msb;
+	int      oldmode;
 };
 
 
 /*----------- defined in video/armedf.c -----------*/
 
-VIDEO_UPDATE( armedf );
-VIDEO_EOF( armedf );
+SCREEN_UPDATE( armedf );
+SCREEN_EOF( armedf );
 VIDEO_START( armedf );
 
 WRITE16_HANDLER( armedf_bg_videoram_w );

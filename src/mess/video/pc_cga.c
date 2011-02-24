@@ -160,7 +160,7 @@ INPUT_PORTS_END
 #define CGA_CHIPSET_PARADISE    0x80    /* Paradise (used in PC1640) */
 
 
-static VIDEO_UPDATE( mc6845_cga );
+static SCREEN_UPDATE( mc6845_cga );
 static READ8_HANDLER( pc_cga8_r );
 static WRITE8_HANDLER( pc_cga8_w );
 static READ16_HANDLER( pc_cga16le_r );
@@ -171,10 +171,10 @@ static MC6845_UPDATE_ROW( cga_update_row );
 static WRITE_LINE_DEVICE_HANDLER( cga_hsync_changed );
 static WRITE_LINE_DEVICE_HANDLER( cga_vsync_changed );
 static VIDEO_START( pc1512 );
-static VIDEO_UPDATE( mc6845_pc1512 );
+static SCREEN_UPDATE( mc6845_pc1512 );
 
 static VIDEO_START( cga_poisk2 );
-static VIDEO_UPDATE( cga_poisk2 );
+static SCREEN_UPDATE( cga_poisk2 );
 
 static const mc6845_interface mc6845_cga_intf =
 {
@@ -195,14 +195,14 @@ MACHINE_CONFIG_FRAGMENT( pcvideo_cga )
 	MCFG_SCREEN_ADD(CGA_SCREEN_NAME, RASTER)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_14_31818MHz,912,0,640,262,0,200)
-	MCFG_PALETTE_LENGTH(/* CGA_PALETTE_SETS * 16*/ 65536 )
+	MCFG_SCREEN_UPDATE( mc6845_cga )
 
+	MCFG_PALETTE_LENGTH(/* CGA_PALETTE_SETS * 16*/ 65536 )
 	MCFG_PALETTE_INIT(pc_cga)
 
 	MCFG_MC6845_ADD(CGA_MC6845_NAME, MC6845, XTAL_14_31818MHz/8, mc6845_cga_intf)
 
 	MCFG_VIDEO_START( pc_cga )
-	MCFG_VIDEO_UPDATE( mc6845_cga )
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_FRAGMENT( pcvideo_cga32k )
@@ -213,13 +213,15 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_FRAGMENT( pcvideo_poisk2 )
 	MCFG_FRAGMENT_ADD( pcvideo_cga )
 	MCFG_VIDEO_START( cga_poisk2 )
-	MCFG_VIDEO_UPDATE( cga_poisk2 )
+	MCFG_SCREEN_MODIFY(CGA_SCREEN_NAME)
+	MCFG_SCREEN_UPDATE( cga_poisk2 )
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_FRAGMENT( pcvideo_pc1512 )
 	MCFG_FRAGMENT_ADD( pcvideo_cga )
 	MCFG_VIDEO_START( pc1512 )
-	MCFG_VIDEO_UPDATE( mc6845_pc1512 )
+	MCFG_SCREEN_MODIFY(CGA_SCREEN_NAME)
+	MCFG_SCREEN_UPDATE( mc6845_pc1512 )
 MACHINE_CONFIG_END
 
 
@@ -553,7 +555,7 @@ static VIDEO_START( pc_cga32k )
 	ntsc_decoder_init( machine, &s_ntsc, 8, 256 );
 }
 
-static VIDEO_UPDATE( mc6845_cga )
+static SCREEN_UPDATE( mc6845_cga )
 {
 	UINT8 *gfx = screen->machine->region("gfx1")->base();
 	device_t *devconf = screen->machine->device(CGA_MC6845_NAME);
@@ -579,7 +581,7 @@ static VIDEO_START( cga_poisk2 )
 	cga.chr_gen = machine->region( "gfx1" )->base() + 0x0000;
 }
 
-static VIDEO_UPDATE( cga_poisk2 )
+static SCREEN_UPDATE( cga_poisk2 )
 {
 	UINT8 *gfx = screen->machine->region("gfx1")->base();
 	device_t *devconf = screen->machine->device(CGA_MC6845_NAME);
@@ -1820,7 +1822,7 @@ static VIDEO_START( pc1512 )
 }
 
 
-static VIDEO_UPDATE( mc6845_pc1512 )
+static SCREEN_UPDATE( mc6845_pc1512 )
 {
 	UINT8 *gfx = screen->machine->region("gfx1")->base();
 	device_t *devconf = screen->machine->device(CGA_MC6845_NAME);

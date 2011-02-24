@@ -829,7 +829,7 @@ VIDEO_START( lisa )
 /*
     Video update
 */
-VIDEO_UPDATE( lisa )
+SCREEN_UPDATE( lisa )
 {
 	lisa_state *state = screen->machine->driver_data<lisa_state>();
 	UINT16 *v;

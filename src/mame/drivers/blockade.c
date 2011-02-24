@@ -34,6 +34,8 @@
 #include "sound/samples.h"
 #include "sound/discrete.h"
 
+#include "blockade.lh"
+
 #define BLOCKADE_LOG 0
 #define MASTER_CLOCK XTAL_20_079MHz
 
@@ -240,7 +242,7 @@ static INPUT_PORTS_START( blasto )
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x04, DEF_STR( On ) )
 	PORT_CONFNAME( 0x08, 0x08, DEF_STR( Game_Time ) )
-	PORT_CONFSETTING(    0x00, "70 Secs" )
+	PORT_CONFSETTING(    0x00, "70 Secs" ) // though service manual says 60
 	PORT_CONFSETTING(    0x08, "90 Secs" )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -439,22 +441,10 @@ static GFXDECODE_START( blasto )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, blasto_layout,   0, 1 )
 GFXDECODE_END
 
-
-static PALETTE_INIT( green )
+static PALETTE_INIT( blockade )
 {
 	palette_set_color(machine,0,MAKE_RGB(0x00,0x00,0x00)); /* BLACK */
-	palette_set_color(machine,1,MAKE_RGB(0x00,0xff,0x00)); /* GREEN */     /* overlay (Blockade) */
-}
-
-static PALETTE_INIT( yellow )
-{
-	palette_set_color(machine,0,MAKE_RGB(0x00,0x00,0x00)); /* BLACK */
-	palette_set_color(machine,1,MAKE_RGB(0xff,0xff,0x20)); /* YELLOW */     /* overlay (Hustle) */
-}
-static PALETTE_INIT( bw )
-{
-	palette_set_color(machine,0,MAKE_RGB(0x00,0x00,0x00)); /* BLACK */
-	palette_set_color(machine,1,MAKE_RGB(0xff,0xff,0xff)); /* WHITE */     /* Comotion/Blasto */
+	palette_set_color(machine,1,MAKE_RGB(0xff,0xff,0xff)); /* WHITE */
 }
 
 
@@ -498,13 +488,13 @@ static MACHINE_CONFIG_START( blockade, blockade_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*8, 28*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
+	MCFG_SCREEN_UPDATE(blockade)
 
 	MCFG_GFXDECODE(blockade)
 	MCFG_PALETTE_LENGTH(2)
 
-	MCFG_PALETTE_INIT(green)
+	MCFG_PALETTE_INIT(blockade)
 	MCFG_VIDEO_START(blockade)
-	MCFG_VIDEO_UPDATE(blockade)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -518,18 +508,8 @@ static MACHINE_CONFIG_START( blockade, blockade_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( comotion, blockade )
-	MCFG_PALETTE_INIT(bw)
-MACHINE_CONFIG_END
-
 static MACHINE_CONFIG_DERIVED( blasto, blockade )
 	MCFG_GFXDECODE(blasto)
-	MCFG_PALETTE_INIT(bw)
-MACHINE_CONFIG_END
-
-static MACHINE_CONFIG_DERIVED( hustle, blockade )
-	MCFG_GFXDECODE(blasto)
-	MCFG_PALETTE_INIT(yellow)
 MACHINE_CONFIG_END
 
 /*************************************
@@ -610,9 +590,9 @@ ROM_END
  *
  *************************************/
 
-GAME( 1976, blockade,  0,        blockade, blockade, 0, ROT0, "Gremlin", "Blockade", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1976, comotion,  0,        comotion, comotion, 0, ROT0, "Gremlin", "Comotion", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1978, blasto,    0,        blasto,   blasto,   0, ROT0, "Gremlin", "Blasto", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1977, hustle,    0,        hustle,   hustle,   0, ROT0, "Gremlin", "Hustle", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAMEL(1976, blockade,  0,        blockade, blockade, 0, ROT0, "Gremlin", "Blockade", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_blockade )
+GAMEL(1976, comotion,  0,        blockade, comotion, 0, ROT0, "Gremlin", "Comotion", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_blockade )
+GAME( 1978, blasto,    0,        blasto,   blasto,   0, ROT0, "Gremlin", "Blasto", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // b/w, no overlay
+GAMEL(1977, hustle,    0,        blasto,   hustle,   0, ROT0, "Gremlin", "Hustle", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_blockade ) // also seen with a yellow overlay, but much less common than green
 GAME( 1977, mineswpr,  0,        blasto,   mineswpr, 0, ROT0, "Amutech", "Minesweeper", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1977, mineswpr4, mineswpr, blasto,   mineswpr4,0, ROT0, "Amutech", "Minesweeper (4-Player)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )

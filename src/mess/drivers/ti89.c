@@ -484,7 +484,7 @@ void ti68k_state::machine_reset()
 }
 
 /* video */
-bool ti68k_state::video_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+bool ti68k_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	/* preliminary implementation, doesn't use the contrast value */
 	UINT8 width = screen.width();

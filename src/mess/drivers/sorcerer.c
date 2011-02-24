@@ -330,7 +330,7 @@ static GFXDECODE_START( sorcerer )
 	GFXDECODE_ENTRY( "maincpu", 0xf800, sorcerer_charlayout, 0, 1 )
 GFXDECODE_END
 
-static VIDEO_UPDATE( sorcerer )
+static SCREEN_UPDATE( sorcerer )
 {
 	UINT8 y,ra,chr,gfx;
 	UINT16 sy=0,ma=0xf080,x;
@@ -417,12 +417,11 @@ static MACHINE_CONFIG_START( sorcerer, sorcerer_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(64*8, 30*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 64*8-1, 0, 30*8-1)
+	MCFG_SCREEN_UPDATE( sorcerer )
 
 	MCFG_GFXDECODE(sorcerer)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
-
-	MCFG_VIDEO_UPDATE( sorcerer )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

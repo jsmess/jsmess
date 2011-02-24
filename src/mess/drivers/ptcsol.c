@@ -560,7 +560,7 @@ static VIDEO_START( sol20 )
 	state->FNT = machine->region("chargen")->base();
 }
 
-static VIDEO_UPDATE( sol20 )
+static SCREEN_UPDATE( sol20 )
 {
 // Visible screen is 64 x 16, with start position controlled by scroll register.
 // Each character is 9 pixels wide (blank ones at the right) and 13 lines deep.
@@ -678,12 +678,13 @@ static MACHINE_CONFIG_START( sol20, sol20_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(576, 208)
 	MCFG_SCREEN_VISIBLE_AREA(0, 575, 0, 207)
+	MCFG_SCREEN_UPDATE(sol20)
+
 	MCFG_GFXDECODE(sol20)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
 
 	MCFG_VIDEO_START(sol20)
-	MCFG_VIDEO_UPDATE(sol20)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

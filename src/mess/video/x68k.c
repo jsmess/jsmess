@@ -1114,7 +1114,7 @@ VIDEO_START( x68000 )
 //  state->scanline_timer->adjust(attotime::zero, 0, attotime::from_hz(55.45)/568);
 }
 
-VIDEO_UPDATE( x68000 )
+SCREEN_UPDATE( x68000 )
 {
 	x68k_state *state = screen->machine->driver_data<x68k_state>();
 	rectangle rect = {0,0,0,0};

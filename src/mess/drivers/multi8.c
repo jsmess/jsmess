@@ -50,7 +50,7 @@ static VIDEO_START( multi8 )
 	state->bw_mode = 0;
 }
 
-static VIDEO_UPDATE( multi8 )
+static SCREEN_UPDATE( multi8 )
 {
 	multi8_state *state = screen->machine->driver_data<multi8_state>();
 	int x,y,count;
@@ -591,6 +591,8 @@ static MACHINE_CONFIG_START( multi8, multi8_state )
     MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
     MCFG_SCREEN_SIZE(640, 200)
     MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
+    MCFG_SCREEN_UPDATE(multi8)
+
     MCFG_PALETTE_LENGTH(8)
     MCFG_PALETTE_INIT(multi8)
 	MCFG_GFXDECODE(multi8)
@@ -598,7 +600,6 @@ static MACHINE_CONFIG_START( multi8, multi8_state )
 	MCFG_MC6845_ADD("crtc", H46505, XTAL_3_579545MHz/2, mc6845_intf)	/* unknown clock, hand tuned to get ~60 fps */
 
     MCFG_VIDEO_START(multi8)
-    MCFG_VIDEO_UPDATE(multi8)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

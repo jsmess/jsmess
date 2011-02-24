@@ -56,7 +56,7 @@ PALETTE_INIT( nes )
 
 ***************************************************************************/
 
-VIDEO_UPDATE( nes )
+SCREEN_UPDATE( nes )
 {
 	nes_state *state = screen->machine->driver_data<nes_state>();
 

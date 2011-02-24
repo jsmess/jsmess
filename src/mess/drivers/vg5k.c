@@ -318,7 +318,7 @@ static VIDEO_START( vg5k )
 {
 }
 
-static VIDEO_UPDATE( vg5k )
+static SCREEN_UPDATE( vg5k )
 {
 	vg5k_state *vg5k = screen->machine->driver_data<vg5k_state>();
 
@@ -410,12 +410,12 @@ static MACHINE_CONFIG_START( vg5k, vg5k_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(336, 300)
 	MCFG_SCREEN_VISIBLE_AREA(00, 336-1, 00, 270-1)
+	MCFG_SCREEN_UPDATE(vg5k)
 
 	MCFG_GFXDECODE(vg5k)
 	MCFG_PALETTE_LENGTH(8)
 
 	MCFG_VIDEO_START(vg5k)
-	MCFG_VIDEO_UPDATE(vg5k)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

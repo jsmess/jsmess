@@ -146,20 +146,20 @@ NVRAM_HANDLER( mac );
 /*----------- defined in video/mac.c -----------*/
 
 VIDEO_START( mac );
-VIDEO_UPDATE( mac );
-VIDEO_UPDATE( macse30 );
+SCREEN_UPDATE( mac );
+SCREEN_UPDATE( macse30 );
 PALETTE_INIT( mac );
 
 VIDEO_START( macrbv );
 VIDEO_START( macv8 );
 VIDEO_START( macsonora );
-VIDEO_UPDATE( macrbv );
-VIDEO_UPDATE( macrbvvram );
+SCREEN_UPDATE( macrbv );
+SCREEN_UPDATE( macrbvvram );
 VIDEO_RESET(macrbv);
 VIDEO_RESET(maceagle);
 
 VIDEO_START( mac_cb264 );
-VIDEO_UPDATE( mac_cb264 );
+SCREEN_UPDATE( mac_cb264 );
 INTERRUPT_GEN( mac_cb264_vbl );
 
 /*----------- defined in audio/mac.c -----------*/

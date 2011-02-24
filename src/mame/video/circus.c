@@ -1,12 +1,8 @@
 /***************************************************************************
 
-  video.c
+  circus.c video
 
   Functions to emulate the video hardware of the machine.
-
-  CHANGES:
-  MAB 05 MAR 99 - changed overlay support to use artwork functions
-  AAT 12 MAY 02 - rewrote Ripcord and added pixel-wise collision
 
 ***************************************************************************/
 
@@ -67,28 +63,42 @@ static void draw_line( bitmap_t *bitmap, const rectangle *cliprect, int x1, int 
 			*BITMAP_ADDR16(bitmap, y1, count) = 1;
 }
 
-static void draw_robot_box( bitmap_t *bitmap, const rectangle *cliprect, int x, int y )
+static void draw_sprite_collision( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	/* Box */
-	int ex = x + 24;
-	int ey = y + 26;
+	circus_state *state = machine->driver_data<circus_state>();
+	const gfx_element *sprite_gfx = machine->gfx[1];
+	const UINT8 *sprite_data = gfx_element_get_data(sprite_gfx, state->clown_z);
+	int sx, sy, dx, dy;
+	int pixel, collision = 0;
 
-	draw_line(bitmap, cliprect, x, y, ex, y, 0);       /* Top */
-	draw_line(bitmap, cliprect, x, ey, ex, ey, 0);     /* Bottom */
-	draw_line(bitmap, cliprect, x, y, x, ey, 0);       /* Left */
-	draw_line(bitmap, cliprect, ex, y, ex, ey, 0);     /* Right */
+	// draw sprite and check collision on a pixel basis
+	for (sy = 0; sy < 16; sy++)
+	{
+		dy = state->clown_x + sy-1;
+		if (dy>=0 && dy<bitmap->height)
+		{
+			for (sx = 0; sx < 16; sx++)
+			{
+				dx = state->clown_y + sx;
+				if (dx>=0 && dx<bitmap->width)
+				{
+					pixel = sprite_data[sy * sprite_gfx->line_modulo + sx];
+					if (pixel)
+					{
+						collision |= *BITMAP_ADDR16(bitmap, dy, dx);
+						*BITMAP_ADDR16(bitmap, dy, dx) = machine->pens[pixel];
+					}
+				}
+			}
+		}
+	}
 
-	/* Score Grid */
-	ey = y + 10;
-	draw_line(bitmap, cliprect, x + 8, ey, ex, ey, 0);   /* Horizontal Divide Line */
-	draw_line(bitmap, cliprect, x + 8, y, x + 8, ey, 0);
-	draw_line(bitmap, cliprect, x + 16, y, x + 16, ey, 0);
+	if (collision)
+		cpu_set_input_line(state->maincpu, 0, ASSERT_LINE);
 }
 
 static void circus_draw_fg( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	circus_state *state = machine->driver_data<circus_state>();
-
 	/* The sync generator hardware is used to   */
 	/* draw the border and diving boards        */
 
@@ -97,24 +107,37 @@ static void circus_draw_fg( running_machine *machine, bitmap_t *bitmap, const re
 	draw_line(bitmap, cliprect, 0, 18, 0, 248, 0);
 	draw_line(bitmap, cliprect, 247, 18, 247, 248, 0);
 
-	draw_line(bitmap, cliprect, 0, 137, 17, 137, 0);
-	draw_line(bitmap, cliprect, 231, 137, 248, 137, 0);
-	draw_line(bitmap, cliprect, 0, 193, 17, 193, 0);
-	draw_line(bitmap, cliprect, 231, 193, 248, 193, 0);
-
-	drawgfx_transpen(bitmap,cliprect,machine->gfx[1],
-			state->clown_z,
-			0,
-			0,0,
-			state->clown_y, state->clown_x, 0);
+	draw_line(bitmap, cliprect, 0, 136, 17, 136, 0);
+	draw_line(bitmap, cliprect, 231, 136, 248, 136, 0);
+	draw_line(bitmap, cliprect, 0, 192, 17, 192, 0);
+	draw_line(bitmap, cliprect, 231, 192, 248, 192, 0);
 }
 
-VIDEO_UPDATE( circus )
+SCREEN_UPDATE( circus )
 {
 	circus_state *state = screen->machine->driver_data<circus_state>();
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 	circus_draw_fg(screen->machine, bitmap, cliprect);
+	draw_sprite_collision(screen->machine, bitmap, cliprect);
 	return 0;
+}
+
+static void robotbwl_draw_box( bitmap_t *bitmap, const rectangle *cliprect, int x, int y )
+{
+	/* Box */
+	int ex = x + 24;
+	int ey = y + 26;
+
+	draw_line(bitmap, cliprect, x, y, ex, y, 0);		/* Top */
+	draw_line(bitmap, cliprect, x, ey, ex, ey, 0);		/* Bottom */
+	draw_line(bitmap, cliprect, x, y, x, ey, 0);		/* Left */
+	draw_line(bitmap, cliprect, ex, y, ex, ey, 0);		/* Right */
+
+	/* Score Grid */
+	ey = y + 10;
+	draw_line(bitmap, cliprect, x + 8, ey, ex, ey, 0);	/* Horizontal Divide Line */
+	draw_line(bitmap, cliprect, x + 8, y, x + 8, ey, 0);
+	draw_line(bitmap, cliprect, x + 16, y, x + 16, ey, 0);
 }
 
 static void robotbwl_draw_scoreboard( bitmap_t *bitmap, const rectangle *cliprect )
@@ -126,19 +149,19 @@ static void robotbwl_draw_scoreboard( bitmap_t *bitmap, const rectangle *cliprec
 
 	for (offs = 15; offs <= 63; offs += 24)
 	{
-		draw_robot_box(bitmap, cliprect, offs, 31);
-		draw_robot_box(bitmap, cliprect, offs, 63);
-		draw_robot_box(bitmap, cliprect, offs, 95);
+		robotbwl_draw_box(bitmap, cliprect, offs, 31);
+		robotbwl_draw_box(bitmap, cliprect, offs, 63);
+		robotbwl_draw_box(bitmap, cliprect, offs, 95);
 
-		draw_robot_box(bitmap, cliprect, offs + 152, 31);
-		draw_robot_box(bitmap, cliprect, offs + 152, 63);
-		draw_robot_box(bitmap, cliprect, offs + 152, 95);
+		robotbwl_draw_box(bitmap, cliprect, offs + 152, 31);
+		robotbwl_draw_box(bitmap, cliprect, offs + 152, 63);
+		robotbwl_draw_box(bitmap, cliprect, offs + 152, 95);
 	}
 
-	draw_robot_box(bitmap, cliprect, 39, 127);                 /* 10th Frame */
-	draw_line(bitmap, cliprect, 39, 137, 47, 137, 0);          /* Extra digit box */
+	robotbwl_draw_box(bitmap, cliprect, 39, 127);		/* 10th Frame */
+	draw_line(bitmap, cliprect, 39, 137, 47, 137, 0);	/* Extra digit box */
 
-	draw_robot_box(bitmap, cliprect, 39 + 152, 127);
+	robotbwl_draw_box(bitmap, cliprect, 39 + 152, 127);
 	draw_line(bitmap, cliprect, 39 + 152, 137, 47 + 152, 137, 0);
 }
 
@@ -161,7 +184,7 @@ static void robotbwl_draw_ball( running_machine *machine, bitmap_t *bitmap, cons
 			state->clown_y + 8, state->clown_x + 8, 0);
 }
 
-VIDEO_UPDATE( robotbwl )
+SCREEN_UPDATE( robotbwl )
 {
 	circus_state *state = screen->machine->driver_data<circus_state>();
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
@@ -179,10 +202,10 @@ static void crash_draw_car( running_machine *machine, bitmap_t *bitmap, const re
 		state->clown_z,
 		0,
 		0,0,
-		state->clown_y, state->clown_x, 0);
+		state->clown_y, state->clown_x - 1, 0);
 }
 
-VIDEO_UPDATE( crash )
+SCREEN_UPDATE( crash )
 {
 	circus_state *state = screen->machine->driver_data<circus_state>();
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
@@ -190,73 +213,10 @@ VIDEO_UPDATE( crash )
 	return 0;
 }
 
-static void ripcord_draw_skydiver( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
-{
-	circus_state *state = machine->driver_data<circus_state>();
-	const gfx_element *gfx;
-	const UINT8  *src_lineptr, *src_pixptr;
-	UINT16 *dst_lineptr, *dst_lineend;
-	UINT32 code;
-	int sx, sy;
-	int src_pitch, dst_width, dst_height, dst_pitch, dst_pixoffs, dst_pixend;
-	int collision, eax, edx;
-
-	gfx = machine->gfx[0];
-
-	code = state->clown_z;
-
-	sx = state->clown_y;
-	sy = state->clown_x - 1;
-	dst_width = 16;
-	dst_height = 16;
-	edx = 1;
-
-	gfx = machine->gfx[1];
-	src_lineptr = gfx_element_get_data(gfx, code);
-	src_pitch = gfx->line_modulo;
-	dst_pitch = bitmap->rowpixels;
-
-	dst_lineptr = BITMAP_ADDR16(bitmap, sy, 0);
-	dst_pixend = (sx + dst_width) & 0xff;
-	dst_lineend = dst_lineptr + dst_pitch * dst_height;
-
-	// draw sky diver and check collision on a pixel basis
-	collision = 0;
-	do
-	{
-		src_pixptr = src_lineptr;
-		dst_pixoffs = sx;
-
-		do
-		{
-			eax = *src_pixptr;
-			src_pixptr++;
-			if (eax)
-			{
-				eax = machine->pens[eax];
-				collision |= dst_lineptr[dst_pixoffs];
-				dst_lineptr[dst_pixoffs] = eax;
-			}
-			dst_pixoffs += edx;
-
-		} while((dst_pixoffs &= 0xff) != dst_pixend);
-
-		src_lineptr += src_pitch;
-
-	} while((dst_lineptr += dst_pitch) != dst_lineend);
-
-	// report collision only when the character is not blank and within display area
-	if (collision && code != 0xf && state->clown_x > 0 && state->clown_x < 240 && state->clown_y > -12 && state->clown_y < 240)
-	{
-		cpu_set_input_line(state->maincpu, 0, ASSERT_LINE); // interrupt accuracy is critical in Ripcord
-		cpu_set_input_line(state->maincpu, 0, CLEAR_LINE);
-	}
-}
-
-VIDEO_UPDATE( ripcord )
+SCREEN_UPDATE( ripcord )
 {
 	circus_state *state = screen->machine->driver_data<circus_state>();
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
-	ripcord_draw_skydiver(screen->machine, bitmap, cliprect);
+	draw_sprite_collision(screen->machine, bitmap, cliprect);
 	return 0;
 }

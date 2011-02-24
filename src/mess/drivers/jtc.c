@@ -508,7 +508,7 @@ static VIDEO_START( jtc )
 {
 }
 
-static VIDEO_UPDATE( jtc )
+static SCREEN_UPDATE( jtc )
 {
 	jtc_state *state = screen->machine->driver_data<jtc_state>();
 
@@ -535,7 +535,7 @@ static VIDEO_START( jtc_es23 )
 {
 }
 
-static VIDEO_UPDATE( jtc_es23 )
+static SCREEN_UPDATE( jtc_es23 )
 {
 	jtc_state *state = screen->machine->driver_data<jtc_state>();
 
@@ -580,7 +580,7 @@ static VIDEO_START( jtc_es40 )
 	state->save_pointer(NAME(state->color_ram_b), JTC_ES40_VIDEORAM_SIZE);
 }
 
-static VIDEO_UPDATE( jtc_es40 )
+static SCREEN_UPDATE( jtc_es40 )
 {
 	jtc_state *state = screen->machine->driver_data<jtc_state>();
 
@@ -700,11 +700,12 @@ static MACHINE_CONFIG_DERIVED( jtc, basic )
     MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
     MCFG_SCREEN_SIZE(64, 64)
     MCFG_SCREEN_VISIBLE_AREA(0, 64-1, 0, 64-1)
+    MCFG_SCREEN_UPDATE(jtc)
+
     MCFG_PALETTE_LENGTH(2)
     MCFG_PALETTE_INIT(black_and_white)
 
     MCFG_VIDEO_START(jtc)
-    MCFG_VIDEO_UPDATE(jtc)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -735,12 +736,13 @@ static MACHINE_CONFIG_DERIVED( jtces23, basic )
     MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
     MCFG_SCREEN_SIZE(128, 128)
     MCFG_SCREEN_VISIBLE_AREA(0, 128-1, 0, 128-1)
+    MCFG_SCREEN_UPDATE(jtc_es23)
+
 	MCFG_GFXDECODE(jtces23)
     MCFG_PALETTE_LENGTH(2)
     MCFG_PALETTE_INIT(black_and_white)
 
     MCFG_VIDEO_START(jtc_es23)
-    MCFG_VIDEO_UPDATE(jtc_es23)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -760,12 +762,13 @@ static MACHINE_CONFIG_DERIVED( jtces40, basic )
     MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
     MCFG_SCREEN_SIZE(320, 192)
     MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 192-1)
+    MCFG_SCREEN_UPDATE(jtc_es40)
+
 	MCFG_GFXDECODE(jtces40)
     MCFG_PALETTE_LENGTH(16)
     MCFG_PALETTE_INIT(jtc_es40)
 
     MCFG_VIDEO_START(jtc_es40)
-    MCFG_VIDEO_UPDATE(jtc_es40)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

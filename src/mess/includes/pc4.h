@@ -21,7 +21,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<device_t> m_beep;
 
-	bool video_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
+	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 	virtual void machine_start();
 
 	DECLARE_WRITE8_MEMBER( clock_w );

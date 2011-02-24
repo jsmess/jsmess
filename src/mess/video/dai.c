@@ -7,7 +7,7 @@
   Krzysztof Strzecha
 
   All video modes are emulated but not fully tested yet.
-  VIDEO_UPDATE function needs strong cleanup and optimalisation.
+  SCREEN_UPDATE function needs strong cleanup and optimalisation.
 
 
 ***************************************************************************/
@@ -56,7 +56,7 @@ VIDEO_START( dai )
 {
 }
 
-VIDEO_UPDATE( dai )
+SCREEN_UPDATE( dai )
 {
 	dai_state *state = screen->machine->driver_data<dai_state>();
 	address_space *space = cputag_get_address_space(screen->machine, "maincpu", ADDRESS_SPACE_PROGRAM);

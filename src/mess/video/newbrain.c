@@ -107,7 +107,7 @@ static void newbrain_update(running_machine *machine, bitmap_t *bitmap, const re
 	}
 }
 
-static VIDEO_UPDATE( newbrain )
+static SCREEN_UPDATE( newbrain )
 {
 	newbrain_state *state = screen->machine->driver_data<newbrain_state>();
 
@@ -132,10 +132,10 @@ MACHINE_CONFIG_FRAGMENT( newbrain_video )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(640, 250)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 249)
+	MCFG_SCREEN_UPDATE(newbrain)
 
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
 
 	MCFG_VIDEO_START(newbrain)
-	MCFG_VIDEO_UPDATE(newbrain)
 MACHINE_CONFIG_END

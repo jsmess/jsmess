@@ -628,7 +628,7 @@ static void beta_plot_gfx_line(running_machine *machine,int x,int y, bitmap_t *b
 }
 
 /* Update video screen, calls either text or graphics update routine as needed */
-VIDEO_UPDATE( dgnbeta )
+SCREEN_UPDATE( dgnbeta )
 {
 	dgn_beta_state *state = screen->machine->driver_data<dgn_beta_state>();
 	long c=0; // this is used to time out the screen redraw, in the case that the 6845 is in some way out state.

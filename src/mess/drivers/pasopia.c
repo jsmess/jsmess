@@ -307,7 +307,7 @@ static void draw_mixed_screen(running_machine *machine, bitmap_t *bitmap,const r
 	}
 }
 
-static VIDEO_UPDATE( paso7 )
+static SCREEN_UPDATE( paso7 )
 {
 	pasopia_state *state = screen->machine->driver_data<pasopia_state>();
 	int width;
@@ -948,6 +948,8 @@ static MACHINE_CONFIG_START( paso7, pasopia_state )
     MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
     MCFG_SCREEN_SIZE(640, 480)
     MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
+    MCFG_SCREEN_UPDATE(paso7)
+
 	MCFG_MC6845_ADD("crtc", H46505, VDP_CLOCK, mc6845_intf)	/* unknown clock, hand tuned to get ~60 fps */
     MCFG_PALETTE_LENGTH(0x28)
     MCFG_PALETTE_INIT(pasopia7)
@@ -955,7 +957,6 @@ static MACHINE_CONFIG_START( paso7, pasopia_state )
 	MCFG_GFXDECODE( pasopia7 )
 
     MCFG_VIDEO_START(paso7)
-    MCFG_VIDEO_UPDATE(paso7)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

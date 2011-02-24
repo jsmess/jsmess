@@ -536,7 +536,7 @@ static void draw_text_40(running_machine *machine, bitmap_t *bitmap, int y_size)
 	}
 }
 
-static VIDEO_UPDATE( pc8801 )
+static SCREEN_UPDATE( pc8801 )
 {
 	bitmap_fill(bitmap, cliprect, screen->machine->pens[0]);
 
@@ -2127,12 +2127,13 @@ static MACHINE_CONFIG_START( pc8801, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
+	MCFG_SCREEN_UPDATE(pc8801)
+
 	MCFG_GFXDECODE( pc8801 )
 	MCFG_PALETTE_LENGTH(0x10)
 	MCFG_PALETTE_INIT( pc8801 )
 
 	MCFG_VIDEO_START(pc8801)
-	MCFG_VIDEO_UPDATE(pc8801)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

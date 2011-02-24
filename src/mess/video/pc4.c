@@ -13,7 +13,7 @@ void pc4_state::set_busy_flag(UINT16 usec)
 	m_busy_timer->adjust( attotime::from_usec( usec ) );
 }
 
-bool pc4_state::video_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+bool pc4_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	bitmap_fill(&bitmap, &cliprect, 0);
 

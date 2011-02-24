@@ -323,7 +323,7 @@ static VIDEO_START( pk8000 )
 {
 }
 
-static VIDEO_UPDATE( pk8000 )
+static SCREEN_UPDATE( pk8000 )
 {
 	return pk8000_video_update(screen, bitmap, cliprect, ram_get_ptr(screen->machine->device(RAM_TAG)));
 }
@@ -353,11 +353,12 @@ static MACHINE_CONFIG_START( pk8000, pk8000_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(256+32, 192+32)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256+32-1, 0, 192+32-1)
+	MCFG_SCREEN_UPDATE(pk8000)
+
 	MCFG_PALETTE_LENGTH(16)
 	MCFG_PALETTE_INIT(pk8000)
 
 	MCFG_VIDEO_START(pk8000)
-	MCFG_VIDEO_UPDATE(pk8000)
 
 	MCFG_I8255A_ADD( "ppi8255_1", pk8000_ppi8255_interface_1 )
 	MCFG_I8255A_ADD( "ppi8255_2", pk8000_ppi8255_interface_2 )

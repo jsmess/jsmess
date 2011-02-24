@@ -215,7 +215,7 @@ static VIDEO_START( homez80 )
 {
 }
 
-static VIDEO_UPDATE( homez80 )
+static SCREEN_UPDATE( homez80 )
 {
 	homez80_state *state = screen->machine->driver_data<homez80_state>();
     int x,y;
@@ -257,12 +257,13 @@ static MACHINE_CONFIG_START( homez80, homez80_state )
     MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
     MCFG_SCREEN_SIZE(344, 32 * 8)
     MCFG_SCREEN_VISIBLE_AREA(0, 344-1, 0, 32 * 8-1)
+    MCFG_SCREEN_UPDATE(homez80)
+
     MCFG_PALETTE_LENGTH(2)
     MCFG_PALETTE_INIT(black_and_white)
 	MCFG_GFXDECODE( homez80 )
 
     MCFG_VIDEO_START(homez80)
-    MCFG_VIDEO_UPDATE(homez80)
 MACHINE_CONFIG_END
 
 /* ROM definition */

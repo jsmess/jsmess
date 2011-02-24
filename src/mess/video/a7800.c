@@ -429,11 +429,11 @@ INTERRUPT_GEN( a7800_interrupt )
 
 ***************************************************************************/
 /* This routine is called at the start of vblank to refresh the screen */
-VIDEO_UPDATE( a7800 )
+SCREEN_UPDATE( a7800 )
 {
 	a7800_state *state = screen->machine->driver_data<a7800_state>();
 	state->maria_scanline = 0;
-	VIDEO_UPDATE_CALL(generic_bitmapped);
+	SCREEN_UPDATE_CALL(generic_bitmapped);
 	return 0;
 }
 

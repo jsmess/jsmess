@@ -70,7 +70,7 @@ extern I8275_DISPLAY_PIXELS(partner_display_pixels);
 extern I8275_DISPLAY_PIXELS(mikrosha_display_pixels);
 extern I8275_DISPLAY_PIXELS(apogee_display_pixels);
 
-extern VIDEO_UPDATE( radio86 );
+extern SCREEN_UPDATE( radio86 );
 extern PALETTE_INIT( radio86 );
 
 #endif /* radio86_H_ */

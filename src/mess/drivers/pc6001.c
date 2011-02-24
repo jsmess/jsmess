@@ -415,14 +415,14 @@ static void pc6001_screen_draw(running_machine *machine, bitmap_t *bitmap,const 
 	}
 }
 
-static VIDEO_UPDATE( pc6001 )
+static SCREEN_UPDATE( pc6001 )
 {
 	pc6001_screen_draw(screen->machine,bitmap,cliprect,1);
 
 	return 0;
 }
 
-static VIDEO_UPDATE( pc6001m2 )
+static SCREEN_UPDATE( pc6001m2 )
 {
 	pc6001_state *state = screen->machine->driver_data<pc6001_state>();
 	int x,y,tile,attr;
@@ -564,7 +564,7 @@ static VIDEO_UPDATE( pc6001m2 )
 	return 0;
 }
 
-static VIDEO_UPDATE( pc6001sr )
+static SCREEN_UPDATE( pc6001sr )
 {
 	pc6001_state *state = screen->machine->driver_data<pc6001_state>();
 	int x,y,tile,attr;
@@ -2281,14 +2281,16 @@ static MACHINE_CONFIG_START( pc6001, pc6001_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_VIDEO_START(pc6001)
-	MCFG_VIDEO_UPDATE(pc6001)
+	MCFG_SCREEN_UPDATE(pc6001)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 //  MCFG_SCREEN_REFRESH_RATE(M6847_NTSC_FRAMES_PER_SECOND)
-//  MCFG_VIDEO_UPDATE(m6847)
+//  MCFG_SCREEN_UPDATE(m6847)
 //  MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(320, 25+192+26)
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
+
+	MCFG_VIDEO_START(pc6001)
+
 	MCFG_PALETTE_LENGTH(16+4)
 	MCFG_PALETTE_INIT(pc6001)
 
@@ -2324,8 +2326,9 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( pc6001m2, pc6001 )
 
 	MCFG_MACHINE_RESET(pc6001m2)
-
-	MCFG_VIDEO_UPDATE(pc6001m2)
+	
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(pc6001m2)
 	MCFG_PALETTE_LENGTH(16+16)
 	MCFG_PALETTE_INIT(pc6001m2)
 
@@ -2351,7 +2354,8 @@ static MACHINE_CONFIG_DERIVED( pc6001sr, pc6001m2 )
 
 	MCFG_MACHINE_RESET(pc6001sr)
 
-	MCFG_VIDEO_UPDATE(pc6001sr)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(pc6001sr)
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", Z80, XTAL_3_579545MHz) //*Yes*, PC-6001 SR Z80 CPU is actually slower than older models

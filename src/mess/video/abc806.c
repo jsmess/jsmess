@@ -507,10 +507,10 @@ void abc806_state::video_start()
 
 
 //-------------------------------------------------
-//  VIDEO_UPDATE( abc806 )
+//  SCREEN_UPDATE( abc806 )
 //-------------------------------------------------
 
-bool abc806_state::video_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+bool abc806_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	// HACK expand visible area to workaround MC6845
 	screen.set_visible_area(0, 767, 0, 311);

@@ -50,7 +50,7 @@ public:
 void pet_vh_init (running_machine *machine);
 void pet80_vh_init (running_machine *machine);
 void superpet_vh_init (running_machine *machine);
-VIDEO_UPDATE( pet );
+SCREEN_UPDATE( pet );
 MC6845_UPDATE_ROW( pet40_update_row );
 MC6845_UPDATE_ROW( pet80_update_row );
 WRITE_LINE_DEVICE_HANDLER( pet_display_enable_changed );

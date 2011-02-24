@@ -201,10 +201,10 @@ static VIDEO_START( cgc7900 )
 }
 
 /*-------------------------------------------------
-    VIDEO_UPDATE( cgc7900 )
+    SCREEN_UPDATE( cgc7900 )
 -------------------------------------------------*/
 
-static VIDEO_UPDATE( cgc7900 )
+static SCREEN_UPDATE( cgc7900 )
 {
 	update_clut(screen->machine);
 	draw_bitmap(screen, bitmap);
@@ -251,6 +251,7 @@ MACHINE_CONFIG_FRAGMENT( cgc7900_video )
     MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
     MCFG_SCREEN_SIZE(1024, 768)
     MCFG_SCREEN_VISIBLE_AREA(0, 1024-1, 0, 768-1)
+    MCFG_SCREEN_UPDATE(cgc7900)
 
 	MCFG_GFXDECODE(cgc7900)
 
@@ -258,7 +259,6 @@ MACHINE_CONFIG_FRAGMENT( cgc7900_video )
 	MCFG_PALETTE_INIT(cgc7900)
 
 	MCFG_VIDEO_START(cgc7900)
-    MCFG_VIDEO_UPDATE(cgc7900)
 
 	MCFG_TIMER_ADD_PERIODIC("blink", blink_tick, attotime::from_hz(XTAL_28_48MHz/7500000))
 MACHINE_CONFIG_END

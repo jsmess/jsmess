@@ -414,7 +414,7 @@ static VIDEO_START( lynx48k )
 	state->mc6845 = machine->device("crtc");
 }
 
-static VIDEO_UPDATE( lynx48k )
+static SCREEN_UPDATE( lynx48k )
 {
 	camplynx_state *state = screen->machine->driver_data<camplynx_state>();
 
@@ -464,13 +464,14 @@ static MACHINE_CONFIG_START( lynx48k, camplynx_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(512, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 479)
+	MCFG_SCREEN_UPDATE(lynx48k)
+
 	MCFG_PALETTE_LENGTH(8)
 	MCFG_PALETTE_INIT(lynx48k)
 
 	MCFG_MC6845_ADD("crtc", MC6845, XTAL_12MHz / 8 /*? dot clock divided by dots per char */, lynx48k_crtc6845_interface)
 
 	MCFG_VIDEO_START(lynx48k)
-	MCFG_VIDEO_UPDATE(lynx48k)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -495,13 +496,14 @@ static MACHINE_CONFIG_START( lynx128k, camplynx_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(512, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 479)
+	MCFG_SCREEN_UPDATE(lynx48k)
+
 	MCFG_PALETTE_LENGTH(8)
 	MCFG_PALETTE_INIT(lynx48k)
 
 	MCFG_MC6845_ADD("crtc", MC6845, XTAL_12MHz / 8 /*? dot clock divided by dots per char */, lynx128k_crtc6845_interface)
 
 	MCFG_VIDEO_START(lynx48k)
-	MCFG_VIDEO_UPDATE(lynx48k)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

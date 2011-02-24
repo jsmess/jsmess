@@ -71,7 +71,6 @@ WRITE8_DEVICE_HANDLER( firetrk_skid_snd_w );
 WRITE8_DEVICE_HANDLER( firetrk_motor_snd_w );
 WRITE8_DEVICE_HANDLER( superbug_motor_snd_w );
 WRITE8_DEVICE_HANDLER( firetrk_xtndply_w );
-WRITE8_DEVICE_HANDLER( superbug_asr_w );
 
 DISCRETE_SOUND_EXTERN( firetrk );
 DISCRETE_SOUND_EXTERN( superbug );
@@ -85,8 +84,8 @@ PALETTE_INIT( montecar );
 VIDEO_START( firetrk );
 VIDEO_START( superbug );
 VIDEO_START( montecar );
-VIDEO_UPDATE( firetrk );
-VIDEO_UPDATE( superbug );
-VIDEO_UPDATE( montecar );
+SCREEN_UPDATE( firetrk );
+SCREEN_UPDATE( superbug );
+SCREEN_UPDATE( montecar );
 
 

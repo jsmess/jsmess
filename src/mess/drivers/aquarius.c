@@ -407,12 +407,13 @@ static MACHINE_CONFIG_START( aquarius, aquarius_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(40 * 8, 25 * 8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 40 * 8 - 1, 0 * 8, 25 * 8 - 1)
+	MCFG_SCREEN_UPDATE( aquarius )
+
 	MCFG_GFXDECODE( aquarius )
 	MCFG_PALETTE_LENGTH(512)
 	MCFG_PALETTE_INIT( aquarius )
 
 	MCFG_VIDEO_START( aquarius )
-	MCFG_VIDEO_UPDATE( aquarius )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

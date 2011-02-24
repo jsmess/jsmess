@@ -6,7 +6,6 @@
 
 #include "emu.h"
 #include "includes/vindictr.h"
-#include "includes/thunderj.h"
 
 
 
@@ -218,7 +217,7 @@ void vindictr_scanline_update(screen_device &screen, int scanline)
  *
  *************************************/
 
-VIDEO_UPDATE( vindictr )
+SCREEN_UPDATE( vindictr )
 {
 	vindictr_state *state = screen->machine->driver_data<vindictr_state>();
 	atarimo_rect_list rectlist;
@@ -286,7 +285,7 @@ VIDEO_UPDATE( vindictr )
 					{
 						/* if bit 2 is set, start setting high palette bits */
 						if (mo[x] & 2)
-							thunderj_mark_high_palette(bitmap, pf, mo, x, y);
+							atarimo_mark_high_palette(bitmap, pf, mo, x, y);
 
 						/* if the upper bit of pen data is set, we adjust the final intensity */
 						if (mo[x] & 8)

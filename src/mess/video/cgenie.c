@@ -414,7 +414,7 @@ static void cgenie_refresh_tv_set(running_machine *machine, bitmap_t * bitmap, c
 /***************************************************************************
   Draw the game screen in the given bitmap_t.
 ***************************************************************************/
-VIDEO_UPDATE( cgenie )
+SCREEN_UPDATE( cgenie )
 {
 	cgenie_state *state = screen->machine->driver_data<cgenie_state>();
     if( state->tv_mode )

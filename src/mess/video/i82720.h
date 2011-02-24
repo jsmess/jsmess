@@ -32,7 +32,7 @@ void compis_gdc_vblank_int (void);
 */
 PALETTE_INIT( compis_gdc );
 VIDEO_START ( compis_gdc );
-VIDEO_UPDATE( compis_gdc );
+SCREEN_UPDATE( compis_gdc );
 /*
 ** The different modes
 */

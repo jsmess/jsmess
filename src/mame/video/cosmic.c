@@ -35,7 +35,7 @@ static pen_t cosmica_map_color( running_machine *machine, UINT8 x, UINT8 y )
 	offs_t offs = (state->color_registers[0] << 9) | ((x >> 4) << 5) | (y >> 3);
 	pen_t pen = machine->region("user1")->base()[offs];
 
-	if (state->color_registers[0])		/* yes, 0 again according to the schematics */
+	if (state->color_registers[1]) // 0 according to the schematics, but that breaks alien formation colors
 		pen >>= 4;
 
 	return pen & 0x07;
@@ -546,7 +546,7 @@ static void nomnlnd_draw_background( screen_device *screen, bitmap_t *bitmap, co
 }
 
 
-VIDEO_UPDATE( cosmicg )
+SCREEN_UPDATE( cosmicg )
 {
 	bitmap_fill(bitmap, cliprect, 0);
 	draw_bitmap(screen->machine, bitmap, cliprect);
@@ -554,7 +554,7 @@ VIDEO_UPDATE( cosmicg )
 }
 
 
-VIDEO_UPDATE( panic )
+SCREEN_UPDATE( panic )
 {
 	bitmap_fill(bitmap, cliprect, 0);
 	draw_bitmap(screen->machine, bitmap, cliprect);
@@ -563,7 +563,7 @@ VIDEO_UPDATE( panic )
 }
 
 
-VIDEO_UPDATE( cosmica )
+SCREEN_UPDATE( cosmica )
 {
 	bitmap_fill(bitmap, cliprect, 0);
 	cosmica_draw_starfield(screen, bitmap, cliprect);
@@ -573,7 +573,7 @@ VIDEO_UPDATE( cosmica )
 }
 
 
-VIDEO_UPDATE( magspot )
+SCREEN_UPDATE( magspot )
 {
 	bitmap_fill(bitmap, cliprect, 0);
 	draw_bitmap(screen->machine, bitmap, cliprect);
@@ -582,7 +582,7 @@ VIDEO_UPDATE( magspot )
 }
 
 
-VIDEO_UPDATE( devzone )
+SCREEN_UPDATE( devzone )
 {
 	cosmic_state *state = screen->machine->driver_data<cosmic_state>();
 
@@ -597,7 +597,7 @@ VIDEO_UPDATE( devzone )
 }
 
 
-VIDEO_UPDATE( nomnlnd )
+SCREEN_UPDATE( nomnlnd )
 {
 	cosmic_state *state = screen->machine->driver_data<cosmic_state>();
 

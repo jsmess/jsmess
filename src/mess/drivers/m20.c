@@ -38,7 +38,7 @@ static VIDEO_START( m20 )
 {
 }
 
-static VIDEO_UPDATE( m20 )
+static SCREEN_UPDATE( m20 )
 {
 	m20_state *state = screen->machine->driver_data<m20_state>();
 	int x,y,i;
@@ -169,11 +169,12 @@ static MACHINE_CONFIG_START( m20, m20_state )
     MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
     MCFG_SCREEN_SIZE(512, 256)
     MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
+    MCFG_SCREEN_UPDATE(m20)
+
     MCFG_PALETTE_LENGTH(4)
 //  MCFG_PALETTE_INIT(black_and_white)
 
     MCFG_VIDEO_START(m20)
-    MCFG_VIDEO_UPDATE(m20)
 
 	MCFG_GFXDECODE(m20)
 MACHINE_CONFIG_END
