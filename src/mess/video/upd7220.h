@@ -90,6 +90,7 @@ READ8_DEVICE_HANDLER( upd7220_r );
 
 /* register write */
 WRITE8_DEVICE_HANDLER( upd7220_w );
+WRITE8_DEVICE_HANDLER( upd7220_bank_w );
 
 /* dma acknowledge */
 READ8_DEVICE_HANDLER( upd7220_dack_r );

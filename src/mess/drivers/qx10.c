@@ -99,16 +99,27 @@ public:
 static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 {
 	qx10_state *state = device->machine->driver_data<qx10_state>();
-	int xi,gfx;
+	int xi,gfx[3];
 	UINT8 pen;
-	UINT8 color;
 
-	color = (state->color_mode) ? 7 : 1; // TODO
-	gfx = vram[address];
+	if(state->color_mode)
+	{
+		gfx[0] = vram[address + 0x00000];
+		gfx[1] = vram[address + 0x08000];
+		gfx[2] = vram[address + 0x10000];
+	}
+	else
+	{
+		gfx[0] = vram[address];
+		gfx[1] = 0;
+		gfx[2] = 0;
+	}
 
 	for(xi=0;xi<16;xi++)
 	{
-		pen = ((gfx >> xi) & 1) ? color : 0;
+		pen = ((gfx[0] >> xi) & 1) ? 1 : 0;
+		pen|= ((gfx[1] >> xi) & 1) ? 2 : 0;
+		pen|= ((gfx[2] >> xi) & 1) ? 4 : 0;
 
 		*BITMAP_ADDR16(bitmap, y, x + xi) = pen;
 	}
@@ -267,7 +278,7 @@ static const struct upd765_interface qx10_upd765_interface =
 	DEVCB_DEVICE_LINE("8237dma_1", drq_w),
 	NULL,
 	UPD765_RDY_PIN_CONNECTED,
-	{FLOPPY_0,NULL, NULL, NULL}
+	{FLOPPY_0,FLOPPY_1, NULL, NULL}
 };
 
 static WRITE8_HANDLER(fdd_motor_w)
@@ -283,13 +294,14 @@ static WRITE8_HANDLER(fdd_motor_w)
 static READ8_HANDLER(qx10_30_r)
 {
 	qx10_state *driver_state = space->machine->driver_data<qx10_state>();
-	floppy_image *floppy;
+	floppy_image *floppy1,*floppy2;
 
-	floppy = flopimg_get_image(floppy_get_device(space->machine, 0));
+	floppy1 = flopimg_get_image(floppy_get_device(space->machine, 0));
+	floppy2 = flopimg_get_image(floppy_get_device(space->machine, 1));
 
 	return driver_state->fdcint |
 		   /*driver_state->fdcmotor*/ 0 << 1 |
-		   ((floppy != NULL) ? 1 : 0) << 3 |
+		   ((floppy1 != NULL) || (floppy2 != NULL) ? 1 : 0) << 3 |
 		   driver_state->membank << 4;
 };
 
@@ -578,7 +590,7 @@ static WRITE8_HANDLER( upd7201_w )
 	{
 		//printf("RS-232c W %02x\n",data);
 		if(data == 0x01) //cheap, but needed for working inputs in "The QX-10 Diagnostic"
-			state->rs232c.rx = 0;
+			state->rs232c.rx = 0x04;
 		else
 			state->rs232c.rx = 0xff;
 	}
@@ -596,8 +608,13 @@ static WRITE8_HANDLER( vram_bank_w )
 {
 	qx10_state *state = space->machine->driver_data<qx10_state>();
 
-	state->vram_bank = data & 7;
-	printf("VRAM %02x\n",data);
+	if(state->color_mode)
+	{
+		state->vram_bank = data & 7;
+		if(data & 1) 	  { upd7220_bank_w(space->machine->device("upd7220"),0,0); } // B
+		else if(data & 2) { upd7220_bank_w(space->machine->device("upd7220"),0,1); } // G
+		else if(data & 4) { upd7220_bank_w(space->machine->device("upd7220"),0,2); } // R
+	}
 }
 
 
@@ -815,8 +832,8 @@ static INPUT_PORTS_START( qx10 )
 
 	/* TODO: All of those have unknown meaning */
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x01, 0x01, "DSW" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x01, 0x00, "DSW" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
@@ -882,7 +899,7 @@ static MACHINE_RESET(qx10)
 		if(state->color_mode) //color
 		{
 			for ( i = 0; i < 8; i++ )
-				palette_set_color_rgb(machine, i, pal1bit((i >> 0) & 1), pal1bit((i >> 1) & 1), pal1bit((i >> 2) & 1));
+				palette_set_color_rgb(machine, i, pal1bit((i >> 2) & 1), pal1bit((i >> 1) & 1), pal1bit((i >> 0) & 1));
 		}
 		else //monochrome
 		{
@@ -891,6 +908,7 @@ static MACHINE_RESET(qx10)
 
 			palette_set_color_rgb(machine, 1, 0x00, 0x9f, 0x00);
 			palette_set_color_rgb(machine, 2, 0x00, 0xff, 0x00);
+			state->vram_bank = 0;
 		}
 	}
 }
@@ -963,7 +981,7 @@ static MACHINE_CONFIG_START( qx10, qx10_state )
 	MCFG_I8237_ADD("8237dma_1", MAIN_CLK/4, qx10_dma8237_1_interface)
 	MCFG_I8237_ADD("8237dma_2", MAIN_CLK/4, qx10_dma8237_2_interface)
 	MCFG_UPD765A_ADD("upd765", qx10_upd765_interface)
-	MCFG_FLOPPY_DRIVE_ADD(FLOPPY_0, qx10_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_ADD(qx10_floppy_config)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

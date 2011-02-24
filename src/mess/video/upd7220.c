@@ -198,6 +198,7 @@ struct _upd7220_t
 	emu_timer *blank_timer;			/* CRT blanking timer */
 
 	UINT16 vram[0x40000];
+	UINT32 vram_bank;
 };
 
 static const int x_dir[8] = { 0, 1, 1, 1, 0,-1,-1,-1};
@@ -654,6 +655,7 @@ static void write_vram(upd7220_t *upd7220,UINT8 type, UINT8 mod)
 static void draw_char(upd7220_t *upd7220,int x,int y)
 {
 	int xi,yi;
+	UINT8 xsize,ysize;
 	UINT8 tile_data;
 	UINT16 bitmask,upper_byte;
 
@@ -669,12 +671,17 @@ static void draw_char(upd7220_t *upd7220,int x,int y)
 	}
 	#endif
 
-	/* TODO: internal direction, slanted character, zooming */
-	for(yi=0;yi<8;yi++)
-	{
-		tile_data = upd7220->ra[(yi & 7) | 8];
+	xsize = upd7220->figs_d;
+	ysize = upd7220->figs_dc + 1;
 
-		for(xi=0;xi<8;xi++)
+	printf("%d %d %d\n",upd7220->figs_dir,xsize,ysize);
+
+	/* TODO: internal direction, slanted character, zooming */
+	for(yi=0;yi<ysize;yi++)
+	{
+		tile_data = upd7220->ra[((yi) & 7) | 8];
+
+		for(xi=0;xi<xsize;xi++)
 		{
 			UINT32 addr = ((y+yi) * upd7220->pitch) + ((x+xi) >> 4);
 
@@ -682,8 +689,8 @@ static void draw_char(upd7220_t *upd7220,int x,int y)
 
 			bitmask = (upper_byte) ? 0x8000 : 0x80;
 
-			upd7220->vram[addr] &= ~(bitmask >> xi);
-			upd7220->vram[addr] |= ((tile_data << upper_byte) & (bitmask >> xi));
+			upd7220->vram[addr + upd7220->vram_bank] &= ~(bitmask >> (xi));
+			upd7220->vram[addr + upd7220->vram_bank] |= ((tile_data << upper_byte) & (bitmask >> (xi)));
 		}
 	}
 
@@ -1096,6 +1103,13 @@ WRITE8_DEVICE_HANDLER( upd7220_w )
 	}
 
 	process_fifo(device);
+}
+
+WRITE8_DEVICE_HANDLER( upd7220_bank_w )
+{
+	upd7220_t *upd7220 = get_safe_token(device);
+
+	upd7220->vram_bank = 0x8000 * (data & 7);
 }
 
 /*-------------------------------------------------
