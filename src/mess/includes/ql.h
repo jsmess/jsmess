@@ -24,14 +24,39 @@
 #define X3 XTAL_4_436MHz
 #define X4 XTAL_11MHz
 
-#define DRIVE_1_MASK	0x01
-#define DRIVE_0_MASK	0x02
-#define MOTOR_MASK		0x04
-#define SIDE_SHIFT		3
-#define SIDE_MASK		(1 << SIDE_SHIFT)
+#define QL_CONFIG_PORT	"QLCONFIG"
+#define DISK_TYPE_MASK	0x03
+#define DISK_TYPE_NONE	0x00
+#define DISK_TYPE_TRUMP	0x01
+#define DISK_TYPE_SANDY	0x02
+
+#define TRUMP_DRIVE1_MASK	0x01
+#define TRUMP_DRIVE0_MASK	0x02
+#define TRUMP_MOTOR_MASK	0x04
+#define TRUMP_SIDE_SHIFT	3
+#define TRUMP_SIDE_MASK		(1 << TRUMP_SIDE_SHIFT)
 
 #define CART_ROM_BASE	0x0c000
+#define CART_ROM_END	0x0ffff
 #define TRUMP_ROM_BASE	0x10000
+#define TRUMP_ROM_LEN	0x08000
+#define TRUMP_ROM_END	(TRUMP_ROM_BASE+(TRUMP_ROM_LEN-1))
+
+#define TRUMP_IO_BASE	0x1c000
+#define TRUMP_IO_LEN	0x04000
+#define TRUMP_IO_END	(TRUMP_IO_BASE+(TRUMP_IO_LEN-1))
+
+#define SANDY_ROM_BASE	0x18000
+#define SANDY_IO_BASE	0xc3fc0
+#define SANDY_IO_LEN	0x00040
+#define SANDY_IO_END	(SANDY_IO_BASE+(SANDY_IO_LEN-1))
+
+#define SANDY_DRIVE0_MASK	0x02
+#define SANDY_DRIVE1_MASK	0x04
+#define SANDY_MOTOR_MASK	0x08
+#define SANDY_SIDE_SHIFT	0
+#define SANDY_SIDE_MASK		(1 << SANDY_SIDE_SHIFT)
+
 
 class ql_state : public driver_device
 {
@@ -62,7 +87,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	
-	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
+	virtual bool video_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 
 	DECLARE_WRITE8_MEMBER( ipc_w );
 	DECLARE_WRITE8_MEMBER( ipc_port1_w );
@@ -88,13 +113,16 @@ public:
 	int m_comdata;
 	int m_baudx4;
 
-	// Trump card
-	DECLARE_READ8_MEMBER( trump_card_r );
-	DECLARE_WRITE8_MEMBER( trump_card_w );
+	// Trump card & Sandy superdisk
+	DECLARE_READ8_MEMBER( disk_io_r );
+	DECLARE_WRITE8_MEMBER( disk_io_w );
 	DECLARE_READ8_MEMBER( trump_card_rom_r );
 	DECLARE_READ8_MEMBER( cart_rom_r );
 	
 	void trump_card_set_control(UINT8 data);
+	void sandy_set_control(UINT8 data);
+	
+	int disk_type;
 };
 
 #endif

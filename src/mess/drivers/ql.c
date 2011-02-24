@@ -255,11 +255,11 @@ READ8_MEMBER( ql_state::ipc_bus_r )
 	return data;
 }
 
-READ8_MEMBER( ql_state::trump_card_r )
+READ8_MEMBER( ql_state::disk_io_r )
 {
 	UINT8	result = 0;
 	
-	//logerror("%s TrumpCard:Read of %08X\n",machine->describe_context(),0x1c000+offset);
+	//logerror("%s DiskIO:Read of %08X\n",machine->describe_context(),0x1c000+offset);
 		
 	switch (offset)
 	{
@@ -272,9 +272,9 @@ READ8_MEMBER( ql_state::trump_card_r )
 	return result;
 }
 
-WRITE8_MEMBER( ql_state::trump_card_w )
+WRITE8_MEMBER( ql_state::disk_io_w )
 {
-	//logerror("%s TrumpCard:Write %02X to %08X\n",machine->describe_context(),data,0x1c000+offset);
+	//logerror("%s DiskIO:Write %02X to %08X\n",machine->describe_context(),data,0x1c000+offset);
 
 	switch (offset)
 	{
@@ -282,7 +282,10 @@ WRITE8_MEMBER( ql_state::trump_card_w )
 		case 0x0001	: wd17xx_w(m_fdc, offset, data); break; 
 		case 0x0002	: wd17xx_w(m_fdc, offset, data); break;
 		case 0x0003	: wd17xx_w(m_fdc, offset, data); break;
-		case 0x2000	: trump_card_set_control(data);  break;
+		case 0x0004 : if(disk_type==DISK_TYPE_SANDY)
+						sandy_set_control(data);break;
+		case 0x2000	: if(disk_type==DISK_TYPE_TRUMP)
+						trump_card_set_control(data);break;
 	}
 }
 
@@ -314,26 +317,43 @@ READ8_MEMBER( ql_state::cart_rom_r )
 
 void ql_state::trump_card_set_control(UINT8 data)
 {
-	if(data & DRIVE_0_MASK)
+	if(data & TRUMP_DRIVE0_MASK)
 		wd17xx_set_drive(m_fdc,0);
 		
-	if(data & DRIVE_1_MASK)
+	if(data & TRUMP_DRIVE1_MASK)
 		wd17xx_set_drive(m_fdc,1);	
 
-	wd17xx_set_side(m_fdc,(data & SIDE_MASK) >> SIDE_SHIFT);
+	wd17xx_set_side(m_fdc,(data & TRUMP_SIDE_MASK) >> TRUMP_SIDE_SHIFT);
 }
+
+void ql_state::sandy_set_control(UINT8 data)
+{
+	logerror("sandy_set_control:%02X\n",data);
+
+	if(data & SANDY_DRIVE0_MASK)
+		wd17xx_set_drive(m_fdc,0);
+		
+	if(data & SANDY_DRIVE1_MASK)
+		wd17xx_set_drive(m_fdc,1);	
+
+	wd17xx_set_side(m_fdc,(data & SANDY_SIDE_MASK) >> SANDY_SIDE_SHIFT);
+}	
 
 static READ_LINE_DEVICE_HANDLER( trump_card_dden_r )
 {
+	//logerror("DiskIO:dden_read\n");
+	
 	return 1;
 }
 
 static WRITE_LINE_DEVICE_HANDLER( trump_card_intrq_w )
 {
+	//logerror("DiskIO:intrq = %d\n",state);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( trump_card_drq_w )
 {
+	//logerror("DiskIO:drq = %d\n",state);
 }
 
 
@@ -347,8 +367,8 @@ static WRITE_LINE_DEVICE_HANDLER( trump_card_drq_w )
 
 static ADDRESS_MAP_START( ql_mem, ADDRESS_SPACE_PROGRAM, 8, ql_state )
 	AM_RANGE(0x000000, 0x00bfff) AM_ROM	// 48K System ROM
-	AM_RANGE(0x00c000, 0x00ffff) AM_ROM AM_WRITENOP AM_READ( cart_rom_r ) // 16K Cartridge ROM
-	AM_RANGE(0x010000, 0x017fff) AM_ROM AM_WRITENOP AM_READ( trump_card_rom_r ) // Trump card ROM
+	AM_RANGE(0x00c000, 0x00ffff) AM_ROM AM_WRITENOP //AM_READ( cart_rom_r ) // 16K Cartridge ROM
+	AM_RANGE(0x010000, 0x017fff) AM_ROM AM_WRITENOP //AM_READ( trump_card_rom_r ) // Trump card ROM
 	AM_RANGE(0x018000, 0x018003) AM_DEVREAD(ZX8302_TAG, zx8302_device, rtc_r)
 	AM_RANGE(0x018000, 0x018001) AM_DEVWRITE(ZX8302_TAG, zx8302_device, rtc_w)
 	AM_RANGE(0x018002, 0x018002) AM_DEVWRITE(ZX8302_TAG, zx8302_device, control_w)
@@ -358,7 +378,7 @@ static ADDRESS_MAP_START( ql_mem, ADDRESS_SPACE_PROGRAM, 8, ql_state )
 	AM_RANGE(0x018022, 0x018022) AM_DEVREADWRITE(ZX8302_TAG, zx8302_device, mdv_track_r, data_w)
 	AM_RANGE(0x018023, 0x018023) AM_DEVREAD(ZX8302_TAG, zx8302_device, mdv_track_r) AM_WRITENOP
 	AM_RANGE(0x018063, 0x018063) AM_DEVWRITE(ZX8301_TAG, zx8301_device, control_w)
-	AM_RANGE(0x01c000, 0x01ffff) AM_READ(trump_card_r) AM_WRITE(trump_card_w) // 16K Expansion I/O
+	AM_RANGE(0x01c000, 0x01ffff) AM_UNMAP //AM_READ(disk_io_r) AM_WRITE(disk_io_w) // 16K Expansion I/O
 	AM_RANGE(0x020000, 0x03ffff) AM_DEVREADWRITE(ZX8301_TAG, zx8301_device, data_r, data_w)
 	AM_RANGE(0x040000, 0x0fffff) AM_RAM
 ADDRESS_MAP_END
@@ -487,6 +507,14 @@ static INPUT_PORTS_START( ql )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON1 )		PORT_PLAYER(2) PORT_CODE(KEYCODE_SPACE)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )	PORT_PLAYER(2) PORT_8WAY PORT_CODE(KEYCODE_DOWN)
+
+
+	PORT_START(QL_CONFIG_PORT)
+	PORT_DIPNAME( DISK_TYPE_MASK, DISK_TYPE_NONE, "Disk interface select")
+	PORT_DIPSETTING(DISK_TYPE_NONE,		DEF_STR( None ))
+	PORT_DIPSETTING(DISK_TYPE_TRUMP,	"Miracle Trump card")
+	PORT_DIPSETTING(DISK_TYPE_SANDY,	"Sandy Superdisk")
+
 INPUT_PORTS_END
 
 
@@ -880,6 +908,20 @@ void ql_state::machine_reset()
 {
 	address_space 	*program 	= cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);
 
+	disk_type=input_port_read(machine,QL_CONFIG_PORT) & DISK_TYPE_MASK;
+
+	logerror("disktype=%d\n",disk_type);
+
+	// Unmap special trump card handlers if not trump card
+	if(disk_type!=DISK_TYPE_TRUMP)
+	{
+		logerror("Removing TrumpCardEmulation\n");
+		memory_unmap_readwrite(program,0x010000, 0x018000, 0, 0);
+		memory_install_rom(program, 0x0c000, 0x0ffff, 0, 0, &machine->region(M68008_TAG)->base()[CART_ROM_BASE]);
+		logerror("TrumpCardEmulation removed\n");
+	}
+
+	logerror("Configuring RAM\n");
 	// configure RAM
 	switch (ram_get_size(m_ram))
 	{
@@ -903,6 +945,23 @@ void ql_state::machine_reset()
 			memory_unmap_readwrite(program, 0x0c0000, 0x0fffff, 0, 0);
 			break;
 	}	
+
+	switch (disk_type)
+	{
+		case DISK_TYPE_SANDY :
+			logerror("Configuring SandySuperDisk\n");
+			memory_install_rom(program, 0x0c0000, 0x0c3fff, 0, 0, &machine->region(M68008_TAG)->base()[SANDY_ROM_BASE]);
+			program->install_handler(SANDY_IO_BASE, SANDY_IO_END, 0, 0, read8_delegate_create(ql_state, disk_io_r, *this));
+			program->install_handler(SANDY_IO_BASE, SANDY_IO_END, 0, 0, write8_delegate_create(ql_state, disk_io_w, *this));
+			break;
+		case DISK_TYPE_TRUMP :
+			logerror("Configuring TrumpCard\n");
+			program->install_handler(CART_ROM_BASE, CART_ROM_END, 0, 0, read8_delegate_create(ql_state, cart_rom_r, *this));
+			program->install_handler(TRUMP_ROM_BASE, TRUMP_ROM_END, 0, 0, read8_delegate_create(ql_state, trump_card_rom_r, *this));
+			program->install_handler(TRUMP_IO_BASE, TRUMP_IO_END, 0, 0, read8_delegate_create(ql_state, disk_io_r, *this));
+			program->install_handler(TRUMP_IO_BASE, TRUMP_IO_END, 0, 0, write8_delegate_create(ql_state, disk_io_w, *this));
+			break;
+	}
 }
 
 //**************************************************************************
@@ -1010,7 +1069,7 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 
 ROM_START( ql )
-    ROM_REGION( 0x18000, M68008_TAG, 0 )
+    ROM_REGION( 0x1C000, M68008_TAG, 0 )
 	ROM_DEFAULT_BIOS("js")
 	ROM_SYSTEM_BIOS( 0, "fb", "v1.00 (FB)" )
     ROMX_LOAD( "fb.ic33", 0x0000, 0x8000, NO_DUMP, ROM_BIOS(1) )
@@ -1038,6 +1097,7 @@ ROM_START( ql )
 	ROM_CART_LOAD("cart", 0xc000, 0x4000, ROM_MIRROR | ROM_OPTIONAL)
 
 	ROM_LOAD( "trumpcard-125.rom", TRUMP_ROM_BASE, 0x08000, CRC(938eaa46) SHA1(9b3458cf3a279ed86ba395dc45c8f26939d6c44d))
+	ROM_LOAD( "sandysuperdisk.rom", SANDY_ROM_BASE, 0x04000, CRC(b52077da) SHA1(bf531758145ffd083e01c1cf9c45d0e9264a3b53))
 
 	ROM_REGION( 0x800, I8749_TAG, 0 )
 	ROM_LOAD( "ipc8049.ic24", 0x000, 0x800, CRC(6a0d1f20) SHA1(fcb1c97ee7c66e5b6d8fbb57c06fd2f6509f2e1b) )
