@@ -87,7 +87,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	
-	virtual bool video_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
+	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 
 	DECLARE_WRITE8_MEMBER( ipc_w );
 	DECLARE_WRITE8_MEMBER( ipc_port1_w );
