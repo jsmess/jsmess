@@ -29,6 +29,8 @@ Skeleton drivers:
 
 System Driver Changes:
 ----------------------
+- [AC1] Added cassette support. [Robbbert]
+
 - [ADAM] Added dumps of the internal M6801 ROMs. [KevinP]
 
 - [ADAM] Rewrote driver to use the M6801 CPUs. Currently the only working
