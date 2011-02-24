@@ -13,6 +13,20 @@
     - floppy (upd765)
     - DMA
     - Interrupts (pic8295)
+
+    banking:
+    - 0x1c = 0
+    AM_RANGE(0x0000,0x1fff) ROM
+	AM_RANGE(0x2000,0xdfff) NOP
+    AM_RANGE(0xe000,0xffff) RAM
+    - 0x1c = 1 0x20 = 1
+    AM_RANGE(0x0000,0x7fff) RAM (0x18 selects bank)
+    AM_RANGE(0x8000,0x87ff) CMOS
+    AM_RANGE(0x8800,0xdfff) NOP or previous bank?
+    AM_RANGE(0xe000,0xffff) RAM
+    - 0x1c = 1 0x20 = 0
+    AM_RANGE(0x0000,0xdfff) RAM (0x18 selects bank)
+    AM_RANGE(0xe000,0xffff) RAM
 ****************************************************************************/
 
 #include "emu.h"
@@ -77,6 +91,73 @@ public:
 
 	UINT8 vram_bank;
 };
+
+static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
+{
+	qx10_state *state = device->machine->driver_data<qx10_state>();
+	int xi,gfx;
+	UINT8 pen;
+	UINT8 color;
+
+	color = (state->color_mode) ? 7 : 1; // TODO
+	gfx = vram[address];
+
+	for(xi=0;xi<16;xi++)
+	{
+		pen = ((gfx >> xi) & 1) ? color : 0;
+
+		*BITMAP_ADDR16(bitmap, y, x + xi) = pen;
+	}
+}
+
+static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
+{
+	qx10_state *state = device->machine->driver_data<qx10_state>();
+	int x;
+	int xi,yi;
+	int tile;
+	int attr;
+	UINT8 color;
+	UINT8 tile_data;
+	UINT8 pen;
+
+	for( x = 0; x < pitch; x++ )
+	{
+		tile = (vram[addr+x] & 0xff);
+		attr = ((vram[addr+x] & 0xff00) >> 8);
+
+		color = (state->color_mode) ? 1 : (attr & 4) ? 2 : 1; /* TODO: color mode */
+
+		for( yi = 0; yi < lr; yi++)
+		{
+			tile_data = (state->m_char_rom[tile*16+yi]);
+
+			if(attr & 8)
+				tile_data^=0xff;
+
+			if(cursor_on && cursor_addr == addr+x) //TODO
+				tile_data^=0xff;
+
+			for( xi = 0; xi < 8; xi++)
+			{
+				int res_x,res_y;
+
+				if(yi >= 16)
+					pen = 0;
+				else
+					pen = ((tile_data >> xi) & 1) ? color : 0;
+
+				res_x = x * 8 + xi;
+				res_y = y * lr + yi;
+
+				if(res_x > screen_max_x || res_y > screen_max_y)
+					continue;
+
+				*BITMAP_ADDR16(bitmap, res_y, res_x) = pen;
+			}
+		}
+	}
+}
 
 /*
     Memory
@@ -482,6 +563,7 @@ static WRITE8_HANDLER( upd7201_w )
 				break;
 			case 0xe0:
 				printf("keyb Reset Issued, diagnostic is %s\n",data & 1 ? "on" : "off");
+				state->keyb.rx = 0;
 				break;
 		}
 	}
@@ -507,8 +589,8 @@ static WRITE8_HANDLER( vram_bank_w )
 static ADDRESS_MAP_START(qx10_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x7fff ) AM_RAMBANK("bank1")
-	AM_RANGE( 0x8000, 0xefff ) AM_RAMBANK("bank2")
-	AM_RANGE( 0xf000, 0xffff ) AM_RAM
+	AM_RANGE( 0x8000, 0xdfff ) AM_RAMBANK("bank2")
+	AM_RANGE( 0xe000, 0xffff ) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( qx10_io , ADDRESS_SPACE_IO, 8)
@@ -719,18 +801,18 @@ static INPUT_PORTS_START( qx10 )
 	/* TODO: All of those have unknown meaning */
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x01, 0x01, "DSW" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) ) //CMOS related
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
@@ -830,70 +912,6 @@ bool qx10_state::video_update(screen_device &screen, bitmap_t &bitmap, const rec
 	upd7220_update(m_hgdc, &bitmap, &cliprect);
 
 	return 0;
-}
-
-static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
-{
-	int xi,gfx;
-	UINT8 pen;
-
-	gfx = vram[address];
-
-	for(xi=0;xi<16;xi++)
-	{
-		pen = ((gfx >> xi) & 1) ? 7 : 0;
-
-		*BITMAP_ADDR16(bitmap, y, x + xi) = pen;
-	}
-}
-
-static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
-{
-	qx10_state *state = device->machine->driver_data<qx10_state>();
-	int x;
-	int xi,yi;
-	int tile;
-	int attr;
-	UINT8 color;
-	UINT8 tile_data;
-	UINT8 pen;
-
-	for( x = 0; x < pitch; x++ )
-	{
-		tile = (vram[addr+x] & 0xff);
-		attr = ((vram[addr+x] & 0xff00) >> 8);
-
-		color = (state->color_mode) ? 1 : (attr & 4) ? 2 : 1; /* TODO: color mode */
-
-		for( yi = 0; yi < lr; yi++)
-		{
-			tile_data = (state->m_char_rom[tile*16+yi]);
-
-			if(attr & 8)
-				tile_data^=0xff;
-
-			if(cursor_on && cursor_addr == addr+x) //TODO
-				tile_data^=0xff;
-
-			for( xi = 0; xi < 8; xi++)
-			{
-				int res_x,res_y;
-
-				if(yi >= 16)
-					pen = 0;
-				else
-					pen = ((tile_data >> xi) & 1) ? color : 0;
-
-				res_x = x * 8 + xi;
-				res_y = y * lr + yi;
-
-				if(res_x > screen_max_x || res_y > screen_max_y)
-					continue;
-
-				*BITMAP_ADDR16(bitmap, res_y, res_x) = pen;
-			}
-		}
-	}
 }
 
 static UPD7220_INTERFACE( hgdc_intf )
