@@ -494,13 +494,11 @@ static VIDEO_START( pc_cga )
 			fatalerror("CGA: Bus width %d not supported", buswidth);
 			break;
 	}
-
+	internal_pc_cga_video_start(machine);
 	cga.videoram_size = 0x4000;
 	cga.videoram = auto_alloc_array(machine, UINT8, 0x4000);
 
 	memory_set_bankptr(machine,"bank11", cga.videoram);
-
-	internal_pc_cga_video_start(machine);
 
 	ntsc_decoder_init( machine, &s_ntsc, 8, 256 );
 }
@@ -537,12 +535,12 @@ static VIDEO_START( pc_cga32k )
 			break;
 	}
 
+	internal_pc_cga_video_start(machine);
+
 	cga.videoram_size = 0x8000;
 	cga.videoram = auto_alloc_array(machine, UINT8, 0x8000);
 
 	memory_set_bankptr(machine,"bank11", cga.videoram);
-
-	internal_pc_cga_video_start(machine);
 
 	ntsc_decoder_init( machine, &s_ntsc, 8, 256 );
 }
@@ -1764,21 +1762,20 @@ WRITE16_HANDLER ( pc1512_videoram16le_w ) { write16le_with_write8_handler(pc1512
 
 static VIDEO_START( pc1512 )
 {
-	cga.videoram_size = 0x10000;
-	cga.videoram = auto_alloc_array(machine, UINT8, 0x10000 );
-	memory_set_bankptr(machine, "bank1", cga.videoram + videoram_offset[0]);
-
 	memset( &pc1512, 0, sizeof ( pc1512 ) );
 	pc1512.write = 0xf;
 	pc1512.read = 0;
 
 	/* PC1512 cut-down 6845 */
 	internal_pc_cga_video_start(machine);
-
+	cga.videoram_size = 0x10000;
+	cga.videoram = auto_alloc_array(machine, UINT8, 0x10000 );
+	
 	address_space *space = cpu_get_address_space( machine->firstcpu, ADDRESS_SPACE_PROGRAM );
 	address_space *io_space = cpu_get_address_space( machine->firstcpu, ADDRESS_SPACE_IO );
 
 	memory_install_read_bank( space, 0xb8000, 0xbbfff, 0, 0x0C000, "bank1" );
+	memory_set_bankptr(machine, "bank1", cga.videoram + videoram_offset[0]);
 	memory_install_write16_handler( space, 0xb8000, 0xbbfff, 0, 0x0C000, pc1512_videoram16le_w );
 
 	memory_install_read16_handler( io_space, 0x3d0, 0x3df, 0, 0, pc1512_16le_r );
