@@ -377,9 +377,6 @@ static MACHINE_CONFIG_START( abc1600, abc1600_state )
     MCFG_PALETTE_INIT(black_and_white)
 	MCFG_MC6845_ADD(SY6845E_TAG, SY6845E, XTAL_64MHz, crtc_intf)
 
-	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-
 	// devices
 	MCFG_Z80DMA_ADD(Z8410AB1_0_TAG, 4000000, dma0_intf)
 	MCFG_Z80DMA_ADD(Z8410AB1_1_TAG, 4000000, dma1_intf)
