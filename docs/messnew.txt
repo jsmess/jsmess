@@ -25,7 +25,8 @@ Skeleton drivers:
 - PDP-11 [Unibus](M9312)
 - PDP-11 [Q-BUS] (M7195 - MXV11)
 - Terak 8510A
-
+- Olivetti M24
+- Olivetti M240
 
 System Driver Changes:
 ----------------------

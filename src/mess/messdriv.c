@@ -652,6 +652,8 @@ const game_driver * const drivers[] =
 	DRIVER( mc1702 )
 	DRIVER( mc1502 )
 	DRIVER( zdsupers )
+	DRIVER( m24 )
+	DRIVER( m240 )
 
 	/* AT */
 	DRIVER( ibm5170 )   /* 1984 IBM PC/AT 5170, original 6 MHz model    */
