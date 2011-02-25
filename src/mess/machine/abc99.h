@@ -82,6 +82,7 @@ public:
 	DECLARE_WRITE8_MEMBER( z2_bus_w );
 	DECLARE_WRITE8_MEMBER( z2_p1_w );
 	DECLARE_READ8_MEMBER( z2_p2_r );
+	DECLARE_READ8_MEMBER( z2_t0_r );
 	DECLARE_READ8_MEMBER( z2_t1_r );
 	DECLARE_READ8_MEMBER( z5_p1_r );
 	DECLARE_WRITE8_MEMBER( z5_p2_w );
@@ -95,19 +96,25 @@ public:
 protected:
     // device-level overrides
     virtual void device_start();
+	virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 private:
+	static const device_timer_id TIMER_SERIAL = 0;
+	static const device_timer_id TIMER_MOUSE = 1;
+
 	inline void serial_input();
 	inline void serial_output();
 	inline void serial_clock();
 	inline void key_down(int state);
+	inline void scan_mouse();
 
 	devcb_resolved_write_line	m_out_txd_func;
 	devcb_resolved_write_line	m_out_clock_func;
 	devcb_resolved_write_line	m_out_keydown_func;
 
 	emu_timer *m_serial_timer;
+	emu_timer *m_mouse_timer;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_mousecpu;

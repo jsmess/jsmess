@@ -37,9 +37,12 @@ Notes:
 
 	TODO:
 
-    - MCS-48 PC:01DC - Unimplemented opcode = 75 (ENT0 CLK, enable clock/3 output on T0)
-	- EA
+	- verify keys
 	- mouse
+	- investigate unknown ROMs
+    - MCS-48 PC:01DC - Unimplemented opcode = 75
+		- 75 = ENT0 CLK : enable CLK (unscaled_clock/3) output on T0
+		- halt Z2 when Z5 is reset, resume Z2 when Z5 executes ENT0 CLK instruction
 
 */
 
@@ -166,6 +169,7 @@ static ADDRESS_MAP_START( abc99_z2_io, ADDRESS_SPACE_IO, 8, abc99_device )
 	AM_RANGE(MCS48_PORT_BUS, MCS48_PORT_BUS) AM_DEVWRITE(DEVICE_SELF_OWNER, abc99_device, z2_bus_w)
 	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_DEVWRITE(DEVICE_SELF_OWNER, abc99_device, z2_p1_w)
 	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_DEVREAD(DEVICE_SELF_OWNER, abc99_device, z2_p2_r)
+	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_DEVREAD(DEVICE_SELF_OWNER, abc99_device, z2_t0_r)
 	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_DEVREAD(DEVICE_SELF_OWNER, abc99_device, z2_t1_r)
 ADDRESS_MAP_END
 
@@ -197,7 +201,7 @@ ADDRESS_MAP_END
 
 static MACHINE_CONFIG_FRAGMENT( abc99 )
 	// keyboard CPU
-	MCFG_CPU_ADD(I8035_Z2_TAG, I8035, XTAL_6MHz)
+	MCFG_CPU_ADD(I8035_Z2_TAG, I8035, XTAL_6MHz/3) // from Z5 T0 output
 	MCFG_CPU_PROGRAM_MAP(abc99_z2_mem)
 	MCFG_CPU_IO_MAP(abc99_z2_io)
 
@@ -256,7 +260,7 @@ INPUT_PORTS_START( abc99 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 3") PORT_CODE(KEYCODE_3_PAD) PORT_CHAR(UCHAR_MAMEKEY(3_PAD))
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad .") PORT_CODE(KEYCODE_DEL_PAD) PORT_CHAR(UCHAR_MAMEKEY(DEL_PAD))
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("LEFT SHIFT") PORT_CODE(KEYCODE_LSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Left SHIFT") PORT_CODE(KEYCODE_LSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("X3")
@@ -274,8 +278,8 @@ INPUT_PORTS_START( abc99 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("PF15")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("DEL") PORT_CODE(KEYCODE_DEL)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) // cursor B
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) // cursor D
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(UTF8_RIGHT) PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT)) // cursor B
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(UTF8_LEFT) PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT)) // cursor D
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_X) PORT_CHAR('x') PORT_CHAR('X')
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
@@ -285,7 +289,7 @@ INPUT_PORTS_START( abc99 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("BS") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(0x00FC) PORT_CHAR(0x00DC)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR('\'') PORT_CHAR('*')
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("RIGHT SHIFT") PORT_CODE(KEYCODE_RSHIFT)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Right SHIFT") PORT_CODE(KEYCODE_RSHIFT)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Q) PORT_CHAR('q') PORT_CHAR('Q')
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A) PORT_CHAR('a') PORT_CHAR('A')
 
@@ -294,8 +298,8 @@ INPUT_PORTS_START( abc99 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("PF14")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("INS") PORT_CODE(KEYCODE_INSERT)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 6") PORT_CODE(KEYCODE_6_PAD) PORT_CHAR(UCHAR_MAMEKEY(6_PAD))
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) // cursor A
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) // cursor C
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(UTF8_UP) PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP)) // cursor A
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(UTF8_DOWN) PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN)) // cursor C
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("CTRL") PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_MAMEKEY(LCONTROL))
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("CAPS LOCK") PORT_CODE(KEYCODE_CAPSLOCK) PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK))
 
@@ -437,9 +441,9 @@ const input_port_token *abc99_device_config::input_ports() const
 
 inline void abc99_device::serial_input()
 {
-	cpu_set_input_line(m_maincpu, INPUT_LINE_IRQ0, (m_si_en | m_si) ? CLEAR_LINE : ASSERT_LINE);
+	cpu_set_input_line(m_maincpu, MCS48_INPUT_IRQ, (m_si_en | m_si) ? CLEAR_LINE : ASSERT_LINE);
 	
-	cpu_set_input_line(m_mousecpu, INPUT_LINE_IRQ0, m_si ? CLEAR_LINE : ASSERT_LINE);
+	cpu_set_input_line(m_mousecpu, MCS48_INPUT_IRQ, m_si ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -474,6 +478,15 @@ inline void abc99_device::key_down(int state)
 }
 
 
+//-------------------------------------------------
+//  scan_mouse -
+//-------------------------------------------------
+
+inline void abc99_device::scan_mouse()
+{
+}
+
+
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -503,8 +516,10 @@ abc99_device::abc99_device(running_machine &_machine, const abc99_device_config 
 void abc99_device::device_start()
 {
 	// allocate timers
-	m_serial_timer = timer_alloc();
+	m_serial_timer = timer_alloc(TIMER_SERIAL);
 	m_serial_timer->adjust(MCS48_ALE_CLOCK(XTAL_6MHz));
+
+	m_mouse_timer = timer_alloc(TIMER_MOUSE);
 
 	// resolve callbacks
     devcb_resolve_write_line(&m_out_txd_func, &m_config.m_out_txd_func, this);
@@ -514,12 +529,33 @@ void abc99_device::device_start()
 
 
 //-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void abc99_device::device_reset()
+{
+	// set EA lines
+	cpu_set_input_line(m_maincpu, MCS48_INPUT_EA, ASSERT_LINE);
+	cpu_set_input_line(m_mousecpu, MCS48_INPUT_EA, ASSERT_LINE);
+}
+
+
+//-------------------------------------------------
 //  device_timer - handler timer events
 //-------------------------------------------------
 
 void abc99_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	serial_clock();
+	switch (id)
+	{
+	case TIMER_SERIAL:
+		serial_clock();
+		break;
+		
+	case TIMER_MOUSE:
+		scan_mouse();
+		break;
+	}
 }
 
 
@@ -529,6 +565,8 @@ void abc99_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 
 WRITE8_MEMBER( abc99_device::z2_bus_w )
 {
+	if (m_led_en) return;
+	
 	output_set_led_value(LED_1, BIT(data, 0));
 	output_set_led_value(LED_2, BIT(data, 1));
 	output_set_led_value(LED_3, BIT(data, 2));
@@ -609,6 +647,16 @@ READ8_MEMBER( abc99_device::z2_p2_r )
 
 
 //-------------------------------------------------
+//  z2_t0_r -
+//-------------------------------------------------
+
+READ8_MEMBER( abc99_device::z2_t0_r )
+{
+	return 1; // 0=mouse connected, 1=no mouse
+}
+
+
+//-------------------------------------------------
 //  z2_t1_r -
 //-------------------------------------------------
 
@@ -639,12 +687,10 @@ READ8_MEMBER( abc99_device::z5_p1_r )
 		
 	*/
 	
-	astring tempstring;
-	
 	UINT8 data = 0;
 
 	// mouse buttons
-	data |= input_port_read(machine, this, "MOUSEB") << 4;
+	data |= (input_port_read(machine, this, "MOUSEB") & 0x07) << 4;
 
 	// serial input
 	data |= m_si << 7;
