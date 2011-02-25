@@ -44,7 +44,7 @@ public:
 	required_device<device_t> m_cio;
 	required_device<device_t> m_fdc;
 	required_device<device_t> m_rtc;
-	optional_device<device_t> m_nvram; // TODO change to required
+	required_device<nmc9306_device> m_nvram;
 	required_device<device_t> m_crtc;
 
 	virtual void machine_start();

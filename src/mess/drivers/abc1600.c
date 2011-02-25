@@ -38,6 +38,7 @@
 #include "machine/8530scc.h"
 #include "machine/abc99.h"
 #include "machine/e0516.h"
+#include "machine/nmc9306.h"
 #include "machine/s1410.h"
 #include "machine/wd17xx.h"
 #include "machine/z80dart.h"
@@ -384,6 +385,11 @@ READ8_MEMBER( abc1600_state::cio_pc_r )
 		
 	*/
 
+	UINT8 data = 0;
+
+	// data in	
+	data |= (e0516_dio_r(m_rtc) | m_nvram->do_r()) << 1;
+	
 	return 0;
 }
 
@@ -395,10 +401,23 @@ WRITE8_MEMBER( abc1600_state::cio_pc_w )
 		
 		PC0		CLOCK
 		PC1		DATA OUT
-		PC2		enable RTC
-		PC3		enable NVRAM
+		PC2		RTC CS
+		PC3		NVRAM CS
 		
 	*/
+	
+	int clock = BIT(data, 0);
+	int data_out = BIT(data, 1);
+	int rtc_cs = BIT(data, 2);
+	int nvram_cs = BIT(data, 3);
+	
+	e0516_cs_w(m_rtc, rtc_cs);
+	e0516_dio_w(m_rtc, data_out);
+	e0516_clk_w(m_rtc, clock);
+	
+	m_nvram->cs_w(nvram_cs);
+	m_nvram->di_w(data_out);
+	m_nvram->sk_w(clock);
 }
 
 static Z8536_INTERFACE( cio_intf )
@@ -496,7 +515,7 @@ static MACHINE_CONFIG_START( abc1600, abc1600_state )
 	MCFG_Z80DART_ADD(Z8470AB1_TAG, XTAL_64MHz/16, dart_intf)
 	MCFG_SCC8530_ADD(Z8530B1_TAG, XTAL_64MHz/16)
 	MCFG_Z8536_ADD(Z8536B1_TAG, XTAL_64MHz/16, cio_intf)
-//	MCFG_NMC9306_ADD(NMC9306_TAG)
+	MCFG_NMC9306_ADD(NMC9306_TAG)
 	MCFG_E0516_ADD(E050_C16PC_TAG, XTAL_32_768kHz)
 	MCFG_WD179X_ADD(SAB1797_02P_TAG, fdc_intf)
 	MCFG_FLOPPY_DRIVE_ADD(FLOPPY_0, abc1600_floppy_config)
