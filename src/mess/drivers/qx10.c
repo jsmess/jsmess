@@ -611,6 +611,9 @@ static WRITE8_HANDLER( vram_bank_w )
 	if(state->color_mode)
 	{
 		state->vram_bank = data & 7;
+		if(data != 1 && data != 2 && data != 4)
+			printf("%02x\n",data);
+
 		if(data & 1) 	  { upd7220_bank_w(space->machine->device("upd7220"),0,0); } // B
 		else if(data & 2) { upd7220_bank_w(space->machine->device("upd7220"),0,1); } // G
 		else if(data & 4) { upd7220_bank_w(space->machine->device("upd7220"),0,2); } // R

@@ -106,16 +106,11 @@ static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 	}
 }
 
-static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
-{
-
-}
-
 static UPD7220_INTERFACE( hgdc_intf )
 {
 	"screen",
 	hgdc_display_pixels,
-	hgdc_draw_text,
+	NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL

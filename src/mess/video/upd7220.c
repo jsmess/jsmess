@@ -659,8 +659,8 @@ static void draw_char(upd7220_t *upd7220,int x,int y)
 	UINT8 tile_data;
 	UINT16 bitmask,upper_byte;
 
-	#if 0
 	/* snippet for character checking */
+	#if 0
 	for(yi=0;yi<8;yi++)
 	{
 		for(xi=0;xi<8;xi++)
@@ -674,12 +674,18 @@ static void draw_char(upd7220_t *upd7220,int x,int y)
 	xsize = upd7220->figs_d;
 	ysize = upd7220->figs_dc + 1;
 
-	printf("%d %d %d\n",upd7220->figs_dir,xsize,ysize);
-
-	/* TODO: internal direction, slanted character, zooming */
+	/* TODO: internal direction, slanted character, zooming, size stuff bigger than 8 */
 	for(yi=0;yi<ysize;yi++)
 	{
-		tile_data = upd7220->ra[((yi) & 7) | 8];
+		switch(upd7220->figs_dir & 7)
+		{
+			case 0: tile_data = 0xff; printf("%d %d %d %d %d\n",upd7220->pitch,x,y,xsize,ysize); break; // TODO
+			case 2:	tile_data = BITSWAP8(upd7220->ra[((yi) & 7) | 8],7,6,5,4,3,2,1,0); break;
+			case 6:	tile_data = BITSWAP8(upd7220->ra[((ysize-1-yi) & 7) | 8],0,1,2,3,4,5,6,7); break;
+			default: tile_data = BITSWAP8(upd7220->ra[((yi) & 7) | 8],7,6,5,4,3,2,1,0);
+					 printf("%d %d %d\n",upd7220->figs_dir,xsize,ysize);
+					 break;
+		}
 
 		for(xi=0;xi<xsize;xi++)
 		{
