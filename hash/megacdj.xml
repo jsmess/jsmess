@@ -319,7 +319,7 @@
 	</software>
   
 	<software name="lunar2">
-		<description>Lunar - Eternal Blue (Jpn)</description>
+		<description>Lunar - Eternal Blue (Jpn, set 1)</description>
 		<year>19??</year>
 		<publisher>Sega</publisher>
 		<part name="cdrom" interface="scd_cdrom">
@@ -1284,7 +1284,8 @@
 	</software>
 -->
   
-	<software name="heavynov">
+  <!--
+	<software name="hvynova">
 		<description>Heavy Nova (Jpn)</description>
 		<year>1991</year>
 		<publisher>Micronet</publisher>
@@ -1294,6 +1295,7 @@
 			</diskarea>
 		</part>
 	</software>
+  -->
   
 <!--
 	<software name="heimdall">
@@ -1429,9 +1431,9 @@
 -->
   
 	<!-- one of these probably matches the REDUMP set -->
-	<software name="lunear2b" cloneof="lunar2">
+	<software name="lunar2b" cloneof="lunar2">
 	<!-- Serial: T-45074P-00271-R1M -->
-		<description>Lunar - Eternal Blue (Jpn)</description>
+		<description>Lunar - Eternal Blue (Jpn, set 2)</description>
 		<year>1994</year>
 		<publisher>Game Arts</publisher>
 		<part name="cdrom" interface="scd_cdrom">
@@ -1441,9 +1443,9 @@
 		</part>
 	</software>
 
-	<software name="lunear2a" cloneof="lunar2">
+	<software name="lunar2a" cloneof="lunar2">
 	<!-- Serial: T-45074P-00271A-R1M -->
-		<description>Lunar - Eternal Blue (Jpn, Alt)</description>
+		<description>Lunar - Eternal Blue (Jpn, set 3)</description>
 		<year>1994</year>
 		<publisher>Game Arts</publisher>
 		<part name="cdrom" interface="scd_cdrom">

@@ -2981,5 +2981,17 @@
 		</part>
 	</software>
 
+  <!-- reports read error, but boots anyway? -->
+  <software name="mmm">
+    <description>Mighty Mighty Missile (US) (demo?)</description>
+    <year>2004</year>
+    <publisher>Sega</publisher>
+    <part name="cdrom" interface="scd_cdrom">
+      <diskarea name="cdrom">
+        <disk name="mighty mighty missile (u)" sha1="ce86a6d92939e8bf8a4633d7b8887e3247b34b7f"/>
+      </diskarea>
+    </part>
+  </software>
+
 
 </softwarelist>

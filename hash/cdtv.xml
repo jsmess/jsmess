@@ -81,5 +81,28 @@
 			</diskarea>
 		</part>
 	</software>
-  
+
+	<!-- Controls are a bit odd to figure out, but these both appear to work -->
+	<software name="turrican">
+		<description>Turrican</description>
+		<year>1991</year>
+		<publisher>Rainbow Arts</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="turrican" sha1="58caee214235e499d94f89f7ef6246cd548a9bd3"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="turricn2">
+		<description>Turrican II</description>
+		<year>1991</year>
+		<publisher>Rainbow Arts</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="turrican2" sha1="f7d371e43e5f82314330972a3ce531c4b9ae811e"/>
+			</diskarea>
+		</part>
+	</software>
+
 </softwarelist>
