@@ -32,7 +32,7 @@
 
 	<!-- JPN releases -->
 	<software name="1552tenk">
-		<description>1552 Tenka Tairan (SCD)(JPN)</description>
+		<description>1552 Tenka Tairan (SCD)(Jpn)</description>
 		<!-- Serial: AKCD3001 - Release Date: 1993-07-16 -->
 		<year>1993</year>
 		<publisher>ASK Kodansha</publisher>
@@ -44,7 +44,7 @@
 	</software>
 
 	<software name="3x3eyes">
-		<description>3 x 3 Eyes - Sanjiyan Hensei (ACD, SCD)(JPN)</description>
+		<description>3 x 3 Eyes - Sanjiyan Hensei (ACD, SCD)(Jpn)</description>
 		<!-- Serial: HECD4010 - Release Date: 1994-07-08 -->
 		<year>1994</year>
 		<publisher>NEC Home Electronics</publisher>
@@ -56,7 +56,7 @@
 	</software>
 
 	<software name="aiii">
-		<description>A. III (SCD)(JPN)</description>
+		<description>A. III (SCD)(Jpn)</description>
 		<!-- Serial: ADCD3001 - Release Date: 1993-06-11 -->
 		<year>1993</year>
 		<publisher>Artdink</publisher>
@@ -68,7 +68,7 @@
 	</software>
 
 	<software name="avgeo">
-		<description>Advanced Variable Geo (SCD)(JPN)</description>
+		<description>Advanced Variable Geo (SCD)(Jpn)</description>
 		<!-- Serial: GLCD4001 - Release Date: 1994-07-22 -->
 		<year>1994</year>
 		<publisher>TGL</publisher>
@@ -80,7 +80,7 @@
 	</software>
 
 	<software name="advquiz">
-		<description>Adventure Quiz - Capcom World Hatena no Daibouken (SCD)(JPN)</description>
+		<description>Adventure Quiz - Capcom World Hatena no Daibouken (SCD)(Jpn)</description>
 		<!-- Serial: HCD2028 - Release Date: 1992-06-19 -->
 		<year>1992</year>
 		<publisher>Hudson</publisher>
@@ -92,7 +92,7 @@
 	</software>
 
 	<software name="aichoan">
-		<description>Ai Chou Aniki (SCD)(JPN)</description>
+		<description>Ai Chou Aniki (SCD)(Jpn)</description>
 		<!-- Serial: NSCD5018 - Release Date: 1995-02-24 -->
 		<year>1995</year>
 		<publisher>NCS</publisher>
@@ -104,7 +104,7 @@
 	</software>
 
 	<software name="draculax">
-		<description>Akumajou Dracula X - Chi no Rondo (SCD)(JPN)</description>
+		<description>Akumajou Dracula X - Chi no Rondo (SCD)(Jpn)</description>
 		<!-- Serial: KMCD3005 - Release Date: 1993-10-29 -->
 		<year>1993</year>
 		<publisher>Konami</publisher>
@@ -116,7 +116,7 @@
 	</software>
 
 	<software name="alshark">
-		<description>Alshark [Imperfect] (SCD)(JPN)</description>
+		<description>Alshark [Imperfect] (SCD)(Jpn)</description>
 		<!-- Serial: JCCD4014 - Release Date: 1994-08-26 -->
 		<year>1994</year>
 		<publisher>Victor Entertainment</publisher>
@@ -128,7 +128,7 @@
 	</software>
 
 	<software name="anesan">
-		<description>Ane-San (SCD)(JPN)</description>
+		<description>Ane-San (SCD)(Jpn)</description>
 		<!-- Serial: NAPR-1045 - Release Date: 1995-02-24 -->
 		<year>1995</year>
 		<publisher>NEC Avenue</publisher>
@@ -140,7 +140,7 @@
 	</software>
 
 	<software name="angels2">
-		<description>Angels II - Holy Night [Prototype][Backup] (SCD)(JPN)</description>
+		<description>Angels II - Holy Night [Prototype][Backup] (SCD)(Jpn)</description>
 		<!-- Serial:  -->
 		<year>19??</year>
 		<publisher>NEC</publisher>
@@ -152,7 +152,7 @@
 	</software>
 
 	<software name="arukiba">
-		<description>Arunamu no Kiba - Juuzoku Juuni Shinto Densetsu (SCD)(JPN)</description>
+		<description>Arunamu no Kiba - Juuzoku Juuni Shinto Densetsu (SCD)(Jpn)</description>
 		<!-- Serial: RSCD4006 - Release Date: 1994-12-22 -->
 		<year>1994</year>
 		<publisher>Right Stuff</publisher>
@@ -164,7 +164,7 @@
 	</software>
 
 	<software name="asuka120">
-		<description>Asuka 120% Maxima Burning Fest (SCD)(JPN)</description>
+		<description>Asuka 120% Maxima Burning Fest (SCD)(Jpn)</description>
 		<!-- Serial: NAPR-1049 - Release Date: 1995-07-28 -->
 		<year>1995</year>
 		<publisher>NEC Avenue</publisher>
@@ -176,7 +176,7 @@
 	</software>
 
 	<software name="auroraq">
-		<description>Aurora Quest - Otaku no Seiza (SCD)(JPN)</description>
+		<description>Aurora Quest - Otaku no Seiza (SCD)(Jpn)</description>
 		<!-- Serial: PVCD-3010 - Release Date: 1993-12-10 -->
 		<year>1993</year>
 		<publisher>Pack-In-Video</publisher>
@@ -188,7 +188,7 @@
 	</software>
 
 	<software name="avenger">
-		<description>Avenger (CD)(JPN)</description>
+		<description>Avenger (CD)(Jpn)</description>
 		<!-- Serial: TJCD0011 - Release Date: 1990-12-07 -->
 		<year>1990</year>
 		<publisher>Nihon Telenet</publisher>
@@ -200,7 +200,7 @@
 	</software>
 
 	<software name="babel">
-		<description>Babel (SCD)(JPN)</description>
+		<description>Babel (SCD)(Jpn)</description>
 		<!-- Serial: TJCD2024 - Release Date: 1992-03-27 -->
 		<year>1992</year>
 		<publisher>Nihon Telenet</publisher>
@@ -212,7 +212,7 @@
 	</software>
 
 	<software name="babyjo">
-		<description>Baby Jo (SCD)(JPN)</description>
+		<description>Baby Jo (SCD)(Jpn)</description>
 		<!-- Serial: MWCD2004 - Release Date: 1992-08-28 -->
 		<year>1992</year>
 		<publisher>Micro World</publisher>
@@ -224,7 +224,7 @@
 	</software>
 
 	<software name="bakuzone">
-		<description>Bakuden Unbalance Zone (SCD)(JPN)</description>
+		<description>Bakuden Unbalance Zone (SCD)(Jpn)</description>
 		<!-- Serial: SRCD4001 - Release Date: 1994-04-22 -->
 		<year>1994</year>
 		<publisher>Sony Music Entertainment</publisher>
@@ -236,7 +236,7 @@
 	</software>
 
 	<software name="bakuhunt">
-		<description>Bakuretsu Hunter (SCD)(JPN)</description>
+		<description>Bakuretsu Hunter (SCD)(Jpn)</description>
 		<!-- Serial: HMD-002 - Release Date: 1994-01-01 -->
 		<year>1994</year>
 		<publisher>Dengeki</publisher>
@@ -248,7 +248,7 @@
 	</software>
 
 	<software name="bakushou">
-		<description>Bakushou Yoshimoto no Shinkigeki (SCD)(JPN)</description>
+		<description>Bakushou Yoshimoto no Shinkigeki (SCD)(Jpn)</description>
 		<!-- Serial: HCD4045 - Release Date: 1994-01-03 -->
 		<year>1994</year>
 		<publisher>Hudson</publisher>
@@ -260,7 +260,7 @@
 	</software>
 
 	<software name="basted">
-		<description>Basted (SCD)(JPN)</description>
+		<description>Basted (SCD)(Jpn)</description>
 		<!-- Serial: NAPR-1042 - Release Date: 1994-10-21 -->
 		<year>1994</year>
 		<publisher>NEC Avenue</publisher>
@@ -272,7 +272,7 @@
 	</software>
 
 	<software name="battle94">
-		<description>Battlefield '94 in Tokyo Dome (ACD)(JPN)</description>
+		<description>Battlefield '94 in Tokyo Dome (ACD)(Jpn)</description>
 		<!-- Serial: FCCD4001 - Release Date: 1994-11-25 -->
 		<year>1994</year>
 		<publisher>Fujicom</publisher>
@@ -284,7 +284,7 @@
 	</software>
 
 	<software name="bazaru">
-		<description>Bazaru Degozaru no Game Degozaru (SCD)(JPN)</description>
+		<description>Bazaru Degozaru no Game Degozaru (SCD)(Jpn)</description>
 		<!-- Serial: HECD5025 - Release Date: 1996-07-26 -->
 		<year>1996</year>
 		<publisher>NEC Home Electronics</publisher>
@@ -296,7 +296,7 @@
 	</software>
 
 	<software name="bikkurim">
-		<description>Bikkuriman Daijikai (CD)(JPN)</description>
+		<description>Bikkuriman Daijikai (CD)(Jpn)</description>
 		<!-- Serial: HCD8003 - Release Date: 1988-12-23 -->
 		<year>1988</year>
 		<publisher>Hudson</publisher>
@@ -308,7 +308,7 @@
 	</software>
 
 	<software name="sailormn">
-		<description>Bishoujo Senshi Sailor Moon (SCD)(JPN)</description>
+		<description>Bishoujo Senshi Sailor Moon (SCD)(Jpn)</description>
 		<!-- Serial: BACD4002 - Release Date: 1994-08-05 -->
 		<year>1994</year>
 		<publisher>Banpresto</publisher>
@@ -320,7 +320,7 @@
 	</software>
 
 	<software name="sailormc">
-		<description>Bishoujo Senshi Sailor Moon Collection (SCD)(JPN)</description>
+		<description>Bishoujo Senshi Sailor Moon Collection (SCD)(Jpn)</description>
 		<!-- Serial: BACD4004 - Release Date: 1994-11-25 -->
 		<year>1994</year>
 		<publisher>Banpresto</publisher>
@@ -332,7 +332,7 @@
 	</software>
 
 	<software name="blckhole">
-		<description>Black Hole Assault (SCD)(JPN)</description>
+		<description>Black Hole Assault (SCD)(Jpn)</description>
 		<!-- Serial: MNCD3001 - Release Date: 1993-07-23 -->
 		<year>1993</year>
 		<publisher>Micronet</publisher>
@@ -344,7 +344,7 @@
 	</software>
 
 	<software name="blodgear">
-		<description>Blood Gear (SCD)(JPN)</description>
+		<description>Blood Gear (SCD)(Jpn)</description>
 		<!-- Serial: HCD4048 - Release Date: 1994-10-28 -->
 		<year>1994</year>
 		<publisher>Hudson</publisher>
@@ -356,7 +356,7 @@
 	</software>
 
 	<software name="bombmn94">
-		<description>Bomberman '94 Taikenban (SCD)(JPN)</description>
+		<description>Bomberman '94 Taikenban (SCD)(Jpn)</description>
 		<!-- Serial: HCD3054 - Release Date: 1993-12-10 -->
 		<year>1993</year>
 		<publisher>Hudson</publisher>
@@ -368,7 +368,7 @@
 	</software>
 
 	<software name="panicbom">
-		<description>Bomberman Panic Bomber (SCD)(JPN)</description>
+		<description>Bomberman Panic Bomber (SCD)(Jpn)</description>
 		<!-- Serial: HCD4069 - Release Date: 1994-12-22 -->
 		<year>1994</year>
 		<publisher>Hudson</publisher>
@@ -380,7 +380,7 @@
 	</software>
 
 	<software name="bnzabros">
-		<description>Bonanza Bros. (SCD)(JPN)</description>
+		<description>Bonanza Bros. (SCD)(Jpn)</description>
 		<!-- Serial: NAPR-2028 - Release Date: 1992-07-31 -->
 		<year>1992</year>
 		<publisher>NEC Avenue</publisher>
@@ -392,7 +392,7 @@
 	</software>
 
 	<software name="brandish">
-		<description>Brandish (ACD, SCD)(JPN)</description>
+		<description>Brandish (ACD, SCD)(Jpn)</description>
 		<!-- Serial: HECD4007 - Release Date: 1994-06-17 -->
 		<year>1994</year>
 		<publisher>NEC Home Electronics</publisher>
@@ -404,7 +404,7 @@
 	</software>
 
 	<software name="browning">
-		<description>Browning (SCD)(JPN)</description>
+		<description>Browning (SCD)(Jpn)</description>
 		<!-- Serial: TJCD1020 - Release Date: 1992-02-07 -->
 		<year>1992</year>
 		<publisher>Nihon Telenet</publisher>
@@ -416,7 +416,7 @@
 	</software>
 
 	<software name="buildlnd">
-		<description>Builderland (SCD)(JPN)</description>
+		<description>Builderland (SCD)(Jpn)</description>
 		<!-- Serial: MWCD2003 - Release Date: 1992-04-01 -->
 		<year>1992</year>
 		<publisher>Micro World</publisher>
@@ -428,7 +428,7 @@
 	</software>
 
 	<software name="bunilla">
-		<description>Bunilla Syndrome Mahjong (CD, SCD)(JPN)</description>
+		<description>Bunilla Syndrome Mahjong (CD, SCD)(Jpn)</description>
 		<!-- Serial: NBCD1001 - Release Date: 1991-10-25 -->
 		<year>1991</year>
 		<publisher>Nichibutsu</publisher>
@@ -440,7 +440,7 @@
 	</software>
 
 	<software name="burai">
-		<description>Burai - Hachigyoku no Yuushi Densetsu (CD)(JPN)</description>
+		<description>Burai - Hachigyoku no Yuushi Densetsu (CD)(Jpn)</description>
 		<!-- Serial: RHCD1001 - Release Date: 1991-08-06 -->
 		<year>1991</year>
 		<publisher>Riverhill Software</publisher>
@@ -452,7 +452,7 @@
 	</software>
 
 	<software name="burai2">
-		<description>Burai II - Yami Koutei no Gyakushuu (SCD)(JPN)</description>
+		<description>Burai II - Yami Koutei no Gyakushuu (SCD)(Jpn)</description>
 		<!-- Serial: RHCD2004 - Release Date: 1992-12-18 -->
 		<year>1992</year>
 		<publisher>Riverhill Software</publisher>
@@ -464,7 +464,7 @@
 	</software>
 
 	<software name="cal2">
-		<description>Cal II (SCD)(JPN)</description>
+		<description>Cal II (SCD)(Jpn)</description>
 		<!-- Serial: NAPR-1034 - Release Date: 1993-03-31 -->
 		<year>1993</year>
 		<publisher>NEC Avenue</publisher>
@@ -476,7 +476,7 @@
 	</software>
 
 	<software name="cal3">
-		<description>Cal III (SCD)(JPN)</description>
+		<description>Cal III (SCD)(Jpn)</description>
 		<!-- Serial: NAPR-1039 - Release Date: 1994-03-25 -->
 		<year>1994</year>
 		<publisher>NEC Avenue</publisher>
@@ -488,7 +488,7 @@
 	</software>
 
 	<software name="cardangl">
-		<description>Cardangels (SCD)(JPN)</description>
+		<description>Cardangels (SCD)(Jpn)</description>
 		<!-- Serial: FCCD4002 - Release Date: 1994-12-09 -->
 		<year>1994</year>
 		<publisher>Fujicom</publisher>
@@ -500,7 +500,7 @@
 	</software>
 
 	<software name="cdbattle">
-		<description>CD Battle Hikari no Yuushatachi (SCD)(JPN)</description>
+		<description>CD Battle Hikari no Yuushatachi (SCD)(Jpn)</description>
 		<!-- Serial: KICD3001 - Release Date: 1993-03-19 -->
 		<year>1993</year>
 		<publisher>King Records</publisher>
@@ -512,7 +512,7 @@
 	</software>
 
 	<software name="cddenjin">
-		<description>CD Denjin Rockabilly Tengoku (SCD)(JPN)</description>
+		<description>CD Denjin Rockabilly Tengoku (SCD)(Jpn)</description>
 		<!-- Serial: HCD3049 - Release Date: 1993-07-30 -->
 		<year>1993</year>
 		<publisher>Hudson</publisher>
@@ -524,7 +524,7 @@
 	</software>
 
 	<software name="chrally">
-		<description>Championship Rally (SCD)(JPN)</description>
+		<description>Championship Rally (SCD)(Jpn)</description>
 		<!-- Serial: IGCD3006 - Release Date: 1993-08-06 -->
 		<year>1993</year>
 		<publisher>Intec</publisher>
@@ -536,7 +536,7 @@
 	</software>
 
 	<software name="chiki">
-		<description>Chiki Chiki Boys (SCD)(JPN)</description>
+		<description>Chiki Chiki Boys (SCD)(Jpn)</description>
 		<!-- Serial: NAPR-1033 - Release Date: 1994-07-15 -->
 		<year>1994</year>
 		<publisher>NEC Avenue</publisher>
@@ -548,7 +548,7 @@
 	</software>
 
 	<software name="choaniki">
-		<description>Chou Aniki (SCD)(JPN)</description>
+		<description>Chou Aniki (SCD)(Jpn)</description>
 		<!-- Serial: NSCD2013 - Release Date: 1992-12-25 -->
 		<year>1992</year>
 		<publisher>NCS</publisher>
@@ -560,7 +560,7 @@
 	</software>
 
 	<software name="dynheroj" cloneof="dynhero">
-		<description>Chou Eiyuu Densetsu - Dynastic Hero (SCD)(JPN)</description>
+		<description>Chou Eiyuu Densetsu - Dynastic Hero (SCD)(Jpn)</description>
 		<!-- Serial: HCD4032 - Release Date: 1994-05-20 -->
 		<year>1994</year>
 		<publisher>Hudson</publisher>
@@ -572,7 +572,7 @@
 	</software>
 
 	<software name="cobra">
-		<description>Cobra - Kokuryuuou no Densetsu (CD)(JPN)</description>
+		<description>Cobra - Kokuryuuou no Densetsu (CD)(Jpn)</description>
 		<!-- Serial: HCD8004 - Release Date: 1989-03-31 -->
 		<year>1989</year>
 		<publisher>Hudson</publisher>
@@ -584,7 +584,7 @@
 	</software>
 
 	<software name="cobra2">
-		<description>Cobra II - Densetsu no Otoko (CD)(JPN)</description>
+		<description>Cobra II - Densetsu no Otoko (CD)(Jpn)</description>
 		<!-- Serial: HCD1014 - Release Date: 1991-06-07 -->
 		<year>1991</year>
 		<publisher>Hudson</publisher>
@@ -596,7 +596,7 @@
 	</software>
 
 	<software name="colorwar">
-		<description>Color Wars (CD)(JPN)</description>
+		<description>Color Wars (CD)(Jpn)</description>
 		<!-- Serial: CJCD2002 - Release Date: 1992-07-10 -->
 		<year>1992</year>
 		<publisher>Coconuts Japan</publisher>
@@ -608,7 +608,7 @@
 	</software>
 
 	<software name="cosmfnt">
-		<description>Cosmic Fantasy - Bouken Shounen Yuu (CD)(JPN)</description>
+		<description>Cosmic Fantasy - Bouken Shounen Yuu (CD)(Jpn)</description>
 		<!-- Serial: TJCD9003 - Release Date: 1990-03-30 -->
 		<year>1990</year>
 		<publisher>Nihon Telenet</publisher>
@@ -620,7 +620,7 @@
 	</software>
 
 	<software name="cosmfnt2j" cloneof="cosmfnt2">
-		<description>Cosmic Fantasy II - Bouken Shounen Ban (CD)(JPN)</description>
+		<description>Cosmic Fantasy II - Bouken Shounen Ban (CD)(Jpn)</description>
 		<!-- Serial: TJCD1015 - Release Date: 1991-04-15 -->
 		<year>1991</year>
 		<publisher>Nihon Telenet</publisher>
@@ -632,7 +632,7 @@
 	</software>
 
 	<software name="cosmfnt3">
-		<description>Cosmic Fantasy III - Bouken Shounen Rei (SCD)(JPN)</description>
+		<description>Cosmic Fantasy III - Bouken Shounen Rei (SCD)(Jpn)</description>
 		<!-- Serial: TJCD2029 - Release Date: 1992-09-25 -->
 		<year>1992</year>
 		<publisher>Nihon Telenet</publisher>
@@ -644,7 +644,7 @@
 	</software>
 
 	<software name="cosmfn4g">
-		<description>Cosmic Fantasy IV - Ginga Shounen Densetsu Gekitou Hen (SCD)(JPN)</description>
+		<description>Cosmic Fantasy IV - Ginga Shounen Densetsu Gekitou Hen (SCD)(Jpn)</description>
 		<!-- Serial: TJCD4040 - Release Date: 1994-11-25 -->
 		<year>1994</year>
 		<publisher>Nihon Telenet</publisher>
@@ -656,7 +656,7 @@
 	</software>
 
 	<software name="cosmfn4t">
-		<description>Cosmic Fantasy IV - Ginga Shounen Densetsu Totsunyuu Hen (SCD)(JPN)</description>
+		<description>Cosmic Fantasy IV - Ginga Shounen Densetsu Totsunyuu Hen (SCD)(Jpn)</description>
 		<!-- Serial: TJCD4038 - Release Date: 1994-06-10 -->
 		<year>1994</year>
 		<publisher>Nihon Telenet</publisher>
@@ -668,7 +668,7 @@
 	</software>
 
 	<software name="cottonj" cloneof="cotton">
-		<description>Cotton - Fantastic Night Dreams (SCD)(JPN)</description>
+		<description>Cotton - Fantastic Night Dreams (SCD)(Jpn)</description>
 		<!-- Serial: HCD3043 - Release Date: 1993-02-12 -->
 		<year>1993</year>
 		<publisher>Hudson</publisher>
@@ -680,7 +680,7 @@
 	</software>
 
 	<software name="crazyhos">
-		<description>Crazy Hospital - Fushigi no Kuni no Tenshi (SCD)(JPN)</description>
+		<description>Crazy Hospital - Fushigi no Kuni no Tenshi (SCD)(Jpn)</description>
 		<!-- Release Date: 1997-03-10 -->
 		<year>1997</year>
 		<publisher>Asia Soft Lab</publisher>
@@ -692,7 +692,7 @@
 	</software>
 
 	<software name="crestwlf">
-		<description>Crest of Wolf (SCD)(JPN)</description>
+		<description>Crest of Wolf (SCD)(Jpn)</description>
 		<!-- Serial: HCD3044 - Release Date: 1993-02-26 -->
 		<year>1993</year>
 		<publisher>Hudson</publisher>
@@ -704,7 +704,7 @@
 	</software>
 
 	<software name="cyber808">
-		<description>Cyber City OEDO 808 (CD)(JPN)</description>
+		<description>Cyber City OEDO 808 (CD)(Jpn)</description>
 		<!-- Serial: NSCD0003 - Release Date: 1991-03-15 -->
 		<year>1991</year>
 		<publisher>NCS</publisher>
@@ -716,7 +716,7 @@
 	</software>
 
 	<software name="daisenpu">
-		<description>Daisenpuu Custom (CD)(JPN)</description>
+		<description>Daisenpuu Custom (CD)(Jpn)</description>
 		<!-- Serial: NAPR-1019 - Release Date: 1991-07-26 -->
 		<year>1991</year>
 		<publisher>NEC Avenue</publisher>
@@ -728,7 +728,7 @@
 	</software>
 
 	<software name="daisenry">
-		<description>Daisenryaku II - Campaign Version (SCD)(JPN)</description>
+		<description>Daisenryaku II - Campaign Version (SCD)(Jpn)</description>
 		<!-- Serial: MCCD1003 - Release Date: 1992-05-29 -->
 		<year>1992</year>
 		<publisher>Micro Cabin</publisher>
@@ -740,7 +740,7 @@
 	</software>
 
 	<software name="deja">
-		<description>De-Ja (SCD)(JPN)</description>
+		<description>De-Ja (SCD)(Jpn)</description>
 		<!-- Serial: NIPR-1002 - Release Date: 1996-07-12 -->
 		<year>1996</year>
 		<publisher>NEC Interchannel</publisher>
@@ -752,7 +752,7 @@
 	</software>
 
 	<software name="dedbrain">
-		<description>Dead of the Brain I II (SCD)(JPN)</description>
+		<description>Dead of the Brain I II (SCD)(Jpn)</description>
 		<!-- Serial: HECD5024 - Release Date: 1999-06-03 -->
 		<year>1999</year>
 		<publisher>NEC Home Electronics</publisher>
@@ -764,7 +764,7 @@
 	</software>
 
 	<software name="deathbrn">
-		<description>Death Bringer - The Knight of Darkness (CD)(JPN)</description>
+		<description>Death Bringer - The Knight of Darkness (CD)(Jpn)</description>
 		<!-- Serial: TJCD0007 - Release Date: 1990-04-27 -->
 		<year>1990</year>
 		<publisher>Nihon Telenet</publisher>
@@ -776,7 +776,7 @@
 	</software>
 
 	<software name="dedenden">
-		<description>Deden no Den (SCD)(JPN)</description>
+		<description>Deden no Den (SCD)(Jpn)</description>
 		<!-- Serial: HCD4064 - Note: Promotional item -->
 		<year>199?</year>
 		<publisher>Hudson</publisher>
@@ -788,7 +788,7 @@
 	</software>
 
 	<software name="dekoboko">
-		<description>Dekoboko Densetsu - Hashire Wagamanma (CD)(JPN)</description>
+		<description>Dekoboko Densetsu - Hashire Wagamanma (CD)(Jpn)</description>
 		<!-- Serial: TJCD0013 - Release Date: 1990-11-02 -->
 		<year>1990</year>
 		<publisher>Nihon Telenet</publisher>
@@ -800,7 +800,7 @@
 	</software>
 
 	<software name="dennoten">
-		<description>Dennou Tenshi - Digital Angel (SCD)(JPN)</description>
+		<description>Dennou Tenshi - Digital Angel (SCD)(Jpn)</description>
 		<!-- Serial: TICD4003 - Release Date: 1994-11-16 -->
 		<year>1994</year>
 		<publisher>Tokuma Shoten</publisher>
@@ -812,7 +812,7 @@
 	</software>
 
 	<software name="devmag1">
-		<description>Develo Magazine Volume I (SCD)(JPN)</description>
+		<description>Develo Magazine Volume I (SCD)(Jpn)</description>
 		<!-- Serial: TICD-6008 - Release Date: 1996-12-26 -->
 		<year>1996</year>
 		<publisher>Tokuma Shoten</publisher>
@@ -824,7 +824,7 @@
 	</software>
 
 	<software name="devstart">
-		<description>Develo Starter Kit - Assembler (SCD)(JPN)</description>
+		<description>Develo Starter Kit - Assembler (SCD)(Jpn)</description>
 		<!-- Serial: TICD-6004 - Release Date: 1996-03-01 -->
 		<year>1996</year>
 		<publisher>Tokuma Shoten</publisher>
@@ -836,7 +836,7 @@
 	</software>
 
 	<software name="devbasic">
-		<description>Develo Starter Kit - Basic (SCD)(JPN)</description>
+		<description>Develo Starter Kit - Basic (SCD)(Jpn)</description>
 		<!-- Serial: TICD-6007 - Release Date: 1996-09-10 -->
 		<year>1996</year>
 		<publisher>Tokuma Shoten</publisher>
@@ -848,7 +848,7 @@
 	</software>
 
 	<software name="doraemon">
-		<description>Doraemon Nobita no Dorabian Night (SCD)(JPN)</description>
+		<description>Doraemon Nobita no Dorabian Night (SCD)(Jpn)</description>
 		<!-- Serial: HCD2030 - Release Date: 1992-05-29 -->
 		<year>1992</year>
 		<publisher>Hudson</publisher>
@@ -860,7 +860,7 @@
 	</software>
 
 	<software name="ddragon2">
-		<description>Double Dragon II - The Revenge (SCD)(JPN)</description>
+		<description>Double Dragon II - The Revenge (SCD)(Jpn)</description>
 		<!-- Serial: NXCD2010 - Release Date: 1993-03-12 -->
 		<year>1993</year>
 		<publisher>Naxat Soft</publisher>
@@ -872,7 +872,7 @@
 	</software>
 
 	<software name="dokyusei">
-		<description>Doukyuusei (SCD)(JPN)</description>
+		<description>Doukyuusei (SCD)(Jpn)</description>
 		<!-- Serial: NAPR-1051 - Release Date: 1995-11-23 -->
 		<year>1995</year>
 		<publisher>NEC Avenue</publisher>
@@ -884,7 +884,7 @@
 	</software>
 
 	<software name="downld2">
-		<description>Download II (CD)(JPN)</description>
+		<description>Download II (CD)(Jpn)</description>
 		<!-- Serial: NAPR-1018 - Release Date: 1991-03-29 -->
 		<year>1991</year>
 		<publisher>NEC Avenue</publisher>
@@ -896,7 +896,7 @@
 	</software>
 
 	<software name="downtown">
-		<description>Downtown Nekketsu Monogatari (SCD)(JPN)</description>
+		<description>Downtown Nekketsu Monogatari (SCD)(Jpn)</description>
 		<!-- Serial: NXCD2015 - Release Date: 1993-12-24 -->
 		<year>1993</year>
 		<publisher>Naxat Soft</publisher>
@@ -908,7 +908,7 @@
 	</software>
 
 	<software name="draghalf">
-		<description>Dragon Half (SCD)(JPN)</description>
+		<description>Dragon Half (SCD)(Jpn)</description>
 		<!-- Serial: MCCD4006 - Release Date: 1994-09-30 -->
 		<year>1994</year>
 		<publisher>Micro Cabin</publisher>
@@ -920,7 +920,7 @@
 	</software>
 
 	<software name="dknightg">
-		<description>Dragon Knight &amp; Grafitti (SCD)(JPN)</description>
+		<description>Dragon Knight &amp; Grafitti (SCD)(Jpn)</description>
 		<!-- Serial: NAPR-1046 - Release Date: 1995-03-31 -->
 		<year>1995</year>
 		<publisher>NEC Avenue</publisher>
@@ -932,7 +932,7 @@
 	</software>
 
 	<software name="dknight2">
-		<description>Dragon Knight II (SCD)(JPN)</description>
+		<description>Dragon Knight II (SCD)(Jpn)</description>
 		<!-- Serial: NAPR-1029 - Release Date: 1992-08-07 -->
 		<year>1992</year>
 		<publisher>NEC Avenue</publisher>
@@ -944,7 +944,7 @@
 	</software>
 
 	<software name="dknight3">
-		<description>Dragon Knight III (SCD)(JPN)</description>
+		<description>Dragon Knight III (SCD)(Jpn)</description>
 		<!-- Serial: NAPR-1035 - Release Date: 1994-07-22 -->
 		<year>1994</year>
 		<publisher>NEC Avenue</publisher>
@@ -956,7 +956,7 @@
 	</software>
 
 	<software name="dslayerj" cloneof="dslayer">
-		<description>Dragon Slayer - Eiyuu Densetsu (SCD)(JPN)</description>
+		<description>Dragon Slayer - Eiyuu Densetsu (SCD)(Jpn)</description>
 		<!-- Serial: HCD1020 - Release Date: 1991-10-25 -->
 		<year>1991</year>
 		<publisher>Hudson</publisher>
@@ -968,7 +968,7 @@
 	</software>
 
 	<software name="dslayer2">
-		<description>Dragon Slayer - Eiyuu Densetsu II (SCD)(JPN)</description>
+		<description>Dragon Slayer - Eiyuu Densetsu II (SCD)(Jpn)</description>
 		<!-- Serial: HCD2033 - Release Date: 1992-12-23 -->
 		<year>1992</year>
 		<publisher>Hudson</publisher>
@@ -980,7 +980,7 @@
 	</software>
 
 	<software name="dbz">
-		<description>Dragonball Z - Idainaru Son Gokuu Densetsu (SCD)(JPN)</description>
+		<description>Dragonball Z - Idainaru Son Gokuu Densetsu (SCD)(Jpn)</description>
 		<!-- Serial: BNCD4001 - Release Date: 1994-11-11 -->
 		<year>1994</year>
 		<publisher>Bandai</publisher>
@@ -992,7 +992,7 @@
 	</software>
 
 	<software name="dungexp2j" cloneof="dungexp2">
-		<description>Dungeon Explorer II (SCD)(JPN)</description>
+		<description>Dungeon Explorer II (SCD)(Jpn)</description>
 		<!-- Serial: HCD3034 - Release Date: 1993-03-26 -->
 		<year>1993</year>
 		<publisher>Hudson</publisher>
@@ -1004,7 +1004,7 @@
 	</software>
 
 	<software name="dungmstrj" cloneof="dungmstr">
-		<description>Dungeon Master - Theron's Quest (SCD)(JPN)</description>
+		<description>Dungeon Master - Theron's Quest (SCD)(Jpn)</description>
 		<!-- Serial: JCCD2010 - Release Date: 1992-09-18 -->
 		<year>1992</year>
 		<publisher>Victor Entertainment</publisher>
@@ -1016,7 +1016,7 @@
 	</software>
 
 	<software name="eferajil">
-		<description>Efera &amp; Jiliora - The Emblem from Darkness (CD)(JPN)</description>
+		<description>Efera &amp; Jiliora - The Emblem from Darkness (CD)(Jpn)</description>
 		<!-- Serial: BRCD1002 - Release Date: 1991-12-13 -->
 		<year>1991</year>
 		<publisher>Brain Gray</publisher>
@@ -1028,7 +1028,7 @@
 	</software>
 
 	<software name="eikankim">
-		<description>Eikan ha Kimini - Koukou Yakyuu Zenkoku Taikai (ACD, SCD)(JPN)</description>
+		<description>Eikan ha Kimini - Koukou Yakyuu Zenkoku Taikai (ACD, SCD)(Jpn)</description>
 		<!-- Serial: ADCD4003 - Release Date: 1994-07-15 -->
 		<year>1994</year>
 		<publisher>Artdink</publisher>
@@ -1040,7 +1040,7 @@
 	</software>
 
 	<software name="eiyu3gok">
-		<description>Eiyuu Sangokushi (SCD)(JPN)</description>
+		<description>Eiyuu Sangokushi (SCD)(Jpn)</description>
 		<!-- Serial: ICCD3003 - Release Date: 1993-03-26 -->
 		<year>1993</year>
 		<publisher>Irem</publisher>
@@ -1052,7 +1052,7 @@
 	</software>
 
 	<software name="emerdrgn">
-		<description>Emerald Dragon (SCD)(JPN)</description>
+		<description>Emerald Dragon (SCD)(Jpn)</description>
 		<!-- Serial: HECD3005 - Release Date: 1994-01-28 -->
 		<year>1994</year>
 		<publisher>NEC Home Electronics</publisher>
@@ -1064,7 +1064,7 @@
 	</software>
 
 	<software name="emerdrgnt" cloneof="emerdrgn">
-		<description>Emerald Dragon Taikenban (SCD)(JPN)</description>
+		<description>Emerald Dragon Taikenban (SCD)(Jpn)</description>
 		<!-- Serial: HMD-001 -->
 		<year>1994</year>
 		<publisher>NEC Home Electronics</publisher>
@@ -1076,7 +1076,7 @@
 	</software>
 
 	<software name="exilej" cloneof="exile">
-		<description>Exile - Toki no Hasama he (CD)(JPN)</description>
+		<description>Exile - Toki no Hasama he (CD)(Jpn)</description>
 		<!-- Serial: TJCD1014 - Release Date: 1991-03-29 -->
 		<year>1991</year>
 		<publisher>Nihon Telenet</publisher>
@@ -1088,7 +1088,7 @@
 	</software>
 
 	<software name="exile2j" cloneof="exile2">
-		<description>Exile II - Janen no Jishou (SCD)(JPN)</description>
+		<description>Exile II - Janen no Jishou (SCD)(Jpn)</description>
 		<!-- Serial: TJCD2028 - Release Date: 1992-09-22 -->
 		<year>1992</year>
 		<publisher>Nihon Telenet</publisher>
@@ -1100,7 +1100,7 @@
 	</software>
 
 	<software name="f1circus">
-		<description>F1 Circus Special - Pole to Win (SCD)(JPN)</description>
+		<description>F1 Circus Special - Pole to Win (SCD)(Jpn)</description>
 		<!-- Serial: NBCD2002 - Release Date: 1992-06-26 -->
 		<year>1992</year>
 		<publisher>Nichibutsu</publisher>
@@ -1112,7 +1112,7 @@
 	</software>
 
 	<software name="f1team">
-		<description>F1 Team Simulation Project F (SCD)(JPN)</description>
+		<description>F1 Team Simulation Project F (SCD)(Jpn)</description>
 		<!-- Serial: TJCD2026 - Release Date: 1992-09-04 -->
 		<year>1992</year>
 		<publisher>Nihon Telenet</publisher>
@@ -1124,7 +1124,7 @@
 	</software>
 
 	<software name="faceball">
-		<description>Faceball (SCD)(JPN)</description>
+		<description>Faceball (SCD)(Jpn)</description>
 		<!-- Serial: RHCD3007 - Release Date: 1993-11-26 -->
 		<year>1993</year>
 		<publisher>Riverhill Software</publisher>
@@ -1136,7 +1136,7 @@
 	</software>
 
 	<software name="faceballt" cloneof="faceball">
-		<description>Faceball Taikenban (SCD)(JPN)</description>
+		<description>Faceball Taikenban (SCD)(Jpn)</description>
 		<!-- Serial: RH3001 -->
 		<year>1993</year>
 		<publisher>Riverhill Software</publisher>
@@ -1148,7 +1148,7 @@
 	</software>
 
 	<software name="elfeen">
-		<description>Faerie Dust Story - Meikyuu no Elfeene (CD)(JPN)</description>
+		<description>Faerie Dust Story - Meikyuu no Elfeene (CD)(Jpn)</description>
 		<!-- Serial: TJCD0008 - Release Date: 1990-07-06 -->
 		<year>1990</year>
 		<publisher>Nihon Telenet</publisher>
@@ -1160,7 +1160,7 @@
 	</software>
 
 	<software name="metlfant">
-		<description>Farjius no Jakoutei - Neo Metal Fantasy (SCD)(JPN)</description>
+		<description>Farjius no Jakoutei - Neo Metal Fantasy (SCD)(Jpn)</description>
 		<!-- Serial: HMCD2003 - Release Date: 1992-08-29 -->
 		<year>1992</year>
 		<publisher>Human Entertainment</publisher>
@@ -1172,7 +1172,7 @@
 	</software>
 
 	<software name="faussete">
-		<description>Faussete Amour (SCD)(JPN)</description>
+		<description>Faussete Amour (SCD)(Jpn)</description>
 		<!-- Serial: NXCD2017 - Release Date: 1993-03-26 -->
 		<year>1993</year>
 		<publisher>Naxat Soft</publisher>
@@ -1184,7 +1184,7 @@
 	</software>
 
 	<software name="fiendhun">
-		<description>Fiend Hunter (SCD)(JPN)</description>
+		<description>Fiend Hunter (SCD)(Jpn)</description>
 		<!-- Serial: RSCD-3002 - Release Date: 1993-04-16 -->
 		<year>1993</year>
 		<publisher>Right Stuff</publisher>
@@ -1196,7 +1196,7 @@
 	</software>
 
 	<software name="fstreetj" cloneof="fstreet">
-		<description>Fighting Street (CD)(JPN)</description>
+		<description>Fighting Street (CD)(Jpn)</description>
 		<!-- Serial: HCD8002 - Release Date: 1988-12-04 -->
 		<year>1988</year>
 		<publisher>Hudson</publisher>
@@ -1208,7 +1208,7 @@
 	</software>
 
 	<software name="fzone2j" cloneof="fzone2">
-		<description>Final Zone II (CD)(JPN)</description>
+		<description>Final Zone II (CD)(Jpn)</description>
 		<!-- Serial: TJCD0006 - Release Date: 1990-03-23 -->
 		<year>1990</year>
 		<publisher>Nihon Telenet</publisher>
@@ -1220,7 +1220,7 @@
 	</software>
 
 	<software name="fireproj">
-		<description>Wrestling Universe - Fire Pro Jyoshi - Dome Chojyo Taisen - WOWOW vs. JWP (ACD)(JPN)</description>
+		<description>Wrestling Universe - Fire Pro Jyoshi - Dome Chojyo Taisen - WOWOW vs. JWP (ACD)(Jpn)</description>
 		<!-- Serial: HMCD4008 - Release Date: 1995-02-03 -->
 		<year>1995</year>
 		<publisher>Human Entertainment</publisher>
@@ -1232,7 +1232,7 @@
 	</software>
 
 	<software name="flashhid">
-		<description>Flash Hiders (SCD)(JPN)</description>
+		<description>Flash Hiders (SCD)(Jpn)</description>
 		<!-- Serial: RSCD3004 - Release Date: 1993-12-19 -->
 		<year>1993</year>
 		<publisher>Right Stuff</publisher>
@@ -1244,7 +1244,7 @@
 	</software>
 
 	<software name="flashhidt" cloneof="flashhid">
-		<description>Flash Hiders Taikenban (SCD)(JPN)</description>
+		<description>Flash Hiders Taikenban (SCD)(Jpn)</description>
 		<!-- Serial:  -->
 		<year>1993</year>
 		<publisher>Right Stuff</publisher>
@@ -1256,7 +1256,7 @@
 	</software>
 
 	<software name="forgottnj" cloneof="forgottn">
-		<description>Forgotten Worlds (SCD)(JPN)</description>
+		<description>Forgotten Worlds (SCD)(Jpn)</description>
 		<!-- Serial: NAPR-1025 - Release Date: 1992-03-27 -->
 		<year>1992</year>
 		<publisher>NEC Avenue</publisher>
@@ -1268,7 +1268,7 @@
 	</software>
 
 	<software name="forms95">
-		<description>Formation Soccer '95 - Della Serie A (ACD, SCD)(JPN)</description>
+		<description>Formation Soccer '95 - Della Serie A (ACD, SCD)(Jpn)</description>
 		<!-- Serial: HMCD5009 - Release Date: 1995-04-07 -->
 		<year>1995</year>
 		<publisher>Human Entertainment</publisher>
@@ -1280,7 +1280,7 @@
 	</software>
 
 	<software name="fraycd">
-		<description>Fray CD Xak Gaiden (SCD)(JPN)</description>
+		<description>Fray CD Xak Gaiden (SCD)(Jpn)</description>
 		<!-- Serial: MCCD4005 - Release Date: 1994-03-30 -->
 		<year>1994</year>
 		<publisher>Micro Cabin</publisher>
@@ -1292,7 +1292,7 @@
 	</software>
 
 	<software name="nadia">
-		<description>Fushigi no Umi no Nadia (SCD)(JPN)</description>
+		<description>Fushigi no Umi no Nadia (SCD)(Jpn)</description>
 		<!-- Serial: HCD3036 - Release Date: 1993-01-29 -->
 		<year>1993</year>
 		<publisher>Hudson</publisher>
@@ -1304,7 +1304,7 @@
 	</software>
 
 	<software name="gground">
-		<description>Gain Ground SX (SCD)(JPN)</description>
+		<description>Gain Ground SX (SCD)(Jpn)</description>
 		<!-- Serial: NAPR-1032 - Release Date: 1992-12-25 -->
 		<year>1992</year>
 		<publisher>NEC Avenue</publisher>
@@ -1316,7 +1316,7 @@
 	</software>
 
 	<software name="galaxyde">
-		<description>Galaxy Deka Gayvan (SCD)(JPN)</description>
+		<description>Galaxy Deka Gayvan (SCD)(Jpn)</description>
 		<!-- Serial: IGCD3005 - Release Date: 1993-10-29 -->
 		<year>1993</year>
 		<publisher>Intec</publisher>
@@ -1328,7 +1328,7 @@
 	</software>
 
 	<software name="galaxyfy">
-		<description>Galaxy Fraulein Yuna {HRH310827-3FAAT} (SCD)(JPN)</description>
+		<description>Galaxy Fraulein Yuna {HRH310827-3FAAT} (SCD)(Jpn)</description>
 		<!-- Serial: HCD2031 - Release Date: 1992-10-23 -->
 		<year>1992</year>
 		<publisher>Hudson</publisher>
@@ -1340,7 +1340,7 @@
 	</software>
 
 	<software name="galaxyfya" cloneof="galaxyfy">
-		<description>Galaxy Fraulein Yuna {HRH310827-3FAFT} (SCD)(JPN)</description>
+		<description>Galaxy Fraulein Yuna {HRH310827-3FAFT} (SCD)(Jpn)</description>
 		<!-- Serial: HCD2031 - Release Date: 1992-10-23 -->
 		<year>1992</year>
 		<publisher>Hudson</publisher>
@@ -1352,7 +1352,7 @@
 	</software>
 
 	<software name="galaxyfyhv" cloneof="galaxyfy">
-		<description>Galaxy Fraulien Yuna HuVideo CD (SCD)(JPN)</description>
+		<description>Galaxy Fraulien Yuna HuVideo CD (SCD)(Jpn)</description>
 		<!-- Serial: HCD5078 -->
 		<year>1995</year>
 		<publisher>Hudson</publisher>
@@ -1364,7 +1364,7 @@
 	</software>
 
 	<software name="galaxyf2">
-		<description>Galaxy Fraulien Yuna II - Eternal Princess (SCD)(JPN)</description>
+		<description>Galaxy Fraulien Yuna II - Eternal Princess (SCD)(Jpn)</description>
 		<!-- Serial: HCD5075 - Release Date: 1995-06-30 -->
 		<year>1995</year>
 		<publisher>Hudson</publisher>
@@ -1376,7 +1376,7 @@
 	</software>
 
 	<software name="gambler">
-		<description>Gambler Jikochuushinha (CD)(JPN)</description>
+		<description>Gambler Jikochuushinha (CD)(Jpn)</description>
 		<!-- Serial: HCD9008 - Release Date: 1989-11-24 -->
 		<year>1989</year>
 		<publisher>Hudson</publisher>
@@ -1388,7 +1388,7 @@
 	</software>
 
 	<software name="gamblrpz">
-		<description>Gambler Jikochuushinha - Mahjong Puzzle Collection (CD)(JPN)</description>
+		<description>Gambler Jikochuushinha - Mahjong Puzzle Collection (CD)(Jpn)</description>
 		<!-- Serial: TPCD1003 - Release Date: 1992-09-28 -->
 		<year>1992</year>
 		<publisher>Taito</publisher>
@@ -1400,7 +1400,7 @@
 	</software>
 
 	<software name="ganchouh">
-		<description>Ganchouhishi - Aoki Ookami to Shiroki Mejika (SCD)(JPN)</description>
+		<description>Ganchouhishi - Aoki Ookami to Shiroki Mejika (SCD)(Jpn)</description>
 		<!-- Serial: KOCD3004 - Release Date: 1993-09-30 -->
 		<year>1993</year>
 		<publisher> Koei</publisher>
@@ -1412,7 +1412,7 @@
 	</software>
 
 	<software name="garoud2s" cloneof="garoud2">
-		<description>Garou Densetsu II - Aratanaru Tatakai - Sample Disc (ACD)(JPN)</description>
+		<description>Garou Densetsu II - Aratanaru Tatakai - Sample Disc (ACD)(Jpn)</description>
 		<year>1994</year>
 		<publisher>Hudson</publisher>
 		<part name="cdrom" interface="pce_cdrom">
@@ -1423,7 +1423,7 @@
 	</software>
 
 	<software name="garoud2">
-		<description>Garou Densetsu II - Aratanaru Tatakai [Imperfect] (ACD)(JPN)</description>
+		<description>Garou Densetsu II - Aratanaru Tatakai [Imperfect] (ACD)(Jpn)</description>
 		<!-- Serial: HCD4060 - Release Date: 1994-03-12 -->
 		<year>1994</year>
 		<publisher>Hudson</publisher>
@@ -1435,7 +1435,7 @@
 	</software>
 
 	<software name="garoudsp">
-		<description>Garou Densetsu Special (ACD)(JPN)</description>
+		<description>Garou Densetsu Special (ACD)(Jpn)</description>
 		<!-- Serial: HCD4067 - Release Date: 1994-12-02 -->
 		<year>1994</year>
 		<publisher>Hudson</publisher>
@@ -1447,7 +1447,7 @@
 	</software>
 
 	<software name="gatethun">
-		<description>Gate of Thunder (SCD)(JPN)</description>
+		<description>Gate of Thunder (SCD)(Jpn)</description>
 		<!-- Serial: HCD2025 - Release Date: 1992-02-21 -->
 		<year>1992</year>
 		<publisher>Hudson</publisher>
@@ -1459,7 +1459,7 @@
 	</software>
 
 	<software name="genocide">
-		<description>Genocide (SCD)(JPN)</description>
+		<description>Genocide (SCD)(Jpn)</description>
 		<!-- Serial: BRCD2003 - Release Date: 1992-06-26 -->
 		<year>1992</year>
 		<publisher>Brain Gray</publisher>
@@ -1471,7 +1471,7 @@
 	</software>
 
 	<software name="auleria">
-		<description>Gensou Tairiku Auleria (CD)(JPN)</description>
+		<description>Gensou Tairiku Auleria (CD)(Jpn)</description>
 		<!-- Serial: TPCD1002 - Release Date: 1993-02-26 -->
 		<year>1993</year>
 		<publisher>Taito</publisher>
@@ -1483,7 +1483,7 @@
 	</software>
 
 	<software name="sapphire">
-		<description>Ginga Fukei Densetsu Sapphire (ACD)(JPN)</description>
+		<description>Ginga Fukei Densetsu Sapphire (ACD)(Jpn)</description>
 		<!-- Serial: HCD5080 - Release Date: 1995-11-24 -->
 		<year>1995</year>
 		<publisher>Hudson</publisher>
@@ -1495,7 +1495,7 @@
 	</software>
 
 	<software name="gogobird">
-		<description>Go! Go! Birdie Chance (SCD)(JPN)</description>
+		<description>Go! Go! Birdie Chance (SCD)(Jpn)</description>
 		<!-- Serial: HECD5022 - Release Date: 1996-06-28 -->
 		<year>1996</year>
 		<publisher>NEC Home Electronics</publisher>
@@ -1507,7 +1507,7 @@
 	</software>
 
 	<software name="godpanic">
-		<description>God Panic - Shijyou Saikyo Gundan (SCD)(JPN)</description>
+		<description>God Panic - Shijyou Saikyo Gundan (SCD)(Jpn)</description>
 		<!-- Serial: TMCD2001 - Release Date: 1992-11-27 -->
 		<year>1992</year>
 		<publisher>Teichiku Records</publisher>
@@ -1519,7 +1519,7 @@
 	</software>
 
 	<software name="godzillaj" cloneof="godzilla">
-		<description>Godzilla - Bakutou Retsuden (SCD)(JPN)</description>
+		<description>Godzilla - Bakutou Retsuden (SCD)(Jpn)</description>
 		<!-- Serial: TCCD4001 - Release Date: 1994-02-26 -->
 		<year>1994</year>
 		<publisher>Toho</publisher>
@@ -1531,7 +1531,7 @@
 	</software>
 
 	<software name="goldnaxe">
-		<description>Golden Axe (CD)(JPN)</description>
+		<description>Golden Axe (CD)(Jpn)</description>
 		<!-- Serial: TJCD0005 - Release Date: 1990-03-16 -->
 		<year>1990</year>
 		<publisher>Nihon Telenet</publisher>
@@ -1543,7 +1543,7 @@
 	</software>
 
 	<software name="gotzendi">
-		<description>Gotzendiener (SCD)(JPN)</description>
+		<description>Gotzendiener (SCD)(Jpn)</description>
 		<!-- Serial: HECD4014 - Release Date: 1994-11-25 -->
 		<year>1994</year>
 		<publisher>NEC Home Electronics</publisher>
@@ -1555,7 +1555,7 @@
 	</software>
 
 	<software name="gradius2">
-		<description>Gradius II - Gofer no Yabou (SCD)(JPN)</description>
+		<description>Gradius II - Gofer no Yabou (SCD)(Jpn)</description>
 		<!-- Serial: KMCD2003 - Release Date: 1992-12-18 -->
 		<year>1992</year>
 		<publisher>Konami</publisher>
@@ -1567,7 +1567,7 @@
 	</software>
 
 	<software name="gsmikami">
-		<description>GS Mikami (SCD)(JPN)</description>
+		<description>GS Mikami (SCD)(Jpn)</description>
 		<!-- Serial: BACD4003 - Release Date: 1994-07-29 -->
 		<year>1994</year>
 		<publisher>Banpresto</publisher>
@@ -1579,7 +1579,7 @@
 	</software>
 
 	<software name="gulcligh">
-		<description>Gulclight TDF 2 (CD)(JPN)</description>
+		<description>Gulclight TDF 2 (CD)(Jpn)</description>
 		<!-- Serial: PVCD-0002 - Release Date: 1991-01-25 -->
 		<year>1991</year>
 		<publisher>Pack-In-Video</publisher>
@@ -1591,7 +1591,7 @@
 	</software>
 
 	<software name="hatsukoi">
-		<description>Hatsukoi Monogatari (SCD)(JPN)</description>
+		<description>Hatsukoi Monogatari (SCD)(Jpn)</description>
 		<!-- Serial: TICD-4002 - Release Date: 1994-04-28 -->
 		<year>1994</year>
 		<publisher>Tokuma Shoten</publisher>
@@ -1603,7 +1603,7 @@
 	</software>
 
 	<software name="hawkf123">
-		<description>Hawk F-123 (SCD)(JPN)</description>
+		<description>Hawk F-123 (SCD)(Jpn)</description>
 		<!-- Serial: PVCD-2007 - Release Date: 1992-03-13 -->
 		<year>1992</year>
 		<publisher>Pack-In-Video</publisher>
@@ -1615,7 +1615,7 @@
 	</software>
 
 	<software name="hellfire">
-		<description>Hellfire S - The Another Story (CD)(JPN)</description>
+		<description>Hellfire S - The Another Story (CD)(Jpn)</description>
 		<!-- Serial: NAPR-1017 - Release Date: 1991-04-12 -->
 		<year>1991</year>
 		<publisher>NEC Avenue</publisher>
@@ -1627,7 +1627,7 @@
 	</software>
 
 	<software name="highgrnd">
-		<description>High Grenadier (CD)(JPN)</description>
+		<description>High Grenadier (CD)(Jpn)</description>
 		<!-- Serial: TJCD-1016 - Release Date: 1991-04-12 -->
 		<year>1991</year>
 		<publisher>Nihon Telenet</publisher>
@@ -1639,7 +1639,7 @@
 	</software>
 
 	<software name="chrisbkn">
-		<description>Hihou Densetsu Chris no Bouken (CD)(JPN)</description>
+		<description>Hihou Densetsu Chris no Bouken (CD)(Jpn)</description>
 		<!-- Serial: PVCD-1004 - Release Date: 1991-12-13 -->
 		<year>1991</year>
 		<publisher>Pack-In-Video</publisher>
@@ -1651,7 +1651,7 @@
 	</software>
 
 	<software name="himitsu">
-		<description>Himitsu no Hanazono (SCD)(JPN)</description>
+		<description>Himitsu no Hanazono (SCD)(Jpn)</description>
 		<!-- Serial: TICD-3001 - Release Date: 1993-12-10 -->
 		<year>1993</year>
 		<publisher>Tokuma Shoten</publisher>
@@ -1663,7 +1663,7 @@
 	</software>
 
 	<software name="horrorst">
-		<description>Horror Story (SCD)(JPN)</description>
+		<description>Horror Story (SCD)(Jpn)</description>
 		<!-- Serial: NAPR-1027 - Release Date: 1993-02-26 -->
 		<year>1993</year>
 		<publisher>NEC Avenue</publisher>
@@ -1675,7 +1675,7 @@
 	</software>
 
 	<software name="hupga2">
-		<description>Hu PGA Tour Power Golf 2 - Golfer (SCD)(JPN)</description>
+		<description>Hu PGA Tour Power Golf 2 - Golfer (SCD)(Jpn)</description>
 		<!-- Serial: HCD4056 - Release Date: 1994-03-04 -->
 		<year>1994</year>
 		<publisher>Hudson</publisher>
@@ -1687,7 +1687,7 @@
 	</software>
 
 	<software name="humanspt">
-		<description>Human Sports Festival (SCD)(JPN)</description>
+		<description>Human Sports Festival (SCD)(Jpn)</description>
 		<!-- Serial: HMCD2002 - Release Date: 1992-02-28 -->
 		<year>1992</year>
 		<publisher>Human Entertainment</publisher>
@@ -1699,7 +1699,7 @@
 	</software>
 
 	<software name="hyakumon">
-		<description>Hyaku Monogatari - Hontou ni Atta Kowai Hanashi (SCD)(JPN)</description>
+		<description>Hyaku Monogatari - Hontou ni Atta Kowai Hanashi (SCD)(Jpn)</description>
 		<!-- Serial: HCD5077 - Release Date: 1995-08-04 -->
 		<year>1995</year>
 		<publisher>Hudson</publisher>
@@ -1711,7 +1711,7 @@
 	</software>
 
 	<software name="hyperdyn">
-		<description>Hyper Dyne SideArms Special (CD)(JPN)</description>
+		<description>Hyper Dyne SideArms Special (CD)(Jpn)</description>
 		<!-- Serial: HACD9002 - Release Date: 1989-12-15 -->
 		<year>1989</year>
 		<publisher>NEC Avenue</publisher>
@@ -1723,7 +1723,7 @@
 	</software>
 
 	<software name="hyperwar">
-		<description>Hyper Wars (SCD)(JPN)</description>
+		<description>Hyper Wars (SCD)(Jpn)</description>
 		<!-- Serial: HCD4068 - Release Date: 1994-11-05 -->
 		<year>1994</year>
 		<publisher>Hudson</publisher>
@@ -1735,7 +1735,7 @@
 	</software>
 
 	<software name="iganin">
-		<description>Iga Ninden Gaiou (SCD)(JPN)</description>
+		<description>Iga Ninden Gaiou (SCD)(Jpn)</description>
 		<!-- Serial: NBCD3003 - Release Date: 1993-12-10 -->
 		<year>1993</year>
 		<publisher>Nichibutsu</publisher>
@@ -1747,7 +1747,7 @@
 	</software>
 
 	<software name="imagef2">
-		<description>Image Fight II (SCD)(JPN)</description>
+		<description>Image Fight II (SCD)(Jpn)</description>
 		<!-- Serial: ICCD2002 - Release Date: 1992-12-18 -->
 		<year>1992</year>
 		<publisher>Irem</publisher>
@@ -1759,7 +1759,7 @@
 	</software>
 
 	<software name="inouemam">
-		<description>Inoue Mami - Kono Hoshi ni Tatta Hitori no Kimi (SCD)(JPN)</description>
+		<description>Inoue Mami - Kono Hoshi ni Tatta Hitori no Kimi (SCD)(Jpn)</description>
 		<!-- Serial: HCD2035 - Release Date: 1992-12-25 -->
 		<year>1992</year>
 		<publisher>Hudson</publisher>
@@ -1771,7 +1771,7 @@
 	</software>
 
 	<software name="iqpanic">
-		<description>IQ Panic (CD)(JPN)</description>
+		<description>IQ Panic (CD)(Jpn)</description>
 		<!-- Serial: AICD1002 - Release Date: 1992-02-21 -->
 		<year>1992</year>
 		<publisher>IGS</publisher>
@@ -1783,7 +1783,7 @@
 	</software>
 
 	<software name="jthunder">
-		<description>J Thunder (SCD)(JPN)</description>
+		<description>J Thunder (SCD)(Jpn)</description>
 		<!-- Serial:  -->
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1795,7 +1795,7 @@
 	</software>
 
 	<software name="jbharoldj" cloneof="jbharold">
-		<description>J. B. Harold Murder Club (CD)(JPN)</description>
+		<description>J. B. Harold Murder Club (CD)(Jpn)</description>
 		<!-- Serial: HCD0013 - Release Date: 1990-11-23 -->
 		<year>1990</year>
 		<publisher>Hudson</publisher>
@@ -1807,7 +1807,7 @@
 	</software>
 
 	<software name="jleagt94">
-		<description>J. League Tremendous Soccer '94 (ACD, SCD)(JPN)</description>
+		<description>J. League Tremendous Soccer '94 (ACD, SCD)(Jpn)</description>
 		<!-- Serial: HECD4017 - Release Date: 1994-12-23 -->
 		<year>1994</year>
 		<publisher>NEC Home Electronics</publisher>
@@ -1819,7 +1819,7 @@
 	</software>
 
 	<software name="jacknickj" cloneof="jacknick">
-		<description>Jack Nicklaus World Tour Golf (CD)(JPN)</description>
+		<description>Jack Nicklaus World Tour Golf (CD)(Jpn)</description>
 		<!-- Serial: JCCD0003 - Release Date: 1990-09-14 -->
 		<year>1990</year>
 		<publisher>Victor Entertainment</publisher>
@@ -1831,7 +1831,7 @@
 	</software>
 
 	<software name="jongmstr">
-		<description>Janshin Densetsu - Quest of Jongmaster (ACD)(JPN)</description>
+		<description>Janshin Densetsu - Quest of Jongmaster (ACD)(Jpn)</description>
 		<!-- Serial: HECD5016 - Release Date: 1995-02-24 -->
 		<year>1995</year>
 		<publisher>NEC Home Electronics</publisher>
@@ -1843,7 +1843,7 @@
 	</software>
 
 	<software name="jantei">
-		<description>Jantei Monogatari (CD)(JPN)</description>
+		<description>Jantei Monogatari (CD)(Jpn)</description>
 		<!-- Serial: TJCD0012 - Release Date: 1990-10-09 -->
 		<year>1990</year>
 		<publisher>Nihon Telenet</publisher>
@@ -1855,7 +1855,7 @@
 	</software>
 
 	<software name="jantei2k">
-		<description>Jantei Monogatari II - Uchuu Tantei Divan Kanketsu Hen (CD)(JPN)</description>
+		<description>Jantei Monogatari II - Uchuu Tantei Divan Kanketsu Hen (CD)(Jpn)</description>
 		<!-- Serial: ATCD2004 - Release Date: 1992-04-24 -->
 		<year>1992</year>
 		<publisher>Atlus</publisher>
@@ -1867,7 +1867,7 @@
 	</software>
 
 	<software name="jantei2s">
-		<description>Jantei Monogatari II - Uchuu Tantei Divan Shutsudou Hen (CD)(JPN)</description>
+		<description>Jantei Monogatari II - Uchuu Tantei Divan Shutsudou Hen (CD)(Jpn)</description>
 		<!-- Serial: ATCD1002 - Release Date: 1992-02-28 -->
 		<year>1992</year>
 		<publisher>Atlus</publisher>
@@ -1879,7 +1879,7 @@
 	</software>
 
 	<software name="jantei3">
-		<description>Jantei Monogatari III - Saver Angels (SCD)(JPN)</description>
+		<description>Jantei Monogatari III - Saver Angels (SCD)(Jpn)</description>
 		<!-- Serial: ATCD3005 - Release Date: 1993-04-23 -->
 		<year>1993</year>
 		<publisher>Atlus</publisher>
@@ -1891,7 +1891,7 @@
 	</software>
 
 	<software name="jimpower">
-		<description>Jim Power - In Mutant Planet (SCD)(JPN)</description>
+		<description>Jim Power - In Mutant Planet (SCD)(Jpn)</description>
 		<!-- Serial: MWCD2006 - Release Date: 1993-03-19 -->
 		<year>1993</year>
 		<publisher>Micro World</publisher>
@@ -1903,7 +1903,7 @@
 	</software>
 
 	<software name="juuouki">
-		<description>Juuouki (CD)(JPN)</description>
+		<description>Juuouki (CD)(Jpn)</description>
 		<!-- Serial: HACD9001 - Release Date: 1989-09-22 -->
 		<year>1989</year>
 		<publisher>NEC Avenue</publisher>
@@ -1915,7 +1915,7 @@
 	</software>
 
 	<software name="kagamai">
-		<description>Kagamai no Kuni no Legend (CD)(JPN)</description>
+		<description>Kagamai no Kuni no Legend (CD)(Jpn)</description>
 		<!-- Serial: JCCD9001 - Release Date: 1989-10-27 -->
 		<year>1989</year>
 		<publisher>Victor Entertainment</publisher>
@@ -1927,7 +1927,7 @@
 	</software>
 
 	<software name="shubimn3">
-		<description>Kaizou Choujin Shubibinman III - Ikai no Princess (CD)(JPN)</description>
+		<description>Kaizou Choujin Shubibinman III - Ikai no Princess (CD)(Jpn)</description>
 		<!-- Serial: NSCD2010 - Release Date: 1992-02-28 -->
 		<year>1992</year>
 		<publisher>NCS</publisher>
@@ -1939,7 +1939,7 @@
 	</software>
 
 	<software name="algunos">
-		<description>Kakutou Haou Densetsu Algunos (SCD)(JPN)</description>
+		<description>Kakutou Haou Densetsu Algunos (SCD)(Jpn)</description>
 		<!-- Serial: IGCD3007 - Release Date: 1994-01-28 -->
 		<year>1994</year>
 		<publisher>Intec</publisher>
@@ -1951,7 +1951,7 @@
 	</software>
 
 	<software name="kawatsur">
-		<description>Kawa no Nushi Tsuri - Shizenha (CD)(JPN)</description>
+		<description>Kawa no Nushi Tsuri - Shizenha (CD)(Jpn)</description>
 		<!-- Serial: PVCD-2006 - Release Date: 1992-03-27 -->
 		<year>1992</year>
 		<publisher>Pack-In-Video</publisher>
@@ -1963,7 +1963,7 @@
 	</software>
 
 	<software name="kazekiri">
-		<description>Kaze Kiri - Ninja Action (SCD)(JPN)</description>
+		<description>Kaze Kiri - Ninja Action (SCD)(Jpn)</description>
 		<!-- Serial: NXCD3025 - Release Date: 1994-04-28 -->
 		<year>1994</year>
 		<publisher>Naxat Soft</publisher>
@@ -1975,7 +1975,7 @@
 	</software>
 
 	<software name="xanadu">
-		<description>Kaze no Densetsu Xanadu (SCD)(JPN)</description>
+		<description>Kaze no Densetsu Xanadu (SCD)(Jpn)</description>
 		<!-- Serial: HECD4006 - Release Date: 1994-02-18 -->
 		<year>1994</year>
 		<publisher>NEC Home Electronics</publisher>
@@ -1990,7 +1990,7 @@
   <!-- Serial: HE4002 -->
   <!--
   <software name="xanadus" cloneof="xanadu">
-		<description>Kaze no Densetsu Xanadu - Sample Disc (SCD)(JPN)</description>
+		<description>Kaze no Densetsu Xanadu - Sample Disc (SCD)(Jpn)</description>
 		<year>1994</year>
 		<publisher>NEC Home Electronics</publisher>
 		<part name="cdrom" interface="pce_cdrom">
@@ -2002,7 +2002,7 @@
   -->
   
 	<software name="xanadu2">
-		<description>Kaze no Densetsu Xanadu II (SCD)(JPN)</description>
+		<description>Kaze no Densetsu Xanadu II (SCD)(Jpn)</description>
 		<!-- Serial: NFCD5001 - Release Date: 1995-06-30 -->
 		<year>1995</year>
 		<publisher>Nihon Falcom</publisher>
@@ -2014,7 +2014,7 @@
 	</software>
 
 	<software name="kiaidan">
-		<description>Kiaidan 00 (SCD)(JPN)</description>
+		<description>Kiaidan 00 (SCD)(Jpn)</description>
 		<!-- Serial: TJCD2031 - Release Date: 1992-10-23 -->
 		<year>1992</year>
 		<publisher>Nihon Telenet</publisher>
@@ -2026,7 +2026,7 @@
 	</software>
 
 	<software name="patlabor">
-		<description>Kidou Keisatsu Patlabor - Griffon Hen (SCD)(JPN)</description>
+		<description>Kidou Keisatsu Patlabor - Griffon Hen (SCD)(Jpn)</description>
 		<!-- Serial: RHCD-3006 - Release Date: 1993-09-30 -->
 		<year>1993</year>
 		<publisher>Riverhill Soft</publisher>
@@ -2038,7 +2038,7 @@
 	</software>
 
 	<software name="kisoulou">
-		<description>Kisou Louga (SCD)(JPN)</description>
+		<description>Kisou Louga (SCD)(Jpn)</description>
 		<!-- Serial: KSCD3004 - Release Date: 1993-12-03 -->
 		<year>1993</year>
 		<publisher>Kogado Studio</publisher>
@@ -2050,7 +2050,7 @@
 	</software>
 
 	<software name="kisoulo2">
-		<description>Kisou Louga II - The Ends of Shangrila (SCD)(JPN)</description>
+		<description>Kisou Louga II - The Ends of Shangrila (SCD)(Jpn)</description>
 		<!-- Serial: HECD5021 - Release Date: 1995-05-26 -->
 		<year>1995</year>
 		<publisher>NEC Home Electronics</publisher>
@@ -2062,7 +2062,7 @@
 	</software>
 
 	<software name="koseikib">
-		<description>KO Seiki Beast - Gaia Fukkatsu Kanketsu Hen (SCD)(JPN)</description>
+		<description>KO Seiki Beast - Gaia Fukkatsu Kanketsu Hen (SCD)(Jpn)</description>
 		<!-- Serial: PVCD4011 - Release Date: 1994-06-17 -->
 		<year>1994</year>
 		<publisher>Pack-In-Video</publisher>
@@ -2074,7 +2074,7 @@
 	</software>
 
 	<software name="gulliver">
-		<description>Kuusou Kagaku Sekai Gulliver Boy (SCD)(JPN)</description>
+		<description>Kuusou Kagaku Sekai Gulliver Boy (SCD)(Jpn)</description>
 		<!-- Serial: HCD5076 - Release Date: 1995-05-26 -->
 		<year>1995</year>
 		<publisher>Hudson</publisher>
@@ -2086,7 +2086,7 @@
 	</software>
 
 	<software name="ldis">
-		<description>L-Dis (CD)(JPN)</description>
+		<description>L-Dis (CD)(Jpn)</description>
 		<!-- Serial: NSCD0005 - Release Date: 1991-04-05 -->
 		<year>1991</year>
 		<publisher>NCS</publisher>
@@ -2098,7 +2098,7 @@
 	</software>
 
 	<software name="ladyphan">
-		<description>Lady Phantom (SCD)(JPN)</description>
+		<description>Lady Phantom (SCD)(Jpn)</description>
 		<!-- Serial: TJCD1019 - Release Date: 1991-11-29 -->
 		<year>1991</year>
 		<publisher>Laser Soft</publisher>
@@ -2110,7 +2110,7 @@
 	</software>
 
 	<software name="langriss">
-		<description>Langrisser - Hikari no Matsuei (SCD)(JPN)</description>
+		<description>Langrisser - Hikari no Matsuei (SCD)(Jpn)</description>
 		<!-- Serial: NSCD2017 - Release Date: 1993-08-06 -->
 		<year>1993</year>
 		<publisher>NCS</publisher>
@@ -2122,7 +2122,7 @@
 	</software>
 
 	<software name="laplace">
-		<description>Laplace no Ma (SCD)(JPN)</description>
+		<description>Laplace no Ma (SCD)(Jpn)</description>
 		<!-- Serial: HMCD2005 - Release Date: 1993-03-30 -->
 		<year>1993</year>
 		<publisher>Human Entertainment</publisher>
@@ -2134,7 +2134,7 @@
 	</software>
 
 	<software name="laplacep" cloneof="laplace">
-		<description>Laplace no Ma - Preview Disk (SCD)(JPN)</description>
+		<description>Laplace no Ma - Preview Disk (SCD)(Jpn)</description>
 		<!-- Serial: HMCD2007 -->
 		<year>1993</year>
 		<publisher>Human Entertainment</publisher>
@@ -2146,7 +2146,7 @@
 	</software>
 
 	<software name="lsoft1">
-		<description>Laser Soft Visual Collection Volume I - Cosmic Fantasy Visual Shuu (CD)(JPN)</description>
+		<description>Laser Soft Visual Collection Volume I - Cosmic Fantasy Visual Shuu (CD)(Jpn)</description>
 		<!-- Serial: TJCD3034 - Release Date: 1993-02-12 -->
 		<year>1993</year>
 		<publisher>Nihon Telenet</publisher>
@@ -2158,7 +2158,7 @@
 	</software>
 
 	<software name="lsoft2">
-		<description>Laser Soft Visual Collection Volume II - Valis Visual Shuu (CD)(JPN)</description>
+		<description>Laser Soft Visual Collection Volume II - Valis Visual Shuu (CD)(Jpn)</description>
 		<!-- Serial: TJCD3035 - Release Date: 1993-02-19 -->
 		<year>1993</year>
 		<publisher>Nihon Telenet</publisher>
@@ -2170,7 +2170,7 @@
 	</software>
 
 	<software name="lastarma">
-		<description>Last Armageddon {BRCD0001-6-0625-R1F} (CD)(JPN)</description>
+		<description>Last Armageddon {BRCD0001-6-0625-R1F} (CD)(Jpn)</description>
 		<!-- Serial: BRCD0001 - Release Date: 1990-08-31 -->
 		<year>1990</year>
 		<publisher>Brain Gray</publisher>
@@ -2185,7 +2185,7 @@
   <!-- Serial: BRCD0001 - Release Date: 1990-08-31 -->
   <!--
   <software name="lastarma1" cloneof="lastarma">
-		<description>Last Armageddon {BRCD0001-6-0625-R3D} (CD)(JPN)</description>
+		<description>Last Armageddon {BRCD0001-6-0625-R3D} (CD)(Jpn)</description>
 		<year>1990</year>
 		<publisher>Brain Gray</publisher>
 		<part name="cdrom" interface="pce_cdrom">
@@ -2197,7 +2197,7 @@
   -->
 
 	<software name="lastarm2" cloneof="lastarma">
-		<description>Last Armageddon {BRCD0001-7-0904-R1D} (CD)(JPN)</description>
+		<description>Last Armageddon {BRCD0001-7-0904-R1D} (CD)(Jpn)</description>
 		<!-- Serial: BRCD0001 - Release Date: 1990-08-31 -->
 		<year>1990</year>
 		<publisher>Brain Gray</publisher>
@@ -2209,7 +2209,7 @@
 	</software>
 
 	<software name="legion">
-		<description>Legion (CD)(JPN)</description>
+		<description>Legion (CD)(Jpn)</description>
 		<!-- Serial: TJCD0010 - Release Date: 1996-09-21 -->
 		<year>1990</year>
 		<publisher>Nihon Telenet</publisher>
@@ -2221,7 +2221,7 @@
 	</software>
 
 	<software name="lemmings">
-		<description>Lemmings (SCD)(JPN)</description>
+		<description>Lemmings (SCD)(Jpn)</description>
 		<!-- Serial: SSCD2003 - Release Date: 1992-11-28 -->
 		<year>1992</year>
 		<publisher>SunSoft</publisher>
@@ -2233,7 +2233,7 @@
 	</software>
 
 	<software name="linda3">
-		<description>Linda³ (ACD, SCD)(JPN)</description>
+		<description>Linda³ (ACD, SCD)(Jpn)</description>
 		<!-- Serial: HECD5023 - Release Date: 1995-10-13 -->
 		<year>1995</year>
 		<publisher>NEC Home Electronics</publisher>
@@ -2245,7 +2245,7 @@
 	</software>
 
 	<software name="lodoss">
-		<description>Lodoss Tousenki - Record of Lodoss War (CD)(JPN)</description>
+		<description>Lodoss Tousenki - Record of Lodoss War (CD)(Jpn)</description>
 		<!-- Serial: HCD2029 - Release Date: 1992-07-17 -->
 		<year>1992</year>
 		<publisher>Hudson</publisher>
@@ -2260,7 +2260,7 @@
 	<!-- Serial:  -->
   <!--
   <software name="lodosst" cloneof="lodoss">
-    <description>Lodoss Tousenki - Record of Lodoss War Taikenban (CD)(JPN)</description>
+    <description>Lodoss Tousenki - Record of Lodoss War Taikenban (CD)(Jpn)</description>
     <year>1992</year>
 		<publisher>Hudson</publisher>
 		<part name="cdrom" interface="pce_cdrom">
@@ -2272,7 +2272,7 @@
   -->
 
 	<software name="lodoss2">
-		<description>Lodoss Tousenki II - Record of Lodoss War II (SCD)(JPN)</description>
+		<description>Lodoss Tousenki II - Record of Lodoss War II (SCD)(Jpn)</description>
 		<!-- Serial: HCD4066 - Release Date: 1994-12-16 -->
 		<year>1994</year>
 		<publisher>Hudson</publisher>
@@ -2284,7 +2284,7 @@
 	</software>
 
 	<software name="loomj" cloneof="loom">
-		<description>Loom (SCD)(JPN)</description>
+		<description>Loom (SCD)(Jpn)</description>
 		<!-- Serial: JCCD2009 - Release Date: 1992-09-25 -->
 		<year>1992</year>
 		<publisher>Victor Entertainment</publisher>
@@ -2296,7 +2296,7 @@
 	</software>
 
 	<software name="lordwars">
-		<description>Lord of Wars (CD)(JPN)</description>
+		<description>Lord of Wars (CD)(Jpn)</description>
 		<!-- Serial: SACD1001 - Release Date: 1991-11-29 -->
 		<year>1991</year>
 		<publisher>System Soft</publisher>
@@ -2308,7 +2308,7 @@
 	</software>
 
 	<software name="macr2036">
-		<description>Choujikuu Yousai Macross 2036 (CD, SCD)(JPN)</description>
+		<description>Choujikuu Yousai Macross 2036 (CD, SCD)(Jpn)</description>
 		<!-- Serial: NSCD2007 - Release Date: 1992-04-03 -->
 		<year>1992</year>
 		<publisher>NCS</publisher>
@@ -2320,7 +2320,7 @@
 	</software>
 
 	<software name="macrosls">
-		<description>Choujikuu Yousai Macross Eien no Love Song (SCD)(JPN)</description>
+		<description>Choujikuu Yousai Macross Eien no Love Song (SCD)(Jpn)</description>
 		<!-- Serial: NSCD2014 - Release Date: 1992-12-04 -->
 		<year>1992</year>
 		<publisher>NCS</publisher>
@@ -2332,7 +2332,7 @@
 	</software>
 
 	<software name="madstlkr">
-		<description>Mad Stalker - Full Metal Force (ACD)(JPN)</description>
+		<description>Mad Stalker - Full Metal Force (ACD)(Jpn)</description>
 		<!-- Serial: HECD4009 - Release Date: 1994-09-15 -->
 		<year>1994</year>
 		<publisher>NEC Home Electronics</publisher>
@@ -2344,7 +2344,7 @@
 	</software>
 
 	<software name="madstlkrs" cloneof="madstlkr">
-		<description>Mad Stalker - Full Metal Force - Sample Disc (ACD)(JPN)</description>
+		<description>Mad Stalker - Full Metal Force - Sample Disc (ACD)(Jpn)</description>
 		<!-- Serial:  -->
 		<year>1994</year>
 		<publisher>NEC Home Electronics</publisher>
@@ -2356,7 +2356,7 @@
 	</software>
 
 	<software name="madoumon">
-		<description>Madou Monogatari I - Honou no Sotsuenji [Imperfect] (ACD)(JPN)</description>
+		<description>Madou Monogatari I - Honou no Sotsuenji [Imperfect] (ACD)(Jpn)</description>
 		<!-- Serial: NAPR-1047 - Release Date: 1996-12-13 -->
 		<year>1996</year>
 		<publisher>NEC Avenue</publisher>
@@ -2368,7 +2368,7 @@
 	</software>
 
 	<software name="popful">
-		<description>Magical Fantasy Adventure - Popful Mail (ACD, SCD)(JPN)</description>
+		<description>Magical Fantasy Adventure - Popful Mail (ACD, SCD)(Jpn)</description>
 		<!-- Serial: HECD4011 - Release Date: 1994-08-12 -->
 		<year>1994</year>
 		<publisher>NEC Home Electronics</publisher>
@@ -2380,7 +2380,7 @@
 	</software>
 
 	<software name="magsaurs" cloneof="magdino">
-		<description>Magical Saurus Tour (CD)(JPN)</description>
+		<description>Magical Saurus Tour (CD)(Jpn)</description>
 		<!-- Serial: JCCD0002 - Release Date: 1990-08-24 -->
 		<year>1990</year>
 		<publisher>Victor Entertainment</publisher>
@@ -2392,7 +2392,7 @@
 	</software>
 
 	<software name="magicoal">
-		<description>Magicoal (SCD)(JPN)</description>
+		<description>Magicoal (SCD)(Jpn)</description>
 		<!-- Serial: HECD3002 - Release Date: 1993-10-29 -->
 		<year>1993</year>
 		<publisher>NEC Home Electronics</publisher>
@@ -2404,7 +2404,7 @@
 	</software>
 
 	<software name="mjclinic">
-		<description>Mahjong Clinic Special (SCD)(JPN)</description>
+		<description>Mahjong Clinic Special (SCD)(Jpn)</description>
 		<!-- Serial: NXCD3023 - Release Date: 1993-09-24 -->
 		<year>1993</year>
 		<publisher>Naxat Soft</publisher>
@@ -2416,7 +2416,7 @@
 	</software>
 
 	<software name="mjlemang">
-		<description>Mahjong Lemon Angel (SCD)(JPN)</description>
+		<description>Mahjong Lemon Angel (SCD)(Jpn)</description>
 		<!-- Serial: NXCD3028 - Release Date: 1994-02-25 -->
 		<year>1994</year>
 		<publisher>Naxat Soft</publisher>
@@ -2428,7 +2428,7 @@
 	</software>
 
 	<software name="mjbeach">
-		<description>Mahjong on the Beach (SCD)(JPN)</description>
+		<description>Mahjong on the Beach (SCD)(Jpn)</description>
 		<!-- Serial: NAPR1037 - Release Date: 1993-09-30 -->
 		<year>1993</year>
 		<publisher>NEC Avenue</publisher>
@@ -2440,7 +2440,7 @@
 	</software>
 
 	<software name="mjsword">
-		<description>Mahjong Sword - Princess Quest Gaiden (ACD, SCD)(JPN)</description>
+		<description>Mahjong Sword - Princess Quest Gaiden (ACD, SCD)(Jpn)</description>
 		<!-- Serial: NXCD4031 - Release Date: 1995-08-11 -->
 		<year>1995</year>
 		<publisher>Naxat Soft</publisher>
@@ -2452,7 +2452,7 @@
 	</software>
 
 	<software name="silkylipo" cloneof="silkylip">
-		<description>Mahou no Shoujo Silky Lip [Ver 3.1 Prototype][Backup] (SCD)(JPN)</description>
+		<description>Mahou no Shoujo Silky Lip [Ver 3.1 Prototype][Backup] (SCD)(Jpn)</description>
 		<year>19??</year>
 		<publisher>Telenet Japan</publisher>
 		<part name="cdrom" interface="pce_cdrom">
@@ -2463,7 +2463,7 @@
 	</software>
 
 	<software name="silkylip">
-		<description>Mahou no Shoujo Silky Lip [Ver 5.0 Prototype][Backup][alt] (SCD)(JPN)</description>
+		<description>Mahou no Shoujo Silky Lip [Ver 5.0 Prototype][Backup][alt] (SCD)(Jpn)</description>
 		<year>19??</year>
 		<publisher>Telenet Japan</publisher>
 		<part name="cdrom" interface="pce_cdrom">
@@ -2474,7 +2474,7 @@
 	</software>
 
 	<software name="mamonoht">
-		<description>Mamono Hunter Youko - Makai Kara no Tenkousei (CD)(JPN)</description>
+		<description>Mamono Hunter Youko - Makai Kara no Tenkousei (CD)(Jpn)</description>
 		<!-- Serial: NSCD2011 - Release Date: 1992-03-13 -->
 		<year>1992</year>
 		<publisher>NCS</publisher>
@@ -2486,7 +2486,7 @@
 	</software>
 
 	<software name="mamonohu">
-		<description>Mamono Hunter Youko - Tooki Yobigoe (SCD)(JPN)</description>
+		<description>Mamono Hunter Youko - Tooki Yobigoe (SCD)(Jpn)</description>
 		<!-- Serial: NSCD2016 - Release Date: 1993-01-08 -->
 		<year>1993</year>
 		<publisher>NCS</publisher>
@@ -2498,7 +2498,7 @@
 	</software>
 
 	<software name="mtlchamp">
-		<description>Martial Champion (SCD)(JPN)</description>
+		<description>Martial Champion (SCD)(Jpn)</description>
 		<!-- Serial: KMCD3006 - Release Date: 1993-12-17 -->
 		<year>1993</year>
 		<publisher>Konami</publisher>
@@ -2510,7 +2510,7 @@
 	</software>
 
 	<software name="lavaleur">
-		<description>Mashou Denki La Valeur (CD)(JPN)</description>
+		<description>Mashou Denki La Valeur (CD)(Jpn)</description>
 		<!-- Serial: KSCD1001 - Release Date: 1991-03-22 -->
 		<year>1991</year>
 		<publisher>Kogado Studio</publisher>
@@ -2522,7 +2522,7 @@
 	</software>
 
 	<software name="mastrmon">
-		<description>Master of Monsters (CD)(JPN)</description>
+		<description>Master of Monsters (CD)(Jpn)</description>
 		<!-- Serial: MCCD0002 - Release Date: 1991-02-15 -->
 		<year>1991</year>
 		<publisher>Micro Cabin</publisher>
@@ -2534,7 +2534,7 @@
 	</software>
 
 	<software name="matekida">
-		<description>Mateki Densetsu Astralius (CD)(JPN)</description>
+		<description>Mateki Densetsu Astralius (CD)(Jpn)</description>
 		<!-- Serial: AICD0001 - Release Date: 1991-06-21 -->
 		<year>1991</year>
 		<publisher>IGS</publisher>
@@ -2546,7 +2546,7 @@
 	</software>
 
 	<software name="megamipa">
-		<description>Megami Paradise (SCD)(JPN)</description>
+		<description>Megami Paradise (SCD)(Jpn)</description>
 		<!-- Serial: HECD4008 - Release Date: 1994-09-30 -->
 		<year>1994</year>
 		<publisher>NEC Home Electronics</publisher>
@@ -2558,7 +2558,7 @@
 	</software>
 
 	<software name="metalang">
-		<description>Metal Angel (SCD)(JPN)</description>
+		<description>Metal Angel (SCD)(Jpn)</description>
 		<!-- Serial: PVCD-3008 - Release Date: 1993-09-24 -->
 		<year>1993</year>
 		<publisher>Pack-In-Video</publisher>
@@ -2570,7 +2570,7 @@
 	</software>
 
 	<software name="metalan2">
-		<description>Metal Angel II (SCD)(JPN)</description>
+		<description>Metal Angel II (SCD)(Jpn)</description>
 		<!-- Serial: PVCD-4012 - Release Date: 1995-01-20 -->
 		<year>1995</year>
 		<publisher>Pack-In-Video</publisher>
@@ -2582,7 +2582,7 @@
 	</software>
 
 	<software name="metamorj">
-		<description>Metamor Jupiter (SCD)(JPN)</description>
+		<description>Metamor Jupiter (SCD)(Jpn)</description>
 		<!-- Serial: HECD2001 - Release Date: 1993-01-22 -->
 		<year>1993</year>
 		<publisher>NEC Home Electronics</publisher>
@@ -2594,7 +2594,7 @@
 	</software>
 
 	<software name="mmagic">
-		<description>Might and Magic (CD)(JPN)</description>
+		<description>Might and Magic (CD)(Jpn)</description>
 		<!-- Serial: NAPR-1022 - Release Date: 1992-01-24 -->
 		<year>1992</year>
 		<publisher>NEC Avenue</publisher>
@@ -2606,7 +2606,7 @@
 	</software>
 
 	<software name="mmagic3j" cloneof="mmagic3">
-		<description>Might and Magic III - Isles of Terra (SCD)(JPN)</description>
+		<description>Might and Magic III - Isles of Terra (SCD)(Jpn)</description>
 		<!-- Serial: HCD3050 - Release Date: 1993-10-29 -->
 		<year>1993</year>
 		<publisher>Hudson</publisher>
@@ -2618,7 +2618,7 @@
 	</software>
 
 	<software name="mineswep">
-		<description>Mine Sweeper (CD)(JPN)</description>
+		<description>Mine Sweeper (CD)(Jpn)</description>
 		<!-- Serial: PVCD-2005 - Release Date: 1992-03-20 -->
 		<year>1992</year>
 		<publisher>Pack-In-Video</publisher>
@@ -2630,7 +2630,7 @@
 	</software>
 
 	<software name="conan">
-		<description>Mirai Shonen Conan (SCD)(JPN)</description>
+		<description>Mirai Shonen Conan (SCD)(Jpn)</description>
 		<!-- Serial: TJCD-2022 - Release Date: 1992-02-28 -->
 		<year>1992</year>
 		<publisher>Nihon Telenet</publisher>
@@ -2642,7 +2642,7 @@
 	</software>
 
 	<software name="mitsubac">
-		<description>Mitsubachi Gakuen (CD)(JPN)</description>
+		<description>Mitsubachi Gakuen (CD)(Jpn)</description>
 		<!-- Serial: HCD0007 - Release Date: 1990-09-14 -->
 		<year>1990</year>
 		<publisher>Hudson</publisher>
@@ -2654,7 +2654,7 @@
 	</software>
 
 	<software name="wboy3j" cloneof="mlair">
-		<description>Monster Lair - Wonderboy III (CD)(JPN)</description>
+		<description>Monster Lair - Wonderboy III (CD)(Jpn)</description>
 		<!-- Serial: HCD9006 - Release Date: 1989-08-31 -->
 		<year>1989</year>
 		<publisher>Hudson</publisher>
@@ -2666,7 +2666,7 @@
 	</software>
 
 	<software name="monsterm">
-		<description>Monster Maker - Yami no Ryuukishi (SCD)(JPN)</description>
+		<description>Monster Maker - Yami no Ryuukishi (SCD)(Jpn)</description>
 		<!-- Serial: NAPR-1026 - Release Date: 1994-03-30 -->
 		<year>1994</year>
 		<publisher>NEC Avenue</publisher>
@@ -2678,7 +2678,7 @@
 	</software>
 
 	<software name="moonligh">
-		<description>Moonlight Lady (SCD)(JPN)</description>
+		<description>Moonlight Lady (SCD)(Jpn)</description>
 		<!-- Serial: HECD3003 - Release Date: 1993-03-26 -->
 		<year>1993</year>
 		<publisher>NEC Home Electronics</publisher>
@@ -2690,7 +2690,7 @@
 	</software>
 
 	<software name="motoroad">
-		<description>Motoroader MC (SCD)(JPN)</description>
+		<description>Motoroader MC (SCD)(Jpn)</description>
 		<!-- Serial: NSCD2015 - Release Date: 1992-12-18 -->
 		<year>1992</year>
 		<publisher>NCS</publisher>
@@ -2702,7 +2702,7 @@
 	</software>
 
 	<software name="motteke">
-		<description>Motteke Tamago [Imperfect] (SCD)(JPN)</description>
+		<description>Motteke Tamago [Imperfect] (SCD)(Jpn)</description>
 		<!-- Serial: NXCD3022 - Release Date: 1997-04-16 -->
 		<year>1997</year>
 		<publisher>Naxat Soft</publisher>
@@ -2714,7 +2714,7 @@
 	</software>
 
 	<software name="valis">
-		<description>Mugen Senshi Valis - Legend of a Fantasm Soldier (SCD)(JPN)</description>
+		<description>Mugen Senshi Valis - Legend of a Fantasm Soldier (SCD)(Jpn)</description>
 		<!-- Serial: TJCD2023 - Release Date: 1992-03-19 -->
 		<year>1992</year>
 		<publisher>Nihon Telenet</publisher>
@@ -2726,7 +2726,7 @@
 	</software>
 
 	<software name="mysticf">
-		<description>Mystic Formula (SCD)(JPN)</description>
+		<description>Mystic Formula (SCD)(Jpn)</description>
 		<!-- Serial: MCCD3004 - Release Date: 1993-07-23 -->
 		<year>1993</year>
 		<publisher>Micro Cabin</publisher>
@@ -2738,7 +2738,7 @@
 	</software>
 
 	<software name="dodgebal">
-		<description>Nekketsu Koukou Dodgeballbu Soccer Hen (SCD)(JPN)</description>
+		<description>Nekketsu Koukou Dodgeballbu Soccer Hen (SCD)(Jpn)</description>
 		<!-- Serial: NXCD1005 - Release Date: 1991-12-20 -->
 		<year>1991</year>
 		<publisher>Naxat Soft</publisher>
@@ -2750,7 +2750,7 @@
 	</software>
 
 	<software name="soreyukd">
-		<description>Nekketsu Koushinkyoku - Soreyuke Daiundoukai (SCD)(JPN)</description>
+		<description>Nekketsu Koushinkyoku - Soreyuke Daiundoukai (SCD)(Jpn)</description>
 		<!-- Serial: NXCD2015 - Release Date: 1992-12-11 -->
 		<year>1992</year>
 		<publisher>Naxat Soft</publisher>
@@ -2762,7 +2762,7 @@
 	</software>
 
 	<software name="nekketlb">
-		<description>Nekketsu Legend Baseball (SCD)(JPN)</description>
+		<description>Nekketsu Legend Baseball (SCD)(Jpn)</description>
 		<!-- Serial: PVCD-5013 - Release Date: 1995-06-16 -->
 		<year>1995</year>
 		<publisher>Pack-In-Video</publisher>
@@ -2774,7 +2774,7 @@
 	</software>
 
 	<software name="nemurenu">
-		<description>Nemurenumori no Chiisana Ohanashi (SCD)(JPN)</description>
+		<description>Nemurenumori no Chiisana Ohanashi (SCD)(Jpn)</description>
 		<!-- Serial: HECD3004 - Release Date: 1993-07-30 -->
 		<year>1993</year>
 		<publisher>NEC Home Electronics</publisher>
@@ -2786,7 +2786,7 @@
 	</software>
 
 	<software name="neonectr">
-		<description>Neo Nectaris (SCD)(JPN)</description>
+		<description>Neo Nectaris (SCD)(Jpn)</description>
 		<!-- Serial: HCD4062 - Release Date: 1994-07-29 -->
 		<year>1994</year>
 		<publisher>Hudson</publisher>
@@ -2798,7 +2798,7 @@
 	</software>
 
 	<software name="nexzr">
-		<description>Nexzr (SCD)(JPN)</description>
+		<description>Nexzr (SCD)(Jpn)</description>
 		<!-- Serial: NXCD2014 - Release Date: 1992-12-11 -->
 		<year>1992</year>
 		<publisher>Naxat Soft</publisher>
@@ -2810,7 +2810,7 @@
 	</software>
 
 	<software name="nishimur">
-		<description>Nishimura Kyoutarou Mystery - Hokutosei no Onna (CD)(JPN)</description>
+		<description>Nishimura Kyoutarou Mystery - Hokutosei no Onna (CD)(Jpn)</description>
 		<!-- Serial: NXCD9001 - Release Date: 1990-02-23 -->
 		<year>1990</year>
 		<publisher>Naxat Soft</publisher>
@@ -2822,7 +2822,7 @@
 	</software>
 
 	<software name="noriko">
-		<description>No.Ri.Ko (CD)(JPN)</description>
+		<description>No.Ri.Ko (CD)(Jpn)</description>
 		<!-- Serial: HCD8001 - Release Date: 1988-12-04 -->
 		<year>1988</year>
 		<publisher>Hudson</publisher>
@@ -2834,7 +2834,7 @@
 	</software>
 
 	<software name="nobubf">
-		<description>Nobunaga no Yabou - Bushou Fuuunroku (SCD)(JPN)</description>
+		<description>Nobunaga no Yabou - Bushou Fuuunroku (SCD)(Jpn)</description>
 		<!-- Serial: KOCD2001 - Release Date: 1993-02-27 -->
 		<year>1993</year>
 		<publisher>Koei</publisher>
@@ -2846,7 +2846,7 @@
 	</software>
 
 	<software name="nobuzenk">
-		<description>Nobunaga no Yabou Zenkokuban (SCD)(JPN)</description>
+		<description>Nobunaga no Yabou Zenkokuban (SCD)(Jpn)</description>
 		<!-- Serial: KOCD3005 - Release Date: 1993-12-11 -->
 		<year>1993</year>
 		<publisher>Koei</publisher>
@@ -2858,7 +2858,7 @@
 	</software>
 
 	<software name="pachio3">
-		<description>Pachiokun III - Pachisuro Pachinko (SCD)(JPN)</description>
+		<description>Pachiokun III - Pachisuro Pachinko (SCD)(Jpn)</description>
 		<!-- Serial: CJCD4004 - Release Date: 1994-04-15 -->
 		<year>1994</year>
 		<publisher>Coconuts Japan</publisher>
@@ -2870,7 +2870,7 @@
 	</software>
 
 	<software name="pachio">
-		<description>Pachiokun Maboroshi no Densetsu (CD)(JPN)</description>
+		<description>Pachiokun Maboroshi no Densetsu (CD)(Jpn)</description>
 		<!-- Serial: CJCD1001 - Release Date: 1991-04-19 -->
 		<year>1991</year>
 		<publisher>Coconuts Japan</publisher>
@@ -2882,7 +2882,7 @@
 	</software>
 
 	<software name="pachiowu">
-		<description>Pachiokun Warau Uchuu (SCD)(JPN)</description>
+		<description>Pachiokun Warau Uchuu (SCD)(Jpn)</description>
 		<!-- Serial: CJCD2003 - Release Date: 1992-12-22 -->
 		<year>1992</year>
 		<publisher>Coconuts Japan</publisher>
@@ -2894,7 +2894,7 @@
 	</software>
 
 	<software name="paradion">
-		<description>Paradion - Auto Crusher Palladium (SCD)(JPN)</description>
+		<description>Paradion - Auto Crusher Palladium (SCD)(Jpn)</description>
 		<!-- Serial: PVCD3009 - Release Date: 1994-02-25 -->
 		<year>1994</year>
 		<publisher>Pack-In-Video</publisher>
@@ -2906,7 +2906,7 @@
 	</software>
 
 	<software name="pastelli">
-		<description>Pastel Lime (SCD)(JPN)</description>
+		<description>Pastel Lime (SCD)(Jpn)</description>
 		<!-- Serial: NXCD2018 - Release Date: 1992-12-18 -->
 		<year>1992</year>
 		<publisher>Naxat Soft</publisher>
@@ -2918,7 +2918,7 @@
 	</software>
 
 	<software name="fanspc1">
-		<description>PCEngine Fan Special CD-Rom Volume I (SCD)(JPN)</description>
+		<description>PCEngine Fan Special CD-Rom Volume I (SCD)(Jpn)</description>
 		<!-- Serial: TICD6006 (R-660034) - Release Date: 1996-06-29 -->
 		<year>1996</year>
 		<publisher>Tokuma Shoten</publisher>
@@ -2930,7 +2930,7 @@
 	</software>
 
 	<software name="hypercap">
-		<description>PCEngine Hyper Catalog (CD-Rom Capsule) (SCD)(JPN)</description>
+		<description>PCEngine Hyper Catalog (CD-Rom Capsule) (SCD)(Jpn)</description>
 		<!-- Serial: HCD2042 - Release Date: 1992-12-11 -->
 		<year>1992</year>
 		<publisher>Shogakukan</publisher>
@@ -2942,7 +2942,7 @@
 	</software>
 
 	<software name="hyprcata">
-		<description>PCEngine Hyper Catalog Duo-RX - Disc A (SCD)(JPN)</description>
+		<description>PCEngine Hyper Catalog Duo-RX - Disc A (SCD)(Jpn)</description>
 		<!-- Serial: SHCD-4008 -->
 		<year>19??</year>
 		<publisher>Shogakukan</publisher>
@@ -2954,7 +2954,7 @@
 	</software>
 
 	<software name="hyprcatb">
-		<description>PCEngine Hyper Catalog Duo-RX - Disc B (SCD)(JPN)</description>
+		<description>PCEngine Hyper Catalog Duo-RX - Disc B (SCD)(Jpn)</description>
 		<!-- Serial: SHCD-4009 -->
 		<year>19??</year>
 		<publisher>Shogakukan</publisher>
@@ -2966,7 +2966,7 @@
 	</software>
 
 	<software name="hyprcat2">
-		<description>PCEngine Hyper Catalog II (SCD)(JPN)</description>
+		<description>PCEngine Hyper Catalog II (SCD)(Jpn)</description>
 		<!-- Serial: HCD3052 - Release Date: 1993-05-21 -->
 		<year>1993</year>
 		<publisher>Shogakukan</publisher>
@@ -2978,7 +2978,7 @@
 	</software>
 
 	<software name="hyprcat3">
-		<description>PCEngine Hyper Catalog III (SCD)(JPN)</description>
+		<description>PCEngine Hyper Catalog III (SCD)(Jpn)</description>
 		<!-- Serial: HCD3055 - Release Date: 1993-08-09 -->
 		<year>1993</year>
 		<publisher>Shogakukan</publisher>
@@ -2990,7 +2990,7 @@
 	</software>
 
 	<software name="hyprcat4">
-		<description>PCEngine Hyper Catalog IV (SCD)(JPN)</description>
+		<description>PCEngine Hyper Catalog IV (SCD)(Jpn)</description>
 		<!-- Serial: HCD3056 - Release Date: 1993-11-11 -->
 		<year>1993</year>
 		<publisher>Shogakukan</publisher>
@@ -3002,7 +3002,7 @@
 	</software>
 
 	<software name="hyprcat5">
-		<description>PCEngine Hyper Catalog V (SCD)(JPN)</description>
+		<description>PCEngine Hyper Catalog V (SCD)(Jpn)</description>
 		<!-- Serial: SHCD-4005 - Release Date: 1994-04-21 -->
 		<year>1994</year>
 		<publisher>Shogakukan</publisher>
@@ -3014,7 +3014,7 @@
 	</software>
 
 	<software name="hyprct6a">
-		<description>PCEngine Hyper Catalog VI - Disc A (SCD)(JPN)</description>
+		<description>PCEngine Hyper Catalog VI - Disc A (SCD)(Jpn)</description>
 		<!-- Serial: SHCD-40006 - Release Date: 1994-07-21 -->
 		<year>1994</year>
 		<publisher>Shogakukan</publisher>
@@ -3026,7 +3026,7 @@
 	</software>
 
 	<software name="hyprct6b">
-		<description>PCEngine Hyper Catalog VI - Disc B (SCD)(JPN)</description>
+		<description>PCEngine Hyper Catalog VI - Disc B (SCD)(Jpn)</description>
 		<!-- Serial: SHCD-4007 - Release Date: 1994-07-21 -->
 		<year>1994</year>
 		<publisher>Shogakukan</publisher>
@@ -3038,7 +3038,7 @@
 	</software>
 
 	<software name="policeco">
-		<description>Police Connection (SCD)(JPN)</description>
+		<description>Police Connection (SCD)(Jpn)</description>
 		<!-- Serial: TJCD3036 - Release Date: 1993-02-26 -->
 		<year>1993</year>
 		<publisher>Nihon Telenet</publisher>
@@ -3050,7 +3050,7 @@
 	</software>
 
 	<software name="pompingw" cloneof="bbros">
-		<description>Pomping World (CD)(JPN)</description>
+		<description>Pomping World (CD)(Jpn)</description>
 		<!-- Serial: HCD1019 - Release Date: 1991-05-31 -->
 		<year>1991</year>
 		<publisher>Hudson</publisher>
@@ -3062,7 +3062,7 @@
 	</software>
 
 	<software name="popnmagi">
-		<description>Pop'n Magic (SCD)(JPN)</description>
+		<description>Pop'n Magic (SCD)(Jpn)</description>
 		<!-- Serial: TJCD2027 - Release Date: 1992-07-24 -->
 		<year>1992</year>
 		<publisher>Nihon Telenet</publisher>
@@ -3074,7 +3074,7 @@
 	</software>
 
 	<software name="populous">
-		<description>Populous - The Promised Lands (SCD)(JPN)</description>
+		<description>Populous - The Promised Lands (SCD)(Jpn)</description>
 		<!-- Serial: HCD1021 - Release Date: 1991-10-25 -->
 		<year>1991</year>
 		<publisher>Hudson</publisher>
@@ -3086,7 +3086,7 @@
 	</software>
 
 	<software name="ppersiaj" cloneof="ppersia">
-		<description>Prince of Persia (SCD)(JPN)</description>
+		<description>Prince of Persia (SCD)(Jpn)</description>
 		<!-- Serial: RHCD1002 - Release Date: 1991-11-08 -->
 		<year>1991</year>
 		<publisher>Riverhill Software</publisher>
@@ -3098,7 +3098,7 @@
 	</software>
 
 	<software name="prinmakr">
-		<description>Princess Maker I (SCD)(JPN)</description>
+		<description>Princess Maker I (SCD)(Jpn)</description>
 		<!-- Serial: HECD4015 - Release Date: 1995-01-03 -->
 		<year>1995</year>
 		<publisher>NEC Home Electronics</publisher>
@@ -3118,7 +3118,7 @@
 	</software>
 
 	<software name="prinmak2">
-		<description>Princess Maker II (ACD, SCD)(JPN)</description>
+		<description>Princess Maker II (ACD, SCD)(Jpn)</description>
 		<!-- Serial: HECD5020 - Release Date: 1995-06-16 -->
 		<year>1995</year>
 		<publisher>NEC Home Electronics</publisher>
@@ -3130,7 +3130,7 @@
 	</software>
 
 	<software name="princesm">
-		<description>Princess Minerva (SCD)(JPN)</description>
+		<description>Princess Minerva (SCD)(Jpn)</description>
 		<!-- Serial: RHCD-4008 - Release Date: 1994-03-25 -->
 		<year>1994</year>
 		<publisher>Riverhill Software</publisher>
@@ -3142,7 +3142,7 @@
 	</software>
 
 	<software name="priveyed">
-		<description>Private Eyedol (ACD, SCD)(JPN)</description>
+		<description>Private Eyedol (ACD, SCD)(Jpn)</description>
 		<!-- Serial: HECD5019 - Release Date: 1995-08-11 -->
 		<year>1995</year>
 		<publisher>NEC Home Electronics</publisher>
@@ -3154,7 +3154,7 @@
 	</software>
 
 	<software name="psycdet3">
-		<description>Psychic Detective Series Vol. III - Aya (SCD)(JPN)</description>
+		<description>Psychic Detective Series Vol. III - Aya (SCD)(Jpn)</description>
 		<!-- Serial: DWCD2003 - Release Date: 1992-11-20 -->
 		<year>1992</year>
 		<publisher>DataWest</publisher>
@@ -3166,7 +3166,7 @@
 	</software>
 
 	<software name="psycdet3d" cloneof="psycdet3">
-		<description>Psychic Detective Series Vol. III - Aya - Auto Demo (SCD)(JPN)</description>
+		<description>Psychic Detective Series Vol. III - Aya - Auto Demo (SCD)(Jpn)</description>
 		<!-- Serial:  -->
 		<year>1992</year>
 		<publisher>DataWest</publisher>
@@ -3178,7 +3178,7 @@
 	</software>
 
 	<software name="psycdet4">
-		<description>Psychic Detective Series Vol. IV - Orgel (SCD)(JPN)</description>
+		<description>Psychic Detective Series Vol. IV - Orgel (SCD)(Jpn)</description>
 		<!-- Serial: DWCD3004 - Release Date: 1993-08-06 -->
 		<year>1993</year>
 		<publisher>DataWest</publisher>
@@ -3190,7 +3190,7 @@
 	</software>
 
 	<software name="psychics">
-		<description>Psychic Storm (SCD)(JPN)</description>
+		<description>Psychic Storm (SCD)(Jpn)</description>
 		<!-- Serial: TJCD2025 - Release Date: 1992-03-19 -->
 		<year>1992</year>
 		<publisher>Nihon Telenet</publisher>
@@ -3202,7 +3202,7 @@
 	</software>
 
 	<software name="puyopuyo">
-		<description>Puyo Puyo CD (SCD)(JPN)</description>
+		<description>Puyo Puyo CD (SCD)(Jpn)</description>
 		<!-- Serial: NAPR-1038 - Release Date: 1994-04-22 -->
 		<year>1994</year>
 		<publisher>NEC Avenue</publisher>
@@ -3214,7 +3214,7 @@
 	</software>
 
 	<software name="puyopuy2">
-		<description>Puyo Puyo CD Tsuu (SCD)(JPN)</description>
+		<description>Puyo Puyo CD Tsuu (SCD)(Jpn)</description>
 		<!-- Serial: NIPR-1001 - Release Date: 1996-03-29 -->
 		<year>1996</year>
 		<publisher>NEC Interchannel</publisher>
@@ -3226,7 +3226,7 @@
 	</software>
 
 	<software name="quizaven">
-		<description>Quiz Avenue (CD)(JPN)</description>
+		<description>Quiz Avenue (CD)(Jpn)</description>
 		<!-- Serial: NAPR-1013 - Release Date: 1991-02-15 -->
 		<year>1991</year>
 		<publisher>NEC Avenue</publisher>
@@ -3238,7 +3238,7 @@
 	</software>
 
 	<software name="quizavn2">
-		<description>Quiz Avenue II (CD)(JPN)</description>
+		<description>Quiz Avenue II (CD)(Jpn)</description>
 		<!-- Serial: NAPR-1024 - Release Date: 1991-10-11 -->
 		<year>1991</year>
 		<publisher>NEC Avenue</publisher>
@@ -3250,7 +3250,7 @@
 	</software>
 
 	<software name="quizavn3">
-		<description>Quiz Avenue III (SCD)(JPN)</description>
+		<description>Quiz Avenue III (SCD)(Jpn)</description>
 		<!-- Serial: NAPR-1040 - Release Date: 1994-11-25 -->
 		<year>1994</year>
 		<publisher>NEC Avenue</publisher>
@@ -3262,7 +3262,7 @@
 	</software>
 
 	<software name="quizcara">
-		<description>Quiz Caravan Cult Q (CD)(JPN)</description>
+		<description>Quiz Caravan Cult Q (CD)(Jpn)</description>
 		<!-- Serial: HCD3047 - Release Date: 1993-05-28 -->
 		<year>1993</year>
 		<publisher>Hudson</publisher>
@@ -3274,7 +3274,7 @@
 	</software>
 
 	<software name="quizgaku">
-		<description>Quiz de Gakuensai (SCD)(JPN)</description>
+		<description>Quiz de Gakuensai (SCD)(Jpn)</description>
 		<!-- Serial: NXCD3026 - Release Date: 1993-11-26 -->
 		<year>1993</year>
 		<publisher>Naxat Soft</publisher>
@@ -3286,7 +3286,7 @@
 	</software>
 
 	<software name="quizmaru">
-		<description>Quiz Marugoto the World (CD)(JPN)</description>
+		<description>Quiz Marugoto the World (CD)(Jpn)</description>
 		<!-- Serial: ATCD1001 - Release Date: 1991-04-05 -->
 		<year>1991</year>
 		<publisher>Atlus</publisher>
@@ -3298,7 +3298,7 @@
 	</software>
 
 	<software name="quizmar2">
-		<description>Quiz Marugoto The World II - Time Machine ni Onegai! (CD)(JPN)</description>
+		<description>Quiz Marugoto The World II - Time Machine ni Onegai! (CD)(Jpn)</description>
 		<!-- Serial: ATCD2003 - Release Date: 1992-03-27 -->
 		<year>1992</year>
 		<publisher>Atlus</publisher>
@@ -3310,7 +3310,7 @@
 	</software>
 
 	<software name="quiznoho">
-		<description>Quiz no Hoshi (SCD)(JPN)</description>
+		<description>Quiz no Hoshi (SCD)(Jpn)</description>
 		<!-- Serial: SSCD2002 - Release Date: 1992-08-10 -->
 		<year>1992</year>
 		<publisher>Sunsoft</publisher>
@@ -3322,7 +3322,7 @@
 	</software>
 
 	<software name="quiztono">
-		<description>Quiz Tonosama no Yabou (CD)(JPN)</description>
+		<description>Quiz Tonosama no Yabou (CD)(Jpn)</description>
 		<!-- Serial: HCD2038 - Release Date: 1992-10-10 -->
 		<year>1992</year>
 		<publisher>Hudson</publisher>
@@ -3334,7 +3334,7 @@
 	</software>
 
 	<software name="rtype">
-		<description>R-Type Complete CD (SCD)(JPN)</description>
+		<description>R-Type Complete CD (SCD)(Jpn)</description>
 		<!-- Serial: ICCD1001 - Release Date: 1991-12-20 -->
 		<year>1991</year>
 		<publisher>Irem</publisher>
@@ -3346,7 +3346,7 @@
 	</software>
 
 	<software name="rainbow">
-		<description>Rainbow Islands (CD)(JPN)</description>
+		<description>Rainbow Islands (CD)(Jpn)</description>
 		<!-- Serial: NAPR-1012 - Release Date: 1993-06-30 -->
 		<year>1993</year>
 		<publisher>NEC Avenue</publisher>
@@ -3358,7 +3358,7 @@
 	</software>
 
 	<software name="ranma">
-		<description>Ranma ½ (CD)(JPN)</description>
+		<description>Ranma ½ (CD)(Jpn)</description>
 		<!-- Serial: NSCD0004 - Release Date: 1990-12-07 -->
 		<year>1990</year>
 		<publisher>NCS</publisher>
@@ -3370,7 +3370,7 @@
 	</software>
 
 	<software name="ranmadat">
-		<description>Ranma ½ Datou, Ganso Musabetsu Kakutou-Ryuu! (CD, SCD)(JPN)</description>
+		<description>Ranma ½ Datou, Ganso Musabetsu Kakutou-Ryuu! (CD, SCD)(Jpn)</description>
 		<!-- Serial: NSCD2009 - Release Date: 1992-10-02 -->
 		<year>1992</year>
 		<publisher>NCS</publisher>
@@ -3382,7 +3382,7 @@
 	</software>
 
 	<software name="ranmator">
-		<description>Ranma ½ Toraware no Hanayome (CD)(JPN)</description>
+		<description>Ranma ½ Toraware no Hanayome (CD)(Jpn)</description>
 		<!-- Serial: NSCD1006 - Release Date: 1991-12-06 -->
 		<year>1991</year>
 		<publisher>NCS</publisher>
@@ -3394,7 +3394,7 @@
 	</software>
 
 	<software name="rayxan2">
-		<description>Rayxanber II (CD)(JPN)</description>
+		<description>Rayxanber II (CD)(Jpn)</description>
 		<!-- Serial: DWCD1001 - Release Date: 1991-06-07 -->
 		<year>1991</year>
 		<publisher>DataWest</publisher>
@@ -3406,7 +3406,7 @@
 	</software>
 
 	<software name="rayxan3">
-		<description>Rayxanber III (SCD)(JPN)</description>
+		<description>Rayxanber III (SCD)(Jpn)</description>
 		<!-- Serial: DWCD2002 - Release Date: 1992-06-26 -->
 		<year>1992</year>
 		<publisher>DataWest</publisher>
@@ -3418,7 +3418,7 @@
 	</software>
 
 	<software name="redalert" cloneof="lstalert">
-		<description>Red Alert (CD)(JPN)</description>
+		<description>Red Alert (CD)(Jpn)</description>
 		<!-- Serial: TJCD9004 - Release Date: 1989-12-28 -->
 		<year>1989</year>
 		<publisher>Nihon Telenet</publisher>
@@ -3430,7 +3430,7 @@
 	</software>
 
 	<software name="rennybla">
-		<description>Renny Blaster (SCD)(JPN)</description>
+		<description>Renny Blaster (SCD)(Jpn)</description>
 		<!-- Serial: NAPR-1044 - Release Date: 1995-06-23 -->
 		<year>1995</year>
 		<publisher>NEC Avenue</publisher>
@@ -3442,7 +3442,7 @@
 	</software>
 
 	<software name="risingsn" cloneof="lordrsun">
-		<description>Rising Sun (CD)(JPN)</description>
+		<description>Rising Sun (CD)(Jpn)</description>
 		<!-- Serial: JCCD2006 - Release Date: 1992-03-13 -->
 		<year>1992</year>
 		<publisher>Victor Entertainment</publisher>
@@ -3454,7 +3454,7 @@
 	</software>
 
 	<software name="roadspir">
-		<description>Road Spirits (CD)(JPN)</description>
+		<description>Road Spirits (CD)(Jpn)</description>
 		<!-- Serial: PVCD-1003 - Release Date: 1991-03-22 -->
 		<year>1991</year>
 		<publisher>Pack-In-Video</publisher>
@@ -3466,7 +3466,7 @@
 	</software>
 
 	<software name="karaoke1">
-		<description>Rom² Karaoke - Volume I (CD)(JPN)</description>
+		<description>Rom² Karaoke - Volume I (CD)(Jpn)</description>
 		<!-- Serial: HRCD-9101 -->
 		<year>1989</year>
 		<publisher>NEC Avenue</publisher>
@@ -3478,7 +3478,7 @@
 	</software>
 
 	<software name="karao1ss">
-		<description>Rom² Karaoke - Volume I - Suteki ni Standard (CD)(JPN)</description>
+		<description>Rom² Karaoke - Volume I - Suteki ni Standard (CD)(Jpn)</description>
 		<!-- Serial: JCCD9501 -->
 		<year>1989</year>
 		<publisher>Victor Musical Industries</publisher>
@@ -3490,7 +3490,7 @@
 	</software>
 
 	<software name="karaoke2">
-		<description>Rom² Karaoke - Volume II (CD)(JPN)</description>
+		<description>Rom² Karaoke - Volume II (CD)(Jpn)</description>
 		<!-- Serial: HRCD-9102 -->
 		<year>1989</year>
 		<publisher>NEC Avenue</publisher>
@@ -3502,7 +3502,7 @@
 	</software>
 
 	<software name="karao2ni">
-		<description>Rom² Karaoke - Volume II - Nattoku Idol (CD)(JPN)</description>
+		<description>Rom² Karaoke - Volume II - Nattoku Idol (CD)(Jpn)</description>
 		<!-- Serial: JCCD9502 -->
 		<year>1989</year>
 		<publisher>Victor Musical Industries</publisher>
@@ -3514,7 +3514,7 @@
 	</software>
 
 	<software name="karaoke3">
-		<description>Rom² Karaoke - Volume III (CD)(JPN)</description>
+		<description>Rom² Karaoke - Volume III (CD)(Jpn)</description>
 		<!-- Serial: HRCD-9103 -->
 		<year>1989</year>
 		<publisher>NEC Avenue</publisher>
@@ -3526,7 +3526,7 @@
 	</software>
 
 	<software name="karao3yb">
-		<description>Rom² Karaoke - Volume III - Yappashi Band (CD)(JPN)</description>
+		<description>Rom² Karaoke - Volume III - Yappashi Band (CD)(Jpn)</description>
 		<!-- Serial: JCCD9503 -->
 		<year>1990</year>
 		<publisher>Victor Musical Industries</publisher>
@@ -3538,7 +3538,7 @@
 	</software>
 
 	<software name="karaoke4">
-		<description>Rom² Karaoke - Volume IV (CD)(JPN)</description>
+		<description>Rom² Karaoke - Volume IV (CD)(Jpn)</description>
 		<!-- Serial: HRCD-9104 -->
 		<year>1989</year>
 		<publisher>NEC Avenue</publisher>
@@ -3550,7 +3550,7 @@
 	</software>
 
 	<software name="karao4co">
-		<description>Rom² Karaoke - Volume IV - Choito Otona! (CD)(JPN)</description>
+		<description>Rom² Karaoke - Volume IV - Choito Otona! (CD)(Jpn)</description>
 		<!-- Serial: JCCD9504 -->
 		<year>1990</year>
 		<publisher>Victor Musical Industries</publisher>
@@ -3562,7 +3562,7 @@
 	</software>
 
 	<software name="karaoke5">
-		<description>Rom² Karaoke - Volume V (CD)(JPN)</description>
+		<description>Rom² Karaoke - Volume V (CD)(Jpn)</description>
 		<!-- Serial: HRCD-9105 -->
 		<year>1990</year>
 		<publisher>NEC Avenue</publisher>
@@ -3574,7 +3574,7 @@
 	</software>
 
 	<software name="karao5mu">
-		<description>Rom² Karaoke - Volume V - Maku no Uchi (CD)(JPN)</description>
+		<description>Rom² Karaoke - Volume V - Maku no Uchi (CD)(Jpn)</description>
 		<!-- Serial: JCCD9505 -->
 		<year>1990</year>
 		<publisher>Victor Musical Industries</publisher>
@@ -3586,7 +3586,7 @@
 	</software>
 
 	<software name="romstad">
-		<description>Rom Rom Stadium (CD)(JPN)</description>
+		<description>Rom Rom Stadium (CD)(Jpn)</description>
 		<!-- Serial: NSCD9001 - Release Date: 1989-12-22 -->
 		<year>1989</year>
 		<publisher>NCS</publisher>
@@ -3598,7 +3598,7 @@
 	</software>
 
 	<software name="ruin">
-		<description>Ruin - Kami no Isan (SCD)(JPN)</description>
+		<description>Ruin - Kami no Isan (SCD)(Jpn)</description>
 		<!-- Serial: JCCD3013 - Release Date: 1993-11-19 -->
 		<year>1993</year>
 		<publisher>Victor Entertainment</publisher>
@@ -3610,7 +3610,7 @@
 	</software>
 
 	<software name="ryukoken">
-		<description>Ryuuko no Ken (ACD)(JPN)</description>
+		<description>Ryuuko no Ken (ACD)(Jpn)</description>
 		<!-- Serial: HCD4061 - Release Date: 1994-03-26 -->
 		<year>1994</year>
 		<publisher>Hudson</publisher>
@@ -3622,7 +3622,7 @@
 	</software>
 
 	<software name="ryukokens" cloneof="ryukoken">
-		<description>Ryuuko no Ken - Sample Disc (ACD)(JPN)</description>
+		<description>Ryuuko no Ken - Sample Disc (ACD)(Jpn)</description>
 		<!-- Serial:  -->
 		<year>1994</year>
 		<publisher>Hudson</publisher>
@@ -3634,7 +3634,7 @@
 	</software>
 
 	<software name="sangoku">
-		<description>Sangokushi Eiketsu - Tenka ni Nozomu (CD)(JPN)</description>
+		<description>Sangokushi Eiketsu - Tenka ni Nozomu (CD)(Jpn)</description>
 		<!-- Serial: NXCD0002 - Release Date: 1991-03-29 -->
 		<year>1991</year>
 		<publisher>Naxat Soft</publisher>
@@ -3646,7 +3646,7 @@
 	</software>
 
 	<software name="sangoku3">
-		<description>Sangokushi III (SCD)(JPN)</description>
+		<description>Sangokushi III (SCD)(Jpn)</description>
 		<!-- Serial: KOCD3003 - Release Date: 1993-10-01 -->
 		<year>1993</year>
 		<publisher>Koei</publisher>
@@ -3658,7 +3658,7 @@
 	</software>
 
 	<software name="spriggan">
-		<description>Seirei Senshi Spriggan (CD)(JPN)</description>
+		<description>Seirei Senshi Spriggan (CD)(Jpn)</description>
 		<!-- Serial: NXCD1004 - Release Date: 1991-07-12 -->
 		<year>1991</year>
 		<publisher>Naxat Soft</publisher>
@@ -3670,7 +3670,7 @@
 	</software>
 
 	<software name="monbit">
-		<description>Seiryuu Densetsu Monbit (CD)(JPN)</description>
+		<description>Seiryuu Densetsu Monbit (CD)(Jpn)</description>
 		<!-- Serial: HCD1018 - Release Date: 1991-08-30 -->
 		<year>1991</year>
 		<publisher>Hudson</publisher>
@@ -3682,7 +3682,7 @@
 	</software>
 
 	<software name="seisensh">
-		<description>Seisenshi Denshou - Jantaku no Kishi (SCD)(JPN)</description>
+		<description>Seisenshi Denshou - Jantaku no Kishi (SCD)(Jpn)</description>
 		<!-- Serial: NBCD4005 - Release Date: 1994-08-01 -->
 		<year>1994</year>
 		<publisher>Nichibutsu</publisher>
@@ -3694,7 +3694,7 @@
 	</software>
 
 	<software name="seiyamon">
-		<description>Seiya Monogatari - Anearth Fantasy Stories (SCD)(JPN)</description>
+		<description>Seiya Monogatari - Anearth Fantasy Stories (SCD)(Jpn)</description>
 		<!-- Serial: HCD5071 - Release Date: 1995-12-22 -->
 		<year>1995</year>
 		<publisher>Hudson</publisher>
@@ -3706,7 +3706,7 @@
 	</software>
 
 	<software name="seiyamont" cloneof="seiyamon">
-		<description>Seiya Monogatari - Anearth Fantasy Stories Taikenban (SCD)(JPN)</description>
+		<description>Seiya Monogatari - Anearth Fantasy Stories Taikenban (SCD)(Jpn)</description>
 		<!-- Serial: HMD-004 -->
 		<year>1995</year>
 		<publisher>Hudson</publisher>
@@ -3718,7 +3718,7 @@
 	</software>
 
 	<software name="seiyamonp" cloneof="seiyamon">
-		<description>Seiya Monogatari - Anearth Fantasy Stories [Debug Version Prototype] (SCD)(JPN)</description>
+		<description>Seiya Monogatari - Anearth Fantasy Stories [Debug Version Prototype] (SCD)(Jpn)</description>
 		<!-- Serial:  -->
 		<year>19??</year>
 		<publisher>NEC</publisher>
@@ -3730,7 +3730,7 @@
 	</software>
 
 	<software name="sengokuk">
-		<description>Sengoku Kantou Sankokushi (CD)(JPN)</description>
+		<description>Sengoku Kantou Sankokushi (CD)(Jpn)</description>
 		<!-- Serial: IGCD1002 - Release Date: 1991-06-28 -->
 		<year>1991</year>
 		<publisher>Intec</publisher>
@@ -3742,7 +3742,7 @@
 	</software>
 
 	<software name="sexyidol">
-		<description>Sexy Idol Mahjong (SCD)(JPN)</description>
+		<description>Sexy Idol Mahjong (SCD)(Jpn)</description>
 		<!-- Serial: NBCD3004 - Release Date: 1993-12-24 -->
 		<year>1993</year>
 		<publisher>Nichibutsu</publisher>
@@ -3754,7 +3754,7 @@
 	</software>
 
 	<software name="sexyidof">
-		<description>Sexy Idol Mahjong Fashion Monogatari (ACD, SCD)(JPN)</description>
+		<description>Sexy Idol Mahjong Fashion Monogatari (ACD, SCD)(Jpn)</description>
 		<!-- Serial: NBCD4006 - Release Date: 1994-09-16 -->
 		<year>1994</year>
 		<publisher>Nichibutsu</publisher>
@@ -3766,7 +3766,7 @@
 	</software>
 
 	<software name="sexyidoy">
-		<description>Sexy Idol Mahjong Yakyuuken no Uta [Imperfect] (SCD)(JPN)</description>
+		<description>Sexy Idol Mahjong Yakyuuken no Uta [Imperfect] (SCD)(Jpn)</description>
 		<!-- Serial: NBCD4007 - Release Date: 1995-01-31 -->
 		<year>1995</year>
 		<publisher>Nichibutsu</publisher>
@@ -3778,7 +3778,7 @@
 	</software>
 
 	<software name="beastj" cloneof="beast">
-		<description>Shadow of the Beast (SCD)(JPN)</description>
+		<description>Shadow of the Beast (SCD)(Jpn)</description>
 		<!-- Serial: JCCD2008 - Release Date: 1992-03-27 -->
 		<year>1992</year>
 		<publisher>Victor Entertainment</publisher>
@@ -3790,7 +3790,7 @@
 	</software>
 
 	<software name="shangha2">
-		<description>Shanghai II (CD)(JPN)</description>
+		<description>Shanghai II (CD)(Jpn)</description>
 		<!-- Serial: HCD0010 - Release Date: 1990-04-13 -->
 		<year>1990</year>
 		<publisher>Hudson</publisher>
@@ -3802,7 +3802,7 @@
 	</software>
 
 	<software name="shangha3">
-		<description>Shanghai III - Dragon's Eye (CD)(JPN)</description>
+		<description>Shanghai III - Dragon's Eye (CD)(Jpn)</description>
 		<!-- Serial: AKCD2002 - Release Date: 1992-12-18 -->
 		<year>1992</year>
 		<publisher>ASK Kodansha</publisher>
@@ -3814,7 +3814,7 @@
 	</software>
 
 	<software name="shapeshj" cloneof="shapesh">
-		<description>Shapeshifter - Makai Eiyuu Den (SCD)(JPN)</description>
+		<description>Shapeshifter - Makai Eiyuu Den (SCD)(Jpn)</description>
 		<!-- Serial: JCCD2011 - Release Date: 1992-09-25 -->
 		<year>1992</year>
 		<publisher>Victor Entertainment</publisher>
@@ -3826,7 +3826,7 @@
 	</software>
 
 	<software name="holmesj" cloneof="holmes">
-		<description>Sherlock Holmes no Tantei Kouza (CD)(JPN)</description>
+		<description>Sherlock Holmes no Tantei Kouza (CD)(Jpn)</description>
 		<!-- Serial: JCCD1004 - Release Date: 1991-07-26 -->
 		<year>1991</year>
 		<publisher>Victor Entertainment</publisher>
@@ -3838,7 +3838,7 @@
 	</software>
 
 	<software name="holmes2j" cloneof="holmes2">
-		<description>Sherlock Holmes no Tantei Kouza II (CD)(JPN)</description>
+		<description>Sherlock Holmes no Tantei Kouza II (CD)(Jpn)</description>
 		<!-- Serial: JCCD3012 - Release Date: 1993-05-28 -->
 		<year>1993</year>
 		<publisher>Victor Entertainment</publisher>
@@ -3850,7 +3850,7 @@
 	</software>
 
 	<software name="shiawase">
-		<description>Shiawase Usagi - Nureta Bishoujo Ichi Hajimete na no ni [Imperfect] (SCD)(JPN)</description>
+		<description>Shiawase Usagi - Nureta Bishoujo Ichi Hajimete na no ni [Imperfect] (SCD)(Jpn)</description>
 		<!-- Serial:  -->
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -3862,7 +3862,7 @@
 	</software>
 
 	<software name="shiawas2">
-		<description>Shiawase Usagi II - Toraware Usagi Sailor Z (SCD)(JPN)</description>
+		<description>Shiawase Usagi II - Toraware Usagi Sailor Z (SCD)(Jpn)</description>
 		<!-- Serial:  -->
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -3874,7 +3874,7 @@
 	</software>
 
 	<software name="shmegamt">
-		<description>Shin Megami Tensei (SCD)(JPN)</description>
+		<description>Shin Megami Tensei (SCD)(Jpn)</description>
 		<!-- Serial: ATCD3006 - Release Date: 1993-12-25 -->
 		<year>1993</year>
 		<publisher>Atlus</publisher>
@@ -3886,7 +3886,7 @@
 	</software>
 
 	<software name="shinonry">
-		<description>Shin Onryou Senki (SCD)(JPN)</description>
+		<description>Shin Onryou Senki (SCD)(Jpn)</description>
 		<!-- Serial: FCCD5003 - Release Date: 1995-09-22 -->
 		<year>1995</year>
 		<publisher>Fujicom</publisher>
@@ -3898,7 +3898,7 @@
 	</software>
 
 	<software name="shinsang">
-		<description>Shin Sangokushi - Tenka ha Ware ni (CD)(JPN)</description>
+		<description>Shin Sangokushi - Tenka ha Ware ni (CD)(Jpn)</description>
 		<!-- Serial: NXCD2009 - Release Date: 1992-11-20 -->
 		<year>1992</year>
 		<publisher>Naxat Soft</publisher>
@@ -3910,7 +3910,7 @@
 	</software>
 
 	<software name="shinsets">
-		<description>Shinsetsu Shiawase Usagi (SCD)(JPN)</description>
+		<description>Shinsetsu Shiawase Usagi (SCD)(Jpn)</description>
 		<!-- Release Date: 1995-09-30  -->
 		<year>1995</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -3922,7 +3922,7 @@
 	</software>
 
 	<software name="shinsetf">
-		<description>Shinsetsu Shiawase Usagi F - Yuujiyou Yorimo Aiyoku (SCD)(JPN)</description>
+		<description>Shinsetsu Shiawase Usagi F - Yuujiyou Yorimo Aiyoku (SCD)(Jpn)</description>
 		<!-- Release Date: 1997-09-10  -->
 		<year>1997</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -3934,7 +3934,7 @@
 	</software>
 
 	<software name="shinset2">
-		<description>Shinsetsu Shiawase Usagi II (SCD)(JPN)</description>
+		<description>Shinsetsu Shiawase Usagi II (SCD)(Jpn)</description>
 		<!-- Release Date: 1996-02-25  -->
 		<year>1996</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -3946,7 +3946,7 @@
 	</software>
 
 	<software name="shougidb">
-		<description>Shougi Database Kiyuu (SCD)(JPN)</description>
+		<description>Shougi Database Kiyuu (SCD)(Jpn)</description>
 		<!-- Serial: STCD5001 - Release Date: 1995-10-27 -->
 		<year>1995</year>
 		<publisher>Seta</publisher>
@@ -3958,7 +3958,7 @@
 	</software>
 
 	<software name="simearthj" cloneof="simearth">
-		<description>Sim Earth - The Living Planet (SCD)(JPN)</description>
+		<description>Sim Earth - The Living Planet (SCD)(Jpn)</description>
 		<!-- Serial: HCD2040 - Release Date: 1993-01-14 -->
 		<year>1993</year>
 		<publisher>Hudson</publisher>
@@ -3970,7 +3970,7 @@
 	</software>
 
 	<software name="slimewor">
-		<description>Slime World (SCD)(JPN)</description>
+		<description>Slime World (SCD)(Jpn)</description>
 		<!-- Serial: MWCD2005 - Release Date: 1992-10-09 -->
 		<year>1992</year>
 		<publisher>Micro World</publisher>
@@ -3982,7 +3982,7 @@
 	</software>
 
 	<software name="slotgamb">
-		<description>Slot Gambler (SCD)(JPN)</description>
+		<description>Slot Gambler (SCD)(Jpn)</description>
 		<!-- Serial: NBCD5008 - Release Date: 1995-04-28 -->
 		<year>1995</year>
 		<publisher>Nichibutsu</publisher>
@@ -3994,7 +3994,7 @@
 	</software>
 
 	<software name="snatcher">
-		<description>Snatcher (SCD)(JPN)</description>
+		<description>Snatcher (SCD)(Jpn)</description>
 		<!-- Serial: KMCD2002 - Release Date: 1992-10-23 -->
 		<year>1992</year>
 		<publisher>Konami</publisher>
@@ -4006,7 +4006,7 @@
 	</software>
 
 	<software name="snatcherpd" cloneof="snatcher">
-		<description>Snatcher - Pilot Disk (SCD)(JPN)</description>
+		<description>Snatcher - Pilot Disk (SCD)(Jpn)</description>
 		<!-- Serial: KMCD2001 - Release Date: 1992-08-07 -->
 		<year>1992</year>
 		<publisher>Konami</publisher>
@@ -4018,7 +4018,7 @@
 	</software>
 
 	<software name="solbianc">
-		<description>Sol Bianca (CD)(JPN)</description>
+		<description>Sol Bianca (CD)(Jpn)</description>
 		<!-- Serial: NSCD0002 - Release Date: 1990-06-29 -->
 		<year>1990</year>
 		<publisher>NCS</publisher>
@@ -4030,7 +4030,7 @@
 	</software>
 
 	<software name="solmoona">
-		<description>Sol Moonarge (SCD)(JPN)</description>
+		<description>Sol Moonarge (SCD)(Jpn)</description>
 		<!-- Serial: ICCD3004 - Release Date: 1994-01-07 -->
 		<year>1994</year>
 		<publisher>Irem</publisher>
@@ -4042,7 +4042,7 @@
 	</software>
 
 	<software name="solidfrc">
-		<description>Solid Force (SCD)(JPN)</description>
+		<description>Solid Force (SCD)(Jpn)</description>
 		<!-- Serial: HECD5018 - Release Date: 1995-03-17 -->
 		<year>1995</year>
 		<publisher>NEC Home Electronics</publisher>
@@ -4054,7 +4054,7 @@
 	</software>
 
 	<software name="sorcern">
-		<description>Sorcerian (SCD)(JPN)</description>
+		<description>Sorcerian (SCD)(Jpn)</description>
 		<!-- Serial: JCCD1005 - Release Date: 1992-07-17 -->
 		<year>1992</year>
 		<publisher>Victor Entertainment</publisher>
@@ -4066,7 +4066,7 @@
 	</software>
 
 	<software name="sotsugyo">
-		<description>Sotsugyou - Graduation (SCD)(JPN)</description>
+		<description>Sotsugyou - Graduation (SCD)(Jpn)</description>
 		<!-- Serial: NAPR-1036 - Release Date: 1993-07-30 -->
 		<year>1993</year>
 		<publisher>NEC Avenue</publisher>
@@ -4078,7 +4078,7 @@
 	</software>
 
 	<software name="sotsugy2">
-		<description>Sotsugyou II - Neo Generation (ACD, SCD)(JPN)</description>
+		<description>Sotsugyou II - Neo Generation (ACD, SCD)(Jpn)</description>
 		<!-- Serial: RHCD-4009 - Release Date: 1994-12-23 -->
 		<year>1994</year>
 		<publisher>Riverhill Software</publisher>
@@ -4090,7 +4090,7 @@
 	</software>
 
 	<software name="sotsugym">
-		<description>Sotsugyou Shashin - Miki (SCD)(JPN)</description>
+		<description>Sotsugyou Shashin - Miki (SCD)(Jpn)</description>
 		<!-- Serial: CJCD4005 - Release Date: 1994-10-28 -->
 		<year>1994</year>
 		<publisher>Coconuts Japan</publisher>
@@ -4102,7 +4102,7 @@
 	</software>
 
 	<software name="spacefan">
-		<description>Space Fantasy Zone [Prototype][Backup] (CD, SCD)(JPN)</description>
+		<description>Space Fantasy Zone [Prototype][Backup] (CD, SCD)(Jpn)</description>
 		<year>19??</year>
 		<publisher>NEC Avenue</publisher>
 		<part name="cdrom" interface="pce_cdrom">
@@ -4113,7 +4113,7 @@
 	</software>
 
 	<software name="spaceinv">
-		<description>Space Invaders - The Original Game (SCD)(JPN)</description>
+		<description>Space Invaders - The Original Game (SCD)(Jpn)</description>
 		<!-- Serial: NAPR-1050 - Release Date: 1995-07-28 -->
 		<year>1995</year>
 		<publisher>NEC Avenue</publisher>
@@ -4125,7 +4125,7 @@
 	</software>
 
 	<software name="splashlj" cloneof="splashl">
-		<description>Splash Lake (CD)(JPN)</description>
+		<description>Splash Lake (CD)(Jpn)</description>
 		<!-- Serial: NAPR-1020 - Release Date: 1991-06-28 -->
 		<year>1991</year>
 		<publisher>NEC Avenue</publisher>
@@ -4137,7 +4137,7 @@
 	</software>
 
 	<software name="spriggn2">
-		<description>Spriggan Mark II - Re Terraform Project [Imperfect] (SCD)(JPN)</description>
+		<description>Spriggan Mark II - Re Terraform Project [Imperfect] (SCD)(Jpn)</description>
 		<!-- Serial: NXCD2008 - Release Date: 1992-05-01 -->
 		<year>1992</year>
 		<publisher>Naxat Soft</publisher>
@@ -4149,7 +4149,7 @@
 	</software>
 
 	<software name="starbrkr">
-		<description>Star Breaker (SCD)(JPN)</description>
+		<description>Star Breaker (SCD)(Jpn)</description>
 		<!-- Serial: RFCD4002 - Release Date: 1994-02-10 -->
 		<year>1994</year>
 		<publisher>Ray Force</publisher>
@@ -4161,7 +4161,7 @@
 	</software>
 
 	<software name="starmobi">
-		<description>Star Mobile (CD)(JPN)</description>
+		<description>Star Mobile (CD)(Jpn)</description>
 		<!-- Serial: NXCD2013 - Release Date: 1992-10-02 -->
 		<year>1992</year>
 		<publisher>Naxat Soft</publisher>
@@ -4173,7 +4173,7 @@
 	</software>
 
 	<software name="starparo">
-		<description>Star Parodia (SCD)(JPN)</description>
+		<description>Star Parodia (SCD)(Jpn)</description>
 		<!-- Serial: HCD2024 - Release Date: 1992-04-24 -->
 		<year>1992</year>
 		<publisher>Hudson</publisher>
@@ -4185,7 +4185,7 @@
 	</software>
 
 	<software name="startody">
-		<description>Startling Odyssey (SCD)(JPN)</description>
+		<description>Startling Odyssey (SCD)(Jpn)</description>
 		<!-- Serial: RFCD3001 - Release Date: 1993-10-22 -->
 		<year>1993</year>
 		<publisher>Ray Force</publisher>
@@ -4197,7 +4197,7 @@
 	</software>
 
 	<software name="startod2">
-		<description>Startling Odyssey II (SCD)(JPN)</description>
+		<description>Startling Odyssey II (SCD)(Jpn)</description>
 		<!-- Serial: RFCD4003 - Release Date: 1994-10-21 -->
 		<year>1994</year>
 		<publisher>Ray Force</publisher>
@@ -4209,7 +4209,7 @@
 	</software>
 
 	<software name="steamhea">
-		<description>Steam Heart's [Imperfect] (SCD)(JPN)</description>
+		<description>Steam Heart's [Imperfect] (SCD)(Jpn)</description>
 		<!-- Serial: GLCD6002 - Release Date: 1996-03-22 -->
 		<year>1996</year>
 		<publisher>TGL</publisher>
@@ -4221,7 +4221,7 @@
 	</software>
 
 	<software name="strider">
-		<description>Strider Hiryuu (ACD)(JPN)</description>
+		<description>Strider Hiryuu (ACD)(Jpn)</description>
 		<!-- Serial: NAPR1041 - Release Date: 1994-09-22 -->
 		<year>1994</year>
 		<publisher>NEC Avenue</publisher>
@@ -4233,7 +4233,7 @@
 	</software>
 
 	<software name="sugoroku">
-		<description>Sugoroku '92 Nari Tore Nariagari Trendy (CD)(JPN)</description>
+		<description>Sugoroku '92 Nari Tore Nariagari Trendy (CD)(Jpn)</description>
 		<!-- Serial: TJCD1021 - Release Date: 1991-12-20 -->
 		<year>1991</year>
 		<publisher>Nihon Telenet</publisher>
@@ -4245,7 +4245,7 @@
 	</software>
 
 	<software name="summer92">
-		<description>Summer Carnival '92 - Alzadick (CD)(JPN)</description>
+		<description>Summer Carnival '92 - Alzadick (CD)(Jpn)</description>
 		<!-- Serial: NXCD2012 - Release Date: 1992-07-17 -->
 		<year>1992</year>
 		<publisher>Naxat Soft</publisher>
@@ -4257,7 +4257,7 @@
 	</software>
 
 	<software name="summer93">
-		<description>Summer Carnival '93 - Nexzr Special (SCD)(JPN)</description>
+		<description>Summer Carnival '93 - Nexzr Special (SCD)(Jpn)</description>
 		<!-- Serial: NXCD3021 - Release Date: 1993-07-23 -->
 		<year>1993</year>
 		<publisher>Naxat Soft</publisher>
@@ -4269,7 +4269,7 @@
 	</software>
 
 	<software name="superalb">
-		<description>Super Albatross (CD)(JPN)</description>
+		<description>Super Albatross (CD)(Jpn)</description>
 		<!-- Serial: TJCD9002 - Release Date: 1989-09-14 -->
 		<year>1989</year>
 		<publisher>Nihon Telenet</publisher>
@@ -4281,7 +4281,7 @@
 	</software>
 
 	<software name="scdrpgs">
-		<description>Super CD-Rom RPG Sampler (SCD)(JPN)</description>
+		<description>Super CD-Rom RPG Sampler (SCD)(Jpn)</description>
 		<!-- Serial: NCD1027 - Release Date: 1991-12-13 -->
 		<year>1991</year>
 		<publisher>Hudson</publisher>
@@ -4293,7 +4293,7 @@
 	</software>
 
 	<software name="suprdais">
-		<description>Super Daisenryaku (CD)(JPN)</description>
+		<description>Super Daisenryaku (CD)(Jpn)</description>
 		<!-- Serial: MCCD0001 - Release Date: 1990-04-27 -->
 		<year>1990</year>
 		<publisher>Micro Cabin</publisher>
@@ -4305,7 +4305,7 @@
 	</software>
 
 	<software name="sdarius">
-		<description>Super Darius (CD)(JPN)</description>
+		<description>Super Darius (CD)(Jpn)</description>
 		<!-- Serial: HACD0003 - Release Date: 1990-03-16 -->
 		<year>1990</year>
 		<publisher>NEC Avenue</publisher>
@@ -4317,7 +4317,7 @@
 	</software>
 
 	<software name="sdarius2">
-		<description>Super Darius II (SCD)(JPN)</description>
+		<description>Super Darius II (SCD)(Jpn)</description>
 		<!-- Serial: NAPR1031 - Release Date: 1993-12-24 -->
 		<year>1993</year>
 		<publisher>NEC Avenue</publisher>
@@ -4329,7 +4329,7 @@
 	</software>
 
 	<software name="supermj">
-		<description>Super Mahjong Taikai (SCD)(JPN)</description>
+		<description>Super Mahjong Taikai (SCD)(Jpn)</description>
 		<!-- Serial: KOCD2002 - Release Date: 1992-12-28 -->
 		<year>1992</year>
 		<publisher>Koei</publisher>
@@ -4341,7 +4341,7 @@
 	</software>
 
 	<software name="sraiden">
-		<description>Super Raiden (SCD)(JPN)</description>
+		<description>Super Raiden (SCD)(Jpn)</description>
 		<!-- Serial: HCD2023 - Release Date: 1992-04-02 -->
 		<year>1992</year>
 		<publisher>Hudson</publisher>
@@ -4353,7 +4353,7 @@
 	</software>
 
 	<software name="srmp23">
-		<description>Super Real Mahjong P II III Custom (ACD, SCD)(JPN)</description>
+		<description>Super Real Mahjong P II III Custom (ACD, SCD)(Jpn)</description>
 		<!-- Serial: NXCD4030 - Release Date: 1994-08-05 -->
 		<year>1994</year>
 		<publisher>Naxat Soft</publisher>
@@ -4365,7 +4365,7 @@
 	</software>
 
 	<software name="srmp4">
-		<description>Super Real Mahjong P IV Custom (SCD)(JPN)</description>
+		<description>Super Real Mahjong P IV Custom (SCD)(Jpn)</description>
 		<!-- Serial: NXCD3027 - Release Date: 1993-12-17 -->
 		<year>1993</year>
 		<publisher>Naxat Soft</publisher>
@@ -4377,7 +4377,7 @@
 	</software>
 
 	<software name="srmp5">
-		<description>Super Real Mahjong P V Custom (ACD, SCD)(JPN)</description>
+		<description>Super Real Mahjong P V Custom (ACD, SCD)(Jpn)</description>
 		<!-- Serial: NXCD5032 - Release Date: 1995-03-03 -->
 		<year>1995</year>
 		<publisher>Naxat Soft</publisher>
@@ -4389,7 +4389,7 @@
 	</software>
 
 	<software name="srmspec">
-		<description>Super Real Mahjong Special (SCD)(JPN)</description>
+		<description>Super Real Mahjong Special (SCD)(Jpn)</description>
 		<!-- Serial: NXCD2016 - Release Date: 1994-12-18 -->
 		<year>1992</year>
 		<publisher>Naxat Soft</publisher>
@@ -4401,7 +4401,7 @@
 	</software>
 
 	<software name="supersch">
-		<description>Super Schwartzschild (CD, SCD)(JPN)</description>
+		<description>Super Schwartzschild (CD, SCD)(Jpn)</description>
 		<!-- Serial: KSCD1002 - Release Date: 1991-12-06 -->
 		<year>1991</year>
 		<publisher>Kogado Studio</publisher>
@@ -4413,7 +4413,7 @@
 	</software>
 
 	<software name="supersc2">
-		<description>Super Schwartzschild II (SCD)(JPN)</description>
+		<description>Super Schwartzschild II (SCD)(Jpn)</description>
 		<!-- Serial: KSCD2003 - Release Date: 1992-12-04 -->
 		<year>1992</year>
 		<publisher>Kogado Studio</publisher>
@@ -4425,7 +4425,7 @@
 	</software>
 
 	<software name="swordmas">
-		<description>Sword Master (SCD)(JPN)</description>
+		<description>Sword Master (SCD)(Jpn)</description>
 		<!-- Serial: RSCD3003 - Release Date: 1993-11-19 -->
 		<year>1993</year>
 		<publisher>Right Stuff</publisher>
@@ -4437,7 +4437,7 @@
 	</software>
 
 	<software name="sylphia">
-		<description>Sylphia (SCD)(JPN)</description>
+		<description>Sylphia (SCD)(Jpn)</description>
 		<!-- Serial: THCD3001 - Release Date: 1993-10-22 -->
 		<year>1993</year>
 		<publisher>Tonkin House</publisher>
@@ -4449,7 +4449,7 @@
 	</software>
 
 	<software name="tadaima">
-		<description>Tadaima Yuusha Boshuuchuu (SCD)(JPN)</description>
+		<description>Tadaima Yuusha Boshuuchuu (SCD)(Jpn)</description>
 		<!-- Serial: HMCD3006 - Release Date: 1993-11-26 -->
 		<year>1993</year>
 		<publisher>Human Entertainment</publisher>
@@ -4461,7 +4461,7 @@
 	</software>
 
 	<software name="tadaimas" cloneof="tadaima">
-		<description>Tadaima Yuusha Boshuuchuu - Sample Disc (SCD)(JPN)</description>
+		<description>Tadaima Yuusha Boshuuchuu - Sample Disc (SCD)(Jpn)</description>
 		<!-- Serial:  -->
 		<year>1993</year>
 		<publisher>Human Entertainment</publisher>
@@ -4474,7 +4474,7 @@
 	</software>
 
 	<software name="taiheiki">
-		<description>Taiheiki (CD)(JPN)</description>
+		<description>Taiheiki (CD)(Jpn)</description>
 		<!-- Serial: IGCD1003 - Release Date: 1991-12-13 -->
 		<year>1991</year>
 		<publisher>Intec</publisher>
@@ -4486,7 +4486,7 @@
 	</software>
 
 	<software name="tanjodeb">
-		<description>Tanjou Debut (ACD, SCD)(JPN)</description>
+		<description>Tanjou Debut (ACD, SCD)(Jpn)</description>
 		<!-- Serial: NAPR1043 - Release Date: 1994-09-22 -->
 		<year>1994</year>
 		<publisher>NEC Avenue</publisher>
@@ -4498,7 +4498,7 @@
 	</software>
 
 	<software name="tecmowc">
-		<description>Tecmo World Cup Super Soccer (SCD)(JPN)</description>
+		<description>Tecmo World Cup Super Soccer (SCD)(Jpn)</description>
 		<!-- Serial: MRCD2001 - Release Date: 1992-12-04 -->
 		<year>1992</year>
 		<publisher>Media Rings</publisher>
@@ -4510,7 +4510,7 @@
 	</software>
 
 	<software name="tekiwork">
-		<description>Tekipaki Working Love (SCD)(JPN)</description>
+		<description>Tekipaki Working Love (SCD)(Jpn)</description>
 		<!-- Serial: HECD6026 - Release Date: 1997-03-28 -->
 		<year>1997</year>
 		<publisher>NEC Home Electronics</publisher>
@@ -4522,7 +4522,7 @@
 	</software>
 
 	<software name="tenchi">
-		<description>Tenchi Muyou! Ryououki (SCD)(JPN)</description>
+		<description>Tenchi Muyou! Ryououki (SCD)(Jpn)</description>
 		<!-- Serial: NAPR-1048 - Release Date: 1995-05-26 -->
 		<year>1995</year>
 		<publisher>NEC Avenue</publisher>
@@ -4534,7 +4534,7 @@
 	</software>
 
 	<software name="tenchiku">
-		<description>Tenchi wo Kurau (SCD)(JPN)</description>
+		<description>Tenchi wo Kurau (SCD)(Jpn)</description>
 		<!-- Serial: NAPR1030 - Release Date: 1994-06-17 -->
 		<year>1994</year>
 		<publisher>NEC Avenue</publisher>
@@ -4546,7 +4546,7 @@
 	</software>
 
 	<software name="tengaims">
-		<description>Tengai Makyo - Fuun Kabuki Den Shutsugeki no Sho (SCD)(JPN)</description>
+		<description>Tengai Makyo - Fuun Kabuki Den Shutsugeki no Sho (SCD)(Jpn)</description>
 		<!-- Serial: HCD3046 - Release Date: 1993-07-10 -->
 		<year>1993</year>
 		<publisher>Hudson</publisher>
@@ -4558,7 +4558,7 @@
 	</software>
 
 	<software name="tengaima">
-		<description>Tengai Makyo - Kabuki Itouryodan (ACD)(JPN)</description>
+		<description>Tengai Makyo - Kabuki Itouryodan (ACD)(Jpn)</description>
 		<!-- Serial: HCD5070 - Release Date: 1995-02-24 -->
 		<year>1995</year>
 		<publisher>Hudson</publisher>
@@ -4570,7 +4570,7 @@
 	</software>
 
 	<software name="tengaimz">
-		<description>Tengai Makyo - Ziria (CD)(JPN)</description>
+		<description>Tengai Makyo - Ziria (CD)(Jpn)</description>
 		<!-- Serial: HCD9005 - Release Date: 1989-06-30 -->
 		<year>1989</year>
 		<publisher>Hudson</publisher>
@@ -4582,7 +4582,7 @@
 	</software>
 
 	<software name="tengaimzh" cloneof="tengaimz">
-		<description>Tengai Makyo - Ziria [Hibaihin] (SCD)(JPN)</description>
+		<description>Tengai Makyo - Ziria [Hibaihin] (SCD)(Jpn)</description>
 		<!-- Serial: HDC2037 - Notes: Promotional item in SCD format -->
 		<year>1992</year>
 		<publisher>Hudson</publisher>
@@ -4594,7 +4594,7 @@
 	</software>
 
 	<software name="tengaim2">
-		<description>Tengai Makyo II - Manji Maru (SCD)(JPN)</description>
+		<description>Tengai Makyo II - Manji Maru (SCD)(Jpn)</description>
 		<!-- Serial: HCD1022 - Release Date: 1992-03-26 -->
 		<year>1992</year>
 		<publisher>Hudson</publisher>
@@ -4606,7 +4606,7 @@
 	</software>
 
 	<software name="tenshiut">
-		<description>Tenshi no Uta (SCD)(JPN)</description>
+		<description>Tenshi no Uta (SCD)(Jpn)</description>
 		<!-- Serial: TJCD1018 - Release Date: 1991-10-25 -->
 		<year>1991</year>
 		<publisher>Nihon Telenet</publisher>
@@ -4618,7 +4618,7 @@
 	</software>
 
 	<software name="tenshiu2">
-		<description>Tenshi no Uta II - Datenshi no Uta (SCD)(JPN)</description>
+		<description>Tenshi no Uta II - Datenshi no Uta (SCD)(Jpn)</description>
 		<!-- Serial: TJCD3033 - Release Date: 1993-03-26 -->
 		<year>1993</year>
 		<publisher>Nihon Telenet</publisher>
@@ -4630,7 +4630,7 @@
 	</software>
 
 	<software name="terraforj" cloneof="terrafor">
-		<description>Terraforming (CD, SCD)(JPN)</description>
+		<description>Terraforming (CD, SCD)(Jpn)</description>
 		<!-- Serial: RSCD2001 - Release Date: 1992-05-01 -->
 		<year>1992</year>
 		<publisher>Right Stuff</publisher>
@@ -4642,7 +4642,7 @@
 	</software>
 
 	<software name="atlas">
-		<description>The Atlas - Renaissance Voyager (ACD, SCD)(JPN)</description>
+		<description>The Atlas - Renaissance Voyager (ACD, SCD)(Jpn)</description>
 		<!-- Serial: ADCD4002 - Release Date: 1994-03-04 -->
 		<year>1994</year>
 		<publisher>Artdink</publisher>
@@ -4654,7 +4654,7 @@
 	</software>
 
 	<software name="daviscup">
-		<description>The Davis Cup Tennis (SCD)(JPN)</description>
+		<description>The Davis Cup Tennis (SCD)(Jpn)</description>
 		<!-- Serial: MWCD2002 - Release Date: 1992-04-01 -->
 		<year>1992</year>
 		<publisher>Micro World</publisher>
@@ -4666,7 +4666,7 @@
 	</software>
 
 	<software name="kickbox">
-		<description>The Kick Boxing (SCD)(JPN)</description>
+		<description>The Kick Boxing (SCD)(Jpn)</description>
 		<!-- Serial: MWCD2001 - Release Date: 1992-07-31 -->
 		<year>1992</year>
 		<publisher>Micro World</publisher>
@@ -4678,7 +4678,7 @@
 	</software>
 
 	<software name="manhole">
-		<description>The Manhole (CD)(JPN)</description>
+		<description>The Manhole (CD)(Jpn)</description>
 		<!-- Serial: SSCD0001 - Release Date: 1991-03-22 -->
 		<year>1991</year>
 		<publisher>Sunsoft</publisher>
@@ -4690,7 +4690,7 @@
 	</software>
 
 	<software name="proyakyu">
-		<description>The Pro Yakyuu (CD)(JPN)</description>
+		<description>The Pro Yakyuu (CD)(Jpn)</description>
 		<!-- Serial: IGCD0001 - Release Date: 1990-10-05 -->
 		<year>1990</year>
 		<publisher>Intec</publisher>
@@ -4702,7 +4702,7 @@
 	</software>
 
 	<software name="proyak94">
-		<description>The Pro Yakyuu Super '94 (SCD)(JPN)</description>
+		<description>The Pro Yakyuu Super '94 (SCD)(Jpn)</description>
 		<!-- Serial: IGCD4008 - Release Date: 1994-06-17 -->
 		<year>1994</year>
 		<publisher>Intec</publisher>
@@ -4714,7 +4714,7 @@
 	</software>
 
 	<software name="proyaks">
-		<description>The Pro Yakyuu Super (SCD)(JPN)</description>
+		<description>The Pro Yakyuu Super (SCD)(Jpn)</description>
 		<!-- Serial: IGCD2004 - Release Date: 1992-10-09 -->
 		<year>1992</year>
 		<publisher>Intec</publisher>
@@ -4726,7 +4726,7 @@
 	</software>
 
 	<software name="tvshow">
-		<description>The TV Show (SCD)(JPN)</description>
+		<description>The TV Show (SCD)(Jpn)</description>
 		<!-- Serial: RSCD-4005 - Release Date: 1995-09-29 -->
 		<year>1995</year>
 		<publisher>Right Stuff</publisher>
@@ -4738,7 +4738,7 @@
 	</software>
 
 	<software name="tokimeki">
-		<description>Tokimeki Memorial {HRKM70414-1FAAT} [Imperfect] (SCD)(JPN)</description>
+		<description>Tokimeki Memorial {HRKM70414-1FAAT} [Imperfect] (SCD)(Jpn)</description>
 		<!-- Serial: KMCD4007 - Release Date: 1994-05-27 -->
 		<year>1994</year>
 		<publisher>Konami</publisher>
@@ -4753,7 +4753,7 @@
   <!-- Serial: KMCD4007 - Release Date: 1994-05-27 -->
   <!--
   <software name="tokimekia" cloneof="tokimeki">
-		<description>Tokimeki Memorial {HRKM70414-1FABT} [Imperfect] (SCD)(JPN)</description>
+		<description>Tokimeki Memorial {HRKM70414-1FABT} [Imperfect] (SCD)(Jpn)</description>
 		<year>1994</year>
 		<publisher>Konami</publisher>
 		<part name="cdrom" interface="pce_cdrom">
@@ -4765,7 +4765,7 @@
   -->
   
 	<software name="tokimekib" cloneof="tokimeki">
-		<description>Tokimeki Memorial {HRKM70701-2FAAT} (SCD)(JPN)</description>
+		<description>Tokimeki Memorial {HRKM70701-2FAAT} (SCD)(Jpn)</description>
 		<!-- Serial: KMCD4007 - Release Date: 1994-05-27 -->
 		<year>1994</year>
 		<publisher>Konami</publisher>
@@ -4777,7 +4777,7 @@
 	</software>
 
 	<software name="tokimekic" cloneof="tokimeki">
-		<description>Tokimeki Memorial {HRKM71014-3FAAT} (SCD)(JPN)</description>
+		<description>Tokimeki Memorial {HRKM71014-3FAAT} (SCD)(Jpn)</description>
 		<!-- Serial: KMCD4007 - Release Date: 1994-05-27 -->
 		<year>1994</year>
 		<publisher>Konami</publisher>
@@ -4792,7 +4792,7 @@
   <!-- Serial: KMCD4007 - Release Date: 1994-05-27 -->
   <!--
   <software name="tokimekid" cloneof="tokimeki">
-		<description>Tokimeki Memorial {HRKM71014-3FABT} (SCD)(JPN)</description>
+		<description>Tokimeki Memorial {HRKM71014-3FABT} (SCD)(Jpn)</description>
 		<year>1994</year>
 		<publisher>Konami</publisher>
 		<part name="cdrom" interface="pce_cdrom">
@@ -4804,7 +4804,7 @@
   -->
 
 	<software name="gunbust1">
-		<description>Top o Nerae! GunBuster Volume I (SCD)(JPN)</description>
+		<description>Top o Nerae! GunBuster Volume I (SCD)(Jpn)</description>
 		<!-- Serial: RHCD2003 - Release Date: 1992-06-25 -->
 		<year>1992</year>
 		<publisher>Riverhill Software</publisher>
@@ -4816,7 +4816,7 @@
 	</software>
 
 	<software name="gunbust2">
-		<description>Top o Nerae! GunBuster Volume II (SCD)(JPN)</description>
+		<description>Top o Nerae! GunBuster Volume II (SCD)(Jpn)</description>
 		<!-- Serial: RHCD3005 - Release Date: 1993-03-26 -->
 		<year>1993</year>
 		<publisher>Riverhill Software</publisher>
@@ -4828,7 +4828,7 @@
 	</software>
 
 	<software name="travelep">
-		<description>Travel Epuru (SCD)(JPN)</description>
+		<description>Travel Epuru (SCD)(Jpn)</description>
 		<!-- Serial: TJCD2030 - Release Date: 1992-09-04 -->
 		<year>1992</year>
 		<publisher>Nihon Telenet</publisher>
@@ -4840,7 +4840,7 @@
 	</software>
 
 	<software name="traveler">
-		<description>Travelers! Densetsu wo ButtobaSe [Imperfect] (SCD)(JPN)</description>
+		<description>Travelers! Densetsu wo ButtobaSe [Imperfect] (SCD)(Jpn)</description>
 		<!-- Serial: JCCD4015 - Release Date: 1994-12-29 -->
 		<year>1994</year>
 		<publisher>Victor Entertainment</publisher>
@@ -4852,7 +4852,7 @@
 	</software>
 
 	<software name="usyamato">
-		<description>Uchuu Senkan Yamato (SCD)(JPN)</description>
+		<description>Uchuu Senkan Yamato (SCD)(Jpn)</description>
 		<!-- Serial: HMCD2004 - Release Date: 1992-12-22 -->
 		<year>1992</year>
 		<publisher>Human Entertainment</publisher>
@@ -4864,7 +4864,7 @@
 	</software>
 
 	<software name="ultrago2">
-		<description>Ultrabox II Go (CD)(JPN)</description>
+		<description>Ultrabox II Go (CD)(Jpn)</description>
 		<!-- Serial: JCCD0602 - Release Date: 1990-09-28 -->
 		<year>1990</year>
 		<publisher>Victor Entertainment</publisher>
@@ -4876,7 +4876,7 @@
 	</software>
 
 	<software name="ultrago3">
-		<description>Ultrabox III Go (CD)(JPN)</description>
+		<description>Ultrabox III Go (CD)(Jpn)</description>
 		<!-- Serial: JCCD0603 - Release Date: 1990-12-28 -->
 		<year>1990</year>
 		<publisher>Victor Entertainment</publisher>
@@ -4888,7 +4888,7 @@
 	</software>
 
 	<software name="ultrago4">
-		<description>Ultrabox IV Go (CD)(JPN)</description>
+		<description>Ultrabox IV Go (CD)(Jpn)</description>
 		<!-- Serial: JCCD1604 - Release Date: 1991-05-24 -->
 		<year>1991</year>
 		<publisher>Victor Entertainment</publisher>
@@ -4900,7 +4900,7 @@
 	</software>
 
 	<software name="ultrago5">
-		<description>Ultrabox V Go (CD)(JPN)</description>
+		<description>Ultrabox V Go (CD)(Jpn)</description>
 		<!-- Serial: JCCD1605 - Release Date: 1991-09-27 -->
 		<year>1991</year>
 		<publisher>Victor Entertainment</publisher>
@@ -4912,7 +4912,7 @@
 	</software>
 
 	<software name="ultrago6">
-		<description>Ultrabox VI Go (CD)(JPN)</description>
+		<description>Ultrabox VI Go (CD)(Jpn)</description>
 		<!-- Serial: JCCD2606 - Release Date: 1992-01-31 -->
 		<year>1992</year>
 		<publisher>Victor Entertainment</publisher>
@@ -4924,7 +4924,7 @@
 	</software>
 
 	<software name="ultrasgo">
-		<description>Ultrabox Sohkan Go (CD)(JPN)</description>
+		<description>Ultrabox Sohkan Go (CD)(Jpn)</description>
 		<!-- Serial: JCCD0601 - Release Date: 1990-06-15 -->
 		<year>1990</year>
 		<publisher>Victor Entertainment</publisher>
@@ -4936,7 +4936,7 @@
 	</software>
 
 	<software name="uruseiya">
-		<description>Urusei Yatsura - Stay With You (CD)(JPN)</description>
+		<description>Urusei Yatsura - Stay With You (CD)(Jpn)</description>
 		<!-- Serial: HCD0012 / HCD0011 (w/ audio CD) - Release Date: 1990-06-29 -->
 		<year>1990</year>
 		<publisher>Hudson</publisher>
@@ -4956,7 +4956,7 @@
 	</software>
 
 	<software name="valis2j" cloneof="valis2">
-		<description>Valis II - The Fantasm Soldier (CD)(JPN)</description>
+		<description>Valis II - The Fantasm Soldier (CD)(Jpn)</description>
 		<!-- Serial: TJCD9001 - Release Date: 1989-06-23 -->
 		<year>1989</year>
 		<publisher>Nihon Telenet</publisher>
@@ -4968,7 +4968,7 @@
 	</software>
 
 	<software name="valis3j" cloneof="valis2">
-		<description>Valis III - The Fantasm Soldier (CD)(JPN)</description>
+		<description>Valis III - The Fantasm Soldier (CD)(Jpn)</description>
 		<!-- Serial: TJCD0009 - Release Date: 1990-09-07 -->
 		<year>1990</year>
 		<publisher>Nihon Telenet</publisher>
@@ -4980,7 +4980,7 @@
 	</software>
 
 	<software name="valis4">
-		<description>Valis IV - The Fantasm Soldier (CD)(JPN)</description>
+		<description>Valis IV - The Fantasm Soldier (CD)(Jpn)</description>
 		<!-- Serial: TJCD1017 - Release Date: 1991-08-23 -->
 		<year>1991</year>
 		<publisher>Nihon Telenet</publisher>
@@ -4992,7 +4992,7 @@
 	</software>
 
 	<software name="vasteelj" cloneof="vasteel">
-		<description>Vasteel (CD)(JPN)</description>
+		<description>Vasteel (CD)(Jpn)</description>
 		<!-- Serial: HMCD0001 - Release Date: 1990-12-20 -->
 		<year>1990</year>
 		<publisher>Human Entertainment</publisher>
@@ -5004,7 +5004,7 @@
 	</software>
 
 	<software name="vasteel2">
-		<description>Vasteel II (ACD, SCD)(JPN)</description>
+		<description>Vasteel II (ACD, SCD)(Jpn)</description>
 		<!-- Serial: HMCD4007 - Release Date: 1994-07-08 -->
 		<year>1994</year>
 		<publisher>Human Entertainment</publisher>
@@ -5016,7 +5016,7 @@
 	</software>
 
 	<software name="virgindr">
-		<description>Virgin Dream (SCD)(JPN)</description>
+		<description>Virgin Dream (SCD)(Jpn)</description>
 		<!-- Serial: TICD-6004 - Release Date: 1996-05-31 -->
 		<year>1996</year>
 		<publisher>Tokuma Shoten</publisher>
@@ -5028,7 +5028,7 @@
 	</software>
 
 	<software name="wworld">
-		<description>Where in the World is Carmen Sandiego? (CD)(JPN)</description>
+		<description>Where in the World is Carmen Sandiego? (CD)(Jpn)</description>
 		<!-- Serial: PVCD0001 - Release Date: 1990-03-30 -->
 		<year>1990</year>
 		<publisher>Pack-In-Video</publisher>
@@ -5040,7 +5040,7 @@
 	</software>
 
 	<software name="windthun" cloneof="lordthun">
-		<description>Winds of Thunder (SCD)(JPN)</description>
+		<description>Winds of Thunder (SCD)(Jpn)</description>
 		<!-- Serial: HCD3039 - Release Date: 1993-04-23 -->
 		<year>1993</year>
 		<publisher>Hudson</publisher>
@@ -5052,7 +5052,7 @@
 	</software>
 
 	<software name="wizard12">
-		<description>Wizardry I II (SCD)(JPN)</description>
+		<description>Wizardry I II (SCD)(Jpn)</description>
 		<!-- Serial: NXCD3020 - Release Date: 1993-07-23 -->
 		<year>1993</year>
 		<publisher>Naxat Soft</publisher>
@@ -5064,7 +5064,7 @@
 	</software>
 
 	<software name="wizard34">
-		<description>Wizardry III IV (SCD)(JPN)</description>
+		<description>Wizardry III IV (SCD)(Jpn)</description>
 		<!-- Serial: NXCD4029 - Release Date: 1994-03-04 -->
 		<year>1994</year>
 		<publisher>Naxat Soft</publisher>
@@ -5076,7 +5076,7 @@
 	</software>
 
 	<software name="wizard5">
-		<description>Wizardry V - Heart of the Maelstrom (SCD)(JPN)</description>
+		<description>Wizardry V - Heart of the Maelstrom (SCD)(Jpn)</description>
 		<!-- Serial: NXCD2011 - Release Date: 1992-09-25 -->
 		<year>1992</year>
 		<publisher>Naxat Soft</publisher>
@@ -5088,7 +5088,7 @@
 	</software>
 
 	<software name="wh2">
-		<description>World Heroes II (ACD)(JPN)</description>
+		<description>World Heroes II (ACD)(Jpn)</description>
 		<!-- Serial: HCD4063 - Release Date: 1994-06-04 -->
 		<year>1994</year>
 		<publisher>Hudson</publisher>
@@ -5100,7 +5100,7 @@
 	</software>
 
 	<software name="wh2s" cloneof="wh2">
-		<description>World Heroes II - Sample Disc (ACD)(JPN)</description>
+		<description>World Heroes II - Sample Disc (ACD)(Jpn)</description>
 		<!-- Serial:  -->
 		<year>1994</year>
 		<publisher>Hudson</publisher>
@@ -5112,7 +5112,7 @@
 	</software>
 
 	<software name="wrestang">
-		<description>Wrestling Angels - Double Impact (ACD, SCD)(JPN)</description>
+		<description>Wrestling Angels - Double Impact (ACD, SCD)(Jpn)</description>
 		<!-- Serial: HECD4012 - Release Date: 1995-05-19 -->
 		<year>1995</year>
 		<publisher>NEC Home Electronics</publisher>
@@ -5124,7 +5124,7 @@
 	</software>
 
 	<software name="xak12">
-		<description>Xak I II (SCD)(JPN)</description>
+		<description>Xak I II (SCD)(Jpn)</description>
 		<!-- Serial: TJCD2032 - Release Date: 1992-12-25 -->
 		<year>1992</year>
 		<publisher>Nihon Telenet</publisher>
@@ -5136,7 +5136,7 @@
 	</software>
 
 	<software name="xak3">
-		<description>Xak III - The Eternal Recurrence (SCD)(JPN)</description>
+		<description>Xak III - The Eternal Recurrence (SCD)(Jpn)</description>
 		<!-- Serial: HECD4013 - Release Date: 1994-09-30 -->
 		<year>1994</year>
 		<publisher>NEC Home Electronics</publisher>
@@ -5148,7 +5148,7 @@
 	</software>
 
 	<software name="yamamura">
-		<description>Yamamura Misa Suspense - Kinsen Ka Kyo E Zara Satsu Jin Ji Ken (SCD)(JPN)</description>
+		<description>Yamamura Misa Suspense - Kinsen Ka Kyo E Zara Satsu Jin Ji Ken (SCD)(Jpn)</description>
 		<!-- Serial: NXCD2006 - Release Date: 1992-03-06 -->
 		<year>1992</year>
 		<publisher>Naxat Soft</publisher>
@@ -5160,7 +5160,7 @@
 	</software>
 
 	<software name="yamikets">
-		<description>Yami no Ketsuzoku Harukanaru Kioku (SCD)(JPN)</description>
+		<description>Yami no Ketsuzoku Harukanaru Kioku (SCD)(Jpn)</description>
 		<!-- Serial: NXCD3024 - Release Date: 1993-12-17 -->
 		<year>1993</year>
 		<publisher>Naxat Soft</publisher>
@@ -5172,7 +5172,7 @@
 	</software>
 
 	<software name="yawara">
-		<description>Yawara! (SCD)(JPN)</description>
+		<description>Yawara! (SCD)(Jpn)</description>
 		<!-- Serial: SXCD2001 - Release Date: 1992-10-01 -->
 		<year>1992</year>
 		<publisher>Sofix</publisher>
@@ -5184,7 +5184,7 @@
 	</software>
 
 	<software name="yawara2">
-		<description>Yawara! II (SCD)(JPN)</description>
+		<description>Yawara! II (SCD)(Jpn)</description>
 		<!-- Serial: SXCD4002 - Release Date: 1994-09-23 -->
 		<year>1994</year>
 		<publisher>Sofix</publisher>
@@ -5196,7 +5196,7 @@
 	</software>
 
 	<software name="ys12j" cloneof="ys12">
-		<description>Ys Book I II (CD)(JPN)</description>
+		<description>Ys Book I II (CD)(Jpn)</description>
 		<!-- Serial: HCD9009 - Release Date: 1989-12-21 -->
 		<year>1989</year>
 		<publisher>Hudson</publisher>
@@ -5208,7 +5208,7 @@
 	</software>
 
 	<software name="ys3j" cloneof="ys3">
-		<description>Ys III - Wanderers from Ys (CD)(JPN)</description>
+		<description>Ys III - Wanderers from Ys (CD)(Jpn)</description>
 		<!-- Serial: HCD0015 - Release Date: 1991-03-22 -->
 		<year>1991</year>
 		<publisher>Hudson</publisher>
@@ -5220,7 +5220,7 @@
 	</software>
 
 	<software name="ys4">
-		<description>Ys IV - The Dawn of Ys {HCD3051-4-1108-R1F} (SCD)(JPN)</description>
+		<description>Ys IV - The Dawn of Ys {HCD3051-4-1108-R1F} (SCD)(Jpn)</description>
 		<!-- Serial: HCD3051 - Release Date: 1993-12-22 -->
 		<year>1993</year>
 		<publisher>Hudson</publisher>
@@ -5232,7 +5232,7 @@
 	</software>
 
 	<software name="ys4a" cloneof="ys4">
-		<description>Ys IV - The Dawn of Ys {HCD3051-5-1116-R1P} (SCD)(JPN)</description>
+		<description>Ys IV - The Dawn of Ys {HCD3051-5-1116-R1P} (SCD)(Jpn)</description>
 		<!-- Serial: HCD3051 - Release Date: 1993-12-22 -->
 		<year>1993</year>
 		<publisher>Hudson</publisher>
@@ -5244,7 +5244,7 @@
 	</software>
 
 	<software name="yuyu">
-		<description>Yu Yu Hakusho (SCD)(JPN)</description>
+		<description>Yu Yu Hakusho (SCD)(Jpn)</description>
 		<!-- Serial: BACD3001 - Release Date: 1993-09-30 -->
 		<year>1993</year>
 		<publisher>Banpresto</publisher>
@@ -5256,7 +5256,7 @@
 	</software>
 
 	<software name="zan">
-		<description>Zan - Kagerou no Toki (CD)(JPN)</description>
+		<description>Zan - Kagerou no Toki (CD)(Jpn)</description>
 		<!-- Serial: TPCD1001 - Release Date: 1991-12-27 -->
 		<year>1991</year>
 		<publisher>Taito</publisher>
@@ -5268,7 +5268,7 @@
 	</software>
 
 	<software name="zero4cha">
-		<description>Zero 4 Champ II (SCD)(JPN)</description>
+		<description>Zero 4 Champ II (SCD)(Jpn)</description>
 		<!-- Serial: MRCD2002 - Release Date: 1993-03-05 -->
 		<year>1993</year>
 		<publisher>Media Rings</publisher>
@@ -5280,7 +5280,7 @@
 	</software>
 
 	<software name="zerowing">
-		<description>Zero Wing (CD)(JPN)</description>
+		<description>Zero Wing (CD)(Jpn)</description>
 		<!-- Serial: NXCD1003 - Release Date: 1992-09-18 -->
 		<year>1992</year>
 		<publisher>Naxat Soft</publisher>
@@ -5915,7 +5915,7 @@
 
 	<!-- Game Express Titles - use different System Card -->
 	<software name="hilegfan">
-		<description>Hi-Leg Fantasy (GECD)(JPN)</description>
+		<description>Hi-Leg Fantasy (GECD)(Jpn)</description>
 		<!-- Serial: GED-1011 - Release Date: 1994-09-16 -->
 		<year>1994</year>
 		<publisher>Game Express</publisher>
@@ -5927,7 +5927,7 @@
 	</software>
 
 	<software name="avtanjo">
-		<description>AV Tanjou (GECD)(JPN)</description>
+		<description>AV Tanjou (GECD)(Jpn)</description>
 		<!-- Serial: GED-1015 -->
 		<year>1995</year>
 		<publisher>Game Express</publisher>
@@ -5939,7 +5939,7 @@
 	</software>
 
 	<software name="idolpai">
-		<description>Bishoujo Jyanshi Idol Pai (GECD)(JPN)</description>
+		<description>Bishoujo Jyanshi Idol Pai (GECD)(Jpn)</description>
 		<!-- Serial: GED-1016 - Release Date: 1995-11-10 -->
 		<year>1995</year>
 		<publisher>Game Express</publisher>
@@ -5951,7 +5951,7 @@
 	</software>
 
 	<software name="pachinko">
-		<description>CD Bishoujo Pachinko Kyuuma Yon Shimai [Imperfect] (GECD)(JPN)</description>
+		<description>CD Bishoujo Pachinko Kyuuma Yon Shimai [Imperfect] (GECD)(Jpn)</description>
 		<!-- Serial: GECD-1014 - Release Date: 1995-01-05 -->
 		<year>1995</year>
 		<publisher>Game Express</publisher>
@@ -5963,7 +5963,7 @@
 	</software>
 
 	<software name="hanafuda">
-		<description>CD Hanafuda Bishoujo Fan Club (GECD)(JPN)</description>
+		<description>CD Hanafuda Bishoujo Fan Club (GECD)(Jpn)</description>
 		<!-- Serial: GED-1013 - Release Date: 1994-11-25 -->
 		<year>1994</year>
 		<publisher>Game Express</publisher>
@@ -5975,7 +5975,7 @@
 	</software>
 
 	<software name="mahjong">
-		<description>CD Mahjong Bishoujo Chuushinha (GECD)(JPN)</description>
+		<description>CD Mahjong Bishoujo Chuushinha (GECD)(Jpn)</description>
 		<!-- Serial: GECD-1010 - Release Date: 1993-07-30 -->
 		<year>1993</year>
 		<publisher>Game Express</publisher>
@@ -5987,7 +5987,7 @@
 	</software>
 
 	<software name="pachislt">
-		<description>CD Pachisuro Bishoujo Gambler (GECD)(JPN)</description>
+		<description>CD Pachisuro Bishoujo Gambler (GECD)(Jpn)</description>
 		<!-- Serial: GECD-1012 - Release Date: 1994-07-29 -->
 		<year>1994</year>
 		<publisher>Game Express</publisher>
