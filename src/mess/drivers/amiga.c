@@ -430,6 +430,7 @@ static MACHINE_CONFIG_DERIVED( cdtv, ntsc )
 
 	MCFG_CPU_ADD("rcmcu", M6502, XTAL_1MHz) /* 1 MHz? */
 	MCFG_CPU_PROGRAM_MAP(cdtv_rcmcu_mem)
+	MCFG_DEVICE_DISABLE()
 
 //  MCFG_CPU_ADD("lcd", LC6554, XTAL_4MHz) /* 4 MHz? */
 //  MCFG_CPU_PROGRAM_MAP(cdtv_lcd_mem)
@@ -445,6 +446,9 @@ static MACHINE_CONFIG_DERIVED( cdtv, ntsc )
 
 	/* cdrom */
 	MCFG_CDROM_ADD( "cdrom" )
+	MCFG_CDROM_INTERFACE("cdrom")
+	MCFG_SOFTWARE_LIST_ADD("cd_list", "cdtv")
+
 	MCFG_TPI6525_ADD("tpi6525", cdtv_tpi_intf)
 
 	/* cia */
