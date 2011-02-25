@@ -561,6 +561,7 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_MACHINE)/upd7002.o	\
 	$(MESS_MACHINE)/upd7201.o	\
 	$(MESS_MACHINE)/wd17xx.o	\
+	$(MESS_MACHINE)/z8536.o	\
 	$(MESS_VIDEO)/cdp1861.o		\
 	$(MESS_VIDEO)/cdp1862.o		\
 	$(MESS_VIDEO)/crt9007.o		\

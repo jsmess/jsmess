@@ -10,17 +10,22 @@
 
     TODO:
 
-	- memory access controller (MMU)
-    - video
-    - keyboard
-    - mouse
-    - floppy
-    - DMA
+	- memory access controller
+		- task register
+		- segment RAM
+		- page RAM
+		- DMA
+	- video
+		- CRTC
+		- bitmap layer
+		- monitor portrait/landscape mode
+    - CIO (interrupt controller)
+		- RTC
+		- NVRAM
     - DART
-    - CIO
-    - RTC
+		- keyboard
+    - floppy
     - hard disk (Xebec S1410)
-    - monitor portrait/landscape mode
 
 */
 
@@ -32,10 +37,12 @@
 #include "machine/ram.h"
 #include "machine/8530scc.h"
 #include "machine/abc99.h"
+#include "machine/e0516.h"
 #include "machine/s1410.h"
 #include "machine/wd17xx.h"
 #include "machine/z80dart.h"
 #include "machine/z80dma.h"
+#include "machine/z8536.h"
 #include "video/mc6845.h"
 #include "includes/abc1600.h"
 
@@ -124,17 +131,18 @@ WRITE8_MEMBER( abc1600_state::en_spec_contr_reg_w )
 //-------------------------------------------------
 
 static ADDRESS_MAP_START( abc1600_mem, ADDRESS_SPACE_PROGRAM, 8, abc1600_state )
-	AM_RANGE(0x00000, 0x03fff) AM_ROM
-	AM_RANGE(0x04000, 0x7ffff) AM_RAM
-	AM_RANGE(0x80000, 0xfffff) AM_RAM
+	AM_RANGE(0x00000, 0x03fff) AM_ROM AM_REGION(MC68008P8_TAG, 0)
 /*
-	logical addresses
-	AM_RANGE(0x1ff000, 0x1ff003) AM_DEVREADWRITE_LEGACY(SAB1797_02P_TAG, wd17xx_r, wd17xx_w) // A2,A1
+	Logical Address Map
+	
+	AM_RANGE(0x000000, 0x0fffff) AM_RAM
+	AM_RANGE(0x100000, 0x17ffff) AM_RAM AM_MEMBER(m_video_ram)
+	AM_RANGE(0x1ff000, 0x1ff007) AM_DEVREADWRITE_LEGACY(SAB1797_02P_TAG, wd17xx_r, wd17xx_w) // A2,A1
 	AM_RANGE(0x1ff100, 0x1ff100) AM_DEVWRITE_LEGACY(SY6845E_TAG, mc6845_address_w)
 	AM_RANGE(0x1ff101, 0x1ff101) AM_DEVREADWRITE_LEGACY(SY6845E_TAG, mc6845_register_r, mc6845_register_w)
-	AM_RANGE(0x1ff200, 0x1ff203) AM_DEVREADWRITE_LEGACY(Z80DART_TAG, z80dart_ba_cd_r, z80dart_ba_cd_w) // A2,A1
-	AM_RANGE(0x1ff600, 0x1ff603) AM_DEVREADWRITE(Z8530B1_TAG, scc8530_r, scc8530_w) // A2,A1
-	AM_RANGE(0x1ff700, 0x1ff703) AM_DEVREADWRITE(Z8536B1_TAG, z8536_r, z8536_w) // A2,A1
+	AM_RANGE(0x1ff200, 0x1ff207) AM_DEVREADWRITE_LEGACY(Z80DART_TAG, z80dart_ba_cd_r, z80dart_ba_cd_w) // A2,A1
+	AM_RANGE(0x1ff600, 0x1ff607) AM_DEVREADWRITE(Z8530B1_TAG, scc8530_r, scc8530_w) // A2,A1
+	AM_RANGE(0x1ff700, 0x1ff707) AM_DEVREADWRITE(Z8536B1_TAG, z8536_r, z8536_w) // A2,A1
 	AM_RANGE(0x1ff800, 0x1ff800) AM_READ(iord0_w)
 	AM_RANGE(0x1ff800, 0x1ff807) AM_WRITE(iowr0_w)
 	AM_RANGE(0x1ff900, 0x1ff907) AM_WRITE(iowr1_w)
@@ -143,7 +151,8 @@ static ADDRESS_MAP_START( abc1600_mem, ADDRESS_SPACE_PROGRAM, 8, abc1600_state )
 	AM_RANGE(0x1ffb01, 0x1ffb01) AM_WRITE(fw1_w)
 	AM_RANGE(0x1ffd00, 0x1ffd07) AM_WRITE(dmamap_w)
 	AM_RANGE(0x1ffe00, 0x1ffe00) AM_WRITE(en_spec_contr_reg_w)
-*/
+
+	*/
 
 /*
 	AM_RANGE(0x1ff000, 0x1ff000) AM_DEVREADWRITE_LEGACY(Z8410AB1_0_TAG, z80dma_r, z80dma_w)
@@ -300,6 +309,109 @@ static Z80DART_INTERFACE( dart_intf )
 	DEVCB_NULL
 };
 
+//-------------------------------------------------
+//  Z8536_INTERFACE( cio_intf )
+//-------------------------------------------------
+
+READ8_MEMBER( abc1600_state::cio_pa_r )
+{
+	/*
+		
+		bit		description
+		
+		PA0		BUS2
+		PA1		BUS1
+		PA2		BUS0X*2
+		PA3		BUS0X*3
+		PA4		BUS0X*4
+		PA5		BUS0X*5
+		PA6		BUS0X
+		PA7		BUS0I
+		
+	*/
+	
+	return 0;
+}
+
+READ8_MEMBER( abc1600_state::cio_pb_r )
+{
+	/*
+		
+		bit		description
+		
+		PB0		
+		PB1		POWERFAIL
+		PB2		
+		PB3		
+		PB4		MINT
+		PB5		_PREN-1
+		PB6		_PREN-0
+		PB7		FINT
+		
+	*/
+
+	return 0;
+}
+
+WRITE8_MEMBER( abc1600_state::cio_pb_w )
+{
+	/*
+		
+		bit		description
+		
+		PB0		PRBR
+		PB1		
+		PB2		
+		PB3		
+		PB4		
+		PB5		
+		PB6		
+		PB7		
+		
+	*/
+}
+
+READ8_MEMBER( abc1600_state::cio_pc_r )
+{
+	/*
+		
+		bit		description
+		
+		PC0		
+		PC1		DATA IN
+		PC2		
+		PC3		
+		
+	*/
+
+	return 0;
+}
+
+WRITE8_MEMBER( abc1600_state::cio_pc_w )
+{
+	/*
+		
+		bit		description
+		
+		PC0		CLOCK
+		PC1		DATA OUT
+		PC2		enable RTC
+		PC3		enable NVRAM
+		
+	*/
+}
+
+static Z8536_INTERFACE( cio_intf )
+{
+	DEVCB_NULL,	// INT
+	DEVCB_DRIVER_MEMBER(abc1600_state, cio_pa_r),
+	DEVCB_NULL,
+	DEVCB_DRIVER_MEMBER(abc1600_state, cio_pb_r),
+	DEVCB_DRIVER_MEMBER(abc1600_state, cio_pb_w),
+	DEVCB_DRIVER_MEMBER(abc1600_state, cio_pc_r),
+	DEVCB_DRIVER_MEMBER(abc1600_state, cio_pc_w)
+};
+
 
 //-------------------------------------------------
 //  wd17xx_interface fdc_intf
@@ -381,8 +493,11 @@ static MACHINE_CONFIG_START( abc1600, abc1600_state )
 	MCFG_Z80DMA_ADD(Z8410AB1_0_TAG, 4000000, dma0_intf)
 	MCFG_Z80DMA_ADD(Z8410AB1_1_TAG, 4000000, dma1_intf)
 	MCFG_Z80DMA_ADD(Z8410AB1_2_TAG, 4000000, dma2_intf)
-	MCFG_Z80DART_ADD(Z8470AB1_TAG, 4000000, dart_intf)
-	MCFG_SCC8530_ADD(Z8530B1_TAG, 4000000)
+	MCFG_Z80DART_ADD(Z8470AB1_TAG, XTAL_64MHz/16, dart_intf)
+	MCFG_SCC8530_ADD(Z8530B1_TAG, XTAL_64MHz/16)
+	MCFG_Z8536_ADD(Z8536B1_TAG, XTAL_64MHz/16, cio_intf)
+//	MCFG_NMC9306_ADD(NMC9306_TAG)
+	MCFG_E0516_ADD(E050_C16PC_TAG, XTAL_32_768kHz)
 	MCFG_WD179X_ADD(SAB1797_02P_TAG, fdc_intf)
 	MCFG_FLOPPY_DRIVE_ADD(FLOPPY_0, abc1600_floppy_config)
 	MCFG_ABC99_ADD(abc99_intf)
