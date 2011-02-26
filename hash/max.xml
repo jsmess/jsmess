@@ -157,7 +157,7 @@
 		<year>1982</year>
 		<publisher>Commodore</publisher>
 		<part name="cart" interface="ultimax_cart">
-			<dataarea name="romh" size="4096">
+			<dataarea name="romh" size="8192">
 				<rom name="musicm.bin" size="4096" crc="f86946a9" sha1="2592d8716331804dbc07d406e10f009ec472b7b2" offset="0x1000" />
 			</dataarea>
 		</part>
