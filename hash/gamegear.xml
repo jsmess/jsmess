@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+﻿<?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
 Undumped protos:
@@ -5394,7 +5394,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1994</year>
 		<publisher>U.S. Gold</publisher>
 		<part name="cart" interface="gamegear_cart">
-			<dataarea name="rom" size="262144">
+			<dataarea name="rom" size="524288">
 				<rom name="power drive (europe).bin" size="524288" crc="ac369ae3" sha1="c523db9fcf30d7f8af5e5a298ba01f59d124ff72" offset="000000" />
 			</dataarea>
 		</part>
