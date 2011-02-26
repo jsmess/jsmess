@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+﻿<?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!-- Othello Multivision carts are marked with OMV.
 
@@ -254,7 +254,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		<year>1983</year>
 		<publisher>Sega / Alpha Denshi</publisher>
 		<part name="cart" interface="sg1000_cart">
-			<dataarea name="rom" size="16384">
+			<dataarea name="rom" size="40960">
 				<rom name="champion baseball [40k].bin" size="40960" crc="c0c16fa7" sha1="85e5c2f354b9110e5f7c7dfcc7ab9814598b7956" offset="000000" />
 			</dataarea>
 		</part>
@@ -1085,7 +1085,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		<year>1983</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sg1000_cart">
-			<dataarea name="rom" size="16384">
+			<dataarea name="rom" size="40960">
 				<rom name="n-sub [40k].bin" size="40960" crc="b377d6e1" sha1="aa3eae849553a5a176762466b101f312b8b968e4" offset="000000" />
 			</dataarea>
 		</part>
@@ -1420,7 +1420,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		<year>1983</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sg1000_cart">
-			<dataarea name="rom" size="16384">
+			<dataarea name="rom" size="40960">
 				<rom name="sega flipper [40k map].bin" size="40960" crc="fd76ad99" sha1="d713dcbd79a3db8f1ef2cfb27da31a286fff16d1" offset="000000" />
 			</dataarea>
 		</part>
@@ -1929,7 +1929,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		<year>1983</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sg1000_cart">
-			<dataarea name="rom" size="16384">
+			<dataarea name="rom" size="40960">
 				<rom name="chuugaku hisshuu eisakubun (chuugaku 1-nen) (jp).bin" size="40960" crc="975106b6" sha1="ebc8544bf8a36840a639bb7a2698f984429f4762" offset="000000" />
 			</dataarea>
 		</part>
