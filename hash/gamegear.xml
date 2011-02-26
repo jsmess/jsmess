@@ -258,7 +258,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<description>Alex Kidd in Miracle World (Tw, SMS Mode)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="sms_cart">
+		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="alex kidd in miracle world [sms-gg] (tw).bin" size="131072" crc="6f8e46cf" sha1="da0bf41dc5fd68a191d0f02fb1213ffdb006d7b8" offset="000000" />
 			</dataarea>
