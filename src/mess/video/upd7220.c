@@ -184,13 +184,15 @@ struct _upd7220_t
 	int disp;						/* display zoom factor */
 	int gchr;						/* zoom factor for graphics character writing and area filling */
 
-	UINT8 figs_dir;					/* figs param 0: drawing direction */
-	UINT8 figs_figure_type;			/* figs param 1: figure type */
-	UINT16 figs_dc;					/* figs param 2: */
-	UINT16 figs_d;					/* figs param 3: */
-	UINT16 figs_d1;					/* figs param 4: */
-	UINT16 figs_d2;					/* figs param 5: */
-	UINT16 figs_dm;					/* figs param 6: */
+	struct {
+		UINT8 dir;					/* figs param 0: drawing direction */
+		UINT8 figure_type;			/* figs param 1: figure type */
+		UINT16 dc;					/* figs param 2: */
+		UINT16 d;					/* figs param 3: */
+		UINT16 d1;					/* figs param 4: */
+		UINT16 d2;					/* figs param 5: */
+		UINT16 dm;					/* figs param 6: */
+	}figs;
 
 	/* timers */
 	emu_timer *vsync_timer;			/* vertical sync timer */
@@ -470,16 +472,16 @@ static void recompute_parameters(device_t *device)
 }
 
 /*-----------------------------------------------------
-    reset_figs_param - reset figs after each vrram rmw
+    reset_figs_param - reset figs after each vram rmw
 -----------------------------------------------------*/
 
 static void reset_figs_param(upd7220_t *upd7220)
 {
-	upd7220->figs_dc = 0x0000;
-	upd7220->figs_d = 0x0008;
-	upd7220->figs_d1 = 0x0008;
-	upd7220->figs_d2 = 0x0000;
-	upd7220->figs_dm = 0x0000;
+	upd7220->figs.dc = 0x0000;
+	upd7220->figs.d = 0x0008;
+	upd7220->figs.d1 = 0x0008;
+	upd7220->figs.d2 = 0x0000;
+	upd7220->figs.dm = 0x0000;
 }
 
 /*-------------------------------------------------
@@ -488,7 +490,7 @@ static void reset_figs_param(upd7220_t *upd7220)
 
 #define EAD			upd7220->ead
 #define DAD			upd7220->dad
-#define P			x_dir[upd7220->figs_dir] + (y_dir[upd7220->figs_dir] * upd7220->pitch)
+#define P			x_dir[upd7220->figs.dir] + (y_dir[upd7220->figs.dir] * upd7220->pitch)
 #define MSB(value)	(BIT(value, 15))
 #define LSB(value)	(BIT(value, 0))
 #define LR(value)	((value << 1) | MSB(value))
@@ -561,7 +563,7 @@ static void read_vram(upd7220_t *upd7220,UINT8 type, UINT8 mod)
 	if(mod)
 		logerror("uPD7220 RDAT used with mod = %02x?\n",mod);
 
-	for(i=0;i<upd7220->figs_dc;i++)
+	for(i=0;i<upd7220->figs.dc;i++)
 	{
 		switch(type)
 		{
@@ -617,11 +619,11 @@ static void write_vram(upd7220_t *upd7220,UINT8 type, UINT8 mod)
 	//if(result)
 	{
 		//printf("%04x %02x %02x %04x %02x %02x\n",upd7220->vram[upd7220->ead],upd7220->pr[1],upd7220->pr[2],upd7220->mask,type,mod);
-		//printf("%04x %02x %02x\n",upd7220->ead,upd7220->figs_dir,upd7220->pitch);
-		//printf("%04x %04x %02x %04x\n",upd7220->ead,result,mod,upd7220->figs_dc);
+		//printf("%04x %02x %02x\n",upd7220->ead,upd7220->figs.dir,upd7220->pitch);
+		//printf("%04x %04x %02x %04x\n",upd7220->ead,result,mod,upd7220->figs.dc);
 	}
 
-	for(i=0;i<upd7220->figs_dc + 1;i++)
+	for(i=0;i<upd7220->figs.dc + 1;i++)
 	{
 		switch(mod & 3)
 		{
@@ -671,19 +673,19 @@ static void draw_char(upd7220_t *upd7220,int x,int y)
 	}
 	#endif
 
-	xsize = upd7220->figs_d;
-	ysize = upd7220->figs_dc + 1;
+	xsize = upd7220->figs.d;
+	ysize = upd7220->figs.dc + 1;
 
 	/* TODO: internal direction, slanted character, zooming, size stuff bigger than 8 */
 	for(yi=0;yi<ysize;yi++)
 	{
-		switch(upd7220->figs_dir & 7)
+		switch(upd7220->figs.dir & 7)
 		{
 			case 0: tile_data = 0xff; printf("%d %d %d %d %d\n",upd7220->pitch,x,y,xsize,ysize); break; // TODO
 			case 2:	tile_data = BITSWAP8(upd7220->ra[((yi) & 7) | 8],7,6,5,4,3,2,1,0); break;
 			case 6:	tile_data = BITSWAP8(upd7220->ra[((ysize-1-yi) & 7) | 8],0,1,2,3,4,5,6,7); break;
 			default: tile_data = BITSWAP8(upd7220->ra[((yi) & 7) | 8],7,6,5,4,3,2,1,0);
-					 printf("%d %d %d\n",upd7220->figs_dir,xsize,ysize);
+					 printf("%d %d %d\n",upd7220->figs.dir,xsize,ysize);
 					 break;
 		}
 
@@ -700,8 +702,8 @@ static void draw_char(upd7220_t *upd7220,int x,int y)
 		}
 	}
 
-	upd7220->ead = ((x+8*x_dir_dot[upd7220->figs_dir]) >> 4) + ((y+8*y_dir_dot[upd7220->figs_dir]) * upd7220->pitch);
-	upd7220->dad = ((x+8*x_dir_dot[upd7220->figs_dir]) & 0xf);
+	upd7220->ead = ((x+8*x_dir_dot[upd7220->figs.dir]) >> 4) + ((y+8*y_dir_dot[upd7220->figs.dir]) * upd7220->pitch);
+	upd7220->dad = ((x+8*x_dir_dot[upd7220->figs.dir]) & 0xf);
 }
 
 /*-------------------------------------------------
@@ -984,39 +986,42 @@ static void process_fifo(device_t *device)
 	case COMMAND_FIGS: /* figure drawing parameters specify */
 		if (upd7220->param_ptr == 2)
 		{
-			upd7220->figs_dir = upd7220->pr[1] & 0x7;
-			upd7220->figs_figure_type = (upd7220->pr[1] & 0xf8) >> 3;
+			upd7220->figs.dir = upd7220->pr[1] & 0x7;
+			upd7220->figs.figure_type = (upd7220->pr[1] & 0xf8) >> 3;
 
-			//if(upd7220->figs_dir != 2)
+			//if(upd7220->figs.dir != 2)
 			//	printf("DIR %02x\n",upd7220->pr[1]);
 		}
 
 		if (upd7220->param_ptr == 4)
-			upd7220->figs_dc = (upd7220->pr[2]) | ((upd7220->pr[3] & 0x3f) << 8);
+			upd7220->figs.dc = (upd7220->pr[2]) | ((upd7220->pr[3] & 0x3f) << 8);
 
 		if (upd7220->param_ptr == 6)
-			upd7220->figs_d = (upd7220->pr[4]) | ((upd7220->pr[5] & 0x3f) << 8);
+			upd7220->figs.d = (upd7220->pr[4]) | ((upd7220->pr[5] & 0x3f) << 8);
 
 		if (upd7220->param_ptr == 8)
-			upd7220->figs_d2 = (upd7220->pr[6]) | ((upd7220->pr[7] & 0x3f) << 8);
+			upd7220->figs.d2 = (upd7220->pr[6]) | ((upd7220->pr[7] & 0x3f) << 8);
 
 		if (upd7220->param_ptr == 10)
-			upd7220->figs_d1 = (upd7220->pr[8]) | ((upd7220->pr[9] & 0x3f) << 8);
+			upd7220->figs.d1 = (upd7220->pr[8]) | ((upd7220->pr[9] & 0x3f) << 8);
 
 		if (upd7220->param_ptr == 12)
-			upd7220->figs_dm = (upd7220->pr[10]) | ((upd7220->pr[11] & 0x3f) << 8);
+			upd7220->figs.dm = (upd7220->pr[10]) | ((upd7220->pr[11] & 0x3f) << 8);
 
 		break;
 
 	case COMMAND_FIGD: /* figure draw start */
-		printf("uPD7220 '%s' Unimplemented command FIGD\n", device->tag());
+		printf("uPD7220 '%s' Unimplemented command FIGD %02x\n", device->tag(),upd7220->figs.figure_type);
+		upd7220->sr |= UPD7220_SR_DRAWING_IN_PROGRESS;
 		break;
 
 	case COMMAND_GCHRD: /* graphics character draw and area filling start */
-		if(upd7220->figs_figure_type == 2)
+		if(upd7220->figs.figure_type == 2)
 			draw_char(upd7220,((upd7220->ead % upd7220->pitch) << 4) | (upd7220->dad & 0xf),(upd7220->ead / upd7220->pitch));
 		else
-			printf("uPD7220 '%s' Unimplemented command GCHRD %02x\n", device->tag(),upd7220->figs_figure_type);
+			printf("uPD7220 '%s' Unimplemented command GCHRD %02x\n", device->tag(),upd7220->figs.figure_type);
+
+		upd7220->sr |= UPD7220_SR_DRAWING_IN_PROGRESS;
 		break;
 
 	case COMMAND_RDAT: /* read data from display memory */
@@ -1082,6 +1087,10 @@ READ8_DEVICE_HANDLER( upd7220_r )
 	{
 		/* status register */
 		data = upd7220->sr;
+
+		/* TODO: timing of these */
+		upd7220->sr &= ~UPD7220_SR_DRAWING_IN_PROGRESS;
+		upd7220->sr &= ~UPD7220_SR_DMA_EXECUTE;
 	}
 
 	return data;
