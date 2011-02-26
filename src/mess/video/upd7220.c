@@ -690,6 +690,39 @@ static void draw_line(upd7220_t *upd7220,int x,int y)
 	}
 }
 
+static void draw_rectangle(upd7220_t *upd7220,int x,int y)
+{
+	int i;
+
+	printf("%d %d %02x %08x\n",x,y,upd7220->figs.dir,upd7220->ead);
+
+	/* TODO: direction */
+	for(i = 0;i < upd7220->figs.d;i++)
+	{
+		draw_pixel(upd7220,x,y,1 << (x & 0xf));
+		x++;
+	}
+	for(i = 0;i < upd7220->figs.d2;i++)
+	{
+		draw_pixel(upd7220,x,y,1 << (x & 0xf));
+		y--;
+	}
+	for(i = 0;i < upd7220->figs.d;i++)
+	{
+		draw_pixel(upd7220,x,y,1 << (x & 0xf));
+		x--;
+	}
+	for(i = 0;i < upd7220->figs.d2;i++)
+	{
+		draw_pixel(upd7220,x,y,1 << (x & 0xf));
+		y++;
+	}
+
+	upd7220->ead = (x >> 4) + (y * upd7220->pitch);
+	upd7220->dad = x & 0x0f;
+
+}
+
 /*-------------------------------------------------
     draw_char - put per-pixel VRAM data (charset)
 -------------------------------------------------*/
@@ -1053,6 +1086,8 @@ static void process_fifo(device_t *device)
 	case COMMAND_FIGD: /* figure draw start */
 		if(upd7220->figs.figure_type == 1)
 			draw_line(upd7220,((upd7220->ead % upd7220->pitch) << 4) | (upd7220->dad & 0xf),(upd7220->ead / upd7220->pitch));
+		else if(upd7220->figs.figure_type == 8)
+			draw_rectangle(upd7220,((upd7220->ead % upd7220->pitch) << 4) | (upd7220->dad & 0xf),(upd7220->ead / upd7220->pitch));
 		else
 			printf("uPD7220 '%s' Unimplemented command FIGD %02x\n", device->tag(),upd7220->figs.figure_type);
 
@@ -1310,9 +1345,6 @@ static void update_graphics(device_t *device, bitmap_t *bitmap, const rectangle 
 	{
 		get_graphics_partition(upd7220, area, &sad, &len, &im, &wd);
 
-		if(area == 1)
-		popmessage("%04x %04x %d %d %d %d %d %08x\n",sad,len,im,wd,area,bsy,tsy,upd7220->pitch);
-
 		for (y = 0; y < len; y++)
 		{
 			addr = (sad & 0x1ffff) + (y * upd7220->pitch); //TODO: sad needs to be & 0x3ffff
@@ -1322,7 +1354,7 @@ static void update_graphics(device_t *device, bitmap_t *bitmap, const rectangle 
 			else
 			{
 				if (upd7220->draw_text_func)
-					upd7220->draw_text_func(device, bitmap, upd7220->vram, addr, y + tsy, wd, upd7220->pitch,0,0,upd7220->aw * 8 - 1,upd7220->al - 1,upd7220->lr, upd7220->dc, upd7220->ead);
+					upd7220->draw_text_func(device, bitmap, upd7220->vram, addr, y + tsy, wd, upd7220->pitch,0,0,upd7220->aw * 8 - 1,len + bsy - 1,upd7220->lr, upd7220->dc, upd7220->ead);
 			}
 		}
 
