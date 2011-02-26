@@ -171,7 +171,8 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 				if(res_x > screen_max_x || res_y > screen_max_y)
 					continue;
 
-				*BITMAP_ADDR16(bitmap, res_y, res_x) = pen;
+				if(pen)
+					*BITMAP_ADDR16(bitmap, res_y, res_x) = pen;
 			}
 		}
 	}
@@ -944,6 +945,8 @@ void qx10_state::video_start()
 
 bool qx10_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
+	bitmap_fill(&bitmap, &cliprect, 0);
+
 	/* graphics */
 	upd7220_update(m_hgdc, &bitmap, &cliprect);
 

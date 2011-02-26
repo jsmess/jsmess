@@ -650,6 +650,46 @@ static void write_vram(upd7220_t *upd7220,UINT8 type, UINT8 mod)
 	}
 }
 
+static void draw_pixel(upd7220_t *upd7220,int x,int y,UINT16 tile_data)
+{
+	UINT32 addr = (y * upd7220->pitch + (x >> 4)) & 0x3ffff;
+	int dad;
+
+	dad = x & 0xf;
+
+	upd7220->vram[addr + upd7220->vram_bank] &= ~(0x8000 >> (15-dad));
+	upd7220->vram[addr + upd7220->vram_bank] |= ((tile_data) & (0x8000 >> (15-dad)));
+}
+
+static void draw_line(upd7220_t *upd7220,int x,int y)
+{
+	int line_size,i;
+	const int line_x_dir[8] = { 0, 1, 1, 1, 0,-1,-1,-1};
+	const int line_y_dir[8] = { 1, 1, 0,-1,-1,-1, 0, 1};
+	const int line_x_step[8] = { 1, 0, 0, 1,-1, 0, 0,-1 };
+	const int line_y_step[8] = { 0, 1,-1, 0, 0,-1, 1, 0 };
+	UINT16 line_pattern;
+	int line_step = 0;
+
+	line_size = upd7220->figs.dc + 1;
+	line_pattern = (upd7220->ra[8]) | (upd7220->ra[9]<<8);
+
+	//printf("%d %d %08x %04x %d %04x\n",x,y,line_size,line_pattern,upd7220->figs.dir,upd7220->pitch);
+
+	return;
+
+	for(i = 0;i<line_size;i++)
+	{
+		line_step = (upd7220->figs.d1 * i);
+		line_step/= upd7220->figs.dc;
+		line_step++;
+		line_step >>= 1;
+		draw_pixel(upd7220,x + line_step*line_x_step[upd7220->figs.dir],y + line_step*line_y_step[upd7220->figs.dir],1 << ((x + line_step*line_x_step[upd7220->figs.dir]) & 0xf));
+		x += line_x_dir[upd7220->figs.dir];
+		y += line_y_dir[upd7220->figs.dir];
+	}
+}
+
 /*-------------------------------------------------
     draw_char - put per-pixel VRAM data (charset)
 -------------------------------------------------*/
@@ -1011,7 +1051,12 @@ static void process_fifo(device_t *device)
 		break;
 
 	case COMMAND_FIGD: /* figure draw start */
-		printf("uPD7220 '%s' Unimplemented command FIGD %02x\n", device->tag(),upd7220->figs.figure_type);
+		if(upd7220->figs.figure_type == 1)
+			draw_line(upd7220,((upd7220->ead % upd7220->pitch) << 4) | (upd7220->dad & 0xf),(upd7220->ead / upd7220->pitch));
+		else
+			printf("uPD7220 '%s' Unimplemented command FIGD %02x\n", device->tag(),upd7220->figs.figure_type);
+
+		reset_figs_param(upd7220);
 		upd7220->sr |= UPD7220_SR_DRAWING_IN_PROGRESS;
 		break;
 
@@ -1021,6 +1066,7 @@ static void process_fifo(device_t *device)
 		else
 			printf("uPD7220 '%s' Unimplemented command GCHRD %02x\n", device->tag(),upd7220->figs.figure_type);
 
+		reset_figs_param(upd7220);
 		upd7220->sr |= UPD7220_SR_DRAWING_IN_PROGRESS;
 		break;
 
@@ -1258,23 +1304,30 @@ static void update_graphics(device_t *device, bitmap_t *bitmap, const rectangle 
 	UINT32 addr, sad;
 	UINT16 len;
 	int im, wd, area;
-	int y, sy = 0;
+	int y, tsy = 0, bsy = 0;
 
 	for (area = 0; area < 2; area++)
 	{
 		get_graphics_partition(upd7220, area, &sad, &len, &im, &wd);
+
+		if(area == 1)
+		popmessage("%04x %04x %d %d %d %d %d %08x\n",sad,len,im,wd,area,bsy,tsy,upd7220->pitch);
 
 		for (y = 0; y < len; y++)
 		{
 			addr = (sad & 0x1ffff) + (y * upd7220->pitch); //TODO: sad needs to be & 0x3ffff
 
 			if (im || force_bitmap)
-				draw_graphics_line(device, bitmap, addr, y + sy, wd);
+				draw_graphics_line(device, bitmap, addr, y + bsy, wd);
 			else
-				if (upd7220->draw_text_func) upd7220->draw_text_func(device, bitmap, upd7220->vram, addr, y + sy, wd, upd7220->pitch,0,0,upd7220->aw * 8 - 1,upd7220->al - 1,upd7220->lr, upd7220->dc, upd7220->ead);
+			{
+				if (upd7220->draw_text_func)
+					upd7220->draw_text_func(device, bitmap, upd7220->vram, addr, y + tsy, wd, upd7220->pitch,0,0,upd7220->aw * 8 - 1,upd7220->al - 1,upd7220->lr, upd7220->dc, upd7220->ead);
+			}
 		}
 
-		sy += (y / upd7220->lr);
+		tsy += (y / upd7220->lr);
+		bsy += y;
 	}
 }
 
