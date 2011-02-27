@@ -305,6 +305,12 @@ static WRITE8_HANDLER(towns_system_w)
 	}
 }
 
+static TIMER_CALLBACK(towns_wait_end)
+{
+	towns_state* state = machine->driver_data<towns_state>();
+	cpu_set_input_line(state->maincpu,INPUT_LINE_HALT,CLEAR_LINE);
+}
+
 static READ8_HANDLER(towns_sys6c_r)
 {
 	logerror("SYS: (0x6c) Timer? read\n");
@@ -316,6 +322,9 @@ static WRITE8_HANDLER(towns_sys6c_w)
 	towns_state* state = space->machine->driver_data<towns_state>();
 //  logerror("SYS: (0x6c) write to timer (0x%02x)\n",data);
 	state->ftimer -= 0x54;
+	// halts the CPU for a period of time (exact length unknown)
+	cpu_set_input_line(state->maincpu,INPUT_LINE_HALT,ASSERT_LINE);
+	state->towns_wait_timer->adjust(attotime::from_usec(1),0,attotime::zero);
 }
 
 static READ8_HANDLER(towns_dma1_r)
@@ -2062,7 +2071,7 @@ static ADDRESS_MAP_START( towns_io , ADDRESS_SPACE_IO, 32)
   // Keyboard (8042 MCU)
   AM_RANGE(0x0600,0x0607) AM_READWRITE8(towns_keyboard_r, towns_keyboard_w,0x00ff00ff)
   // SCSI controller
-  AM_RANGE(0x0c30,0x0c33) AM_DEVREADWRITE8_MODERN("scsi",fmscsi_device,fmscsi_r,fmscsi_w,0x00ff00ff)
+  AM_RANGE(0x0c30,0x0c37) AM_DEVREADWRITE8_MODERN("scsi",fmscsi_device,fmscsi_r,fmscsi_w,0x00ff00ff)
   // CMOS
   AM_RANGE(0x3000,0x3fff) AM_READWRITE8(towns_cmos8_r, towns_cmos8_w,0x00ff00ff)
   // Something (MS-DOS wants this 0x41ff to be 1)
@@ -2300,6 +2309,7 @@ static DRIVER_INIT( towns )
 	state->towns_rtc_timer = machine->scheduler().timer_alloc(FUNC(rtc_second));
 	state->towns_kb_timer = machine->scheduler().timer_alloc(FUNC(poll_keyboard));
 	state->towns_mouse_timer = machine->scheduler().timer_alloc(FUNC(towns_mouse_timeout));
+	state->towns_wait_timer = machine->scheduler().timer_alloc(FUNC(towns_wait_end));
 
 	// CD-ROM init
 	state->towns_cd.read_timer = machine->scheduler().timer_alloc(FUNC(towns_cdrom_read_byte), (void*)machine->device("dma_1"));

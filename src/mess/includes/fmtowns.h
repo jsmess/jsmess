@@ -124,6 +124,7 @@ class towns_state : public driver_device
 	UINT8 towns_volume_select;
 	UINT8 towns_scsi_control;
 	UINT8 towns_scsi_status;
+	emu_timer* towns_wait_timer;
 	struct towns_cdrom_controller towns_cd;
 	struct towns_video_controller video;
 	required_shared_ptr<UINT8>	m_nvram;

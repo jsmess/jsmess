@@ -16,13 +16,16 @@
 #define FMSCSI_LINE_MSG   0x20
 #define FMSCSI_LINE_CD    0x10
 #define FMSCSI_LINE_BSY   0x08
+#define FMSCSI_LINE_EX    0x04
 #define FMSCSI_LINE_INT   0x02
 #define FMSCSI_LINE_PERR  0x01
 
 // SCSI output lines (to target)
 #define FMSCSI_LINE_WEN   0x80
 #define FMSCSI_LINE_IMSK  0x40
+#define FMSCSI_LINE_RMSK  0x20
 #define FMSCSI_LINE_ATN   0x10
+#define FMSCSI_LINE_WRD   0x08
 #define FMSCSI_LINE_SEL   0x04
 #define FMSCSI_LINE_DMAE  0x02
 #define FMSCSI_LINE_RST   0x01

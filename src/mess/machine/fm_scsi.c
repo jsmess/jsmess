@@ -453,19 +453,23 @@ void fmscsi_device::fmscsi_control_w(UINT8 data)
 
 READ8_MEMBER( fmscsi_device::fmscsi_r )
 {
-	switch(offset & 0x01)
+	switch(offset & 0x03)
 	{
 	case 0x00:
 		return fmscsi_data_r();
 	case 0x01:
 		return fmscsi_status_r();
+	case 0x02:
+		return 0x80;  // Linux uses this port to detect the ability to do word transfers.  We'll tell it that it doesn't for now.
+	default:
+		logerror("FMSCSI: Unknown read at offset %i\n",offset);
 	}
 	return 0;
 }
 
 WRITE8_MEMBER( fmscsi_device::fmscsi_w )
 {
-	switch(offset & 0x01)
+	switch(offset & 0x03)
 	{
 	case 0x00:
 		fmscsi_data_w(data);
@@ -473,5 +477,7 @@ WRITE8_MEMBER( fmscsi_device::fmscsi_w )
 	case 0x01:
 		fmscsi_control_w(data);
 		break;
+	default:
+		logerror("FMSCSI: Unknown write 0x%02x at offset %i\n",data,offset);
 	}
 }
