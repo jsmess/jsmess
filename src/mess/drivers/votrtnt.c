@@ -5,9 +5,35 @@
 *  with loads of help (dumping, code disassembly, schematics, and other
 *  documentation) from Kevin 'kevtris' Horton
 *
-*  The Votrax TNT was sold from some time in early 1981 until at least 1983
-
+*  The Votrax TNT was sold from some time in early 1981 until at least 1983.
+*
+*  2011-02-27 The TNT communicates with its host via serial (RS-232) by
+*             using a 6850 ACIA. It will echo whatever is sent, back to the
+*             host. In order that we can examine it, I have connected the
+*             'terminal' so we can enter data, and see what gets sent back.
+*             I've also connected the 'votrax' device, but it is far from
+*             complete (the phoneme-to-sample table does not exist), and
+*             therefore produces no sound. Selected phonemes would show in
+*             the error log if the status return was working properly.
+*
+*             ACIA status code is set to E2 for no data and E3 for data.
+*
+*             On the CPU, A12 and A15 are not connected. A13 and A14 are used
+*             to select devices. A0-A9 address RAM. A0-A11 address ROM.
+*             A0 switches the ACIA between status/command, and data in/out.
+*
+*  Special codes: The Type 'N Talk will take notice of certain codes. They
+*                 are: 08, 0D, 1B, 20. I didn't investigate what the codes do.
+*
+*  ToDo:
+*  - Fix votrax audio device to produce sound.
+*  - Fix votrax device to perform a callback on change of status rather than
+*           having to poll it.
+*  - Allow votrax frequency to be changed via a callable routine.
+*  - Reconnect the ACIA when serial coms become viable in MESS.
+*
 ******************************************************************************/
+#define ADDRESS_MAP_MODERN
 
 /* Core includes */
 #include "emu.h"
@@ -18,31 +44,68 @@
 #include "sound/votrax.h"
 #include "machine/6850acia.h"
 
+/* For testing */
+#include "machine/terminal.h"
+
+
 
 class votrtnt_state : public driver_device
 {
 public:
 	votrtnt_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+		: driver_device(machine, config),
+	m_maincpu(*this, "maincpu"),
+	m_terminal(*this, TERMINAL_TAG),
+	//m_acia(*this, "acia_0"),
+	m_votrax(*this, "votrax")
+	{ }
 
+	required_device<cpu_device> m_maincpu;
+	required_device<device_t> m_terminal;
+	//required_device<device_t> m_acia;
+	required_device<device_t> m_votrax;
+	DECLARE_READ8_MEMBER( votrtnt_acia_status_r );
+	DECLARE_READ8_MEMBER( votrtnt_acia_data_r );
+	DECLARE_WRITE8_MEMBER( votrtnt_votrax_w );
+	DECLARE_WRITE8_MEMBER( votrtnt_kbd_put );
+	UINT8 m_term_data;
+	UINT8 m_term_status;
 };
 
+READ8_MEMBER( votrtnt_state::votrtnt_acia_status_r )
+{
+	return m_term_status;
+}
 
-/* Devices */
+READ8_MEMBER( votrtnt_state::votrtnt_acia_data_r )
+{
+	m_term_status = 0xe2;
+	return m_term_data;
+}
+
+WRITE8_MEMBER( votrtnt_state::votrtnt_votrax_w )
+{
+	data &= 0x3f;  // intonation bits are grounded
+	//printf("%X ",data);
+	votrax_w(m_votrax, 0, data);
+}
+
 
 
 /******************************************************************************
  Address Maps
 ******************************************************************************/
 
-static ADDRESS_MAP_START(6802_mem, ADDRESS_SPACE_PROGRAM, 8)
-    ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
-    AM_RANGE(0x0000, 0x07ff) AM_RAM AM_MIRROR(0x9800)/* RAM, 2114*2 (0x400 bytes) mirrored 4x */
-	AM_RANGE(0x2000, 0x2000) AM_NOP AM_MIRROR(0x9ffe)//AM_DEVREADWRITE("acia_0",aciastat_r,aciactrl_w) AM_MIRROR(0x9ffe)/* 6850 ACIA */
-	AM_RANGE(0x2001, 0x2001) AM_NOP AM_MIRROR(0x9ffe)//AM_DEVREADWRITE("acia_0",aciadata_r,aciadata_w) AM_MIRROR(0x9ffe)/* 6850 ACIA */
-	AM_RANGE(0x4000, 0x4000) AM_NOP AM_MIRROR(0x9fff)/* low 6 bits write to 6 bit input of sc-01-a; high 2 bits are ignored (but by adding a buffer chip could be made to control the inflection bits of the sc-01-a which are normally grouned on the tnt) */
-	AM_RANGE(0x6000, 0x6fff) AM_ROM AM_MIRROR(0x9000)/* ROM in potted block */
+static ADDRESS_MAP_START(6802_mem, ADDRESS_SPACE_PROGRAM, 8, votrtnt_state)
+	ADDRESS_MAP_UNMAP_HIGH
+	ADDRESS_MAP_GLOBAL_MASK(0x6fff)
+	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_MIRROR(0xc00)/* RAM, 2114*2 (0x400 bytes) mirrored 4x */
+	//AM_RANGE(0x2000, 0x2000) AM_NOP AM_MIRROR(0xffe)//AM_DEVREADWRITE("acia_0",aciastat_r,aciactrl_w)/* 6850 ACIA */
+	//AM_RANGE(0x2001, 0x2001) AM_NOP AM_MIRROR(0xffe)//AM_DEVREADWRITE("acia_0",aciadata_r,aciadata_w)/* 6850 ACIA */
+	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0xffe) AM_READ(votrtnt_acia_status_r) AM_WRITENOP// temp testing
+	AM_RANGE(0x2001, 0x2001) AM_MIRROR(0xffe) AM_READ(votrtnt_acia_data_r) AM_DEVWRITE_LEGACY(TERMINAL_TAG, terminal_write) // temp testing
+	AM_RANGE(0x4000, 0x5fff) AM_WRITE(votrtnt_votrax_w) /* low 6 bits write to 6 bit input of sc-01-a; high 2 bits are ignored (but by adding a buffer chip could be made to control the inflection bits of the sc-01-a which are normally grounded on the tnt) */
+	AM_RANGE(0x6000, 0x6fff) AM_ROM /* ROM in potted block */
 ADDRESS_MAP_END
 
 
@@ -63,31 +126,57 @@ static INPUT_PORTS_START(votrtnt)
 	PORT_DIPSETTING(    0x80, "9600" )
 INPUT_PORTS_END
 
+static MACHINE_RESET(votrtnt)
+{
+	votrtnt_state *state = machine->driver_data<votrtnt_state>();
+	state->m_term_data = 0;
+	state->m_term_status = 0xe2;
+}
+
+WRITE8_MEMBER( votrtnt_state::votrtnt_kbd_put )
+{
+	m_term_data = data;
+	m_term_status = 0xe3;
+}
+
+static GENERIC_TERMINAL_INTERFACE( votrtnt_terminal_intf )
+{
+	DEVCB_DRIVER_MEMBER(votrtnt_state, votrtnt_kbd_put)
+};
+
+static TIMER_DEVICE_CALLBACK( votrtnt_poll_votrax )
+{
+	votrtnt_state *state = timer.machine->driver_data<votrtnt_state>();
+	UINT8 status = votrax_status_r(state->m_votrax);
+	//printf("%X ",status);
+	cpu_set_input_line(timer.machine->device("maincpu"), INPUT_LINE_IRQ0, status ? ASSERT_LINE : CLEAR_LINE);
+}
+
 
 /******************************************************************************
  Machine Drivers
 ******************************************************************************/
 
 static MACHINE_CONFIG_START( votrtnt, votrtnt_state )
-    /* basic machine hardware */
-    MCFG_CPU_ADD("maincpu", M6802, XTAL_2_4576MHz)  /* 2.4576MHz XTAL, verified; divided by 4 inside the m6802*/
-    MCFG_CPU_PROGRAM_MAP(6802_mem)
-    MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", M6802, XTAL_2_4576MHz)  /* 2.4576MHz XTAL, verified; divided by 4 inside the m6802*/
+	MCFG_CPU_PROGRAM_MAP(6802_mem)
 
-    /* video hardware */
-    MCFG_DEFAULT_LAYOUT(layout_votrtnt)
+	MCFG_MACHINE_RESET(votrtnt)
+	/* video hardware */
+	//MCFG_DEFAULT_LAYOUT(layout_votrtnt)
 
-    /* serial hardware */
-    //MCFG_ACIA6850_ADD("acia_0", acia_intf)
+	/* serial hardware */
+	//MCFG_ACIA6850_ADD("acia_0", acia_intf)
 
-    /* sound hardware */
-	//MCFG_SPEAKER_STANDARD_MONO("mono")
-	//MCFG_SOUND_ADD("sc-01-a", VOTRAX, 1700000) /* 1.70 MHz? needs verify */
-	//MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("votrax", VOTRAX, 1700000) /* 1.70 MHz? needs verify */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	/* printer */
-	//MCFG_PRINTER_ADD("printer")
-
+	MCFG_FRAGMENT_ADD( generic_terminal )
+	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, votrtnt_terminal_intf)
+	MCFG_TIMER_ADD_PERIODIC("votrtnt_timer", votrtnt_poll_votrax, attotime::from_hz(70) )
 MACHINE_CONFIG_END
 
 
@@ -97,9 +186,8 @@ MACHINE_CONFIG_END
 ******************************************************************************/
 
 ROM_START(votrtnt)
-    ROM_REGION(0x10000, "maincpu", 0)
+	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("cn49752n.bin", 0x6000, 0x1000, CRC(a44e1af3) SHA1(af83b9e84f44c126b24ee754a22e34ca992a8d3d)) /* 2332 mask rom inside potted brick */
-
 ROM_END
 
 
@@ -110,14 +198,14 @@ ROM_END
 /*
 static ACIA6850_INTERFACE( acia_intf )
 {
-    9600, // rx clock, actually based on dipswitches
-    9600, // tx clock, actually based on dipswitches
-    DEVCB_NULL, // rx callback
-    DEVCB_NULL, // tx callback
-    DEVCB_NULL,
-    DEVCB_NULL,
-    DEVCB_NULL,
-    DEVCB_NULL
+	9600, // rx clock, actually based on dipswitches
+	9600, // tx clock, actually based on dipswitches
+	DEVCB_NULL, // rx callback
+	DEVCB_NULL, // tx callback
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };*/
 
 /******************************************************************************
@@ -125,5 +213,5 @@ static ACIA6850_INTERFACE( acia_intf )
 ******************************************************************************/
 
 /*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT      COMPANY                     FULLNAME                            FLAGS */
-COMP( 1980, votrtnt,   0,          0,      votrtnt,   votrtnt, 0,     "Votrax",        "Type 'N Talk",                        GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1980, votrtnt,   0,          0,      votrtnt,   votrtnt, 0,     "Votrax",        "Type 'N Talk", GAME_NOT_WORKING | GAME_NO_SOUND)
 
