@@ -43,6 +43,7 @@ public:
 	DECLARE_WRITE8_MEMBER( cc10_porta_w );
 	DECLARE_READ8_MEMBER( vcc_portb_r );
 	DECLARE_WRITE8_MEMBER( vcc_porta_w );
+	DECLARE_WRITE8_MEMBER( abc_speech_w );
 	DECLARE_WRITE8_MEMBER(kp_matrix_w);
 	DECLARE_READ8_MEMBER(unknown_r);
 	DECLARE_READ8_MEMBER(exp_i8243_p2_r);

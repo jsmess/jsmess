@@ -1784,6 +1784,7 @@ const game_driver * const drivers[] =
 	DRIVER( vcc )
 	DRIVER( uvc )
 	DRIVER( abc )
+	DRIVER( vbc )
 	DRIVER( victor9k )
 	DRIVER( phc25 )
 	DRIVER( phc25j )

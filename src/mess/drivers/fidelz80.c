@@ -8,9 +8,8 @@
 *  TODO:
 *  * Figure out why it says the first speech line twice; it shouldn't. (It sometimes does this on the sensory chess challenger real hardware)
 *  * Get rom locations from pcb (done for UVC, VCC is probably similar)
-*  * Add sensory chess challenger to driver, similar hardware.
-*  * Add rom for speech and attach speech chip to ABC
-*  * Add VBC (older version of ABC rom)
+*  * Add sensory chess challenger roms/memmap to driver, similar hardware.
+*  * correctly hook up VBC/ABC speech so that the z80 is halted while words are being spoken
 *
 ***********************************************************************
 
@@ -152,15 +151,423 @@ PC.6 - button column C (W)
 PC.7 - button column D (W)
 
 ******************************************************************************
-Voice Bridge Challenger (VBC) [needs adding]
+Voice Bridge Challenger (VBC)
 and Advanced Bridge Challenger (ABC)
-(add details)
-(s14001a sound is missing from both of these!)
+--------------------------------
+
+This unit is similar in construction kinda to the chess challengers, however it
+has an 8041 which does ALL of the system I/O.  The Z80 has NO IO AT ALL other than
+what is performed through the 8041!
+
+The main CPU is a Z80 running at 2.5MHz
+
+INT connects to VCC (not used)
+NMI connects to VCC (not used)
+RST connects to power on reset, and reset button
+
+The 8041 runs at 5MHz.
+
+Memory Map:
+-----------
+
+0000-1FFF: 8K 101-64108 ROM
+2000-3FFF: 8K 101-64109 ROM
+4000-5FFF: 8K 101-64110 ROM
+6000-7FFF: 1K of RAM (2114 * 2)
+8000-DFFF: unused
+E000-FFFF: write to TSI chip
+
+NOTE: when the TSI chip is written to, the CPU IS STOPPED.  The CPU will run again
+when the word is done being spoken.  This is because D0-D5 run to the TSI chip directly.
+
+The TSI chip's ROM is 4K, and is marked 101-32118.  The clock is the same as the Chess
+Challengers- 470K/100pf which gives a frequency around 25KHz or so.
+
+I/O Map:
+--------
+
+00-FF: 8041 I/O ports (A0 selects between the two)
+
+
+
+8041 pinout:
+------------
+
+(note: columns are pulled up with 10K resistors)
+
+P10 - column H, RD LED, VFD grid 0
+P11 - column G, DB LED, VFD grid 1
+P12 - column F, <>V LED, VFD grid 2
+P13 - column E, ^V LED, VFD grid 3
+P14 - column D, W LED, VFD grid 4
+P15 - column C, S LED, VFD grid 5
+P16 - column B, E LED, VFD grid 6
+P17 - column A, N LED, VFD grid 7
+
+P20 - I/O expander
+P21 - I/O expander
+P22 - I/O expander
+P23 - I/O expander
+P24 - row 0 through inverter
+P25 - row 1 through inverter
+P26 - row 2 through inverter
+P27 - row 3 through inverter
+
+PROG - I/O expander
+
+T0 - optical card sensor (high = bright/reflective, low = dark/non reflective)
+T1 - connects to inverter, then nothing
+
+D8243C I/O expander:
+--------------------
+
+P4.0 - segment M
+P4.1 - segment L
+P4.2 - segment N
+P4.3 - segment E
+
+P5.0 - segment D
+P5.1 - segment I
+P5.2 - segment K
+P5.3 - segment J
+
+P6.0 - segment A
+P6.1 - segment B
+P6.2 - segment F
+P6.3 - segment G
+
+P7.0 - LED enable (high = LEDs can be lit.  low = LEDs will not light)
+P7.1 - goes through inverter, to pads that are not used
+P7.2 - segment C
+P7.3 - segment H
+
+
+button matrix:
+--------------
+
+the matrix is composed of 8 columns by 4 rows.
+
+     A  B  C  D     E  F  G  H
+     -------------------------
+0-   RE xx CL EN    J  Q  K  A
+1-   BR PB DB SC    7  8  9 10
+2-   DL CV VL PL    3  4  5  6
+3-   cl di he sp   NT  P  1  2
+
+xx - speaker symbol
+cl - clubs symbol
+di - diamonds symbol
+he - hearts symbol
+sp - spades symbol
+
+NOTE: RE is not wired into the matrix, and is run separately out.
+
+There are 8 LEDs, and an 8 digit 14 segment VFD with commas and periods.
+This display is the same one as can be found on the speak and spell.
+ 
+       A       * comma
+  ***********  *
+ * *I  *J K* *
+F*  *  *  *  *B
+ *   * * *   *
+  G**** *****H 
+ *   * * *   *
+E*  *  *  *  *C
+ * *N  *M L* *
+  ***********  *decimal point
+       D
+
+The digits of the display are numbered left to right, 0 through 7 and are controlled
+by the grids.  hi = grid on, hi = segment on.
 
 ******************************************************************************
 
-Sensory Chess Challenger [needs adding]
-(add details)
+Sensory Chess Challenger champion (6502 based, needs its own driver .c file)
+---------------------------------
+
+Memory map:
+-----------
+0000-07FF: 2K of RAM
+0800-0FFF: 1K of RAM (note: mirrored twice)
+1000-17FF: PIA 0 (display, TSI speech chip)
+1800-1FFF: PIA 1 (keypad, LEDs)
+2000-3FFF: 101-64019 ROM (also used on the regular sensory chess challenger)
+4000-7FFF: mirror of 0000-3FFF
+8000-9FFF: not used
+A000-BFFF: 101-1025A03 ROM
+C000-DFFF: 101-1025A02 ROM
+E000-FDFF: 101-1025A01 ROM
+FE00-FFFF: 512 byte 74S474 PROM
+
+
+CPU is a 6502 running at 1.95MHz (3.9MHz resonator, divided by 2)
+
+NMI is not used.
+IRQ is connected to a 600Hz oscillator (38.4KHz divided by 64).
+Reset is connected to a power-on reset circuit.
+
+
+PIA port lines:
+---------------
+
+
+PIA 0:
+------
+
+PA0 - 7seg segments H, TSI A0
+PA1 - 7seg segments G, TSI A1
+PA2 - 7seg segments C, TSI A2
+PA3 - 7seg segments B, TSI A3
+PA4 - 7seg segments A, TSI A4
+PA5 - 7seg segments F, TSI A5
+PA6 - 7seg segments E
+PA7 - 7seg segments D
+
+PB0 - A12 on speech ROM (if used... not used on this model, ROM is 4K)
+PB1 - START line on S14001A
+PB2 - white wire
+PB3 - DONE line from S14001A
+PB4 - Tone line (toggle to make a tone in the speaker)
+PB5 - button column I
+PB6 - selection jumper (resistor to 5V)
+PB7 - selection jumper (resistor to ground)
+
+CA1 - NC
+CA2 - violet wire
+
+CB1 - NC
+CB2 - NC (connects to pin 14 of soldered connector)
+
+PIA 1:
+------
+
+PA0 - button row 1
+PA1 - button row 2
+PA2 - button row 3
+PA3 - button row 4
+PA4 - button row 5
+PA5 - button row 6
+PA6 - 7442 selector bit 0
+PA7 - 7442 selector bit 1
+
+PB0 - LED row 1
+PB1 - LED row 2
+PB2 - LED row 3
+PB3 - LED row 4
+PB4 - LED row 5
+PB5 - LED row 6
+PB6 - LED row 7
+PB7 - LED row 8
+
+CA1 - button row 7
+CA2 - selector bit 3
+
+CB1 - button row 8
+CB2 - selector bit 2
+
+Selector: (attached to PIA 1, outputs 1 of 10 pins low.  7442)
+---------
+
+output # (selected turns this column on, and all others off)
+0 - LED column A, button column A, 7seg digit 1
+1 - LED column B, button column B, 7seg digit 2
+2 - LED column C, button column C, 7seg digit 3
+3 - LED column D, button column D, 7seg digit 4
+4 - LED column E, button column E
+5 - LED column F, button column F
+6 - LED column G, button column G
+7 - LED column H, button column H
+8 - button column I
+9 - 
+
+The rows/columns are indicated on the game board:
+
+
+ ABCDEFGH   I 
+--------------
+|            | 8
+|            | 7
+|            | 6 
+|            | 5
+|            | 4
+|            | 3
+|            | 2
+|            | 1
+--------------
+
+The "lone LED" is above the control column.
+column I is the "control column" on the right for starting a new game, etc.
+
+The upper 6 buttons are connected as such:
+
+column A - speak
+column B - RV
+column C - TM
+column D - LV
+column E - DM
+column F - ST
+
+these 6 buttons use row 9 (connects to PIA 0)
+
+LED display:
+------------
+
+43 21 (digit number)
+-----
+88:88
+
+The LED display is four 7 segment digits.  normal ABCDEFG lettering is used for segments.
+
+The upper dot is connected to digit 3 common
+The lower dot is connected to digit 4 common
+The lone LED is connected to digit 1 common
+
+All three of the above are called "segment H".
+
+
+***********************************************************************
+Sensory Chess Challenger (needs adding to driver)
+------------------------
+
+The display/button/LED/speech technology is identical to the above product.
+Only the CPU board was changed.  As such, it works the same but is interfaced
+to different port chips this time.
+
+Hardware:
+---------
+
+On the board are 13 chips. 
+
+The CPU is a Z80A running at 3.9MHz, with 20K of ROM and 1K of RAM mapped.
+I/O is composed of an 8255 triple port adaptor, and a Z80A PIO parallel I/O
+interface.
+
+There's the usual TSI S14001A speech synth with its requisite 4K ROM which is the
+same as on the other talking chess boards.  The TSI chip is running at 26.37KHz.
+It uses a 470K resistor and a 100pf capacitor.
+
+The "perfect" clock would be 1/RC most likely (actually this will be skewed a tad by 
+duty cycle of the oscillator) which with those parts values gives 21.27KHz.  The
+formula is probably more likely to be 1/1.2RC or so.
+
+Rounding out the hardware are three driver chips for the LEDs, a 7404 inverter to
+run the crystal osc, a 555 timer to generate a clock, and a 74138 selector.
+
+NMI runs to a 555 oscillator that generates a 600Hz clock (measured: 598.9Hz.  It has a multiturn pot to adjust).
+INT is pulled to 5V
+RST connects to a power-on reset circuit
+
+
+Memory map:
+-----------
+
+0000-1FFF: 8K ROM 101-64018 
+2000-3FFF: 8K ROM 101-64019 (also used on the sensory champ. chess challenger)
+4000-5FFF: 4K ROM 101-32024
+6000-7FFF: 1K of RAM (2114 * 2)
+8000-FFFF: not used, maps to open bus
+
+I/O map:
+--------
+
+There's only two chips in the I/O map, an 8255 triple port chip, and a Z80A PIO
+parallel input/output device.
+
+Decoding isn't performed using a selector, but instead address lines are used.
+
+A2 connects to /CE on the 8255 
+A3 connects to /CE on the Z80A PIO
+
+A1 connects to control/data select on PIO & A0 of 8255
+A0 connects to port A/B select on PIO & A1 of 8255
+
+So to enable only the 8255, you'd write/read to 08-0Bh for example
+To enable only the PIO, you'd write/read to 04-07h for example.
+
+writing to 00-03h will enable and write to BOTH chips, and reading 00-03h
+will return data from BOTH chips (and cause a bus conflict).  The code probably
+never does either of these things.
+
+Likewise, writing/reading to 0Ch-0Fh will result in open bus, because neither chip's
+enable line will be low.
+
+This sequence repeats every 16 addresses.  So to recap:
+
+00-03: both chips enabled (prolly not used)
+04-07: PIO enabled
+08-0B: 8255 enabled
+0C-0F: neither enabled
+
+10-FF: mirrors of 00-0F.
+
+
+Refer to the Sensory Champ. Chess Chall. above for explainations of the below
+I/O names and labels.  It's the same.
+
+8255:
+-----
+
+PA.0 - segment D, TSI A0
+PA.1 - segment E, TSI A1
+PA.2 - segment F, TSI A2
+PA.3 - segment A, TSI A3
+PA.4 - segment B, TSI A4
+PA.5 - segment C, TSI A5
+PA.6 - segment G
+PA.7 - segment H
+
+PB.0 - LED row 1
+PB.1 - LED row 2
+PB.2 - LED row 3
+PB.3 - LED row 4
+PB.4 - LED row 5
+PB.5 - LED row 6
+PB.6 - LED row 7
+PB.7 - LED row 8
+
+PC.0 - LED column A, button column A, 7seg digit 1
+PC.1 - LED column B, button column B, 7seg digit 2
+PC.2 - LED column C, button column C, 7seg digit 3
+PC.3 - LED column D, button column D, 7seg digit 4
+PC.4 - LED column E, button column E
+PC.5 - LED column F, button column F
+PC.6 - LED column G, button column G
+PC.7 - LED column H, button column H
+
+
+Z80A PIO:
+---------
+
+PA.0 - button row 1
+PA.1 - button row 2
+PA.2 - button row 3
+PA.3 - button row 4
+PA.4 - button row 5
+PA.5 - button row 6
+PA.6 - button row 7
+PA.7 - button row 8
+
+PB.0 - button column I
+PB.1 - button row 9
+PB.2 - Tone line (toggle to make tone in the speaker)
+PB.3 - violet wire
+PB.4 - white wire (and TSI done line)
+PB.5 - selection jumper input (see below)
+PB.6 - TSI start line
+PB.7 - TSI ROM D0 line
+
+selection jumpers:
+------------------
+
+These act like another row of buttons.  It is composed of two diode locations,
+so there's up to 4 possible configurations.  My board does not have either diode
+stuffed, so this most likely is "english".  I suspect it selects which language to use
+for the speech synth.  Of course you need the other speech ROMs for this to function
+properly.
+
+Anyways, the two jumpers are connected to button columns A and B and the common
+connects to Z80A PIO PB.5, which basically makes a 10th button row.  I would
+expect that the software reads these once on startup only.
 
 ******************************************************************************/
 
@@ -295,6 +702,14 @@ WRITE8_MEMBER( fidelz80_state::vcc_porta_w )
 
 		update_display(space.machine);
 	}
+}
+
+WRITE8_MEMBER( fidelz80_state::abc_speech_w )
+{
+	// todo: HALT THE z80 here, and set up a callback to poll the s14001a DONE line to resume z80
+	s14001a_set_volume(m_speech, 15); // hack, s14001a core should assume a volume of 15 unless otherwise stated...
+	s14001a_reg_w(m_speech, data & 0x3f);
+	s14001a_rst_w(m_speech, (data & 0x80)>>7);
 }
 
 static I8255A_INTERFACE( cc10_ppi8255_intf )
@@ -516,7 +931,8 @@ static ADDRESS_MAP_START(abc_z80_mem, ADDRESS_SPACE_PROGRAM, 8, fidelz80_state)
     AM_RANGE(0x0000, 0x1fff) AM_ROM // 8k rom
 	AM_RANGE(0x2000, 0x3fff) AM_ROM // 8k rom
 	AM_RANGE(0x4000, 0x5fff) AM_ROM // 8k rom
-	AM_RANGE(0x6000, 0x67ff) AM_RAM // probably mirrored
+	AM_RANGE(0x6000, 0x67ff) AM_RAM AM_MIRROR(0x1c00) // 1k ram (2114*2) mirrored 8 times
+	AM_RANGE(0xE000, 0xE000) AM_WRITE(abc_speech_w) AM_MIRROR(0x1FFF) // write to speech chip, halts cpu
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(fidel_z80_io, ADDRESS_SPACE_IO, 8, fidelz80_state)
@@ -538,7 +954,7 @@ static ADDRESS_MAP_START(abc_mcu_io, ADDRESS_SPACE_IO, 8, fidelz80_state)
 	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READWRITE(exp_i8243_p2_r, exp_i8243_p2_w)
 	AM_RANGE(MCS48_PORT_PROG, MCS48_PORT_PROG) AM_DEVWRITE_LEGACY("i8243", i8243_prog_w)
 
-	// probably related to the card scanner and the speech chip
+	// related to the card scanner, probably clock and data optical
 	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_READ(unknown_r)
 	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(rand_r)
 ADDRESS_MAP_END
@@ -695,7 +1111,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( abc, fidelz80_state )
     /* basic machine hardware */
-    MCFG_CPU_ADD("maincpu", Z80, XTAL_4MHz) // unknown clock/divider
+    MCFG_CPU_ADD("maincpu", Z80, XTAL_5MHz/2) // 2.5MHz
     MCFG_CPU_PROGRAM_MAP(abc_z80_mem)
     MCFG_CPU_IO_MAP(abc_z80_io)
     MCFG_QUANTUM_TIME(attotime::from_hz(60))
@@ -704,7 +1120,7 @@ static MACHINE_CONFIG_START( abc, fidelz80_state )
 	MCFG_DEFAULT_LAYOUT(layout_abc)
 
 	/* other hardware */
-	MCFG_CPU_ADD("mcu", I8041, XTAL_4MHz) // unknown clock/divider
+	MCFG_CPU_ADD("mcu", I8041, XTAL_5MHz) // 5MHz
 	MCFG_CPU_IO_MAP(abc_mcu_io)
 
 	MCFG_I8243_ADD("i8243", NULL, digit_w)
@@ -712,6 +1128,7 @@ static MACHINE_CONFIG_START( abc, fidelz80_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO( "mono" )
 	MCFG_SOUND_ADD( "beep", BEEP, 0 )
+	MCFG_SOUND_ADD("speech", S14001A, 25000) // around 25khz
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 MACHINE_CONFIG_END
 
@@ -744,6 +1161,19 @@ ROM_START(uvc)
     ROM_LOAD("101-32107.c4", 0x0000, 0x1000, CRC(F35784F9) SHA1(348E54A7FA1E8091F89AC656B4DA22F28CA2E44D)) // "NEC P9Y019 // D2332C 229 // 101-32107", == vcc-engl.bin on vcc
 ROM_END
 
+ROM_START(vbc)
+    ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("101-64108.bin", 0x0000, 0x2000, CRC(08472223) SHA1(859865B13C908DBB474333263DC60F6A32461141))
+	ROM_LOAD("101-64109.bin", 0x2000, 0x2000, CRC(320AFA0F) SHA1(90EDFE0AC19B108D232CDA376B03A3A24BEFAD4C))
+	ROM_LOAD("101-64110.bin", 0x4000, 0x2000, CRC(3040D0BD) SHA1(CAA55FC8D9196E408FB41E7171A68E5099519813))
+
+    ROM_REGION(0x1000, "mcu", 0)
+    ROM_LOAD("100-1009.bin", 0x0000, 0x0400, CRC(60eb343f) SHA1(8a63e95ebd62e123bdecc330c0484a47c354bd1a))
+	
+    ROM_REGION(0x2000, "speech", 0)
+    ROM_LOAD("101-32118.bin", 0x0000, 0x1000, CRC(A0B8BB8F) SHA1(F56852108928D5C6CACCFC8166FA347D6760A740))
+ROM_END
+
 ROM_START(abc)
     ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("bridge_w.bin", 0x0000, 0x2000, CRC(eb1620ef) SHA1(987a9abc8c685f1a68678ea4ee65ec4a99419179))
@@ -752,6 +1182,9 @@ ROM_START(abc)
 
     ROM_REGION(0x1000, "mcu", 0)
     ROM_LOAD("100-1009.bin", 0x0000, 0x0400, CRC(60eb343f) SHA1(8a63e95ebd62e123bdecc330c0484a47c354bd1a))
+	
+    ROM_REGION(0x2000, "speech", 0)
+    ROM_LOAD("101-32118.bin", 0x0000, 0x1000, CRC(A0B8BB8F) SHA1(F56852108928D5C6CACCFC8166FA347D6760A740))
 ROM_END
 
 /******************************************************************************
@@ -759,8 +1192,9 @@ ROM_END
 ******************************************************************************/
 
 /*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT      COMPANY                     FULLNAME                                                    FLAGS */
-COMP( 1978, cc10,       0,          0,      cc10,  fidelz80, 0,      "Fidelity Electronics",   "Chess Challenger 10",						GAME_NOT_WORKING )
+COMP( 1978, cc10,       0,          0,      cc10,  fidelz80, 0,      "Fidelity Electronics",   "Chess Challenger 10 (Model CC10/BCC)", GAME_NOT_WORKING )
 COMP( 1979, vcc,        0,          0,      vcc,   fidelz80, 0,      "Fidelity Electronics",   "Talking Chess Challenger (model VCC)", GAME_NOT_WORKING )
-COMP( 1980, uvc,        vcc,          0,      vcc,   fidelz80, 0,      "Fidelity Electronics",   "Advanced Talking Chess Challenger (model UVC)", GAME_NOT_WORKING )
-COMP( 1980, abc,        0,          0,      abc,   abc, 	 0,      "Fidelity Electronics",   "Advanced Bridge Challenger (model ABC)",	GAME_NOT_WORKING )
+COMP( 1979, vbc,        0,          0,      abc,   abc,      0,      "Fidelity Electronics",   "Bridge Challenger (model VBC)",	GAME_NOT_WORKING )
+COMP( 1980, uvc,        vcc,        0,      vcc,   fidelz80, 0,      "Fidelity Electronics",   "Advanced Talking Chess Challenger (model UVC)", GAME_NOT_WORKING )
+COMP( 1980, abc,        vbc,        0,      abc,   abc,      0,      "Fidelity Electronics",   "Advanced Bridge Challenger (model ABC)", GAME_NOT_WORKING )
 
