@@ -52,6 +52,12 @@ public:
 	virtual void video_start();
 	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 	
+	DECLARE_READ8_MEMBER( cause_r );
+	DECLARE_WRITE8_MEMBER( task_w );
+	DECLARE_READ8_MEMBER( segment_r );
+	DECLARE_WRITE8_MEMBER( segment_w );
+	DECLARE_READ8_MEMBER( page_r );
+	DECLARE_WRITE8_MEMBER( page_w );
 	DECLARE_WRITE8_MEMBER( fw0_w );
 	DECLARE_WRITE8_MEMBER( fw1_w );
 	DECLARE_WRITE8_MEMBER( en_spec_contr_reg_w );
@@ -61,6 +67,13 @@ public:
 	DECLARE_WRITE8_MEMBER( cio_pb_w );
 	DECLARE_READ8_MEMBER( cio_pc_r );
 	DECLARE_WRITE8_MEMBER( cio_pc_w );
+
+	void bankswitch();
+
+	// memory access controller
+	UINT8 m_task;
+	UINT8 m_segment_ram[0x400];
+	UINT16 m_page_ram[0x400];
 
 	// video
 	UINT8 *m_video_ram;

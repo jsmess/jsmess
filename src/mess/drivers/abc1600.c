@@ -12,8 +12,10 @@
 
 	- memory access controller
 		- task register
+		- cause register (parity error)
 		- segment RAM
 		- page RAM
+		- bankswitching
 		- DMA
 	- video
 		- CRTC
@@ -46,6 +48,205 @@
 #include "machine/z8536.h"
 #include "video/mc6845.h"
 #include "includes/abc1600.h"
+
+
+
+//**************************************************************************
+//  MEMORY ACCESS CONTROLLER
+//**************************************************************************
+
+//-------------------------------------------------
+//  bankswitch -
+//-------------------------------------------------
+
+void abc1600_state::bankswitch()
+{
+}
+
+
+//-------------------------------------------------
+//  cause_r -
+//-------------------------------------------------
+
+READ8_MEMBER( abc1600_state::cause_r )
+{
+	return 0;
+}
+
+
+//-------------------------------------------------
+//  task_w -
+//-------------------------------------------------
+
+WRITE8_MEMBER( abc1600_state::task_w )
+{
+	/*
+	
+		bit		description
+		
+		0		SEGA5
+		1		SEGA6
+		2		SEGA7
+		3		SEGA8
+		4		
+		5		
+		6		BOOTE
+		7		READ_MAGIC
+	
+	*/
+
+	m_task = data;
+
+	bankswitch();
+}
+
+
+//-------------------------------------------------
+//  segment_r -
+//-------------------------------------------------
+
+READ8_MEMBER( abc1600_state::segment_r )
+{
+	/*
+	
+		bit		description
+		
+		0		SEGD0
+		1		SEGD1
+		2		SEGD2
+		3		SEGD3
+		4		SEGD4
+		5		SEGD5
+		6		SEGD6
+		7		READ_MAGIC
+	
+	*/
+
+	UINT16 sega = ((m_task & 0x0f) << 4) | ((offset >> 15) & 0x0f);
+	UINT8 segd = m_segment_ram[sega];
+
+	return (m_task & 0x80) | (segd & 0x7f);
+}
+
+
+//-------------------------------------------------
+//  segment_w -
+//-------------------------------------------------
+
+WRITE8_MEMBER( abc1600_state::segment_w )
+{
+	/*
+	
+		bit		description
+		
+		0		SEGD0
+		1		SEGD1
+		2		SEGD2
+		3		SEGD3
+		4		SEGD4
+		5		SEGD5
+		6		SEGD6
+		7		
+	
+	*/
+
+	UINT16 sega = ((m_task & 0x0f) << 4) | ((offset >> 15) & 0x0f);
+	m_segment_ram[sega] = data & 0x7f;
+
+	bankswitch();
+}
+
+
+//-------------------------------------------------
+//  page_r -
+//-------------------------------------------------
+
+READ8_MEMBER( abc1600_state::page_r )
+{
+	/*
+	
+		bit		description
+		
+		0		X11
+		1		X12
+		2		X13
+		3		X14
+		4		X15
+		5		X16
+		6		X17
+		7		X18
+
+		8		X19
+		9		X20
+		10
+		11
+		12
+		13
+		14		_WP
+		15		NONX
+	
+	*/
+
+	UINT16 sega = ((m_task & 0x0f) << 4) | ((offset >> 15) & 0x0f);
+	UINT8 segd = m_segment_ram[sega];
+
+	UINT16 pagea = (segd << 4) | ((offset >> 11) & 0x0f);
+	UINT16 paged = m_page_ram[pagea];
+
+	int a0 = BIT(offset, 0);
+
+	return a0 ? (paged >> 8) : (paged & 0xff);
+}
+
+
+//-------------------------------------------------
+//  page_w -
+//-------------------------------------------------
+
+WRITE8_MEMBER( abc1600_state::page_w )
+{
+	/*
+	
+		bit		description
+		
+		0		X11
+		1		X12
+		2		X13
+		3		X14
+		4		X15
+		5		X16
+		6		X17
+		7		X18
+
+		8		X19
+		9		X20
+		10
+		11
+		12
+		13
+		14		_WP
+		15		NONX
+	
+	*/
+
+	UINT16 sega = ((m_task & 0x0f) << 4) | ((offset >> 15) & 0x0f);
+	UINT8 segd = m_segment_ram[sega];
+
+	UINT16 pagea = (segd << 4) | ((offset >> 11) & 0x0f);
+
+	int a0 = BIT(offset, 0);
+
+	if (a0)
+	{
+		m_page_ram[pagea] = (data << 8) | (m_page_ram[pagea] & 0xff);
+	}
+	else
+	{
+		m_page_ram[pagea] = (m_page_ram[pagea] & 0xff00) | data;
+	}
+
+	bankswitch();
+}
 
 
 
@@ -134,6 +335,15 @@ WRITE8_MEMBER( abc1600_state::en_spec_contr_reg_w )
 static ADDRESS_MAP_START( abc1600_mem, ADDRESS_SPACE_PROGRAM, 8, abc1600_state )
 	AM_RANGE(0x00000, 0x03fff) AM_ROM AM_REGION(MC68008P8_TAG, 0)
 /*
+
+	Supervisor Data map
+
+	AM_RANGE(0x80000, 0x80001) AM_MIRROR(0x7f800) AM_MASK(0x7f800) AM_READWRITE(page_r, page_w)
+	AM_RANGE(0x80003, 0x80003) AM_MIRROR(0x7f800) AM_MASK(0x7f800) AM_READWRITE(segment_r, segment_w)
+	AM_RANGE(0x80004, 0x80004) AM_READ(cause_r)
+	AM_RANGE(0x80007, 0x80007) AM_WRITE(task_w)
+
+
 	Logical Address Map
 	
 	AM_RANGE(0x000000, 0x0fffff) AM_RAM
@@ -307,7 +517,7 @@ static Z80DART_INTERFACE( dart_intf )
 	DEVCB_NULL,
 	DEVCB_NULL,
 
-	DEVCB_NULL
+	DEVCB_CPU_INPUT_LINE(MC68008P8_TAG, M68K_IRQ_5) // shared with SCC
 };
 
 //-------------------------------------------------
@@ -422,7 +632,7 @@ WRITE8_MEMBER( abc1600_state::cio_pc_w )
 
 static Z8536_INTERFACE( cio_intf )
 {
-	DEVCB_NULL,	// INT
+	DEVCB_CPU_INPUT_LINE(MC68008P8_TAG, M68K_IRQ_2),
 	DEVCB_DRIVER_MEMBER(abc1600_state, cio_pa_r),
 	DEVCB_NULL,
 	DEVCB_DRIVER_MEMBER(abc1600_state, cio_pb_r),
