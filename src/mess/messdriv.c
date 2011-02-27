@@ -615,6 +615,8 @@ const game_driver * const drivers[] =
 
 	/* IBM PC & Clones */
 	DRIVER( ibm5150 )   /* 1981 IBM 5150    */
+	DRIVER( ibm5155 )   /* 1982 IBM 5155    */
+	DRIVER( ibm5140 )   /* 1985 IBM 5140    */
 	DRIVER( dgone )	 /* 1984 Data General/One */
 	DRIVER( pcmda )	 /* 1987 PC with MDA     */
 	DRIVER( pcherc )	/* 1987 PC with Hercules (for testing hercules)  */
@@ -624,6 +626,7 @@ const game_driver * const drivers[] =
 
 	/* PC Junior */
 	DRIVER( ibmpcjr )   /* 1984 IBM PC Jr      */
+	DRIVER( ibmpcjx )   /* 1985 IBM PC JX      */
 	DRIVER( t1000hx )   /* 1987 Tandy 1000 HX (similiar to PCJr)  */
 	DRIVER( t1000sx )   /* 1987 Tandy 1000 SX (similiar to PCJr)  */
 	DRIVER( t1000tx )	/* 1987 Tandy 1000 TX */
