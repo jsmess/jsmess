@@ -1598,7 +1598,9 @@ const game_driver * const drivers[] =
 //  DRIVER( mephisto )  /* Mephisto  */
 	DRIVER( mm2 )       /* Mephisto 2 */
 	DRIVER( mm4 )       /* Mephisto 4       */
+	DRIVER( mm4tk )       /* Mephisto 4 Turbo Kit  */
 	DRIVER( mm5 )       /* Mephisto 5.1 ROM   */
+	DRIVER( mm5tk )       /* Mephisto 5.1 ROM Turbo Kit Speed   */
 	DRIVER( mm50 )      /* Mephisto 5.0 ROM    */
 	DRIVER( rebel5 )    /* Mephisto 5      */
 	DRIVER( glasgow )       /* Glasgow     */
@@ -1609,7 +1611,9 @@ const game_driver * const drivers[] =
 	DRIVER( roma )      /* Roma    */
 	DRIVER( roma32 )    /* Roma  */
     DRIVER( polgar )      /* Polgar    */
+	DRIVER( polgar )      /* Polgar    */
 	DRIVER( milano )      /* Milano    */
+
 
 	/* JAKKS Pacific, Inc. / HotGen, Ltd. */
 	DRIVER( batmantv )	/* The Batman, 2004 */

@@ -53,6 +53,20 @@ $8000-$FFF ROM
 
 */
 
+/*  Mephisto 4 Turbo Kit 18mhz - (mm4tk)
+	This is a replacement rom combining the turbo kit initial rom with the original MM IV.
+	The Turbo Kit powers up to it's tiny rom, copies itself to ram, banks in normal rom,
+	copies that to faster SRAM, then patches the checksum and the LED blink delays.
+	If someone else wants to code up the power up banking, feel free
+
+	There is an undumped MM V Turbo Kit, which will be the exact same except for location of
+	the patches. The mm5tk just needs the normal mm5 ROM swapped out for that one to
+	blinks the LEDs a little slower.
+
+	-- Cowering (2011)
+*/
+
+
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
 // #include "sound/dac.h"
@@ -72,6 +86,7 @@ public:
 	UINT8 led_status;
 	UINT8 *ram;
 	UINT8 led7;
+	UINT8 allowNMI;
 };
 
 
@@ -84,6 +99,13 @@ static WRITE8_HANDLER ( write_lcd )
 	//output_set_digit_value(state->lcd_shift_counter,data ^ state->ram[0x165]);    // 0x109 MM IV // 0x040 MM V
 	state->lcd_shift_counter--;
 	state->lcd_shift_counter&=3;
+}
+
+static WRITE8_HANDLER ( mephisto_NMI )
+{
+
+	mephisto_state *state = space->machine->driver_data<mephisto_state>();
+	state->allowNMI = 1;
 }
 
 static READ8_HANDLER(read_keys)
@@ -157,7 +179,7 @@ static ADDRESS_MAP_START(mephisto_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE( 0x3400, 0x3407) AM_WRITE( write_led )			// Status LEDs+ buzzer
 	AM_RANGE( 0x2400, 0x2407) AM_WRITE ( mboard_write_LED_8 )		// Chessboard
 	AM_RANGE( 0x2800, 0x2800) AM_WRITE ( mboard_write_board_8)		// Chessboard
-	AM_RANGE( 0x3800, 0x3800) AM_RAM						// unknwon write access
+	AM_RANGE( 0x3800, 0x3800) AM_WRITE ( mephisto_NMI )			// NMI enable
 	AM_RANGE( 0x3000, 0x3000) AM_READ( mboard_read_board_8 )		// Chessboard
 	AM_RANGE( 0x4000, 0x7fff) AM_ROM						// Opening Library
 	AM_RANGE( 0x8000, 0xffff) AM_ROM
@@ -320,8 +342,10 @@ static TIMER_DEVICE_CALLBACK( update_nmi )
 {
 	mephisto_state *state = timer.machine->driver_data<mephisto_state>();
 	device_t *speaker = timer.machine->device("beep");
-	cputag_set_input_line(timer.machine, "maincpu", INPUT_LINE_NMI,PULSE_LINE);
-	// dac_data_w(0,state->led_status&64?128:0);
+	if (state->allowNMI) {
+		state->allowNMI = 0;
+		cputag_set_input_line(timer.machine, "maincpu", INPUT_LINE_NMI,PULSE_LINE);
+	}
 	beep_set_state(speaker,state->led_status&64?1:0);
 }
 
@@ -339,7 +363,7 @@ static MACHINE_START( mephisto )
 {
 	mephisto_state *state = machine->driver_data<mephisto_state>();
 	state->lcd_shift_counter=3;
-
+	state->allowNMI = 1;
 	mboard_savestate_register(machine);
 }
 
@@ -357,7 +381,7 @@ static MACHINE_RESET( mephisto )
 {
 	mephisto_state *state = machine->driver_data<mephisto_state>();
 	state->lcd_shift_counter = 3;
-
+	state->allowNMI = 1;
 	mboard_set_border_pieces();
 	mboard_set_board();
 
@@ -367,6 +391,10 @@ static MACHINE_RESET( mephisto )
 		output_set_value("MM",1);
 	else if (!strcmp(machine->m_game.name,"mm4") )
 		output_set_value("MM",2);
+	else if (!strcmp(machine->m_game.name,"mm4tk") )
+		output_set_value("MM",5);
+	else if (!strcmp(machine->m_game.name,"mm5tk") )
+		output_set_value("MM",5);
 	else if (!strcmp(machine->m_game.name,"mm5") )
 		output_set_value("MM",3);
 	else if (!strcmp(machine->m_game.name,"mm50") )
@@ -398,14 +426,12 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( rebel5, mephisto )
 	/* basic machine hardware */
-//  MCFG_IMPORT_FROM( mephisto )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(rebel5_mem)
 	//beep_set_frequency(0, 4000);
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mm2, mephisto )
-//  MCFG_IMPORT_FROM( mephisto )
 	MCFG_CPU_REPLACE("maincpu", M65C02, 3700000)
 	MCFG_CPU_PROGRAM_MAP(mm2_mem)
 	MCFG_MACHINE_START( mm2 )
@@ -414,6 +440,11 @@ static MACHINE_CONFIG_DERIVED( mm2, mephisto )
 	MCFG_TIMER_ADD_PERIODIC("irq_timer", update_irq, attotime::from_hz(450))
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( mm4tk, mephisto )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_REPLACE("maincpu", M65C02, 18000000)
+	MCFG_CPU_PROGRAM_MAP(mephisto_mem)
+MACHINE_CONFIG_END
 
 ROM_START(rebel5)
 	ROM_REGION(0x10000,"maincpu",0)
@@ -432,6 +463,22 @@ ROM_START(mm4)
 	ROM_SYSTEM_BIOS( 0, "none", "No Opening Library" )
 	ROM_SYSTEM_BIOS( 1, "hg440", "HG440 Opening Library" )
 	ROMX_LOAD( "hg440.rom", 0x4000, 0x4000, CRC(81ffcdfd) SHA1(b0f7bcc11d1e821daf92cde31e3446c8be0bbe19), ROM_BIOS(2))
+ROM_END
+
+ROM_START(mm4tk)
+	ROM_REGION(0x10000,"maincpu",0)
+	ROM_LOAD("mm4tk.rom", 0x8000, 0x8000, CRC(51cb36a4) SHA1(9e184b4e85bb721e794b88d8657ae8d2ff5a24af))
+	ROM_SYSTEM_BIOS( 0, "none", "No Opening Library" )
+	ROM_SYSTEM_BIOS( 1, "hg440", "HG440 Opening Library" )
+	ROMX_LOAD( "hg440.rom", 0x4000, 0x4000, CRC(81ffcdfd) SHA1(b0f7bcc11d1e821daf92cde31e3446c8be0bbe19), ROM_BIOS(0))
+ROM_END
+
+ROM_START(mm5tk)
+	ROM_REGION(0x10000,"maincpu",0)
+	ROM_LOAD("mephisto5.rom", 0x8000, 0x8000, CRC(89c3d9d2) SHA1(77cd6f8eeb03c713249db140d2541e3264328048))
+	ROM_SYSTEM_BIOS( 0, "none", "No Opening Library" )
+	ROM_SYSTEM_BIOS( 1, "hg550", "HG550 Opening Library" )
+	ROMX_LOAD("hg550.rom", 0x4000, 0x4000, CRC(0359f13d) SHA1(833cef8302ad8d283d3f95b1d325353c7e3b8614),ROM_BIOS(0))
 ROM_END
 
 ROM_START(mm5)
@@ -466,7 +513,9 @@ static DRIVER_INIT( mephisto )
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT        COMPANY             FULLNAME                            FLAGS */
 
 CONS( 1987, mm4,        0,      0,      mephisto,   mephisto,   mephisto,   "Hegener & Glaser", "Mephisto 4 Schach Computer",       GAME_SUPPORTS_SAVE )
+CONS( 1987, mm4tk,      mm4,    0,      mm4tk,      mephisto,   mephisto,   "Hegener & Glaser", "Mephisto 4 Schach Computer Turbo Kit + HG440",       GAME_SUPPORTS_SAVE )
 CONS( 1990, mm5,        mm4,	0,      mephisto,   mephisto,   mephisto,   "Hegener & Glaser", "Mephisto 5.1 Schach Computer",     GAME_SUPPORTS_SAVE )
+CONS( 1990, mm5tk,      mm4,    0,      mm4tk,      mephisto,   mephisto,   "Hegener & Glaser", "Mephisto 5.1 Schach Computer Turbo Kit + HG550",       GAME_SUPPORTS_SAVE )
 CONS( 1990, mm50,       mm4,	0,      mephisto,   mephisto,   mephisto,   "Hegener & Glaser", "Mephisto 5.0 Schach Computer",     GAME_SUPPORTS_SAVE )
 CONS( 1986, rebel5,     mm4,	0,      rebel5,     mephisto,   mephisto,   "Hegener & Glaser", "Mephisto Rebel 5 Schach Computer", GAME_SUPPORTS_SAVE )
 CONS( 1984, mm2,        mm4,	0,      mm2,        mephisto,   mephisto,   "Hegener & Glaser", "Mephisto MM2 Schach Computer",     GAME_SUPPORTS_SAVE )
