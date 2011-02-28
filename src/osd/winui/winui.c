@@ -5897,6 +5897,7 @@ static void ToggleScreenShot(void)
 
 static void ToggleSoftware(void)
 {
+#ifdef MESS
 	BOOL showSoftware = GetShowSoftware();
 
 	SetShowSoftware((showSoftware) ? FALSE : TRUE);
@@ -5905,6 +5906,7 @@ static void ToggleSoftware(void)
 	/* Redraw list view */
 	if (hBackground != NULL && showSoftware)
 		InvalidateRect(hwndList, NULL, FALSE);
+#endif		
 }
 
 static void AdjustMetrics(void)

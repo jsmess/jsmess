@@ -131,9 +131,9 @@ extern const DIRECTORYINFO g_directoryInfo[] =
 
 extern const SPLITTERINFO g_splitterInfo[] =
 {
-	{ 0.2,	IDC_SPLITTER,	IDC_TREE,	IDC_LIST,		AdjustSplitter1Rect },
-	{ 0.4,	IDC_SPLITTER2,	IDC_LIST,	IDC_SWLIST,		AdjustSplitter1Rect },
-	{ 0.6,	IDC_SPLITTER3,	IDC_SWTAB,	IDC_SSFRAME,	AdjustSplitter2Rect },
+	{ 0.25,	IDC_SPLITTER,	IDC_TREE,	IDC_LIST,		AdjustSplitter1Rect },
+//	{ 0.4,	IDC_SPLITTER2,	IDC_LIST,	IDC_SWTAB,		AdjustSplitter1Rect },
+	{ 0.5,	IDC_SPLITTER2,	IDC_LIST,	IDC_SSFRAME,	AdjustSplitter2Rect },
 	{ -1 }
 };
 
