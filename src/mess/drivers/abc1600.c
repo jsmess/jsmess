@@ -358,8 +358,8 @@ WRITE8_MEMBER( abc1600_state::page_w )
 inline offs_t abc1600_state::get_dma_address(int index, UINT16 offset)
 {
 	// A0 = DMA15, A1 = BA1, A2 = BA2
-	UINT8 dmamap_addr = (index << 1) | BIT(offset, 15);
-	UINT8 dmamap = m_dmamap[dmamap_addr & 0x07];
+	UINT8 dmamap_addr = index | BIT(offset, 15);
+	UINT8 dmamap = m_dmamap[dmamap_addr];
 
 	return ((dmamap & 0x1f) << 16) | offset;
 }
