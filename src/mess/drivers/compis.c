@@ -351,6 +351,9 @@ static GFXDECODE_START( compis )
 	GFXDECODE_ENTRY( "bios", 0x0000, compis_charlayout, 1, 7 )
 GFXDECODE_END
 
+static ADDRESS_MAP_START( upd7220_map, 0, 16 )
+	AM_RANGE(0x00000, 0x3ffff) AM_DEVREADWRITE("upd7220",upd7220_vram_r,upd7220_vram_w)
+ADDRESS_MAP_END
 
 static MACHINE_CONFIG_START( compis, compis_state )
 	/* basic machine hardware */

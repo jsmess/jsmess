@@ -151,8 +151,7 @@ static ADDRESS_MAP_START( mm1m6_map, ADDRESS_SPACE_PROGRAM, 8, mm1_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mm1_upd7220_map, 0, 16, mm1_state )
-	AM_RANGE(0x00000, 0x07fff) AM_RAM
-	AM_RANGE(0x08000, 0x3ffff) AM_UNMAP // wrong
+	AM_RANGE(0x00000, 0x3ffff) AM_DEVREADWRITE_LEGACY(UPD7220_TAG,upd7220_vram_r,upd7220_vram_w)
 ADDRESS_MAP_END
 
 /* Input Ports */

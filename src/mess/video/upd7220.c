@@ -1406,23 +1406,19 @@ ROM_END
     ADDRESS_MAP( upd7220 )
 -------------------------------------------------*/
 
-static READ16_HANDLER( upd7220_vram_r )
+READ16_DEVICE_HANDLER( upd7220_vram_r )
 {
-	upd7220_t *upd7220 = get_safe_token(space->cpu);
+	upd7220_t *upd7220 = get_safe_token(device);
 
 	return upd7220->vram[offset];
 }
 
-static WRITE16_HANDLER( upd7220_vram_w )
+WRITE16_DEVICE_HANDLER( upd7220_vram_w )
 {
-	upd7220_t *upd7220 = get_safe_token(space->cpu);
+	upd7220_t *upd7220 = get_safe_token(device);
 
 	COMBINE_DATA(&upd7220->vram[offset]);
 }
-
-ADDRESS_MAP_START( upd7220_map, 0, 16 )
-	AM_RANGE(0x00000, 0x3ffff) AM_READWRITE(upd7220_vram_r,upd7220_vram_w)
-ADDRESS_MAP_END
 
 /*-------------------------------------------------
     DEVICE_START( upd7220 )
@@ -1518,7 +1514,7 @@ DEVICE_GET_INFO( upd7220 )
 		case DEVINFO_PTR_ROM_REGION:					info->romregion = ROM_NAME(upd7220);				break;
 
 		/* --- the following bits of info are returned as pointers to data --- */
-		case DEVINFO_PTR_DEFAULT_MEMORY_MAP_0:			info->default_map16 = ADDRESS_MAP_NAME(upd7220_map);break;
+		//case DEVINFO_PTR_DEFAULT_MEMORY_MAP_0:			info->default_map16 = ADDRESS_MAP_NAME(upd7220_map);break;
 
 		/* --- the following bits of info are returned as pointers to functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(upd7220);			break;

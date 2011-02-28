@@ -40,7 +40,7 @@
 ***************************************************************************/
 
 DECLARE_LEGACY_MEMORY_DEVICE(UPD7220, upd7220);
-ADDRESS_MAP_EXTERN( upd7220_map,16 );
+//ADDRESS_MAP_EXTERN( upd7220_map,16 );
 
 #define MCFG_UPD7220_ADD(_tag, _clock, _config, _map) \
 	MCFG_DEVICE_ADD(_tag, UPD7220, _clock) \
@@ -91,6 +91,8 @@ READ8_DEVICE_HANDLER( upd7220_r );
 /* register write */
 WRITE8_DEVICE_HANDLER( upd7220_w );
 WRITE8_DEVICE_HANDLER( upd7220_bank_w );
+READ16_DEVICE_HANDLER( upd7220_vram_r );
+WRITE16_DEVICE_HANDLER( upd7220_vram_w );
 
 /* dma acknowledge */
 READ8_DEVICE_HANDLER( upd7220_dack_r );

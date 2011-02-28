@@ -968,6 +968,10 @@ static PALETTE_INIT( gdc )
 	// ...
 }
 
+static ADDRESS_MAP_START( upd7220_map, 0, 16 )
+	AM_RANGE(0x00000, 0x3ffff) AM_DEVREADWRITE("upd7220",upd7220_vram_r,upd7220_vram_w)
+ADDRESS_MAP_END
+
 
 static MACHINE_CONFIG_START( qx10, qx10_state )
 	/* basic machine hardware */
