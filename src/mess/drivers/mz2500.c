@@ -2155,7 +2155,7 @@ ROM_START( mz2520 )
 	ROM_REGION( 0x100000, "emm", ROMREGION_ERASEFF )
 
 	ROM_REGION( 0x08000, "ipl", 0 )
-	ROM_LOAD( "ipl.rom", 0x00000, 0x8000, CRC(0a126eb2) SHA1(faf71236b3ad82d30184adea951d43d10ced663d) )
+	ROM_LOAD( "ipl2520.rom", 0x00000, 0x8000, CRC(0a126eb2) SHA1(faf71236b3ad82d30184adea951d43d10ced663d) )
 
 	/* this is probably an hand made ROM, will be removed in the end ...*/
 	ROM_REGION( 0x1000, "cgrom", 0 )
