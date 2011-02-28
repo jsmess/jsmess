@@ -22,13 +22,22 @@
 #include "machine/pic8259.h"
 #include "machine/upd765.h"
 #include "sound/beep.h"
+#include "video/upd7220.h"
 #include "imagedev/flopdrv.h"
 
 class pc9801_state : public driver_device
 {
 public:
 	pc9801_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+		: driver_device(machine, config),
+		  m_hgdc(*this, "upd7220_chr")
+		{ }
+
+	required_device<device_t> m_hgdc;
+
+	virtual void video_start();
+	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
+	UINT8 *m_char_rom;
 
 	UINT8 portb_tmp;
 	int dma_channel;
@@ -39,7 +48,7 @@ public:
 	UINT8 video_ff[8];
 	UINT8 pal_clut[4];
 
-	UINT16 *tvram;
+	UINT8 *tvram;
 
 	UINT16 font_addr;
 	UINT8 font_line;
@@ -57,80 +66,164 @@ public:
 #define MEMSW_REG   6
 #define DISPLAY_REG 7
 
-static VIDEO_START( pc9801 )
-{
-	pc9801_state *state = machine->driver_data<pc9801_state>();
 
-	state->tvram = auto_alloc_array(machine, UINT16, 0x2000*2);
+void pc9801_state::video_start()
+{
+	//pc9801_state *state = machine->driver_data<pc9801_state>();
+
+	tvram = auto_alloc_array(machine, UINT8, 0x4000);
+
+	// find memory regions
+	m_char_rom = machine->region("chargen")->base();
+
+	VIDEO_START_CALL(generic_bitmapped);
 }
 
-static SCREEN_UPDATE( pc9801 )
+bool pc9801_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
-	pc9801_state *state = screen->machine->driver_data<pc9801_state>();
-	int x,y;
-	int xi,yi;
-	UINT8 *gfx_rom = screen->machine->region("chargen")->base();
-	int x_width;
+	bitmap_fill(&bitmap, &cliprect, 0);
 
-	bitmap_fill(bitmap, cliprect, screen->machine->pens[8]);
+	/* graphics */
+	upd7220_update(m_hgdc, &bitmap, &cliprect);
+
+	return 0;
+}
+
+static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
+{
+	// ...
+}
+
+static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
+{
+	pc9801_state *state = device->machine->driver_data<pc9801_state>();
+	int xi,yi;
+	int x;
 
 	if(state->video_ff[DISPLAY_REG] == 0) //screen is off
-		return 0;
+		return;
 
-	x_width = state->video_ff[WIDTH40_REG] ? 40 : 80;
-
-	for(y=0;y<25;y++)
+	for(x=0;x<pitch;x++)
 	{
-		for(x=0;x<x_width;x++)
+		UINT8 tile_data,secret,reverse,u_line,v_line;
+		UINT8 color;
+		UINT8 tile,attr,pen;
+
+		tile = vram[addr+(x*(state->video_ff[WIDTH40_REG]+1))] & 0xff;
+		attr = (vram[addr+(x*(state->video_ff[WIDTH40_REG]+1))] & 0xff00) >> 8;
+
+		secret = (attr & 1) ^ 1;
+		//blink = attr & 2;
+		reverse = attr & 4;
+		u_line = attr & 8;
+		v_line = attr & 0x10;
+		color = (attr & 0xe0) >> 5;
+
+		for(yi=0;yi<lr;yi++)
 		{
-			UINT8 tile,attr,pen;
-			UINT8 secret,reverse,color,u_line,v_line;
-
-			tile = state->tvram[(x+y*x_width)*(state->video_ff[WIDTH40_REG]+1)] & 0xff;
-			attr = state->tvram[(x+y*x_width)*(state->video_ff[WIDTH40_REG]+1)+0x1000] & 0xff;
-			secret = (attr & 1) ^ 1;
-			//blink = attr & 2;
-			reverse = attr & 4;
-			u_line = attr & 8;
-			v_line = attr & 0x10;
-			color = (attr & 0xe0) >> 5;
-
-			for(yi=0;yi<8;yi++)
+			for(xi=0;xi<8;xi++)
 			{
-				for(xi=0;xi<8;xi++)
+				int res_x,res_y;
+
+				res_x = (x*8+xi) * (state->video_ff[WIDTH40_REG]+1);
+				res_y = y*8+yi;
+
+				if(res_x > 640 || res_y > 200) //TODO
+					continue;
+
+				tile_data = secret ? 0 : (state->m_char_rom[tile*8+yi]);
+
+				if(reverse) { tile_data^=0xff; }
+				if(u_line && yi == 7) { tile_data = 0xff; }
+				if(v_line)	{ tile_data|=8; }
+
+				if(yi >= 8)
+					pen = 0;
+				else
+					pen = (tile_data >> (7-xi) & 1) ? color : 0;
+
+				if(pen)
+					*BITMAP_ADDR16(bitmap, res_y, res_x) = pen;
+				if(state->video_ff[WIDTH40_REG])
 				{
-					int res_x,res_y;
-					UINT8 tile_data;
-
-					res_x = (x*8+xi)*(state->video_ff[WIDTH40_REG]+1);
-					res_y = y*8+yi;
-
-					if((res_x)>screen->machine->primary_screen->visible_area().max_x || (res_y)>screen->machine->primary_screen->visible_area().max_y)
+					if(res_x+1 > 640 || res_y > 200) //TODO
 						continue;
 
-					tile_data = secret ? 0 : (gfx_rom[tile*8+yi]);
-
-					if(reverse) { tile_data^=0xff; }
-					if(u_line && yi == 7) { tile_data = 0xff; }
-					if(v_line)	{ tile_data|=8; }
-
-					pen =  (tile_data >> (7-xi) & 1) ? color : 0;
-
-					*BITMAP_ADDR16(bitmap, res_y, res_x) = screen->machine->pens[pen];
-					if(state->video_ff[WIDTH40_REG])
-					{
-						if((res_x+1)>screen->machine->primary_screen->visible_area().max_x || (res_y)>screen->machine->primary_screen->visible_area().max_y)
-							continue;
-
-						*BITMAP_ADDR16(bitmap, res_y, res_x+1) = screen->machine->pens[pen];
-					}
+					*BITMAP_ADDR16(bitmap, res_y, res_x+1) = pen;
 				}
 			}
 		}
 	}
 
-	return 0;
+	/* old code, for reference */
+	#if 0
+	printf("%d %d\n",y,lr);
+
+	x_width = state->video_ff[WIDTH40_REG] ? 40 : 80;
+
+	for(x=0;x<x_width;x++)
+	{
+		UINT8 tile,attr,pen;
+		UINT8 secret,reverse,color,u_line,v_line;
+
+		tile = vram[(addr+x)*(state->video_ff[WIDTH40_REG]+1)] & 0xff;
+		attr = (vram[(addr+x)*(state->video_ff[WIDTH40_REG]+1)] & 0xff00) >> 8;
+		secret = (attr & 1) ^ 1;
+		//blink = attr & 2;
+		reverse = attr & 4;
+		u_line = attr & 8;
+		v_line = attr & 0x10;
+		color = (attr & 0xe0) >> 5;
+
+		for(yi=0;yi<lr;yi++)
+		{
+			for(xi=0;xi<8;xi++)
+			{
+				int res_x,res_y;
+				UINT8 tile_data;
+
+				res_x = (x*8+xi)*(state->video_ff[WIDTH40_REG]+1);
+				res_y = y*8+yi;
+
+				if(res_x > screen_max_x || res_y > screen_max_y)
+					continue;
+
+				tile_data = secret ? 0 : (state->m_char_rom[tile*8+yi]);
+
+				if(reverse) { tile_data^=0xff; }
+				if(u_line && yi == 7) { tile_data = 0xff; }
+				if(v_line)	{ tile_data|=8; }
+
+				if(yi >= 16)
+					pen = 0;
+				else
+					pen = (tile_data >> (7-xi) & 1) ? color : 0;
+
+				*BITMAP_ADDR16(bitmap, res_y, res_x) = pen;
+				if(state->video_ff[WIDTH40_REG])
+				{
+					if(res_x+1 > screen_max_x || res_y > screen_max_y)
+						continue;
+
+					*BITMAP_ADDR16(bitmap, res_y, res_x+1) = pen;
+				}
+			}
+		}
+	}
+	#endif
 }
+
+
+static UPD7220_INTERFACE( hgdc_intf )
+{
+	"screen",
+	hgdc_display_pixels, //TODO: needs NULL
+	hgdc_draw_text,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
 
 #if 0
 static READ8_HANDLER( pc9801_xx_r )
@@ -312,9 +405,7 @@ static READ8_HANDLER( pc9801_60_r )
 {
 	if((offset & 1) == 0)
 	{
-		UINT8 vsync = input_port_read(space->machine, "VBLANK") & 0x20;
-
-		return 4 | vsync; // upd7220 character port
+		return upd7220_r(space->machine->device("upd7220_chr"),(offset & 2) >> 1); // upd7220 character port
 	}
 	else // odd
 	{
@@ -327,7 +418,7 @@ static WRITE8_HANDLER( pc9801_60_w )
 {
 	if((offset & 1) == 0)
 	{
-		// upd7220 character ports
+		upd7220_w(space->machine->device("upd7220_chr"),(offset & 2) >> 1,data); // upd7220 character port
 	}
 	else // odd
 	{
@@ -601,20 +692,32 @@ static WRITE8_HANDLER( pc9801_fdc_2dd_w )
 }
 
 
-/* TODO: banking */
+/* TODO: banking? */
 static READ16_HANDLER( pc9801_tvram_r )
 {
-	pc9801_state *state = space->machine->driver_data<pc9801_state>();
+	//pc9801_state *state = space->machine->driver_data<pc9801_state>();
+	UINT8 res;
 
-	return state->tvram[offset] | ((offset & 0x1000) ? 0xff00 : 0x0000);
+	if(offset & 0x1000)
+		res = upd7220_vram_r(space->machine->device("upd7220_chr"),((offset & 0x0fff) >> 0),0xffff) >> 8;
+	else
+		res = upd7220_vram_r(space->machine->device("upd7220_chr"),((offset & 0x0fff) >> 0),0xffff) & 0xff;
+
+	return res | ((offset & 0x1000) ? 0xff00 : 0x00);
 }
 
 static WRITE16_HANDLER( pc9801_tvram_w )
 {
 	pc9801_state *state = space->machine->driver_data<pc9801_state>();
+	UINT16 write_vram;
 
-	if(offset < (0x3fe0/2) || state->video_ff[MEMSW_REG])
-		COMBINE_DATA(&state->tvram[offset]);
+	if(offset < (0x3fe2/2) || state->video_ff[MEMSW_REG])
+		COMBINE_DATA(&state->tvram[offset]); //TODO: remove this
+
+	write_vram = (state->tvram[(offset & 0x0fff)] & 0xff);
+	write_vram|= (state->tvram[(offset & 0x0fff) | 0x1000] << 8);
+
+	upd7220_vram_w(space->machine->device("upd7220_chr"),(offset & 0x0fff), write_vram,0xffff);
 }
 
 static ADDRESS_MAP_START( pc9801_map, ADDRESS_SPACE_PROGRAM, 16)
@@ -645,6 +748,11 @@ static ADDRESS_MAP_START( pc9801_io, ADDRESS_SPACE_IO, 16)
 	AM_RANGE(0x00c8, 0x00cd) AM_READWRITE8(pc9801_fdc_2dd_r,pc9801_fdc_2dd_w,0xffff) //upd765a 2dd / <undefined>
 //  AM_RANGE(0x0188, 0x018b) ym2203 opn / <undefined>
 ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( upd7220_map, 0, 16 )
+	AM_RANGE(0x00000, 0x3ffff) AM_DEVREADWRITE("upd7220_chr",upd7220_vram_r,upd7220_vram_w)
+ADDRESS_MAP_END
+
 
 /* keyboard code */
 /* TODO: key repeat, key modifiers, remove port impulse! */
@@ -1244,13 +1352,13 @@ static MACHINE_CONFIG_START( pc9801, pc9801_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
-	MCFG_SCREEN_UPDATE(pc9801)
+
+	MCFG_UPD7220_ADD("upd7220_chr", 5000000/2, hgdc_intf, upd7220_map)
+//	MCFG_UPD7220_ADD("upd7220_bm", 5000000/2, hgdc_intf, upd7220_map)
 
 	MCFG_PALETTE_LENGTH(16)
 	MCFG_PALETTE_INIT(pc9801)
 	MCFG_GFXDECODE(pc9801)
-
-	MCFG_VIDEO_START(pc9801)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

@@ -1514,7 +1514,7 @@ DEVICE_GET_INFO( upd7220 )
 		case DEVINFO_PTR_ROM_REGION:					info->romregion = ROM_NAME(upd7220);				break;
 
 		/* --- the following bits of info are returned as pointers to data --- */
-		//case DEVINFO_PTR_DEFAULT_MEMORY_MAP_0:			info->default_map16 = ADDRESS_MAP_NAME(upd7220_map);break;
+		case DEVINFO_PTR_DEFAULT_MEMORY_MAP_0:			info->default_map16 = NULL; 						break;
 
 		/* --- the following bits of info are returned as pointers to functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(upd7220);			break;
