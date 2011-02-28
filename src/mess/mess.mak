@@ -1707,6 +1707,7 @@ $(MESSOBJ)/wavemate.a:			\
 
 $(MESSOBJ)/xerox.a:				\
 	$(MESS_DRIVERS)/xerox820.o	\
+	$(MESS_DRIVERS)/bigbord2.o	\
 
 $(MESSOBJ)/zvt.a:				\
 	$(MESS_DRIVERS)/pp01.o		\
