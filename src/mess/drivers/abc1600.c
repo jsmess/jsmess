@@ -20,6 +20,7 @@
 	- video
 		- CRTC
 		- bitmap layer
+		- "mover" (blitter)
 		- monitor portrait/landscape mode
     - CIO (interrupt controller)
 		- RTC
@@ -31,23 +32,32 @@
 
 */
 
-#define ADDRESS_MAP_MODERN
-
-#include "emu.h"
-#include "cpu/m68000/m68000.h"
-#include "imagedev/flopdrv.h"
-#include "machine/ram.h"
-#include "machine/8530scc.h"
-#include "machine/abc99.h"
-#include "machine/e0516.h"
-#include "machine/nmc9306.h"
-#include "machine/s1410.h"
-#include "machine/wd17xx.h"
-#include "machine/z80dart.h"
-#include "machine/z80dma.h"
-#include "machine/z8536.h"
-#include "video/mc6845.h"
 #include "includes/abc1600.h"
+
+
+
+//**************************************************************************
+//  CONSTANTS / MACROS
+//**************************************************************************
+
+// DMA
+#define A0 BIT(addr, 0)
+#define A7 BIT(addr, 7)
+#define A2_A1_A0 (addr & 0x07)
+#define A1_A2 ((BIT(addr, 1) << 1) | BIT(addr, 2))
+#define A2_A1 ((addr >> 1) & 0x03)
+
+
+// DMA map
+enum
+{
+	DMAMAP_R2_LO = 0,
+	DMAMAP_R2_HI,
+	DMAMAP_R1_LO,
+	DMAMAP_R1_HI,
+	DMAMAP_R0_LO,
+	DMAMAP_R0_HI
+};
 
 
 
@@ -249,6 +259,217 @@ WRITE8_MEMBER( abc1600_state::page_w )
 }
 
 
+//**************************************************************************
+//  DMA
+//**************************************************************************
+
+//-------------------------------------------------
+//  get_dma_address - 
+//-------------------------------------------------
+
+inline offs_t abc1600_state::get_dma_address(int index, UINT16 offset)
+{
+	// A0 = DMA15, A1 = BA1, A2 = BA2
+	UINT8 dmamap_addr = (index << 1) | BIT(offset, 15);
+	UINT8 dmamap = m_dmamap[dmamap_addr];
+
+	return ((dmamap & 0x1f) << 16) | offset;
+}
+
+
+//-------------------------------------------------
+//  dma_mreq_r - DMA memory read
+//-------------------------------------------------
+
+inline UINT8 abc1600_state::dma_mreq_r(int index, UINT16 offset)
+{
+	offs_t addr = get_dma_address(index, offset);
+	UINT8 data = 0;
+	
+	if (addr < 0x100000)
+	{
+		UINT8 *ram = ram_get_ptr(m_ram);
+		data = ram[addr];
+	}
+	else if (addr <= 0x180000)
+	{
+		data = m_video_ram[addr - 0x100000];
+	}
+	
+	return data;
+}
+
+
+//-------------------------------------------------
+//  dma_mreq_w - DMA memory write
+//-------------------------------------------------
+
+inline void abc1600_state::dma_mreq_w(int index, UINT16 offset, UINT8 data)
+{
+	offs_t addr = get_dma_address(index, offset);
+	
+	if (addr < 0x100000)
+	{
+		UINT8 *ram = ram_get_ptr(m_ram);
+		ram[addr] = data;
+	}
+	else if (addr <= 0x180000)
+	{
+		m_video_ram[addr - 0x100000] = data;
+	}
+}
+
+
+//-------------------------------------------------
+//  dma_iorq_r - DMA I/O read
+//-------------------------------------------------
+
+inline UINT8 abc1600_state::dma_iorq_r(int index, UINT16 offset)
+{
+	address_space *space = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);
+	offs_t addr = get_dma_address(index, offset);
+	UINT8 data = 0;
+	
+	if (addr >= 0x1ff000 && addr < 0x1ff100)
+	{
+		data = wd17xx_r(m_fdc, A2_A1);
+	}
+	else if (addr >= 0x1ff100 && addr < 0x1ff200)
+	{
+		if (A0) data = mc6845_register_r(m_crtc, 0);
+	}
+	else if (addr >= 0x1ff200 && addr < 0x1ff300)
+	{
+		data = z80dart_ba_cd_r(m_dart, A2_A1);
+	}
+	else if (addr >= 0x1ff300 && addr < 0x1ff400)
+	{
+		data = m_dma0->read();
+	}
+	else if (addr >= 0x1ff400 && addr < 0x1ff500)
+	{
+		data = m_dma1->read();
+	}
+	else if (addr >= 0x1ff500 && addr < 0x1ff600)
+	{
+		data = m_dma2->read();
+	}
+	else if (addr >= 0x1ff600 && addr < 0x1ff700)
+	{
+		data = scc8530_r(m_scc, A1_A2);
+	}
+	else if (addr >= 0x1ff700 && addr < 0x1ff800)
+	{
+		data = m_cio->read(*space, A2_A1);
+	}
+	else if (addr >= 0x1ff800 && addr < 0x1ff900)
+	{
+		data = iord0_r(*space, offset);
+	}
+
+	return 0;
+}
+
+
+//-------------------------------------------------
+//  dma_iorq_w - DMA I/O write
+//-------------------------------------------------
+
+inline void abc1600_state::dma_iorq_w(int index, UINT16 offset, UINT8 data)
+{
+	address_space *space = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);
+	offs_t addr = get_dma_address(index, offset);
+
+	if (addr >= 0x1ff000 && addr < 0x1ff100)
+	{
+		wd17xx_w(m_fdc, A2_A1, data);
+	}
+	else if (addr >= 0x1ff100 && addr < 0x1ff200)
+	{
+		if (A0)
+			mc6845_register_w(m_crtc, 0, data);
+		else
+			mc6845_address_w(m_crtc, 0, data);
+	}
+	else if (addr >= 0x1ff200 && addr < 0x1ff300)
+	{
+		z80dart_ba_cd_w(m_dart, A2_A1, data);
+	}
+	else if (addr >= 0x1ff300 && addr < 0x1ff400)
+	{
+		m_dma0->write(data);
+	}
+	else if (addr >= 0x1ff400 && addr < 0x1ff500)
+	{
+		m_dma1->write(data);
+	}
+	else if (addr >= 0x1ff500 && addr < 0x1ff600)
+	{
+		m_dma2->write(data);
+	}
+	else if (addr >= 0x1ff600 && addr < 0x1ff700)
+	{
+		scc8530_w(m_scc, A1_A2, data);
+	}
+	else if (addr >= 0x1ff700 && addr < 0x1ff800)
+	{
+		m_cio->write(*space, A2_A1, data);
+	}
+	else if (addr >= 0x1ff800 && addr < 0x1ff900)
+	{
+		iowr0_w(*space, A2_A1_A0, data);
+	}
+	else if (addr >= 0x1ff900 && addr < 0x1ffa00)
+	{
+		iowr1_w(*space, A2_A1_A0, data);
+	}
+	else if (addr >= 0x1ffa00 && addr < 0x1ffb00)
+	{
+		iowr2_w(*space, A2_A1_A0, data);
+	}
+	else if (addr >= 0x1ffb00 && addr < 0x1ffc00)
+	{
+		if (!A7 && A0)
+			fw1_w(*space, 0, data);
+		else
+			fw0_w(*space, 0, data);
+	}
+	else if (addr >= 0x1ffd00 && addr < 0x1ffe00)
+	{
+		dmamap_w(*space, A2_A1_A0, data);
+	}
+	else if (addr >= 0x1ffe00 && addr < 0x1fff00)
+	{
+		en_spec_contr_reg_w(*space, 0, data);
+	}
+}
+
+
+//-------------------------------------------------
+//  dmamap_w - DMA map write
+//-------------------------------------------------
+
+WRITE8_MEMBER( abc1600_state::dmamap_w )
+{
+	/*
+	
+		bit		description
+		
+		0		X16
+		1		X17
+		2		X18
+		3		X19
+		4		X20
+		5		
+		6		
+		7		_R/W
+	
+	*/
+	
+	m_dmamap[offset] = data;
+}
+
+
 
 //**************************************************************************
 //  READ/WRITE HANDLERS
@@ -274,6 +495,14 @@ WRITE8_MEMBER( abc1600_state::fw0_w )
 		7		
 	
 	*/
+
+	// drive select
+	if (BIT(data, 0)) wd17xx_set_drive(m_fdc, 0);
+//	if (BIT(data, 1)) wd17xx_set_drive(m_fdc, 1);
+//	if (BIT(data, 2)) wd17xx_set_drive(m_fdc, 2);
+	
+	// floppy motor
+	floppy_mon_w(m_floppy, !BIT(data, 3));
 }
 
 
@@ -297,6 +526,12 @@ WRITE8_MEMBER( abc1600_state::fw1_w )
 		7		P2
 	
 	*/
+	
+	// FDC master reset
+	wd17xx_mr_w(m_fdc, BIT(data, 0));
+	
+	// density select
+	wd17xx_dden_w(m_fdc, BIT(data, 1));
 }
 
 
@@ -306,20 +541,38 @@ WRITE8_MEMBER( abc1600_state::fw1_w )
 
 WRITE8_MEMBER( abc1600_state::en_spec_contr_reg_w )
 {
-	/*
+	int state = BIT(data, 3);
 	
-		bit		description
-		
-		0		CS7
-		1		
-		2		_BTCE
-		3		_ATCE
-		4		PARTST
-		5		_DMADIS
-		6		SYSSCC
-		7		SYSFS
+	switch (data & 0x07)
+	{
+	case 0: // CS7
+		break;
 	
-	*/
+	case 1:
+		break;
+	
+	case 2: // _BTCE
+		break;
+	
+	case 3: // _ATCE
+		break;
+	
+	case 4: // PARTST
+		break;
+	
+	case 5: // _DMADIS
+		m_dmadis = state;
+		break;
+	
+	case 6: // SYSSCC
+		m_sysscc = state;
+		break;
+	
+	case 7: // SYSFS
+		m_sysfs = state;
+		if (m_sysfs) z80dma_rdy_w(m_dma0, wd17xx_drq_r(m_fdc));
+		break;
+	}
 }
 
 
@@ -389,61 +642,6 @@ INPUT_PORTS_END
 
 
 //**************************************************************************
-//  VIDEO
-//**************************************************************************
-
-//-------------------------------------------------
-//  mc6845_interface crtc_intf
-//-------------------------------------------------
-
-static MC6845_UPDATE_ROW( abc1600_update_row )
-{
-}
-
-static MC6845_ON_UPDATE_ADDR_CHANGED( crtc_update )
-{
-}
-
-static const mc6845_interface crtc_intf =
-{
-	SCREEN_TAG,
-	8,
-	NULL,
-	abc1600_update_row,
-	NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	crtc_update
-};
-
-
-//-------------------------------------------------
-//  SCREEN_UPDATE( abc1600 )
-//-------------------------------------------------
-
-void abc1600_state::video_start()
-{
-	// allocate video RAM
-	m_video_ram = auto_alloc_array(machine, UINT8, 128*1024);
-}
-
-
-//-------------------------------------------------
-//  SCREEN_UPDATE( abc1600 )
-//-------------------------------------------------
-
-bool abc1600_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
-{
-	mc6845_update(m_crtc, &bitmap, &cliprect);
-
-	return 0;
-}
-
-
-
-//**************************************************************************
 //  DEVICE CONFIGURATION
 //**************************************************************************
 
@@ -451,15 +649,43 @@ bool abc1600_state::screen_update(screen_device &screen, bitmap_t &bitmap, const
 //  Z80DMA_INTERFACE( dma0_intf )
 //-------------------------------------------------
 
+WRITE_LINE_MEMBER( abc1600_state::dbrq_w )
+{
+	if (!m_dmadis)
+	{
+		// TODO
+	}
+}
+
+READ8_MEMBER( abc1600_state::dma0_mreq_r )
+{
+	return dma_mreq_r(DMAMAP_R0_LO, offset);
+}
+
+WRITE8_MEMBER( abc1600_state::dma0_mreq_w )
+{
+	dma_mreq_w(DMAMAP_R0_LO, offset, data);
+}
+
+READ8_MEMBER( abc1600_state::dma0_iorq_r )
+{
+	return dma_iorq_r(DMAMAP_R0_LO, offset);
+}
+
+WRITE8_MEMBER( abc1600_state::dma0_iorq_w )
+{
+	dma_iorq_w(DMAMAP_R0_LO, offset, data);
+}
+
 static Z80DMA_INTERFACE( dma0_intf )
 {
+	DEVCB_DRIVER_LINE_MEMBER(abc1600_state, dbrq_w),
 	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
+	DEVCB_DEVICE_LINE(Z8410AB1_1_TAG, z80dma_bai_w),
+	DEVCB_DRIVER_MEMBER(abc1600_state, dma0_mreq_r),
+	DEVCB_DRIVER_MEMBER(abc1600_state, dma0_mreq_w),
+	DEVCB_DRIVER_MEMBER(abc1600_state, dma0_iorq_r),
+	DEVCB_DRIVER_MEMBER(abc1600_state, dma0_iorq_w)
 };
 
 
@@ -467,15 +693,35 @@ static Z80DMA_INTERFACE( dma0_intf )
 //  Z80DMA_INTERFACE( dma1_intf )
 //-------------------------------------------------
 
+READ8_MEMBER( abc1600_state::dma1_mreq_r )
+{
+	return dma_mreq_r(DMAMAP_R1_LO, offset);
+}
+
+WRITE8_MEMBER( abc1600_state::dma1_mreq_w )
+{
+	dma_mreq_w(DMAMAP_R1_LO, offset, data);
+}
+
+READ8_MEMBER( abc1600_state::dma1_iorq_r )
+{
+	return dma_iorq_r(DMAMAP_R1_LO, offset);
+}
+
+WRITE8_MEMBER( abc1600_state::dma1_iorq_w )
+{
+	dma_iorq_w(DMAMAP_R1_LO, offset, data);
+}
+
 static Z80DMA_INTERFACE( dma1_intf )
 {
+	DEVCB_DRIVER_LINE_MEMBER(abc1600_state, dbrq_w),
 	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
+	DEVCB_DEVICE_LINE(Z8410AB1_2_TAG, z80dma_bai_w),
+	DEVCB_DRIVER_MEMBER(abc1600_state, dma1_mreq_r),
+	DEVCB_DRIVER_MEMBER(abc1600_state, dma1_mreq_w),
+	DEVCB_DRIVER_MEMBER(abc1600_state, dma1_iorq_r),
+	DEVCB_DRIVER_MEMBER(abc1600_state, dma1_iorq_w)
 };
 
 
@@ -483,15 +729,35 @@ static Z80DMA_INTERFACE( dma1_intf )
 //  Z80DMA_INTERFACE( dma2_intf )
 //-------------------------------------------------
 
+READ8_MEMBER( abc1600_state::dma2_mreq_r )
+{
+	return dma_mreq_r(DMAMAP_R2_LO, offset);
+}
+
+WRITE8_MEMBER( abc1600_state::dma2_mreq_w )
+{
+	dma_mreq_w(DMAMAP_R2_LO, offset, data);
+}
+
+READ8_MEMBER( abc1600_state::dma2_iorq_r )
+{
+	return dma_iorq_r(DMAMAP_R2_LO, offset);
+}
+
+WRITE8_MEMBER( abc1600_state::dma2_iorq_w )
+{
+	dma_iorq_w(DMAMAP_R2_LO, offset, data);
+}
+
 static Z80DMA_INTERFACE( dma2_intf )
 {
+	DEVCB_DRIVER_LINE_MEMBER(abc1600_state, dbrq_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
+	DEVCB_DRIVER_MEMBER(abc1600_state, dma2_mreq_r),
+	DEVCB_DRIVER_MEMBER(abc1600_state, dma2_mreq_w),
+	DEVCB_DRIVER_MEMBER(abc1600_state, dma2_iorq_r),
+	DEVCB_DRIVER_MEMBER(abc1600_state, dma2_iorq_w)
 };
 
 
@@ -560,8 +826,13 @@ READ8_MEMBER( abc1600_state::cio_pb_r )
 		PB7		FINT
 		
 	*/
+	
+	UINT8 data = 0;
+	
+	// floppy interrupt
+	data |= wd17xx_intrq_r(m_fdc) << 7;
 
-	return 0;
+	return data;
 }
 
 WRITE8_MEMBER( abc1600_state::cio_pb_w )
@@ -658,11 +929,16 @@ static const floppy_config abc1600_floppy_config =
     NULL
 };
 
+WRITE_LINE_MEMBER( abc1600_state::drq_w )
+{
+	if (m_sysfs) z80dma_rdy_w(m_dma0, state);
+}
+
 static const wd17xx_interface fdc_intf =
 {
 	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
+	DEVCB_NULL,// DEVCB_DEVICE_LINE_MEMBER(Z8536B1_TAG, z8536_device, pb7_w), 
+	DEVCB_DRIVER_LINE_MEMBER(abc1600_state, drq_w),
 	{ FLOPPY_0, NULL, NULL, NULL }
 };
 
@@ -708,15 +984,7 @@ static MACHINE_CONFIG_START( abc1600, abc1600_state )
 	MCFG_CPU_PROGRAM_MAP(abc1600_mem)
 
 	// video hardware
-    MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
-    MCFG_SCREEN_REFRESH_RATE(50)
-    MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // not accurate
-    MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-    MCFG_SCREEN_SIZE(1024, 768)
-    MCFG_SCREEN_VISIBLE_AREA(0, 1024-1, 0, 768-1)
-    MCFG_PALETTE_LENGTH(2)
-    MCFG_PALETTE_INIT(black_and_white)
-	MCFG_MC6845_ADD(SY6845E_TAG, SY6845E, XTAL_64MHz, crtc_intf)
+	MCFG_FRAGMENT_ADD(abc1600_video)
 
 	// devices
 	MCFG_Z80DMA_ADD(Z8410AB1_0_TAG, 4000000, dma0_intf)
