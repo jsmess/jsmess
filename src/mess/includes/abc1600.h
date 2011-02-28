@@ -123,6 +123,7 @@ public:
 	DECLARE_READ8_MEMBER( cio_pc_r );
 	DECLARE_WRITE8_MEMBER( cio_pc_w );
 
+	void install_memory_page(offs_t start, offs_t virtual_address, bool wp, bool nonx);
 	void bankswitch();
 	inline offs_t get_dma_address(int index, UINT16 offset);
 	inline UINT8 dma_mreq_r(int index, UINT16 offset);

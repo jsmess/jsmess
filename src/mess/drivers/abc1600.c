@@ -40,6 +40,25 @@
 //  CONSTANTS / MACROS
 //**************************************************************************
 
+// MAC
+#define SEGMENT_ADDRESS(_segment) \
+	(((m_task & 0x0f) << 5) | _segment)
+
+#define SEGMENT_DATA(_segment) \
+	m_segment_ram[SEGMENT_ADDRESS(_segment)]
+
+#define PAGE_ADDRESS(_segment, _page) \
+	((SEGMENT_DATA(_segment) << 4) | _page)
+
+#define PAGE_DATA(_segment, _page) \
+	m_page_ram[PAGE_ADDRESS(_segment, _page)]
+
+#define PAGE_SIZE	0x800
+
+#define PAGE_WP		0x4000
+#define PAGE_NONX	0x8000
+
+
 // DMA
 #define A0 BIT(addr, 0)
 #define A7 BIT(addr, 7)
@@ -66,11 +85,85 @@ enum
 //**************************************************************************
 
 //-------------------------------------------------
+//  install_memory_page -
+//-------------------------------------------------
+
+void abc1600_state::install_memory_page(offs_t start, offs_t virtual_address, bool wp, bool nonx)
+{
+	address_space *program = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);
+	offs_t end = start + PAGE_SIZE - 1;
+
+	logerror("MAC physical %06x: virtual %06x %s %s\n", start, virtual_address, wp ? "WP":"", nonx ? "NONX":"");
+
+	if (nonx)
+	{
+		// TODO read/write should raise Bus Error
+		memory_unmap_readwrite(program, start, end, 0, 0);
+	}
+	else
+	{
+		if (virtual_address < 0x100000)
+		{
+			// main RAM
+			UINT8 *ram = ram_get_ptr(m_ram);
+			offs_t offset = virtual_address;
+		
+			if (wp)
+				memory_install_rom(program, start, end, 0, 0, ram + offset);
+			else
+				memory_install_ram(program, start, end, 0, 0, ram + offset);
+		}
+		else if (virtual_address < 0x180000)
+		{
+			// video RAM
+			offs_t offset = virtual_address - 0x100000;
+
+			if (wp)
+				memory_install_rom(program, start, end, 0, 0, m_video_ram + offset);
+			else
+				memory_install_ram(program, start, end, 0, 0, m_video_ram + offset);
+		}
+		else if (virtual_address >= 0x1ff000 && virtual_address < 0x1ff800)
+		{
+			// TODO I/O
+			memory_unmap_readwrite(program, start, end, 0, 0);
+		}
+		else if (virtual_address >= 0x1ff800 && virtual_address < 0x200000)
+		{
+			// TODO I/O
+			memory_unmap_readwrite(program, start, end, 0, 0);
+		}
+		else
+		{
+			// unmapped
+			memory_unmap_readwrite(program, start, end, 0, 0);
+		}
+	}
+}
+
+
+//-------------------------------------------------
 //  bankswitch -
 //-------------------------------------------------
 
 void abc1600_state::bankswitch()
 {
+	offs_t physical_address = 0;
+
+	for (int segment = 0; segment < 32; segment++)
+	{
+		for (int page = 0; page < 32; page++)
+		{
+			UINT16 page_data = PAGE_DATA(segment, page);
+			offs_t virtual_address = (page_data & 0x3ff) << 11;
+			bool wp = ((page_data & PAGE_WP) == 0);
+			bool nonx = ((page_data & PAGE_NONX) == PAGE_NONX);
+
+			install_memory_page(physical_address, virtual_address, wp, nonx);
+
+			physical_address += PAGE_SIZE;
+		}
+	}
 }
 
 
@@ -132,10 +225,10 @@ READ8_MEMBER( abc1600_state::segment_r )
 	
 	*/
 
-	UINT16 sega = ((m_task & 0x0f) << 4) | ((offset >> 15) & 0x0f);
-	UINT8 segd = m_segment_ram[sega];
+	int segment = (offset >> 15) & 0x1f;
+	UINT8 data = SEGMENT_DATA(segment);
 
-	return (m_task & 0x80) | (segd & 0x7f);
+	return (m_task & 0x80) | (data & 0x7f);
 }
 
 
@@ -160,8 +253,8 @@ WRITE8_MEMBER( abc1600_state::segment_w )
 	
 	*/
 
-	UINT16 sega = ((m_task & 0x0f) << 4) | ((offset >> 15) & 0x0f);
-	m_segment_ram[sega] = data & 0x7f;
+	int segment = (offset >> 15) & 0x1f;
+	SEGMENT_DATA(segment) = data & 0x7f;
 
 	bankswitch();
 }
@@ -197,15 +290,13 @@ READ8_MEMBER( abc1600_state::page_r )
 	
 	*/
 
-	UINT16 sega = ((m_task & 0x0f) << 4) | ((offset >> 15) & 0x0f);
-	UINT8 segd = m_segment_ram[sega];
-
-	UINT16 pagea = (segd << 4) | ((offset >> 11) & 0x0f);
-	UINT16 paged = m_page_ram[pagea];
+	int segment = (offset >> 15) & 0x1f;
+	int page = (offset >> 11) & 0x0f;
+	UINT16 data = PAGE_DATA(segment, page);
 
 	int a0 = BIT(offset, 0);
 
-	return a0 ? (paged >> 8) : (paged & 0xff);
+	return a0 ? (data >> 8) : (data & 0xff);
 }
 
 
@@ -239,20 +330,17 @@ WRITE8_MEMBER( abc1600_state::page_w )
 	
 	*/
 
-	UINT16 sega = ((m_task & 0x0f) << 4) | ((offset >> 15) & 0x0f);
-	UINT8 segd = m_segment_ram[sega];
-
-	UINT16 pagea = (segd << 4) | ((offset >> 11) & 0x0f);
-
+	int segment = (offset >> 15) & 0x1f;
+	int page = (offset >> 11) & 0x0f;
 	int a0 = BIT(offset, 0);
 
 	if (a0)
 	{
-		m_page_ram[pagea] = (data << 8) | (m_page_ram[pagea] & 0xff);
+		PAGE_DATA(segment, page) = (data << 8) | (PAGE_DATA(segment, page) & 0xff);
 	}
 	else
 	{
-		m_page_ram[pagea] = (m_page_ram[pagea] & 0xff00) | data;
+		PAGE_DATA(segment, page) = (PAGE_DATA(segment, page) & 0xff00) | data;
 	}
 
 	bankswitch();
@@ -313,7 +401,7 @@ inline void abc1600_state::dma_mreq_w(int index, UINT16 offset, UINT8 data)
 		UINT8 *ram = ram_get_ptr(m_ram);
 		ram[addr] = data;
 	}
-	else if (addr <= 0x180000)
+	else if (addr < 0x180000)
 	{
 		m_video_ram[addr - 0x100000] = data;
 	}
@@ -429,10 +517,13 @@ inline void abc1600_state::dma_iorq_w(int index, UINT16 offset, UINT8 data)
 	}
 	else if (addr >= 0x1ffb00 && addr < 0x1ffc00)
 	{
-		if (!A7 && A0)
-			fw1_w(*space, 0, data);
-		else
-			fw0_w(*space, 0, data);
+		if (!A7)
+		{
+			if (A0)
+				fw1_w(*space, 0, data);
+			else
+				fw0_w(*space, 0, data);
+		}
 	}
 	else if (addr >= 0x1ffd00 && addr < 0x1ffe00)
 	{
