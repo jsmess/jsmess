@@ -9,11 +9,14 @@
 #ifndef PC_VGA_H
 #define PC_VGA_H
 
-#include "osdepend.h"
-#include "pc_video_mess.h"
+typedef void (*pc_video_update_proc)(bitmap_t *bitmap,
+	struct mscrtc6845 *crtc);
+
+struct mscrtc6845 *pc_video_start(running_machine *machine, const struct mscrtc6845_config *config,
+	pc_video_update_proc (*choosevideomode)(running_machine *machine, int *width, int *height, struct mscrtc6845 *crtc),
+	size_t vramsize);
 
 MACHINE_CONFIG_EXTERN( pcvideo_vga );
-MACHINE_CONFIG_EXTERN( pcvideo_pc1640 );
 
 struct pc_vga_interface
 {
@@ -43,25 +46,7 @@ void pc_vga_reset(running_machine *machine);
 void *pc_vga_memory(void);
 size_t pc_vga_memory_size(void);
 
-READ8_HANDLER( ega_port_03c0_r );
-
-READ8_HANDLER( paradise_ega_03c0_r );
-READ16_HANDLER( paradise_ega16le_03c0_r );
-
-READ8_HANDLER( vga_port_03b0_r );
-READ8_HANDLER( vga_port_03c0_r );
 READ8_HANDLER( vga_port_03d0_r );
-WRITE8_HANDLER( vga_port_03b0_w );
-WRITE8_HANDLER( vga_port_03c0_w );
-WRITE8_HANDLER( vga_port_03d0_w );
-
-READ16_HANDLER( vga_port16le_03b0_r );
-READ16_HANDLER( vga_port16le_03c0_r );
-READ16_HANDLER( vga_port16le_03d0_r );
-WRITE16_HANDLER( vga_port16le_03b0_w );
-WRITE16_HANDLER( vga_port16le_03c0_w );
-WRITE16_HANDLER( vga_port16le_03d0_w );
-
 /*
   pega notes (paradise)
   build in amstrad pc1640

@@ -51,7 +51,7 @@
 #include "sound/speaker.h"
 #include "sound/saa1099.h"
 #include "machine/ram.h"
-
+#include "machine/nvram.h"
 #include "memconv.h"
 
 
@@ -81,7 +81,6 @@
 
 static ADDRESS_MAP_START( at16_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x09ffff) AM_MIRROR(0xff000000) AM_RAMBANK("bank10")
-//  AM_RANGE(0x0a0000, 0x0bffff) AM_READWRITE(SMH_RAM, pc_video_videoram16le_w) AM_BASE((UINT16 **)&videoram) AM_SIZE(&videoram_size)
 	AM_RANGE(0x0c0000, 0x0c7fff) AM_ROM
 	AM_RANGE(0x0c8000, 0x0cffff) AM_ROM
 	AM_RANGE(0x0d0000, 0x0effff) AM_RAM
@@ -95,7 +94,6 @@ static ADDRESS_MAP_START( at386_map, ADDRESS_SPACE_PROGRAM, 32 )
 	ADDRESS_MAP_GLOBAL_MASK(0x00ffffff)
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAMBANK("bank10")
 	AM_RANGE(0x000a0000, 0x000bffff) AM_NOP
-//  AM_RANGE(0x000b8000, 0x000bffff) AM_READWRITE(SMH_RAM, pc_video_videoram32_w) AM_BASE((UINT32 **) &videoram) AM_SIZE(&videoram_size)
 	AM_RANGE(0x000c0000, 0x000c7fff) AM_ROM
 	AM_RANGE(0x000c8000, 0x000cffff) AM_ROM
 	AM_RANGE(0x000d0000, 0x000effff) AM_ROM
@@ -107,7 +105,6 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( at586_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAMBANK("bank10")
 	AM_RANGE(0x000a0000, 0x000bffff) AM_NOP
-//  AM_RANGE(0x000b8000, 0x000bffff) AM_READWRITE(SMH_RAM, pc_video_videoram32_w) AM_BASE((UINT32 **) &videoram) AM_SIZE(&videoram_size)
 	AM_RANGE(0x00800000, 0x00800bff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xfffe0000, 0xffffffff) AM_ROM AM_REGION("user1", 0x20000)
 ADDRESS_MAP_END
@@ -673,10 +670,6 @@ static MACHINE_CONFIG_START( ps2m30286, at_state )
 
 	MCFG_FRAGMENT_ADD( pcvideo_vga )
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
@@ -739,10 +732,6 @@ static MACHINE_CONFIG_START( atvga, at_state )
 	MCFG_NS16450_ADD( "ns16450_3", ibm5170_com_interface[3] )			/* TODO: verify model */
 
 	MCFG_FRAGMENT_ADD( pcvideo_vga )
-
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 
 	MCFG_MACHINE_START( at )
 	MCFG_MACHINE_RESET( at )
@@ -816,10 +805,6 @@ static MACHINE_CONFIG_START( at386, at_state )
 
 	MCFG_FRAGMENT_ADD( pcvideo_vga )
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
@@ -842,7 +827,7 @@ static MACHINE_CONFIG_START( at386, at_state )
 	MCFG_KB_KEYTRONIC_ADD("keyboard", at_keytronic_intf)
 
 	MCFG_MC146818_ADD( "rtc", MC146818_STANDARD )
-//  MCFG_NVRAM_ADD_0FILL("nvram")
+    MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* printers */
 	MCFG_PC_LPT_ADD("lpt_0", at_lpt_config)

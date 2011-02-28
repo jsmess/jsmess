@@ -145,9 +145,6 @@ static MACHINE_CONFIG_START( bebox, bebox_state )
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_vga )
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 
 	MCFG_MACHINE_START( bebox )
 	MCFG_MACHINE_RESET( bebox )
