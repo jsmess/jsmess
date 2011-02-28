@@ -4,8 +4,8 @@
 
     OKI MSM9810 ADCPM(2) sound chip.
 
-	Notes:
-	The master clock frequency for this chip can range from 3.5MHz to 4.5Mhz.
+    Notes:
+    The master clock frequency for this chip can range from 3.5MHz to 4.5Mhz.
       The typical oscillator is a 4.096Mhz crystal.
 
 ***************************************************************************/
@@ -21,13 +21,6 @@
 //**************************************************************************
 //  CONSTANTS
 //**************************************************************************
-
-enum
-{
-	OKIM9810_SERIAL_PIN_LOW = 0,
-	OKIM9810_SERIAL_PIN_HIGH = 1,
-    // etc
-};
 
 enum
 {
@@ -131,32 +124,38 @@ protected:
 	{
 	public:
 		okim_voice();
-		void generate_audio(direct_read_data &direct, 
-                			stream_sample_t *buffer, 
+		void generate_audio(direct_read_data &direct,
+                			stream_sample_t **buffers,
                 			int samples,
-			                const UINT8 global_volume);
+			                const UINT8 global_volume,
+                            const UINT32 clock,
+                            const UINT8 filter_type);
 
         // computes volume scale from 3 volume numbers
 		UINT8 volume_scale(const UINT8 global_volume,
 						   const UINT8 channel_volume,
                 		   const UINT8 pan_volume) const;
 
-		oki_adpcm_state m_adpcm;		// current ADPCM state
-		oki_adpcm2_state m_adpcm2;		// current ADPCM2 state
-		UINT8		m_playbackAlgo;		// current playback method
-		bool		m_looping;
-		UINT8		m_startFlags;
-		UINT8		m_endFlags;
-		offs_t		m_base_offset;		// pointer to the base memory location
-		UINT32		m_count;			// total samples to play
-		UINT32		m_samplingFreq;		// voice sampling frequency
+		oki_adpcm_state m_adpcm;	// current ADPCM state
+		oki_adpcm2_state m_adpcm2;	// current ADPCM2 state
+		UINT8	m_playbackAlgo;		// current playback method
+		bool	m_looping;
+		UINT8	m_startFlags;
+		UINT8	m_endFlags;
+		offs_t	m_base_offset;		// pointer to the base memory location
+		UINT32	m_count;			// total samples to play
+		UINT32	m_samplingFreq;		// voice sampling frequency
 
-		bool		m_playing;			// playback state
-		UINT32		m_sample;			// current sample number
+		bool	m_playing;			// playback state
+		UINT32	m_sample;			// current sample number
 
-		UINT8		m_channel_volume;	// volume set with the CVOL command
-		UINT8		m_pan_volume_left;  // volume set with the PAN command
-		UINT8		m_pan_volume_right; // volume set with the PAN command
+		UINT8	m_channel_volume;	// volume index set with the CVOL command
+		UINT8	m_pan_volume_left;  // volume index set with the PAN command
+		UINT8	m_pan_volume_right; // volume index set with the PAN command
+
+        INT32	m_startSample;		// interpolation state - sample to interpolate from
+        INT32	m_endSample;		// interpolation state - sample to interpolate to
+        UINT32	m_interpSampleNum;	// interpolation state - fraction between start & end
 
 		static const UINT8 s_volume_table[16];
 	};
@@ -169,10 +168,10 @@ protected:
 	direct_read_data* m_direct;
 
     UINT8 m_TMP_register;
-    
-	UINT8 m_global_volume;		// volume set with the OPT command
-    UINT8 m_filter_type;
-	UINT8 m_output_level;
+
+	UINT8 m_global_volume;		// volume index set with the OPT command
+    UINT8 m_filter_type;		// interpolation filter type set with the OPT command
+	UINT8 m_output_level;		// flag stating if a voltage follower is connected
 
 	static const int OKIM9810_VOICES = 8;
 	okim_voice m_voice[OKIM9810_VOICES];

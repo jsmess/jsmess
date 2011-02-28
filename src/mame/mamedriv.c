@@ -3385,7 +3385,7 @@ V-V                           TP-027
 	/* Namco System 10 */
 	DRIVER( mrdrilr2 )	/* 2000.07 Mr Driller 2 (DR21 Ver.A) */
 	DRIVER( mrdrlr2a )      /* 2000.?? Mr Driller 2 (DR22 Ver.A) */
-	DRIVER( ptblank3 ) 	/* 2000.12 Point Blank 3 / Gunbalina */
+	DRIVER( ptblank3 )	/* 2000.12 Point Blank 3 / Gunbalina */
 						/* 2001.02 Photo Battole */
 						/* 2001.02 Taiko no Tatsujin */
 						/* 2001.03 Gahaha Ippatsudou */
@@ -4928,7 +4928,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( ftspeed )	/* 2004.09 Faster than Speed */
 	DRIVER( kov7sprt )	/* 2004.?? Knights of Valour - The Seven Sprits */
 	DRIVER( vfurlong )	/* 2005.03 Net Select Keiba Victory Furlong */
-						/* 2005.03 The Rumble Fish 2 */
+	DRIVER( rumblef2 )	/* 2005.03 The Rumble Fish 2 */
 	DRIVER( ngbc )		/* 2005.07 NeoGeo Battle Colloseum */
 	DRIVER( samsptk )	/* 2005.09 Samurai Spirits Tenkaichi Kenkakuden */
 	DRIVER( kofxi )		/* 2005.10 The King of Fighters XI */
@@ -8053,6 +8053,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( funcube2 )	/* (c) 2001 Namco */
 	DRIVER( funcube4 )	/* (c) 2001 Namco */
 	DRIVER( trophyh )	/* (c) 2002 Sammy USA Corporation */
+	DRIVER( reelquak )	/* (c) ???? <unknown> */
 
 	/* SSV System (Seta, Sammy, Visco) games */
 	DRIVER( srmp4 )		/* (c) 1993 Seta */
@@ -8556,6 +8557,7 @@ Other Sun games
 
 	/* Sigma B98 / Sammy Medal Games */
 	DRIVER( gegege )	/* (c) 1997 Banpresto / Sigma */
+	DRIVER( sammymdl )	/* (c) 2000-2003 Sammy */
 	DRIVER( animalc )	/* (c) 2000 Sammy */
 	DRIVER( itazuram )	/* (c) 2000 Sammy */
 	DRIVER( pyenaget )	/* (c) 2000 Sammy */
@@ -8685,6 +8687,7 @@ Other Sun games
 	DRIVER( kov2106 )		/* (c) 2000 */
 	DRIVER( kov2103 )		/* (c) 2000 */
 	DRIVER( kov2102 )		/* (c) 2000 */
+	DRIVER( kov2101 )		/* (c) 2000 */
 	DRIVER( kov2100 )		/* (c) 2000 */
 	DRIVER( kov2p )			/* (c) 2000 */
 	DRIVER( kov2p205 )		/* (c) 2000 */
@@ -9431,6 +9434,7 @@ Other Sun games
 	DRIVER( poizone )	/* (c) 1990 Sisteme */
 	DRIVER( ssfindo )	/* (c) 1999 Icarus */
 	DRIVER( ppcar )		/* (c) 1999 Icarus */
+	DRIVER( tetfight)	/* (c) 2001 Sego */
 	DRIVER( imolagp )	/* (c) 1981 Leante Games */
 	DRIVER( dambustr )	/* (c) 1981 South West Research */
 	DRIVER( dambustra )	/* (c) 1981 South West Research */
@@ -9606,6 +9610,7 @@ Other Sun games
 	DRIVER( smoto20 )	/* (c) 1996 Subsino */
 	DRIVER( smoto16 )	/* (c) 1996 Subsino */
 	DRIVER( mtrain )	/* (c) 1996 Subsino */
+	DRIVER( mtrainnv )	/* (c) 1996 Subsino */
 	DRIVER( expcard )	/* (c) 1998 American Alpha */
 	DRIVER( saklove )	/* (c) 1998 Subsino */
 	DRIVER( bishjan )	/* (c) 1999 Subsino */
@@ -9688,7 +9693,11 @@ Other Sun games
 	DRIVER( sloco93 )	/* 1993, Unknown */
 	DRIVER( sloco93a )	/* 1993, Unknown */
 	DRIVER( maverik )	/* 198?, Unknown */
+	DRIVER( brasil86 )	/* 1986, Unknown */
+	DRIVER( brasil87 )	/* 1987, Unknown */
 	DRIVER( brasil89 )	/* 1989, Unknown */
+	DRIVER( brasil89a )	/* 1989, Unknown */
+	DRIVER( brasil93 )	/* 1993, Unknown */
 	DRIVER( poker91 )	/* 1991, Unknown */
 	DRIVER( genie )		/* (c) 198? Video Fun Games Ltd. */
 	DRIVER( silverga )	/* 1983, Unknown */
@@ -10749,6 +10758,7 @@ Other Sun games
 	DRIVER( freedom  )
 	DRIVER( matahari )
 	DRIVER( nightrdr )
+	DRIVER( nightr20 )
 	DRIVER( pwerplay )
 	DRIVER( stk_sprs )
 
@@ -10763,6 +10773,7 @@ Other Sun games
 	DRIVER( cybrnaut )
 	DRIVER( dollyptn )
 	DRIVER( eballdlx )
+	DRIVER( eballd14 )
 	DRIVER( elektra  )
 	DRIVER( embryon  )
 	DRIVER( fathom   )
@@ -10953,9 +10964,6 @@ Other Sun games
 	DRIVER( tomy_h30 )
 	DRIVER( wwfr_106 )
 	DRIVER( wwfr_103 )
-	DRIVER( titanic )
-	DRIVER( monopred )
-	DRIVER( wackadoo )
 
 
 	// de_3b.c
@@ -10980,8 +10988,10 @@ Other Sun games
 	DRIVER( frankstg )
 	DRIVER( mav_402 )
 	DRIVER( mav_401 )
+	DRIVER( mav_400 )
 	DRIVER( mav_100 )
 	DRIVER( detest )
+	DRIVER( ctcheese )
 
 
 	// flicker.c
@@ -11574,6 +11584,9 @@ Other Sun games
 
 	// whitestar.c
 	DRIVER( apollo13 )
+	DRIVER( aust301 )
+	DRIVER( aust300 )
+	DRIVER( aust201 )
 	DRIVER( austin )
 	DRIVER( austnew )
 	DRIVER( austinf )
@@ -11608,7 +11621,10 @@ Other Sun games
 	DRIVER( id4 )
 	DRIVER( lostspc )
 	DRIVER( monopolp )
-	DRIVER( monopole )
+	DRIVER( monop303 )
+	DRIVER( monop301 )
+	DRIVER( monop251 )
+	DRIVER( monop233 )
 	DRIVER( monopolf )
 	DRIVER( monopolg )
 	DRIVER( monopoli )
@@ -11616,22 +11632,46 @@ Other Sun games
 	DRIVER( mononew )
 	DRIVER( nfl )
 	DRIVER( playboys )
+	DRIVER( playboys_303 )
+	DRIVER( playboys_300 )
 	DRIVER( playnew )
 	DRIVER( playboyf )
+	DRIVER( playboyf_303 )
+	DRIVER( playboyf_300 )
 	DRIVER( playboyg )
+	DRIVER( playboyg_303 )
+	DRIVER( playboyg_300 )
 	DRIVER( playboyi )
+	DRIVER( playboyi_303 )
+	DRIVER( playboyi_300 )
 	DRIVER( playboyl )
+	DRIVER( playboyl_303 )
+	DRIVER( playboyl_300 )
 	DRIVER( rctycn )
+	DRIVER( rctycn_701 )
+	DRIVER( rctycn_400 )
 	DRIVER( rctnew )
 	DRIVER( rctycng )
+	DRIVER( rctycng_701 )
+	DRIVER( rctycng_400 )
 	DRIVER( rctycnf )
+	DRIVER( rctycnf_701 )
+	DRIVER( rctycnf_400 )
 	DRIVER( rctycni )
+	DRIVER( rctycni_701 )
+	DRIVER( rctycni_400 )
 	DRIVER( rctycnl )
+	DRIVER( rctycnl_701 )
+	DRIVER( rctycnl_400 )
 	DRIVER( shrkysht )
+	DRIVER( shrky_207 )
 	DRIVER( shrknew )
-	DRIVER( shrky_gr )
-	DRIVER( shrky_fr )
-	DRIVER( shrky_it )
+	DRIVER( shrkygr )
+	DRIVER( shrkygr_207 )
+	DRIVER( shrkyfr )
+	DRIVER( shrkyfr_207 )
+	DRIVER( shrkyit )
+	DRIVER( shrkyit_207 )
 	DRIVER( sprk_103 )
 	DRIVER( sprk_090 )
 	DRIVER( spacejam )
@@ -11649,11 +11689,15 @@ Other Sun games
 	DRIVER( strxt_it )
 	DRIVER( strxt_sp )
 	DRIVER( term3 )
+	DRIVER( term3_205 )
 	DRIVER( t3new )
 	DRIVER( term3g )
 	DRIVER( term3l )
+	DRIVER( term3l_205 )
 	DRIVER( term3f )
+	DRIVER( term3f_205 )
 	DRIVER( term3i )
+	DRIVER( term3i_205 )
 	DRIVER( jplstw22 )
 	DRIVER( jplstw20 )
 	DRIVER( simpprty )
@@ -11668,14 +11712,33 @@ Other Sun games
 	DRIVER( twst_404 )
 	DRIVER( twst_300 )
 	DRIVER( viprsega )
+	DRIVER( ctchzdlx )
+	DRIVER( titanic )
+	DRIVER( monopred )
+	DRIVER( wackadoo )
 
 
 	// white_mod.c
 	DRIVER( elvisp )
+	DRIVER( elvisp4 )
+	DRIVER( elvisp303 )
+	DRIVER( elvisp302 )
 	DRIVER( elvisl )
+	DRIVER( elvisl4 )
+	DRIVER( elvisl303 )
+	DRIVER( elvisl302 )
 	DRIVER( elvisg )
+	DRIVER( elvisg4 )
+	DRIVER( elvisg303 )
+	DRIVER( elvisg302 )
 	DRIVER( elvisf )
+	DRIVER( elvisf4 )
+	DRIVER( elvisf303 )
+	DRIVER( elvisf302 )
 	DRIVER( elvisi )
+	DRIVER( elvisi4 )
+	DRIVER( elvisi303 )
+	DRIVER( elvisi302 )
 	DRIVER( gprix )
 	DRIVER( gprixg )
 	DRIVER( gprixl )
@@ -11684,16 +11747,51 @@ Other Sun games
 	DRIVER( nascar )
 	DRIVER( nascarl )
 	DRIVER( ripleys )
+	DRIVER( rip310 )
+	DRIVER( rip302 )
+	DRIVER( rip300 )
 	DRIVER( ripleysf )
+	DRIVER( ripf310 )
+	DRIVER( ripf302 )
+	DRIVER( ripf300 )
 	DRIVER( ripleysg )
+	DRIVER( ripg310 )
+	DRIVER( ripg302 )
+	DRIVER( ripg300 )
 	DRIVER( ripleysi )
+	DRIVER( ripi310 )
+	DRIVER( ripi302 )
+	DRIVER( ripi300 )
 	DRIVER( ripleysl )
+	DRIVER( ripl310 )
+	DRIVER( ripl302 )
+	DRIVER( ripl300 )
 	DRIVER( lotr )
+	DRIVER( lotr9 )
+	DRIVER( lotr8 )
+	DRIVER( lotr7 )
+	DRIVER( lotr401 )
 	DRIVER( lotr_le )
 	DRIVER( lotr_sp )
+	DRIVER( lotr_sp9 )
+	DRIVER( lotr_sp8 )
+	DRIVER( lotr_sp7 )
+	DRIVER( lotr_sp401 )
 	DRIVER( lotr_gr )
+	DRIVER( lotr_gr9 )
+	DRIVER( lotr_gr8 )
+	DRIVER( lotr_gr7 )
+	DRIVER( lotr_gr401 )
 	DRIVER( lotr_fr )
+	DRIVER( lotr_fr9 )
+	DRIVER( lotr_fr8 )
+	DRIVER( lotr_fr7 )
+	DRIVER( lotr_fr401 )
 	DRIVER( lotr_it )
+	DRIVER( lotr_it9 )
+	DRIVER( lotr_it8 )
+	DRIVER( lotr_it7 )
+	DRIVER( lotr_it401 )
 	DRIVER( sopranos )
 	DRIVER( soprano3 )
 	DRIVER( sopranog )

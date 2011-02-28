@@ -951,7 +951,7 @@ static MACHINE_CONFIG_DERIVED( montecar, firetrk )
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE(montecar)
-	
+
 	MCFG_VIDEO_START(montecar)
 	MCFG_GFXDECODE(montecar)
 
@@ -1042,5 +1042,5 @@ ROM_END
 
 
 GAME( 1977, superbug, 0, superbug, superbug, 0, ROT270, "Atari", "Super Bug", 0 )
-GAME( 1978, firetrk,  0, firetrk,  firetrk,  0, ROT270, "Atari", "Fire Truck", 0 )
+GAME( 1978, firetrk,  0, firetrk,  firetrk,  0, ROT270, "Atari", "Fire Truck / Smokey Joe", 0 )
 GAME( 1979, montecar, 0, montecar, montecar, 0, ROT270, "Atari", "Monte Carlo", 0 )

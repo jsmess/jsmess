@@ -36,16 +36,9 @@ ToDo:
 
 - all games that uses YUV just updates one frame then dies, why?
 
-- all or almost all games seems to have issues with the sound loops, for example sfz3ugd keeps to say "This-This-This ..." at start-up
-  instead of completing the phrase;
-
-- suchie3: used to boot (at least go over the I/O test), it doesn't now, might be protection related.
+- SH to ARM sound streaming doesn't work (used by ADX compression system)
 
 - ngdup23a, ngdup23c: missing DIMM emulation, hence they can't possibly work, emulate the DIMM means to add an extra SH-4 ...
-
-- totd: emulation exits at some point during attract mode without any output.
-
-- spkrbtl: ARM CPU crashes sometimes? Also, it crashes when entering into the gameplay.
 
 ---------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -932,7 +925,7 @@ Guru's Readme
 Atomis Wave (system overview)
 Sammy/SEGA, 2002
 
-This is one of the latest arcade systems so far, basically just a Dreamcast using ROM carts.
+The Atomiswave System is basically just a Sega Dreamcast using ROM carts.
 
 PCB Layout
 ----------
@@ -1033,11 +1026,11 @@ Pin     Function    I/O    Pin   Function  I/O
 The bottom of the PCB contains nothing significant except some connectors. One for the game cart, one for special controls
 or I/O, one for a communication module, one for a cooling fan and one for the serial connection daughterboard.
 
----------------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------
 
 
 
-Atomiswave cart PCB layout and game usage (revision 0.4 13/9/2010 6:12pm)
+Atomiswave cart PCB layout and game usage (revision 1.0 26/2/2011 5:59pm)
 -----------------------------------------
 
 Type 1 ROM Board:
@@ -1075,6 +1068,7 @@ Notes:
                Dolphin Blue                          AX0401F01
                Maximum Speed                         AX0501F01
                Demolish Fist                         AX0601F01
+               Guilty Gear X Ver. 1.5                AX0801F01
                Guilt Gear Isuka                      AX1201F01
                Knights Of Valour Seven Spirits       AX1301F01
                Salaryman Kintaro                     AX1401F01
@@ -1090,12 +1084,7 @@ Notes:
                The name in the archive has been devised purely for convenience.
                This ROM holds the main program.
 
-IC10 to IC17 - Custom-badged 128M TSOP48 mask ROMs. I suspect they are Macronix
-               ROMs because the ROM on the main board is also a custom Macronix
-               ROM and they have a history of producing custom ROMs for other
-               companies that hide their ROM types like Nintendo etc. May as well
-               be MX23L12810 or MR27V12800J, which have the same pinout.
-
+IC10 to IC17 - Custom-badged 128M TSOP48 mask ROMs.
                IC10 - Not Populated for 7 ROMs or less (ROM 01 if 8 ROMs are populated)
                IC11 - ROM 01 (or ROM 02 if 8 ROMs are populated)
                IC12 - ROM 02 (or ROM 03 if 8 ROMs are populated)
@@ -1114,6 +1103,7 @@ IC10 to IC17 - Custom-badged 128M TSOP48 mask ROMs. I suspect they are Macronix
                Dolphin Blue                          AX0401M01 to AX0405M01    5
                Maximum Speed                         AX0501M01 to AX0505M01    5
                Demolish Fist                         AX0601M01 to AX0607M01    7
+               Guilty Gear X Ver. 1.5                AX0801M01 to AX0807M01    7
                Guilty Gear Isuka                     AX1201M01 to AX1208M01    8
                Knights Of Valour Seven Spirits       AX1301M01 to AX1307M01    7
                Salaryman Kintaro                     AX1401M01 to AX1407M01    7
@@ -1158,6 +1148,7 @@ Notes:
                Game (sorted by code)                 Code
                -----------------------------------------------
                Samurai Spirits Tenkaichi Kenkakuden  AX2901F01
+               Metal Slug 6                          AX3001F01
                The King Of Fighters XI               AX3201F01
                Neogeo Battle Coliseum                AX3301F01
                Rumble Fish 2                         AX3401F01
@@ -1169,8 +1160,7 @@ Notes:
                is a TSOP48, using the middle pins. The other 2 pins on each side of the ROM
                are not connected to anything.
 
-       MROM* - Custom-badged SSOP70 mask ROMs. These may be OKI MR26V25605 or MR26V25655 (256M)
-               or possibly 26V51253 (512M) or something else similar.
+       MROM* - Custom-badged 256M SSOP70 mask ROMs
 
                ROM Codes
                ---------
@@ -1178,6 +1168,7 @@ Notes:
                Game (sorted by code)                 Code                      of ROMs
                -----------------------------------------------------------------------
                Samurai Spirits Tenkaichi Kenkakuden  AX2901M01 to AX2907M01    7
+               Metal Slug 6                          AX3001M01 to AX3004M01    4
                The King Of Fighters XI               AX3201M01 to AX3207M01    7
                Neogeo Battle Coliseum                AX3301M01 to AX3307M01    7
                Rumble Fish 2                         AX3401M01 to AX3405M01    5
@@ -1190,6 +1181,7 @@ This type is manufactured by Sega when Sammy merged with Sega.
 171-8355A
 PC BD A/W 128M FLASH
 837-14608 (sticker for Extreme Hunting 2 Tournament Edition)
+837-14695 (sticker for Dirty Pigskin Football)
 |----------------------------|
 | XC9536*         U16   U2*  |
 |                            |
@@ -1215,40 +1207,27 @@ Notes:
                Game                                  Part#      Sticker
                ---------------------------------------------------------
                Extreme Hunting 2 Tournament Edition  315-6428P  315-6248
+               Dirty Pigskin Football                ?          ?
 
           U* - Fujitsu MBM29PL12LM-10PCN 128M MirrorFlash TSOP56 flash ROM.
                (configured as 16Mbytes x8bit or 8Mwords x16bit)
                This ROM has no additional custom markings. The name in the archive has been devised
-               purely for convenience. The number of ROMs may vary between games. So far all 8
-               positions have been seen populated. It's also possible all positions are present
-               when manufactured, each board is programmed to requirements and depending on the total
-               data length, some ROMs may be empty.
+               purely for convenience using the Sega 837- sticker number. The number of ROMs may vary
+               between games. So far all 8 positions have been seen populated. It's also possible all
+               positions are present when manufactured, each board is programmed to requirements and
+               depending on the total data length, some ROMs may be empty.
 
-
-               Other games not dumped (some may have been cancelled, * = known to be released)
-               ----------------------
-               Chase 1929
-               Dirty Pigskin
-               Force Five
-               Guilty Gear X Version 1.5 *
-               Kenju
-               Metal Slug 6 *
-               Premier Eleven
-               Sushi Bar
-           The King Of Fighters XI *
-               Sega Clay Challenge *
-               Sega Bass Fishing Challenge *
 
 
 Network Board
 -------------
 
-This board is required for Extreme Hunting 2 Tournament Edition, although it doesn't need to be connected
-to a network or another Atomiswave unit to boot up. However it must be plugged into the PCB in the
-communication slot or the game will not go in-game. It will boot but then displays NETWORK BOARD ERROR
-if not present. Externally there's a hole for an RJ45 network cable and a slot for a PIC16C621/PIC16C622
-PIC enclosed in a black plastic housing. This is the same type as used in NAOMI etc. This board probably acts
-like the NAOMI network DIMM board minus the on-board DIMM RAM storage.
+This board is required for Extreme Hunting 2 Tournament Edition (and possibly some other Sega-made Atomiswave carts)
+although it doesn't need to be connected to a network or another Atomiswave unit to boot up. However it must be
+plugged into the PCB in the communication slot or the game will not go in-game. It will boot but then displays
+NETWORK BOARD ERROR if not present. Externally there's a hole for an RJ45 network cable and a slot for a
+PIC16C621/PIC16C622 PIC enclosed in a black plastic housing. This is the same type as used in NAOMI etc. This
+board probably acts like the NAOMI network DIMM board minus the on-board DIMM RAM storage.
 
 837-14508R
 171-8324C
@@ -1285,6 +1264,7 @@ Notes:
                            Game                                   Sega Part#
                            ---------------------------------------------------
                            Extreme Hunting 2 Tournament Edition   317-0445-COM
+
 
 AW-NET Network Board
 --------------------
@@ -1334,6 +1314,18 @@ Notes:
       CN3 - Gun connection for player 2 pump switch
       CN4 - Gun connection for player 1 trigger and optical
       CN5 - Gun connection for player 1 pump switch
+
+
+Other games not dumped (some may have been cancelled)
+----------------------
+Chase 1929
+Force Five
+Kenju
+Premier Eleven
+Sushi Bar
+Sega Clay Challenge
+Sega Bass Fishing Challenge
+
 */
 
 #include "emu.h"
@@ -2652,25 +2644,6 @@ ROM_START( doa2 )
 	// on-cart X76F100 eeprom contents
 	ROM_REGION( 0x84, "naomibd_eeprom", 0 )
 	ROM_LOAD( "841-0003.sf",  0x000000, 0x000084, CRC(3a119a17) SHA1(d37a092cca7c9cfc5f2637b355af90a65d04013e) )
-
-	// trojaned protection data (filename is word offset)
-	ROM_REGION( 0x200000, "naomibd_prot", ROMREGION_ERASE00 )
-        ROM_LOAD( "00000500.bin", 0x000000, 0x020000, CRC(3751d50e) SHA1(08d56e7befd3e1bc2c29217c60dee0c862af65ed) )
-        ROM_LOAD( "00020504.bin", 0x020000, 0x020000, CRC(6b4ab9f6) SHA1(205c355a5a55659f35645d3e66dc1dcff703727c) )
-        ROM_LOAD( "00040508.bin", 0x040000, 0x020000, CRC(dae5d37d) SHA1(63d0cde73b86e77ea7b5e1d71643566c500f9933) )
-        ROM_LOAD( "0006050c.bin", 0x060000, 0x020000, CRC(c2b7ea51) SHA1(59f1cb01b140e7fdea7d945acad464e08e3adf44) )
-        ROM_LOAD( "00080510.bin", 0x080000, 0x020000, CRC(7b84acb4) SHA1(e48448795c058c0fc3a9e9108de18a3181db5417) )
-        ROM_LOAD( "000a0514.bin", 0x0a0000, 0x020000, CRC(f954ffcd) SHA1(3015dfc298de1e16db07406e9ecb5fc0e2aae0a8) )
-        ROM_LOAD( "000c0518.bin", 0x0c0000, 0x020000, CRC(28fce8ad) SHA1(180ae2dc9181bbe4215093e4e933c9e78d3af7a8) )
-        ROM_LOAD( "000e051c.bin", 0x0e0000, 0x020000, CRC(a7f7a5c1) SHA1(6b39aa8f8a762ffe61b07f77713cca5c95a8dfcf) )
-        ROM_LOAD( "00100520.bin", 0x100000, 0x020000, CRC(85417674) SHA1(0d35aa0f3d5f451bbf4daad343b9ad1ebd9d9551) )
-        ROM_LOAD( "00118a3a.bin", 0x120000, 0x020000, CRC(72e58444) SHA1(09ae85c131f7b4a0638efd1dff0807cc20b59637) )
-        ROM_LOAD( "0012c0d8.bin", 0x140000, 0x020000, CRC(84e8e517) SHA1(f1e81913181b9c6276a430988fefc00597e33e89) )
-        ROM_LOAD( "00147e22.bin", 0x160000, 0x020000, CRC(66efd53e) SHA1(40cfc20df93f9ec1f260fc3f56bb5ac0be775cc6) )
-        ROM_LOAD( "001645ce.bin", 0x180000, 0x020000, CRC(adc73d19) SHA1(4df4bd7db6bf2f9af06d9d3ec9466970bec7833c) )
-        ROM_LOAD( "0017c6b2.bin", 0x1a0000, 0x020000, CRC(717f2e91) SHA1(e03d778a1c39cf01827f79a1b10c03a4a6047962) )
-        ROM_LOAD( "0019902e.bin", 0x1c0000, 0x020000, CRC(f4882ea8) SHA1(a27e52062780e095675f749191e0ea22755152eb) )
-        ROM_LOAD( "001b562a.bin", 0x1e0000, 0x013e00, CRC(01ae0721) SHA1(b9f24e0bb8609b8cb1a45e7c1e1dc1f271bbdcaf) )
 ROM_END
 
 /*
@@ -2741,25 +2714,6 @@ ROM_START( doa2m )
 	// on-cart X76F100 eeprom contents
 	ROM_REGION( 0x84, "naomibd_eeprom", 0 )
 	ROM_LOAD( "841-0003.sf",  0x000000, 0x000084, CRC(3a119a17) SHA1(d37a092cca7c9cfc5f2637b355af90a65d04013e) )
-
-	// trojaned protection data (filename is word offset)
-	ROM_REGION( 0x200000, "naomibd_prot", ROMREGION_ERASE00 )
-        ROM_LOAD( "00000500.bin", 0x000000, 0x020000, CRC(a42f0337) SHA1(0aaeff753a4e2f9b5d287cd80952533f0ced430c) )
-        ROM_LOAD( "00020504.bin", 0x020000, 0x020000, CRC(3d3bfbe4) SHA1(4748ca4c14a31da623ebd3a1acff93635c039888) )
-        ROM_LOAD( "00040508.bin", 0x040000, 0x020000, CRC(d0c3699c) SHA1(11a4e8b47cb6ae827307cd44689477ebfe23d690) )
-        ROM_LOAD( "0006050c.bin", 0x060000, 0x020000, CRC(bc2e8e71) SHA1(253561a58caf15607d87d932d9b98d6ffa779669) )
-        ROM_LOAD( "00080510.bin", 0x080000, 0x020000, CRC(a26a6159) SHA1(8e4f0a2091b5b2eb825bb9220c5e4dfe9ab935fe) )
-        ROM_LOAD( "000a0514.bin", 0x0a0000, 0x020000, CRC(83138b3b) SHA1(6b69e43b6e6c4b75278045a883337cb7abcf9501) )
-        ROM_LOAD( "000c0518.bin", 0x0c0000, 0x020000, CRC(9f246058) SHA1(bc54f3bdc23a278b14867e096c3f644447b9c0a6) )
-        ROM_LOAD( "000e051c.bin", 0x0e0000, 0x020000, CRC(7cfd53d5) SHA1(d77ff8d3edbc2d41334d6416d17339ea2c764887) )
-        ROM_LOAD( "00100520.bin", 0x100000, 0x020000, CRC(8dd856d3) SHA1(9952fdf9017bdb8c50b413de5817a746c24901e9) )
-        ROM_LOAD( "0011a5b4.bin", 0x120000, 0x020000, CRC(484c511d) SHA1(02c8c1b46ce8a27b85652d3f032f4f42be5341ba) )
-        ROM_LOAD( "0012e7c4.bin", 0x140000, 0x020000, CRC(ceffdd4b) SHA1(36dfa9fd4857429cf9b505d04d7a82d3bc161b90) )
-        ROM_LOAD( "001471f6.bin", 0x160000, 0x020000, CRC(263d0706) SHA1(194e259b78d3006372ad007a7e3b9456f607b922) )
-        ROM_LOAD( "001640c4.bin", 0x180000, 0x020000, CRC(3addb31e) SHA1(97794166b0811ff9535b3a3f598e0cb3da9fc7b3) )
-        ROM_LOAD( "001806ca.bin", 0x1a0000, 0x020000, CRC(dbfddad2) SHA1(72696b5ed942fe3ef0bc271f6d66d5f089221192) )
-        ROM_LOAD( "00199df4.bin", 0x1c0000, 0x020000, CRC(2ab0d0c3) SHA1(10642e9d8c9c24f366359fbe7890a0f1347a7a1a) )
-        ROM_LOAD( "001b5d0a.bin", 0x1e0000, 0x017e00, CRC(c9c3bbd5) SHA1(6f3853e3e1614993b5d658ebec6bf5183577ab36) )
 ROM_END
 
 /*
@@ -3424,29 +3378,6 @@ ROM_START( ggx )
 	ROM_LOAD("mpr-23353.ic12", 0x6000000, 0x0800000, CRC(daa0ca24) SHA1(afce14e213e79add7fded838e71bb4447425906a) )
 	ROM_LOAD("mpr-23354.ic13", 0x6800000, 0x0800000, CRC(cea127f7) SHA1(11f12472ebfc93eb72b764c780e30afd4812dbe9) )
 	ROM_LOAD("mpr-23355.ic14", 0x7000000, 0x0800000, CRC(e809685f) SHA1(dc052b4eb4fdcfdc22c4807316ce34ee7a0d58a6) )
-
-	// trojaned protection data
-	ROM_REGION( 0x200000, "naomibd_prot", ROMREGION_ERASE00 )
-        ROM_LOAD( "a0100000.bin", 0x000000, 0x010000, CRC(cbe5a37a) SHA1(63f40758ef94d02a53ad860b2bed9c41e20a8263) )
-        ROM_LOAD( "a010b268.bin", 0x010000, 0x010000, CRC(7f0ba37e) SHA1(2d33703c9ec08800c3fae23991859f713f8c944b) )
-        ROM_LOAD( "a0115558.bin", 0x020000, 0x010000, CRC(882c945f) SHA1(60bf8fe3dcf079464f660c7c210d2a379b2ef04f) )
-        ROM_LOAD( "a0120b28.bin", 0x030000, 0x010000, CRC(024952c0) SHA1(98e4ce87b5ac1169b5ab1ba9cc7553069e09cbbe) )
-        ROM_LOAD( "a012987a.bin", 0x040000, 0x010000, CRC(50ea6621) SHA1(ea4e5e0b9563c5e49794a634c08be8d2e81fb773) )
-        ROM_LOAD( "a012e320.bin", 0x050000, 0x010000, CRC(e445906e) SHA1(cd585100b78253bdd16f3895fdb37ff1e08690f6) )
-        ROM_LOAD( "a0133cf6.bin", 0x060000, 0x00f014, CRC(5763d154) SHA1(645b0a10fd196f53ff7f656b8db798c8e753c4ed) )
-        ROM_LOAD( "a0170000.bin", 0x070000, 0x010000, CRC(e153030a) SHA1(e1738ec558f0e3d5a796e34618c533cfcd6928ed) )
-        ROM_LOAD( "a017cf18.bin", 0x080000, 0x010000, CRC(def783cf) SHA1(911e6b99f8ce498ddd5048ea655b76cad33f47c0) )
-        ROM_LOAD( "a018a45a.bin", 0x090000, 0x010000, CRC(408cd99b) SHA1(110f9922cded7ffc5108ed964b82ac39beb6ce6b) )
-        ROM_LOAD( "a0197852.bin", 0x0a0000, 0x010000, CRC(09d10a60) SHA1(04bfdba2ea9a45cb10a60fe95d7d2e0997012b4f) )
-        ROM_LOAD( "a01a4916.bin", 0x0b0000, 0x010000, CRC(3895730e) SHA1(b2c0a839e330916e598c8f27f2a4873bbaaddbde) )
-        ROM_LOAD( "a01b1c3e.bin", 0x0c0000, 0x010000, CRC(eecb6a13) SHA1(0203c54b98aaf203e7d1b3646102efe63c550115) )
-        ROM_LOAD( "a01bef38.bin", 0x0d0000, 0x010000, CRC(7d9a497c) SHA1(680a49389e7774aa03ebe6fc844dea53b430796f) )
-        ROM_LOAD( "a01cbb10.bin", 0x0e0000, 0x010000, CRC(69b770bd) SHA1(aac5801d9a8a48ef77e932195cd7c30ae562bc38) )
-        ROM_LOAD( "a01d7500.bin", 0x0f0000, 0x010000, CRC(a1119fca) SHA1(1acda8f73a5b1fb180985245b8b0eb9453db0cea) )
-        ROM_LOAD( "a0200000.bin", 0x100000, 0x010000, CRC(21662b41) SHA1(4dab25dcc92d1a7418d308542499bdec6c3b3b2b) )
-        ROM_LOAD( "a0210004.bin", 0x110000, 0x010000, CRC(07166890) SHA1(529c28bf925243468fc00b0ad5ea57429d4de907) )
-        ROM_LOAD( "a0220008.bin", 0x120000, 0x008000, CRC(09cd1354) SHA1(83f6b36aec4e7c5aa1b8bc21dc6fabf8f283ed55) )
-        ROM_LOAD( "a0228000.bin", 0x130000, 0x008000, CRC(628a4917) SHA1(cf36bc2413cb63fb511936ab4b5f11b7c8cbb057) )
 ROM_END
 
 /*
@@ -3640,16 +3571,6 @@ ROM_START( mvsc2 )
 	ROM_LOAD("mpr-23061.ic30",  0x7000000, 0x0800000, CRC(fb1844c4) SHA1(1d1571516a6dbed0c4ded3b80efde9cc9281f66f) )
 	ROM_LOAD("mpr-23083.ic31",  0x7800000, 0x0400000, CRC(c61d2dfe) SHA1(a05fb979ed7c8040de91716fc8814e6bd995efa2) )
 	ROM_LOAD("mpr-23084.ic32",  0x8000000, 0x0400000, CRC(e228cdfd) SHA1(d02a2e3557bd24cf34c5ddb42d41ca15e78ae885) )
-
-
-
-	// DMA protection data
-	ROM_LOAD("88000000.bin", 0x8800000, 0x025f00, CRC(77d79823) SHA1(2545d28eee47114e8ffb9bc6d7a910e90fc48420) )
-	ROM_LOAD("88026440.bin", 0x8830000, 0x016520, CRC(dad9ebbd) SHA1(39c0697caa2b5ee11d99e75726e92ed86a23f10b) )
-	ROM_LOAD("8803bda0.bin", 0x8850000, 0x01e5e0, CRC(9e0b8202) SHA1(729bed557c1a00da13c990603bbadab38d90285e) )
-	ROM_LOAD("8805a560.bin", 0x8870000, 0x0017a0, CRC(7bc27482) SHA1(6ce6074cf47989f42af02deb7aac52883912784a) )
-	ROM_LOAD("8805b720.bin", 0x8880000, 0x02b5a0, CRC(485d0aef) SHA1(853f4b49b489cc512c906edcaf3cd8b5bf4c64c0) )
-	ROM_LOAD("8808b7e0.bin", 0x88a0000, 0x013ec0, CRC(0fc8f363) SHA1(dad30d43cef89d01ce80301b1d796aabad755de6) )
 ROM_END
 
 /* toy fighter - 1999 sega */
@@ -3744,9 +3665,6 @@ ROM_START( 18wheelr )
         ROM_LOAD( "mpr-22182.ic19s", 0x9800000, 0x800000, CRC(c5606c42) SHA1(5871104ff1c7acde0493e13b9a4d0abdf8a40728) )
         ROM_LOAD( "mpr-22183.ic20s", 0xa000000, 0x800000, CRC(776af308) SHA1(7d29cb4dce75d34c622549fea7e102868d0da60a) )
 
-	ROM_REGION( 0x200000, "naomibd_prot", ROMREGION_ERASE00 )
-        ROM_LOAD( "00800000.bin", 0x000000, 0x002000, CRC(7fc42084) SHA1(7c7b9e7e0b8885e690f3edd25e6d26201c899f2f) )
-
 	// JVS I/O board 837-13844, code is for a Z80 of unknown type (it's inside the big Sega ASIC)
 	ROM_REGION( 0x20000, "jvsio", ROMREGION_ERASEFF)
         ROM_LOAD( "epr-21868.ic7", 0x000000, 0x010000, CRC(c306a51f) SHA1(7833b73dc34c4c62401a30637968f46b949ceac0) )
@@ -3803,10 +3721,6 @@ ROM_START( sgtetris )
         ROM_LOAD( "mpr-22913.ic4", 0x2000000, 0x800000, CRC(1fbdc41a) SHA1(eb8b9577b7677b9e9aec05ae950dee516ae15bf5) )
         ROM_LOAD( "mpr-22914.ic5", 0x2800000, 0x800000, CRC(77844b60) SHA1(65d71febb8a160d00778ac7b53e082253cad9834) )
         ROM_LOAD( "mpr-22915.ic6", 0x3000000, 0x800000, CRC(e48148ac) SHA1(c1273353eeaf9bb6b185f133281d7d04271bc895) )
-
-	// trojaned protection data (filename is address read from)
-	ROM_REGION( 0x200000, "naomibd_prot", ROMREGION_ERASE00 )
-        ROM_LOAD( "a0cad0c0.bin", 0x000000, 0x0101b2, CRC(0db80e6d) SHA1(74f8e817e3e69c64391b2eff2c8c504dcad9f84f) )
 ROM_END
 
 /*
@@ -4102,9 +4016,6 @@ ROM_START( qmegamis )
 	ROM_LOAD32_WORD("mpr-23226.ic32", 0x8000002, 0x0800000, CRC(cd5da506) SHA1(2e76c8892c1d389b0f12a0046213f43d2ab07d78) ) //ic 17
 
 	ROM_COPY( "user1", 0x1400000, 0x0800000, 0x0800000 ) // mirror data for IC1 (no test on this game, but layout is the same as gram2000)
-
-	// trojaned protection data (must be in the "user1" region because it's accessed via DMA)
-	ROM_LOAD( "81452000_dma.bin", 0x9000000, 0x000120, CRC(96049488) SHA1(e2b98e8986f8cbf026db50a652300081a8e470b0) )
 ROM_END
 
 /*
@@ -4695,9 +4606,6 @@ ROM_START( vtenis2c )
         ROM_LOAD32_WORD( "mpr-22322.32",   0x7800002, 0x800000, CRC(21bf1caf) SHA1(bc1828db2f5f71ef87153a81b49b2ba72ba176e1) )
         ROM_LOAD32_WORD( "mpr-22323.33s",  0x8800000, 0x800000, CRC(0bd632ab) SHA1(21acab5336dd0ba317839176f2557df95917729e) )
         ROM_LOAD32_WORD( "mpr-22324.34",   0x8800002, 0x800000, CRC(ff2571d4) SHA1(c2cbb2345163bbf1973e63cefb9a952e5a52a6cf) )
-
-	ROM_REGION( 0x200000, "naomibd_prot", ROMREGION_ERASE00 )
-        ROM_LOAD( "01f169c0.bin", 0x000000, 0x000100, CRC(b0a330f4) SHA1(10c7a7f4d6c7f265a32887beaca73686c4cb1e03) )
 ROM_END
 
 ROM_START( kick4csh )
@@ -6137,11 +6045,11 @@ ROM_START( initdv2j )
 	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
 	//PIC16C622A (317-0345-JPN)
 	//(sticker 253-5508-0345J)
-	ROM_LOAD( "317-0345-jpn.pic", 0x000000, 0x004000, CRC(56e1274a) SHA1(735a6071226f3297de64bc0a38be741e87f5d023) ) 
+	ROM_LOAD( "317-0345-jpn.pic", 0x000000, 0x004000, CRC(56e1274a) SHA1(735a6071226f3297de64bc0a38be741e87f5d023) )
 ROM_END
 
 ROM_START( initdv2jo )
-	NAOMI2_BIOS
+	NAOMIGD_BIOS
 	NAOMI_DEFAULT_EEPROM
 
 	DISK_REGION( "gdrom" )
@@ -6163,7 +6071,7 @@ ROM_START( initdv2e )
 
 	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
 	//PIC16C622A (317-0357-EXP)
-	ROM_LOAD( "317-0357-exp.pic", 0x000000, 0x004000, CRC(38f84b4d) SHA1(03c12d8580da1a4b3a554e62fd8b1f3447b7ebbd) ) 
+	ROM_LOAD( "317-0357-exp.pic", 0x000000, 0x004000, CRC(38f84b4d) SHA1(03c12d8580da1a4b3a554e62fd8b1f3447b7ebbd) )
 ROM_END
 
 ROM_START( initdv3j )
@@ -6181,7 +6089,7 @@ ROM_START( initdv3j )
 ROM_END
 
 ROM_START( initdv3jb )
-	NAOMI2_BIOS
+	NAOMIGD_BIOS
 	NAOMI_DEFAULT_EEPROM
 
 	DISK_REGION( "gdrom" )
@@ -6923,6 +6831,7 @@ static const UINT32 dirtypig_key = 0xc194f;
 static const UINT32 mslug6_key   = 0x53627;
 static const UINT32 samsptk_key  = 0xe935f;
 static const UINT32 ggx15_key    = 0x91257;
+static const UINT32 rumblef2_key = 0xd674a;
 
 static DRIVER_INIT( atomiswave )
 {
@@ -6975,6 +6884,7 @@ AW_DRIVER_INIT(dirtypig)
 AW_DRIVER_INIT(mslug6)
 AW_DRIVER_INIT(samsptk)
 AW_DRIVER_INIT(ggx15)
+AW_DRIVER_INIT(rumblef2)
 
 ROM_START( fotns )
 	ROM_REGION( 0x200000, "awflash", 0)
@@ -7287,14 +7197,28 @@ ROM_START( ggx15 )
 	AW_BIOS
 
 	ROM_REGION( 0x8000000, "user1", ROMREGION_ERASE)
-        ROM_LOAD( "ax0801p01.ic18", 0x0000000, 0x0800000, CRC(d920c6bb) SHA1(ab34bbef3c71396447bc5322d8e8786041fc832a) ) 
-        ROM_LOAD( "ax0801m01.ic11", 0x1000000, 0x1000000, CRC(61879b2d) SHA1(9592fbd979cef9d8f465cd92d0f00b9c13ecf7ba) ) 
-        ROM_LOAD( "ax0802m01.ic12", 0x2000000, 0x1000000, CRC(c0ff124d) SHA1(dd403d10de2f097fbaa6b93bc311e2b9e893828d) ) 
-        ROM_LOAD( "ax0803m01.ic13", 0x3000000, 0x1000000, CRC(4400c89a) SHA1(4e13536c01103ecfbfc9e3e33746ceae7a91a520) ) 
-        ROM_LOAD( "ax0804m01.ic14", 0x4000000, 0x1000000, CRC(70f58ab4) SHA1(cd2def19bbad945c87567f8d28f3a2a179a7f7f6) ) 
-        ROM_LOAD( "ax0805m01.ic15", 0x5000000, 0x1000000, CRC(72740e45) SHA1(646eded89f10008c9176cd6772a8ac9d1bf4271a) ) 
-        ROM_LOAD( "ax0806m01.ic16", 0x6000000, 0x1000000, CRC(3bf8ecba) SHA1(43e7fbf21d8ee60bab72ce558640730fd9c3e3b8) ) 
-        ROM_LOAD( "ax0807m01.ic17", 0x7000000, 0x1000000, CRC(e397dd79) SHA1(5fec32dc19dd71ef0d451f8058186f998015723b) ) 
+        ROM_LOAD( "ax0801p01.ic18", 0x0000000, 0x0800000, CRC(d920c6bb) SHA1(ab34bbef3c71396447bc5322d8e8786041fc832a) )
+        ROM_LOAD( "ax0801m01.ic11", 0x1000000, 0x1000000, CRC(61879b2d) SHA1(9592fbd979cef9d8f465cd92d0f00b9c13ecf7ba) )
+        ROM_LOAD( "ax0802m01.ic12", 0x2000000, 0x1000000, CRC(c0ff124d) SHA1(dd403d10de2f097fbaa6b93bc311e2b9e893828d) )
+        ROM_LOAD( "ax0803m01.ic13", 0x3000000, 0x1000000, CRC(4400c89a) SHA1(4e13536c01103ecfbfc9e3e33746ceae7a91a520) )
+        ROM_LOAD( "ax0804m01.ic14", 0x4000000, 0x1000000, CRC(70f58ab4) SHA1(cd2def19bbad945c87567f8d28f3a2a179a7f7f6) )
+        ROM_LOAD( "ax0805m01.ic15", 0x5000000, 0x1000000, CRC(72740e45) SHA1(646eded89f10008c9176cd6772a8ac9d1bf4271a) )
+        ROM_LOAD( "ax0806m01.ic16", 0x6000000, 0x1000000, CRC(3bf8ecba) SHA1(43e7fbf21d8ee60bab72ce558640730fd9c3e3b8) )
+        ROM_LOAD( "ax0807m01.ic17", 0x7000000, 0x1000000, CRC(e397dd79) SHA1(5fec32dc19dd71ef0d451f8058186f998015723b) )
+ROM_END
+
+ROM_START( rumblef2 )
+	ROM_REGION( 0x200000, "awflash", 0)
+	AW_BIOS
+
+	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE)
+	ROM_LOAD( "ax3401p01.fmem1", 0x0000000, 0x0800000, CRC(a33601cf) SHA1(2dd60a9c3a2517f2257ab69288fa95645de133fa) )
+	ROM_LOAD( "ax3401m01.mrom1", 0x1000000, 0x2000000, CRC(60894d4c) SHA1(5b21af3c7c82d4d64bfd8498c26283111ada1298) )
+	ROM_LOAD( "ax3402m01.mrom2", 0x3000000, 0x2000000, CRC(e4224cc9) SHA1(dcab06fcf48cda286f93d2b37f03a83abf3230cb) )
+	ROM_LOAD( "ax3403m01.mrom3", 0x5000000, 0x2000000, CRC(081c0edb) SHA1(63a3f1b5f9d7ca4367868c492236406f23996cc3) )
+	ROM_LOAD( "ax3404m01.mrom4", 0x7000000, 0x2000000, CRC(a426b443) SHA1(617aab42e432a80b0663281fb7faa6c14ef4f149) )
+	ROM_LOAD( "ax3405m01.mrom5", 0x9000000, 0x2000000, CRC(4766ce56) SHA1(349b82013a75905ae5520b14a87702c9038a5def) )
+	ROM_COPY( "user1", 0x9000000, 0xb000000, 0x2000000)
 ROM_END
 
 /* Atomiswave */
@@ -7313,6 +7237,7 @@ GAME( 2004, salmankt, awbios,   aw,    aw,    salmankt, ROT0, "Sammy",          
 GAME( 2004, ftspeed,  awbios,   aw,    aw,    ftspeed,  ROT0, "Sammy",				 "Faster Than Speed", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 GAME( 2004, kov7sprt, awbios,   aw,    aw,    kov7sprt, ROT0, "Sammy / IGS",			 "Knights of Valour - The Seven Spirits", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
 GAME( 2005, vfurlong, awbios,   aw,    aw,    vfurlong, ROT0, "Sammy",			         "Net Select Keiba Victory Furlong", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+GAME( 2004, rumblef2, awbios,   aw,    aw,    rumblef2, ROT0, "Sammy / Dimps",                   "The Rumble Fish 2", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 GAME( 2005, ngbc,     awbios,   aw,    aw,    ngbc,     ROT0, "Sammy / SNK Playmore",            "Neo-Geo Battle Coliseum", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 GAME( 2005, samsptk,  awbios,   aw,    aw,    samsptk,  ROT0, "Sammy / SNK Playmore",            "Samurai Spirits Tenkaichi Kenkakuden", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 GAME( 2005, kofxi,    awbios,   aw,    aw,    kofxi,    ROT0, "Sammy / SNK Playmore",            "The King of Fighters XI", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
