@@ -202,6 +202,8 @@ struct _upd7220_t
 
 	UINT16 vram[0x40000];
 	UINT32 vram_bank;
+
+	UINT8 bitmap_mod;
 };
 
 static const int x_dir[8] = { 0, 1, 1, 1, 0,-1,-1,-1};
@@ -658,6 +660,12 @@ static void draw_pixel(upd7220_t *upd7220,int x,int y,UINT16 tile_data)
 
 	dad = x & 0xf;
 
+	if((upd7220->bitmap_mod & 3) == 2) //reset to zero
+		tile_data = 0;
+
+	if((upd7220->bitmap_mod & 2) == 0)
+		printf("Used bitmap modifier %02x\n",upd7220->bitmap_mod);
+
 	upd7220->vram[addr + upd7220->vram_bank] &= ~(0x8000 >> (15-dad));
 	upd7220->vram[addr + upd7220->vram_bank] |= ((tile_data) & (0x8000 >> (15-dad)));
 }
@@ -674,10 +682,7 @@ static void draw_line(upd7220_t *upd7220,int x,int y)
 	UINT8 dot;
 
 	line_size = upd7220->figs.dc + 1;
-	/* TODO: line pattern is unchecked */
 	line_pattern = (upd7220->ra[8]) | (upd7220->ra[9]<<8);
-
-	//printf("%d %d %08x %04x %d %04x\n",x,y,line_size,line_pattern,upd7220->figs.dir,upd7220->pitch);
 
 	for(i = 0;i<line_size;i++)
 	{
@@ -1023,7 +1028,7 @@ static void process_fifo(device_t *device)
 				upd7220->ra_addr++;
 			}
 
-			upd7220->param_ptr = 1;
+			upd7220->param_ptr = 0;
 		}
 		break;
 
@@ -1037,7 +1042,8 @@ static void process_fifo(device_t *device)
 		break;
 
 	case COMMAND_WDAT: /* write data into display memory */
-		//printf("CR %02x\n",upd7220->cr);
+		upd7220->bitmap_mod = upd7220->cr & 3;
+
 		if (upd7220->param_ptr == 3 || (upd7220->param_ptr == 2 && upd7220->cr & 0x10))
 		{
 			//printf("%02x = %02x %02x (%c) %04x\n",upd7220->cr,upd7220->pr[2],upd7220->pr[1],upd7220->pr[1],EAD);
