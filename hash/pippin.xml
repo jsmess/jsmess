@@ -1,0 +1,301 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="pippin" description="Pippin CD-ROM list">
+  
+<!-- Todo: Some (maybe all?) Pippin discs are compatible with macs 
+       
+    Undumped (to be confirmed):
+	name						publisher		serial		date
+	@World Basics					?			01338C		?
+	@World Browser (Beta)				?			41458		?
+	@World Online Suite Browser			?			41588		?
+	@World Registration				?			01348C		?
+	Action Designer Ultraman Tiga			?			BDE-70018	?
+	AI Shougi					ASG			BDS-20032	?
+	Anime Designer - DragonBall Z			Bandai			BDE-10019	?
+	Anime Designer - DragonBall Z (Sample disc)	Bandai			BDE-10019	?
+	Anpanman no AIUEO-N !				?			BDE-10015	?
+	Anpanman to asobou! 1				?			BDE-10009	?
+	Anpanman to asobou! 2				?			BDE-70016	?
+	Atmark Adapter A				?			?		?
+	Atmark Town Ver. 2.0				?			BDB-022		?
+	B no Kaidan					?			?		?
+	Chibikko Club					?			BDS-20009	?
+	Chisato Moritaka CD-Rom Watarase Bashi		?			BDE-10007	?
+	CineNoir					Bandai			31158C		?
+	Circus!						?			BDS-20031	?
+	Compton's Interactive Encyclopedia		?			71278C		?
+	Cool Crafts					Bandai			71058C		?
+	Dazzeloids					?			BDS-20030	?
+	Densha Daishuugou - Driving Train		?			BDE-10014	?
+	EGWord Pure Version 1.0 for Pippin		?			BDE-10021	?
+	Epson Colorio Printer drivers			?			?		?
+	Exotic Sushi					Bandai			71062F		?
+	Fortullia					?			BDE-10003	?
+	Funky Funny Alien				?			BDS-20014	?
+	Gadget						?			BDS-20033	?
+	Gokigen Mama no Omakase Diary			?			?		?
+	Gundam Virtual Modeler Light			?			BDE-10029	?
+	Gus Goes to Cyberopolis				Bandai			11198C		?
+	Gus Goes to Kooky Carnival			Bandai			11208C		?
+	Hare Tokidoki Buta - Fair, Then Partly Piggy	?			BDS-20038	?
+	Hanshin Daishinsai 				?			BDS-20005	1995.1.17
+	Home Improvement 1-2-3				?			?		?
+	Katz Pippin Demo CD 2.0				?			Kats-X01	?
+	Internet Kit Ver. 1.1				Bandai			BDB-010		?
+	Internet Kit Ver. 2.0 (Disk 6 vol.1.1)		Bandai			BDB-012		?
+	Jungle Park					?			BDE-10013	?
+	Kids Box					?			BDS-20003	?
+	L-Zone - Interactive Theater 			Bandai			BDS-20017	?
+	LuLu						?			BDS-20039	?
+	Mac Bin 38 (Mac User Japanese Edition 1997 1) 	?			MUJ-9701	1997
+	Mac Bin 40 A (Mac User Japanese Edition 1997 3) ?			MUJ-9703-1	1997
+	Mac Bin 40 B (Mac User Japanese Edition 1997 3) ?			MUJ-9703-2	1997
+	Mac Fan Pippin - Pippin Title Demo		?			?		?
+	Macintosh on Pippin (aka Tuscon)		?			?		?
+	Mission School R				?			BDS-20035	?
+	Movieoke					Bandai			?		?
+	Mobile Suit Gundam Zion Dukedom Military-File	Bandai			BDE-10038	?
+	Mobile Suit Gundam White Base			Bandai			BDE-10031	?
+	Music ISLAND vol.1 Prokofiev Peter and the Wolf ?			BDS-20007	?
+	Music ISLAND vol.2 Tchaikovsky’s The Nutcracker ?			BDS-20027	?
+	Music ISLAND vol.3 Vivaldi The Four Seasons	?			BDS-20028	?
+	Music ISLAND vol.4 Saint-Saens carnival		?			BDS-20029	?
+	Mr. Potato Head Saves Veggie Valley		Bandai			11048C		?
+	Narabete! Tsukkute! Ugoku Block			?			BDE-10011	?
+	Navigator					Apple			?		?
+	Nemurenu Yoru no Chiisana ohanashi		?			BDS-20015	?
+	NETCRUISER 3.0 J-Data Web Viewer		?			BDB-033		?
+	Nobunaga no Yabou Returns			?			BDE-10018	?
+	PEase						MAKI Enterprise		PEASE001	1996
+	PEase						MAKI Enterprise		PEASE002	1996
+	PEase Turbo 					MAKI Enterprise		PEASE2001	?
+	Pegasus Prime					Bandai			?		?
+	Pippin Atmark Demonstration Disk		Bandai			BDZ-00001	?
+	Pippin Hardware Demo				Bandai			xxx-001		?
+	Pippin Navigator CD Ver. 1.1 (Disk 4 vol.1)	Bandai			BDB-008		?
+	Pippin Network CD Ver. 2.0 (Disk 4 vol.1)	Bandai			BDB-011		?
+	Pippin Network CD Ver. 2.1 (Disk 6 vol.1.1)	Bandai			BDB-014		?
+	Pippin Network CD Ver. 3.0			Bandai			?		?
+	Pippin SDK Version 1.1				Bandai			?		04/96
+	Pippin SDK					Bandai			?		11/96
+	Playskool Puzzles				?			1118C		?
+	Power Nazorer					?			PNL9610HBLD	?
+	Power Rangers Zeo vs. the Machine Empire	Bandai			41018F		?
+	Racing Days (Jpn)				Bandai			BDE-20008	?
+	Racing Days (USA)				Bandai			41148F		?
+	Racing Days (Bonus disc)			Bandai			?		?
+	Randoseru Shougakkou 1 Nen Sei			?			BDS-20010	?
+	SD Gundam Wars					Bandai			BDE-10017	?
+	SD Ultraman no Chyousen! Meiro Island		Bandai			BDE-10010	?
+	SeesawC 1 - Sukinamonodake Eitango 120		?			BDE-10006	?
+	SeesawC 2 - Sukinatokorode Eitango 400		?			BDE-10023	?
+	Shichisokusen					?			BDS-20019	?
+	Shockwave: Invasion Earth 2019			Electronic Arts		BDS-20024	?
+	T-Break						Infocity		BDS-20026	?
+	Tarot Mystery					Visit			BDS-20004	?
+	Tamagotchi CD-ROM				?			BDE-10033	?
+	Terror T.R.A.X.					Bandai			61528		?
+	Techno Park Tondematto				?			?		?
+	Testuman Gaiden - Game Daiou no Yabou		?			?		?
+	Tropic Island					?			BDS-20011	?
+	TV Works Ver. 1.0 (USA)				Bandai			61088C		?
+	TV Works Ver. 2.1 (Jpn) (Disk 6 vol.1.1)	Bandai			BDB-013		?
+	TV Works Ver. 2.0 (Jpn)	(Disk 4 vol.1)		Bandai			BDB-009		1996
+	TV Works Ver. 3.0 (USA)				Bandai			61088C		?
+	TV Works Ver. POP				Bandai			BDB-020		?
+	Ultraman Quiz King				?			BDE-70020	?
+	Victorian Park CD1				?			BDE-10004	?
+	Victorian Park CD2				?			BDE-10004	?
+	WebViewer With Internet Explorer 3.0 		?			BDB-026		?
+	Yellow Brick Road I				?			BDS-20022	?
+	Yellow Brick Road II CD1			?			BDS-20023	?
+	Yellow Brick Road II CD2			?			BDS-20023	?
+	Yellows - Akira Gomi Photographs		?			BDS-20001	?
+	Yellows 2.0 Tokyo 1993 Akira Gomi Photographs	?			BDS-20002	?
+	Yoku Mite Goran					?			BDS-20018	?
+	Zukkoke Sanningumi -Drama Satsujinjiken- 	?			BDE-10032	?
+
+-->
+
+	<software name="atmtown">
+		<description>Atmark Town (Ver 1.0) (Jpn)</description>
+		<!-- Serial: BDB-005 (Disk 6 vol.1) -->
+		<year>1996</year>
+		<publisher>Bandai</publisher>
+		<part name="cdrom" interface="pippin_cdrom">
+			<diskarea name="cdrom">
+				<disk name="atmtown" sha1="76acb73432ac4f71cbc982c129f94936b26d8778"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="gundamc">
+		<description>@Card SD Gundam Gaiden (Jpn)</description>
+		<!-- Serial: BDE-10034 -->
+		<year>1997</year>
+		<publisher>Bandai</publisher>
+		<part name="cdrom" interface="pippin_cdrom">
+			<diskarea name="cdrom">
+				<disk name="gundamc" sha1="b7b7989c4d837b316e65b275a43ae43fcb7e416d"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="franky">
+		<description>Franky Online (Jpn)</description>
+		<!-- Serial: BDB-006 (Disk 6 vol.1) -->
+		<year>1996</year>
+		<publisher>Bandai</publisher>
+		<part name="cdrom" interface="pippin_cdrom">
+			<diskarea name="cdrom">
+				<disk name="franky" sha1="699b9d0dada0bf9a9c2ac5b56510a4b5a927a30e"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="gakkono">
+		<description>Gakko no Kowai Uwasa: Hanako-san ga Kita!! (Jpn)</description>
+		<!-- Serial: BDS-20012 -->
+		<year>1996</year>
+		<publisher>Bandai</publisher>
+		<part name="cdrom" interface="pippin_cdrom">
+			<diskarea name="cdrom">
+				<disk name="gakkono" sha1="e7e6b4cdc5e73bebc3ba9c837b910103e9fceef7"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="gundamt">
+		<description>Gundam Tactics: Mobility Fleet0079 (Jpn)</description>
+		<!-- Serial: BDE-10008 -->
+		<year>1996</year>
+		<publisher>Bandai</publisher>
+		<part name="cdrom" interface="pippin_cdrom">
+			<diskarea name="cdrom">
+				<disk name="gundamt" sha1="6e86a9e5d748b8e736746cdc58131a7141cf56a7"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="thomas">
+		<description>Hashitte Asobou! Kikansha Thomas (Jpn)</description>
+		<!-- Serial: BDE-70024 -->
+		<year>1996</year>
+		<publisher>Bandai</publisher>
+		<part name="cdrom" interface="pippin_cdrom">
+			<diskarea name="cdrom">
+				<disk name="thomas" sha1="4163c5f5baa265b14e08fc09eb633f8d89346dc4"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="internet">
+		<description>Internet Kit (Jpn)</description>
+		<!-- Serial: BDB-004 (Disk 6 vol.1) -->
+		<year>1996</year>
+		<publisher>Bandai</publisher>
+		<part name="cdrom" interface="pippin_cdrom">
+			<diskarea name="cdrom">
+				<disk name="internet" sha1="e720808537ae3081bd0434a7ebc808033dc94387"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="navcd">
+		<description>Pippin Navigator CD (Jpn)</description>
+		<!-- Serial: BDB-001 (Disk 6 vol.1) -->
+		<year>1996</year>
+		<publisher>Bandai</publisher>
+		<part name="cdrom" interface="pippin_cdrom">
+			<diskarea name="cdrom">
+				<disk name="navcd" sha1="4bffb7ccadba49a40dff358ab8af088f7e0eddc1"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="netcd">
+		<description>Pippin Network CD (Jpn)</description>
+		<!-- Serial: BDB-002 (Disk 6 vol.1) -->
+		<year>1996</year>
+		<publisher>Bandai</publisher>
+		<part name="cdrom" interface="pippin_cdrom">
+			<diskarea name="cdrom">
+				<disk name="netcd" sha1="d48ce56da5ef379249e4af5df27491138b81f812"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="catalog1">
+		<description>Pippin TITLE CD-ROM CATALOG: Vol. I: 1996.3 (Jpn)</description>
+		<!-- Serial: BDB-007 -->
+		<year>1996</year>
+		<publisher>Bandai</publisher>
+		<part name="cdrom" interface="pippin_cdrom">
+			<diskarea name="cdrom">
+				<disk name="catalog1" sha1="58b2a18b1b1d4dda9b8e1914652e54ceb422f952"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="postcard">
+		<description>Post de Card Light (Ver 3.0) (Jpn)</description>
+		<!-- Serial: BDE-10028 -->
+		<year>1996</year>
+		<publisher>Bandai</publisher>
+		<part name="cdrom" interface="pippin_cdrom">
+			<diskarea name="cdrom">
+				<disk name="postcard" sha1="b95f3fc216d5879fc4ff4ccf0d3f3e98eacb3a57"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="suprmara">
+		<description>Super Marathon (USA)</description>
+		<!-- Serial: 41028C -->
+		<year>?</year>
+		<publisher>Bandai</publisher>
+		<part name="cdrom" interface="pippin_cdrom">
+			<diskarea name="cdrom">
+				<disk name="suprmara" sha1="b924e19d622ffd7f18f4e179b4378cbf5930d014"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="tunglue">
+		<description>Tunin' Glue (Jpn)</description>
+		<!-- Serial: BDE-10005 -->
+		<year>1996</year>
+		<publisher>Bandai</publisher>
+		<part name="cdrom" interface="pippin_cdrom">
+			<diskarea name="cdrom">
+				<disk name="tunglue" sha1="df182ff36c395872aeb9fbc45580ed3c468ef389"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="tvworks">
+		<description>TV Works - Word Paint Mail (Ver 1.0) (Jpn)</description>
+		<!-- Serial: BDB-003 (Disk 6 vol.1) -->
+		<year>1996</year>
+		<publisher>Bandai</publisher>
+		<part name="cdrom" interface="pippin_cdrom">
+			<diskarea name="cdrom">
+				<disk name="tvworks" sha1="56eb1944b8853723bde9e1352833c08ea143cafe"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="ultraman">
+		<description>Ultraman: The Digital Board Game (Jpn)</description>
+		<!-- Serial: BDE-70002 -->
+		<year>1996</year>
+		<publisher>Bandai</publisher>
+		<part name="cdrom" interface="pippin_cdrom">
+			<diskarea name="cdrom">
+				<disk name="ultraman" sha1="2ba048023f08d3cfd1de2ef18e11ca73a7db962f"/>
+			</diskarea>
+		</part>
+	</software>
+
+</softwarelist>
