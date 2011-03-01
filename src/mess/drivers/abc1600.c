@@ -1017,7 +1017,7 @@ static const floppy_config abc1600_floppy_config =
     DEVCB_NULL,
     FLOPPY_STANDARD_5_25_DSQD,
     FLOPPY_OPTIONS_NAME(default),
-    NULL
+    "floppy_5_25"
 };
 
 WRITE_LINE_MEMBER( abc1600_state::drq_w )
