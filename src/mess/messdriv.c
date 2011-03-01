@@ -663,7 +663,7 @@ const game_driver * const drivers[] =
 	DRIVER( ibm5170a )  /* 1985 IBM PC/AT 5170, enhanced 8 MHz model    */
 	DRIVER( i8530286 )  /* 1988 IBM PS/2 Model 30-286 (VGA)    */
 	DRIVER( i8555081 )  /* 1988 IBM PS/2 Model 55SX (VGA)    */
-	DRIVER( at )	/* 1987 AMI Bios and Diagnostics    */
+	DRIVER( at )	/* 1987 AMI Bios and Diagnostics    */	
 	DRIVER( atvga )	 /* 19?? AT VGA   */
 	DRIVER( neat )	  /* 1989 New Enhanced AT chipset, AMI BIOS    */
 	DRIVER( at386 )	 /* 19?? IBM AT 386   */
@@ -676,6 +676,7 @@ const game_driver * const drivers[] =
 	DRIVER( megapcpl )
 	DRIVER( ec1849 )
 	DRIVER( t2000sx )
+	DRIVER( cmdpc30 )
 
 	/* 3Com / Palm / USRobotics */
 	DRIVER( pilot1k )   /* Pilot 1000 */

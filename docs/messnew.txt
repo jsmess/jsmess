@@ -29,6 +29,8 @@ Skeleton drivers:
 - Olivetti M240
 - IBM PC 5140 Convertible
 - IBM PC JX
+- Commodore PC 30 III
+
 
 System Driver Changes:
 ----------------------

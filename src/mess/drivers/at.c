@@ -1099,6 +1099,17 @@ ROM_START( at )
 	ROM_REGION(0x50000, "gfx2", ROMREGION_ERASE00)
 ROM_END
 
+ROM_START( cmdpc30 )
+    ROM_REGION(0x1000000,"maincpu", 0)
+    ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a))
+	ROMX_LOAD( "commodore pc 30 iii even.bin", 0xf8000, 0x4000, CRC(36307aa9) SHA1(50237ffea703b867de426ab9ebc2af46bac1d0e1),ROM_SKIP(1))
+	ROMX_LOAD( "commodore pc 30 iii odd.bin",  0xf8001, 0x4000, CRC(41bae42d) SHA1(27d6ad9554be86359d44331f25591e3122a31519),ROM_SKIP(1))
+	/* Character rom */
+	ROM_REGION(0x2000,"gfx1", 0)
+	ROM_LOAD("5788005.u33", 0x00000, 0x2000, CRC(0bf56d70) SHA1(c2a8b10808bf51a3c123ba3eb1e9dd608231916f))
+
+	ROM_REGION(0x50000, "gfx2", ROMREGION_ERASE00)
+ROM_END
 
 ROM_START( atvga )
     ROM_REGION(0x1000000,"maincpu", 0)
@@ -1345,6 +1356,7 @@ COMP ( 1985, ibm5162,  ibm5170, 0,       ibm5162,   atcga,  atcga,      "Interna
 COMP ( 1988, i8530286, ibm5170, 0,       ps2m30286, atvga,	ps2m30286,  "International Business Machines",  "IBM PS/2 Model 30-286", GAME_NOT_WORKING )
 COMP ( 1989, i8555081, ibm5170, 0,       at386,		atvga,	at386,		"International Business Machines",  "IBM PS/2 Model 55SX", GAME_NOT_WORKING )
 COMP ( 1987, at,       ibm5170, 0,       ibm5162,   atcga,	atcga,      "<generic>",  "PC/AT (CGA, MF2 Keyboard)", GAME_NOT_WORKING )
+COMP ( 1988, cmdpc30,  ibm5170, 0,       ibm5162,   atcga,	atcga,      "Commodore Business Machines",  "PC 30 III", GAME_NOT_WORKING )
 COMP ( 1989, neat,     ibm5170, 0,       ibm5162,   atcga,	atcga,      "<generic>",  "NEAT (CGA, MF2 Keyboard)", GAME_NOT_WORKING )
 COMP ( 1987, atvga,    ibm5170, 0,       atvga,     atvga,	at_vga,     "<generic>",  "PC/AT (VGA, MF2 Keyboard)" , GAME_NOT_WORKING )
 COMP ( 1988, at386,    ibm5170, 0,       at386,     atvga,	at386,      "<generic>",  "PC/AT 386 (VGA, MF2 Keyboard)", GAME_NOT_WORKING )
