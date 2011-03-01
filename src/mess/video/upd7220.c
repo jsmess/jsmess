@@ -19,13 +19,14 @@
         - FIGS
         - FIGD
         - GCHRD
-        - RDAT, needs a delayed FIFO (seen in A5105 when it scrolls up)
+        - RDAT, needs a larger FIFO (seen in A5105 when it scrolls up)
         - DMAR
         - DMAW
     - read-modify-write cycle
         - read data
         - modify data
         - write data
+	- QX-10 diagnostic test crashes when it attempts to draw lines;
 
     - honor visible area
     - wide mode (32-bit access)
@@ -664,14 +665,16 @@ static void draw_pixel(upd7220_t *upd7220,int x,int y,UINT16 tile_data)
 static void draw_line(upd7220_t *upd7220,int x,int y)
 {
 	int line_size,i;
-	const int line_x_dir[8] = { 0, 1, 1, 1, 0,-1,-1,-1};
-	const int line_y_dir[8] = { 1, 1, 0,-1,-1,-1, 0, 1};
+	const int line_x_dir[8] = { 0, 1, 1, 0, 0,-1,-1, 0};
+	const int line_y_dir[8] = { 1, 0, 0,-1,-1, 0, 0, 1};
 	const int line_x_step[8] = { 1, 0, 0, 1,-1, 0, 0,-1 };
 	const int line_y_step[8] = { 0, 1,-1, 0, 0,-1, 1, 0 };
 	UINT16 line_pattern;
 	int line_step = 0;
+	UINT8 dot;
 
 	line_size = upd7220->figs.dc + 1;
+	/* TODO: line pattern is unchecked */
 	line_pattern = (upd7220->ra[8]) | (upd7220->ra[9]<<8);
 
 	//printf("%d %d %08x %04x %d %04x\n",x,y,line_size,line_pattern,upd7220->figs.dir,upd7220->pitch);
@@ -682,7 +685,8 @@ static void draw_line(upd7220_t *upd7220,int x,int y)
 		line_step/= upd7220->figs.dc;
 		line_step++;
 		line_step >>= 1;
-		draw_pixel(upd7220,x + line_step*line_x_step[upd7220->figs.dir],y + line_step*line_y_step[upd7220->figs.dir],1 << ((x + line_step*line_x_step[upd7220->figs.dir]) & 0xf));
+		dot = (line_pattern >> ((15-i+upd7220->dad) & 0xf)) & 1;
+		draw_pixel(upd7220,x + (line_step*line_x_step[upd7220->figs.dir]),y + (line_step*line_y_step[upd7220->figs.dir]),dot << ((x + line_step*line_x_step[upd7220->figs.dir]) & 0xf));
 		x += line_x_dir[upd7220->figs.dir];
 		y += line_y_dir[upd7220->figs.dir];
 	}
