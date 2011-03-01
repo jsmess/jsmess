@@ -931,7 +931,7 @@ static ADDRESS_MAP_START(abc_z80_mem, ADDRESS_SPACE_PROGRAM, 8, fidelz80_state)
     AM_RANGE(0x0000, 0x1fff) AM_ROM // 8k rom
 	AM_RANGE(0x2000, 0x3fff) AM_ROM // 8k rom
 	AM_RANGE(0x4000, 0x5fff) AM_ROM // 8k rom
-	AM_RANGE(0x6000, 0x67ff) AM_RAM AM_MIRROR(0x1c00) // 1k ram (2114*2) mirrored 8 times
+	AM_RANGE(0x6000, 0x63ff) AM_RAM AM_MIRROR(0x1c00) // 1k ram (2114*2) mirrored 8 times
 	AM_RANGE(0xE000, 0xE000) AM_WRITE(abc_speech_w) AM_MIRROR(0x1FFF) // write to speech chip, halts cpu
 ADDRESS_MAP_END
 
