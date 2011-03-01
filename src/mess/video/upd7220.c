@@ -687,8 +687,7 @@ static void draw_line(upd7220_t *upd7220,int x,int y)
 	for(i = 0;i<line_size;i++)
 	{
 		line_step = (upd7220->figs.d1 * i);
-		line_step/= upd7220->figs.dc;
-		line_step++;
+		line_step/= (upd7220->figs.dc + 1);
 		line_step >>= 1;
 		dot = (line_pattern >> ((15-i+upd7220->dad) & 0xf)) & 1;
 		draw_pixel(upd7220,x + (line_step*line_x_step[upd7220->figs.dir]),y + (line_step*line_y_step[upd7220->figs.dir]),dot << ((x + line_step*line_x_step[upd7220->figs.dir]) & 0xf));
