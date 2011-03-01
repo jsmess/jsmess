@@ -10,7 +10,7 @@
 
     TODO:
 
-	- Unable to allocate bank for RAM/ROM area 46000-467FF (run out of banks)
+	- get supervisor bit from M68008
 	
 	- memory access controller
 		- task register
@@ -55,18 +55,23 @@
 #define PAGE_DATA(_segment, _page) \
 	m_page_ram[PAGE_ADDRESS(_segment, _page)]
 
-#define PAGE_SIZE	0x800
-
 #define PAGE_WP		0x4000
 #define PAGE_NONX	0x8000
 
 
 // DMA
-#define A0 BIT(addr, 0)
-#define A7 BIT(addr, 7)
-#define A2_A1_A0 (addr & 0x07)
-#define A1_A2 ((BIT(addr, 1) << 1) | BIT(addr, 2))
-#define A2_A1 ((addr >> 1) & 0x03)
+#define BOOTE		BIT(m_task, 6)
+#define A0			BIT(offset, 0)
+#define A1			BIT(offset, 1)
+#define A2			BIT(offset, 2)
+#define A7			BIT(offset, 7)
+#define A8			BIT(offset, 8)
+#define A17			BIT(offset, 17)
+#define A18			BIT(offset, 18)
+#define A19			BIT(offset, 19)
+#define A2_A1_A0	(offset & 0x07)
+#define A1_A2		((A1 << 1) | A2)
+#define A2_A1		((offset >> 1) & 0x03)
 
 
 // DMA map
@@ -87,86 +92,364 @@ enum
 //**************************************************************************
 
 //-------------------------------------------------
-//  install_memory_page -
+//  read_ram -
 //-------------------------------------------------
 
-void abc1600_state::install_memory_page(int segment, int page)
+UINT8 abc1600_state::read_ram(offs_t offset)
 {
-	address_space *program = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);
+	UINT8 data = 0;
 
-	UINT16 page_data = PAGE_DATA(segment, page);
-
-	offs_t virtual_address = (page_data & 0x3ff) << 11;
-	bool wp = ((page_data & PAGE_WP) == 0);
-	bool nonx = ((page_data & PAGE_NONX) == PAGE_NONX);
-
-	offs_t start = (segment * 0x8000) + (page * 0x800);
-	offs_t end = start + PAGE_SIZE - 1;
-
-	logerror("MAC physical %06x: virtual %06x %s %s\n", start, virtual_address, wp ? "WP":"", nonx ? "NONX":"");
-
-	if (nonx)
+	if (offset < 0x100000)
 	{
-		// TODO read/write should raise Bus Error
-		memory_unmap_readwrite(program, start, end, 0, 0);
+		// main RAM
+		UINT8 *ram = ram_get_ptr(m_ram);
+		data = ram[offset];
+	}
+	else if (offset < 0x180000)
+	{
+		// video RAM
+		data = m_video_ram[offset - 0x100000];
 	}
 	else
 	{
-		if (virtual_address < 0x100000)
-		{
-			// main RAM
-			UINT8 *ram = ram_get_ptr(m_ram);
-			offs_t offset = virtual_address;
-		
-			if (wp)
-				memory_install_rom(program, start, end, 0, 0, ram + offset);
-			else
-				memory_install_ram(program, start, end, 0, 0, ram + offset);
-		}
-		else if (virtual_address < 0x180000)
-		{
-			// video RAM
-			offs_t offset = virtual_address - 0x100000;
+		logerror("Unmapped read from virtual memory %06x\n", offset);
+	}
 
-			if (wp)
-				memory_install_rom(program, start, end, 0, 0, m_video_ram + offset);
+	return data;
+}
+
+
+//-------------------------------------------------
+//  write_ram -
+//-------------------------------------------------
+
+void abc1600_state::write_ram(offs_t offset, UINT8 data)
+{
+	if (offset < 0x100000)
+	{
+		UINT8 *ram = ram_get_ptr(m_ram);
+		ram[offset] = data;
+	}
+	else if (offset < 0x180000)
+	{
+		m_video_ram[offset - 0x100000] = data;
+	}
+	else
+	{
+		logerror("Unmapped write to virtual memory %06x : %02x\n", offset, data);
+	}
+}
+
+
+//-------------------------------------------------
+//  read_io -
+//-------------------------------------------------
+
+UINT8 abc1600_state::read_io(offs_t offset)
+{
+	address_space *program = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);
+	UINT8 data = 0;
+	
+	if (offset >= 0x1ff000 && offset < 0x1ff100)
+	{
+		data = wd17xx_r(m_fdc, A2_A1);
+	}
+	else if (offset >= 0x1ff100 && offset < 0x1ff200)
+	{
+		if (A0) data = mc6845_register_r(m_crtc, 0);
+	}
+	else if (offset >= 0x1ff200 && offset < 0x1ff300)
+	{
+		data = z80dart_ba_cd_r(m_dart, A2_A1);
+	}
+	else if (offset >= 0x1ff300 && offset < 0x1ff400)
+	{
+		data = m_dma0->read();
+	}
+	else if (offset >= 0x1ff400 && offset < 0x1ff500)
+	{
+		data = m_dma1->read();
+	}
+	else if (offset >= 0x1ff500 && offset < 0x1ff600)
+	{
+		data = m_dma2->read();
+	}
+	else if (offset >= 0x1ff600 && offset < 0x1ff700)
+	{
+		data = scc8530_r(m_scc, A1_A2);
+	}
+	else if (offset >= 0x1ff700 && offset < 0x1ff800)
+	{
+		data = m_cio->read(*program, A2_A1);
+	}
+	else if (offset >= 0x1ff800 && offset < 0x1ff900)
+	{
+		data = iord0_r(*program, offset);
+	}
+	else
+	{
+		logerror("Unmapped read from virtual memory %06x\n", offset);
+	}
+
+	return data;
+}
+
+
+//-------------------------------------------------
+//  write_io -
+//-------------------------------------------------
+
+void abc1600_state::write_io(offs_t offset, UINT8 data)
+{
+	address_space *program = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);
+
+	if (offset >= 0x1ff000 && offset < 0x1ff100)
+	{
+		wd17xx_w(m_fdc, A2_A1, data);
+	}
+	else if (offset >= 0x1ff100 && offset < 0x1ff200)
+	{
+		if (A0)
+			mc6845_register_w(m_crtc, 0, data);
+		else
+			mc6845_address_w(m_crtc, 0, data);
+	}
+	else if (offset >= 0x1ff200 && offset < 0x1ff300)
+	{
+		z80dart_ba_cd_w(m_dart, A2_A1, data);
+	}
+	else if (offset >= 0x1ff300 && offset < 0x1ff400)
+	{
+		m_dma0->write(data);
+	}
+	else if (offset >= 0x1ff400 && offset < 0x1ff500)
+	{
+		m_dma1->write(data);
+	}
+	else if (offset >= 0x1ff500 && offset < 0x1ff600)
+	{
+		m_dma2->write(data);
+	}
+	else if (offset >= 0x1ff600 && offset < 0x1ff700)
+	{
+		scc8530_w(m_scc, A1_A2, data);
+	}
+	else if (offset >= 0x1ff700 && offset < 0x1ff800)
+	{
+		m_cio->write(*program, A2_A1, data);
+	}
+	else if (offset >= 0x1ff800 && offset < 0x1ff900)
+	{
+		iowr0_w(*program, A2_A1_A0, data);
+	}
+	else if (offset >= 0x1ff900 && offset < 0x1ffa00)
+	{
+		iowr1_w(*program, A2_A1_A0, data);
+	}
+	else if (offset >= 0x1ffa00 && offset < 0x1ffb00)
+	{
+		iowr2_w(*program, A2_A1_A0, data);
+	}
+	else if (offset >= 0x1ffb00 && offset < 0x1ffc00)
+	{
+		if (!A7)
+		{
+			if (A0)
+				fw1_w(*program, 0, data);
 			else
-				memory_install_ram(program, start, end, 0, 0, m_video_ram + offset);
+				fw0_w(*program, 0, data);
 		}
-		else if (virtual_address >= 0x1ff000 && virtual_address < 0x1ff800)
+	}
+	else if (offset >= 0x1ffd00 && offset < 0x1ffe00)
+	{
+		dmamap_w(*program, A2_A1_A0, data);
+	}
+	else if (offset >= 0x1ffe00 && offset < 0x1fff00)
+	{
+		en_spec_contr_reg_w(*program, 0, data);
+	}
+	else
+	{
+		logerror("Unmapped write to virtual memory %06x : %02x\n", offset, data);
+	}
+}
+
+
+//-------------------------------------------------
+//  read_user_memory -
+//-------------------------------------------------
+
+UINT8 abc1600_state::read_user_memory(offs_t offset)
+{
+	int segment = (offset >> 15) & 0x1f;
+	int page = (offset >> 11) & 0x0f;
+	UINT16 page_data = PAGE_DATA(segment, page);
+
+	offs_t virtual_offset = (page_data & 0x3ff) << 11;
+	//bool nonx = ((page_data & PAGE_NONX) == PAGE_NONX);
+
+	//if (nonx) Bus Error
+
+	UINT8 data = 0;
+
+	if (offset < 0x180000)
+	{
+		data = read_ram(virtual_offset);
+	}
+	else
+	{
+		data = read_io(virtual_offset);
+	}
+
+	return data;
+}
+
+
+//-------------------------------------------------
+//  write_user_memory -
+//-------------------------------------------------
+
+void abc1600_state::write_user_memory(offs_t offset, UINT8 data)
+{
+	int segment = (offset >> 15) & 0x1f;
+	int page = (offset >> 11) & 0x0f;
+	UINT16 page_data = PAGE_DATA(segment, page);
+
+	offs_t virtual_offset = (page_data & 0x3ff) << 11;
+	bool wp = ((page_data & PAGE_WP) == 0);
+	//bool nonx = ((page_data & PAGE_NONX) == PAGE_NONX);
+
+	if (wp) return;
+	//if (nonx) BUS ERROR
+
+	if (virtual_offset < 0x180000)
+	{
+		write_ram(virtual_offset, data);
+	}
+	else
+	{
+		write_io(virtual_offset, data);
+	}
+}
+
+
+//-------------------------------------------------
+//  read_supervisor_memory -
+//-------------------------------------------------
+
+UINT8 abc1600_state::read_supervisor_memory(offs_t offset)
+{
+	address_space *program = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);
+	UINT8 data = 0;
+
+	if (!A19)
+	{
+		if (!A18 & !A17 & !BOOTE)
 		{
-			// TODO I/O
-			memory_unmap_readwrite(program, start, end, 0, 0);
-		}
-		else if (virtual_address >= 0x1ff800 && virtual_address < 0x200000)
-		{
-			// TODO I/O
-			memory_unmap_readwrite(program, start, end, 0, 0);
+			// _BOOTCE
+			UINT8 *rom = machine->region(MC68008P8_TAG)->base();
+			data = rom[offset & 0x3fff];
 		}
 		else
 		{
-			// unmapped
-			memory_unmap_readwrite(program, start, end, 0, 0);
+			data = read_user_memory(offset);
+		}
+	}
+	else
+	{
+		if (!A2 & !A1)
+		{
+			// _EP
+			data = page_r(*program, offset);
+		}
+		else if (!A2 & A1 & A0)
+		{
+			// _ES
+			data = segment_r(*program, offset);
+		}
+		else if (A2 & A1 & A0)
+		{
+			// _CAUSE
+			data = cause_r(*program, offset);
+		}
+	}
+
+	return data;
+}
+
+
+//-------------------------------------------------
+//  write_supervisor_memory -
+//-------------------------------------------------
+
+void abc1600_state::write_supervisor_memory(offs_t offset, UINT8 data)
+{
+	address_space *program = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);
+
+	if (!A19)
+	{
+		write_user_memory(offset, data);
+	}
+	else
+	{
+		if (!A2 & !A1)
+		{
+			// _WEP
+			page_w(*program, offset, data);
+		}
+		else if (!A2 & A1 & A0)
+		{
+			// _WES
+			segment_w(*program, offset, data);
+		}
+		else if (A2 & A1 & A0)
+		{
+			// W(C)
+			task_w(*program, offset, data);
 		}
 	}
 }
 
 
 //-------------------------------------------------
-//  bankswitch -
+//  mac_r -
 //-------------------------------------------------
 
-void abc1600_state::bankswitch()
+READ8_MEMBER( abc1600_state::mac_r )
 {
-/*
-	for (int segment = 0; segment < 32; segment++)
+	bool supervisor = true;
+
+	UINT8 data = 0;
+
+	if (supervisor)
 	{
-		for (int page = 0; page < 16; page++)
-		{
-			install_memory_page(segment, page);
-		}
+		data = read_supervisor_memory(offset);
 	}
-*/
+	else
+	{
+		data = read_user_memory(offset);
+	}
+
+	return data;
+}
+
+
+//-------------------------------------------------
+//  mac_w -
+//-------------------------------------------------
+
+WRITE8_MEMBER( abc1600_state::mac_w )
+{
+	bool supervisor = true;
+
+	if (supervisor)
+	{
+		write_supervisor_memory(offset, data);
+	}
+	else
+	{
+		write_user_memory(offset, data);
+	}
 }
 
 
@@ -216,11 +499,7 @@ WRITE8_MEMBER( abc1600_state::task_w )
 	
 	*/
 
-	if (m_task != data)
-	{
-		m_task = data;
-		bankswitch();
-	}
+	m_task = data;
 }
 
 
@@ -245,7 +524,7 @@ READ8_MEMBER( abc1600_state::segment_r )
 	
 	*/
 
-	int segment = (offset >> 15) & 0x1f;
+	int segment = (A8 << 4) | ((offset >> 15) & 0x0f);
 	UINT8 data = SEGMENT_DATA(segment);
 
 	return (m_task & 0x80) | (data & 0x7f);
@@ -273,16 +552,10 @@ WRITE8_MEMBER( abc1600_state::segment_w )
 	
 	*/
 
-	int segment = (offset >> 15) & 0x1f;
+	int segment = (A8 << 4) | ((offset >> 15) & 0x0f);
 	SEGMENT_DATA(segment) = data & 0x7f;
 	
 	logerror("Task %u Segment %u : %02x\n", m_task & 0x0f, segment, data);
-/*
-	for (int page = 0; page < 16; page++)
-	{
-		install_memory_page(segment, page);
-	}
-*/
 }
 
 
@@ -316,13 +589,11 @@ READ8_MEMBER( abc1600_state::page_r )
 	
 	*/
 
-	int segment = (offset >> 15) & 0x1f;
+	int segment = (A8 << 4) | ((offset >> 15) & 0x0f);
 	int page = (offset >> 11) & 0x0f;
 	UINT16 data = PAGE_DATA(segment, page);
 
-	int a0 = BIT(offset, 0);
-
-	return a0 ? (data & 0xff) : (data >> 8);
+	return A0 ? (data & 0xff) : (data >> 8);
 }
 
 
@@ -356,11 +627,10 @@ WRITE8_MEMBER( abc1600_state::page_w )
 	
 	*/
 
-	int segment = (offset >> 15) & 0x1f;
+	int segment = (A8 << 4) | ((offset >> 15) & 0x0f);
 	int page = (offset >> 11) & 0x0f;
-	int a0 = BIT(offset, 0);
 
-	if (a0)
+	if (A0)
 	{
 		PAGE_DATA(segment, page) = (PAGE_DATA(segment, page) & 0xff00) | data;
 	}
@@ -370,8 +640,6 @@ WRITE8_MEMBER( abc1600_state::page_w )
 	}
 
 	logerror("Task %u Segment %u Page %u : %04x\n", m_task & 0x0f, segment, page, PAGE_DATA(segment, page));
-
-	install_memory_page(segment, page);
 }
 
 
@@ -399,20 +667,9 @@ inline offs_t abc1600_state::get_dma_address(int index, UINT16 offset)
 
 inline UINT8 abc1600_state::dma_mreq_r(int index, UINT16 offset)
 {
-	offs_t addr = get_dma_address(index, offset);
-	UINT8 data = 0;
-	
-	if (addr < 0x100000)
-	{
-		UINT8 *ram = ram_get_ptr(m_ram);
-		data = ram[addr];
-	}
-	else if (addr <= 0x180000)
-	{
-		data = m_video_ram[addr - 0x100000];
-	}
-	
-	return data;
+	offs_t virtual_offset = get_dma_address(index, offset);
+
+	return read_ram(virtual_offset);
 }
 
 
@@ -422,17 +679,9 @@ inline UINT8 abc1600_state::dma_mreq_r(int index, UINT16 offset)
 
 inline void abc1600_state::dma_mreq_w(int index, UINT16 offset, UINT8 data)
 {
-	offs_t addr = get_dma_address(index, offset);
-	
-	if (addr < 0x100000)
-	{
-		UINT8 *ram = ram_get_ptr(m_ram);
-		ram[addr] = data;
-	}
-	else if (addr < 0x180000)
-	{
-		m_video_ram[addr - 0x100000] = data;
-	}
+	offs_t virtual_offset = get_dma_address(index, offset);
+
+	write_ram(virtual_offset, data);
 }
 
 
@@ -442,48 +691,9 @@ inline void abc1600_state::dma_mreq_w(int index, UINT16 offset, UINT8 data)
 
 inline UINT8 abc1600_state::dma_iorq_r(int index, UINT16 offset)
 {
-	address_space *space = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);
-	offs_t addr = get_dma_address(index, offset);
-	UINT8 data = 0;
-	
-	if (addr >= 0x1ff000 && addr < 0x1ff100)
-	{
-		data = wd17xx_r(m_fdc, A2_A1);
-	}
-	else if (addr >= 0x1ff100 && addr < 0x1ff200)
-	{
-		if (A0) data = mc6845_register_r(m_crtc, 0);
-	}
-	else if (addr >= 0x1ff200 && addr < 0x1ff300)
-	{
-		data = z80dart_ba_cd_r(m_dart, A2_A1);
-	}
-	else if (addr >= 0x1ff300 && addr < 0x1ff400)
-	{
-		data = m_dma0->read();
-	}
-	else if (addr >= 0x1ff400 && addr < 0x1ff500)
-	{
-		data = m_dma1->read();
-	}
-	else if (addr >= 0x1ff500 && addr < 0x1ff600)
-	{
-		data = m_dma2->read();
-	}
-	else if (addr >= 0x1ff600 && addr < 0x1ff700)
-	{
-		data = scc8530_r(m_scc, A1_A2);
-	}
-	else if (addr >= 0x1ff700 && addr < 0x1ff800)
-	{
-		data = m_cio->read(*space, A2_A1);
-	}
-	else if (addr >= 0x1ff800 && addr < 0x1ff900)
-	{
-		data = iord0_r(*space, offset);
-	}
+	offs_t virtual_offset = get_dma_address(index, offset);
 
-	return 0;
+	return read_io(virtual_offset);
 }
 
 
@@ -493,74 +703,9 @@ inline UINT8 abc1600_state::dma_iorq_r(int index, UINT16 offset)
 
 inline void abc1600_state::dma_iorq_w(int index, UINT16 offset, UINT8 data)
 {
-	address_space *space = cpu_get_address_space(m_maincpu, ADDRESS_SPACE_PROGRAM);
-	offs_t addr = get_dma_address(index, offset);
+	offs_t virtual_offset = get_dma_address(index, offset);
 
-	if (addr >= 0x1ff000 && addr < 0x1ff100)
-	{
-		wd17xx_w(m_fdc, A2_A1, data);
-	}
-	else if (addr >= 0x1ff100 && addr < 0x1ff200)
-	{
-		if (A0)
-			mc6845_register_w(m_crtc, 0, data);
-		else
-			mc6845_address_w(m_crtc, 0, data);
-	}
-	else if (addr >= 0x1ff200 && addr < 0x1ff300)
-	{
-		z80dart_ba_cd_w(m_dart, A2_A1, data);
-	}
-	else if (addr >= 0x1ff300 && addr < 0x1ff400)
-	{
-		m_dma0->write(data);
-	}
-	else if (addr >= 0x1ff400 && addr < 0x1ff500)
-	{
-		m_dma1->write(data);
-	}
-	else if (addr >= 0x1ff500 && addr < 0x1ff600)
-	{
-		m_dma2->write(data);
-	}
-	else if (addr >= 0x1ff600 && addr < 0x1ff700)
-	{
-		scc8530_w(m_scc, A1_A2, data);
-	}
-	else if (addr >= 0x1ff700 && addr < 0x1ff800)
-	{
-		m_cio->write(*space, A2_A1, data);
-	}
-	else if (addr >= 0x1ff800 && addr < 0x1ff900)
-	{
-		iowr0_w(*space, A2_A1_A0, data);
-	}
-	else if (addr >= 0x1ff900 && addr < 0x1ffa00)
-	{
-		iowr1_w(*space, A2_A1_A0, data);
-	}
-	else if (addr >= 0x1ffa00 && addr < 0x1ffb00)
-	{
-		iowr2_w(*space, A2_A1_A0, data);
-	}
-	else if (addr >= 0x1ffb00 && addr < 0x1ffc00)
-	{
-		if (!A7)
-		{
-			if (A0)
-				fw1_w(*space, 0, data);
-			else
-				fw0_w(*space, 0, data);
-		}
-	}
-	else if (addr >= 0x1ffd00 && addr < 0x1ffe00)
-	{
-		dmamap_w(*space, A2_A1_A0, data);
-	}
-	else if (addr >= 0x1ffe00 && addr < 0x1fff00)
-	{
-		en_spec_contr_reg_w(*space, 0, data);
-	}
+	write_io(virtual_offset, data);
 }
 
 
@@ -705,17 +850,14 @@ WRITE8_MEMBER( abc1600_state::en_spec_contr_reg_w )
 //-------------------------------------------------
 
 static ADDRESS_MAP_START( abc1600_mem, ADDRESS_SPACE_PROGRAM, 8, abc1600_state )
-	AM_RANGE(0x00000, 0x03fff) AM_ROM AM_REGION(MC68008P8_TAG, 0)
-	AM_RANGE(0x80000, 0x80001) AM_MIRROR(0x7f800) AM_MASK(0x7f801) AM_READWRITE(page_r, page_w)
-	AM_RANGE(0x80002, 0x80002) AM_MIRROR(0x7f800) AM_NOP
-	AM_RANGE(0x80003, 0x80003) AM_MIRROR(0x7f800) AM_MASK(0x7f800) AM_READWRITE(segment_r, segment_w)
-	AM_RANGE(0x80007, 0x80007) AM_READWRITE(cause_r, task_w)
+	AM_RANGE(0x00000, 0xfffff) AM_READWRITE(mac_r, mac_w)
 ADDRESS_MAP_END
 
 /*
 
 	Supervisor Data map
 
+	AM_RANGE(0x00000, 0x03fff) AM_ROM AM_REGION(MC68008P8_TAG, 0)
 	AM_RANGE(0x80000, 0x80001) AM_MIRROR(0x7f800) AM_MASK(0x7f801) AM_READWRITE(page_r, page_w)
 	AM_RANGE(0x80002, 0x80002) AM_MIRROR(0x7f800) AM_NOP
 	AM_RANGE(0x80003, 0x80003) AM_MIRROR(0x7f800) AM_MASK(0x7f800) AM_READWRITE(segment_r, segment_w)
@@ -1095,7 +1237,6 @@ void abc1600_state::machine_start()
 void abc1600_state::machine_reset()
 {
 	m_task = 0;
-	bankswitch();
 }
 
 

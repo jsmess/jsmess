@@ -87,6 +87,8 @@ public:
 	virtual void video_start();
 	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 	
+	DECLARE_READ8_MEMBER( mac_r );
+	DECLARE_WRITE8_MEMBER( mac_w );
 	DECLARE_READ8_MEMBER( cause_r );
 	DECLARE_WRITE8_MEMBER( task_w );
 	DECLARE_READ8_MEMBER( segment_r );
@@ -124,8 +126,14 @@ public:
 	DECLARE_READ8_MEMBER( cio_pc_r );
 	DECLARE_WRITE8_MEMBER( cio_pc_w );
 
-	void install_memory_page(int segment, int page);
-	void bankswitch();
+	UINT8 read_ram(offs_t offset);
+	void write_ram(offs_t offset, UINT8 data);
+	UINT8 read_io(offs_t offset);
+	void write_io(offs_t offset, UINT8 data);
+	UINT8 read_user_memory(offs_t offset);
+	void write_user_memory(offs_t offset, UINT8 data);
+	UINT8 read_supervisor_memory(offs_t offset);
+	void write_supervisor_memory(offs_t offset, UINT8 data);
 	inline offs_t get_dma_address(int index, UINT16 offset);
 	inline UINT8 dma_mreq_r(int index, UINT16 offset);
 	inline void dma_mreq_w(int index, UINT16 offset, UINT8 data);
